@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.9 2000/11/02 04:14:31 tausq Exp $ */
+/* $Id: udpkg.c,v 1.10 2000/11/02 07:02:54 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -307,7 +307,8 @@ static int dpkg_install(struct package_t *pkgs)
 		}
 	}
 	
-	status_merge(status, pkgs);
+	if (ordered != 0)
+		status_merge(status, pkgs);
 	SYSTEM("rm -rf -- " DPKGCIDIR);
 	return 0;
 }
