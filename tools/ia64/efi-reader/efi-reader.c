@@ -4,7 +4,7 @@
  * Copyright (C) 2003, Alastair McKinstry <mckinstry@debian.org>
  * Released under the GNU Public License; see file COPYING for details
  *
- * $Id: efi-reader.c,v 1.4 2003/10/04 09:43:02 mckinstry Exp $
+ * $Id: efi-reader.c,v 1.5 2003/11/07 00:34:24 rhirst Exp $
  */
 
 #include <sys/types.h>
@@ -20,8 +20,10 @@
 /* snarfed from linux kernel efivars.c
  */
 typedef u_int16_t efi_char16_t;
+#if 0
 typedef u_int8_t __u8;
 typedef u_int32_t __u32;
+#endif
 typedef struct { __u8 b[16]; } efi_guid_t;
 typedef unsigned long efi_status_t;
 
@@ -72,7 +74,7 @@ int get_efi_lang_code (char *lang_code)
 char *two_code (char *three_code)
 {
 	int t = 0;
-	while (trans_table[t].threecode != '\0' ) {
+	while (trans_table[t].threecode[0] != '\0' ) {
 		if (strcmp (three_code, trans_table[t].threecode) == 0) 
 			return trans_table[t].twocode;
 		t++;
@@ -93,7 +95,7 @@ int main (int argc, char *argv[])
 	client = debconfclient_new ();
 	if (get_efi_lang_code(lang_code)) 
 		exit (1);
-	debian_set (client, "debian-installer/language", two_code (lang_code));
+	debconf_set (client, "debian-installer/language", two_code (lang_code));
 	exit (0);
 }  
 
