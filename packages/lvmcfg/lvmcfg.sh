@@ -718,8 +718,8 @@ done
 
 # install lvm-tools in /target if needed
 #set -- `vgdisplay -v | grep 'NOT active' | wc -l`
-#[ $1 -gt 0 ] && apt-install lvm10
-[ -e /proc/lvm/VGs ] && set -- `ls /proc/lvm/VGs/ | wc -l` && [ $1 -gt 0 ] && apt-install lvm10
+#[ $1 -gt 0 ] && apt-install lvm2
+[ -e /proc/lvm/VGs ] && set -- `ls /proc/lvm/VGs/ | wc -l` && [ $1 -gt 0 ] && apt-install lvm2
 
 exit 0
 
