@@ -25,6 +25,10 @@ ifeq ($(ARCH),i386)
 CFLAGS += -DAT_KBD  -DUSB_KBD 
 OBJS   += at-kbd.o usb-kbd.o
 endif
+ifeq ($(ARCH),ia64)
+CFLAGS += -DAT_KBD  -DUSB_KBD 
+OBJS   += at-kbd.o usb-kbd.o
+endif
 ifeq ($(ARCH),sparc)
 CFLAGS += -DSPARC -DUSB_KBD 
 OBJS   += sparc-kbd.o usb-kbd.o
