@@ -1115,12 +1115,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
 	        devpath = mountmap[partcount].devpath;
 
-                /*
-                 * Zero out old LVM headers if present.  Is 100 KiB a good
-                 * value?
-                 */
-                zero_dev(devpath, 100 * 1024);
-
 		/* We must commit before calling lvm_init_dev() to
 		   make sure the device file is available when we need
 		   it. */
@@ -1186,6 +1180,13 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
         lvm_pv_stack_pop(lvm_pv_stack, &vgname, &devpath);
 	autopartkit_log(1, "  Init LVM pv name %s, devpath=%s\n",
 			vgname, devpath);
+
+        /*
+         * Zero out old LVM headers if present.  Is 100 KiB a good
+         * value?
+         */
+        zero_dev(devpath, 100 * 1024);
+
         if ( 0 == lvm_init_dev(devpath) )
         {
             autopartkit_log(1, "  lvm_init_dev(%s) successful.\n", devpath);
