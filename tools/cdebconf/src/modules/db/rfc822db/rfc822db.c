@@ -82,7 +82,10 @@ static void parse_variables(struct question *q, char *string)
 
 static void parse_owners(struct question *q, char *string)
 {
-    char *wc = strdup(string);
+    char *wc, *owc;
+    
+    owc = wc = strdup(string);
+
     while (wc != NULL)
     {
         char *delim = wc;
@@ -102,7 +105,8 @@ static void parse_owners(struct question *q, char *string)
         }
         
     }
-    free(wc);
+
+    free(owc);
 }
 
 static int parse_flags(char *string)
