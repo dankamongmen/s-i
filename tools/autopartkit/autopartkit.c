@@ -953,7 +953,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     spaceinfo = get_free_space_list();
     if ( ! spaceinfo )
         /* fatal error */
-        autopartkit_error (1,"  error: Unable to find any free space\n");
+        autopartkit_error (1,"  Unable to find any free space\n");
 
     autopartkit_log(1, "Found free space, distributing partitions.\n");
     ret = distribute_partitions(spaceinfo, requirements);
@@ -1041,8 +1041,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		ret = ped_disk_add_partition(disk_maybe, ext_part, any);
 		if ( 0 == ret)
 		    /* fatal error */
-		    autopartkit_error (1, "  error: ped_disk_add_partition "
-				       "failed\n");
+		    autopartkit_error (1, "  ped_disk_add_partition failed\n");
 
 		ped_disk_maximize_partition(disk_maybe, ext_part, any);
 	    }
@@ -1096,8 +1095,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	    else
 	    {
 	        /* fatal error */
-	        autopartkit_error (1,
-				   "  error: ped_disk_add_partition failed\n");
+	        autopartkit_error (1,"  ped_disk_add_partition failed\n");
 	    }
 		
 	    ped_constraint_destroy(any);
