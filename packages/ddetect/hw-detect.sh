@@ -188,6 +188,14 @@ get_ide_floppy_info() {
 # The order of these modules are important.
 get_manual_hw_info() {
 	get_floppy_info
+        # Chances are, if you are using a Sparc32, you have one of these babies.
+        # Discover doesn't know about SBUS now so let's at least make the
+        # situation better for now.
+        case "$SUBARCH" in
+          sparc/sparc32)
+            echo "sunhme:Sun Happy Meal 10/100 Ethernet driver"
+          ;;
+        esac
 	# ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
 	echo "ide-mod:Linux IDE driver"
 	echo "ide-probe-mod:Linux IDE probe driver"
