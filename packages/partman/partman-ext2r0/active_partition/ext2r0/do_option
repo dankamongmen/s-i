@@ -20,7 +20,6 @@ do_mountpoint () {
 	else
 	    old_mountpoint=/boot
 	fi
-	db_fset partman-ext2r0/mountpoint seen false
 	db_set partman-ext2r0/mountpoint "$old_mountpoint"
 	db_input critical partman-ext2r0/mountpoint || $noninteractive
 	db_go || return 1
@@ -53,7 +52,6 @@ do_mountpoint_manual () {
 	    else
 		old_mountpoint=/
 	    fi
-	    db_fset partman-ext2r0/mountpoint_manual seen false
 	    db_set partman-ext2r0/mountpoint_manual "$old_mountpoint"
 	    db_input critical partman-ext2r0/mountpoint_manual || $noninteractive
 	    db_go || return 1
@@ -62,7 +60,6 @@ do_mountpoint_manual () {
 	    if expr "$RET" : '/[^ ]*' >/dev/null; then
 		new_mountpoint=$RET
 	    else
-		db_fset partman-ext2r0/bad_mountpoint seen false
 		db_input high partman-ext2r0/bad_mountpoint || true
 		db_go || true
 	    fi
@@ -88,7 +85,6 @@ case $1 in
 	else
 	    label=''
 	fi
-	db_reset partman-basicfilesystems/choose_label
 	db_set partman-basicfilesystems/choose_label "$label"
 	db_input critical partman-basicfilesystems/choose_label || true
 	db_go || exit 1
@@ -98,6 +94,7 @@ case $1 in
 	else
 	    [ ! -f $part/label ] || rm $part/label
 	fi
+	db_reset partman-basicfilesystems/choose_label
 	;;
 esac
 

@@ -37,7 +37,6 @@ fi
 
 # We need an old ext2 (revision 0) filesystem to boot
 if [ "$boot_fs" != "ext2r0" ]; then
-	db_fset partman-ext2r0/boot_not_ext2r0 seen false
 	db_set partman-ext2r0/boot_not_ext2r0 'true'
 	db_input critical partman-ext2r0/boot_not_ext2r0 || true
 	db_go || true
@@ -50,7 +49,6 @@ fi
 # The boot file system has to be the first primary partition
 part_num=$(echo "$boot_path" | sed -e 's/.*[^0-9]\+//')
 if [ "$boot_type" != "primary" -o "$part_num" -ne 1 ]; then
-	db_fset partman-ext2r0/boot_not_first_partition seen false
 	db_set partman-ext2r0/boot_not_first_partition 'true'
 	db_input critical partman-ext2r0/boot_not_first_partition || true
 	db_go || true
@@ -63,7 +61,6 @@ fi
 # The root partition has to be primary
 # FIXME: This should probably move to colo-installer
 if [ "$root_path" != "$boot_path" -a "$root_type" != "primary" ]; then
-	db_fset partman-ext2r0/root_not_primary seen false
 	db_set partman-ext2r0/root_not_primary 'true'
 	db_input critical partman-ext2r0/root_not_primary || true
 	db_go || true
