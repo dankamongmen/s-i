@@ -29,7 +29,8 @@ print_trans () {
 awk -v TFILE1="$TEMPLATE_TMP" -v TFILE2="$TEMPLATE_NEW" \
     -v TEMPLATE="$TEMPLATE_NAME" -f template_extract.awk \
     $TEMPLATE_BASE
-    echo "" >>$TEMPLATE_NEW
+
+cp $TEMPLATE_BASE $TEMPLATE_NEW
 
 # Get the English versions of the template items
 EN_CHOICES=$(awk -v ITEM="Choices:" -f template_get_item.awk \
