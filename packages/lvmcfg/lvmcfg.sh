@@ -85,7 +85,7 @@ getfree_vg() {
 #
 getsize_vg() {
 	cmdout=`vgdisplay "$1" 2>&1`
-	echo "$cmdout" | grep '^[ ]*VG Size' | sed -e 's/^VG Size \+//'
+	echo "$cmdout" | grep '^[ ]*VG Size' | sed -e 's/^[ ]*VG Size \+//'
 }
 
 #
