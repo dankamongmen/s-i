@@ -1100,7 +1100,7 @@ static sym iso_8859_9_syms[] = { /* latin-5 */
 	{ 0x00da, "" },
 	{ 0x00db, "" },
 	{ 0x00dc, "" },
-	{ 0x0130, "Idotabove" },
+	{ 0x0130, "Iabovedot" },
 	{ 0x015e, "Scedilla" },
 	{ 0x00df, "" },
 	{ 0x00e0, "" },
@@ -1132,7 +1132,7 @@ static sym iso_8859_9_syms[] = { /* latin-5 */
 	{ 0x00fa, "" },
 	{ 0x00fb, "" },
 	{ 0x00fc, "" },
-	{ 0x0131, "dotlessi" },
+	{ 0x0131, "idotless" },
 	{ 0x015f, "scedilla" },
 	{ 0x00ff, "" }
 };
@@ -1607,7 +1607,10 @@ synonyms[] = {
 	{ "cyrillic_small_letter_yeri", "cyrillic_small_letter_yeru" },
 	{ "cyrillic_small_letter_reversed_e", "cyrillic_small_letter_e" },
 	{ "cyrillic_small_letter_ii", "cyrillic_small_letter_i" },
-	{ "cyrillic_small_letter_short_ii", "cyrillic_small_letter_short_i" }
+	{ "cyrillic_small_letter_short_ii", "cyrillic_small_letter_short_i" },
+/* Turkish */
+	{ "Idotabove",          "Iabovedot" },
+	{ "dotlessi",           "idotless" }
 };
 
 const int syms_size = sizeof(syms) / sizeof(syms_entry);
@@ -1618,6 +1621,7 @@ struct cs {
     sym *charnames;
     int start;
 } charsets[] = {
+    { "", NULL, 256 },
     { "iso-8859-1",	latin1_syms, 160 },
     { "iso-8859-2",	latin2_syms, 160 },
 #ifdef CHARSET_ISO_8859_3
@@ -1666,8 +1670,11 @@ int set_charset(const char *charset) {
 		return 0;
 	}
 
-	for (i = 0; i < sizeof(charsets)/sizeof(charsets[0]); i++) {
+	for (i = 1; i < sizeof(charsets)/sizeof(charsets[0]); i++) {
 		if (!strcasecmp(charsets[i].charset, charset)) {
+			charsets[0].charset = charsets[i].charset;
+			charsets[0].charnames = charsets[i].charnames;
+			charsets[0].start = charsets[i].start;
 			p = charsets[i].charnames;
 			for (i = charsets[i].start; i < 256; i++,p++) {
 				if(p->name[0])
