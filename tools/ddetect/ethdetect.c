@@ -41,26 +41,26 @@ static char *debconf_input(char *priority, char *template)
 }
 
 
-static int ethdetect_insmod(char *modulename)
-{
-        char buffer[128];
-        char *params = NULL;
-        params = debconf_input("low", "ethdetect/module_params");
-        snprintf(buffer, sizeof(buffer), "modprobe -v %s %s", modulename,
-                 (params ? params : " "));
-
-        if (di_execlog(buffer) != 0) {
-                client->command(client, "input", "critical", "ethdetect/error",
-                                NULL);
-                client->command(client, "go", NULL);
-                return 1;
-        } else {
-                di_prebaseconfig_append("ethdetect",
-                                        "echo \"%s %s\" >> /etc/modules",
-                                        modulename,
-                                        (params ? params : " "));
-                return 0;
-        }
+static int ethdetect_insmod(char *modulename) {
+     char buffer[128];
+     char *params = NULL;
+    
+     params = debconf_input("low", "ethdetect/module_params");
+     snprintf(buffer, sizeof(buffer), "modprobe -v %s %s", modulename,
+              (params ? params : " "));
+     
+     if (di_execlog(buffer) != 0) {
+          client->command(client, "input", "critical", "ethdetect/error",
+                          NULL);
+          client->command(client, "go", NULL);
+          return 1;
+     } else {
+          di_prebaseconfig_append("ethdetect",
+                                  "echo \"%s %s\" >> /etc/modules",
+                                  modulename,
+                                  (params ? params : " "));
+          return 0;
+     }
 }
 
 
@@ -104,6 +104,18 @@ static struct ethernet_info *ethdetect_detect(struct cards_lst *lst)
 
 #define ETHDETECT_PCI_LIST "/usr/share/ddetect/ethpci.lst"
 
+int module_loaded(char *module) {
+     static char *modules[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+     int i;
+     for (i = 0; modules[i] != NULL && i < sizeof(modules); i++) {
+          if (strcmp(modules[i], module) == 0)
+               return 1;
+     }
+     fprintf(stderr, "checking %d\n", i);
+     modules[i] = strdup(module);
+     return 0;
+}
+
 int main(int argc, char *argv[])
 {
         char *ptr = NULL;
@@ -128,6 +140,9 @@ int main(int argc, char *argv[])
         } else {
                 ethernet = ethdetect_detect(lst);
                 for (; ethernet; ethernet = ethernet->next) {
+                     if (module_loaded(ethernet->module))
+                          continue;
+                     
                         client->command(client, "subst",
                                         "ethdetect/load_module", "bus",
                                         bus2str(ethernet->bus), NULL);
