@@ -81,6 +81,14 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 69,	0,	"sd",		ENTRY_TYPE_DISC,	80,	4 },
     { 70,	0,	"sd",		ENTRY_TYPE_DISC,	96,	4 },
     { 71,	0,	"sd",		ENTRY_TYPE_DISC,	112,	4 },
+    { 72,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY,	0,	3 },
+    { 73,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY,	1,	3 },
+    { 74,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY,	2,	3 },
+    { 75,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY,	3,	3 },
+    { 76,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY,	4,	3 },
+    { 77,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY,	5,	3 },
+    { 78,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY,	6,	3 },
+    { 79,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY,	7,	3 },
     { 88,	0,	"hd",		ENTRY_TYPE_DISC,	12,	6 },
     { 89,	0,	"hd",		ENTRY_TYPE_DISC,	14,	6 },
     { 90,	0,	"hd",		ENTRY_TYPE_DISC,	16,	6 },
@@ -88,6 +96,13 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 94,	0,	"dasd",		ENTRY_TYPE_DISC,	0,	2 },
     { 104,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	0,	4 },
     { 105,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	1,	4 },
+    { 106,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	2,	4 },
+    { 107,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	3,	4 },
+    { 108,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	4,	4 },
+    { 109,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	5,	4 },
+    { 110,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	6,	4 },
+    { 111,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	7,	4 },
+    { 114,	0,	"ataraid",	ENTRY_TYPE_DISC_ARRAY,	0,	4 },
     { 0,	0,	NULL,		ENTRY_TYPE_ONE,		0,	0 },
   };
 
@@ -115,9 +130,12 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     e++;
   }
   if (!e->name)
+#ifdef TEST
+    fprintf(stderr, "(unknown device)\n");
+#endif
     /* Pass unknown devices on without changes. */
     return snprintf (buf, n, "%s", path);
-
+  
   strcat (buf, "/dev/");
 
   switch (e->type)
@@ -170,5 +188,22 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
   return ret;
 }
 
+#ifndef TEST
 ssize_t di_mapdevfs (const char *path, char *buf, size_t n) __attribute__ ((alias("di_system_devfs_map_from")));
-
+#else
+/* Build standalone binary with -DTEST */
+main (int argc, char **argv) {
+  static char ret[256];
+  if (argc != 2) {
+    fprintf(stderr, "wrong number of args\n");
+    exit(1);
+  }
+  di_system_devfs_map_from(argv[1], ret, sizeof(ret));
+  printf("%s => %s", argv[1], ret);
+  if (strcmp(argv[1], ret) == 0) {
+    printf("\t\t(SAME)");
+  }
+  printf("\n");
+  exit(0);
+}
+#endif
