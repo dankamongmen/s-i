@@ -13,8 +13,8 @@ if [ -d /usr/lib/locale/C.UTF-8 ] ; then
     LANG=C.UTF-8
     export LANG
     if [ linux = "$TERM" ] ; then # We are using a Linux console.
-        echo -n "\033%G" # Enable UTF-8 console ("<ESC>%@" will turn it off).
-        # Workaround for strange border lines in UTF-8 mode
+        echo -n "\033%G" # Enable UTF-8 console
+        # Workaround for strange border lines in UTF-8 mode (bug #187704)
         TERM=xterm
         export TERM
     fi
@@ -39,3 +39,5 @@ if [ -z "$DEBIAN_FRONTEND" ] ; then
 fi
 
 /sbin/di-main-menu
+
+echo -n "\033%@" # Disable UTF-8 console
