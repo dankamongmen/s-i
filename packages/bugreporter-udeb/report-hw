@@ -9,8 +9,8 @@ else
 fi
 
 LSPCI=/sbin/lspci
-if [ -x /target/sbin/lspci ] ; then
-	LSPCI=/target/sbin/lspci
+if [ -x /target/bin/lspci ] ; then
+	LSPCI=/target/bin/lspci
 fi
 
 if [ -x $LSPCI ] ; then
@@ -24,6 +24,7 @@ if [ -x $LSPCI ] ; then
 else
 	echo "error: $0: Unable to find lspci."
 	cat /proc/pci | sed "s%^%info: $0: /proc/pci: %"
+	cat /proc/bus/pci/devices | sed "s%^%info: $0: /proc/bus/pci/devices: %"
 fi
 
 if [ -x /sbin/lsmod ] ; then
@@ -57,3 +58,5 @@ fi
 #    disk="/dev/$part"
 #    /sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
 #done
+
+df | sed "s%^%info: $0: df: %"
