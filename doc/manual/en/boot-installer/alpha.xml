@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: alpha.xml,v 1.1 2003/10/22 14:43:55 toff Exp $ -->
+<!-- $Id: alpha.xml,v 1.2 2003/10/24 01:03:02 toff Exp $ -->
 
  <sect2 arch="alpha" id="alpha-firmware">
  <title>Alpha Console Firmware</title>
@@ -65,7 +65,7 @@ only boot from ARC.
 </para><para>
 
 The following table summarizes available and supported system
-type/console combinations (see <xref linkend="supported-cpus"></xref> for the
+type/console combinations (see <xref linkend="supported-cpus"/> for the
 system type names).  The word `ARC' below denotes any of the
 ARC-compliant consoles.
 
@@ -182,7 +182,7 @@ the only way to bootstrap Linux from the ARC console.
 is needed for each system type) and exist only for those systems, for
 which ARC support is shown in the table above.  See also the
 (unfortunately outdated) 
-<ulink url="&url-milo-howto;"> name="MILO HOWTO"</ulink>.
+<ulink url="&url-milo-howto;">MILO HOWTO</ulink>.
 
 </para><para>
 
@@ -227,7 +227,8 @@ products contain both SRM and AlphaBIOS in their firmware.  For
 "half-flash" machines such as the various evaluation boards, it is
 possible to switch from one version to another by reflashing the
 firmware.  Also, once SRM is installed, it is possible to run
-ARC/AlphaBIOS from a floppy disk (using the `arc' command).  For the
+ARC/AlphaBIOS from a floppy disk (using the <command>arc</command>
+command).  For the
 reasons mentioned above, we recommend switching to SRM before
 installing &debian;.
 
@@ -236,7 +237,7 @@ installing &debian;.
 As on other architectures, you should install the newest available
 revision of the firmware <footnote>Except on Jensen, where Linux is
 not supported on firmware versions newer than 1.7 - see <ulink
-url="&url-jensen-howto;"></ulink>> for more information</footnote> before
+url="&url-jensen-howto;"></ulink> for more information</footnote> before
 installing &debian;.  For Alpha, firmware updates can be obtained from
 <ulink url="&url-alpha-firmware;">Alpha Firmware Updates</ulink>.
 
@@ -280,11 +281,11 @@ You can get a listing of valid modes with <userinput>>>>set ewa0_mode</userinput
 Then, to boot from the first Ethernet interface, you would type:
 <informalexample><screen>
 
->>>boot ewa0
+>>> boot ewa0
 
 </screen></informalexample>
 
-<para>
+</para><para>
 
 If you wish to use a serial console, you <emphasis>must</emphasis> pass the
 <userinput>console=</userinput> parameter to the kernel.  This can be done using the
@@ -294,7 +295,7 @@ ports are named the same as their corresponding files in
 console on the first serial port, you would type:
 <informalexample><screen>
 
->>>boot ewa0 -flags console=ttyS0
+>>> boot ewa0 -flags console=ttyS0
 
 </screen></informalexample>
 
@@ -315,12 +316,13 @@ where <replaceable>xxxx</replaceable> is your CD-ROM drive in SRM notation.
 </para>
   </sect2>
 
-  <sect2><title>Booting from CD-ROM with the ARC or AlphaBIOS Console</title>
+  <sect2 arch="alpha">
+  <title>Booting from CD-ROM with the ARC or AlphaBIOS Console</title>
 
 <para>
 
 To boot a CD-ROM from the ARC console, find your sub-architecture code
-name (see <xref linkend="supported-cpus"></xref>), then enter
+name (see <xref linkend="supported-cpus"/>), then enter
 <filename>\milo\linload.exe</filename> as the boot loader and
 <filename>\milo\<replaceable>subarch</replaceable></filename> (where
 <replaceable>subarch</replaceable> is the proper subarchitecture name)
@@ -332,19 +334,20 @@ boot loader.
   </sect2>
 
 
-  <sect2><title>Booting from Floppies with the SRM Console</title>
+  <sect2 arch="alpha">
+  <title>Booting from Floppies with the SRM Console</title>
 <para>
 
-At the SRM prompt (<command>&gt;&gt;&gt;</command>), issue the following
+At the SRM prompt (<prompt>&gt;&gt;&gt;</prompt>), issue the following
 command:
-        <informalexample><screen>
+<informalexample><screen>
 
 &gt;&gt;&gt; boot dva0 -flags 0
         
 </screen></informalexample>
 possibly replacing <filename>dva0</filename> with the actual device
 name.  Usually, <filename>dva0</filename> is the floppy; type
-        <informalexample><screen>
+<informalexample><screen>
 
 &gt;&gt;&gt; show dev
         
@@ -353,15 +356,15 @@ to see the list of devices (e.g., if you want to boot from a CD).
 Note that if you are booting via MILO, <command>-flags</command> argument
 is ignored, so you can just type <command>boot dva0</command>.
 
-<para>
+</para><para>
 
 If everything works OK, you will eventually see the Linux kernel boot.
 
-<para>
+</para><para>
 
 If you want to specify kernel parameters when booting via
 <command>aboot</command>, use the following command:
-        <informalexample><screen>
+<informalexample><screen>
 
 &gt;&gt;&gt; boot dva0 -file linux.bin.gz -flags "root=/dev/fd0 load_ramdisk=1 arguments"
         
@@ -371,13 +374,17 @@ device name for <filename>dva0</filename>, the Linux boot device name for
 <filename>fd0</filename>, and the desired kernel parameters for
 <filename>arguments</filename>.
 
-<para>
+</para><para>
 
 If you want to specify kernel parameters when booting via
 <command>MILO</command>, you will have to interrupt bootstrap once you get
-into MILO.  See <xref linkend="booting-from-milo"></xref>.
+into MILO.  See <xref linkend="booting-from-milo"/>.
+</para>
+  </sect2>
 
-  <sect2><title>Booting from floppies with the ARC or AlphaBIOS Console</title>
+
+  <sect2 arch="alpha">
+  <title>Booting from floppies with the ARC or AlphaBIOS Console</title>
 
 <para>
 
@@ -385,7 +392,11 @@ In the OS Selection menu, set <command>linload.exe</command> as the boot
 loader, and <command>milo</command> as the OS Path.  Bootstrap using the
 newly created entry.
 
-  <sect2><title>Booting from floppies with the APB boot loader (UP1000)</title>
+</para>
+  </sect2>
+
+  <sect2 arch="alpha">
+  <title>Booting from floppies with the APB boot loader (UP1000)</title>
 
 <para>
 

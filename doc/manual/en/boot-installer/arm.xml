@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: arm.xml,v 1.1 2003/10/22 14:43:55 toff Exp $ -->
+<!-- $Id: arm.xml,v 1.2 2003/10/24 01:03:02 toff Exp $ -->
 
 
   <sect2 arch="arm"><title>Booting from TFTP on NetWinder</title>
@@ -8,19 +8,33 @@
 
 NetWinders have two network interfaces: The 10Mbps NE2000-compatible
 card is <filename>eth0</filename> and the 100Mbps Tulip card is
-<filename>eth1</filename>. 
+<filename>eth1</filename>.
 
-<para>
+</para><note>
 
-NOTE: You need NeTTrom 2.2.1 or later to boot the
+You need NeTTrom 2.2.1 or later to boot the
 installation system. NeTTrom 2.3.3 is recommended: get these files
 from 
-<ulink url="ftp://ftp.netwinder.org/pub/netwinder/firmware/">>:
-<itemizedlist> |<file/nettrom-2.3-3.armv4l.rpm/
-|<file/nettrom-2.3.3.bin/ |<file/nettrom-2.3.3.bin.md5sum/
+<ulink url="ftp://ftp.netwinder.org/pub/netwinder/firmware/"></ulink>:
+<itemizedlist>
+<listitem><para>
+
+<filename>nettrom-2.3-3.armv4l.rpm</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>nettrom-2.3.3.bin</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>nettrom-2.3.3.bin.md5sum</filename>
+
+</para></listitem>
 </itemizedlist>
 
-<para>
+</note><para>
 
 After rebooting and interrupting the boot process during the countdown, you 
 must first configure the network either with a static address:
@@ -36,9 +50,10 @@ where 24 is the number of set bits in the netmask, or a dynamic address:
 
 </screen></informalexample>
 
-<para>
+</para><para>
 
-You may also need to configure the <userinput>route1</userinput> settings if the TFTP
+You may also need to configure the <userinput>route1</userinput>
+settings if the TFTP
 server is not on the local subnet.  The rest of the config is pretty 
 standard (the save-all step is optional):
 <informalexample><screen>
@@ -51,13 +66,14 @@ standard (the save-all step is optional):
 
 </screen></informalexample>
 
-<para>
+</para><para>
 
 Only the last two of these interfere with normal disk booting, so it is 
-safe to "save-all" right before it, which will store the network settings 
-in case you need to boot from the network again. Use the "printenv" 
-command to review your environment settings. Finally, if your 
-"cmdappend" NeTTrom variable has the "noinitrd" option (which is 
+safe to <command>save-all</command> right before it, which will
+store the network settings in case you need to boot from the network
+again. Use the <command>printenv</command> command to review your
+environment settings. Finally, if your <envar>cmdappend</envar>
+NeTTrom variable has the <option>noinitrd</option> option (which is  
 necessary to boot 2.4 kernels), you must remove it so the downloaded 
 kernel can boot with its attached ramdisk.
 
@@ -68,7 +84,8 @@ kernel can boot with its attached ramdisk.
 
 <para>
 
-On CATS machines, use <command>boot de0:</command> or similar at the Cyclone prompt.
+On CATS machines, use <command>boot de0:</command> or similar at the
+Cyclone prompt.
 
 </para>
   </sect2>
