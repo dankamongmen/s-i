@@ -132,9 +132,9 @@ if grep -q sysfs /proc/filesystems ; then
   fi
 fi
 
+errcode=0
 chroot /target /usr/sbin/elilo --autoconf --boot $bootpart \
-      --root $rootfs --efiboot
-errcode=$?
+      --root $rootfs --efiboot || errcode=$?
 
 ## umount sysfs if we mounted it above
 if [ $sysmount -eq 1 ]; then
