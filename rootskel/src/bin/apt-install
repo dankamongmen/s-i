@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+. /usr/share/debconf/confmodule
+
 if [ ! -f /target/etc/apt/sources.list ] ; then
     # Only queue the package, it will be installed by base-installer
     # postinst.
@@ -10,6 +12,16 @@ if [ ! -f /target/etc/apt/sources.list ] ; then
     done
     # Return error as the package is not ready to be used yet.
     exit 1
+fi
+
+# Try to enable proxy when using HTTP.  What about using ftp_proxy for
+# FTP sources?  (This code is in both apt-update and apt-install)
+if db_get mirror/protocol && [ "http" = "$RET" ]; then
+    # try to find http proxy
+    if db_get mirror/http/proxy && [ "$RET" ] ; then
+	http_proxy="$RET"
+	export http_proxy
+    fi
 fi
 
 # first copy the files into /target/, then install in chroot

@@ -1,8 +1,20 @@
 #!/bin/sh -e
 
+. /usr/share/debconf/confmodule
+
 if [ ! -f /target/etc/apt/sources.list ] ; then
     echo "apt-update: error: Missing /target/etc/apt/sources.list."
     exit 1
+fi
+
+# Try to enable proxy when using HTTP.  What about using ftp_proxy for
+# FTP sources?  (This code is in both apt-update and apt-install)
+if db_get mirror/protocol && [ "http" = "$RET" ]; then
+    # try to find http proxy
+    if db_get mirror/http/proxy && [ "$RET" ] ; then
+	http_proxy="$RET"
+	export http_proxy
+    fi
 fi
 
 PATH=$PATH:/target/usr/bin:/target/bin:/target/usr/sbin:/target/sbin \
