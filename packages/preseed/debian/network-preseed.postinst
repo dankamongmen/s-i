@@ -1,0 +1,43 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+TMPFILE=/tmp/preseed
+
+error () {
+	ERROR="$1"
+	FILE="$2"
+	db_subst preseed/$ERROR LOCATION "$FILE"
+	db_input critical preseed/$ERROR || true
+	db_go || true
+	exit 1
+}
+
+fetch() {
+	url="$1"
+	file="$2"
+	iters=0
+	while [ $iters -lt 3 ]; do
+		# TODO proxy support? Would it be useful?
+		if wget -q "$url" -O "$file"; then
+			return 0
+		fi
+        	iters=$(($iters + 1))
+	done
+	return 1
+}
+
+db_get preseed/url
+URL="$RET"
+if [ -n "$URL" ]; then
+	if ! fetch $URL $TMPFILE; then
+		error retrieve_error "$URL"
+	fi
+fi
+
+if ! debconf-set-selections "$TMPFILE"; then
+	error load_error "$TMPFILE"
+fi
+
+rm -f $TMPFILE
