@@ -45,7 +45,7 @@ partkit_error (int rv)
 }
 
 char *
-debconf_input (char *priority, char *template)
+my_debconf_input (char *priority, char *template)
 {
   client->command (client, "fset", template, "seen", "false", NULL);
   client->command (client, "input", priority, template, NULL);
@@ -259,7 +259,7 @@ partkit_create (PedDevice * dev)
   client->command (client, "subst", "partkit/create_part_type", "table",
 		   table, NULL);
 
-  ptr = debconf_input ("critical", "partkit/create_part_type");
+  ptr = my_debconf_input ("critical", "partkit/create_part_type");
 
   switch (ptr[0])
     {
@@ -281,7 +281,7 @@ partkit_create (PedDevice * dev)
 
   do
     {
-      ptr = debconf_input ("critical", "partkit/create_start");
+      ptr = my_debconf_input ("critical", "partkit/create_start");
       start = (strtod (ptr, &endptr)) * MEGABYTE_SECTORS;
       if (ptr == endptr)
 	{
@@ -300,7 +300,7 @@ partkit_create (PedDevice * dev)
 		   "table", table, NULL);
   do
     {
-      ptr = debconf_input ("critical", "partkit/create_end");
+      ptr = my_debconf_input ("critical", "partkit/create_end");
       end = (strtod (ptr, &endptr)) * MEGABYTE_SECTORS;
       if (ptr == endptr)
 	{
@@ -319,7 +319,7 @@ partkit_create (PedDevice * dev)
   client->command (client, "subst", "partkit/create_confirm",
 		   "table", table, NULL);
 
-  ptr = debconf_input ("critical", "partkit/create_confirm");
+  ptr = my_debconf_input ("critical", "partkit/create_confirm");
   if (!strstr (ptr, "true"))
     return 1;
 
@@ -370,12 +370,12 @@ partkit_delete (PedDevice * dev)
 		   NULL);
   free (ptr);
 
-  ptr = debconf_input ("critical", "partkit/delete_choice");
+  ptr = my_debconf_input ("critical", "partkit/delete_choice");
 
   client->command (client, "subst", "partkit/delete_confirm",
 		   "partition", ptr, NULL);
 
-  ptr = debconf_input ("critical", "partkit/delete_confirm");
+  ptr = my_debconf_input ("critical", "partkit/delete_confirm");
   if (!strstr (ptr, "true"))
     return 1;
 
@@ -505,7 +505,7 @@ main (int argc, char *argv[])
 		       ptr, NULL);
       free (ptr);
 
-      ptr = debconf_input ("critical", "partkit/choose_operation");
+      ptr = my_debconf_input ("critical", "partkit/choose_operation");
 
       if (strstr (ptr, "delete"))
 	partkit_delete (dev);
