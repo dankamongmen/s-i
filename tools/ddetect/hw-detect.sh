@@ -115,7 +115,7 @@ get_ide_chipset_info() {
     done
 }
 
-# Return list of lines with "Kernel module<tab>Vendor<tab>Model"
+# Return list of lines formatted "module:Description"
 get_all_hw_info() {
     discover_hw
     if [ -d /proc/bus/usb ]; then
@@ -126,7 +126,7 @@ get_all_hw_info() {
    
 # Manually load modules to enable things we can't detect.
 # XXX: This isn't the best way to do this; we should autodetect.
-# The order of these modules are important. [pere 2003-03-16]
+# The order of these modules are important.
 get_manual_hw_info() {
     echo "floppy:Linux Floppy"
     # ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
@@ -156,14 +156,15 @@ MANUAL_HW_INFO=$(get_manual_hw_info)
 ALL_HW_INFO=$(get_all_hw_info)
 db_progress STEP $OTHER_STEPSIZE
 
-# Remove modules that are already loaded, and count how many are left.
+# Remove modules that are already loaded, and construct the list for the
+# question.
 LOADED_MODULES=$(cat /proc/modules | cut -f 1 -d ' ')
-count=0
-# Setting IFS to adjust how the for loop splits the values
+LIST=""
 IFS_SAVE="$IFS"
 IFS="$NEWLINE"
 for device in $ALL_HW_INFO; do
-    	module="`echo $device | cut -d: -f1`"
+	module="`echo $device | cut -d: -f1`"
+	cardname="`echo $device | cut -d: -f2 | sed 's/,/ /g'`"
 	loaded=0
 	for m in $LOADED_MODULES; do
 		if [ "$m" = "$module" ]; then
@@ -172,24 +173,40 @@ for device in $ALL_HW_INFO; do
 		fi
 	done
 	if [ "$loaded" = 0 ]; then
-		count=$(expr $count + 1)
-		HW_INFO="$HW_INFO
-$device"
+		if [ -n "$LIST" ]; then
+			LIST="$LIST, "
+		fi
+		if [ -z "$module" ] ; then module="[Unknown]" ; fi
+		if [ -z "$cardname" ] ; then cardname="[Unknown]" ; fi
+		# If this is changed, be sure to change the loop
+		# that parses it, below!
+		LIST="$LIST$module ($cardname)"
 	fi
 done
 IFS="$IFS_SAVE"
 db_progress STEP $OTHER_STEPSIZE
 
+# Ask which modules to install.
+db_subst hw-detect/select_modules list "$LIST"
+db_set hw-detect/select_modules "$LIST"
+db_input medium hw-detect/select_modules || true
+db_go || exit 10 # back up
+db_get hw-detect/select_modules
+LIST="$RET"
+
+list_to_lines() {
+	echo "$LIST" | sed 's/, /\n/g'
+}
+
 # Work out amount to step per module load. expr rounds down, so 
 # it may not get quite to 100%, but will at least never exceed it.
-MODULE_STEPSIZE=$(expr \( $MAX_STEPS - \( $OTHER_STEPS \* $OTHER_STEPSIZE \) \) / $count)
+MODULE_STEPSIZE=$(expr \( $MAX_STEPS - \( $OTHER_STEPS \* $OTHER_STEPSIZE \) \) / $(list_to_lines | wc -l))
 
 log "Loading modules..."
-IFS_SAVE="$IFS"
 IFS="$NEWLINE"
-for device in $HW_INFO; do
-    module="`echo $device | cut -d: -f1`"
-    cardname="`echo $device | cut -d: -f2`"
+for device in $(list_to_lines); do
+    module="`echo $device | cut -d' ' -f1`"
+    cardname="`echo $device | cut -d'(' -f2 | sed 's/)$//'`"
     # Restore IFS after extracting the fields.
     IFS="$IFS_SAVE"
 
