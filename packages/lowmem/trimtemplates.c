@@ -10,6 +10,9 @@
 #define DEFAULT_TO_REMOVE "Default-"
 #define DESCRIPTION_TO_REMOVE "Description-"
 #define CHOICES_TO_REMOVE "Choices-"
+#define DEFAULT_TO_KEEP "Default-en"
+#define DESCRIPTION_TO_KEEP "Description-en"
+#define CHOICES_TO_KEEP "Choices-en"
 #define FILENAME_LENGTH 256
 
 int trimtemplate(char *filename) {
@@ -46,8 +49,16 @@ int trimtemplate(char *filename) {
 	      || strstr(template_line, CHOICES_TO_REMOVE)
 	      || strstr(template_line, DEFAULT_TO_REMOVE)
 	       ) {
-	       ignore = 1;
-	       continue;
+	       	  if (strstr(template_line, DESCRIPTION_TO_KEEP) 
+	              || strstr(template_line, CHOICES_TO_KEEP)
+	              || strstr(template_line, DEFAULT_TO_KEEP)
+		      ) {
+		         ignore = 0;
+			 continue;
+		  } else {
+		         ignore = 1;
+			 continue;
+		  }
 	  }
 	  if (fputs(template_line, tmpfd) == EOF) {
 	       perror("unable to write to temp file");
