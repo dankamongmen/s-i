@@ -111,7 +111,6 @@ int module_loaded(char *module) {
           if (strcmp(modules[i], module) == 0)
                return 1;
      }
-     fprintf(stderr, "checking %d\n", i);
      modules[i] = strdup(module);
      return 0;
 }
