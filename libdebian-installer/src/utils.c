@@ -17,16 +17,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: utils.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: utils.c,v 1.3 2003/10/03 16:07:53 waldi Exp $
  */
 
 #include <debian-installer/utils.h>
+
+#include <string.h>
 
 static const char *progname;
 
 void di_init (const char *_progname)
 {
-  progname = _progname;
+  progname = strdup (_progname);
 }
 
 const char *di_progname_get (void)

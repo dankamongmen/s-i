@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.5 2003/10/03 13:57:12 waldi Exp $
+ * $Id: log.c,v 1.6 2003/10/03 16:07:53 waldi Exp $
  */
 
 #include <debian-installer/log.h>
@@ -196,6 +196,9 @@ unsigned int di_log_set_handler (di_log_level_flags log_levels, di_log_handler *
 
   return handler_id;
 }
+
+void di_log (di_log_level_flags log_level, const char *format, ...) __attribute__ ((visibility("hidden")));
+void di_log_real_4 (di_log_level_flags log_level, const char *format, ...) __attribute__ ((alias("di_log")));
 
 void di_log (di_log_level_flags log_level, const char *format, ...)
 {
