@@ -1320,7 +1320,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	autopartkit_log(1, "Vg %s - %d to use\n",
 			vg[0].path, vg[0].freespace);
 	autopartkit_log(1, "Reducing...\n");
-        reduce_disk_usage_size(&vg[0], lvm_reqs, 0.66);
+        reduce_disk_usage_size(&vg[0], lvm_reqs, 0.50);
 	autopartkit_log(1, "Vg %s - %d to use\n",
 			vg[0].path, vg[0].freespace);
         /* Call distribute_partitions */
