@@ -167,9 +167,14 @@ fi
 
 db_progress info lilo-installer/progress_lilo_conf
 
-user_params=$(echo $(user-params)) || true
+user_params=$(echo $(user-params | grep -v 'vga=')) || true
 if [ -n "$user_params" ]; then
   APPEND="    append=\"$user_params\""
+fi
+
+VGA=$(user-params | grep 'vga=')
+if [ -z "VGA" ]; then
+	VGA="vga=normal"
 fi
 
 #write out lilo.conf
@@ -279,7 +284,7 @@ delay=20
 # vga=ask
 # vga=9
 #
-vga=normal
+${VGA}
 
 # Kernel command line options that apply to all installed images go
 # here.  See: The \`boot-prompt-HOWTO' and \`kernel-parameters.txt' in
