@@ -37,18 +37,19 @@ The kernel-versions file lists the kernel versions to produce packages for.
 There are 6 whitespace separated fields per line, and it looks something
 like this:
 
-# arch   version  flavour       installedname        multkern  build-depends
-i386     2.4.25-1 386           2.4.25-1-386         n         kernel-image-2.4.25-1-386, kernel-pcmcia-modules-2.4.25-1-386
-i386     2.4.24   speakup       2.4.24-speakup       n         kernel-image-2.4.24-speakup
+# arch   version  flavour       installedname        suffix    build-depends
+i386     2.4.25-1 386           2.4.25-1-386         -         kernel-image-2.4.25-1-386, kernel-pcmcia-modules-2.4.25-1-386
+i386     2.4.24   speakup       2.4.24-speakup       -         kernel-image-2.4.24-speakup
 
 In this case we are building two different flavours of i386 kernels.
 We could just as easily be building kernels for differnet architectures.
 
 The installedname column gives the directory/filename that the kernel and
-modules are installed using in the kernel .deb. The multkern column is
-either y on n; if it is y then the kernel image inside the udeb will include
-the version and flavour in its name. (So will the System.map). The
-build-depends show what kernel deb to use for this kernel.
+modules are installed using in the kernel .deb. The suffix column is
+either y, - or -$suffix; if it is y then the kernel image inside the udeb will
+include the version and flavour in its name, if it is -$suffix then it will
+include this. (So will the System.map). The build-depends show what kernel deb
+to use for this kernel.
 
 Finally, you need a modules/<arch> directory, or directories. These are
 used to list the modules that go in a kernel. For example, for i386, we
