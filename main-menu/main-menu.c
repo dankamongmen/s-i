@@ -68,12 +68,31 @@ int isdefault(di_system_package *p) {
 	}
 }
 
+int provides_installed_virtual_package(di_package *p) {
+	di_slist_node *node1, *node2;
+
+	for (node1 = p->depends.head; node1; node1 = node1->next) {
+		di_package_dependency *d = node1->data;
+
+		if (d->type == di_package_dependency_type_provides)
+			for (node2 = d->ptr->depends.head; node2; node2 = node2->next) {
+				d = node2->data;
+
+				if (d->type == di_package_dependency_type_reverse_provides
+				    && d->ptr->status == di_package_status_installed)
+					return 1;
+			}
+	}
+
+	return 0;
+}
+
 /* Expects a topologically ordered linked list of packages. */
 static di_system_package *
 get_default_menu_item(di_slist *list)
 {
 	di_system_package *p;
-	di_slist_node *node, *node1;
+	di_slist_node *node;
 	int cont;
 
 	/* Traverse the list, return the first menu item that isn't installed */
@@ -87,17 +106,10 @@ get_default_menu_item(di_slist *list)
 		if (!isdefault(p))
 			continue;
 		cont = 0;
-		/* Check if a "parallel" package is installed
-		 * (netcfg-{static,dhcp} and {lilo,grub}-installer are
-		 * examples of parallel packages */
-		for (node1 = p->p.depends.head; node1; node1 = node1->next) {
-			di_package_dependency *d = node1->data;
-			if (d->type == di_package_dependency_type_provides && d->ptr->status == di_package_status_installed) {
-				cont = 1;
-				break;
-			}
-		}
-		if (!cont)
+		/* Do not default to a package that provides a virtual
+		   package that is provided by a package that is
+		   already installed.  */
+		if (!provides_installed_virtual_package(&p->p))
 			return p;
 	}
 	/* Severely broken, there are no menu items in the sorted list */
