@@ -51,10 +51,16 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 
 	lowpri_p = (struct linkedlist_t *)malloc(sizeof(struct linkedlist_t));
 	lowpri_p->head = lowpri_p->tail = NULL;
+
+	/* Resolve the dependency pointers */
+	di_pkg_resolve_deps(packages);
+
         for (node = packages->head; node != NULL; node = next)
-        {
+	{
 		next = node->next;
 		p = (struct package_t *)node->data;
+		if (di_pkg_is_virtual(p))
+			continue;
 		if (is_installed(p, status_p)) {
                         if (prev)
                                 prev->next = next;
@@ -122,7 +128,9 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 			}
 		}
 	}
-	return packages;
+
+	/* Finally, pull in needed dependencies */
+	return di_pkg_toposort_list(packages);
 }
 
 /* Calls udpkg to unpack a package. */
