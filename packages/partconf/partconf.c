@@ -589,7 +589,7 @@ main(int argc, char *argv[])
     };
 
     /* FIXME: How can we tell which file system modules to load?  */
-    char *file_system_modules[] = {"ext3", "reiserfs", "jfs", "xfs", NULL};
+    char *file_system_modules[] = {"ext2", "ext3", "reiserfs", "jfs", "xfs", NULL};
 
     debconf = debconfclient_new();
     debconf_capb(debconf, "backup");
