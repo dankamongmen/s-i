@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.15 2002/05/02 06:29:41 tausq Exp $ */
+/* $Id: udpkg.h,v 1.16 2003/09/27 12:32:49 ley Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -16,6 +16,9 @@
 #define SYSTEM(x) system(x)
 #define DPRINTF(fmt,args...) /* nothing */
 #endif
+
+#define PRINTF(fmt,args...) if (getenv(UDPKG_QUIET) == NULL) printf(fmt, ##args)
+#define FPRINTF(str,fmt,args...) if (getenv(UDPKG_QUIET) == NULL) fprintf(str, fmt, ##args)
 
 #define BUFSIZE		4096
 #define STATUSFILE	ADMINDIR "/status.udeb"

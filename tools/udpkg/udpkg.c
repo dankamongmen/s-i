@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.38 2003/06/26 14:43:16 tfheen Exp $ */
+/* $Id: udpkg.c,v 1.39 2003/09/27 12:32:49 ley Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -115,7 +115,7 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	if ((pkg->status & STATUS_STATUSINSTALLED) != 0 &&
         !force_configure)
     {
-        printf("Package %s is already installed and configured\n",
+        PRINTF("Package %s is already installed and configured\n",
                 pkg->package);
         return 1;
     }
@@ -128,7 +128,7 @@ static int dpkg_doconfigure(struct package_t *pkg)
 		snprintf(buf, sizeof(buf), "exec %s configure", config);
 		if ((r = do_system(buf)) != 0)
 		{
-			fprintf(stderr, "config exited with status %d\n", r);
+			FPRINTF(stderr, "config exited with status %d\n", r);
 			pkg->status |= STATUS_STATUSHALFCONFIGURED;
 			return 1;
 		}
@@ -140,10 +140,10 @@ static int dpkg_doconfigure(struct package_t *pkg)
 		snprintf(buf, sizeof(buf), "exec %s configure", postinst);
 		if ((r = do_system(buf)) != 0)
 		{
-			fprintf(stderr, "%s's postinst exited with status %d\n",
-				pkg->package, r);
+			FPRINTF(stderr, "%s's postinst exited with status %d\n",
+				pkg->package, WEXITSTATUS(r));
 			pkg->status |= STATUS_STATUSHALFCONFIGURED;
-			return 1;
+			return WEXITSTATUS(r);
 		}
 	}
 
@@ -186,7 +186,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 
 			if (ret < 0)
 			{
-				fprintf(stderr, "Cannot copy %s to %s: %s\n", 
+				FPRINTF(stderr, "Cannot copy %s to %s: %s\n", 
 					buf, buf2, strerror(errno));
 				r = 1;
 				break;
@@ -224,7 +224,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 		if ((infp = popen(buf, "r")) == NULL ||
 		    (outfp = fopen(buf2, "w")) == NULL)
 		{
-			fprintf(stderr, "Cannot create %s\n",
+			FPRINTF(stderr, "Cannot create %s\n",
 				buf2);
 			r = 1;
 		}
@@ -341,7 +341,7 @@ static int dpkg_configure(struct package_t *pkgs)
 		found = tfind(pkg, &status, package_compare);
 		if (found == 0)
 		{
-			fprintf(stderr, "Trying to configure %s, but it is not installed\n", pkg->package);
+			FPRINTF(stderr, "Trying to configure %s, but it is not installed\n", pkg->package);
 			r = 1;
 		}
 		else
@@ -413,7 +413,7 @@ static int dpkg_fields(struct package_t *pkg)
 
 	if (pkg == NULL)
 	{
-		fprintf(stderr, "udpkg: The -f flag requires an argument.\n");
+		FPRINTF(stderr, "udpkg: The -f flag requires an argument.\n");
 		return 1;
 	}
 	asprintf(&command, "ar -p %s control.tar.gz|tar -xzOf - ./control", pkg->file);
@@ -433,7 +433,7 @@ static int dpkg_remove(struct package_t *pkgs)
 	status_merge(status, 0);
 	return 0;
 #else
-	fprintf(stderr, "udpkg: No support for -r.\n");
+	FPRINTF(stderr, "udpkg: No support for -r.\n");
 	return 1;
 #endif
 }
@@ -497,6 +497,6 @@ int main(int argc, char **argv)
 
 	/* if it falls through to here, some of the command line options were
 	   wrong */
-	fprintf(stderr, "udpkg [--force-configure] <-i|-r|--unpack|--configure|--print-architecture|-f> my.deb\n");
+	FPRINTF(stderr, "udpkg [--force-configure] <-i|-r|--unpack|--configure|--print-architecture|-f> my.deb\n");
 	return 0;
 }
