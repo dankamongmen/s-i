@@ -1,10 +1,11 @@
-MAJOR=0
-MINOR=1
+MAJOR=1
+MINOR=0
 MICRO=0
 LIB=libdebian-installer.so
+LIBNAME_A=libdebian-installer.a
 LIBNAME=$(LIB).$(MAJOR).$(MINOR).$(MICRO)
-SONAME=$(LIB).$(MAJOR).$(MINOR)
-LIBS=$(LIB) $(SONAME) $(LIBNAME)
+SONAME=$(LIB).$(MAJOR)
+LIBS=$(LIB) $(SONAME) $(LIBNAME) $(LIBNAME_A)
 
 
 OBJS=di_prebaseconfig_append.o di_execlog.o di_log.o di_check_dir.o di_snprintfcat.o
@@ -42,6 +43,10 @@ $(LIBNAME): debian-installer.c
 	$(CC) -shared -Wl,-soname,$(SONAME) -o $@ $^ $(DEFS) $(CFLAGS)
 	size $@ 
 
+$(LIBNAME_A): debian-installer.c
+	$(CC) -c -Wall -Os -o debian-installer.o $^ $(DEFS)
+	$(AR) cr $@ debian-installer.o
+
 $(SONAME) $(LIB): $(LIBNAME)
 	@ln -sf $^ $@
 
@@ -49,6 +54,7 @@ install:
 	install -d  ${libdir}
 	install -d  ${incdir}
 	install -m 755 $(LIBNAME) ${libdir}
+	install -m 755 $(LIBNAME_A) ${libdir}
 	ln -s $(LIBNAME) ${libdir}/$(SONAME)
 	ln -s $(LIBNAME) ${libdir}/$(LIB)
 	install -m 755 $(PIC_LIB) ${libdir}
