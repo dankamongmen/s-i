@@ -2,9 +2,14 @@
 
 . /usr/share/debconf/confmodule
 
+ARCH=`udpkg --print-architecture`
 MOUNTPOINT="/target"
 
-TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
+if [ "$ARCH" = "i386" ]; then
+    TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
+elif [ "$ARCH" = "s390" -o "$ARCH" = "s390x" ]; then
+    TMP=`for i in /dev/dasd/*/disc; do fdasd -p $i | grep "Linux native" | cut -d\  -f 2; done`
+fi
 
 for P in $TMP; do
     if [ "$PARTS" ]; then

@@ -1,12 +1,17 @@
-#! /bin/sh -ex
+#! /bin/sh -e
 
 . /usr/share/debconf/confmodule
 
+ARCH=`udpkg --print-architecture`
 DIRS=
 
-for d in /dev/ide /dev/scsi; do
-    [ -d "$d" ] && DIRS="$DIRS $d"
-done
+if [ "$ARCH" = "s390" -o "$ARCH" = "s390x" ]; then
+    DIRS=/dev/dasd
+else
+    for d in /dev/ide /dev/scsi; do
+        [ -d "$d" ] && DIRS="$DIRS $d"
+    done
+fi
 
 TMP=`find $DIRS -name disc`
 for D in $TMP; do
@@ -16,23 +21,25 @@ for D in $TMP; do
         DISCS="$D"
     fi
 done
-DISCS=`echo "$DISCS" | sed 's/, $//'`
 
 db_subst di-utils-partitioner/disc DISCS $DISCS
 
+db_fset di-utils-partitioner/disc seen false
 db_input critical di-utils-partitioner/disc
 db_go
 
-FDISK=fdisk
+if [ "$ARCH" = "i386" ]; then
+    FDISK=fdisk
 
-if [ "$DEBIAN_FRONTEND" = "slang" ]; then
-    type -p cfdisk > /dev/null && FDISK=cfdisk
-elif [ "$DEBIAN_FRONTEND" = "text" ]; then
-    type -p fdisk > /dev/null && FDISK=fdisk
+    if [ "$DEBIAN_FRONTEND" = "slang" ]; then
+        type -p cfdisk > /dev/null && FDISK=cfdisk
+    elif [ "$DEBIAN_FRONTEND" = "text" ]; then
+        type -p fdisk > /dev/null && FDISK=fdisk
+    fi
+elif [ "$ARCH" = "s390" -o "$ARCH" = "s390x" ]; then
+    FDISK=fdasd
 fi
 
 db_get di-utils-partitioner/disc
 
-if [ `udpkg --print-architecture` = "i386" ]; then
-    $FDISK $RET < /dev/console >/dev//console 2>/dev/console
-fi
+$FDISK $RET < /dev/console >/dev//console 2>/dev/console
