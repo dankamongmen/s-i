@@ -1,21 +1,30 @@
 #! /bin/sh -e
 
+log() {
+    logger -t prebaseconfig "$@"
+}
+
 # Use this instead of /target/bin/run-parts because one of the
 # parts will unmount /target/
 run_parts() {
     partsdir="$1"
+    tmpfile=/tmp/prebaseconfig.stderr.log
     for script in "$partsdir"/*; do
         if [ -x "$script" ] ; then
-            echo "prebaseconfig: info: Running $script" 1>&2
-            if "$script" ; then
+            log "info: Running $script"
+            if "$script" 2> $tmpfile ; then
 		:
 	    else
-		echo "prebaseconfig: warning: $script returned error code $?" 1>&2
+		log "warning: $script returned error code $?"
 	    fi
+	    if [ -s "$tmpfile" ] ; then
+		logger -t prebaseconfig < "$tmpfile"
+	    fi
+	    rm -f "$tmpfile"
         else
-            echo "prebaseconfig: error: Unable to execute $script" 1>&2
+            log "error: Unable to execute $script"
         fi
     done
 }
 
-run_parts /usr/lib/prebaseconfig.d 2>> /var/log/messages
+run_parts /usr/lib/prebaseconfig.d
