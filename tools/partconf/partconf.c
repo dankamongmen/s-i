@@ -440,7 +440,7 @@ streqcomma(const char *s1, const char *s2)
         s1++;
         s2++;
     }
-    return *s1 == *s2;
+    return *s1 == *s2 || *s2 == ' ';
 }
 
 static int
@@ -624,6 +624,7 @@ int
 main(int argc, char **argv)
 {
     assert(!streqcomma("foo", "foobar"));
+    assert(streqcomma("foo", "foo bar"));
     return 0;
 }
 #endif
