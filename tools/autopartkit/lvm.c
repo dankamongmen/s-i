@@ -38,7 +38,7 @@ typedef enum {
 
 static const char *VGSCAN = "/sbin/vgscan";
 
-BOOLEAN
+static BOOLEAN
 lvm_isinstalled(void)
 {
     struct stat statbuf;
