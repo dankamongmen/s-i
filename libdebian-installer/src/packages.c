@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.11 2003/12/11 19:29:50 waldi Exp $
+ * $Id: packages.c,v 1.12 2004/01/06 02:01:34 kraai Exp $
  */
 
 #include <config.h>
@@ -205,7 +205,8 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
 
           if (d->type == di_package_dependency_type_reverse_provides)
           {
-            if (!best_provide || best_provide->priority < d->ptr->priority)
+            if (!best_provide || best_provide->priority < d->ptr->priority
+		|| d->ptr->status == di_package_status_installed)
               best_provide = d->ptr;
           }
         }
