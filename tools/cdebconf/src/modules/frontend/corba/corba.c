@@ -1,3 +1,9 @@
+/*
+ * cdebconf frontend, corba client
+ *
+ * $Id: corba.c,v 1.2 2001/02/22 02:31:03 zw Exp $
+ */
+
 #include "common.h"
 #include "template.h"
 #include "question.h"
@@ -17,8 +23,6 @@
 #include <sys/types.h>
 
 #include "dcf.h"
-
-#define UIDATA(f) ((struct uidata *)(f)->data)
 
 #define EXCEPTION(ev) 								\
   if ((ev)->_major != CORBA_NO_EXCEPTION) { 					\
@@ -40,6 +44,7 @@
     } 										\
   }
 
+#define UIDATA(f) ((struct uidata *)(f)->data)
 
 /* Private variables */
 struct uidata {
@@ -111,10 +116,11 @@ static int corba_text(struct frontend *f, struct question *q) {
   struct uidata *uid = UIDATA(f);
   CORBA_Environment *ev = uid->ev;
 
-  CORBA_boolean ans = Debconf_Frontend_Text(*uid->serv, "yes/no", ev);
+  CORBA_char *ans = Debconf_Frontend_Text(*uid->serv, "Enter some text: ", ev);
   EXCEPTION(ev);
 
-  question_setvalue(q, (ans ? "true" : "false"));
+  question_setvalue(q, (char *) ans);
+  CORBA_free(ans);
   return DC_OK;
 }
 
@@ -135,8 +141,14 @@ struct question_handlers {
 
 int corba_initialize(struct frontend *f, struct configuration *conf)
 {
-  struct uidata *uid;
-  CORBA_ORB orb;
+  struct uidata 	  *uid;
+  CORBA_ORB 		  orb;
+  CORBA_Environment 	  *ev;
+  CORBA_Object 		  *serv;
+  CosNaming_NamingContext root;
+  CosNaming_NameComponent name_component[2] = {{"Debconf", "subcontext"},
+					       {"Frontend", "server"}};
+  CosNaming_Name	  name = {2, 2, name_component, CORBA_FALSE};
   gchar *dummy_argv[2];
   gint dummy_argc;
 
@@ -148,30 +160,45 @@ int corba_initialize(struct frontend *f, struct configuration *conf)
   if (! uid)
     return DC_NOTOK;
   memset(uid, 0, sizeof(struct uidata));
-  uid->ev = (CORBA_Environment *) malloc(sizeof(CORBA_Environment));
+  ev = uid->ev = (CORBA_Environment *) malloc(sizeof(CORBA_Environment));
   if (! uid->ev)
     return DC_NOTOK;
-  uid->serv = (CORBA_Object *) malloc(sizeof(CORBA_Object));
+  serv = uid->serv = (CORBA_Object *) malloc(sizeof(CORBA_Object));
   if (! uid->serv)
     return DC_NOTOK;
 
   f->interactive = 1;
 
-  CORBA_exception_init(uid->ev);
-  orb = CORBA_ORB_init(&dummy_argc, dummy_argv, "orbit-local-orb", uid->ev);
-  if (uid->ev->_major != CORBA_NO_EXCEPTION) {
+  CORBA_exception_init(ev);
+  orb = CORBA_ORB_init(&dummy_argc, dummy_argv, "orbit-local-orb", ev);
+  if (ev->_major != CORBA_NO_EXCEPTION) {
     fprintf(stderr, "Error: unable to initialise the ORB: %s\n", 
-	    CORBA_exception_id(uid->ev));
-    CORBA_exception_free(uid->ev);
-    free(uid->ev);
-    free(uid->serv);
+	    CORBA_exception_id(ev));
+    CORBA_exception_free(ev);
+    free(ev);
+    free(serv);
     free(uid);
     return DC_NOTOK;
-  } 
-  *uid->serv = CORBA_ORB_string_to_object(orb, argv[1], uid->ev);
-
-  f->data = uid;
+  }
   
+  root = CORBA_ORB_resolve_initial_service(orb, "NameService", ev);
+  if (ev->_major != CORBA_NO_EXCEPTION) {
+    fprintf(stderr, "Error: could not get name service: %s\n", 
+	     CORBA_exception_id(&ev));
+    exit(1);
+  }
+
+  *serv = CosNaming_NamingContext_resolve(root, &name, ev);
+  if (ev->_major != CORBA_NO_EXCEPTION) {
+    fprintf(stderr, "Error: could resolve object: %s\n", 
+	    CORBA_exception_id(&ev));
+    exit(1);
+  }
+  
+  f->data = uid;
+
+  /* Or shall I put it in uidata to free it later? */
+  CORBA_free (root);
   return DC_OK;
 }
 
