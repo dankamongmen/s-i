@@ -1,6 +1,12 @@
 #!/bin/sh -e
 
-log=/var/log/messages
+. /usr/share/debconf/confmodule
+
+if db_get anna/retriever && [ "$RET" ]; then
+	# Install the requested modules immediatly.
+	exec anna install "$@"
+fi
+
 queue=/var/lib/anna-install/queue
 
 mkdir -p /var/lib/anna-install
