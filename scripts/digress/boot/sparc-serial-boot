@@ -1,0 +1,15 @@
+#!/usr/bin/expect
+# Expect script to make an sparc boot.
+# Needs a serial console.
+spawn -noecho $env(CONSOLECOMMAND)
+
+# This is the conserver break sequence.
+send "cl0"
+
+set timeout 20
+expect "ok>"
+send $env(OF_BOOT_COMMAND)
+send "\r"
+sleep 1
+
+exit
