@@ -6,8 +6,8 @@ set -e
 
 NEWLINE="
 "
-
 MISSING_MODULES_LIST=""
+NETDISCOVER="/tmp/discover-net"
 
 # This is a gross and stupid hack, but we don't have a better idea right
 # now. See Debian bug #136743
@@ -38,40 +38,15 @@ compare_devs() {
   echo "${devs#$olddevs}" | sed -e 's/^ //'
 }
 
-NETDISCOVER="/tmp/discover-net"
-
-get_modinfo()
-{
-  local module="$1"
-  local modinfo=""
-
-  [ -f "$NETDISCOVER" ] || return
-
-  if grep -q "^$1" $NETDISCOVER; then
-    lines=$(grep "^$1" $NETDISCOVER | wc -l)
-    if [ $lines -eq 1 ]; then
-      modinfo=$(grep "^$1" $NETDISCOVER | cut -d':' -f2 | sed 's/,//g')
-    elif [ $lines -eq 0 ]; then
-      return
-    else
-      modinfo_tmp=$(grep -n "^$1" $NETDISCOVER | head -n 1)
-      modinfo=$(echo "$modinfo_tmp" | cut -d':' -f3- | sed 's/,//g')
-      linenum=$(echo "$modinfo_tmp" | cut -d':' -f1)
-      # Write out the tmp file without the line just used.
-      grep -n . $NETDISCOVER | grep -v ^${linenum} | cut -f2- -d':' > $NETDISCOVER~
-      mv $NETDISCOVER~ $NETDISCOVER
-    fi
-
-    echo "$modinfo"
-  fi
-}
-
 load_module() {
     local module="$1"
+    local cardname="$2"
     local devs=""
     local olddevs=""
     local newdev=""
-    local modinfo=""
+    
+    old=`cat /proc/sys/kernel/printk`
+    echo 0 > /proc/sys/kernel/printk
     
     db_fset hw-detect/module_params seen false
     db_subst hw-detect/module_params MODULE "$module"
@@ -83,15 +58,14 @@ load_module() {
     	if [ "$RET" != "" ]; then
 		register-module "$module" "$RET"
 	fi
+	
 	olddevs="$devs"
 	devs="$(snapshot_devs)"
-	
 	newdev="$(compare_devs "$olddevs" "$devs")"
 
         if [ -n "$newdev" ]; then
-          modinfo="$(get_modinfo "$module")"
-          if [ -n "$modinfo" ]; then
-            echo "${newdev}:${modinfo}" >> /etc/network/devnames
+          if [ -n "$cardname" ]; then
+            echo "${newdev}:${cardname}" >> /etc/network/devnames
           fi
         fi
     else   
@@ -100,15 +74,7 @@ load_module() {
 	db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
 	db_go
     fi
-}
-
-load_modules()
-{
-    old=`cat /proc/sys/kernel/printk`
-    echo 0 > /proc/sys/kernel/printk
-    for module in $* ; do
-	load_module $module
-    done
+    
     echo $old > /proc/sys/kernel/printk
 }
 
@@ -117,8 +83,7 @@ load_modules()
 # is needed ;-) )
 dumb_join_discover (){
     IFS_SAVE="$IFS"
-    IFS="
-"
+    IFS="$NEWLINE"
     for i in $MODEL_INFOS; do
         echo $1:$i;
         shift
@@ -280,7 +245,7 @@ for device in $(list_to_lines); do
         log "Trying to load module '$module'"
 
         if find /lib/modules/`uname -r`/ | grep -q /${module}\\. ; then
-            if load_modules "$module"; then
+            if load_module "$module" "$cardname"; then
                 :
             else
                 log "Error loading driver '$module' for '$cardname'!"
@@ -320,7 +285,7 @@ if [ -e /proc/scsi/scsi ] ; then
                     db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
                     db_subst hw-detect/load_progress_step MODULE "sd_mod"
                     db_progress INFO hw-detect/load_progress_step
-		    load_modules sd_mod
+		    load_module sd_mod
 		    register-module sd_mod
 		fi
 	    fi
@@ -334,7 +299,7 @@ if [ -e /proc/scsi/scsi ] ; then
                     db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
                     db_subst hw-detect/load_progress_step MODULE "sr_mod"
                     db_progress INFO hw-detect/load_progress_step
-		    load_modules sr_mod
+		    load_module sr_mod
 		    register-module sr_mod
 		fi
 	    fi
