@@ -1,12 +1,11 @@
 
-# define this if you want to link against uC-libc
-#UC_LIBC=yes
 
 
 OBJS=ddetect.o
 
 ifndef PROGS
-PROGS=memdetect diskdetect mdmdetect cddetect cpudetect ethdetect 
+PROGS=ethdetect
+#memdetect diskdetect mdmdetect cddetect cpudetect ethdetect 
 endif
 
 HEADERS= cddetect.h mdmdetect.h
@@ -17,7 +16,7 @@ INSTALL=install
 STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment 
 INCS=-I../cdebconf/src/
-LDFLAGS=-L../cdebconf/src/ -ldebconf -ldetect -lisapnp 
+LDFLAGS=-L../cdebconf/src/ -ldetect -lisapnp -ldebconf
 
 
 all: lst2header $(HEADERS) $(OBJS) $(PROGS)
@@ -30,7 +29,7 @@ cddetect : cddetect.c ddetect.o
 
 
 ethdetect :ethdetect.c ddetect.o
-	$(CC) $< -o $@ $(CFLAGS) $(INCS) $(LDFLAGS) ddetect.o
+	$(CC) $< -o $@ $(CFLAGS) $(INCS) $(LDFLAGS)
 
 lst2header: lst2header.c
 	$(CC) lst2header.c -o lst2header -ldetect -lisapnp 

@@ -14,6 +14,7 @@
 
 #include "ddetect.h"
 #include "ethdetect.h"
+#define DEBUG
 
 static char buffer[128];
 static char *unknown_str = "unknown";
@@ -21,41 +22,68 @@ static char *ignore_str = "ignore";
 static struct debconfclient *client;
 
 
+int do_system(char *);
 static char * debconf_input (char *priority, char *template);
 static int install_module(char *modulename);
 static int detect_and_install(int passive_detection);
+void debconf_unseen (char *template);
+int module_prompt(void);
 
 int
 main (int argc, char *argv[])
 {
     char *ptr=NULL;
-    int passive_detection;
-    
+    int passive_detection=1;
+   
     client = debconfclient_new ();
 
-    ptr = debconf_input ("high", "ddetect/detection_type");
-
-    if (strstr(ptr, "none")) {
-	ptr = debconf_input ("high", "ethdetect/module_select");
-	if (strstr(ptr, "other"))
-	    ptr = debconf_input ("high", "ethdetect/module_prompt");
-	if(ptr)
-	    if (install_module(ptr) != 0){
-		client->command (client, "input", "high", "ethdetect/error", NULL);
-		client->command (client, "go", NULL);
-		exit(1);
-	    }
-	exit(0);
+    debconf_unseen ("ethdetect/detection_type");
+    ptr = debconf_input ("high", "ethdetect/detection_type");
+   
+    if (strstr(ptr, "none")){ 
+	exit(module_prompt());
     }
-
-    if (strstr(ptr, "full"))
+    else if (strstr(ptr, "full"))
 	passive_detection = 0;
     else
 	passive_detection = 1;
-	
-    return detect_and_install(passive_detection);
-
+    
+    exit(detect_and_install(passive_detection));
 }
+
+int
+module_prompt(void){
+    char *ptr;
+    char *module=NULL;
+    int rv=1;
+
+    ptr = debconf_input ("high", "ethdetect/module_select");
+    if (strstr(ptr, "other"))
+	ptr = debconf_input ("high", "ethdetect/module_prompt");
+    if(ptr) {
+	module = strdup(ptr);
+	if (install_module(module) != 0){
+	    client->command (client, "input", "high", "ethdetect/error", NULL);
+	    client->command (client, "go", NULL);
+	    rv = 1;
+	}
+	else 
+	    rv = 0;
+    }
+    
+    if(module)
+	free(module);
+    return rv;
+}
+
+
+
+void
+debconf_unseen (char *template)
+{
+  client->command (client, "fset", template, "seen", "false", NULL);
+}
+
 
 
 static char *
@@ -73,7 +101,7 @@ install_module(char *modulename){
     char *params=NULL;
     params = debconf_input ("high", "ethdetect/module_params");
     snprintf(buffer, sizeof(buffer), "insmod %s %s", modulename, (params ? params : " "));
-    return system (buffer);
+    return do_system (buffer);
 }
 
 int
@@ -137,14 +165,20 @@ detect_and_install(int passive_detection) {
     
     lst[num_cards - 1].next = NULL;
     
-    
     sync ();
     bus.pci = pci_detect (lst);
     if (!passive_detection)
 	bus.isa = isa_detect (lst);
     
     bus.pcmcia = pcmcia_detect (lst);
-    
+   
+   
+    if (((ethernet = ethernet_detect (&bus)) == NULL) ){
+	    client->command (client, "input", "high", "ethdetect/nothing_detected", NULL);
+	    client->command (client, "go", NULL);
+	    return 1;
+    }
+   
     for (; ethernet; ethernet = ethernet->next)
     {
 	client->command (client, "subst", "ethdetect/load_module", "bus", 
@@ -163,3 +197,17 @@ detect_and_install(int passive_detection) {
     
     return 0;
 }
+
+int
+do_system (char *s){
+    int rv;
+#ifdef DEBUG
+    fprintf(stderr, "executing '%s'\n", s);
+#endif
+   rv = system(s); 
+#ifdef DEBUG
+    fprintf(stderr, "rv = %d\n", rv);
+#endif
+    return rv;
+}
+
