@@ -94,10 +94,10 @@ fi
 ) >> /target/etc/environment
 # If the locale isn't already valid, append it to locale.gen
 if chroot /target/ /usr/sbin/validlocale $LOCALE \
-    >> /target/etc/locale.gen 2> $LOG ; then
+    >> /target/etc/locale.gen 2>> $LOG ; then
     : # Nothing to do
 else
     # New locale added to locale.gen, generate it
-    chroot /target /usr/sbin/locale-gen > $LOG 2>&1
+    chroot /target /usr/sbin/locale-gen >> $LOG 2>&1
 fi
 
