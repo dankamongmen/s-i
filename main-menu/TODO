@@ -1,3 +1,18 @@
+     - The main menu design has some issues. If a step is failing
+       because some step above it did something wrong, but thought
+       it succeeded (a disk was partitioned, but very badly, and
+       installing the base system to it fails), there is no way to
+       force the user to back up. This seems to preclude linear
+       install mode. I posted a longer example to -boot. Three
+       possible fixes:
+                        - Detect loops, and have code to figure out what went
+                          wrong and back up to the appropriate step that can
+                          fix it
+                        - Detect loops, and back up to the beginning of
+                          the menu
+                        - Detect whenever any menu item fails, and leave
+                          linear mode. (BEST)
+
 * Update to new debconf stuff -- no isdefault flag setting needed; use seen
   flag instead.
 * Figure out how to handle configuring only one virtual package (pick off
