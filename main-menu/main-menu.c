@@ -15,8 +15,7 @@
  */
 
 #include "main-menu.h"
-#include "debconf.h"
-
+#include <debconfclient.h>
 #include <stdlib.h>
 #include <search.h>
 #include <stdio.h>
@@ -100,10 +99,14 @@ int isdefault(struct package_t *p) {
 
 /* Displays the main menu via debconf and returns the selected menu item. */
 struct package_t *show_main_menu(struct package_t *packages) {
+	static struct debconfclient *debconf = NULL;
 	struct package_t **package_list, *p, *head = NULL, *tail = NULL;
 	int i = 0, num = 0;
 	char *s, *menudefault = NULL;
 	char menutext[1024];
+
+	if (! debconf)
+		debconf = debconfclient_new();
 	
 	/* Make a flat list of the packages. */
 	for (p = packages; p; p = p->next)
@@ -150,16 +153,16 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	s = menutext;
 	
 	/* Make debconf show the menu and get the user's choice. */
-	debconf_command("TITLE", "Debian Installer Main Menu", NULL);
+	debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
 	if (menudefault)
-		debconf_command("SET", MAIN_MENU, menudefault, NULL);
-	debconf_command("FSET", MAIN_MENU, "isdefault", "true", NULL);
-	debconf_command("SUBST", MAIN_MENU, "MENU", menutext, NULL);
-	debconf_command("INPUT medium", MAIN_MENU, NULL);
-	debconf_command("GO", NULL);
-	debconf_command("GET", MAIN_MENU, NULL);
-	s=debconf_ret();
-
+		debconf->command(debconf, "SET", MAIN_MENU, menudefault, NULL);
+	debconf->command(debconf, "FSET", MAIN_MENU, "isdefault", "true", NULL);
+	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
+	debconf->command(debconf, "INPUT medium", MAIN_MENU, NULL);
+	debconf->command(debconf, "GO", NULL);
+	debconf->command(debconf, "GET", MAIN_MENU, NULL);
+	s=debconf->value;
+	
 	/* Figure out which menu item was selected. */
 	for (p = head; p; p = p->next) {
 		if (p->installer_menu_item && strcmp(p->description, s) == 0)
