@@ -120,7 +120,7 @@ static enum state_wanted get_channel (void)
 	if (!update_state ())
 		return WANT_ERROR;
 
-	if (dasds_items > 30)
+	if (dasds_items > 20)
 	{
 		while (1)
 		{
@@ -146,7 +146,7 @@ static enum state_wanted get_channel (void)
 				break;
 		}
 	}
-	else if (dasds_items > 1)
+	else if (dasds_items > 0)
 	{
 		unsigned int device;
 
@@ -189,8 +189,6 @@ static enum state_wanted get_channel (void)
 				break;
 			}
 	}
-	else if (dasds_items)
-		dasd_current = dasds;
 	return WANT_NEXT;
 }
 
@@ -358,7 +356,7 @@ int main ()
 						state = CONFIRM;
 						break;
 					case CONFIRM:
-						state = QUIT;
+						state = GET_CHANNEL;
 						break;
 					default:
 						state = ERROR;
