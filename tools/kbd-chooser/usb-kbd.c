@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.15 2003/11/14 20:53:16 mckinstry Rel $
+ * $Id: usb-kbd.c,v 1.16 2004/02/15 22:36:19 mckinstry Exp $
  */
 
 #include "config.h"
@@ -35,10 +35,6 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 	k->next = keyboards;
 	keyboards = k;
 
-#if 0
-	/* Disable autodetection of USB keyboards for the moment;
-	 * something has changed in the recent kernel(s)
-	 */
 #if defined (KERNEL_2_6)
 	/* In 2.6 series, we can detect keyboard via /proc/bus/input
 	 *
@@ -52,7 +48,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 #endif
 	/* 2.4 code */
 
-	/* In 2.4, if "keyboard" is present in /proc/bus/usb/drivers,
+	/* In 2.4, if "Device=usbkbd" is present in /proc/bus/usb/devices
 	 * a USB keyboard is present.
 	 * There may be multiple keyboards, but they can only have one
 	 * map, so one choice to be made.
@@ -64,7 +60,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 	 *     not that there is one at the moment.
 	 */
 	
-	res = grep ("/proc/bus/usb/drivers", "usbkbd");
+	res = grep ("/proc/bus/usb/devices", "Driver=usbkbd");
 	if (res < 0) {
 		if (DEBUG) 
 			di_log (DI_LOG_LEVEL_DEBUG, "mounting usbdevfs to look for kbd");		
@@ -81,7 +77,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 		close (2);
 		dup (serr);
 		mounted_fs = 1;
-		res = grep ("/proc/bus/usb/drivers", "usbkbd");
+		res = grep ("/proc/bus/usb/devices", "Driver=usbkbd");
 		if (res < 0) {
 			di_warning ("Failed to grep /proc/bus/usb/drivers");
 		}
@@ -93,7 +89,6 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 	if (mounted_fs)
 		system ("umount /proc/bus/usb");
 
-#endif /* ifdef 0 */
 
 	return keyboards;	
 }
