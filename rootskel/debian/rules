@@ -43,6 +43,8 @@ install: build
 	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
 	$(foreach DIR, $(DIRS), \
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
+	mknod debian/rootskel/dev/console c 5 1
+	mknod debian/rootskel/dev/tty1 c 4 1
 
 
 # Build architecture-independent files here.
