@@ -1,10 +1,10 @@
 #!/bin/sh
 # This is a special linuxrc for the boot floppy image. It just loads the
 # next floppy.
-# Throughout we use DEBCONF_DEBUG to turn on debugging. 1 = minimal,
+# Throughout we use BOOT_DEBUG to turn on debugging. 1 = minimal,
 # with 2 you'll get shells in strategic places.
 
-if [ "$DEBCONF_DEBUG" -gt 1 ]; then
+if [ "$BOOT_DEBUG" -gt 1 ]; then
 	set -x
 fi
 
@@ -37,7 +37,7 @@ echo
 echo -n "Please insert the second floppy ..."
 MOUNTED=0
 
-if [ 1 -gt "$DEBCONF_DEBUG" ]; then
+if [ 1 -gt "$BOOT_DEBUG" ]; then
 	# Shut up kernel errors if the disk is inserted at wrong time, etc.
 	OLD_PRINTK=`cat /proc/sys/kernel/printk`
 	echo 0 > /proc/sys/kernel/printk
@@ -64,7 +64,7 @@ while [ "$MOUNTED" = 0 ]; do
 	done
 done
 
-if [ 1 -gt "$DEBCONF_DEBUG" ]; then
+if [ 1 -gt "$BOOT_DEBUG" ]; then
 	# Restore kernel errors.
 	echo $OLD_PRINTK > /proc/sys/kernel/printk
 fi
@@ -100,7 +100,7 @@ fi
 # Close all open files on the initrd, and run busybox init.
 rm -f linuxrc # probably not busybox init
 ln -s /sbin/init linuxrc
-if [ "$DEBCONF_DEBUG" -gt 0 ]; then
+if [ "$BOOT_DEBUG" -gt 0 ]; then
 	echo "This is ia debug shell, just before running the new linuxrc."
 	sh
 fi
