@@ -115,25 +115,61 @@ get_chosen_retriever(void)
 static int
 choose_retriever(void)
 {
+	static char * const retrievers[] = {
+		"net-retriever",
+		"cdrom-retriever",
+		"floppy-retriever",
+		NULL
+	};
+	int i;
 	struct debconfclient *debconf;
 	struct linkedlist_t *ret_pkgs;
-	char *ret_choices;
+	struct list_node *node;
+	struct package_t *p;
+	char *ret_choices, *defval = NULL;
 
 	ret_pkgs = get_retriever_packages();
 	if (ret_pkgs == NULL)
 		return 0;
 	ret_choices = get_retriever_choices(ret_pkgs);
-	di_list_free(ret_pkgs, di_pkg_free);
 	if (ret_choices[0] == '\0')
 		return 0;
 
 	debconf = debconfclient_new();
-	debconf->command(debconf, "TITLE", "Choose Retriever", NULL);
+	debconf->command(debconf, "FGET", ANNA_RETRIEVER, "seen", NULL);
+	if (debconf->value == NULL || strcmp(debconf->value, "true") != 0) {
+		for (i = 0; retrievers[i] != NULL; i++)
+			if (strstr(ret_choices, retrievers[i]) != NULL) {
+				defval = retrievers[i];
+				break;
+			}
+		if (defval == NULL) {
+			di_log("No standard retrievers available??");
+			if ((defval = strrchr(ret_choices, ',')) != NULL)
+				defval += 2;
+			else
+				defval = ret_choices;
+		}
+		for (node = ret_pkgs->head; node != NULL; node = node->next) {
+			p = (struct package_t *)node->data;
+			if (strcmp(p->package, defval) == 0) {
+				asprintf(&defval, "%s: %s", p->package, p->description);
+				break;
+			}
+		}
+		if (node == NULL)
+			di_log("Didn't manage to find a default retriever!");
+		else {
+			debconf->command(debconf, "SET", ANNA_RETRIEVER, defval, NULL);
+			free(defval);
+		}
+	}
+	di_list_free(ret_pkgs, di_pkg_free);
 	debconf->command(debconf, "FSET", ANNA_RETRIEVER, "seen", "false",
 		NULL);
 	debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES",
 			ret_choices, NULL);
-	debconf->command(debconf, "INPUT critical", ANNA_RETRIEVER, NULL);
+	debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
 	debconf->command(debconf, "GO", NULL);
 
 	free(ret_choices);
