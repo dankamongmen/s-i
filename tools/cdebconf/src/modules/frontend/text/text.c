@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.58 2004/03/08 10:11:59 barbier Exp $
+ * $Id: text.c,v 1.59 2004/03/09 09:05:07 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -140,14 +140,14 @@ static void wrap_print(const char *str)
 }
 
 /*
- * Function: texthandler_displaydesc
+ * Function: text_handler_displaydesc
  * Input: struct frontend *obj - UI object
  *        struct question *q - question for which to display the description
  * Output: none
  * Description: displays the description for a given question 
  * Assumptions: none
  */
-static void texthandler_displaydesc(struct frontend *obj, struct question *q) 
+static void text_handler_displaydesc(struct frontend *obj, struct question *q) 
 {
 	char *descr = q_get_description(q);
 	char *ext_descr = q_get_extended_description(q);
@@ -175,14 +175,14 @@ get_text(struct frontend *obj, const char *template, const char *fallback )
 }
 
 /*
- * Function: texthandler_boolean
+ * Function: text_handler_boolean
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
  * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
  * Description: handler for the boolean question type
  * Assumptions: none
  */
-static int texthandler_boolean(struct frontend *obj, struct question *q)
+static int text_handler_boolean(struct frontend *obj, struct question *q)
 {
 	char buf[30];
 	int ans = -1;
@@ -236,7 +236,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 }
 
 /*
- * Function: texthandler_multiselect
+ * Function: text_handler_multiselect
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
  * Output: int - DC_OK, DC_NOTOK
@@ -245,7 +245,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
  *
  * TODO: factor common code with select
  */
-static int texthandler_multiselect(struct frontend *obj, struct question *q)
+static int text_handler_multiselect(struct frontend *obj, struct question *q)
 {
 	char **choices;
 	char **choices_translated;
@@ -352,14 +352,14 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 }
 
 /*
- * Function: texthandler_note
+ * Function: text_handler_note
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
  * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
  * Description: handler for the note question type
  * Assumptions: none
  */
-static int texthandler_note(struct frontend *obj, struct question *q)
+static int text_handler_note(struct frontend *obj, struct question *q)
 {
 	int c;
 	if (obj->methods.can_go_back (obj, q))
@@ -379,7 +379,7 @@ static int texthandler_note(struct frontend *obj, struct question *q)
 }
 
 /*
- * Function: texthandler_password
+ * Function: text_handler_password
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
  * Output: int - DC_OK, DC_NOTOK
@@ -388,7 +388,7 @@ static int texthandler_note(struct frontend *obj, struct question *q)
  *
  * TODO: this can be *MUCH* improved. no editing is possible right now
  */
-static int texthandler_password(struct frontend *obj, struct question *q)
+static int text_handler_password(struct frontend *obj, struct question *q)
 {
 	struct termios oldt, newt;
 	char passwd[256] = {0};
@@ -413,7 +413,7 @@ static int texthandler_password(struct frontend *obj, struct question *q)
 }
 
 /*
- * Function: texthandler_select
+ * Function: text_handler_select
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
  * Output: int - DC_OK, DC_NOTOK
@@ -422,7 +422,7 @@ static int texthandler_password(struct frontend *obj, struct question *q)
  *
  * TODO: factor common code with multiselect
  */
-static int texthandler_select(struct frontend *obj, struct question *q)
+static int text_handler_select(struct frontend *obj, struct question *q)
 {
 	char **choices;
 	char **choices_translated;
@@ -444,7 +444,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	if (count == 1)
 		defval = choices[0];
 
-	/* fprintf(stderr,"In texthandler_select, count is: %d\n", count);*/
+	/* fprintf(stderr,"In text_handler_select, count is: %d\n", count);*/
 	if (defval != NULL)
 	{
 		for (i = 0; i < count; i++)
@@ -516,14 +516,14 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 }
 
 /*
- * Function: texthandler_string
+ * Function: text_handler_string
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
  * Output: int - DC_OK, DC_NOTOK
  * Description: handler for the string question type
  * Assumptions: none
  */
-static int texthandler_string(struct frontend *obj, struct question *q)
+static int text_handler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
 	const char *defval = question_getvalue(q, "");
@@ -546,14 +546,14 @@ static int texthandler_string(struct frontend *obj, struct question *q)
 }
 
 /*
- * Function: texthandler_text
+ * Function: text_handler_text
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
  * Output: int - DC_OK, DC_NOTOK
  * Description: handler for the text question type
  * Assumptions: none
  */
-static int texthandler_text(struct frontend *obj, struct question *q)
+static int text_handler_text(struct frontend *obj, struct question *q)
 {
 	char *out = 0;
 	char buf[1024];
@@ -576,14 +576,14 @@ static int texthandler_text(struct frontend *obj, struct question *q)
 }
 
 /*
- * Function: texthandler_error
+ * Function: text_handler_error
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
  * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
  * Description: handler for the error question type. Currently equal to _note
  * Assumptions: none
  */
-static int texthandler_error(struct frontend *obj, struct question *q)
+static int text_handler_error(struct frontend *obj, struct question *q)
 {
 	int c;
 	if (obj->methods.can_go_back (obj, q))
@@ -606,14 +606,14 @@ struct question_handlers {
 	const char *type;
 	int (*handler)(struct frontend *obj, struct question *q);
 } question_handlers[] = {
-	{ "boolean",	texthandler_boolean },
-	{ "multiselect", texthandler_multiselect },
-	{ "note",	texthandler_note },
-	{ "password",	texthandler_password },
-	{ "select",	texthandler_select },
-	{ "string",	texthandler_string },
-	{ "text",	texthandler_text },
-	{ "error",	texthandler_error },
+	{ "boolean",	text_handler_boolean },
+	{ "multiselect", text_handler_multiselect },
+	{ "note",	text_handler_note },
+	{ "password",	text_handler_password },
+	{ "select",	text_handler_select },
+	{ "string",	text_handler_string },
+	{ "text",	text_handler_text },
+	{ "error",	text_handler_error },
 };
 
 /*
@@ -658,7 +658,7 @@ static int text_go(struct frontend *obj)
 					printf("%s\n\n", obj->title);
 					display_title = 0;
 				}
-				texthandler_displaydesc(obj, q);
+				text_handler_displaydesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
 				if (ret == DC_OK)
 					obj->qdb->methods.set(obj->qdb, q);
