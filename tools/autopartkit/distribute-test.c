@@ -40,7 +40,7 @@ struct disk_info_t diskinfo[] = {
     { "/dev/hda", EMPTYGEOMETRY,   MiB_TO_BLOCKS( 400), MiB_TO_BLOCKS( 400) },
     { "/dev/hdb", EMPTYGEOMETRY,   MiB_TO_BLOCKS(1000), MiB_TO_BLOCKS(1000) },
     { "/dev/hdc", EMPTYGEOMETRY,   MiB_TO_BLOCKS(2000), MiB_TO_BLOCKS(2000) },
-    { NULL, EMPTYGEOMETRY, 0, 0 }
+    { NULL,       EMPTYGEOMETRY,   MiB_TO_BLOCKS(   0), MiB_TO_BLOCKS(   0) }
 };
 
 static int
@@ -54,8 +54,9 @@ cmp_spaceinfo_path(const void *ap, const void *bp)
 int
 main(int argc, char *argv[])
 {
-    diskspace_req_t *reqs;  
+    diskspace_req_t *reqs;
     int retval;
+    int partnum;
     char *infile;
     struct disk_info_t *spaceinfo = NULL;
 
@@ -84,6 +85,13 @@ main(int argc, char *argv[])
         qsort(spaceinfo, 3, sizeof(spaceinfo[0]), cmp_spaceinfo_path);
       }
 
+    /* Do not make LVM logical volumes on the disk */
+    for (partnum = 0; partnum < 10 /* MAX_PARTITIONS */
+	   && reqs[partnum].fstype;
+	 ++partnum)
+        if ( 0 == strncmp("lvm:", reqs[partnum].fstype, 4) )
+	    reqs[partnum].ondisk = 0;
+
     retval = distribute_partitions(spaceinfo, reqs);
 
     if (retval)
@@ -92,6 +100,9 @@ main(int argc, char *argv[])
         print_list(spaceinfo, reqs);
 
     free_partition_list(reqs);
+
+    if (diskinfo != spaceinfo)
+        free(spaceinfo);
 
     PED_DONE();
 

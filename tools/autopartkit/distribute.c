@@ -112,8 +112,8 @@ distribute_partitions(struct disk_info_t diskinfo[],
     for (i = 0; reqs[i].mountpoint; ++i)
     {
 	struct disk_info_t *disk;
-	if (0 == reqs[i].max_blk)
-	    continue; /* Ignore zero-size partitions */
+	if (! reqs[i].ondisk)
+	    continue; /* Ignore mount points without disk partition */
 	disk = find_disk_with_freespace(diskinfo, reqs[i].min_blk);
 	if (NULL == disk)
 	{
@@ -162,7 +162,8 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	    if (reqs[j].curdisk == &diskinfo[i])
 	    {
 		PedSector newsize;
-		/* These calculations can overflow if the numbers are too big. */
+		/* These calculations can overflow if the numbers are
+		   too big. */
 		newsize = reqs[j].max_blk - reqs[j].min_blk;
 		newsize *= diskinfo[i].freespace;
 		newsize /= total_wanted;
@@ -198,7 +199,7 @@ print_list(struct disk_info_t diskinfo[], struct diskspace_req_s reqs[])
 	    {
 		autopartkit_log(0,
 				"    %s [%llu <= %llu <= %llu] [%lld <= %lld]"
-				" %s %lld-%lld\n",
+				" %s %lld-%lld %s\n",
 				( reqs[j].mountpoint ?
 				  reqs[j].mountpoint : "[null]" ),
 				BLOCKS_TO_MiB(reqs[j].min_blk),
@@ -208,7 +209,8 @@ print_list(struct disk_info_t diskinfo[], struct diskspace_req_s reqs[])
 				(uint64_t)reqs[j].maxsize,
 				reqs[j].curdisk->path,
 				reqs[j].curdisk->geom.start,
-				reqs[j].curdisk->geom.end);
+				reqs[j].curdisk->geom.end,
+				reqs[j].ondisk ? "on disk" : "");
 	    }
 	}
     }
@@ -286,5 +288,8 @@ get_free_space_list(void)
         return spaceinfo;
     }
     else
+    {
+        free(spaceinfo);
         return NULL;
+    }
 }

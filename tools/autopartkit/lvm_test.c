@@ -75,7 +75,7 @@ test_split(void)
     autopartkit_log(0, "Failed to parse '%s'\n", fstype);
   else
     {
-      autopartkit_log(0, "  Stacking LVM lv %s on vg %s "
+      autopartkit_log(2, "  Stacking LVM lv %s on vg %s "
 		      "fstype %s\n", info[1], info[2], info[3]);
     }
 }

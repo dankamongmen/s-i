@@ -934,6 +934,12 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
     lvm_pv_stack = lvm_pv_stack_new();
     lvm_lv_stack = lvm_lv_stack_new();
+
+    /* Do not make LVM logical volumes on the disk */
+    for (partnum = 0; partnum < MAX_PARTITIONS && requirements[partnum].fstype;
+	 ++partnum)
+        if ( 0 == strncmp("lvm:", requirements[partnum].fstype, 4) )
+	    requirements[partnum].ondisk = 0;
 #endif /* LVM_HACK */
 
     memset(mountmap,0,sizeof(device_mntpoint_map_t)*MAX_PARTITIONS);
@@ -972,22 +978,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	if (req_tmp->minsize == -1)
 	    break;
 
-	assert(req_tmp->curdisk); /* XXX fails for shmfs */
-
-	autopartkit_log(1, "  device path '%s' [%lld-%lld]\n",
-			req_tmp->curdisk->path,
-			req_tmp->curdisk->geom.start,
-			req_tmp->curdisk->geom.end);
-
-	dev_tmp = ped_device_get(req_tmp->curdisk->path);
-	assert(dev_tmp);
-	disk_maybe = ped_disk_new(dev_tmp);
-
-	autopartkit_log(1, "  creating in free area %lld-%lld\n",
-			req_tmp->curdisk->geom.start,
-			req_tmp->curdisk->geom.end);
 	assert(req_tmp->fstype);
-	{
+	{ /* Look up the file system type with libparted. */
 	    const char *parted_fs = linux_fstype_to_parted(req_tmp->fstype); 
 	    fs_type = ped_file_system_type_get(parted_fs);
 	}
@@ -1001,26 +993,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 			    req_tmp->fstype);
 #if defined(LVM_HACK)
 	    if ( 0 == strncmp("lvm:", req_tmp->fstype, 4) )
-	    {
-	        /* Create LVM logical volume with given FS.  Assuming
-		   LVM volume group is already created. */
-	        char *info[4]; /* 0='lvm', 1=vgname, 2=lvname, 3=fstype */
-		unsigned long mbsize = req_tmp->minsize;
-
-	        /* Extract vgname, lvname and fstype from
-		   "lvm:tjener_vg:home0_lv:default". */
-		if (0 != lvm_split_fstype(req_tmp->fstype, ':', 4, info))
-		    autopartkit_log(0, "  Failed to parse '%s'\n",
-				    req_tmp->fstype);
-		else
-		{
-		    autopartkit_log(1, "  Stacking LVM lv %s on vg %s "
-				    "fstype %s\n", info[1], info[2], info[3]);
-		    /* Store vgname, lvname and size in stack */
-		    lvm_lv_stack_push(lvm_lv_stack, info[1], info[2], info[3],
-				      mbsize);
-		}
-	    }
+                lvm_lv_add(lvm_lv_stack, req_tmp->fstype,
+                                req_tmp->minsize);
 	    else
 #endif /* LVM_HACK */
 	    {
@@ -1034,6 +1008,21 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	{
 	    int isroot = 0;
 	    PedSector endsector;
+
+	    assert(req_tmp->curdisk); /* XXX fails for shmfs, ie ->nodisk */
+
+	    autopartkit_log(1, "  device path '%s' [%lld-%lld]\n",
+			    req_tmp->curdisk->path,
+			    req_tmp->curdisk->geom.start,
+			    req_tmp->curdisk->geom.end);
+
+	    dev_tmp = ped_device_get(req_tmp->curdisk->path);
+	    assert(dev_tmp);
+	    disk_maybe = ped_disk_new(dev_tmp);
+
+	    autopartkit_log(1, "  creating in free area %lld-%lld\n",
+			    req_tmp->curdisk->geom.start,
+			    req_tmp->curdisk->geom.end);
 
 	    autopartkit_log(1, "  Creating partition on disk having "
 			    "sectors %lld\n", disk_maybe->dev->length);
@@ -1360,7 +1349,7 @@ int main (int argc, char *argv[])
         autopartkit_log(2, "post_confirm %d %d\n", 0,0);
 
         nuke_all_partitions();
-	make_partitions(disk_reqs,dev);
+        make_partitions(disk_reqs, dev);
 
 	free_partition_list(disk_reqs);
     }

@@ -229,15 +229,39 @@ lvm_split_fstype(const char *str, int separator, int elemcount,
 	if (NULL == nextp)  /* Last element */
 	  {
 	    elements[elemnum] = strdup(curp);
-	    autopartkit_log(1, "Found last '%s'\n", elements[elemnum]);
+	    autopartkit_log(3, "Found last '%s'\n", elements[elemnum]);
 	    return 0;
 	  }
 	elements[elemnum] = strndup(curp, nextp - curp);
-	autopartkit_log(1, "Found '%s'\n", elements[elemnum]);
+	autopartkit_log(3, "Found '%s'\n", elements[elemnum]);
 	curp = nextp + 1;
     }
     
     return 0;
+}
+
+int
+lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize)
+{
+    /* Create LVM logical volume with given FS.  Assuming LVM volume
+       group is already created. */
+    char *info[4]; /* 0='lvm', 1=vgname, 2=lvname, 3=fstype */
+
+    /* Extract vgname, lvname and fstype from
+       "lvm:tjener_vg:home0_lv:default". */
+    if (0 != lvm_split_fstype(fstype, ':', 4, info))
+    {
+        autopartkit_log(0, "  Failed to parse '%s'\n", fstype);
+	return -1;
+    }
+    else
+    {
+	autopartkit_log(2, "  Stacking LVM lv %s on vg %s "
+			"fstype %s\n", info[1], info[2], info[3]);
+	/* Store vgname, lvname and size in stack */
+	return lvm_lv_stack_push(stack, info[1], info[2], info[3],
+				 mbsize);
+    }
 }
 
 /* LVM stack operations */

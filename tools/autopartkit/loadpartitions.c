@@ -48,7 +48,7 @@ list_makeroom(struct partition_list *list, unsigned int room)
 
 static int
 list_add_entry(struct partition_list *list, char *mountpoint, 
-	       char *fstype, int minsize, int maxsize)
+	       char *fstype, int minsize, int maxsize, int ondisk)
 {
   if (0 != list_makeroom(list, 1))
     return -1;
@@ -63,6 +63,7 @@ list_add_entry(struct partition_list *list, char *mountpoint,
   list->disk_reqs[list->count].fstype = fstype;
   list->disk_reqs[list->count].minsize = minsize;
   list->disk_reqs[list->count].maxsize = maxsize;
+  list->disk_reqs[list->count].ondisk = ondisk;
   (list->count)++;
 
   return 0;
@@ -95,6 +96,7 @@ add_partition(struct partition_list *list, char *line)
   char fstype[1024];
   int minsize;
   int maxsize;
+  int ondisk;
 
   if (!line || ! *line) /* Ignore empty lines */
     return -1;
@@ -106,14 +108,18 @@ add_partition(struct partition_list *list, char *line)
   if (4 != sscanf(line, "%s %s %d %d ", mountpoint, fstype, &minsize,
 		  &maxsize))
   {
-    autopartkit_log(3, "Failed to parse line.\n");
+      autopartkit_log(3, "Failed to parse line.\n");
       return -1; /* error */
   }
 
   autopartkit_log(2, "Fetched partition info %s %s %d %d\n",
                   mountpoint, fstype, minsize, maxsize);
+  if (maxsize != 0)
+      ondisk = 1;
+  else
+      ondisk = 0;
 
-  return list_add_entry(list, mountpoint, fstype, minsize, maxsize);
+  return list_add_entry(list, mountpoint, fstype, minsize, maxsize, ondisk);
 }
 
 diskspace_req_t *
@@ -146,7 +152,7 @@ load_partitions(const char *filename)
   fclose(fp);
 
   /* Terminate list */
-  list_add_entry(&list, NULL, NULL, -1, -1);
+  list_add_entry(&list, NULL, NULL, -1, -1, 0);
 
   return list.disk_reqs; /* Transfering resposibility for this memory block */
 }

@@ -12,6 +12,8 @@ struct diskspace_req_s {
   int minsize; /* In MB */
   int maxsize; /* In MB */
 
+  int ondisk; /* flag if the file system should get a disk partition */
+
   /* Used by the allocation algorithm in distribute.c */
   PedSector min_blk;
   PedSector max_blk;
@@ -70,6 +72,7 @@ char *lvm_create_logicalvolume(const char *vgname, const char *lvname,
 			       unsigned int mbsize);
 int lvm_split_fstype(const char *str, int separator, int elemcount,
 		     char *elements[]);
+int lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize);
 
 void *lvm_pv_stack_new(void);
 int lvm_pv_stack_isempty(void *stack);

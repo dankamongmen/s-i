@@ -42,6 +42,7 @@ distribute_test_SOURCES = \
 tabledir = $(sysconfdir)/autopartkit
 table_DATA = \
 	default.table
+	test.table
 
 EXTRA_DIST = $(table_DATA)
 
@@ -58,5 +59,5 @@ check-autopartkit: autopartkit_test testdevice
 	@cat fstab
 
 check: distribute_test lvm_test
-	./distribute_test $(top_srcdir)/default.table
+	./distribute_test $(top_srcdir)/test.table
 	./lvm_test
