@@ -50,7 +50,7 @@ _Description: Failed to create a swap space
 Template: partman-basicfilesystems/no_mount_point
 Type: boolean
 _Description: Do you want to return to the partitioning menu?
- No mount point is assigned for ${FILESYSTEM} filesystem in partition
+ No mount point is assigned for ${FILESYSTEM} file system in partition
  #${PARTITION} of ${DEVICE}.
  .
  If you do not go back to the partitioning menu and assign a mount point
@@ -58,7 +58,7 @@ _Description: Do you want to return to the partitioning menu?
 
 Template: partman-basicfilesystems/mountpoint
 Type: select
-_Choices: /, /boot, /home, /tmp, /usr, /usr/local, /var, Enter manually, Do not mount it
+__Choices: / - the root file system, /boot - static files of the boot loader, /home - user home directories, /tmp - temporary files, /usr - static data, /var - variable data, /srv - data for services provided by this system, /opt - add-on application software packages, /usr/local - local hierarchy, Enter manually, Do not mount it
 _Description: Mount point for this partition:
 
 Template: partman-basicfilesystems/fat_mountpoint
@@ -105,6 +105,40 @@ Type: text
 # In the following context: "Label: none"
 _Description: none
 
+Template: partman-basicfilesystems/text/reserved_for_root
+Type: text
+# Up to 24 character positions
+_Description: Reserved blocks:
+
+Template: partman-basicfilesystems/specify_reserved
+Type: string
+_Description: Percentage of the file system blocks reserved for the super-user:
+
+Template: partman-basicfilesystems/text/usage
+Type: text
+# Up to 25 character positions
+_Description: Typical usage:
+
+Template: partman-basicfilesystems/text/typical_usage
+Type: text
+# In the following context: "Typical usage: standard"
+_Description: standard
+
+Template: partman-basicfilesystems/specify_usage
+Type: select
+# Translate "standard" the same way as in the
+# partman-basicfilesystems/text/typical_usage template.  Do not
+# translate "news", "largefile" and "largefile4".
+Choices: ${CHOICES}
+_Description: Typical usage of this partition:
+ Please specify how the file system is going to be used, so that
+ optimal file system parameters can be chosen for that use.
+ .
+ standard = standard parameters,
+ news = one inode per 4KB block,
+ largefile = one inode per megabyte,
+ largefile4 = one inode per 4 megabytes.
+
 Template: partman-basicfilesystems/text/specify_mountpoint
 Type: text
 # This is an item in the menu "Partition settings"
@@ -117,7 +151,7 @@ _Description: none
 
 Template: partman/filesystem_long/ext2
 Type: text
-_Description: ext2 file system
+_Description: Ext2 file system
 
 Template: partman/filesystem_short/ext2
 Type: text
@@ -168,10 +202,10 @@ Template: partman-basicfilesystems/options
 Type: multiselect
 __Choices: noatime - do not update inode access times at each access, nodev - do not support character or block special devices, nosuid - ignore set-user-identifier or set-group-identifier bits, noexec - do not allow execution of any binaries, ro - mount the file system read-only, sync - all input/output activities occur synchronously, usrquota - user disk quota accounting enabled, grpquota - group disk quota accounting enabled
 _Description: Mount options:
- Mount options can tune the behavior of the file system.
+ Mount options can tune the behaviour of the file system.
 
 Template: partman-basicfilesystems/fatoptions
 Type: multiselect
 __Choices: ro - mount the file system read-only, sync - all input/output activities occur synchronously, quiet - changing owner and permissions does not return errors
 _Description: Mount options:
- Mount options can tune the behavior of the file system.
+ Mount options can tune the behaviour of the file system.

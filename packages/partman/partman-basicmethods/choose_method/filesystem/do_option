@@ -35,4 +35,11 @@ else
 fi
 
 echo $fs >$dev/$id/filesystem
+
+if [ ! -d $dev/$id/options ]; then
+    mkdir $dev/$id/options
+    echo 'noatime - do not update inode access times at each access' >$dev/$id/options/noatime
+    echo 'quiet - changing owner and permissions does not return errors' >$dev/$id/options/quiet
+fi
+
 update_partition $dev $id

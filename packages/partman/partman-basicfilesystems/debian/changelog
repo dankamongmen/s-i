@@ -3,6 +3,25 @@ partman-basicfilesystems (31) UNRELEASED; urgency=low
   * Christian Perrier
     - Typo correction in French translation. Closes: #266306
     - Rename templates file to partman-basicfilesystems.templates
+  * Anton Zinoviev
+    - new script select_mountpoint in order to share code with the other
+      file system packages.
+    - select_mountpoint: show descriptions of the directories.  Add /opt
+      and /srv.  Thanks to Ryan Underwood, closes: #265296.
+    - new scripts get_mountoptions and select_mountoptions in order to
+      share code with the other file system packages
+    - get_mountoptions, select_mountoptions: use a directory "options"
+      instead of files "mountoptions" and "full_mountoptions".  Ignore
+      options that are not allowed for the selected file system.  For
+      example if the user chooses "notail" with reiserfs and then changes
+      reiserfs to ext2 the option "notail" will be ignored
+    - use capital letter in the long name of the file system ("Ext2 file
+      system") to be consistent with the names of the other file systems.
+      Thanks to Changwoo Ryu.
+    - allow user to specify usage type (the -T parameter of mkfs.ext2) and
+      percentage reserved blocks for super-user (the -m parameter of
+      tune2fs).  The same change is made in partman-ext3.  Thanks to Tomas
+      Davidek, closes: #242632.
 
  -- Christian Perrier <bubulle@debian.org>  Wed, 18 Aug 2004 10:09:01 +0200
 

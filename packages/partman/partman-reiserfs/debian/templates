@@ -20,27 +20,11 @@ _Description: Failed to create a file system
 Template: partman-reiserfs/no_mount_point
 Type: boolean
 _Description: Do you want to return to the partitioning menu?
- No mount point is assigned for the ReiserFS filesystem in partition
+ No mount point is assigned for the ReiserFS file system in partition
  #${PARTITION} of ${DEVICE}.
  .
  If you do not go back to the partitioning menu and assign a mount point
  from there, this partition will not be used at all.
-
-Template: partman-reiserfs/mountpoint
-Type: select
-_Choices: /, /boot, /home, /tmp, /usr, /usr/local, /var, Enter manually, Do not mount it
-_Description: Please choose the mountpoint for this partition
-
-Template: partman-reiserfs/mountpoint_manual
-Type: string
-_Description: Mount point for this partition:
-
-Template: partman-reiserfs/bad_mountpoint
-Type: error
-_Description: Invalid mount point
- The mount point you entered is invalid.
- .
- Mount points must start with "/".  They cannot contain spaces.
 
 Template: partman-reiserfs/text/specify_mountpoint
 Type: text
@@ -52,15 +36,11 @@ Type: text
 # File system name (untranslatable in many languages)
 _Description: ReiserFS
 
-Template: partman-reiserfs/text/options
-Type: text
-_Description: Mount options:
-
 Template: partman-reiserfs/options
 Type: multiselect
-__Choices: notail - set this option for the partition containing /boot, noatime - do not update inode access times at each access, nodev - do not support character or block special devices, nosuid - ignore set-user-identifier or set-group-identifier bits, noexec - do not allow execution of any binaries, ro - mount the file system read-only, sync - all input/output activities occur synchronously, usrquota - user disk quota accounting enabled, grpquota - group disk quota accounting enabled
+__Choices: notail - disable packing of files into the file system tree, noatime - do not update inode access times at each access, nodev - do not support character or block special devices, nosuid - ignore set-user-identifier or set-group-identifier bits, noexec - do not allow execution of any binaries, ro - mount the file system read-only, sync - all input/output activities occur synchronously, usrquota - user disk quota accounting enabled, grpquota - group disk quota accounting enabled
 _Description: Mount options:
- Mount options can tune the behavior of the file system.
+ Mount options can tune the behaviour of the file system.
 
 Template: partman/filesystem_long/reiserfs
 Type: text

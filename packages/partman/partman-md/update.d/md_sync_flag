@@ -46,7 +46,9 @@ if [ "$method" = '' -a "$has_raid" = yes ]; then
     if [ -f $dev/$id/use_filesystem ]; then
        rm $dev/$id/use_filesystem
     fi
-    >$dev/$id/format
+    if [ -f $dev/$id/format ]; then
+	rm $dev/$id/format
+    fi
 elif [ "$method" = raid -a "$has_raid" = no ]; then
     open_dialog SET_FLAGS $id
     write_line "$flags"

@@ -165,25 +165,27 @@ longint2human () {
 	case ${#1} in
 	    1|2|3)
 		suffix=B
-		longint=${1}0
+		longint=${1}00
 		;;
 	    4|5|6)
 		suffix=kB
-		longint=${1%??}
+		longint=${1%?}
 		;;
 	    7|8|9)
 		suffix=MB
-		longint=${1%?????}
+		longint=${1%????}
 		;;
 	    10|11|12)
 		suffix=GB
-		longint=${1%????????}
+		longint=${1%???????}
 		;;
 	    *)
 		suffix=TB
-		longint=${1%???????????}
+		longint=${1%??????????}
 		;;
 	esac
+	longint=$(($longint + 5))
+	longint=${longint%?}
 	int=${longint%?}
 	frac=${longint#$int}
 	printf "%i%s%i %s\n" $int $deci $frac $suffix

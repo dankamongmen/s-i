@@ -16,24 +16,11 @@ for dev in $DEVICES/*; do
 		ext3)
 		    [ -f "$id/mountpoint" ] || continue
 		    mountpoint=$(cat $id/mountpoint)
-		    if [ -f "$id/mountoptions" ]; then
-			if [ "$mountpoint" != /tmp ]; then
-			    options=$(cat $id/mountoptions | sed 's/ //g')
-			else
-			    # due to #249322, #255135, #258117:
-			    options=$(cat $id/mountoptions |
-				     sed  -e 's/ //g' \
-					 -e 's/noexec//g' \
-					 -e 's/,,/,/g' \
-					 -e 's/^,//g' \
-					 -e 's/,$//g' )
-			fi
-		    else
-			options=''
+                    # due to #249322, #255135, #258117:
+		    if [ "$mountpoint" = /tmp ]; then
+			rm $id/options/noexec >/dev/null 2>/dev/null || true
 		    fi
-		    if [ -z "$options" ]; then
-			options=defaults
-		    fi
+		    options=$(get_mountoptions $dev $id)
 		    if [ "$mountpoint" = / ]; then
 			options="${options},errors=remount-ro"
 			pass=1

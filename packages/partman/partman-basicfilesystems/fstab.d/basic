@@ -19,24 +19,11 @@ for dev in $DEVICES/*; do
 		ext2)
 		    [ -f "$id/mountpoint" ] || continue
 		    mountpoint=$(cat $id/mountpoint)
-		    if [ -f "$id/mountoptions" ]; then
-			if [ "$mountpoint" != /tmp ]; then
-			    options=$(cat $id/mountoptions | sed 's/ //g')
-			else
-			    # due to #249322, #255135, #258117:
-			    options=$(cat $id/mountoptions |
-				     sed  -e 's/ //g' \
-					 -e 's/noexec//g' \
-					 -e 's/,,/,/g' \
-					 -e 's/^,//g' \
-					 -e 's/,$//g' )
-			fi
-		    else
-			options=''
+                    # due to #249322, #255135, #258117:
+		    if [ "$mountpoint" = /tmp ]; then
+			rm $id/options/noexec >/dev/null 2>/dev/null || true
 		    fi
-		    if [ -z "$options" ]; then
-			options=defaults
-		    fi
+		    options=$(get_mountoptions $dev $id)
 		    if [ "$mountpoint" = / ]; then
 			options="${options},errors=remount-ro"
 			pass=1
@@ -48,13 +35,7 @@ for dev in $DEVICES/*; do
 		fat16|fat32)
 		    [ -f "$id/mountpoint" ] || continue
 		    mountpoint=$(cat $id/mountpoint)
-		    options=''
-		    if [ -f "$id/fatmountoptions" ]; then
-			options=$(cat $id/fatmountoptions | sed 's/ //g')
-		    fi
-		    if [ -z "$options" ]; then
-			options=defaults
-		    fi
+		    options=$(get_mountoptions $dev $id)
 		    echo "$path" "$mountpoint" vfat $options 0 2
 		    ;;
 	    esac

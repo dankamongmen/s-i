@@ -11,7 +11,7 @@ cd $dev
 [ -f $part/method -a -f $part/acting_filesystem ] || exit 0
 filesystem=$(cat $part/acting_filesystem)
 
-do_mountpoint () {
+do_fatmountpoint () {
     local noninteractive tpl
     noninteractive=true
     while true; do
@@ -81,38 +81,21 @@ do_mountpoint_manual () {
     done
 }
 
-do_options () {
-    local tpl seen_marker full_options
-    tpl=partman-basicfilesystems/${1}options
-    if [ -f $part/${1}mountoptions ]; then
-	full_options=$(cat $part/${1}full_mountoptions)
-    else
-	full_options=''
-    fi
-    db_fset $tpl seen false
-    db_set $tpl "$full_options"
-    db_input critical $tpl || true
-    db_go || exit
-    db_get $tpl
-    if [ "$RET" ]; then
-	echo "$RET" | sed 's/ *-[^,]*//g' >$part/${1}mountoptions
-	echo "$RET" >$part/${1}full_mountoptions
-    else
-	[ ! -f $part/${1}mountoptions ] || rm $part/${1}mountoptions
-	[ ! -f $part/${1}full_mountoptions ] || rm $part/${1}full_mountoptions
-    fi
-}
-
 case $1 in
     mountpoint)
-	do_mountpoint
+	if [ "$filesystem" = fat16 -o "$filesystem" = fat32 ]; then
+	    do_fatmountpoint
+	else
+	    select_mountpoint $dev $id
+	fi
 	update_partition $dev $id
 	;;
     options)
-	do_options ''
-	;;
-    fatoptions)
-	do_options fat
+	if [ "$filesystem" = fat16 -o "$filesystem" = fat32 ]; then
+	    select_mountoptions $dev $id partman-basicfilesystems/fatoptions
+	else
+	    select_mountoptions $dev $id partman-basicfilesystems/options
+	fi
 	;;
     format_swap)
 	>$part/format
@@ -147,5 +130,43 @@ case $1 in
 	    [ ! -f $part/label ] || rm $part/label
 	fi
 	;;
+    reserved_for_root)
+	if [ -f $part/reserved_for_root ]; then
+	    reserved=$(cat $part/reserved_for_root)
+	else
+	    reserved=5
+	fi
+	db_reset partman-basicfilesystems/specify_reserved
+	db_set partman-basicfilesystems/specify_reserved "$reserved%"
+	db_input critical partman-basicfilesystems/specify_reserved || true
+	db_go || exit 1
+	db_get partman-basicfilesystems/specify_reserved
+	RET=`expr "$RET" : '\([0-9][0-9]\?\)\([,. %].*\)\?$'`
+	if [ "$RET" ]; then
+	    echo "$RET" >$part/reserved_for_root
+	else
+	    [ ! -f $part/reserved_for_root ] || rm $part/reserved_for_root
+	fi
+	;;
+    usage)
+	db_metaget partman-basicfilesystems/text/typical_usage description
+	typical_usage="$RET"
+	if [ -f $part/usage ]; then
+	    usage=$(cat $part/usage)
+	else
+	    usage="$typical_usage"
+	fi
+	db_subst partman-basicfilesystems/specify_usage CHOICES "$typical_usage, news, largefile, largefile4"
+	db_set partman-basicfilesystems/specify_usage "$usage"
+	db_input critical partman-basicfilesystems/specify_usage || true
+	db_go || exit 1
+	db_get partman-basicfilesystems/specify_usage
+	if [ "$RET" != "$typical_usage" ]; then
+	    echo "$RET" >$part/usage
+	else
+	    [ ! -f $part/usage ] || rm $part/usage
+	fi
+	;;
 esac
 
+exit 0

@@ -595,6 +595,17 @@ maximize_extended_partition(PedDisk *disk)
                                     ped_constraint_any(disk->dev));
 }
 
+/* Makes the extended partition as small as possible or removes it if
+   there are no logical partitions. */
+void
+minimize_extended_partition(PedDisk *disk)
+{
+        PedPartition *extended;
+        assert(disk != NULL);
+        if (0 != strcmp(disk->type->name, "dvh")) {
+                ped_disk_minimize_extended_partition(disk);
+}
+
 /* Add to `disk' a new primary partition with file system `fs_type'
    starting at `start' and ending at `end'.  Note: The partition is
    not formatted, but only created. */
@@ -611,7 +622,7 @@ add_primary_partition(PedDisk *disk, PedFileSystemType *fs_type,
                    extended partition, but no logical partitions, this
                    command removes the extended partition. */
                 log("Minimizing extended partition.");
-                ped_disk_minimize_extended_partition(disk);
+                minimize_extended_partition(disk);
         }
         part = ped_partition_new(disk, 0, fs_type, start, end);
         if (part == NULL) {
@@ -642,15 +653,15 @@ add_logical_partition(PedDisk *disk, PedFileSystemType *fs_type,
         part = ped_partition_new(disk, PED_PARTITION_LOGICAL, fs_type,
                                  start, end);
         if (part == NULL) {
-                ped_disk_minimize_extended_partition(disk);
+                minimize_extended_partition(disk);
                 return NULL;
         }
         if (!ped_disk_add_partition(disk, part, ped_constraint_any(disk->dev))) {
                 ped_partition_destroy(part);
-                ped_disk_minimize_extended_partition(disk);
+                minimize_extended_partition(disk);
                 return NULL;
         }
-        ped_disk_minimize_extended_partition(disk);
+        minimize_extended_partition(disk);
         return part;
 }
 
@@ -714,7 +725,7 @@ resize_partition(PedDisk *disk, PedPartition *part,
         if (fs != NULL)
                 ped_file_system_close(fs);
         if (part->type & PED_PARTITION_LOGICAL)
-                ped_disk_minimize_extended_partition(disk);
+                minimize_extended_partition(disk);
         return result;
         /* TODO: not sure if constraints here should be
            ped_constraint_destroy-ed.  Lets be safe. */
@@ -862,26 +873,26 @@ partition_info(PedDisk *disk, PedPartition *part)
                 fs = part->fs_type->name;
         if (0 == strcmp(disk->type->name, "loop")) {
                 path = strdup(disk->dev->path);
-        } else if (0 == strcmp(disk->type->name, "dvh")) {
-                PedPartition *p;
-                int count = 1;
-                int number_offset;
-                for (p = NULL;
-                     NULL != (p = ped_disk_next_partition(disk, p));) {
-                        if (PED_PARTITION_METADATA & p->type)
-                                continue;
-                        if (PED_PARTITION_FREESPACE & p->type)
-                                continue;
-                        if (PED_PARTITION_LOGICAL & p->type)
-                                continue;
-                        if (part->num > p->num)
-                                count++;
-                }
-                path = ped_partition_get_path(part);
-                number_offset = strlen(path);
-                while (number_offset > 0 && isdigit(path[number_offset-1]))
-                        number_offset--;
-                sprintf(path + number_offset, "%i", count);
+/*         } else if (0 == strcmp(disk->type->name, "dvh")) { */
+/*                 PedPartition *p; */
+/*                 int count = 1; */
+/*                 int number_offset; */
+/*                 for (p = NULL; */
+/*                      NULL != (p = ped_disk_next_partition(disk, p));) { */
+/*                         if (PED_PARTITION_METADATA & p->type) */
+/*                                 continue; */
+/*                         if (PED_PARTITION_FREESPACE & p->type) */
+/*                                 continue; */
+/*                         if (PED_PARTITION_LOGICAL & p->type) */
+/*                                 continue; */
+/*                         if (part->num > p->num) */
+/*                                 count++; */
+/*                 } */
+/*                 path = ped_partition_get_path(part); */
+/*                 number_offset = strlen(path); */
+/*                 while (number_offset > 0 && isdigit(path[number_offset-1])) */
+/*                         number_offset--; */
+/*                 sprintf(path + number_offset, "%i", count); */
         } else {
                 path = ped_partition_get_path(part);
         }
@@ -1176,7 +1187,7 @@ command_partitions()
                 return;
         }
         if (has_extended_partition(disk))
-                ped_disk_minimize_extended_partition(disk);
+                minimize_extended_partition(disk);
         for (part = NULL;
              NULL != (part = ped_disk_next_partition(disk, part));) {
                 char *part_info;
@@ -1195,6 +1206,10 @@ command_partitions()
                     && ped_disk_type_check_feature(disk->type,
                                                    PED_DISK_TYPE_EXTENDED)
                     && (part->geom).length < dev->sectors * dev->heads)
+                        continue;
+                /* Another hack :) */
+                if (0 == strcmp(disk->type->name, "dvh")
+                    && PED_PARTITION_LOGICAL & part->type) {
                         continue;
                 part_info = partition_info(disk, part);
                 oprintf("%s\n", part_info);
@@ -1469,7 +1484,8 @@ command_uses_extended()
         open_out();
         oprintf("OK\n");
         deactivate_exception_handler();
-        if (ped_disk_type_check_feature(disk->type, PED_DISK_TYPE_EXTENDED))
+        if (ped_disk_type_check_feature(disk->type, PED_DISK_TYPE_EXTENDED)
+            && 0 != strcmp(disk->type->name, "dvh"))
                 oprintf("yes\n");
         else
                 oprintf("no\n");
@@ -1752,7 +1768,7 @@ command_delete_partition()
                 log("Partition found");
                 ped_disk_delete_partition(disk, part);
                 if (type & PED_PARTITION_LOGICAL)
-                        ped_disk_minimize_extended_partition(disk);
+                        minimize_extended_partition(disk);
                 log("Partition deleted");
         }
         oprintf("OK\n");
@@ -1838,7 +1854,7 @@ command_get_resize_range()
                 maximize_extended_partition(disk);
         max_geom = ped_disk_get_max_partition_geometry(disk, part, constraint);
         if (part->type & PED_PARTITION_LOGICAL)
-                ped_disk_minimize_extended_partition(disk);
+                minimize_extended_partition(disk);
         max_size = max_geom->length * PED_SECTOR_SIZE;
         min_size = constraint->min_size * PED_SECTOR_SIZE;
         current_size = (part->geom).length * PED_SECTOR_SIZE;

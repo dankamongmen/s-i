@@ -4,7 +4,7 @@ partman-auto/text/multi_user_scheme ::
 	$bootable{ }
 	method{ newworld } .
 
-70 400 150 ext3
+70 400 280 ext3
 	method{ format }
 	format{ }
 	use_filesystem{ }
@@ -16,6 +16,7 @@ partman-auto/text/multi_user_scheme ::
 	format{ }
 	use_filesystem{ }
 	filesystem{ ext3 }
+	options/nodev{ nodev - do not support character or block special devices }
 	mountpoint{ /usr } .
 
 70 1500 3000 ext3
@@ -23,13 +24,25 @@ partman-auto/text/multi_user_scheme ::
 	format{ }
 	use_filesystem{ }
 	filesystem{ ext3 }
+	options/nodev{ nodev - do not support character or block special devices }
+	options/noexec{ noexec - do not allow execution of any binaries }
+	options/usrquota{ usrquota - user disk quota accounting enabled }
+	options/grpquota{ grpquota - group disk quota accounting enabled }
 	mountpoint{ /var } .
+
+64 512 300% linux-swap
+	method{ swap }
+	format{ } .
 
 20 300 400 ext3
 	method{ format }
 	format{ }
 	use_filesystem{ }
 	filesystem{ ext3 }
+	options/nodev{ nodev - do not support character or block special devices }
+	options/nosuid{ nosuid - ignore set-user-identifier or set-group-identifier bits }
+	options/usrquota{ usrquota - user disk quota accounting enabled }
+	options/grpquota{ grpquota - group disk quota accounting enabled }
         mountpoint{ /tmp } .
 
 300 3000 1000000000 ext3
@@ -37,8 +50,9 @@ partman-auto/text/multi_user_scheme ::
 	format{ }
 	use_filesystem{ }
 	filesystem{ ext3 }
+	options/nodev{ nodev - do not support character or block special devices }
+	options/nosuid{ nosuid - ignore set-user-identifier or set-group-identifier bits }
+	options/usrquota{ usrquota - user disk quota accounting enabled }
+	options/grpquota{ grpquota - group disk quota accounting enabled }
 	mountpoint{ /home } .
 
-64 512 512 linux-swap
-	method{ swap }
-	format{ } .

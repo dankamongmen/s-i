@@ -41,28 +41,9 @@ choice_mountpoint () {
 }
 
 choice_options () {
-    case "$filesystem" in
-	ext2)
-	    if [ -f $part/mountoptions ]; then
-		options=$(cat $part/mountoptions|sed 's/ //g')
-	    else
-		options=defaults
-	    fi
-	    db_metaget partman-basicfilesystems/text/options description
-	    RET=$(stralign -25 "$RET")
-	    printf "options\t%s%.45s\n" "$RET" "$options"
-	    ;;
-	fat16|fat32)
-	    if [ -f $part/fatmountoptions ]; then
-		options=$(cat $part/fatmountoptions|sed 's/ //g')
-	    else
-		options=defaults
-	    fi
-	    db_metaget partman-basicfilesystems/text/options description
-	    RET=$(stralign -25 "$RET")
-	    printf "fatoptions\t%s%.45s\n" "$RET" "$options"
-	    ;;
-    esac
+    db_metaget partman-basicfilesystems/text/options description
+    RET=$(stralign -25 "$RET")
+    printf "options\t%s%.45s\n" "$RET" "$(get_mountoptions $dev $id)"
 }
 
 choice_format_swap () {
@@ -118,6 +99,43 @@ choice_label () {
     esac
 }
 
+choice_reserved () {
+    local reserved
+    [ "$filesystem" = ext2 ] || return 0
+    # allow to set reserved space only if the partition is to be formatted
+    [ -f $part/format ] || return 0
+    [ ! -f $part/formatted \
+      -o $part/formatted -ot $part/method \
+      -o $part/formatted -ot $part/filesystem ] || return 0
+    if [ -f $part/reserved_for_root ]; then
+	reserved=$(cat $part/reserved_for_root)
+    else
+	reserved=5
+    fi
+    db_metaget partman-basicfilesystems/text/reserved_for_root description
+    RET=$(stralign -25 "$RET")
+    printf "reserved_for_root\t%s%s\n" "$RET" "$reserved%"
+}
+
+choice_usage () {
+    local usage
+    [ "$filesystem" = ext2 ] || return 0
+    # allow to set usage only if the partition is to be formatted
+    [ -f $part/format ] || return 0
+    [ ! -f $part/formatted \
+      -o $part/formatted -ot $part/method \
+      -o $part/formatted -ot $part/filesystem ] || return 0
+    if [ -f $part/usage ]; then
+	usage=$(cat $part/usage)
+    else
+	db_metaget partman-basicfilesystems/text/typical_usage description
+	usage=$RET
+    fi
+    db_metaget partman-basicfilesystems/text/usage description
+    RET=$(stralign -25 "$RET")
+    printf "usage\t%s%s\n" "$RET" "$usage"
+}
+
 choice_mountpoint
 
 choice_options
@@ -125,3 +143,7 @@ choice_options
 choice_format_swap
 
 choice_label
+
+choice_reserved
+
+choice_usage

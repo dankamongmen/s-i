@@ -24,19 +24,9 @@ case "$filesystem" in
 esac
 
 choice_mountpoint () {
-    case "$filesystem" in
-	reiserfs)
-	    if [ -f $part/mountpoint ]; then
-		mp=$(cat $part/mountpoint)
-	    else
-		db_metaget partman-basicfilesystems/text/no_mountpoint description
-		mp="$RET"
-	    fi
-	    db_metaget partman-reiserfs/text/specify_mountpoint description
-	    RET=$(stralign -25 "$RET")
-	    printf "mountpoint\t%s%s\n" "$RET" "$mp"
-	    ;;
-    esac
+    db_metaget partman-basicfilesystems/text/options description
+    RET=$(stralign -25 "$RET")
+    printf "options\t%s%.45s\n" "$RET" "$(get_mountoptions $dev $id)"
 }
 
 choice_options () {

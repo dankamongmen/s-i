@@ -49,17 +49,26 @@ for dev in $DEVICES/*; do
 		db_subst $template DEVICE $(humandev $(cat device))
 		case $filesystem in
 		    ext2)
-			name_progress_bar $template
-			open_dialog CREATE_FILE_SYSTEM $id $filesystem
-			read_line status
-			close_dialog
-			sync
+			if [ ! -f $id/usage ]; then
+			    name_progress_bar $template
+			    open_dialog CREATE_FILE_SYSTEM $id $filesystem
+			    read_line status
+			    close_dialog
+			    sync
+			else
+			    status=failed
+			fi
 			if [ "$status" != OK ]; then
 			    db_progress START 0 3 partman/text/formatting
 			    db_progress INFO $template
 			    db_progress SET 1
+			    if [ -f $id/usage ]; then
+				usage="-T $(cat $id/usage)"
+			    else
+				usage=''
+			    fi
 			    if
-				mkfs.ext2 $device >/dev/null 2>>/var/log/messages
+				mkfs.ext2 $device $usage >/dev/null 2>>/var/log/messages
 			    then
 				sync
 				status=OK
@@ -79,7 +88,10 @@ for dev in $DEVICES/*; do
 				label=''
 			    fi
 			    if [ "$label" ]; then
-				tune2fs -L "$label" $device
+				tune2fs -L "$label" $device >/dev/null 2>>/var/log/messages
+			    fi
+			    if [ -f $id/reserved_for_root ]; then
+				tune2fs -m $(cat $id/reserved_for_root) $device >/dev/null 2>>/var/log/messages
 			    fi
 			fi
 			;;

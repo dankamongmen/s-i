@@ -46,7 +46,9 @@ if [ "$method" = '' -a "$has_lvm" = yes ]; then
     if [ -f $dev/$id/use_filesystem ]; then
 	rm $dev/$id/use_filesystem
     fi
-    >$dev/$id/format
+    if [ -f $dev/$id/format ]; then
+	rm $dev/$id/format
+    fi
 elif [ "$method" = lvm -a "$has_lvm" = no ]; then
     open_dialog SET_FLAGS $id
     write_line "$flags"

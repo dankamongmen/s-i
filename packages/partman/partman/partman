@@ -13,7 +13,7 @@ abort () {
 }
 
 confirm_changes () {
-    local dev x part partitions num id size type fs path name filesystem partitems items
+    local dev x part partitions num id size type fs path name filesystem partitems items formatted_previously
     # Compute the changes we are going to do
     partitems=''
     items=''
@@ -37,16 +37,25 @@ confirm_changes () {
 	done
 	close_dialog
 	
+	formatted_previously=no
 	for part in $partitions; do
 	    id=${part%,*}
 	    num=${part#*,}
             [ -f $id/method -a -f $id/format \
                 -a -f $id/visual_filesystem ] || continue
+	    # if no filesystem (e.g. swap) should either be not
+            # formatted or formatted before the method is specified
             [ -f $id/filesystem -o ! -f $id/formatted \
                 -o $id/formatted -ot $id/method ] || continue
+	    # if it is already formatted filesystem it must be formatted 
+	    # before the method or filesystem is specified
             [ ! -f $id/filesystem -o ! -f $id/formatted \
                 -o $id/formatted -ot $id/method \
-                -o $id/formatted -ot $id/filesystem ] || continue
+                -o $id/formatted -ot $id/filesystem ] ||
+	            {
+			formatted_previously=yes
+			continue
+		    }
 	    filesystem=$(cat $id/visual_filesystem)
 	    db_subst partman/text/confirm_item TYPE "$filesystem"
 	    db_subst partman/text/confirm_item PARTITION "$num"
@@ -90,12 +99,16 @@ $items"
 	    return 0
 	fi
     else
-	db_reset partman/confirm_nochanges
-	db_input high partman/confirm_nochanges
-	db_go || true
-	db_get partman/confirm_nochanges
-	if [ "$RET" = false ]; then
-	    return 1
+	if [ "$formatted_previously" = no ]; then
+	    db_reset partman/confirm_nochanges
+	    db_input high partman/confirm_nochanges
+	    db_go || true
+	    db_get partman/confirm_nochanges
+	    if [ "$RET" = false ]; then
+		return 1
+	    else
+		return 0
+	    fi
 	else
 	    return 0
 	fi
@@ -106,11 +119,11 @@ db_capb backup
 
 # Measure the width of partman/text/number here to make things faster.
 # number_width is used only in visual.d/number
-db_metaget partman/text/number description
-RET=$(printf "$RET" '')
-RET=$(stralign 50 "$RET" | sed 's/[^ ]//g')
-number_width=$((2 + 50 - ${#RET}))
-export number_width
+#db_metaget partman/text/number description
+#RET=$(printf "$RET" '')
+#RET=$(stralign 50 "$RET" | sed 's/[^ ]//g')
+#number_width=$((2 + 50 - ${#RET}))
+#export number_width
 
 
 # Here is maybe not a good place to set deci (TODO)
@@ -135,6 +148,7 @@ while true; do
     for s in /lib/partman/init.d/*; do
 	if [ -x $s ]; then
 	    base=$(basename $s | sed 's/[0-9]*//')
+	    echo $base >&2
 	    # Not every init script has, or needs, its own progress
 	    # template. Add them to slow init scripts only.
 	    if ! db_progress INFO partman/progress/init/$base; then

@@ -1,3 +1,33 @@
+partman-auto (31) UNRELEASED; urgency=low
+
+  * Anton Zinoviev
+    - second try: closes:  #261244
+    - raise the maximal size for / in multi_user recipes (150->280MB).
+      Thanks to Chris Walker, closes: #248278.
+    - resipes.sh (setup_partition): allow creation of subdirectories in
+      the partition directories.
+    - add "noatime" mount option in the atomic and home recipes.  Thanks
+      to Ryan Underwood, closes: #265295
+    - add mount options in the multi_user recipes:
+         "nodev" and "noexec" for /boot,
+	 "nodev" for /usr,
+	 "nodev", "noexec", "usrquota" and "grpquota" for /var,
+	 "nodev", "nosuid", "usrquota" and "grpquota" for /tmp,
+	 "nodev", "nosuid", "usrquota" and "grpquota" for /home
+    - move the swap between / and /home in the home recipes; reorder the
+      partitions in the multi_user recipe so that swap is in the middle and
+      the most often accessible partitions are around it:
+      (/boot), /, /usr, /var, swap, /tmp, /home.
+    - templates: rename the recipes:
+         home:        Desktop machine
+         multi_user:  Multi-user workstation
+      Thanks to Margarita Manterola, closes: #251414
+    - limit the maximum size of the swap to 3 times the available RAM but
+      not less than 64 MB.  Thanks to Margarita Manterola, closes: #254935
+    - README: document #261244 and #265290
+  
+ -- Anton Zinoviev <zinoviev@debian.org>  Thu, 25 Aug 2004 21:12:22 +0300
+
 partman-auto (30) unstable; urgency=low
 
   * Jim Lieb

@@ -40,18 +40,9 @@ choice_mountpoint () {
 }
 
 choice_options () {
-    if [ -f $part/mountoptions ]; then
-	options=$(cat $part/mountoptions|sed 's/ //g')
-    else
-	options=defaults
-    fi
-    case "$filesystem" in
-	jfs)
-	    db_metaget partman-jfs/text/options description
-	    RET=$(stralign -25 "$RET")
-	    printf "options\t%s%.45s\n" "$RET" "$options"
-	    ;;
-    esac
+    db_metaget partman-basicfilesystems/text/options description
+    RET=$(stralign -25 "$RET")
+    printf "options\t%s%.45s\n" "$RET" "$(get_mountoptions $dev $id)"
 }
 
 choice_label () {
