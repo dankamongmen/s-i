@@ -30,5 +30,6 @@ int skip_package(struct package_t *p);
 int pkgname_cmp(const void *v1, const void *v2);
 struct linkedlist_t *get_initial_package_list(struct linkedlist_t *pkgs);
 void drop_excludes(struct linkedlist_t *pkgs);
+int enhances(struct package_t *p, struct linkedlist_t *installed);
 
 #endif /* ANNA_H_ */

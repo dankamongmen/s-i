@@ -87,7 +87,7 @@ choose_modules(void)
     for (node = pkglist->head; node != NULL; node = next) {
         next = node->next;
         p = (struct package_t *)node->data;
-        if (p->package == NULL || is_installed(p, status_p) || skip_package(p)) {
+        if (p->package == NULL || (!enhances(p, status_p) && (is_installed(p, status_p) || skip_package(p)))) {
             if (prev)
                 prev->next = next;
             else
@@ -108,8 +108,8 @@ choose_modules(void)
         next = node->next;
         p = (struct package_t *)node->data;
         pkg_kernel = udeb_kernel_version(p);
-        if (p->priority >= standard || (running_kernel && pkg_kernel &&
-                    strcmp(running_kernel, pkg_kernel) == 0)) {
+        if (p->priority >= standard || enhances(p, status_p) ||
+                (running_kernel && pkg_kernel && strcmp(running_kernel, pkg_kernel) == 0)) {
             /* These packages will automatically be installed */
             if (prev != NULL)
                 prev->next = next;

@@ -497,3 +497,16 @@ drop_excludes(struct linkedlist_t *pkglist)
     fclose(fp);
     return;
 }
+
+// Does p enhance any installed package?
+int
+enhances(struct package_t *p, struct linkedlist_t *installed)
+{
+    int i;
+
+    for (i = 0; p->enhances[i] != NULL; i++)
+        if (di_pkg_find(installed, p->enhances[i]->name))
+            return 1;
+    return 0;
+}
+
