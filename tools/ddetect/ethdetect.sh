@@ -27,7 +27,7 @@ load_module() {
 }
 
 snapshot_devs() {
-	return $(echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`)
+	echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`
 }
 
 compare_devs() {
