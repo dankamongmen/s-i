@@ -1,0 +1,13 @@
+#!/bin/sh
+# Set framebuffer for second stage
+set -e
+
+if [ "`udpkg --print-architecture`" = "i386" ] && \
+   [ "$TERM_TYPE" = virtual -a -e /dev/fb/0 ] && \
+   [ "`debconf-get debian-installer/framebuffer`" = true ]; then
+  if [ -z "`cat /proc/fb|grep VGA16`" ]; then
+    echo "vesafb" >> /target/etc/modules
+  else
+    echo "vga16fb" >> /target/etc/modules
+  fi
+fi
