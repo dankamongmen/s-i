@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.16 2004/02/15 22:36:19 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.17 2004/03/13 10:58:16 mckinstry Exp $
  */
 
 #include "config.h"
@@ -35,19 +35,13 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 	k->next = keyboards;
 	keyboards = k;
 
-#if defined (KERNEL_2_6)
-	/* In 2.6 series, we can detect keyboard via /proc/bus/input
-	 *
-	 * FIXME: Write this code	 
-	 *   Need to search /proc/bus/input/devices
-	 
-	 */	
-	if (check_dir ("/proc/bus/input") >= 0) { // 2.6 kernel
-#warning "Kernel 2.6 code not written yet"
-	}
-#endif
-	/* 2.4 code */
 
+#if !defined(__powerpc__)
+	/* The following code tries to autodetect USB keyboards.
+	 * its currently implicated in debian bug #234513,
+	 * and excluded for beta3.
+	 */
+	
 	/* In 2.4, if "Device=usbkbd" is present in /proc/bus/usb/devices
 	 * a USB keyboard is present.
 	 * There may be multiple keyboards, but they can only have one
@@ -89,6 +83,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 	if (mounted_fs)
 		system ("umount /proc/bus/usb");
 
+#endif
 
 	return keyboards;	
 }
