@@ -1,37 +1,39 @@
 #ifndef ANNA_H_
 #define ANNA_H_ 1
 
+#include <cdebconf/debconfclient.h>
 #include <debian-installer.h>
 
-#define STATUS_FILE             "/var/lib/dpkg/status"
 #define RETRIEVER_DIR           "/usr/lib/debian-installer/retriever"
 #define DOWNLOAD_DIR            "/var/cache/anna"
 #define DOWNLOAD_PACKAGES       DOWNLOAD_DIR "/Packages"
 #define INCLUDE_FILE            DOWNLOAD_DIR "/include"
 #define EXCLUDE_FILE            DOWNLOAD_DIR "/exclude"
-#define DPKG_UNPACK_COMMAND     "udpkg --unpack"
+#define DPKG_UNPACK_COMMAND	"udpkg --unpack"
 #define ANNA_RETRIEVER          "anna/retriever"
 #define ANNA_CHOOSE_MODULES     "anna/choose_modules"
 #define ANNA_NO_MODULES         "anna/no_modules"
 
-struct linkedlist_t *get_retriever_packages(void);
-char *get_retriever_choices(struct linkedlist_t *list);
+#undef LIBDI_SYSTEM_DPKG
+
+extern struct debconfclient *debconf;
+
+di_package **get_retriever_packages(di_packages *status);
 const char *get_default_retriever(const char *choices);
 char *get_retriever(void);
 int config_retriever(void);
-struct linkedlist_t *get_packages(void);
-int is_installed(struct package_t *p, struct linkedlist_t *installed);
-char *list_to_choices(struct package_t *list[], const int count);
-int get_package (struct package_t *package, char *dest);
-int unpack_package (char *pkgfile);
-int md5sum(char* sum, char *file);
+di_packages *get_packages(di_packages_allocator *allocator);
+int is_installed(di_package *p, di_packages *status);
+size_t package_to_choice(di_package *package, const char *language, char *buf, size_t size);
+char *list_to_choices(di_package **packages, const char *language);
+int get_package (di_package *package, char *dest);
+int md5sum(const char* sum, const char *file);
 void cleanup(void);
-char *udeb_kernel_version(struct package_t *p);
-int skip_package(struct package_t *p);
-int pkgname_cmp(const void *v1, const void *v2);
-struct linkedlist_t *get_initial_package_list(struct linkedlist_t *pkgs);
-void drop_excludes(struct linkedlist_t *pkgs);
-int enhances(struct package_t *p, struct linkedlist_t *installed);
-int new_retrievers(struct linkedlist_t* retrievers_before, struct linkedlist_t* retrievers_after);
+char *udeb_kernel_version(di_package *package);
+int skip_package(di_package *p);
+int package_array_compare(const void *v1, const void *v2);
+void get_initial_package_list(di_packages *packages);
+void drop_excludes(di_packages *packages);
+int new_retrievers(di_package **retrievers_before, di_package **retrievers_after);
 
 #endif /* ANNA_H_ */

@@ -3,158 +3,136 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/utsname.h>
-#include <cdebconf/debconfclient.h>
-#include <debian-installer.h>
 #include "anna.h"
 
-static struct debconfclient *debconf = NULL;
-
+struct debconfclient *debconf = NULL;
 
 static int
-choose_retriever(void)
+choose_retriever(di_packages *status, di_packages **packages __attribute__((unused)), di_packages_allocator **packages_allocator __attribute__((unused)), const char *language)
 {
-    struct linkedlist_t *ret_pkgs;
-    char *ret_choices;
+    char *choices;
+   di_package **retrievers;
 
-    ret_pkgs = get_retriever_packages();
-    if (ret_pkgs == NULL)
-        return 1;
-    ret_choices = get_retriever_choices(ret_pkgs);
-    if (ret_choices[0] == '\0')
-        return 2;
+    retrievers = get_retriever_packages(status);
+    if (!retrievers)
+        di_log(DI_LOG_LEVEL_WARNING, "can't find any retrievers");
+    choices = list_to_choices(retrievers, language);
+    if (!choices)
+        di_log(DI_LOG_LEVEL_ERROR, "can't build choices");
     debconf->command(debconf, "FGET", ANNA_RETRIEVER, "seen", NULL);
     if (strcmp(debconf->value, "false") == 0) {
-        char *defval = (char *)get_default_retriever(ret_choices);
-        struct package_t *p;
+        const char *retriever = get_default_retriever(choices);
+        char buf[200];
+        di_package *p;
 
-        if (defval != NULL && (p = di_pkg_find(ret_pkgs, defval))) {
-            if (asprintf(&defval, "%s: %s", p->package, p->description) == -1)
-                return 3;
-            debconf->command(debconf, "SET", ANNA_RETRIEVER, defval, NULL);
-            free(defval);
+        if (retriever && (p = di_packages_get_package(status, retriever, 0))) {
+            package_to_choice(p, language, buf, 200);
+            debconf->command(debconf, "SET", ANNA_RETRIEVER, buf, NULL);
         }
     }
-    di_list_free(ret_pkgs, di_pkg_free);
 
     debconf->command(debconf, "FSET", ANNA_RETRIEVER, "seen", "false", NULL);
-    debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES", ret_choices, NULL);
+    debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES", choices, NULL);
     debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
 
-    free(ret_choices);
+    di_free(retrievers);
+    di_free(choices);
 
     return 0;
 }
 
 
-/* Ick */
-static struct linkedlist_t *instlist;
-static struct package_t **askpkgs;
-static int ask_count;
-
 static int
-choose_modules(void)
+choose_modules(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator, const char *language)
 {
-    struct linkedlist_t *pkglist, *tmplist, *status_p, *asklist;
-    struct list_node *node, *prev, *next;
-    struct package_t *p;
-    FILE *fp;
-    char *choices, *pkg_kernel, *running_kernel = NULL;
-    struct utsname uts;
+    char *choices, *package_kernel, *running_kernel = NULL;
     int package_count = 0;
+    di_package *package, *status_package, **package_array;
+    di_slist_node *node, *node1;
+    struct utsname uts;
 
     config_retriever();
-    ask_count = 0;
     if (uname(&uts) == 0)
         running_kernel = uts.release;
-    pkglist = get_packages();
-    if (pkglist == NULL || pkglist->head == NULL) {
+
+    *packages_allocator = di_system_packages_allocator_alloc();
+    *packages = get_packages(*packages_allocator);
+
+    if (*packages == NULL) {
         debconf->command(debconf, "INPUT critical", ANNA_NO_MODULES, NULL);
         debconf->command(debconf, "GO", NULL);
-        free(pkglist);
         return 4;
     }
-    /* OK. We have a list of packages. What we want to do is partition it in
-     * two parts. One with packages that will be installed and one with
-     * packages that *might* be installed */
-    fp = fopen(STATUS_FILE, "r");
-    if (fp == NULL)
-        return 5;
-    status_p = di_pkg_parse(fp);
-    fclose(fp);
 
-    /* First of all, do some sanity checks on the package list! */
-    prev = NULL;
-    for (node = pkglist->head; node != NULL; node = next) {
-        next = node->next;
-        p = (struct package_t *)node->data;
-        if (p->package == NULL || (!enhances(p, status_p) && (is_installed(p, status_p) || skip_package(p)))) {
-            if (prev)
-                prev->next = next;
-            else
-                pkglist->head = next;
-            /* FIXME: When is it safe to free p? */
-            free(node);
-            continue;
-        }
-        prev = node;
-    }
+    get_initial_package_list(*packages);
 
-    /* Resolve provides */
-    di_pkg_resolve_deps(pkglist);
-    /* Figure out which packages we definitely want to install */
-    prev = NULL;
-    instlist = get_initial_package_list(pkglist);
-    for (node = pkglist->head; node != NULL; node = next) {
-        next = node->next;
-        p = (struct package_t *)node->data;
-        pkg_kernel = udeb_kernel_version(p);
-        if (p->priority >= standard || enhances(p, status_p) ||
-                (running_kernel && pkg_kernel && strcmp(running_kernel, pkg_kernel) == 0)) {
-            /* These packages will automatically be installed */
-            if (prev != NULL)
-                prev->next = next;
-            else
-                pkglist->head = next;
-            if (instlist->tail == NULL) {
-                instlist->head = node;
-                instlist->tail = node;
-            } else {
-                instlist->tail->next = node;
-                instlist->tail = node;
+    for (node = status->list.first; node; node = node->next) {
+        status_package = node->data;
+        if (status_package->status == di_package_status_unpacked || status_package->status == di_package_status_installed) {
+            package = di_packages_get_package(*packages, status_package->package, 0);
+            if (!package)
+                continue;
+            for (node1 = package->depends.first; node1; node1 = node1->next) {
+                di_package_dependency *d = node1->data;
+                if (d->type == di_package_dependency_type_reverse_enhances)
+                {
+                    package->status_want = di_package_status_want_install;
+                    di_log (DI_LOG_LEVEL_DEBUG, "install %s because of enhances", package->package);
+                }
             }
-            node->next = NULL;
-            continue;
         }
-        package_count++;
-        prev = node;
     }
+
+    for (node = (*packages)->list.first; node; node = node->next) {
+        package = node->data;
+        package_kernel = udeb_kernel_version(package);
+
+        package->status_want = di_package_status_want_deinstall;
+
+        if (package->status_want == di_package_status_want_install)
+          continue;
+        if (package->type != di_package_type_real_package)
+          continue;
+        if (is_installed(package, status))
+          continue;
+
+//	di_log (DI_LOG_LEVEL_DEBUG, "running-kernel: %s, package_kernel: %s", running_kernel, package_kernel);
+        if (running_kernel && package_kernel && strcmp(running_kernel, package_kernel) == 0)
+        {
+            package->status_want = di_package_status_want_unknown;
+            di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, matches kernel", package->package);
+        }
+	else if (package_kernel)
+	  continue;
+        if (package->priority >= di_package_priority_standard)
+        {
+            package->status_want = di_package_status_want_install;
+            di_log (DI_LOG_LEVEL_DEBUG, "install %s, priority >= standard", package->package);
+        }
+        else if (((di_system_package *)package)->installer_menu_item)
+        {
+            package->status_want = di_package_status_want_unknown;
+            di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, is installer item", package->package);
+        }
+    }
+
     /* Drop files in udeb_exclude */
-    drop_excludes(instlist);
-    /* Pull in dependencies */
-    tmplist = di_pkg_toposort_list(instlist);
-    /* Free up the memory used by the nodes in the old instlist */
-    //di_list_free(instlist, free); /* This actually causes memory corruption...dammit */
-    di_list_free(status_p, di_pkg_free);
-    instlist = tmplist;
+    drop_excludes(*packages);
+
+    di_packages_resolve_dependencies_mark(*packages);
 
     /* Slight over-allocation, but who cares */
-    askpkgs = calloc(package_count, sizeof(struct package_t *));
+    package_array = di_new0(di_package *, di_hash_table_size((*packages)->table));
     /* Now build the asklist, figuring out which packages have been
      * pulled into instlist */
-    prev = NULL;
-    asklist = pkglist;
-    for (node = asklist->head; node != NULL; node = next) {
-        next = node->next;
-        p = (struct package_t *)node->data;
-        /* If p->filename is NULL, it's a virtual package */
-        if (p->filename != NULL && di_pkg_find(instlist, p->package) == NULL &&
-	    p->installer_menu_item > 0)
-            askpkgs[ask_count++] = p;
-        free(node);
+    for (node = (*packages)->list.first; node; node = node->next) {
+        package = node->data;
+        if (package->status_want == di_package_status_want_unknown)
+            package_array[package_count++] = package;
     }
-    free(asklist);
-    qsort(askpkgs, ask_count, sizeof(struct package_t *), pkgname_cmp);
-    choices = list_to_choices(askpkgs, ask_count);
+
+    qsort(package_array, package_count, sizeof(di_package *), package_array_compare);
+    choices = list_to_choices(package_array, language);
     debconf->command(debconf, "FSET", ANNA_CHOOSE_MODULES, "seen", "false", NULL);
     debconf->command(debconf, "SUBST", ANNA_CHOOSE_MODULES, "CHOICES", choices, NULL);
     debconf->command(debconf, "INPUT medium", ANNA_CHOOSE_MODULES, NULL);
@@ -164,87 +142,67 @@ choose_modules(void)
 }
 
 static int
-install_modules(void)
+install_modules(di_packages *status, di_packages *packages, di_packages_allocator *status_allocator)
 {
-    FILE *sfp;
-    struct linkedlist_t *tmplist, *status_p;
-    struct list_node *node;
-    struct package_t *p;
+    di_slist_node *node;
+    di_package *package;
     char *f, *fp, *dest_file;
-    int ret = 0, pkg_count = 0, i;
+    int ret = 0, pkg_count = 0;
 
-    sfp = fopen(STATUS_FILE, "r");
-    if (sfp == NULL)
-        return 5;
-    status_p = di_pkg_parse(sfp);
-    fclose(sfp);
     debconf->command(debconf, "GET", ANNA_CHOOSE_MODULES, NULL);
     if (debconf->value != NULL) {
         char *choices = debconf->value;
 
-        for (i = 0; i < ask_count; i++) {
-            p = askpkgs[i];
+        for (node = packages->list.first; node; node = node->next) {
+            package = node->data;
             /* Not very safe, but at least easy ;) */
-            if (strstr(choices, p->package) != NULL) {
-                node = malloc(sizeof(struct list_node));
-                node->next = NULL;
-                node->data = p;
-                if (instlist->tail == NULL) {
-                    instlist->head = node;
-                    instlist->tail = node;
-                } else {
-                    instlist->tail->next = node;
-                    instlist->tail = node;
-                }
-            }
+            if (strstr(choices, package->package) != NULL)
+                package->status_want = di_package_status_want_install;
         }
     }
-    free(askpkgs);
-    /* Pull in dependencies again since we might have added packages */
-    di_pkg_resolve_deps(instlist);
-    tmplist = di_pkg_toposort_list(instlist);
-    /* Free some memory. Note, we don't know which of the nodes inside
-       the asklist we can free. sigh. */
-    instlist = tmplist;
 
-    for (node = instlist->head; node != NULL; node = node->next) {
-        p = (struct package_t *)node->data;
-        if (p->filename != NULL && !is_installed(p, status_p))
+    di_packages_resolve_dependencies_mark(packages);
+
+    for (node = packages->list.first; node; node = node->next) {
+        package = node->data;
+        if (package->status_want == di_package_status_want_install && !is_installed(package, status))
             pkg_count++;
+        else
+            package->status_want = di_package_status_want_unknown;
     }
     // Short-circuit if there's no packages to install
     if (pkg_count <= 0)
         return 0;
     debconf->commandf(debconf, "PROGRESS START 0 %d anna/progress_title", 2*pkg_count);
-    for (node = instlist->head; node != NULL; node = node->next) {
-        p = (struct package_t *)node->data;
-        if (p->filename != NULL && !is_installed(p, status_p)) {
+    for (node = packages->list.first; node; node = node->next) {
+        package = node->data;
+        if (package->type == di_package_type_real_package && package->status_want == di_package_status_want_install) {
             /*
              * Come up with a destination filename.. let's use
              * the filename we're getting, minus any path
              * component.
              */
-            for(f = fp = p->filename; *fp != 0; fp++)
+            for(f = fp = package->filename; *fp != 0; fp++)
                 if (*fp == '/')
                     f = ++fp;
             if (asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f) == -1) 
                 return 5;
 
-            debconf->command(debconf, "SUBST", "anna/progress_step_retr", "PACKAGE", p->package, NULL);
-            debconf->command(debconf, "SUBST", "anna/progress_step_inst", "PACKAGE", p->package, NULL);
+            debconf->command(debconf, "SUBST", "anna/progress_step_retr", "PACKAGE", package->package, NULL);
+            debconf->command(debconf, "SUBST", "anna/progress_step_inst", "PACKAGE", package->package, NULL);
             debconf->command(debconf, "PROGRESS", "INFO", "anna/progress_step_retr", NULL);
-            if (!get_package(p, dest_file)) {
+            if (get_package(package, dest_file)) {
                 debconf->command(debconf, "PROGRESS STOP", NULL);
-                debconf->command(debconf, "SUBST", "anna/retrieve_failed", "PACKAGE", p->package, NULL);
+                debconf->command(debconf, "SUBST", "anna/retrieve_failed", "PACKAGE", package->package, NULL);
                 debconf->command(debconf, "INPUT critical", "anna/retrieve_failed", NULL);
                 debconf->command(debconf, "GO", NULL);
                 free(dest_file);
                 ret = 6;
                 break;
             }
-            if (!md5sum(p->md5sum, dest_file)) {
+            if (!md5sum(package->md5sum, dest_file)) {
                 debconf->command(debconf, "PROGRESS STOP", NULL);
-                debconf->command(debconf, "SUBST", "anna/md5sum_failed", "PACKAGE", p->package, NULL);
+                debconf->command(debconf, "SUBST", "anna/md5sum_failed", "PACKAGE", package->package, NULL);
                 debconf->command(debconf, "INPUT critical", "anna/md5sum_failed", NULL);
                 debconf->command(debconf, "GO", NULL);
                 unlink(dest_file);
@@ -254,9 +212,13 @@ install_modules(void)
             }
             debconf->command(debconf, "PROGRESS", "STEP", "1", NULL);
             debconf->command(debconf, "PROGRESS", "INFO", "anna/progress_step_inst", NULL);
+#ifdef LIBDI_SYSTEM_DPKG
+            if (di_system_dpkg_package_unpack(status, package->package, dest_file, status_allocator)) {
+#else
             if (!unpack_package(dest_file)) {
+#endif
                 debconf->command(debconf, "PROGRESS STOP", NULL);
-                debconf->command(debconf, "SUBST", "anna/install_failed", "PACKAGE", p->package, NULL);
+                debconf->command(debconf, "SUBST", "anna/install_failed", "PACKAGE", package->package, NULL);
                 debconf->command(debconf, "INPUT critical", "anna/install_failed", NULL);
                 debconf->command(debconf, "GO", NULL);
                 unlink(dest_file);
@@ -272,9 +234,6 @@ install_modules(void)
 
     debconf->command(debconf, "PROGRESS STOP", NULL);
 
-    di_list_free(instlist, di_pkg_free);
-    di_list_free(status_p, di_pkg_free);
-
     return ret;
 }
 
@@ -282,37 +241,57 @@ int
 main()
 {
     int ret, state = 0;
-    int (*states[])(void) = {
+    int (*states[])(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator, const char *language) = {
         choose_retriever,
         choose_modules,
         NULL,
     };
-    struct linkedlist_t *retrievers_before = get_retriever_packages();
-    struct linkedlist_t *retrievers_after = NULL;
+    di_packages *packages = NULL, *status;
+    di_packages_allocator *packages_allocator = NULL, *status_allocator;
 
     debconf = debconfclient_new();
     debconf->command(debconf, "CAPB", "backup", NULL);
+
+    di_init("anna");
+    di_log_set_handler(DI_LOG_LEVEL_MASK, di_log_handler_syslog, NULL);
+
+    status_allocator = di_system_packages_allocator_alloc();
+    status = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, status_allocator);
+
+    di_packages **retrievers_before = get_retriever_packages(status);
+
     while (state >= 0 && states[state] != NULL) {
-        ret = states[state]();
+        ret = states[state](status, &packages, &packages_allocator, NULL);
         if (ret != 0)
             state = -1;
         else if (debconf->command(debconf, "GO", NULL) == 0)
             state++;
         else
+        {
+            if (packages)
+            {
+                di_packages_free(packages);
+                di_packages_allocator_free(packages_allocator);
+                packages = NULL;
+                packages_allocator = NULL;
+            }
             state--;
+        }
     }
     if (state < 0)
         ret = 10; /* back to the menu */
     else
-        ret = install_modules();
-    if (!ret) {
-	retrievers_after = get_retriever_packages();
-	if (new_retrievers(retrievers_before, retrievers_after))
-	    ret = 10;
+    {
+        ret = install_modules(status, packages, status_allocator);
+#ifdef LIBDI_SYSTEM_DPKG
+        di_system_packages_status_write_file(status, DI_SYSTEM_DPKG_STATUSFILE);
+#endif
     }
-    di_list_free(retrievers_before, di_pkg_free);
-    if (retrievers_after)
-	di_list_free(retrievers_after, di_pkg_free);
+    if (!ret) {
+        di_packages **retrievers_after = get_retriever_packages(status);
+        if (new_retrievers(retrievers_before, retrievers_after))
+            ret = 10;
+
     cleanup();
     return ret;
 }

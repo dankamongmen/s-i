@@ -4,90 +4,36 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/utsname.h>
-#include <cdebconf/debconfclient.h>
-#include <debian-installer.h>
 #include "anna.h"
 
 
-/*
- * Helper functions for choose_retriever
- */
-
-static int
-is_retriever(struct package_t *p)
-{
-    int i;
-
-    for (i = 0; p->provides[i] != 0; i++)
-        if (strcmp(p->provides[i]->name, "retriever") == 0)
-            return 1;
-    return 0;
-}
-
 /* Construct a list of all the retriever packages */
-struct linkedlist_t *
-get_retriever_packages(void)
+di_package **
+get_retriever_packages(di_packages *status)
 {
-    FILE *fp;
-    struct package_t *p;
-    struct linkedlist_t *list;
-    struct list_node *node, *tmp;
+  int ret_count = 0, ret_size = 4;
+  di_package *package, **ret;
+  di_slist_node *node;
+  
+  package = di_packages_get_package (status, "retriever", 0);
 
-    fp = fopen(STATUS_FILE, "r");
-    list = di_pkg_parse(fp);
-    fclose(fp);
-    while (list->head != NULL && !is_retriever((struct package_t *)list->head->data)) {
-        di_pkg_free((struct package_t *)list->head->data);
-        tmp = list->head->next;
-        free(list->head);
-        list->head = tmp;
-    }
-    node = list->head;
-    while (node != NULL && node->next != NULL)
-    {
-        while (1)
-        {
-            if (node->next == NULL)
-                break;
-            /* half_configured means we have tried to configure
-             * it before, and that failed. */
-            p = (struct package_t *)node->next->data;
-            if (!is_retriever(p) || p->status == half_configured) {
-                di_pkg_free(p);
-                tmp = node->next->next;
-                free(node->next);
-                node->next = tmp;
-            } else
-                break;
-        }
-        node = node->next;
-    }
-    return list;
-}
+  if (!package)
+    return NULL;
 
-/* Given a list of packages, construct a debconf choices string */
-char *
-get_retriever_choices(struct linkedlist_t *list)
-{
-    int retstr_size = 1;
-    char *ret_choices;
-    struct list_node *node;
-    struct package_t *p;
+  ret = di_new0(di_package *, ret_size);
 
-    ret_choices = malloc(1);
-    ret_choices[0] = '\0';
-    for (node = list->head; node != NULL; node = node->next) {
-        p = (struct package_t *)node->data;
-        retstr_size += strlen(p->package) + 2 + strlen(p->description) + 2;
-        ret_choices = realloc(ret_choices, retstr_size);
-        strcat(ret_choices, p->package);
-        strcat(ret_choices, ": ");
-        strcat(ret_choices, p->description);
-        strcat(ret_choices, ", ");
-    }
-    if (retstr_size >= 3)
-        ret_choices[retstr_size-3] = '\0';
-    return ret_choices;
+  for (node = package->depends.first; node; node = node->next)
+  {
+    di_package_dependency *d = node->data;
+
+    if (d->type == di_package_dependency_type_reverse_provides)
+      ret[ret_count++] = d->ptr;
+    if (ret_count + 1 >= ret_size)
+      break;
+  }
+
+  ret[ret_count] = NULL;
+  return ret;
 }
 
 /* Try retrievers in a sane turn. Also, see doc/retriever.txt */
@@ -106,7 +52,7 @@ get_default_retriever(const char *choices)
         if (strstr(choices, retrievers[i]) != NULL)
             return retrievers[i];
     }
-    return NULL;
+    di_log (DI_LOG_LEVEL_ERROR, "don't find retriever: %s", __PRETTY_FUNCTION__);
 }
 
 
@@ -117,11 +63,8 @@ get_default_retriever(const char *choices)
 char *
 get_retriever(void)
 {
-    static struct debconfclient *debconf = NULL;
     char *retriever = NULL, *colon_p = NULL;
 
-    if (debconf == NULL)
-        debconf = debconfclient_new();
     debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
     if (debconf->value != NULL)
         colon_p = strchr(debconf->value, ':');
@@ -130,6 +73,8 @@ get_retriever(void)
         if (asprintf(&retriever, "%s/%s", RETRIEVER_DIR, debconf->value) == -1)
             retriever = NULL;
     }
+    if (!retriever)
+      di_log (DI_LOG_LEVEL_ERROR, "don't find retriever in %s, get %s", __PRETTY_FUNCTION__, debconf->value);
     return retriever;
 }
 
@@ -143,88 +88,95 @@ config_retriever(void)
     retriever = get_retriever();
     if (asprintf(&command, "%s config", retriever) == -1)
         return 1;
-    ret = system(command);
+    ret = di_exec_shell_log(command);
     free(command);
     return ret;
 }
 
-struct linkedlist_t *
-get_packages(void)
+di_packages *
+get_packages(di_packages_allocator *allocator)
 {
-    FILE *fp;
-    struct linkedlist_t *pkglist;
+    di_packages *packages;
     char *retriever, *command;
     int ret;
 
     retriever = get_retriever();
     if (asprintf(&command, "%s packages " DOWNLOAD_PACKAGES, retriever) == -1)
         return NULL;
-    ret = system(command);
+    ret = di_exec_shell_log(command);
     free(command);
     if (ret != 0)
         return NULL;
-    fp = fopen(DOWNLOAD_PACKAGES, "r");
-    if (fp == NULL)
-        return NULL;
-    pkglist = di_pkg_parse(fp);
-    fclose(fp);
+    packages = di_system_packages_read_file(DOWNLOAD_PACKAGES, allocator);
     unlink(DOWNLOAD_PACKAGES);
-    return pkglist;
+    if (!packages)
+      di_log(DI_LOG_LEVEL_ERROR, "can't find packages file");
+    return packages;
 }
 
 /* This is not to be confused with di_pkg_is_installed which only checks
  * the package struct. This function checks if p is in the given list of
  * installed packages and compares versions. */
 int
-is_installed(struct package_t *p, struct linkedlist_t *installed)
+is_installed(di_package *p, di_packages *status)
 {
-    struct package_t *q;
-    struct version_t pv, qv;
+    di_package *q;
+    di_package_version *pv, *qv;
     int ret;
 
     /* If we don't understand the version number, we play safe
      * and assume we should install it */
-    if (p->version == NULL || !di_parse_version(&pv, p->version))
+    if (p->version == NULL || !(pv = di_package_version_parse(p)))
         return 0;
-    q = di_pkg_find(installed, p->package);
-    if (q == NULL || q->version == NULL || !di_parse_version(&qv, q->version))
+    q = di_packages_get_package(status, p->package, 0);
+    if (q == NULL || q->version == NULL || !(qv = di_package_version_parse(q)))
         return 0;
-    ret = (di_compare_version(&pv, &qv) <= 0);
-    free((void *)pv.version);
-    free((void *)qv.version);
+    ret = (di_package_version_compare(pv, qv) <= 0);
+    di_package_version_free(pv);
+    di_package_version_free(qv);
     return ret;
 }
 
-char *
-list_to_choices(struct package_t *list[], const int count)
+size_t
+package_to_choice(di_package *package, const char *language, char *buf, size_t size)
 {
-    struct package_t *p;
-    char *choices, *ptr;
-    size_t choices_size = 1;
-    int i;
+  di_package_description *description;
+  description = di_package_get_description(package, language);
+  return snprintf(buf, size, "%s: %s", package->package, description ? description->short_description : "<none>");
+}
 
-    choices = malloc(choices_size);
-    choices[0] = '\0';
-    for (i = 0; i < count; i++) {
-        p = list[i];
-        choices_size += strlen(p->package) + 2 + strlen(p->description) + 2;
-        choices = realloc(choices, choices_size);
-        strcat(choices, p->package);
-        strcat(choices, ": ");
-        /* If ', ' is in the description, drop it and everything after it */
-        if ((ptr = strstr(p->description, ", ")) != NULL)
-            *ptr = '\0';
-        strcat(choices, p->description);
-        strcat(choices, ", ");
+char *
+list_to_choices(di_package **packages, const char *language)
+{
+    char buf[200], *ret;
+    int count = 0;
+    size_t ret_size = 1024, ret_used = 0, size;
+    di_package *p;
+
+    ret = malloc(1024);
+    ret[0] = '\0';
+    while ((p = packages[count])) {
+        size = package_to_choice(p, language, buf, 200);
+        if (ret_used + size + 2 > ret_size)
+        {
+            ret_size += 1024;
+            ret = realloc(ret, ret_size);
+        }
+        strcat(ret, buf);
+        ret_used += size + 2;
+        count++;
+        if (packages[count])
+          strcat(ret, ", ");
     }
-    if (choices_size >= 3)
-        choices[choices_size-3] = '\0';
-    return choices;
+    if (ret_used)
+        return ret;
+    free(ret);
+    return NULL;
 }
 
 /* Ask the chosen retriever to download a particular package to to dest. */
 int
-get_package (struct package_t *package, char *dest)
+get_package (di_package *package, char *dest)
 {
     int ret;
     char *retriever;
@@ -232,14 +184,15 @@ get_package (struct package_t *package, char *dest)
 
     retriever = get_retriever();
     if (asprintf(&command, "%s retrieve %s %s", retriever, package->filename, dest) == -1)
-       return 0;
-    ret = !system(command);
+       return 1;
+    ret = di_exec_shell_log(command);
     free(retriever);
     free(command);
     return ret;
 }
 
 /* Calls udpkg to unpack a package. */
+#ifndef LIBDI_SYSTEM_DPKG
 int
 unpack_package (char *pkgfile)
 {
@@ -248,15 +201,16 @@ unpack_package (char *pkgfile)
 
     if (asprintf(&command, "%s %s", DPKG_UNPACK_COMMAND, pkgfile) == -1)
         return 0;
-    ret = !system(command);
+    ret = !di_exec_shell_log(command);
     free(command);
     return ret;
 }
+#endif
 
 /* check whether the md5sum of file matches sum.  if they don't,
  * return 0. */
 int
-md5sum(char *sum, char *file)
+md5sum(const char *sum, const char *file)
 {
 	FILE *fp;
 	char line[1024];
@@ -288,7 +242,7 @@ cleanup(void)
 
     retriever = get_retriever();
     if (asprintf(&command, "%s cleanup", retriever) != -1) {
-        system(command);
+        di_exec_shell_log(command);
         free(command);
     }
     free(retriever);
@@ -300,125 +254,60 @@ cleanup(void)
  * FIXME: Should we cross-check against the package version?
  */
 char *
-udeb_kernel_version(struct package_t *p)
+udeb_kernel_version(di_package *p)
 {
     char *name;
     char *t1, *t2;
 
     if (p->package == NULL)
 	return NULL;
-    name = strdup(p->package);
+    name = p->package;
     if ((t1 = strstr(name, "-modules-")) == NULL)
-        goto Error;
-    t1 += strlen("-modules-");
+        return NULL;
+    t1 += sizeof("-modules-") - 1;
     if ((t2 = strstr(t1, "-udeb")) == NULL)
-        goto Error;
-    if (t2[strlen("-udeb")] != '\0')
-        goto Error;
-    *t2 = '\0';
-    t2 = strdup(t1);
-    free(name);
+        return NULL;
+    if (t2[sizeof("-udeb") - 1] != '\0')
+        return NULL;
+    t2 = di_stradup(t1, t2 - t1);
     return t2;
-Error:
-    /* Ick. Well, think of it as an exception... */
-    free(name);
-    return NULL;
-}
-
-/*
- * Should this udeb be skipped?
- */
-int
-skip_package(struct package_t *p)
-{
-    static const char *skiplist[] = {
-        "cdebconf-udeb",
-        "anna",
-        "main-menu",
-        "busybox-udeb",
-        "busybox-cvs-udeb",
-        "busybox-cvs-net-udeb",
-        "rootskel",
-        "kernel-image-",
-        NULL
-    };
-    char *pkg_kernel, *running_kernel = NULL;
-    struct utsname uts;
-    int i;
-
-    /* Packages without filenames (!) will be brutally skipped. */
-    if (p->filename == NULL)
-        return 1;
-    for (i = 0; skiplist[i] != NULL; i++)
-        if (strstr(p->package, skiplist[i]) == p->package)
-            return 1;
-    if (uname(&uts) == 0)
-        running_kernel = uts.release;
-    if (running_kernel != NULL && (pkg_kernel = udeb_kernel_version(p)) != NULL) {
-        if (strcmp(running_kernel, pkg_kernel) != 0)
-            return 1;
-    }
-    return 0;
 }
 
 int
-pkgname_cmp(const void *v1, const void *v2)
+package_array_compare(const void *v1, const void *v2)
 {
-    struct package_t *p1, *p2;
+    di_package *p1, *p2;
 
-    p1 = *(struct package_t **)v1;
-    p2 = *(struct package_t **)v2;
+    p1 = *(di_package **)v1;
+    p2 = *(di_package **)v2;
     return strcmp(p1->package, p2->package);
 }
 
-struct linkedlist_t *
-get_initial_package_list(struct linkedlist_t *pkglist)
+void
+get_initial_package_list(di_packages *packages)
 {
-    struct linkedlist_t *list;
-    struct list_node *node, *next, *prev;
-    struct package_t *p;
+    di_package *p;
     FILE *fp;
     char buf[1024], *ptr;
 
-    list = malloc(sizeof(struct linkedlist_t));
-    list->head = list->tail = NULL;
     if ((fp = fopen(INCLUDE_FILE, "r")) == NULL)
-        return list;
+        return;
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (buf[0] == '#')
             continue;
         if ((ptr = strchr(buf, '\n')) != NULL)
             *ptr = '\0';
-        prev = NULL;
-        for (node = pkglist->head; node != NULL; node = next) {
-            next = node->next;
-            p = (struct package_t *)node->data;
-            if (strcmp(buf, p->package) == 0) {
-                if (prev)
-                    prev->next = next;
-                else
-                    pkglist->head = next;
-                if (list->tail == NULL) {
-                    list->head = node;
-                    list->tail = node;
-                } else {
-                    list->tail->next = node;
-                    list->tail = node;
-                }
-                continue;
-            }
-            prev = node;
-        }
+        p = di_packages_get_package(packages, ptr, 0);
+        if (p)
+          p->status_want = di_package_status_want_install;
     }
     fclose(fp);
-    return list;
 }
 
 void
-drop_excludes(struct linkedlist_t *pkglist)
+drop_excludes(di_packages *packages)
 {
-    struct list_node *node, *next, *prev;
-    struct package_t *p;
+    di_package *p;
     FILE *fp;
     char buf[1024], *ptr;
 
@@ -429,59 +318,31 @@ drop_excludes(struct linkedlist_t *pkglist)
             continue;
         if ((ptr = strchr(buf, '\n')) != NULL)
             *ptr = '\0';
-        prev = NULL;
-        for (node = pkglist->head; node != NULL; node = next) {
-            next = node->next;
-            p = (struct package_t *)node->data;
-            if (strcmp(buf, p->package) == 0) {
-                if (prev)
-                    prev->next = next;
-                else
-                    pkglist->head = next;
-                continue;
-            }
-            prev = node;
-        }
+        p = di_packages_get_package(packages, ptr, 0);
+        if (p)
+          p->status_want = di_package_status_want_deinstall;
     }
     fclose(fp);
-    return;
 }
 
-// Does p enhance any installed package?
 int
-enhances(struct package_t *p, struct linkedlist_t *installed)
+new_retrievers(di_package **retrievers_before, di_package **retrievers_after)
 {
-    int i;
-
-    for (i = 0; p->enhances[i] != NULL; i++)
-        if (di_pkg_find(installed, p->enhances[i]->name))
-            return 1;
-    return 0;
-}
-
-//Have there been new retrievers installed?
-int
-new_retrievers(struct linkedlist_t* retrievers_before,
-	       struct linkedlist_t* retrievers_after)
-{
-    struct list_node *node1, *node2;
+    int i, j;
     int match;
 
-    node1 = retrievers_after->head;
-    while (node1 != NULL) {
-	node2 = retrievers_before->head;
+    for (i = 0; retrievers_before[i]; i++)
 	match = 0;
-	while (node2 != NULL) {
-	    if (strcmp(((struct package_t*) node1->data)->package,
-		       ((struct package_t*) node2->data)->package) == 0) {
+	for (j = 0; retrievers_after[i]; i++)
+	    if (strcmp(retrievers_before[i]->package,
+                       retrievers_after[j]->package) == 0) {
 		match = 1;
 		break;
 	    }
-	    node2 = node2->next;
 	}
 	if (!match)
 	    return 1;
-	node1 = node1->next;
     }
     return 0;
 }
+
