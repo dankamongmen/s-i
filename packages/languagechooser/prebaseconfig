@@ -2,6 +2,8 @@
 
 . /usr/share/debconf/confmodule
 
+LOG=/var/log/messages
+
 modify_cyrconfig() {
         if [ "$2" ]; then
            sed -e "s/^$1 .*\$/$1 $2/" \
@@ -76,3 +78,19 @@ fi
     echo "LANG_INST=\"$LOCALE\""
     echo "LANGUAGE_INST=\"$LANGLIST\""
 ) >> /target/root/dbootstrap_settings
+
+# Set global locale and language, and make sure the glibc locale is
+# generated.  This task is also done in termwrap and base-config, and
+# should probably be removed from there when this part work.
+(
+    echo "LANG=\"$LOCALE\"
+    echo "LANGUAGE=\"$LANGLIST\""
+) >> /target/etc/environment
+# If the locale isn't already valid, append it to locale.gen
+if chroot /target/ /usr/sbin/validlocale $LOCALE \
+    >> /target/etc/locale.gen 2> $LOG ; then
+    : # Nothing to do
+else
+    # New locale added to locale.gen, generate it
+    chroot /target /usr/sbin/locale-gen > $LOG 2>&1
+fi
