@@ -76,7 +76,7 @@ while [ 1 ]; do
 		echo "$sum  $file" >$TMPFILE
 		md5sum -c $TMPFILE 1>/dev/null 2>&1
 		if [ $? -ne 0 ]; then
-			echo -n "$2" >$TMPFILE
+			echo -n "$file" >$TMPFILE
 			break
 		fi
 		cleanup
