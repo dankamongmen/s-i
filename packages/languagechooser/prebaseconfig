@@ -20,15 +20,13 @@ kbd)
         acm=`echo $consolefont | sed -e 's/.*(//' -e 's/).*//'`
         [ "$acm" = utf8 ] && acm=
         if [ -n "$acm" ]; then
-            sed -e "s/^#SCREEN_FONT_MAP=iso01/SCREEN_FONT_MAP=$acm/" \
-                $ctconfig > $ctconfig.tmp && \
-            mv $ctconfig.tmp $ctconfig
+	    echo "# Debian Installer enforces these values" >>$ctconfig
+            echo "SCREEN_FONT_MAP=$acm" >>$ctconfig
+            echo "APP_CHARSET_MAP=$acm" >>$ctconfig
         fi
         consolefont=`echo $consolefont | sed -e 's/(.*//'`
         if [ -n "$consolefont" ]; then
-            sed -e "s/^#SCREEN_FONT=iso01.f16/SCREEN_FONT=$consolefont/" \
-                $ctconfig > $ctconfig.tmp && \
-            mv $ctconfig.tmp $ctconfig
+            echo "SCREEN_FONT=$consolefont" >>$ctconfig
         fi
     fi
     ;;
