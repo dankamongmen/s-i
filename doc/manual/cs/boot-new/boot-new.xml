@@ -1,0 +1,770 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<!-- $Id: boot-new.xml,v 1.1 2004/01/11 16:36:45 mck-guest Exp $ -->
+<!-- original version: 1.1 -->
+
+<chapter id="boot-new">
+ <title>Zavedení vašeho nového systému</title>
+
+ <sect1><title>Make System Bootable</title>
+<para>
+
+Zavádění více operačních systémů na jednom počítači je stále něco jako
+černá magie. Tento dokument se ani nesnaží pokrýt všechny možné
+zavaděče, které se liší na jednotlivých architekturách a dokonce i na
+jejich podarchitekturách. Měli byste si dobře prostudovat dokumentaci
+vašeho zavaděče a pamatujete: třikrát měř a jednou řež.
+
+</para>
+
+&bootloader-i386.xml;
+&bootloader-m68k.xml;
+&bootloader-alpha.xml;
+&bootloader-sparc.xml;
+&bootloader-powerpc.xml;
+&bootloader-hppa.xml;
+&bootloader-s390.xml;
+&bootloader-arm.xml;
+&bootloader-mipsel.xml;
+
+  <sect2 condition="supports-nfsroot">
+  <title>Bezdiskové stanice</title>
+<para>
+
+Pokud instalujete bezdiskovou stanici, zavádění systému z lokálního
+disku evidentně nebude nejsmysluplnější volba - tento krok přeskočte.
+<phrase arch="sparc"> Možná budete chtít nastavit OpenBoot tak, aby
+standardně zaváděl systém ze sítě, viz
+<xref linkend="boot-dev-select-sun"/>.</phrase>
+
+</para>
+
+  </sect2>
+</sect1>
+
+ <sect1 id="make-boot-floppy">
+ <title>Vytvoření zaváděcí diskety</title>
+<para>
+
+Zaváděcí disketu byste si měli připravit i v případě, že systém chcete
+startovat z pevného disku. Je totiž možné, že se se zavaděčem na disku
+něco stane a odmítne pracovat (třeba kvůli špatnému nastavení nebo
+fyzické chybě disku). Pro tyto případy se hodí zaváděcí disketa, která
+většinou funguje i v těchto kritických situacích.
+
+</para><para>
+
+Podle pokynů instalačního programu vložte do mechaniky prázdnou
+disketu. Zkontrolujte, zda není chráněná proti zápisu, neboť
+instalační program ji zformátuje a přepíše. Označte si, že se jedná
+o Vaši <quote>zaváděcí disketu</quote> a nastavte na ní ochranu proti
+zápisu.
+
+</para><para>
+
+Tato disketa bude obsahovat jednoduchý souborový systém, jádro
+a příkaz, aby použilo váš nový kořenový souborový systém.
+
+</para><para arch="alpha">
+
+Bohužel, zaváděcí disketa může být vytvořena pouze pro SRM systémy,
+protože se na disketu nevejdou <command>MILO</command> a jádro
+zároveň.
+
+</para>
+ </sect1>
+
+
+ <sect1 id="base-boot">
+ <title>Okamžik pravdy</title>
+<para>
+
+Teď přichází chvíle <emphasis>zahoření</emphasis> systému.
+
+</para><para arch="s390">
+
+Z menu zvolte položku <quote>Restartovat počítač</quote>, což v tomto
+případě zastaví systém, protože takovéto restartování není na
+&arch-title; podporováno.  Poté musíte zavést (IPL) GNU/Linux z DASD,
+které jste na začátku instalace vybrali pro kořenový systém.
+
+</para><para>
+
+Jestliže Debian z disku nenaběhne, zkuste to znovu z původního
+instalačního média (například ze záchranné diskety), nebo založte do
+mechaniky svou vlastní zaváděcí disketu (pokud jste ji vytvořili)
+a restartujte počítač.  Pokud <emphasis>nepoužíváte</emphasis> svou
+debianí zaváděcí disketu, pravděpodobně budete muset při startu přidat
+nějaké parametry.  Například při použití záchranné diskety musíte
+specifikovat
+<userinput>rescue root=<replaceable>kořen</replaceable></userinput>,
+kde <replaceable>kořen</replaceable> je vaše kořenová oblast
+(např. <filename>/dev/sda1</filename>).
+
+</para>
+
+  <sect2 arch="m68k">
+  <title>Zavádění VME6000</title>
+<para>
+
+Jestliže provádíte bezdiskovou instalaci na systémech BVM nebo
+Motorola VMEbus, měli byste po natažení programu
+<command>tftplilo</command> z TFTP serveru zadat v promptu
+<prompt>LILO Boot:</prompt> jedno z následujících:
+
+<itemizedlist>
+<listitem><para>
+
+<userinput>b6000</userinput> &enterkey; pro start BVME4000/6000
+
+</para></listitem><listitem><para>
+
+<userinput>b162</userinput> &enterkey; pro start MVME162
+
+</para></listitem><listitem><para>
+
+<userinput>b167</userinput> &enterkey; pro start MVME166/167
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+
+   </sect2>
+
+  <sect2 arch="m68k">
+  <title>Zavádění na Macintoshích</title>
+
+<para>
+
+Přejděte do adresáře kde jsou instalační soubory a za držení klávesy
+<keycap>command</keycap> spusťte zavaděč <command>Penguin</command>.
+V dialogovém okně <userinput>Settings</userinput> (<keycombo>
+<keycap>command</keycap> <keycap>T</keycap> </keycombo>) najděte řádku
+s volbami jádra, která by měla vypadat nějak takto:
+<userinput>root=/dev/ram video=font:VGA8x16</userinput>.
+
+</para><para>
+
+Tuto řádku změňte na
+<userinput>root=/dev/<replaceable>yyyy</replaceable></userinput>, kde
+<replaceable>yyyy</replaceable> je linuxový název oblasti, kam jste
+nainstalovali systém (např. <filename>/dev/sda1</filename>). Parametr
+<userinput>video=font:VGA8x8</userinput> je vhodný pro uživatele
+s malými obrazovkami. Jádro by sice zvolilo hezčí font (6x11), ale
+ovladač konzole by s ním mohl zaseknout počítač. Proto je bezpečnější
+použít font 8x16 nebo 8x8, což můžete kdykoliv změnit.
+
+</para><para>
+
+Pokud nechcete, aby se GNU/Linux zaváděl při každém startu počítače,
+zrušte zatržení u položky <userinput>Auto Boot</userinput>. Příkazem
+<userinput>Save Settings As Default</userinput> uložíte nové nastavení
+do souboru.
+
+</para><para>
+
+Nyní můžete příkazem <userinput>Boot Now</userinput> (<keycombo>
+<keycap>command</keycap> <keycap>B</keycap> </keycombo>) nastartovat
+svůj čerstvě nainstalovaný systém GNU/Linux.
+
+</para><para>
+
+Při zavádění systému by se měly objevit stejné zprávy jako při
+zavedení instalačního systému následované nějakými novými zprávami.
+
+</para>
+
+   </sect2>
+ </sect1>
+
+ <sect1 id="base-config">
+ <title>Prvotní přizpůsobení Debianu</title>
+
+<para>
+
+Po zavedení systému budete vyzváni k dokončení konfigurace základního
+systému a k výběru balíčků, které chcete nainstalovat.  Aplikace,
+která vás tímto procesem povede, se nazývá
+<classname>base-config</classname>.  Jestliže někdy v budoucnu budete
+chtít <classname>base-config</classname> spustit znovu, stačí když
+jako root napíšete <userinput>base-config</userinput>.
+
+</para>
+
+ </sect1>
+
+ <sect1 id="base-config-tz">
+ <title>Nastavení časového pásma</title>
+
+<para>
+
+Nejprve budete vyzváni k výběru vašeho časového pásma.  <phrase
+arch="m68k;powerpc">Hardwarové hodiny v Macintoshích jsou standardně
+nastaveny na místní čas. Jestliže budete mít duální zavádění, místo
+<userinput>GMT</userinput> vyberte volbu <userinput>local</userinput>.
+</phrase> Po volbě, zda jsou hardwarové hodiny nastaveny na místní
+nebo univerzální časové pásmo, si vyberete oblast a město, které je ve
+stejném časovém pásmu jako váš počítač. Při výběru ze seznamu se
+můžete stiskem písmene přesunout na první položku začínající daným
+písmenem.
+
+</para>
+
+ </sect1>
+
+ <sect1 id="base-config-md5">
+ <title>MD5 hesla</title>
+
+<para>
+
+Další otázka zní, zda chcete nainstalovat MD5 hesla.  Tato
+alternativní metoda ukládání hesel je bezpečnější než standardní
+funkce <quote>crypt</quote>.
+
+</para><para>
+
+Přednastavené je &MSG-NO;, ale pokud nepotřebujete podporu NIS a velmi
+vám záleží na bezpečnosti vašeho stroje, měli byste odpovědět
+&MSG-YES;.
+
+</para>
+
+ </sect1>
+
+ <sect1 id="base-config-shadow">
+ <title>Podpora stínových hesel (Shadow Password)</title>
+
+<para>
+
+Pokud jste odpověděli na MD5 hesla &MSG-YES;,
+<classname>base-config</classname> se vás zeptá, zda chcete povolit
+používání stínových hesel.  Stínová hesla jsou prostředkem k lepšímu
+zabezpečení systému. Systémy bez stínových hesel uchovávají
+uživatelská hesla v zašifrované podobě v souboru
+<filename>/etc/passwd</filename> přístupném všem uživatelům. Tento
+soubor musí zůstat čitelný, poněvadž obsahuje důležité informace
+o uživatelích, například jak se mají převádět uživatelská jména na
+odpovídající číselné hodnoty. Kdokoliv, kdo získá soubor
+<filename>/etc/passwd</filename>, se může pokusit útokem hrubou silou
+(automatizované zkoušení všech možných kombinací) odhalit, jaká hesla
+mají uživatelé systému.
+
+</para><para>
+
+Pokud povolíte použití stínových hesel, hesla se budou uchovávat
+v souboru <filename>/etc/shadow</filename>, který je přístupný pouze
+správci systému. Vřele doporučujeme stínová hesla používat.
+
+</para><para>
+
+Na stínová hesla můžete systém převést i později programem
+<command>shadowconfig</command>. Po instalaci najdete postup v souboru
+<filename>/usr/share/doc/passwd/README.debian.gz</filename>.
+
+</para>
+
+ </sect1>
+
+ <sect1 id="base-config-root">
+ <title>Nastavení rootova hesla</title>
+
+<para>
+
+Účet <emphasis>root</emphasis> je účtem pro
+<emphasis>superuživatele</emphasis>, na kterého se nevztahují
+bezpečnostní omezení. Měli byste ho používat pouze, když provádíte
+správu systému, a jen na dobu nezbytně nutnou.
+
+</para><para>
+
+Uživatelská hesla by měla být sestavena ze 6 až 8 písmen, obsahovat
+malá a velká písmena včetně dalších znaků (jako ; . ,).  Speciální
+pozornost věnujte výběru hesla pro roota, protože je to velmi mocný
+účet. Vyhněte se slovům ze slovníků, jménům oblíbených postav,
+jakýmkoliv osobním údajům, prostě čemukoliv, co se dá lehce uhodnout.
+
+</para><para>
+
+Jestliže vám někdo bude tvrdit, že potřebuje heslo vašeho rootovského
+účtu, buďte velice ostražití. V žádném případě byste neměli toto heslo
+prozrazovat! Jedině snad, že daný stroj spravuje více
+spolu-administrátorů.
+
+</para>
+
+ </sect1>
+
+ <sect1 id="make-normal-user">
+ <title>Vytvoření uživatelského účtu</title>
+
+<para>
+
+Systém se zeptá, zda nyní chcete vytvořit uživatelský účet.  (Účet je
+právo k používání počítače, tvoří ho jméno uživatele a jeho heslo).
+Tento účet byste měli používat ke každodenní práci. Jak již bylo
+řečeno, <emphasis>nepoužívejte</emphasis> účet superuživatele pro
+běžné úkoly.
+
+</para><para>
+
+Proč ne?  Případná chyba by mohla mít katastrofické důsledky a dokonce
+by si mohla vyžádat novou instalaci systému.  Dalším důvodem je
+možnost, že vám může být nastrčen program nazývaný <emphasis>trojský
+kůň</emphasis>, který zneužije práv, jež jako root máte, a naruší
+bezpečnost vašeho systému.  Kvalitní knihy o administraci unixového
+operačního systému vám jistě podrobněji osvětlí danou problematiku.
+Jestliže v Unixu začínáte, uvažte četbu na toto téma.
+
+</para><para>
+
+Jméno uživatelského účtu si můžete vybrat zcela libovolně.  Například,
+pokud se jmenujete Jan Novák, vytvořte si nový účet
+<userinput>novak</userinput>, <userinput>jnovak</userinput> nebo
+<userinput>jn</userinput>. Kromě hesla budete ještě dotázáni na celé
+jméno uživatele.
+
+</para><para>
+
+Pokud budete chtít vytvořit další účet, můžete to udělat kdykoliv
+po skončení instalace programem <command>adduser</command>.
+
+</para><para>
+
+Pokud se chcete připojovat telnetem, musíte na systému &arch-title;
+vytvořit uživatelský účet, protože ve standardní konfiguraci Debianu
+server telnetd nepovoluje přihlášení superuživatele. Ke vzdálenému
+přihlašování jako superuživatel sice můžete použít ssh (Secure SHell),
+ale nedoporučuje se to.
+
+</para>
+
+ </sect1>
+
+ <sect1 arch="not-s390" id="PPP">
+ <title>Nastavení PPP</title>
+
+<para>
+
+Dále budete dotázáni zda chcete instalovat zbytek systému přes PPP.
+Jestliže instalujete z CD a/nebo jste připojeni přímo k síti, můžete
+klidně zvolit &MSG-NO; a tuto sekci přeskočit.
+
+</para><para>
+
+Pokud odpovíte kladně, spustí se program <command>pppconfig</command>,
+který vám pomůže PPP nastavit.  Až se vás program bude ptát na název
+vytáčeného (dialup) spojení, uveďte <userinput>provider</userinput>.
+
+</para><para>
+
+Doufáme, že s pomocí <command>pppconfig</command>u bude nastavení
+snadné. Pokud by se vám to nepodařilo, přečtěte si následují pokyny.
+
+</para><para>
+
+Pro nastavení PPP potřebujete znát základy prohlížení a editace
+souborů v GNU/Linuxu. K zobrazení obsahu souboru používejte programy
+<command>more</command>, nebo <command>zmore</command> pro
+komprimované soubory s koncovkou <userinput>.gz</userinput>. Například
+soubor <filename>README.debian.gz</filename> si můžete prohlédnout
+příkazem <userinput>zmore README.debian.gz</userinput>.  Pro úpravu
+souborů je v základním systému nainstalován editor
+<command>nano</command>, který nepřekypuje funkcemi, ale je snadno
+použitelný.  Později si samozřejmě můžete doinstalovat další editory
+a prohlížeče, jako třeba <command>jed</command>,
+<command>nvi</command>, <command>less</command>
+a <command>emacs</command>.
+
+</para><para>
+
+V souboru <filename>/etc/ppp/peers/provider</filename> nahraďte
+<userinput>/dev/modem</userinput> řetězcem
+<userinput>/dev/ttyS<replaceable>&num;</replaceable></userinput>, kde
+<replaceable>&num;</replaceable> značí číslo sériového portu. V Linuxu
+se porty označují čísly od 0, takže první sériový port
+<phrase arch="i386">(<userinput>COM1</userinput>)</phrase> je pod
+Linuxem <filename>/dev/ttyS0</filename>.
+
+<phrase arch="powerpc;m68k">Na Macintoshích se sériovými porty je
+modem na portu <filename>/dev/ttyS0</filename> a tiskárna na portu
+<filename>/dev/ttyS1</filename>.</phrase>
+
+Dále upravte soubor <filename>/etc/chatscripts/provider</filename>,
+kam vložíte telefonní číslo ke zprostředkovateli Internetu,
+uživatelské jméno a heslo. Sekvenci <quote>\q</quote> v úvodu hesla
+nemažte, protože zabraňuje zapisování hesla do souborů se záznamem
+spojení.
+
+</para><para>
+
+Místo ověření uživatele v textovém režimu používají mnozí
+zprostředkovatelé protokoly PAP nebo CHAP, jiní používají oba druhy.
+Jestliže váš poskytovatel požaduje PAP nebo CHAP, je třeba postupovat
+jiným způsobem. V souboru
+<filename>/etc/chatscript/provider</filename> zakomentujte vše za
+vytáčecí sekvencí (začíná <quote>ATDT</quote>), upravte soubor
+<filename>/etc/ppp/peers/provider</filename> podle návodu uvedeného
+výše a připojte
+<userinput>user <replaceable>jmeno</replaceable></userinput>, kde
+<replaceable>jmeno</replaceable> je vaše uživatelské jméno
+u zprostředkovatele připojení. Dále editujte soubor
+<filename>/etc/ppp/pap-secrets</filename> nebo
+<filename>/etc/ppp/chap-secrets</filename> a doplňte do něj heslo.
+
+</para><para>
+
+Do souboru <filename>/etc/resolv.conf</filename> ještě doplňte IP
+adresu DNS serveru vašeho zprostředkovatele připojení. Řádky souboru
+<filename>/etc/resolv.conf</filename> mají následující formát:
+
+<informalexample><screen>
+nameserver <replaceable>xxx.xxx.xxx.xxx</replaceable>
+</screen></informalexample>
+
+kde <replaceable>x</replaceable> jsou čísla v IP adrese.  Případně byste
+mohli do souboru <filename>/etc/ppp/peers/provider</filename> přidat
+možnost <userinput>usepeerdns</userinput>, čímž zapnete automatický
+výběr vhodných DNS serverů podle nastavení hostitelského počítače.
+
+</para><para>
+
+Pokud váš poskytovatel používá standardní přihlašovací proceduru, mělo
+by být vše připraveno k připojení. PPP spojení spustíte pod uživatelem
+root příkazem <command>pon</command> a jeho průběh můžete sledovat
+pomocí <command>plog</command>. Odpojíte se příkazem
+<command>poff</command>.
+
+</para><para>
+
+Pro další informace o používání PPP v Debianu si přečtěte
+<filename>/usr/share/doc/ppp/README.Debian.gz</filename>.
+
+</para><para>
+
+Pro statické připojení pomocí SLIP budete muset do souboru
+<filename>/etc/init.d/network</filename> přidat příkaz
+<userinput>slattach</userinput> (z balíku
+<classname>net-tools</classname>).  Dynamické SLIP vyžaduje balík
+<classname>gnudip</classname>.
+
+</para>
+
+ </sect1>
+
+
+ <sect1 condition="supports-pcmcia">
+ <title>Odstranění podpory PCMCIA</title>
+
+<para>
+
+Jestliže nebudete využívat zařízení PCMCIA, můžete nyní jejich podporu
+odstranit. Pročistí se tím zavádění systému a také budete mít snazší
+pozici při přípravě vlastního jádra. (Podpora PCMCIA vyžaduje větší
+soulad mezi verzemi ovladačů pro PCMCIA, modulů jádra a samotným
+jádrem).
+
+</para>
+
+ </sect1>
+
+ <sect1 id="configure-apt">
+ <title>Nastavení APT</title>
+
+<para>
+
+Uživatelé nejčastěji instalují balíčky programem <command>apt-get</command>
+z balíčku <classname>apt</classname>.<footnote>
+
+<para>
+
+Ve skutečnosti balíčky instaluje program na nižší úrovni:
+<command>dpkg</command>.  <command>dpkg</command> je podle potřeby
+volán z nástroje <command>apt-get</command>, který se stará o získání
+potřebných balíčků ze sítě, CD nebo jiného zdroje a také o vyřešení
+závislostí mezi balíčky.
+
+</para>
+</footnote>
+
+Aby APT věděl, odkud má získávat balíčky, musí se nastavit. S tím
+pomůže aplikace <command>apt-setup</command>.
+
+</para><para>
+
+Po skončení instalace můžete kdykoliv změnit nastavení APT spuštěním
+programu <command>apt-setup</command>, nebo ručně upravit soubor
+<filename>/etc/apt/sources.list</filename>.
+
+</para><para>
+
+Jestliže instalujete z oficiálních CD, pak by CD v mechanice mělo být
+automaticky bez ptaní nastaveno jako zdroj pro apt.  Poznáte to podle
+toho, že uvidíte jak je CD zkoumáno a poté budete dotázáni zda chcete
+nastavit další CD.  Jestliže máte sadu několika CD &mdash; a většina
+lidí má &mdash; tak byste měli pokračovat a postupně nechat prozkoumat
+jedno po druhém.
+
+</para><para>
+
+Uživatelům bez oficiálních CD bude nabídnuto několik možností, jak
+získat debianí balíky: FTP, HTTP, CD-ROM nebo lokální souborový
+systém. O tyto možnosti nejsou ochuzeni ani uživatelé s oficiálními CD
+&mdash; stačí zvolit možnost <quote>Přidat další zdroj</quote>.
+
+</para><para>
+
+Všimněte si, že je úplně normální (a dokonce výhodné) mít několik
+různých APT zdrojů i pro jeden a ten samý debianí archív.
+<command>apt-get</command> automaticky ze všech dostupných verzí
+balíčku vybere tu s nejvyšším číslem verze.  Nebo pokud máte například
+jako zdroje uvedeny HTTP i CD-ROM, <command>apt-get</command> bude
+implicitně využívat CD-ROM a HTTP použije pouze pokud na síti bude
+novější verze daného balíčku.  Na druhé straně není nejlepší nápad
+přidat zbytečně mnoho APT zdrojů, protože to zpomalí proces kontroly
+síťových archívů na nové verze.
+
+</para>
+
+  <sect2 id="configure-apt-net">
+  <title>Nastavení síťových zdrojů s balíčky</title>
+
+<para>
+
+Jestliže plánujete instalovat zbytek sytému po síti, nejvhodnější
+volba je asi zdroj <userinput>http</userinput>. Zdroje dostupné přes
+<userinput>ftp</userinput> nejsou o nic horší, ale navazování spojení
+může trvat déle.
+
+</para><para>
+
+Další otázka se ptá, zda chcete mít přístup k nesvobodnému softwaru.
+To znamená komerční nebo jiný software, jehož licenční podmínky
+nevyhovují <ulink url="&url-dfsg;">Debian Free Software
+Guidelines</ulink>.  Můžete odpovědět &MSG-YES;, ale buďte opatrní při
+instalaci takového softwaru, protože se musíte ujistit, že jej
+používáte v souladu s licenčními podmínkami.
+
+</para><para>
+
+V dalším kroku sdělíte <command>apt-setup</command>u zemi, ve které
+žijete, a podle toho se vybere některé z oficiálních internetových
+zrcadel Debianu. Z nabídnutého seznamu vhodných serverů si některý
+vyberte.
+
+</para><para>
+
+Jestliže instalujete přes HTTP, budete dotázáni na nastavení proxy
+serveru.  To je někdy potřeba pro uživatele za firewallem, na
+podnikových sítích a podobně.
+
+</para><para>
+
+Nakonec bude nově zvolený síťový zdroj balíčků otestován, a jestli
+vše dopadne dobře, budete vám nabídnuta možnost přidat další
+zdroj.
+
+</para>
+
+  </sect2>
+
+ </sect1>
+
+ <sect1 id="install-packages">
+ <title>Instalace balíčků: základní nebo pokročilá</title>
+
+<para>
+
+Nyní budete dotázáni, zda chcete výběr balíčků provést jednodušší,
+nebo detailnější cestou.  Doporučujeme vám začít jednodušším způsobem,
+protože k detailnímu nastavení se můžete po skončení instalace
+kdykoliv vrátit.
+
+</para><para>
+
+Protože je <command>base-config</command> velmi líný, tak si na pomoc
+zavolá jiné aplikace.  Pro začátečnickou instalaci spustí program
+<command>tasksel</command>, pro pokročilou program
+<command>dselect</command>.  Oba dva nástroje můžete spustit
+samostatně kdykoliv po instalaci a nainstalovat si tak další balíčky.
+Pokud potřebujete po skončení instalace doinstalovat konkrétní
+balíček, jednoduše spusťte příkaz <userinput>apt-get install
+<replaceable>balik</replaceable></userinput>, kde
+<replaceable>balik</replaceable> je jméno balíčku, který chcete
+nainstalovat.
+
+</para>
+
+ </sect1>
+
+ <sect1 id="preselections">
+ <title>Jednoduchá cesta &mdash; instalace úloh</title>
+
+<para>
+
+Jestliže jste zvolili jednodušší instalaci, ocitnete se v programu
+<command>tasksel</command>.  Program vám předloží nabídku připravených
+softwarových úloh.  Vždy samozřejmě můžete přejít k programu
+<command>dselect</command> a balík po balíku určit, co se má
+instalovat, ovšem projít všechny balíky vám pravděpodobně zabere hodně
+času, protože budete vybírat z &num-of-distrib-pkgs; balíků!
+
+</para><para>
+
+Z tohoto důvodu vám raději nabízíme <emphasis>úlohy</emphasis>
+(zadání).  <emphasis>Zadáním</emphasis> se myslí funkce, kterou systém
+bude schopen plnit. Můžete volit z několika připravených zadání jako
+třeba <quote>vývoj v jazyce C</quote>, <quote>souborový
+server</quote>, <quote>vědecké aplikace</quote> nebo <quote>Debian
+Jr.</quote>.
+
+</para><para>
+
+U každé úlohy si můžete výběrem <userinput>Task Info</userinput>
+nechat zobrazit podrobnější informace o úloze, jako třeba seznam
+balíčků v ní obsažených. <xref linkend="tasksel-size-list"/> obsahuje
+tabulku několika úloh a jejich přibližné velikosti.
+
+</para><para>
+
+Až skončíte s výběrem, vyberte <userinput>Finish</userinput>.  Tím se
+spustí <command>apt-get</command>, který nainstaluje vybrané balíčky.
+I když nevyberete žádné úlohy, doinstalují se všechny chybějící balíky
+s prioritou standardní, požadované a důležité. (To je ekvivalentní
+spuštění příkazu <userinput>tasksel -s</userinput> a v současné době
+to znamená asi 37 megabajtů balíčků).  Před samotnou instalací se
+ještě zobrazí počet instalovaných balíků a celková velikost balíčků,
+které se musí stáhnout ze sítě.
+
+</para><para>
+
+Zde musíme zmínit, že v připravených úlohách je zahrnuta pouze malá
+část ze všech &num-of-distrib-pkgs; dostupných balíčků.  Informace
+o dalších balících získáte příkazem <userinput>apt-cache search
+<replaceable>hledany-retezec</replaceable></userinput> (viz manuálová
+stránka <citerefentry> <refentrytitle>apt-cache</refentrytitle>
+<manvolnum>8</manvolnum> </citerefentry>), nebo si podle popisu níže
+spusťte program <command>dselect</command>.
+
+</para>
+
+ </sect1>
+
+ <sect1 id="install-advanced">
+ <title>Pokročilá správa balíčků programem <command>dselect</command></title>
+
+<para>
+
+Po výběru úloh programem <command>tasksel</command> se
+<command>base-config</command> zeptá, zda chcete provést detailnější
+výběr balíčků programem <command>dselect</command>.  V <ulink
+url="&url-dselect-beginner;">dselect Tutorial</ulink> jsou informace,
+které byste měli znát předtím, než <command>dselect</command>
+spustíte. <command>dselect</command> slouží k výběru jednotlivých
+<emphasis>balíků</emphasis>, které se nainstalují na váš počítač.
+Program <command>dselect</command> je nutné spustit jako superuživatel
+(root).
+
+</para>
+
+ </sect1>
+
+ <sect1 id="debconf">
+ <title>Výzvy během instalace balíčků</title>
+
+<para>
+
+Každý balíček, který jste vybrali v programech
+<command>tasksel</command> nebo <command>dselect</command>, bude
+rozbalen a nainstalován programy <command>apt-get</command>
+a <command>dpkg</command>. Pokud jsou k instalaci balíčku potřebné
+informace od uživatele, budete na ně dotázáni během této fáze
+instalace. Na obrazovce se také mohou objevit zprávy o instalačních
+problémech.
+
+</para>
+
+  <sect2 arch="powerpc" id="xserver">
+  <title>Nastavení X Serveru</title>
+
+<para>
+
+X server na iMacech a některých starších Macintoshích nespočítá
+správně nastavení obrazovky. Proto budete muset během nastavení videa
+zvolit položku <quote>Advanced</quote> a nastavit horizontální
+frekvenci obrazu na <userinput>59-63</userinput>.  Vertikální
+obnovovací frekvenci můžete ponechat na původních hodnotách.
+
+</para><para>
+
+Zařízení pro myš by mělo být <userinput>/dev/input/mice</userinput>.
+
+</para>
+
+  </sect2>
+
+ </sect1>
+
+ <sect1 id="login">
+ <title>Přihlášení do systému</title>
+
+<para>
+
+Po dokončení instalace balíků se setkáte s výzvou k přihlášení do
+systému (tzv. <firstterm>login prompt</firstterm>).  Přihlaste se na
+svůj osobní účet, systém je připraven k používání.
+
+</para><para>
+
+Pokud jste začínající uživatel, asi si budete chtít prohlédnout
+dokumentaci dostupnou v systému. V současné době existuje několik
+dokumentačních systémů, ale pracuje se na jejich sjednocení.
+
+</para><para>
+
+Dokumentace vztahující se k instalovaným programům je v adresáři
+<filename>/usr/share/doc/</filename> v podadresáři se jménem programu.
+Například příručka pro použití programu <command>apt</command> (APT
+User's Guide) je v souboru
+<filename>/usr/share/doc/apt/guide.html/index.html</filename>.
+
+</para><para>
+
+<filename>/usr/share/doc/</filename> navíc obsahuje několik
+speciálních adresářů. Například linuxové návody <quote>jak na
+to</quote> (HOWTO) jsou v adresářích
+<filename>/usr/share/doc/HOWTO/en-txt/</filename> a
+<filename>/usr/share/doc/HOWTO/en-txt/mini/</filename>.
+Nainstalujete-li balík <command>dhelp</command>, získáte soubor
+<filename>/usr/share/doc/HTML/index.html</filename>, který obsahuje
+seznam veškeré instalované dokumentace.
+
+</para><para>
+
+Tyto dokumenty můžete jednoduše prohlížet tak, že vstoupíte do
+adresáře s dokumentací (<userinput>cd /usr/share/doc/</userinput>)
+a napíšete <userinput>lynx .</userinput> (tečka znamená aktuální
+adresář).
+
+</para><para>
+
+Dokumentaci k příkazu můžete získat, když napíšete na příkazovém řádku
+<userinput>info <replaceable>prikaz</replaceable></userinput> nebo
+<userinput>man <replaceable>prikaz</replaceable></userinput>. Zkrácený
+návod k použití příkazu obvykle získáte, když za příkaz přidáte
+parametr <userinput>--help</userinput>. Jestliže je výstup delší než
+obrazovka, napište na konec příkazu ještě
+<userinput>| more</userinput> (výstup se pak zastaví po každé plné 
+obrazovce). Všechny příkazy začínající určitým řetězcem zobrazíte tak,
+že napíšete řetězec a dvakrát stisknete klávesu <keycap>Tab</keycap>.
+Nápovědu k povelům shellu získáte příkazem
+<userinput>help</userinput>.
+
+</para><para>
+
+Obsáhlejší úvod do Debianu a GNU/Linuxu najdete (anglicky) v
+<filename>/usr/share/doc/debian-guide/html/noframes/index.html</filename>.
+
+</para>
+
+ </sect1>
+</chapter>
