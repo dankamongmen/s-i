@@ -5,18 +5,9 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
 INSTALL      = install -m0755
-INSTALL_DATA = install -m0644
 
-PACKAGE=$(shell dh_listpackages)
-
-BUGREPORTERUDEB=bugreporter-udeb
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=all
-BUGREPORTERUDEBFILENAME=$(BUGREPORTERUDEB)_$(VERSION)_$(ARCH).udeb
+PACKAGE=bugreporter-udeb
 
 build:
 # Nothing to do.
@@ -46,15 +37,15 @@ install-bugreporter-udeb: install-common
 binary-indep: install bugreporter-udeb
 
 bugreporter-udeb: install-bugreporter-udeb
-	dh_testdir -p$@
-	dh_testroot -p$@
-	dh_installdebconf -p$@
-	dh_strip -p$@
-	dh_compress -p$@
-	dh_fixperms -p$@
-	dh_installdeb -p$@
-	dh_gencontrol -p$@ -- -n$(BUGREPORTERUDEBFILENAME)
-	dh_builddeb -p$@ --filename=$(BUGREPORTERUDEBFILENAME)
+	dh_testdir 
+	dh_testroot 
+	dh_installdebconf 
+	dh_strip 
+	dh_compress 
+	dh_fixperms 
+	dh_installdeb 
+	dh_gencontrol 
+	dh_builddeb 
 
 # Build architecture-dependent files here.
 binary-arch: build install

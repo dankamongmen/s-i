@@ -5,13 +5,6 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-
-PACKAGE=autopartkit
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
-
 CFLAGS = -Wall -W -Os
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
@@ -64,9 +57,8 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_installdirs etc/autopartkit usr/bin
-	$(MAKE) install DESTDIR=`pwd`/debian/autopartkit
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/autopartkit
 	strip --remove-section=.note --remove-section=.comment `pwd`/debian/autopartkit/usr/bin/autopartkit
-
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -83,9 +75,8 @@ autopartkit:
 	dh_fixperms
 	dh_installdeb 
 	dh_shlibdeps
-	dh_gencontrol -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure autopartkit

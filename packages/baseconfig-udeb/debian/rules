@@ -5,20 +5,14 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PACKAGE=$(shell dh_listpackages)
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-FILENAME=$(PACKAGE)_$(VERSION)_all.udeb
+PACKAGE = baseconfig-udeb
 
-build: build-stamp
-build-stamp:
-	dh_testdir
-	touch build-stamp
+build:
+# Ye olde no-op.
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
 	dh_clean
 
 install: build
@@ -38,11 +32,11 @@ binary-indep: build install
 	dh_strip
 	dh_compress
 	dh_fixperms
-	dh_installdebconf -n
+	dh_installdebconf
 	dh_installdeb
 	dh_shlibdeps
-	dh_gencontrol -- -n$(FILENAME)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 # Build architecture-dependent files here.
 binary-arch: build install
