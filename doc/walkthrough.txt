@@ -63,7 +63,7 @@ disk formatter and mount module, a swap setup module, a base system installer
 module, a lilo installer module, and a rescue floppy creator module). Then it
 exits.
 
-It is time to display them menu again, but a bunch of new modules have 
+It is time to display the menu again, but a bunch of new modules have 
 installed menu control files, so it has now grown to look like this:
 
 - Configure installation media
@@ -86,7 +86,8 @@ run. It switches to a fresh VT, displays info about getting back to the
 menu, and runs the shell.
 
 The menu is them redisplayed. The second menu item again becomes the
-default. Eventually the user switches back to this VT and selects it.
+default. Eventually the user switches back to this VT and selects it, so
+it's time to partition the disk.
 
 All the modules the disk partitioner depends on are configured. It depends
 on only one, a hard disk driver module.
@@ -110,9 +111,9 @@ mounted.
 Back to the menu, where "install the base system" becomes the default, and
 is picked by the user. This makes the base system installer module run.
 
-This module sets up a FIFO and for the base system to be retrieved to the fifo.
-As the CD retriever does that, another process runs, reading from the fifo
-and unpacking the base system to the destination filesystem.
+This module sets up a fifo and causes the base system to be retrieved to the
+fifo. cAs the CD retriever does that, another process runs, reading from the
+fifo and unpacking the base system to the destination filesystem.
 
 With the base system installed, a few more things are set up, like the
 fstab file.
@@ -126,8 +127,6 @@ load drivers for stuff like the disk into the kernel when it boots.
 Back to the menu, where make a rescue floppy is default. The user skips
 that step and chooses to reboot the system.
 
-That step makes sure that the boot media is ejected, and reboots.
-
 The system boots back up.
 
 The kernel loads its initrd, which loads a few modules into the kernel, and
@@ -137,5 +136,5 @@ system.
 Init runs dpkg-reconfigure on several packages that need to be configured
 on a fresh install, rather like base-config works now.
 
-The user sees a loin prompt.
+The user sees a login prompt.
 
