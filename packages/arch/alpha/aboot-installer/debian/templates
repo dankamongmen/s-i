@@ -8,6 +8,29 @@ _Description: Device for boot loader installation:
  and the configuration file /etc/aboot.conf will be copied to that
  partition.
 
+Template: debian-installer/aboot-installer/non-bsd-partitions
+Type: boolean
+Default: false
+_Description: Install /boot on a disk with an unsupported partition table?
+ To be bootable from the SRM console, aboot and the kernel it loads must
+ be installed on a disk which uses BSD disklabels for its partition
+ table.  Your /boot directory is not located on such a disk.  If you
+ proceed, you will not be able to boot your system using aboot, and will
+ need to boot it some other way.
+
+Template: aboot-installer/non-ext2-boot
+Type: boolean
+Default: false
+_Description: Use unsupported filesystem type for /boot?
+ Aboot requires /boot to be located on an ext2 partition on a bootable
+ device.  This means that either the root partition must be an ext2
+ filesystem, or you must have a separate ext2 partition mounted at
+ /boot.
+ .
+ Currently, /boot is located on a partition of type ${PARTTYPE}.  If you
+ keep this setting, you will not be able to boot your Debian system
+ using aboot.
+
 Template: debian-installer/aboot-installer/title
 Type: text
 #  Main menu item

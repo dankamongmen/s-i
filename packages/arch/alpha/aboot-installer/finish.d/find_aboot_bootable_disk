@@ -1,0 +1,75 @@
+#!/bin/sh -e
+
+. /lib/partman/definitions.sh
+
+# Verify that /boot is on an ext2 partition on a disk using BSD
+# disklabels, so that the system will actually be bootable.
+
+(modprobe srm_env || true) 2> /dev/null
+if [ ! -f /proc/srm_environment/named_variables/booted_dev ]
+then
+	# No need for us to check anything more -- aboot won't work here
+	# anyway.  This is a problem for whatever installs milo.
+	exit 0
+fi
+
+(for i in /lib/partman/fstab.d/*; do
+	[ -x "$i" ] || continue
+	$i
+done) | 
+while read fs mp type options dump pass
+do
+	if [ "$mp" = / ]; then
+		root_type=$type
+		root_fs=$fs
+	elif [ "$mp" = /boot ]; then
+		boot_type=$type
+		boot_fs=$fs
+	fi
+done
+
+if [ -z "$boot_fs" ]
+then
+	boot_fs=$root_fs
+	boot_type=$root_type
+fi
+
+disk=
+for dev in $DEVICES/*
+do
+	[ -d "$dev" ] || continue
+	cd $dev
+	partitions=
+	open_dialog PARTITIONS
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+		if [ -d $id -a "$path" = "$boot_fs" ]; then
+			disk="$dev"
+		fi
+	done
+	close_dialog
+
+	[ -z "$disk" ] || break
+done
+
+# If we can't figure out the parent dev, let it slide for now.
+if [ -n "$disk" ]
+then
+	label=$(parted "$disk" print | sed -n 's/Disk label type: //p')
+	if [ "$label" != "bsd" ]; then
+		. /usr/share/debconf/confmodule
+
+		db_input critical aboot-installer/non-bsd-partitions
+		db_go
+		exit 1
+	fi
+fi
+
+if [ "$boot_type" != "ext2" ]
+then
+	. /usr/share/debconf/confmodule
+
+	db_subst aboot-installer/non-ext2-boot PARTTYPE $boot_type 
+	db_input critical aboot-installer/non-ext2-boot
+	db_go
+	exit 1
+fi
