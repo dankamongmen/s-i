@@ -384,6 +384,7 @@ int main (int argc, char **argv) {
 				update_language();
 				break;
 			}
+		di_list_free(packages, di_pkg_free);
 		packages = status_read();
 	}
 	
