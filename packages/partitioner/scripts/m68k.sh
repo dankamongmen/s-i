@@ -12,22 +12,13 @@ case "`archdetect`" in
 "m68k/mac")
 	mac-fdisk $DISK
 	;;
-"m68k/bvme6000")
-	pmac-fdisk $DISK
-	;;
-"m68k/mvme147")
-	pmac-fdisk $DISK
-	;;
-"m68k/mvme16x")
+"m68k/*vme*")
 	pmac-fdisk $DISK
 	;;
 "m68k/q40")
 	atari-fdisk $DISK
 	;;
-"m68k/sun")
-	parted $DISK
-	;;
-"m68k/sun3x")
+"m68k/sun*")
 	parted $DISK
 	;;
 *)
@@ -35,8 +26,9 @@ case "`archdetect`" in
 	;;
 esac
 
-if [ "`uname -r | grep '^2.2.'`" != "" ] && [ -x /usr/bin/update-dev ]; then
-	update-dev
+if [ -x /usr/bin/update-dev ]; then
+	logger -t "partitioner" "userdevfs: update-dev"
+        /usr/bin/update-dev 2>&1 | logger -t "update-dev"
 fi
 
 exit $?
