@@ -22,6 +22,7 @@ while [ "$STATE" -gt 0 ]; do
 case "$STATE" in
   1)
     db_fset "$languagenamecode" seen false
+    db_fset "$languagecode" seen false
     db_input critical "$languagenamecode" || [ $? -eq 30 ]
     if db_go; then
         db_get "$languagenamecode"
@@ -35,12 +36,15 @@ case "$STATE" in
 
   2)
     db_fset "$countrynamecode" seen false
+    db_fset "$countrycode" seen false
     db_input critical "$countrynamecode" || [ $? -eq 30 ]
     if db_go; then
         db_get "$countrynamecode"
         if [ "$RET" != "Other" ]; then
             country=`echo $RET | sed -e 's/ .*//'`
             db_set "$countrycode" "$country"
+        else
+            country=unknown
         fi
         STATE=$(($STATE + 1))
     else
