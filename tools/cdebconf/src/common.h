@@ -41,7 +41,13 @@
 #define STRDUP(s) ((s) == NULL ? NULL : strdup(s))
 #define STRLEN(s) ((s) == NULL ? 0 : strlen(s))
 #define DIM(ar) (sizeof(ar)/sizeof(ar[0]))
+
+/* MIN and MAX are also defined from perl.h, called from perldb.c */
+#ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
+#ifndef MAX
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
 
 #endif
