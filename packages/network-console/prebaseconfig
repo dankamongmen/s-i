@@ -11,6 +11,19 @@ log() {
 
 TEMPLATE_ROOT=debian-installer/network-console
 
+if chroot /target dpkg -l network-console-config 2>/dev/null | grep "^ii" ; then
+    log "Package network-console-config was installed into /target"
+    db_input critical $TEMPLATE_ROOT/prebaseconfig-reminder
+    db_go
+else
+    ## FIXME (see #279090) ##
+    # There really should be a dialog shown here
+    # Not implemented yet because of string freeze for RC2 release
+    log "Package network-console-config was not installed into /target;"
+    log "aborting configuration of base-configuration over SSH"
+    exit 0
+fi
+
 DIR=/etc/ssh/
 
 mkdir /target/$DIR
@@ -19,14 +32,3 @@ cp $DIR/sshd_config_target /target/$DIR/sshd_config
 
 echo 'installer:x:0:0:installer:/:/usr/sbin/base-config-network-console' >> /target/etc/passwd
 grep "^installer:" /etc/shadow >> /target/etc/shadow
-
-if apt-install network-console-config ; then
-    log "Installed network-console-config successfully into /target"
-    db_input critical $TEMPLATE_ROOT/prebaseconfig-reminder
-    db_go
-else
-    ## FIXME (see #279090) ##
-    # There really should be a dialog shown here
-    # Not implemented yet because of string freeze for RC2 release
-    log "Installation of network-console-config into /target failed"
-fi
