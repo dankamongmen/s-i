@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.16 2003/09/27 12:32:49 ley Exp $ */
+/* $Id: udpkg.h,v 1.17 2003/10/16 00:39:42 kraai Rel $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -9,11 +9,9 @@
 #ifdef DODEBUG
 #include <assert.h>
 #define ASSERT(x) assert(x)
-#define SYSTEM(x) do_system(x)
 #define DPRINTF(fmt,args...) fprintf(stderr, fmt, ##args)
 #else
 #define ASSERT(x) /* nothing */
-#define SYSTEM(x) system(x)
 #define DPRINTF(fmt,args...) /* nothing */
 #endif
 

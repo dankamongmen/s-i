@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.40 2003/10/14 06:30:11 kraai Exp $ */
+/* $Id: udpkg.c,v 1.41 2003/10/16 00:39:42 kraai Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -13,22 +13,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/utsname.h>
+#include <debian-installer.h>
 
 static int force_configure = 0;
 
 /* 
  * Main udpkg implementation routines
  */
-
-#ifdef DODEBUG
-static int do_system(const char *cmd)
-{
-	DPRINTF("cmd is %s\n", cmd);
-	return system(cmd);
-}
-#else
-#define do_system(cmd) system(cmd)
-#endif
 
 static int is_file(const char *fn)
 {
@@ -126,7 +117,7 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	if (is_file(config))
 	{
 		snprintf(buf, sizeof(buf), "exec %s configure", config);
-		if ((r = do_system(buf)) != 0)
+		if ((r = di_exec_shell_log(buf)) != 0)
 		{
 			FPRINTF(stderr, "config exited with status %d\n", r);
 			pkg->status |= STATUS_STATUSHALFCONFIGURED;
@@ -138,7 +129,7 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	if (is_file(postinst))
 	{
 		snprintf(buf, sizeof(buf), "exec %s configure", postinst);
-		if ((r = do_system(buf)) != 0)
+		if ((r = di_exec_shell_log(buf)) != 0)
 		{
 			FPRINTF(stderr, "%s's postinst exited with status %d\n",
 				pkg->package, WEXITSTATUS(r));
@@ -155,21 +146,24 @@ static int dpkg_doconfigure(struct package_t *pkg)
 static int dpkg_dounpack(struct package_t *pkg)
 {
 	int r = 0;
-	char *cwd, *p;
-	FILE *infp, *outfp;
+	char *cwd;
 	char buf[1024], buf2[1024];
 	int i;
 	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
 	                         "conffiles", "md5sums", "shlibs", 
 				 "templates", "menutest", "isinstallable",
                                  "config" };
+#ifdef DOREMOVE
+	char *p;
+	FILE *infp, *outfp;
+#endif
 
 	DPRINTF("Unpacking %s\n", pkg->package);
 
 	cwd = getcwd(0, 0);
 	chdir("/");
 	snprintf(buf, sizeof(buf), "ar -p %s data.tar.gz|tar -xzf -", pkg->file);
-	if (SYSTEM(buf) == 0)
+	if (di_exec_shell_log(buf) == 0)
 	{
 		/* Installs the package scripts into the info directory */
 		for (i = 0; i < sizeof(adminscripts) / sizeof(adminscripts[0]);
@@ -201,7 +195,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 					snprintf(buf, sizeof(buf),
 						 "debconf-loadtemplate %s %s",
 						 pkg->package, buf2);
-					if (SYSTEM(buf) != 0)
+					if (di_exec_shell_log(buf) != 0)
 						r = 1;
 				}
 #endif
@@ -295,7 +289,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	{
 		snprintf(buf, sizeof(buf), "ar -p %s control.tar.gz|tar -xzf -",
 			pkg->file);
-		if (SYSTEM(buf) == 0)
+		if (di_exec_shell_log(buf) == 0)
 		{
 			if ((f = fopen("control", "r")) != NULL) {
 				control_read(f, pkg);
@@ -315,7 +309,7 @@ static int dpkg_unpack(struct package_t *pkgs)
 	struct package_t *pkg;
 	void *status = status_read();
 
-	if (SYSTEM("rm -rf -- " DPKGCIDIR) != 0 ||
+	if (di_exec_shell_log("rm -rf -- " DPKGCIDIR) != 0 ||
 	    mkdir(DPKGCIDIR, S_IRWXU) != 0)
 	{
 		perror("mkdir");
@@ -329,7 +323,7 @@ static int dpkg_unpack(struct package_t *pkgs)
 		if (r != 0) break;
 	}
 	status_merge(status, pkgs);
-	if (SYSTEM("rm -rf -- " DPKGCIDIR) != 0)
+	if (di_exec_shell_log("rm -rf -- " DPKGCIDIR) != 0)
 		r = 1;
 	return r;
 }
@@ -363,7 +357,7 @@ static int dpkg_install(struct package_t *pkgs)
 {
 	struct package_t *p, *ordered = 0;
 	void *status = status_read();
-	if (SYSTEM("rm -rf -- " DPKGCIDIR) != 0 ||
+	if (di_exec_shell_log("rm -rf -- " DPKGCIDIR) != 0 ||
 	    mkdir(DPKGCIDIR, S_IRWXU) != 0)
 	{
 		perror("mkdir");
@@ -406,7 +400,7 @@ static int dpkg_install(struct package_t *pkgs)
 	
 	if (ordered != 0)
 		status_merge(status, pkgs);
-	return SYSTEM("rm -rf -- " DPKGCIDIR);
+	return di_exec_shell_log("rm -rf -- " DPKGCIDIR);
 }
 
 static int dpkg_fields(struct package_t *pkg)
@@ -420,7 +414,7 @@ static int dpkg_fields(struct package_t *pkg)
 		return 1;
 	}
 	asprintf(&command, "ar -p %s control.tar.gz|tar -xzOf - ./control", pkg->file);
-	ret = SYSTEM(command);
+	ret = di_exec_shell_log(command);
 	free(command);
 	return ret;
 }
