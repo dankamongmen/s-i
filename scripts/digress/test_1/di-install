@@ -1,5 +1,6 @@
 #!/usr/bin/expect
-# Expect script to run for interactive first stage installs.
+# Expect script to run for partially interactive first stage installs using the
+# dialog frontend. At least partitioning must be preseeded.
 
 spawn -noecho $env(CONSOLECOMMAND)
 
@@ -10,12 +11,16 @@ expect {
 		sleep 1
 		send "\r"
 		exp_continue -continue_timer
-	} "<Go Back>" {
+	} -re "<Go.*Back>" {
 		sleep 1
 		send "\r"
 		exp_continue -continue_timer
-	} "Please stand by while rebooting the system." {
+	} -re "rebooting.*the.*system." {
 		exit
+	} -re "down.*NOW" {
+		exit
+	} -re "Installation.*step.*failed" {
+		exit 1
 	} timeout {
 		puts "timeout!"
 		exit 1
