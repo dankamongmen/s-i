@@ -341,7 +341,20 @@ config_package(struct package_t *p) {
 	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
 	ret = SYSTEM(configcommand);
 	free(configcommand);
-        p->status = (ret == 0) ? installed : half_configured;
+        if (ret == 0) {
+            p->status = installed;
+            /*
+             * A language selection package must provide the virtual
+             * package 'language-selected'.
+             * The LANGUAGE environment variable must be updated
+             */
+            for (i = 0; p->provides[i] != NULL; i++)
+                if (strcmp(p->provides[i]->name, "language-selected") == 0) {
+                    update_language();
+                    break;
+                }
+        } else
+            p->status = half_configured;
 	return !ret;
 }
 
@@ -389,16 +402,6 @@ int main (int argc, char **argv) {
 			di_log("Setting main menu question priority to critical");
 			menu_priority = "critical";
 		}
-		/*
-		 * A language selection package must provide the virtual
-		 * package 'language-selected'.
-		 * The LANGUAGE environment variable must be updated
-		 */
-		for (i = 0; p->provides[i] != NULL; i++)
-			if (strcmp(p->provides[i]->name, "language-selected") == 0) {
-				update_language();
-				break;
-			}
 		di_list_free(packages, di_pkg_free);
 		packages = status_read();
 	}
