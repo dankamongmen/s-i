@@ -9,9 +9,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <detect.h>
-#include <debconfclient.h>
+#include <cdebconf/debconfclient.h>
+#include <d-i.h>
 #include <string.h>
-#include "utils.h"
 
 static int niccfg_other_modules;
 static struct debconfclient *client;
@@ -44,7 +44,7 @@ niccfg_modprobe (char *modulename)
   snprintf (buffer, sizeof (buffer), "modprobe -v %s %s", modulename,
 	    (params ? params : " "));
 
-  if (execlog (buffer) != 0)
+  if (di_execlog (buffer) != 0)
     {
 	niccfg_error();
 	return 1;

@@ -2,8 +2,7 @@ ifndef TARGETS
 TARGETS=niccfg-manual
 endif
 
-INCS=-I../cdebconf/src/
-LDOPTS=-L../cdebconf/src -ldebconf -Wl,-rpath,../cdebconf/src 
+LDOPTS=-ldebconf  -ld-i
 
 PREFIX=$(DESTDIR)/usr/
 CFLAGS=-Wall  -Os -fomit-frame-pointer
@@ -13,8 +12,8 @@ STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 
 all: $(TARGETS)
 
-niccfg-manual: niccfg-manual.c utils.o
-	$(CC) $(CFLAGS) $@.c  -o $@ $(INCS) $(LDOPTS) utils.o
+niccfg-manual: niccfg-manual.c
+	$(CC) $(CFLAGS) $@.c  -o $@ $(INCS) $(LDOPTS)
 
 clean:
-	rm -f niccfg-manual *.o 
+	rm -f niccfg-manual
