@@ -50,7 +50,12 @@ sub get_translations {
 	next if m/^\#/;
 	my ($name, $translation) = split(/: /);
 	$translation =~ s/,/\\,/g;
-	$translation = "$locales{$name} - $translation" if ($show_locales);
+        if ($show_locales) {
+	     print ">>$name\n";
+             $translation = $locales{$name}.
+                            (" " x (5 - length($locales{$name}))).
+                            " - $translation";
+        }
 	$translations{$name} = $translation;
     }
     close(L);
@@ -60,10 +65,17 @@ sub get_translations {
 my @languagenames   = get_language_names($list);
 my %translationmap  = get_translations($listl10n);
 
+sub order_trans {
+    my ($a_locale)=$translationmap{$a}=~/^(\w+)/;
+    my ($b_locale)=$translationmap{$b}=~/^(\w+)/;
+    $a_locale.="_ZZ" if length $a_locale == 2;
+    $b_locale.="_ZZ" if length $b_locale == 2;
+    return $a_locale cmp $b_locale;
+}
+
 my @translations;
 my @sortedlanguagenames;
-for my $name (sort { $translationmap{$a} cmp $translationmap{$b} }
-	      @languagenames) {
+for my $name (sort order_trans @languagenames) {
     if (exists $translationmap{$name}) {
 	push(@translations, $translationmap{$name});
 	push(@sortedlanguagenames, $name);
