@@ -212,7 +212,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
         }
     }
 
-    di_packages_resolve_dependencies_mark(packages);
+    di_system_packages_resolve_dependencies_mark_kernel(packages);
 
     for (node = packages->list.head; node; node = node->next) {
         package = node->data;
