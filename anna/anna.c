@@ -147,6 +147,9 @@ int md5sum(char* sum, char *file) {
         int io[2];
         int pid;
         char line[1024];
+	/* Trivially true if the Packages file doesn't have md5sum lines */
+	if (sum == NULL)
+		return 1;
         pipe(io);
         pid = fork();
         if (pid == 0) {
