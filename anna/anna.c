@@ -28,7 +28,8 @@ choose_retriever(void)
         struct package_t *p;
 
         if (defval != NULL && (p = di_pkg_find(ret_pkgs, defval))) {
-            asprintf(&defval, "%s: %s", p->package, p->description);
+            if (asprintf(&defval, "%s: %s", p->package, p->description) == -1)
+                return 3;
             debconf->command(debconf, "SET", ANNA_RETRIEVER, defval, NULL);
             free(defval);
         }
@@ -225,7 +226,8 @@ install_modules(void)
             for(f = fp = p->filename; *fp != 0; fp++)
                 if (*fp == '/')
                     f = ++fp;
-            asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f);
+            if (asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f) == -1) 
+                return 5;
 
             debconf->command(debconf, "SUBST", "anna/progress_step_retr", "PACKAGE", p->package, NULL);
             debconf->command(debconf, "SUBST", "anna/progress_step_inst", "PACKAGE", p->package, NULL);

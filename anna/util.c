@@ -127,7 +127,8 @@ get_retriever(void)
         colon_p = strchr(debconf->value, ':');
     if (colon_p != NULL) {
         *colon_p = '\0';
-        asprintf(&retriever, "%s/%s", RETRIEVER_DIR, debconf->value);
+        if (asprintf(&retriever, "%s/%s", RETRIEVER_DIR, debconf->value) == -1)
+            retriever = NULL;
     }
     return retriever;
 }
@@ -140,7 +141,8 @@ config_retriever(void)
     int ret;
 
     retriever = get_retriever();
-    asprintf(&command, "%s config", retriever);
+    if (asprintf(&command, "%s config", retriever) == -1)
+        return 1;
     ret = system(command);
     free(command);
     return ret;
@@ -154,8 +156,9 @@ try_get_Packages_file(const char *ext, const char *suite)
     int ret;
 
     retriever = get_retriever();
-    asprintf(&command, "%s packages " DOWNLOAD_DIR "/Packages%s %s %s",
-            retriever, ext, ext[0] == '\0' ? "." : ext, suite);
+    if (asprintf(&command, "%s packages " DOWNLOAD_DIR "/Packages%s %s %s",
+            retriever, ext, ext[0] == '\0' ? "." : ext, suite) == -1)
+        return 0;
     ret = system(command);
     free(command);
     if (ret != 0) {
@@ -166,10 +169,12 @@ try_get_Packages_file(const char *ext, const char *suite)
             debconf = debconfclient_new();
         debconf->command(debconf, "GET", "mirror/distribution", NULL);
         dist = debconf->value;
-        asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
-                dist, suite, ARCH, ext);
-        asprintf(&command, "%s retrieve %s " DOWNLOAD_DIR "/Packages%s",
-                retriever, file, ext);
+        if (asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
+                dist, suite, ARCH, ext) == -1)
+            return 0;
+        if (asprintf(&command, "%s retrieve %s " DOWNLOAD_DIR "/Packages%s",
+                retriever, file, ext) == -1)
+            return 0;
         free(file);
         ret = system(command);
         free(command);
@@ -278,7 +283,8 @@ get_package (struct package_t *package, char *dest)
     char *command;
 
     retriever = get_retriever();
-    asprintf(&command, "%s retrieve %s %s", retriever, package->filename, dest);
+    if (asprintf(&command, "%s retrieve %s %s", retriever, package->filename, dest) == -1)
+       return 0;
     ret = !system(command);
     free(retriever);
     free(command);
@@ -292,7 +298,8 @@ unpack_package (char *pkgfile)
     char *command;
     int ret;
 
-    asprintf(&command, "%s %s", DPKG_UNPACK_COMMAND, pkgfile);
+    if (asprintf(&command, "%s %s", DPKG_UNPACK_COMMAND, pkgfile) == -1)
+        return 0;
     ret = !system(command);
     free(command);
     return ret;
@@ -332,10 +339,11 @@ cleanup(void)
     char *command;
 
     retriever = get_retriever();
-    asprintf(&command, "%s cleanup", retriever);
-    system(command);
+    if (asprintf(&command, "%s cleanup", retriever) != -1) {
+        system(command);
+        free(command);
+    }
     free(retriever);
-    free(command);
 }
 
 /* 
