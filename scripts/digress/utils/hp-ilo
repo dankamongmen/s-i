@@ -12,16 +12,33 @@
 
 use strict;
 use IPC::Open2;
-
+	
 my $action=shift;
 if ($action eq 'reset') {
-	exit send_command(qq{<RESET_SERVER/>});
+	send_command(qq{<RESET_SERVER/>});
+	exit process_result();
 }
 elsif ($action eq 'poweron') {
-	exit send_command(qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
+	send_command(qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
+	exit process_result();
 }
 elsif ($action eq 'poweroff') {
-	exit send_command(qq{<SET_HOST_POWER HOST_POWER="No"/>});
+	send_command(qq{<SET_HOST_POWER HOST_POWER="No"/>});
+	exit process_result();
+}
+elsif ($action eq 'force_restart') {
+	send_command(qq{<GET_HOST_POWER_STATUS/>});
+	if (scan_result("HOST_POWER") eq 'OFF') {
+		send_command(qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
+	}
+	else {
+		send_command(qq{<RESET_SERVER/>});
+	}
+	exit process_result();
+}
+elsif ($action eq 'get_host_power') {
+	send_command(qq{<GET_HOST_POWER_STATUS/>});
+	print "Power: ".scan_result("HOST_POWER")."\n";
 }
 else {
 	print STDERR "unnown action $action\n";
@@ -29,28 +46,44 @@ else {
 
 sub send_command {
 	my $command=gen_command(@_);
-	
+
 	if (! defined $ENV{HP_ILO_HOST}) {
 		die "Please set HP_ILO_HOST\n";
 	}
-	my $pid = open2 (\*RDRFH, \*WTRFH, "locfg.pl", 
-		"-s", $ENV{HP_ILO_HOST}, "-f", "-");
+
+	my $pid = open2 (\*RDRFH, \*WTRFH, "locfg.pl", "-s", $ENV{HP_ILO_HOST}, "-f", "-");
 	if (! $pid) {
 		die "failed to run locfg.pl: $!";
 	}
+
 	print WTRFH $command;
 	close WTRFH;
-	
-	# This assumes the last response will be an error if there was some
-	# error.
+}
+
+sub scan_result {
+	my $token=shift;
+	my $ret;
+	while (<RDRFH>) {
+		if (/$token="(.*?)"/) {
+			$ret=$1;
+		}
+	}
+	return $ret;
+}
+
+sub process_result {
 	my $error;
 	while (<RDRFH>) {
 		if (/MESSAGE='(.*?)'/) {
-			if (lc($1) eq 'no error' || ! defined $error) {
-				$error=0;
+			my $msg=$1;
+			if ($msg=~/error/i && lc($msg) ne "no error") {
+				$error=1;
+			}
+			elsif (lc($msg) eq 'no error') {
+				$error=0 unless defined $error;
 			}
 			else {
-				$error=1;
+				print "Message: $msg\n";
 			}
 		}
 	}
