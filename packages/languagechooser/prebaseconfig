@@ -20,9 +20,12 @@ kbd)
         acm=`echo $consolefont | sed -e 's/.*(//' -e 's/).*//'`
         [ "$acm" = utf8 ] && acm=
         if [ -n "$acm" ]; then
-	    echo "# Debian Installer enforces these values" >>$ctconfig
-            echo "SCREEN_FONT_MAP=$acm" >>$ctconfig
-            echo "APP_CHARSET_MAP=$acm" >>$ctconfig
+           if [ "$acm" = "iso09" ]; then
+               # Special case for Turkish console.
+                echo "APP_CHARSET_MAP=iso09"
+           else
+                echo "SCREEN_FONT_MAP=$acm"
+           fi >> $ctconfig
         fi
         consolefont=`echo $consolefont | sed -e 's/(.*//'`
         if [ -n "$consolefont" ]; then
