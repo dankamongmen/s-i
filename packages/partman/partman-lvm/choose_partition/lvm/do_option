@@ -69,24 +69,26 @@ $partitems"
 	    x="$partitems
 $items"
 	fi
-	db_reset partman-lvm/confirm
 	db_subst partman-lvm/confirm ITEMS "$x"
 	db_input critical partman-lvm/confirm
 	db_go || true
 	db_get partman-lvm/confirm
 	if [ "$RET" = false ]; then
+	    db_reset partman-lvm/confirm
 	    return 1
 	else
+	    db_reset partman-lvm/confirm
 	    return 0
 	fi
     else
-	db_reset partman-lvm/confirm_nochanges
 	db_input high partman-lvm/confirm_nochanges
 	db_go || true
 	db_get partman-lvm/confirm_nochanges
 	if [ "$RET" = false ]; then
+	    db_reset partman-lvm/confirm_nochanges
 	    return 1
 	else
+	    db_reset partman-lvm/confirm_nochanges
 	    return 0
 	fi
     fi
@@ -99,7 +101,6 @@ confirm_changes || exit 0
 for s in /lib/partman/commit.d/*; do
     if [ -x $s ]; then
 	$s || {
-	    db_fset partman-lvm/commit_failed seen false
 	    db_input high partman-lvm/commit_failed || true
 	    db_go || true
 	    for s in /lib/partman/init.d/*; do
