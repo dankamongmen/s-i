@@ -1,3 +1,6 @@
-dir = var/run
+dir = usr
+
+subdirs = \
+	lib
 
 include ../../Makefile.inc

@@ -1,0 +1,11 @@
+bterm=/usr/bin/bterm
+font=/unifont.bgf
+
+if [ -x "$bterm" -a -e "$font" -a -n "$TERM_UTF8" -a -n "$TERM_FRAMEBUFFER" ] ; then
+	TERM=bterm
+	export TERM
+	$bterm -f $font -l $LANG debconf -o d-i $MENU
+else
+	rm -f $font
+	debconf -o d-i $MENU
+fi

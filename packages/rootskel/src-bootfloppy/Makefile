@@ -1,17 +1,13 @@
 dir =
 
 subdirs = \
-	etc \
-	lib \
-	sbin \
-	var
+	sbin
 
 subdirs_empty = \
 	dev \
 	floppy \
 	initrd \
 	mnt \
-	proc \
-	sys
+	proc
 
 include ../Makefile.inc

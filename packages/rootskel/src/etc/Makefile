@@ -10,4 +10,7 @@ files = \
 	nsswitch.conf \
 	passwd
 
-include ../Makefile.inc
+install-local:: $(outdir)
+	ln -s /proc/mounts $(outdir)/mtab
+
+include ../../Makefile.inc

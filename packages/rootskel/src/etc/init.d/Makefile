@@ -3,4 +3,4 @@ dir = etc/init.d
 files_exec = \
 	rcS
 
-include ../../Makefile.inc
+include ../../../Makefile.inc

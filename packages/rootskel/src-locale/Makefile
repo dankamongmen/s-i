@@ -1,3 +1,5 @@
-dir = proc
+dir =
+
+subdirs = usr
 
 include ../Makefile.inc

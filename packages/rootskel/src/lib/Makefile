@@ -2,4 +2,4 @@ dir = lib
 
 subdirs = debian-installer.d
 
-include ../Makefile.inc
+include ../../Makefile.inc

@@ -1,7 +1,5 @@
-dir = var
+dir = usr
 
 subdirs = lib
-
-subdirs_empty = log run
 
 include ../../Makefile.inc

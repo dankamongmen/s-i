@@ -1,3 +1,16 @@
-export TERM=dumb
-export TERM_TYPE=serial
-export DEBIAN_FRONTEND=text
+case `readlink /proc/self/fd/0` in
+	/dev/console)
+		TERM=dumb
+		TERM_TYPE=serial
+		DEBIAN_FRONTEND=text
+		;;
+	/dev/pts/*)
+		TERM=linux
+		TERM_TYPE=pts
+		DEBIAN_FRONTEND=
+		;;
+esac
+
+export TERM
+export TERM_TYPE
+export DEBIAN_FRONTEND

@@ -1,9 +1,6 @@
 dir = sbin
 
 files_exec = \
-	debian-installer \
-	env2debconf \
-	shutdown \
 	init
 
 include ../../Makefile.inc

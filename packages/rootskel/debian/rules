@@ -1,13 +1,12 @@
 #!/usr/bin/make -f
 
-ARCH=$(shell dpkg --print-architecture)
+build: build-stamp
+build-stamp:
+	dh_testdir
 
-build: debian/rootskel-locale/usr/lib/locale/C.UTF-8 debian/templates
+	$(MAKE) build
 
-debian/rootskel-locale/usr/lib/locale/C.UTF-8: debian/C.UTF-8
-	mkdir -p debian/rootskel-locale/usr/lib/locale
-	localedef -i "debian/C.UTF-8" -f "UTF-8" \
-	  "debian/rootskel-locale/usr/lib/locale/C.UTF-8" 
+	touch $@
 
 debian/templates: debian/templates-arch
 	debian/templates-build.pl $(ARCH) < $< > $@
@@ -15,17 +14,18 @@ debian/templates: debian/templates-arch
 clean:
 	dh_testdir
 	dh_testroot
-	dh_clean debian/templates
+	rm -f build-stamp
+
+	$(MAKE) clean
+	rm -f debian/templates
+
+	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_installdirs
-	$(MAKE) -C src DESTDIR=$(CURDIR)/debian/rootskel/
 
-	# TODO make this be in the Makefiles too, instead of done here..
-	mkdir -p debian/rootskel-bootfloppy/sbin/
-	install -m755 src/sbin/init.bootfloppy debian/rootskel-bootfloppy/sbin/init
+	$(MAKE) install
 
 binary-indep: build install
 
@@ -38,7 +38,6 @@ binary-arch: build install
 	dh_fixperms
 	dh_installdeb
 	dh_shlibdeps
-	dh_link /proc/mounts /etc/mtab 
 	dh_gencontrol
 	dh_builddeb
 

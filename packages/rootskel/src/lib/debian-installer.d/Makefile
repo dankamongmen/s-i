@@ -11,13 +11,11 @@ extra_files =
 
 ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
   files_menu = \
-	S70main-menu-linux
+	S70menu-linux
 
   files_term = \
 	S30term-linux \
-	S35framebuffer-linux \
 	S40utf8-linux \
-	S60devpts-linux \
 	S90utf8-linux
 
   ifeq ($(DEB_HOST_GNU_CPU),i386)
@@ -25,8 +23,11 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
 	S33framebuffer-module-linux-i386
   endif
   ifeq ($(DEB_HOST_GNU_CPU),s390)
-    files_term = \
+    files_term += \
 	S30term-linux-s390
+  else
+    files_term += \
+	S35framebuffer-linux
   endif
 endif
 
@@ -41,4 +42,4 @@ files += \
 	$(files_term) \
 	$(extra_files)
 
-include ../../Makefile.inc
+include ../../../Makefile.inc

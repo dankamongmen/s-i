@@ -1,15 +1,12 @@
 case `readlink /proc/self/fd/0` in
-	/dev/console)
-		TERM_TYPE=serial
-		;;
-	/dev/tts/*)
+	/dev/console|/dev/tts/*)
 		TERM_TYPE=serial
 		;;
 	/dev/vc/*)
 		TERM_TYPE=virtual
 		;;
-	*)
-		TERM_TYPE=virtual
+	/dev/pts/*)
+		TERM_TYPE=pts
 		;;
 esac
 
