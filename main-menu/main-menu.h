@@ -20,9 +20,5 @@
 #include <debian-installer.h>
 
 /* status.c */
-struct package_t *status_read(void);
+struct linkedlist_t *status_read(void);
 
-/* tree.c */
-struct package_t *tree_find(char *);
-struct package_t *tree_add(struct package_t *);
-void tree_clear();

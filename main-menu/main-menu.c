@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+static struct linkedlist_t *packages;
+
 #ifdef DODEBUG
 static int do_system(const char *cmd) {
 	DPRINTF("cmd is %s\n", cmd);
@@ -43,6 +45,8 @@ int compare (const void *a, const void *b) {
 		      (*(struct package_t **)a)->package);
 }
 
+#if 0
+// This is commented out becuase I'm not sure we want to do this
 /*
  * Builds a linked list of packages, ordered by dependencies, so
  * depended-upon packages come first. Pass the package to start ordering
@@ -82,6 +86,7 @@ void order_done(struct package_t *head) {
 	for (p=head; p; p=p->next)
 		p->processed = 0;
 }
+#endif
 
 /* Returns true if the given package could be the default menu item. */
 int isdefault(struct package_t *p) {
@@ -106,10 +111,11 @@ int isdefault(struct package_t *p) {
 }
 
 /* Displays the main menu via debconf and returns the selected menu item. */
-struct package_t *show_main_menu(struct package_t *packages) {
+struct package_t *show_main_menu(struct linkedlist_t *list) {
 	static struct debconfclient *debconf = NULL;
 	char *language = NULL;
-	struct package_t **package_list, *p, *head = NULL, *tail = NULL;
+	struct package_t **package_list, *p;
+	struct list_node *node;
         struct package_t *menudefault = NULL;
 	struct language_description *langdesc;
 	int i = 0, num = 0;
@@ -125,12 +131,18 @@ struct package_t *show_main_menu(struct package_t *packages) {
         if (debconf->value)
           language = strdup(debconf->value);
 	/* Make a flat list of the packages. */
-	for (p = packages; p; p = p->next)
-		num++;
+	for (node = list->head; node; node = node->next) {
+		p = (struct package_t *)node->data;
+		if (p->installer_menu_item)
+			num++;
+	}
 	package_list = malloc(num * sizeof(struct package_t *));
-	for (p = packages; p; p = p->next) {
-		package_list[i] = p;
-		i++;
+	for (node = list->head; node; node = node->next) {
+		p = (struct package_t *)node->data;
+		if (p->installer_menu_item) {
+			package_list[i] = (struct package_t *)node->data;
+			i++;
+		}
 	}
 	
 	/* Sort by menu number. */
@@ -138,52 +150,54 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	
 	/* Order menu so depended-upon packages come first. */
 	/* The menu number is really only used to break ties. */
+#if 0
+//I'm not sure this is a good idea... Maybe it's better to highlight the
+//default choice in some other way instead?
 	for (i = 0; i < num ; i++) {
 		if (package_list[i]->installer_menu_item) {
 			order(package_list[i], &head, &tail);
 		}
 	}
 	order_done(head);
-
 	free(package_list);
+#endif
 	
 	/*
 	 * Generate list of menu choices for debconf. Also figure out which
 	 * is the default.
 	 */
 	s = menutext;
-	for (p = head; p; p = p->next) {
-		if (p->installer_menu_item) {
-			int ok = 0;
-			if (language) {
-				langdesc = p->localized_descriptions;
-				while (langdesc) {
-					if (strcmp(langdesc->language,language) == 0) {
-						/* Use this description */
-						strcpy(s,langdesc->description);
-						s += strlen(langdesc->description);
-						ok = 1;
-						break;
-					}
-					langdesc = langdesc->next;
+	for (i = 0; i < num; i++) {
+		int ok = 0;
+		p = package_list[i];
+		if (language) {
+			langdesc = p->localized_descriptions;
+			while (langdesc) {
+				if (strcmp(langdesc->language,language) == 0) {
+					/* Use this description */
+					strcpy(s,langdesc->description);
+					s += strlen(langdesc->description);
+					ok = 1;
+					break;
 				}
+				langdesc = langdesc->next;
 			}
-			if (ok == 0) {
-				strcpy(s, p->description);
-				s += strlen(p->description);
-			}
-			*s++ = ',';
-			*s++ = ' ';
+		}
+		if (ok == 0) {
+			strcpy(s, p->description);
+			s += strlen(p->description);
+		}
+		*s++ = ',';
+		*s++ = ' ';
 
-			if (isdefault(p)) {
-                          if (menudefault) {
-                            if (menudefault->installer_menu_item > p->installer_menu_item) {
-                              menudefault = p;
-                            }
-                          } else {
-                            menudefault = p;
-                          }
-                        }
+		if (isdefault(p)) {
+			if (menudefault) {
+				if (menudefault->installer_menu_item > p->installer_menu_item) {
+					menudefault = p;
+				}
+			} else {
+				menudefault = p;
+			}
 		}
 	}
 	/* Trim trailing ", " */
@@ -206,7 +220,8 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	s=debconf->value;
 	
 	/* Figure out which menu item was selected. */
-	for (p = head; p; p = p->next) {
+	for (i = 0; i < num; i++) {
+		p = package_list[i];
 		if (p->installer_menu_item && strcmp(p->description, s) == 0)
 			return p;
 		else if (p->installer_menu_item && language) {
@@ -221,16 +236,6 @@ struct package_t *show_main_menu(struct package_t *packages) {
 }
 
 static int config_package(struct package_t *);
-
-static int provides(struct package_t *p, const char *what)
-{
-	int i;
-
-	for (i = 0; p->provides[i] != 0; i++)
-		if (strcmp(p->provides[i], what) == 0)
-			return 1;
-	return 0;
-}
 
 /*
  * Satisfy the dependencies of a virtual package. Its dependencies that actually
@@ -252,9 +257,9 @@ static int satisfy_virtual(struct package_t *p) {
 	 * package with highest priority. If we have ties, menu items are
 	 * preferred. If we still have ties, the default choice is arbitrary */
 	for (i = 0; p->depends[i] != 0; i++) {
-		if ((dep = tree_find(p->depends[i])) == NULL)
+		if ((dep = p->depends[i]->ptr) == NULL)
 			continue;
-		if (!provides(dep, p->package)) {
+		if (!di_pkg_provides(dep, p)) {
 			/* Non-providing dependency */
 			if (dep->status != installed && !config_package(dep))
 				return 0;
@@ -300,9 +305,9 @@ static int satisfy_virtual(struct package_t *p) {
 		}
 		/* Go through the dependencies again */
 		for (i = 0; p->depends[i] != 0; i++) {
-			if ((dep = tree_find(p->depends[i])) == NULL)
+			if ((dep = p->depends[i]->ptr) == NULL)
 				continue;
-			if (!provides(dep, p->package))
+			if (!di_pkg_provides(dep, p))
 				continue;
 			if (!is_menu_item || strcmp(debconf->value, dep->description) == 0) {
 				/* Ick. If we have a menu item it has to match the
@@ -323,23 +328,6 @@ static int satisfy_virtual(struct package_t *p) {
 }
 
 /*
- * Simplistic test for virtual packages. A package is virtual if any
- * of its dependencies provides it.
- */
-static int is_virtual(struct package_t *p) {
-	int i;
-	struct package_t *dep;
-
-	for (i = 0; p->depends[i] != 0; i++) {
-		if ((dep = tree_find(p->depends[i])) == NULL)
-			continue;
-		if (provides(dep, p->package))
-			return 1;
-	}
-	return 0;
-}
-
-/*
  * Configure all dependencies, special case for virtual packages.
  * This is done depth-first.
  */
@@ -350,11 +338,11 @@ config_package(struct package_t *p) {
 	struct package_t *dep;
 
 	for (i = 0; p->depends[i] != 0; i++) {
-		if ((dep = tree_find(p->depends[i])) == NULL)
+		if ((dep = p->depends[i]->ptr) == NULL)
 			continue;
 		if (dep->status == installed)
 			continue;
-		if (is_virtual(dep)) {
+		if (di_pkg_is_virtual(dep)) {
 			if (!satisfy_virtual(dep))
 				return 0;
 		} else {
@@ -389,7 +377,7 @@ int do_menu_item(struct package_t *p) {
 }
 
 int main (int argc, char **argv) {
-	struct package_t *p, *packages;
+	struct package_t *p;
 	
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
