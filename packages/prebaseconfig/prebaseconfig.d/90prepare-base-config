@@ -48,7 +48,7 @@ config_inittab () {
 
     case "$console" in
     ttyS*)
-        log "Configuring /etc/inittab to run base-config for serial console"
+        log "Configuring /etc/inittab for serial console"
         ttyspeed=$(chroot /target stty --file /dev/$console speed)
         ttyline=${console#ttyS}
         ttyterm="$TERM"
@@ -64,16 +64,23 @@ config_inittab () {
             echo "$console" >> /target/etc/securetty
         fi
 
-        sed -e "s/^\([23]\):/#\1:/" \
-            -e "s#CONSOLEDEV#/dev/$console#g" \
-            /usr/share/prebaseconfig/inittab > /target/etc/inittab
+        if [ -n "$BOOT_BASECONFIG" ] ; then
+            log "Configuring /etc/inittab to run base-config for serial console"
+            sed -e "s/^\([23]\):/#\1:/" \
+                -e "s#CONSOLEDEV#/dev/$console#g" \
+                /usr/share/prebaseconfig/inittab > /target/etc/inittab
+        else
+            mv /target/etc/inittab.real /target/etc/inittab
+        fi
         ;;
     *)
-        log "Configuring /etc/inittab to run base-config for regular console"
-        mv /target/etc/inittab /target/etc/inittab.real
-        sed -e "s#CONSOLEDEV#/dev/$console#g" /usr/share/prebaseconfig/inittab \
-            > /target/etc/inittab
-    ;;
+        if [ -n "$BOOT_BASECONFIG" ] ; then
+            log "Configuring /etc/inittab to run base-config for regular console"
+            mv /target/etc/inittab /target/etc/inittab.real
+            sed -e "s#CONSOLEDEV#/dev/$console#g" /usr/share/prebaseconfig/inittab \
+                > /target/etc/inittab
+        fi
+        ;;
     esac
 }
 
@@ -96,15 +103,13 @@ create_cd_link () {
 ## MAINLINE
 config_dbootstrap
 
+BOOT_BASECONFIG="1"
 if test_ssh_install ; then
     # Note: this test fixes #279090
-    # Maybe the configuration of /etc/inittab for serial console is
-    # something that _should_ be done in this situation (without
-    # starting base-config); but as it was not done in the old
-    # situation, we leave /etc/inittab as is.
     log "Network installation: not configuring /etc/inittab to run base-config after reboot"
-else
-    config_inittab
+    BOOT_BASECONFIG=""
 fi
+
+config_inittab
 
 create_cd_link
