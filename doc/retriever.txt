@@ -2,43 +2,43 @@ Retrievers
 ----------
 
 Retrievers are modules that can download or otherwise retrieve
-other modules[1] and Packages files. It is expected that at least the
-following types will eventually be implemented:
+file[1], including other modules and Packages files. It is expected that at
+least the following types will eventually be implemented:
 
 - cd retriever
-	Ensures an install cd is mounted, and finds modules on it. No real
+	Ensures an install cd is mounted, and finds files on it. No real
 	retrieving done.
 - floppy retriever
-	May or may not need to deal with modules split accross multiple
-	floppies. In any case, pulls modules off floppies.
+	May or may not need to deal with files split accross multiple
+	floppies. In any case, pulls files off floppies.
 - hard disk retriever
-	Gets a module from a local hard disk (dos, linux, etc).
+	Gets a file from a local hard disk (dos, linux, etc).
 - http retriever
-	Downloads a module from a remote http mirror.
+	Downloads a file from a remote http mirror.
 - ftp retriever (needed?)
-	Downloads a module from a remote ftp mirror.
+	Downloads a file from a remote ftp mirror.
 - nfs retriever
-	Gets module via nfs.
+	Gets a file via nfs.
 
-A module retriever must be able to do the following:
+A retriever must be able to do the following:
 
 - Set itself up so it can access the cdrom, mirror, or whatever.
 - Get a list of the modules that are available. This will be done by
   retreiving a standard Packages file.
-- Retrieve a module.
+- Retrieve a file.
 
-A separate module will take care of parsing the Packages files, and 
-checking md5sums of downloaded modules. And a separate module
-(udpkg/microdpkg/whatever it's called today) will handle actually
-installing modules.
+A separate module will take care of parsing the Packages files, and
+checking md5sums of downloaded modules, and a separate program
+(udpkg) will handle actually installing modules.
 
-Since retrievers are debian packages, they have a postinst that is
+Since retrievers are debian packages, they can have a postinst that is
 run to set them up. During setup, they may need to prompt the user for
-information (using debconf).
+information (using debconf). For example, a nfs retriever will probably
+need to prompt the user for a nfs server name.
 
 Retrievers may also need to depend on additional modules. For example the
-http/ftp/nfs retrievers will need to depend on a module to sets up networking,
-while the cdrom retriever will need to depend on module(s) that include kernel
+http/ftp/nfs retrievers will need to depend on a module to set up networking,
+while the cdrom retriever may need to depend on module(s) that include kernel
 modules for the iso9660 filesystem and cd drivers.
 
 Retrievers may also need to interact with the user when they are retrieving
@@ -51,7 +51,7 @@ Retriever interface
 All retrievers should support the following interface.
 
 [ This interface is preliminary and depends on the filesystem layout and
-ramdisk allocation scheme used by the installer, and the location may 
+ramdisk allocation scheme used by the installer, and so the location may 
 change. ]
 
 /usr/lib/debian-installer/retriever/<retriever name> is a executable. It
@@ -70,7 +70,7 @@ is run with the following parameters:
 		program -d ./retrievers/ http-retriever.deb
 
 If the destination file already exists, the retriever may want to attempt
-to continue a download.
+to continue a download. Note that the destination file may also be a fifo.
 
 Once ran, retrievers are free to prompt the user, or do whatever else is 
 necessary to retrieve the file.
@@ -84,8 +84,8 @@ what site to install from, and probably what version of the debian-installer
 is being used as well. The user will likely have to be prompted for some,
 but not all, of this data during retriever setup.
 
-
-Footnotes:
+Footnotes
+---------
 
 [1] Conceptually, rather similar to apt's methods, although the interface
     is a lot more simplistic and we don't need to suppoprt things like
@@ -94,4 +94,3 @@ Footnotes:
     Support for this may need to be added to debconf, via a new data type.
     It's rather hard to do in the context of debconf -- details to be
     determined.
-

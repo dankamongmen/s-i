@@ -7,81 +7,11 @@ Here is an overview of the new design.
 3. installer
   - Check to see what UI's are available (already unpacked onto the
     initrd), and choses one of them.
-  - Configures the UI.
-  - Checks to see what other modules are already unpacked and not yet
-    configured on the initrd, and configures each in turn (dpkg --configure
-    -a equivilant). This is expected to include at least one module retriever.
-  - Asks the module retrievers to retrieve any additional modules that are
-    available, and installs and configures those modules, one at a time.
-    This is expected to include at least a disk partitioning and formatting
-    module. THIS STEP NEEDS WORK (Should all modules be installed? What if
-                                  we chain retrievers?)
-  - Asks a module retriever to retrieve the base system module (yes, it's a
-    .deb too..), and install it (its postinst probably chroots into the
-    new base system and runs a base setup program, that sets up lilo and
-    a few other essentials).
+  - Starts up and configures the UI.
+  - Main menu runs (see ui.txt).
 4. reboot into a full debian system
   - Since the system was installed with a minimal kernel that cannot talk to
     the hard drive, an initrd must be used. The initrd has a syslinux file on
     it, and a set of modules. It just loads the modules, in a certian order,
     with certian parameters, and then lets the kernel pass control to init.
   - Set up all packages that need to be set up (timezone, password, etc, etc).
-
-The modules follow.
-
-The UI
-
-This is some kind of a modular UI with a simple API so other modules can use
-it. It's probably not much more complex than dialog. I want to say
-"mini debconf!" here, but I dunno if that's wise. :-)
-
-The UI has a basic setup program that is intended to ask just enough
-questions to get the UI setup and working. It might probe instead of asking
-questions. The things it needs to find out are probably:
-
- - what is your language?
-   (This could be probed by looking to see if any other languages are
-    available and if not, going with the one language that is)
- - If text GUI, does color work?
-   (This could be assummed in some cases.)
- - If other GUI, other stuff.
-   (Probing possible.)
-
-The bootstrap loader    
-
-The sole purpose of this component is to acquire a file from somewhere.
-It might accomplish this by loading it off of floppies, or off a cd,
-or by initializing the ethernet, running dhcp, and then tfpting,
-nfs loading, or ftp or httping it off a server. Or even by setting up
-a modem and ppp, and downloading it.
-
-It is intended to be a modular compnent, with a simple API. There are two
-API calls:
-  - set yourself up (may be a no-op, may be quite involved)
-  - download a specified file to a specified location
-
-This lets one (very simple) loader be put on cd's. Other loaders might be
-put on floppies, one per floppy. So there will be a "piles of floppies
-install" floppy; an "ethernet install" floppy, a "ppp install" floppy, etc.
-
-The bootstrap partitioner
-
-The sole goal of this component is to set up the install destination
-and the swap space. So it will have drivers for various disks, a disk
-partitioner(s), formatters, etc, and when it is run it will interact with the
-user (or probe) to set up the disk.
-
-One other thing this module does is it stores data about what modules
-loaded, and how, plus what device files it made, etc. This data is used
-later when the full system is booted via initrd.
-
-Extra modules
-
-It should be possible to include extra modules on the boot media, or in the
-initrd (easier). These are almost like debian packages. They can be
-installed into the initrd, and provide extra functionality. When installed,
-a setup program in them is automatically run.
-
-The main thing I expect this will be used for is a module that provides a
-basic shell system and some tty's. I'm sure someone will want to stick doom
-in one so we can compete with Caldera's tetris. ;-)
