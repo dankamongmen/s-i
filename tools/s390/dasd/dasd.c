@@ -166,11 +166,13 @@ int main(int argc, char *argv[])
 	if (cur->state == 2)
 	{
 		client->command (client, "subst", "debian-install/s390/dasd/format", "device", cur->device, NULL);
+		client->command (client, "set", "debian-install/s390/dasd/format", "true", NULL);
 		ptr = my_debconf_input ("high", "debian-install/s390/dasd/format");
 	}
 	else if (cur->state == 3)
 	{
 		client->command (client, "subst", "debian-install/s390/dasd/format_unclean", "device", cur->device, NULL);
+		client->command (client, "set", "debian-install/s390/dasd/format_unclean", "false", NULL);
 		ptr = my_debconf_input ("critical", "debian-install/s390/dasd/format_unclean");
 	}
 	else
