@@ -815,7 +815,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     fprintf(fstab, "# /etc/fstab: static file system information.\n#\n");
     fprintf(fstab, "# <file system> <mount point> <type> <options>"
 		   "\t<dump>\t<pass>\n");
-    fprintf(fstab, "%s\t/\t%s\tdefaults,errors=remount-ro\t\t1\t1\n", 
+    fprintf(fstab, "%s\t/\t%s\tdefaults,errors=remount-ro\t\t0\t1\n", 
 	    normalize_devfs(find_partition_by_mountpoint(mountmap,"/")),
 	    DEFAULT_FS);
 #endif /* CREATE_FSTAB */
