@@ -314,10 +314,19 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 fi
 
 # get pcmcia running if possible
-if [ -x /etc/init.d/pcmcia ] && [ ! -e /var/run/cardmgr.pid ]; then
-	db_input medium hw-detect/start_pcmcia || true
+if [ -x /etc/init.d/pcmcia ]; then
+	if ! [ -e /var/run/cardmgr.pid ]; then
+		db_input medium hw-detect/start_pcmcia || true
+	fi
 	if db_go && db_get hw-detect/start_pcmcia && [ "$RET" = true ]; then
 		db_progress INFO hw-detect/pcmcia_step
+		
+		if [ -e /var/run/cardmgr.pid ]; then
+			# Not using /etc/init.d/pcmcia stop as it
+			# uses sleep which is not available and is racey.
+			kill -9 $(cat /var/run/cardmgr.pid) 2>/dev/null || true
+			rm -f /var/run/cardmgr.pid
+		fi
 
 		# If hotplugging is available in the kernel, we can use it to load
 		# modules for Cardbus cards and tell which network interfaces belong
@@ -350,7 +359,7 @@ if [ -x /etc/init.d/pcmcia ] && [ ! -e /var/run/cardmgr.pid ]; then
 			echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
 		fi
 	    
-		CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 2>&1 \
+		CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 3<&0 2>&1 \
 			| logger -t hw-detect
 	    
 		if [ -f /proc/sys/kernel/hotplug ]; then

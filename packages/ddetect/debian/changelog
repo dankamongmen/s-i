@@ -10,8 +10,11 @@ ddetect (0.94) UNRELEASED; urgency=low
     - The airport test is good enough to not belong in get_manual_hw_info.
     - Ask the start_pcmcia qestion.
     - Mark the start_pcmcia question as translatable.
-    - Only ask the question and start pcmcia if pcmcia is not running
-      (uses its pid file).
+    - Only ask the question if pcmcia is not running (uses its pid file).
+    - Restart cardmgr if it's already running to make sure it uses any modules
+      that were not available before. Closes: #234564
+    - Redirect fd 3 from /dev/null when starting pcmcia to avoid debconf fd
+      hang issues.
   * Christian Perrier
     - Removed the double questioning in the pcmcia_start template
       Reworded the template for simplification
