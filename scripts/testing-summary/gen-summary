@@ -14,6 +14,7 @@ my %packageversions;
 my %source2bin;
 my %seenpackages;
 my %pooldirs;
+my %poolfiles;
 my @annotations;
 
 sub between_versions {
@@ -87,6 +88,7 @@ foreach my $dist (@dists) {
 				$packageversions{$source}{$dist}{$arch} = $version;
 				push @{$source2bin{$source}}, $package;
 				$seenpackages{$source}=1;
+				($poolfiles{$source}{$arch})=m/Filename: (.*)\n/;
 				my ($pooldir)=m/Filename: (.*)\/.*?\n/;
 				$pooldirs{$source}=$pooldir;
 			}
@@ -174,6 +176,9 @@ foreach my $withchangelog (0,1) {
 					print "<td>$version</td>";
 				}
 			}
+			# Looking at the file modification date may not be
+			# safe. FIXME
+			print "<td>".(-M $poolfiles{$package}{$some_arch})."</td>\n";
 			print "</tr>\n";
 			
 			foreach my $ann (@annotations) {
