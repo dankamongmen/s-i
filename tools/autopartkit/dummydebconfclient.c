@@ -14,7 +14,7 @@ struct {
   {NULL, NULL}
 };
 
-void
+static void
 my_debconfclient_command(struct debconfclient *client,
 			 const char *operation, ...)
 {
