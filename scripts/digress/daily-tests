@@ -39,10 +39,6 @@ if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
 fi
 
 datestamp=$(date +%Y%m%d%H%M)
-mkdir -p $DI_TESTDIR/logs/$datestamp
-
-touch $DI_TESTDIR/logs/overview.log
-
 . $DI_TESTDIR/config
 
 for SCHEME in $@; do
@@ -51,6 +47,9 @@ for SCHEME in $@; do
 	use common
 	use $SCHEME
 	
+	mkdir -p $LOGDIR/$datestamp
+	touch $LOGDIR/overview.log
+
 	if $DIGRESSDIR/test-harness $MACHINE $SCHEME > $LOGDIR/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
 		overview $LOGDIR success
 	else
