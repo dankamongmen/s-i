@@ -148,7 +148,7 @@ do
     then
         log "Trying to load module '$module'"
 
-        if find /lib/modules/`uname -r`/ | grep -q ${module}\\.o
+        if find /lib/modules/`uname -r`/ | grep -q /${module}\\.o
         then
             if load_modules "$module"
             then
