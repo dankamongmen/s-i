@@ -96,6 +96,16 @@ discover_hw () {
     fi
 }
 
+# Some pci chipsets are needed or there can be DMA or other problems.
+get_ide_chipset_info() {
+    for ide_module in /lib/modules/*/kernel/drivers/ide/pci/*.o; do
+    	if [ -e $ide_module ]; then
+		baseidemod=$(echo $ide_module | sed s/\.o$// | sed 's/.*\///')
+		echo "$baseidemod:IDE chipset support"
+    	fi
+    done
+}
+
 # Return list of lines with "Kernel module<tab>Vendor<tab>Model"
 get_hw_info() {
     # Try to make sure the floppy driver is available
@@ -108,13 +118,9 @@ get_hw_info() {
     # The order of these packages are important. [pere 2003-03-16]
     echo "ide-mod:Linux IDE driver"
     echo "ide-probe-mod:Linux IDE probe driver"
-    # Some pci chipsets are needed or there can be DMA or other problems.
-    for ide_module in /lib/modules/*/kernel/drivers/ide/pci/*.o; do
-    	if [ -e $ide_module ]; then
-		baseidemod=$(echo $ide_module | sed s/\.o$// | sed 's/.*\///')
-		echo "$baseidemod:IDE chipset support"
-    	fi
-    done
+
+    get_ide_chipset_info
+
     echo "ide-detect:Linux IDE detection driver"
     echo "ide-floppy:Linux IDE floppy driver"
     echo "ide-disk:Linux ATA DISK driver"
