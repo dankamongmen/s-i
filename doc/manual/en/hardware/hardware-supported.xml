@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: hardware-supported.xml,v 1.5 2003/09/19 02:07:12 toff Exp $ -->
+<!-- $Id: hardware-supported.xml,v 1.6 2003/09/19 04:09:42 toff Exp $ -->
 
  <sect1 id="hardware-supported">
  <title>Supported Hardware</title>
@@ -100,11 +100,7 @@ for information on any of the other Debian-supported architectures
 take a look at the
 <ulink url="http://www.debian.org/ports/">Debian-Ports</ulink> pages.
 
-</para>
-
-<![ %new-arch; [
-
-<para>
+</para><para condition="new-arch">
 
 This is the first official release of &debian; for the &arch-title;
 architecture.  We feel that it has proven itself sufficiently to be
@@ -119,28 +115,25 @@ problems; make sure to mention the fact that the bug is on the
 as well.
   
 </para>
-]]>
 
   </sect2>
 
 <!-- supported cpu docs -->
-<![ %alpha;    [ &supported-alpha.xml; ]]>
-<![ %arm;      [ &supported-arm.xml; ]]>
-<![ %hppa;     [ &supported-hppa.xml; ]]>
-<![ %i386;     [ &supported-i386.xml; ]]>
-<![ %ia64;     [ &supported-ia64.xml; ]]> <!-- FIXME: currently missing -->
-<![ %m68k;     [ &supported-m68k.xml; ]]>
-<![ %mips;     [ &supported-mips.xml; ]]>
-<![ %mipsel;   [ &supported-mipsel.xml; ]]>
-<![ %powerpc;  [ &supported-powerpc.xml; ]]>
-<![ %s390;     [ &supported-s390.xml; ]]>
-<![ %sparc;    [ &supported-sparc.xml; ]]>
+&supported-alpha.xml;
+&supported-arm.xml;
+&supported-hppa.xml;
+&supported-i386.xml;
+&supported-ia64.xml;  <!-- FIXME: currently missing -->
+&supported-m68k.xml;
+&supported-mips.xml;
+&supported-mipsel.xml;
+&supported-powerpc.xml;
+&supported-s390.xml;
+&supported-sparc.xml;
 
-<![ %not-s390; [
-  <sect2 id="gfx"><title>Graphics Card</title>
+  <sect2 id="gfx" arch="not-s390"><title>Graphics Card</title>
 
-<![ %i386; [
-<para>
+<para arch="i386">
 
 You should be using a VGA-compatible display interface for the console
 terminal. Nearly every modern display card is compatible with
@@ -148,10 +141,7 @@ VGA. Ancient standards such CGA, MDA, or HGA should also work,
 assuming you do not require X11 support.  Note that X11 is not used
 during the installation process described in this document.
 
-</para>
-]]>
-
-<para>
+</para><para>
 
 Debian's support for graphical interfaces is determined by the
 underlying support found in XFree86's X11 system.  The newer AGP video
@@ -161,23 +151,14 @@ buses, cards, monitors, and pointing devices can be found at
 <ulink url="&url-xfree-support;"></ulink>.  Debian &release; ships 
 with X11 revision &x11ver;.
 
-</para>
-
-<![ %mips; [
-<para>
+</para><para arch="mips">
 
 The XFree86's X11 system is only supported on the SGI Indy.
 
 </para>
-]]>
-
   </sect2>
-<!-- end %not-s390;  --> ]]>
 
-<![ %i386; [
-
-  <sect2 id="laptops"><title>Laptops</title>
-
+  <sect2 arch="i386" id="laptops"><title>Laptops</title>
 <para>
 
 Laptops are also supported.  Laptops are often specialized or contain
@@ -187,11 +168,9 @@ with GNU/Linux, see the
 
 </para>
    </sect2>
-]]>
 
-<![ %defaults-smp; [
 
-  <sect2>
+  <sect2 condition="defaults-smp">
 <title>Multiple Processors</title>
 
 <para>
@@ -214,11 +193,9 @@ kernel config.
 </para>
 
   </sect2>
-]]>
 
-<![ %supports-smp; [
 
-  <sect2>
+  <sect2 condition="supports-smp">
  <title>Multiple Processors</title>
 <para>
 
@@ -240,6 +217,4 @@ kernel config.
 
 </para>
   </sect2>
-]]>
-
  </sect1>
