@@ -1,10 +1,10 @@
 /* @file  dec-kbd.c
  * @brief Report keyboards present on DEC
  *
- * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
+ * Copyright (C) 2004 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: sparc-kbd.c 11900 2004-03-24 21:52:04Z mckinstry $
+ * $Id: dec-kbd.c 11900 2004-03-24 21:52:04Z mckinstry $
  */
 
 #include "config.h"
@@ -17,7 +17,7 @@
 /**
  * @brief list of keyboards present
  */
-kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
+kbd_t *dec_kbd_get (kbd_t *keyboards, const char *subarch)
 {
 	kbd_t *k = xmalloc (sizeof(kbd_t));
 
