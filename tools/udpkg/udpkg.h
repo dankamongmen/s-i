@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.1 2000/08/24 06:23:56 tausq Exp $ */
+/* $Id: udpkg.h,v 1.2 2000/11/01 22:26:22 joeyh Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -53,7 +53,7 @@
 
 /* data structures */
 struct package_t {
-	char *file;	
+	char *file;
 	char *package;
 	char *version;
 	char *depends;

@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.3 2000/11/01 21:54:02 joeyh Exp $ */
+/* $Id: status.c,v 1.4 2000/11/01 22:26:22 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -182,7 +182,7 @@ int status_merge(void *status, struct package_t *pkgs)
 	{
 		buf[strlen(buf)-1] = 0; /* trim newline */
 		/* If we see a package header, find out if it's a package
-		 * that we have processed. if so, we skip that block for 
+		 * that we have processed. if so, we skip that block for
 		 * now (write it at the end).
 		 *
 		 * we also look at packages in the status cache and update
@@ -203,15 +203,32 @@ int status_merge(void *status, struct package_t *pkgs)
 			 */
 			if (statpkg != 0) statpkg = *(struct package_t **)statpkg;
 		}
-		if (pkg == 0) continue;
+		if (pkg != 0) continue;
 
 		if (strstr(buf, "Status: ") == buf && statpkg != 0)
 		{
 			  snprintf(buf, sizeof(buf), "Status: %s\n",
 				 status_print(statpkg->status));
 		}
-		fputs(buf, fout);
+		// TODO: handle Description and translated description here.
+		// TODO: handle Depends and Pre-Depends and Provides here.
+		else {
+			fputs(buf, fout);
+			fputc('\n', fout);
+		}
 	}
+
+	// Print out packages we processed.
+	for (pkg = pkgs; pkg != 0; pkg = pkg->next) {
+		fprintf(fout, "Package: %s\nStatus: %s\nVersion: %s\n", 
+			pkg->package, status_print(pkg->status), pkg->version);
+		if (pkg->depends)
+			fprintf(fout, "Depends: %s\n", pkg->depends);
+		if (pkg->depends)
+			fprintf(fout, "Provides: %s\n", pkg->provides);
+		fputc('\n', fout);
+	}
+	
 	fclose(fin);
 	fclose(fout);
 
