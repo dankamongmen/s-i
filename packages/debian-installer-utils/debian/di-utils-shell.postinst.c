@@ -26,7 +26,6 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
   client = debconfclient_new();
 
   debconf_capb(client, "backup");
-  debconf_fset(client, "di-utils-shell/do-shell", "seen", "false");
   debconf_input(client, "high", "di-utils-shell/do-shell");
   if (debconf_go(client) == 30)
     exit(10);
