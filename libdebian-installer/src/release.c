@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: release.c,v 1.5 2003/12/11 19:29:50 waldi Exp $
+ * $Id: release.c,v 1.6 2004/02/01 16:38:12 waldi Exp $
  */
 
 #include <config.h>
@@ -87,7 +87,7 @@ const di_parser_fieldinfo *di_release_parser_fieldinfo[] =
 
 /** @} */
 
-static void di_release_file_destroy_func (void *data)
+static void internal_di_release_file_destroy_func (void *data)
 {
   di_release_file *file = data;
 
@@ -103,7 +103,7 @@ di_release *di_release_alloc (void)
   di_release *ret;
 
   ret = di_new0 (di_release, 1);
-  ret->md5sum = di_hash_table_new_full (di_rstring_hash, di_rstring_equal, NULL, di_release_file_destroy_func);
+  ret->md5sum = di_hash_table_new_full (di_rstring_hash, di_rstring_equal, NULL, internal_di_release_file_destroy_func);
   ret->release_file_mem_chunk = di_mem_chunk_new (sizeof (di_release_file), 4096);
 
   return ret;

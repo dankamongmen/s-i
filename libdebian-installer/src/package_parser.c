@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.10 2003/12/11 19:29:50 waldi Exp $
+ * $Id: package_parser.c,v 1.11 2004/02/01 16:38:11 waldi Exp $
  */
 
 #include <config.h>
@@ -417,23 +417,6 @@ void di_package_parser_read_name (data, fip, field_modifier, value, user_data)
   p->type = di_package_type_real_package;
 }
 
-struct nr_to_string
-{
-  di_rstring string;
-  unsigned int nr;
-};
-#define nr_to_string_one(string, nr) { {  string, sizeof (string) - 1 }, nr }
-
-const struct nr_to_string priorities[] =
-{
-  nr_to_string_one ("required", di_package_priority_required),
-  nr_to_string_one ("important", di_package_priority_important),
-  nr_to_string_one ("standard", di_package_priority_standard),
-  nr_to_string_one ("optional", di_package_priority_optional),
-  nr_to_string_one ("extra", di_package_priority_extra),
-  nr_to_string_one ("", 0),
-};
-
 void di_package_parser_read_priority (
   void **data,
   const di_parser_fieldinfo *fip __attribute__ ((unused)),
@@ -442,15 +425,7 @@ void di_package_parser_read_priority (
   void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
-  const struct nr_to_string *prio;
-
-  for (prio = priorities; prio->string.size; prio++)
-    if (!strncmp (prio->string.string, value->string, prio->string.size))
-    {
-      p->priority = prio->nr;
-      return;
-    }
-  p->priority = di_package_priority_extra;
+  p->priority = internal_di_package_priority_text_from_rstring (value);
 }
 
 void di_package_parser_write_priority (
@@ -461,35 +436,32 @@ void di_package_parser_write_priority (
   void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
-  const struct nr_to_string *prio;
+  di_rstring value;
+  value.string = (char *) di_package_priority_text_to (p->priority);
+  value.size = strlen(value.string);
 
-  for (prio = priorities; prio->string.size; prio++)
-    if (p->priority == prio->nr)
-    {
-      callback (&fip->key, &prio->string, callback_data);
-      return;
-    }
+  callback (&fip->key, &value, callback_data);
 }
 
-const struct nr_to_string status_want[] =
+static const char *status_want_text[] =
 {
-  nr_to_string_one ("unknown", di_package_status_want_unknown),
-  nr_to_string_one ("install", di_package_status_want_install),
-  nr_to_string_one ("hold", di_package_status_want_hold),
-  nr_to_string_one ("deinstall", di_package_status_want_deinstall),
-  nr_to_string_one ("purge", di_package_status_want_purge),
-  nr_to_string_one ("", 0),
+  "unknown",                            /* == di_package_status_want_unknown */
+  "install",                            /* == di_package_status_want_install */
+  "hold",                               /* == di_package_status_want_hold */
+  "deinstall",                          /* == di_package_status_want_deinstall */
+  "purge",                              /* == di_package_status_want_purge */
+  NULL
 };
 
-const struct nr_to_string status[] =
+static const char *status_text[] =
 {
-  nr_to_string_one ("not-installed", di_package_status_not_installed),
-  nr_to_string_one ("unpacked", di_package_status_unpacked),
-  nr_to_string_one ("half-configured", di_package_status_half_configured),
-  nr_to_string_one ("installed", di_package_status_installed),
-  nr_to_string_one ("half-configured", di_package_status_half_configured),
-  nr_to_string_one ("config-files", di_package_status_config_files),
-  nr_to_string_one ("", 0),
+  "undefined",                          /* == di_package_status_undefined */
+  "not-installed",                      /* == di_package_status_not_installed */
+  "unpacked",                           /* == di_package_status_unpacked */
+  "installed",                          /* == di_package_status_installed */
+  "half-configured",                    /* == di_package_status_half_configured */
+  "config-files",                       /* == di_package_status_config_files */
+  NULL
 };
 
 void di_package_parser_read_status (
@@ -500,22 +472,22 @@ void di_package_parser_read_status (
   void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
-  const struct nr_to_string *stat;
   char *next;
+  int i;
 
-  for (stat = status_want; stat->string.size; stat++)
-    if (!strncmp (stat->string.string, value->string, stat->string.size))
+  for (i = 0; status_want_text[i]; i++)
+    if (strncmp (status_want_text[i], value->string, value->size) == 0)
     {
-      p->status_want = stat->nr;
+      p->status_want = i;
       break;
     }
 
   next = memchr (value->string, ' ', value->size);
-  next = memchr (next + 1, ' ', value->size - (next - value->string) - 1);
-  for (stat = status; stat->string.size; stat++)
-    if (!strncmp (stat->string.string, next + 1, stat->string.size))
+  next = memchr (next + 1, ' ', value->size - (next - value->string) - 1) + 1;
+  for (i = 0; status_text[i]; i++)
+    if (strncmp (status_text[i], next, value->size - (next - value->string) - 1) == 0)
     {
-      p->status = stat->nr;
+      p->status = i;
       break;
     }
 }
@@ -528,22 +500,12 @@ void di_package_parser_write_status (
   void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
-  const struct nr_to_string *stat;
   char value_buf[128];
   di_rstring value = { value_buf, 0 };
 
-  for (stat = status_want; stat->string.size; stat++)
-    if (p->status_want == stat->nr)
-    {
-      value.size = snprintf (value.string, sizeof (value_buf), "%s ok", stat->string.string);
-      break;
-    }
-  for (stat = status; stat->string.size; stat++)
-    if (p->status == stat->nr)
-    {
-      value.size += di_snprintfcat (value.string, sizeof (value_buf), " %s", stat->string.string);
-      callback (&fip->key, &value, callback_data);
-      return;
-    }
+  value.size = snprintf (value.string, sizeof (value_buf), "%s ok %s", 
+      status_want_text[p->status_want], 
+      status_text[p->status]);
+  callback (&fip->key, &value, callback_data);
 }
 

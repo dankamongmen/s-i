@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.12 2004/01/06 02:01:34 kraai Exp $
+ * $Id: packages.c,v 1.13 2004/02/01 16:38:12 waldi Exp $
  */
 
 #include <config.h>
@@ -77,6 +77,8 @@ di_packages_allocator *internal_di_packages_allocator_alloc (void)
  */
 void di_packages_free (di_packages *packages)
 {
+  if (!packages)
+    return;
   di_hash_table_destroy (packages->table);
   di_free (packages);
 }

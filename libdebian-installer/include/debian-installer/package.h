@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.h,v 1.5 2003/11/19 09:24:14 waldi Exp $
+ * $Id: package.h,v 1.6 2004/02/01 16:38:11 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_H
@@ -173,6 +173,9 @@ void di_package_version_free (di_package_version *version);
 
 int di_package_version_compare (const di_package_version *a, const di_package_version *b);
 di_package_version *di_package_version_parse (di_package *package);
+
+di_package_priority di_package_priority_text_from (const char *text);
+const char *di_package_priority_text_to (const di_package_priority priority);
 
 /** @} */
 

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.c,v 1.4 2003/12/11 19:29:50 waldi Exp $
+ * $Id: package.c,v 1.5 2004/02/01 16:38:11 waldi Exp $
  */
 
 #include <config.h>
@@ -145,5 +145,38 @@ di_package_version *di_package_version_parse (di_package *package)
     version->upstream = di_stradup (string, end - string);
 
   return version;
+}
+
+static const char *priority_text[] =
+{
+  "unspecified",
+  "extra",                              /* == di_package_priority_extra */
+  "optional",                           /* == di_package_priority_optional */
+  "standard",                           /* == di_package_priority_standard */
+  "important",                          /* == di_package_priority_important */
+  "required",                           /* == di_package_priority_required */
+  NULL
+};
+
+di_package_priority di_package_priority_text_from (const char *text)
+{
+  const di_rstring temp = { (char *) text, strlen (text) };
+  return internal_di_package_priority_text_from_rstring (&temp);
+}
+
+di_package_priority internal_di_package_priority_text_from_rstring (const di_rstring *text)
+{
+  int i;
+  for (i = 1; priority_text[i]; i++)
+    if (strncmp (priority_text[i], text->string, text->size) == 0)
+    {
+      return i;
+    }
+  return 0;
+}
+
+const char *di_package_priority_text_to (const di_package_priority priority)
+{
+  return priority_text[priority];
 }
 
