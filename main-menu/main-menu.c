@@ -29,6 +29,8 @@
 const int RAISE = 1;
 const int LOWER = 0;
 
+int last_successful_item = -1;
+
 /* Save default priority, to be able to return to it when we have to lower it */
 int default_priority = 1;
 
@@ -105,6 +107,9 @@ get_default_menu_item(di_slist *list)
 		if (!p->installer_menu_item ||
 		    p->p.status == di_package_status_installed ||
 		    !isinstallable(p))
+			continue;
+		if (p->installer_menu_item < last_successful_item &&
+		    p->installer_menu_item < 900)
 			continue;
 		/* If menutest says this item should be default, make it so */
 		if (!isdefault(p))
@@ -566,7 +571,18 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 			modify_debconf_priority(LOWER);
 		}
 		else
-			modify_debconf_priority(RAISE);
+		{
+		  /* Success */
+		  modify_debconf_priority(RAISE);
+
+		  if (p->installer_menu_item < 900)
+		  {
+		    last_successful_item = p->installer_menu_item;
+		    di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
+		  }
+		  else
+		    di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= 900", p->p.package, p->installer_menu_item);
+		}
 		
 		di_packages_free (packages);
 		di_packages_allocator_free (allocator);
