@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. /lib/partman/definitions.sh
 . /lib/partman/recipes.sh
 
 dev=$1
@@ -33,3 +34,6 @@ done
 close_dialog
 
 perform_recipe $dev $free_space $recipe || exit $?
+
+# default to accepting the autopartitioning
+menudir_default_choice /lib/partman/choose_partition finish || true
