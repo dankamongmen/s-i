@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.21 2003/03/25 21:26:23 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.22 2003/04/10 15:02:36 mckinstry Exp $
  */
 
 #include "config.h"
@@ -70,7 +70,7 @@ int mydebconf_default_set (char *template, char *value)
 	if (client->value == NULL  || (strlen (client->value) == 0)) {
 		res = client->command (client, "set", template, STRDUP (value), NULL);
 		if (res) return res;
-	 	res = client->command (client, "fset", template, "seen", "false", NULL);
+		res = client->command (client, "fset", template, "seen", "false", NULL);
 	} 
 	return res;
 }
@@ -193,12 +193,40 @@ inline char *insert_description (char *buf, char *name, char *description)
 	*s++ = '[';
 	while (*t)  *s++ = *t++;
 	*s++ = ']'; *s++ = ' ';
-	t = gettext (description);
+	t = description;
 	while (*t)  *s++ = *t++;
 	*s = '\0';
 	return s;
 }
-  
+ 
+
+/**
+ * @brief Sort the maps in a maplist.
+ */
+
+void maplist_sort (maplist_t *maplist)
+{
+	keymap_t *mp, **prev;
+	int in_order = 0;
+
+	while (!in_order) {
+		// Bubblesort convenient for short list structures.
+		in_order = 1;
+		prev = &(maplist->maps);
+		mp = maplist->maps;
+		while (mp) {
+			if (mp->next && (strcmp (mp->next->description, mp->description) < 0)) {
+				in_order = 0;
+				*prev = mp->next;
+				mp->next = mp->next->next ; 
+				(*prev)->next = mp;
+			}
+			prev = &(mp->next);
+			mp = mp->next;
+		}
+	}
+}
+
 /**
  * @brief Enter a maplist into debconf, picking a default via locale.
  * @param maplist - a maplist (for a given arch, for example)
@@ -209,6 +237,8 @@ void maplist_select (maplist_t *maplist)
 	keymap_t *mp, *preferred = NULL;
 	int score = 0, best = -1;
 	struct debconfclient *client = mydebconf_get ();
+
+	maplist_sort (maplist);
 	
 	mp = maplist->maps;
 	while (mp) {
@@ -229,7 +259,7 @@ void maplist_select (maplist_t *maplist)
 	STRCPY (template, "console-data/keymap/");
 	STRCPY (template + 20, maplist->name);
 	client->command (client, "subst", template, "choices", buf, NULL);	
-	// set the default
+        // set the default
 	if (best > 0) {
 		s = insert_description (deflt, preferred->name, preferred->description);
 		*s = '\0';
@@ -244,24 +274,24 @@ void maplist_select (maplist_t *maplist)
  */
 maplist_t *maplist_get ( const char *name)
 {
-	static maplist_t *maplists = NULL;
+static maplist_t *maplists = NULL;
 
-	maplist_t *p = maplists;
+maplist_t *p = maplists;
 	
-	while (p) {
-		if (strcmp(p->name, name) == 0)
-			break;
-		p = p->next;
-	}	
-	if (p) return p;
-	p = NEW (maplist_t);
-	if (DEBUG && p==NULL)
-		DIE ("Failed to create maplist\n");
-	p->next = maplists;
-	p->maps = NULL;
-	p->name = STRDUP (name);
-	maplists = p;
-	return p;
+while (p) {
+if (strcmp(p->name, name) == 0)
+break;
+p = p->next;
+}	
+if (p) return p;
+p = NEW (maplist_t);
+if (DEBUG && p==NULL)
+DIE ("Failed to create maplist\n");
+p->next = maplists;
+p->maps = NULL;
+p->name = STRDUP (name);
+maplists = p;
+return p;
 }
 
 /**
@@ -329,7 +359,7 @@ maplist_t *maplist_parse_file (const char *name)
 		map = keymap_get (maplist, tab1+1);
 		if (! map->langs) { // new keymap
 			map->langs = STRDUP (buf);
-			map->description = STRDUP (tab2+1);
+			map->description = STRDUP (dgettext (maplist, tab2+1));
 		}
 	}
 	fclose (fp);
@@ -389,6 +419,33 @@ void read_keymap_files (char *listdir)
 }
 
 /**
+ * @brief Sort keyboards
+ */
+void keyboards_sort (kbd_t **keyboards)
+{
+	kbd_t *p = *keyboards, **prev ;
+	int in_order = 1;
+
+
+	// Yes, its bubblesort. But for this size of list, its efficient
+	while (!in_order) {
+		in_order = 1;
+		p = *keyboards;
+		prev = keyboards;
+		while (p) {
+			if (p->next && (strcmp (p->next->description, p->description) < 0)) {
+				in_order = 0;
+				*prev = p->next;
+				p->next = p->next->next;
+				(*prev)->next = p;
+			}
+			prev = &(p->next);
+			p = p->next;
+		}
+	}
+}
+
+/**
  * @brief Build a list of the keyboards present on this computer
  * @returns kbd_t list
  */
@@ -424,8 +481,10 @@ kbd_t *keyboards_get (void)
 	// Did we forget to compile in a keyboard ???
 	if (DEBUG &&  keyboards == NULL) DIE ("No keyboards found");
 
+	keyboards_sort (&keyboards);
 	return keyboards;
 }
+
 
 /**
  * @brief set debian-installer/serial console as to whether we are using a serial console
@@ -445,6 +504,7 @@ void check_if_serial_console (void)
 	client->command (client, "set", "debian-installer/serial-console",
 			 present, NULL);
 	close (fd);
+	/* di_logf ("Setting debian-installer/serial-console to %d", present); */
 }
 		
 /**
@@ -454,7 +514,7 @@ void check_if_serial_console (void)
 void add_no_keyboard_case (char *s, char **preference)
 {
 	char template[LINESIZE], *t;
-	t = insert_description (template, "none", N_("No keyboard to configure"));
+	t = insert_description (template, "none", _("No keyboard to configure"));
 	*t = '\0';
 	strcpy (s, template);
 	if (*preference == NULL)
@@ -564,11 +624,7 @@ int keymap_select (char *arch, char *keymap)
  */
 void keymap_set (struct debconfclient *client, char *keymap)
 {
-	if (DEBUG) {
-		char buf[LINESIZE];
-		sprintf (buf, "kbdchooser: setting keymap to %s\n", keymap);
-		di_log (buf);
-	}
+	/* di_logf ("kbd_chooser: setting keymap %s", keymap) */;
 	client->command (client, "set", "debian-installer/keymap",
 			 keymap, NULL);
 	// "seen" Used by scripts to decide not to call us again

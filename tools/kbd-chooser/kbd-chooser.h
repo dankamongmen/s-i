@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.8 2003/03/25 07:18:35 mckinstry Exp $
+ * $Id: kbd-chooser.h,v 1.9 2003/04/10 15:02:36 mckinstry Exp $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -32,7 +32,7 @@ typedef struct maplist_s {
 
 typedef struct kbd_s { 
 	char *name;		/* short name of kbd arch */
-	char *description;	/* description in english */
+	char *description;	/* description  */
 	char *deflt;	/* default keymap for this keyboard */
 	exists present;
 	int fd;			

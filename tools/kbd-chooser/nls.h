@@ -22,6 +22,7 @@
 # define textdomain(Domain) /* empty */
 # define _(Text) (Text)
 # define gettext(Text) (Text)
+# define dgettext(domain,Text) (Text)
 # define N_(Text) (Text)
 #endif
 
