@@ -4,6 +4,7 @@
 #include "database.h"
 
 #include <signal.h>
+#include <string.h>
 
 static struct configuration *config = NULL;
 static struct frontend *frontend = NULL;
@@ -50,10 +51,23 @@ int main(int argc, char **argv)
 	/* initialize database and frontend modules */
 	if ((db = database_new(config)) == 0)
 		DIE("Cannot initialize DebConf database");
-#if 1
 	if ((frontend = frontend_new(config, db)) == 0)
 		DIE("Cannot initialize DebConf frontend");
-#endif
+
+	/* set title */
+	{
+		char buf[100], pkg[100];
+		char *slash = strrchr(argv[1], '/');
+		if (slash == NULL) slash = argv[1]; else slash++;
+		snprintf(pkg, sizeof(pkg), "%s", slash);
+		if (strlen(pkg) >= 7 
+			&& strcmp(pkg + strlen(pkg) - 7, ".config") == 0)
+		{
+			pkg[strlen(pkg) - 7] = '\0';
+		}
+		snprintf(buf, sizeof(buf), "Configuring %s", pkg);
+		frontend->title = STRDUP(buf);
+	}
 
 	/* load templates */
 	db->load(db);
