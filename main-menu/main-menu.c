@@ -45,49 +45,6 @@ int compare (const void *a, const void *b) {
 		      (*(struct package_t **)a)->package);
 }
 
-#if 0
-// This is commented out becuase I'm not sure we want to do this
-/*
- * Builds a linked list of packages, ordered by dependencies, so
- * depended-upon packages come first. Pass the package to start ordering
- * at. head points to the start of the ordered list of packages, and tail
- * points to the end of the list (generally pass in pointers to NULL, unless
- * successive calls to the function are needed to build up a larger list).
- */
-void order(struct package_t *p, struct package_t **head, struct package_t **tail) {
-	struct package_t *found;
-	int i;
-	
-	if (p->processed)
-		return;
-	
-	for (i=0; p->depends[i] != 0; i++) {
-		if ((found = tree_find(p->depends[i])))
-			order(found, head, tail);
-	}
-	
-	if (*head)
-		(*tail)->next = *tail = p;
-	else
-		*head = *tail = p;
-	
-	(*tail)->next = NULL;
-		
-	p->processed = 1;
-}
-
-/*
- * Call this function after calling order to clear the processed tags.
- * Otherwise, later calls to order won't work.
- */
-void order_done(struct package_t *head) {
-	struct package_t *p;
-	
-	for (p=head; p; p=p->next)
-		p->processed = 0;
-}
-#endif
-
 /* Returns true if the given package could be the default menu item. */
 int isdefault(struct package_t *p) {
 	char *menutest, *cmd;
@@ -112,7 +69,7 @@ int isdefault(struct package_t *p) {
 
 /* The visit function for the depth-first traversal */
 static void
-dfs(struct package_t *p, struct linkedlist_t *queue)
+dfs_visit(struct package_t *p, struct linkedlist_t *queue)
 {
 	struct package_t *q;
 	struct list_node *node;
@@ -124,7 +81,7 @@ dfs(struct package_t *p, struct linkedlist_t *queue)
 		if (q == NULL)
 			continue;
 		if (!q->processed)
-			dfs(q, queue);
+			dfs_visit(q, queue);
 	}
 	/* Note that since we consider the list a queue and append in the end
 	 * we will actually get a "reversed" toposort, but that's what we want.
@@ -140,24 +97,34 @@ dfs(struct package_t *p, struct linkedlist_t *queue)
 	}
 }
 
-static struct package_t *
-get_default_menu_item(struct package_t **packages, const int pkg_count)
+/* Create a topological order of the packages, packages with few or no
+ * dependencies will come first */
+static struct linkedlist_t *
+topological_order(struct package_t **packages, const int pkg_count)
 {
-	struct package_t *p, *q;
-	struct linkedlist_t list;
-	struct list_node *node;
-	int i, cont;
+	struct linkedlist_t *list;
+	int i;
 
-	/* Topological sort of the packages, packages with fulfilled
-	 * dependencies will come first */
-	list.head = list.tail = NULL;
+	list = (struct linkedlist_t *)malloc(sizeof(struct linkedlist_t));
+	list->head = list->tail = NULL;
 	for (i = 0; i < pkg_count; i++)
 		packages[i]->processed = 0;
 	for (i = 0; i < pkg_count; i++)
 		if (!packages[i]->processed)
-			dfs(packages[i], &list);
+			dfs_visit(packages[i], list);
+	return list;
+}
+
+/* Expects a topologically ordered linked list of packages. */
+static struct package_t *
+get_default_menu_item(struct linkedlist_t *list)
+{
+	struct package_t *p, *q;
+	struct list_node *node;
+	int i, cont;
+
 	/* Traverse the list, return the first menu item that isn't installed */
-	for (node = list.head; node != NULL; node = node->next) {
+	for (node = list->head; node != NULL; node = node->next) {
 		p = (struct package_t *)node->data;
 		if (!p->installer_menu_item || p->status == installed)
 			continue;
@@ -184,6 +151,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	static struct debconfclient *debconf = NULL;
 	char *language = NULL;
 	struct package_t **package_list, *p;
+	struct linkedlist_t *olist;
 	struct list_node *node;
         struct package_t *menudefault = NULL;
 	struct language_description *langdesc;
@@ -217,26 +185,17 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	
 	/* Order menu so depended-upon packages come first. */
 	/* The menu number is really only used to break ties. */
-#if 0
-//I'm not sure this is a good idea... Maybe it's better to highlight the
-//default choice in some other way instead?
-	for (i = 0; i < num ; i++) {
-		if (package_list[i]->installer_menu_item) {
-			order(package_list[i], &head, &tail);
-		}
-	}
-	order_done(head);
-	free(package_list);
-#endif
-	
+	olist = topological_order(package_list, num);
+
 	/*
-	 * Generate list of menu choices for debconf. Also figure out which
-	 * is the default.
+	 * Generate list of menu choices for debconf.
 	 */
 	s = menutext;
-	for (i = 0; i < num; i++) {
+	for (node = olist->head; node != NULL; node = node->next) {
 		int ok = 0;
-		p = package_list[i];
+		p = (struct package_t *)node->data;
+		if (!p->installer_menu_item)
+			continue;
 		if (language) {
 			langdesc = p->localized_descriptions;
 			while (langdesc) {
@@ -262,7 +221,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 		s = s - 2;
 	*s = 0;
 	s = menutext;
-	menudefault = get_default_menu_item(package_list, num);
+	menudefault = get_default_menu_item(olist);
 
 	/* Make debconf show the menu and get the user's choice. */
         debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
