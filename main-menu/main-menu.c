@@ -142,7 +142,7 @@ static char *menu_entry(struct debconfclient *debconf, char *language,
 {
 	char *entry = NULL, *question;
 
-	asprintf(&question, "main-menu/%s", package->package);
+	asprintf(&question, "debian-installer/%s/title", package->package);
 	if (language) {
 		char *field;
 
