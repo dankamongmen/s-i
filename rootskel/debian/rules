@@ -11,10 +11,6 @@ ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
-ifeq ($(ARCH), s390)
-NONVC=1
-endif
-
 # This is the debhelper compatability version to use.
 export DH_COMPAT=2
 
@@ -37,11 +33,6 @@ install: build
 	dh_testroot
 	mkdir -p debian/rootskel/
 	cp -a src/* debian/rootskel/
-ifdef NONVC
-	mv debian/rootskel/etc/inittab-nonvc debian/rootskel/etc/inittab
-else
-	rm debian/rootskel/etc/inittab-nonvc
-endif
 	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
 	$(foreach DIR, $(DIRS), \
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
