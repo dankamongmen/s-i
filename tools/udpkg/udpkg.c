@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.25 2002/04/20 16:10:49 tfheen Exp $ */
+/* $Id: udpkg.c,v 1.26 2002/08/01 09:12:50 cjwatson Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -99,7 +99,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 	int i;
 	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
 	                         "conffiles", "md5sums", "shlibs", 
-				 "templates" };
+				 "templates", "menutest", "isinstallable" };
 
 	DPRINTF("Unpacking %s\n", pkg->package);
 
