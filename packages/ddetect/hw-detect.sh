@@ -176,7 +176,7 @@ discover_hw () {
 		  sparc/*) sbus=",sbus" ;;
 		esac
 		discover --format="%m:%V %M\n" --disable-all \
-		          --enable=pci,ide,scsi${sbus},pcmcia scsi cdrom ethernet bridge |
+		          --enable=pci,ide,scsi${sbus},pcmcia ide scsi cdrom ethernet bridge |
 			sed 's/ $//'
 		;;
 	esac
