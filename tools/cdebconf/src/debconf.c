@@ -4,10 +4,12 @@
  */
 #include "confmodule.h"
 #include "configuration.h"
+#include "question.h"
 #include "frontend.h"
 #include "database.h"
 
 #include <signal.h>
+#include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
 #include <locale.h>
@@ -50,11 +52,21 @@ static void cleanup()
 
 void sighandler(int sig)
 {
+	struct question *q = NULL;
+
 	save();
-	if (sig != SIGUSR1) {
-		cleanup();
-		exit(1);
+	if (sig == SIGUSR1)
+	{
+		if (questions != NULL)
+		{
+			q = questions->methods.get(questions, "debconf/language");
+			if (q != NULL)
+				setenv("LANGUAGE", question_getvalue(q, NULL), 1);
+		}
+		return;
 	}
+	cleanup();
+	exit(1);
 }
 
 void help(const char *exename)
