@@ -13,13 +13,13 @@ check-scripts:
 		$$SH -n $$s ; \
 	done
 
-check-utf8: languagelist.l10n
-	iconv -f utf-8 -t unicode languagelist.l10n > /dev/null
+check-utf8: $(L10NLIST)
+	iconv -f utf-8 -t unicode $(L10NLIST) > /dev/null
 
 check-data:
 	# Check that the listed locale is supported, to make sure base-config know
 	# how to handle it.
-	@for locale in `grep -v "^#" languagelist | cut -d\; -f2` ; do \
+	@for locale in `grep -v "^#" $(LIST) | cut -d\; -f2` ; do \
 		if grep -q "^$$locale " /usr/share/i18n/SUPPORTED ; then \
 			: ; \
 		else \
