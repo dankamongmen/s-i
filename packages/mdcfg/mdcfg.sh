@@ -88,7 +88,7 @@ md_create_raid1() {
 
 	# Get a list of RAID partitions. This only works if there is no 
 	# filesystem on the partitions, which is fine by us.
-	RAW_PARTITIONS=`/usr/lib/partconf/find-partitions 2>/dev/null|grep RAID|cut -f1`;
+	RAW_PARTITIONS=`/usr/lib/partconf/find-partitions --ignore-fstype 2>/dev/null|grep RAID|cut -f1`;
 
 	# Convert it into a proper list form for a select question 
 	# (comma seperated)
