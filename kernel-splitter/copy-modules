@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+#
+# This program reads a debian/control, and writes out a debian/control.out.
+# This debian/control is rather special. It lists kernel module udebs, and
+# specifices what kernel modules go in each, by listing the modules in the
+# Provides: line (these are technically legal package names, more or less
+# -- good enough for the purposes of the debian installer). Each module so
+# listed is found, and copied into the appropriate location in the temporary
+# build directory.
+#
+# Before debian/control.out is written, all occurrances of #KVERS# are
+# replaced with the version of the kernel that is being used. Also, the
+# Provdes: lines are munged, so if a particular module could not be found,
+# it is not listed.
+
+use v5.6;
+use strict;
+
+my $kvers="2.4.0";
+
+# Get a list of all available modules.
+my @available=map {s/^unpacked\///; s/\n//; $_}
+		`find unpacked/ -type f -name '*.o'`;
+
+$/="\n\n"; # read in a stanza at a time
+open IN, "debian/control" or die "debian/control: $!";
+open OUT, ">debian/control.out" or die "debian/control.out: $!";
+print OUT scalar <IN>; # source stanza
+while (my $line = <IN>) {
+	$line =~ s/#KVERS#/$kvers/g;
+	my ($package) = $line =~ /^Package:\s+(.*)/m;
+	if ($line =~ /^Provides:\s+(.*)/m) {
+		my @modules;
+		foreach my $module (split(/,\s+/, $1)) {
+			if (grep(/$module/, @available)) {
+				push @modules, grep(/$module/, @available);
+			}
+			else {
+				warn "$package: $module is not available; skipping\n";
+			}
+		}
+		if (@modules) {
+			# Make directory structure.
+			my %dirs;
+			foreach my $file (@modules) {
+				$_=$file;
+				s![^/]*$!!;
+				$dirs{$_}=1;
+				$dirs{$_}=1 while s![^/]*/$!! and $_;
+			}
+			mkdir "debian/$package";
+			mkdir "debian/$package/$_" foreach sort keys %dirs;
+			# Copy in the modules.
+			foreach (@modules) {
+				system("cp", "unpacked/$_",
+					     "debian/$package/$_");
+			}
+			# Set the Provides: line to list whatever was
+			# actually installed.
+			$line =~ s{^Provides:\s+.*}{
+				"Provides: ".join(', ',
+					map { s:.*/::; $_ } @modules)
+			}em;
+		}
+		else {
+			die "$package: none of the provided modules are available!\n";
+		}
+	}
+
+	print OUT $line;
+}
+close OUT;
+close IN;
