@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.11 2003/11/06 22:30:41 mckinstry Rel $
+ * $Id: at-kbd.c,v 1.12 2003/11/13 11:15:49 kraai Exp $
  */
 
 #include "config.h"
@@ -23,13 +23,13 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 
 #if defined(__m68k__)
 	// on m68k only mvme and bvme have PC-style keyboards
-	if (substr(subarch, "vme") == NULL)
+	if (strstr(subarch, "vme") == NULL)
 		return keyboards;
 #endif
 #if defined(__powerpc__)
 	// On powerpc, prep and chrp machines have pc keyboards
-	if ((substr(subarch, "prep") == NULL) &&
-	    (substr(subarch, "chrp") == NULL))
+	if ((strstr(subarch, "prep") == NULL) &&
+	    (strstr(subarch, "chrp") == NULL))
 		return keyboards;
 #endif
 	
