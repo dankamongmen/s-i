@@ -331,7 +331,7 @@ PedDevice* choose_device()
     {
 	client->command(client, "FGET", "autopartkit/choose_device", "seen", 
 			NULL);
-	if (strcmp(client->value, "false"))
+	if (strcmp(client->value, "false") == 0)
 		client->command(client, "SET", "autopartkit/choose_device", 
 			default_device, NULL);
 	client->command(client, "FSET", "autopartkit/choose_device", "seen", 
