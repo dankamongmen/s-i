@@ -4,7 +4,7 @@
 #
 # check_dit - d-i translations spell-checker
 #
-# Packages: aspell, aspell-bin, aspell-it, aspell-fr, etc (I tested it with it)
+# Packages: aspell, aspell-bin, aspell-${DICT}
 #
 # Author: Davide Viti <zinosat@tiscali.it> 2004, for the Debian Project
 #
@@ -20,7 +20,9 @@ GATHER_MSGID_SCRIPT=./msgid_extract.awk
 
 ALL_STRINGS=$DEST_DIR/${LANG}_all.txt
 NO_VARS=$DEST_DIR/1_no_vars_${LANG}
+NEEDS_RM="$NO_VARS $NEEDS_RM"
 ALL_UNKNOWN=$DEST_DIR/2_all_unkn_${LANG}
+NEEDS_RM="$ALL_UNKNOWN $NEEDS_RM"
 UNKN=$DEST_DIR/${LANG}_unkn_wl.txt
 }
 
@@ -113,15 +115,40 @@ if [ $WL_WARN -ne 2 ] ; then
     WL_PARAM="--add-extra-dicts ./$WLIST"
 fi
 
+PO_FILE_LIST="${LANG}_file_list.txt"
+NEEDS_RM="$PO_FILE_LIST $NEEDS_RM"
+
+# Create a list of all the po files and count them
+find $DI_COPY -name "$LANG.po" > $PO_FILE_LIST
+NUM_PO_FILES=`wc -l $PO_FILE_LIST | awk '{print $1}'`
+
+# Deal with "master files" so that we don't count twice unknown words:
+#
+# 1) there are both po files and master file (i.e. "fr")
+#      ignore the master file
+# 2) there's only the master file file (i.e. "ga") 
+#      leave it unchanged
+# 3) there's just a bunch of sparse po files and no master file (i.e. "it")
+#      leave them unchanged   
+# 4) English language if made of "en.po" + "templates.pot"
+
+if [ $NUM_PO_FILES -gt 1 ]; then
+    PO_FILE_LIST_NO_MASTER="${LANG}_no_master.txt"
+    NEEDS_RM="$PO_FILE_LIST_NO_MASTER $NEEDS_RM"
+    cat $PO_FILE_LIST | sed "s:$DI_COPY/po/$LANG.po::" > $PO_FILE_LIST_NO_MASTER
+    PO_FILE_LIST=$PO_FILE_LIST_NO_MASTER
+fi
+
 rm -f $ALL_STRINGS
-for LANG_FILE in `find $DI_COPY -name "$LANG.po"`; do
+for LANG_FILE in `cat $PO_FILE_LIST`; do
     ENC=`cat $LANG_FILE | grep -e "^\"Content-Type:" | sed 's:^.*charset=::' | sed 's:\\\n\"::'`
     awk -f $GATHER_MSGSTR_SCRIPT $LANG_FILE | iconv --from $ENC --to utf-8 >> $ALL_STRINGS
 done
 
-# "en" lang is made of various "templates.pot" and "en.po" 
 if [ $LANG = en ] ; then
-    for LANG_FILE in `find $DI_COPY -name "templates.pot"`; do
+    find $DI_COPY -name "templates.pot" >> $PO_FILE_LIST
+
+    for LANG_FILE in `cat $PO_FILE_LIST | grep "templates.pot$"`; do
 	awk -f $GATHER_MSGID_SCRIPT $LANG_FILE >> $ALL_STRINGS
     done
 fi
@@ -143,18 +170,18 @@ cat $ALL_UNKNOWN | sort -f | uniq -c > $UNKN
 
 echo `wc -l $UNKN | awk '{print $1}'` $LANG >> ${DEST_DIR}/stats.txt
 
-rm $NO_VARS $ALL_UNKNOWN
+rm $NEEDS_RM
 
 if [ ! -d  $DEST_DIR/zip ] ; then
-mkdir $DEST_DIR/zip
+    mkdir $DEST_DIR/zip
 fi
 
 if [ ! -d  $DEST_DIR/nozip ] ; then
-mkdir $DEST_DIR/nozip
+    mkdir $DEST_DIR/nozip
 fi
 
 tar czf $DEST_DIR/${LANG}.tar.gz $ALL_STRINGS $UNKN
-mv $DEST_DIR/${LANG}.tar.gz $DEST_DIR/zip
 
+mv $DEST_DIR/${LANG}.tar.gz $DEST_DIR/zip
 mv $ALL_STRINGS $UNKN $DEST_DIR/nozip
 
