@@ -38,8 +38,8 @@ static int do_system(const char *cmd) {
 static void update_language (void);
 
 /*
- * qsort comparison function (sort by menu item values, fallback to lexical
- * sort to resolve ties deterministically).
+ * qsort comparison function (sort by menu item values, fall back to
+ * lexical sort to resolve ties deterministically).
  */
 int compare (const void *a, const void *b) {
 	/* Sometimes, I wish I was writing perl. */
@@ -217,10 +217,10 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 static int config_package(struct package_t *);
 
 /*
- * Satisfy the dependencies of a virtual package. Its dependencies that actually
- * provide the package are presented in a debconf select question for the user
- * to pick and choose. Other dependencies are just fed recursively through
- * config_package.
+ * Satisfy the dependencies of a virtual package. Its dependencies
+ * that actually provide the package are presented in a debconf select
+ * question for the user to pick and choose. Other dependencies are
+ * just fed recursively through config_package.
  */
 static int satisfy_virtual(struct package_t *p) {
 	struct debconfclient *debconf = NULL;
