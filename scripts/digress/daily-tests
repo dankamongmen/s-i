@@ -20,7 +20,9 @@ use () {
 }
 
 overview () {
-	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1"
+	grep -v "$MACHINE-$SCHEME " $DI_TESTDIR/logs/overview.log > $DI_TESTDIR/logs/overview.log.new
+	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $DI_TESTDIR/logs/overview.log.new
+	mv $DI_TESTDIR/logs/overview.log.new $DI_TESTDIR/logs/overview.log
 }
 
 DIGRESSDIR=$(dirname $0)
@@ -37,7 +39,6 @@ fi
 datestamp=$(date +%Y%m%d%H%M)
 mkdir $DI_TESTDIR/logs/$datestamp
 
-rm -f $DI_TESTDIR/logs/overview.log
 touch $DI_TESTDIR/logs/overview.log
 
 . $DI_TESTDIR/config
@@ -47,9 +48,9 @@ for SCHEME in $@; do
 	use $SCHEME
 	
 	if ./test-harness $MACHINE $SCHEME > $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
-		overview success >> $DI_TESTDIR/logs/overview.log
+		overview success
 	else
-		overview failed >> $DI_TESTDIR/logs/overview.log
+		overview failed
 	fi
 	ln -f $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log $DI_TESTDIR/logs/$MACHINE-$SCHEME.log
 done
