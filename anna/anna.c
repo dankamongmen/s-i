@@ -58,8 +58,9 @@ int install_packages (struct package_t *packages) {
 			sprintf(dest_file, "%s/%s", DOWNLOAD_DIR, f);
 
 			if (! get_package(p, dest_file)) {
-				fprintf(stderr, "anna: error getting %s!",
+				fprintf(stderr, "anna: error getting %s!\n",
 					p->filename);
+				exit(1);
 			}
 			else if (! unpack_package(dest_file)) {
 				unlink(dest_file);
