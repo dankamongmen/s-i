@@ -4,7 +4,13 @@
 
 #export DEBCONF_DEBUG=5 
 
-echo -n "\033[9;0]" # Turn off console blanking.
+bterm=/usr/bin/bterm
+font=/unifont.bgf
+
+# Load framebuffer and enable it for bterm
+if [ -x "$bterm" -a -e "$font" ] && enable-fb ; then
+    use_bterm=true
+fi
 
 /usr/bin/debconf-loadtemplate debian /var/lib/dpkg/info/*.templates 
 
@@ -13,6 +19,7 @@ if [ -d /usr/lib/locale/C.UTF-8 ] ; then
     LANG=C.UTF-8
     export LANG
     if [ linux = "$TERM" ] ; then # We are using a Linux console.
+        echo -n "\033[9;0]" # Turn off console blanking.
         echo -n "\033%G" # Enable UTF-8 console
         export TERM
     fi
@@ -36,12 +43,14 @@ if [ -z "$DEBIAN_FRONTEND" ] ; then
     done
 fi
 
-if [ -d /usr/bin/bterm ] ; then
+if [ true = "$use_bterm" ] ; then
 	TERM=bterm
 	export TERM
-	bterm -f unifont.bgf -l $LANG /sbin/di-main-menu
+	$bterm -f $font -l $LANG /sbin/di-main-menu
 else
 	/sbin/di-main-menu
 fi
 
-echo -n "\033%@" # Disable UTF-8 console
+if [ C.utf-8 = "$LANG" -a linux = "$TERM" ] ; then
+    echo -n "\033%@" # Disable UTF-8 console
+fi

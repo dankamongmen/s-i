@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# Load one of vesafb and vga16fb to enable framebuffer
+
+echo "info: Trying to enable linux framebuffer."
+modprobe -l '*vesafb*' | grep -q vesafb && modprobe vesafb
+if (modprobe vesafb || modprobe vga16fb) && fbset ; then
+    :
+else
+    exit 1
+fi
+
+exit 0
