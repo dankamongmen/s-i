@@ -17,11 +17,15 @@ ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
+CFLAGS = -W -Wall -Os
+
+export CFLAGS
+
 build: build-stamp
 build-stamp:
 	dh_testdir
-	./configure --without-depends --without-debug --without-remove \
-		--with-admindir=/var/lib/dpkg
+	env CFLAGS="$(CFLAGS)" ./configure --without-depends --without-debug \
+		--without-remove --with-admindir=/var/lib/dpkg
 	$(MAKE) small
 	touch build-stamp
 
