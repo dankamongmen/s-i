@@ -1,46 +1,7 @@
-Issues with the cdebconf progress bars
-======================================
-
 The cdebconf progress bars are currently driven by the following protocol:
-
-PROGRESS START <min> <max> <title-template>
-PROGRESS STEP <inc> <info-template>
-PROGRESS STOP
-
-
-
-This is wildly incompatible with what debootstrap uses, which is:
-
-P: <curr> <max> <title-string>
-I: <info-string>
-
-In debootstrap there is no concept of starting and stopping, a progress
-bar simply "is" and has a current and a max value. The info is decoupled
-from the actual stepping.
-
-
-
-Thus, I suggest we change the protocol to something that interacts more
-easily with debootstrap, something like:
 
 PROGRESS START <min> <max> <title-template>
 PROGRESS SET <val>
 PROGRESS STEP <inc>
 PROGRESS INFO <info-template>
 PROGRESS STOP
-
-Now that libdebconf is scrapped in favour of libdebconfclient and
-everything's incompatible with each other anyway :) I thought I'd get down
-to implementing this. Also added the progress step as per Petter
-Reinholdtsen's suggestion below.
-
--Martin
-
-
-It will be easier to use progress bars in shell scripts (less code to
-write) if the script don't have to keep track of the current progress
-value.  It is very convinient being able to use 'STEP 1' for every
-iteration.  I suggest allowing both 'SET <val>' and 'STEP <inc>' in
-the new protocol.
-
- - Petter Reinholdtsen
