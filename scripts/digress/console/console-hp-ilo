@@ -15,4 +15,8 @@ $exp->send($ENV{HP_ILO_USER}."\r");
 $exp->expect(10, "Password:");
 $exp->send($ENV{HP_ILO_PASSWORD}."\r");
 
+# for newer iLO with command line interface
+$exp->expect(10, "iLO>");
+$exp->send("remcons\r");
+
 $exp->interact;
