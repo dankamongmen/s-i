@@ -1,4 +1,4 @@
-CFLAGS=-Wall -g -D_GNU_SOURCE -DWITH_HTTP -DWITH_FTP
+CFLAGS=-Wall -g -D_GNU_SOURCE -DWITH_HTTP
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=choose-mirror
 LIBS=-ldebconfclient
