@@ -55,21 +55,21 @@ decode_recipe () {
 		line=''
 		;;
 	    .)
-		# correct errors in order not to crash parted_server
+		# we correct errors in order not to crash parted_server
 		set -- $line
 		if expr "$1" : '[0-9][0-9]*$' >/dev/null; then
 		    min=$1
 		elif expr "$1" : '[0-9][0-9]*%$' >/dev/null; then
 		    min=$(($ram * ${1%?} / 100))
-		else
-		    min=2200000000
+		else # error
+		    min=2200000000 # there is no so big storage device jet
 		fi
 		if expr "$2" : '[0-9][0-9]*%$' >/dev/null; then
 		    factor=$(($ram * ${2%?} / 100))
 		elif expr "$2" : '[0-9][0-9]*$' >/dev/null; then
 		    factor=$2
-		else
-		    factor=$min
+		else # error
+		    factor=$min # do not enlarge the partition
 		fi
 		if [ "$factor" -lt "$min" ]; then
 		    factor="$min"
@@ -78,13 +78,13 @@ decode_recipe () {
 		    max=$3
 		elif expr "$3" : '[0-9][0-9]*%$' >/dev/null; then
 		    max=$(($ram * ${3%?} / 100))
-		else
-		    max=$min
+		else # error
+		    max=$min # do not enlarge the partition
 		fi
 		if [ "$max" -lt "$min" ]; then
 		    max="$min"
 		fi
-		case "$4" in
+		case "$4" in # allow only valid file systems
 		    ext2|ext3|linux-swap|fat16|fat32)
 			fs="$4"
 			;;
@@ -184,7 +184,7 @@ partition_after () {
 
 pull_primary () {
     primary=''
-    secondary=''
+    logical=''
     foreach_partition '
         if
             [ -z "$primary" ] \
@@ -192,10 +192,10 @@ pull_primary () {
         then
             primary="$*"
         else
-    	    if [ -z "$secondary" ]; then
-    	        secondary="$*"
+    	    if [ -z "$logical" ]; then
+    	        logical="$*"
     	    else
-                secondary="${secondary}${NL}$*"
+                logical="${logical}${NL}$*"
     	    fi
         fi'
 }
@@ -367,7 +367,8 @@ do
 	close_dialog
     fi
     if 
-	[ -z "$neighbour" -o "$fs" != free -o "$new_free_type" = unusable ]
+	[ -z "$neighbour" -o "$fs" != free \
+	  -o "$new_free_type" = primary -o "$new_free_type" = unusable ]
     then
 	open_dialog DELETE_PARTITION $id
 	close_dialog
@@ -388,13 +389,13 @@ do
 	then
 	    open_dialog DELETE_PARTITION $id
 	    close_dialog
-	    autopartitioning_failed
+	    break
 	fi
     fi
     shift; shift; shift; shift
     setup_partition $id $*
     primary=''
-    scheme="$secondary"
+    scheme="$logical"
     free_space=$new_free_space
     free_type="$new_free_type"
 done
