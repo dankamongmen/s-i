@@ -97,35 +97,26 @@ di_packages *di_system_packages_alloc (void)
 
 bool di_system_package_check_subarchitecture (di_package *package, const char *subarchitecture)
 {
-  char *string, *begin, *end, *temp;
-  int ret = false;
+  char *begin, *end, *temp;
 
-  if (!((di_system_package *) package)->subarchitecture)
+  begin = ((di_system_package *) package)->subarchitecture;
+  if (!begin)
     return true;
 
-  string = begin = strdup (((di_system_package *) package)->subarchitecture);
   end = begin + strlen (begin);
-
   while (begin < end)
   {
-    while (begin < end && isspace (*begin))
-      begin++;
+    begin += strspn (begin, " \t\n");
     temp = begin;
-    while (temp < end && !isspace (*++temp));
-    *temp = '\0';
+    temp += strcspn (temp, " \t\n");
 
-    if (!strcmp (begin, subarchitecture))
-    {
-      ret = true;
-      goto cleanup;
-    }
-    begin = temp + 1;
+    if (!strncmp (begin, subarchitecture, temp - begin))
+      return true;
+
+    begin = temp;
   }
 
-cleanup:
-  free (string);
-
-  return ret;
+  return false;
 }
 
 di_parser_info *di_system_package_parser_info (void)
