@@ -9,7 +9,7 @@
  *              of client configuration modules and communications
  *              between the debconf frontend and the confmodule
  *
- * $Id: confmodule.c,v 1.11 2001/01/07 05:05:12 tausq Exp $
+ * $Id: confmodule.c,v 1.12 2002/05/27 14:23:31 tfheen Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -72,6 +72,7 @@ static commands_t commands[] = {
 	{ "fset",	command_fset },
 	{ "exist",	command_exist },
 	{ "stop",	command_stop },
+        { "x_loadtemplatefile", command_x_loadtemplatefile },
 	{ 0, 0 }
 };
 
