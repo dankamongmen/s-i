@@ -8,7 +8,7 @@ SONAME=$(LIB).$(MAJOR)
 LIBS=$(LIB) $(SONAME) $(LIBNAME) $(LIBNAME_A)
 
 
-OBJS=di_prebaseconfig_append.o di_execlog.o di_log.o di_check_dir.o di_snprintfcat.o
+OBJS=di_prebaseconfig_append.o di_execlog.o di_log.o di_check_dir.o di_snprintfcat.o di_stristr.o di_pkg_parse.o
 PIC_LIB=libdebian-installer_pic.a
 
 

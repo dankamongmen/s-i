@@ -162,3 +162,128 @@ di_snprintfcat (char *str, size_t size, const char *format, ...)
   return retval;
 }
 #endif /* L__di_snprintfcat__ */
+
+#ifdef L__di_stristr__
+char *
+di_stristr(const char *haystack, const char *needle)
+{
+    /* I suppose using strncasecmp is suboptimal, but we are already
+     * using GNU extensions in other places. */
+    const char *ret;
+    size_t n_len;
+
+    n_len = strlen(needle);
+    for (ret = haystack; *ret != '\0'; ret++)
+    {
+        if (strncasecmp(ret, needle, n_len) == 0)
+            return (char *)ret;
+    }
+    return NULL;
+}
+#endif /* L__di_stristr__ */
+
+#ifdef L__di_pkg_parse__
+#define BUFSIZE         4096
+struct package_t *
+di_pkg_parse(FILE *f)
+{
+    static int desc_xx_len = -1;
+    char buf[BUFSIZE];
+    struct package_t *p = NULL, *newp;
+    char *lang_code;
+    struct language_description *langdesc;
+    char *b;
+    int i;
+
+    if (desc_xx_len < 0)
+        desc_xx_len = strlen("Description-XX: ");
+
+    while (fgets(buf, BUFSIZE, f) && !feof(f))
+    {
+        buf[strlen(buf)-1] = 0;
+        if (di_stristr(buf, "Package: ") == buf)
+        {
+            newp = (struct package_t *)malloc(sizeof(struct package_t));
+            memset(newp, 0, sizeof(struct package_t));
+            newp->package = strdup(strchr(buf, ' ') + 1);
+            newp->next = p;
+            p = newp;
+        }
+        else if (di_stristr(buf, "Filename: ") == buf)
+        {
+            p->filename = strdup(strchr(buf, ' ') + 1);
+        }
+        else if (di_stristr(buf, "MD5sum: ") == buf)
+        {
+            p->md5sum = strdup(strchr(buf, ' ') + 1);
+        }
+        else if (di_stristr(buf, "installer-menu-item: ") == buf)
+        {
+            p->installer_menu_item = atoi(strchr(buf, ' ') + 1);
+        }
+        else if (di_stristr(buf, "Status: ") == buf)
+        {
+            if (di_stristr(buf, " unpacked"))
+                p->status = unpacked;
+            else if (di_stristr(buf, " half-configured"))
+                p->status = half_configured;
+            else if (di_stristr(buf, " installed"))
+                p->status = installed;
+            else
+                p->status = other;
+        }
+        else if (di_stristr(buf, "Description: ") == buf)
+        {
+            p->description = strdup(strchr(buf, ' ') + 1);
+        }
+        else if (di_stristr(buf, "Description-") == buf &&
+                strlen(buf) >= desc_xx_len &&
+                buf[desc_xx_len-2] == ':')
+        {
+            lang_code = (char *) malloc(3);
+            memcpy(lang_code, strchr(buf, '-') + 1, 2);
+            lang_code[2] = 0;
+            langdesc = malloc(sizeof (struct language_description));
+            memset(langdesc,0,sizeof(struct language_description));
+            langdesc->language = lang_code;
+            langdesc->description = strdup(strchr(buf, ' ') + 1);
+            if (p->localized_descriptions) 
+                langdesc->next = p->localized_descriptions;
+            p->localized_descriptions = langdesc;
+        }
+        else if (di_stristr(buf, "Depends: ") == buf)
+        {
+            /*
+             * Basic depends line parser. Can ignore versioning
+             * info since the depends are already satisfied.
+             */
+            b = strdup(strchr(buf, ' ') + 1);
+            i = 0;
+            while (*b != 0 && *b != '\n')
+            {
+                if (*b != ' ')
+                {
+                    if (*b == ',')
+                    {
+                        *b = 0;
+                        p->depends[++i] = 0;
+                    }
+                    else if (p->depends[i] == 0)
+                        p->depends[i] = b;
+                }
+                else
+                    *b = 0; /* eat the space... */
+                b++;
+            }
+            *b = 0;
+            p->depends[i+1] = 0;
+        }
+        else if (di_stristr(buf, "Provides: ") == buf)
+        {
+            p->provides = strdup(strchr(buf, ' ') + 1);
+        }
+    }
+
+    return p;
+}
+#endif /* L__di_pkg_parse__ */
