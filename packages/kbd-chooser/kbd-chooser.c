@@ -807,7 +807,6 @@ main (int argc, char **argv)
 	debconf_version (client,  2);
 
 	read_keymap_files (KEYMAPLISTDIR);
-	check_if_serial_console ();
 	kbd_priority = keyboard_select ();
 	s = buf;
 
