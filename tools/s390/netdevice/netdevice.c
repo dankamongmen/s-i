@@ -86,13 +86,6 @@ static bool get_networktype (void)
 	return true;
 }
 
-static void log_channel (const char *text, struct channel *channel)
-{
-	char buf[256];
-	snprintf (buf, sizeof (buf), "%s: %%x %%x %%x %%x", text);
-	di_log (DI_LOG_LEVEL_WARNING, buf, channel->device, channels->chantype, channels->cutype, channels->cumodel);
-}
-
 static bool get_channel (void)
 {
 	FILE *f;
@@ -100,7 +93,7 @@ static bool get_channel (void)
 	int j;
 	char buf[256], *ptr, *ptr2;
 
-	channels = malloc (5 * sizeof (struct channel));
+	channels = di_new (struct channel, 5);
 	channels_items = 0;
 
 	f = fopen ("/proc/chandev", "r");
@@ -126,8 +119,6 @@ static bool get_channel (void)
 	fgets (buf, sizeof (buf), f);
 
 	while (fgets (buf, sizeof (buf), f))
-	{
-		di_log (DI_LOG_LEVEL_WARNING, "get line: %s", buf);
 		if (sscanf (buf, "0x%*x 0x%4x 0x%2x 0x%4x 0x%2x",
 					&channels[channels_items].device,
 					&channels[channels_items].chantype,
@@ -137,14 +128,11 @@ static bool get_channel (void)
 			if (channels[channels_items].chantype & type_escon)
 				channels[channels_items].chantype |= type_ctc;
 
-			log_channel ("get channel", &channels[channels_items]);
-
 			channels[channels_items].device_first = 0;
 			channels_items++;
 			if ((channels_items % 5) == 0)
 				channels = realloc (channels, (channels_items + 5) * sizeof (struct channel));
 		}
-	}
 	fclose (f);
 
 	qsort (channels, channels_items, sizeof (struct channel), &channel_sort);
@@ -153,22 +141,15 @@ static bool get_channel (void)
 
 	for (i = 0; i < channels_items; i++)
 	{
-		log_channel ("test channel", &channels[i]);
 		k = 0;
 		for (j = i; j >= 0; j--)
 			if (channels[i].device == channels[j].device + k &&
 			    channels[i].chantype == channels[j].chantype &&
 			    channels[i].cutype == channels[j].cutype &&
 			    channels[i].cumodel == channels[j].cumodel)
-			{
-				log_channel ("against (match)", &channels[j]);
 				k++;
-			}
 			else
-			{
-				log_channel ("against (no match)", &channels[j]);
 				break;
-			}
 
 		if (channels[i].chantype & type_qeth)
 		{
@@ -463,7 +444,7 @@ static bool setup (void)
 
 int main (int argc, char *argv[])
 {
-	di_system_init("s390-netdevice");
+	di_system_init ("s390-netdevice");
 
 	client = debconfclient_new ();
 	debconf_capb (client, "backup");
