@@ -160,7 +160,6 @@ autopartkit_handle_timer(PedTimer* timer, void* context)
     sprintf(hours, "%u", minutes_left / 60);
     sprintf(minutes, "%u", minutes_left % 60);
     
-    debconf_subst(client, template, "STATUS", timer->state_name);
     debconf_subst(client, template, "HOURS", hours);
     debconf_subst(client, template, "MINUTES", minutes);
 
