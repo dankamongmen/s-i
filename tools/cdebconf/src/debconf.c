@@ -100,8 +100,8 @@ int main(int argc, char **argv)
 	/* set title */
 	{
 		char buf[100], pkg[100];
-		char *slash = strrchr(argv[1], '/');
-		if (slash == NULL) slash = argv[1]; else slash++;
+		char *slash = strrchr(argv[optind], '/');
+		if (slash == NULL) slash = argv[optind]; else slash++;
 		snprintf(pkg, sizeof(pkg), "%s", slash);
 		if (strlen(pkg) >= 7 
 			&& strcmp(pkg + strlen(pkg) - 7, ".config") == 0)
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 
 	/* startup the confmodule; run the config script and talk to it */
 	confmodule = confmodule_new(config, templates, questions, frontend);
-	confmodule->run(confmodule, argc, argv);
+	confmodule->run(confmodule, argc - optind + 1, argv + optind - 1);
 	confmodule->communicate(confmodule);
 
 	/* shutting down .... sync the database and shutdown the modules */
