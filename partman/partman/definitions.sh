@@ -573,9 +573,27 @@ default_disk_label () {
 		    echo UNKNOWN;;
 	    esac;;
 	mips)
-	    echo dvh;;
+	    case "$sub" in
+		r4k-ip22)
+		    echo dvh;;
+		r5k-ip22)
+		    echo dvh;;
+		sb1-swarm-bn)
+		    echo msdos;;
+		*)
+		    echo UNKNOWN;;
+	    esac;;
 	mipsel)
-	    echo msdos;;
+	    case "$sub" in
+		r3k-kn02)
+		    echo msdos;;
+		r4k-kn04)
+		    echo msdos;;
+		sb1-swarm-bn)
+		    echo msdos;;
+		*)
+		    echo UNKNOWN;;
+	    esac;;
 	powerpc)
 	    case "$sub" in
 		apus)
