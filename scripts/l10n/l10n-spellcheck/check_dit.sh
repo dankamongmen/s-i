@@ -154,8 +154,8 @@ fi
 
 rm -f $ALL_STRINGS
 for LANG_FILE in `cat $PO_FILE_LIST`; do
-    $CHECK_VAR $LANG_FILE >> $SUSPECT_VARS
     ENC=`cat $LANG_FILE | grep -e "^\"Content-Type:" | sed 's:^.*charset=::' | sed 's:\\\n\"::'`
+    $CHECK_VAR -s $LANG_FILE | iconv --from $ENC --to utf-8 >> $SUSPECT_VARS
     awk -f $GATHER_MSGSTR_SCRIPT $LANG_FILE | iconv --from $ENC --to utf-8 >> $ALL_STRINGS
 done
 
@@ -163,7 +163,7 @@ if [ $LANG = en ] ; then
     find $DI_COPY -name "templates.pot" >> $PO_FILE_LIST
 
     for LANG_FILE in `cat $PO_FILE_LIST | grep "templates.pot$"`; do
-	$CHECK_VAR $LANG_FILE >> $SUSPECT_VARS
+	$CHECK_VAR -s $LANG_FILE >> $SUSPECT_VARS
 	awk -f $GATHER_MSGID_SCRIPT $LANG_FILE >> $ALL_STRINGS
     done
 fi
