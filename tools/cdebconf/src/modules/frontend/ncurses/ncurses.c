@@ -228,15 +228,20 @@ static void drawdesc(struct frontend *ui, struct question *q)
 {
 	WINDOW *qrywin = UIDATA(ui)->qrywin;
 	WINDOW *descwin = UIDATA(ui)->descwin;
+	char *descr = q_get_description(q);
+	char *ext_descr = q_get_extended_description(q);
 
 	drawframe(ui, WIN_QUERY, ui->title);
-	wrapprint(qrywin, q_get_description(q), 0, COLS-2);
-	wrapprint(descwin, q_get_extended_description(q), 0, COLS-2);
+	wrapprint(qrywin, descr, 0, COLS-2);
+	if (*ext_descr)
+		wrapprint(descwin, ext_descr, 0, COLS-2);
 	wclrtobot(qrywin);
 	wclrtobot(descwin);
 	wrefresh(stdscr);
 	wrefresh(qrywin);
 	wrefresh(descwin);
+	free(descr);
+	free(ext_descr);
 }
 
 static int nchandler_boolean(struct frontend *ui, struct question *q)

@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.31 2003/10/16 23:53:11 barbier Exp $
+ * $Id: slang.c,v 1.32 2003/11/04 23:48:52 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -208,14 +208,17 @@ static void slang_wrapprint(struct slwindow *win, const char *str, int start)
 static void slang_drawdesc(struct frontend *ui, struct question *q)
 {
 	struct uidata *uid = UIDATA(ui);
+	char *descr = q_get_description(q);
+	char *ext_descr = q_get_extended_description(q);
 
 	/* Clear the windows */
 	slang_drawwin(&uid->qrywin);
 	slang_drawwin(&uid->descwin);
 	/* Draw in the descriptions */
-	slang_wrapprint(&uid->qrywin, q_get_description(q), 0);
-	slang_wrapprint(&uid->descwin, q_get_extended_description(q),
-		uid->descstart);
+	slang_wrapprint(&uid->qrywin, descr, 0);
+	slang_wrapprint(&uid->descwin, ext_descr, uid->descstart);
+	free(descr);
+	free(ext_descr);
 
 	/* caller should call slang_flush() ! */
 }

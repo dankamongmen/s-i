@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.50 2003/10/16 23:53:11 barbier Exp $
+ * $Id: text.c,v 1.51 2003/11/04 23:48:52 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -151,8 +151,13 @@ static void wrap_print(const char *str)
  */
 static void texthandler_displaydesc(struct frontend *obj, struct question *q) 
 {
-	wrap_print(q_get_description(q));
-	wrap_print(q_get_extended_description(q));
+	char *descr = q_get_description(q);
+	char *ext_descr = q_get_extended_description(q);
+	wrap_print(descr);
+	if (*ext_descr)
+		wrap_print(ext_descr);
+	free(descr);
+	free(ext_descr);
 }
 
 /*

@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.36 2003/10/30 22:33:52 mckinstry Exp $
+ * $Id: newt.c,v 1.37 2003/11/04 23:48:51 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -227,13 +227,20 @@ static char *
 get_full_description(struct question *q)
 {
     char *res = NULL;
+    char *descr = q_get_description(q);
+    char *ext_descr = q_get_extended_description(q);
 
-    assert(q_get_description(q));
-    assert(q_get_extended_description(q));
-    res = malloc(strlen(q_get_extended_description(q))+strlen(q_get_description(q))+3);
-    strcpy(res, q_get_extended_description(q));
-    strcat(res, "\n\n");
-    strcat(res, q_get_description(q));
+    assert(descr);
+    assert(ext_descr);
+    res = malloc(strlen(descr)+strlen(ext_descr)+3);
+    *res = '\0';
+    if (*ext_descr) {
+        strcpy(res, ext_descr);
+        strcat(res, "\n\n");
+    }
+    strcat(res, descr);
+    free(descr);
+    free(ext_descr);
     return res;
 }
 
