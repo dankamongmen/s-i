@@ -12,3 +12,10 @@ if [ -e $ARCH-boot ]; then
 	rm $ARCH-boot
 fi
 ln -sf $NETBOOT_IMAGE_DIR $ARCH-boot
+
+# Also update pxelinux links to use the $ARCH-boot dir, the d-i tarball
+# sets up links that do not.
+if [ "$ARCH" = i386 ]; then
+	ln -sf $ARCH-boot/pxelinux.0
+	ln -sf $ARCH-boot/pxelinux.cfg
+fi
