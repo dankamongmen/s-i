@@ -59,7 +59,7 @@ fi
 if [ -z "$CDDEV" ]; then
 	CDDEV=$(grep "[[:space:]]/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
 fi
-if [ -n "$CDDEV" ] && [ -e "/target/$CDDEV" ] && [ ! -e "/target/dev/cdrom" ]; then
+if [ -n "$CDDEV" ] && [ -e "/target/$CDDEV" ]; then
 	chown 0:24 /target$CDDEV || true
-	ln -s "$CDDEV" /target/dev/cdrom
+	ln -sf "$CDDEV" /target/dev/cdrom
 fi
