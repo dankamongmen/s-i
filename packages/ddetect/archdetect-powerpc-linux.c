@@ -29,6 +29,7 @@ struct map map_machine[] = {
 	{ "CHRP IBM,7044-270", "chrp_rs6k" },
 	{ "CHRP IBM,7046-B50", "chrp_rs6k" },
 	{ "CHRP IBM,8842-21X", "chrp_rs6k" },
+	{ "CHRP IBM,9111-520", "chrp_rs6k" },
 	{ "CHRP IBM,9113-550", "chrp_rs6k" },
 	{ "CHRP IBM,9117-570", "chrp_rs6k" },
 	{ "CHRP IBM,9124-720", "chrp_rs6k" },
