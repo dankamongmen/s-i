@@ -14,6 +14,7 @@ struct map {
 struct map map_generation[] = {
 	{ "OldWorld", "powermac_oldworld" },
 	{ "NewWorld", "powermac_newworld" },
+	{ "NuBus", "powermac_nubus" },
 	{ NULL, NULL }
 };
 
