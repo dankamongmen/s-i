@@ -978,7 +978,7 @@ scan_device_name()
 void
 command_quit()
 {
-        log("Quiting");
+        log("Quitting");
         fflush(logfile);
         exit(0);
 }
