@@ -215,7 +215,7 @@ void get_swapspaces() {
 }
 
 void mapdevfs(struct fstab_entry *entry) {
-	char *cmd = NULL;
+	char *cmd = NULL, *ptr;
 	FILE *pfile = NULL;
 	char device[PATH_MAX];
 
@@ -223,11 +223,13 @@ void mapdevfs(struct fstab_entry *entry) {
 		return;
 
 	asprintf(&cmd, "%s %s 2>/dev/null", MAPDEVFS, entry->filesystem);
-
 	pfile = popen(cmd, "r");
+	free(cmd);
 	if(pfile == NULL)
 		return;
 	if (fgets(device, PATH_MAX, pfile) != NULL && strlen(device) > 0) {
+		if ((ptr = strchr(device, '\n')) != NULL)
+			*ptr = '\0';
 		free(entry->filesystem);
 		entry->filesystem = strdup(device);
 	}
