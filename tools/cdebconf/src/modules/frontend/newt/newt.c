@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.35 2003/10/18 00:32:16 barbier Exp $
+ * $Id: newt.c,v 1.36 2003/10/30 22:33:52 mckinstry Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -302,7 +302,7 @@ show_separate_window(struct frontend *obj, struct question *q)
     cRet = newtRunForm(form);
     if (cRet == bOk)
         ret = DC_OK;
-    else if (bCancel != NULL && cRet == bCancel)
+    else if ((cRet == NULL) || (bCancel != NULL && cRet == bCancel))
         ret = DC_GOBACK;
     else
         ret = DC_NOTOK;
@@ -373,7 +373,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     newtFormAddComponents(form, textbox, bOk, entry, bCancel, NULL);
     newtFormSetCurrent(form, entry);
     cRet = newtRunForm(form);
-    if (bCancel != NULL && cRet == bCancel)
+    if ((cRet == NULL) || (bCancel != NULL && cRet == bCancel))
         ret = DC_GOBACK;
     else {
         ret = DC_OK;
@@ -488,7 +488,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     newtFormAddComponent(form, sform);
     newtFormSetCurrent(form, sform);
     cRet = newtRunForm(form);
-    if (bCancel != NULL && cRet == bCancel)
+    if ((cRet == NULL) || (bCancel != NULL && cRet == bCancel))
         ret = DC_GOBACK;
     else {
         char *ans = strdup(""), *tmp;
@@ -618,7 +618,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         newtListboxSetCurrent(listbox, defchoice);
     newtFormAddComponents(form, listbox, bOk, bCancel, NULL);
     cRet = newtRunForm(form);
-    if (bCancel != NULL && cRet == bCancel)
+    if ((cRet == NULL) || (bCancel != NULL && cRet == bCancel))
         ret = DC_GOBACK;
     else {
         if (newtListboxGetCurrent(listbox) != NULL)
@@ -702,7 +702,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     } else if (cRet == bNo) {
         ret = DC_OK;
         question_setvalue(q, "false");
-    } else if (bCancel != NULL && cRet == bCancel)
+    } else if ((cRet == NULL) || (bCancel != NULL && cRet == bCancel))
         ret = DC_GOBACK;
     else
         ret = DC_NOTOK;
