@@ -39,17 +39,19 @@ int package_compare(const void *p1, const void *p2) {
 }
 
 /* Adds a new package to the tree, unless it already exists. */
-struct package_t *_newpackage (const char *packagename, void *status) {
+struct package_t *_newpackage (const char *packagename, void **status) {
 	struct package_t *p, *t = 0;
 
 	p = (struct package_t *)malloc(sizeof(struct package_t));
 	memset(p, 0, sizeof(struct package_t));
 	p->package = strdup(packagename);
-	t = *(struct package_t **)tsearch(p, &status, package_compare);
+	t = *(struct package_t **)tsearch(p, status, package_compare);
 	if (t->refcount++ > 0) {
 		free(p->package);
 		free(p);
-printf("dup! %s\n", t->package);
+	}
+	else {
+		printf("new package %s\n", t->package);
 	}
 	return t;
 }
@@ -77,8 +79,8 @@ void *status_read(void) {
 			p = 0;
 		}
 		else if (strstr(buf, "Package: ") == buf) {
-			p = _newpackage(buf+9, status);
-printf("%s %i\n", p->package, p->refcount);
+			p = _newpackage(buf+9, &status);
+printf("%s\n", buf+9);
 		}
 		else if (strstr(buf, "Installer-Menu-Item: ") == buf) {
 			p->installer_menu_item=atoi(buf+21);
@@ -100,9 +102,8 @@ printf("%s %i\n", p->package, p->refcount);
 			dependsvec = depends_split(buf+9);
 			i=0;
 			while (dependsvec[i] != 0) {
-				t = _newpackage(dependsvec[i], status);
+				t = _newpackage(dependsvec[i], &status);
 				t->requiredfor[t->requiredcount++] = p;
-printf("%s required for %s\n", t->package, p->package);
 				i++;
 			}
 		}
