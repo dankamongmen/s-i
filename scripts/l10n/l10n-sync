@@ -164,7 +164,7 @@ if ! grep "svn/d-i/trunk" $DI_COPY/.svn/entries >/dev/null 2>&1 ; then
 fi
 
 # Do not accept working on an unclean copy
-if [ $(find $DI_COPY/packages -name \*.mine | wc -l) != 0 ] ; then
+if $(svn st $DI_COPY/packages | grep -q "^C") ; then
   echo $DI_COPY seems to contain some SVN conflict files
   echo Please fix this before lauching the script again...
   exit 1
@@ -183,7 +183,7 @@ if [ "$ONLINE" = "Y" ] ; then
 fi
 
 # Let's check the thing again....ceinture et bretelles as we say in French
-if [ $(find $DI_COPY/packages -name \*.mine | wc -l) != 0 ] ; then
+if $(svn st $DI_COPY/packages | grep -q "^C") ; then
   echo $DI_COPY seems to contain some SVN conflict files
   echo Please fix this before lauching the script again...
   exit 1
