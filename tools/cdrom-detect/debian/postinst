@@ -4,11 +4,16 @@ set -e
 . /usr/share/debconf/confmodule
 #set -x
 
+log () {
+    log=/var/log/messages
+    echo "$0: $@" >> $log
+}
+
 # Is a cdrom already mounted?  If so, assume it's the right one..
 mount | grep -q ^/dev/cdroms/ && exit 0
 
 # Load kernel modules
-hwdetect
+hwdetect || true
 
 log "Searching for Debian installation media..."
 
