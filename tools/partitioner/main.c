@@ -67,6 +67,7 @@ static int get_all_disks(PedDevice *discs[], int max_disks) {
 
 		if ((discs[disk_count] = ped_device_get(fullname)))
 			disk_count++;
+		free(fullname);
 	}
 
 	closedir(devdir);
@@ -88,7 +89,7 @@ static char *build_choice(PedDevice *dev) {
 			string[i] = ';';
 	}
 
-	return(strdup(string));
+	return(string);
 }
 
 static char *extract_choice(const char *choice) {
@@ -196,11 +197,9 @@ int main(int argc, char *argv[]) {
 				debconf_go(debconf);
 			}
 		}
-
-		if(disk != NULL) {
-			free(disk);
-			disk = NULL;
-		}
+		free(cmd_script);
+		free(disk);
+		free(cmd);
 	}
 
 	return(EXIT_SUCCESS);
