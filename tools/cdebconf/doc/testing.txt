@@ -6,7 +6,42 @@ make
 cd src/test
 cp ../cdebconf.conf .
 
-Edit cdebconf.conf to suite your needs (default_fe should be text)
+Edit cdebconf.conf to suite your needs, mine looks like this:
+- 8< -----
+global {
+  module_path {
+    frontend "../modules/frontend";
+    database "../modules/db";
+  };
+
+  default {
+    frontend "default_fe";
+    template "templatedb";
+    config "configdb";
+  };
+};
+
+frontend {
+  instance "default_fe" {
+    driver "text";
+  };
+};
+
+template {
+  instance "templatedb" {
+    driver "rfc822db";
+    path "./templates.dat";
+  };
+};
+
+config {
+  instance "configdb" {
+    driver "rfc822db";
+    path "./questions.dat";
+  };
+};
+- 8< -----
+
 
 ../debconf-loadtemplate debian test.templates
 ../debconf test.config
