@@ -115,6 +115,9 @@ if [ "$LANGUAGE" != "C" ]; then
 				# Build a short list of supported locales fo
 				# the language.
 				SHORTLIST=''
+				sed -n '/^Name: countrychooser\/country-name$/,/^$/s/^Choices: //p' /var/lib/cdebconf/templates.dat | sed -e 's/, /\n/g' -e 's/\\ //g'> /tmp/countrychooser.english
+				sed -n '/^Name: countrychooser\/country-name$/,/^$/s/^Choices-'$LANGUAGE'\.UTF-8: //p' /var/libi/cdebconf/templates.dat | sed -e 's/, /\n/g' -e '/s\\ //g'> /tmp/countrychooser.$LANGUAGE
+				paste /tmp/countrychooser.english /tmp/countrychooser.$LANGUAGE | sed 's/\(.*\)\t\(.*\)/s\/\1\/\2\//' > /tmp/countrychooser.translate
 				for code in $(grep -e "^$LANGUAGE" $SUPPORTEDLOCALES | cut -b 4-5 | sort | uniq); do
 					line=`grep -e "^$code" $ISO3166TAB`
 					if [ "$line" ] ; then
@@ -123,7 +126,7 @@ if [ "$LANGUAGE" != "C" ]; then
 						set $line
 						IFS="$OLD_IFS"
 						if [ "$2" ]; then
-							countryname=$(echo "${INDENT}$2" | sed 's/,/\\,/g');
+							countryname=$(echo "${INDENT}$2" | sed -f /tmp/countrychooser.translate -e 's/,/\\,/g')
 						fi
 						if [ ! -z "${SHORTLIST}" ]; then
 							SHORTLIST="${SHORTLIST}, "
@@ -131,6 +134,7 @@ if [ "$LANGUAGE" != "C" ]; then
 						SHORTLIST="${SHORTLIST}${countryname}"
 					fi
 				done
+				rm /tmp/countrychooser.english /tmp/countrychooser.$LANGUAGE /tmp/countrychooser.script
 				db_subst $shortlist SHORTLIST "${SHORTLIST}"
 				db_subst $shortlist DEFAULTLOCALE "${DEFAULTLOCALE}"
 				db_input critical $shortlist || [ $? -eq 30 ]
