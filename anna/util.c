@@ -329,16 +329,18 @@ new_retrievers(di_package **retrievers_before, di_package **retrievers_after)
     int i, j;
     int match;
 
-    for (i = 0; retrievers_before[i]; i++)
+    for (i = 0; retrievers_before[i]; i++) {
 	match = 0;
-	for (j = 0; retrievers_after[i]; i++)
+	for (j = 0; retrievers_after[j]; j++) {
 	    if (strcmp(retrievers_before[i]->package,
                        retrievers_after[j]->package) == 0) {
 		match = 1;
 		break;
 	    }
+	}
 	if (!match)
 	    return 1;
+    }
     return 0;
 }
 
