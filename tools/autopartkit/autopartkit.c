@@ -843,7 +843,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 	if (mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
 		  MS_MGC_VAL, NULL) == -1)
 	    autopartkit_error(1,
-			      "Unable to mount '%' on '%s' as fstype %s: %s",
+			      "Unable to mount '%s' on '%s' as fstype %s: %s",
 			      mountmap[i].devpath, tmpmnt,
 			      mountmap[i].mountpoint->fstype,
 			      strerror(errno));
