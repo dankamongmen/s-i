@@ -2,77 +2,78 @@
 
 # run for 2.2.x kernels only
 if [ "`uname -r | grep '^2.2.'`" != "" ]; then
-
-    if [ ! -z "$1" ]; then
-	ROOT="$1"
-    else
-	ROOT=""
-    fi
-
-    if [ ! -d $ROOT/dev/vc ]; then
-	echo 'Creating Virtual Console devices ...'
-	mkdir -p $ROOT/dev/vc
-	for i in $(seq 0 5); do
-	    mknod $ROOT/dev/vc/$i c 4 $i
-	done
-    fi
-
-    if [ ! -d $ROOT/dev/loop ]; then
-	echo 'Creating loopback devices ...'
-	mkdir -p $ROOT/dev/loop
-	for i in $(seq 0 3); do
-	    mknod $ROOT/dev/loop/$i b 7 $i 
-	done
-    fi
-    
-    if [ ! -d $ROOT/dev/floppy ]; then
-	echo 'Creating floppy device(s) ...'
-	mkdir -p $ROOT/dev/floppy
-	mknod $ROOT/dev/floppy/0 b 2 0
-    fi
-
-    if [ ! -d $ROOT/dev/cdroms ]; then
-	echo 'Creating cdrom devices ...'
-	mkdir -p $ROOT/dev/cdroms
-	
-	IDECDROM=`dmesg | grep -i cdrom | grep -i ide | cut -d: -f 1`
-	SCSICDROM=`dmesg | grep -i detected | grep -i scsi | \
-		grep -i cd-rom | cut -d' ' -f 4`
-
-	if [ "" != "$IDECDROM" ]; then
-	    case "$IDECDROM" in
-	    "hda")
-		if [ ! -b $ROOT/dev/hda ]; then
-		    mknod $ROOT/dev/hda b 3 0
-		fi
-		;;
-	    "hdb")
-		if [ ! -b $ROOT/dev/hdb ]; then
-		    mknod $ROOT/dev/hdb b 3 64
-		fi
-		;;
-	    "hdc")
-		if [ ! -b $ROOT/dev/hdc ]; then
-		    mknod $ROOT/dev/hdc b 22 0 
-		fi
-		;;
-	    "hdd")
-		if [ ! -b $ROOT/dev/hdd ]; then
-		    mknod $ROOT/dev/hdd b 22 64
-		fi
-		;;
-	    *)
-		echo "Undefined IDE CDROM: $IDECDROM"
-	    esac
-	    ln -sf $ROOT/dev/$IDECDROM /dev/cdroms/cdrom0
-	
-	elif [ "" != "$SCSICDROM" ]; then
-	    if [ ! -b $ROOT/dev/scd0 ]; then
-		mknod $ROOT/dev/scd0 b 11 0
-	    fi
-	    ln -sf $ROOT/dev/scd0 $ROOT/dev/cdrom
-	    ln -sf $ROOT/dev/scd0 $ROOT/dev/cdroms/cdrom0
+	if [ ! -z "$1" ]; then
+		ROOT="$1"
+	else
+		ROOT=""
 	fi
-    fi
+
+	DMESG='/var/log/dmesg'
+	if [ ! -f $DMESG ]; then
+		dmesg > $DMESG
+	fi
+
+	if [ ! -d $ROOT/dev/vc ]; then
+		echo 'Creating Virtual Console devices ...'
+		mkdir -p $ROOT/dev/vc
+		for i in $(seq 0 5); do
+			mknod $ROOT/dev/vc/$i c 4 $i
+		done
+	fi
+
+	if [ ! -d $ROOT/dev/loop ]; then
+		echo 'Creating loopback devices ...'
+		mkdir -p $ROOT/dev/loop
+		for i in $(seq 0 3); do
+			mknod $ROOT/dev/loop/$i b 7 $i 
+		done
+	fi
+	
+	if [ ! -d $ROOT/dev/floppy ]; then
+		echo 'Creating floppy device(s) ...'
+		mkdir -p $ROOT/dev/floppy
+		mknod $ROOT/dev/floppy/0 b 2 0
+	fi
+
+	if [ ! -d $ROOT/dev/cdroms ]; then
+		echo 'Creating cdrom devices ...'
+		mkdir -p $ROOT/dev/cdroms
+	
+		IDECDROM=`grep -i cdrom $DMESG | grep -i ide | cut -d: -f 1`
+		if [ "" != "$IDECDROM" ]; then
+			CNT=0
+			for i in $IDECDROM; do
+				if [ ! -b $ROOT/dev/$i ]; then
+					case $i in
+					"hda") mknod $ROOT/dev/hda b 3 0 ;;
+					"hdb") mknod $ROOT/dev/hdb b 3 64 ;;
+					"hdc") mknod $ROOT/dev/hdc b 22 0 ;;
+					"hdd") mknod $ROOT/dev/hdd b 22 64 ;;
+					*)
+						echo "Undefined IDE CDROM: $IDECDROM"
+					esac
+				fi
+				ln -sf $ROOT/dev/$i /dev/cdroms/cdrom$CNT
+				CNT=$(($CNT+1))
+			done
+		fi
+	
+		SCSICDROM=`grep -i detected $DMESG | grep -i scsi | \
+			grep -i cd-rom | cut -d' ' -f 4 | sed -e 's/sr/scd/'`
+		if [ "" != "$SCSICDROM" ]; then
+			CNT=0
+			for i in $SCSICDROM; do
+				if [ ! -b $ROOT/dev/$i ]; then
+					mknod $ROOT/dev/$i b 11 $CNT
+				fi
+				ln -sf $ROOT/dev/$i $ROOT/dev/cdroms/cdrom$CNT
+				CNT=$(($CNT+1))
+			done
+			if [ ! -e $ROOT/dev/cdrom ]; then
+				ln -sf $ROOT/dev/scd0 $ROOT/dev/cdrom
+			fi
+		fi
+	fi
 fi
+
 
