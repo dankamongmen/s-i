@@ -58,7 +58,9 @@ if ($type eq 'template') {
 	}
 	print TEMPLATE "Template: mirror/http/countries\n";
         print TEMPLATE "Type: select\n";
-        print TEMPLATE "__Choices: enter information manually";
+        print TEMPLATE "Listorder: lexicographic\n";
+        print TEMPLATE "#  Translators, ignore leading exclamation mark,\n";
+        print TEMPLATE "__Choices: !enter information manually";
 	foreach  my $country (sort (keys %http_countries)) {
 		print TEMPLATE ", ${country}";
 	}
@@ -69,7 +71,9 @@ if ($type eq 'template') {
 
 	print TEMPLATE "Template: mirror/ftp/countries\n";
 	print TEMPLATE "Type: select\n";
-        print TEMPLATE "__Choices: enter information manually";
+        print TEMPLATE "Listorder: lexicographic\n";
+        print TEMPLATE "#  Translators, ignore leading exclamation mark,\n";
+        print TEMPLATE "__Choices: !enter information manually";
 	foreach  my $country (sort (keys %ftp_countries)) {
                 print TEMPLATE ", ${country}";
         }
