@@ -559,7 +559,10 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
 	    if (strcmp(choices[tindex[i]], defvals[j]) == 0)
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
         }
-        g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
+        /* TODO: This should go somewhere that doesn't interfere. "Help"
+         * that prevents you from actually doing anything is not helpful.
+         */
+        /* g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data); */
         gtk_box_pack_start(GTK_BOX(check_container), check, FALSE, FALSE, 0);
 	if (is_first_question(q) && (i == 0) )
 	    gtk_widget_grab_focus(check);
