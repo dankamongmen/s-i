@@ -71,7 +71,10 @@ if [ -n "$RET" ]; then
 	# This is needed at the end of the script
 	COUNTRYCODE_LANGUAGECHOOSER="$RET"
 	COUNTRY_LANGUAGECHOOSER="$(code2country "$RET")"
-	db_set "$fulllist" "${COUNTRY_LANGUAGECHOOSER}"
+	db_fget "$fulllist" seen
+	if [ "$RET" = false ]; then
+		db_set "$fulllist" "${COUNTRY_LANGUAGECHOOSER}"
+	fi
 fi
 
 
@@ -150,7 +153,10 @@ if [ "$LANGUAGE" != "C" ]; then
                                         shortlist_template="$shortlist-$use_lang"
                                         db_register $shortlist_template $shortlist
                                         # Set the default
-                                        db_set $shortlist $COUNTRYCODE_LANGUAGECHOOSER
+					db_fget $shortlist seen
+					if [ "$RET" = false ]; then
+	                                        db_set $shortlist $COUNTRYCODE_LANGUAGECHOOSER
+					fi
                                         db_input $shortprio $shortlist || [ $? -eq 30 ]
 					askedshort=1
 				fi
