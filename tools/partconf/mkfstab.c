@@ -234,7 +234,7 @@ void get_swapspaces() {
 }
 
 void mapdevfs(struct fstab_entry *entry) {
-	char device[PATH_MAX];
+	char device[PATH_MAX] = "";
 
 	if(entry->filesystem == NULL)
 		return;
@@ -243,7 +243,7 @@ void mapdevfs(struct fstab_entry *entry) {
 	printf("Query devfs for: %s\n", entry->filesystem);
 #endif
 
-	di_mapdevfs(entry->filesystem, device, PATH_MAX);
+	di_system_devfs_map_from(entry->filesystem, device, PATH_MAX);
 	if(device != NULL && strlen(device) > 0) {
 #ifdef DEBUG
 		printf("Mapped device: %s\n", device);
