@@ -761,7 +761,7 @@ struct question_handlers {
 };
 
 /*
- * Function: text_intitialize
+ * Function: text_initialize
  * Input: struct frontend *obj - frontend UI object
  *        struct configuration *cfg - configuration parameters
  * Output: int - DC_OK, DC_NOTOK
