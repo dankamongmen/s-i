@@ -17,15 +17,17 @@ PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
 
-# Unpack the source (which we build-depend on).
+# This is a convenicnce function, not used as part of the build process.
+# Use it to edit the config file using make xconfig.
+configure: unpack
+	cd kernel-source-$(KVERS); make xconfig
+	cp kernel-source-$(KVERS)/.config config.$(ARCH)
+
+# Unpack the source (which we build-depend on), and set it up
+# for a kernel-package build.
 unpack: unpack-stamp
 unpack-stamp:
 	tar xf /usr/src/kernel-source-$(KVERS).tar.bz2 --bzip2
-	touch unpack-stamp
-
-# Use kernel-package to do the actual building.
-build: fixcontrol unpack build-stamp
-build-stamp:
 	mkdir -p kernel-source-$(KVERS)/debian
 	./make-kernel-control $(KVERS) $(FLAVOUR) \
 		kernel-source-$(KVERS)/debian/control
@@ -38,7 +40,12 @@ build-stamp:
 			cp Makefile Makefile.pristine; \
 		fi; \
 		sed 's/^\(KERNELRELEASE=.*\)$$/\1-$$(FLAVOUR)/' Makefile.pristine > Makefile; \
-		make-kpkg --flavour di build
+	touch unpack-stamp
+
+# Use kernel-package to do the actual building.
+build: fixcontrol unpack build-stamp
+build-stamp:
+	cd kernel-source-$(KVERS); make-kpkg --flavour di build
 	touch build-stamp
 
 fixcontrol:
