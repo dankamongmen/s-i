@@ -290,7 +290,7 @@ fi
 
 # get pcmcia running if possible
 if [ -x /etc/init.d/pcmcia ]; then
-	/etc/init.d/pcmcia start </dev/null 2>&1 | logger -t hw-detect
+	CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 2>&1 | logger -t hw-detect
 fi
 
 if [ -d /proc/bus/pccard ]; then
