@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.9 2001/01/21 01:12:40 tausq Exp $
+ * $Id: frontend.c,v 1.10 2002/05/30 11:04:50 tfheen Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -207,9 +207,8 @@ struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 
 	snprintf(modlabel, sizeof(modlabel), "frontend::driver::%s::module",
 		modname);
-	
+
 	modname = cfg->get(cfg, modlabel, 0);
-	INFO(INFO_DEBUG, "Trying to load %s\n", modname);
 	if ((dlh = dlopen(modname, RTLD_NOW)) == NULL)
 		DIE("Cannot load frontend module %s: %s", modname, dlerror());
 
