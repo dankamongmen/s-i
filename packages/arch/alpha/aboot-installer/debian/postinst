@@ -106,8 +106,8 @@ bootdev=$RET
 
 # Determine the name of the disk, and the partition number where
 # aboot.conf is located, from the name of the selected partition.
-bootdisk=`echo $bootdev | sed -e's/[0-9]*$//'`
-partnum=`echo $bootdev | sed -e's/^[^0-9]*//'`
+bootdisk=`echo $bootdev | sed -e's/p*[0-9]*$//'`
+partnum=${bootdev##*[a-z]}
 
 db_progress STEP 1
 db_subst aboot-installer/progress/step_install_loader BOOTDISK $bootdisk
