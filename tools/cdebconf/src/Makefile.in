@@ -12,7 +12,9 @@ CLILIBNAME_A=libdebconfclient.a
 CLILIBNAME=$(CLILIB).$(MAJOR).$(MINOR).$(MICRO)
 CLISONAME=$(CLILIB).$(MAJOR)
 DEBCONF=debconf
-TOOLS=debconf-loadtemplate debconf-copydb debconf-communicate dpkg-reconfigure #dpkg-preconfigure
+TOOLS=debconf-loadtemplate debconf-copydb debconf-communicate \
+	debconf-dumpdb \
+	dpkg-reconfigure #dpkg-preconfigure
 BIN=$(DEBCONF) $(TOOLS)
 
 LIBOBJS=commands.opic configuration.opic confmodule.opic debug.opic \
@@ -65,7 +67,7 @@ install:
 	install -m 644 ${srcdir}/src/client/confmodule ${sharedir}
 	ln -sf ../../bin/$(DEBCONF) ${sharedir}/frontend
 ifneq ($(TARGET),udeb)
-	install -m 755 debconf debconf-copydb ${bindir}
+	install -m 755 debconf debconf-copydb debconf-dumpdb ${bindir}
 	install -d -m 755 ${incdir}
 	install -m 644 ${srcdir}/src/debconfclient.h ${incdir}
 endif
