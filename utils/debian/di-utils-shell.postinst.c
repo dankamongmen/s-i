@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <debian-installer.h>
 #include <cdebconf/debconfclient.h>
 
 int main () {
@@ -22,8 +23,9 @@ int main () {
 	    (dup2(DEBCONF_OLD_STDOUT_FD, 2) == -1))
 		exit(1);
 
-	/* TODO: clear screen and reset background color. */
-	
+	/*  clear screen and reset background color, if possible */
+	di_exec_shell("/usr/bin/clear");
+
 	chdir("/");
 	execl("/bin/sh", "/bin/sh", NULL);
 	exit(1);

@@ -48,6 +48,11 @@ binary-arch: build
 	dh_installdeb -a
 	dh_strip -a # should come after dh_installdeb; binary postinst
 	dh_shlibdeps -a
+	for file in /etc/terminfo/a/ansi /etc/terminfo/l/linux \
+	  /etc/terminfo/v/vt102; do \
+	  mkdir -p debian/di-utils-terminfo/`dirname $$file`; \
+          cp -a $$file debian/di-utils-terminfo/$$file; \
+       done
 	$(foreach PACKAGE, $(ARCH_PACKAGES), \
 	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
 	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \

@@ -14,7 +14,7 @@ di-utils: $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
 
 debian/di-utils-shell.postinst: debian/di-utils-shell.postinst.c
-	$(CC) $(CFLAGS) $^ -o $@ -ldebconfclient
+	$(CC) $(CFLAGS) $^ -o $@ -ldebconfclient -ldebian-installer
 
 strip: $(TARGETS)
 	$(STRIP) $^
