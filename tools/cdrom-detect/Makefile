@@ -1,7 +1,13 @@
+INSTALL = /usr/bin/install -c
+INSTALL_SCRIPT = ${INSTALL}
+INSTALL_DATA = ${INSTALL} -m 644
+
 all:
 
 install:
-	install -d $(DESTDIR)/usr/lib/prebaseconfig.d
-	install prebaseconfig $(DESTDIR)/usr/lib/prebaseconfig.d/15cdrom-detect
+	$(INSTALL_SCRIPT) hwdetect $(DESTDIR)/bin/hwdetect
+	$(INSTALL) -d $(DESTDIR)/usr/lib/prebaseconfig.d
+	$(INSTALL_SCRIPT) prebaseconfig \
+		$(DESTDIR)/usr/lib/prebaseconfig.d/15cdrom-detect
 
 clean:
