@@ -20,7 +20,7 @@ int get_package (struct package_t *package, char *dest) {
 	int ret;
 	char *retriever=chosen_retriever();
 	char *command=malloc(strlen(retriever) + 1 + strlen(package->filename) +
-				     strlen(dest) + 1);
+				     1 + strlen(dest) + 1);
 	sprintf(command, "%s %s %s", retriever, package->filename, dest);
 	ret=! system(command);
 	free(command);
