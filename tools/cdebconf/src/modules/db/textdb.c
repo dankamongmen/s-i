@@ -247,6 +247,8 @@ static int textdb_question_add(struct database *db, struct question *q)
 {
 	FILE *outf;
 	char *filename;
+	struct questionvariable *var;
+	struct questionowner *owner;
 
 	if (q->tag == NULL) return DC_NOTOK;
 	filename = question_filename(db->config, q->tag);
@@ -256,6 +258,27 @@ static int textdb_question_add(struct database *db, struct question *q)
 
 	fprintf(outf, "question {\n");
 	fprintf(outf, "\tname \"%s\";\n", q->tag);
+	fprintf(outf, "\tvalue \"%s\";\n", q->value);
+	fprintf(outf, "\tdefault \"%s\";\n", q->defaultval);
+	fprintf(outf, "\tflags %08X;\n", q->flags);
+	fprintf(outf, "\ttemplate \"%s\";\n", q->template->tag);
+	if ((var = q->variables))
+	{
+		fprintf(outf, "\tvariables {\n");
+		do {
+			fprintf(outf, "\t\t%s \"%s\"\n", var->variable,
+				var->value);
+		} while ((var = var->next));
+		fprintf(outf, "};\n");
+	}
+	if ((owner = q->owners))
+	{
+		fprintf(outf, "\towners:: {\n");
+		do {
+			fprintf(outf, "\t\t\"%s\"\n", owner->owner);
+		} while ((owner = owner->next));
+		fprintf(outf, "};\n");
+	}
 
 	fprintf(outf, "}\n");
 	fclose(outf);
@@ -284,8 +307,11 @@ static struct question *textdb_question_get(struct database *db,
 
 	q->tag = STRDUP(rec->get(rec, "question::tag", 0));
 	q->value = STRDUP(rec->get(rec, "question::value", 0));
+	q->defaultval = STRDUP(rec->get(rec, "question::default", 0));
+	q->flags = rec->geti(rec, "question::flags", 0);
 	q->template = textdb_template_get(db,
 		rec->get(rec, "question::template", 0));
+	/* TODO: variables and owners */
 	if (q->tag == 0 || q->value == 0 || q->template == 0)
 	{
 		question_delete(q);
