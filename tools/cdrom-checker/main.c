@@ -122,7 +122,7 @@ int valid_cdrom() {
 
 int check_cdrom() {
 	FILE *md5file = NULL;
-	int lines, status;
+	int lines, status = 0;
 	char line[1024];
 	char filename[1024];
 
