@@ -1,0 +1,47 @@
+#!/bin/sh
+# Script to ensure that S/390 network is correct on reboot
+# Adam Thornton <athornton@sinenomine.net> 20 July 2004
+
+# This is S/390[x]-specific.  The script is in an S/390[x]-only package, but
+# even so, be safe, and check the architecture first
+ARCH=`udpkg --print-architecture`
+
+case "$ARCH" in
+    s390)
+        ;;
+    s390x)
+        ;;
+    *)
+        exit 0
+        ;;
+esac
+
+# Get a list of ethX and trX devices on a given (S/390) host and walk
+# through them determining which are lcs and which are qeth (more
+# precisely, which are qeth, and which are not) and then add the
+# appropriate lines to the modutils config.
+
+# We don't have egrep, so we have to do this the hard way
+ETH=`ifconfig | grep '^eth' | cut -f 1 -d ' '`
+TR=`ifconfig | grep '^tr' | cut -f 1 -d ' '`
+IFLIST="${ETH} ${TR}"
+if [ $IFLIST ]; then
+    OUTPUT=/target/etc/modutils/arch/s390
+    TMP=${OUTPUT}_tmp
+    grep -v '^alias eth' $OUTPUT | grep -v '^alias tr'> $TMP
+    echo "### Autodetected in prebaseconfig ###" >> $TMP
+    for i in $IFLIST; do
+        grep $i /proc/qeth 2>&1 > /dev/null
+        if [ $? ] ; then
+            echo "alias $i   qeth" >> $TMP
+        else
+            echo "alias $i   lcs" >> $TMP
+        fi
+    done
+    mv $TMP $OUTPUT
+fi
+
+# Now update /etc/modules.conf and update module lists
+
+chroot /target /sbin/update-modules
+chroot /target /sbin/depmod -a
