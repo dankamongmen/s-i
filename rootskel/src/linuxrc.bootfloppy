@@ -5,6 +5,9 @@
 #
 # Throughout we use BOOT_DEBUG to turn on debugging. 1 = minimal,
 # 2 = set -x, with 3 you'll get shells in strategic places.
+#
+# INSTALL_MEDIA_DEV can be passed as a boot parameter to force only 
+# one device or set of devices to be scanned.
 
 debugshell () {
 	if [ "$BOOT_DEBUG" -gt 2 ]; then
@@ -17,21 +20,33 @@ if [ "$BOOT_DEBUG" -gt 1 ]; then
 	set -x
 fi
 
+if [ -n "$INSTALL_MEDIA_DEV" ] && echo "$INSTALL_MEDIA_DEV" | grep -qv floppy; then
+	NO_FLOPPY=1
+fi
+if [ -n "$INSTALL_MEDIA_DEV" ] && echo "$INSTALL_MEDIA_DEV" | grep -qv scsi; then
+	NO_SCSI=1
+fi
+
 mount -t proc proc proc
 mount -t devfs devfs dev
 
 modprobe vfat >/dev/null
 modprobe loop >/dev/null
 
-# Hardware detection.
-modprobe floppy >/dev/null
-if [ -x /usr/sbin/usb-discover ]; then
-	/usr/sbin/usb-discover
+debugshell "before hardware detection"
+
+if [ ! "$NO_FLOPPY" ]; then
+	modprobe floppy >/dev/null
 fi
-# This is currently needed or usb-storage won't load (for ide_fix_driveid).
-modprobe ide-core >/dev/null
-modprobe usb-storage >/dev/null
-modprobe sd_mod >/dev/null
+if [ ! "$NO_SCSI" ]; then
+	if [ -x /usr/sbin/usb-discover ]; then
+		/usr/sbin/usb-discover
+	fi
+	# This is currently needed or usb-storage won't load (for ide_fix_driveid).
+	modprobe ide-core >/dev/null
+	modprobe usb-storage >/dev/null
+	modprobe sd_mod >/dev/null
+fi
 
 debugshell "after hardware detection"
 
@@ -67,11 +82,15 @@ while [ "$LOADED" = 0 ]; do
 		# It's done each time through the loop as USB devices may
 		# be inserted at any time.
 		DEVS=""
-		if [ -d dev/floppy ]; then
-			DEVS=dev/floppy/?
-		fi
-		if [ -d /dev/scsi ]; then
-			DEVS="$DEVS `find /dev/scsi`"
+		if [ -z "$INSTALL_MEDIA_DEV" ]; then
+			if [ -d /dev/floppy ]; then
+				DEVS=/dev/floppy/?
+			fi
+			if [ -d /dev/scsi ]; then
+				DEVS="$DEVS `find /dev/scsi`"
+			fi
+		else
+			DEVS="`find $INSTALL_MEDIA_DEV`"
 		fi
 		
 		for dev in $DEVS; do
@@ -83,6 +102,13 @@ while [ "$LOADED" = 0 ]; do
 					if [ -e floppy/initrd.gz -a ! -e floppy/linux ]; then
 						MOUNTED=1
 						echo " mounted."
+
+						# Export a variable
+						# pointing to the device.
+						# This is used by eg, the
+						# floppy retreiver.
+						INSTALL_MEDIA_DEV=$dev
+						export INSTALL_MEDIA_DEV
 					else
 						umount floppy || echo "umount failed!"
 					fi
