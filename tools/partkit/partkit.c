@@ -416,12 +416,22 @@ main (int argc, char *argv[])
   client = debconfclient_new ();
   client->command (client, "title", "Partition Editor", NULL);
 
-
-  if ((dev = ped_device_get (argv[1])) == NULL)
-    partkit_error (1);
-
   do
     {
+      /* FIXME: how to get a list of available devices ? */
+      ptr = /* get_device_list() */ "/dev/hdb";
+
+
+      client->command (client, "subst", "partkit/select_device", "choices",
+		       ptr, NULL);
+      /*FIXME: how to get a default device? */
+      client->command (client, "subst", "partkit/select_device", "default",
+		       ptr, NULL);
+
+
+      if ((dev = ped_device_get (argv[1])) == NULL)
+	partkit_error (1);
+
       ptr = partkit_get_operations (dev);
       client->command (client, "subst", "partkit/choose_operation", "choices",
 		       ptr, NULL);
