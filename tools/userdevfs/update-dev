@@ -3,17 +3,18 @@
 rm -rf $ROOT/dev/discs
 mkdir -p $ROOT/dev/discs
 lastdisc=0
-discnr=0
+discnr=-1
 (sed -e '1,2d' -e 's/  */ /g' /proc/partitions) | while read line
 do
-  major=$(echo $line|cut -d' ' -f 2)
-  minor=$(echo $line|cut -d' ' -f 3)
+  major=$(echo $line|cut -d' ' -f 1)
+  minor=$(echo $line|cut -d' ' -f 2)
   if [ $major -ne $lastdisc ]
   then
+    discnr=$(( $discnr + 1 ))
     mkdir -p /dev/discs/disc$discnr
     mknod /dev/discs/disc$discnr/disc b $major $minor
-    discnr=$(( $discnr + 1 ))
   else
     mknod /dev/discs/disc$discnr/part$minor b $major $minor
   fi
+  lastdisc=$major
 done
