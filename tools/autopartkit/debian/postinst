@@ -1,11 +1,13 @@
 #! /bin/sh -e
 
+template=autopartkit/partition_table
+
 run_parts() {
     partsdir="$1"
 
     for script in "$partsdir"/*; do
 	if [ -x "$script" ] ; then
-	    "$script" || true
+	    "$script" "$template" || true
 	else
 	    echo "error: Unable to execute $script" 1>&2
 	fi
@@ -15,10 +17,7 @@ run_parts() {
 # Run all scripts to choose table file
 run_parts /usr/lib/autopartkit.d
 
-# Using support script to work around bug in cdebconf.
-#table=`autopartkit-gettable`
-
-if autopartkit autopartkit/partition_table ; then
+if autopartkit "$template" ; then
     :
 else
     # This should use debconf to report the error.

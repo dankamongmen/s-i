@@ -2,8 +2,6 @@ SUBDIRS = autopartkit.d
 
 bin_PROGRAMS = autopartkit
 
-bin_SCRIPTS = autopartkit autopartkit-gettable
-
 noinst_PROGRAMS = dumptable distribute-test
 
 autopartkit_SOURCES = \
