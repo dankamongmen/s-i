@@ -5,7 +5,7 @@ set -e
 #set -x
 
 is_not_loaded() {
-    module="$1"
+    local module="$1"
     if cut -d" " -f1 /proc/modules | grep -q "^${module}\$" ; then
 	false
     else
@@ -13,22 +13,41 @@ is_not_loaded() {
     fi
 }
 
+load_module() {
+	local module="$1"
+   	local priority=low
+    
+	case "$module" in
+	"plip")
+		module_probe parport_pc high
+		priority=high		
+		;;
+	"ne")
+		priority=high
+		;;
+	esac
+	
+	module_probe "$module" "$priority"
+}
+
 module_probe() {
-    module="$1"
-    db_subst ethdetect/module_params MODULE "$module"
-    if [ "$module" != ne ]; then
-	priority=low
-    else
-	priority=high
-    fi
-    db_input $priority ethdetect/module_params || [ $? -eq 30 ]
+    local module="$1"
+    local priority="$2"
+    local template="ethdetect/module_params"
+    local question="$template/$module"
+
+    db_register "$template" "$question"
+    db_subst "$question" MODULE "$module"
+
+    db_input $priority "$question" || [ $? -eq 30 ]
     db_go
-    db_get ethdetect/module_params
+    db_get "$question"
     if modprobe -v "$module" $RET ; then
 	if [ "$RET" != "" ]; then
 		register-module "$module" $RET
 	fi
     else
+	db_unregister "$question"
 	db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 	db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
 	db_go
@@ -69,8 +88,7 @@ do
         fi
         module="$RET"
         if [ -n "$module" ] && is_not_loaded "$module" ; then
-    	    register-module "$module"
-    	    module_probe "$module"
+		load_module "$module"
         fi
 	continue
     fi
