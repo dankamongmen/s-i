@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.7 2003/04/10 14:59:22 mckinstry Exp $
+ * $Id: at-kbd.c,v 1.8 2003/07/29 18:21:59 mckinstry Exp $
  */
 
 #include "config.h"
@@ -25,8 +25,8 @@ kbd_t *at_kbd_get (kbd_t *keyboards)
 	// /proc must be mounted by this point
 	assert (di_check_dir ("/proc") == 1);
 
-	k->name = "ps2"; // This must match the name "ps2" in console-keymaps-ps2
-	k->description = _("PC Style (PS2/connector)");
+	k->name = "at"; // This must match the name "ps2" in console-keymaps-at
+	k->description = _("PC Style (AT connector)");
 	k->deflt = "us";
 	k->fd = -1;
 	k->present = UNKNOWN;

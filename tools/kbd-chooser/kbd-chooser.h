@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.9 2003/04/10 15:02:36 mckinstry Exp $
+ * $Id: kbd-chooser.h,v 1.10 2003/07/29 18:21:59 mckinstry Exp $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -58,7 +58,7 @@ extern int grep (const char *file, const char *string);
 #endif
 
 #ifdef AT_KBD
-#define PREFERRED_KBD "ps2"
+#define PREFERRED_KBD "at"
 #endif
 
 #endif

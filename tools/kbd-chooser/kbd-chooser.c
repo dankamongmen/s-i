@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.28 2003/07/28 11:07:38 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.29 2003/07/29 18:21:59 mckinstry Exp $
  */
 
 #include "config.h"
@@ -293,7 +293,7 @@ maplist_select (maplist_t * maplist)
 
 /**
  * @brief	Get a maplist "name", creating if necessary
- * @name	name of arch, eg. "ps2"
+ * @name	name of arch, eg. "at", "mac"
  */
 maplist_t *maplist_get (const char *name)
 {
