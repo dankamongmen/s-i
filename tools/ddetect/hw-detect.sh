@@ -205,12 +205,13 @@ IFS="$IFS_SAVE"
 #log "Progress bar stop"
 db_progress STOP
 
-# always load sd_mod if a scsi controller module was loaded.
+# always load sd_mod and sr_mod if a scsi controller module was loaded.
+# sd_mod to find the disks, and sr_mod to find the CD-ROMs
 if [ -e /proc/scsi/scsi ] ; then
     if grep -q "Attached devices: none" /proc/scsi/scsi ; then
         :
     else
-        load_modules sd_mod
+        load_modules sd_mod sr_mod
     fi
 fi
 
