@@ -46,6 +46,7 @@ static void frontend_clear(struct frontend *obj)
 	{
 		q = obj->questions;
 		obj->questions = obj->questions->next;
+		q->next = q->prev = NULL;
 		question_deref(q);
 	}
 }
