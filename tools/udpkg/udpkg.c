@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.22 2000/12/08 05:59:10 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.23 2000/12/08 06:25:40 joeyh Rel $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -106,7 +106,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 	cwd = getcwd(0, 0);
 	/* chdir("/"); */
 	//chdir("tmp/"); /* testing */
-	snprintf(buf, sizeof(buf), "ar p %s data.tar.gz|zcat|tar -xf -", pkg->file);
+	snprintf(buf, sizeof(buf), "ar -p %s data.tar.gz|zcat|tar -xf -", pkg->file);
 	if (SYSTEM(buf) == 0)
 	{
 		/* Installs the package scripts into the info directory */
@@ -133,7 +133,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 				 * so oddly...
 				 */
 				snprintf(buf, sizeof(buf), 
-					"ar p %s data.tar.gz|zcat|tar -tf -", 
+					"ar -p %s data.tar.gz|zcat|tar -tf -", 
 					pkg->file);
 				snprintf(buf2, sizeof(buf2),
 					"%s%s.list", INFODIR, pkg->package);
@@ -206,7 +206,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	DPRINTF("dir = %s\n", buf);
 	if (mkdir(buf, S_IRWXU) == 0 && chdir(buf) == 0)
 	{
-		snprintf(buf, sizeof(buf), "ar p %s control.tar.gz|zcat|tar -xf -",
+		snprintf(buf, sizeof(buf), "ar -p %s control.tar.gz|zcat|tar -xf -",
 			pkg->file);
 		if (SYSTEM(buf) == 0)
 		{
