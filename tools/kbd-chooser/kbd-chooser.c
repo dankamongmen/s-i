@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.24 2003/05/15 19:43:03 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.25 2003/05/15 19:47:15 mckinstry Exp $
  */
 
 #include "config.h"
@@ -626,7 +626,7 @@ int keymap_select (char *arch, char *keymap)
  */
 void keymap_set (struct debconfclient *client, char *keymap)
 {
-	/* di_logf ("kbd_chooser: setting keymap %s", keymap) */;
+	di_logf ("kbd_chooser: setting keymap %s", keymap);
 	client->command (client, "set", "debian-installer/keymap",
 			 keymap, NULL);
 	// "seen" Used by scripts to decide not to call us again
@@ -670,11 +670,9 @@ int main (int argc, char **argv)
 		case CHOOSE_ARCH:				 
 			res = mydebconf_ask (kbd_priority, "console-tools/archs", &s);
 			if (res) {
-				if (res == CMDSTATUS_GOBACK) {
+				if (res == CMDSTATUS_GOBACK) 
 					di_log ("kbdchooser: GOBACK recieved; leaving");
-					exit (0);
-				} else
-					exit (res);
+				exit (res);
 			}
 			if (s == NULL || (strlen(s) == 0)) {
 				di_log("kbd-chooser: not setting keymap (console-tools/archs not set)");
