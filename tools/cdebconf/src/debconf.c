@@ -22,12 +22,16 @@ static struct option options[] = {
     { 0, 0, 0, 0 },
 };
 
-void cleanup()
+static void save()
 {
 	if (questions != NULL)
 		questions->methods.save(questions);
 	if (templates != NULL)
 		templates->methods.save(templates);
+}
+
+static void cleanup()
+{
 	if (frontend != NULL)
 		frontend_delete(frontend);
 	if (questions != NULL)
@@ -40,8 +44,11 @@ void cleanup()
 
 void sighandler(int sig)
 {
-	cleanup();
-	exit(1);
+	save();
+	if (sig != SIGUSR1) {
+		cleanup();
+		exit(1);
+	}
 }
 
 void help(const char *exename)
@@ -82,6 +89,7 @@ int main(int argc, char **argv)
 {
 	signal(SIGINT, sighandler);
 	signal(SIGTERM, sighandler);
+	signal(SIGUSR1, sighandler);
 	setlocale (LC_ALL, "");
 
 	config = config_new();
@@ -129,6 +137,7 @@ int main(int argc, char **argv)
 	confmodule->communicate(confmodule);
 
 	/* shutting down .... sync the database and shutdown the modules */
+	save();
 	cleanup();
 
 	return confmodule->exitcode;
