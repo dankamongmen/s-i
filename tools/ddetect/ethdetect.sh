@@ -49,7 +49,7 @@ get_static_modinfo() {
 module_probe() {
 	local module="$1"
 	local priority="$2"
-	local template="ethdetect/module_params"
+	local template="hw-detect/module_params"
 	local question="$template/$module"
 	local modinfo=""
 	local devs=""
