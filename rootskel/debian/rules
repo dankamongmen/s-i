@@ -5,10 +5,9 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PACKAGE=rootskel
+PACKAGES=$(shell dh_listpackages)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
 # This is the debhelper compatability version to use.
@@ -23,11 +22,11 @@ build-stamp: build-locale
 
 	touch build-stamp
 
-build-locale: build-tree/usr/lib/locale/C.UTF-8
-build-tree/usr/lib/locale/C.UTF-8: debian/C.UTF-8
-	mkdir -p build-tree/usr/lib/locale
+build-locale: debian/rootskel-locale/usr/lib/locale/C.UTF-8
+debian/rootskel-locale/usr/lib/locale/C.UTF-8: debian/C.UTF-8
+	mkdir -p debian/rootskel-locale/usr/lib/locale
 	localedef -i "debian/C.UTF-8" -f "UTF-8" \
-	  "build-tree/usr/lib/locale/C.UTF-8" 
+	  "debian/rootskel-locale/usr/lib/locale/C.UTF-8" 
 
 clean:
 	dh_testdir
@@ -45,8 +44,7 @@ install: build
 	dh_testroot
 	mkdir -p debian/rootskel/
 	cp -a build-tree/* debian/rootskel/
-	$(foreach DIR, $(DIRS), \
-	(mkdir -p debian/rootskel/$(DIR) ) ; )
+	dh_installdirs
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -64,10 +62,16 @@ binary-arch: build install
 	dh_compress
 	dh_fixperms
 	dh_installdeb
+	dh_shlibdeps
 	dh_link /proc/mounts /etc/mtab 
+	$(foreach PACKAGE, $(PACKAGES), \
+	  (dpkg-gencontrol -p$(PACKAGE) -Pdebian/$(PACKAGE) -isp \
+	  -Tdebian/$(PACKAGE).substvars \
+	  -n$(PACKAGE)_$(VERSION)_all.udeb ) ; )
+	$(foreach PACKAGE, $(PACKAGES), \
+	  (dh_builddeb -p$(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_all.udeb \
+		); )
 	dh_gencontrol -- -fdebian/files~ 
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY) 
-	dh_builddeb --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
