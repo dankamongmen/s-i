@@ -41,6 +41,24 @@ fi
 bootdev=`mapdevfs $bootdev`
 rootfs=`mapdevfs $rootfs`
 
+# If installing to a partition (not MBR), offer to make it active
+if echo "${bootdev}" | grep -q '[0-9]$'; then
+    # Installing to a partition, check if it is already marked active
+    disc=$(echo ${bootdev} | sed 's/part[0-9]\+$/disc/')
+    if ! fdisk -l ${disc} | grep "^${bootdev}" | grep -q '\*'; then
+        # partition is not marked active, offer to make it so
+        db_input high lilo-installer/activate-part || true
+        db_go || true
+        db_get lilo-installer/activate-part
+        if [ "${RET}" = "yes"]; then
+            pnum=$(echo ${bootdev} | sed 's/^.*\([0-9]\+\)$/\1/')
+            echo -n "I: Setting partition to active..." >&2
+            sfdisk -A${pnum} ${disc}
+            echo "done." >&2
+        fi
+    fi
+fi
+
 # Use a serial console if current default console is a serial port.
 # default console is last listed
 defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
