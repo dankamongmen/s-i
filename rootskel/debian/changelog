@@ -1,3 +1,22 @@
+rootskel (0.54) UNRELEASE; urgency=low
+
+  * Add a register-module command, similar to apt-install, which queues
+    modules for entry into /target/etc/modules and /target/etc/modutils/local.
+    Does not yet handle 2.6 modutils. Should only be used for modules
+    that discover does not find, or that have special parameters.
+  * Add debian-installer/framebuffer and only enable frame buffer if it is
+    true.
+  * Add a S25env2debconf in debian-installer.d, that finds environment
+    variables in the form foo/bar=baz, and uses these special ones to set
+    debconf values in the db. This allows booting with any d-i debconf
+    values on the command line, to override *anything*. For example --
+    boot: debian-installer/framebuffer=false
+  * Fixed debconf-get to not output value on stderr, and not clear screen
+    either. But it is insanely gross and expensive now, and should be
+    moved to cdebconf and rewritten.
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  3 Dec 2003 01:50:23 -0500
+
 rootskel (0.53) unstable; urgency=low
 
   * rootskel.bootfloppy: deal better with the ram disk filling up
