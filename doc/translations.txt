@@ -1,6 +1,8 @@
-Some clues for translators
-==========================
+Debian Installer notes for translation and internationalisation
+---------------------------------------------------------------
 
+(if you happen to modify this file, please don't forget to update the
+ trailing changelog)
 
 Translation order
 -----------------
@@ -15,6 +17,7 @@ Suggested translation order:
 
 -languagechooser
   (read debian-installer/tools/languagechooser/README.trans for details)
+-countrychooser and iso-codes (see APPENDIX)
 -common udebs
 -supported architectures udebs
 -second stage
@@ -48,6 +51,13 @@ How to get files to be translated
 
  Rename this file to xx.po and start working on it
 
+-Getting 2nd stage files
+ * base-config : the project is also hosted on alioth CVS server. Files
+                 are available on pages mentioned above
+ * tasksel     : also hosted on alioth. Uses subversion
+ * others      : use "apt-get source <package>" and report translations
+                 as normal bugs against the given packages 
+
 How to translate
 ----------------
 This document is not intended to be a tutorial for gettext-related
@@ -58,7 +68,8 @@ Please use a dedicated PO-editing tool unless you become very familiar
 with translation work.
 
 Don't forget to properly fill up the PO files header, especially the
-Last-Translator field.
+Last-Translator field. Fill the Project-Id-Version field with the
+package name, that will help you in translation maintenance.
 
 If a translation team exists for your language, WORK WITH THEM. First
 check the debian-l10n-xxxxx mailing list where xxxxx is your language
@@ -86,6 +97,8 @@ translation helper like acheck).  Running
 (from the gettext package) before committing is also a good idea to
 check that your file is valid and will be integrated without trouble.
 
+You may also use the Debian aspell package.
+
 You could also run podebconf-display-po (from po-debconf >= 0.8.3)
 on your file:
   podebconf-display-po -fdialog debian/po/<YOUR LANGUAGE CODE>.po
@@ -97,7 +110,7 @@ Running debian-installer is the only solution to test translations.
 How to get help
 ---------------
 
-If you need further assistance, do not hesitate to ask for help on
+If you need further assistance, feel free to ask for help on
 debian-boot (for debian-installer related stuff) or debian-i18n (for
 l10n related questions) Debian mailing lists.
 
@@ -128,7 +141,7 @@ packages.  The packages names are the last part of the lines below
 (for instance, "languagechooser" for tools/languagechooser).
 Some packages have different names which are mentioned when needed.
 
-For bug reports, please use the "d-i" tag.
+For bug reports, please use the "d-i" and "l10n" tags.
 
  Send to debian-boot
  -------------------
@@ -147,6 +160,7 @@ PACKAGES LIST
  Core udebs
  ----------
 
+ tools/countrychooser (plus iso-codes, see APPENDIX)
  tools/cdebconf
  anna
  main-menu
@@ -167,12 +181,13 @@ PACKAGES LIST
  retriever/choose-mirror
  tools/cdrom-checker
  tools/iso-scan
+ tools/autopartkit
+ partman/* (several partman-* packages)
  tools/bugreporter-udeb
- tools/partitioner
  tools/partconf
  tools/baseconfig-udeb
  tools/lvmcfg
- tools/autopartkit
+ tools/partitioner
 
  Architecture-dependent udebs
  ----------------------------
@@ -184,11 +199,11 @@ PACKAGES LIST
   tools/lilo-installer
   tools/mips/arcboot-installer
   tools/yaboot-installer
+  tools/aboot-installer
 
  2) Will be supported soon/in the future
  ---------------------------------------
 
-  tools/aboot-installer
   tools/ia64/elilo-installer
   tools/hppa/palo-installer
   tools/sparc/silo-installer
@@ -261,12 +276,53 @@ PACKAGES LIST
  samba dash mysql-server gdm apt-listchanges libdiscover1
  discover libslp1 libnet-perl cupsys-client cupsys
 
+APPENDIX
+--------
+ Countrychooser/iso-codes
+ ------------------------
+
+The countrychooser package uses country names and codes from the
+iso-codes package. The country name translations are taken from this
+package instead of just sitting in the countrychooser package.
+
+For this reason, you need to translate the iso_3166.tab file in the
+iso-codes package:
+ - apt-get source iso-codes (from unstable)
+ - cd iso-codes-<version>/iso_3166
+ - get templates.pot file and translate country names there or complete
+   the existing translation
+ - send the new file as a bug report against the iso-codes package with
+   the "l10n" and "patch" tag, severity wishlist
+
+The countrychooser package includes a mechanism for using an interim
+translted file instead of iso-codes package translations. This allows
+you to immediately test your translations. Just drop your file in
+tools/countrychooser/iso-codes.updates and commit it. However, when
+the upstream iso-codes package includes your translation, please
+REMOVE the interim file from debian-installer CVS.
+
+--------------------------------------------------------------------------
 
 This guide is supposed to be be a first start for translators.  There
 are probably errors, and some packages we forgot.  Please add them if
 you discover such packages, and fix it if you find errors.
 
-  Petter Reinholdtsen, 2003-11-08
-  Christian Perrier, 2003-12-20 (updated packages list and more information)
-  Javier Fernandez-Sanguino, 2004-01-20 (added more packages and mentioned the
-  	'by priority' and 'popular' criteria)
+--------------------------------------------------------------------------
+Changelog:
+
+2004/01/22 Christian Perrier
+ - updated packages information (countrychooser and partman-* added)
+ - mentioned aspell in tools
+ - appendix added with iso-codes note
+ - reformatted changelog
+ - new title
+
+2004/01/20 Javier Fernandez-Sanguino
+ - added more packages and mentioned the 'by priority' and 'popular' criteria)
+
+2003/12/20 Christian Perrier
+ - updated packages list and more information
+ - rewamped the file
+
+2003/11/08 Petter Reinholdtsen
+ - file creation
