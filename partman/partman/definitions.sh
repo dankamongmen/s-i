@@ -511,13 +511,10 @@ enable_swap () {
 	    [ $fs != free ] || continue
 	    [ -f "$id/method" ] || continue
 	    [ -f "$id/acting_filesystem" ] || continue
-	    method=$(cat $id/method)
 	    filesystem=$(cat $id/acting_filesystem)
-	    case "$filesystem" in
-		linux-swap)
-		    swaps="$swaps $path"
-		    ;;
-	    esac
+	    if [ "$filesystem" = linux-swap ]; then
+		swaps="$swaps $path"
+	    fi
 	done
 	close_dialog
     done

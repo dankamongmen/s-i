@@ -15,7 +15,11 @@ if [ ! -f /var/run/parted_server.pid ]; then
     
     count=0
     IFS="$NL"
-    for partdev in $(parted_devices | sort); do
+    for partdev in $(parted_devices | 
+	    sed 's,^/dev/ide,!/dev/ide,' | 
+	    sed 's,^/dev/scsi,!/dev/scsi,' | 
+	    sort | 
+	    sed 's,^!,,' ); do
 	IFS="$TAB"
 	set -- $partdev
 	count=$(( $count + 1 ))
