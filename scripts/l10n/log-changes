@@ -39,14 +39,13 @@ fi
 # Line number of the changelog's old date
 LINE=`grep -a "; urgency=" "$CHANGELOG" | grep -n "$RELEASE" | head -n 1 | sed 's/:.*//g'`
 
-if [ -z "$LINE" ]; then
-	echo "$0: cannot parse changelog" >&2
-	exit 1
+if [ ! -z "$LINE" ]; then
+	# Date of the last release
+	DATE=`grep -a "^ --" "$CHANGELOG" | head -n $LINE | tail -n 1 | sed 's/.*>  //g'`
+	OLD_DATE=`date -d "$DATE" +%s`
+else
+	OLD_DATE=0
 fi
-
-# Date of the last release
-DATE=`grep -a "^ --" "$CHANGELOG" | head -n $LINE | tail -n 1 | sed 's/.*>  //g'`
-OLD_DATE=`date -d "$DATE" +%s`
 
 touch $PACKAGE/debian/.credits_log
 
