@@ -378,6 +378,12 @@ int do_menu_item(struct package_t *p) {
 	char *configcommand;
 	int ret = 0;
 
+	{
+            char buf[256];
+            snprintf(buf, sizeof(buf), "Menu item '%s' selected", p->package);
+            di_log(buf);
+	}
+
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
 		asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package);
