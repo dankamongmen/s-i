@@ -1,3 +1,5 @@
+include ../../globalmakeflags
+
 SUBDIRS=db frontend
 
 all install clean: $(addsuffix /Makefile,$(SUBDIRS))

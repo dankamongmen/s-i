@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.9 2002/07/01 06:58:38 tausq Exp $
+ * $Id: slang.c,v 1.10 2002/07/02 06:53:47 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -273,7 +273,7 @@ static int slang_keyhandler(struct frontend *ui, struct question *q, int *pos,
  *
  * draws the navigation buttons (previous, next) onto the screen
  *
- * TODO: if cangoback/forward is false, draw the buttons in a "disabled"
+ * TODO: if can_go_back/forward is false, draw the buttons in a "disabled"
  * color
  */
 static void slang_navbuttons(struct frontend *ui, struct question *q, 
@@ -296,13 +296,13 @@ static void slang_navbuttons(struct frontend *ui, struct question *q,
 	/* draw the actual buttons, note that these are drawn in the
 	 * query window instead of in the parent (like the frame) */
 
-	if (ui->cangoback(ui, q))
+	if (ui->methods.can_go_back(ui, q))
 	{
 		slang_printf(ybut - 1, 2, (selected == 0 ? win->selectedcolor :
 			win->drawcolor), _(" <Previous> "));
 	}
 
-	if (ui->cangoforward(ui, q))
+	if (ui->methods.can_go_forward(ui, q))
 	{
 		slang_printf(ybut - 1, COLS-10, (selected == 1 ? 
 			win->selectedcolor : win->drawcolor), _(" <Next> "));
@@ -683,7 +683,7 @@ static int slang_go(struct frontend *obj)
 				switch (ret)
 				{
 				case DC_OK:
-					obj->db->question_set(obj->db, q);
+					obj->qdb->methods.set(obj->qdb, q);
 					break;
 				case DC_GOBACK:
 					if (q->prev != NULL)

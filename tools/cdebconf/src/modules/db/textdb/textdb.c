@@ -9,7 +9,9 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 
 static void translate_tag_name(char *buf)
 {
@@ -19,34 +21,39 @@ static void translate_tag_name(char *buf)
 		if (*t == '/') *t = ':';  /* : is illegal in templates etc */
 }
 
-static char *template_filename(struct configuration *cfg, const char *tag)
+static char *template_filename(struct template_db *db, const char *tag)
 {
 	static char filename[1024];
+    static char tmp[1024];
 	char tagname[1024];
 	filename[0] = 0;
 
 	strncpy(tagname, tag, sizeof(tagname));
 	translate_tag_name(tagname);
 
+    snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
+
 	snprintf(filename, sizeof(filename), "%s/%s",
-		cfg->get(cfg, "database::driver::textdb::templatepath", 
-		TEXTDB_TEMPLATE_PATH), tagname);
+		db->config->get(db->config, tmp, ""), tagname);
 
 	return filename;
 }
 
-static char *question_filename(struct configuration *cfg, const char *tag)
+static char *question_filename(struct question_db *db, const char *tag)
 {
 	static char filename[1024];
+    static char tmp[1024];
 	char tagname[1024];
+
 	filename[0] = 0;
 
 	strncpy(tagname, tag, sizeof(tagname));
 	translate_tag_name(tagname);
 
+    snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
+
 	snprintf(filename, sizeof(filename), "%s/%s",
-		cfg->get(cfg, "database::driver::textdb::questionpath", 
-		TEXTDB_QUESTION_PATH), tagname);
+		db->config->get(db->config, tmp, "."), tagname);
 
 	return filename;
 }
@@ -69,9 +76,9 @@ static char *escapestr(const char *in)
 }
 
 static struct template *textdb_lookup_cached_template(
-	const struct database *db, const char *tag)
+	const struct template_db *db, const char *tag)
 {
-	struct db_cache *dbdata = db->data;
+	struct template_db_cache *dbdata = db->data;
 	struct template *result;
 	for (result = dbdata->templates; result; result = result->next)
 	{
@@ -80,10 +87,10 @@ static struct template *textdb_lookup_cached_template(
 	return result;
 }
 
-static void textdb_remove_cached_template(struct database *db,
+static void textdb_remove_cached_template(struct template_db *db,
 	const char *tag)
 {
-	struct db_cache *dbdata = db->data;
+	struct template_db_cache *dbdata = db->data;
 	struct template **result;
 	for (result = &dbdata->templates; *result; result = &(*result)->next)
 	{
@@ -99,7 +106,7 @@ static void textdb_remove_cached_template(struct database *db,
 static struct question *textdb_lookup_cached_question(
 	const struct database *db, const char *tag)
 {
-	struct db_cache *dbdata = db->data;
+	struct question_db_cache *dbdata = db->data;
 	struct question *result;
 	for (result = dbdata->questions; result; result = result->next) 
 	{
@@ -109,39 +116,28 @@ static struct question *textdb_lookup_cached_question(
 }
 */
 
-static int textdb_initialize(struct database *db, struct configuration *cfg)
+static int textdb_template_initialize(struct template_db *db, struct configuration *cfg)
 {
-	struct db_cache *dbdata;
-	dbdata = malloc(sizeof(struct db_cache));
+	struct template_db_cache *dbdata;
+	dbdata = malloc(sizeof(struct template_db_cache));
 
 	if (dbdata == NULL)
 		return DC_NOTOK;
 
-	dbdata->questions = NULL;
 	dbdata->templates = NULL;
 	db->data = dbdata;
 
 	return DC_OK;
 }
 
-static int textdb_load(struct database *db)
-{
-	return DC_OK;
-}
-
-static int textdb_save(struct database *db)
-{
-	return DC_OK;
-}
-
-static int textdb_template_set(struct database *db, struct template *t)
+static int textdb_template_set(struct template_db *db, struct template *t)
 {
 	FILE *outf;
 	char *filename;
 	struct language_description *langdesc;
 
 	if (t->tag == NULL) return DC_NOTOK;
-	filename = template_filename(db->config, t->tag);
+	filename = template_filename(db, t->tag);
 	
 	if ((outf = fopen(filename, "w")) == NULL)
 		return DC_NOTOK;
@@ -178,7 +174,7 @@ static int textdb_template_set(struct database *db, struct template *t)
 	return DC_OK;
 }
 
-static struct template *textdb_template_get_real(struct database *db, 
+static struct template *textdb_template_get_real(struct template_db *db, 
 	const char *ltag)
 {
 	struct configuration *rec;
@@ -188,7 +184,7 @@ static struct template *textdb_template_get_real(struct database *db,
 	const char *tmp;
 
 	if (ltag == NULL) return DC_NOTOK;
-	filename = template_filename(db->config, ltag);
+	filename = template_filename(db, ltag);
 
 	rec = config_new();
 	if (rec->read(rec, filename) != DC_OK)
@@ -250,7 +246,7 @@ static struct template *textdb_template_get_real(struct database *db,
 	return t;
 }
 
-static struct template *textdb_template_get(struct database *db, 
+static struct template *textdb_template_get(struct template_db *db, 
 	const char *ltag)
 {
 	struct template *result;
@@ -258,7 +254,7 @@ static struct template *textdb_template_get(struct database *db,
 	result = textdb_lookup_cached_template(db, ltag);
 	if (!result && (result = textdb_template_get_real(db, ltag)))
 	{
-		struct db_cache *dbdata = db->data;
+		struct template_db_cache *dbdata = db->data;
 		result->next = dbdata->templates;
 		dbdata->templates = result;
 	}
@@ -266,7 +262,7 @@ static struct template *textdb_template_get(struct database *db,
 	return result;
 }
 
-static int textdb_template_remove(struct database *db, const char *tag)
+static int textdb_template_remove(struct template_db *db, const char *tag)
 {
 	char *filename;
 
@@ -274,24 +270,24 @@ static int textdb_template_remove(struct database *db, const char *tag)
 
 	textdb_remove_cached_template(db, tag);
 
-	filename = template_filename(db->config, tag);
+	filename = template_filename(db, tag);
 	if (unlink(filename) == 0)
 		return DC_OK;
 	else
 		return DC_NOTOK;
 }
 
-static struct template *textdb_template_iterate(struct database *db,
+static struct template *textdb_template_iterate(struct template_db *db,
 	void **iter)
 {
 	DIR *dir;
 	struct dirent *ent;
+    char tmp[1024];
 
 	if (*iter == NULL)
 	{
-		dir = opendir(db->config->get(db->config, 
-			"database::driver::textdb::templatepath", 
-			TEXTDB_TEMPLATE_PATH));
+        snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
+		dir = opendir(db->config->get(db->config, tmp, ""));
 		if (dir == NULL)
 			return NULL;
 		*iter = dir;
@@ -310,7 +306,21 @@ static struct template *textdb_template_iterate(struct database *db,
 	return textdb_template_get(db, ent->d_name);
 }
 
-static int textdb_question_set(struct database *db, struct question *q)
+static int textdb_question_initialize(struct question_db *db, struct configuration *cfg)
+{
+	struct question_db_cache *dbdata;
+	dbdata = malloc(sizeof(struct question_db_cache));
+
+	if (dbdata == NULL)
+		return DC_NOTOK;
+
+	dbdata->questions = NULL;
+	db->data = dbdata;
+
+	return DC_OK;
+}
+
+static int textdb_question_set(struct question_db *db, struct question *q)
 {
 	FILE *outf;
 	char *filename;
@@ -318,7 +328,7 @@ static int textdb_question_set(struct database *db, struct question *q)
 	struct questionowner *owner;
 
 	if (q->tag == NULL) return DC_NOTOK;
-	filename = question_filename(db->config, q->tag);
+	filename = question_filename(db, q->tag);
 	
 	if ((outf = fopen(filename, "w")) == NULL)
 		return DC_NOTOK;
@@ -356,7 +366,7 @@ static int textdb_question_set(struct database *db, struct question *q)
 	return DC_OK;
 }
 
-static struct question *textdb_question_get(struct database *db, 
+static struct question *textdb_question_get(struct question_db *db, 
 	const char *ltag)
 {
 	struct configuration *rec;
@@ -365,7 +375,9 @@ static struct question *textdb_question_get(struct database *db,
 	struct configitem *node;
 
 	if (ltag == NULL) return DC_NOTOK;
-	filename = question_filename(db->config, ltag);
+	filename = question_filename(db, ltag);
+
+    INFO(INFO_DEBUG, "%s: filename = [%s]\n", __FILE__, filename);
 
 	rec = config_new();
 	if (rec->read(rec, filename) != DC_OK)
@@ -380,8 +392,8 @@ static struct question *textdb_question_get(struct database *db,
 	q->value = STRDUP(unescapestr(rec->get(rec, "question::value", 0)));
 	q->defaultval = STRDUP(unescapestr(rec->get(rec, "question::default", 0)));
 	q->flags = rec->geti(rec, "question::flags", 0);
-	q->template = textdb_template_get(db,
-		unescapestr(rec->get(rec, "question::template", 0)));
+	q->template = db->tdb->methods.get(db->tdb,
+		unescapestr(rec->get(rec, "question::template", "")));
 
 	/* TODO: variables and owners */
 	if ((node = rec->tree(rec, "question::variables")) != 0)
@@ -399,6 +411,8 @@ static struct question *textdb_question_get(struct database *db,
 				question_owner_add(q, node->tag);
 	}
 
+    INFO(INFO_DEBUG, "Read q = %s\n", q->tag);
+
 	if (q->tag == 0 || q->value == 0 || q->template == 0)
 	{
 		question_deref(q);
@@ -410,7 +424,7 @@ static struct question *textdb_question_get(struct database *db,
 	return q;
 }
 
-static int textdb_question_disown(struct database *db, const char *tag, 
+static int textdb_question_disown(struct question_db *db, const char *tag, 
 	const char *owner)
 {
 	struct question *q = textdb_question_get(db, tag);
@@ -421,17 +435,23 @@ static int textdb_question_disown(struct database *db, const char *tag,
 	return DC_OK;
 }
 
-static struct question *textdb_question_iterate(struct database *db,
+static struct question *textdb_question_iterate(struct question_db *db,
 	void **iter)
 {
 	DIR *dir;
 	struct dirent *ent;
+    static const char *path = "";
+    char tmp[1024];
+    int ret;
+    struct stat st;
 
 	if (*iter == NULL)
 	{
-		dir = opendir(db->config->get(db->config, 
-			"database::driver::textdb::questionpath", 
-			TEXTDB_QUESTION_PATH));
+        snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
+        path = db->config->get(db->config, tmp, ".");
+        INFO(INFO_VERBOSE, "Checking %s -> %s\n", tmp, path);
+
+		dir = opendir(path);
 		if (dir == NULL)
 			return NULL;
 		*iter = dir;
@@ -441,28 +461,35 @@ static struct question *textdb_question_iterate(struct database *db,
 		dir = (DIR *)*iter;
 	}
 
-	if ((ent = readdir(dir)) == NULL)
-	{
-		closedir(dir);
-		return NULL;
-	}
+    do {
+        if ((ent = readdir(dir)) == NULL)
+        {
+            INFO(INFO_DEBUG, "readdir returned NULL\n");
+            closedir(dir);
+            return NULL;
+        }
 
+        snprintf(tmp, sizeof(tmp), "%s/%s", path, ent->d_name);
+        ret = stat(tmp, &st);
+    } while (ret < 0 || S_ISDIR(st.st_mode));
+
+    INFO(INFO_DEBUG, "Getting %s\n", ent->d_name);
 	return textdb_question_get(db, ent->d_name);
 }
 
-struct database_module debconf_database_module =
-{
-	initialize: textdb_initialize,
-	load: textdb_load,
-	save: textdb_save,
-
-	template_set: textdb_template_set,
-	template_get: textdb_template_get,
-	template_remove: textdb_template_remove,
-	template_iterate: textdb_template_iterate,
-
-	question_get: textdb_question_get,
-	question_set: textdb_question_set,
-	question_disown: textdb_question_disown,
-	question_iterate: textdb_question_iterate
+struct template_db_module debconf_template_db_module = {
+    initialize: textdb_template_initialize,
+    set: textdb_template_set,
+    get: textdb_template_get,
+    remove: textdb_template_remove,
+    iterate: textdb_template_iterate,
 };
+
+struct question_db_module debconf_question_db_module = {
+    initialize: textdb_question_initialize,
+    set: textdb_question_set,
+    get: textdb_question_get,
+    disown: textdb_question_disown,
+    iterate: textdb_question_iterate,
+};
+

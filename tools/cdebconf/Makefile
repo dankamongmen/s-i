@@ -20,6 +20,6 @@ clean:
 
 distclean: clean
 	-rm -f config.status config.log config.cache globalmakeflags 
-	-rm -f src/makefile src/config.h
+	-rm -f src/Makefile src/config.h man/Makefile
 
 .PHONY: cdebconf clean distclean

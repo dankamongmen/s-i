@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.10 2002/07/01 06:58:38 tausq Exp $
+ * $Id: text.c,v 1.11 2002/07/02 06:53:47 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -447,7 +447,7 @@ static int text_go(struct frontend *obj)
 				texthandler_displaydesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
 				if (ret == DC_OK)
-					obj->db->question_set(obj->db, q);
+					obj->qdb->methods.set(obj->qdb, q);
 				else
 					return ret;
 				break;

@@ -1,6 +1,15 @@
 #ifndef _DATABASE_H_
 #define _DATABASE_H_
 
+/**
+ * \file database.h
+ * \brief Definitions of question_db and template_db objects
+ */
+
+/**
+ * \def DEBCONF_MAX_CONFIGPATH_LEN
+ * \brief maximum length of a configuration path to a database config
+ */
 #define DEBCONF_MAX_CONFIGPATH_LEN  128
 
 /* Debconf database interfaces */
@@ -11,6 +20,9 @@ struct template_db;
 struct question;
 struct question_db;
 
+/**
+ * Methods for a template database module
+ */
 struct template_db_module {
     int (*initialize)(struct template_db *db, struct configuration *cfg);
     int (*shutdown)(struct template_db *db);
@@ -24,6 +36,9 @@ struct template_db_module {
     struct template *(*iterate)(struct template_db *db, void **iter);
 };
 
+/**
+ * Methods for a question database module
+ */
 struct question_db_module {
     int (*initialize)(struct question_db *db, struct configuration *cfg);
     int (*shutdown)(struct question_db *db);

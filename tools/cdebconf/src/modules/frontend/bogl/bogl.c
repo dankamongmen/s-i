@@ -49,9 +49,9 @@ static handler_t handler(const char *type)
 /* FIXME: Needs disabled button widget. */
 static void drawnavbuttons(struct frontend *ui, struct question *q)
 {
-	if(ui->cangoback(ui, q))
+	if(ui->methods.can_go_back(ui, q))
 		bowl_new_button(_("Previous"), DC_GOBACK);
-	if(ui->cangoforward(ui, q))
+	if(ui->methods.can_go_forward(ui, q))
 		bowl_new_button(_("Next"), DC_OK);
 }
 
@@ -87,7 +87,7 @@ int bogl_handler_boolean(struct frontend *ui, struct question *q)
 	drawdesctop(ui, q);
 
 	/* Should be:  bowl_new_radio(); drawnavbuttons(ui, q); */
-	if(ui->cangoback(ui, q))
+	if(ui->methods.can_go_back(ui, q))
 		bowl_new_button(_("Previous"), 0);
 	bowl_new_button(_("Yes"), 1);
 	bowl_new_button(_("No"), 2);
@@ -233,7 +233,7 @@ static int bogl_go(struct frontend *ui)
 		ret = DC_OK;
 		(*handler(q->template->type))(ui, q);
 		if(ret == DC_OK)
-			ui->db->question_set(ui->db, q);
+			ui->qdb->methods.set(ui->qdb, q);
 		else
 			return ret;
 		

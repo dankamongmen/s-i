@@ -71,12 +71,12 @@ static void wfill(WINDOW *w)
 			mvwaddch(w, y, x, ' ');
 }
 
-static int cangoback(struct frontend *ui)
+static int can_go_back(struct frontend *ui)
 {
 	return 1;
 }
 
-static int cangoforward(struct frontend *ui)
+static int can_go_forward(struct frontend *ui)
 {
 	return 1;
 }
@@ -201,13 +201,13 @@ static void drawnavbuttons(struct frontend *ui, int selected)
 	/* draw the actual buttons, note that these are drawn in the
 	 * query window instead of in the parent (like the frame) */
 
-	if (cangoback(ui))
+	if (can_go_back(ui))
 	{
 		if (selected == 0) wstandout(win); else wstandend(win);
 		mvwprintw(win, ybut-1, 2, "<Previous>");
 	}
 
-	if (cangoforward(ui))
+	if (can_go_forward(ui))
 	{
 		if (selected == 1) wstandout(win); else wstandend(win);
 		mvwprintw(win, ybut-1, COLS-10, "<Next>");
@@ -281,7 +281,7 @@ static int nchandler_boolean(struct frontend *ui, struct question *q)
 			switch (pos)
 			{
 				case 0:
-					if (cangoback(ui))
+					if (can_go_back(ui))
 						ret = DC_GOBACK;
 					/* go to previous if possible */
 					break;
@@ -331,7 +331,7 @@ static int nchandler_note(struct frontend *ui, struct question *q)
 			switch (pos)
 			{
 				case 0:
-					if (cangoback(ui))
+					if (can_go_back(ui))
 						ret = DC_GOBACK;
 					/* go to previous if possible */
 					break;
@@ -421,7 +421,7 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 			switch (pos)
 			{
 				case 0:
-					if (cangoback(ui))
+					if (can_go_back(ui))
 						ret = DC_GOBACK;
 					/* go to previous if possible */
 					break;
@@ -521,7 +521,7 @@ static int ncurses_go(struct frontend *obj)
 				switch (ret)
 				{
 				case DC_OK:
-					obj->db->question_set(obj->db, q);
+					obj->qdb->methods.set(obj->qdb, q);
 					break;
 				case DC_GOBACK:
 					if (qlast != 0)
