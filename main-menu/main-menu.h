@@ -1,6 +1,4 @@
 #define BUFSIZE		4096
-/* This should be set to 5 or so, set high because status_read is buggy. */
-#define PACKAGECHUNK	100
 #define STATUSFILE	"./status"
 
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
@@ -16,3 +14,4 @@ struct package_t {
 };
 
 struct package_t *status_read(void);
+int package_compare (const void *, const void *);
