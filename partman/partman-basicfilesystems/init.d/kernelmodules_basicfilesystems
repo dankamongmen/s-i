@@ -2,6 +2,14 @@
 
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 
+cat /proc/modules | 
+while read module_name x; do
+    if [ "$module_name" = vfat ]; then
+	>/var/lib/partman/vfat
+	exit 0
+    fi
+done
+
 if modprobe vfat; then
     >/var/lib/partman/vfat
 fi
