@@ -32,8 +32,8 @@ binary-indep: build
 	dh_compress -i
 	dh_fixperms -i
 	dh_installdeb -i
-	dh_di_gencontrol -i --udeb
-	dh_di_builddeb -i --udeb
+	dh_di_gencontrol -i
+	dh_di_builddeb -i
 
 binary-arch: build
 	dh_testdir
@@ -48,8 +48,8 @@ binary-arch: build
 ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 	dh_strip -a
 endif
-	dh_di_gencontrol -a --udeb
-	dh_di_builddeb -a --udeb
+	dh_di_gencontrol -a
+	dh_di_builddeb -a
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary
