@@ -33,7 +33,7 @@ install-ethdetect: ethdetect.sh
 	$(INSTALL) ethdetect.sh $(bindir)/ethdetect
 
 	$(INSTALL) -d $(DESTDIR)/usr/lib/prebaseconfig.d
-	$(INSTALL_SCRIPT) prebaseconfig \
+	$(INSTALL) prebaseconfig \
 		$(DESTDIR)/usr/lib/prebaseconfig.d/40ethdetect
 
 install-archdetect: archdetect
