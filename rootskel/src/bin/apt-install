@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 log=/var/log/messages
+queue=/var/lib/apt-install/queue
 
 # The C.UTF-8 locale is not usable inside /target/.  Unset it here to avoid
 # warnings like 'perl: warning: Setting locale failed.'.
@@ -10,10 +11,10 @@ fi
 
 # Add to list of extra packages (to be) installed into /target/.
 mkdir -p /var/lib/apt-install
-touch /var/lib/apt-install/queue
+touch $queue
 for pkg in $@ ; do
-    if ! grep -q "^$pkg$" /var/lib/apt-install/queue; then
-        echo "$pkg" >> /var/lib/apt-install/queue
+    if ! grep -q "^$pkg$" $queue; then
+        echo "$pkg" >> $queue
     fi
 done
 
@@ -24,7 +25,7 @@ if [ ! -f /target/etc/apt/sources.list ] ; then
 fi
 
 # Try to enable proxy when using HTTP.  What about using ftp_proxy for
-# FTP sources?  (This code is in both apt-update and apt-install)
+# FTP sources?  (This code is in both apt-install and base-installer)
 RET=`debconf-get mirror/protocol || true`
 if [ "http" = "$RET" ]; then
     # try to find http proxy
@@ -46,7 +47,7 @@ unset DEBCONF_FRONTEND
 unset DEBCONF_REDIR
 
 # first copy the files into /target/, then install in chroot
-# environment.  This work around a bug in glibc, and make sure the
+# environment. This works around a bug in glibc, and make sure the
 # packages run their postinst script in their target environment.
 
 PATH=$PATH:/target/usr/bin:/target/bin:/target/usr/sbin:/target/sbin \
