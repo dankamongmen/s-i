@@ -11,7 +11,7 @@ if [ -x /sbin/depmod ]; then
 fi
 
 is_not_loaded() {
-	! (cut -d" " -f1 /proc/modules | grep -q "^$1\$")
+	! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
 }
 
 load_module() {

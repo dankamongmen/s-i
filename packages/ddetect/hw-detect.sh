@@ -28,7 +28,7 @@ log () {
 }
 
 is_not_loaded() {
-	! (cut -d" " -f1 /proc/modules | grep -q "^$1\$")
+       ! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
 }
 
 # The list can be delimited with spaces or spaces and commas.
