@@ -115,7 +115,8 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
 #endif
 
       value_begin = field_end + 1;
-      while (value_begin < end && isspace (*++value_begin));
+      while (value_begin < end && (*value_begin == ' ' || *value_begin == '\t'))
+        value_begin++;
       readsize = end - field_begin < READSIZE ? end - field_begin : READSIZE;
       value_end = memchr (field_begin, '\n', readsize);
       if (!value_end)
