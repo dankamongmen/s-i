@@ -78,8 +78,11 @@ install: build
 		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf/usr \
 		etcdir=$(shell pwd)/debian/cdebconf/etc )
 
-	dh_movefiles -pcdebconf-dev --sourcedir=debian/cdebconf \
+	dh_movefiles -plibcdebconf-dev --sourcedir=debian/cdebconf \
 		usr/lib/*.so usr/include/cdebconf
+	dh_movefiles -plibcdebconf0 --sourcedir=debian/cdebconf \
+		usr/lib/*.so*
+
 	rm -rf debian/cdebconf/usr/include
 
 # Build architecture-independent files here.
@@ -96,6 +99,19 @@ cdebconf: install
 	dh_testdir
 	dh_testroot
 	dh_installdirs
+
+	dh_installdocs		-plib$@0
+	dh_installchangelogs	-plib$@0
+	dh_makeshlibs		-plib$@0
+	#dh_strip		-plib$@0
+	dh_compress		-plib$@0
+	dh_fixperms		-plib$@0
+	dh_installdeb		-plib$@0
+	#dh_shlibdeps		-plib$@0
+	dh_gencontrol		-plib$@0
+	dh_md5sums		-plib$@0
+	dh_builddeb		-plib$@0
+
 	dh_installdocs		-p$@ doc/*
 	dh_installchangelogs	-p$@
 	dh_strip		-p$@
@@ -103,21 +119,22 @@ cdebconf: install
 	dh_fixperms		-p$@
 	dh_makeshlibs		-p$@
 	dh_installdeb		-p$@
-	dh_shlibdeps		-p$@ -ldebian/$@/usr/lib
+	dh_shlibdeps -p$@ -ldebian/lib$@0/usr/lib
 	dh_gencontrol		-p$@
 	dh_md5sums		-p$@
 	dh_builddeb		-p$@
 
-	dh_installdocs		-p$@-dev
-	dh_installchangelogs	-p$@-dev
-	#dh_strip		-p$@-dev
-	dh_compress		-p$@-dev
-	dh_fixperms		-p$@-dev
-	dh_installdeb		-p$@-dev
-	#dh_shlibdeps		-p$@-dev
-	dh_gencontrol		-p$@-dev
-	dh_md5sums		-p$@-dev
-	dh_builddeb		-p$@-dev
+	dh_installdocs		-plib$@-dev
+	dh_installchangelogs	-plib$@-dev
+	#dh_strip		-plib$@-dev
+	dh_compress		-plib$@-dev
+	dh_fixperms		-plib$@-dev
+	dh_installdeb		-plib$@-dev
+	#dh_shlibdeps		-plib$@-dev
+	dh_gencontrol		-plib$@-dev
+	dh_md5sums		-plib$@-dev
+	dh_builddeb		-plib$@-dev
+
 
 cdebconf-udeb: install-udeb
 	@echo "Building $@"
@@ -128,7 +145,7 @@ cdebconf-udeb: install-udeb
 	dh_compress		-p$@
 	dh_fixperms		-p$@
 	dh_installdeb		-p$@
-	dh_shlibdeps		-p$@ -ldebian/$@/usr/lib
+	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
 	# Don't write your stupid guesses to debian/files.
 	dh_gencontrol 		-p$@ -- -fdebian/files~
 	# Register file manually.

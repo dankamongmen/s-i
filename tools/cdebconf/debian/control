@@ -19,10 +19,13 @@ Description: Debian Configuration Management System (C-implementation)
  Installing this package is rather dangerous now. It will break debconf.
  You have been warned!
 
-Package: cdebconf-dev
+Package: libcdebconf-dev
 Architecture: all
 Section: devel
-Depends: cdebconf (= ${Source-Version})
+Depends: libcdebconf0 (= ${Source-Version})
+Conflicts: cdebconf-dev
+Provides: cdebconf-dev
+Replaces: cdebconf-dev
 Description: Development files for cdebconf
  Debconf is a configuration management system for Debian packages. It is
  used by some packages to prompt you for information before they are
@@ -44,3 +47,15 @@ Description: Debian Configuration Management System (C-implementation)
  .
  cdebconf-udeb is a minimal cdebconf package used by the 
  debian-installer
+
+Package: libcdebconf0
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}
+Description: Debian Configuration Management System (C-implementation)
+ Debconf is a configuration management system for Debian packages. It is
+ used by some packages to prompt you for information before they are
+ installed. This is a reimplementation of the original debconf version
+ in C.
+ .
+ This is the libraries needed by cdebconf-dev and cdebconf.
