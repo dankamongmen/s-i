@@ -1,4 +1,4 @@
-ddetect (0.46) UNRELEASED; urgency=low
+ddetect (0.46) unstable; urgency=low
 
   * Claus Hindsgaul
     - Update da (Danish) translation.
@@ -13,8 +13,26 @@ ddetect (0.46) UNRELEASED; urgency=low
       substrings. (Closes: #215453)
     - Try to load ide-floppy as well, as some platforms need it,
       and I am not sure how to probe for it. (Closes: #215455)
+  * Joey Hess
+    - Load all the PCI IDE drivers before ide-detect, to fix DMA
+      issues on some systems. Closes: #215442
+    - Remove the hard-coded list of modules from ethdetect, instead search
+      for all net drivers and put them in the list, which is not 100% right
+      but still much better.
+    - Remove the confusing question about manually specifying the module to
+      load. Anyone who knows where a non-modprobe-able module is can use the
+      shell..
+    - Remove redundant ethdetect/title template, and unused
+      ethdetect/module_prompt template.
+    - hw-detect: collect any modprobe failures, and show them all in one
+      screen at the end. Closes: #215163
+    - hw-detect: Say "Loading module", not "Detected module", as not all
+      the loaded modules were detected.
+    - ethdetect: Loop if manual loading does not work, to let the user try
+      several modules. Add error if ethernet card is not found.
+    - Add myself to uploaders, at least temporarily.
 
- -- Andre Luis Lopes <andrelop@debian.org>  Sun, 12 Oct 2003 18:31:48 -0200
+ -- Joey Hess <joeyh@debian.org>  Wed, 15 Oct 2003 12:35:13 -0400
 
 ddetect (0.45) unstable; urgency=low
 
