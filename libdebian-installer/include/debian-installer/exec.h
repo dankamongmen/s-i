@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.h,v 1.10 2004/01/06 15:24:53 waldi Exp $
+ * $Id: exec.h,v 1.11 2004/02/24 00:45:54 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__EXEC_H
@@ -58,7 +58,7 @@ di_process_handler
  *
  * @param path executable with path
  * @param argv NULL-terminated area of char pointer
- * @param stdout_handler di_io_handler which gets stdout
+ * @param stdout_handler di_io_handler which gets stdout (and to stderr if stderr_handler is NULL)
  * @param stderr_handler di_io_handler which gets stderr
  * @param io_user_data user_data for di_io_handler
  * @param parent_prepare_handler di_process_handler which is called after the fork in the parent
@@ -120,7 +120,7 @@ static inline int di_exec_shell (const char *const cmd)
  */
 inline static int di_exec_shell_log (const char *const cmd)
 {
-  return di_exec_shell_full (cmd, di_exec_io_log, di_exec_io_log, NULL, NULL, NULL, NULL, NULL);
+  return di_exec_shell_full (cmd, di_exec_io_log, NULL, NULL, NULL, NULL, NULL, NULL);
 }
 
 /**

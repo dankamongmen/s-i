@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.11 2004/01/06 15:24:52 waldi Exp $
+ * $Id: exec.c,v 1.12 2004/02/24 00:45:54 waldi Exp $
  */
 
 #include <config.h>
@@ -42,36 +42,67 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
 {
   char line[MAXLINE];
   pid_t pid;
-  int pipeout[2], pipeerr[2];
+  int fds[4] = { -1, }, mode = 0, pipes = 0, i;
 
-  pipe (pipeout);
-  pipe (pipeerr);
+  if (stdout_handler)
+  {
+    mode += 1;
+    pipes++;
+  }
+  if (stderr_handler)
+  {
+    mode += 2;
+    pipes++;
+  }
+
+  for (i = 0; i < pipes; i++)
+    pipe (&fds[i * 2]);
 
   pid = fork ();
 
-  if (pid == 0)
-  {
-    dup2 (pipeout[1], 1);
-    dup2 (pipeerr[1], 2);
-  }
   if (pid <= 0)
   {
-    close (pipeout[0]);
-    close (pipeerr[0]);
+    for (i = 0; i < pipes; i++)
+      close (fds[i * 2]);
   }
-  close (pipeout[1]);
-  close (pipeerr[1]);
 
   if (pid == 0)
   {
-#if 0
-    int i;
+    int temp, realfds[3] =
+    {
+      0,
+      fds[1],
+      fds[3]
+    };
 
-    i = open ("/dev/null", O_RDONLY);
-    dup2 (i, 0);
-    close (i);
-#endif
+    temp = open ("/dev/null", O_RDWR);
 
+    switch (mode)
+    {
+      case 0:
+        realfds[1] = temp;
+        realfds[2] = temp;
+        break;
+      case 2:
+        realfds[1] = temp;
+        realfds[2] = fds[1];
+        break;
+      case 1:
+        realfds[2] = fds[1];
+        break;
+    }
+
+    for (i = 1; i <= 2; i++)
+      dup2 (realfds[i], i);
+
+    close (temp);
+  }
+
+  for (i = 0; i < pipes; i++)
+    close (fds[i * 2 + 1]);
+
+  if (pid == 0)
+  {
     if (child_prepare_handler)
       if (child_prepare_handler (pid, child_prepare_user_data))
         exit (255);
@@ -86,43 +117,47 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
   }
   else
   {
-    int i, status = -1;
-    struct pollfd fds[2] =
-    {
-      { pipeout[0], POLLIN, 0 },
-      { pipeerr[0], POLLIN, 0 },
-    };
+    int status = -1;
+    struct pollfd pollfds[pipes];
     struct files
     {
       FILE *file;
       di_io_handler *handler;
     }
-    files[] =
+    files[pipes];
+
+    for (i = 0; i < pipes; i++)
     {
-      { fdopen (pipeout[0], "r"), stdout_handler },
-      { fdopen (pipeerr[0], "r"), stderr_handler },
-    };
+      fcntl (fds[i * 2], F_SETFL, O_NONBLOCK);
+      files[i].file = fdopen (fds[i * 2], "r");
+      pollfds[i].fd = fds[i * 2];
+      pollfds[i].events = POLLIN;
+    }
 
-    fcntl (pipeout[0], F_SETFL, O_NONBLOCK);
-    fcntl (pipeerr[0], F_SETFL, O_NONBLOCK);
-
-    if (parent_prepare_handler)
-      if (parent_prepare_handler (pid, parent_prepare_user_data))
-      {
-        kill (pid, 9);
-        goto cleanup;
-      }
-
-    while (poll (fds, 2, -1) >= 0)
+    switch (mode)
     {
-      int exit = 0;
+      case 2:
+        files[0].handler = stderr_handler;
+        break;
+      case 3:
+        files[1].handler = stderr_handler;
+      case 1:
+        files[0].handler = stdout_handler;
+        break;
+    }
 
-      for (i = 0; i < 2; i++)
+    if (parent_prepare_handler && parent_prepare_handler (pid, parent_prepare_user_data))
+      kill (pid, 9);
+    else if (pipes)
+      while (poll (pollfds, pipes, -1) >= 0)
       {
-        if (fds[i].revents & POLLIN)
+        bool exit = false;
+
+        for (i = 0; i < pipes; i++)
         {
-          while (fgets (line, sizeof (line), files[i].file) != NULL)
-            if (files[i].handler)
+          if (pollfds[i].revents & POLLIN)
+          {
+            while (fgets (line, sizeof (line), files[i].file) != NULL)
             {
               size_t len = strlen (line);
               if (line[len - 1] == '\n')
@@ -132,27 +167,26 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
               }
               files[i].handler (line, len, io_user_data);
             }
-          exit = 1;
+            exit = true;
+          }
         }
+
+        if (exit)
+          continue;
+
+        for (i = 0; i < pipes; i++)
+          if (pollfds[i].revents & POLLHUP)
+            exit = true;
+
+        if (exit)
+          break;
       }
-
-      if (exit)
-        continue;
-
-      for (i = 0; i < 2; i++)
-        if (fds[i].revents & POLLHUP)
-          exit = 1;
-
-      if (exit)
-        break;
-    }
 
     if (!waitpid (pid, &status, 0))
       return -1;
 
-cleanup:
-    fclose (files[0].file); /* closes pipeout[0] */
-    fclose (files[1].file); /* closes pipeerr[0] */
+    for (i = 0; i < pipes; i++)
+      fclose (files[i].file); /* closes fds[i * 2] */
 
     return status;
   }
