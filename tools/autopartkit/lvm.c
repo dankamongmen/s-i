@@ -213,6 +213,32 @@ lvm_create_logicalvolume(const char *vgname, const char *lvname,
         return NULL;
 }
 
+/* Extract vgname, lvname and fstype from "lvm:tjener_vg:home0_lv:default". */
+int
+lvm_split_fstype(const char *str, int separator, int elemcount,
+		 char *elements[])
+{
+    int elemnum;
+    const char *curp = str;
+    const char *nextp;
+
+    for (elemnum = 0 ; elemnum < elemcount; elemnum++)
+    {
+	nextp = strchr(curp, separator);
+	if (NULL == nextp)  /* Last element */
+	  {
+	    elements[elemnum] = strdup(curp);
+	    autopartkit_log(1, "Found last '%s'\n", elements[elemnum]);
+	    return 0;
+	  }
+	elements[elemnum] = strndup(curp, nextp - curp);
+	autopartkit_log(1, "Found '%s'\n", elements[elemnum]);
+	curp = nextp + 1;
+    }
+    
+    return 0;
+}
+
 /* LVM stack operations */
 struct lvm_pv_info {
     struct lvm_pv_info *next;
@@ -320,7 +346,7 @@ lvm_lv_stack_isempty(void *stack)
 }
 int
 lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
-		  unsigned int mbsize)
+		  const char *fstype, unsigned int mbsize)
 {
     struct lvm_lv_info *head = stack;
     struct lvm_lv_info *elem;
@@ -338,7 +364,8 @@ lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
     return 0;
 }
 int
-lvm_lv_stack_pop(void *stack, char **vgname, char **lvname, unsigned int *mbsize)
+lvm_lv_stack_pop(void *stack, char **vgname, char **lvname, char **fstype,
+		 unsigned int *mbsize)
 {
     struct lvm_lv_info *head = stack;
     struct lvm_lv_info *elem;

@@ -908,29 +908,6 @@ zero_dev(const char *devpath, unsigned int length)
     return 0;
 }
 
-/* Extract vgname, lvname and fstype from "lvm:tjener_vg:home0_lv:default". */
-static int
-split_string(const char *str, int separator, int elemcount, char *elements[])
-{
-    int elemnum;
-    const char *curp = str;
-    const char *nextp;
-
-    for (elemnum = 0 ; elemnum < elemcount; elemnum++)
-    {
-	nextp = strchr(curp, separator);
-	if (NULL == nextp)  /* Last element */
-	  {
-	    elements[elemnum] = strdup(curp);
-	    return -1;
-	  }
-	elements[elemnum] = strndup(curp, nextp - curp);
-	curp = nextp + 1;
-    }
-    
-    return 0;
-}
-
 /*
  * Create all the partitions on the disk
  *
@@ -1032,13 +1009,16 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
 	        /* Extract vgname, lvname and fstype from
 		   "lvm:tjener_vg:home0_lv:default". */
-		if (0 != split_string(req_tmp->fstype, ':', 4, info))
-		    autopartkit_log(0, "Failed to parse '%s'\n",
+		if (0 != lvm_split_fstype(req_tmp->fstype, ':', 4, info))
+		    autopartkit_log(0, "  Failed to parse '%s'\n",
 				    req_tmp->fstype);
 		else
 		{
+		    autopartkit_log("  Stacking LVM lv %s on vg %s "
+				    "fstype %s\n", info[1], info[2], info[3]);
 		    /* Store vgname, lvname and size in stack */
-		    lvm_lv_stack_push(lvm_lv_stack, info[1], info[2], mbsize);
+		    lvm_lv_stack_push(lvm_lv_stack, info[1], info[2], info[3],
+				      mbsize);
 		}
 	    }
 	    else
@@ -1225,6 +1205,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
 #if defined(LVM_HACK)
     /* Initialize LVM partitions and volumes, if the LVM tools are available */
+    autopartkit_log(1, "Initializing LVM.\n");
+    
     while ( ! lvm_pv_stack_isempty(lvm_pv_stack) )
     {
         char *vgname;
@@ -1236,7 +1218,9 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
         {
             autopartkit_log(1, "  lvm_init_dev(%s) successful.\n", devpath);
             lvm_volumegroup_add_dev(vgname, devpath);
-        }
+	}
+	else
+            autopartkit_log(1, "  lvm_init_dev(%s) failed.\n", devpath);
         free(vgname);
         free(devpath);
     }
@@ -1245,18 +1229,22 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     {
         char *vgname;
         char *lvname;
+	char *fstype;
         unsigned int mbsize;
         char *devpath;
 
-        lvm_lv_stack_pop(lvm_lv_stack, &vgname, &lvname, &mbsize);
+        lvm_lv_stack_pop(lvm_lv_stack, &vgname, &lvname, &fstype, &mbsize);
 
 	autopartkit_log(1, "  Init LVM lv on vg=%s, lvname=%s mbsize=%ud\n",
 			vgname, lvname, mbsize);
 
         /* Create lv, using minimum size (?) */
         devpath = lvm_create_logicalvolume(vgname, lvname, mbsize);
-
-        autopartkit_log(1, " LVM lv created ok, devpath=%s\n", devpath);
+	if (NULL == devpath)
+	    autopartkit_log(1, " LVM lv creation failed\n");
+	else
+	{
+	    autopartkit_log(1, " LVM lv created ok, devpath=%s\n", devpath);
 
         /* Create filesystem */
         /*
@@ -1282,6 +1270,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                                     devpath);
             }
         }
+	}
     }
     lvm_lv_stack_delete(lvm_lv_stack);
     lvm_pv_stack_delete(lvm_pv_stack);
