@@ -52,38 +52,40 @@
 int
 di_prebaseconfig_append(const char *udeb, const char *fmt, ...)
 {
-        char *path = NULL;
-        FILE *fp = NULL;
-        int rv = -1;
-        va_list ap;
-        time_t t;
-
-        if (asprintf (&path, PREBASECONFIG_D "/%s", udeb) == -1) {
-                perror ("di_prebaseconfig_append: asprintf");
-                goto finished;
-        }
-        
-        if ( (fp = fopen (path, "a")) == NULL) {
-                perror ("di_prebaseconfig_append: fopen");
-                goto finished;
-        }
-
-        time(&t);
-        fprintf(fp, "\n# start entry %s\n", ctime(&t));
-
-        va_start(ap, fmt);
-        fprintf(fp, fmt, ap);
-        va_end(ap);
-        
-        fprintf(fp, "\n# end entry\n");
-
-        rv = 0;
-
+  char *path = NULL;
+  FILE *fp = NULL;
+  int rv = -1;
+  va_list ap;
+  time_t t;
+  
+  if (asprintf (&path, PREBASECONFIG_D "/%s", udeb) == -1) 
+   {
+    perror ("di_prebaseconfig_append: asprintf");
+    goto finished;
+   }
+  
+  if ( (fp = fopen (path, "a")) == NULL) 
+   {
+    perror ("di_prebaseconfig_append: fopen");
+    goto finished;
+   }
+  
+  time(&t);
+  fprintf(fp, "\n# start entry %s\n", ctime(&t));
+  
+  va_start(ap, fmt);
+  fprintf(fp, fmt, ap);
+  va_end(ap);
+  
+  fprintf(fp, "\n# end entry\n");
+  
+  rv = 0;
+  
 finished:
-       free(path);
-       if (fp)
-               fclose(fp);
-       return rv;
+  free(path);
+  if (fp)
+    fclose(fp);
+  return rv;
 }
 
 #endif /* L__di_prebaseconfig_append__ */
@@ -123,7 +125,7 @@ di_execlog (const char *incmd)
 #ifdef L__di_log__
 
 void
-di_log(char *msg){
+di_log(const char *msg){
     openlog ("installer", LOG_PID | LOG_PERROR, LOG_USER);
     syslog (LOG_DEBUG, "%s", msg);
     closelog ();
