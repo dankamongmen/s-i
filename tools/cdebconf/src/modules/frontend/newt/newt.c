@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.47 2004/03/04 00:32:41 barbier Exp $
+ * $Id: newt.c,v 1.48 2004/03/04 09:44:09 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -349,7 +349,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
 {
     newtComponent form, textbox, bOk, bCancel, entry, cRet;
     int width = 80, height = 24, t_height, t_width, win_width, win_height;
-    int t_width_title, t_width_buttons;
+    int t_width_scroll = 0, t_width_buttons;
     int ret;
 #ifdef HAVE_LIBTEXTWRAP
     int tflags = 0;
@@ -381,20 +381,18 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     else {
         win_height = height - 5;
         tflags |= NEWT_FLAG_SCROLL;
+        t_width_scroll = 2;
     }
     t_height = win_height - 6;
     t_width = get_text_width(full_description);
-    t_width_title = get_text_width(obj->title) + 5;
-    if (t_width_title > t_width)
-        t_width = t_width_title;
     t_width_buttons = 2*BUTTON_PADDING + get_text_width(continue_text(obj)) + 2;
     if (obj->methods.can_go_back(obj, q))
         //  Add an interspace
         t_width_buttons += get_text_width(goback_text(obj)) + 3;
     if (t_width_buttons > t_width)
         t_width = t_width_buttons;
-    if (win_width > t_width + 2*TEXT_PADDING)
-        win_width = t_width + 2*TEXT_PADDING;
+    if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
+        win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
     create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, tflags);
@@ -713,7 +711,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     newtComponent form, bYes, bNo, bCancel, textbox, cRet;
     int width = 80, height = 24;
     int win_width, win_height = -1, t_height, t_width;
-    int t_width_buttons;
+    int t_width_scroll = 0, t_width_buttons;
     int ret;
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
@@ -742,6 +740,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     else {
         win_height = height-5;
         flags |= NEWT_FLAG_SCROLL;
+        t_width_scroll = 2;
     }
     t_height = win_height - 4;
     t_width = get_text_width(full_description);
@@ -754,8 +753,8 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
         t_width_buttons += get_text_width(goback_text(obj)) + 3;
     if (t_width_buttons > t_width)
         t_width = t_width_buttons;
-    if (win_width > t_width + 2*TEXT_PADDING + 2)
-        win_width = t_width + 2*TEXT_PADDING + 2;
+    if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
+        win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
     create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, flags);
