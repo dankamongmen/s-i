@@ -10,8 +10,6 @@
 #include <cdebconf/debconfclient.h>
 #include <parted/parted.h>
 
-#define MEGABYTE (1024 * 1024)
-#define MEGABYTE_SECTORS (MEGABYTE / 512)
 #define MAX_DISKS 128
 
 #define FDISK_PATH "/usr/share/partitioner"
@@ -19,9 +17,9 @@
 static struct debconfclient *debconf;
 
 static PedExceptionOption my_exception_handler(PedException* ex) {
-	if (ex->type < PED_EXCEPTION_ERROR) {
+	if (ex->options | PED_EXCEPTION_IGNORE ||
+	    ex->type < PED_EXCEPTION_ERROR)
 		return PED_EXCEPTION_IGNORE;
-	}
 
 	return PED_EXCEPTION_CANCEL;
 }
@@ -79,9 +77,9 @@ static char *build_choice(PedDevice *dev) {
 	char *string = NULL;
 	int i;
 
-	asprintf(&string, "%s (%s/ %.0fMB)",
+	asprintf(&string, "%s (%s/ %.0fMiB)",
 		dev->path, dev->model,
-		(dev->length-1)*1.0/MEGABYTE_SECTORS);
+		dev->length * 1.0 * dev->sector_size / (1024*1024));
 
 	/* remove ",", this will confuse debconf */
 	for(i=0; string[i]; i++) {
