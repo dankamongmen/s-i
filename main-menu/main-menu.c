@@ -363,8 +363,14 @@ config_package(struct package_t *p) {
         if (ret == 0) {
             p->status = installed;
 	    check_special(p);
-        } else
+        } else {
+            char buf[256];
+            snprintf(buf, sizeof(buf),
+                     "Configuring '%s' failed with error code %d",
+                     p->package, ret);
+            di_log(buf);
             p->status = half_configured;
+	}
 	return !ret;
 }
 
@@ -375,9 +381,17 @@ int do_menu_item(struct package_t *p) {
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
 		asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package);
-		ret = !SYSTEM(configcommand);
+                ret = SYSTEM(configcommand);
 		free(configcommand);
 		check_special(p);
+                if (ret) {
+                    char buf[256];
+                    snprintf(buf, sizeof(buf),
+                             "Reconfiguring '%s' failed with error code %d",
+                             p->package, ret);
+                    di_log(buf);
+                }
+                ret = !ret;
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
 		ret = config_package(p);
@@ -447,13 +461,10 @@ int main (int argc, char **argv) {
 
 	packages = status_read();
 	while ((p=show_main_menu(packages))) {
-		int retval;
-		retval = do_menu_item(p);
-		if (!retval) {
+		if (!do_menu_item(p)) {
 			char buf[256];
 			snprintf(buf, sizeof(buf),
-				"Menu item '%s' failed with value %d.",
-				 p->package, retval);
+				"Menu item '%s' failed.", p->package);
 			di_log(buf);
 			/* Something went wrong.  Lower debconf
 			   priority limit to try to give the user more
