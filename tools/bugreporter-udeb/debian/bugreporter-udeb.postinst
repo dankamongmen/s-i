@@ -22,13 +22,43 @@ copy_cdebconf_db /var/log/cdebconf-copy
 
 /bin/package-versions > /var/log/package-versions
 
-di_input important bugreporter-udeb/insert_floppy || [ $? -eq 30 ]
-di_go
+db_input important bugreporter-udeb/insert_floppy || [ $? -eq 30 ]
+db_go
 
-# mount floppy
-modprobe floppy
+# Mostly copied from floppy-retriever. [pere 2004-03-13]
+mountfloppy() {
+	if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
+		# This is a good reasonable default, but will fail for
+		# USB floppys.
+		FLOPPYDEV=/dev/floppy/0
+		
+		if [ ! -e $FLOPPYDEV ]; then
+			modprobe floppy >> /var/log/messages 2>&1 || true
+		fi
+	
+		if ! grep -q ^vfat /proc/modules ; then
+			modprobe vfat >> /var/log/messages 2>&1 || true
+		fi
+
+		if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
+			# Cannot find a device, or found the wrong device.
+			# Ask for help from the user and try it again.
+			#FLOPPYDEV=$(ask_dev)
+			#mount $FLOPPYDEV -tauto $FLOPPYMNT
+		        false
+		fi
+	fi
+	true
+}
+
 test -d /floppy || mkdir /floppy
-mount /dev/floppy/0 /floppy
+if mountfloppy ; then
+    :
+else
+    db_input important bugreporter-udeb/no_floppy || [ $? -eq 30 ]
+    db_go
+    exit 1
+fi
 
 # make tarball with logs and stuff
 # This fail because busybox tar is not compiled with creation support
