@@ -23,12 +23,12 @@ int main(int argc, char **argv) {
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/hostname", NULL);
 	hostname=strdup(debconf->value);
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/directory", NULL);
-	directory=debconf->value;
+	directory=strdup(debconf->value);
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/proxy", NULL);
-	if (strcmp(debconf->value,"") == 0)
+	if (debconf->value && strcmp(debconf->value,"") != 0) {
 		if (setenv("http_proxy", debconf->value, 1) == -1)
 			exit(1);
-	
+	}
 	src=argv[1];
 	/*
 	 * Intercept requests for a Packages file, and
