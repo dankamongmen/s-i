@@ -1,0 +1,60 @@
+#!/bin/sh
+set -e
+
+if [ -f /etc/mtab ]; then
+    MTAB=/etc/mtab
+else
+    MTAB=/proc/mounts
+fi
+
+# detect which is the root partition: /target
+# ugh, I wanted to use awk, but sed has better chance of being in busybox
+rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
+
+# detect which hard drive has /target/boot mounted on it. this does *not*
+# have to be the same as the drive /target is mounted on.
+defaultbootdev=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
+
+if [ "$defaultbootdev" = '' ]; then
+	defaultbootdev=$rootfs
+fi
+
+defaultbootdev=`/target/bin/echo $defaultbootdev | /target/bin/sed 's/[0-9]+$//'` 
+
+FIXME: this approach to findin the boot device is wrong for ia64, we need
+FIXME: something more like yaboot's disk chooser!    bdale
+
+if [ "$defaultbootdev" = '' ]; then
+	defaultbootdev='/dev/hda'
+fi
+
+. /usr/share/debconf/confmodule
+db_subst elilo-installer/bootdev bootdev "$defaultbootdev"
+db_input high elilo-installer/bootdev || true
+db_go || true
+
+db_get elilo-installer/bootdev
+bootdev=$RET
+
+if [ "$bootdev" = '' ]; then
+	bootdev=$defaultbootdev
+fi
+
+bootdev=`mapdevfs $bootdev`
+rootfs=`mapdevfs $rootfs`
+
+#write out elilo.conf
+
+	# this can be done with elilo --autoconf, right?
+
+#/target/bin/echo "boot=$bootdev" > /target/etc/lilo.conf
+#/target/bin/echo "root=$rootfs" >> /target/etc/lilo.conf
+#/target/bin/echo 'install=/boot/boot.b' >> /target/etc/lilo.conf
+#/target/bin/echo 'map=/boot/map' >> /target/etc/lilo.conf
+#/target/bin/echo 'image=/vmlinuz' >> /target/etc/lilo.conf
+#/target/bin/echo '	label=Linux' >> /target/etc/lilo.conf
+#if [ -L /target/initrd.img -o -f /target/initrd.img ]; then
+#/target/bin/echo '	initrd=/initrd.img' >> /target/etc/lilo.conf
+#fi
+
+chroot /target /usr/sbin/elilo
