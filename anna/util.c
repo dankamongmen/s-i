@@ -162,22 +162,26 @@ try_get_Packages_file(const char *ext, const char *suite)
     ret = system(command);
     free(command);
     if (ret != 0) {
+	/* For retreivers that do not implement the packages command,
+	 * fall back to doing a retrieve with a path to the Packages file
+	 * as it is on the mirror. */
         static struct debconfclient *debconf = NULL;
         char *dist, *file;
 
         if (debconf == NULL)
             debconf = debconfclient_new();
-        debconf->command(debconf, "GET", "mirror/distribution", NULL);
-        dist = debconf->value;
-        if (asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
-                dist, suite, ARCH, ext) == -1)
-            return 0;
-        if (asprintf(&command, "%s retrieve %s " DOWNLOAD_DIR "/Packages%s",
-                retriever, file, ext) == -1)
-            return 0;
-        free(file);
-        ret = system(command);
-        free(command);
+	if (debconf->command(debconf, "GET", "mirror/distribution", NULL) == 0) {
+        	dist = debconf->value;
+        	if (asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
+	                dist, suite, ARCH, ext) == -1)
+	            return 0;
+	        if (asprintf(&command, "%s retrieve %s " DOWNLOAD_DIR "/Packages%s",
+	                retriever, file, ext) == -1)
+	            return 0;
+	        free(file);
+	        ret = system(command);
+	        free(command);
+	}
     }
     return !ret;
 }
