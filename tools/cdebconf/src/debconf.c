@@ -117,10 +117,12 @@ int main(int argc, char **argv)
 	/* initialize database and frontend modules */
 	if ((templates = template_db_new(config, NULL)) == 0)
         	DIE("Cannot initialize debconf template database");
-    	templates->methods.load(templates);
+    	if (templates->methods.load(templates) != DC_OK)
+        	DIE("Cannot initialize debconf template database");
 	if ((questions = question_db_new(config, templates, NULL)) == 0)
 		DIE("Cannot initialize debconf configuration database");
-	questions->methods.load(questions);
+	if (questions->methods.load(questions) != DC_OK)
+		DIE("Cannot initialize debconf configuration database");
 	if ((frontend = frontend_new(config, templates, questions)) == 0)
 		DIE("Cannot initialize debconf frontend");
 	/* set title */
