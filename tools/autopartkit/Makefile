@@ -1,6 +1,4 @@
 
-#INCS=-I../cdebconf/src/
-#LDOPTS=-L../cdebconf/src -ldebconf -lparted
 LDOPTS=-ldebconf -lparted
 PREFIX=$(DESTDIR)/usr/
 CFLAGS=-Wall -Os -fomit-frame-pointer
@@ -15,7 +13,7 @@ install:
 	cp autopartkit debian/autopartkit.postinst
 
 autopartkit: autopartkit.c
-	$(CC) $(CFLAGS) autopartkit.c -o $@ $(INCS) $(LDOPTS)
+	$(CC) $(CFLAGS) autopartkit.c -o $@ $(LDOPTS)
 	$(STRIP) $@
 	size $@ 
 
