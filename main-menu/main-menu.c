@@ -89,7 +89,7 @@ int isdefault(struct package_t *p) {
 	struct stat statbuf;
 	int ret;
 
-	asprintf(&menutest, DPKGDIR "info/%s.menutest", p->package);
+	asprintf(&menutest, DPKGDIR "info/%s.menutest >/dev/null", p->package);
 	if (stat(menutest, &statbuf) == 0) {
 		ret = SYSTEM(menutest);
 		free(menutest);
