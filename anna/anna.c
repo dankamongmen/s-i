@@ -149,7 +149,7 @@ install_modules(void)
     struct linkedlist_t *tmplist;
     struct list_node *node;
     struct package_t *p;
-    char *f, *fp, *emsg, *dest_file;
+    char *f, *fp, *dest_file;
     int ret = 0, pkg_count = 0;
 
     debconf->command(debconf, "GET", ANNA_CHOOSE_MODULES, NULL);
@@ -208,23 +208,32 @@ install_modules(void)
             debconf->command(debconf, "SUBST", "anna/progress_step_inst", "PACKAGE", p->package, NULL);
             debconf->commandf(debconf, "PROGRESS STEP 1 anna/progress_step_retr");
             if (!get_package(p, dest_file)) {
-                asprintf(&emsg, "anna: error getting %s!\n", p->filename);
-                di_log(emsg);
-                free(emsg);
+                debconf->command(debconf, "PROGRESS STOP", NULL);
+                debconf->command(debconf, "SUBST", "anna/retrieve_failed", "PACKAGE", p->package, NULL);
+                debconf->command(debconf, "INPUT critical", "anna/retrieve_failed", NULL);
+                debconf->command(debconf, "GO", NULL);
+                free(dest_file);
                 ret = 6;
                 break;
             }
             if (!md5sum(p->md5sum, dest_file)) {
-                asprintf(&emsg, "anna: md5sum mismatch on %s!\n", p->filename);
-                di_log(emsg);
-                free(emsg);
+                debconf->command(debconf, "PROGRESS STOP", NULL);
+                debconf->command(debconf, "SUBST", "anna/md5sum_failed", "PACKAGE", p->package, NULL);
+                debconf->command(debconf, "INPUT critical", "anna/md5sum_failed", NULL);
+                debconf->command(debconf, "GO", NULL);
                 unlink(dest_file);
+                free(dest_file);
                 ret = 7;
                 break;
             }
             debconf->commandf(debconf, "PROGRESS STEP 1 anna/progress_step_inst");
             if (!unpack_package(dest_file)) {
+                debconf->command(debconf, "PROGRESS STOP", NULL);
+                debconf->command(debconf, "SUBST", "anna/install_failed", "PACKAGE", p->package, NULL);
+                debconf->command(debconf, "INPUT critical", "anna/install_failed", NULL);
+                debconf->command(debconf, "GO", NULL);
                 unlink(dest_file);
+                free(dest_file);
                 ret = 8;
                 break;
             }
