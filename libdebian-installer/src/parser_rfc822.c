@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser_rfc822.c,v 1.7 2003/11/13 21:28:57 waldi Exp $
+ * $Id: parser_rfc822.c,v 1.8 2004/01/06 15:36:50 waldi Exp $
  */
 
 #include <config.h>
@@ -30,6 +30,7 @@
 
 #include <ctype.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -115,15 +116,21 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
 
       value_begin = field_end + 1;
       while (value_begin < end && isspace (*++value_begin));
-      readsize = end - value_begin < READSIZE ? end - value_begin : READSIZE;
-      value_end = memchr (value_begin, '\n', readsize);
+      readsize = end - field_begin < READSIZE ? end - field_begin : READSIZE;
+      value_end = memchr (field_begin, '\n', readsize);
       if (!value_end)
       {
-        di_warning ("parser_rfc822: Iek! Don't find end of value");
+        di_warning ("parser_rfc822: Iek! Don't find end of value!");
+        return -1;
+      }
+      if (value_end < field_end)
+      {
+        di_warning ("parser_rfc822: Iek! Don't find end of field, it seems to be after the end of the line!");
         return -1;
       }
 
-      while (*(value_end + 1) == ' ' || *(value_end + 1) == '\t')
+      /* while (isblank (value_end[1])) FIXME: C99 */
+      while (value_end[1] == ' ' || value_end[1] == '\t')
       {
         readsize = end - value_end + 1 < READSIZE ? end - value_end + 1 : READSIZE;
         if ((value_end = memchr (value_end + 1, '\n', readsize)) == NULL)
@@ -142,7 +149,10 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
       fip = di_hash_table_lookup (info->table, &field_string);
 
       if (fip)
+      {
         fip->read (&act, fip, NULL, &value_string, user_data);
+        goto next;
+      }
 
 #if MODIFIER
       if (info->wildcard)
@@ -160,6 +170,8 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
         field_modifier_string.size = field_modifier_size;
 
         fip->read (&act, fip, &field_modifier_string, &value_string, user_data);
+
+        goto next;
       }
 #endif
 
@@ -203,22 +215,26 @@ int di_parser_rfc822_read_file (const char *file, di_parser_info *info, di_parse
 {
   struct stat statbuf;
   char *begin;
-  int fd, ret;
+  int fd, ret = -1;
 
   if ((fd = open (file, O_RDONLY)) < 0)
-    return -1;
+    return ret;
   if (fstat (fd, &statbuf))
-    return -1;
+    goto cleanup;
   if (!statbuf.st_size)
-    return 0;
+  {
+    ret = 0;
+    goto cleanup;
+  }
   if (!(begin = mmap (NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0)))
-    return -1;
+    goto cleanup;
   madvise (begin, statbuf.st_size, MADV_SEQUENTIAL);
 
-  if ((ret = di_parser_rfc822_read (begin, statbuf.st_size, info, entry_new, entry_finish, user_data)) < 0)
-    return -1;
+  ret = di_parser_rfc822_read (begin, statbuf.st_size, info, entry_new, entry_finish, user_data);
 
   munmap (begin, statbuf.st_size);
+
+cleanup:
   close (fd);
 
   return ret;
@@ -240,14 +256,17 @@ int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_pars
   void *act = NULL, *state_data = NULL;
   di_slist_node *node;
   FILE *f;
-  char tmpfile[1024] = { '\0' };
+  char tmpfile[PATH_MAX];
 
 
   if (!strncmp (file, "-", 1))
+  {
+    tmpfile[0] = '\0';
     f = stdout;
+  }
   else
   {
-    snprintf (tmpfile, 1024, "%s.tmp", file);
+    snprintf (tmpfile, sizeof (tmpfile), "%s.tmp", file);
     f = fopen (tmpfile, "w");
   }
 
@@ -268,7 +287,7 @@ int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_pars
       if (fip->write)
         fip->write (&act, fip, callback, f, user_data);
     }
-    fputs ("\n", f);
+    fputc ('\n', f);
   }
 
   if (*tmpfile)
@@ -280,5 +299,4 @@ int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_pars
 
   return nr;
 }
-
 
