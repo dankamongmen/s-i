@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.21 2001/02/10 10:17:42 bug1 Exp $ */
+/* $Id: status.c,v 1.22 2001/02/14 15:04:55 bug1 Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -231,9 +231,8 @@ int status_merge(void *status, struct package_t *pkgs)
 		 */
 		if (strstr(buf, "Package: ") == buf)
 		{
-			for (pkg = pkgs; pkg != 0 && strncmp(buf+9,
-					pkg->package, strlen(buf) - 9)!=0;
-			     pkg = pkg->next) ;
+			for (pkg = pkgs; pkg != 0 && strcmp(buf+9,
+				pkg->package)!=0; pkg = pkg->next) ;
 
 			locpkg.package = buf+9;
 			statpkg = tfind(&locpkg, &status, package_compare);
