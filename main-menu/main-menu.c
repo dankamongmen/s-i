@@ -212,7 +212,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 
 	/* Order menu so depended-upon packages come first. */
 	/* The menu number is really only used to break ties. */
-	list = di_packages_resolve_dependencies_array (packages, (di_package **) package_array, allocator);
+	list = di_system_packages_resolve_dependencies_array_permissive (packages, (di_package **) package_array, allocator);
 
 	/*
 	 * Generate list of menu choices for debconf.
@@ -269,7 +269,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 		 * (for example, leading whitespace in menu items can
 		 * be stripped and confuse the comparisons), or other
 		 * problem. */
-		di_log(DI_LOG_LEVEL_INFO, "Internal error! Cannot find \"%s\" in menu.", s);
+		di_log(DI_LOG_LEVEL_WARNING, "Internal error! Cannot find \"%s\" in menu.", s);
 	}
 	
 	free(language);
@@ -431,6 +431,8 @@ check_special(di_system_package *p)
 static void set_package_title(di_system_package *p) {
 	char *title;
 
+	if (!p->installer_menu_item)
+		return;
 	asprintf(&title, "debian-installer/%s/title", p->p.package);
 	if (debconf_settitle(debconf, title))
 		di_log(DI_LOG_LEVEL_WARNING, "Unable to set title for %s.", p->p.package);
