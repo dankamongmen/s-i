@@ -31,13 +31,18 @@ is_debian_iso () {
 	test -e /cdrom/.disk/info
 }
 
-# Set the distribution used by base-installer, test in priority order
 register_cd () {
+	# Set the distribution used by base-installer, test in priority order
 	for dist in stable testing unstable ; do
 		if [ -e /cdrom/dists/$dist ] ; then
 			CODENAME=`sed -n 's/^Codename: *//p' /cdrom/dists/$dist/Release`
-			db_set mirror/distribution $CODENAME
 			log "Detected ISO with '$CODENAME' distribution"
+			db_set mirror/distribution $CODENAME
+			db_subst iso-scan/success DISTRIBUTION $CODENAME
+			
+			DESCRIPTION=`sed -n 's/^Description: *//p' /cdrom/dists/$dist/Release`
+			db_subst iso-scan/success DESCRIPTION $DESCRIPTION
+			
 			break
 		fi
 	done
@@ -45,24 +50,34 @@ register_cd () {
 
 # Try to mount a file as an iso, and see if it's a Debian cd.
 try_iso () {
-	if mount -i iso9660 -o ro,exec $1 /cdrom 2>/dev/null; then
+	iso_to_try=$1
+	iso_device=$2
+	if mount -t iso9660 -o loop,ro,exec $iso_to_try /cdrom 2>/dev/null; then
 		log "Mounted $1"
 		ISO_MOUNT_COUNT=$(expr $ISO_MOUNT_COUNT + 1)
-		if is_debian_cd; then
+		if is_debian_iso; then
 			# This could be more sophisticated, and try to deal
 			# with multiple Debian ISO's. For now, once we've got
 			# a Debian ISO, any Debian ISO, we're done.
-			register_cd
+			register_cd $iso_to_try $iso_device
+			db_progress STOP
+			db_subst iso-scan/success FILENAME $iso_to_try
+			db_subst iso-scan/success DEVICE $iso_device
+			db_fset iso-scan/success seen false
+			db_input high iso-scan/success || true
+			db_go || true
 			exit 0
 		else
 			log "Not a Debian ISO"
 			umount /cdrom
 		fi
+	else
+		log "Failed mounting $iso_to_try"
 	fi
 }
 
 # Is a cdrom already mounted?  If so, assume it's the right one..
-mount | grep -q ^/cdrom && exit 0
+mount | grep -q 'on /cdrom' && exit 0
 
 # Hopefully this will find the drive.
 hw-detect || true
@@ -83,8 +98,9 @@ db_progress START 0 $DEV_COUNT iso-scan/progress_title
 # Load up every filesystem known to man. The drive could have anything.
 FS="ext2 ext3 reiserfs fat vfat xfs iso9660"
 for fs in $FS; do
-	modprobe $fs 2>/dev/null || true
+	modprobe $fs >/dev/null 2>&1 || true
 done
+modprobe loop >/dev/null
 
 mkdir /cdrom 2>/dev/null || true
 mkdir /hd-media 2>/dev/null || true
@@ -108,7 +124,7 @@ for dev in $DEVS; do
 					if [ -e $iso ]; then
 						log "Found ISO $iso on $dev"
 						ISO_COUNT=$(expr $ISO_COUNT + 1)
-						try_iso $iso
+						try_iso $iso $dev
 					fi
 				done
 			fi
@@ -120,7 +136,7 @@ for dev in $DEVS; do
 	# It's possible that the ISO was written right to the front of a
 	# device, and not to a filesystem. (Hey, we may even be spinning
 	# a real CD here, though that would be pretty weird..)
-	try_iso $dev
+	try_iso $dev $dev
 
 	db_progress STEP 1
 done
@@ -152,7 +168,7 @@ if [ "$MOUNTABLE_DEVS_COUNT" != 0 ]; then
 						for iso in $(find $dir 2>/dev/null | grep -i '\.iso$'); do
 							log "Found ISO $iso on $dev"
 							ISO_COUNT=$(expr $ISO_COUNT + 1)
-							try_iso $iso
+							try_iso $iso $dev
 						done
 						db_progress STEP 1
 					fi
@@ -168,7 +184,6 @@ if [ "$MOUNTABLE_DEVS_COUNT" != 0 ]; then
 fi
 
 # Failure. Display the best message we can about what happened.
-# TODO manual filename entry
 # Let them know the second pass failed too.
 if [ "$ISO_COUNT" = 0 ]; then
 	db_fset iso-scan/no-isos seen false
