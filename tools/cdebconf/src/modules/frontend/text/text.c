@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.8 2001/01/08 00:44:32 tausq Exp $
+ * $Id: text.c,v 1.9 2002/05/18 22:31:02 tfheen Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -298,11 +298,13 @@ static int texthandler_password(struct frontend *obj, struct question *q)
 static int texthandler_select(struct frontend *obj, struct question *q)
 {
 	char *choices[100] = {0};
+	char *choices_translated[100] = {0};
 	char answer[10];
 	int i, count, choice = 1, def = -1;
 	const char *defval = question_defaultval(q);
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
+	strchoicesplit(question_choices_translated(q), choices_translated, DIM(choices_translated));
 	if (count > 1)
 	{
 		if (defval != NULL)
@@ -315,7 +317,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 		do
 		{
 			for (i = 0; i < count; i++)
-				printf("%3d. %s%s\n", i+1, choices[i],
+				printf("%3d. %s%s\n", i+1, choices_translated[i],
 					(def == i ? _(" (default)") : ""));
 
 			printf(_("Prompt: 1 - %d> "), count);
@@ -326,10 +328,14 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 				choice = atoi(answer);
 		} while (choice <= 0 || choice > count);
 	}
-
+	/*	fprintf(stderr,"In %s, line: %d\n\tanswer: %s, choice[choice]: %s\n",
+		__FILE__,__LINE__,answer, choices[choice - 1]);*/
 	question_setvalue(q, choices[choice - 1]);
 	for (i = 0; i < count; i++) 
+	{
 		free(choices[i]);
+		free(choices_translated[i]);
+	}
 	
 	return DC_OK;
 }
