@@ -251,6 +251,11 @@ if [ -f /etc/pcmcia/cb_mod_queue ]; then
 	fi
 fi
 
+log "Detecting hardware..."
+db_progress INFO hw-detect/detect_progress_step
+ALL_HW_INFO=$(get_detected_hw_info; get_manual_hw_info)
+db_progress STEP $OTHER_STEPSIZE
+
 # Load yenta_socket on 2.6 kernels, if hardware is available, so that
 # discover will see Cardbus cards.
 if [ -d /sys/bus/pci/devices ] && grep -q 0x060700 \
@@ -265,11 +270,6 @@ if [ -d /sys/bus/pci/devices ] && grep -q 0x060700 \
 	# Ugly hack, but what's the alternative?
 	sleep 3 || true
 fi
-
-log "Detecting hardware..."
-db_progress INFO hw-detect/detect_progress_step
-ALL_HW_INFO=$(get_detected_hw_info; get_manual_hw_info)
-db_progress STEP $OTHER_STEPSIZE
 
 # Remove modules that are already loaded or not available, and construct
 # the list for the question.
