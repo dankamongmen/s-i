@@ -6,4 +6,14 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
 		uhci-pci.lst
 endif
 
-include ../../../Makefile.inc
+all:
+
+lists: $(files)
+
+ohci-pci.lst: /usr/share/discover/pci.lst
+	 awk '$$3 ~ /usb-ohci/ { print $$1}' < /usr/share/discover/pci.lst | \
+	 	sort > $@.new && mv $@.new $@
+
+uhci-pci.lst: /usr/share/discover/pci.lst
+	 awk '$$3 ~ /usb-uhci/ { print $$1}' < /usr/share/discover/pci.lst | \
+	 	sort > $@.new && mv $@.new $@
