@@ -164,6 +164,7 @@ get_detected_hw_info() {
 		if [ -f /proc/device-tree/aliases/mac-io ]; then
 			if [ -e "/proc/device-tree`cat /proc/device-tree/aliases/mac-io`/radio" ]; then
 				echo "airport:Airport wireless"
+				register-module airport
 			fi
 		fi
 	fi
