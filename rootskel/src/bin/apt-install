@@ -16,13 +16,15 @@ fi
 
 # Try to enable proxy when using HTTP.  What about using ftp_proxy for
 # FTP sources?  (This code is in both apt-update and apt-install)
-if db_get mirror/protocol && [ "http" = "$RET" ]; then
-    # try to find http proxy
-    if db_get mirror/http/proxy && [ "$RET" ] ; then
-	http_proxy="$RET"
-	export http_proxy
-    fi
-fi
+# XXX Using debconf functions failed when called from base-installer and
+# XXX kernel-installer
+#if db_get mirror/protocol && [ "http" = "$RET" ]; then
+#    # try to find http proxy
+#    if db_get mirror/http/proxy && [ "$RET" ] ; then
+#	http_proxy="$RET"
+#	export http_proxy
+#    fi
+#fi
 
 # first copy the files into /target/, then install in chroot
 # environment.  This work around a bug in glibc, and make sure the
