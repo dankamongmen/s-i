@@ -15,7 +15,7 @@
  */
 struct package_t *status_read(void) {
 	FILE *f;
-	char *b, buf[BUFSIZE], *lang_code, *lingua;
+	char *b, buf[BUFSIZE], *lang_code, *lingua = NULL;
 	int i;
 	struct package_t *found, *newp, *p = 0;
 
