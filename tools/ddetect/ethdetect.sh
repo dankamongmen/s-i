@@ -30,7 +30,7 @@ module_insmod() {
     fi
 }
 
-db_title "Network Hardware Configuration"
+db_settitle ethdetect/title
 
 db_input low ethdetect/detection_type || [ $? -eq 30 ]
 db_go

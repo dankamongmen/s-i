@@ -115,7 +115,7 @@ get_hw_info() {
 
 log "Detecting hardware..."
 
-db_title "Detecting HW and loading kernel modules"
+db_settitle hw-detect/title
 
 set -- `get_hw_info | wc -l`
 count="$1"
