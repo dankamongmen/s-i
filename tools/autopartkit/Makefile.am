@@ -4,12 +4,14 @@ bin_PROGRAMS = autopartkit
 
 noinst_PROGRAMS = autopartkit_test dumptable distribute_test
 
+if TEST
 DUMMYCDEBCONF = \
 	dummydebconfclient.c \
 	dummydebconfclient.h
-#CFLAGS = -DTEST
+endif
 
 autopartkit_SOURCES = \
+	$(DUMMYCDEBCONF) \
 	autopartkit.h \
 	distribute.c \
 	loadpartitions.c \
@@ -19,7 +21,6 @@ autopartkit_SOURCES = \
 	autopartkit.c
 
 autopartkit_test_SOURCES = \
-	$(DUMMYCDEBCONF) \
 	$(autopartkit_SOURCES)
 
 dumptable_SOURCES = \

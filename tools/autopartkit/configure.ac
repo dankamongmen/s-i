@@ -60,8 +60,11 @@ AC_CHECK_FUNCS([ped_disk_commit ped_disk_write])
 AC_ARG_ENABLE(test,
 [  --enable-test            Enable test code [default=no]],
 [case "${enableval}" in
-      yes) AC_DEFINE(TEST, 1, [Enable test code]) CFLAGS="$CFLAGS -DTEST" ;;
-      no)  ;;
+      yes) AC_DEFINE(TEST, 1, [Enable test code])
+           CFLAGS="$CFLAGS -DTEST -g"
+	   AM_CONDITIONAL(TEST, true)
+	   ;;
+      no)  AM_CONDITIONAL(TEST, false) ;;
       *)   AC_MSG_ERROR(bad value ${enableval} for --enable-test) ;;
  esac],[])
 
