@@ -102,7 +102,6 @@ ask_user () {
 	    restore_ifs
 	done
     )
-    db_fset $template seen false
     code=0
     debconf_select $priority $template "$choices" "$default" || code=$?
     if [ $code -ge 100 ]; then return 255; fi
@@ -386,7 +385,6 @@ error_handler () {
 	options=$(read_list)
 	db_subst partman/exception_handler TYPE "$type"
 	db_subst partman/exception_handler DESCRIPTION "$message"
-	db_fset partman/exception_handler seen false
 	db_subst partman/exception_handler CHOICES "$options"
 	if
 	    expr "$options" : '.*,.*' >/dev/null \
@@ -401,7 +399,6 @@ error_handler () {
 	else
 	    db_subst partman/exception_handler_note TYPE "$type"
 	    db_subst partman/exception_handler_note DESCRIPTION "$message"
-	    db_fset partman/exception_handler_note seen false
 	    db_input $priority partman/exception_handler_note || true
 	    db_go || true
 	    write_line "unhandled"
