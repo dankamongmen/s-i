@@ -1159,6 +1159,7 @@ command_set_flags()
         oprintf("OK\n");
         deactivate_exception_handler();
         first = ped_partition_flag_next(0);
+        last = first - 1;
         for (flag = first; flag != 0; flag = ped_partition_flag_next(flag))
                 last = flag;
         states = malloc(sizeof(bool[last - first + 1]));
