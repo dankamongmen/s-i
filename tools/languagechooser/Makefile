@@ -2,7 +2,7 @@ all: debian/templates check-scripts check-data
 
 LIST=languagelist
 
-debian/templates: Makefile debian/templates-in $(LIST)
+debian/templates: mktemplates debian/templates-in $(LIST)  $(LIST).l10n
 	./mktemplates $(LIST) $(LIST).l10n $@ $@-in
 
 check-scripts:
