@@ -61,9 +61,9 @@ struct confmodule {
      * @param const char *cmd - command to execute
      * @param char *out - return buffer
      * @param size_t outsize - size of return buffer
-     * @return int - DC_OK, DC_NOTOK
+     * @return char* - DC_OK, DC_NOTOK + error message
      */
-    int (*process_command)(struct confmodule *mod, char *cmd);
+    char* (*process_command)(struct confmodule *mod, char *cmd);
 
     /**
      * @brief Shuts down the confmodule
