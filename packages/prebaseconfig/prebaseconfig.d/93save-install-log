@@ -12,10 +12,7 @@ logsavedir=/target/var/log/debian-installer
 db_get debconf/priority
 db_set debconf/priority $RET
 # Make sure debconf has saved the database.
-kill -USR1 $(ps | grep "[d]ebconf -o" | sed 's/ root.*//')
-# Make sure we wait until after it is done saving to copy the db, to avoid
-# racing. This should block until it does..
-db_get debconf/priority
+db_x_save
 
 test -d $logsavedir || mkdir $logsavedir
 cp /var/log/* $logsavedir
