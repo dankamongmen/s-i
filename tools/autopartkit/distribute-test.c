@@ -81,8 +81,6 @@ main(int argc, char *argv[])
       {
         autopartkit_log(0, "no free space list, using hardcoded table.\n");
 	spaceinfo = diskinfo;
-        /* sort list on device path, order bus0 before bus1 */
-        qsort(spaceinfo, 3, sizeof(spaceinfo[0]), cmp_spaceinfo_path);
       }
 
     /* Do not make LVM logical volumes on the disk */
