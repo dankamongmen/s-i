@@ -311,17 +311,25 @@ makedirs(const char *dir)
     }
 }
 
+#define MK_SWAP(p)  ((p)->op.filesystem != NULL && strcmp((p)->op.filesystem, "swap"))
+// This is a swap partition IFF
+//   The new fs is swap
+// or
+//   The existing fs is swap and we have no new fs
+#define IS_SWAP(p)  (((p)->op.filesystem != NULL && strcmp((p)->op.filesystem, "swap") == 0) ||\
+       ((p)->op.filesystem == NULL && (p)->fstype != NULL && strcmp((p)->fstype, "swap") == 0))
+
 static void
 finish(void)
 {
     int i, ret;
-    char *cmd, *mntpt, *errq = NULL;
+    char *cmd, *mntpt, *errq = NULL, *fs;
 
+    // Sort the partitions according to the order they have to be mounted
     qsort(parts, part_count, sizeof(struct partition *), mountpoint_sort_func);
     for (i = 0; i < part_count; i++) {
-        if (parts[i]->op.filesystem == NULL)
-            continue;
-        if (strcmp(parts[i]->op.filesystem, "swap") == 0) {
+        if (MK_SWAP(parts[i])) {
+            append_message("partconf: Creating swap on %s\n", parts[i]->path);
             asprintf(&cmd, "mkswap %s >/dev/null 2>>/var/log/messages", parts[i]->path);
             ret = system(cmd);
             free(cmd);
@@ -329,6 +337,9 @@ finish(void)
                 errq = "partconf/failed-mkswap";
                 break;
             }
+        }
+        if (IS_SWAP(parts[i])) {
+            append_message("partconf: Activating swap on %s\n", parts[i]->path);
             asprintf(&cmd, "swapon %s >/dev/null 2>>/var/log/messages", parts[i]->path);
             ret = system(cmd);
             free(cmd);
@@ -336,7 +347,15 @@ finish(void)
                 errq = "partconf/failed-swapon";
                 break;
             }
-        } else {
+            continue;
+        }
+        // If we have absolutely no file system, continue with next partition
+        if (parts[i]->op.filesystem == NULL && parts[i]->fstype == NULL)
+            continue;
+        if (parts[i]->op.filesystem != NULL)
+        {
+            append_message("partconf: Creating %s file system on %s\n",
+                    parts[i]->op.filesystem, parts[i]->path);
             asprintf(&cmd, "mkfs.%s %s >/dev/null 2>>/var/log/messages",
                     parts[i]->op.filesystem, parts[i]->path);
             ret = system(cmd);
@@ -346,12 +365,14 @@ finish(void)
                 debconf->command(debconf, "SUBST", errq, "FS", parts[i]->op.filesystem, NULL);
                 break;
             }
-            if (parts[i]->op.mountpoint == NULL)
-                continue;
-            append_message("Mounting %s on %s\n", parts[i]->path, parts[i]->op.mountpoint);
+        }
+        if (parts[i]->op.mountpoint != NULL) {
+            append_message("partconf: Mounting %s on %s\n",
+                    parts[i]->path, parts[i]->op.mountpoint);
             asprintf(&mntpt, "/target%s", parts[i]->op.mountpoint);
             makedirs(mntpt);
-            ret = mount(parts[i]->path, mntpt, parts[i]->op.filesystem, 0xC0ED0000, NULL);
+            fs = parts[i]->op.filesystem ? parts[i]->op.filesystem : parts[i]->fstype;
+            ret = mount(parts[i]->path, mntpt, fs, 0xC0ED0000, NULL);
             // Ignore failure due to unknown filesystem
             if (ret < 0 && errno != ENODEV) {
                 append_message("mount: %s\n", strerror(errno));
@@ -455,7 +476,7 @@ mountpoint(void)
         free(curr_part->op.filesystem);
         curr_part->op.filesystem = strdup(filesystems[i]);
     }
-    if (curr_part->op.filesystem != NULL && strcmp(curr_part->op.filesystem, "swap") != 0) {
+    if (curr_part->op.filesystem == NULL || strcmp(curr_part->op.filesystem, "swap") != 0) {
         // TODO: default to current mount point, if any
         debconf->command(debconf, "SUBST", "partconf/mountpoint", "PARTITION",
                 curr_part->path, NULL);
@@ -470,8 +491,6 @@ static int
 mountpoint_manual(void)
 {
     do_mount_manual = 0;
-    if (curr_part->op.filesystem == NULL || strcmp(curr_part->op.filesystem, "swap") == 0)
-        return 0;
     debconf->command(debconf, "GET", "partconf/mountpoint", NULL);
     if (strcmp(debconf->value, "Don't mount it") == 0) {
         free(curr_part->op.mountpoint);
