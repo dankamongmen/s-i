@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.28 2002/10/14 03:52:21 tfheen Exp $ */
+/* $Id: udpkg.c,v 1.29 2002/10/18 15:49:50 waldi Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -36,8 +36,10 @@ static int is_file(const char *fn)
 
 int dpkg_print_architecture()
 {
-#ifdef __i386__
+#if defined(__i386__)
         printf("i386\n");
+#elif defined(__s390__)
+        printf("s390\n");
 #else
         return 1;
 #endif
