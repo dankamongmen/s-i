@@ -4,29 +4,36 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.9 2003/10/03 22:02:49 mckinstry Exp $
+ * $Id: at-kbd.c,v 1.10 2003/10/14 20:30:40 mckinstry Exp $
  */
 
 #include "config.h"
 #include <assert.h>
 #include <debian-installer.h>
 #include "xmalloc.h"
-#include "nls.h"
 #include "kbd-chooser.h"
 
 
 /**
  * @brief list of keyboards present
  */
-kbd_t *at_kbd_get (kbd_t *keyboards)
+kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 {
 	kbd_t *k = xmalloc (sizeof(kbd_t));
 
-	// /proc must be mounted by this point
-	assert (di_check_dir ("/proc") == 1);
-
-	k->name = "at"; // This must match the name "ps2" in console-keymaps-at
-	k->description = _("PC Style (AT connector)");
+#if defined(__m68k__)
+	// on m68k only mvme and bvme have PC-style keyboards
+	if (substr(subarch, "vme") == NULL)
+		return keyboards;
+#endif
+#if defined(__powerpc__)
+	// On powerpc, prep and chrp machines have pc keyboards
+	if ((substr(subarch, "prep") == NULL) &&
+	    (substr(subarch, "chrp") == NULL))
+		return keyboards;
+#endif
+	
+	k->name = "at"; // This must match the name "at" in console-keymaps-at
 	k->deflt = "us";
 	k->fd = -1;
 	k->present = UNKNOWN;
@@ -35,12 +42,15 @@ kbd_t *at_kbd_get (kbd_t *keyboards)
 
 
 #if defined (KERNEL_2_6)
+	// /proc must be mounted by this point
+	assert (di_check_dir ("/proc") == 1);
+
 	/* In 2.6 series, we can detect keyboard via /proc/bus/input
 	 *
 	 */
 	if (di_check_dir ("/proc/bus/input") >= 0) {
 	        // this dir only present in 2.6
-		res = grep ("/proc/bus/input/devices","AT Set ");
+		res_at = grep ("/proc/bus/input/devices","AT Set ");
 		if (res < 0) {
 			di_warning ("at-kbd: Failed to open /proc/bus/input/devices");
 			return keyboards;
