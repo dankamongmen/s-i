@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.36 2003/04/26 22:12:56 sjogren Exp $ */
+/* $Id: udpkg.c,v 1.37 2003/05/24 12:41:22 waldi Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -124,7 +124,7 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	snprintf(config, sizeof(config), "%s%s.config", INFODIR, pkg->package);
 	if (is_file(config))
 	{
-		snprintf(buf, sizeof(buf), "%s configure", config);
+		snprintf(buf, sizeof(buf), "exec %s configure", config);
 		if ((r = do_system(buf)) != 0)
 		{
 			fprintf(stderr, "config exited with status %d\n", r);
@@ -136,7 +136,7 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	snprintf(postinst, sizeof(postinst), "%s%s.postinst", INFODIR, pkg->package);
 	if (is_file(postinst))
 	{
-		snprintf(buf, sizeof(buf), "%s configure", postinst);
+		snprintf(buf, sizeof(buf), "exec %s configure", postinst);
 		if ((r = do_system(buf)) != 0)
 		{
 			fprintf(stderr, "%s's postinst exited with status %d\n",
