@@ -149,6 +149,7 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 	packages = di_pkg_toposort_list(packages);
 
 	/* And finally (bleh), remove virtual and installed packages again */
+	prev = NULL;
 	for (node = packages->head; node != NULL; node = next)
 	{
 		next = node->next;
