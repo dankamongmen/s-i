@@ -40,8 +40,7 @@ do
     fi
     for device in $devices
     do
-        if mount -t iso9660 -o ro,exec $device /cdrom
-        then
+        if mount -t iso9660 -o ro,exec $device /cdrom; then
             log "CDROM-mount succeeded: device=$device"
             mounted=1
 	    db_set cdrom-detect/cdrom_device $device
@@ -49,7 +48,7 @@ do
         else
             log "CDROM-mount failed (error=$?): device=$device"
             log "Unmounting CD just to be sure."
-            umount /cdrom || true
+            umount /cdrom 2>/dev/null || true
             log "Trying it again."
             if mount -t iso9660 -o ro,exec $device /cdrom
             then
@@ -60,24 +59,21 @@ do
             else
                 log "CDROM-mount failed again (error=$?): device=$device"
                 log "Unmounting CD just to be sure and giving it up."
-                umount /cdrom || true
+                umount /cdrom 2>/dev/null || true
             fi
         fi
     done
 
-    if [ "$mounted" = "1" ]
-    then
+    if [ "$mounted" = "1" ]; then
         break
     fi
 
     # If a device was detected but the mount failed, ask for the CD.
-    if [ -n "$devices" ]
-    then
+    if [ -n "$devices" ]; then
 	db_input critical cdrom-detect/retry || [ $? -eq 30 ]
 	db_go
 	db_get cdrom-detect/retry
-	if [ "$RET" = "true" ]
-	then
+	if [ "$RET" = "true" ]; then
 	    continue
 	else
             fail
@@ -107,8 +103,7 @@ do
 	modules="$modules, $i"
     done
     
-    if [ "$RET" = "true" ]
-    then
+    if [ "$RET" = "true" ]; then
 	db_subst cdrom-detect/cdrom_module choices "$modules"
 	db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
 	db_go
@@ -122,19 +117,17 @@ do
 	db_get cdrom-detect/cdrom_device
 	device="$RET"
 
-	if [ "$module" != "none" ]
-	then
+	if [ "$module" != "none" ]; then
 	    modprobe $module
 	fi
-	if mount -t iso9660 -o ro,exec $device /cdrom
-	then
+	if mount -t iso9660 -o ro,exec $device /cdrom; then
             log "CDROM-mount succeeded: device=$device"
 	    mounted=1
 	    break
         else
             log "CDROM-mount failed (error=$?): device=$device"
             log "Unmounting CD just to be sure and giving it up."
-            umount /cdrom || true
+            umount /cdrom 2>/dev/null || true
 	fi
     else
 	fail
