@@ -79,6 +79,8 @@ case "$ARCH","$SUBARCH" in
 		db_input high nobootloader/confirmation || true
 	;;
 	*)
+		bootfs=`mapdevfs $bootfs`
+
 		db_get debian-installer/kernel/linux/link_in_boot
 		link_in_boot="$RET"
 		if [ "$link_in_boot" = "true" ]; then
@@ -94,6 +96,7 @@ case "$ARCH","$SUBARCH" in
 		fi
 
 		db_subst nobootloader/confirmation_common ROOT "${rootfs}"
+		db_subst nobootloader/confirmation_common BOOT "${bootfs}"
 		db_subst nobootloader/confirmation_common KERNEL_LOC "${kernel}"
 		db_input high nobootloader/confirmation_common || true
 	;;
