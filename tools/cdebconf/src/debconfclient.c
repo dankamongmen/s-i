@@ -7,7 +7,7 @@
  *
  * Description: debconf client support interface
  *
- * $Id: debconfclient.c,v 1.2 2000/12/11 05:16:38 tausq Exp $
+ * $Id: debconfclient.c,v 1.3 2000/12/20 01:01:13 bug1 Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -46,6 +46,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/types.h>
+#include <stdarg.h>
 
 static int debconfclient_command(struct debconfclient *client, 
 	const char *command, ...)
