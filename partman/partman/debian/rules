@@ -12,6 +12,14 @@ ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
+MENUITEMNUM=42
+ifeq ($(ARCH),arm)
+MENUITEMNUM=49
+endif
+ifeq ($(ARCH),mips)
+MENUITEMNUM=49
+endif
+
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -55,7 +63,7 @@ binary-arch: build install
 	dh_installdebconf -n
 	dh_fixperms
 	dh_installdeb
-	dh_gencontrol -- -fdebian/files~
+	dh_gencontrol -- -Vmenuitemnum=$(MENUITEMNUM) -fdebian/files~
 	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
 	dh_builddeb --filename=$(FILENAME)
 
