@@ -459,3 +459,29 @@ enhances(struct package_t *p, struct linkedlist_t *installed)
     return 0;
 }
 
+//Have there been new retrievers installed?
+int
+new_retrievers(struct linkedlist_t* retrievers_before,
+	       struct linkedlist_t* retrievers_after)
+{
+    struct list_node *node1, *node2;
+    int match;
+
+    node1 = retrievers_after->head;
+    while (node1 != NULL) {
+	node2 = retrievers_before->head;
+	match = 0;
+	while (node2 != NULL) {
+	    if (strcmp(((struct package_t*) node1->data)->package,
+		       ((struct package_t*) node2->data)->package) == 0) {
+		match = 1;
+		break;
+	    }
+	    node2 = node2->next;
+	}
+	if (!match)
+	    return 1;
+	node1 = node1->next;
+    }
+    return 0;
+}

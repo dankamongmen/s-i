@@ -287,6 +287,8 @@ main()
         choose_modules,
         NULL,
     };
+    struct linkedlist_t *retrievers_before = get_retriever_packages();
+    struct linkedlist_t *retrievers_after = NULL;
 
     debconf = debconfclient_new();
     debconf->command(debconf, "CAPB", "backup", NULL);
@@ -303,6 +305,14 @@ main()
         ret = 10; /* back to the menu */
     else
         ret = install_modules();
+    if (!ret) {
+	retrievers_after = get_retriever_packages();
+	if (new_retrievers(retrievers_before, retrievers_after))
+	    ret = 10;
+    }
+    di_list_free(retrievers_before, di_pkg_free);
+    if (retrievers_after)
+	di_list_free(retrievers_after, di_pkg_free);
     cleanup();
     return ret;
 }
