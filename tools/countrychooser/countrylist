@@ -31,7 +31,10 @@ open (L, $iso3166tab) || die "$iso3166tab: $!";
 while (<L>) {
 	chomp;
 	my ($code, $country) = split(' ', $_, 2);
-	$country=~s/Å/A/g; # HACK!!
+	if ($country !~ /^[-_A-Za-z0-9 !@#$%^&Z*()-_+={};:'",.<>?|]+$/) {
+		print STDERR "Skipping country $country; not ASCII\n";
+		next;
+	}
 	$code2country{$code}=$country;
 	$codes_listed{$code}=0;
 }
