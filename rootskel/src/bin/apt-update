@@ -1,5 +1,10 @@
 #!/bin/sh -e
 
+if [ ! -f /target/etc/apt/sources.list ] ; then
+    echo "apt-update: error: Missing /target/etc/apt/sources.list."
+    exit 1
+fi
+
 PATH=$PATH:/target/usr/bin:/target/bin:/target/usr/sbin:/target/sbin \
 LD_LIBRARY_PATH=/usr/lib:/lib:/target/usr/lib:/target/lib \
 /target/usr/bin/apt-get \
