@@ -7,5 +7,5 @@ struct debconfclient {
   void (*command)(struct debconfclient *client, const char *operation, ...);
 };
 
-struct debconfclient *debconfclient_new(void);
-void debconfclient_delete(struct debconfclient *client);
+struct debconfclient *my_debconfclient_new(void);
+void my_debconfclient_delete(struct debconfclient *client);

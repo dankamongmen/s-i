@@ -38,7 +38,7 @@ my_debconfclient_command(struct debconfclient *client,
 }
 
 struct debconfclient *
-debconfclient_new(void)
+my_debconfclient_new(void)
 {
   struct debconfclient *retval = malloc(sizeof(*retval));
   if (retval) {
@@ -49,7 +49,7 @@ debconfclient_new(void)
 }
 
 void
-debconfclient_delete(struct debconfclient *client)
+my_debconfclient_delete(struct debconfclient *client)
 {
   free(client);
 }
