@@ -3,6 +3,22 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+db_capb backup
+
+log=/var/log/messages
+
+log() {
+	logger -t elilo-installer "$@"
+}
+
+error() {
+	log "error: $@"
+}
+
+info() {
+    log "info: $@"
+}
+
 if [ -f /etc/mtab ]; then
     MTAB=/etc/mtab
 else
@@ -52,6 +68,7 @@ else
 	db_go
 	exit 1
 fi
+rm -f /tmp/efi_boot.list
 db_subst elilo-installer/bootpart BOOTPARTS $BOOTPARTS
 
 db_fset elilo-installer/bootpart seen false
@@ -66,5 +83,45 @@ rootfs=`mapdevfs $rootfs`
 
 # Write out elilo.conf
 
-chroot /target /usr/sbin/elilo --autoconf --boot $bootpart --root $rootfs --efiboot
+db_progress START 0 2 elilo-installer/title
 
+db_progress INFO elilo-installer/progress_installing
+
+if ! apt-install elilo ; then
+	info "Calling 'apt-install elilo' failed"
+	# Hm, unable to install elilo into /target/, what should we do?
+	db_input critical elilo-installer/apt-install-failed || [ $? -eq 30 ]
+	if ! db_go; then
+		db_progress STOP
+		exit 10 # back up to menu
+	fi
+	db_get elilo-installer/apt-install-failed
+	if [ true != "$RET" ] ; then
+		db_progress STOP
+		exit 1
+	fi
+fi
+
+db_progress STEP 1
+
+db_subst elilo-installer/progress_running bootdev "$bootpart"
+db_progress INFO elilo-installer/progress_running
+
+chroot /target /usr/sbin/elilo --autoconf --boot $bootpart \
+      --root $rootfs --efiboot
+errcode=$?
+if [ "$errcode" = 0 ] ; then
+	info "Boot loader successfully installed into EFI partition"
+else
+	db_subst elilo-installer/failed ERRCODE "$errcode"
+	db_input critical elilo-installer/failed || [ $? -eq 30 ]
+	db_progress STOP
+	db_go || exit 10 # back up
+	exit 1
+fi
+
+db_progress STEP 1
+
+db_progress STOP
+
+exit 0

@@ -11,7 +11,30 @@ _Description: No boot partitions detected
  There were no suitable partitions found for elilo to use.  Elilo needs
  a partition with a FAT filesystem, and the boot flag set.
 
-Template: debian-installer/elilo-installer/title
+Template: elilo-installer/title
 Type: text
 #  Main menu item
 _Description: Install the elilo boot loader on a hard disk
+
+Template: elilo-installer/progress_installing
+Type: text
+_Description: Installing the ELILO package
+
+Template: elilo-installer/progress_running
+Type: text
+_Description: Running ELILO for ${bootdev}
+
+Template: elilo-installer/apt-install-failed
+Type: boolean
+Default: yes
+_Description: ELILO installation failed.  Continue anyway?
+ The elilo package failed to install into /target/.  Installing ELILO
+ as a boot loader is a required step.  The install problem might however be
+ unrelated to ELILO, so continuing the installation may be possible.
+
+Template: elilo-installer/failed
+Text: error
+_Description: ELILO installation failed
+ Running "/usr/sbin/elilo" failed with error code "${ERRCODE}".
+
+
