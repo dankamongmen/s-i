@@ -55,16 +55,12 @@ void sighandler(int sig)
 	struct question *q = NULL;
 
 	save();
+	/*
+	 * SIGUSR1 used to reconfigure the language. Now it
+	 * only saves the database.
+	 */
 	if (sig == SIGUSR1)
-	{
-		if (questions != NULL)
-		{
-			q = questions->methods.get(questions, "debconf/language");
-			if (q != NULL)
-				setenv("LANGUAGE", question_getvalue(q, NULL), 1);
-		}
 		return;
-	}
 	cleanup();
 	exit(1);
 }
