@@ -1,7 +1,5 @@
 #!/usr/bin/make -f
 
-PACKAGE=usb-discover
-
 build:
 
 clean:
@@ -19,11 +17,9 @@ binary-arch:
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installdirs usr/lib/usb-discover usr/sbin lib/debian-installer.d
-	install -m0644 S45usb-linux debian/$(PACKAGE)/lib/debian-installer.d
-	install -m0644 ohci-pci.lst debian/$(PACKAGE)/usr/lib/usb-discover
-	install -m0644 uhci-pci.lst debian/$(PACKAGE)/usr/lib/usb-discover
-	install -m0755 usb-discover debian/$(PACKAGE)/usr/sbin
+	dh_install S45usb-linux lib/debian-installer.d
+	dh_install ohci-pci.lst uhci-pci.lst usr/lib/usb-discover
+	dh_install usb-discover usr/sbin
 	dh_installdebconf
 	dh_fixperms
 	dh_installdeb
