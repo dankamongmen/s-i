@@ -13,9 +13,23 @@ Default[ia64]: kernel-image-2.4.19-itanium-smp
 Default[s390]: kernel-image-2.4.19-s390
 Description: kernel image
 
-Template: debian-installer/kernel/initrd
+Template: debian-installer/kernel/linux/devfs
+Type: boolean
+Default: false
+Default[s390]: true
+Description: enable devfs (linux only)
+
+Template: debian-installer/kernel/linux/devfs/builtin
+Type: boolean
+Default: true
+Default[hppa]: false
+Default[m68k]: false
+Description: kernel includes devfs (workaround for broken maintainers) (linux only)
+
+Template: debian-installer/kernel/linux/initrd
 Type: boolean
 Default: true
 Default[s390]: false
 Default[hppa]: false
-Description: kernel needs an initrd
+Description: kernel needs an initrd (linux only)
+
