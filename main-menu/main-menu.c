@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef DODEBUG
 static int do_system(const char *cmd) {
@@ -100,7 +101,9 @@ int isdefault(struct package_t *p) {
 /* Displays the main menu via debconf and returns the selected menu item. */
 struct package_t *show_main_menu(struct package_t *packages) {
 	static struct debconfclient *debconf = NULL;
+	char *language = NULL;
 	struct package_t **package_list, *p, *head = NULL, *tail = NULL;
+	struct language_description *langdesc;
 	int i = 0, num = 0;
 	char *s, *menudefault = NULL;
 	char menutext[1024];
@@ -108,6 +111,11 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	if (! debconf)
 		debconf = debconfclient_new();
 	
+	debconf->command(debconf, "GET", "debian-installer/language", NULL);
+	if (language)
+		free(language);
+        if (debconf->value)
+          language = strdup(debconf->value);
 	/* Make a flat list of the packages. */
 	for (p = packages; p; p = p->next)
 		num++;
@@ -138,8 +146,24 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	s = menutext;
 	for (p = head; p; p = p->next) {
 		if (p->installer_menu_item) {
-			strcpy(s, p->description);
-			s += strlen(p->description);
+			int ok = 0;
+			if (language) {
+				langdesc = p->localized_descriptions;
+				while (langdesc) {
+					if (strcmp(langdesc->language,language) == 0) {
+						/* Use this description */
+						strcpy(s,langdesc->description);
+						s += strlen(langdesc->description);
+						ok = 1;
+						break;
+					}
+					langdesc = langdesc->next;
+				}
+			}
+			if (ok == 0) {
+				strcpy(s, p->description);
+				s += strlen(p->description);
+			}
 			*s++ = ',';
 			*s++ = ' ';
 
@@ -152,9 +176,9 @@ struct package_t *show_main_menu(struct package_t *packages) {
 		s = s - 2;
 	*s = 0;
 	s = menutext;
-	
+
 	/* Make debconf show the menu and get the user's choice. */
-	debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
+        debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
 	if (menudefault)
 		debconf->command(debconf, "SET", MAIN_MENU, menudefault, NULL);
 	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
@@ -170,6 +194,13 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	for (p = head; p; p = p->next) {
 		if (p->installer_menu_item && strcmp(p->description, s) == 0)
 			return p;
+		else if (p->installer_menu_item && language) {
+			for (langdesc = p->localized_descriptions; langdesc; langdesc = langdesc->next)
+				if (strcmp(langdesc->language,language) == 0 &&
+				    strcmp(langdesc->description,s) == 0) {
+					return p;
+				}
+		}
 	}
 	return NULL;
 }
@@ -211,7 +242,6 @@ int main (int argc, char **argv) {
 	packages = status_read();
 	while ((p=show_main_menu(packages))) {
 		do_menu_item(p);
-		
 		packages = status_read();
 	}
 	

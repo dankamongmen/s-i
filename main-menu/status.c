@@ -18,6 +18,7 @@ struct package_t *status_read(void) {
 	char *b, buf[BUFSIZE], *lang_code, *lingua = NULL;
 	int i;
 	struct package_t *found, *newp, *p = 0;
+	struct language_description *langdesc;
 
 	tree_clear();
 
@@ -64,24 +65,20 @@ struct package_t *status_read(void) {
 			 * possible.
 			 */
 			if (! p->description)
-				p->description = strdup(buf+13); 
+				p->description = strdup(buf+13);
 		}
-		else if (strstr(buf, "Description-") == buf && lingua &&
+		else if (strstr(buf, "Description-") == buf &&
 			 strlen(buf) >= 16 && buf[14] == ':') {
 			lang_code = (char *) malloc(3);
 			memcpy(lang_code, buf + 12, 2);
-			if (strcmp(lang_code, lingua) == 0) {
-				/* 
-				 * Store the translated description in
-				 * the description field (evil). But the
-				 * field may already filled (from a
-				 * Description: line).
-				 */
-				if (p->description)
-					free(p->description);
-				p->description = strdup(buf + 16);
-			}
-			free(lang_code);
+			lang_code[2] = 0;
+			langdesc = malloc(sizeof (struct language_description));
+			memset(langdesc,0,sizeof(struct language_description));
+			langdesc->language = lang_code;
+			langdesc->description = strdup(buf+16);
+			if (p->localized_descriptions) 
+				langdesc->next = p->localized_descriptions;
+			p->localized_descriptions = langdesc;
 		}
 		else if (strstr(buf, "Depends: ") == buf) {
 			/*

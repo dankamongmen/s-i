@@ -20,6 +20,14 @@
 
 typedef enum { unpacked, installed, half_configured, other } package_status;
 
+struct language_description 
+{
+	char *language;
+	char *description;
+	char *extended_description;
+	struct language_description *next;
+};
+
 struct package_t {
 	char *package;
 	int installer_menu_item;
@@ -27,6 +35,7 @@ struct package_t {
 	char *depends[DEPENDSMAX];
 	package_status status;
 	int processed;
+	struct language_description *localized_descriptions;
 	struct package_t *next;
 };
 
