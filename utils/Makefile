@@ -10,7 +10,7 @@ STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 all: $(TARGETS)
 
 shell: shell.c
-	$(CC) $(CFLAGS) $@.c  -o $@  -ldebconf
+	$(CC) $(CFLAGS) $@.c  -o $@  -ldebconfclient
 
 strip: $(TARGETS)
 	$(STRIP) $^
