@@ -8,8 +8,7 @@ debian/templates: mktemplates debian/templates-in $(LIST) $(L10NLIST)
 
 check-scripts:
 	if [ -x /bin/ash ] ; then SH=ash ; else SH=dash; fi ; \
-	for s in debian/postinst prebaseconfig \
-	   languagemap languagechooser ; do \
+	for s in debian/postinst languagemap languagechooser ; do \
 		$$SH -n $$s ; \
 	done
 
