@@ -74,6 +74,7 @@ then
 	if [ -n "$non_aboot_partition" ]; then
 		db_input critical aboot-installer/no-space-for-aboot
 		db_go
+		db_get aboot-installer/no-space-for-aboot
 		if [ "$RET" = "false" ]; then
 			exit 1
 		fi
@@ -85,6 +86,7 @@ then
 
 		db_input critical aboot-installer/non-bsd-partitions
 		db_go
+		db_get aboot-installer/non-bsd-partitions
 		if [ "$RET" = "false" ]; then
 			exit 1
 		fi
@@ -99,6 +101,7 @@ then
 	db_subst aboot-installer/non-ext2-boot PARTTYPE $boot_type 
 	db_input critical aboot-installer/non-ext2-boot
 	db_go
+	db_get aboot-installer/non-ext2-boot
 	if [ "$RET" = "false" ]; then
 		exit 1
 	fi
