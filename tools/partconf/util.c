@@ -45,7 +45,7 @@ modprobe(const char *mod)
         fputs("0\n", fp);
         fclose(fp);
     }
-    asprintf(&cmd, "modprobe %s 2>&1 >>/var/log/messages", mod);
+    asprintf(&cmd, "modprobe %s >>/var/log/messages 2>&1", mod);
     system(cmd);
     free(cmd);
     if ((fp = fopen("/proc/sys/kernel/printk", "w")) != NULL) {
