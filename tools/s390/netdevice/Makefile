@@ -7,13 +7,24 @@
 #
 
 CC := gcc
-CFLAGS := -Wall -Werror -pipe -O2
+CFLAGS := -Wall -pipe -Os
+LDFLAGS := -ldebconf -ldebian-installer
 
-all: changrep
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+CFLAGS += -g
+STRIP = /bin/true
+else
+CFLAGS += -fomit-frame-pointer
+STRIPTOOL=strip
+STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
+endif
 
-changrep: changrep.c
-	$(CC) $(CFLAGS) -o $@ $^
+all: netdevice
+
+netdevice: netdevice.c
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(STRIP) $@
 
 clean:
-	rm -f changrep
+	rm -f netdevice
 

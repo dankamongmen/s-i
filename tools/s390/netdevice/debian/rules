@@ -5,6 +5,9 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+# This is the debhelper compatability version to use.
+export DH_COMPAT=3
+
 PACKAGE=s390-netdevice
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
@@ -12,13 +15,9 @@ FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
 
-# This is the debhelper compatability version to use.
-export DH_COMPAT=3
-
 build: build-stamp
 build-stamp:
 	dh_testdir
-
 	$(MAKE)
 	touch build-stamp
 
@@ -26,18 +25,15 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
-	rm -f debian/files~
+	rm -f debian/files~ debian/$(PACKAGE).postinst
 	$(MAKE) clean
-
 	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-
-	install -d `pwd`/debian/s390-netdevice/usr/lib/debian-installer
-	install changrep `pwd`/debian/s390-netdevice/usr/lib/debian-installer
+	cp netdevice debian/$(PACKAGE).postinst
 	
 
 # Build architecture-independent files here.

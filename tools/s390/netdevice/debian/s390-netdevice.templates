@@ -1,59 +1,54 @@
-Template: s390/netcfg/choose_networktype
+Template: debian-installer/s390/netdevice/choose_networktype
 Type: select
-Choices: ${choices}
+Choices: ctc: Channel to Channel (CTC) or ESCON connection, lcs: qeth: OSA-2 Token Ring/Ethernet or OSA-Express Fast Ethernet (non-QDIO), qeth: OSA-Express in QDIO mode / HiperSockets, iucv: Inter-User Communication Vehicle - available for VM guests only, Quit
 _Description: Select the type of your network device.
  The following network devices are supported. Choose the type of your
  primary network interface that you will need for installing the Debian
  system (via NFS or HTTP).
 
-Template: s390/netcfg/common/get_read
+Template: debian-installer/s390/netdevice/ctc/choose
 Type: select
-Choices: ${choices}
-_Description: Read device number.
- The following devices are available.
+Choices: ${choices} Quit
+_Description: Select the CTC device.
+ The following device numbers might belong to CTC or ESCON connections, but
+ please note that OSA-2 or OSA-Express cards might also be listed here.
 
-Template: s390/netcfg/common/get_write
-Type: select
-Choices: ${choices}
-_Description: Write device number.
- Can't find write device number, please select.
-  The following devices are available.
+Template: debian-installer/s390/netdevice/ctc/confirm
+Type: boolean
+Default: true
+_Description: Is this configuration correct?
+  read channel  = ${device_read}
+  write channel = ${device_write}
+  protocol      = ${protocol}
 
-Template: s390/netcfg/common/get_data
-Type: select
-Choices: ${choices}
-_Description: Data device number.
- Can't find data device number, please select.
-  The following devices are available.
-
-Template: s390/netcfg/ctc/no
+Template: debian-installer/s390/netdevice/ctc/no
 Type: note
 _Description: No CTC or ESCON connections were detected.
  No CTC or ESCON connections were detected. Please make sure that you have
  set them up correctly.
 
-Template: s390/netcfg/ctc/confirm_one
-Type: boolean
-Default: true
-_Description: One CTC or ESCON connections detected. Correct?
-  read channel  = ${devno_read}
-  write channel = ${devno_write}
-
-Template: s390/netcfg/ctc/confirm
-Type: boolean
-Default: true
-_Description: Is this configuration correct?
-  read channel  = ${devno_read}
-  write channel = ${devno_write}
-  protocol      = ${protocol}
-
-Template: s390/netcfg/ctc/protocol
+Template: debian-installer/s390/netdevice/ctc/protocol
 Type: select
-_Choices: 0: s/390, 1: linux, 2: linux tty, 3: os/390
+_Choices: S/390 (0), Linux (1), Linux TTY (2), OS/390 (3)
 _Description: Please specify protocol for this connection.
  Please specify protocol for this connection.
 
-Template: s390/netcfg/lcs/no
+Template: debian-installer/s390/netdevice/lcs/choose
+Type: select
+Choices: ${choices} Quit
+_Description: Select the OSA-2 or OSA-Express device.
+ The following device numbers might belong to OSA-2 or OSA-Express cards, but
+ please note that CTC/ESCON devives might also be listed here.
+
+Template: debian-installer/s390/netdevice/lcs/confirm
+Type: boolean
+Default: true
+_Description: Is this configuration correct?
+  read channel  = ${device_read}
+  write channel = ${device_write}
+  port          = ${port}
+
+Template: debian-installer/s390/netdevice/lcs/no
 Type: note
 _Description: No OSA-2 or OSA-Express cards were detected.
  No OSA-2 or OSA-Express cards were detected. If you are running VM please
@@ -61,28 +56,29 @@ _Description: No OSA-2 or OSA-Express cards were detected.
  HiperSockets or an OSA-Express card in QDIO mode please use the qeth
  driver instead.
 
-Template: s390/netcfg/lcs/confirm_one
-Type: boolean
-Default: true
-_Description: One OSA-2 or OSA-Express card detected. Correct?
-  read channel  = ${devno_read}
-  write channel = ${devno_write}
-
-Template: s390/netcfg/lcs/confirm
-Type: boolean
-Default: true
-_Description: Is this configuration correct?
-  read channel  = ${devno_read}
-  write channel = ${devno_write}
-  port          = ${port}
-
-Template: s390/netcfg/lcs/port
+Template: debian-installer/s390/netdevice/lcs/port
 Type: select
-_Choices: 0: port 0, 1: port 1, 2: port 2, 3: port 3
+_Choices: port 0, port 1, port 2, port 3
 _Description: Please specify port for this connection.
  Please specify relative port.
 
-Template: s390/netcfg/qeth/no
+Template: debian-installer/s390/netdevice/qeth/choose
+Type: select
+Choices: ${choices} Quit
+_Description: Select OSA-Express QDIO / HiperSockets device.
+The following device numbers belong to OSA-Express QDIO / HiperSockets devices.
+
+Template: debian-installer/s390/netdevice/qeth/confirm
+Type: boolean
+Default: true
+_Description: Is this configuration correct?
+  read channel  = ${device_read}
+  write channel = ${device_write}
+  data channel  = ${device_data}
+  port          = ${port}
+  portname      = ${portname}
+
+Template: debian-installer/s390/netdevice/qeth/no
 Type: note
 _Description: No OSA-Express QDIO cards / HiperSockets were detected.
  No OSA-Express QDIO cards / HiperSockets were detected. If you are running
@@ -90,32 +86,15 @@ _Description: No OSA-Express QDIO cards / HiperSockets were detected.
  to use an OSA-2 or OSA-Express card in non-QDIO mode please use the lcs
  driver instead.
 
-Template: s390/netcfg/qeth/confirm_one
-Type: boolean
-Default: true
-_Description: One OSA-2 or OSA-Express card detected. Correct?
-  read channel  = ${devno_read}
-  write channel = ${devno_write}
-  data channel  = ${devno_data}
-
-Template: s390/netcfg/qeth/confirm
-Type: boolean
-Default: true
-_Description: Is this configuration correct?
-  read channel  = ${devno_read}
-  write channel = ${devno_write}
-  data channel  = ${devno_data}
-  port          = ${port}
-
-Template: s390/netcfg/qeth/port
+Template: debian-installer/s390/netdevice/qeth/port
 Type: select
-_Choices: 0: port 0, 1: port 1
+_Choices: port 0, port 1
 _Description: Please specify port.
  Please specify relative port.
 
-Template: s390/netcfg/qeth/postname
+Template: debian-installer/s390/netdevice/qeth/portname
 Type: string
-_Description: Please specify postname.
+_Description: Please specify portname.
  Please enter the portname of your OSA-Express card. This name must be 1 to
  8 characters long and must be equal on all systems accessing the same
  card! Leave it empty if you want to use HiperSockets. This parameter is
@@ -123,7 +102,7 @@ _Description: Please specify postname.
  share a card. The name will be converted to uppercase letters
  automatically!
 
-Template: s390/netcfg/iucv/peer
+Template: debian-installer/s390/netdevice/iucv/peer
 Type: string
 _Description: Please specify the VM peer.
  Please enter the name of the VM peer you want to connect to. If you want
