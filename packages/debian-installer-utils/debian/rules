@@ -17,8 +17,11 @@ binary-indep: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_install -i
-	dh_installdirs -i
+	dh_install -pdi-utils anna-install apt-install debconf-get \
+	                      debconf-set register-module search-path \
+	                      user-params debconf-set-selections bin
+	dh_installdirs -pdi-utils usr/lib/prebaseconfig.d
+	install register-module.prebaseconfig debian/di-utils/usr/lib/prebaseconfig.d/50register-module
 	dh_installdebconf -i
 	dh_compress -i
 	dh_fixperms -i
@@ -36,12 +39,13 @@ binary-arch: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_install -a
+	dh_install -pdi-utils-mapdevfs mapdevfs bin
+	dh_install -pdi-utils-bootfloppy pipe_progress bin
 	dh_installdebconf -a
 	dh_compress -a
 	dh_fixperms -a
 	dh_installdeb -a
-	dh_strip -a
+	dh_strip -a # should come after dh_installdeb; binary postinst
 	dh_shlibdeps -a
 	dh_gencontrol -a
 	dh_builddeb -a

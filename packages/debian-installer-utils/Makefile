@@ -1,5 +1,5 @@
 ifndef TARGETS
-TARGETS = execlog mapdevfs debian/di-utils-shell.postinst pipe_progress
+TARGETS=mapdevfs debian/di-utils-shell.postinst pipe_progress
 endif
 
 # Where to create device entries for di-utils-devicefiles
@@ -13,9 +13,6 @@ STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 
 all: $(TARGETS)
-
-execlog: execlog.c
-	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
 
 mapdevfs: mapdevfs.c
 	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
