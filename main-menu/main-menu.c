@@ -103,8 +103,6 @@ get_default_menu_item(struct linkedlist_t *list)
 	return NULL;
 }
 
-static char *menu_priority = "medium";
-
 /* Displays the main menu via debconf and returns the selected menu item. */
 struct package_t *show_main_menu(struct linkedlist_t *list) {
 	static struct debconfclient *debconf = NULL;
@@ -190,7 +188,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
 	if (menudefault)
 		debconf->command(debconf, "SET", MAIN_MENU, menudefault->description, NULL);
-	debconf->command(debconf, "INPUT", menu_priority, MAIN_MENU, NULL);
+	debconf->command(debconf, "INPUT", "medium", MAIN_MENU, NULL);
 	debconf->command(debconf, "GO", NULL);
 	debconf->command(debconf, "GET", MAIN_MENU, NULL);
 	s=debconf->value;
@@ -402,6 +400,38 @@ static void update_language (void) {
 	debconfclient_delete(debconf);
 }
 
+static char *debconf_priorities[] =
+  {
+    "low",
+    "medium",
+    "high",
+    "critical"
+  };
+
+#define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
+static void lower_debconf_priority (void) {
+	int pri;
+	struct debconfclient *debconf = debconfclient_new();
+	debconf->command(debconf, "GET", "debconf/priority", NULL);
+	if ( ! debconf->value )
+		pri = 1;
+	else
+		for (pri = 0; pri < ARRAY_SIZE(debconf_priorities); ++pri) {
+			if (0 == strcmp(debconf->value,
+					debconf_priorities[pri]) )
+				break;
+		}
+	--pri;
+	if (0 > pri)
+		pri = 0;
+
+	di_log("Lowering debconf priority limit");
+
+	debconf->command(debconf, "SET", "debconf/priority",
+			 debconf_priorities[pri], NULL);
+	debconfclient_delete(debconf);
+}
+
 int main (int argc, char **argv) {
 	struct package_t *p;
 
@@ -411,8 +441,10 @@ int main (int argc, char **argv) {
 	packages = status_read();
 	while ((p=show_main_menu(packages))) {
 		if (!do_menu_item(p)) {
-			di_log("Setting main menu question priority to critical");
-			menu_priority = "critical";
+			/* Something went wrong.  Lower debconf
+			   priority limit to try to give the user more
+			   control over the situation. */
+			lower_debconf_priority();
 		}
 		di_list_free(packages, di_pkg_free);
 		packages = status_read();
