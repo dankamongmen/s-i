@@ -16,7 +16,7 @@ PACKAGE=cdebconf-udeb
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 FILENAME=$(PACKAGE)_$(VERSION)_$(DEB_HOST_ARCH).udeb
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
+PRIORITY=$(shell grep '^Package: cdebconf-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
 CONFFILE=/etc/cdebconf.conf
 
 FRONTENDS=text slang
