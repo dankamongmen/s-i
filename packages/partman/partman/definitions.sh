@@ -501,6 +501,40 @@ humandev () {
 	    db_metaget partman/text/scsi_partition description
 	    printf "$RET" ${scsinum} ${bus} ${target} ${lun} ${part} ${linux}
 	    ;;
+	/dev/cciss/*)
+	    # /dev/cciss/hostN/targetM/disc is 2.6 form
+	    # /dev/cciss/discM/disk seems to be 2.4 form
+	    line=`echo $1 | sed 's,/dev/cciss/\([a-z]*\)\([0-9]*\)/\(.*\),\1 \2 \3,'`
+	    cont=`echo "$line" | cut -d" " -f2`
+	    host=`echo "$line" | cut -d" " -f1`
+	    line=`echo "$line" | cut -d" " -f3`
+	    if [ "$host" = host ] ; then
+	       line=`echo "$line" | sed 's,target\([0-9]*\)/\([a-z]*\)\(.*\),\1 \2 \3,'`
+	       lun=`echo  "$line" | cut -d" " -f1`
+	       disc=`echo "$line" | cut -d" " -f2`
+	       part=`echo "$line" | cut -d" " -f3`
+	    else
+	       line=`echo "$line" | sed 's,disc\([0-9]*\)/\([a-z]*\)\(.*\),\1 \2 \3,'`
+	       lun=`echo  "$line" | cut -d" " -f1`
+	       if [ "$lun" > 15 ] ; then
+	          cont=$(($lun / 16))
+		  lun=$(($lun % 16))
+	       else
+		  cont=0
+	       fi
+	       disc=`echo "$line" | cut -d" " -f2`
+	       part=`echo "$line" | cut -d" " -f3`
+	    fi
+	    linux=$(mapdevfs $1)
+	    linux=${linux#/dev/}
+	    if [ "$disc" = disc ] ; then
+	       db_metaget partman/text/scsi_disk description
+	       printf "$RET" ".CCISS" "-" ${cont} ${lun} ${linux}
+	    else
+	       db_metaget partman/text/scsi_partition description
+	       printf "$RET" ".CCISS" "-" ${cont} ${lun} ${part} ${linux}
+	    fi
+	    ;;
 	/dev/md/*)
 	    device=`echo "$1" | sed -e "s/.*md\/\?\(.*\)/\1/"`
 	    type=`grep "^md${device}[ :]" /proc/mdstat | sed -e "s/^.* : active raid\([[:alnum:]]\).*/\1/"`
