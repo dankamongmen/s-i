@@ -1,0 +1,14 @@
+#!/bin/bash
+if [ ! -z "$1" ]
+then
+ ROOT="$1"
+else
+ ROOT=/
+echo -n 'creating Virtual Console files... '
+mkdir -p debian/tmp/dev/vc
+for i in $(seq 0 63)
+do
+ mknod $ROOT/dev/vc/$i c 4 $i
+ echo "$i "
+done
+echo 'done.'

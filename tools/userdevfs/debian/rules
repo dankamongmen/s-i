@@ -1,0 +1,55 @@
+#! /usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This is the debhelper compatability version to use.
+export DH_COMPAT=2
+
+PACKAGE=$(shell dh_listpackages)
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=$(shell dpkg --print-architecture)
+FILENAME=$(PACKAGE)_$(VERSION)_all.udeb
+
+build: 
+build-stamp:
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	dh_clean
+
+install-dirs:
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	mkdir -p debian/$(PACKAGE)/usr/bin
+	mkdir -p debian/$(PACKAGE)/etc/rcS.d
+	mkdir -p debian/$(PACKAGE)/dev/vc
+
+install: install-dirs
+	install update-dev debian/$(PACKAGE)/usr/bin
+	install S10userdevfs debian/$(PACKAGE)/etc/rcS.d
+	install init-dev debian/$(PACKAGE)/usr/bin
+	debian/mkvc
+
+# Build architecture-independent files here.
+binary-indep: install
+	dh_testdir
+	dh_testroot
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol -- -n$(FILENAME)
+	dh_builddeb --filename=$(FILENAME)
+
+# Build architecture-dependent files here.
+#
+# Note that this builds a .udeb, which is not policy compliant or anything.
+binary-arch: binary-indep
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
