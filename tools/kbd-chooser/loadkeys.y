@@ -1,7 +1,8 @@
 /*
  * loadkeys.y
  *
- * For history, see older versions.
+ * Taken from kbd-1.08 and hacked by amck, 2003-01-17
+ * Stripped down version for use in kbd-chooser.
  */
 
 %token EOL NUMBER LITERAL CHARSET KEYMAPS KEYCODE EQUALS
@@ -10,6 +11,7 @@
 %token UNUMBER ALT_IS_META STRINGS AS USUAL ON FOR
 
 %{
+#include "config.h"
 #include <errno.h>
 #include <stdio.h>
 #include <getopt.h>
@@ -25,11 +27,6 @@
 #include "findfile.h"
 #include "modifiers.h"
 #include "nls.h"
-#include "version.h"
-
-#define DATADIR "/usr/share"
-#define KEYMAPDIR "keymaps"
-#define DEFMAP "us"
 
 #ifndef KT_LETTER
 #define KT_LETTER KT_LATIN
@@ -243,24 +240,6 @@ rvalue		: NUMBER
 
 #include "analyze.c"
 
-void
-usage(void) {
-	fprintf(stderr, _("loadkeys version %s\n"
-"\n"
-"Usage: loadkeys [option...] [mapfile...]\n"
-"\n"
-"valid options are:\n"
-"\n"
-"	-c --clearcompose clear kernel compose table\n"
-"	-d --default	  load \"" DEFMAP "\"\n"
-"	-h --help	  display this help text\n"
-"	-m --mktable      output a \"defkeymap.c\" to stdout\n"
-"	-s --clearstrings clear kernel string table\n"
-"	-u --unicode      implicit conversion to Unicode\n"
-"	-v --verbose      report the changes\n"), VERSION);
-	exit(1);
-}
-
 char *keymap_name;
 char **args;
 int optd = 0;
@@ -269,75 +248,12 @@ int opts = 0;
 int verbose = 0;
 int quiet = 0;
 int nocompose = 0;
-#if 0
-int
-main(unsigned int argc, char *argv[]) {
-	const char *short_opts = "cdhmsuqvV";
-	const struct option long_opts[] = {
-		{ "clearcompose", no_argument, NULL, 'c' },
-	        { "default",    no_argument, NULL, 'd' },
-		{ "help",	no_argument, NULL, 'h' },
-		{ "mktable",    no_argument, NULL, 'm' },
-		{ "clearstrings", no_argument, NULL, 's' },
-		{ "unicode",	no_argument, NULL, 'u' },
-		{ "quiet",	no_argument, NULL, 'q' },
-		{ "verbose",    no_argument, NULL, 'v' },
-		{ "version",	no_argument, NULL, 'V' },
-		{ NULL, 0, NULL, 0 }
-	};
-	int c;
 
-	set_progname(argv[0]);
-
-	while ((c = getopt_long(argc, argv,
-		short_opts, long_opts, NULL)) != -1) {
-		switch (c) {
-		        case 'c':
-		                nocompose = 1;
-				break;
-		        case 'd':
-		    		optd = 1;
-				break;
-		        case 'm':
-		                optm = 1;
-				break;
-			case 's':
-				opts = 1;
-				break;
-			case 'u':
-				set_charset("unicode");
-				break;
-			case 'q':
-				quiet = 1;
-				break;
-			case 'v':
-				verbose++;
-				break;
-			case 'V':
-				print_version_and_exit();
-			case 'h':
-			case '?':
-				usage();
-		}
-	}
-
-	args = argv + optind - 1;
-	unicode_used = 0;
-	yywrap();	/* set up the first input file, if any */
-	if (yyparse() || private_error_ct) {
-		fprintf(stderr, _("syntax error in map file\n"));
-		if(!optm)
-		  fprintf(stderr, _("key bindings not changed\n"));
-		exit(1);
-	}
-	do_constant();
-	if(optm)
-	        mktable();
-	else
-	        loadkeys();
-	exit(0);
+void set_kbd_mode ()
+{
+	// Set kbd mode as Unicode if required
+	// FIXME Write this
 }
-#endif
 
 void loadkeys_wrapper (char *map)
 {
@@ -350,6 +266,7 @@ void loadkeys_wrapper (char *map)
 	}
 	do_constant();
 	loadkeys ();
+	set_kbd_mode ();
 	exit (0);
 }
 
@@ -367,13 +284,13 @@ yyerror(const char *s) {
 /* fatal errors - change to varargs next time */
 void
 lkfatal(const char *s) {
-	fprintf(stderr, "%s: %s:%d: %s\n", progname, filename, line_nr, s);
+	fprintf(stderr, "%s: %s:%d: %s\n", PROGNAME, filename, line_nr, s);
 	exit(1);
 }
 
 void
 lkfatal0(const char *s, int d) {
-	fprintf(stderr, "%s: %s:%d: ", progname, filename, line_nr);
+	fprintf(stderr, "%s: %s:%d: ", PROGNAME, filename, line_nr);
 	fprintf(stderr, s, d);
 	fprintf(stderr, "\n");
 	exit(1);
@@ -381,7 +298,7 @@ lkfatal0(const char *s, int d) {
 
 void
 lkfatal1(const char *s, const char *s2) {
-	fprintf(stderr, "%s: %s:%d: ", progname, filename, line_nr);
+	fprintf(stderr, "%s: %s:%d: ", PROGNAME, filename, line_nr);
 	fprintf(stderr, s, s2);
 	fprintf(stderr, "\n");
 	exit(1);
@@ -605,24 +522,6 @@ yywrap(void) {
 
 	line_nr = 1;
 
-#if 0
-	if (optd) {
-	        /* first read default map - search starts in . */
-	        optd = 0;
-	        if((f = findfile(DEFMAP, dirpath, suffixes)) == NULL) {
-		    fprintf(stderr, _("Cannot find %s\n"), DEFMAP);
-		    exit(1);
-		}
-		goto gotf;
-	}
-	if (*args)
-		args++;
-	if (!*args)
-		return 1;
-	if (!strcmp(*args, "-")) {
-		f = stdin;
-		strcpy(pathname, "<stdin>");
-#endif
 	if (done)
 		return  1;
 	if ((f = findfile(keymap_name, dirpath, suffixes)) == NULL) {
@@ -634,7 +533,6 @@ yywrap(void) {
 		I think assigning directly to yyin isn't necessarily safe in
 		other situations, hence the flag.
 	*/
-      gotf:
 	filename = xstrdup(pathname);
 	if (!quiet)
 		fprintf(stderr, _("Loading %s\n"), pathname);
@@ -727,7 +625,7 @@ addfunc(struct kbsentry kbs) {
 
         if (kbs.kb_func >= MAX_NR_FUNC) {
 	        fprintf(stderr, _("%s: addfunc called with bad func %d\n"),
-			progname, kbs.kb_func);
+			PROGNAME, kbs.kb_func);
 		exit(1);
 	}
 	if ((q = func_table[kbs.kb_func])) { /* throw out old previous def */
@@ -752,7 +650,7 @@ addfunc(struct kbsentry kbs) {
         sh = strlen(kbs.kb_string) + 1;
 	if (fp + sh > func_buf + sizeof(func_buf)) {
 	        fprintf(stderr,
-			_("%s: addfunc: func_buf overflow\n"), progname);
+			_("%s: addfunc: func_buf overflow\n"), PROGNAME);
 		exit(1);
 	}
 	q = fp;
@@ -837,7 +735,7 @@ defkeys(int fd) {
 			perror("KDSKBENT");
 			fprintf(stderr,
 				_("%s: could not deallocate keymap %d\n"),
-				progname, i);
+				PROGNAME, i);
 			exit(1);
 		    }
 		    /* probably an old kernel */
@@ -852,7 +750,7 @@ defkeys(int fd) {
 			    perror("KDSKBENT");
 			    fprintf(stderr,
 				    _("%s: cannot deallocate or clear keymap\n"),
-				    progname);
+				    PROGNAME);
 			    exit(1);
 			}
 		    }
@@ -863,11 +761,11 @@ defkeys(int fd) {
 	if(unicode_used && oldm != K_UNICODE) {
 	     if (ioctl(fd, KDSKBMODE, oldm)) {
 		  fprintf(stderr, _("%s: failed to restore keyboard mode\n"),
-			  progname);
+			  PROGNAME);
 	     }
 	     fprintf(stderr, _("%s: warning: this map uses Unicode symbols\n"
 		             "    (perhaps you want to do `kbd_mode -u'?)\n"),
-		     progname);
+		     PROGNAME);
 	}
 	return ct;
 }
