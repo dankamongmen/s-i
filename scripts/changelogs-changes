@@ -41,6 +41,8 @@ LINE=`grep "; urgency=" "$CHANGELOG" | grep -n "$RELEASE" | head -n 1 | sed 's/:
 DATE=`grep " --" "$CHANGELOG" | head -n $LINE | tail -n 1 | sed 's/.*>  //g'`
 OLD_DATE=`date -d "$DATE" +%s`
 
+echo "* Updated translations: "
+
 for i in $POS/*.po
 do
   if [ -e $i ]
@@ -51,7 +53,73 @@ do
 	NEW_DATE=`date -d "$DATE" +%s`
 	if [ $NEW_DATE -gt $OLD_DATE ]
 	then
-    	    echo "Updated `basename $i` translation"
+# Here some magic to extract the appropriate language from
+# languagechooser's 'languagelist'. $CSN is for Country Short Name and
+# means the iso code of the country (i.e. CSN = "ru")
+#
+# grep ";$CSN;" languagelist | grep -v "^#" | head -n 1 | cut -d ";" -f 1 | sed 's/(.*)//g' | sed 's/\ *$//g'
+#
+# It is not used here, as the script might be universal and thus there'd
+# be no languagelist available -- nevertheless, it could be a nice idea
+# to include it somewhere in the Debian distribution
+#
+# Here another one, to extract all languages from the languagelist
+#
+# grep -v "^#" languagelist | while read line ; do CSN=`echo $line | cut -d ";" -f 3`; COUNTRY=`echo $line | cut -d ";" -f 1 | sed 's/(.*)//g' | sed 's/\ *$//g'`; echo $CSN $COUNTRY; done | sort | uniq
+# 		
+	    CSN=`basename $i | sed 's/\.po//g'`;
+	    case $CSN in
+
+	    "ar") R="Arabic";;
+	    "bg") R="Bulgarian";;
+	    "bs") R="Bosnian";;
+	    "ca") R="Catalan";;
+	    "cs") R="Czech";;
+	    "da") R="Danish";;
+	    "de") R="German";;
+	    "el") R="Greek";;
+	    "en") R="English";;
+	    "es") R="Spanish";;
+	    "fi") R="Finnish";;
+	    "fr") R="French";;
+	    "ga") R="Irish";;
+	    "he") R="Hebrew";;
+	    "hu") R="Hungarian";;
+	    "it") R="Italian";;
+	    "ja") R="Japanese";;
+	    "ko") R="Korean";;
+	    "lt") R="Lithuanian";;
+	    "lv") R="Latvian";;
+	    "nb") R="Norwegian";;
+	    "nl") R="Dutch";;
+	    "nn") R="Norwegian";;
+	    "pl") R="Polish";;
+	    "pt") R="Portuguese";;
+	    "pt_BR") R="Portuguese (Brazil)";;
+	    "ru") R="Russian";;
+	    "sk") R="Slovak";;
+	    "sl") R="Slovenian";;
+	    "sq") R="Albanian";;
+	    "sv") R="Swedish";;
+	    "tr") R="Turkish";;
+	    "uk") R="Ukrainian";;
+	    "zh_CN") R="Simplified Chinese";;
+	    *) R=$CSN;;
+	    esac
+
+	    # Get the translator's name
+
+	    translator=`grep "Last-Translator" $i| sed 's/\"//g' | sed 's/Last-Translator: //g' |sed 's/<.*$//g'`		
+	    
+	    # Convert to UTF-8 -- the changelogs should be UTF-8, the
+	    # translations need not.
+
+	    encoding=`grep "charset=" $i | sed 's/\"//g' | sed 's/^.*charset=//g' | sed 's/n//g'`
+	    trans=`echo $translator | iconv -f $encoding -t utf-8`
+	    
+	    # And output the changelog line
+	    
+	    echo "   - $R ($CSN.po) by $trans"
         fi
     fi
   fi
