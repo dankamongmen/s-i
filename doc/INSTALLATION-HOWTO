@@ -1,0 +1,189 @@
+How to install sarge with the new debian-installer
+--------------------------------------------------
+
+This documents describes how to perform an installation with the new
+debian-installer, which will be released together with the upcoming
+Debian release, codename: sarge.
+
+
+1. Preliminaries
+
+Debian-installer images are currently only availebale for the i386
+architecure. Porters to other architectures are of course
+welcome. Please see section 6 if you want to help developing.
+
+The debian-installer is still in its alpha stadium. If you encounter
+bugs during your install, please refer to section 5 on how to report
+them. If you have questions which cannot be answered by this document,
+please direct them to the debian-boot mailinglist
+(debian-boot@lists.debian.org) or ask on irc (#debian-boot on the
+freenode network).
+
+
+2. Getting images
+
+The installer team provides different types of images for the
+debian-installer. They are described below, choose whatever image
+suits you best. However note: This document only covers the
+installation from CD!
+
+2.1. Install from CD 
+
+The debian-cd team provides two netinst images which can be used to
+install sarge with the debian-installer. They can be obtained here:
+http://gluck.debian.org/cdimage/testing/netinst/i386/
+
+These images are intended to boot from CD and install additional
+packages over a network, hence the name 'netinst'. The difference
+between the two images is, that on the full netinst image the base
+packages are included, whereas you have to download these from the web
+if you are using the businesscard image.
+
+2.2. Install from floppy
+
+If you can't boot from CD, you can download floppy images to install
+Debian. Daily built images can be found here:
+http://people.debian.org/~sjogren/d-i/images/daily/
+
+You need the floppy-image.img and one of the drivers disks
+net_drivers-image.img or cd_drivers-image.img. The drivers disks
+contain the necessary modules to do the actual installation from CD or
+over the network.
+
+
+3. Installation
+
+From here on, I assume you have downloaded and burnt the 'netinst'
+CD. Put it into your CD-drive and make your system boot from CD.
+
+You will be greeted by a welcome screen. Hit ENTER to boot. After a
+while you will be presented the main-menu of the debian-installer.
+Some general remarks:
+
+The main-menu is not static. New entries are added when new installer
+modules are loaded. However main-menu tries to resolve the next best
+choice and presents that as default selction. If that selection does
+not suit your needs just select another entry.
+
+When main-menu first is shown, the default will be "Choose language".
+Hit return and choose your language from the list that now is
+presented. You will be taken back to main-menu and the next item will
+be the default, which is "Detect a keyboard and select layout".
+
+Select that entry and observe that the installer tries to set a
+reasonable default based upon your language selection. Select your
+preferred keymap and continue.
+
+The next step is "Detect CDROM devices and mount the CD in
+/cdrom". This step does not require user interaction, everything
+happens automatically.
+
+Now we are able to access additional modules. Select the corresponding
+entry "Load installer modules". Since the modules we want to access
+are on the CD, select "cdrom-retriever". The floppy-retriever can be
+used to load additional modules from a floppy, e.g. if you have exotic
+hardware.
+
+You are presented a long list with optional modules to install. We
+only want to install the standard modules, which are selected
+automatically, so just hit "Continue". Wait and watch until all
+modules have been installed.
+
+Main-menu appears again, but with the additional modules there are new
+entries. The next default step would be to configure a network. We are
+breaking out of the default route, because we do not need networking
+since the base debs are on the CD.
+
+Select "Detect hardware and load kernel drivers for it (full
+version)". This step again involves no user interaction.
+
+Now it is time to partition your disk. Unfortunatly the associated
+menu-entry "Partition a harddrive" is broken as of writing this
+document. Here is what you can do to work around:
+
+  a) You have already partitioned your harddrive. Just proceed with
+     the next step.
+  b) Switch to the second console via ALT-F2 and start cfdisk
+     there. You have to give the disk to partition as argument.
+  c) Use the autopartkit ("Automatically partition harddrives"). It
+     tries to determine a sane partitioning. WARNING: Use this option
+     ONLY if you have no or unimportant data on your harddrives.
+
+After finishing partitioning, select the entry "Configure and mount
+partitions". Since autopartkit creates filesystems and mounts them
+automatically you can skip this step if you used autopartkit to
+partition your harddrive.
+
+Configuring the partitions is pretty straightforward. You are
+presented a list with all partitions, their sizes and a filesystem if
+one was detected on that partition. Selecting a partition lets you
+choose which filesystem to create on that partition. If you select a
+non-swap filesystem, you are also asked for a mount point.
+
+Configure the partitions to your need, and remember to specify a
+partition with mount point "/". When you made your choices select
+"Finish" and confirm that the filesystems should be created as
+requested.
+
+Now we are ready to install the base system. Select the corresponding
+entry ("Install the base system") and lean back. The packages are
+retrieved from the CD and installed in the /target area.
+
+Next step will be to install the kernel ("Install the kernel"). If you
+did not use autopartkit to partition your harddrive you will be asked
+how your fstab file should be created. Select "debian-installer
+utility for creating fstab file" to do that.
+
+Next you will presented a list of all available kernel images on the
+CD. Select the most suitable for your system and wait until the
+installation has finished.
+
+Now we are almost done. Select "Install LILO on a hard disk" to make
+your harddisk bootable. You will be asked where LILO shall install the
+bootblock. A good idea is your first harddrive in your system which
+should be in fact the default selection.
+
+If that last step has completed successfully select "Finish the
+installation and reboot", eject you CD and wait until your computer
+restarts. Make sure it boots from harddisk, cross your fingers and
+wait until base-config is started.
+
+Stepping through base-config is not within the scope of this document
+as it is not part of debian-installer.
+
+
+4. Installation Report
+
+If you successfully managed an installation with debian-installer,
+please take you time to provide us with a report. There is a template
+named "install-report.template" in the /root directory of a freshly
+installed system. Please fill it out and file it as a bug against the
+package "installation-reports". See section 5 on how to file bugs.
+
+
+5. Reporting bugs
+
+If you did not reach base-config or ran into other trouble, you
+probably found a bug in debian-installer. To improve the installer it
+is necessary that we know about them, so please take your time and
+report them.
+
+First, look here if your bug has already been reported:
+http://bugs.qa.debian.org/cgi-bin/debian-installer.cgi?full=yes
+
+The page is sorted by packages which represent the individual
+subsystems of debain-installer. File your bug against the respective
+subsystem or, if you do not know which it is, against the package
+"install". Look here for an explanation of how to file bugs:
+http://www.debian.org/Bugs/Reporting
+
+
+6. Get involved
+
+The Debian-Installer Team always welcomes people who would like to
+work on the installer. We have plenty of work to do: fixing bugs,
+improve usability, create new modules and of course extensive
+testing. If you are interested to help, check out this page:
+http://people.debian.org/~pere/debian-installer/ 
+
+
