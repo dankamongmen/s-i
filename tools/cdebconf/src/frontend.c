@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.13 2002/08/13 16:18:54 tfheen Exp $
+ * $Id: frontend.c,v 1.14 2002/09/16 23:37:03 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -201,18 +201,19 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
     modname = getenv("DEBIAN_FRONTEND");
     if (modname == NULL)
         modname = cfg->get(cfg, "_cmdline::frontend", 0);
-	if (modname == NULL)
-		modname = cfg->get(cfg, "global::default::frontend", 0);
     if (modname == NULL)
-		DIE("No frontend instance defined");
-
+    {
+            modname = cfg->get(cfg, "global::default::frontend", 0);
+            if (modname == NULL)
+                    DIE("No frontend instance defined");
+            
+            snprintf(tmp, sizeof(tmp), "frontend::instance::%s::driver",
+                     modname);
+            modname = cfg->get(cfg, tmp, 0);
+    }
     modpath = cfg->get(cfg, "global::module_path::frontend", 0);
     if (modpath == NULL)
-		DIE("Frontend module path not defined (global::module_path::frontend)");
-
-	snprintf(tmp, sizeof(tmp), "frontend::instance::%s::driver",
-		modname);
-	modname = cfg->get(cfg, tmp, 0);
+        DIE("Frontend module path not defined (global::module_path::frontend)");
 
     if (modname == NULL)
         DIE("Frontend instance driver not defined (%s)", tmp);
