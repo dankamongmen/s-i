@@ -117,7 +117,9 @@ do
 		db_go || break
 
 		db_get ethdetect/module_select
-		if [ "$RET" != "none of the above" ]; then
+		if [ "$RET" = "no ethernet card" ]; then
+			break
+		elif [ "$RET" != "none of the above" ]; then
 			module="$RET"
 			if [ -n "$module" ] && is_not_loaded "$module" ; then
 				register-module "$module"
