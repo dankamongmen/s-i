@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -O2
+CFLAGS = -Wall -Os
 
 trimtemplates: trimtemplates.c
 	${CC} ${CFLAGS} -o trimtemplates $^
