@@ -61,27 +61,37 @@ PARTITIONS="$RET"
 get_premounts
 PREMOUNTS="$RET"
 
-# ask for partitions
-db_subst $DEBCONF_BASE/which-partition PARTITIONS $PARTITIONS
-db_set $DEBCONF_BASE/which-partition "false"
-db_input medium $DEBCONF_BASE/which-partition
-db_go
-db_get $DEBCONF_BASE/which-partition
-PARTITIONS="$RET"
+# if we have not yet mounted the root partition
+grep " ${TARGET} " /proc/mounts 2>/dev/null
+if [ $? -ne 0 ]; then
+	db_subst $DEBCONF_BASE/rootpartition PARTITIONS $PARTITIONS
+	db_set $DEBCONF_BASE/rootpartition "false"
+	db_input medium $DEBCONF_BASE/rootpartition
+	db_go
+	db_get $DEBCONF_BASE/rootpartition
+	PARTITIONS="$RET"
+	MOUNTPOINT="/"
+fi
 
 # ask for mount-point (if no root mounted allow only root)
 grep " ${TARGET} " /proc/mounts 2>/dev/null
-if [ $? -ne 0 ]; then
-	db_subst $DEBCONF_BASE/mountpoint MOUNTPOINTS "/"
-else
+if [ $? -eq 0 ]; then
+	# ask for partitions
+	db_subst $DEBCONF_BASE/which-partition PARTITIONS $PARTITIONS
+	db_set $DEBCONF_BASE/which-partition "false"
+	db_input medium $DEBCONF_BASE/which-partition
+	db_go
+	db_get $DEBCONF_BASE/which-partition
+	PARTITIONS="$RET"
+
 	db_subst $DEBCONF_BASE/mountpoint MOUNTPOINTS $PREMOUNTS
+	db_subst $DEBCONF_BASE/mountpoint PARTITION $PARTITIONS
+	db_set $DEBCONF_BASE/mountpoint "/"
+	db_input medium $DEBCONF_BASE/mountpoint
+	db_go
+	db_get $DEBCONF_BASE/mountpoint
+	MOUNTPOINT="$RET"
 fi
-db_subst $DEBCONF_BASE/mountpoint PARTITION $PARTITIONS
-db_set $DEBCONF_BASE/mountpoint "/"
-db_input medium $DEBCONF_BASE/mountpoint
-db_go
-db_get $DEBCONF_BASE/mountpoint
-MOUNTPOINT="$RET"
 
 # ask for manual mointpoint if needed (multi lang support)
 echo "$MOUNTPOINT" | grep -q '^/'
