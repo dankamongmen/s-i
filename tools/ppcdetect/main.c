@@ -26,6 +26,11 @@ static void detect_chrp() {
 		exit(0);
 }
 
+static void detect_amiga() {
+	if(check_value(machine, "Amiga", NULL))
+		exit(0);
+}
+
 int check_value(const char *key, const char* value, const char *msg) {
 	/* make NULL-pointer sanity */
 	if((key == NULL) || (value == NULL))
@@ -51,6 +56,7 @@ int main(int argc, char *argv[]) {
 		detect_chrp,
 		detect_newworld,
 		detect_oldworld,
+		detect_amiga,
 		NULL
 	};
 
