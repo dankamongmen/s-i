@@ -57,10 +57,10 @@ echo 'map=/boot/map' >> /target/etc/lilo.conf
 if [ "${SERIAL}" ]; then
     echo "serial=${SERIAL}" >> /target/etc/lilo.conf
 fi
-echo 'image=/vmlinuz' >> /target/etc/lilo.conf
+echo 'image=/boot/vmlinuz' >> /target/etc/lilo.conf
 echo '	label=Linux' >> /target/etc/lilo.conf
-if [ -L /target/initrd.img -o -f /target/initrd.img ]; then
-    echo '	initrd=/initrd.img' >> /target/etc/lilo.conf
+if [ -e /target/boot/initrd.img ]; then
+    echo '	initrd=/boot/initrd.img' >> /target/etc/lilo.conf
 fi
 if [ "${SERIAL}" ]; then
     echo "	append=\"console=ttyS${SERIAL}\"" >> /target/etc/lilo.conf
