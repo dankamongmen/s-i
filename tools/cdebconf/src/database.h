@@ -83,10 +83,10 @@ struct question_db {
     struct question_db_module methods;
 };
 
-struct template_db *template_db_new(struct configuration *);
+struct template_db *template_db_new(struct configuration *, char *);
 void template_db_delete(struct template_db *db);
 
-struct question_db *question_db_new(struct configuration *, struct template_db *tdb);
+struct question_db *question_db_new(struct configuration *, struct template_db *tdb, char *);
 void question_db_delete(struct question_db *db);
 
 #endif

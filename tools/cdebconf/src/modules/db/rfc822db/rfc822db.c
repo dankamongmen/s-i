@@ -596,8 +596,9 @@ static struct question *rfc822db_question_get(struct question_db *db,
     struct question *q, q2;
 
     memset(&q2, 0, sizeof (struct question));
-    q2.tag = ltag;
+    q2.tag = strdup(ltag);
     q = tfind(&q2, &dbdata->root, nodequestioncomp);
+    free(q2.tag);
     if (q != NULL)
     {
             q = *(struct question **)q;

@@ -8,7 +8,7 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.13 2002/09/19 17:14:14 dancer Exp $
+ * $Id: dpkg-reconfigure.c,v 1.14 2002/11/17 21:21:19 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -403,9 +403,9 @@ int main(int argc, char **argv)
 		DIE("Error reading configuration information");
 
 	/* initialize database and frontend modules */
-	if ((g_templates = template_db_new(g_config)) == 0)
+	if ((g_templates = template_db_new(g_config, NULL)) == 0)
 		DIE("Cannot initialize DebConf templates database");
-    if ((g_questions = question_db_new(g_config, g_templates)) == 0)
+    if ((g_questions = question_db_new(g_config, g_templates, NULL)) == 0)
 		DIE("Cannot initialize DebConf config database");
 	if ((g_frontend = frontend_new(g_config, g_templates, g_questions)) == 0)
 		DIE("Cannot initialize DebConf frontend");

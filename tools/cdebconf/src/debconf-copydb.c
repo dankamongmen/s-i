@@ -8,7 +8,7 @@
  * Description: Allows the user to load template/question infrom from
  *              one database to another
  *
- * $Id: debconf-copydb.c,v 1.3 2002/09/19 17:14:14 dancer Exp $
+ * $Id: debconf-copydb.c,v 1.4 2002/11/17 21:21:19 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -98,13 +98,13 @@ int main(int argc, char **argv)
         DIE("Error reading configuration information");
 
     /* initialize database modules */
-    if ((tdb = template_db_new(config)) == 0)
+    if ((tdb = template_db_new(config, NULL)) == 0)
         DIE("Cannot initialize DebConf template database");
     setenv("DEBCONF_CONFIG", db1name, 1);
-    if ((db1 = question_db_new(config, tdb)) == 0)
+    if ((db1 = question_db_new(config, tdb, NULL)) == 0)
         DIE("Cannot initialize first DebConf database");
     setenv("DEBCONF_CONFIG", db2name, 1);
-    if ((db2 = question_db_new(config, tdb)) == 0)
+    if ((db2 = question_db_new(config, tdb, NULL)) == 0)
         DIE("Cannot initialize second DebConf database");
 
     /* load database */

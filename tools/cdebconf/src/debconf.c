@@ -13,6 +13,7 @@ static struct frontend *frontend = NULL;
 static struct confmodule *confmodule = NULL;
 static struct question_db *questions = NULL;
 static struct template_db *templates = NULL;
+static char *owner;
 
 static struct option options[] = {
     { "owner", 1, 0, 'o' },
@@ -58,6 +59,7 @@ void parsecmdline(struct configuration *config, int argc, char **argv)
         switch (c)
         {
             case 'o':
+                owner = optarg;
                 break;
             case 'p':
                 break;
@@ -91,9 +93,9 @@ int main(int argc, char **argv)
 		DIE("Error reading configuration information");
 
 	/* initialize database and frontend modules */
-    if ((templates = template_db_new(config)) == 0)
+    if ((templates = template_db_new(config, NULL)) == 0)
         DIE("Cannot initialize DebConf template database");
-	if ((questions = question_db_new(config, templates)) == 0)
+	if ((questions = question_db_new(config, templates, NULL)) == 0)
 		DIE("Cannot initialize DebConf configuration database");
 	if ((frontend = frontend_new(config, templates, questions)) == 0)
 		DIE("Cannot initialize DebConf frontend");
@@ -114,10 +116,13 @@ int main(int argc, char **argv)
 
 	/* load templates and config */
 	templates->methods.load(templates);
-    questions->methods.load(questions);
+        questions->methods.load(questions);
 
 	/* startup the confmodule; run the config script and talk to it */
 	confmodule = confmodule_new(config, templates, questions, frontend);
+        if (owner == NULL)
+          owner = "unknown";
+        confmodule->owner = owner;
 	confmodule->run(confmodule, argc - optind + 1, argv + optind - 1);
 	confmodule->communicate(confmodule);
 

@@ -8,7 +8,7 @@
  * Description: simple utility to load a template file into the 
  *              database
  *
- * $Id: debconf-loadtemplate.c,v 1.7 2002/09/19 17:14:14 dancer Exp $
+ * $Id: debconf-loadtemplate.c,v 1.8 2002/11/17 21:21:19 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -102,9 +102,9 @@ int main(int argc, char **argv)
         DIE("Error reading configuration information");
 
     /* initialize database modules */
-    if ((tdb = template_db_new(config)) == 0)
+    if ((tdb = template_db_new(config, NULL)) == 0)
         DIE("Cannot initialize DebConf template database");
-    if ((qdb = question_db_new(config, tdb)) == 0)
+    if ((qdb = question_db_new(config, tdb, NULL)) == 0)
         DIE("Cannot initialize DebConf config database");
 
     tdb->methods.load(tdb);

@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.12 2002/07/31 21:48:55 tfheen Exp $
+ * $Id: database.c,v 1.13 2002/11/17 21:21:19 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -105,15 +105,19 @@ static struct template *template_db_iterate(struct template_db *db,
 	return 0;
 }
 
-struct template_db *template_db_new(struct configuration *cfg)
+struct template_db *template_db_new(struct configuration *cfg, char *instance)
 {
 	struct template_db *db;
 	void *dlh;
 	struct template_db_module *mod;
 	char tmp[256];
 	const char *modpath, *modname, *driver;
-
-    modname = cfg->get(cfg, "global::default::template", getenv("DEBCONF_TEMPLATE"));
+        
+        if (instance != NULL) {
+          modname = strdup(instance);
+        } else {
+          modname = cfg->get(cfg, "global::default::template", getenv("DEBCONF_TEMPLATE"));
+        }
 
     if (modname == NULL)
 		DIE("No template database instance defined");
@@ -293,7 +297,8 @@ static struct question *question_db_iterate(struct question_db *db,
 	return 0;
 }
 
-struct question_db *question_db_new(struct configuration *cfg, struct template_db *tdb)
+struct question_db *question_db_new(struct configuration *cfg, struct template_db *tdb, 
+                                    char *instance)
 {
 	struct question_db *db;
 	void *dlh;
@@ -301,12 +306,17 @@ struct question_db *question_db_new(struct configuration *cfg, struct template_d
 	char tmp[256];
 	const char *modpath, *modname, *driver;
 
-    modname = getenv("DEBCONF_CONFIG");
-    if (modname == NULL)
-        modname = cfg->get(cfg, "global::default::config", 0);
+        if (instance != NULL)
+          modname = strdup(instance);
+        
+        if (modname == NULL)
+          modname = getenv("DEBCONF_CONFIG");
 
-    if (modname == NULL)
-		DIE("No question database instance defined");
+        if (modname == NULL)
+          modname = cfg->get(cfg, "global::default::config", 0);
+
+        if (modname == NULL)
+          DIE("No question database instance defined");
 
     modpath = cfg->get(cfg, "global::module_path::database", 0);
     if (modpath == NULL)

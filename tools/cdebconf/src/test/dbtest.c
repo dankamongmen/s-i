@@ -51,10 +51,10 @@ int main(int argc, char **argv)
 		DIE("Error reading configuration information");
 
 	/* initialize database and frontend modules */
-	if ((tdb = template_db_new(config)) == 0)
+	if ((tdb = template_db_new(config, NULL)) == 0)
 		DIE("Cannot initialize DebConf template database");
 
-	if ((qdb = question_db_new(config, tdb)) == 0)
+	if ((qdb = question_db_new(config, tdb, NULL)) == 0)
 		DIE("Cannot initialize DebConf question database");
 
 	/* load templates */

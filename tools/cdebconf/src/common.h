@@ -17,6 +17,7 @@
 #define DC_OK		1
 #define DC_NOTIMPL	2
 #define DC_AUTHNEEDED	3
+#define DC_REJECT	4
 
 #define DC_GOBACK	30
 
