@@ -680,7 +680,7 @@ normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
 
     for (count = 0; source[count].mountpoint != NULL; count++)
     {
-        memcpy(&dest[count], &source[count], sizeof(&dest[0]));
+        memcpy(&dest[count], &source[count], sizeof(dest[0]));
         dest[count].mountpoint = strdup(source[count].mountpoint);
 
 	if (strcmp(source[count].fstype,"default") == 0)
@@ -688,10 +688,12 @@ normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
 	else
 	    dest[count].fstype = strdup(source[count].fstype);
 
+#if 0
         /* Hm, these should not be nessesary.  Testing... */
+        dest[count].ondisk = source[count].ondisk;
         dest[count].minsize = source[count].minsize;
         dest[count].maxsize = source[count].maxsize;
-
+#endif
         /* Make sure minsize <= maxsize, unless maxsize == -1 (unlimited) */
 	if (-1 != dest[count].maxsize)
 	{
@@ -941,7 +943,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     lvm_pv_stack = lvm_pv_stack_new();
     lvm_lv_stack = lvm_lv_stack_new();
 
-    autopartkit_log(1, "  Created LVM stacks\n");
+    autopartkit_log(1, "Created LVM stacks\n");
 
     /* Do not make LVM logical volumes on the disk */
     for (partnum = 0; partnum < MAX_PARTITIONS && requirements[partnum].fstype;
