@@ -210,8 +210,6 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	int menu_size, menu_used, size;
 
 	debconf_get(debconf,"debian-installer/language");
-	if (language)
-		free(language);
 	if (debconf->value)
 		language = strdup(debconf->value);
 
