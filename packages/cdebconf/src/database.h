@@ -29,6 +29,7 @@ struct template_db_module {
     int (*lock)(struct template_db *, const char *name);
     int (*unlock)(struct template_db *, const char *name);
     struct template *(*iterate)(struct template_db *db, void **iter);
+    int (*accept)(struct template_db *, const char *name, const char *type);
 };
 
 /**
@@ -47,6 +48,7 @@ struct question_db_module {
     int (*unlock)(struct question_db *, const char *name);
     int (*is_visible)(struct question_db *, const char *name, const char *priority);
     struct question *(*iterate)(struct question_db *, void **iter);
+    int (*accept)(struct question_db *, const char *name, const char *type);
 };
 
 /**

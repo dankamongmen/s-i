@@ -9,6 +9,39 @@
 #include <unistd.h>
 #include <string.h>
 
+static int common_accept(const char *type,
+    struct configitem *accept_types, struct configitem *reject_types)
+{
+    struct configitem *child;
+    int found;
+
+    if (accept_types != NULL)
+    {
+        found = 0;
+        for (child = accept_types->child; child != NULL; child = child->next)
+        {
+            if (strcmp(child->value, type) == 0)
+                found = 1;
+        }
+        if (!found)
+            return DC_REJECT;
+    }
+
+    if (reject_types != NULL)
+    {
+        found = 0;
+        for (child = reject_types->child; child != NULL; child = child->next)
+        {
+            if (strcmp(child->value, type) == 0)
+                found = 1;
+        }
+        if (found)
+            return DC_REJECT;
+    }
+
+    return DC_OK;
+}
+
 /**
  *
  * Template database 
@@ -64,6 +97,29 @@ static struct template *template_db_iterate(struct template_db *db,
 	void **iter)
 {
 	return 0;
+}
+
+static int template_db_accept(struct template_db *db,
+    const char *name, const char *type)
+{
+    char tmp[1024];
+    struct configitem *accept_types, *reject_types;
+
+    if (type == NULL || *type == '\0')
+    {
+        struct template *template = db->methods.get(db, name);
+        if (template != NULL && template->type != NULL)
+            type = template->type;
+        else
+            type = "";
+    }
+
+    snprintf(tmp, sizeof(tmp), "%s::accept_types", db->configpath);
+    accept_types = db->config->tree(db->config, tmp);
+    snprintf(tmp, sizeof(tmp), "%s::reject_types", db->configpath);
+    reject_types = db->config->tree(db->config, tmp);
+
+    return common_accept(type, accept_types, reject_types);
 }
 
 struct template_db *template_db_new(struct configuration *cfg, char *instance)
@@ -124,6 +180,7 @@ struct template_db *template_db_new(struct configuration *cfg, char *instance)
 	SETMETHOD(lock);
 	SETMETHOD(unlock);
 	SETMETHOD(iterate);
+	SETMETHOD(accept);
 
 #undef SETMETHOD
 
@@ -278,6 +335,30 @@ static struct question *question_db_iterate(struct question_db *db,
 	return 0;
 }
 
+static int question_db_accept(struct question_db *db,
+    const char *name, const char *type)
+{
+    char tmp[1024];
+    struct configitem *accept_types, *reject_types;
+
+    if (type == NULL || *type == '\0')
+    {
+        struct question *question = db->methods.get(db, name);
+        if (question != NULL && question->template != NULL &&
+                question->template->type != NULL)
+            type = question->template->type;
+        else
+            type = "";
+    }
+
+    snprintf(tmp, sizeof(tmp), "%s::accept_types", db->configpath);
+    accept_types = db->config->tree(db->config, tmp);
+    snprintf(tmp, sizeof(tmp), "%s::reject_types", db->configpath);
+    reject_types = db->config->tree(db->config, tmp);
+
+    return common_accept(type, accept_types, reject_types);
+}
+
 struct question_db *question_db_new(struct configuration *cfg, 
                                     struct template_db *tdb, 
                                     char *instance)
@@ -344,6 +425,7 @@ struct question_db *question_db_new(struct configuration *cfg,
 	SETMETHOD(unlock);
 	SETMETHOD(is_visible);
 	SETMETHOD(iterate);
+	SETMETHOD(accept);
 
 #undef SETMETHOD
 

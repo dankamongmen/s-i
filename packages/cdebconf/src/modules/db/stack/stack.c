@@ -122,15 +122,20 @@ static int stack_template_db_set(struct template_db *db, struct template *t)
      struct template_stack *tstack = (struct template_stack *)db->data;
      int ret;
      while (tstack) {
+          ret = tstack->db->methods.accept(tstack->db, t->tag, t->type);
+          if (ret == DC_REJECT) {
+               tstack = tstack->next;
+               continue;
+          }
           ret = tstack->db->methods.set(tstack->db, t);
           switch (ret) {
           case DC_OK:
                return DC_OK;
           case DC_NOTOK:
                return DC_NOTOK;
-          case DC_REJECT:
+          case DC_REJECT: /* obsolete as return code from set() */
                tstack = tstack->next;
-               break;
+               continue;
           }
      }
      /* everybody rejected it, it seems */
@@ -251,15 +256,21 @@ static int stack_question_db_set(struct question_db *db, struct question *t) {
      struct question_stack *qstack = (struct question_stack *)db->data;
      int ret;
      while (qstack) {
+          const char *type = t->template ? t->template->type : "";
+          ret = qstack->db->methods.accept(qstack->db, t->tag, type);
+          if (ret == DC_REJECT) {
+               qstack = qstack->next;
+               continue;
+          }
           ret = qstack->db->methods.set(qstack->db, t);
           switch (ret) {
           case DC_OK:
                return DC_OK;
           case DC_NOTOK:
                return DC_NOTOK;
-          case DC_REJECT:
+          case DC_REJECT: /* obsolete as return code from set() */
                qstack = qstack->next;
-               break;
+               continue;
           }
      }
      /* everybody rejected it, it seems */
