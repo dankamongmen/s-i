@@ -38,7 +38,7 @@ load_module() {
     db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
     db_get hw-detect/module_params
-    if modprobe -v "$module" $RET 2>&1 | logger -t hw-detect ; then
+    if modprobe -v "$module" $RET >> /var/log/messages 2>&1 ; then
 	# Not sure if this is usefull.  After all, 'discover' is installed
 	# in /target/. [pere 2003-04-18]
 	#prebaseconfig=/usr/lib/prebaseconfig.d/40ethdetect
