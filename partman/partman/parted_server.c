@@ -771,7 +771,11 @@ partition_info(PedDisk *disk, PedPartition *part)
                 fs = "unknown";
         else
                 fs = part->fs_type->name;
-        path = ped_partition_get_path(part);
+        if (0 != strcmp(disk->type->name, "loop")) {
+                path = ped_partition_get_path(part);
+        } else {
+                path = strdup(disk->dev->path);
+        }
         if (ped_disk_type_check_feature(part->disk->type,
                                         PED_DISK_TYPE_PARTITION_NAME)
             && ped_partition_is_active(part))
