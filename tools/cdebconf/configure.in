@@ -75,6 +75,14 @@ AC_ARG_WITH(conffile,[  --with-conffile=PATH    cdebconf config file [/etc/debco
  esac])
 AC_DEFINE_UNQUOTED(DEBCONFCONFIG, "$DEBCONFCONFIG") 
 
+DEFAULT_FRONTEND=text
+AC_ARG_WITH(default-frontend, [  --with-default-frontend default frontend to use[text]],
+[case "$withval" in
+  "") AC_MSG_ERROR(invalid default frontend specified) ;;
+  *)  DEFAULT_FRONTEND="$withval";;
+ esac])
+AC_SUBST(DEFAULT_FRONTEND)
+
 dnl Check for libraries
 AC_CHECK_LIB(dl, dlopen)
 
@@ -124,4 +132,4 @@ AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(socket strdup strstr strtol)
 
-AC_OUTPUT(globalmakeflags src/Makefile man/Makefile)
+AC_OUTPUT(globalmakeflags src/cdebconf.conf-dist src/Makefile man/Makefile)
