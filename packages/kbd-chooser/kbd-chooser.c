@@ -148,12 +148,17 @@ locale_parse (char *locale, char **lang, char **territory, char **modifier, char
 {
 	char *und, *at, *dot, *loc = strdup (locale);
 
-	if ((und = strchr (loc, '_')) != NULL)
-		*und = '\0';	
-	if ((at = strchr (loc, '@')) != NULL)
-		*at = '\0';
-	if ((dot = strchr (loc, '.')) != NULL)
-		*dot = '\0';
+	// Each separator occurs only once in a well-formed locale
+	und = strchr (loc, '_');
+	at = strchr (loc, '@');
+	dot = strchr (loc, '.');
+
+	if (und)
+	    *und = '\0';
+	if (at)
+	    *at = '\0';
+	if (dot)
+	    *dot = '\0';
 
 	*lang = loc;
 	*territory = und ? (und + 1) : NULL;
@@ -164,7 +169,7 @@ locale_parse (char *locale, char **lang, char **territory, char **modifier, char
 /**
  * @brief compare langs list with the preferred locale
  * @param langs: colon-seperated list of locales
- * @return score 0-4
+ * @return score 0-8
  */
 int
 locale_list_compare (char *langs)
@@ -197,7 +202,7 @@ locale_list_compare (char *langs)
 				score--;
 			if (territory1 && !territory2)
 				score++;
-			if (charset1 && !charset2 && !strcmp (charset1, charset2))	       	{
+			if (charset1 && charset2 && !strcmp (charset1, charset2))	       	{
 				score += 3;	// charset more important than territory
 			}
 		}
