@@ -217,16 +217,25 @@ fi
 db_set "$countrycode"  "$COUNTRYCODE"
 log "$countrycode = '$COUNTRYCODE'"
 
-# If the country forms a supported locale, set the locale.
-if grep -q "^${LANGUAGE}_${COUNTRYCODE}$" $SUPPORTEDLOCALES; then
-	LOCALE=${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER}
-	db_set "$localecode" "${LOCALE}"
-	log "$localecode = '${LOCALE}'"
-else
-	# We fall back to a supported locale
-	db_set "$localecode" "${FALLBACKLOCALE}"
-	log "$localecode = '${FALLBACKLOCALE}'"
+# Search for a supported locale which most closely resembles.
+LOCALE=""
+for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
+	     ${LANGUAGE}_${COUNTRYCODE}; do
+	if grep -q "^${entry}$" $SUPPORTEDLOCALES; then
+		LOCALE="${entry}"
+		break
+	fi
+done
+
+# Fall back to a supported locale.
+if [ -z "${LOCALE}" ]; then
+	LOCALE="${FALLBACKLOCALE}"
+	log "falling back to locale '${FALLBACKLOCALE}'"
 fi
+
+# Set the locale.
+db_set "$localecode" "${LOCALE}"
+log "$localecode = '${LOCALE}'"
 
 # The code below tries to add lang_COUNTRY at the beginning of the language
 # list we got from languagechooser
