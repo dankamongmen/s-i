@@ -117,9 +117,10 @@ get_hw_info() {
     echo "ide-disk:Linux ATA DISK driver"
     echo "ide-cd:Linux ATAPI CD-ROM driver"
     echo "isofs:Linux ISO 9660 filesystem driver"
-    #echo "i82365:Linux Unknown"
-    #echo "sr_mod:Linux Unknown"
-    #echo "usb-storage:Linux Unknown"
+
+    if [ -d /proc/bus/usb ]; then
+    	echo "usb-storage:USB storage"
+    fi
 }
 
 
