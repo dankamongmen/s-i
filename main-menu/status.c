@@ -41,7 +41,7 @@ struct package_t *status_read(void) {
 			p = newp;
 		}
 		else if (strstr(buf, "Installer-Menu-Item: ") == buf) {
-			p->installer_menu_item = atoi(buf+21);
+			p->installer_menu_item = atoi(buf + 21);
 		}
 		else if (strstr(buf, "Status: ") == buf) {
 			if (strstr(buf, " unpacked")) {

@@ -19,10 +19,6 @@
 
 typedef enum { unpacked, installed, other } package_status;
 
-#define STATUS_UNKNOWN		0
-#define STATUS_UNPACKED		1
-#define STATUS_INSTALLED	2
-
 struct package_t {
 	char *package;
 	int installer_menu_item;
