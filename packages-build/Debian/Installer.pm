@@ -80,7 +80,7 @@ sub control
     }
     elsif (/^Architecture:\s*(.*)/)
     {
-      $arch = $1 eq "all" ? $1 : get_arch();
+      $arch = $1;
     }
     elsif (/^(XC-)?Package-Type:\s*(.*)/)
     {
@@ -103,7 +103,9 @@ sub control
       $packages{$package}->{real_package} = $real_package,
       $packages{$package}->{type} = $type,
 
-      $packages{$package}->{filename} = $real_package . "_" . $version . "_" . $arch . "." . $type;
+      my $buildarch = $arch eq "all" ? $arch : get_arch();
+
+      $packages{$package}->{filename} = $real_package . "_" . $version . "_" . $buildarch . "." . $type;
 
       $package = undef;
       $arch = undef;
@@ -202,9 +204,17 @@ sub packages_args
   my $type = shift;
   my @ret;
 
+  my $buildarch = get_arch();
+
   foreach (@_)
   {
-    push @ret, "-p", $_ if $type eq $packages{$_}->{type};
+    if ($type eq $packages{$_}->{type} and
+        ($packages{$_}->{arch} eq "all" or
+         $packages{$_}->{arch} eq "any" or
+         $packages{$_}->{arch} =~ /\b$buildarch\b/))
+    {
+      push @ret, "-p", $_;
+    }
   }
 
   return @ret;
