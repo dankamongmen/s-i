@@ -2,23 +2,12 @@
 set -e
 
 . /usr/share/debconf/confmodule
+. /lib/preseed/preseed.sh
 
-log () {
-	logger -t preseed "$@"
-}
-
-error () {
-	ERROR="$1"
-	FILE="$2"
-	db_subst preseed/$ERROR LOCATION "$FILE"
-	db_input critical preseed/$ERROR || true
-	db_go || true
-	exit 1
-}
-
-fetch() {
-	url="$1"
-	file="$2"
+# Used by preseed function.
+preseed_fetch () {
+	local url="$1"
+	local file="$2"
 	iters=0
 	while [ $iters -lt 3 ]; do
 		# TODO proxy support? Would it be useful?
@@ -30,21 +19,13 @@ fetch() {
 	done
 	return 1
 }
-
-db_get preseed/url
-URL="$RET"
-if [ -n "$URL" ]; then
-	if ! fetch $URL /var/log/debconf-seed; then
-		error retrieve_error "$URL"
+preseed_relative () {
+	if [ -z ${1##*://*} ]; then
+		return 1
+	else
+		return 0
 	fi
-fi
+}
 
-if ! debconf-set-selections /var/log/debconf-seed; then
-	error load_error "$URL"
-fi
-
-log "successfully loaded $TMPFILE"
-
-rm -f $TMPFILE
-
+preseed preseed/url
 preseed_command preseed/early_command
