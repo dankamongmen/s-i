@@ -119,6 +119,9 @@ get_all_partitions(struct partition *parts[], const int max_parts)
     struct partition *p;
     int disc_count = 0, part_count = 0;
     int i, cont, size;
+    PedDevice *dev;
+    PedDisk *disk;
+    PedPartition *part;
 
     if ((d = opendir("/dev/discs")) == NULL)
         return 0;
@@ -169,48 +172,58 @@ get_all_partitions(struct partition *parts[], const int max_parts)
         p->path = strdup(partname);
         p->fstype = NULL;
         p->fsid = NULL;
+        p->size = 0L;
         p->op.filesystem = NULL;
         p->op.mountpoint = NULL;
         p->op.done = 0;
-        test_lvm(p);
-        test_evms(p);
-        test_raid(p);
+//        test_lvm(p);
+//        test_evms(p);
+//        test_raid(p);
         // FIXME: Other tests?
         parts[part_count++] = p;
+        // Open the partition/volume as if it was a disk, it should
+        // just have one partition that we can toy with.
+        if ((dev = ped_device_get(partname)) == NULL)
+            continue;
+        if ((disk = ped_disk_new(dev)) == NULL)
+            continue;
+        if ((part = ped_disk_next_partition(disk, NULL)) == NULL)
+            continue;
+        if (part->fs_type != NULL)
+            p->fstype = strdup(part->fs_type->name);
+        p->size = PART_SIZE_BYTES(dev, part);
     }
     // Add partitions from all the disks we found
     for (i = 0; i < disc_count; i++) {
-        PedDevice *dev;
-        PedDisk *disk;
-        PedPartition *part = NULL;
-        const PedFileSystemType *fstype;
         char *foo;
 
         asprintf(&foo, "%s/disc", discs[i]);
         if ((dev = ped_device_get(foo)) == NULL) {
+            free(foo);
             continue;
         }
+        free(foo);
         if ((disk = ped_disk_new(dev)) == NULL) {
             continue;
         }
+        part = NULL;
         while ((part = ped_disk_next_partition(disk, part)) != NULL) {
             if (part->type & (PED_PARTITION_METADATA | PED_PARTITION_FREESPACE | PED_PARTITION_EXTENDED))
                 continue;
-            if (ped_partition_is_flag_available(part, PED_PARTITION_LVM) &&
-                    ped_partition_get_flag(part, PED_PARTITION_LVM)) {
-                continue;
-            }
-            if (ped_partition_is_flag_available(part, PED_PARTITION_RAID) &&
-                    ped_partition_get_flag(part, PED_PARTITION_RAID)) {
-                continue;
-            }
             p = malloc(sizeof(*p));
             p->path = ped_partition_get_path(part);
-            fstype = part->fs_type;
-            if (fstype != NULL)
-                p->fstype = strdup(fstype->name);
-            else
-                p->fstype = NULL;
+            if (part->fs_type != NULL)
+                p->fstype = strdup(part->fs_type->name);
+            else {
+                if (ped_partition_is_flag_available(part, PED_PARTITION_LVM) &&
+                        ped_partition_get_flag(part, PED_PARTITION_LVM)) {
+                    p->fstype = strdup("LVM");
+                }
+                if (ped_partition_is_flag_available(part, PED_PARTITION_RAID) &&
+                        ped_partition_get_flag(part, PED_PARTITION_RAID)) {
+                    p->fstype = strdup("RAID");
+                }
+            }
             p->fsid = NULL;
             p->size = PART_SIZE_BYTES(dev, part);
             p->op.filesystem = NULL;
