@@ -12,7 +12,9 @@ fi
 mkdir -p /var/lib/apt-install
 touch /var/lib/apt-install/queue
 for pkg in $@ ; do
-    echo "$pkg" >> /var/lib/apt-install/queue
+    if ! grep -q "$pkg" /var/lib/apt-install/queue; then
+        echo "$pkg" >> /var/lib/apt-install/queue
+    fi
 done
 
 if [ ! -f /target/etc/apt/sources.list ] ; then
