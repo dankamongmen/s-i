@@ -36,18 +36,18 @@ enable_daemons () {
 	mv /target/sbin/start-stop-daemon.REAL /target/sbin/start-stop-daemon
 }
 
-# Add to list of extra packages to be installed into /target/.
-mkdir -p /var/lib/apt-install
-touch $queue
-for pkg in $@ ; do
-	if ! grep -q "^$pkg$" $queue; then
-		echo "$pkg" >> $queue
-	fi
-done
-
+# If we don't have a working mirror yet, only queue the package;
+# it will be installed later by the postinst in base-installer.
 if [ ! -f /target/etc/apt/sources.list ] ; then
-	# The package was only queued, and will be installed by the
-	# postinst in base-installer.
+	# Add to list of extra packages to be installed into /target/.
+	mkdir -p /var/lib/apt-install
+	touch $queue
+	for pkg in $@ ; do
+		if ! grep -q "^$pkg$" $queue; then
+			echo "$pkg" >> $queue
+		fi
+	done
+
 	exit 1 # Return error as the package is not ready to be used yet.
 fi
 
