@@ -25,13 +25,15 @@ then
   exit
 fi
 
-echo $PACKAGE/debian/.credits_log
-if [ ! -e "$PACKAGE/debian/.credits_log" ]
+if [ ! -f "$PACKAGE/debian/.credits_log" ]
 then 
     $CURDIR/log-changes $P
 fi   
 
+if [ "`cat "$PACKAGE/debian/.credits_log"| wc -l`" -gt 0 ]
+then
 echo "* Updated translations: "
+fi
 
 PREV=""
 

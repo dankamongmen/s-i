@@ -43,6 +43,8 @@ LINE=`grep "; urgency=" "$CHANGELOG" | grep -n "$RELEASE" | head -n 1 | sed 's/:
 DATE=`grep "^ --" "$CHANGELOG" | head -n $LINE | tail -n 1 | sed 's/.*>  //g'`
 OLD_DATE=`date -d "$DATE" +%s`
 
+touch $PACKAGE/debian/.credits_log
+
 for i in $POS/*.po
 do
   if [ -f "$i" ]
