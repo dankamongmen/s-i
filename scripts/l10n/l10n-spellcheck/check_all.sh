@@ -92,17 +92,25 @@ XTICS=`echo $XTICS | sed "s:^":\(":" | sed "s:,$:):"`
 cat $STATS.txt | sort -n | awk '{print $1}' > $GNUPLOT_DATA
 
 rm -f $GNUPLOT_SCRIPT
+LOGFILE=$GNUPLOT_SCRIPT
+exec 6>&1           # Link file descriptor #6 with stdout.
+                    # Saves stdout.
+
+exec > $LOGFILE     # stdout replaced with file "logfile.txt".
+
 #echo "set terminal png size 640,480" >> $GNUPLOT_SCRIPT
-echo "set terminal png" >> $GNUPLOT_SCRIPT
-echo "set output \"$DEST_DIR/graph.png\"" >> $GNUPLOT_SCRIPT
-echo "set title \"Statistics for the $i languages with an Aspell dictionary\"" >> $GNUPLOT_SCRIPT
-echo "set key left" >> $GNUPLOT_SCRIPT
-echo "set xlabel \"Languages\" 0,-1" >> $GNUPLOT_SCRIPT
-echo "set ylabel \"Unknown words\"" >> $GNUPLOT_SCRIPT
-echo "set origin 0,0.01" >> $GNUPLOT_SCRIPT
-echo "set xtics rotate $XTICS" >> $GNUPLOT_SCRIPT
-echo "set xrange [-1:$i]" >> $GNUPLOT_SCRIPT
-echo "plot \"$GNUPLOT_DATA\" with impulses,$AVERAGE t \"Average: $AVERAGE words\"" >> $GNUPLOT_SCRIPT
+echo "set terminal png"
+echo "set output \"$DEST_DIR/graph.png\""
+echo "set title \"Statistics for the $i languages with an Aspell dictionary\""
+echo "set key left"
+echo "set xlabel \"Languages\" 0,-1"
+echo "set ylabel \"Unknown words\""
+echo "set origin 0,0.01"
+echo "set xtics rotate $XTICS"
+echo "set xrange [-1:$i]"
+echo "plot \"$GNUPLOT_DATA\" with impulses,$AVERAGE t \"Average: $AVERAGE words\""
+
+exec 1>&6 6>&-      # Restore stdout and close file descriptor #6.
 
 gnuplot $GNUPLOT_SCRIPT
 

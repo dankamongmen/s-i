@@ -39,17 +39,23 @@ if [ $i -ne 0 ] ; then
     AVERAGE=`expr $TOTAL / $i`
 fi
 
+LOGFILE=$TABLE_HTML
+exec 6>&1           # Link file descriptor #6 with stdout.
+                    # Saves stdout.
+
+exec > $LOGFILE     # stdout replaced with file "logfile.txt".
+
 # create HTML table
-echo "<table>" > $TABLE_HTML
-echo "  <tr>" >> $TABLE_HTML
-echo "   <th class=\"col1\">Language</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">Unknown words</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">Messages</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">List of unknown words</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">Suspect variables</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">All files</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">Aspell Dictionary</th>" >> $TABLE_HTML
-echo " </tr>" >> $TABLE_HTML
+echo "<table>"
+echo "  <tr>"
+echo "   <th class=\"col1\">Language</th>"
+echo "   <th class=\"t1\">Unknown words</th>"
+echo "   <th class=\"t1\">Messages</th>"
+echo "   <th class=\"t1\">List of unknown words</th>"
+echo "   <th class=\"t1\">Suspect variables</th>"
+echo "   <th class=\"t1\">All files</th>"
+echo "   <th class=\"t1\">Aspell Dictionary</th>"
+echo " </tr>"
 
 # fill the table:
 # Language, Unknown words, Messages, List of unknown words, Suspect vars, All Files
@@ -74,37 +80,38 @@ fi
 
 DICT_NAME=`echo $DICT_URL | sed "s|ftp://ftp.gnu.org/gnu/aspell/dict/.*/||" | sed "s:.tar.bz2$::"`
 
-echo "  <tr>" >> $TABLE_HTML
-echo "   <td class=\"col1\">$LANG</td>" >> $TABLE_HTML
-echo "   <td>$UNKN</td>" >> $TABLE_HTML
-echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a></td>" >> $TABLE_HTML
-echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a></td>" >> $TABLE_HTML
-echo "   <td><a href=\"$SUSPECT_VARS_URL\">$SUSPECT_VARS_NAME</a></td>" >> $TABLE_HTML
-echo "   <td><a href=\"latest/zip/$LANG.tar.gz\">$LANG.tar.gz</a></td>" >> $TABLE_HTML
-echo "   <td><a href=\"$DICT_URL\">$DICT_NAME</a></td>" >> $TABLE_HTML
-echo "  </tr>" >> $TABLE_HTML
+echo "  <tr>"
+echo "   <td class=\"col1\">$LANG</td>"
+echo "   <td>$UNKN</td>"
+echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a></td>"
+echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a></td>"
+echo "   <td><a href=\"$SUSPECT_VARS_URL\">$SUSPECT_VARS_NAME</a></td>"
+echo "   <td><a href=\"latest/zip/$LANG.tar.gz\">$LANG.tar.gz</a></td>"
+echo "   <td><a href=\"$DICT_URL\">$DICT_NAME</a></td>"
+echo "  </tr>"
     
 done
 
 # Total unknown words
-echo "  <tr>" >> $TABLE_HTML
-echo "   <td class=\"col1\">TOTAL</td>" >> $TABLE_HTML
-echo "   <td>$TOTAL</td>" >> $TABLE_HTML
-echo "   <td></td>" >> $TABLE_HTML
-echo "   <td></td>" >> $TABLE_HTML
-echo "   <td></td>" >> $TABLE_HTML
-echo "  </tr>" >> $TABLE_HTML
+echo "  <tr>"
+echo "   <td class=\"col1\">TOTAL</td>"
+echo "   <td>$TOTAL</td>"
+echo "   <td></td>"
+echo "   <td></td>"
+echo "   <td></td>"
+echo "  </tr>"
 
 # Average unknown words per language
-echo "  <tr>" >> $TABLE_HTML
-echo "   <td class=\"col1\">AVERAGE</td>" >> $TABLE_HTML
-echo "   <td>$AVERAGE</td>" >> $TABLE_HTML
-echo "   <td></td>" >> $TABLE_HTML
-echo "   <td></td>" >> $TABLE_HTML
-echo "   <td></td>" >> $TABLE_HTML
-echo "  </tr>" >> $TABLE_HTML
+echo "  <tr>"
+echo "   <td class=\"col1\">AVERAGE</td>"
+echo "   <td>$AVERAGE</td>"
+echo "   <td></td>"
+echo "   <td></td>"
+echo "   <td></td>"
+echo "  </tr>"
 
-echo "</table>" >> $TABLE_HTML
+echo "</table>"
+exec 1>&6 6>&-      # Restore stdout and close file descriptor #6.
 
 sed "/<!-- HTML TABLE STARTS HERE -->/r ${TABLE_HTML}" $TEMPLATE > $INDEX_HTML
 
