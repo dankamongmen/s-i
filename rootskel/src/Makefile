@@ -10,7 +10,8 @@ subdirs = \
 	proc \
 	sbin \
 	usr \
-	var
+	var \
+	initrd
 
 files_exec = linuxrc
 

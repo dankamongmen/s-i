@@ -1,0 +1,69 @@
+#!/bin/sh
+# This is a special linuxrc for the usb-chainboot floppy image.
+
+if [ "$DEBCONF_DEBUG" -gt 1 ]; then
+	set -x
+fi
+
+# must be mounted for mounting the usb device to work
+mount -t proc proc proc
+mount -t devfs devfs dev
+
+/bin/sh
+
+# Load the appropriate usb controller.
+# XXX this should be a program in /bin..
+/lib/debian-installer.d/S45usb-linux
+
+# Rest of the necessary modules.
+modprobe usb-storage
+modprobe fat
+
+echo "If you have not inserted your USB media, do so now."
+echo "Searching for devices."
+while :; do
+	for dev in /dev/sda1 /dev/sdb1 `find /dev/scsi`; do
+		if [ -b $dev ]; then
+			echo -e "\r"
+			echo -n "Probing for USB media in $dev.."
+			if mount $dev /usb; then
+				if [ -e /usb/initrd ]; then
+					echo -e "found debian installer media!       "
+					mount -o loop /usb/initrd /usb_initrd
+					break
+				else
+					echo -n "bad media inserted                  "
+					
+					umount /usb
+				fi
+			else
+				echo -n "no usb media found                          "
+			fi
+		fi
+	done
+done
+
+# Now these should not be mounted. They'll be mounted again inside the
+# new root.
+umount /dev
+umount /proc
+
+# This is quite close to the standard d-i linuxrc, except the tree to copy
+# is in /usb_initrd, not /
+echo "Setting up filesystem, please wait ..."
+mount -t shm shm mnt
+cp -a usb_initrd/* mnt
+cd mnt
+pivot_root . initrd
+mount -t proc proc proc
+mount -t devfs devfs dev
+# Close all open files on the initrd, and run busybox init.
+umount initrd/usb_initrd
+umount initrd/usb
+rm -f linuxrc # this program
+ln -s /sbin/init linuxrc
+if [ "$DEBCONF_DEBUG" -gt 0 ]; then
+	echo "This is ia debug shell, just before running the new linuxrc."
+	sh
+fi
+exec /usr/sbin/chroot . /linuxrc <dev/console >dev/console 2>&1
