@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.10 2000/11/02 07:02:54 tausq Exp $ */
+/* $Id: udpkg.c,v 1.11 2000/11/03 03:38:32 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -22,9 +22,10 @@ static int do_system(const char *cmd)
 	DPRINTF("cmd is %s\n", cmd);
 	return system(cmd);
 }
+#else
+#define do_system(cmd) system(cmd)
 #endif
 
-#if 0
 static int is_file(const char *fn)
 {
 	struct stat statbuf;
@@ -33,6 +34,7 @@ static int is_file(const char *fn)
 	return S_ISREG(statbuf.st_mode);
 }
 
+#if 0
 static int dpkg_doinstall(struct package_t *pkg)
 {
 	char buf[1024];
@@ -90,7 +92,21 @@ static int dpkg_copyfile(const char *src, const char *dest)
 
 static int dpkg_doconfigure(struct package_t *pkg)
 {
+	int r;
+	char buf[1024];
 	DPRINTF("Configuring %s\n", pkg->package);
+	if (is_file(DPKGCIDIR "postinst"))
+	{
+		snprintf(buf, sizeof(buf), DPKGCIDIR "postinst configure %s", pkg->version);
+		if ((r = do_system(buf)) != 0)
+		{
+			fprintf(stderr, "postinstallation script exited with status %d\n", r);
+			pkg->status &= STATUS_STATUSMASK;
+			pkg->status |= STATUS_STATUSPOSTINSTFAILED;
+			return 1;
+		}
+	}
+
 	return 0;
 }
 
@@ -299,7 +315,6 @@ static int dpkg_install(struct package_t *pkgs)
 		if (dpkg_doinstall(p) != 0)
 		{
 			perror(p->file);
-			break;
 		}
 		else {
 			p->status &= STATUS_STATUSMASK;
