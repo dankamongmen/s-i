@@ -81,5 +81,6 @@ struct linkedlist_t *di_pkg_toposort_list(struct linkedlist_t *list);
 int di_parse_version(struct version_t *rversion, const char *string);
 int di_compare_version(const struct version_t *a, const struct version_t *b);
 void di_list_free(struct linkedlist_t *list, void (*freefunc)(void *));
+char *di_mapdevfs(const char *path);
 
 #endif /* _DEBIAN_INSTALLER_H_ */
