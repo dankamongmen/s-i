@@ -87,6 +87,9 @@ get_default_menu_item(struct linkedlist_t *list)
 		p = (struct package_t *)node->data;
 		if (!p->installer_menu_item || p->status == installed)
 			continue;
+		/* If menutest says this item should be default, make it so */
+		if (isdefault(p))
+			return p;
 		cont = 0;
                 /* Check if a "parallel" package is installed
 		 * (netcfg-{static,dhcp} and {lilo,grub}-installer are
