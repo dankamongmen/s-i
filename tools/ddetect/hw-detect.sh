@@ -217,23 +217,6 @@ if [ -e /proc/scsi/scsi ] ; then
     fi
 fi
 
-# If PCMCIA was detected, load the PCMCIA drivers and load cardmgr
-if [ -e /proc/bus/pccard ]
-then
-    pcmcia=0
-    if [ -d /lib/modules/*/pcmcia ]
-    then
-	log "PCMCIA was detected on this system."
-	pcmcia=1
-    fi
-
-    if [ "$pcmcia" = "1" ]
-    then
-	gunzip /etc/pcmcia/config.gz
-	/sbin/cardmgr
-    fi
-fi
-
 if [ -n "$MISSING_MODULES_LIST" ]; then
 	log "Missing modules '$MISSING_MODULES_LIST"
 	# Tell the user to try to load more modules from floppy
@@ -243,6 +226,19 @@ if [ -n "$MISSING_MODULES_LIST" ]; then
 	db_input low "$template" || [ $? -eq 30 ]
 	db_go || true
 fi
+
+# get pcmcia running if possible
+if [ -x /etc/init.d/pcmcia ]; then
+	# avoid debconf daemon issues..
+	db_stop
+	/etc/init.d/pcmcia start </dev/null 2>&1 | logger -t hd-detect
+fi
+
+if [ -d /proc/bus/pccard ]; then
+	# Ask for pcmcia-cs to be installed into target
+	apt-install pcmcia-cs || true
+fi
+
 	    
 # Ask for discover to be installed into /target/, to make sure the
 # required drivers are loaded.
