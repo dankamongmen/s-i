@@ -12,12 +12,15 @@ topdir=$(shell pwd)
 udebbuild=$(topdir)/debian/build-udeb
 debbuild=$(topdir)/debian/build
 
-PACKAGE=cdebconf-udeb
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
-FILENAME=$(PACKAGE)_$(VERSION)_$(DEB_HOST_ARCH).udeb
-PRIORITY=$(shell grep '^Package: cdebconf-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
 CONFFILE=/etc/cdebconf.conf
+
+udebname=cdebconf-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
+udebpriority=$(shell grep '^Package: cdebconf-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
+
+slang_udebname=cdebconf-slang-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
+slang_udebpriority=$(shell grep '^Package: cdebconf-slang-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
 
 #package names
 LIBDEBCONFDEV=libdebconf1-dev
@@ -54,7 +57,7 @@ build-udeb-stamp:
 	(cd $(udebbuild); CFLAGS="$(CFLAGS) $(SIZEOPTFLAG) -fomit-frame-pointer" \
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
 		--without-rpath --with-db="rfc822db" \
-		--with-frontend="text" $(DEBUG_CONFIGURE_OPT) \
+		--with-frontend="text slang" $(DEBUG_CONFIGURE_OPT) \
 		--with-conffile=$(CONFFILE))
 	(cd $(udebbuild); $(MAKE) clean; $(MAKE))
 	touch $@
@@ -83,7 +86,17 @@ install-udeb: build-udeb
 		etcdir=$(shell pwd)/debian/cdebconf-udeb/etc )
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/include
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/share/man
+	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/cdebconf/frontend/slang.so
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/lib*.a
+
+install-slang-udeb: build-udeb
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	dh_installdebconf -n -pcdebconf-slang-udeb
+	(cd $(udebbuild)/src/modules/frontend/slang; \
+		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf-slang-udeb/usr )
 
 install: build
 	dh_testdir
@@ -108,7 +121,7 @@ binary-indep: build install
 # Build architecture-dependent files here.
 #
 # Note that this builds a .udeb, which is not policy compliant or anything.
-binary-arch: cdebconf cdebconf-udeb
+binary-arch: cdebconf cdebconf-udeb cdebconf-slang-udeb
 
 $(LIBDEBCONF): install
 	dh_testdir
@@ -176,10 +189,28 @@ cdebconf-udeb: install-udeb
 	# Don't write your stupid guesses to debian/files.
 	dh_gencontrol 		-p$@ -- -fdebian/files~
 	# Register file manually.
-	dpkg-distaddfile	$(FILENAME) debian-installer $(PRIORITY)
+	dpkg-distaddfile	$(udebname) debian-installer $(udebpriority)
 # udebs shouldn't have md5sums.
 #	dh_md5sums		-p$@
-	dh_builddeb		-p$@ --filename=$(FILENAME)
+	dh_builddeb		-p$@ --filename=$(udebname)
+
+cdebconf-slang-udeb: install-slang-udeb
+	@echo "Building $@"
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	dh_strip		-p$@
+	dh_compress		-p$@
+	dh_fixperms		-p$@
+	dh_installdeb		-p$@
+	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
+	# Don't write your stupid guesses to debian/files.
+	dh_gencontrol 		-p$@ -- -fdebian/files~
+	# Register file manually.
+	dpkg-distaddfile	$(slang_udebname) debian-installer $(slang_udebpriority)
+# udebs shouldn't have md5sums.
+#	dh_md5sums		-p$@
+	dh_builddeb		-p$@ --filename=$(slang_udebname)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
