@@ -19,7 +19,6 @@ ask_dev() {
 			fi
 		fi
 	done
-	db_fset retriever/floppy/device seen false
 	db_subst retriever/floppy/device DEVS $DEVS
 	db_input high retriever/floppy/device
 	db_go 
@@ -108,6 +107,22 @@ case "x$cmd" in
 		db_progress STOP
 	;;
 
+	xerror)
+		umount $FLOPPYMNT || true
+
+		T="retriever/floppy/error"
+		db_set "$T" true
+		db_input high "$T" || true
+		db_capb # no backup
+		db_go || true
+		db_get "$T"
+		if [ "$RET" = true ]; then
+			exit 0
+		else
+			exit 2
+		fi
+	;;
+	
 	xcleanup)
 		umount $FLOPPYMNT || true
 	;;

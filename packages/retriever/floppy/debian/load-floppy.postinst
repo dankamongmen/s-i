@@ -3,21 +3,15 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-# If priority is high, the user did not manually choose to load
-# a floppy, so ask them if they want to.
-db_get debconf/priority
 T=retriever/floppy/loadnow
-if [ "$RET" != low ] && [ "$RET" != medium ]; then
-	db_set $T true || true
-	db_fset $T seen false || true
-	db_input critical $T || true
-	if ! db_go; then
-		exit 10 # backup
-	fi
-	db_get $T
-	if [ "$RET" = false ]; then
-		exit 0
-	fi
+db_set $T true || true
+db_input critical $T || true
+if ! db_go; then
+	exit 10 # backup
 fi
-	
+db_get $T
+if [ "$RET" = false ]; then
+	exit 0
+fi
+
 anna floppy-retriever
