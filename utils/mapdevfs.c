@@ -95,6 +95,12 @@ char *normalize_devfs(const char* path)
     if (0 == strcmp("none", path))
 	return strdup(path);
 
+    if (strlen(path) > 9 && 0 == strncmp("/dev/tts/", path, 9)) {
+        retval = strdup(path);
+        *(retval+7) = 'y'; *(retval+8) = 'S';
+        return retval;
+    }
+
     ret = stat(path,&statbuf);
     if (ret == -1)
     {
@@ -120,10 +126,17 @@ char *normalize_devfs(const char* path)
 }
 
 int main(int argc, char **argv) {
+    char *result = NULL;
+
     if (argc != 2) {
         fprintf(stderr, "Wrong number of args: mapdevfs <path>\n");
         return 1;
     }
-    printf("%s\n", normalize_devfs(argv[1]));
-    return 0;
+
+    if ((result = normalize_devfs(argv[1]))) {
+        printf("%s\n", result);
+        return 0;
+    }
+
+    return 1;
 }
