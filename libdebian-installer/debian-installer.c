@@ -36,7 +36,6 @@
 
 #define PREBASECONFIG_D "/usr/lib/prebaseconfig.d"
 
-#ifdef L__di_prebaseconfig_append__
 /*
    di_prebaseconfig_append()
 
@@ -88,10 +87,8 @@ finished:
   return rv;
 }
 
-#endif /* L__di_prebaseconfig_append__ */
 
 
-#ifdef L__di_execlog__
 /* di_execlog():
    execute the command, log the result
    */
@@ -120,9 +117,7 @@ di_execlog (const char *incmd)
      executed, not sure how to do that cleanly */
   return (pclose (output));
 }
-#endif /* L__di_execlog__ */
 
-#ifdef L__di_log__
 
 void
 di_log(const char *msg){
@@ -131,10 +126,8 @@ di_log(const char *msg){
     closelog ();
 }
 
-#endif /* L__di_log__ */
 
 
-#ifdef L__di_check_dir__
 int
 di_check_dir (const char *dirname)
 {
@@ -145,9 +138,7 @@ di_check_dir (const char *dirname)
     return S_ISDIR (check.st_mode);
 }
 
-#endif /*  L__di_check_dir__ */
 
-#ifdef L__di_snprintfcat__
 int
 di_snprintfcat (char *str, size_t size, const char *format, ...)
 {
@@ -161,9 +152,7 @@ di_snprintfcat (char *str, size_t size, const char *format, ...)
 
   return retval;
 }
-#endif /* L__di_snprintfcat__ */
 
-#ifdef L__di_stristr__
 char *
 di_stristr(const char *haystack, const char *needle)
 {
@@ -180,9 +169,7 @@ di_stristr(const char *haystack, const char *needle)
     }
     return NULL;
 }
-#endif /* L__di_stristr__ */
 
-#ifdef L__di_pkg_parse__
 #define BUFSIZE         4096
 struct package_t *
 di_pkg_parse(FILE *f)
@@ -323,4 +310,3 @@ di_pkg_parse(FILE *f)
 
     return p;
 }
-#endif /* L__di_pkg_parse__ */
