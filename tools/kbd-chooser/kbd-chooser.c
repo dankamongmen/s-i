@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.43 2004/01/28 01:29:51 kraai Exp $
+ * $Id: kbd-chooser.c,v 1.44 2004/02/05 20:32:06 barbier Exp $
  */
 
 #include "config.h"
@@ -570,10 +570,10 @@ check_if_serial_console (void)
 	if (fd == -1)
 		return 2;
 	present = (ioctl (fd, TIOCGSERIAL, &sr) == 0) ? 1 : 0;
-	debconf_set (client,  "debian-installer/serial-console", present ? "yes" : "no");
+	debconf_set (client,  "debian-installer/serial-console", present ? "true" : "false");
 	close (fd);
 
-	di_info ("Setting debian-installer/serial-console to %d", present);
+	di_info ("Setting debian-installer/serial-console to %s", present ? "true" : "false");
 	return present;
 }
 
