@@ -1,7 +1,6 @@
 
 . /usr/share/debconf/confmodule
 
-NBSP=' ' # non-break space (U+00A0)
 TAB='	'
 NL='
 '
@@ -39,7 +38,7 @@ debconf_select () {
 		local key option
 		restore_ifs
 		key=$(echo ${x%$TAB*})
-		option=$(echo "${x#*$TAB}" | sed "s/ /$NBSP/g")
+		option=$(echo "${x#*$TAB}" | sed 's/ *$//g')
 		newchoices="${newchoices}${NL}${key}${TAB}${option}"
 		if [ "$key" = "$default_choice" ]; then
 		    default="$option"
@@ -48,9 +47,10 @@ debconf_select () {
 	choices="$newchoices"
 	u=''
 	IFS="$NL"
-	# escape the commas but keep them unescaped in $choices
+	# escape the commas and leading whitespace but keep them unescaped
+	# in $choices
         for x in $choices; do
-                u="$u, `echo ${x#*$TAB} | sed 's/,/\\\\,/g'`"
+                u="$u, `echo ${x#*$TAB} | sed 's/,/\\\\,/g' | sed 's/^ /\\\\ /'`"
         done
         u=${u#, }
 	if [ -n "$default" ]; then
