@@ -4,7 +4,14 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/utsname.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "anna.h"
+
+#define LOWMEM_STATUS_FILE "/var/lib/lowmem"
+int lowmem=0;
+char *choose_modules_question;
 
 struct debconfclient *debconf = NULL;
 static char *running_kernel = NULL, *subarchitecture;
@@ -69,8 +76,9 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 {
     char *choices;
     int package_count = 0;
-    di_package *package, *status_package, **package_array;
-    di_slist_node *node, *node1;
+    di_package *package, *status_package, **package_array, *test_package;
+    di_slist_node *node, *node1, *node2;
+    int reverse_depend=0;
 
     config_retriever();
 
@@ -123,22 +131,48 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
         if (!di_system_package_check_subarchitecture(package, subarchitecture))
           continue;
 
+	di_log (DI_LOG_LEVEL_DEBUG, "lowmem: %d, debconf status: %s", lowmem, debconf->value);
+	
         if (((di_system_package *)package)->kernel_version)
         {
-          if (running_kernel && strcmp(running_kernel, ((di_system_package *)package)->kernel_version) == 0)
-          {
-              package->status_want = di_package_status_want_unknown;
-              di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, matches kernel", package->package);
-          }
-          else
-            continue;
-        }
+	     if (running_kernel && strcmp(running_kernel, ((di_system_package *)package)->kernel_version) == 0)
+	     {
+		  package->status_want = di_package_status_want_unknown;
+		  di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, matches kernel", package->package);
+	     }
+	     else
+		  continue;
+	}
+ 
+	if (lowmem > 1) {
+	     if (package->priority == di_package_priority_standard
+		 && ! ((di_system_package *)package)->installer_menu_item) {
+		  /* get only packages which are not dependencies of other packages */
+		  reverse_depend=0;
+		  for (node1 = (*packages)->list.head; node1; node1 = node1->next) {
+		       test_package = node1->data;
+		       for (node2 = test_package->depends.head; node2; node2 = node2->next) {
+			    di_package_dependency *d = node2->data;
+			    if (d->ptr == package) {
+				 reverse_depend=1;
+			    }
+		       }
+		  }
+		  if (reverse_depend == 0 && ! ((di_system_package *)package)->kernel_version) {
+		       package->status_want = di_package_status_want_unknown;
+		  }
+		  package->priority = di_package_priority_optional;
+	     }
+	}
+
         if (package->priority >= di_package_priority_standard || is_queued(package))
         {
             package->status_want = di_package_status_want_install;
             di_log (DI_LOG_LEVEL_DEBUG, "install %s, priority >= standard", package->package);
         }
-        else if (((di_system_package *)package)->installer_menu_item)
+        else if (((di_system_package *)package)->installer_menu_item 
+		 && package->status != di_package_status_installed) /* we don't want to see installed packages
+								     * in choices list*/
         {
             package->status_want = di_package_status_want_unknown;
             di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, is installer item", package->package);
@@ -165,10 +199,14 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 
     qsort(package_array, package_count, sizeof(di_package *), package_array_compare);
     choices = list_to_choices(package_array);
-    debconf_fset(debconf, ANNA_CHOOSE_MODULES, "seen", "false");
-    debconf_subst(debconf, ANNA_CHOOSE_MODULES, "CHOICES", choices);
-    debconf_input(debconf, "medium", ANNA_CHOOSE_MODULES);
-
+    debconf_fset(debconf, choose_modules_question, "seen", "false");
+    debconf_subst(debconf, choose_modules_question, "CHOICES", choices);
+    if (lowmem < 2) {
+	 debconf_input(debconf, "medium", choose_modules_question);
+    }
+    else {
+	 debconf_input(debconf, "high", choose_modules_question);
+    }
     di_free(choices);
     di_free(package_array);
 
@@ -192,7 +230,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
     int ret = 0, pkg_count = 0;
     int progress_step=0;
 
-    debconf_get(debconf, ANNA_CHOOSE_MODULES);
+    debconf_get(debconf, choose_modules_question);
     if (debconf->value != NULL) {
         char *choices = debconf->value;
 
@@ -314,6 +352,18 @@ OUT:
     return ret;
 }
 
+int get_lowmem_level () {
+	int l;
+	l=open(LOWMEM_STATUS_FILE, O_RDONLY);
+	if (l) {
+		char buf[2];
+		read(l, buf, 1);
+		close(l);
+		return atoi(buf);
+	}
+	return 0;
+}
+
 #ifndef TEST
 int
 main(int argc, char **argv)
@@ -333,6 +383,14 @@ main(int argc, char **argv)
     debconf_capb(debconf, "backup");
 
     di_system_init("anna");
+
+    lowmem=get_lowmem_level();
+    if (lowmem < 2) {
+	choose_modules_question="anna/choose_modules";
+    }
+    else {
+	choose_modules_question="anna/choose_modules_lowmem";
+    }
 
     if (debconf_get(debconf, "debian-installer/kernel/subarchitecture"))
         subarchitecture = strdup("generic");

@@ -13,7 +13,6 @@
 #define DPKG_UNPACK_COMMAND	"udpkg --unpack"
 #define DPKG_CONFIGURE_COMMAND	"udpkg --configure"
 #define ANNA_RETRIEVER          "anna/retriever"
-#define ANNA_CHOOSE_MODULES     "anna/choose_modules"
 
 #undef LIBDI_SYSTEM_DPKG
 
