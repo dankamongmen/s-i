@@ -234,10 +234,10 @@ static void drawdesc(struct frontend *ui, struct question *q)
 
 static int nchandler_boolean(struct frontend *ui, struct question *q)
 {
-	char *value = "true";
+	const char *value = "true";
 	int ret = 0, ans, pos = 2;
 	int ybut = UIDATA(ui)->qrylines - 6;
-	char *dft = question_getvalue(q, "");
+	const char *dft = question_getvalue(q, "");
 	WINDOW *win = UIDATA(ui)->qrywin;
 
 	if (dft)
