@@ -81,7 +81,10 @@ else
 	moddir=/lib/modules/$installedname
 fi
 
-[ -d /lib/modules/$installedname ] || exit 0
+if [ ! -d $moddir ]; then
+	echo "$moddir does not exist!" >&2
+	exit 1
+fi
 
 # The directory of modules lists to use.
 if [ -d modules/$arch-$flavour ]; then
