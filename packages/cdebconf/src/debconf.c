@@ -13,6 +13,8 @@
 #include <string.h>
 #include <getopt.h>
 #include <locale.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 static struct configuration *config = NULL;
 static struct frontend *frontend = NULL;

@@ -147,7 +147,6 @@ static pid_t confmodule_run(struct confmodule *mod, int argc, char **argv)
     int i;
     char **args;
     bool old[3] = { true, true, true };
-    int temp = -1;
     int config[5]; /* 0=read/to, 1=write/to, 2=read/from, 3=write/from, 4=null */
     pipe(&config[0]);
     pipe(&config[2]);
