@@ -198,6 +198,7 @@ db_progress STEP $OTHER_STEPSIZE
 # Ask which modules to install.
 db_subst hw-detect/select_modules list "$LIST"
 db_set hw-detect/select_modules "$LIST"
+db_fset hw-detect/select_modules seen false
 db_input medium hw-detect/select_modules || true
 db_go || exit 10 # back up
 db_get hw-detect/select_modules
