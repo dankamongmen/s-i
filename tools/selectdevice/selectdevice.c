@@ -21,7 +21,9 @@ int main(int argc, char **argv)
 	client = debconfclient_new ();
 	client->command (client, "title", "Select device to partition", NULL);
 	client->command (client, "subst", "kdetect/select_device", "device_list", device_list, NULL);
-	client->command (client, "subst", "kdetect/select_device", "default_device", default_device, NULL);
+	client->command (client, "fget", "kdetect/select_device", "seen", NULL);
+	if (strcmp(client->value, "false") == 0)
+		client->command (client, "set", "kdetect/select_device", default_device, NULL);
 	client->command (client, "fset", "kdetect/select_device", "seen", "false", NULL);
 	client->command (client, "input", "high", "kdetect/select_device", NULL);
 	client->command (client, "go", NULL);
