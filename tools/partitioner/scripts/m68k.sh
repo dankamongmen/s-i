@@ -4,7 +4,7 @@ DISK="$1"
 
 case "`/bin/archdetect`" in
 "m68k/amiga")
-	amiga-fdisk $DISK
+	parted $DISK
 	;;
 "m68k/atari")
 	atari-fdisk $DISK
