@@ -48,6 +48,11 @@ close IN;
 
 # Output an array of all the countries that have mirrors. It is sorted
 # lexically.
+#
+# FIXME:  It should only print countries which have mirrors of $type.  
+#
+# Test case: Norway, only has FTP, not HTTP.
+#
 open (OUT, ">mirrors_$type.h") or die "mirrors_$type.h: $!";
 print OUT "/* Automatically generated; do not edit. */\n";
 print OUT "static char *countries_$type\[] = {\n";

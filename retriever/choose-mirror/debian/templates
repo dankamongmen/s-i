@@ -6,6 +6,15 @@ Description: Use a mirror from what country?
  The goal is to find a mirror that is close to you on the network -- be 
  aware that near countries, or even your own, may not be the best choice.
 
+Template: mirror/protocol
+Type: select
+Choices: ${protocols}
+Default: http
+Description: Use which protocol
+ Enter which protocol you would like to use.  If you are unsure,
+ choose http as it is usually less problems with it related to
+ firewalls.
+
 Template: mirror/http/mirror
 Type: select
 Choices: ${mirrors}
@@ -16,6 +25,7 @@ Description: Choose the Debian mirror to use:
 
 Template: mirror/http/hostname
 Type: string
+Default:
 Description: Enter mirror hostname:
  Enter the hostname of mirror Debian will be downloaded from.
 
@@ -33,3 +43,32 @@ Description: Enter http proxy information, or leave blank for none:
  .
  When entering proxy information, use the standard form of
  "http://[[user][:pass]@]host[:port]/"
+
+Template: mirror/ftp/mirror
+Type: select
+Choices: ${mirrors}
+Default: ftp.us.debian.org
+Description: Choose the Debian mirror to use:
+ Select the mirror Debian will be downloaded from. You should select a 
+ mirror that is close to you on the net.
+
+Template: mirror/ftp/hostname
+Type: string
+Default:
+Description: Enter mirror hostname:
+ Enter the hostname of mirror Debian will be downloaded from.
+
+Template: mirror/ftp/directory
+Type: string
+Default: /debian
+Description: Enter mirror directory:
+ Enter the directory the Debian mirror is located in.
+
+Template: mirror/ftp/proxy
+Type: string
+Description: Enter ftp proxy information, or leave blank for none:
+ If you need to use a http proxy to access the outside world, enter the
+ proxy information here. Otherwise, leave this blank.
+ .
+ When entering proxy information, use the standard form of
+ "ftp://[[user][:pass]@]host[:port]/"

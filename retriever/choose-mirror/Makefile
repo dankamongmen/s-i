@@ -1,4 +1,4 @@
-CFLAGS=-Wall -g -D_GNU_SOURCE
+CFLAGS=-Wall -g -D_GNU_SOURCE -DWITH_FTP -DWITH_HTTP
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=choose-mirror
 LIBS=-ldebconf
@@ -23,10 +23,10 @@ mirrors_http.h: Mirrors.masterlist
 mirrors_ftp.h: Mirrors.masterlist
 	./makeheader.pl ftp
 
-choose-mirror.c: mirrors_http.h
+choose-mirror.c: mirrors_http.h mirrors_ftp.h
 
 $(BIN): $(OBJS)
-	$(CC) -o $(BIN) $(OBJS) $(LIBS)
+	$(CC) -o $(BIN) $(OBJS) $(LIBS) $(LDFLAGS)
 
 # Size optimized and stripped binary target.
 small: CFLAGS=-Os $(CFLAGS) -DSMALL

@@ -6,9 +6,39 @@
 #include <string.h>
 #include <stdlib.h>
 #include "mirrors.h"
+#ifdef WITH_HTTP
 #include "mirrors_http.h"
+#endif
+#ifdef WITH_FTP
+#include "mirrors_ftp.h"
+#endif
+#ifndef WITH_FTP
+#ifndef WITH_HTTP
+#error Must compile with at least one of FTP and HTTP
+#endif
+#endif
 
 struct debconfclient *debconf;
+
+/*
+ * Returns a string on the form "DEBCONF_BASE/protocol/supplied".  The
+ * calling function is responsible for freeing the string afterwards.
+ * FIXME : find a better name
+ */
+
+char *add_protocol(char *string) {
+	char *protocol;
+	char *ret;
+
+	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+	protocol = strdup(debconf->value);
+	
+	ret = malloc(strlen(DEBCONF_BASE) + strlen(protocol) + strlen(string) + 2);
+	/* +2 since we need one for the slash and one for the terminating NULL */
+	sprintf(ret,"%s%s/%s",DEBCONF_BASE,protocol,string);
+	free(protocol);
+	return ret;
+}
 
 /*
  * Generates a list, suitable to be passed into debconf, from a
@@ -27,18 +57,49 @@ char *debconf_list(char *list[]) {
 			ret[size++ - 1] = ',';
 			ret[size++ - 1] = ' ';
 		}
+		ret[size -1] = '\0';
 	}
-
 	return ret;
+}
+
+/*
+ * Returns the correct mirror list, depending on whether protocol is
+ * set to http or ftp.  Do NOT free the structure - it is a pointer to
+ * the static list in mirrors_protocol.h
+ */
+
+struct mirror_t *mirror_list(void) {
+	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+
+#ifdef WITH_HTTP
+	if (strcasecmp(debconf->value,"http") == 0) {
+		return mirrors_http;
+	}
+#endif
+#ifdef WITH_FTP
+	if (strcasecmp(debconf->value,"ftp") == 0) {
+		return mirrors_ftp;
+	}
+#endif
+
 }
 
 /* Returns an array of hostnames of mirrors in the specified country. */
 char **mirrors_in(char *country) {
-	char **ret=malloc(100 * sizeof(char *)); // TODO: don't hardcode size
-	int i, j;
-	for (i = j = 0; mirrors_http[i].country != NULL; i++)
-		if (strcmp(mirrors_http[i].country, country) == 0)
-			ret[j++]=mirrors_http[i].site;
+        static char **ret;
+	int i, j, num = 1;
+	struct mirror_t *mirrors = mirror_list();
+
+	ret = malloc(num * sizeof(char *));
+	for (i = j = 0; mirrors[i].country != NULL; i++) {
+		if (j == num-1) {
+			num *= 2;
+			ret = realloc(ret,num * sizeof(char*));
+		}
+	if (strcmp(mirrors[i].country, country) == 0) {
+			ret[j++]=mirrors[i].site;
+		}
+	}
 	ret[j]=NULL;
 	return ret;
 }
@@ -47,66 +108,125 @@ char **mirrors_in(char *country) {
 char *mirror_root(char *mirror) {
 	int i;
 
-	for (i = 0; mirrors_http[i].site != NULL; i++)
-		if (strcmp(mirrors_http[i].site, mirror) == 0)
-			return mirrors_http[i].root;
+	struct mirror_t *mirrors = mirror_list();
+	
+	for (i = 0; mirrors[i].site != NULL; i++)
+		if (strcmp(mirrors[i].site, mirror) == 0)
+			return mirrors[i].root;
 
 	return NULL;
 }
 
-void choose_country(void) {
-	char *list=debconf_list(countries_http);
+int choose_country(void) {
+	char *list;
+	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+#ifdef WITH_HTTP
+	if (debconf->value != NULL && strcasecmp(debconf->value,"http") == 0) {
+		list = debconf_list(countries_http);
+	}
+#endif
+#ifdef WITH_FTP
+	if (debconf->value != NULL && strcasecmp(debconf->value,"ftp") == 0) {
+		list = debconf_list(countries_ftp);
+	}
+#endif
+
 	debconf->command(debconf, "SUBST", DEBCONF_BASE "country", "countries", list, NULL);
 	free(list);
 	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "country", NULL);
+	return 0;
+}
+
+/* 
+ * Choose which protocol to use.
+ * FIXME: currently shows ftp/http even if not compiled in.
+ */
+
+int choose_protocol(void) {
+	debconf->command(debconf, "SUBST", DEBCONF_BASE "protocol", "protocols", "http, ftp", NULL);
+	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "protocol", NULL);
+	return 0;
 }
 
 int manual_entry;
 
-void choose_mirror(void) {
+int choose_mirror(void) {
 	char *list;
-
+	char *protocol, *country;
+	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+	protocol = strdup(debconf->value);
+	
 	debconf->command(debconf, "GET", DEBCONF_BASE "country", NULL);
+	country = strdup(debconf->value);
 	manual_entry = ! strcmp(debconf->value, "enter information manually");
 	if (! manual_entry) {
-		/* Prompt for mirror in selected country. */
-		list=debconf_list(mirrors_in(debconf->value));
-		debconf->command(debconf, "SUBST", DEBCONF_BASE "http/mirror", "mirrors", list, NULL);
+                /* Prompt for mirror in selected country. */
+
+		list=debconf_list(mirrors_in(country));
+
+		debconf->command(debconf, "SUBST", add_protocol("mirror"), "mirrors", list, NULL);
 		free(list);
-		debconf->command(debconf, "INPUT", "medium", DEBCONF_BASE "http/mirror", NULL);
+		debconf->command(debconf, "INPUT", "medium", add_protocol("mirror"), NULL);
+		
 	}
 	else {
 		/* Manual entry. */
-		debconf->command(debconf, "INPUT", "critical", DEBCONF_BASE "http/hostname", NULL);
-		debconf->command(debconf, "INPUT", "critical", DEBCONF_BASE "http/directory", NULL);
+		debconf->command(debconf, "INPUT", "critical", add_protocol("hostname"), NULL);
+		debconf->command(debconf, "INPUT", "critical", add_protocol("directory"), NULL);
 	}
 	/* Always ask about a proxy. */
-	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "http/proxy", NULL);
+	debconf->command(debconf, "INPUT", "high", add_protocol("proxy"), NULL);
+	free(protocol);
+	free(country);
+	return 0;
 }
 
-void validate_mirror(void) {
+int validate_mirror(void) {
 	char *mirror;
+	char *protocol;
+
+	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+	protocol = strdup(debconf->value);
 
 	if (! manual_entry) {
 		/*
 		 * Copy information about the selected
-		 * mirror into mirror/http/{hostname,directory},
+		 * mirror into mirror/{protocol}/{hostname,directory},
 		 * which is the standard location other
-		 *tools can look at.
+		 * tools can look at.
 		 */
-		debconf->command(debconf, "GET", DEBCONF_BASE "http/mirror", NULL);
+		debconf->command(debconf, "GET", add_protocol("mirror"), NULL);
 		mirror=strdup(debconf->value);
-		debconf->command(debconf, "SET", DEBCONF_BASE "http/hostname", mirror, NULL);
-		debconf->command(debconf, "SET", DEBCONF_BASE "http/directory",
-			mirror_root(mirror), NULL);
+		debconf->command(debconf, "SET", add_protocol("hostname"), 
+				 mirror, NULL);
+		debconf->command(debconf, "SET", add_protocol("directory"),
+				 mirror_root(mirror), NULL);
 		free(mirror);
+		return 0;
+	} else {
+		int not_ok = 0; /* Is 0 if everything is ok, 1 else, aka retval */
+		/* Manual entry - check that the mirror is somewhat valid */
+		debconf->command(debconf, "GET", add_protocol("hostname"), NULL);		
+		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
+			debconf->command(debconf, "fset", add_protocol("hostname"), "seen", "false", NULL);
+			not_ok = 1;
+		}
+		debconf->command(debconf, "GET", add_protocol("directory"), NULL);		
+		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
+			debconf->command(debconf, "fset", add_protocol("directory"), "seen", "false", NULL);
+			not_ok = 1;
+		}
+		return not_ok;
 	}
+	return 0;
 }
 
 int main (int argc, char **argv) {
 	/* Use a state machine with a function to run in each state */
 	int state = 0;
-	void (*states[])() = {
+	int ret;
+	int (*states[])() = {
+		choose_protocol,
 		choose_country,
 		choose_mirror,
 		validate_mirror,
@@ -122,8 +242,9 @@ int main (int argc, char **argv) {
 	 * forward and back by one state always. Enough for our purposes.
 	 */
 	while (state >= 0 && states[state]) {
-		states[state]();
-		if (debconf->command(debconf, "GO", NULL) == 0)
+		ret = states[state]();
+		
+		if (ret == 0 && debconf->command(debconf, "GO", NULL) == 0) 
 			state++;
 		else
 			state--; /* back up */
