@@ -264,21 +264,6 @@ sanity_checks(void)
     return 1;
 }
 
-static int
-mountpoint_sort_func(const void *v1, const void *v2)
-{
-    struct partition *p1, *p2;
-
-    p1 = *(struct partition **)v1;
-    p2 = *(struct partition **)v2;
-    if (strstr(p1->path, p2->path) == p1->path)
-        return 1;
-    else if (strstr(p2->path, p1->path) == p2->path)
-        return -1;
-    else
-        return strcmp(p1->path, p2->path);
-}
-
 /*
  * Like mkdir -p
  */
@@ -297,6 +282,7 @@ makedirs(const char *dir)
         basedir = dirname(dirtmp);
         makedirs(basedir);
         free(dirtmp);
+        mkdir(dir, 0755);
     }
 }
 
@@ -306,7 +292,6 @@ finish(void)
     int i, ret;
     char *cmd, *mntpt, *errq = NULL;
 
-    qsort(parts, part_count, sizeof(struct partition *), mountpoint_sort_func);
     for (i = 0; i < part_count; i++) {
         if (parts[i]->op.filesystem == NULL)
             continue;
@@ -337,6 +322,7 @@ finish(void)
             }
             if (parts[i]->op.mountpoint == NULL)
                 continue;
+            append_message("Mounting %s on %s\n", parts[i]->path, parts[i]->op.mountpoint);
             asprintf(&mntpt, "/target%s", parts[i]->op.mountpoint);
             makedirs(mntpt);
             ret = mount(parts[i]->path, mntpt, parts[i]->op.filesystem, 0xC0ED0000, NULL);
@@ -349,10 +335,6 @@ finish(void)
                 break;
             }
             free(mntpt);
-            //asprintf(&cmd, "mount %s -t%s %s >/dev/null 2>>/var/log/messages",
-            //        parts[i]->path, parts[i]->op.filesystem, parts[i]->op.mountpoint);
-            //ret = system(cmd);
-            //free(cmd);
         }
     }
     if (errq != NULL) {
@@ -361,6 +343,8 @@ finish(void)
         debconf->command(debconf, "GO", NULL);
         exit(30);
     }
+    else
+        exit(0);
 }
 
 static struct partition *curr_part = NULL;
