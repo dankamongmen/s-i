@@ -3,16 +3,17 @@
 use strict;
 use Expect;
 
-# Takes it a minute to reset between connections.
-sleep 2;
+# Takes it a secto reset between connections.
+sleep 3;
 
 my $exp = new Expect;
 #$exp->exp_internal(1);
 $exp->raw_pty(1);
 
 $exp->spawn($ENV{HP_GSP_CONNECTCOMMAND}) or die "cannot connect: $!\n";
-
+print STDERR "look for login\n";
 $exp->expect(60, "Service Processor login:") or die "no login\n";
+print STDERR "found it\n";
 $exp->send($ENV{HP_GSP_USER}."\r");
 
 $exp->expect(10, "Service Processor password:");
