@@ -2,55 +2,6 @@
 # This script is called at system startup
 # This is where the installer actually interacts with the user
 
-#export DEBCONF_DEBUG=5 
-
-bterm=/usr/bin/bterm
-font=/unifont.bgf
-
-/usr/bin/debconf-loadtemplate debian /var/lib/dpkg/info/*.templates 
-
-# Enable UTF-8 locale if it is available
-if [ -d /usr/lib/locale/C.UTF-8 ] ; then
-    LANG=C.UTF-8
-    export LANG
-    if [ linux = "$TERM" ] ; then # We are using a Linux console.
-        echo -n "\033[9;0]" # Turn off console blanking.
-        echo -n "\033%G" # Enable UTF-8 console
-        export TERM
-    fi
-fi
-
-# Load framebuffer and enable it for bterm
-if [ -x "$bterm" -a -e "$font" -a C.UTF-8 = "$LANG" ] && enable-fb ; then
-    use_bterm=true
-fi
-
-# Use boot variable, but make it possible to change it in main-menu
-if [ "$DEBCONF_PRIORITY" ] ; then
-    debconf-set debconf/priority "$DEBCONF_PRIORITY"
-    unset DEBCONF_PRIORITY
-fi
-
-# init will restart this script when it exits.  This will let us pick another
-# frontend every time main-menu exits
-if [ -z "$DEBIAN_FRONTEND" ] ; then
-    for frontend in gtk newt slang text ; do
-        if [ -e "/usr/lib/cdebconf/frontend/$frontend.so" ] ; then
-            DEBIAN_FRONTEND=$frontend
-            export DEBIAN_FRONTEND
-            break
-        fi
-    done
-fi
-
-if [ true = "$use_bterm" ] ; then
-	TERM=bterm
-	export TERM
-	$bterm -f $font -l $LANG /sbin/di-main-menu
-else
-	/sbin/di-main-menu
-fi
-
-if [ C.UTF-8 = "$LANG" -a linux = "$TERM" ] ; then
-    echo -n "\033%@" # Disable UTF-8 console
-fi
+for script in /lib/debian-installer.d/S[0-9][0-9]*; do
+    . $script
+done
