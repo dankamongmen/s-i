@@ -215,6 +215,14 @@ print_list(struct disk_info_t diskinfo[], struct diskspace_req_s reqs[])
     autopartkit_log(1, "Done listing suggested partition distribution.\n");
 }
 
+static int
+cmp_spaceinfo_path(const void *ap, const void *bp)
+{
+    const struct disk_info_t *a = (const struct disk_info_t *)ap;
+    const struct disk_info_t *b = (const struct disk_info_t *)bp;
+    return strcmp(a->path, b->path);
+}
+
 struct disk_info_t *
 get_free_space_list(void)
 {
@@ -272,7 +280,11 @@ get_free_space_list(void)
     autopartkit_log(2, "Done locating free space, found %d free areas\n",
 		    spacenum);
     if (0 < spacenum)
+    {
+        /* sort list on device path, order bus0 before bus1 */
+        qsort(spaceinfo, spacenum, sizeof(spaceinfo[0]), cmp_spaceinfo_path);
         return spaceinfo;
+    }
     else
         return NULL;
 }
