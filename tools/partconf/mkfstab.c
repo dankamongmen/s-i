@@ -6,7 +6,7 @@ char *find_mountdevice(const char *mountpoint, char *default_device) {
 	char line[1024];
 	char *newdevice = NULL;
 
-	newdevice = default_device+(sizeof(char));
+	newdevice = default_device+1;
 
 	fmounts = fopen("/proc/mounts", "r");
 	if(fmounts == NULL) {
