@@ -156,12 +156,10 @@ static int confmodule_shutdown(struct confmodule *mod)
     return mod->exitcode;
 }
 
-static inline void check_fd(int fd, int newfd, int *oldstdin, int *oldstdout)
+static inline void check_fd(int fd, int newfd, int old[])
 {
-    if (fd == 0)
-        *oldstdin = -1;
-    else if (fd == 1)
-        *oldstdout = -1;
+    if (fd <= 2)
+        old[fd] = -1;
     dup2(fd, newfd);
     close(fd);
 }
@@ -171,7 +169,7 @@ static pid_t confmodule_run(struct confmodule *mod, int argc, char **argv)
     pid_t pid;
     int i;
     char **args;
-    int oldstdin = 0, oldstdout = 1, temp = -1;
+    int old[3] = { 0, 1, 2}, temp = -1;
     int config[4]; /* 0=read/to, 1=write/to, 2=read/from, 3=write/from */
     pipe(&config[0]);
     pipe(&config[2]);
@@ -184,10 +182,10 @@ static pid_t confmodule_run(struct confmodule *mod, int argc, char **argv)
         case 0:
             /* 10=read/to, 11=write/to, 12=read/from, 13=write/from */
             for (i = 0; i < 4; i++)
-                check_fd(config[i], 10 + i, &oldstdin, &oldstdout);
+                check_fd(config[i], 10 + i, old);
             temp = open("/dev/null", O_RDWR);
-            dup2(oldstdin != -1 ? oldstdin : temp, DEBCONF_OLD_STDIN_FD);
-            dup2(oldstdout != -1 ? oldstdout : temp, DEBCONF_OLD_STDOUT_FD);
+            for (i = 0; i <= 2; i++)
+                dup2(old[i] != -1 ? old[i] : temp, DEBCONF_OLD_STDIN_FD + i);
             dup2(10, 0); dup2(13, 1);
             for (i = 0; i < 4; i++)
                 close(10 + i);

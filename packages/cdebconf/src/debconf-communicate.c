@@ -18,12 +18,13 @@ static struct confmodule *confmodule = NULL;
 static struct question_db *questions = NULL;
 static struct template_db *templates = NULL;
 
-static void save()
+int save()
 {
 	if (questions != NULL)
 		questions->methods.save(questions);
 	if (templates != NULL)
 		templates->methods.save(templates);
+        return 0;
 }
 
 static void cleanup()

@@ -58,8 +58,10 @@ struct debconfclient *debconfclient_new(void);
  */
 void debconfclient_delete(struct debconfclient *client);
 
-#define DEBCONF_OLD_STDIN_FD    4
-#define DEBCONF_OLD_STDOUT_FD   5
+#define DEBCONF_OLD_FD_BASE     4
+#define DEBCONF_OLD_STDIN_FD    DEBCONF_OLD_FD_BASE
+#define DEBCONF_OLD_STDOUT_FD   DEBCONF_OLD_FD_BASE + 1
+#define DEBCONF_OLD_STDERR_FD   DEBCONF_OLD_FD_BASE + 2
 
 /**
  * @brief command codes returned by debconf commands

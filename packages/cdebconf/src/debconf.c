@@ -29,7 +29,7 @@ static struct option options[] = {
     { 0, 0, 0, 0 },
 };
 
-void save(void)
+int save(void)
 {
 	if (confmodule != NULL)
 		confmodule->update_seen_questions(confmodule, STACK_SEEN_SAVE);
@@ -37,6 +37,7 @@ void save(void)
 		questions->methods.save(questions);
 	if (templates != NULL)
 		templates->methods.save(templates);
+        return 0;
 }
 
 static void cleanup()

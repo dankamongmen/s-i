@@ -1,1 +1,1 @@
-extern void save(void);
+extern int save(void);

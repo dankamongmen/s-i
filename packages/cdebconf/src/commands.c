@@ -670,22 +670,27 @@ command_settitle(struct confmodule *mod, char *arg)
     return out;
 }
 
-void save(void) __attribute__ ((weak));
-void save(void) { }
+int save(void) __attribute__ ((weak));
+int save(void)
+{
+    return 1;
+}
 
-char *
-command_x_save(struct confmodule *mod, char *arg)
+char *command_x_save(struct confmodule *mod, char *arg)
 {
     char *argv[2];
-    int argc;
+    int argc, ret;
     char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 0);
-    save();
-    asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
+    ret = save();
+    if (ret)
+        asprintf(&out, "%u not implemented", CMDSTATUS_INTERNALERROR);
+    else
+        asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;
 }
 
-/* vim expandtabs sw=4
- */
+/* vim: expandtab sw=4
+*/
