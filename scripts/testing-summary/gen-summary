@@ -1,5 +1,11 @@
 #!/usr/bin/perl
 # Summary of udebs in testing vs those in unstable.
+#
+# TODO
+# - Does not currently notice if some binaries from a source package
+#   are at different versions in a given arch. Only displays the version
+#   of the last binary from a source that it processes.
+# 
 use strict;
 use warnings;
 
@@ -90,11 +96,7 @@ foreach my $dist (@dists) {
 				if (! defined $source) {
 					$source=$package;
 				}
-#				if (exists $packageversions{$source}{$dist}{$arch} &&
-#				    $packageversions{$source}{$dist}{$arch} ne $version) {
-#					push @annotations, {package => $source, version => $version, annotation => "binary package $package from this source is at version $version on arch $arch" };
-#				}
-				$packageversions{$source}{$dist}{$arch} = $version;
+				push @{$packageversions{$source}{$dist}{$arch}}, $version;
 				$seenpackages{$source}=1;
 				my ($filename)=m/Filename: (.*)\n/;
 				push @{$poolfiles{$source}{$arch}}, $filename;
@@ -114,7 +116,7 @@ foreach my $package (keys %seenpackages) {
 		my %seen;
 		foreach my $dist (@dists) {
 			if (exists $packageversions{$package}{$dist}{$arch}) {
-				my $version=$packageversions{$package}{$dist}{$arch};
+				my $version=$packageversions{$package}{$dist}{$arch}->[0];
 				$key.=" $version";
 				$seen{$version}++;
 			}
@@ -165,14 +167,16 @@ foreach my $withchangelog (0,1) {
 			my $some_arch=@{$transitions{$package}{$transition}}[0];
 			my @vers;
 			foreach my $dist (@dists) {
-				my $version=$packageversions{$package}{$dist}{$some_arch};
-				if (! defined $version) {
+				my $version;
+				if (exists $packageversions{$package}{$dist}{$some_arch}) {
+					$version=$packageversions{$package}{$dist}{$some_arch}->[0];
+					push @vers, $version;
+				}
+				else {
 					$version="-";
 					push @vers, '';
 				}
-				else {
-					push @vers, $version;
-				}
+				
 				if ($dist eq $dists[-1]) {
 					if ($withchangelog) {
 						print "<td><a name=\"$transition\"><a href=\"#nochangelog $transition\">$version</a>";
