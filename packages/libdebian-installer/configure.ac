@@ -1,4 +1,4 @@
-AC_INIT([libdebian-installer],[0.20])
+AC_INIT([libdebian-installer],m4_esyscmd(dpkg-parsechangelog | perl -ne 'print $1 if m/^Version: (.*)$/;'))
 AM_INIT_AUTOMAKE([])
 AM_MAINTAINER_MODE
 
