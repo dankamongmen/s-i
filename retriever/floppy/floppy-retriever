@@ -4,6 +4,28 @@
 
 FLOPPYMNT=/floppy
 
+ask_dev() {
+	DEVS=""
+	for dev in `find /dev/floppy /dev/scsi /dev/ide`; do
+		if [ -b "$dev" ]; then
+			if [ -z "$DEVS" ]; then
+				DEVS="$dev"
+			else
+				DEVS="$DEVS, $dev"
+			fi
+		fi
+	done
+	db_fset retriever/floppy/device seen false
+	db_subst retriever/floppy/device DEVS $DEVS
+	db_input high retriever/floppy/device
+	db_go 
+	db_get retriever/floppy/device
+	if [ "$RET" = Cancel ]; then
+		exit 1
+	fi
+	echo $RET
+}
+
 mountfloppy()
 {
     if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
@@ -14,21 +36,23 @@ mountfloppy()
 	if [ -n "$INSTALL_MEDIA_DEV" ]; then
 	    FLOPPYDEV=$INSTALL_MEDIA_DEV
         else
-	    # XXX not ideal. Fails if the floppy is USB.
 	    FLOPPYDEV=/dev/floppy/0
 	fi
-	    
+	  
         if [ ! -e $FLOPPYDEV ]; then
             modprobe floppy >> /var/log/messages 2>&1 || true
         fi
-        if [ ! -e $FLOPPYDEV ]; then
-            exit 1
-        fi
+	
         if ! grep -q ^vfat /proc/modules ; then
             modprobe vfat >> /var/log/messages 2>&1 || true
         fi
 
-        mount $FLOPPYDEV -tauto $FLOPPYMNT
+	if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
+		# Cannot find a device, or found the wrong device. Ask for
+		# help from the user and try it again.
+		FLOPPYDEV=$(ask_dev)
+		mount $FLOPPYDEV -tauto $FLOPPYMNT
+	fi
     fi
 }
 
