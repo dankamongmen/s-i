@@ -420,6 +420,7 @@ filesystem(void)
     if (curr_part->fstype != NULL) {
         curr_q = "partconf/existing-filesystem";
         debconf->command(debconf, "SUBST", curr_q, "FSTYPE", curr_part->fstype, NULL);
+        debconf->command(debconf, "SET", curr_q, "Leave the file system intact", NULL);
     } else
         curr_q = "partconf/create-filesystem";
     debconf->command(debconf, "SUBST", curr_q, "FSCHOICES", fschoices, NULL);
