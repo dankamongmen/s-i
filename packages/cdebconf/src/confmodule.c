@@ -133,10 +133,10 @@ static int confmodule_shutdown(struct confmodule *mod)
     return mod->exitcode;
 }
 
-static inline void check_fd(int fd, int newfd, int old[])
+static inline void check_fd(int fd, int newfd, bool old[])
 {
     if (fd <= 2)
-        old[fd] = -1;
+        old[fd] = false;
     dup2(fd, newfd);
     close(fd);
 }
@@ -146,8 +146,9 @@ static pid_t confmodule_run(struct confmodule *mod, int argc, char **argv)
     pid_t pid;
     int i;
     char **args;
-    int old[3] = { 0, 1, 2}, temp = -1;
-    int config[4]; /* 0=read/to, 1=write/to, 2=read/from, 3=write/from */
+    bool old[3] = { true, true, true };
+    int temp = -1;
+    int config[5]; /* 0=read/to, 1=write/to, 2=read/from, 3=write/from, 4=null */
     pipe(&config[0]);
     pipe(&config[2]);
     switch ((pid = fork()))
@@ -157,16 +158,15 @@ static pid_t confmodule_run(struct confmodule *mod, int argc, char **argv)
             DIE("Cannot execute client config script");
             break;
         case 0:
-            /* 10=read/to, 11=write/to, 12=read/from, 13=write/from */
-            for (i = 0; i < 4; i++)
-                check_fd(config[i], 10 + i, old);
-            temp = open("/dev/null", O_RDWR);
+            /* 20=read/to, 21=write/to, 22=read/from, 23=write/from, 24=null */
+            config[4] = open("/dev/null", O_RDWR);
+            for (i = 0; i < 5; i++)
+                check_fd(config[i], 20 + i, old);
             for (i = 0; i <= 2; i++)
-                dup2(old[i] != -1 ? old[i] : temp, DEBCONF_OLD_STDIN_FD + i);
-            close(temp);
-            dup2(10, 0); dup2(13, 1); dup2(13, 3);
-            for (i = 0; i < 4; i++)
-                close(10 + i);
+                dup2(old[i] ? i : 24, DEBCONF_OLD_FD_BASE + i);
+            dup2(20, 0); dup2(23, 1); dup2(23, 3);
+            for (i = 0; i < 5; i++)
+                close(20 + i);
 
             args = (char **)malloc(sizeof(char *) * argc);
             for (i = 1; i < argc; i++)
