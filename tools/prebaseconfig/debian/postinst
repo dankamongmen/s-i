@@ -116,6 +116,17 @@ cp /usr/share/prebaseconfig/inittab /target/etc/inittab
 # Throw out the CD if installing from CD.
 eject || /target/usr/bin/eject || true
 
+# run-parts is part of debianutils, is it available in d-i? [pere 2002-11-02]
+#run-parts --report /usr/lib/prebaseconfig.d || true
+# Using this until run-parts is available.
+for f in /usr/lib/prebaseconfig.d/*; do
+    if [ -x $f ] ; then
+	$f || true
+    else
+	echo "error: Unable to execute $f" 1>&2
+    fi
+done
+
 umount -a || true
 
 /sbin/reboot
