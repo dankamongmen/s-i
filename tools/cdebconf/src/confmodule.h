@@ -38,6 +38,7 @@ struct confmodule {
 	int backed_up;
 	char *owner;
 	char **seen_questions;
+	int number_seen_questions;
 
 	/* methods */
     /*

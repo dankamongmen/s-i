@@ -214,7 +214,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
 		if (mod->seen_questions == NULL)
 			narg = 0;
 		else
-			narg = sizeof(mod->seen_questions) / sizeof(char *);
+			narg = mod->number_seen_questions;
 
 		i = narg;
 		for (q = mod->frontend->questions; q != NULL; q = q->next)
@@ -228,22 +228,22 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
 			*(mod->seen_questions+i) = strdup(q->tag);
 			i++;
 		}
+		mod->number_seen_questions = i;
 		break;
 	case STACK_SEEN_REMOVE:
 		if (mod->seen_questions == NULL)
 			return DC_OK;
 
-		narg = sizeof(mod->seen_questions) / sizeof(char *);
 		for (q = mod->frontend->questions; q != NULL; q = q->next)
 			qlast = q;
 
 		for (q = qlast; q != NULL; q = q->prev)
 		{
-			if (strcmp(*(mod->seen_questions + narg - 1), q->tag) != 0)
+			if (strcmp(*(mod->seen_questions + mod->number_seen_questions - 1), q->tag) != 0)
 				return DC_OK;
-			DELETE(*(mod->seen_questions + narg - 1));
-			narg --;
-			if (narg == 0)
+			DELETE(*(mod->seen_questions + mod->number_seen_questions - 1));
+			(mod->number_seen_questions) --;
+			if (mod->number_seen_questions == 0)
 				DELETE(mod->seen_questions);
 		}
 		break;
@@ -251,7 +251,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
 		if (mod->seen_questions == NULL)
 			return DC_OK;
 
-		narg = sizeof(mod->seen_questions) / sizeof(char *);
+		narg = mod->number_seen_questions;
 		for (i = 0; i < narg; i++)
 		{
 			q = mod->questions->methods.get(mod->questions, *(mod->seen_questions+i));
@@ -261,6 +261,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
 			DELETE(*(mod->seen_questions+i));
 		}
 		DELETE(mod->seen_questions);
+		mod->number_seen_questions = 0;
 		break;
 	default:
 		/* should never happen */
