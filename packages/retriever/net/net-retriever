@@ -80,9 +80,11 @@ case "x$cmd" in
     xerror)
 	T="retriever/net/error"
 	db_set "$T" "Retry"
-	db_input high "$T" || true
+	db_input critical "$T" || true
 	
-	db_go || true
+	if ! db_go; then
+		exit 2
+	fi
 	db_get "$T"
 	if [ "$RET" = "Retry" ]; then
 		exit 0
