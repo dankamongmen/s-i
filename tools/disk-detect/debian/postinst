@@ -93,6 +93,9 @@ do
                 log "Copying drivers from modules disk... "
                 gunzip -c /mnt/modules.tgz | tar xf - $module.o
                 umount /mnt
+                # Make sure 'depmod -a' accepts the new module
+                chown -R root /lib/modules
+                depmod -a
             fi
         fi
 
