@@ -1381,8 +1381,6 @@ int main (int argc, char *argv[])
 			"Continuing anyway.\n");
 #endif /* LVM_HACK */
 
-    debconf_settitle(client, "autopartkit/title");
-
     disable_kmsg(1);
     ped_exception_set_handler(exception_handler);
     PED_INIT();
