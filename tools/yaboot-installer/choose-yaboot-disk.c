@@ -1,130 +1,320 @@
 /* Program to search for disks with a correct yaboot setup, and then
    prompt the user for which one to install yaboot on.
 
+   Copyright (C) 2003 Thorsten Sauter <tsauter@gmx.net>
    Copyright (C) 2002 Colin Walters <walters@gnu.org>
 */
 
-#define _GNU_SOURCE
-
-#include "libkdetect.h"
-#include <parted/parted.h>
-#include <stdio.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <cdebconf/debconfclient.h>
+#include "choose-yaboot-disk.h"
 
 PedExceptionOption exception_handler(PedException *ex) {
-  if (ex->type > 3) {
-    fprintf(stderr, "A fatal error occurred: %s\n", ex->message);
-    exit(1);
-  }
-  return PED_EXCEPTION_UNHANDLED;
-}
-
-int newworld_powermac_partition_is_bootable(PedPartition *partition) {
-  if (!(partition->type & PED_PARTITION_METADATA || partition->type & PED_PARTITION_FREESPACE)) {
-    if (ped_partition_is_flag_available(partition, PED_PARTITION_BOOT) &&
-	ped_partition_get_flag(partition, PED_PARTITION_BOOT)) {
-      /* Check for at least 800k of space. */
-      if (partition->geom.length*512 >= 800 * 1024) {
-	PedFileSystemType *fs = ped_file_system_probe(&partition->geom);
-	if (fs && !strcmp(fs->name, "hfs"))
-	  return 1;
-      }
-    }
-  }
-  return 0;
-}
-
-static char *machine_type = NULL;
-char *get_powerpc_type(void) {
-  if (machine_type != NULL) {
-    return machine_type;
-  } else {
-    FILE *f = popen("./powerpc-type", "r");
-    char *buf = NULL;
-    int size = 0;
-    int readbytes;
-    if ((readbytes = getline(&buf, &size, f)) >= 0) {
-      buf[readbytes-1] = '\0';
-      machine_type = buf;
-      return machine_type;
-    }
-    return "Unknown";
-  }
-}
-
-int partition_is_bootable(PedPartition *partition) {
-  if (!strcmp("NewWorld PowerMac", get_powerpc_type())) {
-    return newworld_powermac_partition_is_bootable(partition);
-  } else {
-    fprintf(stderr, "Unknown machine type\n");
-    return 0;
-  }
-}
-
-int main(int argc, char **argv)
-{
-  struct debconfclient *client;
-  char *p;
-  char *device_list = NULL;
-  char *valid_device_list = strdup("");
-
-  ped_exception_set_handler(exception_handler);
-
-  printf("machine type: %s\n", get_powerpc_type());
-  
-  device_list = (char *) malloc(512);
-  device_list = get_device_list();
-  printf("device list is [%s]\n",device_list);
-  
-  for (p = device_list; p != NULL; p = strchr(p, ' ') ? strchr(p, ' ')+1 : NULL) {
-    char *end = strchr(p, ' ');
-    int count = end ? end - p : strlen(p);
-    char *devname = malloc(strlen("/dev/") + count + 1);
-    strcpy(devname, "/dev/");
-    strncat(devname, p, count);
-    printf("examining device: %s\n", devname);
-    {
-      PedDevice *dev = ped_device_get(devname);
-      PedDiskType *ptype;
-      if (dev) {
-	ptype = ped_disk_probe(dev);
-	if (!strcmp(ptype->name, "mac")) {
-	  PedDisk *disk = ped_disk_new(dev);
-	  PedPartition *partition = NULL;
-	  for (partition = ped_disk_next_partition(disk, partition); partition != NULL; partition = ped_disk_next_partition(disk, partition)) {
-	    if (partition_is_bootable(partition)) {
-	      char *partname;
-	      asprintf(&partname, "%s%d", devname, partition->num);
-	      printf("%s is bootable\n", partname);
-	      valid_device_list = realloc(valid_device_list, strlen(valid_device_list) + 1 + strlen(partname) + 1);
-	      strcat(valid_device_list, " ");
-	      strcat(valid_device_list, partname);
-	    }
-	  }
+	if(ex->type > 3) {
+		fprintf(stderr, "A fatal error occurred: %s\n", ex->message);
+		exit(1);
 	}
-      }
-    }
-  }
-
-  client = debconfclient_new ();
-  if (strlen(valid_device_list) == 0) {
-    client->command (client, "title", "No valid boot device", NULL);
-    client->command (client, "fset", "yaboot-installer/no-valid-bootdev", "seen", "false", NULL);
-    client->command (client, "input", "high", "yaboot-input/no-valid-bootdev", NULL);
-    client->command (client, "go", NULL);
-    exit(1);
-  } else {
-    client->command (client, "title", "Select device on which to install yaboot", NULL);
-    client->command (client, "subst", "yaboot-installer/bootdev", "devices", valid_device_list, NULL);
-    
-    client->command (client, "fset", "yaboot-installer/bootdev", "seen", "false", NULL);
-    client->command (client, "input", "high", "yaboot-installer/bootdev", NULL);
-    client->command (client, "go", NULL);
-    client->command (client, "get", "yaboot-installer/bootdev", NULL);
-  }
-  exit(0);
+	return(PED_EXCEPTION_UNHANDLED);
 }
+
+/* read all physical discs in the system */
+int read_physical_discs() {
+	DIR *dir = NULL;
+	struct dirent *entry = NULL;
+	int count = 0;
+
+	if((dir = opendir("/dev/discs")) == NULL) {
+		fprintf(stderr, "Failed to open find disks: %s (/dev/discs)\n",
+			strerror(errno));
+		return(0);
+	}
+
+	while((entry = readdir(dir)) != NULL) {
+			char *fullname = NULL;
+			char lnkname[1024];
+			PedDevice *pdev = NULL;
+			PedDiskType *ptype = NULL;
+
+			/* skip dot-files */
+			if(entry->d_name[0] == '.')
+				continue;
+
+			/* create the fullname (inkl. resolve links) */
+			asprintf(&fullname, "/dev/discs/%s", entry->d_name);
+			realpath(fullname, lnkname);
+			free(fullname); fullname = NULL;
+			asprintf(&fullname, "%s/%s", lnkname, "disc");
+
+			/* make sure, this disk is usable */
+			if((pdev = ped_device_get(fullname)) == NULL) {
+				free(fullname);
+				continue;
+			}
+			ptype = ped_disk_probe(pdev);
+			if(strcmp(ptype->name, "mac")) {
+				free(fullname);
+				continue;
+			}
+
+			if(read_all_partitions(strdup(fullname)) > 0)
+				count++;
+			free(fullname);
+	}
+
+	closedir(dir);
+	return(count);
+}
+
+int read_all_partitions(const char *devname) {
+	PedDevice *pdev = NULL;
+	PedDisk *pdisk = NULL;
+	PedPartition *ppart = NULL;
+	int count = 0;
+
+	if((pdev = ped_device_get(devname)) == NULL)
+		return(0);
+	if((pdisk = ped_disk_new(pdev)) == NULL)
+		return(0);
+
+	while((ppart = ped_disk_next_partition(pdisk, ppart)) != NULL) {
+		if(is_bootable(ppart) == 1) {
+			bparts[part_count] = ppart;
+			part_count++;
+			count++;
+		}
+	}
+
+	return(count);
+}
+
+int is_bootable(const PedPartition *part) {
+	if((part->type & PED_PARTITION_METADATA || 
+	part->type & PED_PARTITION_FREESPACE)) {
+		return(0);
+	}
+
+	if(ped_partition_is_flag_available(part, PED_PARTITION_BOOT) &&
+	ped_partition_get_flag(part, PED_PARTITION_BOOT)) {
+		if(part->geom.length*512 >= (800*1024)) {
+			PedFileSystemType *fs = 
+				ped_file_system_probe((PedGeometry*)&part->geom);
+
+			if(fs && !strcmp(fs->name, "hfs")) {
+				return(1);	/* puh. yes, this disk is yaboot ready :) */
+			}
+		}
+	}
+
+	return(0);
+}
+
+char *find_rootpartition() {
+	FILE *fmounts = NULL;
+	char line[1024];
+
+	fmounts = fopen("/proc/mounts", "r");
+	if(fmounts == NULL) {
+		fprintf(stderr, "Unable to open /proc/mounts: %s\n", strerror(errno));
+		return(NULL);
+	}
+
+	while(fgets(line, 1024, fmounts) != NULL) {
+		char fs[1024], mnt[1024];
+
+		sscanf(line, "%s %s %*s", fs, mnt);
+		if(strcmp(mnt, TARGET) == 0) {
+			fclose(fmounts);
+			return(strdup(fs));
+		}
+	}
+
+	fclose(fmounts);
+	return(NULL);
+}
+
+/* TODO: map devices to old names (eg /dev/hda): maybe not needed? */
+int generate_yabootconf(const char *boot, const char *root) {
+	char *cmd = NULL;
+	int ret;
+	FILE *conf = NULL;
+
+	/* running yabootconfig to create the basic yaboot.conf */
+	asprintf(&cmd, "/usr/sbin/yabootconfig -q --noinstall -t %s -b %s -r %s",
+		TARGET, boot, root);
+	ret = system(cmd);
+	if(WEXITSTATUS(ret) != 0) 
+		return(1);
+
+	/* append the Debian backup kernel */
+	conf = fopen("/target/etc/yaboot.conf", "a");
+	if(conf == NULL)
+		return(1);
+
+	fprintf(conf, "\n");
+	fprintf(conf, "image=/vmlinux.old\n");
+	fprintf(conf, "\tlabel=LinuxOld\n");
+	fprintf(conf, "\tread-only\n");
+	fprintf(conf, "\n");
+	fprintf(conf, "enablecdboot\n");
+	fprintf(conf, "\n");
+	fclose(conf);
+
+	return(0);
+}
+
+int update_kernelconf() {
+	FILE *conf = NULL;
+
+	conf = fopen("/target/etc/kernel-img.conf", "w");
+	if(conf == NULL)
+		return(1);
+
+	fprintf(conf, "## Generated by d-i yaboot-installer\n");
+	fprintf(conf, "\n");
+	fprintf(conf, "do_symlinks = Yes\n");
+	fprintf(conf, "image_in_boot = Yes\n");
+	fprintf(conf, "relative_links = Yes\n");
+	fprintf(conf, "\n");
+
+	fclose(conf);
+	return(0);
+}
+
+char *build_choice(PedPartition *part) {
+	char *string = NULL;
+
+	asprintf(&string, "%s (Typ: %s)",
+		ped_partition_get_path(part),
+		part->disk->dev->model);
+
+	return(strdup(string));
+}
+
+char *extract_choice(const char *choice) {
+	char *blank = NULL;
+	char device[PATH_MAX];
+	int i;
+
+	for(i=0; i<PATH_MAX; i++)
+	device[i] = '\0';
+
+	blank = strchr(choice, 32);
+	if(blank == NULL) {
+		return(strdup(choice));
+	}
+
+	strncpy(device, choice, blank-choice);
+	return(strdup(device));
+}
+
+int main(int argc, char **argv) {
+	int i = 0;
+	char *rootpart = NULL;
+	char *choices = NULL;
+
+	/* initialize debconf */
+	debconf = debconfclient_new();
+	debconf->command(debconf, "title", "Installing yaboot", NULL);
+
+	/* first, check if this machine as newworld */
+	if(get_powerpc_type() != 0) {
+		debconf->command(debconf, "fset", "yaboot-installer/wrongmac",
+			"seen", "false", NULL);
+		debconf->command(debconf, "set", "yaboot-installer/wrongmac", "false", NULL);
+		debconf->command(debconf, "input", "yaboot-installer/wrongmac", NULL);
+		debconf->command(debconf, "go", NULL);
+		exit(1);
+	}
+
+	/* add a libparted exception handler */
+	ped_exception_set_handler(exception_handler);
+
+	/* walk through the disks, and store all boot partitions */
+	read_physical_discs();
+	if(part_count <= 0) {
+		debconf->command(debconf, "fset", "yaboot-installer/nopart",
+			"seen", "false", NULL);
+		debconf->command(debconf, "set", "yaboot-installer/nopart", "false", NULL);
+		debconf->command(debconf, "input", "yaboot-installer/nopart", NULL);
+		debconf->command(debconf, "go", NULL);
+		exit(1);
+	}
+
+	rootpart = find_rootpartition();
+	if(rootpart == NULL) {
+		debconf->command(debconf, "fset", "yaboot-installer/noroot",
+			"seen", "false", NULL);
+		debconf->command(debconf, "set", "yaboot-installer/noroot", "false", NULL);
+		debconf->command(debconf, "input", "yaboot-installer/noroot", NULL);
+		debconf->command(debconf, "go", NULL);
+		exit(1);
+	}
+
+	/* build a cdebconf compatible string */
+	for(i=0; i<part_count; i++) {
+		char *tmp = NULL;
+
+		tmp = build_choice(bparts[i]);
+		if(tmp == NULL)
+			continue;
+
+		if(choices == NULL)
+			asprintf(&choices, "%s", tmp);
+		else
+			asprintf(&choices, "%s, %s", choices, tmp);
+
+		free(tmp);
+	}
+
+	/* ask for boot partition */
+	debconf->command(debconf, "subst", "yaboot-installer/bootdev",
+		"DEVICES", choices, NULL);
+	debconf->command(debconf, "fset", "yaboot-installer/bootdev",
+		"seen", "false", NULL);
+	debconf->command(debconf, "set", "yaboot-installer/bootdev", "false", NULL);
+	debconf->command(debconf, "input", "yaboot-installer/bootdev", NULL);
+	debconf->command(debconf, "go", NULL);
+	if(strcmp(debconf->value, "") == 0) {
+		debconf->command(debconf, "fset", "yaboot-installer/nopart",
+			"seen", "false", NULL);
+		debconf->command(debconf, "set", "yaboot-installer/nopart", "false", NULL);
+		debconf->command(debconf, "input", "yaboot-installer/nopart", NULL);
+		debconf->command(debconf, "go", NULL);
+	}
+
+	/* update the kernel config file */
+	i = update_kernelconf();
+	if(i != 0) {
+		debconf->command(debconf, "fset", "yaboot-installer/kconferr",
+			"seen", "false", NULL);
+		debconf->command(debconf, "set", "yaboot-installer/kconferr", "false", NULL);
+		debconf->command(debconf, "input", "yaboot-installer/kconferr", NULL);
+		debconf->command(debconf, "go", NULL);
+	}
+
+	/* generate yaboot.conf and ybin */
+	i = generate_yabootconf(debconf->value, rootpart);
+	if(i != 0) {
+		debconf->command(debconf, "fset", "yaboot-installer/conferr",
+			"seen", "false", NULL);
+		debconf->command(debconf, "set", "yaboot-installer/conferr", "false", NULL);
+		debconf->command(debconf, "input", "yaboot-installer/conferr", NULL);
+		debconf->command(debconf, "go", NULL);
+	}
+	
+	/* running "ybin" */
+	i = system("/target/usr/sbin/ybin -C /target/etc/yaboot.conf -v");
+	if(WEXITSTATUS(i) != 0) {
+		debconf->command(debconf, "fset", "yaboot-installer/ybinerr",
+			"seen", "false", NULL);
+		debconf->command(debconf, "set", "yaboot-installer/ybinerr", "false", NULL);
+		debconf->command(debconf, "input", "yaboot-installer/ybinerr", NULL);
+		debconf->command(debconf, "go", NULL);
+		return(1);
+	}
+	
+	debconf->command(debconf, "fset", "yaboot-installer/success", "seen", "false", NULL);
+	debconf->command(debconf, "set", "yaboot-installer/success", "false", NULL);
+	debconf->command(debconf, "input", "yaboot-installer/success", NULL);
+	debconf->command(debconf, "go", NULL);
+	return(0);
+}
+
