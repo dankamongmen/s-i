@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: parameters.xml,v 1.3 2003/11/04 05:46:56 mck Exp $ -->
+<!-- $Id: parameters.xml,v 1.4 2003/11/09 22:59:05 toff Exp $ -->
 
  <sect1 id="boot-parms"><title>Boot Parameters</title>
 <para>
@@ -18,8 +18,8 @@ any special parameters that inform the system about your hardware.
 
 </para><para>
 
-Full information on boot parameters can be found in the <ulink
-url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html"> Linux
+Information on many boot parameters can be found in the 
+<ulink url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html"> Linux
 BootPrompt HOWTO</ulink>, including tips for obscure hardware.  This
 section contains only a sketch of the most salient parameters.  Some
 common gotchas are included below in 
@@ -85,38 +85,109 @@ useful.
 
 <variablelist>
 <varlistentry>
-<term>DEBCONF_PRIORITY=CRITICAL</term>
-<listitem><para>
-
-This will cause the installation system to
-display only critical messages and try to do the right thing without
-fuss.  If problems are encountered, the installer adjusts the priority
-as needed.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<term>DEBCONF_PRIORITY=HIGH</term>
-<term>DEBCONF_PRIORITY=MEDIUM</term>
-<term>DEBCONF_PRIORITY=LOW</term>
-
+<term>DEBCONF_PRIORITY</term>
 <listitem><para>
 
 These parameter settings will similarly set the highest priority of
-messages to be displayed. For example, with the priority set to HIGH,
-both high and critical priority messages are shown, but medium and 
-low priority messages are skipped.
+messages to be displayed. 
+
+</para><para>
+
+With DEBCONF_PRIORITY=critical, the installation system will display
+only critical messages and try to do the right thing without fuss.  If
+problems are encountered, the installer adjusts the priority as
+needed.
+
+</para><para>
+
+If DEBCONF_PRIORITY=high (the default setting), both high and critical
+priority messages are shown, but medium and low priority messages are
+skipped. When DEBCONF_PRIORITY=low is used, all messages are shown.
 
 </para></listitem>
 </varlistentry>
 
+
+<variablelist>
 <varlistentry>
-<term>debug</term>
+<term>DEBCONF_FRONTEND</term>
 <listitem><para>
 
-Emit additional debug messages to the installation system log (see
-<xref linkend="dbootstrap-shell-log"/>), including every command run.
+This boot parameter controls the type of user interface used for the
+installer. The current possible parameter settings are:
+
+<itemizedlist>
+<item>DEBCONF_FRONTEND=noninteractive</item>
+<item>DEBCONF_FRONTEND=text</item>
+<item>DEBCONF_FRONTEND=newt</item>
+<item>DEBCONF_FRONTEND=slang</item>
+<item>DEBCONF_FRONTEND=ncurses</item>
+<item>DEBCONF_FRONTEND=bogl</item>
+<item>DEBCONF_FRONTEND=gtk</item>
+<item>DEBCONF_FRONTEND=corba</item>
+</itemizedlist>
+
+The default front end is DEBCONF_FRONTEND=newt. DEBCONF_FRONTEND=text
+may be preferable for serial console installs.
+
+</para></listitem>
+</varlistentry>
+</variablelist>
+
+
+<variablelist>
+<varlistentry>
+<term>BOOT_DEBUG</term>
+<listitem><para>
+
+Passing this boot parameter will cause the boot to be more verbosely 
+logged.
+
+<variablelist>
+<varlistentry>
+<term>BOOT_DEBUG=0</term>
+<listitem><para>This is the default.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>BOOT_DEBUG=1</term>
+<listitem><para>More verbose than usual.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>BOOT_DEBUG=2</term>
+<listitem><para>Lots of debugging information.</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>BOOT_DEBUG=3</term>
+<listitem><para>
+
+Shells are run at various points in the boot process to allow detailed
+debugging. Exit the shell to continue the boot.
+
+</para></listitem>
+</varlistentry>
+</variablelist>
+
+</para></listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term>INSTALL_MEDIA_DEV</term>
+<listitem><para>
+
+The value of the parameter is the path to the device to load the
+Debian installer from. For example,
+<userinput>INSTALL_MEDIA_DEV=/dev/floppy/0</userinput>
+
+</para><para>
+
+The boot floppy, which normally scans all floppys and USB storage
+devices it can to find the root floppy, can be overridden by this
+parameter to only look at the one device.  This parameter also
+controls which floppy drive driver floppys are read from.
 
 </para></listitem>
 </varlistentry>
@@ -134,9 +205,8 @@ a few minutes after starting the install.
 </para><para arch="i386">
 
 The <userinput>video=vga16:off</userinput> argument may also be used
-to disable
-the framebuffer. Such problems have been reported on a Dell Inspiron with
-Mobile Radeon card.
+to disable the framebuffer. Such problems have been reported on a Dell
+Inspiron with Mobile Radeon card.
 
 </para><para arch="m68k">
 
