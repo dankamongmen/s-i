@@ -93,6 +93,7 @@ config_retriever(void)
     if (asprintf(&command, "%s config", retriever) == -1)
         return 1;
     ret = di_exec_shell_log(command);
+    free(retriever);
     free(command);
     return ret;
 }
@@ -108,6 +109,7 @@ get_packages(di_packages_allocator *allocator)
     if (asprintf(&command, "%s packages " DOWNLOAD_PACKAGES, retriever) == -1)
         return NULL;
     ret = di_exec_shell_log(command);
+    free(retriever);
     free(command);
     if (ret != 0)
         return NULL;
