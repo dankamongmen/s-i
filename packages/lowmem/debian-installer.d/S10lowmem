@@ -1,19 +1,24 @@
 #!/bin/sh
-ram=$(grep ^Mem: /proc/meminfo | { read x y z; echo $y; }) # in bytes
-ram=$(expr 000000"$ram" : '0*\(.*\)......$') # convert to megabytes
+# TODO: this does not work on 2.6
+ram=$(grep ^MemTotal: /proc/meminfo | { read x y z; echo $y; }) || true # in kilobytes
 
-# This is the max memory footprint of the installer in non lowmem mode
-# up to running the partitioner.
-ARCH=`udpkg --print-architecture`
-case $ARCH in
-	i386) needed=45 ;;
-	mips) needed=25 ;;
-	mipsel) needed=25 ;;
-	*) needed=45 ;;
-esac
+if [ "$ram" = "" ]; then
+	echo "Cannot determine system memory, skipping lowmem probe" >&2
+else
+	ram=$(expr "$ram" / 1024) # convert to megabytes
+	# This is the max memory footprint of the installer in non lowmem mode
+	# up to running the partitioner.
+	ARCH=`udpkg --print-architecture`
+	case $ARCH in
+		i386) needed=45 ;;
+		mips) needed=25 ;;
+		mipsel) needed=25 ;;
+		*) needed=45 ;;
+	esac
 
-if [ "$ram" -lt "$needed" ]; then
-	touch /var/lib/lowmem
-
-       	trimtemplates /var/lib/dpkg/info || true
+	if [ "$ram" -lt "$needed" ]; then
+		touch /var/lib/lowmem
+	
+	       	trimtemplates /var/lib/dpkg/info || true
+	fi
 fi
