@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.14 2004/01/21 14:00:45 smarenka Exp $
+ * $Id: kbd-chooser.h,v 1.15 2004/02/13 01:54:42 jbailey Exp $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -54,7 +54,7 @@ extern int grep (const char *file, const char *string);
 extern int check_dir (const char *dirname);
 
 #ifdef SPARC_KBD
-#define PREFERRED_KBD "sparc"
+#define PREFERRED_KBD "sun"
 #endif
 
 #ifndef __m68k__
