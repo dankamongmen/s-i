@@ -54,6 +54,7 @@
    times!
  */
 #define STRDUP(s) ((s) == NULL ? NULL : strdup(s))
+#define STRDUP_NOTNULL(s) ((s) == NULL ? strdup("") : strdup(s))
 #define STRLEN(s) ((s) == NULL ? 0 : strlen(s))
 #define STRCPY(d,s) strcpy(d,((s) == NULL ? "" : (s)))
 #define DIM(ar) (sizeof(ar)/sizeof(ar[0]))

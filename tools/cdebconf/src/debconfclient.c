@@ -7,7 +7,7 @@
  *
  * Description: debconf client support interface
  *
- * $Id: debconfclient.c,v 1.5 2002/07/01 06:58:37 tausq Exp $
+ * $Id: debconfclient.c,v 1.6 2002/11/23 23:08:06 waldi Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -82,7 +82,7 @@ static int debconfclient_command(struct debconfclient *client,
 		strtok(buf, " \t\n");
 		DELETE(client->value);
 		v = strtok(NULL, "\n");
-		client->value = STRDUP(v);
+		client->value = STRDUP_NOTNULL(v);
 		return atoi(buf);
 	}
 	else 
