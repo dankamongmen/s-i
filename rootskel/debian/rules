@@ -32,8 +32,6 @@ clean:
 	rm -f build-stamp configure-stamp
 	dh_clean
 
-# This is a list of the devices we want to create
-DEVS=console kmem mem null ram0 ram tty1 tty2 tty3 tty4 hda hdb hdc hdd fd0
 
 install: build
 	dh_testdir
@@ -41,8 +39,6 @@ install: build
 	mkdir -p debian/rootskel/
 	cp -a src/* debian/rootskel/
 	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
-	$(foreach DEV, $(DEVS), \
-	(cp -dpR /dev/$(DEV) debian/rootskel/dev/ ) ; )
 
 # Build architecture-independent files here.
 binary-indep: build install
