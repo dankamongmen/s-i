@@ -17,17 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: utils.c,v 1.1 2003/10/01 10:43:17 waldi Exp $
+ * $Id: utils.c,v 1.2 2003/10/16 23:01:20 joeyh Rel $
  */
 
 #include <debian-installer.h>
 
-extern int exec_main (int argv, char **argc);
 extern int mapdevfs_main (int argv, char **argc);
-extern int shell_main (int argv, char **argc);
-#if 0
-extern int udpkg_main (int argv, char **argc);
-#endif
 
 static struct applet
 {
@@ -36,12 +31,7 @@ static struct applet
 }
 applets[] =
 {
-  { "exec", exec_main },
   { "mapdevfs", mapdevfs_main },
-  { "shell", shell_main },
-#if 0
-  { "udpkg", udpkg_main },
-#endif
 };
 
 static int applet_name_compare (const void *x, const void *y)
@@ -65,9 +55,9 @@ static int call_applet (int argc, char **argv, int recurse)
   for (s = applet_name; *s;)
     if (*s++ == '/')
       applet_name = s;
-
+  
   applet = bsearch (applet_name, applets, sizeof (applets) / sizeof (struct applet), sizeof (struct applet), applet_name_compare);
-
+  
   if (applet)
     return applet->main (argc, argv);
 
@@ -75,10 +65,10 @@ static int call_applet (int argc, char **argv, int recurse)
   {
     argc--;
     argv++;
-
     return call_applet (argc, argv, 1);
   }
 
+  fprintf(stderr, "Usage: di-utils [command] [args]\n");
   return 1;
 }
 
@@ -86,4 +76,3 @@ int main (int argc, char **argv)
 {
   return call_applet (argc, argv, 0);
 }
-
