@@ -2,7 +2,7 @@
 #
 # debian/rules file for srm-reader
 # Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
-# $Id: rules,v 1.1 2003/03/07 12:01:25 mckinstry Exp $
+# $Id: rules,v 1.2 2003/03/15 08:53:43 mckinstry Exp $
 
 export DH_VERBOSE=1
 PACKAGE=srm-reader
@@ -36,6 +36,7 @@ install: build
 	dh_clean
 	dh_installdirs
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/srm-reader
+	dh_link /usr/bin/srm-reader /etc/rcS.d/S40srm-reader
 
 # Build architecture-independent files here.
 binary-indep:
