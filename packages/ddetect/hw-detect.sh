@@ -153,6 +153,9 @@ get_manual_hw_info() {
 	echo "ide-disk:Linux ATA DISK"
 	echo "ide-cd:Linux ATAPI CD-ROM"
 	echo "isofs:Linux ISO 9660 filesystem"
+	if [ "`udpkg --print-architecture`" = powerpc ]; then
+		echo "airport:Airport wireless"
+	fi
 }
 
 # Should be greater than the number of kernel modules we can reasonably
