@@ -17,9 +17,9 @@ fi
 # not give reliable answers about what sort of terminal
 # we have.  The stdin of /sbin/debian-installer seems
 # to tell the truth.
-console_=$(readlink /proc/$(pidof debian-installer)/fd/0)
-console=$(mapdevfs "$console_")
-console_=${console_#/dev/}
+rawconsole=$(readlink /proc/$(pidof debian-installer)/fd/0)
+console=$(mapdevfs "$rawconsole")
+rawconsole=${rawconsole#/dev/}
 console=${console#/dev/}
 
 case "$console" in
@@ -34,8 +34,8 @@ ttyS*)
 	-e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
             /target/etc/inittab > /target/etc/inittab.real
     echo "# serial console added by debian-installer" >> /target/etc/securetty
-    echo "$console_" >> /target/etc/securetty
-    if [ -n "$console" ] && [ "$console" != "$console_" ]; then
+    echo "$rawconsole" >> /target/etc/securetty
+    if [ -n "$console" ] && [ "$console" != "$rawconsole" ]; then
 	echo "$console" >> /target/etc/securetty
     fi
 
