@@ -3,6 +3,7 @@
 . /usr/share/debconf/confmodule
 
 logfile=/var/log/messages
+logfile=messages
 
 localecode="debian-installer/locale"
 languagecode="debian-installer/language"
@@ -17,11 +18,11 @@ db_title "Choose language"
 #   debconf/language is an alias for debian-installer/language
 db_register "$languagecode" "debconf/language"
 
-db_fset "languagechooser/languagename" seen false
+db_fset "languagechooser/language-name" seen false
 db_fset "$languagecode" seen false
-db_input critical "languagechooser/languagename" || [ $? -eq 30 ]
+db_input critical "languagechooser/language-name" || [ $? -eq 30 ]
 if db_go; then
-    db_get "languagechooser/languagename"
+    db_get "languagechooser/language-name"
     if test "$RET" ; then
 	LANGNAME="$RET"
 	. languagemap
@@ -40,8 +41,8 @@ fi
 db_get "$languagecode"
 db_set "debconf/language" "$LANGUAGELIST"
 
-log "debian-installer/locale   = '$LOCALE'"
-log "debian-installer/language = '$LANGUAGELIST'"
-log "debian-installer/country  = '$COUNTRY'"
+log "$localecode   = '$LOCALE'"
+log "$languagecode = '$LANGUAGELIST'"
+log "$countrycode  = '$COUNTRY'"
 
 exit 0
