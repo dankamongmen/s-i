@@ -3,7 +3,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.17 2003/03/19 20:52:32 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.18 2003/03/19 22:54:33 mckinstry Exp $
  */
 
 #include "config.h"
@@ -272,7 +272,6 @@ maplist_t *parse_keymap_file (const char *name)
 	char buf[LINESIZE], *tab1, *tab2, *nl;
 	fp = fopen (name, "r");
 
-	printf ("FIXME: Parsing keymap file %s \n", name);
 	if (DEBUG && fp == NULL)
 		DIE ("Failed to open %s: %s \n", name, strerror (errno));
 	maplist = maplist_get (maplists, (char *) (name + STRLEN (KEYMAPLISTDIR) + STRLEN ("console-keymaps-") + 1));
@@ -534,9 +533,7 @@ void set_keymap (struct debconfclient *client, char *keymap)
 	// "seen" Used by scripts to decide not to call us again
 	client->command (client, "fset", "debian-installer/keymap",
 			 "seen", "yes", NULL);
-	fprintf (stderr, "FIXME: Entering loadkeys_wrappe\n");
 	loadkeys_wrapper (keymap);
-	printf ("FIXME: Exiting loadkeys_wrappe\n");
 
 }
 
@@ -574,7 +571,6 @@ int main (int argc, char **argv)
 			// First select a keyboard arch. 
 		case CHOOSE_ARCH:				 
 			res = my_debconf_input (client, kbd_priority, "console-tools/archs", &s);
-			printf ("FIXME: console-tools/archs == %s \n", s);
 			if (res != CMDSTATUS_SUCCESS) {
 				exit (res == CMDSTATUS_GOBACK ? 0 : 1);
 			}
