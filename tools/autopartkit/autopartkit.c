@@ -1210,6 +1210,9 @@ int main (int argc, char *argv[])
     const char *profiles;
     const char *tablefile;
     
+    autopartkit_log(1, "Using %d default disk label type\n",
+		    default_disk_label());
+
     client = debconfclient_new ();
     debconf_set_title("Automatic Partitionner");
 
