@@ -97,3 +97,40 @@ Supported Headers
 * postinst
 * debconf
 * provides
+
+
+
+A 5 minute primer on building udebs.
+====================================
+FIXME: Is this up-to-date?
+
+I build udebs by asking debhelper to build a normal .deb, except at the
+very last step, I force it to use the ".udeb' extention. The problems
+that show up are:
+
+1. dpkg-gencontrol has an annoying habit of guessing what .deb you are
+   going to build, and listing it in debian/files. This later propigates to
+   your .changes file, and things blow up since you didn't really build
+   a .deb. The fix is to tell dpkg-gencontrol to write to some other
+   file than debian/files, which you then delete/ignore. With debhelper,
+   I do it like this:
+         dh_gencontrol -- -fdebian/files~
+2. Since dpkg-gencontrol doesn't register the file, you have to do that
+   manually:
+         dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
+3. And finally you have to generate the package with a .udeb extention,
+   which looks like this in debhelper (with dpkg-deb -b, you just
+   specify a full filename, rather than the .. directory).
+         dh_builddeb --filename=$(FILENAME)
+   (This --filename switch requires debhelper (>= 2.1.18))
+4. The above commands use several handy variables, which I set like so:
+    PACKAGE=$(shell dh_listpackages)
+    VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+    ARCH=$(shell dpkg --print-architecture)
+    FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+    PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
+5. Even if you do all this, your dpkg-buildpackage run will fail, unless
+   you are using the (unreleased) dpkg-dev 1.7.0. The patch is trivial
+   though.
+
+
