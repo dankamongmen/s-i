@@ -11,7 +11,8 @@ if [ -x /sbin/depmod ]; then
 fi
 
 is_not_loaded() {
-	! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
+	! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || \
+	   (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
 }
 
 load_module() {
@@ -122,15 +123,25 @@ do
 		db_go || break
 
 		db_get ethdetect/module_select
-		if [ "$RET" = "none of the above" ]; then
-			exit 1
+		if [ "$RET" != "none of the above" ]; then
+			module="$RET"
+			if [ -n "$module" ] && is_not_loaded "$module" ; then
+				register-module "$module"
+				load_module "$module"
+			fi
+			continue
 		fi
-		module="$RET"
-		if [ -n "$module" ] && is_not_loaded "$module" ; then
-			register-module "$module"
-			load_module "$module"
+	fi
+
+	if [ -e /usr/lib/debian-installer/retriever/floppy-retriever ]; then
+		db_input critical ethdetect/load_floppy
+		db_go || continue # back up
+		db_get ethdetect/load_floppy
+		if [ "$RET" = true ] && \
+		   anna floppy-retriever && \
+		   hw-detect ethdetect/detect_progress_title; then
+			continue
 		fi
-		continue
 	fi
 
 	db_fset ethdetect/cannot_find seen false
