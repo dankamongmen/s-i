@@ -1,16 +1,51 @@
-Template: di-utils-mkfs/which-partition
-Type: select
+Template: di-utils-mkfs/partitions
+Type: multiselect
 Choices: ${PARTITIONS}
-_Description: Please select which partition to make a file system on
+_Description: Please select which make a file system on
  Listed are the partitions available in your system.  Please choose which
- partition you want to mkfs.  Note that this will COMPLETELY ERASE
+ partitions you want to mkfs.  Note that this will COMPLETELY ERASE
  that partition and any data on it.
 
-Template: di-utils-mkfs/filesystem
+Template: di-utils-mkfs/filesystems
 Type: select
-Choices: ${MKFS}
+Choices: ${FILESYSTEMS}
 Default: ext2
-_Description: Please choose what file system you want for ${PARTITION}
- There are several different file systems available which you can use
- on ${PARTITION}.  If you are unsure, ext2 should be a safe choice.
+_Description: Please select the filesystem you want to use
+ You can choose one of the following filesystem do use on your partition.
+
+Template: di-utils-mkfs/badblock
+Type: boolean
+Default: false
+_Description: Check for bad blocks
+ Should the filesystem check for badblocks during the mkfs process?
+
+Template: di-utils-mkfs/confirm
+Type: boolean
+Default: false
+_Description: Ready to format disc(s)?
+ WARNING all data on the partition(s) ${PARTITION} will now be deleted.
+ .
+ The selected filesystem is: ${FILESYSTEM}
+
+Template: di-utils-mkfs/noparts
+Type: note
+_Description: No valid partitions found
+ Unable to find any valid partition in the system. Maybe other kernel
+ modules need to be loaded.
+
+Template: di-utils-mkfs/nofs
+Type: note
+_Description: No usable filesystem found
+ Unable to find any usable filesystem to mkfs the partition(s). Other kernel
+ modules need to be loaded, to support filesystems.
+
+Template: di-utils-mkfs/nosel
+Type: note
+_Description: No partitions selected
+ No partition was selected. Aborting.
+
+Template: di-utils-mkfs/mkfserror
+Type: note
+_Description: Error while creating filesystem
+ Unable to create the filesystem on ${PARTITION} with ${FILESYSTEM}.
 
