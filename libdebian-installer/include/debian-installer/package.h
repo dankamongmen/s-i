@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.h,v 1.3 2003/09/29 12:10:00 waldi Exp $
+ * $Id: package.h,v 1.4 2003/11/03 13:46:12 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_H
@@ -44,6 +44,10 @@ typedef enum di_package_type di_package_type;
  * @defgroup di_package Package
  * @{
  */
+/**
+ * @defgroup di_package_parser Package - Parser
+ */
+
 /**
  * Packages file - Priority field
  */
@@ -86,8 +90,8 @@ enum di_package_status_want
  */
 enum di_package_type
 {
-  di_package_type_non_existent = 0,                     /**< @internal */
-  di_package_type_virtual_package,                      /**< Virtual package. */
+  di_package_type_non_existent = 0,                     /**< @internal Non existing package */
+  di_package_type_virtual_package,                      /**< Virtual package */
   di_package_type_real_package,                         /**< Real package */
 };
 
@@ -175,34 +179,71 @@ di_package_version *di_package_version_parse (di_package *package);
 
 /** @} */
 
-di_parser_fields_function_read
-  di_package_parser_read_dependency,
-  di_package_parser_read_description,
-  di_package_parser_read_name,
-  di_package_parser_read_priority,
-  di_package_parser_read_status;
-
-di_parser_fields_function_write
-  di_package_parser_write_dependency,
-  di_package_parser_write_description,
-  di_package_parser_write_priority,
-  di_package_parser_write_status;
-
 /**
  * @addtogroup di_package_parser
  * @{
  */
 
+di_parser_fields_function_read
+  /**
+   * Read function for Dependency field
+   */
+  di_package_parser_read_dependency,
+  /**
+   * Read function for Description field
+   */
+  di_package_parser_read_description,
+  /**
+   * Read function for Package field
+   */
+  di_package_parser_read_name,
+  /**
+   * Read function for Priority field
+   */
+  di_package_parser_read_priority,
+  /**
+   * Read function for Status field
+   */
+  di_package_parser_read_status;
+
+di_parser_fields_function_write
+  /**
+   * Write function for Dependency field
+   */
+  di_package_parser_write_dependency,
+  /**
+   * Write function for Description field
+   */
+  di_package_parser_write_description,
+  /**
+   * Write function for Priority field
+   */
+  di_package_parser_write_priority,
+  /**
+   * Write function for Status field
+   */
+  di_package_parser_write_status;
+
 extern const di_parser_fieldinfo *di_package_parser_fieldinfo[];
 
 di_parser_info *di_package_parser_info (void);
 
+/**
+ * Read a special package control file
+ *
+ * @param file file to read
+ * @param packages di_packages which the package is add to
+ * @param allocator the corresponding allocator
+ * @param info info function
+ */
 di_package *di_package_special_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator, di_parser_info *(info) (void));
 
 /**
  * Read a package control file
  *
  * @param file file to read
+ * @param packages di_packages which the package is add to
+ * @param allocator the corresponding allocator
  */
 static inline di_package *di_package_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator)
 {

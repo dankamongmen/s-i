@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.h,v 1.5 2003/10/05 10:09:18 waldi Exp $
+ * $Id: exec.h,v 1.6 2003/11/03 13:46:12 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__EXEC_H
@@ -47,8 +47,10 @@ di_process_handler
  * @param stdout_handler di_io_handler which gets stdout
  * @param stderr_handler di_io_handler which gets stderr
  * @param io_user_data user_data for di_io_handler
- * @param prepare_handler di_process_handler which is called before the exec
- * @param prepare_user_data user_data for di_process_handler
+ * @param parent_prepare_handler di_process_handler which is called after the fork in the parent
+ * @param parent_prepare_user_data user_data for parent_prepare_handler
+ * @param child_prepare_handler di_process_handler which is called after the fork in the child
+ * @param child_prepare_user_data user_data for child_prepare_handler
  *
  * @return status or error
  */
@@ -74,8 +76,10 @@ static inline int di_exec (const char *path, const char *const argv[])
  * @param stdout_handler di_io_handler which gets stdout
  * @param stderr_handler di_io_handler which gets stderr
  * @param io_user_data user_data for di_io_handler
- * @param prepare_handler di_process_handler which is called before the exec
- * @param prepare_user_data user_data for di_process_handler
+ * @param parent_prepare_handler di_process_handler which is called after the fork in the parent
+ * @param parent_prepare_user_data user_data for parent_prepare_handler
+ * @param child_prepare_handler di_process_handler which is called after the fork in the child
+ * @param child_prepare_user_data user_data for child_prepare_handler
  *
  * @return status or error
  */

@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.c,v 1.4 2003/09/29 14:08:48 waldi Exp $
+ * $Id: hash.c,v 1.5 2003/11/03 13:46:12 waldi Exp $
  */
 
 #include <debian-installer/hash.h>
@@ -38,8 +38,8 @@ typedef struct di_hash_node di_hash_node;
  */
 struct di_hash_table
 {
-  di_ksize_t size;                                      /**< the overall size */
-  di_ksize_t nnodes;                                    /**< number of nodes */
+  size_t size;                                          /**< the overall size */
+  size_t nnodes;                                        /**< number of nodes */
   di_hash_node **nodes;                                 /**< nodes */
   di_mem_chunk *mem_chunk;                              /**< di_mem_chunk for allocating the nodes (di_hash_node) */
   di_hash_func *hash_func;                              /**< hashing function */
@@ -141,7 +141,7 @@ di_hash_table *di_hash_table_new (di_hash_func hash_func, di_equal_func key_equa
 di_hash_table *di_hash_table_new_full (di_hash_func hash_func, di_equal_func key_equal_func, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func)
 {
   di_hash_table *hash_table;
-  di_ksize_t i;
+  size_t i;
 
   hash_table = di_new (di_hash_table, 1);
   hash_table->size               = HASH_TABLE_MIN_SIZE;
@@ -170,7 +170,7 @@ di_hash_table *di_hash_table_new_full (di_hash_func hash_func, di_equal_func key
  */
 void di_hash_table_destroy (di_hash_table *hash_table)
 {
-  di_ksize_t i;
+  size_t i;
 
   for (i = 0; i < hash_table->size; i++)
     di_hash_nodes_destroy (hash_table->nodes[i], hash_table->key_destroy_func, hash_table->value_destroy_func);

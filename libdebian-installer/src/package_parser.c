@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.5 2003/11/02 20:58:49 waldi Exp $
+ * $Id: package_parser.c,v 1.6 2003/11/03 13:46:12 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -28,14 +28,6 @@
 #include <ctype.h>
 #include <stddef.h>
 
-/**
- * @addtogroup di_package_parser
- * @{
- */
-/**
- * @internal
- * parser info
- */
 const di_parser_fieldinfo 
   internal_di_package_parser_field_package = 
     DI_PARSER_FIELDINFO
@@ -234,8 +226,6 @@ const di_parser_fieldinfo *di_package_parser_fieldinfo[] =
   NULL
 };
 
-/** @} */
-
 void *internal_di_package_parser_new (void *user_data)
 {
   internal_di_package_parser_data *parser_data = user_data;
@@ -278,12 +268,12 @@ di_package *di_package_special_read_file (const char *file, di_packages *package
   return data.package;
 }
 
-void di_package_parser_read_dependency (data, fip, field_modifier, value, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip __attribute__ ((unused));
-  di_rstring *field_modifier __attribute__ ((unused));
-  di_rstring *value;
-  void *user_data __attribute__ ((unused));
+void di_package_parser_read_dependency (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
 {
   internal_di_package_parser_data *parser_data = user_data;
   di_package *p = *data, *q;
@@ -336,17 +326,17 @@ void di_package_parser_read_dependency (data, fip, field_modifier, value, user_d
   }
 }
 
-void di_package_parser_write_dependency (data, fip, callback, callback_data, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip;
-  di_parser_fields_function_write_callback callback;
-  void *callback_data;
-  void *user_data __attribute__ ((unused));
+void di_package_parser_write_dependency (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
   di_slist_node *node;
   di_rstring value = { NULL, 0 };
-  di_ksize_t value_size = 0, value_size_needed;
+  size_t value_size = 0, value_size_needed;
 
   for (node = p->depends.head; node; node = node->next)
   {
@@ -354,14 +344,14 @@ void di_package_parser_write_dependency (data, fip, callback, callback_data, use
 
     if (d->type == fip->integer && d->ptr)
     {
-      di_ksize_t size = strlen (d->ptr->package);
+      size_t size = strlen (d->ptr->package);
       if (value.size)
         value_size_needed = size + 2;
       else
         value_size_needed = size;
       if (value.size + value_size_needed > value_size)
       {
-        int new_value_size = value_size + 1024;
+        size_t new_value_size = value_size + 1024;
         value.string = di_renew (char, value.string, new_value_size);
         value.string[value_size] = 0;
         value_size = new_value_size;
@@ -379,12 +369,12 @@ void di_package_parser_write_dependency (data, fip, callback, callback_data, use
   di_free (value.string);
 }
 
-void di_package_parser_read_description (data, fip, field_modifier, value, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip __attribute__ ((unused));
-  di_rstring *field_modifier __attribute__ ((unused));
-  di_rstring *value;
-  void *user_data __attribute__ ((unused));
+void di_package_parser_read_description (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
   char *temp;
@@ -399,12 +389,12 @@ void di_package_parser_read_description (data, fip, field_modifier, value, user_
     p->short_description = di_stradup (value->string, value->size);
 }
 
-void di_package_parser_write_description (data, fip, callback, callback_data, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip;
-  di_parser_fields_function_write_callback callback;
-  void *callback_data;
-  void *user_data __attribute__ ((unused));
+void di_package_parser_write_description (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
   di_rstring value;
@@ -446,12 +436,12 @@ const struct nr_to_string priorities[] =
   nr_to_string_one ("", 0),
 };
 
-void di_package_parser_read_priority (data, fip, field_modifier, value, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip __attribute__ ((unused));
-  di_rstring *field_modifier __attribute__ ((unused));
-  di_rstring *value;
-  void *user_data __attribute__ ((unused));
+void di_package_parser_read_priority (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
   const struct nr_to_string *prio;
@@ -465,12 +455,12 @@ void di_package_parser_read_priority (data, fip, field_modifier, value, user_dat
   p->priority = di_package_priority_extra;
 }
 
-void di_package_parser_write_priority (data, fip, callback, callback_data, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip;
-  di_parser_fields_function_write_callback callback;
-  void *callback_data;
-  void *user_data __attribute__ ((unused));
+void di_package_parser_write_priority (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
   const struct nr_to_string *prio;
@@ -504,12 +494,12 @@ const struct nr_to_string status[] =
   nr_to_string_one ("", 0),
 };
 
-void di_package_parser_read_status (data, fip, field_modifier, value, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip __attribute__ ((unused));
-  di_rstring *field_modifier __attribute__ ((unused));
-  di_rstring *value;
-  void *user_data __attribute__ ((unused));
+void di_package_parser_read_status (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
   const struct nr_to_string *stat;
@@ -532,12 +522,12 @@ void di_package_parser_read_status (data, fip, field_modifier, value, user_data)
     }
 }
 
-void di_package_parser_write_status (data, fip, callback, callback_data, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip;
-  di_parser_fields_function_write_callback callback;
-  void *callback_data;
-  void *user_data __attribute__ ((unused));
+void di_package_parser_write_status (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
   const struct nr_to_string *stat;

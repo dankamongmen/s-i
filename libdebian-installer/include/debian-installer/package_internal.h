@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_internal.h,v 1.1 2003/09/24 11:49:52 waldi Exp $
+ * $Id: package_internal.h,v 1.2 2003/11/03 13:46:12 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_INTERNAL_H
@@ -32,6 +32,10 @@ typedef struct internal_di_package_parser_data internal_di_package_parser_data;
  * @{
  */
 
+/**
+ * @internal
+ * parser info
+ */
 const di_parser_fieldinfo
   internal_di_package_parser_field_status,
   internal_di_package_parser_field_essential,
@@ -54,6 +58,9 @@ const di_parser_fieldinfo
   internal_di_package_parser_field_md5sum,
   internal_di_package_parser_field_description;
 
+/**
+ * @internal
+ */
 struct internal_di_package_parser_data
 {
   di_packages_allocator *allocator;

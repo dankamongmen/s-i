@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem.c,v 1.3 2003/11/02 20:58:49 waldi Exp $
+ * $Id: mem.c,v 1.4 2003/11/03 13:46:12 waldi Exp $
  */
 
 #include <debian-installer/mem.h>
@@ -110,9 +110,9 @@ struct di_mem_chunk
 {
   int num_mem_areas;            /**< the number of memory areas */
   int num_marked_areas;         /**< the number of areas marked for deletion */
-  di_ksize_t atom_size;         /**< the size of an atom */
-  di_ksize_t area_size;         /**< the size of a memory area */
-  di_ksize_t rarea_size;        /**< the size of a real memory area */
+  size_t atom_size;             /**< the size of an atom */
+  size_t area_size;             /**< the size of a memory area */
+  size_t rarea_size;            /**< the size of a real memory area */
   di_mem_area *mem_area;        /**< the current memory area */
   di_mem_area *mem_areas;       /**< a list of all the mem areas owned by this chunk */
 };
@@ -125,9 +125,9 @@ struct di_mem_area
 {
   di_mem_area *next;           /**< the next mem area */
   di_mem_area *prev;           /**< the previous mem area */
-  di_ksize_t index;            /**< the current index into the "mem" array */
-  di_ksize_t free;             /**< the number of free bytes in this mem area */
-  di_ksize_t allocated;        /**< the number of atoms allocated from this area */
+  size_t index;                /**< the current index into the "mem" array */
+  size_t free;                 /**< the number of free bytes in this mem area */
+  size_t allocated;            /**< the number of atoms allocated from this area */
   char mem[MEM_AREA_SIZE];     /**< the mem array from which atoms get allocated
                                 *   the actual size of this array is determined by
                                 *   the mem chunk "area_size". ANSI says that it
@@ -137,7 +137,7 @@ struct di_mem_area
                                 */
 };
 
-static size_t di_mem_chunk_compute_size (di_ksize_t size, di_ksize_t min_size) __attribute__ ((nonnull));
+static size_t di_mem_chunk_compute_size (size_t size, size_t min_size) __attribute__ ((nonnull));
 
 /** @} */
 
@@ -256,10 +256,10 @@ size_t di_mem_chunk_size (di_mem_chunk *mem_chunk)
   return size;
 }
 
-static size_t di_mem_chunk_compute_size (di_ksize_t size, di_ksize_t min_size)
+static size_t di_mem_chunk_compute_size (size_t size, size_t min_size)
 {
-  di_ksize_t power_of_2;
-  di_ksize_t lower, upper;
+  size_t power_of_2;
+  size_t lower, upper;
 
   power_of_2 = 16;
   while (power_of_2 < size)

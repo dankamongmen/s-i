@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: utils.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: utils.h,v 1.2 2003/11/03 13:46:12 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__UTILS_H
@@ -29,8 +29,16 @@
  * @{
  */
 
+/**
+ * Inits the lib
+ * @param progname name of the called binary
+ */
 void di_init (const char *progname);
 
+/**
+ * Get the name of the called binary
+ * @return name
+ */
 const char *di_progname_get (void);
 
 /** @} */
