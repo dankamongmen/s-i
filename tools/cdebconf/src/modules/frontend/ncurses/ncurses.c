@@ -11,6 +11,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
+#define q_get_description(q)  		question_get_field((q), "", "description")
+#define q_get_choices(q)		question_get_field((q), "", "choices")
+#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
+#define q_get_listorder(q)		question_get_field((q), NULL, "listorder")
+
 #define WIN_QUERY	1
 #define WIN_DESC	2
 #define COLOR_FRAME	1
@@ -224,8 +230,8 @@ static void drawdesc(struct frontend *ui, struct question *q)
 	WINDOW *descwin = UIDATA(ui)->descwin;
 
 	drawframe(ui, WIN_QUERY, ui->title);
-	wrapprint(qrywin, question_get_field(q, "", "description"), 0, COLS-2);
-	wrapprint(descwin, question_get_field(q, "", "extended_description"), 0, COLS-2);
+	wrapprint(qrywin, q_get_description(q), 0, COLS-2);
+	wrapprint(descwin, q_get_extended_description(q), 0, COLS-2);
 	wclrtobot(qrywin);
 	wclrtobot(descwin);
 	wrefresh(stdscr);
@@ -361,12 +367,12 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 	WINDOW *win = UIDATA(ui)->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
+	count = strchoicesplit(q_get_choices_vals(q), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 	if (count == 1)
 		defval = choices[0];
 
-	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
+	strchoicesplit(q_get_choices(q), choices_translated, DIM(choices_translated));
 	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
 
 	/* See what the currently selected value should be -- either a

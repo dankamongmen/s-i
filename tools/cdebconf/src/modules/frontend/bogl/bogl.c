@@ -8,7 +8,11 @@
 #include <bogl/bogl.h>
 #include <bogl/bowl.h>
 
-#define q_get_description(q)            question_get_field((q), "", "description")
+#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
+#define q_get_description(q)  		question_get_field((q), "", "description")
+#define q_get_choices(q)		question_get_field((q), "", "choices")
+#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
+#define q_get_listorder(q)		question_get_field((q), NULL, "listorder")
 
 /* Any private variables we may need. */
 struct uidata {
@@ -64,12 +68,12 @@ static void drawnavbuttons(struct frontend *ui, struct question *q)
 static void drawdesctop(struct frontend *ui, struct question *q)
 {
 	bowl_title(ui->title);
-	bowl_new_text(question_get_field(q, "", "description"));
+	bowl_new_text(q_get_description(q));
 }
 
 static void drawdescbot(struct frontend *ui, struct question *q)
 {
-	bowl_new_text(question_get_field(q, "", "extended_description"));
+	bowl_new_text(q_get_extended_description(q));
 }
 
 
@@ -78,7 +82,7 @@ static void drawdescbot(struct frontend *ui, struct question *q)
 int bogl_handler_boolean(struct frontend *ui, struct question *q)
 {
 	/* Should just make bowl_new_checkbox be properly const-qualified. */
-	char *desc = strdup(question_get_field(q, "", "description"));
+	char *desc = strdup(q_get_description(q));
 	int ret;
 	
 #if 0
@@ -130,7 +134,7 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 	const char *p;
 
 	count = 0;
-	p = question_get_field(q, NULL, "choices");
+	p = q_get_choices_vals(q);
 	if (*p)
 	{
 		count++;
@@ -142,9 +146,9 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 	if (count <= 0) return DC_NOTOK;
 
 	choices = malloc(sizeof(char *) * count);
-	strchoicesplit(question_get_field(q, NULL, "choices"), choices, count);
+	strchoicesplit(q_get_choices_vals(q), choices, count);
 	choices_translated = malloc(sizeof(char *) * count);
-	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, count);
+	strchoicesplit(q_get_choices(q), choices_translated, count);
 	selected = malloc(sizeof(char) * count);
 	memset(selected, ' ', count);
 
@@ -178,7 +182,7 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 	if(ret == DC_OK)
 	{
 		/* Be safe - allow for commas and spaces. */
-		char *answer = malloc(strlen(question_get_field(q, "", "choices")) + 1 + count);
+		char *answer = malloc(strlen(q_get_choices(q)) + 1 + count);
 		answer[0] = 0;
 		for(i = 0; i < count; i++)
 			if (selected[i] == '*')

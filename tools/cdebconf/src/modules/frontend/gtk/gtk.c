@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.26 2003/10/06 19:03:18 mckinstry Exp $
+ * $Id: gtk.c,v 1.27 2003/10/13 22:56:32 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -65,7 +65,11 @@
 
 #include <gtk/gtk.h>
 
-#define q_get_description(q)            question_get_field((q), "", "description")
+#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
+#define q_get_description(q)  		question_get_field((q), "", "description")
+#define q_get_choices(q)		question_get_field((q), "", "choices")
+#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
+#define q_get_listorder(q)		question_get_field((q), NULL, "listorder")
 
 /* A struct to let a question handler store appropriate set functions that will be called after
    gtk_main has quit */
@@ -107,7 +111,7 @@ gboolean show_description( GtkWidget *widget, struct frontend_question_data* dat
     q = data->q;
     target = ((struct frontend_data*)obj->data)->description_label;
 
-    gtk_label_set_text(GTK_LABEL(target), question_get_field(q, "", "extended_description"));
+    gtk_label_set_text(GTK_LABEL(target), q_get_extended_description(q));
 
     return FALSE;
 }
@@ -144,10 +148,10 @@ static void combo_setter(void *entry, struct question *q)
     char *tmp;
     int i, count;
     
-    tmp = question_get_field(q, NULL, "choices");
+    tmp = q_get_choices_vals(q);
     count = strchoicesplit(tmp, choices, DIM(choices));
     free(tmp);
-    tmp = question_get_field(q, "", "choices");
+    tmp = q_get_choices(q);
     strchoicesplit(tmp, choices_translated, DIM(choices_translated));
     free(tmp);
     for (i = 0; i < count; i++)
@@ -175,10 +179,10 @@ static void multi_setter(void *check_container, struct question *q)
     {
 	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_list->data)))
 	{
-	    tmp = question_get_field(q, NULL, "choices");
+	    tmp = q_get_choices_vals(q);
 	    count = strchoicesplit(tmp, choices, DIM(choices));
 	    free(tmp);
-	    tmp = question_get_field(q, "", "choices");
+	    tmp = q_get_choices(q);
 	    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
 	    free(tmp);
 	    for (i = 0; i < count; i++)
@@ -232,10 +236,10 @@ void button_single_callback(GtkWidget *button, struct frontend_question_data* da
     gchar *choices_translated[100] = {0};
     int i, count;
 
-    tmp = question_get_field(q, NULL, "choices");
+    tmp = q_get_choices_vals(q);
     count = strchoicesplit(tmp, choices, DIM(choices));
     free(tmp);
-    tmp = question_get_field(q, "", "choices");
+    tmp = q_get_choices(q);
     strchoicesplit(tmp, choices_translated, DIM(choices_translated));
     free(tmp);
     for (i = 0; i < count; i++)
@@ -404,7 +408,7 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
     gtk_box_pack_start(GTK_BOX(button_box), yes_button, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(button_box), no_button, FALSE, FALSE, 5);
 
-    description_label = gtk_label_new(question_get_field(q, "", "extended_description"));
+    description_label = gtk_label_new(q_get_extended_description(q));
     gtk_misc_set_alignment(GTK_MISC (description_label), 0.0, 0.0);
     gtk_label_set_line_wrap(GTK_LABEL (description_label), TRUE);
 
@@ -412,7 +416,7 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
     gtk_box_pack_start(GTK_BOX(vbox), description_label, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(vbox), button_box, FALSE, FALSE, 5);
 
-    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), vbox);
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
@@ -445,7 +449,7 @@ static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q,
     data->obj = obj;
     data->q = q;
 	
-    check = gtk_check_button_new_with_label(question_get_field(q, "", "description"));
+    check = gtk_check_button_new_with_label(q_get_description(q));
     if (strcmp(defval, "true") == 0)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
     else
@@ -489,10 +493,10 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     data->obj = obj;
     data->q = q;
 
-    tmp = question_get_field(q, NULL, "choices");
+    tmp = q_get_choices_vals(q);
     count = strchoicesplit(tmp, choices, DIM(choices));
     free(tmp);
-    tmp = question_get_field(q, "", "choices");
+    tmp = q_get_choices(q);
     strchoicesplit(tmp, choices_translated, DIM(choices_translated));
     free(tmp);
     tmp = question_get_field(q, NULL, "value");
@@ -523,7 +527,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
 	free(choices[i]);
     }
 
-    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), check_container);	
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
@@ -537,11 +541,11 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 {
     GtkWidget *frame, *label;
 	
-    label = gtk_label_new (question_get_field(q, "", "extended_description"));
+    label = gtk_label_new (q_get_extended_description(q));
     gtk_misc_set_alignment(GTK_MISC (label), 0.0, 0.0);
     gtk_label_set_line_wrap(GTK_LABEL (label), TRUE);
 
-    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), label);	
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
@@ -557,7 +561,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
     gtk_entry_set_visibility (GTK_ENTRY (entry), FALSE);
-    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), entry);	
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
@@ -591,17 +595,17 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     data->obj = obj;
     data->q = q;
 
-    tmp = question_get_field(q, NULL, "choices");
+    tmp = q_get_choices_vals(q);
     count = strchoicesplit(tmp, choices, DIM(choices));
     free(tmp);
-    tmp = question_get_field(q, "", "choices");
+    tmp = q_get_choices(q);
     strchoicesplit(tmp, choices_translated, DIM(choices_translated));
     free(tmp);
     if (count <= 0) return DC_NOTOK;
 
     button_box = gtk_vbutton_box_new();
 
-    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), button_box);
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
@@ -634,7 +638,7 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     const char *defval = question_getvalue(q, "");
     char * tmp;
     
-    tmp = question_get_field(q, "", "choices");
+    tmp = q_get_choices(q);
     count = strchoicesplit(tmp, choices_translated, DIM(choices_translated));
     free(tmp);
     if (count <= 0) return DC_NOTOK;
@@ -649,7 +653,7 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     gtk_entry_set_text (GTK_ENTRY(GTK_COMBO(combo)->entry), defval);
     gtk_combo_set_value_in_list (GTK_COMBO (combo), TRUE, FALSE);
 
-    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), combo);	
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
@@ -690,7 +694,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     if (defval)
 	gtk_entry_set_text (GTK_ENTRY(entry), defval);
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
-    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), entry);	
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
@@ -836,7 +840,7 @@ static int gtk_go(struct frontend *obj)
 
     if (strcmp(q->template->type, "note") != 0 )
         gtk_label_set_text(GTK_LABEL( ((struct frontend_data*)obj->data)->description_label), 
-                           question_get_field(q, "", "extended_description")); 
+                           q_get_extended_description(q)); 
     while (q != 0)
     {
         for (i = 0; i < DIM(question_handlers); i++)
