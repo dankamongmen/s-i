@@ -47,12 +47,11 @@ static const char *getlanguage(void)
 		/*   LANGUAGE has changed, reset cache_cur_lang...  */
 		DELETE(cache_cur_lang);
 		/*   ... and language linked list  */
-		for (p = cache_list_lang_ptr; p != NULL; p = p->next)
+		for (p = cache_list_lang_ptr; p != NULL; p = q)
 		{
 			DELETE(p->lang);
 			q = p->next;
 			free(p);
-			p = q;
 		}
 		cache_list_lang_ptr = NULL;
 		if (envlang == NULL)
