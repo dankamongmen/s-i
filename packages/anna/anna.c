@@ -317,7 +317,8 @@ OUT:
 int
 main(int argc, char **argv)
 {
-    int ret, state = 0;
+    int ret, state;
+    int firststate = 0;
     int (*states[])(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator) = {
         choose_retriever,
         choose_modules,
@@ -347,10 +348,11 @@ main(int argc, char **argv)
 
     if (argc > 1) {
 	    set_retriever(argv[1]);
-	    state=1; /* skip manual setting and use the supplied retriever */
+	    firststate=1; /* skip manual setting and use the supplied retriever */
     }
     
-    while (state >= 0 && states[state] != NULL) {
+    state=firststate;
+    while (state >= firststate && states[state] != NULL) {
         ret = states[state](status, &packages, &packages_allocator);
         if (ret != 0)
             state = -1;
@@ -368,7 +370,7 @@ main(int argc, char **argv)
             state--;
         }
     }
-    if (state < 0)
+    if (state < firststate)
         ret = 10; /* back to the menu */
     else
     {
