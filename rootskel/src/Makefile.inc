@@ -5,7 +5,7 @@ install: install-local install-recursive
 install-local: $(outdir) install-local-files install-local-files-exec
 
 install-local-files: $(files)
-	if [ -z "$(DESTDIR)" ]; then \
+	@if [ -z "$(DESTDIR)" ]; then \
 	  echo "You *must* give a DESTDIR!"; \
 	  exit 1; \
 	fi
@@ -15,7 +15,7 @@ install-local-files: $(files)
 	done
 
 install-local-files-exec: $(files_exec)
-	if [ -z "$(DESTDIR)" ]; then \
+	@if [ -z "$(DESTDIR)" ]; then \
 	  echo "You *must* give a DESTDIR!"; \
 	  exit 1; \
 	fi
@@ -25,7 +25,7 @@ install-local-files-exec: $(files_exec)
 	done
 
 install-recursive: $(outdir)
-	if [ -z "$(DESTDIR)" ]; then \
+	@if [ -z "$(DESTDIR)" ]; then \
 	  echo "You *must* give a DESTDIR!"; \
 	  exit 1; \
 	fi
