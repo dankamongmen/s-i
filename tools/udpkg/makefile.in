@@ -1,0 +1,16 @@
+CC=@CC@
+CFLAGS=@CFLAGS@ -DADMINDIR=\"@ADMINDIR@\"
+OBJS=$(subst .c,.o,$(wildcard *.c))
+BIN=udpkg
+LIBS=
+
+all: $(BIN)
+
+$(BIN): $(OBJS)
+	$(CC) -o $(BIN) $(OBJS) $(LIBS)
+
+clean:
+	-rm -f $(BIN) $(OBJS) *~
+
+distclean: clean
+	-rm -f config.status config.log config.cache makefile config.h
