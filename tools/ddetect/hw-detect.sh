@@ -230,7 +230,11 @@ for device in $(list_to_lines); do
 		log "Trying to load module '$module'"
 
 		if find /lib/modules/`uname -r`/ | grep -q /${module}\\. ; then
-			load_module "$module" "$cardname"
+			if [ "$cardname" = "[Unknown]" ]; then
+			  load_module "$module" "$cardname"
+			else
+			  load_module "$module"
+			fi
 		else
 			db_subst hw-detect/load_progress_skip_step CARDNAME "$cardname"
 			db_subst hw-detect/load_progress_skip_step MODULE "$module"
