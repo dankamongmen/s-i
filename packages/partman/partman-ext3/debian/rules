@@ -5,21 +5,14 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PACKAGE=$(shell dh_listpackages)
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=all
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
+PACKAGE = partman-ext3
 
-build: build-stamp
-build-stamp:
-	dh_testdir
-	touch build-stamp
+build:
+# Ye olde no-op.
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
 	rm -f `find . -name '*~'`
 	dh_clean
 
@@ -43,12 +36,11 @@ binary-arch: build install
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installdebconf -n
+	dh_installdebconf
 	dh_fixperms
 	dh_installdeb
-	dh_gencontrol -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
