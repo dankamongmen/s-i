@@ -2,12 +2,15 @@
 # Gathers data about an installed systen over ssh.
 use Expect;
 
-my $timeout=$ENV{STAGE_2_MAX_TIME};
+my $timeout=600;
 
-my $exp = Expect->spawn("ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ENV{USER}\@$ENV{MACHINE}");
+my $exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ENV{USER}\@$ENV{MACHINE}");
+#$exp->debug(2);
+#$exp->exp_internal(1);
 $exp->expect($timeout, "Password:");
 $exp->send("$ENV{USER_PASSWORD}\r");
 $exp->expect($timeout, "Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY");
+sleep 2;
 $exp->send("uname -a; mount; df -h; free; locale; dmesg; dpkg -l\r");
 foreach my $log (qw{status hardware-summary syslog partman}) {
 	$exp->send("cat /var/log/debian-installer/$log\r");
