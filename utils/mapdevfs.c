@@ -72,6 +72,8 @@ struct diskentry diskentries[] = {
     { 8,   0, "sda"},
     { 3,  64, "hdb"},
     { 3,   0, "hda"},
+    { 2,   1, "fd1"},
+    { 2,   0, "fd0"},
     { 0,   0,  NULL} };
 
 /* Returns the devfs path name normalized into a "normal" (hdaX, sdaX)
