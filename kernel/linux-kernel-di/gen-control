@@ -1,8 +1,10 @@
 #!/usr/bin/perl
 # Generate a debian/control from the control stub, the kernel-versions
 # files, and the package-list.
+use strict;
+use warnings;
 
-my @controlfields=qw(Package XC-Package-Type Provides Depends Architecture Section Priority Description);
+my @controlfields=qw(Package XC-Package-Type Provides Depends Architecture XB-Kernel-Version Section Priority Description);
 my @versions;
 my @packages;
 my @builddeps;
@@ -94,11 +96,35 @@ foreach my $ver (@versions) {
 		
 		print "\n";
 		
+		if (-e "$modlistdir/".$package->("Package").".control") {
+			open(CONTROL, "$modlistdir/".$package->("Package").".control");
+			while (<CONTROL>) {
+				chomp;
+				next if /^#/;
+	
+				if (/^(\S+):\s*(.*)/) {
+					$field=$1;
+					my $val=$2;
+					if (! grep { $field =~ /^\Q$_\E(_.+)?$/ } @controlfields) {
+						die "unknown field, $field";
+					}
+					$pkg{'Extra-'.$field}=$val;
+				}
+				elsif (/^(\s+.*)/) {
+					# continued field
+					$pkg{'Extra-'.$field}.="\n".$1;
+				}
+			}
+                        close (CONTROL);
+		}
+
 		$pkg{Architecture}=$arch;
 		$pkg{Provides}=$package->("Package");
+		$pkg{Provides}.=", ".$pkg{"Extra-Provides"} if defined $pkg{"Extra-Provides"};
 		$pkg{Package}=$package->("Package")."-".$kernelversion."-".$flavour."-di";
 		$pkg{'XC-Package-Type'}="udeb";
-		
+		$pkg{'XB-Kernel-Version'}=$kernelversion."-".$flavour;
+
 		if (defined $package->("Depends")) {
 			$pkg{Depends}=join(", ",
 				map { $_."-".$kernelversion."-".$flavour."-di" }
