@@ -37,7 +37,7 @@ while [ "$STATE" -gt 0 ]; do
         db_input critical "languagechooser/language-first" || [ $? -eq 30 ]
         if db_go; then
             db_get "languagechooser/language-first"
-            language=`echo $RET | sed -e 's/ .*//'`
+            language=`echo $RET | sed -e 's/ .*//' -e 's/[][]//g'`
             db_set "$languagecode" "$language"
             db_fset "$languagecode" seen true
         else
@@ -67,7 +67,7 @@ while [ "$STATE" -gt 0 ]; do
                 fi
                 ;;
               *)
-                language="${language}:"`echo $RET | sed -e 's/ .*//'`
+                language="${language}:"`echo $RET | sed -e 's/ .*//' -e 's/[][]//g'`
                 db_set "$languagecode" "$language"
                 ;;
             esac
@@ -83,7 +83,7 @@ while [ "$STATE" -gt 0 ]; do
         if db_go; then
             db_get "languagechooser/country-name"
             if [ "$RET" != "Other" ]; then
-                country=`echo $RET | sed -e 's/ .*//'`
+                country=`echo $RET | sed -e 's/ .*//' -e 's/[][]//g'`
                 db_set "$countrycode" "$country"
             else
                 country=unknown
