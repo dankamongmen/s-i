@@ -27,32 +27,8 @@ bootfs_devfs=$(findfs /boot)
 rootfs=$(mapdevfs $rootfs_devfs)
 bootfs=$(mapdevfs $bootfs_devfs)
 
-case "$rootfs_devfs" in
-  /dev/ide*) prefix=/dev/ide ;;
-  /dev/scsi*) prefix=/dev/scsi ;;
-  *)
-    # Last ditch effort - in case /dev/discs was mounted
-    case "$rootfs" in
-      /dev/hd*) prefix=/dev/ide ;;
-      /dev/sd*) prefix=/dev/scsi ;;
-      *)
-        error "Installation target is neither SCSI nor IDE?"
-        exit 1
-      ;;
-    esac
-  ;;
-esac
-
-for disc in $(find $prefix -name disc); do
-  dir=$(echo $disc | sed 's/\/disc$//')
-  # Must make sure this is a hard disk, i.e. has partitions.
-  # CD-ROMs won't.
-  if [ -b "$dir/part1" ]; then
-    disc_offered_devfs=$disc
-    break
-  fi
-done
-
+prefix=$(echo "$bootfs_devfs" | sed 's/\(\/dev\/[a-z]\+\).*/\1/')
+disc_offered_devfs=$(find $prefix -name disc | head -n 1)
 disc_offered=$(mapdevfs "$disc_offered_devfs")
 
 . /usr/share/debconf/confmodule
