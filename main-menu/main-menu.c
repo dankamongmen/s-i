@@ -305,6 +305,8 @@ static int satisfy_virtual(struct package_t *p) {
 			}
 		}
 	}
+	if (debconf)
+		debconfclient_delete(debconf);
 	free(choices);
 	/* It doesn't make sense to configure virtual packages,
 	 * since they are, well, virtual. */
