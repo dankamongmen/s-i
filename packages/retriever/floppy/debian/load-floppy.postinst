@@ -3,6 +3,10 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+# SPARC floppy drives don't have an eject button. Dropping to PROM
+# and calling eject-floppy isn't the best way to go..
+eject /dev/floppy/0 >/dev/null 2>&1 || true
+
 T=retriever/floppy/loadnow
 db_set $T true || true
 db_input critical $T || true
