@@ -7,6 +7,7 @@ set -e
 session=digress-$MACHINE-$SCHEME
 
 # Check to see if this session is already running
+screen -wipe >/dev/null 2>&1 || true
 existing=$(screen -ls $session | grep "$session	(") || true
 if [ -n "$existing" ]; then
 	if echo $existing | grep -q "Attached"; then
