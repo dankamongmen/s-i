@@ -20,10 +20,6 @@ KEEP_REVISION=N
 svn=svn
 debconfupdatepo=debconf-updatepo
 
-# The packages we want to see first in template.pot and PO files
-sortedpackages="languagechooser countrychooser kbd-chooser"
-
-
 usage() {
 echo  "Usage:"
 echo  "$0 [--keep-revision=lang] [--online] [--atomic] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
@@ -115,8 +111,8 @@ fi
 # First, update the copy of D-I repository
 cd $DI_COPY
 if [ "$ONLINE" = "Y" ] ; then
-  echo Synchronising $DI_COPY:
   if [ "$DEBUG" = "Y" ] ; then
+    echo Synchronising $DI_COPY:
     $svn update
   else
     $svn update >/dev/null 2>&1
@@ -126,59 +122,71 @@ fi
 
 # Build a list of all D-I packages with i18n material
 cd packages
-echo -n Building a list of all packages with i18n material...
+if [ "$DEBUG" = "Y" ] ; then
+  echo -n Building a list of all packages with i18n material...
+fi
 pots=$(find . -mindepth 3 -name templates.pot |\
           grep /debian/po/templates.pot\$)
 packages=$(echo $pots |\
           sed 's/\.\///g'|\
           sed 's/\/debian\/po\/templates\.pot//g')
-echo Done.
-
-otherpackages=`for i in $packages ; do if ! (echo $sortedpackages | grep $i  >/dev/null 2>&1) ; then echo $i ; fi ; done`
-
-packages="$sortedpackages $otherpackages"
-
+if [ "$DEBUG" = "Y" ] ; then
+  echo Done.
+fi
 
 # Loop over packages
 #  1a) sync the debian/ directory
 #  1b) run debconf-updatepo
 #  1c) commit back the changes
-echo Run debconf-updatepo for all packages:
+if [ "$DEBUG" = "Y" ] ; then
+  echo Run debconf-updatepo for all packages:
+fi
+
 for i in  $packages ; do 
- echo "  $i:"
+ if [ "$DEBUG" = "Y" ] ; then
+  echo "  $i:"
+ fi
  cd $DI_COPY/packages/$i/debian
  if [ "$ONLINE" = "Y" ] ; then
-   echo -n "    - Update..."
    if [ "$DEBUG" = "Y" ] ; then
+     echo -n "    - Update..."
      $svn update
    else
      $svn update >/dev/null 2>&1
    fi
-   echo Done.
+   if [ "$DEBUG" = "Y" ] ; then
+    echo Done.
+   fi
  fi
- echo -n "    - Debconf-updatepo..."
+ if [ "$DEBUG" = "Y" ] ; then
+  echo -n "    - Debconf-updatepo..."
+ fi
  cd $DI_COPY/packages/$i/debian
  if [ "$DEBUG" = "Y" ] ; then
    $debconfupdatepo
  else
    $debconfupdatepo >/dev/null 2>&1
  fi
- echo Done.
- if [ "$ATOMIC_COMMITS" = "Y"  -o "$BIG_COMMITS" = "Y" ] ; then
-   echo -n "    - Commit..."
-   cd $DI_COPY/packages/$i/debian/po
-   if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo" 
-   else
-     $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo" >/dev/null 2>&1
-   fi
+ if [ "$DEBUG" = "Y" ] ; then
    echo Done.
+ fi
+ if [ "$ATOMIC_COMMITS" = "Y"  -o "$BIG_COMMITS" = "Y" ] ; then
+   if [ "$DEBUG" = "Y" ] ; then
+     echo -n "    - Commit..."
+   fi
+   cd $DI_COPY/packages/$i/debian/po
+   $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on $DI_COPY/packages/$i" 
+   if [ "$DEBUG" = "Y" ] ; then
+     echo Done.
+   fi
  fi
 done
 
 # 2) Merge all templates.pot file together
 cd $DI_COPY/packages
-echo -n "Creating the general template.pot file..."
+if [ "$DEBUG" = "Y" ] ; then
+  echo -n "Creating the general template.pot file..."
+fi
 if [ "$DEBUG" = "Y" ] ; then
   msgcat $pots | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new
 else
@@ -193,38 +201,50 @@ else
   echo ERROR : no $DI_COPY/packages/po/header.pot file. Cannot continue.
   exit 1
 fi
-echo Done.
-if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-  echo -n "Commiting the general template.pot file..."
-  cd $DI_COPY/packages/po
-  if [ "$DEBUG" = "Y" ] ; then
-    $svn commit -m"${COMMIT_MARKER} Update from the l10n synchronisation script" template.pot
-  else
-    $svn commit -m"${COMMIT_MARKER} Update from the l10n synchronisation script" template.pot >/dev/null 2>&1
-  fi
+if [ "$DEBUG" = "Y" ] ; then
   echo Done.
+fi
+if [ "$ATOMIC_COMMITS" = "Y" ] ; then
+  if [ "$DEBUG" = "Y" ] ; then
+    echo -n "Commiting the general template.pot file..."
+  fi
+  cd $DI_COPY/packages/po
+  $svn commit -m"${COMMIT_MARKER} Update general template file from the l10n synchronisation script" template.pot
+  if [ "$DEBUG" = "Y" ] ; then
+    echo Done.
+  fi
 fi
 
 # For each PO file in packages/po:
 # 3a) Synchronize with D-I SVN
 # 3b) Update with template.pot
 # 3c) commit back the changed file
-echo Updating general PO files:
+if [ "$DEBUG" = "Y" ] ; then
+  echo Updating general PO files:
+fi
 cd $DI_COPY/packages/po
 languages=$(ls -1 *.po | sed 's/\.po//g')
 for po in *.po ; do
  lang=$(basename $po .po)
- echo "   $lang:"
+ if [ "$DEBUG" = "Y" ] ; then
+  echo "   $lang:"
+ fi
  if [ "$ONLINE" = "Y" ] ; then
-   echo -n "     - Update from SVN..."
+   if [ "$DEBUG" = "Y" ] ; then
+     echo -n "     - Update from SVN..."
+   fi
    if [ "$DEBUG" = "Y" ] ; then
      $svn update
    else
      $svn update >/dev/null 2>&1
    fi
-   echo Done.
+   if [ "$DEBUG" = "Y" ] ; then
+     echo Done.
+   fi
  fi
- echo "     - Merge with template.pot:"
+ if [ "$DEBUG" = "Y" ] ; then
+   echo "     - Merge with template.pot:"
+ fi
  if [ "$DEBUG" = "Y" ] ; then
    # This will not make comments go into the PO files
    # but this have been proven to work
@@ -243,23 +263,23 @@ for po in *.po ; do
    mv $po.new $po
  fi
  if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
-   echo -n "     - Commit back to SVN..."
    if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"${COMMIT_MARKER} Updated with general template.pot" $po
-   else
-     $svn commit -m"${COMMIT_MARKER} Updated with general template.pot" $po >/dev/null 2>&1
+     echo -n "     - Commit back to SVN..."
    fi
-   echo Done.
+   $svn commit -m"${COMMIT_MARKER} Updated packages/po/$po with general template.pot" $po
+   if [ "$DEBUG" = "Y" ] ; then
+     echo Done.
+   fi
  fi
 done
 if [ "$BIG_COMMITS" = "Y" ] ; then
-   echo -n "Commit all general PO files to SVN..."
    if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"${COMMIT_MARKER} Updated with general template.pot" *.po template.pot
-   else
-     $svn commit -m"${COMMIT_MARKER} Updated with general template.pot" *.po template.pot >/dev/null 2>&1
+     echo -n "Commit all general PO files to SVN..."
    fi
-   echo Done.
+   $svn commit -m"${COMMIT_MARKER} Updated packages/po/* with general template.pot" *.po template.pot
+   if [ "$DEBUG" = "Y" ] ; then
+     echo Done.
+   fi
 fi
 
 
@@ -267,23 +287,35 @@ fi
 # 4a) synchronize the local copy with the D-I SVN 
 # 4b) update debian/po/*.po files with files in packages/po/
 # 4c) commit back the changes to D-I SVN
-echo Updating D-I packages:
+if [ "$DEBUG" = "Y" ] ; then
+  echo Updating D-I packages:
+fi
 for package in $packages ; do
- echo "   $package:"
+ if [ "$DEBUG" = "Y" ] ; then
+  echo "   $package:"
+ fi
  cd $DI_COPY/packages/$package/debian/po
  if [ "$ONLINE" = "Y" ] ; then
-   echo -n "      - synchronize with D-I repository..."
+   if [ "$DEBUG" = "Y" ] ; then
+     echo -n "      - synchronize with D-I repository..."
+   fi
    if [ "$DEBUG" = "Y" ] ; then
      $svn update
    else
      $svn update >/dev/null 2>&1
    fi
-   echo Done.
+   if [ "$DEBUG" = "Y" ] ; then
+     echo Done.
+   fi
  fi
- echo -n "      - rebuild languages files: "
+ if [ "$DEBUG" = "Y" ] ; then
+   echo -n "      - rebuild languages files: "
+ fi
  # For each languages listed in packages/po, update PO files
  for lang in $languages ; do
-      echo -n "$lang "
+      if [ "$DEBUG" = "Y" ] ; then
+        echo -n "$lang "
+      fi
       if [ "$DEBUG" = "Y" ] ; then
         msgmerge $DI_COPY/packages/po/$lang.po templates.pot |\
            msgattrib --no-obsolete - >$lang.po.new
@@ -305,24 +337,36 @@ for package in $packages ; do
 	    cat $lang.po.new | sed "s/\"PO-Revision-Date:.*/$old_revision\\\\n\"/g" >$lang.po	    
 	  else
 	    mv $lang.po.new $lang.po
-	    echo -n "(CHANGED) "
+            if [ "$DEBUG" = "Y" ] ; then
+	      echo -n "(CHANGED) "
+	    else
+              echo ${package}/debian/po/${lang}.po CHANGED
+	    fi
 	  fi
         fi
       else
 	mv $lang.po.new $lang.po
 	svn add $lang.po
-	echo -n "(ADDED) "
+        if [ "$DEBUG" = "Y" ] ; then
+	  echo -n "(ADDED) "
+        else
+          echo ${package}/debian/po/${lang}.po ADDED
+	fi
       fi
  done
  echo ""
  if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
-   echo -n "      - commiting back updated files..."
+   if [ "$DEBUG" = "Y" ] ; then
+     echo -n "      - commiting back updated files..."
+   fi
    if [ "$DEBUG" = "Y" ] ; then
      $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po
    else
      $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po >/dev/null 2>&1
    fi
-   echo Done.
+   if [ "$DEBUG" = "Y" ] ; then
+     echo Done.
+   fi
  fi
 done
 
