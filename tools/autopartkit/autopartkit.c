@@ -130,15 +130,15 @@ struct _DeviceStats {
 };
 
 /* Pre-declarations */
-static void debconf_debug(const char*, const char*);
-static const char* debconf_input(char*, char*);
+static void mydebconf_debug(const char*, const char*);
+static const char* mydebconf_input(char*, char*);
 static PedDevice* choose_device(void);
 static void fix_mounting(device_mntpoint_map_t mountmap[], int partcount);
 #if defined(fordebian)
 static DeviceStats* get_device_stats(PedDevice*);
 #endif /* fordebian */
 
-static void debconf_debug (const char* variable, const char* value)
+static void mydebconf_debug (const char* variable, const char* value)
 {
     autopartkit_log(2, "debug: %s = %s\n", variable, value);
     client->command(client, "FSET", "autopartkit/debug", "seen", "false", NULL);
@@ -178,7 +178,7 @@ autopartkit_error (int isfatal, const char * format, ...)
         exit (isfatal);
 }
 
-static const char * debconf_input (char *priority, char *template)
+static const char * mydebconf_input (char *priority, char *template)
 {
     client->command (client, "FSET", template, "seen", "false", NULL);
     client->command (client, "INPUT", priority, template, NULL);
@@ -187,34 +187,34 @@ static const char * debconf_input (char *priority, char *template)
     return client->value;
 }
 
-static void debconf_note(char * template)
+static void mydebconf_note(char * template)
 {
     client->command(client, "FSET", template, "seen", "false", NULL);
     client->command(client, "INPUT high", template, NULL);
     client->command(client, "GO", NULL);
 }
 
-static const char * debconf_get(const char *template)
+static const char * mydebconf_get(const char *template)
 {
     client->command(client, "GET", template, NULL);
     return client->value;
 }
 
-static void debconf_set_title(const char *new_title)
+static void mydebconf_set_title(const char *new_title)
 {
     client->command(client, "TITLE", new_title, NULL);
 }
 
-static int debconf_bool(char *priority, char *template)
+static int mydebconf_bool(char *priority, char *template)
 {
     const char *value;
 
-    value = debconf_input(priority, template);
+    value = mydebconf_input(priority, template);
     if (strstr(value, "true"))
 	return 1;
     if (strstr(value, "false"))
 	return 0;
-    debconf_debug("unknown bool value", value);
+    mydebconf_debug("unknown bool value", value);
     return 0;
 }
 
@@ -241,7 +241,7 @@ static void autopartkit_confirm(void)
     static int confirm = 0;
     if (confirm)
 	return;
-    if (debconf_bool("high", "autopartkit/confirm"))
+    if (mydebconf_bool("high", "autopartkit/confirm"))
     {
 	confirm = 1;
 	return;
@@ -354,7 +354,7 @@ static PedDevice* choose_device(void)
 	/* No devices detected */
 	while (dev == NULL) 
 	{
-	    dev_name = debconf_input("critical", "autopartkit/device_name");
+	    dev_name = mydebconf_input("critical", "autopartkit/device_name");
 	    disable_kmsg(1);
 	    dev = ped_device_get(dev_name);
 	    disable_kmsg(0);
@@ -442,7 +442,7 @@ static PedDevice* choose_device(void)
         client->command(client, "SUBST", "autopartkit/choose_device", 
                         "TABLE", table, NULL);
 
-        value = debconf_input("critical", "autopartkit/choose_device");
+        value = mydebconf_input("critical", "autopartkit/choose_device");
         disable_kmsg(1);
         dev = ped_device_get(value);
         disable_kmsg(0);
@@ -1181,7 +1181,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     fix_mounting(mountmap, partcount);
 
     log_line();
-    /* debconf_note("autopartkit/success"); */
+    /* mydebconf_note("autopartkit/success"); */
 }
 
 /* 
@@ -1215,14 +1215,14 @@ int main (int argc, char *argv[])
 		    default_disk_label());
 
     client = debconfclient_new ();
-    debconf_set_title("Automatic Partitionner");
+    mydebconf_set_title("Automatic Partitionner");
 
     disable_kmsg(1);
     ped_exception_set_handler(exception_handler);
     PED_INIT();
     disable_kmsg(0);
 
-    profiles = debconf_get("debian-installer/profile");
+    profiles = mydebconf_get("debian-installer/profile");
     tablefile = choose_profile_table(profiles);
     disk_reqs = load_partitions(tablefile);
 
