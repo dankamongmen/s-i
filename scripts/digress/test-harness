@@ -124,12 +124,18 @@ fi
 
 if [ -n "$HP_ILO_PASSWORD_FILE" ]; then
 	HP_ILO_PASSWORD=$(cat $HP_ILO_PASSWORD_FILE) || true
+	if [ -z "$HP_ILO_PASSWORD" ]; then
+		error "HP_ILO_PASSWORD contains no password"
+	fi
 	export HP_ILO_PASSWORD
 fi
 
 if [ -n "$HP_GSP_PASSWORD_FILE" ]; then
 	HP_GSP_PASSWORD=$(cat $HP_GSP_PASSWORD_FILE) || true
 	export HP_GSP_PASSWORD
+	if [ -z "$HP_GSP_PASSWORD" ]; then
+		error "HP_GSP_PASSWORD contains no password"
+	fi
 fi
 
 started=1
