@@ -1,6 +1,7 @@
 #include "common.h"
 #include "configuration.h"
 #include "database.h"
+#include "rfc822.h"
 #include "rfc822db.h"
 #include "template.h"
 #include "question.h"
@@ -139,85 +140,6 @@ static int parse_flags(char *string)
     return ret;
 }
 
-/*
- * Function: rc822db_parse_stanza
- * Input: a FILE pointer to an open readable file containing a stanza in rfc822 
- *    format.
- * Output: a pointer to a dynamically allocated rfc822_header structure
- * Description: parse a stanza from file into the returned header struct
- * Assumptions: no lines are over 8192 bytes long.
- */
-
-static struct rfc822_header* rfc822db_parse_stanza(FILE *file)
-{
-    struct rfc822_header *head, **tail, *cur;
-    char buf[8192];
-
-    head = NULL;
-    tail = &head;
-    cur = NULL;
-
-    /*    fprintf(stderr,"rfc822db_parse_stanza(file)\n");*/
-    while (fgets(buf, sizeof(buf), file))
-    {
-        char *tmp = buf;
-
-        if (*tmp == '\n')
-            break;
-
-        CHOMP(buf);
-
-        if (isspace(*tmp))
-        {
-            /* continuation line, just append it */
-            int len;
-
-            if (cur == NULL)
-                break; /* should report an error here */
-
-            len = strlen(cur->value) + strlen(tmp) + 2;
-
-            cur->value = realloc(cur->value, len);
-            strvacat(cur->value, len, "\n", tmp, NULL);
-        } 
-        else 
-        {
-            while (*tmp != 0 && *tmp != ':')
-                tmp++;
-            *tmp++ = '\0';
-
-            cur = NEW(struct rfc822_header);
-            if (cur == NULL)
-                return NULL;
-            memset(cur, '\0',sizeof(struct rfc822_header));    
-
-            cur->header = strdup(buf);
-
-            while (isspace(*tmp))
-                tmp++;
-
-            cur->value = strdup(unescapestr(tmp));
-
-            *tail = cur;
-            tail = &cur->next;
-        }
-    }
-
-    return head;
-}
-
-
-static char *rfc822db_header_lookup(struct rfc822_header *list, const char* key)
-{
-/*    fprintf(stderr,"rfc822db_header_lookup(list,key=%s)\n",key);*/
-    while (list && (strcasecmp(key, list->header) != 0))
-        list = list->next;
-    if (!list)
-        return NULL;
-/*    fprintf(stderr,"rfc822db_header_lookup returning: '%s'\n", list->value);*/
-    return list->value;
-}
-
 /* templates */
 static int rfc822db_template_initialize(struct template_db *db, struct configuration *cfg)
 {
@@ -257,13 +179,13 @@ static int rfc822db_template_load(struct template_db *db)
         return DC_NOTOK;
     }
 
-    while ((header = rfc822db_parse_stanza(inf)) != NULL)
+    while ((header = rfc822_parse_stanza(inf)) != NULL)
     {
         struct template *tmp;
         const char *name;
         struct rfc822_header *h;
 
-        name = rfc822db_header_lookup(header, "name");
+        name = rfc822_header_lookup(header, "name");
         if (name == NULL)
         {
             INFO(INFO_ERROR, "Read a stanza without a name\n");
@@ -460,12 +382,12 @@ static int rfc822db_question_load(struct question_db *db)
         return DC_NOTOK;
     }
 
-    while ((header = rfc822db_parse_stanza(inf)) != NULL)
+    while ((header = rfc822_parse_stanza(inf)) != NULL)
     {
         struct question *tmp;
         const char *name;
 
-        name = rfc822db_header_lookup(header, "name");
+        name = rfc822_header_lookup(header, "name");
 
         if (name == NULL || *name == 0)
         {
@@ -476,11 +398,11 @@ static int rfc822db_question_load(struct question_db *db)
 
         tmp = question_new(name);
 
-        question_setvalue(tmp, rfc822db_header_lookup(header, "value"));
-        tmp->flags = parse_flags(rfc822db_header_lookup(header,"flags"));
-        parse_owners(tmp, rfc822db_header_lookup(header, "owners"));
-        parse_variables(tmp, rfc822db_header_lookup(header, "variables"));
-        tmp->template = db->tdb->methods.get(db->tdb, rfc822db_header_lookup(header, "template"));
+        question_setvalue(tmp, rfc822_header_lookup(header, "value"));
+        tmp->flags = parse_flags(rfc822_header_lookup(header,"flags"));
+        parse_owners(tmp, rfc822_header_lookup(header, "owners"));
+        parse_variables(tmp, rfc822_header_lookup(header, "variables"));
+        tmp->template = db->tdb->methods.get(db->tdb, rfc822_header_lookup(header, "template"));
         if (tmp->template == NULL) {
                 tmp->template = template_new(name);
                 db->tdb->methods.set(db->tdb, tmp->template);
