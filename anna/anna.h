@@ -34,7 +34,7 @@ void cleanup(void);
 char *udeb_kernel_version(di_package *package);
 int skip_package(di_package *p);
 int package_array_compare(const void *v1, const void *v2);
-void get_initial_package_list(di_packages *packages);
+void take_includes(di_packages *packages);
 void drop_excludes(di_packages *packages);
 int new_retrievers(di_package **retrievers_before, di_package **retrievers_after);
 #ifndef LIBDI_SYSTEM_DPKG
