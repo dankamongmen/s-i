@@ -112,9 +112,9 @@ for i in  $packages ; do
    echo -n "    - Commit..."
    cd $DI_COPY/packages/$i/debian/po
    if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"Run debconf-updatepo" 
+     $svn commit -m"[l10n-sync] Run debconf-updatepo" 
    else
-     $svn commit -m"Run debconf-updatepo" >/dev/null 2>&1
+     $svn commit -m"[l10n-sync] Run debconf-updatepo" >/dev/null 2>&1
    fi
    echo Done.
  fi
@@ -133,9 +133,9 @@ if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
   echo -n "Commiting the general template.pot file..."
   cd $DI_COPY/packages/po
   if [ "$DEBUG" = "Y" ] ; then
-    $svn commit -m"Update from the l10n synchronisation script" template.pot
+    $svn commit -m"[l10n-sync] Update from the l10n synchronisation script" template.pot
   else
-    $svn commit -m"Update from the l10n synchronisation script" template.pot >/dev/null 2>&1
+    $svn commit -m"[l10n-sync] Update from the l10n synchronisation script" template.pot >/dev/null 2>&1
   fi
   echo Done.
 fi
@@ -180,9 +180,9 @@ for po in *.po ; do
  if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
    echo -n "     - Commit back to SVN..."
    if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"Updated with general template.pot" $i
+     $svn commit -m"[l10n-sync] Updated with general template.pot" $i
    else
-     $svn commit -m"Updated with general template.pot" $i >/dev/null 2>&1
+     $svn commit -m"[l10n-sync] Updated with general template.pot" $i >/dev/null 2>&1
    fi
    echo Done.
  fi
@@ -229,9 +229,9 @@ for package in $packages ; do
  if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
    echo -n "      - commiting back updated files..."
    if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"Synchronising with files from packages/po" *.po
+     $svn commit -m"[l10n-sync] Synchronising with files from packages/po" *.po
    else
-     $svn commit -m"Synchronising with files from packages/po" *.po >/dev/null 2>&1
+     $svn commit -m"[l10n-sync] Synchronising with files from packages/po" *.po >/dev/null 2>&1
    fi
    echo Done.
  fi
