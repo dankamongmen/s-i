@@ -42,12 +42,12 @@ static size_t channels_items, devices_items;
 static int items, items_ctc, items_escon, items_lcs, items_qeth;
 static int chantype_qeth;
 static int device_selected, device_ctc_protocol, device_qeth_lcs_port;
-static char *device_qeth_portname, *device_qeth_portname_display;
+static char *device_qeth_portname_iucv_peer;
 static char *type_text = "", chandev_parm[256], chandev_module_parm[256];
 
 #define TEMPLATE_PREFIX	"debian-installer/s390/netdevice/"
 
-static int my_debconf_input (char *priority, char *template, char **p)
+static int my_debconf_input (const char *priority, const char *template, char **p)
 {
 	int ret;
 
@@ -175,15 +175,15 @@ static int get_channel (void)
 			if (!(k % 3))
 			{
 				devices[devices_items].device_read =
-					channels[i-2].device_first = 
+					channels[i-2].device_first =
 					channels[i-1].device_first =
 					channels[i].device_first =
 						channels[i].device - 2;
-				devices[devices_items].device_write = 
+				devices[devices_items].device_write =
 					channels[i].device - 1;
-				devices[devices_items].device_data = 
+				devices[devices_items].device_data =
 					channels[i].device;
-				devices[devices_items].chantype = 
+				devices[devices_items].chantype =
 					channels[i].chantype;
 				devices_items++;
 				items_qeth++;
@@ -194,12 +194,12 @@ static int get_channel (void)
 			if (!(k % 2))
 			{
 				devices[devices_items].device_read =
-					channels[i-1].device_first = 
+					channels[i-1].device_first =
 					channels[i].device_first =
 						channels[i].device - 1;
-				devices[devices_items].device_write = 
+				devices[devices_items].device_write =
 					channels[i].device;
-				devices[devices_items].chantype = 
+				devices[devices_items].chantype =
 					channels[i].chantype;
 				devices_items++;
 				if (channels[i].chantype & chantype_ctc)
@@ -323,38 +323,49 @@ static int get_qeth_lcs_port (void)
 	return 0;
 }
 
-static int get_qeth_portname (void)
+static int get_qeth_portname_iucv_peer (void)
 {
+	const char *template = NULL;
 	char *ptr;
 	int ret, j, k;
 
-	ret = my_debconf_input ("critical", TEMPLATE_PREFIX "qeth/portname", &ptr);
+        switch (type)
+        {
+		case TYPE_QETH:
+			template = TEMPLATE_PREFIX "qeth/portname";
+			break;
+		case TYPE_IUCV:
+			template = TEMPLATE_PREFIX "iucv/peer";
+			break;
+		default:
+			break;
+	}
+
+	ret = my_debconf_input ("critical", template, &ptr);
 	if (ret)
 		return ret;
 
-	free (device_qeth_portname);
+	free (device_qeth_portname_iucv_peer);
+	device_qeth_portname_iucv_peer = NULL;
 
 	j = strlen (ptr);
+
 	if (j)
 	{
-		di_log (DI_LOG_LEVEL_WARNING, "length: %d", j);
-		device_qeth_portname = strdup (ptr);
+		device_qeth_portname_iucv_peer = strdup (ptr);
 		for (k = 0; k < j; k++)
-			device_qeth_portname[k] = toupper (device_qeth_portname[k]);
-		device_qeth_portname_display = device_qeth_portname;
-	}
-	else
-	{
-		device_qeth_portname = NULL; 
-		device_qeth_portname_display = "-";
+			device_qeth_portname_iucv_peer[k] = toupper (device_qeth_portname_iucv_peer[k]);
+
+		return 0;
 	}
 
-	return 0;
+	return 1;
 }
 
 static int confirm (void)
 {
-	char *template, buf[10], *ptr;
+	const char *template;
+	char buf[10], *ptr;
 	int ret;
 
 	switch (type)
@@ -368,16 +379,24 @@ static int confirm (void)
 		case TYPE_LCS:
 			template = TEMPLATE_PREFIX "lcs/confirm";
 			break;
+		case TYPE_IUCV:
+			template = TEMPLATE_PREFIX "iucv/confirm";
+			break;
 		default:
 			return -1;
 	}
 
+	if (device_qeth_portname_iucv_peer)
+		ptr = device_qeth_portname_iucv_peer;
+	else
+		ptr = "-";
+		
 	switch (type)
 	{
 		case TYPE_QETH:
 			snprintf (buf, sizeof (buf), "0x%x", devices[device_selected].device_data);
 			debconf_subst (client,  template, "device_data", buf);
-			debconf_subst (client,  template, "portname", device_qeth_portname_display);
+			debconf_subst (client,  template, "portname", ptr);
 
 		case TYPE_LCS:
 			snprintf (buf, sizeof (buf), "%d", device_qeth_lcs_port);
@@ -391,8 +410,10 @@ static int confirm (void)
 			break;
 
 		case TYPE_IUCV:
+			debconf_subst (client,  template, "peer", ptr);
 			break;
 	}
+
 	switch (type)
 	{
 		case TYPE_CTC:
@@ -430,12 +451,12 @@ static int confirm (void)
 				  devices[device_selected].device_write,
 				  devices[device_selected].device_data,
 				  device_qeth_lcs_port);
-			if (device_qeth_portname)
+			if (device_qeth_portname_iucv_peer)
 				snprintf (chandev_parm, sizeof (chandev_parm), "add_parms,0x%x,0x%x,0x%x,portname:%s",
 					  chantype_qeth,
 					  devices[device_selected].device_read,
 					  devices[device_selected].device_data,
-					  device_qeth_portname);
+					  device_qeth_portname_iucv_peer);
 			break;
 		case TYPE_CTC:
 			snprintf (chandev_module_parm, sizeof (chandev_module_parm), "ctc-1,0x%x,0x%x,0,%d",
@@ -454,50 +475,64 @@ static int confirm (void)
 
 static int setup (void)
 {
-	FILE *f, *chandev;
-	char buf[256];
+	FILE *f;
+	char buf[256], buf1[256] = "", *ptr = NULL;
 
 	if (mkdir ("/etc/modutils", 777) && errno != EEXIST)
 		return 1;
 
-	chandev = fopen ("/proc/chandev", "a");
-
-	if (!chandev)
-		return 1;
-
-	if (strlen (chandev_parm))
+	switch (type)
 	{
-		f = fopen ("/etc/modutils/0chandev.chandev", "a");
+		case TYPE_QETH:
+		case TYPE_CTC:
+		case TYPE_LCS:
+			if (strlen (chandev_parm))
+				ptr = chandev_parm;
 
-		if (f)
-		{
-			fprintf (f, "%s\n", chandev_parm);
+			if (ptr)
+			{
+				f = fopen ("/etc/modutils/0chandev.chandev", "a");
+				if (!f)
+					return 1;
+
+				fprintf (f, "%s\n", ptr);
+				fclose (f);
+			}
+
+			snprintf (buf, sizeof (buf), "/etc/modutils/%s.chandev", type_text);
+
+			f = fopen (buf, "a");
+			if (!f)
+				return 1;
+
+			fprintf (f, "%s\n", chandev_module_parm);
 			fclose (f);
-		}
-		else
-			return 1;
 
-		fprintf (chandev, "%s\n", chandev_parm);
+			f = fopen ("/proc/chandev", "a");
+			if (!f)
+				return 1;
+
+			fprintf (f, "%s\n", chandev_module_parm);
+			if (ptr)
+				fprintf (f, "%s\n", ptr);
+			fprintf (f, "noauto\n");
+			fprintf (f, "reprobe\n");
+			fclose (f);
+			break;
+
+		case TYPE_IUCV:
+			f = fopen("/etc/modutils/netiucv", "a");
+			if (!f)
+				 return 1;
+
+			fprintf(f,"iucv=%s\n", device_qeth_portname_iucv_peer);
+			fclose(f);
+
+			snprintf (buf1, sizeof (buf1), "iucv=%s", device_qeth_portname_iucv_peer);
+			break;
 	}
 
-	snprintf (buf, sizeof (buf), "/etc/modutils/%s.chandev", type_text);
-
-	f = fopen (buf, "a");
-
-	if (f)
-	{
-		fprintf (f, "%s\n", chandev_module_parm);
-		fclose (f);
-	}
-	else
-		return 1;
-
-	fprintf (chandev, "%s\n", chandev_module_parm);
-	fprintf (chandev, "noauto\n");
-	fprintf (chandev, "reprobe\n");
-	fclose (chandev);
-
-	snprintf (buf, sizeof (buf), "modprobe %s", type_text);
+	snprintf (buf, sizeof (buf), "modprobe %s %s", type_text, buf1);
 
 	di_exec_shell_log (buf);
 
@@ -514,8 +549,8 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 
 	enum
 	{
-		BACKUP, GET_NETWORKTYPE, GET_IUCV, GET_CHANNEL,
-		GET_CTC_PROTOCOL, GET_QETH_LCS_PORT, GET_QETH_PORTNAME,
+		BACKUP, GET_NETWORKTYPE, GET_CHANNEL,
+		GET_CTC_PROTOCOL, GET_QETH_LCS_PORT, GET_QETH_PORTNAME_IUCV_PEER,
 		CONFIRM
 	}
 	state = GET_NETWORKTYPE;
@@ -534,7 +569,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						switch (type)
 						{
 							case TYPE_IUCV:
-								state = GET_IUCV;
+								state = GET_QETH_PORTNAME_IUCV_PEER;
 								break;
 							default:
 								state = GET_CHANNEL;
@@ -548,8 +583,6 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						return 1;
 				}
 				break;
-			case GET_IUCV:
-				return 1;
 			case GET_CHANNEL:
 				ret = get_channel ();
 				switch (ret)
@@ -597,7 +630,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						switch (type)
 						{
 							case TYPE_QETH:
-								state = GET_QETH_PORTNAME;
+								state = GET_QETH_PORTNAME_IUCV_PEER;
 								break;
 							default:
 								state = CONFIRM;
@@ -611,12 +644,22 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						return 1;
 				}
 				break;
-			case GET_QETH_PORTNAME:
-				ret = get_qeth_portname ();
+			case GET_QETH_PORTNAME_IUCV_PEER:
+				ret = get_qeth_portname_iucv_peer ();
 				switch (ret)
 				{
 					case 0:
 						state = CONFIRM;
+						break;
+					case 1:
+						switch (type)
+						{
+							case TYPE_QETH:
+								state = CONFIRM;
+								break;
+							default:
+								break;
+						}
 						break;
 					case 30:
 						state = GET_QETH_LCS_PORT;
@@ -638,7 +681,8 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						switch (type)
 						{
 							case TYPE_QETH:
-								state = GET_QETH_PORTNAME;
+							case TYPE_IUCV:
+								state = GET_QETH_PORTNAME_IUCV_PEER;
 								break;
 							case TYPE_CTC:
 								state = GET_CTC_PROTOCOL;
