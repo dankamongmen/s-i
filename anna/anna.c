@@ -28,8 +28,8 @@ struct package_t *select_packages (struct package_t *packages) {
 /* Calls udpkg to unpack a package. */
 int unpack_package (char *pkgfile) {
 	char *command=malloc(strlen(DPKG_UNPACK_COMMAND) + 1 +
-			     strlen(pkgfile) + 12);
-	sprintf(command, "%s %s >/dev/null", DPKG_UNPACK_COMMAND, pkgfile);
+			     strlen(pkgfile) + 1);
+	sprintf(command, "%s %s", DPKG_UNPACK_COMMAND, pkgfile);
 	return ! system(command);
 }
 
@@ -73,5 +73,8 @@ int install_packages (struct package_t *packages) {
 }
 
 int main (int argc, char **argv) {
+	/* Tell udpkg to shut up. */
+	setenv("UDPKG_QUIET", "y", 1);
+	
 	return ! install_packages(select_packages(get_packages()));
 }

@@ -196,6 +196,9 @@ void do_menu_item(struct package_t *p) {
 int main (int argc, char **argv) {
 	struct package_t *p, *packages;
 	
+	/* Tell udpkg to shut up. */
+	setenv("UDPKG_QUIET", "y", 1);
+	
 	packages = status_read();
 	while ((p=show_main_menu(packages))) {
 		do_menu_item(p);
