@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+#define CONFIGPREFIX	"frontend::driver::slang::"
 #define WIN_QUERY	1
 #define WIN_DESC	2
 #define LINES		SLtt_Screen_Rows
@@ -41,15 +42,26 @@ static void slang_flush(void)
  *
  * sets the color of a given object from the configuration
  */
+static void slang_setcolor(struct frontend *ui, int *handle, const char *obj, 
+	const char *fgdefault, const char *bgdefault)
+{
+	static int colorsused = 0;
+	char fgname[50], bgname[50];
+
+	snprintf(fgname, sizeof(fgname), CONFIGPREFIX "%s_fg", obj);
+	snprintf(bgname, sizeof(bgname), CONFIGPREFIX "%s_bg", obj);
+	*handle = colorsused++;
+	SLtt_set_color(*handle, 0, ui->cfg->get(ui->cfg, fgname, defaultfg),
+		ui->cfg->get(ui->cfg, bgname, defaultbg));
+}
 
 /*
  * slang_initwin
  *
  * initializes the various "windows" -- setup positions, colors, etc
  */
-static void slang_initwin(int type, struct slwindow *win)
+static void slang_initwin(struct frontend *ui, int type, struct slwindow *win)
 {
-	static int colorsused = 0;
 	switch (type)
 	{
 	case WIN_QUERY:
@@ -57,6 +69,12 @@ static void slang_initwin(int type, struct slwindow *win)
 		win->x = win->y = 0;
 		win->w = COLS;
 		win->h = LINES*2/3;
+		slang_setcolor(ui, &win->drawcolor, "query::draw", "yellow",
+			"blue");
+		slang_setcolor(ui, &win->fillcolor, "query::fill", "blue",
+			"blue");
+		slang_setcolor(ui, &win->selectedcolor, "query::selected",
+			"black", "yellow");
 		break;
 	case WIN_DESC:
 		win->border = 1;
@@ -64,16 +82,16 @@ static void slang_initwin(int type, struct slwindow *win)
 		win->y = LINES*2/3;
 		win->w = COLS;
 		win->h = LINES - win->y;
+		slang_setcolor(ui, &win->drawcolor, "desc:::draw", "yellow",
+			"blue");
+		slang_setcolor(ui, &win->fillcolor, "desc::fill", "blue",
+			"blue");
+		slang_setcolor(ui, &win->selectedcolor, "desc::selected",
+			"black", "yellow");
 		break;
 	default:
 		INFO(INFO_DEBUG, "Unrecognized window type");
 	}
-	win->drawcolor = colorsused++;
-	SLtt_set_color(win->drawcolor, 0, "yellow", "blue");
-	win->fillcolor = colorsused++;
-	SLtt_set_color(win->fillcolor, 0, "blue", "blue");
-	win->selectedcolor = colorsused++;
-	SLtt_set_color(win->selectedcolor, 0, "black", "yellow");
 }
 
 /*
@@ -543,8 +561,8 @@ static int slang_initialize(struct frontend *obj, struct configuration *cfg)
 	SLang_init_tty(-1, 0, 0);
 	SLkp_init();
 
-	slang_initwin(WIN_QUERY, &uid->qrywin);
-	slang_initwin(WIN_DESC, &uid->descwin);
+	slang_initwin(obj, WIN_QUERY, &uid->qrywin);
+	slang_initwin(obj, WIN_DESC, &uid->descwin);
 
 	slang_drawwin(&uid->qrywin);
 	slang_drawwin(&uid->descwin);

@@ -7,9 +7,9 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.11 2001/01/06 17:15:51 tausq Exp $
+ * $Id: strutl.c,v 1.12 2001/01/07 05:05:12 tausq Exp $
  *
- * cdebconf is (c) 2000 Randolph Chung and others under the following
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
  *
  * Redistribution and use in source and binary forms, with or without

@@ -8,9 +8,9 @@
  * Description: configuration file parsing and access routines
  *              (adapted from APT's Configuration class)
  *
- * $Id: configuration.c,v 1.4 2000/12/02 07:52:01 tausq Exp $
+ * $Id: configuration.c,v 1.5 2001/01/07 05:05:12 tausq Exp $
  *
- * cdebconf is (c) 2000 Randolph Chung and others under the following
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,8 +44,20 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#define DELIMITER	"::"
+
 /* private functions */
-/* helper lookup function */
+/*
+ * Function: config_lookuphlp
+ * Input: struct configitem *head - where to start looking
+ *        const char *tag - tag to look for
+ *        unsigned long len - length of tag
+ *        int create - create a new node if it doesn't exist?
+ * Output: struct configitem * - node of the item being sought, NULL if not
+ *         found
+ * Description: helper function for lookups
+ * Assumptions: none
+ */
 static struct configitem *config_lookuphlp(struct configitem *head, 
 	const char *tag, unsigned long len, int create)
 {
@@ -80,6 +92,15 @@ static struct configitem *config_lookuphlp(struct configitem *head,
 	return newitem;
 }
 
+/*
+ * Function: config_lookup
+ * Input: struct configuration *config - config object to look inside
+ *        const char *tag - tag of item to look for
+ *        int create - create if doesn't exist?
+ * Output: struct configitem * - item being sough, NULL if doesn't exist
+ * Description: lookup a given configuration item
+ * Assumptions: none
+ */
 static struct configitem *config_lookup(struct configuration *config, 
 	const char *tag, int create)
 {
@@ -112,6 +133,16 @@ static struct configitem *config_lookup(struct configuration *config,
 	return item;
 }
 
+/*
+ * Function: config_fulltag
+ * Input: const struct configitem *top - head of config tree
+ *        const struct configitem *stop - when to stop
+ *        char *tag - buffer to build the tag
+ *        const size_t maxlen - length of buffer
+ * Output: none
+ * Description: recursive builds the complete tag name, seperated by :: 
+ * Assumptions: none
+ */
 void config_fulltag(const struct configitem *top, 
 	const struct configitem *stop, char *tag, const size_t maxlen)
 {
@@ -125,10 +156,19 @@ void config_fulltag(const struct configitem *top,
 		return;
 	}
 	config_fulltag(top->parent, stop, buf, sizeof(buf));
-	strvacat(tag, maxlen, buf, "::", top->tag, 0);
+	strvacat(tag, maxlen, buf, DELIMITER, top->tag, 0);
 }
 
 /* public functions */
+/*
+ * Function: config_get
+ * Input: struct configurat *cfg - configuration object
+ *        const char *tag - tag of configuration item to retrieve
+ *        const char *defaultvalue - value to return if tag not found
+ * Output: const char * - value of tag (or default)
+ * Description: retrieves in string format the value of a given parameter
+ * Assumptions: none
+ */
 static const char *config_get(struct configuration *cfg, const char *tag, 
 		const char *defaultvalue)
 {
@@ -139,6 +179,16 @@ static const char *config_get(struct configuration *cfg, const char *tag,
 		return item->value;
 }
 
+/*
+ * Function: config_geti
+ * Input: struct configurat *cfg - configuration object
+ *        const char *tag - tag of configuration item to retrieve
+ *        const char *defaultvalue - value to return if tag not found
+ * Output: int - value of tag (or default)
+ * Description: retrieves in integer format the value of a given parameter
+ * Assumptions: if the parameter being sought exists but is a string, 
+ *              return defaultvalue
+ */
 static int config_geti(struct configuration *cfg, const char *tag, 
 		int defaultvalue)
 {
@@ -155,14 +205,35 @@ static int config_geti(struct configuration *cfg, const char *tag,
 		return res;
 }
 
+/*
+ * Function: config_set
+ * Input: struct configuration *cfg - configuration object
+ *        const char *tag - tag of configuration item
+ *        const char *value - value of configuration item
+ * Output: none
+ * Description: Sets the value of a given (string-type) configuration 
+ *              parameter
+ * Assumptions: none
+ */
 static void config_set(struct configuration *cfg, const char *tag,
 		const char *value)
 {
 	struct configitem *item = config_lookup(cfg, tag, 1);
 	if (item == 0) return;
+	DELETE(item->value);
 	item->value = STRDUP(value);
 }
 
+/*
+ * Function: config_seti
+ * Input: struct configuration *cfg - configuration object
+ *        const char *tag - tag of configuration item
+ *        const char *value - value of configuration item
+ * Output: none
+ * Description: Sets the value of a given (integer-type) configuration 
+ *              parameter
+ * Assumptions: none
+ */
 static void config_seti(struct configuration *cfg, const char *tag,
 		int value)
 {
@@ -171,18 +242,32 @@ static void config_seti(struct configuration *cfg, const char *tag,
 	config_set(cfg, tag, s);
 }
 
+/*
+ * Function: config_exists
+ * Input: struct configuration *cfg - configuration object
+ *        const char *tag - tag of configuration parmaeter being sought
+ * Output: int - 0 if exists, non-zero otherwise
+ * Description: determines if a configuration parameter with the given
+ *              tag exists
+ * Assumptions: none
+ */
 static int config_exists(struct configuration *cfg, const char *tag)
 {
 	struct configitem *item = config_lookup(cfg, tag, 0);
 	return (item != 0);
 }
 
+/*
+ * Function: config_read
+ * Input: struct configuration *cfg - configuration object
+ *        const char *filename - name of file to parse
+ * Output: int - 1 if suceeded, 0 otherwise
+ * Description: parses a BIND-like configuration file for configuration
+ *              parameters
+ * Assumptions: const buffer sizes below limits the length of tags
+ */
 static int config_read(struct configuration *cfg, const char *filename)
 {
-	/* 
-	 * rather involved parsing routine, but still better than using bison
-	 * i guess
-	 */
 	FILE *infp;
 	char parenttag[256];
 	char tag[256], value[4096], item[4096];
@@ -352,7 +437,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 					if (value[0] != 0)
 					{
 						strvacat(tag, sizeof(tag),
-							"::", value, 0);
+							DELIMITER, value, 0);
 						value[0] = 0;
 					}
 
@@ -362,7 +447,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 					else
 						strvacat(parenttag,
 							sizeof(parenttag), 
-							"::", tag, 0);
+							DELIMITER, tag, 0);
 					tag[0] = 0;
 				}
 
@@ -375,7 +460,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 					{
 						item[0] = 0;
 						strvacat(item, sizeof(item),
-							parenttag, "::",
+							parenttag, DELIMITER,
 							tag, 0);
 					}
 					else
@@ -417,6 +502,14 @@ static int config_read(struct configuration *cfg, const char *filename)
 	return 1;
 }
 
+/*
+ * Function: config_dump
+ * Input: struct configuration *cfg - configuration object
+ * Output: none
+ * Description: prints out all the configuration items currently stored in the
+ *              object
+ * Assumptions: none
+ */
 static void config_dump(struct configuration *cfg)
 {
 	const struct configitem *top = cfg->tree(cfg, 0);
@@ -440,11 +533,29 @@ static void config_dump(struct configuration *cfg)
 	}
 }
 
+/*
+ * Function: config_tree
+ * Input: struct configuration *cfg - configuration object
+ *        const char *tag - tag to look for
+ * Output: struct configitem * - head of tree at the point where the tag
+ *                               is as given
+ * Description: returns an internal pointer to a tree structure representing
+ *              a node with the given tag
+ * Assumptions: external callers should not change the structure of the
+ *              tree returned
+ */
 static struct configitem *config_tree(struct configuration *cfg, const char *tag)
 {
 	return config_lookup(cfg, tag, 0);
 }
 
+/*
+ * Function: config_new
+ * Input: none
+ * Output: struct configuration * - configuration object created
+ * Description: Creates a configuration object
+ * Assumptions: NEW succeeds
+ */
 struct configuration *config_new(void)
 {
 	struct configuration *config = NEW(struct configuration);
@@ -462,6 +573,13 @@ struct configuration *config_new(void)
 	return config;
 }
 
+/*
+ * Function: config_delete
+ * Input: struct configuration *cfg - configuration object
+ * Output: none
+ * Description: releases the memory used by cfg 
+ * Assumptions: config != NULL
+ */
 void config_delete(struct configuration *config)
 {
 	struct configitem *next;

@@ -7,9 +7,9 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.14 2001/01/06 17:15:51 tausq Exp $
+ * $Id: commands.c,v 1.15 2001/01/07 05:05:12 tausq Exp $
  *
- * cdebconf is (c) 2000 Randolph Chung and others under the following
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -582,8 +582,8 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
  *        size_t outsize - output buffer size
  * Output: int - DC_NOTOK if error, DC_OK otherwise
  * Description: handler for the FGET debconf command; retrieves the value
- *              of
- * Assumptions:
+ *              of a given flag
+ * Assumptions: none
  */
 int command_fget(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
@@ -612,21 +612,24 @@ int command_fget(struct confmodule *mod, int argc, char **argv,
 				((q->flags & DC_QFLAG_SEEN) ? "true" : "false"));
 		else
 			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
+
 	}
+	question_deref(q);
 
 	return DC_OK;
 }
 
 /*
- * Function:
+ * Function: command_fset
  * Input: struct confmodule *mod - confmodule object
  *        int argc - number of arguments
  *        char **argv - argument array
  *        char *out - output buffer
  *        size_t outsize - output buffer size
  * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description:
- * Assumptions:
+ * Description: handler for the FSET debconf command; sets the value of 
+ *              the given flag
+ * Assumptions: none
  */
 int command_fset(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
@@ -654,19 +657,21 @@ int command_fset(struct confmodule *mod, int argc, char **argv,
 		else
 			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
 	}
+	question_deref(q);
 	return DC_OK;
 }
 
 /*
- * Function:
+ * Function: command_exist
  * Input: struct confmodule *mod - confmodule object
  *        int argc - number of arguments
  *        char **argv - argument array
  *        char *out - output buffer
  *        size_t outsize - output buffer size
  * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description:
- * Assumptions:
+ * Description: handler for the EXIST debconf command; checks to see if a
+ *              template exists
+ * Assumptions: none
  */
 int command_exist(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
@@ -684,19 +689,21 @@ int command_exist(struct confmodule *mod, int argc, char **argv,
 	{
 		snprintf(out, outsize, "%u false", CMDSTATUS_SUCCESS);
 	}
+	question_deref(q);
 	return DC_OK;
 }
 
 /*
- * Function:
+ * Function: command_stop
  * Input: struct confmodule *mod - confmodule object
  *        int argc - number of arguments
  *        char **argv - argument array
  *        char *out - output buffer
  *        size_t outsize - output buffer size
  * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description:
- * Assumptions:
+ * Description: handler for the STOP debconf command; finishes the debconf
+ *              session
+ * Assumptions: none
  */
 int command_stop(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)

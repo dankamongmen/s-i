@@ -9,9 +9,9 @@
  *              of client configuration modules and communications
  *              between the debconf frontend and the confmodule
  *
- * $Id: confmodule.c,v 1.10 2001/01/06 17:15:51 tausq Exp $
+ * $Id: confmodule.c,v 1.11 2001/01/07 05:05:12 tausq Exp $
  *
- * cdebconf is (c) 2000 Randolph Chung and others under the following
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,6 +76,16 @@ static commands_t commands[] = {
 };
 
 /* private functions */
+/*
+ * Function: _confmodule_process
+ * Input: struct confmodule *mod - confmodule object
+ *        char *in - input command
+ *        char *out - reply buffer
+ *        size_t outsize - reply buffer length
+ * Output: int - DC_OK, DC_NOTOK, DC_NOTIMPL
+ * Description: helper function to process incoming commands
+ * Assumptions: in != NULL
+ */
 static int _confmodule_process(struct confmodule *mod, char *in, char *out, size_t outsize)
 {
 	int i = 0, argc;
@@ -94,10 +104,18 @@ static int _confmodule_process(struct confmodule *mod, char *in, char *out, size
 							out, outsize);
 		}
 	}
-	return 0;
+	return DC_NOTOK;
 }
 
 /* public functions */
+/*
+ * Function: confmodule_communicate
+ * Input: struct confmodule *mod - confmodule object
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handles communication between a config script and the
+ *              confmodule
+ * Assumptions: none
+ */
 static int confmodule_communicate(struct confmodule *mod)
 {
 	char in[1024];
@@ -123,6 +141,13 @@ static int confmodule_communicate(struct confmodule *mod)
 	return ret;
 }
 
+/*
+ * Function: confmodule_shutdown
+ * Input: struct confmodule *mod - confmodule object
+ * Output: int - exit code of the config script
+ * Description: Shuts down the confmodule
+ * Assumptions: none
+ */
 static int confmodule_shutdown(struct confmodule *mod)
 {
 	int status;
@@ -137,6 +162,15 @@ static int confmodule_shutdown(struct confmodule *mod)
 	return mod->exitcode;
 }
 
+/*
+ * Function: confmodule_run
+ * Input: struct confmodule *mod - confmodule object
+ *        int argc - number of arguments to pass to config script
+ *        char **argv - argument array
+ * Output: int - pid of config script, -1 if error
+ * Description: runs a config script, connected to the confmodule
+ * Assumptions: none
+ */
 static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 {
 	int pid;
@@ -164,8 +198,8 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 		args[argc-1] = NULL;
 		if (execv(argv[1], args) != 0)
 			perror("execv");
-		/* execv failed :( */
-		exit(1);
+		/* should never reach here, otherwise execv failed :( */
+		DIE("Cannot execute client config script");
 	default:
 		close(fromconfig[1]); close(toconfig[0]);
 		mod->infd = fromconfig[0];
@@ -175,6 +209,15 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 	return pid;
 }
 
+/*
+ * Function: confmodule_new
+ * Input: struct configuration *config - configuration parameters
+ *        struct database *db - database object
+ *        struct frontend *frontend - frontend UI object
+ * Output: struct confmodule * - newly created confmodule
+ * Description: creates a new confmodule object
+ * Assumptions: none
+ */
 struct confmodule *confmodule_new(struct configuration *config,
 	struct database *db, struct frontend *frontend)
 {
@@ -193,6 +236,13 @@ struct confmodule *confmodule_new(struct configuration *config,
 	return mod;
 }
 
+/*
+ * Function: confmodule_delete
+ * Input: confmodule *mod - confmodule object to destroy
+ * Output: none
+ * Description: destroys a confmodule object
+ * Assumptions: none
+ */
 void confmodule_delete(struct confmodule *mod)
 {
 	DELETE(mod);

@@ -8,9 +8,9 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.7 2001/01/06 17:15:51 tausq Exp $
+ * $Id: dpkg-reconfigure.c,v 1.8 2001/01/07 05:05:12 tausq Rel $
  *
- * cdebconf is (c) 2000 Randolph Chung and others under the following
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
  *
  * Redistribution and use in source and binary forms, with or without

@@ -8,9 +8,9 @@
  * Description: Allows the user to load template/question infrom from
  *              one database to another
  *
- * $Id: debconf-convertdb.c,v 1.1 2000/12/09 04:22:29 tausq Exp $
+ * $Id: debconf-convertdb.c,v 1.2 2001/01/07 05:05:12 tausq Rel $
  *
- * cdebconf is (c) 2000 Randolph Chung and others under the following
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
  *
  * Redistribution and use in source and binary forms, with or without

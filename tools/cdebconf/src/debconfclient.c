@@ -7,9 +7,9 @@
  *
  * Description: debconf client support interface
  *
- * $Id: debconfclient.c,v 1.3 2000/12/20 01:01:13 bug1 Exp $
+ * $Id: debconfclient.c,v 1.4 2001/01/07 05:05:12 tausq Rel $
  *
- * cdebconf is (c) 2000 Randolph Chung and others under the following
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,6 +48,14 @@
 #include <sys/types.h>
 #include <stdarg.h>
 
+/*
+ * Function: debconfclient_command
+ * Input: struct debconfclient *client - client object
+ *        const char *command, ... - null terminated command string
+ * Output: return code from confmodule
+ * Description: sends a command to the confmodule
+ * Assumptions: command list is NULL terminated
+ */
 static int debconfclient_command(struct debconfclient *client, 
 	const char *command, ...)
 {
@@ -89,11 +97,25 @@ static int debconfclient_command(struct debconfclient *client,
 	}
 }
 
+/*
+ * Function: debconfclient_ret
+ * Input: struct debconfclient *client - client object
+ * Output: char * - return value
+ * Description: simple accessor method for the return value
+ * Assumptions: client != NULL
+ */
 static char *debconfclient_ret(struct debconfclient *client)
 {
 	return client->value;
 }
 
+/*
+ * Function: debconfclient_new
+ * Input: none
+ * Output: struct debconfclient * - newly created debconfclient object
+ * Description: creates  a debconfclient object
+ * Assumptions: none
+ */
 struct debconfclient *debconfclient_new(void)
 {
 	struct debconfclient *client = NEW(struct debconfclient);
@@ -105,6 +127,13 @@ struct debconfclient *debconfclient_new(void)
 	return client;
 }
 
+/*
+ * Function: debconfclient_delete
+ * Input: struct debconfclient *client - client object to destroy
+ * Output: none
+ * Description: destroys the debconfclient object 
+ * Assumptions: client != NULL
+ */
 void debconfclient_delete(struct debconfclient *client)
 {
 	DELETE(client->value);

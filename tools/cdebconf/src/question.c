@@ -7,9 +7,9 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.8 2000/12/17 06:16:05 tausq Exp $
+ * $Id: question.c,v 1.9 2001/01/07 05:05:12 tausq Exp $
  *
- * cdebconf is (c) 2000 Randolph Chung and others under the following
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,6 +65,7 @@ void question_ref(struct question *q)
 
 void question_deref(struct question *q)
 {
+	if (q == NULL) return;
 	if (--q->ref == 0)
 		question_delete(q);
 }
