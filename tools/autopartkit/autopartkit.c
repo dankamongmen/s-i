@@ -916,9 +916,12 @@ split_string(const char *str, int separator, int elemcount, char *elements[])
     for (elemnum = 0 ; elemnum < elemcount; elemnum++)
     {
 	nextp = strchr(curp, separator);
-	if (NULL == nextp)
+	if (NULL == nextp)  /* Last element */
+	  {
+	    elements[elemnum] = strdup(curp);
 	    return -1;
-	elements[elemcount] = strndup(curp, nextp - curp);
+	  }
+	elements[elemnum] = strndup(curp, nextp - curp);
 	curp = nextp + 1;
     }
     
@@ -1047,9 +1050,10 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 			  retval = system(cmd);
 			  free(cmd);
 			  if (0 != retval)
-			      autopartkit_log(0,
-					      "Failed to create ext3 fs on %s",
-					      devpath);
+			      autopartkit_error(1,
+						"Failed to create ext3 fs "
+						"on '%s'",
+						devpath);
 		      }
 		    }
 		}
