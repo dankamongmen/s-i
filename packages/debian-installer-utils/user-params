@@ -2,17 +2,26 @@
 CMDLINE=/proc/cmdline
 for item in $(cat $CMDLINE); do
 	var="${item%=*}"
+	
+	# BOOT_IMAGE is added by syslinux.
+	if [ "$var" = "BOOT_IMAGE" ]; then
+		continue
+	fi
+	
+	# Skip debconf variables.
 	varnoslash="${var##*/*}"
-	if [ "$varnoslash" != "" ]; then
-		if [ "$item" = "--" ]; then
-			inuser=1
-			collect=""
-		elif [ "$inuser" ]; then
-			if [ -z "$collect" ]; then
-				collect="$item"
-			else
-				collect="$collect $item"
-			fi
+	if [ "$varnoslash" = "" ]; then
+		continue
+	fi
+	
+	if [ "$item" = "--" ]; then
+		inuser=1
+		collect=""
+	elif [ "$inuser" ]; then
+		if [ -z "$collect" ]; then
+			collect="$item"
+		else
+			collect="$collect $item"
 		fi
 	fi
 done
