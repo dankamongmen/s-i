@@ -5,7 +5,7 @@ ifdef DEBUG
 CFLAGS += -g3
 endif
 
-PARTCONF_OBJS = util.o partconf.o find-parts.o
+PARTCONF_OBJS = hinting.o util.o partconf.o find-parts.o
 
 all: partconf find-partitions mkfstab
 
@@ -19,6 +19,7 @@ mkfstab: mkfstab.c mkfstab.h
 	$(CC) $(CFLAGS) -o $@ mkfstab.c $(LIBS)
 
 util.o: util.c
+hinting.o: hinting.c hinting.h
 partconf.o: partconf.c partconf.h
 find-parts.o: find-parts.c partconf.h
 
