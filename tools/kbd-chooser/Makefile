@@ -36,7 +36,7 @@ ifeq ($(ARCH),mips)
 CFLAGS += -DAT_KBD -DUSB_KBD
 OBJS += at-kbd.o usb-kbd.o
 endif
-ifeq $(ARCH),mipsel)
+ifeq ($(ARCH),mipsel)
 CFLAGS += -DAT_KBD -DUSB_KBD
 OBJS += at-kbd.o usb-kbd.o
 endif
