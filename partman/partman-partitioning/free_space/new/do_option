@@ -1,0 +1,127 @@
+#!/bin/sh
+
+set -e
+
+. /lib/partman/definitions.sh
+
+dev=$2
+freeid=$3
+
+cd $dev
+
+open_dialog PARTITION_INFO $freeid
+read_line x1 freeid freesize freetype x2 x3 x4
+close_dialog
+
+[ "$freeid" ] || exit 1
+
+freehsize=$(longint2human $freesize)
+
+ask_for_size () {
+	local noninteractive
+	noninteractive=true
+	while true; do
+		size=''
+		while [ ! "$size" ]; do
+			db_set partman-partitioning/new_partition_size "$freehsize"
+			db_fset partman-partitioning/new_partition_size seen false
+			db_subst partman-partitioning/new_partition_size MAXSIZE "$freehsize"
+			db_input high partman-partitioning/new_partition_size ||
+				$noninteractive
+			noninteractive="return 1"
+			db_go || return 1
+			db_get partman-partitioning/new_partition_size
+			if valid_human "$RET"; then
+				hsize="$RET"
+				size=$(human2longint "$hsize")
+			else
+				db_fset partman-partitioning/bad_new_partition_size seen false
+				db_input high partman-partitioning/bad_new_partition_size || true
+				db_go || true
+			fi
+		done
+		if ask_for_type; then break; fi
+	done
+	return 0
+}
+
+ask_for_type () {
+	local noninteractive
+	noninteractive=true
+	while true; do
+		case "$freetype" in
+		primary)
+			$noninteractive
+			type=Primary
+			;;
+		logical)
+			$noninteractive
+			type=Logical
+			;;
+		pri/log)
+			db_fset partman-partitioning/new_partition_type seen false
+			db_input high partman-partitioning/new_partition_type ||
+				$noninteractive
+			db_go || return 1
+			db_get partman-partitioning/new_partition_type
+			type="$RET"
+		esac
+		if ask_for_place; then break; fi
+		noninteractive="return 1"
+	done
+}
+
+ask_for_place () {
+	local noninteractive
+	noninteractive=true
+	while true; do
+		if [ "$hsize" = "$freehsize" ]; then
+			$noninteractive
+			place=full
+		else
+			db_fset partman-partitioning/new_partition_place seen false
+			db_input high partman-partitioning/new_partition_place ||
+				$noninteractive
+			db_go || return 1
+			db_get partman-partitioning/new_partition_place
+			place="$RET"
+		fi
+		if create_new_partition; then break; fi
+		noninteractive="return 1"
+	done
+}
+
+create_new_partition () {
+	local num id size type fs path name
+	open_dialog NEW_PARTITION $type ext2 $freeid $place $size
+	id=''
+	read_line num id size type fs path name
+	close_dialog
+
+	partitions=''
+	open_dialog PARTITIONS
+	while { read_line num part size type fs path name; [ "$part" ]; }; do
+	    partitions="$partitions $part"
+	done
+	close_dialog
+	
+	for part in $partitions; do
+	    update_partition $dev $part
+	done
+
+	if [ "$id" ]; then
+	    while true; do
+		set +e
+		ask_user /lib/partman/active_partition "$dev" "$id"
+		exitcode="$?"
+		if [ "$exitcode" -ge 100 ]; then
+		    break
+		fi
+		set -e
+	    done
+	fi
+}
+
+ask_for_size || exit $?
+exit 0
+

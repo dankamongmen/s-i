@@ -1,0 +1,27 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+dev=$1
+id=$2
+method=$3
+
+db_metaget partman-basicfilesystems/text/ext2 description
+
+case $method in
+    formatable)
+	printf "ext2\t${RET}\n"
+	;;
+    existing)
+	[ -f $id/detected_filesystem ] || exit 0
+	fs=$(cat $id/detected_filesystem)
+	
+	case "$fs" in
+	    ext2)
+		printf "ext2\t${RET}\n"
+		;;
+	esac
+	;;
+esac
+
+

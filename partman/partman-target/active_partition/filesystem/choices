@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+dev="$1"
+id=$2
+
+[ -f $dev/$id/method ] || exit 0
+
+method=$(cat $dev/$id/method)
+
+if [ $(cat $dev/$id/available_filesystems | wc -l) -ge 2 ]; then
+    db_metaget partman-target/text/choose_filesystem description
+    printf "fs\t${RET}\n"
+fi
+

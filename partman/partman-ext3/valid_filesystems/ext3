@@ -1,0 +1,27 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+dev=$1
+id=$2
+property=$3
+
+[ -f /var/lib/partman/ext3 ] || exit 0
+
+case $property in
+    formatable)
+	printf "ext3\tExtended 3\n"
+	;;
+    existing)
+	[ -f $id/detected_filesystem ] || exit 0
+	fs=$(cat $id/detected_filesystem)
+	
+	case "$fs" in
+	    ext3)
+		printf "ext3\tExtended 3\n"
+		;;
+	esac
+	;;
+esac
+
+

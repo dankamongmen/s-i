@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+cd $1
+
+num=$2
+id=$3
+size=$4
+type=$5
+fs=$6
+path=$7
+name=$8
+
+db_metaget partman/text/number description
+x=$(printf "$RET" '')
+length=$((${#x} + 2))
+#RET='#%s'
+#length=4
+
+if [ "$fs" = free ]; then
+    printf "%${length}s" ''
+else
+    x=$(printf "$RET" $num)
+    printf "%${length}s" "$x"
+fi

@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -e
+
+. /lib/partman/definitions.sh
+
+if [ ! -f /var/run/parted_server.pid ]; then
+    mknod /var/lib/partman/infifo p || true
+    mknod /var/lib/partman/outfifo p || true
+    [ -d /var/run ] || mkdir /var/run
+    parted_server &
+    echo $! >/var/run/parted_server.pid
+    mkdir $DEVICES || true
+    
+    count=0
+    IFS="$NL"
+    for partdev in $(parted_devices); do
+	IFS="$TAB"
+	set -- $partdev
+	count=$(( $count + 1 ))
+	dev=$DEVICES/hd-$count
+	mkdir $dev || continue
+	printf "%s" "$1" >$dev/device
+	printf "%s" "$2" >$dev/size
+	printf "%s" "$3" >$dev/model
+	
+	cd $dev
+	open_dialog OPEN "$(cat $dev/device)"
+	read_line responce
+	close_dialog
+	if [ "$responce" = failed ]; then
+	    cd /
+	    rm -rf $dev
+	fi
+    done
+fi
+

@@ -1,0 +1,75 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+abort () {
+    # This loop is probably unnecessary
+    for s in /lib/partman/undo.d/*; do
+	if [ -x $s ]; then
+	    $s || true
+	fi
+    done
+    open_infifo
+    write_line "QUIT"
+    close_infifo
+    rm /var/run/parted_server.pid
+    exit $1
+}
+
+db_capb backup
+
+# Here is maybe not a good place to set deci (TODO)
+#db_metaget partman/text/deci description
+#deci="$RET"
+#export deci
+
+# The comma has special meaning for debconf.  Lets force dot untill we
+# discover where the comma has to be escaped..
+deci='.'
+
+if [ -e /var/lib/partman ]; then 
+    rm -rf /var/lib/partman 
+fi
+
+mkdir /var/lib/partman
+
+while true; do
+    
+    for s in /lib/partman/init.d/*; do
+	if [ -x $s ]; then
+	    $s || exit 1
+	fi
+    done
+    
+    while true; do
+	ask_user /lib/partman/choose_partition
+	exitcode=$?
+	[ $exitcode -ge 100 ] && break
+    done
+    
+    if [ $exitcode -eq 255 ]; then
+	abort 1
+    fi
+    
+    for s in /lib/partman/commit.d/*; do
+	if [ -x $s ]; then
+	    $s || continue 2
+	fi
+    done
+    
+    for s in /lib/partman/finish.d/*; do
+	if [ -x $s ]; then
+	    $s || {
+		status=$?
+		if [ "$status" = 1 ]; then
+		    continue 2
+		else
+		    abort $status
+		fi
+	    }
+	fi
+    done
+
+    break
+done    
+

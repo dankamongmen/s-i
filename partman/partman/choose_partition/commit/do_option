@@ -1,0 +1,14 @@
+#!/bin/sh
+
+for s in /lib/partman/commit.d/*; do
+    if [ -x $s ]; then
+	$s || break
+    fi
+done
+
+for s in /lib/partman/init.d/*; do
+    if [ -x $s ]; then
+	$s || exit 1
+    fi
+done
+

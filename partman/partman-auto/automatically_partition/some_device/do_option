@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+dev=$1
+
+cd $dev
+open_dialog NEW_LABEL msdos # FIXME: defaults for non-i386
+close_dialog
+
+# Different types partition tables support different visuals.  Some
+# have partition names other don't have, some have extended and
+# logical partitions, others don't.  Hence we have to regenerate the
+# list of the visuals
+if [ -f visuals ]; then
+    rm visuals
+fi
+
+myfreespace=''
+open_dialog PARTITIONS
+while { read_line num id size type fs path name; [ "$id" ]; }; do
+    if [ "$fs" = free ]; then
+	myfreespace=$id
+    fi
+done
+close_dialog
+
+autopartition $dev $myfreespace
+

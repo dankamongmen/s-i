@@ -1,0 +1,36 @@
+#!/bin/sh -e
+
+set -e
+
+. /lib/partman/definitions.sh
+
+dev=${1%//*}
+id=${1#*//}
+
+cd $dev
+
+if [ -z "$id" ]; then
+    ask_user /lib/partman/storage_device "$dev" "$id" || true
+else
+    open_dialog PARTITION_INFO $id
+    read_line num id size type fs path name
+    close_dialog
+    [ "$id" ] || exit 0
+    case "$fs" in
+	free)
+	    ask_user /lib/partman/free_space "$dev" "$id" || true
+	    ;;
+	*)
+	    while true; do
+		set +e
+		ask_user /lib/partman/active_partition "$dev" "$id"
+		exitcode="$?"
+		if [ "$exitcode" -ge 100 ]; then
+		    break
+		fi
+		set -e
+	    done
+	    ;;
+    esac
+fi
+

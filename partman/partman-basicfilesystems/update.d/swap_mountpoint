@@ -1,0 +1,18 @@
+#!/bin/sh
+
+dev=$1
+num=$2
+id=$3
+size=$4
+type=$5
+fs=$6
+path=$7
+name=$8
+
+cd $dev
+
+[ -f $id/acting_filesystem ] || exit 0
+
+if [ $(cat $id/acting_filesystem) = linux-swap -a -f $id/mountpoint ]; then
+    rm $id/mountpoint
+fi

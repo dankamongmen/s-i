@@ -1,0 +1,35 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+dev=$1
+id=$2
+property=$3
+
+[ -f /var/lib/partman/vfat ] || exit 0
+
+db_metaget partman-basicfilesystems/text/fat16 description
+f16="$RET"
+db_metaget partman-basicfilesystems/text/fat32 description
+f32="$RET"
+
+case $property in
+    formatable)
+	printf "fat16\t${f16}\n"
+	printf "fat32\t${f32}\n"
+	;;
+    existing)
+	[ -f $id/detected_filesystem ] || exit 0
+	fs=$(cat $id/detected_filesystem)
+	
+	case "$fs" in
+	    fat16)
+		printf "fat16\t${f16}\n"
+		;;
+	    fat32)
+		printf "fat32\t${f32}\n"
+		;;
+	esac
+	;;
+esac
+

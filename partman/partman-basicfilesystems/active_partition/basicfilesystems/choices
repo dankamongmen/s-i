@@ -1,0 +1,42 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+set -e
+
+dev=$1
+id=$2
+part=$dev/$id
+
+cd $dev
+
+[ -f $part/method -a -f $part/acting_filesystem ] || exit 0
+
+filesystem=$(cat $part/acting_filesystem)
+
+choice_mountpoint () {
+    case "$filesystem" in
+	ext2|fat16|fat32)
+	    db_metaget partman-basicfilesystems/text/specify_mountpoint description
+	    printf "mountpoint\t$RET\n"
+	    ;;
+    esac
+}
+
+choice_options () {
+    case "$filesystem" in
+	ext2)
+	    db_metaget partman-basicfilesystems/text/options description
+	    printf "options\t$RET\n"
+	    ;;
+	fat16|fat32)
+	    db_metaget partman-basicfilesystems/text/options description
+	    printf "fatoptions\t$RET\n"
+	    ;;
+    esac
+}
+
+choice_mountpoint
+
+choice_options
+

@@ -1,0 +1,1746 @@
+#include <parted/parted.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <stdbool.h>
+
+/**********************************************************************
+   Logging
+**********************************************************************/
+
+/* This file is used as log-file. */
+char logfile_name[] = "/var/log/partman";
+
+/* main() opens the logfile */
+FILE *logfile;
+
+/* This string is used to prepend the messages written in the log file */
+char const program_name[] = "parted_server";
+
+/* Write a message to the log-file.  Arguments are the same as in printf. */
+/* log(const char *format, ...) */
+#define log(...) \
+	({ \
+                char *msg_log; \
+                asprintf(&msg_log, __VA_ARGS__); \
+                fprintf(logfile, "%s: %s\n", program_name, msg_log); \
+                fflush(logfile); \
+                free(msg_log); \
+        })
+
+/* Write a line to the log-file and exit. */
+/* critical_error(const char *format, ...) */
+#define critical_error(...) \
+        ({ \
+                log(__VA_ARGS__); \
+                log("CRITICAL ERROR!!!  EXITING."); \
+                exit(1); \
+        })
+
+/* For debugint purposes */
+#define traceline() log("Line: %i", __LINE__)
+
+#define assert(x) \
+        if(!(x)) \
+                critical_error("Assertion failed at line %i.", __LINE__)
+
+#define log_partitions(dev, disk) \
+        (dump_info(logfile, dev, disk), fflush(logfile))
+
+/**********************************************************************
+   Reading from infifo and writting to outfifo
+**********************************************************************/
+
+/* This directory contains infifo and outfifo */
+char my_directory[] = "/var/lib/partman";
+
+/* The output FIFO.  We write to it, the clients read. */
+FILE *outfifo = NULL;
+
+/* Open the output FIFO.  After this function the global variable
+   outfifo can be used for writting. */
+void
+open_out()
+{
+        char *str;
+        log("Opening outfifo");
+        asprintf(&str, "%s/outfifo", my_directory);
+        outfifo = fopen(str, "w");
+        if (outfifo == NULL)
+                critical_error("Can't open outfifo");
+        free(str);
+}
+
+/* Write to the output FIFO.  The arguments are the same as in
+   printf. */
+#define oprintf(...) \
+        ({ \
+                char *msg_oprintf; \
+                fprintf(outfifo,__VA_ARGS__); \
+                fflush(outfifo); \
+                asprintf(&msg_oprintf, __VA_ARGS__); \
+                log("OUT: %s\n", msg_oprintf); \
+                free(msg_oprintf); \
+        })
+
+/* The input FIFO.  We read from it, the clients write. */
+FILE *infifo = NULL;
+
+/* Open the input FIFO.  After this function the global variable
+   infifo can be used for reading */
+void
+open_in()
+{
+        char *str;
+        log("Opening infifo");
+        asprintf(&str, "%s/infifo", my_directory);
+        infifo = fopen(str, "r");
+        if (infifo == NULL)
+                critical_error("Can't open infifo");
+        free(str);
+}
+
+/* Do fscanf from the intput FIFO.  The arguments are the same as in
+   the function `scanf' */
+#define iscanf(...) fscanf(infifo,__VA_ARGS__)
+
+/* This function closes infifo and outfifo.  Then in order to
+   synchronise with the clients it opens and closes first outfifo and
+   afterwards infifo but in oposite direction -- outfifo for reading
+   and infifo for writting. */
+void
+close_fifos_and_synchronise()
+{
+        char *str;
+        char c;
+        log("Closing infifo and outfifo");
+        fclose(infifo);
+        fclose(outfifo);
+        asprintf(&str, "%s/outfifo", my_directory);
+        outfifo = fopen(str, "r");
+        if (outfifo == NULL)
+                critical_error("Can't open outfifo for synchronisation");
+        free(str);
+        while (EOF != (c = fgetc(outfifo))) {
+        }
+        fclose(outfifo);
+        asprintf(&str, "%s/infifo", my_directory);
+        infifo = fopen(str, "w");
+        if (infifo == NULL)
+                critical_error("Can't open infifo for synchronisation");
+        free(str);
+        fclose(infifo);
+}
+
+/**********************************************************************
+   Timer
+**********************************************************************/
+
+bool timer_started = false;
+
+/* Tell the client to open a progress bar. */
+void
+start_timer()
+{
+        assert(!timer_started);
+        oprintf("Timer\n");
+        timer_started = true;
+}
+
+/* Tell the client to close the progress bar. */
+void
+stop_timer()
+{
+        assert(timer_started);
+        oprintf("ready\n");
+        timer_started = false;
+}
+
+/* Tell the client the fraction of operation done (in permiles). */
+void
+timer_handler(PedTimer *timer, void *context)
+{
+        assert(timer_started);
+        oprintf("%.0f %s\n", 1000 * timer->frac, timer->state_name);
+}
+
+/* Like ped_file_system_create but automaticaly creates PedTimer */
+PedFileSystem *
+timered_file_system_create(PedGeometry *geom, PedFileSystemType *type)
+{
+        PedFileSystem *result;
+        PedTimer *timer;
+/* DEBUG start */
+        PedConstraint *constr;
+        constr = ped_file_system_get_create_constraint(type, geom->dev);
+        log("AAAAAA min_size=%lli", constr->min_size);
+        log("AAAAAA max_size=%lli", constr->max_size);
+        log("AAAAAA start_range=%lli-%lli", constr->start_range->start, 
+            constr->start_range->end);
+        log("AAAAAA end_range=%lli-%lli", constr->end_range->start, 
+            constr->end_range->end);
+        log("AAAAAA start_align=%lli-%lli", constr->start_align->offset, 
+            constr->start_align->grain_size);
+        log("AAAAAA end_align=%lli-%lli", constr->end_align->offset, 
+            constr->end_align->grain_size);
+        log("AAAAAA geom.start=%lli", geom->start);
+        log("AAAAAA geom.end=%lli", geom->end);
+        if (ped_constraint_is_solution(constr, geom))
+                log("AAAAAA geom is a solution");
+        else
+                log("AAAAAA geom is NOT a solution");
+/* DEBUG end */
+        start_timer();
+        timer = ped_timer_new(&timer_handler, NULL);
+        result = ped_file_system_create(geom, type, timer);
+        stop_timer();
+        ped_timer_destroy(timer);
+        return result;
+}
+
+/* Like ped_file_system_check but automaticaly creates PedTimer */
+int
+timered_file_system_check(PedFileSystem *fs)
+{
+        int result;
+        PedTimer *timer;
+        start_timer();
+        timer = ped_timer_new(&timer_handler, NULL);
+        result = ped_file_system_check(fs, timer);
+        stop_timer();
+        ped_timer_destroy(timer);
+        return result;
+}
+
+/* Like ped_file_system_copy but automaticaly creates PedTimer */
+PedFileSystem *
+timered_file_system_copy(PedFileSystem *fs, PedGeometry *geom)
+{
+        PedFileSystem *result;
+        PedTimer *timer;
+        start_timer();
+        timer = ped_timer_new(&timer_handler, NULL);
+        result = ped_file_system_copy(fs, geom, timer);
+        stop_timer();
+        ped_timer_destroy(timer);
+        return result;
+}
+
+/* Like ped_file_system_resize but automaticaly creates PedTimer */
+int
+timered_file_system_resize(PedFileSystem *fs, PedGeometry *geom)
+{
+        int result;
+        PedTimer *timer;
+        start_timer();
+        timer = ped_timer_new(&timer_handler, NULL);
+        result = ped_file_system_resize(fs, geom, timer);
+        stop_timer();
+        ped_timer_destroy(timer);
+        return result;
+}
+
+/**********************************************************************
+   Exception handler
+**********************************************************************/
+
+/* Generate for the client an exception using the following scenario: */
+/*    1. Print `type' in outfifo */
+/*    2. Print `message' to be presented to the user. */
+/*    3. Print newline to mark the end of the message. */
+/*    4. Print the options for the user, one per line and end with an
+ *       empty line. */
+/*    5. Read from infifo the user responce.  This is either
+ *       "unhandled" or one of the options from 4. */
+/* Arguments: `type' is a string such as "information", "warning",
+ * "error", etc., `message' is the text to be presented to the user
+ * and `options' is an array of pointers to strings such "Yes", "No",
+ * "Cancel", etc.; the last pointer is NULL.  The function returns the
+ * index of the chosen by the user option or -1 if the option read in
+ * 5. was "unhandled".  The client responses with "unhandled" when the
+ * user cansels the debconf dialog or when the dialog was not
+ * presented to the user because of the debconf priority. */
+int
+pseudo_exception(char *type, char *message, char **options)
+{
+        int i;
+        char *str;
+        bool timer_was_started = timer_started;
+        if (timer_was_started)
+                stop_timer();
+        oprintf("%s\n", type);
+        oprintf("%s\n", message);
+        oprintf("\n");
+        for (i = 0; options[i] != NULL; i++) {
+                oprintf("%s\n", options[i]);
+        }
+        oprintf("\n");
+        if (timer_was_started)
+                start_timer();
+        if (1 != iscanf(" %a[^\n]", &str))
+                critical_error("No data in infifo.");
+        if (!strcmp(str, "unhandled")) {
+                log("User canceled exeption handler");
+                return -1;
+        }
+        for (i = 0; options[i] != NULL; i++)
+                if (!strcasecmp(str, options[i])) {
+                        free(str);
+                        return i;
+                }
+        critical_error("exception_handler: Bad option: \"%s\"", str);
+}
+
+/* The maximal meaningfull bit in PedExceptionOption.  In the current
+   version of libparted (1.6) this is 7, but let us be safer. */
+#define MAXIMAL_OPTION 10
+#define POWER_MAXIMAL_OPTION 1024       /* 2 to the MAXIMAL_OPTION */
+
+/* The exception handler for ped_exception_set_handler(). */
+PedExceptionOption
+exception_handler(PedException *ex)
+{
+        char *options[MAXIMAL_OPTION + 1];
+        int i;
+        unsigned bit;
+        int response;
+        i = 0;
+        for (bit = 1; bit <= POWER_MAXIMAL_OPTION; bit = bit << 1) {
+                if (bit & ex->options) {
+                        options[i] = ped_exception_get_option_string(bit);
+                        i++;
+                }
+        }
+        options[i] = NULL;
+        response =
+            pseudo_exception(ped_exception_get_type_string(ex->type),
+                             ex->message, options);
+        if (response == -1) {
+                log("User canceled exeption handler");
+                return PED_EXCEPTION_UNHANDLED;
+        }
+        for (bit = 1; bit <= POWER_MAXIMAL_OPTION; bit = bit << 1) {
+                if (bit & ex->options) {
+                        char *option;
+                        option = ped_exception_get_option_string(bit);
+                        if (!strcasecmp(options[response], option)) {
+                                return bit;
+                        }
+                }
+        }
+        critical_error("exception_handler: Bad option: <%s>",
+                       options[response]);
+}
+
+/* If we want to disable temporary the exception handler for some
+   commands, we use deactivate_exception_handler() before them and
+   activate_exception_handler after them. */
+
+unsigned handler_deactivation_counter = 0;
+
+void
+deactivate_exception_handler()
+{
+        if (handler_deactivation_counter == 0)
+                ped_exception_fetch_all();
+        handler_deactivation_counter++;
+}
+
+void
+activate_exception_handler()
+{
+        assert(handler_deactivation_counter > 0);
+        handler_deactivation_counter--;
+        if (handler_deactivation_counter == 0)
+                ped_exception_leave_all();
+}
+
+/**********************************************************************
+   Registry of the opened devices
+**********************************************************************/
+
+struct devdisk {
+        char *name;
+        PedDevice *dev;
+        PedDisk *disk;
+};
+
+/* We store the accessed devices from `devices[0]' to
+   `devices[number_devices - 1]'.  `number_devices' is a small number
+   so there is no need to use a hash table or some more advanced data
+   structure.  Moreover a version of parted_server using the hash
+   implementation from libdebian-installer was in 200 bytes longer. */
+
+unsigned number_devices = 0;
+struct devdisk *devices = NULL;
+
+/* The size of the array `devices' */
+unsigned allocated_devices = 0;
+
+/* 0 == strcmp(devices[index_of_name(name)].name, name) */
+int
+index_of_name(char *name)
+{
+        int i;
+        assert(name != NULL);
+        for (i = 0; i < number_devices; i++)
+                if (0 == strcmp(name, devices[i].name))
+                        return i;
+        if (number_devices == allocated_devices) {
+                allocated_devices = 1 + 2 * allocated_devices;
+                devices = realloc(devices,
+                                  sizeof(struct devdisk[allocated_devices]));
+                if (devices == NULL)
+                        critical_error("Can not allocate memory.");
+        }
+        number_devices++;
+        devices[i].name = strdup(name);
+        if (NULL == devices[i].name)
+                critical_error("Can not allocate memory.");
+        devices[i].dev = NULL;
+        devices[i].disk = NULL;
+        return i;
+}
+
+/* Return the PedDevice of `name'. */
+PedDevice *
+device_named(char *name)
+{
+        return devices[index_of_name(name)].dev;
+}
+
+
+/* Return the PedDisk of `name'. */
+PedDisk *
+disk_named(char *name)
+{
+        return devices[index_of_name(name)].disk;
+}
+
+/* True iff the PedDevice of `name' is not NULL. */
+bool
+device_opened(char *name)
+{
+        return NULL != device_named(name);
+}
+
+/* Set the PedDevice of `name' to be `dev'.  The old PedDevice of
+   `name' (if any) will be ped_device_destroy-ed. */
+void
+set_device_named(char *name, PedDevice *dev)
+{
+        PedDevice *old_dev;
+        assert(disk_named(name) == NULL);
+        old_dev = device_named(name);
+        if (NULL != old_dev)
+                ped_device_destroy(old_dev);
+        devices[index_of_name(name)].dev = dev;
+}
+
+/* Set the PedDisk of `name' to be `disk'.  The old PedDisk of `name'
+   (if any) will be ped_disk_destroy-ed. */
+void
+set_disk_named(char *name, PedDisk *disk)
+{
+        PedDisk *old_disk;
+        assert(device_opened(name));
+        old_disk = disk_named(name);
+        if (NULL != old_disk)
+                ped_disk_destroy(old_disk);
+        devices[index_of_name(name)].disk = disk;
+}
+
+
+/**********************************************************************
+   Partition creation
+**********************************************************************/
+
+/* True if `disk' has already an extended partition. */
+bool
+has_extended_partition(PedDisk *disk)
+{
+        assert(disk != NULL);
+        return ped_disk_extended_partition(disk) != NULL;
+}
+
+/* Add to `disk' a new extended partition starting at `start' and
+   ending at `end' */
+PedPartition *
+add_extended_partition(PedDisk *disk, PedSector start, PedSector end)
+{
+        PedPartition *extended;
+        assert(disk != NULL);
+        assert(!has_extended_partition(disk));
+        /* ext2 has no sense, but parted requires some argument */
+        extended = ped_partition_new(disk, PED_PARTITION_EXTENDED,
+                                     ped_file_system_type_get("ext2"),
+                                     start, end);
+        if (!extended) {
+                return NULL;
+        }
+        if (!ped_disk_add_partition(disk, extended,
+                                    ped_constraint_any(disk->dev))) {
+                ped_partition_destroy(extended);
+                return NULL;
+        }
+        return extended;
+}
+
+/* Makes the extended partition as large as possible. */
+void
+maximize_extended_partition(PedDisk *disk)
+{
+        PedPartition *extended;
+        assert(disk != NULL);
+        assert(has_extended_partition(disk));
+        extended = ped_disk_extended_partition(disk);
+        ped_disk_maximize_partition(disk, extended,
+                                    ped_constraint_any(disk->dev));
+}
+
+/* Add to `disk' a new primary partition with file system `fs_type'
+   starting at `start' and ending at `end'.  Note: The partition is
+   not formatted, but only created. */
+PedPartition *
+add_primary_partition(PedDisk *disk, PedFileSystemType *fs_type,
+                      PedSector start, PedSector end)
+{
+        PedPartition *part;
+        assert(disk != NULL);
+        log("add_primary_partition()");
+        if (has_extended_partition(disk)) {
+                /* Minimise the extended partition.  If there is an
+                   extended partition, but no logical partitions, this
+                   command removes the extended partition. */
+                log("Minimizing extended partition.");
+                ped_disk_minimize_extended_partition(disk);
+        }
+        part = ped_partition_new(disk, 0, fs_type, start, end);
+        if (part == NULL) {
+                log("Can not create new primary partition.");
+                return NULL;
+        }
+        if (!ped_disk_add_partition(disk, part, ped_constraint_any(disk->dev))) {
+                log("Can not add the primary partition to partition table.");
+                ped_partition_destroy(part);
+                return NULL;
+        }
+        return part;
+}
+
+/* Add to `disk' a new logical partition with file system `fs_type'
+   starting at `start' and ending at `end'.  Note: The partition is
+   not formatted, but only created. */
+PedPartition *
+add_logical_partition(PedDisk *disk, PedFileSystemType *fs_type,
+                      PedSector start, PedSector end)
+{
+        PedPartition *part;
+        assert(disk != NULL && fs_type != NULL);
+        if (!has_extended_partition(disk))
+                if (!add_extended_partition(disk, start, end))
+                        return NULL;
+        maximize_extended_partition(disk);
+        part = ped_partition_new(disk, PED_PARTITION_LOGICAL, fs_type,
+                                 start, end);
+        if (part == NULL) {
+                ped_disk_minimize_extended_partition(disk);
+                return NULL;
+        }
+        if (!ped_disk_add_partition(disk, part, ped_constraint_any(disk->dev))) {
+                ped_partition_destroy(part);
+                ped_disk_minimize_extended_partition(disk);
+                return NULL;
+        }
+        ped_disk_minimize_extended_partition(disk);
+        return part;
+}
+
+/* Resizes `part' from `disk' to start from `start' and end at `end'.
+   If `disk' contains some file system it is also resized.  Returns
+   true on success. */
+bool
+resize_partition(PedDisk *disk, PedPartition *part,
+                 PedSector start, PedSector end)
+{
+        PedFileSystem *fs;
+        PedConstraint *constraint;
+        PedSector old_start, old_end;
+        bool result;
+        old_start = (part->geom).start;
+        old_end = (part->geom).end;
+        if (old_start == start && old_end == end)
+                return true;
+        fs = ped_file_system_open(&(part->geom));
+        if (NULL != fs && !timered_file_system_check(fs)) {
+                /* TODO: inform the user. */
+                ped_file_system_close(fs);
+                return false;
+        }
+        if (part->type & PED_PARTITION_LOGICAL)
+                maximize_extended_partition(disk);
+        if (NULL != fs)
+                constraint = ped_file_system_get_resize_constraint(fs);
+        else
+                constraint = ped_constraint_any(disk->dev);
+        if (!ped_disk_set_partition_geom(disk, part, constraint, start, end))
+                result = false;
+        else if (NULL == fs)
+                result = true;
+        else if (timered_file_system_resize(fs, &(part->geom))) {
+                result = true;
+        } else {
+                ped_disk_set_partition_geom(disk, part,
+                                            ped_constraint_any(disk->dev),
+                                            old_start, old_end);
+                result = false;
+        }
+        if (fs != NULL)
+                ped_file_system_close(fs);
+        if (part->type & PED_PARTITION_LOGICAL)
+                ped_disk_minimize_extended_partition(disk);
+        return result;
+        /* TODO: not sure if constraints here should be
+           ped_constraint_destroy-ed.  Lets be safe. */
+}
+
+/**********************************************************************
+   Getting info
+**********************************************************************/
+
+/* true when it is possible to create a primary partition in `space'.
+   `space' must be a free space in `disk'. */
+bool
+possible_primary_partition(PedDisk *disk, PedPartition *space)
+{
+        bool result;
+        assert(disk != NULL);
+        assert(space != NULL && PED_PARTITION_FREESPACE & space->type);
+        deactivate_exception_handler();
+        result = (!(PED_PARTITION_LOGICAL & space->type)
+                  && (ped_disk_get_primary_partition_count(disk)
+                      < ped_disk_get_max_primary_partition_count(disk)));
+        activate_exception_handler();
+        return result;
+}
+
+/* true when it is possible to create an extended partition in `space'.
+   `space' must be a free space in `disk'. */
+bool
+possible_extended_partition(PedDisk *disk, PedPartition *space)
+{
+        bool result;
+        assert(disk != NULL);
+        assert(space != NULL && PED_PARTITION_FREESPACE & space->type);
+        deactivate_exception_handler();
+        result = (ped_disk_type_check_feature(disk->type,
+                                              PED_DISK_TYPE_EXTENDED)
+                  && !has_extended_partition(disk)
+                  && possible_primary_partition(disk, space));
+        activate_exception_handler();
+        return result;
+}
+
+/* true if the last sector of `part1' is phisicaly before the first
+   sector of `part2'. */
+inline bool
+partition_before(PedPartition *part1, PedPartition *part2)
+{
+        return (part1->geom).end < (part2->geom).start;
+}
+
+/* true when it is possible to create a logical partition in `space'.
+   `space' must be a free space in `disk'. */
+bool
+possible_logical_partition(PedDisk *disk, PedPartition *space)
+{
+        PedPartition *extended, *part;
+        bool result;
+        assert(disk != NULL);
+        assert(space != NULL && (PED_PARTITION_FREESPACE & space->type));
+        deactivate_exception_handler();
+        if (!has_extended_partition(disk))
+                result = possible_extended_partition(disk, space);
+        else {
+                extended = ped_disk_extended_partition(disk);
+                result = true;
+                part = ped_disk_next_partition(disk, NULL);
+                while (result && NULL != part) {
+                        if (ped_partition_is_active(part)
+                            && ((partition_before(space, part)
+                                 && partition_before(part, extended))
+                                || (partition_before(extended, part)
+                                    && partition_before(part, space)))) {
+                                /* There is a primary partition between us
+                                   and the extended partition. */
+                                assert(!(PED_PARTITION_LOGICAL & part->type));
+                                result = false;
+                        }
+                        part = ped_disk_next_partition(disk, part);
+                }
+        }
+        activate_exception_handler();
+        return result;
+}
+
+/* Finds in `disk' a partition with id `id' and returns it. */
+PedPartition *
+partition_with_id(PedDisk *disk, char *id)
+{
+        PedPartition *part;
+        long long start, end;
+        long long start_sector, end_sector;
+        assert(id != NULL);
+        log("partition_with_id(%s)", id);
+        if (2 != sscanf(id, "%lli-%lli", &start, &end))
+                critical_error("Bad id %s", id);
+        start_sector = start / PED_SECTOR_SIZE;
+        end_sector = (end - PED_SECTOR_SIZE + 1) / PED_SECTOR_SIZE;
+        if (disk == NULL)
+                return NULL;
+        for (part = NULL;
+             NULL != (part = ped_disk_next_partition(disk, part));)
+                if ((part->geom).start == start_sector
+                    && (part->geom).end == end_sector)
+                        return part;
+        return NULL;
+}
+
+/* Returns informational strung about `part' from `disk'.  Format:*/
+/* Number<TAB>id<TAB>length<TAB>type<TAB>fs<TAB>path<TAB>name */
+char *
+partition_info(PedDisk *disk, PedPartition *part)
+{
+        char const *type;
+        char const *fs;
+        char *path;
+        char const *name;
+        char *result;
+        assert(disk != NULL && part != NULL);
+        if (PED_PARTITION_FREESPACE & part->type) {
+                bool possible_primary = possible_primary_partition(disk, part);
+                bool possible_logical = possible_logical_partition(disk, part);
+                if (possible_primary)
+                        if (possible_logical)
+                                type = "pri/log";
+                        else
+                                type = "primary";
+                else if (possible_logical)
+                        type = "logical";
+                else
+                        type = "unusable";
+        } else if (PED_PARTITION_LOGICAL & part->type)
+                type = "logical";
+        else
+                type = "primary";
+
+        if (PED_PARTITION_FREESPACE & part->type)
+                fs = "free";
+        else if (PED_PARTITION_METADATA & part->type)
+                fs = "label";
+        else if (PED_PARTITION_EXTENDED & part->type)
+                fs = "extended";
+        else if (NULL == (part->fs_type))
+                fs = "unknown";
+        else
+                fs = part->fs_type->name;
+        path = ped_partition_get_path(part);
+        if (ped_disk_type_check_feature(part->disk->type,
+                                        PED_DISK_TYPE_PARTITION_NAME)
+            && ped_partition_is_active(part))
+                name = ped_partition_get_name(part);
+        else
+                name = "";
+        asprintf(&result, "%i\t%lli-%lli\t%lli\t%s\t%s\t%s\t%s",
+                 part->num,
+                 (part->geom).start * PED_SECTOR_SIZE,
+                 (part->geom).end * PED_SECTOR_SIZE + PED_SECTOR_SIZE - 1,
+                 (part->geom).length * PED_SECTOR_SIZE, type, fs, path, name);
+        free(path);
+        return result;
+}
+
+/* Print in `dumpfile' information about the `dev', `disk' and the
+   partitions in `disk'. */
+void
+dump_info(FILE *dumpfile, PedDevice *dev, PedDisk *disk)
+{
+        PedPartition *part;
+        deactivate_exception_handler();
+        if (dev == NULL) {
+                fprintf(dumpfile, "Device: no");
+                activate_exception_handler();
+                return;
+        }
+        fprintf(dumpfile, "Device: yes\n");
+        fprintf(dumpfile, "Model: %s\n", dev->model);
+        fprintf(dumpfile, "Path: %s\n", dev->path);
+        fprintf(dumpfile, "Sector size: %i\n", dev->sector_size);
+        fprintf(dumpfile, "Sectors: %lli\n", dev->length);
+        fprintf(dumpfile, "Sectors/track: %i\n", dev->sectors);
+        fprintf(dumpfile, "Heads: %i\n", dev->heads);
+        fprintf(dumpfile, "Cylinders: %i\n", dev->cylinders);
+        if (disk == NULL) {
+                fprintf(dumpfile, "Partition table: no\n");
+                activate_exception_handler();
+                return;
+        }
+        fprintf(dumpfile, "Partition table: yes\n");
+        fprintf(dumpfile, "Type: %s\n", disk->type->name);
+        fprintf(dumpfile, "Partitions: #\tid\tlength\ttype\tfs\tpath\tname\n");
+        for (part = NULL;
+             NULL != (part = ped_disk_next_partition(disk, part));) {
+                /* TODO: there is the same code in command_get_chs */
+                long long cylinder_size, track_size;
+                long long start, end;
+                long long cyl_start, cyl_end;
+                long long head_start, head_end;
+                long long sec_start, sec_end;
+                char *part_info = partition_info(disk, part);
+                track_size = dev->sectors;
+                cylinder_size = track_size * dev->heads;
+                start = (part->geom).start;
+                end = (part->geom).end;
+                cyl_start = start / cylinder_size;
+                cyl_end = end / cylinder_size;
+                start = start % cylinder_size;
+                end = end % cylinder_size;
+                head_start = start / track_size;
+                head_end = end / track_size;
+                sec_start = start % track_size;
+                sec_end = end % track_size;
+                fprintf(dumpfile,
+                        "(%lli,%lli,%lli)\t(%lli,%lli,%lli)\t%s\n",
+                        cyl_start, head_start, sec_start, cyl_end,
+                        head_end, sec_end, part_info);
+                free(part_info);
+        }
+        fprintf(dumpfile, "Dump finished.\n");
+        activate_exception_handler();
+}
+
+/**********************************************************************
+   Commands
+*********************************************************************/
+
+
+#define SETUP_DEV_DISK \
+        PedDevice *dev; PedDisk *disk; \
+        { \
+                char *name; \
+                if (1 != iscanf("%as", &name)) \
+                        critical_error("Expected device identifier."); \
+                if (!device_opened(name)) \
+                        critical_error("The device %s is not opened.", name); \
+                dev = device_named(name); \
+                disk = disk_named(name); \
+                free(name); \
+        }
+
+
+void
+command_quit()
+{
+        log("Quiting");
+        fflush(logfile);
+        exit(0);
+}
+
+void
+command_open()
+{
+        log("command_open()");
+        char *name, *device;
+        if (1 != iscanf("%as", &name))
+                critical_error("Expected device identifier.");
+        if (1 != iscanf("%as", &device))
+                critical_error("Expected device name.");
+        log("Request to open %s", name);
+        open_out();
+        if (device_opened(name)) {
+                static char *only_ok[] = { "OK", NULL };
+                log("Warning: the device is opened");
+                pseudo_exception("Warning",
+                                 "The device is already opened.", only_ok);
+        } else {
+                set_device_named(name, ped_device_get(device));
+        }
+        oprintf("OK\n");
+        if (NULL != device_named(name)) {
+                oprintf("OK\n");
+                deactivate_exception_handler();
+                set_disk_named(name, ped_disk_new(device_named(name)));
+                activate_exception_handler();
+        } else
+                oprintf("failed\n");
+        free(name);
+        free(device);
+}
+
+void
+command_close()
+{
+        log("command_close()");
+        char *name;
+        if (1 != iscanf("%as", &name))
+                critical_error("Expected device name.");
+        open_out();
+        if (!device_opened(name)) {
+                static char *only_cancel[] = { "Cancel", NULL };
+                pseudo_exception("Error",
+                                 "The device is not opened!", only_cancel);
+        }
+        set_disk_named(name, NULL);
+        set_device_named(name, NULL);
+        oprintf("OK\n");
+}
+
+void
+command_opened()
+{
+        log("command_opened()");
+        char *name;
+        if (1 != iscanf("%as", &name))
+                critical_error("Expected partition device name.");
+        open_out();
+        oprintf("OK\n");
+        if (NULL != device_named(name)) {
+                oprintf("yes\n");
+        } else {
+                oprintf("no\n");
+        }
+}
+
+void
+command_commit()
+{
+        SETUP_DEV_DISK;
+        log("command_commit()");
+        open_out();
+        if (disk != NULL)
+                ped_disk_commit(disk);
+        oprintf("OK\n");
+}
+
+void
+command_undo()
+{
+        PedDevice *dev;
+        char *name;
+        if (1 != iscanf("%as", &name))
+                critical_error("Expected partition device name.");
+        if (NULL == device_named(name))
+                critical_error("The device %s is not opened.", name);
+        dev = device_named(name);
+        log("command_undo()");
+        open_out();
+        log("Rereading disk label");
+        deactivate_exception_handler();
+        if (dev != NULL)
+                set_disk_named(name, ped_disk_new(dev));
+        activate_exception_handler();
+        oprintf("OK\n");
+}
+
+/* Print in /var/log/partition_dump information about the disk, the
+   partition table and the partitions. */
+void
+command_dump()
+{
+        FILE *dumpfile;
+        static char *only_cancel[] = { "Cancel", NULL };
+        SETUP_DEV_DISK;
+        log("command_dump()");
+        open_out();
+        dumpfile = fopen("/var/log/partition_dump", "a+");
+        if (dumpfile == NULL) {
+                pseudo_exception("Error",
+                                 "Can't open /var/log/partition_dump",
+                                 only_cancel);
+        } else {
+                dump_info(dumpfile, dev, disk);
+                fclose(dumpfile);
+        }
+        oprintf("OK\n");
+}
+
+void
+command_partitions()
+{
+        PedPartition *part;
+        SETUP_DEV_DISK;
+        log("command_partitions()");
+        open_out();
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        if (disk == NULL) {
+                log("No partitions");
+                /* No label, hence no partitions.  When there is a
+                   label, there is at least one partition because the
+                   free space counts as a partition. */
+                oprintf("\n");
+                activate_exception_handler();
+                return;
+        }
+        if (has_extended_partition(disk))
+                ped_disk_minimize_extended_partition(disk);
+        for (part = NULL;
+             NULL != (part = ped_disk_next_partition(disk, part));) {
+                char *part_info;
+                if (PED_PARTITION_EXTENDED & part->type)
+                        continue;
+                if (PED_PARTITION_METADATA & part->type)
+                        continue;
+                /* Undoubtedly the following operator is a hack.
+                   Libparted tries to allign the partitions at
+                   cylinder boundaries but despite this it sometimes
+                   reports free spaces due to alligning and even
+                   allows creation of unaligned partitions in these
+                   free spaces.  I am not sure if this is a bug or a
+                   feature of libparted. */
+                if (PED_PARTITION_FREESPACE & part->type
+                    && ped_disk_type_check_feature(disk->type,
+                                                   PED_DISK_TYPE_EXTENDED)
+                    && (part->geom).length < dev->sectors * dev->heads)
+                        continue;
+                part_info = partition_info(disk, part);
+                oprintf("%s\n", part_info);
+                free(part_info);
+        }
+        log("Partitions printed");
+        /* An empty line after the last partition */
+        oprintf("\n");
+        activate_exception_handler();
+}
+
+void
+command_partition_info()
+{
+        char *id;
+        PedPartition *part;
+        SETUP_DEV_DISK;
+        log("command_partition_info()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("command_partition_info: info for partition with id %s", id);
+        part = partition_with_id(disk, id);
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        if (part == NULL) {
+                log("command_partition_info: no such a partitions");
+                oprintf("\n");
+        } else {
+                char *part_info;
+                log("command_partition_info: partition found");
+                part_info = partition_info(disk, part);
+                oprintf("%s\n", part_info);
+                free(part_info);
+        }
+        free(id);
+        activate_exception_handler();
+}
+
+void
+command_get_chs()
+{
+        char *id;
+        PedPartition *part;
+        SETUP_DEV_DISK;
+        log("command_get_chs()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("command_get_chs: Cyl/Head/Sec for partition with id %s", id);
+        part = partition_with_id(disk, id);
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        if (part == NULL) {
+                log("command_get_chs: no such a partitions");
+                oprintf("\n");
+        } else {
+                /* TODO: there is the same code in dump_info */
+                long long cylinder_size, track_size;
+                long long start, end;
+                long long cyl_start, cyl_end;
+                long long head_start, head_end;
+                long long sec_start, sec_end;
+                log("command_get_chs: partition found");
+                track_size = dev->sectors;
+                cylinder_size = track_size * dev->heads;
+                start = (part->geom).start;
+                end = (part->geom).end;
+                cyl_start = start / cylinder_size;
+                cyl_end = end / cylinder_size;
+                start = start % cylinder_size;
+                end = end % cylinder_size;
+                head_start = start / track_size;
+                head_end = end / track_size;
+                sec_start = start % track_size;
+                sec_end = end % track_size;
+                oprintf("%lli\t%lli\t%lli\t%lli\t%lli\t%lli\n",
+                        cyl_start, head_start, sec_start,
+                        cyl_end, head_end, sec_end);
+        }
+        free(id);
+        activate_exception_handler();
+}
+
+void
+command_label_types()
+{
+        PedDiskType *type = NULL;
+        SETUP_DEV_DISK;
+        log("command_label_types()");
+        open_out();
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        while (NULL != (type = ped_disk_type_get_next(type))) {
+                oprintf("%s\n", type->name);
+        }
+        oprintf("\n");
+        activate_exception_handler();
+}
+
+void
+command_valid_flags()
+{
+        char *id;
+        PedPartition *part;
+        PedPartitionFlag flag;
+        SETUP_DEV_DISK;
+        log("command_valid_flags()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        part = partition_with_id(disk, id);
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        if (part == NULL || !ped_partition_is_active(part)) {
+                log("No such an active partition: %s", id);
+        } else {
+                log("Partition found (%s)", id);
+                for (flag = 0; 0 != (flag = ped_partition_flag_next(flag));)
+                        if (ped_partition_is_flag_available(part, flag))
+                                oprintf("%s\n",
+                                        ped_partition_flag_get_name(flag));
+        }
+        oprintf("\n");
+        free(id);
+        activate_exception_handler();
+}
+
+void
+command_get_flags()
+{
+        char *id;
+        PedPartition *part;
+        PedPartitionFlag flag;
+        SETUP_DEV_DISK;
+        log("command_get_flags()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        part = partition_with_id(disk, id);
+        if (part == NULL || !ped_partition_is_active(part))
+                critical_error("No such an active partition: %s", id);
+        log("Partition found (%s)", id);
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        for (flag = 0; 0 != (flag = ped_partition_flag_next(flag));)
+                if (ped_partition_is_flag_available(part, flag)
+                    && ped_partition_get_flag(part, flag))
+                        oprintf("%s\n", ped_partition_flag_get_name(flag));
+        oprintf("\n");
+        free(id);
+        activate_exception_handler();
+}
+
+void
+command_set_flags()
+{
+        char *id, *str;
+        PedPartition *part;
+        PedPartitionFlag flag;
+        bool states[PED_PARTITION_LAST_FLAG + 1];
+        SETUP_DEV_DISK;
+        log("command_set_flags()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        part = partition_with_id(disk, id);
+        if (part == NULL || !ped_partition_is_active(part))
+                critical_error("No such an active partition: %s", id);
+        log("Partition found (%s)", id);
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        for (flag = PED_PARTITION_FIRST_FLAG;
+             flag <= PED_PARTITION_LAST_FLAG; flag++)
+                states[flag] = false;
+        while (1) {
+                if (1 != iscanf(" %a[^\n]", &str))
+                        critical_error("No data in infifo!");
+                if (!strcmp(str, "NO_MORE"))
+                        break;
+                log("Processing flag %s", str);
+                flag = ped_partition_flag_get_by_name(str);
+                if (flag < PED_PARTITION_FIRST_FLAG
+                    || flag > PED_PARTITION_LAST_FLAG)
+                        critical_error("No such a flag: %s", str);
+                states[flag] = true;
+                free(str);
+        }
+        for (flag = PED_PARTITION_FIRST_FLAG;
+             flag <= PED_PARTITION_LAST_FLAG; flag++)
+                if (ped_partition_is_flag_available(part, flag))
+                        ped_partition_set_flag(part, flag, states[flag]);
+        free(str);
+        activate_exception_handler();
+        free(id);
+}
+
+void
+command_uses_names()
+{
+        SETUP_DEV_DISK;
+        log("command_uses_names()");
+        open_out();
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        if (ped_disk_type_check_feature(disk->type,
+                                        PED_DISK_TYPE_PARTITION_NAME))
+                oprintf("yes\n");
+        else
+                oprintf("no\n");
+        activate_exception_handler();
+}
+
+void
+command_set_name()
+{
+        char *id, *name;
+        PedPartition *part;
+        SETUP_DEV_DISK;
+        log("command_set_name()");
+        if (!ped_disk_type_check_feature(disk->type,
+                                         PED_DISK_TYPE_PARTITION_NAME))
+                critical_error("This label doesn't support partition names.");
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        part = partition_with_id(disk, id);
+        if (part == NULL || !ped_partition_is_active(part))
+                critical_error("No such an active partition: %s", id);
+        log("Partition found (%s)", id);
+        if (1 != iscanf(" %a[^\n]", &name))
+                critical_error("No data in infifo!");
+        log("Changing name to %s", name);
+        open_out();
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        ped_partition_set_name(part, name);
+        free(name);
+        free(id);
+        activate_exception_handler();
+}
+
+void
+command_uses_extended()
+{
+        SETUP_DEV_DISK;
+        log("command_uses_extended()");
+        open_out();
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        if (ped_disk_type_check_feature(disk->type, PED_DISK_TYPE_EXTENDED))
+                oprintf("yes\n");
+        else
+                oprintf("no\n");
+        activate_exception_handler();
+}
+
+void
+command_file_system_types()
+{
+        PedFileSystemType *type;
+        SETUP_DEV_DISK;
+        log("command_file_system_types()");
+        open_out();
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        for (type = NULL;
+             NULL != (type = ped_file_system_type_get_next(type));)
+                oprintf("%s\n", type->name);
+        oprintf("\n");
+        activate_exception_handler();
+}
+
+void
+command_get_file_system()
+{
+        char *id;
+        PedPartition *part;
+        PedFileSystemType *fstype;
+        SETUP_DEV_DISK;
+        log("command_get_file_system()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("command_get_file_system: File system for partition %s", id);
+        part = partition_with_id(disk, id);
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        fstype = ped_file_system_probe(&(part->geom));
+        if (fstype == NULL) {
+                oprintf("none\n");
+        } else {
+                oprintf("%s\n", fstype->name);
+        }
+        free(id);
+        activate_exception_handler();
+}
+
+void
+command_change_file_system()
+{
+        char *id;
+        PedPartition *part;
+        char *s_fstype;
+        PedFileSystemType *fstype;
+        SETUP_DEV_DISK;
+        open_out();
+        if (2 != iscanf("%as %as", &id, &s_fstype))
+                critical_error("Expected partition id and file system");
+        log("command_change_file_system(%s,%s)", id, s_fstype);
+        part = partition_with_id(disk, id);
+        free(id);
+        fstype = ped_file_system_type_get(s_fstype);
+        free(s_fstype);
+        if (fstype == NULL)
+                critical_error("Bad file system type: %s", s_fstype);
+        ped_partition_set_system(part, fstype);
+        oprintf("OK\n");
+}
+
+void
+command_check_file_system()
+{
+        char *id;
+        PedPartition *part;
+        PedFileSystem *fs;
+        char *status;
+        SETUP_DEV_DISK;
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("command_check_file_system(%s)", id);
+        part = partition_with_id(disk, id);
+        free(id);
+        fs = ped_file_system_open(&(part->geom));
+        if (NULL == fs)
+                status = "n/c";
+        else {
+                if (timered_file_system_check(fs))
+                        status = "good";
+                else
+                        status = "bad";
+                ped_file_system_close(fs);
+        }
+        oprintf("OK\n");
+        oprintf("%s\n", status);
+}
+
+void
+command_create_file_system()
+{
+        char *id;
+        PedPartition *part;
+        char *s_fstype;
+        PedFileSystemType *fstype;
+        PedFileSystem *fs;
+        SETUP_DEV_DISK;
+        open_out();
+        if (2 != iscanf("%as %as", &id, &s_fstype))
+                critical_error("Expected partition id and file system");
+        log("command_create_file_system(%s,%s)", id, s_fstype);
+        part = partition_with_id(disk, id);
+        if (part == NULL)
+                critical_error("No such partition: %s", id);
+        free(id);
+        fstype = ped_file_system_type_get(s_fstype);
+        free(s_fstype);
+        if (fstype == NULL)
+                critical_error("Bad file system type: %s", s_fstype);
+        ped_partition_set_system(part, fstype);
+        fs = timered_file_system_create(&(part->geom), fstype);
+        oprintf("OK\n");
+        if (fs != NULL)
+                oprintf("OK\n");
+        else
+                oprintf("failed\n");
+}
+
+void
+command_new_label()
+{
+        PedDiskType *type;
+        char *str, *device;
+        PedDevice *dev;
+        PedDisk *disk;
+        char *name;
+        if (1 != iscanf("%as", &name))
+                critical_error("Expected partition device name.");
+        if (!device_opened(name))
+                critical_error("The device %s is not opened.", name);
+        dev = device_named(name);
+        disk = disk_named(name);
+        log("command_new_label()");
+        open_out();
+        if (1 != iscanf("%as", &str))
+                critical_error("Expected label type");
+        type = ped_disk_type_get(str);
+        if (type == NULL)
+                critical_error("Bad label type: %s", str);
+        log("command_new_label: requested label with type %s", str);
+        device = strdup(device_named(name)->path);
+        /* The old partition table may have contained wrong
+           Cylinder/Head/Sector geometry.  So it is not probably
+           enough to change the partition table (i.e. `disk'). */
+        set_disk_named(name, NULL);
+        set_device_named(name, NULL);
+        dev = ped_device_get(device);
+        if (NULL == dev)
+                critical_error("Can not reopen %s", name);
+        set_device_named(name, dev);
+        log("command_new_label: creating");
+        disk = ped_disk_new_fresh(dev, type);
+        if (disk == NULL) {
+                static char *only_cancel[] = { "Cancel", NULL };
+                pseudo_exception("Error",
+                                 "Can't create new disk label.", only_cancel);
+        } else
+                set_disk_named(name, disk);
+        oprintf("OK\n");
+        free(str);
+}
+
+void
+command_new_partition()
+{
+        char *s_type, *s_fs_type;
+        PedPartitionType type;
+        PedFileSystemType *fs_type;
+        long long range_start, range_end;
+        char *position;
+        PedSector length;
+        PedSector part_start, part_end;
+        PedPartition *part;
+        int n;
+        SETUP_DEV_DISK;
+        assert(disk != NULL);
+        log("command_new_partition()");
+        open_out();
+        n = iscanf("%as %as %lli-%lli %as %lli", &s_type, &s_fs_type,
+                   &range_start, &range_end, &position, &length);
+        if (n != 6)
+                critical_error
+                    ("Expected: part_type file_system id position length");
+
+        if (!strcasecmp(s_type, "primary"))
+                type = 0;
+        else if (!strcasecmp(s_type, "logical"))
+                type = PED_PARTITION_LOGICAL;
+        else
+                critical_error("Bad label type: %s", s_type);
+        log("requested partition with type %s", s_type);
+        free(s_type);
+
+        fs_type = ped_file_system_type_get(s_fs_type);
+        if (fs_type == NULL)
+                critical_error("Bad file system type: %s", s_fs_type);
+        log("requested partition with file system %s", s_fs_type);
+        free(s_fs_type);
+
+        if (!strcasecmp(position, "full")) {
+                part_start = range_start / PED_SECTOR_SIZE;
+                part_end = ((range_end - PED_SECTOR_SIZE + 1)
+                            / PED_SECTOR_SIZE);
+        } else if (!strcasecmp(position, "beginning")) {
+                part_start = range_start / PED_SECTOR_SIZE;
+                part_end = (range_start + length) / PED_SECTOR_SIZE;
+        } else if (!strcasecmp(position, "end")) {
+                part_start = (range_end - length) / PED_SECTOR_SIZE;
+                part_end = ((range_end - PED_SECTOR_SIZE + 1)
+                            / PED_SECTOR_SIZE);
+        } else
+                critical_error("Bad position: %s", position);
+        free(position);
+
+        if (disk == NULL)
+                critical_error("No opened device or no partition table");
+
+        if (type == 0 /* PED_PARTITION_PRIMARY */ )
+                part = add_primary_partition(disk, fs_type,
+                                             part_start, part_end);
+        else
+                part = add_logical_partition(disk, fs_type,
+                                             part_start, part_end);
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        if (part) {
+                char *part_info = partition_info(disk, part);
+                oprintf("%s\n", part_info);
+                free(part_info);
+        } else
+                oprintf("\n");
+        activate_exception_handler();
+}
+
+void
+command_delete_partition()
+{
+        PedPartition *part;
+        char *id;
+        SETUP_DEV_DISK;
+        log("command_delete_partition()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("Deleting partition with id %s", id);
+        part = partition_with_id(disk, id);
+        if (part == NULL)
+                log("No such partition");
+        else {
+                PedPartitionType type = part->type;
+                log("Partition found");
+                ped_disk_delete_partition(disk, part);
+                if (type & PED_PARTITION_LOGICAL)
+                        ped_disk_minimize_extended_partition(disk);
+                log("Partition deleted");
+        }
+        oprintf("OK\n");
+        free(id);
+}
+
+void
+command_resize_partition()
+{
+        PedPartition *part;
+        char *id;
+        long long new_size;
+        PedSector start, end;
+        SETUP_DEV_DISK;
+        assert(disk != NULL);
+        log("command_resize_partition()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("Resizing partition with id %s", id);
+        part = partition_with_id(disk, id);
+        if (part == NULL)
+                critical_error("No such partition");
+        if (1 != iscanf(" %lli", &new_size))
+                critical_error("Expected new size");
+        start = (part->geom).start;
+        end = start + new_size / PED_SECTOR_SIZE - 1;
+        if (resize_partition(disk, part, start, end)) {
+                ped_disk_commit(disk);
+        }
+        oprintf("OK\n");
+        oprintf("%lli-%lli\n", (part->geom).start * PED_SECTOR_SIZE,
+                (part->geom).end * PED_SECTOR_SIZE);
+        free(id);
+}
+
+void
+command_get_resize_range()
+{
+        char *id;
+        PedPartition *part;
+        PedFileSystem *fs;
+        PedConstraint *constraint, *fixed_start;
+        PedGeometry *max_geom;
+        long long max_size, min_size, current_size;
+        SETUP_DEV_DISK;
+        assert(disk != NULL);
+        log("command_get_resize_range()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        part = partition_with_id(disk, id);
+        if (part == NULL)
+                critical_error("No such partition");
+        /* TODO: Should we ped_constraint_duplicate? */
+        fixed_start = ped_constraint_duplicate(ped_constraint_any(disk->dev));
+        ped_geometry_set_start(fixed_start->start_range, (part->geom).start);
+        ped_geometry_set_end(fixed_start->start_range, (part->geom).start);
+        fs = ped_file_system_open(&(part->geom));
+        if (NULL != fs)
+                constraint = ped_file_system_get_resize_constraint(fs);
+        else
+                constraint = ped_constraint_any(disk->dev);
+        constraint = ped_constraint_intersect(constraint, fixed_start);
+        if (part->type & PED_PARTITION_LOGICAL)
+                maximize_extended_partition(disk);
+        max_geom = ped_disk_get_max_partition_geometry(disk, part, constraint);
+        if (part->type & PED_PARTITION_LOGICAL)
+                ped_disk_minimize_extended_partition(disk);
+        max_size = max_geom->length * PED_SECTOR_SIZE;
+        min_size = constraint->min_size * PED_SECTOR_SIZE;
+        current_size = (part->geom).length * PED_SECTOR_SIZE;
+        oprintf("OK\n");
+        oprintf("%lli %lli %lli\n", min_size, current_size, max_size);
+        ped_geometry_destroy(max_geom);
+        ped_constraint_destroy(constraint);
+        /* TODO: Probably there are memory leaks because of constraints. */
+        free(id);
+}
+
+void
+command_copy_partition()
+{
+        char *srcid, *srcdiskid, *destid;
+        PedPartition *source, *destination;
+        PedDisk *srcdisk;
+        PedFileSystem *fs;
+        SETUP_DEV_DISK;
+        assert(disk != NULL);
+        log("command_copy_partition()");
+        open_out();
+        if (3 != iscanf("%as %as %as", &destid, &srcdiskid, &srcid))
+                critical_error("Expected id device_identifier id");
+        if (!device_opened(srcdiskid))
+                critical_error("The device %s is not opened.", srcdiskid);
+        srcdisk = disk_named(srcdiskid);
+        if (srcdisk == NULL)
+                critical_error("The source device has label");
+        source = partition_with_id(srcdisk, srcid);
+        destination = partition_with_id(disk, destid);
+        if (source == NULL)
+                critical_error("No source partition %s", srcid);
+        if (destination == NULL)
+                critical_error("No destination partition %s", destid);
+        fs = ped_file_system_open(&(source->geom));
+        if (fs != NULL) {
+                /* TODO: is ped_file_system_check(fs, ...) necessary? */
+                if (timered_file_system_copy(fs, &(destination->geom)))
+                        ped_partition_set_system(destination, fs->type);
+                ped_file_system_close(fs);
+        }
+        oprintf("OK\n");
+        free(destid);
+        free(srcdiskid);
+        free(srcid);
+}
+
+
+/**********************************************************************
+   Main
+**********************************************************************/
+
+void main_loop() __attribute__ ((noreturn));
+
+void
+main_loop()
+{
+        char *str;
+        int iteration = 1;
+        while (1) {
+                log("main_loop: iteration %i", iteration++);
+                open_in();
+                if (1 != iscanf("%as", &str))
+                        critical_error("No data in infifo.");
+                log("Read command: %s", str);
+                if (!strcasecmp(str, "QUIT"))
+                        command_quit();
+                else if (!strcasecmp(str, "OPEN"))
+                        command_open();
+                else if (!strcasecmp(str, "CLOSE"))
+                        command_close();
+                else if (!strcasecmp(str, "OPENED"))
+                        command_opened();
+                else if (!strcasecmp(str, "DUMP"))
+                        command_dump();
+                else if (!strcasecmp(str, "COMMIT"))
+                        command_commit();
+                else if (!strcasecmp(str, "UNDO"))
+                        command_undo();
+                else if (!strcasecmp(str, "PARTITIONS"))
+                        command_partitions();
+                else if (!strcasecmp(str, "PARTITION_INFO"))
+                        command_partition_info();
+                else if (!strcasecmp(str, "GET_CHS"))
+                        command_get_chs();
+                else if (!strcasecmp(str, "LABEL_TYPES"))
+                        command_label_types();
+                else if (!strcasecmp(str, "VALID_FLAGS"))
+                        command_valid_flags();
+                else if (!strcasecmp(str, "GET_FLAGS"))
+                        command_get_flags();
+                else if (!strcasecmp(str, "SET_FLAGS"))
+                        command_set_flags();
+                else if (!strcasecmp(str, "SET_NAME"))
+                        command_set_name();
+                else if (!strcasecmp(str, "USES_NAMES"))
+                        command_uses_names();
+                else if (!strcasecmp(str, "USES_EXTENDED"))
+                        command_uses_extended();
+                else if (!strcasecmp(str, "FILE_SYSTEM_TYPES"))
+                        command_file_system_types();
+                else if (!strcasecmp(str, "GET_FILE_SYSTEM"))
+                        command_get_file_system();
+                else if (!strcasecmp(str, "CHANGE_FILE_SYSTEM"))
+                        command_change_file_system();
+                else if (!strcasecmp(str, "CHECK_FILE_SYSTEM"))
+                        command_check_file_system();
+                else if (!strcasecmp(str, "CREATE_FILE_SYSTEM"))
+                        command_create_file_system();
+                else if (!strcasecmp(str, "NEW_LABEL"))
+                        command_new_label();
+                else if (!strcasecmp(str, "NEW_PARTITION"))
+                        command_new_partition();
+                else if (!strcasecmp(str, "DELETE_PARTITION"))
+                        command_delete_partition();
+                else if (!strcasecmp(str, "RESIZE_PARTITION"))
+                        command_resize_partition();
+                else if (!strcasecmp(str, "GET_RESIZE_RANGE"))
+                        command_get_resize_range();
+                else if (!strcasecmp(str, "COPY_PARTITION"))
+                        command_copy_partition();
+                else
+                        critical_error("Unknown command %s", str);
+                free(str);
+                close_fifos_and_synchronise();
+        }
+}
+
+int
+main(int argc, char *argv[])
+{
+        logfile = fopen(logfile_name, "a+");
+        if (logfile == NULL) {
+                fprintf(stderr, "Can not append to the log file\n");
+                exit(255);
+        }
+        ped_exception_set_handler(exception_handler);
+        log("======= Starting the server");
+        main_loop();
+}
+
+/*
+The following command can be used to format this file in a consistent
+with codingstyle.txt way:
+
+indent parted_server.c -kr -i8 -nut -psl -l79 -T FILE -T bool -T PedSector -T PedDeviceType -T PedDevice -T PedDiskTypeFeature -T PedDiskType -T PedDisk -T PedGeometry -T PedPartitionType -T PedPartitionFlag -T PedPartition -T PedFileSystemType -T PedFileSystem -T PedConstraint -T PedAlignment -T PedTimer -T PedExceptionType -T PedExceptionOption -T PedException
+*/
+
+/*
+Local variables:
+indent-tabs-mode: nil
+c-file-style: "linux"
+c-font-lock-extra-types: ("FILE" "\\sw+_t" "bool" "Ped\\sw+")
+End:
+*/

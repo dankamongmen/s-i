@@ -1,0 +1,48 @@
+#!/bin/sh
+
+cd $1
+
+num=$2
+id=$3
+size=$4
+type=$5
+fs=$6
+path=$7
+name=$8
+
+if [ ! -f $id/method ]; then
+    printf "  "
+else
+    method=$(cat $id/method)
+    case "$method" in
+	keep)
+	    if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
+		printf " ☻"
+	    else
+		printf " K"
+	    fi
+	    ;;
+	format)
+	    if [ -f $id/detected_filesystem ]; then
+		if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
+		    printf " ☠"
+		else
+		    printf " F"
+		fi
+	    else
+		if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
+		    printf " ☺"
+		else
+		    printf " f"
+		fi
+	    fi
+	    ;;
+	*)
+	    printf "  "
+	    ;;
+    esac
+fi
+
+# Local Variables:
+# coding: utf-8
+# End:
