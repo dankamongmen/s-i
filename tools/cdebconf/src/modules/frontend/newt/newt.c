@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.24 2003/09/27 12:21:23 sjogren Exp $
+ * $Id: newt.c,v 1.25 2003/09/27 12:45:38 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -753,6 +753,22 @@ newt_handler_text(struct frontend *obj, struct question *q)
     return newt_handler_note(obj, q);
 }
 
+static int
+newt_handler_error(struct frontend *obj, struct question *q)
+{
+    char *oldcolor;
+    int ret;
+    struct newtColors palette = newtDefaultColorPalette;
+
+    oldcolor = palette.rootBg;
+    palette.rootBg = "red";
+    newtSetColors(palette);
+    ret = newt_handler_note(obj, q);
+    palette.rootBg = oldcolor;
+    newtSetColors(palette);
+    return ret;
+}
+
 /* ----------------------------------------------------------------------- */
 struct question_handlers {
 	const char *type;
@@ -765,7 +781,7 @@ struct question_handlers {
 	{ "password",	newt_handler_password },        // OK
 	{ "note",	newt_handler_note },            // OK
 	{ "text",	newt_handler_text },
-        { "error",      newt_handler_note },
+        { "error",      newt_handler_error },
 };
 
 /*
