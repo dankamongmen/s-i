@@ -76,7 +76,7 @@ void debconfclient_delete(struct debconfclient *client);
     _client->commandf(_client, "VERSION %u", _version)
 
 #define debconf_capb(_client, _capb...) \
-    _client->command(_client, "CAPB", ##_capb)
+    _client->command(_client, "CAPB", ##_capb, NULL)
 
 #define debconf_title(_client, _title) \
     _client->commandf(_client, "TITLE %s", _title)
