@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.h,v 1.1 2003/09/24 11:49:52 waldi Exp $
+ * $Id: package.h,v 1.2 2003/09/28 00:16:49 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_H
@@ -168,6 +168,11 @@ struct di_package_version
 
 void di_package_destroy (di_package *package);
 
+static inline di_package *di_package_alloc (di_packages_allocator *allocator)
+{
+  return di_mem_chunk_alloc0 (allocator->package_mem_chunk);
+}
+
 static inline di_package_dependency *di_package_dependency_alloc (di_packages_allocator *allocator)
 {
   return di_mem_chunk_alloc0 (allocator->package_dependency_mem_chunk);
@@ -190,6 +195,7 @@ di_package_version *di_package_version_parse (di_package *package);
 di_parser_fields_function_read
   di_package_parser_read_dependency,
   di_package_parser_read_description,
+  di_package_parser_read_name,
   di_package_parser_read_priority,
   di_package_parser_read_status;
 
@@ -208,16 +214,16 @@ extern const di_parser_fieldinfo *di_package_parser_fieldinfo[];
 
 di_parser_info *di_package_parser_info (void);
 
-di_package *di_package_special_read_file (const char *file, di_packages_allocator *allocator, di_parser_info *(info) (void));
+di_package *di_package_special_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator, di_parser_info *(info) (void));
 
 /**
  * Read a package control file
  *
  * @param file file to read
  */
-static inline di_package *di_package_read_file (const char *file, di_packages_allocator *allocator)
+static inline di_package *di_package_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator)
 {
-  return di_package_special_read_file (file, allocator, di_package_parser_info);
+  return di_package_special_read_file (file, packages, allocator, di_package_parser_info);
 }
 
 /** @} */

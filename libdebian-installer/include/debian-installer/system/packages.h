@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.3 2003/09/26 00:18:09 waldi Exp $
+ * $Id: packages.h,v 1.4 2003/09/28 00:16:49 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__PACKAGES_H
@@ -56,9 +56,9 @@ di_parser_info *di_system_packages_status_parser_info (void);
  *
  * @param file file to read
  */
-static inline di_package *di_system_package_read_file (const char *file, di_packages_allocator *allocator)
+static inline di_package *di_system_package_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator)
 {
-  return di_package_special_read_file (file, allocator, di_system_package_parser_info);
+  return di_package_special_read_file (file, packages, allocator, di_system_package_parser_info);
 }
 
 /**

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.4 2003/09/24 11:49:52 waldi Exp $
+ * $Id: packages.h,v 1.5 2003/09/28 00:16:49 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGES_H
@@ -71,6 +71,7 @@ void di_packages_free (di_packages *packages);
 di_packages_allocator *di_packages_allocator_alloc (void);
 void di_packages_allocator_free (di_packages_allocator *packages);
 
+void di_packages_append_package (di_packages *packages, di_package *package, di_packages_allocator *allocator);
 di_package *di_packages_get_package (di_packages *packages, const char *name, size_t n);
 di_package *di_packages_get_package_new (di_packages *packages, di_packages_allocator *allocator, char *name, size_t n);
 
@@ -92,6 +93,7 @@ extern const di_parser_fieldinfo *di_packages_status_parser_fieldinfo[];
 extern const di_parser_fieldinfo *di_packages_minimal_parser_fieldinfo[];
 
 di_parser_info *di_packages_parser_info (void);
+di_parser_info *di_packages_minimal_parser_info (void);
 di_parser_info *di_packages_status_parser_info (void);
 
 di_packages *di_packages_special_read_file (const char *file, di_packages_allocator *allocator, di_parser_info *(info)(void));
@@ -105,6 +107,16 @@ int di_packages_special_write_file (di_packages *packages, const char *file, di_
 static inline di_packages *di_packages_read_file (const char *file, di_packages_allocator *allocator)
 {
   return di_packages_special_read_file (file, allocator, di_packages_parser_info);
+}
+
+/**
+ * Read a minimal Packages file
+ *
+ * @param file file to read
+ */
+static inline di_packages *di_packages_minimal_read_file (const char *file, di_packages_allocator *allocator)
+{
+  return di_packages_special_read_file (file, allocator, di_packages_minimal_parser_info);
 }
 
 /**
