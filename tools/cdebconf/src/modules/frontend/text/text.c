@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.66 2004/03/11 22:17:46 barbier Exp $
+ * $Id: text.c,v 1.67 2004/03/12 00:19:04 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -821,11 +821,11 @@ static void text_progress_set(struct frontend *obj, int val)
 	int new;
 
 	obj->progress_cur = val;
-	/*  Prevent verbose output  */
-	if (obj->progress_cur < last)
-		last = 0;
 	new = ((double)(obj->progress_cur - obj->progress_min) / 
 		(double)(obj->progress_max - obj->progress_min) * 100.0);
+	if (new < last)
+		last = 0;
+	/*  Prevent verbose output  */
 	if (new / 10 == last / 10)
 		return;
 	last = new;
