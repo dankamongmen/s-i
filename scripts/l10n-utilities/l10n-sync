@@ -161,9 +161,21 @@ for po in *.po ; do
  fi
  echo "     - Merge with template.pot:"
  if [ "$DEBUG" = "Y" ] ; then
-   msgmerge -U $po template.pot
+   # This will not make comments go into the PO files
+   # but this have been proven to work
+   # msgmerge -U $po template.pot
+   #
+   # Less tested
+   msgmerge $po template.pot >$po.new
+   mv $po.new $po
  else
-   msgmerge -U $po template.pot >/dev/null 2>&1
+   # This will not make comments go into the PO files
+   # but this have been proven to work
+   # msgmerge -U $po template.pot >/dev/null 2>&1
+   #
+   # Less tested
+   msgmerge $po template.pot >$po.new 2>/dev/null
+   mv $po.new $po
  fi
  if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
    echo -n "     - Commit back to SVN..."
