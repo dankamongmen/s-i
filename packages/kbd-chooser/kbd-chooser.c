@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.45 2004/03/13 09:04:47 mckinstry Exp $
+ * $Id$
  */
 
 #include "config.h"
@@ -35,6 +35,12 @@
 #endif
 
 extern int loadkeys_wrapper (char *map);	// in loadkeys.y
+
+typedef enum { 
+	SERIAL_ABSENT = 0,
+	SERIAL_PRESENT = 1,
+	SERIAL_UNKNOWN = 2
+} sercon_state;
 
 
 struct debconfclient *
@@ -558,21 +564,27 @@ char *keyboard_parse (char *reply)
  * This is then passed via prebaseconfig to base-config
  * @return 1 if present, 0 if absent, 2 if unknown.
  */
-int
+sercon_state
 check_if_serial_console (void)
 {
 	int fd;
 	struct serial_struct sr;
-	int present;
+	sercon_state present = SERIAL_UNKNOWN;
 	struct debconfclient *client = mydebconf_get ();
 
-	fd = open ("/dev/console", O_NONBLOCK);
-	if (fd == -1)
-		return 2;
-	present = (ioctl (fd, TIOCGSERIAL, &sr) == 0) ? 1 : 0;
-	debconf_set (client,  "debian-installer/serial-console", present ? "true" : "false");
-	close (fd);
-
+	// Some UARTs don't support the TIOCGSERIAL ioctl(), so also
+	// try to detect serial console via cmdline
+	if ((grep("/proc/cmdline","console=ttyS") == 0) ||
+	    (grep("/proc/cmdline","console=ttys") == 0)) {
+		present = SERIAL_PRESENT;
+	} else {
+		fd = open ("/dev/console", O_NONBLOCK);
+		if (fd == -1)
+			return SERIAL_UNKNOWN;
+		present = (ioctl (fd, TIOCGSERIAL, &sr) == 0) ? SERIAL_PRESENT : SERIAL_ABSENT;
+		debconf_set (client,  "debian-installer/serial-console", present ? "true" : "false");
+		close (fd);
+	}
 	di_info ("Setting debian-installer/serial-console to %s", present ? "true" : "false");
 	return present;
 }
@@ -587,6 +599,7 @@ keyboard_select (void)
 	kbd_t *kp = NULL, *preferred = NULL;
 	char buf[LINESIZE], *s = NULL, *none = NULL;
 	int choices = 0, first_entry = 1;
+	sercon_state sercon;
 	struct debconfclient *client = mydebconf_get ();
 
 	/* k is returned by a method if it is preferred keyboard.
@@ -612,19 +625,26 @@ keyboard_select (void)
 			}
 		}
 	}
-	if (((preferred == NULL) || (preferred->present == UNKNOWN))
-	    && check_if_serial_console ()) {
-		di_info ("Can't tell if kbd present; add no keyboard option\n");
-		none = translated_template_get ("kbd-chooser/no-keyboard");
-		s = insert_description (s, none, &first_entry);
+	sercon = check_if_serial_console();
+	none = translated_template_get ("kbd-chooser/no-keyboard");
+	if (sercon == SERIAL_PRESENT) {
 		choices++;
+		s = insert_description (s, none, &first_entry);
+		mydebconf_default_set ("console-tools/archs", none);
+	} else {
+		if (((preferred == NULL) || (preferred->present == UNKNOWN))
+		    && (sercon == SERIAL_UNKNOWN)) {
+			di_info ("Can't tell if kbd present; add no keyboard option\n");
+			s = insert_description (s, none, &first_entry);
+			choices++;
+			mydebconf_default_set ("console-tools/archs",  
+				      preferred ? preferred->description : none);
+		}
 	}
 	debconf_subst (client, "console-tools/archs", "choices", buf);
-	mydebconf_default_set ("console-tools/archs",  
-			      preferred ? preferred->description : none);
-	if (none)
-		free(none);
-	return  (preferred && (preferred->present == TRUE)) ? "low" : "medium";
+	free(none);
+	return ((sercon == SERIAL_PRESENT) || 
+		(preferred && preferred->present == TRUE)) ? "low" : "medium";
 }
 
 /**
