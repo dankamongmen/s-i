@@ -1,10 +1,31 @@
 #! /bin/sh -e
-#
+
+. /usr/share/debconf/confmodule
+
+db_get debian-installer/consoledisplay || true
+consolefont=`echo $RET | sed -e 's/^kbd=//'`
+if [ "$consolefont" != "$RET" ]; then
+    if apt-install console-tools; then
+        ctconfig=/target/etc/console-tools/config
+        acm=`echo $consolefont | sed -e 's/.*(//' -e 's/).*//'`
+        [ "$acm" = utf8 ] && acm=
+        if [ -n "$acm" ]; then
+            sed -e "s/^#SCREEN_FONT_MAP=iso01/SCREEN_FONT_MAP=$acm/" \
+                $ctconfig > $ctconfig.tmp && \
+            mv $ctconfig.tmp $ctconfig
+        fi
+        consolefont=`echo $consolefont | sed -e 's/(.*//'`
+        if [ -n "$consolefont" ]; then
+            sed -e "s/^#SCREEN_FONT=iso01.f16/SCREEN_FONT=$consolefont/" \
+                $ctconfig > $ctconfig.tmp && \
+            mv $ctconfig.tmp $ctconfig
+        fi
+    fi
+fi
+ 
 # Pass the language/locale information needed by base-config into
 # /target/root/dbootstrap_settings.
 # This exists only to support installing woody (skolelinux, etc)
-
-. /usr/share/debconf/confmodule
 
 db_get debian-installer/locale
 LOCALE="$RET"
