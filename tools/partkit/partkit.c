@@ -409,28 +409,87 @@ error:
 
 }
 
+char *partkit_get_devices(PedDevice *dev)
+{
+  char *ptr = 0;
+  int drivelistlen = 0;
+
+  ped_device_probe_all();
+
+  //mbc - unfortunately, do two passes for now to do the malloc...
+  while((dev = ped_device_get_next(dev)))
+    {
+      drivelistlen += strlen(dev->path);
+      drivelistlen += 2;
+    }
+
+  if(drivelistlen)
+     {
+	 ptr = (char *)malloc(drivelistlen);
+	  
+	 if(ptr)
+	   {
+	     *ptr = 0;
+	     dev = NULL;
+	  
+	     while((dev = ped_device_get_next(dev)))
+	       {
+		 if(*ptr == 0)
+		   strcpy(ptr, dev->path);
+		 else if (*ptr != 0)
+		   {
+		     strcat(ptr, ", ");
+		     strcat(ptr, dev->path);
+		   }
+	       }
+	   }
+	 
+     }
+
+  return ptr;
+
+}
+
+//mbc - for now, just use the first device
+char *partkit_get_default_device(void)
+{
+  PedDevice *dev = NULL;
+  char *ptr = 0;
+ 
+  dev = ped_device_get_next(dev);
+
+  ptr = (char *)malloc(strlen(dev->path));
+
+  strcpy(ptr, dev->path);
+
+  return ptr;
+}
 
 int
 main (int argc, char *argv[])
 {
   int finished = 0;
   PedDevice *dev = NULL;
-  char *ptr;
+  char *ptr = 0;
   client = debconfclient_new ();
   client->command (client, "title", "Partition Editor", NULL);
 
+  //mbc - should install an exception handler here
+
   do
     {
-      /* FIXME: how to get a list of available devices ? */
-      ptr = /* get_device_list() */ "/dev/hdb";
-
+      ptr = partkit_get_devices(dev);
 
       client->command (client, "subst", "partkit/select_device", "choices",
 		       ptr, NULL);
-      /*FIXME: how to get a default device? */
+      free(ptr);
+
+      ptr = partkit_get_default_device();
+      
       client->command (client, "subst", "partkit/select_device", "default",
 		       ptr, NULL);
 
+      free(ptr);
 
       if ((dev = ped_device_get (argv[1])) == NULL)
 	partkit_error (1);
