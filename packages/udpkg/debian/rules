@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	CFLAGS="-W -Wall -Os" ./configure --without-depends --without-debug \
+		--without-remove --with-admindir=/var/lib/dpkg
+	$(MAKE) small
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	-$(MAKE) distclean
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_install udpkg usr/bin 
+	dh_installdirs var/lib/dpkg/info
+
+binary-indep: build install
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

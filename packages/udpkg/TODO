@@ -1,0 +1,16 @@
+* Install a deb that has a failing postinst (libc6.deb into the demo system
+  works well, and you see something like:
+
+  ldconfig: Can't create temporary cache file /etc/ld.so.cache~: Permission denied
+  postinst exited with status 256
+  /mirror/debian/all/libc6_2.2-5.deb: No such file or directory
+
+  The last line seems bogus, it did install the file after all.
+
+* fix bugs
+ 1) Multiple packages are removed from status file. e.g.
+  udpkg -r apt-move_4.1.13_i386.deb removes both apt and apt-move from the status file
+
+ 2) udpkg -i apt-move doesnt add all the fields to the status file that dpkg does.
+
+ 3) Improve error handling, when the disk is full at 'ar' and 'tar' fails.
