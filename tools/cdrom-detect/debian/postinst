@@ -1,5 +1,7 @@
 #! /bin/sh
 
+set -e
+
 . /usr/share/debconf/confmodule
 
 log () {
@@ -9,7 +11,7 @@ log "Detecting hardware..."
 
 # Manually load modules to enable things we can't detect.
 # XXX: This isn't the best way to do this; we should autodetect.
-manual_load="ide-mod ide-probe-mod ide-cd ide-disk isa-pnp isofs"
+manual_load="ide-mod ide-probe-mod ide-cd ide-disk isofs"
 #manual_load=i82365 usb-storage
 #manual_load=i82365 sr_mod usb-storage
 old=`cat /proc/sys/kernel/printk`
@@ -21,42 +23,44 @@ done
 echo $old >/proc/sys/kernel/printk
 
 # Creating devices for CDROM (devfs is used)
-mknod() {
-    test -e "$1" || /bin/mknod $1 $2 $3 $4
-}
-for i in 0 1 2 3 4
-do
-    mknod /dev/scd$i b 11 $i  # Scsi
-    mknod /dev/mcdx$i b 20 $i # Mitsumi
-    mknod /dev/pcd$i b 46 $i
-done
-# Special devices
-mknod /dev/mcd b 23 0
-mknod /dev/sonycd b 15 0
-mknod /dev/cdu535 b 24 0
-mknod /dev/lmscd b 24 0
-mknod /dev/sbpcd b 25 0
-mknod /dev/aztcd b 29 0
-mknod /dev/cm206cd b 30 0
-mknod /dev/gscd b 16 0
-mknod /dev/bpcd b 41 0
-mknod /dev/optcd b 17 0
-mknod /dev/sjcd b 18 0
-# Standard IDE
-mknod /dev/hda b 3 0
-mknod /dev/hdb b 3 64
-mknod /dev/hdc b 22 0
-mknod /dev/hdd b 22 64
+#mknod() {
+#    test -e "$1" || /bin/mknod $1 $2 $3 $4
+#    true
+# }
+# for i in 0 1 2 3 4
+# do
+#     mknod /dev/scd$i b 11 $i  # Scsi
+#     mknod /dev/mcdx$i b 20 $i # Mitsumi
+#     mknod /dev/pcd$i b 46 $i
+# done
+# # Special devices
+# mknod /dev/mcd b 23 0
+# mknod /dev/sonycd b 15 0
+# mknod /dev/cdu535 b 24 0
+# mknod /dev/lmscd b 24 0
+# mknod /dev/sbpcd b 25 0
+# mknod /dev/aztcd b 29 0
+# mknod /dev/cm206cd b 30 0
+# mknod /dev/gscd b 16 0
+# mknod /dev/bpcd b 41 0
+# mknod /dev/optcd b 17 0
+# mknod /dev/sjcd b 18 0
+# # Standard IDE
+# mknod /dev/hda b 3 0
+# mknod /dev/hdb b 3 64
+# mknod /dev/hdc b 22 0
+# mknod /dev/hdd b 22 64
 
-IFS_SAVE=$IFS
+IFS_SAVE="$IFS"
 IFS="
 "
 for device in `/sbin/discover --disable-all --enable=pci,ide,scsi,pcmcia \
                 --format="%m\t%V\t%M\n" scsi cdrom`
 do
-    vendor=`echo $device | cut -f2`
-    model=`echo $device | cut -f3`
-    module=`echo $device | cut -f1`
+    vendor="`echo $device | cut -f2`"
+    model="`echo $device | cut -f3`"
+    module="`echo $device | cut -f1`"
+    IFS="$IFS_SAVE"
 
     if [ "$vendor" != "Unknown" ]
     then
@@ -74,12 +78,12 @@ do
         then
             while true
             do
-		db_fset cdrom-detect/not_included seen false
-		db_subst cdrom-detect/not_included vendor "$name"
-		db_subst cdrom-detect/not_included module $module
-		db_input critical cdrom-detect/not_included
-		db_go
-		db_get cdrom-detect/not_included
+		db_fset cdrom-detect/not_included seen false || true
+		db_subst cdrom-detect/not_included vendor "$name" || true
+		db_subst cdrom-detect/not_included module $module || true
+		db_input critical cdrom-detect/not_included || true
+		db_go || true
+		db_get cdrom-detect/not_included || true
                 mounted=0
                 if [ "$RET" != "true" ]
                 then
@@ -108,7 +112,7 @@ do
         if [ -f /lib/modules/*/*/$module.o ]
         then
 	    old=`cat /proc/sys/kernel/printk`
-	    echo 0 >/pros/sys/kernel/printk
+	    echo 0 >/proc/sys/kernel/printk
             modprobe $module >>/var/log/messages 2>&1
 	    echo $old >/proc/sys/kernel/printk
             if [ "$?" != "0" ]
@@ -121,7 +125,7 @@ do
         fi
     fi
 done
-IFS=$IFS_SAVE
+IFS="$IFS_SAVE"
 
 # If PCMCIA was detected, load the PCMCIA drivers and load cardmgr
 #if [ -e /proc/bus/pccard ]
