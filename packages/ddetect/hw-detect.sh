@@ -309,46 +309,46 @@ fi
 
 # get pcmcia running if possible
 if [ -x /etc/init.d/pcmcia ]; then
-    db_progress INFO hw-detect/pcmcia_step
+	db_progress INFO hw-detect/pcmcia_step
 
-    # If hotplugging is available in the kernel, we can use it to load
-    # modules for Cardbus cards and tell which network interfaces belong
-    # to PCMCIA devices. The former is only necessary on 2.4 kernels,
-    # though.
-    if [ -f /proc/sys/kernel/hotplug ]; then
-        # Snapshot discover information so we can detect modules for
-	# Cardbus cards by later comparison in the hotplug handler.
-	# (Only on 2.4 kernels.)
-	if expr `uname -r` : "2.4.*" >/dev/null 2>&1; then
-	    DISCOVER_TEST=$(discover --version 2> /dev/null)
-	    if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
-		dpath=linux/module/name
-		dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
-		dflags="-d all -e pci scsi fixeddisk modem network removabledisk"
+	# If hotplugging is available in the kernel, we can use it to load
+	# modules for Cardbus cards and tell which network interfaces belong
+	# to PCMCIA devices. The former is only necessary on 2.4 kernels,
+	# though.
+	if [ -f /proc/sys/kernel/hotplug ]; then
+		# Snapshot discover information so we can detect modules for
+		# Cardbus cards by later comparison in the hotplug handler.
+		# (Only on 2.4 kernels.)
+		if expr `uname -r` : "2.4.*" >/dev/null 2>&1; then
+			DISCOVER_TEST=$(discover --version 2> /dev/null)
+			if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
+				dpath=linux/module/name
+				dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
+				dflags="-d all -e pci scsi fixeddisk modem network removabledisk"
 		
-		echo `discover --data-path=$dpath --data-version=$dver $dflags` \
-		    | sed 's/ $//' >/tmp/pcmcia-discover-snapshot
-	    else
-		discover --format="%m " --disable-all --enable=pci \
-		    scsi ide ethernet \
-		    | sed 's/ $//' >/tmp/pcmcia-discover-snapshot
-	    fi
-	fi
+				echo `discover --data-path=$dpath --data-version=$dver $dflags` \
+					| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
+			else
+				discover --format="%m " --disable-all --enable=pci \
+					scsi ide ethernet \
+					| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
+			fi
+		fi
 	
-        # Simple handling of hotplug events during PCMCIA detection
-	saved_hotplug=`cat /proc/sys/kernel/hotplug`
-	echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
-    fi
+		# Simple handling of hotplug events during PCMCIA detection
+		saved_hotplug=`cat /proc/sys/kernel/hotplug`
+		echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
+	fi
     
-    CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 2>&1 \
-	| logger -t hw-detect
+	CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 2>&1 \
+		| logger -t hw-detect
     
-    if [ -f /proc/sys/kernel/hotplug ]; then
-	echo $saved_hotplug >/proc/sys/kernel/hotplug
-	rm -f /tmp/pcmcia-discover-snapshot
-    fi
+	if [ -f /proc/sys/kernel/hotplug ]; then
+		echo $saved_hotplug >/proc/sys/kernel/hotplug
+		rm -f /tmp/pcmcia-discover-snapshot
+	fi
     
-    db_progress STEP $OTHER_STEPSIZE
+	db_progress STEP $OTHER_STEPSIZE
 fi
 if [ -e /proc/bus/pccard/drivers ]; then
 	apt-install pcmcia-cs || true
