@@ -281,7 +281,7 @@ lvm_lv_add(void *stack, const char *fstype, unsigned int mbminsize,
 }
 
 /* (andread@linpro.no) */
-void *
+int
 lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
 {
     FILE *vgdisplay = NULL;
@@ -301,7 +301,7 @@ lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
         autopartkit_log(0, "Failed to run vgdisplay\n");
 	free(spaceinfo);
 	free(command);
-	return NULL;
+	return 0;
     }
     if (fgets(buf, 160, vgdisplay) != NULL){
 	char *token = NULL;
@@ -332,7 +332,7 @@ lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
 	  /* No tokens */
 	  free(spaceinfo);
 	  free(command);
-	  return NULL;
+	  return 0;
 	}
 	/* FIXME: Some problems with the data from vgdisplay -c. Using
            field 12 for now instead */
@@ -351,7 +351,7 @@ lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
         autopartkit_log(0, "Failed to find vg size\n");
         free(spaceinfo);
 	free(command);
-        return NULL;
+        return 0;
     }
     free(command);
     return 1;
