@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.c,v 1.8 2003/11/09 00:49:05 pere Exp $
+ * $Id: dpkg.c,v 1.9 2004/01/21 16:56:36 waldi Exp $
  */
 
 #include <config.h>
@@ -78,7 +78,7 @@ int di_system_dpkg_package_configure (di_packages *status, const char *_package,
 int di_system_dpkg_package_control_file_exec (di_package *package, const char *name, int argc, const char *const argv[])
 {
   char buf[PATH_MAX];
-  const char *real_argv[argc + 1];
+  const char *real_argv[argc + 2];
   int i;
   struct stat statbuf;
 
@@ -92,6 +92,7 @@ int di_system_dpkg_package_control_file_exec (di_package *package, const char *n
   real_argv[0] = buf;
   for (i = 0; i < argc; i++)
     real_argv[i+1] = argv[i];
+  real_argv[argc + 1] = NULL;
 
   i = di_exec (buf, real_argv);
   return di_exec_mangle_status (i);
