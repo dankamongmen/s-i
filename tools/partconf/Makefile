@@ -28,5 +28,11 @@ small: clean partconf find-partitions mkfstab
 	strip --remove-section=.comment --remove-section=.note find-partitions
 	strip --remove-section=.comment --remove-section=.note mkfstab
 
+check:
+	$(CC) $(CFLAGS) -o test-mkfstab -DTEST mkfstab.c $(LIBS) -ldebian-installer
+	./test-mkfstab
+
 clean:
-	-rm -f partconf find-partitions mkfstab *.o
+	-rm -f partconf find-partitions mkfstab test-mkfstab *.o
+
+.PHONY: all check clean small

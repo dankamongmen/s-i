@@ -1,5 +1,10 @@
-
+#include <assert.h>
 #include "mkfstab.h"
+
+static int has_device(struct fstab_entry *entry) {
+	return (strcmp(entry->typ, "proc") != 0
+		&& strcmp(entry->typ, "tmpfs") != 0);
+}
 
 char *find_mountdevice(const char *mountpoint, char *default_device) {
 	FILE *fmounts = NULL;
@@ -249,6 +254,7 @@ void mapdevfs(struct fstab_entry *entry) {
 	}
 }
 
+#ifndef TEST
 int main(int argc, char *argv[]) {
 	int i = 0;
 	FILE *outfile = NULL;
@@ -274,7 +280,7 @@ int main(int argc, char *argv[]) {
 	for(i=0; i<count_entries; i++) {
 		int pass;
 
-		if(strcmp(entries[i]->typ, "proc") == 0)
+		if(!has_device(entries[i]))
 			pass = 0;
 		else {
 			if(strcmp(entries[i]->mountpoint, "/cdrom") == 0
@@ -304,4 +310,12 @@ int main(int argc, char *argv[]) {
 
 	return(EXIT_SUCCESS);
 }
-
+#else
+int main(int argc, char **argv) {
+	struct fstab_entry proc_entry = {"proc", "/proc", "proc", "defaults"};
+	struct fstab_entry tmpfs_entry = {"none", "/tmp", "tmpfs", "defaults"};
+	assert(!has_device(&proc_entry));
+	assert(!has_device(&tmpfs_entry));
+	return 0;
+}
+#endif
