@@ -227,52 +227,73 @@ static int satisfy_virtual(struct package_t *p) {
 	int i, ret;
 	char *choices, *defval;
 	size_t c_size = 1;
+	int is_menu_item = 0;
 
 	choices = malloc(1);
 	choices[0] = '\0';
 	for (i = 0; p->depends[i] != 0; i++) {
 		if ((dep = tree_find(p->depends[i])) == NULL)
 			continue;
-		if (strstr(dep->provides, p->package) == NULL) {
+		if (dep->provides == NULL || strstr(dep->provides, p->package) == NULL) {
 			/* Non-providing dependency */
-			if (!config_package(dep))
+			if (dep->status != installed && !config_package(dep))
 				return 0;
-		} else {
-			/* TODO: This only makes sense if dep is a menu item */
-			c_size += strlen(dep->description) + 2;
-			choices = realloc(choices, c_size);
-			strcat(choices, dep->description);
-			strcat(choices, ", ");
+			continue;
 		}
+		if (dep->status == installed) {
+			/* This means that a providing package is already
+			 * configure. So we short-circuit. */
+			choices[0] = '\0';
+			break;
+		}
+		/* This only makes sense if one of the dependencies
+		 * is a menu item */
+		if (dep->installer_menu_item)
+			is_menu_item = 1;
+		c_size += strlen(dep->description) + 2;
+		choices = realloc(choices, c_size);
+		strcat(choices, dep->description);
+		strcat(choices, ", ");
 	}
+	if (c_size >= 3)
+		choices[c_size-3] = '\0';
 	if (choices[0] != '\0') {
-		/* There were packages to choose from */
-		defval = strrchr(choices, ',');
-		if (defval != NULL && defval[1] != '\0')
-			defval += 2;
-		else
-			defval = "";
-		debconf = debconfclient_new();
-		debconf->command(debconf, "SUBST", MISSING_PROVIDE, "CHOICES", choices, NULL);
-		debconf->command(debconf, "SUBST", MISSING_PROVIDE, "DEFAULT", defval, NULL);
-		debconf->command(debconf, "INPUT medium", MISSING_PROVIDE, NULL);
-		debconf->command(debconf, "GO", NULL);
-		free(choices);
-		debconf->command(debconf, "GET", MISSING_PROVIDE, NULL);
+		if (is_menu_item) {
+			/* Only let the user choose if one of them is a menu item */
+			/* TODO: package with highest priority should be default */
+			defval = strrchr(choices, ',');
+			if (defval != NULL && defval[1] != '\0')
+				defval += 2;
+			else
+				defval = "";
+			debconf = debconfclient_new();
+			debconf->command(debconf, "SUBST", MISSING_PROVIDE,
+					"CHOICES", choices, NULL);
+			debconf->command(debconf, "SUBST", MISSING_PROVIDE,
+					"DEFAULT", defval, NULL);
+			debconf->command(debconf, "INPUT medium", MISSING_PROVIDE,
+					NULL);
+			debconf->command(debconf, "GO", NULL);
+			debconf->command(debconf, "GET", MISSING_PROVIDE, NULL);
+		}
+		/* Go through the dependencies again */
 		for (i = 0; p->depends[i] != 0; i++) {
 			if ((dep = tree_find(p->depends[i])) == NULL)
 				continue;
 			if (strstr(dep->provides, p->package) == NULL)
 				continue;
-			if (strcmp(debconf->value, dep->description))
-			{
-				/* Recursively configure the chosen package */
+			if (!is_menu_item || strcmp(debconf->value, dep->description) == 0) {
+				/* Ick. If we have a menu item it has to match the
+				 * debconf choice, otherwise we configure all of
+				 * the providing packages */
 				if (!config_package(dep))
 					return 0;
-				break;
+				if (is_menu_item)
+					break;
 			}
 		}
 	}
+	free(choices);
 	/* And finally configure the virtual package itself */
 	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
 	ret = SYSTEM(configcommand);
@@ -291,7 +312,7 @@ static int is_virtual(struct package_t *p) {
 	for (i = 0; p->depends[i] != 0; i++) {
 		if ((dep = tree_find(p->depends[i])) == NULL)
 			continue;
-		if (strstr(dep->provides, p->package) != NULL)
+		if (dep->provides != NULL && strstr(dep->provides, p->package) != NULL)
 			return 1;
 	}
 	return 0;
@@ -310,7 +331,7 @@ config_package(struct package_t *p) {
 	for (i = 0; p->depends[i] != 0; i++) {
 		if ((dep = tree_find(p->depends[i])) == NULL)
 			continue;
-		if (dep->status != unpacked && p->status == half_configured)
+		if (dep->status == installed)
 			continue;
 		if (is_virtual(dep)) {
 			if (!satisfy_virtual(dep))
