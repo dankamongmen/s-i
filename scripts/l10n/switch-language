@@ -46,10 +46,6 @@ if [ ! -f $DI_COPY/packages/languagechooser/debian/po/$LANG.po ] ; then
   exit 1
 fi
 
-echo $LANG
-echo $DI_COPY
-
-
 cd $DI_COPY
 if [ ! -x scripts/l10n/gettext-helper ] ; then
   echo $DI_COPY/scripts/l10n/gettext-helper not found
@@ -57,7 +53,9 @@ if [ ! -x scripts/l10n/gettext-helper ] ; then
   exit 1
 fi
 
+echo Running gettext-helper:
 scripts/l10n/gettext-helper export $LANG
+
 
 if [ ! -f packages/po/$LANG.po ] ; then
   echo No packages/po/$LANG.po generated
@@ -66,8 +64,10 @@ if [ ! -f packages/po/$LANG.po ] ; then
   exit 1
 fi
 
+echo Commiting new file
 svn add packages/po/$LANG.po
 svn commit -m"[switch-language] Added master file for $LANG" packages/po/$LANG.po
 
+echo Launching l10n-sync with the keep-revision switch
 scripts/l10n/l10n-sync --keep-revision=$LANG --commit $DI_COPY
 
