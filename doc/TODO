@@ -1,99 +1,99 @@
-Done this week:
-- udebs are flooding into sid
-- demo3 is a chrooted demo system
-  http://people.debian.org/~joeyh/debian-installer/
-- build system is beginning to take shape
-* Several people have done demo systems that I have not summarized.
-- Aj has a script that can download and build an entire base debian system.
-  http://people.debian.org/~ajt/base-deb-20010104.tar.gz
-
 Where we are:
 
-Now that we have a chrooted system, it's time to start seriously looking at
-the size of the d-i base system. library reduction and trimming down
-busybox need to be done soon. It's also time to start writing the modules
-that are actual components of the installer, like the disk partitioner, the
-disk formatter, etc, etc.
+	We have a small chrooted system that is being autobuilt daily.
+
+	Now it is time to begin working on making it actually boot. The
+	other thing that really needs work is the partitioner.
+
+General things to keep an eye on:
+
+	- All udeb packages should be able to build debug versions if
+	  DEB_BUILD_OPTIONS="debug".
+	- Packages that link in cdebconf should build-depend on
+	  cdebconf-dev now that it is in Debian.
+	- Make sure all udebs declare dependancies on everything they
+	  depend on (this includes depending on ash, busybox, etc). The
+	  dependancy web is pretty spotty right now.
+	- Keep this progress file up-to-date as you complete various parts 
+	  of it.
 
 Still Todo:
+
+        - target media detector
+                Just has to figure out what media to install to.
+                Probably trivial; most support already in the kernel.
+        - disk partitioner
+                Some kind of a UI to let the user partition their
+                disks and decide what the partitions are used for.
+        - disk formatter
+                Formats disks, turns on swap, etc.
+	- polish everything so it is actually usable
+	- i18n
+	- translations
+		(Waiting until there is i18n and final text to translate..)
+        - user documentation
+		(Waiting until we have something to document..)
+	- cd installs, etc, etc, etc
+
+Under development:
+
+        - cdebconf (miniature debconf in C) [Randolph Chung, Anthony Towns]
+                In progress, has one working database backend and one
+		working text-based frontend, with progress on a slang
+		frontend. Quite usable by now.
+        - ethdetect [David Whedon]
+		Seems to work, still needs some itegration into the chroot.
+	- insmod/modprobe [David Whedon]
+		Udebs not yet available, patch sent to bts.
+        - netcfg [David Whedon]
+		Development in progress, and partly works now.
+        - anna (retreiver control program) [Joey Hess, Glenn McGrath]
+		About 10% done realistically, but it does work.
+        - choose-mirror [Joey Hess]
+		80% done
+        - base system installer [Anthony Towns]
+		Aj has a script that bootstraps a chrooted base system
+		starting with just busybox. It needs integration into the
+		system, and udebs are not available yet.
+        - {lilo,grub} installer [Gergely Risko]
+		Debconfized lilo is in debian.
+        - kernel-image-di [Joey Hess]
+		Builds both a regular kernel-image package and udebs for
+		the modules. Still needs work. Kenrel config file needs 
+		work expecially, as do the selections of exactly which
+		modules go in which udebs.
+        - library reduction [Marcus Brinkmann]
+		mklibs.sh works, but it is not packaged.
+        - install media build system [Joey Hess, David Whedon]
+		We can build chrootable, library-reduced trees. It almost
+		boots too.
+	- post-reboot configuration [Joey Hess?]
+		Many packages that are currently set up by the
+		boot-floppies need to start handling their own setup, after
+		reboot, via debconf. These include timezone and clock config, 
+		many of the things in base-config now, what else?
+
+Needs testing:
+	- netkit-tiny [David Whedon]
+		Packaged, not really tested.
+	- other hardware detection [David Whedon]
+		David has written detectors for sound, ethernet, cd, cpu,
+		disk, and memory detection. All need testing.
+	- system as a whole
+
+More or less done, for now anyway:
 
 	- design [Joey Hess, debian-boot]
                 80% done. Enough to know what the big peices are 
                 and how they fit together.
-        - cdebconf (miniature debconf in C) [Randolph Chung, Anthony Towns]
-                In progress, has one working database backend and one
-		working text-based frontend, with progress on a ncurses
-		frontend.
         - udpkg (tiny dpkg clone) [Randolph Chung, Joey Hess]
 		Usable. One todo item (localized descriptions)
         - main-menu (main menu generator) [Joey Hess]
                 90% done (one non-trivial todo item)
         - busybox integration [Erik Andersen]
 		First pass busybox udeb available.
-	- netkit-tiny [David Whedon]
-		ifconfig is needed at least by netcfg
-        - network card detector [Glenn McGrath, David Whedon]
-		Pcidetect is written, detects PCI cards only. Needs
-		testing. David has another detector that uses libdetect
-		instead.
-	- other hardware detection [David Whedon]
-		David has written detectors for sound, ethernet, cd, cpu,
-		disk, and memory detection. All need testing.
-        - netcfg [David Whedon]
-		Development in progress, and partly works now.
-        - anna (retreiver control program) [Joey Hess, Glenn McGrath]
-		About 10% done realistically, but it does work.
-        - choose-mirror [Joey Hess]
-		75% done
  	- http retriever [Joey Hess]
 		Works, needs testing and proxy support.
-        - target media detector [UNCLAIMED]
-                Not started. Just has to figure out what media to install to.
-                Probably trivial; most support already in the kernel.
-        - disk partitioner [UNCLAIMED]
-                Not started. Some kind of a UI to let the user partition their
-                disks and decide what the partitions are used for.
-        - disk formatter [UNCLAIMED]
-                Not started. Formats disks, turns on swap, etc.
-        - base system installer [Anthony Towns]
-		Aj has a script that bootstraps a chrooted base system
-		starting with just busybox.
-        - {lilo,grub} installer [Gergely Risko]
-		Debconfized lilo is in debian, although it has some issues.
-        - kernel module udebs [Vaidhy]
-                Not started. We will need various sets of kernel modules;
-                one such set is NIC drivers. Each set goes in a udeb; there
-                probably has to be a system to build the whole kernel and
-                udebs.
-        - library reduction [Marcus Brinkmann]
-                Not started. There is code in the boot-floppies that should
-                be usable; a deb of it is needed.
-        - install media build system [Joey Hess]
-		We can build chrootable, library-reduced trees. Not bootable
-		yet though.
-        - user documentation
-		Not started. (Waiting until we have something to document..)
-	- after-reboot configuration [Joey?]
-		Many packages that are currently set up by the
-		boot-floppies need to start handling their own setup, after
-		reboot, via debconf. These include timezone and clock config, 
-		many of the things in base-config now, what else?
-
-Other stuff:
-     - The main menu design has some issues. If a step is failing
-       because some step above it did something wrong, but thought
-       it succeeded (a disk was partitioned, but very badly, and
-       installing the base system to it fails), there is no way to
-       force the user to back up. This seems to preclude linear
-       install mode. I posted a longer example to -boot. Three
-       possible fixes:
-                        - Detect loops, and have code to figure out what went
-                          wrong and back up to the appropriate step that can
-                          fix it
-                        - Detect loops, and back up to the beginning of
-                          the menu
-                        - Detect whenever any menu item fails, and leave
-                          linear mode. (BEST)
-    - Need to define module subsystems for network/hardware
-      support, network configuration, target media support, etc.
+	- archive setup
+		Done.
 
