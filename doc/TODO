@@ -1,26 +1,32 @@
-- micodebconf		[Glenn McGrath <bug1@netconnect.com.au>]
+- micodebconf		[Glenn McGrath <bug1@netconnect.com.au> (stalled)]
 - microdpkg		[Randolph Chung <tausq@debian.org>]
 - more detailed design docs that other people besides Joey Hess can
   understand		[Joey Hess <joeyh@debian.org and debian-boot]
-	- If multiple UI's are available, we want some kind of fallback
-          so the best workable UI can be used. Possibly similar to how
-	  debconf works now.
-	- How a ui module works and interfaces with udebconf needs to be
-	  worked out. However, this will probably be very dependant on
-	  udebconf -- ui's may well be loadable modules.
  	- The main menu design has some issues. If a step is failing
 	  because some step above it did something wrong, but thought it
 	  succeeded (a disk was partitioned, but very badly, and installing
 	  the base system to it fails), there is no way to force the user
 	  to back up. This seems to preclude linear install mode. I posted
-	  a longer example to -boot.
+	  a longer example to -boot. Three possible fixes:
+	  	- Detect loops, and have code to figure out what went wrong
+		  and back up to the appropriate step that can fix it
+		- Detect loops, and back up to the beginning of the menu
+		- Detect whenever any menu item fails, and leave linear
+		  mode.
 	- Items on the main menu should be able to specify that they depend
 	  on some package being configured. If it is not, they are not the
 	  default. There are several ways to do this..
 	- Need to define module subsystems for network/hardware support,
 	  network configuration, target media support, etc.
-- write the simplest possible retriever (a crummy floppy retriever, maybe?)
-- other modules that are not yet even designed
-- cobble together a demonstration system that can install onto some very
-  limited set of machines, in some very limited fashion
-- everything else
+- Cobble together a demonstration system that can install onto some very
+  limited set of machines, in some very limited fashion. Here are the
+  things we would need for such a system:
+	- mini-debconf
+	- one debconf ui
+	- one retreiver and whatever it depends on
+	- main menu
+	- disk partitioner
+	- disk formatter
+	- base system extractor
+	- lilo setup
+	- reboot
