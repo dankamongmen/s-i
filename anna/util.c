@@ -117,20 +117,20 @@ get_packages(di_packages_allocator *allocator)
 /* This is not to be confused with di_pkg_is_installed which only checks
  * the package struct. This function checks if p is in the given list of
  * installed packages and compares versions. */
-int
+bool
 is_installed(di_package *p, di_packages *status)
 {
     di_package *q;
     di_package_version *pv, *qv;
-    int ret;
+    bool ret;
 
     /* If we don't understand the version number, we play safe
      * and assume we should install it */
     if (p->version == NULL || !(pv = di_package_version_parse(p)))
-        return 0;
+        return false;
     q = di_packages_get_package(status, p->package, 0);
     if (q == NULL || q->version == NULL || !(qv = di_package_version_parse(q)))
-        return 0;
+        return false;
     ret = (di_package_version_compare(pv, qv) <= 0);
     di_package_version_free(pv);
     di_package_version_free(qv);
@@ -148,17 +148,17 @@ list_to_choices(di_package **packages)
 {
     char buf[200], *ret;
     int count = 0;
-    size_t ret_size = 1024, ret_used = 0, size;
+    size_t ret_size = 1024, ret_used = 1, size;
     di_package *p;
 
-    ret = malloc(1024);
+    ret = di_malloc(1024);
     ret[0] = '\0';
     while ((p = packages[count])) {
         size = package_to_choice(p, buf, 200);
         if (ret_used + size + 2 > ret_size)
         {
             ret_size += 1024;
-            ret = realloc(ret, ret_size);
+            ret = di_realloc(ret, ret_size);
         }
         strcat(ret, buf);
         ret_used += size + 2;

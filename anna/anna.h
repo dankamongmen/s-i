@@ -3,6 +3,7 @@
 
 #include <cdebconf/debconfclient.h>
 #include <debian-installer.h>
+#include <stdbool.h>
 
 #define RETRIEVER_DIR           "/usr/lib/debian-installer/retriever"
 #define DOWNLOAD_DIR            "/var/cache/anna"
@@ -23,7 +24,7 @@ const char *get_default_retriever(const char *choices);
 char *get_retriever(void);
 int config_retriever(void);
 di_packages *get_packages(di_packages_allocator *allocator);
-int is_installed(di_package *p, di_packages *status);
+bool is_installed(di_package *p, di_packages *status);
 size_t package_to_choice(di_package *package, char *buf, size_t size);
 char *list_to_choices(di_package **packages);
 int get_package (di_package *package, char *dest);

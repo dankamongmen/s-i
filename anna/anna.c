@@ -45,7 +45,7 @@ choose_retriever(di_packages *status, di_packages **packages __attribute__((unus
 static int
 choose_modules(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator)
 {
-    char *choices, *package_kernel, *running_kernel = NULL;
+    char *choices, *package_kernel, *running_kernel = NULL, *subarchitecture;
     int package_count = 0;
     di_package *package, *status_package, **package_array;
     di_slist_node *node, *node1;
@@ -77,11 +77,16 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
                 if (d->type == di_package_dependency_type_reverse_enhances)
                 {
                     package->status_want = di_package_status_want_install;
-                    di_log (DI_LOG_LEVEL_DEBUG, "install %s because of enhances", package->package);
+                    di_log (DI_LOG_LEVEL_DEBUG, "install %s, enhances installed packages %s", package->package, status_package->package);
                 }
             }
         }
     }
+
+    if (debconf_get(debconf, "debian-installer/kernel/subarchitecture"))
+      subarchitecture = strdup("generic");
+    else
+      subarchitecture = strdup(debconf->value);
 
     for (node = (*packages)->list.head; node; node = node->next) {
         package = node->data;
@@ -94,6 +99,8 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
         if (package->type != di_package_type_real_package)
           continue;
         if (is_installed(package, status))
+          continue;
+        if (!di_system_package_check_subarchitecture(package, subarchitecture))
           continue;
 
         if (running_kernel && package_kernel && strcmp(running_kernel, package_kernel) == 0)
@@ -135,7 +142,9 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     debconf->command(debconf, "FSET", ANNA_CHOOSE_MODULES, "seen", "false", NULL);
     debconf->command(debconf, "SUBST", ANNA_CHOOSE_MODULES, "CHOICES", choices, NULL);
     debconf->command(debconf, "INPUT medium", ANNA_CHOOSE_MODULES, NULL);
-    free(choices);
+
+    di_free(choices);
+    di_free(package_array);
 
     return 0;
 }
