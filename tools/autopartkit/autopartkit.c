@@ -1255,9 +1255,11 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                 mkfs = "/sbin/mkfs.ext3";
             else if (0 == strcmp("reiserfs", fstype))
                 mkfs = "/sbin/mkfs.reiserfs";
+            else if (0 == strcmp("default", fstype))
+                mkfs = "/sbin/mkfs.ext3"; /* Let ext3 be default */
             else /* Any default fs will have to do for now */
             {
-                autopartkit_log(1, "  Unknown filesystem %s on LVM volume\n",
+                autopartkit_log(1, "  Unknown filesystem '%s' on LVM volume\n",
                                 fstype);
                 mkfs = "/sbin/mkfs.ext2";
             }
