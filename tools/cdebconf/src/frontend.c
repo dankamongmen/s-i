@@ -10,11 +10,16 @@
 
 static int frontend_add(struct frontend *obj, struct question *q)
 {
-	struct question *qi = obj->questions;
-	struct question **qlast = &obj->questions;
+	struct question **qlast;
 
-	for (; qi != 0; qlast = &qi->next, qi = qi->next);
+	if (q == NULL) {
+		fprintf(stderr, "WTF?\n");
+	}
+
+	for (qlast = &obj->questions; *qlast; qlast = &(*qlast)->next);
 	*qlast = q;
+	q->next = NULL;
+
 	return 1;
 }
 

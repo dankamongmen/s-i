@@ -7,7 +7,7 @@
 #include "strutl.h"
 
 #define CHECKARGC(pred) \
-	if (_command_checkargc(argc ## pred, out, outsize) == 0) return DC_NOTOK
+	if (_command_checkargc(argc ## pred, out, outsize) == 0) return DC_OK
 
 static int _command_checkargc(int pred, char *out, size_t outsize)
 {
@@ -36,8 +36,8 @@ int command_input(struct confmodule *mod, int argc, char **argv,
 	/* check question */
 	/* check priority */
 
-	qtag = argv[1];
-	priority = argv[2];
+	priority = argv[1];
+	qtag = argv[2];
 
 	visible = (mod->frontend->interactive && mod->db->question_visible(mod->db, qtag, priority));
 
@@ -45,6 +45,11 @@ int command_input(struct confmodule *mod, int argc, char **argv,
 	if (visible)
 	{
 		q = mod->db->question_get(mod->db, qtag);
+		if (!q) {
+			snprintf(out, outsize, "%u No such question",
+				CMDSTATUS_BADQUESTION);
+			return DC_OK;
+		}
 		visible = mod->frontend->add(mod->frontend, q);
 	}
 
@@ -54,7 +59,6 @@ int command_input(struct confmodule *mod, int argc, char **argv,
 	else
 		snprintf(out, outsize, "%u Question skipped",
 			CMDSTATUS_INPUTINVISIBLE);
-
 	return DC_OK;
 }
 
@@ -92,7 +96,7 @@ int command_version(struct confmodule *mod, int argc, char **argv,
 int command_capb(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	return DC_OK;
+	return DC_NOTOK;
 }
 
 int command_title(struct confmodule *mod, int argc, char **argv, 
@@ -247,9 +251,8 @@ int command_register(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	CHECKARGC(== 2);
-
 	
-	return DC_OK;
+	return DC_NOTOK;
 }
 
 int command_unregister(struct confmodule *mod, int argc, char **argv, 
@@ -307,13 +310,18 @@ int command_fget(struct confmodule *mod, int argc, char **argv,
 int command_fset(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	return DC_OK;
+	return DC_NOTOK;
 }
 
 int command_exist(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	return DC_OK;
+	return DC_NOTOK;
 }
 
-
+int command_stop(struct confmodule *mod, int argc, char **argv,
+	char *out, size_t outsize)
+{
+	CHECKARGC(== 0);
+	return DC_OK;
+}

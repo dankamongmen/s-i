@@ -30,6 +30,7 @@ static commands_t commands[] = {
 	{ "fget",	command_fget },
 	{ "fset",	command_fset },
 	{ "exist",	command_exist },
+	{ "stop",	command_stop },
 	{ 0, 0 }
 };
 
@@ -67,14 +68,15 @@ static int confmodule_communicate(struct confmodule *mod)
 	{
 		in[ret] = 0;
 		inp = strstrip(in);
-		ret = _confmodule_process(mod, inp, out, sizeof(out));
-		if (ret > 0) {
+		ret = _confmodule_process(mod, inp, out, sizeof(out) - 1);
+		if (ret == DC_NOTOK) {
+			fprintf(stderr, "E: Unimplemented function\n");
+			continue;
+		}
+		if (out[0] == 0) break; // STOP called
+
 		strcat(out, "\n");
 		write(mod->outfd, out, strlen(out));
-		if (out[0] == 0) ret = 0;
-		} else {
-			break;
-		}
 	}
 	return ret;
 }
