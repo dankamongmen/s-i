@@ -16,6 +16,7 @@
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
 
 #define MAIN_MENU	"debian-installer/main-menu"
+#define DPKG_CONFIGURE_COMMAND "usr/bin/udpkg -c"
 
 typedef enum { unpacked, installed, other } package_status;
 

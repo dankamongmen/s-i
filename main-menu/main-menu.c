@@ -184,7 +184,7 @@ void do_menu_item(struct package_t *p) {
 		order_done(head);
 		for (p = head; p; p = p->next) {
 			if (p->status == unpacked) {
-				sprintf(configcommand, "dpkg --configure %s",
+				sprintf(configcommand, DPKG_CONFIGURE_COMMAND " %s",
 						p->package);
 				if (SYSTEM(configcommand) != 0)
 					return; /* give up on failure */				
