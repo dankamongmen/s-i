@@ -8,10 +8,6 @@
 #include <bogl/bogl.h>
 #include <bogl/bowl.h>
 
-#ifndef _
-#define _(x) x
-#endif
-
 /* Any private variables we may need. */
 struct uidata {
 };

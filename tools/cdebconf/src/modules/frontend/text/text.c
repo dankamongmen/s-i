@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.25 2002/12/09 17:31:35 sjogren Exp $
+ * $Id: text.c,v 1.26 2002/12/17 23:07:44 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -55,10 +55,6 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
-#ifndef _
-#define _(x) x
-#endif
 
 /*
  * Function: getwidth

@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.21 2002/12/17 23:04:33 barbier Exp $
+ * $Id: slang.c,v 1.22 2002/12/17 23:07:44 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -56,10 +56,6 @@
 #define LINES		(SLtt_Screen_Rows ? SLtt_Screen_Rows : 24)
 #define COLS		(SLtt_Screen_Cols ? SLtt_Screen_Cols : 80)
 #define UIDATA(obj) 	((struct uidata *)(obj)->data)
-
-#ifndef _
-#define _(x) x
-#endif
 
 /* Private variables */
 struct uidata {

@@ -5,6 +5,9 @@
 #ifndef _FRONTEND_H_
 #define _FRONTEND_H_
 
+#undef _
+#define _(x) (x)
+
 struct configuration;
 struct template_db;
 struct question_db;

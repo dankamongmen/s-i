@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.9 2002/12/17 23:04:33 barbier Exp $
+ * $Id: gtk.c,v 1.10 2002/12/17 23:07:44 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -62,10 +62,6 @@
 #include <sys/types.h>
 
 #include <gtk/gtk.h>
-
-#ifndef _
-#define _(x) x
-#endif
 
 struct multicheck_data
 {
