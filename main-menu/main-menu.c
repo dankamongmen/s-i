@@ -189,7 +189,7 @@ int do_menu_item(struct package_t *p) {
 		order(p, &head, &tail);
 		order_done(head);
 		for (p = head; p; p = p->next) {
-			if (p->status == unpacked) {
+			if (p->status == unpacked || p->status == half_configured) {
 				sprintf(configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
 				if (SYSTEM(configcommand) != 0)
 					return 0; /* give up on failure */
