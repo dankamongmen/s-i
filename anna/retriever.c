@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "anna.h"
 
 /* Returns the filename of the retriever to use. */
@@ -36,10 +37,16 @@ struct package_t *get_packages (void) {
 	FILE *packages;
 	char buf[BUFSIZE];
 	struct package_t *p = NULL, *newp;
-	char *command=malloc(strlen(retriever) + 10);
+	static char tmp_packages[] = DOWNLOAD_DIR "/Packages";
+	char *command=malloc(strlen(retriever) + 10 + sizeof(tmp_packages) + 1);
 
-	sprintf(command, "%s Packages", retriever);
-	packages=popen(command, "r");
+	unlink(tmp_packages);
+	sprintf(command, "%s Packages %s", retriever, tmp_packages);
+	if (system(command) != 0) {
+		free(command);
+		return NULL;
+	}
+	packages=fopen(tmp_packages, "r");
 	free(command);
 
 	while (fgets(buf, BUFSIZE, packages) && !feof(packages)) {
@@ -60,6 +67,8 @@ struct package_t *get_packages (void) {
 			p->md5sum = strdup(buf + 8);
 		}
 	}
+	
+	unlink(tmp_packages);
 	
 	return p;
 }
