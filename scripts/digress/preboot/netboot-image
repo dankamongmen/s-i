@@ -11,6 +11,10 @@ if [ ! -e "$TFTP_DIR" ]; then
 	error "Bad TFTPDIR $TFTP_DIR does not exist"
 fi
 
+if [ ! -e "$NETBOOT_IMAGE" ]; then
+	error "$NETBOOT_IMAGE does not exist"
+fi
+
 if [ -e "$NETBOOT_IMAGE_ALT" ] && [ "$NETBOOT_IMAGE_ALT" -nt "$NETBOOT_IMAGE" ]; then
 	echo "Using netboot image: alternate"
 	NETBOOT_IMAGE="$NETBOOT_IMAGE_ALT"
