@@ -53,7 +53,7 @@
 	Οι ημερήσιες εκδόσεις όλων των non-ISO εικόνων του debian-installer,
 	συμπεριλαμβανομένων των εικόνων για δισκέττες και initrd είναι
 	διαθέσιμα στις διευθύνσεις:
-	για i386:    http://people.debian.org/~sjogren/d-i/images/daily
+	για i386:    http://people.debian.org/~joeyh/d-i/images/daily
 	για  powerpc: http://people.debian.org/~tsauter/d-i/images-powerpc/daily/
 	(μόνο για cdrom και netboot).
 	
