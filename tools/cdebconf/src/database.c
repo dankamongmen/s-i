@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.15 2002/11/23 00:37:24 barbier Exp $
+ * $Id: database.c,v 1.16 2002/11/23 20:45:53 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -276,7 +276,8 @@ static int question_db_is_visible(struct question_db *db, const char *name,
 		ret = DC_NO;
 
 	showold = getenv("DEBCONF_SHOWOLD");
-	if (showold != NULL && strcmp(showold, "false") == 0)
+	if (showold != NULL && strcmp(showold, "false") == 0 &&
+	    (q->flags & DC_QFLAG_SEEN) != 0)
 		ret = DC_NO;
 
     if (q != NULL)
