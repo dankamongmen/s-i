@@ -6,9 +6,9 @@
 OBJS=ddetect.o
 
 ifndef PROGS
-PROGS=memdetect diskdetect mdmdetect cddetect cpudetect ethdetect snddetect
+PROGS=memdetect diskdetect mdmdetect cddetect cpudetect ethdetect 
 endif
-HEADERS= snddetect.h cddetect.h mdmdetect.h
+HEADERS= cddetect.h mdmdetect.h
 
 INSTALL_DIR=$(DESTDIR)/usr/bin/
 CFLAGS=-Wall  -Os -fomit-frame-pointer 
@@ -23,16 +23,14 @@ all: lst2header $(HEADERS) $(OBJS) $(PROGS)
 	($(STRIP) $(PROG)) ; )	
 
 mdmdetect: mdmdetect.c ddetect.o
+#	$(CC) mdmdetect.c -o mdmdetect -lisapnp objs/modem.o objs/serial.o objs/utils.o ddetect.o objs/conv.o
 cddetect : cddetect.c ddetect.o
 ethdetect :ethdetect.c ddetect.o
 	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) ddetect.o
-snddetect: snddetect.c ddetect.o
 
 lst2header: lst2header.c
 	$(CC) lst2header.c -o lst2header -ldetect -lisapnp 
 
-snddetect.h: lst2header
-	-./lst2header -s > $@ 
 cddetect.h: lst2header
 	-./lst2header -c > $@ 
 mdmdetect.h: lst2header
@@ -46,36 +44,3 @@ install:
 	mkdir -p $(INSTALL_DIR)
 	$(INSTALL) $(PROGS) $(INSTALL_DIR)
 
-
-ifdef UC_LIBC
-
-UC_INC=/usr/home/davidw/debian/uclib/uC-libc/include/
-
-#CFLAGS=-g -Wall -nostdinc -I$(UC_INC) -I$(UC_INC)linux -I/usr/include
-CFLAGS=-g -Wall
-
-#LIBC=/usr/home/davidw/debian/uclib/uC-libc/libc.a
-
-OBJS=ddetect.o ddetect_nopassive.o
-
-%.o: %.c
-	$(CC) $(DEFS) $(CFLAGS) -c $< -o $@
-
-%:%.c %.h
-	$(CC) $(CFLAGS) $< -o $@  -ldetect -lisapnp $(LDFLAGS)
-	$(STRIP) $@	
-	@chmod +x $@ 
-	@size $@	
-
-
-ddetect: $(PROG).c $(OBJS)
-#	$(CC) -nostdlib -luC -ldetect ddetect.c -o ddetect	
-	$(LD) $(OBJS) $(LIBC) --static -o $(PROG) -L. -ldetect  -luc
-	$(STRIP) $(PROG)	
-	@chmod +x  $(PROG)
-	@size $(PROG)
-
-test: test.o
-	$(CC) -nostdlib -s -gc-sections test.o $(LIBC) -o test -lgcc
-
-endif

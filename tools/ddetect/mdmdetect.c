@@ -30,13 +30,11 @@ main (int argc, char *argv[])
   lst[i - 1].next = NULL;
 
 
-
   bus.pci = pci_detect (lst);
   bus.usb = usb_detect (lst);
   bus.serial = serial_detect (lst);
   if (!passive_detection)
-    bus.isa = isa_detect (lst);
-
+      bus.isa = isa_detect (lst);
   if (((modem = modem_detect (&bus)) != NULL) && (debug == 1))
     {
       printf ("bus:device:speed:module\n");
