@@ -1,4 +1,4 @@
-all:
+all: debian/templates
 
 debian/templates: Makefile debian/templates.in languagelist
 	languagenames=`grep -v "^#" languagelist | cut -d\; -f1 | tr "\n" "," | sed 's/,/, /g' | sed "s/, $$//g"`; \
