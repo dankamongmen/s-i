@@ -4,10 +4,6 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-ARCH=`udpkg --print-architecture`
-db_get debian-installer/kernel/subarchitecture
-SUBARCH="$RET"
-
 findfs () {
 	mount | grep "on /target${1%/} " | cut -d' ' -f1
 }
@@ -25,8 +21,8 @@ fi
 rootfs=$(mapdevfs $rootfs_devfs)
 bootfs=$(mapdevfs $bootfs_devfs)
 
-case "$ARCH","$SUBARCH" in
-	powerpc,chrp_pegasos)
+case "`archdetect`" in
+	powerpc/chrp_pegasos)
 		kernel=`ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%'`
 
 		kind=`echo $bootfs_devfs | sed -e 's%/dev/%%' -e 's%/host.*$%%'`
@@ -64,7 +60,7 @@ case "$ARCH","$SUBARCH" in
 		db_subst nobootloader/confirmation_powerpc_chrp_pegasos OF_BOOT_FILE "${boot}${kernel} root=${rootfs}"
 		db_input high nobootloader/confirmation_powerpc_chrp_pegasos || true
 	;;
-	arm,netwinder)
+	arm/netwinder)
 		kernel="/vmlinuz"
 		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNDEV "$bootfs"
 		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNFILE "$kernel"
