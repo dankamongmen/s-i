@@ -29,7 +29,8 @@ binary-arch: links debian/control
 	dh_testdir
 	dh_clean -k
 
-	for kernel in `grep '^$(ARCH)[ 	]' kernel-versions | awk '{print $$2 "-" $$3}'`; do \
+	set -e; \
+	for kernel in `grep '^$(ARCH)[ 	]' kernel-versions | awk '{print $$4 }'`; do \
 		echo $$kernel; \
 		name=`grep '^$(ARCH)[ 	]' kernel-names | awk '{print $$2 }'`; \
 		install -D -m 644 $(SOURCEDIR)/boot/$$name-$$kernel debian/kernel-image-$$kernel-di/boot/$$name; \
