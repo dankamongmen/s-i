@@ -16,14 +16,9 @@ binary-indep:
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_install --all preseed_command bin
-	dh_install --all 05preseed usr/lib/prebaseconfig.d
-	dh_install --all preseed.sh lib/preseed
+	dh_install
 	dh_installdebconf
-	set -e; \
-	for pkg in $(shell dh_listpackages); do \
-		(echo; po2debconf debian/common.templates ) \
-			>> debian/$$pkg/DEBIAN/templates; \
+	for pkg in file-preseed network-preseed; do \
 		cp debian/$$pkg.isinstallable debian/$$pkg/DEBIAN/isinstallable; \
 	done
 	dh_compress

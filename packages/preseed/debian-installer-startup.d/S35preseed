@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+. /lib/preseed/preseed.sh
+
+# Used by preseed functions.
+preseed_fetch () {
+	ln -s "$1" $2
+}
+preseed_relative () {
+	if [ -z "${1##/*}" ]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+if [ -e /preseed.cfg ]; then
+	preseed_location /preseed.cfg
+fi
