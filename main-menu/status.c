@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <search.h>
+#include <locale.h>
 
 /*
  * Read status file and generate and return a linked list of packages.
@@ -23,7 +24,15 @@ struct package_t *status_read(void) {
 		return 0;
 	}
 	
-	lingua = getenv("LINGUA"); /* Gross hack here. FIXME */
+/*	lingua = getenv("LINGUA");*/ /* Gross hack here. FIXME */
+	b = setlocale(LC_MESSAGES, "");
+	if (strcmp(b, "C") == 0)
+		lingua = strdup("en");
+	else {
+		lingua = (char *) malloc(3);
+		memcpy(lingua, b, 2);
+		lingua[2] = '\0';
+	}
 
 	while (fgets(buf, BUFSIZE, f) && !feof(f)) {
 		buf[strlen(buf)-1] = 0;
