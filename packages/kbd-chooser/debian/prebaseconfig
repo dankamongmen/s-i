@@ -10,6 +10,16 @@ then
 	exit 0
 fi
 
+# Install non-Unicode variants of Turkish keymaps
+if [ "$KEYMAP" = "trqu" ]; then
+	KEYMAP="trq"
+	db_set debian-installer/keymap $KEYMAP
+fi
+if [ "$KEYMAP" = "trfu" ]; then
+	KEYMAP="trf"
+	db_set debian-installer/keymap $KEYMAP
+]
+
 db_get debian-installer/serial-console
 if [ "$RET" = "false" ] ; then
 	apt-install console-tools console-data console-common 
