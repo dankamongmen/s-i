@@ -1677,7 +1677,7 @@ int set_charset(const char *charset) {
 			return 0;
 		}
 	}
-	di_error (PROGNAME ":unknown charset %s - ignoring charset request\n", charset);
+	di_error (":unknown charset %s - ignoring charset request\n", charset);
 	return 1;
 }
 
@@ -1747,26 +1747,26 @@ ksymtocode(const char *s) {
 
 		for (i = 0; i < 256 - 160; i++)
 			if (!strcmp(s, latin1_syms[i].name)) {
-				di_warning (PROGNAME ": assuming iso-8859-1 %s\n", s);
+				di_warning (": assuming iso-8859-1 %s\n", s);
 				return K(KT_LATIN, 160 + i);
 			}
 
 		for (i = 0; i < 256 - 160; i++)
 			if (!strcmp(s, iso_8859_15_syms[i].name)) {
-				di_warning (PROGNAME ": assuming iso-8859-15 %s\n", s);
+				di_warning (": assuming iso-8859-15 %s\n", s);
 				return K(KT_LATIN, 160 + i);
 			}
 
 		for (i = 0; i < 256 - 160; i++)
 			if (!strcmp(s, latin2_syms[i].name)) {
-				di_warning (PROGNAME ": assuming iso-8859-2 %s\n", s);
+				di_warning (": assuming iso-8859-2 %s\n", s);
 				return K(KT_LATIN, 160 + i);
 			}
 
 #ifdef CHARSET_ISO_8859_3
 		for (i = 0; i < 256 - 160; i++)
 			if (!strcmp(s, latin3_syms[i].name)) {
-				di_warning (PROGNAME ": assuming iso-8859-3 %s\n", s);
+				di_warning (": assuming iso-8859-3 %s\n", s);
 				return K(KT_LATIN, 160 + i);
 			}
 #endif
@@ -1774,13 +1774,13 @@ ksymtocode(const char *s) {
 #ifdef CHARSET_ISO_8859_4
 		for (i = 0; i < 256 - 160; i++)
 			if (!strcmp(s, latin4_syms[i].name)) {
-				di_warning (PROGNAME ": assuming iso-8859-4 %s\n", s);
+				di_warning (": assuming iso-8859-4 %s\n", s);
 				return K(KT_LATIN, 160 + i);
 			}
 #endif
 	}
 
-	di_warning (PROGNAME ": unknown keysym '%s'\n", s);
+	di_warning (": unknown keysym '%s'\n", s);
 
 	return -1;
 }
@@ -1815,6 +1815,6 @@ add_capslock(int code)
 		sprintf(buf, "0x%04x", code);
 		p = buf;
 	}
-	di_warning (PROGNAME ": plus before %s ignored\n", p);
+	di_warning (": plus before %s ignored\n", p);
 	return code;
 }

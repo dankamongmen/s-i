@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.12 2003/10/14 20:43:17 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.13 2003/10/31 22:55:54 mckinstry Exp $
  */
 
 #include "config.h"
@@ -60,7 +60,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 	 *     not that there is one at the moment.
 	 */
 	
-	res = grep ("/proc/bus/usb/drivers", "keyboard");
+	res = grep ("/proc/bus/usb/drivers", "usbkbd");
 	if (res < 0) {
 		if (DEBUG) 
 			di_log (DI_LOG_LEVEL_DEBUG, "mounting usbdevfs to look for kbd");		
@@ -77,7 +77,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 		close (2);
 		dup (serr);
 		mounted_fs = 1;
-		res = grep ("/proc/bus/usb/drivers", "keyboard");
+		res = grep ("/proc/bus/usb/drivers", "usbkbd");
 		if (res < 0) {
 			di_warning ("Failed to grep /proc/bus/usb/drivers");
 		}

@@ -86,10 +86,10 @@ install:
 	cp kbd-chooser $(DESTDIR)/usr/bin/kbd-chooser
 
 .PHONY: demo
-demo.templates: debian/templates
-	sed -e 's/_Description:/Description:/' -e '/^#/d' < debian/templates > demo.templates
+demo.templates: debian/kbd-chooser.templates
+	sed -e 's/_Description:/Description:/' -e '/^#/d' < $< > $@
 
-demo: demo.templates
+demo: demo.templates kbd-chooser
 	rm -f demo
 	ln -s kbd-chooser demo
 	DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./demo

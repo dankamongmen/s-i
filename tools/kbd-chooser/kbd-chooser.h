@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.10 2003/07/29 18:21:59 mckinstry Exp $
+ * $Id: kbd-chooser.h,v 1.11 2003/10/31 22:55:54 mckinstry Rel $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -42,13 +42,13 @@ typedef struct kbd_s {
 /* Some of the following will be linked in
  * via *-kbd.c
  */
-extern kbd_t *at_kbd_get (kbd_t *keyboards);
-extern kbd_t *usb_kbd_get (kbd_t *keyboards);
-extern kbd_t *mac_kbd_get (kbd_t *keyboards);
-extern kbd_t *sparc_kbd_get (kbd_t *keyboards);
-extern kbd_t *amiga_kbd_get (kbd_t *keyboards);
-extern kbd_t *serial_kbd_get (kbd_t *keyboards);
-extern kbd_t *atari_kbd_get (kbd_t *keyboards);
+extern kbd_t *at_kbd_get (kbd_t *keyboards,const char *subarch);
+extern kbd_t *usb_kbd_get (kbd_t *keyboards,const char *subarch);
+extern kbd_t *mac_kbd_get (kbd_t *keyboards,const char *subarch);
+extern kbd_t *sparc_kbd_get (kbd_t *keyboards,const char *subarch);
+extern kbd_t *amiga_kbd_get (kbd_t *keyboards,const char *subarch);
+extern kbd_t *serial_kbd_get (kbd_t *keyboards,const char *subarch);
+extern kbd_t *atari_kbd_get (kbd_t *keyboards,const char *subarch);
 
 extern int grep (const char *file, const char *string);
 
@@ -61,4 +61,8 @@ extern int grep (const char *file, const char *string);
 #define PREFERRED_KBD "at"
 #endif
 
+#ifndef PREFERRED_KBD
+#define PREFERRED_KBD "none"
 #endif
+
+#endif  /* KBD_CHOOSER_H */

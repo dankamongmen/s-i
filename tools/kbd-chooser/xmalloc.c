@@ -16,7 +16,7 @@ extern int line_nr;
 
 static void
 nomem(void) {
-	di_error (PROGNAME ": Out of memory\n");
+	di_error (": Out of memory\n");
 	exit(1);
 }
 
@@ -48,23 +48,21 @@ xstrdup(char *p) {
 /* fatal errors - change to varargs next time */
 void
 lkfatal(const char *s) {
-	di_error (PROGNAME ": %s:%d: %s\n", filename, line_nr, s);
+	di_error (" %s:%d: %s\n", filename, line_nr, s);
 	exit(1);
 }
 
 void
 lkfatal0(const char *s, int d) {
-	di_error( PROGNAME ": %s:%d: ", filename, line_nr);
+	di_error( " %s:%d: ", filename, line_nr );
 	di_error( s, d);
-	di_error("\n");
 	exit(1);
 }
 
 void
 lkfatal1(const char *s, const char *s2) {
-	di_error(PROGNAME ": %s:%d: ", filename, line_nr);
+	di_error("%s:%d: ", filename, line_nr);
 	di_error( s, s2);
-	di_error( "\n");
 	exit(1);
 }
 

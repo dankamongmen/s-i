@@ -595,7 +595,7 @@ addfunc(struct kbsentry kbs) {
 	char *p, *q, *r;
 
         if (kbs.kb_func >= MAX_NR_FUNC) {
-	        di_error (PROGNAME ": addfunc called with bad func %d\n",
+	        di_error (": addfunc called with bad func %d\n",
 			 kbs.kb_func);
 		exit(1);
 	}
@@ -638,7 +638,7 @@ static void
 compose(int diacr, int base, int res) {
         struct kbdiacr *p;
         if (accent_table_size == MAX_DIACR) {
-	        di_error ( PROGNAME " compose table overflow\n");
+	        di_error ( " compose table overflow\n");
 		exit(1);
 	}
 	p = &accent_table[accent_table_size++];
