@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.12 2000/12/12 05:13:36 tausq Exp $
+ * $Id: commands.c,v 1.13 2000/12/22 00:12:46 bug1 Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -262,7 +262,7 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	struct question *q;
-	struct questionvariable *var, *prevvar;
+	struct questionvariable;
 	char *variable;
 	int i;
 	char buf[1024];
@@ -297,8 +297,6 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 int command_register(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	struct question *q;
-	struct template *t;
 	CHECKARGC(== 2);
 	
 	return DC_NOTOK;
