@@ -439,7 +439,7 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 
   DISPLAY:
 	printlist (obj, q, count, choices_translated, tindex, selected);
-	printf(get_text(obj, "debconf/text-prompt-default", 
+	printf(get_text(obj, "debconf/text-prompt-default-string", 
 		"Prompt: '%c' for help, default=%s> "), CHAR_HELP, defval);
 	get_answer(answer, sizeof(answer));
 	if (answer[0] == CHAR_HELP && answer[1] == 0)
@@ -691,7 +691,7 @@ static int text_handler_string(struct frontend *obj, struct question *q)
 	const char *defval = question_getvalue(q, "");
 	while (1) {
 		if (defval)
-			printf(get_text(obj, "debconf/text-prompt-default", "Prompt: '%c' for help, default=%s> "), CHAR_HELP, defval);
+			printf(get_text(obj, "debconf/text-prompt-default-string", "Prompt: '%c' for help, default=%s> "), CHAR_HELP, defval);
 		else
 			printf(get_text(obj, "debconf/text-prompt", "Prompt: '%c' for help> "), CHAR_HELP);
 		fflush(stdout);
