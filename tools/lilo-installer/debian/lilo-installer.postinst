@@ -41,12 +41,18 @@ fi
 bootdev=`mapdevfs $bootdev`
 rootfs=`mapdevfs $rootfs`
 
-# serial support
-
-if grep -q console=ttyS /proc/cmdline; then
-    PORT=$(sed -e 's%.*console=ttyS%%' -e 's%,.*%%' /proc/cmdline)
-    SPEED=$(sed -e 's%.*console=ttyS[0-9]\+,%%' -e 's% .*%%' /proc/cmdline)
+# Use a serial console if current default console is a serial port.
+# default console is last listed
+defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
+if echo "${defconsole}" | grep -q console=ttyS; then
+    PORT=$(echo "${defconsole}" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
+    SPEED=$(echo "${defconsole}" | sed -e 's%^console=ttyS[0-9]\+,%%' -e 's% .*%%')
     SERIAL="${PORT},${SPEED}"
+
+    db_subst lilo-installer/serial-console PORT "ttyS${PORT}"
+    db_subst lilo-installer/serial-console SPEED "${SPEED}"
+    db_input medium lilo-installer/serial-console || [ $? -eq 30 ]
+    db_go || true
 fi
 
 #write out lilo.conf
