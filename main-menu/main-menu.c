@@ -150,6 +150,7 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	s = menutext;
 	
 	/* Make debconf show the menu and get the user's choice. */
+	debconf_command("TITLE", "Debian Installer Main Menu", NULL);
 	if (menudefault)
 		debconf_command("SET", MAIN_MENU, menudefault, NULL);
 	debconf_command("FSET", MAIN_MENU, "isdefault", "true", NULL);
