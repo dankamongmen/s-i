@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.2 2000/10/08 03:23:44 tausq Exp $ */
+/* $Id: status.c,v 1.3 2000/11/01 21:54:02 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -180,9 +180,10 @@ int status_merge(void *status, struct package_t *pkgs)
 	printf("(Updating database...)\n");
 	while (fgets(buf, BUFSIZE, fin) && !feof(fin))
 	{
+		buf[strlen(buf)-1] = 0; /* trim newline */
 		/* If we see a package header, find out if it's a package
 		 * that we have processed. if so, we skip that block for 
-		 * now (write it at the end. 
+		 * now (write it at the end).
 		 *
 		 * we also look at packages in the status cache and update
 		 * their status fields

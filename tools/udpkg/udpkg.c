@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.5 2000/11/01 20:39:47 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.6 2000/11/01 21:54:02 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -190,7 +190,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 {
 	int r = 1;
 	char *cwd = 0;
-	char *p, *q;
+	char *p;
 	int fd;
 	char buf[1024];
 	struct stat statbuf;
@@ -314,9 +314,7 @@ static int dpkg_install(struct package_t *pkgs)
 		}
 	
 	status_merge(status, pkgs);
-	/*
 	SYSTEM("rm -rf -- " DPKGCIDIR);
-	*/
 	return 0;
 }
 
