@@ -1,0 +1,70 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+db_get debian-installer/profile || true
+if [ "$RET" ]; then
+	PROFILE=$RET
+else
+	PROFILE=Workstation
+fi
+
+db_get netcfg/get_hostname 
+HOSTNAME=$RET
+
+db_get netcfg/get_domain
+FQDN=${HOSTNAME}.$RET
+
+echo "$HOSTNAME" > /target/etc/hostname
+echo "127.0.0.1 $FQDN $HOSTNAME localhost" > /target/etc/hosts
+
+
+if test "$PROFILE" = "Workstation"; then
+    cat > /target/etc/network/interfaces <<EOF
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+# The first network card - this entry was created during the Debian installation
+iface eth0 inet dhcp
+
+EOF
+elif test "$PROFILE" = "Server"; then
+    cat > /target/etc/network/interfaces <<EOF
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+# The first network card - this entry was created during the Debian installation
+auto eth0
+iface eth0 inet static
+    address 192.168.0.1
+    netmask 255.255.255.0
+
+EOF
+else 
+    cat > /target/etc/network/interfaces <<EOF
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+EOF
+
+fi
+
+chroot /target /sbin/grub-install '(hd0)'
+touch /target/boot/grub/menu.lst
+chroot /target /sbin/update-grub
+
+cp -a /var/lib/cdebconf /target/root
+mv /target/etc/inittab /target/etc/inittab.real
+cp /usr/share/prebaseconfig/inittab /target/etc/inittab
+umount -a
+/sbin/reboot
+

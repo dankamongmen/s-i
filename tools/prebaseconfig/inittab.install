@@ -1,0 +1,46 @@
+# /etc/inittab: init(8) configuration.
+#
+# WARNING: This file is installed by the Debian boot disks.
+# It is not meant to be used by default, but only to make
+# sure that certain configurations are done after the initial
+# boot into a new system. The real inittab is most likely
+# named /etc/inittab.real.
+#
+# $Id: inittab.install,v 1.1 2002/04/27 19:22:09 tfheen Exp $
+
+id:2:initdefault:
+si::sysinit:/etc/init.d/rcS
+~~:S:wait:/sbin/sulogin
+
+l0:0:wait:/etc/init.d/rc 0
+l1:1:wait:/etc/init.d/rc 1
+l2:2:wait:/etc/init.d/rc 2
+l3:3:wait:/etc/init.d/rc 3
+l4:4:wait:/etc/init.d/rc 4
+l5:5:wait:/etc/init.d/rc 5
+l6:6:wait:/etc/init.d/rc 6
+
+ca:12345:ctrlaltdel:/sbin/shutdown -t1 -r now
+kb::kbrequest:/bin/echo "Keyboard Request--edit /etc/inittab to let this work."
+pf::powerwait:/etc/init.d/powerfail start
+pn::powerfailnow:/etc/init.d/powerfail now
+po::powerokwait:/etc/init.d/powerfail stop
+
+1:2345:respawn:/usr/sbin/termwrap /usr/sbin/base-config </dev/tty1 >/dev/tty1 2>&1
+2:23:respawn:/sbin/getty 38400 tty2
+3:23:respawn:/sbin/getty 38400 tty3
+
+# For serial-console installs (will be edited by base configuration)
+#
+#T0:2345:respawn:/usr/sbin/termwrap /usr/sbin/base-config </dev/ttyS0 >/dev/ttyS0 2>&1
+#T1:2345:respawn:/usr/sbin/termwrap /usr/sbin/base-config </dev/ttyS1 >/dev/ttyS1 2>&1
+#T2:2345:respawn:/usr/sbin/termwrap /usr/sbin/base-config </dev/ttyS2 >/dev/ttyS2 2>&1
+#T3:2345:respawn:/usr/sbin/termwrap /usr/sbin/base-config </dev/ttyS3 >/dev/ttyS3 2>&1
+#T4:2345:respawn:/usr/sbin/termwrap /usr/sbin/base-config </dev/ttyS4 >/dev/ttyS4 2>&1
+#T5:2345:respawn:/usr/sbin/termwrap /usr/sbin/base-config </dev/ttyS5 >/dev/ttyS5 2>&1
+# T0:23:respawn:/sbin/getty -L ttyS0 9600 vt100
+# T1:23:respawn:/sbin/getty -L ttyS1 9600 vt100
+# T2:23:respawn:/sbin/getty -L ttyS2 9600 vt100
+# T3:23:respawn:/sbin/getty -L ttyS3 9600 vt100
+# T4:23:respawn:/sbin/getty -L ttyS4 9600 vt100
+# T5:23:respawn:/sbin/getty -L ttyS5 9600 vt100
