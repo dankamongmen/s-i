@@ -7,6 +7,10 @@
 #include <limits.h>
 #include <wchar.h>
 
+#ifdef HAVE_LIBTEXTWRAP
+#include <textwrap.h>
+#endif
+
 int strcountcmp(const char *s1, const char *e1, const char *s2, const char *e2)
 {
 	for (; s1 != e1 && s2 != e2 && *s1 == *s2; s1++, s2++) ;
@@ -76,7 +80,7 @@ void strvacat(char *buf, size_t maxlen, ...)
 int strparsecword(char **inbuf, char *outbuf, size_t maxlen)
 {
 	char buffer[maxlen];
-	char *buf = buffer;
+char *buf = buffer;
 	char *c = *inbuf;
 	char *start;
 
@@ -298,6 +302,35 @@ void strescape(const char *inbuf, char *outbuf, const size_t maxlen, const int q
 
 int strwrap(const char *str, const int width, char *lines[], int maxlines)
 {
+#ifdef HAVE_LIBTEXTWRAP
+	textwrap_t p;
+	int j;
+	char *s;
+	char *s0;
+	char *t;
+
+	textwrap_init(&p);
+	textwrap_columns(&p, width);
+	s0 = s = textwrap(&p, str);
+	for (j=0; j<maxlines; j++)
+	{
+		t = strchr(s, '\n');
+		if (t == NULL)
+		{
+			lines[j] = (char *)malloc(strlen(s) + 1);
+			strcpy(lines[j], s);
+			free(s0);
+			return j + 1;
+		}
+		else
+		{
+			lines[j] = (char *)malloc(t - s + 1);
+			strncpy(lines[j], s, t-s); lines[j][t-s] = 0;
+			s = t + 1;
+		}
+	}
+	return j;
+#else
 	/* "Simple" greedy line-wrapper */
 	int len = STRLEN(str);
 	int l = 0;
@@ -347,6 +380,7 @@ int strwrap(const char *str, const int width, char *lines[], int maxlines)
 		if (++l >= maxlines) break;
 	}
 	return l;
+#endif /* HAVE_LIBTEXTWRAP */
 }
 
 int strlongest(char **strs, int count)

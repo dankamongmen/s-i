@@ -83,6 +83,12 @@ AC_ARG_WITH(default-frontend, [  --with-default-frontend default frontend to use
  esac])
 AC_SUBST(DEFAULT_FRONTEND)
 
+dnl whether to use libtextwrap
+AC_ARG_WITH(textwrap, [  --with-textwrap         use libtextwrap for line-folding],
+[if test "x$withval" = "xyes" ; then
+   AC_CHECK_LIB(textwrap, textwrap_init)
+ fi])
+
 dnl logging to syslog (should be configurable in config file
 SYSLOG_LOGGING=
 AC_ARG_WITH(syslog-logging, [  --with-syslog-logging         enable logging to syslog],
