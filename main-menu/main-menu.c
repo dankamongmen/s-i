@@ -148,7 +148,8 @@ struct package_t *show_main_menu(struct package_t *packages) {
 		}
 	}
 	/* Trim trailing ", " */
-	s = s - 2;
+	if (s > menutext)
+		s = s - 2;
 	*s = 0;
 	s = menutext;
 	
