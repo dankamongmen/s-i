@@ -69,7 +69,7 @@ static int channel_sort (const void *_s1, const void *_s2)
 static bool get_networktype (void)
 {
 	char *ptr;
-	int ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_networktype", &ptr);
+	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "choose_networktype", &ptr);
 
 	if (ret)
 		return false;
@@ -220,11 +220,11 @@ static bool get_channel (void)
 	if (!items)
 	{
 		if (type == type_ctc)
-			my_debconf_input ("high", TEMPLATE_PREFIX "ctc/no", &ptr);
+			my_debconf_input ("critical", TEMPLATE_PREFIX "ctc/no", &ptr);
 		else if (type == type_lcs)
-			my_debconf_input ("high", TEMPLATE_PREFIX "lcs/no", &ptr);
+			my_debconf_input ("critical", TEMPLATE_PREFIX "lcs/no", &ptr);
 		else if (type == type_qeth)
-			my_debconf_input ("high", TEMPLATE_PREFIX "qeth/no", &ptr);
+			my_debconf_input ("critical", TEMPLATE_PREFIX "qeth/no", &ptr);
 		return false;
 	}
 
@@ -252,7 +252,7 @@ static bool get_channel (void)
 	debconf_subst (client, ptr2, "choices", ptr);
 	free (ptr);
 	debconf_fset (client, ptr2, "seen", "false");
-	debconf_input (client, "medium", ptr2);
+	debconf_input (client, "critical", ptr2);
 	debconf_go (client);
 	debconf_get (client, ptr2);
 
@@ -266,7 +266,7 @@ static bool get_channel (void)
 static bool get_ctc_protocol (void)
 {
 	char *ptr;
-	int ret = my_debconf_input ("medium", TEMPLATE_PREFIX "ctc/protocol", &ptr);
+	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "ctc/protocol", &ptr);
 	if (ret)
 		return false;
 
@@ -284,7 +284,7 @@ static bool get_ctc_protocol (void)
 static bool get_qeth_lcs_port (void)
 {
 	char *ptr;
-	int ret = my_debconf_input ("high", TEMPLATE_PREFIX "qeth_lcs/port", &ptr);
+	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "qeth_lcs/port", &ptr);
 	if (ret)
 		return false;
 
@@ -298,7 +298,7 @@ static bool get_qeth_portname (void)
 	char *ptr;
 	int ret, j, k;
 
-	ret = my_debconf_input ("high", TEMPLATE_PREFIX "qeth/portname", &ptr);
+	ret = my_debconf_input ("critical", TEMPLATE_PREFIX "qeth/portname", &ptr);
 	if (ret)
 		return false;
 
