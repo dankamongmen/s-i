@@ -41,19 +41,24 @@ while (<KVERS>) {
 	chomp;
 	next if /^#/ || ! length;
 
-	my ($arch, $kernelversion, $flavour, $installedname, $builddep)=split(' ', $_, 5);
+	my ($arch, $kernelversion, $flavour, $installedname, $multkern, $builddep)=split(' ', $_, 5);
 	if (! length $arch || ! length $kernelversion ||
 	    ! length $installedname || ! length $flavour) {
 		die "parse error";
 	}
 	next unless $arch eq $hostarch;
 
+	my $extraname="";
+	if ($multkern) {
+		$extraname="-$kernelversion-$flavour";
+	}
+	
 	doit("install", "-D", "-m", 644,
 		"$sourcedir/boot/$kname-$installedname",
-		"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname");
+		"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname$extraname");
 	doit("install", "-D", "-m", 644,
 		"$sourcedir/boot/System.map-$installedname",
-		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map");
+		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname");
 	doit("./copy-modules", $kernelversion, $flavour, $installedname);
 	doit("./find-dups", "$kernelversion-$flavour");
 }
