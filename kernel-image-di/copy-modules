@@ -4,20 +4,24 @@
 # control file, control.out. At the same time, it populates temporary
 # directories with the appropriate set of modules.
 #
-# This debian/control is rather special. It has two types of packages in
-# it. The first 1 package in the file is a kernel image, which will be built
-# with make-kpkg. The next is a kernel image udeb. All of the remainder are
-# kernel module udebs.
+# The debian/control is rather special. The first package in the file is a
+# kernel image, which will be built with make-kpkg. The next is a kernel image
+# udeb. All of the remainder are kernel module udebs.
 #
 # All occurrances of ${kernel:Version} are replaced with the version of the
 # kernel that is being built.
 #
-# To specify what modules go in the kernel module udebs, list the modules in
-# its Provides: line (these are technically legal package names, more or less
-# -- good enough for the purposes of the debian installer). Each module so
-# listed is found, and copied into the appropriate location in the temporary
-# build directory. If a module is not found, the provides entry for it is
-# removed.
+# To specify what modules no in the kernel module udebs, list them in
+# files named debian/<packagename>.list, where <packagename> is
+# the package name from the control file minus the kernel version number.
+# These files can contain comments, and eventually will be able to 
+# have arch-specific info flagged in them too.
+#
+# This program keeps track of dependancies between modules and module
+# udeb packages. So if package foo contains module foo.o, and foo.o needs
+# bar.o to function, bar.o will automatically be pulled into package foo.
+# On the other hand, if package foo depends on package bar that contains
+# bar.o, then this program will notice that and do nothing special.
 
 use v5.6;
 use strict;
@@ -32,10 +36,44 @@ my @files=map { s/$kdir//; s/\n//; $_ } `find $kdir -type f -name '*.o'`;
 my %filename=map { m#.*/([^/]*)# => $_ } @files;
 my @available=map { s#.*/##; $_ } @files;
 
+# Find and parse a modules.dep file, and turn it into a hash of modules,
+# with the hash values being arrays of the modules they depend on.
+my %moddep;
+sub basename {
+	my $fn=shift;
+	$fn=~s:.*/::;
+	return $fn;
+}
+sub depends {
+	my $module=basename(shift) || return;
+	if (exists $moddep{$module}) {
+		warn "Collision detected; there is a file named $module in 2 seperate directories\n";
+		warn "combining the dependancies of both...\n";
+	}
+	my $deps=shift;
+	$deps=~s/\\//sg; # continuation markers
+	$moddep{$module}=[map {basename $_} split(' ', $deps)];
+}
+my $module='';
+my $deps='';
+my $depfile=`find $kdir -type f -name modules.dep`;
+open (DEP, $depfile) or die "$depfile: $!"; 
+while (<DEP>) {
+	if (/.*:/) {
+		depends($module => $deps);
+		($module, $deps)=split(':', $_, 2);
+	}
+	else {
+		$deps.=$_;
+	}
+}
+depends($module => $deps);
+close DEP;
+
+# Process the control file, and begin to write out the processed version.
 $/="\n\n"; # read in a stanza at a time
 open IN, "debian/control" or die "debian/control: $!";
 open OUT, ">debian/control.out" or die "debian/control.out: $!";
-
 my $stanza;
 
 # Source stanza and then kernel-image stanzas.
@@ -45,52 +83,112 @@ for (1..3) {
 	print OUT $stanza;
 }
 
-# Now the modules.
+# Now read in all the module packages and store their stanzas in this hash.
+my %stanzas;
+# Also, build up a hash of package name and the things it depends on as we go.
+my %packagedep;
+# And also, read in the debian/package.list files and parse them,
+# generating a list of the modules that belong in each package.
+my %packagemodules;
 while ($stanza = <IN>) {
 	$stanza =~ s/\$\{kernel:Version\}/$kvers-$flavour/g;
+
 	my ($package) = $stanza =~ /^Package:\s+(.*)/m;
-	if ($stanza =~ /^Provides:\s+(.*)/m) {
-		my @modules;
-		foreach my $module (split(/,\s+/, $1)) {
-			# Note use of grep here allows regexps to be
-			# used to specify modules.
+	$stanzas{$package}=$stanza;
+	
+	my ($deps) = $stanza =~ /^Depends:\s+(.*)/m;
+	# Ignore dependancy versioning.
+	$packagedep{$package} = [map {s/\(.*\)//;$_} split(/,\s/, $deps)];
+
+	my ($shortpackage)=$package=~m/(.*)-$kvers-$flavour/;
+	open (MOD, "debian/$shortpackage.list") or
+		die "debian/$shortpackage.list: $!";
+	my @list;
+	while (<MOD>) {
+		s/#.*//; # comments
+		# TODO: add tags for modules that are only needed
+		# for a given arch here..
+		#next if does_not_match_build_arch;
+
+		foreach my $module (split) {
 			if (grep(/$module/, @available)) {
-				push @modules, grep(/$module/, @available);
+				# Note use of grep here allows regexps to be
+				# used to specify modules.
+				push @list, grep(/$module/, @available);
 			}
 			else {
 				warn "$package: $module is not available; skipping\n";
 			}
 		}
-		if (@modules) {
-			# Make directory structure.
-			my %dirs;
-			foreach my $module (@modules) {
-				$_=$filename{$module};
-				s#[^/]*$##;
-				$dirs{$_}=1;
-				$dirs{$_}=1 while s![^/]*/$!! and $_;
+	}
+	close MOD;
+	$packagemodules{$package}=[@list];
+}
+close IN;
+
+# Now check the module dependancies against the list of modules in each
+# package, and make sure all module dependancies are met. Keeping
+# in mind package dependancies too, of course.
+sub modules_from {
+	my $package=shift;
+	my %seen=@_;
+
+	# Guard against loops.
+	if ($seen{$package}) {
+		die "package dependancy loop detected at $package\n";
+	}
+	$seen{$package}=1;
+	
+	# If a package contians no modules, it is not going to be built.
+	# So even if it depends on other packages, we just abort, since
+	# those dependancies will never see the light of day.
+	return unless $packagemodules{$package};
+	
+	my @ret=@{$packagemodules{$package}};
+	foreach my $dep (@{$packagedep{$package}}) {
+		push @ret, modules_from($dep, %seen);
+	}
+	return @ret;
+}
+my $bad=0;
+foreach my $package (keys %packagemodules) {
+	foreach my $module (@{$packagemodules{$package}}) {
+		foreach my $dep (@{$moddep{$module}}) {
+			if (! grep { $_ eq $dep } modules_from($package)) {
+				$bad++;
+				warn "$package: $module depends on $dep, which is not included.\n";
 			}
-			mkdir "debian/$package";
-			mkdir "debian/$package/$_" foreach sort keys %dirs;
-			# Copy in the modules.
-			foreach (@modules) {
-				system "cp", $kdir.$filename{$_}, 
-					"debian/$package/$filename{$_}";
-			}
-			# Set the Provides: line to list whatever was
-			# actually installed.
-			$stanza =~ s{^Provides:\s+.*}{
-				"Provides: ".join(', ',
-					map { s:.*/::; $_ } @modules)
-			}em;
-		}
-		else {
-			warn "$package: none of the provided modules are available!\n";
-			next;
 		}
 	}
+}
+die "Module dependancies not satisfied; aborting.\n" if $bad;
 
-	print OUT $stanza;
+# Write out the remainder of the control file, skipping
+# packages that have no modules at all. At the same time, build up
+# the directory structure of the package, and copy in its modules.
+foreach my $package (keys %packagemodules) {
+	if (! @{$packagemodules{$package}}) {
+		warn "$package: would be empty; skipping!\n";
+		next;
+	}
+
+	print OUT $stanzas{$package};
+
+	# Make directory structure.
+	my %dirs;
+	foreach my $module (@{$packagemodules{$package}}) {
+		$_=$filename{$module};
+		s#[^/]*$##;
+		$dirs{$_}=1;
+		$dirs{$_}=1 while s![^/]*/$!! and $_;
+	}
+	mkdir "debian/$package";
+	mkdir "debian/$package/$_" foreach sort keys %dirs;
+	
+	# Copy in the modules.
+	foreach my $module (@{$packagemodules{$package}}) {
+		system "cp", $kdir.$filename{$module}, 
+			"debian/$package/$filename{$module}";
+	}
 }
 close OUT;
-close IN;

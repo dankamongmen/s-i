@@ -15,14 +15,11 @@ get away with using ${kernel:Version} substitutions everywhere in it,
 including in package names. The first package in the control file is the
 kernel-image.deb to build. The second is the kernel-image.udeb to build
 (this contains only a vmlinu[xz] file). All remaining packages are module
-.udebs, which contain a logical set of modules. The Provides: field
-lists the .o files which go in the udeb. If a particular .o file is not
-available for some reason, it will be skipped with a warning. If every .o
-file in a given package is skipped, the entire package is skipped too.
+.udebs, which each contain a set of modules.
 
-We will probably move the data from Provides: out into a set of files,
-as the current method is not aging very well, and it feels too much like a
-hack.
+Files named debian/package.list list the modules that go in each module
+udeb. The build system will make sure that you don't have broken module
+dependancies.
 
 If you are a porter, make a new config.$ARCH for your architecture.
 If you need various flavors, talk to JoeyH, a mechanism for these is not

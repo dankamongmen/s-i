@@ -2,7 +2,7 @@ Source: kernel-image-di
 Section: debian-installer
 Priority: extra
 Maintainer: Joey Hess <joeyh@debian.org>
-Standards-Version: 3.5.0.0
+Standards-Version: 3.5.1.0
 Build-Depends: debhelper (>= 2.1.18), dpkg-dev (>= 1.7.0), kernel-source-2.4.1, kernel-package
 
 Package: kernel-image-${kernel:Version}
@@ -25,37 +25,32 @@ Description: Linux kernel binary image for the Debian installer
  a usable kernel for your full Debian system.
 
 Package: nic-modules-${kernel:Version}
-Depends: kernel-image-${kernel:Version}
+Depends: kernel-image-${kernel:Version}, isa-pnp-modules-${kernel:Version}
 Architecture: any
-Provides: 3c501.o, 3c503.o, 3c505.o, 3c507.o, 3c509.o, 3c515.o, 3c59x.o, 82596.o, eepro100.o, via-rhine.o, ne.o, ne2k-pci.o, tulip.o, 8390.o
 Description: Common NIC drivers
  This package contains common NIC drivers for the linux kernel.
 
 Package: serial-modules-${kernel:Version}
 Depends: kernel-image-${kernel:Version}
 Architecture: any
-Provides: generic_serial.o
 Description: Serial drivers
  This package contains serial drivers for the linux kernel.
 
 Package: ppp-modules-${kernel:Version}
 Depends: serial-modules-${kernel:Version}, kernel-image-${kernel:Version}
 Architecture: any
-Provides: ppp_generic.o, ppp_async.o, ppp_synctty.o, ppp_deflate.o, pppox.o, pppoe.o
 Description: PPP drivers
  This package contains PPP drivers for the linux kernel.
 
 Package: isa-pnp-modules-${kernel:Version}
 Depends: kernel-image-${kernel:Version}
 Architecture: any
-Provides: isa-pnp.o
 Description: isa-pnp drivers
  This package contains isa-pnp drivers for the linux kernel.
 
 Package: packet-socket-${kernel:Version}
 Depends: kernel-image-${kernel:Version}
 Architecture: any
-Provides: af_packet.o
 Description: packet protocol driver
  This package contains the packet socket driver, used by dhcp and other
  things that need raw network device access.
