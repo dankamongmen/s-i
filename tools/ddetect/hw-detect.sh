@@ -88,9 +88,10 @@ discover_hw () {
 
 # Some pci chipsets are needed or there can be DMA or other problems.
 get_ide_chipset_info() {
-    for ide_module in /lib/modules/*/kernel/drivers/ide/pci/*.o; do
+    for ide_module in /lib/modules/*/kernel/drivers/ide/pci/*.o \
+		/lib/modules/*/kernel/drivers/ide/pci/*.ko; do
     	if [ -e $ide_module ]; then
-		baseidemod=$(echo $ide_module | sed s/\.o$// | sed 's/.*\///')
+		baseidemod=$(echo $ide_module | sed -re s/\.k?o$// | sed 's/.*\///')
 		echo "$baseidemod:IDE chipset support"
     	fi
     done
@@ -177,7 +178,7 @@ if [ "$count" != 0 ]; then
 	        db_progress INFO hw-detect/load_progress_step
 	        log "Trying to load module '$module'"
 	
-	        if find /lib/modules/`uname -r`/ | grep -q /${module}\\.o
+	        if find /lib/modules/`uname -r`/ | grep -q /${module}\\.k?o
 	        then
 	            if load_modules "$module"
 	            then
