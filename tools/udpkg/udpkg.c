@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.30 2002/11/13 19:17:41 sjogren Exp $ */
+/* $Id: udpkg.c,v 1.31 2002/11/21 21:21:59 bdale Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -38,6 +38,8 @@ int dpkg_print_architecture()
 {
 #if defined(__i386__)
         printf("i386\n");
+#elif defined(__ia64__)
+        printf("ia64\n");
 #elif defined(__s390__)
         printf("s390\n");
 #else
