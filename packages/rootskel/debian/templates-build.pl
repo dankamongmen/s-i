@@ -2,6 +2,9 @@
 use strict;
 use warnings;
 
+die "must specify arch" if not defined $ARGV[0];
+my $arch = $ARGV[0];
+
 my %template;
 $template{Fields} = [];
 $template{'Description-Long'} = "";
@@ -10,9 +13,8 @@ sub print_template {
 	foreach ( @{$template{Fields}} ) {
 		print $_ . ": ";
 		if ( ref $template{$_} eq "HASH" ) {
-			if ( defined $ARGV[0] &&
-			     defined $template{$_}->{$ARGV[0]} ) {
-				print $template{$_}->{$ARGV[0]};
+			if ( defined $template{$_}->{$arch} ) {
+				print $template{$_}->{$arch};
 			} else {
 				print $template{$_}->{default};
 			}

@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
 build: build-stamp debian/templates
 build-stamp:
 	dh_testdir
@@ -9,7 +11,7 @@ build-stamp:
 	touch $@
 
 debian/templates: debian/templates-arch
-	debian/templates-build.pl $(ARCH) < $< > $@
+	debian/templates-build.pl $(DEB_HOST_ARCH) < $< > $@
 
 clean:
 	dh_testdir
