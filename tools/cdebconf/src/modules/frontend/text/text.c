@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.44 2003/10/08 21:08:39 barbier Exp $
+ * $Id: text.c,v 1.45 2003/10/08 21:40:19 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -220,9 +220,9 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 		else if (strcasecmp(buf, get_text(obj, "debconf/no", "No")) == 0)
 			ans = 0;
 #if defined(__s390__) || defined (__s390x__)
-		else if (defval && (strcmp(buf, "\n") == 0 || strcmp(buf, ".\n") == 0))
+		else if ((buf[0] == 0 || (buf[0] == '.' && buf[1] == 0)) && defval != 0)
 #else
-		else if (defval && strcmp(buf, "\n") == 0)
+		if (buf[0] == 0 && defval != 0)
 #endif
 			ans = def;
 	} while (ans < 0);
@@ -474,10 +474,11 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 				i, count);
 	    }
 	    fgets(answer, sizeof(answer), stdin);
+	    CHOMP(answer);
 #if defined(__s390__) || defined (__s390x__)
-	    if (answer[0] == '\n' || (answer[0] == '.' && answer[1] == '\n'))
+	    if (answer[0] == 0 || (answer[0] == '.' && answer[1] == 0))
 #else
-	    if (answer[0] == '\n')
+	    if (answer[0] == 0)
 #endif
 	        choice = def;
 	    else
