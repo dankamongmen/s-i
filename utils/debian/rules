@@ -1,13 +1,5 @@
 #!/usr/bin/make -f
 
-ARCH_PACKAGES=$(shell dh_listpackages -a)
-INDEP_PACKAGES=$(shell dh_listpackages -i)
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-
-# Make debhelper not generate any maint scripts.
-export DH_OPTIONS=-n
-
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -19,7 +11,6 @@ clean:
 	dh_testroot
 	rm -f build-stamp
 	-$(MAKE) clean
-
 	dh_clean
 
 binary-indep: build
@@ -35,12 +26,9 @@ binary-indep: build
           cp -a $$file debian/di-utils-terminfo/$$file; \
         done
 	#$(MAKE) devicefiles  DEVDIR=debian/di-utils-devicefiles
-	# v4 mode marks conffiles, so use v3
-	DH_COMPAT=3 dh_installdeb -i
-	$(foreach PACKAGE, $(INDEP_PACKAGES), \
-	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_all.udeb; \
-	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_all.udeb; \
-	)
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_builddeb -i
 
 binary-arch: build
 	dh_testdir
@@ -55,10 +43,8 @@ binary-arch: build
 	dh_installdeb -a
 	dh_strip -a # should come after dh_installdeb; binary postinst
 	dh_shlibdeps -a
-	$(foreach PACKAGE, $(ARCH_PACKAGES), \
-	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
-	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
-	)
+	dh_gencontrol -a
+	dh_builddeb -a
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary
