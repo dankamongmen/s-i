@@ -20,7 +20,12 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 
-	./configure --prefix=/usr --sysconfdir=/etc --enable-small
+	if ./configure --prefix=/usr --sysconfdir=/etc --enable-small ; then \
+		: ; \
+	else \
+		echo "Dump of config.log: " ; cat config.log ; echo ; \
+		exit 1 ; \
+	fi
 
 	touch configure-stamp
 
