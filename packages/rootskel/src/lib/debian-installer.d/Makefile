@@ -32,9 +32,9 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
 endif
 
 files = \
+	S10frontend \
 	S20templates \
 	S25env2debconf \
-	S50frontend \
 	S50priority
 
 files += \
