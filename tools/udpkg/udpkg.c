@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.13 2000/11/06 21:21:01 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.14 2000/11/06 21:29:01 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -373,10 +373,13 @@ int main(int argc, char **argv)
 			memset(p, 0, sizeof(struct package_t));
 			if (**argv == '/')
 				p->file = *argv;
-			else
+			else if (opt != 'c')
 			{
 				p->file = malloc(strlen(cwd) + strlen(*argv) + 2);
 				sprintf(p->file, "%s/%s", cwd, *argv);
+			}
+			else {
+				p->package = strdup(*argv);
 			}
 			p->next = packages;
 			packages = p;
