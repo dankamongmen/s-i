@@ -749,7 +749,10 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     /* FIXME Should use fstype for /, not DEFAULT_FS */
     if (mount(find_partition_by_mountpoint(mountmap,"/"), 
 	      "/target", DEFAULT_FS, MS_MGC_VAL, NULL) == -1)
-        autopartkit_error(1, strerror(errno));
+        autopartkit_error(1,
+			  "Unable to mount '%' on '/target' as fstype %s: %s",
+			  find_partition_by_mountpoint(mountmap,"/"),
+			  DEFAULT_FS, strerror(errno));
     log_line();
     
     /* Find and turn on swap */
@@ -839,7 +842,11 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 	make_path(tmpmnt, 0755);
 	if (mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
 		  MS_MGC_VAL, NULL) == -1)
-	    autopartkit_error(1, strerror(errno));
+	    autopartkit_error(1,
+			      "Unable to mount '%' on '%s' as fstype %s: %s",
+			      mountmap[i].devpath, tmpmnt,
+			      mountmap[i].mountpoint->fstype,
+			      strerror(errno));
 	free(tmpmnt);
     }
 
