@@ -61,6 +61,15 @@ binary-udebs: build
 	dh_testdir
 	dh_testroot
 	
+	install -d debian/kernel-image-$(KVERS)-$(FLAVOUR)-udeb/boot
+	# Copy in the kernel image. Since make-kpkg has complex logic about
+	# what file is the kernel image that I do not care to duplicate,
+	# I use a nasty little hack to make its rules file echo the
+	# variable. I have talked to Manoj, and a better method may be
+	# forthcoming.
+	cd kernel-source-$(KVERS); \
+		../get-kernel-image DEST=$(shell pwd)/debian/kernel-image-$(KVERS)-$(FLAVOUR)-udeb/boot/vmlinuz
+	
 	cd kernel-source-$(KVERS); \
 		FLAVOUR=di make INSTALL_MOD_PATH=`pwd`/modules modules_install
 	# Actually installs all the modules into place, and
@@ -70,17 +79,6 @@ binary-udebs: build
 		mv -f debian/control debian/control.orig; \
 	fi
 	mv -f debian/control.out debian/control
-
-	install -d debian/tmp/kernel-image-$(KVERS)-$(FLAVOUR)-udeb/boot
-	# Copy in the kernel image. Since make-kpkg has complex logic about
-	# what file is the kernel image that I do not care to duplicate,
-	# I use a nasty little hack to make its rules file echo the
-	# variable. I have talked to Manoj, and a better method may be
-	# forthcoming.
-	cp kernel-source-$(KVERS)/`\
-		  echo -e "include debian/rules\nall:\n\techo $$(kimagesrc)" | \
-		  make -f - 2>/dev/null | tail -1` \
-		debian/tmp/kernel-image-$(KVERS)-$(FLAVOUR)-udeb/boot
 	
 	dh_compress
 	dh_fixperms
