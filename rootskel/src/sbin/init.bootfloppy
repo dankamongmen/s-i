@@ -5,6 +5,9 @@
 #
 # Throughout we use BOOT_DEBUG to turn on debugging. 1 = minimal,
 # 2 = set -x, with 3 you'll get shells in strategic places.
+#
+# INSTALL_MEDIA_DEV can be passed as a boot parameter to force only 
+# one device or set of devices to be scanned.
 
 debugshell () {
 	if [ "$BOOT_DEBUG" -gt 2 ]; then
@@ -17,21 +20,33 @@ if [ "$BOOT_DEBUG" -gt 1 ]; then
 	set -x
 fi
 
+if [ -n "$INSTALL_MEDIA_DEV" ] && echo "$INSTALL_MEDIA_DEV" | grep -qv floppy; then
+	NO_FLOPPY=1
+fi
+if [ -n "$INSTALL_MEDIA_DEV" ] && echo "$INSTALL_MEDIA_DEV" | grep -qv scsi; then
+	NO_SCSI=1
+fi
+
 mount -t proc proc proc
 mount -t devfs devfs dev
 
-modprobe vfat
-modprobe loop
+modprobe vfat >/dev/null
+modprobe loop >/dev/null
 
-# Hardware detection.
-modprobe floppy
-if [ -x /usr/sbin/usb-discover ]; then
-	/usr/sbin/usb-discover
+debugshell "before hardware detection"
+
+if [ ! "$NO_FLOPPY" ]; then
+	modprobe floppy >/dev/null
 fi
-# This is currently needed or usb-storage won't load (for ide_fix_driveid).
-modprobe ide-core
-modprobe usb-storage
-modprobe sd_mod
+if [ ! "$NO_SCSI" ]; then
+	if [ -x /usr/sbin/usb-discover ]; then
+		/usr/sbin/usb-discover
+	fi
+	# This is currently needed or usb-storage won't load (for ide_fix_driveid).
+	modprobe ide-core >/dev/null
+	modprobe usb-storage >/dev/null
+	modprobe sd_mod >/dev/null
+fi
 
 debugshell "after hardware detection"
 
@@ -67,11 +82,15 @@ while [ "$LOADED" = 0 ]; do
 		# It's done each time through the loop as USB devices may
 		# be inserted at any time.
 		DEVS=""
-		if [ -d dev/floppy ]; then
-			DEVS=dev/floppy/?
-		fi
-		if [ -d /dev/scsi ]; then
-			DEVS="$DEVS `find /dev/scsi`"
+		if [ -z "$INSTALL_MEDIA_DEV" ]; then
+			if [ -d /dev/floppy ]; then
+				DEVS=/dev/floppy/?
+			fi
+			if [ -d /dev/scsi ]; then
+				DEVS="$DEVS `find /dev/scsi`"
+			fi
+		else
+			DEVS="`find $INSTALL_MEDIA_DEV`"
 		fi
 		
 		for dev in $DEVS; do
@@ -83,6 +102,13 @@ while [ "$LOADED" = 0 ]; do
 					if [ -e floppy/initrd.gz -a ! -e floppy/linux ]; then
 						MOUNTED=1
 						echo " mounted."
+
+						# Export a variable
+						# pointing to the device.
+						# This is used by eg, the
+						# floppy retreiver.
+						INSTALL_MEDIA_DEV=$dev
+						export INSTALL_MEDIA_DEV
 					else
 						umount floppy || echo "umount failed!"
 					fi
@@ -98,20 +124,30 @@ while [ "$LOADED" = 0 ]; do
 		echo $OLD_PRINTK > /proc/sys/kernel/printk
 	fi
 	
-	# TODO progress display, this can take quite some time!
-	echo "Loading the Debian installer, please wait...."
 	mount -t shm shm mnt
-	if zcat floppy/initrd.gz > mnt/tmp-initrd; then
+	echo -n "Loading the Debian installer.."
+	# pipe_progress adds dots to the above line while there is
+	# activity. But we must be sure to catch errors from the zcat.
+	# Hard to do in a pipeline..
+	rm -f /tmp/zcat_failure
+	if [ -e /bin/pipe_progress ]; then
+		(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) | pipe_progress > mnt/tmp-initrd
+	else
+		# TODO remove after pipe_progress is available in the archive
+		(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) > mnt/tmp-initrd
+	fi
+	if [ ! -e /tmp/zcat_failure ]; then
 		LOADED=1
 	else
-		echo "This install media seems to be bad."
+		rm -f /tmp/zcat_failure
+		echo "install media seems to be bad!" >&2
 		debugshell "bad media mounted"
 		umount mnt
 	fi
 	umount floppy
 done
 
-echo "Setting up filesystem, please wait..."
+echo "Setting up filesystem..."
 mount -o loop mnt/tmp-initrd initrd
 cp -a initrd/* mnt
 umount initrd
