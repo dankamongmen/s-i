@@ -98,7 +98,10 @@ static void parse_variables(struct question *q, char *string)
 static void parse_owners(struct question *q, char *string)
 {
     char *wc, *owc;
-    
+   
+    if (!string)
+	    return;
+
     owc = wc = strdup(string);
 
     while (wc != NULL)
