@@ -4,4 +4,18 @@
 
 cdromdev=/dev/cdroms/cdrom0
 
+umount /cdrom
+
+if test ! -e /etc/mtab ; then
+    # stupid eject refuses to work unless /etc/mtab exists
+    touch /etc/mtab
+    dummymtab=yes
+else
+    dummymtab=no
+fi
+
 eject $cdromdev || /target/usr/bin/eject $cdromdev || true
+
+if test yes = "$dummymtab" ; then
+    rm /etc/mtab
+fi
