@@ -1,0 +1,63 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+MESSAGES=/var/log/messages
+
+log () {
+	logger -t rescue-mode "$@"
+}
+
+try_load_module () {
+	modprobe "$1" >>"$MESSAGES" 2>&1 || true
+}
+
+try_load_module ext2
+try_load_module ext3
+try_load_module jfs
+try_load_module reiserfs
+try_load_module xfs
+
+# Linux root filesystems won't be on vfat, but this may be useful anyway ...
+try_load_module vfat
+
+db_capb backup
+
+while :; do
+	db_input critical rescue/root
+	db_go || exit 10
+	db_get rescue/root
+	rootdev="$RET"
+	log "selected root device '$rootdev'"
+	if [ ! -e "$rootdev" ]; then
+		log "'$rootdev' does not exist"
+		db_subst rescue/no-such-device DEVICE "$rootdev"
+		db_input critical rescue/no-such-device
+		# Since continuing returns to the rescue/root question,
+		# backing up returns to the main menu.
+		db_go || exit 10
+		continue
+	fi
+
+	mkdir -p /target
+	umount /target >>"$MESSAGES" 2>&1 || true
+	if ! mount "$rootdev" /target >>"$MESSAGES" 2>&1; then
+		log "mount '$rootdev' /target failed"
+		db_subst rescue/no-such-device DEVICE "$rootdev"
+		db_input critical rescue/mount-failed
+		# Since continuing returns to the rescue/root question,
+		# backing up returns to the main menu.
+		db_go || exit 10
+		continue
+	fi
+
+	break
+done
+
+OLD_STDIN="$DEBCONF_OLD_FD_BASE"
+OLD_STDOUT="$(($DEBCONF_OLD_FD_BASE + 1))"
+OLD_STDERR="$(($DEBCONF_OLD_FD_BASE + 2))"
+
+env -i PATH="$PATH" TERM="$TERM" chroot /target <&$OLD_STDIN >&$OLD_STDOUT 2>&$OLD_STDERR
+
+/lib/debian-installer/exit

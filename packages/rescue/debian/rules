@@ -1,0 +1,29 @@
+#! /usr/bin/make -f
+
+build:
+
+clean:
+	dh_testdir
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_install -prescue-check debian-installer-startup.d lib
+
+binary-arch:
+
+binary-indep: install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf -i
+	install -m755 debian/rescue-mode.isinstallable debian/rescue-mode/DEBIAN/isinstallable
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_builddeb -i
+
+binary: binary-arch binary-indep
+.PHONY: build clean install binary-arch binary-indep binary
