@@ -268,6 +268,7 @@ struct confmodule *confmodule_new(struct configuration *config,
 	mod->templates = templates;
 	mod->questions = questions;
 	mod->frontend = frontend;
+	mod->seen_questions = NULL;
 	mod->run = confmodule_run;
 	mod->communicate = confmodule_communicate;
 	mod->process_command = confmodule_process_command;
