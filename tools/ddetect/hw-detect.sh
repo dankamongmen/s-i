@@ -7,10 +7,9 @@ set -e
 NEWLINE="
 "
 MISSING_MODULES_LIST=""
-NETDISCOVER="/tmp/discover-net"
 
-# This is a gross and stupid hack, but we don't have a better idea right
-# now. See Debian bug #136743
+# This is a hack, but we don't have a better idea right now.
+# See Debian bug #136743
 if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
@@ -122,8 +121,6 @@ discover_hw () {
         $DISCOVER --format="%m:%V %M\n" \
             --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
 	  sed 's/ $//'
-	$DISCOVER --format="%m:%V %M\n" \
-	    --disable-all --enable=pci,pcmcia ethernet | sed 's/ $//' > $NETDISCOVER
     fi
 }
 
