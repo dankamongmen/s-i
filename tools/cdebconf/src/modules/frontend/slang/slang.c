@@ -1,4 +1,5 @@
 #include "common.h"
+#include "configuration.h"
 #include "debug.h"
 #include "template.h"
 #include "question.h"
@@ -43,7 +44,7 @@ static void slang_flush(void)
  * sets the color of a given object from the configuration
  */
 static void slang_setcolor(struct frontend *ui, int *handle, const char *obj, 
-	const char *fgdefault, const char *bgdefault)
+	const char *defaultfg, const char *defaultbg)
 {
 	static int colorsused = 0;
 	char fgname[50], bgname[50];
@@ -51,8 +52,8 @@ static void slang_setcolor(struct frontend *ui, int *handle, const char *obj,
 	snprintf(fgname, sizeof(fgname), CONFIGPREFIX "%s_fg", obj);
 	snprintf(bgname, sizeof(bgname), CONFIGPREFIX "%s_bg", obj);
 	*handle = colorsused++;
-	SLtt_set_color(*handle, 0, ui->cfg->get(ui->cfg, fgname, defaultfg),
-		ui->cfg->get(ui->cfg, bgname, defaultbg));
+	SLtt_set_color(*handle, 0, ui->config->get(ui->config, fgname, 
+		defaultfg), ui->config->get(ui->config, bgname, defaultbg));
 }
 
 /*
@@ -293,13 +294,8 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 
 		switch (slang_keyhandler(ui, q, &pos, 3, 0))
 		{
-		case 0:
-			if (ui->cangoback(ui, q))
-				ret = DC_GOBACK;
-			/* go to previous if possible */
-			break;
-		case 1:
-			ret = DC_OK; break;
+		case 0: ret = DC_GOBACK; break;
+		case 1: ret = DC_OK; break;
 		case 2: ans = 1; break;
 		case 3: ans = 0; break;
 		}
@@ -329,14 +325,8 @@ static int slang_note(struct frontend *ui, struct question *q)
 
 		switch (slang_keyhandler(ui, q, &pos, 1, 0))
 		{
-		case 0:
-			if (ui->cangoback(ui, q))
-				ret = DC_GOBACK;
-				/* go to previous if possible */
-			break;
-		case 1:
-			ret = DC_OK;
-			break;
+		case 0: ret = DC_GOBACK; break;
+		case 1: ret = DC_OK; break;
 		}
 	}
 	return ret;
@@ -400,14 +390,8 @@ static int slang_select(struct frontend *ui, struct question *q)
 		default:
 			switch (slang_keyhandler(ui, q, &pos, 2, ch))
 			{
-				case 0:
-					if (ui->cangoback(ui, q))
-						ret = DC_GOBACK;
-					/* go to previous if possible */
-					break;
-				case 1:
-					ret = DC_OK;
-					break;
+			case 0: ret = DC_GOBACK; break;
+			case 1: ret = DC_OK; break;
 			}
 		}
 	}
@@ -501,14 +485,8 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 			default:
 				switch (slang_keyhandler(ui, q, &pos, 2, ch))
 				{
-				case 0:
-					if (ui->cangoback(ui, q))
-						ret = DC_GOBACK;
-					/* go to previous if possible */
-					break;
-				case 1:
-					ret = DC_OK;
-					break;
+				case 0: ret = DC_GOBACK; break;
+				case 1: ret = DC_OK; break;
 				}
 			}
 		}
@@ -585,7 +563,6 @@ static int slang_shutdown(struct frontend *obj)
 static int slang_go(struct frontend *obj)
 {
 	struct question *q = obj->questions;
-	struct question *qlast = 0;
 	int i;
 	int ret;
 
@@ -604,22 +581,19 @@ static int slang_go(struct frontend *obj)
 					obj->db->question_set(obj->db, q);
 					break;
 				case DC_GOBACK:
-					if (qlast != 0)
-						q = qlast;
-					else
-						return ret;
-					break;
+					if (q->prev != NULL)
+					{
+						q = q->prev;
+						break;
+					}
+					/* fallthrough */
 				default:
 					return ret;
 				}
 				break;
 			}
 		if (ret == DC_OK)
-		{
-			qlast = q;
 			q = q->next;
-		}
-		
 	}
 
 	return DC_OK;

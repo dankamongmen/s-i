@@ -26,7 +26,7 @@ struct question {
 	struct template *template;
 	struct questionvariable *variables;
 	struct questionowner *owners;
-	struct question *next;
+	struct question *prev, *next;
 };
 
 struct question *question_new(const char *tag);

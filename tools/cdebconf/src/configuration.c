@@ -8,7 +8,7 @@
  * Description: configuration file parsing and access routines
  *              (adapted from APT's Configuration class)
  *
- * $Id: configuration.c,v 1.5 2001/01/07 05:05:12 tausq Exp $
+ * $Id: configuration.c,v 1.6 2001/01/07 06:39:25 tausq Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -85,6 +85,7 @@ static struct configitem *config_lookuphlp(struct configitem *head,
 	newitem->tag = malloc(len+1);
 	newitem->tag[len] = 0;
 	memcpy(newitem->tag, tag, len);
+	newitem->value = 0;
 	newitem->next = *last;
 	newitem->parent = head;
 	newitem->child = 0;

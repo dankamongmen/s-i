@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.7 2001/01/07 05:05:12 tausq Exp $
+ * $Id: frontend.c,v 1.8 2001/01/07 06:39:25 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -57,19 +57,27 @@
  */
 static int frontend_add(struct frontend *obj, struct question *q)
 {
-	struct question **qlast;
+	struct question *qlast;
+	ASSERT(q != NULL);
+	ASSERT(q->prev == NULL);
+	ASSERT(q->next == NULL);
 
-	if (q == NULL) {
-		fprintf(stderr, "WTF?\n");
+	qlast = obj->questions;
+	if (qlast == NULL)
+	{
+		obj->questions = q;
 	}
-
-	for (qlast = &obj->questions; *qlast; qlast = &(*qlast)->next);
-	*qlast = q;
-	q->next = NULL;
+	else
+	{
+		while (qlast->next != NULL)
+			qlast = qlast->next;
+		qlast->next = q;
+		q->prev = qlast;
+	}
 
 	question_ref(q);
 
-	return 1;
+	return DC_OK;
 }
 
 /*
@@ -99,7 +107,7 @@ static void frontend_clear(struct frontend *obj)
 	{
 		q = obj->questions;
 		obj->questions = obj->questions->next;
-		question_delete(q);
+		question_deref(q);
 	}
 }
 

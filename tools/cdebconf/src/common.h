@@ -31,8 +31,10 @@
 #ifndef NODEBUG
 #define INFO(level, fmt, args...)					\
 	debug_printf(level, fmt, ##args)
+#define ASSERT(cond) if (!(cond)) DIE("Assertion failed: %s", #cond)
 #else
 #define INFO(level, fmt, args...)	/* nothing */
+#define ASSERT(cond)
 #endif
 
 #define NEW(type) (type *)malloc(sizeof(type))
