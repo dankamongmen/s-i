@@ -3,7 +3,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.14 2003/03/14 22:49:33 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.15 2003/03/18 21:44:42 mckinstry Exp $
  */
 
 #include "config.h"
@@ -549,7 +549,9 @@ int main (int argc, char **argv)
 	char *kbd_priority, *arch = NULL, keymap[LINESIZE], buf[LINESIZE], *s;
 	enum { CHOOSE_ARCH, CHOOSE_KEYMAP } state = CHOOSE_ARCH;
 	int res;
-	
+
+	client = debconfclient_new ();
+
 	// As a form of debugging, allow a keyboard map to 
 	// be named on command-line
 	if (argc == 2)  {
@@ -557,7 +559,6 @@ int main (int argc, char **argv)
 		exit (0);
 	}
 
-	client = debconfclient_new (); 
 	client->command (client, "capb", "backup", NULL);
 	client->command (client, "title", "Select a Keyboard Layout", NULL);
 
