@@ -263,6 +263,10 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
              * the filename we're getting, minus any path
              * component.
              */
+            if (!package->filename) {
+                di_log(DI_LOG_LEVEL_ERROR, "no Filename field for %s, ignoring", package->package);
+                continue;
+            }
             for(f = fp = package->filename; *fp != 0; fp++)
                 if (*fp == '/')
                     f = ++fp;
