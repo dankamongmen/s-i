@@ -37,8 +37,23 @@ if [ "$MOUNTPOINT" = "manual" ]; then
     db_get di-utils-mount-partitions/manual-mountpoint
     MOUNTPOINT="$RET"
 fi
-MOUNTPOINT="/target/$MOUNTPOINT"
-mkdir -p "$MOUNTPOINT"
 
-mount "$PARTITION" "$MOUNTPOINT"
+if [ "$MOUNTPOINT" = "/" ]; then
+    pass=1
+else
+    pass=2
+fi
+
+MOUNTPOINT="$MOUNTPOINT"
+mkdir -p "/target$MOUNTPOINT"
+
+mount "$PARTITION" "/target$MOUNTPOINT"
+
+# This goes after the mount, since else /target/etc might not have
+# been mounted yet
+
+mkdir -p "/target/etc/"
+device=`mapdevfs $PARTITION`
+echo "$device $MOUNTPOINT auto defaults,errors=remount-ro 0 $pass" >> /target/etc/fstab
+
 exit 0

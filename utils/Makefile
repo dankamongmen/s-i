@@ -1,5 +1,5 @@
 ifndef TARGETS
-TARGETS=shell
+TARGETS=shell mapdevfs
 endif
 
 CFLAGS=-Wall  -Os -fomit-frame-pointer
