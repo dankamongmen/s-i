@@ -44,6 +44,11 @@ build: configure-stamp build-stamp
 build-stamp:
 	dh_testdir
 
+	# Make sure we do not ship symlinks in the source package (#232610)
+	for file in install-sh mkinstalldirs ; do \
+	    cp $$file $$file.new; mv $$file.new $$file; \
+	done
+
 	$(MAKE)
 
 	touch build-stamp
