@@ -4,6 +4,12 @@ set -e
 . /usr/share/debconf/confmodule
 #set -x
 
+if [ -z "$1" ]; then
+	PROGRESSBAR=hw-detect/detect_progress_title
+else
+	PROGRESSBAR=$1
+fi
+
 NEWLINE="
 "
 MISSING_MODULES_LIST=""
@@ -149,15 +155,13 @@ get_manual_hw_info() {
 	echo "isofs:Linux ISO 9660 filesystem"
 }
 
-db_settitle hw-detect/title
-
 # Should be greater than the number of kernel modules we can reasonably
 # expect it will ever need to load.
 MAX_STEPS=1000
 OTHER_STEPS=5
 # Use 1/10th of the progress bar for the non-module-load steps.
 OTHER_STEPSIZE=$(expr $MAX_STEPS / 10 / $OTHER_STEPS)
-db_progress START 0 $MAX_STEPS hw-detect/detect_progress_title
+db_progress START 0 $MAX_STEPS $PROGRESSBAR
 
 log "Detecting hardware..."
 db_progress INFO hw-detect/detect_progress_step

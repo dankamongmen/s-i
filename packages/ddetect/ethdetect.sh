@@ -97,14 +97,12 @@ module_probe() {
 	fi
 }
 
-db_settitle debian-installer/ethdetect/title
-
 db_input low ethdetect/detection_type || [ $? -eq 30 ]
 db_go
 
 db_get ethdetect/detection_type
 if [ true = "$RET" ] ; then
-	hw-detect || true
+	hw-detect ethdetect/detect_progress_title || true
 fi
 
 while [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`" ]

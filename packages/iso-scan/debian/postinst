@@ -87,10 +87,7 @@ umount /cdrom 2>/dev/null || true
 umount /hd-media 2>/dev/null || true
 
 # Hopefully this will find the drive.
-hw-detect || true
-
-# Main-menu should set the title, but hw-detect clobbers that.
-db_settitle debian-installer/iso-scan/title
+hw-detect iso-scan/detect_progress_title || true
 
 # Find all block devices, and get a count of them, for use in progress bar.
 DEVS=$(block_devices)
