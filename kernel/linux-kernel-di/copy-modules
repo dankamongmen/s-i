@@ -6,7 +6,7 @@
 #
 # Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
 #
-# Usage: copy-modules version flavour
+# Usage: copy-modules version flavour installedname
 
 set -e
 
@@ -33,6 +33,7 @@ deplist() {
 
 version=$1-$2
 flavour=$2
+installedname=$3
 arch=$(dpkg-architecture -qDEB_HOST_ARCH)
 home=$PWD
 
@@ -43,11 +44,12 @@ mkdir $tmpdir
 
 # SOURCEDIR may be set externally to control where to copy from.
 if [ -n "$SOURCEDIR" ]; then
-	moddir=$SOURCEDIR/lib/modules/$version
+	moddir=$SOURCEDIR/lib/modules/$installedname
 else
-	moddir=/lib/modules/$version
+	moddir=/lib/modules/$installedname
 fi
 
+# The direcotry of modules lists to use.
 if [ -d modules/$arch-$flavour ]; then
 	modlistdir=modules/$arch-$flavour
 else
@@ -107,11 +109,11 @@ for i in $(
 	# dependent udeb into module-list/$i
 	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
 
-	# copy kernel modules to debian/$i-$version-di
+	# copy kernel modules to package build dir
 	cd $moddir/kernel
 	tar cfT - $tmpdir/module-list/$i |
 	(
-		dir=$home/debian/$i-$version-di/lib/modules/$version/kernel
+		dir=$home/debian/$i-$version-di/lib/modules/$installedname/kernel
 		mkdir -p $dir
 		cd $dir
 		tar xf -
