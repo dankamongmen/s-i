@@ -19,8 +19,7 @@ demo: $(BIN)
 # Size optimized and stripped binary target.
 small: CFLAGS=-Os $(CFLAGS) -DSMALL
 small: clean $(BIN)
-	strip --remove-section=.comment --remove-section=.note \
-		--strip-unneeded $(BIN)
+	strip --remove-section=.comment --remove-section=.note $(BIN)
 	ls -l $(BIN)
 
 clean:
