@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.31 2002/11/21 21:21:59 bdale Exp $ */
+/* $Id: udpkg.c,v 1.32 2002/11/24 22:52:34 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -9,8 +9,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <utime.h>
+#include <getopt.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
+
+static int force_configure = 0;
 
 /* 
  * Main udpkg implementation routines
@@ -36,17 +40,34 @@ static int is_file(const char *fn)
 
 int dpkg_print_architecture()
 {
-#if defined(__i386__)
-        printf("i386\n");
-#elif defined(__ia64__)
-        printf("ia64\n");
-#elif defined(__s390__)
-        printf("s390\n");
-#else
-        return 1;
-#endif
-        return 0;
+    struct utsname name;
+    int i;
+    struct {
+        const char *gnuname;
+        const char *newname;
+    } xlattbl[] = { 
+        { "i486", "i386" },
+        { "i586", "i386" },
+        { "i686", "i386" },
+        { "pentium", "i386" },
+        { "parisc", "hppa" },
+        { "parisc64", "hppa" },
+    };
 
+    if (uname(&name) < 0)
+        return 1;
+
+    for (i = 0; i < sizeof(xlattbl)/sizeof(xlattbl[0]); i++)
+    {
+        if (strcmp(name.machine, xlattbl[i].gnuname) == 0)
+        {
+            printf("%s\n", xlattbl[i].newname);
+            return 0;
+        }
+    }
+
+    printf("%s\n", name.machine);
+    return 0;
 }
 
 
@@ -88,7 +109,16 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	char postinst[1024];
 	char config[1024];
 	char buf[1024];
-	DPRINTF("Configuring %s\n", pkg->package);
+	DPRINTF("Configuring %s [force=%d]\n", pkg->package, force_configure);
+
+	if ((pkg->status & STATUS_STATUSINSTALLED) != 0 &&
+        !force_configure)
+    {
+        printf("Package %s is already installed and configured\n",
+                pkg->package);
+        return 1;
+    }
+
 	pkg->status &= STATUS_STATUSMASK;
 
 	snprintf(config, sizeof(config), "%s%s.config", INFODIR, pkg->package);
@@ -397,49 +427,59 @@ int udpkg(int argc, char **argv)
 int main(int argc, char **argv)
 #endif
 {
-	char opt = 0;
-	char *s;
+	int opt = 0;
 	struct package_t *p, *packages = NULL;
 	char *cwd = getcwd(0, 0);
+    char **origargv = argv;
+    struct option longopts[] = {
+        /* name, has_arg, flag, val */
+	    { "unpack", 0, 0, 'u' },
+        { "configure", 0, 0, 'c' },
+        { "print-architecture", 0, 0, 'p' } ,
+        { "force-configure", 0, &force_configure, 1 },
+        { 0, 0, 0, 0 },
+    };
+
 	while (*++argv)
 	{
-		if (**argv == '-') {
-			/* Nasty little hack to "parse" long options. */
-			s = *argv;
-			while (*s == '-')
-				s++;
-			opt=s[0];
-		}
-		else
+		if (**argv != '-') 
 		{
 			p = (struct package_t *)malloc(sizeof(struct package_t));
 			memset(p, 0, sizeof(struct package_t));
 			if (**argv == '/')
 				p->file = *argv;
-			else if (opt != 'c')
-			{
+            else
 				asprintf(&p->file, "%s/%s", cwd, *argv);
-			}
-			else {
-				p->package = strdup(*argv);
-			}
+			p->package = strdup(*argv);
 			p->next = packages;
 			packages = p;
 		}
-			
 	}
-	switch (opt)
-	{
-		case 'i': return dpkg_install(packages); break;
-		case 'r': return dpkg_remove(packages); break;
-		case 'u': return dpkg_unpack(packages); break;
-		case 'c': return dpkg_configure(packages); break;
-                case 'p': return dpkg_print_architecture(); break;
-		case 'f': return dpkg_fields(packages); break;
+
+    /* let's do this in a silly way, the first pass let's us
+     * set flags (e.g. --force-configure), whereas the second
+     * will actually do stuff
+     */
+    while (getopt_long(argc, origargv, "irf", longopts, 0) >= 0)
+        /* nothing */;
+    optind = 1;
+
+    while ((opt = getopt_long(argc, origargv, "irf", longopts, 0)) >= 0)
+    {
+        switch (opt)
+        {
+            case 'i': return dpkg_install(packages); break;
+            case 'r': return dpkg_remove(packages); break;
+            case 'u': return dpkg_unpack(packages); break;
+            case 'c': return dpkg_configure(packages); break;
+            case 'p': return dpkg_print_architecture(); break;
+            case 'f': return dpkg_fields(packages); break;
+            case '0': /* option, not action */; break;
+        }
 	}
 
 	/* if it falls through to here, some of the command line options were
 	   wrong */
-	fprintf(stderr, "udpkg <-i|-r|--unpack|--configure|--print-architecture|-f> my.deb\n");
+	fprintf(stderr, "udpkg [--force-configure] <-i|-r|--unpack|--configure|--print-architecture|-f> my.deb\n");
 	return 0;
 }
