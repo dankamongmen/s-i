@@ -52,8 +52,7 @@ case "x$cmd" in
         rm -f "$1"
         touch "$1"
 	
-        db_get mirror/udeb/suite || true
-	if [ -z "$RET" ]; then
+        if ! db_get mirror/udeb/suite || [ -z "$RET" ]; then
 		db_get mirror/suite
 	fi
         suite="$RET"
