@@ -19,8 +19,8 @@ export DH_COMPAT=3
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	# Add here commands to configure the package.
-	
+
+	./configure --prefix=/usr --sysconfdir=/etc --enable-small
 
 	touch configure-stamp
 
@@ -28,7 +28,6 @@ build: configure-stamp build-stamp
 build-stamp:
 	dh_testdir
 
-	# Add here commands to compile the package.
 	$(MAKE)
 
 	touch build-stamp
@@ -38,7 +37,7 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 	rm -f debian/autopartkit.postinst
-	# Add here commands to clean up after the build process.
+
 	-$(MAKE) clean
 
 	dh_clean
@@ -46,8 +45,9 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_installdirs etc/autopartkit usr/bin
 	$(MAKE) install DESTDIR=`pwd`/debian/autopartkit
+	strip --remove-section=.note --remove-section=.comment `pwd`/debian/autopartkit/usr/bin/autopartkit
 
 
 # Build architecture-independent files here.
@@ -55,12 +55,12 @@ binary-indep: build install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install partkit
-partkit:
+binary-arch: build install autopartkit
+autopartkit:
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
-#	cp debian/menutest debian/partkit/DEBIAN/menutest	
+#	cp debian/menutest debian/autopartkit/DEBIAN/menutest	
 	dh_strip
 	dh_compress
 	dh_fixperms
@@ -72,4 +72,4 @@ partkit:
 	dh_builddeb --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure partkit
+.PHONY: build clean binary-indep binary-arch binary install configure autopartkit

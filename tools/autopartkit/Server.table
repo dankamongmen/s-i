@@ -1,0 +1,22 @@
+#
+# Create these partitions on the server
+# MPoint   FStype       Min     Max     percent of total diskspace
+/          default      320    4352     0.0
+
+# Disable separate /usr until libldap is moved into /lib (bug #198)
+#/usr       default      320    4096     0.0
+
+# swap should be 2 x memory size
+swap       swap         128    2048     0.0
+
+# /var needs to store all downloaded .debs
+/var       default      128    2048     0.0
+
+# /tmp should be shm. "mount -t shm shmfs -o nr_blocks=262144 /dev/shm"
+# will make a 1GiB /dev/shm. [check if this is correct - pere]
+# Hm, shmfs is not supported by the default kernel [pere 2002-08-07]
+#/tmp       shm            0       0     0.0
+/tmp       default      128    1024     0.0
+
+# The rest of the disk should be used by LVM.
+lvm        lvm          512      -1     0.0

@@ -1,0 +1,20 @@
+#
+# Create these partitions on a combined server / ltsp-server
+# MPoint   FStype       Min     Max     percent of total diskspace
+
+/          default     1408    4352     0.0
+
+# Disable separate /usr until libldap is moved into /lib (bug #198)
+#/usr       default     1088    4096     0.0
+
+# swap should be 2 x memory size
+swap       swap         128    2048     0.0
+
+# /var needs to store all downloaded .debs
+/var       default      384    2048     0.0
+
+# FIXME: Should be shmfs when it is supported
+/tmp       default      128    1024     0.0
+
+# The rest of the disk should be used by LVM.
+lvm        lvm          512      -1     0.0

@@ -1,6 +1,40 @@
+autopartkit (0.33) unstable; urgency=low
+  
+  * NOT RELEASED YET.
+  * Development version moved from Skolelinux into Debian CVS.  Skipping
+    version numbers 0.2 - 0.32 used by Skolelinux versions.
+  * Moved partition requests into separate .table files, and choose table
+    based on debian-installer/profile content.  Add depend on
+    profilechooser to make sure debconf contain the requested multiselect
+    value.  If the value is empty or unknown, use default.table.
+  * Split partitioning operation in two, one calculating the new partition
+    layout, and another doing the change.  This will make it possible to
+    preview the partitioning changes.
+  * Add depend on di-fake to make sure libparted.so is available at run
+    time.
+  * Change orders of provides entries to get around a bug in anna.  This
+    should get base-installer to depend on autopartkit.
+  * Increase priority to standard to get anna to install this package by
+    default.
+  * Refuse to compile on platforms where the default partition table
+    format is unknown.  At the moment this is all non-x86 platforms.
+  * Add code to handle both v1.4 and v1.6 of libparted.  The code uses
+    v1.6 API, but there is a compatibility wrapper in parted-compat.h
+  * Source converted to use autoconf/automake.
+  * Change log location to /var/log/messages.
+  * Change menu entry and confirm question to make it more obvious that
+    this is an unsafe program.
+  * Make sure we ask the user if it is OK to destroy the partition tables
+    before destroying the partition tables.
+  * Add code to handle several different file system types.
+  * Add SCSI-support.
+  * Add some support for creating LVM partitions.
+
+ -- Petter Reinholdtsen <pere@hungry.com>  Mon,  7 Oct 2002 09:18:27 +0200
+
 autopartkit (0.02) unstable; urgency=low
 
-  * NOT RELEASED YET.
+  * Never released.  Some of the changes might have been lost in 0.33.
   * Change build-deps to libcdebconf-dev.
   * Remove emacs changelog variables.
   * Don't try to do funky stuff with ../cdebconf/src, build-dep on
