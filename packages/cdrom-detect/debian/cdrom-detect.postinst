@@ -151,7 +151,7 @@ for pooldir in /cdrom/pool/*/*; do
 	if [ -d "$pooldir" ]; then
 		db_subst cdrom-detect/scanning_progress_step DIR "$pooldir"
 		db_progress INFO cdrom-detect/scanning_progress_step
-		find "$pooldir/" >/dev/null 2>&1
+		find "$pooldir/" >/dev/null 2>>/var/log/messages || true
 	fi
 	db_progress STEP 1
 done
