@@ -67,7 +67,7 @@ discover_hw () {
         log "Using discover2 do not work yet."
 
         dpath=linux/module/name
-        dver=`uname -r|cut -d. -f1,2` # Kernel version (ie 2.4)
+        dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
         dflags="-d all -e ata -e pci -e pcmcia -e scsi display"
 
 	# Use fixed name temp files, as 'tempfile' is missing from busybox
