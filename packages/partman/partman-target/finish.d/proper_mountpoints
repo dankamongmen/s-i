@@ -20,7 +20,6 @@ no_root () {
 	fi
     done
     
-    db_fset partman-target/no_root seen false
     db_input critical partman-target/no_root || true
     db_go || true
     exit 1
@@ -47,7 +46,6 @@ same_mountpoints () {
 	mp=${x%,*}
 	fs=${x#*,}
 	if [ "$mp" = "$oldmp" ]; then
-	    db_fset partman-target/same_mountpoint seen false
 	    db_subst partman-target/same_mountpoint PART1 $(humandev $oldfs)
 	    db_subst partman-target/same_mountpoint PART2 $(humandev $fs)
 	    db_subst partman-target/same_mountpoint MOUNTPOINT "$mp"
