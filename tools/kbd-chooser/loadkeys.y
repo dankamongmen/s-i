@@ -245,7 +245,7 @@ void set_kbd_mode (int fd)
 		int e;
 		e = ioctl (fd, KDSKBMODE, K_UNICODE);
 		if (DEBUG && e) {
-			di_logf ("kbd-chooser: Failed to set kbd to unicode modei : %s", strerror(errno));
+			di_error ("kbd-chooser: Failed to set kbd to unicode modei : %s", strerror(errno));
 			exit (1);
 		}
 	}
@@ -260,7 +260,7 @@ void loadkeys_wrapper (char *map)
 	unicode_used = 0;
 	yywrap ();
 	if (yyparse() || private_error_ct) {
-		di_logf ("kbd-chooser: Syntax error in keymap\n");
+		di_error ("kbd-chooser: Syntax error in keymap\n");
 		exit (1);
 	}
 	do_constant();
@@ -275,7 +275,7 @@ int line_nr = 1;
 
 int
 yyerror(const char *s) {
-	di_logf("kbd-chooser: %s:%d: %s\n", filename, line_nr, s);
+	di_error("kbd-chooser: %s:%d: %s\n", filename, line_nr, s);
 	private_error_ct++;
 	return(0);
 }
@@ -496,7 +496,7 @@ yywrap(void) {
 	if (done)
 		return  1;
 	if ((f = findfile(keymap_name, dirpath, suffixes)) == NULL) {
-		di_logf ("kbd-chooser: cannot open file %s\n", keymap_name);
+		di_error ("kbd-chooser: cannot open file %s\n", keymap_name);
 		exit(1);
 	}
 	/*
@@ -592,7 +592,7 @@ addfunc(struct kbsentry kbs) {
 	char *p, *q, *r;
 
         if (kbs.kb_func >= MAX_NR_FUNC) {
-	        di_logf (PROGNAME ": addfunc called with bad func %d\n",
+	        di_error (PROGNAME ": addfunc called with bad func %d\n",
 			 kbs.kb_func);
 		exit(1);
 	}
@@ -617,7 +617,7 @@ addfunc(struct kbsentry kbs) {
 	func_table[kbs.kb_func] = p;
         sh = strlen(kbs.kb_string) + 1;
 	if (fp + sh > func_buf + sizeof(func_buf)) {
-	       di_logf  ("%s: addfunc: func_buf overflow\n", PROGNAME);
+	       di_error  ("%s: addfunc: func_buf overflow\n", PROGNAME);
 		exit(1);
 	}
 	q = fp;
@@ -635,7 +635,7 @@ static void
 compose(int diacr, int base, int res) {
         struct kbdiacr *p;
         if (accent_table_size == MAX_DIACR) {
-	        di_logf ( PROGNAME " compose table overflow\n");
+	        di_error ( PROGNAME " compose table overflow\n");
 		exit(1);
 	}
 	p = &accent_table[accent_table_size++];
@@ -671,15 +671,15 @@ defkeys(int fd) {
 			fail = ioctl(fd, KDSKBENT, (unsigned long)&ke);
 			if (fail) {
 			    if (errno == EPERM) {
-			    	di_logf ("kbd-chooser: Keymap %d: Permission denied\n", i);
+			    	di_error ("kbd-chooser: Keymap %d: Permission denied\n", i);
 				j = NR_KEYS;
 				continue;
 			    }
-			    di_logf ("kbd_chooser: KDSKBENT : %s", strerror(errno));
+			    di_error ("kbd_chooser: KDSKBENT : %s", strerror(errno));
 			} else
 			  ct++;
 			if (fail)
-				di_logf ("kbd-chooser: failed to bind key %d to value %d\n",
+				di_error ("kbd-chooser: failed to bind key %d to value %d\n",
 				  	j, (key_map[i])[j]);
 		    }
 		}
@@ -691,7 +691,7 @@ defkeys(int fd) {
 
 		if(ioctl(fd, KDSKBENT, (unsigned long)&ke)) {
 		    if (errno != EINVAL) {
-				di_logf("%s: could not deallocate keymap %d (%s)\n",
+				di_error("%s: could not deallocate keymap %d (%s)\n",
 				PROGNAME, i, strerror(errno));
 			exit(1);
 		    }
@@ -704,7 +704,7 @@ defkeys(int fd) {
 			if(ioctl(fd, KDSKBENT, (unsigned long)&ke)) {
 			    if (errno == EINVAL && i >= 16)
 			      break; /* old kernel */
-				    di_logf("%s: cannot deallocate or clear keymap (%s)\n",
+				    di_error("%s: cannot deallocate or clear keymap (%s)\n",
 				    PROGNAME, strerror(errno));
 			    exit(1);
 			}
@@ -715,9 +715,9 @@ defkeys(int fd) {
 
 	if(unicode_used && oldm != K_UNICODE) {
 	     if (ioctl(fd, KDSKBMODE, oldm)) {
-		  di_logf("%s: failed to restore keyboard mode\n", PROGNAME);
+		  di_error("%s: failed to restore keyboard mode\n", PROGNAME);
 	     }
-	     di_logf ( "%s: warning: this map uses Unicode symbols\n"
+	     di_error ( "%s: warning: this map uses Unicode symbols\n"
 		             "    (perhaps you want to do `kbd_mode -u'?)\n",
 		     PROGNAME);
 	}
@@ -761,7 +761,7 @@ deffuncs(int fd){
 	    if ((p = func_table[i])) {
 		strcpy(kbs_buf.kb_string, p);
 		if (ioctl(fd, KDSKBSENT, (unsigned long)&kbs_buf))
-		  di_logf ("failed to bind string '%s' to function %s\n",
+		  di_error ("failed to bind string '%s' to function %s\n",
 			  ostr(kbs_buf.kb_string), syms[KT_FN].table[kbs_buf.kb_func]);
 		else
 		  ct++;
@@ -778,13 +778,13 @@ defdiacs(int fd){
 	kd.kb_cnt = accent_table_size;
 	if (kd.kb_cnt > MAX_DIACR) {
 	    kd.kb_cnt = MAX_DIACR;
-	    di_logf("kbd-chooser: too many compose definitions\n");
+	    di_error("kbd-chooser: too many compose definitions\n");
 	}
 	for (i = 0; i < kd.kb_cnt; i++)
 	    kd.kbdiacr[i] = accent_table[i];
 
 	if(ioctl(fd, KDSKBDIACR, (unsigned long) &kd)) {
-	    di_logf("kbd-chooser: KDSKBDIACR (%s)", strerror(errno));
+	    di_error("kbd-chooser: KDSKBDIACR (%s)", strerror(errno));
 	    exit(1);
 	}
 	return kd.kb_cnt;
@@ -884,7 +884,7 @@ static void strings_as_usual(void) {
 static void
 compose_as_usual(char *charset) {
 	if (charset && strcmp(charset, "iso-8859-1")) {
-		di_logf("kbd-chooser: loadkeys: don't know how to compose for %s\n",
+		di_error("kbd-chooser: loadkeys: don't know how to compose for %s\n",
 			charset);
 		exit(1);
 	} else {

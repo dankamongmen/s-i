@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.10 2003/04/10 14:59:22 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.11 2003/10/03 22:02:49 mckinstry Exp $
  */
 
 #include "config.h"
@@ -37,15 +37,15 @@ kbd_t *usb_kbd_get (kbd_t *keyboards)
 	k->next = keyboards;
 	keyboards = k;
 	
-#if defined (KERNEL_2_5)
-	/* In 2.5 series, we can detect keyboard via /proc/bus/input
+#if defined (KERNEL_2_6)
+	/* In 2.6 series, we can detect keyboard via /proc/bus/input
 	 *
 	 * FIXME: Write this code	 
 	 *   Need to search /proc/bus/input/devices
 	 
 	 */	
-	if (di_check_dir ("/proc/bus/input") >= 0) { // 2.5 kernel
-#warning "Kernel 2.5 code not written yet"
+	if (di_check_dir ("/proc/bus/input") >= 0) { // 2.6 kernel
+#warning "Kernel 2.6 code not written yet"
 	}
 #endif
 	/* 2.4 code */
@@ -65,14 +65,14 @@ kbd_t *usb_kbd_get (kbd_t *keyboards)
 	res = grep ("/proc/bus/usb/drivers", "keyboard");
 	if (res < 0) {
 		if (DEBUG) 
-			di_log ("mounting usbdevfs to look for kbd");		
+			di_log (DI_LOG_LEVEL_DEBUG, "mounting usbdevfs to look for kbd");		
 		// redirect stderr for the moment
 		serr = dup(2);
 		close (2);
 		open ("/dev/null", O_RDWR);
 		if (system ("mount -t  usbdevfs usbdevfs /proc/bus/usb") != 0) {		 
-			di_log ("Failed to mount USB filesystem to autodetect USB keyboard;");
-			di_log ("Will add USB keyboard option just in case");
+			di_warning ("Failed to mount USB filesystem to autodetect USB keyboard;");
+			di_warning ("Will add USB keyboard option just in case");
 			return keyboards;
 		}
 		// restore stderr
@@ -81,7 +81,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards)
 		mounted_fs = 1;
 		res = grep ("/proc/bus/usb/drivers", "keyboard");
 		if (res < 0) {
-			di_log ("Failed to grep /proc/bus/usb/drivers");
+			di_warning ("Failed to grep /proc/bus/usb/drivers");
 		}
 	}	
 	if (res == 0) 

@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: acorn-kbd.c,v 1.3 2003/04/10 14:59:22 mckinstry Exp $
+ * $Id: acorn-kbd.c,v 1.4 2003/10/03 22:02:48 mckinstry Exp $
  */
 
 #include "config.h"
@@ -37,7 +37,7 @@ kbd_t *acorn_kbd_get (kbd_t *keyboards)
 
 	res = grep ("/proc/cpuinfo", "Acorn");
 	if (res < 0) {
-		di_log ("amiga-kbd: failed to open /proc/cpuinfo.");
+		di_warning ("amiga-kbd: failed to open /proc/cpuinfo.");
 		return keyboards;
 	}
 	if (res != 0) { // Not an acorn
@@ -45,20 +45,20 @@ kbd_t *acorn_kbd_get (kbd_t *keyboards)
 		return keyboards;
 	}
 		
-#if defined (KERNEL_2_5)
+#if defined (KERNEL_2_6)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
 	 *
 	 * FIXME: Write this code
 	 */
-#warning "Kernel 2.5 code not written yet"
+#warning "Kernel 2.6 code not written yet"
 	if (di_check_dir ("/proc/bus/input") >= 0) {
 		// this dir only present in 2.5
 	}
 
 
-#endif // KERNEL_2_5
+#endif // KERNEL_2_6
 
-	/* ***  Only reached if KERNEL_2_5 not present ***  */
+	/* ***  Only reached if KERNEL_2_6 not present ***  */
 
 	/* For 2.4, assume a keyboard is present
 	 */	

@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.31 2003/09/04 20:43:52 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.32 2003/10/03 22:02:49 mckinstry Exp $
  */
 
 #include "config.h"
@@ -50,11 +50,11 @@ mydebconf_ask (char *priority, char *template, char **result)
 	struct debconfclient *client = mydebconf_get ();
 
 	// res = client->command (client, "fset", template, "seen", "false", NULL);
-	res = client->command (client, "input", priority, template, NULL);
-	res = client->command (client, "go", NULL);
+	res = debconf_input (client, priority, template);
+	res = debconf_go (client);
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
-	res = client->command (client, "get", template, NULL);
+	res = debconf_get (client, template);
 	*result = client->value;
 	return res;
 }
@@ -67,16 +67,16 @@ mydebconf_default_set (char *template, char *value)
 {
 	int res;
 	struct debconfclient *client = mydebconf_get ();
-	res = client->command (client, "get", template, NULL);
+	res = debconf_get (client, template);
 	if (res)
 		return res;
 
 	if (client->value == NULL || (strlen (client->value) == 0))
 	{
-		res = client->command (client, "set", template, strdup (value), NULL);
+		res = debconf_set (client, template, strdup (value));
 		if (res)
 			return res;
-		res = client->command (client, "fset", template, "seen", "false", NULL);
+		res = debconf_fset (client, template, "seen", "false");
 	}
 	return res;
 }
@@ -118,8 +118,7 @@ locale_get (void)
 	// languagechooser sets locale of the form xx_YY
 	// NO encoding used.
 
-
-	client->command (client, "get", "debian-installer/locale", NULL);
+	debconf_get (client, "debian-installer/locale");
 	if (client->value && (strlen (client->value) > 0))
 		return client->value;
 	else
@@ -286,7 +285,7 @@ maplist_select (maplist_t * maplist)
 	*s = '\0';
 	strcpy (template, "console-data/keymap/");
 	strcpy (template + 20, maplist->name);
-	client->command (client, "subst", template, "choices", buf, NULL);
+	debconf_subst (client, template, "choices", buf);
 	// set the default
 	if (best > 0)	{
 		s = insert_description (deflt, preferred->name, preferred->description);
@@ -315,7 +314,7 @@ maplist_t *maplist_get (const char *name)
 		return p;
 	p = NEW (maplist_t);
 	if (p == NULL)    {
-		di_logf (PROGNAME ": Failed to create maplist (out of memory)\n");
+		di_error (PROGNAME ": Failed to create maplist (out of memory)\n");
 		exit (1);
 	}
 	p->next = maplists;
@@ -343,7 +342,7 @@ keymap_t *keymap_get (maplist_t * list, char *name)
 		return mp;
 	mp = NEW (keymap_t);
 	if (mp == NULL)    {
-		di_logf (PROGNAME ": Failed to malloc keymap_t");
+		di_error (PROGNAME ": Failed to malloc keymap_t");
 		exit (1);
 	}
 	mp->langs = NULL;
@@ -371,7 +370,7 @@ maplist_parse_file (const char *name)
 
 	if (fp == NULL)
 	{
-		di_logf (PROGNAME ": Failed to open %s: %s \n", name, strerror (errno));
+		di_error (PROGNAME ": Failed to open %s: %s \n", name, strerror (errno));
 		exit (1);
 	}
 	maplist =
@@ -427,7 +426,7 @@ read_keymap_files (char *listdir)
 
 	d = opendir (listdir);
 	if (d == NULL)	{
-		di_logf (PROGNAME ": Failed to open %s: %s (keymap files probably not installed)\n",
+		di_error (PROGNAME ": Failed to open %s: %s (keymap files probably not installed)\n",
 			 listdir, strerror (errno));
 		exit (1);
 	}
@@ -438,7 +437,7 @@ read_keymap_files (char *listdir)
 			continue;
 		strcpy (p, ent->d_name);
 		if (stat (fullname, &sbuf) == -1)		{
-			di_logf (PROGNAME ": Failed to stat %s: %s\n", fullname,
+			di_error (PROGNAME ": Failed to stat %s: %s\n", fullname,
 				 strerror (errno));
 			exit (1);
 		}
@@ -526,7 +525,7 @@ keyboards_get (void)
 	// Did we forget to compile in a keyboard ???
 	if (DEBUG && keyboards == NULL)
 	{
-		di_logf (PROGNAME ": No keyboards found\n");
+		di_error (PROGNAME ": No keyboards found\n");
 		exit (1);
 	}
 	keyboards_sort (&keyboards);
@@ -551,10 +550,9 @@ check_if_serial_console (void)
 	if (fd == -1)
 		return 2;
 	present = (ioctl (fd, TIOCGSERIAL, &sr) == 0) ? 1 : 0;
-	client->command (client, "set", "debian-installer/serial-console",
-			 present ? "yes" : "no", NULL);
+	debconf_set (client,  "debian-installer/serial-console", present ? "yes" : "no");
 	close (fd);
-	di_logf ("Setting debian-installer/serial-console to %d", present);
+	di_log (DI_LOG_LEVEL_INFO, "Setting debian-installer/serial-console to %d", present);
 	return present;
 }
 
@@ -631,12 +629,11 @@ keyboard_select (void)
 	    && check_if_serial_console ())
 	{
 		s = s ? (strcpy (s, ", ") + 2) : buf;
-		di_log ("Can't tell if kbd present; add no keyboard option\n");
+		di_log (DI_LOG_LEVEL_INFO, "Can't tell if kbd present; add no keyboard option\n");
 		add_no_keyboard_case (s, &preference);
 		choices++;
 	}
-	client->command (client, "subst", "console-tools/archs", "choices", buf,
-			 NULL);
+	debconf_subst (client, "console-tools/archs", "choices", buf);
 	mydebconf_default_set ("console-tools/archs", preference);
 	free (preference);
 	// Should we prompt the user?
@@ -668,7 +665,7 @@ keymap_select (char *arch, char *keymap)
 			break;
 	if (DEBUG && !kb)
 	{
-		di_log ("Keyboard not found\n");
+		di_error ("Keyboard not found\n");
 		exit (1);
 	}
 	// Should we set a default ?
@@ -694,11 +691,10 @@ keymap_select (char *arch, char *keymap)
 void
 keymap_set (struct debconfclient *client, char *keymap)
 {
-	di_logf ("kbd_chooser: setting keymap %s", keymap);
-	client->command (client, "set", "debian-installer/keymap", keymap, NULL);
+	di_log (DI_LOG_LEVEL_INFO, "kbd_chooser: setting keymap %s", keymap);
+	debconf_set (client, "debian-installer/keymap", keymap);
 	// "seen" Used by scripts to decide not to call us again
-	client->command (client, "fset", "debian-installer/keymap",
-			 "seen", "yes", NULL);
+	debconf_fset (client, "debian-installer/keymap", "seen", "yes");
 	loadkeys_wrapper (keymap);
 
 }
@@ -716,6 +712,8 @@ main (int argc, char **argv)
 	setlocale (LC_ALL, "");
 	client = mydebconf_get ();
 
+	di_system_init("kbd-chooser"); // enable syslog
+
 	// As a form of debugging, allow a keyboard map to 
 	// be named on command-line
 	if (argc == 2)
@@ -724,9 +722,10 @@ main (int argc, char **argv)
 		exit (0);
 	}
 
-	client->command (client, "capb", "backup", NULL);
-	client->command (client, "version", "2.0", NULL);
-	client->command (client, "title", N_("Select a Keyboard Layout"), NULL);
+	debconf_capb (client, "backup");
+	debconf_version (client,  "2.0");
+	// debconf_settitle (client, N_("Select a Keyboard Layout"));
+	client->command(client, "title",  N_("Select a Keyboard Layout"), NULL);
 
 	read_keymap_files (KEYMAPLISTDIR);
 	check_if_serial_console ();
@@ -742,16 +741,16 @@ main (int argc, char **argv)
 			res = mydebconf_ask (kbd_priority, "console-tools/archs", &s);
 			if (res)			{
 				if (res == CMDSTATUS_GOBACK)
-					di_log ("kbdchooser: GOBACK recieved; leaving");
+					di_log (DI_LOG_LEVEL_INFO, "kbdchooser: GOBACK recieved; leaving");
 				exit (res);
 			}
 			if (s == NULL || (strlen (s) == 0))	{
-				di_log ("kbd-chooser: not setting keymap (console-tools/archs not set)");
+				di_log (DI_LOG_LEVEL_INFO, "kbd-chooser: not setting keymap (console-tools/archs not set)");
 				exit (0);
 			}
 			arch = extract_name (xmalloc (LINESIZE), s);
 			if (strcmp (arch, "none") == 0)	 {
-				di_log ("kbd-chooser: not setting keymap (kbd == none selected)");
+				di_log (DI_LOG_LEVEL_INFO, "kbd-chooser: not setting keymap (kbd == none selected)");
 				exit (0);
 			}
 			state = CHOOSE_KEYMAP;
