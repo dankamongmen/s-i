@@ -360,6 +360,12 @@ finish(void)
 		if (strcmp(fs, "reiserfs") == 0) {
 			mkfs_opts="-q";
 		}
+		/* mkfs.xfs will not overwrite existing filesystems unless
+		 * one passes -f. at this point, user has claimed "yes, do
+		 * as I say!" so let's force it here. */
+		else if (strcmp(fs, "xfs") == 0) {
+		  	mkfs_opts="-f";
+		}
                 append_message("partconf: Creating %s file system on %s\n", fs, parts[i]->path);
                 asprintf(&cmd, "mkfs.%s %s %s >/dev/null 2>>/var/log/messages", fs, mkfs_opts, parts[i]->path);
                 ret = system(cmd);
