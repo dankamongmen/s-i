@@ -27,6 +27,11 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
     files += \
 	S40framebuffer-module-linux-mips
    endif
+
+  ifneq (,$(filter alpha,$(DEB_HOST_GNU_CPU)))
+    files += \
+	S40framebuffer-module-linux-alpha
+   endif
 endif
 
 include ../../../Makefile.inc
