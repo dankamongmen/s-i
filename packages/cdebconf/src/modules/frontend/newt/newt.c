@@ -83,33 +83,45 @@ struct newt_data {
 /*  Horizontal offset between text box and borders */
 #define BUTTON_PADDING 4
 
+/*
+ * Function: get_text
+ * Input: struct frontend *obj - frontend object
+ *        const char *template - template name
+ *        const char *fallback - string to use if not available
+ * Output: const char * - ptr to string, translated if possible
+ * Description: get the translated version of a string
+ * Assumptions: None.
+ */
+static const char *
+get_text(struct frontend *obj, const char *template, const char *fallback )
+{
+	struct question *q = obj->qdb->methods.get(obj->qdb, template);
+	return q ? q_get_description(q) : fallback;
+}
+
 /* gettext would be much nicer :-( */
-static char *
+static const char *
 continue_text(struct frontend *obj)
 {
-    struct question *q = obj->qdb->methods.get(obj->qdb, "debconf/button-continue");
-    return q ? q_get_description(q) : "Continue";
+    return get_text(obj, "debconf/button-continue", "Continue");
 }
 
-static char *
+static const char *
 goback_text(struct frontend *obj)
 {
-    struct question *q = obj->qdb->methods.get(obj->qdb, "debconf/button-goback");
-    return q ? q_get_description(q) : "Go Back";
+    return get_text(obj, "debconf/button-goback", "Go Back");
 }
 
-static char *
+static const char *
 yes_text(struct frontend *obj)
 {
-    struct question *q = obj->qdb->methods.get(obj->qdb, "debconf/button-yes");
-    return q ? q_get_description(q) : "Yes";
+    return get_text(obj, "debconf/button-yes", "Yes");
 }
 
-static char *
+static const char *
 no_text(struct frontend *obj)
 {
-    struct question *q = obj->qdb->methods.get(obj->qdb, "debconf/button-no");
-    return q ? q_get_description(q) : "No";
+    return get_text(obj, "debconf/button-no", "No");
 }
 
 static void
