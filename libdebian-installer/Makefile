@@ -1,5 +1,5 @@
 MAJOR=3
-MINOR=0
+MINOR=1
 MICRO=0
 LIB=libdebian-installer.so
 LIBNAME_A=libdebian-installer.a

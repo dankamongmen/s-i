@@ -74,6 +74,8 @@ int di_pkg_provides(struct package_t *p, struct package_t *target);
 int di_pkg_is_virtual(struct package_t *p);
 int di_pkg_is_installed(struct package_t *p);
 void di_pkg_resolve_deps(struct linkedlist_t *ptr);
+struct linkedlist_t *di_pkg_toposort_arr(struct package_t **packages, const int pkg_count);
+struct linkedlist_t *di_pkg_toposort_list(struct linkedlist_t *list);
 int di_parse_version(struct version_t *rversion, const char *string);
 int di_compare_version(const struct version_t *a, const struct version_t *b);
 

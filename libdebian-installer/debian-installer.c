@@ -400,7 +400,10 @@ di_pkg_is_installed(struct package_t *p)
     return (p->status == installed);
 }
 
-/* This function has quadratic complexity over the number of packages,
+/* Resolve dependency/provides pointers. Creates dummy packages for virtual
+ * packages with reverse depends.
+ *
+ * This function has quadratic complexity over the number of packages,
  * but since the number of packages will typically be <100, we don't
  * care all that much about it. */
 void
@@ -450,6 +453,79 @@ di_pkg_resolve_deps(struct linkedlist_t *ptr)
     }
 
     return;
+}
+
+/* visit function for the depth-first traversal performed by the
+ * toposort functions */
+static void
+dfs_visit(struct package_t *p, struct linkedlist_t *queue)
+{
+    struct package_t *q;
+    struct list_node *node;
+    int i;
+
+    p->processed = 1;
+    for (i = 0; p->depends[i] != NULL; i++) {
+        q = p->depends[i]->ptr;
+        if (q == NULL)
+            continue;
+        if (!q->processed)
+            dfs_visit(q, queue);
+    }
+    node = (struct list_node *)malloc(sizeof(struct list_node));
+    node->data = p;
+    node->next = NULL;
+    if (queue->tail == NULL)
+        queue->head = queue->tail = node;
+    else {
+        queue->tail->next = node;
+        queue->tail = node;
+    }
+}
+
+/* Create a topological ordering of set of packages. This will also pull in
+ * their dependencies even if they're not actually in the list, because that's
+ * what we want most of the time. By using a queue, we'll get the dependencies
+ * before the packages that depend on them. */
+struct linkedlist_t *
+di_pkg_toposort_arr(struct package_t **packages, const int pkg_count)
+{
+    struct linkedlist_t *queue;
+    int i;
+
+    queue = (struct linkedlist_t *)malloc(sizeof(struct linkedlist_t));
+    queue->head = queue->tail = NULL;
+    for (i = 0; i < pkg_count; i++)
+        packages[i]->processed = 0;
+    for (i = 0; i < pkg_count; i++)
+        if (!packages[i]->processed)
+            dfs_visit(packages[i], queue);
+    return queue;
+}
+
+/* Same as di_pkg_toposort_arr, but for a linked list of packages */
+struct linkedlist_t *
+di_pkg_toposort_list(struct linkedlist_t *list)
+{
+    struct linkedlist_t *ret;
+    struct list_node *node;
+    struct package_t **packages, *p;
+    int count = 0, i = 0;
+
+    for (node = list->head; node != NULL; node = node->next) {
+        p = (struct package_t *)node->data;
+        if (p != NULL)
+            count++;
+    }
+    packages = malloc(count * sizeof(struct package_t *));
+    for (node = list->head; node != NULL; node = node->next) {
+        p = (struct package_t *)node->data;
+        if (p != NULL)
+            packages[i++] = p;
+    }
+    ret = di_pkg_toposort_arr(packages, count);
+    free(packages);
+    return ret;
 }
 
 
