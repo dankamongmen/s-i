@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.26 2002/11/18 00:44:14 barbier Exp $
+ * $Id: commands.c,v 1.27 2002/11/18 02:00:00 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -525,10 +525,8 @@ int command_register(struct confmodule *mod, int argc, char **argv,
                 snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
                 return DC_OK;
         }
-        fprintf(stderr,"got register\n");
         q = question_new(argv[2]);
         q->template = mod->templates->methods.get(mod->templates, argv[1]);
-        fprintf(stderr, "got tag: %s\n", q->template->tag);
         template_ref(mod->templates->methods.get(mod->templates, argv[1]));
         mod->questions->methods.set(mod->questions, q);
 	snprintf(out, outsize, "%u Question added", CMDSTATUS_SUCCESS);

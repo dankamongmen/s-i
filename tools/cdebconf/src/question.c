@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.16 2002/11/18 00:44:14 barbier Exp $
+ * $Id: question.c,v 1.17 2002/11/18 02:00:00 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -144,7 +144,6 @@ void question_variable_add(struct question *q, const char *var,
 void question_owner_add(struct question *q, const char *owner)
 {
 	struct questionowner **ownerp = &q->owners;
-        fprintf(stderr, "register: %s\n", owner);
 	
 	while (*ownerp != 0)
 	{

@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.13 2002/11/17 21:21:19 tfheen Exp $
+ * $Id: database.c,v 1.14 2002/11/18 02:00:00 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -297,14 +297,15 @@ static struct question *question_db_iterate(struct question_db *db,
 	return 0;
 }
 
-struct question_db *question_db_new(struct configuration *cfg, struct template_db *tdb, 
+struct question_db *question_db_new(struct configuration *cfg, 
+                                    struct template_db *tdb, 
                                     char *instance)
 {
 	struct question_db *db;
 	void *dlh;
 	struct question_db_module *mod;
 	char tmp[256];
-	const char *modpath, *modname, *driver;
+	const char *modpath, *driver, *modname = NULL;
 
         if (instance != NULL)
           modname = strdup(instance);
