@@ -20,8 +20,8 @@ main ()
 		   NULL);
   client->command (client, "go", NULL);
 
-  if ((dup2 (4, 0) == -1)
-      || (dup2 (5, 1) == -1))
+  if ((dup2 (DEBCONF_OLD_STDIN_FD, 0) == -1)
+      || (dup2 (DEBCONF_OLD_STDOUT_FD, 1) == -1))
     {
       return -1;
     }
