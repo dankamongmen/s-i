@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -249,6 +250,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
     return ret;
 }
 
+#ifndef TEST
 int
 main()
 {
@@ -307,3 +309,12 @@ main()
     cleanup();
     return ret;
 }
+#else
+int
+main()
+{
+    di_package package = { "foo-modules-2.4.22-1-di" };
+    assert(strcmp(udeb_kernel_version(&package), "2.4.22-1") == 0);
+    return 0;
+}
+#endif

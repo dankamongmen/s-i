@@ -18,7 +18,15 @@ small: clean $(BIN)
 	strip --remove-section=.comment --remove-section=.note $(BIN)
 	ls -l $(BIN)
 
+test-anna: anna.c anna.h util.o
+	$(CC) -o test-anna -DTEST anna.c util.o $(LIBS)
+
+check: test-anna
+	./test-anna
+
 clean:
-	-rm -f $(BIN) $(OBJS) *~
+	-rm -f $(BIN) $(OBJS) *~ test-anna
 
 anna.o util.o: anna.h
+
+.PHONY: check
