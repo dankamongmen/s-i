@@ -49,7 +49,7 @@ do
 	if [ -z "$CHOICES" ]; then
 		CHOICES="$mod"
 	else
-		CHOICES="$mod, $CHOICES"
+		CHOICES="$CHOICES, $mod"
 	fi
     done
 
