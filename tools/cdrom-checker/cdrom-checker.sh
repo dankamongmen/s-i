@@ -11,7 +11,7 @@ ask_mount() {
 	db_input high cdrom-checker/askmount
 	db_go
 
-	mount -t auto $DEVICE $TARGET -o ro
+	mount -t auto $DEVICE $TARGET -o ro 1>/dev/null 2>&1
 	if [ $? -ne 0 ]; then
 		db_fset cdrom-checker/mntfailed seen false
 		db_input high cdrom-checker/mntfailed
@@ -34,7 +34,6 @@ cleanup() {
 }
 
 
-
 # ask the user if we should check
 db_set cdrom-checker/start "false"
 db_fset cdrom-checker/start seen false
@@ -52,22 +51,29 @@ while [ 1 ]; do
 	# cdrom is mounted, start checking
 	cd $TARGET
 	cd_check
-	#db_progress_start 0 $mcount cdrom-checker/progress_title	# FIXME
 
 	# calculate the max percent
 	set -- `wc -l md5sum.txt`
 	mcount="$1"
+	db_progress START 0 $mcount cdrom-checker/progress_title
 
 	cleanup
 	count=0
-	cat md5sum.txt 2>/dev/null | \
-	while read LINE; do
+	while [ $count -lt $mcount ]; do
 		count=$(($count+1))
-		set -- $LINE
-		file=`echo $2 | sed -e 's/^\.\///'`
-		#db_subst cdrom-checker/progress_step FILE "$file"
-		#db_progress_step 1 cdrom-checker/progress_step
-		echo "$1  $2" >$TMPFILE
+		LINE=`sed -n -e "${count}p" md5sum.txt`
+		sum=`echo $LINE | sed -e 's/\(.*\)[[:space:]].*/\1/'`
+		file=`echo $LINE | sed -e 's/.*[[:space:]]\(.*\)/\1/' -e 's/^\.\///'`
+
+		# make sure, the tmpfile is good
+		if [ -z "$sum" -o -z "$file" ]; then
+			cleanup
+			continue
+		fi
+		
+		db_subst cdrom-checker/progress_step FILE "$file"
+		db_progress STEP 1 cdrom-checker/progress_step
+		echo "$sum  $file" >$TMPFILE
 		md5sum -c $TMPFILE 1>/dev/null 2>&1
 		if [ $? -ne 0 ]; then
 			echo -n "$2" >$TMPFILE
@@ -78,11 +84,11 @@ while [ 1 ]; do
 
 	cd /	# make sure, cdrom is not bussy
 	umount /cdrom
-	#db_progress_stop			# FIXME
+	db_progress STOP
 
 	# some file is faulty, stop here
 	if [ -f "$TMPFILE" ]; then
-		file=`cat $TMPFILE | sed -e 's/^\.\///'`
+		file=`head -n1 $TMPFILE | sed -e 's/^\.\///'`
 		db_subst cdrom-checker/missmatch FILE "$file"
 		db_fset cdrom-checker/missmatch seen false
 		db_input critical cdrom-checker/missmatch
