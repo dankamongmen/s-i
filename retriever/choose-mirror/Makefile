@@ -1,7 +1,7 @@
 CFLAGS=-Wall -g -D_GNU_SOURCE -DWITH_HTTP -DWITH_FTP
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=choose-mirror
-LIBS=-ldebconfclient
+LIBS=-ldebconfclient -ldebian-installer
 MIRRORLISTURL=http://cvs.debian.org/*checkout*/webwml/english/mirror/Mirrors.masterlist?rev=HEAD&cvsroot=webwml&content-type=text/plain
 
 ifdef DEBUG

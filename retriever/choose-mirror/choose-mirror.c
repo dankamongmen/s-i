@@ -2,6 +2,7 @@
  * current version of d-i is targeted at installing. */
 #define PREFERRED_DISTRIBUTION "sarge"
 
+#include <debian-installer.h>
 #include <cdebconf/debconfclient.h>
 #include <string.h>
 #include <stdlib.h>
@@ -245,11 +246,21 @@ static int validate_mirror(void) {
 	char *mir;
 	char *host;
 	char *dir;
+	char *prx;
+	char *proxy;
 	int ret = 0;
 
 	mir = add_protocol("mirror");
 	host = add_protocol("hostname");
 	dir = add_protocol("directory");
+	prx = add_protocol("proxy");
+	
+	debconf_get(debconf, prx);
+	if (NULL != debconf->value)
+		proxy = strdup(debconf->value);
+	else
+		proxy = NULL;
+	free(prx);
 
 	if (! manual_entry) {
 		char *mirror;
@@ -295,12 +306,19 @@ static int validate_mirror(void) {
 		hostname = strdup(debconf->value);
 		debconf_get(debconf, dir);
 		directory = strdup(debconf->value);
-		
-		asprintf(&command, "wget -q %s://%s%s%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+	
+		if ( NULL == proxy )
+			asprintf(&command, "wget -q %s://%s%s%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
 		                   protocol, hostname, directory,
+				   "dists/" PREFERRED_DISTRIBUTION);
+		else
+			asprintf(&command, "%s_proxy=%s wget -q %s://%s%s%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+		                   protocol, proxy, 
+				   protocol, hostname, directory,
 				   "dists/" PREFERRED_DISTRIBUTION);
 		
 		//fprintf(stderr, "command is %s\n", command);
+		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
 		
 		free(hostname);
 		free(directory);
@@ -357,6 +375,8 @@ int main (void) {
 	debconf = debconfclient_new();
 	debconf_capb(debconf, "backup");
 	debconf_version(debconf, 2);
+
+	di_system_init("choose-mirror");
 
 	while (state >= 0 && states[state]) {
 		if (states[state]() != 0) { /* back up to start */
