@@ -17,19 +17,19 @@ fi
 # detect which is the root partition: /target
 # ugh, I wanted to use awk, but sed has better chance of being in
 # busybox
-rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
+rootfs=`sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
 
 # some combination of partconf and kernel 2.2 ends up with /target/.
 if [ "" = "$rootfs" ]; then
-	rootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/ /s/ .*//p' $MTAB`
+	rootfs=`sed -ne '/^[^ ]* \/target\/ /s/ .*//p' $MTAB`
 fi
 
 # detect if /boot is a separate partition and if so which partition it is.
-bootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
+bootfs=`sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
 
 # some combination of partconf and kernel 2.2 ends up with /target/.
 if [ "" = "$bootfs" ]; then
-	bootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/boot\/ /s/ .*//p' $MTAB`
+	bootfs=`sed -ne '/^[^ ]* \/target\/boot\/ /s/ .*//p' $MTAB`
 fi
 
 if [ "" = "$bootfs" ]; then
@@ -68,7 +68,7 @@ case "$ARCH","$SUBARCH" in
 			for alias in `ls /proc/device-tree/aliases/*`; do
 				device=`grep disk $alias | sed -e 's%@[^/]*/%/%g'`
 				if [ "$path" = "$device" ]; then
-					path=`echo $alias | sed -e 's%/proc/device-tree/aliases/%%'`
+					path="${alias#/proc/device-tree/aliases/}"
 				fi
 			done
 		fi
