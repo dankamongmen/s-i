@@ -324,6 +324,9 @@ if [ "$slashboot" != "$root" ]; then
     initrd="${initrd#/boot}"
 fi
 
+# Work out user parameters.
+user_params="$(echo $(user-params))" || true
+
 # we generate our own yaboot.conf kernel (yabootconfig is horribly broken)
 # cjwatson: a little more justification of that would have been nice ...
 # but it does seem clear that yabootconfig isn't flexible enough for our
@@ -370,9 +373,9 @@ if [ "$initrd" ]; then
 	initrd=$initrd
 EOF
 fi
-if [ "$video" ]; then
+if [ "$user_params" ]; then
     writeyabootconf <<EOF
-	append="video=$video"
+	append="$user_params"
 EOF
 fi
 writeyabootconf <<EOF
@@ -386,9 +389,9 @@ if [ "$initrd" ]; then
 	initrd=$initrd.old
 EOF
 fi
-if [ "$video" ]; then
+if [ "$user_params" ]; then
     writeyabootconf <<EOF
-	append="video=$video"
+	append="$user_params"
 EOF
 fi
 
