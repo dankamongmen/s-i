@@ -6,7 +6,47 @@
 mountfloppy()
 {
     if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
-        mount /dev/floppy/0 /floppy
+        if [ ! -d /dev/floppy ]; then
+            modprobe floppy >> /var/log/messages 2>&1 || true
+        fi
+        if [ ! -d /dev/floppy ]; then
+            exit 1
+        fi
+        if ! lsmod | grep -q ^fat; then
+            insmod fat >> /var/log/messages 2>&1 || true
+        fi
+        if ! lsmod | grep -q ^vfat; then
+            insmod vfat >> /var/log/messages 2>&1 || true
+        fi
+
+        choices="`echo /dev/floppy/[0-9] | sed 's/ /, /g'`"
+        db_subst retriever/floppy/device CHOICES "$choices" || true
+        db_fset retriever/floppy/device seen false || true
+        db_input medium retriever/floppy/device || true
+        db_go || true
+        db_get retriever/floppy/device
+        floppydev=$RET
+
+        db_fset retriever/floppy/fstype seen false || true
+        db_input low retriever/floppy/fstype || true
+        db_go || true
+        db_get retriever/floppy/fstype
+        case x$RET in
+            xFAT)
+                fstype=msdos
+                ;;
+            xFAT32)
+                fstype=vfat
+                ;;
+            xExt2)
+                fstype=ext2
+                ;;
+            *)
+                fstype=auto
+                ;;
+        esac
+
+        mount $floppydev -t$fstype /floppy
     fi
 }
 
@@ -22,8 +62,12 @@ case "x$1" in
         ;;
     xpackages)
         # generate a Packages file based on what udebs are on the floppy
-        if [ -n "$3" ]; then
+        if [ "$3" != "." ]; then
             # sorry, no compressed files
+            exit 1
+        fi
+        if [ -n "$4" -a "$4" != "main" ]; then
+            # only do 'main'
             exit 1
         fi
         mountfloppy
