@@ -243,6 +243,9 @@ get_input_info() {
 		  register-module i8042
 		  echo "atkbd:AT keyboard support"
 		  register-module atkbd
+		  echo "psmouse:AT mouse support"
+		  register-module psmouse
+		;;
 		;;
 	esac
 }
