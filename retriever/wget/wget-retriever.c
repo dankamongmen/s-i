@@ -1,8 +1,6 @@
 /*
  * Retrieve files via busybox wget.
  * Copyright 2000 Joey Hess <joeyh@debian.org>, GPL'd
- *
- * TODO: proxy support
  */
 
 #include <debconfclient.h>
@@ -21,11 +19,15 @@ int main(int argc, char **argv) {
 	if (argc < 3)
 		exit(1);
 	
-					    // TODO: what about ftp?
+	// TODO: what about ftp?
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/hostname", NULL);
 	hostname=strdup(debconf->value);
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/directory", NULL);
 	directory=debconf->value;
+	debconf->command(debconf, "GET", DEBCONF_BASE "http/proxy", NULL);
+	if (strcmp(debconf->value,"") == 0)
+		if (setenv("http_proxy", debconf->value, 1) == -1)
+			exit(1);
 	
 	src=argv[1];
 	/*
