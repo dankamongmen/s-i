@@ -729,7 +729,7 @@ keymap_set (struct debconfclient *client, char *keymap)
 	di_info ("kbd_chooser: setting keymap %s", keymap);
 	debconf_set (client, "debian-installer/keymap", keymap);
 	// "seen" Used by scripts to decide not to call us again
-	debconf_fset (client, "debian-installer/keymap", "seen", "yes");
+	debconf_fset (client, "debian-installer/keymap", "seen", "true");
 	loadkeys_wrapper (keymap);
 
 }
