@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.38 2003/11/12 22:39:19 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.39 2003/11/14 20:53:16 mckinstry Exp $
  */
 
 #include "config.h"
@@ -74,6 +74,18 @@ mydebconf_default_set (char *template, char *value)
 	if (client->value == NULL || (strlen (client->value) == 0))
 		res = debconf_set (client, template, strdup (value));
 	return res;
+}
+
+
+/**
+ * @brief  Ensure a directory is present (and readable)
+ */
+int check_dir (const char *dirname)
+{
+	struct stat buf;
+	if (stat (dirname, &buf))
+		return 0;
+	return S_ISDIR(buf.st_mode);
 }
 
 /**

@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: mac-kbd.c,v 1.6 2003/10/14 20:15:34 mckinstry Rel $
+ * $Id: mac-kbd.c,v 1.7 2003/11/14 20:53:16 mckinstry Rel $
  */
 
 #include "config.h"
@@ -36,7 +36,7 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 	 * FIXME: Write this code
 	 */
 #warning "Kernel 2.6 code not written yet"
-	if (di_check_dir ("/proc/bus/input") >= 0) {
+	if (check_dir ("/proc/bus/input") >= 0) {
 		// this dir only present in 2.6
 	}
 

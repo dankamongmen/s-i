@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: amiga-kbd.c,v 1.8 2003/11/06 22:30:41 mckinstry Rel $
+ * $Id: amiga-kbd.c,v 1.9 2003/11/14 20:53:16 mckinstry Rel $
  */
 
 #include "config.h"
@@ -43,10 +43,10 @@ kbd_t *amiga_kbd_get (kbd_t *keyboards, const char *subarch)
 #if defined (KERNEL_2_6)
 
 	// /proc must be mounted by this point
-	assert (di_check_dir ("/proc") == 1);
+	assert (check_dir ("/proc") == 1);
 	
 	// In 2.6 series, we can detect keyboard via /proc/bus/input
-	if (di_check_dir ("/proc/bus/input") >= 0) {
+	if (check_dir ("/proc/bus/input") >= 0) {
 		int res;
 		// this dir only present in 2.6
 		res = grep ("/proc/bus/input/devices", "Amiga keyboard");

@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.11 2003/10/31 22:55:54 mckinstry Rel $
+ * $Id: kbd-chooser.h,v 1.12 2003/11/14 20:53:16 mckinstry Rel $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -51,9 +51,9 @@ extern kbd_t *serial_kbd_get (kbd_t *keyboards,const char *subarch);
 extern kbd_t *atari_kbd_get (kbd_t *keyboards,const char *subarch);
 
 extern int grep (const char *file, const char *string);
+extern int check_dir (const char *dirname);
 
-
-#ifdef SPARC
+#ifdef SPARC_KBD
 #define PREFERRED_KBD "sparc"
 #endif
 

@@ -4,7 +4,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: sparc-kbd.c,v 1.8 2003/11/06 22:30:41 mckinstry Rel $
+ * $Id: sparc-kbd.c,v 1.9 2003/11/14 20:53:16 mckinstry Rel $
  */
 
 #include "config.h"
@@ -38,7 +38,7 @@ kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
 #warning "Kernel 2.6 code not written yet"
 
 	  // /proc must be mounted by this point
-	  assert (di_check_dir ("/proc") == 1); 
+	  assert (check_dir ("/proc") == 1); 
 	
 	  if (di_check_dir ("/proc/bus/input") >= 0) {
 		int res;

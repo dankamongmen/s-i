@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: acorn-kbd.c,v 1.6 2003/11/06 22:30:41 mckinstry Rel $
+ * $Id: acorn-kbd.c,v 1.7 2003/11/14 20:53:16 mckinstry Rel $
  */
 
 #include "config.h"
@@ -24,7 +24,7 @@ kbd_t *acorn_kbd_get (kbd_t *keyboards, const char *subarch)
 	int res;
 
 	// /proc must be mounted by this point
-	assert (di_check_dir ("/proc") == 1);
+	assert (check_dir ("/proc") == 1);
 
 	k->name = "acorn"; // This must match the name "acorn" in console-keymaps-acorn
 	k->deflt = NULL;

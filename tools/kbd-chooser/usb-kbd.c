@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.14 2003/11/06 21:55:02 mckinstry Rel $
+ * $Id: usb-kbd.c,v 1.15 2003/11/14 20:53:16 mckinstry Rel $
  */
 
 #include "config.h"
@@ -46,7 +46,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 	 *   Need to search /proc/bus/input/devices
 	 
 	 */	
-	if (di_check_dir ("/proc/bus/input") >= 0) { // 2.6 kernel
+	if (check_dir ("/proc/bus/input") >= 0) { // 2.6 kernel
 #warning "Kernel 2.6 code not written yet"
 	}
 #endif

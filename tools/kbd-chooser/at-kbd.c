@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.12 2003/11/13 11:15:49 kraai Exp $
+ * $Id: at-kbd.c,v 1.13 2003/11/14 20:53:16 mckinstry Rel $
  */
 
 #include "config.h"
@@ -43,7 +43,7 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 
 #if defined (KERNEL_2_6)
 	// /proc must be mounted by this point
-	assert (di_check_dir ("/proc") == 1);
+	assert (check_dir ("/proc") == 1);
 
 	/* In 2.6 series, we can detect keyboard via /proc/bus/input
 	 *
