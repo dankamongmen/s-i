@@ -61,14 +61,14 @@ discover_hw () {
     # unrecongized option!
     DISCOVER_TEST=$(discover --version 2> /dev/null)
     if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
-        # Discover 2.x
+        # Discover 2.x, see <URL:http://hackers.progeny.com/discover/> for doc
         # XXX: This is copied from xfree86, and do not work yet
 
         log "Using discover2 do not work yet."
 
         dpath=linux/module/name
         dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
-        dflags="-d all -e ata -e pci -e pcmcia -e scsi display"
+        dflags="-d all -e ata -e pci -e pcmcia -e scsi all"
 
 	# Use fixed name temp files, as 'tempfile' is missing from busybox
         VENDOR_MODEL_FILE=/tmp/discover-vendor.txt
@@ -76,6 +76,7 @@ discover_hw () {
 
         discover --type-summary $dflags > $VENDOR_MODEL_FILE
         discover --data-path=$dpath --data-version=$dver $dflags > $DRIVER_FILE
+        # 'paste' is missing from busybox-cvs-udeb [pere 2003-06-01]
         paste $VENDOR_MODEL_FILE $DRIVER_FILE
         rm -f $VENDOR_MODEL_FILE $DRIVER_FILE
     else
