@@ -162,7 +162,7 @@ get_pvs() {
 # list all activated volume groups
 #
 list_vgs() {
-	echo `vgdisplay | grep '^[ ]*VG Name' | sed -e 's/.*[[:space:]]\(.*\)$/\1/' | sort`
+	echo `vgdisplay | grep '^[ ]*VG Name' | sed -e 's/.*[[:space:]]\+\(.*\)$/\1/' | sort`
 }
 
 #
