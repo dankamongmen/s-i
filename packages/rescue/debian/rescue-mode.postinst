@@ -12,6 +12,19 @@ try_load_module () {
 	modprobe "$1" >>"$MESSAGES" 2>&1 || true
 }
 
+chroot_has () {
+	PATH="$CHROOT_PATH" search-path "$1"
+}
+
+disconnect_run () {
+	env -i PATH="$PATH" TERM="$TERM" "$@" \
+		<&$OLD_STDIN >&$OLD_STDOUT 2>&$OLD_STDERR
+}
+
+chroot_run () {
+	disconnect_run chroot /target "$@"
+}
+
 try_load_module ext2
 try_load_module ext3
 try_load_module jfs
@@ -54,11 +67,57 @@ while :; do
 	break
 done
 
+# Work out a sensible $PATH with respect to /target.
+CHROOT_PATH=
+OLD_IFS="$IFS"
+IFS=:
+for element in $PATH; do
+	# Only include absolute elements.
+	if [ "${element#/}" != "$element" ]; then
+		CHROOT_PATH="${CHROOT_PATH:+$CHROOT_PATH:}/target$element"
+	fi
+done
+IFS="$OLD_IFS"
+
 OLD_STDIN="$DEBCONF_OLD_FD_BASE"
 OLD_STDOUT="$(($DEBCONF_OLD_FD_BASE + 1))"
 OLD_STDERR="$(($DEBCONF_OLD_FD_BASE + 2))"
 
-env -i PATH="$PATH" TERM="$TERM" chroot /target <&$OLD_STDIN >&$OLD_STDOUT 2>&$OLD_STDERR
+FALLBACK_SHELL=
+
+shell_failed () {
+	FALLBACK_SHELL=rescue/maybe-fallback-shell
+	db_subst "$FALLBACK_SHELL" SHELL "$*"
+}
+
+if [ -f /target/bin/sh ] && [ -x /target/bin/sh ]; then
+	chroot_run /bin/sh -i || shell_failed '/bin/sh -i'
+elif chroot_has sash; then
+	chroot_run sash || shell_failed sash
+	:
+elif chroot_has busybox; then
+	# Try this last even though busybox is useful, since it might fail
+	# due to a missing sh applet.
+	chroot_run busybox sh || shell_failed 'busybox sh'
+else
+	FALLBACK_SHELL=rescue/fallback-shell
+fi
+
+if [ "$FALLBACK_SHELL" ]; then
+	db_subst "$FALLBACK_SHELL" DEVICE "$rootdev"
+	db_input critical "$FALLBACK_SHELL"
+	if ! db_go; then
+		umount /target >>"$MESSAGES" 2>&1 || true
+		exit 10
+	fi
+	if [ "$FALLBACK_SHELL" != rescue/maybe-fallback-shell ] || \
+	   (db_get "$FALLBACK_SHELL" && [ "$RET" = true ]); then
+		# If this fails, we're doomed anyway!
+		disconnect_run /bin/sh -i || true
+	fi
+fi
+
+disconnect_run printf '\nRebooting...\n'
 
 umount -a || true
 
