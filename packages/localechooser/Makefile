@@ -3,8 +3,8 @@ all: debian/SUPPORTED debian/short-tmp/shortlists debian/templates check-scripts
 LIST     = languagelist
 L10NLIST = languagelist.l10n
 
-debian/templates.base: mktemplates.language debian/templates-in $(LIST) $(L10NLIST)
-	LC_COLLATE=C ./mktemplates.language $(LIST) $(L10NLIST) debian/templates.lang debian/templates-in
+debian/templates.base: mktemplates.language debian/localechooser.templates-in $(LIST) $(L10NLIST)
+	LC_COLLATE=C ./mktemplates.language $(LIST) $(L10NLIST) debian/templates.lang debian/localechooser.templates-in
 	./mktemplates.country debian/templates debian/templates.lang
 
 debian/iso-codes: 
