@@ -158,11 +158,11 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	/* Figure out which menu item was selected. */
 	for (p = head; p; p = p->next) {
 		if (p->description_ll) {
-		    if (p->installer_menu_item && strcmp(p->description, s) == 0)
+		    if (p->installer_menu_item && strcmp(p->description_ll, s) == 0)
 			    return p;
 		}	    
 		else
-		    if (p->installer_menu_item && strcmp(p->description_ll, s) == 0)
+		    if (p->installer_menu_item && strcmp(p->description, s) == 0)
 			    return p;
 	}
 	return 0;
