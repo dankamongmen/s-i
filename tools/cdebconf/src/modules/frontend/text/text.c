@@ -100,8 +100,8 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char answer[1024];
 	int i, j, count, dcount, choice;
 
-	count = strchoicesplit(question_choices(q), choices, DIM(choices));
-	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
+	count = strchoicesplit((char *)question_choices(q), choices, DIM(choices));
+	dcount = strchoicesplit((char *)question_defaultval(q), defaults, DIM(defaults));
 
 	if (dcount > 0)
 		for (i = 0; i < count; i++)
@@ -186,7 +186,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	int i, count, choice = 1, def = -1;
 	const char *defval = question_defaultval(q);
 
-	count = strchoicesplit(question_choices(q), choices, DIM(choices));
+	count = strchoicesplit((char *)question_choices(q), choices, DIM(choices));
 	if (count > 1)
 	{
 		if (defval != NULL)
