@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.45 2003/10/08 21:40:19 barbier Exp $
+ * $Id: text.c,v 1.46 2003/10/13 22:32:09 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -60,6 +60,7 @@
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
+#define q_get_listorder(q)		question_get_field((q), NULL, "listorder")
 
 #define MAKE_UPPER(C) do { if (islower((int) C)) { C = (char) toupper((int) C); } } while(0)
 /*
@@ -250,6 +251,8 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char answer[4096] = {0};
 	int i, j, line, count = 0, dcount, choice;
         const char *p;
+        int *tindex = NULL;
+        const char *listorder = q_get_listorder(q);
 
     p = q_get_choices_vals(q);
     if (*p)
@@ -264,23 +267,25 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
     choices = malloc(sizeof(char *) * count);
     count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_translated = malloc(sizeof(char *) * count);
-    if (strchoicesplit(q_get_choices(q), choices_translated, count) != count)
+    tindex = malloc(sizeof(int *) * count);
+    if (strchoicesplit2(q_get_choices(q), listorder, choices_translated, tindex, count) != count)
         return DC_NOTOK;
+
     defaults = malloc(sizeof(char *) * count);
     dcount = strchoicesplit(question_getvalue(q, ""), defaults, count);
     selected = calloc(1, sizeof(char) * count);
 
 	for (j = 0; j < dcount; j++)
 		for (i = 0; i < count; i++) {
-			if (strcmp(choices[i], defaults[j]) == 0)
-				selected[i] = 1;
+			if (strcmp(choices[tindex[i]], defaults[j]) == 0)
+				selected[tindex[i]] = 1;
                 }
 
 	i = 0;
 
 	while (1) {
  	    for (line = 0; i < count && line < getheight()-1; i++, line++)
-	        if (selected[i])
+	        if (selected[tindex[i]])
 		       /* A selected item in a Multiselect question */
 	               printf(get_text(obj, "debconf/multiselect-selected", "%3d. %s (selected)"), i+1, choices_translated[i]);
                 else
@@ -309,14 +314,14 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	    if (answer[0] == *(get_text(obj,"debconf/begin-key", "B"))) 
 	    		{ i = 0; continue; }
 
-	    choice = atoi(answer);
+	    choice = atoi(answer) - 1;
 
-	    if (choice > 0 && choice <= count) {
-	        if (selected[choice-1] == 0) 
-	            selected[choice-1] = 1;
+	    if (choice >= 0 && choice < count) {
+	        if (selected[tindex[choice]] == 0) 
+	            selected[tindex[choice]] = 1;
 	        else
-	            selected[choice-1] = 0;
-	        i = choice-getheight()+1 > 0 ? choice-getheight()+1 : 0;
+	            selected[tindex[choice]] = 0;
+	        i = choice-getheight()+2 > 0 ? choice-getheight()+2 : 0;
 	    }
 	}
 
@@ -332,6 +337,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 		free(choices[i]);
 		free(choices_translated[i]);
 	}
+        free(tindex);
         free(choices);
         free(choices_translated);
         free(selected);
@@ -422,22 +428,25 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	int i, line, count = 0, choice = 1, def = -1;
 	const char *defval = question_getvalue(q, "");
         const char *p;
+	int *tindex = NULL;
+	const char *listorder = q_get_listorder(q);
 
-    p = q_get_choices_vals(q);
-    if (*p)
-    {
-        count++;
-        for (; *p; p++)
-            if (*p == ',') // won't work with escaping \, :-(
-                count++;
-    }
-    if (count <= 0)
-        return DC_NOTOK;
-    choices = malloc(sizeof(char *) * count);
-    count = strchoicesplit(q_get_choices_vals(q), choices, count);
-    choices_translated = malloc(sizeof(char *) * count);
-    if (strchoicesplit(q_get_choices(q), choices_translated, count) != count)
-        return DC_NOTOK;
+	p = q_get_choices_vals(q);
+	if (*p)
+	{
+		count++;
+		for (; *p; p++)
+            		if (*p == ',') // won't work with escaping \, :-(
+                		count++;
+	}
+	if (count <= 0)
+		return DC_NOTOK;
+	choices = malloc(sizeof(char *) * count);
+	count = strchoicesplit(q_get_choices_vals(q), choices, count);
+	choices_translated = malloc(sizeof(char *) * count);
+	tindex = malloc(sizeof(int *) * count);
+	if (strchoicesplit2(q_get_choices(q), listorder, choices_translated, tindex, count) != count)
+        	return DC_NOTOK;
 
 	if (count == 1)
 		defval = choices[0];
@@ -446,15 +455,15 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	if (defval != NULL)
 	{
 		for (i = 0; i < count; i++)
-			if (strcmp(choices[i], defval) == 0)
-				def = i + 1;
+			if (strcmp(choices[tindex[i]], defval) == 0)
+				def = i;
 	}
 
 	i = 0;
 
 	do {
 	    for (line = 0; i < count && line < getheight()-1; i++, line++) {
-	        if (def == i + 1)
+	        if (def == i)
 		       /* A selected item in a Select question */
 	               printf(get_text(obj, "debconf/select-default", "%3d. %s (default)"), i+1, choices_translated[i]);
 		else
@@ -463,9 +472,9 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	    }
  
 	    if (i == count) {
-	        if (def > 0 && choices_translated[def-1]) {
+	        if (def >= 0 && choices_translated[def]) {
 	            printf(get_text(obj, "debconf/prompt-num-with-default", "Prompt: 1 - %d, default=%s> "), 
-				    count, choices_translated[def-1]);
+				    count, choices_translated[def]);
 	        } else {
 	            printf(get_text(obj, "debconf/prompt-num", "Prompt: 1 - %d> "), count);
                 }
@@ -482,16 +491,17 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 #endif
 	        choice = def;
 	    else
-	        choice = atoi(answer);
-	} while (choice <= 0 || choice > count);
+	        choice = atoi(answer) - 1;
+	} while (choice < 0 || choice >= count);
 	/*	fprintf(stderr,"In %s, line: %d\n\tanswer: %s, choice[choice]: %s\n",
 		__FILE__,__LINE__,answer, choices[choice - 1]);*/
-	question_setvalue(q, choices[choice - 1]);
+	question_setvalue(q, choices[tindex[choice]]);
 	for (i = 0; i < count; i++) 
 	{
 		free(choices[i]);
 		free(choices_translated[i]);
 	}
+        free(tindex);
         free(choices);
         free(choices_translated);
 	

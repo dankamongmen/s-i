@@ -40,6 +40,7 @@ void strvacat(char *buf, size_t len, ...);
 int strparsecword(char **inbuf, char *outbuf, size_t maxlen);
 int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen);
 int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg);
+int strchoicesplit2(const char *inbuf, const char *listorder, char **argv, int *tindex, size_t maxnarg);
 int strcmdsplit(char *inbuf, char **argv, size_t maxnarg);
 void strunescape(const char *inbuf, char *outbuf, const size_t maxlen, const int quote);
 void strescape(const char *inbuf, char *outbuf, const size_t maxlen, const int quote);

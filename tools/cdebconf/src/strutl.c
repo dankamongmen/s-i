@@ -10,6 +10,7 @@
 #ifdef HAVE_LIBTEXTWRAP
 #include <textwrap.h>
 #endif
+#include <assert.h>
 
 int strcountcmp(const char *s1, const char *e1, const char *s2, const char *e2)
 {
@@ -216,6 +217,85 @@ int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
 
         s = e;
         if (*s == ',') s++;
+    }
+    return argc;
+}
+
+static int mystrcmp_lexicographic(const void *p1, const void *p2)
+{
+	return strcmp(*((char **) p1), *((char **) p2));
+}
+
+int strchoicesplit2(const char *inbuf, const char *listorder, char **argv, int *tindex, size_t maxnarg)
+{
+    int argc = 0, i;
+    const char *s = inbuf, *e, *c;
+    char *p;
+
+    assert(tindex);
+    assert(argv);
+    if (inbuf == 0) return 0;
+
+    INFO(INFO_VERBOSE, "Splitting [%s]\n", inbuf);
+    while (*s != 0 && argc < maxnarg)
+    {
+        /* skip initial spaces */
+        while (isspace(*s)) s++;
+
+        /* find end */
+        e = s;
+        while (*e != 0)
+        {
+            if (*e == '\\' && *(e+1) == ',')
+                e += 2;
+            else if (*e == ',')
+                break;
+            else
+                e++;
+        }
+
+        argv[argc] = malloc(e-s+1+10);
+        for (c = s, i = 0; c < e; c++, i++)
+        {
+            if (*c == '\\' && c < (e-1) && *(c+1) == ',')
+            {
+                argv[argc][i] = ',';
+                c++;
+            }
+            else
+                argv[argc][i] = *c;
+        }
+        argv[argc][i] = 0;
+        p = &argv[argc][i-1];
+        /* strip off trailing spaces */
+        while (p > argv[argc] && *p == ' ') *p-- = 0;
+
+        /* append string index */
+        p++;
+        snprintf(p, 10, ":%d", argc);
+
+        argc++;
+        s = e;
+        if (*s == ',') s++;
+    }
+    if (strcmp(listorder, "lexicographic") == 0)
+        qsort(argv, argc, sizeof(char *), mystrcmp_lexicographic);
+
+    /*
+     *  In each string stored in argv, ":IND" has been appended,
+     *  where IND was the position before sorting.
+     *  This loop removes this extra markup to restore original
+     *  strings, and put this information into an array of integers:
+     *    original index -> ret[index in translated strings]
+     */
+    i = 0;
+    while (i < argc)
+    {
+        p = strrchr(argv[i], ':');
+        assert(p);
+        *p = 0;
+        tindex[i] = strtol(p+1, NULL, 10);
+        i++;
     }
     return argc;
 }

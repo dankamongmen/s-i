@@ -18,6 +18,7 @@ static void remove_newlines(char *);
 const char *template_fields_list[] = {
         "tag",
         "type",
+        "listorder",
         "default",
         "choices",
         "description",
@@ -116,6 +117,7 @@ void template_delete(struct template *t)
 
 	DELETE(t->tag);
 	DELETE(t->type);
+	DELETE(t->listorder);
 	p = t->fields;
 	DELETE(t);
 	while (p != NULL)
@@ -155,6 +157,7 @@ struct template *template_dup(struct template *t)
         struct template_l10n_fields *from, *to;
 
         ret->type = STRDUP(t->type);
+        ret->listorder = STRDUP(t->listorder);
         if (t->fields == NULL)
                 return ret;
 
@@ -248,6 +251,8 @@ static char *template_lget(struct template *t, const char *lang,
         return t->tag;
     else if (strcasecmp(field, "type") == 0)
         return t->type;
+    else if (strcasecmp(field, "listorder") == 0)
+        return t->listorder;
 
     /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
@@ -349,6 +354,11 @@ static void template_lset(struct template *t, const char *lang,
     else if (strcasecmp(field, "type") == 0)
     {
         t->type = STRDUP(value);
+        return;
+    }
+    else if (strcasecmp(field, "listorder") == 0)
+    {
+        t->listorder = STRDUP(value);
         return;
     }
 
@@ -500,6 +510,8 @@ struct template *template_load(const char *filename)
 			t = template_new(p+10);
 		else if (strstr(p, "Type: ") == p && t != 0)
 			template_lset(t, NULL, "type", p+6);
+		else if (strstr(p, "Listorder: ") == p && t != 0)
+			template_lset(t, NULL, "listorder", p+11);
 		else if (strstr(p, "Default: ") == p && t != 0)
 			template_lset(t, NULL, "default", p+9);
 		else if (strstr(p, "Default-") == p && t != 0) 
