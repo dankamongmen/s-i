@@ -41,16 +41,16 @@ CFLAGS += -DAT_KBD -DUSB_KBD
 KEYBOARDS := at usb
 endif
 ifeq ($(ARCH),sparc)
-CFLAGS += -DSPARC -DUSB_KBD 
+CFLAGS += -DSPARC_KBD -DUSB_KBD 
 KEYBOARDS := sparc usb
 endif
 ifeq ($(ARCH),powerpc)
-CFLAGS += -DPOWERPC -DUSB_KBD -DAT_KBD -DAMIGA_KBD 
+CFLAGS +=  -DUSB_KBD -DAT_KBD -DAMIGA_KBD 
 KEYBOARDS := at usb amiga
 endif
 ifeq ($(ARCH),arm)
-CFLAGS += -DARM -DAT_KBD -DUSB_KBD 
-KEYBOARDS := at arm usb
+CFLAGS +=  -DAT_KBD -DUSB_KBD 
+KEYBOARDS := at usb
 endif
 ifeq ($(ARCH),m68k)
 CFLAGS += -DAMIGA_KBD -DATARI_KBD -DMAC_KBD -DAT_KBD
