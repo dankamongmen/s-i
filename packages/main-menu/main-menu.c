@@ -561,15 +561,14 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 		else
 		{
 		  /* Success */
-		  modify_debconf_priority(RAISE);
-
 		  if (p->installer_menu_item < NEVERDEFAULT)
 		  {
 		    last_successful_item = p->installer_menu_item;
-		    di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
+		    modify_debconf_priority(RAISE);
+		    //di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
 		  }
 		  else
-		    di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
+		   // di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
 		}
 		
 		di_packages_free (packages);
