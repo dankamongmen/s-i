@@ -1,0 +1,87 @@
+#!/usr/bin/make -f
+
+# Kernel version.
+KVERS=2.4.0
+# Kenrel flavor.
+FLAVOUR=di
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This is the debhelper compatability version to use.
+export DH_COMPAT=2
+
+PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=$(shell dpkg --print-architecture)
+
+# Unpack the source (which we build-depend on).
+unpack: unpack-stamp
+unpack-stamp:
+	tar xf /usr/src/kernel-source-$(KVERS).tar.bz2 --bzip2
+	touch unpack-stamp
+
+# Use kernel-package to do the actual building.
+build: unpack build-stamp
+build-stamp:
+	mkdir -p kernel-source-$(KVERS)/debian
+	./make-kernel-control $(KVERS) $(FLAVOUR) \
+		kernel-source-$(KVERS)/debian/control
+	cp debian/changelog kernel-source-$(KVERS)/debian
+	echo official > kernel-source-$(KVERS)/debian/official
+	cp config kernel-source-$(KVERS)/.config
+	# Hack up the Makefile for flavour support.
+	cd kernel-source-$(KVERS); \
+		if [ ! -e Makefile.orig ]; then \
+			cp Makefile Makefile.orig; \
+		fi; \
+		sed 's/^\(KERNELRELEASE=.*\)$$/\1-$$(FLAVOUR)/' Makefile.orig > Makefile; \
+		make-kpkg --flavour di build
+	touch build-stamp
+
+clean:
+	rm -f build-stamp unpack-stamp
+	-rm -rf kernel-source-$(KVERS)
+	DH_CONTROL=debian/control.out dh_clean debian/control.out || dh_clean
+
+install: build
+	cd kernel-source-$(KVERS); \
+		FLAVOUR=di make INSTALL_MOD_PATH=`pwd`/modules modules_install
+	# Actually installs all the modules into place, and
+	# generates debian/control.out.
+	./copy-modules kernel-source-$(KVERS)/modules $(KVERS) $(FLAVOUR)
+
+# Use kernel-package to build the kernel image.
+binary-image: build
+	cd kernel-source-$(KVERS); \
+		CLEAN_SOURCE=no make-kpkg --flavour di kernel-image
+	cp kernel-source-$(KVERS)/debian/files debian/
+	mv *.deb ..
+
+# Build module udebs.
+# Make debhelper use this processed control file.
+export DH_CONTROL=
+binary-arch: DH_CONTROL=debian/control.out
+binary-arch: install binary-image
+	dh_testversion 2.2.15
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	# Don't write your stupid guesses to debian/files.
+	dh_gencontrol -- -fdebian/files~
+	# Register udebs manually and build udebs.
+	for package in `dh_listpackages`; do \
+		dpkg-distaddfile $${package}_$(VERSION)_$(ARCH).udeb \
+			debian-installer $(PRIORITY); \
+		dh_builddeb --package=$${package} \
+			--filename=$${package}_$(VERSION)_$(ARCH).udeb; \
+	done
+
+binary-indep:
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install unpack
