@@ -22,6 +22,7 @@ struct map map_machine[] = {
 	{ "CHRP Pegasos", "chrp_pegasos" },
 	{ "CHRP", "chrp" },
 	{ "Amiga", "amiga" },
+	{ "64-bit iSeries Logical Partition", "iseries" },
 	{ NULL, NULL }
 };
 
