@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.32 2003/10/03 22:02:49 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.33 2003/10/04 21:21:37 mckinstry Exp $
  */
 
 #include "config.h"
@@ -49,7 +49,6 @@ mydebconf_ask (char *priority, char *template, char **result)
 	int res;
 	struct debconfclient *client = mydebconf_get ();
 
-	// res = client->command (client, "fset", template, "seen", "false", NULL);
 	res = debconf_input (client, priority, template);
 	res = debconf_go (client);
 	if (res != CMDSTATUS_SUCCESS)
@@ -76,7 +75,6 @@ mydebconf_default_set (char *template, char *value)
 		res = debconf_set (client, template, strdup (value));
 		if (res)
 			return res;
-		res = debconf_fset (client, template, "seen", "false");
 	}
 	return res;
 }
