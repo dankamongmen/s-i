@@ -15,9 +15,7 @@ fi
 
 while [ -z "$PASSWORD" ]; do
   db_set $TEMPLATE_ROOT/password ""
-  db_fset $TEMPLATE_ROOT/password seen false
   db_set $TEMPLATE_ROOT/password-again ""
-  db_fset $TEMPLATE_ROOT/password-again seen false
 
   db_input critical $TEMPLATE_ROOT/password || true
   db_go
@@ -28,14 +26,12 @@ while [ -z "$PASSWORD" ]; do
   db_get $TEMPLATE_ROOT/password
   ROOT_PW="$RET"
   if [ -z "$ROOT_PW" ]; then
-    db_fset $TEMPLATE_ROOT/password-empty seen false
     db_input critical $TEMPLATE_ROOT/password-empty
     db_go
     continue
   fi
   db_get $TEMPLATE_ROOT/password-again
   if [ "$COMPARE_PW" ] && [ "$ROOT_PW" != "$RET" ]; then
-    db_fset $TEMPLATE_ROOT/password-mismatch seen false
     db_input critical $TEMPLATE_ROOT/password-mismatch
     db_go
     continue
@@ -50,7 +46,6 @@ KEY_FINGERPRINT=$(ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' ')
 sshd
 
 db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
-db_fset $TEMPLATE_ROOT/start seen false
 db_input critical $TEMPLATE_ROOT/start
 db_go
 
