@@ -25,7 +25,7 @@ is_installed(struct package_t *p, struct linkedlist_t *installed)
 	if (p->version == NULL || !di_parse_version(&pv, p->version))
 		return 0;
 	q = di_pkg_find(installed, p->package);
-	if (q == NULL || q-> version == NULL || !di_parse_version(&qv, q->version))
+	if (q == NULL || q->version == NULL || !di_parse_version(&qv, q->version))
 		return 0;
 	return (di_compare_version(&pv, &qv) <= 0);
 }
