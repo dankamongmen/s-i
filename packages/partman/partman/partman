@@ -169,15 +169,7 @@ while true; do
 	ask_user /lib/partman/choose_partition
 	exitcode=$?
 	if [ $exitcode -eq 255 ]; then
-	    db_subst partman/confirm_abort ITEMS "$items"
-	    db_input high partman/confirm_abort
-	    db_go || true
-	    db_get partman/confirm_abort
-	    if [ "$RET" = true ]; then
-	        db_reset partman/confirm_abort
-		abort 10 # back up to main menu
-	    fi
-	    db_reset partman/confirm_abort
+	    abort 10 # back up to main menu
 	elif [ $exitcode -ge 100 ] && confirm_changes; then
 	    break
 	fi
