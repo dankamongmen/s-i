@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.5 2003/01/28 11:02:05 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.6 2003/01/30 14:09:31 mckinstry Exp $
  */
 
 #include "config.h"
@@ -39,23 +39,21 @@ int my_debconf_input (char *priority, char *template, char **result)
 	res = client->command (client, "go", NULL);
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
-	printf ("(DEBUG4)\n");
 	res = client->command (client, "get", template, NULL);
-	printf ("(DEBUG5)\n");
 	*result = client->value;
 	return res;
 }
 
 /**
  * @brief  Do a grep for a string
- * @return 0 if present, 1 if not, errno if error
+ * @return 0 if present, 1 if not, -errno if error
  */
 int grep (const char *file, const char *string)
 {
 	FILE *fp = fopen (file, "r");	
 	char buf[LINESIZE];
 	if (!fp)
-		return errno;
+		return -errno;
 	while (!feof (fp)) {
 		fgets (buf, LINESIZE, fp);
 		if (strstr (buf, string) != NULL) {
@@ -181,6 +179,7 @@ inline char *insert_description (char *buf, char *name, char *description)
 	*s++ = ']'; *s++ = ' ';
 	t = gettext (description);
 	while (*t)  *s++ = *t++;
+	*s = '\0';
 	return s;
 }
   
@@ -320,15 +319,14 @@ void collect_keyboards (void)
 }
 
 
-char  *add_no_keyboard_case (char *s, char **preferred_name)
+void add_no_keyboard_case (char *s, char **preference)
 {
-	char template[256], *t;
+	char template[LINESIZE], *t;
 	t = insert_description (template, "none", N_("No keyboard to configure"));
-	*(++t) = '\0';
-	strcpy (s, t);
-	*preferred_name = STRDUP (t);
-
-	return s + strlen (t);
+	*t = '\0';
+	strcpy (s, template);
+	if (*preference == NULL)
+		*preference = STRDUP (template);
 }
 
 char *extract_name (char *name, char *ptr)
@@ -348,16 +346,15 @@ char *extract_name (char *name, char *ptr)
 char *ponder_keyboard_choices (void)
 {
 	kbd_t *kp = NULL, *preferred = NULL;
-	char buf [LINESIZE], *s = NULL, *preferred_arch;
-	int kboards = 0, res;
+	char buf [LINESIZE], *s = NULL, *preference = NULL, *entry;
+	int choices = 0, res;
 
 	assert (maplists != NULL); // needed to choose default kbd in some cases
 
 	collect_keyboards ();
 
 	// Did we forget to compile in a keyboard ???
-	if (DEBUG &&  keyboards == NULL)
-		DIE ("No keyboards found");
+	if (DEBUG &&  keyboards == NULL) DIE ("No keyboards found");
 
 	/* k is returned by a method if it is preferred keyboard.
 	 * For 2.4 kernels, we just select one keyboard. 
@@ -368,34 +365,37 @@ char *ponder_keyboard_choices (void)
 	// Add the keyboards to debconf
 	for (kp = keyboards; kp != NULL ; kp = kp->next) {
 		if (kp->present != FALSE) {
-			kboards++;
-			if (s) {
-				STRCPY (s, ", ");
-				s += 2;
-			} else
-				s = buf;		
-			s = insert_description (s, kp->name, kp->description);
-			if (preferred == NULL || (preferred->present != TRUE))
-				preferred = kp;					
+			choices++;
+			s = s ? ( strcpy (s, ", ") + 2) : buf ;
+			entry = s;
+			s = insert_description (s, kp->name, kp->description);		       			
+			if (strcmp (PREFERRED_KBD, kp->name) == 0) {
+				preference = strdup (entry);
+				if ((preferred == NULL) || (preferred->present ==UNKNOWN) || (kp->present == TRUE))
+					preferred = kp;
+			} else {
+				if (preferred == NULL || (preferred->present != TRUE))
+					preferred = kp;					
+			}
 		}	
-	}
-	if ((preferred == NULL) || (preferred->present == UNKNOWN)) 
-		s = add_no_keyboard_case (s, &preferred_arch);
-	else 
-		preferred_arch = preferred->name;
+	}	
+	if ((preferred == NULL) || (preferred->present == UNKNOWN)) {
+		s = s ? ( strcpy (s, ", ") + 2) : buf ;
+		printf ("Setting no keybd case\n");
+		add_no_keyboard_case (s, &preference );
+		choices++;
+	}		
+	client->command (client, "su bst", "console-tools/archs", 
+			 "choices", buf, NULL);		      
 	
 	// Set the default option
 	res = client->command (client, "fget", "console-tools/archs", "seen", NULL);
 	if (strcmp(client->value, "false") == 0) {
-	  printf ("DEBUG6: val %s preferred %s , res %d\n", client->value, preferred_arch, res);
-		client->command (client, "set", "console-tools/archs", strdup (preferred_arch), NULL);
+		client->command (client, "set", "console-tools/archs", preference, NULL);
 	}
-	*s = '\0';
-	client->command (client, "subst", "console-tools/archs", 
-			 "choices", buf, NULL);		      
-	       
+	
 	// Should we prompt the user?
-	if (kboards <= 1)		
+	if (choices < 2)		
 		return "low";
 	return (preferred->present == TRUE) ? "medium" : "high";	
 }
@@ -461,8 +461,10 @@ int main (int argc, char **argv)
 			if (my_debconf_input (kbd_priority, "console-tools/archs", &s) != CMDSTATUS_SUCCESS)
 				exit (0);
 			arch = extract_name (xmalloc (LINESIZE), s);
-			if (strcmp (arch, "none") == 0)
+			if (strcmp (arch, "none") == 0) {
+				di_log ("not setting keymap");
 				exit (0);
+			}
 			state = CHOOSE_KEYMAP;
 			break;
 
@@ -472,7 +474,6 @@ int main (int argc, char **argv)
 				state = CHOOSE_ARCH;
 				break;
 			}
-			client->command (client, "set", "console-data/keymap", keymap, NULL);
 			loadkeys_wrapper (keymap);  
 			exit (0);
 			break;			

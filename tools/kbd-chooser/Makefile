@@ -22,7 +22,7 @@ LDOPTS=  -ldebconf -ldebian-installer
 
 
 ifeq ($(ARCH),i386)
-CFLAGS += -DAT_KBD  -DUSB_KBD
+CFLAGS += -DAT_KBD  -DUSB_KBD -DPREFERRED_KBD=\"ps2\"
 OBJS   += at-kbd.o usb-kbd.o
 endif
 ifeq ($(ARCH),sparc)

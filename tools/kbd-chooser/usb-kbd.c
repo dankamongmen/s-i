@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.6 2003/01/29 09:52:15 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.7 2003/01/30 14:09:31 mckinstry Exp $
  */
 
 #include "config.h"
@@ -48,7 +48,8 @@ void usb_kbd_get (void)
 	if (di_check_dir ("/proc/bus/input") >= 0) { // 2.5 kernel
 #warning "Kernel 2.5 code not written yet"
 	}
-#else /* 2.4 code */
+#endif
+	/* 2.4 code */
 
 	/* In 2.4, if "keyboard" is present in /proc/bus/usb/drivers,
 	 * a USB keyboard is present.
@@ -83,7 +84,6 @@ void usb_kbd_get (void)
 	if (mounted_fs)
 		system ("umount /proc/bus/usb");
 	
-#endif	
 }
 
 /*
