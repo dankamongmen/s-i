@@ -5,7 +5,7 @@ BIN=anna
 LIBS=-ldebconf -ldebian-installer
 
 ifdef DEBUG
-CFLAGS:=$(CFLAGS) -DDODEBUG
+CFLAGS:=$(CFLAGS) -g3 -DDODEBUG
 endif
 
 all: $(BIN)

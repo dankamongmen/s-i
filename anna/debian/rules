@@ -18,10 +18,10 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 # Make small unless we are building a debug package.
-ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
-	$(MAKE)
-else
+ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 	$(MAKE) small
+else
+	$(MAKE) DEBUG=1
 endif
 	touch build-stamp
 
@@ -37,7 +37,7 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs usr/bin var/cache/anna
-	install -s $(PACKAGE) debian/$(PACKAGE)/usr/bin
+	install $(PACKAGE) debian/$(PACKAGE)/usr/bin
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -50,10 +50,12 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
-	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_installdeb
+ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+	dh_strip
+endif
 	dh_shlibdeps
 	install -m0755 debian/menutest debian/$(PACKAGE)/DEBIAN/
 	# Don't write your stupid guesses to debian/files.
