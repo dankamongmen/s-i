@@ -1,5 +1,7 @@
 dir = lib/debian-installer
 
-files_exec = menu
+files_exec = \
+	exit \
+	menu
 
 include ../../../Makefile.inc

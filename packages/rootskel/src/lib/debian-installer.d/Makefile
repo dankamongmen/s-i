@@ -24,6 +24,7 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
   files += \
 	S40utf8-linux \
 	S70menu-linux \
+	S72menu-exit \
 	S90utf8-linux
 endif
 
