@@ -455,15 +455,23 @@ if ! is_not_loaded ohci1394; then
 	# also try to enable firewire ethernet (The right way to do this is
 	# really to catch the hotplug events from the kernel.)
 	if is_not_loaded eth1394; then
-		if is_available eth1394; then
-			db_subst hw-detect/load_progress_step CARDNAME "FireWire ethernet support"
-			db_subst hw-detect/load_progress_step MODULE "eth1394"
-			db_progress INFO hw-detect/load_progress_step
-			load_module eth1394 "FireWire ethernet"
-			register-module eth1394
-		else
-			missing_module eth1394 "FireWire ethernet"
-		fi
+		case "$(uname -r)" in
+		2.4*)
+			:
+		;;
+		*)
+			if is_available eth1394; then
+				db_subst hw-detect/load_progress_step CARDNAME "FireWire ethernet support"
+				db_subst hw-detect/load_progress_step MODULE "eth1394"
+				db_progress INFO hw-detect/load_progress_step
+				load_module eth1394 "FireWire ethernet"
+				# do not call register-module; hotplug will load it
+				# on the installed system
+			else
+				missing_module eth1394 "FireWire ethernet"
+			fi
+		;;
+		esac
 	fi
 fi
 
