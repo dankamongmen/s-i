@@ -44,11 +44,10 @@ binary-arch: build install
 	dh_testroot
 	dh_installdebconf	
 	dh_fixperms
+	dh_strip
 	dh_installdeb
-	dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
-		-n$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-	cd debian && dpkg-deb -b $(PACKAGE) \
-		../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

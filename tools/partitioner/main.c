@@ -125,6 +125,15 @@ static char *execute_fdisk(void) {
 	return(fdiskcmd);
 }
 
+static int handler (pid_t pid, void *user_data)
+{
+	if ((dup2(DEBCONF_OLD_STDIN_FD, 0) == -1) ||
+	    (dup2(DEBCONF_OLD_STDOUT_FD, 1) == -1) ||
+	    (dup2(DEBCONF_OLD_STDOUT_FD, 2) == -1))
+		return 1;
+	return 0;
+}
+
 int main(int argc, char *argv[]) {
 	int disks_count, i;
 	PedDevice *discs[MAX_DISKS];
@@ -194,9 +203,9 @@ int main(int argc, char *argv[]) {
 		setenv("LANGUAGE", language, "1");
 
 		if (strcmp(disk,"false") != 0) {
-		  asprintf(&cmd, "/bin/sh %s %s </dev/tty >/dev/tty 2>/dev/tty", cmd_script, disk);
+		  asprintf(&cmd, "/bin/sh %s %s", cmd_script, disk);
 
-			i = system(cmd);
+			i = di_exec_shell_full (cmd, NULL, NULL, NULL, NULL, NULL, handler, NULL);
 			if(i != 0) {
 				debconf_subst(debconf, "partitioner/fdiskerr", "DISC", disk);
 				debconf_fset(debconf, "partitioner/fdiskerr", "seen", "false");
