@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.30 2003/01/23 00:25:08 barbier Exp $
+ * $Id: text.c,v 1.31 2003/01/26 16:51:54 kraai Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -226,7 +226,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 		if (selected[i])
 		{
 			if (answer[0] != 0)
-				strvacat(answer, sizeof(answer), ", ");
+				strvacat(answer, sizeof(answer), ", ", NULL);
 			strvacat(answer, sizeof(answer), choices[i], NULL);
 		}
 		free(choices[i]);

@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.23 2003/01/12 18:04:00 sjogren Exp $
+ * $Id: slang.c,v 1.24 2003/01/26 16:51:54 kraai Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -490,7 +490,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 		if (selected[i])
 		{
 			if (answer[0] != 0)
-				strvacat(answer, sizeof(answer), ", ");
+				strvacat(answer, sizeof(answer), ", ", NULL);
 			strvacat(answer, sizeof(answer), choices[i], NULL);
 		}
 		free(choices[i]);
