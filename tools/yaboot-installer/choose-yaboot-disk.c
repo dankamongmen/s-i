@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 	      char *partname;
 	      asprintf(&partname, "%s%d", devname, partition->num);
 	      printf("%s is bootable\n", partname);
-	      valid_device_list = realloc(valid_device_list, strlen(valid_device_list) + 1 + strlen(partname));
+	      valid_device_list = realloc(valid_device_list, strlen(valid_device_list) + 1 + strlen(partname) + 1);
 	      strcat(valid_device_list, " ");
 	      strcat(valid_device_list, partname);
 	    }
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
   }
 
   client = debconfclient_new ();
-  if (strlen(device_list) == 0) {
+  if (strlen(valid_device_list) == 0) {
     client->command (client, "title", "No valid boot device", NULL);
     client->command (client, "fset", "yaboot-installer/no-valid-bootdev", "seen", "false", NULL);
     client->command (client, "input", "high", "yaboot-input/no-valid-bootdev", NULL);
