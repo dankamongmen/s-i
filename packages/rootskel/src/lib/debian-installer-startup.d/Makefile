@@ -14,6 +14,7 @@ files = \
 ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
   ifeq ($(DEB_HOST_GNU_CPU),i386)
     files += \
+	S05acpi-i386 \
 	S40framebuffer-module-linux-i386
    endif
 
