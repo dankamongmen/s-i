@@ -52,6 +52,8 @@ processmodules() {
 			fi
 			if [ -e $moddir/$file ]; then
 				echo $file
+			elif [ -e $moddir/${file%.o}.ko ]; then
+				echo ${file%.o}.ko
 			else
 				if [ "$optional" = 0 ]; then
 					echo "missing module $file" >&2
@@ -150,7 +152,7 @@ for i in $(
 	# dependent udeb into module-list/$i
 	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
 
-	# deal with modules marked as optional
+	# deal with modules marked as optional and other transformations
 	processmodules $tmpdir/module-list/$i $moddir$kernel_modules
 
 	if [ -s $tmpdir/module-list/$i ]; then
