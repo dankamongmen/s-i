@@ -1,221 +1,231 @@
 Template: lvmcfg/activevg
 Type: boolean
 Default: true
-_Description: Found existing volume groups
- Should I try to activate the old already existing volume groups I have
- found in the system (Count: ${COUNT}).
+_Description: Activate existing Volume Groups?
+ ${COUNT} existing Volume Groups have been found. Please
+ indicate whether you want to activate them. 
 
 Template: lvmcfg/mainmenu
 Type: select
 Choices: Volume Groups (VG), Logical Volumes (LV), Leave
-_Description: LVM Configuration Menu
- Please select one of the following options to configure the logical
- volume manager.
+_Description: LVM configuration action:
+ This is the Logical Volume Manager configuration menu.
+ .
+ Please select one of the proposed actions to configure the Logical
+ Volume Manager (LVM).
 
 Template: lvmcfg/vgmenu
 Type: select
 Choices: Create VG, Delete VG, Extend VG, Reduce VG, Leave
-_Description: Configure your Volume Groups
- Please select one of the following options to configure the
- volume groups.
+_Description: Volume Groups configuration action:
+ Please select one of the following actions to configure the
+ Volume Groups (VG).
 
 Template: lvmcfg/lvmenu
 Type: select
 Choices: Create LV, Delete LV, Leave
-_Description: Configure your Logical Volumes
- Please select one of the following options to configure the 
- logical volumes.
+_Description: Logical Volumes configuration action:
+ Please select one of the following actions to configure the 
+ Logical Volumes (LV).
 
 Template: lvmcfg/vgcreate_parts
 Type: multiselect
 Choices: ${PARTITIONS}
-_Description: Select devices for new volume group
- Please select the devices for the new volume group. You can select
- one or more devices.
+_Description: Devices for the new Volume Group:
+ Please select the devices for the new Volume Group. 
+ .
+ You can select one or more devices.
 
 Template: lvmcfg/vgcreate_name
 Type: string
-_Description: Insert the volume group name
- Insert the name you would like to use for the new volume group.
+_Description: Volume Group name:
+ Please enter the name you would like to use for the new Volume Group.
 
 Template: lvmcfg/vgcreate_nosel
-Type: note
+Type: error
 _Description: No physical volumes selected
- No physical volumes where selected. Aborting the creation of a new
- volume group.
+ No physical volumes were selected. The creation of a new
+ Volume Group was aborted.
 
 Template: lvmcfg/vgcreate_nameused
-Type: note
-_Description: Volume group name already in use
- The selected volume group name is already in use. Please choose another
- name and try it again.
+Type: error
+_Description: Volume Group name already in use
+ The selected Volume Group name is already in use. Please choose another
+ name.
 
 Template: lvmcfg/vgdelete_names
 Type: select
 Choices: ${GROUPS}
-_Description: Select volume group to delete
- Select one of the following volume groups to delete.
+_Description: Volume Group to delete:
+ Please select the Volume Group you wish to delete.
 
 Template: lvmcfg/vgdelete_novg
-Type: note
-_Description: No volume group found
- No volume groups for deletion found. Maybe the volume group is
- already deleted?
+Type: error
+_Description: No Volume Group found
+ No Volume Group has been found. 
+ .
+ The Volume Group may have already been deleted.
 
 Template: lvmcfg/vgdelete_confirm
 Type: boolean
 Default: true
-_Description: Continue deleting the volume group
- Are you sure you want to continue deleting the volume group: ${VG}?
+_Description: Really delete the Volume Group?
+ Please confirm the ${VG} volume group removal.
 
 Template: lvmcfg/vgdelete_error
-Type: note
-_Description: Error while deleting volume group
- The selected volume group could not be deleted. Maybe one or more
- logical volumes are yet in use?
+Type: error
+_Description: Error while deleting Volume Group
+ The selected Volume Group could not be deleted. One or more Logical
+ Volumes may currently be in use.
 
 Template: lvmcfg/vgextend_novg
-Type: note
-_Description: No volume group found
- No volume groups for extension found. You must create a volume group
- first.
+Type: error
+_Description: No Volume Group found
+ No Volume Group has been found. 
+ .
+ No Volume Group can be deleted.
 
 Template: lvmcfg/vgextend_names
 Type: select
 Choices: ${GROUPS}
-_Description: Select volume group to extend
- Select one of the following volume groups to extend.
+_Description: Volume Group to extend:
+ Please select the Volume Group you wish to extend.
 
 Template: lvmcfg/vgextend_parts
 Type: multiselect
 Choices: ${PARTITIONS}
-_Description: Select devices to extend volume group
- Please select the devices to extend the volume group. You can select
- one or more devices.
+_Description: Devices to add to the Volume Group:
+ Please select the devices you wish to add to the Volume Group.
+ .
+ You can select one or more devices.
 
 Template: lvmcfg/vgextend_nosel
-Type: note
+Type: error
 _Description: No physical volumes selected
- No physical volumes where selected. Aborting the extending of the
- volume group.
+ No physical volumes were selected. Extension of the Volume Group was
+ aborted.
 
 Template: lvmcfg/vgextend_error
-Type: note
-_Description: Error while extending volume group
- The selected volume group (${VG}) could not be extended by the new
- physical volume: ${PARTITION}!
+Type: error
+_Description: Error while extending Volume Group
+ The physical volume ${PARTITION} could not be added to the selected 
+ Volume Group.
 
 Template: lvmcfg/vgreduce_novg
-Type: note
-_Description: No volume group found
- No volume groups for reducing found. You must create a volume group
- first.
+Type: error
+_Description: No Volume Group found
+ No Volume Group has been found. 
+ .
+ No Volume Group can be reduced.
 
 Template: lvmcfg/vgreduce_names
 Type: select
 Choices: ${GROUPS}
-_Description: Select volume group to reduce
- Select one of the following volume groups to reduce.
+_Description: Volume Group to reduce:
+ Please select the Volume Group you wish to reduce.
 
 Template: lvmcfg/vgreduce_parts
 Type: select
 Choices: ${PARTITIONS}
-_Description: Select devices to reduce volume group
- Please select the devices to reduce the volume group.
+_Description: Device to remove from Volume Group:
+ Please select the device you wish to remove from the volume group.
 
 Template: lvmcfg/vgreduce_minpv
-Type: note
-_Description: Error while reducing volume group
- The selected volume group (${VG}) could not be reduced. There is only one 
- physical volume attached. Please delete the volume group instead.
+Type: error
+_Description: Error while reducing Volume Group
+ The selected Volume Group (${VG}) could not be reduced. There is only one 
+ physical volume attached. Please delete the Volume Group instead.
 
 Template: lvmcfg/vgreduce_error
-Type: note
-_Description: Error while reducing volume group
- The selected volume group (${VG}) could not be reduced. Failed to remove
- physical volume: ${PARTITION}. Please check error log on tty3 for more
- information.
+Type: error
+_Description: Error while reducing Volume Group
+ The physical volume ${PARTITION} could not be removed from the selected 
+ Volume Group.
+ .
+ Please check the error log on the third console for more information.
 
 Template: lvmcfg/lvcreate_novg
-Type: note
-_Description: No volume group found
- No volume groups for creating a new logical volume found. You must create a
- volume group first.
+Type: error
+_Description: No Volume Group found
+ No Volume Groups were found for creating a new Logical Volume.
 
 Template: lvmcfg/lvcreate_name
 Type: string
-_Description: Insert the logical volume name
- Insert the name you would like to use for the new logical volume.
+_Description: Logical Volume name:
+ Please enter the name you would like to use for the new Logical Volume.
 
 Template: lvmcfg/lvcreate_vgnames
 Type: select
 Choices: ${GROUPS}
-_Description: Select volume group
- Select the volume group where the new logical volume
+_Description: Volume Group:
+ Please select the Volume Group where the new Logical Volume
  should be created.
 
 Template: lvmcfg/lvcreate_exists
-Type: note
-_Description: Error while creating new logical volume
- The given name ${LV} is already in use by another logical volume on the
- same volume group (${VG}).
+Type: error
+_Description: Error while creating a new Logical Volume
+ The name ${LV} is already in use by another Logical Volume on the
+ same Volume Group (${VG}).
 
 Template: lvmcfg/lvcreate_size
 Type: string
-_Description: Insert the logical volume size
- Insert the size of the new logical volume. Size can be inserted in the
- following formats: 10K (Kilobytes), 10M (Megabytes), 10G (Gigabytes),
- 10T (Terabytes). Default unit is Megabytes.
+_Description: Logical Volume size:
+ Please enter the size of the new Logical Volume. The size may be
+ entered in the following formats: 10K (Kilobytes), 10M (Megabytes),
+ 10G (Gigabytes), 10T (Terabytes). The default unit is Megabytes.
 
 Template: lvmcfg/lvcreate_error
-Type: note
-_Description: Error while creating new logical volume
- Unable to create new logical volume (${LV}) on ${VG} with new size ${SIZE}.
- Please check error log on tty3 for more information.
+Type: error
+_Description: Error while creating a new Logical Volume
+ Unable to create a new logical volume (${LV}) on ${VG} with the new
+ size ${SIZE}.
+ .
+ Please check the error log on the third console for more information.
 
 Template: lvmcfg/lvdelete_novg
-Type: note
-_Description: No volume group found
- No volume groups for deleting a new logical volume found. You must create a
- volume group first.
+Type: error
+_Description: No Volume Group found
+ No Volume Group has been found for deleting a Logical Volume. 
 
 Template: lvmcfg/lvdelete_vgnames
 Type: select
 Choices: ${GROUPS}
-_Description: Select volume group
- Select the volume group where the logical volume
- to be deleted resides.
+_Description: Volume Group:
+ Please select the Volume Group which contains the Logical Volume to
+ be deleted.
 
 Template: lvmcfg/lvdelete_nolv
-Type: note
-_Description: No logical volume found
- No logical volumes for deleting found. You must create a logical volume
- first.
+Type: error
+_Description: No Logical Volume found
+ No Logical Volume has been found. 
+ . 
+ Please create a Logical Volume first.
 
 Template: lvmcfg/lvdelete_lvnames
 Type: select
 Choices: ${LVS}
-_Description: Select logical volume on ${VG}
- Select the logical volume to be deleted.
+_Description: Logical Volume:
+ Please select the Logical Volume to be deleted on ${VG}.
 
 Template: lvmcfg/lvdelete_error
-Type: note
-_Description: Error while deleting the logical volume
- Unable to delete the logical volume (${LV}) on ${VG}.
- Please check error log on tty3 for more information.
+Type: error
+_Description: Error while deleting the Logical Volume
+ The Logical Volume (${LV}) on ${VG} could not be deleted.
+ .
+ Please check the error log on the third console for more information.
 
 Template: lvmcfg/nopartitions
-Type: note
+Type: error
 _Description: No usable physical volumes found
- Unable to find any physical volume (e.g. partition) in your system. Maybe you
- must load required kernel modules, or re-partition the hard drives, or all
- physical volumes are already in use.
+ No physical volumes (i.e. partitions) were found in your system. All
+ physical volumes may already be in use. You may also need to load
+ some required kernel modules or re-partition the hard drives.
 
 Template: lvmcfg/nolvm
-Type: note
+Type: error
 _Description: Logical Volume Manager not available
- The current kernel doesn't support the Logical Volume Manager. Maybe you
- need to modprobe the lvm-mod module, to insert this functionality.
+ The current kernel doesn't support the Logical Volume Manager. You may
+ need to load the lvm-mod module.
 
 Template: debian-installer/lvmcfg/title
 Type: text
