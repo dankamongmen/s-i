@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.17 2003/03/27 12:58:04 sley Exp $
+ * $Id: gtk.c,v 1.18 2003/04/04 10:16:31 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -252,6 +252,16 @@ gboolean need_continue_button(struct frontend *obj)
     return TRUE;
 }
 
+gboolean need_back_button(struct frontend *obj)
+{
+    if (obj->questions->next == NULL)
+    {
+	if (strcmp(obj->questions->template->type, "boolean") == 0)
+	    return FALSE;
+    }
+    return TRUE;
+}
+
 gboolean is_first_question(struct question *q)
 {
     struct question *crawl;
@@ -283,13 +293,18 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 	g_signal_connect (G_OBJECT (continue_button), "clicked", G_CALLBACK (exit_button_callback), obj);
     }
 
-    if (obj->methods.can_go_back(obj, q))
+    if (need_back_button(obj))
     {
-	back_button = gtk_button_new_with_label("Back");
+	back_button = gtk_button_new_with_label("Go Back");
 	ret_val = NEW(int);
 	*ret_val = DC_GOBACK;
 	gtk_object_set_user_data(GTK_OBJECT(back_button), ret_val);
 	g_signal_connect (G_OBJECT (back_button), "clicked", G_CALLBACK (exit_button_callback), obj);
+
+	if (obj->methods.can_go_back(obj, q) == FALSE)
+	{
+	    gtk_widget_set_sensitive(back_button, FALSE);
+	}
     }
 
     if (continue_button || back_button)
@@ -316,9 +331,10 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 
 static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *frame, *yes_button, *no_button, *button_box, *vbox, *description_label;
+    GtkWidget *frame, *yes_button, *no_button, *back_button, *button_box, *vbox, *description_label;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
+    int *ret_val;
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -326,15 +342,27 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
 	
     yes_button = gtk_button_new_with_label("Yes");
     no_button = gtk_button_new_with_label("No");
+    back_button = gtk_button_new_with_label("Go Back");
 
+    ret_val = NEW(int);
+    *ret_val = DC_GOBACK;
+
+    gtk_object_set_user_data(GTK_OBJECT(back_button), ret_val);
     gtk_object_set_user_data(GTK_OBJECT(yes_button), g_strdup("true"));
     gtk_object_set_user_data(GTK_OBJECT(no_button), g_strdup("false"));
 
+    g_signal_connect (G_OBJECT (back_button), "clicked", G_CALLBACK (exit_button_callback), obj);
     g_signal_connect (G_OBJECT (yes_button), "clicked", G_CALLBACK (button_single_callback), data);
     g_signal_connect (G_OBJECT (no_button), "clicked", G_CALLBACK (button_single_callback), data);
 
+    if (obj->methods.can_go_back(obj, q) == FALSE)
+    {
+	gtk_widget_set_sensitive(back_button, FALSE);
+    }
+
     button_box = gtk_hbutton_box_new();
     gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
+    gtk_box_pack_start(GTK_BOX(button_box), back_button, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(button_box), yes_button, FALSE, FALSE, 5);
     gtk_box_pack_start(GTK_BOX(button_box), no_button, FALSE, FALSE, 5);
 
