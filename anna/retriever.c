@@ -144,18 +144,59 @@ int get_package (struct package_t *package, char *dest) {
 	return ret;
 }
 
+/* The location of a downloaded Packages file. Used by try_get_packages
+ * and get_packages. Damn, it'd be neat if you could nest function
+ * definitions. */
+static char tmp_packages[] = DOWNLOAD_DIR "/Packages";
+
+/*
+ * Try getting a Packages file, with a given extension. If the extension
+ * is not "", unpack_cmd must be the name of a program for unpacking the
+ * file. It has to follow the convention of gunzip and bunzip2 and turn
+ * 'Packages.xyz' into 'Packages'. If unpack_cmd is NULL, the downloaded
+ * file will be left intact.
+ */
+static int
+try_get_packages(char *dist, char *suite, char *ext, char *unpack_cmd)
+{
+	char *tmp_packages_ext;
+	char *retriever;
+	char *file, *command;
+	int ret;
+
+	retriever = get_chosen_retriever();
+	unlink(tmp_packages_ext);
+	/* Gotta love string fiddling in C *sigh* */
+	asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
+		dist, suite, ARCH, ext);
+	asprintf(&tmp_packages_ext, "%s%s", tmp_packages, ext);
+	asprintf(&command, "%s %s %s", retriever, file, tmp_packages_ext);
+	free(file);
+	ret = system(command);
+	free(command);
+	if (unpack_cmd != NULL && ret == 0) {
+		/* This means we have Packages.XYZ */
+		unlink(tmp_packages);
+		asprintf(&command, "%s %s", unpack_cmd, tmp_packages_ext);
+		ret = system(command);
+		free(command);
+		unlink(tmp_packages_ext);
+		if (ret != 0)
+			unlink(tmp_packages);
+	}
+	free(tmp_packages_ext);
+
+	return ret;
+}
+
 /*
  * Ask the chosen retriever to download the Packages file, and parses it,
  * returning a linked list of package_t structures, or NULL if it fails.
- *
- * TODO: compressed Packages files?
  */
 struct package_t *get_packages (void) {
 	struct debconfclient *debconf;
-	char *retriever;
 	FILE *packages;
 	struct package_t *p = NULL, *newp, *plast;
-	static char tmp_packages[] = DOWNLOAD_DIR "/Packages";
         /* This is a workaround until d-i gets Release files, at which point
            we should parse them instead */
 	char *dist;
@@ -164,30 +205,19 @@ struct package_t *get_packages (void) {
         int currsuite = 0;
 
 	choose_retriever();
-	retriever = get_chosen_retriever();
 	debconf = debconfclient_new();
 	debconf->command(debconf, "GET", "mirror/distribution", NULL);
 	dist = debconf->value;
         suite = suites[currsuite];
-        while (suite != NULL) {
-		char *file;
-		char *command;
+        for (; suite != NULL; suite = suites[++currsuite]) {
+		int ret;
 
-                unlink(tmp_packages);
-		asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages",
-			dist, suite, ARCH);
-                asprintf(&command, "%s %s %s", retriever, file, tmp_packages);
-		free(file);
-                fprintf(stderr,"%s\n", command);
-                if (system(command) != 0) {
-                        free(command);
-                        unlink(tmp_packages);
-                        suite = suites[++currsuite];
-/*                        return NULL;*/
-                        continue;
-                }
-                packages=fopen(tmp_packages, "r");
-                free(command);
+		ret = try_get_packages(dist, suite, ".gz", "gunzip");
+		if (ret != 0)
+			ret = try_get_packages(dist, suite, "", NULL);
+		if (ret != 0)
+			continue;
+                packages = fopen(tmp_packages, "r");
                 newp = di_pkg_parse(packages);
                 fclose(packages);
                 unlink(tmp_packages);
@@ -201,10 +231,7 @@ struct package_t *get_packages (void) {
                     while (plast->next != NULL)
                         plast = plast->next;
                 }
-
-                suite = suites[++currsuite];
         }
-	free(retriever);
 	return p;
 }
 
