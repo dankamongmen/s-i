@@ -3,7 +3,7 @@ ifdef DEBUG
 DEB_BUILD_OPTIONS := debug:${DEB_BUILD_OPTIONS}
 endif
 
-CFLAGS := -Wall  -I.
+CFLAGS := -W -Wall  -I.
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 CFLAGS += -g  -DDEBUG=1

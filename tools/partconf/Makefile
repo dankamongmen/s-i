@@ -1,5 +1,5 @@
 LIBS = -lparted -ldl
-CFLAGS = -Wall
+CFLAGS = -W -Wall
 
 ifdef DEBUG
 CFLAGS += -g3
