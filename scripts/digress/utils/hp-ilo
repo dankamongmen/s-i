@@ -26,6 +26,39 @@ elsif ($action eq 'poweron') {
 	exit process_result();
 }
 elsif ($action eq 'poweroff') {
+	# Do a warm boot before turning off since iLO may not allow turning
+	# the power off if certian kernels (2.6) are running.
+	
+	# This is done using the telnet interface and expect because
+	# I do not know how to accomplish a warm boot using the xml
+	# interface. it requires iLO 1.60.
+	my $exp = new Expect;
+	$exp->raw_pty(1);
+	#$exp->debug(2);
+	#$exp->exp_internal(1);
+
+	$exp->spawn("nc", $ENV{HP_ILO_HOST}, "telnet") or die "cannot spawn nc: $!\n";
+
+	$exp->expect(60, "Login Name:");
+	$exp->send(getuser()."\r");
+
+	$exp->expect(10, "Password:");
+	$exp->send(getpassword()."\r");
+
+	$exp->expect(10, "iLO>");
+	$exp->send("power\r");
+
+	my $power;
+	$exp->expect(10, 
+		[ "Off" => sub { $power=0 } ],
+		[ "On" => sub { $power=1 } ],
+	);
+	$exp->expect(10, "iLO>");
+	if ($power) {
+		$exp->send("power warm\r");
+	}
+	$exp->soft_close;
+
 	print "Powering off..\n";
 	send_command('server_info', qq{<SET_HOST_POWER HOST_POWER="No"/>});
 	exit process_result();
