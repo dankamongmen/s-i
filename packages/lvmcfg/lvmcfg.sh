@@ -66,10 +66,6 @@ addinfos_pv() {
 		sed -e 's/^[ ]*VG Name \+\(.*\)/VG: \1/'`
 	RET="${RET2}"
 
-	RET2=`echo "$cmdout" | grep '^[ ]*Cur LV' | \
-		sed -e 's/^[ ]*Cur LV \+\(.*\)/LVs: \1/'`
-	RET="${RET}/ ${RET2}"
-
 	RET2=`echo "$cmdout" | grep '^[ ]*PV Size' | \
 		sed -e 's/^[ ]*PV Size \+\(.*\)/Size: \1/' | \
 		cut -d "[" -f 1 | cut -d "/" -f 1 | sed -e 's/ $//'`
