@@ -8,7 +8,7 @@
  * Description: simple utility to load a template file into the 
  *              database
  *
- * $Id: debconf-loadtemplate.c,v 1.4 2002/07/01 06:58:37 tausq Exp $
+ * $Id: debconf-loadtemplate.c,v 1.5 2002/07/22 22:55:02 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -120,6 +120,7 @@ int main(int argc, char **argv)
             {
                 q = question_new(t->tag);
                 q->template = t;
+                template_ref(t);
             }
             question_owner_add(q, argv[1]);
             if (qdb->methods.set(qdb, q) != DC_OK)
