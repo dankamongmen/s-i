@@ -38,7 +38,7 @@ struct configuration {
      * @brief Get a configuration item with a given tag (integer)
      * @param cfg configuration object
      * @param tag Tag of configuration item
-     * @param defaultvault Default value
+     * @param defaultvalue Default value
      * @return Value of configuration item
      */
 	int (*geti)(struct configuration *cfg, const char *tag, 

@@ -260,7 +260,7 @@ static int rfc822db_template_save(struct template_db *db)
 
     if (outf != NULL)
     {
-            INFO(INFO_ERROR, "Internal incostisency error, outf is not NULL");
+            INFO(INFO_ERROR, "Internal inconsistency error, outf is not NULL");
             return DC_NOTOK;
     }
 
