@@ -56,7 +56,7 @@ loadkeys.o:     loadkeys.c analyze.c
 	$(CC) -c $(CFLAGS) $(DEFS) $<
 
 clean:
-	rm -f *~ *.o kbd-chooser analyze.c loadkeys.c *#
+	rm -f *~ *.o kbd-chooser analyze.c loadkeys.c demo demo.templates *#
 
 install:
 	mkdir -p ${DESTDIR}/usr/bin
