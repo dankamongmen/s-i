@@ -2,7 +2,7 @@
 # Generate a debian/control from the control stub, the kernel-versions
 # files, and the package-list.
 
-my @controlfields=qw(Package Depends Architecture Section Priority Description);
+my @controlfields=qw(Package Provides Depends Architecture Section Priority Description);
 my @versions;
 my @packages;
 my @builddeps;
@@ -79,6 +79,7 @@ foreach my $ver (@versions) {
 		print "\n";
 		
 		$pkg{Architecture}=$arch;
+		$pkg{Provides}=$pkg{Package};
 		$pkg{Package}=$pkg{Package}."-".$kernelversion."-".$flavour."-di";
 		
 		if (exists $pkg{Depends}) {
