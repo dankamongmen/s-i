@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.52 2003/11/06 22:27:08 barbier Rel $
+ * $Id: text.c,v 1.53 2003/11/11 23:07:48 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -280,13 +280,14 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	i = 0;
 
 	while (1) {
- 	    for (line = 0; i < count && line < getheight()-1; i++, line++)
+ 	    for (line = 0; i < count && line < getheight()-1; i++, line++) {
 	        if (selected[tindex[i]])
 		       /* A selected item in a Multiselect question */
 	               printf(get_text(obj, "debconf/multiselect-selected", "%3d. %s (selected)"), i+1, choices_translated[i]);
                 else
 	               printf("%3d. %s", i+1, choices_translated[i]);
 	        printf("\n");
+	    }
 
 	    if (i == count && count < getheight()-1) {
 	        printf(get_text(obj, "debconf/prompt-1-page", 
