@@ -14,4 +14,7 @@ install:
 	#rm $(DESTDIR)/usr/share/discover/isa.lst
 	#touch $(DESTDIR)/usr/share/discover/isa.lst
 
+	install -d $(DESTDIR)/usr/lib/prebaseconfig.d
+	install prebaseconfig $(DESTDIR)/usr/lib/prebaseconfig.d/15cdrom-detect
+
 clean:
