@@ -62,8 +62,14 @@ void insert_line(const char *line) {
 			dummy->filesystem = strdup(filesystem);
 		}
 	}
-	if(strlen(mountpoint) > 0)
-		dummy->mountpoint = strdup(mountpoint);
+	if(strlen(mountpoint) > 0) {
+		if (strcmp(mountpoint, TARGET) == 0)
+			dummy->mountpoint = strdup("/");
+		else if (strstr(mountpoint, TARGET) == mountpoint)
+			dummy->mountpoint = strdup(mountpoint + strlen(TARGET));
+		else
+			dummy->mountpoint = strdup(mountpoint);
+        }
 	if(strlen(typ) > 0)
 		dummy->typ = strdup(typ);
 
@@ -173,21 +179,10 @@ void get_filesystems() {
 
 	while(fgets(line, 1024, fmounts) != NULL) {
 		char mountpoint[1024];
-		char *pos = NULL;
-		int i = 0;
 
 		sscanf(line, "%*s %s %*s", mountpoint);
-		if((pos = strstr(mountpoint, TARGET)) == NULL)
+		if (strstr(mountpoint, TARGET) != mountpoint)
 			continue;
-
-		/* remove the leading /target string; very ugly :) */
-		pos = strstr(line, TARGET);
-		for(i=0; i<strlen(TARGET); i++) {
-			pos[i] = 32;
-		}
-		if(pos[i] == 32)
-			pos[i-1] = '/';
-
 		insert_line(line);
 	}
 
@@ -227,19 +222,16 @@ void mapdevfs(struct fstab_entry *entry) {
 	if(entry->filesystem == NULL)
 		return;
 
-	asprintf(&cmd, "%s %s 2>/dev/null", MAPDEVFS, strdup(entry->filesystem));
+	asprintf(&cmd, "%s %s 2>/dev/null", MAPDEVFS, entry->filesystem);
 
 	pfile = popen(cmd, "r");
 	if(pfile == NULL)
 		return;
-	fscanf(pfile, "%s", device);
-	pclose(pfile);
-
-	if(strlen(device) > 0) {
+	if (fgets(device, PATH_MAX, pfile) != NULL && strlen(device) > 0) {
 		free(entry->filesystem);
-		entry->filesystem = NULL;
 		entry->filesystem = strdup(device);
 	}
+	pclose(pfile);
 }
 
 int main(int argc, char *argv[]) {
