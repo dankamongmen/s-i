@@ -12,11 +12,11 @@ print_trans () {
     ITEM_TRANS=$(awk -v ITEM="$1-$LANG.UTF-8:" \
         -f template_get_item.awk $TEMPLATE_TMP)
     if [ -n "$ITEM_TRANS" ] ; then
-        echo $ITEM_TRANS
+        echo "$ITEM_TRANS"
     else
         # We use the original entry as default
         REGEXP="s/$1:/$1-$LANG.UTF-8:/"
-        echo $2 | sed "$REGEXP"
+        echo "$2" | sed "$REGEXP"
     fi
 }
 
@@ -52,7 +52,7 @@ for LANG in $SHORTLIST_LANGS; do
         SHORTLIST="$SHORTLIST$COUNTRYCODE, "
     done
     REGEXP="s/\${SHORTLIST}, /$SHORTLIST/"
-    echo $EN_CHOICES | sed "$REGEXP" >>$TEMPLATE_NEW
+    echo "$EN_CHOICES" | sed "$REGEXP" >>$TEMPLATE_NEW
     TRANS_CHOICES=$(print_trans "Choices" "$EN_CHOICES")
 
     # Next we build the translated shortlist containing translated countrynames
@@ -69,10 +69,10 @@ for LANG in $SHORTLIST_LANGS; do
     done
     IFS="$OLD_IFS"
     REGEXP="s/\${SHORTLIST}, /$SHORTLIST/" >>$TEMPLATE_NEW
-    echo $TRANS_CHOICES | sed "$REGEXP"  >>$TEMPLATE_NEW
+    echo "$TRANS_CHOICES" | sed "$REGEXP"  >>$TEMPLATE_NEW
 
     # Finally we add the description and translated description
-    echo $EN_DESCR >>$TEMPLATE_NEW
+    echo "$EN_DESCR" >>$TEMPLATE_NEW
     if [ ! "$LANG" = "en" ] ; then
         print_trans "Description" "EN_DESCR" >>$TEMPLATE_NEW
     fi
