@@ -90,7 +90,7 @@ get_chosen_retriever(void)
 	if (colon_p != NULL)
 	{
 		retriever = malloc(strlen(RETRIEVER_DIR "/") +
-				colon_p - debconf->value);
+				colon_p - debconf->value + 1);
 		strcpy(retriever, RETRIEVER_DIR "/");
 		strncat(retriever, debconf->value, colon_p - debconf->value);
 	}
@@ -171,14 +171,20 @@ try_get_packages(char *dist, char *suite, char *ext, char *unpack_cmd)
 
 	retriever = get_chosen_retriever();
 	unlink(tmp_packages_ext);
-	/* Gotta love string fiddling in C *sigh* */
-	asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
-		dist, suite, ARCH, ext);
 	asprintf(&tmp_packages_ext, "%s%s", tmp_packages, ext);
-	asprintf(&command, "%s retrieve %s %s", retriever, file, tmp_packages_ext);
-	free(file);
+        /* First try the packages command. If that doesn't work, fall back to
+         * retrieving the normal location of a Packages file. */
+	asprintf(&command, "%s packages %s %s", retriever, tmp_packages_ext, ext);
 	ret = system(command);
 	free(command);
+	if (ret != 0) {
+		asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
+				dist, suite, ARCH, ext);
+		asprintf(&command, "%s retrieve %s %s", retriever, file, tmp_packages_ext);
+		free(file);
+		ret = system(command);
+		free(command);
+	}
 	if (unpack_cmd != NULL && ret == 0) {
 		/* This means we have Packages.XYZ */
 		unlink(tmp_packages);

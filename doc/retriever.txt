@@ -61,7 +61,7 @@ contains it). It is run with the following parameters:
 
 retriever [command] [args]
 
-Currently, the only command is "retrieve":
+Currently, there are two commands:
 
 retriever retrieve [source-filename] [dest-filename] [suite]
 	Download the specified file to the specified destination from
@@ -74,6 +74,16 @@ retriever retrieve [source-filename] [dest-filename] [suite]
 	
 	While retrieving a deb is something like this:
 		retreiver retrievers/http-retriever.deb /tmp/http-retriever.deb
+
+retriever packages [dest-filename] [optional extension]
+	Download a Packages file, or a Packages-like file. The fields used by
+	anna are:
+	- Package
+	- Version
+	- Filename
+	Whether other fields are needed is currently undecided. A retriever
+	doesn't have to support the 'packages' command, if it fails, anna will
+	try to guess the location of a Packages file and try to retrieve it.
 
 If the destination file already exists, the retriever may optionally attempt
 to continue a download.
