@@ -18,30 +18,39 @@ mountfloppy()
             modprobe vfat >> /var/log/messages 2>&1
         fi
 
-        db_fset retriever/floppy/insert seen false || true
-        db_fset retriever/floppy/fstype seen false || true
-
-        db_input critical retriever/floppy/insert || true
-        db_input low retriever/floppy/fstype || true
-        db_go # no '|| true', we want it to exit on 30 (backup)
+        STATE=1
+        while [ "$STATE" != 0 -a "$STATE" != 3 ]; do
+            case "$STATE" in
+            1)
+                db_fset retriever/floppy/insert seen false || true
+                db_fset retriever/floppy/fstype seen false || true
+                db_input critical retriever/floppy/insert || true
+                db_input low retriever/floppy/fstype || true
+                ;;
+            2)
+                db_get retriever/floppy/fstype
+                if [ "$RET" = "Enter manually" ]; then
+                    db_input critical retriever/floppy/fstype-manual || true
+                fi
+                ;;
+            esac
+            if db_go; then
+                STATE=$(($STATE + 1))
+            else
+                STATE=$(($STATE - 1))
+            fi
+        done
+        if [ "$STATE" = 0 ]; then
+            exit 30 # backed out
+        fi
 
         db_get retriever/floppy/fstype
-        case x$RET in
-            xFAT)
-                fstype=msdos
-                ;;
-            xFAT32)
-                fstype=vfat
-                ;;
-            xExt2)
-                fstype=ext2
-                ;;
-            *)
-                fstype=auto
-                ;;
-        esac
+        if [ "$RET" = "Enter manually" ]; then
+            db_get retriever/floppy/fstype-manual
+        fi
+        fstype="$RET"
 
-        mount /dev/floppy/0 -t$fstype /floppy
+        mount /dev/floppy/0 -t"$fstype" /floppy
     fi
 }
 
