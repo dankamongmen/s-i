@@ -717,65 +717,6 @@ normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
 }
 
 
-/* Returns the devfs path name normalized into a "normal" (hdaX, sdaX)
- * name.  The return value is malloced, which means that the caller
- * needs to free it.  This is kinda hairy, but I don't see any other
- * way of operating with non-devfs systems when we use devfs on the
- * boot medium.  The numbers are taken from devices.txt in the
- * Documentation subdirectory off the kernel sources.
- */
-
-static char *normalize_devfs(const char* path)
-{
-    int ret;
-    struct stat statbuf;
-    char *retval = NULL;
-    char *devpath;
-    char *partpath;
-
-    int maxparts;
-    int subdev;
-    int partnum;
-
-    if (0 == strcmp("none", path))
-	return strdup(path);
-
-    ret = stat(path,&statbuf);
-    if (ret == -1)
-    {
-        return NULL;
-    }
-    switch (major(statbuf.st_rdev))
-    {
-    case 3: /* First IDE controller */
-      maxparts  = 64;
-      devpath   = "/dev/hd%c";
-      partpath  = "/dev/hd%c%d";
-      break;
-    case 8: /* First SCSI controller */
-      maxparts = 16;
-      devpath  = "/dev/sd%c";
-      partpath  = "/dev/sd%c%d";
-      break;
-    default:
-      autopartkit_err(1,
-		      "Unable to normalize unknown device type %d,%d for %s\n",
-		      major(statbuf.st_rdev), minor(statbuf.st_rdev), path);
-      return NULL;
-      break;
-    }
-
-    subdev  = minor(statbuf.st_rdev) / maxparts;
-    partnum = minor(statbuf.st_rdev) % maxparts;
-
-    if (0 == partnum)
-      asprintf(&retval, devpath, 'a' + subdev);
-    else
-      asprintf(&retval, partpath, 'a' + subdev, partnum);
-
-    return retval;
-}
-
 /* 
  * This hurts my heart, but libparted seems to have some design
  * issues, and it is _impossible_ to get the path of a partition

@@ -7,6 +7,7 @@ autopartkit_SOURCES = \
 	choosetable.c \
 	distribute.c \
 	loadpartitions.c \
+	mapdevfs.c \
 	parted-compat.h \
 	autopartkit.c
 
