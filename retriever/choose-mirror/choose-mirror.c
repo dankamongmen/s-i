@@ -142,7 +142,7 @@ static int choose_country(void) {
 		if (has_mirror(country)) {
 			debconf_set(debconf, DEBCONF_BASE "http/countries", country);
 		}
-		debconf_input(debconf, "high", DEBCONF_BASE "http/countries");
+		debconf_input(debconf, "medium", DEBCONF_BASE "http/countries");
 	}
 #endif
 #ifdef WITH_FTP
@@ -150,7 +150,7 @@ static int choose_country(void) {
 		if (has_mirror(country)) {
 			debconf_set(debconf, DEBCONF_BASE "ftp/countries", country);
 		}
- 		debconf_input(debconf, "high", DEBCONF_BASE "ftp/countries");
+ 		debconf_input(debconf, "medium", DEBCONF_BASE "ftp/countries");
 	}
 #endif
 	
@@ -211,7 +211,7 @@ static int choose_mirror(void) {
 		debconf_subst(debconf, mir, "mirrors", list);
 		free(list);
 		
-		debconf_input(debconf, "high", mir);
+		debconf_input(debconf, "medium", mir);
 		free(mir);
 	}
 	else {
