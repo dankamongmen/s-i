@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.13 2003/07/14 12:52:48 sjogren Exp $
+ * $Id: newt.c,v 1.14 2003/07/14 18:00:53 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -262,16 +262,29 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     newtComponent form, sform = NULL, scrollbar, textbox, label, bOk, bCancel, cRet;
     int width = 80, height = 24;
     int win_width, win_height = -1, t_height, sel_height, sel_width;
-    char *choices[100], *choices_trans[100], *defvals[100], answer[100];
-    int count, defcount, i, k, ret, def;
+    char **choices, **choices_trans, **defvals, *answer;
+    int count = 0, defcount, i, k, ret, def;
+    const char *p;
 
     newtGetScreenSize(&width, &height);
-    count = strchoicesplit(q_get_choices_vals(q), choices, 100);
+    p = q_get_choices_vals(q);
+    if (*p)
+    {
+        count++;
+        for (; *p; p++)
+            if (*p == ',') // won't work with escaping \, :-(
+                count++;
+    }
     if (count <= 0)
         return DC_NOTOK;
-    if (strchoicesplit(q_get_choices(q), choices_trans, 100) != count)
+    choices = malloc(sizeof(char *) * count);
+    strchoicesplit(q_get_choices_vals(q), choices, count);
+    choices_trans = malloc(sizeof(char *) * count);
+    if (strchoicesplit(q_get_choices(q), choices_trans, count) != count)
         return DC_NOTOK;
-    defcount = strchoicesplit(question_getvalue(q, ""), defvals, 100);
+    defvals = malloc(sizeof(char *) * count);
+    defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
+    answer = malloc(sizeof(char) * count);
     win_width = width-7;
     sel_height = count;
     form = create_form(NULL);
@@ -341,9 +354,13 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
             free(choices[i]);
             free(choices_trans[i]);
         }
+        free(choices);
+        free(choices_trans);
+        free(answer);
         question_setvalue(q, ans);
         for (i = 0; i < defcount; i++)
             free(defvals[i]);
+        free(defvals);
         ret = DC_OK;
     }
     newtFormDestroy(form);
@@ -358,14 +375,25 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     int listflags = NEWT_FLAG_RETURNEXIT;
     int width = 80, height = 24;
     int win_width, win_height = -1, t_height, sel_height, sel_width;
-    char *choices[100] = {NULL}, *choices_trans[100] = {NULL}, *defval;
+    char **choices, **choices_trans, *defval;
     int count = 0, i, ret, defchoice = -1;
+    const char *p;
 
     newtGetScreenSize(&width, &height);
-    count = strchoicesplit(q_get_choices_vals(q), choices, 100);
+    p = q_get_choices_vals(q);
+    if (*p)
+    {
+        count++;
+        for (; *p; p++)
+            if (*p == ',') // won't work with escaping \, :-(
+                count++;
+    }
     if (count <= 0)
         return DC_NOTOK;
-    if (strchoicesplit(q_get_choices(q), choices_trans, 100) != count)
+    choices = malloc(sizeof(char *) * count);
+    strchoicesplit(q_get_choices_vals(q), choices, count);
+    choices_trans = malloc(sizeof(char *) * count);
+    if (strchoicesplit(q_get_choices(q), choices_trans, count) != count)
         return DC_NOTOK;
     win_width = width-7;
     sel_height = count;
@@ -405,6 +433,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         if (defval != NULL && strcmp(defval, choices[i]) == 0)
             defchoice = i;
     }
+    free(choices);
+    free(choices_trans);
     if (count == 1)
         defchoice = 0;
     if (defchoice >= 0)

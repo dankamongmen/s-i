@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.39 2003/07/14 12:52:48 sjogren Exp $
+ * $Id: text.c,v 1.40 2003/07/14 18:00:54 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -55,6 +55,11 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
+#define q_get_description(q)  		question_get_field((q), "", "description")
+#define q_get_choices(q)		question_get_field((q), "", "choices")
+#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
 
 /*
  * Function: getwidth
@@ -211,23 +216,38 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
  */
 static int texthandler_multiselect(struct frontend *obj, struct question *q)
 {
-	char *choices[200] = {0};
-	char *choices_translated[200] = {0};
-	char *defaults[200] = {0};
-	char selected[200] = {0};
+	char **choices;
+	char **choices_translated;
+	char **defaults;
+	char *selected;
 	char answer[4096] = {0};
-	int i, j, line, count, dcount, choice;
+	int i, j, line, count = 0, dcount, choice;
+        const char *p;
 
-	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
-	if (count <= 0) return DC_NOTOK;
-
-	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
+    p = q_get_choices_vals(q);
+    if (*p)
+    {
+        count++;
+        for (; *p; p++)
+            if (*p == ',') // won't work with escaping \, :-(
+                count++;
+    }
+    if (count <= 0)
+        return DC_NOTOK;
+    choices = malloc(sizeof(char *) * count);
+    strchoicesplit(q_get_choices_vals(q), choices, count);
+    choices_translated = malloc(sizeof(char *) * count);
+    if (strchoicesplit(q_get_choices(q), choices_translated, count) != count)
+        return DC_NOTOK;
+    defaults = malloc(sizeof(char *) * count);
+    dcount = strchoicesplit(question_getvalue(q, ""), defaults, count);
+    selected = calloc(1, sizeof(char) * count);
 
 	for (j = 0; j < dcount; j++)
-		for (i = 0; i < count; i++)
+		for (i = 0; i < count; i++) {
 			if (strcmp(choices[i], defaults[j]) == 0)
 				selected[i] = 1;
+                }
 
 	i = 0;
 
@@ -272,8 +292,12 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 		free(choices[i]);
 		free(choices_translated[i]);
 	}
+        free(choices);
+        free(choices_translated);
+        free(selected);
 	for (i = 0; i < dcount; i++)
 		free(defaults[i]);
+        free(defaults);
 	question_setvalue(q, answer);
 	
 	return DC_OK;
@@ -348,18 +372,32 @@ static int texthandler_password(struct frontend *obj, struct question *q)
  */
 static int texthandler_select(struct frontend *obj, struct question *q)
 {
-	char *choices[100] = {0};
-	char *choices_translated[100] = {0};
+	char **choices;
+	char **choices_translated;
 	char answer[10];
-	int i, line, count, choice = 1, def = -1;
+	int i, line, count = 0, choice = 1, def = -1;
 	const char *defval = question_getvalue(q, "");
+        const char *p;
 
-	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
-	if (count <= 0) return DC_NOTOK;
+    p = q_get_choices_vals(q);
+    if (*p)
+    {
+        count++;
+        for (; *p; p++)
+            if (*p == ',') // won't work with escaping \, :-(
+                count++;
+    }
+    if (count <= 0)
+        return DC_NOTOK;
+    choices = malloc(sizeof(char *) * count);
+    strchoicesplit(q_get_choices_vals(q), choices, count);
+    choices_translated = malloc(sizeof(char *) * count);
+    if (strchoicesplit(q_get_choices(q), choices_translated, count) != count)
+        return DC_NOTOK;
+
 	if (count == 1)
 		defval = choices[0];
 
-	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
         /* fprintf(stderr,"In texthandler_select, count is: %d\n", count);*/
 	if (defval != NULL)
 	{
@@ -402,6 +440,8 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 		free(choices[i]);
 		free(choices_translated[i]);
 	}
+        free(choices);
+        free(choices_translated);
 	
 	return DC_OK;
 }
