@@ -687,8 +687,8 @@ depmod -a 1>/dev/null 2>&1
 modprobe dm-mod >/dev/null 2>&1
 modprobe lvm-mod >/dev/null 2>&1
 
-# make sure, lvm is available
-if [ ! -d /proc/lvm ]; then
+# make sure that lvm is available
+if ! grep -q "[0-9] device-mapper$" /proc/misc ; then
 	db_set lvmcfg/nolvm "false"
 	db_input high lvmcfg/nolvm
 	db_go
