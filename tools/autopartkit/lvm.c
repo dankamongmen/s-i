@@ -36,6 +36,8 @@ typedef enum {
     TRUE = 1
 } BOOLEAN;
 
+static const char *VGSCAN = "/sbin/vgscan";
+
 BOOLEAN
 lvm_isinstalled(void)
 {
@@ -49,9 +51,9 @@ lvm_isinstalled(void)
     }
   
     /* Is /bin/vgscan available? */
-    if (0 != stat("/bin/vgscan", &statbuf) || ! S_ISREG(statbuf.st_mode))
+    if (0 != stat(VGSCAN, &statbuf) || ! S_ISREG(statbuf.st_mode))
     {
-        autopartkit_error(0, "Missing /bin/vgscan, no LVM support available.");
+        autopartkit_error(0, "Missing %s, no LVM support available.", VGSCAN);
         return FALSE;
     }
 
@@ -71,11 +73,11 @@ vg_exists(const char *vgname)
         return FALSE;
 
     asprintf(&cmd, "/proc/lvm/VGs/%s", vgname);
-    if ( cmd &&
+    if ( ! cmd ||
 	 0 != stat(cmd, &statbuf)
 	 || ! S_ISDIR(statbuf.st_mode) )
     {
-        autopartkit_error(0, "Missing %s", cmd);
+        autopartkit_error(0, "Missing volume group '%s'", cmd);
 	if (cmd)
 	    free(cmd);
 	return FALSE;
@@ -90,7 +92,7 @@ lvm_init(void)
     if ( ! lvm_isinstalled())
         return -1;
     /* Call vgscan */
-    retval = system("/bin/vgscan");
+    retval = system("vgscan");
     return 0;
 }
 
