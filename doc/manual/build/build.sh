@@ -1,6 +1,6 @@
 #!/bin/sh
 
-languages="en" # cs fr pt_BR ...
+languages="en" # cs fr pt_BR ja ...
 architectures="alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc"
 
 destination="/tmp/manual"
