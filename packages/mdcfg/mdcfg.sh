@@ -34,12 +34,13 @@ md_delete_verify() {
 		"true")
 			# Stop the MD device, and zero the superblock
 			# of all the component devices
-                        DEVICES=`mdadm -Q --detail /dev/md/${NUMBER} | grep "\(active\|spare\) | sed -e 's/.* //'`
-			#echo "mdadm --stop /dev/${DEVICE}"
+      DEVICES=`mdadm -Q --detail /dev/md/${NUMBER} | grep "\(active\|spare\)" | sed -e 's/.* //'`
 			mdadm --stop /dev/md/${NUMBER}
-			for DEV in $DEVICES; do
-				mdadm --zero-superblock ${DEV}
-				#echo "mdadm --zero-superblock /dev/${DEV}"
+			echo "Removing /dev/md/$NUMBER" > /var/log/mdcfg.log
+			echo "${DEVICES}" >> /var/log/mdcfg.log
+			for DEV in "$DEVICES"; do
+				mdadm --zero-superblock --force ${DEV}
+				echo ${DEV} >> /var/log/mdcfg.log
 			done
 			;;
 		"false") ;;
@@ -141,7 +142,8 @@ md_create_raid1() {
 	db_set mdcfg/raid1sparecount "0"
 	OK=0
 
-	# Same procedure as above
+	# Same procedure as above, but get the number of spare partitions
+	# this time.
 	# TODO: Make a general function for this kind of stuff
 	while [ "${OK}" -eq 0 ]; do
 		db_fset mdcfg/raid1sparecount "seen" "false"
@@ -162,12 +164,12 @@ md_create_raid1() {
 	db_get mdcfg/raid1sparecount
 	SPARE_COUNT="${RET}"
 	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
-	if [ "$REQUIRED" -gt "$NUM_PART" ] ; then
+	if [ "$DEV_COUNT" -gt "$NUM_PART" ] ; then
 		db_fset mdcfg/notenoughparts "seen" "false"
 		db_subst mdcfg/notenoughparts NUM_PART "${NUM_PART}"
-		db_subst mdcfg/notenoughparts REQUIRED "${REQUIRED}"
-		db_subst mdcfg/notenoughparts DEV "${DEV_COUNT}"
-		db_subst mdcfg/notenoughparts SPARE "${SPARE_COUNT}"
+		db_subst mdcfg/notenoughparts REQUIRED "${DEV_COUNT}"
+#db_subst mdcfg/notenoughparts DEV "${DEV_COUNT}"
+#db_subst mdcfg/notenoughparts SPARE "${SPARE_COUNT}"
 		db_input critical mdcfg/notenoughparts
 		db_go mdcfg/notenoughparts
 		return
@@ -176,7 +178,7 @@ md_create_raid1() {
 	db_set mdcfg/raid1devs ""
 	SELECTED=0
 
-	# Loop until the correct amount of devices has been selected
+	# Loop until the correct amount of active devices has been selected
 	while [ "${SELECTED}" -ne "${DEV_COUNT}" ]; do
 		db_fset mdcfg/raid1devs "seen" "false"
 		db_subst mdcfg/raid1devs COUNT "${DEV_COUNT}"
@@ -220,24 +222,29 @@ md_create_raid1() {
 
 	db_set mdcfg/raid1sparedevs ""
 	SELECTED=0
-	# Loop until the correct amount of devices has been selected
-	while [ "${SELECTED}" -ne "${SPARE_COUNT}" ]; do
-		db_fset mdcfg/raid1sparedevs "seen" "false"
-		db_subst mdcfg/raid1sparedevs COUNT "${SPARE_COUNT}"
-		db_subst mdcfg/raid1sparedevs PARTITIONS "${PARTITIONS}"
-		db_input high mdcfg/raid1sparedevs
-		db_go
-		if [ "$?" -eq "30" ]; then
-			return
-		fi
-
-		db_get mdcfg/raid1sparedevs
-		SELECTED=0
-		for i in $RET; do
-			DEVICE=`echo ${i}|sed -e "s/,//"`
-			let SELECTED++
+	if [ "${SPARE_COUNT}" -gt 0 ]; then  
+		FIRST=1
+		# Loop until the correct amount of devices has been selected.
+	  # That means any number less than or equal to the spare count
+		while [ "${SELECTED}" -gt "${SPARE_COUNT}" -o "${FIRST}" -eq 1 ]; do
+			FIRST=0
+			db_fset mdcfg/raid1sparedevs "seen" "false"
+			db_subst mdcfg/raid1sparedevs COUNT "${SPARE_COUNT}"
+			db_subst mdcfg/raid1sparedevs PARTITIONS "${PARTITIONS}"
+			db_input high mdcfg/raid1sparedevs
+			db_go
+			if [ "$?" -eq "30" ]; then
+				return
+			fi
+	
+			db_get mdcfg/raid1sparedevs
+			SELECTED=0
+			for i in $RET; do
+				DEVICE=`echo ${i}|sed -e "s/,//"`
+				let SELECTED++
+			done
 		done
-	done
+	fi
 
 	# The amount of spares, the user has selected
 	NAMED_SPARES=${SELECTED}
