@@ -14,8 +14,15 @@ chroot="chroot /target"
 # most generic architecture first (386 above 686).
 
 # Using 'sort -u' to avoid listing the same kernel more then once.
-
-kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" | sort -ur | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' | sed 's/, $//'`
+if [ -x /usr/bin/uniq ] ; then
+    kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" |
+      sort -r | uniq | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' |
+      sed 's/, $//'`
+else
+    kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" |
+      sort -r | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' |
+      sed 's/, $//'`
+fi
 
 if [ "$kernels" ] ; then
     db_subst kernel-chooser/which-kernel kernels "$kernels"
@@ -36,7 +43,7 @@ ARCH=`$chroot dpkg --print-architecture`
 DEFAULT=
 case "$ARCH" in
     i386*)
-        version=2.4.20
+        version=2.4.20-1
         MODEL=`grep 'model name' /proc/cpuinfo | cut -d: -f2`
 	case "$MODEL" in 
 	    "Intel(R) Pentium(R) 4")
