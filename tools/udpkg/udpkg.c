@@ -1,8 +1,9 @@
-/* $Id: udpkg.c,v 1.2 2000/08/26 21:11:27 tausq Exp $ */
+/* $Id: udpkg.c,v 1.3 2000/10/08 03:23:44 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
 #include <fcntl.h>
+#include <search.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -258,14 +259,22 @@ static int dpkg_unpack(struct package_t *pkgs)
 static int dpkg_configure(struct package_t *pkgs)
 {
 	int r = 0;
-	struct package_t *pkg;
+	struct package_t *pkg, *statpkg;
 	void *status = status_read();
-	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
+	for (pkg = pkgs; pkg != 0 && r == 0; pkg = pkg->next)
 	{
-		r = dpkg_doconfigure(pkg);
-		if (r != 0) break;
+		statpkg = tfind(pkg, &status, package_compare);
+		if (statpkg == 0)
+		{
+			fprintf(stderr, "Trying to configure %s, but it is not installed\n", pkg->package);
+			r = 1;
+		}
+		else
+		{
+			r = dpkg_doconfigure(pkg);
+		}
 	}
-	status_merge(status, pkgs);
+	status_merge(status, 0);
 	return r;
 }
 
@@ -319,9 +328,7 @@ static int dpkg_remove(struct package_t *pkgs)
 	for (p = pkgs; p != 0; p = p->next)
 	{
 	}
-	/*
 	status_merge(status, 0);
-	*/
 	return 0;
 }
 

@@ -1,8 +1,9 @@
-/* $Id: depends.c,v 1.2 2000/08/26 21:46:43 tausq Exp $ */
+/* $Id: depends.c,v 1.3 2000/10/08 03:23:44 tausq Exp $ */
 #include "udpkg.h"
 
 #ifdef DODEPENDS
 #include <stdio.h>
+#include <stdlib.h>
 #include <search.h>
 #include <string.h>
 #include <ctype.h>

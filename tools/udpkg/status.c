@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.1 2000/08/24 06:23:56 tausq Exp $ */
+/* $Id: status.c,v 1.2 2000/10/08 03:23:44 tausq Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -163,6 +163,8 @@ int status_merge(void *status, struct package_t *pkgs)
 {
 	FILE *fin, *fout;
 	char buf[BUFSIZE];
+	struct package_t *pkg = 0, *statpkg = 0;
+	struct package_t locpkg;
 	int r = 0;
 
 	if ((fin = fopen(STATUSFILE, "r")) == NULL)
@@ -178,7 +180,35 @@ int status_merge(void *status, struct package_t *pkgs)
 	printf("(Updating database...)\n");
 	while (fgets(buf, BUFSIZE, fin) && !feof(fin))
 	{
-		/* TODO */
+		/* If we see a package header, find out if it's a package
+		 * that we have processed. if so, we skip that block for 
+		 * now (write it at the end. 
+		 *
+		 * we also look at packages in the status cache and update
+		 * their status fields
+		 */
+		if (strstr(buf, "Package: ") == buf)
+		{
+			for (pkg = pkgs; pkg != 0 && strncmp(buf+9,
+					pkg->package, strlen(pkg->package))!=0;
+			     pkg = pkg->next) ;
+
+			locpkg.package = buf+9;
+			statpkg = tfind(&locpkg, &status, package_compare);
+			
+			/* note: statpkg should be non-zero, unless the status
+			 * file was changed while we are processing (no locking
+			 * is currently done...
+			 */
+			if (statpkg != 0) statpkg = *(struct package_t **)statpkg;
+		}
+		if (pkg == 0) continue;
+
+		if (strstr(buf, "Status: ") == buf && statpkg != 0)
+		{
+			  snprintf(buf, sizeof(buf), "Status: %s\n",
+				 status_print(statpkg->status));
+		}
 		fputs(buf, fout);
 	}
 	fclose(fin);
