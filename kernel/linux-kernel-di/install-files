@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 # Create and populate the package build directories.
 
 sub doit {
@@ -12,7 +12,13 @@ sub doit {
 my $hostarch=`dpkg-architecture -qDEB_HOST_ARCH`;
 chomp $hostarch;
 
+my $sourcedir=$ENV{SOURCEDIR};
+if (! defined $sourcedir) {
+	$sourcedir="";
+}
+
 my $kname;
+
 open(NAMES, "kernel-names") || die "kernel-names: $!";
 while (<NAMES>) {
 	chomp;
@@ -25,6 +31,7 @@ while (<NAMES>) {
 	}
 }
 close NAMES;
+
 if (! defined $kname) {
 	die "could not find $hostarch in kernel-names";
 }
@@ -42,11 +49,12 @@ while (<KVERS>) {
 	next unless $arch eq $hostarch;
 
 	doit("install", "-D", "-m", 644,
-		$ENV{SOURCEDIR}."/boot/$kname-$installedname",
+		$sourcedir."/boot/$kname-$installedname",
 		"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname");
 	doit("install", "-D", "-m", 644,
-		$ENV{SOURCEDIR}."/lib/modules/$installedname/modules.dep",
+		$sourcedir."/lib/modules/$installedname/modules.dep",
 		"debian/kernel-image-$kernelversion-$flavour-di/lib/modules/$installedname/modules.dep");
 	doit("./copy-modules", $kernelversion, $flavour, $installedname);
 	doit("./find-dups", "$kernelversion-$flavour");
 }
+close KVERS;
