@@ -305,23 +305,13 @@ di_package *di_packages_resolve_dependencies_check_virtual (di_package *package 
 bool di_packages_resolve_dependencies_check_non_existant (di_packages_resolve_dependencies_check *r __attribute__ ((unused)), di_package *package, di_package_dependency *d __attribute__ ((unused)))
 {
   di_log (DI_LOG_LEVEL_WARNING, "package %s doesn't exist", package->package);
-#if 1
-  /* Backward compatiblity */
-  return true;
-#else
   return false;
-#endif
 }
 
 bool di_packages_resolve_dependencies_check_non_existant_quiet (di_packages_resolve_dependencies_check *r __attribute__ ((unused)), di_package *package __attribute__ ((unused)), di_package_dependency *d __attribute__ ((unused)))
 {
   di_log (DI_LOG_LEVEL_DEBUG, "package %s doesn't exist", package->package);
-#if 1
-  /* Backward compatiblity */
-  return true;
-#else
   return false;
-#endif
 }
 
 bool di_packages_resolve_dependencies_check_non_existant_permissive (di_packages_resolve_dependencies_check *r __attribute__ ((unused)), di_package *package __attribute__ ((unused)), di_package_dependency *d __attribute__ ((unused)))
