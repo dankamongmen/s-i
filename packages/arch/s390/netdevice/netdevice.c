@@ -45,7 +45,7 @@ static int device_selected, device_ctc_protocol, device_qeth_lcs_port;
 static char *device_qeth_portname_iucv_peer;
 static char *type_text = "", *module = "", chandev_parm[256], chandev_module_parm[256];
 
-#define TEMPLATE_PREFIX	"debian-installer/s390/netdevice/"
+#define TEMPLATE_PREFIX	"s390-netdevice/"
 
 static int my_debconf_input (const char *priority, const char *template, char **p)
 {

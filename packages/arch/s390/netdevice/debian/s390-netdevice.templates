@@ -1,4 +1,4 @@
-Template: debian-installer/s390/netdevice/choose_networktype
+Template: s390-netdevice/choose_networktype
 Type: select
 _Choices: ctc: Channel to Channel (CTC) or ESCON connection, lcs: qeth: OSA-2 Token Ring/Ethernet or OSA-Express Fast Ethernet (non-QDIO), qeth: OSA-Express in QDIO mode / HiperSockets, iucv: Inter-User Communication Vehicle - available for VM guests only
 _Description: Network device type:
@@ -6,14 +6,14 @@ _Description: Network device type:
  will need for installing the Debian system (via NFS or HTTP). Only
  the listed devices are supported.
 
-Template: debian-installer/s390/netdevice/ctc/choose
+Template: s390-netdevice/ctc/choose
 Type: select
 Choices: ${choices}
 _Description: CTC device:
  The following device numbers might belong to CTC or ESCON connections, but
  please note that OSA-2 or OSA-Express cards might also be listed here.
 
-Template: debian-installer/s390/netdevice/ctc/confirm
+Template: s390-netdevice/ctc/confirm
 Type: boolean
 Default: true
 _Description: Do you accept this configuration?
@@ -22,25 +22,25 @@ _Description: Do you accept this configuration?
   write channel = ${device_write}
   protocol      = ${protocol}
 
-Template: debian-installer/s390/netdevice/ctc/no
+Template: s390-netdevice/ctc/no
 Type: error
 _Description: No CTC or ESCON connections
  Please make sure that you have set them up correctly.
 
-Template: debian-installer/s390/netdevice/ctc/protocol
+Template: s390-netdevice/ctc/protocol
 Type: select
 Choices: S/390 (0), Linux (1), OS/390 (3)
 Default: S/390 (0)
 _Description: Protocol for this connection:
 
-Template: debian-installer/s390/netdevice/lcs/choose
+Template: s390-netdevice/lcs/choose
 Type: select
 Choices: ${choices}
 _Description: Device:
  The following device numbers might belong to OSA-2 or OSA-Express cards, but
  please note that CTC/ESCON devices might also be listed here.
 
-Template: debian-installer/s390/netdevice/lcs/confirm
+Template: s390-netdevice/lcs/confirm
 Type: boolean
 Default: true
 _Description: Do you accept this configuration?
@@ -49,7 +49,7 @@ _Description: Do you accept this configuration?
   write channel = ${device_write}
   port          = ${port}
 
-Template: debian-installer/s390/netdevice/lcs/no
+Template: s390-netdevice/lcs/no
 Type: error
 _Description: No OSA-2 or OSA-Express cards
  If you are running VM please
@@ -57,13 +57,13 @@ _Description: No OSA-2 or OSA-Express cards
  HiperSockets or an OSA-Express card in QDIO mode please use the qeth
  driver instead.
 
-Template: debian-installer/s390/netdevice/qeth/choose
+Template: s390-netdevice/qeth/choose
 Type: select
 Choices: ${choices}
 _Description: Device:
  Please select the OSA-Express QDIO / HiperSockets device.
 
-Template: debian-installer/s390/netdevice/qeth/confirm
+Template: s390-netdevice/qeth/confirm
 Type: boolean
 Default: true
 _Description: Do you accept this configuration?
@@ -74,7 +74,7 @@ _Description: Do you accept this configuration?
   port          = ${port}
   portname      = ${portname}
 
-Template: debian-installer/s390/netdevice/qeth/no
+Template: s390-netdevice/qeth/no
 Type: error
 _Description: No OSA-Express QDIO cards / HiperSockets
  No OSA-Express QDIO cards / HiperSockets were detected. If you are running
@@ -82,7 +82,7 @@ _Description: No OSA-Express QDIO cards / HiperSockets
  to use an OSA-2 or OSA-Express card in non-QDIO mode please use the lcs
  driver instead.
 
-Template: debian-installer/s390/netdevice/qeth/portname
+Template: s390-netdevice/qeth/portname
 Type: string
 _Description: Portname:
  Please enter the portname of your OSA-Express card. This name must be 1 to
@@ -95,20 +95,20 @@ _Description: Portname:
  .
  The name will automatically be converted to uppercase.
 
-Template: debian-installer/s390/netdevice/qeth_lcs/port
+Template: s390-netdevice/qeth_lcs/port
 Type: string
 Default: 0
 _Description: Port:
  Please enter a relative port for this connection.
 
-Template: debian-installer/s390/netdevice/iucv/confirm
+Template: s390-netdevice/iucv/confirm
 Type: boolean
 Default: true
 _Description: Do you accept this configuration?
  The configured parameter is:
   peer  = ${peer}
 
-Template: debian-installer/s390/netdevice/iucv/peer
+Template: s390-netdevice/iucv/peer
 Type: string
 _Description: VM peer:
  Please enter the name of the VM peer you want to connect to.

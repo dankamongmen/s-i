@@ -17,6 +17,8 @@ const char *const file_subchannels = "/proc/subchannels";
 //const char *const file_devices = "/dev/null";
 //const char *const file_subchannels = "subchannels";
 
+#define TEMPLATE_PREFIX	"s390-dasd/"
+
 static struct debconfclient *client;
 
 static struct dasd
@@ -126,7 +128,7 @@ static enum state_wanted get_channel (void)
 		{
 			unsigned int device;
 
-			ret = my_debconf_input ("high", "debian-installer/s390/dasd/choose", &ptr);
+			ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose", &ptr);
 			sscanf (ptr, "%4x", &device);
 
 			for (i = 0; i < dasds_items; i++)
@@ -138,7 +140,7 @@ static enum state_wanted get_channel (void)
 
 			if (!dasd_current)
 			{
-				ret = my_debconf_input ("high", "debian-installer/s390/dasd/choose_invalid", &ptr);
+				ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_invalid", &ptr);
 				if (ret == 10)
 					return WANT_BACKUP;
 			}
@@ -173,8 +175,8 @@ static enum state_wanted get_channel (void)
 			di_snprintfcat (buf, sizeof (buf), "%04x %s, ", dasds[i].device, ptr);
 		}
 
-		debconf_subst (client, "debian-install/s390/dasd/choose_select", "choices", buf);
-		ret = my_debconf_input ("high", "debian-install/s390/dasd/choose_select", &ptr);
+		debconf_subst (client, TEMPLATE_PREFIX "choose_select", "choices", buf);
+		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_select", &ptr);
 
 		if (ret == 10)
 			return WANT_BACKUP;
@@ -234,14 +236,14 @@ static enum state_wanted confirm (void)
 		case UNFORMATTED:
 		case READY:
 			needs_format = true;
-			debconf_subst (client, "debian-install/s390/dasd/format", "device", buf);
-			debconf_set (client, "debian-install/s390/dasd/format", "true");
-			ret = my_debconf_input ("medium", "debian-install/s390/dasd/format", &ptr);
+			debconf_subst (client, TEMPLATE_PREFIX "format", "device", buf);
+			debconf_set (client, TEMPLATE_PREFIX "format", "true");
+			ret = my_debconf_input ("medium", TEMPLATE_PREFIX "format", &ptr);
 			break;
 		case FORMATTED:
-			debconf_subst (client, "debian-install/s390/dasd/format_unclean", "device", buf);
-			debconf_set (client, "debian-install/s390/dasd/format_unclean", "false");
-			ret = my_debconf_input ("critical", "debian-install/s390/dasd/format_unclean", &ptr);
+			debconf_subst (client, TEMPLATE_PREFIX "format_unclean", "device", buf);
+			debconf_set (client, TEMPLATE_PREFIX "format_unclean", "false");
+			ret = my_debconf_input ("critical", TEMPLATE_PREFIX "format_unclean", &ptr);
 			break;
 		default:
 			return WANT_ERROR;
@@ -265,8 +267,8 @@ static enum state_wanted confirm (void)
 			return WANT_ERROR;
 		close (fd);
 
-		debconf_subst (client, "debian-install/s390/dasd/formating", "device", buf);
-		debconf_progress_start (client, 0, drive_geo.cylinders, "debian-install/s390/dasd/formating");
+		debconf_subst (client, TEMPLATE_PREFIX "formating", "device", buf);
+		debconf_progress_start (client, 0, drive_geo.cylinders, TEMPLATE_PREFIX "formating");
 
 		snprintf (buf, sizeof (buf), "dasdfmt -l LX%04x -b 4096 -m 1 -f %s -y", dasd_current->device, dev);
 		ret = di_exec_shell_full (buf, format_handler, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -310,7 +312,7 @@ static void error (void)
 {
 	char *ptr;
 
-	my_debconf_input ("high", "debian-install/s390/dasd/error", &ptr);
+	my_debconf_input ("high", TEMPLATE_PREFIX "error", &ptr);
 }
 
 int main ()
