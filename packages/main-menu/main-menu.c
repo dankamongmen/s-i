@@ -577,6 +577,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 				break;
 			case EXIT_BACKUP:
 				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' succeeded but requested to be left unconfigured.", p->p.package); 
+				modify_debconf_priority(LOWER);
 				break;
 			case EXIT_QUIT:
 			case EXIT_RESTART:
@@ -594,7 +595,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 		packages = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, allocator);
 
 		/* tell cdebconf to save the database */
-		kill(getppid(), SIGUSR1);
+		debconf->command(debconf, "X_SAVE", NULL);
 	}
 	
 	return EXIT_FAILURE;

@@ -17,7 +17,13 @@
 
 #define NEVERDEFAULT 900
 
-#define EXIT_OK 	        0
-#define EXIT_BACKUP	        10
-#define EXIT_QUIT	        11
-#define EXIT_RESTART	        12
+enum
+{
+	EXIT_OK			= 0,
+	EXIT_BACKUP		= 10,
+	EXIT_QUIT		= 11,
+	EXIT_RESTART		= 12,
+};
+
+/* vim: noexpandtab sw=8
+ */
