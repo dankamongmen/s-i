@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.1 2002/09/05 12:30:23 tfheen Exp $
+ * $Id: gtk.c,v 1.2 2002/09/06 15:06:49 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -67,12 +67,12 @@
 #define _(x) x
 #endif
 
-int gBool;
-int gSelectNum;
-char *gPassword;
-int gMultiChoices[100];
-gboolean gBack, gNext;
-GtkWidget *gRadio;
+struct multicheck_data
+{
+  int multiChoices[100];
+  GtkWidget **choices;
+};
+
 
 /*
  * Function: passwd_callback
@@ -82,14 +82,17 @@ GtkWidget *gRadio;
  * Assumptions: 
  */
 void passwd_callback( GtkWidget *widget,
-                     GtkWidget *entry )
+                     GtkWidget *data )
 {
   const char *entrytext;
-  entrytext = gtk_entry_get_text (GTK_ENTRY (entry));
+  char **callstring;
+
+  callstring = (char **)data;
+
+  entrytext = gtk_entry_get_text (GTK_ENTRY (widget));
   
-  gPassword = malloc(strlen(entrytext));
-  strcpy(gPassword, entrytext);
-  
+  *callstring = strdup(entrytext);
+
   printf("Password captured.\n");
 }
 
@@ -103,15 +106,19 @@ void passwd_callback( GtkWidget *widget,
 void check_callback( GtkWidget *widget,
             gpointer   data )
 {
+  gboolean *gbool;
+
+  gbool = (gboolean *)data;
+
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) 
     {
       /* If control reaches here, the toggle button is down */
-      gBool = 1;
+      *gbool = TRUE;
     
     } else {
     
       /* If control reaches here, the toggle button is up */
-      gBool = 0;
+      *gbool = FALSE;
     }
 }
 
@@ -126,10 +133,13 @@ void multicheck_callback( GtkWidget *widget,
             gpointer   data )
 {
   int i, val; 
-  GtkWidget **choices;
   gboolean done;
+  struct multicheck_data *call_data;
+  GtkWidget **choices;
 
-  choices = (GtkWidget **)data;
+  call_data = (struct multicheck_data *)data;
+  choices = call_data->choices;
+
   i = 0;
   done = FALSE;
 
@@ -149,7 +159,7 @@ void multicheck_callback( GtkWidget *widget,
     {
       if(*choices == widget)
 	{
-	  gMultiChoices[i] = val;
+	  call_data->multiChoices[i] = val;
 	  done = TRUE;
 	}
 
@@ -170,50 +180,20 @@ void multicheck_callback( GtkWidget *widget,
 void select_callback( GtkWidget *widget,
             gpointer   data )
 {
+  GtkWidget **radio;
+
+  radio = (GtkWidget **)data;
 
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) 
     {
       /* If control reaches here, the toggle button is down */
       printf("selected: %p\n", widget);
-      gRadio = widget;
+      *radio = widget;
 
     } else {
     
       /* If control reaches here, the toggle button is up */
       printf("deselected: %p\n", widget);
-    }
-
-}
-
-
-/*
- * Function: choice_callback
- * Input: none
- * Output: none
- * Description: respond to button press and determing which button was pressed
- * Assumptions: 
- */
-void choice_callback( GtkWidget *widget,
-            gpointer   data )
-{
-  int i; 
-  GtkWidget **choices;
-  gboolean done;
-
-  choices = (GtkWidget **)data;
-  i = 0;
-  done = FALSE;
-
-  while(*choices && !done)
-    {
-      if(*choices == widget)
-	{
-	  gSelectNum = i;
-	  done = TRUE;
-	}
-
-      i++;
-      choices++;
     }
 
 }
@@ -229,10 +209,12 @@ void choice_callback( GtkWidget *widget,
 void next( GtkWidget *widget,
             gpointer   data )
 {
-  gNext = TRUE;
-  gBack = FALSE;
+  GtkWidget *window;
+
+  window = (GtkWidget *)data;
 
   g_print ("next\n");
+  gtk_widget_hide(window);
   gtk_main_quit();
 }
 
@@ -240,14 +222,18 @@ void next( GtkWidget *widget,
  * Function: back
  * Input: none
  * Output: none
- * Description: go back to previous question
- * Assumptions: 
+ * Description: go back to previous question. 
+ * Assumptions: the question handler loop will increment before continuing
+ *              so move back two questions in order to move back one. 
  */
 void back( GtkWidget *widget,
             gpointer   data )
 {
-  gBack = TRUE;
-  gNext = FALSE;
+  struct question **pq;
+  
+  pq = (struct question **)data;
+
+  *pq = (*pq)->prev->prev;
 
   g_print ("back\n");
   gtk_main_quit();
@@ -299,6 +285,8 @@ void add_common_buttons(GtkWidget *window, GtkWidget *box, GtkWidget *bigbox, st
 	GtkWidget *nextButton, *backButton;
 	GtkWidget *descbox, *label, *elabel, *separator;
 
+	gtk_window_set_title(GTK_WINDOW(window), question_description(q));
+
 	//set up window signal handlers
 	//TODO: move this out of here!
 	g_signal_connect (G_OBJECT (window), "delete_event",
@@ -334,7 +322,7 @@ void add_common_buttons(GtkWidget *window, GtkWidget *box, GtkWidget *bigbox, st
 	  {
 	    backButton = gtk_button_new_with_label ("Back");
 	    g_signal_connect (G_OBJECT (backButton), "clicked",
-			  G_CALLBACK (back), NULL);
+			  G_CALLBACK (back), &q);
 	    gtk_box_pack_start(GTK_BOX(box), backButton, FALSE, 5, 5);
 	    gtk_widget_show (backButton);
 	  }
@@ -346,7 +334,8 @@ void add_common_buttons(GtkWidget *window, GtkWidget *box, GtkWidget *bigbox, st
 	  nextButton = gtk_button_new_with_label("Finish");
 
 	g_signal_connect (G_OBJECT (nextButton), "clicked",
-			  G_CALLBACK (next), NULL);
+			  G_CALLBACK (next), window);
+
 	gtk_box_pack_start(GTK_BOX(box), nextButton, FALSE, 5, 5);
 	gtk_widget_show (nextButton);
 
@@ -358,75 +347,6 @@ void add_common_buttons(GtkWidget *window, GtkWidget *box, GtkWidget *bigbox, st
 
 
 /*
- * Function: getwidth
- * Input: none
- * Output: int - width of screen
- * Description: get the width of the current terminal
- * Assumptions: doesn't handle resizing; caches value on first call
- * 
- * TODO: implement this to get the size of the X desktop
- 
-static const int getwidth(void)
-{
-	static int res = 80;
-	static int inited = 0;
-	int fd;
-	struct winsize ws;
-
-	if (inited == 0)
-	{
-		inited = 1;
-		if ((fd = open("/dev/tty", O_RDONLY)) > 0)
-		{
-			if (ioctl(fd, TIOCGWINSZ, &ws) == 0)
-				res = ws.ws_col;
-			close(fd);
-		}
-	}
-	return res;
-}
-*/
-
-
-/*
- * Function: wrap_print
- * Input: const char *str - string to display
- * Output: none
- * Description: prints a string to the screen with word wrapping 
- * Assumptions: string fits in <500 lines
- *  Simple greedy line-wrapper 
- 
-static void wrap_print(const char *str)
-{
-
-	int i, lc;
-	char *lines[500];
-
-	lc = strwrap(str, getwidth() - 1, lines, DIM(lines));
-
-	for (i = 0; i < lc; i++)
-	{
-		printf("%s\n", lines[i]);
-		DELETE(lines[i]);
-	}
-}
-*/
-
-/*
- * Function: texthandler_displaydesc
- * Input: struct frontend *obj - UI object
- *        struct question *q - question for which to display the description
- * Output: none
- * Description: displays the description for a given question 
- * Assumptions: none
- *
-static void texthandler_displaydesc(struct frontend *obj, struct question *q) 
-{
-	wrap_print(question_description(q));
-	wrap_print(question_extended_description(q));
-}*/
-
-/*
  * Function: gtkhandler_boolean
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
@@ -436,14 +356,15 @@ static void texthandler_displaydesc(struct frontend *obj, struct question *q)
  */
 static int gtkhandler_boolean(struct frontend *obj, struct question *q)
 {
-	int ans = -1;
 	int def = -1;
 	const char *defval;
 	GtkWidget *window;
 	GtkWidget *boolButton;
 	GtkWidget *hboxtop, *hboxbottom, *bigbox;
+	gboolean gbool;
 
 	defval = question_defaultval(q);
+
 	if (defval)
 	{
 		if (strcmp(defval, "true") == 0)
@@ -465,7 +386,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q)
 
 	boolButton = gtk_check_button_new_with_label ( (gchar *)question_description(q) );
 	g_signal_connect (G_OBJECT (boolButton), "clicked",
-			  G_CALLBACK (check_callback), NULL);
+			  G_CALLBACK (check_callback), &gbool);
 	gtk_box_pack_start(GTK_BOX(hboxtop), boolButton, FALSE, 5, 5);
 	gtk_widget_show (boolButton);		
 
@@ -484,16 +405,8 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q)
 
 	gtk_main ();
 
-	if(gBool)
-	  {
-	    ans = 1;
-	  }
-	else
-	  {
-	    ans = 0;
-	  }
+	question_setvalue(q, (gbool ? "true" : "false"));
 
-	question_setvalue(q, (ans ? "true" : "false"));
 	return DC_OK;
 }
 
@@ -518,16 +431,15 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q)
 	GtkWidget *window;
 	GtkWidget *hboxtop, *hboxbottom, *bigbox;
 	GtkWidget **choiceButtons;
+	struct multicheck_data call_data;
+
+	memset(&call_data.choices, 0, sizeof(call_data.multiChoices));
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
 
-	choiceButtons = (GtkWidget **)malloc( (count * (sizeof(GtkWidget *)) + 1) );
-
-	for(i = 0; i < count; i++)
-	  choiceButtons[i] = (GtkWidget *)malloc(sizeof(GtkWidget *));
-
-	choiceButtons[count + 1] = 0;
+	choiceButtons = (GtkWidget **)malloc( (count + 1) * (sizeof(GtkWidget *)) );
+	choiceButtons[count] = 0;
 
 	if (dcount > 0)
 		for (i = 0; i < count; i++)
@@ -535,7 +447,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q)
 				if (strcmp(choices[i], defaults[j]) == 0)
 					{
 					  selected[i] = 1;
-					  gMultiChoices[i] = 1;
+					  call_data.multiChoices[i] = 1;
 					}
 
 	//create the window for the question
@@ -548,13 +460,15 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q)
 
 	add_common_buttons(window, hboxbottom, bigbox, q);
 
+	call_data.choices = choiceButtons;
+
 	for (i = 0; i < count; i++)
 	  {
 	    //create a button for each choice here and init the global place to store them
 
 	    choiceButtons[i] = gtk_check_button_new_with_label ( (gchar *)choices[i] );
 	    g_signal_connect (G_OBJECT (choiceButtons[i]), "clicked",
-			      G_CALLBACK (multicheck_callback), choiceButtons);
+			      G_CALLBACK (multicheck_callback), &call_data);
 	    gtk_box_pack_start(GTK_BOX(hboxtop), choiceButtons[i], FALSE, 5, 0);
 	    gtk_widget_show (choiceButtons[i]);
 			
@@ -581,7 +495,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q)
 
 	for (i = 0; i < count; i++)
 	  {
-	    if(gMultiChoices[i])
+	    if(call_data.multiChoices[i])
 	      {
 		if(j)
 		  {
@@ -593,9 +507,8 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q)
 	      }
 	  }
 
-	for (i = 0; i < count; i++)
-		free(choiceButtons[i]);
-
+	free(choiceButtons);
+	
 	printf("%s", answer);
 
 	question_setvalue(q, answer);
@@ -662,6 +575,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q)
 	char passwd[256] = {0};
 	GtkWidget *window, *hboxbottom, *hboxtop, *bigbox;
 	GtkWidget *entry;
+	char *callstring;
 
 	//create the window for the question
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -674,9 +588,10 @@ static int gtkhandler_password(struct frontend *obj, struct question *q)
 	//add actual password field
 	entry = gtk_entry_new ();
 	gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
+	
 	g_signal_connect (G_OBJECT (entry), "activate",
 			  G_CALLBACK (passwd_callback),
-			  entry);
+			  &callstring);
 	gtk_box_pack_start (GTK_BOX (hboxtop), entry, TRUE, TRUE, 0);
 	gtk_widget_show (entry);
 
@@ -696,7 +611,10 @@ static int gtkhandler_password(struct frontend *obj, struct question *q)
 
 	gtk_main();
 
-	strcpy(passwd, gPassword);
+	if(callstring)
+	  strcpy(passwd, callstring);
+	else
+	  strcpy(passwd, "");
 
 	question_setvalue(q, passwd);
 	return DC_OK;
@@ -725,14 +643,15 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 	GtkWidget *hboxtop, *hboxbottom, *bigbox;
 	GtkWidget **choiceButtons;
 	GtkWidget *firstButton, *nextButton;
+	GtkWidget *radio;
+	int selectNum;
+
+	selectNum = 0;
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
 
-	choiceButtons = (GtkWidget **)malloc( (count * (sizeof(GtkWidget *)) + 1) );
-
-	for(i = 0; i < count; i++)
-	  choiceButtons[i] = (GtkWidget *)malloc(sizeof(GtkWidget *));
+	choiceButtons = (GtkWidget **)malloc(  (count+1) * ( sizeof(GtkWidget *) )  );
 
 	choiceButtons[count + 1] = 0;
 
@@ -742,7 +661,7 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 				if (strcmp(choices[i], defaults[j]) == 0)
 					{
 					  selected[i] = 1;
-					  gSelectNum = i;
+					  selectNum = i;
 					}
 
 	//create the window for the question
@@ -771,16 +690,16 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 	    choiceButtons[i] = nextButton;
 	    
 	    g_signal_connect (G_OBJECT (nextButton), "clicked",
-			      G_CALLBACK (select_callback), choiceButtons);
+			      G_CALLBACK (select_callback), &radio);
 
 	    gtk_box_pack_start (GTK_BOX (hboxtop), nextButton, TRUE, TRUE, 0);
 	    gtk_widget_show (nextButton);
 
-	    if(i == gSelectNum)
+	    if(i == selectNum)
 	      {
 		printf("setting default to %d\n", i);
-		GTK_WIDGET_SET_FLAGS (nextButton, GTK_CAN_DEFAULT);
-		gtk_widget_grab_default (nextButton);
+		//GTK_WIDGET_SET_FLAGS (nextButton, GTK_CAN_DEFAULT);
+		//gtk_widget_grab_default (nextButton);
 	      }
 
 	    firstButton = nextButton;
@@ -799,38 +718,25 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 
 	gtk_main();
 
-	i = 0;
+        for (i = 0; choiceButtons[i] != NULL; i++)
+            if (choiceButtons[i] == radio)
+            {
+                selectNum = i;
+                break;
+            }
 
-	while(*choiceButtons)
-	  {
-	    if(*choiceButtons == gRadio)
-	      {
-		gSelectNum = i;
-		break;
-	      }
-	    else
-	      {
-		i++;
-		choiceButtons++;
-	      }
-	  }
-
-	printf("selected: %d\n", gSelectNum);
+	printf("selected: %d\n", selectNum);
 
 	//once the dialog returns, handle the result
 	printf("freeing %d buttons\n", count);
 
-	//FIXME: why does this crash?!
-	/*	for (i = 0; i < count; i++)
-	  {
-	    free(choiceButtons[i]);
-	    }*/
+	free(choiceButtons);
 
-	printf("selectnum: %d\n", gSelectNum);
+	printf("selectnum: %d\n", selectNum);
 
-	if(gSelectNum >= 0 && gSelectNum < count)
+	if(selectNum >= 0 && selectNum < count)
 	  {
-	    strcpy(answer, choices[gSelectNum]);
+	    strcpy(answer, choices[selectNum]);
 	  }
 
 	printf("answer: %s\n", answer);
@@ -856,6 +762,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q)
 	char passwd[256] = {0};
 	GtkWidget *window, *hboxbottom, *hboxtop, *bigbox;
 	GtkWidget *entry;
+	char *callstring;
 
 	//create the window for the question
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -867,10 +774,11 @@ static int gtkhandler_string(struct frontend *obj, struct question *q)
 
 	//add actual text entry field
 	entry = gtk_entry_new ();
+
 	gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
 	g_signal_connect (G_OBJECT (entry), "activate",
 			  G_CALLBACK (passwd_callback),
-			  entry);
+			  &callstring);
 	gtk_box_pack_start (GTK_BOX (hboxtop), entry, TRUE, TRUE, 0);
 	gtk_widget_show (entry);
 
@@ -889,7 +797,10 @@ static int gtkhandler_string(struct frontend *obj, struct question *q)
 
 	gtk_main();
 
-	strcpy(passwd, gPassword);
+	if(callstring)
+	  strcpy(passwd, callstring);
+	else
+	  strcpy(passwd, "");
 
 	question_setvalue(q, passwd);
 
@@ -914,11 +825,11 @@ static int gtkhandler_text(struct frontend *obj, struct question *q)
 	char buf[1024];
 	GtkWidget *window;
 	GtkWidget *hboxtop, *hboxbottom, *bigbox;
-	GtkWidget *view;
+	GtkWidget *view, *sw;
 	GtkTextBuffer *buffer;
         char *text;
         GtkTextIter start, end;
-
+      
 	//create the window for the question
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	bigbox = gtk_vbox_new(FALSE, 0);
@@ -929,12 +840,25 @@ static int gtkhandler_text(struct frontend *obj, struct question *q)
 
 	//add the text entry field
 	view = gtk_text_view_new ();
-	gtk_box_pack_start(GTK_BOX(hboxtop), view, FALSE, 5, 5);
-	gtk_widget_show (view);	
+	//gtk_box_pack_start(GTK_BOX(hboxtop), view, FALSE, 5, 5);
 
 	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 	gtk_text_buffer_get_start_iter (buffer, &start);
 	gtk_text_buffer_get_end_iter (buffer, &end);
+
+	sw = gtk_scrolled_window_new (NULL, NULL);
+	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
+					GTK_POLICY_AUTOMATIC,
+					GTK_POLICY_AUTOMATIC);
+
+	gtk_box_pack_start(GTK_BOX(hboxtop), sw, FALSE, 5, 5);
+
+	//gtk_container_add (window, vpaned);
+
+	gtk_container_add (GTK_CONTAINER (sw), view);
+
+	gtk_widget_show (view);	
+	gtk_widget_show (sw);	
 
 	//adjust the size
       
@@ -954,6 +878,9 @@ static int gtkhandler_text(struct frontend *obj, struct question *q)
 	gtk_widget_show (window);
 
 	gtk_main();
+
+	gtk_text_buffer_get_start_iter (buffer, &start);
+	gtk_text_buffer_get_end_iter (buffer, &end);
 
 	text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
 
@@ -1045,8 +972,8 @@ static int gtk_go(struct frontend *obj)
 					return ret;
 				
 				//I think we need to go back two because the loop 
-				if(gBack && !gNext)
-				  q = q->prev->prev;
+				//if(gBack && !gNext)
+				//q = q->prev->prev;
 
 				break;
 			}
