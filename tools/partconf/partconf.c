@@ -515,9 +515,6 @@ main(int argc, char *argv[])
     debconf->command(debconf, "CAPB", "backup", NULL);
     ped_exception_set_handler(my_exception_handler);
     modprobe("ext3 reiserfs jfs xfs"); // FIXME: Any others?
-    modprobe("lvm-mod");
-    // FIXME: EVMS?
-    modprobe("raid0 raid1 raid5 linear");
     if ((part_count = get_all_partitions(parts, MAX_PARTS)) <= 0) {
         debconf->command(debconf, "INPUT critical", "partconf/no-partitions", NULL);
         debconf->command(debconf, "GO", NULL);

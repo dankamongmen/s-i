@@ -33,11 +33,25 @@ size_desc(long long bytes)
 void
 modprobe(const char *mod)
 {
+    FILE *fp;
     char *cmd;
+    char printk[1024] = "";
 
+    if ((fp = fopen("/proc/sys/kernel/printk", "r")) != NULL) {
+        fgets(printk, sizeof(printk), fp);
+        fclose(fp);
+    }
+    if ((fp = fopen("/proc/sys/kernel/printk", "w")) != NULL) {
+        fputs("0\n", fp);
+        fclose(fp);
+    }
     asprintf(&cmd, "modprobe %s 2>&1 >>/var/log/messages", mod);
     system(cmd);
     free(cmd);
+    if ((fp = fopen("/proc/sys/kernel/printk", "w")) != NULL) {
+        fputs(printk, fp);
+        fclose(fp);
+    }
 }
 
 /*
