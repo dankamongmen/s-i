@@ -35,9 +35,9 @@ for file in debian/po/*.po en.po; do
 	 if [ "$2" ]; then
 	   translation=$( (grep "^$2	" $tabfile || true) | sed -e 's/^.*	//')
 	   if [ "$translation" ]; then
-	      echo "$1	$translation" >> $outfile
+	      echo -e "$1\t$translation" >> $outfile
 	   else
-	      echo "$1	$2" >> $outfile
+	      echo -e "$1\t$2" >> $outfile
 	   fi
 	 fi
       fi
@@ -57,7 +57,10 @@ SHORTLISTS=debian/short-tmp/shortlists
 
 for file in debian/short-tmp/*.short; do
    lang=`basename $file .short`
-   echo ":$lang" >> $SHORTLISTS
-   cat $file >> $SHORTLISTS
+   echo -n "$lang" >> $SHORTLISTS
+   ( while read line; do
+         echo -en "\t$line" >> $SHORTLISTS
+     done
+   ) < $file
+   echo "" >> $SHORTLISTS
 done
-

@@ -62,31 +62,52 @@ country2code() {
 	fi
 }
 
-cat_shortlist() {
-	(out=""
-	IFS='
-'
-	while read line; do
-		if $(echo "$line" | grep -q "^:$1\$"); then
-			out=1
-		elif $(echo "$line" | grep -q "^:"); then
-			out=""
-		elif [ "$out" ]; then
-			echo "$line"
+# This function performs several tasks:
+# - Search in $COUNTRY_SHORTLIST for either a coutrycode or a countryname
+# - Build a shortlist for the dialog
+get_shortlist() {
+	OLD_IFS="$IFS"
+	IFS=$(echo -en "\t")
+	SLIST=""
+	count=0
+	for value in $COUNTRY_SHORTLIST; do
+		count=$(($count+1))
+		if [ "$(($count % 2))" -eq 1 ] ; then
+			CCODE=$value
+		else
+			CNAME=$value
+			case "$1" in
+			code)
+				if [ "$CNAME" = "$2" ] ; then
+					echo $CCODE
+					break
+				fi
+				;;
+			name)
+				if [ "$CCODE" = "$2" ] ; then
+					echo $CNAME
+					break
+				fi
+				;;
+			shortlist)
+				if [ ! -z "${SLIST}" ]; then
+					SLIST="${SLIST}, "
+				fi
+				SL_NAME=$(echo "${INDENT}${CNAME}" | sed -e 's/,/\\,/')
+				SLIST="${SLIST}${SL_NAME}"
+				;;
+			esac
 		fi
 	done
-	) < $SHORTLISTS
+	if [ "$1" = "shortlist" ] ; then
+		echo "$SLIST"
+	fi
+	IFS="$OLD_IFS"
 }
 
 loccountry2code() {
 	COUNTRYNAME=$(echo "$1" | sed "s/^$INDENT//" | sed 's/\\,/,/g')
-	line=`cat_shortlist $2| grep "$COUNTRYNAME\$"`
-	if [ -n "$line" ]; then
-		set $line
-		if [ -n "$1" ]; then
-			echo "$1"
-		fi
-	fi
+	echo $(get_shortlist code "$COUNTRYNAME")
 }
 
 # First grab back the country we got from languagechooser
@@ -133,9 +154,9 @@ EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
 
 FIRST_LANG=$(echo $LANGUAGELIST | sed -e 's/:.*$//')
 
-if grep -q "^:$FIRST_LANG\$" $SHORTLISTS; then
+if grep -q "^$FIRST_LANG" $SHORTLISTS; then
   use_lang=$FIRST_LANG
-elif grep -q "^:$LANGUAGE\$" $SHORTLISTS; then
+elif grep -q "^$LANGUAGE" $SHORTLISTS; then
   use_lang=$LANGUAGE
 else
   use_lang=""
@@ -160,19 +181,10 @@ if [ "$LANGUAGE" != "C" ]; then
 				if [ "$use_lang" ]; then
 					# Build a short list of supported locales for
 					# the language.
-					OLD_IFS="$IFS"
-					IFS='
-'
-					COUNTRIES=$(cat_shortlist $use_lang | sed -e 's/^.*	//');
-					SHORTLIST=""
-					for name in $COUNTRIES; do
-						if [ ! -z "${SHORTLIST}" ]; then
-							SHORTLIST="${SHORTLIST}, "
-						fi
-						countryname=$(echo "${INDENT}${name}" | sed -e 's/,/\\,/')
-						SHORTLIST="${SHORTLIST}${countryname}"
-					done
-					IFS="$OLD_IFS"	
+					COUNTRY_SHORTLIST=$(grep "^$use_lang[[:space:]]" $SHORTLISTS | \
+							    sed -e "s/^$use_lang[[:space:]]//")
+					SHORTLIST=$(get_shortlist shortlist $use_lang)
+
 					db_subst $shortlist SHORTLIST "${SHORTLIST}"
 					db_subst $shortlist DEFAULTLOCALE "${DEFAULTLOCALE}"
 					db_input $shortprio $shortlist || [ $? -eq 30 ]
