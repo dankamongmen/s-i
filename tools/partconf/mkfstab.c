@@ -170,7 +170,7 @@ void get_fstab_d_dir() {
 
 
 			sscanf(line, "%s %*s", filesystem);
-			if((filesystem[0] != '$') && (filesystem[0] == '/')) {
+			if(filesystem[0] == '/') {
 				struct stat buf;
 				if(stat(filesystem, &buf) != 0) {
 					continue;
