@@ -9,10 +9,55 @@
 # Author: Davide Viti <zinosat@tiscali.it> 2004, for the Debian Project
 #
 
-usage()
-{
+usage() {
     echo  "Usage:"
     echo  "$0 <lang> <aspell-suffix> <D-I repository path> <output dir>"
+}
+
+initialise() {
+LANG=$1
+DICT=$2
+DI_COPY=$3
+DEST_DIR=$4
+
+GATHER_STRINGS_SCRIPT=./msgstr_extract.awk
+
+ALL_STRINGS=$DEST_DIR/${LANG}_all.txt
+NO_VARS=$DEST_DIR/1_no_vars_${LANG}
+ALL_UNKNOWN=$DEST_DIR/2_all_unkn_${LANG}
+UNKN=$DEST_DIR/${LANG}_unkn_wl.txt
+}
+
+checks(){
+
+if [ ! -d $DI_COPY ] ; then
+    echo $DI_COPY does not exist
+    exit 1
+fi
+
+if [ ! -f $GATHER_STRINGS_SCRIPT ] ; then
+    echo "$GATHER_STRINGS_SCRIPT does not exist. You need it!"
+    exit 1
+fi
+
+dpkg -l aspell | grep -q "^ii"
+if [ $? != 0 ] ; then
+    echo "aspell is not installed"
+    echo "you need some packages (aspell, aspell-bin, and aspell-${LANG})"
+    exit 1
+fi
+
+dpkg -l aspell-${DICT} | grep -q "^ii" 
+if  [ $? != 0 ] ; then
+    echo "There was an error during the detection of aspell-${DICT}"
+    exit 1
+fi
+
+
+if [ ! -d $DEST_DIR ] ; then
+    mkdir $DEST_DIR
+fi
+
 }
 
 if [ -z "$4" ]
@@ -21,43 +66,9 @@ if [ -z "$4" ]
     exit 1
 fi
 
-LANG=$1
-DICT=$2
-DI_COPY=$3
-DEST_DIR=$4
+initalise	# initalise some variables
+checks		# do an environment check
 
-if [ ! -d $DI_COPY ] ; then
-    echo $DI_COPY does not exist
-    exit 1
-fi
-
-
-GATHER_STRINGS_SCRIPT=./msgstr_extract.awk
-
-if [ ! -f $GATHER_STRINGS_SCRIPT ] ; then
-    echo $GATHER_STRINGS_SCRIPT does not exist. You need it!
-    exit 1
-fi
-
-if [ ! -f /usr/bin/aspell ] ; then
-    echo aspell is not installed
-    echo "you need some packages (aspell, aspell-bin, and aspell-${LANG})"
-    exit 1
-fi
-
-dpkg -l aspell-${DICT} | grep -q "^ii" 
-if  [ $? != 0 ] ; then
-    exit 1
-fi
-
-ALL_STRINGS=$DEST_DIR/${LANG}_all.txt
-NO_VARS=$DEST_DIR/1_no_vars_${LANG}
-ALL_UNKNOWN=$DEST_DIR/2_all_unkn_${LANG}
-UNKN=$DEST_DIR/${LANG}_unkn_wl.txt
-
-if [ ! -d $DEST_DIR ] ; then
-    mkdir $DEST_DIR
-fi
 
 # Build word list: it's composed by words common to all d-i translations
 # AND words specific for each language:
