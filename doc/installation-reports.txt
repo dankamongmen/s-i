@@ -288,24 +288,23 @@ of course the specifics of the hardware.
 
 d-i actually contains three different modules that can do this.
 
-The one a user will use if they don't make a special effort will be the
-"partitioner" module. This uses libparted to list the existing partitions,
-and then cfdisk to do the actual partitioning.
+partman is our new system, which is now the default on most architectures.
+It uses parted exclusively, and does file system creation too.
+
+The old system is the "partitioner" module. This uses libparted to list the
+existing partitions, and then cfdisk to do the actual partitioning.
 
 If they say they used the automatic partitioner, that is "autopartkit".
 It uses parted exclusively, and also takes care of file system creation in
 the same step.
 
-partman is our new system, which is available in recent daily builds, but
-not the default yet. It uses parted exclusively, and does file system
-creation too.
-
   Create file systems:    [ ]
   Mount partitions:       [ ]
 
-If the user used "partitioner" above, then they will use partconf for these
-two steps. partconf uses libparted to list the partitions. It uses standard
-mkfs.fstype programs to create the various file systems.
+Generally this is also partman's job. If the user used "partitioner" above,
+then they will use partconf for these two steps. partconf uses libparted to
+list the partitions. It uses standard mkfs.fstype programs to create the
+various file systems.
 
   Install base system:    [ ]
 
