@@ -11,8 +11,8 @@ logsavedir=/target/var/log/debian-installer
 . /usr/share/debconf/confmodule
 db_get debconf/priority
 db_set debconf/priority $RET
-# Make sure cdebconf has saved the database.
-kill -USR1 $(ps | grep [d]ebconf/frontend | sed 's/ root.*//')
+# Make sure debconf has saved the database.
+kill -USR1 $(ps | grep "debconf -o" | sed 's/ root.*//')
 # Make sure we wait until after it is done saving to copy the db, to avoid
 # racing. This should block until it does..
 db_get debconf/priority
