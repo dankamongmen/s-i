@@ -68,6 +68,12 @@ if [ ! -f po/$LANG.po ] ; then
   exit 1
 fi
 
+echo Getting Last-Translator for languagechooser
+TSL=`grep "Last-Translator:" $DI_COPY/packages/languagechooser/debian/po/$LANG.po |cut -f2 -d: |sed 's/\\\\n\\"//g'`
+echo $TSL
+echo Fixing Last-Translator
+cat po/$LANG.po | sed "s/Last-Translator:.*/Last-Translator: $TSL\\\\n\"/g" >po/$LANG.po.new
+
 echo Commiting new file
 svn add po/$LANG.po
 svn commit -m"[switch-language] Added master file for $LANG" po/$LANG.po
