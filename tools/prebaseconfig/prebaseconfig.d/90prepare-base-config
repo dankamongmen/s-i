@@ -13,8 +13,7 @@ fi
 # Look in /proc/cmdline for console=ttyS*, indicating a serial console
 # and fix inittab if so.
 console=$( echo " " $( cat /proc/cmdline ) " " | sed -n 's/^.* console=\([^ ]*\) .*$/\1/p' )
-# XXX limited to hppa so far, until tested elsewhere
-if [ "$ARCH" = "hppa" ] && ( echo "$console" | grep -q "^ttyS" )
+if ( echo "$console" | grep -q "^ttyS" )
 then
     # serial console, fix inittab and /etc/securetty.  This edits the
     # ttyS0 entry for whichever ttySn is used, rather than trying to
