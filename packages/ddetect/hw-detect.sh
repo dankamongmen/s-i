@@ -148,7 +148,8 @@ get_manual_hw_info() {
 	echo "ide-mod:Linux IDE driver"
 	echo "ide-probe-mod:Linux IDE probe driver"
 	get_ide_chipset_info
-	echo "ide-detect:Linux IDE detection"
+	echo "ide-detect:Linux IDE detection" # 2.4.x > 20
+	echo "ide-generic:Linux IDE support" # 2.6
 	echo "ide-floppy:Linux IDE floppy"
 	echo "ide-disk:Linux ATA DISK"
 	echo "ide-cd:Linux ATAPI CD-ROM"
@@ -237,12 +238,11 @@ for device in $(list_to_lines); do
 
 	if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] && \
 	   is_not_loaded "$module"; then
-		db_subst hw-detect/load_progress_step CARDNAME "$cardname"
-		db_subst hw-detect/load_progress_step MODULE "$module"
-		db_progress INFO hw-detect/load_progress_step
-		log "Trying to load module '$module'"
-
 		if find $MODPATH | grep -q /${module}\\. ; then
+			db_subst hw-detect/load_progress_step CARDNAME "$cardname"
+			db_subst hw-detect/load_progress_step MODULE "$module"
+			db_progress INFO hw-detect/load_progress_step
+			log "Trying to load module '$module'"
 			if [ "$cardname" = "[Unknown]" ]; then
 				load_module "$module"
 			else
