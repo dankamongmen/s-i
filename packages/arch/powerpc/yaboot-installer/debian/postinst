@@ -60,10 +60,29 @@ fi
 db_progress STEP 1
 db_progress INFO yaboot-installer/part
 
+db_get debian-installer/kernel/subarchitecture
+SUBARCH="$RET"
+info "subarchitecture $SUBARCH"
+
+case $SUBARCH in
+    powermac_newworld)
+	ALLOWED_PTYPES='hfs'
+	;;
+    chrp)
+	ALLOWED_PTYPES='.*' # no parted support yet
+	;;
+    *)
+	error 'unknown subarchitecture; allowing any bootable partition'
+	ALLOWED_PTYPES='[^ ]\+'
+	;;
+esac
+info "allowing partition types matching '$ALLOWED_PTYPES'"
+
 for i in /dev/discs/*/disc; do
     dev="`parted -s "$i" print | sed -n 's,^Disk geometry for \([^:]*\)/disc:.*$,\1,p'`"
-    # Look for partitions with hfs filesystems and the boot flag set.
-    for part in `parted -s "$i" print | sed -n 's,^\([0-9]\+\) \+[0-9.]\+ \+[0-9.]\+ \+hfs \+.\+ \+boot$,'"$dev"'/part\1,p'`; do
+    # Look for partitions with an appropriate partition type and with the
+    # boot flag set.
+    for part in `parted -s "$i" print | sed -n 's,^\([0-9]\+\) \+[0-9.]\+ \+[0-9.]\+ \+'"$ALLOWED_PTYPES"' \+.\+ \+boot$,'"$dev"'/part\1,p'`; do
 	if [ -z "$PARTITIONS" ]; then
 	    DEFAULT="$part"
 	    PARTITIONS="$part"
