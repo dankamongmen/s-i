@@ -3,7 +3,14 @@ ddetect (1.15) UNRELEASED; urgency=low
   * Joey Hess
     - Force register and load sunhme, sunbmac, and esp on sparc since
       apparently discover does not find these on at least an E4500.
-      This is kind of a work around for #299074.
+      This is kind of a work around for #299074, and will be reverted once
+      discover is fixed.
+    - Detect if only one ethernet interface is found, and if it's a firewire
+      interface, warn the user and allow them to manually select modules to
+      load. This after noticing that 2.6 installs that fail to load the
+      ethernet driver fail unexpectedly when the firewire ethernet ends up
+      being used. Closes: #303445
+    - Add a few missing 2.6 ethernet drivers to devnames.txt.
 
  -- Joey Hess <joeyh@debian.org>  Fri, 11 Mar 2005 14:27:07 -0500
 

@@ -74,6 +74,33 @@ get_static_modinfo() {
 	echo "$modinfo"
 }
 
+ethernet_found() {
+	local ifaces=0
+	local firewire=0
+
+	for iface in $(sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//"| sed "s/^ *//"); do
+		ifaces=$(expr $ifaces + 1)
+		if grep "^$iface:" /etc/network/devnames | grep -q -i firewire; then
+			firewire=$(expr $firewire + 1)
+		fi
+	done
+	
+	if [ "$ifaces" = "$firewire" ]; then
+		db_input high ethdetect/use_firewire_ethernet || true
+		db_go || true
+		db_get ethdetect/use_firewire_ethernet
+		if [ "$RET" = true ]; then
+			return 0
+		else
+			return 1
+		fi
+	elif [ "$ifaces" != 0 ]; then
+		return 0
+	else
+		return 1
+	fi
+}
+		
 module_probe() {
 	local module="$1"
 	local priority="$2"
@@ -148,8 +175,7 @@ module_probe() {
 
 hw-detect ethdetect/detect_progress_title || true
 
-while [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`" ]
-do
+while ! ethernet_found; do
 	CHOICES=""
 	for mod in $(list_nic_modules | sort); do
 		modinfo=$(get_static_modinfo $mod)
