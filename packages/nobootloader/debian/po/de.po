@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-06 18:32+0200\n"
-"PO-Revision-Date: 2004-09-08 22:29GMT\n"
+"PO-Revision-Date: 2004-09-10 23:58GMT\n"
 "Last-Translator: Dennis Stampfer <seppy@debian.org>\n"
 "Language-Team: Debian German <debian-l10n-german@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -44,6 +44,11 @@ msgid ""
 "system will reboot.  At the Pegasos OpenFirmware prompt, set the following "
 "OpenFirmware variables to enable auto-booting:"
 msgstr ""
+"Damit Ihr Computer Debian automatisch starten kann, müssen einige Variablen "
+"in Pegasos OpenFirmware festgelegt werden. Der Computer wird am Ende der "
+"Installation neu starten. Um den automatischen Bootvorgang zu aktivieren, "
+"geben Sie die folgenden Variablen an der Eingabeaufforderung der Pegasos "
+"OpenFirmware ein:"
 
 #: ../nobootloader.templates:8
 msgid ""
@@ -52,34 +57,37 @@ msgid ""
 " setenv auto-boot-timeout 5000\n"
 " setenv auto-boot? true"
 msgstr ""
+" setenv boot-device ${OF_BOOT_DEVICE}\n"
+" setenv boot-file ${OF_BOOT_FILE}\n"
+" setenv auto-boot-timeout 5000\n"
+" setenv auto-boot? true"
 
 #. Type: note
 #. Description
 #: ../nobootloader.templates:8
-#, fuzzy
 msgid ""
 "Alternatively, you will be able to boot the kernel manually by entering :"
 msgstr ""
-"Sie müssen den Kernel manuell starten: \n"
-" ${KERNEL_BOOT}"
+"Alternativ können Sie den Kernel von Hand booten, indem Sie folgendes "
+"eingeben:"
 
 #. Type: note
 #. Description
 #: ../nobootloader.templates:8
 msgid " ${KERNEL_BOOT}"
-msgstr ""
+msgstr " ${KERNEL_BOOT}"
 
 #. Type: note
 #. Description
 #: ../nobootloader.templates:8
 msgid "at the OpenFirmware prompt."
-msgstr ""
+msgstr "an der Eingabeaufforderung von OpenFirmware"
 
 #. Type: note
 #. Description
 #: ../nobootloader.templates:30
 msgid "Setting firmware variables for automatic boot"
-msgstr ""
+msgstr "Setzen der Firmware Variablen für den automatischen Start"
 
 #. Type: note
 #. Description
@@ -91,6 +99,12 @@ msgid ""
 "You can abort this by pressing any key. You will then be dropped into the "
 "NeTTrom command system where you have to execute the following commands:"
 msgstr ""
+"Damit Ihr Computer Debian automatisch starten kann, müssen in der Netwinder "
+"NeTTrom Firmware einige Variablen festgelegt werden. Am Ende der "
+"Installation wird der Computer neu starten und die Firmware versuchen zu "
+"booten. Sie können dies durch drücken einer beliebigen Taste abbrechen, "
+"wodurch Sie in den NeTTrom Befehlsmodus gelangen. Führen Sie dort folgende "
+"Befehle aus:"
 
 #: ../nobootloader.templates:30
 msgid ""
@@ -101,6 +115,12 @@ msgid ""
 "   setenv cmdappend ${CMDAPPEND}\n"
 "   save-all"
 msgstr ""
+"   setenv kernconfig fs\n"
+"   setenv kerndev ${KERNDEV}\n"
+"   setenv kernfile ${KERNFILE}\n"
+"   setenv rootdev ${ROOTDEV}\n"
+"   setenv cmdappend ${CMDAPPEND}\n"
+"   save-all"
 
 #. Type: note
 #. Description
@@ -133,10 +153,9 @@ msgstr ""
 #. Type: note
 #. Description
 #: ../nobootloader.templates:50
-#, fuzzy
 msgid ""
 "You will need to boot manually with the ${KERNEL} kernel on partition "
 "${BOOT} and ${ROOT} passed as kernel argument."
 msgstr ""
-"Sie müssen manuell mit dem ${KERNEL_LOC} starten und ${ROOT} als Argument "
-"übergeben."
+"Sie müssen manuell mit dem Kernel ${KERNEL} auf der Partition ${BOOT} "
+"starten und ${ROOT} dem Kernel als Parameter übergeben."
