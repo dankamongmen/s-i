@@ -6,6 +6,7 @@ release.
 
   * There are rumours that udeb_include and/or udeb_exclude are broken.
     Is this true?
+    (If it's just #201396, that doesn't look so bad.)
 
   * Get the severities of the linux-kernel-di package fixed, they are
     overrdidden to bad values and this makes some hardware and filesystems
@@ -31,8 +32,6 @@ release.
 
   * Update the web site to include user docs, including links to download
     boot media.
-
-  * Finish updating this TODO file. :-/
 
 Current status
 ==============
@@ -62,7 +61,7 @@ time.
 	- lintian support for udebs, to catch all the common gotchas
 	- ppp support
 	  Not as important for analog dialup, as for ISDN, pppoe.
-	- Some architectures
+	- some architectures
 		arm
 		hurd-i386
 		sh
@@ -80,11 +79,13 @@ time.
 		There are some basic implementations. The trick is to make
 		it a GUI that does not suck, while still using debconf
 		underneath.
+	- cdrom-checker
+		apparently broken (#213054)
 	- pcmcia support
 		Needs integration with the rest of the hardware detection,
 		instead of being a (broken) toplevel menu item.
 		Works sometimes, but only with vast pain.
-	- Some architectures
+	- some architectures
 		alpha
 		hppa
 		ia64
@@ -99,31 +100,20 @@ time.
 		into debconf.
 	- translations
 		Varying languages translated to varying degrees.
-	- polish everything so it is actually usable
-        - boot loader installers
+	- language-chooser
+		The perrenial problem is how to order/present the list of
+		languages. Many complaints, but it works.
+        - boot loader installers (lilo, grub, etc)
 		Work, except for when they don't. See BTS.
         - disk formatter
-                Formats disks, turns on swap, etc. Swap is not begun.
+                Works, except for reiserfs hang prolem.
         - base system installer
 		debootstrap is stable, and has quite good support in
                 base-installer
 		Except for when it fails. See BTS.
 		In particular, it always fails when used on a non-empty
 		partition. Many users run into this.
-	- archive setup
-                Mostly done, we probably want to separate testing and
-                unstable at some point.
-		Install images are in archive.
-	- design [Joey Hess, debian-boot]
-                80% done. Enough to know what the big pieces are 
-                and how they fit together.
-	- dhcp [Matt Kraai]
-		We're using dhclient, but should keep an eye on udhcpc,
-		which is smaller.  We need to decide on one dhcp
-                client.
-	- floppy retriever [Martin Sjögren]
-                Seems to work, at least for the time being.
-        - netcfg [David Whedon]
+        - netcfg
 		Working, pending rewrite for IPv6 and multiple devices
                 support.
 	- anna
@@ -145,23 +135,19 @@ time.
 		http://www.debian.org/devel/debian-installer/
 		Could be better laid out, lacking some sections, other
 		parts are quite good.
-	- bts
-		Search for bugs tagged d-i
-		(Still need a non-manual way to tag our bugs.)
 	- archive integration
+                We probably want to separate testing and unstable at some
+		point.
 		Only a few arches (i386, powerpc) have boot media in the
 		archive.
 		There is currently no mechanism to promote boot media
 		or udebs from unstable to testing.
-	- Some architectures
+	- some architectures
 		powerpc (some subarches)
 		i386
 
 [90%] Single missing important feature or bug.
 ---------------------------------------------------------------------
-        - main-menu
-        - choose-mirror
-        - busybox integration
         - install media build system
 		The mrvn branch needs to be tested and merged.
 		The dest/ image names need to be reorganised.
@@ -169,20 +155,20 @@ time.
 		Reiserfs hangs, in interactive mode.
 	- hw-detect
 		Working but needs to be switched over to discover2
+	- bts
+		Search for bugs tagged d-i
+		(Still need a non-manual way to tag our bugs.)
 
 [100%] Those shouldn't need to be touched any more 
        (except for wishlist features)
 ---------------------------------------------------------------------
-        - udpkg (tiny dpkg clone)
+        - udpkg
 		May be eventually replaced with busybox dpkg.
 	- cd installs
                 Works mostly.
  	- net retriever
-		Seems to work.
 	- cdrom retriever
-   		Working
         - ethdetect
-		Working
         - library reduction
 		Working (on all arches?)
 	- post-reboot configuration
@@ -192,11 +178,14 @@ time.
 		Integration with debian installer's debconf database still
 		needs to be done, although the current ugly system works.
         - cdebconf
-		Working.
+	- dhcp
+	- floppy retriever
+        - main-menu
+        - choose-mirror
+        - busybox integration
 
-
-Common problems
-===============
+Common problems and transitions
+===============================
 
 This is a list of common mistakes that need to be corrected throughout the
 code base:
@@ -226,3 +215,12 @@ code base:
 
   * udebs should not include md5sums files, or postrm, prerm, preinst
     scripts. This includes ones generated by debhelper.
+
+  * Use the cdebconf error template type for error messages, instead of
+    note.
+  
+  * Most debconf title setting can be replaced with providing the
+    appropriate title template and letting main-menu set it.
+
+  * Some main menu items still need to be updated to provide menu entry
+    templates.
