@@ -786,7 +786,7 @@ static int text_initialize(struct frontend *obj, struct configuration *conf)
  * Description: tells whether confmodule supports backing up
  * Assumptions: none
  */
-static int
+static bool
 text_can_go_back(struct frontend *obj, struct question *q)
 {
 	return (obj->capability & DCF_CAPB_BACKUP);
