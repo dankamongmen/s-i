@@ -1,10 +1,11 @@
+SUBDIRS = autopartkit.d
+
 bin_PROGRAMS = autopartkit
 
-noinst_PROGRAMS = dumptable distribute-test choosetable-test
+noinst_PROGRAMS = dumptable distribute-test
 
 autopartkit_SOURCES = \
 	autopartkit.h \
-	choosetable.c \
 	distribute.c \
 	loadpartitions.c \
 	mapdevfs.c \

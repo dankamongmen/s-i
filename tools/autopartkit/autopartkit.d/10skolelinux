@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# Handle the fact that the debian-installer/profile value is
+# multiselect.
+#
+# Mapping:
+#   Server                             => Server
+#   Server + Workstation               => Server+Workstation
+#   Server + LTSP-server               => Server+LTSP-server
+#   Server + Workstation + LTSP-server => Server+LTSP-server
+#   Workstation                        => Workstation
+#   LTSP-server                        => Workstation+LTSP-server
+#   Workstation + LTSP-server          => Workstation+LTSP-server
+
+. /usr/share/debconf/confmodule
+
+print() {
+    echo "$*" 1>&2
+}
+
+get_table() {
+    PROFILE="$1"
+    print "info: Got profile '$PROFILE'"
+    for value in `echo $PROFILE |sed 's/ /-/g' | sed 's/,-/ /g'`; do
+	print "info: Testing profile '$value'"
+	case $value in
+	    Workstation) got_work=w ;;
+            LTSP-server) got_ltsp=l ;;
+	    Server)      got_serv=s ;;
+	    *)
+	        error "unknown profile '$profile'"
+	    ;;
+        esac
+    done
+
+    case "$got_serv$got_ltsp$got_work" in
+	s)   echo /etc/autopartkit/Server.table
+	;;
+	sw)  echo /etc/autopartkit/Server+Workstation.table
+	;;
+	sl)  echo /etc/autopartkit/Server+LTSP-server.table
+	;;
+	slw) echo /etc/autopartkit/Server+LTSP-server.table
+	;;
+	w)   echo /etc/autopartkit/Workstation.table
+	;;
+	l)   echo /etc/autopartkit/Workstation+LTSP-server.table
+	;;
+	lw)  echo /etc/autopartkit/Workstation+LTSP-server.table
+	;;
+    esac
+}
+
+db_get "debian-installer/profile"
+
+TABLE=`get_table "$RET"`
+
+db_set autopartkit/partition_table "$TABLE"
+
+exit 0

@@ -1178,7 +1178,7 @@ int main (int argc, char *argv[])
     PedDevice *dev = NULL;
     diskspace_req_t *disk_reqs = NULL;
     const char *profiles;
-    const char *tablefile;
+    const char *tablefile = NULL;
     int retval = 1;
     
     autopartkit_log(1, "Using '%s' default disk label type\n",
@@ -1192,8 +1192,12 @@ int main (int argc, char *argv[])
     PED_INIT();
     disable_kmsg(0);
 
-    profiles = mydebconf_get("debian-installer/profile");
-    tablefile = choose_profile_table(profiles);
+    if (argc > 1)
+        tablefile = argv[1];
+
+    if ( ! tablefile )
+        autopartkit_err(1, "usage: %s <partition-table>\n", argv[0]);
+
     disk_reqs = load_partitions(tablefile);
 
     /* Step 1 & 2 : discover & choose device */

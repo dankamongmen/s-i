@@ -1,6 +1,26 @@
 #! /bin/sh -e
 
-if autopartkit ; then
+. /usr/share/debconf/confmodule
+
+run_parts() {
+    partsdir="$1"
+
+    for script in "$partsdir"/*; do
+	if [ -x "$script" ] ; then
+	    "$script" || true
+	else
+	    echo "error: Unable to execute $script" 1>&2
+	fi
+    done
+}
+
+# Run all scripts to choose table file
+run_parts /usr/lib/autopartkit.d
+
+db_get autopartkit/partition_table
+table="$RET"
+
+if autopartkit "$table" ; then
     :
 else
     # This should use debconf to report the error.

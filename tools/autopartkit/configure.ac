@@ -82,5 +82,5 @@ AC_ARG_ENABLE(small,
  esac],[])
 
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile autopartkit.d/Makefile])
 AC_OUTPUT
