@@ -64,6 +64,7 @@ autopartkit.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "autopartkit.h"
 #include <assert.h>
 
@@ -141,7 +142,7 @@ distribute_partitions(struct disk_info_t diskinfo[],
     for (i = 0; diskinfo[i].capasity; i++)
     {
 	int j;
-	long long total_wanted = 0;
+	int64_t total_wanted = 0;
 	/* First find out how much extra space the partitions on this disk
 	   want, ie the sum of all max_blk-min_blk */
 	for (j = 0; reqs[j].mountpoint; ++j)
@@ -205,8 +206,8 @@ print_list(struct disk_info_t diskinfo[], struct diskspace_req_s reqs[])
 				BLOCKS_TO_MiB(reqs[j].min_blk),
 				BLOCKS_TO_MiB(reqs[j].blocks),
 				BLOCKS_TO_MiB(reqs[j].max_blk),
-				(unsigned long long)reqs[j].minsize,
-				(unsigned long long)reqs[j].maxsize,
+				(uint64_t)reqs[j].minsize,
+				(uint64_t)reqs[j].maxsize,
 				reqs[j].curdisk->path,
 				reqs[j].curdisk->geom.start,
 				reqs[j].curdisk->geom.end);
