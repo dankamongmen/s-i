@@ -13,12 +13,19 @@ fi
     echo "SUITE=\"$SUITE\""
 ) >> /target/root/dbootstrap_settings
 
-console=$(chroot /target tty | sed 's/\/dev\///g')
+# Since this script is running with debconf, 'tty' does
+# not give reliable answers about what sort of terminal
+# we have.  The stdin of /sbin/debian-installer seems
+# to tell the truth.
+console_=$(readlink /proc/$(pidof debian-installer)/fd/0)
+console=$(mapdevfs "$console_")
+console_=${console_#/dev/}
+console=${console#/dev/}
 
 case "$console" in
 ttyS*)
     ttyspeed=$(chroot /target stty speed)
-    ttyline=$(echo "$console" | sed 's/^ttyS//')
+    ttyline=${console#ttyS}
     ttyterm="$TERM"
 
     if [ -z "$ttyterm" ]; then ttyterm=vt100; fi
@@ -27,8 +34,11 @@ ttyS*)
         -e "s/^\([1-6]\):/#\1:/" \
 	-e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
             > /target/etc/inittab.real
-    echo "# $console added by debian-installer" >> /target/etc/securetty
-    echo "$console" >> /target/etc/securetty
+    echo "# serial console added by debian-installer" >> /target/etc/securetty
+    echo "$console_" >> /target/etc/securetty
+    if [ -n "$console" ] && [ "$console" != "$console_" ]; then
+	echo "$console" >> /target/etc/securetty
+    fi
 ;;
 *)
     # graphical console, leave inittab alone
