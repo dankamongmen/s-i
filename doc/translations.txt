@@ -1,6 +1,10 @@
 Some clues for translators
 ==========================
 
+
+Translation order
+-----------------
+
 When starting to translate debian-installer, you should first make
 sure to get your language choice included, then translate the core
 udebs, next translate the common udebs, and finally complete the rest
@@ -16,24 +20,44 @@ Suggested translation order:
 -second stage
 -future architectures udebs
 
-You may send your translations as bug reports against the given
-packages.  The packages names are the last part of the lines below
-(for instance, "languagechooser" for tools/languagechooser).
-Some packages have different names which are mentioned when needed.
+See the complete packages list at the end of this document.
 
-For bug reports, please use the "d-i" tag.
+How to get files to be translated
+---------------------------------
 
-You may also send the translations to the debian-boot mailing list.
-Please use [INTL] [xx] in Subjects where xx is your language code
-(xx_yy for some languages such as brazilian portuguese).
+-Go to http://people.debian.org/~barbier/d-i/l10n/xx where xx is your
+ language ISO code (or xx_YY for languages which have country-dependent
+ flavours such as pt_BR or zh_CN).
 
-If you have CVS write access, don't forget to update changelogs and
-remember: changelog files use UTF-8!! The debian-installer CVS is hosted on
-alioth.debian.org ("debian-installer" and "base-config" projects).
+-Look at the STATUS.utf8.txt file
 
-For getting up-to-date files for your language and know the
-translation status for the d-i core packages, use the following URL:
-http://people.debian.org/~barbier/d-i/l10n/
+-For files reported as missing, go pick up the templates.pot file
+ in the debian-installer CVS :
+ http://cvs.alioth.debian.org/cgi-bin/cvsweb.cgi/debian-installer/?cvsroot=d-i.
+ 
+ Example : 
+ "Missing file: debian-installer/retriever/choose-mirror/debian/po/xx.po"
+ --> pick up http://cvs.alioth.debian.org/cgi-bin/cvsweb.cgi/debian-installer/retriever/choose-mirror/debian/po/templates.pot?cvsroot=d-i
+
+ Rename this file to xx.po and start working on it
+
+-For files reported as incomplete, get the file in
+ http://people.debian.org/~barbier/d-i/l10n/xx and complete it. Don't
+ forget to contact the original translator (see PO file header)
+
+ Rename this file to xx.po and start working on it
+
+How to translate
+----------------
+This document is not intended to be a tutorial for gettext-related
+stuff. Please look for documentation of PO editing software such as
+KBabel, PoEdit, EMacs PO-mode, etc.
+
+Please use a dedicated PO-editing tool unless you become very familiar
+with translation work.
+
+Don't forget to properly fill up the PO files header, especially the
+Last-Translator field.
 
 If a translation team exists for your language, WORK WITH THEM. First
 check the debian-l10n-xxxxx mailing list where xxxxx is your language
@@ -42,6 +66,34 @@ name in english (e.g. debian-l10n-polish, debian-l10n-portuguese...).
 For general translation issues or for finding other translators for
 your language, you may also use the debian-i18n mailing list (don't
 post translations there, however).
+
+
+How to get your work included in debian-installer
+-------------------------------------------------
+
+Choose either of the methods below. CVS commits are encouraged. Create
+an alioth account and ask in -boot for getting write access.
+
+ CVS commit
+ ----------
+If you have CVS write access, don't forget to update changelogs and
+remember: changelog files use UTF-8!! The debian-installer CVS is hosted on
+alioth.debian.org ("debian-installer" and "base-config" projects).
+
+ File a bug
+ ----------
+You may send your translations as bug reports against the given
+packages.  The packages names are the last part of the lines below
+(for instance, "languagechooser" for tools/languagechooser).
+Some packages have different names which are mentioned when needed.
+
+For bug reports, please use the "d-i" tag.
+
+ Send to debian-boot
+ -------------------
+You may also send the translations to the debian-boot mailing list.
+Please use [INTL:xx] in Subjects where xx is your language code
+(or xx_YY)
 
 PACKAGES LIST
 -------------
@@ -84,7 +136,8 @@ PACKAGES LIST
  Architecture-dependent udebs
  ----------------------------
 
- 1) Already supported architectures
+ 1) Already supported architectures specific tools
+ -------------------------------------------------
 
   tools/grub-installer
   tools/lilo-installer
@@ -100,16 +153,21 @@ PACKAGES LIST
   tools/sparc/silo-installer
   tools/s390/netdevice
   tools/s390/dasd
+  tools/mipsel/delo-installer
 
- Second stage
- ------------
+ Post-reboot installation stage
+ ------------------------------
 
- (some of these packages  do not only need debconf-type translation, but
+ (some of these packages do not only need debconf-type translation, but
  also program translation)
 
- Except for base-config, translations MUST be reported as wishlist bugs
- against these packages.
+ Translations must be reported as wishlist bugs against these
+ packages.  
 
+ Base-config is an exception because it is maintained by the debian-boot
+ team, so other methods (CVS commits and -boot filing) may apply for it.
+ Note that it is a separate project on alioth.
+  
  base-config (debconf)
  shadow (debconf+programs)
  console-data (debconf)
