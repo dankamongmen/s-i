@@ -59,9 +59,9 @@ change. ]
 name of the exectable must be the same as the name of the module that
 contains it). It is run with the following parameters:
 
-retriever [dest-filename]
+retriever [source-filename] [dest-filename]
 	Download the specified file to the specified destination.
-	If the destination is unspecified, use stdout. The filename 
+	If the destination is unspecified, use stdout. The source-filename
 	is the Filename field of a Packages file.
 
 	Thus, retrieving the Packages file itself to stdout is 
@@ -71,11 +71,11 @@ retriever [dest-filename]
 	While retrieving a deb is something like this:
 		retreiver retrievers/http-retriever.deb /tmp/http-retriever.deb
 
-If the destination file already exists, the retriever may want to attempt
-to continue a download[2].
+If the destination file already exists, the retriever may optionally attempt
+to continue a download.
 
 Once ran, retrievers are free to prompt the user, or do whatever else is 
-necessary to retrieve the file.
+necessary to retrieve the file[2].
 
 Note that this simple interface requires that retrievers know the location
 of the base directory of the archive. This will not be a problem for many 

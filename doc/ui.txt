@@ -73,7 +73,7 @@ Each item in the main menu is provided by an installer module. Installer
 modules indicate that they want to appear on the menu by including the
 following special flag in their control file:
 
-	Installer-Menu-Item: nnn
+	installer-menu-item: nnn
 
 Where nnn is a priority number. The priority number influsences the
 ordering of items in the menu; higher numbered items are closer to the
@@ -130,7 +130,7 @@ An example -- we have the following packages unpacked onto the installer's
 ramdisk (leaving out the parts of their control files that don't matter):
 
 Package: install-media
-Installer-Menu-Item: 1
+installer-menu-item: 1
 Depends: retriever
 Description: Configure installation media
 
@@ -138,33 +138,33 @@ Package: floppy-retriever
 Provides: retriever
 
 Package: partitions
-Installer-Menu-Item: 3
+installer-menu-item: 3
 Depends: disk-driver
 Description: Partition disk
 
 Package: disk-driver
 
 Package: format-partitions
-Installer-Menu-Item: 1
+installer-menu-item: 1
 Depends: partitions, disk-driver
 Description: Format and mount partitions
 
 Package: install-base
-Installer-Menu-Item: 2
+installer-menu-item: 2
 Depends: format-partitions, install-media
 Description: Install base system
 
 Package: install-lilo
-Installer-Menu-Item: 2
+installer-menu-item: 2
 Depends: install-base
 Description: Install lilo
 
 Package: rescue-floppy
-Installer-Menu-Item: 4
+installer-menu-item: 4
 Description: Make a rescue floppy
 
 Package: reboot
-Installer-Menu-Item: 5
+installer-menu-item: 5
 Description: Reboot the system
 
 (Note that the above package and virtual package names are just examples.)
@@ -179,7 +179,7 @@ This set of package results in the following menu:
   - Make a rescue floppy
   - Reboot the system
 
-To understand why, order all the modules by their Installer-Menu-Item's:
+To understand why, order all the modules by their installer-menu-item's:
 
 	install-media (1)
 	format-partitions (2)	Depends: partitions
