@@ -75,23 +75,24 @@ static int
 vg_exists(const char *vgname)
 {
     struct stat statbuf;
-    char *cmd = NULL;
+    char *devpath = NULL;
     int retval = FALSE;
 
     if (NULL == vgname)
         return FALSE;
 
-    asprintf(&cmd, "/proc/lvm/VGs/%s", vgname);
-    if ( cmd
-         && 0 == stat(cmd, &statbuf)
+    asprintf(&devpath, "/proc/lvm/VGs/%s", vgname);
+    if ( devpath
+         && 0 == stat(devpath, &statbuf)
          && S_ISDIR(statbuf.st_mode) )
         retval = TRUE;
     else
-        autopartkit_error(0, "Missing volume group '%s'",
-                          cmd ? cmd : "(null)");
+        autopartkit_error(0, "Missing volume group '%s' (%s)",
+			  vgname, 
+                          devpath ? devpath : "(null)");
 
-    if (cmd)
-      free(cmd);
+    if (devpath)
+        free(devpath);
 
     return retval;
 }
@@ -111,7 +112,7 @@ int
 lvm_init_dev(const char *devpath)
 {
     char * cmd = NULL;
-    int retval = 0;
+    int retval = -1;
 
     if ( ! lvm_isinstalled())
         return -1;
@@ -120,9 +121,11 @@ lvm_init_dev(const char *devpath)
                     devpath ? devpath : "(null)");
 
     asprintf(&cmd, "pvcreate %s >> /var/log/messages 2>&1", devpath);
-    retval = system(cmd);
     if (cmd)
+    {
+        retval = system(cmd);
         free(cmd);
+    }
     return retval;
 }
 
@@ -133,7 +136,7 @@ lvm_init_dev(const char *devpath)
 int
 lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
 {
-    int retval = 0;
+    int retval = -1;
     char *progname = NULL;
     char * cmd = NULL;
 
@@ -151,10 +154,11 @@ lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
 
     asprintf(&cmd, "%s %s %s >> /var/log/messages 2>&1", progname,
              vgname, devpath);
-    retval = system(cmd);
-
     if (cmd)
+    {
+	retval = system(cmd);
         free(cmd);
+    }
     return retval;
 }
 
@@ -167,9 +171,9 @@ char *
 lvm_create_logicalvolume(const char *vgname, const char *lvname,
                        unsigned int mbsize)
 {
-    char * str = NULL;
-    int retval;
-
+    char *cmd = NULL;
+    char *devpath = NULL;
+    int retval = -1;
 
     if ( ! lvm_isinstalled())
         return NULL;
@@ -179,19 +183,19 @@ lvm_create_logicalvolume(const char *vgname, const char *lvname,
                     vgname ? vgname : "(null)",
                     mbsize);
 
-    asprintf(&str, "lvcreate -n%s -L%d %s >> /var/log/messages 2>&1",
+    asprintf(&cmd, "lvcreate -n%s -L%d %s >> /var/log/messages 2>&1",
              lvname, mbsize, vgname);
-
-    retval = system(str);
-
-    if (str)
-      free(str);
-    str=NULL;
+    if (cmd)
+    {
+	retval = system(cmd);
+	free(cmd);
+	cmd=NULL;
+    }
 
     if (0 == retval)
     {
-        asprintf(&str, "/dev/%s/%s", vgname, lvname);
-        return str;
+        asprintf(&devpath, "/dev/%s/%s", vgname, lvname);
+        return devpath;
     }
     else 
         return NULL;
