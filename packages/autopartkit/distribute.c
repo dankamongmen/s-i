@@ -152,7 +152,7 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	        int64_t span;
 		if ((PedSector)-1 == reqs[j].max_blk)
 		    reqs[j].max_blk = maxmax_blk;
-		span = reqs[j].max_blk - reqs[j].min_blk
+		span = reqs[j].max_blk - reqs[j].min_blk;
 		total_wanted += span;
 		autopartkit_log(0, "Adding %ld to total_wanted, now %ld\n",
 				(long)span, (long)total_wanted);
