@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.33 2003/02/23 12:36:06 mlang Exp $
+ * $Id: text.c,v 1.34 2003/02/23 15:52:27 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -366,7 +366,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 		       (def == i + 1 ? _(" (default)") : ""));
  
 	    if (i == count) {
-	        if (choices_translated[def-1]) {
+	        if (def > 0 && choices_translated[def-1]) {
 	            printf(_("Prompt: 1 - %d, default=%s> "), count, choices_translated[def-1]);
 	        } else {
 	            printf(_("Prompt: 1 - %d> "), count);
