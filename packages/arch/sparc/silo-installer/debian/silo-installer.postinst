@@ -25,6 +25,10 @@ fi
 
 if [ -e "/target/boot/initrd.img" ]; then
 	initrd="initrd=${boot}/initrd.img"
+	initrdold="${initrd}.old"
+else
+	initrd=""
+	initrdold=""
 fi
 
 # Install silo
@@ -53,7 +57,7 @@ image=${boot}/vmlinuz
 	
 image=${boot}/vmlinuz.old
 	label=LinuxOLD
-	${initrd}.old
+	${initrdold}
 EOF
 
 chmod 644 /target/boot/silo.conf
