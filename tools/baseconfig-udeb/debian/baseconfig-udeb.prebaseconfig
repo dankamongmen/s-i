@@ -41,7 +41,13 @@ exit 0
 EOF
 chmod a+rx $targetdir/sbin/start-stop-daemon
 
-tty=/dev/console
+# debconf do not understand TERM=bterm.  Use vt100 instead.
+if [ "$TERM" = bterm ] ; then
+   TERM=vt100
+fi
+
+# tty=/dev/console do not work any more.  Not sure why [pere 2003-10-21]
+tty=/dev/tty
 chroot $targetdir /usr/sbin/termwrap /usr/sbin/base-config new < $tty > $tty
 
 # Undo hack to avoid starting daemons
