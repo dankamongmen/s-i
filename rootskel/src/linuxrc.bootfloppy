@@ -20,18 +20,18 @@ fi
 mount -t proc proc proc
 mount -t devfs devfs dev
 
-modprobe vfat
-modprobe loop
+modprobe vfat >/dev/null
+modprobe loop >/dev/null
 
 # Hardware detection.
-modprobe floppy
+modprobe floppy >/dev/null
 if [ -x /usr/sbin/usb-discover ]; then
 	/usr/sbin/usb-discover
 fi
 # This is currently needed or usb-storage won't load (for ide_fix_driveid).
-modprobe ide-core
-modprobe usb-storage
-modprobe sd_mod
+modprobe ide-core >/dev/null
+modprobe usb-storage >/dev/null
+modprobe sd_mod >/dev/null
 
 debugshell "after hardware detection"
 
