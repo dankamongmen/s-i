@@ -147,9 +147,9 @@ int check_cdrom() {
 
 	/* print the result of the command */
 	if(status != 0) {
-		debconf_fset(debconf,"cdrom-checker/missmatch", "seen", "false");
-		debconf_subst(debconf, "cdrom-checker/missmatch", "FILE", filename);
-		debconf_input(debconf, "high", "cdrom-checker/missmatch");
+		debconf_fset(debconf,"cdrom-checker/mismatch", "seen", "false");
+		debconf_subst(debconf, "cdrom-checker/mismatch", "FILE", filename);
+		debconf_input(debconf, "high", "cdrom-checker/mismatch");
 	} else {
 		debconf_fset(debconf, "cdrom-checker/passed", "seen", "false");
 		debconf_input(debconf, "high", "cdrom-checker/passed");
@@ -160,9 +160,12 @@ int check_cdrom() {
 }
 
 int main(int argc, char **argv) {
+	system("touch /tmp/test");
+	system("logger init");
         di_system_init(basename(argv[0]));
 	/* initialize the debconf frontend */
 	debconf = debconfclient_new();
+	system("logger after");
 
 	/* ask if we should proceed the checking */
 	debconf_fset(debconf, "cdrom-checker/start", "seen", "false");
@@ -173,6 +176,7 @@ int main(int argc, char **argv) {
 	if(!strstr(debconf->value, "true")) {	/* return to main-menu */
 		return(EXIT_SUCCESS);
 	}
+	system("logger after-quest");
 
 	detect_cdrom();
 
