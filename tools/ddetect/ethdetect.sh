@@ -81,11 +81,9 @@ module_probe() {
 		# Pick up multiple cards that were loaded by a single module
 		# hence they'll have same description
 		
-		if [ -n "$newdevs" ]; then
-			modinfo=$(get_static_modinfo $module)
-
-			if [ -n "$modinfo" ]; then break; fi
-			
+		modinfo=$(get_static_modinfo $module)
+		
+		if [ -n "$newdevs" -a -n "$modinfo" ]; then
 			for ndev in $newdevs; do
 				echo "${ndev}:${modinfo}" >> /etc/network/devnames
 			done
