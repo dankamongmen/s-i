@@ -22,6 +22,9 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 static struct linkedlist_t *packages;
 
@@ -31,6 +34,8 @@ static int do_system(const char *cmd) {
 	return system(cmd);
 }
 #endif
+
+static void update_language (void);
 
 /*
  * qsort comparison function (sort by menu item values, fallback to lexical
@@ -345,15 +350,35 @@ int do_menu_item(struct package_t *p) {
 	return 1;
 }
 
+static void update_language (void) {
+	struct debconfclient *debconf;
+
+	debconf = debconfclient_new();
+	debconf->command(debconf, "GET", "debian-installer/language", NULL);
+	if (*debconf->value != 0)
+	{
+		setenv("LANGUAGE", debconf->value, 1);
+		/*  debconf backend must also be updated  */
+		kill(getppid(), SIGUSR1);
+	}
+	debconfclient_delete(debconf);
+}
+
 int main (int argc, char **argv) {
 	struct package_t *p;
-	
+
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
-	
+
 	packages = status_read();
 	while ((p=show_main_menu(packages))) {
 		do_menu_item(p);
+		/*
+		 *  By convention, language selection is item 10;
+		 *  the LANGUAGE environment variable must be updated
+		 */
+		if (p->installer_menu_item == 10)
+			update_language();
 		packages = status_read();
 	}
 	
