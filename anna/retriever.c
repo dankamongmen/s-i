@@ -19,7 +19,7 @@ int get_package (char *src, char *dest) {
 	char *command=malloc(strlen(retriever) + 1 + strlen(src) +
 				     strlen(dest) + 1);
 	sprintf(command, "%s %s %s", retriever, src, dest);
-	return system(command);
+	return ! system(command);
 }
 
 /*
