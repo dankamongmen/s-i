@@ -34,8 +34,23 @@ struct package_t *status_read(void) {
 		else if (strstr(buf, "Installer-Menu-Item: ") == buf) {
 			p->installer_menu_item = atoi(buf+21);
 		}
+		else if (strstr(buf, "Status: ") == buf) {
+			if (strstr(buf, " unpacked")) {
+				p->status = STATUS_UNPACKED;
+			}
+			else if (strstr(buf, " installed")) {
+				p->status = STATUS_INSTALLED;
+			}
+			else {
+				p->status = STATUS_UNKNOWN;
+			}
+		}
 		else if (strstr(buf, "Description: ") == buf) {
 			/* Short description only. */
+			/*
+			 * TODO: need to get translated data from
+			 * somewhere, if in a different locale.
+			 */
 			p->description = strdup(buf+13);
 		}
 		else if (strstr(buf, "Depends: ") == buf) {

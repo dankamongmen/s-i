@@ -50,7 +50,8 @@ void main_menu(struct package_t *packages) {
 	struct package_t **package_list, *p, *head = NULL, *tail = NULL;
 	int i = 0, num = 0;
 	void *package_tree = NULL;
-	char *s, menutext[1024] = "SUBST " MAIN_MENU " MENU ";
+	char *s, *menudefault = NULL;
+	char menutext[1024] = "";
 	
 	/* Make a flat list of the packages, plus a btree for name lookup. */
 	for (p = packages; p; p = p->next) {
@@ -74,25 +75,36 @@ void main_menu(struct package_t *packages) {
 		}
 	}
 	
-	/* Make debconf display it. */
-	s = menutext + strlen(menutext);
-	for (p = head; p; p=p->next) {
+	/*
+	 * Generate list of menu choices for debconf. Also figure out which
+	 * is the default.
+	 */
+	s = menutext;
+	for (p = head; p; p = p->next) {
 		if (p->installer_menu_item) {
 			strcpy(s, p->description);
 			s += strlen(p->description);
 			*s++ = ',';
 			*s++ = ' ';
+
+			if (! menudefault) {
+				/* TODO: menutest scripts */
+				if (p->status == STATUS_UNPACKED) {
+					menudefault = p->description;
+				}
+			}
 		}
 	}
+	/* Trim trailing ", " */
 	s = s - 2;
 	*s = 0;
-	/*
-	 * TODO: save some executable size by not hard coding the MAIN_MENU
-	 * string everwhere
-	 */
-	debconf_command("FSET " MAIN_MENU " isdefault true");
-	debconf_command(menutext);
-	debconf_command("INPUT medium " MAIN_MENU);
+	s = menutext;
+	
+	if (menudefault)
+		debconf_command("SET %s %s", MAIN_MENU, menudefault);
+	debconf_command("FSET %s isdefault true", MAIN_MENU);
+	debconf_command("SUBST %s MENU %s", MAIN_MENU, menutext);
+	debconf_command("INPUT medium %s", MAIN_MENU);
 	debconf_command("GO");
 }
 

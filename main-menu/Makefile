@@ -10,5 +10,9 @@ $(BIN): $(OBJS)
 demo: $(BIN)
 	/usr/share/debconf/frontend ./$(BIN)
 
+strip: $(BIN)
+	strip --remove-section=.comment --remove-section=.note \
+		--strip-unneeded $(BIN)
+
 clean:
 	-rm -f $(BIN) $(OBJS) *~
