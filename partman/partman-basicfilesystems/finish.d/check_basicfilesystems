@@ -22,10 +22,15 @@ for dev in $DEVICES/*; do
 	case $filesystem in
 	    linux-swap|ext2|fat16|fat32)
 		log "Check the file system in $dev/$id"
-		db_subst partman-basicfilesystems/progress_checking TYPE "$filesystem"
-		db_subst partman-basicfilesystems/progress_checking PARTITION "$num"
-		db_subst partman-basicfilesystems/progress_checking DEVICE $(humandev $(cat device))
-		current_action partman-basicfilesystems/progress_checking
+		if [ "$filesystem" = linux-swap ]; then
+		    template=partman-basicfilesystems/progress_swap_checking
+		else
+		    template=partman-basicfilesystems/progress_checking
+		fi
+		db_subst $template TYPE "$filesystem"
+		db_subst $template PARTITION "$num"
+		db_subst $template DEVICE $(humandev $(cat device))
+		name_progress_bar $template
 		open_dialog CHECK_FILE_SYSTEM $id
 		read_line status
 		close_dialog
