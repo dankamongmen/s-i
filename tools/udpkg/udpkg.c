@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.12 2000/11/06 21:00:55 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.13 2000/11/06 21:21:01 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -247,6 +247,14 @@ static int dpkg_unpack(struct package_t *pkgs)
 	int r = 0;
 	struct package_t *pkg;
 	void *status = status_read();
+
+	if (SYSTEM("rm -rf -- " DPKGCIDIR) != 0 ||
+	    mkdir(DPKGCIDIR, S_IRWXU) != 0)
+	{
+		perror("mkdir");
+		return 1;
+	}
+	
 	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
 	{
 		dpkg_unpackcontrol(pkg);
@@ -254,6 +262,7 @@ static int dpkg_unpack(struct package_t *pkgs)
 		if (r != 0) break;
 	}
 	status_merge(status, pkgs);
+	SYSTEM("rm -rf -- " DPKGCIDIR);
 	return r;
 }
 
