@@ -26,7 +26,7 @@ libdebian_installer_la_LIBADD = \
 	system/libsystem.la
 
 libdebian_installer_la_LDFLAGS = \
-	-version-info 4:0:0 \
+	-version-number 4:0:1 \
 	-Wl,--version-script=$(srcdir)/libdebian-installer.ver
 
 libdebian_installer_la_DEPENDENCIES = \

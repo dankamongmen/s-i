@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: mem.c,v 1.3 2003/11/02 20:58:49 waldi Exp $
  */
 
 #include <debian-installer/mem.h>
@@ -273,5 +273,4 @@ static size_t di_mem_chunk_compute_size (di_ksize_t size, di_ksize_t min_size)
   else
     return upper;
 }
-
 
