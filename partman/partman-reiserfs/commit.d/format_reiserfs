@@ -2,6 +2,8 @@
 
 . /lib/partman/definitions.sh
 
+enable_swap
+
 for dev in $DEVICES/*; do
     [ -d "$dev" ] || continue
     cd $dev
@@ -34,6 +36,7 @@ for dev in $DEVICES/*; do
 # 		open_dialog CREATE_FILE_SYSTEM $id reiserfs
 # 		read_line status
 # 		close_dialog
+#               sync
 		if [ "$status" != OK ]; then
 		    db_progress START 0 3 partman/text/please_wait
 		    db_progress INFO partman-reiserfs/progress_formatting
@@ -41,6 +44,7 @@ for dev in $DEVICES/*; do
 		    if
 			mkfs.reiserfs -f -q $device >/dev/null 2>>/var/log/messages
 		    then
+			sync
 			status=OK
 		    else
 			status=failed
@@ -53,9 +57,12 @@ for dev in $DEVICES/*; do
 		    db_subst partman-reiserfs/create_failed DEVICE $(humandev $(cat device))
 		    db_input critical partman-reiserfs/create_failed || true
 		    db_go || true
+		    disable_swap
 		    exit 1
 		fi
 		;;
 	esac
     done
 done
+
+disable_swap

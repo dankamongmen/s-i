@@ -2,6 +2,8 @@
 
 . /lib/partman/definitions.sh
 
+enable_swap
+
 for dev in $DEVICES/*; do
     [ -d "$dev" ] || continue
     cd $dev
@@ -34,8 +36,10 @@ for dev in $DEVICES/*; do
 		    open_dialog CREATE_FILE_SYSTEM $id ext2
 		    read_line status
 		    close_dialog
+		    sync
 		    if [ "$status" = OK ]; then
 			/sbin/tune2fs -j $device >/dev/null 2>>/var/log/messages || status=failed
+			sync
 		    fi
 		fi
 		if [ "$status" != OK ]; then
@@ -45,6 +49,7 @@ for dev in $DEVICES/*; do
 		    if
 			mkfs.ext3 $device >/dev/null 2>>/var/log/messages
 		    then
+			sync
 			status=OK
 		    else
 			status=failed
@@ -57,9 +62,12 @@ for dev in $DEVICES/*; do
 		    db_subst partman-ext3/create_failed DEVICE $(humandev $(cat device))
 		    db_input critical partman-ext3/create_failed || true
 		    db_go || true
+		    disable_swap
 		    exit 1
 		fi
 		;;
 	esac
     done
 done
+
+disable_swap
