@@ -28,6 +28,7 @@ bootfs_devfs=$(findfs /boot)
 
 rootfs=$(mapdevfs $rootfs_devfs)
 bootfs=$(mapdevfs $bootfs_devfs)
+bootdev=`echo $rootfs | sed 's/[0-9]\+$//'`
 bootfs_no_dev=${bootfs#/dev/}
 
 db_progress INFO sibyl-installer/apt-install
@@ -42,6 +43,19 @@ if ! apt-install sibyl ; then
 	if [ true != "$RET" ] ; then
 		exit 1
 	fi
+else
+	case "`archdetect`" in
+		mips/sb1-swarm-bn)
+			FLAG="-EB"
+		;;
+		mipsel/sb1-swarm-bn)
+			FLAG="-EL"
+		*)
+			error "Unknown architecture `archdetect`"
+		;;
+	esac
+	info "Installing sibyl.bin to $bootdev with flag $FLAG"
+	chroot /usr/sbin/installboot $FLAG /usr/lib/sibyl/sibyl.bin $bootdev
 fi
 
 db_progress STEP 2
