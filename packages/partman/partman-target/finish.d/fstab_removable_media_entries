@@ -79,13 +79,11 @@ done
 populate_media floppy auto rw,user,noauto $FDDEVICES
 
 # See if a usb storage device is plugged in right now. If so, assume it is
-# removable media unless the disk is already listed in the fstab. If
-# installing from usb, list that device first.
+# removable media unless the disk is already listed in the fstab. 
 USBDEVICES=''
 HD_MEDIA=$(grep /hd-media /proc/mounts | cut -d ' ' -f 1)
 if [ -n "$HD_MEDIA" ]; then
     HD_MEDIA="$(mapdevfs $HD_MEDIA)"
-    USBDEVICES="$HD_MEDIA"
 fi
 for dir in /proc/scsi/usb-storage-* /proc/scsi/usb-storage; do
     if [ -d "$dir" ]; then
@@ -102,8 +100,15 @@ for dir in /proc/scsi/usb-storage-* /proc/scsi/usb-storage; do
 	        done
 		if [ ! "$infstab" ]; then
 		    dev=$(mapdevfs $(find /dev/scsi/host$host/ -type b | grep /disc))
-		    if [ "$dev" != "$HD_MEDIA" ]; then
-		        USBDEVICES="$USBDEVICES $dev"
+		    if [ -z "$USBDEVICES" ]; then
+		        USBDEVICES="$dev"
+		    else
+		        if [ "$dev" != "$HD_MEDIA" ]; then
+		            USBDEVICES="$USBDEVICES $dev"
+                        else
+			    # If installing from usb, list that device first.
+			    USBDEVICES="$dev $USBDEVICES"
+			fi
 		    fi
 		fi
 	    fi
