@@ -31,6 +31,10 @@ writefile () {
     cat >>"$1" || die yaboot-installer/conferr "Error writing $2"
 }
 
+findfs () {
+    df "/target$1" | sed '1d;s/[[:space:]].*//'
+}
+
 db_progress START 0 6 yaboot-installer/progress
 
 die() {
@@ -123,8 +127,11 @@ bootdev="$RET"
 db_progress STEP 1
 db_progress INFO yaboot-installer/root
 
-rootdev="`sed -n -e '/^[^[:space:]]\+[[:space:]]\+\/target[[:space:]]/ { s/[[:space:]].*//; p }' /proc/mounts`"
+rootdev="$(findfs /)"
 [ "$rootdev" ] || die yaboot-installer/noroot 'No root partition found'
+
+slashbootdev="$(findfs /boot)"
+[ "$slashbootdev" ] || slashbootdev="$rootdev"
 
 mountvirtfs () {
     fstype="$1"
@@ -254,13 +261,12 @@ db_progress INFO yaboot-installer/conf
 
 boot="`mapdevfs "$bootdev"`"
 root="`mapdevfs "$rootdev"`"
+slashboot="`mapdevfs "$slashbootdev"`"
 
-partnr="`printf %s "$root" | sed 's/[^0-9]*\([0-9]\)/\1/'`"
-disk="`printf %s "$root" | sed 's/[0-9].*//'`"
+partnr="`printf %s "$slashboot" | sed 's/[^0-9]*\([0-9]\)/\1/'`"
+disk="`printf %s "$slashboot" | sed 's/[0-9].*//'`"
 
 ofpath="`chroot /target ofpath "$disk"`"
-
-# TODO: deal with /boot on separate partition
 
 if [ -e /target/boot/vmlinux ]; then
     kernel=/boot/vmlinux
@@ -274,6 +280,12 @@ elif [ -e /target/initrd.img ]; then
     initrd=/initrd.img
 else
     initrd=
+fi
+
+# Is /boot on a separate partition?
+if [ "$slashboot" != "$root" ]; then
+    kernel="${kernel#/boot}"
+    initrd="${initrd#/boot}"
 fi
 
 # we generate our own yaboot.conf kernel (yabootconfig is horribly broken)
