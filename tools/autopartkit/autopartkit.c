@@ -162,7 +162,7 @@ autopartkit_error (int isfatal, const char * format, ...)
     if (-1 == vasprintf(&msg, format, ap))
     {
         /* fatal error */
-        exit(0);
+        exit(1);
     }
     va_end(ap);
 
