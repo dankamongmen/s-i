@@ -3,6 +3,7 @@
 #include "strutl.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 static const char *template_lget(struct template *t, const char *lang,
                 const char *field);
@@ -44,13 +45,11 @@ static const char *getlanguage(void)
 	    (cache_cur_lang != NULL && envlang != NULL && strcmp(cache_cur_lang, envlang) != 0))
 	{
 		/*   LANGUAGE has changed, reset cache_cur_lang...  */
-		if (cache_cur_lang != NULL)
-			free(cache_cur_lang);
+		DELETE(cache_cur_lang);
 		/*   ... and language linked list  */
 		for (p = cache_list_lang_ptr; p != NULL; p = p->next)
 		{
-			if (p->lang != NULL)
-				free(p->lang);
+			DELETE(p->lang);
 			q = p->next;
 			free(p);
 			p = q;
@@ -61,8 +60,7 @@ static const char *getlanguage(void)
 
 		cache_list_lang_ptr = (struct cache_list_lang *)
 			malloc(sizeof(struct cache_list_lang));
-		cache_list_lang_ptr->next = NULL;
-		cache_list_lang_ptr->lang = NULL;
+		memset(cache_list_lang_ptr, 0, sizeof(struct cache_list_lang *));
 
 		p = cache_list_lang_ptr;
 		cache_cur_lang = strdup(envlang);
