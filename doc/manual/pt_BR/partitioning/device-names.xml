@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- $Id: device-names.xml,v 1.1 2004/01/25 11:12:25 gleydson Exp $ -->
+<!-- original version: 1.3 -->
+
+ <sect1 id="device-names">
+ <title>Nomes de Dispositivos no Linux</title>
+<para>
+
+Nomes de discos e partições no Linux podem ser diferentes de outros
+sistemas operacionais. Você precisará conhecer os nomes que o Linux
+utiliza quando criar e montar partições. Aqui está o esquema básico 
+de nomes:
+
+</para>
+<itemizedlist arch="not-s390">
+<listitem><para>
+
+A primeira unidade de disquete tem o nome "/dev/fd0".
+
+</para></listitem>
+<listitem><para>
+
+A segunda unidade de disquetes tem o nome "/dev/fd1".
+
+</para></listitem>
+<listitem><para>
+
+O primeiro disco SCSI (usando o esquema de IDs SCSI) é nomeado "/dev/sda".
+
+</para></listitem>
+<listitem><para>
+
+O segundo disco SCSI (usando o esquema de IDs SCSI) é nomeado "/dev/sdb" 
+e assim por diante.
+
+</para></listitem>
+<listitem><para>
+
+A primeira unidade de CD-ROM SCSI tem o nome "/dev/scd0" também conhecida
+como "/dev/sr0".
+
+</para></listitem>
+<listitem><para>
+
+O disco IDE principal na controladora primária tem o nome "/dev/hda".
+
+</para></listitem>
+<listitem><para>
+
+O disco IDE escrevao na controladora primária tem o nome "/dev/hdb".
+
+</para></listitem>
+<listitem><para>
+
+Os discos principal e escravo da segunda controladora podem ser chamados
+"/dev/hdc" e "/dev/hdd" respectivamente. As controladoras IDE mais novas
+podem ter dois canais, efetivamente atuando como duas controladoras.
+
+<phrase arch="m68k">
+As duas letras podem se diferir das mostradas no programa pdisk do
+Mac (i.e. as mostradas como /dev/hdc no pdisk podem ser mostradas 
+como /dev/hda na Debian).
+</phrase>
+
+</para></listitem>
+
+<listitem arch="i386"><para>
+
+O primeiro disco XT tem o nome "/dev/xda".
+
+</para></listitem>
+<listitem arch="i386"><para>
+
+O segundo disco XT tem o nome "/dev/xdb".
+
+</para></listitem>
+<listitem arch="m68k"><para>
+
+O primeiro dispositivo ACSI tem o nome "/dev/ada" o segundo tem o 
+nome "/dev/adb".  
+
+</para></listitem>
+</itemizedlist>
+
+<itemizedlist arch="s390">
+<listitem><para>
+
+Os dispositivos DASD tem o nome "/dev/dasd/xxxx/device" onde xxxx é o 
+número do dispositivos em notação hexadecimal. O kernel que vem com a 
+Debian GNU/Linux utiliza o devfs assim os nomes de dispositivos podem ser 
+automaticamente criados e removidos quando os dispositivos DASD são 
+conectados ou desconectados. Por favor, veja o capítulo 3 em
+<ulink url="http://oss.software.ibm.com/developerworks/opensource/linux390/docu/l390dd08.pdf">
+Controladores de Dispositivos e Comandos de Instalação</ulink> para mais
+informações sobre isto.
+
+</para></listitem>
+</itemizedlist>
+
+<para arch="not-s390">
+
+As partições em cada dispositivos são representadas adicionando-se um 
+número decimal ao nome de dispositivo: "sda1" e "sda2" representa a 
+primeira e segundas partições no  primeiro disco SCSI em seu sistema.
+
+</para><para arch="not-s390">
+
+Aqui está um exemplo da vida real. Vamos assumir que seu sistema tem
+2 discos SCSI, um no endereço SCSI 2 e a outra no endereço SCSI 4.
+O primeiro disco (no endereço 2) é então chamado "sda" e o segundo
+"sdb". Caso a unidade "sda" tenha 3 partições, elas serão referenciadas
+como "sda1", "sda2" e "sda3". O mesmo se aplica ao disco
+"sdb" e suas partições.
+
+</para><para arch="not-s390">
+
+Note que se tiver duas placas adaptadoras SCSI (i.e., controladoras), 
+a ordem das unidades podem se tornar confusas. A melhor solução neste
+caso é olhar as mensagens de inicialização, assumindo que conheça o modelo
+das unidades e/ou suas capacidades.
+
+</para><para arch="i386">
+
+O Linux representa as partições primárias como nomes de unidade acrescido
+de um número de 1 a 4. Por exemplo, a primeira partição primária no 
+primeiro disco rígido IDE é <filename>/dev/hda1</filename>. As partições
+lógicas são representadas por números iniciando-se por 5, assim se a primeira
+partição lógica no mesmo disco será <filename>/dev/hda5</filename>. Lembre-se
+que a partição extendida, isto é, a partição primária que armazena as 
+partições lógicas, não é utilizada. Isto se aplica tanto a discos SCSI como
+também a discos IDE.
+
+</para><para arch="m68k">
+
+Sistemas VMEbus que utilizam a unidade de disquetes SCSI TEAC FC-1 serão
+visualizadas como unidades de disquetes normais. Para tornar a identificação
+da unidade mais simples o programa de instalação criará um link simbólico
+apontando para o nome de dispositivo apropriado e o nomeará como "/dev/sfd0".
+
+</para><para arch="sparc">
+
+Partições de disco do Sun permitem 8 partições separadas (ou slices). 
+A terceira partição é normalmente (e é preferível que tenha) a 
+partição "Whole Disk". Esta partição possui a referência de todos os 
+setores do disco e é usada pelo gerenciador de inicialização (ou o 
+SILO ou Sun's).
+
+</para><para arch="s390">
+
+Partições de disco &arch-title; permitem 3 partições separadas. 
+Elas serão chamadas /dev/dasd/xxxx/part1, /dev/dasd/xxxx/part2 e 
+/dev/dasd/xxxx/part3.
+
+</para>
+ </sect1>
