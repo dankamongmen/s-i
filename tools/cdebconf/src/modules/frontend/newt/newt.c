@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.12 2003/05/11 14:00:51 sjogren Exp $
+ * $Id: newt.c,v 1.13 2003/07/14 12:52:48 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -603,7 +603,8 @@ struct question_handlers {
 	{ "string",	newt_handler_string },          // OK
 	{ "password",	newt_handler_password },        // OK
 	{ "note",	newt_handler_note },            // OK
-	{ "text",	newt_handler_text }
+	{ "text",	newt_handler_text },
+        { "error",      newt_handler_note },
 };
 
 /*

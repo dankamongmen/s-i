@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.21 2003/06/10 22:37:08 sley Exp $
+ * $Id: gtk.c,v 1.22 2003/07/14 12:52:47 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -676,6 +676,7 @@ struct question_handlers {
     { "password",	gtkhandler_password },
     { "select",	        gtkhandler_select },
     { "string",	        gtkhandler_string },
+    { "error",	        gtkhandler_note },
     //	{ "text",	gtkhandler_text }
 };
 

@@ -28,7 +28,8 @@ struct question_handlers {
 	{ "password",	nchandler_password },
 	{ "select",	nchandler_select },
 	{ "string",	nchandler_string },
-	{ "text",	nchandler_text }
+	{ "text",	nchandler_text },
+	{ "error",	nchandler_note },
 };
 
 /* Private variables */

@@ -1,7 +1,7 @@
 /*
  * cdebconf frontend, corba client
  *
- * $Id: corba.c,v 1.3 2001/02/22 05:59:06 zw Rel $
+ * $Id: corba.c,v 1.4 2003/07/14 12:52:47 sjogren Rel $
  */
 
 #include "common.h"
@@ -137,7 +137,8 @@ struct question_handlers {
   { "password", corba_password },
   { "select", 	corba_select },
   { "string", 	corba_string },
-  { "text", 	corba_text }
+  { "text", 	corba_text },
+  { "error", 	corba_note },
 };
 
 int corba_initialize(struct frontend *f, struct configuration *conf)

@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.25 2003/02/09 08:48:29 barbier Exp $
+ * $Id: slang.c,v 1.26 2003/07/14 12:52:48 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -652,7 +652,8 @@ static struct question_handlers {
 	{ "password",	slang_password },
 	{ "select",	slang_select },
 	{ "string",	slang_string },
-	{ "text",	slang_text }
+	{ "text",	slang_text },
+        { "error",      slang_note },
 };
 
 static int slang_initialize(struct frontend *obj, struct configuration *cfg)

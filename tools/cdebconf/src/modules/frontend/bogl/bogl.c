@@ -31,6 +31,7 @@ struct question_handlers question_handlers[] = {
 	{ "select", bogl_handler_select },
 	{ "note", bogl_handler_note },
 	{ "string", bogl_handler_string },
+        { "eror", bogl_handler_note },
 };
 
 static handler_t handler(const char *type)

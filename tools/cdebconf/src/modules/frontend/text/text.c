@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.38 2003/05/11 11:59:15 sjogren Exp $
+ * $Id: text.c,v 1.39 2003/07/14 12:52:48 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -211,11 +211,11 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
  */
 static int texthandler_multiselect(struct frontend *obj, struct question *q)
 {
-	char *choices[100] = {0};
-	char *choices_translated[100] = {0};
-	char *defaults[100] = {0};
-	char selected[100] = {0};
-	char answer[1024] = {0};
+	char *choices[200] = {0};
+	char *choices_translated[200] = {0};
+	char *defaults[200] = {0};
+	char selected[200] = {0};
+	char answer[4096] = {0};
 	int i, j, line, count, dcount, choice;
 
 	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
@@ -465,6 +465,29 @@ static int texthandler_text(struct frontend *obj, struct question *q)
 	return DC_OK;
 }
 
+/*
+ * Function: texthandler_error
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
+ * Description: handler for the error question type. Currently equal to _note
+ * Assumptions: none
+ */
+static int texthandler_error(struct frontend *obj, struct question *q)
+{
+	int c;
+	if (obj->methods.can_go_back (obj, q))
+		printf (_("[Press enter to continue, or 'c to cancel]"));
+	else
+		printf(_("[Press enter to continue]\n"));
+	do { 
+		c = fgetc(stdin); 
+		if ((obj->methods.can_go_back (obj, q)) &&  ((c == 'c' ) || (c == 'C')))
+			return DC_GOBACK;
+	} while (c != '\r' && c != '\n');
+	return DC_OK;
+}
+
 /* ----------------------------------------------------------------------- */
 struct question_handlers {
 	const char *type;
@@ -476,7 +499,8 @@ struct question_handlers {
 	{ "password",	texthandler_password },
 	{ "select",	texthandler_select },
 	{ "string",	texthandler_string },
-	{ "text",	texthandler_text }
+	{ "text",	texthandler_text },
+        { "error",      texthandler_error },
 };
 
 /*
@@ -513,7 +537,7 @@ static int text_go(struct frontend *obj)
 
         for (; q != 0; q = q->next) 
 	{
-		for (i = 0; i < DIM(question_handlers); i++)
+		for (i = 0; i < DIM(question_handlers); i++) {
 			if (strcmp(q->template->type, question_handlers[i].type) == 0) 
 			{
 
@@ -530,6 +554,7 @@ static int text_go(struct frontend *obj)
 					return ret;
 				break;
 			}
+                }
 	}
 
 	return DC_OK;
