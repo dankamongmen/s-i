@@ -57,5 +57,6 @@ check-autopartkit: autopartkit_test testdevice
 	@echo
 	@cat fstab
 
-check: distribute_test
+check: distribute_test lvm_test
 	./distribute_test $(top_srcdir)/default.table
+	./lvm_test
