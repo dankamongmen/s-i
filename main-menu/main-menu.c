@@ -526,7 +526,10 @@ int main (int argc, char **argv) {
 		ret = do_menu_item(p);
 		adjust_default_priority();
 		if (!ret) {
-			di_logf("Menu item '%s' failed.", p->package);
+			if (ret == 10)
+				di_logf("Menu item '%s' succeeded but requested to be left unconfigured.", p->package); 
+			else
+				di_logf("Menu item '%s' failed.", p->package);
 			/* Something went wrong.  Lower debconf
 			   priority limit to try to give the user more
 			   control over the situation. */
