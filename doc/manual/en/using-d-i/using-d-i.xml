@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: using-d-i.xml,v 1.1 2003/10/27 03:09:13 toff Exp $ -->
+<!-- $Id: using-d-i.xml,v 1.2 2003/11/09 03:03:26 toff Exp $ -->
 
 
  <chapter id="d-i-intro"><title>Using the Debian Installer</title>
@@ -10,9 +10,10 @@
 The Debian Installer consists of a number of special-purpose modules
 to perform each installation task. Each module performs its task,
 asking the user questions as necessary to do its job. If there is no
-problem, the next module in line takes over. When there is a problem,
-the user will see an error screen, and the installer menu will be
-shown in order to select some alternative action. If there are no
+problem, the next module in the sequence takes over without any user
+interaction (other than various progress messages). When there is a
+problem, the user will see an error screen, and the installer menu may
+be shown in order to select some alternative action. If there are no
 problems, the user will never see the installer menu, but will simply
 answer questions for each module in turn.
 
@@ -22,21 +23,31 @@ The questions themselves are given priorities, and the priority
 of questions to be asked can be set. Thus if the installer knows
 what to do, and the user need not be aware of other choices which
 are available, then the installer will make the choice and not
-display the question.
-The <emphasis>Enter</emphasis> to activate choices.
+display the question. Serious error notifications are set to 
+priority 'critical' so the user will always be notified.
 
 </para><para>
 
-The normal installer display is character-based rather than the more
-familiar graphical interface. Here are the keys you can use to
-navigate within the various dialogs.  The right arrow or Tab key move
-`forward', and left arrow or Shift-Tab move `backward' between
-displayed buttons and selections. The up and down arrow select
-different items within a scrollable list, and also scroll the list
-itself. In addition, in long lists, you can type a letter to cause the
-list to scroll directly to the section with items starting with the
-letter you typed and use Pg-Up and Pg-Down to scroll the list in
-sections. The space bar selects an item such as a checkbox.
+Power users may be more comfortable with a menu-driven interface,
+where each step is controlled by the user rather than the installer
+performing each step automatically in sequence. To use the installer
+in a manual, menu-driven way, add the boot argument
+DEBCONF_PRIORITY=MEDIUM.
+
+</para><para>
+
+The normal installer display is character-based (as opposed to the now
+more familiar graphical interface). The mouse is not operational in
+this environment. Here are the keys you can use to navigate within the
+various dialogs.  The right arrow or Tab key move `forward', and left
+arrow or Shift-Tab move `backward' between displayed buttons and
+selections. The up and down arrow select different items within a
+scrollable list, and also scroll the list itself. In addition, in long
+lists, you can type a letter to cause the list to scroll directly to
+the section with items starting with the letter you typed and use
+Pg-Up and Pg-Down to scroll the list in sections. The space bar
+selects an item such as a checkbox.  Use &enterkey; to activate
+choices.
 
 </para><para arch="s390">
 
@@ -45,8 +56,8 @@ telnet session to view the logs described below.
 
 </para><para>
 
-Error messages are redirected to the third virtual terminal (known as
-<userinput>tty3</userinput>).  You can access this terminal by
+Error messages are redirected to the third console (known as
+<userinput>tty3</userinput>).  You can access this console by
 pressing <keycombo><keycap>Left Alt</keycap><keycap>F3</keycap></keycombo>
 (hold the <keycap>Alt</keycap> key while pressing the
 <keycap>F3</keycap> function key); get back to
@@ -58,7 +69,10 @@ the main installer process with
 These messages can also be found in
 <filename>/var/log/messages</filename>.  After installation, this log
 is copied to <filename>/var/log/installer.log</filename> on your new
-system.
+system. Other installation messages may be found in
+<filename>/target/var/log/debian-installer/</filename> during the
+installation, and <filename>/var/log/debian-installer/</filename>
+after the computer has been booted into the installed system.
 
 </para>
  </sect1>
@@ -79,10 +93,12 @@ using a particular module are in <xref linkend="module-details"/>.
 <term>main-menu</term><listitem><para>
 
 Shows the list of modules to the user during installer operation, and
-starts a selected module when it is selected. Main- menu's questions
+starts a selected module when it is selected. Main-menu's questions
 are set to priority MEDIUM, so if your priority is set to HIGH or
-CRITICAL (HIGH is the default), you will not see the menu (unless
-there is an error which requires your intervention).
+CRITICAL (HIGH is the default), you will not see the menu. On the
+other hand, if there is an error which requires your intervention,
+the question priority may be downgraded temporarily to allow you
+to resolve the problem, and in that case the menu may appear.
 
 </para></listitem>
 </varlistentry>
@@ -248,9 +264,9 @@ console.
 
 <term>bugreporter</term><listitem><para>
 
-Provides a way for the user to record information when trouble is
-encountered, and report installer software problems to Debian
-developers.
+Provides a way for the user to record information on a floppy disk
+when trouble is encountered, in order to accurately report installer
+software problems to Debian developers later.
 
 </para></listitem>
 </varlistentry>
