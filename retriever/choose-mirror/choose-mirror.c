@@ -13,10 +13,8 @@
 #ifdef WITH_FTP
 #include "mirrors_ftp.h"
 #endif
-#ifndef WITH_FTP
-#ifndef WITH_HTTP
+#if ! defined (WITH_HTTP) && ! defined (WITH_FTP)
 #error Must compile with at least one of FTP and HTTP
-#endif
 #endif
 
 struct debconfclient *debconf;
@@ -24,7 +22,6 @@ struct debconfclient *debconf;
 /*
  * Returns a string on the form "DEBCONF_BASE/protocol/supplied".  The
  * calling function is responsible for freeing the string afterwards.
- * FIXME : find a better name
  */
 
 char *add_protocol(char *string) {
@@ -119,7 +116,7 @@ char *mirror_root(char *mirror) {
 }
 
 int choose_country(void) {
-	char *list;
+	char *list = 0;
 	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
 #ifdef WITH_HTTP
 	if (debconf->value != NULL && strcasecmp(debconf->value,"http") == 0) {
@@ -138,14 +135,20 @@ int choose_country(void) {
 	return 0;
 }
 
-/* 
- * Choose which protocol to use.
- * FIXME: currently shows ftp/http even if not compiled in.
- */
-
+/* Choose which protocol to use. */
 int choose_protocol(void) {
+#if defined (WITH_HTTP) && defined (WITH_FTP)
+	/* Both are supported, so ask. */
 	debconf->command(debconf, "SUBST", DEBCONF_BASE "protocol", "protocols", "http, ftp", NULL);
 	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "protocol", NULL);
+#else
+#ifdef WITH_HTTP
+	debconf->command(debconf, "SET", DEBCONF_BASE "protocol", "http");
+#endif
+#ifdef WITH_FTP
+	debconf->command(debconf, "SET", DEBCONF_BASE "protocol", "ftp");
+#endif
+#endif /* WITH_HTTP && WITH_FTP */
 	return 0;
 }
 
