@@ -3,16 +3,30 @@
 . /usr/share/debconf/confmodule
 
 db_get debian-installer/kernel/commandline
-echo $RET > /target/boot/parmfile
+PARAMETER=$RET
 
 cat > /target/etc/zipl.conf << EOF
 [defaultboot]
-default=debian
+defaultmenu = menu
+
+:menu
+target = /boot
+1 = debian
+2 = old
+default = 1
+prompt = 1
+timeout = 10
 
 [debian]
-target=/boot
-image=/vmlinuz
-parmfile=/boot/parmfile
+target = /boot
+image = /boot/vmlinuz
+parameters = $PARMFILE
+
+[old]
+target = /boot
+image = /boot/vmlinuz.old
+parameters = $PARMFILE
+optional = 1
 EOF
 
 chroot /target /sbin/zipl
