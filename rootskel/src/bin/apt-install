@@ -5,8 +5,8 @@ if [ ! -f /target/etc/apt/sources.list ] ; then
     # postinst.
     mkdir -p /var/lib/apt-install
     touch /var/lib/apt-install/queue
-    for pkg in $* ; do
-	echo $pkg >> /var/lib/apt-install/queue
+    for pkg in $@ ; do
+	echo "$pkg" >> /var/lib/apt-install/queue
     done
     # Return error as the package is not ready to be used yet.
     exit 1
@@ -27,7 +27,7 @@ LD_LIBRARY_PATH=/usr/lib:/lib:/target/usr/lib:/target/lib \
     -o Dir::Bin::gzip=/target/bin/gzip \
     -o Dir::Bin::dpkg=/target/usr/bin/dpkg \
     -o Dpkg::Options::=--root=/target \
-    -y --download-only install $*
+    -y --download-only install $@
 
 # Some packages (eg. the kernel-image package) require a mounted /proc/
 # Only mount it if it isn't mounted already
@@ -36,7 +36,7 @@ if [ ! -f /target/proc/cmdline ] ; then
 fi
 
 DEBIAN_FRONTEND=noninteractive \
-chroot /target apt-get --no-download -y install $* < /dev/null
+chroot /target apt-get --no-download -y install $@ < /dev/null
 
 umount /target/proc
 
