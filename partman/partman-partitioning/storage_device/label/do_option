@@ -11,7 +11,13 @@ close_dialog
 
 db_fset partman-partitioning/choose_label seen false
 db_subst partman-partitioning/choose_label CHOICES "$types"
-db_input high partman-partitioning/choose_label || true
+PRIORITY=high
+# i386 users are not accustomed to deal with this stuff
+if [ "`udpkg --print-architecture`" = i386 ]; then
+	db_set partman-partitioning/choose_label msdos
+	PRIORITY=low
+fi
+db_input $PRIORITY partman-partitioning/choose_label || true
 db_go || exit 1
 db_get partman-partitioning/choose_label
 
