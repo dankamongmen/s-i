@@ -11,8 +11,8 @@ $(SOBJ): $(OBJS)
 
 install:
 ifneq ($(INSTALLOBJ),)
-	install -d -m 755 ${moddir}/db
-	install -m 644 $(INSTALLOBJ) ${moddir}/db
+	install -d -m 755 ${moddir}/frontend
+	install -m 644 $(INSTALLOBJ) ${moddir}/frontend
 endif
 
 clean:
