@@ -105,7 +105,6 @@ discover_version () {
 	else
 		log "Using discover version 1."
 		DISCOVER_VERSION=1
-		# must be Discover 1.x
 	fi
 }
 
