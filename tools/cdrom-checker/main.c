@@ -37,7 +37,7 @@ void detect_cdrom() {
 	fclose(mount);
 	
 	if(cdrom_device == NULL) {
-		di_log("Unable to detect cdrom device!");
+		di_log(DI_LOG_LEVEL_WARNING, "Unable to detect cdrom device!");
 		exit(EXIT_SUCCESS);
 	}
 }
@@ -48,17 +48,10 @@ int mount_cdrom() {
 
 	asprintf(&cmd, "/bin/grep -q '^%s' /proc/mounts",
 		cdrom_device);
-	status = system(cmd);
-	if(status == 0) {
-		free(cmd);
+	status = di_exec_shell(cmd);
+        di_free(cmd);
+	if(WIFEXITED(status) && WEXITSTATUS(status) == 0)
 		return(EXIT_SUCCESS);
-	}
-
-	/* free up cmd allocated memory */
-	if(cmd != NULL) {
-		free(cmd);
-		cmd = NULL;
-	}
 
 	/* ask if we should mount the device */
 	debconf->command(debconf, "fset", "cdrom-checker/askmount",
@@ -71,8 +64,9 @@ int mount_cdrom() {
 	
 	asprintf(&cmd, "mount -t iso9660 %s %s -o ro 1>/dev/null 2>&1",
 		cdrom_device, TARGET);
-	status = system(cmd);
-	if(status == 0)
+	status = di_exec_shell(cmd);
+        di_free(cmd);
+	if(WIFEXITED(status) && WEXITSTATUS(status) == 0)
 		return(EXIT_SUCCESS);
 
 	/* unable to mount the cdrom device */
@@ -179,6 +173,7 @@ int check_cdrom() {
 }
 
 int main(int argc, char **argv) {
+        di_system_init(basename(argv[0]));
 	/* initialize the debconf frontend */
 	debconf = debconfclient_new();
 	debconf->command(debconf, "title", "CD-ROM Checker", NULL);
@@ -219,7 +214,7 @@ int main(int argc, char **argv) {
 
 		/* make sure cdrom isn't bussy anymore, then umount it */
 		chdir("/");
-		di_execlog("umount /cdrom");
+		di_exec_shell_log("umount /cdrom");
 
 		debconf->command(debconf, "fset", "cdrom-checker/nextcd",
 			"seen", "false", NULL);
@@ -238,7 +233,7 @@ int main(int argc, char **argv) {
 	debconf->command(debconf, "set", "cdrom-checker/firstcd", "false", NULL);
 	debconf->command(debconf, "input", "high", "cdrom-checker/firstcd", NULL);
 	debconf->command(debconf, "go", NULL);
-	di_execlog("udpkg --force-configure --configure cdrom-detect");
+	di_exec_shell_log("udpkg --force-configure --configure cdrom-detect");
 
 	return(EXIT_SUCCESS);
 }

@@ -30,7 +30,7 @@ int get_all_disks(PedDevice *discs[], int max_disks) {
 
 	devdir = opendir("/dev/discs");
 	if(devdir == NULL) {
-		di_log("Failed to open disc directory");
+		di_log(DI_LOG_LEVEL_ERROR, "Failed to open disc directory");
 		return(0);
 	}
 
@@ -99,7 +99,7 @@ char *execute_fdisk() {
 	/* try to run arch fdisk command */
 	asprintf(&fdiskcmd, "%s/%s.sh", FDISK_PATH, get_architecture());
 	if(access(fdiskcmd, R_OK) == 0) {
-		di_log("Using architecture depend fdisk configuration!");
+		di_log(DI_LOG_LEVEL_INFO, "Using architecture depend fdisk configuration!");
 		return(fdiskcmd);
 	}
 
@@ -107,14 +107,14 @@ char *execute_fdisk() {
 	free(fdiskcmd);
 	asprintf(&fdiskcmd, "%s/%s", FDISK_PATH, "common.sh");
 	if(access(fdiskcmd, R_OK) == 0) {
-		di_log("Using default fdisk configuration!");
+		di_log(DI_LOG_LEVEL_INFO, "Using default fdisk configuration!");
 		return(fdiskcmd);
 	}
 
 	/* fall back to >fdisk< */
 	free(fdiskcmd);
 	asprintf(&fdiskcmd, "%s", "/usr/sbin/fdisk");
-	di_log("Fall back to default fdisk");
+	di_log(DI_LOG_LEVEL_INFO, "Fall back to default fdisk");
 	return(fdiskcmd);
 }
 
