@@ -38,7 +38,7 @@
 
 #define MAXLINE 1024
 
-int di_exec_env_full (const char *path, const char *const argv[], const char *const envp[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
+static int internal_di_exec (const char *path, bool use_path, const char *const argv[], const char *const envp[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
 {
   char line[MAXLINE];
   pid_t pid;
@@ -107,7 +107,9 @@ int di_exec_env_full (const char *path, const char *const argv[], const char *co
       if (child_prepare_handler (pid, child_prepare_user_data))
         exit (255);
 
-    if (envp)
+    if (use_path)
+      execvp (path, (char *const *) argv);
+    else if (envp)
       execve (path, (char *const *) argv, (char *const *) envp);
     else
       execv (path, (char *const *) argv);
@@ -199,13 +201,23 @@ int di_exec_env_full (const char *path, const char *const argv[], const char *co
 
 int di_exec_full (const char *path, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
 {
-  return di_exec_env_full (path, argv, NULL, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data);
+  return internal_di_exec (path, false, argv, NULL, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data);
+}
+
+int di_exec_env_full (const char *path, const char *const argv[], const char *const envp[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
+{
+  return internal_di_exec (path, false, argv, envp, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data);
+}
+
+int di_exec_path_full (const char *file, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
+{
+  return internal_di_exec (file, true, argv, NULL, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data);
 }
 
 int di_exec_shell_full (const char *const cmd, di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
 {
   const char *const argv[] = { "sh", "-c", cmd, NULL };
-  return di_exec_full ("/bin/sh", argv, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data); 
+  return internal_di_exec ("/bin/sh", false, argv, NULL, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data); 
 }
 
 int di_exec_prepare_chdir (pid_t pid __attribute__ ((unused)), void *user_data)

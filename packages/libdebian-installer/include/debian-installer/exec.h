@@ -54,6 +54,36 @@ di_process_handler
   di_exec_prepare_chroot;
 
 /**
+ * execv like call
+ *
+ * @param path executable with path
+ * @param argv NULL-terminated area of char pointer
+ * @param stdout_handler di_io_handler which gets stdout (and to stderr if stderr_handler is NULL)
+ * @param stderr_handler di_io_handler which gets stderr
+ * @param io_user_data user_data for di_io_handler
+ * @param parent_prepare_handler di_process_handler which is called after the fork in the parent
+ * @param parent_prepare_user_data user_data for parent_prepare_handler
+ * @param child_prepare_handler di_process_handler which is called after the fork in the child
+ * @param child_prepare_user_data user_data for child_prepare_handler
+ *
+ * @return status or error
+ */
+int di_exec_full (const char *path, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data);
+
+/**
+ * execv like call
+ *
+ * @param path executable with path
+ * @param argv NULL-terminated area of char pointer
+ *
+ * @return status or error
+ */
+static inline int di_exec (const char *path, const char *const argv[])
+{
+  return di_exec_full (path, argv, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+}
+
+/**
  * execve like call
  *
  * @param path executable with path
@@ -86,9 +116,9 @@ static inline int di_exec_env (const char *path, const char *const argv[], const
 }
 
 /**
- * execv like call
+ * execvp like call
  *
- * @param path executable with path
+ * @param file executable
  * @param argv NULL-terminated area of char pointer
  * @param stdout_handler di_io_handler which gets stdout (and to stderr if stderr_handler is NULL)
  * @param stderr_handler di_io_handler which gets stderr
@@ -100,19 +130,19 @@ static inline int di_exec_env (const char *path, const char *const argv[], const
  *
  * @return status or error
  */
-int di_exec_full (const char *path, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data);
+int di_exec_path_full (const char *file, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data);
 
 /**
- * execv like call
+ * execvp like call
  *
- * @param path executable with path
+ * @param file executable
  * @param argv NULL-terminated area of char pointer
  *
  * @return status or error
  */
-static inline int di_exec (const char *path, const char *const argv[])
+static inline int di_exec_path (const char *file, const char *const argv[])
 {
-  return di_exec_full (path, argv, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+  return di_exec_path_full (file, argv, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 }
 
 /**
