@@ -273,7 +273,7 @@ static int satisfy_virtual(di_system_package *p) {
 		}
 		if (defpkg == NULL || dep->p.priority > defpkg->p.priority ||
 				(dep->p.priority == defpkg->p.priority &&
-				 dep->installer_menu_item))
+				 dep->installer_menu_item < defpkg->installer_menu_item))
 			defpkg = dep;
 		/* This only makes sense if one of the dependencies
 		 * is a menu item */
