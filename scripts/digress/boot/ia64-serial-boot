@@ -1,0 +1,38 @@
+#!/usr/bin/expect
+# Expect script to make an ia64 boot a given entry in the efi menu.
+# Needs a serial console.
+set entry $env(EFI_MENUENTRY)
+
+spawn -noecho $env(CONSOLECOMMAND)
+
+send "(\r"
+send "rs\r"
+send ")\r"
+
+# It can take some time to get to the efi boot menu..
+set timeout 360
+expect "Please select a boot option"
+
+# Wait for the whole menu to be displayed once.
+set timeout 10
+expect "Use Enter to select an option"
+
+# Look to see if entry is selected. If not, go down the menu, and look
+# again. Currenly requires that the entry be the first or second item on
+# the menu.
+expect {
+	"$entry" { puts "found entry"  }
+	"Debian GNU/Linux" { puts "found other" ; send v }
+}
+
+sleep 1
+
+# Boot it. Not sure why I need multiple newlines, it sometimes seems to
+# not see the first.
+send "\r\r\r"
+
+# Wait to make sure linux is really starting.
+set timeout 360
+expect "Linux version"
+
+exit
