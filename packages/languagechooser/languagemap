@@ -20,17 +20,15 @@ LANGUAGE=C
 
 # A colon separated priority list of language codes and locales to use
 # when selecting translations.
-LANGUAGELIST=C
+LANGUAGELIST=
 
 # The assumed country (location)
-COUNTRY=US
+COUNTRY=us
 
 # echo "Looking up '$LANGNAME'"
 
-line=$(grep "^$LANGNAME" $languages || true)
+line=`grep "^$LANGNAME" $languages`
 #echo L: $line 1>&2
-
-log "line=$line"
 
 if [ "$line" ] ; then
     OLD_IFS="$IFS"
@@ -49,12 +47,6 @@ if [ "$line" ] ; then
     if [ -z "$LANGUAGELIST" ] ; then
 	LANGUAGELIST="$LANGUAGE"
     fi
-
 else
     echo "error: Unable to locate info on language '$LANGNAME'"
-    log "error: Unable to locate info on language '$LANGNAME'"
 fi
-
-# bubulle 5/15/2004 : needed when choosing "English (C)". I've been unable to 
-# sort out why
-exit 0
