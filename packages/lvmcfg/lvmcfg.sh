@@ -246,7 +246,7 @@ vg_mainmenu() {
 		db_get lvmcfg/vgmenu
 
 		VGRET=`echo "$RET" | \
-			sed -e 's,^\(.*\)[[:space:]].*,\1,' | \
+			sed -e 's/[[:space:]].*//' | \
 			tr '[A-Z]' '[a-z']`
 		vgscan >>/var/log/messages 2>&1
 		case "$VGRET" in
@@ -517,7 +517,7 @@ lv_mainmenu() {
 		db_get lvmcfg/lvmenu
 
 		LVRET=`echo "$RET" | \
-			sed -e 's,^\(.*\)[[:space:]].*,\1,' | \
+			sed -e 's/[[:space:]].*//' | \
 			tr '[A-Z]' '[a-z']`
 		vgscan >>/var/log/messages 2>&1
 		case "$LVRET" in
