@@ -230,11 +230,10 @@ get_ide_floppy_info() {
 	esac
 }
 
+# TODO: This should be removed once rootskel 1.10 is in testing.
 get_input_info() {
 	case $SUBARCH in
 		powerpc/chrp*|powerpc/prep)
-		  # TODO: i8042 and atkbd should be removed from here once
-		  # rootskel 1.10 is in testing.
 		  echo "i8042:i8042 PC Keyboard controller"
 		  register-module i8042
 		  echo "atkbd:AT keyboard support"
