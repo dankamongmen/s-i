@@ -31,7 +31,7 @@ install-recursive: $(outdir)
 	fi
 	@list='$(subdirs)'; for subdir in $$list; do \
 	  echo "Making install in $$subdir"; \
-	  (cd $$subdir && $(MAKE) install) \
+	  (cd $$subdir && $(MAKE) install) || exit 1; \
 	done
 
 clean: clean-local clean-recursive
