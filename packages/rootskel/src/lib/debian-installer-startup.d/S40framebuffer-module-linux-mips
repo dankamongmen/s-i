@@ -1,0 +1,15 @@
+if [ -n "$TERM_FRAMEBUFFER_TRY" -a "`debconf-get debian-installer/framebuffer`" = true ]; then
+	case "`archdetect`" in
+		mips/sb1-swarm-bn | mipsel/sb1-swarm-bn)
+			echo "Trying to enable the frame buffer..."
+			modprobe -q matroxfb_base >/dev/null 2>&1 || \
+			modprobe -q rivafb >/dev/null 2>&1 || \
+			modprobe -q aty128fb >/dev/null 2>&1 || \
+			modprobe -q clgenfb >/dev/null 2>&1 || \
+			modprobe -q radeonfb >/dev/null 2>&1 || \
+			modprobe -q sstfb >/dev/null 2>&1 || \
+			modprobe -q tdfxfb >/dev/null 2>&1 || \
+			modprobe -q atyfb >/dev/null 2>&1 || \
+			true
+	esac
+fi

@@ -22,6 +22,11 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
     files += \
 	S45keyboard-linux-powerpc
   endif
+
+  ifneq (,$(filter mips mipsel,$(DEB_HOST_GNU_CPU)))
+    files += \
+	S40framebuffer-module-linux-mips
+   endif
 endif
 
 include ../../../Makefile.inc
