@@ -65,7 +65,7 @@ get_retriever(void)
 {
     char *retriever = NULL, *colon_p = NULL;
 
-    debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
+    debconf_get(debconf, ANNA_RETRIEVER);
     if (debconf->value != NULL)
         colon_p = strchr(debconf->value, ':');
     if (colon_p != NULL) {

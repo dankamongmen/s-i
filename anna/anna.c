@@ -19,7 +19,7 @@ choose_retriever(di_packages *status, di_packages **packages __attribute__((unus
     choices = list_to_choices(retrievers);
     if (!choices)
         di_log(DI_LOG_LEVEL_ERROR, "can't build choices");
-    debconf->command(debconf, "FGET", ANNA_RETRIEVER, "seen", NULL);
+    debconf_fget(debconf, ANNA_RETRIEVER, "seen");
     if (strcmp(debconf->value, "false") == 0) {
         const char *retriever = get_default_retriever(choices);
         char buf[200];
@@ -27,13 +27,13 @@ choose_retriever(di_packages *status, di_packages **packages __attribute__((unus
 
         if (retriever && (p = di_packages_get_package(status, retriever, 0))) {
             package_to_choice(p, buf, 200);
-            debconf->command(debconf, "SET", ANNA_RETRIEVER, buf, NULL);
+            debconf_set(debconf, ANNA_RETRIEVER, buf);
         }
     }
 
-    debconf->command(debconf, "FSET", ANNA_RETRIEVER, "seen", "false", NULL);
-    debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES", choices, NULL);
-    debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
+    debconf_fset(debconf, ANNA_RETRIEVER, "seen", "false");
+    debconf_subst(debconf, ANNA_RETRIEVER, "CHOICES", choices);
+    debconf_input(debconf, "medium", ANNA_RETRIEVER);
 
     di_free(retrievers);
     di_free(choices);
@@ -59,8 +59,8 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     *packages = get_packages(*packages_allocator);
 
     if (*packages == NULL) {
-        debconf->command(debconf, "INPUT critical", ANNA_NO_MODULES, NULL);
-        debconf->command(debconf, "GO", NULL);
+        debconf_input(debconf, "critical", ANNA_NO_MODULES);
+        debconf_go(debconf);
         return 4;
     }
 
@@ -143,9 +143,9 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 
     qsort(package_array, package_count, sizeof(di_package *), package_array_compare);
     choices = list_to_choices(package_array);
-    debconf->command(debconf, "FSET", ANNA_CHOOSE_MODULES, "seen", "false", NULL);
-    debconf->command(debconf, "SUBST", ANNA_CHOOSE_MODULES, "CHOICES", choices, NULL);
-    debconf->command(debconf, "INPUT medium", ANNA_CHOOSE_MODULES, NULL);
+    debconf_fset(debconf, ANNA_CHOOSE_MODULES, "seen", "false");
+    debconf_subst(debconf, ANNA_CHOOSE_MODULES, "CHOICES", choices);
+    debconf_input(debconf, "medium", ANNA_CHOOSE_MODULES);
 
     di_free(choices);
     di_free(package_array);
@@ -161,7 +161,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
     char *f, *fp, *dest_file;
     int ret = 0, pkg_count = 0;
 
-    debconf->command(debconf, "GET", ANNA_CHOOSE_MODULES, NULL);
+    debconf_get(debconf, ANNA_CHOOSE_MODULES);
     if (debconf->value != NULL) {
         char *choices = debconf->value;
 
@@ -185,7 +185,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
     // Short-circuit if there's no packages to install
     if (pkg_count <= 0)
         return 0;
-    debconf->commandf(debconf, "PROGRESS START 0 %d anna/progress_title", 2*pkg_count);
+    debconf_progress_start(debconf, 0, 2*pkg_count,  "anna/progress_title");
     for (node = packages->list.head; node; node = node->next) {
         package = node->data;
         if (package->type == di_package_type_real_package && package->status_want == di_package_status_want_install) {
@@ -200,39 +200,39 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
             if (asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f) == -1) 
                 return 5;
 
-            debconf->command(debconf, "SUBST", "anna/progress_step_retr", "PACKAGE", package->package, NULL);
-            debconf->command(debconf, "SUBST", "anna/progress_step_inst", "PACKAGE", package->package, NULL);
-            debconf->command(debconf, "PROGRESS", "INFO", "anna/progress_step_retr", NULL);
+            debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
+            debconf_subst(debconf, "anna/progress_step_inst", "PACKAGE", package->package);
+            debconf_progress_info(debconf, "anna/progress_step_retr");
             if (get_package(package, dest_file)) {
-                debconf->command(debconf, "PROGRESS STOP", NULL);
-                debconf->command(debconf, "SUBST", "anna/retrieve_failed", "PACKAGE", package->package, NULL);
-                debconf->command(debconf, "INPUT critical", "anna/retrieve_failed", NULL);
-                debconf->command(debconf, "GO", NULL);
+                debconf_progress_stop(debconf);
+                debconf_subst(debconf, "anna/retrieve_failed", "PACKAGE", package->package);
+                debconf_input(debconf, "critical", "anna/retrieve_failed");
+                debconf_go(debconf);
                 free(dest_file);
                 ret = 6;
                 break;
             }
             if (!md5sum(package->md5sum, dest_file)) {
-                debconf->command(debconf, "PROGRESS STOP", NULL);
-                debconf->command(debconf, "SUBST", "anna/md5sum_failed", "PACKAGE", package->package, NULL);
-                debconf->command(debconf, "INPUT critical", "anna/md5sum_failed", NULL);
-                debconf->command(debconf, "GO", NULL);
+                debconf_progress_stop(debconf);
+                debconf_subst(debconf, "anna/md5sum_failed", "PACKAGE", package->package);
+                debconf_input(debconf, "critical", "anna/md5sum_failed");
+                debconf_go(debconf);
                 unlink(dest_file);
                 free(dest_file);
                 ret = 7;
                 break;
             }
-            debconf->command(debconf, "PROGRESS", "STEP", "1", NULL);
-            debconf->command(debconf, "PROGRESS", "INFO", "anna/progress_step_inst", NULL);
+            debconf_progress_step(debconf, 1);
+            debconf_progress_info(debconf, "anna/progress_step_inst");
 #ifdef LIBDI_SYSTEM_DPKG
             if (di_system_dpkg_package_unpack(status, package->package, dest_file, status_allocator)) {
 #else
             if (!unpack_package(dest_file)) {
 #endif
-                debconf->command(debconf, "PROGRESS STOP", NULL);
-                debconf->command(debconf, "SUBST", "anna/install_failed", "PACKAGE", package->package, NULL);
-                debconf->command(debconf, "INPUT critical", "anna/install_failed", NULL);
-                debconf->command(debconf, "GO", NULL);
+                debconf_progress_stop(debconf);
+                debconf_subst(debconf, "anna/install_failed", "PACKAGE", package->package);
+                debconf_input(debconf, "critical", "anna/install_failed");
+                debconf_go(debconf);
                 unlink(dest_file);
                 free(dest_file);
                 ret = 8;
@@ -240,11 +240,11 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
             }
             unlink(dest_file);
             free(dest_file);
-            debconf->command(debconf, "PROGRESS", "STEP", "1", NULL);
+            debconf_progress_step(debconf, 1);
         }
     }
 
-    debconf->command(debconf, "PROGRESS STOP", NULL);
+    debconf_progress_stop(debconf);
 
     return ret;
 }
@@ -262,7 +262,7 @@ main()
     di_packages_allocator *packages_allocator = NULL, *status_allocator;
 
     debconf = debconfclient_new();
-    debconf->command(debconf, "CAPB", "backup", NULL);
+    debconf_capb(debconf, "backup");
 
     di_system_init("anna");
 
@@ -275,7 +275,7 @@ main()
         ret = states[state](status, &packages, &packages_allocator);
         if (ret != 0)
             state = -1;
-        else if (debconf->command(debconf, "GO", NULL) == 0)
+        else if (debconf_go(debconf) == 0)
             state++;
         else
         {
