@@ -147,7 +147,8 @@ choose_modules(void)
         next = node->next;
         p = (struct package_t *)node->data;
         /* If p->filename is NULL, it's a virtual package */
-        if (p->filename != NULL && di_pkg_find(instlist, p->package) == NULL)
+        if (p->filename != NULL && di_pkg_find(instlist, p->package) == NULL &&
+	    p->installer_menu_item > 0)
             askpkgs[ask_count++] = p;
         free(node);
     }
