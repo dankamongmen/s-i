@@ -32,10 +32,7 @@ clean:
 	dh_clean
 
 # cvs update -P will remove these dirs if they are empty
-DIRS=proc var/log mnt floppy
-
-# This is a list of the devices we want to create
-DEVS=log console kmem mem null ram0 ram tty0 tty1 tty2 tty3 tty4 hda hdb hdc hdd fd0
+DIRS=dev proc var/log mnt floppy
 
 
 install: build
@@ -46,10 +43,6 @@ install: build
 	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
 	$(foreach DIR, $(DIRS), \
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
-	mkdir -p debian/rootskel/dev/
-	$(foreach DEV, $(DEVS), \
-	(cp -dpR /dev/$(DEV) debian/rootskel/dev/ ) ; )
-
 
 
 # Build architecture-independent files here.
