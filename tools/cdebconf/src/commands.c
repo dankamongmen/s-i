@@ -141,7 +141,7 @@ command_capb(struct confmodule *mod, char *arg)
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     /* FIXME: frontend.h should provide a method to prevent direct
-     *        access to capability membre */
+     *        access to capability member */
     mod->frontend->capability = 0;
     for (i = 0; i < argc; i++)
         if (strcmp(argv[i], "backup") == 0)
