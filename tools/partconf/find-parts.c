@@ -173,10 +173,8 @@ get_all_partitions(struct partition *parts[], const int max_parts)
         p->fstype = NULL;
         p->fsid = NULL;
         p->size = 0L;
-        p->hinting = 0;
         p->op.filesystem = NULL;
         p->op.mountpoint = NULL;
-        p->op.mountopts = NULL;
         p->op.done = 0;
         test_lvm(p);
         test_evms(p);

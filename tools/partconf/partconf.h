@@ -4,8 +4,6 @@
 #include <parted/parted.h>
 #include <stdarg.h>
 
-#include <cdebconf/debconfclient.h>
-
 #define FS_ID_SWAP      "82"
 #define FS_ID_LINUX     "83"
 #define FS_ID_LVM       "8E"
@@ -20,7 +18,6 @@
 struct operation {
     char                *filesystem; /* 'swap' is special case */
     char                *mountpoint;
-    char                *mountopts;
     int                  done;
 };
 
@@ -30,7 +27,6 @@ struct partition {
     char                *fstype;
     char                *fsid;
     long long            size;
-	int					 hinting;
     struct operation     op;
 };
 
@@ -42,6 +38,5 @@ void     append_message(const char *fmt, ...);
 
 /* find-parts.c */
 int      get_all_partitions(struct partition *parts[], const int max_parts);
-void	 makedirs(const char *dir);
 
 #endif /* PARTCONF_H_ */
