@@ -8,16 +8,22 @@ else
 	echo "error: $0: Unable to find /sbin/discover"
 fi
 
-if [ -x /sbin/lspci ] ; then
+LSPCI=/sbin/lspci
+if [ -x /target/sbin/lspci ] ; then
+	LSPCI=/target/sbin/lspci
+fi
+
+if [ -x $LSPCI ] ; then
 	(
-		/sbin/lspci -v -t || true
-		/sbin/lspci -n || true
-		/sbin/lspci -v || true
+		$LSPCI -v -t || true
+		$LSPCI -n || true
+		$LSPCI -v || true
 		echo "For use with 'lspci -F':"
-		/sbin/lspci -x || true
+		$LSPCI -x || true
 	)| sed "s%^%info: $0: lspci: %"
 else
-	echo "error: $0: Unable to find /sbin/lspci"
+	echo "error: $0: Unable to find lspci."
+	cat /proc/pci | sed "s%^%info: $0: /proc/pci: %"
 fi
 
 if [ -x /sbin/lsmod ] ; then
@@ -34,9 +40,17 @@ for file in cpuinfo ioports iomem interrupts meminfo ; do
 	fi
 done
 
-for disk in `sed -ne '/\(ide\|scsi\).*\/disc/s%[^/]* \([^ ]*\).*%/dev/\1%p' /proc/partitions` ; do 
-    /sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
-done
+HDPARM=/sbin/hdparm
+if [ -x /target/sbin/hdparm ] ; then
+	HDPARM=/target/sbin/hdparm
+fi
+if [ -x $HDPARM ] ; then
+	for disk in `sed -ne '/\(ide\|scsi\).*\/disc/s%[^/]* \([^ ]*\).*%/dev/\1%p' /proc/partitions` ; do 
+		/sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
+	done
+else
+	echo "error: $0: Unable to find hdparm."
+fi
 
 #grep /disc < /proc/partitions | while read line; do
 #    part=`echo $line | cut -f4 -d' '`
