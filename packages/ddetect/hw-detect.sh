@@ -64,6 +64,7 @@ load_module() {
 		newdevs="$(compare_devs "$olddevs" "$devs")"
 
 		if [ -n "$newdevs" -a -n "$cardname" ]; then
+			mkdir -p /etc/network
 			for dev in $newdevs; do
 				echo "${dev}:${cardname}" >> /etc/network/devnames
 			done
