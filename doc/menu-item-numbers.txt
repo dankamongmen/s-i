@@ -2,19 +2,29 @@ This is a list of the menu-item numbers we have currently assigned.
 If you need a number, don't just grab one, ask on debian-boot@lists.debian.org
 first.
 
+Please do not allocate numbers with too high a granularity. If you have two
+packages, A and B, and A depends on B, then main-menu will always put A
+after B. There is no need to assign different numbers to the two; one
+number will do and will be more flexible, and help avoid BASIC line number
+disease. In other words, hacing a bunch of menu items with the same number
+is a bug, not a feature. Use different menu items only to break ties and do
+gross positioning in the menu.
+
+TODO: Take above advice into account in the list below..
+
 0 -> 10 Reserved
 
-10 -> 20 Preparation
+10 -> 30 Preparation and installer setup
 10 languagechooser
-11 ethdetect
+13 load-floppy
+15 ethdetect
    s390-netdevice (s390)
-12 netcfg-dhcp (!s390)
-13 netcfg-static
-14 choose-mirror
-15 cdrom-detect
-
-20 -> 30 Installer setup
-25 anna
+18 netcfg-dhcp
+20 netcfg-static
+   cdrom-detect
+   choose-mirror
+   load-installer
+   download-installer
 
 30 -> 40 Disk detection & etc
 35 hw-detect-full (!s390)
