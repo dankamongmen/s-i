@@ -3,63 +3,108 @@
 # Prepare to run base-config after reboot
 set -e
 
-# Only here for woody installs (ie, skolelinux)
-. /usr/share/debconf/confmodule
-if db_get mirror/suite && [ "$RET" ] ; then
-    SUITE="$RET"
-fi
-(
-    echo "# inserted by prebaseconfig"
-    echo "SUITE=\"$SUITE\""
-) >> /target/root/dbootstrap_settings
+log() {
+    logger -t prebaseconfig "$@"
+}
 
-# Since this script is running with debconf, 'tty' does
-# not give reliable answers about what sort of terminal
-# we have.  The stdin of /sbin/debian-installer seems
-# to tell the truth.
-rawconsole=$(readlink /proc/$(pidof debian-installer)/fd/0)
-console=$(mapdevfs "$rawconsole")
-rawconsole=${rawconsole#/dev/}
-console=${console#/dev/}
-
-case "$console" in
-ttyS*)
-    ttyspeed=$(chroot /target stty --file /dev/$console speed)
-    ttyline=${console#ttyS}
-    ttyterm="$TERM"
-
-    if [ -z "$ttyterm" ]; then ttyterm=vt100; fi
-    if [ -z "$ttyspeed" ]; then ttyspeed=9600; fi
-    sed -e "s/^\([1-6]\):/#\1:/" \
-	-e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
-            /target/etc/inittab > /target/etc/inittab.real
-    echo "# serial console added by debian-installer" >> /target/etc/securetty
-    echo "$rawconsole" >> /target/etc/securetty
-    if [ -n "$console" ] && [ "$console" != "$rawconsole" ]; then
-	echo "$console" >> /target/etc/securetty
+config_dbootstrap () {
+    # Only here for woody installs (ie, skolelinux)
+    . /usr/share/debconf/confmodule
+    if db_get mirror/suite && [ "$RET" ] ; then
+        SUITE="$RET"
     fi
+    (
+        echo "# inserted by prebaseconfig"
+        echo "SUITE=\"$SUITE\""
+    ) >> /target/root/dbootstrap_settings
+}
 
-    sed -e "s/^\([23]\):/#\1:/" \
-        -e "s#CONSOLEDEV#/dev/$console#g" \
-	/usr/share/prebaseconfig/inittab > /target/etc/inittab
-;;
-*)
-    mv /target/etc/inittab /target/etc/inittab.real
-    sed -e "s#CONSOLEDEV#/dev/$console#g" /usr/share/prebaseconfig/inittab \
-        > /target/etc/inittab
-;;
-esac
+test_ssh_install () {
+    if [ "$TERM_TYPE" != network ] ; then
+        return 1
+    fi
+    # Check if network-console-config has been installed
+    if chroot /target dpkg -l network-console-config 2>/dev/null | grep "^ii" ; then
+        return 0
+    else
+        return 1
+    fi
+}
 
-# Set up /dev/cdrom link to point to the device used for /media/cdrom0 in
-# /target; various programs including base-config want a /dev/cdrom.
-CDDEV=$(grep "[[:space:]]/media/cdrom0[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
-if [ -z "$CDDEV" ]; then
-	CDDEV=$(grep "[[:space:]]/media/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+config_inittab () {
+    # Since this script is running with debconf, 'tty' does
+    # not give reliable answers about what sort of terminal
+    # we have.  The stdin of /sbin/debian-installer seems
+    # to tell the truth.
+
+    # If the installation is run using network-console (over ssh),
+    # there can be two debian-installer processes; only use the first.
+
+    inst_pid=$(pidof debian-installer | cut -d" " -f1)
+    rawconsole=$(readlink /proc/${inst_pid}/fd/0)
+    console=$(mapdevfs "$rawconsole")
+    rawconsole=${rawconsole#/dev/}
+    console=${console#/dev/}
+
+    case "$console" in
+    ttyS*)
+        log "Configuring /etc/inittab to run base-config for serial console"
+        ttyspeed=$(chroot /target stty --file /dev/$console speed)
+        ttyline=${console#ttyS}
+        ttyterm="$TERM"
+
+        if [ -z "$ttyterm" ]; then ttyterm=vt100; fi
+        if [ -z "$ttyspeed" ]; then ttyspeed=9600; fi
+        sed -e "s/^\([1-6]\):/#\1:/" \
+            -e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
+                /target/etc/inittab > /target/etc/inittab.real
+        echo "# serial console added by debian-installer" >> /target/etc/securetty
+        echo "$rawconsole" >> /target/etc/securetty
+        if [ -n "$console" ] && [ "$console" != "$rawconsole" ]; then
+            echo "$console" >> /target/etc/securetty
+        fi
+
+        sed -e "s/^\([23]\):/#\1:/" \
+            -e "s#CONSOLEDEV#/dev/$console#g" \
+            /usr/share/prebaseconfig/inittab > /target/etc/inittab
+        ;;
+    *)
+        log "Configuring /etc/inittab to run base-config for regular console"
+        mv /target/etc/inittab /target/etc/inittab.real
+        sed -e "s#CONSOLEDEV#/dev/$console#g" /usr/share/prebaseconfig/inittab \
+            > /target/etc/inittab
+    ;;
+    esac
+}
+
+create_cd_link () {
+    # Set up /dev/cdrom link to point to the device used for /media/cdrom0 in
+    # /target; various programs including base-config want a /dev/cdrom.
+    CDDEV=$(grep "[[:space:]]/media/cdrom0[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+    if [ -z "$CDDEV" ]; then
+        CDDEV=$(grep "[[:space:]]/media/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+    fi
+    if [ -z "$CDDEV" ]; then
+        CDDEV=$(grep "[[:space:]]/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+    fi
+    if [ -n "$CDDEV" ] && [ -e "/target/$CDDEV" ]; then
+        chown 0:24 /target$CDDEV || true
+        ln -sf "$CDDEV" /target/dev/cdrom
+    fi
+}
+
+## MAINLINE
+config_dbootstrap
+
+if test_ssh_install ; then
+    # Note: this test fixes #279090
+    # Maybe the configuration of /etc/inittab for serial console is
+    # something that _should_ be done in this situation (without
+    # starting base-config); but as it was not done in the old
+    # situation, we leave /etc/inittab as is.
+    log "Network installation: not configuring /etc/inittab to run base-config after reboot"
+else
+    config_inittab
 fi
-if [ -z "$CDDEV" ]; then
-	CDDEV=$(grep "[[:space:]]/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
-fi
-if [ -n "$CDDEV" ] && [ -e "/target/$CDDEV" ]; then
-	chown 0:24 /target$CDDEV || true
-	ln -sf "$CDDEV" /target/dev/cdrom
-fi
+
+create_cd_link
