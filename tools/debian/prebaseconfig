@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Run Debian second stage installer (base-config) from within the
+# first stage installer (debian-installer).
+
+. /usr/share/debconf/confmodule
+
+if db_get "debian-installer/inline-base-config" && [ "true" = "$RET" ] ; then
+    # Continue
+    :
+else
+    # Not running base-config
+    exit 0
+fi
+
+targetdir=/target
+
+# These are unset to make sure a new instance of debconf is started
+# within the chroot environment
+unset DEBIAN_HAS_FRONTEND # Set by debconf
+unset DEBCONF_REDIR       # Set by debconf
+unset DEBIAN_FRONTEND     # Just to be sure
+unset DEBCONF_FRONTEND    # Probably not used any more [pere 2003-01-18]
+
+mount -t proc proc $targetdir/proc
+
+# Make sure to enable devfsd if installed.  It is needed to get CDROM
+# symlinks pointing to the right spot.  We must start it before we
+# make dummy start-stop-daemon
+if [ -x $targetdir/etc/init.d/devfsd ] ; then
+    chroot $targetdir /etc/init.d/devfsd start
+fi
+
+# Make sure we do not start any daemons in the chroot environment
+mv $targetdir/sbin/start-stop-daemon $targetdir/sbin/start-stop-daemon.debian
+cat > $targetdir/sbin/start-stop-daemon <<EOF
+#!/bin/sh
+echo 1>&2
+echo 'Warning: Fake start-stop-daemon called, doing nothing.' 1>&2
+exit 0
+EOF
+chmod a+rx $targetdir/sbin/start-stop-daemon
+
+tty=/dev/console
+chroot $targetdir /usr/sbin/termwrap /usr/sbin/base-config new < $tty > $tty
+
+# Undo hack to avoid starting daemons
+mv $targetdir/sbin/start-stop-daemon.debian $targetdir/sbin/start-stop-daemon
+
+if [ -x $targetdir/etc/init.d/devfsd ] ; then
+    chroot $targetdir /etc/init.d/devfsd stop
+fi
+
+umount $targetdir/proc
