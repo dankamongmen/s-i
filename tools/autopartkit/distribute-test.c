@@ -42,6 +42,14 @@ struct disk_info_t diskinfo[] = {
     { NULL, EMPTYGEOMETRY, 0, 0 }
 };
 
+static int
+cmp_spaceinfo_path(const void *ap, const void *bp)
+{
+    const struct disk_info_t *a = (const struct disk_info_t *)ap;
+    const struct disk_info_t *b = (const struct disk_info_t *)bp;
+    return strcmp(a->path, b->path);
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -71,6 +79,8 @@ main(int argc, char *argv[])
       {
         autopartkit_log(0, "no free space list, using hardcoded table.\n");
 	spaceinfo = diskinfo;
+        /* sort list on device path, order bus0 before bus1 */
+        qsort(spaceinfo, 3, sizeof(spaceinfo[0]), cmp_spaceinfo_path);
       }
 
     retval = distribute_partitions(spaceinfo, reqs);
