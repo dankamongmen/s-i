@@ -50,7 +50,7 @@ const char *subarch_analyze(void)
 		pos = strchr(line, ':');
 		if (pos == NULL)
 			continue;
-		while (*++pos && isblank(*pos));
+		while (*++pos && (*pos == '\t' || *pos == ' '));
 
 		if (strstr(line, "machine") == line)
 			strncpy(cpuinfo_machine, pos, sizeof(cpuinfo_machine));
