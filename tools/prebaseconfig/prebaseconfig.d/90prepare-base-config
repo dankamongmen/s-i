@@ -4,16 +4,6 @@
 
 set -e
 
-# XXX Obsolete, to be removed.
-. /usr/share/debconf/confmodule
-if db_get mirror/distribution && [ "$RET" ] ; then
-    SUITE="$RET"
-fi
-(
-    echo "# inserted by prebaseconfig"
-    echo "SUITE=\"$SUITE\""
-) >> /target/root/dbootstrap_settings
-
 # Look in /proc/cmdline for console=ttyS*, indicating a serial console
 # and fix inittab if so.
 console=$( echo " " $( cat /proc/cmdline ) " " | sed -n 's/^.* console=\([^ ]*\) .*$/\1/p' )
@@ -40,4 +30,3 @@ else
 fi
 
 cp /usr/share/prebaseconfig/inittab /target/etc/inittab
-
