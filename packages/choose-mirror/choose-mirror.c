@@ -193,7 +193,7 @@ static int get_protocol(void) {
 }
 
 static int choose_suite(void) {
-	debconf_input(debconf, "high", DEBCONF_BASE "suite");
+	debconf_input(debconf, "medium", DEBCONF_BASE "suite");
 	return 0;
 }
 

@@ -59,7 +59,7 @@ http: clean strip
 
 clean:
 	rm -f $(BIN) $(OBJS) *~ mirrors_*.h
-	rm -f debian/templates-countries
+	rm -f debian/templates-countries debian/httplist-countries debian/ftplist-countries
 	rm -f demo demo.templates
 
 reallyclean:
