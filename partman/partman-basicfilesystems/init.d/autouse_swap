@@ -1,0 +1,27 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+partitions=
+for dev in /var/lib/partman/devices/*; do
+    [ -d "$dev" ] || continue
+    cd $dev
+    open_dialog PARTITIONS
+    while { read_line num id size type fs path name; [ "$id" ]; }; do
+	[ -f $id/detected_filesystem ] || continue
+	fs=$(cat $id/detected_filesystem)
+	if [ "$fs" = linux-swap ]; then
+	    partitions="$partitions $dev,$id"
+	fi
+    done
+    close_dialog
+done
+
+for part in $partitions; do
+    dev=${part%,*}
+    id=${part#*,}
+    [ -d $dev/$id ] || continue
+    echo keep >$id/method
+    update_partition $dev $id
+done
+

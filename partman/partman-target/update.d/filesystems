@@ -33,13 +33,27 @@ else
     property=existing
 fi
 
+# sed can be removed here
 filesystems=$(
     for i in /lib/partman/valid_filesystems/*; do
 	if [ -x $i ]; then $i $dev $id "$property"; fi
-    done 
+    done | sed "s/${TAB}.*//"
 )
 
-echo "$filesystems" >$dev/$id/available_filesystems
+available=''
+for fs in $filesystems; do
+    if [ "$fs" ]; then
+	db_metaget partman/filesystem_long/$fs description || RET=''
+	RET=${RET:-$fs}
+	if [ "$available" ]; then
+	    available="${available}${NL}${fs}${TAB}${RET}"
+	else
+	    available="${fs}${TAB}${RET}"
+	fi
+    fi
+done
+
+echo "$available" >$dev/$id/available_filesystems
 
 if [ -f $id/acting_filesystem ]; then
     old_acting=$(cat $id/acting_filesystem)
@@ -48,14 +62,14 @@ else
 fi
 
 # The outer echo removes the spaces
-case $(echo $(echo "$filesystems" | wc -l)) in
+case $(echo $(echo "$available" | wc -l)) in
     0)
 	if [ -f $id/acting_filesystem ]; then
 	    rm $id/acting_filesystem
 	fi
 	;;
     1)
-	echo ${filesystems%$TAB*} >$id/acting_filesystem
+	echo ${available%$TAB*} >$id/acting_filesystem
 	;;
     *)
 	if [ -f $id/filesystem ]; then

@@ -70,8 +70,8 @@ them to undo their partitioning operations.
 <package>partman</package> opens the main partitioning menu; it may
 look like this one:
 <example>
-+-------------------+ [!!] Debian Installer Main Menu +-------------------+
-|         Please choose a partition, free space or device to edit         |
++------------------+ [!!] Partition the storage devices +-----------------+
+|             Partition, free space or device to be modified              |
 |                                                                         |
 |        ------- IDE1 master - Seagate U Series 40810 (40.0 GB)           |
 |         #3 primary    2.1 GB B F ext3       /                           |
@@ -101,17 +101,19 @@ choose a partition they are offered with a menu with various editing
 operations:
 
 <example>
-+-------------------+ [!!] Debian Installer Main Menu +-------------------+
-|          Please choose what to do with the chosen partition.            |
++------------------+ [!!] Partition the storage devices +-----------------+
+|                    Settings on the partition:                           |
 |                                                                         |
-|                Choose how this partition should be used                 |
-|                Choose a filesystem                                      |
-|                Specify mountpoint for this partition                    |
-|                Turn bootable flag on                                    |
-|                Resize the partition                                     |
-|                Copy here data from another partition                    |
-|                Delete the partition                                     |
-|                Finished with this partition                             |
+|           Usage method:          format the partition                   |
+|           File system:           ext3                                   |
+|           Mount point:           /var/mail                              |
+|           Mount options:         noatime,nodev,nosuid,noexec,usrquota   |
+|           Bootable flag:         off                                    |
+|           Size:                  995.2 MB                               |
+|           Choose this if you are satisfied with the above settings      |
+|           -----------------------------------------------------         |
+|           Copy here data from another partition                         |
+|           Delete the partition                                          |
 |                                                                         |
 |      &lt;Go Back&gt;                                          &lt;Continue&gt;      |
 |                                                                         |
@@ -357,13 +359,13 @@ items in the menu.
 <p> The partitioning starts with the menu of the menu-directory
 <file>/lib/partman/choose_partition</file>.  This is the main
 partitioning menu.  Every udeb is allowed to install new items in it.
-If the script <prgn>do_option</prgn> exits with exit-code from 0 to 99
-the user will be shown again the main partitioning menu.  If the
-script exits with exit-code from 100 to 254 this means that the
-partitioning should is finished.  In this case the scripts from
-<prgn>commit.d</prgn> and <prgn>finish.d</prgn> will be executed as
-described in <ref id="basics">.  If the script <prgn>do_option</prgn>
-exits with exit code 255 the partitioning will be aborted immediately.
+If the script <prgn>do_option</prgn> exits with exit-code 0 the user
+will be shown again the main partitioning menu.  If the script exits
+with exit-code 100 this means that the partitioning should be
+finished.  In this case the scripts from <prgn>commit.d</prgn> and
+<prgn>finish.d</prgn> will be executed as described in <ref
+id="basics">.  If the script <prgn>do_option</prgn> exits with exit
+code 255 the partitioning will be aborted immediately.
 
 <p> The main partitioning menu always contains an item for every
 partitioned storage device, an item for every partition and an item
@@ -384,12 +386,12 @@ second argument is the id of the free space.
 <file>/lib/partman/active_partition</file> will be opened.  The first
 argument given to <prgn>choices</prgn> is the device directory.  The
 second argument is the id of the chosen partition.  If the script
-<prgn>do_option</prgn> exits with exit-code from 0 to 99 the user will
-be shown again the menu <prgn>active_partition</prgn> for the same
-partition.  If the script <prgn>do_option</prgn> exits with exit-code
-from 100 to 255 the user will be returned back to the main
-partitioning menu.  This should happen when the id of the partition is
-invalidated, for example when the partition is deleted or resized.
+<prgn>do_option</prgn> exits with exit-code 0 the user will be shown
+again the menu <prgn>active_partition</prgn> for the same partition.
+`If the script <prgn>do_option</prgn> exits with exit-code 100 or 255
+the user will be returned back to the main partitioning menu.  This
+should happen when the id of the partition is invalidated, for example
+when the partition is deleted or resized.
 
 <p> In the main partitioning menu the partitions are presented by
 lines of this kind:
@@ -457,11 +459,11 @@ user will be provided with options to choose file systems for the
 partitions, specify wether they should be formated and select mount
 points.  The package <package>partman-target</package> adds to the
 menu directory <file>/lib/partman/active_partition</file> the item
-`Choose how this partition should be used'.  If the user chooses this
-item the menu directory <file>/lib/partman/choose_method</file> will
-be opened.  The scripts <prgn>choices</prgn> from
-<prgn>choose_method</prgn> are given the device directory as first
-argument and the partition id as second argument.
+`Usage method:'.  If the user chooses this item the menu directory
+<file>/lib/partman/choose_method</file> will be opened.  The scripts
+<prgn>choices</prgn> from <prgn>choose_method</prgn> are given the
+device directory as first argument and the partition id as second
+argument.
 
 <p> The package <package>partman-basicmethods</package> adds in the
 menu of the menu directory <prgn>choose_method</prgn> three items: `Do
@@ -479,6 +481,23 @@ example if the user chooses to `format the partition' the contents of
 this file will be `format' and if the user chooses to `keep and use
 the existing data' the contents of this file will be `keep'.
 Partitions that won't be used do not have a file <prgn>method</prgn>.
+
+<p>The udebs providing methods may provide also translatable names of
+the methods for the user interface using debconf templates named
+<prgn>partman/method_long/<var>some_method</var></prgn> and
+<prgn>partman/method_short/<var>some_method</var></prgn>.  For example
+the package <package>partman-palo</package> providing method
+<prgn>palo</prgn> can provide also the following debconf templates:
+
+<example>
+Template: partman/method_long/palo
+Type: text
+_Description: Palo boot partition
+
+Template: partman/method_short/palo
+Type: text
+_Description: Palo
+</example>
 
 <p> Another job for the scripts <prgn>do_option</prgn> of the menu
 directory <prgn>choose_method</prgn> is to create or remove a file
@@ -505,17 +524,11 @@ then the job of the script is to check if the specified partition can
 be formated and used.  If the third argument is `existing' then the
 job of the script is to check if the partition can be used withour
 formatting.  In either case if the partition can be used then the
-script should print a line having the form
-<example>
-ext2&lt;TAB&gt;Extended 2
-</example>
-Here <tt>&lt;TAB&gt;</tt> is ASCII 9.  After &lt;TAB&gt; stays some
-description of the file system that is suitable to be presented to the
-user.  Before &lt;TAB&gt; stays an unique identifier of the type of
-the file system.
+script should print a line with the identifier of the type of the file
+system.
 
 <p> Packages that provide support for some file systems use the
-directory <file>/lib/partman/partman_names</file> to define a mapping
+directory <file>/lib/partman/parted_names</file> to define a mapping
 from the unique file system type identifiers to the names used by
 <prgn>parted_server</prgn>.  Suppose for example that the package
 providing support for UMSDOS file system chooses the string `umsdos'
@@ -525,15 +538,33 @@ contents is the string `fat16'.  This means that
 <prgn>parted_server</prgn> will know UMSDOS file systems as being
 fat16 file systems.
 
+<p>The udebs providing file systems may provide also translatable
+names of the file systems for the user interface using debconf
+templates named
+<prgn>partman/filesystem_long/<var>some_filesystem</var></prgn> and
+<prgn>partman/filesystem_short/<var>some_filesystem</var></prgn>.  For
+example the package <package>partman-ext3</package> providing file
+system with unique identifier <prgn>ext3</prgn> can provide also the
+following debconf templates:
+
+<example>
+Template: partman/filesystem_long/ext3
+Type: text
+_Description: Extended 3
+
+Template: partman/filesystem_short/ext3
+Type: text
+_Description: Ext3
+</example>
+
 <p> Most of the packages that provide support for a file system will
-have to add an item `Specify mountpoint for this partition' to the
-menu <prgn>active_partition</prgn>.  Ofcourse this item should be
-showed only when the contents of the file
-<prgn>acting_filesystem</prgn> is appropriate.  The chosen by the
-user mount point should be written in a file named
-<prgn>mountpoint</prgn> situated in the directory of the partition.
-If the user chooses not to mount this file system then the file
-<prgn>mountpoint</prgn> shoult be removed (if exists).
+have to add an item `Mount point:' to the menu
+<prgn>active_partition</prgn>.  Ofcourse this item should be showed
+only when the contents of the file <prgn>acting_filesystem</prgn> is
+appropriate.  The chosen by the user mount point should be written in
+a file named <prgn>mountpoint</prgn> situated in the directory of the
+partition.  If the user chooses not to mount this file system then the
+file <prgn>mountpoint</prgn> shoult be removed (if exists).
 
 <p> In order to be able to mount file systems and generate fstab the
   directories <file>/lib/partman/fstab.d/</file> and
@@ -841,6 +872,14 @@ terminate the communication dialog.
 
 
 <chapt> The commands of <prgn>parted_server</prgn>
+
+<p> You should be very carefull when you communicate with the
+<prgn>parted_server</prgn>.  If <prgn>parted_server</prgn> detects any
+error it will exit immediately.  This is safer approach then to try to
+resolve somehow the error.  However this also means that the user will
+not be shown any information about what happened and why the installer
+freezed.  The log-file <file>/var/log/partman</file> can be used to
+see the reasons why <prgn>parted_server</prgn> exited.
 
 <sect> Open a new device
 

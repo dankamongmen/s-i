@@ -27,11 +27,13 @@ while { read_line flag; [ "$flag" ]; }; do
 done
 close_dialog
 
-if [ $bootable = yes ]; then
-    db_metaget partman-partitioning/text/bootable_off description
-    printf "unbootable\t${RET}\n"
-else
-    db_metaget partman-partitioning/text/bootable_on description
-    printf "bootable\t${RET}\n"
-fi
+db_metaget partman-partitioning/text/bootable description
+description="$RET"
 
+if [ $bootable = yes ]; then
+    db_metaget partman-partitioning/text/on description
+    printf "unbootable\t%-25s%s\n" "$description" "${RET}"
+else
+    db_metaget partman-partitioning/text/off description
+    printf "bootable\t%-25s%s\n" "$description" "${RET}"
+fi

@@ -12,17 +12,22 @@ fs=$6
 path=$7
 name=$8
 
-db_metaget partman/text/free_space description
-
-if [ "$fs" = free ]; then
-    filesystem="$RET"
-elif [ -f $id/acting_filesystem ]; then
-    filesystem=$(cat $id/acting_filesystem)
-elif [ -f $id/detected_filesystem -a ! -f $id/method ]; then
-    filesystem=$(cat $id/detected_filesystem)
+if [ "$fs" != free ]; then
+    if [ -f $id/acting_filesystem ]; then
+	filesystem=$(cat $id/acting_filesystem)
+    elif [ -f $id/detected_filesystem -a ! -f $id/method ]; then
+	filesystem=$(cat $id/detected_filesystem)
+    else
+	filesystem=''
+    fi
+    RET=''
+    if [ "$filesystem" ]; then
+	db_metaget partman/filesystem_short/$filesystem description || RET=''
+    fi
+    RET="${RET:-$filesystem}"
 else
-    filesystem=''
+    db_metaget partman/text/free_space description
 fi
 
-printf " %-10s" "$filesystem" #TODO: language dependent length
+printf " %-10s" "$RET" #TODO: language dependent length
 

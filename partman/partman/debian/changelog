@@ -1,5 +1,41 @@
-partman (11) UNRELEASED; urgency=low
+partman (12) UNRELEASED; urgency=low
 
+  * Anton Zinoviev
+    - new release
+
+ -- Anton Zinoviev <zinoviev@debian.org>  Tue, 24 Feb 2004 19:28:56 +0200
+
+partman (11) unstable; urgency=low
+
+  * Anton Zinoviev
+    - in the menu for a storage device added new item to cancel the menu
+      (for debconf frontends without back button)
+    - sort the storage devices so that for example the devices on the
+      second IDE channel are not listed before the devices on the first
+      IDE channel
+    - in the main menu: swap finish and undo.  Changed the text of finish
+      and abort
+    - renumbered init.d/update_partitions (90->70),
+      init.d/filesystems_detected (91->71) and active_partition/finish
+      (99->75) 
+    - deactivated active_partition/chs (put "exit 0" in choices script)
+    - fixed bug in update.d/visual causing only the first word of the
+      partition name to be shown in the main menu
+    - visual.d/filesystem uses template partman/filesystem_short/... as
+      said in the new version of the documentation.
+    - definitions.sh (error_handler): added support for new undocumented
+      exception type 'No Implementation'
+    - definitions.sh (error_handler): use partman/exception_handler_note
+      instead of partman/exception_handler when there is only one one
+      alternative
+    - parted_server.c (command_get_resize_range): add
+      deactivate_exception_handler
+    - parted_server.c (resize_partition): add check for the case when
+      there is a file system but it can not be opened
+    - debian/templates: state that `partition the storage devices' is an
+      alternative partitioner rather than additional partitioning step in
+      the installer process
+  
   * Translations
     - Elian Myftiu
       - Updated Albanian (sq) translation
@@ -8,7 +44,7 @@ partman (11) UNRELEASED; urgency=low
     - Changwoo Ryu
       - Added Korean translation (ko.po)
 
- -- Anton Zinoviev <zinoviev@debian.org>  Mon, 16 Feb 2004 11:40:21 +0200
+ -- Anton Zinoviev <zinoviev@debian.org>  Tue, 24 Feb 2004 20:11:35 +0200
 
 partman (10) unstable; urgency=low
 

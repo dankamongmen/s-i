@@ -17,21 +17,32 @@ filesystem=$(cat $part/acting_filesystem)
 choice_mountpoint () {
     case "$filesystem" in
 	ext2|fat16|fat32)
+	    if [ -f $part/mountpoint ]; then
+		mp=$(cat $part/mountpoint)
+	    else
+		db_metaget partman-basicfilesystems/text/no_mountpoint description
+		mp="$RET"
+	    fi
 	    db_metaget partman-basicfilesystems/text/specify_mountpoint description
-	    printf "mountpoint\t$RET\n"
+	    printf "mountpoint\t%-25s%s\n" "$RET" "$mp"
 	    ;;
     esac
 }
 
 choice_options () {
+    if [ -f $part/mountoptions ]; then
+	options=$(cat $part/mountoptions|sed 's/ //g')
+    else
+	options=defaults
+    fi
     case "$filesystem" in
 	ext2)
 	    db_metaget partman-basicfilesystems/text/options description
-	    printf "options\t$RET\n"
+	    printf "options\t%-25s%.45s\n" "$RET" "$options"
 	    ;;
 	fat16|fat32)
 	    db_metaget partman-basicfilesystems/text/options description
-	    printf "fatoptions\t$RET\n"
+	    printf "fatoptions\t%-25s%.45s\n" "$RET" "$options"
 	    ;;
     esac
 }

@@ -1,16 +1,12 @@
 #!/bin/sh
 
-. /lib/partman/definitions.sh
-
 dev=$1
 id=$2
 method=$3
 
-db_metaget partman-basicfilesystems/text/swap description
-
 case $method in
     formatable)
-	printf "linux-swap\t${RET}\n"
+	echo linux-swap
 	;;
     existing)
 	[ -f $id/detected_filesystem ] || exit 0
@@ -18,7 +14,7 @@ case $method in
 	
 	case "$fs" in
 	    linux-swap)
-		printf "linux-swap\t${RET}\n"
+		echo linux-swap
 		;;
 	esac
 	;;
