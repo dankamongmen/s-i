@@ -45,7 +45,7 @@ fi
 while [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`" ]
 do
     CHOICES=""
-    for mod in $(find /lib/modules/*/kernel/drivers/net -type f | sed -re s/\.k?o$// | sed 's/.*\///' | sort); do
+    for mod in $(find /lib/modules/*/kernel/drivers/net -type f | sed s/\.o$// | sed s/\.ko$// | sed 's/.*\///' | sort); do
 	if [ -z "$CHOICES" ]; then
 		CHOICES="$mod"
 	else
