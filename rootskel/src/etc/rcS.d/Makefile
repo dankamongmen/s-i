@@ -6,10 +6,4 @@ files = \
 	S05init-pid \
 	S50sysklog
 
-ifeq ($(DEB_HOST_ARCH),i386)
-# workaround
-files += \
-	S10unix
-endif
-
 include ../../Makefile.inc
