@@ -1,5 +1,7 @@
-MODULES=$(FRONTEND_MODULES)
-SOBJS=$(addsuffix .so,$(FRONTEND_MODULES))
+include ../../../globalmakeflags
+
+MODULES=$(FRONTENDMODULES)
+SOBJS=$(addsuffix .so,$(FRONTENDMODULES))
 
 all:
 	@for module in $(MODULES); do \
