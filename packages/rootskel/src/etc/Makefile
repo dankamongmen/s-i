@@ -7,6 +7,7 @@ files = \
 	group \
 	inittab \
 	modules.conf \
+	nsswitch.conf \
 	passwd
 
 include ../Makefile.inc
