@@ -62,4 +62,11 @@ void autopartkit_error (int isfatal, const char * format, ...);
 /* from mapdevfs.c */
 char *normalize_devfs(const char* path);
 
+/* from lvm.c */
+int lvm_init(void);
+int lvm_init_dev(const char *devpath);
+int lvm_volumegroup_add_dev(const char *vgname, const char *devpath);
+char *lvm_create_logicalvolume(const char *vgname, const char *lvname,
+			       unsigned int mbsize);
+
 #endif /* AUTOPARTKIT_H */

@@ -462,7 +462,7 @@ linux_fstype_to_parted(const char *linux_fstype)
       return "linux-swap";
 #if defined(LVM_HACK)
   if (strcmp(linux_fstype,"lvm") == 0)
-      /* Creating with default FS and converting to LVM below */
+      /* Creating with any FS/partition type and converting to LVM below */
       return "linux-swap"; /* Use any format that is fast to create. */
 #endif /* LVM_HACK */
   else
@@ -881,7 +881,7 @@ nuke_all_partitions(void)
  * 0-bytes.  This is used to remove old headers from LVM partitions.
  */
 static int
-zero_dev(char *devpath, unsigned int length)
+zero_dev(const char *devpath, unsigned int length)
 {
     FILE *fp = fopen(devpath, "w");
     char buf[10240]; /* 10 KiB blocks */
@@ -902,6 +902,26 @@ zero_dev(char *devpath, unsigned int length)
 	i += size;
     }
     fclose(fp);
+    return 0;
+}
+
+/* Extract vgname, lvname and fstype from "lvm:tjener_vg:home0_lv:default". */
+static int
+split_string(const char *str, int separator, int elemcount, char *elements[])
+{
+    int elemnum;
+    const char *curp = str;
+    const char *nextp;
+
+    for (elemnum = 0 ; elemnum < elemcount; elemnum++)
+    {
+	nextp = strchr(curp, separator);
+	if (NULL == nextp)
+	    return -1;
+	elements[elemcount] = strndup(curp, nextp - curp);
+	curp = nextp + 1;
+    }
+    
     return 0;
 }
 
@@ -985,9 +1005,49 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 			req_tmp->fstype);
 	if (NULL == fs_type)
 	{
-	    autopartkit_log(1, "  fstype not handle by parted.  "
-			    "Passing it directly to fstab.\n");
-	    mountmap[partcount].devpath = strdup("none");
+	    char *devpath = NULL;
+	    autopartkit_log(1, "  fstype '%s' not handle by libparted.\n",
+			    req_tmp->fstype);
+#if defined(LVM_HACK)
+	    if ( 0 == strncmp("lvm:", req_tmp->fstype, 4) )
+	    {
+	        /* Create LVM logical volume with given FS.  Assuming
+		   LVM volume group is already created. */
+	        char *info[4]; /* 0='lvm', 1=vgname, 2=lvname, 3=fstype */
+		unsigned long mbsize = req_tmp->minsize;
+
+	        /* Extract vgname, lvname and fstype from
+		   "lvm:tjener_vg:home0_lv:default". */
+		if (0 != split_string(req_tmp->fstype, ':', 4, info))
+		    autopartkit_log(0, "Failed to parse '%s'\n",
+				    req_tmp->fstype);
+		else
+		{
+
+	            /* Create lv, using minimum size (?) */
+		    devpath = lvm_create_logicalvolume(info[1], info[2], mbsize);
+
+		    /* Create filesystem */
+		    /*
+		      const char *parted_fs = linux_fstype_to_parted(info[3]); 
+		      fs_type = ped_file_system_type_get(parted_fs);
+
+		      part_geom from devpath.
+		      fs = ped_file_system_create(&part_geom, fs_type, NULL);
+
+		      ped_file_system_close(fs);
+		    */
+
+		}
+	    }
+	    else
+#endif /* LVM_HACK */
+	    {
+		autopartkit_log(1, "  Passing it directly to fstab.\n");
+		devpath = strdup("none");
+	    }
+	    /* Add to fstab */
+	    mountmap[partcount].devpath = devpath;
 	}
 	else
 	{
@@ -1095,13 +1155,20 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	     */
 	    if (strcmp(req_tmp->fstype,"lvm") == 0)
 	    {
+	        const char *devpath = mountmap[partcount].devpath;
+		const char *mountpoint = mountmap[partcount].mountpoint->mountpoint;
 	        autopartkit_log(1, "  converting partition type to LVM\n");
 		ped_partition_set_flag(newpart,PED_PARTITION_LVM,1);
+
                 /*
                  * Zero out old LVM headers if present.  Is 100 KiB a good
                  * value?
                  */
-                zero_dev(mountmap[partcount].devpath, 100 * 1024);
+                zero_dev(devpath, 100 * 1024);
+
+                /* Initialize LVM partition, if the LVM tools are available */
+                if ( 0 == lvm_init_dev(devpath) )
+		    lvm_volumegroup_add_dev(mountpoint, devpath);
 	    }
 #endif /* LVM_HACK */
 
@@ -1182,6 +1249,12 @@ int main (int argc, char *argv[])
     
     autopartkit_log(1, "Using '%s' default disk label type\n",
 		    default_disk_label());
+
+#if defined(LVM_HACK)
+    if (0 != lvm_init())
+        autopartkit_log(1, "Unable to initialize LVM support.  "
+			"Continuing anyway.");
+#endif /* LVM_HACK */
 
     client = debconfclient_new ();
     mydebconf_set_title("Automatic Partitionner");

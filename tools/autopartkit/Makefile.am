@@ -4,10 +4,16 @@ bin_PROGRAMS = autopartkit
 
 noinst_PROGRAMS = dumptable distribute-test
 
+DUMMYCDEBCONF = \
+	dummydebconfclient.c \
+	dummydebconfclient.h
+#CFLAGS = -DTEST
+
 autopartkit_SOURCES = \
 	autopartkit.h \
 	distribute.c \
 	loadpartitions.c \
+	lvm.c \
 	mapdevfs.c \
 	parted-compat.h \
 	autopartkit.c
@@ -35,10 +41,6 @@ table_DATA = \
 	default.table
 
 EXTRA_DIST = $(table_DATA)
-
-foo = \
-	dummydebconfclient.c \
-	dummydebconfclient.h
 
 testdevice:
 	dd if=/dev/zero of=$@ bs=1M count=2048
