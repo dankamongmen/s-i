@@ -170,11 +170,11 @@ list_vgs() {
 # check if any VGs have free space
 #
 any_free_vgs() {
-	free=no
+	free=1
 	for i in $(list_vgs); do
-		[ "$(getfree_vg "$i")" = "0" ] || free=yes
+		[ "$(getfree_vg "$i")" = "0" ] || free=0
 	done
-	echo $free
+	return $free
 }
 
 #
@@ -530,7 +530,7 @@ lv_mainmenu() {
 		# free space anymore after setting up LVs.
 		if [ "$FIRST" = "yes" ]; then
 			if [ "$LVRET" = "create" ]; then
-				if [ "$(any_free_vgs)" = "no" ] ; then
+				if ! $(any_free_vgs) ; then
 					OVERRIDE=no
 					db_set lvmcfg/mainmenu "Leave"
 					break
