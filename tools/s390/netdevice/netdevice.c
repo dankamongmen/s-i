@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,37 +15,47 @@
 
 static struct debconfclient *client;
 
-struct channel {
+static struct channel
+{
 	unsigned int device;
 	unsigned int chantype;
 	unsigned int cutype;
 	unsigned int cumodel;
 	unsigned int device_first;
-};
+}
+*channels;
 
-struct device {
+static struct device
+{
 	unsigned int device_read;
 	unsigned int device_write;
 	unsigned int device_data;
 	unsigned int chantype;
-};
+}
+*devices;
+
+static size_t channels_items, devices_items;
+static int type, type_ctc, type_escon, type_lcs, type_qeth;
+static int items, items_ctc, items_escon, items_lcs, items_qeth;
+static int device_selected, device_ctc_protocol, device_qeth_lcs_port;
+static char *device_qeth_portname, *device_qeth_portname_display;
+static char *type_text = "", chandev_parm[256], chandev_module_parm[256];
 
 #define TEMPLATE_PREFIX	"debian-installer/s390/netdevice/"
 
-static char *my_debconf_input (char *priority, char *question)
+static int my_debconf_input (char *priority, char *template, char **p)
 {
-	char template[256];
-
-	snprintf (template, 256, TEMPLATE_PREFIX "%s", question);
+	int ret;
 
 	debconf_fset(client, template, "seen", "false");
 	debconf_input(client, priority, template);
-	debconf_go(client);
+	ret = debconf_go(client);
 	debconf_get(client, template);
-	return client->value;
+	*p = client->value;
+	return ret;
 }
 
-int channel_sort (const void *_s1, const void *_s2)
+static int channel_sort (const void *_s1, const void *_s2)
 {
 	struct channel *s1 = (struct channel *) _s1;
 	struct channel *s2 = (struct channel *) _s2;
@@ -55,32 +66,13 @@ int channel_sort (const void *_s1, const void *_s2)
 	return 0;
 }
 
-#if 0
-struct d_dasd *find_dasd (struct d_dasd *p, int i, char *s)
+static bool get_networktype (void)
 {
-	int j;
-	for (j = 0; j < i; j++)
-		if (!strncasecmp(p[j].device, s, 4))
-			return &p[j];
-	return NULL;
-}
-#endif
+	char *ptr;
+	int ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_networktype", &ptr);
 
-int main (int argc, char *argv[])
-{
-	FILE *f;
-	struct channel *channels;
-	struct device *devices;
-	size_t channels_items = 0, devices_items = 0;
-	int type = 0, type_ctc = 0, type_escon = 0, type_lcs = 0, type_qeth = 0;
-	int items = 0, items_ctc = 0, items_escon = 0, items_lcs = 0, items_qeth = 0;
-	int i, j, k;
-	char line[255], *type_text = "", chandev_parm[255], chandev_module_parm[255], *ptr, *ptr2;
-
-	client = debconfclient_new ();
-	// client->command (client, "title", "Network Device Configuration", NULL);
-
-	ptr = my_debconf_input ("high", "choose_networktype");
+	if (ret)
+		return false;
 
 	if (!strncmp (ptr, "iucv", 4))
 		type_text = "iucv";
@@ -91,317 +83,457 @@ int main (int argc, char *argv[])
 	else if (!strncmp (ptr, "qeth", 4))
 		type_text = "qeth";
 
-	if (!strcmp (type_text, "iucv"))
+	return true;
+}
+
+static void log_channel (const char *text, struct channel *channel)
+{
+	char buf[256];
+	snprintf (buf, sizeof (buf), "%s: %%x %%x %%x %%x", text);
+	di_log (DI_LOG_LEVEL_WARNING, buf, channel->device, channels->chantype, channels->cutype, channels->cumodel);
+}
+
+static bool get_channel (void)
+{
+	FILE *f;
+	unsigned int i, k;
+	int j;
+	char buf[256], *ptr, *ptr2;
+
+	channels = malloc (5 * sizeof (struct channel));
+	channels_items = 0;
+
+	f = fopen ("/proc/chandev", "r");
+
+	if (!f)
+		return false;
+
+	while (fgets (buf, sizeof (buf), f) && strncmp (buf, "chan_type", 9));
+	// I know its a hack
+	ptr = buf + 23;
+	while ((ptr2 = strsep (&ptr, ",")))
 	{
+		sscanf (ptr2, "ctc=%x", &type_ctc);
+		sscanf (ptr2, "escon=%x", &type_escon);
+		sscanf (ptr2, "lcs=%x", &type_lcs);
+		sscanf (ptr2, "qeth=%x", &type_qeth);
+	}
+
+	while (fgets (buf, sizeof (buf), f) && strncmp (buf, "channels detected", 17));
+
+	fgets (buf, sizeof (buf), f);
+	fgets (buf, sizeof (buf), f);
+	fgets (buf, sizeof (buf), f);
+
+	while (fgets (buf, sizeof (buf), f))
+	{
+		di_log (DI_LOG_LEVEL_WARNING, "get line: %s", buf);
+		if (sscanf (buf, "0x%*x 0x%4x 0x%2x 0x%4x 0x%2x",
+					&channels[channels_items].device,
+					&channels[channels_items].chantype,
+					&channels[channels_items].cutype,
+					&channels[channels_items].cumodel) == 4)
+		{
+			if (channels[channels_items].chantype & type_escon)
+				channels[channels_items].chantype |= type_ctc;
+
+			log_channel ("get channel", &channels[channels_items]);
+
+			channels[channels_items].device_first = 0;
+			channels_items++;
+			if ((channels_items % 5) == 0)
+				channels = realloc (channels, (channels_items + 5) * sizeof (struct channel));
+		}
+	}
+	fclose (f);
+
+	qsort (channels, channels_items, sizeof (struct channel), &channel_sort);
+
+	devices = malloc (5 * sizeof (struct device));
+
+	for (i = 0; i < channels_items; i++)
+	{
+		log_channel ("test channel", &channels[i]);
+		k = 0;
+		for (j = i; j >= 0; j--)
+			if (channels[i].device == channels[j].device + k &&
+			    channels[i].chantype == channels[j].chantype &&
+			    channels[i].cutype == channels[j].cutype &&
+			    channels[i].cumodel == channels[j].cumodel)
+			{
+				log_channel ("against (match)", &channels[j]);
+				k++;
+			}
+			else
+			{
+				log_channel ("against (no match)", &channels[j]);
+				break;
+			}
+
+		if (channels[i].chantype & type_qeth)
+		{
+			if (!(k % 3))
+			{
+				devices[devices_items].device_read =
+					channels[i-2].device_first = 
+					channels[i-1].device_first =
+					channels[i].device_first =
+						channels[i].device - 2;
+				devices[devices_items].device_write = 
+					channels[i].device - 1;
+				devices[devices_items].device_data = 
+					channels[i].device;
+				devices[devices_items].chantype = 
+					channels[i].chantype;
+				devices_items++;
+				items_qeth++;
+			}
+		}
+		else
+		{
+			if (!(k % 2))
+			{
+				devices[devices_items].device_read =
+					channels[i-1].device_first = 
+					channels[i].device_first =
+						channels[i].device - 1;
+				devices[devices_items].device_write = 
+					channels[i].device;
+				devices[devices_items].chantype = 
+					channels[i].chantype;
+				devices_items++;
+				if (channels[i].chantype & type_ctc)
+					items_ctc++;
+				if (channels[i].chantype & type_escon)
+					items_escon++;
+				if (channels[i].chantype & type_lcs)
+					items_lcs++;
+			}
+		}
+
+		if ((devices_items % 5) == 0)
+			devices = realloc (devices, (devices_items + 5) * sizeof (struct device));
+	}
+
+	chandev_parm[0] = '\0';
+	chandev_module_parm[0] = '\0';
+
+	if (!strcmp (type_text, "ctc"))
+	{
+		type = type_ctc;
+		items = items_ctc;
+	}
+	else if (!strcmp (type_text, "lcs"))
+	{
+		type = type_lcs;
+		items = items_lcs;
+	}
+	else if (!strcmp (type_text, "qeth"))
+	{
+		type = type_qeth;
+		items = items_qeth;
+	}
+	else
+		return false;
+
+	if (!items)
+	{
+		if (type == type_ctc)
+			my_debconf_input ("high", TEMPLATE_PREFIX "ctc/no", &ptr);
+		else if (type == type_lcs)
+			my_debconf_input ("high", TEMPLATE_PREFIX "lcs/no", &ptr);
+		else if (type == type_qeth)
+			my_debconf_input ("high", TEMPLATE_PREFIX "qeth/no", &ptr);
+		return false;
+	}
+
+	ptr = malloc (items * 16); // "0x0000-0x0000, "
+	ptr[0] = '\0';
+
+	for (i = 0; i < devices_items; i++)
+		if (devices[i].chantype & type)
+		{
+			if (type == type_qeth)
+				di_snprintfcat (ptr, items * 16, "0x%04x-0x%04x, ", devices[i].device_read, devices[i].device_data);
+			else
+				di_snprintfcat (ptr, items * 16, "0x%04x-0x%04x, ", devices[i].device_read, devices[i].device_write);
+		}
+
+	if (type == type_ctc)
+		ptr2 = TEMPLATE_PREFIX "ctc/choose";
+	else if (type == type_lcs)
+		ptr2 = TEMPLATE_PREFIX "lcs/choose";
+	else if (type == type_qeth)
+		ptr2 = TEMPLATE_PREFIX "qeth/choose";
+	else
+		return false;
+
+	debconf_subst (client, ptr2, "choices", ptr);
+	free (ptr);
+	debconf_fset (client, ptr2, "seen", "false");
+	debconf_input (client, "medium", ptr2);
+	debconf_go (client);
+	debconf_get (client, ptr2);
+
+	sscanf (client->value, "0x%x", &i);
+
+	for (device_selected = 0; devices[device_selected].device_read != i; device_selected++);
+
+	return true;
+}
+
+static bool get_ctc_protocol (void)
+{
+	char *ptr;
+	int ret = my_debconf_input ("medium", TEMPLATE_PREFIX "ctc/protocol", &ptr);
+	if (ret)
+		return false;
+
+	device_ctc_protocol = 0;
+	if (!strcmp (ptr, "Linux (1)"))
+		device_ctc_protocol = 1;
+	else if (!strcmp (ptr, "Linux TTY (2)"))
+		device_ctc_protocol = 2;
+	else if (!strcmp (ptr, "OS/390 (3)"))
+		device_ctc_protocol = 3;
+
+	return true;
+}
+
+static bool get_qeth_lcs_port (void)
+{
+	char *ptr;
+	int ret = my_debconf_input ("high", TEMPLATE_PREFIX "qeth_lcs/port", &ptr);
+	if (ret)
+		return false;
+
+	sscanf (ptr, "%d", &device_qeth_lcs_port);
+
+	return true;
+}
+
+static bool get_qeth_portname (void)
+{
+	char *ptr;
+	int ret, j, k;
+
+	ret = my_debconf_input ("high", TEMPLATE_PREFIX "qeth/portname", &ptr);
+	if (ret)
+		return false;
+
+	free (device_qeth_portname);
+
+	j = strlen (ptr);
+	if (j)
+	{
+		di_log (DI_LOG_LEVEL_WARNING, "length: %d", j);
+		device_qeth_portname = strdup (ptr);
+		for (k = 0; k < j; k++)
+			device_qeth_portname[k] = toupper (device_qeth_portname[k]);
+		device_qeth_portname_display = device_qeth_portname;
 	}
 	else
 	{
-		channels = malloc (5 * sizeof (struct channel));
+		device_qeth_portname = NULL; 
+		device_qeth_portname_display = "-";
+	}
 
-		f = fopen ("/proc/chandev", "r");
+	return true;
+}
+
+static bool confirm (void)
+{
+	char *template, buf[10], *ptr;
+	int ret;
+
+	if (type == type_ctc)
+		template = TEMPLATE_PREFIX "ctc/confirm";
+	else if (type == type_qeth)
+		template = TEMPLATE_PREFIX "qeth/confirm";
+	else if (type == type_lcs)
+		template = TEMPLATE_PREFIX "lcs/confirm";
+	else
+		return false;
+
+	if (type == type_ctc || type == type_qeth || type == type_lcs)
+	{
+		snprintf (buf, sizeof (buf), "0x%x", devices[device_selected].device_read);
+		debconf_subst (client,  template, "device_read", buf);
+		snprintf (buf, sizeof (buf), "0x%x", devices[device_selected].device_write);
+		debconf_subst (client,  template, "device_write", buf);
+	}
+	if (type == type_qeth || type == type_lcs)
+	{
+		snprintf (buf, sizeof (buf), "%d", device_qeth_lcs_port);
+		debconf_subst (client, template, "port", buf);
+	}
+	if (type == type_qeth)
+	{
+		snprintf (buf, sizeof (buf), "0x%x", devices[device_selected].device_data);
+		debconf_subst (client,  template, "device_data", buf);
+		debconf_subst (client,  template, "portname", device_qeth_portname_display);
+	}
+
+	debconf_set (client, template, "true");
+	ret = my_debconf_input ("medium", template, &ptr);
+
+	if (ret || !strstr (ptr, "true"))
+		return false;
+
+	if (type == type_ctc)
+		snprintf (chandev_module_parm, sizeof (chandev_module_parm), "ctc-1,0x%x,0x%x,0,%d",
+			  devices[device_selected].device_read,
+			  devices[device_selected].device_write,
+			  device_ctc_protocol);
+	else if (type == type_qeth)
+	{
+		snprintf (chandev_module_parm, sizeof (chandev_module_parm), "qeth-1,0x%x,0x%x,0x%x,0,%d",
+			  devices[device_selected].device_read,
+			  devices[device_selected].device_write,
+			  devices[device_selected].device_data,
+			  device_qeth_lcs_port);
+		if (device_qeth_portname)
+			snprintf (chandev_parm, sizeof (chandev_parm), "add_parms,0x%x,0x%x,0x%x,portname:%s",
+				  type_qeth,
+				  devices[device_selected].device_read,
+				  devices[device_selected].device_data,
+				  device_qeth_portname);
+	}
+#if 0
+	else if (type == type_lcs)
+#endif
+
+	return true;
+}
+
+static bool setup (void)
+{
+	FILE *f, *chandev;
+	char buf[256];
+
+	if (mkdir ("/etc/modutils", 777) && errno != EEXIST)
+		perror ("mkdir");
+
+	chandev = fopen ("/proc/chandev", "a");
+
+	if (!chandev)
+		exit (30);
+
+	if (strlen (chandev_parm))
+	{
+		f = fopen ("/etc/modutils/0chandev.chandev", "a");
 
 		if (f)
 		{
-			while (fgets (line, sizeof (line), f) && strncmp (line, "chan_type", 9));
-			// I know its a hack
-			ptr = line + 23;
-			while ((ptr2 = strsep (&ptr, ",")))
-			{
-				sscanf (ptr2, "ctc=%x", &type_ctc);
-				sscanf (ptr2, "escon=%x", &type_escon);
-				sscanf (ptr2, "lcs=%x", &type_lcs);
-				sscanf (ptr2, "qeth=%x", &type_qeth);
-			}
-
-			while (fgets (line, sizeof (line), f) && strncmp (line, "channels detected", 17));
-
-			fgets (line, sizeof (line), f);
-			fgets (line, sizeof (line), f);
-			fgets (line, sizeof (line), f);
-
-			while (fgets (line, sizeof (line), f))
-				if (sscanf (line, "0x%*x 0x%4x 0x%2x 0x%4x 0x%2x",
-							&channels[channels_items].device,
-							&channels[channels_items].chantype,
-							&channels[channels_items].cutype,
-							&channels[channels_items].cumodel) == 4)
-				{
-					if (channels[channels_items].chantype & type_escon)
-						channels[channels_items].chantype |= type_ctc;
-
-					channels[channels_items].device_first = 0;
-					channels_items++;
-					if ((channels_items % 5) == 0)
-						channels = realloc (channels, (channels_items + 5) * sizeof (struct channel));
-				}
+			fprintf (f, "%s\n", chandev_parm);
 			fclose (f);
 		}
 		else
-			perror ("fopen");
+			exit (30);
 
-		qsort (channels, channels_items, sizeof (struct channel), &channel_sort);
+		fprintf (chandev, "%s\n", chandev_parm);
+	}
 
-		devices = malloc (5 * sizeof (struct device));
+	snprintf (buf, sizeof (buf), "/etc/modutils/%s.chandev", type_text);
 
-		for (i = 0; i < channels_items; i++)
+	f = fopen (buf, "a");
+
+	if (f)
+	{
+		fprintf (f, "%s\n", chandev_module_parm);
+		fclose (f);
+	}
+	else
+	{
+		perror ("fopen");
+		exit (30);
+	}
+
+	fprintf (chandev, "%s\n", chandev_module_parm);
+	fprintf (chandev, "noauto\n");
+	fprintf (chandev, "reprobe\n");
+	fclose (chandev);
+
+	snprintf (buf, sizeof (buf), "modprobe %s", type_text);
+
+	di_exec_shell_log (buf);
+
+	return true;
+}
+
+int main (int argc, char *argv[])
+{
+	di_system_init("s390-netdevice");
+
+	client = debconfclient_new ();
+	debconf_capb (client, "backup");
+
+	enum
+	{
+		BACKUP, GET_NETWORKTYPE, GET_IUCV, GET_CHANNEL,
+		GET_CTC_PROTOCOL, GET_QETH_LCS_PORT, GET_QETH_PORTNAME,
+		CONFIRM, QUIT
+	}
+	state = GET_NETWORKTYPE;
+
+	while (1)
+	{
+		switch(state)
 		{
-			k = 0;
-			for (j = i; j >= 0; j--)
-				if (channels[i].device == channels[j].device + k &&
-				    channels[i].chantype == channels[j].chantype &&
-				    channels[i].cutype == channels[j].cutype &&
-				    channels[i].cumodel == channels[j].cumodel)
-				{
-					k++;
-				}
+			case BACKUP:
+				return 10;
+			case GET_NETWORKTYPE:
+				if (!get_networktype ())
+					state = BACKUP;
+				else if (!strcmp (type_text, "iucv"))
+					state = GET_IUCV;
 				else
-					break;
-
-			if (channels[i].chantype & type_qeth)
-			{
-				if (!(k % 3))
-				{
-					devices[devices_items].device_read =
-						channels[i-2].device_first = 
-						channels[i-1].device_first =
-						channels[i].device_first =
-							channels[i].device - 2;
-					devices[devices_items].device_write = 
-						channels[i].device - 1;
-					devices[devices_items].device_data = 
-						channels[i].device;
-					devices[devices_items].chantype = 
-						channels[i].chantype;
-					devices_items++;
-					items_qeth++;
-				}
-			}
-			else
-			{
-				if (!(k % 2))
-				{
-					devices[devices_items].device_read =
-						channels[i-1].device_first = 
-						channels[i].device_first =
-							channels[i].device - 1;
-					devices[devices_items].device_write = 
-						channels[i].device;
-					devices[devices_items].chantype = 
-						channels[i].chantype;
-					devices_items++;
-					if (channels[i].chantype & type_ctc)
-						items_ctc++;
-					if (channels[i].chantype & type_escon)
-						items_escon++;
-					if (channels[i].chantype & type_lcs)
-						items_lcs++;
-				}
-			}
-
-			if ((devices_items % 5) == 0)
-				devices = realloc (devices, (devices_items + 5) * sizeof (struct device));
-		}
-
-		chandev_parm[0] = '\0';
-		chandev_module_parm[0] = '\0';
-
-		if (!strcmp (type_text, "ctc"))
-		{
-			type = type_ctc;
-			items = items_ctc;
-		}
-		else if (!strcmp (type_text, "lcs"))
-		{
-			type = type_lcs;
-			items = items_lcs;
-		}
-		else if (!strcmp (type_text, "qeth"))
-		{
-			type = type_qeth;
-			items = items_qeth;
-		}
-		else
-			exit (1);
-
-		if (!items)
-		{
-			if (type == type_ctc)
-				my_debconf_input ("high", "ctc/no");
-			else if (type == type_lcs)
-				my_debconf_input ("high", "lcs/no");
-			else if (type == type_qeth)
-				my_debconf_input ("high", "qeth/no");
-			exit (0);
-		}
-
-		ptr = malloc (items * 16); // "0x0000-0x0000, "
-		ptr[0] = '\0';
-
-		for (i = 0; i < devices_items; i++)
-			if (devices[i].chantype & type)
-			{
-				if (type == type_qeth)
-					di_snprintfcat (ptr, items_ctc * 16, "0x%04x-0x%04x, ", devices[i].device_read, devices[i].device_data);
+					state = GET_CHANNEL;
+				break;
+			case GET_IUCV:
+				return 30;
+			case GET_CHANNEL:
+				if (!get_channel ())
+					state = GET_NETWORKTYPE;
+				else if (type == type_ctc)
+					state = GET_CTC_PROTOCOL;
+				else if (type == type_qeth || type == type_lcs)
+					state = GET_QETH_LCS_PORT;
 				else
-					di_snprintfcat (ptr, items_ctc * 16, "0x%04x-0x%04x, ", devices[i].device_read, devices[i].device_write);
-			}
-
-		if (type == type_ctc)
-			ptr2 = TEMPLATE_PREFIX "ctc/choose";
-		else if (type == type_lcs)
-			ptr2 = TEMPLATE_PREFIX "lcs/choose";
-		else if (type == type_qeth)
-			ptr2 = TEMPLATE_PREFIX "qeth/choose";
-
-		debconf_subst (client, ptr2, "choices", ptr);
-		free (ptr);
-		debconf_fset (client, ptr2, "seen", "false");
-		debconf_input (client, "medium", ptr2);
-		debconf_go (client);
-		debconf_get (client, ptr2);
-
-		if (!strcmp (client->value, "Other"))
-			exit (1);
-		else if (!strcmp (client->value, "Quit"))
-			exit (0);
-
-		sscanf (client->value, "0x%x", &j);
-		fprintf (stderr, "got: %x\n", j);
-
-		for (i = 0; devices[i].device_read != j; i++);
-
-		if (type == type_ctc)
-		{
-			ptr = TEMPLATE_PREFIX "ctc/confirm";
-
-			ptr2 = my_debconf_input ("medium", "ctc/protocol");
-			j = 0;
-			if (!strcmp (ptr2, "Linux (1)"))
-				j = 1;
-			else if (!strcmp (ptr2, "Linux TTY (2)"))
-				j = 2;
-			else if (!strcmp (ptr2, "OS/390 (3)"))
-				j = 3;
-
-			sprintf (line, "%x", devices[i].device_data);
-			debconf_subst (client, ptr, "protocol", ptr2);
-
-			snprintf (chandev_module_parm, sizeof (chandev_module_parm), "ctc-1,0x%x,0x%x,0,%d",
-				  devices[i].device_read, devices[i].device_write, j);
+					state = BACKUP;
+				break;
+			case GET_CTC_PROTOCOL:
+				if (!get_ctc_protocol ())
+					state = GET_CHANNEL;
+				else
+					state = CONFIRM;
+				break;
+			case GET_QETH_LCS_PORT:
+				if (!get_qeth_lcs_port ())
+					state = GET_CHANNEL;
+				else if (type == type_qeth)
+					state = GET_QETH_PORTNAME;
+				else
+					state = CONFIRM;
+				break;
+			case GET_QETH_PORTNAME:
+				if (!get_qeth_portname ())
+					state = GET_QETH_LCS_PORT;
+				else
+					state = CONFIRM;
+				break;
+			case CONFIRM:
+				if (!confirm ())
+					state = GET_CHANNEL;
+				else
+				{
+					setup ();
+					state = QUIT;
+				}
+				break;
+			case QUIT:
+				return 0;
 		}
-		else if (type == type_lcs)
-		{
-			ptr = TEMPLATE_PREFIX "lcs/confirm";
-
-			ptr2 =  my_debconf_input ("high", "lcs/port");
-			sscanf (ptr2, "port %d", &j);
-			sprintf (line, "%d", j);
-			debconf_subst (client,  ptr, "port", line);
-		}
-		else if (type == type_qeth)
-		{
-			ptr = TEMPLATE_PREFIX "qeth/confirm";
-
-			sprintf (line, "0x%x", devices[i].device_data);
-			debconf_subst (client,  ptr, "device_data", line);
-
-			ptr2 =  my_debconf_input ("high", "qeth/port");
-			sscanf (ptr2, "port %d", &j);
-			sprintf (line, "%d", j);
-			debconf_subst (client,  ptr, "port", line);
-
-			snprintf (chandev_module_parm, sizeof (chandev_module_parm), "qeth-1,0x%x,0x%x,0x%x,0,%d",
-				  devices[i].device_read, devices[i].device_write, devices[i].device_data, j);
-
-			ptr2 =  my_debconf_input ("high", "qeth/portname");
-			j = strlen (ptr2);
-			if (j)
-			{
-				for (k = 0; k < j; k++)
-					ptr2[k] = toupper (ptr2[k]);
-				snprintf (chandev_parm, sizeof (chandev_parm), "add_parms,0x%x,0x%x,0x%x,portname:%s",
-					  type_qeth, devices[i].device_read, devices[i].device_data, ptr2);
-			}
-			else
-				ptr2 = "-";
-			debconf_subst (client,  ptr, "portname", ptr2);
-		}
-
-		sprintf (line, "0x%x", devices[i].device_read);
-		debconf_subst (client,  ptr, "device_read", line);
-		sprintf (line, "0x%x", devices[i].device_write);
-		debconf_subst (client, ptr, "device_write", line);
-
-		debconf_set (client, ptr, "true");
-		debconf_fset (client, ptr, "seen", "false");
-		debconf_input (client, "medium", ptr);
-		debconf_go (client);
-		debconf_get (client, ptr);
-
-		if (!strcmp (client->value, "false"))
-			exit (1);
-
-		fprintf (stderr, "chandev_parm: %s\n", chandev_parm);
-		fprintf (stderr, "chandev_module_parm: %s\n", chandev_module_parm);
-
-		if (mkdir ("/etc/modutils", 777) && errno != EEXIST)
-			perror ("mkdir");
-
-		if (strlen (chandev_parm))
-		{
-			f = fopen ("/etc/modutils/0chandev.chandev", "a");
-
-			if (f)
-			{
-				fprintf (f, "%s\n", chandev_parm);
-				fclose (f);
-			}
-			else
-				exit (1);
-
-			f = fopen ("/proc/chandev", "a");
-
-			if (f)
-			{
-				fprintf (f, "%s\n", chandev_parm);
-				fclose (f);
-			}
-			else
-				exit (1);
-		}
-
-		snprintf (line, sizeof (line), "/etc/modutils/%s.chandev", type_text);
-
-		f = fopen (line, "a");
-
-		if (f)
-		{
-			fprintf (f, "%s\n", chandev_module_parm);
-			fclose (f);
-		}
-		else
-		{
-			perror ("fopen");
-			exit (1);
-		}
-
-		f = fopen ("/proc/chandev", "a");
-
-		if (f)
-		{
-			fprintf (f, "%s\n", chandev_module_parm);
-			fprintf (f, "reprobe\n");
-			fclose (f);
-		}
-		else
-		{
-			perror ("fopen");
-			exit (1);
-		}
-
-		snprintf (line, sizeof (line), "modprobe %s", type_text);
-
-		di_execlog (line);
 	}
 
 	return 0;
