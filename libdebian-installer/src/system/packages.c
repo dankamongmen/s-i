@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.12 2004/01/17 14:44:16 waldi Exp $
+ * $Id: packages.c,v 1.13 2004/03/09 17:10:29 waldi Exp $
  */
 
 #include <config.h>
@@ -27,8 +27,10 @@
 #include <debian-installer/package_internal.h>
 #include <debian-installer/packages_internal.h>
 #include <debian-installer/parser_rfc822.h>
+#include <debian-installer/slist_internal.h>
 
 #include <ctype.h>
+#include <sys/utsname.h>
 
 const di_parser_fieldinfo
   internal_di_system_package_parser_field_installer_menu_item =
@@ -44,12 +46,20 @@ const di_parser_fieldinfo
       di_parser_read_string,
       di_parser_write_string,
       offsetof (di_system_package, subarchitecture)
+    ),
+  internal_di_system_package_parser_field_kernel_version =
+    DI_PARSER_FIELDINFO (
+      "Kernel-Version",
+      di_parser_read_string,
+      di_parser_write_string,
+      offsetof (di_system_package, kernel_version)
     );
 
 const di_parser_fieldinfo *di_system_package_parser_fieldinfo[] =
 {
   &internal_di_system_package_parser_field_installer_menu_item,
   &internal_di_system_package_parser_field_subarchitecture,
+  &internal_di_system_package_parser_field_kernel_version,
   NULL
 };
 
@@ -146,5 +156,45 @@ di_parser_info *di_system_packages_status_parser_info (void)
   di_parser_info_add (info, di_system_package_parser_fieldinfo);
 
   return info;
+}
+
+di_slist *di_system_packages_resolve_dependencies_array_permissive (di_packages *packages, di_package **array, di_packages_allocator *allocator)
+{
+  struct di_packages_resolve_dependencies_check s =
+  {
+    di_packages_resolve_dependencies_check_real,
+    di_packages_resolve_dependencies_check_virtual,
+    di_packages_resolve_dependencies_check_non_existant_permissive,
+    { NULL, NULL },
+    allocator,
+    0
+  };
+
+  return di_packages_resolve_dependencies_array_special (packages, array, &s);
+}
+
+static di_package *check_virtual_kernel (di_package *package __attribute__ ((unused)), di_package *best, di_package_dependency *d)
+{
+  struct utsname uts;
+  if (uname(&uts) == 0)
+    if (((di_system_package *)d->ptr)->kernel_version &&
+        strcmp (((di_system_package *)d->ptr)->kernel_version, uts.release))
+      return best;
+  return di_packages_resolve_dependencies_check_virtual (package, best, d);
+}
+
+void di_system_packages_resolve_dependencies_mark_kernel (di_packages *packages)
+{
+  struct di_packages_resolve_dependencies_check s =
+  {
+    di_packages_resolve_dependencies_check_real,
+    check_virtual_kernel,
+    di_packages_resolve_dependencies_check_non_existant,
+    { NULL, NULL },
+    NULL,
+    0
+  };
+
+  return di_packages_resolve_dependencies_mark_special (packages, &s);
 }
 

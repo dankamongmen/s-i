@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.12 2004/01/17 14:44:16 waldi Exp $
+ * $Id: packages.h,v 1.13 2004/03/09 17:10:28 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__PACKAGES_H
@@ -43,6 +43,7 @@ struct di_system_package
   di_package p;                                         /**< standard package */
   int installer_menu_item;                              /**< Installer-Menu-Item field */
   char *subarchitecture;                                /**< Subarchitecture field */
+  char *kernel_version;                                 /**< Kernel-Version field */
 };
 
 void di_system_package_destroy (di_system_package *package);
@@ -112,6 +113,9 @@ static inline int di_system_packages_status_write_file (di_packages *packages, c
 {
   return di_packages_special_write_file (packages, file, di_system_packages_status_parser_info);
 }
+
+di_slist *di_system_packages_resolve_dependencies_array_permissive (di_packages *packages, di_package **array, di_packages_allocator *allocator);
+void di_system_packages_resolve_dependencies_mark_kernel (di_packages *packages);
 
 /** @} */
 #endif
