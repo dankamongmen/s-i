@@ -263,10 +263,8 @@ udeb_kernel_version(di_package *p)
     if ((t1 = strstr(name, "-modules-")) == NULL)
         return NULL;
     t1 += sizeof("-modules-") - 1;
-    if ((t2 = strstr(t1, "-udeb")) == NULL
-	&& (t2 = strstr(t1, "-di")) == NULL)
-        return NULL;
-    if (t2[sizeof("-udeb") - 1] != '\0')
+    if (((t2 = strstr(t1, "-udeb")) == NULL || t2[sizeof("-udeb") - 1] != '\0')
+	&& ((t2 = strstr(t1, "-di")) == NULL || t2[sizeof("-di") - 1] != '\0'))
         return NULL;
     t2 = di_stradup(t1, t2 - t1);
     return t2;

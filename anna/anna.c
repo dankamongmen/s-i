@@ -313,7 +313,9 @@ main()
 int
 main()
 {
-    di_package package = { "foo-modules-2.4.22-1-di" };
+    char name[] = "foo-modules-2.4.22-1-di\0aaaaaaa";
+    di_package package;
+    package.package = name;
     assert(strcmp(udeb_kernel_version(&package), "2.4.22-1") == 0);
     return 0;
 }
