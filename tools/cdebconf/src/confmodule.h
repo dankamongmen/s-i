@@ -9,6 +9,12 @@
 
 #include "common.h"
 
+enum debconf_seen_action {
+        DEBCONF_SEEN_REMOVE = -1,
+        DEBCONF_SEEN_SAVE   = 0,
+        DEBCONF_SEEN_ADD    = 1
+};
+
 struct configuration;
 struct template_db;
 struct question_db;
@@ -66,7 +72,7 @@ struct confmodule {
      * @param int action - push, pop or sync values
      * @return int - DC_OK, DC_NOTOK
      */
-	int (*update_seen_questions)(struct confmodule *mod, int action);
+	int (*update_seen_questions)(struct confmodule *mod, enum debconf_seen_action action);
 };
 
 /**

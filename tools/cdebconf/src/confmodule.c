@@ -192,7 +192,7 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 	return pid;
 }
 
-static int confmodule_update_seen_questions(struct confmodule *mod, int action)
+static int confmodule_update_seen_questions(struct confmodule *mod, enum debconf_seen_action action)
 {
 	struct question *q;
 	struct question *qlast = NULL;
@@ -200,7 +200,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, int action)
 
 	switch (action)
 	{
-	case 1:
+	case DEBCONF_SEEN_ADD:
 		if (mod->seen_questions == NULL)
 			narg = 0;
 		else
@@ -219,7 +219,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, int action)
 			i++;
 		}
 		break;
-	case -1:
+	case DEBCONF_SEEN_REMOVE:
 		if (mod->seen_questions == NULL)
 			return DC_OK;
 
@@ -235,7 +235,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, int action)
 			narg --;
 		}
 		break;
-	case 0:
+	case DEBCONF_SEEN_SAVE:
 		if (mod->seen_questions == NULL)
 			return DC_OK;
 
@@ -270,7 +270,7 @@ struct confmodule *confmodule_new(struct configuration *config,
 	mod->frontend = frontend;
 	mod->run = confmodule_run;
 	mod->communicate = confmodule_communicate;
-    mod->process_command = confmodule_process_command;
+	mod->process_command = confmodule_process_command;
 	mod->shutdown = confmodule_shutdown;
 	mod->update_seen_questions = confmodule_update_seen_questions;
 
