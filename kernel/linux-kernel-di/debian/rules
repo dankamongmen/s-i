@@ -28,13 +28,15 @@ binary-arch:
 	dh_installdirs
 
 	./copy-modules 386
+	./find-dups
+
 	install -D -m 644 /boot/vmlinuz-$(version)-386 $(kdst)/boot/vmlinuz
 	install -D -m 644 /lib/modules/$(version)-386/modules.dep \
 		$(kdst)/lib/modules/$(version)-386/modules.dep
 	dh_fixperms
-	for i in $$(dh_listpackages); do \
-		dh_gencontrol -p $$i -- -n$${i}_$(fullversion)_i386.udeb; \
-		dh_builddeb -p $$i --filename=$${i}_$(fullversion)_i386.udeb; \
+	for p in $$(dh_listpackages); do \
+		dh_gencontrol -p $$p -- -n$${p}_$(fullversion)_i386.udeb; \
+		dh_builddeb -p $$p --filename=$${p}_$(fullversion)_i386.udeb; \
 	done
 
 binary: binary-indep binary-arch
