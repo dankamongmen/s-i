@@ -92,11 +92,13 @@ fi
 
 if [ "$defaultbootdev" ]; then
     db_set aboot-installer/bootdev "$defaultbootdev"
+    prio=medium
+else
+    prio=high
 fi
 
 db_subst aboot-installer/bootdev PARTITIONS $PARTITIONS
-# FIXME: this should be 'medium', but need to test it first
-db_input high aboot-installer/bootdev || [ $? -eq 30 ]
+db_input $prio aboot-installer/bootdev || [ $? -eq 30 ]
 db_go
 
 db_get aboot-installer/bootdev
@@ -163,6 +165,16 @@ if [ "$bootdev" = "$realbootdev" ] ; then
         db_progress INFO aboot-installer/progress/step_copy_kernel
         mkdir /target/boot/etc/
         cp -a /target/etc/aboot.conf /target/boot/etc/
+	# FIXME: we probably really want symlinks_in_boot here,
+	# but that requires more finagling of aboot.conf in turn.
+	realkernel=`readlink /target/vmlinuz`
+	realinitrd=`readlink /target/initrd.img`
+	if [ -n "$realkernel" ] ; then
+	    ln -s ${realkernel##*/} /target/boot/vmlinuz
+	fi
+	if [ -n "$realinitrd" ] ; then
+	    ln -s ${realinitrd##*/} /target/boot/initrd
+	fi
     fi
 elif [ "$bootdev" != "$rootdev" ] ; then
     # The chosen device is neither / nor /boot; special case.
