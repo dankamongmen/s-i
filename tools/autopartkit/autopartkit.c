@@ -295,11 +295,13 @@ default_disk_label(void)
 {
     /* Need to define on a per arch basis */
 #if defined(__i386__)
-  return  "msdos";
+    return  "msdos";
 #elif defined(ia64)
-  return "GPT";
+    return "GPT";
 #elif defined(hppa)
-  return"msdos";
+    return"msdos";
+#elif defined(__sparc__)
+    return "sun";
 #elif defined(__mips__) && defined(__MIPSEL__)
     return"msdos";
 #elif defined(__mips__) && defined(__MIPSEB__)
