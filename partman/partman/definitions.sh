@@ -38,9 +38,8 @@ debconf_select () {
 		local key option
 		restore_ifs
 		key=$(echo ${x%$TAB*})
-# I can not use escaped spaces, lets return non-break spaces for now (anton)
-#		option=$(echo "${x#*$TAB}" | sed 's/ *$//g')
-		option=$(echo "${x#*$TAB}" | sed 's/ / /g')
+		option=$(echo "${x#*$TAB}" | sed 's/ *$//g')
+#		option=$(echo "${x#*$TAB}" | sed 's/ / /g')
 		newchoices="${newchoices}${NL}${key}${TAB}${option}"
 		if [ "$key" = "$default_choice" ]; then
 		    default="$option"
