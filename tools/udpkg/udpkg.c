@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.11 2000/11/03 03:38:32 tausq Exp $ */
+/* $Id: udpkg.c,v 1.12 2000/11/06 21:00:55 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -118,7 +118,8 @@ static int dpkg_dounpack(struct package_t *pkg)
 	char buf[1024], buf2[1024];
 	int i;
 	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
-	                         "conffiles", "md5sums", "shlibs" };
+	                         "conffiles", "md5sums", "shlibs", 
+				 "templates" };
 
 	DPRINTF("Unpacking %s\n", pkg->package);
 
@@ -186,6 +187,10 @@ static int dpkg_dounpack(struct package_t *pkg)
 				fclose(outfp);
 			}
 		}
+		pkg->status &= STATUS_WANTMASK;
+		pkg->status |= STATUS_WANTINSTALL;
+		pkg->status &= STATUS_FLAGMASK;
+		pkg->status |= STATUS_FLAGOK;
 		pkg->status &= STATUS_STATUSMASK;
 		if (r == 0)
 			pkg->status |= STATUS_STATUSUNPACKED;
@@ -244,6 +249,7 @@ static int dpkg_unpack(struct package_t *pkgs)
 	void *status = status_read();
 	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
 	{
+		dpkg_unpackcontrol(pkg);
 		r = dpkg_dounpack(pkg);
 		if (r != 0) break;
 	}
@@ -300,7 +306,7 @@ static int dpkg_install(struct package_t *pkgs)
 	ordered = pkgs;
 #endif
 	
-	/* Stage 3: install */			
+	/* Stage 3: install */
 	for (p = ordered; p != 0; p = p->next)
 	{
 		p->status &= STATUS_WANTMASK;
