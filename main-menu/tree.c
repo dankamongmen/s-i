@@ -78,7 +78,7 @@ void tree_dump() {
 #endif
 
 void _tree_free(void *nodep) {
-	struct package_t *p = (struct package_t **)nodep;
+	struct package_t *p = (struct package_t *)nodep;
 	
 	if (p->description)
 		free(p->description);
