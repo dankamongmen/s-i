@@ -1,5 +1,5 @@
 ifndef TARGETS
-TARGETS=shell mapdevfs
+TARGETS=shell mapdevfs async
 endif
 
 CFLAGS=-Wall -D_GNU_SOURCE -Os -fomit-frame-pointer
@@ -14,6 +14,9 @@ mapdevfs: mapdevfs.c
 
 shell: shell.c
 	$(CC) $(CFLAGS) $^ -o $@ -ldebconfclient
+
+async: async.c
+	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer -ldebconfclient
 
 strip: $(TARGETS)
 	$(STRIP) $^
