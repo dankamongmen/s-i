@@ -230,15 +230,21 @@ get_ide_floppy_info() {
 	esac
 }
 
-# TODO: This should be removed once rootskel 1.10 is in testing.
 get_input_info() {
+	case "$(udpkg --print-architecture)" in
+		i386|ia64)
+			register-module psmouse
+		;;
+	esac
+	
 	case $SUBARCH in
 		powerpc/chrp*|powerpc/prep)
-		  echo "i8042:i8042 PC Keyboard controller"
-		  register-module i8042
-		  echo "atkbd:AT keyboard support"
-		  register-module atkbd
-		  register-module psmouse
+			register-module psmouse
+			# TODO: below should be removed once rootskel 1.10 is in testing.
+			echo "i8042:i8042 PC Keyboard controller"
+			register-module i8042
+			echo "atkbd:AT keyboard support"
+			register-module atkbd
 		;;
 	esac
 }
