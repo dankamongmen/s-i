@@ -98,3 +98,6 @@ else
     db_go || true
     exit 1
 fi
+
+sed -e 's/do_bootloader = no/do_bootloader = yes/' -e 's/postinst_hook = \/sbin\/update-grub//' -e 's/postrm_hook   = \/sbin\/update-grub//' < /target/etc/kernel-img.conf > /target/etc/kernel-img.conf.$$
+mv /target/etc/kernel-img.conf.$$ /target/etc/kernel-img.conf
