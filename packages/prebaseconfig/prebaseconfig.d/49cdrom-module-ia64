@@ -1,0 +1,50 @@
+#!/bin/sh
+# get the ide controller driver to the head of the line
+# in /etc/modules on ia64 class machines.
+# we have to put it here because 50prebaseconfig (
+# from debian-installer-utils) adds modules in file name
+# sort order and the 2.4.x ide is not module load order
+# friendly. 2.6 is however.
+#
+# NOTE: this is a workaround for many things.  This
+# should be deprecated once 2.6 becomes the oldest supported
+# kernel or the structure of /etc/rcS.d is restructured to load
+# hardware drivers before modutils is run (might not be possible).
+
+# Only for ia64 (at this point)
+if [ `uname -m` != ia64 ] ; then
+  exit 0
+fi
+
+case `uname -r` in
+  2.6.*) exit 0 ;;
+  *) : ;;
+esac
+
+rootdev=$(cat /proc/mounts | grep /target | cut -d ' ' -f 2)
+rootdev=$(mapdevfs $rootdev)
+
+# ide/ata root partitions load the driver in initrd
+case $rootdev in
+  /dev/hd*) exit 0 ;;
+  *) : ;;
+esac
+
+idemodules=$(cat /proc/modules |grep ide-core | sed -e 's/.*\[\(.*\)]/\1/')
+idedev=$(ls /proc/ide | grep -v hd[a-g] | grep -v drivers | grep -v ide[0-9])
+
+# verify that driver is a module
+driver=
+for m in $idemodules; do
+  if [ "$idedev" = "$m" ] ; then
+    driver=$m
+  fi
+done
+
+if [ -n $driver ] ; then
+  echo $driver >> /target/etc/modules
+else
+  exit 0
+fi
+
+
