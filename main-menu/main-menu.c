@@ -135,6 +135,33 @@ get_default_menu_item(struct linkedlist_t *list)
 	return NULL;
 }
 
+/* Return the text of the menu entry for PACKAGE, translated to
+   LANGUAGE if possible.  */
+static char *menu_entry(struct debconfclient *debconf, char *language,
+			struct package_t *package)
+{
+	char *entry = NULL, *question;
+
+	asprintf(&question, "main-menu/%s", package->package);
+	if (language) {
+		char *field;
+
+		asprintf(&field, "Description-%s.UTF-8", language);
+		if (!debconf_metaget(debconf, question, field))
+			entry = strdup(debconf->value);
+		free(field);
+	}
+	if (entry == NULL && !debconf_metaget(debconf, question, "Description"))
+		entry = strdup(debconf->value);
+	free(question);
+
+	/* The following fallback case can go away once all packages
+	   have transitioned to the new form.  */
+	if (entry == NULL)
+		entry = strdup(package->description);
+	return entry;
+}
+
 /* Displays the main menu via debconf and returns the selected menu item. */
 struct package_t *show_main_menu(struct linkedlist_t *list) {
 	static struct debconfclient *debconf = NULL;
@@ -143,7 +170,6 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	struct linkedlist_t *olist;
 	struct list_node *node;
         struct package_t *menudefault = NULL, *ret = NULL;
-	struct language_description *langdesc;
 	int i = 0, num = 0;
 	char *s;
 	char menutext[1024];
@@ -181,29 +207,16 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	 */
 	s = menutext;
 	for (node = olist->head; node != NULL; node = node->next) {
-		int ok = 0;
+		char *entry;
 		p = (struct package_t *)node->data;
 		if (!p->installer_menu_item || !check_script(p, "isinstallable"))
 			continue;
-		if (language) {
-			langdesc = p->localized_descriptions;
-			while (langdesc) {
-				if (strcmp(langdesc->language,language) == 0) {
-					/* Use this description */
-					strcpy(s,langdesc->description);
-					s += strlen(langdesc->description);
-					ok = 1;
-					break;
-				}
-				langdesc = langdesc->next;
-			}
-		}
-		if (ok == 0) {
-			strcpy(s, p->description);
-			s += strlen(p->description);
-		}
+		entry = menu_entry(debconf, language, p);
+		strcpy(s, entry);
+		s += strlen(entry);
 		*s++ = ',';
 		*s++ = ' ';
+		free(entry);
 	}
 	/* Trim trailing ", " */
 	if (s > menutext)
@@ -218,28 +231,29 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	debconf->command(debconf, "CAPB", NULL);
 	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
-	if (menudefault)
-		debconf->command(debconf, "SET", MAIN_MENU, menudefault->description, NULL);
+	if (menudefault) {
+		char *entry = menu_entry(debconf, language, menudefault);
+		debconf->command(debconf, "SET", MAIN_MENU, entry, NULL);
+		free(entry);
+	}
 	debconf->command(debconf, "INPUT", "medium", MAIN_MENU, NULL);
 	debconf->command(debconf, "GO", NULL);
 	debconf->command(debconf, "GET", MAIN_MENU, NULL);
-	s=debconf->value;
+	s = strdup(debconf->value);
 	
 	/* Figure out which menu item was selected. */
 	for (i = 0; i < num; i++) {
+		char *entry;
 		p = package_list[i];
-		if (strcmp(p->description, s) == 0) {
+		entry = menu_entry(debconf, language, p);
+		if (strcmp(entry, s) == 0) {
+			free(entry);
 			ret = p;
 			break;
-		} else if (language) {
-			for (langdesc = p->localized_descriptions; langdesc; langdesc = langdesc->next)
-				if (strcmp(langdesc->language,language) == 0 &&
-				    strcmp(langdesc->description,s) == 0) {
-					ret = p;
-					break;
-				}
 		}
+		free(entry);
 	}
+	free(s);
 	free(language);
 	free(package_list);
 	return ret;
