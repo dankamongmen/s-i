@@ -1,13 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <linux/kd.h>
-#include <sys/ioctl.h>
-#include "nls.h"
-#include "getfd.h"
-
 /*
  * getfd.c
  *
@@ -15,6 +5,19 @@
  * We try several things because opening /dev/console will fail
  * if someone else used X (which does a chown on /dev/console).
  */
+
+#include "config.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <linux/kd.h>
+#include <sys/ioctl.h>
+#include <debian-installer.h>
+#include "nls.h"
+#include "getfd.h"
+
 
 static int
 is_a_console(int fd) {
@@ -64,7 +67,6 @@ int getfd() {
       if (is_a_console(fd))
 	return fd;
 
-    fprintf(stderr,
-	    _("Couldnt get a file descriptor referring to the console\n"));
+    di_log ("Couldnt get a file descriptor referring to the console\n");
     exit(1);		/* total failure */
 }

@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.2 2003/01/19 12:23:31 mckinstry Exp $
+ * $Id: kbd-chooser.h,v 1.3 2003/01/20 23:08:28 mckinstry Exp $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -14,7 +14,6 @@
 #define KEYMAPLISTDIR "/usr/share/console/lists"
 
 #define LINESIZE 512
-#define DEBUG 1
 
 typedef enum { TRUE = 1, FALSE = 0, UNKNOWN = -1 } exists;
 

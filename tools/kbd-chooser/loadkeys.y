@@ -14,7 +14,6 @@
 #include "config.h"
 #include <errno.h>
 #include <stdio.h>
-#include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
@@ -22,6 +21,7 @@
 #include <linux/keyboard.h>
 #include <sys/ioctl.h>
 #include <ctype.h>
+#include "xmalloc.h"
 #include "paths.h"
 #include "getfd.h"
 #include "findfile.h"
@@ -60,8 +60,7 @@ static void killkey(int index, int table);
 static void compose(int diacr, int base, int res);
 static void do_constant(void);
 static void do_constant_key (int, u_short);
-static void loadkeys(void);
-static void mktable(void);
+static void loadkeys(int fd);
 static void strings_as_usual(void);
 static void keypad_as_usual(char *keyboard);
 static void function_keys_as_usual(char *keyboard);
@@ -70,7 +69,7 @@ static void compose_as_usual(char *charset);
 static void lkfatal0(const char *, int);
 extern int set_charset(const char *charset);
 extern int getfd(void);
-extern char *xstrdup(char *);
+
 int key_buf[MAX_NR_KEYMAPS];
 int mod;
 extern int unicode_used;
@@ -242,31 +241,37 @@ rvalue		: NUMBER
 
 char *keymap_name;
 char **args;
-int optd = 0;
-int optm = 0;
-int opts = 0;
-int verbose = 0;
 int quiet = 0;
 int nocompose = 0;
 
-void set_kbd_mode ()
+void set_kbd_mode (int fd)
 {
-	// Set kbd mode as Unicode if required
-	// FIXME Write this
+	// Set kd mode as Unicode if required
+	if (unicode_used) {
+		int e;
+		e = ioctl (fd, KDSKBMODE, K_UNICODE);
+		if (DEBUG && e) {
+			perror ("Failed to set kbd to unicode mode");
+			exit (1);
+		}
+	}
 }
 
 void loadkeys_wrapper (char *map)
 {
+	int fd;
+	fd = getfd();
+
 	keymap_name = map;
 	unicode_used = 0;
 	yywrap ();
 	if (yyparse() || private_error_ct) {
-		fprintf (stderr, "Syntax error\n");
+		di_log ("Syntax error in keymap\n");
 		exit (1);
 	}
 	do_constant();
-	loadkeys ();
-	set_kbd_mode ();
+	loadkeys (fd);
+	set_kbd_mode (fd);
 	exit (0);
 }
 
@@ -445,7 +450,7 @@ FILE *find_incl_file(char *s) {
 		char *user_dir[2] = { 0, 0 };
 		while(ev) {
 			char *t = index(ev, ':');
-			char sv;
+			char sv = '\0';
 			if (t) {
 				sv = *t;
 				*t = 0;
@@ -468,11 +473,6 @@ FILE *find_incl_file(char *s) {
 
 void
 open_include(char *s) {
-	char *t, *te;
-
-	if (verbose)
-		/* start reading include file */
-		fprintf(stderr, _("switching to %s\n"), s);
 
 	lk_push();
 
@@ -609,7 +609,6 @@ addkey(int index, int table, int keycode) {
 	     int alttable = table | M_ALT;
 	     int type = KTYP(keycode);
 	     int val = KVAL(keycode);
-	     char *p;
 	     if (alttable != table && defining[alttable] &&
 		 (!keymap_was_set[alttable] ||
 		  !(keymap_was_set[alttable])[index]) &&
@@ -712,10 +711,7 @@ defkeys(int fd) {
 			    perror("KDSKBENT");
 			} else
 			  ct++;
-			if(verbose)
-			  printf("keycode %d, table %d = %d%s\n", j, i,
-				 (key_map[i])[j], fail ? _("    FAILED") : "");
-			else if (fail)
+			if (fail)
 			  fprintf(stderr,
 				  _("failed to bind key %d to value %d\n"),
 				  j, (key_map[i])[j]);
@@ -726,9 +722,6 @@ defkeys(int fd) {
 		ke.kb_index = 0;
 		ke.kb_table = i;
 		ke.kb_value = K_NOSUCHMAP;
-
-		if (verbose > 1)
-		  printf(_("deallocate keymap %d\n"), i);
 
 		if(ioctl(fd, KDSKBENT, (unsigned long)&ke)) {
 		    if (errno != EINVAL) {
@@ -811,14 +804,7 @@ deffuncs(int fd){
 			  ostr(kbs_buf.kb_string), syms[KT_FN].table[kbs_buf.kb_func]);
 		else
 		  ct++;
-	    } else if (opts) {
-		kbs_buf.kb_string[0] = 0;
-		if (ioctl(fd, KDSKBSENT, (unsigned long)&kbs_buf))
-		  fprintf(stderr, _("failed to clear string %s\n"),
-			  syms[KT_FN].table[kbs_buf.kb_func]);
-		else
-		  ct++;
-	    }
+	    } 
 	  }
 	return ct;
 }
@@ -899,25 +885,13 @@ do_constant (void) {
 }
 
 static void
-loadkeys (void) {
-        int fd;
+loadkeys (int fd) {
         int keyct, funcct, diacct;
 
-	fd = getfd();
 	keyct = defkeys(fd);
 	funcct = deffuncs(fd);
 	if (accent_table_size > 0 || nocompose)
 		diacct = defdiacs(fd);
-	if (verbose) {
-	        printf(_("\nChanged %d %s and %d %s.\n"),
-		       keyct, (keyct == 1) ? _("key") : _("keys"),
-		       funcct, (funcct == 1) ? _("string") : _("strings"));
-		if (accent_table_size > 0 || nocompose)
-			printf(_("Loaded %d compose %s.\n"), diacct,
-			       (diacct == 1) ? _("definition") : _("definitions"));
-		else
-			printf(_("(No change in compose definitions.)\n"));
-	}
 }
 
 static void strings_as_usual(void) {
@@ -999,142 +973,3 @@ compose_as_usual(char *charset) {
 	}
 }
 
-/*
- * mktable.c
- *
- */
-static char *modifiers[8] = {
-    "shift", "altgr", "ctrl", "alt", "shl", "shr", "ctl", "ctr"
-};
-
-static char *mk_mapname(char mod) {
-    static char buf[60];
-    int i;
-
-    if (!mod)
-      return "plain";
-    buf[0] = 0;
-    for (i=0; i<8; i++)
-      if (mod & (1<<i)) {
-	  if (buf[0])
-	    strcat(buf, "_");
-	  strcat(buf, modifiers[i]);
-      }
-    return buf;
-}
-
-
-static void
-outchar (unsigned char c, int comma) {
-        printf("'");
-        printf((c == '\'' || c == '\\') ? "\\%c" : isgraph(c) ? "%c"
-	       : "\\%03o", c);
-	printf(comma ? "', " : "'");
-}
-
-static void
-mktable () {
-	int i, imax, j;
-
-	struct kbsentry kbs;
-	u_char *p;
-	int maxfunc;
-	unsigned int keymap_count = 0;
-
-	printf(
-/* not to be translated... */
-"/* Do not edit this file! It was automatically generated by   */\n");
-	printf(
-"/*    loadkeys --mktable defkeymap.map > defkeymap.c          */\n\n");
-	printf("#include <linux/types.h>\n");
-	printf("#include <linux/keyboard.h>\n");
-	printf("#include <linux/kd.h>\n\n");
-
-	for (i = 0; i < MAX_NR_KEYMAPS; i++)
-	  if (key_map[i]) {
-	      keymap_count++;
-	      if (i)
-		   printf("static ");
-	      printf("u_short %s_map[NR_KEYS] = {", mk_mapname(i));
-	      for (j = 0; j < NR_KEYS; j++) {
-		  if (!(j % 8))
-		    printf("\n");
-		  printf("\t0x%04x,", U((key_map[i])[j]));
-	      }
-	      printf("\n};\n\n");
-	  }
-
-	for (imax = MAX_NR_KEYMAPS-1; imax > 0; imax--)
-	  if (key_map[imax])
-	    break;
-	printf("ushort *key_maps[MAX_NR_KEYMAPS] = {");
-	for (i = 0; i <= imax; i++) {
-	    printf((i%4) ? " " : "\n\t");
-	    if (key_map[i])
-	      printf("%s_map,", mk_mapname(i));
-	    else
-	      printf("0,");
-	}
-	if (imax < MAX_NR_KEYMAPS-1)
-	  printf("\t0");
-	printf("\n};\n\nunsigned int keymap_count = %d;\n\n", keymap_count);
-
-/* uglified just for xgettext - it complains about nonterminated strings */
-	printf(
-"/*\n"
-" * Philosophy: most people do not define more strings, but they who do\n"
-" * often want quite a lot of string space. So, we statically allocate\n"
-" * the default and allocate dynamically in chunks of 512 bytes.\n"
-" */\n"
-"\n");
-	for (maxfunc = MAX_NR_FUNC; maxfunc; maxfunc--)
-	  if(func_table[maxfunc-1])
-	    break;
-
-	printf("char func_buf[] = {\n");
-	for (i = 0; i < maxfunc; i++) {
-	    p = func_table[i];
-	    if (p) {
-		printf("\t");
-		for ( ; *p; p++)
-		        outchar(*p, 1);
-		printf("0, \n");
-	    }
-	}
-	if (!maxfunc)
-	  printf("\t0\n");
-	printf("};\n\n");
-
-	printf(
-"char *funcbufptr = func_buf;\n"
-"int funcbufsize = sizeof(func_buf);\n"
-"int funcbufleft = 0;          /* space left */\n"
-"\n");
-
-	printf("char *func_table[MAX_NR_FUNC] = {\n");
-	for (i = 0; i < maxfunc; i++) {
-	    if (func_table[i])
-	      printf("\tfunc_buf + %d,\n", func_table[i] - func_buf);
-	    else
-	      printf("\t0,\n");
-	}
-	if (maxfunc < MAX_NR_FUNC)
-	  printf("\t0,\n");
-	printf("};\n");
-
-	printf("\nstruct kbdiacr accent_table[MAX_DIACR] = {\n");
-	for (i = 0; i < accent_table_size; i++) {
-	        printf("\t{");
-	        outchar(accent_table[i].diacr, 1);
-		outchar(accent_table[i].base, 1);
-		outchar(accent_table[i].result, 0);
-		printf("},");
-		if(i%2) printf("\n");
-	}
-	if(i%2) printf("\n");
-	printf("};\n\n");
-	printf("unsigned int accent_table_size = %d;\n",
-	       accent_table_size);
-
-	exit(0);
-}

@@ -4,16 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sysexits.h>
+#include <debian-installer.h>
 #include "nls.h"
-#include "xmalloc.h"
-
 
 static void
 nomem(void) {
-	fprintf(stderr, _("%s: out of memory\n"),  PROGNAME);
-	exit(EX_OSERR);
+	di_log (PROGNAME ": Out of memory\n");
+	exit(1);
 }
+
 
 void *
 xmalloc(size_t sz) {
@@ -38,3 +37,5 @@ xstrdup(char *p) {
 		nomem();
 	return q;
 }
+
+

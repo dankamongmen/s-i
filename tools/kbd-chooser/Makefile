@@ -1,4 +1,3 @@
-DESTDIR=
 
 ifdef DEBUG
 DEB_BUILD_OPTIONS := debug:${DEB_BUILD_OPTIONS}
@@ -7,8 +6,11 @@ endif
 CFLAGS := -Wall -Os -I.
 ARCH := $(shell dpkg --print-architecture)
 
+OBJS := loadkeys.o findfile.o ksyms.o  getfd.o
+
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 CFLAGS += -g  -DDEBUG=1
+OBJS += xmalloc.o
 STRIP= /bin/true
 else
 CFLAGS +=  -fomit-frame-pointer
@@ -18,8 +20,6 @@ endif
 
 LDOPTS=  -ldebconf -ldebian-installer
 
-
-OBJS = loadkeys.o findfile.o ksyms.o  getfd.o xmalloc.o
 
 ifeq ($(ARCH),i386)
 CFLAGS += -DAT_KBD -DPREFERRED_KEYBOARD="PS/2" -DUSB_KBD
