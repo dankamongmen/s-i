@@ -1,0 +1,22 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+
+# find all packages implementing 'kernel-image'
+
+if [ "$kernels" ] ; then
+    db_subst kernel-chooser/which-kernel kernels "$kernels"
+fi
+
+
+# Pick a good default choice, and set it
+
+db_input low kernel-chooser/which-kernel || true
+db_go || true
+
+db_get kernel-chooser/which-kernel
+kernel=$RET
+
+# Pass the kernel name on to kernel-installer
+db_set debian-installer/kernel/image "$kernel"
