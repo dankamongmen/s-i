@@ -1,0 +1,50 @@
+#!/usr/bin/make -f
+
+export DH_COMPAT=2
+
+SHELL := sh -e
+
+khsed := s/^Package: kernel-image-\(.*\)-386.*/\1/
+export version := $(shell sed -n '$(khsed); t e; b; :e; p; q' debian/control)
+fullversion := $(shell \
+	dpkg-parsechangelog | sed -n 's/^Version: //p; t e; b; :e; q' \
+)
+
+kdst := debian/kernel-image-$(version)-386-udeb
+
+build:
+	dh_testdir
+
+clean:
+	dh_testdir
+	dh_clean
+
+binary-indep:
+
+binary-arch:
+	dh_testdir
+	dh_clean -k
+	dh_installdirs
+
+	./script/copy-modules 386
+	install -D -m 644 /boot/vmlinuz-$(version)-386 $(kdst)/boot/vmlinuz
+	install -D -m 644 /lib/modules/$(version)-386/modules.dep \
+		$(kdst)/lib/modules/$(version)-386/modules.dep
+	dh_fixperms
+	# Don't write your stupid guesses to debian/files.
+	dh_gencontrol -- -fdebian/files~
+	for i in $$(dh_listpackages); do \
+		dpkg-distaddfile $${i}_$(fullversion)_i386.udeb \
+			debian-installer $$( \
+				sed -n " \
+					/^Package: $${i}\$$/!d; \
+					:b; s/^Priority: //p; t e; \
+					n; b b; :e; q \
+				" debian/control \
+			); \
+		dh_builddeb --package=$$i \
+			--filename=$${i}_$(fullversion)_i386.udeb; \
+	done
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

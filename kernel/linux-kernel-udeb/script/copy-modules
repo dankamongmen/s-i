@@ -1,0 +1,89 @@
+#!/bin/sh
+#
+# Copy modules into the right directories in preparation for building udebs.
+# This script is named after the its counterpart in the originial
+# kernel-image-di package by Joey Hess <joeyh@debian.org>.
+#
+# Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
+#
+# $Id: copy-modules,v 1.1 2003/10/11 02:49:13 joeyh Exp $
+
+set -e
+
+deplist() {
+	deps=$1
+	list=$2
+	cp $list $tmpdir/work
+	while :; do
+		join -o 2.2 $tmpdir/work $deps | sort -u | comm -23 - $list \
+			> $tmpdir/work.new
+		mv $tmpdir/work.new $tmpdir/work
+		[ -s $tmpdir/work ] || break
+		sort -um -o $list $list $tmpdir/work
+	done
+}
+
+flavour=$1
+version=$version-$flavour
+home=$PWD
+
+trap 'rm -rf $tmpdir' EXIT
+tmpdir=$(tempfile)
+rm $tmpdir
+mkdir $tmpdir
+
+moddir=/lib/modules/$version
+
+moddir_awk="\/lib\/modules\/$version\/kernel\/"
+awk '
+	{
+		gsub(/'"$moddir_awk"'/, "", $0)
+	}
+
+	$1 ~ /:$/ {
+		module = substr($1, 1, length($1) - 1)
+		if ($2) {
+			print module "\t" $2
+		}
+		next
+	}
+
+	$1 {
+		print module "\t" $1
+	}
+' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
+unset moddir_awk
+
+mkdir $tmpdir/module-deps $tmpdir/module-list
+
+mkfifo $tmpdir/fifo
+for i in $(
+	{
+		find modules/ -maxdepth 1 -type f -printf "%f\t%f\n"
+		cat module-deps
+	} | tsort | tac
+); do
+	echo $i | join -o 2.2 - $home/module-deps | {
+		cd $tmpdir/module-deps
+		xargs -r sh -c 'printf "%s\n" "$@"; cat "$@"' sh
+	} | sort -u | tee $tmpdir/module-deps/$i | {
+		cd $tmpdir/module-list
+		xargs -r cat
+	} | sort -u > $tmpdir/exclude
+
+	cp $home/modules/$i $tmpdir/module-list
+	join -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |
+		sort -k 1,1 > $tmpdir/tmpdeps
+
+	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
+
+	cd $moddir/kernel
+	tar cfT - $tmpdir/module-list/$i > $tmpdir/fifo&
+	{
+		dir=$home/debian/$i-$version-udeb/lib/modules/$version/kernel
+		mkdir -p $dir
+		cd $dir
+		tar xf -
+	} < $tmpdir/fifo
+	wait $!
+done
