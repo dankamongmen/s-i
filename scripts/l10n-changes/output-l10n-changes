@@ -45,7 +45,12 @@ $CURDIR/log-changes $P
 
 if [ "`cat "$PACKAGE/debian/.credits_log"| wc -l`" -gt 0 ]
 then
-echo -n "  * Updated translations: "
+	OUTPUT=1
+	echo -n "  * Updated translations"
+	if [ "$SCAN_TRANS" ]; then
+		echo -n " in $P"
+	fi
+	echo -n ": "
 fi
 
 PREV=""
@@ -54,7 +59,7 @@ while read line
 do
     L=`echo $line | cut -d ":" -f 1`
     T=`echo $line | cut -d ":" -f 2`
-    CSN=`echo $L | sed 's/\.po$//g'`;
+    CSN=`echo $L | sed 's/\.po$//g'`
     TEMP=`echo $CSN | grep _`
     if [ ! "x$TEMP" = "x" ]
     then
@@ -121,4 +126,10 @@ if [ "x$DELETE" != "x" ]
 then
     rm $PACKAGE/debian/.credits_log
 fi
-echo
+if [ -n "$OUTPUT" ]; then
+	echo
+else
+	if [ "$SCAN_TRANS" ]; then
+		exit 10
+	fi
+fi
