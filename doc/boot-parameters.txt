@@ -6,13 +6,18 @@ For example:
 DEBCONF_PRIORITY
 
 	Control how many questions the installer asks. Default is high, use
-	medium or low for more control, critical to make as far decisions
+	medium or low for more control, critical to make as few decisions
 	as possible.
 
 DEBCONF_FRONTEND
 
 	Pick the frontend to use. Default is newt. Other frontends are not
 	available on default install media, so this is not very useful.
+
+DEBCONF_DEBUG
+
+	Control how much debugging output goes in the log. 5 for a lot, 0
+	for none.
 
 BOOT_DEBUG
 
@@ -34,3 +39,16 @@ INSTALL_MEDIA_DEV
 	The boot floppy, which normally scans all floppys and USB storage
 	devices it can to find the root floppy, can be overridden by this
 	parameter to only look at the one device.
+
+In addition to the above, any debconf variable in debian-installer can have
+its default value overridden on the command line. For example:
+
+  boot: linux debconf/priority=low
+
+There is not a complete list of all available debconf variables, and some
+variables cannot be overridden at boot time. Here are some particularly
+useful ones that are known to work:
+
+debian-installer/framebuffer
+
+	Set to "false" if enabling the frame buffer console causes problems.
