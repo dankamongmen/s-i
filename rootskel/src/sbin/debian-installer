@@ -25,6 +25,12 @@ if [ -x "$bterm" -a -e "$font" -a C.UTF-8 = "$LANG" ] && enable-fb ; then
     use_bterm=true
 fi
 
+# Set the kbd early, if necessary
+bootkbd=$( echo " " $( cat /proc/cmdline ) " " | sed -n 's/^.* bootkbd=\([^ ]*\) .*$/\1/p' )
+if [ -x "$kbdchooser" -a $bootkbd != "" ] ; then
+     kbd-chooser $bootkbd
+fi
+
 # Use boot variable, but make it possible to change it in main-menu
 if [ "$DEBCONF_PRIORITY" ] ; then
     debconf-set debconf/priority "$DEBCONF_PRIORITY"
