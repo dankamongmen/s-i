@@ -32,9 +32,7 @@ is_installed(struct package_t *p, struct linkedlist_t *installed)
 		return 0;
 	ret = (di_compare_version(&pv, &qv) <= 0);
 	free(pv.version);
-	free(pv.revision);
 	free(qv.version);
-	free(qv.revision);
 	return ret;
 }
 
