@@ -66,7 +66,7 @@ is_queued(di_package *package)
 static int
 choose_modules(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator)
 {
-    char *choices, *package_kernel, *running_kernel = NULL, *subarchitecture;
+    char *choices, *running_kernel = NULL, *subarchitecture;
     int package_count = 0;
     di_package *package, *status_package, **package_array;
     di_slist_node *node, *node1;
@@ -112,7 +112,6 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 
     for (node = (*packages)->list.head; node; node = node->next) {
         package = node->data;
-        package_kernel = udeb_kernel_version(package);
 
         package->status_want = di_package_status_want_deinstall;
 
@@ -124,16 +123,17 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
           continue;
         if (!di_system_package_check_subarchitecture(package, subarchitecture))
           continue;
-	if (strncmp(package->package, "kernel-image-", 13) == 0)
-	  continue;
 
-        if (running_kernel && package_kernel && strcmp(running_kernel, package_kernel) == 0)
+        if (((di_system_package *)package)->kernel_version)
         {
-            package->status_want = di_package_status_want_unknown;
-            di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, matches kernel", package->package);
+          if (running_kernel && strcmp(running_kernel, ((di_system_package *)package)->kernel_version) == 0)
+          {
+              package->status_want = di_package_status_want_unknown;
+              di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, matches kernel", package->package);
+          }
+          else
+            continue;
         }
-	else if (package_kernel)
-	  continue;
         if (package->priority >= di_package_priority_standard || is_queued(package))
         {
             package->status_want = di_package_status_want_install;
@@ -152,7 +152,7 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     /* Drop packages in udeb_exclude */
     drop_excludes(*packages);
 
-    di_packages_resolve_dependencies_mark(*packages);
+    di_system_packages_resolve_dependencies_mark_kernel(*packages);
 
     /* Slight over-allocation, but who cares */
     package_array = di_new0(di_package *, di_hash_table_size((*packages)->table));

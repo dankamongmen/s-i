@@ -32,7 +32,6 @@ char *list_to_choices(di_package **packages);
 int get_package (di_package *package, char *dest);
 int md5sum(const char* sum, const char *file);
 void cleanup(void);
-char *udeb_kernel_version(di_package *package);
 int skip_package(di_package *p);
 int package_array_compare(const void *v1, const void *v2);
 void take_includes(di_packages *packages);

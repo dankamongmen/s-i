@@ -282,30 +282,6 @@ cleanup(void)
     free(retriever);
 }
 
-/* 
- * Simply return the XYZ in foo-modules-XYZ-udeb
- * Returns NULL if the match fails
- * FIXME: Should we cross-check against the package version?
- */
-char *
-udeb_kernel_version(di_package *p)
-{
-    char *name;
-    char *t1, *t2;
-
-    if (p->package == NULL)
-	return NULL;
-    name = p->package;
-    if ((t1 = strstr(name, "-modules-")) == NULL)
-        return NULL;
-    t1 += sizeof("-modules-") - 1;
-    if (((t2 = strstr(t1, "-udeb")) == NULL || t2[sizeof("-udeb") - 1] != '\0')
-	&& ((t2 = strstr(t1, "-di")) == NULL || t2[sizeof("-di") - 1] != '\0'))
-        return NULL;
-    t2 = di_stradup(t1, t2 - t1);
-    return t2;
-}
-
 int
 package_array_compare(const void *v1, const void *v2)
 {
