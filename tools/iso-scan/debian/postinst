@@ -75,8 +75,9 @@ try_iso () {
 	fi
 }
 
-# Is a cdrom already mounted?  If so, assume it's the right one..
-mount | grep -q 'on /cdrom' && exit 0
+# Try to unmount anything that was previously mounted.
+umount /cdrom 2>/dev/null || true
+umount /hd-media 2>/dev/null || true
 
 # Hopefully this will find the drive.
 hw-detect || true
