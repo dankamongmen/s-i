@@ -92,6 +92,7 @@ findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
 	if (d == NULL)
 	    return NULL;
 	while ((de = readdir(d)) != NULL) {
+	    struct stat statbuf;
 	    int okdir;
 
 	    if (strcmp(de->d_name, ".") == 0 ||
@@ -104,7 +105,6 @@ findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
 	    okdir = (ff && strcmp(de->d_name, fdir) == 0);
 
 	    if ((secondpass && recdepth) || okdir) {
-       		struct stat statbuf;
 		char *a;
 
 		a = xmalloc(strlen(dir) + strlen(de->d_name) + 2);
@@ -136,6 +136,9 @@ findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
 		    continue;
 
 	    sprintf(pathname, "%s/%s", dir, de->d_name);
+
+	    if (stat(pathname, &statbuf) == 0 && S_ISDIR(statbuf.st_mode))
+		    continue;
 
 	    /* Does tail consist of a known suffix and possibly
 	       a compression suffix? */
