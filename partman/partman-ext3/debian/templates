@@ -8,20 +8,19 @@ _Description: Creating ext3 file system in partition #${PARTITION} of ${DEVICE}.
 
 Template: partman-ext3/check_failed
 Type: select
-__Choices: Return to the partitioning menu, Continue anyway
+__Choices: Go back to the partitioning menu, Continue anyway
 _Description: Uncorrected errors in a file system
- The test of the file system with type ext3 in partition #${PARTITION} of
- ${DEVICE} found uncorrected errors in it.
+ The test of the file system with type ext3 in partition #${PARTITION}
+ of ${DEVICE} found uncorrected errors.
  .
- Do you want to be returned back to the partitioning menu?
+ Please choose whether you want to go back to the partitioning menu or
+ ignore these errors and continue the process.
 
 Template: partman-ext3/create_failed
-Type: note
+Type: error
 _Description: Failed to create a file system
- The attempt to create a file system with type ext3 in partition
+ The ext3 file system creation in partition
  #${PARTITION} of ${DEVICE} failed.
- .
- You will be returned back to the partitioning menu.
 
 Template: partman-ext3/no_mount_point
 Type: select
@@ -32,20 +31,23 @@ _Description: Use partition with no file system.  Resume the partitioning?
 
 Template: partman-ext3/mountpoint
 Type: select
-__Choices: /, /boot, /home, /tmp, /usr, /usr/local, /var, Enter manually, Do not mount it
+_Choices: /, /boot, /home, /tmp, /usr, /usr/local, /var, Enter manually, Do not mount it
 _Description: Please choose the mountpoint for this partition
 
 Template: partman-ext3/mountpoint_manual
 Type: string
-_Description: Please specify the mountpoint for this partition
+_Description: Mount point for this partition:
 
 Template: partman-ext3/bad_mountpoint
-Type: note
-_Description: The mountpoint must start with /.  It can not contain spaces.
+Type: error
+_Description: Invalid mount point
+ The mount point you entered is invalid.
+ .
+ Mount points must start with /.  They cannot contain spaces.
 
 Template: partman-ext3/text/specify_mountpoint
 Type: text
-_Description: Specify mount point for this partition
+_Description: Mount point for this partition:
 
 Template: partman-ext3/text/ext3
 Type: text
@@ -59,30 +61,28 @@ _Description: Specify mount options
 Template: partman-ext3/options
 Type: multiselect
 Choices: noatime, nodev, nosuid, noexec, ro, sync, usrquota, grpquota
-_Descriptions: Please specify the mount options
- This is the meaning of the options:
+_Descriptions: Mount options:
+ You may choose one or more mounting options among the following:
  .
  noatime -- do not update inode access times for each access.  This
- option is usefull e.g. for fast access to the news spool.  It is
+ option is e.g. useful for fast access to news spools.  It is
  recommended for file systems on Compact Flash cards, USB Flash Drive
  and similar devices as they break down after too many writes.
  .
  nodev -- do not interpret character or block special devices.  On
  hardened secure hosts this option should be used for all file systems
  that contain directories where regular users have write access
- (/home, /tmp, /var/tmp, etc.).  Ofcource it may not be used for the
+ (/home, /tmp, /var/tmp, etc.).  Do not use this option for the
  root file system.
  .
- nosuid -- do not allow set-user-identifier or set-group-identifier
- bits to take effect.  (This is not safe if you have suidperl
- installed.)
+ nosuid -- ignore set-user-identifier or set-group-identifier
+ bits (this is not safe if you have suidperl installed).
  .
  noexec -- do not allow execution of any binaries.
  .
  ro -- mount the file system read-only.
  .
- sync -- do synchronously all I/O to the file system.
+ sync -- all input/output activities occur synchronously on the file system;
  .
  usrquota / grpquota -- user/group disk quota accounting enabled, and
  limits (optionally) enforced.
-
