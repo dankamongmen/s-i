@@ -154,8 +154,7 @@ void mapdevfs(struct fstab_entry *entry) {
 	if(entry->filesystem == NULL)
 		return;
 
-	asprintf(&cmd, "%s %s 2>/dev/null",
-		"/home/sar/installer/utils/mapdevfs", strdup(entry->filesystem));
+	asprintf(&cmd, "%s %s 2>/dev/null", "mapdevfs", strdup(entry->filesystem));
 
 	pfile = popen(cmd, "r");
 	if(pfile == NULL)
