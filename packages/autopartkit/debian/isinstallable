@@ -1,0 +1,13 @@
+#!/bin/sh
+. /usr/share/debconf/confmodule
+
+log() {
+	logger -t autopartkit "$@"
+}
+
+db_get autopartkit/hide
+if [ "$RET" = true ]; then
+	exit 1
+fi
+
+exit 0
