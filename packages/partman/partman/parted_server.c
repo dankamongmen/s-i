@@ -600,9 +600,8 @@ maximize_extended_partition(PedDisk *disk)
 void
 minimize_extended_partition(PedDisk *disk)
 {
-        PedPartition *extended;
         assert(disk != NULL);
-        if (0 != strcmp(disk->type->name, "dvh")) {
+        if (0 != strcmp(disk->type->name, "dvh"))
                 ped_disk_minimize_extended_partition(disk);
 }
 
@@ -1209,7 +1208,7 @@ command_partitions()
                         continue;
                 /* Another hack :) */
                 if (0 == strcmp(disk->type->name, "dvh")
-                    && PED_PARTITION_LOGICAL & part->type) {
+                    && PED_PARTITION_LOGICAL & part->type)
                         continue;
                 part_info = partition_info(disk, part);
                 oprintf("%s\n", part_info);
