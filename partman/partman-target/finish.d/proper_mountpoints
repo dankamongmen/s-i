@@ -34,7 +34,10 @@ same_mountpoints () {
 	    $i
 	done | 
 	while read fs mp type options dump pass; do
-	    echo $mp,$fs
+	    case "$mp" in
+		/*)
+		    echo $mp,$fs;;
+	    esac
 	done |
 	sort
     )
