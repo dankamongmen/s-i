@@ -19,6 +19,9 @@ CONFFILE=/etc/cdebconf.conf
 udebname=cdebconf-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
 udebpriority=$(shell grep '^Package: cdebconf-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
 
+priorityudebname=cdebconf-priority_$(VERSION)_$(DEB_HOST_ARCH).udeb
+priorityudebpriority=$(shell grep '^Package: cdebconf-priority' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
+
 libudebname=libdebconfclient0-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
 libudebpriority=$(shell grep '^Package: libdebconfclient0-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
 
@@ -104,6 +107,11 @@ install-udeb: build-udeb install-dirs
 	mv $(shell pwd)/debian/cdebconf-udeb/usr/lib/libdebconfclient.so.* \
 		$(shell pwd)/debian/libdebconfclient0-udeb/usr/lib
 
+install-priority-udeb: build-udeb install-dirs
+	dh_testdir
+	dh_testroot
+	dh_installdebconf -n -pcdebconf-priority
+
 install-slang-udeb: build-udeb install-dirs
 	dh_testdir
 	dh_testroot
@@ -153,7 +161,7 @@ binary-indep: build install
 # Build architecture-dependent files here.
 #
 # Note that this builds a .udeb, which is not policy compliant or anything.
-binary-arch: cdebconf cdebconf-udeb libdebconfclient0-udeb \
+binary-arch: cdebconf cdebconf-udeb cdebconf-priority libdebconfclient0-udeb \
 	cdebconf-slang-udeb cdebconf-newt-udeb cdebconf-gtk-udeb
 
 $(LIBDEBCONF): install
@@ -226,6 +234,24 @@ cdebconf-udeb: install-udeb
 # udebs shouldn't have md5sums.
 #	dh_md5sums		-p$@
 	dh_builddeb		-p$@ --filename=$(udebname)
+
+cdebconf-priority: install-priority-udeb
+	@echo "Building $@"
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	dh_strip		-p$@
+	dh_compress		-p$@
+	dh_fixperms		-p$@
+	dh_installdeb		-p$@
+	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
+	# Don't write your stupid guesses to debian/files.
+	dh_gencontrol 		-p$@ -- -fdebian/files~
+	# Register file manually.
+	dpkg-distaddfile	$(priorityudebname) debian-installer $(priorityudebpriority)
+# udebs shouldn't have md5sums.
+#	dh_md5sums		-p$@
+	dh_builddeb		-p$@ --filename=$(priorityudebname)
 
 libdebconfclient0-udeb: install-udeb
 	@echo "Building $@"

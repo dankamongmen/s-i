@@ -233,6 +233,10 @@ command_set(struct confmodule *mod, char *arg, char *out, size_t outsize)
 	    { /* Pass the value on to getlanguage() in templates.c */
                 setenv("LANGUAGE", argv[1], 1);
 	    }
+            else if (strcmp(argv[0], "debconf/priority") == 0)
+            {
+                setenv("DEBCONF_PRIORITY", argv[1], 1);
+            }
         }
         else
             snprintf(out, outsize, "%u cannot set value",
