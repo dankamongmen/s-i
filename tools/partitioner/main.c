@@ -171,6 +171,7 @@ int main(int argc, char *argv[]) {
 		char *cmd_script = NULL;
 		char *cmd = NULL;
 		char *disk = NULL;
+		char *language = NULL;
 
 		debconf_subst(debconf, "partitioner/disc", "DISCS", choices);
 		debconf_fset(debconf, "partitioner/disc", "seen", "false");
@@ -185,8 +186,17 @@ int main(int argc, char *argv[]) {
 
 		cmd_script = execute_fdisk();
 		disk = extract_choice(debconf->value);
+
+		/* Hack for translated fdisks (mostly cfdisk) to be  */
+		/* translated (tsl comes from the util-linux package */
+		/* Comment if this causes problems with terminals    */
+		/* not properly handling characters in translations  */
+		debconf_get(debconf, "debian-installer/language");
+		language = extract_choice(debconf->value);
+		setenv("LANGUAGE", language, "1");
+
 		if (strcmp(disk,"false") != 0) {
-			asprintf(&cmd, "/bin/sh %s %s </dev/tty >/dev/tty 2>/dev/tty", cmd_script, disk);
+		  asprintf(&cmd, "/bin/sh %s %s </dev/tty >/dev/tty 2>/dev/tty", cmd_script, disk);
 
 			i = system(cmd);
 			if(i != 0) {
