@@ -1,14 +1,14 @@
 Where we are:
 
 	We have a small chrooted system that is being autobuilt daily.
-	A single bootable floppy image has been created, and works.
+	Ufortunatly, it is about 233k too big now. We're hoping to get this
+	fixed by Wednesday.
 
 General things to keep an eye on:
 
 	- All udeb packages should be able to build debug versions if
 	  DEB_BUILD_OPTIONS="debug".
-	- Packages that link in cdebconf should build-depend on
-	  cdebconf-dev now that it is in Debian.
+	- Udebs should not include .md5sum files.
 	- Make sure all udebs declare dependancies on everything they
 	  depend on (this includes depending on ash, busybox, etc). The
 	  dependancy web is pretty spotty right now.
@@ -17,11 +17,18 @@ General things to keep an eye on:
 
 Still Todo:
 
+	- generate treecompare data for each daily build and put or mail it
+	  somewhere [Joey Hess]
+	- re-orient and get back on our feet after the long hiatus:
+		- daily autobuilds are happening again
+		- TODO: scan and summarize all changes since last spring
+
         - target media detector
                 Just has to figure out what media to install to.
                 Probably trivial; most support already in the kernel.
         - disk formatter
                 Formats disks, turns on swap, etc.
+        - {lilo,grub} installer
 	- polish everything so it is actually usable
 	- i18n
 	- translations
@@ -31,17 +38,16 @@ Still Todo:
 	- cd installs, etc, etc, etc
 
 Under development:
+
         - disk partitioner [David Whedon]
-		tools/partkit in CVS.  Currently doesn't do much
+		tools/partkit in CVS. Currently doesn't do much
 		but is a good start.
-        - cdebconf (miniature debconf in C) [Randolph Chung, Anthony Towns]
+        - cdebconf [Randolph Chung]
                 In progress, has one working database backend and one
 		working text-based frontend, with progress on a slang
 		frontend. Quite usable by now.
         - ethdetect [David Whedon]
 		Seems to work, still needs some itegration into the chroot.
-	- insmod/modprobe [David Whedon]
-		Udebs not yet available, patch sent to bts.
         - netcfg [David Whedon]
 		Development in progress, and partly works now.
 		some required patches (dhcp) still in bts.
@@ -50,28 +56,17 @@ Under development:
         - choose-mirror [Joey Hess]
 		80% done
         - base system installer [Anthony Towns]
-		Aj has a script that bootstraps a chrooted base system
-		starting with just busybox. It needs integration into the
-		system, and udebs are not available yet.
-        - {lilo,grub} installer [Gergely Risko]
-		Debconfized lilo is in debian.
-        - kernel-image-di [Joey Hess]
-		Builds both a regular kernel-image package and udebs for
-		the modules. Still needs work. Kernel config file needs 
-		work expecially, as do the selections of exactly which
-		modules go in which udebs.
-        - library reduction [Marcus Brinkmann]
-		mklibs.sh works, but it is not packaged.
+		debootstrap is stable, but needs to be integrated into d-i
+		udebs are not available yet.
+        - library reduction
+		mklibs.sh works, but it is not packaged. This is a pain in
+		the ass.
         - install media build system [Joey Hess, David Whedon]
 		We can build chrootable, library-reduced trees. It 
-		boots too. Dns doesnot work though.
-	- post-reboot configuration [Joey Hess?]
-		Many packages that are currently set up by the
-		boot-floppies need to start handling their own setup, after
-		reboot, via debconf. These include timezone and clock config, 
-		many of the things in base-config now, what else?
+		boots too (CHECK: does it still?). Dns does not work though.
 
 Needs testing:
+
 	- netkit-tiny [David Whedon]
 		Packaged, not really tested.
 	- other hardware detection [David Whedon]
@@ -86,13 +81,18 @@ More or less done, for now anyway:
                 and how they fit together.
         - udpkg (tiny dpkg clone) [Randolph Chung, Joey Hess]
 		Usable. One todo item (localized descriptions)
+		May be replaced with busybox dpkg.
         - main-menu (main menu generator) [Joey Hess]
                 90% done (one non-trivial todo item)
         - busybox integration [Erik Andersen]
 		First pass busybox udeb available.
+	- kernel-package integration [Herbert Xu]
+		Udebs are built automatically; this is well in hand.
  	- wget retriever [Joey Hess]
 		Needs proxy and general testing.  Will soon have
 		ftp support.
 	- archive setup
 		Done.
-
+	- post-reboot configuration [Joey Hess]
+		base-cofig is stable, though stuff may need to be added to
+		it to handle things d-i doesn't bother with
