@@ -41,5 +41,9 @@ vmlinux=`cd /target/boot && ls -l vmlinux | /target/bin/sed 's/^.* -> \(.*\)$/\1
 /target/bin/echo "--recoverykernel=/boot/$vmlinux" >> /target/etc/palo.conf
 /target/bin/echo "--init-partitioned=$bootdev" >> /target/etc/palo.conf
 
+set +e
+apt-install palo
+set -e
+
 chroot /target /sbin/palo
 
