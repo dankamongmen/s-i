@@ -97,7 +97,7 @@ int make_path(const char *pathname, mode_t mode);
 /* ext3 is not supported by libparted v1.4, nor v1.6. */
 #define DEFAULT_FS "ext2"
 
-/* from evaulator.c */
+/* from evaluator.c */
 double evaluate(const char *expression);
 
 #endif /* AUTOPARTKIT_H */
