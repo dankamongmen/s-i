@@ -9,7 +9,7 @@ Find a recent revision of this document in the debian-installer cvs
 repository, browsable via web:
 http://cvs.debian.org/debian-installer/doc/INSTALLATION-HOWTO?rev=HEAD&content-type=text/vnd.viewcvs-markup
 
-Last change to this document: 06.10.2003
+Last change to this document: 06.13.2003
 
 1. Preliminaries
 
@@ -25,47 +25,67 @@ please direct them to the debian-boot mailing list
 freenode network).
 
 Recently the debian-installer has switched to ask only the important
-questions and confugure the rest automatically. This also involves
-that you won't get to see the main menu anymore, except when something
-goes wrong. If you want to restore the old configuration with more
-questions asked, set DEBCONF_PRIORITY=medium at the boot prompt. If
-you do so, refer to section 3.1. for installing rather than section 3.
+questions and configure the rest automatically. This also means that you
+won't get to see the main menu anymore, except when something goes wrong.
+If you want to restore the old configuration with more questions asked, set
+DEBCONF_PRIORITY=medium at the boot prompt. If you do so, refer to section
+3.1. for installing rather than section 3.
 
 
 2. Getting images
 
 The installer team provides different types of images for the
-debian-installer. They are described below, choose whatever image
-suits you best. However note: This document only covers the
-installation from CD!
+debian-installer. None of these images are yet available on Debian mirrors,
+but there are a few semi-official places to get different kinds of images.
 
-2.1. Install from CD 
+The debian-cd team provides weekly builds of CD images for debian-installer
+here: http://gluck.debian.org/cdimage/testing/netinst/
 
-The debian-cd team provides two netinst images which can be used to
-install sarge with the debian-installer. They can be obtained here:
-http://gluck.debian.org/cdimage/testing/netinst/$ARCH/
+If you feel more adventurous you are invited to test our daily builds, which
+can be found in the 'daily' subdirectories. In the past they often have been
+broken, but nevertheless these images need testing as well.
 
-These images are intended to boot from CD and install additional
-packages over a network, hence the name 'netinst'. The difference
-between the two images is, that on the full netinst image the base
-packages are included, whereas you have to download these from the web
-if you are using the business card image.
-
-If you feel more adventurous you are invited to test our daily builds,
-which can be found in the 'daily' subdir of the above mentioned
-location. In the past they often have been broken, but nevertheless
-these images need testing as well.
-
-2.2. Install from floppy
-
-If you can't boot from CD, you can download floppy images to install
-Debian. Daily built images can be found here:
+Daily builds of all non-CDROM the debian-installer images, including floppy
+images and initrd's are here:
 http://people.debian.org/~sjogren/d-i/images/daily/
 
-You need the floppy-image.img and one of the drivers disks
-net_drivers-image.img or cd_drivers-image.img. The drivers disks
-contain the necessary modules to do the actual installation from CD or
-over the network.
+The subsections below will give the details about which images you should
+get for each possible means of installation.
+
+2.1 CDROM
+
+There are two different netinst images at the location above which can be
+used to install sarge with the debian-installer. These images are intended
+to boot from CD and install additional packages over a network, hence the
+name 'netinst'. The difference between the two images is, that on the full
+netinst image the base packages are included, whereas you have to download
+these from the web if you are using the business card image.
+
+Download whichever type you prefer, burn it to a CD, and boot it.
+
+2.2 Floppy and other images
+
+If you can't boot from CD, you can download floppy images to install
+Debian. You need the bootfloppy-image.ing, the floppy-image.img and one of
+the drivers disks net_drivers-image.img or cd_drivers-image.img. The
+drivers disks contain the necessary modules to do the actual installation
+from CD or over the network.
+
+Floppy disks are one of the least reliable media around, so be prepared for
+lots of bad disks. Each .img file you downloaded goes on a single floppy;
+you can use the dd command to write it to /dev/fd0 or some other means.
+It's a good idea to them use cmp to compare what ended up on the unreliable
+floppy disk with the image. If it fails throw that floppy away and try
+again. Since you'll have more than one floppy, it's a good idea to label
+them.
+
+The boot floppy is the one with bootfloppy-image on it. This floppy, when
+booted, will prompt you to insert a second floppy -- use the one with
+floppy-image on it. The driver floppies can be loaded in any order, and
+then you'll have a debian-installer system not unlike what you get if you
+boot from a CD.
+
+Note that the rest of this document only covers installation from CD!
 
 
 3. Installation
@@ -248,6 +268,7 @@ wait until base-config is started.
 
 Stepping through base-config is not within the scope of this document
 as it is not part of debian-installer.
+
 
 4. Installation Report
 
