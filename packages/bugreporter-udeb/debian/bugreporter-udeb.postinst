@@ -1,10 +1,19 @@
-#!/bin/sh -e
+#!/bin/sh -e 
 
 . /usr/share/debconf/confmodule
 
 # Use tar in /target/ if present
 PATH=/target/bin:$PATH
 export PATH
+
+if [ "" = "$DILOGDIR" ]; then
+	DILOGDIR=/target/var/log/debian-installer
+fi
+
+if [ "" = "$FLOPPYMNT" ]; then
+	FLOPPYMNT=/floppy
+fi
+
 
 copy_cdebconf_db() {
     destdir="$1"
@@ -13,21 +22,35 @@ copy_cdebconf_db() {
     cp -a /var/lib/cdebconf "$destdir"
 }
 
-# generate files with HW info, debconf database info etc, and store
-# them in /var/log
 
-copy_cdebconf_db /var/log/cdebconf-copy
+# make sure we have a directory
+if [ ! -d $DILOGDIR ]; then
+	mkdir -p $DILOGDIR
+fi
 
-/bin/report-hw > /var/log/hardware-summary
-
-/bin/package-versions > /var/log/package-versions
-
-db_input important bugreporter-udeb/insert_floppy || [ $? -eq 30 ]
+db_input critical bugreporter-udeb/insert_floppy || [ $? -eq 30 ]
 db_go
+
+# generate files with HW info, debconf database info etc, and store
+# them in $DILOGDIR
+db_progress START 0 5 prebaseconfig/progress/bugreporter-udeb
+
+cp -a /var/log/* $DILOGDIR || true
+db_progress STEP 1
+
+copy_cdebconf_db $DILOGDIR/cdebconf-copy
+db_progress STEP 1
+
+/bin/package-versions > $DILOGDIR/package-versions
+db_progress STEP 1
+
+/bin/report-hw > $DILOGDIR/hardware-summary
+db_progress STEP 1
 
 # Mostly copied from floppy-retriever. [pere 2004-03-13]
 mountfloppy() {
 	if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
+		logger -t bugreporter-udeb -p user.debug "failed to mount floppy, trying harder"
 		# This is a good reasonable default, but will fail for
 		# USB floppys.
 		FLOPPYDEV=/dev/floppy/0
@@ -41,42 +64,45 @@ mountfloppy() {
 		fi
 
 		if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
+			logger -t bugreporter-udeb -p user.debug "cannot mount floppy"
 			# Cannot find a device, or found the wrong device.
 			# Ask for help from the user and try it again.
 			#FLOPPYDEV=$(ask_dev)
 			#mount $FLOPPYDEV -tauto $FLOPPYMNT
-		        false
+		        return 1
 		fi
 	fi
-	true
+	logger -t bugreporter-udeb -p user.debug "mounted floppy"
+	return 0
 }
 
 test -d /floppy || mkdir /floppy
 if mountfloppy ; then
-    :
-else
-    db_input important bugreporter-udeb/no_floppy || [ $? -eq 30 ]
-    db_go
-    exit 1
-fi
-
-# make tarball with logs and stuff
-# This fail because busybox tar is not compiled with creation support
-tar zcf /tmp/debuginfo.tgz /var/log /target/var/log 
-if [ -f /tmp/debuginfo.tgz ]; then
-    # copy tarball into floppy
-    cp /tmp/debuginfo.tgz /floppy
-else
+	# make tarball with logs and stuff
+	# This fail because busybox tar is not compiled with creation support
+	tar zcf /tmp/debuginfo.tgz /var/log /target/var/log 
+	if [ -f /tmp/debuginfo.tgz ]; then
+    	# copy tarball into floppy
+		cp /tmp/debuginfo.tgz /floppy
+	else
     # At least copy something to the floppy.
-    for file in \
-        /var/log/messages \
-        /var/log/syslog \
-        /var/log/hardware-summary \
-        /var/log/package-versions; do 
-        cp $file /floppy/
-    done
-fi
+	for file in \
+		/var/log/messages \
+		/var/log/syslog \
+		$DILOGDIR/hardware-summary \
+		$DILOGDIR/package-versions; do 
+			cp $file /floppy/
+    		done
+	fi
 
-umount /floppy
+	umount /floppy
+	db_progress STEP 1
+	db_progress STOP
+else
+	db_progress STEP 1
+	db_progress STOP
+	db_input critical bugreporter-udeb/no_floppy || [ $? -eq 30 ]
+	db_go
+fi
 
 #DEBHELPER#
