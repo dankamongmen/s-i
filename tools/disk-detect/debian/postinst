@@ -36,11 +36,13 @@ load_floppy_driver() {
 
 log "Detecting hardware..."
 
+# Return list of lines with "Kernel module<tab>Vendor<tab>Model"
 get_hw_info() {
     /sbin/discover --format="%m\t%V\t%M\n" \
 	--disable-all --enable=pci,ide,scsi,pcmcia scsi
     # Manually load modules to enable things we can't detect.
     # XXX: This isn't the best way to do this; we should autodetect.
+    # The order of these packages are important. [pere 2003-03-16]
     echo "ide-mod	Unknown	Unknown"
     echo "ide-probe-mod	Unknown	Unknown"
     echo "ide-disk	Unknown	Unknown"
@@ -51,10 +53,12 @@ get_hw_info() {
 
 set -- `get_hw_info | wc -l`
 count="$1"
+log "Progress bar from 0 to $count"
 db_progress START 0 $count disk-detect/progress_title
 
 found_scsi=
 
+# Setting IFS to adjust how the for loop splits the values
 IFS_SAVE="$IFS"
 IFS="
 "
@@ -63,6 +67,7 @@ do
     module="`echo $device | cut -f1`"
     vendor="`echo $device | cut -f2`"
     model="`echo $device | cut -f3`"
+    # Restore IFS after extracting the fields.
     IFS="$IFS_SAVE"
 
     if [ "$vendor" != "Unknown" ]
@@ -72,7 +77,7 @@ do
         name="$model"
     fi
 
-    log "Detected load module '$module' for '$name'"
+    log "Detected load module '$module' for '$name', progress step 1"
 
     if [ "$module" ]
     then
@@ -145,12 +150,14 @@ do
         else
             log "Could not locate driver '$module' for $vendor $model."
         fi
-        db_progress STOP
     fi
     IFS="
 "
 done
 IFS="$IFS_SAVE"
+
+log "Progress bar stop"
+db_progress STOP
 
 # always load sd_mod if a scsi controller module was loaded
 if [ "$found_scsi" ] ; then
