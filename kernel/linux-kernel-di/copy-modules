@@ -32,7 +32,7 @@ deplist() {
 }
 
 version=$1
-arch=$(dpkg-architecture -qDEB_BUILD_ARCH)
+arch=$(dpkg-architecture -qDEB_HOST_ARCH)
 home=$PWD
 
 trap 'rm -rf $tmpdir' EXIT
@@ -40,9 +40,9 @@ tmpdir=$(tempfile)
 rm $tmpdir
 mkdir $tmpdir
 
-# MODDIR may be set externally to change the module directory.
-if [ -n "$MODDIR" ]; then
-	moddir=$MODDIR
+# SOURCEDIR may be set externally to control where to copy from.
+if [ -n "$SOURCEDIR" ]; then
+	moddir=$SOURCEDIR/lib/modules/$version
 else
 	moddir=/lib/modules/$version
 fi

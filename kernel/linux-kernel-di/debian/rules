@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
+ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 
 links:
@@ -32,8 +32,8 @@ binary-arch: links debian/control
 	for kernel in `grep '^$(ARCH)[ 	]' kernel-versions | awk '{print $$2 "-" $$3}'`; do \
 		echo $$kernel; \
 		name=`grep '^$(ARCH)[ 	]' kernel-names | awk '{print $$2 }'`; \
-		install -D -m 644 /boot/$$name-$$kernel debian/kernel-image-$$kernel-di/boot/$$name; \
-		install -D -m 644 /lib/modules/$$kernel/modules.dep \
+		install -D -m 644 $(SOURCEDIR)/boot/$$name-$$kernel debian/kernel-image-$$kernel-di/boot/$$name; \
+		install -D -m 644 $(SOURCEDIR)/lib/modules/$$kernel/modules.dep \
 			debian/kernel-image-$$kernel-di/lib/modules/$$kernel/modules.dep; \
 		./copy-modules $$kernel; \
 		./find-dups $$kernel; \
