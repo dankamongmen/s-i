@@ -15,13 +15,20 @@ expect {
 		send "\r"
 		exp_continue -continue_timer
 	} "<Cont" {
+		# Needed for the long message before profile selection.
 		sleep 1
 		send "\r"
 		exp_continue -continue_timer
 	} "Choose Debian-Edu profile" {
-		sleep 1
 		# Pick the first one, main-server. TODO: parameterise
+		sleep 1
 		send " \t\r"
+		exp_continue -continue_timer
+	} "use the automatic partitioning" {
+		# Move over to the yes button.
+		sleep 1
+		puts "select yes\n"
+		send "\[D\r"
 		exp_continue -continue_timer
 	} "Please stand by while rebooting the system." {
 		exit
