@@ -18,6 +18,15 @@ struct map map_model[] = {
 	{ "BVME", "bvme6000" },
 	{ "Motorola MVME147", "mvme147" },
 	{ "Motorola", "mvme16x" },
+	{ "Q40", "q40" },
+	{ "Sun 3/160 Series", "sun3" },
+	{ "Sun 3/50", "sun3" },
+	{ "Sun 3/260 Series", "sun3" },
+	{ "Sun 3/110 Series", "sun3" },
+	{ "Sun 3/60", "sun3" },
+	{ "Sun 3/E", "sun3" },
+	{ "Sun 3/460 Series", "sun3x" },
+	{ "Sun 3/80", "sun3x" },
 	{ NULL, NULL }
 };
 
