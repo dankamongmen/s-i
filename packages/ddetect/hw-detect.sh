@@ -56,19 +56,24 @@ load_module() {
 	local devs=""
 	local olddevs=""
 	local newdev=""
+	local params=""
     
+	if [ "$PROMPT_MODULE_PARAMS" = 1 ]; then
+		db_fset hw-detect/module_params seen false
+		db_subst hw-detect/module_params MODULE "$module"
+		db_input low hw-detect/module_params || [ $? -eq 30 ]
+		db_go
+		db_get hw-detect/module_params
+		params="$RET"
+	fi
+	
 	old=`cat /proc/sys/kernel/printk`
 	echo 0 > /proc/sys/kernel/printk
     
-	db_fset hw-detect/module_params seen false
-	db_subst hw-detect/module_params MODULE "$module"
-	db_input low hw-detect/module_params || [ $? -eq 30 ]
-	db_go
-	db_get hw-detect/module_params
 	devs="$(snapshot_devs)"
-	if modprobe -v "$module" "$RET" >> /var/log/messages 2>&1 ; then
-		if [ "$RET" != "" ]; then
-			register-module "$module" "$RET"
+	if modprobe -v "$module" "$params" >> /var/log/messages 2>&1 ; then
+		if [ "$params" != "" ]; then
+			register-module "$module" "$params"
 		fi
 	
 		olddevs="$devs"
@@ -300,6 +305,15 @@ db_input medium hw-detect/select_modules || true
 db_go || exit 10 # back up
 db_get hw-detect/select_modules
 LIST="$RET"
+
+db_input high prompt_module_params || true
+db_go || exit 10 # back up
+db_get prompt_module_params
+if [ "$RET" = true ]; then
+	PROMPT_MODULE_PARAMS=1
+else
+	PROMPT_MODULE_PARAMS=0
+fi
 
 list_to_lines() {
 	echo "$LIST" | sed 's/, /\n/g'
