@@ -1049,7 +1049,7 @@ newt_go(struct frontend *obj)
     return DC_OK;
 }
 
-static int
+static bool
 newt_can_go_back(struct frontend *obj, struct question *q)
 {
     return (obj->capability & DCF_CAPB_BACKUP);

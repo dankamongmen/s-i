@@ -5,6 +5,8 @@
 #ifndef _FRONTEND_H_
 #define _FRONTEND_H_
 
+#include <stdbool.h>
+
 #undef _
 #define _(x) (x)
 
@@ -24,8 +26,8 @@ struct frontend_module {
     int (*add)(struct frontend *, struct question *q);
     int (*go)(struct frontend *);
     void (*clear)(struct frontend *);
-    int (*can_go_back)(struct frontend *, struct question *);
-    int (*can_go_forward)(struct frontend *, struct question *);
+    bool (*can_go_back)(struct frontend *, struct question *);
+    bool (*can_go_forward)(struct frontend *, struct question *);
 
     void (*progress_start)(struct frontend *fe, int min, int max, const char *title);
     void (*progress_set) (struct frontend *fe, int val);

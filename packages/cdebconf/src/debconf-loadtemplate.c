@@ -143,5 +143,5 @@ int main(int argc, char **argv)
     question_db_delete(qdb);
     config_delete(config);
 
-    return 0;
+    return EXIT_SUCCESS;
 }

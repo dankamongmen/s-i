@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <locale.h>
+#include <stdbool.h>
 
 
 #include "confmodule.h"
@@ -101,17 +102,17 @@ static void usage(void)
  * Function: file_exists
  * Inputs: filename - name of file to check
  *         mode - minimum mode requirement (mask)
- * Outputs: 1 if filename exists and is a regular file, 0 otherwise
+ * Outputs: true if filename exists and is a regular file, false otherwise
  * Description: checks to see if a file exists
  * Assumptions: none
  ************************************************************************/
-static int file_exists(const char *filename, mode_t mode)
+static bool file_exists(const char *filename, mode_t mode)
 {
 	struct stat buf;
 	stat(filename, &buf);
-	if (!S_ISREG(buf.st_mode)) return 0;
-	if ((buf.st_mode & mode) == 0) return 0;
-	return 1;
+	if (!S_ISREG(buf.st_mode)) return false;
+	if ((buf.st_mode & mode) == 0) return false;
+	return true;
 }
 
 /************************************************************************

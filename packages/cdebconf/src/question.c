@@ -150,7 +150,7 @@ static char *question_expand_vars(struct question *q, const char *field)
     size_t size;
     char *buf;
 
-    if (p == 0) return 0;
+    if (p == 0) return NULL;
     if (*p == 0) return strdup("");
     size = strlen(field);
 

@@ -163,10 +163,10 @@ static pid_t confmodule_run(struct confmodule *mod, int argc, char **argv)
             temp = open("/dev/null", O_RDWR);
             for (i = 0; i <= 2; i++)
                 dup2(old[i] != -1 ? old[i] : temp, DEBCONF_OLD_STDIN_FD + i);
-            dup2(10, 0); dup2(13, 1);
+            close(temp);
+            dup2(10, 0); dup2(13, 1); dup2(13, 3);
             for (i = 0; i < 4; i++)
                 close(10 + i);
-            close(temp);
 
             args = (char **)malloc(sizeof(char *) * argc);
             for (i = 1; i < argc; i++)

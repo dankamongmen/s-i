@@ -78,14 +78,14 @@ static void frontend_set_title(struct frontend *f, const char *title)
 	f->title = STRDUP(title);
 }
 
-static int frontend_can_go_back(struct frontend *ui, struct question *q)
+static bool frontend_can_go_back(struct frontend *ui, struct question *q)
 {
-	return 0;
+	return false;
 }
 
-static int frontend_can_go_forward(struct frontend *ui, struct question *q)
+static bool frontend_can_go_forward(struct frontend *ui, struct question *q)
 {
-	return 1;
+	return true;
 }
 
 static void frontend_progress_start(struct frontend *ui, int min, int max, const char *title)

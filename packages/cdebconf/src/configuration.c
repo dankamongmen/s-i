@@ -39,7 +39,7 @@ static struct configitem *config_lookuphlp(struct configitem *head,
 	if (res == 0)
 		return i;
 	if (create == 0)
-		return 0;
+		return NULL;
 
 	newitem = NEW(struct configitem);
 	memset(newitem, 0, sizeof(struct configitem));
@@ -80,14 +80,14 @@ static struct configitem *config_lookup(struct configuration *config,
 		{
 			item = config_lookuphlp(item, start, tagend-start, create);
 			if (item == 0)
-				return 0;
+				return NULL;
 			tagend = start = tagend + 2;
 		}
 	}
 
 	/* trailing :: */
 	if (end - start == 0)
-		if (create == 0) return 0;
+		if (create == 0) return NULL;
 	
 	item = config_lookuphlp(item, start, end-start, create);
 	return item;
@@ -188,7 +188,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 		stack[i] = NULL;
 
 	if ((infp = fopen(filename, "r")) == NULL)
-		return 0;
+		return DC_NOTOK;
 
 	while (fgets(buffer, sizeof(buffer), infp))
 	{
@@ -309,7 +309,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 				if (termchar == '{' && linebuf[0] == 0)
 				{
 					INFO(INFO_ERROR, "Syntax error %s:%u: block starts with no name\n", filename, curline);
-					return 0;
+					return DC_NOTOK;
 				}
 
 				if (linebuf[0] == 0)
@@ -330,7 +330,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 				if (strparsequoteword(&q, tag, sizeof(tag)) == 0)
 				{
 					INFO(INFO_ERROR, "Syntax error %s:%u: Malformed tag\n", filename, curline);
-					return 0;
+					return DC_NOTOK;
 				}
 
 				/* parse off the value */
@@ -349,7 +349,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 				if (strlen(q) != 0)
 				{
 					INFO(INFO_ERROR, "Syntax error %s:%u: Extra junk after tag", filename, curline);
-					return 0;
+					return DC_NOTOK;
 				}
 
 				if (termchar == '{')
@@ -423,7 +423,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 		strcat(linebuf, buf);
 	}
 	fclose(infp);
-	return 1;
+	return DC_OK;
 }
 
 static void config_dump(struct configuration *cfg)

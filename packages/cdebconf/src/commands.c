@@ -673,7 +673,7 @@ command_settitle(struct confmodule *mod, char *arg)
 int save(void) __attribute__ ((weak));
 int save(void)
 {
-    return 1;
+    return DC_NOTOK;
 }
 
 char *command_x_save(struct confmodule *mod, char *arg)
@@ -685,10 +685,10 @@ char *command_x_save(struct confmodule *mod, char *arg)
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 0);
     ret = save();
-    if (ret)
-        asprintf(&out, "%u not implemented", CMDSTATUS_INTERNALERROR);
-    else
+    if (ret == DC_OK)
         asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
+    else
+        asprintf(&out, "%u not implemented", CMDSTATUS_INTERNALERROR);
     return out;
 }
 

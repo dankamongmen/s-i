@@ -81,6 +81,11 @@ static char *debconfclient_ret(struct debconfclient *client)
 	return client->value;
 }
 
+void debconfclient_init(void) __attribute__ ((constructor));
+void debconfclient_init(void)
+{
+}
+
 struct debconfclient *debconfclient_new(void)
 {
 	struct debconfclient *client = (struct debconfclient *)
@@ -89,7 +94,6 @@ struct debconfclient *debconfclient_new(void)
 
 	if (getenv("DEBCONF_REDIR") == NULL)
 	{
-		dup2(1, 3);
 		dup2(DEBCONF_OLD_STDOUT_FD, 1);
 		setenv("DEBCONF_REDIR", "1", 1);
 	}
