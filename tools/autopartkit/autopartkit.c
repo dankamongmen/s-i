@@ -1198,7 +1198,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	}
 	mountmap[partcount].mountpoint = req_tmp;
 
-	autopartkit_log( 1, "  mp: %s\tdev: %s\n",
+	autopartkit_log( 1, "  mp: %s dev: %s\n",
 			 req_tmp->mountpoint,
 			 mountmap[partcount].devpath);
 
