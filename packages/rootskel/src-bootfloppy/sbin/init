@@ -75,8 +75,11 @@ while [ "$LOADED" = 0 ]; do
 		echo "Insert the $ROOT_LABEL or plug in a USB storage device."
 		GOTLINE=0
 		while [ "$GOTLINE" = 0 ]; do
+			OLDPRINTK=$(cat /proc/sys/kernel/printk)
+			echo 0 > /proc/sys/kernel/printk
 			echo -n "Press Enter when ready, or type a command: "
 			read line
+			echo $OLDPRINTK > /proc/sys/kernel/printk
 			if [ -n "$line" ]; then
 				# inexpensive and easy and it makes this a lot more flexible!
 				eval "$line" || true
