@@ -490,11 +490,15 @@ static int rfc822db_question_save(struct question_db *db)
     
     snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
     path = db->config->get(db->config, tmp, 0);
-    if (path == NULL ||
-        (outf = fopen(path, "w")) == NULL)
+    if (path == NULL)
     {
-        INFO(INFO_ERROR, "Cannot open question file %s\n",
-            path ? path : "<empty>");
+        INFO(INFO_ERROR, "Cannot open question file <empty>\n");
+        return DC_NOTOK;
+    }
+    else if ((outf = fopen(path, "w")) == NULL)
+    {
+        INFO(INFO_ERROR, "Cannot open question file %s: %s\n",
+            path, strerror(errno));
         return DC_NOTOK;
     }
 
