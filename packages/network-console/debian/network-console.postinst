@@ -43,9 +43,7 @@ while [ -z "$PASSWORD" ]; do
   PASSWORD=$ROOT_PW
 done
 
-grep -v "^installer" /etc/passwd > /etc/passwd.new
-echo "installer:$(gen-crypt $PASSWORD):0:0:Installer:/:/bin/network-console" >> /etc/passwd.new
-mv /etc/passwd.new /etc/passwd
+echo "installer:$(gen-crypt $PASSWORD):1:0:99999:7:::" >> /etc/shadow
 
 KEY_FINGERPRINT=$(ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' ')
 

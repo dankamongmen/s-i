@@ -1,0 +1,37 @@
+#!/bin/sh
+set -x
+
+DIR=/etc/ssh/
+
+mkdir /target/$DIR
+cp $DIR/ssh_host_rsa_key* /target/$DIR
+cp $DIR/sshd_config_target /target/$DIR/sshd_config
+
+echo 'installer:x:0:0:installer:/:/root/network-console-base-config' >> /target/etc/passwd
+grep "^installer:" /etc/shadow >> /target/etc/shadow
+
+cat > /target/usr/lib/base-config/menu/cleanup-network-console.mnu << EOF
+Only-New: true
+Debconf: true
+Order: 110
+EOF
+cat > /target/usr/lib/base-config/menu/cleanup-network-console << EOF
+#!/bin/sh
+set -e
+grep -v "^installer:" /etc/passwd > /etc/passwd.new
+mv /etc/passwd.new /etc/passwd
+grep -v "^installer:" /etc/shadow > /etc/shadow.new
+mv /etc/shadow.new /etc/shadow
+rm -f /usr/lib/base-config/menu/cleanup-network-console*
+rm -f /root/network-console-base-config
+EOF
+chmod 755 /target/usr/lib/base-config/menu/cleanup-network-console
+cat > /target/root/network-console-base-config << EOF
+#!/bin/sh
+exec /usr/sbin/base-config new
+EOF
+chmod 755 /target/root/network-console-base-config
+
+apt-install ssh
+
+sleep 86400
