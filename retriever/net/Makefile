@@ -2,7 +2,8 @@ ARCH=$(shell dpkg --print-architecture)
 CFLAGS=-Wall -g -D_GNU_SOURCE -DARCH=\"$(ARCH)\"
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=net-retriever
-LIBS=-ldebconf
+LIBS=-ldebconfclient
+
 # We're sticking at sid for now, since the udebs are not in woody.
 # This must be kept up-to-date to whatever the name of the release of
 # debian is. TODO: paramterize somehow, outside of this retreiver?
