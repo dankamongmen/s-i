@@ -358,7 +358,7 @@ int main ()
 						state = CONFIRM;
 						break;
 					case CONFIRM:
-						state = GET_CHANNEL;
+						state = QUIT;
 						break;
 					default:
 						state = ERROR;
