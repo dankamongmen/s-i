@@ -49,8 +49,8 @@ get_static_modinfo() {
 		zcat $DEVNAMES > $TEMP_EXTRACT
 	fi
 	
-	if grep -q "$module:" $TEMP_EXTRACT; then 
-		modinfo=$(zcat $DEVNAMES | grep ^${module}: | head -n 1 | cut -d':' -f2-)
+	if grep -q "^${module}:" $TEMP_EXTRACT; then 
+		modinfo=$(zcat $DEVNAMES | grep "^${module}:" | head -n 1 | cut -d':' -f2-)
 	fi
 	echo "$modinfo"
 }

@@ -246,7 +246,6 @@ get_input_info() {
 		  echo "psmouse:AT mouse support"
 		  register-module psmouse
 		;;
-		;;
 	esac
 }
 
