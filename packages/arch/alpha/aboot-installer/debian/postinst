@@ -112,7 +112,11 @@ db_subst aboot-installer/progress/step_install_loader BOOTDISK $bootdisk
 db_progress INFO aboot-installer/progress/step_install_loader
 
 info "Installing aboot on '$bootdisk'"
-chroot /target /sbin/swriteboot $bootdisk /boot/bootlx
+if [ -e /var/lib/aboot-installer/aboot-partnum ]; then
+	partnum_arg=-f$(cat /var/lib/aboot-installer/aboot-partnum)
+fi
+
+chroot /target /sbin/swriteboot $partnum_arg $bootdisk /boot/bootlx
 # TODO: should this say something if it fails, like grub-installer does?
 
 db_progress STEP 1
