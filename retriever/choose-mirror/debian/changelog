@@ -1,9 +1,16 @@
 choose-mirror (0.033) UNRELEASED; urgency=low
 
   * Joey Hess
-    - Fixed two templates from type "test" to "text". Thank you, lintian. 
+    - Fixed two templates from type "test" to "text". Thank you, lintian.
+  * Joshua Kwan
+    - When popening into a FILE*, pclose it, don't fclose it.
+    - Don't frob with memory that's not yours: suite[strlen(suite)] ->
+      suite[strlen(suite) - 1].
+    - Fix detection of proxy usage (or lack thereof), we were launching
+      'http_proxy= wget ...' and that actually _set_ the variable and broke
+      busybox's wget because '' is not a valid proxy.
 
- -- Joey Hess <joeyh@debian.org>  Sun, 22 Feb 2004 18:53:40 -0500
+ -- Joshua Kwan <joshk@triplehelix.org>  Sun, 22 Feb 2004 23:48:28 -0800
 
 choose-mirror (0.032) unstable; urgency=low
 

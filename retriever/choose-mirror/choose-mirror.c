@@ -307,7 +307,7 @@ static int validate_mirror(void) {
 		debconf_get(debconf, dir);
 		directory = strdup(debconf->value);
 	
-		if ( NULL == proxy )
+		if ( NULL == proxy || (proxy && *proxy == '\0'))
 			asprintf(&command, "wget -q %s://%s%s%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
 		                   protocol, hostname, directory,
 				   "dists/" PREFERRED_DISTRIBUTION);
@@ -327,14 +327,14 @@ static int validate_mirror(void) {
 		if (f != NULL) {
 			char suite[32];
 			if (fgets(suite, 31, f)) {
-				if (suite[strlen(suite)] == '\n')
-					suite[strlen(suite)] = '\0';
+				if (suite[strlen(suite) - 1] == '\n')
+					suite[strlen(suite) - 1] = '\0';
 				debconf_set(debconf, DEBCONF_BASE "suite", suite);
 			}
 			else {
 				ret = 1;
 			}
-			fclose(f);
+			pclose(f);
 		}
 		else {
 			ret = 1;
