@@ -64,6 +64,19 @@ do_subdir ()
 	return 0
 }
 
+# Build kernel packages.
+do_kernel ()
+{
+	while [ $# -ge 1 ]; do
+		[ -d $1 ] && {
+			(cd $1 && debian/rules debian/control)
+			do_subdir $1
+		}
+		shift
+	done
+	return 0
+}
+
 # Guess what.
 usage ()
 {
@@ -118,8 +131,8 @@ build packages/kernel/kernel-wedge
 install_deb packages/kernel kernel-wedge
 
 # Build all other udebs.
-(cd packages/kernel/linux-kernel-di-$ARCH && debian/rules debian/control)
-do_subdir packages/kernel/linux-kernel-di-$ARCH
+do_kernel packages/kernel/linux-kernel-di-$ARCH \
+	packages/kernel/linux-kernel-di-$ARCH-2.6
 
 do_subdir packages/partman/partman packages/partman/partman-auto \
 	packages/partman/partman-basicfilesystems \
