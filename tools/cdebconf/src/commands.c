@@ -239,8 +239,14 @@ int command_set(struct confmodule *mod, int argc, char **argv,
         question_setvalue(q, buf);
 
         if (mod->questions->methods.set(mod->questions, q) != 0)
+        {
             snprintf(out, outsize, "%u value set",
                     CMDSTATUS_SUCCESS);
+            if (0 == strcmp("debconf/language", argv[1]))
+	    { /* Pass the value on to getlanguage() in templates.c */
+                setenv("LANGUAGE", buf, 1);
+	    }
+        }
         else
             snprintf(out, outsize, "%u cannot set value",
                     CMDSTATUS_INTERNALERROR);
