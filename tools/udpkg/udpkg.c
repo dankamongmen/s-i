@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.34 2003/01/31 05:59:25 kraai Exp $ */
+/* $Id: udpkg.c,v 1.35 2003/04/21 16:02:05 waldi Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -167,25 +167,30 @@ static int dpkg_dounpack(struct package_t *pkg)
 
 	cwd = getcwd(0, 0);
 	chdir("/");
-	snprintf(buf, sizeof(buf), "ar -p %s data.tar.gz|zcat|tar -xf -", pkg->file);
+	snprintf(buf, sizeof(buf), "ar -p %s data.tar.gz|tar -xzf -", pkg->file);
 	if (SYSTEM(buf) == 0)
 	{
 		/* Installs the package scripts into the info directory */
 		for (i = 0; i < sizeof(adminscripts) / sizeof(adminscripts[0]);
 		     i++)
 		{
+			int ret;
+
 			snprintf(buf, sizeof(buf), "%s%s/%s",
 				DPKGCIDIR, pkg->package, adminscripts[i]);
 			snprintf(buf2, sizeof(buf), "%s%s.%s", 
 				INFODIR, pkg->package, adminscripts[i]);
-			if (dpkg_copyfile(buf, buf2) < 0)
+
+			ret = dpkg_copyfile(buf, buf2);
+
+			if (ret < 0)
 			{
 				fprintf(stderr, "Cannot copy %s to %s: %s\n", 
 					buf, buf2, strerror(errno));
 				r = 1;
 				break;
 			}
-			else
+			else if (ret > 0)
 			{
 #ifdef DOLOADTEMPLATE
 				/* Is this the templates files?  If
@@ -199,47 +204,49 @@ static int dpkg_dounpack(struct package_t *pkg)
 				}
 #endif
 
-				/* ugly hack to create the list file; should
-				 * probably do something more elegant
-				 *
-				 * why oh why does dpkg create the list file
-				 * so oddly...
-				 */
-				snprintf(buf, sizeof(buf), 
-					"ar -p %s data.tar.gz|zcat|tar -tf -", 
-					pkg->file);
-				snprintf(buf2, sizeof(buf2),
-					"%s%s.list", INFODIR, pkg->package);
-				if ((infp = popen(buf, "r")) == NULL ||
-				    (outfp = fopen(buf2, "w")) == NULL)
-				{
-					fprintf(stderr, "Cannot create %s\n",
-						buf2);
-					r = 1;
-					break;
-				}
-				while (fgets(buf, sizeof(buf), infp) &&
-				       !feof(infp))
-				{
-					p = buf;
-					if (*p == '.') p++;
-					if (*p == '/' && *(p+1) == '\n')
-					{
-						*(p+1) = '.';
-						*(p+2) = '\n';
-						*(p+3) = 0;
-					}
-					if (p[strlen(p)-2] == '/')
-					{
-						p[strlen(p)-2] = '\n';
-						p[strlen(p)-1] = 0;
-					}
-					fputs(p, outfp);
-				}
-				fclose(infp);
-				fclose(outfp);
 			}
 		}
+
+		/* ugly hack to create the list file; should
+		 * probably do something more elegant
+		 *
+		 * why oh why does dpkg create the list file
+		 * so oddly...
+		 */
+		snprintf(buf, sizeof(buf), 
+			"ar -p %s data.tar.gz|tar -tzf -", 
+			pkg->file);
+		snprintf(buf2, sizeof(buf2),
+			"%s%s.list", INFODIR, pkg->package);
+		if ((infp = popen(buf, "r")) == NULL ||
+		    (outfp = fopen(buf2, "w")) == NULL)
+		{
+			fprintf(stderr, "Cannot create %s\n",
+				buf2);
+			r = 1;
+		}
+		else
+			while (fgets(buf, sizeof(buf), infp) &&
+			       !feof(infp))
+			{
+				p = buf;
+				if (*p == '.') p++;
+				if (*p == '/' && *(p+1) == '\n')
+				{
+					*(p+1) = '.';
+					*(p+2) = '\n';
+					*(p+3) = 0;
+				}
+				if (p[strlen(p)-2] == '/')
+				{
+					p[strlen(p)-2] = '\n';
+					p[strlen(p)-1] = 0;
+				}
+				fputs(p, outfp);
+			}
+		fclose(infp);
+		fclose(outfp);
+
 		pkg->status &= STATUS_WANTMASK;
 		pkg->status |= STATUS_WANTINSTALL;
 		pkg->status &= STATUS_FLAGMASK;
@@ -279,7 +286,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	DPRINTF("dir = %s\n", buf);
 	if (mkdir(buf, S_IRWXU) == 0 && chdir(buf) == 0)
 	{
-		snprintf(buf, sizeof(buf), "ar -p %s control.tar.gz|zcat|tar -xf -",
+		snprintf(buf, sizeof(buf), "ar -p %s control.tar.gz|tar -xzf -",
 			pkg->file);
 		if (SYSTEM(buf) == 0)
 		{
@@ -405,7 +412,7 @@ static int dpkg_fields(struct package_t *pkg)
 		fprintf(stderr, "udpkg: The -f flag requires an argument.\n");
 		return 1;
 	}
-	asprintf(&command, "ar -p %s control.tar.gz|zcat|tar -xOf - ./control", pkg->file);
+	asprintf(&command, "ar -p %s control.tar.gz|tar -xzOf - ./control", pkg->file);
 	ret = SYSTEM(command);
 	free(command);
 	return ret;
