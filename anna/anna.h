@@ -10,5 +10,5 @@
 #define STATUS_FILE "/var/lib/dpkg/status"
 
 int get_package (struct package_t *package, char *dest);
-struct package_t *get_packages (void);
+struct linkedlist_t *get_packages (void);
 void cleanup (void);

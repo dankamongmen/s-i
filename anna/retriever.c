@@ -19,52 +19,58 @@ is_retriever(struct package_t *p)
 	int i;
 
 	for (i = 0; p->provides[i] != 0; i++)
-		if (strcmp(p->provides[i], "retriever") == 0)
+		if (strcmp(p->provides[i]->name, "retriever") == 0)
 			return 1;
 	return 0;
 }
 
-static struct package_t *
+static struct linkedlist_t *
 get_retriever_packages(void)
 {
 	FILE *fp;
-	struct package_t *p, *q;
+	struct package_t *p;
+	struct linkedlist_t *list;
+	struct list_node *node;
 
 	fp = fopen(STATUS_FILE, "r");
-	p = di_pkg_parse(fp);
+	list = di_pkg_parse(fp);
 	fclose(fp);
-	while (!is_retriever(p))
-		p = p->next;
-	q = p;
-	while (q != NULL && q->next != NULL)
+	while (!is_retriever((struct package_t *)list->head->data))
+		list->head = list->head->next;
+	node = list->head;
+	while (node != NULL && node->next != NULL)
 	{
 		while (1)
 		{
-			if (q->next == NULL)
+			if (node->next == NULL)
 				break;
 			// FIXME: Explain why it can't be half-configured
-			if (!is_retriever(q->next) || q->next->status == half_configured)
-				q->next = q->next->next;
+			p = (struct package_t *)node->next->data;
+			if (!is_retriever(p) || p->status == half_configured)
+				node->next = node->next->next;
 			else
 				break;
 		}
-		q = q->next;
+		node = node->next;
 	}
-	return p;
+	return list;
 }
 
 /* helper function for chosen_retriever() */
 /* TODO: i18n */
 static char *
-get_retriever_choices(struct package_t *p)
+get_retriever_choices(struct linkedlist_t *list)
 {
 	int retstr_size = 1;
 	char *ret_choices;
+	struct list_node *node;
+	struct package_t *p;
 
 	ret_choices = malloc(1);
 	ret_choices[0] = '\0';
-	for (; p != NULL; p = p->next)
+	for (node = list->head; node != NULL; node = node->next)
 	{
+		p = (struct package_t *)node->data;
 		retstr_size += strlen(p->package) + 2 + strlen(p->description) + 2;
 		ret_choices = realloc(ret_choices, retstr_size);
 		strcat(ret_choices, p->package);
@@ -102,7 +108,7 @@ static int
 choose_retriever(void)
 {
 	struct debconfclient *debconf;
-	struct package_t *ret_pkgs;
+	struct linkedlist_t *ret_pkgs;
 	char *ret_choices;
 
 	ret_pkgs = get_retriever_packages();
@@ -197,10 +203,10 @@ try_get_packages(char *dist, char *suite, char *ext, char *unpack_cmd)
  * Ask the chosen retriever to download the Packages file, and parses it,
  * returning a linked list of package_t structures, or NULL if it fails.
  */
-struct package_t *get_packages (void) {
+struct linkedlist_t *get_packages (void) {
 	struct debconfclient *debconf;
 	FILE *packages;
-	struct package_t *p = NULL, *newp, *plast;
+	struct linkedlist_t *list = NULL, *tmplist;
         /* This is a workaround until d-i gets Release files, at which point
            we should parse them instead */
 	char *dist;
@@ -216,26 +222,25 @@ struct package_t *get_packages (void) {
         for (; suite != NULL; suite = suites[++currsuite]) {
                 packages = NULL;
 		if (try_get_packages(dist, suite, ".gz", "gunzip") == 0)
-                    packages = fopen(tmp_packages, "r");
+			packages = fopen(tmp_packages, "r");
 		if (packages == NULL && try_get_packages(dist, suite, "", NULL) == 0)
 			packages = fopen(tmp_packages, "r");
 		if (packages == NULL)
 			continue;
-                newp = di_pkg_parse(packages);
+                tmplist = di_pkg_parse(packages);
                 fclose(packages);
                 unlink(tmp_packages);
 
-                if (newp != NULL) {
-                    if (p == NULL) {
-                        p = newp;
-                        plast = newp;
-                    } else
-                        plast->next = newp;
-                    while (plast->next != NULL)
-                        plast = plast->next;
+		if (tmplist != NULL) {
+			if (list == NULL)
+				list = tmplist;
+			else if (list->tail != NULL) {
+				list->tail->next = tmplist->head;
+				free(tmplist);
+			}
                 }
         }
-	return p;
+	return list;
 }
 
 /* Corresponds to the retriever command 'cleanup' */

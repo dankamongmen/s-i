@@ -15,24 +15,19 @@
 #include "anna.h"
 
 static int
-is_installed(struct package_t *package, struct package_t *installed)
+is_installed(struct package_t *p, struct linkedlist_t *installed)
 {
 	struct package_t *q;
 	struct version_t pv, qv;
 
 	/* If we don't understand the version number, we play safe
 	 * and assume we should install it */
-	if (package->version == NULL || !di_parse_version(&pv, package->version))
+	if (p->version == NULL || !di_parse_version(&pv, p->version))
 		return 0;
-	for (q = installed; q != NULL; q = q->next) {
-		if (strcmp(package->package, q->package) == 0) {
-			if (q->version == NULL || !di_parse_version(&qv, q->version))
-				return 0;
-			else
-				return (di_compare_version(&pv, &qv) <= 0);
-		}
-	}
-	return 0;
+	q = di_pkg_find(installed, p->package);
+	if (q == NULL || q-> version == NULL || !di_parse_version(&qv, q->version))
+		return 0;
+	return (di_compare_version(&pv, &qv) <= 0);
 }
 
 /*
@@ -42,10 +37,10 @@ is_installed(struct package_t *package, struct package_t *installed)
  * - Don't install packages that are already installed
  * - Ask for which packages with priority below standard to install
  */
-struct package_t *select_packages (struct package_t *packages) {
-	struct package_t *p, *prev = NULL, *q;
-	struct package_t *status_p;
-	struct package_t *lowpri_p = NULL, *lowpri_last = NULL;
+struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
+	struct list_node *node, *next, *prev;
+	struct package_t *p;
+	struct linkedlist_t *status_p, *lowpri_p;
 	FILE *fp;
 
 	fp = fopen(STATUS_FILE, "r");
@@ -54,35 +49,36 @@ struct package_t *select_packages (struct package_t *packages) {
 	status_p = di_pkg_parse(fp);
 	fclose(fp);
 
-        for (p = packages; p; p = q)
+	lowpri_p = (struct linkedlist_t *)malloc(sizeof(struct linkedlist_t));
+	lowpri_p->head = lowpri_p->tail = NULL;
+        for (node = packages->head; node != NULL; node = next)
         {
-		q = p->next;
+		next = node->next;
+		p = (struct package_t *)node->data;
 		if (is_installed(p, status_p)) {
                         if (prev)
-                                prev->next = p->next;
+                                prev->next = next;
                         else
-                                packages = p->next;
+                                packages->head = next;
                         continue;
                 } else if (p->priority < standard) {
 			/* Unlink these packages temporarily */
 			if (prev)
-				prev->next = p->next;
+				prev->next = next;
 			else
-				packages = p->next;
-			if (lowpri_last == NULL) {
-				lowpri_p = p;
-				lowpri_last = p;
-				p->next = NULL;
-			} else {
-				lowpri_last->next = p;
-				p->next = NULL;
-				lowpri_last = p;
+				packages->head = next;
+			node->next = NULL;
+			if (lowpri_p->tail == NULL)
+				lowpri_p->head = lowpri_p->tail = node;
+			else {
+				lowpri_p->tail->next = node;
+				lowpri_p->tail = node;
 			}
 			continue;
 		}
-                prev = p;
+                prev = node;
         }
-	if (lowpri_p != NULL) {
+	if (lowpri_p->head != NULL) {
 		struct debconfclient *debconf;
 		char *choices;
 		char *tmp;
@@ -90,7 +86,8 @@ struct package_t *select_packages (struct package_t *packages) {
 
 		choices = malloc(choices_size);
 		choices[0] = '\0';
-		for (p = lowpri_p; p != NULL; p = p->next) {
+		for (node = lowpri_p->head; node != NULL; node = node->next) {
+			p = (struct package_t *)node->data;
 			choices_size += strlen(p->package) + 2 + strlen(p->description) + 2;
 			choices = realloc(choices, choices_size);
 			strcat(choices, p->package);
@@ -113,12 +110,13 @@ struct package_t *select_packages (struct package_t *packages) {
 		if (debconf->value != NULL) {
 			/* This is probably not the best way to do it,
 			 * but I'm feeling lazy. Feel free to improve it. */
-			for (p = lowpri_p; p != NULL; p = q) {
-				q = p->next;
+			for (node = lowpri_p->head; node != NULL; node = next) {
+				next = node->next;
+				p = (struct package_t *)node->data;
 				asprintf(&tmp, "%s: %s", p->package, p->description);
 				if (tmp != NULL && strstr(debconf->value, tmp) != NULL) {
-					p->next = packages;
-					packages = p;
+					node->next = packages->head;
+					packages->head = node;
 				}
 				free(tmp);
 			}
@@ -170,13 +168,15 @@ int md5sum(char* sum, char *file) {
  * 
  * Returns false on failure, and aborts the operation.
  */
-int install_packages (struct package_t *packages) {
+int install_packages (struct linkedlist_t *packages) {
+	struct list_node *node;
 	struct package_t *p;
 	char *f, *fp, *dest_file;
 	char *emsg;
 	int ret = 1;
 
-	for (p=packages; p; p=p->next) {
+	for (node = packages->head; node != NULL; node = node->next) {
+		p = (struct package_t *)node->data;
 		if (p->filename) {
 			/*
 			 * Come up with a destination filename.. let's use
