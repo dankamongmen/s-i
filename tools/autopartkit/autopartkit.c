@@ -1155,10 +1155,12 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	     */
 	    if (strcmp(req_tmp->fstype,"lvm") == 0)
 	    {
-	        const char *devpath = mountmap[partcount].devpath;
-		const char *mountpoint = mountmap[partcount].mountpoint->mountpoint;
+	        const char *devpath;
+
 	        autopartkit_log(1, "  converting partition type to LVM\n");
 		ped_partition_set_flag(newpart,PED_PARTITION_LVM,1);
+
+	        devpath = mountmap[partcount].devpath;
 
                 /*
                  * Zero out old LVM headers if present.  Is 100 KiB a good
@@ -1168,7 +1170,12 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
                 /* Initialize LVM partition, if the LVM tools are available */
                 if ( 0 == lvm_init_dev(devpath) )
+		{
+		    const char *mountpoint;
+		    autopartkit_log(1, "  lvm_init_dev() successfull.\n");
+		    mountpoint = req_tmp->mountpoint;
 		    lvm_volumegroup_add_dev(mountpoint, devpath);
+		}
 	    }
 #endif /* LVM_HACK */
 
@@ -1180,7 +1187,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	mountmap[partcount].mountpoint = req_tmp;
 
 	autopartkit_log( 1, "  mp: %s\tdev: %s\n",
-			 mountmap[partcount].mountpoint->mountpoint,
+			 req_tmp->mountpoint,
 			 mountmap[partcount].devpath);
 
 	newpart = NULL;
