@@ -15,11 +15,6 @@ usage() {
 }
 
 initialise() {
-LANG=$1
-DICT=$2
-DI_COPY=$3
-DEST_DIR=$4
-
 GATHER_STRINGS_SCRIPT=./msgstr_extract.awk
 
 ALL_STRINGS=$DEST_DIR/${LANG}_all.txt
@@ -66,7 +61,12 @@ if [ -z "$4" ]
     exit 1
 fi
 
-initalise	# initalise some variables
+LANG=$1
+DICT=$2
+DI_COPY=$3
+DEST_DIR=$4
+
+initialise	# initalise some variables
 checks		# do an environment check
 
 
