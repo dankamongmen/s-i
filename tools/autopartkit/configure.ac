@@ -10,11 +10,8 @@ AC_PROG_CC
 AC_PROG_INSTALL
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-ldebconf':
-AC_CHECK_LIB([debconf], [main])
-# FIXME: Replace `main' with a function in `-ldl':
+AC_CHECK_LIB([debconfclient], [debconfclient_new])
 AC_CHECK_LIB([dl], [dlopen])
-# FIXME: Replace `main' with a function in `-lparted':
 AC_CHECK_LIB([parted], [ped_constraint_any])
 
 if test "$ac_cv_lib_parted_ped_constraint_any" != yes; then
