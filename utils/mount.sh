@@ -6,6 +6,7 @@
 DEBCONF_BASE="di-utils-mount-partitions"
 TARGET="/target"
 PREMOUNTS="/usr,/boot,/home,/var,manual"	# !!! NO SPACES !!!
+SILLYMOUNTS="/etc /proc /dev"
 
 # generate the premounts list, and hide already used
 get_premounts() {
@@ -110,6 +111,32 @@ if [ -z "$PARTITIONS" -o -z "$MOUNTPOINT" ]; then
         db_input high $DEBCONF_BASE/nosel
         db_go
         exit 1
+fi
+
+# check, if the partition is already mounted
+grep -q " ${TARGET}${MOUNTPOINT} " /proc/mounts 1>/dev/null 2>&1
+if [ $? -eq 0 ]; then
+	db_subst $DEBCONF_BASE/doublemnt MOUNTPOINT $MOUNTPOINT
+	db_set $DEBCONF_BASE/doublemnt "false"
+	db_input high $DEBCONF_BASE/doublemnt
+	db_go
+	exit 1
+fi
+
+# don't allow silly mount points
+ALLOW=1
+for m in $SILLYMOUNTS; do
+	if [ "$m" = "$MOUNTPOINT" ]; then
+		ALLOW=0
+		break
+	fi
+done
+if [ $ALLOW -ne 1 ]; then
+	db_subst $DEBCONF_BASE/sillymnt MOUNTPOINT $MOUNTPOINT
+	db_set $DEBCONF_BASE/sillymnt "false"
+	db_input high $DEBCONF_BASE/sillymnt
+	db_go
+	exit 1
 fi
 
 # finally start mounting
