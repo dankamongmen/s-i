@@ -82,18 +82,12 @@ module_probe() {
 		# hence they'll have same description
 		
 		if [ -n "$newdevs" ]; then
-			local devcount=0
 			modinfo=$(get_static_modinfo $module)
 
 			if [ -n "$modinfo" ]; then break; fi
 			
 			for ndev in $newdevs; do
-				devcount=$(($devcount + 1))
-				if [ $devcount -ge 2 ]; then
-					echo "${ndev}:${modinfo} (${devcount})" >> /etc/network/devnames
-				else
-					echo "${ndev}:${modinfo}" >> /etc/network/devnames
-				fi
+				echo "${ndev}:${modinfo}" >> /etc/network/devnames
 			done
 		fi
 	else

@@ -58,14 +58,8 @@ load_module() {
 		newdevs="$(compare_devs "$olddevs" "$devs")"
 
 		if [ -n "$newdevs" -a -n "$cardname" ]; then
-			local devcount=0
 			for dev in $newdevs; do
-				devcount=$(($devcount + 1))
-				if [ $devcount -ge 2 ]; then
-					echo "${dev}:${cardname} (${devcount})" >> /etc/network/devnames
-				else
-					echo "${dev}:${cardname}" >> /etc/network/devnames
-				fi
+				echo "${dev}:${cardname}" >> /etc/network/devnames
 			done
 		fi
 	else   
