@@ -214,6 +214,16 @@ struct package_t *show_main_menu(struct package_t *packages) {
 
 static int config_package(struct package_t *);
 
+static int provides(struct package_t *p, const char *what)
+{
+	int i;
+
+	for (i = 0; p->provides[i] != 0; i++)
+		if (strcmp(p->provides[i], what) == 0)
+			return 1;
+	return 0;
+}
+
 /*
  * Satisfy the dependencies of a virtual package. Its dependencies that actually
  * provide the package are presented in a debconf select question for the user
@@ -234,7 +244,7 @@ static int satisfy_virtual(struct package_t *p) {
 	for (i = 0; p->depends[i] != 0; i++) {
 		if ((dep = tree_find(p->depends[i])) == NULL)
 			continue;
-		if (dep->provides == NULL || strstr(dep->provides, p->package) == NULL) {
+		if (!provides(dep, p->package)) {
 			/* Non-providing dependency */
 			if (dep->status != installed && !config_package(dep))
 				return 0;
@@ -280,7 +290,7 @@ static int satisfy_virtual(struct package_t *p) {
 		for (i = 0; p->depends[i] != 0; i++) {
 			if ((dep = tree_find(p->depends[i])) == NULL)
 				continue;
-			if (strstr(dep->provides, p->package) == NULL)
+			if (!provides(dep, p->package))
 				continue;
 			if (!is_menu_item || strcmp(debconf->value, dep->description) == 0) {
 				/* Ick. If we have a menu item it has to match the
@@ -312,7 +322,7 @@ static int is_virtual(struct package_t *p) {
 	for (i = 0; p->depends[i] != 0; i++) {
 		if ((dep = tree_find(p->depends[i])) == NULL)
 			continue;
-		if (dep->provides != NULL && strstr(dep->provides, p->package) != NULL)
+		if (provides(dep, p->package))
 			return 1;
 	}
 	return 0;

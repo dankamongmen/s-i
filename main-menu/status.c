@@ -15,7 +15,7 @@
  */
 struct package_t *status_read(void) {
 	FILE *f;
-	int i;
+	int i, k;
 	struct package_t *found, *plist, *p;
 
 	tree_clear();
@@ -34,14 +34,14 @@ struct package_t *status_read(void) {
 
         for (p = plist; p != NULL; p = p->next)
         {
-            if (p->provides != NULL)
+            for (k = 0; p->provides[k] != 0; k++)
             {
-                found = tree_find(p->provides);
+                found = tree_find(p->provides[k]);
                 if (found == NULL)
                 {
                     found = (struct package_t *)malloc(sizeof(struct package_t));
                     memset(found, 0, sizeof(struct package_t));
-                    found->package = strdup(p->provides);
+                    found->package = strdup(p->provides[k]);
                     tree_add(found);
                     /* TODO: Do we want the virtual packages in the list
                      * or just the tree? */

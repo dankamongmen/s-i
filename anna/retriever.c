@@ -13,6 +13,17 @@
 #include <unistd.h>
 #include "anna.h"
 
+static int
+is_retriever(struct package_t *p)
+{
+	int i;
+
+	for (i = 0; p->provides[i] != 0; i++)
+		if (strcmp(p->provides[i], "retriever") == 0)
+			return 1;
+	return 0;
+}
+
 static struct package_t *
 get_retriever_packages(void)
 {
@@ -22,7 +33,7 @@ get_retriever_packages(void)
 	fp = fopen(STATUS_FILE, "r");
 	p = di_pkg_parse(fp);
 	fclose(fp);
-	while (p->provides == NULL || strstr(p->provides, "retriever") == NULL)
+	while (!is_retriever(p))
 		p = p->next;
 	q = p;
 	while (q != NULL && q->next != NULL)
@@ -31,11 +42,8 @@ get_retriever_packages(void)
 		{
 			if (q->next == NULL)
 				break;
-			if (q->next->provides == NULL
-					||  strstr(q->next->provides, "retriever") == NULL
-					||  (q->next->status != unpacked &&
-						q->next->status != installed)
-			   )
+			// FIXME: Explain why it can't be half-configured
+			if (!is_retriever(q->next) || q->next->status == half_configured)
 				q->next = q->next->next;
 			else
 				break;
