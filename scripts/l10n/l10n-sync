@@ -272,11 +272,16 @@ for package in $packages ; do
       fi
       # We use the new file only if the changes are more than just 
       # changing the PO-Revision-Date line
-      if [ $(diff --ignore-matching-lines="PO-Revision-Date" $lang.po $lang.po.new | wc -l) = 0 ] ; then
-	rm $lang.po.new
+      if [ -f $lang.po ] ; then
+        if [ $(diff --ignore-matching-lines="PO-Revision-Date" $lang.po $lang.po.new | wc -l) = 0 ] ; then
+	  rm $lang.po.new
+        else
+	  mv $lang.po.new $lang.po
+	  echo -n "(CHANGED) "
+        fi
       else
 	mv $lang.po.new $lang.po
-	echo -n "(CHANGED) "
+	echo -n "(ADDED) "
       fi
  done
  echo ""
