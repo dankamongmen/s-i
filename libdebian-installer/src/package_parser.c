@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.3 2003/09/30 19:22:07 waldi Exp $
+ * $Id: package_parser.c,v 1.4 2003/09/30 19:47:34 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -241,6 +241,20 @@ void *internal_di_package_parser_new (void *user_data)
   internal_di_package_parser_data *parser_data = user_data;
   parser_data->package = di_package_alloc (parser_data->allocator);
   return parser_data->package;
+}
+
+/**
+ * @internal
+ * Get parser info for standard control file
+ */
+di_parser_info *di_package_parser_info (void)
+{
+  di_parser_info *info;
+
+  info = di_parser_info_alloc ();
+  di_parser_info_add (info, di_package_parser_fieldinfo);
+
+  return info;
 }
 
 /**
