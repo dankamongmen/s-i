@@ -14,7 +14,7 @@ check-scripts:
 	done
 
 check-utf8: languagelist.l10n
-	iconv -f utf-8 languagelist.l10n > /dev/null
+	iconv -f utf-8 -t unicode languagelist.l10n > /dev/null
 
 check-data:
 	# Check that the listed locale is supported, to make sure base-config know
