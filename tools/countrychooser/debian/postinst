@@ -15,7 +15,7 @@ countrycode="debian-installer/country"
 languagechooserlanguage="languagechooser/language-name"
 
 # This is the iso_3166.tab file location
-ISO3166TAB=/etc/iso_3166.tab
+ISO3166TAB=/usr/share/iso-codes/iso_3166.tab
 
 for list in $ISO3166TAB ; do 
 	if [ -f "$list" ]; then
@@ -95,7 +95,8 @@ else
 fi
 
 # At this step we should have either xx, or xx_YY in LANGNAME
-while :; do
+if [ "$LANGUAGE" != "C" ]; then
+  while :; do
 	# Build up the Choices list from the language selection
 	shortlistcodes=`cat /etc/SUPPORTED-short | grep -e "^$LANGUAGE"|cut -b 4-5|sort|uniq`
 	SHORTLIST=''
@@ -141,7 +142,11 @@ while :; do
 		# TODO display error message?
 		:
 	fi
-done
+  done
+else
+  db_fset "countrychooser/country-name" seen true
+  db_fset "countrychooser/country-name-shortlist" seen true
+fi
 
 db_set "$countrycode"  "$COUNTRYCODE"
 log "$countrycode = '$COUNTRYCODE'"
