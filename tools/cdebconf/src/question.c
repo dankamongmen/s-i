@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.12 2002/08/07 16:34:01 tfheen Exp $
+ * $Id: question.c,v 1.13 2002/11/09 11:03:45 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -347,7 +347,10 @@ const char *question_defaultval(struct question *q)
 {
 	if (q->value != 0 && *q->value != 0)
 		return q->value;
-	else
-		return q->template->defaultval;
+	else {
+		static char buf[4096] = {0}; /* FIXME */
+		question_expand_vars(q, q->template->defaultval, buf, sizeof(buf));
+		return buf;
+	}
 }
 
