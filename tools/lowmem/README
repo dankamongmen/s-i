@@ -1,0 +1,67 @@
+This package is, frankly, a collection of hacks, hung on a reasonable
+framework to which you can add more hacks to save memory. The memory saving
+hacks are divided into two groups, which run at different times:
+initialisation, and post anna run.
+
+Initialisation hacks are in the debian-installer.d/S10lowmem and
+debian-installer.d/S31lowmem scripts, in the lowmemcheck package. The
+former script is what decides if the system is low on memory, and it
+creates /var/lib/lowmem as a flag indicating the system should be in lowmem
+mode. Other hacks test for this file. The latter of the scripts is run
+after debconf is started up, so it can communicate with the user and
+manipulate the debconf database.
+
+Post anna run hacks are in the lowmem package, which is queued for install
+by anna on lowmem systems, and provides a menu item.
+
+Current hacks:
+
+	disable framebuffer
+		Running w/o framebuffer saves lots of memory. The unifont.bgf
+		is also removed, saving much ram.
+
+	remove translations, force English
+		Happens at both init, and also trimtemplates is called by
+		udpkg when unpacking packages.
+
+		Saves a significant, but not huge amount of memory.
+
+	truncate log files
+		Happens after anna run. By now the log files may be rather
+		large, and so this truncates them and restarts the tails.
+
+		Saves a few hundred K of memory, at the expense of
+		diagnostics.
+
+	remove debconf templates after load
+		This is done at initialisation by rootskel. After
+		initialisation, udpkg takes care of it. It's not in lowmem,
+		because this is a safe, simple trick that's worth doing on
+		even systems with lots of memory.
+
+		Saves a few hundred K of memory.
+
+Possible future hacks:
+
+	remove loaded kernel modules
+		If a kernel module is loaded, there is no reason to keep it
+		on the ramdisk.
+	
+		May free hundreds of KB of memory.
+
+	remove all kernel modules
+		If lowmem runs after hw-detect-full, we probably don't need
+		any of the kernel modules in the initrd (except filesystem
+		modules, hmm..)
+	
+		Removing them would free up tons of space. Fairly 
+		unsafe/inflexible though.
+	
+	find swap partitions and auto-swapon
+		Try to scan disks for existing swap partitions and swapon.
+		This will make later partitioning a bit more difficult, and
+		requires a previous install.
+	
+	let user choose a partition to use as swap
+		Scan disks for existing small-ish partitions, list them,
+		and offer to turn them into swap space.

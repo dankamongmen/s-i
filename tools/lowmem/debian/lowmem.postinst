@@ -1,0 +1,9 @@
+#!/bin/sh
+if [ ! -e /var/lib/lowmem ]; then
+	exit 0
+fi
+
+for log in syslog messages; do
+	echo "Log file truncated to save memory." > /var/log/$log
+	kill $(ps | grep [t]ail | grep /var/log/$log | sed 's/ root.*//')
+done

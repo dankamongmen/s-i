@@ -1,0 +1,41 @@
+#!/bin/sh
+if [ ! -e /var/lib/lowmem ]; then
+	exit 0
+fi
+
+newline="
+"
+
+for file in $@; do
+	(
+		IFS="$newline"
+		ignore=0
+		while read line; do
+			case "$line" in
+				Description-en.UTF-8)
+					ignore=0
+				;;
+				Description-*)
+					ignore=1
+				;;
+				Choices-en.UTF-8)
+					ignore=0
+				;;
+				Choices-*)
+					ignore=1
+				;;
+				\ *)
+					:
+				;;
+				*)
+					ignore=0
+				;;
+			esac
+	
+			if [ "$ignore" = 0 ]; then
+				echo $line
+			fi
+		done
+	) < $file > $file.trimmed
+	mv -f $file.trimmed $file
+done

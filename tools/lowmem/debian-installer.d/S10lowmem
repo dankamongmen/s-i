@@ -1,0 +1,14 @@
+#!/bin/sh
+ram=$(grep ^Mem: /proc/meminfo | { read x y z; echo $y; }) # in bytes
+ram=$(expr 000000"$ram" : '0*\(.*\)......$') # convert to megabytes
+
+# This is the max memory footprint of the installer in non lowmem mode
+# up to running the partitioner.
+# TODO varies by arch
+needed=45
+
+if [ "$ram" -lt "$needed" ]; then
+	touch /var/lib/lowmem
+
+	trimtemplates /var/lib/dpkg/info/*.templates || true
+fi
