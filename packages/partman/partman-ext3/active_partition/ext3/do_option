@@ -27,7 +27,6 @@ case $1 in
 	else
 	    label=''
 	fi
-	db_reset partman-basicfilesystems/choose_label
 	db_set partman-basicfilesystems/choose_label "$label"
 	db_input critical partman-basicfilesystems/choose_label || true
 	db_go || exit 1
@@ -37,6 +36,7 @@ case $1 in
 	else
 	    [ ! -f $part/label ] || rm $part/label
 	fi
+	db_reset partman-basicfilesystems/choose_label
 	;;
     reserved_for_root)
 	if [ -f $part/reserved_for_root ]; then
@@ -44,7 +44,6 @@ case $1 in
 	else
 	    reserved=5
 	fi
-	db_reset partman-basicfilesystems/specify_reserved
 	db_set partman-basicfilesystems/specify_reserved "$reserved%"
 	db_input critical partman-basicfilesystems/specify_reserved || true
 	db_go || exit 1
@@ -55,6 +54,7 @@ case $1 in
 	else
 	    [ ! -f $part/reserved_for_root ] || rm $part/reserved_for_root
 	fi
+	db_reset partman-basicfilesystems/specify_reserved
 	;;
     usage)
 	db_metaget partman-basicfilesystems/text/typical_usage description
