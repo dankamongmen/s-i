@@ -23,12 +23,8 @@ kbd_t *amiga_kbd_get (kbd_t *keyboards, const char *subarch)
 {
 	kbd_t *k = NULL;
 
-#if defined(__m68k__)
+#if defined(__m68k__) || defined(__powerpc__)
 	if (strstr (subarch, "amiga") ==NULL)
-		return keyboards;
-#endif
-#if defined(__powerpc__)
-	if  (strstr (subarch, "apus") == NULL)
 		return keyboards;
 #endif
 
