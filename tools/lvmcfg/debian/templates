@@ -30,7 +30,7 @@ Template: lvmcfg/vgcreate_parts
 Type: multiselect
 Choices: ${PARTITIONS}
 _Description: Select devices for new volume group
- Please select the devices for the new volume group. You can select either
+ Please select the devices for the new volume group. You can select
  one or more devices.
 
 Template: lvmcfg/vgcreate_name
@@ -47,7 +47,7 @@ _Description: No physical volumes selected
 Template: lvmcfg/vgcreate_nameused
 Type: note
 _Description: Volume group name already in use
- The selected volume group name is already in use. Please choose an other
+ The selected volume group name is already in use. Please choose another
  name and try it again.
 
 Template: lvmcfg/vgdelete_names
@@ -66,7 +66,7 @@ Template: lvmcfg/vgdelete_confirm
 Type: boolean
 Default: true
 _Description: Continue deleting the volume group
- Are you sure to continue deleting the volume group: ${VG}?
+ Are you sure you want to continue deleting the volume group: ${VG}?
 
 Template: lvmcfg/vgdelete_error
 Type: note
@@ -90,7 +90,7 @@ Template: lvmcfg/vgextend_parts
 Type: multiselect
 Choices: ${PARTITIONS}
 _Description: Select devices to extend volume group
- Please select the devices to extend the volume group. You can select either
+ Please select the devices to extend the volume group. You can select
  one or more devices.
 
 Template: lvmcfg/vgextend_nosel
@@ -114,7 +114,7 @@ _Description: No volume group found
 Template: lvmcfg/vgreduce_names
 Type: select
 Choices: ${GROUPS}
-_Description: Select volume group to reducing
+_Description: Select volume group to reduce
  Select one of the following volume groups to reduce.
 
 Template: lvmcfg/vgreduce_parts
@@ -126,7 +126,7 @@ _Description: Select devices to reduce volume group
 Template: lvmcfg/vgreduce_minpv
 Type: note
 _Description: Error while reducing volume group
- The selected volume group (${VG}) could not be reduced. The is only one 
+ The selected volume group (${VG}) could not be reduced. There is only one 
  physical volume attached. Please delete the volume group instead.
 
 Template: lvmcfg/vgreduce_error
@@ -151,27 +151,27 @@ Template: lvmcfg/lvcreate_vgnames
 Type: select
 Choices: ${GROUPS}
 _Description: Select volume group
- Select one of the following volume groups to create the new logical
- volume on.
+ Select the volume group where the new logical volume
+ should be created.
 
 Template: lvmcfg/lvcreate_exists
 Type: note
 _Description: Error while creating new logical volume
- The given name ${LV} is already in use by an other logical volume on the
+ The given name ${LV} is already in use by another logical volume on the
  same volume group (${VG}).
 
 Template: lvmcfg/lvcreate_size
 Type: string
 _Description: Insert the logical volume size
  Insert the size of the new logical volume. Size can be inserted in the
- following formats: 10K (Kilobytes, 10M (Megabytes), 10G (Gigabytes),
- 10T (Terabytes). Default unit is megabytes.
+ following formats: 10K (Kilobytes), 10M (Megabytes), 10G (Gigabytes),
+ 10T (Terabytes). Default unit is Megabytes.
 
 Template: lvmcfg/lvcreate_error
 Type: note
 _Description: Error while creating new logical volume
  Unable to create new logical volume (${LV}) on ${VG} with new size ${SIZE}.
- Please check error log on tty3 for more informations.
+ Please check error log on tty3 for more information.
 
 Template: lvmcfg/lvdelete_novg
 Type: note
@@ -183,8 +183,8 @@ Template: lvmcfg/lvdelete_vgnames
 Type: select
 Choices: ${GROUPS}
 _Description: Select volume group
- Select one of the following volume groups to delete the logical
- volume from.
+ Select the volume group where the logical volume
+ to be deleted resides.
 
 Template: lvmcfg/lvdelete_nolv
 Type: note
@@ -196,24 +196,24 @@ Template: lvmcfg/lvdelete_lvnames
 Type: select
 Choices: ${LVS}
 _Description: Select logical volume on ${VG}
- Select one of the following logical volumes for deleting.
+ Select the logical volume to be deleted.
 
 Template: lvmcfg/lvdelete_error
 Type: note
 _Description: Error while deleting the logical volume
  Unable to delete the logical volume (${LV}) on ${VG}.
- Please check error log on tty3 for more informations.
+ Please check error log on tty3 for more information.
 
 Template: lvmcfg/nopartitions
 Type: note
 _Description: No usable physical volumes found
- Unable to found any physical volume (eg partition) in you system. Maybe you
- must load required kernel modules, or repartition the harddrives, or all
+ Unable to find any physical volume (e.g. partition) in your system. Maybe you
+ must load required kernel modules, or re-partition the hard drives, or all
  physical volumes are already in use.
 
 Template: lvmcfg/nolvm
 Type: note
 _Description: Logical Volume Manager not available
  The current kernel doesn't support the Logical Volume Manager. Maybe you
- need modprobe the lvm-mod module, to insert this functionality.
+ need to modprobe the lvm-mod module, to insert this functionality.
 
