@@ -19,6 +19,10 @@ FILENAME=$(PACKAGE)_$(VERSION)_$(DEB_HOST_ARCH).udeb
 PRIORITY=$(shell grep '^Package: cdebconf-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
 CONFFILE=/etc/cdebconf.conf
 
+#package names
+LIBDEBCONFDEV=libdebconf0.2-dev
+LIBDEBCONF=libdebconf0.2
+
 FRONTENDS=text slang
 ifeq (,$(findstring hurd-,$(DEB_HOST_ARCH)))
 FRONTENDS += bogl
@@ -78,6 +82,7 @@ install-udeb: build-udeb
 		etcdir=$(shell pwd)/debian/cdebconf-udeb/etc )
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/include
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/share/man
+	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/lib*.a
 
 install: build
 	dh_testdir
@@ -88,10 +93,8 @@ install: build
 		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf/usr \
 		etcdir=$(shell pwd)/debian/cdebconf/etc )
 
-	dh_movefiles -plibcdebconf-dev --sourcedir=debian/cdebconf \
-		usr/lib/*.so usr/include/cdebconf
-	dh_movefiles -plibcdebconf0 --sourcedir=debian/cdebconf \
-		usr/lib/*.so*
+	d-shlibmove --commit --movedev debian/cdebconf/usr/include/cdebconf usr/include \
+	  debian/cdebconf/usr/lib/lib*.so
 
 	rm -rf debian/cdebconf/usr/include
 
@@ -104,23 +107,44 @@ binary-indep: build install
 # Note that this builds a .udeb, which is not policy compliant or anything.
 binary-arch: cdebconf cdebconf-udeb
 
-cdebconf: install
-	@echo "Building $@"
+$(LIBDEBCONF): install
 	dh_testdir
 	dh_testroot
 	dh_installdirs
 
-	dh_installdocs		-plib$@0
-	dh_installchangelogs	-plib$@0
-	dh_makeshlibs		-plib$@0
-	#dh_strip		-plib$@0
-	dh_compress		-plib$@0
-	dh_fixperms		-plib$@0
-	dh_installdeb		-plib$@0
-	#dh_shlibdeps		-plib$@0
-	dh_gencontrol		-plib$@0
-	dh_md5sums		-plib$@0
-	dh_builddeb		-plib$@0
+	dh_installdocs		-p$@
+	dh_installchangelogs	-p$@
+	dh_makeshlibs		-p$@
+	#dh_strip		-p$@
+	dh_compress		-p$@
+	dh_fixperms		-p$@
+	dh_installdeb		-p$@
+	#dh_shlibdeps		-p$@
+	dh_gencontrol		-p$@
+	dh_md5sums		-p$@
+	dh_builddeb		-p$@
+
+$(LIBDEBCONFDEV): install
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+
+	dh_installdocs		-p$@
+	dh_installchangelogs	-p$@
+	#dh_strip		-p$@
+	dh_compress		-p$@
+	dh_fixperms		-p$@
+	dh_installdeb		-p$@
+	#dh_shlibdeps		-p$@
+	dh_gencontrol		-p$@
+	dh_md5sums		-p$@
+	dh_builddeb		-p$@
+
+cdebconf: $(LIBDEBCONFDEV) $(LIBDEBCONF)
+	@echo "Building $@"
+	dh_testdir
+	dh_testroot
+	dh_installdirs
 
 	dh_installdocs		-p$@ doc/*
 	dh_installchangelogs	-p$@
@@ -129,21 +153,11 @@ cdebconf: install
 	dh_fixperms		-p$@
 	dh_makeshlibs		-p$@
 	dh_installdeb		-p$@
-	dh_shlibdeps -p$@ -ldebian/lib$@0/usr/lib
+	dh_shlibdeps -p$@ -ldebian/$(LIBDEBCONF)/usr/lib
 	dh_gencontrol		-p$@
 	dh_md5sums		-p$@
 	dh_builddeb		-p$@
 
-	dh_installdocs		-plib$@-dev
-	dh_installchangelogs	-plib$@-dev
-	#dh_strip		-plib$@-dev
-	dh_compress		-plib$@-dev
-	dh_fixperms		-plib$@-dev
-	dh_installdeb		-plib$@-dev
-	#dh_shlibdeps		-plib$@-dev
-	dh_gencontrol		-plib$@-dev
-	dh_md5sums		-plib$@-dev
-	dh_builddeb		-plib$@-dev
 
 
 cdebconf-udeb: install-udeb

@@ -7,6 +7,7 @@ MINOR=2
 MICRO=0
 LDFLAGS=-L. -ldebconf @RPATH@
 LIB=libdebconf.so
+LIBNAME_A=libdebconf.a
 LIBNAME=libdebconf.so.$(MAJOR).$(MINOR).$(MICRO)
 SONAME=libdebconf.so.$(MAJOR).$(MINOR)
 DEBCONF=debconf
@@ -17,10 +18,12 @@ LIBOBJS=commands.opic configuration.opic confmodule.opic debug.opic \
 	database.opic debconfclient.opic frontend.opic priority.opic \
 	strutl.opic question.opic template.opic
 
+LIBOBJS_A=$(LIBOBJS:.opic=.o)
+
 all: $(BIN) $(LIB) $(SONAME) modules/Makefile
 	@$(MAKE) -C modules $@
 
-$(BIN): $(LIB) $(addsuffix .o,$(BIN))
+$(BIN): $(LIB) $(LIBNAME_A) $(addsuffix .o,$(BIN))
 	@for bin in $(BIN); do \
 		echo Compiling tool $$bin; \
 		$(CC) $(CFLAGS) -o $$bin $$bin.o $(LDFLAGS); \
@@ -29,6 +32,10 @@ $(BIN): $(LIB) $(addsuffix .o,$(BIN))
 $(LIBNAME): $(LIBOBJS)
 	@echo Creating shared library $@
 	@$(CC) $(CFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $^ -ldl
+
+$(LIBNAME_A): $(LIBOBJS_A)
+	$(AR) cr $@ $^
+	ranlib $@
 
 $(SONAME) $(LIB): $(LIBNAME)
 	-@ln -sf $^ $@
@@ -42,9 +49,10 @@ install:
 	install -d -m 755 ${sharedir}
 	install -m 755 debconf debconf-loadtemplate ${bindir}
 	install -m 755 dpkg-reconfigure ${sbindir}
-	install -m 755 $(LIBNAME) ${libdir}
+	install -m 644 $(LIBNAME) ${libdir}
 	ln -sf $(LIBNAME) ${libdir}/$(SONAME)
 	ln -sf $(LIBNAME) ${libdir}/$(LIB)
+	install -m 644 $(LIBNAME_A) ${libdir}
 	install -m 644 ${srcdir}/src/cdebconf.conf-dist ${etcdir}/cdebconf.conf
 	install -m 644 ${srcdir}/src/client/confmodule ${sharedir}
 	ln -sf ../../bin/$(DEBCONF) ${sharedir}/frontend

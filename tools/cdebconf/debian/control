@@ -1,6 +1,6 @@
 Source: cdebconf
 Section: utils
-Build-Depends: dpkg-dev (>= 1.7.0), debhelper (>= 2.1.18), slang1-dev, libbogl-dev [!hurd-i386], libperl-dev
+Build-Depends: dpkg-dev (>= 1.7.0), debhelper (>= 2.1.18), slang1-dev, libbogl-dev [!hurd-i386], libperl-dev, d-shlibs (>= 0.2)
 Priority: optional
 Maintainer: Randolph Chung <tausq@debian.org>
 Standards-Version: 3.5.6.1
@@ -19,13 +19,13 @@ Description: Debian Configuration Management System (C-implementation)
  Installing this package is rather dangerous now. It will break debconf.
  You have been warned!
 
-Package: libcdebconf-dev
-Architecture: all
+Package: libdebconf0.2-dev
+Architecture: any
 Section: devel
-Depends: libcdebconf0 (= ${Source-Version})
-Conflicts: cdebconf-dev
-Provides: cdebconf-dev
-Replaces: cdebconf-dev
+Depends: libdebconf0.2 (= ${Source-Version}), ${shlibs:Depends}, ${devlibs:Depends}
+Conflicts: libdebconf-dev
+Provides: libdebconf-dev, libcdebconf-dev
+Replaces: libdebconf-dev
 Description: Development files for cdebconf
  Debconf is a configuration management system for Debian packages. It is
  used by some packages to prompt you for information before they are
@@ -48,7 +48,7 @@ Description: Debian Configuration Management System (C-implementation)
  cdebconf-udeb is a minimal cdebconf package used by the 
  debian-installer
 
-Package: libcdebconf0
+Package: libdebconf0.2
 Architecture: any
 Section: libs
 Depends: ${shlibs:Depends}
@@ -58,4 +58,4 @@ Description: Debian Configuration Management System (C-implementation)
  installed. This is a reimplementation of the original debconf version
  in C.
  .
- This is the libraries needed by cdebconf-dev and cdebconf.
+ This is the libraries needed by libdebconf-dev and cdebconf.
