@@ -2,8 +2,9 @@
 
 . /usr/share/debconf/confmodule
 
-
-# find all packages implementing 'kernel-image'
+# find all packages implementing 'kernel-image'.  Is there a better
+# way? [pere 2003-02-16]
+kernels=`chroot /target apt-cache search kernel-image | grep "^kernel-image" | sort -ur | awk '{print $1}' | tr "\n" "," | sed 's/,/, /g'`
 
 if [ "$kernels" ] ; then
     db_subst kernel-chooser/which-kernel kernels "$kernels"
