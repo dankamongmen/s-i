@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.40 2003/07/14 18:00:54 sjogren Exp $
+ * $Id: text.c,v 1.41 2003/07/15 18:39:32 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -235,7 +235,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
-    strchoicesplit(q_get_choices_vals(q), choices, count);
+    count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_translated = malloc(sizeof(char *) * count);
     if (strchoicesplit(q_get_choices(q), choices_translated, count) != count)
         return DC_NOTOK;
@@ -390,7 +390,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
-    strchoicesplit(q_get_choices_vals(q), choices, count);
+    count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_translated = malloc(sizeof(char *) * count);
     if (strchoicesplit(q_get_choices(q), choices_translated, count) != count)
         return DC_NOTOK;

@@ -169,34 +169,51 @@ int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 
 int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
 {
-	int argc = 0;
-	const char *s = inbuf, *e;
-	char *p;
+    int argc = 0, i;
+    const char *s = inbuf, *e, *c;
+    char *p;
 
-	if (inbuf == 0) return 0;
+    if (inbuf == 0) return 0;
 
-	INFO(INFO_VERBOSE, "Splitting [%s]\n", inbuf);
-	while (*s != 0 && argc < maxnarg)
-	{
-		/* skip initial spaces */
-		while (isspace(*s)) s++;
+    INFO(INFO_VERBOSE, "Splitting [%s]\n", inbuf);
+    while (*s != 0 && argc < maxnarg)
+    {
+        /* skip initial spaces */
+        while (isspace(*s)) s++;
 
-		/* find end */
-		e = s;
-		while (*e != 0 && *e != ',') e++;
+        /* find end */
+        e = s;
+        while (*e != 0)
+        {
+            if (*e == '\\' && *(e+1) == ',')
+                e += 2;
+            else if (*e == ',')
+                break;
+            else
+                e++;
+        }
 
-		argv[argc] = malloc(e-s+1);
-		memcpy(argv[argc], s, e-s);
-		argv[argc][e-s] = 0;
-		p = &argv[argc][e-s-1];
-		/* strip off trailing spaces */
-		while (p > argv[argc] && *p == ' ') *p-- = 0;
-		argc++;
+        argv[argc] = malloc(e-s+1);
+        for (c = s, i = 0; c < e; c++, i++)
+        {
+            if (*c == '\\' && c < (e-1) && *(c+1) == ',')
+            {
+                argv[argc][i] = ',';
+                c++;
+            }
+            else
+                argv[argc][i] = *c;
+        }
+        argv[argc][i] = 0;
+        p = &argv[argc][i-1];
+        /* strip off trailing spaces */
+        while (p > argv[argc] && *p == ' ') *p-- = 0;
+        argc++;
 
-		s = e;
-		if (*s == ',') s++;
-	}
-	return argc;
+        s = e;
+        if (*s == ',') s++;
+    }
+    return argc;
 }
 
 int strcmdsplit(char *inbuf, char **argv, size_t maxnarg)

@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.15 2003/07/15 12:59:59 sjogren Exp $
+ * $Id: newt.c,v 1.16 2003/07/15 18:39:31 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -283,7 +283,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
-    strchoicesplit(q_get_choices_vals(q), choices, count);
+    count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_trans = malloc(sizeof(char *) * count);
     if (strchoicesplit(q_get_choices(q), choices_trans, count) != count)
         return DC_NOTOK;
@@ -396,7 +396,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
-    strchoicesplit(q_get_choices_vals(q), choices, count);
+    count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_trans = malloc(sizeof(char *) * count);
     if (strchoicesplit(q_get_choices(q), choices_trans, count) != count)
         return DC_NOTOK;
