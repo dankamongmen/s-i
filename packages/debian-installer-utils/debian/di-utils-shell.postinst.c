@@ -32,5 +32,4 @@ int main () {
 
 	chdir("/");
 	execl("/bin/sh", "/bin/sh", NULL);
-	exit(1);
 }
