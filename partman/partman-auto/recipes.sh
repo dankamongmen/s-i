@@ -82,7 +82,7 @@ decode_recipe () {
 		    max="$min"
 		fi
 		case "$4" in # allow only valid file systems
-		    ext2|ext3|linux-swap|fat16|fat32)
+		    ext2|ext3|xfs|reiserfs|linux-swap|fat16|fat32)
 			fs="$4"
 			;;
 		    *)
@@ -257,6 +257,12 @@ choose_recipe () {
 	fi
     done
 
+    if [ -z "$choices" ]; then
+       db_input critical partman-auto/no_recipe || true
+       db_go || true # TODO handle backup right
+       return 1
+    fi
+    
 #    db_metaget partman-auto/text/expert_recipe description
 #    choices="${choices}expert${TAB}${RET}"
     
