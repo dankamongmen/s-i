@@ -119,11 +119,10 @@ else
 fi
 
 # Set the distribution used by base-installer, test in priority order
-for dist in stable testing unstable ; do
+for dist in testing stable unstable ; do
     if [ -e /cdrom/dists/$dist ] ; then
-	CODENAME=`sed -n 's/^Codename: *//p' /cdrom/dists/$dist/Release`
-	db_set mirror/distribution $CODENAME
-	log "Detected CD with '$CODENAME' distribution"
+	db_set mirror/distribution $dist
+	log "Detected CD with '$dist' distribution"
 	break
     fi
 done
