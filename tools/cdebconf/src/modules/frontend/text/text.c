@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.59 2004/03/09 09:05:07 barbier Exp $
+ * $Id: text.c,v 1.60 2004/03/09 09:26:51 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -57,12 +57,17 @@
 #include <sys/types.h>
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
-#define q_get_description(q)  		question_get_field((q), "", "description")
+#define q_get_description(q)		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
 #define q_get_indices(q)		question_get_field((q), "", "indices")
 
 #define MAKE_UPPER(C) do { if (islower((int) C)) { C = (char) toupper((int) C); } } while(0)
+
+#define CHAR_GOBACK '<'
+#define CHAR_HELP '?'
+#define CHAR_CLEAR '!'
+
 /*
  * Function: getwidth
  * Input: none
@@ -151,9 +156,9 @@ static void text_handler_displaydesc(struct frontend *obj, struct question *q)
 {
 	char *descr = q_get_description(q);
 	char *ext_descr = q_get_extended_description(q);
-	wrap_print(descr);
 	if (*ext_descr)
 		wrap_print(ext_descr);
+	wrap_print(descr);
 	free(descr);
 	free(ext_descr);
 }
@@ -168,10 +173,44 @@ static void text_handler_displaydesc(struct frontend *obj, struct question *q)
  * Assumptions: None.
  */
 static const char *
-get_text(struct frontend *obj, const char *template, const char *fallback )
+get_text(struct frontend *obj, const char *template, const char *fallback)
 {
 	struct question *q = obj->qdb->methods.get(obj->qdb, template);
 	return q ? q_get_description(q) : fallback;
+}
+
+static void show_help (struct frontend *obj, struct question *q)
+{
+	char *descr = q_get_description(q);
+	printf("%s", get_text(obj, "debconf/text-help-title", "KEYSTROKES:"));
+	printf("\n  %c  ", CHAR_HELP);
+	printf("%s", get_text(obj, "debconf/text-help-keystroke", "Display this help message"));
+	if (obj->methods.can_go_back (obj, q)) {
+		printf("\n  %c  ", CHAR_GOBACK);
+		printf("%s", get_text(obj, "debconf/text-help-goback", "Go back to previous question"));
+	}
+	if (strcmp(q->template->type, "string") == 0 ||
+	    strcmp(q->template->type, "passwd") == 0) {
+		printf("\n  %c  ", CHAR_CLEAR);
+		printf("%s", get_text(obj, "debconf/text-help-clear", "Select an empty string"));
+	}
+	else if (strcmp(q->template->type, "select") == 0 ||
+	    strcmp(q->template->type, "multiselect") == 0) {
+		/* n for next page */
+		printf("\n  %c  ", *(get_text(obj,"debconf/next-key", "N")));
+		printf("%s", get_text(obj, "debconf/text-help-next", "Display next page"));
+		/* b to back up */
+		printf("\n  %c  ", *(get_text(obj,"debconf/prev-key", "B")));
+		printf("%s", get_text(obj, "debconf/text-help-prev", "Display previous page"));
+	}
+	if (strcmp(q->template->type, "multiselect") == 0) {
+		/* q to quit select */
+		printf("\n  %c  ", *(get_text(obj,"debconf/quit-key", "Q")));
+		printf(get_text(obj, "debconf/text-help-prev", "Quit selection"));
+	}
+	printf("\n");
+	wrap_print(descr);
+	free(descr);
 }
 
 /*
@@ -198,30 +237,28 @@ static int text_handler_boolean(struct frontend *obj, struct question *q)
 			def = 0;
 	}
 
-	/* turn of SIGINT before asking for input, otherwise things
-	 * get very messy
-	 */
 	do {
-		if (defval == NULL) {
-			if (obj->methods.can_go_back(obj, q))
-				printf(get_text(obj, "debconf/prompt-yes-no-cancel", "Prompt: Yes/No/Cancel> "));
+		if (def == 1)
+			printf(get_text(obj, "debconf/select-default", "%3d. %s (default)"), 1, get_text(obj, "debconf/yes", "Yes"));
 		else
-			printf(get_text(obj, "debconf/prompt-yes-no", "Prompt: Yes/No> "));
-		} else {
-			if (obj->methods.can_go_back(obj, q))
-				printf(get_text(obj, "debconf/prompt-yes-no-cancel-default", "Prompt: Yes/No/Cancel, default=%s> "),
-					(def == 0 ? get_text(obj, "debconf/yes", "Yes") : get_text(obj, "debconf/no", "No")));
-			else
-				printf(get_text(obj, "debconf/prompt-yes-no-default", "Prompt: Yes/No, default=%s> "),
-					(def == 0 ? get_text(obj, "debconf/yes", "Yes") : get_text(obj, "debconf/no", "No")));
-		}
+			printf("%3d. %s", 1, get_text(obj, "debconf/yes", "Yes"));
+		printf("\n");
+		if (def == 0)
+			printf(get_text(obj, "debconf/select-default", "%3d. %s (default)"), 2, get_text(obj, "debconf/no", "No"));
+		else
+			printf("%3d. %s", 2, get_text(obj, "debconf/no", "No"));
+		printf("\n");
+		printf(get_text(obj, "debconf/text-prompt", "Prompt: '%c' for help> "), CHAR_HELP);
 		fgets(buf, sizeof(buf), stdin);
 		CHOMP(buf);
-		if (strcasecmp(buf, get_text(obj, "debconf/cancel", "Cancel")) == 0)
+		if (*buf == CHAR_HELP)
+			show_help(obj, q);
+		else if (obj->methods.can_go_back (obj, q) &&
+		         *buf == CHAR_GOBACK && *(buf+1) == 0)
 			return DC_GOBACK;
-		if (strcasecmp(buf, get_text(obj, "debconf/yes", "Yes")) == 0)
+		else if (*buf == '1')
 			ans = 1;
-		else if (strcasecmp(buf, get_text(obj, "debconf/no", "No")) == 0)
+		else if (*buf == '2')
 			ans = 0;
 #if defined(__s390__) || defined (__s390x__)
 		else if ((buf[0] == 0 || (buf[0] == '.' && buf[1] == 0)) && defval != 0)
@@ -279,7 +316,7 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 
 	while (1) {
 		if (i < 0)
- 			i = 0;
+			i = 0;
 		for (line = 0; i < count && line < getheight()-1; i++, line++) {
 			if (selected[tindex[i]])
 				/* A selected item in a Multiselect question */
@@ -289,33 +326,31 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 			printf("\n");
 		}
 
-		if (i == count && count < getheight()-1) {
-			printf(get_text(obj, "debconf/prompt-1-page", 
-				"Prompt: 1 - %d, q to quit select> "), count);
-		} else if (i == count) {
-			printf(get_text(obj, "debconf/prompt-last-page",
-				"Prompt: 1 - %d, q to quit select, b to back up> "), count);
-		} else if (i == getheight()-1) {
-			printf(get_text(obj, "debconf/prompt-first-page", 
-				"Prompt: 1 - %d/%d, q to quit select, n for next page> "), i, count);
-		} else {
-			printf(get_text(obj, "debconf/prompt-multi-page", 
-				"Prompt: 1 - %d/%d, q to quit select, b to back up, n for next page> "), i, count);
-		}
-
+		printf(get_text(obj, "debconf/prompt-multiselect-page", 
+			"Prompt: 1 - %d/%d, '%c' for help, '%c' to quit select> "),
+				i, count, CHAR_HELP, *(get_text(obj,"debconf/quit-key", "Q")));
 		fgets(answer, sizeof(answer), stdin);
 		CHOMP(answer);
 		MAKE_UPPER(answer[0]); 
+		if (answer[0] == CHAR_HELP)
+			{ show_help(obj, q); continue; }
+		else if (obj->methods.can_go_back (obj, q) &&
+		         answer[0] == CHAR_GOBACK && answer[1] == 0)
+			return DC_GOBACK;
 		/* q to quit select */
-		if (answer[0] == *(get_text(obj,"debconf/quit-key", "Q")))
+		else if (answer[0] == *(get_text(obj,"debconf/quit-key", "Q")))
 			break;
 		/* n for next page */
-		if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
+		else if (answer[0] == *(get_text(obj,"debconf/next-key", "N"))) {
+			if (i == count)
+				i -= getheight()-1;
 			continue;
+		}
 		/* b to back up */
-		if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
-			{ i -= 2*(getheight()-1); continue; }
-		
+		else if (answer[0] == *(get_text(obj,"debconf/prev-key", "B"))) {
+			i -= 2*(getheight()-1);
+			continue;
+		}
 		choice = atoi(answer) - 1;
 		
 		if (choice >= 0 && choice < count) {
@@ -348,67 +383,6 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 	free(defaults);
 	question_setvalue(q, answer);
 	
-	return DC_OK;
-}
-
-/*
- * Function: text_handler_note
- * Input: struct frontend *obj - frontend object
- *        struct question *q - question to ask
- * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
- * Description: handler for the note question type
- * Assumptions: none
- */
-static int text_handler_note(struct frontend *obj, struct question *q)
-{
-	int c;
-	if (obj->methods.can_go_back (obj, q))
-		printf("%s\n", get_text(obj , "debconf/cont-cancel-prompt", 
-				  "[Press enter to continue, or 'c' to cancel]"));
-	else
-		printf("%s\n", get_text(obj, "debconf/cont-prompt", "[Press enter to continue]"));
-	do { 
-		c = fgetc(stdin);
-		MAKE_UPPER(c); 
-		if ((obj->methods.can_go_back (obj, q)) &&  
-			/*  Cancel key */ 
-		    (c == *(get_text(obj, "debconf/cancel-key", "C"))))
-			return DC_GOBACK;
-	} while (c != '\r' && c != '\n');
-	return DC_OK;
-}
-
-/*
- * Function: text_handler_password
- * Input: struct frontend *obj - frontend object
- *        struct question *q - question to ask
- * Output: int - DC_OK, DC_NOTOK
- * Description: handler for the password question type
- * Assumptions: none
- *
- * TODO: this can be *MUCH* improved. no editing is possible right now
- */
-static int text_handler_password(struct frontend *obj, struct question *q)
-{
-	struct termios oldt, newt;
-	char passwd[256] = {0};
-	int i = 0, c;
-
-	tcgetattr(0, &oldt);
-	memcpy(&newt, &oldt, sizeof(struct termios));
-	cfmakeraw(&newt);
-	tcsetattr(0, TCSANOW, &newt);
-	while ((c = fgetc(stdin)) != EOF)
-	{
-		fputc('*', stdout);
-		passwd[i++] = (char)c;
-		if (c == '\r' || c == '\n') break;
-
-	}
-	printf("\n");
-	passwd[i] = 0;
-	tcsetattr(0, TCSANOW, &oldt);
-	question_setvalue(q, passwd);
 	return DC_OK;
 }
 
@@ -467,30 +441,37 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 			printf("\n");
 		}
  
-		if (i == count) {
+		do {
 			if (def >= 0 && choices_translated[def]) {
-				printf(get_text(obj, "debconf/prompt-num-with-default", "Prompt: 1 - %d, default=%s> "), 
-					count, choices_translated[def]);
+				printf(get_text(obj, "debconf/prompt-num-with-default",
+					"Prompt: 1 - %d/%d, '%c' for help, default=%s> "),
+					i, count, CHAR_HELP, choices_translated[def]);
 			} else {
-				printf(get_text(obj, "debconf/prompt-num", "Prompt: 1 - %d> "), count);
+				printf(get_text(obj, "debconf/prompt-num",
+					"Prompt: 1 - %d/%d, '%c' for help> "),
+					i, count, CHAR_HELP);
 			}
-		} else if (i == getheight()-1) {
-			printf(get_text(obj, "debconf/prompt-firstpage", "Prompt: 1 - %d/%d, n for next page> "),
-				i, count);
-		} else {
-			printf(get_text(obj, "debconf/prompt-multipage", "Prompt: 1 - %d/%d, b to back up, n for next page> "),
-				i, count);
-		}
-		fgets(answer, sizeof(answer), stdin);
-		CHOMP(answer);
-		MAKE_UPPER(answer[0]); 
-		/* n for next page */
-		if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
-			continue;
-		/* b to back up */
-		if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
-			{ i -= 2*(getheight()-1); continue; }
+			fgets(answer, sizeof(answer), stdin);
+			CHOMP(answer);
+			if (answer[0] == CHAR_HELP)
+				show_help(obj, q);
+		} while (answer[0] == CHAR_HELP && answer[1] == 0);
 
+		MAKE_UPPER(answer[0]); 
+		if (obj->methods.can_go_back (obj, q) &&
+		         answer[0] == CHAR_GOBACK && answer[1] == 0)
+			return DC_GOBACK;
+		/* n for next page */
+		else if (answer[0] == *(get_text(obj,"debconf/next-key", "N"))) {
+			if (i == count)
+				i -= getheight()-1;
+			continue;
+		}
+		/* b to back up */
+		else if (answer[0] == *(get_text(obj,"debconf/prev-key", "B"))) {
+			i -= 2*(getheight()-1);
+			continue;
+		}
 #if defined(__s390__) || defined (__s390x__)
 		if (answer[0] == 0 || (answer[0] == '.' && answer[1] == 0))
 #else
@@ -516,6 +497,75 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 }
 
 /*
+ * Function: text_handler_note
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
+ * Description: handler for the note question type
+ * Assumptions: none
+ */
+static int text_handler_note(struct frontend *obj, struct question *q)
+{
+	int c;
+	printf("%s\n", get_text(obj, "debconf/cont-prompt", "[Press enter to continue]"));
+	while (1) {
+		c = fgetc(stdin);
+		MAKE_UPPER(c); 
+		if (obj->methods.can_go_back (obj, q) && c == CHAR_GOBACK)
+			return DC_GOBACK;
+#if defined(__s390__) || defined (__s390x__)
+		if (c == '.')
+#else
+		if (c == '\r' || c == '\n');
+#endif
+			break;
+	}
+	return DC_OK;
+}
+
+/*
+ * Function: text_handler_password
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handler for the password question type
+ * Assumptions: none
+ *
+ * TODO: this can be *MUCH* improved. no editing is possible right now
+ */
+static int text_handler_password(struct frontend *obj, struct question *q)
+{
+	struct termios oldt, newt;
+	char passwd[256] = {0};
+	int i = 0, c;
+
+	tcgetattr(0, &oldt);
+	memcpy(&newt, &oldt, sizeof(struct termios));
+	cfmakeraw(&newt);
+	tcsetattr(0, TCSANOW, &newt);
+	while ((c = fgetc(stdin)) != EOF)
+	{
+		passwd[i] = (char)c;
+		if (c == '\r' || c == '\n')
+			break;
+		i++;
+
+	}
+	passwd[i] = 0;
+	tcsetattr(0, TCSANOW, &oldt);
+	printf("\n%s\n", passwd);
+	printf("\n%c %d\n", passwd[0], passwd[1]);
+	if (obj->methods.can_go_back (obj, q) &&
+	    passwd[0] == CHAR_GOBACK && passwd[1] == 0)
+		return DC_GOBACK;
+	if (passwd[0] == CHAR_CLEAR && passwd[1] == 0)
+		question_setvalue(q, "");
+	else
+		question_setvalue(q, passwd);
+	return DC_OK;
+}
+
+/*
  * Function: text_handler_string
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
@@ -527,11 +577,22 @@ static int text_handler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
 	const char *defval = question_getvalue(q, "");
-	if (defval)
-		printf(get_text(obj, "debconf/default-bracket", "[default = %s]"), defval);
-	printf("> "); fflush(stdout);
-	fgets(buf, sizeof(buf), stdin);
-	CHOMP(buf);
+	while (1) {
+		if (defval)
+			printf(get_text(obj, "debconf/text-prompt-default", "Prompt: '%c' for help, default=%s> "), CHAR_HELP, defval);
+		else
+			printf(get_text(obj, "debconf/text-prompt", "Prompt: '%c' for help> "), CHAR_HELP);
+		fflush(stdout);
+		fgets(buf, sizeof(buf), stdin);
+		CHOMP(buf);
+		if (buf[0] == CHAR_HELP && buf[1] == 0)
+			show_help(obj, q);
+		else
+			break;
+	}
+	if (obj->methods.can_go_back (obj, q) &&
+	    buf[0] == CHAR_GOBACK && buf[1] == 0)
+		return DC_GOBACK;
 #if defined(__s390__) || defined (__s390x__)
 	if (buf[0] == '.' && buf[1] == 0 && defval == 0)
 		question_setvalue(q, "");
@@ -540,6 +601,8 @@ static int text_handler_string(struct frontend *obj, struct question *q)
 	if (buf[0] == 0 && defval != 0)
 #endif
 		question_setvalue(q, defval);
+	else if (buf[0] == CHAR_CLEAR && buf[1] == 0)
+		question_setvalue(q, "");
 	else
 		question_setvalue(q, buf);
 	return DC_OK;
@@ -549,30 +612,13 @@ static int text_handler_string(struct frontend *obj, struct question *q)
  * Function: text_handler_text
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
- * Output: int - DC_OK, DC_NOTOK
+ * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
  * Description: handler for the text question type
  * Assumptions: none
  */
 static int text_handler_text(struct frontend *obj, struct question *q)
 {
-	char *out = 0;
-	char buf[1024];
-	int sz = 1;
-
-	out = malloc(sz);
-	printf("%s\n", get_text(obj, "debconf/enter-line", "Enter . on a line by itself when you are done"));
-	while (fgets(buf, sizeof(buf), stdin))
-	{
-		if (strcmp(buf, ".\n") == 0)
-			break;
-		sz += strlen(buf);
-		out = realloc(out, sz);
-		memcpy(out + sz - strlen(buf) - 1, buf, strlen(buf));
-	}
-	out[sz-1] = 0;
-	question_setvalue(q, out);
-	free(out);
-	return DC_OK;
+	return text_handler_note(obj, q);
 }
 
 /*
@@ -585,20 +631,7 @@ static int text_handler_text(struct frontend *obj, struct question *q)
  */
 static int text_handler_error(struct frontend *obj, struct question *q)
 {
-	int c;
-	if (obj->methods.can_go_back (obj, q))
-		printf("%s\n", get_text(obj , "debconf/cont-cancel-prompt", 
-				  "[Press enter to continue, or 'c' to cancel]"));
-	else
-		printf("%s\n", get_text(obj, "debconf/cont-prompt", "[Press enter to continue]"));
-	do { 
-		c = fgetc(stdin); 
-		MAKE_UPPER(c);
-		if ((obj->methods.can_go_back (obj, q)) &&  
-		    (c == *(get_text(obj, "debconf/cancel-key", "C"))))
-			return DC_GOBACK;
-	} while (c != '\r' && c != '\n');
-	return DC_OK;
+	return text_handler_note(obj, q);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -635,6 +668,20 @@ static int text_initialize(struct frontend *obj, struct configuration *conf)
 }
 
 /*
+ * Function: text_can_go_back
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question object
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: tells whether confmodule supports backing up
+ * Assumptions: none
+ */
+static int
+text_can_go_back(struct frontend *obj, struct question *q)
+{
+	return (obj->capability & DCF_CAPB_BACKUP);
+}
+
+/*
  * Function: text_go
  * Input: struct frontend *obj - frontend object
  * Output: int - DC_OK, DC_NOTOK
@@ -645,10 +692,10 @@ static int text_go(struct frontend *obj)
 {
 	struct question *q = obj->questions;
 	int i;
-	int ret;
+	int ret = DC_OK;
 	int display_title = 1;
 
-	for (; q != 0; q = q->next) {
+	while (q != NULL) {
 		for (i = 0; i < DIM(question_handlers); i++) {
 			if (strcmp(q->template->type, question_handlers[i].type) == 0) 
 			{
@@ -662,13 +709,16 @@ static int text_go(struct frontend *obj)
 				ret = question_handlers[i].handler(obj, q);
 				if (ret == DC_OK)
 					obj->qdb->methods.set(obj->qdb, q);
+				else if (ret == DC_GOBACK && q->prev != NULL)
+					q = q->prev;
 				else
 					return ret;
 				break;
 			}
 		}
+		if (ret == DC_OK)
+			q = q->next;
 	}
-
 	return DC_OK;
 }
 
@@ -704,6 +754,7 @@ static void text_progress_stop(struct frontend *obj)
 struct frontend_module debconf_frontend_module =
 {
 	initialize: text_initialize,
+	can_go_back: text_can_go_back,
 	go: text_go,
 	progress_start: text_progress_start,
 	progress_set: text_progress_set,
