@@ -13,13 +13,13 @@ fi
 # detect which is the root partition: /target
 # ugh, I wanted to use awk, but sed has better chance of being in
 # busybox
-	rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
+rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
 
 # some combination of partconf and kernel 2.2 ends up with /target/.
-	if [ "" = "$rootfs" ]; then
-	    rootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/ /s/ .*//p' $MTAB`
-	fi
-	rootfs=`mapdevfs $rootfs`
+if [ "" = "$rootfs" ]; then
+	rootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/ /s/ .*//p' $MTAB`
+fi
+rootfs=`mapdevfs $rootfs`
 
 db_subst nobootloader/confirmation ROOT "${rootfs}"
 db_input high nobootloader/confirmation || true
