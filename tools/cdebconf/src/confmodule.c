@@ -9,7 +9,7 @@
  *              of client configuration modules and communications
  *              between the debconf frontend and the confmodule
  *
- * $Id: confmodule.c,v 1.9 2000/12/12 05:13:36 tausq Exp $
+ * $Id: confmodule.c,v 1.10 2001/01/06 17:15:51 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -40,6 +40,7 @@
  ***********************************************************************/
 #include "confmodule.h"
 #include "commands.h"
+#include "frontend.h"
 #include "strutl.h"
 
 #include <stdio.h>
@@ -147,6 +148,7 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 	switch ((pid = fork()))
 	{
 	case -1:
+		mod->frontend->shutdown(mod->frontend);
 		DIE("Cannot execute client config script");
 		break;
 	case 0:

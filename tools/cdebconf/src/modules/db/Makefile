@@ -1,4 +1,4 @@
-MODULES=perldb textdb
+MODULES=textdb perldb
 SOBJS=$(addsuffix .so,$(MODULES))
 
 all:

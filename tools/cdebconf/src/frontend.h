@@ -16,6 +16,8 @@ typedef void (*dcf_set_title_t)(struct frontend *, const char *title);
 typedef int (*dcf_add_t)(struct frontend *, struct question *q);
 typedef int (*dcf_go_t)(struct frontend *);
 typedef void (*dcf_clear_t)(struct frontend *);
+typedef int (*dcf_cangoback_t)(struct frontend *, struct question *);
+typedef int (*dcf_cangoforward_t)(struct frontend *, struct question *);
 
 struct frontend {
 	/* module handle */
@@ -43,6 +45,8 @@ struct frontend {
 	dcf_add_t add;
 	dcf_go_t go;
 	dcf_clear_t clear;
+	dcf_cangoback_t cangoback;
+	dcf_cangoforward_t cangoforward;
 };
 
 struct frontend *frontend_new(struct configuration *, struct database *);
@@ -56,6 +60,8 @@ struct frontend_module {
 	dcf_add_t add;
 	dcf_go_t go;
 	dcf_clear_t clear;
+	dcf_cangoback_t cangoback;
+	dcf_cangoforward_t cangoforward;
 };
 
 #endif

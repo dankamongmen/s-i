@@ -8,7 +8,7 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.6 2000/12/03 19:42:38 tausq Exp $
+ * $Id: dpkg-reconfigure.c,v 1.7 2001/01/06 17:15:51 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -184,11 +184,10 @@ static char *getfield(const char *package, const char *fieldname)
 	FILE *fp;
 	char buf[1024], srch[256];
 	int inpkg = 0;
-	int len, fieldlen;
+	int fieldlen;
 
 	field[0] = 0;
 	snprintf(srch, sizeof(srch), "Package: %s", package);
-	len = strlen(srch);
 
 	fieldlen = strlen(fieldname);
 
@@ -197,7 +196,7 @@ static char *getfield(const char *package, const char *fieldname)
 		while (fgets(buf, sizeof(buf), fp))
 		{
 			CHOMP(buf);
-			if (strncmp(buf, srch, len) == 0)
+			if (strcmp(buf, srch) == 0)
 			{
 				inpkg = 1;
 			}

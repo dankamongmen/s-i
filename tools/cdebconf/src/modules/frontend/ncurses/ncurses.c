@@ -37,6 +37,40 @@ struct uidata {
 	WINDOW *qrywin, *descwin;
 };
 
+/* Slang compatibility functions */
+#ifdef USESLANG
+static int mvhline(int r, int c, int ch, int w)
+{
+	int i;
+	if (ch == 0)
+		ch = ACS_HLINE;
+	for (i = 0; i < w; i++)
+		mvaddch(r, c + i, ch);
+	return 0;
+}
+
+static int mvvline(int r, int c, int ch, int h)
+{
+	int i;
+	if (ch == 0)
+		ch = ACS_VLINE;
+	for (i = 0; i < h; i++)
+		mvaddch(r + i, c, ch);
+	return 0;
+}
+
+#endif
+
+static void wfill(WINDOW *w)
+{
+	int x, y, xmax, ymax;
+
+	getmaxyx(w, ymax, xmax);
+	for (x = 0; x < xmax; x++)
+		for (y = 0; y < ymax; y++)
+			mvwaddch(w, y, x, ' ');
+}
+
 static int cangoback(struct frontend *ui)
 {
 	return 1;
@@ -426,7 +460,6 @@ static int ncurses_initialize(struct frontend *obj, struct configuration *cfg)
 	cbreak();
 	noecho();
 	nonl();
-	intrflush(stdscr, FALSE);
 	keypad(stdscr, TRUE);
 
 	uid->qrylines = 3 * LINES / 5;
@@ -443,16 +476,19 @@ static int ncurses_initialize(struct frontend *obj, struct configuration *cfg)
 	init_pair(COLOR_QUERY, COLOR_WHITE, COLOR_BLUE);
 	init_pair(COLOR_DESC, COLOR_WHITE, COLOR_BLUE);
 
-	bkgdset(COLOR_PAIR(COLOR_QUERY)|' ');
-	wbkgdset(uid->qrywin, COLOR_PAIR(COLOR_QUERY)|A_BOLD|' ');
-	wbkgdset(uid->descwin, COLOR_PAIR(COLOR_DESC)|A_BOLD|' ');
-
-	clear();
+	attrset(COLOR_PAIR(COLOR_QUERY)|' ');
+	wfill(stdscr);
+	wattrset(uid->qrywin, COLOR_PAIR(COLOR_QUERY)|A_BOLD|' ');
+	wfill(uid->qrywin);
+	wattrset(uid->descwin, COLOR_PAIR(COLOR_DESC)|A_BOLD|' ');
+	wfill(uid->descwin);
 
 	drawframe(obj, WIN_QUERY, NULL);
 	drawframe(obj, WIN_DESC, NULL);
 
 	refresh();
+
+	getch();
 
 	return DC_OK;
 }

@@ -38,8 +38,13 @@
 #define NEW(type) (type *)malloc(sizeof(type))
 #define DELETE(x) do { free(x); x = 0; } while (0)
 #define CHOMP(s) if (s[strlen(s)-1] == '\n') s[strlen(s)-1] = 0 
+
+/* Be careful with these macros; they evaluate the string arguments multiple
+   times!
+ */
 #define STRDUP(s) ((s) == NULL ? NULL : strdup(s))
 #define STRLEN(s) ((s) == NULL ? 0 : strlen(s))
+#define STRCPY(d,s) strcpy(d,((s) == NULL ? "" : (s)))
 #define DIM(ar) (sizeof(ar)/sizeof(ar[0]))
 
 /* MIN and MAX are also defined from perl.h, called from perldb.c */

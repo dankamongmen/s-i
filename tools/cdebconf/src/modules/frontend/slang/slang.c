@@ -212,7 +212,8 @@ static int slang_keyhandler(struct frontend *ui, struct question *q, int *pos,
  * TODO: if cangoback/forward is false, draw the buttons in a "disabled"
  * color
  */
-static void slang_navbuttons(struct frontend *ui, int selected)
+static void slang_navbuttons(struct frontend *ui, struct question *q, 
+	int selected)
 {
 	struct uidata *uid = UIDATA(ui);
 	struct slwindow *win = &uid->qrywin;
@@ -231,13 +232,13 @@ static void slang_navbuttons(struct frontend *ui, int selected)
 	/* draw the actual buttons, note that these are drawn in the
 	 * query window instead of in the parent (like the frame) */
 
-	if (ui->cangoback(ui))
+	if (ui->cangoback(ui, q))
 	{
 		slang_printf(ybut - 1, 2, (selected == 0 ? win->selectedcolor :
 			win->drawcolor), " <Previous> ");
 	}
 
-	if (ui->cangoforward(ui))
+	if (ui->cangoforward(ui, q))
 	{
 		slang_printf(ybut - 1, COLS-10, (selected == 1 ? 
 			win->selectedcolor : win->drawcolor), " <Next> ");
@@ -267,7 +268,7 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 		slang_printf(ybut, (COLS/2)+4, (pos == 3 ? win->selectedcolor :
 			win->drawcolor), " (%c) No ", (ans ? ' ' : '*'));
 
-		slang_navbuttons(ui, pos);
+		slang_navbuttons(ui, q, pos);
 
 
 		slang_flush();
@@ -275,7 +276,7 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 		switch (slang_keyhandler(ui, q, &pos, 3, 0))
 		{
 		case 0:
-			if (ui->cangoback(ui))
+			if (ui->cangoback(ui, q))
 				ret = DC_GOBACK;
 			/* go to previous if possible */
 			break;
@@ -305,13 +306,13 @@ static int slang_note(struct frontend *ui, struct question *q)
 
 	while (ret == 0)
 	{
-		slang_navbuttons(ui, pos);
+		slang_navbuttons(ui, q, pos);
 		slang_flush();
 
 		switch (slang_keyhandler(ui, q, &pos, 1, 0))
 		{
 		case 0:
-			if (ui->cangoback(ui))
+			if (ui->cangoback(ui, q))
 				ret = DC_GOBACK;
 				/* go to previous if possible */
 			break;
@@ -361,7 +362,7 @@ static int slang_select(struct frontend *ui, struct question *q)
 				" %-*s ", longest, choices[i]);
 		}
 
-		slang_navbuttons(ui, pos);
+		slang_navbuttons(ui, q, pos);
 		slang_flush();
 
 		switch ((ch = SLkp_getkey()))
@@ -382,7 +383,7 @@ static int slang_select(struct frontend *ui, struct question *q)
 			switch (slang_keyhandler(ui, q, &pos, 2, ch))
 			{
 				case 0:
-					if (ui->cangoback(ui))
+					if (ui->cangoback(ui, q))
 						ret = DC_GOBACK;
 					/* go to previous if possible */
 					break;
@@ -429,7 +430,7 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 			}
 		}
 
-		slang_navbuttons(ui, pos);
+		slang_navbuttons(ui, q, pos);
 		slang_flush();
 
 		if (pos == 2)
@@ -483,7 +484,7 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 				switch (slang_keyhandler(ui, q, &pos, 2, ch))
 				{
 				case 0:
-					if (ui->cangoback(ui))
+					if (ui->cangoback(ui, q))
 						ret = DC_GOBACK;
 					/* go to previous if possible */
 					break;

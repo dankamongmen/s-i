@@ -7,7 +7,7 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.10 2000/12/11 00:22:44 tausq Exp $
+ * $Id: strutl.c,v 1.11 2001/01/06 17:15:51 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -358,4 +358,16 @@ int strwrap(const char *str, const int width, char *lines[], int maxlines)
 		if (++l >= maxlines) break;
 	}
 	return l;
+}
+
+int strlongest(char **strs, int count)
+{
+	int i, max = 0;
+
+	for (i = 0; i < count; i++)
+	{
+		if (strlen(strs[i]) > max)
+			max = strlen(strs[i]);
+	}
+	return max;
 }

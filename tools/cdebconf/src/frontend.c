@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.5 2000/12/03 19:14:54 tausq Exp $
+ * $Id: frontend.c,v 1.6 2001/01/06 17:15:51 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -48,6 +48,13 @@
 
 #define SETMETHOD(method) obj->method = (mod->method ? mod->method : frontend_ ## method)
 
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 static int frontend_add(struct frontend *obj, struct question *q)
 {
 	struct question **qlast;
@@ -60,14 +67,30 @@ static int frontend_add(struct frontend *obj, struct question *q)
 	*qlast = q;
 	q->next = NULL;
 
+	question_ref(q);
+
 	return 1;
 }
 
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 static int frontend_go(struct frontend *obj)
 {
 	return 0;
 }
 
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 static void frontend_clear(struct frontend *obj)
 {
 	struct question *q;
@@ -80,26 +103,86 @@ static void frontend_clear(struct frontend *obj)
 	}
 }
 
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 static int frontend_initialize(struct frontend *obj, struct configuration *cfg)
 {
 	return DC_OK;
 }
 
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 static int frontend_shutdown(struct frontend *obj)
 {
 	return DC_OK;
 }
 
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 static unsigned long frontend_query_capability(struct frontend *f)
 {
 	return 0;
 }
 
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 static void frontend_set_title(struct frontend *f, const char *title)
 {
 	DELETE(f->title);
 	f->title = STRDUP(title);
 }
+
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
+static int frontend_cangoback(struct frontend *ui, struct question *q)
+{
+	return 1;
+}
+
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
+static int frontend_cangoforward(struct frontend *ui, struct question *q)
+{
+	return 1;
+}
+
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 
 struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 {
@@ -137,6 +220,8 @@ struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 	SETMETHOD(add);
 	SETMETHOD(go);
 	SETMETHOD(clear);
+	SETMETHOD(cangoback);
+	SETMETHOD(cangoforward);
 
 	if (obj->initialize(obj, cfg) == 0)
 	{
@@ -149,6 +234,13 @@ struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 	return obj;
 }
 
+/*
+ * Function:
+ * Input:
+ * Output:
+ * Description:
+ * Assumptions:
+ */
 void frontend_delete(struct frontend *obj)
 {
 	obj->shutdown(obj);
