@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.7 2003/10/03 13:57:12 waldi Exp $
+ * $Id: packages.c,v 1.8 2003/10/03 18:25:02 waldi Exp $
  */
 
 #include <debian-installer/system/packages.h>
@@ -83,12 +83,15 @@ di_packages *di_system_packages_alloc (void)
   return ret;
 }
 
-int di_system_package_check_subarchitecture (di_package *package, const char *subarchitecture)
+bool di_system_package_check_subarchitecture (di_package *package, const char *subarchitecture)
 {
   char *string, *begin, *end, *temp;
-  int ret = 1;
+  int ret = false;
 
-  string = begin = strdup (package->package);
+  if (!((di_system_package *) package)->subarchitecture)
+    return true;
+
+  string = begin = strdup (((di_system_package *) package)->subarchitecture);
   end = begin + strlen (begin);
 
   while (begin < end)
@@ -99,11 +102,9 @@ int di_system_package_check_subarchitecture (di_package *package, const char *su
     while (temp < end && !isspace (*++temp));
     *temp = '\0';
 
-    printf ("get: %s\n", begin);
     if (!strcmp (begin, subarchitecture))
     {
-      printf ("found it\n");
-      ret = 1;
+      ret = true;
       goto cleanup;
     }
     begin = temp + 1;
@@ -112,7 +113,7 @@ int di_system_package_check_subarchitecture (di_package *package, const char *su
 cleanup:
   free (string);
 
-  return ret;
+  return false;
 }
 
 di_parser_info *di_system_package_parser_info (void)

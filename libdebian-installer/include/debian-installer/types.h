@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: types.h,v 1.3 2003/10/02 14:27:06 waldi Exp $
+ * $Id: types.h,v 1.4 2003/10/03 18:25:02 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__TYPES_H
@@ -26,6 +26,7 @@
 
 #include <debian-installer/log.h>
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -33,7 +34,7 @@
  * @defgroup di_types Types definitions
  * @{
  */
-typedef int di_equal_func (const void *key1, const void *key2);
+typedef bool di_equal_func (const void *key1, const void *key2);
 typedef void di_destroy_notify (void *data);
 typedef uint32_t di_hash_func (const void *key);
 typedef void di_hfunc (void *key, void *value, void *user_data);

@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: string.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: string.c,v 1.3 2003/10/03 18:25:02 waldi Exp $
  */
 
 #include <debian-installer/string.h>
@@ -50,14 +50,14 @@ char *di_stradup (const char *s, size_t n)
   return memcpy (string, s, n);
 }
 
-int di_rstring_equal (const void *key1, const void *key2)
+bool di_rstring_equal (const void *key1, const void *key2)
 {
   const di_rstring *rstring1 = key1;
   const di_rstring *rstring2 = key2;
 
   if (rstring1->size == rstring2->size)
     return strncasecmp (rstring1->string, rstring2->string, rstring1->size) == 0;
-  return 0;
+  return false;
 }
 
 uint32_t di_rstring_hash (const void *key)
@@ -74,7 +74,7 @@ uint32_t di_rstring_hash (const void *key)
 }
 
 #if 0
-int di_string_equal (const void *key1, const void *key2)
+bool di_string_equal (const void *key1, const void *key2)
 {
   const char *string1 = key1;
   const char *string2 = key2;
