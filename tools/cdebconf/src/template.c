@@ -459,7 +459,8 @@ static void remove_newlines(char *text)
 
 struct template *template_load(const char *filename)
 {
-	char buf[4096];/* XXX This buffer limits the length of template files */
+	char buf[4096];
+	char *line;
 	char extdesc[8192];
 	char *lang;
 	char *p;
@@ -467,13 +468,24 @@ struct template *template_load(const char *filename)
 	FILE *fp;
 	struct template *tlist = NULL, *t = 0;
 	unsigned int i;
+	int linesize;
 	
 	if ((fp = fopen(filename, "r")) == NULL)
 		return NULL;
 	while (fgets(buf, sizeof(buf), fp))
 	{
+		line = strdup(buf);
+		linesize = sizeof(buf);
+		while (strlen(buf) == sizeof(buf)-1)
+		{
+			fgets(buf, sizeof(buf), fp);
+			line = (char*) realloc(line, linesize + sizeof(buf));
+			linesize = linesize + sizeof(buf);
+			strcat(line, buf);
+		}
+		
 		lang = NULL;
-		p = strstrip(buf);
+		p = strstrip(line);
 		if (*p == 0)
 		{
 			if (t != 0)
@@ -590,6 +602,8 @@ struct template *template_load(const char *filename)
 		}
 		if (lang)
 			free(lang);
+		if (line)
+			free(line);
 	}
 
 	if (t != 0)
