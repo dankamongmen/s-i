@@ -84,6 +84,12 @@ if [ ! -d $moddir ]; then
 	echo "$moddir does not exist!" >&2
 	exit 1
 fi
+	
+if [ "" != "`echo $version | grep ^2.2.`" ]; then
+	kernel_modules=""
+else
+	kernel_modules="/kernel"
+fi
 
 # The directory of modules lists to use.
 if [ -d modules/$arch-$flavour ]; then
@@ -146,30 +152,18 @@ for i in $(
 	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
 
 	# deal with modules marked as optional
-	if [ "" != "`echo $version | grep ^2.2.`" ]; then
-		processmodules $tmpdir/module-list/$i $moddir
-	else
-		processmodules $tmpdir/module-list/$i $moddir/kernel
-	fi
+	processmodules $tmpdir/module-list/$i $moddir$kernel_modules
 
 	if [ -s $tmpdir/module-list/$i ]; then
 		# copy kernel modules to package build dir
-		if [ "" != "`echo $version | grep ^2.2.`" ]; then
-			cd $moddir
-		else
-			cd $moddir/kernel
-		fi
+		cd $moddir$kernel_modules
 		ret=$( ( (
 			set +e
 			tar cfT - $tmpdir/module-list/$i
 			printf $? >&3
 		) | (
 			set +e
-			if [ "" != "`echo $version | grep ^2.2.`" ]; then
-				dir=$home/debian/$i-$version-di/lib/modules/$installedname
-			else
-				dir=$home/debian/$i-$version-di/lib/modules/$installedname/kernel
-			fi
+			dir=$home/debian/$i-$version-di/lib/modules/$installedname$kernel_modules
 			mkdir -p $dir
 			cd $dir
 			tar xf -
