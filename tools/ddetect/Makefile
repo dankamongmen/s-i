@@ -42,7 +42,7 @@ install-archdetect: archdetect
 
 ARCHDETECT_TYPE_FILE = archdetect-$(DEB_HOST_GNU_TYPE).o
 
-ifeq (,($(wildcard $(ARCHDETECT_TYPE_FILE).o)))
+ifeq (,$(wildcard $(ARCHDETECT_TYPE_FILE)))
 ARCHDETECT_TYPE_FILE = archdetect-generic.o
 endif
 
