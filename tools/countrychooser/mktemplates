@@ -32,7 +32,7 @@ CHOICES=$(./countrylist $ISO3166TAB ./regionmap "$INDENTMARKER" | \
 # and defined this field as translatable (__Choices hack)
 cat debian/templates-in | \
     perl -pe 's/\@countrylist\@/'"$CHOICES"'/g' | \
-    sed "s/Choices:/__Choices:/g" \
+    sed "/^Choices:/s/Choices:/__Choices:/g" \
     >debian/templates.tmp
 
 # Create a temporary "pobuild" directory
@@ -81,7 +81,8 @@ for pofile in debian/po/*.po ; do
                  -C $ISO3166TRANSLATIONS/$pofilename.munged \
                  debian/pobuild/$pofilename.temp \
                  debian/pobuild/templates.pot.temp | \
-                 sed '/^msgid/s/,/ -/' \
+                 sed '/^msgid/s/,/ -/' | \
+                 sed '/^msgstr/s/,/ -/' \
 		 > debian/pobuild/$pofilename
     # Else we just use what's translated
     else

@@ -14,7 +14,10 @@ languagecode="debian-installer/language"
 countrycode="debian-installer/country"
 languagechooserlanguage="languagechooser/language-name"
 
-for list in /etc/iso_3166.tab ; do 
+# This is the iso_3166.tab file location
+ISO3166TAB=/etc/iso_3166.tab
+
+for list in $ISO3166TAB ; do 
 	if [ -f "$list" ]; then
 		countries="$list"
 	fi
@@ -61,18 +64,74 @@ country2code() {
 db_get "$countrycode"
 if [ -n "$RET" ]; then
 	# Remember which code was first used
-	COUNTRYCODE_LANGUAGECHOOSER="$(code2country "$RET")"
-	db_set "countrychooser/country-name" "$COUNTRYCODE_LANGUAGECHOOSER"
+	# This is needed at the end of the script
+	COUNTRYCODE_LANGUAGECHOOSER="$RET"
+	COUNTRY_LANGUAGECHOOSER="$(code2country "$RET")"
+	db_set "countrychooser/country-name" "${COUNTRY_LANGUAGECHOOSER}"
+	db_set "countrychooser/country-name-shortlist" "${COUNTRY_LANGUAGECHOOSER}"
 fi
 
+# Then grab back the language we got from languagechooser
+db_get "$languagechooserlanguage"
+if [ -n "$RET" ]; then
+   LANGNAME="$RET"
+    # languagemap is a script from languagechooser	    
+    # languagemap returns the language list in LANGUAGELIST
+    # languagemap returns the language alone in LANGUAGE
+    # if languagemap couldn't be found
+    # fall back to C
+    if ! . languagemap ; then
+	LANGUAGE=C
+    fi
+fi
+
+# Then grab back the locale we got from languagechooser
+db_get "$localecode"
+if [ -n "$RET" ]; then
+   DEFAULTLOCALE="$RET"
+else
+   # Just in case
+   DEFAULTLOCALE="C"
+fi
+
+# At this step we should have either xx, or xx_YY in LANGNAME
 while :; do
-	#db_fset countrychooser/country-name seen false
-	db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
-	if ! db_go; then
+	# Build up the Choices list from the language selection
+	shortlistcodes=`cat /etc/SUPPORTED-short | grep -e "^$LANGUAGE"|cut -b 4-5|sort|uniq`
+	SHORTLIST=''
+	for code in $shortlistcodes; do
+	    line=`grep -e "^$code" $ISO3166TAB`
+	    if [ "$line" ] ; then
+		OLD_IFS="$IFS"
+		IFS='	'
+		set $line
+		IFS="$OLD_IFS"
+		if [ "$2" ] ; then countryname="${INDENT}$2"; fi
+		if [ ! -z "${SHORTLIST}" ]; then
+		    SHORTLIST="${SHORTLIST}, "
+		fi
+		SHORTLIST="${SHORTLIST}${countryname}"
+	    fi
+	done
+	db_subst "countrychooser/country-name-shortlist" SHORTLIST "${SHORTLIST}"
+	db_subst "countrychooser/country-name-shortlist" DEFAULTLOCALE "${DEFAULTLOCALE}"
+	db_input critical "countrychooser/country-name-shortlist" || [ $? -eq 30 ]
+        if ! db_go; then
 		exit 10 # back up
 	fi
-
-	db_get "countrychooser/country-name"
+	db_get "countrychooser/country-name-shortlist"
+	if [ -z "$RET" ]; then
+	    # Should not happen, but fall back to Others
+	    RET="Others"
+	fi
+	if [ "$RET" = "Others" ]; then
+	    db_subst "countrychooser/country-name" DEFAULTLOCALE "${DEFAULTLOCALE}"
+	    db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
+	    if ! db_go; then
+		exit 10 # back up
+	    fi
+	    db_get "countrychooser/country-name"
+	fi
 	COUNTRYCODE="$(country2code "$RET")" || true
 	if [ -n "$COUNTRYCODE" ]; then
 		break
@@ -87,6 +146,16 @@ done
 db_set "$countrycode"  "$COUNTRYCODE"
 log "$countrycode = '$COUNTRYCODE'"
 
+# Now set the locale
+#
+# We do this only if one of the supported countries has been chosen
+db_get "countrychooser/country-name-shortlist"
+if [ "$RET" != "Others" ]; then
+   LOCALE=${LANGUAGE}_${COUNTRYCODE}
+   db_set "$localecode" "${LOCALE}"
+   log "$localecode = '${LOCALE}'"
+fi
+
 # The code below tries to add lang_COUNTRY at the beginning of the language
 # list we got from languagechooser
 # Example:
@@ -97,29 +166,11 @@ log "$countrycode = '$COUNTRYCODE'"
 # We shouldn't just add this before the former list in case the country 
 # is changed several times.
 #
-# First re-get the language list from languagechooser
-db_get "$languagechooserlanguage"
-# If we get nothing, do not change anything
-if test "$RET" ; then
-    LANGNAME="$RET"
-    # languagemap is a script from languagechooser	    
-    # languagemap returns the language list in LANGUAGELIST
-    # languagemap returns the language alone in LANGUAGE
-    # if languagemap couldn't be found
-    # do nothing
-    if . languagemap ; then
-	# If the country was changed from the default one
-	# then add xx_YY at the beginning of the languagelist we got
-	# from languagechooser
-	if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n $LANGUAGE ]; then
-		LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:${LANGUAGELIST}
-		# Languagelist setting
-		db_set "$languagecode" "$LANGUAGELIST"
-		log "$languagecode = '$LANGUAGELIST'"
-	fi
-
-    fi
+if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n $LANGUAGE ]; then
+	LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:${LANGUAGELIST}
+	# Languagelist setting
+	db_set "$languagecode" "$LANGUAGELIST"
+	log "$languagecode = '$LANGUAGELIST'"
 fi
-
 
 exit 0

@@ -21,6 +21,8 @@ build-stamp:
 	dh_testdir
 	# Grab ISO codes from iso-codes package
 	./get-iso-codes
+	# Pick up SUPPORTED list of locales and keep only relevant information
+	./get-SUPPORTED
 	# Build the templates
 	./mktemplates
 	touch build-stamp
@@ -43,6 +45,9 @@ install: build
 	# The following while iso-3166-udeb doesn't exist
 	# Should become useless when we will have it
 	install -m644 /usr/share/iso-codes/iso_3166.tab debian/$(PACKAGE)/etc/iso_3166.tab
+	# The following while we have no ther way to get SUPPORTED
+	# Should become useless when we will have it
+	install -m644 debian/SUPPORTED-short debian/$(PACKAGE)/etc/SUPPORTED-short
 
 # Build architecture-independent files here.
 binary-indep: build install
