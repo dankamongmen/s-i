@@ -1,0 +1,25 @@
+This package generates kernel modules udebs for the debian installer. It
+build-depends on the kernel image, and pulls modules out of it to create
+the udebs. It also generates one package with only the kernel in it.
+
+The modules to put in each udeb are listed in the files in the modules
+directory. The files contain paths relative to the top-level kernel modules
+directory (/lib/modules/<kernel-version>/). In fact these files are used as
+the input to a tar command, and can list either files, or whole
+directories, though the latter is rarely used.
+
+The copy-modules script does the actual copying of modules to the temp dirs
+that are used to build the package. It is complicated by the need to make
+sure that all of a module's dependencies are included in its package, or in
+a package on which it depends. If necessary, extra modules will be added to
+a package to make sure the dependencies are satisfied.
+
+The dependency information in the modules is compared with the module-deps
+file, which lists interrelationships between packages, in a form used by
+tsort. As such, it must be kept sorted. The same dependency information is
+redundantly included in debian/control too, and these two need to be kept
+in sync.
+
+The modules packages are named with the version of the kernel in their
+package name, since that can be useful during kernel transitions. The -di
+prefix is used to prevent any posible collisions in names with real debs.
