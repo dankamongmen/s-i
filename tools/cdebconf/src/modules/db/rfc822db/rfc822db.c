@@ -274,7 +274,7 @@ static int rfc822db_template_load(struct template_db *db)
         tmp = template_new(name);
         for (h = header; h != NULL; h = h->next)
             if (strcmp(h->header, "Name") != 0)
-                tmp->set(tmp, NULL, h->header, h->value);
+                tmp->lset(tmp, NULL, h->header, h->value);
 
         tmp->next = NULL;
         tsearch(tmp, &dbdata->root, nodetemplatecomp);
@@ -298,12 +298,12 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
         break;
     case postorder: 
     case leaf:
-        p = t->get((struct template *) t, NULL, "tag");
+        p = t->lget((struct template *) t, NULL, "tag");
         INFO(INFO_VERBOSE, "dumping template %s\n", p);
 
         for (field = template_fields_list; *field != NULL; field++)
         {
-            p = t->get((struct template *) t, NULL, *field);
+            p = t->lget((struct template *) t, NULL, *field);
             if (p != NULL)
             {
                 if (strcmp(*field, "tag") == 0)
@@ -319,7 +319,7 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
         {
             for (field = template_fields_list; *field != NULL; field++)
             {
-                p = t->get((struct template *) t, lang, *field);
+                p = t->lget((struct template *) t, lang, *field);
                 if (p != NULL && strcmp(*field, "tag") != 0)
                     fprintf(outf, "%c%s-%s.UTF-8: %s\n",
                         toupper((*field)[0]), (*field)+1, lang, escapestr(p));

@@ -138,8 +138,8 @@ static int textdb_template_set(struct template_db *db, struct template *t)
 	const char *p, *lang;
 	const char **field;
 
-	if (t->get(t, NULL, "tag") == NULL) return DC_NOTOK;
-	filename = template_filename(db, t->get(t, NULL, "tag"));
+	if (t->lget(t, NULL, "tag") == NULL) return DC_NOTOK;
+	filename = template_filename(db, t->lget(t, NULL, "tag"));
 	
 	if ((outf = fopen(filename, "w")) == NULL)
 		return DC_NOTOK;
@@ -148,7 +148,7 @@ static int textdb_template_set(struct template_db *db, struct template *t)
 
 	for (field = template_fields_list; *field != NULL; field++)
 	{
-		p = t->get(t, NULL, *field);
+		p = t->lget(t, NULL, *field);
 		if (p != NULL)
 			fprintf(outf, "\t%s \"%s\";\n", *field, escapestr(p));
 	}
@@ -158,7 +158,7 @@ static int textdb_template_set(struct template_db *db, struct template *t)
 	{
 		for (field = template_fields_list; *field != NULL; field++)
 		{
-			p = t->get(t, lang, *field);
+			p = t->lget(t, lang, *field);
 			if (p != NULL && strcmp(*field, "tag") != 0)
 				fprintf(outf, "\t%s-%s.UTF-8 \"%s\";\n",
 						*field, lang, escapestr(p));
@@ -201,11 +201,11 @@ static struct template *textdb_template_get_real(struct template_db *db,
 	}
 	else
 	{
-		t->set(t, NULL, "type", STRDUP(unescapestr(rec->get(rec, "template::type", "string"))));
-		t->set(t, NULL, "default", STRDUP(unescapestr(rec->get(rec, "template::default", 0))));
-		t->set(t, NULL, "choices", STRDUP(unescapestr(rec->get(rec, "template::choices", 0))));
-		t->set(t, NULL, "description", STRDUP(unescapestr(rec->get(rec, "template::description", 0))));
-		t->set(t, NULL, "extended_description", STRDUP(unescapestr(rec->get(rec, "template::extended_description", 0))));
+		t->lset(t, NULL, "type", STRDUP(unescapestr(rec->get(rec, "template::type", "string"))));
+		t->lset(t, NULL, "default", STRDUP(unescapestr(rec->get(rec, "template::default", 0))));
+		t->lset(t, NULL, "choices", STRDUP(unescapestr(rec->get(rec, "template::choices", 0))));
+		t->lset(t, NULL, "description", STRDUP(unescapestr(rec->get(rec, "template::description", 0))));
+		t->lset(t, NULL, "extended_description", STRDUP(unescapestr(rec->get(rec, "template::extended_description", 0))));
 
 		/* We can't ask for all the localized descriptions so we need to
 		 * brute-force this.

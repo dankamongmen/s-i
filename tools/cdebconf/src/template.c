@@ -7,7 +7,7 @@
  *
  * Description: interface to debconf templates
  *
- * $Id: template.c,v 1.11 2002/11/19 21:54:12 barbier Exp $
+ * $Id: template.c,v 1.12 2002/11/19 23:18:44 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -42,9 +42,9 @@
 
 #include <stdio.h>
 
-static const char *template_get(struct template *t, const char *lang,
+static const char *template_lget(struct template *t, const char *lang,
                 const char *field);
-static void template_set(struct template *t, const char *lang,
+static void template_lset(struct template *t, const char *lang,
                 const char *field, const char *value);
 static const char *template_next_lang(struct template *t, const char *l);
 static const char *getlanguage(void);
@@ -85,8 +85,8 @@ struct template *template_new(const char *tag)
 	memset(t, 0, sizeof(struct template));
 	t->ref = 1;
 	t->tag = STRDUP(tag);
-	t->get = template_get;
-	t->set = template_set;
+	t->lget = template_lget;
+	t->lset = template_lset;
 	t->next_lang = template_next_lang;
 	t->fields = f;
 	return t;
@@ -204,7 +204,7 @@ static void template_field_set(struct template_l10n_fields *p,
 }
 
 /*
- * Function: template_get
+ * Function: template_lget
  * Input: a template
  * Input: a language name
  * Input: a field name
@@ -215,7 +215,7 @@ static void template_field_set(struct template_l10n_fields *p,
  * Assumptions: 
  */
 
-static const char *template_get(struct template *t, const char *lang,
+static const char *template_lget(struct template *t, const char *lang,
                 const char *field)
 {
     struct template_l10n_fields *p;
@@ -229,7 +229,7 @@ static const char *template_get(struct template *t, const char *lang,
     else if (strcasecmp(field, "type") == 0)
         return t->type;
 
-    /*   If field is Foo-xx.UTF-8 then call template_get(t, "xx", "Foo")  */
+    /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
     {
         orig_field = strdup(field);
@@ -239,12 +239,12 @@ static const char *template_get(struct template *t, const char *lang,
         if (strstr(altlang, ".UTF-8") == altlang + 2)
         {
             *(altlang+2) = 0;
-            ret = template_get(t, altlang, orig_field);
+            ret = template_lget(t, altlang, orig_field);
         }
         else if (strstr(altlang, ".UTF-8") == altlang + 5)
         {
             *(altlang+5) = 0;
-            ret = template_get(t, altlang, orig_field);
+            ret = template_lget(t, altlang, orig_field);
         }
 #ifndef NODEBUG
         else
@@ -283,7 +283,7 @@ static const char *template_get(struct template *t, const char *lang,
     return template_field_get(t->fields, field);
 }
 
-static void template_set(struct template *t, const char *lang,
+static void template_lset(struct template *t, const char *lang,
                 const char *field, const char *value)
 {
     struct template_l10n_fields *p, *last;
@@ -302,7 +302,7 @@ static void template_set(struct template *t, const char *lang,
         return;
     }
 
-    /*   If field is Foo-xx.UTF-8 then call template_get(t, "xx", "Foo")  */
+    /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
     {
         orig_field = strdup(field);
@@ -312,12 +312,12 @@ static void template_set(struct template *t, const char *lang,
         if (strstr(altlang, ".UTF-8") == altlang + 2)
         {
             *(altlang+2) = 0;
-            template_set(t, altlang, orig_field, value);
+            template_lset(t, altlang, orig_field, value);
         }
         else if (strstr(altlang, ".UTF-8") == altlang + 5)
         {
             *(altlang+5) = 0;
-            template_set(t, altlang, orig_field, value);
+            template_lset(t, altlang, orig_field, value);
         }
 #ifndef NODEBUG
         else
@@ -396,22 +396,22 @@ struct template *template_load(const char *filename)
 		if (strstr(p, "Template: ") == p)
 			t = template_new(p+10);
 		else if (strstr(p, "Type: ") == p && t != 0)
-			template_set(t, NULL, "type", p+6);
+			template_lset(t, NULL, "type", p+6);
 		else if (strstr(p, "Default: ") == p && t != 0)
-			template_set(t, NULL, "default", p+9);
+			template_lset(t, NULL, "default", p+9);
 		else if (strstr(p, "Choices: ") == p && t != 0)
-			template_set(t, NULL, "choices", p+9);
+			template_lset(t, NULL, "choices", p+9);
 		else if (strstr(p, "Choices-") == p && t != 0) 
 		{
 			if (strstr(p, ".UTF-8: ") == p + 10)
 			{
 				lang = strndup(p+8, 2);
-				template_set(t, lang, "choices", p+18);
+				template_lset(t, lang, "choices", p+18);
 			}
 			else if (strstr(p, ".UTF-8: ") == p + 13)
 			{
 				lang = strndup(p+8, 5);
-				template_set(t, lang, "choices", p+21);
+				template_lset(t, lang, "choices", p+21);
 			}
 			else
 			{
@@ -423,7 +423,7 @@ struct template *template_load(const char *filename)
 		}
 		else if (strstr(p, "Description: ") == p && t != 0)
 		{
-			template_set(t, NULL, "description", p+13);
+			template_lset(t, NULL, "description", p+13);
 			extdesc[0] = 0;
 			i = fgetc(fp);
 			/* Don't use fgets unless you _need_ to, a
@@ -464,7 +464,7 @@ struct template *template_load(const char *filename)
 							*bufp = ' ';
 					}
 					
-				template_set(t, NULL, "extended_description", extdesc);
+				template_lset(t, NULL, "extended_description", extdesc);
 			}
 		}
 		else if (strstr(p, "Description-") == p && t != 0)
@@ -472,12 +472,12 @@ struct template *template_load(const char *filename)
 			if (strstr(p, ".UTF-8: ") == p + 14)
 			{
 				lang = strndup(p+12, 2);
-				template_set(t, lang, "description", p+22);
+				template_lset(t, lang, "description", p+22);
 			}
 			else if (strstr(p, ".UTF-8: ") == p + 17)
 			{
 				lang = strndup(p+12, 5);
-				template_set(t, lang, "description", p+25);
+				template_lset(t, lang, "description", p+25);
 			}
 			else
 			{
@@ -526,7 +526,7 @@ struct template *template_load(const char *filename)
 					}
 				
 				if (lang)
-					template_set(t, lang, "extended_description", extdesc);
+					template_lset(t, lang, "extended_description", extdesc);
 			}
 		}
 		if (lang)

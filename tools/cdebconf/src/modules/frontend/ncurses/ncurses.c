@@ -244,7 +244,7 @@ static int nchandler_boolean(struct frontend *ui, struct question *q)
 		value = q->value;
 	else
 	{
-		dft = (char *) q->template->get(q->template, NULL, "default");
+		dft = (char *) q->template->lget(q->template, NULL, "default");
 		if (dft != 0 && *dft != 0)
 			value = dft;
 	}
