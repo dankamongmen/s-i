@@ -11,11 +11,15 @@ autopartkit_error(int fatal, const char * format, ...)
     fprintf(stderr, "error: ");
     vfprintf(stderr, format, ap);
     va_end(ap);
+    if (fatal)
+      exit(fatal);
 }
 
 void autopartkit_log(const int level, const char * format, ...)
 {
     va_list ap;
+
+    fprintf(stderr, "log %d: ", level);
 
     va_start(ap, format);
     vfprintf(stderr, format, ap);

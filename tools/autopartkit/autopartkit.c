@@ -291,7 +291,7 @@ static void disable_kmsg(int disable)
  * current hardware
  */
 static const char *
-default_disk_label()
+default_disk_label(void)
 {
     /* Need to define on a per arch basis */
 #if defined(__i386__)
@@ -1135,9 +1135,9 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 #endif /* LVM_HACK */
 	    mountmap[partcount].devpath = get_device_path(disk_maybe->dev,
 							  newpart);
-	    // disable_kmsg(1);
+	    /* disable_kmsg(1); */
 	    log_line();
-	    // disable_kmsg(0);
+	    /* disable_kmsg(0); */
 	    ped_disk_commit(disk_maybe);
 	}
 	mountmap[partcount].mountpoint = req_tmp;
