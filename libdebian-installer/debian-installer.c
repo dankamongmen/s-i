@@ -187,16 +187,10 @@ di_stristr(const char *haystack, const char *needle)
 struct package_t *
 di_pkg_parse(FILE *f)
 {
-    static int desc_xx_len = -1;
     char buf[BUFSIZE];
     struct package_t *p = NULL, *newp;
-    char *lang_code;
-    struct language_description *langdesc;
     char *b;
     int i;
-
-    if (desc_xx_len < 0)
-        desc_xx_len = strlen("Description-XX: ");
 
     while (fgets(buf, BUFSIZE, f) && !feof(f))
     {
@@ -236,20 +230,28 @@ di_pkg_parse(FILE *f)
         {
             p->description = strdup(strchr(buf, ' ') + 1);
         }
-        else if (di_stristr(buf, "Description-") == buf &&
-                strlen(buf) >= desc_xx_len &&
-                buf[desc_xx_len-2] == ':')
+        else if (di_stristr(buf, "Description-") == buf)
         {
-            lang_code = (char *) malloc(3);
-            memcpy(lang_code, strchr(buf, '-') + 1, 2);
-            lang_code[2] = 0;
-            langdesc = malloc(sizeof (struct language_description));
-            memset(langdesc,0,sizeof(struct language_description));
-            langdesc->language = lang_code;
-            langdesc->description = strdup(strchr(buf, ' ') + 1);
-            if (p->localized_descriptions) 
-                langdesc->next = p->localized_descriptions;
-            p->localized_descriptions = langdesc;
+            struct language_description *langdesc;
+            char *colon_idx, *dash_idx;
+            char *lang_code;
+            int lang_code_len;
+            
+            dash_idx = strchr(buf, '-');
+            if ((colon_idx = strstr(buf, ": ")) != NULL)
+            {
+                lang_code_len = colon_idx - dash_idx;
+                lang_code = (char *)malloc(lang_code_len);
+                memcpy(lang_code, dash_idx + 1, lang_code_len-1);
+                lang_code[lang_code_len-1] = '\0';
+                langdesc = malloc(sizeof(struct language_description));
+                memset(langdesc, 0, sizeof(struct language_description));
+                langdesc->language = lang_code;
+                langdesc->description = strdup(colon_idx + 2);
+                if (p->localized_descriptions) 
+                    langdesc->next = p->localized_descriptions;
+                p->localized_descriptions = langdesc;
+            }
         }
         else if (di_stristr(buf, "Depends: ") == buf)
         {
