@@ -10,7 +10,7 @@
 #endif
 
 #define BUFSIZE		4096
-#define DPKGDIR 	"./"	// "/var/lib/dpkg/"
+#define DPKGDIR 	"./var/lib/dpkg/"
 #define STATUSFILE	DPKGDIR "status"
 
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
