@@ -60,8 +60,10 @@ do
 
     if [ -n "$module" -a "$module" != "ignore" ]
     then
-        if [ ! -f /lib/modules/*/*/"$module".o ]
+        if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
+                :
+        else
             while true
             do
 		db_fset disk-detect/not_included seen false || true
@@ -99,7 +101,7 @@ do
             fi
         fi
 
-        if [ -f /lib/modules/*/*/"$module".o ]
+        if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
 	    old=`cat /proc/sys/kernel/printk`
 	    echo 0 >/proc/sys/kernel/printk
