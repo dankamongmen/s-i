@@ -12,7 +12,7 @@ mount | grep -q ^/dev/cdroms/ && exit 0
 # bug #136743
 
 if [ -x /sbin/depmod ]; then
-	depmod -a || true 2>&1 > /dev/null
+	depmod -a > /dev/null 2>&1 || true
 fi
 
 log () {
@@ -162,6 +162,15 @@ IFS="$IFS_SAVE"
 
 log "Progress bar stop"
 db_progress STOP
+
+# always load sd_mod if a scsi controller module was loaded.
+if [ -e /proc/scsi/scsi ] ; then
+    if grep -q "Attached devices: none" /proc/scsi/scsi ; then
+        :
+    else
+        load_modules sd_mod
+    fi
+fi
 
 log "Searching for Debian installation media..."
 
