@@ -308,7 +308,10 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 fi
 
 # get pcmcia running if possible
-if [ -x /etc/init.d/pcmcia ]; then
+if [ -x /etc/init.d/pcmcia ] && \
+#   db_input medium hw-detect/start_pcmcia && db_go && \ # not asked yet
+   db_get hw-detect/start_pcmcia && \
+   [ "$RET" = true ]; then
 	db_progress INFO hw-detect/pcmcia_step
 
 	# If hotplugging is available in the kernel, we can use it to load
