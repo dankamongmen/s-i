@@ -2,9 +2,7 @@
 
 . /lib/partman/definitions.sh
 
-reiser_partitions=''
 has_boot=no
-
 for dev in $DEVICES/*; do
     [ -d $dev ] || continue
     cd $dev
@@ -18,36 +16,41 @@ for dev in $DEVICES/*; do
 	if [ "$mountpoint" = /boot ]; then
 	    has_boot=yes
 	fi
-	case "$filesystem" in
-	    reiserfs)
-		reiser_partitions="$reiser_partitions $dev,$id"
-		;;
-	esac
     done
     close_dialog
 done
 
-for x in $reiser_partitions; do
-    dev=${x%,*}
-    id=${x#*,}
-    [ -f "$id/mountpoint" ] || continue
-    mountpoint=$(cat $id/mountpoint)
-    # due to #249322, #255135, #258117:
-    if [ "$mountpoint" = /tmp ]; then
-	rm $id/options/noexec >/dev/null 2>/dev/null || true
-    fi
-    if \
-	[ "$mountpoint" = /boot \
-	  -o \( "$mountpoint" = / -a "$has_boot" = no \) ]
-    then
-	> $id/options/notail
-    fi
-    options=$(get_mountoptions $dev $id)
-    if [ "$mountpoint" = / ]; then
-	options="${options},errors=remount-ro"
-	pass=1
-    else
-	pass=2
-    fi
-    echo "$path" "$mountpoint" reiserfs $options 0 $pass
+for dev in $DEVICES/*; do
+    [ -d $dev ] || continue
+    cd $dev
+    open_dialog PARTITIONS
+    while { read_line num id size type fs path name; [ "$id" ]; }; do
+	[ $fs != free ] || continue
+	[ -f "$id/method" ] || continue
+	[ -f "$id/acting_filesystem" ] || continue
+	[ -f "$id/mountpoint" ] || continue
+	mountpoint=$(cat $id/mountpoint)
+	filesystem=$(cat $id/acting_filesystem)
+	case "$filesystem" in
+	    reiserfs)
+    		# due to #249322, #255135, #258117:
+    		if [ "$mountpoint" = /tmp ]; then
+		    rm $id/options/noexec >/dev/null 2>/dev/null || true
+    		fi
+    		if [ "$mountpoint" = /boot \
+	  	     -o \( "$mountpoint" = / -a "$has_boot" = no \) ]; then
+			> $id/options/notail
+    		fi
+    		options=$(get_mountoptions $dev $id)
+    		if [ "$mountpoint" = / ]; then
+			options="${options},errors=remount-ro"
+			pass=1
+    		else
+			pass=2
+    		fi
+    		echo "$path" "$mountpoint" reiserfs $options 0 $pass
+		;;
+	esac
+    done
+    close_dialog
 done
