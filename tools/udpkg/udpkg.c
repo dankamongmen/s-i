@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.43 2003/11/01 21:57:22 merker Exp $ */
+/* $Id: udpkg.c,v 1.44 2003/11/02 15:55:30 joeyh Rel $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -439,7 +439,7 @@ static int dpkg_fields(struct package_t *pkg)
 		return 1;
 	}
 	asprintf(&command, "ar -p %s control.tar.gz|tar -xzOf - ./control", pkg->file);
-	ret = di_exec_shell_log(command);
+	ret = system(command);
 	free(command);
 	return ret;
 }
