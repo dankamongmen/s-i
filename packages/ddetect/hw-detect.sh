@@ -268,6 +268,17 @@ get_manual_hw_info() {
 	echo "ide-cd:Linux ATAPI CD-ROM"
 	echo "isofs:Linux ISO 9660 filesystem"
 	get_input_info
+
+	# on some hppa systems, nic and scsi won't be found because they're
+	# not on a bus that discover understands ... 
+	if [ "`udpkg --print-architecture`" = hppa ]; then
+		echo "lasi_82596:LASI Ethernet"
+		register-module lasi_82596
+		echo "lasi700:LASI SCSI"
+		register-module lasi700
+		echo "zalon7xx:Zalon SCSI"
+		register-module zalon7xx
+	fi
 }
 
 # Detect discover version
