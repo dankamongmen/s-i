@@ -28,9 +28,8 @@ if [ ! -d /target/root ] ; then
 fi
 
 # Map no-latin1 to i386/qwerty/no-latin1
-KBD=`find /usr/share/keymaps/ -name "$KEYMAP.kmap*" | sed 's%/usr/share/keymaps/%%' | sed 's/.kmap.gz$//' `
+KBD=`find /usr/share/keymaps/ -name "$KEYMAP.kmap*" | sed -e 's%/usr/share/keymaps/%%' -e 's/.kmap.gz$//' -e 's/.kmap$//' `
 (
 	echo "# Inserted by kbd-chooser."
 	echo "KBD=\"$KBD\""
 ) >> /target/root/dbootstrap_settings
-
