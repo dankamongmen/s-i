@@ -690,7 +690,7 @@ pvscan >>/var/log/messages 2>&1
 vgscan >>/var/log/messages 2>&1
 
 # try to activate old volume groups
-set -- `vgdisplay -v | grep 'NOT active' | wc -l`
+set -- `vgdisplay -v | grep 'NOT \(active\|available\)' | wc -l`
 if [ $1 -gt 0 -a ! -f /var/cache/lvmcfg/first ]; then
 	db_subst lvmcfg/activevg COUNT $1
 	db_set lvmcfg/activevg "false"
