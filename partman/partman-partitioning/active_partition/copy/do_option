@@ -50,6 +50,11 @@ perform_copying () {
 		db_fset partman-partitioning/copy_commit_failed seen false
 		db_input high partman-partitioning/copy_commit_failed || true
 		db_go || true
+		for s in /lib/partman/init.d/*; do
+		    if [ -x $s ]; then
+			$s || exit 0
+		    fi
+		done
 		exit 0
 	    }
 	fi

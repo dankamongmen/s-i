@@ -60,6 +60,11 @@ perform_resizing () {
 		db_fset partman-partitioning/new_size_commit_failed seen false
 		db_input high partman-partitioning/new_size_commit_failed || true
 		db_go || true
+		for s in /lib/partman/init.d/*; do
+		    if [ -x $s ]; then
+			$s || exit 100
+		    fi
+		done
 		exit 100
 	    }
 	fi
@@ -74,13 +79,12 @@ perform_resizing () {
 	[ ! -e "$newid" ] || rm -rf $newid
 	mkdir $newid
 	cp -r $oldid/* $newid/
-	
-	for s in /lib/partman/init.d/*; do
-	    if [ -x $s ]; then
-		$s || exit 100
-	    fi
-	done
     fi
+    for s in /lib/partman/init.d/*; do
+	if [ -x $s ]; then
+	    $s || exit 100
+	fi
+    done
 }
 
 ask_for_size
