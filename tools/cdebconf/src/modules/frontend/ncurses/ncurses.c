@@ -475,7 +475,7 @@ static int ncurses_go(struct frontend *obj)
 	while (q != 0)
 	{
 		ret = DC_OK;
-		for (i = 0; i < sizeof(question_handlers) / sizeof(question_handlers[0]); i++)
+		for (i = 0; i < DIM(question_handlers); i++)
 			if (strcasecmp(q->template->type, question_handlers[i].type) == 0)
 			{
 				drawdesc(obj, q);

@@ -14,6 +14,6 @@ int strchoicesplit(char *inbuf, char **argv, size_t maxnarg);
 int strcmdsplit(char *inbuf, char **argv, size_t maxnarg);
 void strunescape(const char *inbuf, char *outbuf, const size_t maxlen);
 void strescape(const char *inbuf, char *outbuf, const size_t maxlen);
-int strwrap(const char *str, const int width, char **lines, int maxlines);
+int strwrap(const char *str, const int width, char *lines[], int maxlines);
 
 #endif

@@ -38,44 +38,15 @@ static const int getwidth(void)
 static void wrap_print(const char *str)
 {
 	/* Simple greedy line-wrapper */
-	const int width = getwidth() - 1;
-	int len = STRLEN(str);
-	char line[width+1];
-	const char *s, *e, *end, *lb;
+	int i, lc;
+	char *lines[500];
 
-	if (str == 0) return;
+	lc = strwrap(str, getwidth() - 1, lines, DIM(lines));
 
-	s = e = str;
-	end = str + len;
-	
-	while (len > 0)
+	for (i = 0; i < lc; i++)
 	{
-		/* try to fit the most characters */
-		e = s + width;
-		
-		if (e >= end) 
-		{
-			e = end;
-		}
-		else
-		{
-			while (e > s && isalnum(*e)) e--;
-			e++;
-		}
-		/* no word-break point found, so just break the line */
-		if (e == s) e = s + width;
-
-		/* if there's an explicit linebreak, honor it */
-		lb = strchr(s, '\n');
-		if (lb != NULL && lb < e) e = lb + 1;
-
-		strncpy(line, s, e-s);
-		line[e-s] = 0;
-		printf("%s%s", line, (lb == NULL || lb >= e ? "\n" : ""));
-
-		len -= (e-s);
-		s = e;
-		while (*s == ' ') s++;
+		printf("%s\n", lines[i]);
+		DELETE(lines[i]);
 	}
 }
 
@@ -248,9 +219,15 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 static int texthandler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
+	if (q->template->defaultval)
+		printf("[%s]", q->template->defaultval);
+	printf("> "); fflush(stdout);
 	fgets(buf, sizeof(buf), stdin);
 	CHOMP(buf);
-	question_setvalue(q, buf);
+	if (buf[0] == 0 && q->template->defaultval != 0)
+		question_setvalue(q, q->template->defaultval);
+	else
+		question_setvalue(q, buf);
 	return DC_OK;
 }
 

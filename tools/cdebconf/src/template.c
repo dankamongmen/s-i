@@ -7,7 +7,7 @@
  *
  * Description: interface to debconf templates
  *
- * $Id: template.c,v 1.4 2000/12/09 04:22:30 tausq Exp $
+ * $Id: template.c,v 1.5 2000/12/12 05:13:36 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -77,7 +77,7 @@ void template_deref(struct template *t)
 struct template *template_load(const char *filename)
 {
 	char buf[2048], extdesc[8192];
-	char *p;
+	char *p, *bufp;
 	FILE *fp;
 	struct template *tlist = NULL, *t = 0;
 
@@ -110,13 +110,31 @@ struct template *template_load(const char *filename)
 			while (fgets(buf, sizeof(buf), fp))
 			{
 				if (buf[0] != ' ') break;
-				if (buf[1] == '.')
-					strvacat(extdesc, sizeof(extdesc), "\n\n", 0);
-				else
-					strvacat(extdesc, sizeof(extdesc), buf+1, "\n",  0);
+				strvacat(extdesc, sizeof(extdesc), buf+1, 0);
 			}
 			if (*extdesc != 0)
+			{
+				/* remove extraneous linebreaks */
+				/* remove internal linebreaks unless the next
+				 * line starts with a space; also change
+				 * lines that contain a . only to an empty
+				 * line
+				 */
+				for (bufp = extdesc; *bufp != 0; bufp++)
+					if (*bufp == '\n')
+					{
+						if (*(bufp+1) == '.' &&
+							*(bufp+2) == '\n')
+						{
+							*(bufp+1) = ' ';
+							bufp+=2;
+						}
+						else if (*(bufp+1) != ' ')
+							*bufp = ' ';
+					}
+					
 				t->extended_description = strdup(extdesc);
+			}
 
 			if (t != 0)
 			{

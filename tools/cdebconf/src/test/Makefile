@@ -1,6 +1,6 @@
 include ../../globalmakeflags
 CFLAGS += -I..
-BIN=configtest dbtest fetest
+BIN=configtest dbtest strtest.o
 OBJS=$(subst .c,.o,$(wildcard *.c))
 LDFLAGS=-Wl,-rpath,/home/randolph/projects/debian-installer/tools/cdebconf/src -ldl
 
@@ -15,7 +15,8 @@ dbtest: ../strutl.o ../configuration.o ../priority.o ../template.o ../question.o
 fetest: ../strutl.o ../configuration.o ../priority.o ../template.o ../question.o ../database.o ../frontend.o fetest.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-
+strtest: ../strutl.o strtest.o
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
 	-rm -f $(BIN) $(OBJS) *~

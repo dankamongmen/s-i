@@ -9,7 +9,7 @@
  *              of client configuration modules and communications
  *              between the debconf frontend and the confmodule
  *
- * $Id: confmodule.c,v 1.8 2000/12/02 08:33:39 tausq Exp $
+ * $Id: confmodule.c,v 1.9 2000/12/12 05:13:36 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -108,13 +108,14 @@ static int confmodule_communicate(struct confmodule *mod)
 	{
 		in[ret] = 0;
 		inp = strstrip(in);
+		INFO(INFO_DEBUG, "--> %s\n", inp);
 		ret = _confmodule_process(mod, inp, out, sizeof(out) - 1);
 		if (ret == DC_NOTIMPL) {
 			fprintf(stderr, "E: Unimplemented function\n");
 			continue;
 		}
 		if (out[0] == 0) break; // STOP called
-
+		INFO(INFO_DEBUG, "<-- %s\n", out);
 		strcat(out, "\n");
 		write(mod->outfd, out, strlen(out));
 	}

@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.11 2000/12/09 08:18:07 tausq Exp $
+ * $Id: commands.c,v 1.12 2000/12/12 05:13:36 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -267,7 +267,7 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 	int i;
 	char buf[1024];
 
-	CHECKARGC(>= 2);
+	CHECKARGC(>= 3);
 
 	variable = argv[2];
 	q = mod->db->question_get(mod->db, argv[1]);
@@ -278,8 +278,9 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 	else
 	{
 		buf[0] = 0;
-		for (i = 3; i <= argc; i++)
-			strvacat(buf, sizeof(buf), argv[i], " ", 0);	
+		strvacat(buf, sizeof(buf), argv[3], 0);	
+		for (i = 4; i <= argc; i++)
+			strvacat(buf, sizeof(buf), " ", argv[i], 0);	
 
 		question_variable_add(q, variable, buf);
 
