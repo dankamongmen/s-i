@@ -45,4 +45,4 @@ clean:
 
 install:
 	$(foreach PROG, $(PROGS), \
-	cp $(PROG) debian/$(PROG).config)
+	cp $(PROG) debian/$(PROG).postinst)
