@@ -1259,7 +1259,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
         { /* Do it like this for now */
             char *cmd = NULL;
             int retval;
-            retval = asprintf(&cmd, "mke2fs -j %s >> /var/log/messages 2>&1",
+            retval = asprintf(&cmd,
+			      "/sbin/mkfs.ext3 %s >> /var/log/messages 2>&1",
                               devpath);
             if (-1 != retval)
             {
