@@ -148,9 +148,20 @@ else
 	# Just in case
 	DEFAULTLOCALE="C"
 fi
+
+# Finally grab the fallback locale we got from languagechooser
+db_get "$fallbacklocalecode"
+if [ -n "$RET" ]; then
+	FALLBACKLOCALE="$RET"
+else
+	# Just in case
+	FALLBACKLOCALE="C"
+fi
+
 # If present, keep track of charset or modifier we got from languagechooser
 # This charset or modifier is in the fallback locale
 EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
+
 
 FIRST_LANG=$(echo $LANGUAGELIST | sed -e 's/:.*$//')
 
@@ -241,6 +252,7 @@ log "LANGUAGECODE_LANGUAGECHOOSER = '$LANGUAGECODE_LANGUAGECHOOSER'"
 log "COUNTRYCODE = '$COUNTRYCODE'"
 log "COUNTRYCODE_LANGUAGECHOOSER = '$COUNTRYCODE_LANGUAGECHOOSER'"
 log "LOCALE_LANGUAGECHOOSER = '$LOCALE_LANGUAGECHOOSER'"
+log "FALLBACKLOCALE = '$FALLBACKLOCALE'"
 
 for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
 	     ${LANGUAGE}_${COUNTRYCODE}; do
@@ -277,8 +289,12 @@ done
 
 # Fall back to a supported locale.
 if [ -z "${LOCALE}" ]; then
-	LOCALE="${FALLBACKLOCALE}"
-	log "falling back to locale '${FALLBACKLOCALE}'"
+        if grep -q "^${FALLBACKLOCALE}$" $SUPPORTEDLOCALES; then
+                LOCALE="${FALLBACKLOCALE}"
+        else
+                LOCALE=`echo $FALLBACKLOCALE | sed -e 's/[.@].*$//'`
+        fi
+        log "falling back to locale '${LOCALE}'"
 fi
 
 # Set the locale.
