@@ -104,6 +104,7 @@ get_hw_info() {
     # The order of these packages are important. [pere 2003-03-16]
     echo "ide-mod:Linux IDE Driver"
     echo "ide-probe-mod:Linux IDE probe Driver"
+    echo "ide-detect:Linux IDE detection Driver"
     echo "ide-disk:Linux ATA DISK Driver"
     echo "ide-cd:Linux ATAPI CD-ROM Driver"
     echo "isofs:Linux ISO 9660 Filesystem Driver"
