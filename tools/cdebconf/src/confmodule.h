@@ -44,6 +44,16 @@ struct confmodule {
 	int (*communicate)(struct confmodule *mod);
 
     /**
+     * @brief process one command
+     * @param const char *cmd - command to execute
+     * @param char *out - return buffer
+     * @param size_t outsize - size of return buffer
+     * @return int - DC_OK, DC_NOTOK
+     */
+    int (*process_command)(struct confmodule *mod, char *cmd, 
+        char *out, size_t outsize);
+
+    /**
      * @brief Shuts down the confmodule
      * @param struct confmodule *mod - confmodule object
      * @return int - exit code of the config script

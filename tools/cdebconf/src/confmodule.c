@@ -120,6 +120,26 @@ static int confmodule_communicate(struct confmodule *mod)
 	return ret;
 }
 
+static int confmodule_process_command(struct confmodule *mod, char *cmd, 
+        char *out, size_t outsize)
+{
+    int ret;
+    char *inp;
+
+    inp = strstrip(cmd);
+
+    INFO(INFO_DEBUG, "--> %s\n", inp);
+    ret = _confmodule_process(mod, inp, out, outsize);
+    if (ret == DC_NOTIMPL) {
+        fprintf(stderr, "E: Unimplemented function\n");
+        snprintf(out, outsize, "%u Not implemented", ret);
+    }
+    /*		if (out[0] == 0) break; // STOP called*/
+    INFO(INFO_DEBUG, "<-- %s\n", out);
+
+    return ret;
+}
+
 static int confmodule_shutdown(struct confmodule *mod)
 {
     int status;
@@ -250,6 +270,7 @@ struct confmodule *confmodule_new(struct configuration *config,
 	mod->frontend = frontend;
 	mod->run = confmodule_run;
 	mod->communicate = confmodule_communicate;
+    mod->process_command = confmodule_process_command;
 	mod->shutdown = confmodule_shutdown;
 	mod->update_seen_questions = confmodule_update_seen_questions;
 
