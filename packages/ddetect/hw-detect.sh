@@ -384,6 +384,26 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 	esac
 fi
 
+# If firewire was found, try to enable firewire cd support.
+if ! is_not_loaded ohci1394; then
+	# TODO: update progress bar here (after string freeze)
+	if is_not_loaded sbp2; then
+		load_module sbp2
+	fi
+	register-module sbp2
+	if is_not_loaded sr_mod; then
+		load_module sr_mod
+	fi
+	register-module sr_mod
+	case "$(uname -r)" in
+	2.4*)
+		# Rescan bus for firewire CD after loading sr_mod.
+		# (Sometimes this echo fails.)
+		echo "scsi add-single-device 0 0 0 0" > /proc/scsi/scsi || true
+	;;
+	esac
+fi
+
 # get pcmcia running if possible
 
 apply_pcmcia_resource_opts() {
