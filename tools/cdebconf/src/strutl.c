@@ -213,7 +213,7 @@ int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
         e = s;
         while (*e != 0)
         {
-            if (*e == '\\' && *(e+1) == ',')
+            if (*e == '\\' && (*(e+1) == ',' || *(e+1) == ' '))
                 e += 2;
             else if (*e == ',')
                 break;
@@ -228,6 +228,11 @@ int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
             {
                 argv[argc][i] = ',';
                 c++;
+            }
+	    else if (*c == '\\' && c < (e-1) && *(c+1) == ' ')
+            {
+                argv[argc][i] = ' ';
+		c++;
             }
             else
                 argv[argc][i] = *c;
