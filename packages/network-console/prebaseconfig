@@ -24,11 +24,11 @@ if chroot /target dpkg -l $PACKAGE 2>/dev/null | grep "^ii" ; then
     db_input critical $TEMPLATE_ROOT/prebaseconfig-reminder
     db_go
 else
-    ## FIXME (see #279090) ##
-    # There really should be a dialog shown here
-    # Not implemented yet because of string freeze for RC2 release
     log "Package $PACKAGE was not installed into /target;"
     log "the system will not be set up to run base-configuration over SSH"
+    db_subst $TEMPLATE_ROOT/prebaseconfig-failure PACKAGE $PACKAGE
+    db_input critical $TEMPLATE_ROOT/prebaseconfig-failure
+    db_go
     exit 0
 fi
 
