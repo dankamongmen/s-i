@@ -302,7 +302,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 				/* extra junk */
 				if (strlen(q) != 0)
 				{
-					INFO(INFO_ERROR, "Syntax error %s:%u: Extra junk after tag\n", filename, curline);
+					INFO(INFO_ERROR, "Syntax error %s:%u: Extra junk after tag", filename, curline);
 					return 0;
 				}
 

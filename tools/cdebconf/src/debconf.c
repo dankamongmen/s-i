@@ -50,8 +50,10 @@ int main(int argc, char **argv)
 	/* initialize database and frontend modules */
 	if ((db = database_new(config)) == 0)
 		DIE("Cannot initialize DebConf database");
+#if 0
 	if ((frontend = frontend_new(config, db)) == 0)
 		DIE("Cannot initialize DebConf frontend");
+#endif
 
 	/* load templates */
 	db->load(db);

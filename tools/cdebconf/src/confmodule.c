@@ -47,8 +47,10 @@ static int _confmodule_process(struct confmodule *mod, char *in, char *out, size
 
 	for (; commands[i].command != 0; i++)
 	{
-		if (strcmp(argv[0], commands[i].command) == 0)
-			return (*commands[i].handler)(mod, argc - 1, argv, out, outsize);
+		if (strcasecmp(argv[0], commands[i].command) == 0) {
+			return (*commands[i].handler)(mod, argc - 1, argv, 
+							out, outsize);
+		}
 	}
 	return 0;
 }
@@ -61,14 +63,18 @@ static int confmodule_communicate(struct confmodule *mod)
 	char *inp;
 	int ret = 0;
 
-	if ((ret = read(mod->infd, in, sizeof(in))) > 0)
+	while ((ret = read(mod->infd, in, sizeof(in))) > 0)
 	{
 		in[ret] = 0;
 		inp = strstrip(in);
 		ret = _confmodule_process(mod, inp, out, sizeof(out));
+		if (ret > 0) {
 		strcat(out, "\n");
 		write(mod->outfd, out, strlen(out));
 		if (out[0] == 0) ret = 0;
+		} else {
+			break;
+		}
 	}
 	return ret;
 }
@@ -92,19 +98,32 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 	int pid;
 	int i;
 	char **args;
+	int toconfig[2], fromconfig[2]; /* 0=read, 1=write */
+	pipe(toconfig);
+	pipe(fromconfig);
 	switch ((pid = fork()))
 	{
 	case -1:
 		DIE("Cannot execute client config script");
 		break;
 	case 0:
+		close(fromconfig[0]); close(toconfig[1]);
+		if (toconfig[0] != 0) { /* if stdin is closed initially */
+			dup2(toconfig[0], 0); close(toconfig[0]);
+		}
+		dup2(fromconfig[1], 1); close(fromconfig[1]);
+
 		args = (char **)malloc(sizeof(char *) * argc-1);
 		for (i = 1; i < argc; i++)
 			args[i-1] = argv[i];
+		args[argc-1] = NULL;
 		execv(argv[1], args);
-		/* never reached */
-		break;
+		/* execv failed :( */
+		exit(1);
 	default:
+		close(fromconfig[1]); close(toconfig[0]);
+		mod->infd = fromconfig[0];
+		mod->outfd = toconfig[1];
 	}
 
 	return pid;

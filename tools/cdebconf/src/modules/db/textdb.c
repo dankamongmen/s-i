@@ -50,6 +50,21 @@ static char *question_filename(struct configuration *cfg, const char *tag)
 	return filename;
 }
 
+static int textdb_initialize(struct database *db, struct configuration *cfg)
+{
+	struct db_cache *dbdata;
+	dbdata = malloc(sizeof(struct db_cache));
+
+	if (dbdata == NULL)
+		return DC_NOTOK;
+
+	dbdata->questions = NULL;
+	dbdata->templates = NULL;
+	db->data = dbdata;
+
+	return DC_OK;
+}
+
 static int textdb_load(struct database *db)
 {
 	return DC_OK;
@@ -91,7 +106,7 @@ static int textdb_template_add(struct database *db, struct template *t)
 	return DC_OK;
 }
 
-static struct template *textdb_template_get(struct database *db, 
+static struct template *textdb_template_get2(struct database *db, 
 	const char *ltag)
 {
 	struct configuration *rec;
@@ -128,6 +143,23 @@ static struct template *textdb_template_get(struct database *db,
 	config_delete(rec);
 
 	return t;
+}
+
+static struct template *textdb_template_get(struct database *db, 
+	const char *ltag)
+{
+	struct db_cache *dbdata = db->data;
+	struct template *result;
+
+	for (result = dbdata->templates; result; result = result->next) {
+		if (strcmp(result->tag, ltag) == 0) return result;
+	}
+	result = textdb_template_get2(db, ltag);
+	if (result) {
+		result->next = dbdata->templates;
+		dbdata->templates = result;
+	}
+	return result;
 }
 
 static int textdb_template_remove(struct database *db, const char *tag)
@@ -212,13 +244,11 @@ static struct question *textdb_question_get(struct database *db,
 	q = NEW(struct question);
 
 	q->tag = STRDUP(rec->get(rec, "question::tag", 0));
-	if (q->tag == 0)
+	q->value = STRDUP(rec->get(rec, "question::value", 0));
+	if (q->tag == 0 || q->value == 0)
 	{
 		question_delete(q);
 		q = 0;
-	}
-	else
-	{
 	}
 
 	config_delete(rec);
@@ -268,6 +298,7 @@ static struct question *textdb_question_iterate(struct database *db,
 
 struct database_module debconf_database_module =
 {
+	initialize: textdb_initialize,
 	load: textdb_load,
 	save: textdb_save,
 	template_add: textdb_template_add,
@@ -276,7 +307,7 @@ struct database_module debconf_database_module =
 	template_iterate: textdb_template_iterate,
 	question_add: textdb_question_add,
 	question_get: textdb_question_get,
-	question_add: textdb_question_add,	/* no separate set method */
+	question_set: textdb_question_add,	/* no separate set method */
 	question_disown: textdb_question_disown,
 	question_iterate: textdb_question_iterate
 };

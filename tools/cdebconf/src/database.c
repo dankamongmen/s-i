@@ -11,7 +11,6 @@
 
 static int database_initialize(struct database *db, struct configuration *cfg)
 {
-	printf("in initialize\n");
 	return DC_OK;
 }
 
