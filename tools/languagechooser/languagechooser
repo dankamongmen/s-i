@@ -17,11 +17,11 @@ db_title "Choose language"
 #   debconf/language is an alias for debian-installer/language
 db_register "$languagecode" "debconf/language"
 
-db_fset "languagechooser/language" seen false
+db_fset "languagechooser/languagename" seen false
 db_fset "$languagecode" seen false
-db_input critical "languagechooser/language" || [ $? -eq 30 ]
+db_input critical "languagechooser/languagename" || [ $? -eq 30 ]
 if db_go; then
-    db_get "languagechooser/language"
+    db_get "languagechooser/languagename"
     if test "$RET" ; then
 	LANGNAME="$RET"
 	. languagemap
@@ -30,9 +30,11 @@ if db_go; then
 	db_set "$countrycode"  "$COUNTRY"
     else
 	# Error, not sure how to handle it
+	:
     fi
 else
     # Error, not sure how to handle it
+    :
 fi
 
 db_get "$languagecode"
