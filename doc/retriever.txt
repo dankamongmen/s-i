@@ -115,8 +115,8 @@ TODO: it might make sense to break some of this out into the retreiver
 controller, and expand the interface. It's stilly that all the retreivers
 need to know the distribution code name for instance.
 
-Retriever controller
---------------------
+Retriever controller (anna)
+---------------------------
 
 This is another module, that makes use of the retrievers. It doesn't
 actually depend on any though. What it does is, when it is picked from the
@@ -126,6 +126,15 @@ retreive whatever seems appropriate. Thus, the menu item can be picked
 multiple times, using a different retreiver every time. And if a retreiver
 downloads a second retreiver, it will show up in future displays of the
 retreivers menu.
+
+The default retriever (if more than one is available, and it's the first
+time the question is asked) will be, in turn and if they exist:
+ 1. net-retriever (if you've got connectivity you probably want to use it)
+ 2. cdrom-retriever (using a CD is also very common)
+ 3. floppy-retriever (we usually don't have to use the floppy)
+ (4. file-retriever? not currently used, but if resurrected, should
+                     probably have lower priority than the floppy
+                     retriever)
 
 Which modules are needed is an interesting question. One simplistic
 technique is to simply download and unpack all available modules. Another
