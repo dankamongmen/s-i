@@ -110,6 +110,75 @@ int isdefault(struct package_t *p) {
 	return ret;
 }
 
+/* The visit function for the depth-first traversal */
+static void
+dfs(struct package_t *p, struct linkedlist_t *queue)
+{
+	struct package_t *q;
+	struct list_node *node;
+	int i;
+
+	p->processed = 1;
+	for (i = 0; p->depends[i] != NULL; i++) {
+		q = p->depends[i]->ptr;
+		if (q == NULL)
+			continue;
+		if (!q->processed)
+			dfs(q, queue);
+	}
+	/* Note that since we consider the list a queue and append in the end
+	 * we will actually get a "reversed" toposort, but that's what we want.
+	 */
+	node = (struct list_node *)malloc(sizeof(struct list_node));
+	node->data = p;
+	node->next = NULL;
+	if (queue->tail == NULL)
+		queue->head = queue->tail = node;
+	else {
+		queue->tail->next = node;
+		queue->tail = node;
+	}
+}
+
+static struct package_t *
+get_default_menu_item(struct package_t **packages, const int pkg_count)
+{
+	struct package_t *p, *q;
+	struct linkedlist_t list;
+	struct list_node *node;
+	int i, cont;
+
+	/* Topological sort of the packages, packages with fulfilled
+	 * dependencies will come first */
+	list.head = list.tail = NULL;
+	for (i = 0; i < pkg_count; i++)
+		packages[i]->processed = 0;
+	for (i = 0; i < pkg_count; i++)
+		if (!packages[i]->processed)
+			dfs(packages[i], &list);
+	/* Traverse the list, return the first menu item that isn't installed */
+	for (node = list.head; node != NULL; node = node->next) {
+		p = (struct package_t *)node->data;
+		if (!p->installer_menu_item || p->status == installed)
+			continue;
+		cont = 0;
+                /* Check if a "parallel" package is installed
+		 * (netcfg-{static,dhcp} and {lilo,grub}-installer are
+		 * examples of parallel packages */
+		for (i = 0; p->provides[i] != NULL; i++) {
+			q = p->provides[i]->ptr;
+			if (q != NULL && di_pkg_is_installed(q)) {
+				cont = 1;
+				break;
+			}
+		}
+		if (!cont)
+			return p;
+	}
+	/* Severely broken, there are no menu items in the sorted list */
+	return NULL;
+}
+
 /* Displays the main menu via debconf and returns the selected menu item. */
 struct package_t *show_main_menu(struct linkedlist_t *list) {
 	static struct debconfclient *debconf = NULL;
@@ -139,10 +208,8 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	package_list = malloc(num * sizeof(struct package_t *));
 	for (node = list->head; node; node = node->next) {
 		p = (struct package_t *)node->data;
-		if (p->installer_menu_item) {
-			package_list[i] = (struct package_t *)node->data;
-			i++;
-		}
+		if (p->installer_menu_item)
+			package_list[i++] = (struct package_t *)node->data;
 	}
 	
 	/* Sort by menu number. */
@@ -189,27 +256,16 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 		}
 		*s++ = ',';
 		*s++ = ' ';
-
-		if (isdefault(p)) {
-			if (menudefault) {
-				if (menudefault->installer_menu_item > p->installer_menu_item) {
-					menudefault = p;
-				}
-			} else {
-				menudefault = p;
-			}
-		}
 	}
 	/* Trim trailing ", " */
 	if (s > menutext)
 		s = s - 2;
 	*s = 0;
 	s = menutext;
+	menudefault = get_default_menu_item(package_list, num);
 
 	/* Make debconf show the menu and get the user's choice. */
         debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
-	if (menudefault)
-		debconf->command(debconf, "SET", MAIN_MENU, menudefault->description, NULL);
 	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
 	if (menudefault)
@@ -222,9 +278,9 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	/* Figure out which menu item was selected. */
 	for (i = 0; i < num; i++) {
 		p = package_list[i];
-		if (p->installer_menu_item && strcmp(p->description, s) == 0)
+		if (strcmp(p->description, s) == 0)
 			return p;
-		else if (p->installer_menu_item && language) {
+		else if (language) {
 			for (langdesc = p->localized_descriptions; langdesc; langdesc = langdesc->next)
 				if (strcmp(langdesc->language,language) == 0 &&
 				    strcmp(langdesc->description,s) == 0) {
