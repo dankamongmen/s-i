@@ -1,0 +1,47 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=$(shell dpkg --print-architecture)
+PACKAGE=ppcdetect
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	$(MAKE) all
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	-$(MAKE) distclean
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	install -m755 -d debian/$(PACKAGE)/usr/bin/
+	install -m755 ppcdetect debian/$(PACKAGE)/usr/bin/ppcdetect
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf	
+	dh_fixperms
+	dh_installdeb
+	dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
+		-n$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+	cd debian && dpkg-deb -b $(PACKAGE) \
+		../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
