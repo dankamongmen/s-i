@@ -57,13 +57,27 @@ load_modules()
     echo $old > /proc/sys/kernel/printk
 }
 
+# HACK ALERT! (pere: do not use as an example ;-) )
+# join hack for discover 2 (ask Eric Gillespie why this
+# is needed ;-) )
+dumb_join_discover (){
+    IFS_SAVE="$IFS"
+    IFS="
+"
+    for i in $MODEL_INFOS; do
+        echo $1:$i;
+        shift
+    done
+    IFS="$IFS_SAVE"
+}
+
 # wrapper for discover command that can distinguish Discover 1.x and 2.x
 discover_hw () {
     DISCOVER=/sbin/discover
-    if [ -f /usr/bin/didiscover ] ; then
+    if [ -f /usr/bin/discover ] ; then
         log "Testing experimental discover2 package."
 
-        DISCOVER=/usr/bin/didiscover
+        DISCOVER=/usr/bin/discover
     fi
     # Ugh, Discover 1.x didn't exit with nonzero status if given an
     # unrecongized option!
@@ -73,14 +87,16 @@ discover_hw () {
         # This worked with jeff's didiscover utility, which progeny removed from
         # the discover subversion repository :-(
 
-        log "Using discover2 do not work yet."
-
         dpath=linux/module/name
         dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
-        dflags="-d all -e ata -e pci -e pcmcia -e scsi all"
+        dflags="-d all -e ata -e pci -e pcmcia -e \
+                scsi bridge broadband fixeddisk humaninput modem \
+                network optical removabledisk"
 
-        $DISCOVER --data-path=$dpath --data-version=$dver \
-	    --data-vendor --data-model --format='%s:%s %s' $dflags
+        MODEL_INFOS=$($DISCOVER -t $dflags)
+        MODULES=$($DISCOVER --data-path=$dpath --data-version=$dver $dflags)
+        dumb_join_discover $MODULES
+
     else
         # must be Discover 1.x
         $DISCOVER --format="%m:%V %M\n" \
