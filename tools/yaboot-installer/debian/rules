@@ -30,21 +30,21 @@ clean:
 	$(MAKE) clean
 	rm -f build-stamp
 	rm -f debian/files~
+	rm -f debian/postinst
 	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-
 	dh_installdirs
+	install -m755 choose-yaboot-disk debian/postinst
 
 binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
 	dh_installdeb 
-	install -m755 choose-yaboot-disk debian/postinst
 	cp powerpc-type debian/yaboot-installer/usr/sbin
 	cp debian/isinstallable debian/yaboot-installer/DEBIAN/
 	dh_gencontrol -- -fdebian/files~
