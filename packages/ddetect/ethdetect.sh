@@ -83,18 +83,21 @@ module_probe() {
 	local devs=""
 	local olddevs=""
 	local newdev=""
+	local prompted_params=""
 	
 	devs="$(snapshot_devs)"
 
 	db_register "$template" "$question"
 	db_subst "$question" MODULE "$module"
-	db_input $priority "$question" || [ $? -eq 30 ]
+	if db_input $priority "$question"; then
+		prompted_params=1
+	fi
 	db_go
 	db_get "$question"
 	local params="$RET"
 	
 	if ! modprobe -v "$module" "$params"; then
-		if [ -z "$params" ]; then
+		if [ -z "$params" ] && [ ! "$prompted_params" ]; then
 			# Prompt the user for parameters for the module.
 			template="ethdetect/retry_params"
 			db_unregister "$question"
