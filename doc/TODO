@@ -11,6 +11,9 @@ Important things to do before the next beta release
   * Get d-i syslinux boot screens onto the CD image, instead of the current
     old ones.
  
+  * Fix pcmcia suport (wrong pcmcia-cs-udeb priority, modules not on
+    netinst cd)
+ 
   * Get the following NEW/BYHAND packages into the archive:
      - debian-installer
      - netcfg
@@ -99,10 +102,12 @@ time.
 	- cdrom-checker
 		apparently broken (#213054)
 	- pcmcia support
-		may work, may not.. (many failure reports)
-		pcmcia-modules are not installed onto the target system
-		Probably need to re-run hw-detect after loading pcmcia from
-		the net_driver floppy.
+		- may work, may not.. (many failure reports)
+		- pcmcia-modules are not installed onto the target system
+		- pcmcia is not enabled during CD or netboot installs,
+		  because pcmcia-cs-udeb has the wrong priority.
+		- Probably need to re-run hw-detect after loading pcmcia from
+		  the net_driver floppy.
 	- some architectures
 		alpha
 		hppa
