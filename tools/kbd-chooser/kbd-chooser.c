@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.4 2003/01/26 17:06:45 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.5 2003/01/28 11:02:05 mckinstry Exp $
  */
 
 #include "config.h"
@@ -39,9 +39,32 @@ int my_debconf_input (char *priority, char *template, char **result)
 	res = client->command (client, "go", NULL);
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
+	printf ("(DEBUG4)\n");
 	res = client->command (client, "get", template, NULL);
+	printf ("(DEBUG5)\n");
 	*result = client->value;
 	return res;
+}
+
+/**
+ * @brief  Do a grep for a string
+ * @return 0 if present, 1 if not, errno if error
+ */
+int grep (const char *file, const char *string)
+{
+	FILE *fp = fopen (file, "r");	
+	char buf[LINESIZE];
+	if (!fp)
+		return errno;
+	while (!feof (fp)) {
+		fgets (buf, LINESIZE, fp);
+		if (strstr (buf, string) != NULL) {
+			fclose (fp);
+			return 0;
+		}
+	}
+	fclose (fp);
+	return 1;
 }
 
 /*
@@ -326,7 +349,7 @@ char *ponder_keyboard_choices (void)
 {
 	kbd_t *kp = NULL, *preferred = NULL;
 	char buf [LINESIZE], *s = NULL, *preferred_arch;
-	int kboards = 0;
+	int kboards = 0, res;
 
 	assert (maplists != NULL); // needed to choose default kbd in some cases
 
@@ -362,10 +385,11 @@ char *ponder_keyboard_choices (void)
 		preferred_arch = preferred->name;
 	
 	// Set the default option
-	client->command (client, "fget", "console-tools/archs", "seen", NULL);
-	if (strcmp(client->value, "false") == 0)
-		client->command (client, "set", "console-tools/archs", preferred_arch, NULL);
-		
+	res = client->command (client, "fget", "console-tools/archs", "seen", NULL);
+	if (strcmp(client->value, "false") == 0) {
+	  printf ("DEBUG6: val %s preferred %s , res %d\n", client->value, preferred_arch, res);
+		client->command (client, "set", "console-tools/archs", strdup (preferred_arch), NULL);
+	}
 	*s = '\0';
 	client->command (client, "subst", "console-tools/archs", 
 			 "choices", buf, NULL);		      
@@ -433,12 +457,12 @@ int main (int argc, char **argv)
 		switch (state) {
 
 			// First select a keyboard arch. 
-		case CHOOSE_ARCH:		
+		case CHOOSE_ARCH:				  
 			if (my_debconf_input (kbd_priority, "console-tools/archs", &s) != CMDSTATUS_SUCCESS)
 				exit (0);
 			arch = extract_name (xmalloc (LINESIZE), s);
 			if (strcmp (arch, "none") == 0)
-			  exit (0);
+				exit (0);
 			state = CHOOSE_KEYMAP;
 			break;
 
@@ -448,6 +472,7 @@ int main (int argc, char **argv)
 				state = CHOOSE_ARCH;
 				break;
 			}
+			client->command (client, "set", "console-data/keymap", keymap, NULL);
 			loadkeys_wrapper (keymap);  
 			exit (0);
 			break;			
