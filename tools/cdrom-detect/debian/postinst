@@ -70,16 +70,17 @@ do
     then
         if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
-            :
+                :
         else
             while true
             do
-		db_fset cdrom-detect/not_included seen false || true
-		db_subst cdrom-detect/not_included vendor "$name" || true
-		db_subst cdrom-detect/not_included module $module || true
-		db_input low cdrom-detect/not_included || true
+	        template=cdrom-detect/not_included
+		db_fset "$template" seen false || true
+		db_subst "$template" vendor "$name" || true
+		db_subst "$template" module $module || true
+		db_input low "$template" || true
 		db_go || true
-		db_get cdrom-detect/not_included || true
+		db_get "$template" || true
                 mounted=0
                 if [ "$RET" != "true" ]
                 then
