@@ -142,7 +142,7 @@ int get_package (struct package_t *package, char *dest) {
 	char *command;
 
 	retriever = get_chosen_retriever();
-	asprintf(&command, "%s %s %s", retriever, package->filename, dest);
+	asprintf(&command, "%s retrieve %s %s", retriever, package->filename, dest);
 	free(retriever);
 	ret=! system(command);
 	free(command);
@@ -175,7 +175,7 @@ try_get_packages(char *dist, char *suite, char *ext, char *unpack_cmd)
 	asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
 		dist, suite, ARCH, ext);
 	asprintf(&tmp_packages_ext, "%s%s", tmp_packages, ext);
-	asprintf(&command, "%s %s %s", retriever, file, tmp_packages_ext);
+	asprintf(&command, "%s retrieve %s %s", retriever, file, tmp_packages_ext);
 	free(file);
 	ret = system(command);
 	free(command);
