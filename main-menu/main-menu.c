@@ -314,6 +314,23 @@ static int satisfy_virtual(struct package_t *p) {
 	return 1;
 }
 
+static void
+check_special(struct package_t *p)
+{
+	int i;
+
+	/*
+	 * A language selection package must provide the virtual
+	 * package 'language-selected'.
+	 * The LANGUAGE environment variable must be updated
+	 */
+	for (i = 0; p->provides[i] != NULL; i++)
+		if (strcmp(p->provides[i]->name, "language-selected") == 0) {
+			update_language();
+			break;
+		}
+}
+
 /*
  * Configure all dependencies, special case for virtual packages.
  * This is done depth-first.
@@ -343,16 +360,7 @@ config_package(struct package_t *p) {
 	free(configcommand);
         if (ret == 0) {
             p->status = installed;
-            /*
-             * A language selection package must provide the virtual
-             * package 'language-selected'.
-             * The LANGUAGE environment variable must be updated
-             */
-            for (i = 0; p->provides[i] != NULL; i++)
-                if (strcmp(p->provides[i]->name, "language-selected") == 0) {
-                    update_language();
-                    break;
-                }
+	    check_special(p);
         } else
             p->status = half_configured;
 	return !ret;
@@ -367,6 +375,7 @@ int do_menu_item(struct package_t *p) {
 		asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package);
 		ret = !SYSTEM(configcommand);
 		free(configcommand);
+		check_special(p);
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
 		ret = config_package(p);
@@ -391,7 +400,6 @@ static void update_language (void) {
 
 int main (int argc, char **argv) {
 	struct package_t *p;
-	int i;
 
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
