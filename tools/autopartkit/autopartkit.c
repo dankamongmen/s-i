@@ -378,7 +378,7 @@ DeviceStats* get_device_stats(PedDevice* dev)
     stats->max_contiguous_free_space = 0;
     stats->has_extended = 0;
     
-    stats->size = (int) ((dev->length * dev->sector_size) / MEGABYTE);
+    stats->size = (PedSector) ((dev->length * dev->sector_size) / MEGABYTE);
     disk = ped_disk_open(dev);
     if (! disk)
     {
@@ -398,7 +398,7 @@ DeviceStats* get_device_stats(PedDevice* dev)
 	}
 	if (part->type == PED_PARTITION_FREESPACE)
 	{
-	    int space = (int)((part->geom.length * dev->sector_size)
+	    PedSector space = (PedSector)((part->geom.length * dev->sector_size)
 					/ MEGABYTE);
 	    if (space > stats->max_contiguous_free_space)
 		stats->max_contiguous_free_space = space;
@@ -434,11 +434,11 @@ DeviceStats* get_device_stats(PedDevice* dev)
 		 * FIXME: empty fat partition will be resized to zero-sized
 		 * partition, detect those and resize them to a half or a
 		 * third instead */
-		if (part->geom.length > (int) (constraint->min_size *
+		if (part->geom.length > (PedSector) (constraint->min_size *
 			    MINSIZE_FACTOR))
 		{
 		    stats->free_space_in_fat += ((part->geom.length -
-			(int) (constraint->min_size * MINSIZE_FACTOR)) 
+			(PedSector) (constraint->min_size * MINSIZE_FACTOR)) 
 			* dev->sector_size) / MEGABYTE;
 		}
 		ped_file_system_close(fs);
@@ -510,7 +510,7 @@ int resize_fat_partitions(PedDisk *disk)
 
 	    if ((! ped_disk_set_partition_geom(disk, part, constraint,
 		     part->geom.start, part->geom.start + 
-		     (int)(constraint->min_size * MINSIZE_FACTOR)))
+		     (PedSector)(constraint->min_size * MINSIZE_FACTOR)))
 	        ||
 		(! ped_file_system_resize(fs, &part->geom))
 	       )
@@ -543,7 +543,7 @@ void create_partitions(PedDisk *disk)
     char device[64];
     FILE *fstab;
     char *diskpath = strdup(disk->dev->path);
-    int start, end;
+    PedSector start, end;
     
     /* Look for empty space on the disk */
     for(part = ped_disk_next_partition(disk, NULL); part;
@@ -573,13 +573,14 @@ void create_partitions(PedDisk *disk)
     any = ped_constraint_any(disk);
     autopartkit_log("Trying to create extented part on %d - %d\n", 
 		    free->geom.start, free->geom.end);
-    new = ped_partition_new(disk, PED_PARTITION_EXTENDED, NULL,
+    free = ped_partition_new(disk, PED_PARTITION_EXTENDED, NULL,
 			    free->geom.start, free->geom.end);
-    ped_disk_add_partition(disk, new, any);
+    ped_disk_add_partition(disk, free, any);
     autopartkit_log("Created extented part on %d - %d\n", 
-		    new->geom.start, new->geom.end);
+		    free->geom.start, free->geom.end);
     ped_constraint_destroy(any);
     
+    new = free ;
     /* Create / */
     start = new->geom.start + 1;
     end = new->geom.start + 1 + (SIZE_ROOT * MEGABYTE) / disk->dev->sector_size;
@@ -639,7 +640,7 @@ void create_partitions(PedDisk *disk)
     /* Create /usr */
     start = new->geom.end + 1;
     end = start + (MIN_SIZE_USR * MEGABYTE) / disk->dev->sector_size + 
-	  (int)(0.20 * (free->geom.end -
+	  (PedSector)(0.20 * (free->geom.end -
 	  (start + (MIN_SIZE_USR * MEGABYTE) / disk->dev->sector_size)));
     any = ped_constraint_any(disk);
     autopartkit_log("Trying to create /usr part on %d - %d\n", start, end);
