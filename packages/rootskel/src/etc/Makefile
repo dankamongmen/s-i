@@ -1,6 +1,7 @@
 dir = etc
 
-subdirs = init.d rcS.d
+# backward compatiblity
+subdirs_empty = rcS.d
 
 files = \
 	fstab \

@@ -1,4 +1,10 @@
 # Make sure proc and devfs are mounted when we continue.
+umount /initrd/dev
+umount /initrd
+if [ "`uname -r | grep '^2.2.'`" = "" ]; then
+	freeramdisk /dev/rd/0
+fi
+
 if [ ! -d /proc/self ] ; then
     mount -t proc proc /proc
 fi
@@ -8,3 +14,4 @@ fi
 if grep -q '[[:space:]]sysfs' /proc/filesystems; then
     mount -t sysfs sysfs /sys
 fi
+

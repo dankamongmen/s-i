@@ -12,6 +12,7 @@ subdirs_empty = \
 	initrd \
 	mnt \
 	proc \
-	sys
+	sys \
+	usr/lib/prebaseconfig.d
 
 include ../Makefile.inc

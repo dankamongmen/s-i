@@ -1,7 +1,9 @@
 dir = var
 
-subdirs = lib log
+subdirs = log
 
-subdirs_empty = run
+subdirs_empty = \
+	lib/apt-install \
+	run
 
 include ../../Makefile.inc
