@@ -84,7 +84,7 @@ sub control
     }
     elsif (/^(XC-)?Package-Type:\s*(.*)/)
     {
-      $type = $1;
+      $type = $2;
     }
 
     if ($package and (!$_ or eof))
