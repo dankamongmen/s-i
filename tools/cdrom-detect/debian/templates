@@ -4,27 +4,27 @@ Default: false
 Description: Do you want to load the missing module from a drivers floppy ?
  The module required for ${vendor} (${module}) is missing from this
  installation disk. If you want to load it from a driver floppy, then
- insert this floppy disk in the floppy drive and choose yes. Otherwise
- choose no.
+ insert this floppy disk in the floppy drive before proceeding.
 
 Template: cdrom-detect/manual_config
 Type: boolean
 Default: true
 Description: Do you want to manually select the CDROM module and device ?
- Apparently, we couldn't detect any common CDROM reader. But you may
- have an old Mitsumi or another non-IDE, non-SCSI CDROM reader. In
- that case you can indicate which module to load and which devide to
- use. If you know what module we have to use, answer yes, otherwise
- look for some documentation or try a net install instead of a CDROM
- install.
+ No common CDROM reader was detected. But you may have an old Mitsumi
+ or another non-IDE, non-SCSI CDROM reader. In that case you can
+ indicate which module to load and which device to use. If you don't
+ know what module and device are needed, look for some documentation or
+ try a net install instead of a CDROM install.
 
 Template: cdrom-detect/is_cd_inserted
 Type: boolean
 Default: false
-Description: Is the installation CD in the CDROM reader ?
- We couldn't mount your installation CD. That probably means that the CD
- is not yet inserted. If that's the case, please insert it and answer no.
- Otherwise answer yes and you'll be prompted for a manual configuration.
+Description: Perform manual CD configuration ?
+ Your installation CD couldn't be mounted. That probably means that
+ the CD is not yet inserted. If that's the case, just insert it and
+ don't perform the manual configuration; the CD mount will be
+ re-tried. If your CD was already in the drive, there was another
+ problem; try the manual CD configuration.
 
 Template: cdrom-detect/cdrom_module
 Type: select
@@ -50,14 +50,14 @@ Description: Give the corresponding device file
 Template: cdrom-detect/success
 Type: note
 Description: A CDROM has been detected.
- The autodetection worked. A CDROM reader has been found.
- It contains the following CD : ${cdname}
+ CD autodetection worked. A CDROM reader has been found
+ with the following CD inserted : ${cdname}
  You can continue the install.
 
 Template: cdrom-detect/skip_autodetection
 Type: boolean
 Default: false
 Description: Do you want to skip CDROM autodetection ?
- You may want to try that if autodetection is causing troubles. Otherwise
- you really shouldn't as it won't let you go any further without
- manual intervention to mount the CDROM on /cdrom.
+ You may want to try this if autodetection is causing trouble.
+ Otherwise you really shouldn't; manual intervention will be
+ required to mount the CDROM on /cdrom before you can proceed.
