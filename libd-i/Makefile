@@ -14,7 +14,7 @@ PIC_LIB=libd-i_pic.a
 PREFIX=$(DESTDIR)/usr/
 libdir=$(DESTDIR)/usr/lib/
 incdir=$(DESTDIR)/usr/include/
-CFLAGS=-Wall  -Os 
+CFLAGS=-fPIC -Wall  -Os 
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 CFLAGS += -g
@@ -35,12 +35,12 @@ $(PIC_LIB): $(OBJS)
 DEFS=$(addprefix -DL__, $(subst .o,__,$(OBJS)))
 
 di%.o: d-i.c
-	$(CC) -c -fPIC $(CFLAGS) -DL__$(subst .o,,$@)__ -o $@ d-i.c
+	$(CC) -c $(CFLAGS) -DL__$(subst .o,,$@)__ -o $@ d-i.c
 
 $(LIBNAME): d-i.c
-	$(CC) -c $(CFLAGS) $(DEFS) -o d-i.o d-i.c
+#	$(CC) -c $(CFLAGS) $(DEFS) -o d-i.o d-i.c
 	@echo Creating $(LIBNAME)
-	$(CC) -shared -Wl,-soname,$(SONAME) -o $@ $^
+	$(CC) -shared -Wl,-soname,$(SONAME) -o $@ $^ $(DEFS) $(CFLAGS)
 	size $@ 
 
 $(SONAME) $(LIB): $(LIBNAME)
@@ -58,4 +58,4 @@ install:
 
 
 clean:
-	rm -f *.o $(LIBS) 
+	rm -f *.o $(PIC_LIB) $(LIBS) 
