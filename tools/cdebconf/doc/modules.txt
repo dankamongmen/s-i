@@ -1,9 +1,112 @@
+XXX -- General things which are missing
+XXX Documentation of frontend API
+XXX Refactoring to be more readable -- sections will need to be moved.
+
 General APIs
 ~~~~~~~~~~~~
-struct configuration stuff -- XXX
-struct template stuff -- XXX
-struct question stuff -- XXX
+Tags are strings consisting of identifiers seperated by "::"
+XXX How to choose tags?
 
+configuration API
+~~~~~~~~~~~~~~~~~
+
+A "struct configuration" has several publically accessible methods:
+
+const char *get(struct configuration *, const char *tag, const char *default):
+   Return a string value for given tag
+
+int geti(struct configuration *, const char *tag, int default)
+   Return an integral value for given tag
+
+void set(struct configuration *, const char *tag, const char *value):
+   Save string value at tag
+
+void seti(struct configuration *, const char *tag, int value)
+   Save integral value at tag
+
+XXX memory ownership not discussed
+XXX new/delete, read/dump not documented
+
+template API
+~~~~~~~~~~~~
+Initializing a template should be done via the function
+struct template *template_new(const char * tag). This function takes
+a tag, and returns an empty template object.
+
+A template has the following publically accessible fields:
+
+- char *tag: the template's tag
+- char *type: the template's type XXX can be one of ...
+- char *defaultval: the template's default value, as a string
+- char *choices: if the template's type is choices based, here the choices
+                 are listed in a single string, seperated by commas XXX right?
+- char *description: a description of the template XXX must be under ... chars?
+- char *extended_description: a longer description 
+- struct language_description *localized descriptions - has following fields:
+  - struct language_description *next: NULL or another localized description
+  - char *language: ISO tag for language XXX right?
+  - char *choices, char *description, char *extended_description: as above,
+    only in specified language
+  
+XXX not covering "next", I assume it is private
+XXX not covering memory management or deletion
+
+question API
+~~~~~~~~~~~~
+struct questionvariable has the following fields:
+- char *variable: name
+- char *value: value
+- struct questionvariable *: next variable or NULL
+
+XXX what are variables, and does anything use them?
+XXX only references I've seen are in db modules
+
+struct questionowner has the following fields:
+- char *owner: the owner
+- struct questionowner *next: next owner or NULL
+
+These are documented here because the serializer needs to be able
+to write all of them out. In general, nothing should directly modify
+those except via the APIs.
+
+struct question has the following public fields:
+
+* char *tag: the tag for this question
+* char *value: the value for this question
+* char *defaultvalue: the default value for this question
+* struct template *template: the template belonging to this question
+* unsigned int flags: XXX
+* struct questionvariable *variables: list of variables
+* struct questionowner *owners: list of owners
+
+XXX not documenting next/prev
+
+The following functions are supported:
+
+- struct question *question_new(const char *tag):
+  allocate and initialize a question
+- void question_setvalue(struct question *q, const char *value):
+  set the value of a question
+  (note that setvalue must *always* be called with non-translated choices)
+- void question_owner_add(struct question *q, const char *owner):
+  add an owner
+- void question_owner_delete(struct question *q, const char *owner)
+  remove an owner
+- const char *question_description(struct question *q):
+  return the description from the question template XXX who owns it?
+- const char *question_extended_description(struct question *q):
+  return the extended description from the question template XXX who owns it?
+- const char *question_choices_translated(struct question *q):
+  return the list of choices as a comma seperated string, if possible, 
+  translated
+- const char *question_choices(struct question *q):
+  return the list of choices as a comma seperated string
+- const char *question_defaultval(struct question *q):
+  return the default value (if in choices, *always* non-translated)
+
+XXX not dealing with variables
+XXX not dealing with memory management
+  
 Writing modules
 ~~~~~~~~~~~~~~~
 
@@ -106,7 +209,7 @@ struct templete *template_iterate(struct database *, void **iter):
     calling template_get() with the template's name.
 
 struct question *question_get(struct database *, const char *name):
-    Return a newly initialized question object, corresponding to the name.
+    Return a newly allocated question object, corresponding to the name.
 
 int question_set(struct database *, struct question *):
     Save the data about the question in the database.
@@ -161,4 +264,4 @@ you only need to override the ones you need.
 
 See modules/frontend/* for examples.
 
-$Id: modules.txt,v 1.3 2002/05/28 11:41:24 tfheen Exp $
+$Id: modules.txt,v 1.4 2002/05/28 12:36:57 moshez Exp $
