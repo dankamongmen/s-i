@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.45 2004/03/03 23:57:29 barbier Exp $
+ * $Id: newt.c,v 1.46 2004/03/04 00:26:24 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -154,12 +154,12 @@ get_text_height(const char *text, int win_width)
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
     wrappedtext = textwrap(&tw, text);
-    textbox = newtTextbox(TEXT_PADDING, 2, win_width - 4, 10, NEWT_FLAG_SCROLL);
+    textbox = newtTextbox(TEXT_PADDING, 2, win_width - 2 - 2*TEXT_PADDING, 10, NEWT_FLAG_SCROLL);
 #else
 
     // Create a dummy testbox to find out how many lines the text in the
     // question will occupy
-    textbox = newtTextbox(TEXT_PADDING, 2, win_width - 4, 10, NEWT_FLAG_SCROLL|NEWT_FLAG_WRAP);
+    textbox = newtTextbox(TEXT_PADDING, 2, win_width - 2 - 2*TEXT_PADDING, 10, NEWT_FLAG_SCROLL|NEWT_FLAG_WRAP);
 #endif
     assert(textbox);
     assert(text);
