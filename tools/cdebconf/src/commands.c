@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.32 2002/11/23 21:30:06 waldi Exp $
+ * $Id: commands.c,v 1.33 2002/11/23 22:29:42 waldi Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -334,9 +334,11 @@ int command_get(struct confmodule *mod, int argc, char **argv,
 	if (q == NULL)
 		snprintf(out, outsize, "%u %s does not exist",
 			CMDSTATUS_BADQUESTION, argv[1]);
-	else
+	else {
+		const char *value = question_getvalue(q, NULL);
 		snprintf(out, outsize, "%u %s",
-			CMDSTATUS_SUCCESS, question_getvalue(q, NULL));
+			CMDSTATUS_SUCCESS, value ? value : "");
+	}
 	question_deref(q);
 
 	return DC_OK;
@@ -595,7 +597,6 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	struct question *q;
-	const char *value;
 
 	CHECKARGC(== 2);
 	q = mod->questions->methods.get(mod->questions, argv[1]);
@@ -604,8 +605,8 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 	{
-		value = question_get_field(q, "", argv[2]);
-		snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, value);
+		const char *value = question_get_field(q, NULL, argv[2]);
+		snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, value ? value : "");
 	}
 
 	return DC_OK;
