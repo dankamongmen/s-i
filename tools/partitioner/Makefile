@@ -2,7 +2,7 @@
 CC = gcc
 CFLAGS = -Wall -O0 -g -ggdb
 LD = gcc
-LDFLAGS = -ldebconf -ldebian-installer -lparted -ldl
+LDFLAGS = -ldebconfclient -ldebian-installer -lparted -ldl
 
 all: partitioner
 
