@@ -13,27 +13,27 @@ fi
 mkdir -p /var/lib/apt-install
 touch $queue
 for pkg in $@ ; do
-    if ! grep -q "^$pkg$" $queue; then
-        echo "$pkg" >> $queue
-    fi
+	if ! grep -q "^$pkg$" $queue; then
+		echo "$pkg" >> $queue
+	fi
 done
 
 if [ ! -f /target/etc/apt/sources.list ] ; then
-    # The package was only queued, and will be installed by the
-    # postinst in base-installer.
-    exit 1 # Return error as the package is not ready to be used yet.
+	# The package was only queued, and will be installed by the
+	# postinst in base-installer.
+	exit 1 # Return error as the package is not ready to be used yet.
 fi
 
 # Try to enable proxy when using HTTP.  What about using ftp_proxy for
 # FTP sources?  (This code is in both apt-install and base-installer)
 RET=`debconf-get mirror/protocol || true`
 if [ "http" = "$RET" ]; then
-    # try to find http proxy
-    RET=`debconf-get mirror/http/proxy || true`
-    if [ "$RET" ] ; then
-	http_proxy="$RET"
-	export http_proxy
-    fi
+	# try to find http proxy
+	RET=`debconf-get mirror/http/proxy || true`
+	if [ "$RET" ] ; then
+		http_proxy="$RET"
+		export http_proxy
+	fi
 fi
 
 # Unset to avoid problems with packages using debconf.  This should
@@ -56,7 +56,7 @@ mountpoints > /tmp/mount.pre
 # Some packages (eg. the kernel-image package) require a mounted /proc/
 # Only mount it if it isn't mounted already
 if [ ! -f /target/proc/cmdline ] ; then
-    mount -t proc proc /target/proc
+	mount -t proc proc /target/proc
 fi
 
 DEBCONF_ADMIN_EMAIL="" \
@@ -69,11 +69,9 @@ chroot /target apt-get -y install $@ < /dev/null >> $log 2>&1
 for dir in $( (cat /tmp/mount.pre /tmp/mount.pre; mountpoints ) | \
 	     sort -r | uniq -c | grep "[[:space:]]1[[:space:]]" | \
 	     sed "s/[[:space:]]*[0-9][[:space:]]//"); do
-    if umount $dir ; then
-	:
-    else
-	logger -t apt-install "warning: Unable to umount '$dir'"
-    fi
+	if ! umount $dir ; then
+		logger -t apt-install "warning: Unable to umount '$dir'"
+	fi
 done
 
 rm -f /tmp/mount.pre
