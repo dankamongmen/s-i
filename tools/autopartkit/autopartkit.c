@@ -88,13 +88,6 @@
 #define MAX_PARTITIONS 10
 
 #define PART_SIZE_BYTE(device, part) ((part)->geom.length * (device)->sector_size)
- 
-/* Need to define on a per arch basis */
-#if defined(__i386__)
-#define DISK_LABEL "msdos"
-#else /* not __i386__ */
-#error "Default DISK_LABEL is not known on this platform"
-#endif /* not __i386__ */
 
 /* Write /etc/windows_part?
 #define WRITE_WINDOWS_PART
@@ -291,6 +284,31 @@ static void disable_kmsg(int disable)
 	fprintf(printk, "%s", level);
 	fclose(printk);
     }
+}
+
+/**
+ * Return a string representing the defalt partition type for the
+ * current hardware
+ */
+const char *
+default_disk_label()
+{
+    /* Need to define on a per arch basis */
+#if defined(__i386__)
+  return  "msdos";
+#elif defined(ia64)
+  return "msdos";
+#elif defined(hppa)
+  return"msdos";
+#elif defined(__mips__) && defined(__MIPSEL__)
+    return"msdos";
+#elif defined(__mips__) && defined(__MIPSEB__)
+/* Only supported in libparted 1.6.3? */
+    return "mips"; /* SGI disklabel */
+#else /* not __i386__ */
+#  error "Default DISK_LABEL is not known or not supported on this platform"
+    return 0;
+#endif /* not __i386__ */
 }
 
 /**
@@ -915,7 +933,7 @@ nuke_all_partitions(void)
     dev = ped_device_get_next(NULL);
     do {
         PedDisk *p;
-	p = ped_disk_new_fresh(dev, ped_disk_type_get(DISK_LABEL));
+	p = ped_disk_new_fresh(dev, ped_disk_type_get(default_disk_label()));
 #if defined(HAVE_PED_DISK_COMMIT) /* libparted 1.6 */
 	ped_disk_commit(p);
 #endif
