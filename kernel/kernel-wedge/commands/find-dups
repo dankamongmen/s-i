@@ -1,0 +1,18 @@
+#!/bin/sh -e
+# Find duplicate modules. Pass the kernel name.
+kernel=$1
+(
+	for dir in debian/*-modules-$kernel-di; do
+		cd $dir
+		find lib -type f -printf "$dir %p\n"
+		cd ../..
+	done
+) | sort -k2 | perl -ne '
+	while (<>) {
+		($d, $f)=split;
+		if ($f eq $lf) { print "$d $f\n$ld $lf\n"; $dups++ }
+		$lf=$f;
+		$ld=$d
+	}
+	die "some modules are in more than one package\n" if $dups;
+'

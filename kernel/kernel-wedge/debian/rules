@@ -1,0 +1,37 @@
+#!/usr/bin/make -f
+
+build:
+	dh_testdir
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
+
+binary-indep: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_install kernel-wedge usr/bin
+	dh_install kernel-names generic-rules package-list modules commands \
+	           usr/lib/kernel-wedge
+	dh_installchangelogs
+	dh_installdocs README TODO
+	dh_installexamples
+	dh_install
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_perl
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-arch: build
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

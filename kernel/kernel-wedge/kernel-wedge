@@ -1,0 +1,21 @@
+#!/bin/sh
+LIBDIR=/usr/lib/kernel-wedge/commands
+usage () {
+	echo "Usage: kernel-wedge command options"
+	echo "Commands:"
+	for file in $LIBDIR/*.txt; do
+		echo -n "	"
+		head -1 $file
+	done
+	exit 1
+}
+set -e
+command=$1
+shift 1 || true
+if [ -z "$command" ]; then
+	usage
+fi
+if [ ! -x "$LIBDIR/$command" ]; then
+	usage
+fi
+$LIBDIR/$command "$@"

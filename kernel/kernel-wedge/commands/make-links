@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+# Generate symlinks from .lnk files.
+foreach my $link (`find modules -type f -name \\*.lnk`) {
+	chomp $link;
+	my $file=$link;
+	$file=~s/\.lnk$//;
+	unlink $file || die "unlink $file: $!";
+	open (LINK, $link) || die "$link: $!\n";
+	my $target=<LINK>;
+	chomp $target;
+	$target=~s#^common/#/usr/lib/kernel-wedge/modules/#;
+	symlink($target, $file) || die "symlink $target $file: $!"
+}

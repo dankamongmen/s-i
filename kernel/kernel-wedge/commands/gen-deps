@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+# Generates from the package-list a dependency file, suitable to be fed to
+# tsort. The file has the base package name on the left, and the package it
+# depends on is on the right. It is sorted.
+
+my $arch=`dpkg-architecture -qDEB_HOST_ARCH`;
+chomp $arch;
+
+my $flavour=$ARGV[0];
+
+open(LIST, "/usr/lib/kernel-wedge/package-list") || die "package-list: $!";
+my $package;
+my @out;
+while (<LIST>) {
+	chomp;
+	next if /^#/;
+	
+	if (/^Package:\s*(.*)/) {
+		$package=$1;
+	}
+	elsif (/Depends:\s*(.*)/) {
+		my @depends=split(", ", $1);
+		# Skip packages that are not built for this architecture.
+		my $modlistdir="";
+		if (-d "modules/$arch-$flavour") {
+			$modlistdir="modules/$arch-$flavour";
+		}
+		elsif (-d "modules/$flavour") {
+			$modlistdir="modules/$flavour";
+		}
+		else {
+			$modlistdir="modules/$arch";
+		}
+		next unless -e "$modlistdir/$package";
+		foreach my $dep (@depends) {
+			# Skip depends that are not built for this
+			# architecture.
+			next unless -e "$modlistdir/$dep";
+			push @out, "$package\t$dep\n";
+		}
+	}
+}
+close LIST;
+
+print sort @out;

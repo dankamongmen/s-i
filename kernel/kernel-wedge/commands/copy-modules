@@ -1,0 +1,176 @@
+#!/bin/sh
+#
+# Copy modules into the right directories in preparation for building udebs.
+# This script is named after the its counterpart in the original
+# kernel-image-di package by Joey Hess <joeyh@debian.org>.
+#
+# Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
+#
+# Usage: copy-modules version flavour installedname
+
+set -e
+
+deplist() {
+	local deps=$1
+	local list=$2
+	
+	cp $list $tmpdir/work
+
+	# recursively append external dependencies to $list
+	while :; do
+
+		# list external dependencies of $work
+		join -o 2.2 $tmpdir/work $deps | sort -u | comm -23 - $list \
+			> $tmpdir/work.new
+		mv $tmpdir/work.new $tmpdir/work
+
+		# exit if work is empty
+		[ -s $tmpdir/work ] || break
+      
+		# append work to $list
+		sort -um -o $list $list $tmpdir/work
+	done
+}
+
+processmodules() {
+	local list=$1
+	local moddir=$2
+	
+	cp $list $tmpdir/work
+	local missing=0
+	(
+		while read file; do
+			if echo "$file" | grep -q -- '^#' || [ -z "$file" ]; then
+				continue
+			fi
+
+			if echo "$file" | grep -q -- '^-'; then
+				optional=1
+				file=$(echo $file | sed 's/^-//');
+			else
+				optional=0
+			fi
+			if [ -e $moddir/$file ]; then
+				echo $file
+			else
+				if [ "$optional" = 0 ]; then
+					echo "missing module $file" >&2
+					exit 1
+				fi
+			fi
+		done
+	) < $tmpdir/work > $list
+}
+
+version=$1-$2
+flavour=$2
+installedname=$3
+arch=$(dpkg-architecture -qDEB_HOST_ARCH)
+home=$PWD
+
+trap 'rm -rf $tmpdir' EXIT
+tmpdir=$(tempfile)
+rm $tmpdir
+mkdir $tmpdir
+
+# SOURCEDIR may be set externally to control where to copy from.
+if [ -n "$SOURCEDIR" ]; then
+	moddir=$SOURCEDIR/lib/modules/$installedname
+else
+	moddir=/lib/modules/$installedname
+fi
+
+if [ ! -d $moddir ]; then
+	echo "$moddir does not exist!" >&2
+fi
+	
+if [ "" != "`echo $version | grep ^2.2.`" ]; then
+	kernel_modules=""
+else
+	kernel_modules="/kernel"
+fi
+
+# The directory of modules lists to use.
+if [ -d modules/$arch-$flavour ]; then
+	modlistdir=modules/$arch-$flavour
+elif [ -d modules/$flavour ]; then
+	modlistdir=modules/$flavour
+else
+	modlistdir=modules/$arch
+fi
+
+# get module dependencies from modules.dep
+# sort it by field 2
+perl -lne '
+	@words=split(" ");
+	s!.*/kernel/!! foreach (@words);
+	if ($words[0] =~ /:$/) {
+		$words[0]=~s/:$//;
+		$module=$words[0];
+		if ($words[1]) {
+			print "$module\t$words[1]";
+		}
+	}
+	elsif ($words[0]) { # continuation
+		print "$module\t$words[0]";
+	}
+' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
+unset moddir_awk
+
+mkdir $tmpdir/module-deps $tmpdir/module-list
+
+# generate module interealationships from package-list file
+kernel-wedge gen-deps $flavour > $tmpdir/module-deps.packages
+
+# loop over all udebs, sort that all dependent modules are processed first
+for i in $(
+	{
+		find $modlistdir -maxdepth 1 \( -type f -or -type l \) -not -name '*.lnk' -printf "%f\t%f\n"
+		cat $tmpdir/module-deps.packages
+	} | tsort | tac
+); do
+	# write dependent (direct and indirect) udebs to exclude
+	# write dependencies to module-deps/$i
+	echo $i | join -o 2.2 - $tmpdir/module-deps.packages | { # dependent modules
+		cd $tmpdir/module-deps
+		xargs -r sh -c 'printf "%s\n" "$@"; cat "$@"' sh # direct and indirect deps
+	} | sort -u | tee $tmpdir/module-deps/$i | {	# write deps
+		cd $tmpdir/module-list
+		xargs -r cat
+	} | sort -u > $tmpdir/exclude			# modules to exclude
+	# Sort so that the joins work, no matter what the order of the
+	# input file.
+	sort $home/$modlistdir/$i > $tmpdir/module-list/$i
+
+	# exclude modules in exclude from dependency list
+	join -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |
+		sort -k 1,1 > $tmpdir/tmpdeps
+
+	# include dependent modules which are not in a
+	# dependent udeb into module-list/$i
+	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
+
+	# deal with modules marked as optional
+	processmodules $tmpdir/module-list/$i $moddir$kernel_modules
+
+	if [ -s $tmpdir/module-list/$i ]; then
+		# copy kernel modules to package build dir
+		cd $moddir$kernel_modules
+		ret=$( ( (
+			set +e
+			tar cfT - $tmpdir/module-list/$i
+			printf $? >&3
+		) | (
+			set +e
+			dir=$home/debian/$i-$version-di/lib/modules/$installedname$kernel_modules
+			mkdir -p $dir
+			cd $dir
+			tar xf -
+			printf $? >&3
+		) ) 3>&1)
+		if [ "$ret" != "00" ]; then
+			echo "tar failed" >&2
+			exit $ret
+		fi
+	fi
+done
