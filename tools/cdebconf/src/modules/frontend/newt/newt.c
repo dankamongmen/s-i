@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.5 2003/03/02 14:08:08 sjogren Exp $
+ * $Id: newt.c,v 1.6 2003/03/19 10:07:52 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -61,26 +61,7 @@
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
 
-static void
-init_and_cls(int scroll)
-{
-    int i, width = 80, height = 24;
-
-    newtInit();
-    if (scroll) {
-        newtGetScreenSize(&width, &height);
-        // Fill the screen so people can shift-pgup properly
-        for (i = 0; i < height; i++)
-            putchar('\n');
-    }
-    newtCls();
-}
-
-static newtComponent
-create_form(newtComponent scrollbar)
-{
-    return newtForm(scrollbar, NULL, 0);
-}
+#define create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
 
 static int
 get_text_height(const char *text, int win_width)
@@ -574,8 +555,14 @@ struct question_handlers {
 static int
 newt_initialize(struct frontend *obj, struct configuration *conf)
 {
+    int i, width = 80, height = 24;
+
     obj->interactive = 1;
-    init_and_cls(1);
+    newtInit();
+    newtGetScreenSize(&width, &height);
+    // Fill the screen so people can shift-pgup properly
+    for (i = 0; i < height; i++)
+        putchar('\n');
     newtFinished();
     return DC_OK;
 }
@@ -598,12 +585,17 @@ static int
 newt_go(struct frontend *obj)
 {
     struct question *q = obj->questions;
-    int i, ret = DC_OK;
+    int i, ret = DC_OK, cleared;
 
-    init_and_cls(0);
+    cleared = 0;
     while (q != NULL) {
         for (i = 0; i < DIM(question_handlers); i++)
             if (strcmp(q->template->type, question_handlers[i].type) == 0) {
+                if (!cleared) {
+                    cleared = 1;
+                    newtInit();
+                    newtCls();
+                }
                 ret = question_handlers[i].handler(obj, q);
                 if (ret == DC_OK)
                     obj->qdb->methods.set(obj->qdb, q);
@@ -618,7 +610,8 @@ newt_go(struct frontend *obj)
         if (ret == DC_OK)
             q = q->next;
     }
-    newtFinished();
+    if (cleared)
+        newtFinished();
     return DC_OK;
 }
 
@@ -642,7 +635,8 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     obj->progress_min = 0;
     obj->progress_max = max-min;
     obj->progress_cur = 0;
-    init_and_cls(0);
+    newtInit();
+    newtCls();
     newtGetScreenSize(&width, NULL);
     win_width = width-7;
     newtCenteredWindow(win_width, 5, title);
