@@ -173,7 +173,6 @@ do
 		fi
 	fi
 
-	db_fset ethdetect/cannot_find seen false
 	db_input high ethdetect/cannot_find
 	db_go || break
 

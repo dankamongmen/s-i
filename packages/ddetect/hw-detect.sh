@@ -75,7 +75,6 @@ load_module() {
 	local params=""
     
 	if [ "$PROMPT_MODULE_PARAMS" = 1 ]; then
-		db_fset hw-detect/module_params seen false
 		db_subst hw-detect/module_params MODULE "$module"
 		db_input low hw-detect/module_params || [ $? -eq 30 ]
 		db_go
@@ -109,7 +108,6 @@ load_module() {
 	else   
 		log "Error loading '$module'"
 		if [ "$module" != floppy ] && [ "$module" != ide-floppy ] && [ "$module" != ide-cd ]; then
-			db_fset hw-detect/modprobe_error seen false
 			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 			db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
 			db_go
@@ -333,7 +331,6 @@ db_progress STEP $OTHER_STEPSIZE
 # Ask which modules to install.
 db_subst hw-detect/select_modules list "$LIST"
 db_set hw-detect/select_modules "$LIST"
-db_fset hw-detect/select_modules seen false
 db_input medium hw-detect/select_modules || true
 db_go || exit 10 # back up
 db_get hw-detect/select_modules
@@ -683,7 +680,6 @@ if [ -n "$MISSING_MODULES_LIST" ]; then
 	log "Missing modules '$MISSING_MODULES_LIST"
 	# Tell the user to try to load more modules from floppy
 	template=hw-detect/missing_modules
-	db_fset "$template" seen false
 	db_subst "$template" MISSING_MODULES_LIST "$MISSING_MODULES_LIST" || true
 	db_input low "$template" || [ $? -eq 30 ]
 	db_go || true
