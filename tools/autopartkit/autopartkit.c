@@ -82,6 +82,10 @@
 /* Need to define on a per arch basis */
 #define DISK_LABEL "msdos"
 
+/* Write /etc/windows_part?
+#define WRITE_WINDOWS_PART
+*/
+
 /* Ignore devfs devices */
 #define IGNORE_DEVFS_DEVICES
  
@@ -443,6 +447,7 @@ DeviceStats* get_device_stats(PedDevice* dev)
 		}
 		ped_file_system_close(fs);
 
+#ifdef WRITE_WINDOWS_PART
 		/* Check if it's a windows bootable partition */
 		if (ped_partition_is_flag_available(part, boot_flag) &&
 		    ped_partition_get_flag(part, boot_flag))
@@ -451,6 +456,7 @@ DeviceStats* get_device_stats(PedDevice* dev)
 		    fprintf(winpart, "%s%d", dev->path, part->num);
 		    fclose(winpart);
 		}
+#endif
 	    }
 	}
     }
