@@ -119,11 +119,13 @@ rootdev="`sed -n -e '/^[^[:space:]]\+[[:space:]]\+\/target[[:space:]]/ { s/[[:sp
 [ "$rootdev" ] || die yaboot-installer/noroot 'No root partition found'
 
 # mkofboot needs proc in /target
-mkdir -p /target/proc || \
-    die yaboot-installer/mounterr 'Error creating /target/proc'
-mount -t proc none /target/proc || \
-    die yaboot-installer/mounterr 'Error mounting /target/proc'
-trap 'umount /target/proc' HUP INT QUIT KILL PIPE TERM EXIT
+if ! [ -e /target/proc/cmdline ]; then
+    mkdir -p /target/proc || \
+	die yaboot-installer/mounterr 'Error creating /target/proc'
+    mount -t proc proc /target/proc || \
+	die yaboot-installer/mounterr 'Error mounting /target/proc'
+    trap 'umount /target/proc' HUP INT QUIT KILL PIPE TERM EXIT
+fi
 
 # Probe for other OSes.
 
