@@ -49,3 +49,16 @@ ttyS*)
         > /target/etc/inittab
 ;;
 esac
+
+# Set up /dev/cdrom link to point to the device used for /media/cdrom0 in
+# /target; various programs including base-config want a /dev/cdrom.
+CDDEV=$(grep "[[:space:]]/media/cdrom0[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+if [ -z "$CDDEV" ]; then
+	CDDEV=$(grep "[[:space:]]/media/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+fi
+if [ -z "$CDDEV" ]; then
+	CDDEV=$(grep "[[:space:]]/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+fi
+if [ -n "$CDDEV" ] && [ -e "/target/$CDDEV" ]; then
+	ln -s "$CDDEV" /target/dev/cdrom
+fi
