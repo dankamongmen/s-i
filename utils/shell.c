@@ -16,9 +16,8 @@ shell_main (int argc __attribute__((unused)), char **argv __attribute__((unused)
   struct debconfclient *client;
   client = debconfclient_new ();
 
-  client->command (client, "input", "medium", "di-utils-shell/do-shell",
-		   NULL);
-  client->command (client, "go", NULL);
+  debconf_input (client, "medium", "di-utils-shell/do-shell");
+  debconf_go (client);
 
   if ((dup2 (DEBCONF_OLD_STDIN_FD, 0) == -1)
       || (dup2 (DEBCONF_OLD_STDOUT_FD, 1) == -1)

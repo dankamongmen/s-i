@@ -146,7 +146,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	char buf[256], *menu, *s;
 	int menu_size, menu_used, size;
 
-	debconf->command(debconf, "GET", "debian-installer/language", NULL);
+	debconf_get(debconf,"debian-installer/language");
 	if (language)
 		free(language);
 	if (debconf->value)
@@ -199,17 +199,17 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	di_slist_free(list);
 
 	/* Make debconf show the menu and get the user's choice. */
-	debconf->command(debconf, "SETTITLE", "debian-installer/main-menu-title", NULL);
-	debconf->command(debconf, "CAPB", NULL);
-	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
-	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menu, NULL);
+	debconf_settitle(debconf, "debian-installer/main-menu-title");
+	debconf_capb(debconf);
+	debconf_fset(debconf,  MAIN_MENU, "seen", "false");
+	debconf_subst(debconf, MAIN_MENU, "MENU", menu);
 	if (menudefault) {
 		menu_entry(debconf, language, menudefault, buf, sizeof (buf));
-		debconf->command(debconf, "SET", MAIN_MENU, buf, NULL);
+		debconf_set(debconf, MAIN_MENU, buf);
 	}
-	debconf->command(debconf, "INPUT", "medium", MAIN_MENU, NULL);
-	debconf->command(debconf, "GO", NULL);
-	debconf->command(debconf, "GET", MAIN_MENU, NULL);
+	debconf_input(debconf, "medium", MAIN_MENU);
+	debconf_go(debconf);
+	debconf_get(debconf, MAIN_MENU);
 	s = strdup(debconf->value);
 	
 	/* Figure out which menu item was selected. */
@@ -242,7 +242,7 @@ static int satisfy_virtual(di_system_package *p) {
 	size_t menu_size, menu_used, size;
 	int is_menu_item = 0;
 
-	debconf->command(debconf, "GET", "debian-installer/language", NULL);
+	debconf_get(debconf, "debian-installer/language");
 	if (debconf->value)
 		language = strdup(debconf->value);
 
@@ -309,24 +309,20 @@ static int satisfy_virtual(di_system_package *p) {
 		if (is_menu_item) {
 			char *priority = "medium";
 			/* Only let the user choose if one of them is a menu item */
-			debconf->command(debconf, "FSET", MISSING_PROVIDE, "seen",
-					"false", NULL);
+			debconf_fset(debconf, MISSING_PROVIDE, "seen", "false");
 			if (defpkg != NULL) {
 				menu_entry(debconf, language, defpkg, buf, sizeof(buf));
-				debconf->command(debconf, "SET",
-						 MISSING_PROVIDE, buf, NULL);
+				debconf_set(debconf, MISSING_PROVIDE, buf);
 			} else
 				/* TODO: How to figure out a default? */
 				priority = "critical";
-			debconf->command(debconf, "CAPB backup", NULL);
-			debconf->command(debconf, "SUBST", MISSING_PROVIDE,
-					"CHOICES", menu, NULL);
-			debconf->command(debconf, "INPUT", priority, MISSING_PROVIDE,
-					NULL);
-			if (debconf->command(debconf, "GO", NULL) != 0)
+			debconf_capb(debconf, "backup");
+			debconf_subst(debconf, MISSING_PROVIDE, "CHOICES", menu);
+			debconf_input(debconf, priority, MISSING_PROVIDE);
+			if (debconf_go(debconf) != 0)
 				return 0;
-			debconf->command(debconf, "CAPB", NULL);
-			debconf->command(debconf, "GET", MISSING_PROVIDE, NULL);
+			debconf_capb(debconf);
+			debconf_get(debconf, MISSING_PROVIDE);
 			s = strdup(debconf->value);
 		}
 		/* Go through the dependencies again */
@@ -355,7 +351,7 @@ static int satisfy_virtual(di_system_package *p) {
 }
 
 static void update_language (void) {
-	debconf->command(debconf, "GET", "debian-installer/language", NULL);
+	debconf_get(debconf, "debian-installer/language");
 	if (*debconf->value != 0)
 		setenv("LANGUAGE", debconf->value, 1);
 }
@@ -423,7 +419,7 @@ static char *debconf_priorities[] =
 static void modify_debconf_priority (int raise_or_lower) {
 	int pri;
 	const char *template = "debconf/priority";
-	debconf->command(debconf, "GET", template, NULL);
+	debconf_get(debconf, template);
 	if ( ! debconf->value )
 		pri = 1;
 	else
@@ -446,15 +442,14 @@ static void modify_debconf_priority (int raise_or_lower) {
 			debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
 		local_priority = pri;
 	    
-		debconf->command(debconf, "SET", template,
-				 debconf_priorities[pri], NULL);
+		debconf_set(debconf, template, debconf_priorities[pri]);
 	}
 }
 	
 static void adjust_default_priority (void) {
 	int pri;
 	const char *template = "debconf/priority";
-	debconf->command(debconf, "GET", template, NULL);	
+	debconf_get(debconf,  template);	
 	if ( ! debconf->value )
 		pri = 1;
 	else

@@ -99,12 +99,12 @@ void display_stderr_log(const char *package) {
 		while ((p = strchr(ret, '\n')))
 			p[0]=' ';
 	
-		debconf->command(debconf, "SUBST", titletemplate, "PACKAGE", package, NULL);
-		debconf->command(debconf, "SETTITLE",  titletemplate, NULL);
-		debconf->command(debconf, "SUBST", template, "PACKAGE", package, NULL);
-		debconf->command(debconf, "SUBST", template, "ERROR", ret, NULL);
-		debconf->command(debconf, "INPUT", "high", template, NULL);
-		debconf->command(debconf, "GO", NULL);
+		debconf_subst(debconf, titletemplate, "PACKAGE", package);
+		debconf_settitle(debconf, titletemplate);
+		debconf_subst(debconf, template, "PACKAGE", package);
+		debconf_subst(debconf, template, "ERROR", ret);
+		debconf_input(debconf, "high", template);
+		debconf_go(debconf);
 
 		fclose(f);
 		unlink(STDERR_LOG);
