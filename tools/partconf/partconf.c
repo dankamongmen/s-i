@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -439,7 +440,7 @@ streqcomma(const char *s1, const char *s2)
         s1++;
         s2++;
     }
-    return 1;
+    return *s1 == *s2;
 }
 
 static int
@@ -554,6 +555,7 @@ fixup(void)
     return 0;
 }
 
+#ifndef TEST
 int
 main(int argc, char *argv[])
 {
@@ -617,3 +619,11 @@ main(int argc, char *argv[])
         ret = 30;
     return ret;
 }
+#else
+int
+main(int argc, char **argv)
+{
+    assert(!streqcomma("foo", "foobar"));
+    return 0;
+}
+#endif

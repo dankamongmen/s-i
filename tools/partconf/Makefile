@@ -31,10 +31,14 @@ small: clean partconf find-partitions mkfstab
 test-mkfstab: mkfstab.c mkfstab.h
 	$(CC) $(CFLAGS) -o test-mkfstab -DTEST mkfstab.c $(LIBS) -ldebian-installer
 
-check: test-mkfstab
+test-partconf: find-parts.o partconf.c partconf.h util.o
+	$(CC) $(CFLAGS) -o test-partconf -DTEST partconf.c find-parts.o util.o $(LIBS) -ldebian-installer
+
+check: test-mkfstab test-partconf
 	./test-mkfstab
+	./test-partconf
 
 clean:
-	-rm -f partconf find-partitions mkfstab test-mkfstab *.o
+	-rm -f partconf find-partitions mkfstab test-mkfstab test-partconf *.o
 
 .PHONY: all check clean small
