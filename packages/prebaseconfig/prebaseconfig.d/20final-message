@@ -3,6 +3,15 @@
 set -e
 . /usr/share/debconf/confmodule
 
+if [ "`udpkg --print-architecture`" = mips ]; then
+    db_get debian-installer/kernel/subarchitecture
+    case "$RET" in
+    # SGI mips is already handled by arcboot-installer
+    *-ip??) exit 0 ;;
+    *) : ;;
+    esac
+fi
+
 db_capb backup
 db_input critical prebaseconfig/reboot_in_progress || [ $? -eq 30 ]
 if ! db_go ; then
