@@ -5,6 +5,7 @@ if [ -e /proc/bus/pci/devices ]; then
 
 	OHCI=no
 	UHCI=no
+	EHCI=no
 
 	# Probe for OHCI first
 	while read REPLY ; do 
@@ -18,6 +19,12 @@ if [ -e /proc/bus/pci/devices ]; then
 			UHCI=yes
 		fi
 	done  <  /usr/lib/usb-discover/uhci-pci.lst 
+
+	while read REPLY ; do 
+		if  grep -q $REPLY /proc/bus/pci/devices ; then
+			EHCI=yes
+		fi
+	done  <  /usr/lib/usb-discover/ehci-pci.lst 
 
 	kver=`uname -r | cut -d. -f1,2` # Kernel version (e.g. 2.4)
 	
@@ -35,8 +42,10 @@ if [ -e /proc/bus/pci/devices ]; then
 			modprobe usb-uhci
 		fi
 	fi
-
-	# TODO ehci?
+	if [ "$EHCI" = yes ] ; then
+		# Same in 2.4 and 2.6
+		modprobe ehci-hcd
+	fi
 
 	if [ "$kver" = 2.6 ]; then
 		modprobe usbkbd || true
