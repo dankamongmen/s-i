@@ -178,6 +178,7 @@ distribute_partitions(struct disk_info_t diskinfo[],
 		    newsize = reqs[j].max_blk;
 
 		/* We know the new size.  Activate it */
+		total_wanted -= reqs[j].max_blk - reqs[j].min_blk;
 		diskinfo[i].freespace -= newsize - reqs[j].blocks;
 		reqs[j].blocks = newsize;
 	    }
