@@ -14,6 +14,10 @@ PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
 CFLAGS = -Wall -W -Os
 
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -g
+endif
+
 export CFLAGS
 
 # This is the debhelper compatability version to use.
