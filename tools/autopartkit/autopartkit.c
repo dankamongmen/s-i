@@ -59,6 +59,9 @@
  *    on /target and write the entries in /target/etc/fstab.
  *
  */
+
+#include "config.h"
+
 #define _GNU_SOURCE /* To enable vasprintf() */
 #include <stdio.h>
 #include <stdarg.h>
@@ -990,7 +993,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
 	dev_tmp = ped_device_get(req_tmp->curdisk->path);
 	assert(dev_tmp);
-	disk_maybe = ped_disk_open(dev_tmp);
+	disk_maybe = ped_disk_new(dev_tmp);
 
 	autopartkit_log(1, "  creating in free area %lld-%lld\n",
 			req_tmp->curdisk->geom.start,
