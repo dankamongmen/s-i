@@ -79,6 +79,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
+#include <syslog.h>
 #include <assert.h>
 
 #include "autopartkit.h"
@@ -222,15 +223,11 @@ static int mydebconf_bool(char *priority, char *template)
 void autopartkit_log(const int level, const char * format, ...)
 {
     int LOGLIMIT = 1;
-    FILE* log;
     va_list ap;
-    log = fopen(LOGFILE, "a");
 
+    openlog("autopartkit", LOG_PID, LOG_USER);
     va_start(ap, format);
-    if (log) {
-        vfprintf(log, format, ap);
-        fclose(log);
-    }
+    vsyslog(LOG_DEBUG, format, ap);
     va_end(ap);
 }
 static void autopartkit_confirm(void)
