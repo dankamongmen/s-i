@@ -5,6 +5,8 @@ umount /initrd/dev
 umount /initrd
 freeramdisk /dev/rd/0
 
+modprobe -l '*unix*' | grep -q unix && modprobe unix
+
 echo -n "Starting system log daemon: "
 /sbin/syslogd -m 0 -O /var/log/syslog
 echo -n "syslogd, "
