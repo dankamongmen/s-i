@@ -15,7 +15,8 @@ usage() {
 }
 
 initialise() {
-GATHER_STRINGS_SCRIPT=./msgstr_extract.awk
+GATHER_MSGSTR_SCRIPT=./msgstr_extract.awk
+GATHER_MSGID_SCRIPT=./msgid_extract.awk
 
 ALL_STRINGS=$DEST_DIR/${LANG}_all.txt
 NO_VARS=$DEST_DIR/1_no_vars_${LANG}
@@ -30,8 +31,13 @@ if [ ! -d $DI_COPY ] ; then
     exit 1
 fi
 
-if [ ! -f $GATHER_STRINGS_SCRIPT ] ; then
-    echo "$GATHER_STRINGS_SCRIPT does not exist. You need it!"
+if [ ! -f $GATHER_MSGSTR_SCRIPT ] ; then
+    echo "$GATHER_MSGSTR_SCRIPT does not exist. You need it!"
+    exit 1
+fi
+
+if [ ! -f $GATHER_MSGID_SCRIPT ] ; then
+    echo "$GATHER_MSGID_SCRIPT does not exist. You need it!"
     exit 1
 fi
 
@@ -110,8 +116,15 @@ fi
 rm -f $ALL_STRINGS
 for LANG_FILE in `find $DI_COPY -name "$LANG.po"`; do
     ENC=`cat $LANG_FILE | grep -e "^\"Content-Type:" | sed 's:^.*charset=::' | sed 's:\\\n\"::'`
-    awk -f $GATHER_STRINGS_SCRIPT $LANG_FILE | iconv --from $ENC --to utf-8 >> $ALL_STRINGS
+    awk -f $GATHER_MSGSTR_SCRIPT $LANG_FILE | iconv --from $ENC --to utf-8 >> $ALL_STRINGS
 done
+
+# "en" lang is made of various "templates.pot" and "en.po" 
+if [ $LANG = en ] ; then
+    for LANG_FILE in `find $DI_COPY -name "templates.pot"`; do
+	awk -f $GATHER_MSGID_SCRIPT $LANG_FILE >> $ALL_STRINGS
+    done
+fi
 
 # Remove ${HOME} from the "*** path_of_po_file" string
 cat $ALL_STRINGS | sed "s:\(.*\)${HOME}\(.*\):\1\2:" > $DEST_DIR/no_home.txt

@@ -7,8 +7,7 @@
 # Author: Davide Viti <zinosat@tiscali.it> 2005, for the Debian Project
 #
 
-PATH=~/aspell:~/gnuplot/bin:$PATH
-export PATH
+export PATH=~/aspell:~/gnuplot/bin:$PATH
 
 LOCAL_REPOSITORY=~/debian-installer
 OUT_DIR=~/public_html/spellcheck/
@@ -27,17 +26,18 @@ LATEST=`ls -l $OUT_DIR/latest | sed "s:.*-> ::"`
 SAVED_STATS=`echo ${NEW}.txt | sed "s:check_:stats_:"`
 
 rm $OUT_DIR/previous
-rm -r $OUT_DIR/$PREVIOUS
-
 rm $OUT_DIR/latest
 
 ln -s $OUT_DIR/$NEW    $OUT_DIR/latest
-ln -s $OUT_DIR/$LATEST $OUT_DIR/previous
+ln -s $LATEST          $OUT_DIR/previous
 
-cp $OUT_DIR/$NEW/stats.txt $OUT_DIR/history/$SAVED_STATS
-mv $OUT_DIR/$NEW/index.html $OUT_DIR
+# purge old entry
+rm -fr $PREVIOUS
+
+cp $OUT_DIR/latest/stats.txt $OUT_DIR/history/$SAVED_STATS
+mv $OUT_DIR/latest/index.html $OUT_DIR
 
 echo ""
 echo "***  $SAVED_STATS  ***"
 
-sh diff_stats.sh $OUT_DIR/$LATEST/stats.txt $OUT_DIR/$NEW/stats.txt
+sh diff_stats.sh $OUT_DIR/previous/stats.txt $OUT_DIR/latest/stats.txt
