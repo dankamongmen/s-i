@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.56 2004/01/25 23:52:05 barbier Exp $
+ * $Id: text.c,v 1.57 2004/03/08 08:06:50 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -99,24 +99,22 @@ static const int getwidth(void)
  */
 static const int getheight(void)
 {
-  static int res = 25;
-  static int inited = 0;
+	static int res = 25;
+	static int inited = 0;
 
-  if (inited == 0) {
-    int fd;
+	if (inited == 0) {
+		int fd;
 
-    inited = 1;
-    if ((fd = open("/dev/tty", O_RDONLY)) > 0) {
-      struct winsize ws;
+		inited = 1;
+		if ((fd = open("/dev/tty", O_RDONLY)) > 0) {
+			struct winsize ws;
+			if (ioctl(fd, TIOCGWINSZ, &ws) == 0 && ws.ws_row > 0)
+				res = ws.ws_row;
+			close(fd);
+		}
+	}
 
-      if (ioctl(fd, TIOCGWINSZ, &ws) == 0 && ws.ws_row > 0)
-	res = ws.ws_row;
-
-      close(fd);
-    }
-  }
-
-  return res;
+	return res;
 }
 
 /*
@@ -205,18 +203,18 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	 */
 	do {
 		if (defval == NULL) {
-		        if (obj->methods.can_go_back(obj, q))
-		                printf(get_text(obj, "debconf/prompt-yes-no-cancel", "Prompt: Yes/No/Cancel> "));
-		        else
-		                printf(get_text(obj, "debconf/prompt-yes-no", "Prompt: Yes/No> "));
+			if (obj->methods.can_go_back(obj, q))
+				printf(get_text(obj, "debconf/prompt-yes-no-cancel", "Prompt: Yes/No/Cancel> "));
+		else
+			printf(get_text(obj, "debconf/prompt-yes-no", "Prompt: Yes/No> "));
 		} else {
-	                if (obj->methods.can_go_back(obj, q))
-		                printf(get_text(obj, "debconf/prompt-yes-no-cancel-default", "Prompt: Yes/No/Cancel, default=%s> "),
+			if (obj->methods.can_go_back(obj, q))
+				printf(get_text(obj, "debconf/prompt-yes-no-cancel-default", "Prompt: Yes/No/Cancel, default=%s> "),
 					(def == 0 ? get_text(obj, "debconf/yes", "Yes") : get_text(obj, "debconf/no", "No")));
-                        else
-		                printf(get_text(obj, "debconf/prompt-yes-no-default", "Prompt: Yes/No, default=%s> "),
+			else
+				printf(get_text(obj, "debconf/prompt-yes-no-default", "Prompt: Yes/No, default=%s> "),
 					(def == 0 ? get_text(obj, "debconf/yes", "Yes") : get_text(obj, "debconf/no", "No")));
-                }
+		}
 		fgets(buf, sizeof(buf), stdin);
 		CHOMP(buf);
 		if (strcasecmp(buf, get_text(obj, "debconf/cancel", "Cancel")) == 0)
@@ -255,78 +253,78 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char *selected;
 	char answer[4096] = {0};
 	int i, j, line, count = 0, dcount, choice;
-        int *tindex = NULL;
-        const char *indices = q_get_indices(q);
+	int *tindex = NULL;
+	const char *indices = q_get_indices(q);
 
-    count = strgetargc(q_get_choices_vals(q));
-    if (count <= 0)
-        return DC_NOTOK;
-    choices = malloc(sizeof(char *) * count);
-    choices_translated = malloc(sizeof(char *) * count);
-    tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
-        return DC_NOTOK;
+	count = strgetargc(q_get_choices_vals(q));
+	if (count <= 0)
+		return DC_NOTOK;
+	choices = malloc(sizeof(char *) * count);
+	choices_translated = malloc(sizeof(char *) * count);
+	tindex = malloc(sizeof(int) * count);
+	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+		return DC_NOTOK;
 
-    defaults = malloc(sizeof(char *) * count);
-    dcount = strchoicesplit(question_getvalue(q, ""), defaults, count);
-    selected = calloc(1, sizeof(char) * count);
+	defaults = malloc(sizeof(char *) * count);
+	dcount = strchoicesplit(question_getvalue(q, ""), defaults, count);
+	selected = calloc(1, sizeof(char) * count);
 
 	for (j = 0; j < dcount; j++)
 		for (i = 0; i < count; i++) {
 			if (strcmp(choices[tindex[i]], defaults[j]) == 0)
 				selected[tindex[i]] = 1;
-                }
+		}
 
 	i = 0;
 
 	while (1) {
- 	    if (i < 0)
- 	        i = 0;
- 	    for (line = 0; i < count && line < getheight()-1; i++, line++) {
-	        if (selected[tindex[i]])
-		       /* A selected item in a Multiselect question */
-	               printf(get_text(obj, "debconf/multiselect-selected", "%3d. %s (selected)"), i+1, choices_translated[i]);
-                else
-	               printf("%3d. %s", i+1, choices_translated[i]);
-	        printf("\n");
-	    }
+		if (i < 0)
+ 			i = 0;
+		for (line = 0; i < count && line < getheight()-1; i++, line++) {
+			if (selected[tindex[i]])
+				/* A selected item in a Multiselect question */
+				printf(get_text(obj, "debconf/multiselect-selected", "%3d. %s (selected)"), i+1, choices_translated[i]);
+			else
+				printf("%3d. %s", i+1, choices_translated[i]);
+			printf("\n");
+		}
 
-	    if (i == count && count < getheight()-1) {
-	        printf(get_text(obj, "debconf/prompt-1-page", 
-			        "Prompt: 1 - %d, q to quit select> "), count);
-	    } else if (i == count) {
-	        printf(get_text(obj, "debconf/prompt-last-page",
-			        "Prompt: 1 - %d, q to quit select, b to back up> "), count);
-	    } else if (i == getheight()-1) {
-	        printf(get_text(obj, "debconf/prompt-first-page", 
-			        "Prompt: 1 - %d/%d, q to quit select, n for next page> "), i, count);
-	    } else {
-	        printf(get_text(obj, "debconf/prompt-multi-page", 
-			        "Prompt: 1 - %d/%d, q to quit select, b to back up, n for next page> "), i, count);
-	    }
+		if (i == count && count < getheight()-1) {
+			printf(get_text(obj, "debconf/prompt-1-page", 
+				"Prompt: 1 - %d, q to quit select> "), count);
+		} else if (i == count) {
+			printf(get_text(obj, "debconf/prompt-last-page",
+				"Prompt: 1 - %d, q to quit select, b to back up> "), count);
+		} else if (i == getheight()-1) {
+			printf(get_text(obj, "debconf/prompt-first-page", 
+				"Prompt: 1 - %d/%d, q to quit select, n for next page> "), i, count);
+		} else {
+			printf(get_text(obj, "debconf/prompt-multi-page", 
+				"Prompt: 1 - %d/%d, q to quit select, b to back up, n for next page> "), i, count);
+		}
 
-	    fgets(answer, sizeof(answer), stdin);
-	    CHOMP(answer);
-	    MAKE_UPPER(answer[0]); 
-	                       /* q to quit select */
-	    if (answer[0] == *(get_text(obj,"debconf/quit-key", "Q")))
-                    break;
-	                       /* n for next page */
-	    if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
-                    continue;
-	                       /* b to back up */
-	    if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
-	            { i -= 2*(getheight()-1); continue; }
-
-	    choice = atoi(answer) - 1;
-
-	    if (choice >= 0 && choice < count) {
-	        if (selected[tindex[choice]] == 0) 
-	            selected[tindex[choice]] = 1;
-	        else
-	            selected[tindex[choice]] = 0;
-	        i = choice-getheight()+2 > 0 ? choice-getheight()+2 : 0;
-	    }
+		fgets(answer, sizeof(answer), stdin);
+		CHOMP(answer);
+		MAKE_UPPER(answer[0]); 
+		/* q to quit select */
+		if (answer[0] == *(get_text(obj,"debconf/quit-key", "Q")))
+			break;
+		/* n for next page */
+		if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
+			continue;
+		/* b to back up */
+		if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
+			{ i -= 2*(getheight()-1); continue; }
+		
+		choice = atoi(answer) - 1;
+		
+		if (choice >= 0 && choice < count) {
+			if (selected[tindex[choice]] == 0) 
+				selected[tindex[choice]] = 1;
+			else
+				selected[tindex[choice]] = 0;
+			i = choice-getheight()+2 > 0 ? choice-getheight()+2 : 0;
+		}
 	}
 
 	answer[0] = 0;
@@ -341,13 +339,13 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 		free(choices[i]);
 		free(choices_translated[i]);
 	}
-        free(tindex);
-        free(choices);
-        free(choices_translated);
-        free(selected);
+	free(tindex);
+	free(choices);
+	free(choices_translated);
+	free(selected);
 	for (i = 0; i < dcount; i++)
 		free(defaults[i]);
-        free(defaults);
+	free(defaults);
 	question_setvalue(q, answer);
 	
 	return DC_OK;
@@ -373,7 +371,7 @@ static int texthandler_note(struct frontend *obj, struct question *q)
 		c = fgetc(stdin);
 		MAKE_UPPER(c); 
 		if ((obj->methods.can_go_back (obj, q)) &&  
-		            /*  Cancel key */ 
+			/*  Cancel key */ 
 		    (c == *(get_text(obj, "debconf/cancel-key", "C"))))
 			return DC_GOBACK;
 	} while (c != '\r' && c != '\n');
@@ -435,18 +433,18 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	const char *indices = q_get_indices(q);
 
 	count = strgetargc(q_get_choices_vals(q));
-        if (count <= 0)
-        	return DC_NOTOK;
+	if (count <= 0)
+		return DC_NOTOK;
 	choices = malloc(sizeof(char *) * count);
 	choices_translated = malloc(sizeof(char *) * count);
 	tindex = malloc(sizeof(int) * count);
 	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
-        	return DC_NOTOK;
+		return DC_NOTOK;
 
 	if (count == 1)
 		defval = choices[0];
 
-        /* fprintf(stderr,"In texthandler_select, count is: %d\n", count);*/
+	/* fprintf(stderr,"In texthandler_select, count is: %d\n", count);*/
 	if (defval != NULL)
 	{
 		for (i = 0; i < count; i++)
@@ -458,49 +456,49 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	choice = -1;
 
 	do {
- 	    if (i < 0)
- 	        i = 0;
-	    for (line = 0; i < count && line < getheight()-1; i++, line++) {
-	        if (def == i)
-		       /* A selected item in a Select question */
-	               printf(get_text(obj, "debconf/select-default", "%3d. %s (default)"), i+1, choices_translated[i]);
-		else
-	               printf("%3d. %s", i+1, choices_translated[i]);
-	        printf("\n");
-	    }
+		if (i < 0)
+			i = 0;
+		for (line = 0; i < count && line < getheight()-1; i++, line++) {
+			if (def == i)
+				/* A selected item in a Select question */
+				printf(get_text(obj, "debconf/select-default", "%3d. %s (default)"), i+1, choices_translated[i]);
+			else
+				printf("%3d. %s", i+1, choices_translated[i]);
+			printf("\n");
+		}
  
-	    if (i == count) {
-	        if (def >= 0 && choices_translated[def]) {
-	            printf(get_text(obj, "debconf/prompt-num-with-default", "Prompt: 1 - %d, default=%s> "), 
-				    count, choices_translated[def]);
-	        } else {
-	            printf(get_text(obj, "debconf/prompt-num", "Prompt: 1 - %d> "), count);
-                }
-	    } else if (i == getheight()-1) {
-	        printf(get_text(obj, "debconf/prompt-firstpage", "Prompt: 1 - %d/%d, n for next page> "),
+		if (i == count) {
+			if (def >= 0 && choices_translated[def]) {
+				printf(get_text(obj, "debconf/prompt-num-with-default", "Prompt: 1 - %d, default=%s> "), 
+					count, choices_translated[def]);
+			} else {
+				printf(get_text(obj, "debconf/prompt-num", "Prompt: 1 - %d> "), count);
+			}
+		} else if (i == getheight()-1) {
+			printf(get_text(obj, "debconf/prompt-firstpage", "Prompt: 1 - %d/%d, n for next page> "),
 				i, count);
-	    } else {
-	        printf(get_text(obj, "debconf/prompt-multipage", "Prompt: 1 - %d/%d, b to back up, n for next page> "),
+		} else {
+			printf(get_text(obj, "debconf/prompt-multipage", "Prompt: 1 - %d/%d, b to back up, n for next page> "),
 				i, count);
-	    }
-	    fgets(answer, sizeof(answer), stdin);
-	    CHOMP(answer);
-	    MAKE_UPPER(answer[0]); 
-	                       /* n for next page */
-	    if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
-                    continue;
-	                       /* b to back up */
-	    if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
-	            { i -= 2*(getheight()-1); continue; }
+		}
+		fgets(answer, sizeof(answer), stdin);
+		CHOMP(answer);
+		MAKE_UPPER(answer[0]); 
+		/* n for next page */
+		if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
+			continue;
+		/* b to back up */
+		if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
+			{ i -= 2*(getheight()-1); continue; }
 
 #if defined(__s390__) || defined (__s390x__)
-	    if (answer[0] == 0 || (answer[0] == '.' && answer[1] == 0))
+		if (answer[0] == 0 || (answer[0] == '.' && answer[1] == 0))
 #else
-	    if (answer[0] == 0)
+		if (answer[0] == 0)
 #endif
-	        choice = def;
-	    else
-	        choice = atoi(answer) - 1;
+			choice = def;
+		else
+			choice = atoi(answer) - 1;
 	} while (choice < 0 || choice >= count);
 	/*	fprintf(stderr,"In %s, line: %d\n\tanswer: %s, choice[choice]: %s\n",
 		__FILE__,__LINE__,answer, choices[choice - 1]);*/
@@ -510,9 +508,9 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 		free(choices[i]);
 		free(choices_translated[i]);
 	}
-        free(tindex);
-        free(choices);
-        free(choices_translated);
+	free(tindex);
+	free(choices);
+	free(choices_translated);
 	
 	return DC_OK;
 }
@@ -561,11 +559,12 @@ static int texthandler_text(struct frontend *obj, struct question *q)
 	char buf[1024];
 	int sz = 1;
 
-        out = malloc(sz);
+	out = malloc(sz);
 	printf("%s\n", get_text(obj, "debconf/enter-line", "Enter . on a line by itself when you are done"));
 	while (fgets(buf, sizeof(buf), stdin))
 	{
-		if (strcmp(buf, ".\n") == 0) break;
+		if (strcmp(buf, ".\n") == 0)
+			break;
 		sz += strlen(buf);
 		out = realloc(out, sz);
 		memcpy(out + sz - strlen(buf) - 1, buf, strlen(buf));
@@ -614,7 +613,7 @@ struct question_handlers {
 	{ "select",	texthandler_select },
 	{ "string",	texthandler_string },
 	{ "text",	texthandler_text },
-        { "error",      texthandler_error },
+	{ "error",	texthandler_error },
 };
 
 /*
@@ -649,8 +648,7 @@ static int text_go(struct frontend *obj)
 	int ret;
 	int display_title = 1;
 
-        for (; q != 0; q = q->next) 
-	{
+	for (; q != 0; q = q->next) {
 		for (i = 0; i < DIM(question_handlers); i++) {
 			if (strcmp(q->template->type, question_handlers[i].type) == 0) 
 			{
@@ -668,7 +666,7 @@ static int text_go(struct frontend *obj)
 					return ret;
 				break;
 			}
-                }
+		}
 	}
 
 	return DC_OK;
@@ -676,61 +674,61 @@ static int text_go(struct frontend *obj)
 
 static void text_progress_start(struct frontend *ui, int min, int max, const char *title)
 {
-    DELETE(ui->progress_title);
+	DELETE(ui->progress_title);
 	ui->progress_title = STRDUP(title);
-    ui->progress_min = min;
-    ui->progress_max = max;
-    ui->progress_cur = min;
+	ui->progress_min = min;
+	ui->progress_max = max;
+	ui->progress_cur = min;
 
-    printf("%s\n", title);
+	printf("%s\n", title);
 }
 
 static void text_progress_set(struct frontend *ui, int val)
 {
-    char out[256];
+	char out[256];
 
-    ui->progress_cur = val;
+	ui->progress_cur = val;
 
-    snprintf(out, sizeof(out), "[%5.1f%%]",
-        (double)(ui->progress_cur - ui->progress_min) / 
-        (double)(ui->progress_max - ui->progress_min) * 100.0);
+	snprintf(out, sizeof(out), "[%5.1f%%]",
+		(double)(ui->progress_cur - ui->progress_min) / 
+		(double)(ui->progress_max - ui->progress_min) * 100.0);
 
-    printf("\r%s", out);
-    fflush(stdout);
+	printf("\r%s", out);
+	fflush(stdout);
 }
 
 static void text_progress_info(struct frontend *ui, const char *info)
 {
-    int width = getwidth(), i;
-    char out[256];
+	int width = getwidth(), i;
+	char out[256];
 
-    ui->methods.progress_step(ui, 0);
-    strncpy(out, info, sizeof(out)-1);
-    out[255] = '\0';
-    if (strlen(out) > width - 9)
-        out[width - 9] = '\0';
-    else
-    {
-        for (i = strlen(out); i < width - 9; i++)
-            out[i] = ' ';
-        out[i] = '\0';
-    }
-    printf(" %s\r", out);
-    fflush(stdout);
+	ui->methods.progress_step(ui, 0);
+	strncpy(out, info, sizeof(out)-1);
+	out[255] = '\0';
+	if (strlen(out) > width - 9)
+		out[width - 9] = '\0';
+	else
+	{
+		for (i = strlen(out); i < width - 9; i++)
+			out[i] = ' ';
+		out[i] = '\0';
+	}
+	printf(" %s\r", out);
+	fflush(stdout);
 }
 
 static void text_progress_stop(struct frontend *ui)
 {
-    INFO(INFO_DEBUG, "%s\n", __FUNCTION__);
-    printf("\n");
+	INFO(INFO_DEBUG, "%s\n", __FUNCTION__);
+	printf("\n");
 }
 
 struct frontend_module debconf_frontend_module =
 {
 	initialize: text_initialize,
 	go: text_go,
-    progress_start: text_progress_start,
-    progress_set: text_progress_set,
-    progress_info: text_progress_info,
-    progress_stop: text_progress_stop,
+	progress_start: text_progress_start,
+	progress_set: text_progress_set,
+	progress_info: text_progress_info,
+	progress_stop: text_progress_stop,
 };
