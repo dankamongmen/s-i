@@ -10,7 +10,8 @@ choose_recipe "$total_size" || exit $?
 
 # We have to write the changes in the partition table that the user
 # has made, let him confirm
-confirm_changes || exit 0
+# TODO unimplemented
+#confirm_changes || exit 0
 
 # perform the recipe
 
@@ -89,7 +90,7 @@ modprobe lvm-mod  >>/var/log/messages 2>&1 || true
 # Choose name, create VG and atach each partition as a phisical volume
 noninteractive=true
 while true; do
-    db_input medium partman-auto-lvm/new_vg_name || $noninteractive
+    db_input medium partman-auto-lvm/new_vg_name || eval $noninteractive
     db_go || exit 1
     db_get partman-auto-lvm/new_vg_name
     VG_name="$RET"
