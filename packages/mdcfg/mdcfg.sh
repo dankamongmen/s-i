@@ -112,7 +112,7 @@ md_create_raid1() {
 
 	OK=0
 
-	db_set mdcfg/raid1devcount ""
+	db_set mdcfg/raid1devcount "2"
 
 	# Get the count of active devices
 	while [ "${OK}" -eq 0 ]; do
@@ -132,7 +132,7 @@ md_create_raid1() {
 		fi
 	done
 
-	db_set mdcfg/raid1sparecount ""
+	db_set mdcfg/raid1sparecount "0"
 	OK=0
 
 	# Same procedure as above
