@@ -12,7 +12,7 @@ while (<KVERS>) {
 	chomp;
 	next if /^#/ || ! length;
 	
-	my ($arch, $kernelversion, $flavour, $installedname, $multkern, $builddep)=split(' ', $_, 5);
+	my ($arch, $kernelversion, $flavour, $installedname, $multkern, $builddep)=split(' ', $_, 6);
 	if (! length $arch || ! length $kernelversion || ! length $flavour) {
 		die "parse error";
 	}
@@ -42,10 +42,11 @@ while (<LIST>) {
 	
 	if (/^(\S+):\s*(.*)/) {
 		$field=$1;
-		if (! grep { $_ eq $field } @controlfields) {
+		my $val=$2;
+		if (! grep { $field =~ /^\Q$_\E(_.+)?$/ } @controlfields) {
 			die "unknown field, $field";
 		}
-		$pkg{$field}=$2;
+		$pkg{$field}=$val;
 	}
 	elsif (/^$/) {
 		push @packages, [%pkg];
@@ -65,6 +66,18 @@ foreach my $ver (@versions) {
 	my ($arch, $kernelversion, $flavour) = @$ver;
 	foreach my $pkg (@packages) {
 		%pkg=(@$pkg); # copy for modification
+
+		# Used to get a field of the package, looking first for
+		# architecture-specific fields.
+		my $package = sub {
+			my $field=shift;
+			return $pkg{$field."_".$arch}
+				if exists $pkg{$field."_".$arch};
+			return $pkg{$field}
+				if exists $pkg{$field};
+			return undef;
+		};
+
 		# Check for a modules list file for this architecture and
 		# package.
 		my $modlistdir="";
@@ -77,27 +90,27 @@ foreach my $ver (@versions) {
 		else {
 			$modlistdir="modules/$arch";
 		}
-		next unless -e "$modlistdir/$pkg{Package}";
+		next unless -e "$modlistdir/".$package->("Package");
 		
 		print "\n";
 		
 		$pkg{Architecture}=$arch;
-		$pkg{Provides}=$pkg{Package};
-		$pkg{Package}=$pkg{Package}."-".$kernelversion."-".$flavour."-di";
+		$pkg{Provides}=$package->("Package");
+		$pkg{Package}=$package->("Package")."-".$kernelversion."-".$flavour."-di";
 		$pkg{'XC-Package-Type'}="udeb";
 		
-		if (exists $pkg{Depends}) {
+		if (defined $package->("Depends")) {
 			$pkg{Depends}=join(", ",
 				map { $_."-".$kernelversion."-".$flavour."-di" }
 				# If the dep is not built for this arch,
 				# skip it.
 				grep { -e "$modlistdir/$_" } 
-				split(", ", $pkg{Depends}));
+				split(", ", $package->("Depends")));
 		}
 		
 		foreach my $field (@controlfields) {
-			print $field.": ".$pkg{$field}."\n"
-				if exists $pkg{$field};
+			print $field.": ".$package->($field)."\n"
+				if defined $package->($field);
 		}
 	}
 }
