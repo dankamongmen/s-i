@@ -17,7 +17,31 @@ if db_get debian-installer/kernel/image && [ "$RET" ] ; then
     db_set kernel-chooser/which-kernel "$RET"
 fi
 
-# Pick a good default choice, and set it
+# Pick a good default choice, based on the available kernels and
+# perhaps /proc/cpuinfo.
+ARCH=`$chroot dpkg --print-architecture`
+
+# Should this be located in small script fragments, named after their
+# architecture?  Something like this:
+#   [ -f /usr/lib/kernel-chooser/$ARCH ] && . /usr/lib/kernel-chooser/$ARCH
+DEFAULT=
+case "$ARCH" in
+    i386*)
+        version=2.4.20
+        MODEL=`grep 'model name' /proc/cpuinfo | cut -d: -f2`
+	case "$MODEL" in 
+	    "Intel(R) Pentium(R) 4"
+	    DEFAULT=kernel-image-$version-686
+	    ;;
+	esac
+        ;;
+    *)
+        echo "warning: Unknown arcitecture '$ARCH'." 1>&2
+	;;
+esac
+if [ "$DEFAULT" ] ; then
+    db_set kernel-chooser/which-kernel "$DEFAULT"
+fi
 
 db_input medium kernel-chooser/which-kernel || true
 db_go || true
