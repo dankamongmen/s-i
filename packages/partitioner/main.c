@@ -149,7 +149,6 @@ int main(int argc, char *argv[]) {
 	/* collect all discs from system, and build choices list */
 	disks_count = get_all_disks(discs, MAX_DISKS);
 	if(disks_count < 1) {
-		debconf_fset(debconf, "partitioner/nodiscs", "seen", "false");
 		debconf_set(debconf, "partitioner/nodiscs", "false");
 		debconf_input(debconf, "high", "partitioner/nodiscs");
 		debconf_go(debconf);
@@ -181,7 +180,6 @@ int main(int argc, char *argv[]) {
 		char *language = NULL;
 
 		debconf_subst(debconf, "partitioner/disc", "DISCS", choices);
-		debconf_fset(debconf, "partitioner/disc", "seen", "false");
 		debconf_set(debconf, "partitioner/disc", "false");
 		debconf_input(debconf, "critical", "partitioner/disc");
 		debconf_go(debconf);
@@ -208,7 +206,6 @@ int main(int argc, char *argv[]) {
 			i = di_exec_shell_full (cmd, NULL, NULL, NULL, NULL, NULL, handler, NULL);
 			if(i != 0) {
 				debconf_subst(debconf, "partitioner/fdiskerr", "DISC", disk);
-				debconf_fset(debconf, "partitioner/fdiskerr", "seen", "false");
 				debconf_set(debconf, "partitioner/fdiskerr", "false");
 				debconf_input(debconf, "high", "partitioner/fdiskerr");
 				debconf_go(debconf);
