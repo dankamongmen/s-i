@@ -7,10 +7,10 @@
  * TODO: could stand to be a little more stable when it encounters NULLs.
  */
 
+#include <debconfclient.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "debconf.h"
 
 #define DEBCONF_BASE "mirror/"
 #define DEMO 1
@@ -19,11 +19,16 @@ int main(int argc, char **argv) {
 	int ret;
 	char *src;
 	char *hostname, *directory, *command;
+	struct debconfclient *debconf = debconfclient_new();
+	
+	if (argc < 3)
+		exit(1);
+	
 					    // TODO: what about ftp?
-	debconf_command("GET", DEBCONF_BASE "http/hostname", NULL);
-	hostname=strdup(debconf_ret());
-	debconf_command("GET", DEBCONF_BASE "http/directory", NULL);
-	directory=debconf_ret();
+	debconf->command(debconf, "GET", DEBCONF_BASE "http/hostname", NULL);
+	hostname=strdup(debconf->value);
+	debconf->command(debconf, "GET", DEBCONF_BASE "http/directory", NULL);
+	directory=debconf->value;
 	
 #ifdef DEMO
 	/*
@@ -43,9 +48,12 @@ int main(int argc, char **argv) {
 	 */
 	if (strcmp(src, "Packages") == 0) {
 #ifndef DEMO
-		/* TODO: obviously this path is woody and i386 specific. FIXME */
-		/* It's also probably not right.. */
-		src="dists/woody/main/installer-i386/Packages";
+		/* TODO: obviously this path is woody specific. FIXME */
+		/*
+		 * It's also probably not right, but we won't know until
+		 * elmo gets off his ass.
+		 */
+		src="dists/woody/main/installer-" ARCH "/Packages";
 #else
 		/* For the demo system, I just hardcode this. */
 		src="Packages";
