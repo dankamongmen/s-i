@@ -1144,7 +1144,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 			 mountmap[partcount].devpath);
 
 	newpart = NULL;
-	// req_tmp->minsize = -1; /* Why? */
+	/* req_tmp->minsize = -1; */ /* Why? */
 	partcount++;
     }
 
