@@ -21,7 +21,7 @@ struct partition_list {
 static int
 list_makeroom(struct partition_list *list, unsigned int room)
 {
-  int newsize;
+  unsigned int newsize;
   void *mem;
   assert(list);
   if (list->capasity > list->count + room)
@@ -86,7 +86,7 @@ static void
 remove_junk(char *buf, unsigned int buflength)
 {
   /* Terminate on comment char */
-  int i;
+  unsigned int i;
   for (i=0; i < buflength; ++i)
     if ('#' == buf[i] || '\n' == buf[i])
       buf[i] = '\0';
