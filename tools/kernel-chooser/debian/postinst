@@ -6,7 +6,7 @@ chroot="chroot /target"
 
 # find all packages implementing 'kernel-image'.  Is there a better
 # way? [pere 2003-02-16]
-kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" | sort -ur | awk '{print $1}' | tr "\n" "," | sed 's/,/, /g' | sed 's/, $//'`
+kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" | sort -ur | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' | sed 's/, $//'`
 
 if [ "$kernels" ] ; then
     db_subst kernel-chooser/which-kernel kernels "$kernels"
@@ -30,7 +30,7 @@ case "$ARCH" in
         version=2.4.20
         MODEL=`grep 'model name' /proc/cpuinfo | cut -d: -f2`
 	case "$MODEL" in 
-	    "Intel(R) Pentium(R) 4"
+	    "Intel(R) Pentium(R) 4")
 	    DEFAULT=kernel-image-$version-686
 	    ;;
 	esac
