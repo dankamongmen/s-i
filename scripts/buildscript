@@ -35,10 +35,10 @@ install_deb ()
 		for i in ${_files}; do
 			local v=$(dpkg-deb -f $i Version)
 
-			[ $(dpkg --compare-versions $v le ${_ver}) ] || {
+			if $(dpkg --compare-versions $v ge $_ver); then
 				_ver=$v
 				_file=$i
-			}
+			fi
 		done
 
 		[ -z "${_file}" ] || $REALROOTCMD dpkg -i ${_file}
@@ -54,17 +54,17 @@ supply_udeb ()
 	local _dir=$1
 	local _pkg=$(grep -sh "^Package: " ${_dir}/debian/control |sed -e 's/^Package: //' |xargs echo -n)
 	for i in ${_pkg}; do
-		local _files=$(find ${_dir}/.. -maxdepth 1 -regex "${_dir}/\.\./${1}_.*_\(${ARCH}\|all\)\.udeb")
+		local _files=$(find ${_dir}/.. -maxdepth 1 -regex "${_dir}/\.\./${i}_.*_\(${ARCH}\|all\)\.udeb")
 		local _file=""
 		local _ver=0
 
-		for i in ${_files}; do
-			local v=$(dpkg-deb -f $i Version)
+		for j in ${_files}; do
+			local v=$(dpkg-deb -f $j Version)
 
-			[ $(dpkg --compare-versions $v le ${_ver}) ] || {
+			if $(dpkg --compare-versions $v ge $_ver); then
 				_ver=$v
-				_file=$i
-			}
+				_file=$j
+			fi
 		done
 
 		[ -z "${_file}" ] || {
@@ -165,6 +165,7 @@ do_subdir packages/partman/partman packages/partman/partman-auto \
 	packages/partman/partman-partitioning \
 	packages/partman/partman-target
 
+# Arch-specific partman partitioning.
 case $ARCH in
     arm|mipsel)
 	do_subdir packages/partman/partman-ext2r0
