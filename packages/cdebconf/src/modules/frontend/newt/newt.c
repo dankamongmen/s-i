@@ -508,8 +508,11 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         sel_width = win_width-8;
         for (i = 0; i < count; i++) {
             if (strwidth(choices_trans[i]) > sel_width) {
-                for (res = 0, p = choices_trans[i]; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 && res < sel_width; p += k)
+                for (res = 0, p = choices_trans[i]; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0; p += k) {
                     res += wcwidth (c);
+                    if (res > sel_width)
+                        break;
+                }
                 *p = 0;
             }
         }
@@ -656,8 +659,11 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         sel_width = win_width-8;
         for (i = 0; i < count; i++) {
             if (strwidth(choices_trans[i]) > sel_width) {
-                for (res = 0, p = choices_trans[i]; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 && res < sel_width; p += k)
+                for (res = 0, p = choices_trans[i]; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0; p += k) {
                     res += wcwidth (c);
+                    if (res > sel_width)
+                        break;
+                }
                 *p = 0;
             }
         }
