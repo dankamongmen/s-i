@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
         ptr = debconf_input("high", "ethdetect/detection_type");
 
-        if (strstr(ptr, "no")) {
+        if (strstr(ptr, "false")) {
                 if ((module = ethdetect_prompt()) == NULL)
                         return 1;
                 rv = ethdetect_insmod(module);
