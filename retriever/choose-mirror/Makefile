@@ -26,7 +26,7 @@ mirrors_http.h: Mirrors.masterlist
 mirrors_ftp.h: Mirrors.masterlist
 	./makeheader.pl ftp
 
-choose-mirror.c: mirrors_http.h mirrors_ftp.h
+choose-mirror.o: mirrors_http.h mirrors_ftp.h
 
 $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LIBS) $(LDFLAGS)
