@@ -1,10 +1,5 @@
 #!/usr/bin/make -f
 
-ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-
-links:
-
 debian/control: gen-control debian/control.stub package-list kernel-versions
 	./make-links
 	./gen-control > debian/control
@@ -26,10 +21,8 @@ binary-arch: debian/control
 	./install-files
 
 	dh_fixperms -s
-	for p in $$(dh_listpackages -s); do \
-		dh_gencontrol -p $$p -- -n$${p}_$(VERSION)_$(ARCH).udeb; \
-		dh_builddeb -p $$p --filename=$${p}_$(VERSION)_$(ARCH).udeb; \
-	done
+	dh_gencontrol -s
+	dh_builddeb -s
 
 binary: build binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary links
+.PHONY: build clean binary-indep binary-arch binary

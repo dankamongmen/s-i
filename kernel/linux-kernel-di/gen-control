@@ -2,7 +2,7 @@
 # Generate a debian/control from the control stub, the kernel-versions
 # files, and the package-list.
 
-my @controlfields=qw(Package Provides Depends Architecture Section Priority Description);
+my @controlfields=qw(Package XC-Package-Type Provides Depends Architecture Section Priority Description);
 my @versions;
 my @packages;
 my @builddeps;
@@ -84,6 +84,7 @@ foreach my $ver (@versions) {
 		$pkg{Architecture}=$arch;
 		$pkg{Provides}=$pkg{Package};
 		$pkg{Package}=$pkg{Package}."-".$kernelversion."-".$flavour."-di";
+		$pkg{'XC-Package-Type'}="udeb";
 		
 		if (exists $pkg{Depends}) {
 			$pkg{Depends}=join(", ",
