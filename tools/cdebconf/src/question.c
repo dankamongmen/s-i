@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.6 2000/12/12 05:13:36 tausq Exp $
+ * $Id: question.c,v 1.7 2000/12/13 04:47:11 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -81,6 +81,7 @@ void question_variable_add(struct question *q, const char *var,
 	struct questionvariable *qvi = q->variables;
 	struct questionvariable **qlast = &q->variables;
 
+	INFO(INFO_DEBUG, "Adding [%s] -> [%s]\n", var, value);
 	for (; qvi != 0; qlast = &qvi->next, qvi = qvi->next)
 		if (strcmp(qvi->variable, var) == 0)
 		{
@@ -176,12 +177,12 @@ static int question_expand_vars(struct question *q, const char *field,
 		if (qvi != 0)
 		{
 			strvacat(buf, maxlen, qvi->value, NULL);
-			i = strlen(buf) - 1;
+			i = strlen(buf);
 		}
 
 		p = varend + 1;
 	}
-	return 1;
+	return DC_OK;
 }
 
 const char *question_description(struct question *q)
