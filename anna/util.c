@@ -229,17 +229,17 @@ is_installed(struct package_t *p, struct linkedlist_t *installed)
 }
 
 char *
-list_to_choices(struct linkedlist_t *list)
+list_to_choices(struct package_t *list[], const int count)
 {
-    struct list_node *node;
     struct package_t *p;
     char *choices, *ptr;
     size_t choices_size = 1;
+    int i;
 
     choices = malloc(choices_size);
     choices[0] = '\0';
-    for (node = list->head; node != NULL; node = node->next) {
-        p = (struct package_t *)node->data;
+    for (i = 0; i < count; i++) {
+        p = list[i];
         choices_size += strlen(p->package) + 2 + strlen(p->description) + 2;
         choices = realloc(choices, choices_size);
         strcat(choices, p->package);
@@ -335,7 +335,6 @@ udeb_kernel_version(struct package_t *p)
     char *name = strdup(p->package);
     char *t1, *t2;
 
-    fprintf(stderr, "Package %s\n", p->package);
     if ((t1 = strstr(name, "-modules-")) == NULL)
         return NULL;
     t1 += strlen("-modules-");
@@ -346,7 +345,6 @@ udeb_kernel_version(struct package_t *p)
     *t2 = '\0';
     t2 = strdup(t1);
     free(name);
-    fprintf(stderr, "  kernel-version: %s\n", t2);
     return t2;
 }
 
@@ -373,3 +371,14 @@ skip_package(struct package_t *p)
     }
     return 0;
 }
+
+int
+pkgname_cmp(const void *v1, const void *v2)
+{
+    struct package_t *p1, *p2;
+
+    p1 = *(struct package_t **)v1;
+    p2 = *(struct package_t **)v2;
+    return strcmp(p1->package, p2->package);
+}
+

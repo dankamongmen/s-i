@@ -17,12 +17,13 @@ const char *get_default_retriever(const char *choices);
 char *get_retriever(void);
 struct linkedlist_t *get_packages(void);
 int is_installed(struct package_t *p, struct linkedlist_t *installed);
-char *list_to_choices(struct linkedlist_t *list);
+char *list_to_choices(struct package_t *list[], const int count);
 int get_package (struct package_t *package, char *dest);
 int unpack_package (char *pkgfile);
 int md5sum(char* sum, char *file);
 void cleanup(void);
 char *udeb_kernel_version(struct package_t *p);
 int skip_package(struct package_t *p);
+int pkgname_cmp(const void *v1, const void *v2);
 
 #endif /* ANNA_H_ */

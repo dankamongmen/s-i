@@ -46,18 +46,22 @@ choose_retriever(void)
 
 
 /* Ick */
-static struct linkedlist_t *instlist, *asklist;
+static struct linkedlist_t *instlist;
+static struct package_t **askpkgs;
+static int ask_count;
 
 static int
 choose_modules(void)
 {
-    struct linkedlist_t *pkglist, *tmplist, *status_p;
+    struct linkedlist_t *pkglist, *tmplist, *status_p, *asklist;
     struct list_node *node, *prev, *next;
     struct package_t *p;
     FILE *fp;
     char *choices, *pkg_kernel, *running_kernel = NULL;
     struct utsname uts;
+    int package_count = 0;
 
+    ask_count = 0;
     if (uname(&uts) == 0)
         running_kernel = uts.release;
     pkglist = get_packages();
@@ -109,6 +113,7 @@ choose_modules(void)
                 instlist->tail = node;
             }
             node->next = NULL;
+            package_count++;
             continue;
         }
         prev = node;
@@ -120,6 +125,8 @@ choose_modules(void)
     di_list_free(status_p, di_pkg_free);
     instlist = tmplist;
 
+    /* Slight over-allocation, but who cares */
+    askpkgs = calloc(package_count, sizeof(struct package_t *));
     /* Now build the asklist, figuring out which packages have been
      * pulled into instlist */
     prev = NULL;
@@ -127,18 +134,13 @@ choose_modules(void)
     for (node = asklist->head; node != NULL; node = next) {
         next = node->next;
         p = (struct package_t *)node->data;
-        if (di_pkg_find(instlist, p->package) != NULL) {
-            /* We found it in instlist, remove it here */
-            if (prev != NULL)
-                prev->next = next;
-            else
-                asklist->head = next;
-            free(node);
-            continue;
-        }
-        prev = node;
+        if (di_pkg_find(instlist, p->package) == NULL)
+            askpkgs[ask_count++] = p;
+        free(node);
     }
-    choices = list_to_choices(asklist);
+    free(asklist);
+    qsort(askpkgs, ask_count, sizeof(struct package_t *), pkgname_cmp);
+    choices = list_to_choices(askpkgs, ask_count);
     debconf->command(debconf, "FSET", ANNA_CHOOSE_MODULES, "seen", "false", NULL);
     debconf->command(debconf, "SUBST", ANNA_CHOOSE_MODULES, "CHOICES", choices, NULL);
     debconf->command(debconf, "INPUT medium", ANNA_CHOOSE_MODULES, NULL);
@@ -155,7 +157,7 @@ install_modules(void)
     struct list_node *node;
     struct package_t *p;
     char *f, *fp, *dest_file;
-    int ret = 0, pkg_count = 0;
+    int ret = 0, pkg_count = 0, i;
 
     sfp = fopen(STATUS_FILE, "r");
     if (sfp == NULL)
@@ -167,15 +169,13 @@ install_modules(void)
         char *choices = debconf->value;
         struct list_node *prev = NULL, *next;
 
-        for (node = asklist->head; node != NULL; node = next) {
-            next = node->next;
-            p = (struct package_t *)node->data;
+        for (i = 0; i < ask_count; i++) {
+            p = askpkgs[i];
             /* Not very safe, but at least easy ;) */
             if (strstr(choices, p->package) != NULL) {
-                if (prev != NULL)
-                    prev->next = next;
-                else
-                    asklist->head = next;
+                node = malloc(sizeof(struct list_node));
+                node->next = NULL;
+                node->data = p;
                 if (instlist->tail == NULL) {
                     instlist->head = node;
                     instlist->tail = node;
@@ -183,18 +183,15 @@ install_modules(void)
                     instlist->tail->next = node;
                     instlist->tail = node;
                 }
-                node->next = NULL;
-                continue;
             }
-            prev = node;
         }
     }
+    free(askpkgs);
     /* Pull in dependencies again since we might have added packages */
     di_pkg_resolve_deps(instlist);
     tmplist = di_pkg_toposort_list(instlist);
     /* Free some memory. Note, we don't know which of the nodes inside
        the asklist we can free. sigh. */
-    free(asklist);
     instlist = tmplist;
 
     for (node = instlist->head; node != NULL; node = node->next) {
