@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.30 2003/09/03 19:28:11 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.31 2003/09/04 20:43:52 mckinstry Exp $
  */
 
 #include "config.h"
@@ -156,7 +156,7 @@ locale_parse (char *locale, char **lang, char **territory, char **charset)
 /**
  * @brief compare langs list with the preferred locale
  * @param langs: colon-seperated list of locales
- * @return score 0-3
+ * @return score 0-4
  */
 int
 locale_list_compare (char *langs)
@@ -179,11 +179,15 @@ locale_list_compare (char *langs)
 			*colon = '\0';
 		locale_parse (s, &lang2, &territory2, &charset2);
 		if (!strcmp (lang1, lang2))    {
-			score = 1;
+			score = 2;
 			if (territory1 != NULL && territory2 != NULL
 			    && !strcmp (territory1, territory2))  	{
 				score++;
 			}
+			// Favour 'generic' locales; ie 'fr' matches 'fr' better
+			// than 'fr_BE' does
+			if (territory1 == NULL && territory2 != NULL)
+				score--;
 			if (charset1 != NULL && charset2 != NULL
 			    && !strcmp (charset1, charset2))	       	{
 				score += 2;	// charset more important than territory
