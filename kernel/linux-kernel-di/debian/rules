@@ -1,43 +1,49 @@
 #!/usr/bin/make -f
 
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
+ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 
-SHELL := sh -e
+links:
+	# Generate symlinks from .lnk files.
+	set -e; \
+	for lnk in $$(find modules -type f -name \*.lnk); do \
+		file=$$(echo $$lnk | sed s/.lnk//); \
+		rm -f $$file; \
+		ln -sf $$(cat $$lnk) $$file; \
+	done
 
-khsed := s/^Package: kernel-image-\(.*\)-386.*/\1/
-version := $(shell sed -n '$(khsed); t e; b; :e; p; q' debian/control)
-fullversion := $(shell \
-	dpkg-parsechangelog | sed -n 's/^Version: //p; t e; b; :e; q' \
-)
+debian/control: links gen-control debian/control.stub package-list kernel-versions
+	./gen-control > debian/control
 
-kdst := debian/kernel-image-$(version)-386-di
-
-build:
+build: links debian/control
 	dh_testdir
 
-clean:
+clean: debian/control
 	dh_testdir
+	find modules -type l | xargs rm -f
 	dh_clean
 
 binary-indep:
 
-binary-arch:
+binary-arch: links debian/control
 	dh_testdir
 	dh_clean -k
-	dh_installdirs
 
-	./copy-modules 386 $(version)
-	./find-dups
+	for kernel in `grep '^$(ARCH)[ 	]' kernel-versions | awk '{print $$2 "-" $$3}'`; do \
+		echo $$kernel; \
+		name=`grep '^$(ARCH)[ 	]' kernel-names | awk '{print $$2 }'`; \
+		install -D -m 644 /boot/$$name-$$kernel debian/kernel-image-$$kernel-di/boot/$$name; \
+		install -D -m 644 /lib/modules/$$kernel/modules.dep \
+			debian/kernel-image-$$kernel-di/lib/modules/$$kernel/modules.dep; \
+		./copy-modules $$kernel; \
+		./find-dups $$kernel; \
+	done
 
-	install -D -m 644 /boot/vmlinuz-$(version)-386 $(kdst)/boot/vmlinuz
-	install -D -m 644 /lib/modules/$(version)-386/modules.dep \
-		$(kdst)/lib/modules/$(version)-386/modules.dep
-	dh_fixperms
-	for p in $$(dh_listpackages); do \
-		dh_gencontrol -p $$p -- -n$${p}_$(fullversion)_i386.udeb; \
-		dh_builddeb -p $$p --filename=$${p}_$(fullversion)_i386.udeb; \
+	dh_fixperms -s
+	for p in $$(dh_listpackages -s); do \
+		dh_gencontrol -p $$p -- -n$${p}_$(VERSION)_i386.udeb; \
+		dh_builddeb -p $$p --filename=$${p}_$(VERSION)_i386.udeb; \
 	done
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
+.PHONY: build clean binary-indep binary-arch binary links

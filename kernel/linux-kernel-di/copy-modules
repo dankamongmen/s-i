@@ -6,7 +6,7 @@
 #
 # Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
 #
-# Usage: copy-modules flavour version
+# Usage: copy-modules version-flavour
 
 set -e
 
@@ -31,9 +31,8 @@ deplist() {
 	done
 }
 
-flavour=$1
-version=$2
-version=$version-$flavour
+version=$1
+arch=$(dpkg-architecture -qDEB_BUILD_ARCH)
 home=$PWD
 
 trap 'rm -rf $tmpdir' EXIT
@@ -68,27 +67,30 @@ unset moddir_awk
 
 mkdir $tmpdir/module-deps $tmpdir/module-list
 
+# generate module interealationships from package-list file
+./gen-deps > $tmpdir/module-deps.packages
+
 # loop over all udebs, sort that all 
 # dependent modules are processed before
 # the module
 for i in $(
 	{
-		find modules/ -maxdepth 1 -type f -printf "%f\t%f\n"
-		cat module-deps
+		find modules/$arch -maxdepth 1 \( -type f -or -type l \) -not -name '*.lnk' -printf "%f\t%f\n"
+		cat $tmpdir/module-deps.packages
 	} | tsort | tac
 ); do
 
 	# write dependent (direct and indirect) udebs to exclude
 	# write dependencies to module-deps/$i
-	echo $i | join -o 2.2 - $home/module-deps | {	# dependent modules
+	echo $i | join -o 2.2 - $tmpdir/module-deps.packages | { # dependent modules
 		cd $tmpdir/module-deps
-		xargs -r sh -c 'printf "%s\n" "$@"; cat "$@"' sh #direct and indirect deps
+		xargs -r sh -c 'printf "%s\n" "$@"; cat "$@"' sh # direct and indirect deps
 	} | sort -u | tee $tmpdir/module-deps/$i | {	# write deps
 		cd $tmpdir/module-list
 		xargs -r cat
 	} | sort -u > $tmpdir/exclude			# modules to exclude
 
-	cp $home/modules/$i $tmpdir/module-list
+	cp $home/modules/$arch/$i $tmpdir/module-list
 
 	# exclude modules in exclude from dependency list
 	join -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |

@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+# Generate a debian/control from the control stub, the kernel-versions
+# files, and the package-list.
+
+my @controlfields=qw(Package Depends Architecture Section Priority Description);
+my @versions;
+my @packages;
+my @builddeps;
+
+open(KVERS, "kernel-versions") || die "kernel-versions: $!";
+while (<KVERS>) {
+	chomp;
+	next if /^#/ || ! length;
+	
+	my ($arch, $kernelversion, $flavour, $builddep)=split(' ', $_, 4);
+	if (! length $arch || ! length $kernelversion || ! length $flavour) {
+		die "parse error";
+	}
+	push @versions, [ $arch, $kernelversion, $flavour ];
+	foreach my $pkg (split(", ", $builddep)) {
+		push @builddeps, "$pkg [$arch]";
+	}
+}
+
+open(STUB, "debian/control.stub") || die "debian/control.stub: $!";
+while (<STUB>) {
+	chomp;
+	if (/^Build-Depends:/) {
+		$_=join(", ", $_, @builddeps);
+	}
+	print $_."\n";
+}
+close STUB;
+
+open(LIST, "package-list") || die "package-list: $!";
+my $field;
+my %pkg;
+while (<LIST>) {
+	chomp;
+	next if /^#/;
+	
+	if (/^(\S+):\s*(.*)/) {
+		$field=$1;
+		if (! grep { $_ eq $field } @controlfields) {
+			die "unknown field, $field";
+		}
+		$pkg{$field}=$2;
+	}
+	elsif (/^$/) {
+		push @packages, [%pkg];
+		%pkg=();
+	}
+	elsif (/^(\s+.*)/) {
+		# continued field
+		$pkg{$field}.="\n".$1;
+	}
+}
+if (%pkg) {
+	push @packages, [%pkg];
+}
+close LIST;
+
+foreach my $ver (@versions) {
+	my ($arch, $kernelversion, $flavour) = @$ver;
+	foreach my $pkg (@packages) {
+		%pkg=(@$pkg); # copy for modification
+		# Check for a modules list file for this architecture and
+		# package.
+		next unless -e "modules/$arch/$pkg{Package}";
+		
+		print "\n";
+		
+		$pkg{Architecture}=$arch;
+		$pkg{Package}=$pkg{Package}."-".$kernelversion."-".$flavour."-di";
+		
+		if (exists $pkg{Depends}) {
+			$pkg{Depends}=join(", ",
+				map { $_."-".$kernelversion."-".$flavour."-di" }
+				# If the dep is not built for this arch,
+				# skip it.
+				grep { -e "modules/$arch/$_" } 
+				split(", ", $pkg{Depends}));
+		}
+		
+		foreach my $field (@controlfields) {
+			print $field.": ".$pkg{$field}."\n"
+				if exists $pkg{$field};
+		}
+	}
+}
+close KVERS;

@@ -3,22 +3,19 @@ Section: devel
 Priority: optional
 Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
 Uploaders: Joey Hess <joeyh@debian.org>, Herbert Xu <herbert@debian.org>
-Build-Depends: debhelper (>= 4), kernel-image-2.4.22-1-386, kernel-pcmcia-modules-2.4.22-1-386
+Build-Depends: debhelper (>= 4), kernel-image-2.4.22-1-386 [i386], kernel-pcmcia-modules-2.4.22-1-386 [i386], kernel-image-2.4.22-1-generic [alpha]
 
 Package: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
-Depends: modutils-basic | modutils-full
 Description: Linux kernel binary image for the Debian installer
- This package contains the Linux kernel image version 2.4.22-1-386,
- for the Debian installer boot images. It does _not_ provide a usable
- kernel for your full Debian system.
+ This package contains the Linux kernel image for the Debian installer
+ boot images. It does _not_ provide a usable kernel for your full
+ Debian system.
 
 Package: nic-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, nic-shared-modules-2.4.22-1-386-di, isa-pnp-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Common NIC drivers
  This package contains common NIC drivers for the Linux kernel.
@@ -26,7 +23,6 @@ Description: Common NIC drivers
 Package: nic-extra-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, isa-pnp-modules-2.4.22-1-386-di, nic-shared-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Rare NIC drivers
  This package contains rare NIC drivers for the Linux kernel.
@@ -34,7 +30,6 @@ Description: Rare NIC drivers
 Package: nic-shared-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Shared NIC drivers
  This package contains NIC drivers needed by both nic-modules and
@@ -43,7 +38,6 @@ Description: Shared NIC drivers
 Package: serial-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, pcmcia-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: optional
 Description: Serial drivers
  This package contains serial drivers for the Linux kernel.
@@ -51,7 +45,6 @@ Description: Serial drivers
 Package: ppp-modules-2.4.22-1-386-di
 Depends: serial-modules-2.4.22-1-386-di, kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: optional
 Description: PPP drivers
  This package contains PPP drivers for the Linux kernel.
@@ -59,7 +52,6 @@ Description: PPP drivers
 Package: isa-pnp-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: isa-pnp drivers
  This package contains isa-pnp drivers for the Linux kernel.
@@ -67,34 +59,36 @@ Description: isa-pnp drivers
 Package: socket-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: Socket drivers
  This package contains the packet socket driver, used by dhcp and other
- things that need raw network device access.  It also contains the UNIX
+ things that need raw network device access. It also contains the UNIX
  domain socket driver.
 
 Package: ide-modules-2.4.22-1-386-di
-Depends: kernel-image-2.4.22-1-386-di
+Depends: kernel-image-2.4.22-1-386-di, ide-core-modules-2.4.22-1-386-di, cdrom-core-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
-Depends: ide-core-modules-2.4.22-1-386-di
 Description: IDE drivers
  This package contains IDE drivers for the Linux kernel.
 
 Package: ide-core-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
-Description: IDE drivers
- This package contains core IDE drivers for the Linux kernel.
+Description: IDE support
+ This package contains core IDE support for the Linux kernel.
+
+Package: cdrom-core-modules-2.4.22-1-386-di
+Depends: kernel-image-2.4.22-1-386-di
+Architecture: i386
+Priority: standard
+Description: CDROM support
+ This package contains core CDROM support for the Linux kernel.
 
 Package: cdrom-modules-2.4.22-1-386-di
-Depends: ide-modules-2.4.22-1-386-di, kernel-image-2.4.22-1-386-di
+Depends: ide-modules-2.4.22-1-386-di, cdrom-core-modules-2.4.22-1-386-di, kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: optional
 Description: Esoteric CDROM drivers
  This package contains esoteric CDROM drivers for the Linux kernel.
@@ -102,7 +96,6 @@ Description: Esoteric CDROM drivers
 Package: firewire-core-modules-2.4.22-1-386-di
 Depends: scsi-core-modules-2.4.22-1-386-di, kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Core FireWire drivers
  This package contains core FireWire drivers for the Linux kernel.
@@ -110,15 +103,13 @@ Description: Core FireWire drivers
 Package: scsi-core-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Core SCSI subsystem
  This package contains the core SCSI subsystem for the Linux kernel.
 
 Package: scsi-modules-2.4.22-1-386-di
-Depends: isa-pnp-modules-2.4.22-1-386-di, kernel-image-2.4.22-1-386-di, scsi-core-modules-2.4.22-1-386-di, parport-modules-2.4.22-1-386-di
+Depends: kernel-image-2.4.22-1-386-di, isa-pnp-modules-2.4.22-1-386-di, scsi-core-modules-2.4.22-1-386-di, parport-modules-2.4.22-1-386-di, cdrom-core-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: SCSI drivers
  This package contains SCSI drivers for the Linux kernel.
@@ -126,7 +117,6 @@ Description: SCSI drivers
 Package: scsi-extra-modules-2.4.22-1-386-di
 Depends: scsi-modules-2.4.22-1-386-di, scsi-core-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Uncommon SCSI drivers
  This package contains uncommon SCSI drivers for the Linux kernel.
@@ -135,7 +125,6 @@ Description: Uncommon SCSI drivers
 Package: plip-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, parport-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: optional
 Description: PLIP drivers
  This package contains PLIP drivers for the Linux kernel.
@@ -143,7 +132,6 @@ Description: PLIP drivers
 Package: floppy-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Floppy driver
  This package contains the floppy driver for the Linux kernel.
@@ -151,7 +139,6 @@ Description: Floppy driver
 Package: ipv6-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: IPv6 driver
  This package contains the IPv6 driver for the Linux kernel.
@@ -159,7 +146,6 @@ Description: IPv6 driver
 Package: ext3-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: EXT3 filesystem support
  This package contains the EXT3 filesystem module for the Linux kernel.
@@ -167,7 +153,6 @@ Description: EXT3 filesystem support
 Package: reiserfs-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: Reiser filesystem support
  This package contains the Reiser filesystem module for the Linux kernel.
@@ -175,7 +160,6 @@ Description: Reiser filesystem support
 Package: fat-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: FAT filesystem support
  This package contains the FAT and VFAT filesystem modules for the Linux kernel.
@@ -183,7 +167,6 @@ Description: FAT filesystem support
 Package: md-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: RAID and LVM support
  This package contains RAID and LVM modules for the Linux kernel.
@@ -191,7 +174,6 @@ Description: RAID and LVM support
 Package: usb-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: USB support
  This package contains core USB drivers for the Linux kernel.
@@ -199,7 +181,6 @@ Description: USB support
 Package: usb-storage-modules-2.4.22-1-386-di
 Depends: ide-core-modules-2.4.22-1-386-di, scsi-core-modules-2.4.22-1-386-di, usb-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: USB storage support
  This package contains the USB storage driver for the Linux kernel.
@@ -207,7 +188,6 @@ Description: USB storage support
 Package: brltty-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, usb-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: Braille support
  This package contains Braille drivers for the Linux kernel.
@@ -215,7 +195,6 @@ Description: Braille support
 Package: fb-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: Frame buffer support
  This package contains Frame buffer drivers for the Linux kernel.
@@ -223,7 +202,6 @@ Description: Frame buffer support
 Package: input-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, usb-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: Input devices support
  This package contains input device drivers for the Linux kernel.
@@ -231,7 +209,6 @@ Description: Input devices support
 Package: irda-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, ppp-modules-2.4.22-1-386-di, usb-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: Infrared devices support
  This package contains infrared device drivers for the Linux kernel.
@@ -239,7 +216,6 @@ Description: Infrared devices support
 Package: parport-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: extra
 Description: Parallel port support
  This package contains parallel port drivers for the Linux kernel.
@@ -247,7 +223,6 @@ Description: Parallel port support
 Package: nic-pcmcia-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, nic-shared-modules-2.4.22-1-386-di, pcmcia-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Common PCMCIA NIC drivers
  This package contains common PCMCIA NIC drivers for the Linux kernel.
@@ -255,7 +230,186 @@ Description: Common PCMCIA NIC drivers
 Package: pcmcia-modules-2.4.22-1-386-di
 Depends: kernel-image-2.4.22-1-386-di, isa-pnp-modules-2.4.22-1-386-di
 Architecture: i386
-Section: debian-installer
 Priority: standard
 Description: Common PCMCIA drivers
  This package contains common PCMCIA drivers for the Linux kernel.
+
+Package: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: Linux kernel binary image for the Debian installer
+ This package contains the Linux kernel image for the Debian installer
+ boot images. It does _not_ provide a usable kernel for your full
+ Debian system.
+
+Package: nic-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di, nic-shared-modules-2.4.22-1-generic-di, isa-pnp-modules-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: Common NIC drivers
+ This package contains common NIC drivers for the Linux kernel.
+
+Package: nic-extra-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di, isa-pnp-modules-2.4.22-1-generic-di, nic-shared-modules-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: Rare NIC drivers
+ This package contains rare NIC drivers for the Linux kernel.
+
+Package: nic-shared-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: Shared NIC drivers
+ This package contains NIC drivers needed by both nic-modules and
+ nic-extra-modules.
+
+Package: serial-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: optional
+Description: Serial drivers
+ This package contains serial drivers for the Linux kernel.
+
+Package: ppp-modules-2.4.22-1-generic-di
+Depends: serial-modules-2.4.22-1-generic-di, kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: optional
+Description: PPP drivers
+ This package contains PPP drivers for the Linux kernel.
+
+Package: isa-pnp-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: isa-pnp drivers
+ This package contains isa-pnp drivers for the Linux kernel.
+
+Package: socket-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: Socket drivers
+ This package contains the packet socket driver, used by dhcp and other
+ things that need raw network device access. It also contains the UNIX
+ domain socket driver.
+
+Package: ide-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di, ide-core-modules-2.4.22-1-generic-di, cdrom-core-modules-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: IDE drivers
+ This package contains IDE drivers for the Linux kernel.
+
+Package: ide-core-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: IDE support
+ This package contains core IDE support for the Linux kernel.
+
+Package: cdrom-core-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: CDROM support
+ This package contains core CDROM support for the Linux kernel.
+
+Package: cdrom-modules-2.4.22-1-generic-di
+Depends: ide-modules-2.4.22-1-generic-di, cdrom-core-modules-2.4.22-1-generic-di, kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: optional
+Description: Esoteric CDROM drivers
+ This package contains esoteric CDROM drivers for the Linux kernel.
+
+Package: scsi-core-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: Core SCSI subsystem
+ This package contains the core SCSI subsystem for the Linux kernel.
+
+Package: scsi-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di, isa-pnp-modules-2.4.22-1-generic-di, scsi-core-modules-2.4.22-1-generic-di, parport-modules-2.4.22-1-generic-di, cdrom-core-modules-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: SCSI drivers
+ This package contains SCSI drivers for the Linux kernel.
+
+Package: scsi-extra-modules-2.4.22-1-generic-di
+Depends: scsi-modules-2.4.22-1-generic-di, scsi-core-modules-2.4.22-1-generic-di
+Architecture: alpha
+Priority: standard
+Description: Uncommon SCSI drivers
+ This package contains uncommon SCSI drivers for the Linux kernel.
+ This includes SCSI RAID drivers.
+
+Package: plip-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di, parport-modules-2.4.22-1-generic-di
+Architecture: alpha
+Priority: optional
+Description: PLIP drivers
+ This package contains PLIP drivers for the Linux kernel.
+
+Package: ipv6-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: IPv6 driver
+ This package contains the IPv6 driver for the Linux kernel.
+
+Package: ext3-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: EXT3 filesystem support
+ This package contains the EXT3 filesystem module for the Linux kernel.
+
+Package: reiserfs-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: Reiser filesystem support
+ This package contains the Reiser filesystem module for the Linux kernel.
+
+Package: md-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: RAID and LVM support
+ This package contains RAID and LVM modules for the Linux kernel.
+
+Package: usb-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: USB support
+ This package contains core USB drivers for the Linux kernel.
+
+Package: usb-storage-modules-2.4.22-1-generic-di
+Depends: ide-core-modules-2.4.22-1-generic-di, scsi-core-modules-2.4.22-1-generic-di, usb-modules-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: USB storage support
+ This package contains the USB storage driver for the Linux kernel.
+
+Package: brltty-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di, usb-modules-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: Braille support
+ This package contains Braille drivers for the Linux kernel.
+
+Package: fb-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: Frame buffer support
+ This package contains Frame buffer drivers for the Linux kernel.
+
+Package: parport-modules-2.4.22-1-generic-di
+Depends: kernel-image-2.4.22-1-generic-di
+Architecture: alpha
+Priority: extra
+Description: Parallel port support
+ This package contains parallel port drivers for the Linux kernel.
