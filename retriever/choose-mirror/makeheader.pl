@@ -69,8 +69,8 @@ if ($type eq 'template') {
 "#  ignored and appear here only to distinguish this msgid from the same\n".
 "#  one in the Choices field.\n";
 	print TEMPLATE "_Default: US[ Default value for http]\n";
-	print TEMPLATE "_Description: Use a mirror from what country?\n";
-	print TEMPLATE " The goal is to find a mirror that is close to you on the network -- be\n";
+	print TEMPLATE "_Description: Debian archive mirror country:\n";
+	print TEMPLATE " The goal is to find a mirror of the Debian archive that is close to you on the network -- be\n";
 	print TEMPLATE " aware that nearby countries, or even your own, may not be the best choice.\n\n";
 
 	print TEMPLATE "Template: mirror/ftp/countries\n";
@@ -86,8 +86,8 @@ if ($type eq 'template') {
 "#  ignored and appear here only to distinguish this msgid from the same\n".
 "#  one in the Choices field.\n";
 	print TEMPLATE "_Default: US[ Default value for ftp]\n";
-        print TEMPLATE "_Description: Use a mirror from what country?\n";
-        print TEMPLATE " The goal is to find a mirror that is close to you on the network -- be\n";
+	print TEMPLATE "_Description: Debian archive mirror country:\n";
+	print TEMPLATE " The goal is to find a mirror of the Debian archive that is close to you on the network -- be\n";
         print TEMPLATE " aware that nearby countries, or even your own, may not be the best choice.\n\n";
 	close TEMPLATE;
 	exit 0;
