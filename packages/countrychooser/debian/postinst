@@ -142,8 +142,8 @@ if [ "$LANGUAGE" != "C" ]; then
 			# If the locale includes a country, then
 			# don't display the short list, and only show the
 			# full list at medium priority.
+			askedshort=0
 			if (echo $DEFAULTLOCALE | grep "_" >/dev/null 2>&1) ; then
-				askedshort=0
 				fullprio=medium
 			else
 				if [ "$use_lang" ]; then
@@ -153,16 +153,14 @@ if [ "$LANGUAGE" != "C" ]; then
                                         db_set $shortlist $COUNTRYCODE_LANGUAGECHOOSER
                                         db_input $shortprio $shortlist || [ $? -eq 30 ]
 					askedshort=1
-				else
-					askedshort=0
 				fi
 			fi
 		;;
 		2)
-			db_get $shortlist
-			if [ "$askedshort" = 1 ] && [ "$RET" != "other" ]; then
-     				COUNTRYCODE="$RET"
-				if [ -n "$COUNTRYCODE" ]; then
+			if [ "$askedshort" = 1 ] ; then
+				db_get $shortlist
+				if [ -n "$RET" ] && [ "$RET" != "other" ]; then
+					COUNTRYCODE="$RET"
 					break
 				fi
 			fi
