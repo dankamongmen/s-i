@@ -34,7 +34,6 @@ clean:
 # cvs update -P will remove these dirs if they are empty
 DIRS=dev proc var/log mnt floppy
 
-
 install: build
 	dh_testdir
 	dh_testroot
@@ -45,7 +44,6 @@ install: build
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
 	mknod debian/rootskel/dev/console c 5 1
 	mknod debian/rootskel/dev/tty1 c 4 1
-
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -61,9 +59,7 @@ binary-arch: build install
 	dh_installdeb
 	dh_gencontrol -- -fdebian/files~ 
 	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY) 
-	dh_md5sums
 	dh_builddeb --filename=$(FILENAME)
-
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure

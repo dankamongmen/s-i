@@ -1,8 +1,8 @@
 Where we are:
 
 	We have a small chrooted system that is being autobuilt daily.
-	Ufortunatly, it is about 233k too big now. We're hoping to get this
-	fixed by Wednesday.
+	Ufortunatly, it is too big now. We're hoping to get this fixed
+	by Wednesday.
 
 General things to keep an eye on:
 
@@ -17,46 +17,51 @@ General things to keep an eye on:
 
 Still Todo:
 
+	- Some kind of a machanism for udebs to declare what parts of
+	  busybox they need, so we can ensure that all deps are met while
+	  keeping the busybox footprint small.
+	- sort out Raphael's changes to rootskel and build/Makefile;
+	  devices are made by both right now, and then devfs provides some
+	  too. This all needs to be dealt with; rootskel shouldn't need to
+	  make any devices, maybe it sets up symlinks though? And the
+	  Makefile should not make any devices, for sure.
 	- generate treecompare data for each daily build and put or mail it
 	  somewhere [Joey Hess]
-	- re-orient and get back on our feet after the long hiatus:
-		- daily autobuilds are happening again
-		- TODO: scan and summarize all changes since last spring
-
-        - target media detector
-                Just has to figure out what media to install to.
-                Probably trivial; most support already in the kernel.
         - disk formatter
                 Formats disks, turns on swap, etc.
+	- debootstrap interface
         - {lilo,grub} installer
 	- polish everything so it is actually usable
 	- i18n
 	- translations
-		(Waiting until there is i18n and final text to translate..)
+		(Waiting until there is i18n and final text to translate,
+		and until we have figured out where the translations go.)
         - user documentation
 		(Waiting until we have something to document..)
 	- cd installs, etc, etc, etc
 
 Under development:
 
-        - disk partitioner [David Whedon]
-		tools/partkit in CVS. Currently doesn't do much
-		but is a good start.
+        - disk selector, partitioner [Raphael Hertzog, Raphael Hertzog]
+		There are two of them, autopartkit and partkit.
+		Autopartkit is a bit more advanced ATM.
         - cdebconf [Randolph Chung]
                 In progress, has one working database backend and one
 		working text-based frontend, with progress on a slang
 		frontend. Quite usable by now.
         - ethdetect [David Whedon]
-		Seems to work, still needs some itegration into the chroot.
+		Current status?
         - netcfg [David Whedon]
-		Development in progress, and partly works now.
-		some required patches (dhcp) still in bts.
+		Current status?
+	- dhcp [Matt Kraai]
+		We're using dhclient, but should keep an eye on udhcpc,
+		which is smaller.
 	- anna (retreiver control program) [Joey Hess, Glenn McGrath]
 		About 10% done realistically, but it does work.
         - choose-mirror [Joey Hess]
 		80% done
         - base system installer [Anthony Towns]
-		debootstrap is stable, but needs to be integrated into d-i
+		debootstrap is stable, but needs to be integrated into d-i;
 		udebs are not available yet.
         - library reduction
 		mklibs.sh works, but it is not packaged. This is a pain in
@@ -64,15 +69,6 @@ Under development:
         - install media build system [Joey Hess, David Whedon]
 		We can build chrootable, library-reduced trees. It 
 		boots too (CHECK: does it still?). Dns does not work though.
-
-Needs testing:
-
-	- netkit-tiny [David Whedon]
-		Packaged, not really tested.
-	- other hardware detection [David Whedon]
-		David has written detectors for sound, ethernet, cd, cpu,
-		disk, and memory detection. All need testing.
-	- system as a whole
 
 More or less done, for now anyway:
 
@@ -85,12 +81,15 @@ More or less done, for now anyway:
         - main-menu (main menu generator) [Joey Hess]
                 90% done (one non-trivial todo item)
         - busybox integration [Erik Andersen]
-		First pass busybox udeb available.
+		TODO: seems we need touch, head, sort, and wc back on for
+		debootstrap.
 	- kernel-package integration [Herbert Xu]
 		Udebs are built automatically; this is well in hand.
  	- wget retriever [Joey Hess]
 		Needs proxy and general testing.  Will soon have
 		ftp support.
+	- cdrom retriever [Raphael Hertzog]
+		I guess it works.
 	- archive setup
 		Done.
 	- post-reboot configuration [Joey Hess]
