@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.8 2000/11/29 02:44:30 joeyh Exp $ */
+/* $Id: udpkg.h,v 1.9 2000/11/29 06:27:21 tausq Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -21,6 +21,7 @@
 #define STATUSFILE	ADMINDIR ## "/status"
 #define DPKGCIDIR	ADMINDIR ## "/tmp.ci/"
 #define INFODIR		ADMINDIR ## "/info/"
+#define UDPKG_QUIET	"UDPKG_QUIET"
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
 
 #define STATUS_WANTSTART		(0)
