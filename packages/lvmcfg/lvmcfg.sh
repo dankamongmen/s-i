@@ -247,6 +247,22 @@ vg_mainmenu() {
 			break
 			;;
 		esac
+
+		# If we have only created VGs so far, then check if any PVs
+		# are still free; if not, leave the menu and default to
+		# creating a LV.
+		if [ "$FIRST" = "yes" ]; then
+			if [ "$VGRET" = "create" ]; then
+				get_pvs
+				if [ -z "$PARTITIONS" ]; then
+					OVERRIDE=no
+					db_set lvmcfg/mainmenu "Logical Volumes (LV)"
+					break
+				fi
+			else
+				FIRST=no
+			fi
+		fi
 	done
 }
 
@@ -635,14 +651,22 @@ fi
 # ask only the first time
 mkdir -p /var/cache/lvmcfg && touch /var/cache/lvmcfg/first
 
+FIRST=yes
+# The following variable determines whether the lvmcfg/mainmenu is set
+# to false.  At various places in this script, OVERRIDE=no is set in
+# order to set a default.  This is useful to have LV as default when
+# all VGs have been set up, and Leave the default after all LVs have
+# been allocated.
+OVERRIDE=yes
 # main-loop
 while [ 1 ]; do
-	db_set lvmcfg/mainmenu "false"
+	[ "$OVERRIDE" = "yes" ] && db_set lvmcfg/mainmenu "false"
 	db_input high lvmcfg/mainmenu
 	db_go
 	db_get lvmcfg/mainmenu
 	MAINRET=`echo "$RET" | sed -e 's,.*(\(.*\)).*,\1,'`
 
+	OVERRIDE=yes
 	case "$MAINRET" in
 	"PV")	# currently unused
 		#pv_mainmenu
