@@ -10,9 +10,6 @@ endif
 
 all: $(BIN) debian/choose-mirror.templates
 
-install: small
-	cp choose-mirror debian/choose-mirror.postinst
-
 # Freshen Mirrors.masterlist file, but allow failure.
 Mirrors.masterlist: force-try-update
 	if [ "$$ONLINE" != n ]; then \
