@@ -1,11 +1,12 @@
 Template: autopartkit/choose_device
 Type: select
 Choices: ${CHOICES}
-_Description: Select the device to partition (the install device)
- Choose the disk which has the free space required (column Free) to install
- Debian GNU/Linux. If there's not enough free space, space can be
- liberated by resizing the FAT partitions (column FreeFat indicates how much
- space will be freed by resizing the existing fat partitions).
+_Description: Device to partition:
+ Please choose the disk which has the free space required (column
+ Free) to install Debian GNU/Linux. If there's not enough free space,
+ space can be liberated by resizing the FAT partitions (column FreeFat
+ indicates how much space will be freed by resizing the existing fat
+ partitions).
  .
   Device   Model               Size   Free   FreeFat NbPart
  .
@@ -14,7 +15,7 @@ _Description: Select the device to partition (the install device)
 Template: autopartkit/confirm
 Type: boolean
 Default: false
-_Description: Are you sure you want to automatically partition the disk ?
+_Description: Really use the automatic partitioning tool?
  This will destroy the partition table on all disks in the machine.
  REPEAT: THIS WILL WIPE CLEAN ALL HARD DISKS IN THE MACHINE!
  If you have important data that are not backed up, you may want to
@@ -22,23 +23,23 @@ _Description: Are you sure you want to automatically partition the disk ?
  restart the installation later.
 
 Template: autopartkit/error
-Type: note
-_Description: An error occured during the previous operation.
+Type: error
+_Description: An error occured during the previous operation
  You may be able to continue. Here is some more information :
  .
  ${error}
 
 Template: autopartkit/refuse
 Type: note
-_Description: The partitioner will not work.
- This version of the autopartitioner is not elaborate enough to handle the
- partitioning of the selected disk. It will partition only an empty disk or
+_Description: Automatic partitioning impossible
+ This version of the autopartitioner cannot handle the
+ partitioning of the selected disk. It may partition only an empty disk or
  a disk with no more than 2 FAT partitions (and no extended partitions or
  other non-FAT partitions).
  .
  If you want to continue the installation process, switch to the second
  console (ALT+F2), partition the disk as you like using parted and the
- other tools available, and then mount all your partitions in /target.
+ other available tools, and then mount all your partitions in /target.
  /target is the root directory of your new system, so your root partition
  will be mounted on /target and your /usr partition must be mounted on
  /target/usr.
@@ -47,14 +48,14 @@ _Description: The partitioner will not work.
  disk.
 
 Template: autopartkit/notenoughspace
-Type: note
-_Description: The disk doesn't have enough space.
+Type: error
+_Description: Not enough space on disk
  The autopartitioner makes some assumptions about partition sizes, and
- because of that it requires at least 3Gb of free space. It appears that
- you don't have that much space.
+ because of that it requires at least 3Gb of free space. The free space
+ on this disk appears to be below this limit.
  .
- If you really want to install, you'll have to make some free space
- available, or you may relaunch this program and select another disk with
+ If you really want to install, you'll have to free some space.
+ You may alos launch this program again and select another disk with
  more free space.
 
 Template: autopartkit/debug
@@ -66,21 +67,21 @@ _Description: Debug information about ${variable}
 
 Template: autopartkit/success
 Type: note
-_Description: The partitioning has been successfully completed.
+_Description: Successful partitioning
  The required partitions have been created and mounted on /target. You can
  now continue the installation process.
 
 Template: autopartkit/partition_table
 Type: text
 Default: /etc/autopartkit/default.table
-_Description: File containing the requested partition table
+_Description: File containing the requested partition table:
  The automatic partitioning will be created using the partitions and
  sizes specified in this file.
 
 Template: debian-installer/autopartkit/title
 Type: text
 #  Item in the main menu to select this package
-_Description: Automatically partition hard drives (unsafe)
+_Description: Automatically partition hard drives
 
 Template: autopartkit/createfs-progress
 Type: text
