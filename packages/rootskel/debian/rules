@@ -28,6 +28,9 @@ install: build
 	dh_testroot
 
 	$(MAKE) install
+ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH),amd64)
+	ln -s lib debian/rootskel/lib64
+endif
 
 binary-indep: build install
 
