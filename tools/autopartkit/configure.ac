@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT(autopartkit, 0.29, linuxiskolen@skolelinux.no)
-AM_INIT_AUTOMAKE(autopartkit, 0.29)
+AC_INIT(autopartkit, 0.48, linuxiskolen@skolelinux.no)
+AM_INIT_AUTOMAKE(autopartkit, 0.48)
 
 AC_CONFIG_SRCDIR([autopartkit.c])
 AM_CONFIG_HEADER(config.h)
@@ -62,11 +62,12 @@ AC_ARG_ENABLE(test,
 [case "${enableval}" in
       yes) AC_DEFINE(TEST, 1, [Enable test code])
            CFLAGS="$CFLAGS -DTEST -g"
-	   AM_CONDITIONAL(TEST, true)
+	   ENABLE_TEST=yes
 	   ;;
-      no)  AM_CONDITIONAL(TEST, false) ;;
+      no)  ENABLE_TEST=no ;;
       *)   AC_MSG_ERROR(bad value ${enableval} for --enable-test) ;;
  esac],[])
+AM_CONDITIONAL(TEST, test "$ENABLE_TEST" = yes)
 
 AC_ARG_ENABLE(lvm,
 [  --enable-lvm            Enable hack to make LVM partitions [default=no]],
