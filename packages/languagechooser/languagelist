@@ -1,93 +1,86 @@
 #
 # This is the complete list of languages (locales) to choose from.
 #
-#Language [(Region/Country)];locale;langcode;countrycode;langlist;console-data
+#Language;locale;fallbacklocale;langcode;countrycode;langlist;console-data
+# where:
+#   -locale          =default locale
+#                     xx for languages with multiple countries
+#                     i.e. languages for which a valid locale may exist
+#                     with several different countries-->type 1 (see below)
+#                     xx_YY when only one country code leads to a supported
+#                     locale-->type 2 (see below)
+#   -fallbacklocale  =fallback locale (MUST be valid)
+#                     This locale will be used in case the user goes to
+#                     the "other" choice in countrychooser and chooses a
+#                     country with "unsupported" locale
+#   -langcode        =iso-639 TWO characters language code
+#   -countrycode     =default value for country choice in countrychoose
+#                     MUST be a valid ISO-3166 alpha-2 code
+#   -langlist        =colon-separated list of possible fallback languages
+#                     this will be used in the LANGUAGE variable
+#                     this DOES NOT be empty
+#   -console-data    =special options for the console-data package
+#                     (mostly keyboard or temrinal settings)
+#
 # (languages marked #X need updated translations)
-# We defined three language "types":
-# - type 1 (ex. Arabic) do not have any default country
+#
+# We defined two language "types":
+# - type 1 (ex. Arabic, English, Spanish) do not have any default country
 #   the countrycode field MUST be empty and the locale
 #   field MUST only by "xx"
 #   This is for languages will several possible countries and
 #   no "obvious" default
 # - type 2 (ex. Bulgarian) have only one possible default country
-#   the countrycode and locale fileds MUST be xx_YY
+#   the countrycode and locale fileds MUST be xx_YY or "C"
 #   This is for languages with only one possible country
 #   leading to a valid locale
-# - type 3 (ex. English, Spanish) have up to four entries
-#   Up to three of these are of type 2
-#   The remaining one has type 1
-#   This is for languages with several possible countries
-#   but one or a few offered as "quick selections"
-Albanian;sq_AL;sq;AL;sq_AL:sq:en_GB:en;kbd=lat0-sun16(iso15)
-Arabic;ar;ar;;ar:en_GB:en;kbd=iso06.f16(utf8)
-Basque;eu_ES;eu;ES;eu_ES:eu:en_GB:en;kbd=lat0-sun16(iso15)
-Bosnian;bs_BA;bs;BA;bs_BA:bs:en_GB:en;kbd=lat2-sun16(iso02)
-Bulgarian;bg_BG;bg;BG;;
-Catalan;ca_ES@euro;ca;ES;;kbd=lat0-sun16(iso15)
+#
+# Type 1 languages will trigger countrychooser
+# Type 2 languages won't
+C;;;;;C
+Albanian;sq_AL;sq_AL;sq;AL;sq_AL:sq:en_GB:en;kbd=lat0-sun16(iso15)
+Arabic;ar;ar_EG;ar;;ar:en_GB:en;kbd=iso06.f16(utf8)
+Basque;eu_ES;eu_ES;eu;ES;eu_ES:eu:en_GB:en;kbd=lat0-sun16(iso15)
+Bosnian;bs_BA;bs_BA;bs;BA;bs_BA:bs:en_GB:en;kbd=lat2-sun16(iso02)
+Bulgarian;bg_BG;bg_BG;bg;BG;bg_BG:bg:en_GB:en;
+Catalan;ca_ES@euro;ca_ES@euro;ca;ES;ca_ES:ca:en_GB:en;kbd=lat0-sun16(iso15)
 # Special case for Chinese as the two flavours share the same ISO 639 code
 # Both will trigger countrychooser. Each will the the backup for the other
 # one
-Chinese (Simplified - China);zh_CN;zh;CN;zh_CN:zh:en_US:en
-Chinese (Simplified - other);zh;zh;;zh_CN:zh:en_US:en
-Chinese (Traditional - Taiwan);zh_TW;zh;TW;zh_TW:zh:en_US:en
-Chinese (Traditional - other);zh;zh;;zh_TW:zh:en_US:en
+Chinese (Simplified);zh;zh_CN;zh;;zh_CN:zh:en_US:en
+Chinese (Traditional);zh;zh_TW;zh;;zh_TW:zh:en_US:en
 #X Croatian;hr_HR;hr;HR;;kbd=lat2-sun16(iso02)
-Czech;cs_CZ;cs;CZ;;kbd=lat2-sun16(iso02)
-Danish;da_DK;da;DK;;kbd=lat0-sun16(iso15)
-Dutch (Belgium);nl_BE@euro;nl;BE;nl_BE:nl:en_GB:en;kbd=lat0-sun16(iso15)
-Dutch (The Netherlands);nl_NL@euro;nl;NL;nl_NL:nl:en_GB:en;kbd=lat0-sun16(iso15)
-Dutch (other);nl;nl;;nl:en_GB:en;kbd=lat0-sun16(iso15)
-English (Australia);en_AU;en;AU;;kbd=lat0-sun16(iso15)
-English (USA);en_US;en;US;;kbd=lat0-sun16(iso15)
-English (United Kingdom);en_GB;en;GB;;kbd=lat0-sun16(iso15)
-English (other);en;en;;;kbd=lat0-sun16(iso15)
-#X Esperanto;eo_XX;eo;;eo_XX:eo:en_GB:en;
-Finnish;fi_FI@euro;fi;FI;fi:se;kbd=lat0-sun16(iso15)
-French (Belgium);fr_BE@euro;fr;BE;fr_BE:fr:NL_BE@euro:NL_BE:nl:en_GB:en;kbd=lat0-sun16(iso15)
-French (Canada);fr_CA;fr;CA;;kbd=lat0-sun16(iso15)
-French (France);fr_FR@euro;fr;FR;fr_FR:fr:en_GB:en;kbd=lat0-sun16(iso15)
-French (other);fr;fr;;fr:en_GB:en;kbd=lat0-sun16(iso15)
-Galician;gl_ES;gl;ES;gl:es;kbd=lat0-sun16(iso15)
-German (Germany);de_DE@euro;de;DE;de_DE:de:en_GB:en;kbd=lat0-sun16(iso15)
-German (Austria);de_AT@euro;de;AT;de_AT:de:en_GB:en;kbd=lat0-sun16(iso15)
-German (Switzerland);de_CH;de;CH;de_CH:de:en_GB:en;kbd=lat0-sun16(iso15)
-German (other);de;de;;de:en_GB:en;kbd=lat0-sun16(iso15)
-Greek;el_GR.UTF-8;el;GR;;kbd=iso07.f16(utf8)
-Hebrew;he_IL;he;IL;;kbd=iso08.f16(utf8)
-Hungarian;hu_HU;hu;HU;;kbd=lat2-sun16(iso02)
-Indonesian;id_ID;id;ID;;kbd=lat0-sun16(iso15)
-Irish;ga_IE@euro;ga;IE;ga:en_IE;kbd=lat0-sun16(iso15)
-#X Icelandic;is_IS;is;IS;;kbd=lat0-sun16(iso15)
-Italian (Italy);it_IT@euro;it;IT;;kbd=lat0-sun16(iso15)
-Italian (Switzerland);it_CH;it;CH;;kbd=lat0-sun16(iso15)
-Italian (other);it;it;;it:en_GB:en;kbd=lat0-sun16(iso15)
-# Not sure which locale to select, the EUC-JP or the UTF-8 one.
-# Picked one at random.  [pere 2003-09-06]
-Japanese;ja_JP.EUC-JP;ja;JP;;
-Korean;ko_KR.UTF-8;ko;KR;ko_KR:ko:en_US:en;
-Latvian;lv_LV;lv;LV;lv:ru:en;kbd=lat7-14(iso13)
-Lithuanian;lt_LT;lt;LT;;kbd=lat7-14(iso13)
-#X Northern Saami;se_NO;se_NO:se:nb_NO:nb:no_NO:no:nn_NO:nn:en_GB:en;
-Norwegian Bokmaal;no_NO;nb;NO;nb_NO:nb:no_NO:no:nn_NO:nn:da:sv:en_GB:en;kbd=lat0-sun16(iso15)
-Norwegian Nynorsk;nn_NO;nn;NO;nn_NO:nn:no_NO:no:nb_NO:nb:da:sv:en_GB:en;kbd=lat0-sun16(iso15)
-Polish;pl_PL;pl;PL;;kbd=lat2-sun16(iso02)
-Portuguese (Brazil);pt_BR;pt;BR;pt_BR:pt:pt_PT;kbd=lat0-sun16(iso15)
-Portuguese (Portugal);pt_PT@euro;pt;PT;pt_PT:pt:pt_BR;kbd=lat0-sun16(iso15)
-Portuguese (other);pt;pt;;pt:pt_BR:en_GB:en;kbd=lat0-sun16(iso15)
-Romanian;ro_RO;ro;RO;;kbd=lat2-sun16(iso02)
-Russian (Russia);ru_RU.KOI8-R;ru;RU;;cyr=uni,16,koi8-r,ru_ms(ctrl_shift_toggle)
-Russian (other);ru;ru;;ru:en_GB:en;cyr=uni,16,koi8-r,ru_ms(ctrl_shift_toggle)
-Serbian;sr_YU.UTF-8@cyrillic;sr;CS;sr_CS:sr_YU:sr:en_GB:en;cyr=uni,16,utf-8,sr(ctrl_shift_toggle)
-Slovak;sk_SK;sk;SK;;kbd=lat2-sun16(iso02)
-Slovenian;sl_SI;sl;SI;sl_SI:sl:en_GB;kbd=lat2-sun16(iso02)
-Spanish (Spain);es_ES@euro;es;ES;;kbd=lat0-sun16(iso15)
-Spanish (Argentina);es_AR;es;AR;;kbd=lat0-sun16(iso15)
-Spanish (Mexico);es_MX;es;MX;es_MX:es;kbd=lat0-sun16(iso15)
-Spanish (other);es;es;;es:en_GB:en;kbd=lat0-sun16(iso15)
-Swedish (Finland);sv_FI@euro;sv;FI;;kbd=lat0-sun16(iso15)
-Swedish (Sweden);sv_SE;sv;SE;;kbd=lat0-sun16(iso15)
-Swedish (other);sv;sv;;sv:en_GB:en;kbd=lat0-sun16(iso15)
-Turkish;tr_TR;tr;TR;;kbd=ter-916f(iso09)
-Ukrainian;uk_UA;uk;UA;uk_UA:uk:en_GB:en;cyr=uni,16,koi8-u,ua_ms(ctrl_shift_toggle)
-Vietnamese;vi_VN.UTF-8;vi;VN;vi_VN:vi:en_GB:en
-Welsh;cy_GB.UTF-8;cy;GB;cy_GB:en_GB:en;kbd=iso14.f16(utf8)
+Czech;cs_CZ;cs_CZ;cs;CZ;cs_CZ:cs:en_GB:en;kbd=lat2-sun16(iso02)
+Danish;da_DK;da_DK;da;DK;da_DK:da:en_GB:en;kbd=lat0-sun16(iso15)
+Dutch;nl;nl_NL;nl;;nl:en_GB:en;kbd=lat0-sun16(iso15)
+English;en;en_US;en;;en_GB:en_US:en;kbd=lat0-sun16(iso15)
+Finnish;fi_FI@euro;fi_FI@euro;fi;FI;fi_FI:fi:sv:en_GB:en;kbd=lat0-sun16(iso15)
+French;fr;fr_FR@euro;fr;;fr_FR:fr:en_GB:en;kbd=lat0-sun16(iso15)
+Galician;gl_ES;gl_ES;gl;ES;gl_ES:gl:es;kbd=lat0-sun16(iso15)
+German;de;de_DE@euro;de;;de_DE:de:en_GB:en;kbd=lat0-sun16(iso15)
+Greek;el_GR.UTF-8;el_GR.UTF-8;el;GR;el_GR:el:en_GB:en;kbd=iso07.f16(utf8)
+Hebrew;he_IL;he_IL;he;IL;he_IL:he:en_GB:en;kbd=iso08.f16(utf8)
+Hungarian;hu_HU;hu_HU;hu;HU;hu_HU:hu:en_GB:en;kbd=lat2-sun16(iso02)
+Indonesian;id_ID;id_ID;id;ID;id_ID:id:en_GB:en;kbd=lat0-sun16(iso15)
+Irish;ga_IE@euro;ga_IE@euro;ga;IE;ga_IE;ga:en_IE:en_GB:en;kbd=lat0-sun16(iso15)
+Italian;it;it_IT@euro;it;;it_IT;it:en_GB:en;kbd=lat0-sun16(iso15)
+Japanese;ja_JP.EUC-JP;ja_JP.EUC-JP;ja;JP;ja_JP:ja:en_GB:en;
+Korean;ko_KR.UTF-8;ko_KR.UTF-8;ko;KR;ko_KR:ko:en_GB:en;
+Latvian;lv_LV;lv_LV;lv;LV;lv_LV:lv:ru:en_GB:en;kbd=lat7-14(iso13)
+Lithuanian;lt_LT;lt_LT;lt;LT;lt_LT:lt:ru:en_GB:en;kbd=lat7-14(iso13)
+Norwegian Bokmaal;no_NO;no_NO;nb;NO;nb_NO:nb:no_NO:no:nn_NO:nn:da:sv:en_GB:en;kbd=lat0-sun16(iso15)
+Norwegian Nynorsk;nn_NO;nn_NO;nn;NO;nn_NO:nn:no_NO:no:nb_NO:nb:da:sv:en_GB:en;kbd=lat0-sun16(iso15)
+Polish;pl_PL;pl_PL;pl;PL;pl_PL:pl:en_GB:en;kbd=lat2-sun16(iso02)
+Portuguese (Brazil);pt_BR;pt_BR;pt;BR;pt_BR:pt:pt_PT;kbd=lat0-sun16(iso15)
+Portuguese;pt;pt_PT@euro;pt;;pt:pt_BR:en_GB:en;kbd=lat0-sun16(iso15)
+Romanian;ro_RO;ro_RO;ro;RO;ro_RO:ro:en_GB:en;kbd=lat2-sun16(iso02)
+Russian;ru;ru_RU.KOI8-R;ru;;ru_RU:ru:en_GB:en;cyr=uni,16,koi8-r,ru_ms(ctrl_shift_toggle)
+Serbian;sr_YU.UTF-8@cyrillic;sr_YU.UTF-8@cyrillic;sr;CS;sr_CS:sr_YU:sr:en_GB:en;cyr=uni,16,utf-8,sr(ctrl_shift_toggle)
+Slovak;sk_SK;sk_SK;sk;SK;sk_SK:sk:en_GB:en;kbd=lat2-sun16(iso02)
+Slovenian;sl_SI;sl_SI;sl;SI;sl_SI:sl:en_GB:en;kbd=lat2-sun16(iso02)
+Spanish;es;es_ES@euro;es;;es_ES:es:en_GB:en;kbd=lat0-sun16(iso15)
+Swedish;sv;sv_SE.ISO-8859-1;sv;;sv_SV:sv:en_GB:en;kbd=lat0-sun16(iso15)
+Turkish;tr_TR;tr_TR;tr;TR;tr_TR:tr:en_GB:en;kbd=ter-916f(iso09)
+Ukrainian;uk_UA;uk_UA;uk;UA;uk_UA:uk:ru:en_GB:en;cyr=uni,16,koi8-u,ua_ms(ctrl_shift_toggle)
+Vietnamese;vi_VN;vi_VN;vi;VN;vi_VN:vi:en_GB:en
+Welsh;cy_GB.UTF-8;cy_GB.UTF-8;cy;GB;cy_GB:en_GB:en;kbd=iso14.f16(utf8)

@@ -15,20 +15,25 @@ done
 # The prefered locale (sent to base-config)
 LOCALE=C
 
+# The fallback locale (used for LOCALE when this value is invalid)
+FALLBACKLOCALE=C
+
 # The choosen language code
 LANGUAGE=C
 
 # A colon separated priority list of language codes and locales to use
 # when selecting translations.
-LANGUAGELIST=
+LANGUAGELIST=C
 
 # The assumed country (location)
-COUNTRY=us
+COUNTRY=US
 
 # echo "Looking up '$LANGNAME'"
 
-line=`grep "^$LANGNAME" $languages`
+line=$(grep "^${LANGNAME};" $languages || true)
 #echo L: $line 1>&2
+
+#log "line=$line"
 
 if [ "$line" ] ; then
     OLD_IFS="$IFS"
@@ -39,14 +44,21 @@ if [ "$line" ] ; then
     #echo "C: $*"
 
     if [ "$2" ] ; then LOCALE="$2"; fi
-    if [ "$3" ] ; then LANGUAGE="$3"; fi
-    if [ "$4" ] ; then COUNTRY="$4"; fi
-    if [ "$5" ] ; then LANGUAGELIST="$5"; fi
-    if [ "$6" ] ; then CONSOLE="$6"; fi
+    if [ "$3" ] ; then FALLBACKLOCALE="$3"; fi
+    if [ "$4" ] ; then LANGUAGE="$4"; fi
+    if [ "$5" ] ; then COUNTRY="$5"; fi
+    if [ "$6" ] ; then LANGUAGELIST="$6"; fi
+    if [ "$7" ] ; then CONSOLE="$7"; fi
 
     if [ -z "$LANGUAGELIST" ] ; then
 	LANGUAGELIST="$LANGUAGE"
     fi
+
 else
     echo "error: Unable to locate info on language '$LANGNAME'"
+     log "error: Unable to locate info on language '$LANGNAME'"
 fi
+
+# bubulle 5/15/2004 : needed when choosing "Default". I've been unable to 
+# sort out why
+# exit 0

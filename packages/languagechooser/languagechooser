@@ -3,6 +3,7 @@
 . /usr/share/debconf/confmodule
 
 localecode="debian-installer/locale"
+fallbacklocalecode="debian-installer/fallbacklocale"
 # We need to remember which locale has been set in languagechooser
 # as countrychooser will also be able to change debian-installer/locale
 languagechooserlocalecode="languagechooser/locale"
@@ -33,8 +34,8 @@ if db_go; then
 	. languagemap
 	db_set "$languagecode" "$LANGUAGELIST"
 	db_set "$localecode"   "$LOCALE"
+	db_set "$fallbacklocalecode"   "$FALLBACKLOCALE"
 	# For "remembering" which locale is set by languagechooser
-	# this is supposed to ba a *valid* locale
 	db_set "$languagechooserlocalecode"   "$LOCALE"
 	db_set "$countrycode"  "$COUNTRY"
 	db_set "$consoledisplay"  "$CONSOLE"
@@ -89,6 +90,7 @@ case "$LANGUAGE" in
 esac
 
 log "$localecode   = '$LOCALE'"
+log "$fallbacklocalecode   = '$FALLBACKLOCALE'"
 log "$languagechooserlocalecode   = '$LOCALE'"
 log "$languagecode = '$LANGUAGELIST'"
 log "$countrycode  = '$COUNTRY'"
