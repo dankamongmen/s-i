@@ -50,7 +50,7 @@ if echo "${bootdev}" | grep -q '[0-9]$'; then
         db_input high lilo-installer/activate-part || [ $? -eq 30 ]
         db_go || true
         db_get lilo-installer/activate-part
-        if [ "${RET}" = "yes"]; then
+        if [ "${RET}" = "true"]; then
             pnum=$(echo ${bootdev} | sed 's/^.*\([0-9]\+\)$/\1/')
             echo -n "I: Setting partition to active..." >&2
             sfdisk -A${pnum} ${disc}
