@@ -215,11 +215,14 @@ fi
 db_set "$countrycode"  "$COUNTRYCODE"
 log "$countrycode = '$COUNTRYCODE'"
 
-# If the country forms a supported locale, set the locale.
+# If language_COUNTRY==supported locale, set the locale
+# Do this *only* if languagechooser's locale didn't have any country code
 if grep -q "^${LANGUAGE}_${COUNTRYCODE}$" $SUPPORTEDLOCALES; then
-	LOCALE=${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER}
-	db_set "$localecode" "${LOCALE}"
-	log "$localecode = '${LOCALE}'"
+	if ! (echo $DEFAULTLOCALE | grep "_" >/dev/null 2>&1) ; then	
+	    LOCALE=${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER}
+	    db_set "$localecode" "${LOCALE}"
+	    log "$localecode = '${LOCALE}'"
+	fi
 fi
 
 # The code below tries to add lang_COUNTRY at the beginning of the language
@@ -227,7 +230,7 @@ fi
 # Example:
 #   -user chooses "Arabic" at languagechooser-->she gets "ar_EG:ar:en_US:en"
 #    (see the languagelist file from languagechooser)
-#   -shes chooses "Syria" as country-->then we end up with 
+#   -she chooses "Syria" as country-->then we end up with 
 #    "ar_SY:ar_EG:ar:en_UC:en"
 # We shouldn't just add this before the former list in case the country 
 # is changed several times.
