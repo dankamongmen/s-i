@@ -47,6 +47,8 @@ static void cleanup()
 
 void sighandler(int sig)
 {
+	if (sig == SIGCHLD)
+		wait(NULL);
 	save();
 	/*
 	 * SIGUSR1 used to reconfigure the language. Now it
@@ -94,6 +96,7 @@ void parsecmdline(struct configuration *config, int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+	signal(SIGCHLD, sighandler);
 	signal(SIGINT, sighandler);
 	signal(SIGTERM, sighandler);
 	signal(SIGUSR1, sighandler);
