@@ -240,7 +240,7 @@ static void autopartkit_confirm(void)
     static int confirm = 0;
     if (confirm)
 	return;
-    if (mydebconf_bool("high", "autopartkit/confirm"))
+    if (mydebconf_bool("critical", "autopartkit/confirm"))
     {
 	confirm = 1;
 	return;
