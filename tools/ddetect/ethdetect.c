@@ -107,11 +107,13 @@ static struct ethernet_info *ethdetect_detect(struct cards_lst *lst)
 int module_loaded(char *module) {
      static char *modules[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
      int i;
-     for (i = 0; modules[i] != NULL && i < sizeof(modules); i++) {
+     for (i = 0; modules[i] != NULL && i < sizeof(modules) / sizeof(modules[0]);
+	  i++) {
           if (strcmp(modules[i], module) == 0)
                return 1;
      }
-     modules[i] = strdup(module);
+     if (i < sizeof(modules) / sizeof(modules[0]))
+	  modules[i] = strdup(module);
      return 0;
 }
 
