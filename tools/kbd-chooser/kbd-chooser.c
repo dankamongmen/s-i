@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.6 2003/01/30 14:09:31 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.7 2003/01/31 21:13:55 mckinstry Exp $
  */
 
 #include "config.h"
@@ -23,6 +23,12 @@
 #include "nls.h"
 #include "xmalloc.h"
 #include "kbd-chooser.h"
+
+
+#ifndef PREFERRED_KBD
+#define PREFERRED_KBD "none"
+#endif
+
 
 kbd_t *keyboards = NULL;
 static maplist_t *maplists = NULL;
