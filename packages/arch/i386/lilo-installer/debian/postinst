@@ -36,7 +36,6 @@ first_pv () {
 	pvdisplay -c | grep "^[^:]*:$1:" | sed 's/^ *\([^:]*\):.*$/\1/' | head -n 1
 }
 
-# detect the partitions /target and /target/boot
 rootfs_devfs=$(findfs /)
 bootfs_devfs=$(findfs /boot)
 [ -n "$bootfs_devfs" ] || bootfs_devfs="$rootfs_devfs"
@@ -51,7 +50,12 @@ fi
 bootfs=$(mapdevfs $bootfs_devfs)
 
 prefix=$(echo "$bootfs_devfs" | sed 's/\(\/dev\/[a-z]\+\).*/\1/')
-disc_offered_devfs=$(find $prefix -name disc | head -n 1)
+
+if [ "$prefix" != /dev/md ]; then
+	disc_offered_devfs=$(find $prefix -name disc | head -n 1)
+else
+	disc_offered_devfs="$bootfs_devfs"
+fi
 disc_offered=$(mapdevfs "$disc_offered_devfs")
 
 db_capb backup
