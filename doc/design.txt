@@ -9,32 +9,23 @@ Here is an overview of the new design.
     initrd), and choses one of them.
   - Configures the UI.
   - Checks to see what other modules are already unpacked and not yet
-    configured on the initrd, and configures each in turn. This is expected
-    to include at least one module retreiver, and possibly more.
-  - Asks the module retreivers to retreive any additional modules that are
+    configured on the initrd, and configures each in turn (dpkg --configure
+    -a equivilant). This is expected to include at least one module retriever.
+  - Asks the module retrievers to retrieve any additional modules that are
     available, and installs and configures those modules, one at a time.
     This is expected to include at least a disk partitioning and formatting
-    module.
-  - Asks a module retreiver to retreive the base system module (yes, it's a
+    module. THIS STEP NEEDS WORK (Should all modules be installed? What if
+                                  we chain retrievers?)
+  - Asks a module retriever to retrieve the base system module (yes, it's a
     .deb too..), and install it (its postinst probably chroots into the
-    new base system and a base setup program).
-4. base setup program
-  - Sets up some of:
-    - lilo (or other loader)
-    - the initrd debian will boot from
-    - the timezone
-    - additional hardware
-    - shadow passwords
-    - root's password
-    - another user account
-    - networking
-  - Then it reboots into the full debian system, or perhaps optionally
-    just runs init to start it w/o reboot.
-5. booting the full debian system
+    new base system and runs a base setup program, that sets up lilo and
+    a few other essentials).
+4. reboot into a full debian system
   - Since the system was installed with a minimal kernel that cannot talk to
     the hard drive, an initrd must be used. The initrd has a syslinux file on
     it, and a set of modules. It just loads the modules, in a certian order,
     with certian parameters, and then lets the kernel pass control to init.
+  - Set up all packages that need to be set up (timezone, password, etc, etc).
 
 The modules follow.
 
