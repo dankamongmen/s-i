@@ -26,6 +26,7 @@ preseed_location () {
 	fi
 
 	db_set preseed/include ""
+	db_set preseed/include_command ""
 	if ! debconf-set-selections $tmp; then
 		error load_error "$location"
 	fi
@@ -37,11 +38,17 @@ preseed_location () {
 	fi
 	rm -f $tmp
 
-	log "successfully loaded $location"
+	log "successfully loaded preseed file from $location"
 	local last_location="$location"
 	
 	db_get preseed/include
-	for location in $RET; do
+	local include="$RET"
+	db_get preseed/include_command
+	if [ -n "$RET" ]; then
+		include="$include $(eval $RET)" || true # TODO error handling?
+	fi
+	
+	for location in $include; do
 		# Support relative paths, just use path of last file.
 		if preseed_relative "$location"; then
 			# This works for urls too.
