@@ -445,7 +445,22 @@ gen_pcmcia_devnames() {
 	done
 }
 
-if [ -e /proc/bus/pccard/drivers ]; then
+have_pcmcia=0
+case "$(uname -r)" in
+  2.4*)
+    if [ -e "/proc/bus/pccard/drivers" ]; then
+      have_pcmcia=1
+    fi
+  ;;
+  2.6*)
+    if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
+      have_pcmcia=1
+    fi
+  ;;
+esac
+    
+# Try to do this only once..
+if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>/dev/null; then
 	log "Detected PCMCIA, installing pcmcia-cs."
 	apt-install pcmcia-cs || true
 
