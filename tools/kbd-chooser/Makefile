@@ -83,7 +83,7 @@ install:
 
 .PHONY: demo
 demo.templates: debian/templates
-	sed 's/_Description:/Description:/' < debian/templates > demo.templates
+	sed -e 's/_Description:/Description:/' -e '/^#/d' < debian/templates > demo.templates
 
 demo: demo.templates
 	rm -f demo
