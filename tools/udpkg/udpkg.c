@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.48 2004/03/08 20:52:45 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.49 2004/03/08 21:49:20 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -165,6 +165,13 @@ static int dpkg_dounpack(struct package_t *pkg)
 				 * so, call debconf-loadtemplate on it
 				 */
 				if (strcmp(adminscripts[i],"templates") == 0) {
+					/* Possibly reduce templates prior
+					 * to loading. Done on lowmem
+					 * installs. */
+					snprintf(buf, sizeof(buf),
+					         "trimtemplates %s", buf2);
+					di_exec_shell_log(buf);
+					
 					snprintf(buf, sizeof(buf),
 						 "debconf-loadtemplate %s %s",
 						 pkg->package, buf2);
