@@ -9,19 +9,38 @@ struct cpu {
 	char *ret;
 };
 
-struct system {
+struct systype {
 	char *sys;
 	struct cpu *cpu;
 };
 
 static struct cpu system_sgi_ind_cpu[] = {
 	{ "R4", "r4k-ip22" },
-	{ "R5", "r5k-ip22" },
+	{ "R5000", "r5k-ip22" },
+	{ "R8000", "r8k-ip26" },
+	{ "R10000", "r10k-ip28" },
+	{ NULL, "unknown" }
+};
+
+static struct cpu system_sgi_origin_cpu[] = {
+	{ "R10000", "r10k-ip27" },
+	{ "R12000", "r12k-ip27" },
+	{ NULL, "unknown" }
+};
+
+static struct cpu system_sgi_o2_cpu[] = {
+	{ "R10000", "r10k-ip32" },
+	{ "R12000", "r12k-ip32" },
 	{ NULL, "unknown" }
 };
 
 static struct cpu system_sibyte_sb1_ind_cpu[] = {
 	{ "SiByte SB1", "sb1-swarm-bn" },
+	{ NULL, "unknown" }
+};
+
+static struct cpu system_sni_rm200c_cpu[] = {
+	{ "R4", "r4k-rm200c" },
 	{ NULL, "unknown" }
 };
 
@@ -31,16 +50,22 @@ static struct cpu system_unknown_cpu[] = {
 	{ NULL, "unknown" }
 };
 
-static struct system system_type[] = {
+static struct systype system_type[] = {
 	/* match "SGI Indy" and "SGI Indigo2" */
 	{"SGI Ind", system_sgi_ind_cpu },
+	/* SGI Origin (ip27) */
+	{"SGI Origin", system_sgi_origin_cpu },
+	/* SGI O2 (ip32) */
+	{"SGI IP32", system_sgi_o2_cpu },
 	/* match the Broadcom SWARM development board */
 	{"SiByte BCM91250A", system_sibyte_sb1_ind_cpu },
+	/* SNI RM200C */
+	{"SNI RM200_PCI", system_sni_rm200c_cpu },
 	/* add new system types here */
 	{ NULL, system_unknown_cpu }
 };
 
-#define INVALID_SYS_IDX (sizeof(system_type) / sizeof(struct system) - 1)
+#define INVALID_SYS_IDX (sizeof(system_type) / sizeof(struct systype) - 1)
 #define INVALID_CPU_IDX (-1)
 
 #define BUFFER_LENGTH (1024)
