@@ -3,6 +3,7 @@
 #define __MKFSTAB_H__
 
 #define _GNU_SOURCE
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

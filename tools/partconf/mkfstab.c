@@ -1,4 +1,3 @@
-#include <assert.h>
 #include "mkfstab.h"
 
 static int has_device(struct fstab_entry *entry) {
