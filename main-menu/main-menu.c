@@ -30,8 +30,6 @@
 const int RAISE = 1;
 const int LOWER = 0;
 
-#define UNUSED_VARIABLE(var) (void)var
-
 /* Save default priority, to be able to return to it when we have to lower it */
 int default_priority = 1;
 
@@ -271,6 +269,7 @@ static int satisfy_virtual(di_system_package *p) {
 		if (dep->p.status == di_package_status_installed) {
 			/* This means that a providing package is already
 			 * configure. So we short-circuit. */
+			menu_used = 0;
 			break;
 		}
 		if (defpkg == NULL || dep->p.priority > defpkg->p.priority ||
@@ -472,12 +471,11 @@ static void adjust_default_priority (void) {
 	}
 }
 
-int main (int argc, char **argv) {
+int main (int argc __attribute__ ((unused)), char **argv) {
 	di_system_package *p;
 	di_packages *packages;
 	di_packages_allocator *allocator;
 	int ret;
-	UNUSED_VARIABLE(argc);
 
 	debconf = debconfclient_new();
 	di_system_init(basename(argv[0]));
