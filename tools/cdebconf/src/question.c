@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.9 2001/01/07 05:05:12 tausq Exp $
+ * $Id: question.c,v 1.10 2002/05/18 22:35:05 tfheen Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -40,6 +40,11 @@
 #include "question.h"
 #include "template.h"
 #include "strutl.h"
+#include "configuration.h"
+#include "database.h"
+
+static struct database *db = NULL;
+static struct configuration *config = NULL;
 
 struct question *question_new(const char *tag)
 {
@@ -68,6 +73,39 @@ void question_deref(struct question *q)
 	if (q == NULL) return;
 	if (--q->ref == 0)
 		question_delete(q);
+}
+
+/*
+ * Function: question_dup
+ * Input: q - the question to be duplicated
+ * Output: a deep copy of the question struct passed as input.  the template 
+ *         pointer is not changed
+ * Description: duplicate a questions
+ * Assumptions: all allocations succeed
+ * Todo: 
+ */
+
+struct question *question_dup(struct question *q)
+{
+        struct question *ret = question_new(q->tag);
+        struct questionvariable *qv = q->variables;
+        struct questionowner *qo = q->owners;
+        ret->value = STRDUP(q->value);
+        ret->defaultval = STRDUP(q->defaultval);
+        ret->flags = q->flags;
+        ret->template = q->template;
+//        ret->template = template_dup(q->template);
+        while (qv)
+        {
+                question_variable_add(ret,qv->variable,qv->value);
+                qv = qv->next;
+        }
+        while (qo)
+        {
+                question_owner_add(ret,qo->owner);
+                qo = qo->next;
+        }
+        return ret;
 }
 
 void question_setvalue(struct question *q, const char *value)
@@ -190,9 +228,59 @@ static int question_expand_vars(struct question *q, const char *field,
 	return DC_OK;
 }
 
+/*
+ * Function: getlanguage
+ * Input: none
+ * Output: const char* (size == 3) the language code of the currently 
+ *         selected language
+ * Description: find the currently selected language
+ * Assumptions: config_new and database_new succeeds, 
+ *              debian-installer/language exists
+ */
+
+const char *getlanguage()
+{
+	static char language[3];
+	/* We need to directly access the configuration, since I couldn't
+	   get debconfclient to work from in here. */
+	struct question *q2 = NULL;
+        memset(language,'\0',3);
+
+	if (! config) /* Then db isn't set either.. */
+	{
+		config = config_new();
+                if (config == 0) 
+                        DIE("Error initializing configuration item (%s %d)", __FILE__,__LINE__);
+		if (config->read(config, DEBCONFCONFIG) == 0)
+			DIE("Error reading configuration information");
+		if ((db = database_new(config)) == 0)
+			DIE("Cannot initialize DebConf database");
+		db->load(db);
+	}
+	q2 = db->question_get(db, "debian-installer/language");
+        if (q2 != NULL) {
+                if (q2->value != NULL)
+                        snprintf(language,3,"%.2s",q2->value);
+                question_deref(q2);
+        }
+	return language;
+}
+
 const char *question_description(struct question *q)
 {
 	static char buf[4096] = {0};
+	struct language_description *langdesc;
+
+	langdesc = q->template->localized_descriptions;
+	while (langdesc)
+	{
+		if (strcmp(langdesc->language,getlanguage()) == 0) 
+		{
+			question_expand_vars(q, langdesc->description, buf, sizeof(buf));
+			return buf;
+		}
+		langdesc = langdesc->next;
+	}
 	question_expand_vars(q, q->template->description, buf, sizeof(buf));
 	return buf;
 }
@@ -201,6 +289,44 @@ const char *question_extended_description(struct question *q)
 {
 	static char buf[4096] = {0};
 	question_expand_vars(q, q->template->extended_description, buf, sizeof(buf));
+	return buf;
+}
+
+const char *question_extended_description_translated(struct question *q)
+{
+	static char buf[4096] = {0};
+	struct language_description *langdesc;
+
+	langdesc = q->template->localized_descriptions;
+	while (langdesc)
+	{
+		if (strcmp(langdesc->language,getlanguage()) == 0 && langdesc->description != NULL)
+		{
+			question_expand_vars(q, langdesc->extended_description, buf, sizeof(buf));
+			return buf;
+		}
+		langdesc = langdesc->next;
+	}
+	question_expand_vars(q, q->template->extended_description, buf, sizeof(buf));
+	return buf;
+}
+
+const char *question_choices_translated(struct question *q)
+{
+	static char buf[4096] = {0};
+	struct language_description *langdesc;
+
+	langdesc = q->template->localized_descriptions;
+	while (langdesc)
+	{
+		if (strcmp(langdesc->language,getlanguage()) == 0 && langdesc->choices != NULL)
+		{
+			question_expand_vars(q, langdesc->choices, buf, sizeof(buf));
+			return buf;
+		}
+		langdesc = langdesc->next;
+	}
+	question_expand_vars(q, q->template->choices, buf, sizeof(buf));
 	return buf;
 }
 
@@ -218,3 +344,4 @@ const char *question_defaultval(struct question *q)
 	else
 		return q->template->defaultval;
 }
+

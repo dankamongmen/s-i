@@ -31,6 +31,7 @@ struct question {
 
 struct question *question_new(const char *tag);
 void question_delete(struct question *question);
+struct question *question_dup(struct question *q);
 
 void question_ref(struct question *);
 void question_deref(struct question *);
@@ -45,6 +46,7 @@ void question_owner_add(struct question *q, const char *owner);
 void question_owner_delete(struct question *q, const char *owner);
 const char *question_description(struct question *q);
 const char *question_extended_description(struct question *q);
+const char *question_choices_translated(struct question *q);
 const char *question_choices(struct question *q);
 const char *question_defaultval(struct question *q);
 
