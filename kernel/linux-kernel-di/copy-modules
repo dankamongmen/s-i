@@ -6,7 +6,7 @@
 #
 # Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
 #
-# $Id: copy-modules,v 1.1 2003/10/16 15:50:04 joeyh Rel $
+# $Id: copy-modules,v 1.2 2003/10/21 07:43:17 gaudenz Exp $
 
 set -e
 
@@ -14,11 +14,19 @@ deplist() {
 	deps=$1
 	list=$2
 	cp $list $tmpdir/work
+
+   #recursively append external dependencies to $list
 	while :; do
+
+      #list external dependencies of $work
 		join -o 2.2 $tmpdir/work $deps | sort -u | comm -23 - $list \
 			> $tmpdir/work.new
 		mv $tmpdir/work.new $tmpdir/work
+
+      #exit if work is empty
 		[ -s $tmpdir/work ] || break
+      
+      #append work to $list
 		sort -um -o $list $list $tmpdir/work
 	done
 }
@@ -34,6 +42,8 @@ mkdir $tmpdir
 
 moddir=/lib/modules/$version
 
+# get module dependencies from modules.dep
+# sort it by by field 2
 moddir_awk="\/lib\/modules\/$version\/kernel\/"
 awk '
 	{
@@ -56,26 +66,37 @@ unset moddir_awk
 
 mkdir $tmpdir/module-deps $tmpdir/module-list
 
+# loop over all udebs, sort that all 
+# dependent modules are processed before
+# the module
 for i in $(
 	{
 		find modules/ -maxdepth 1 -type f -printf "%f\t%f\n"
 		cat module-deps
 	} | tsort | tac
 ); do
-	echo $i | join -o 2.2 - $home/module-deps | {
+
+   #write dependent (direct and indirect) udebs to exclude
+   #write dependencies to module-deps/$i
+	echo $i | join -o 2.2 - $home/module-deps | {       #dependent modules
 		cd $tmpdir/module-deps
-		xargs -r sh -c 'printf "%s\n" "$@"; cat "$@"' sh
-	} | sort -u | tee $tmpdir/module-deps/$i | {
+		xargs -r sh -c 'printf "%s\n" "$@"; cat "$@"' sh #direct and indirect deps
+	} | sort -u | tee $tmpdir/module-deps/$i | {        #write deps
 		cd $tmpdir/module-list
 		xargs -r cat
-	} | sort -u > $tmpdir/exclude
+	} | sort -u > $tmpdir/exclude                       #modules to exclude
 
 	cp $home/modules/$i $tmpdir/module-list
+
+   #exclude modules in exclude from dependency list
 	join -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |
 		sort -k 1,1 > $tmpdir/tmpdeps
 
+   #include dependent modules which are not in a
+   #dependent udeb into module-list/$i
 	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
 
+   #copy kernel modules to debian/$i-$version-di
 	cd $moddir/kernel
 	tar cfT - $tmpdir/module-list/$i |
 	(
