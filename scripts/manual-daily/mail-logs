@@ -14,6 +14,9 @@ add-svnlog () {
     echo "" >>$mainlog
     echo "=============== snv up ===============" >>$mainlog
     cat $logdir/svn_up.log >>$mainlog
+    echo "" >>$mainlog
+    echo "=============== snv ci ===============" >>$mainlog
+    cat $logdir/svn_ci.log >>$mainlog
 }
 
 if [ -f $ROOT/do_not_build ] ; then
@@ -34,7 +37,7 @@ for lang in `egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -
     BUILD_ERRORS=0
     egrep -v "^(Writing|Info:|Warning:|dvips:)" \
              $logdir/$lang.log >/tmp/build_log.$$
-    if egrep -v -q "^(|Error: no ID for constraint linkend:.*|Starting build.*|Building manual.*)$" \
+    if egrep -v -q "^(|Error: no ID for constraint linkend:.*|(Preparing|Starting) build.*|Building manual.*)$" \
                 /tmp/build_log.$$ ; then
         BUILD_ERRORS=1
     fi
@@ -70,12 +73,8 @@ for lang in `egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -
     fi
 
     cat $ROOT/bin/msgtxt.common >>/tmp/message.$$
-    grepexp="^([UAD][[:space:]]*${lang}/|Updated to revision)"
+    grepexp="^([UAD][[:space:]]*(po/|)${lang}/|Updated to revision)"
     egrep "$grepexp" $logdir/svn_up.log >>/tmp/message.$$
-    if [ -f $logdir/svn_ci.log ] ; then
-        echo "" >>/tmp/message.$$
-        cat logdir/svn_ci.log >>/tmp/message.$$
-    fi
 
     # Mail message
     mutt -H /tmp/header.$$ $ATTACHMENT </tmp/message.$$

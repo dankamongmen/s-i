@@ -53,7 +53,7 @@ get_formats () {
 }
 
 update_from_svn () {
-    echo "Performing SVN update" >>$mainlog
+    echo "Performing SVN update..." >>$mainlog
     svn up &>$logdir/svn_up.log
     RESULT=$?
     if [ ! "$RESULT" = "0" ] ; then
@@ -122,6 +122,7 @@ echo "" >>$mainlog
 # Prepare for the build: generate XML for translations using PO files
 # Note: English should always be processed first
 EN_UPDATED=""
+echo "Updating POT and PO files..." >>$mainlog
 for lang in $languages; do
     langlog=$logdir/$lang.log
     : >$langlog
@@ -160,6 +161,7 @@ for lang in $languages; do
             [ -n "$LANG_UPDATED" ] && \
                 echo "Info: building manual from PO files" >>$langlog
             if [ -n "$LANG_UPDATED" ] || [ -n "$EN_UPDATED" ] ; then
+                echo "Info: updating PO files for $lang" >>$mainlog
                 update_po $lang >>$langlog 2>&1
                 checkfatal "$?" "updating po for $lang"
             fi
