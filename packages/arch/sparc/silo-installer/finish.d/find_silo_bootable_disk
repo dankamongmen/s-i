@@ -15,7 +15,7 @@ get_silo_root_boot() {
 		if [ "$mp" = / ]; then
 			echo "root_type=$type; root_fs=$fs;"
 		elif [ "$mp" = /boot ]; then
-			echo "boot_type=$type; boot_fs=$fs; bpart=$mp"
+			echo "boot_type=$type; boot_fs=$fs;"
 		fi
 	done
 }
@@ -26,7 +26,6 @@ if [ -z "$boot_fs" ]
 then
 	boot_fs=$root_fs
 	boot_type=$root_type
-	bpart='/'
 fi
 
 disk=
@@ -48,13 +47,13 @@ do
 	# We got /boot or /. Hooray!
 	if [ -n "$disk" ]; then
 		# /boot or / goes past the 1024cyl barrier
-                open_dialog GET_CHS "$id"
-                read_line start_cyl start_head start_sector end_cyl end_head end_sector
-                close_dialog
+		open_dialog GET_CHS "$id"
+		read_line start_cyl start_head start_sector end_cyl end_head end_sector
+		close_dialog
 
-                # Only sparc32 suffers from this problem though.
-                if [ "$end_cyl" -gt 1024 ] && [ "$(archdetect)" = sparc/sparc32 ]; then
-			db_subst silo-installer/boot-after-1024cyl BPART "$bpart"
+		# Only sparc32 suffers from this problem though.
+		if [ "$end_cyl" -gt 1024 ] && [ "$(archdetect)" = sparc/sparc32 ]; then
+			db_subst silo-installer/boot-after-1024cyl CYL "$end_cyl"
 			db_input critical silo-installer/boot-after-1024cyl
 			db_go
 			db_get silo-installer/boot-after-1024cyl
