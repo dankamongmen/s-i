@@ -137,7 +137,7 @@ int generate_yabootconf(const char *boot, const char *root) {
 	FILE *conf = NULL;
 
 	/* running yabootconfig to create the basic yaboot.conf */
-	asprintf(&cmd, "/usr/sbin/yabootconfig -q --noinstall -t %s -b %s -r %s",
+	asprintf(&cmd, "/target/usr/sbin/yabootconfig -q --noinstall -t %s -b %s -r %s",
 		TARGET, boot, root);
 	ret = system(cmd);
 	if(WEXITSTATUS(ret) != 0) 
