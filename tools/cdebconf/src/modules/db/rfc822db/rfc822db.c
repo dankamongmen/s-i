@@ -320,7 +320,7 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
             for (field = template_fields_list; *field != NULL; field++)
             {
                 p = t->lget((struct template *) t, lang, *field);
-                if (p != NULL && strcmp(*field, "tag") != 0)
+                if (p != NULL && p != t->lget((struct template *) t, NULL, *field))
                     fprintf(outf, "%c%s-%s.UTF-8: %s\n",
                         toupper((*field)[0]), (*field)+1, lang, escapestr(p));
             }
@@ -329,7 +329,7 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
         fprintf(outf, "\n");
     }
 }
-  
+
 static int rfc822db_template_save(struct template_db *db)
 {
     struct template_db_cache *dbdata = db->data;
