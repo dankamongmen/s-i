@@ -38,7 +38,7 @@ static struct cpu system_sgi_o2_cpu[] = {
 	{ NULL, "unknown" }
 };
 
-static struct cpu system_sibyte_sb1_ind_cpu[] = {
+static struct cpu system_sibyte_sb1_cpu[] = {
 	{ "SiByte SB1", "sb1-swarm-bn" },
 	{ NULL, "unknown" }
 };
@@ -63,7 +63,7 @@ static struct systype system_type[] = {
 	/* SGI O2 (ip32) */
 	{"SGI IP32", system_sgi_o2_cpu },
 	/* match the Broadcom SWARM development board */
-	{"SiByte BCM91250A", system_sibyte_sb1_ind_cpu },
+	{"SiByte BCM91250A", system_sibyte_sb1_cpu },
 	/* SNI RM200C */
 	{"SNI RM200_PCI", system_sni_rm200c_cpu },
 	/* add new system types here */
