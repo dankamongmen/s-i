@@ -18,7 +18,7 @@ demo: $(BIN)
 	rm -f main-menu.template
 
 # Size optimized and stripped binary target.
-small: CFLAGS=-Os $(CFLAGS) -DSMALL
+small: CFLAGS:=-Os $(CFLAGS) -DSMALL
 small: clean $(BIN)
 	strip --remove-section=.comment --remove-section=.note $(BIN)
 	ls -l $(BIN)
