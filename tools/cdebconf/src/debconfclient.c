@@ -83,6 +83,7 @@ struct debconfclient *debconfclient_new(void)
 	memset(client, 0, sizeof(struct debconfclient));
 
 	client->command = debconfclient_command;
+	client->commandf = debconf_commandf;
 	client->ret = debconfclient_ret;
 
 	return client;
