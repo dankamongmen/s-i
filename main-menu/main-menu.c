@@ -103,6 +103,8 @@ get_default_menu_item(struct linkedlist_t *list)
 	return NULL;
 }
 
+static char *menu_priority = "medium";
+
 /* Displays the main menu via debconf and returns the selected menu item. */
 struct package_t *show_main_menu(struct linkedlist_t *list) {
 	static struct debconfclient *debconf = NULL;
@@ -187,7 +189,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
 	if (menudefault)
 		debconf->command(debconf, "SET", MAIN_MENU, menudefault->description, NULL);
-	debconf->command(debconf, "INPUT medium", MAIN_MENU, NULL);
+	debconf->command(debconf, "INPUT", menu_priority, MAIN_MENU, NULL);
 	debconf->command(debconf, "GO", NULL);
 	debconf->command(debconf, "GET", MAIN_MENU, NULL);
 	s=debconf->value;
@@ -221,7 +223,7 @@ static int config_package(struct package_t *);
  * config_package.
  */
 static int satisfy_virtual(struct package_t *p) {
-	struct debconfclient *debconf;
+	struct debconfclient *debconf = NULL;
 	struct package_t *dep, *defpkg = NULL;
 	int i;
 	char *choices, *tmp;
@@ -268,6 +270,7 @@ static int satisfy_virtual(struct package_t *p) {
 		choices[c_size-2] = '\0';
 	if (choices[0] != '\0') {
 		if (is_menu_item) {
+			char *priority = "medium";
 			/* Only let the user choose if one of them is a menu item */
 			debconf = debconfclient_new();
 			debconf->command(debconf, "FSET", MISSING_PROVIDE, "seen",
@@ -275,9 +278,12 @@ static int satisfy_virtual(struct package_t *p) {
 			if (defpkg != NULL)
 				debconf->command(debconf, "SET", MISSING_PROVIDE,
 						defpkg->description, NULL);
+			else
+				/* TODO: How to figure out a default? */
+				priority = "critical";
 			debconf->command(debconf, "SUBST", MISSING_PROVIDE,
 					"CHOICES", choices, NULL);
-			debconf->command(debconf, "INPUT medium", MISSING_PROVIDE,
+			debconf->command(debconf, "INPUT", priority, MISSING_PROVIDE,
 					NULL);
 			debconf->command(debconf, "GO", NULL);
 			debconf->command(debconf, "GET", MISSING_PROVIDE, NULL);
@@ -339,20 +345,19 @@ config_package(struct package_t *p) {
 
 int do_menu_item(struct package_t *p) {
 	char *configcommand;
-	int ret;
+	int ret = 0;
 
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
 		asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package);
-		ret = SYSTEM(configcommand);
+		ret = !SYSTEM(configcommand);
 		free(configcommand);
-		return !ret;
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
-		config_package(p);
+		ret = config_package(p);
 	}
 
-	return 1;
+	return ret;
 }
 
 static void update_language (void) {
@@ -378,7 +383,10 @@ int main (int argc, char **argv) {
 
 	packages = status_read();
 	while ((p=show_main_menu(packages))) {
-		do_menu_item(p);
+		if (!do_menu_item(p)) {
+			di_log("Setting main menu question priority to critical");
+			menu_priority = "critical";
+		}
 		/*
 		 * A language selection package must provide the virtual
 		 * package 'language-selected'.
