@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.8 2003/02/04 04:45:24 kraai Exp $
+ * $Id: kbd-chooser.c,v 1.9 2003/02/04 04:48:38 kraai Exp $
  */
 
 #include "config.h"
@@ -249,17 +249,21 @@ maplist_t *parse_keymap_file (const char *name)
 	mp = &(mapfile->maps);
 
 	while (!feof (fp)) {
-		map = NEW (keymap_t);
-		
 		fgets (buf, LINESIZE, fp);
 		tab1 = strchr (buf, '\t');
 		if (!tab1)
-			break; // end of file
+			continue; // malformed line
 		tab2 = strchr (tab1+1, '\t');
+		if (!tab2)
+			continue; // malformed line
 		nl = strchr (tab2, '\n');
+		if (!nl)
+			continue; // malformed line
 		*tab1 = '\0';
 		*tab2 = '\0';
 		*nl = '\0';
+		
+		map = NEW (keymap_t);
 		map->langs = STRDUP (buf);
 		map->name =  STRDUP (tab1+1);
 		map->description = STRDUP (tab2+1);
