@@ -125,8 +125,8 @@ int main (int argc, char **argv) {
 			state--; /* back up */
 	}
 
-	if (state == 0)
-		exit(10); /* backed all the way out */
-	else
+	if (state >= 0)
 		exit(0);
+	else
+		exit(10); /* backed all the way out */
 }
