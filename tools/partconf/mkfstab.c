@@ -161,6 +161,16 @@ void get_fstab_d_dir() {
 		}
 
 		while(fgets(line, 1024, file) != NULL) {
+			char filesystem[1024];
+
+			sscanf(line, "%s %*s", filesystem);
+			if(filesystem[0] != '$') {
+				struct stat buf;
+				if(stat(filesystem, &buf) != 0) {
+					continue;
+				}
+			}
+
 			insert_line(line);
 		}
 
