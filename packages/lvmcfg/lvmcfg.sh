@@ -77,7 +77,7 @@ addinfos_pv() {
 #
 getfree_vg() {
 	cmdout=`vgdisplay "$1" 2>&1`
-	echo "$cmdout" | grep '^[ ]*Free  PE' | sed -e 's,^.*/ ,,'
+	echo "$cmdout" | grep '^[ ]*Free  PE' | sed -e 's,^.*/ ,,' | sed -e 's/ \+$//'
 }
 
 #
