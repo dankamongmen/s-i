@@ -27,7 +27,11 @@ do
     # discover doesn't do devfs, :/
 
     # devices=`/sbin/discover --disable-all --enable=pci,ide,scsi --device cdrom`
-    devices="`echo /dev/cdroms/*`"
+    if [ -d /dev/cdroms ]; then
+        devices="`echo /dev/cdroms/*`"
+    else
+        devices=""
+    fi
     for device in $devices
     do
         if mount -t iso9660 -o ro,exec $device /cdrom 2>/dev/null
