@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.53 2003/11/11 23:07:48 barbier Exp $
+ * $Id: text.c,v 1.54 2003/11/11 23:22:40 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -280,6 +280,8 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	i = 0;
 
 	while (1) {
+ 	    if (i < 0)
+ 	        i = 0;
  	    for (line = 0; i < count && line < getheight()-1; i++, line++) {
 	        if (selected[tindex[i]])
 		       /* A selected item in a Multiselect question */
@@ -291,25 +293,30 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 
 	    if (i == count && count < getheight()-1) {
 	        printf(get_text(obj, "debconf/prompt-1-page", 
-			        "Prompt: 1 - %d, q to end> "), count);
+			        "Prompt: 1 - %d, q to quit select> "), count);
 	    } else if (i == count) {
 	        printf(get_text(obj, "debconf/prompt-last-page",
-			        "Prompt: 1 - %d, q to end, b for begin> "), count);
+			        "Prompt: 1 - %d, q to quit select, b for back> "), count);
+	    } else if (i == getheight()-1) {
+	        printf(get_text(obj, "debconf/prompt-first-page", 
+			        "Prompt: 1 - %d/%d, q to quit select, n for next page> "), i, count);
 	    } else {
 	        printf(get_text(obj, "debconf/prompt-multi-page", 
-			        "Prompt: 1 - %d/%d, q to end, n for next page> "), i, count);
+			        "Prompt: 1 - %d/%d, q to quit select, b for back, n for next page> "), i, count);
 	    }
 
 	    fgets(answer, sizeof(answer), stdin);
 	    CHOMP(answer);
 	    MAKE_UPPER(answer[0]); 
-	                       /* q to end */
-	    if (answer[0] == *(get_text(obj,"debconf/quit-key", "Q"))) break;
+	                       /* q to quit select */
+	    if (answer[0] == *(get_text(obj,"debconf/quit-key", "Q")))
+                    break;
 	                       /* n for next page */
-	    if (answer[0] == *(get_text(obj,"debconf/next-key", "N"))) continue;
-	                       /* b for begin */
-	    if (answer[0] == *(get_text(obj,"debconf/begin-key", "B"))) 
-	    		{ i = 0; continue; }
+	    if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
+                    continue;
+	                       /* b for back */
+	    if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
+	            { i -= 2*(getheight()-1); continue; }
 
 	    choice = atoi(answer) - 1;
 
@@ -448,8 +455,11 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	}
 
 	i = 0;
+	choice = -1;
 
 	do {
+ 	    if (i < 0)
+ 	        i = 0;
 	    for (line = 0; i < count && line < getheight()-1; i++, line++) {
 	        if (def == i)
 		       /* A selected item in a Select question */
@@ -466,12 +476,23 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	        } else {
 	            printf(get_text(obj, "debconf/prompt-num", "Prompt: 1 - %d> "), count);
                 }
+	    } else if (i == getheight()-1) {
+	        printf(get_text(obj, "debconf/prompt-firstpage", "Prompt: 1 - %d/%d, n for next page> "),
+				i, count);
 	    } else {
-	        printf(get_text(obj, "debconf/prompt-multipage", "Prompt: 1 - %d/%d, n for next page> "),
+	        printf(get_text(obj, "debconf/prompt-multipage", "Prompt: 1 - %d/%d, b for back, n for next page> "),
 				i, count);
 	    }
 	    fgets(answer, sizeof(answer), stdin);
 	    CHOMP(answer);
+	    MAKE_UPPER(answer[0]); 
+	                       /* n for next page */
+	    if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
+                    continue;
+	                       /* b for back */
+	    if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
+	            { i -= 2*(getheight()-1); continue; }
+
 #if defined(__s390__) || defined (__s390x__)
 	    if (answer[0] == 0 || (answer[0] == '.' && answer[1] == 0))
 #else
