@@ -43,7 +43,7 @@ installer of GNU/Linux and that are related to partitioning:
   RAID and LVM as well as encrypted file systems.
 
 <item> It should be able to partition disks automatically and allow
-  the user to inspect and customise the automatical partitioning
+  the user to inspect and customise the automatic partitioning
   latter.
 
 <item> It should be able to resize partitions and move their contents
@@ -53,9 +53,9 @@ from one place to another.
 them to undo their partitioning operations.
 
 <item> The partitioner should discover that there is already some
-  installed GNU/Linux system and analise its <prgn>fstab</prgn>,
-  <prgn>passwd</prgn>, etc. in order to provide automatic upgrade from
-  the old already installed installed GNU/Linux system to the new one.
+  installed GNU/Linux system and analyse its <prgn>fstab</prgn>,
+  <prgn>passwd</prgn>, etc. in order to provide an automatic upgrade from
+  the old already installed GNU/Linux system to the new one.
 </list>
 
 <p> One nice feature of the Debian installer is that it is modular.
@@ -63,8 +63,8 @@ them to undo their partitioning operations.
   relatively independent development process.  This document describes
   how we can solve all mentioned tasks keeping the Debian installer as
   modular as it is now.  Ideally in order to add some new feature only
-  few new udebs must be all that is needed &ndash; no changes in the
-  existing udebs and no recompilation.
+  a few new udebs must be all that is needed &ndash; no changes in the
+  existing udebs and no recompilation would be required.
 
 <p> The script <file>partman</file> from the package
 <package>partman</package> opens the main partitioning menu; it may
@@ -663,7 +663,7 @@ debconf_select <var>priority</var> <var>template</var> <var>choices</var> <var>d
  returns with exit-code 255.  Otherwise the value of the variable
  <tt>RET</tt> will be the <var><tt>menu_item_id</tt></var> of the
  chosen menu item.  If the chosen menu item was chosen by the user
- then the exit-code is 0.  If the item was chosen automaticaly (due
+ then the exit-code is 0.  If the item was chosen automatically (due
  to the debconf-priority or to some other reason) the exit-code is 1.
 
 <p> The function <prgn>debconf_select</prgn> doesn't care
@@ -766,18 +766,18 @@ about the partitions.  They can communicate with
 partition.  However not everithing can be known from
 <prgn>parted_server</prgn>.  Imagine an udeb that provides the user
 with the option to upgrade some existing GNU/Linux installation.  This
-udeb analises the <prgn>fstab</prgn> and knows that some partition is
+udeb analyses the <prgn>fstab</prgn> and knows that some partition is
 used as <file>/home</file> and should not be formatted.  This sort of
 information has nothing to do with <prgn>parted_server</prgn>.  The
 udeb stores it in a subdirectory of the device directory named after
 the id of the partition.
 
-<p> But now a problem arises.  Suppose that the users choose to format
+<p> But now a problem arises.  Suppose that the user chooses to format
 some partition as ext2 and mount it on <file>/home</file>.  The udebs
-responsible for formatting and mounting create in the partition
-directory files <prgn>filesystem</prgn> and <prgn>mountpoint</prgn>.
+responsible for formatting and mounting create the directories
+<prgn>filesystem</prgn> and <prgn>mountpoint</prgn> in the partition.
 What will happen if the users change their mind and decide to use the
-same partition as a swap space?  Swap spaces have no mount points and
+same partition as swap space?  Swap spaces have no mount points and
 the file <prgn>mountpoint</prgn> should be removed.  Who is
 responsible to remove it?  The udeb that allows the user to choose a
 file system for the partition doesn't have to know that swap-spaces
@@ -785,8 +785,8 @@ have no mount points, only the udeb that provides support for
 swap-spaces can know that the file <prgn>mountpoint</prgn> should be
 removed.
 
-<p> In order to solve this difficulty every script that makes change
-in some partition should invoke the function
+<p> In order to solve this difficulty every script that makes changes
+to some partition should invoke the function
 <prgn>update_partition</prgn> from <prgn>definitions.sh</prgn>.
 Synopsis:
 <example>
@@ -827,13 +827,13 @@ please read how these functions are implemented.
 <prgn>open_outfifo</prgn> and <prgn>close_outfifo</prgn> are called
 without arguments.  They open and close <prgn>infifo</prgn> and
 <prgn>outfifo</prgn> assigning them file descriptors 6 and 7
-correspondingly.  You need not to use these low-level functions.
+correspondingly.  You do not need to use these low-level functions.
 
 <p> The function <prgn>write_line</prgn> prints its arguments to
 <prgn>outfifo</prgn>.
 
 <p> The function <prgn>read_line</prgn> reads from <prgn>infifo</prgn>
-a line, splits it in fields acording to <tt>$IFS</tt> and assigns
+a line, splits it in fields according to <tt>$IFS</tt> and assigns
 these fields to variables whose names are given to
 <prgn>read_line</prgn> as arguments.  For example
 <example>
@@ -1239,7 +1239,7 @@ end_dialog
 <p> libparted assigns every partition some file system.  This command
 can be used to change this file system.  The file system assigned to
 the partition is not necessarily the same as the actual file system.
-Libparted uses it to determine automaticaly the type of the partition
+Libparted uses it to determine automatically the type of the partition
 in some partition tables.  For example with msdos partition tables the
 partitions with file system `ext2' receive type 83.  The partitions
 that are swap spaces receive type 82.
