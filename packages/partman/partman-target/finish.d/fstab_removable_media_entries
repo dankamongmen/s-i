@@ -6,7 +6,7 @@ MEDIA=/media # or MEDIA='' to make directories in /
 
 # dev, mountpoint, type, options, dump, pass
 addfstab () {
-	printf "%-15s %-15s %-7s %-15s %-7s %s\n" "$1" "$2" "$3" "$4" "$5" "$6" >> /target/etc/fstab
+    printf "%-15s %-15s %-7s %-15s %-7s %s\n" "$1" "$2" "$3" "$4" "$5" "$6" >> /target/etc/fstab
 }
 
 rm_dir_or_link () {
@@ -25,20 +25,17 @@ populate_media () {
     options=$3
     shift; shift; shift
     mkdir -p /target$MEDIA
-    if [ "$2" ]; then
-	number=0
-	rm_dir_or_link /target${MEDIA}/${category}
-	ln -s ${category}0 /target${MEDIA}/${category}
-	addfstab $1 ${MEDIA}/${category} $fs $options 0 0
-    else
-	number=''
+    if [ "$1" ]; then
+        rm_dir_or_link /target${MEDIA}/${category}
+        ln -s ${category}0 /target${MEDIA}/${category}
     fi
+    number=0
     while [ "$1" ]; do
 	mount_point="${MEDIA}/${category}$number"
 	addfstab $1 $mount_point $fs $options 0 0
 	rm_dir_or_link /target$mount_point
 	mkdir -p /target$mount_point
-	[ -z "$number" ] || number=$(($number + 1))
+	number=$(($number + 1))
 	shift
     done
 }
@@ -61,6 +58,12 @@ done
 CDDEVICES="$MAPCDDEV $CDDEVICES" # first the mounted cdrom
 
 populate_media cdrom iso9660 ro,user,noauto $CDDEVICES
+# Compatability link to keep things working; sarge is not migrated away
+# entirely from /cdrom.
+if [ -n "$CDDEVICES" ]; then
+    rm_dir_or_link /target/cdrom
+    ln -s media/cdrom /target/cdrom
+fi
 
 modprobe floppy >>/var/log/messages 2>&1 || true
 
@@ -75,8 +78,37 @@ done
 
 populate_media floppy auto rw,user,noauto $FDDEVICES
 
-# Setup /cdrom for compatability
-if [ "$MAPCDDEV" ]; then
-    addfstab "$MAPCDDEV" "/cdrom" "iso9660" "ro,user,noauto" "0" "0"
+# See if a usb storage device is plugged in right now. If so, assume it is
+# removable media unless the disk is already listed in the fstab. If
+# installing from usb, list that device first.
+USBDEVICES=''
+HD_MEDIA=$(grep /hd-media /proc/mounts | cut -d ' ' -f 1)
+if [ -n "$HD_MEDIA" ]; then
+    HD_MEDIA="$(mapdevfs $HD_MEDIA)"
+    USBDEVICES="$HD_MEDIA"
 fi
+for dir in /proc/scsi/usb-storage-* /proc/scsi/usb-storage; do
+    if [ -d "$dir" ]; then
+        for ent in $dir/*; do
+	    if [ -f "$ent" ]; then
+	        host=$(grep "Host scsi" $ent | sed 's/.*scsi\([0-9]\).*/\1/')
+	        infstab=""
+	        for dev in $(find /dev/scsi/host$host/ -type b); do
+	            if [ -b "$dev" ]; then
+	 	        if grep -q "^$(mapdevfs $dev) " /target/etc/fstab; then
+			    infstab=1
+			fi
+	 	    fi
+	        done
+		if [ ! "$infstab" ]; then
+		    dev=$(mapdevfs $(find /dev/scsi/host$host/ -type b | grep /disc))
+		    if [ "$dev" != "$HD_MEDIA" ]; then
+		        USBDEVICES="$USBDEVICES $dev"
+		    fi
+		fi
+	    fi
+        done
+    fi
+done
 
+populate_media usb auto rw,user,noauto $USBDEVICES
