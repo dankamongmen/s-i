@@ -7,7 +7,7 @@
  *
  * Description: interface to debconf templates
  *
- * $Id: template.c,v 1.15 2002/11/21 00:32:21 barbier Exp $
+ * $Id: template.c,v 1.16 2002/11/22 21:12:41 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -44,6 +44,8 @@
 
 static const char *template_lget(struct template *t, const char *lang,
                 const char *field);
+static const char *template_get_internal(struct template *t, const char *lang,
+                const char *field);
 static void template_lset(struct template *t, const char *lang,
                 const char *field, const char *value);
 static const char *template_next_lang(struct template *t, const char *l);
@@ -59,10 +61,66 @@ const char *template_fields_list[] = {
         NULL
 };
 
+struct cache_list_lang
+{
+	char *lang;
+	struct cache_list_lang *next;
+};
+struct cache_list_lang *cache_list_lang_ptr = NULL;
+/*   cache_cur_lang contains the colon separated list of languages  */
+static char *cache_cur_lang = NULL;
+
 static const char *getlanguage(void)
 {
-        /*  NULL is a valid return value  */
-	return getenv("LANGUAGE");
+	const char *envlang = getenv("LANGUAGE");
+	struct cache_list_lang *p, *q;
+	char *cpb, *cpe;
+
+	if ((cache_cur_lang == NULL && envlang != NULL) ||
+	    (cache_cur_lang != NULL && envlang == NULL) ||
+	    (cache_cur_lang != NULL && envlang != NULL && strcmp(cache_cur_lang, envlang) != 0))
+	{
+		/*   LANGUAGE has changed, reset cache_cur_lang...  */
+		if (cache_cur_lang != NULL)
+			free(cache_cur_lang);
+		/*   ... and language linked list  */
+		for (p = cache_list_lang_ptr; p != NULL; p = p->next)
+		{
+			if (p->lang != NULL)
+				free(p->lang);
+			q = p->next;
+			free(p);
+			p = q;
+		}
+		cache_list_lang_ptr = NULL;
+		if (envlang == NULL)
+			return NULL;
+
+		cache_list_lang_ptr = (struct cache_list_lang *)
+			malloc(sizeof(struct cache_list_lang));
+		cache_list_lang_ptr->next = NULL;
+		cache_list_lang_ptr->lang = NULL;
+
+		p = cache_list_lang_ptr;
+		cache_cur_lang = strdup(envlang);
+		cpb = cache_cur_lang;
+		while((cpe = strchr(cpb, ':')) != NULL)
+		{
+			p->lang = strndup(cpb, (int) (cpe - cpb));
+			p->next = (struct cache_list_lang *)
+					malloc(sizeof(struct cache_list_lang));
+			cpb = cpe + 1;
+			p = p->next;
+		}
+		p->lang = strdup(cpb);
+		p->next = NULL;
+	}
+
+	/*  Return the first language  */
+	if (cache_list_lang_ptr == NULL)
+		return NULL;
+
+	return cache_list_lang_ptr->lang;
 }
 
 /*
@@ -218,12 +276,11 @@ static void template_field_set(struct template_l10n_fields *p,
 static const char *template_lget(struct template *t, const char *lang,
                 const char *field)
 {
-    struct template_l10n_fields *p;
-    const char *ret = NULL, *altret = NULL;
+    const char *ret = NULL;
     char *orig_field;
     char *altlang;
     char *cp;
-    const char *curlang;
+    struct cache_list_lang *cl;
 
     if (strcasecmp(field, "tag") == 0)
         return t->tag;
@@ -255,32 +312,62 @@ static const char *template_lget(struct template *t, const char *lang,
     	return template_field_get(t->fields, field);
 
     if (*lang == 0)
-        curlang = getlanguage();
+    {
+        getlanguage();
+        for (cl = cache_list_lang_ptr; cl != NULL; cl = cl->next)
+        {
+            ret = template_get_internal(t, cl->lang, field);
+            if (ret != NULL)
+                return ret;
+        }
+    }
     else
-        curlang = lang;
+    {
+        ret = template_get_internal(t, lang, field);
+        if (ret != NULL)
+            return ret;
+    }
 
-    p = t->fields;
+    /*  Default value  */
+    return template_field_get(t->fields, field);
+}
+
+/*
+ * Function: template_get_internal
+ * Input: a template
+ * Input: a language name
+ * Input: a field name
+ * Output: the value of the given field in the given language, field
+ *         name may be any of type, default, choices, description and
+ *         extended_description
+ * Description: get field value
+ * Assumptions: Arguments have been previously checked, lang and field
+ *              are not MULL
+ */
+
+static const char *template_get_internal(struct template *t, const char *lang,
+                const char *field)
+{
+    struct template_l10n_fields *p;
+    const char *altret = NULL;
+
+    p = t->fields->next;
     while (p != NULL)
     {
         /*  Exact match  */
-        if (curlang == NULL || strcmp(p->language, curlang) == 0)
-        {
-            ret = template_field_get(p, field);
-            if (ret == NULL)
-                ret = template_field_get(t->fields, field);
-            return ret;
-        }
+        if (strcmp(p->language, lang) == 0)
+            return template_field_get(p, field);
 
         /*  Language is xx_XX and a xx field is found  */
-        if (strlen(p->language) == 2 && strncmp(curlang, p->language, 2) == 0)
+        if (strlen(p->language) == 2 && strncmp(lang, p->language, 2) == 0)
             altret = template_field_get(p, field);
 
         p = p->next;
     }
     if (altret != NULL)
         return altret;
-    /*  Default value  */
-    return template_field_get(t->fields, field);
+
+    return NULL;
 }
 
 static void template_lset(struct template *t, const char *lang,
