@@ -20,12 +20,26 @@ findfs () {
 	mount | grep "on /target${1%/} " | cut -d' ' -f1
 }
 
+lvm_vg () {
+	lvdisplay -c "$1"| sed 's/^[^:]*:\([^:]*\):.*$/\1/'
+}
+
+first_pv () {
+	pvdisplay -c | grep "^[^:]*:$1:" | sed 's/^ *\([^:]*\):.*$/\1/' | head -n 1
+}
+
 # detect the partitions /target and /target/boot
 rootfs_devfs=$(findfs /)
 bootfs_devfs=$(findfs /boot)
-[ "$bootfs_devfs" ] || bootfs_devfs="$rootfs_devfs"
+[ -n "$bootfs_devfs" ] || bootfs_devfs="$rootfs_devfs"
 
 rootfs=$(mapdevfs $rootfs_devfs)
+
+bootvg=$(lvm_vg $bootfs_devfs)
+if [ -n "$bootvg" ]; then
+	bootfs_devfs=$(first_pv $bootvg)
+fi
+
 bootfs=$(mapdevfs $bootfs_devfs)
 
 prefix=$(echo "$bootfs_devfs" | sed 's/\(\/dev\/[a-z]\+\).*/\1/')
@@ -114,6 +128,15 @@ db_progress step 1
 
 # Use a serial console if current default console is a serial port.
 # default console is last listed
+IFS=" "
+for arg in $(cat /proc/cmdline); do
+  case "$arg" in
+    console=*)
+      defconsole=$arg
+    ;;
+  esac
+done
+
 defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
 if echo "${defconsole}" | grep -q console=ttyS; then
     PORT=$(echo "${defconsole}" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
