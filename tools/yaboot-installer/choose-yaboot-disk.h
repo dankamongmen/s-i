@@ -17,7 +17,6 @@
 #include <dirent.h>
 #include <cdebconf/debconfclient.h>
 #include <debian-installer.h>
-#include "powerpc-type.h"
 
 #define MAX_DISCS 64
 #define TARGET "/target"

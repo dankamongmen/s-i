@@ -98,13 +98,8 @@ int is_bootable(const PedPartition *part) {
 	if(ped_partition_is_flag_available(part, PED_PARTITION_BOOT) &&
 	ped_partition_get_flag(part, PED_PARTITION_BOOT)) {
 		if(part->geom.length*512 >= (800*1024)) {
-			PedFileSystemType *fs = 
-				ped_file_system_probe((PedGeometry*)&part->geom);
-
-			if(fs && !strcmp(fs->name, "hfs")) {
-				return(1);	/* puh. yes, this disk is yaboot ready :) */
-			}
-		}
+        return(1);	/* puh. yes, this disk is yaboot ready :) */
+      }
 	}
 
 	return(0);
@@ -260,14 +255,15 @@ int main(int argc, char **argv) {
 	debconf->command(debconf, "title", "Installing yaboot", NULL);
 
 	/* first, check if this machine as newworld */
-	if(get_powerpc_type() != 0) {
+   /* FIXME: this is currently broken (needs new subarch detection)	
+     if(get_powerpc_type() != 0) {
 		debconf->command(debconf, "fset", "yaboot-installer/wrongmac",
 			"seen", "false", NULL);
 		debconf->command(debconf, "set", "yaboot-installer/wrongmac", "false", NULL);
 		debconf->command(debconf, "input", "critical", "yaboot-installer/wrongmac", NULL);
 		debconf->command(debconf, "go", NULL);
 		exit(1);
-	}
+      } */
 
 	/* add a libparted exception handler */
 	ped_exception_set_handler(exception_handler);
@@ -337,7 +333,7 @@ int main(int argc, char **argv) {
 		debconf->command(debconf, "go", NULL);
 	}
 
-   /* yabootconfig and ybin need proc and devfs
+   /* mkofboot needs proc
       running them in chroot /target */
    i = system("mount -t proc none /target/proc >>/var/log/messages 2>&1");
    atexit((void*)unmount_proc);
@@ -361,8 +357,8 @@ int main(int argc, char **argv) {
                 exit(1);
 	}
 	
-	/* running "ybin" */
-	i = system("chroot /target /usr/sbin/ybin -v >>/var/log/messages 2>&1");
+	/* running "mkofboot" */
+	i = system("chroot /target /usr/sbin/mkofboot -v -f >>/var/log/messages 2>&1");
 	if(WEXITSTATUS(i) != 0) {
 		debconf->command(debconf, "fset", "yaboot-installer/ybinerr",
 			"seen", "false", NULL);
