@@ -4,7 +4,7 @@ DISK="$1"
 
 case "$DEBIAN_FRONTEND" in
 *)
-	fdisk $DISK
+	parted $DISK
 	;;
 esac
 
