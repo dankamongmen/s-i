@@ -49,9 +49,12 @@ fi
 info "Using kernel '$kernel'"
 
 cat > /target/boot/default.colo <<EOF
+#:CoLo:#
+#
 # load the Debian kernel from $bootfs_no_dev
+#
 mount $bootfs_no_dev
 load $kernel
-execute root=$rootfs console=ttyS0,115200
+execute root=$rootfs console=ttyS0,{console-speed}
 EOF
 
