@@ -25,7 +25,7 @@ CLILIBOBJS=debconfclient.opic
 
 CLILIBOBJS_A=$(CLILIBOBJS:.opic=.o)
 
-all: $(BIN) $(LIBNAME) $(CLILIBNAME) $(CLILIBNAME_A) modules/Makefile
+all: $(BIN) $(LIBNAME) $(CLILIBNAME) $(CLILIBNAME_A) modules/Makefile client/confmodule
 	@$(MAKE) -C modules $@
 
 bin: $(BIN)
@@ -49,6 +49,14 @@ $(CLILIBNAME_A): $(CLILIBOBJS_A)
 $(CLISONAME) $(CLILIB): $(CLILIBNAME)
 	-@ln -sf $^ $@
 
+commands-list.h: commands-list.in
+	$(srcdir)/$(SUBDIR)/commands-list.h.build $< > $@
+
+client/confmodule: commands-list.in client/confmodule.in
+	$(srcdir)/$(SUBDIR)/client/confmodule.build $^ > $@
+
+confmodule.o confmodule.opic: commands-list.h
+
 install:
 	install -d -m 755 $(DESTDIR)${bindir}
 	install -d -m 755 $(DESTDIR)${sbindir}
@@ -64,7 +72,7 @@ install:
 	ln -sf $(CLILIBNAME) $(DESTDIR)${libdir}/$(CLILIB)
 	install -m 644 $(CLILIBNAME_A) $(DESTDIR)${libdir}
 	install -m 644 cdebconf.conf-dist $(DESTDIR)${etcdir}/cdebconf.conf
-	install -m 644 ${srcdir}/src/client/confmodule $(DESTDIR)${sharedir}
+	install -m 644 client/confmodule $(DESTDIR)${sharedir}
 	ln -sf ../../bin/$(DEBCONF) $(DESTDIR)${sharedir}/frontend
 ifneq ($(TARGET),udeb)
 	install -m 755 debconf debconf-copydb debconf-dumpdb $(DESTDIR)${bindir}
@@ -74,7 +82,7 @@ endif
 	@$(MAKE) -C modules $@
 
 clean:
-	-@rm -f $(BIN) $(LIBNAME) $(CLILIB) $(CLILIBNAME) $(CLILIBNAME_A) $(CLISONAME) *~ *.o *.opic
+	-@rm -f $(BIN) $(LIBNAME) $(CLILIB) $(CLILIBNAME) $(CLILIBNAME_A) $(CLISONAME) *~ *.o *.opic commands-list.h client/confmodule
 	@$(MAKE) -C modules clean
 
 .PHONY: all bin install clean

@@ -18,30 +18,7 @@
 #include <debian-installer.h>
 
 static commands_t commands[] = {
-    { "beginblock",          command_beginblock },
-    { "capb",                command_capb },
-    { "clear",               command_clear },
-    { "endblock",            command_endblock },
-    { "exist",               command_exist },
-    { "fget",                command_fget },
-    { "fset",                command_fset },
-    { "get",                 command_get },
-    { "go",                  command_go },
-    { "input",               command_input },
-    { "metaget",             command_metaget },
-    { "progress",            command_progress },
-    { "purge",               command_purge },
-    { "register",            command_register },
-    { "reset",               command_reset },
-    { "set",                 command_set },
-    { "settitle",            command_settitle },
-    { "stop",                command_stop },
-    { "subst",               command_subst },
-    { "title",               command_title },
-    { "unregister",          command_unregister },
-    { "version",             command_version },
-    { "x_loadtemplatefile",  command_x_loadtemplatefile },
-    { "x_save",              command_x_save },
+#include "commands-list.h"
     { 0, 0 }
 };
 
