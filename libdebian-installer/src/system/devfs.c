@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: devfs.c,v 1.4 2003/11/20 20:02:48 waldi Exp $
+ * $Id: devfs.c,v 1.5 2004/02/19 21:06:02 smarenka Exp $
  */
 
 #include <debian-installer/system/devfs.h>
@@ -57,6 +57,7 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 4,	0,	"tty",		ENTRY_TYPE_NUMBER,	0,	6 },
     { 8,	0,	"sd",		ENTRY_TYPE_DISC,	0,	4 },
     { 9,	0,	"md",		ENTRY_TYPE_NUMBER,	0,	0 },
+    { 11,	0,	"scd",		ENTRY_TYPE_NUMBER,	0,	0 },
     { 22,	0,	"hd",		ENTRY_TYPE_DISC,	2,	6 },
     { 33,	0,	"hd",		ENTRY_TYPE_DISC,	4,	6 },
     { 34,	0,	"hd",		ENTRY_TYPE_DISC,	6,	6 },
