@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.20 2002/11/30 15:57:58 barbier Exp $
+ * $Id: slang.c,v 1.21 2002/12/17 23:04:33 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -133,7 +133,7 @@ static void slang_initwin(struct frontend *ui, int type, struct slwindow *win)
 			"black", "yellow");
 		break;
 	default:
-		INFO(INFO_DEBUG, _("Unrecognized window type"));
+		INFO(INFO_DEBUG, "Unrecognized window type");
 	}
 }
 
@@ -305,8 +305,9 @@ static void slang_navbuttons(struct frontend *ui, struct question *q,
 
 	if (ui->methods.can_go_back(ui, q))
 	{
-		slang_printf(ybut - 1, COLS-12, (selected == 1 ? win->selectedcolor :
-			win->drawcolor), _(" <Cancel> "));
+		slang_printf(ybut - 1, COLS-2-strlen(_(" <Cancel> ")),
+			(selected == 1 ? win->selectedcolor : win->drawcolor),
+			_(" <Cancel> "));
 	}
 
 	/* caller should call slang_flush() ! */
@@ -329,11 +330,13 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	while (ret == 0) 
 	{
 		/* Draw the radio boxes */
-		slang_printf(ybut, (COLS/2)-11, (pos == 2 ? win->selectedcolor :
-			win->drawcolor), " (%c) %s ", (ans ? '*' : ' '), 
+		slang_printf(ybut, (COLS/2)-strlen(_("Yes"))-8,
+			(pos == 2 ? win->selectedcolor : win->drawcolor),
+			" (%c) %s ", (ans ? '*' : ' '), 
 			_("Yes"));
-		slang_printf(ybut, (COLS/2)+4, (pos == 3 ? win->selectedcolor :
-			win->drawcolor), " (%c) %s ", (ans ? ' ' : '*'),
+		slang_printf(ybut, (COLS/2)+4,
+			(pos == 3 ? win->selectedcolor : win->drawcolor),
+			" (%c) %s ", (ans ? ' ' : '*'),
 			_("No"));
 
 		slang_navbuttons(ui, q, pos);

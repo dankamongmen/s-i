@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.8 2002/11/26 22:28:51 barbier Exp $
+ * $Id: gtk.c,v 1.9 2002/12/17 23:04:33 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -93,7 +93,7 @@ void passwd_callback( GtkWidget *widget,
   
   *callstring = strdup(entrytext);
 
-  printf(_("Password captured.\n"));
+  printf("Password captured.\n");
 }
 
 /*
@@ -187,13 +187,13 @@ void select_callback( GtkWidget *widget,
   if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (widget))) 
     {
       /* If control reaches here, the toggle button is down */
-      printf(_("selected: %p\n"), widget);
+      printf("selected: %p\n", widget);
       *radio = widget;
 
     } else {
     
       /* If control reaches here, the toggle button is up */
-      printf(_("deselected: %p\n"), widget);
+      printf("deselected: %p\n", widget);
     }
 
 }
@@ -257,7 +257,7 @@ gint delete_event( GtkWidget *widget,
    * This is useful for popping up 'are you sure you want to quit?'
    * type dialogs. */
 
-  g_print ("delete event occurred\n");
+  g_print (_("delete event occurred\n"));
 
   /* Change TRUE to FALSE and the main window will be destroyed with
    * a "delete_event". */
@@ -471,7 +471,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q)
 	    //create a button for each choice here and init the global place to store them
 
 	    choiceButtons[i] = gtk_check_button_new_with_label ( (gchar *)choices_translated[i] );
-	    g_signal_connect (G_OBJECT (choiceButtons[i]), _("clicked"),
+	    g_signal_connect (G_OBJECT (choiceButtons[i]), "clicked",
 			      G_CALLBACK (multicheck_callback), &call_data);
 	    gtk_box_pack_start(GTK_BOX(hboxtop), choiceButtons[i], FALSE, 5, 0);
 	    gtk_widget_show (choiceButtons[i]);
@@ -695,7 +695,7 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 
 	    choiceButtons[i] = nextButton;
 	    
-	    g_signal_connect (G_OBJECT (nextButton), _("clicked"),
+	    g_signal_connect (G_OBJECT (nextButton), "clicked",
 			      G_CALLBACK (select_callback), &radio);
 
 	    gtk_box_pack_start (GTK_BOX (hboxtop), nextButton, TRUE, TRUE, 0);
@@ -703,7 +703,7 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 
 	    if(i == def)
 	      {
-		printf(_("setting default to %d\n"), i);
+		printf("setting default to %d\n", i);
 		//GTK_WIDGET_SET_FLAGS (nextButton, GTK_CAN_DEFAULT);
 		//gtk_widget_grab_default (nextButton);
 	      }
@@ -731,21 +731,21 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
                 break;
             }
 
-	printf(_("selected: %d\n"), choice);
+	printf("selected: %d\n", choice);
 
 	//once the dialog returns, handle the result
-	printf(_("freeing %d buttons\n"), count);
+	printf("freeing %d buttons\n", count);
 
 	free(choiceButtons);
 
-	printf(_("selectnum: %d\n"), choice);
+	printf("selectnum: %d\n", choice);
 
 	if(choice >= 0 && choice < count)
 	  {
 	    strcpy(answer, choices[choice]);
 	  }
 
-	printf(_("answer: %s\n"), answer);
+	printf("answer: %s\n", answer);
 
 	question_setvalue(q, answer);
 
@@ -890,7 +890,7 @@ static int gtkhandler_text(struct frontend *obj, struct question *q)
 
 	text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
 
-	printf(_("text captured: %s.\n"), text);
+	printf("text captured: %s.\n", text);
 
 	strcpy(buf, text);
 
