@@ -94,9 +94,8 @@ int lvm_lv_stack_delete(void *);
 
 /* andread@linpro.no */
 int lvm_get_free_space_list(char*, struct disk_info_t*);
-void *reduce_disk_usage_size(struct disk_info_t*,
-			     struct diskspace_req_s[],
-			     double);
+void reduce_disk_usage_size(struct disk_info_t*, struct diskspace_req_s[],
+			    double);
 void *lvm_vg_stack_new(void);
 int lvm_vg_stack_isempty(void *stack);
 int lvm_vg_stack_push(void *stack, const char *vgname);

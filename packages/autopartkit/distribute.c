@@ -305,7 +305,7 @@ get_free_space_list(void)
 }
 
 /* andread@linpro.no */
-void *
+void
 reduce_disk_usage_size(struct disk_info_t *vg, 
                      struct diskspace_req_s reqs[],
                      double percent){
