@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.15 2002/11/05 03:01:51 tfheen Exp $
+ * $Id: text.c,v 1.16 2002/11/13 14:41:55 waldi Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -159,7 +159,11 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 			ans = 1;
 		else if (strcmp(buf, "no\n") == 0)
 			ans = 0;
+#if defined(__s390__) || defined (__s390x__)
+		else if (defval && (strcmp(buf, "\n") == 0 || strcmp(buf, ".\n") == 0))
+#else
 		else if (defval && strcmp(buf, "\n") == 0)
+#endif
 			ans = def;
 	} while (ans < 0);
 
@@ -323,7 +327,11 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 
 			printf(_("Prompt: 1 - %d> "), count);
 			fgets(answer, sizeof(answer), stdin);
+#if defined(__s390__) || defined (__s390x__)
+			if (answer[0] == '\n' || (answer[0] == '.' && answer[1] == '\n'))
+#else
 			if (answer[0] == '\n')
+#endif
 				choice = def;
 			else
 				choice = atoi(answer);
@@ -358,7 +366,13 @@ static int texthandler_string(struct frontend *obj, struct question *q)
 	printf("> "); fflush(stdout);
 	fgets(buf, sizeof(buf), stdin);
 	CHOMP(buf);
+#if defined(__s390__) || defined (__s390x__)
+	if (buf[0] == '.' && buf[1] == 0 && defval == 0)
+		question_setvalue(q, "");
+	else if ((buf[0] == 0 || (buf[0] == '.' && buf[1] == 0)) && defval != 0)
+#else
 	if (buf[0] == 0 && defval != 0)
+#endif
 		question_setvalue(q, defval);
 	else
 		question_setvalue(q, buf);
