@@ -226,6 +226,22 @@ di_pkg_parse(FILE *f)
             else
                 p->status = other;
         }
+        else if (di_stristr(buf, "Priority: ") == buf)
+        {
+            if (di_stristr(buf, " extra"))
+                p->priority = extra;
+            else if (di_stristr(buf, " optional"))
+                p->priority = optional;
+            else if (di_stristr(buf, " standard"))
+                p->priority = standard;
+            else if (di_stristr(buf, " important"))
+                p->priority = important;
+            else if (di_stristr(buf, " required"))
+                p->priority = required;
+            else
+                /* ??? */
+                p->priority = extra;
+        }
         else if (di_stristr(buf, "Description: ") == buf)
         {
             p->description = strdup(strchr(buf, ' ') + 1);

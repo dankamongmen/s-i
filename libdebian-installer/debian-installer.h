@@ -13,6 +13,7 @@
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
 #define PROVIDESMAX     16      /* maximum number of provides we can handle */
 typedef enum { unpacked, installed, half_configured, other } package_status;
+typedef enum { extra, optional, standard, important, required } package_priority;
 
 struct language_description
 {
@@ -34,6 +35,7 @@ struct package_t {
         int processed;
         struct language_description *localized_descriptions;
         struct package_t *next;
+        package_priority priority;
 };
 
 int di_prebaseconfig_append (const char *udeb, const char *format, ...);
