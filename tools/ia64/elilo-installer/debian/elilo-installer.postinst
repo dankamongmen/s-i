@@ -29,7 +29,8 @@ if [ "$defaultbootdev" = '' ]; then
 fi
 
 . /usr/share/debconf/confmodule
-db_subst elilo-installer/bootdev bootdev "$defaultbootdev"
+db_fget elilo-installer/bootdev seen
+[ "$RET" = true ] || db_set elilo-installer/bootdev "$defaultbootdev"
 db_input high elilo-installer/bootdev || true
 db_go || true
 
