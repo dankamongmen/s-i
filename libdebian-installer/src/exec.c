@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.9 2003/12/11 19:29:50 waldi Exp $
+ * $Id: exec.c,v 1.10 2003/12/31 16:57:28 waldi Exp $
  */
 
 #include <config.h>
@@ -166,11 +166,14 @@ int di_exec_shell_full (const char *const cmd, di_io_handler *stdout_handler, di
   return di_exec_full ("/bin/sh", argv, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data); 
 }
 
-/**
- * chdir to user_data
- *
- * @param user_data path
- */
+int di_exec_prepare_chdir (pid_t pid __attribute__ ((unused)), void *user_data)
+{
+  char *path = user_data;
+  if (chdir (path))
+    return -1;
+  return 0;
+}
+
 int di_exec_prepare_chroot (pid_t pid __attribute__ ((unused)), void *user_data)
 {
   char *path = user_data;
@@ -181,9 +184,6 @@ int di_exec_prepare_chroot (pid_t pid __attribute__ ((unused)), void *user_data)
   return 0;
 }
 
-/**
- * logs to di_log
- */
 int di_exec_io_log (const char *buf, size_t len __attribute__ ((unused)), void *user_data __attribute__ ((unused)))
 {
   di_log (DI_LOG_LEVEL_OUTPUT, "%s", buf);

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.h,v 1.8 2003/11/19 09:24:14 waldi Exp $
+ * $Id: exec.h,v 1.9 2003/12/31 16:57:28 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__EXEC_H
@@ -29,15 +29,29 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-di_io_handler
-  di_exec_io_log;
-di_process_handler
-  di_exec_prepare_chroot;
-
 /**
  * @addtogroup di_exec
  * @{
  */
+
+di_io_handler
+  /**
+   * logs the output
+   */
+  di_exec_io_log;
+di_process_handler
+  /**
+   * chdir to user_data
+   *
+   * @param user_data path
+   */
+  di_exec_prepare_chdir,
+  /**
+   * chroot to user_data
+   *
+   * @param user_data path
+   */
+  di_exec_prepare_chroot;
 
 /**
  * execv like call
