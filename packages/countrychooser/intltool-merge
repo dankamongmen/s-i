@@ -913,19 +913,22 @@ sub rfc822deb_merge_translations
                 
                     for my $str (@str_list) 
                     {
+			my $str_copy = $str;
                         my $translation = $translations{$lang, $str};
                     
                         if (!$translation) 
                         {
                             $is_translated = 0;
                             # last;
-			    $str =~ s/\[\s[^\[\]]*\]$//;
+			    $str_copy =~ s/\[\s[^\[\]]*\]$//;
+			    $str_copy =~ s/,/\\,/ if $underscore eq 2;
                         }
 			else
 			{
 	                  #  $translation may also contain [] dummy
                           #  strings, mostly to indicate an empty string
 	                  $translation =~ s/\[\s[^\[\]]*\]$//;
+                          $translation =~ s/,/\\,/ if $underscore eq 2;
                         }
                         if ($first) 
                         {
@@ -937,7 +940,7 @@ sub rfc822deb_merge_translations
 				}
 				else
 				{
-				  $str_translated .= $str;
+				  $str_translated .= $str_copy;
 				  $is_translated = 1;
 				}
                             }
@@ -958,7 +961,7 @@ sub rfc822deb_merge_translations
 				}
 				else
 				{
-				  $str_translated .= ', ' . $str;
+				  $str_translated .= ', ' . $str_copy;
 				  $is_translated = 1;
 				}
                             }
@@ -1004,7 +1007,16 @@ sub rfc822deb_split
     my $type = shift;
     my $text = shift;
     $text =~ s/^[ \t]//mg;
-    return (split(/, */, $text, 0)) if $type ne 1;
+    if ($type ne 1)
+    {
+        my @values = ();
+        for my $value (split(/(?<!\\), */, $text, 0))
+        {
+            $value =~ s/\\,/,/;
+            push @values, $value;
+        }
+        return @values;
+    }
     return ($text) if $text !~ /\n/;
 
     $text =~ s/([^\n]*)\n//;

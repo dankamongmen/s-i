@@ -21,10 +21,9 @@ INDENT='\\  '
 # Get the ordered list of countries from the iso_3166.tab, sorted
 # according to the regionmap.
 #
-# We need to replace all commas by something : ' -' as the comma is
-# the choices list separator for debconf templates
+# We need to escape commas by preceding them with a backslash.
 CHOICES=$(./countrylist $ISO3166TAB ./regionmap "$INDENTMARKER" | \
-         sed 's/,/ -/g' | \
+         sed 's/,/\\\\\\\\,/g' | \
          (read a; echo -n "$a"; while read b; do echo -n ", $b"; done; echo))
 	 
 # Now put this list as the choices in the templates
@@ -70,9 +69,7 @@ for pofile in debian/po/*.po ; do
 	msgmerge -C debian/po/$pofilename \
                  -C $ISO3166TRANSLATIONS/$pofilename.munged \
                  /dev/null \
-                 debian/pobuild/templates.pot | \
-                 sed '/^msgid/s/,/ -/' | \
-                 sed '/^msgstr/s/,/ -/' \
+                 debian/pobuild/templates.pot \
 		 > debian/pobuild/$pofilename
     # Else we just use what's translated
     else
