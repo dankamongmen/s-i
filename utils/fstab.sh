@@ -15,12 +15,13 @@ mkdir -p `dirname $FSTAB`
 	grep " $TARGET" /proc/mounts | \
 		while read LINE; do
 		set -- `echo $LINE`
+		fstype=$3
 		mnt=`echo $2 | sed -e "s#^$TARGET##"`
 		[ -z "$mnt" ] && mnt="/"
 		pass="2"
 		[ "$mnt" = "/" ] && pass="1"
 		devpath=`mapdevfs $1` || devpath=$1
-		echo "$devpath	$mnt	$5	defaults	0	$pass"
+		echo "$devpath	$mnt	$fstype	defaults	0	$pass"
 	done
 	
 	# print swaps
