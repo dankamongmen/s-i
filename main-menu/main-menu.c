@@ -474,7 +474,7 @@ int main (int argc, char **argv) {
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
 
-	packages = status_read();
+	packages = di_status_read();
 	while ((p=show_main_menu(packages))) {
 		if (!do_menu_item(p)) {
 			char buf[256];
@@ -487,7 +487,7 @@ int main (int argc, char **argv) {
 			lower_debconf_priority();
 		}
 		di_list_free(packages, di_pkg_free);
-		packages = status_read();
+		packages = di_status_read();
 	}
 	
 	return(0);
