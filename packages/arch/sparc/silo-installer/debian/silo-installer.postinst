@@ -12,14 +12,17 @@ fi
 
 # detect which is the root partition: /target
 rootfs=$(mapdevfs `/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`)
+foo=${rootfs%?}
+rootpart=${rootfs#$foo}
 
 # detect which hard drive has /target/boot mounted on it. this does *not*
 # have to be the same as the drive /target is mounted on.
-bootpart=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
+bootpart=$(mapdevfs `/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`)
 
-# Nothing is mounted on /boot, so assume $rootfs = $bootpart
-if [ -z "$bootpart" ]; then
-	boot="/boot"
+if [ $rootpart -ne $bootpart ]; then
+	boot="${bootpart}"
+else
+	boot="${rootpart}/boot"
 fi
 
 if [ -e "/target/boot/initrd.img" ]; then
@@ -29,6 +32,7 @@ fi
 # Write out silo.conf
 cat > /target/boot/silo.conf << EOF
 root=${rootfs}
+partition=${bootpart}
 default=Linux
 read-only
 timeout=100
