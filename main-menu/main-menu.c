@@ -129,16 +129,20 @@ struct package_t *show_main_menu(struct package_t *packages) {
 		if (p->installer_menu_item && strcmp(p->description, s) == 0)
 			return p;
 	}
-	return 0; // should never happen
+	return 0;
+}
+
+void do_menu_item(struct package_t *p) {
 }
 
 int main (int argc, char **argv) {
 	struct package_t *p, *packages;
 	
 	packages = status_read();
-	p=show_main_menu(packages);
-
-	fprintf(stderr, "%s\n", p->package);
+	while ((p=show_main_menu(packages))) {
+		do_menu_item(p);
+		packages = status_read();
+	}
 	
 	return(0);
 }

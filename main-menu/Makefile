@@ -10,7 +10,9 @@ $(BIN): $(OBJS)
 demo: $(BIN)
 	/usr/share/debconf/frontend ./$(BIN)
 
-strip: $(BIN)
+# Size optimized and stripped binary target.
+small: CFLAGS=-Os $(CFLAGS)
+small: clean $(BIN)
 	strip --remove-section=.comment --remove-section=.note \
 		--strip-unneeded $(BIN)
 
