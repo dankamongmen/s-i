@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.5 2000/11/01 22:31:42 joeyh Exp $ */
+/* $Id: status.c,v 1.6 2000/11/01 23:16:16 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -92,10 +92,52 @@ static const char *status_print(unsigned long flags)
 	return buf;
 }
 
+/*
+ * Read a control file (or a stanza of a status file) and parse it,
+ * filling parsed fields into the package structure
+ */
+void control_read(FILE *f, struct package_t *p)
+{
+	char buf[BUFSIZE];
+	while (fgets(buf, BUFSIZE, f) && !feof(f))
+	{
+		buf[strlen(buf)-1] = 0;
+		if (*buf == 0)
+			return;
+		else if (strstr(buf, "Package: ") == buf)
+		{
+			p->package = strdup(buf+9);
+		}
+		else if (strstr(buf, "Status: ") == buf)
+		{
+			p->status = status_parse(buf+8);
+		}
+#if 0
+		else if (strstr(buf, "Depends: ") == buf)
+		{
+			p->depends = strdup(buf+9);
+		}
+#endif
+		else if (strstr(buf, "Provides: ") == buf)
+		{
+			p->provides = strdup(buf+10);
+		}
+		/* This is specific to the Debian Installer. Ifdef? */
+		else if (strstr(buf, "Installer-Menu-Item: ") == buf) 
+		{
+			p->installer_menu_item = atoi(buf+21);
+		}
+		else if (strstr(buf, "Description: ") == buf)
+		{
+			p->description = strdup(buf+13);
+		}
+		/* TODO: localized descriptions */
+	}
+}
+
 void *status_read(void)
 {
 	FILE *f;
-	char buf[BUFSIZE];
 	void *status = 0;
 	struct package_t *m = 0, *p = 0, *t = 0;
 
@@ -105,48 +147,21 @@ void *status_read(void)
 		return 0;
 	}
 	printf("(Reading database...)\n");
-	while (fgets(buf, BUFSIZE, f) && !feof(f))
-	{
-		buf[strlen(buf)-1] = 0;
-		if (*buf == 0)
-		{
-			if (m != 0)
-			{
-				tsearch(m, &status, package_compare);
-			}
-
-			m = 0;
-		}
-		else if (strstr(buf, "Package: ") == buf)
-		{
-			ASSERT(m == 0);
-			m = (struct package_t *)malloc(sizeof(struct package_t));
-			memset(m, 0, sizeof(struct package_t));
-			m->package = strdup(buf+9);
-			m->refcount = 1;
-		} 
-		else if (strstr(buf, "Status: ") == buf)
-		{
-			ASSERT(m != 0);
-			m->status = status_parse(buf+8);
-		}
-#if 0
-		else if (strstr(buf, "Depends: ") == buf)
-		{
-			ASSERT(m != 0);
-			m->depends = strdup(buf+9);
-		}
-#endif
-		else if (strstr(buf, "Provides: ") == buf)
-		{
-			/* a "Provides" triggers the insertion of a pseudo package
-			 * into the status binary-tree
+	while (!feof(f)) {
+		m = (struct package_t *)malloc(sizeof(struct package_t));
+		memset(m, 0, sizeof(struct package_t));
+		m->refcount = 1;
+		control_read(f, m);
+		if (m->package)
+			tsearch(m, &status, package_compare);
+		if (m->provides) {
+			/* 
+			 * A "Provides" triggers the insertion of a pseudo 
+			 * package into the status binary-tree.
 			 */
-			ASSERT(m != 0);
 			p = (struct package_t *)malloc(sizeof(struct package_t));
 			memset(p, 0, sizeof(struct package_t));
-			p->package = strdup(buf+10);
-			p->status = m->status;
+			p->package = strdup(m->provides);
 			t = *(struct package_t **)tsearch(p, &status, package_compare);
 			if (t->refcount++ > 0)
 			{

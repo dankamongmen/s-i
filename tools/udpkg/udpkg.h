@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.2 2000/11/01 22:26:22 joeyh Exp $ */
+/* $Id: udpkg.h,v 1.3 2000/11/01 23:16:16 joeyh Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -58,6 +58,8 @@ struct package_t {
 	char *version;
 	char *depends;
 	char *provides;
+	char *description;
+	int installer_menu_item;
 	char *control;
 	unsigned long status;
 	char color; /* for topo-sort */
