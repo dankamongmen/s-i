@@ -53,6 +53,10 @@ case "x$cmd" in
         ARCH=`udpkg --print-architecture`
         components="`grep ^Components: $Release | cut -d' ' -f2-`"
         ret=1
+        if [ -z "$components" ]; then
+            error "No components listed in $Release."
+            exit 1
+        fi
         for comp in $components; do
             for ext in '' '.gz'; do
                 pkgfile="$comp/debian-installer/binary-$ARCH/Packages$ext"
