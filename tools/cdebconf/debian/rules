@@ -24,6 +24,16 @@ ifeq (,$(findstring hurd-,$(DEB_HOST_ARCH)))
 FRONTENDS += bogl
 endif
 
+SIZEOPTFLAG=-Os
+SPEEDOPTFLAG=-O2
+DEBUG_CONFIGURE_OPT=
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -g
+	SIZEOPTFLAG=
+	SPEEDOPTFLAG=
+	DEBUG_CONFIGURE_OPT=--with-debug=yes
+endif
+
 clean:
 	dh_testdir
 	dh_testroot
@@ -37,10 +47,10 @@ build-udeb: build-udeb-stamp
 build-udeb-stamp:
 	dh_testdir
 	[ -d $(udebbuild) ] || mkdir -p $(udebbuild)
-	(cd $(udebbuild); CFLAGS="-Os -fomit-frame-pointer" \
+	(cd $(udebbuild); CFLAGS="$(CFLAGS) $(SIZEOPTFLAG) -fomit-frame-pointer" \
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
 		--without-rpath --with-db="textdb rfc822db" \
-		--with-frontend="text" \
+		--with-frontend="text" $(DEBUG_CONFIGURE_OPT) \
 		--with-conffile=$(CONFFILE))
 	(cd $(udebbuild); $(MAKE) clean; $(MAKE))
 	touch $@
@@ -49,9 +59,9 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 	[ -d $(debbuild) ] || mkdir -p $(debbuild)
-	(cd $(debbuild); CFLAGS="-O2" \
+	(cd $(debbuild); CFLAGS="$(CFLAGS) $(SPEEDOPTFLAG)" \
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
-		--without-rpath \
+		--without-rpath $(DEBUG_CONFIGURE_OPT) \
 		--with-db="textdb rfc822db" \
 		--with-frontend="$(FRONTENDS)" \
 		--with-conffile=$(CONFFILE))
