@@ -39,10 +39,6 @@ is_installed(struct package_t *package, struct package_t *installed)
  * This function takes a linked list of available packages, decides which
  * are worth installing, creates a linked list of those, and returns it.
  *
- * TODO: How it will eventually makes such choices is unknown, for now
- * it just returns all of the packages, putting the onus on whoever makes
- * the Packages file to make these decisions.
- *
  * - Don't install packages that are already installed
  * - Ask for which packages with priority below standard to install
  */
@@ -177,6 +173,7 @@ int md5sum(char* sum, char *file) {
 int install_packages (struct package_t *packages) {
 	struct package_t *p;
 	char *f, *fp, *dest_file;
+	char *emsg;
 
 	for (p=packages; p; p=p->next) {
 		if (p->filename) {
@@ -191,17 +188,21 @@ int install_packages (struct package_t *packages) {
 			asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f);
 
 			if (! get_package(p, dest_file)) {
-				fprintf(stderr, "anna: error getting %s!\n",
+				asprintf(&emsg, "anna: error getting %s!\n",
 					p->filename);
-				exit(1);
+				di_log(emsg);
+				free(emsg);
+				return 0;
 			} else if (! md5sum(p->md5sum, dest_file)) {
-                          fprintf(stderr, "anna: md5sum mismatch on %s!\n",
-                                  p->filename);
-                          unlink(dest_file);
-                          exit(1);
-                        } else if (! unpack_package(dest_file)) {
+				asprintf(&emsg, "anna: md5sum mismatch on %s!\n",
+					p->filename);
+				di_log(emsg);
+				free(emsg);
 				unlink(dest_file);
-				return(0);
+				return 0;
+			} else if (! unpack_package(dest_file)) {
+				unlink(dest_file);
+				return 0;
 			}
 			unlink(dest_file);
 			free(dest_file);
