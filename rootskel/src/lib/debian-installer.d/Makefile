@@ -24,7 +24,7 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
 	S33framebuffer-module-linux-i386
   endif
   ifeq ($(DEB_HOST_GNU_CPU),s390)
-    files_term += \
+    files_term = \
 	S30term-linux-s390
   endif
 endif
