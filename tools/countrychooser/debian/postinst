@@ -9,66 +9,69 @@ localecode="debian-installer/locale"
 languagecode="debian-installer/language"
 countrycode="debian-installer/country"
 
-log() {
-	logger -t countrychooser "info: $@"
-}
-
 for list in /etc/iso_3166.tab ; do 
-	if [ -f "$list" ] ; then
+	if [ -f "$list" ]; then
 		countries="$list"
 	fi
 done
 
-countrycodemap() {
+error() {
+	logger -t countrychooser "error: $@"
+	exit 1
+}
+
+log() {
+	logger -t countrychooser "info: $@"
+}
+
+code2country() {
+	COUNTRYCODE="$1"
 	line=`grep "$COUNTRYCODE" $countries`
 
-	if [ "$line" ] ; then
+	if [ -n "$line" ]; then
 		# Remember that country names may have spaces so the code
 		# is different than in countrymap.
-		COUNTRYNAME=`echo $line | cut -b 4-`
+		echo $line | cut -b 4-
 	else
-		echo "error: Unable to locate info on country '$COUNTRYCODE'"
+		error "Unable to locate info on country '$COUNTRYCODE'"
 	fi
 }
 
-countrymap() {
-	line=`grep "$COUNTRYNAME" $countries`
+country2code() {
+	COUNTRYNAME="$1"
+	line=`grep "$COUNTRYNAME$" $countries`
 
-	if [ "$line" ] ; then
+	if [ -n "$line" ]; then
 		set $line
-
-		if [ "$1" ] ; then COUNTRYCODE="$1"; fi
+		if [ -n "$1" ]; then
+			echo "$1"
+		fi
 	else
-		echo "error: Unable to locate info on country '$COUNTRYNAME'"
+		error "Unable to locate info on country '$COUNTRYNAME'"
 	fi
 }
 
 # First grab back the country we got from languagechooser
-# (or from elsewhere)
-# and populate the debconf database with it so that it becomes
-# the default choice
+# (or from elsewhere) and populate the debconf database with
+# it so that it becomes the default choice
 db_get "$countrycode"
-if test "$RET" ; then
-	COUNTRYCODE="$RET"
-	countrycodemap
-	db_set "countrychooser/country-name" "$COUNTRYNAME"
+if [ -n "$RET" ]; then
+	# Remember which code was first used
+	COUNTRYCODE_LANGUAGECHOOSER="$(code2country "$RET")"
+	db_set "countrychooser/country-name" "$COUNTRYCODE_LANGUAGECHOOSER"
 fi
 
-# Remember which code was first used
-COUNTRYCODE_LANGUAGECHOOSER=$COUNTRYCODE
-
+db_fset countrychooser/country-name seen false
 db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
 if ! db_go; then
 	exit 10 # back up
 fi
 
 db_get "countrychooser/country-name"
-if test "$RET" ; then
-	COUNTRYNAME="$RET"
-	countrymap
-	db_set "$countrycode"  "$COUNTRYCODE"
+if [ -n "$RET" ]; then
+	db_set "$countrycode"  "$(country2code "$RET")"
 	db_get "$languagecode"
-	if test "$RET" ; then
+	if [ -n "$RET" ]; then
 		LANGUAGECODE=$RET
 		# Locale setting
 		# Keep locale inherited from languagechooser
@@ -78,12 +81,12 @@ if test "$RET" ; then
 		# Make sure locale is at least "C"
 		if [ "$LANGUAGECODE" != "C" ]; then
 			db_get "$localecode"
-			if test "$RET" ; then
+			if [ -n "$RET" ]; then
 				LOCALE="$RET"
 			else
 				LOCALE="C"
 			fi
-			if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ] ; then
+			if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ]; then
 				LOCALE=${LANGUAGECODE}_${COUNTRYCODE}:${LOCALE}
 			fi
 		else
@@ -92,10 +95,9 @@ if test "$RET" ; then
 	else
 		LOCALE=C
 	fi
-	db_set "$localecode"   "$LOCALE"
+	db_set "$localecode" "$LOCALE"
 else
-	# Error, not sure how to handle it
-	:
+	error "Got empty value for country name!"
 fi
 
 log "$countrycode   = '$COUNTRYCODE'"
