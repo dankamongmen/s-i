@@ -1,42 +1,8 @@
-/***********************************************************************
- *
- * cdebconf - An implementation of the Debian Configuration Management
- *            System
- *
- * File: dpkg-reconfigure.c
- *
- * Description: dpkg-reconfigure utility that allows users to 
- *              reconfigure a package after it's been installed
- *
- * $Id: dpkg-reconfigure.c,v 1.14 2002/11/17 21:21:19 tfheen Exp $
- *
- * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
- * license.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- * 
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- ***********************************************************************/
+/**
+ * @file dpkg-reconfigure.c
+ * @brief dpkg-reconfigure utility that allows users to 
+ *        reconfigure a package after it's been installed
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -68,7 +34,7 @@ struct option g_dpc_args[] = {
 	{ "frontend", 1, NULL, 'f' },
 	{ "priority", 1, NULL, 'p' },
 	{ "default-priority", 1, NULL, 'd' },
-	{ "all", 0, NULL, 'A' },
+	{ "all", 0, NULL, 'a' },
 	{ "unseen-only", 0, NULL, 'u' },
     { "force", 0, NULL, 'F' },
 	{ 0, 0, 0, 0 }
@@ -328,30 +294,6 @@ int reconfigure(char **pkgs, int i, int max)
 		if (file_exists(filename, S_IRUSR|S_IRGRP|S_IROTH))
 			loadtemplate(filename, pkg);
 		
-		snprintf(filename, sizeof(filename), INFODIR "/%s.postinst", pkg);
-		if (file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
-		{
-			if (is_confmodule(filename))
-			{
-				argv[1] = filename;
-				argv[2] = "configure";
-				argv[3] = getfield(pkg, VERSIONFIELD);
-				if ((ret = runconfmodule(4, argv)) != 0)
-					return ret;
-			}
-			else
-			{
-				g_templates->methods.save(g_templates);
-				g_questions->methods.save(g_questions);
-				strvacat(filename, sizeof(filename), " configure ", getfield(pkg, VERSIONFIELD), NULL);
-
-				ret = system(filename);
-				if (ret != 0) return DC_NOTOK;
-				g_templates->methods.load(g_templates);
-				g_questions->methods.load(g_questions);
-			}
-		}
-
 		snprintf(filename, sizeof(filename), INFODIR "/%s.config", pkg);
 		if (file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
 		{
@@ -361,6 +303,43 @@ int reconfigure(char **pkgs, int i, int max)
 			if ((ret = runconfmodule(4, argv)) != DC_OK)
 				return ret;
 		}
+        else
+        {
+            snprintf(filename, sizeof(filename), INFODIR "/%s.postinst", pkg);
+            if (file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
+            {
+                if (is_confmodule(filename))
+                {
+                    argv[1] = filename;
+                    argv[2] = "configure";
+                    argv[3] = getfield(pkg, VERSIONFIELD);
+                    if ((ret = runconfmodule(4, argv)) != 0)
+                        return ret;
+                }
+                else
+                {
+                    /* according to debconf:
+                     * Since postinst might run other programs that
+                     * use debconf, checkpoint the db state and
+                     * reinitialize when the script finishes 
+                     */
+                    g_templates->methods.save(g_templates);
+                    g_questions->methods.save(g_questions);
+
+                    unsetenv("DEBIAN_HAS_FRONTEND");
+
+                    strvacat(filename, sizeof(filename), " configure ", getfield(pkg, VERSIONFIELD), NULL);
+
+                    ret = system(filename);
+                    if (ret != 0) return DC_NOTOK;
+
+                    setenv("DEBIAN_HAS_FRONTEND", "1", 1);
+
+                    g_templates->methods.load(g_templates);
+                    g_questions->methods.load(g_questions);
+                }
+            }
+        }
 
 		i++;
 	}
@@ -371,7 +350,7 @@ int reconfigure(char **pkgs, int i, int max)
  * Function: main
  * Inputs: argc, argv - arguments passed in
  * Outputs: int - 0 if no error, >0 otherwise
- * Description: main entry point to dpkg-preconfigure
+ * Description: main entry point to dpkg-reconfigure
  * Assumptions: none
  ************************************************************************/
 int main(int argc, char **argv)
@@ -381,9 +360,12 @@ int main(int argc, char **argv)
 	signal(SIGINT, sighandler);
 	setlocale (LC_ALL, "");
 
+    if (getuid() != 0)
+        DIE("%s must be run as root", argv[0]);
+
 	g_config = config_new();
 
-	while ((opt = getopt_long(argc, argv, "dhf:p:AF", g_dpc_args, NULL) > 0))
+	while ((opt = getopt_long(argc, argv, "dhf:p:aF", g_dpc_args, NULL) > 0))
 	{
 		switch (opt)
 		{
@@ -392,7 +374,7 @@ int main(int argc, char **argv)
         case 'p': g_config->set(g_config, "_cmdline::priority", optarg); break;
 		case 'd': break;
 		case 'u': break;
-		case 'A': opt_all = 1; break;
+		case 'a': opt_all = 1; break;
         case 'F': opt_force = 1; break;
 		}
 	}
