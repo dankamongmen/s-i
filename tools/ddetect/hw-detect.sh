@@ -40,7 +40,7 @@ load_module() {
 	:
     else
 	db_fset hw-detect/modprobe_error seen false
-	db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $RET"
+	db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 	db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
 	db_go
     fi
