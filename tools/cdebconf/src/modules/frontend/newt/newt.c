@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.14 2003/07/14 18:00:53 sjogren Exp $
+ * $Id: newt.c,v 1.15 2003/07/15 12:59:59 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -149,10 +149,13 @@ get_text_height(const char *text, int win_width)
 static int
 min_window_height(struct question *q, int win_width)
 {
-    int height;
+    int height = 3;
     char *type = q->template->type;
+    char *qtext;
 
-    height = get_text_height(q_get_extended_description(q), win_width) + 4;
+    qtext = q_get_extended_description(q);
+    if (qtext != NULL)
+        height = get_text_height(qtext, win_width) + 1;
     if (strcmp(type, "multiselect") == 0 || strcmp(type, "select") == 0)
         height += 4; // at least three lines for choices + blank line
     else if (strcmp(type, "string") == 0 || strcmp(type, "password") == 0)
@@ -165,9 +168,11 @@ static int
 need_separate_window(struct question *q)
 {
     int width = 80, height = 24;
+    int x;
 
     newtGetScreenSize(&width, &height);
-    return (min_window_height(q, width-7) >= height-5);
+    x = min_window_height(q, width-7);
+    return (x >= height-5);
 }
 
 static int
@@ -377,11 +382,11 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     int win_width, win_height = -1, t_height, sel_height, sel_width;
     char **choices, **choices_trans, *defval;
     int count = 0, i, ret, defchoice = -1;
-    const char *p;
+    const char *p, *q_ext_text;
 
     newtGetScreenSize(&width, &height);
     p = q_get_choices_vals(q);
-    if (*p)
+    if (p && *p)
     {
         count++;
         for (; *p; p++)
@@ -398,9 +403,10 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     win_width = width-7;
     sel_height = count;
     form = create_form(NULL);
-    if (show_ext_desc) {
+    q_ext_text = q_get_extended_description(q);
+    if (show_ext_desc && q_ext_text) {
         textbox = newtTextbox(1, 1, win_width-4, 10, NEWT_FLAG_WRAP);
-        newtTextboxSetText(textbox, q_get_extended_description(q));
+        newtTextboxSetText(textbox, q_ext_text);
         t_height = newtTextboxGetNumLines(textbox);
         newtTextboxSetHeight(textbox, t_height);
         newtFormAddComponent(form, textbox);
@@ -686,7 +692,7 @@ newt_go(struct frontend *obj)
 
     cleared = 0;
     while (q != NULL) {
-        for (i = 0; i < DIM(question_handlers); i++)
+        for (i = 0; i < DIM(question_handlers); i++) {
             if (strcmp(q->template->type, question_handlers[i].type) == 0) {
                 if (!cleared) {
                     cleared = 1;
@@ -704,6 +710,7 @@ newt_go(struct frontend *obj)
                 }
                 break;
             }
+        }
         if (ret == DC_OK)
             q = q->next;
     }
