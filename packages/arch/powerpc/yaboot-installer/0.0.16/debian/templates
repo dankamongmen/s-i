@@ -1,0 +1,106 @@
+Template: yaboot-installer/progress
+Type: text
+_Description: Installing YaBoot
+
+Template: yaboot-installer/wrongmac
+Type: error
+_Description: This machine is not a NewWorld PowerMac
+ Yaboot can only be used on NewWorld PowerMac's. Please use the correct
+ boot loader for your ppc-architecture.
+
+Template: yaboot-installer/apt-install
+Type: text
+_Description: Installing Yaboot boot loader
+
+Template: yaboot-installer/apt-install-failed
+Type: boolean
+Default: yes
+_Description: Yaboot installation failed.  Continue anyway?
+ The yaboot package failed to install into /target/.  Installing Yaboot
+ as a boot loader is a required step.  The install problem might however be
+ unrelated to Yaboot, so continuing the installation may be possible.
+
+Template: yaboot-installer/part
+Type: text
+_Description: Looking for bootstrap partitions
+
+Template: yaboot-installer/nopart
+Type: error
+_Description: No bootstrap partition found
+ No hard disks were found which have an "Apple_Bootstrap" partition. 
+ You must create an 800k partition named "bootstrap", with type
+ "Apple_Bootstrap".
+
+Template: yaboot-installer/root
+Type: text
+_Description: Looking for root partition
+
+Template: yaboot-installer/noroot
+Type: error
+_Description: No root partition found
+ No partition is mounted as your new root partition.
+ You must mount a root partition first.
+
+Template: yaboot-installer/os-probing
+Type: text
+_Description: Probing for other operating systems
+
+Template: yaboot-installer/bootdev
+Type: select
+Choices: ${DEVICES}
+Default: invaliddevice
+_Description: Device for boot loader installation:
+ Yaboot (the Linux boot loader) needs to be installed on a hard disk
+ partition in order for your system to be bootable.  Please choose
+ the destination partition from among these "Apple_Bootstrap" partitions.
+
+Template: yaboot-installer/conf
+Type: text
+_Description: Creating yaboot configuration
+
+Template: yaboot-installer/conferr
+Type: error
+_Description: Failed to create yaboot configuration
+ The creation of the main yaboot configuration file failed.
+ .
+ Please check the system log or the output on the third console (tty3).
+ .
+ Warning: Your system may be unbootable!
+
+Template: yaboot-installer/ybin
+Type: text
+_Description: Installing yaboot into bootstrap partition
+
+Template: yaboot-installer/ybinerr
+Type: error
+_Description: Failed to install bootloader
+ The installation of the yaboot boot loader failed.
+ .
+ Please check the system log or the output on the third console (tty3).
+ .
+ Warning: Your system may be unbootable!
+
+Template: yaboot-installer/success
+Type: note
+_Description: Successfully installed yaboot
+ The yaboot boot loader was successfully installed.
+ .
+ The system is now ready to boot the new Debian GNU/Linux system.
+
+Template: yaboot-installer/mounterr
+Type: error
+_Description: Failed to mount /target/proc
+ Mounting the proc filesystem on /target/proc failed.
+ .
+ Please check the system log or the output on the third console (tty3).
+ .
+ Warning: Your system may be unbootable!
+
+Template: yaboot-installer/bootstrap-progress
+Type: text
+_Description: Installing yaboot bootloader
+
+Template: debian-installer/yaboot-installer/title
+Type: text
+#  Main menu item
+_Description: Install yaboot on a hard disk
