@@ -46,9 +46,9 @@ struct confmodule {
      * @param struct confmodule *mod - confmodule object
      * @param int argc - number of arguments to pass to config script
      * @param char **argv - argument array
-     * @return int - pid of config script, -1 if error
+     * @return pid_t - pid of config script, -1 if error
      */
-	int (*run)(struct confmodule *, int argc, char **argv);
+	pid_t (*run)(struct confmodule *, int argc, char **argv);
 
     /**
      * @brief handles communication between a config script and the 

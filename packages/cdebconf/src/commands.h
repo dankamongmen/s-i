@@ -197,6 +197,15 @@ char *command_progress(struct confmodule *, char *);
 char *command_x_loadtemplatefile(struct confmodule *, char *);
 
 /**
+ * @brief handler for the X_SAVE debconf command
+ *
+ * Saves the debconf database to disk
+ *
+ * @warning This is not in the debconf spec
+ */
+char *command_x_save(struct confmodule *, char *);
+
+/**
  * @brief handler for the SETTITLE debconf command
  *
  * Set the debconf title to the discription of the template specified

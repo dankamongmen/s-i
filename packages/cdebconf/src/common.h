@@ -40,7 +40,7 @@
 		fprintf(stderr, "%s:%d (%s): ", __FILE__, __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ##args);			\
 		fprintf(stderr, "\n");				\
-		exit(1);					\
+		exit(EXIT_FAILURE);					\
 	} while(0)
 
 #ifndef NODEBUG

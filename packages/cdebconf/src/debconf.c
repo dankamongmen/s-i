@@ -4,6 +4,7 @@
  */
 #include "confmodule.h"
 #include "configuration.h"
+#include "debconf.h"
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
@@ -28,7 +29,7 @@ static struct option options[] = {
     { 0, 0, 0, 0 },
 };
 
-static void save()
+void save(void)
 {
 	if (confmodule != NULL)
 		confmodule->update_seen_questions(confmodule, STACK_SEEN_SAVE);
@@ -147,6 +148,7 @@ int main(int argc, char **argv)
         confmodule->owner = owner;
 	confmodule->run(confmodule, argc - optind + 1, argv + optind - 1);
 	confmodule->communicate(confmodule);
+        confmodule->shutdown(confmodule);
 
 	/* shutting down .... sync the database and shutdown the modules */
 	save();

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "commands.h"
+#include "debconf.h"
 #include "frontend.h"
 #include "database.h"
 #include "question.h"
@@ -668,3 +669,23 @@ command_settitle(struct confmodule *mod, char *arg)
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;
 }
+
+void save(void) __attribute__ ((weak));
+void save(void) { }
+
+char *
+command_x_save(struct confmodule *mod, char *arg)
+{
+    char *argv[2];
+    int argc;
+    char *out;
+
+    argc = strcmdsplit(arg, argv, DIM(argv));
+    CHECKARGC(== 0);
+    save();
+    asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
+    return out;
+}
+
+/* vim expandtabs sw=4
+ */
