@@ -28,7 +28,7 @@ fi
 . /usr/share/debconf/confmodule
 db_fget lilo-installer/bootdev seen
 [ "$RET" = true ] || db_set lilo-installer/bootdev "$defaultbootdev"
-db_input high lilo-installer/bootdev || true
+db_input high lilo-installer/bootdev || [ $? -eq 30 ]
 db_go || true
 
 db_get lilo-installer/bootdev
