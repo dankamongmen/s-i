@@ -8,7 +8,7 @@
 #include "choose-yaboot-disk.h"
 
 void unmount_proc() {
-  di_exec_shell_log("umount /target/proc");
+  system("umount /target/proc >>/var/log/messages 2>&1");
 }
 
 PedExceptionOption exception_handler(PedException *ex) {
@@ -138,8 +138,8 @@ int generate_yabootconf(const char *boot_devfs, const char *root_devfs) {
   FILE *conf = NULL, *ofpath = NULL;
 
   /* convert paths to non-devfs */
-  di_system_devfs_map_from(boot_devfs, boot, PATH_MAX);
-  di_system_devfs_map_from(root_devfs, root, PATH_MAX);
+  di_mapdevfs(boot_devfs, boot, PATH_MAX);
+  di_mapdevfs(root_devfs, root, PATH_MAX);
 
   /* split disk device and partitionnr of root partition */ 
   len = strcspn(root, "0123456789");
@@ -253,19 +253,15 @@ int main(int argc, char **argv) {
 
 	/* initialize debconf */
 	debconf = debconfclient_new();
-	debconf->command(debconf, "title", "Installing yaboot", NULL);
-
-   /* initialize libd-i */
-   di_system_init("yaboot-installer");
 
 	/* first, check if this machine as newworld */
    /* FIXME: this is currently broken (needs new subarch detection)	
      if(get_powerpc_type() != 0) {
-		debconf->command(debconf, "fset", "yaboot-installer/wrongmac",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "yaboot-installer/wrongmac", "false", NULL);
-		debconf->command(debconf, "input", "critical", "yaboot-installer/wrongmac", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_fset(debconf, "yaboot-installer/wrongmac",
+		             "seen", "false");
+		debconf_set(debconf, "yaboot-installer/wrongmac", "false");
+		debconf_input(debconf, "critical", "yaboot-installer/wrongmac");
+		debconf_go(debconf);
 		exit(1);
       } */
 
@@ -275,21 +271,21 @@ int main(int argc, char **argv) {
 	/* walk through the disks, and store all boot partitions */
 	read_physical_discs();
 	if(part_count <= 0) {
-		debconf->command(debconf, "fset", "yaboot-installer/nopart",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "yaboot-installer/nopart", "false", NULL);
-		debconf->command(debconf, "input", "critical", "yaboot-installer/nopart", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_fset(debconf, "yaboot-installer/nopart",
+		 	     "seen", "false");
+		debconf_set(debconf, "yaboot-installer/nopart", "false");
+		debconf_input(debconf, "critical", "yaboot-installer/nopart");
+		debconf_go(debconf);
 		exit(1);
 	}
 
 	rootpart = find_rootpartition();
 	if(rootpart == NULL) {
-		debconf->command(debconf, "fset", "yaboot-installer/noroot",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "yaboot-installer/noroot", "false", NULL);
-		debconf->command(debconf, "input", "critical", "yaboot-installer/noroot", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_fset(debconf,"yaboot-installer/noroot",
+			     "seen", "false");
+		debconf_set(debconf, "yaboot-installer/noroot", "false");
+		debconf_input(debconf, "critical", "yaboot-installer/noroot");
+		debconf_go(debconf);
 		exit(1);
 	}
 
@@ -311,72 +307,69 @@ int main(int argc, char **argv) {
 	}
 
 	/* ask for boot partition */
-	debconf->command(debconf, "subst", "yaboot-installer/bootdev",
-		"DEVICES", choices, NULL);
-	debconf->command(debconf, "fset", "yaboot-installer/bootdev",
-		"seen", "false", NULL);
-	debconf->command(debconf, "set", "yaboot-installer/bootdev", default_bootdev, NULL); 
-	debconf->command(debconf, "input", "low", "yaboot-installer/bootdev", NULL);
-	debconf->command(debconf, "go", NULL);
-	debconf->command(debconf, "get", "yaboot-installer/bootdev", NULL);
+	debconf_subst(debconf, "yaboot-installer/bootdev", "DEVICES", choices);
+	debconf_fset(debconf, "yaboot-installer/bootdev", "seen", "false");
+	debconf_set(debconf,"yaboot-installer/bootdev", default_bootdev); 
+	debconf_input(debconf, "low", "yaboot-installer/bootdev");
+	debconf_go(debconf);
+	debconf_get(debconf, "yaboot-installer/bootdev");
 	if(strcmp(debconf->value, "false") == 0) {
-		debconf->command(debconf, "fset", "yaboot-installer/nopart",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "yaboot-installer/nopart", "false", NULL);
-		debconf->command(debconf, "input", "critical", "yaboot-installer/nopart", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_fset(debconf, "yaboot-installer/nopart", 
+			     "seen", "false");
+		debconf_set(debconf, "yaboot-installer/nopart", "false");
+		debconf_input(debconf, "critical", "yaboot-installer/nopart");
+		debconf_go(debconf);
                 exit(1);
 	}
 
 	/* update the kernel config file */
 	i = update_kernelconf();
 	if(i != 0) {
-		debconf->command(debconf, "fset", "yaboot-installer/kconferr",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "yaboot-installer/kconferr", "false", NULL);
-		debconf->command(debconf, "input", "high", "yaboot-installer/kconferr", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_fset(debconf, "yaboot-installer/kconferr", 
+			     "seen", "false");
+		debconf_set(debconf, "yaboot-installer/kconferr", "false");
+		debconf_input(debconf, "high", "yaboot-installer/kconferr");
+		debconf_go(debconf);
 	}
 
    /* mkofboot needs proc
       running them in chroot /target */
-   i = di_exec_shell_log("mount -t proc none /target/proc");
+   i = system("mount -t proc none /target/proc >>/var/log/messages 2>&1");
    atexit((void*)unmount_proc);
    if (i != 0) {
-     debconf->command(debconf, "fset", "yaboot-installer/mounterr",
-                      "seen", "false", NULL);
-     debconf->command(debconf, "set", "yaboot-installer/mounterr", "false", NULL);
-     debconf->command(debconf, "input", "critical", "yaboot-installer/mounterr", NULL);
-     debconf->command(debconf, "go", NULL);
+     debconf_fset(debconf, "yaboot-installer/mounterr", "seen", "false");
+     debconf_set(debconf, "yaboot-installer/mounterr", "false");
+     debconf_input(debconf, "critical", "yaboot-installer/mounterr");
+     debconf_go(debconf);
      exit(1);
    }                
      
 	/* generate yaboot.conf */
 	i = generate_yabootconf(debconf->value, rootpart);
 	if(i != 0) {
-		debconf->command(debconf, "fset", "yaboot-installer/conferr",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "yaboot-installer/conferr", "false", NULL);
-		debconf->command(debconf, "input", "critical", "yaboot-installer/conferr", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_fset(debconf, "yaboot-installer/conferr",
+			     "seen", "false");
+		debconf_set(debconf, "yaboot-installer/conferr", "false");
+		debconf_input(debconf, "critical", "yaboot-installer/conferr");
+		debconf_go(debconf);
                 exit(1);
 	}
 	
 	/* running "mkofboot" */
-	i = di_exec_shell_log("chroot /target /usr/sbin/mkofboot -v -f");
+	i = system("chroot /target /usr/sbin/mkofboot -v -f >>/var/log/messages 2>&1");
 	if(WEXITSTATUS(i) != 0) {
-		debconf->command(debconf, "fset", "yaboot-installer/ybinerr",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "yaboot-installer/ybinerr", "false", NULL);
-		debconf->command(debconf, "input", "critical", "yaboot-installer/ybinerr", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_fset(debconf, "yaboot-installer/ybinerr",
+			     "seen", "false");
+		debconf_set(debconf, "yaboot-installer/ybinerr", "false");
+		debconf_input(debconf, "critical", "yaboot-installer/ybinerr");
+		debconf_go(debconf);
 		return(1);
 	}
 	
-	debconf->command(debconf, "fset", "yaboot-installer/success", "seen", "false", NULL);
-	debconf->command(debconf, "set", "yaboot-installer/success", "false", NULL);
-	debconf->command(debconf, "input", "medium", "yaboot-installer/success", NULL);
-	debconf->command(debconf, "go", NULL);
+	debconf_fset(debconf, "yaboot-installer/success", "seen", "false");
+	debconf_set(debconf, "yaboot-installer/success", "false");
+	debconf_input(debconf, "medium", "yaboot-installer/success");
+	debconf_go(debconf);
 	return(0);
 }
 
