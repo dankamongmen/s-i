@@ -31,6 +31,11 @@ is_not_loaded() {
 	! (cut -d" " -f1 /proc/modules | grep -q "^$1\$")
 }
 
+# The list can be delimited with spaces or spaces and commas.
+in_list() {
+	echo "$2" | grep -q "\(^\| \)$1\(,\| \|$\)"
+}
+
 snapshot_devs() {
 	echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`
 }
@@ -143,12 +148,18 @@ get_ide_chipset_info() {
 }
 
 # Return list of lines formatted "module:Description"
-get_all_hw_info() {
+get_detected_hw_info() {
 	discover_hw
 	if [ -d /proc/bus/usb ]; then
 		echo "usb-storage:USB storage"
 	fi
-	get_manual_hw_info
+	if [ "`udpkg --print-architecture`" = powerpc ]; then
+		if [ -f /proc/device-tree/aliases/mac-io ]; then
+			if [ -e "/proc/device-tree`cat /proc/device-tree/aliases/mac-io`/radio" ]; then
+				echo "airport:Airport wireless"
+			fi
+		fi
+	fi
 }
    
 # Manually load modules to enable things we can't detect.
@@ -166,13 +177,6 @@ get_manual_hw_info() {
 	echo "ide-disk:Linux ATA DISK"
 	echo "ide-cd:Linux ATAPI CD-ROM"
 	echo "isofs:Linux ISO 9660 filesystem"
-	if [ "`udpkg --print-architecture`" = powerpc ]; then
-		if [ -f /proc/device-tree/aliases/mac-io ]; then
-			if [ -e "/proc/device-tree`cat /proc/device-tree/aliases/mac-io`/radio" ]; then
-				echo "airport:Airport wireless"
-			fi
-		fi
-	fi
 }
 
 # Detect discover version
@@ -188,36 +192,42 @@ db_progress START 0 $MAX_STEPS $PROGRESSBAR
 
 log "Detecting hardware..."
 db_progress INFO hw-detect/detect_progress_step
-MANUAL_HW_INFO=$(get_manual_hw_info)
-ALL_HW_INFO=$(get_all_hw_info)
+ALL_HW_INFO=$(get_detected_hw_info; get_manual_hw_info)
 db_progress STEP $OTHER_STEPSIZE
 
-# Remove modules that are already loaded, and construct the list for the
-# question.
-LOADED_MODULES=$(cat /proc/modules | cut -f 1 -d ' ')
+# Remove modules that are already loaded or not available, and construct
+# the list for the question.
 LIST=""
+PROCESSED=""
+AVAIL_MODULES="$(find /lib/modules/$(uname -r)/ | sed 's!.*/!!' | cut -d . -f 1)"
+LOADED_MODULES="$(cut -d " " -f 1 /proc/modules)"
 IFS_SAVE="$IFS"
 IFS="$NEWLINE"
 for device in $ALL_HW_INFO; do
-	module="`echo $device | cut -d: -f1`"
-	cardname="`echo $device | cut -d: -f2 | sed 's/,/ /g'`"
-	loaded=0
-	for m in $LOADED_MODULES; do
-		if [ "$m" = "$module" ]; then
-			loaded=1
-			break
+	module="${device%%:*}"
+	cardname="${device##*:}"
+	if [ "$module" != "ignore" -a "$module" != "" ] &&
+	   ! in_list "$module" "$LOADED_MODULES" &&
+	   ! in_list "$module" "$PROCESSED"
+	then
+		if in_list "$module" "$AVAIL_MODULES"; then
+			if [ -n "$LIST" ]; then
+				LIST="$LIST, "
+			fi
+			if [ -z "$cardname" ]; then
+				cardname="[Unknown]"
+			fi
+			LIST="$LIST$module ($(echo "$cardname" | sed 's/,/ /g'))"
+			PROCESSED="$PROCESSED $module"
+		else
+			log "Missing module '$module'."
+			if ! in_list "$module" "$MISSING_MODULES_LIST"; then
+				if [ -n "$MISSING_MODULES_LIST" ]; then
+					MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
+				fi
+				MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
+			fi
 		fi
-	done
-	if [ "$loaded" = 0 ] &&
-	   echo "$LIST" | grep -v -q '\(^\|, \)'"$module " ; then
-		if [ -n "$LIST" ]; then
-			LIST="$LIST, "
-		fi
-		if [ -z "$module" ] ; then module="[Unknown]" ; fi
-		if [ -z "$cardname" ] ; then cardname="[Unknown]" ; fi
-		# If this is changed, be sure to change the loop
-		# that parses it, below!
-		LIST="$LIST$module ($cardname)"
 	fi
 done
 IFS="$IFS_SAVE"
@@ -243,10 +253,8 @@ MODULE_STEPSIZE=$(expr \( $MAX_STEPS - \( $OTHER_STEPS \* $OTHER_STEPSIZE \) \) 
 log "Loading modules..."
 IFS="$NEWLINE"
 
-# Save from being called so many times
-MODPATH="/lib/modules/$(uname -r)/"
 for device in $(list_to_lines); do
-	module="`echo $device | cut -d' ' -f1`"
+	module="${device%% *}"
 	cardname="`echo $device | cut -d'(' -f2 | sed 's/)$//'`"
 	# Restore IFS after extracting the fields.
 	IFS="$IFS_SAVE"
@@ -256,32 +264,15 @@ for device in $(list_to_lines); do
 
 	log "Detected module '$module' for '$cardname'"
 
-	if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] && \
-	   is_not_loaded "$module"; then
-		if find $MODPATH | grep -q /${module}\\. ; then
-			db_subst hw-detect/load_progress_step CARDNAME "$cardname"
-			db_subst hw-detect/load_progress_step MODULE "$module"
-			db_progress INFO hw-detect/load_progress_step
-			log "Trying to load module '$module'"
-			if [ "$cardname" = "[Unknown]" ]; then
-				load_module "$module"
-			else
-				load_module "$module" "$cardname"
-			fi
+	if is_not_loaded "$module"; then
+		db_subst hw-detect/load_progress_step CARDNAME "$cardname"
+		db_subst hw-detect/load_progress_step MODULE "$module"
+		db_progress INFO hw-detect/load_progress_step
+		log "Trying to load module '$module'"
+		if [ "$cardname" = "[Unknown]" ]; then
+			load_module "$module"
 		else
-			db_subst hw-detect/load_progress_skip_step CARDNAME "$cardname"
-			db_subst hw-detect/load_progress_skip_step MODULE "$module"
-			db_progress INFO hw-detect/load_progress_skip_step
-			log "Missing module '$module'."
-			# Only add the module to the missing list if it was not
-			# manually added to the list of modules to load.
-			if ! echo "$MANUAL_HW_INFO" | grep -q "$module:" &&
-			   ! echo "$MISSING_MODULES_LIST" | grep -q '\(^\|, \)'"$module " ; then
-				if [ -n "$MISSING_MODULES_LIST" ]; then
-					MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
-				fi
-				MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
-			fi
+			load_module "$module" "$cardname"
 		fi
 	fi
 
@@ -323,10 +314,9 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 fi
 
 # get pcmcia running if possible
-if [ -x /etc/init.d/pcmcia ] && \
-#   db_input medium hw-detect/start_pcmcia && db_go && \ # not asked yet
-   db_get hw-detect/start_pcmcia && \
-   [ "$RET" = true ]; then
+if [ -x /etc/init.d/pcmcia ] && [ ! -e /var/run/cardmgr.pid ] &&
+   db_input medium hw-detect/start_pcmcia && db_go &&
+   db_get hw-detect/start_pcmcia && [ "$RET" = true ]; then
 	db_progress INFO hw-detect/pcmcia_step
 
 	# If hotplugging is available in the kernel, we can use it to load
