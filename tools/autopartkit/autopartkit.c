@@ -231,8 +231,6 @@ void autopartkit_log(const int level, const char * format, ...)
         vfprintf(log, format, ap);
         fclose(log);
     }
-    if (level <= LOGLIMIT)
-        vfprintf(stderr, format, ap);
     va_end(ap);
 }
 #define autopartkit_err autopartkit_log
