@@ -30,6 +30,19 @@ convert_return() {
 }
 
 #
+# Convert common terms for disk sizes into something LVM understands.
+#
+human2lvm() {
+    input="$1"
+    input=`echo "$input" | sed -e 's/ \+KB/K/'`
+    input=`echo "$input" | sed -e 's/ \+MB/M/'`
+    input=`echo "$input" | sed -e 's/ \+GB/G/'`
+    input=`echo "$input" | sed -e 's/ \+TB/T/'`
+    input=`echo "$input" | sed -e 's/ \+\(.\)/\1/'`
+    echo "$input"
+}
+
+#
 # return extra informations (like size, current lv) for the
 # volume group
 #
@@ -518,13 +531,13 @@ lv_create() {
 		return
 	fi
 
-	MAX_SIZE=`getfree_vg "$VG"`
+	MAX_SIZE=$(human2lvm "$(getfree_vg "$VG")")
 	db_set lvmcfg/lvcreate_size "$MAX_SIZE"
 	db_fset lvmcfg/lvcreate_size seen false
 	db_input high lvmcfg/lvcreate_size
 	db_go
 	db_get lvmcfg/lvcreate_size
-	SIZE="$RET"
+	SIZE=$(human2lvm "$RET")
 	[ -z "$RET" ] && return
 
 	lvcreate -L${SIZE} -n "$NAME" $VG >>/var/log/messages 2>&1
