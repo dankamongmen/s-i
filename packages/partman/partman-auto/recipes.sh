@@ -84,7 +84,7 @@ decode_recipe () {
 		    max="$min"
 		fi
 		case "$4" in # allow only valid file systems
-		    ext2|ext3|xfs|reiserfs|linux-swap|fat16|fat32|hfs)
+		    ext2|ext3|xfs|reiserfs|jfs|linux-swap|fat16|fat32|hfs)
 			fs="$4"
 			;;
 		    *)
