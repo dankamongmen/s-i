@@ -1,11 +1,17 @@
 #!/bin/sh
 set -e
 
+if [ "$1" = "-v" ]; then
+	VERBOSE=1
+	shift 1
+fi
+
+DATESTAMP=$(date +%Y%m%d%H%M)
 MACHINE="$1"
 shift 1
 
 if [ -z "$MACHINE" ]; then
-	echo "Usage: $0 machine scheme [scheme ...]" >&2
+	echo "Usage: $0 [-v] machine scheme [scheme ...]" >&2
 	exit 1
 fi
 
@@ -20,11 +26,32 @@ use () {
 }
 
 overview () {
-	logdir=$1
+	local logdir=$1
 	shift 1
 	grep -v "$MACHINE-$SCHEME " $LOGDIR/overview.log > $LOGDIR/overview.log.new || true
 	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $LOGDIR/overview.log.new
 	mv $LOGDIR/overview.log.new $LOGDIR/overview.log
+}
+
+log () {
+	local machine=$1
+	local scheme=$2
+	local append=$3
+	local logfile=$LOGDIR/$DATESTAMP/$machine-$scheme.log
+
+	if [ "$VERBOSE" = 1 ]; then
+		if [ "$append" = 1 ]; then
+			tee -a $logfile
+		else
+			tee $logfile
+		fi
+	else
+		if [ "$append" = 1 ]; then
+			cat >> $logfile
+		else
+			cat > $logfile
+		fi
+	fi
 }
 
 DIGRESSDIR=$(dirname $0)
@@ -38,7 +65,6 @@ if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
 	exit 1
 fi
 
-datestamp=$(date +%Y%m%d%H%M)
 . $DI_TESTDIR/config
 
 for SCHEME in $@; do
@@ -47,14 +73,14 @@ for SCHEME in $@; do
 	use common
 	use $SCHEME
 	
-	mkdir -p $LOGDIR/$datestamp
+	mkdir -p $LOGDIR/$DATESTAMP
 	touch $LOGDIR/overview.log
 
-	if $DIGRESSDIR/test-harness $MACHINE $SCHEME > $LOGDIR/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
+	if $DIGRESSDIR/test-harness $MACHINE $SCHEME 2>&1 | log $MACHINE $SCHEME; then
 		overview $LOGDIR success
 	else
 		if [ -n "$RETRY" ]; then
-			if $DIGRESSDIR/test-harness $MACHINE $SCHEME >> $LOGDIR/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
+			if $DIGRESSDIR/test-harness $MACHINE $SCHEME 2>&1 | log $MACHINE $SCHEME 1; then
 				overview $LOGDIR "success second try"
 			else
 				overview $LOGDIR failed
@@ -63,5 +89,5 @@ for SCHEME in $@; do
 			overview $LOGDIR failed
 		fi
 	fi
-	ln -f $LOGDIR/$datestamp/$MACHINE-$SCHEME.log $LOGDIR/$MACHINE-$SCHEME.log
+	ln -f $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log $LOGDIR/$MACHINE-$SCHEME.log
 done
