@@ -200,9 +200,21 @@ get_detected_hw_info() {
 	fi
 	if [ "`udpkg --print-architecture`" = powerpc ]; then
 		if [ -f /proc/device-tree/aliases/mac-io ]; then
-			if [ -e "/proc/device-tree`cat /proc/device-tree/aliases/mac-io`/radio" ]; then
+			macio="/proc/device-tree$(cat /proc/device-tree/aliases/mac-io)"
+			if [ -e "$macio/radio" ]; then
 				echo "airport:Airport wireless"
 				register-module airport
+			fi
+			if [ -e "$macio/bmac" ]; then
+				echo "bmac:PowerMac BMAC Ethernet"
+				register-module bmac
+			else
+				for dir in $(find "$macio" -type d); do
+					if [ "$(cat "$dir/device_type")" = network ] && [ "$(cat "$dir/compatible")" = bmac+ ]; then
+						echo "bmac:PowerMac BMAC Ethernet"
+						register-module bmac
+					fi
+				done
 			fi
 		fi
 	fi
