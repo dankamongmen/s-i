@@ -20,7 +20,10 @@ endif
 
 LDOPTS=  -ldebconfclient -ldebian-installer
 
-
+ifeq ($(ARCH),alpha)
+CFLAGS += -DAT_KBD  -DUSB_KBD
+OBJS   += at-kbd.o usb-kbd.o
+endif
 ifeq ($(ARCH),i386)
 CFLAGS += -DAT_KBD  -DUSB_KBD 
 OBJS   += at-kbd.o usb-kbd.o
@@ -28,6 +31,14 @@ endif
 ifeq ($(ARCH),ia64)
 CFLAGS += -DAT_KBD  -DUSB_KBD 
 OBJS   += at-kbd.o usb-kbd.o
+endif
+ifeq ($(ARCH),mips)
+CFLAGS += -DAT_KBD -DUSB_KBD
+OBJS += at-kbd.o usb-kbd.o
+endif
+ifeq $(ARCH),mipsel)
+CFLAGS += -DAT_KBD -DUSB_KBD
+OBJS += at-kbd.o usb-kbd.o
 endif
 ifeq ($(ARCH),sparc)
 CFLAGS += -DSPARC -DUSB_KBD 
