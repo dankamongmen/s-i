@@ -8,7 +8,7 @@
  * Description: simple utility to load a template file into the 
  *              database
  *
- * $Id: debconf-loadtemplate.c,v 1.2 2001/01/07 05:05:12 tausq Exp $
+ * $Id: debconf-loadtemplate.c,v 1.3 2002/05/27 14:25:09 tfheen Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -42,9 +42,11 @@
 #include "database.h"
 #include "question.h"
 #include "template.h"
+#include "debconfclient.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 void parsecmdline(struct configuration *config, int argc, char **argv)
 {
@@ -52,6 +54,21 @@ void parsecmdline(struct configuration *config, int argc, char **argv)
 	{
 		fprintf(stderr, "%s <owner> <template>\n", argv[0]);
 		exit(-1);
+	}
+}
+
+void add_questions_debconf(int argc, char **argv)
+{
+        int i = 2;
+        struct debconfclient *client;
+        client = debconfclient_new ();
+        
+	while (i <= argc)
+	{
+                if (argv[i])
+                        client->command (client, "X_LOADTEMPLATEFILE", 
+                                         argv[i], NULL);
+                i++;
 	}
 }
 
@@ -66,6 +83,15 @@ int main(int argc, char **argv)
 	config = config_new();
 	parsecmdline(config, argc, argv);
 
+        if (getenv("DEBIAN_HAS_FRONTEND") != NULL)
+          {
+                  /* Use debconfclient instead.  This is a kinda hack
+                   * for debian-installer, but not too ugly.  
+                   * -- tfheen, 2002-05-23
+                   */
+                  add_questions_debconf(argc, argv);
+                  exit(0);
+          }
 	/* parse the configuration info */
 	if (config->read(config, DEBCONFCONFIG) == 0)
 		DIE("Error reading configuration information");
@@ -73,6 +99,8 @@ int main(int argc, char **argv)
 	/* initialize database and frontend modules */
 	if ((db = database_new(config)) == 0)
 		DIE("Cannot initialize DebConf database");
+
+        db->load(db);
 
 	while (i <= argc)
 	{
