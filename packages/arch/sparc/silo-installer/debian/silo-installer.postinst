@@ -5,7 +5,10 @@ set -e
 db_capb backup
 
 findfs () {
-	mapdevfs $(mount | grep "on /target${1%/} " | cut -d' ' -f1)
+        check=$(mount | grep "on /target${1%/} " | cut -d' ' -f1)
+        if [ -n "$check" ]; then
+		mapdevfs $check
+	fi
 }
 
 # detect the partitions /target and /target/boot
