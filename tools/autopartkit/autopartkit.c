@@ -290,14 +290,14 @@ static void disable_kmsg(int disable)
  * Return a string representing the defalt partition type for the
  * current hardware
  */
-const char *
+static const char *
 default_disk_label()
 {
     /* Need to define on a per arch basis */
 #if defined(__i386__)
   return  "msdos";
 #elif defined(ia64)
-  return "msdos";
+  return "GPT";
 #elif defined(hppa)
   return"msdos";
 #elif defined(__mips__) && defined(__MIPSEL__)
