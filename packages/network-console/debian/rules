@@ -3,11 +3,21 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-build:
+build: build-stamp
+build-stamp:
+	dh_testdir
+	
+	$(MAKE)
+
+	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
+	rm -f build-stamp
+
+	$(MAKE) clean
+
 	dh_clean
 
 install:
@@ -15,10 +25,17 @@ install:
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
+
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/network-console
+
 	dh_install
 
 # Build architecture-independent files here.
 binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf	
@@ -29,10 +46,6 @@ binary-indep: build install
 	dh_installdeb
 	dh_gencontrol
 	dh_builddeb
-
-# Build architecture-dependent files here.
-binary-arch: build install
-# We have nothing to do by default.
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

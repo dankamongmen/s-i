@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+TEMPLATE_ROOT=debian-installer/network-console
+
+db_input critical $TEMPLATE_ROOT/login
+db_go
+db_get $TEMPLATE_ROOT/login
+
+if [ "$RET" = 'Start menu' ]; then
+  exec /usr/bin/main-menu
+elif [ "$RET" = 'Start shell' ]; then
+  exec udpkg --configure di-utils-shell
+fi

@@ -7,8 +7,8 @@ TEMPLATE_ROOT=debian-installer/network-console
 
 KEY_FILE=/etc/ssh/ssh_host_rsa_key
 
-if [ ! -f $KEY_FILE ]; done
-  db_progress START 0 1 $TEMPLATE_ROOT/generate_key
+if [ ! -f $KEY_FILE ]; then
+  db_progress START 0 1 $TEMPLATE_ROOT/key
   ssh-keygen -b 2048 -t rsa -N '' -f $KEY_FILE -q
   db_progress STOP
 fi
@@ -20,36 +20,41 @@ while [ -z "$PASSWORD" ]; do
   db_fset $TEMPLATE_ROOT/password-again seen false
 
   db_input critical $TEMPLATE_ROOT/password || true
+  db_go
   COMPARE_PW=''
   db_input high $TEMPLATE_ROOT/password-again && COMPARE_PW=1 || true
+  db_go
 
   db_get $TEMPLATE_ROOT/password
   ROOT_PW="$RET"
   if [ -z "$ROOT_PW" ]; then
     db_fset $TEMPLATE_ROOT/password-empty seen false
     db_input critical $TEMPLATE_ROOT/password-empty
+    db_go
     continue
   fi
   db_get $TEMPLATE_ROOT/password-again
   if [ "$COMPARE_PW" ] && [ "$ROOT_PW" != "$RET" ]; then
     db_fset $TEMPLATE_ROOT/password-mismatch seen false
     db_input critical $TEMPLATE_ROOT/password-mismatch
+    db_go
     continue
   fi
   PASSWORD=$ROOT_PW
 done
 
-chpasswd << EOF
-root:$PASSWORD
-EOF
+grep -v "^installer" /etc/passwd > /etc/passwd.new
+echo "installer:$(gen-crypt $PASSWORD):0:0:Installer:/:/bin/network-console" >> /etc/passwd.new
+mv /etc/passwd.new /etc/passwd
 
-KEY_FINGERPRINT=`ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' '`
+KEY_FINGERPRINT=$(ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' ')
 
 sshd
 
 db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
 db_fset $TEMPLATE_ROOT/start seen false
 db_input critical $TEMPLATE_ROOT/start
+db_go
 
 killall sshd
 
