@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.8 2001/01/21 01:12:40 tausq Exp $
+ * $Id: database.c,v 1.9 2002/05/02 06:35:25 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -45,6 +45,7 @@
 
 #include <dlfcn.h>
 #include <unistd.h>
+#include <string.h>
 
 #define SETMETHOD(method) db->method = (mod->method ? mod->method : database_ ## method)
 

@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.16 2001/01/20 02:36:34 tausq Exp $
+ * $Id: commands.c,v 1.17 2002/05/02 06:35:25 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -45,7 +45,7 @@
 #include "strutl.h"
 
 #define CHECKARGC(pred) \
-	if (_command_checkargc(argc ## pred, out, outsize) == DC_NOTOK) \
+	if (_command_checkargc(argc pred, out, outsize) == DC_NOTOK) \
 		return DC_OK
 
 
@@ -90,7 +90,7 @@ int command_input(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	int visible = 1;
-	struct question *q;
+	struct question *q = 0;
 	char *qtag;
 	char *priority;
 

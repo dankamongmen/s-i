@@ -14,10 +14,15 @@ debbuild=$(topdir)/debian/build
 
 PACKAGE=cdebconf-udeb
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
+FILENAME=$(PACKAGE)_$(VERSION)_$(DEB_HOST_ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 CONFFILE=/etc/cdebconf.conf
+
+FRONTENDS=text slang
+ifeq (,$(findstring hurd-,$(DEB_HOST_ARCH)))
+FRONTENDS += bogl
+endif
 
 clean:
 	dh_testdir
@@ -35,7 +40,7 @@ build-udeb-stamp:
 	(cd $(udebbuild); CFLAGS="-Os -fomit-frame-pointer" \
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
 		--without-rpath --with-db="textdb" \
-		--with-frontend="text slang" \
+		--with-frontend="text" \
 		--with-conffile=$(CONFFILE))
 	(cd $(udebbuild); $(MAKE) clean; $(MAKE))
 	touch $@
@@ -48,7 +53,7 @@ build-stamp:
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
 		--without-rpath \
 		--with-db="textdb perldb" \
-		--with-frontend="text slang bogl" \
+		--with-frontend="$(FRONTENDS)" \
 		--with-conffile=$(CONFFILE))
 	(cd $(debbuild); $(MAKE) clean; $(MAKE))
 	touch $@

@@ -38,7 +38,7 @@ install:
 	install -d -m 755 ${libdir}
 	install -d -m 755 ${moddir}
 	install -d -m 755 ${sharedir}
-	install -m 755 debconf debconf-loadtemplate debconf-convertdb ${bindir}
+	install -m 755 debconf debconf-loadtemplate ${bindir}
 	install -m 755 dpkg-reconfigure ${sbindir}
 	install -m 755 $(LIBNAME) ${libdir}
 	ln -sf $(LIBNAME) ${libdir}/$(SONAME)
@@ -47,6 +47,7 @@ install:
 	install -m 644 client/confmodule ${sharedir}
 	ln -sf ../../bin/$(DEBCONF) ${sharedir}/frontend
 ifneq ($(TARGET),udeb)
+	install -m 755 debconf debconf-convertdb ${bindir}
 	install -d -m 755 ${incdir}
 	install -m 644 *.h ${incdir}
 endif
