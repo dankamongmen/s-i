@@ -44,28 +44,15 @@ int main(int argc, char **argv) {
 	if (strcmp(src, "Packages") == 0) {
                 if (argc == 4) {
                         /* third argument is which suite we want */
-                        src = malloc(strlen("dists/") + strlen(distribution)
-                                     + 1 /* / */ +
-                                     + strlen(argv[3]) + 
-                                     strlen("/debian-installer/binary-" 
-                                            ARCH "/Packages") + 1);
-                        sprintf(src,"dists/%s/%s/debian-installer/binary-" 
-                                ARCH "/Packages", distribution, argv[3]);
+                        asprintf(&src,"dists/%s/%s/debian-installer/binary-" 
+                                 ARCH "/Packages", distribution, argv[3]);
                 } else {
-                        src = malloc(strlen("dists/") + strlen(distribution)
-                                     + 1 /* / */ +
-                                     + strlen("main") + 
-                                     strlen("/debian-installer/binary-" 
-                                            ARCH "/Packages") + 1);
-                        sprintf(src,"dists/%s/main/debian-installer/binary-" 
-                                ARCH "/Packages", distribution);
+                        asprintf(&src,"dists/%s/main/debian-installer/binary-" 
+                                 ARCH "/Packages", distribution);
                 }
         }
 	
-	command=malloc( 18 /* wget -c -q http:// */ + strlen(hostname) +
-			strlen(directory) + 1 /* / */ + strlen(src) +
-			4 /*  -O  */ + strlen(argv[2]) + 1);
-	sprintf(command, "wget -c -q http://%s%s/%s -O %s", hostname,
+	asprintf(&command, "wget -c -q http://%s%s/%s -O %s", hostname,
 			directory, src, argv[2]);
         fprintf(stderr,"wget: %s\n", command);
 	ret=system(command);

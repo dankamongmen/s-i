@@ -85,16 +85,21 @@ void order_done(struct package_t *head) {
 
 /* Returns true if the given package could be the default menu item. */
 int isdefault(struct package_t *p) {
-	char menutest[1024];
+	char *menutest;
 	struct stat statbuf;
+	int ret;
 
-	sprintf(menutest, DPKGDIR "info/%s.menutest", p->package);
+	asprintf(&menutest, DPKGDIR "info/%s.menutest", p->package);
 	if (stat(menutest, &statbuf) == 0) {
-		return ! SYSTEM(menutest);
+		ret = SYSTEM(menutest);
+		free(menutest);
+		return !ret;
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
+		free(menutest);
 		return 1;
 	}
+	free(menutest);
 	return 0;
 }
 
@@ -206,13 +211,16 @@ struct package_t *show_main_menu(struct package_t *packages) {
 }
 
 int do_menu_item(struct package_t *p) {
-	char configcommand[1024];
+	char *configcommand;
 	struct package_t *head = NULL, *tail = NULL;
+	int ret;
 	
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
-		sprintf(configcommand, "dpkg-reconfigure %s", p->package);
-		return ! SYSTEM(configcommand);
+		asprintf(&configcommand, "dpkg-reconfigure %s", p->package);
+		ret = SYSTEM(configcommand);
+		free(configcommand);
+		return !ret;
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
 		/*
@@ -223,8 +231,10 @@ int do_menu_item(struct package_t *p) {
 		order_done(head);
 		for (p = head; p; p = p->next) {
 			if (p->status == unpacked || p->status == half_configured) {
-				sprintf(configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
-				if (SYSTEM(configcommand) != 0)
+				asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
+				ret = SYSTEM(configcommand);
+				free(configcommand);
+				if (ret != 0)
 					return 0; /* give up on failure */
 			}
 		}

@@ -31,9 +31,7 @@ char *add_protocol(char *string) {
 	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
 	protocol = strdup(debconf->value);
 	
-	ret = malloc(strlen(DEBCONF_BASE) + strlen(protocol) + strlen(string) + 2);
-	/* +2 since we need one for the slash and one for the terminating NULL */
-	sprintf(ret,"%s%s/%s",DEBCONF_BASE,protocol,string);
+	asprintf(&ret,"%s%s/%s",DEBCONF_BASE,protocol,string);
 	free(protocol);
 	return ret;
 }
