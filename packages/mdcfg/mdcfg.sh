@@ -257,9 +257,9 @@ md_mainmenu() {
 		fi
 		db_get mdcfg/mainmenu
 		case $RET in
-			"Create MD")
+			"Create MD device")
 				md_createmain;;
-			"Delete MD")
+			"Delete MD device")
 				md_delete;;
 			"Finish")
 				break;;
