@@ -7,11 +7,14 @@ include /usr/share/kernel-wedge/generic-rules
 clean: cleanup
 
 cleanup:
-	rm kernel-versions
+	rm -f kernel-versions modules/i386
 
-debian/control: configure
+debian/control: kernel-versions modules/i386
 
-configure:
+kernel-versions:
 	sed "s/@arch@/$(DEB_BUILD_ARCH)/g" kernel-versions.in >kernel-versions
+
+modules/i386:
+	ln -s amd64 modules/i386
 
 .PHONY: cleanup configure
