@@ -425,6 +425,7 @@ static const char *template_next_lang(struct template *t, const char *lang)
 static void remove_newlines(char *text)
 {
 	char *in, *out;
+	int asis = 0;
 
 	in = out = text;
 	for (; *in != 0; in++)
@@ -437,8 +438,13 @@ static void remove_newlines(char *text)
 				out++;
 				*out = *in;
 				in+=2;
+				asis=0;
 			}
-			else if (*(in+1) != ' ')
+			else if (*(in+1) == ' ')
+				asis=1;
+			else if (asis)
+				asis=0;
+			else
 			{
 				if (*(in+1) != 0)
 					*out = ' ';
