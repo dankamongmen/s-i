@@ -172,24 +172,40 @@ di_stristr(const char *haystack, const char *needle)
 }
 
 #define BUFSIZE         4096
-struct package_t *
+struct linkedlist_t *
 di_pkg_parse(FILE *f)
 {
     char buf[BUFSIZE];
-    struct package_t *p = NULL, *newp;
+    struct linkedlist_t *list;
+    struct list_node *node;
+    struct package_t *p = NULL;
+    struct package_dependency *dep;
     char *b;
     int i;
 
+    list = (struct linkedlist_t *)malloc(sizeof(struct linkedlist_t));
+    list->head = list->tail = NULL;
     while (fgets(buf, BUFSIZE, f) && !feof(f))
     {
         buf[strlen(buf)-1] = 0;
         if (di_stristr(buf, "Package: ") == buf)
         {
-            newp = (struct package_t *)malloc(sizeof(struct package_t));
-            memset(newp, 0, sizeof(struct package_t));
-            newp->package = strdup(strchr(buf, ' ') + 1);
-            newp->next = p;
-            p = newp;
+            p = (struct package_t *)malloc(sizeof(struct package_t));
+            memset(p, 0, sizeof(struct package_t));
+            p->package = strdup(strchr(buf, ' ') + 1);
+            node = (struct list_node *)malloc(sizeof(struct list_node));
+            node->next = NULL;
+            node->data = p;
+            if (list->head != NULL)
+            {
+                list->tail->next = node;
+                list->tail = node;
+            }
+            else
+            {
+                list->head = node;
+                list->tail = node;
+            }
         }
 	else if (di_stristr(buf, "Version: ") == buf)
         {
@@ -279,7 +295,12 @@ di_pkg_parse(FILE *f)
                         p->depends[++i] = 0;
                     }
                     else if (p->depends[i] == 0)
-                        p->depends[i] = b;
+                    {
+                        dep = malloc(sizeof(struct package_dependency));
+                        dep->name = b;
+                        dep->ptr = NULL;
+                        p->depends[i] = dep;
+                    }
                 }
                 else
                     *b = 0; /* eat the space... */
@@ -302,7 +323,12 @@ di_pkg_parse(FILE *f)
                         p->provides[++i] = 0;
                     }
                     else if (p->provides[i] == 0)
-                        p->provides[i] = b;
+                    {
+                        dep = malloc(sizeof(struct package_dependency));
+                        dep->name = b;
+                        dep->ptr = NULL;
+                        p->provides[i] = dep;
+                    }
                 }
                 else
                     *b = 0; /* eat the space... */
@@ -313,7 +339,100 @@ di_pkg_parse(FILE *f)
         }
     }
 
-    return p;
+    return list;
+}
+
+struct package_t *
+di_pkg_find(struct linkedlist_t *ptr, const char *package)
+{
+    struct list_node *node;
+    struct package_t *p;
+
+    for (node = ptr->head; node != NULL; node = node->next)
+    {
+        p = (struct package_t *)node->data;
+        if (strcmp(p->package, package) == 0)
+            return p;
+    }
+    return NULL;
+}
+
+/* Does 'ptr' provide 'target'? */
+int
+di_pkg_provides(struct package_t *p, struct package_t *target)
+{
+    int i;
+
+    for (i = 0; p->provides[i]; i++) {
+        if (p->provides[i]->ptr == target)
+            return 1;
+    }
+    return 0;
+}
+
+int
+di_pkg_is_virtual(struct package_t *p)
+{
+    int i;
+
+    for (i = 0; p->depends[i] != NULL; i++)
+    {
+        if (p->depends[i]->ptr != NULL && di_pkg_provides(p->depends[i]->ptr, p))
+            return 1;
+    }
+    return 0;
+}
+
+/* This function has quadratic complexity over the number of packages,
+ * but since the number of packages will typically be <100, we don't
+ * care all that much about it. */
+void
+di_pkg_resolve_deps(struct linkedlist_t *ptr)
+{
+    struct list_node *node, *newnode;
+    struct package_t *p, *q;
+    struct package_dependency *dep;
+    int i, j;
+
+    /* Start by resolving provides, creating bogus packages with reverse depends */
+    for (node = ptr->head; node != NULL; node = node->next)
+    {
+        p = (struct package_t *)node->data;
+        for (i = 0; p->provides[i] != NULL; i++)
+        {
+            if ((q = di_pkg_find(ptr, p->provides[i]->name)) == NULL)
+            {
+                q = (struct package_t *)malloc(sizeof(struct package_t));
+                memset(q, 0, sizeof(struct package_t));
+                q->package = strdup(p->provides[i]->name);
+                newnode = (struct list_node *)malloc(sizeof(struct list_node));
+                newnode->data = q;
+                newnode->next = ptr->head;
+                ptr->head = newnode;
+            }
+            p->provides[i]->ptr = q;
+            for (j = 0; q->depends[j] != NULL; j++)
+                ;
+            dep = malloc(sizeof(struct package_dependency));
+            dep->name = p->package;
+            dep->ptr = p;
+            q->depends[j] = dep;
+            q->depends[j+1] = NULL;
+        }
+    }
+
+    /* Now resolve the dependencies */
+    for (node = ptr->head; node != NULL; node = node->next)
+    {
+        p = (struct package_t *)node->data;
+        for (i = 0; p->depends[i] != NULL; i++)
+        {
+            if (p->depends[i]->ptr == NULL)
+                p->depends[i]->ptr = di_pkg_find(ptr, p->depends[i]->name);
+        }
+    }
+
+    return;
 }
 
 

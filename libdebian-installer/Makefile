@@ -1,4 +1,4 @@
-MAJOR=2
+MAJOR=3
 MINOR=0
 MICRO=0
 LIB=libdebian-installer.so

@@ -23,18 +23,23 @@ struct language_description
         struct language_description *next;
 };
 
+struct package_dependency
+{
+    char *name;
+    struct package_t *ptr;
+};
+
 struct package_t {
         char *package;
 	char *filename;
 	char *md5sum;
         int installer_menu_item;
         char *description; /* short only, and only for menu items */
-        char *depends[DEPENDSMAX];
-        char *provides[PROVIDESMAX];
+        struct package_dependency *depends[DEPENDSMAX];
+        struct package_dependency *provides[PROVIDESMAX];
         package_status status;
         int processed;
         struct language_description *localized_descriptions;
-        struct package_t *next;
         package_priority priority;
 	char *version;
 };
@@ -45,13 +50,29 @@ struct version_t {
     const char *revision;
 };
 
+struct list_node
+{
+    struct list_node *next;
+    void *data;
+};
+
+struct linkedlist_t
+{
+    struct list_node *head;
+    struct list_node *tail;
+};
+
 int di_prebaseconfig_append (const char *udeb, const char *format, ...);
 int di_execlog (const char *incmd);
 void di_log(const char *msg);
 int di_check_dir (const char *dirname);
 int di_snprintfcat (char *str, size_t size, const char *format, ...);
 char *di_stristr(const char *haystack, const char *needle);
-struct package_t *di_pkg_parse(FILE *fp);
+struct linkedlist_t *di_pkg_parse(FILE *fp);
+struct package_t *di_pkg_find(struct linkedlist_t *ptr, const char *package);
+int di_pkg_provides(struct package_t *p, struct package_t *target);
+int di_pkg_is_virtual(struct package_t *p);
+void di_pkg_resolve_deps(struct linkedlist_t *ptr);
 int di_parse_version(struct version_t *rversion, const char *string);
 int di_compare_version(const struct version_t *a, const struct version_t *b);
 
