@@ -84,7 +84,7 @@ load_module() {
                 IFS="$IFS_SAVE"
 	else   
 		log "Error loading '$module'"
-		if [ "$module" != floppy ] && [ "$module" != ide-floppy ]; then
+		if [ "$module" != floppy ] && [ "$module" != ide-floppy ] && [ "$module" != ide-cd ]; then
 			db_fset hw-detect/modprobe_error seen false
 			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 			db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
