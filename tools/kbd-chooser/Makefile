@@ -18,7 +18,7 @@ STRIPTOOL=strip
 STRIP= $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 endif
 
-LDOPTS=  -ldebconf -ldebian-installer
+LDOPTS=  -ldebconfclient -ldebian-installer
 
 
 ifeq ($(ARCH),i386)
