@@ -46,7 +46,7 @@ echo "   <th class=\"col1\">Language</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Unknown words</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Messages</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">List of unknown words</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">Suspect vars</th>" >> $TABLE_HTML
+echo "   <th class=\"t1\">Suspect variables</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">All files</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Aspell Dictionary</th>" >> $TABLE_HTML
 echo " </tr>" >> $TABLE_HTML

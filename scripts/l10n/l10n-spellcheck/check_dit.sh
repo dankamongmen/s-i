@@ -209,3 +209,4 @@ tar czf $DEST_DIR/${LANG}.tar.gz $FILES_TO_KEEP
 mv $DEST_DIR/${LANG}.tar.gz $DEST_DIR/zip
 mv $FILES_TO_KEEP $DEST_DIR/nozip
 
+echo "AddCharset UTF-8 .txt" > $DEST_DIR/nozip/.htaccess
