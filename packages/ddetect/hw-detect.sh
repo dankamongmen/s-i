@@ -189,7 +189,9 @@ for device in $ALL_HW_INFO; do
 			break
 		fi
 	done
-	if [ "$loaded" = 0 ]; then
+	if [ "$loaded" = 0 ] &&
+	   echo "$LIST" | grep -v "^$module " &&
+	   echo "$LIST" | grep -v ", $module " ; then
 		if [ -n "$LIST" ]; then
 			LIST="$LIST, "
 		fi
