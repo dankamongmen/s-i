@@ -186,9 +186,9 @@ install_modules(void)
         }
     }
     /* Pull in dependencies again since we might have added packages */
+    di_pkg_resolve_deps(instlist);
     tmplist = di_pkg_toposort_list(instlist);
     /* Free some memory */
-    //di_list_free(instlist, free); /* This causes memory corruption */
     di_list_free(asklist, free);
     instlist = tmplist;
 
