@@ -89,4 +89,12 @@ fi
 if [ "${SERIAL}" ]; then
     echo "	append=\"console=ttyS${SERIAL}\"" >> /target/etc/lilo.conf
 fi
-chroot /target /sbin/lilo
+if chroot /target /sbin/lilo ; then
+    :
+else
+    ERRCODE=$?
+    db_subst lilo-installer/failed ERRCODE "$ERRCODE"
+    db_input critical lilo-installer/failed || [ $? -eq  30 ]
+    db_go || true
+    exit 1
+fi
