@@ -21,7 +21,8 @@ shell_main (int argc __attribute__((unused)), char **argv __attribute__((unused)
   client->command (client, "go", NULL);
 
   if ((dup2 (DEBCONF_OLD_STDIN_FD, 0) == -1)
-      || (dup2 (DEBCONF_OLD_STDOUT_FD, 1) == -1))
+      || (dup2 (DEBCONF_OLD_STDOUT_FD, 1) == -1)
+      || (dup2 (DEBCONF_OLD_STDOUT_FD, 2) == -1))
       return -1;
 
   chdir ("/");

@@ -25,6 +25,7 @@ static int exec_parent (pid_t pid, void *user_data)
 
 int exec_main (int argc, char **argv)
 {
-  di_exec_full (argv[1], &argv[1], di_exec_io_log, di_exec_io_log, NULL, exec_parent, argv[1], NULL, NULL);
+  int status = di_exec_full (argv[1], &argv[1], di_exec_io_log, di_exec_io_log, NULL, exec_parent, argv[1], NULL, NULL);
+  return di_exec_mangle_status (status);
 }
 
