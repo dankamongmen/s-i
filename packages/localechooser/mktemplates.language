@@ -1,0 +1,143 @@
+#!/usr/bin/perl
+#
+# Author: Petter Reinholdtsen
+# Date:   2003-09-27
+#
+# Extract language options for debian-installer
+
+use strict;
+use warnings;
+
+my $list       = shift;
+my $listl10n   = shift;
+my $template   = shift;
+my $templatein = shift;
+
+my $debug = 0;
+
+my $show_locales = 1;
+
+my %locales;
+
+sub get_language_names {
+    my $list = shift;
+    my @names;
+    print "Loading $list\n" if ($debug);
+    open(L, "< $list") || die "Unable to read $list";
+    while (<L>) {
+	print if ($debug);
+	chomp;
+	next if m/^\#/;
+	my ($name, $fb, $locale, ) = split(/;/);
+	push(@names, $name);
+	$locale =~ s/@.+//;
+	# Drop modifier and charset part of locale
+	$locale =~ s/[@.].+$//;
+	$locales{$name} = $locale;
+    }
+    close(L);
+    return @names;
+}
+
+sub get_language_names_nofb {
+    my $list = shift;
+    my @names_nofb;
+    print "Loading $list\n" if ($debug);
+    open(L, "< $list") || die "Unable to read $list";
+    while (<L>) {
+	print if ($debug);
+	chomp;
+	next if m/^\#/;
+	my ($name, $fb, $locale, ) = split(/;/);
+	push(@names_nofb, $name) if ($fb == 1);
+    }
+    close(L);
+    return @names_nofb;
+}
+
+sub get_translations {
+    my ($listl10n, @names) = @_;
+    my %translations;
+    print "Loading $listl10n\n" if ($debug);
+    open(L, "< $listl10n") || die "Unable to read $listl10n";
+    while (<L>) {
+	print if ($debug);
+	chomp;
+	next if m/^\#/;
+	my ($name, $translation) = split(/: /);
+	$translation =~ s/,/\\,/g;
+        if ($show_locales && defined $locales{$name}) {
+# C. Perrier 2004/05/09 change layout
+#
+# Layout 1 : xx_YY : Translated name
+# This is beta4 layout
+#             $translation = $locales{$name}.
+#                            (" " x (5 - length($locales{$name}))).
+#                            " - $name - $translation";
+# Layout 2 : English name     - Translated name
+# Pro : "natural" sorting
+# Con : English looks useless
+             $translation = $name .
+                            (" " x (22 - length($name))).
+			    "- $translation";
+# Layout 3 : Translated name
+# Pro : no useless English
+# Con : no sorting....giving a confusing screen
+#            no change to $translation
+#	      $translation = $translation;
+        }
+	$translations{$name} = $translation;
+    }
+    close(L);
+    return %translations;
+}
+
+my @languagenames   = get_language_names($list);
+my @languagenames_nofb   = get_language_names_nofb($list);
+my %translationmap  = get_translations($listl10n);
+
+sub order_trans {
+    my ($a_locale)=$translationmap{$a}=~/^(\w+)/;
+    my ($b_locale)=$translationmap{$b}=~/^(\w+)/;
+    $a_locale.="_ZZ" if length $a_locale == 2;
+    $b_locale.="_ZZ" if length $b_locale == 2;
+    return $a_locale cmp $b_locale;
+}
+
+my @translations;
+my @translations_nofb;
+my @sortedlanguagenames;
+my @sortedlanguagenames_nofb;
+for my $name (sort order_trans @languagenames) {
+    if (exists $translationmap{$name}) {
+	push(@translations, $translationmap{$name});
+	push(@sortedlanguagenames, $name);
+    } else {
+	print "Missing $name in $listl10n\n";
+    }
+}
+for my $name (sort order_trans @languagenames_nofb) {
+    if (exists $translationmap{$name}) {
+	push(@translations_nofb, $translationmap{$name});
+	push(@sortedlanguagenames_nofb, $name);
+    } else {
+	print "Missing $name in $listl10n\n";
+    }
+}
+my $langstr=join(", ", @sortedlanguagenames);
+my $nativemessages=join(", ", @translations);
+my $langstr_nofb=join(", ", @sortedlanguagenames_nofb);
+my $nativemessages_nofb=join(", ", @translations_nofb);
+
+open(TIN, "< $templatein") || die "Unable to read $templatein";
+open(TOUT, "> $template") || die "Unable to write $template";
+while (<TIN>) {
+    next if m/^#/;
+    s/\@languagenames\@/$langstr/;
+    s/\@nativemessages\@/$nativemessages/;
+    s/\@languagenames_nofb\@/$langstr_nofb/;
+    s/\@nativemessages_nofb\@/$nativemessages_nofb/;
+    print TOUT;
+}
+close(TOUT) || warn;
+close(TIN) || warn;

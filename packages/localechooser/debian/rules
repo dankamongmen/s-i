@@ -1,0 +1,50 @@
+#! /usr/bin/make -f
+
+PACKAGE=localechooser
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	chmod u+x ./get-SUPPORTED ./mktemplates.country ./get-iso-codes ./mk_shortlist_templates
+	$(MAKE)
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	$(MAKE) clean
+	rm -rf debian/pobuild debian/iso-codes debian/short-tmp debian/locales
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	dh_install localechooser languagemap usr/bin
+	mkdir -p debian/$(PACKAGE)/DEBIAN
+	install -m0755 prebaseconfig debian/$(PACKAGE)/usr/lib/prebaseconfig.d/05localechooser
+	install -m644 languagelist debian/$(PACKAGE)/usr/share/languagelist
+	dh_installdirs etc
+	# The following while we have no other way to get SUPPORTED
+	# Should become useless when we will have it
+	install -m644 debian/SUPPORTED-short debian/$(PACKAGE)/etc/SUPPORTED-short
+	install -m644 debian/short-tmp/shortlists debian/$(PACKAGE)/etc/shortlists
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_builddeb
+
+binary-arch: build install
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

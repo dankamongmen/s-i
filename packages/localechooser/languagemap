@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# This file should be automatically generated.
+#
+# Usage:
+#   LANGNAME="langname"
+#   . languagemap
+
+for list in /etc/languagelist /usr/share/languagelist ./languagelist ; do 
+    if [ -f "$list" ] ; then
+	languages="$list"
+    fi
+done
+
+log "LANGNAME=$LANGNAME"
+
+line=$(grep "^${LANGNAME};" $languages || true)
+
+log "line=$line"
+if [ "$line" ] ; then
+    OLD_IFS="$IFS"
+    IFS=';'
+    set $line
+    IFS="$OLD_IFS"
+
+    #echo "C: $*"
+
+    if [ "$3" ] ; then 
+      if [ -z "$LOCALE" ] ; then LOCALE="$3" ; fi
+    fi
+    if [ "$4" ] ; then 
+      if [ -z "$FALLBACKLOCALE" ] ; then FALLBACKLOCALE="$4" ; fi
+    fi
+    if [ "$5" ] ; then 
+      if [ -z "$LANGUAGE" ] ; then LANGUAGE="$5" ; fi
+    fi
+    if [ "$6" ] ; then 
+      if [ -z "$COUNTRY" ] ; then COUNTRY="$6" ;  fi
+    else
+      COUNTRY=US
+    fi
+    if [ "$7" ] ; then LANGUAGELIST="$7"; fi
+    if [ "$8" ] ; then CONSOLE="$8"; fi
+
+    if [ -z "$LANGUAGELIST" ] ; then
+	LANGUAGELIST="$LANGUAGE"
+    fi
+
+else
+    echo "error: Unable to locate info on language '$LANGNAME'"
+    log "error: Unable to locate info on language '$LANGNAME'"
+    FALLBACKLOCALE=""""
+    LANGUAGE=""
+    LOCALE=C
+    COUNTRY=US
+fi
+

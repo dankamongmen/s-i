@@ -1,0 +1,103 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+LOG=/var/log/messages
+
+modify_cyrconfig() {
+        if [ "$2" ]; then
+           sed -e "s/^$1 .*\$/$1 $2/" \
+                  $cyrconfig > $cyrconfig.tmp && \
+           mv $cyrconfig.tmp $cyrconfig
+        fi
+}
+
+db_get debian-installer/consoledisplay || true
+consoletype=`echo $RET | sed -e 's/=.*$//'`
+case "$consoletype" in
+kbd)
+    consolefont=`echo $RET | sed -e 's/^kbd=//'`
+    if apt-install console-tools; then
+        ctconfig=/target/etc/console-tools/config
+        acm=`echo $consolefont | sed -e 's/.*(//' -e 's/).*//'`
+        [ "$acm" = utf8 ] && acm=
+        if [ -n "$acm" ]; then
+	   echo "APP_CHARSET_MAP=$acm" >>$ctconfig
+	   echo "APP_CHARSET_MAP_vc1=$acm" >>$ctconfig
+	   echo "APP_CHARSET_MAP_vc2=$acm" >>$ctconfig
+	   echo "APP_CHARSET_MAP_vc3=$acm" >>$ctconfig
+	   echo "APP_CHARSET_MAP_vc4=$acm" >>$ctconfig
+	   echo "APP_CHARSET_MAP_vc5=$acm" >>$ctconfig
+	   echo "APP_CHARSET_MAP_vc6=$acm" >>$ctconfig
+        fi
+        consolefont=`echo $consolefont | sed -e 's/(.*//'`
+        if [ -n "$consolefont" ]; then
+            echo "SCREEN_FONT=$consolefont" >>$ctconfig
+        fi
+    fi
+    ;;
+cyr)
+    consolefont=`echo $RET | sed -e 's/^cyr=//'`
+    if apt-install console-cyrillic; then
+        cyrconfig=/target/etc/console-cyrillic
+        # format of the consolefont is:
+        # style,size,encoding,layout(option1 option2)
+        style=`echo $consolefont | sed -e 's/,.*$//'`
+        size=`echo $consolefont | sed -e 's/^[^,]*,\([^,]*\),.*$/\1/'`
+        encoding=`echo $consolefont | sed -e 's/^[^,]*,[^,]*,\([^,]*\),.*$/\1/'`
+        layoutopts=`echo $consolefont | sed -e 's/^[^,]*,[^,]*,[^,]*,\([^)]*)\).*$/\1/'`
+        layout=`echo $layoutopts | sed -e 's/(.*)$//'`
+        options=`echo $layoutopts | sed -e 's/.*(//' -e 's/).*//'`
+        modify_cyrconfig style "$style"
+        modify_cyrconfig size "$size"
+        modify_cyrconfig encoding "$encoding"
+        modify_cyrconfig layout "$layout"
+        modify_cyrconfig options "$options"
+        sed -e 's/^.*Bootsetup: .*$/# Bootsetup: YES/' $cyrconfig > $cyrconfig.tmp && \
+           mv $cyrconfig.tmp $cyrconfig
+        sed -e 's/^.*Debconf: .*$/# Debconf: NO/' $cyrconfig > $cyrconfig.tmp && \
+           mv $cyrconfig.tmp $cyrconfig
+    fi
+    ;;
+esac
+ 
+# Pass the language/locale information needed by base-config into
+# /target/root/dbootstrap_settings.
+# This exists only to support installing woody (skolelinux, etc)
+
+db_get debian-installer/locale
+LOCALE="$RET"
+
+db_get debian-installer/language
+LANGLIST="$RET"
+
+if [ ! -d /target/root ] ; then
+    if mkdir /target/root ; then
+        :
+    else
+        echo "error: unable to create /target/root"
+    fi
+fi
+
+(
+    echo "# Inserted by languagechooser."
+    echo "LANG_INST=\"$LOCALE\""
+    echo "LANGUAGE_INST=\"$LANGLIST\""
+) >> /target/root/dbootstrap_settings
+
+# Set global locale and language, and make sure the glibc locale is
+# generated.  This task is also done in termwrap and base-config, and
+# should probably be removed from there when this part work.
+(
+    echo "LANG=\"$LOCALE\""
+    echo "LANGUAGE=\"$LANGLIST\""
+) >> /target/etc/environment
+# If the locale isn't already valid, append it to locale.gen
+if chroot /target/ /usr/sbin/validlocale $LOCALE \
+    >> /target/etc/locale.gen 2>> $LOG ; then
+    : # Nothing to do
+else
+    # New locale added to locale.gen, generate it
+    chroot /target /usr/sbin/locale-gen >> $LOG 2>&1
+fi
+
