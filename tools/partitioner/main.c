@@ -163,7 +163,8 @@ int main(int argc, char *argv[]) {
 
 		free(tmp);
 	}
-	asprintf(&choices, "%s, %s", choices, "Finish");
+	/* Christian Perrier : commented for removing hardcoded string
+	   asprintf(&choices, "%s, %s", choices, "Finish"); */
 
 	while(1) {
 		char *cmd_script = NULL;
