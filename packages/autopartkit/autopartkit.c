@@ -135,12 +135,13 @@ static void fix_mounting(device_mntpoint_map_t mountmap[], int partcount);
 static DeviceStats* get_device_stats(PedDevice*);
 #endif /* fordebian */
 #if defined(HAVE_PED_DISK_COMMIT)
-void autopartkit_handle_timer(PedTimer* timer, void* context);
+static void autopartkit_handle_timer(PedTimer* timer, void* context);
 #endif
 
 #if defined(HAVE_PED_DISK_COMMIT)
 /* update the debconf progress bar when given notice by autopartkit */
-void
+/* No longer used after rewrite to use /sbin/mkfs.*. [pere 2005-03-19] */
+static void
 autopartkit_handle_timer(PedTimer* timer, void* context)
 {
     int minutes_left = (timer->predicted_end - timer->now) / 60;
@@ -207,6 +208,8 @@ void autopartkit_log(const int level, const char * format, ...)
 {
     int LOGLIMIT = 1;
     va_list ap;
+    if (level > LOGLIMIT)
+        return;
 
     openlog("autopartkit", LOG_PID, LOG_USER);
     va_start(ap, format);
@@ -438,15 +441,26 @@ static PedDevice* choose_device(void)
 static const char *
 linux_fstype_to_parted(const char *linux_fstype)
 {
-  if (strcmp(linux_fstype,"swap") == 0)
-      return "linux-swap";
+    if (strcmp(linux_fstype,"swap") == 0)
+        return "linux-swap";
 #if defined(LVM_HACK)
-  if (strcmp(linux_fstype,"lvm") == 0)
-      /* Creating with any FS/partition type and converting to LVM below */
-      return "linux-swap"; /* Use any format that is fast to create. */
+    if (strcmp(linux_fstype,"lvm") == 0)
+        /* Creating with any FS/partition type and converting to LVM below */
+        return "linux-swap"; /* Use any format that is fast to create. */
 #endif /* LVM_HACK */
-  else
-      return linux_fstype;
+    /* These file systems are not supported by libparted.  create ext2
+       and recreate with the correct file system later.  Can't create
+       swap here, as the partition table code would be wrong. */
+    if (strcmp(linux_fstype,"ext3") == 0)
+        return "ext2";
+    if (strcmp(linux_fstype,"xfs") == 0)
+        return "ext2";
+    if (strcmp(linux_fstype,"jfs") == 0)
+        return "ext2";
+    if (strcmp(linux_fstype,"reiserfs") == 0)
+        return "ext2";
+
+    return linux_fstype; /* Pass through everything we don't understand */
 }
 
 #if defined(fordebian)
@@ -871,6 +885,56 @@ zero_dev(const char *devpath, unsigned int length)
 }
 
 /*
+ * Create a filesystem on the device pointed to by devpath.
+ */
+static int
+makefs(const char *devpath, const char *fstype)
+{
+    char *mkfs;
+    int retval;
+    char *cmd = NULL;
+
+    assert(devpath);
+    assert(fstype);
+    /* Create filesystem */
+    /* Do it like this for now */
+    if (0 == strcmp("swap", fstype))
+        mkfs = "/sbin/mkswap";
+    /* XXX This should accept any fstype string, and just use
+       /sbin/mkfs.<fstype> if it exist. */
+    else if (0 == strcmp("ext2", fstype))
+        mkfs = "/sbin/mkfs.ext2";
+    else if (0 == strcmp("ext3", fstype))
+        mkfs = "/sbin/mkfs.ext3";
+    else if (0 == strcmp("jfs", fstype))
+        mkfs = "/sbin/mkfs.jfs";
+    else if (0 == strcmp("xfs", fstype))
+        mkfs = "/sbin/mkfs.xfs";
+    else if (0 == strcmp("reiserfs", fstype))
+        mkfs = "/sbin/mkfs.reiserfs";
+    else /* Any default fs will have to do for now */
+      {
+	autopartkit_log(1, "  Unknown fs '%s' for dev '%s'\n", fstype,devpath);
+	return -1;
+      }
+    retval = asprintf(&cmd, "%s %s >> /var/log/messages 2>&1", mkfs, devpath);
+    if (-1 != retval)
+      {
+	autopartkit_log(1, "Running command: %s\n", cmd);
+	retval = system(cmd);
+	free(cmd);
+	if (0 != retval)
+	    autopartkit_error(1, "  Failed to create '%s' fs on '%s'",
+			      fstype, devpath);
+	else
+	  return 0;
+      }
+    else
+        autopartkit_error(1, "Unable to allocate memory for mkfs call");
+    return -1;
+}
+
+/*
  * Create all the partitions on the disk
  *
  */
@@ -952,6 +1016,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	assert(req_tmp->fstype);
 	{ /* Look up the file system type with libparted. */
 	    const char *parted_fs = linux_fstype_to_parted(req_tmp->fstype);
+	    assert(parted_fs);
 	    fs_type = ped_file_system_type_get(parted_fs);
 	}
 
@@ -1056,6 +1121,9 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
 	    ret = ped_disk_add_partition(disk_maybe, newpart, any);
 
+	    mountmap[partcount].devpath =
+	      get_device_path(disk_maybe->dev, newpart);
+
 	    autopartkit_log(1, "  ped_disk_add_partition: %d\n", ret);
 	    if (0 != ret)
 	    {
@@ -1065,29 +1133,13 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		  newpart->geom.end - newpart->geom.start; /* is this needed?*/
 	        req_tmp->curdisk->geom.start = newpart->geom.end + 1;
 
-#if defined(HAVE_PED_DISK_COMMIT)
-                debconf_subst(client, "autopartkit/createfs-progress", "FSTYPE", req_tmp->fstype);
-                debconf_subst(client, "autopartkit/createfs-progress", "MOUNTPOINT", req_tmp->mountpoint);
-                debconf_progress_start(client, 0, 1000, "autopartkit/createfs-progress");
+                /*
+                 * We must commit before creating file system to make
+                 * sure the device file is available when we need it.
+                */
+                ped_disk_commit(disk_maybe);
 
-		timer = ped_timer_new(autopartkit_handle_timer, NULL);
-                fs = ped_file_system_create(&newpart->geom, fs_type, timer);
-                ped_timer_destroy(timer);
-
-                debconf_progress_stop(client);
-#else
-                fs = ped_file_system_create(&newpart->geom,fs_type, NULL);
-#endif
-		if ( ! fs )
-		  autopartkit_error (1, "  ped_file_system_create failed\n");
-		else
-		{
-		  ped_file_system_close(fs);
-		  autopartkit_log(1, "  Created partition on %lld-%lld "
-				  "length %lld\n",
-				  newpart->geom.start, newpart->geom.end,
-				  newpart->geom.length);
-		}
+                makefs(mountmap[partcount].devpath, req_tmp->fstype);
 	    }
 	    else
 	    {
@@ -1096,9 +1148,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	    }
 		
 	    ped_constraint_destroy(any);
-
-	    mountmap[partcount].devpath = get_device_path(disk_maybe->dev,
-							  newpart);
 
 #if defined(LVM_HACK)
 	    /*
@@ -1236,9 +1285,16 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                 /* Insert into request array */
                 lvm_split_fstype(requirements[partnum].fstype, ':',
 				 4, elements);
-                lvm_reqs[lvm_reqs_index].mountpoint = strdup(elements[2]);
+		if (0 == strcmp("default", elements[3])) {
+		    char *s = strdup(DEFAULT_FS);
+		    assert(s);
+		    free(elements[3]);
+		    elements[3] = s;
+		}
+
+                lvm_reqs[lvm_reqs_index].mountpoint = elements[2];
                 lvm_reqs[lvm_reqs_index].ondisk = 1;
-                lvm_reqs[lvm_reqs_index].fstype = strdup(elements[3]);
+                lvm_reqs[lvm_reqs_index].fstype = elements[3];
                 lvm_reqs[lvm_reqs_index].minsize =
 		    requirements[partnum].minsize;
                 lvm_reqs[lvm_reqs_index].maxsize =
@@ -1270,10 +1326,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                lvm_reqs[partnum].mountpoint; ++partnum){
             char *lvname;
             int mbsize;
-	    char *devpath = NULL;
-	    char *fstype;
-	    char *cmd = NULL;
-	    int retval;
+            char *devpath = NULL;
+            char *fstype;
 
             lvname = lvm_reqs[partnum].mountpoint;
             mbsize = BLOCKS_TO_MiB(lvm_reqs[partnum].blocks);
@@ -1283,63 +1337,34 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 			    vgname, lvname, mbsize);
 	    devpath = lvm_create_logicalvolume(vgname, lvname, mbsize);
 	    if (NULL == devpath)
-	      autopartkit_log(1, "  LVM lv creation failed\n");
+	        autopartkit_log(1, "  LVM lv creation failed\n");
 	    else
 	      {
-		char *mkfs;
 		autopartkit_log(1, "  LVM lv created ok, devpath=%s\n",
 				devpath);
 		autopartkit_log(1, "  LVM creating fs: %s\n", fstype);
-		/* Create filesystem */
-		/* Do it like this for now */
-		if (0 == strcmp("swap", fstype))
-		  mkfs = "/sbin/mkswap";
-		else if (0 == strcmp("ext2", fstype))
-		  mkfs = "/sbin/mkfs.ext2";
-		else if (0 == strcmp("ext3", fstype))
-		  mkfs = "/sbin/mkfs.ext3";
-		else if (0 == strcmp("reiserfs", fstype))
-		  mkfs = "/sbin/mkfs.reiserfs";
-		else /* Any default fs will have to do for now */
-		  {
-		    autopartkit_log(1, "  Unknown fs '%s' on LVM vol\n",
-				    fstype);
-		    mkfs = "/sbin/mkfs.ext2";
-		    fstype = lvm_reqs[partnum].fstype = "ext2";
-		  }
-		retval = asprintf(&cmd, "%s %s >> /var/log/messages 2>&1",
-				  mkfs, devpath);
-		autopartkit_log(1, "Running command: %s\n", cmd);
-		if (-1 != retval)
-		  {
-		    retval = system(cmd);
-		    free(cmd);
-		    if (0 != retval)
-		      autopartkit_error(1, "  Failed to create '%s' fs on '%s'",
-					fstype, devpath);
-		    else
-		      { /* Replace devpath placeholder with real path */
-			char buf[1024];
-			int i;
-			autopartkit_log(1, "  FS '%s' created ok on '%s'",
-					fstype, devpath);
-			snprintf(buf, sizeof(buf), "%s:%s", vgname, lvname);
-			for (i = 0; i < partcount; i++)
-			  if (0 == strcmp(buf, mountmap[i].devpath))
-			    {
-			      free(mountmap[i].devpath);
-			      mountmap[i].mountpoint->fstype = strdup(fstype);
-			      mountmap[i].devpath = devpath;
-			    }
-		      }
+		if (0 == makefs(devpath, fstype))
+		  { /* Replace devpath placeholder with real path */
+		    char buf[1024];
+		    int i;
+		    autopartkit_log(1, "  FS '%s' created ok on '%s'",
+				    fstype, devpath);
+		    snprintf(buf, sizeof(buf), "%s:%s", vgname, lvname);
+		    for (i = 0; i < partcount; i++)
+		      if (0 == strcmp(buf, mountmap[i].devpath))
+			{
+			  free(mountmap[i].devpath);
+			  mountmap[i].mountpoint->fstype = strdup(fstype);
+			  mountmap[i].devpath = devpath;
+			}
 		  }
 		else
-		  autopartkit_error(1,
-				    "Unable to allocate memory for mkfs call");
+		    autopartkit_log(1, "  FS creation failed");
 	      }
-	    autopartkit_log(1, "LVM done\n");
 	}
     }
+    autopartkit_log(1, "LVM done\n");
+
     lvm_lv_stack_delete(lvm_lv_stack);
     lvm_pv_stack_delete(lvm_pv_stack);
 #endif /* LVM_HACK */
