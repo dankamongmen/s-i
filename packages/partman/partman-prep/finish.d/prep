@@ -13,13 +13,13 @@ for dev in $DEVICES/*; do
     open_dialog PARTITIONS
     while { read_line num id size type fs path name; [ "$id" ]; }; do
 	[ "$fs" != free ] || continue
-	partitions="$partitions $id,$num"
+	partitions="$partitions $id,$path"
     done
     close_dialog
     
     for part in $partitions; do
 	id=${part%,*}
-	num=${part#*,}
+	part=${part#*,}
 	[ -f $id/method ] || continue
 	method=$(cat $id/method)
 	if [ "$method" = prep ]; then
@@ -27,6 +27,7 @@ for dev in $DEVICES/*; do
 	    have_prep=yes
 	    if longint_le "$end" 8589934592; then
 		good_place=yes
+		good_paths="${good_paths:+$good_paths,}$path"
 	    fi
 	fi
     done
@@ -52,5 +53,7 @@ if [ $good_place = no ]; then
 	fi
     fi
 fi
+
+db_set partman-prep/boot_partitions "$good_paths"
 
 exit 0
