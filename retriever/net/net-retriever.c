@@ -62,7 +62,6 @@ int main(int argc, char **argv) {
 		src = argv[2];
 		asprintf(&command, "wget -c -q %s://%s%s/%s -O %s", protocol,
 			 hostname, directory, src, argv[3]);
-		fprintf(stderr, "wget: %s\n", command);
 		ret = system(command);
 		if (ret == 256)
 			return 1;
