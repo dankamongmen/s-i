@@ -257,6 +257,11 @@ disk="`printf %s "$root" | sed 's/[0-9].*//'`"
 
 ofpath="`chroot /target ofpath "$disk"`"
 
+initrd=
+if [ -e /target/initrd.img ]; then
+    initrd=/initrd.img
+fi
+
 # we generate our own yaboot.conf kernel (yabootconfig is horribly broken)
 # cjwatson: a little more justification of that would have been nice ...
 # but it does seem clear that yabootconfig isn't flexible enough for our
@@ -298,6 +303,11 @@ image=/vmlinux
 	label=linux
 	read-only
 EOF
+if [ "$initrd" ]; then
+    writeyabootconf <<EOF
+	initrd=$initrd
+EOF
+fi
 if [ "$video" ]; then
     writeyabootconf <<EOF
 	append="video=$video"
@@ -309,6 +319,11 @@ image=/vmlinux.old
 	label=old
 	read-only
 EOF
+if [ "$initrd" ]; then
+    writeyabootconf <<EOF
+	initrd=$initrd.old
+EOF
+fi
 if [ "$video" ]; then
     writeyabootconf <<EOF
 	append="video=$video"
