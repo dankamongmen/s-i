@@ -31,9 +31,11 @@ endheader () {
 
 do_shutdown () {
 	if [ -n "$SHUTDOWN" ]; then
-		if ! $SHUTDOWN; then
-			echo "SHUTDOWN $SHUTDOWN failed"
-		fi
+		for t in $SHUTDOWN; do
+			if ! $t; then
+				echo "SHUTDOWN $t failed"
+			fi
+		done
 	fi
 }
 

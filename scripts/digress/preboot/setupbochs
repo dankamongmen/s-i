@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+
+# Set up config file. 
+rc=$DI_TESTDIR/state/bochs-$MACHINE-$SCHEME.bochsrc
+if [ -e $DI_TESTDIR/bochsrc/$BOCHSRC ]; then
+	cat $DI_TESTDIR/bochsrc/$BOCHSRC > $rc
+else
+	cat $DIGRESSDIR/boshcrc/$BOCHSRC > $rc
+fi
+
+# Add CD to the rc file.
+if [ -n "$BOCHS_CD" ]; then
+	echo "ata0-slave: type=cdrom, path=$BOCHS_CD, status=inserted" >> $rc
+fi
+
+# Create a disk image and add its info to the rc file.
+if [ -n "$BOCHS_DISK_SIZE" ]; then
+	disk=$DI_TESTDIR/state/bochs-$MACHINE-$SCHEME.img
+	rm -f $disk
+	(
+		echo hd
+		echo flat
+		echo "$BOCHS_DISK_SIZE"
+		echo $disk
+	) | bximage | grep ata0-master >> $rc
+fi
