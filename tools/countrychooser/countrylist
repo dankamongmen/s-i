@@ -1,11 +1,29 @@
 #!/usr/bin/perl
+# Builds a list of countries, sorted into regions.
 use strict;
 use warnings;
 
-# Builds a list of countries, sorted into regions.
+# Parameters.
 my $iso3166tab=shift;
 my $regionmap=shift;
 my $indent=shift || "   ";
+
+# These are the regions to use. This specifies what order should be used.
+# The use of gettext is only so that this file can contribute to the po
+# files.
+my @regions = (
+	gettext("North America"),
+	gettext("Central America"),
+	gettext("South America"),
+	gettext("Caribbean"),
+	gettext("Europe"),
+	gettext("Asia"),
+	gettext("Africa"),
+	gettext("Indian Ocean"),
+	gettext("Oceania"),
+	gettext("Antarctica"),
+	gettext("other"),
+);
 
 my %code2country;
 my %codes_listed;
@@ -22,7 +40,6 @@ open (R, $regionmap) || die "$regionmap: $!";
 while (<R>) {
 	chomp;
 	my ($code, $region) = split(' ', $_, 2);
-	$region =~ s/gettext\("(.*)"\)/$1/;
 	if (exists $code2country{$code}) {
 		push @{$regions{$region}}, $code2country{$code};
 		$codes_listed{$code}++;
@@ -41,9 +58,25 @@ foreach my $code (keys %codes_listed) {
 	}
 }
 
-foreach my $region (sort keys %regions) {
-	print "$region\n";
-	foreach my $country (sort @{$regions{$region}}) {
-		print "$indent$country\n";
+foreach my $region (@regions) {
+	if (exists $regions{$region}) {
+		print "$region\n";
+		foreach my $country (sort @{$regions{$region}}) {
+			print "$indent$country\n";
+		}
+		delete $regions{$region};
 	}
+	else {
+		print STDERR "skipping region $region; not in $regionmap\n";
+	}
+}
+
+if (%regions) {
+	print STDERR "skipping the following unlisted regions: ".
+		join(" ", keys %regions)."\n";
+}
+
+# Dummy.
+sub gettext {
+	return shift;
 }
