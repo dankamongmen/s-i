@@ -48,23 +48,23 @@ xstrdup(char *p) {
 /* fatal errors - change to varargs next time */
 void
 lkfatal(const char *s) {
-	fprintf(stderr, "%s: %s:%d: %s\n", PROGNAME, filename, line_nr, s);
+	di_logf (PROGNAME ": %s:%d: %s\n", filename, line_nr, s);
 	exit(1);
 }
 
 void
 lkfatal0(const char *s, int d) {
-	fprintf(stderr, "%s: %s:%d: ", PROGNAME, filename, line_nr);
-	fprintf(stderr, s, d);
-	fprintf(stderr, "\n");
+	di_logf( PROGNAME ": %s:%d: ", filename, line_nr);
+	di_logf( s, d);
+	di_log("\n");
 	exit(1);
 }
 
 void
 lkfatal1(const char *s, const char *s2) {
-	fprintf(stderr, "%s: %s:%d: ", PROGNAME, filename, line_nr);
-	fprintf(stderr, s, s2);
-	fprintf(stderr, "\n");
+	di_logf(PROGNAME ": %s:%d: ", filename, line_nr);
+	di_logf( s, s2);
+	di_logf( "\n");
 	exit(1);
 }
 

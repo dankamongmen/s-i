@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.26 2003/05/18 20:59:42 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.27 2003/07/15 08:29:40 mckinstry Exp $
  */
 
 #include "config.h"
@@ -310,7 +310,7 @@ maplist_t *maplist_get (const char *name)
 		return p;
 	p = NEW (maplist_t);
 	if (p == NULL)    {
-		fprintf (stderr, "Failed to create maplist (out of memory)\n");
+		di_logf (PROGNAME ": Failed to create maplist (out of memory)\n");
 		exit (1);
 	}
 	p->next = maplists;
@@ -338,7 +338,7 @@ keymap_t *keymap_get (maplist_t * list, char *name)
 		return mp;
 	mp = NEW (keymap_t);
 	if (mp == NULL)    {
-		fprintf (stderr, "Failed to malloc keymap_t");
+		di_logf (PROGNAME ": Failed to malloc keymap_t");
 		exit (1);
 	}
 	mp->langs = NULL;
@@ -366,7 +366,7 @@ maplist_parse_file (const char *name)
 
 	if (fp == NULL)
 	{
-		fprintf (stderr, "Failed to open %s: %s \n", name, strerror (errno));
+		di_logf (PROGNAME ": Failed to open %s: %s \n", name, strerror (errno));
 		exit (1);
 	}
 	maplist =
@@ -422,8 +422,7 @@ read_keymap_files (char *listdir)
 
 	d = opendir (listdir);
 	if (d == NULL)	{
-		fprintf (stderr,
-			 "Failed to open %s: %s (keymap files probably not installed)\n",
+		di_logf (PROGNAME ": Failed to open %s: %s (keymap files probably not installed)\n",
 			 listdir, strerror (errno));
 		exit (1);
 	}
@@ -434,7 +433,7 @@ read_keymap_files (char *listdir)
 			continue;
 		strcpy (p, ent->d_name);
 		if (stat (fullname, &sbuf) == -1)		{
-			fprintf (stderr, "Failed to stat %s: %s\n", fullname,
+			di_logf (PROGNAME ": Failed to stat %s: %s\n", fullname,
 				 strerror (errno));
 			exit (1);
 		}
@@ -523,7 +522,7 @@ keyboards_get (void)
 	// Did we forget to compile in a keyboard ???
 	if (DEBUG && keyboards == NULL)
 	{
-		fprintf (stderr, "No keyboards found\n");
+		di_logf (PROGNAME ": No keyboards found\n");
 		exit (1);
 	}
 	keyboards_sort (&keyboards);
@@ -742,15 +741,13 @@ main (int argc, char **argv)
 					di_log ("kbdchooser: GOBACK recieved; leaving");
 				exit (res);
 			}
-			if (s == NULL || (strlen (s) == 0))			{
-				di_log
-					("kbd-chooser: not setting keymap (console-tools/archs not set)");
+			if (s == NULL || (strlen (s) == 0))	{
+				di_log ("kbd-chooser: not setting keymap (console-tools/archs not set)");
 				exit (0);
 			}
 			arch = extract_name (xmalloc (LINESIZE), s);
-			if (strcmp (arch, "none") == 0)			{
-				di_log
-					("kbd-chooser: not setting keymap (kbd == none selected)");
+			if (strcmp (arch, "none") == 0)	 {
+				di_log ("kbd-chooser: not setting keymap (kbd == none selected)");
 				exit (0);
 			}
 			state = CHOOSE_KEYMAP;
