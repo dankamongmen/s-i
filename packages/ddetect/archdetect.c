@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <cdebconf/debconfclient.h>
@@ -9,7 +11,7 @@ int main(int argc, char *argv[])
         const char *subarch;
 
 	if (!(subarch = subarch_analyze()))
-		return 0;
+ 		return EXIT_FAILURE;
 
 	if (strstr(argv[0], "postinst") || (argc > 1 && strcmp(argv[1], "postinst") == 0)) {
                 struct debconfclient *debconf;
