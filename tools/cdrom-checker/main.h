@@ -36,6 +36,7 @@ char *cdrom_device = NULL;
 void detect_cdrom();
 int mount_cdrom();
 int md5file_getlines(FILE *md5file);
+int valid_cdrom();
 int check_cdrom();
 int main(int argc, char **argv);
 
