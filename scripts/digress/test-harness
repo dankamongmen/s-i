@@ -124,9 +124,12 @@ endheader
 if [ -n "$BOOT" ]; then
 	echo
 	header "Booting..."
-	if ! $BOOT; then
-		error "BOOT $BOOT failed"
-	fi
+	endheader
+	for t in $BOOT; do
+		if ! $t; then
+			error "BOOT $t failed"
+		fi
+	done
 fi
 
 if [ -n "$TEST_1" ]; then
