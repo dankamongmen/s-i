@@ -31,6 +31,9 @@ decode_recipe () {
     local ram line word min factor max fs -
     unnamed=$(($unnamed + 1))
     ram=$(grep ^Mem: /proc/meminfo | { read x y z; echo $y; }) # in bytes
+    if [ -z "$ram" ]; then
+    	ram=$(grep ^MemTotal: /proc/meminfo | { read x y z; echo $y; })000
+    fi
     ram=$(expr 0000000"$ram" : '0*\(..*\)......$') # convert to megabytes
     name="Unnamed.${unnamed}"
     scheme=''
