@@ -166,8 +166,8 @@ try_get_packages(char *dist, char *suite, char *ext, char *unpack_cmd)
 	asprintf(&tmp_packages_ext, "%s%s", tmp_packages, ext);
         /* First try the packages command. If that doesn't work, fall back to
          * retrieving the normal location of a Packages file. */
-	asprintf(&command, "%s packages %s %s", retriever, tmp_packages_ext,
-			ext[0] != '\0' ? ext : ".");
+	asprintf(&command, "%s packages %s %s %s", retriever, tmp_packages_ext,
+			ext[0] != '\0' ? ext : ".", suite);
 	ret = system(command);
 	free(command);
 	if (ret != 0) {
