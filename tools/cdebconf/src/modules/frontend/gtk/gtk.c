@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.11 2003/03/23 23:35:12 sley Exp $
+ * $Id: gtk.c,v 1.12 2003/03/24 20:28:07 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -105,6 +105,7 @@ static void combo_setter(GtkWidget *entry, struct question *q)
     gchar *choices_translated[100] = {0};
     int i, count;
     
+    //FIXME: use user-data property of GtkObject to transport the choicename
     count = strchoicesplit(question_get_field(q, NULL, "choices"),
 			   choices, DIM(choices));
     strchoicesplit(question_get_field(q, "", "choices"),
@@ -134,6 +135,7 @@ static void multi_setter(GtkWidget *check_container, struct question *q)
     {
 	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_list->data)))
 	{
+	    //FIXME: use user-data property of GtkObject to transport the choicename
 	    count = strchoicesplit(question_get_field(q, NULL, "choices"),
 				   choices, DIM(choices));
 	    strchoicesplit(question_get_field(q, "", "choices"),
@@ -200,6 +202,12 @@ void free_description_data( GtkObject *obj, struct show_description_data* data )
     free(data);
 }
 
+void button_single_callback(GtkWidget *button, struct question* q)
+{
+    question_setvalue(q, (gchar*) gtk_object_get_user_data(GTK_OBJECT(button)) );
+    gtk_main_quit();
+}
+
 static gboolean show_description( GtkWidget *widget, struct show_description_data* data )
 {
     struct question *q;
@@ -215,25 +223,88 @@ static gboolean show_description( GtkWidget *widget, struct show_description_dat
     return FALSE;
 }
 
-void add_buttons(struct frontend *obj, GtkWidget *qbox)
+gboolean need_finish_button(struct frontend *obj)
 {
-    GtkWidget *nextButton, *separator, *buttonbox;
-
-    separator = gtk_hseparator_new ();
-    gtk_box_pack_start (GTK_BOX (qbox), separator, FALSE, 0, 0);
-
-    nextButton = gtk_button_new_with_label("Finish");
-
-    g_signal_connect (G_OBJECT (nextButton), "clicked",
-                      G_CALLBACK (gtk_main_quit), NULL);
-
-    buttonbox = gtk_hbutton_box_new();
-    gtk_box_pack_start (GTK_BOX(buttonbox), nextButton, FALSE, FALSE, 5);
-
-    gtk_box_pack_start(GTK_BOX(qbox), buttonbox, FALSE, FALSE, 5);
+    if (obj->questions->next == NULL)
+    {
+	if (strcmp(obj->questions->template->type, "boolean") == 0)
+	    return FALSE;
+	else if (strcmp(obj->questions->template->type, "select") == 0)
+	    return FALSE;
+    }
+    return TRUE;
 }
 
-static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidget *qbox)
+void add_buttons(struct frontend *obj, GtkWidget *qbox)
+{
+    GtkWidget *separator, *buttonbox;
+    GtkWidget *finish_button = NULL;
+    GtkWidget *abort_button = NULL;
+    GtkWidget *back_button = NULL;
+
+    if (need_finish_button(obj))
+    {
+	finish_button = gtk_button_new_with_label("Finish");
+	g_signal_connect (G_OBJECT (finish_button), "clicked", G_CALLBACK (gtk_main_quit), NULL);
+    }
+
+    if (finish_button || abort_button || back_button)
+    {
+	separator = gtk_hseparator_new ();
+	gtk_box_pack_start (GTK_BOX (qbox), separator, FALSE, 0, 0);
+
+	buttonbox = gtk_hbutton_box_new();
+
+	if (finish_button)
+	    gtk_box_pack_start (GTK_BOX(buttonbox), finish_button, FALSE, FALSE, 5);
+
+	if (abort_button)
+	    gtk_box_pack_start (GTK_BOX(buttonbox), abort_button, FALSE, FALSE, 5);
+
+	if (back_button)
+	    gtk_box_pack_start (GTK_BOX(buttonbox), back_button, FALSE, FALSE, 5);
+
+	gtk_box_pack_start(GTK_BOX(qbox), buttonbox, FALSE, FALSE, 5);
+    }
+}
+
+static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    GtkWidget *frame, *yes_button, *no_button, *button_box, *vbox, *description_label;
+	
+    yes_button = gtk_button_new_with_label("Yes");
+    no_button = gtk_button_new_with_label("No");
+
+    gtk_object_set_user_data(GTK_OBJECT(yes_button), g_strdup("true"));
+    gtk_object_set_user_data(GTK_OBJECT(no_button), g_strdup("false"));
+
+    g_signal_connect (G_OBJECT (yes_button), "clicked", G_CALLBACK (button_single_callback), q);
+    g_signal_connect (G_OBJECT (no_button), "clicked", G_CALLBACK (button_single_callback), q);
+
+    button_box = gtk_hbutton_box_new();
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
+    gtk_box_pack_start(GTK_BOX(button_box), yes_button, FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(button_box), no_button, FALSE, FALSE, 5);
+
+    description_label = gtk_label_new(question_get_field(q, "", "extended_description"));
+    gtk_misc_set_alignment(GTK_MISC (description_label), 0.0, 0.0);
+    gtk_label_set_line_wrap(GTK_LABEL (description_label), TRUE);
+
+    vbox = gtk_vbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), description_label, FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(vbox), button_box, FALSE, FALSE, 5);
+
+    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    gtk_container_add(GTK_CONTAINER (frame), vbox);
+
+    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+
+    gtk_label_set_text(GTK_LABEL(((struct frontend_data*) obj->data)->description_label), "");
+	
+    return DC_OK;
+}
+
+static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *check;
     struct show_description_data *data;
@@ -250,6 +321,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), FALSE);
     g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
     g_signal_connect (G_OBJECT(check), "grab-focus", G_CALLBACK (show_description), data);
+    g_signal_connect (G_OBJECT(check), "destroy", G_CALLBACK (free_description_data), data);
 
     frame = gtk_frame_new(NULL);
     gtk_container_add(GTK_CONTAINER (frame), check);	
@@ -259,6 +331,14 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
     register_setter(bool_setter, check, q, obj);
 
     return DC_OK;
+}
+
+static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    if (q->next == NULL && q->prev == NULL)
+        return gtkhandler_boolean_single(obj, q, qbox);
+    else
+        return gtkhandler_boolean_multiple(obj, q, qbox);
 }
 
 static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkWidget *qbox)
@@ -286,8 +366,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
 
     check_container = gtk_vbox_new (FALSE, 0);
 
-    g_signal_connect (G_OBJECT(check_container), "destroy",
-                      G_CALLBACK (free_description_data), data);
+    g_signal_connect (G_OBJECT(check_container), "destroy", G_CALLBACK (free_description_data), data);
 
     for (i = 0; i < count; i++) 
     {
@@ -346,9 +425,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     data->obj = obj;
     data->q = q;
 
-    g_signal_connect (G_OBJECT(entry), "destroy",
-                      G_CALLBACK (free_description_data), data);
-
+    g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
     g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
 	
     register_setter(entry_setter, entry, q, obj);
@@ -356,7 +433,43 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     return DC_OK;
 }
 
-static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget *qbox)
+static int gtkhandler_select_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    GtkWidget *frame, *button, *button_box;
+    gchar *choices_translated[100] = {0};
+    gchar *choices[100] = {0};
+    int i, count;
+
+    count = strchoicesplit(question_get_field(q, NULL, "choices"),
+                           choices, DIM(choices));
+	
+    strchoicesplit(question_get_field(q, "", "choices"),
+		   choices_translated, DIM(choices_translated));
+
+    if (count <= 0) return DC_NOTOK;
+
+    button_box = gtk_vbutton_box_new();
+//    gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
+
+    for (i = 0; i < count; i++)
+    {
+        button = gtk_button_new_with_label(choices_translated[i]);
+	gtk_object_set_user_data(GTK_OBJECT(button), choices[i]);
+	g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (button_single_callback), q);	
+	gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
+
+	free(choices_translated);
+    }
+
+    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    gtk_container_add(GTK_CONTAINER (frame), button_box);
+
+    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+	
+    return DC_OK;
+}
+
+static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *combo, *frame;
     GList *items = NULL;
@@ -400,6 +513,14 @@ static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget
     return DC_OK;
 }
 
+static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    if (q->next == NULL && q->prev == NULL)
+        return gtkhandler_select_single(obj, q, qbox);
+    else
+        return gtkhandler_select_multiple(obj, q, qbox);
+}
+
 static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *entry;
@@ -418,9 +539,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     data->obj = obj;
     data->q = q;
 
-    g_signal_connect (G_OBJECT(entry), "destroy",
-                      G_CALLBACK (free_description_data), data);
-
+    g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
     g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
 
     register_setter(entry_setter, entry, q, obj);
@@ -494,6 +613,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     int args = 1;
     char **name;
 
+    //FIXME: This can surely be done in a better way
     (char**) name = malloc(2 * sizeof(char*));
     (char*) name[0] = malloc(9 * sizeof(char));
     name[0] = "cdebconf";
