@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.15 2004/02/13 01:54:42 jbailey Exp $
+ * $Id$
  */
 
 #ifndef KBD_CHOOSER_H
@@ -31,13 +31,14 @@ typedef struct maplist_s {
 } maplist_t;
 
 typedef struct kbd_s { 
-	char *name;		/* short name of kbd arch */
-	char *description;	/* description  */
-	char *deflt;	/* default keymap for this keyboard */
-	exists present;
-	int fd;			
+	char *name;		// short name of kbd arch
+	char *description;	// description 
+	char *deflt;		// default keymap for this keyboard
+	exists present;		// Is keyboard present ?
+	void *data;		// Arch-specific data goes here
 	struct kbd_s *next;
 } kbd_t;
+
 
 /* Some of the following will be linked in
  * via *-kbd.c
@@ -50,20 +51,24 @@ extern kbd_t *amiga_kbd_get (kbd_t *keyboards,const char *subarch);
 extern kbd_t *serial_kbd_get (kbd_t *keyboards,const char *subarch);
 extern kbd_t *atari_kbd_get (kbd_t *keyboards,const char *subarch);
 
+/* Used by *_kb_get() methods */
 extern int grep (const char *file, const char *string);
 extern int check_dir (const char *dirname);
+char *locale_get (void);
 
-#ifdef SPARC_KBD
+#if defined(__sparc__)
 #define PREFERRED_KBD "sun"
 #endif
 
-#ifndef __m68k__
-#ifdef AT_KBD
-#define PREFERRED_KBD "at"
-#endif
+#if defined(__m68k___)
+#define PREFERRED_KBD "none"
 #endif
 
-#ifndef PREFERRED_KBD
+#if defined(AT_KBD) && !defined(PREFERRED_KBD)
+#define PREFERRED_KBD "at"
+#endif
+
+#if !defined(PREFERRED_KBD)
 #define PREFERRED_KBD "none"
 #endif
 

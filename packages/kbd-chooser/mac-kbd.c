@@ -26,7 +26,7 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 	k = xmalloc (sizeof (kbd_t)); 
 	k->name = "mac"; // This must match the name "mac" in console-keymaps-mac
 	k->deflt = NULL;
-	k->fd = -1;
+	k->data = NULL;
 	k->next = keyboards;
 	keyboards = k;
 

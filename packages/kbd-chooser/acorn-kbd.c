@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: acorn-kbd.c,v 1.7 2003/11/14 20:53:16 mckinstry Rel $
+ * $Id$
  */
 
 #include "config.h"
@@ -28,7 +28,7 @@ kbd_t *acorn_kbd_get (kbd_t *keyboards, const char *subarch)
 
 	k->name = "acorn"; // This must match the name "acorn" in console-keymaps-acorn
 	k->deflt = NULL;
-	k->fd = -1;
+	k->data = NULL;
 	k->present = UNKNOWN;
 	k->next = keyboards;
 	keyboards = k;

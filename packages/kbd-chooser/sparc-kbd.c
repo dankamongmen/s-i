@@ -4,7 +4,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: sparc-kbd.c,v 1.10 2004/02/08 01:04:38 jbailey Exp $
+ * $Id$
  */
 
 #include "config.h"
@@ -23,7 +23,7 @@ kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
 
 	k->name = "sun"; // This must match the name "sun" in console-keymaps-sun
 	k->deflt = NULL;
-	k->fd = -1;
+	k->data = NULL;
 	k->present = UNKNOWN;
 	k->next = keyboards;
 	keyboards = k;

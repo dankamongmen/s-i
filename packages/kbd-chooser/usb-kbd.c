@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.17 2004/03/13 10:58:16 mckinstry Exp $
+ * $Id$
  */
 
 #include "config.h"
@@ -29,7 +29,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 
 	// Set up default entries.
 	k->name = "usb";
-	k->fd = -1;
+	k->data = NULL;
 	k->deflt = NULL;
 	k->present = UNKNOWN;
 	k->next = keyboards;

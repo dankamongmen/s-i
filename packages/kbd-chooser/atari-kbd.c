@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: atari-kbd.c,v 1.4 2003/11/06 22:30:41 mckinstry Rel $
+ * $Id$
  */
 
 #include "config.h"
@@ -27,7 +27,7 @@ kbd_t *atari_kbd_get (kbd_t *keyboards, const char *subarch)
 
 	k->name = "atari"; // This must match the name "atari" in console-keymaps-atari
 	k->deflt = NULL;
-	k->fd = -1;
+	k->data = NULL;
 	k->present = UNKNOWN;
 	k->next = keyboards;
 	keyboards = k;

@@ -1,10 +1,10 @@
 /* @file  at-kbd.c
  * @brief Report keyboards present on PC
  *
- * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
+ * Copyright (C) 2002,2004 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.14 2004/03/13 09:17:19 mckinstry Exp $
+ * $Id$
  */
 
 #include "config.h"
@@ -36,35 +36,26 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 	k =  xmalloc (sizeof(kbd_t));	
 	k->name = "at"; // This must match the name "at" in console-keymaps-at
 	k->deflt = NULL;
-	k->fd = -1;
+	k->data = NULL;
 	k->present = UNKNOWN;
 	k->next = keyboards;
 	keyboards = k;
 
 
-#if defined (KERNEL_2_6)
 	// /proc must be mounted by this point
-	assert (check_dir ("/proc") == 1);
+	// assert (check_dir ("/proc") == 1);
 
 	/* In 2.6 series, we can detect keyboard via /proc/bus/input
 	 *
 	 */
-	if (di_check_dir ("/proc/bus/input") >= 0) {
-	        // this dir only present in 2.6
-		res_at = grep ("/proc/bus/input/devices","AT Set ");
-		if (res < 0) {
-			di_warning ("at-kbd: Failed to open /proc/bus/input/devices");
-			return keyboards;
-		}
-		k->present = ( res == 0) ? TRUE : FALSE;
-		return keyboards;
+	if (check_dir ("/proc/bus/input") >= 0) {
+		if ((grep ("/proc/bus/input/devices","AT Set ") == 0) ||
+		    (grep ("/proc/bus/input/devices","AT Translated Set") == 0) ||
+		    (grep ("/proc/bus/input/devices","AT Raw Set") ==0))
+			k->present = TRUE;
+		else
+			k->present = FALSE;
 	}
 
-#endif // KERNEL_2_6
-
-	/* ***  Only reached if KERNEL_2_6 not present ***  */
-
-	/* For 2.6, assume a PC keyboard is present
-	 */
 	return keyboards;
 }
