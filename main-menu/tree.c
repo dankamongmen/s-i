@@ -11,7 +11,7 @@
 
 void *root=NULL;
 
-int tree_compare (const void *p1, const void *p2) {
+int _tree_compare (const void *p1, const void *p2) {
 	return strcmp(((struct package_t *)p1)->package,
 		      ((struct package_t *)p2)->package);
 }
@@ -22,7 +22,7 @@ struct package_t *tree_find(char *packagename) {
 	void *ret;
 
 	find.package = packagename;
-	ret=tfind(&find, &root, tree_compare);
+	ret=tfind(&find, &root, _tree_compare);
 	if (ret)
 		return *(struct package_t **)ret;
 	return NULL;
@@ -41,11 +41,40 @@ struct package_t *tree_add(const char *packagename) {
 	 * makes my code fail horribly later on. I think tsearch has
 	 * issues.
 	 */
-	tsearch(pkg, &root, tree_compare);
+	tsearch(pkg, &root, _tree_compare);
 	return pkg;
+}
+
+void _tree_delete(const void *nodep, const VISIT which, const int depth) {
+	struct package_t *p;
+
+	switch(which) {
+		case postorder:
+//			p = *(struct package_t **)nodep;
+//			printf("[%i] postorder %p %s\n", depth, nodep, p->package);
+			break;
+		case preorder:
+//			p = *(struct package_t **)nodep;
+//			printf("[%i] preorder %p %s\n", depth, nodep, p->package);
+			break;
+		case endorder:
+//			p = *(struct package_t **)nodep;
+//			printf("[%i] endorder %p %s\n", depth, nodep, p->package);
+//			break;
+		case leaf:
+			p = *(struct package_t **)nodep;
+			printf("[%i] delete %p %s\n", depth, nodep, p->package);
+			tdelete((void *)p, &root, _tree_compare);
+			if (p->package)
+				free(p->package);
+			if (p->description)
+				free(p->description);
+			free(p);
+			break;
+	}
 }
 
 /* Clears out the entire tree, freeing all package stucts contained it in. */
 void tree_clear() {
-	/* TODO */
+	twalk(root, _tree_delete);
 }

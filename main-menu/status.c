@@ -19,21 +19,20 @@ struct package_t *status_read(void) {
 	int i;
 	struct package_t *found, *newp, *p = 0;
 
+	tree_clear();
+
 	if ((f = fopen(STATUSFILE, "r")) == NULL) {
 		perror(STATUSFILE);
 		return 0;
 	}
 	
-/*	lingua = getenv("LINGUA");*/ /* Gross hack here. FIXME */
 	b = setlocale(LC_MESSAGES, "");
-	if (strcmp(b, "C") == 0)
-		lingua = strdup("en");
-	else {
+	if (strcmp(b, "C") != 0) {
 		lingua = (char *) malloc(3);
 		memcpy(lingua, b, 2);
 		lingua[2] = '\0';
 	}
-
+		
 	while (fgets(buf, BUFSIZE, f) && !feof(f)) {
 		buf[strlen(buf)-1] = 0;
 		if (strstr(buf, "Package: ") == buf) {

@@ -1,6 +1,10 @@
 * Fix all memory leaks (probably just the btree and the actual package
   structs).
-* Picking a main menu item that is unpacked but not configured doesn't seem
-  to be running dpkg.
+* If I pick install lilo from the menu (and the dpkg runs fail), I'm seeing
+  a new menu with doubled entries. If I don't call order_done, this doesn't
+  happen.
+* Freeing the tree doesn't work too well. Not everything is freed. If I
+  just walk the tree I see more than if I put in the tdelete() calls.
+  Fixing this may well fix the item above.
 * Figure out how to handle configuring only one virtual package (pick off
   of a menu?) if the menu item depends on a virtual package.

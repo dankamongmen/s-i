@@ -34,6 +34,7 @@ static int do_system(const char *cmd) {
  * sort to resolve ties deterministically).
  */
 int compare (const void *a, const void *b) {
+	/* Sometimes, I wish I was writing perl. */
 	int r=(*(struct package_t **)a)->installer_menu_item -
 	      (*(struct package_t **)b)->installer_menu_item;
 	if (r) return r;
@@ -42,11 +43,11 @@ int compare (const void *a, const void *b) {
 }
 
 /*
- * Builds a linked list of packages, ordered by dependencies, so 
- * depended-upon packages come first. Pass the package to start ordering 
- * at. head points to the start of the ordered list of packages, and tail 
- * points to the end of the list (generally pass in pointers to NULL, unless 
- * successive calls to the function are needed to build up a larger list.
+ * Builds a linked list of packages, ordered by dependencies, so
+ * depended-upon packages come first. Pass the package to start ordering
+ * at. head points to the start of the ordered list of packages, and tail
+ * points to the end of the list (generally pass in pointers to NULL, unless
+ * successive calls to the function are needed to build up a larger list).
  */
 void order(struct package_t *p, struct package_t **head, struct package_t **tail) {
 	struct package_t *found;
@@ -66,7 +67,19 @@ void order(struct package_t *p, struct package_t **head, struct package_t **tail
 	}
 	else
 		*head = *tail = p;
+
 	p->processed = 1;
+}
+
+/*
+ * Call this function after calling order to clear the processed tags.
+ * Otherwise, later calls to order won't work.
+ */
+void order_done(struct package_t *head) {
+	struct package_t *p;
+	
+	for (p=head; p; p=p->next)
+		p->processed = 0;
 }
 
 /* Returns true if the given package could be the default menu item. */
@@ -103,13 +116,14 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	/* Sort by menu number. */
 	qsort(package_list, num, sizeof(struct package_t *), compare);
 	
-	/* Order menu so depended-upon packages come first (topo-sort). */
+	/* Order menu so depended-upon packages come first. */
 	/* The menu number is really only used to break ties. */
 	for (i = 0; i < num ; i++) {
 		if (package_list[i]->installer_menu_item) {
 			order(package_list[i], &head, &tail);
 		}
 	}
+	order_done(head);
 
 	free(package_list);
 	
@@ -167,13 +181,13 @@ void do_menu_item(struct package_t *p) {
 		 * it depends on is configured, then configure it.
 		 */
 		order(p, &head, &tail);
-		/* TODO: bug here, these should not be null */
-		DPRINTF("head: %p, tail: %p\n", head, tail);
+		order_done(head);
 		for (p = head; p; p = p->next) {
 			if (p->status == STATUS_UNPACKED) {
 				sprintf(configcommand, "dpkg --configure %s",
 						p->package);
-				SYSTEM(configcommand);
+				if (SYSTEM(configcommand) != 0)
+					return; /* give up on failure */				
 			}
 		}
 	}

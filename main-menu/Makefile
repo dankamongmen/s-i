@@ -12,6 +12,7 @@ $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LIBS)
 
 demo: $(BIN)
+	debconf-loadtemplate debian/templates
 	/usr/share/debconf/frontend ./$(BIN)
 
 # Size optimized and stripped binary target.
