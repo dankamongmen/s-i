@@ -38,10 +38,27 @@ try_load_module xfs
 # Linux root filesystems won't be on vfat, but this may be useful anyway ...
 try_load_module vfat
 
+# LVM support
+try_load_module dm-mod
+try_load_module lvm-mod
+pvscan >>"$MESSAGES" 2>&1 || true
+vgscan >>"$MESSAGES" 2>&1 || true
+
 db_capb backup
 
 PARTITIONS="$(find /dev/discs -follow -name part\* | sort | tr '\n' , | \
 	sed 's/,$//; s/,/, /g')"
+
+if lvdisplay -c | cut -d: -f4 | grep 0 >/dev/null; then
+	# Some unavailable logical volumes; activate them
+	vgchange -a y >>"$MESSAGES" 2>&1 || true
+fi
+LVMPARTS="$(lvdisplay -c | sed 's/^ *//' | cut -d: -f1 | sort | tr '\n' , | \
+	sed 's/,$//; s/,/, /g')" || LVMPARTS=
+if [ "$LVMPARTS" ]; then
+	PARTITIONS="${PARTITIONS:+$PARTITIONS, }$LVMPARTS"
+fi
+
 if [ -z "$PARTITIONS" ]; then
 	# TODO: need a sensible error here, or perhaps drop through to a
 	# fallback shell?
