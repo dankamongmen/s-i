@@ -17,6 +17,10 @@ AC_CHECK_LIB([dl], [dlopen])
 # FIXME: Replace `main' with a function in `-lparted':
 AC_CHECK_LIB([parted], [ped_constraint_any])
 
+if test "$ac_cv_lib_parted_ped_constraint_any" != yes; then
+    AC_MSG_ERROR(Unable to find required library libparted.)
+fi
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h sys/mount.h unistd.h])
