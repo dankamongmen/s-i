@@ -8,13 +8,27 @@
 # "l10n synchronisation windows"
 COMMIT_MARKER="[l10n] [l10n-sync]"
 
-
-# Define ONLINE="YES_I_KNOW_WHAT_I_DO"
-# for doing automatic commits
+# Define ONLINE=Y for doing svn updates and commits
+# Define ATOMIC_COMMITS=Y
+# for doing automatic atomic commits
 # Define ONLINE="Y"
 # for doing automatic updates but no commits
+# Define BIG_COMMITS="Y" to do only one commit
+# for languages files
+# with more risk of conflicts
 if [ ! $ONLINE ]; then
 	ONLINE="N"
+fi
+if [ "$ONLINE" = "Y" ] ; then
+  # Commits disabled by default
+  if [ ! $BIG_COMMITS ]; then
+	BIG_COMMITS="N"
+  fi
+  # If BIG_COMMITS is chosen do not make ATOMIC commits even if ATOMIC_COMMITS
+  # is inadvertently set
+  if [ ! $ATOMIC_COMMITS -o "$BIG_COMMITS" = "Y" ]; then
+	ATOMIC_COMMITS="N"
+  fi
 fi
 
 # Define DEBUG=Y for more output from debconf-updatepo and msg* utilities
@@ -65,7 +79,7 @@ fi
 
 # First, update the copy of D-I repository
 cd $DI_COPY
-if [ "$ONLINE" = "Y" -o "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+if [ "$ONLINE" = "Y" ] ; then
   echo Synchronising $DI_COPY:
   if [ "$DEBUG" = "Y" ] ; then
     $svn update
@@ -93,7 +107,7 @@ echo Run debconf-updatepo for all packages:
 for i in  $packages ; do 
  echo "  $i:"
  cd $DI_COPY/packages/$i/debian
- if [ "$ONLINE" = "Y" -o "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+ if [ "$ONLINE" = "Y" ] ; then
    echo -n "    - Update..."
    if [ "$DEBUG" = "Y" ] ; then
      $svn update
@@ -110,7 +124,7 @@ for i in  $packages ; do
    $debconfupdatepo >/dev/null 2>&1
  fi
  echo Done.
- if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+ if [ "$ATOMIC_COMMITS" = "Y"  -o "$BIG_COMMITS" = "Y" ] ; then
    echo -n "    - Commit..."
    cd $DI_COPY/packages/$i/debian/po
    if [ "$DEBUG" = "Y" ] ; then
@@ -131,7 +145,7 @@ else
   msgcat $pots >$DI_COPY/packages/po/template.pot 2>/dev/null
 fi
 echo Done.
-if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+if [ "$ATOMIC_COMMITS" = "Y"  -o "$BIG_COMMITS" = "Y" ] ; then
   echo -n "Commiting the general template.pot file..."
   cd $DI_COPY/packages/po
   if [ "$DEBUG" = "Y" ] ; then
@@ -152,7 +166,7 @@ languages=$(ls -1 *.po | sed 's/\.po//g')
 for po in *.po ; do
  lang=$(basename $po .po)
  echo "   $lang:"
- if [ "$ONLINE" = "Y" -o "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+ if [ "$ONLINE" = "Y" ] ; then
    echo -n "     - Update from SVN..."
    if [ "$DEBUG" = "Y" ] ; then
      $svn update
@@ -179,7 +193,7 @@ for po in *.po ; do
    msgmerge $po template.pot >$po.new 2>/dev/null
    mv $po.new $po
  fi
- if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+ if [ "$ATOMIC_COMMITS" = "Y"  -o "$BIG_COMMITS" = "Y" ] ; then
    echo -n "     - Commit back to SVN..."
    if [ "$DEBUG" = "Y" ] ; then
      $svn commit -m"${COMMIT_MARKER} Updated with general template.pot" $i
@@ -199,7 +213,7 @@ echo Updating D-I packages:
 for package in $packages ; do
  echo "   $package:"
  cd $DI_COPY/packages/$package/debian/po
- if [ "$ONLINE" = "Y" -o "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+ if [ "$ONLINE" = "Y" ] ; then
    echo -n "      - synchronize with D-I repository..."
    if [ "$DEBUG" = "Y" ] ; then
      $svn update
@@ -225,10 +239,11 @@ for package in $packages ; do
 	rm $lang.po.new
       else
 	mv $lang.po.new $lang.po
+	echo -n "(CHANGED) "
       fi
  done
  echo ""
- if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+ if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
    echo -n "      - commiting back updated files..."
    if [ "$DEBUG" = "Y" ] ; then
      $svn commit -m"${COMMIT_MARKER} Synchronising with files from packages/po" *.po
@@ -238,4 +253,13 @@ for package in $packages ; do
    echo Done.
  fi
 done
+
+# Do the big commits for each language
+if [ "$BIG_COMMITS" = "Y" ] ; then
+  cd $DI_COPY/packages
+  for lang in $languages ; do
+     $svn commit -m"${COMMIT_MARKER} Synchronising with files from packages/po" $(find . -mindepth 3 -name $lang.po |\
+              grep /debian/po/$lang.po\$)
+  done
+fi
 
