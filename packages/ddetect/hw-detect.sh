@@ -196,7 +196,7 @@ get_manual_hw_info() {
         case "$SUBARCH" in
           sparc/sparc32)
             echo "sunhme:Sun Happy Meal 10/100 Ethernet driver"
-            echo "echo sunhme >> /target/etc/modules" >> $prebaseconfig
+            register-module sunhme
           ;;
         esac
 	# ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
