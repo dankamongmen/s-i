@@ -2,9 +2,9 @@
 set -e
 
 if [ -f /etc/mtab ]; then
-    MTAB=/etc/mtab
+	MTAB=/etc/mtab
 else
-    MTAB=/proc/mounts
+	MTAB=/proc/mounts
 fi
 
 # detect which is the root partition: /target
@@ -25,19 +25,28 @@ bootdev=`/target/bin/echo $bootfs | /target/bin/sed 's/part[0-9]\+$/disc/'`
 bootpart=`/target/bin/echo $bootfs | /target/bin/sed 's/^.*part\([0-9]\+\)$/\1/'`
 
 if [ "$rootfs" = "$bootfs" ]; then
-  kernel=$bootpart/boot/vmlinux
+	kernel=$bootpart/boot/vmlinux
 else
-  kernel=$bootpart/vmlinux
+	kernel=$bootpart/vmlinux
+fi
+
+# See if there's an initrd.img, if so add an initrd= parameter.
+if [ -e /target/boot/initrd.img ]; then
+	if [ "$rootfs" = "$bootfs" ]; then
+		initrd=$bootpart/boot/initrd.img
+	else
+		initrd=$bootpart/initrd.img
+	fi
+	initrd_param="initrd=$initrd"
 fi
 
 bootdev=`mapdevfs $bootdev`
 rootfs=`mapdevfs $rootfs`
 
-# See /build/boot-floppies/boot-floppies-cvs/utilities/dbootstrap/bootconfig.c
-
 vmlinux=`cd /target/boot && ls -l vmlinux | /target/bin/sed 's/^.* -> \(.*\)$/\1/'`
-#write out palo.conf
-/target/bin/echo "--commandline=$kernel root=$rootfs HOME=/" > /target/etc/palo.conf
+
+# write out palo.conf
+/target/bin/echo "--commandline=$kernel root=$rootfs $initrd_parm HOME=/" > /target/etc/palo.conf
 /target/bin/echo "--recoverykernel=/boot/$vmlinux" >> /target/etc/palo.conf
 /target/bin/echo "--init-partitioned=$bootdev" >> /target/etc/palo.conf
 
@@ -46,4 +55,3 @@ apt-install palo
 set -e
 
 chroot /target /sbin/palo
-
