@@ -1,15 +1,15 @@
 Template: debian-installer/s390/netdevice/choose_networktype
 Type: select
 _Choices: ctc: Channel to Channel (CTC) or ESCON connection, lcs: qeth: OSA-2 Token Ring/Ethernet or OSA-Express Fast Ethernet (non-QDIO), qeth: OSA-Express in QDIO mode / HiperSockets, iucv: Inter-User Communication Vehicle - available for VM guests only, Quit
-_Description: Select the type of your network device.
- The following network devices are supported. Choose the type of your
- primary network interface that you will need for installing the Debian
- system (via NFS or HTTP).
+_Description: Network device type:
+ Please choose the type of your primary network interface that you
+ will need for installing the Debian system (via NFS or HTTP). Only
+ the listed devices are supported.
 
 Template: debian-installer/s390/netdevice/ctc/choose
 Type: select
 _Choices: ${choices} Quit
-_Description: Select the CTC device.
+_Description: CTC device:
  The following device numbers might belong to CTC or ESCON connections, but
  please note that OSA-2 or OSA-Express cards might also be listed here.
 
@@ -17,26 +17,25 @@ Template: debian-installer/s390/netdevice/ctc/confirm
 Type: boolean
 Default: true
 _Description: Is this configuration correct?
+ The configured parameters are:
   read channel  = ${device_read}
   write channel = ${device_write}
   protocol      = ${protocol}
 
 Template: debian-installer/s390/netdevice/ctc/no
-Type: note
-_Description: No CTC or ESCON connections were detected.
- No CTC or ESCON connections were detected. Please make sure that you have
- set them up correctly.
+Type: error
+_Description: No CTC or ESCON connections
+ Please make sure that you have set them up correctly.
 
 Template: debian-installer/s390/netdevice/ctc/protocol
 Type: select
 _Choices: S/390 (0), Linux (1), Linux TTY (2), OS/390 (3)
-_Description: Please specify protocol for this connection.
- Please specify protocol for this connection.
+_Description: Protocol for this connection:
 
 Template: debian-installer/s390/netdevice/lcs/choose
 Type: select
 _Choices: ${choices} Quit
-_Description: Select the OSA-2 or OSA-Express device.
+_Description: Device:
  The following device numbers might belong to OSA-2 or OSA-Express cards, but
  please note that CTC/ESCON devives might also be listed here.
 
@@ -44,14 +43,15 @@ Template: debian-installer/s390/netdevice/lcs/confirm
 Type: boolean
 Default: true
 _Description: Is this configuration correct?
+ The configured parameters are:
   read channel  = ${device_read}
   write channel = ${device_write}
   port          = ${port}
 
 Template: debian-installer/s390/netdevice/lcs/no
-Type: note
-_Description: No OSA-2 or OSA-Express cards were detected.
- No OSA-2 or OSA-Express cards were detected. If you are running VM please
+Type: error
+_Description: No OSA-2 or OSA-Express cards
+ If you are running VM please
  make sure that your card is attached to this guest. If you want to use
  HiperSockets or an OSA-Express card in QDIO mode please use the qeth
  driver instead.
@@ -59,19 +59,20 @@ _Description: No OSA-2 or OSA-Express cards were detected.
 Template: debian-installer/s390/netdevice/lcs/port
 Type: select
 _Choices: port 0, port 1, port 2, port 3
-_Description: Please specify port for this connection.
- Please specify relative port.
+_Description: Port:
+ Please enter a relative port for this connection.
 
 Template: debian-installer/s390/netdevice/qeth/choose
 Type: select
 _Choices: ${choices} Quit
-_Description: Select OSA-Express QDIO / HiperSockets device.
-The following device numbers belong to OSA-Express QDIO / HiperSockets devices.
+_Description: Device:
+ Please select the OSA-Express QDIO / HiperSockets device.
 
 Template: debian-installer/s390/netdevice/qeth/confirm
 Type: boolean
 Default: true
 _Description: Is this configuration correct?
+ The configured parameters are:
   read channel  = ${device_read}
   write channel = ${device_write}
   data channel  = ${device_data}
@@ -79,8 +80,8 @@ _Description: Is this configuration correct?
   portname      = ${portname}
 
 Template: debian-installer/s390/netdevice/qeth/no
-Type: note
-_Description: No OSA-Express QDIO cards / HiperSockets were detected.
+Type: error
+_Description: No OSA-Express QDIO cards / HiperSockets
  No OSA-Express QDIO cards / HiperSockets were detected. If you are running
  VM please make sure that your card is attached to this guest. If you want
  to use an OSA-2 or OSA-Express card in non-QDIO mode please use the lcs
@@ -89,30 +90,37 @@ _Description: No OSA-Express QDIO cards / HiperSockets were detected.
 Template: debian-installer/s390/netdevice/qeth/port
 Type: select
 _Choices: port 0, port 1
-_Description: Please specify port.
- Please specify relative port.
+_Description: Port:
+ Please enter a relative port.
 
 Template: debian-installer/s390/netdevice/qeth/portname
 Type: string
-_Description: Please specify portname.
+_Description: Portname:
  Please enter the portname of your OSA-Express card. This name must be 1 to
  8 characters long and must be equal on all systems accessing the same
- card! Leave it empty if you want to use HiperSockets. This parameter is
+ card. 
+ .
+ Leave it empty if you want to use HiperSockets. This parameter is
  required for cards with microcode level 2.10 or later or when you want to
- share a card. The name will be converted to uppercase letters
- automatically!
+ share a card. 
+ .
+ The name will automatically be converted to uppercase.
 
 Template: debian-installer/s390/netdevice/iucv/peer
 Type: string
-_Description: Please specify the VM peer.
- Please enter the name of the VM peer you want to connect to. If you want
- to connect to multiple peers, separate the names by colons, e.g.
- tcpip:linux1 The standard TCP/IP server name on VM is TCPIP, on VIF it's
+_Description: VM peer:
+ Please enter the name of the VM peer you want to connect to. 
+ .
+ If you want to connect to multiple peers, separate the names by
+ colons, e.g.  tcpip:linux1.
+ .
+ The standard TCP/IP server name on VM is TCPIP, on VIF it's
  $TCPIP. Note: IUCV must be enabled in the VM user directory for this
- driver to work and it must be set up on both ends of the communication.
+ driver to work and it must be set up on both ends of the
+ communication.
 
 Template: debian-installer/s390-netdevice/title
 Type: text
 #  Main menu item
-_Description: Network Device Configuration
+_Description: Configure the network device
 
