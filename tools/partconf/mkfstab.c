@@ -275,7 +275,9 @@ int main(int argc, char *argv[]) {
 #ifdef DEBUG
 	printf("---------------------------------\n");
 #endif
-	fprintf(outfile, HEADER, FSTAB_FILE);
+	/* Not using FSTAB_FILE because it contain /target/ which will
+	 * be confusing when read after the boot from HD. */
+	fprintf(outfile, HEADER, "/etc/fstab");
 	for(i=0; i<count_entries; i++) {
 		int pass;
 
