@@ -6,7 +6,7 @@
 ### Functions ###
 md_get_devices() {
 	DEVICES=""
-	for i in `cat /proc/mdstat|grep md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1_\2/'`; do
+	for i in `cat /proc/mdstat|grep ^md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1_\2/'`; do
 		if [ -z "$DEVICES" ]; then
 			DEVICES="${i}"
 		else
@@ -17,7 +17,7 @@ md_get_devices() {
 
 md_delete_verify() {
 	DEVICE=`echo "$1" | sed -e "s/^\(md.*\)_.*/\1/"`
-	INFO=`cat /proc/mdstat|grep ${DEVICE}| sed -e "s/^md.* : active \([[:alnum:]]*\) \(.*\)/\1:\2/"`
+	INFO=`cat /proc/mdstat|grep ^${DEVICE}| sed -e "s/^md.* : active \([[:alnum:]]*\) \(.*\)/\1:\2/"`
 	TYPE=`echo ${INFO}|sed -e "s/\(.*\):.*/\1/"`
 	DEVICES=`echo ${INFO}|sed -e "s/.*:\(.*\)/\1/"`
 	NUMBER=`echo ${DEVICE}|sed -e "s/^md//"`
@@ -244,7 +244,7 @@ md_create_raid1() {
 	done
 
 	# Find the next available md-number
-	MD_NUM=`cat /proc/mdstat|grep md|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -1`
+	MD_NUM=`cat /proc/mdstat|grep ^md|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -1`
 	if [ -z "${MD_NUM}" ]; then
 		MD_NUM=0
 	else
