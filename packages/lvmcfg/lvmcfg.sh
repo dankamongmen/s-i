@@ -194,6 +194,10 @@ get_vgs() {
 		if [ "$arg" = "free" -a "$(getfree_vg "$i")" = "0" ]; then
 			continue
 		fi
+		if [ "$arg" = "with-lv"]; then
+			get_vglvs "$i"
+			[ "$LVS" = "" ] && continue
+		fi
 		addinfos_vg "$i"
 		i=`printf "%-15s (%s)" "$i" "$RET"`
 		
@@ -228,6 +232,7 @@ get_vgpvs() {
 # get all logical volumes from a volume group
 #
 get_vglvs() {
+	local i
 	LVS=""
 	for i in `vgdisplay -v $1 | grep '^[ ]*LV Name' | 
 		sed -e 's,.*/\(.*\),\1,' | sort`; do
@@ -650,7 +655,7 @@ lv_create() {
 # create a new logical volume
 #
 lv_delete() {
-	get_vgs
+	get_vgs "with-lv"
 	if [ -z "$GROUPS" ]; then
 		db_set lvmcfg/lvdelete_novg "false"
 		db_input high lvmcfg/lvdelete_novg
