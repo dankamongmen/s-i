@@ -32,6 +32,8 @@
 
 #define MAXLINE 512
 
+
+#ifdef L__di_execlog__
 /* di_execlog():
    execute the command, log the result
    */
@@ -60,6 +62,9 @@ di_execlog (const char *incmd)
      executed, not sure how to do that cleanly */
   return (pclose (output));
 }
+#endif /* L__di_execlog__ */
+
+#ifdef L__di_log__
 
 /* di_log() :
   write a message to the debian-installer log.  This should be used for
@@ -73,6 +78,10 @@ di_log(char *msg){
     closelog ();
 }
 
+#endif /* L__di_log__ */
+
+
+#ifdef L__di_check_dir__
 int
 di_check_dir (const char *dirname)
 {
@@ -82,3 +91,5 @@ di_check_dir (const char *dirname)
   else
     return S_ISDIR (check.st_mode);
 }
+
+#endif /*  L__di_check_dir__ */
