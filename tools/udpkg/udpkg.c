@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.46 2004/01/22 16:55:43 pere Exp $ */
+/* $Id: udpkg.c,v 1.47 2004/01/24 17:58:15 waldi Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -17,23 +17,6 @@
 
 static int force_configure = 0;
 
-/*
- * helper routine to correctly detect mips and mipsel
- */
-
-int is_little_endian()
-{
-  unsigned char numarray[] __attribute__ ((aligned (8))) ={0x12,0x34,0x56,0x78};
-  unsigned long value = *(unsigned long*) numarray;
-  if (value == 0x78563412)
-  {
-    return(-1);
-  } else {
-    return(0);
-  }
-}
-
-
 /* 
  * Main udpkg implementation routines
  */
@@ -48,45 +31,8 @@ static int is_file(const char *fn)
 
 int dpkg_print_architecture()
 {
-    struct utsname name;
-    int i;
-    struct {
-        const char *gnuname;
-        const char *newname;
-    } xlattbl[] = { 
-        { "i486", "i386" },
-        { "i586", "i386" },
-        { "i686", "i386" },
-        { "pentium", "i386" },
-        { "parisc", "hppa" },
-        { "parisc64", "hppa" },
-        { "ppc", "powerpc" },
-	{ "ppc64", "powerpc" },
-	{ "sparc64", "sparc" },
-    };
-
-    if (uname(&name) < 0)
-        return 1;
-
-    for (i = 0; i < sizeof(xlattbl)/sizeof(xlattbl[0]); i++)
-    {
-        if (strcmp(name.machine, xlattbl[i].gnuname) == 0)
-        {
-            printf("%s\n", xlattbl[i].newname);
-            return 0;
-        }
-    }
-
-    /* uname gives "mips" for both mips and mipsel, so we need to  */ 
-    /* distinguish between both by checking the actual endianess   */
-
-    if ((strcmp(name.machine, "mips") == 0) && is_little_endian())
-    {
-        printf("mipsel\n");
-    } else { 
-        printf("%s\n", name.machine);
-    }
-    return 0;
+	puts(ARCH_TEXT);
+	return 0;
 }
 
 

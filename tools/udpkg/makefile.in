@@ -1,5 +1,7 @@
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
 CC=@CC@
-CFLAGS=@CFLAGS@ -D_GNU_SOURCE -DADMINDIR=\"@ADMINDIR@\"
+CFLAGS=@CFLAGS@ -D_GNU_SOURCE -DADMINDIR=\"@ADMINDIR@\" -DARCH_TEXT='"$(DEB_HOST_ARCH)"'
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=udpkg
 BUSYBOX=@BUSYBOXDIR@
