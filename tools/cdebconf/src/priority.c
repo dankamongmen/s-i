@@ -24,9 +24,9 @@ int priority_compare(const char *p1, const char *p2)
 	i2 = priority_code(p2);
 
 	if (i1 > i2)
-		return -1;
+		return 1;
 	else if (i1 == i2)
 		return 0;
 	else
-		return 1;
+		return -1;
 }

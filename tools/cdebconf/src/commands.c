@@ -96,7 +96,9 @@ int command_version(struct confmodule *mod, int argc, char **argv,
 int command_capb(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	return DC_NOTOK;
+	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	return DC_OK;
+	// return DC_NOTOK;
 }
 
 int command_title(struct confmodule *mod, int argc, char **argv, 
@@ -319,7 +321,20 @@ int command_fset(struct confmodule *mod, int argc, char **argv,
 int command_exist(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	return DC_NOTOK;
+	struct question *q;
+	CHECKARGC(== 1);
+
+	q = mod->db->question_get(mod->db, argv[1]);
+	if (q)
+	{
+		question_deref(q);
+		snprintf(out, outsize, "%u true", CMDSTATUS_SUCCESS);
+	}
+	else
+	{
+		snprintf(out, outsize, "%u false", CMDSTATUS_SUCCESS);
+	}
+	return DC_OK;
 }
 
 int command_stop(struct confmodule *mod, int argc, char **argv,

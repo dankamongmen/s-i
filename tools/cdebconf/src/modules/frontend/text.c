@@ -11,11 +11,6 @@
 
 static void texthandler_displaydesc(struct frontend *obj, struct question *q) {
 	int i;
-	printf("%s\n", obj->title);
-	for (i = 0; i < strlen(obj->title); i++) {
-		printf("=");
-	}
-	printf("\n\n");
 	printf("%s", question_description(q));
 	printf("\n");
 	printf("%s\n", question_extended_description(q));
@@ -218,6 +213,12 @@ static int text_go(struct frontend *obj)
 	int i;
 	int ret;
 
+	printf("%s\n", obj->title);
+	for (i = 0; i < strlen(obj->title); i++) {
+		printf("=");
+	}
+	printf("\n\n");
+
 	for (; q != 0; q = q->next)
 	{
 		for (i = 0; i < sizeof(question_handlers) / sizeof(question_handlers[0]); i++)
@@ -226,11 +227,13 @@ static int text_go(struct frontend *obj)
 				ret = question_handlers[i].handler(obj, q);
 				if (ret == DC_OK)
 					obj->db->question_set(obj->db, q);
-				return ret;
+				else
+					return ret;
+				break;
 			}
 	}
 
-	return 0;
+	return DC_OK;
 }
 
 struct frontend_module debconf_frontend_module =

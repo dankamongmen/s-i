@@ -69,7 +69,7 @@ static int confmodule_communicate(struct confmodule *mod)
 		in[ret] = 0;
 		inp = strstrip(in);
 		ret = _confmodule_process(mod, inp, out, sizeof(out) - 1);
-		if (ret == DC_NOTOK) {
+		if (ret == DC_NOTIMPL) {
 			fprintf(stderr, "E: Unimplemented function\n");
 			continue;
 		}

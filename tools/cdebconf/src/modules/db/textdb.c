@@ -345,7 +345,8 @@ static struct question *textdb_question_get(struct database *db,
 	{
 		node = node->child;
 		for (; node != 0; node = node->next)
-			question_owner_add(q, node->tag);
+			if (node->tag && node->tag[0] != 0 && node->tag[0] != ':')
+				question_owner_add(q, node->tag);
 	}
 
 	if (q->tag == 0 || q->value == 0 || q->template == 0)
