@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.34 2003/10/31 22:55:54 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.35 2003/11/02 14:01:16 mckinstry Exp $
  */
 
 #include "config.h"
@@ -29,8 +29,13 @@
 #define CMDSTATUS_GOBACK	30
 
 // TODO Move this into debian-installer.h
+
+#ifndef di_info
 #define di_info(format...)   di_log(DI_LOG_LEVEL_INFO, format)
+#endif
+#ifndef di_debug
 #define di_debug(format...)  di_log(DI_LOG_LEVEL_DEBUG, format)
+#endif
 
 extern int loadkeys_wrapper (char *map);	// in loadkeys.y
 
@@ -702,7 +707,7 @@ main (int argc, char **argv)
 		switch (state)	{
 		case GOBACK:
 			di_info ("kbdchooser: GOBACK recieved; leaving");
-			exit (30);
+			exit (0);
 		case CHOOSE_ARCH: // First select a keyboard arch.
 			if (mydebconf_ask (kbd_priority, "console-tools/archs", &s)) {
 				state = GOBACK;
