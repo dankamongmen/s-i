@@ -22,11 +22,11 @@ struct template
 	char *type;
 	struct template_l10n_fields *fields;
 	struct template *next;
-	const char *(*lget)(struct template *, const char *l, const char *f);
-	const char *(*get)(struct template *, const char *f);  /*unused*/
+	char *(*lget)(struct template *, const char *l, const char *f);
+	char *(*get)(struct template *, const char *f);  /*unused*/
 	void (*lset)(struct template *, const char *l, const char *f, const char *v);
 	void (*set)(struct template *, const char *f, const char *v); /*unused*/
-	const char *(*next_lang)(struct template *, const char *l);
+	char *(*next_lang)(struct template *, const char *l);
 };
 
 extern const char *template_fields_list[];
