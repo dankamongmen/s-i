@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.13 2003/03/25 12:41:07 sley Exp $
+ * $Id: gtk.c,v 1.14 2003/03/25 13:57:35 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -69,6 +69,7 @@ struct frontend_data
     GtkWidget *window; //Main window of the frontend
     GtkWidget *description_label; //Pointer to the Description Field
     GtkWidget *target_box; //Pointer to the box, where question widgets shall be stored in
+    GtkWidget *progress_bar; //Pointer to the Progress Bar, when initialized
     struct setter_struct *setters; //Struct to register the Set Functions of the Widgets
     int button_val; //Value of the button pressed to leave a form
 };
@@ -707,9 +708,62 @@ static int gtk_can_go_back(struct frontend *obj, struct question *q)
     return (obj->capability & DCF_CAPB_BACKUP);
 }
 
+static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
+{
+    GtkWidget *progress_bar, *target_box, *frame;
+
+    obj->progress_title = NULL;
+    obj->progress_min = 0;
+    obj->progress_max = max-min;
+    obj->progress_cur = 0;
+
+    target_box = ((struct frontend_data*)obj->data)->target_box;
+    progress_bar = gtk_progress_bar_new ();
+    ((struct frontend_data*)obj->data)->progress_bar = progress_bar;
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), "");
+
+    frame = gtk_frame_new(title);
+    gtk_container_add(GTK_CONTAINER (frame), progress_bar);
+
+    gtk_box_pack_start(GTK_BOX(target_box), frame, FALSE, FALSE, 5);
+    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
+    while (gtk_events_pending ())
+	gtk_main_iteration ();
+}
+
+static void gtk_progress_step(struct frontend *obj, int step, const char *info)
+{
+    gdouble progress;
+
+    if (obj->progress_max > 0)
+    {
+
+        progress = (gdouble)obj->progress_cur / (gdouble)obj->progress_max;
+	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(((struct frontend_data*)obj->data)->progress_bar),
+				      progress);
+    }
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(((struct frontend_data*)obj->data)->progress_bar), info);
+    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
+    obj->progress_cur += step;
+    while (gtk_events_pending ())
+	gtk_main_iteration ();
+}
+
+static void gtk_progress_stop(struct frontend *obj)
+{
+    gtk_widget_destroy(gtk_widget_get_parent(((struct frontend_data*)obj->data)->progress_bar));
+    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
+      while (gtk_events_pending ())
+	gtk_main_iteration ();
+}
+
+
 struct frontend_module debconf_frontend_module =
 {
     initialize: gtk_initialize,
     go: gtk_go,
     can_go_back: gtk_can_go_back,
+    progress_start: gtk_progress_start,
+    progress_step: gtk_progress_step,
+    progress_stop: gtk_progress_stop,
 };
