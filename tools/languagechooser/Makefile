@@ -1,4 +1,4 @@
-all: debian/templates check-scripts check-data
+all: debian/templates check-scripts check-data check-utf8
 
 LIST     = languagelist
 L10NLIST = languagelist.l10n
@@ -12,6 +12,9 @@ check-scripts:
 	   languagemap languagechooser ; do \
 		$$SH -n $$s ; \
 	done
+
+check-utf8: languagelist.l10n
+	iconv -f utf-8 languagelist.l10n > /dev/null
 
 check-data:
 	# Check that the listed locale is supported, to make sure base-config know
