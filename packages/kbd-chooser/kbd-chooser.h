@@ -51,6 +51,7 @@ extern kbd_t *amiga_kbd_get (kbd_t *keyboards,const char *subarch);
 extern kbd_t *serial_kbd_get (kbd_t *keyboards,const char *subarch);
 extern kbd_t *atari_kbd_get (kbd_t *keyboards,const char *subarch);
 extern kbd_t *dec_kbd_get (kbd_t *keyboards, const char *subarch);
+extern kbd_t *hil_kbd_get (kbd_t *keyboards, const char *subarch);
 
 /* Used by *_kb_get() methods */
 extern int grep (const char *file, const char *string);

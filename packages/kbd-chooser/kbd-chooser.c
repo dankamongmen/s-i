@@ -536,6 +536,9 @@ keyboards_get (void)
 #if defined (DEC_KBD)
 	keyboards = dec_kbd_get (keyboards, subarch);
 #endif
+#if defined (HIL_KBD)
+	keyboards = hil_kbd_get (keyboards, subarch);
+#endif
 
 	// Did we forget to compile in a keyboard ???
 	if (DEBUG && keyboards == NULL) {

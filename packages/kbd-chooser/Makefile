@@ -56,6 +56,7 @@ ifeq ($(ARCH),m68k)
 CFLAGS += -DAMIGA_KBD -DATARI_KBD -DMAC_KBD -DAT_KBD -D__m68k__
 KEYBOARDS := amiga atari mac at
 endif
+# For the moment, don't include HIL keyboards
 ifeq ($(ARCH),hppa)
 CFLAGS += -DAT_KBD -DUSB_KBD
 KEYBOARDS := at usb
