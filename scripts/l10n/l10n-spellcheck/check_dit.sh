@@ -17,13 +17,21 @@ usage() {
 initialise() {
 GATHER_MSGSTR_SCRIPT=./msgstr_extract.awk
 GATHER_MSGID_SCRIPT=./msgid_extract.awk
+CHECK_VAR=./check_var.pl
 
 ALL_STRINGS=$DEST_DIR/${LANG}_all.txt
+FILES_TO_KEEP="$ALL_STRINGS $FILES_TO_KEEP"
+
 NO_VARS=$DEST_DIR/1_no_vars_${LANG}
 NEEDS_RM="$NO_VARS $NEEDS_RM"
+
 ALL_UNKNOWN=$DEST_DIR/2_all_unkn_${LANG}
 NEEDS_RM="$ALL_UNKNOWN $NEEDS_RM"
+
 UNKN=$DEST_DIR/${LANG}_unkn_wl.txt
+FILES_TO_KEEP="$UNKN $FILES_TO_KEEP"
+
+SUSPECT_VARS=$DEST_DIR/${LANG}_var.txt
 }
 
 checks(){
@@ -40,6 +48,11 @@ fi
 
 if [ ! -f $GATHER_MSGID_SCRIPT ] ; then
     echo "$GATHER_MSGID_SCRIPT does not exist. You need it!"
+    exit 1
+fi
+
+if [ ! -f $CHECK_VAR ] ; then
+    echo "$CHECK_VAR does not exist. You need it!"
     exit 1
 fi
 
@@ -141,6 +154,7 @@ fi
 
 rm -f $ALL_STRINGS
 for LANG_FILE in `cat $PO_FILE_LIST`; do
+    $CHECK_VAR $LANG_FILE >> $SUSPECT_VARS
     ENC=`cat $LANG_FILE | grep -e "^\"Content-Type:" | sed 's:^.*charset=::' | sed 's:\\\n\"::'`
     awk -f $GATHER_MSGSTR_SCRIPT $LANG_FILE | iconv --from $ENC --to utf-8 >> $ALL_STRINGS
 done
@@ -149,8 +163,17 @@ if [ $LANG = en ] ; then
     find $DI_COPY -name "templates.pot" >> $PO_FILE_LIST
 
     for LANG_FILE in `cat $PO_FILE_LIST | grep "templates.pot$"`; do
+	$CHECK_VAR $LANG_FILE >> $SUSPECT_VARS
 	awk -f $GATHER_MSGID_SCRIPT $LANG_FILE >> $ALL_STRINGS
     done
+fi
+
+if [ `ls -l $SUSPECT_VARS | awk '{print $5}'` -gt 0 ]; then
+    FILES_TO_KEEP="$SUSPECT_VARS $FILES_TO_KEEP" 
+    SUSPECT_EXIST=1
+else
+    rm $SUSPECT_VARS
+    SUSPECT_EXIST=0
 fi
 
 # Remove ${HOME} from the "*** path_of_po_file" string
@@ -168,7 +191,8 @@ cat $NO_VARS | aspell list --lang=$LANG --encoding=utf-8 $WL_PARAM > $ALL_UNKNOW
 # take note of unknown words
 cat $ALL_UNKNOWN | sort -f | uniq -c > $UNKN
 
-echo `wc -l $UNKN | awk '{print $1}'` $LANG >> ${DEST_DIR}/stats.txt
+# build the entry of stats.txt for the current language (i.e "395 it 1")
+echo `wc -l $UNKN | awk '{print $1}'` $LANG $SUSPECT_EXIST >> ${DEST_DIR}/stats.txt
 
 rm $NEEDS_RM
 
@@ -180,8 +204,8 @@ if [ ! -d  $DEST_DIR/nozip ] ; then
     mkdir $DEST_DIR/nozip
 fi
 
-tar czf $DEST_DIR/${LANG}.tar.gz $ALL_STRINGS $UNKN
+tar czf $DEST_DIR/${LANG}.tar.gz $FILES_TO_KEEP
 
 mv $DEST_DIR/${LANG}.tar.gz $DEST_DIR/zip
-mv $ALL_STRINGS $UNKN $DEST_DIR/nozip
+mv $FILES_TO_KEEP $DEST_DIR/nozip
 

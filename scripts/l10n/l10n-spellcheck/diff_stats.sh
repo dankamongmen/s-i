@@ -37,7 +37,7 @@ echo "-------------------------"
 printf "%-8s %4s %4s %4s\n" "LANG" "OLD" "NEW" "DELTA"
 echo "-------------------------"
 
-for ROW in `cat ${NEW} | sed 's: :,:'`
+for ROW in `cat ${NEW} | sed 's: :,:g'`
   do
 
   UNKN=`echo  ${ROW} | awk -F, '{print $1}'`

@@ -45,29 +45,41 @@ echo "  <tr>" >> $TABLE_HTML
 echo "   <th class=\"col1\">Language</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Unknown words</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Messages</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">Unknown WL</th>" >> $TABLE_HTML
-echo "   <th class=\"t1\">Messages + Unknown WL</th>" >> $TABLE_HTML
+echo "   <th class=\"t1\">List of unknown words</th>" >> $TABLE_HTML
+echo "   <th class=\"t1\">Suspect vars</th>" >> $TABLE_HTML
+echo "   <th class=\"t1\">All files</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Aspell Dictionary</th>" >> $TABLE_HTML
 echo " </tr>" >> $TABLE_HTML
 
 # fill the table:
-# Language, Unknown words, Messages, Unknown WL, Messages + Unknown WL
-for ROW in `cat $STATS | sed  "s: :,:"`; do
+# Language, Unknown words, Messages, List of unknown words, Suspect vars, All Files
+for ROW in `cat $STATS | sed  "s: :,:g"`; do
     LANG=`echo $ROW | awk -F, '{print $2}'`
     UNKN=`echo $ROW | awk -F, '{print $1}'`
+    SUSP=`echo $ROW | awk -F, '{print $3}'`
 
-if [ $LANG = "pt_BR" ] ; then
-    LANG="pt"
+if [ $SUSP = "1" ] ; then
+    SUSPECT_VARS_URL="latest/nozip/${LANG}_var.txt"
+    SUSPECT_VARS_NAME="${LANG}_var.txt"
+else
+    SUSPECT_VARS_URL=""
+    SUSPECT_VARS_NAME="-"
 fi
 
+if [ $LANG = "pt_BR" ] ; then
+    DICT_URL=`grep -w "pt" $DICTIONARIES`
+else
     DICT_URL=`grep -w "${LANG}" $DICTIONARIES`
-    DICT_NAME=`echo $DICT_URL | sed "s|ftp://ftp.gnu.org/gnu/aspell/dict/.*/||" | sed "s:.tar.bz2$::"`
+fi
+
+DICT_NAME=`echo $DICT_URL | sed "s|ftp://ftp.gnu.org/gnu/aspell/dict/.*/||" | sed "s:.tar.bz2$::"`
 
 echo "  <tr>" >> $TABLE_HTML
 echo "   <td class=\"col1\">$LANG</td>" >> $TABLE_HTML
 echo "   <td>$UNKN</td>" >> $TABLE_HTML
 echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a></td>" >> $TABLE_HTML
 echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a></td>" >> $TABLE_HTML
+echo "   <td><a href=\"$SUSPECT_VARS_URL\">$SUSPECT_VARS_NAME</a></td>" >> $TABLE_HTML
 echo "   <td><a href=\"latest/zip/$LANG.tar.gz\">$LANG.tar.gz</a></td>" >> $TABLE_HTML
 echo "   <td><a href=\"$DICT_URL\">$DICT_NAME</a></td>" >> $TABLE_HTML
 echo "  </tr>" >> $TABLE_HTML
