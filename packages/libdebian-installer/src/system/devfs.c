@@ -22,6 +22,8 @@
 
 #include <debian-installer/system/devfs.h>
 
+#include <debian-installer/string.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -42,7 +44,7 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     unsigned char major;
     unsigned char minor;
     char *name;
-    enum { ENTRY_TYPE_ONE, ENTRY_TYPE_NUMBER, ENTRY_TYPE_DISC } type;
+    enum { ENTRY_TYPE_ONE, ENTRY_TYPE_NUMBER, ENTRY_TYPE_DISC, ENTRY_TYPE_DISC_ARRAY } type;
     unsigned char entry_first;
     unsigned char entry_disc_minor_shift;
   }
@@ -62,6 +64,14 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 22,	0,	"hd",		ENTRY_TYPE_DISC,	2,	6 },
     { 33,	0,	"hd",		ENTRY_TYPE_DISC,	4,	6 },
     { 34,	0,	"hd",		ENTRY_TYPE_DISC,	6,	6 },
+    { 48,	0,	"rd",		ENTRY_TYPE_DISC_ARRAY,	0,	3 },
+    { 49,	0,	"rd",		ENTRY_TYPE_DISC_ARRAY,	1,	3 },
+    { 50,	0,	"rd",		ENTRY_TYPE_DISC_ARRAY,	2,	3 },
+    { 51,	0,	"rd",		ENTRY_TYPE_DISC_ARRAY,	3,	3 },
+    { 52,	0,	"rd",		ENTRY_TYPE_DISC_ARRAY,	4,	3 },
+    { 53,	0,	"rd",		ENTRY_TYPE_DISC_ARRAY,	5,	3 },
+    { 54,	0,	"rd",		ENTRY_TYPE_DISC_ARRAY,	6,	3 },
+    { 55,	0,	"rd",		ENTRY_TYPE_DISC_ARRAY,	7,	3 },
     { 56,	0,	"hd",		ENTRY_TYPE_DISC,	8,	6 },
     { 57,	0,	"hd",		ENTRY_TYPE_DISC,	10,	6 },
     { 65,	0,	"sd",		ENTRY_TYPE_DISC,	16,	4 },
@@ -76,6 +86,8 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 90,	0,	"hd",		ENTRY_TYPE_DISC,	16,	6 },
     { 91,	0,	"hd",		ENTRY_TYPE_DISC,	18,	6 },
     { 94,	0,	"dasd",		ENTRY_TYPE_DISC,	0,	2 },
+    { 104,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	0,	4 },
+    { 105,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY,	1,	4 },
     { 0,	0,	NULL,		ENTRY_TYPE_ONE,		0,	0 },
   };
 
@@ -84,7 +96,7 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
 
   ssize_t ret = 0;
 
-  unsigned int unit;
+  unsigned int disc;
   unsigned int part;
 
   if (!strcmp ("none", path))
@@ -106,34 +118,52 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     /* Pass unknown devices on without changes. */
     return snprintf (buf, n, "%s", path);
 
+  strcat (buf, "/dev/");
+
   switch (e->type)
   {
     case ENTRY_TYPE_ONE:
-      ret = snprintf (buf, n, "/dev/%s", e->name);
+      ret = di_snprintfcat (buf, n, "%s", e->name);
       break;
 
     case ENTRY_TYPE_NUMBER:
-      unit = minor (s.st_rdev) - e->minor + e->entry_first;
+      disc = minor (s.st_rdev) - e->minor + e->entry_first;
 
-      ret = snprintf (buf, n, "/dev/%s%d", e->name, unit);
+      ret = di_snprintfcat (buf, n, "%s%d", e->name, disc);
       break;
 
     case ENTRY_TYPE_DISC:
-      unit = (minor (s.st_rdev) >> e->entry_disc_minor_shift);
+    case ENTRY_TYPE_DISC_ARRAY:
+      disc = (minor (s.st_rdev) >> e->entry_disc_minor_shift);
       part = (minor (s.st_rdev) & ((1 << e->entry_disc_minor_shift) - 1));
 
-      unit += e->entry_first;
+      switch (e->type)
+      {
+        case ENTRY_TYPE_DISC:
+          disc += e->entry_first;
 
-      if (unit+'a' > 'z') {
-        unit -= 26;
-        ret = snprintf (buf, n, "/dev/%s%c%c", e->name, 'a' + unit / 26, 'a' + unit % 26);
+          if (disc + 'a' > 'z')
+          {
+            disc -= 26;
+            ret = di_snprintfcat (buf, n, "%s%c%c", e->name, 'a' + disc / 26, 'a' + disc % 26);
+          }
+          else
+            ret = di_snprintfcat (buf, n, "%s%c", e->name, 'a' + disc);
+
+          if (part)
+            ret = di_snprintfcat (buf, n, "%d", part);
+
+          break;
+        case ENTRY_TYPE_DISC_ARRAY:
+          ret = di_snprintfcat (buf, n, "%s/c%dd%d", e->name, e->entry_first, disc);
+
+          if (part)
+            ret = di_snprintfcat (buf, n, "p%d", part);
+
+          break;
+        default:
+          break;
       }
-      else
-        ret = snprintf (buf, n, "/dev/%s%c", e->name, 'a' + unit);
-
-      if (part)
-        ret = snprintf (buf + ret, n - ret, "%d", part);
-
       break;
   };
 
