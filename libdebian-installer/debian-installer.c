@@ -332,27 +332,33 @@ di_pkg_parse(FILE *f)
             i = 0;
             while (*b != 0 && *b != '\n')
             {
-                if (*b != ' ')
+                if (*b != ' ' && *b != ',')
                 {
-                    if (*b == ',')
+                    dep = malloc(sizeof(struct package_dependency));
+                    dep->name = b;
+                    while (*b != 0 && *b != '\n' && *b != ',')
                     {
-                        *b = 0;
-                        p->depends[++i] = 0;
+                        if (*b == ' ')
+                            *b = 0;
+                        b++;
                     }
-                    else if (p->depends[i] == 0)
+                    *b = 0;
+                    dep->name = strdup(dep->name);
+                    dep->ptr = NULL;
+                    p->depends[i] = dep;
+                    p->depends[++i] = 0;
+                    if (i == DEPENDSMAX)
                     {
-                        dep = malloc(sizeof(struct package_dependency));
-                        dep->name = strdup(b);
-                        dep->ptr = NULL;
-                        p->depends[i] = dep;
+                        char *emsg;
+
+                        asprintf(&emsg, "Package %s has more than %d dependencies!",
+                                p->package, DEPENDSMAX-1);
+                        di_log(emsg);
+                        free(emsg);
                     }
                 }
-                else
-                    *b = 0; /* eat the space... */
                 b++;
             }
-            *b = 0;
-            p->depends[i+1] = 0;
         }
         else if (di_stristr(buf, "Provides: ") == buf)
         {
@@ -360,27 +366,33 @@ di_pkg_parse(FILE *f)
             i = 0;
             while (*b != 0 && *b != '\n')
             {
-                if (*b != ' ')
+                if (*b != ' ' && *b != ',')
                 {
-                    if (*b == ',')
+                    dep = malloc(sizeof(struct package_dependency));
+                    dep->name = b;
+                    while (*b != 0 && *b != '\n' && *b != ',')
                     {
-                        *b = 0;
-                        p->provides[++i] = 0;
+                        if (*b == ' ')
+                            *b = 0;
+                        b++;
                     }
-                    else if (p->provides[i] == 0)
+                    *b = 0;
+                    dep->name = strdup(dep->name);
+                    dep->ptr = NULL;
+                    p->provides[i] = dep;
+                    p->provides[++i] = 0;
+                    if (i == PROVIDESMAX)
                     {
-                        dep = malloc(sizeof(struct package_dependency));
-                        dep->name = strdup(b);
-                        dep->ptr = NULL;
-                        p->provides[i] = dep;
+                        char *emsg;
+
+                        asprintf(&emsg, "Package %s has more than %d provides!",
+                                p->package, PROVIDESMAX-1);
+                        di_log(emsg);
+                        free(emsg);
                     }
                 }
-                else
-                    *b = 0; /* eat the space... */
                 b++;
             }
-            *b = 0;
-            p->provides[i+1] = 0;
         }
     }
 
