@@ -12,7 +12,7 @@ for dev in /var/lib/partman/devices/*; do
     open_dialog PARTITIONS
     while { read_line num id size type fs path name; [ "$id" ]; }; do
 	start=${id%-*}
-	if [ "$start" -le "1024" -a "$fs" = "unknown" ]
+	if [ "$(($start/1024))" -le "1" -a "$fs" = "unknown" ]
 	then
 	    [ -d $id ] || mkdir $id
 	    echo aboot >$id/method

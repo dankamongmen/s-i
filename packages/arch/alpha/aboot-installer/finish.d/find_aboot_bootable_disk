@@ -61,7 +61,7 @@ then
 	open_dialog PARTITIONS
 	while { read_line num id size type fs path name; [ "$id" ]; }; do
 		start=${id%-*}
-		if [ "$start" -le 1024 -a -d "$id" ]; then
+		if [ "$(($start/1024))" -le 1 -a -d "$id" ]; then
 			if [ "$(cat $id/method)" = "aboot" ]; then
 				partnum="$num"
 			else
