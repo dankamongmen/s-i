@@ -346,20 +346,27 @@ cleanup(void)
 char *
 udeb_kernel_version(struct package_t *p)
 {
-    char *name = strdup(p->package);
+    char *name;
     char *t1, *t2;
 
+    if (p->package == NULL)
+	return NULL;
+    name = strdup(p->package);
     if ((t1 = strstr(name, "-modules-")) == NULL)
-        return NULL;
+        goto Error;
     t1 += strlen("-modules-");
     if ((t2 = strstr(t1, "-udeb")) == NULL)
-        return NULL;
+        goto Error;
     if (t2[strlen("-udeb")] != '\0')
-        return NULL;
+        goto Error;
     *t2 = '\0';
     t2 = strdup(t1);
     free(name);
     return t2;
+Error:
+    /* Ick. Well, think of it as an exception... */
+    free(name);
+    return NULL;
 }
 
 /*
