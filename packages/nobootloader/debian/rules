@@ -2,34 +2,12 @@
 
 #export DH_VERBOSE=1
 
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
-PACKAGE=nobootloader
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=all
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
-
-CFLAGS='-Wall -Os'
-
-ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -g
-endif
-ifneq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
-	STRIP += ''
-endif
-
-build: build-stamp
-build-stamp:
-	dh_testdir
-
-	touch build-stamp
+build:
+# Ye olde no-op.
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
 	rm -f debian/files~
 	dh_clean
 
@@ -46,9 +24,8 @@ binary-indep: build install
 	dh_testroot
 	dh_installdebconf -i
 	dh_installdeb -i
-	dh_gencontrol -i -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb -i --filename=$(FILENAME)
+	dh_gencontrol -i
+	dh_builddeb -i
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
