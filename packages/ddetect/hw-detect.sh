@@ -143,7 +143,7 @@ discover_hw () {
 		;;
 	1)
 		case "$SUBARCH" in
-		  sparc/*) sbus=",sbus"
+		  sparc/*) sbus=",sbus" ;;
 		esac
 		discover --format="%m:%V %M\n" --disable-all \
 		          --enable=pci,ide,scsi${sbus},pcmcia scsi cdrom ethernet bridge |
@@ -306,9 +306,9 @@ db_go || exit 10 # back up
 db_get hw-detect/select_modules
 LIST="$RET"
 
-db_input low prompt_module_params || true
+db_input low hw-detect/prompt_module_params || true
 db_go || exit 10 # back up
-db_get prompt_module_params
+db_get hw-detect/prompt_module_params
 if [ "$RET" = true ]; then
 	PROMPT_MODULE_PARAMS=1
 else
