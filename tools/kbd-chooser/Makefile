@@ -27,17 +27,20 @@ OBJS   += at-kbd.o usb-kbd.o
 endif
 ifeq ($(ARCH),sparc)
 CFLAGS += -DSPARC -DUSB_KBD
-OBJS   += sparc-kbd.o
+OBJS   += sparc-kbd.o usb-kbd.o
 endif
 ifeq ($(ARCH),powerpc)
-CFLAGS += -DPOWERPC -DUSB_KBD -DAT_KBD
-OBJS += mac-kbd.o amiga-kbd.o at-kbd.o
+CFLAGS += -DPOWERPC -DUSB_KBD -DAT_KBD -DAMIGA_KBD
+OBJS += mac-kbd.o amiga-kbd.o at-kbd.o usb-kbd.o
 endif
 ifeq ($(ARCH),arm)
 CFLAGS += -DARM -DAT_KBD -DUSB_KBD
 OBJS += acorn-kbd.o at-kbd.o usb-kbd.o
 endif
-
+ifeq ($(ARCH),m68k)
+CFLAGS += -DAMIGA_KBD
+OBJS += amiga-kbd.o
+endif
 
 all: kbd-chooser
 
