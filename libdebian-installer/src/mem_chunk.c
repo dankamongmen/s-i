@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem_chunk.c,v 1.3 2003/12/11 19:29:50 waldi Exp $
+ * $Id: mem_chunk.c,v 1.4 2004/01/06 15:25:37 waldi Exp $
  */
 
 #include <config.h>
@@ -77,7 +77,7 @@ struct di_mem_area
                                 */
 };
 
-static size_t di_mem_chunk_compute_size (size_t size, size_t min_size) __attribute__ ((nonnull));
+static size_t internal_di_mem_chunk_compute_size (size_t size, size_t min_size) __attribute__ ((nonnull));
 
 /** @} */
 
@@ -107,7 +107,7 @@ di_mem_chunk* di_mem_chunk_new (di_ksize_t atom_size, di_ksize_t area_size)
   if (mem_chunk->atom_size % MEM_ALIGN)
     mem_chunk->atom_size += MEM_ALIGN - (mem_chunk->atom_size % MEM_ALIGN);
 
-  mem_chunk->rarea_size = di_mem_chunk_compute_size (area_size + sizeof (di_mem_area) - MEM_AREA_SIZE, atom_size + sizeof (di_mem_area) - MEM_AREA_SIZE);
+  mem_chunk->rarea_size = internal_di_mem_chunk_compute_size (area_size + sizeof (di_mem_area) - MEM_AREA_SIZE, atom_size + sizeof (di_mem_area) - MEM_AREA_SIZE);
   mem_chunk->area_size = mem_chunk->rarea_size - (sizeof (di_mem_area) - MEM_AREA_SIZE);
 
   return mem_chunk;
@@ -196,7 +196,7 @@ size_t di_mem_chunk_size (di_mem_chunk *mem_chunk)
   return size;
 }
 
-static size_t di_mem_chunk_compute_size (size_t size, size_t min_size)
+static size_t internal_di_mem_chunk_compute_size (size_t size, size_t min_size)
 {
   size_t power_of_2;
   size_t lower, upper;

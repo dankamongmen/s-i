@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.12 2003/12/14 17:36:04 waldi Exp $
+ * $Id: log.c,v 1.13 2004/01/06 15:25:37 waldi Exp $
  */
 
 #include <config.h>
@@ -171,7 +171,7 @@ void di_log_handler_syslog (di_log_level_flags log_level, const char *message, v
   syslog (syslog_level, "%s", buf);
 }
 
-static di_log_handler *di_log_get_handler (di_log_level_flags log_level, void **user_data)
+static di_log_handler *internal_di_log_get_handler (di_log_level_flags log_level, void **user_data)
 {
   di_slist_node *node;
 
@@ -226,7 +226,7 @@ void di_vlog (di_log_level_flags log_level, const char *format, va_list args)
 
   vsnprintf (buf, sizeof (buf), format, args);
 
-  log_func = di_log_get_handler (log_level, &user_data);
+  log_func = internal_di_log_get_handler (log_level, &user_data);
 
   log_func (log_level, buf, user_data);
 
