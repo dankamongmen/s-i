@@ -33,7 +33,7 @@ kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
 	k = xmalloc (sizeof(kbd_t));
 
 	/* 2.6 enumerates AT keymap */
-	if (strncmp(buf.version, "2.6", 3) == 0)
+	if (strncmp(buf.release, "2.6", 3) == 0)
 		k->name = "at";
 	else
 		k->name = "sun"; // This must match the name "sun" in console-keymaps-sun
