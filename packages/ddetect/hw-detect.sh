@@ -103,6 +103,16 @@ load_module() {
 	echo $old > /proc/sys/kernel/printk
 }
 
+load_sr_mod () {
+	if is_not_loaded "sr_mod"; then
+		db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
+		db_subst hw-detect/load_progress_step MODULE "sr_mod"
+		db_progress INFO hw-detect/load_progress_step
+		load_module sr_mod
+		register-module sr_mod
+	fi
+}
+
 discover_version () {
 	# Ugh, Discover 1.x didn't exit with nonzero status if given an
 	# unrecognized option!
@@ -229,7 +239,7 @@ discover_version
 # Should be greater than the number of kernel modules we can reasonably
 # expect it will ever need to load.
 MAX_STEPS=1000
-OTHER_STEPS=5
+OTHER_STEPS=7
 # Use 1/10th of the progress bar for the non-module-load steps.
 OTHER_STEPSIZE=$(expr $MAX_STEPS / 10 / $OTHER_STEPS)
 db_progress START 0 $MAX_STEPS $PROGRESSBAR
@@ -366,31 +376,6 @@ for device in $(list_to_lines); do
 done
 IFS="$IFS_SAVE"
 
-# always load sd_mod and sr_mod if a scsi controller module was loaded.
-# sd_mod to find the disks, and sr_mod to find the CD-ROMs
-if [ -e /proc/scsi/scsi ] && ! grep -q "Attached devices: none" /proc/scsi/scsi; then
-	if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi && \
-	   is_not_loaded "sd_mod" && \
-	   ! grep -q '^[^[:alpha:]]\+sd$' /proc/devices; then
-		db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
-		db_subst hw-detect/load_progress_step MODULE "sd_mod"
-		db_progress INFO hw-detect/load_progress_step
-		load_module sd_mod
-		register-module sd_mod
-	fi
-	db_progress STEP $OTHER_STEPSIZE
-	if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi && \
-	   is_not_loaded "sr_mod" &&
-	   ! grep -q '^[^[:alpha:]]\+sr$' /proc/devices; then
-		db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
-		db_subst hw-detect/load_progress_step MODULE "sr_mod"
-		db_progress INFO hw-detect/load_progress_step
-		load_module sr_mod
-		register-module sr_mod
-	fi
-	db_progress STEP $OTHER_STEPSIZE
-fi
-
 # if there is an ide bus, then register the ide CD modules so they'll be
 # available on the target system for base-config
 if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
@@ -405,17 +390,38 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 	esac
 fi
 
-# if firewire was found, try to enable firewire cd support
+# always load sd_mod and sr_mod if a scsi controller module was loaded.
+# sd_mod to find the disks, and sr_mod to find the CD-ROMs
+if [ -e /proc/scsi/scsi ] && ! grep -q "Attached devices: none" /proc/scsi/scsi; then
+	if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi && \
+	   is_not_loaded "sd_mod" && \
+	   ! grep -q '^[^[:alpha:]]\+sd$' /proc/devices; then
+		db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
+		db_subst hw-detect/load_progress_step MODULE "sd_mod"
+		db_progress INFO hw-detect/load_progress_step
+		load_module sd_mod
+		register-module sd_mod
+	fi
+	db_progress STEP $OTHER_STEPSIZE
+	if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi && \
+	   ! grep -q '^[^[:alpha:]]\+sr$' /proc/devices; then
+		load_sr_mod
+	fi
+	db_progress STEP $OTHER_STEPSIZE
+fi
+
 if ! is_not_loaded ohci1394; then
-	# TODO: update progress bar here (after string freeze)
+	# if firewire was found, try to enable firewire cd support
 	if is_not_loaded sbp2; then
+		db_subst hw-detect/load_progress_step CARDNAME "FireWire CDROM support"
+		db_subst hw-detect/load_progress_step MODULE "sbp2"
+		db_progress INFO hw-detect/load_progress_step
 		load_module sbp2
 	fi
 	register-module sbp2
-	if is_not_loaded sr_mod; then
-		load_module sr_mod
-	fi
-	register-module sr_mod
+	db_progress STEP $OTHER_STEPSIZE
+	load_sr_mod
+	db_progress STEP $OTHER_STEPSIZE
 	case "$(uname -r)" in
 	2.4*)
 		# rescan bus for firewire CD after loading sr_mod
