@@ -2,7 +2,7 @@ SUBDIRS = autopartkit.d
 
 bin_PROGRAMS = autopartkit
 
-noinst_PROGRAMS = dumptable distribute-test
+noinst_PROGRAMS = dumptable distribute_test
 
 DUMMYCDEBCONF = \
 	dummydebconfclient.c \
@@ -29,11 +29,6 @@ distribute_test_SOURCES = \
 
 tabledir = $(sysconfdir)/autopartkit
 table_DATA = \
-	Server+LTSP-server.table \
-	Server+Workstation.table \
-	Server.table \
-	Workstation+LTSP-server.table \
-	Workstation.table \
 	default.table
 
 EXTRA_DIST = $(table_DATA)
