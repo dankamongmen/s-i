@@ -12,11 +12,8 @@ ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
-e3mount: e3mount.c
-	$(CC) -Wall -Os -D_GNU_SOURCE e3mount.c -o e3mount
-
 build: build-stamp
-build-stamp: e3mount
+build-stamp:
 	dh_testdir
 	touch build-stamp
 
@@ -25,15 +22,12 @@ clean:
 	dh_testroot
 	rm -f build-stamp
 	rm -f `find . -name '*~'`
-	rm -f e3mount
 	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_install e3mount bin
-	strip --remove-section=.note --remove-section=.comment `pwd`/debian/${PACKAGE}/bin/e3mount
 	debian/install-rc active_partition
 	debian/install-rc valid_filesystems
 	debian/install-rc init.d
