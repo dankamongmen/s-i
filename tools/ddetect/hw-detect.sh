@@ -124,17 +124,17 @@ do
 
     if [ "$vendor" != "Unknown" ]
     then
-        name="$vendor $model"
+        cardname="$vendor $model"
     else
-        name="$model"
+        cardname="$model"
     fi
 
     if [ -z "$module" ] ; then module="[Unknown]" ; fi
-    if [ -z "$name" ] ;   then name="[Unknown]" ; fi
+    if [ -z "$cardname" ] ;   then cardname="[Unknown]" ; fi
 
-    log "Detected load module '$module' for '$name'"
+    log "Detected load module '$module' for '$cardname'"
 
-    db_subst hw-detect/progress_step CARDNAME "$name"
+    db_subst hw-detect/progress_step CARDNAME "$cardname"
     db_subst hw-detect/progress_step MODULE "$module"
 
     db_progress STEP 1 hw-detect/progress_step
@@ -156,8 +156,8 @@ do
 		do
 		    template=hw-detect/not_included
 		    db_fset "$template" seen false || true
-		    db_subst "$template" vendor "$name" || true
-		    db_subst "$template" module "$module" || true
+		    db_subst "$template" CARDNAME "$cardname" || true
+		    db_subst "$template" MODULE "$module" || true
 		    db_input medium "$template" || [ $? -eq 30 ]
 		    db_go || true
 		    db_get "$template" || true
