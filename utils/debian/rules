@@ -48,7 +48,9 @@ binary-indep: build install
 	dh_installdeb
 	dh_shlibdeps
 	$(foreach PACKAGE, $(INDEP_PACKAGES), \
-	( dpkg-gencontrol -Pdebian/$(PACKAGE) -p$(PACKAGE) \
+	( if [ -f debian/$(PACKAGE).menutest ]; then \
+	  install debian/$(PACKAGE).menutest debian/$(PACKAGE)/DEBIAN/menutest ; fi; \
+	 dpkg-gencontrol -Pdebian/$(PACKAGE) -p$(PACKAGE) \
 	-n$(PACKAGE)_$(VERSION)_all.udeb ) ; )
 	@$(foreach PACKAGE, $(INDEP_PACKAGES), \
 	(cd debian ; \
