@@ -10,6 +10,18 @@ log() {
     logger -t countrychooser "info: $@"
 }
 
+# First grab back the country we got from languagechooser
+# (or from elsewhere)
+# and populate the debconf database with it so that it becomes
+# the default choice
+db_get "$countrycode"
+if test "$RET" ; then
+  COUNTRYCODE="$RET"
+  . countrycodemap
+  db_set "countrychooser/country-name" "$COUNTRYNAME"
+fi
+
+
 db_fset "countrychooser/country-name" seen false
 db_fset "$countrycode" seen false
 db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
