@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.57 2004/03/08 08:06:50 barbier Exp $
+ * $Id: text.c,v 1.58 2004/03/08 10:11:59 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -672,55 +672,33 @@ static int text_go(struct frontend *obj)
 	return DC_OK;
 }
 
-static void text_progress_start(struct frontend *ui, int min, int max, const char *title)
+static void text_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
-	DELETE(ui->progress_title);
-	ui->progress_title = STRDUP(title);
-	ui->progress_min = min;
-	ui->progress_max = max;
-	ui->progress_cur = min;
+	DELETE(obj->progress_title);
+	obj->progress_title = STRDUP(title);
+	obj->progress_min = min;
+	obj->progress_max = max;
+	obj->progress_cur = min;
 
-	printf("%s\n", title);
-}
-
-static void text_progress_set(struct frontend *ui, int val)
-{
-	char out[256];
-
-	ui->progress_cur = val;
-
-	snprintf(out, sizeof(out), "[%5.1f%%]",
-		(double)(ui->progress_cur - ui->progress_min) / 
-		(double)(ui->progress_max - ui->progress_min) * 100.0);
-
-	printf("\r%s", out);
+	printf("%s  ", title);
 	fflush(stdout);
 }
 
-static void text_progress_info(struct frontend *ui, const char *info)
+static void text_progress_set(struct frontend *obj, int val)
 {
-	int width = getwidth(), i;
-	char out[256];
+	obj->progress_cur = val;
 
-	ui->methods.progress_step(ui, 0);
-	strncpy(out, info, sizeof(out)-1);
-	out[255] = '\0';
-	if (strlen(out) > width - 9)
-		out[width - 9] = '\0';
-	else
-	{
-		for (i = strlen(out); i < width - 9; i++)
-			out[i] = ' ';
-		out[i] = '\0';
-	}
-	printf(" %s\r", out);
+	printf("..%d%%", 
+		(int) ((double)(obj->progress_cur - obj->progress_min) / 
+		(double)(obj->progress_max - obj->progress_min) * 100.0));
 	fflush(stdout);
 }
 
-static void text_progress_stop(struct frontend *ui)
+static void text_progress_stop(struct frontend *obj)
 {
 	INFO(INFO_DEBUG, "%s\n", __FUNCTION__);
 	printf("\n");
+	fflush(stdout);
 }
 
 struct frontend_module debconf_frontend_module =
@@ -729,6 +707,5 @@ struct frontend_module debconf_frontend_module =
 	go: text_go,
 	progress_start: text_progress_start,
 	progress_set: text_progress_set,
-	progress_info: text_progress_info,
 	progress_stop: text_progress_stop,
 };
