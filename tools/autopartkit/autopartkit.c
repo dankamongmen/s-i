@@ -706,21 +706,33 @@ normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
  * issues, and it is _impossible_ to get the path of a partition
  * without guessing like this.  That sucks. :(
  *
+ * Example paths:
+ *  /dev/rd/disc0/disc
+ *  /dev/ide/host0/bus0/target0/lun0/disc
+ *
  * In parted v1.6.1 we can use ped_partition_get_path(freepart);
  */
 static char *get_device_path(PedDevice *dev, PedPartition *freepart)
 { 
     char *retval;
     char *tmp;
+    size_t slen;
 
     asprintf(&retval, "%s%d", dev->path, freepart->num);
-    /* Replace 'disc' with 'part'.  Sucks. */
-    if ((tmp = strstr(retval, "disc")))
+
+    slen = strlen(dev->path);
+    tmp = retval + slen - 5; /* 5 is the length of "/disc" */
+
+    printf("tmp=%s\n", tmp);
+
+    /* Replace '/disc' at the end with 'part'.  It sucks having to do
+       it this way. */
+    if (0 == strncmp("/disc", tmp, 5))
     {
-        tmp[0] = 'p';
-        tmp[1] = 'a';
-        tmp[2] = 'r';
-        tmp[3] = 't';
+        tmp[1] = 'p';
+        tmp[2] = 'a';
+        tmp[3] = 'r';
+        tmp[4] = 't';
     }
     return retval;
 }
