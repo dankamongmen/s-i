@@ -27,7 +27,7 @@ struct frontend_data
   /* Pointer to the box, where question widgets shall be stored in */
   GtkWidget *target_box; 
 
-  /* Buttons for the duid-like interface */
+  /* Buttons for the druid-like interface */
   GtkWidget *button_next;
   GtkWidget *button_prev;
 
@@ -62,5 +62,5 @@ gboolean is_first_question(struct question *q);
 void free_description_data( GtkObject *obj, struct frontend_question_data* data );
 
 /* Function which can be used as callback. Shows the description of specified question 
-   in the description area. Can be used when recieiving focus */
+   in the description area. Can be used when receiving focus */
 gboolean show_description( GtkWidget *widget, struct frontend_question_data* data );
