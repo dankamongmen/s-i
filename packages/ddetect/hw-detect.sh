@@ -318,11 +318,57 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 fi
 
 # get pcmcia running if possible
+
+apply_pcmcia_resource_opts() {
+	local config_opts=/etc/pcmcia/config.opts
+	
+	# Idempotency
+	if ! [ -f ${config_opts}.orig ]; then
+		cp $config_opts ${config_opts}.orig
+	fi
+	cp ${config_opts}.orig $config_opts
+
+	local mode=""
+	local rmode=""
+	local type=""
+	local value=""
+	while [ -n "$1" ]; do
+		if [ "$1" = exclude ]; then
+			mode=exclude
+			rmode=include
+			shift
+		elif [ "$1" = include ]; then
+			mode=include
+			rmode=exclude
+			shift
+		fi
+		type="$1"
+		shift
+		value="$1"
+		shift
+		
+		if grep -q "^$rmode $type $value\$" $config_opts; then
+			sed "s/^$rmode $type $value\$/$mode $type $value/" \
+				$config_opts >${config_opts}.new
+			mv ${config_opts}.new $config_opts
+		else
+			echo "$mode $type $value" >>$config_opts
+		fi
+	done
+}
+
 if [ -x /etc/init.d/pcmcia ]; then
 	if ! [ -e /var/run/cardmgr.pid ]; then
 		db_input medium hw-detect/start_pcmcia || true
 	fi
 	if db_go && db_get hw-detect/start_pcmcia && [ "$RET" = true ]; then
+		if ! [ -e /var/run/cardmgr.pid ]; then
+			db_input medium hw-detect/pcmcia_resources || true
+			db_go || true
+			db_get hw-detect/pcmcia_resources || true
+			apply_pcmcia_resource_opts $RET
+		fi
+		
 		db_progress INFO hw-detect/pcmcia_step
 		
 		if [ -e /var/run/cardmgr.pid ]; then
