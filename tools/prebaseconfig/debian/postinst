@@ -62,6 +62,11 @@ chroot /target /sbin/grub-install '(hd0)'
 touch /target/boot/grub/menu.lst
 chroot /target /sbin/update-grub
 
+# Copy install logs to /target/var/log/
+logsavedir=/target/var/log/debian-installer
+test -d $logsavedir || mkdir $logsavedir
+cp /var/log/* $logsavedir
+
 cp -a /var/lib/cdebconf /target/root
 mv /target/etc/inittab /target/etc/inittab.real
 cp /usr/share/prebaseconfig/inittab /target/etc/inittab
