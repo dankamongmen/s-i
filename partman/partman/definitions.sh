@@ -25,11 +25,11 @@ basename () {
 }
 
 debconf_select () {
-	local IFS priority template choices last default x u newchoices code
+	local IFS priority template choices default_choice default x u newchoices code
 	priority="$1"
 	template="$2"
 	choices="$3"
-	last="$4"
+	default_choice="$4"
 	default=''
 	# Debconf ignores spaces so we have to remove them from
 	# $choices
@@ -39,9 +39,9 @@ debconf_select () {
 		local key option
 		restore_ifs
 		key=$(echo ${x%$TAB*})
-		option=$(echo "${x#*$TAB}" | sed "s/ / /g")
+		option=$(echo "${x#*$TAB}" | sed "s/ /$NBSP/g")
 		newchoices="${newchoices}${NL}${key}${TAB}${option}"
-		if [ "$key" = "$last" ]; then
+		if [ "$key" = "$default_choice" ]; then
 		    default="$option"
 		fi
 	done
@@ -53,7 +53,9 @@ debconf_select () {
                 u="$u, `echo ${x#*$TAB} | sed 's/,/\\\\,/g'`"
         done
         u=${u#, }
-        db_set $template "$default"
+	if [ -n "$default" ]; then
+	        db_set $template "$default"
+	fi
 	db_subst $template CHOICES "$u"
 	code=0
 	db_input $priority $template || code=1
@@ -69,15 +71,31 @@ debconf_select () {
 	return $code
 }
 
+menudir_default_choice () {
+    local dir plugin
+    dir="$1"
+    plugin="$dir/[0-9]*$2"
+    shift 2
+    if [ ! -x $plugin/choices ]; then
+        return 1
+    fi
+    name=$(basename $plugin)
+    IFS="$NL"
+    for option in $($plugin/choices "$@"); do
+        printf "%s__________%s\n" $name $(echo "$option" | cut -f 1) > $dir/default_choice
+    done
+    restore_ifs
+}
+
 ask_user () {
-    local IFS dir template priority last choices plugin name option
+    local IFS dir template priority default choices plugin name option
     dir="$1"; shift
     template=$(cat $dir/question)
     priority=$(cat $dir/priority)
-    if [ -f $dir/last_choice ]; then
-	last=$(cat $dir/last_choice)
+    if [ -f $dir/default_choice ]; then
+	default=$(cat $dir/default_choice)
     else
-	last=asdfasdfasdf
+	default=""
     fi
     choices=$(
 	for plugin in $dir/*; do
@@ -92,9 +110,9 @@ ask_user () {
     )
     db_fset $template seen false
     code=0
-    debconf_select $priority $template "$choices" "$last" || code=$?
+    debconf_select $priority $template "$choices" "$default" || code=$?
     if [ $code -ge 100 ]; then return 255; fi
-    echo "$RET" >$dir/last_choice
+    echo "$RET" >$dir/default_choice
     $dir/${RET%__________*}/do_option ${RET#*__________} "$@" || return $?
     return 0
 }
@@ -115,7 +133,7 @@ partition_tree_choices () {
 	while { read num id size type fs path name; [ "$id" ]; }; do
 	    part=${dev}/$id
 	    [ -f $part/view ] || continue
-	    printf "%s//%s\t$NBSP       %s\n" "$dev" "$id" $(cat $part/view)
+	    printf "%s//%s\t        %s\n" "$dev" "$id" $(cat $part/view)
 	done
 	restore_ifs
     done
