@@ -19,11 +19,7 @@ fstab=$(
 	$i
     done |
     while read fs mp type options dump pass; do
-	case "$mp" in
-	    /*)
-		echo $mp $fs $type $options $dump $pass
-		;;
-	esac
+	echo $mp $fs $type $options $dump $pass
     done |
     sort |
     while read mp fs type options dump pass; do
@@ -35,7 +31,11 @@ IFS="$NL"
 for f in $fstab; do
     restore_ifs
     set -- $f
-    installdir /target$2
+    case "$2" in
+        /*)
+            installdir /target$2
+	;;
+    esac
     for m in /lib/partman/mount.d/*; do
 	[ -x "$m" ] || continue
 	if $m "$f"; then
