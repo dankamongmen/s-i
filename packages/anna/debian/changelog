@@ -1,3 +1,32 @@
+anna (1.07) UNRELEASED; urgency=low
+
+  * Not for sarge.
+  * Joey Hess
+    - Removed load-installer udeb, since it's no longer used, having been
+      replaced by download-installer, etc.
+    - Removed code in anna to present a list of retreivers. Now anna must
+      always be run with an argument. Closes: #216084, #218774
+    - Also removed template for this question.
+    - Removed code to notice new retreivers and exit specially, since
+      that was only needed in old style calling method.
+    - Stop using debconf db transiently to store the retreiver to use.
+    - Various code cleanups.
+    - Remove test-anna ifdefed code that was so old it didn't work.
+    - Remove some defines that were to support libd-i v3.
+    - Split out retreiver interface code into its own file and cleaned up
+      the function names for consistency.
+    - Move anna binary from /usr/bin to /bin.
+    - The state machine in anna's main is overkill, since there is now only
+      one question asked, so remove it. Closes: #222500
+    - Store default retriever in debconf db if ran like
+      "anna <retriever> default", for use by "anna install <udeb>"
+    - Add support for using "anna install <udeb ..>". Closes: #266624
+    - Cache Packages file for default retriever (except in low memory mode)
+      to avoid expensive re-retreival.
+    - Add a README.
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 18 Dec 2004 17:42:54 -0500
+
 anna (1.06) unstable; urgency=low
 
   * Colin Watson
