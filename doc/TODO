@@ -2,38 +2,25 @@ Done this week:
 - dpkg 1.7.0 was released, so udebs can be built now
 - Continuing development of udpkg has gotten all the important features
   working.
-- Pcidetect has been checked in. It is able to detect PCI NIC's.
+- Pcidetect has been checked in. It is able to detect PCI NIC's and is
+  qyite small.
+- Hardware detectors have also been written for sound, ethernet (a competing
+  implementation), cd, cpu, disk, modem, and memory detection, all using
+  libdetect, and supporting pci and optionally isa.
 
 Still Todo:
 	- design [Joey Hess, debian-boot]
                 75% done. Enough to know what the big peices are 
                 and how they fit together.
-		- The main menu design has some issues. If a step is failing
-		  because some step above it did something wrong, but thought 
-		  it succeeded (a disk was partitioned, but very badly, and 
-		  installing the base system to it fails), there is no way to 
-		  force the user to back up. This seems to preclude linear 
-		  install mode. I posted a longer example to -boot. Three
-		  possible fixes:
-		  	- Detect loops, and have code to figure out what went
-			  wrong and back up to the appropriate step that can 
-			  fix it
-			- Detect loops, and back up to the beginning of 
-			  the menu
-			- Detect whenever any menu item fails, and leave 
-			  linear mode. (BEST)
-		- Need to define module subsystems for network/hardware
-		  support, network configuration, target media support, etc.
         - udeb archive setup [James Troup, Anthony Towns, Jason Gunthorpe]
-                95% support in new package pools code. That code will
-		go live soon after Debian 2.2r1 is released.
+                95% support in new package pools code. James is now waiting
+		for after 2.1r2, it seems.
         - udeb building [Joey Hess]
 		Udebs can be built now.
         - cdebconf (miniature debconf in C) [Randolph Chung, Anthony Towns]
                 In progress. Infrastructure is 70% done. have one working
                 database backend, have a conceptual text-based
-                frontend that is ~1/4 done, and may be completed this
-		weekend.
+                frontend that is ~1/4 done.
         - udpkg (tiny dpkg clone) [Randolph Chung, Joey Hess]
 		Usable. One todo item (localized descriptions)
         - main-menu (main menu generator) [Joey Hess]
@@ -41,15 +28,22 @@ Still Todo:
         - busybox integration [Erik Andersen]
                 Not started. Busybox needs to build one or more .udebs.
                 Probably more than one.
-        - network card detector [Glenn McGrath]
-		Pcidetect is a start.
+        - network card detector [Glenn McGrath, David Whedon]
+		Pcidetect is written, detects PCI cards only. Needs
+		testing. David has another detector that uses libdetect
+		instead.
+	- other hardware detection [David Whedon]
+		David has written detectors for sound, ethernet, cd, cpu,
+		disk, and memory detection. All need testing.
+		http://www.gordian.com/users/davidw/debian.html
         - network setup [UNCLAIMED]
                 Not started. Set up the network, via dhcp or via prompting;
                 implementor decides.
-        - retreiver control program [UNCLAIMED]
+        - retreiver control program [Joey Hess, Glenn McGrath]
                 Not started. Sort of like apt, except tons dumber, this
                 uses retreiver(s) to download Packages files and then udebs,
-                and calls udpkg to install them.
+                and calls udpkg to install them. Still unclear exactly how
+		this will work, we need help figuring this out.
         - http retreiver [UNCLAMED]
                 Not started. Download udebs, other files from network.
         - install target media detector [UNCLAIMED]
@@ -76,5 +70,24 @@ Still Todo:
         - install media build system [UNCLAIMED]
                 Not started. Puts all the peices together and makes
                 install media.
-        - documentation [UNCLAIMED]
-		Not started.
+        - user documentation
+		Not started. (Waiting until we have something to document..)
+
+Other stuff:
+     - The main menu design has some issues. If a step is failing
+       because some step above it did something wrong, but thought
+       it succeeded (a disk was partitioned, but very badly, and
+       installing the base system to it fails), there is no way to
+       force the user to back up. This seems to preclude linear
+       install mode. I posted a longer example to -boot. Three
+       possible fixes:
+                        - Detect loops, and have code to figure out what went
+                          wrong and back up to the appropriate step that can
+                          fix it
+                        - Detect loops, and back up to the beginning of
+                          the menu
+                        - Detect whenever any menu item fails, and leave
+                          linear mode. (BEST)
+    - Need to define module subsystems for network/hardware
+      support, network configuration, target media support, etc.
+
