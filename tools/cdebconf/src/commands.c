@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.20 2002/07/09 05:25:03 tausq Exp $
+ * $Id: commands.c,v 1.21 2002/07/22 22:53:16 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -655,7 +655,7 @@ int command_fset(struct confmodule *mod, int argc, char **argv,
 			q->flags &= ~DC_QFLAG_SEEN;
 			if (strcmp(argv[3], "true") == 0)
 				q->flags |= DC_QFLAG_SEEN;
-            mod->questions->methods.set(mod->questions, 0);
+            mod->questions->methods.set(mod->questions, q);
 			snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
 		}
 		else
