@@ -4,7 +4,7 @@
 
 export DH_COMPAT=4
 
-debian/control: debian/control.stub kernel-versions package-list
+debian/control:
 	kernel-wedge gen-control > debian/control
 
 build: debian/control
@@ -29,4 +29,4 @@ binary-arch: debian/control
 	dh_builddeb -s
 
 binary: build binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
+.PHONY: build clean binary-indep binary-arch binary debian/control

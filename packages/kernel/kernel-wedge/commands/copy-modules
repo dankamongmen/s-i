@@ -108,13 +108,10 @@ perl -lne '
 	s!.*/kernel/!! foreach (@words);
 	if ($words[0] =~ /:$/) {
 		$words[0]=~s/:$//;
-		$module=$words[0];
-		if ($words[1]) {
-			print "$module\t$words[1]";
-		}
+		$module=shift @words;
 	}
-	elsif ($words[0]) { # continuation
-		print "$module\t$words[0]";
+	foreach (@words) {
+		print "$module\t$_" unless $_ eq "\\";
 	}
 ' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
 unset moddir_awk
