@@ -552,7 +552,7 @@ enable_swap () {
 	close_dialog
     done
     for path in $swaps; do
-	swapon $path
+	swapon $path || true
     done
 }
 
