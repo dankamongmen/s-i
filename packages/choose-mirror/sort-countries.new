@@ -1,0 +1,46 @@
+#!/bin/sh
+set -e
+
+[ -d debian/locales ] || mkdir debian/locales
+[ -d debian/sort-tmp ] || mkdir debian/sort-tmp
+cd debian/sort-tmp
+for protocol in http ftp
+do
+    sed -n -e "/^Template: mirror\\/$protocol\\/countries/,/^Description:/p" ../choose-mirror/DEBIAN/templates | 
+    sed -e "/^Choices-/s/\\\\,/--/g" |
+    perl -p -e '
+    chomp;
+    if (m/Choices-([^.]*)\.UTF-8:/) {
+      open (OUT, "> list.$1");
+      @t = split(/, /);
+      shift(@t);
+      my $cnt = 1;
+      foreach my $name (@t) {$cnt++; print OUT "$cnt $name\n";}
+      close OUT;
+    }
+    $_="";'
+    echo "Sorting mirror country list for protocol $protocol:"
+    for file in list.*
+    do
+        lang=${file#list.}
+        unilang=$(grep "^$lang.*\\.UTF-8" /usr/share/i18n/SUPPORTED | sed -e 1q | sed -e 's/[@. ].*//' )
+	echo -n "  $lang... "
+        if [ -z "$unilang" ]; then
+            echo "skipped because no UTF-8 variant found." 1>&2
+        else
+            [ -d ../locales/$unilang.UTF-8 ] || localedef -c -f UTF-8 -i $unilang ../locales/$unilang.UTF-8
+            LOCPATH=`pwd` LC_ALL=../locales/$unilang.UTF-8 sort -k 2.1 $file | sed -e 's/ .*/, /' | tr -d '\n' | sed -e "s/^/Indices-$lang.UTF-8: 1, /" -e 's/, $//' > sorted$file
+	    echo "Done."
+	echo "" >>sorted$file
+        fi
+    done
+    #  Now ../choose-mirror/DEBIAN/templates must be patched: all sortedlist.*
+    #  files have to be added to the mirror/$protocol/countries template.
+    sed -e "/$protocol.*countries/{n;q;}" ../choose-mirror/DEBIAN/templates |\
+       sed -e "/^Choices-/s/--/\\,/g" >templates.tmp
+    cat sorted* >>templates.tmp
+    sed -e "/$protocol.*countries/!d;/$protocol.*countries/{:end;n;b end}" ../choose-mirror/DEBIAN/templates | sed '1,2d'>>templates.tmp
+    mv templates.tmp  ../choose-mirror/DEBIAN/templates || true
+done
+cd ../..
+rm -r debian/locales debian/sort-tmp || true
