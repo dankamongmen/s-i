@@ -17,17 +17,18 @@
 
 #define MAIN_MENU	"debian-installer/main-menu"
 
+typedef enum { unpacked, installed, other } package_status;
+
 #define STATUS_UNKNOWN		0
 #define STATUS_UNPACKED		1
 #define STATUS_INSTALLED	2
 
-/* data structures */
 struct package_t {
 	char *package;
 	int installer_menu_item;
 	char *description; /* short only, and only for menu items */
 	char *depends[DEPENDSMAX];
-	int status;
+	package_status status;
 	int processed;
 	struct package_t *next;
 };

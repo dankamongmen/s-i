@@ -45,13 +45,13 @@ struct package_t *status_read(void) {
 		}
 		else if (strstr(buf, "Status: ") == buf) {
 			if (strstr(buf, " unpacked")) {
-				p->status = STATUS_UNPACKED;
+				p->status = unpacked;
 			}
 			else if (strstr(buf, " installed")) {
-				p->status = STATUS_INSTALLED;
+				p->status = installed;
 			}
 			else {
-				p->status = STATUS_UNKNOWN;
+				p->status = other;
 			}
 		}
 		else if (strstr(buf, "Description: ") == buf) {
