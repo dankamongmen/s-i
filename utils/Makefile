@@ -1,5 +1,5 @@
 ifndef TARGETS
-TARGETS=shell mapdevfs async stderr_intercepter
+TARGETS=shell mapdevfs async
 endif
 
 CFLAGS=-Wall -D_GNU_SOURCE -Os -fomit-frame-pointer
