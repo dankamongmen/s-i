@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.17 2002/05/02 06:35:25 tausq Exp $
+ * $Id: commands.c,v 1.18 2002/05/27 14:23:05 tfheen Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -83,7 +83,7 @@ static int _command_checkargc(int pred, char *out, size_t outsize)
  *        size_t outsize - output buffer size
  * Output: int - DC_NOTOK if error, DC_OK otherwise
  * Description: handler for the INPUT debconf command; adds a question
- *              to the list of questions to be asked if appropriate
+ *              to the list of questions to be asked if appropriate.
  * Assumptions: none
  */
 int command_input(struct confmodule *mod, int argc, char **argv, 
@@ -114,13 +114,13 @@ int command_input(struct confmodule *mod, int argc, char **argv,
 		visible = mod->frontend->add(mod->frontend, q);
 	}
 
-	if (visible)
+	if (visible) 
 		snprintf(out, outsize, "%u Question will be asked",
-			CMDSTATUS_SUCCESS);
+			 CMDSTATUS_SUCCESS);
 	else
 		snprintf(out, outsize, "%u Question skipped",
 			CMDSTATUS_INPUTINVISIBLE);
-	question_deref(q);
+        question_deref(q);
 	return DC_OK;
 }
 
@@ -708,5 +708,35 @@ int command_stop(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	CHECKARGC(== 0);
+	return DC_OK;
+}
+
+/*
+ * Function: command_x_loadtemplatefile
+ * Input: struct confmodule *mod - confmodule object
+ *        int argc - number of arguments
+ *        char **argv - argument array
+ *        char *out - output buffer
+ *        size_t outsize - output buffer size
+ * Output: int - DC_NOTOK if error, DC_OK otherwise
+ * Description: handler for the X_LOADTEMPLATEFILE debconf command; 
+ *              loads a new template into the debconf database.  This is a
+ *              debian-installer extension.
+ * Assumptions: none
+ */
+int command_x_loadtemplatefile(struct confmodule *mod, int argc, char **argv, 
+                               char *out, size_t outsize)
+{
+        struct template *t = NULL;
+        struct question *q = NULL;
+        CHECKARGC(== 1);
+        t = template_load(argv[1]);
+        while (t)
+        {
+                mod->db->template_set(mod->db, t);
+                mod->db->question_set(mod->db, question_new(t->tag));
+                t = t->next;
+        }
+	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }

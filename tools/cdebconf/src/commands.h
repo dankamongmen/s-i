@@ -39,5 +39,6 @@ int command_fget(struct confmodule *, int, char **, char *, size_t);
 int command_fset(struct confmodule *, int, char **, char *, size_t);
 int command_exist(struct confmodule *, int, char **, char *, size_t);
 int command_stop(struct confmodule *, int, char **, char *, size_t);
+int command_x_loadtemplatefile(struct confmodule *, int, char **, char *, size_t);
 
 #endif
