@@ -383,6 +383,21 @@ di_pkg_is_virtual(struct package_t *p)
     return 0;
 }
 
+/* For a virtual package, it's true if any of its providing packages
+ * is installed */
+int
+di_pkg_is_installed(struct package_t *p)
+{
+    int i;
+
+    for (i = 0; p->depends[i] != NULL; i++)
+    {
+        if (p->depends[i]->ptr != NULL && di_pkg_provides(p->depends[i]->ptr, p) && p->status == installed)
+            return 1;
+    }
+    return (p->status == installed);
+}
+
 /* This function has quadratic complexity over the number of packages,
  * but since the number of packages will typically be <100, we don't
  * care all that much about it. */

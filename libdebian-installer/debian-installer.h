@@ -72,6 +72,7 @@ struct linkedlist_t *di_pkg_parse(FILE *fp);
 struct package_t *di_pkg_find(struct linkedlist_t *ptr, const char *package);
 int di_pkg_provides(struct package_t *p, struct package_t *target);
 int di_pkg_is_virtual(struct package_t *p);
+int di_pkg_is_installed(struct package_t *p);
 void di_pkg_resolve_deps(struct linkedlist_t *ptr);
 int di_parse_version(struct version_t *rversion, const char *string);
 int di_compare_version(const struct version_t *a, const struct version_t *b);
