@@ -15,6 +15,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <errno.h>
+#include <string.h>
 
 static char *unescapestr(const char *in)
 {
@@ -68,7 +69,7 @@ static void parse_variables(struct question *q, char *string)
 
         wc = delim;
         wc++;
-        if (finished)
+        if (finished != 0)
             break;
 
         while (*wc == ' ' || *wc == '\t')
@@ -96,7 +97,7 @@ static void parse_owners(struct question *q, char *string)
             finished = 1;
         *delim = '\0';
         question_owner_add(q,wc);
-        if (finished)
+        if (finished != 0)
             break;
         wc = delim;
         while (*wc == ' ' || *wc == '\t' || *wc == '\0')
@@ -166,7 +167,7 @@ static struct rfc822_header* rfc822db_parse_stanza(FILE *file)
         {
             while (*tmp != 0 && *tmp != ':')
                 tmp++;
-            *tmp++ = 0;
+            *tmp++ = '\0';
 
             cur = NEW(struct rfc822_header);
             if (cur == NULL)
@@ -200,39 +201,23 @@ static char *rfc822db_header_lookup(struct rfc822_header *list, const char* key)
     return list->value;
 }
 
-static struct template *find_template(struct template *t, const char *name)
-{
-    while (t != NULL)
-    {
-        if (strcmp(name,t->tag) == 0)
-            return t;
-        t = t->next;
-    }
-    return NULL;
-}
-
-static struct question *find_question(struct question *q, const char *name)
-{
-    while (q != NULL)
-    {
-        if (strcmp(name,q->tag) == 0)
-            return q;
-        q = q->next;
-    }
-    return NULL;
-}
-
 /* templates */
 static int rfc822db_template_initialize(struct template_db *db, struct configuration *cfg)
 {
+    int ret;
     struct template_db_cache *dbdata;
     /*    fprintf(stderr,"rfc822db_initialize(db,cfg)\n");*/
     dbdata = malloc(sizeof(struct template_db_cache));
-
     if (dbdata == NULL)
         return DC_NOTOK;
 
-    dbdata->templates = NULL;
+    dbdata->hash = table_alloc(0, &ret);
+    if (dbdata->hash == NULL) {
+        (void)printf("table_alloc returned: %s\n", table_strerror(ret));
+        return DC_NOTOK;
+    }
+    ret = table_attr(dbdata->hash, TABLE_FLAG_AUTO_ADJUST);
+    table_set_data_alignment(dbdata->hash, sizeof(struct template *));
     db->data = dbdata;
 
     return DC_OK;
@@ -244,8 +229,7 @@ static int rfc822db_template_initialize(struct template_db *db, struct configura
  * Output: DC_OK/DC_NOTOK
  * Description: parse a template db file and put it into the cache
  * Assumptions: the file is in valid rfc822 format
- * TODO: handle localized templates; don't use linked lists, it's
- *       slow
+ * TODO: handle localized templates
  */
 static int rfc822db_template_load(struct template_db *db)
 {
@@ -254,11 +238,7 @@ static int rfc822db_template_load(struct template_db *db)
     const char *path;
     FILE *inf;
     struct rfc822_header *header = NULL;
-    struct template **templates;
-
-    templates = &dbdata->templates;
-    while (*templates != NULL)
-        templates = &(*templates)->next;
+    int ret;
 
     snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
     path = db->config->get(db->config, tmp, 0);
@@ -274,6 +254,8 @@ static int rfc822db_template_load(struct template_db *db)
     {
         struct template *tmp;
         const char *name;
+        char tbuf[1024];
+        memset(&tbuf,0,1024);
 
         name = rfc822db_header_lookup(header, "name");
 
@@ -293,11 +275,17 @@ static int rfc822db_template_load(struct template_db *db)
         tmp->extended_description = rfc822db_header_lookup(header, "extended_description");
 /*  struct language_description *localized_descriptions; */
         tmp->next = NULL;
+        
+        ret = table_insert_kd(dbdata->hash, name, strlen(name)+1, 
+                              (void *)(&tmp), sizeof(struct template *), 
+                              NULL, NULL, 0);
+        if (ret != TABLE_ERROR_NONE) {
+                (void)printf("table_insert(%s) returned: %s\n", 
+                             name,
+                             table_strerror(ret));
+                return DC_NOTOK;
+        }
 
-        *templates = tmp;
-        templates = &tmp->next;
-
-        DELETE(header);
     }
 
     fclose(inf);
@@ -311,7 +299,9 @@ static int rfc822db_template_save(struct template_db *db)
     struct template_db_cache *dbdata = db->data;
     char tmp[1024];
     const char *path;
-    struct template *t;
+    struct template **t;
+    char *key;
+    int ret;
 
     snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
     path = db->config->get(db->config, tmp, 0);
@@ -323,23 +313,25 @@ static int rfc822db_template_save(struct template_db *db)
         return DC_NOTOK;
     }
 
-    for (t = dbdata->templates; t != NULL; t = t->next)
+    table_first(dbdata->hash, (void **)&key, NULL, (void **)&t, NULL);
+
+    while (ret == TABLE_ERROR_NONE && t != NULL)
     {
         struct language_description *langdesc;
-        INFO(INFO_VERBOSE, "dumping template %s\n", t->tag);
-
-        fprintf(outf, "Name: %s\n", escapestr(t->tag));
-        fprintf(outf, "Type: %s\n", escapestr(t->type));
-        if (t->defaultval != NULL)
-            fprintf(outf, "Default: %s\n", escapestr(t->defaultval));
-        if (t->choices != NULL)
-            fprintf(outf, "Choices: %s\n", escapestr(t->choices));
-        if (t->description != NULL)
-            fprintf(outf, "Description: %s\n", escapestr(t->description));
-        if (t->extended_description != NULL)
-            fprintf(outf, "Extended_description: %s\n", escapestr(t->extended_description));
+        INFO(INFO_VERBOSE, "dumping template %s\n", (*t)->tag);
         
-        langdesc = t->localized_descriptions;
+        fprintf(outf, "Name: %s\n", escapestr((*t)->tag));
+        fprintf(outf, "Type: %s\n", escapestr((*t)->type));
+        if ((*t)->defaultval != NULL)
+            fprintf(outf, "Default: %s\n", escapestr((*t)->defaultval));
+        if ((*t)->choices != NULL)
+            fprintf(outf, "Choices: %s\n", escapestr((*t)->choices));
+        if ((*t)->description != NULL)
+            fprintf(outf, "Description: %s\n", escapestr((*t)->description));
+        if ((*t)->extended_description != NULL)
+            fprintf(outf, "Extended_description: %s\n", escapestr((*t)->extended_description));
+        
+        langdesc = (*t)->localized_descriptions;
         while (langdesc) 
         {
             if (langdesc->description != NULL) 
@@ -360,6 +352,8 @@ static int rfc822db_template_save(struct template_db *db)
             langdesc = langdesc->next;
         }
         fprintf(outf, "\n");
+     
+        ret = table_next(dbdata->hash, (void **)&key, NULL, (void **)&t, NULL);
     }
 
     if (fclose(outf) == EOF)
@@ -372,64 +366,65 @@ static struct template *rfc822db_template_get(struct template_db *db,
     const char *ltag)
 {
     struct template_db_cache *dbdata = db->data;
-    struct template *t;
-    t = find_template(dbdata->templates, ltag);
+    struct template **t = malloc(sizeof(struct template **));
+    int ret;
+    ret = table_retrieve(dbdata->hash, ltag, strlen(ltag)+1, (void**) &t, NULL);
+    if (ret == TABLE_ERROR_NOT_FOUND)
+    {
+            return NULL;
+    }
+    if (ret != TABLE_ERROR_NONE) {
+            (void)printf("table_retrieve(%s) returned: %s\n", 
+                         ltag,
+                         table_strerror(ret));
+            return DC_NOTOK;
+    }
+
     if (t)
-        template_ref(t);
-    return t;
+      template_ref(*t);
+    return *t;
 }
 
 static int rfc822db_template_set(struct template_db *db, struct template *template)
 {
-    struct template *t = template_dup(template);
+    struct template **t = malloc(sizeof(struct template **));
     struct template_db_cache *dbdata = db->data;
-    struct template **pt;
+    int ret;
+    
+    INFO(INFO_VERBOSE, "rfc822db_template_set(db,t=%s)\n", template->tag);
 
-    INFO(INFO_VERBOSE, "rfc822db_template_set(db,t=%s)\n", t->tag);
-
-    for (pt = &dbdata->templates; *pt != NULL; pt = &(*pt)->next)
+    ret = table_retrieve(dbdata->hash, template->tag, strlen(template->tag), 
+                         (void**) &t, NULL);
+    if (ret != TABLE_ERROR_NOT_FOUND && t)
     {
-        if (strcmp((*pt)->tag, t->tag) == 0)
-        {
-            /* one was there before, remove the old one, we'll
-             * add one back later */
-            struct template *tmp = *pt;
-
-            *pt = tmp->next;
-            template_deref(tmp);
-            
-            break;
-        }
+            template_deref(*t);
+            table_delete(dbdata->hash, template->tag, -1, NULL, NULL);
     }
     
-    /* add it now (to the end) */
-    pt = &dbdata->templates;
-    while (*pt != NULL)
-        pt = &(*pt)->next;
-
-    *pt = t;
+    /* add it now */
+    
+    ret = table_insert_kd(dbdata->hash, template->tag, strlen(template->tag)+1, 
+                              (void *)(&template), sizeof(struct template *), 
+                              NULL, NULL, 0);
+    template_ref(template);
 
     return DC_OK;
 }
 
+/* FIXME b0rken */
 static int rfc822db_template_remove(struct template_db *db, const char *tag)
 {
     struct template_db_cache *dbdata = db->data;
-    struct template **pt;
+    struct template *t;
 
     INFO(INFO_VERBOSE, "rfc822db_template_remove(db,tag=%s)\n",tag);
 
-    for (pt = &dbdata->templates; *pt != NULL; pt = &(*pt)->next)
+    table_retrieve(dbdata->hash, tag, -1, (void**) &t, NULL);
+    if (t)
     {
-        if (strcmp((*pt)->tag, tag) == 0)
-        {
-            struct template **tmp = &(*pt)->next;
-
-            template_deref(*pt);
-            pt = tmp;
-
+            table_delete(dbdata->hash, tag, -1, NULL, NULL);
+            template_deref(t);
             return DC_OK;
-        }
     }
     
     return DC_NOTOK;
@@ -444,6 +439,7 @@ static struct template *rfc822db_template_iterate(struct template_db *db, void *
 /* config database */
 static int rfc822db_question_initialize(struct question_db *db, struct configuration *cfg)
 {
+    int ret;
     struct question_db_cache *dbdata;
     /*    fprintf(stderr,"rfc822db_initialize(db,cfg)\n");*/
     dbdata = malloc(sizeof(struct question_db_cache));
@@ -451,7 +447,12 @@ static int rfc822db_question_initialize(struct question_db *db, struct configura
     if (dbdata == NULL)
         return DC_NOTOK;
 
-    dbdata->questions = NULL;
+    dbdata->hash = table_alloc(0, &ret);
+    if (dbdata->hash == NULL) {
+        (void)printf("table_alloc returned: %s\n", table_strerror(ret));
+        return DC_NOTOK;
+    }
+    ret = table_attr(dbdata->hash, TABLE_FLAG_AUTO_ADJUST);
     db->data = dbdata;
 
     return DC_OK;
@@ -463,7 +464,6 @@ static int rfc822db_question_initialize(struct question_db *db, struct configura
  * Output: DC_OK/DC_NOTOK
  * Description: parse a question db file and put it into the cache
  * Assumptions: the file is in valid rfc822 format
- * TODO: don't use linked lists, it's slow
  */
 static int rfc822db_question_load(struct question_db *db)
 {
@@ -472,11 +472,7 @@ static int rfc822db_question_load(struct question_db *db)
     const char *path;
     FILE *inf;
     struct rfc822_header *header = NULL;
-    struct question **questions;
-
-    questions = &dbdata->questions;
-    while (*questions != NULL)
-        questions = &(*questions)->next;
+    int ret;
 
     snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
     path = db->config->get(db->config, tmp, 0);
@@ -512,9 +508,20 @@ static int rfc822db_question_load(struct question_db *db)
         parse_owners(tmp, rfc822db_header_lookup(header, "owners"));
         parse_variables(tmp, rfc822db_header_lookup(header, "variables"));
         tmp->template = db->tdb->methods.get(db->tdb, rfc822db_header_lookup(header, "template"));
+        if (tmp->template == NULL) {
+                tmp->template = template_new(name);
+                db->tdb->methods.set(db->tdb, tmp->template);
+        }
 
-        *questions = tmp;
-        questions = &tmp->next;
+        ret = table_insert_kd(dbdata->hash, name, strlen(name)+1, 
+                              (void *)(&tmp), sizeof(struct question *), 
+                              NULL, NULL, 0);
+        if (ret != TABLE_ERROR_NONE) {
+                (void)printf("table_insert(%s) returned: %s\n", 
+                             name,
+                             table_strerror(ret));
+                return DC_NOTOK;
+        }
 
         DELETE(header);
     }
@@ -530,10 +537,12 @@ static int rfc822db_question_save(struct question_db *db)
     struct question_db_cache *dbdata = db->data;
     char tmp[1024];
     const char *path;
-    struct question *q;
+    struct question **q = malloc(sizeof(struct question*));
     struct questionowner *owner;
-	struct questionvariable *var;
-
+    struct questionvariable *var;
+    char **key = malloc(sizeof(char *));
+    int ret;
+    
     snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
     path = db->config->get(db->config, tmp, 0);
     if (path == NULL ||
@@ -544,15 +553,22 @@ static int rfc822db_question_save(struct question_db *db)
         return DC_NOTOK;
     }
 
-    for (q = dbdata->questions; q != NULL; q = q->next)
-    {
-        INFO(INFO_VERBOSE, "dumping question %s\n", q->tag);
-        fprintf(outf, "Name: %s\n", escapestr(q->tag));
-        fprintf(outf, "Template: %s\n", escapestr(q->template->tag));
-        if ((q->flags & DC_QFLAG_SEEN) || (q->value && *q->value != 0))
-            fprintf(outf, "Value: %s\n", (q->value ? escapestr(q->value) : ""));
+    ret = table_first(dbdata->hash, (void **)key, NULL, (void **)&q, NULL);
+    if (ret != TABLE_ERROR_NONE) {
+            (void)printf("table_first returned: %s\n", 
+                         table_strerror(ret));
+            return DC_NOTOK;
+    }
 
-        if ((owner = q->owners))
+    while (ret == TABLE_ERROR_NONE && q != NULL)
+    {
+        INFO(INFO_VERBOSE, "dumping question %s\n", (*q)->tag); 
+        fprintf(outf, "Name: %s\n", escapestr((*q)->tag));
+        fprintf(outf, "Template: %s\n", escapestr((*q)->template->tag));
+        if (((*q)->flags & DC_QFLAG_SEEN) || ((*q)->value && *(*q)->value != 0))
+            fprintf(outf, "Value: %s\n", ((*q)->value ? escapestr((*q)->value) : ""));
+
+        if ((owner = (*q)->owners))
         {
             fprintf(outf, "Owners: ");
             for (; owner != NULL; owner = owner->next)
@@ -564,19 +580,19 @@ static int rfc822db_question_save(struct question_db *db)
             fprintf(outf, "\n");
         }
 
-        if (q->flags)
+        if ((*q)->flags)
         {
             tmp[0] = 0;
             fprintf(outf, "Flags: ");
 
             /* TODO: handle multiple flags */
-            if (q->flags & DC_QFLAG_SEEN)
+            if ((*q)->flags & DC_QFLAG_SEEN)
                 fprintf(outf, "seen");
 
             fprintf(outf, "\n");
         }
         
-        if ((var = q->variables))
+        if ((var = (*q)->variables))
         {
             fprintf(outf, "Variables:\n");
             for (; var != NULL; var = var->next)
@@ -589,6 +605,8 @@ static int rfc822db_question_save(struct question_db *db)
         }
 
         fprintf(outf, "\n");
+        ret = table_next(dbdata->hash, (void **)&key, NULL, (void **)&q, NULL);
+
     }
 
     if (fclose(outf) == EOF)
@@ -601,44 +619,61 @@ static struct question *rfc822db_question_get(struct question_db *db,
     const char *ltag)
 {
     struct question_db_cache *dbdata = db->data;
-    struct question *q;
+    struct question **q = malloc(sizeof(struct question **));
+    int ret;
 
-    q = find_question(dbdata->questions, ltag);
+    ret = table_retrieve(dbdata->hash, ltag, strlen(ltag)+1, (void**) &q, 
+                         NULL);
+    if (ret == TABLE_ERROR_NOT_FOUND)
+    {
+            return NULL;
+    }
+    if (ret != TABLE_ERROR_NONE) {
+            (void)printf("table_retrieve(%s) returned: %s\n", 
+                         ltag,
+                         table_strerror(ret));
+            return DC_NOTOK;
+    }
+
     if (q != NULL)
-        question_ref(q);
-    return q;
+    {
+            fprintf(stderr,"referenced from question_get\n");
+            question_ref(*q);
+    }
+    return *q;
 }
 
 static int rfc822db_question_set(struct question_db *db, struct question *question)
 {
-    struct question *q = question_dup(question);
+/*    struct question *q = question_dup(question);*/
+        struct question **q = malloc(sizeof(struct question**));
     struct question_db_cache *dbdata = db->data;
     /* the question in the db, if already there */
-    struct question **pq;
+    int ret;
 
-    INFO(INFO_VERBOSE, "rfc822db_question_set(db,q=%s)\n", q->tag);
+    INFO(INFO_VERBOSE, "rfc822db_question_set(db,q=%s,q=%p)\n", question->tag, question);
 
-    for (pq = &dbdata->questions; *pq != NULL; pq = &(*pq)->next)
+    ret = table_retrieve(dbdata->hash, question->tag, -1, (void**)&q, NULL);
+    if ((ret != TABLE_ERROR_NOT_FOUND) && q != NULL)
     {
-        if (strcmp((*pq)->tag, q->tag) == 0)
-        {
-            /* one was there before, remove the old one, we'll
-             * add one back later */
-            struct question *tmp = *pq;
-
-            *pq = tmp->next;
-            question_deref(tmp);
-            
-            break;
-        }
+            question_deref(*q);
+            table_delete(dbdata->hash, question->tag, -1, NULL, NULL);
     }
     
     /* add it now (to the end) */
-    pq = &dbdata->questions;
-    while (*pq != NULL)
-        pq = &(*pq)->next;
 
-    *pq = q;
+    ret = table_insert_kd(dbdata->hash, question->tag, 
+                          strlen(question->tag)+1, (void *)(&question), 
+                          sizeof(struct question *), NULL, NULL, 0);
+    if (ret != TABLE_ERROR_NONE)
+    {
+            table_delete(dbdata->hash, question->tag, -1, NULL, NULL);
+            question_deref(question);
+    }
+
+    /* Reference it so it doesn't get cleaned */
+    fprintf(stderr,"refing from question_set\n");
+    question_ref(question);
 
     return DC_OK;
 }
@@ -661,16 +696,8 @@ static int rfc822db_question_disown(struct question_db *db, const char *tag,
 static struct question *rfc822db_question_iterate(struct question_db *db,
     void **iter)
 {
-    struct question_db_cache *dbdata;
-
-    dbdata = db->data;
-
-    if (*iter == NULL)
-        *iter = dbdata->questions;
-    else
-        *iter = ((struct question *)*iter)->next;
-      
-    return (struct question *)*iter;
+        INFO(INFO_VERBOSE, "rfc822db_question_iterate stub\n");
+        return NULL;
 }
 
 struct template_db_module debconf_template_db_module = {
@@ -692,6 +719,16 @@ struct question_db_module debconf_question_db_module = {
     disown: rfc822db_question_disown,
     iterate: rfc822db_question_iterate,
 };
+
+void dump_question(struct question *q) {
+    fprintf(stderr,"\nDUMPING QUESTION\n");
+    fprintf(stderr,"Question: %s\n", q->tag);
+    fprintf(stderr,"Value: %s\n", q->value);
+    fprintf(stderr,"Ref count: %d\n", q->ref);
+    fprintf(stderr,"Flags: %d\n", q->flags);
+    fprintf(stderr,"Template: %p", q->template);
+    fprintf(stderr,"(%s)\n", q->template->tag);
+}
 
 #if 0
 int main(int argc, char** argv) 
