@@ -193,7 +193,26 @@ static char *getfield(const char *package, const char *fieldname)
  ************************************************************************/
 static int is_confmodule(const char *filename)
 {
-	return 0;
+	FILE *fp;
+	char buf[1024];
+	int i;
+	int found = 0;
+
+	if ((fp = fopen(filename, "r")) != 0)
+	{
+		while (fgets(buf, sizeof(buf), fp))
+		{
+			for (i = 0; buf[i] != 0; i++)
+				buf[i] = tolower(buf[i]);
+			if (strstr(buf, "confmodule"))
+			{
+				found = 1;
+				break;
+			}
+		}
+		fclose(fp);
+	}
+	return found;
 }
 
 /************************************************************************
