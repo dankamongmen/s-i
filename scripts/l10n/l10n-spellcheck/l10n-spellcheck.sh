@@ -35,3 +35,5 @@ echo ""
 echo "***  $SAVED_STATS  ***"
 echo ""
 cat history/$SAVED_STATS
+
+mv $NEW/index.html .

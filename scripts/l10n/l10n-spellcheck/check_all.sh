@@ -63,6 +63,9 @@ if [ ! -d $DEST_DIR ] ; then
     exit 1
 fi
 
+# build "index.html" with the new results
+sh build_index.sh $STATS.txt index_template.html $DEST_DIR/index.html
+
 # Compute some statistics
 i=0
 TOTAL=0
@@ -76,15 +79,6 @@ done
 if [ $i -ne 0 ] ; then
     AVERAGE=`expr $TOTAL / $i`
 fi
-
-# create HTML table
-echo "<table cellpadding=\"5\" cellspacing=\"1\" border=\"2\">" > $STATS.html
-cat $STATS.txt |\
-sed "s:\(^[0-9]*\)\( [a-z_a-zA-Z ]*$\):<tr><td> <a href=\"zip/\2.tar.gz\">\2</a></td> <td>\1</td></tr>:"|\
-sed "s:/ :/:" >> $STATS.html
-echo "<tr><td><b>Total<b></td> <td><b>$TOTAL<b></td></tr>" >> $STATS.html
-echo "<tr><td><b>Average<b></td> <td><b>$AVERAGE<b></td></tr>" >> $STATS.html
-echo "</table>" >> $STATS.html
 
 # create plot using gnuplot
 i=0
