@@ -108,10 +108,10 @@ bool di_system_package_check_subarchitecture (di_package *package, const char *s
 
   while (begin < end)
   {
-    while (begin < end && (isspace (*begin) || *begin == ','))
+    while (begin < end && isspace (*begin))
       begin++;
     temp = begin;
-    while (temp < end && !isspace (*++temp) && *temp != ',');
+    while (temp < end && !isspace (*++temp));
     *temp = '\0';
 
     if (!strcmp (begin, subarchitecture))
