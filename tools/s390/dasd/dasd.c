@@ -20,10 +20,10 @@ struct d_dasd {
 
 char *my_debconf_input(char *priority, char *template)
 {
-	client->command(client, "fset", template, "seen", "false", NULL);
-	client->command(client, "input", priority, template, NULL);
-	client->command(client, "go", NULL);
-	client->command(client, "get", template, NULL);
+	debconf_fset (client, template, "seen", "false");
+	debconf_input (client, priority, template);
+	debconf_go (client);
+	debconf_get (client, template);
 	return client->value;
 }
 
@@ -71,7 +71,6 @@ int main(int argc, char *argv[])
 	char line[255], *ptr;
 
 	client = debconfclient_new ();
-	client->command (client, "title", "DASD Configuration", NULL);
 
 	dasds = malloc (5*sizeof (struct d_dasd));
 
@@ -114,7 +113,7 @@ int main(int argc, char *argv[])
 
 		if (!(cur = find_dasd (dasds, items, ptr)))
 		{
-			client->command (client, "input", "high", "debian-installer/s390/dasd/choose_invalid", NULL);
+			debconf_input (client, "high", "debian-installer/s390/dasd/choose_invalid");
 			return 3;
 		}
 	}
@@ -141,7 +140,7 @@ int main(int argc, char *argv[])
 			strcat (line, ", ");
 		}
 
-		client->command (client, "subst", "debian-install/s390/dasd/choose_select", "choices", line, NULL);
+		debconf_subst (client, "debian-install/s390/dasd/choose_select", "choices", line);
 		my_debconf_input ("high", "debian-install/s390/dasd/choose_select");
 
 		if (!strcmp (client->value, "Quit"))
@@ -165,14 +164,14 @@ int main(int argc, char *argv[])
 	}
 	if (cur->state == 2)
 	{
-		client->command (client, "subst", "debian-install/s390/dasd/format", "device", cur->device, NULL);
-		client->command (client, "set", "debian-install/s390/dasd/format", "true", NULL);
+		debconf_subst (client, "debian-install/s390/dasd/format", "device", cur->device);
+		debconf_set (client, "debian-install/s390/dasd/format", "true");
 		ptr = my_debconf_input ("high", "debian-install/s390/dasd/format");
 	}
 	else if (cur->state == 3)
 	{
-		client->command (client, "subst", "debian-install/s390/dasd/format_unclean", "device", cur->device, NULL);
-		client->command (client, "set", "debian-install/s390/dasd/format_unclean", "false", NULL);
+		debconf_subst (client, "debian-install/s390/dasd/format_unclean", "device", cur->device);
+		debconf_set (client, "debian-install/s390/dasd/format_unclean", "false");
 		ptr = my_debconf_input ("critical", "debian-install/s390/dasd/format_unclean");
 	}
 	else

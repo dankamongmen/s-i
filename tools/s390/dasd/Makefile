@@ -8,7 +8,7 @@
 
 CC := gcc
 CFLAGS := -Wall -pipe -Os
-LDFLAGS := -ldebconf -ldebian-installer
+LDFLAGS := -ldebconfclient -ldebian-installer
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 CFLAGS += -g
