@@ -35,6 +35,8 @@ findfs () {
     df "/target$1" | sed '1d;s/[[:space:]].*//'
 }
 
+db_capb backup
+
 db_progress START 0 6 yaboot-installer/progress
 
 die() {
@@ -43,7 +45,7 @@ die() {
 
     error "$@"
     db_input critical "$template" || [ $? -eq 30 ]
-    db_go
+    db_go || true
     db_progress STOP
     exit 1
 }
@@ -63,7 +65,7 @@ if ! apt-install yaboot hfsutils powerpc-utils; then
     db_get yaboot-installer/apt-install-failed
     if [ "$RET" != true ]; then
 	db_progress STOP
-	exit 10
+	exit 1
     fi
 fi
 
@@ -122,7 +124,10 @@ fi
 db_subst yaboot-installer/bootdev DEVICES "$PARTITIONS"
 db_set yaboot-installer/bootdev "$DEFAULT"
 db_input "$bootdev_priority" yaboot-installer/bootdev || [ $? -eq 30 ]
-db_go
+if ! db_go; then
+    db_progress STOP
+    exit 10 # back up to menu
+fi
 
 db_get yaboot-installer/bootdev
 if [ "$RET" = false ]; then
@@ -383,4 +388,4 @@ db_progress STEP 1
 db_progress STOP
 
 db_input medium yaboot-installer/success || [ $? -eq 30 ]
-db_go
+db_go || true
