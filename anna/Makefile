@@ -21,3 +21,5 @@ small: clean $(BIN)
 
 clean:
 	-rm -f $(BIN) $(OBJS) *~
+
+anna.o util.o: anna.h
