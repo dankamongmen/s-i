@@ -40,7 +40,6 @@ struct fstab_entry {
 	int pass;
 };
 
-extern int errno;
 struct fstab_entry *entries[MAX_ENTRIES];
 int count_entries = 0;
 

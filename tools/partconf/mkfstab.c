@@ -1,4 +1,5 @@
 #include "mkfstab.h"
+#include "errno.h"
 
 static int has_device(struct fstab_entry *entry) {
 	return (strcmp(entry->typ, "proc") != 0
