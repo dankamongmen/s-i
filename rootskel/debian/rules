@@ -32,7 +32,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
-	rm -f build-tree
+	rm -rf build-tree
 	rm -f debian/files~
 	dh_clean
 
@@ -46,7 +46,6 @@ install: build
 	cp -a build-tree/* debian/rootskel/
 	$(foreach DIR, $(DIRS), \
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
-	touch debian/rootskel/var/lib/apt-install/queue
 
 # Build architecture-independent files here.
 binary-indep: build install
