@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+newline="
+"
+
 log() {
 	logger -t lilo-installer "$@"
 }
@@ -251,8 +254,12 @@ EOF
 probed="$(os-prober)"
 count=2
 
+OLDIFS="$IFS"
+IFS="$newline"
+
 if [ -n "$probed" ]; then
-  for os in $probed; do
+  for os in "$probed"; do
+    IFS="$OLDIFS"
     partition=$(mapdevfs $(echo "$os" | cut -d: -f1))
     label=$(echo "$os" | cut -d: -f3)
     type=$(echo "$os" | cut -d: -f4)
@@ -270,7 +277,9 @@ EOF
 	    info "unhandled: $os"
 	;;
     esac
+    IFS="$newline"
   done
+  IFS="$OLDIFS"
 fi
 
 if ! chroot /target /sbin/lilo ; then
