@@ -4,8 +4,6 @@
 
 FLOPPYMNT=/floppy
 
-db_capb BACKUP
-
 mountfloppy()
 {
     if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
@@ -21,21 +19,14 @@ mountfloppy()
 	fi
 	    
         if [ ! -e $FLOPPYDEV ]; then
-            modprobe floppy >> /var/log/messages 2>&1
+            modprobe floppy >> /var/log/messages 2>&1 || true
         fi
         if [ ! -e $FLOPPYDEV ]; then
             exit 1
         fi
         if ! grep -q ^vfat /proc/modules ; then
-            modprobe vfat >> /var/log/messages 2>&1
+            modprobe vfat >> /var/log/messages 2>&1 || true
         fi
-
-        db_fset retriever/floppy/insert seen false || true
-        db_input critical retriever/floppy/insert || true
-        if ! db_go; then
-            exit 30 # backup
-        fi
-        db_capb
 
         mount $FLOPPYDEV -tauto $FLOPPYMNT
     fi

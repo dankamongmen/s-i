@@ -11,7 +11,7 @@ export DH_COMPAT=3
 # Udebs have no postrm file, don't make one
 export DH_OPTIONS=-n
 
-PACKAGE=$(shell dh_listpackages)
+PACKAGES=$(shell dh_listpackages)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=all
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
@@ -32,9 +32,7 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs usr/lib/debian-installer/retriever/
-	install floppy-retriever \
-		debian/floppy-retriever/usr/lib/debian-installer/retriever/floppy-retriever
+	dh_install floppy-retriever usr/lib/debian-installer/retriever
 
 # Build architecture-dependent files here.
 binary-arch: build install
@@ -52,11 +50,10 @@ binary-indep: build install
 	dh_fixperms
 	dh_installdeb
 	dh_shlibdeps
-	# Don't write your stupid guesses to debian/files.
-	dh_gencontrol -- -fdebian/files~
-	# Register file manually.
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
+	$(foreach PACKAGE, $(PACKAGES), \
+	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
+	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
+	)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
