@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.29 2003/07/29 18:21:59 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.30 2003/09/03 19:28:11 mckinstry Exp $
  */
 
 #include "config.h"
@@ -198,7 +198,9 @@ locale_list_compare (char *langs)
 
 /**
  * @brief  Insert keymap into buffer in the form "[name] translated_description"
- * @return ptr to char after description.
+ * @name        Name of the keymap (eg "us")
+ * @description translated explanation of name; may be NULL.
+ * @return      ptr to char after description.
  */
 inline char *
 insert_description (char *buf, char *name, char *description)
@@ -206,13 +208,12 @@ insert_description (char *buf, char *name, char *description)
 	char *s = buf, *t = name;
 
 	*s++ = '[';
-	while (*t)
-		*s++ = *t++;
+	while (*t) *s++ = *t++;
 	*s++ = ']';
 	*s++ = ' ';
-	t = description;
-	while (*t)
-		*s++ = *t++;
+	// Is there a description? if not, reuse name.
+	t = description ? description : name;
+	while (*t) *s++ = *t++;
 	*s = '\0';
 	return s;
 }
