@@ -116,9 +116,8 @@ addinfos_lv() {
 #	or all other non-lvm devices from /proc/partitions
 #
 get_pvs() {
-	export FSID="8e" && get_partitions
 	PARTITIONS=""
-	for i in `echo "$RET" | sed -e 's/,/ /g'`; do
+	for i in `/usr/lib/partconf/find-partitions 2>/dev/null | grep LVM | cut -f1`; do
 		# skip already assigned
 		vgdisplay -v | grep -q "$i"
 		[ $? -eq 0 ] && continue
