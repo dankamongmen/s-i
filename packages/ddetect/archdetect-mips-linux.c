@@ -15,6 +15,7 @@ struct systype {
 };
 
 static struct cpu system_sgi_ind_cpu[] = {
+	/* match various R4000 variants */
 	{ "R4", "r4k-ip22" },
 	{ "R5000", "r5k-ip22" },
 	{ "R8000", "r8k-ip26" },
@@ -29,6 +30,9 @@ static struct cpu system_sgi_origin_cpu[] = {
 };
 
 static struct cpu system_sgi_o2_cpu[] = {
+	/* match R5000 and R5500 */
+	{ "R5", "r5k-ip32" },
+	{ "RM7000", "r5k-ip32" },
 	{ "R10000", "r10k-ip32" },
 	{ "R12000", "r12k-ip32" },
 	{ NULL, "unknown" }
@@ -40,6 +44,7 @@ static struct cpu system_sibyte_sb1_ind_cpu[] = {
 };
 
 static struct cpu system_sni_rm200c_cpu[] = {
+	/* match various R4000 variants */
 	{ "R4", "r4k-rm200c" },
 	{ NULL, "unknown" }
 };
