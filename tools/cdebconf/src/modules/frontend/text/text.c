@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.29 2002/12/23 09:48:46 tfheen Exp $
+ * $Id: text.c,v 1.30 2003/01/23 00:25:08 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -453,8 +453,7 @@ static int text_go(struct frontend *obj)
 	struct question *q = obj->questions;
 	int i;
 	int ret;
-
-	printf("%s\n\n", obj->title);
+	int display_title = 1;
 
         for (; q != 0; q = q->next) 
 	{
@@ -462,6 +461,11 @@ static int text_go(struct frontend *obj)
 			if (strcmp(q->template->type, question_handlers[i].type) == 0) 
 			{
 
+				if (display_title)
+				{
+					printf("%s\n\n", obj->title);
+					display_title = 0;
+				}
 				texthandler_displaydesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
 				if (ret == DC_OK)
