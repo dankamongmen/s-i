@@ -316,7 +316,6 @@ vg_create() {
 	db_go
 	[ $? -eq 30 ] && return
 	db_get lvmcfg/vgcreate_name
-	[ "$RET" = "false" ] && return
 	NAME="$RET"
 
 	# check whether a name for the vg has been given
