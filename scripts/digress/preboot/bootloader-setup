@@ -3,11 +3,28 @@
 # automatic install.
 case "$ARCH" in
 ia64)
+	# TODO: per-host elilo.conf?
 	sed -i \
 	    -e "s!--.*!-- $BOOT_OPTS\"!" \
 	    -e "s/default=.*/default=$BOOT_SELECTION/" \
 	    -e "s/chooser=textmenu/timeout=10/" \
 	    $TFTP_DIR/debian-installer/ia64/elilo.conf
+;;
+i386)
+	# Create a pxelinux config file specifically for this host.
+	CFG=$TFTP_DIR/debian-installer/i386/pxelinux.cfg/$(gethostip $HOSTNAME | cut -d ' ' -f 3)
+	cp $TFTP_DIR/debian-installer/i386/pxelinux.cfg/default $CFG
+	sed -i \
+	    -e "s!--.*!-- $BOOT_OPTS!" \
+	    -e 's/vga=normal //' \
+	    -e 's/devfs=mount,dall //' \
+	    -e "s/default .*/default $BOOT_SELECTION/" \
+            -e "s/timeout .*/timeout 10/" \
+           $CFG
+	
+	if [ -n "$GRAPHICS_DISABLE" ]; then
+		sed -i -e 's/display .*//' $CFG
+	fi
 ;;
 *)
 	echo "$0 does not support $ARCH"
