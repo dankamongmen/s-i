@@ -64,12 +64,14 @@ for pofile in debian/po/*.po ; do
 	perl -pe 'BEGIN { $marker=shift } s/^msg(id|str) "(.+)"/msg$1 "$marker$2"/' "$INDENTMARKER" \
 		< $ISO3166TRANSLATIONS/$pofilename \
 		> $ISO3166TRANSLATIONS/$pofilename.munged
-	
-	msgmerge -C debian/po/$pofilename \
-                 -C $ISO3166TRANSLATIONS/$pofilename.munged \
-                 /dev/null \
-                 debian/pobuild/templates.pot \
-		 > debian/pobuild/$pofilename
+
+	# msgcat will properly handle different encodings
+	msgcat debian/po/$pofilename \
+	       $ISO3166TRANSLATIONS/$pofilename.munged \
+	       > debian/pobuild/$pofilename
+
+	msgmerge -U debian/pobuild/$pofilename \
+                 debian/pobuild/templates.pot
     # Else we just use what's translated
     else
 	cp $pofile debian/pobuild/$pofilename
