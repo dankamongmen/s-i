@@ -53,18 +53,20 @@ do
 	fi
     done
 
-    db_subst ethdetect/module_select CHOICES "$CHOICES"
-    db_input high ethdetect/module_select || [ $? -eq 30 ]
-    db_go || break
+    if [ -n "$CHOICES" ]; then
+    	db_subst ethdetect/module_select CHOICES "$CHOICES"
+    	db_input high ethdetect/module_select || [ $? -eq 30 ]
+    	db_go || break
 
-    db_get ethdetect/module_select
-    if [ "$RET" = "none of the above" ]; then
-	    exit 1
-    fi
-    module="$RET"
-    if [ -n "$module" ] && is_not_loaded "$module" ; then
-	register-module "$module"
-	module_probe "$module"
+        db_get ethdetect/module_select
+        if [ "$RET" = "none of the above" ]; then
+    	    exit 1
+        fi
+        module="$RET"
+        if [ -n "$module" ] && is_not_loaded "$module" ; then
+    	    register-module "$module"
+    	    module_probe "$module"
+        fi
     fi
     
     # No ethernet interface. Try manual loading.
