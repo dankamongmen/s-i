@@ -30,20 +30,23 @@ ttyS*)
 
     if [ -z "$ttyterm" ]; then ttyterm=vt100; fi
     if [ -z "$ttyspeed" ]; then ttyspeed=9600; fi
-    cat /target/etc/inittab | sed \
-        -e "s/^\([1-6]\):/#\1:/" \
+    sed -e "s/^\([1-6]\):/#\1:/" \
 	-e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
-            > /target/etc/inittab.real
+            /target/etc/inittab > /target/etc/inittab.real
     echo "# serial console added by debian-installer" >> /target/etc/securetty
     echo "$console_" >> /target/etc/securetty
     if [ -n "$console" ] && [ "$console" != "$console_" ]; then
 	echo "$console" >> /target/etc/securetty
     fi
+
+    sed -e "s/^\([23]\):#\1:/" /usr/share/prebaseconfig/inittab \
+       > /target/etc/inittab
 ;;
 *)
     # graphical console, leave inittab alone
     mv /target/etc/inittab /target/etc/inittab.real
+    cp /usr/share/prebaseconfig/inittab /target/etc/inittab
 ;;
 esac
 
-cp /usr/share/prebaseconfig/inittab /target/etc/inittab
+
