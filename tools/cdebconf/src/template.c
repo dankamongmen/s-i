@@ -485,7 +485,8 @@ struct template *template_load(const char *filename)
 		}
 		
 		lang = NULL;
-		p = strstrip(line);
+		p = line;
+		CHOMP(p);
 		if (*p == 0)
 		{
 			if (t != 0)
