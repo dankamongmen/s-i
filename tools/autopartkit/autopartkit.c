@@ -768,11 +768,10 @@ static char *normalize_devfs(const char* path)
     subdev  = minor(statbuf.st_rdev) / maxparts;
     partnum = minor(statbuf.st_rdev) % maxparts;
 
-    retval = malloc(strlen(partpath) + 1); /* I hope this is long enough */
     if (0 == partnum)
-      sprintf(retval, devpath, 'a' + subdev);
+      asprintf(&retval, devpath, 'a' + subdev);
     else
-      sprintf(retval, partpath, 'a' + subdev, partnum);
+      asprintf(&retval, partpath, 'a' + subdev, partnum);
 
     return retval;
 }
@@ -789,10 +788,7 @@ static char *get_device_path(PedDevice *dev, PedPartition *freepart)
     char *retval;
     char *tmp;
 
-    /* devlen + numbers + null termination */
-    retval = malloc(strlen(dev->path) + 3);
-
-    sprintf(retval,"%s%d",dev->path, freepart->num);
+    asprintf(&retval, "%s%d", dev->path, freepart->num);
     /* Replace 'disc' with 'part'.  Sucks. */
     if ((tmp = strstr(retval, "disc")))
     {
@@ -900,10 +896,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 	fprintf(fstab, "%s\t%s\t%s\tdefaults\t\t0\t%d\n", 
 		devpath, mountmap[i].mountpoint->mountpoint,
 		mountmap[i].mountpoint->fstype,	fsckpass);
-	tmpmnt = malloc(/* /target */ 7 + 
-			strlen(mountmap[i].mountpoint->mountpoint) + 1 
-			/* terminating null */);
-	sprintf(tmpmnt, "/target%s",mountmap[i].mountpoint->mountpoint);
+	asprintf(&tmpmnt, "/target%s", mountmap[i].mountpoint->mountpoint);
 	mkdir(tmpmnt, 0755);
 	mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
 	      MS_MGC_VAL, NULL);
