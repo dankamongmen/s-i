@@ -88,25 +88,27 @@ $partitems"
 	    x="$partitems
 $items"
 	fi
-	db_reset partman/confirm
 	db_subst partman/confirm ITEMS "$x"
 	db_input critical partman/confirm
 	db_go || true
 	db_get partman/confirm
 	if [ "$RET" = false ]; then
+	    db_reset partman/confirm
 	    return 1
 	else
+	    db_reset partman/confirm
 	    return 0
 	fi
     else
 	if [ "$formatted_previously" = no ]; then
-	    db_reset partman/confirm_nochanges
 	    db_input high partman/confirm_nochanges
 	    db_go || true
 	    db_get partman/confirm_nochanges
 	    if [ "$RET" = false ]; then
+	        db_reset partman/confirm_nochanges
 		return 1
 	    else
+	        db_reset partman/confirm_nochanges
 		return 0
 	    fi
 	else
@@ -167,14 +169,15 @@ while true; do
 	ask_user /lib/partman/choose_partition
 	exitcode=$?
 	if [ $exitcode -eq 255 ]; then
-	    db_reset partman/confirm_abort
 	    db_subst partman/confirm_abort ITEMS "$items"
 	    db_input high partman/confirm_abort
 	    db_go || true
 	    db_get partman/confirm_abort
 	    if [ "$RET" = true ]; then
+	        db_reset partman/confirm_abort
 		abort 10 # back up to main menu
 	    fi
+	    db_reset partman/confirm_abort
 	elif [ $exitcode -ge 100 ] && confirm_changes; then
 	    break
 	fi
