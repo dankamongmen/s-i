@@ -118,8 +118,9 @@ if [ ! -f $SPECIFIC_WL ] ; then
 fi
 
 # build wl only if there's at least one of the "private" wls
+# "| perl -00lne'/\n/&&print'" would remove blank lines from wl: is it needed?
 if [ $WL_WARN -ne 2 ] ; then
-    cat $COMMON_WL $SPECIFIC_WL | sort -f > $WLIST.txt
+    cat $COMMON_WL $SPECIFIC_WL | sort -f | sed "s:\(^#.*\)::" > $WLIST.txt
 
 # FIXME: does not work for accented letters despite --encoding=utf-8
 # NB: --lang uses $LANG and not $DICT
