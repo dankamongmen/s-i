@@ -147,7 +147,7 @@ prune_partitions() {
 }
 
 md_create_raid0() {
-	db_subst mdcfg/raid0devs "${PARTITIONS}"
+	db_subst mdcfg/raid0devs PARTITIONS "${PARTITIONS}"
 	db_set mdcfg/raid0devs ""
 	db_fset mdcfg/raid0devs "seen" "false"
 	db_input high mdcfg/raid0devs
@@ -173,7 +173,7 @@ md_create_raid0() {
 
 	echo "Number of devices in the RAID0 array md${MD_NUM}: ${SELECTED}"
 
-	RAID_DEVICES="$(echo ${RET} | sed -e "s/,//")"
+	RAID_DEVICES="$(echo ${RET} | sed -e 's/,//g')"
 	echo "Commandline:"
 	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid0 -n ${SELECTED} ${RAID_DEVICES}"`
 }
