@@ -4,10 +4,10 @@ DISK="$1"
 
 case "$DEBIAN_FRONTEND" in
 "slang")
-	cfdisk $DISK
+	LANG=C cfdisk $DISK
 	;;
 "newt")
-	cfdisk $DISK
+	LANG=C cfdisk $DISK
 	;;
 *)
 	fdisk $DISK
