@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.12 2003/03/24 20:28:07 sley Exp $
+ * $Id: gtk.c,v 1.13 2003/03/25 12:41:07 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -70,6 +70,7 @@ struct frontend_data
     GtkWidget *description_label; //Pointer to the Description Field
     GtkWidget *target_box; //Pointer to the box, where question widgets shall be stored in
     struct setter_struct *setters; //Struct to register the Set Functions of the Widgets
+    int button_val; //Value of the button pressed to leave a form
 };
 
 /* Embed frontend ans question in this object to pass it through an event handler */
@@ -208,6 +209,14 @@ void button_single_callback(GtkWidget *button, struct question* q)
     gtk_main_quit();
 }
 
+void exit_button_callback(GtkWidget *button, struct frontend* obj)
+{
+    ((struct frontend_data*)obj->data)->button_val =
+	*((int*)gtk_object_get_user_data(GTK_OBJECT(button))) ;
+
+    gtk_main_quit();
+}
+
 static gboolean show_description( GtkWidget *widget, struct show_description_data* data )
 {
     struct question *q;
@@ -223,7 +232,7 @@ static gboolean show_description( GtkWidget *widget, struct show_description_dat
     return FALSE;
 }
 
-gboolean need_finish_button(struct frontend *obj)
+gboolean need_continue_button(struct frontend *obj)
 {
     if (obj->questions->next == NULL)
     {
@@ -235,36 +244,46 @@ gboolean need_finish_button(struct frontend *obj)
     return TRUE;
 }
 
-void add_buttons(struct frontend *obj, GtkWidget *qbox)
+void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *separator, *buttonbox;
-    GtkWidget *finish_button = NULL;
-    GtkWidget *abort_button = NULL;
+    GtkWidget *separator, *button_box;
+    GtkWidget *continue_button = NULL;
     GtkWidget *back_button = NULL;
+    int *ret_val;
 
-    if (need_finish_button(obj))
+    if (need_continue_button(obj))
     {
-	finish_button = gtk_button_new_with_label("Finish");
-	g_signal_connect (G_OBJECT (finish_button), "clicked", G_CALLBACK (gtk_main_quit), NULL);
+	continue_button = gtk_button_new_with_label("Continue");
+	ret_val = NEW(int);
+	*ret_val = DC_OK;
+	gtk_object_set_user_data(GTK_OBJECT(continue_button), ret_val);
+	g_signal_connect (G_OBJECT (continue_button), "clicked", G_CALLBACK (exit_button_callback), obj);
     }
 
-    if (finish_button || abort_button || back_button)
+    if (obj->methods.can_go_back(obj, q))
+    {
+	back_button = gtk_button_new_with_label("Back");
+	ret_val = NEW(int);
+	*ret_val = DC_GOBACK;
+	gtk_object_set_user_data(GTK_OBJECT(back_button), ret_val);
+	g_signal_connect (G_OBJECT (back_button), "clicked", G_CALLBACK (exit_button_callback), obj);
+    }
+
+    if (continue_button || back_button)
     {
 	separator = gtk_hseparator_new ();
 	gtk_box_pack_start (GTK_BOX (qbox), separator, FALSE, 0, 0);
 
-	buttonbox = gtk_hbutton_box_new();
+	button_box = gtk_hbutton_box_new();
+	gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
 
-	if (finish_button)
-	    gtk_box_pack_start (GTK_BOX(buttonbox), finish_button, FALSE, FALSE, 5);
-
-	if (abort_button)
-	    gtk_box_pack_start (GTK_BOX(buttonbox), abort_button, FALSE, FALSE, 5);
+	if (continue_button)
+	    gtk_box_pack_start (GTK_BOX(button_box), continue_button, FALSE, FALSE, 5);
 
 	if (back_button)
-	    gtk_box_pack_start (GTK_BOX(buttonbox), back_button, FALSE, FALSE, 5);
+	    gtk_box_pack_start (GTK_BOX(button_box), back_button, FALSE, FALSE, 5);
 
-	gtk_box_pack_start(GTK_BOX(qbox), buttonbox, FALSE, FALSE, 5);
+	gtk_box_pack_start(GTK_BOX(qbox), button_box, FALSE, FALSE, 5);
     }
 }
 
@@ -664,24 +683,33 @@ static int gtk_go(struct frontend *obj)
         q = q->next;
     }
 
-    add_buttons(obj, questionbox);
+    add_buttons(obj, q, questionbox);
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
     gtk_main();
-    call_setters(obj);
+    if ( ((struct frontend_data*)obj->data)->button_val == DC_OK ) 
+    {
+	call_setters(obj);
+	q = obj->questions;
+	while (q != NULL)
+	{
+	    obj->qdb->methods.set(obj->qdb, q);
+	    q = q->next;
+	}
+    }
     gtk_widget_destroy(questionbox);
     gtk_label_set_text(GTK_LABEL( ((struct frontend_data*)obj->data)->description_label),""); 
-    q = obj->questions;
-    while (q != NULL)
-    {
-        obj->qdb->methods.set(obj->qdb, q);
-        q = q->next;
-    }
-	
-    return DC_OK;
+
+    return ((struct frontend_data*)obj->data)->button_val;
+}
+
+static int gtk_can_go_back(struct frontend *obj, struct question *q)
+{
+    return (obj->capability & DCF_CAPB_BACKUP);
 }
 
 struct frontend_module debconf_frontend_module =
 {
     initialize: gtk_initialize,
     go: gtk_go,
+    can_go_back: gtk_can_go_back,
 };
