@@ -100,6 +100,8 @@ static char **mirrors_in(char *country) {
 
 static inline int has_mirror(char *country) {
 	char **mirrors;
+	if (strcmp(country, "enter information manually") == 0)
+		return 1;
 	mirrors = mirrors_in(country);
 	return  (mirrors[0] == NULL) ? 0 : 1;
 }
@@ -121,15 +123,16 @@ static int choose_country(void) {
 		free(country);
 	country = NULL;
 
-	/* Pick a default country from elsewhere, eg countrychooser,*/
-	if (debconf_get(debconf, DEBCONF_BASE "country") == 0) {
-		// Not set yet. Seed with a default value
+	debconf_get(debconf, DEBCONF_BASE "country");
+	if (! strlen(debconf->value)) {
+		/* Not set yet. Seed with a default value. */
 		if ((debconf_get(debconf, "debian-installer/country") == 0) &&
 		    (debconf->value != NULL) ) {
-				country = strdup (debconf->value);
-				debconf_set (debconf, DEBCONF_BASE "country", country);
+			country = strdup (debconf->value);
+			debconf_set (debconf, DEBCONF_BASE "country", country);
 		}
-	} else {
+	}
+	else {
 		country = debconf->value;
 	}
 
