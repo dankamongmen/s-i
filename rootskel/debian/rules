@@ -5,8 +5,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-
-PACKAGES=$(shell dh_listpackages)
+PACKAGE=rootskel
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
@@ -35,6 +34,10 @@ clean:
 # cvs update -P will remove these dirs if they are empty
 DIRS=proc var/log mnt floppy
 
+# This is a list of the devices we want to create
+DEVS=log console kmem mem null ram0 ram tty0 tty1 tty2 tty3 tty4 hda hdb hdc hdd fd0
+
+
 install: build
 	dh_testdir
 	dh_testroot
@@ -43,6 +46,9 @@ install: build
 	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
 	$(foreach DIR, $(DIRS), \
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
+	mkdir -p debian/rootskel/dev/
+	$(foreach DEV, $(DEVS), \
+	(cp -dpR /dev/$(DEV) debian/rootskel/dev/ ) ; )
 
 
 
@@ -61,14 +67,10 @@ binary-arch: build install
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol -- -fdebian/files~ 
-	@$(foreach PACKAGE, $(PACKAGES), \
-	(dpkg-distaddfile $(PACKAGE)_$(VERSION)_$(ARCH).udeb \
-		debian-installer $(PRIORITY) ) ; )
+	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY) 
 	dh_md5sums
-	@$(foreach PACKAGE, $(PACKAGES), \
-	(cd debian ; \
-		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb \
-		); )
+	dh_builddeb --filename=$(FILENAME)
+
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
