@@ -1,8 +1,17 @@
 #!/bin/sh
 #
 # Prepare to run base-config after reboot
-
 set -e
+
+# Only here for stable installs (ie, skolelinux)
+. /usr/share/debconf/confmodule
+if db_get mirror/distribution && [ "$RET" ] ; then
+    SUITE="$RET"
+fi
+(
+    echo "# inserted by prebaseconfig"
+    echo "SUITE=\"$SUITE\""
+) >> /target/root/dbootstrap_settings
 
 # Look in /proc/cmdline for console=ttyS*, indicating a serial console
 # and fix inittab if so.
