@@ -153,10 +153,10 @@ do
             then
                 :
             else
-                log "Error loading driver '$module' for $vendor $model!"
+                log "Error loading driver '$module' for '$cardname'!"
 	    fi
         else
-            log "Could not locate driver '$module' for $vendor $model."
+            log "Could not locate driver '$module' for '$cardname'."
 
 	    # Tell the user to try to load more modules from floppy
 	    template=hw-detect/not_included
