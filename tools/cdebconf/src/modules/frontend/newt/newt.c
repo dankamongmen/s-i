@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.32 2003/10/16 23:53:11 barbier Exp $
+ * $Id: newt.c,v 1.33 2003/10/17 20:48:34 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -613,7 +613,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     bYes     = newtCompactButton((win_width - strwidth(yes_text(obj)) - 2)/2, win_height-2, yes_text(obj));
     bNo      = newtCompactButton(win_width - 9 - strwidth(no_text(obj)), win_height-2, no_text(obj));
     newtFormAddComponents(form, textbox, bYes, bNo, bCancel, NULL);
-    if (strcmp(question_getvalue(q, ""), "true") == 0)
+    if (question_getvalue(q, "") != NULL && strcmp(question_getvalue(q, ""), "true") == 0)
         newtFormSetCurrent(form, bYes);
     else
         newtFormSetCurrent(form, bNo);
