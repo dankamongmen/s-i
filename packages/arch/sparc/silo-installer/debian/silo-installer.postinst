@@ -14,13 +14,13 @@ bootfs=$(findfs /boot)
 bootpart=${bootfs#${bootfs%?}}
 
 if [ "$rootfs" = "$bootfs" ]; then
-	boot="${bootpart}/boot"
+	boot="/boot"
 else
-	boot="${bootpart}"
+	boot=""
 fi
 
 if [ -e "/target/boot/initrd.img" ]; then
-	initrd='initrd=/boot/initrd.img'
+	initrd="initrd=${boot}/initrd.img"
 fi
 
 # Write out silo.conf
