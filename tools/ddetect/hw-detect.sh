@@ -4,6 +4,9 @@ set -e
 . /usr/share/debconf/confmodule
 #set -x
 
+NEWLINE="
+"
+
 MISSING_MODULES_LIST=""
 
 # This is a gross and stupid hack, but we don't have a better idea right
@@ -88,7 +91,7 @@ discover_hw () {
 
 # Some pci chipsets are needed or there can be DMA or other problems.
 get_ide_chipset_info() {
-	for ide_module in $(find /lib/modules/*/kernel/drivers/ide/pci/ -type f); do
+	for ide_module in $(find /lib/modules/*/kernel/drivers/ide/pci/ -type f 2>/dev/null); do
     	if [ -e $ide_module ]; then
 		baseidemod=$(echo $ide_module | sed s/\.o$// | sed s/\.ko$// | sed 's/.*\///')
 		echo "$baseidemod:IDE chipset support"
@@ -120,21 +123,26 @@ get_manual_hw_info() {
 
 db_settitle hw-detect/title
 
+# Should be greater than the number of kernel modules we can reasonably
+# expect it will ever need to load.
+MAX_STEPS=1000
+OTHER_STEPS=4
+# Use 1/10th of the progress bar for the non-module-load steps.
+OTHER_STEPSIZE=$(expr $MAX_STEPS / 10 / $OTHER_STEPS)
+db_progress START 0 $MAX_STEPS hw-detect/detect_progress_title
+
 log "Detecting hardware..."
-# Put up a progress bar just to have something on screen if the hardware
-# detection should hang.
-db_progress START 0 2 hw-detect/detect_progress_title
 db_progress INFO hw-detect/detect_progress_step
 MANUAL_HW_INFO=$(get_manual_hw_info)
 ALL_HW_INFO=$(get_all_hw_info)
-db_progress STEP 1
+db_progress STEP $OTHER_STEPSIZE
+
 # Remove modules that are already loaded, and count how many are left.
 LOADED_MODULES=$(cat /proc/modules | cut -f 1 -d ' ')
 count=0
 # Setting IFS to adjust how the for loop splits the values
 IFS_SAVE="$IFS"
-IFS="
-"
+IFS="$NEWLINE"
 for device in $ALL_HW_INFO; do
     	module="`echo $device | cut -d: -f1`"
 	loaded=0
@@ -151,67 +159,59 @@ $device"
 	fi
 done
 IFS="$IFS_SAVE"
-db_progress STEP 1
-db_progress STOP
+db_progress STEP $OTHER_STEPSIZE
 
-if [ "$count" != 0 ]; then
-	log "Loading modules..."
-	db_progress START 0 $count hw-detect/load_progress_title
-	IFS_SAVE="$IFS"
-	IFS="
-	"
-	for device in $HW_INFO; do
-	    module="`echo $device | cut -d: -f1`"
-	    cardname="`echo $device | cut -d: -f2`"
-	    # Restore IFS after extracting the fields.
-	    IFS="$IFS_SAVE"
-	
-	    if [ -z "$module" ] ; then module="[Unknown]" ; fi
-	    if [ -z "$cardname" ] ;   then cardname="[Unknown]" ; fi
-	
-	    log "Detected module '$module' for '$cardname'"
-	
-	    if [ "$module" != "ignore" -a "$module" != "[Unknown]" ]; then
-	    	db_subst hw-detect/load_progress_step CARDNAME "$cardname"
-	        db_subst hw-detect/load_progress_step MODULE "$module"
-	        db_progress INFO hw-detect/load_progress_step
-	        log "Trying to load module '$module'"
-	
-	        if find /lib/modules/`uname -r`/ | grep -q /${module}\\.
-	        then
-	            if load_modules "$module"
-	            then
-	                :
-	            else
-	                log "Error loading driver '$module' for '$cardname'!"
-		    fi
-	        else
-	       	    db_subst hw-detect/load_progress_skip_step CARDNAME "$cardname"
-	            db_subst hw-detect/load_progress_skip_step MODULE "$module"
-	            db_progress INFO hw-detect/load_progress_skip_step
-	            log "Could not load driver '$module' for '$cardname'."
-		    # Only add the module to the missing list if it was not
-		    # manually added to the list of modules to load.
-		    if ! echo "$MANUAL_HW_INFO" | grep -q "$module:"; then
-			    if [ -n "$MISSING_MODULES_LIST" ]; then
-				    MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
-			    fi
-			    MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
-		    fi
-	        fi
+# Work out amount to step per module load. expr rounds down, so 
+# it may not get quite to 100%, but will at least never exceed it.
+MODULE_STEPSIZE=$(expr \( $MAX_STEPS - \( $OTHER_STEPS \* $OTHER_STEPSIZE \) \) / $count)
+
+log "Loading modules..."
+IFS_SAVE="$IFS"
+IFS="$NEWLINE"
+for device in $HW_INFO; do
+    module="`echo $device | cut -d: -f1`"
+    cardname="`echo $device | cut -d: -f2`"
+    # Restore IFS after extracting the fields.
+    IFS="$IFS_SAVE"
+
+    if [ -z "$module" ] ; then module="[Unknown]" ; fi
+    if [ -z "$cardname" ] ; then cardname="[Unknown]" ; fi
+
+    log "Detected module '$module' for '$cardname'"
+
+    if [ "$module" != "ignore" -a "$module" != "[Unknown]" ]; then
+    	db_subst hw-detect/load_progress_step CARDNAME "$cardname"
+        db_subst hw-detect/load_progress_step MODULE "$module"
+        db_progress INFO hw-detect/load_progress_step
+        log "Trying to load module '$module'"
+
+        if find /lib/modules/`uname -r`/ | grep -q /${module}\\. ; then
+            if load_modules "$module"; then
+                :
+            else
+                log "Error loading driver '$module' for '$cardname'!"
 	    fi
-	
-	    db_progress STEP 1
+        else
+       	    db_subst hw-detect/load_progress_skip_step CARDNAME "$cardname"
+            db_subst hw-detect/load_progress_skip_step MODULE "$module"
+            db_progress INFO hw-detect/load_progress_skip_step
+            log "Could not load driver '$module' for '$cardname'."
+	    # Only add the module to the missing list if it was not
+	    # manually added to the list of modules to load.
+	    if ! echo "$MANUAL_HW_INFO" | grep -q "$module:"; then
+		    if [ -n "$MISSING_MODULES_LIST" ]; then
+			    MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
+		    fi
+		    MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
+	    fi
+        fi
+    fi
 
-	    # XXX why is this ere? Paranioa?
-	    IFS="
-	"
-	done
-	IFS="$IFS_SAVE"
-	
-	db_progress STOP
-fi
-	
+    db_progress STEP $MODULE_STEPSIZE
+    IFS="$NEWLINE"
+done
+IFS="$IFS_SAVE"
+
 # always load sd_mod and sr_mod if a scsi controller module was loaded.
 # sd_mod to find the disks, and sr_mod to find the CD-ROMs
 if [ -e /proc/scsi/scsi ] ; then
@@ -220,22 +220,28 @@ if [ -e /proc/scsi/scsi ] ; then
     else
     	if grep -q "Type:.*Direct-Access" /proc/scsi/scsi ; then
 	    if is_not_loaded "sd_mod" ; then
-		if [ "$(cat /proc/devices | sed -e 's/[^[:alpha:]]*//' |grep sd|head -n 1)" = "sd" ]; then
-		    log "Module sd_mod is compiled in statically"
-		else
+		if ! [ "$(cat /proc/devices | sed 's/[^[:alpha:]]*//' |grep sd|head -n 1)" = "sd" ]; then
+                    db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
+                    db_subst hw-detect/load_progress_step MODULE "sd_mod"
+                    db_progress INFO hw-detect/load_progress_step
 		    load_modules sd_mod
+		    register-module sd_mod
 		fi
 	    fi
 	fi
+	db_progress STEP $OTHER_STEPSIZE
     	if grep -q "Type:.*CD-ROM" /proc/scsi/scsi ; then
 	    if is_not_loaded "sr_mod" ; then
-		if [ "$(cat /proc/devices | sed -e 's/[^[:alpha:]]*//' |grep sr|head -n 1)" = "sr" ]; then
-		    log "Module sr_mod is compiled in statically"
-		else
+		if ! [ "$(cat /proc/devices | sed 's/[^[:alpha:]]*//' |grep sr|head -n 1)" = "sr" ]; then
+                    db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
+                    db_subst hw-detect/load_progress_step MODULE "sr_mod"
+                    db_progress INFO hw-detect/load_progress_step
 		    load_modules sr_mod
+		    register-module sr_mod
 		fi
 	    fi
 	fi
+	db_progress STEP $OTHER_STEPSIZE
     fi
 fi
 
@@ -244,16 +250,6 @@ fi
 if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 	register-module ide-cd
 	register-module ide-detect
-fi
-
-if [ -n "$MISSING_MODULES_LIST" ]; then
-	log "Missing modules '$MISSING_MODULES_LIST"
-	# Tell the user to try to load more modules from floppy
-	template=hw-detect/missing_modules
-	db_fset "$template" seen false
-	db_subst "$template" MISSING_MODULES_LIST "$MISSING_MODULES_LIST" || true
-	db_input low "$template" || [ $? -eq 30 ]
-	db_go || true
 fi
 
 # get pcmcia running if possible
@@ -266,9 +262,21 @@ if [ -d /proc/bus/pccard ]; then
 	apt-install pcmcia-cs || true
 fi
 
-	    
 # Ask for discover to be installed into /target/, to make sure the
 # required drivers are loaded.
 apt-install discover || true
+
+db_progress SET $MAX_STEPS
+db_progress STOP
+
+if [ -n "$MISSING_MODULES_LIST" ]; then
+	log "Missing modules '$MISSING_MODULES_LIST"
+	# Tell the user to try to load more modules from floppy
+	template=hw-detect/missing_modules
+	db_fset "$template" seen false
+	db_subst "$template" MISSING_MODULES_LIST "$MISSING_MODULES_LIST" || true
+	db_input low "$template" || [ $? -eq 30 ]
+	db_go || true
+fi
 
 exit 0
