@@ -14,7 +14,7 @@
  */
 struct package_t *status_read(void) {
 	FILE *f;
-	char *b, buf[BUFSIZE];
+	char *b, buf[BUFSIZE], *lang_code, *lingua;
 	int i;
 	struct package_t *found, *newp, *p = 0;
 
@@ -22,6 +22,8 @@ struct package_t *status_read(void) {
 		perror(STATUSFILE);
 		return 0;
 	}
+	
+	lingua = getenv("LINGUA");
 
 	while (fgets(buf, BUFSIZE, f) && !feof(f)) {
 		buf[strlen(buf)-1] = 0;
@@ -52,6 +54,15 @@ struct package_t *status_read(void) {
 			 */
 			p->description = strdup(buf+13);
 		}
+                else if (strstr(buf, "Description-") == buf && lingua) {
+	                if (strlen(buf) >= 16 && buf[14] == ':') {
+	                       lang_code = (char *) malloc(3);
+	                       memcpy(lang_code, buf + 12, 2);
+	                       if (strcmp(lang_code, lingua) == 0)
+	                          p->description_ll = strdup(buf + 16);
+	                       free(lang_code);
+                        }
+                }
 		else if (strstr(buf, "Depends: ") == buf) {
 			/*
 			 * Basic depends line parser. Can ignore versioning
