@@ -2,9 +2,15 @@
 DISK="$1"
 [ -z "$DISK" ] && exit 1
 
-case "$DEBIAN_FRONTEND" in
-*)
+case "`/usr/bin/ppcdetect`" in
+"NewWorld PowerMac")
 	mac-fdisk $DISK
+	;;
+"CHRP Pegasos")
+	parted $DISK
+	;;
+*)
+	fdisk $DISK
 	;;
 esac
 
