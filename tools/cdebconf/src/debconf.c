@@ -40,14 +40,14 @@ static void save()
 
 static void cleanup()
 {
-	if (frontend != NULL)
-		frontend_delete(frontend);
-	if (questions != NULL)
-		question_db_delete(questions);
-	if (templates != NULL)
-		template_db_delete(templates);
-	if (config != NULL)
-		config_delete(config);
+	if (confmodule->frontend != NULL)
+		frontend_delete(confmodule->frontend);
+	if (confmodule->questions != NULL)
+		question_db_delete(confmodule->questions);
+	if (confmodule->templates != NULL)
+		template_db_delete(confmodule->templates);
+	if (confmodule->config != NULL)
+		config_delete(confmodule->config);
 }
 
 void sighandler(int sig)
@@ -119,8 +119,10 @@ int main(int argc, char **argv)
 	/* initialize database and frontend modules */
     if ((templates = template_db_new(config, NULL)) == 0)
         DIE("Cannot initialize DebConf template database");
+    	templates->methods.load(templates);
 	if ((questions = question_db_new(config, templates, NULL)) == 0)
 		DIE("Cannot initialize DebConf configuration database");
+	questions->methods.load(questions);
 	if ((frontend = frontend_new(config, templates, questions)) == 0)
 		DIE("Cannot initialize DebConf frontend");
 	/* set title */
@@ -137,10 +139,6 @@ int main(int argc, char **argv)
 		snprintf(buf, sizeof(buf), "Configuring %s", pkg);
 		frontend->methods.set_title(frontend, buf);
 	}
-
-	/* load templates and config */
-	templates->methods.load(templates);
-        questions->methods.load(questions);
 
 	/* startup the confmodule; run the config script and talk to it */
 	confmodule = confmodule_new(config, templates, questions, frontend);

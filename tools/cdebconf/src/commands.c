@@ -6,6 +6,8 @@
 #include "template.h"
 #include "strutl.h"
 
+#include <dlfcn.h>
+
 #define CHECKARGC(pred) \
 ({\
     char *out; \
@@ -183,9 +185,30 @@ command_go(struct confmodule *mod, char *arg)
     char *argv[3];
     int argc;
     char *out;
+    char *running_frontend = NULL;
+    char *requested_frontend = NULL;
+    struct question *q;
 
     argc = strcmdsplit(arg, argv, DIM(argv) - 1);
     CHECKARGC(== 0);
+
+    q = mod->questions->methods.get(mod->questions, "debconf/frontend");
+    if (q)
+	requested_frontend = question_getvalue(q, "");
+    question_deref(q);
+
+    running_frontend = getenv("DEBIAN_FRONTEND");
+
+    if (requested_frontend && strcmp(running_frontend, requested_frontend) != 0) {
+	q = mod->frontend->questions;
+	mod->frontend->methods.shutdown(mod->frontend);
+	dlclose(mod->frontend->handle);
+	DELETE(mod->frontend);
+	setenv("DEBIAN_FRONTEND",requested_frontend,1);
+	mod->frontend = frontend_new(mod->config, mod->templates, mod->questions);
+	mod->frontend->questions = q;
+    }
+
     if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
     {
         asprintf(&out, "%u backup", CMDSTATUS_GOBACK);

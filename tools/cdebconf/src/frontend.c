@@ -122,6 +122,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	struct frontend_module *mod;
 	char tmp[256];
 	const char *modpath, *modname;
+	struct question *q;
 
     modname = getenv("DEBIAN_FRONTEND");
     if (modname == NULL)
@@ -144,6 +145,10 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
         DIE("Frontend instance driver not defined (%s)", tmp);
 
     setenv("DEBIAN_FRONTEND",modname,1);
+    q = qdb->methods.get(qdb, "debconf/frontend");
+    if (q)
+	question_setvalue(q, modname);
+    question_deref(q);
     snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, modname);
 	if ((dlh = dlopen(tmp, RTLD_NOW)) == NULL)
 		DIE("Cannot load frontend module %s: %s", tmp, dlerror());
