@@ -97,7 +97,20 @@ fi
 # At this step we should have either xx, or xx_YY in LANGNAME
 if [ "$LANGUAGE" != "C" ]; then
   while :; do
-	# Build up the Choices list from the language selection
+     # If languagechoose/language is only xx, then we *have*
+     # to ask for a country
+     # Otherwise, only ask one at medium priority, with the
+     # full world country list only
+     if (echo $DEFAULTLOCALE | grep "_" >/dev/null 2>&1) ; then
+        db_subst "countrychooser/country-name" DEFAULTLOCALE "${DEFAULTLOCALE}"
+	db_input medium "countrychooser/country-name" || [ $? -eq 30 ]
+	if ! db_go; then
+	    exit 10 # back up
+	fi
+	db_get "countrychooser/country-name"
+     else
+	# As we *have* to ask for a country, first build the list
+        # of valid countries
 	shortlistcodes=`cat /etc/SUPPORTED-short | grep -e "^$LANGUAGE"|cut -b 4-5|sort|uniq`
 	SHORTLIST=''
 	for code in $shortlistcodes; do
@@ -125,7 +138,7 @@ if [ "$LANGUAGE" != "C" ]; then
 	    # Should not happen, but fall back to Others
 	    RET="Others"
 	fi
-	if [ "$RET" = "Others" ]; then
+        if [ "$RET" = "Others" ]; then
 	    db_subst "countrychooser/country-name" DEFAULTLOCALE "${DEFAULTLOCALE}"
 	    db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
 	    if ! db_go; then
@@ -133,15 +146,18 @@ if [ "$LANGUAGE" != "C" ]; then
 	    fi
 	    db_get "countrychooser/country-name"
 	fi
-	COUNTRYCODE="$(country2code "$RET")" || true
-	if [ -n "$COUNTRYCODE" ]; then
+     fi
+     # Calculate the country code from the country name
+     # (and check it)
+     COUNTRYCODE="$(country2code "$RET")" || true
+     if [ -n "$COUNTRYCODE" ]; then
 		break
-	else
+     else
 		# If the code cannot be found, the user probably
 		# selected a while region.
 		# TODO display error message?
 		:
-	fi
+     fi
   done
 else
   db_fset "countrychooser/country-name" seen true
