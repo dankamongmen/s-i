@@ -7,12 +7,13 @@
 #include "anna.h"
 
 struct debconfclient *debconf = NULL;
+static char *running_kernel = NULL, *subarchitecture;
 
 static int
 choose_retriever(di_packages *status, di_packages **packages __attribute__((unused)), di_packages_allocator **packages_allocator __attribute__((unused)))
 {
     char *choices;
-   di_package **retrievers;
+    di_package **retrievers;
 
     retrievers = get_retriever_packages(status);
     if (!retrievers)
@@ -66,15 +67,12 @@ is_queued(di_package *package)
 static int
 choose_modules(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator)
 {
-    char *choices, *running_kernel = NULL, *subarchitecture;
+    char *choices;
     int package_count = 0;
     di_package *package, *status_package, **package_array;
     di_slist_node *node, *node1;
-    struct utsname uts;
 
     config_retriever();
-    if (uname(&uts) == 0)
-        running_kernel = uts.release;
 
     *packages_allocator = di_system_packages_allocator_alloc();
     *packages = get_packages(*packages_allocator);
@@ -93,8 +91,6 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 	}
     }
 
-    /* XXX enhances is not a legal field for udebs, so why is this here?
-     *    -- JEH */
     for (node = status->list.head; node; node = node->next) {
         status_package = node->data;
         if (status_package->status == di_package_status_unpacked || status_package->status == di_package_status_installed) {
@@ -111,11 +107,6 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
             }
         }
     }
-
-    if (debconf_get(debconf, "debian-installer/kernel/subarchitecture"))
-      subarchitecture = strdup("generic");
-    else
-      subarchitecture = strdup(debconf->value);
 
     for (node = (*packages)->list.head; node; node = node->next) {
         package = node->data;
@@ -159,7 +150,7 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     /* Drop packages in udeb_exclude */
     drop_excludes(*packages);
 
-    di_system_packages_resolve_dependencies_mark_kernel(*packages);
+    di_system_packages_resolve_dependencies_mark_anna(*packages, subarchitecture, running_kernel);
 
     /* Slight over-allocation, but who cares */
     package_array = di_new0(di_package *, di_hash_table_size((*packages)->table));
@@ -212,7 +203,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
         }
     }
 
-    di_system_packages_resolve_dependencies_mark_kernel(packages);
+    di_system_packages_resolve_dependencies_mark_anna(packages, subarchitecture, running_kernel);
 
     for (node = packages->list.head; node; node = node->next) {
         package = node->data;
@@ -334,11 +325,20 @@ main(int argc, char **argv)
     };
     di_packages *packages = NULL, *status;
     di_packages_allocator *packages_allocator = NULL, *status_allocator;
+    struct utsname uts;
 
     debconf = debconfclient_new();
     debconf_capb(debconf, "backup");
 
     di_system_init("anna");
+
+    if (debconf_get(debconf, "debian-installer/kernel/subarchitecture"))
+        subarchitecture = strdup("generic");
+    else
+        subarchitecture = strdup(debconf->value);
+
+    if (uname(&uts) == 0)
+        running_kernel = strdup(uts.release);
 
     status_allocator = di_system_packages_allocator_alloc();
     status = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, status_allocator);
