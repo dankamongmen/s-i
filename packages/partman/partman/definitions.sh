@@ -492,7 +492,15 @@ humandev () {
 	    db_metaget partman/text/raid_device description
 	    printf "$RET" ${type} ${device}
 	*)
-	    echo "$1"
+	    # Check if it's an LVM device
+	    vg=`echo "$1" | sed -e 's,/dev/\([^/]\+\).*,\1,'`
+	    lv=`echo "$1" | sed -e 's,/dev/[^/]\+/,,'`
+	    if [ -e "/proc/lvm/VGs/$vg/LVs/$lv" ] ; then
+		db_metaget partman/text/lvm_lv description
+		printf "$RET" $vg $lv
+	    else
+		echo "$1"
+	    fi
 	    ;;
     esac
 }
