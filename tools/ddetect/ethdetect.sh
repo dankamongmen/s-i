@@ -74,4 +74,8 @@ do
     db_fset ethdetect/cannot_find seen false
     db_input high ethdetect/cannot_find
     db_go || break
+
+    if [ -z "$CHOICES" ]; then
+	    exit 1
+    fi
 done
