@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.17 2000/11/29 02:44:30 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.18 2000/11/29 04:13:31 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -397,6 +397,6 @@ int main(int argc, char **argv)
 
 	/* if it falls through to here, some of the command line options were
 	   wrong */
-	printf("udpkg <-i|-r|-u|-c> my.deb\n");
+	fprintf(stderr, "udpkg <-i|-r|-u|-c> my.deb\n");
 	return 0;
 }

@@ -1,4 +1,4 @@
-/* $Id: udpkg_main.c,v 1.1 2000/11/20 23:43:34 bug1 Exp $ */
+/* $Id: udpkg_main.c,v 1.2 2000/11/29 04:13:31 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -42,14 +42,14 @@ int main(int argc, char **argv)
 			funct |= UDPKG_UNPACK;
 			break;
 		default:
-			printf("udpkg <-i|-r|-u|-c> my.deb\n");
+			fprintf(stderr, "udpkg <-i|-r|-u|-c> my.deb\n");
 			return(EXIT_FAILURE);
 		}
 	}
 
 	/* Check that a package was specified */
 	if (optind == argc) {
-		printf("you didnt specify a package\n");
+		fprintf(stderr, "you didnt specify a package\n");
 		return(EXIT_FAILURE);
 	}
 

@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.13 2000/11/29 02:44:30 joeyh Exp $ */
+/* $Id: status.c,v 1.14 2000/11/29 04:13:31 tausq Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -85,7 +85,7 @@ static const char *status_print(unsigned long flags)
 		}
 		if (statuswords[i][j] == 0)
 		{
-			printf("corrupted status flag!!\n");
+			fprintf(stderr, "corrupted status flag!!\n");
 			return NULL;
 		}
 	}
@@ -144,7 +144,7 @@ void *status_read(void)
 		perror(STATUSFILE);
 		return 0;
 	}
-	printf("(Reading database...)\n");
+	fprintf(stderr, "(Reading database...)\n");
 	while (!feof(f))
 	{
 		m = (struct package_t *)malloc(sizeof(struct package_t));
@@ -166,7 +166,7 @@ void *status_read(void)
 				t = *(struct package_t **)tsearch(p, &status, package_compare);
 				if (!(t == p))
 				{
-					printf("already provided, freeing\n");
+					fprintf(stderr, "already provided, freeing\n");
 					free(p->package);
 					free(p);
 				}
@@ -210,7 +210,7 @@ int status_merge(void *status, struct package_t *pkgs)
 		perror(STATUSFILE ".new");
 		return 0;
 	}
-	printf("(Updating database...)\n");
+	fprintf(stderr, "(Updating database...)\n");
 	while (fgets(buf, BUFSIZE, fin) && !feof(fin))
 	{
 		buf[strlen(buf)-1] = 0; /* trim newline */
