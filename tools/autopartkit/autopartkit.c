@@ -1247,16 +1247,17 @@ int main (int argc, char *argv[])
     const char *tablefile = NULL;
     int retval = 1;
     
+    client = debconfclient_new ();
+
     autopartkit_log(1, "Using '%s' default disk label type\n",
 		    default_disk_label());
 
 #if defined(LVM_HACK)
     if (0 != lvm_init())
         autopartkit_log(1, "Unable to initialize LVM support.  "
-			"Continuing anyway.");
+			"Continuing anyway.\n");
 #endif /* LVM_HACK */
 
-    client = debconfclient_new ();
     mydebconf_set_title("Automatic Partitionner");
 
     disable_kmsg(1);
