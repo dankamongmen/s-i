@@ -31,5 +31,6 @@ int main () {
 	di_exec_shell("/usr/bin/clear");
 
 	chdir("/");
-	execl("/bin/sh", "/bin/sh", NULL);
+	system("/bin/sh");
+	exit(0);
 }
