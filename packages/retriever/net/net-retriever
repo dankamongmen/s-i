@@ -19,8 +19,20 @@ if [ -n "$proxy" ]; then
 fi
 
 fetch() {
-    wget -c -q "${protocol}://${hostname}${directory}/$1" -O "$2"
-    return $?
+    url="${protocol}://${hostname}${directory}/$1"
+    if [ ! -e "$2" ]; then
+      wget -q "$url" -O "$2"
+      return $?
+    else
+      # busybox wget can sometimes become confused while resuming,
+      # so it it fails, restart
+      if wget -c -q "$url" -O "$2"; then
+        return 0
+      else
+	wget -q "$url" -O "$2"
+	return $?
+      fi
+    fi
 }
 
 cmd="$1"
