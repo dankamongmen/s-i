@@ -20,6 +20,10 @@
 #define COLS		SLtt_Screen_Cols
 #define UIDATA(obj) 	((struct uidata *)(obj)->data)
 
+#ifndef _
+#define _(x) x
+#endif
+
 /* Private variables */
 struct uidata {
 	struct slwindow qrywin, descwin;
@@ -92,7 +96,7 @@ static void slang_initwin(struct frontend *ui, int type, struct slwindow *win)
 			"black", "yellow");
 		break;
 	default:
-		INFO(INFO_DEBUG, "Unrecognized window type");
+		INFO(INFO_DEBUG, _("Unrecognized window type"));
 	}
 }
 
@@ -256,13 +260,13 @@ static void slang_navbuttons(struct frontend *ui, struct question *q,
 	if (ui->cangoback(ui, q))
 	{
 		slang_printf(ybut - 1, 2, (selected == 0 ? win->selectedcolor :
-			win->drawcolor), " <Previous> ");
+			win->drawcolor), _(" <Previous> "));
 	}
 
 	if (ui->cangoforward(ui, q))
 	{
 		slang_printf(ybut - 1, COLS-10, (selected == 1 ? 
-			win->selectedcolor : win->drawcolor), " <Next> ");
+			win->selectedcolor : win->drawcolor), _(" <Next> "));
 	}
 
 	/* caller should call slang_flush() ! */
@@ -285,9 +289,11 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	{
 		/* Draw the radio boxes */
 		slang_printf(ybut, (COLS/2)-11, (pos == 2 ? win->selectedcolor :
-			win->drawcolor), " (%c) Yes ", (ans ? '*' : ' '));
+			win->drawcolor), " (%c) %s ", (ans ? '*' : ' '), 
+			_("Yes"));
 		slang_printf(ybut, (COLS/2)+4, (pos == 3 ? win->selectedcolor :
-			win->drawcolor), " (%c) No ", (ans ? ' ' : '*'));
+			win->drawcolor), " (%c) %s ", (ans ? ' ' : '*'),
+			_("No"));
 
 		slang_navbuttons(ui, q, pos);
 
@@ -308,11 +314,6 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	return ret;
 }
 
-static int slang_multiselect(struct frontend *ui, struct question *q)
-{
-	return 0;
-}
-
 static int slang_note(struct frontend *ui, struct question *q)
 {
 	int ret = 0, pos = 0;
@@ -331,32 +332,34 @@ static int slang_note(struct frontend *ui, struct question *q)
 	return ret;
 }
 
-static int slang_select(struct frontend *ui, struct question *q)
+static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 {
-	const char *value = NULL;
 	char *choices[100] = {0};
-	int i, count, ret = 0, val = 0, pos = 2, xpos, ypos;
+	char *defaults[100] = {0};
+	char selected[100] = {0};
+	char answer[1024] = {0};
+	int i, j, count, dcount, ret = 0, val = 0, pos = 2, xpos, ypos;
 	int top, bottom, longest, ch;
 	struct uidata *uid = UIDATA(ui);
 	struct slwindow *win = &uid->qrywin;
 
 	/* Parse out all the choices */
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
+	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
 	if (count <= 0) return DC_NOTOK;
 
 	/* See what the currently selected value should be -- either a
 	 * previously selected value, or the default for the question
 	 */
-	value = question_defaultval(q);
-	if (value != NULL)
+	for (j = 0; j < dcount; j++)
 	{
 		for (i = 0; i < count; i++)
-			if (strcmp(choices[i], value) == 0)
-				val = i;
+			if (strcmp(choices[i], defaults[j]) == 0)
+				selected[i] = 1;
 	}
 
 	longest = strlongest(choices, count);
-	top = val - win->h + 8;
+	top = 0;
 	if (top < 0) top = 0;
 	xpos = (COLS-longest)/2-1;
 
@@ -366,9 +369,10 @@ static int slang_select(struct frontend *ui, struct question *q)
 		bottom = top + MIN(count, win->h - 7);
 		for (i = top; i < bottom; i++)
 		{
-			slang_printf(ypos++, xpos, (i == val ?
+			slang_printf(ypos++, xpos, ((pos == 2 && i == val) ?
 				win->selectedcolor : win->drawcolor),
-				" %-*s ", longest, choices[i]);
+				"(%c) %-*s ", (selected[i] ? '*' : ' '), 
+				longest, choices[i]);
 		}
 
 		slang_navbuttons(ui, q, pos);
@@ -404,12 +408,45 @@ static int slang_select(struct frontend *ui, struct question *q)
 			{
 			case 0: ret = DC_GOBACK; break;
 			case 1: ret = DC_OK; break;
+			default: 
+				if (multi == 0)
+				{
+					memset(selected, 0, sizeof(selected));
+					selected[val] = 1;
+				}
+				else
+				{
+					selected[val] = !selected[val];
+				}
 			}
 		}
 	}
-	if (ret == DC_OK)
-		question_setvalue(q, choices[val]);
-	return ret;
+	if (ret != DC_OK) return ret;
+
+	for (i = 0; i < count; i++)
+	{
+		if (selected[i])
+		{
+			if (answer[0] != 0)
+				strvacat(answer, sizeof(answer), ", ");
+			strvacat(answer, sizeof(answer), choices[i], NULL);
+		}
+		free(choices[i]);
+	}
+	for (i = 0; i < dcount; i++)
+		free(defaults[i]);
+	question_setvalue(q, answer);
+	return DC_OK;
+}
+
+static int slang_select(struct frontend *ui, struct question *q)
+{
+	return slang_getselect(ui, q, 0);
+}
+
+static int slang_multiselect(struct frontend *ui, struct question *q)
+{
+	return slang_getselect(ui, q, 1);
 }
 
 static int slang_getstring(struct frontend *ui, struct question *q, char showch)
