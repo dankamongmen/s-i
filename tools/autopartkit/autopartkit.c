@@ -99,10 +99,8 @@
 #define IGNORE_DEVFS_DEVICES
 
 #if defined(TEST)
-#define LOGFILE "autopartkit.log"
 #define FSTAB   "fstab"
 #else /* not TEST */
-#define LOGFILE "/var/log/messages"
 #define FSTAB   "/target/etc/fstab"
 #endif /* not TEST */
 
