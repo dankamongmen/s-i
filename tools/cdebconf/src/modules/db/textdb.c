@@ -15,7 +15,7 @@ static void translate_tag_name(char *buf)
 	/* remove / from the tag name so that we can use it as a filename */
 	char *t = buf;
 	for (; *t != 0; t++)
-		if (*t == '/') *t = '_';
+		if (*t == '/') *t = ':';  /* : is illegal in templates etc */
 }
 
 static char *template_filename(struct configuration *cfg, const char *tag)
@@ -48,6 +48,45 @@ static char *question_filename(struct configuration *cfg, const char *tag)
 		TEXTDB_QUESTION_PATH), tagname);
 
 	return filename;
+}
+
+static struct template *textdb_lookup_cached_template(
+	const struct database *db, const char *tag)
+{
+	struct db_cache *dbdata = db->data;
+	struct template *result;
+	for (result = dbdata->templates; result; result = result->next)
+	{
+		if (strcmp(result->tag, tag) == 0) break;
+	}
+	return result;
+}
+
+static void textdb_remove_cached_template(struct database *db,
+	const char *tag)
+{
+	struct db_cache *dbdata = db->data;
+	struct template **result;
+	for (result = &dbdata->templates; *result; result = &(*result)->next)
+	{
+		if (strcmp((*result)->tag, tag) == 0)
+		{
+			*result = (*result)->next;
+			break;
+		}
+	}
+}
+
+static struct question *textdb_lookup_cached_question(
+	const struct database *db, const char *tag)
+{
+	struct db_cache *dbdata = db->data;
+	struct question *result;
+	for (result = dbdata->questions; result; result = result->next) 
+	{
+		if (strcmp(result->tag, tag) == 0) break;
+	}
+	return result;
 }
 
 static int textdb_initialize(struct database *db, struct configuration *cfg)
@@ -106,7 +145,7 @@ static int textdb_template_add(struct database *db, struct template *t)
 	return DC_OK;
 }
 
-static struct template *textdb_template_get2(struct database *db, 
+static struct template *textdb_template_get_real(struct database *db, 
 	const char *ltag)
 {
 	struct configuration *rec;
@@ -148,14 +187,12 @@ static struct template *textdb_template_get2(struct database *db,
 static struct template *textdb_template_get(struct database *db, 
 	const char *ltag)
 {
-	struct db_cache *dbdata = db->data;
 	struct template *result;
 
-	for (result = dbdata->templates; result; result = result->next) {
-		if (strcmp(result->tag, ltag) == 0) return result;
-	}
-	result = textdb_template_get2(db, ltag);
-	if (result) {
+	result = textdb_lookup_cached_template(db, ltag);
+	if (!result && (result = textdb_template_get_real(db, ltag)))
+	{
+		struct db_cache *dbdata = db->data;
 		result->next = dbdata->templates;
 		dbdata->templates = result;
 	}
@@ -167,6 +204,8 @@ static int textdb_template_remove(struct database *db, const char *tag)
 	char *filename;
 
 	if (tag == NULL) return DC_NOTOK;
+
+	textdb_remove_cached_template(db, tag);
 
 	filename = template_filename(db->config, tag);
 	if (unlink(filename) == 0)
@@ -301,10 +340,12 @@ struct database_module debconf_database_module =
 	initialize: textdb_initialize,
 	load: textdb_load,
 	save: textdb_save,
+
 	template_add: textdb_template_add,
 	template_get: textdb_template_get,
 	template_remove: textdb_template_remove,
 	template_iterate: textdb_template_iterate,
+
 	question_add: textdb_question_add,
 	question_get: textdb_question_get,
 	question_set: textdb_question_add,	/* no separate set method */
