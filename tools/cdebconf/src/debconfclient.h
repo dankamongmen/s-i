@@ -62,6 +62,21 @@ void debconfclient_delete(struct debconfclient *client);
 #define DEBCONF_OLD_STDOUT_FD   5
 
 /**
+ * @brief command codes returned by debconf commands
+ */
+typedef enum {
+	CMD_SUCCESS 		= 0,
+	CMD_BADQUESTION		= 10,
+	CMD_BADPARAM		= 15,
+	CMD_SYNTAXERROR		= 20,
+	CMD_INPUTINVISIBLE	= 30, // from debconf_input()
+	CMD_BADVERSION		= 30, // from debconf_version()
+	CMD_GOBACK		= 30, // from debconf_go()
+	CMD_INTERNALERROR	= 100
+} cmdstatus_t;
+
+	
+/**
  * @}
  */
 
