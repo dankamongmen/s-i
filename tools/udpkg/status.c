@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.24 2002/01/23 16:17:56 tfheen Exp $ */
+/* $Id: status.c,v 1.25 2002/04/21 09:53:17 tfheen Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -92,17 +92,20 @@ static const char *status_print(unsigned long flags)
 	return buf;
 }
 
-int read_block(FILE *f, char *multiple_lines)
+int read_block(FILE *f, char **ml)
 {
 	char ch;
+        char *multiple_lines = *ml;
 	char buf[BUFSIZE];
 
 	while (((ch = fgetc(f)) == ' ') && !feof(f)) {
 		fgets(buf, BUFSIZE, f);
 		multiple_lines = (char *) realloc(multiple_lines, strlen(multiple_lines) + strlen(buf) + 2);
+                memset(multiple_lines + strlen(multiple_lines), '\0', strlen(buf) + 2);
 		strcat(multiple_lines, " ");
 		strcat(multiple_lines, buf);
 	}
+        *ml = multiple_lines;
 	ungetc(ch, f);
 	return EXIT_SUCCESS;
 }
@@ -139,23 +142,26 @@ void control_read(FILE *f, struct package_t *p)
 		else if (strstr(buf, "Description: ") == buf)
 		{
 			p->description = strdup(buf+13);
-			p->long_description = malloc(1);
-			read_block(f, p->long_description);
+			p->long_description = strdup(" ");
+			read_block(f, &p->long_description);
 		}
-		else if (strstr(buf, "Description-") == buf)
+#ifdef DOL18N
+		else if (strstr(buf, "description-") == buf)
 		{
 			/* Localized description */
 			struct language_description_t *l;
-			fprintf(stderr,"FOUND LOCALIZED: %s\n",buf);
 			l = malloc(sizeof(struct language_description_t));
+                        memset(l,'\0',sizeof (struct language_description_t));
 			l->next = p->localized_descriptions;
 			p->localized_descriptions = l;
 			buf[14] = '\0';
 			l->language = strdup(buf+12);
 			l->description = strdup(buf+16);
-			l->long_description = malloc(1);
-			read_block(f, l->long_description);
+			l->long_description = strdup(" ");
+			read_block(f, &l->long_description);
+                        
 		}
+#endif
 		/* This is specific to the Debian Installer. Ifdef? */
 		else if (strstr(buf, "installer-menu-item: ") == buf) 
 		{
@@ -191,8 +197,8 @@ void control_read(FILE *f, struct package_t *p)
 		}
 		else if (strstr(buf, "Conffiles: ") == buf)
 		{
-			p->conffiles = malloc(1);
-			read_block(f, p->conffiles);
+                        p->conffiles = strdup(" ");
+			read_block(f, &p->conffiles);
 		}
 
 	}
@@ -352,18 +358,23 @@ int status_merge(void *status, struct package_t *pkgs)
 		if (pkg->conffiles)
 			fprintf(fout, "Conffiles:\n %s\n", pkg->conffiles);
 		if (pkg->description)
-			fprintf(fout, "Description: %s\n%s\n", pkg->description, pkg->long_description);
+			fprintf(fout, "Description: %s\n%s", pkg->description, pkg->long_description);
+#ifdef DOL18N
 		if (pkg->localized_descriptions) {
 			struct language_description_t *ld;
 			ld = pkg->localized_descriptions;
 			while (ld) {
-				fprintf(fout, "Description-%s: %s\n%s\n", 
-					ld->language,
-					ld->description, 
-					ld->long_description);
+                                if (ld->language && ld->description && 
+                                    ld->long_description) {
+                                        fprintf(fout, "description-%s: %s\n%s", 
+                                                ld->language,
+                                                ld->description, 
+                                                ld->long_description);
+                                }
 				ld = ld->next;
 			}
 		}
+#endif
 		if (pkg->installer_menu_item)
 			fprintf(fout, "installer-menu-item: %i\n", pkg->installer_menu_item);
 		fputc('\n', fout);

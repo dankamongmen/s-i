@@ -31,6 +31,18 @@ if test "$with_depends" != "no"; then
   AC_DEFINE(DODEPENDS)
 fi
 
+dnl Do dependency checking?
+AC_ARG_WITH(loadtemplate,[  --without-loadtemplate  do not call debconf-loadtemplate])
+if test "$with_loadtemplate" != "no"; then
+  AC_DEFINE(DOLOADTEMPLATE)
+fi
+
+dnl Do dependency checking?
+AC_ARG_WITH(l18n,[  --without-l18n          do not support localized status files])
+if test "$with_l18n" != "no"; then
+  AC_DEFINE(SUPPORTL18N)
+fi
+
 dnl dpkg library directory
 ADMINDIR="/var/lib/dpkg"
 AC_ARG_WITH(admindir,[  --with-admindir=DIR     store dpkg data in DIR [/var/lib/dpkg]],
