@@ -23,10 +23,10 @@ usage (char *basename)
 {
   fprintf (stderr, "Usage:\n");
   fprintf (stderr, "%s [options]\n", basename);
-  fprintf (stderr, "-e select ethernet cards");
-  fprintf (stderr, "-c select cdroms");
-  fprintf (stderr, "-s select sound cards");
-  fprintf (stderr, "-m select modems");
+  fprintf (stderr, "-e select ethernet cards\n");
+  fprintf (stderr, "-c select cdroms\n");
+  fprintf (stderr, "-s select sound cards\n");
+  fprintf (stderr, "-m select modems\n");
   exit (1);
 }
 
