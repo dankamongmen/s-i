@@ -93,10 +93,11 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 
     for (node = status->list.head; node; node = node->next) {
         status_package = node->data;
+        package = di_packages_get_package(*packages, status_package->package, 0);
+        if (!package)
+            continue;
+        package->status = status_package->status;
         if (status_package->status == di_package_status_unpacked || status_package->status == di_package_status_installed) {
-            package = di_packages_get_package(*packages, status_package->package, 0);
-            if (!package)
-                continue;
             for (node1 = package->depends.head; node1; node1 = node1->next) {
                 di_package_dependency *d = node1->data;
                 if (d->type == di_package_dependency_type_reverse_enhances)
