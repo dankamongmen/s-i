@@ -3,13 +3,40 @@
 log=/var/log/messages
 queue=/var/lib/apt-install/queue
 
-# The C.UTF-8 locale is not usable inside /target/.  Unset it here to avoid
-# warnings like 'perl: warning: Setting locale failed.'.
-if [ "$LANG" = "C.UTF-8" ] ; then
-	unset LANG
-fi
+mountpoints () {
+	cut -d" " -f2 /proc/mounts | sort | uniq
+}
 
-# Add to list of extra packages (to be) installed into /target/.
+# Create a policy-rc.d to stop maintainer scripts using invoke-rc.d from
+# running init scripts. In case of maintainer scripts that don't use
+# invoke-rc.d, add a dummy start-stop-daemon.
+disable_daemons () {
+	cat > /target/usr/sbin/policy-rc.d <<EOF
+#!/bin/sh
+exit 101
+EOF
+	chmod a+rx /target/usr/sbin/policy-rc.d
+	
+	if [ -e /target/sbin/start-stop-daemon ]; then
+		mv /target/sbin/start-stop-daemon /target/sbin/start-stop-daemon.REAL
+	fi
+	cat > /target/sbin/start-stop-daemon <<EOF
+#!/bin/sh
+echo 1>&2
+echo 'Warning: Fake start-stop-daemon called, doing nothing.' 1>&2
+exit 0
+EOF
+	chmod a+rx /target/sbin/start-stop-daemon
+}
+
+enable_daemons () {
+	rm -f /target/usr/sbin/policy-rc.d
+	
+	rm /target/sbin/start-stop-daemon
+	mv /target/sbin/start-stop-daemon.REAL /target/sbin/start-stop-daemon
+}
+
+# Add to list of extra packages to be installed into /target/.
 mkdir -p /var/lib/apt-install
 touch $queue
 for pkg in $@ ; do
@@ -24,8 +51,14 @@ if [ ! -f /target/etc/apt/sources.list ] ; then
 	exit 1 # Return error as the package is not ready to be used yet.
 fi
 
+# The C.UTF-8 locale is not usable inside /target/.  Unset it here to avoid
+# warnings like 'perl: warning: Setting locale failed.'.
+if [ "$LANG" = "C.UTF-8" ] ; then
+	unset LANG
+fi
+
 # Try to enable proxy when using HTTP.  What about using ftp_proxy for
-# FTP sources?  (This code is in both apt-install and base-installer)
+# FTP sources?
 RET=`debconf-get mirror/protocol || true`
 if [ "http" = "$RET" ]; then
 	# try to find http proxy
@@ -45,10 +78,11 @@ unset DEBIAN_HAS_FRONTEND
 unset DEBIAN_FRONTEND
 unset DEBCONF_FRONTEND
 unset DEBCONF_REDIR
-
-mountpoints () {
-	cut -d" " -f2 /proc/mounts | sort | uniq
-}
+# Avoid debconf mailing notes at this point, or asking questions.
+DEBCONF_ADMIN_EMAIL=""
+export DEBCONF_ADMIN_EMAIL
+DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND
 
 # Record the current mounts
 mountpoints > /tmp/mount.pre
@@ -59,9 +93,10 @@ if [ ! -f /target/proc/cmdline ] ; then
 	mount -t proc proc /target/proc
 fi
 
-DEBCONF_ADMIN_EMAIL="" \
-DEBIAN_FRONTEND=noninteractive \
-chroot /target apt-get -y install $@ < /dev/null >> $log 2>&1
+disable_daemons
+ERRCODE=0
+chroot /target apt-get -y install $@ < /dev/null >> $log 2>&1 || ERRCODE=$?
+enable_daemons
 
 # Undo the mounts done by the packages during installation.
 # Reverse sorting to umount the deepest mount points first.
@@ -73,7 +108,10 @@ for dir in $( (cat /tmp/mount.pre /tmp/mount.pre; mountpoints ) | \
 		logger -t apt-install "warning: Unable to umount '$dir'"
 	fi
 done
-
 rm -f /tmp/mount.pre
 
-exit 0
+if [ "$ERRCODE" != 0 ]; then
+	exit 1
+else
+	exit 0
+fi
