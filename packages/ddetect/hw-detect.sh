@@ -248,6 +248,9 @@ get_input_info() {
 # The order of these modules are important.
 get_manual_hw_info() {
 	get_floppy_info
+	# Load explicitly rather than implicitly to allow the user to
+	# specify parameters when the module is loaded.
+	echo "ide-core:Linux IDE support"
 	# ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
 	echo "ide-mod:Linux IDE driver"
 	echo "ide-probe-mod:Linux IDE probe driver"
