@@ -80,7 +80,7 @@ binary-indep: build install
 	$(foreach PACKAGE, $(INDEP_PACKAGES), \
 	( if [ -f debian/$(PACKAGE).menutest ]; then \
 	  install debian/$(PACKAGE).menutest debian/$(PACKAGE)/DEBIAN/menutest ; fi; \
-	 dpkg-gencontrol -Pdebian/$(PACKAGE) -p$(PACKAGE) \
+	 dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
 	-n$(PACKAGE)_$(VERSION)_all.udeb ) ; )
 	@$(foreach PACKAGE, $(INDEP_PACKAGES), \
 	(cd debian ; \
@@ -98,7 +98,7 @@ binary-arch: build install
 	dh_installdeb
 	dh_shlibdeps
 	$(foreach PACKAGE, $(ARCH_PACKAGES), \
-	( dpkg-gencontrol -Pdebian/$(PACKAGE) -p$(PACKAGE) \
+	( dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
 	-n$(PACKAGE)_$(VERSION)_$(ARCH).udeb ) ; )
 	@$(foreach PACKAGE, $(ARCH_PACKAGES), \
 	(cd debian ; \
