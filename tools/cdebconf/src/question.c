@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.14 2002/11/17 21:21:19 tfheen Exp $
+ * $Id: question.c,v 1.15 2002/11/18 00:37:10 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -42,6 +42,8 @@
 #include "strutl.h"
 #include "configuration.h"
 #include "database.h"
+
+static char *cur_lang = NULL;
 
 struct question *question_new(const char *tag)
 {
@@ -229,129 +231,42 @@ static int question_expand_vars(struct question *q, const char *field,
 	return DC_OK;
 }
 
-/*
- * Function: getlanguage
- * Input: none
- * Output: const char* (size == 3) the language code of the currently 
- *         selected language
- * Description: find the currently selected language
- * Assumptions: config_new and database_new succeeds, 
- *              debian-installer/language exists
- */
-
-const char *getlanguage()
+const char *getlanguage(void)
 {
-#if 0   /* FIXME */
-    static struct database *db = NULL;
-    static struct configuration *config = NULL;
-	static char language[3];
-	/* We need to directly access the configuration, since I couldn't
-	   get debconfclient to work from in here. */
-	struct question *q2 = NULL;
-        memset(language,'\0',3);
-
-	if (! config) /* Then db isn't set either.. */
+	if (cur_lang == NULL)
 	{
-		config = config_new();
-                if (config == 0) 
-                        DIE("Error initializing configuration item (%s %d)", __FILE__,__LINE__);
-		if (config->read(config, DEBCONFCONFIG) == 0)
-			DIE("Error reading configuration information");
-		if ((db = database_new(config)) == 0)
-			DIE("Cannot initialize DebConf database");
-		db->load(db);
+		if (getenv("DEBCONF_LANG")) 
+			cur_lang = strdup(getenv("DEBCONF_LANG"));
+		else
+			cur_lang = strdup("C");
 	}
-	q2 = db->question_get(db, "debian-installer/language");
-        if (q2 != NULL) {
-                if (q2->value != NULL)
-                        snprintf(language,3,"%.2s",q2->value);
-                question_deref(q2);
-        }
-	return language;
-#else
-    return "";
-#endif
+	return cur_lang;
 }
 
-const char *question_description(struct question *q)
+const char *question_get_field(struct question *q, const char *field)
 {
 	static char buf[4096] = {0};
-	struct language_description *langdesc;
-
-	langdesc = q->template->localized_descriptions;
-	while (langdesc)
-	{
-		if (strcmp(langdesc->language,getlanguage()) == 0) 
-		{
-			question_expand_vars(q, langdesc->description, buf, sizeof(buf));
-			return buf;
-		}
-		langdesc = langdesc->next;
+	if (strcmp(field, "default") == 0) {
+		if (q->value != 0 && *q->value != 0)
+			return q->value;
+		else
+			return q->template->get(q->template, field);
 	}
-	question_expand_vars(q, q->template->description, buf, sizeof(buf));
+	question_expand_vars(q,
+		q->template->get(q->template, field),
+		buf, sizeof(buf));
 	return buf;
 }
 
-const char *question_extended_description(struct question *q)
+const char *question_get_translated_field(struct question *q, const char *field)
 {
 	static char buf[4096] = {0};
-	question_expand_vars(q, q->template->extended_description, buf, sizeof(buf));
-	return buf;
-}
-
-const char *question_extended_description_translated(struct question *q)
-{
-	static char buf[4096] = {0};
-	struct language_description *langdesc;
-
-	langdesc = q->template->localized_descriptions;
-	while (langdesc)
-	{
-		if (strcmp(langdesc->language,getlanguage()) == 0 && langdesc->description != NULL)
-		{
-			question_expand_vars(q, langdesc->extended_description, buf, sizeof(buf));
-			return buf;
-		}
-		langdesc = langdesc->next;
+	if (strcmp(field, "default") == 0) {
+		if (q->value != 0 && *q->value != 0)
+			return q->value;
 	}
-	question_expand_vars(q, q->template->extended_description, buf, sizeof(buf));
+	question_expand_vars(q,
+		q->template->lget(q->template, getlanguage(), field),
+		buf, sizeof(buf));
 	return buf;
 }
-
-const char *question_choices_translated(struct question *q)
-{
-	static char buf[4096] = {0};
-	struct language_description *langdesc;
-
-	langdesc = q->template->localized_descriptions;
-	while (langdesc)
-	{
-		if (strcmp(langdesc->language,getlanguage()) == 0 && langdesc->choices != NULL)
-		{
-			question_expand_vars(q, langdesc->choices, buf, sizeof(buf));
-			return buf;
-		}
-		langdesc = langdesc->next;
-	}
-	question_expand_vars(q, q->template->choices, buf, sizeof(buf));
-	return buf;
-}
-
-const char *question_choices(struct question *q)
-{
-	static char buf[4096] = {0};
-	question_expand_vars(q, q->template->choices, buf, sizeof(buf));
-	return buf;
-}
-
-const char *question_defaultval(struct question *q)
-{
-	if (q->value != 0 && *q->value != 0)
-		return q->value;
-	else {
-		static char buf[4096] = {0}; /* FIXME */
-		question_expand_vars(q, q->template->defaultval, buf, sizeof(buf));
-		return buf;
-	}
-}
-

@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.16 2002/11/13 14:41:55 waldi Exp $
+ * $Id: text.c,v 1.17 2002/11/18 00:37:10 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -119,8 +119,8 @@ static void wrap_print(const char *str)
  */
 static void texthandler_displaydesc(struct frontend *obj, struct question *q) 
 {
-	wrap_print(question_description(q));
-	wrap_print(question_extended_description(q));
+	wrap_print(question_get_translated_field(q, "description"));
+	wrap_print(question_get_translated_field(q, "extended_description"));
 }
 
 /*
@@ -138,7 +138,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	int def = -1;
 	const char *defval;
 
-	defval = question_defaultval(q);
+	defval = question_get_field(q, "default");
 	if (defval)
 	{
 		if (strcmp(defval, "true") == 0)
@@ -184,25 +184,28 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 static int texthandler_multiselect(struct frontend *obj, struct question *q)
 {
 	char *choices[100] = {0};
+	char *choices_translated[100] = {0};
 	char *defaults[100] = {0};
 	char selected[100] = {0};
-	char answer[1024];
+	char answer[1024] = {0};
 	int i, j, count, dcount, choice;
 
-	count = strchoicesplit(question_choices(q), choices, DIM(choices));
-	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
+	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
+	if (count <= 0) return DC_NOTOK;
 
-	if (dcount > 0)
+	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
+	dcount = strchoicesplit(question_get_field(q, "default"), defaults, DIM(defaults));
+
+	for (j = 0; j < dcount; j++)
 		for (i = 0; i < count; i++)
-			for (j = 0; j < dcount; j++)
-				if (strcmp(choices[i], defaults[j]) == 0)
-					selected[i] = 1;
+			if (strcmp(choices[i], defaults[j]) == 0)
+				selected[i] = 1;
 
 	while(1)
 	{
 		for (i = 0; i < count; i++)
 		{
-			printf("%3d. %s%s\n", i+1, choices[i], 
+			printf("%3d. %s%s\n", i+1, choices_translated[i], 
 				(selected[i] ? _(" (selected)") : ""));
 			
 		}
@@ -221,7 +224,6 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 		}
 	}
 
-	answer[0] = 0;
 	for (i = 0; i < count; i++)
 	{
 		if (selected[i])
@@ -231,6 +233,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 			strvacat(answer, sizeof(answer), choices[i], NULL);
 		}
 		free(choices[i]);
+		free(choices_translated[i]);
 	}
 	for (i = 0; i < dcount; i++)
 		free(defaults[i]);
@@ -305,38 +308,37 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	char *choices_translated[100] = {0};
 	char answer[10];
 	int i, count, choice = 1, def = -1;
-	const char *defval = question_defaultval(q);
+	const char *defval = question_get_field(q, "default");
 
-	count = strchoicesplit(question_choices(q), choices, DIM(choices));
-	strchoicesplit(question_choices_translated(q), choices_translated, DIM(choices_translated));
+	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
+	if (count <= 0) return DC_NOTOK;
+
+	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
         /* fprintf(stderr,"In texthandler_select, count is: %d\n", count);*/
-	if (count > 1)
+	if (defval != NULL)
 	{
-		if (defval != NULL)
-		{
-			for (i = 0; i < count; i++)
-				if (strcmp(choices[i], defval) == 0)
-					def = i + 1;
-		}
-
-		do
-		{
-			for (i = 0; i < count; i++)
-				printf("%3d. %s%s\n", i+1, choices_translated[i],
-					(def == i + 1 ? _(" (default)") : ""));
-
-			printf(_("Prompt: 1 - %d> "), count);
-			fgets(answer, sizeof(answer), stdin);
-#if defined(__s390__) || defined (__s390x__)
-			if (answer[0] == '\n' || (answer[0] == '.' && answer[1] == '\n'))
-#else
-			if (answer[0] == '\n')
-#endif
-				choice = def;
-			else
-				choice = atoi(answer);
-		} while (choice <= 0 || choice > count);
+		for (i = 0; i < count; i++)
+			if (strcmp(choices[i], defval) == 0)
+				def = i + 1;
 	}
+
+	do
+	{
+		for (i = 0; i < count; i++)
+			printf("%3d. %s%s\n", i+1, choices_translated[i],
+				(def == i + 1 ? _(" (default)") : ""));
+
+		printf(_("Prompt: 1 - %d> "), count);
+		fgets(answer, sizeof(answer), stdin);
+#if defined(__s390__) || defined (__s390x__)
+		if (answer[0] == '\n' || (answer[0] == '.' && answer[1] == '\n'))
+#else
+		if (answer[0] == '\n')
+#endif
+			choice = def;
+		else
+			choice = atoi(answer);
+	} while (choice <= 0 || choice > count);
 	/*	fprintf(stderr,"In %s, line: %d\n\tanswer: %s, choice[choice]: %s\n",
 		__FILE__,__LINE__,answer, choices[choice - 1]);*/
 	question_setvalue(q, choices[choice - 1]);
@@ -360,7 +362,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 static int texthandler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
-	const char *defval = question_defaultval(q);
+	const char *defval = question_get_field(q, "default");
 	if (defval)
 		printf(_("[default = %s]"), defval);
 	printf("> "); fflush(stdout);

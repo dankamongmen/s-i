@@ -239,7 +239,6 @@ static int rfc822db_template_initialize(struct template_db *db, struct configura
  * Output: DC_OK/DC_NOTOK
  * Description: parse a template db file and put it into the cache
  * Assumptions: the file is in valid rfc822 format
- * TODO: handle localized templates
  */
 static int rfc822db_template_load(struct template_db *db)
 {
@@ -262,8 +261,7 @@ static int rfc822db_template_load(struct template_db *db)
     {
         struct template *tmp;
         const char *name;
-        char tbuf[1024];
-        memset(&tbuf,0,1024);
+        struct rfc822_header *h;
 
         name = rfc822db_header_lookup(header, "name");
         if (name == NULL)
@@ -274,13 +272,10 @@ static int rfc822db_template_load(struct template_db *db)
         }
 
         tmp = template_new(name);
+        for (h = header; h != NULL; h = h->next)
+            if (strcmp(h->header, "Name") != 0)
+                tmp->set(tmp, h->header, h->value);
 
-        tmp->type = rfc822db_header_lookup(header, "type");
-        tmp->defaultval = rfc822db_header_lookup(header, "default");
-        tmp->choices = rfc822db_header_lookup(header, "choices");
-        tmp->description = rfc822db_header_lookup(header, "description");
-        tmp->extended_description = rfc822db_header_lookup(header, "extended_description");
-/*  struct language_description *localized_descriptions; */
         tmp->next = NULL;
         tsearch(tmp, &dbdata->root, nodetemplatecomp);
     }
@@ -292,52 +287,54 @@ static int rfc822db_template_load(struct template_db *db)
 
 void rfc822db_template_dump(const void *node, const VISIT which, const int depth)
 {
-  struct language_description *langdesc;
-  const struct template *t = (*(struct template **) node);
-  switch (which) {
-  case preorder:
-    break;
-  case endorder:
-    break;
-  case postorder: 
-  case leaf:
-        INFO(INFO_VERBOSE, "dumping template %s\n", (t)->tag);
-        
-        fprintf(outf, "Name: %s\n", escapestr((t)->tag));
-        fprintf(outf, "Type: %s\n", escapestr((t)->type));
-        if ((t)->defaultval != NULL)
-            fprintf(outf, "Default: %s\n", escapestr((t)->defaultval));
-        if ((t)->choices != NULL)
-            fprintf(outf, "Choices: %s\n", escapestr((t)->choices));
-        if ((t)->description != NULL)
-            fprintf(outf, "Description: %s\n", escapestr((t)->description));
-        if ((t)->extended_description != NULL)
-            fprintf(outf, "Extended_description: %s\n", escapestr((t)->extended_description));
-        
-        langdesc = (t)->localized_descriptions;
-        while (langdesc) 
+    const char *p, *lang;
+    const char **field;
+    const struct template *t = (*(struct template **) node);
+
+    switch (which) {
+    case preorder:
+        break;
+    case endorder:
+        break;
+    case postorder: 
+    case leaf:
+        p = t->get((struct template *) t, "tag");
+        INFO(INFO_VERBOSE, "dumping template %s\n", p);
+
+        for (field = template_fields_list; *field != NULL; field++)
         {
-            if (langdesc->description != NULL) 
-                fprintf(outf, "Description-%s: %s\n", 
-                    langdesc->language, 
-                    escapestr(langdesc->description));
-            
-            if (langdesc->extended_description != NULL)
-                fprintf(outf, "Extended_description-%s: %s\n", 
-                    langdesc->language, 
-                    escapestr(langdesc->extended_description));
-            
-            if (langdesc->choices != NULL) 
-                fprintf(outf, "Choices-%s: %s\n", 
-                    langdesc->language, 
-                    escapestr(langdesc->choices));
-            
-            langdesc = langdesc->next;
+            p = t->get((struct template *) t, *field);
+            if (p != NULL)
+            {
+                if (strcmp(*field, "tag") == 0)
+                    fprintf(outf, "Name: %s\n", escapestr(p));
+                            else
+                    fprintf(outf, "%c%s: %s\n",
+                        toupper((*field)[0]),
+                        (*field)+1, escapestr(p));
+            }
+        }
+    
+        lang = t->next_lang((struct template *) t, "C");
+        while (lang) 
+        {
+            for (field = template_fields_list; *field != NULL; field++)
+            {
+                p = t->lget((struct template *) t, lang, *field);
+                if (p != NULL)
+                {
+                    if (strcmp(*field, "tag") != 0)
+                        fprintf(outf, "%c%s-%s.UTF-8: %s\n",
+                            toupper((*field)[0]), (*field)+1,
+                            lang, escapestr(p));
+                }
+            }
+            lang = t->next_lang((struct template *) t, lang);
         }
         fprintf(outf, "\n");
-  }
-  
+    }
 }
+  
 static int rfc822db_template_save(struct template_db *db)
 {
     struct template_db_cache *dbdata = db->data;

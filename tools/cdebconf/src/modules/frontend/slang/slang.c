@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.12 2002/11/18 00:01:36 barbier Exp $
+ * $Id: slang.c,v 1.13 2002/11/18 00:37:10 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -197,8 +197,8 @@ static void slang_drawdesc(struct frontend *ui, struct question *q)
 	slang_drawwin(&uid->qrywin);
 	slang_drawwin(&uid->descwin);
 	/* Draw in the descriptions */
-	slang_wrapprint(&uid->qrywin, question_description(q), 0);
-	slang_wrapprint(&uid->descwin, question_extended_description(q),
+	slang_wrapprint(&uid->qrywin, question_get_translated_field(q, "description"), 0);
+	slang_wrapprint(&uid->descwin, question_get_translated_field(q, "extended_description"),
 		uid->descstart);
 
 	/* caller should call slang_flush() ! */
@@ -319,7 +319,7 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	const char *value = "true";
 	int ret = 0, ans, pos = 2;
 
-	value = question_defaultval(q);
+	value = question_get_field(q, "default");
 
 	ans = (strcmp(value, "true") == 0);
 
@@ -373,6 +373,7 @@ static int slang_note(struct frontend *ui, struct question *q)
 static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 {
 	char *choices[100] = {0};
+	char *choices_translated[100] = {0};
 	char *defaults[100] = {0};
 	char selected[100] = {0};
 	char answer[1024] = {0};
@@ -382,8 +383,9 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	struct slwindow *win = &uid->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit(question_choices(q), choices, DIM(choices));
-	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
+	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
+	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
+	dcount = strchoicesplit(question_get_field(q, "default"), defaults, DIM(defaults));
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
 	if (count <= 0) return DC_NOTOK;
 
@@ -391,11 +393,9 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	 * previously selected value, or the default for the question
 	 */
 	for (j = 0; j < dcount; j++)
-	{
 		for (i = 0; i < count; i++)
 			if (strcmp(choices[i], defaults[j]) == 0)
 				selected[i] = 1;
-	}
 
 	longest = strlongest(choices, count);
 	top = 0;
@@ -414,10 +414,10 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 			slang_printf(ypos++, xpos, ((pos == 2 && i == val) ?
 				win->selectedcolor : win->drawcolor),
 				"(%c) %-*s ", (selected[i] ? '*' : ' '), 
-				longest, choices[i]);
+				longest, choices_translated[i]);
 
 			INFO(INFO_VERBOSE, "(%c) %-*s\n", (selected[i] ? '*' : 
-				' '), longest, choices[i]);
+				' '), longest, choices_translated[i]);
 		}
 
 		slang_navbuttons(ui, q, pos);
@@ -477,10 +477,12 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 			strvacat(answer, sizeof(answer), choices[i], NULL);
 		}
 		free(choices[i]);
+		free(choices_translated[i]);
 	}
 	for (i = 0; i < dcount; i++)
 		free(defaults[i]);
 	question_setvalue(q, answer);
+
 	return DC_OK;
 }
 
@@ -505,7 +507,7 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 	int cursor;
 	char *tmp;
 
-	STRCPY(value, question_defaultval(q));
+	STRCPY(value, question_get_field(q, "default"));
 	cursor = strlen(value);
 
 	/* TODO: scrolling */

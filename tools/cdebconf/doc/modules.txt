@@ -36,20 +36,37 @@ a tag, and returns an empty template object.
 A template has the following publically accessible fields:
 
 - char *tag: the template's tag
-- char *type: the template's type XXX can be one of ...
-- char *defaultval: the template's default value, as a string
-- char *choices: if the template's type is choices based, here the choices
-                 are listed in a single string, seperated by commas XXX right?
-- char *description: a description of the template XXX must be under ... chars?
-- char *extended_description: a longer description 
-- struct language_description *localized descriptions - has following fields:
-  - struct language_description *next: NULL or another localized description
-  - char *language: ISO tag for language XXX right?
-  - char *choices, char *description, char *extended_description: as above,
-    only in specified language
-  
+- char *type: the template's type, can be one of select, multiselect,
+              string, boolean, note, text and password
+- struct template_l10n_fields *fields - has following fields:
+  - struct template_l10n_fields *next: NULL or another localized field
+                                       structure
+  - char *language: ISO code for language (ll or ll_LL)
+  - char *defaultval: the template's default value, as a string
+  - char *choices: if the template's type is choices based, here the choices
+                   are listed in a single string, seperated by commas
+  - char *description: a description of the template XXX must be under ... chars?
+  - char *extended_description: a longer description 
+
+The first template_l10n_fields structure must always be in English, and
+its ISO code is set to C.
+
 XXX not covering "next", I assume it is private
 XXX not covering memory management or deletion
+
+Publically accessible methods:
+
+const char *lget(struct template *, const char *lang, const char *field):
+   Return a string value for given field in a language, or NULL if not found
+
+void lset(struct template *, const char *lang, const char *field, const char *value):
+   Save string value at field for a given language
+
+const char *get(struct template *, const char *field):
+   Return a string value for given field in English
+
+void set(struct template *, const char *field, const char *value):
+   Save string value at English field
 
 question API
 ~~~~~~~~~~~~
@@ -92,17 +109,11 @@ The following functions are supported:
   add an owner
 - void question_owner_delete(struct question *q, const char *owner)
   remove an owner
-- const char *question_description(struct question *q):
-  return the description from the question template XXX who owns it?
-- const char *question_extended_description(struct question *q):
-  return the extended description from the question template XXX who owns it?
-- const char *question_choices_translated(struct question *q):
-  return the list of choices as a comma seperated string, if possible, 
-  translated
-- const char *question_choices(struct question *q):
-  return the list of choices as a comma seperated string
-- const char *question_defaultval(struct question *q):
-  return the default value (if in choices, *always* non-translated)
+- const char *question_get_field(struct question *q, const char *field):
+  return the English field from the question
+- const char *question_get_translated_field(struct question *q, const char *field):
+  return the translated (in the current language, or English if it does
+  not exist) field from the question
 
 XXX not dealing with variables
 XXX not dealing with memory management
@@ -301,4 +312,4 @@ you only need to override the ones you need.
 
 See modules/frontend/* for examples.
 
-$Id: modules.txt,v 1.7 2002/07/01 06:58:37 tausq Exp $
+$Id: modules.txt,v 1.8 2002/11/18 00:37:10 barbier Exp $

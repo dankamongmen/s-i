@@ -135,38 +135,35 @@ static int textdb_template_set(struct template_db *db, struct template *t)
 {
 	FILE *outf;
 	char *filename;
-	struct language_description *langdesc;
+	const char *p, *lang;
+	const char **field;
 
-	if (t->tag == NULL) return DC_NOTOK;
-	filename = template_filename(db, t->tag);
+	if (t->get(t, "tag") == NULL) return DC_NOTOK;
+	filename = template_filename(db, t->get(t, "tag"));
 	
 	if ((outf = fopen(filename, "w")) == NULL)
 		return DC_NOTOK;
 
 	fprintf(outf, "template {\n");
 
-	fprintf(outf, "\ttag \"%s\";\n", escapestr(t->tag));
-	fprintf(outf, "\ttype \"%s\";\n", escapestr(t->type));
-	if (t->defaultval != NULL)
-		fprintf(outf, "\tdefault \"%s\";\n", escapestr(t->defaultval));
-	if (t->choices != NULL)
-		fprintf(outf, "\tchoices \"%s\";\n", escapestr(t->choices));
-	if (t->description != NULL)
-		fprintf(outf, "\tdescription \"%s\";\n", escapestr(t->description));
-	if (t->extended_description != NULL)
-		fprintf(outf, "\textended_description \"%s\";\n", escapestr(t->extended_description));
-
-	langdesc = t->localized_descriptions;
-	while (langdesc) 
+	for (field = template_fields_list; *field != NULL; field++)
 	{
-		if (langdesc->description != NULL) 
-			fprintf(outf, "\tdescription-%s \"%s\";\n", langdesc->language, escapestr(langdesc->description));
-		if (langdesc->extended_description != NULL)
-			fprintf(outf, "\textended_description-%s \"%s\";\n", langdesc->language, escapestr(langdesc->extended_description));
-		if (langdesc->choices != NULL) 
-			fprintf(outf, "\tchoices-%s \"%s\";\n", langdesc->language, escapestr(langdesc->choices));
+		p = t->get(t, *field);
+		if (p != NULL)
+			fprintf(outf, "\t%s \"%s\";\n", *field, escapestr(p));
+	}
 
-		langdesc = langdesc->next;
+	lang = t->next_lang(t, "C");
+	while (lang) 
+	{
+		for (field = template_fields_list; *field != NULL; field++)
+		{
+			p = t->lget(t, lang, *field);
+			if (p != NULL)
+				fprintf(outf, "\t%s-%s.UTF-8 \"%s\";\n",
+						*field, lang, escapestr(p));
+		}
+		lang = t->next_lang(t, lang);
 	}
 
 	fprintf(outf, "};\n");
@@ -204,16 +201,17 @@ static struct template *textdb_template_get_real(struct template_db *db,
 	}
 	else
 	{
-		t->type = STRDUP(unescapestr(rec->get(rec, "template::type", "string")));
-		t->defaultval = STRDUP(unescapestr(rec->get(rec, "template::default", 0)));
-		t->choices = STRDUP(unescapestr(rec->get(rec, "template::choices", 0)));
-		t->description = STRDUP(unescapestr(rec->get(rec, "template::description", 0)));
-		t->extended_description = STRDUP(unescapestr(rec->get(rec, "template::extended_description", 0)));
+		t->set(t, "type", STRDUP(unescapestr(rec->get(rec, "template::type", "string"))));
+		t->set(t, "default", STRDUP(unescapestr(rec->get(rec, "template::default", 0))));
+		t->set(t, "choices", STRDUP(unescapestr(rec->get(rec, "template::choices", 0))));
+		t->set(t, "description", STRDUP(unescapestr(rec->get(rec, "template::description", 0))));
+		t->set(t, "extended_description", STRDUP(unescapestr(rec->get(rec, "template::extended_description", 0))));
 
 		/* We can't ask for all the localized descriptions so we need to
 		 * brute-force this.
 		 * This is stupid and ugly and should be fixed, FIXME
 		 */
+#if 0
 		for (a = 'a'; a <= 'z'; a++)
 			for (b = 'a'; b <= 'z'; b++)
 			{
@@ -239,6 +237,7 @@ static struct template *textdb_template_get_real(struct template_db *db,
 					t->localized_descriptions = langdesc;
 				}
 			}
+#endif
 	}
 		
 

@@ -223,8 +223,8 @@ static void drawdesc(struct frontend *ui, struct question *q)
 	WINDOW *descwin = UIDATA(ui)->descwin;
 
 	drawframe(ui, WIN_QUERY, ui->title);
-	wrapprint(qrywin, question_description(q), 0, COLS-2);
-	wrapprint(descwin, question_extended_description(q), 0, COLS-2);
+	wrapprint(qrywin, question_get_translated_field(q, "description"), 0, COLS-2);
+	wrapprint(descwin, question_get_translated_field(q, "extended_description"), 0, COLS-2);
 	wclrtobot(qrywin);
 	wclrtobot(descwin);
 	wrefresh(stdscr);
@@ -237,12 +237,17 @@ static int nchandler_boolean(struct frontend *ui, struct question *q)
 	char *value = "true";
 	int ret = 0, ans, pos = 2;
 	int ybut = UIDATA(ui)->qrylines - 6;
+	char *dft;
 	WINDOW *win = UIDATA(ui)->qrywin;
 
 	if (q->value != 0 && *q->value != 0)
 		value = q->value;
-	else if (q->template->defaultval != 0 && *q->template->defaultval != 0)
-		value = q->template->defaultval;
+	else
+	{
+		dft = (char *) q->template->get(q->template, "default");
+		if (dft != 0 && *dft != 0)
+			value = dft;
+	}
 
 	ans = (strcmp(value, "true") == 0);
 
@@ -351,29 +356,33 @@ static int nchandler_password(struct frontend *ui, struct question *q)
 
 static int nchandler_select(struct frontend *ui, struct question *q)
 {
-	char *value = NULL;
 	char *choices[100] = {0};
-	int i, count, ret = 0, val = 0, pos = 2, xpos, ypos;
+	char *choices_translated[100] = {0};
+	char *defaults[100] = {0};
+	const char *defval = question_get_field(q, "default");
+
+	int i, count, dcount, ret = 0, def = -1, pos = 2, xpos, ypos;
 	int top, bottom, longest;
 	WINDOW *win = UIDATA(ui)->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit((char *)question_choices(q), choices, DIM(choices));
+	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
+
+	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
+	dcount = strchoicesplit(question_get_field(q, "default"), defaults, DIM(defaults));
 
 	/* See what the currently selected value should be -- either a
 	 * previously selected value, or the default for the question
 	 */
-	if ((q->value != 0 && *q->value != 0 && (value = q->value)) ||
-	    (q->template->defaultval != 0 && *q->template->defaultval != 0 && 
-		(value = q->template->defaultval)))
+	if (defval != NULL)
 	{
 		for (i = 0; i < count; i++)
-			if (strcmp(choices[i], value) == 0)
-				val = i;
+			if (strcmp(choices[i], defval) == 0)
+				def = i + 1;
 	}
 
-	longest = longestlen(choices, count);
+	longest = longestlen(choices_translated, count);
 	top = 0; bottom = MIN(count, UIDATA(ui)->qrylines-5);
 	xpos = (COLS-longest)/2-1;
 
@@ -382,11 +391,11 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 		ypos = 2;
 		for (i = top; i < bottom; i++)
 		{
-			if (pos == 2 && i == val) 
+			if (pos == 2 && i == def) 
 				wstandout(win); 
 			else 
 				wstandend(win);
-			mvwprintw(win, ypos++, xpos, " %-*s ", longest, choices[i]);
+			mvwprintw(win, ypos++, xpos, " %-*s ", longest, choices_translated[i]);
 		}
 		wstandend(win);
 
@@ -398,17 +407,17 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 		{
 		case KEY_LEFT:
 		case KEY_UP:
-			val--;
-			if (val < 0) val = count-1;
+			def--;
+			if (def < 0) def = count-1;
 
-			/* check val against top/bottom */
+			/* check def against top/bottom */
 			break;
 		case KEY_RIGHT:
 		case KEY_DOWN:
-			val++;
-			if (val >= count) val = 0;
+			def++;
+			if (def >= count) def = 0;
 
-			/* check val against top/bottom */
+			/* check def against top/bottom */
 			break;
 		case 9: /* TAB */
 			pos++;
@@ -432,7 +441,7 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 		}
 	}
 	if (ret == DC_OK)
-		question_setvalue(q, choices[val]);
+		question_setvalue(q, choices[def]);
 	return ret;
 }
 
