@@ -209,8 +209,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	char buf[256], *menu, *s;
 	int menu_size, menu_used, size;
 
-	debconf_get(debconf,"debian-installer/language");
-	if (debconf->value)
+	if (debconf_get(debconf,"debian-installer/language") == 0 && debconf->value)
 		language = strdup(debconf->value);
 
 	for (node = packages->list.head; node; node = node->next) {
@@ -312,8 +311,7 @@ static int satisfy_virtual(di_system_package *p) {
 	size_t menu_size, menu_used, size;
 	int is_menu_item = 0;
 
-	debconf_get(debconf, "debian-installer/language");
-	if (debconf->value)
+	if (debconf_get(debconf, "debian-installer/language") == 0 && debconf->value)
 		language = strdup(debconf->value);
 
 	menu = di_malloc(1024);
