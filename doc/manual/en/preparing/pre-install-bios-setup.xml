@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: pre-install-bios-setup.xml,v 1.4 2003/06/15 17:39:02 toff Exp $ -->
+<!-- $Id: pre-install-bios-setup.xml,v 1.5 2003/09/20 02:53:41 toff Exp $ -->
 
  <sect1 id="pre-install-bios-setup">
  <title>Pre-Installation Hardware and Operating System Setup</title>
@@ -15,16 +15,14 @@ hardware; it is most critically invoked during the bootstrap process
 
 </para>
 
-<![ %i386;    [ &bios-setup-i386.xml; ]]>
-<![ %m68k;    [ &bios-setup-m68k.xml; ]]>
-<![ %powerpc; [ &bios-setup-powerpc.xml; ]]>
-<![ %sparc;   [ &bios-setup-sparc.xml; ]]>
-<![ %s390;    [ &bios-setup-s390.xml; ]]>
+&bios-setup-i386.xml; 
+&bios-setup-m68k.xml; 
+&bios-setup-powerpc.xml; 
+&bios-setup-sparc.xml; 
+&bios-setup-s390.xml; 
 
   <sect2><title>Hardware Issues to Watch Out For</title>
-
-<![ %not-s390; [
-<para>
+<para arch="not-s390">
 
 Many people have tried operating their 90 MHz CPU at 100 MHz, etc.  It
 sometimes works, but is sensitive to temperature and other factors and
@@ -34,7 +32,7 @@ aborting the <command>gcc</command> program with an unexpected signal
 while it was compiling the operating system kernel. Turning the CPU
 speed back down to its rated value solved the problem.
 
-</para><para>
+</para><para arch="not-s390">
 
 The <command>gcc</command> compiler is often the first thing to die
 from bad memory modules (or other hardware problems that change data
@@ -44,23 +42,19 @@ to execute an illegal instruction or access a non-existent
 address. The symptom of this will be <command>gcc</command> dying from
 an unexpected signal.
 
-</para>
-]]>
-
-<![ %m68k; [
-<para>
+</para><para arch="m68k">
 
 Atari TT RAM boards are notorious for RAM problems under Linux; if you
 encounter any strange problems, try running at least the kernel in
 ST-RAM.  Amiga users may need to exclude RAM using a booter memfile.
 
-<![ %FIXME; [ <emphasis>FIXME: more description of this needed.</emphasis> ]]> 
+<screen condition="FIXME"><emphasis>
 
-</para>
-]]>
+FIXME: more description of this needed.
 
-<![ %i386; [
-<para>
+</emphasis></screen>
+
+</para><para arch="i386">
 
 The very best motherboards support parity RAM and will actually tell
 you if your system has a single-bit error in RAM. Unfortunately, they
@@ -71,7 +65,7 @@ in your data. Thus, the best systems have motherboards that support
 parity and true-parity memory modules; see 
 <xref linkend="Parity-RAM"></xref>.
 
-</para><para>
+</para><para arch="i386">
 
 If you do have true-parity RAM and your motherboard can handle it, be
 sure to enable any BIOS settings that cause the motherboard to
@@ -79,7 +73,7 @@ interrupt on memory parity errors.
 
 </para>
 
-   <sect3><title>The Turbo Switch</title>
+   <sect3 arch="i386"><title>The Turbo Switch</title>
 <para>
 
 Many systems have a <emphasis>turbo</emphasis> switch that controls
@@ -93,7 +87,7 @@ accidentally touch the software control for the turbo switch.
 </para>
    </sect3>
 
-   <sect3><title>Cyrix CPUs and Floppy Disk Errors</title>
+   <sect3 arch="i386"><title>Cyrix CPUs and Floppy Disk Errors</title>
 <para>
 
 Many users of Cyrix CPUs have had to disable the cache in their
@@ -112,7 +106,7 @@ the cache being invalid after a switch from 16-bit to 32-bit code.
 </para>
    </sect3>
 
-   <sect3><title>Peripheral Hardware Settings</title>
+   <sect3 arch="i386"><title>Peripheral Hardware Settings</title>
 <para>
 
 You may have to change some settings or jumpers on your computer's
@@ -130,7 +124,7 @@ amount of RAM in your system.
 </para>
    </sect3>
 
-   <sect3 id="usb-keyboard-config"><title>USB keyboards</title>
+   <sect3 arch="i386" id="usb-keyboard-config"><title>USB keyboards</title>
 <para>
 
 If you have no AT-style keyboard and only a USB model, you will need
@@ -174,7 +168,5 @@ this is the case please look at <xref linkend="boot-parms"></xref>.
 
 </para>
    </sect3>
-
-]]>
   </sect2>
  </sect1>
