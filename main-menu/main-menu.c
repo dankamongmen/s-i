@@ -2,6 +2,9 @@
 
 #include <stdlib.h>
 #include <search.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <stdlib.h>
 
 /* For btree. */
 int package_compare (const void *p1, const void *p2) {
@@ -45,13 +48,28 @@ static void order(struct package_t *p, void *package_tree,
 	p->processed = 1;
 }
 
+/* Returns true if the given package could be the default menu item. */
+int isdefault(struct package_t *p) {
+	char menutest[1024];
+	struct stat statbuf;
+
+	sprintf(menutest, DPKGDIR "info/%s.menutest", p->package);
+	if (stat(menutest, &statbuf) == 0) {
+		return ! system(menutest);
+	}
+	else if (p->status == STATUS_UNPACKED) {
+		return 1;
+	}
+	return 0;
+}
+
 /* Displays the main menu via debconf. */
 void main_menu(struct package_t *packages) {
 	struct package_t **package_list, *p, *head = NULL, *tail = NULL;
 	int i = 0, num = 0;
 	void *package_tree = NULL;
 	char *s, *menudefault = NULL;
-	char menutext[1024] = "";
+	char menutext[1024];
 	
 	/* Make a flat list of the packages, plus a btree for name lookup. */
 	for (p = packages; p; p = p->next) {
@@ -87,12 +105,8 @@ void main_menu(struct package_t *packages) {
 			*s++ = ',';
 			*s++ = ' ';
 
-			if (! menudefault) {
-				/* TODO: menutest scripts */
-				if (p->status == STATUS_UNPACKED) {
-					menudefault = p->description;
-				}
-			}
+			if (! menudefault && isdefault(p))
+				menudefault = p->description;
 		}
 	}
 	/* Trim trailing ", " */
