@@ -62,9 +62,9 @@ load_module() {
 			for dev in $newdevs; do
 				devcount=$(($devcount + 1))
 				if [ $devcount -ge 2 ]; then
-					echo "${newdev}:${cardname} (${devcount})" >> /etc/network/devnames
+					echo "${dev}:${cardname} (${devcount})" >> /etc/network/devnames
 				else
-					echo "${newdev}:${cardname}" >> /etc/network/devnames
+					echo "${dev}:${cardname}" >> /etc/network/devnames
 				fi
 			done
 		fi
