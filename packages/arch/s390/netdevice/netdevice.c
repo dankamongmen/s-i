@@ -480,64 +480,42 @@ static int confirm (void)
 static int setup (void)
 {
 	FILE *f;
-	char buf[256], buf1[256] = "", *ptr = NULL;
-
-	if (mkdir ("/etc/modutils", 777) && errno != EEXIST)
-		return 1;
+	char buf[256], buf1[64] = "";
 
 	switch (type)
 	{
 		case TYPE_QETH:
 		case TYPE_CTC:
 		case TYPE_LCS:
-			if (strlen (chandev_parm))
-				ptr = chandev_parm;
-
-			if (ptr)
-			{
-				f = fopen ("/etc/modutils/0chandev.chandev", "a");
-				if (!f)
-					return 1;
-
-				fprintf (f, "%s\n", ptr);
-				fclose (f);
-			}
-
-			snprintf (buf, sizeof (buf), "/etc/modutils/%s.chandev", type_text);
-
-			f = fopen (buf, "a");
-			if (!f)
-				return 1;
-
-			fprintf (f, "%s\n", chandev_module_parm);
-			fclose (f);
-
 			f = fopen ("/proc/chandev", "a");
 			if (!f)
 				return 1;
 
+			if (strlen (chandev_parm))
+			{
+				snprintf (buf, sizeof (buf), "register-module -t chandev %s %s", module, chandev_parm);
+				di_exec_shell_log (buf);
+				fprintf (f, "%s\n", chandev_parm);
+			}
+
+			snprintf (buf, sizeof (buf), "register-module -t chandev %s %s", module, chandev_module_parm);
+			di_exec_shell_log (buf);
+
 			fprintf (f, "%s\n", chandev_module_parm);
-			if (ptr)
-				fprintf (f, "%s\n", ptr);
 			fprintf (f, "noauto\n");
 			fprintf (f, "reprobe\n");
 			fclose (f);
 			break;
 
 		case TYPE_IUCV:
-			f = fopen("/etc/modutils/netiucv", "a");
-			if (!f)
-				 return 1;
-
-			fprintf(f,"iucv=%s\n", device_qeth_portname_iucv_peer);
-			fclose(f);
-
 			snprintf (buf1, sizeof (buf1), "iucv=%s", device_qeth_portname_iucv_peer);
 			break;
 	}
 
-	snprintf (buf, sizeof (buf), "modprobe %s %s", module, buf1);
+	snprintf (buf, sizeof (buf), "register-module %s %s", module, buf1);
+	di_exec_shell_log (buf);
 
+	snprintf (buf, sizeof (buf), "modprobe %s %s", module, buf1);
 	di_exec_shell_log (buf);
 
 	return 0;
