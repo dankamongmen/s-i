@@ -366,6 +366,7 @@ static void update_language (void) {
 
 int main (int argc, char **argv) {
 	struct package_t *p;
+	int i;
 
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
@@ -374,11 +375,15 @@ int main (int argc, char **argv) {
 	while ((p=show_main_menu(packages))) {
 		do_menu_item(p);
 		/*
-		 *  By convention, language selection is item 10;
-		 *  the LANGUAGE environment variable must be updated
+		 * A language selection package must provide the virtual
+		 * package 'language-selected'.
+		 * The LANGUAGE environment variable must be updated
 		 */
-		if (p->installer_menu_item == 10)
-			update_language();
+		for (i = 0; p->provides[i] != NULL; i++)
+			if (strcmp(p->provides[i]->name, "language-selected") == 0) {
+				update_language();
+				break;
+			}
 		packages = status_read();
 	}
 	
