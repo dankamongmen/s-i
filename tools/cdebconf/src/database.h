@@ -1,11 +1,11 @@
+/**
+ *
+ * @file database.h
+ * @brief Database class definition
+ *
+ */
 #ifndef _DATABASE_H_
 #define _DATABASE_H_
-
-/**
- * \file database.h
- * \brief Definitions of question_db and template_db objects
- */
-
 
 /* Debconf database interfaces */
 
@@ -16,7 +16,7 @@ struct question;
 struct question_db;
 
 /**
- * Methods for a template database module
+ * @brief Methods for a template database module
  */
 struct template_db_module {
     int (*initialize)(struct template_db *db, struct configuration *cfg);
@@ -32,7 +32,7 @@ struct template_db_module {
 };
 
 /**
- * Methods for a question database module
+ * @brief Methods for a question database module
  */
 struct question_db_module {
     int (*initialize)(struct question_db *db, struct configuration *cfg);
@@ -49,44 +49,73 @@ struct question_db_module {
     struct question *(*iterate)(struct question_db *, void **iter);
 };
 
+/**
+ * @brief Template database object
+ */
 struct template_db {
-	/* db module name */
+	/** db module name */
 	const char *modname;
-	/* db module handle */
+	/** db module handle */
 	void *handle;
-	/* configuration data */
+	/** configuration data */
 	struct configuration *config;
-    /* config path - base of instance configuration */
+    /** config path - base of instance configuration */
     char configpath[DEBCONF_MAX_CONFIGPATH_LEN];
-	/* private data */
+	/** private data */
 	void *data; 
 
-	/* methods */
+	/** methods */
     struct template_db_module methods;
 };
 
+/**
+ * @brief Question database object
+ */
 struct question_db {
-    /* db module name */
+    /** db module name */
 	const char *modname;
-	/* db module handle */
+	/** db module handle */
 	void *handle;
-	/* configuration data */
+	/** configuration data */
 	struct configuration *config;
-    /* config path - base of instance configuration */
+    /** config path - base of instance configuration */
     char configpath[DEBCONF_MAX_CONFIGPATH_LEN];
-	/* private data */
+	/** private data */
 	void *data; 
-    /* template database */
+    /** template database */
     struct template_db *tdb;
 
-	/* methods */
+	/** methods */
     struct question_db_module methods;
 };
 
-struct template_db *template_db_new(struct configuration *, char *);
+/**
+ * @brief Create a new template db object
+ * @param cfg configuration
+ * @param instance Name of instance (NULL for default)
+ * @return Newly created db object
+ */
+struct template_db *template_db_new(struct configuration *cfg, char *instance);
+
+/**
+ * @brief Destroy a template db oject
+ * @param db Object to destroy
+ */
 void template_db_delete(struct template_db *db);
 
-struct question_db *question_db_new(struct configuration *, struct template_db *tdb, char *);
+/**
+ * @brief Create a new question db object
+ * @param cfg configuration
+ * @param tdb associated template database object
+ * @param instance Name of instance (NULL for default)
+ * @return Newly created db object
+ */
+struct question_db *question_db_new(struct configuration *cfg, struct template_db *tdb, char *instance);
+
+/**
+ * @brief Destroy a question db oject
+ * @param db Object to destroy
+ */
 void question_db_delete(struct question_db *db);
 
 #endif

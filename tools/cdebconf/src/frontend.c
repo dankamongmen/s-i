@@ -1,41 +1,3 @@
-/***********************************************************************
- *
- * cdebconf - An implementation of the Debian Configuration Management
- *            System
- *
- * File: frontend.c
- *
- * Description: debconf frontend interface routines
- *
- * $Id: frontend.c,v 1.15 2002/11/29 22:19:33 barbier Exp $
- *
- * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
- * license.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- * 
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- ***********************************************************************/
 #include "common.h"
 #include "configuration.h"
 #include "database.h"
@@ -46,13 +8,6 @@
 #include <string.h>
 #include <unistd.h>
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static int frontend_add(struct frontend *obj, struct question *q)
 {
 	struct question *qlast;
@@ -78,25 +33,11 @@ static int frontend_add(struct frontend *obj, struct question *q)
 	return DC_OK;
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static int frontend_go(struct frontend *obj)
 {
 	return 0;
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static void frontend_clear(struct frontend *obj)
 {
 	struct question *q;
@@ -109,86 +50,37 @@ static void frontend_clear(struct frontend *obj)
 	}
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static int frontend_initialize(struct frontend *obj, struct configuration *cfg)
 {
 	return DC_OK;
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static int frontend_shutdown(struct frontend *obj)
 {
 	return DC_OK;
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static unsigned long frontend_query_capability(struct frontend *f)
 {
 	return 0;
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static void frontend_set_title(struct frontend *f, const char *title)
 {
 	DELETE(f->title);
 	f->title = STRDUP(title);
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static int frontend_can_go_back(struct frontend *ui, struct question *q)
 {
 	return 0;
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 static int frontend_can_go_forward(struct frontend *ui, struct question *q)
 {
 	return 1;
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 
 struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb, struct question_db *qdb)
 {
@@ -263,13 +155,6 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	return obj;
 }
 
-/*
- * Function:
- * Input:
- * Output:
- * Description:
- * Assumptions:
- */
 void frontend_delete(struct frontend *obj)
 {
 	obj->methods.shutdown(obj);

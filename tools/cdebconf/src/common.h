@@ -1,3 +1,9 @@
+/**
+ *
+ * @file common.h
+ * @brief Common utility routines and definitions
+ *
+ */
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
@@ -8,8 +14,8 @@
 #include "debug.h"
 
 /**
- * \def DEBCONF_MAX_CONFIGPATH_LEN
- * \brief maximum length of a configuration path to a configuration
+ * @def DEBCONF_MAX_CONFIGPATH_LEN
+ * @brief maximum length of a configuration path to a configuration
  */
 #define DEBCONF_MAX_CONFIGPATH_LEN  128
 
@@ -59,7 +65,6 @@
 #define STRCPY(d,s) strcpy(d,((s) == NULL ? "" : (s)))
 #define DIM(ar) (sizeof(ar)/sizeof(ar[0]))
 
-/* MIN and MAX are also defined from perl.h, called from perldb.c */
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif

@@ -1,3 +1,7 @@
+/**
+ * @file template.c
+ * @brief interface to debconf templates
+ */
 #ifndef _TEMPLATE_H_
 #define _TEMPLATE_H_
 

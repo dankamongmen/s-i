@@ -1,3 +1,7 @@
+/**
+ * @file question.c
+ * @brief interfaces for handling debconf questions
+ */
 #ifndef _QUESTION_H_
 #define _QUESTION_H_
 
@@ -31,6 +35,13 @@ struct question {
 
 struct question *question_new(const char *tag);
 void question_delete(struct question *question);
+
+/**
+ * @brief duplicate a question
+ * @param q - the question to be duplicated
+ * @return a deep copy of the question struct passed as input.  the 
+ *         template pointer is not changed
+ */
 struct question *question_dup(struct question *q);
 
 void question_ref(struct question *);

@@ -1,41 +1,3 @@
-/***********************************************************************
- *
- * cdebconf - An implementation of the Debian Configuration Management
- *            System
- *
- * File: commands.c
- *
- * Description: implementation of each command specified in the spec
- *
- * $Id: commands.c,v 1.35 2002/11/29 22:19:33 barbier Exp $
- *
- * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
- * license.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- * 
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- ***********************************************************************/
 #include "common.h"
 #include "commands.h"
 #include "frontend.h"
@@ -49,16 +11,15 @@
 		return DC_OK
 
 
-/*
- * Function: _command_checkargc
- * Input: int pred - predicate
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_OK if pred is true, DC_NOTOK otherwise
- * Description: Checks to see if a given predicate is true; and if not
- *              write an appropriate message into the output buffer.
- *              Used in conjunction with the CHECKARGC macro above
- * Assumptions: static, to be used by command_* functions below
+/**
+ * @brief Checks to see if a given predicate is true; and if not
+ *        write an appropriate message into the output buffer.
+ *        Used in conjunction with the CHECKARGC macro above
+ * @param int pred - predicate
+ * @param char *out - output buffer
+ * @param size_t outsize - output buffer size
+ * @return int - DC_OK if pred is true, DC_NOTOK otherwise
+ * @warning  static, to be used by command_* functions below
  */
 static int _command_checkargc(int pred, char *out, size_t outsize)
 {
@@ -74,18 +35,6 @@ static int _command_checkargc(int pred, char *out, size_t outsize)
 	}
 }
 
-/*
- * Function: command_input
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the INPUT debconf command; adds a question
- *              to the list of questions to be asked if appropriate.
- * Assumptions: none
- */
 int command_input(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -124,18 +73,6 @@ int command_input(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_clear
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the CLEAR debconf command; removes any 
- *              questions currently in the queue
- * Assumptions: none
- */
 int command_clear(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -146,19 +83,6 @@ int command_clear(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_version
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the VERSION debconf command; checks to see
- *              if the version required by a confmodule script is 
- *              compatible with the debconf version we recognize
- * Assumptions: none
- */
 int command_version(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -180,19 +104,6 @@ int command_version(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_capb
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the CAPB debconf command; exchanges 
- *              capability information between the confmodule and the
- *              frontend
- * Assumptions: none
- */
 int command_capb(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -208,18 +119,6 @@ int command_capb(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_title
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the TITLE debconf command; sets the title in 
- *              the frontend
- * Assumptions: none
- */
 int command_title(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -246,18 +145,6 @@ int command_title(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_beginblock
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the debconf BEGINBLOCK command; not yet 
- *              implemented
- * Assumptions: TODO
- */
 int command_beginblock(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -265,18 +152,6 @@ int command_beginblock(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_endblock
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the debconf ENDBLOCK command; not yet
- *              implemented
- * Assumptions: TODO
- */
 int command_endblock(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -284,19 +159,6 @@ int command_endblock(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_go
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the debconf GO command; asks all pending 
- *              questions and save the answers in the debconf DB
- * Assumptions: frontend will return CMDSTATUS_GOBACK only if the
- *              confmodule supports backing up
- */
 int command_go(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -316,18 +178,6 @@ int command_go(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_get
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the GET debconf command; retrieves the
- *              value of a given template
- * Assumptions: none
- */
 int command_get(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -348,18 +198,6 @@ int command_get(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_set
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the SET debconf command; sets the value of
- *              a given template
- * Assumptions: none
- */
 int command_set(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -409,18 +247,6 @@ int command_set(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_reset
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the RESET debconf command; resets the value of
- *              a given template to the default
- * Assumptions: none
- */
 int command_reset(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -448,18 +274,6 @@ int command_reset(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_subst
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the debconf SUBST command; registers a
- *              substitution variable/value for a template
- * Assumptions: none
- */
 int command_subst(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -510,17 +324,6 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_register
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the debconf REGISTER command
- * Assumptions: none
- */
 int command_register(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -550,17 +353,6 @@ int command_register(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_unregister
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the debconf UNREGISTER command
- * Assumptions: none
- */
 int command_unregister(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -579,18 +371,6 @@ int command_unregister(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_purge
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the debconf PURGE command; removes all
- *              questions owned by a given owner
- * Assumptions: none
- */
 int command_purge(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -599,17 +379,6 @@ int command_purge(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_metaget
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the METAGET debconf command; retrieves given 
- *              attributes for a template
- */
 int command_metaget(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -635,18 +404,6 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_fget
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the FGET debconf command; retrieves the value
- *              of a given flag
- * Assumptions: none
- */
 int command_fget(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -677,18 +434,6 @@ int command_fget(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_fset
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the FSET debconf command; sets the value of 
- *              the given flag
- * Assumptions: none
- */
 int command_fset(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -723,18 +468,6 @@ int command_fset(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_exist
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the EXIST debconf command; checks to see if a
- *              template exists
- * Assumptions: none
- */
 int command_exist(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
@@ -754,18 +487,6 @@ int command_exist(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_stop
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the STOP debconf command; finishes the debconf
- *              session
- * Assumptions: none
- */
 int command_stop(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
@@ -773,19 +494,6 @@ int command_stop(struct confmodule *mod, int argc, char **argv,
 	return DC_OK;
 }
 
-/*
- * Function: command_x_loadtemplatefile
- * Input: struct confmodule *mod - confmodule object
- *        int argc - number of arguments
- *        char **argv - argument array
- *        char *out - output buffer
- *        size_t outsize - output buffer size
- * Output: int - DC_NOTOK if error, DC_OK otherwise
- * Description: handler for the X_LOADTEMPLATEFILE debconf command; 
- *              loads a new template into the debconf database.  This is a
- *              debian-installer extension.
- * Assumptions: none
- */
 int command_x_loadtemplatefile(struct confmodule *mod, int argc, char **argv, 
                                char *out, size_t outsize)
 {

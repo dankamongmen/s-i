@@ -3,16 +3,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-/*
- * Function: debug_printf
- * Input: int level - level of debug message
- *        char *fmt - format of message to write (a la printf)
- *        ... - other args for format string
- * Output: none
- * Description: prints a debug message to the screen if the level of the 
- *              message is higher than the current debug level
- * Assumptions: "remembers" the debug log level and log file
- */
 void debug_printf(int level, char *fmt, ...)
 {
 	static int loglevel = -1;

@@ -1,3 +1,7 @@
+/**
+ * @file frontend.h
+ * @brief debconf frontend interface
+ */
 #ifndef _FRONTEND_H_
 #define _FRONTEND_H_
 

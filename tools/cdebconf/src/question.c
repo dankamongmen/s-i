@@ -1,41 +1,3 @@
-/***********************************************************************
- *
- * cdebconf - An implementation of the Debian Configuration Management
- *            System
- *
- * File: question.c
- *
- * Description: interfaces for handling debconf questions
- *
- * $Id: question.c,v 1.21 2002/11/22 22:33:16 barbier Exp $
- *
- * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
- * license.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- * 
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- ***********************************************************************/
 #include "common.h"
 #include "question.h"
 #include "template.h"
@@ -74,15 +36,6 @@ void question_deref(struct question *q)
 		question_delete(q);
 }
 
-/*
- * Function: question_dup
- * Input: q - the question to be duplicated
- * Output: a deep copy of the question struct passed as input.  the template 
- *         pointer is not changed
- * Description: duplicate a questions
- * Assumptions: all allocations succeed
- * Todo: 
- */
 
 struct question *question_dup(struct question *q)
 {
@@ -93,7 +46,7 @@ struct question *question_dup(struct question *q)
         ret->flags = q->flags;
         ret->template = q->template;
         template_ref(ret->template);
-//        ret->template = template_dup(q->template);
+/*        ret->template = template_dup(q->template); */
         while (qv)
         {
                 question_variable_add(ret,qv->variable,qv->value);

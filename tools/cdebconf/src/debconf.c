@@ -1,3 +1,7 @@
+/**
+ * @file debconf.c
+ * @brief Configuration module interface
+ */
 #include "confmodule.h"
 #include "configuration.h"
 #include "frontend.h"
