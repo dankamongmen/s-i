@@ -13,6 +13,7 @@
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
 #define RECOMMENDSMAX	64	/* maximum number of recommends we can handle */
 #define PROVIDESMAX     16      /* maximum number of provides we can handle */
+#define ENHANCESMAX     16      /* maximum number of enhances we can handle */
 typedef enum { unpacked, installed, half_configured, other } package_status;
 typedef enum { extra, optional, standard, important, required } package_priority;
 
@@ -44,6 +45,7 @@ struct package_t {
         package_priority priority;
 	char *version;
 	struct package_dependency *recommends[RECOMMENDSMAX];
+	struct package_dependency *enhances[ENHANCESMAX];
 };
 
 struct version_t {

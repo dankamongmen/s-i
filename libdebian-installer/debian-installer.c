@@ -419,6 +419,25 @@ di_pkg_parse(FILE *f)
             }
             p->recommends[i] = NULL;
         }
+        else if (di_stristr(buf, "Enhances: ") == buf)
+        {
+            b = strchr(buf, ' ')+1;
+            i = 0;
+            while (b != NULL) {
+                b = parse_dependency(b, &p->enhances[i++]);
+                if (i == ENHANCESMAX)
+                {
+                    char *emsg;
+
+                    asprintf(&emsg, "Package %s has more than %d enhances!",
+                            p->package, ENHANCESMAX-1);
+                    di_log(emsg);
+                    free(emsg);
+                    break;
+                }
+            }
+            p->enhances[i] = NULL;
+        }
     }
 
     return list;
