@@ -354,17 +354,28 @@ udeb_kernel_version(struct package_t *p)
 int
 skip_package(struct package_t *p)
 {
+    static const char *skiplist[] = {
+        "cdebconf-udeb",
+        "anna",
+        "main-menu",
+        "busybox-udeb",
+        "busybox-cvs-udeb",
+        "rootskel",
+        "kernel-image-",
+        NULL
+    };
     char *pkg_kernel, *running_kernel = NULL;
     struct utsname uts;
+    int i;
 
-    if (uname(&uts) == 0)
-        running_kernel = uts.release;
-    /* Packages without filenames or names (!) or packages already
-     * installed will be brutally skipped. */
+    /* Packages without filenames (!) will be brutally skipped. */
     if (p->filename == NULL)
         return 1;
-    if (strstr(p->package, "kernel-image-") == p->package)
-        return 1;
+    for (i = 0; skiplist[i] != NULL; i++)
+        if (strstr(p->package, skiplist[i]) == p->package)
+            return 1;
+    if (uname(&uts) == 0)
+        running_kernel = uts.release;
     if (running_kernel != NULL && (pkg_kernel = udeb_kernel_version(p)) != NULL) {
         if (strcmp(running_kernel, pkg_kernel) != 0)
             return 1;
