@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.34 2002/11/29 20:08:06 barbier Exp $
+ * $Id: commands.c,v 1.35 2002/11/29 22:19:33 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -196,7 +196,14 @@ int command_version(struct confmodule *mod, int argc, char **argv,
 int command_capb(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	/* TODO: tell frontend about confmodule capabilities */
+	int i;
+
+	/* FIXME: frontend.h should provide a method to prevent direct
+	 *        access to capability membre */
+	for (i = 1; i <= argc; i++)
+		if (strcmp(argv[i], "backup") == 0)
+			mod->frontend->capability |= DCF_CAPB_BACKUP;
+
 	snprintf(out, outsize, "%u multiselect backup", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }

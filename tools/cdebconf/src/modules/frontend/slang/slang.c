@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.18 2002/11/28 00:41:22 barbier Exp $
+ * $Id: slang.c,v 1.19 2002/11/29 22:19:33 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -248,12 +248,14 @@ static int slang_keyhandler(struct frontend *ui, struct question *q, int *pos,
 	case SL_KEY_LEFT:
 	case SL_KEY_UP:
 		(*pos)--;
+		if (*pos == 1 && !ui->methods.can_go_back(ui, q)) (*pos)--;
 		if (*pos < 0) *pos = maxpos;
 		break;
 	case SL_KEY_RIGHT:
 	case SL_KEY_DOWN:
 	case 9: /* tab */
 		(*pos)++;
+		if (*pos == 1 && !ui->methods.can_go_back(ui, q)) (*pos)++;
 		if (*pos > maxpos) *pos = 0;
 		break;
 	case ' ':
@@ -317,11 +319,12 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	struct slwindow *win = &uid->qrywin;
 	int ybut = win->y + win->h - win->border - 4;
 	const char *value = "true";
-	int ret = 0, ans, pos = 2;
+	int ret = 0, ans, pos;
 
 	value = question_get_field(q, NULL, "value");
 
 	ans = (strcmp(value, "true") == 0);
+	pos = (ans ? 2 : 3);
 
 	while (ret == 0) 
 	{
@@ -521,7 +524,6 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 	struct slwindow *win = &uid->qrywin;
 	int xpos = 0, ypos = win->y + win->border + 4;
 	int cursor;
-	char *tmp;
 
 	STRCPY(value, question_get_field(q, NULL, "value"));
 	cursor = strlen(value);
@@ -624,9 +626,21 @@ static int slang_password(struct frontend *ui, struct question *q)
 
 static int slang_text(struct frontend *ui, struct question *q)
 {
-	return 0;
-}
+	int ret = 0, pos = 0;
 
+	while (ret == 0)
+	{
+		slang_navbuttons(ui, q, pos);
+		slang_flush();
+
+		switch (slang_keyhandler(ui, q, &pos, 1, 0))
+		{
+		case 0: ret = DC_OK; break;
+		case 1: ret = DC_GOBACK; break;
+		}
+	}
+	return ret;
+}
 
 /* ----------------------------------------------------------------------- */
 static struct question_handlers {
@@ -680,6 +694,11 @@ static int slang_shutdown(struct frontend *obj)
 	return DC_OK;
 }
 
+static int slang_can_go_back(struct frontend *obj, struct question *q)
+{
+	return (obj->capability & DCF_CAPB_BACKUP);
+}
+
 static int slang_go(struct frontend *obj)
 {
 	struct question *q = obj->questions;
@@ -728,5 +747,6 @@ struct frontend_module debconf_frontend_module =
 {
 	initialize: slang_initialize,
 	shutdown: slang_shutdown,
+	can_go_back: slang_can_go_back,
 	go: slang_go,
 };

@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.14 2002/09/16 23:37:03 tfheen Exp $
+ * $Id: frontend.c,v 1.15 2002/11/29 22:19:33 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -167,7 +167,7 @@ static void frontend_set_title(struct frontend *f, const char *title)
  */
 static int frontend_can_go_back(struct frontend *ui, struct question *q)
 {
-	return 1;
+	return 0;
 }
 
 /*
