@@ -1,6 +1,12 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 #include <cdebconf/debconfclient.h>
 
 static struct debconfclient *client;
@@ -23,7 +29,7 @@ char *debconf_input(char *priority, char *template)
 struct d_dasd *find_dasd (struct d_dasd *p, int i, char *s)
 {
 	int j;
-	for (j = 0; j <= i; j++)
+	for (j = 0; j < i; j++)
 		if (!strncasecmp(p[j].device, s, 4))
 			return &p[j];
 	return NULL;
@@ -98,11 +104,12 @@ int main(int argc, char *argv[])
 	if (items > 10) {
 		ptr = debconf_input ("critical", "s390/dasd/choose");
 
-		if (!(cur = find_dasd (dasds, items, ptr)))
+		if (!(cur = find_dasd (dasds, items, ptr))) {
 			client->command(client, "input", "critical", "s390/dasd/choose_invalid", NULL);
+			return 3;
+		}
 	}
-	else
-	{
+	else if (items > 1) {
 		line[0] = '\0';
 		for (i = 0; i < items; i++) {
 			strcat (line, dasds[i].device);
@@ -129,8 +136,14 @@ int main(int argc, char *argv[])
 
 		cur = find_dasd (dasds, items, client->value);
 	}
+	else if (items)
+		cur = dasds;
+	else {
+		fprintf (stderr, "no dasd found\n");
+		return 2;
+	}
 
-	if (cur->state == 0) {
+	if (cur->state == 1) {
 		snprintf (line, sizeof (line), "echo add %s >/proc/dasd/devices", cur->device);
 		ret = system (line);
 		state (dasds, items);
@@ -147,8 +160,30 @@ int main(int argc, char *argv[])
 		return 1;
 
 	if (!strncmp (ptr, "true", 3)) {
-		snprintf (line, sizeof(line), "echo yes | dasdfmt -l LX%s -b 4096 -n %s >/tmp/dasdfmt.log 2>& 2>&11", cur->device, cur->device);
-		ret = system (line);
+		pid_t child = fork ();
+		if (!child) {
+			int fd;
+			if ((fd = open ("/tmp/dasdfmt.log", O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+				perror ("open");
+			if (close (1) < 0)
+				perror ("close");
+			if (close (2) < 0)
+				perror ("close");
+			if (dup (fd) < 0)
+				perror ("dup");
+			if (dup (fd) < 0)
+				perror ("dup");
+			snprintf (line, sizeof(line), "LX%s", cur->device);
+			execlp ("dasdfmt", "-l", line, "-b", "4096", "-n", cur->device, "-y", NULL);
+		}
+		else if (child < 0) {
+		}
+		else {
+			int status;
+			wait (&status);
+		}
+		//snprintf (line, sizeof(line), "dasdfmt -l LX%s -b 4096 -n %s >/tmp/dasdfmt.log 2>&1", cur->device, cur->device);
+		//ret = system (line);
 	}
 
 	return 0;
