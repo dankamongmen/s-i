@@ -62,17 +62,17 @@ addinfos_pv() {
 		return
 	fi
 
-	RET2=`echo "$cmdout" | grep '^VG Name' | \
-		sed -e 's/^VG Name \+\(.*\)/VG: \1/'`
+	RET2=`echo "$cmdout" | grep '^[ ]*VG Name' | \
+		sed -e 's/^[ ]*VG Name \+\(.*\)/VG: \1/'`
 	RET="${RET2}"
 
-	RET2=`echo "$cmdout" | grep '^Cur LV' | \
-		sed -e 's/^Cur LV \+\(.*\)/LVs: \1/'`
+	RET2=`echo "$cmdout" | grep '^[ ]*Cur LV' | \
+		sed -e 's/^[ ]*Cur LV \+\(.*\)/LVs: \1/'`
 	RET="${RET}/ ${RET2}"
 
-	RET2=`echo "$cmdout" | grep '^PV Size' | \
-		sed -e 's/^PV Size \+\(.*\)/Size: \1/' | \
-		cut -d "[" -f 1 | sed -e 's/ $//'`
+	RET2=`echo "$cmdout" | grep '^[ ]*PV Size' | \
+		sed -e 's/^[ ]*PV Size \+\(.*\)/Size: \1/' | \
+		cut -d "[" -f 1 | cut -d "/" -f 1 | sed -e 's/ $//'`
 	RET="${RET}/ ${RET2}"
 }
 
@@ -81,7 +81,7 @@ addinfos_pv() {
 #
 getfree_vg() {
 	cmdout=`vgdisplay "$1" 2>&1`
-	echo "$cmdout" | grep '^Free  PE' | sed -e 's,^.*/ ,,'
+	echo "$cmdout" | grep '^[ ]*Free  PE' | sed -e 's,^.*/ ,,'
 }
 
 #
@@ -89,7 +89,7 @@ getfree_vg() {
 #
 getsize_vg() {
 	cmdout=`vgdisplay "$1" 2>&1`
-	echo "$cmdout" | grep '^VG Size' | sed -e 's/^VG Size \+//'
+	echo "$cmdout" | grep '^[ ]*VG Size' | sed -e 's/^VG Size \+//'
 }
 
 #
@@ -105,12 +105,12 @@ addinfos_vg() {
 	RET2="Size: `getsize_vg "$1"`"
 	RET="${RET}/ ${RET2}"
 
-	RET2=`echo "$cmdout" | grep '^Cur LV' | \
-		sed -e 's/^Cur LV \+\(.*\)/LVs: \1/'`
+	RET2=`echo "$cmdout" | grep '^[ ]*Cur LV' | \
+		sed -e 's/^[ ]*Cur LV \+\(.*\)/LVs: \1/'`
 	RET="${RET}/ ${RET2}"
 
-	RET2=`echo "$cmdout" | grep '^Cur PV' | \
-		sed -e 's/^Cur PV \+\(.*\)/PVs: \1/'`
+	RET2=`echo "$cmdout" | grep '^[ ]*Cur PV' | \
+		sed -e 's/^[ ]*Cur PV \+\(.*\)/PVs: \1/'`
 	RET="${RET}/ ${RET2}"
 }
 
@@ -121,8 +121,8 @@ addinfos_vg() {
 addinfos_lv() {
 	cmdout=`lvdisplay "$1" 2>&1`
 
-	RET2=`echo "$cmdout" | grep '^LV Size' | \
-		sed -e 's/^LV Size \+\(.*\)/Size: \1/'`
+	RET2=`echo "$cmdout" | grep '^[ ]*LV Size' | \
+		sed -e 's/^[ ]*LV Size \+\(.*\)/Size: \1/'`
 	RET="${RET2}"
 
 	cmdout=`parted $1 print | grep '^1' | \
@@ -163,7 +163,7 @@ get_pvs() {
 # list all activated volume groups
 #
 list_vgs() {
-	echo `vgdisplay | grep '^VG Name' | sed -e 's/.*[[:space:]]\(.*\)$/\1/' | sort`
+	echo `vgdisplay | grep '^[ ]*VG Name' | sed -e 's/.*[[:space:]]\(.*\)$/\1/' | sort`
 }
 
 #
@@ -200,8 +200,8 @@ get_vgs() {
 #
 get_vgpvs() {
 	PARTITIONS=""
-	for i in `vgdisplay -v $1 | grep '^PV Name' | 
-		sed -e 's,.*/dev\(.*\)(.*,/dev\1,' | sort`; do
+	for i in `vgdisplay -v $1 | grep '^[ ]*PV Name' | 
+		sed -e 's,.*/dev,/dev,' | cut -d " " -f 1 | sort`; do
 
 		addinfos_pv "$i"
 		i=`printf "%-15s (%s)" "$i" "$RET"`
@@ -219,7 +219,7 @@ get_vgpvs() {
 #
 get_vglvs() {
 	LVS=""
-	for i in `vgdisplay -v $1 | grep '^LV Name' | 
+	for i in `vgdisplay -v $1 | grep '^[ ]*LV Name' | 
 		sed -e 's,.*/\(.*\),\1,' | sort`; do
 
 		addinfos_lv "/dev/$1/$i"
@@ -319,7 +319,7 @@ vg_create() {
 	NAME="$RET"
 
 	# check, if the vg name is already in use
-	vgdisplay -v | grep '^VG Name' | sed -e 's/ *VG Name *//' | grep -q "^$NAME$"
+	vgdisplay -v | grep '^[ ]*VG Name' | sed -e 's/ *VG Name *//' | grep -q "^$NAME$"
 	if [ $? -eq 0 ]; then
 		db_set lvmcfg/vgcreate_nameused "false"
 		db_input high lvmcfg/vgcreate_nameused
@@ -465,7 +465,7 @@ vg_reduce() {
 	VG=`echo "$RET" | cut -d " " -f1`
 
 	# check, if the vg has more then one pv's
-	set -- `vgdisplay $VG | grep '^Cur PV'`
+	set -- `vgdisplay $VG | grep '^[ ]*Cur PV'`
 	if [ $3 -le 1 ]; then
 		db_subst lvmcfg/vgreduce_minpv VG $VG
 		db_set lvmcfg/vgreduce_minpv "false"
@@ -569,7 +569,7 @@ lv_create() {
 	VG=`echo "$RET" | cut -d " " -f1`
 
 	# make sure, the name isn't already in use
-	vgdisplay -v $VG | grep '^LV Name' | grep -q "${VG}/${NAME}$"
+	vgdisplay -v $VG | grep '^[ ]*LV Name' | grep -q "${VG}/${NAME}$"
 	if [ $? -eq 0 ]; then
 		db_subst lvmcfg/lvcreate_exists LV "$NAME"
 		db_subst lvmcfg/lvcreate_exists VG $VG
@@ -656,6 +656,7 @@ lv_delete() {
 
 # load required kernel modules
 depmod -a 1>/dev/null 2>&1
+modprobe dm-mod >/dev/null 2>&1
 modprobe lvm-mod >/dev/null 2>&1
 
 # make sure, lvm is available
