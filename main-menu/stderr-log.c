@@ -59,7 +59,9 @@ void intercept_stderr(void) {
 void display_stderr_log(const char *package) {
 	static struct debconfclient *debconf = NULL;
 	FILE *f;
-	
+
+	assert(package);
+
 	if (! debconf)
 		debconf = debconfclient_new();
 	
@@ -72,6 +74,7 @@ void display_stderr_log(const char *package) {
 
 		do {
 			ret = realloc(ret, size + 128 + 1);
+			assert(ret);
 			if (! fgets(ret + size, 128, f)) {
 				if (size == 0) {
 					free(ret);
@@ -84,6 +87,9 @@ void display_stderr_log(const char *package) {
 			}
 			size = strlen(ret);
 		} while (size > 0 && ! feof(f));
+
+		di_logf("Package '%s' printed to stderr, size=%d.",
+			package, size);
 		
 		/* remove newlines, as they screw up the debconf
 		 * protocol. Which might one day be fixed.. */

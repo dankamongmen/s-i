@@ -381,11 +381,7 @@ int do_menu_item(struct package_t *p) {
 	char *configcommand;
 	int ret = 0;
 
-	{
-            char buf[256];
-            snprintf(buf, sizeof(buf), "Menu item '%s' selected", p->package);
-            di_log(buf);
-	}
+	di_logf("Menu item '%s' selected", p->package);
 
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
@@ -396,11 +392,8 @@ int do_menu_item(struct package_t *p) {
 		free(configcommand);
 		check_special(p);
                 if (ret) {
-                    char buf[256];
-                    snprintf(buf, sizeof(buf),
-                             "Reconfiguring '%s' failed with error code %d",
-                             p->package, ret);
-                    di_log(buf);
+                    di_logf("Reconfiguring '%s' failed with error code %d",
+			    p->package, ret);
                 }
                 ret = !ret;
 	}
@@ -436,14 +429,9 @@ static void lower_debconf_priority (void) {
 	--pri;
 	if (0 > pri)
 		pri = 0;
-	{ /* XXX This code can be rewritten when di_logf() is available */
-		char buf[256];
-		snprintf(buf, sizeof(buf),
-			 "Lowering debconf priority limit from '%s' to '%s'",
-			 debconf->value ? debconf->value : "(null)",
-			 debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
-		di_log(buf);
-	}
+	di_logf("Lowering debconf priority limit from '%s' to '%s'",
+		debconf->value ? debconf->value : "(null)",
+		debconf_priorities[pri] ? debconf_priorities[pri] : "(null)")
 
 	debconf->command(debconf, "SET", template,
 			 debconf_priorities[pri], NULL);
@@ -463,10 +451,7 @@ int main (int argc, char **argv) {
 	packages = di_status_read();
 	while ((p=show_main_menu(packages))) {
 		if (!do_menu_item(p)) {
-			char buf[256];
-			snprintf(buf, sizeof(buf),
-				"Menu item '%s' failed.", p->package);
-			di_log(buf);
+			di_logf("Menu item '%s' failed.", p->package);
 			/* Something went wrong.  Lower debconf
 			   priority limit to try to give the user more
 			   control over the situation. */
