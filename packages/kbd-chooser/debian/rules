@@ -37,7 +37,7 @@ install: build
 	dh_installdirs
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/kbd-chooser
 	install -m0755 debian/prebaseconfig  debian/$(PACKAGE)/usr/lib/prebaseconfig.d/70kbd-chooser
-	install -m0755 debian/S55kbd-chooser debian/$(PACKAGE)/etc/rcS.d/S55kbd-chooser
+	install -m0755 debian/S55kbd-chooser debian/$(PACKAGE)/lib/debian-installer-startup.d/S55kbd-chooser
 
 # Build architecture-independent files here.
 binary-indep: 
@@ -54,7 +54,6 @@ binary-arch: build install
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol -- -n$(FILENAME)
-	rm debian/$(PACKAGE)/DEBIAN/conffiles
 	dh_builddeb --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
