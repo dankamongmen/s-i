@@ -1,6 +1,13 @@
 #!/bin/sh -e
 
 case "x$1" in
+    xconfig)
+        for f in include exclude; do
+            if [ -e /cdrom/.disk/udeb_$f ]; then
+                ln -sf /cdrom/.disk/udeb_$f /var/cache/anna/$f
+            fi
+        done
+        ;;
     xretrieve)
         if [ -e /cdrom/$2 ]; then
             ln -sf /cdrom/$2 "$3"
@@ -8,6 +15,9 @@ case "x$1" in
         else
             exit 1
         fi
+        ;;
+    xcleanup)
+        rm -f /var/cache/anna/{include,exclude}
         ;;
     *)
         # unknown command
