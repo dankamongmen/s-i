@@ -84,7 +84,16 @@ mount "$PARTITION" "/target$MOUNTPOINT"
 # been mounted yet
 
 mkdir -p "/target/etc/"
+if [ ! -e /target/etc/fstab ]; then
+    cat > /target/etc/fstab <<EOF
+# /etc/fstab: static file system information.
+#
+# <file system>	<mount point>	<type>	<options>		<dump>	<pass>
+proc		/proc		proc	defaults		0	0
+EOF
+fi
+
 device=`mapdevfs $PARTITION`
-echo "$device $MOUNTPOINT auto defaults,errors=remount-ro 0 $pass" >> /target/etc/fstab
+echo "$device	$MOUNTPOINT	auto	errors=remount-ro	0	$pass" >> /target/etc/fstab
 
 exit 0
