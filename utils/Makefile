@@ -1,25 +1,21 @@
 ifndef TARGETS
-TARGETS=shell mapdevfs async
+TARGETS=utils
 endif
+OBJECTS = exec.o mapdevfs.o shell.o utils.o
 
-CFLAGS=-Wall -D_GNU_SOURCE -Os -fomit-frame-pointer
+CFLAGS=-Wall -W -Os -fomit-frame-pointer
+#CFLAGS=-Wall -W -O1 -ggdb
 INSTALL=install
 STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 
 all: $(TARGETS)
 
-mapdevfs: mapdevfs.c
-	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
-
-shell: shell.c
-	$(CC) $(CFLAGS) $^ -o $@ -ldebconfclient
-
-async: async.c
+utils: $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer -ldebconfclient
 
 strip: $(TARGETS)
 	$(STRIP) $^
 
 clean:
-	rm -f $(TARGETS)
+	rm -f $(OBJECTS) $(TARGETS)

@@ -17,14 +17,12 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 	$(MAKE)
-	$(MAKE) strip
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
-	rm -f debian/di-utils-shell.postinst
 	-$(MAKE) clean
 
 	dh_clean
@@ -34,8 +32,10 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-	install -m755 shell debian/di-utils-shell.postinst
-	install  mapdevfs debian/di-utils-mapdevfs/usr/bin
+	install utils debian/di-utils/bin
+	ln -s utils debian/di-utils/bin/exec
+	ln -s utils debian/di-utils/bin/mapdevfs
+	ln -s utils debian/di-utils/bin/shell
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -61,9 +61,6 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	# di-utils
-	install -d debian/di-utils/usr/bin
-	install -m755 async debian/di-utils/usr/bin/
 	dh_installdebconf
 	dh_strip
 	dh_compress

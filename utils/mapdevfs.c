@@ -5,8 +5,8 @@
 
 #include <debian-installer.h>
 
-int main(int argc, char **argv) {
-    static char buf[128];
+int mapdevfs_main(int argc, char **argv) {
+    static char buf[256];
     size_t len = sizeof(buf);
 
     if (argc != 2) {
@@ -14,8 +14,8 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if ((len = di_mapdevfs(argv[1], buf, len))) {
-       printf("%s\n", buf);
+    if ((di_system_devfs_map_from(argv[1], buf, len))) {
+        printf("%s\n", buf);
         return 0;
     }
 
