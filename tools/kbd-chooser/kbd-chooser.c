@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.35 2003/11/02 14:01:16 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.36 2003/11/06 22:48:40 mckinstry Rel $
  */
 
 #include "config.h"
@@ -69,18 +69,13 @@ mydebconf_ask (char *priority, char *template, char **result)
 int
 mydebconf_default_set (char *template, char *value)
 {
-	int res;
+	int res = 0;
 	struct debconfclient *client = mydebconf_get ();
-	res = debconf_get (client, template);
-	if (res)
+	if ((res = debconf_get (client, template)))
 		return res;
 
 	if (client->value == NULL || (strlen (client->value) == 0))
-	{
 		res = debconf_set (client, template, strdup (value));
-		if (res)
-			return res;
-	}
 	return res;
 }
 
@@ -112,7 +107,7 @@ grep (const char *file, const char *string)
 
 /**
  * @brief return a default locale name, eg. en_US.UTF-8 (Change C, POSIX to en_US)
- * @return - char *, (to be freed by caller)
+ * @return - char * locale name (freed by caller)
  */
 char *
 locale_get (void)
@@ -123,9 +118,9 @@ locale_get (void)
 
 	debconf_get (client, "debian-installer/locale");
 	if (client->value && (strlen (client->value) > 0))
-		return client->value;
+		return strdup(client->value);
 	else
-		return "en_US";
+		return strdup("en_US");
 }
 
 /**
@@ -236,14 +231,12 @@ maplist_select (maplist_t * maplist)
 	int score = 0, best = -1;
 
 	// Pick the default
-	mp = maplist->maps;
-	while (mp)	{
+	for (mp = maplist->maps ; mp != NULL ; mp  = mp->next)	{
 		score = locale_list_compare (mp->langs);
 		if (score > best)      	{
 			best = score;
 			preferred = mp;
 		}
-		mp = mp->next;
 	}
 	if (best > 0)	{
 		sprintf (template, "console-keymaps-%s/keymap", maplist->name);
@@ -260,12 +253,11 @@ maplist_t *maplist_get (const char *name)
 {
 	static maplist_t *maplists = NULL;
 
-	maplist_t *p = maplists;
+	maplist_t *p;
 
-	while (p)    {
+	for (p = maplists; p != NULL; p = p->next)    {
 		if (strcmp (p->name, name) == 0)
 			break;
-		p = p->next;
 	}
 	if (p)
 		return p;
@@ -288,12 +280,11 @@ maplist_t *maplist_get (const char *name)
  */
 keymap_t *keymap_get (maplist_t * list, char *name)
 {
-	keymap_t *mp = list->maps;
+	keymap_t *mp;
 
-	while (mp)    {
+	for (mp = list->maps ; mp != NULL; mp = mp->next)    {
 		if (strcmp (mp->name, name) == 0)
 			break;
-		mp = mp->next;
 	}
 	if (mp)
 		return mp;
@@ -448,7 +439,7 @@ char *
 translated_template_get(char *template)
 {
 	int ret = 0;
-	static char *language = NULL;
+	static char *language = NULL, *s;
 	struct debconfclient *client = mydebconf_get();
 	
 	if (!language) {
@@ -461,6 +452,13 @@ translated_template_get(char *template)
 		snprintf(field, sizeof (field), "Description-%s.UTF-8", language);
 		if (!debconf_metaget(client, template, field)) 
 			return (strdup(client->value));
+		s = strchr (language, '_');
+		if (s)  {	// try primary language bit:
+			*s = '\0';
+			snprintf(field, sizeof (field), "Description-%s.UTF-8", language);
+			if (!debconf_metaget(client, template, field))
+				return (strdup(client->value));
+		}
 	}
 	// Description must exist.
 	debconf_metaget(client, template, "Description");
@@ -469,6 +467,7 @@ translated_template_get(char *template)
 
 /**
  * @brief discover what subarchitecture we have
+ * @return subarch string, or "", freed by caller.
  */
 const char *subarch_get (void)
 {
@@ -478,7 +477,7 @@ const char *subarch_get (void)
 		struct debconfclient *client = mydebconf_get();
 
 		if (debconf_get (client, "debian-installer/kernel/subarchitecture"))
-			subarch = "";
+			subarch = strdup("");
 		else
 			subarch = strdup(client->value);
 	}
@@ -527,13 +526,10 @@ keyboards_get (void)
 		exit (6);
 	}
 	// translate the keyboard names
-	p = keyboards;
-	while (p) { 
+	for (p = keyboards; p != NULL; p = p->next) {
 		sprintf(buf, "kbd-chooser/kbd/%s", p->name);
 		p->description = translated_template_get(buf);
-		p = p->next;
 	}
-	keyboards_sort (&keyboards);
 	return keyboards;
 }
 
@@ -603,7 +599,8 @@ keyboard_select (void)
 				    || (kp->present == TRUE))
 					preferred = kp;
 			} else {
-				if (preferred == NULL || (preferred->present != TRUE))
+				if (preferred == NULL || 
+				    (preferred->present != TRUE && kp->present == TRUE))
 					preferred = kp;
 			}
 		}
@@ -630,7 +627,6 @@ keyboard_select (void)
  * @returns CMDSTATUS_SUCCESS or CMDSTATUS_GOBACK, keymap set if SUCCESS
  */
 
-/* FIXME FIXME REVIEW */
 int
 keymap_select (char *arch, char *keymap)
 {
@@ -641,7 +637,6 @@ keymap_select (char *arch, char *keymap)
 
 	sprintf (template, "console-keymaps-%s/keymap", arch);
 
-	// If there is a default keymap for this keyboard, select it
 	for (kb = keyboards_get (); kb != NULL; kb = kb->next)
 		if (!strcmp (kb->name, arch))
 			break;
@@ -649,18 +644,18 @@ keymap_select (char *arch, char *keymap)
 		di_error ("Keyboard not found\n");
 		exit (7);
 	}
-	// Should we set a default ?
+	// If there is a default keymap for this keyboard, select it
+	// This is set if we can actually read preferred type from keyboard,
+	// and shouldn't have to ask the question.
 	if (kb->deflt) {
-		di_debug ( "keymap_select: setting default %s", kb->deflt);
 		def = keymap_get (maplist_get (arch), kb->deflt);
-		mydebconf_default_set (template, kb->description);
+		mydebconf_default_set (template, def->description);
 	}
-	res = mydebconf_ask ("medium", template, &ptr);
+	res = mydebconf_ask ( kb->deflt ? "low" : "medium", template, &ptr);
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
 	strcpy (keymap, (strlen (ptr) == 0) ? "none" : ptr);
 
-	di_debug ("keymap_select: ptr %s", keymap);
 	return CMDSTATUS_SUCCESS;
 }
 
