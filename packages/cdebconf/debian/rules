@@ -9,31 +9,8 @@ topdir=$(shell pwd)
 udebbuild=$(topdir)/debian/build-udeb
 debbuild=$(topdir)/debian/build
 
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 DEB_HOST_ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 CONFFILE=/etc/cdebconf.conf
-
-udebname=cdebconf-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
-udebpriority=$(shell grep '^Package: cdebconf-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
-
-priorityudebname=cdebconf-priority_$(VERSION)_$(DEB_HOST_ARCH).udeb
-priorityudebpriority=$(shell grep '^Package: cdebconf-priority' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
-
-libudebname=libdebconfclient0-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
-libudebpriority=$(shell grep '^Package: libdebconfclient0-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
-
-slang_udebname=cdebconf-slang-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
-slang_udebpriority=$(shell grep '^Package: cdebconf-slang-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
-
-text_udebname=cdebconf-text-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
-text_udebpriority=$(shell grep '^Package: cdebconf-text-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
-	
-newt_udebname=cdebconf-newt-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
-newt_udebpriority=$(shell grep '^Package: cdebconf-newt-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
-
-
-gtk_udebname=cdebconf-gtk-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
-gtk_udebpriority=$(shell grep '^Package: cdebconf-gtk-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
 
 #package names
 LIBDEBCONFDEV=libdebconfclient0-dev
@@ -234,13 +211,8 @@ cdebconf-udeb: install-udeb
 	dh_fixperms		-p$@
 	dh_installdeb		-p$@
 	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
-	# Don't write your stupid guesses to debian/files.
-	dh_gencontrol 		-p$@ -- -fdebian/files~
-	# Register file manually.
-	dpkg-distaddfile	$(udebname) debian-installer $(udebpriority)
-# udebs shouldn't have md5sums.
-#	dh_md5sums		-p$@
-	dh_builddeb		-p$@ --filename=$(udebname)
+	dh_gencontrol 		-p$@
+	dh_builddeb		-p$@
 
 cdebconf-priority: install-priority-udeb
 	@echo "Building $@"
@@ -252,13 +224,8 @@ cdebconf-priority: install-priority-udeb
 	dh_fixperms		-p$@
 	dh_installdeb		-p$@
 	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
-	# Don't write your stupid guesses to debian/files.
-	dh_gencontrol 		-p$@ -- -fdebian/files~
-	# Register file manually.
-	dpkg-distaddfile	$(priorityudebname) debian-installer $(priorityudebpriority)
-# udebs shouldn't have md5sums.
-#	dh_md5sums		-p$@
-	dh_builddeb		-p$@ --filename=$(priorityudebname)
+	dh_gencontrol 		-p$@
+	dh_builddeb		-p$@
 
 libdebconfclient0-udeb: install-udeb
 	@echo "Building $@"
@@ -269,13 +236,8 @@ libdebconfclient0-udeb: install-udeb
 	dh_fixperms		-p$@
 	dh_installdeb		-p$@
 	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
-	# Don't write your stupid guesses to debian/files.
-	dh_gencontrol 		-p$@ -- -fdebian/files~
-	# Register file manually.
-	dpkg-distaddfile	$(libudebname) debian-installer $(libudebpriority)
-# udebs shouldn't have md5sums.
-#	dh_md5sums		-p$@
-	dh_builddeb		-p$@ --filename=$(libudebname)
+	dh_gencontrol 		-p$@
+	dh_builddeb		-p$@
 
 cdebconf-text-udeb: install-text-udeb
 	@echo "building $@"
@@ -287,13 +249,8 @@ cdebconf-text-udeb: install-text-udeb
 	dh_fixperms		-p$@
 	dh_installdeb		-p$@
 	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
-	# don't write your stupid guesses to debian/files.
-	dh_gencontrol 		-p$@ -- -fdebian/files~
-	# register file manually.
-	dpkg-distaddfile	$(text_udebname) debian-installer $(text_udebpriority)
-# udebs shouldn't have md5sums.
-#	dh_md5sums		-p$@
-	dh_builddeb		-p$@ --filename=$(text_udebname)
+	dh_gencontrol 		-p$@
+	dh_builddeb		-p$@
 
 cdebconf-slang-udeb: install-slang-udeb
 	@echo "building $@"
@@ -305,13 +262,7 @@ cdebconf-slang-udeb: install-slang-udeb
 	dh_fixperms		-p$@
 	dh_installdeb		-p$@
 	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
-	# don't write your stupid guesses to debian/files.
-	dh_gencontrol 		-p$@ -- -fdebian/files~
-	# register file manually.
-	dpkg-distaddfile	$(slang_udebname) debian-installer $(slang_udebpriority)
-# udebs shouldn't have md5sums.
-#	dh_md5sums		-p$@
-	dh_builddeb		-p$@ --filename=$(slang_udebname)
+	dh_builddeb		-p$@
 
 cdebconf-newt-udeb: install-newt-udeb
 	@echo "Building $@"
@@ -323,13 +274,8 @@ cdebconf-newt-udeb: install-newt-udeb
 	dh_fixperms		-p$@
 	dh_installdeb		-p$@
 	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
-	# Don't write your stupid guesses to debian/files.
-	dh_gencontrol 		-p$@ -- -fdebian/files~
-	# Register file manually.
-	dpkg-distaddfile	$(newt_udebname) debian-installer $(newt_udebpriority)
-# udebs shouldn't have md5sums.
-#	dh_md5sums		-p$@
-	dh_builddeb		-p$@ --filename=$(newt_udebname)
+	dh_gencontrol 		-p$@
+	dh_builddeb		-p$@
 
 cdebconf-gtk-udeb:	install-gtk-udeb
 	@echo "Building $@"
@@ -341,11 +287,8 @@ cdebconf-gtk-udeb:	install-gtk-udeb
 	dh_fixperms             -p$@
 	dh_installdeb           -p$@
 	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
-	# Don't write your stupid guesses to debian/files.
-	dh_gencontrol           -p$@ -- -fdebian/files~
-	#                 # Register file manually.
-	dpkg-distaddfile        $(gtk_udebname) debian-installer $(gtk_udebpriority)
-	dh_builddeb	-p$@ --filename=$(gtk_udebname)
+	dh_gencontrol           -p$@
+	dh_builddeb		-p$@
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
