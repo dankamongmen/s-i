@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1 2001/02/22 05:59:06 zw Exp $
+# $Id: Makefile,v 1.2 2001/02/22 09:22:39 zw Rel $
 
 # This is wrong 8:P  (Hey, big nose? Or girlie hair?)
 SOBJ = corba.so
@@ -11,15 +11,15 @@ PROJ_SERVSRC = $($(PROJ)-text:%=%.c)
 ORBIT_IDL = /usr/bin/orbit-idl
 ORBIT_IDLFLAGS = --skeleton-impl
 ORBIT_IDLTARGETS = $(PROJ)-stubs.c $(PROJ)-skels.c $(PROJ)-common.c $(PROJ).h
-ORBIT_CFLAGS = -I/usr/lib/glib/include -I/usr/include
-ORBIT_LIBS = -L/usr/lib -lORBit -lIIOP -lORBitutil -lglib -lm
-CFLAGS += $(MODCFLAGS) $(ORBIT_CFLAGS)
-LDFLAGS = $(MODLDFLAGS) $(ORBIT_LIBS)
+GNOME_CFLAGS = $(shell gnome-config --cflags gnome gnomeui gnorba gtk)
+GNOME_LIBS = $(shell gnome-config --libs gnome gnomeui gnorba gtk)
+CFLAGS += $(MODCFLAGS) $(GNOME_CFLAGS)
+LDFLAGS = $(MODLDFLAGS) $(GNOME_LIBS)
 
 $(PROJ)-all: $(ORBIT_IDLTARGETS) $(PROJ_SERV)
 
 $(PROJ)-text: $(PROJ)-text.o $(PROJ)-skels.o $(PROJ)-common.o
-	$(CC) -o $(PROJ)-text $< $(LDFLAGS)
+	$(CC) -o $(PROJ)-text $^ $(LDFLAGS)
 
 $(ORBIT_IDLTARGETS): $(PROJ).idl
 	$(ORBIT_IDL) $(ORBIT_IDLFLAGS) $<

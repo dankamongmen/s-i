@@ -1,7 +1,7 @@
 /*
  * cdebconf frontend, corba servant, text frontend implementation
  *
- * $Id: dcf-textimpl.c,v 1.2 2001/02/22 05:59:06 zw Exp $
+ * $Id: dcf-textimpl.c,v 1.3 2001/02/22 09:22:39 zw Exp $
  */
 
 #include "dcf.h"
@@ -23,9 +23,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#ifndef _
-#define _(x) x
-#endif
+#include <ORBitservices/CosNaming.h>
+#include <libgnorba/gnorba.h>
+#include <gnome.h>		/* Yeah, have to. */
 
 /*** App-specific servant structures ***/
 

@@ -1,19 +1,18 @@
 /*
- * cdebconf frontend, corba servant, text frontend
+ * cdebconf frontend, corba servant, text frontend main program, will
+ * only work in an xterm, haha
  *
- * $Id: dcf-text.c,v 1.2 2001/02/22 05:59:06 zw Exp $
+ * $Id: dcf-text.c,v 1.3 2001/02/22 09:22:39 zw Exp $
  */
 
 #include "dcf-textimpl.c"
-#include <ORBitservices/CosNaming.h>
 
 int main(int argc, char* argv[]) {
   CORBA_ORB                 orb;
   CORBA_Environment	    *ev;
-  PortableServer_ObjectId   *oid;
+  CORBA_Object 		    name_server;
   PortableServer_POA        root_poa;
   PortableServer_POAManager pm;
-  CosNaming_NamingContext   root;
   CosNaming_NameComponent   name_component[2] = {{"Debconf", "subcontext"},
 						 {"Frontend", "server"}};
   CosNaming_Name 	    name = {2, 2, name_component, CORBA_FALSE};
@@ -24,14 +23,17 @@ int main(int argc, char* argv[]) {
 
   CORBA_exception_init(ev);
 
-  orb = CORBA_ORB_init (&argc, argv, "orbit-local-orb", ev);
+  orb = gnorba_CORBA_init(&argc, argv,
+			  GNORBA_INIT_SERVER_FUNC,
+			  ev);
   if (ev->_major != CORBA_NO_EXCEPTION) {
     fprintf(stderr, "Error: could not initializing CORBA ORB: %s\n", 
 	    CORBA_exception_id(ev));
     exit(1);
   }
 
-  root_poa = (PortableServer_POA) CORBA_ORB_resolve_initial_references(orb, "RootPOA",
+  root_poa = (PortableServer_POA) CORBA_ORB_resolve_initial_references(orb,
+								       "RootPOA",
 								       ev);
   if (ev->_major != CORBA_NO_EXCEPTION) {
     fprintf(stderr, "Error: could not get RootPOA: %s\n", 
@@ -47,26 +49,16 @@ int main(int argc, char* argv[]) {
   objref = CORBA_ORB_object_to_string(orb, dcf_text, ev);
   fprintf(stderr, "%s\n", objref);
 
-  root = (CosNaming_NamingContext) CORBA_ORB_resolve_initial_service (orb, "NameService",
-								      ev);
+  /* So I have to use goad ???
+  name_server = gnome_name_service_get();
+  CosNaming_NamingContext_bind(name_server, &name, dcf_text, ev);
   if (ev->_major != CORBA_NO_EXCEPTION) {
-    fprintf(stderr, "Error: could not get name service: %s\n", 
+    fprintf(stderr, "Error: could register object: %s\n",
 	    CORBA_exception_id(ev));
     exit(1);
   }
+  */
   
-  CosNaming_NamingContext_bind(root, &name, dcf_text, ev);
-  if (ev->_major != CORBA_NO_EXCEPTION) {
-    fprintf(stderr, "Error: could register object: %s\n", 
-	    CORBA_exception_id(&ev));
-    exit(1);
-  }
-  
-  /*
-   * TODO: SIGINT is ignored by the text UI, otherwise it interfers with
-   * the way question/answers are handled. this is probably not optimal
-   */
-  signal(SIGINT, SIG_IGN);
   CORBA_ORB_run(orb, ev);
 
   CORBA_exception_free(ev);
