@@ -50,7 +50,7 @@ void question_ref(struct question *);
 void question_deref(struct question *);
 
 void question_setvalue(struct question *q, const char *value);
-const char *question_getvalue(struct question *q, const char *lang);
+char *question_getvalue(struct question *q, const char *lang);
 
 void question_variable_add(struct question *q, const char *var, 	
 	const char *value);
@@ -58,7 +58,7 @@ void question_variable_delete(struct question *q, const char *var,
 	const char *value);
 void question_owner_add(struct question *q, const char *owner);
 void question_owner_delete(struct question *q, const char *owner);
-const char *question_get_field(struct question *q, const char *lang,
+char *question_get_field(struct question *q, const char *lang,
 	const char *field);
 
 #endif

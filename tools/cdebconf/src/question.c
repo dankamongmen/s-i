@@ -74,7 +74,7 @@ void question_setvalue(struct question *q, const char *value)
 	}
 }
 
-const char *question_getvalue(struct question *q, const char *lang)
+char *question_getvalue(struct question *q, const char *lang)
 {
 	if (q->value)
 		return q->value;
@@ -222,7 +222,7 @@ static char *question_expand_vars(struct question *q, const char *field)
     return buf;
 }
 
-const char *question_get_field(struct question *q, const char *lang,
+char *question_get_field(struct question *q, const char *lang,
 	const char *field)
 {
     assert(q);
