@@ -14,10 +14,10 @@ error () {
 
 db_get preseed/file
 FILE="$RET"
-if [ ! -e "$FILE" ]; then
+if [ ! -e "$FILE" ] || ! cp "$FILE" /var/log/debconf-seed; then
 	error retrieve_error "$FILE"
 fi
 
-if ! debconf-set-selections "$FILE"; then
+if ! debconf-set-selections "/var/log/debconf-seed"; then
 	error load_error "$FILE"
 fi

@@ -3,8 +3,6 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-TMPFILE=/tmp/preseed
-
 error () {
 	ERROR="$1"
 	FILE="$2"
@@ -31,13 +29,13 @@ fetch() {
 db_get preseed/url
 URL="$RET"
 if [ -n "$URL" ]; then
-	if ! fetch $URL $TMPFILE; then
+	if ! fetch $URL /var/log/debconf-seed; then
 		error retrieve_error "$URL"
 	fi
 fi
 
-if ! debconf-set-selections "$TMPFILE"; then
-	error load_error "$TMPFILE"
+if ! debconf-set-selections /var/log/debconf-seed; then
+	error load_error "$URL"
 fi
 
 rm -f $TMPFILE
