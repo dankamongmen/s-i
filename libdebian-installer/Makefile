@@ -49,4 +49,4 @@ install:
 
 
 clean:
-	rm -f *.o $(LIBS) 
+	rm -f *.o $(LIB) $(LIBNAME_A) $(LIB).*
