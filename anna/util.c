@@ -229,12 +229,12 @@ unpack_package (const char *pkgfile)
 #endif
 
 int
-configure_package (const char *pkgfile)
+configure_package (const char *package)
 {
     char *command;
     int ret;
 
-    if (asprintf(&command, "%s %s", DPKG_CONFIGURE_COMMAND, pkgfile) == -1)
+    if (asprintf(&command, "%s %s", DPKG_CONFIGURE_COMMAND, package) == -1)
 	return 0;
     ret = !di_exec_shell_log(command);
     free(command);

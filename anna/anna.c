@@ -262,7 +262,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
                 break;
             }
 	    if (!((di_system_package *)package)->installer_menu_item)
-		if (!configure_package(dest_file)) {
+		if (!configure_package(package->package)) {
 		    debconf_progress_stop(debconf);
 		    debconf_subst(debconf, "anna/install_failed", "PACKAGE",
 				  package->package);
