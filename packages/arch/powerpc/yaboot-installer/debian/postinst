@@ -120,12 +120,25 @@ if [ "$SUBARCH" = powermac_newworld ] && \
 fi
 
 if [ -z "$PARTITIONS" ]; then
+    case $SUBARCH in
+	powermac_newworld)
+	    PARTED_MATCH='boot'
+	    ;;
+	chrp)
+	    PARTED_MATCH='prep.*'
+	    ;;
+	*)
+	    error 'unknown subarchitecture; allowing any bootable partition'
+	    PARTED_MATCH='boot'
+	    ;;
+    esac
+
     for i in /dev/discs/*/disc; do
 	info "parted dump of partition table on $i:"
 	parted -s "$i" print | logger -t yaboot-installer
 	dev="`parted -s "$i" print | sed -n 's,^Disk geometry for \([^:]*\)/disc:.*$,\1,p'`"
 	# Look for partitions with the boot flag set.
-	for part in `parted -s "$i" print | sed -n 's,^\([0-9]\+\) .* boot$,'"$dev"'/part\1,p'`; do
+	for part in `parted -s "$i" print | sed -n 's,^\([0-9]\+\) .* '"$PARTED_MATCH"'$,'"$dev"'/part\1,p'`; do
 	    mappart="$(mapdevfs "$part")"
 	    if [ -z "$PARTITIONS" ]; then
 		DEFAULT="$mappart"
