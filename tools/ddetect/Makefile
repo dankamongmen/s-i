@@ -3,27 +3,19 @@
 #UC_LIBC=yes
 
 
-# uncomment this is you want this linked statically 
-#LINK_STATICALLY=yes
-
-ifdef LINK_STATICALLY
-LDFLAGS=-Wl,--static
-endif
-
-
 OBJS=ddetect.o
 
 ifndef PROGS
 PROGS=memdetect diskdetect mdmdetect cddetect cpudetect ethdetect snddetect
 endif
-HEADERS= ethdetect.h snddetect.h cddetect.h mdmdetect.h
+HEADERS= snddetect.h cddetect.h mdmdetect.h
 
 INSTALL_DIR=$(DESTDIR)/usr/bin/
-CFLAGS=-Wall  -Os -fomit-frame-pointer
+CFLAGS=-Wall  -Os -fomit-frame-pointer 
 INSTALL=install
 STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment 
-LDFLAGS=-ldetect -lisapnp
+LDFLAGS=-ldetect -lisapnp 
 
 
 all: lst2header $(HEADERS) $(OBJS) $(PROGS)
@@ -33,13 +25,12 @@ all: lst2header $(HEADERS) $(OBJS) $(PROGS)
 mdmdetect: mdmdetect.c ddetect.o
 cddetect : cddetect.c ddetect.o
 ethdetect :ethdetect.c ddetect.o
+	$(CC) $< -o $@ $(CFLAGS) $(LDFLAGS) ddetect.o
 snddetect: snddetect.c ddetect.o
 
 lst2header: lst2header.c
 	$(CC) lst2header.c -o lst2header -ldetect -lisapnp 
 
-ethdetect.h: lst2header
-	-./lst2header -e > $@ 
 snddetect.h: lst2header
 	-./lst2header -s > $@ 
 cddetect.h: lst2header
@@ -71,7 +62,7 @@ OBJS=ddetect.o ddetect_nopassive.o
 	$(CC) $(DEFS) $(CFLAGS) -c $< -o $@
 
 %:%.c %.h
-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS) -ldetect -lisapnp
+	$(CC) $(CFLAGS) $< -o $@  -ldetect -lisapnp $(LDFLAGS)
 	$(STRIP) $@	
 	@chmod +x $@ 
 	@size $@	
