@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include "anna.h"
 
-/* 
+/*
  * This function takes a linked list of available packages, decides which
  * are worth installing, creates a linked list of those, and returns it.
  *
@@ -56,9 +56,9 @@ int install_packages (struct package_t *packages) {
 					 strlen(f) + 1);
 			sprintf(dest_file, "%s/%s", DOWNLOAD_DIR, f);
 
-			if (! get_package(p->filename, dest_file)) {
-				fprintf(stderr, "anna: error getting %s!", p->filename);
-				perror("anna");
+			if (! get_package(p, dest_file)) {
+				fprintf(stderr, "anna: error getting %s!",
+					p->filename);
 			}
 			else if (! unpack_package(dest_file)) {
 				unlink(dest_file);

@@ -13,13 +13,13 @@ char *chosen_retriever (void) {
 	return "usr/lib/debian-installer/retriever/file-retriever";
 }
 
-/* Ask the chosen retriever to download a package from src to dest. */
-int get_package (char *src, char *dest) {
+/* Ask the chosen retriever to download a particular package to to dest. */
+int get_package (struct package_t *package, char *dest) {
 	int ret;
 	char *retriever=chosen_retriever();
-	char *command=malloc(strlen(retriever) + 1 + strlen(src) +
+	char *command=malloc(strlen(retriever) + 1 + strlen(package->filename) +
 				     strlen(dest) + 1);
-	sprintf(command, "%s %s %s", retriever, src, dest);
+	sprintf(command, "%s %s %s", retriever, package->filename, dest);
 	ret=! system(command);
 	free(command);
 	return ret;
@@ -35,8 +35,8 @@ struct package_t *get_packages (void) {
 	char *retriever=chosen_retriever();
 	FILE *packages;
 	char buf[BUFSIZE];
-	char *command=malloc(strlen(retriever) + 9);
 	struct package_t *p = NULL, *newp;
+	char *command=malloc(strlen(retriever) + 10);
 
 	sprintf(command, "%s Packages", retriever);
 	packages=popen(command, "r");
