@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: list.h,v 1.2 2003/11/19 09:24:14 waldi Exp $
+ * $Id: list.h,v 1.3 2003/12/31 16:38:41 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__LIST_H
@@ -38,8 +38,8 @@ typedef struct di_list_node di_list_node;
  */
 struct di_list
 {
-  di_list_node *first;                                  /**< first node */
-  di_list_node *last;                                   /**< last node */
+  di_list_node *head;                                   /**< head of list */
+  di_list_node *bottom;                                 /**< bottom of list */
 };
 
 /**
@@ -52,10 +52,70 @@ struct di_list_node
   void *data;                                           /**< data */
 };
 
+/**
+ * Allocate a double-linked list
+ *
+ * @return a di_list
+ */
 di_list *di_list_alloc (void);
+
+/**
+ * Destroy the contents of a double-linked list
+ *
+ * @warning never use this function with a list which makes use of the chunk allocator
+ *
+ * @param list a di_list
+ */
+void di_list_destroy (di_list *list, di_destroy_notify destroy_func) __attribute__ ((nonnull(1)));
+
+/**
+ * Free a double-linked list
+ *
+ * @param list a di_list
+ */
+void di_list_free (di_list *list);
+
+/**
+ * Append to a double-linked list
+ *
+ * @warning don't mix with di_list_append_chunk
+ *
+ * @param list a di_list
+ * @param data the data
+ */
 void di_list_append (di_list *list, void *data) __attribute__ ((nonnull(1)));
+
+/**
+ * Append to a double-linked list
+ *
+ * @warning don't mix with di_list_append_chunk
+ *
+ * @param list a di_list
+ * @param data the data
+ */
 void di_list_append_chunk (di_list *list, void *data, di_mem_chunk *mem_chunk) __attribute__ ((nonnull(1,3)));
+
+/**
+ * Prepend to a double-linked list
+ *
+ * @warning don't mix with di_list_prepend_chunk
+ *
+ * @param list a di_list
+ * @param data the data
+ */
 void di_list_prepend (di_list *list, void *data) __attribute__ ((nonnull(1)));
+
+/**
+ * Prepend to a double-linked list
+ *
+ * @warning don't mix with di_list_prepend
+ *
+ * @param list a di_list
+ * @param data the data
+ * @param mem_chunk a di_mem_chunk for allocation of new nodes
+ *
+ * @pre the di_mem_chunk must return chunks with at least the size of di_list_node
+ */
 void di_list_prepend_chunk (di_list *list, void *data, di_mem_chunk *mem_chunk) __attribute__ ((nonnull(1,3)));
 
 /** @} */

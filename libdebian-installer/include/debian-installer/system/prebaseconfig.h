@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: prebaseconfig.h,v 1.5 2003/11/19 09:24:14 waldi Exp $
+ * $Id: prebaseconfig.h,v 1.6 2003/12/31 16:38:41 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__PREBASECONFIG_H
@@ -39,6 +39,7 @@
 int di_system_prebaseconfig_append (const char *udeb, const char *format, ...) __attribute__ ((format(printf,2,3)));
 
 /**
+ * @deprecated
  * Alias of di_system_prebaseconfig_append
  */
 int di_prebaseconfig_append (const char *udeb, const char *format, ...) __attribute__ ((format(printf,2,3),deprecated));

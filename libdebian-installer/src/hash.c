@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.c,v 1.9 2003/12/11 19:29:50 waldi Exp $
+ * $Id: hash.c,v 1.10 2003/12/31 16:38:41 waldi Exp $
  */
 
 #include <config.h>
@@ -104,45 +104,15 @@ static di_hash_node *di_hash_node_new (di_hash_table *hash_table, void *key, voi
 static void di_hash_node_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func) __attribute__ ((unused));
 static void di_hash_nodes_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func);
 
-static unsigned int di_spaced_primes_closest (unsigned int num);
-
 /** @} */
 
-/**
- * Creates a new di_hash_table.
- *
- * @param hash_func a function to create a hash value from a key.
- *   Hash values are used to determine where keys are stored within the
- *   di_hash_table data structure.
- * @param key_equal_func a function to check two keys for equality.  This is
- *   used when looking up keys in the di_hash_table.
- *
- * @return a new di_hash_table.
- **/
+static unsigned int di_spaced_primes_closest (unsigned int num);
+
 di_hash_table *di_hash_table_new (di_hash_func hash_func, di_equal_func key_equal_func)
 {
   return di_hash_table_new_full (hash_func, key_equal_func, NULL, NULL);
 }
 
-/**
- * Creates a new di_hash_table like di_hash_table_new and allows to specify
- * functions to free the memory allocated for the key and value that get
- * called when removing the entry from the di_hash_table
- *
- * @param hash_func a function to create a hash value from a key.
- *   Hash values are used to determine where keys are stored within the
- *   di_hash_table data structure.
- * @param key_equal_func a function to check two keys for equality.  This is
- *   used when looking up keys in the di_hash_table.
- * @param key_destroy_func a function to free the memory allocated for the key
- *   used when removing the entry from the di_hash_table or %NULL if you
- *   don't want to supply such a function.
- * @param value_destroy_func a function to free the memory allocated for the
- *   value used when removing the entry from the di_hash_table or %NULL if
- *   you don't want to supply such a function.
- *
- * @return a new di_hash_table.
- **/
 di_hash_table *di_hash_table_new_full (di_hash_func hash_func, di_equal_func key_equal_func, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func)
 {
   di_hash_table *hash_table;
@@ -164,15 +134,6 @@ di_hash_table *di_hash_table_new_full (di_hash_func hash_func, di_equal_func key
   return hash_table;
 }
 
-/**
- * Destroys the di_hash_table. If keys and/or values are dynamically
- * allocated, you should either free them first or create the di_hash_table
- * using di_hash_table_new_full. In the latter case the destroy functions
- * you supplied will be called on all keys and values before destroying
- * the di_hash_table.
- *
- * @param hash_table a di_hash_table.
- */
 void di_hash_table_destroy (di_hash_table *hash_table)
 {
   size_t i;
@@ -194,9 +155,9 @@ static inline di_hash_node** di_hash_table_lookup_node (di_hash_table *hash_tabl
     [hash_table->hash_func (key) % hash_table->size];
 
   /* Hash table lookup needs to be fast.
-   *  We therefore remove the extra conditional of testing
-   *  whether to call the key_equal_func or not from
-   *  the inner loop.
+   * We therefore remove the extra conditional of testing
+   * whether to call the key_equal_func or not from
+   * the inner loop.
    */
   if (hash_table->key_equal_func)
     while (*node && !(*hash_table->key_equal_func) ((*node)->key, key))
@@ -208,14 +169,6 @@ static inline di_hash_node** di_hash_table_lookup_node (di_hash_table *hash_tabl
   return node;
 }
 
-/**
- * Looks up a key in a di_hash_table.
- *
- * @param hash_table a di_hash_table,
- * @param key the key to look up.
- *
- * @return the associated value, or %NULL if the key is not found.
- */
 void *di_hash_table_lookup (di_hash_table *hash_table, const void *key)
 {
   di_hash_node *node;
@@ -225,19 +178,6 @@ void *di_hash_table_lookup (di_hash_table *hash_table, const void *key)
   return node ? node->value : NULL;
 }
 
-/**
- * Inserts a new key and value into a di_hash_table.
- *
- * If the key already exists in the di_hash_table its current value is replaced
- * with the new value. If you supplied a value_destroy_func when creating the
- * di_hash_table, the old value is freed using that function. If you supplied
- * a key_destroy_func when creating the di_hash_table, the passed key is freed
- * using that function.
- *
- * @param hash_table a di_hash_table.
- * @param key a key to insert.
- * @param value the value to associate with the key.
- */
 void di_hash_table_insert (di_hash_table *hash_table, void *key, void *value)
 {
   di_hash_node **node;
@@ -306,18 +246,6 @@ static void di_hash_nodes_destroy (di_hash_node *hash_node, di_destroy_notify ke
   }
 }
 
-/**
- * Calls the given function for each of the key/value pairs in the
- * di_hash_table. The function is passed the key and value of each
- * pair, and the given user_data parameter.
- *
- * @post The hash table may not be modified while iterating over it
- * (you can't add/remove items).
- *
- * @param hash_table a di_hash_table.
- * @param func the function to call for each key/value pair.
- * @param user_data user data to pass to the function.
- */
 void di_hash_table_foreach (di_hash_table *hash_table, di_hfunc *func, void *user_data)
 {
   di_hash_node *node;

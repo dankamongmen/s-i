@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: types.h,v 1.7 2003/11/19 09:24:14 waldi Exp $
+ * $Id: types.h,v 1.8 2003/12/31 16:38:41 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__TYPES_H
@@ -61,6 +61,12 @@ typedef void di_func (void *data, void *user_data);
  * @param user_data user data
  */
 typedef int di_io_handler (const char *buf, size_t len, void *user_data);
+
+/**
+ * Handler which is called after the fork
+ * @param pid return value of fork
+ * @param user_data user data
+ */
 typedef int di_process_handler (pid_t pid, void *user_data);
 
 /**

@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem.h,v 1.3 2003/11/19 09:24:14 waldi Exp $
+ * $Id: mem.h,v 1.4 2003/12/31 16:38:41 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__MEM_H
@@ -33,9 +33,40 @@
  * @{
  */
 
+
+/**
+ * Allocate memory
+ *
+ * @param n_bytes size in bytes
+ *
+ * @post never returns NULL
+ */
 void *di_malloc (size_t n_bytes) __attribute__ ((malloc));
+
+/**
+ * Allocate cleared memory
+ *
+ * @param n_bytes size in bytes
+ *
+ * @post never returns NULL
+ */
 void *di_malloc0 (size_t n_bytes) __attribute__ ((malloc));
+
+/**
+ * Reallocate memory
+ *
+ * @param mem memory
+ * @param n_bytes size in bytes
+ *
+ * @post never returns NULL
+ */
 void *di_realloc (void *mem, size_t n_bytes) __attribute__ ((malloc));
+
+/**
+ * Free memory
+ *
+ * @param mem memory
+ */
 void di_free (void *mem);
 
 /**
