@@ -2,6 +2,19 @@
 
 DESTDIR = debian/prebaseconfig
 
+scripts = \
+	10bind-mount \
+	20final-message \
+	50config-target-network \
+	51framebuffer-module-linux-i386 \
+	90prepare-base-config \
+	93save-install-log \
+	95umount \
+	99reboot
+ifeq ($(DEB_HOST_GNU_CPU),ia64)
+scripts += 49cdrom-module-ia64
+endif
+
 build: 
 
 clean:
@@ -14,18 +27,8 @@ install: build
 	dh_testroot
 	dh_installdirs
 	install -m0644 inittab.install $(DESTDIR)/usr/share/prebaseconfig/inittab
-	set -e ; for file in \
-		10bind-mount \
-		20final-message \
-		49cdrom-module-ia64 \
-		50config-target-network \
-		51framebuffer-module-linux-i386 \
-		90prepare-base-config \
-		93save-install-log \
-		95umount \
-		99reboot ; \
-	do \
-	    install -m0755 prebaseconfig.d/$$file $(DESTDIR)/usr/lib/prebaseconfig.d/$$file; \
+	set -e ; for file in $(scripts); do \
+		install -m0755 prebaseconfig.d/$$file $(DESTDIR)/usr/lib/prebaseconfig.d/$$file; \
 	done
 
 binary-arch: build install
