@@ -213,6 +213,9 @@ MODULE_STEPSIZE=$(expr \( $MAX_STEPS - \( $OTHER_STEPS \* $OTHER_STEPSIZE \) \) 
 
 log "Loading modules..."
 IFS="$NEWLINE"
+
+# Save from being called so many times
+MODPATH="/lib/modules/$(uname -r)/"
 for device in $(list_to_lines); do
 	module="`echo $device | cut -d' ' -f1`"
 	cardname="`echo $device | cut -d'(' -f2 | sed 's/)$//'`"
@@ -231,7 +234,7 @@ for device in $(list_to_lines); do
 		db_progress INFO hw-detect/load_progress_step
 		log "Trying to load module '$module'"
 
-		if find /lib/modules/`uname -r`/ | grep -q /${module}\\. ; then
+		if find $MODPATH | grep -q /${module}\\. ; then
 			if [ "$cardname" = "[Unknown]" ]; then
 				load_module "$module"
 			else
