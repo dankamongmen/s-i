@@ -29,6 +29,8 @@ for i in `cat /proc/mdstat|grep ^md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\
 	echo "${RET}" > ${DEVICE}/model
 
 	get_size < /proc/mdstat
+	sector_size=$(grep " sectors" /proc/mdstat | sed -e 's/[^0-9]\+//g')
+	size=$(($size * $sector_size))
 	echo "$size" > ${DEVICE}/size
 	open_dialog OPEN "/dev/md/${NUMBER}"
 	read_line response
