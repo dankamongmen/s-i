@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.17 2003/07/16 09:32:25 sjogren Exp $
+ * $Id: newt.c,v 1.18 2003/07/18 12:55:56 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -151,11 +151,11 @@ min_window_height(struct question *q, int win_width)
 {
     int height = 3;
     char *type = q->template->type;
-    char *qtext;
+    char *q_ext_text;
 
-    qtext = q_get_extended_description(q);
-    if (qtext != NULL)
-        height = get_text_height(qtext, win_width) + 1;
+    q_ext_text = q_get_extended_description(q);
+    if (q_ext_text != NULL)
+        height = get_text_height(q_ext_text, win_width) + 1;
     if (strcmp(type, "multiselect") == 0 || strcmp(type, "select") == 0)
         height += 4; // at least three lines for choices + blank line
     else if (strcmp(type, "string") == 0 || strcmp(type, "password") == 0)
@@ -221,12 +221,16 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     newtComponent form, textbox, bOk, bCancel, entry, cRet;
     int width = 80, height = 24, t_height, win_width, win_height;
     int ret, tflags = NEWT_FLAG_WRAP;
-    char *defval, *result;
+    char *defval, *result, *q_ext_text;
 
     eflags |= NEWT_ENTRY_SCROLL | NEWT_FLAG_RETURNEXIT;
     newtGetScreenSize(&width, &height);
     win_width = width-7;
-    t_height = get_text_height(q_get_extended_description(q), win_width);
+    q_ext_text = q_get_extended_description(q);
+    if (q_ext_text != NULL)
+        t_height = get_text_height(q_ext_text, win_width);
+    else
+        t_height = 0;
     if (t_height + 6 <= height-5)
         win_height = t_height + 6;
     else {
@@ -238,7 +242,8 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     form = create_form(NULL);
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, tflags);
-    newtTextboxSetText(textbox, q_get_extended_description(q));
+    if (q_ext_text != NULL)
+        newtTextboxSetText(textbox, q_ext_text);
     if (eflags & NEWT_FLAG_HIDDEN || question_getvalue(q, "") == NULL)
         defval = "";
     else
@@ -270,6 +275,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     char **choices, **choices_trans, **defvals, *answer;
     int count = 0, defcount, i, k, ret, def;
     const char *p;
+    char *q_ext_text;
 
     newtGetScreenSize(&width, &height);
     p = q_get_choices_vals(q);
@@ -293,9 +299,10 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     win_width = width-7;
     sel_height = count;
     form = create_form(NULL);
-    if (show_ext_desc) {
+    q_ext_text = q_get_extended_description(q);
+    if (show_ext_desc && q_ext_text) {
         textbox = newtTextbox(1, 1, win_width-4, 10, NEWT_FLAG_WRAP);
-        newtTextboxSetText(textbox, q_get_extended_description(q));
+        newtTextboxSetText(textbox, q_ext_text);
         t_height = newtTextboxGetNumLines(textbox);
         newtTextboxSetHeight(textbox, t_height);
         newtFormAddComponent(form, textbox);
@@ -475,10 +482,15 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     int width = 80, height = 24;
     int win_width, win_height = -1, t_height;
     int flags = NEWT_FLAG_WRAP, ret;
+    char *q_ext_text;
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
-    t_height = get_text_height(q_get_extended_description(q), win_width);
+    q_ext_text = q_get_extended_description(q);
+    if (q_ext_text != NULL)
+        t_height = get_text_height(q_ext_text, win_width);
+    else
+        t_height = 0;
     if (t_height + 4 <= height-5)
         win_height = t_height + 4;
     else {
@@ -490,7 +502,8 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     form = create_form(NULL);
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
-    newtTextboxSetText(textbox, q_get_extended_description(q));
+    if (q_ext_text != NULL)
+        newtTextboxSetText(textbox, q_ext_text);
     bYes    = newtCompactButton(5, win_height-2, yes_text());
     bNo     = newtCompactButton((win_width - strwidth(no_text()) - 2)/2, win_height-2, no_text());
     bCancel = newtCompactButton(win_width - 9 - strwidth(goback_text()), win_height-2, goback_text());
@@ -731,7 +744,6 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
     int width = 80, win_width;
-    char buf[64];
 
     DELETE(obj->progress_title);
     obj->progress_title = NULL;
@@ -743,14 +755,10 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     newtGetScreenSize(&width, NULL);
     win_width = width-7;
     newtCenteredWindow(win_width, 5, title);
-    sprintf(buf, "%3d%%", 0);
-    data->perc_label = newtLabel(1, 1, buf);
-    data->scale_bar = newtScale(1 + strlen(buf) + 1, 1, win_width-strlen(buf)-3,
-            obj->progress_max);
+    data->scale_bar = newtScale(1, 1, win_width-2, obj->progress_max);
     data->scale_label = newtLabel(1, 3, "");
     data->scale_form = create_form(NULL);
-    newtFormAddComponents(data->scale_form, data->perc_label, data->scale_bar,
-            data->scale_label, NULL);
+    newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_label, NULL);
     newtDrawForm(data->scale_form);
     newtRefresh();
 }
@@ -760,20 +768,23 @@ newt_progress_set(struct frontend *obj, int val)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
 
-    obj->progress_cur = val;
-    if (obj->progress_max - obj->progress_min > 0)
+    if (data->scale_form != NULL)
     {
-        char buf[64];
-        float perc;
+	obj->progress_cur = val;
+/*	if (obj->progress_max - obj->progress_min > 0)
+	{
+	    char buf[64];
+	    float perc;
 
-        perc = 100.0 * (float)(obj->progress_cur - obj->progress_min) / 
-                       (float)(obj->progress_max - obj->progress_min);
-        sprintf(buf, "%3d%%", (int)perc);
-        newtLabelSetText(data->perc_label, buf);
+	    perc = 100.0 * (float)(obj->progress_cur - obj->progress_min) / 
+		(float)(obj->progress_max - obj->progress_min);
+	    sprintf(buf, "%3d%%", (int)perc);
+	    newtLabelSetText(data->perc_label, buf);
+	} */
+	newtScaleSet(data->scale_bar, obj->progress_cur);
+	newtDrawForm(data->scale_form);
+	newtRefresh();
     }
-    newtScaleSet(data->scale_bar, obj->progress_cur);
-    newtDrawForm(data->scale_form);
-    newtRefresh();
 }
 
 static void
@@ -781,9 +792,11 @@ newt_progress_info(struct frontend *obj, const char *info)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
 
-    newtLabelSetText(data->scale_label, info);
-    newtDrawForm(data->scale_form);
-    newtRefresh();
+    if (data->scale_form != NULL) {
+	newtLabelSetText(data->scale_label, info);
+	newtDrawForm(data->scale_form);
+	newtRefresh();
+    }
 }
 
 static void
