@@ -1,0 +1,67 @@
+#!/bin/sh
+set -e
+
+if [ -f /etc/mtab ]; then
+    MTAB=/etc/mtab
+else
+    MTAB=/proc/mounts
+fi
+
+# detect which is the root partition: /target
+# ugh, I wanted to use awk, but sed has better chance of being in busybox
+rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
+
+# detect which hard drive has /target/boot mounted on it. this does *not*
+# have to be the same as the drive /target is mounted on.
+defaultbootdev=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
+
+if [ "$defaultbootdev" = '' ]; then
+	defaultbootdev=$rootfs
+fi
+
+defaultbootdev=`/target/bin/echo $defaultbootdev | /target/bin/sed 's/part[0-9]\+$/disc/'` 
+
+if [ "$defaultbootdev" = '' ]; then
+	defaultbootdev='/dev/sda'
+fi
+
+. /usr/share/debconf/confmodule
+db_fget arcboot/boot_device seen
+[ "$RET" = true ] || db_set  arcboot/boot_device"$defaultbootdev"
+db_input high arcboot/boot_device || [ $? -eq 30 ]
+db_go || true
+
+db_get arcboot/boot_device
+bootdev=$RET
+
+if [ "$bootdev" = '' ]; then
+	bootdev=$defaultbootdev
+fi
+
+bootdev=`mapdevfs $bootdev`
+rootfs=`mapdevfs $rootfs`
+
+# Use a serial console if current default console is a serial port.
+# default console is last listed
+defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
+if echo "${defconsole}" | grep -q console=ttyS; then
+    PORT=$(echo "${defconsole}" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
+    SPEED=$(echo "${defconsole}" | sed -e 's%^console=ttyS[0-9]\+,%%' -e 's% .*%%')
+    SERIAL="${PORT},${SPEED}"
+
+    db_subst arcboot-installer/serial-console PORT "ttyS${PORT}"
+    db_subst arcboot-installer/serial-console SPEED "${SPEED}"
+    db_input medium arcboot-installer/serial-console || [ $? -eq 30 ]
+    db_go || true
+fi
+
+#write out arcboot.conf
+echo '	label=Linux' >> /target/etc/arcboot.conf
+echo 'image=/boot/vmlinuz' >> /target/etc/arcboot.conf
+
+if [ "${SERIAL}" ]; then
+    echo "  append=\"root=${rootfs} console=ttyS${SERIAL}\"" >> /target/etc/arcboot.conf
+else
+    echo "  append=\"root=${rootfs} " >> /target/etc/arcboot.conf
+
+chroot /target /usr/bin/arcboot $bootdev
