@@ -1,0 +1,427 @@
+<!-- retain these comments for translator revision tracking -->
+<!-- $Id: files.xml,v 1.1 2003/06/15 16:06:36 toff Exp $: appendix/files.xml -->
+
+ <sect1 id="obtain"><title>Obtaining Debian GNU/Linux</title>
+
+  <sect2><title>Official Debian GNU/Linux CD Sets</title>
+<para>
+
+If you want to buy a CD set to install Debian GNU/Linux system from
+CD-ROM you should look at the 
+<ulink url="http://www.debian.org/CD/vendors/">CD vendors page</ulink>. 
+There you get a list of addresses for organizations which sell &debian
+on CD-ROMs. The list is sorted by country so you shouldn't have a
+problem finding a vendor near you.
+
+</para>
+  </sect2>
+
+  <sect2 id="mirrors"><title>Debian Mirrors</title>
+<para>
+
+If you live outside of the USA and you want to download Debian
+packages, you can also use one of many mirrors which reside outside
+the USA. A list of countries and mirrors can be found at the
+<ulink url="http://www.debian.org/distrib/ftplist">
+Debian FTP server website</ulink>.
+
+</para>
+  </sect2>
+
+  <sect2 id="file-descs">
+  <title>Description of Installation System Files</title>
+<para>
+TBD
+</para>
+
+   <sect3 id="base-images"><title>Debian Base System Installation Files</title>
+<para>
+
+These files are needed only for computers without a working network
+connection, or those with unsupported network hardware. They contain
+the programs needed for the most basic GNU/Linux operating system. Often
+the contents of these files can be obtained automatically by
+the installer over a working network connection.
+
+</para>
+
+<![ %i386; [
+
+    <sect4><title>Base System Images:</title>
+<para>
+
+These are the base system floppy disk images.
+
+</para>
+<itemizedlist>
+
+&list-base-images;
+
+</itemizedlist>
+    </sect4>
+
+]]>
+
+
+    <sect4><title>Base System archive tarball</title>
+<para>
+
+If you are not limited to diskettes, choose this file.
+
+</para>
+<itemizedlist>
+<listitem><para>
+
+<ulink url="http://http.us.debian.org/debian/dists/woody/main/disks-s390/base-images-current/basedebs.tar">.../base-images-current/basedebs.tar</ulink>
+
+</para></listitem>
+</itemizedlist>
+    </sect4>
+   </sect3>
+
+<![ %i386; [
+
+   <sect3 id="utilities-links"><title>Utilities</title>
+
+<para>
+
+This is a MS-DOS utility to write a floppy disk image to a floppy.  You
+should not copy images to the floppy, but instead use this utility to
+``raw write'' them.
+<!-- TODO link to floppy writing section, rewrite -->
+
+</para>
+<itemizedlist>
+<listitem><para>
+
+&rawrite.exe;
+
+</para></listitem>
+</itemizedlist>
+   </sect3>
+
+]]>
+
+  </sect2>
+ </sect1>
+
+ <sect1 id="linuxdevices"><title>Linux Devices</title>
+<para>
+
+In Linux you have various special files in
+<filename>/dev</filename>. These files are called devices files. In
+the Unix world accessing hardware is different.  There you have a
+special file which actually runs a driver which in turn accesses the
+hardware. The device file is an interface to the actual system
+component. Files under <filename>/dev</filename> also behave
+differently than ordinary files. Below are the most important device
+files listed.
+
+</para><para>
+
+<informalexample><screen>
+fd0First Floppy Drive
+fd1Second Floppy Drive
+</screen></informalexample>
+
+<informalexample><screen>
+hdaIDE Hard disk / CD-ROM on the first IDE port (Master)
+hdbIDE Hard disk / CD-ROM on the first IDE port (Slave)
+hdcIDE Hard disk / CD-ROM on the second IDE port (Master)
+hddIDE Hard disk / CD-ROM on the second IDE port (Slave)
+hda1First partition of the first IDE hard disk
+hdd15Fifteenth partition of the fourth IDE hard disk 
+</screen></informalexample>
+
+<informalexample><screen>
+sdaSCSI Hard disk with lowest SCSI ID (e.g. 0)
+sdbSCSI Hard disk with next higher SCSI ID (e.g. 1)
+sdcSCSI Hard disk with next higher SCSI ID (e.g. 2)
+sda1First partition of the first SCSI hard disk
+sdd10Tenth partition of the fourth SCSI hard disk
+</screen></informalexample>
+
+<informalexample><screen>
+sr0SCSI CD-ROM with the lowest SCSI ID
+sr1SCSI CD-ROM with the next higher SCSI ID
+</screen></informalexample>
+
+<informalexample><screen>
+ttyS0Serial port 0, COM1 under MS-DOS
+ttyS1Serial port 1, COM2 under MS-DOS
+psauxPS/2 mouse device
+gpmdataPseudo device, repeater data from GPM (mouse) daemon
+</screen></informalexample>
+
+<informalexample><screen>
+cdromSymbolic link to the CD-ROM drive
+mouseSymbolic link to the mouse device file
+</screen></informalexample>
+
+<informalexample><screen>
+nulleverything pointed to this device will disappear
+zeroone can endlessly read zeros out of this device
+</screen></informalexample>
+
+</para>
+
+  <sect2>
+<title>Setting Up Your Mouse</title>
+
+<para>
+
+The mouse can be used in both the Linux console (with gpm) and the X window
+environment. The two uses can be made compatible if the gpm repeater is used
+to allow the signal to flow to the X server as shown:
+<informalexample><screen>
+mouse =&#62; /dev/psaux  =&#62; gpm =&#62; /dev/gpmdata -&#62; /dev/mouse =&#62; X
+         /dev/ttyS0             (repeater)        (symlink)
+         /dev/ttyS1
+</screen></informalexample>
+
+</para><para>
+
+Set the repeater protocol to be raw (in <filename>/etc/gpm.conf</filename>) while
+setting X to the original mouse protocol in <filename>/etc/X11/XF86Config</filename>
+or <filename>/etc/X11/XF86Config-4</filename>.
+
+</para><para>
+
+This approach to use gpm even in X has advantages when the mouse is
+unplugged inadvertently.  Simply restarting gpm with
+<informalexample><screen>
+user@debian:# /etc/init.d/gpm restart
+</screen></informalexample>
+will re-connect the mouse in software without restarting X.
+
+</para><para>
+
+If gpm is disabled or not installed with some reason, make sure to set X to
+read directly from the mouse device such as /dev/psaux. For details, refer
+to the 3-Button Mouse mini-Howto at
+<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>, 
+<userinput>man gpm</userinput>, 
+<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and 
+<ulink url="http://www.xfree86.org/current/mouse.html">README.mouse</ulink>.
+</para>
+
+<![ %powerpc; [
+<para>
+
+For PowerPC, in <filename>/etc/X11/XF86Config</filename> or
+<filename>/etc/X11/XF86Config-4</filename>, set the mouse device to
+<userinput>"/dev/input/mice"</userinput>. 
+
+</para><para>
+
+Modern kernels give you the capability to emulate a three-button mouse
+when your mouse only has one button. Just add the following lines to
+<filename>/etc/sysctl.conf</filename> file.
+
+<informalexample><screen>
+
+# 3-button mouse emulation 
+# turn on emulation
+/dev/mac_hid/mouse_button_emulation = 1
+# Send middle mouse button signal with the F11 key
+/dev/mac_hid/mouse_button2_keycode = 87
+# Send right mouse button signal with the F12 key
+/dev/mac_hid/mouse_button3_keycode = 88
+# For different keys, use showkey to tell you what the code is.
+
+</screen></informalexample>  
+</para>
+]]>
+
+  </sect2>
+ </sect1>
+
+ <sect1 id="tasksel-size-list">
+ <title>Disk Space Needed for Tasks</title>
+<para>
+
+The base woody installation on the author's computer required 117MB.
+The installed size for all standard packages was 123MB, with a
+download size of 38MB; so 278MB of space was needed to install the
+base and all standard packages.
+
+</para><para>
+
+The following table lists sizes reported by aptitude (a very nice 
+program, by the way) for the tasks listed in tasksel. The system
+for which the figures were reported already had all standard packages
+installed. Note that some tasks have overlapping constituents, so
+the total installed size for two tasks together may be less than 
+the total obtained by adding the numbers up. 
+
+</para><para>
+
+<informalexample><screen>
+Task                              Installed  Download   Space Needed 
+                                  Size (MB)  Size (MB)  To Install (MB)
+
+desktop environment                 345        118         463
+X window system                      78         36         114
+games                                49         14          63
+Debian Jr.                          340        124         464
+dialup system                        28          8          36
+laptop system                         3          1           4
+scientific applications             110         30         140
+
+C and C++                            32         15          47
+Python                              103         30         133
+Tcl/Tk                               37         11          48
+fortran                              10          4          14
+
+file server                           1          -           1
+mail server                           4          3           7
+usenet news server                    6          2           8
+print server                         48         18          66
+conventional unix server             55         19          74
+web server                            4          1           5
+
+TeX/LaTeX environment               171         64         235
+
+simplified Chinese environment       80         29         109
+traditional Chinese environment     166         68         234
+Cyrillic environment                 29         13          42
+French environment                   60         18          78
+German environment                   31          9          40
+Japanese environment                110         53         163
+Korean environment                  178         72         250
+Polish environment                   58         27          85
+Russian environment                  12          6          18
+Spanish environment                  15          4          19
+
+</screen></informalexample>
+</para>
+ </sect1>
+
+ <sect1 id="verbose-quiet">
+<title>Effects of Verbose and Quiet</title>
+
+<para>
+
+These are the effects of the <userinput>verbose</userinput> boot argument for woody:
+<itemizedlist>
+<listitem><para>
+
+For LiveCD, allow choice of alternate install media
+
+</para></listitem>
+<listitem><para>
+
+When mounting volumes, always ask which mount point
+
+</para></listitem>
+<listitem><para>
+
+Warn that earlier kernels do not support newer file systems
+
+</para></listitem>
+<listitem><para>
+
+Warn that pre-2.4.1 kernels do not support ReiserFS 3.6
+
+</para></listitem>
+<listitem><para>
+
+Confirm install files path even if only one path found
+
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+These are the effects of the <userinput>quiet</userinput> boot argument for woody:
+<itemizedlist>
+<listitem><para>
+
+Suppress confirm before writing the aboot boot loader
+
+</para></listitem>
+<listitem><para>
+
+Suppress confirm before overwriting master boot record
+
+</para></listitem>
+<listitem><para>
+
+Suppress 'Important Information about installed MBR'
+
+</para></listitem>
+<listitem><para>
+
+No invitation to install additional modules from floppy
+
+</para></listitem>
+<listitem><para>
+
+Don't mention that &architecture; doesn't support reboot
+
+</para></listitem>
+<listitem><para>
+
+Suppress confirmation that detected interface is PCMCIA
+
+</para></listitem>
+<listitem><para>
+
+Suppress message about successful DHCP configuration
+
+</para></listitem>
+<listitem><para>
+
+Suppress long message about Lilo and large disk support
+
+</para></listitem>
+<listitem><para>
+
+Suppress long message about PALO and large disk support
+
+</para></listitem>
+<listitem><para>
+
+Suppress SGI disk label note from Dvhtool
+
+</para></listitem>
+<listitem><para>
+
+Don't chatter about how much disk space ReiserFS uses
+
+</para></listitem>
+<listitem><para>
+
+Don't explain what Apple_Bootstrap is
+
+</para></listitem>
+<listitem><para>
+
+Mount the first initialized partition on <filename>/</filename> without asking
+
+</para></listitem>
+<listitem><para>
+
+Don't offer to scan for bad blocks
+
+</para></listitem>
+<listitem><para>
+
+Don't ask before initializing as XFS, ext2/3, ReiserFS, swap
+
+</para></listitem>
+<listitem><para>
+
+Avoid trying to persuade that a swap partition is good
+
+</para></listitem>
+<listitem><para>
+
+Don't lecture before rebooting the system
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+ </sect1>
+
