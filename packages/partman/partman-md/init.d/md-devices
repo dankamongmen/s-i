@@ -2,6 +2,21 @@
 
 . /lib/partman/definitions.sh
 
+# Obtain the size of an MD device
+get_size () {
+    while [ -z "$(echo "$line" | grep "^md$NUMBER :")" ]; do
+        read line
+        [ $? -eq 1 ] && break  # EOF
+    done
+    read line
+    size=$(echo "$line" | sed -e 's/ blocks.*//')
+    # If the sed failed, the line didn't contain the size; just
+    # return 0 in that case.
+    if [ "$size" = "$line" ]; then
+        size=0
+    fi
+}
+
 # Create the raid devices
 for i in `cat /proc/mdstat|grep ^md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'`; do
 	NUMBER=`echo ${i}|sed -e "s/^md//"`
@@ -13,8 +28,8 @@ for i in `cat /proc/mdstat|grep ^md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\
 	db_metaget partman-md/text/device description
 	echo "${RET}" > ${DEVICE}/model
 
-	# Fixme: Find the size from /dev/mdstat
-	echo "0" > ${DEVICE}/size
+	get_size < /proc/mdstat
+	echo "$size" > ${DEVICE}/size
 	open_dialog OPEN "/dev/md/${NUMBER}"
 	read_line response
 	close_dialog
