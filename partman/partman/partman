@@ -29,11 +29,24 @@ mkdir /var/lib/partman
 
 while true; do
     
+    initcount=`ls /lib/partman/init.d/* | wc -l`
+    db_progress START 0 $initcount partman/progress/init/title
     for s in /lib/partman/init.d/*; do
 	if [ -x $s ]; then
-	    $s || exit 1
+	    base=$(basename $s | sed 's/[0-9]*//')
+	    # Not every init script has, or needs, its own progress
+	    # template. Add them to slow init scripts only.
+	    if ! db_progress INFO partman/progress/init/$base; then
+		    db_progress INFO partman/progress/init/fallback
+            fi
+	    if ! $s; then
+	        db_progress STOP
+                exit 1
+            fi
 	fi
+	db_progress STEP 1
     done
+    db_progress STOP
     
     while true; do
 	ask_user /lib/partman/choose_partition
@@ -43,6 +56,14 @@ while true; do
     
     if [ $exitcode -eq 255 ]; then
 	abort 1
+    fi
+    
+    db_reset partman/confirm
+    db_input critical partman/confirm
+    db_go || true
+    db_get partman/confirm
+    if [ "$RET" = false ]; then
+	    abort 10 # back up to main menu
     fi
     
     for s in /lib/partman/commit.d/*; do
@@ -66,4 +87,3 @@ while true; do
 
     break
 done    
-

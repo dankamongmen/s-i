@@ -1,3 +1,15 @@
+Template: partman/progress/init/title
+Type: text
+_Description: Starting up the partitioner
+
+Template: partman/progress/init/fallback
+Type: text
+_Description: Please wait ...
+
+Template: partman/progress/init/parted
+Type: text
+_Description: Scanning disks ...
+
 Template: partman/exception_handler
 Type: select
 Choices: ${CHOICES}
@@ -12,7 +24,21 @@ Description: ${TYPE}
 Template: partman/choose_partition
 Type: select
 Choices: ${CHOICES}
-_Description: Partition, free space or device to be modified:
+_Description: Partition table overview:
+ This is an overview of your currently configured partitions and mount
+ points. Select a partition or device to modify its settings, or select
+ free space to add a new partition.
+
+Template: partman/confirm
+Type: boolean
+Default: false
+# Translators, note that this is identical to partconf/confirm from the
+# partconf package.
+_Description: Ready to create file systems and mount partitions?
+ File systems will be created and partitions mounted.
+ .
+ WARNING: This will destroy all data on the partitions you have assigned
+ file systems to.
 
 Template: partman/storage_device
 Type: select
@@ -27,7 +53,7 @@ _Description: Action on the chosen free space:
 Template: partman/active_partition
 Type: select
 Choices: ${CHOICES}
-_Description: Settings of the partition:
+_Description: Partition settings:
 
 Template: partman/show_partition_chs
 Type: note
@@ -55,23 +81,15 @@ _Description: Show Cylinder/Head/Sector information
 
 Template: partman/text/finished_with_partition
 Type: text
-_Description: Choose this if you are satisfied with the above settings
-
-Template: partman/text/abort_the_partitioning
-Type: text
-_Description: Abort the partitioning (do not write the changes)
-
-Template: partman/text/commit_the_partitioning
-Type: text
-_Description: Commit the partitioning to the storage devices
+_Description: Finished setting up partition
 
 Template: partman/text/end_the_partitioning
 Type: text
-_Description: End the partitioning and continue the installation
+_Description: Finish partitioning and write changes to disk
 
 Template: partman/text/undo_everything
 Type: text
-_Description: Undo all actions
+_Description: Undo changes to partitions
 
 Template: partman/text/show_chs_free
 Type: text
@@ -131,4 +149,3 @@ Template: debian-installer/partman/title
 Type: text
 # Main menu entry
 _Description: Partition disks (partman)
-

@@ -103,7 +103,7 @@ partition_tree_choices () {
     local IFS
     for dev in $DEVICES/*; do
 	[ -d $dev ] || continue
-	printf "%s//\t------- %s\n" $dev "$(device_name $dev)" # GETTEXT?
+	printf "%s//\t%s\n" $dev "$(device_name $dev)" # GETTEXT?
 	cd $dev
 
 	open_dialog PARTITIONS
@@ -115,7 +115,7 @@ partition_tree_choices () {
 	while { read num id size type fs path name; [ "$id" ]; }; do
 	    part=${dev}/$id
 	    [ -f $part/view ] || continue
-	    printf "%s//%s\t%s\n" "$dev" "$id" $(cat $part/view)
+	    printf "%s//%s\t$NBSP       %s\n" "$dev" "$id" $(cat $part/view)
 	done
 	restore_ifs
     done
@@ -461,7 +461,7 @@ humandev () {
 
 device_name () {
     cd $1
-    printf "%s - %s (%s)" "$(humandev $(cat device))" "$(cat model)" "$(longint2human $(cat size))"
+    printf "%s - %s %s" "$(humandev $(cat device))" "$(longint2human $(cat size))" "$(cat model)"
 }
 
 # Local Variables:
