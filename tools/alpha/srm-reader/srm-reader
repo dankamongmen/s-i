@@ -10,7 +10,7 @@
 
 LANGCODE=`cat /proc/srm_environment/named_variables/language`
 
-LANG=`grep $LANGCODE /usr/share/srm-reader/lang-codes | cut -d: -f2`
+LANG=`grep "^$LANGCODE:" /usr/share/srm-reader/lang-codes | cut -b3-`
 if [ "x$LANG" != "x" ] ; 
 	db_set debian-installer/language $LANG
 fi
