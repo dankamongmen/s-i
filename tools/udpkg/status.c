@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.10 2000/11/02 20:36:01 joeyh Exp $ */
+/* $Id: status.c,v 1.11 2000/11/02 20:39:29 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -164,8 +164,9 @@ void *status_read(void)
 				memset(p, 0, sizeof(struct package_t));
 				p->package = strdup(m->provides);
 				t = *(struct package_t **)tsearch(p, &status, package_compare);
-				if (! t == p)
+				if (!(t == p))
 				{
+					printf("already provided, freeing\n");
 					free(p->package);
 					free(p);
 				}
@@ -174,9 +175,9 @@ void *status_read(void)
 					 * Pseudo package status is the
 					 * same as the status of the
 					 * package providing it 
-					 * (not quite right, if 2 packages
-					 * of different statuses provide
-					 * it).
+					 * FIXME: (not quite right, if 2
+					 * packages of different statuses
+					 * provide it).
 					 */
 					t->status = m->status;
 				}
