@@ -4,7 +4,7 @@
  * Copyright (C) 2003, Alastair McKinstry <mckinstry@debian.org>
  * Released under the GNU Public License; see file COPYING for details
  *
- * $Id: efi-reader.c,v 1.5 2003/11/07 00:34:24 rhirst Exp $
+ * $Id$
  */
 
 #include <sys/types.h>
