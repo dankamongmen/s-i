@@ -1,11 +1,11 @@
 Template: partconf/no-partitions
-Type: note
+Type: error
 _Description: No partitions found
  No partitions were found in your system. You may need to partition your
  hard drives or load additional kernel modules.
 
 Template: partconf/no-filesystems
-Type: note
+Type: error
 _Description: No file systems found
  No usable file systems were found. You may need to load additional kernel
  modules.
@@ -34,21 +34,21 @@ Template: partconf/create-filesystem
 Type: select
 _Choices: ${FSCHOICES}, Create swap space
 Default: Create ext2 file system
-_Description: What do you want to do with ${PARTITION}?
+_Description: Action on ${PARTITION}:
  This partition does not seem to have a file system. You can create a file
  system or swap space on it.
 
 Template: partconf/mountpoint
 Type: select
 _Choices: /, /usr, /boot, /home, /var, /tmp, Don't mount it, Enter manually
-_Description: Where do you want to mount ${PARTITION}?
+_Description: Mount point for ${PARTITION}:
  When a partition is mounted, it is available to the users of the system.
  You always need a root ("/") partition, and it's often good to have a
  separate partition for /home.
 
 Template: partconf/mountpoint-manual
 Type: string
-_Description: Where do you want to mount ${PARTITION}?
+_Description: Mount point for ${PARTITION}:
  Please enter where the partition should be mounted.
 
 Template: partconf/already-mounted
@@ -63,7 +63,8 @@ _Description: Partitions have already been mounted!
 Template: partconf/umount-failed
 Type: error
 _Description: Failed to unmount partitions
- An error occurred while unmounting the partitions. Cannot continue.
+ An error occurred while unmounting the partitions. The partition
+ configuration process is aborted.
 
 Template: partconf/internal-create-fs-choice
 Type: text
@@ -77,12 +78,12 @@ _Description: No root partition (/)
 
 Template: partconf/sanity-bad-mount
 Type: error
-_Description: You have assigned a partition to ${MOUNT}
- It makes no sense to mount a partition on ${MOUNT}. Please change this.
+_Description: Partition assigned to ${MOUNT}
+ Mounting a partition on ${MOUNT} makes no sense. Please change this.
 
 Template: partconf/sanity-double-mount
 Type: error
-_Description: You have assigned several partitions to ${MOUNT}
+_Description: Several partitions assigned to ${MOUNT}
  You cannot assign several partitions to the same mount point. Please
  change all but one of them.
 
@@ -90,34 +91,44 @@ Template: partconf/confirm
 Type: boolean
 Default: false
 _Description: Ready to create file systems and mount partitions?
+ File systems will be created and partitions mounted.
+ .
  WARNING: This will destroy all data on the partitions you have assigned
- file systems to!
+ file systems to.
 
 Template: partconf/failed-mkswap
 Type: error
 _Description: Failed to create swap space on ${PARTITION}
- An error occurred when the swap space was created on ${PARTITION}. Please
- see tty3 or /var/log/messages for more information.
+ An error occurred when the swap space was created on ${PARTITION}. 
+ .
+ Please check the error log on the third console or /var/log/messages
+ for more information.
 
 Template: partconf/failed-swapon
 Type: error
 _Description: Failed to activate the swap space on ${PARTITION}
  An error occurred when the swap space on ${PARTITION} was activated.
- Please see tty3 or /var/log/messages for more information.
+ .
+ Please check the error log on the third console or /var/log/messages
+ for more information.
 
 Template: partconf/failed-mkfs
 Type: error
 _Description: Failed to create ${FS} file system on ${PARTITION}
  An error occurred when the ${FS} file system was created on ${PARTITION}.
- Please see tty3 or /var/log/messages for more information.
+ .
+ Please check the error log on the third console or /var/log/messages
+ for more information.
 
 Template: partconf/failed-mount
 Type: error
 _Description: Failed to mount ${PARTITION} on ${MOUNT}
- An error occurred when ${PARTITION} was mounted on ${MOUNT}. Please see
- tty3 or /var/log/messages for more information.
+ An error occurred when ${PARTITION} was mounted on ${MOUNT}. 
+ .
+ Please check the error log on the third console or /var/log/messages
+ for more information.
 
 Template: debian-installer/partconf/title
 Type: text
 #  Main menu item
-_Description: Configure and Mount Partitions
+_Description: Configure and mount partitions
