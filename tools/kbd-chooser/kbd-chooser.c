@@ -3,7 +3,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.15 2003/03/18 21:44:42 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.16 2003/03/19 10:38:15 mckinstry Exp $
  */
 
 #include "config.h"
@@ -34,12 +34,11 @@
 
 kbd_t *keyboards = NULL;
 static maplist_t *maplists = NULL;
-static struct debconfclient *client;
 
 extern int loadkeys_wrapper (char *map); // in loadkeys.y
 
 
-int my_debconf_input (char *priority, char *template, char **result)
+int my_debconf_input (struct debconfclient *client, char *priority, char *template, char **result)
 {
 	int res;
 	// client->command (client, "fset", template, "seen", "false", NULL);
@@ -81,7 +80,7 @@ int grep (const char *file, const char *string)
  * @brief return a default locale name, eg. en_US.UTF-8 (Change C, POSIX to en_US)
  * @return - char *, (to be freed by caller)
  */
-char *get_locale (void)
+char *get_locale (struct debconfclient *client)
 {
 	// languagechooser sets locale of the form xx_YY
 	// NO encoding used.
@@ -124,14 +123,14 @@ void parse_locale (char *locale,
  * @param langs: colon-seperated list of locales
  * @return score 0-3
  */
-int compare_locale_list (char *langs)
+int compare_locale_list (struct debconfclient *client, char *langs)
 {
 	static char *locale = NULL, *lang1= NULL, *territory1 = NULL, *charset1 = NULL;
 	char *lang2 = NULL, *territory2 = NULL, *charset2 = NULL, buf [LINESIZE], *s, *colon;
 	int score = 0, best = -1;
 
 	if (locale == NULL) {
-		locale = get_locale ();
+		locale = get_locale (client);
 		parse_locale (locale, &lang1, &territory1, &charset1);
 	}
 	STRCPY (buf, langs);
@@ -180,7 +179,7 @@ inline char *insert_description (char *buf, char *name, char *description)
  * @brief Enter a maplist into debconf, picking a default via locale.
  * @param maplist - a maplist (for a given arch, for example)
  */
-void select_keymap (maplist_t *maplist)
+void select_keymap (struct debconfclient *client, maplist_t *maplist)
 {
 	char buf[4 * LINESIZE], template[LINESIZE], *s= NULL , deflt[LINESIZE];
 	keymap_t *mp, *preferred = NULL;
@@ -194,7 +193,7 @@ void select_keymap (maplist_t *maplist)
 		} else
 			s = buf;
 		s = insert_description (s, mp->name, mp->description);
-		score = compare_locale_list (mp->langs);
+		score = compare_locale_list (client, mp->langs);
 		if (score > best) {
 			best = score;
 			preferred = mp;
@@ -316,7 +315,7 @@ maplist_t *parse_keymap_file (const char *name)
  * @listdir Directory to look in
  * @warning Assumes files present, readable: this should be guaranteed by the installer dependencies
  */
-void read_keymap_files (char *listdir)
+void read_keymap_files (struct debconfclient *client, char *listdir)
 {
 	DIR *d;
 	char *p, fullname[LINESIZE];
@@ -346,7 +345,7 @@ void read_keymap_files (char *listdir)
 			continue;
 		}
 		if (S_ISDIR (sbuf.st_mode)) {
-			read_keymap_files (p); 
+			read_keymap_files (client, p); 
 		} else { // Assume a file
 			
 			/* two types of name allowed (for the moment; )
@@ -356,7 +355,7 @@ void read_keymap_files (char *listdir)
 				STRCPY (p, ent->d_name);
 			else 
 				strncpy (p, ent->d_name, strchr (ent->d_name, '.') - p);			
-			select_keymap (parse_keymap_file (fullname));
+			select_keymap (client, parse_keymap_file (fullname));
 		}
 	}
 	closedir (d);
@@ -392,7 +391,7 @@ void collect_keyboards (void)
  * @brief set debian-installer/serial console as to whether we are using a serial console
  * This is then passed via prebaseconfig to base-config
  */
-void check_if_serial_console (void)
+void check_if_serial_console (struct debconfclient *client)
 {
 	int fd;
 	struct serial_struct sr;
@@ -435,7 +434,7 @@ char *extract_name (char *name, char *ptr)
  * @brief  Pick a keyboard.
  * @return const char *  - priority of question
  */
-char *ponder_keyboard_choices (void)
+char *ponder_keyboard_choices (struct debconfclient *client)
 {
 	kbd_t *kp = NULL, *preferred = NULL;
 	char buf [LINESIZE], *s = NULL, *preference = NULL, *entry;
@@ -498,7 +497,7 @@ char *ponder_keyboard_choices (void)
  * @keymap  ptr to buffer in which to store chosen keymap name
  * @returns CMDSTATUS_SUCCESS or CMDSTATUS_GOBACK, keymap set if SUCCESS
  */
-int choose_keymap (char *arch, char *keymap)
+int choose_keymap (struct debconfclient *client, char *arch, char *keymap)
 {
 	char template[50], *ptr, preferred[LINESIZE], *s;
 	kbd_t *kb;
@@ -518,7 +517,7 @@ int choose_keymap (char *arch, char *keymap)
 		client->command (client, "set", template, preferred, NULL);
 	}
 	
-	res = my_debconf_input (kb->deflt ? "low" : "medium", 
+	res = my_debconf_input (client, kb->deflt ? "low" : "medium", 
 				template, &ptr);
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
@@ -534,20 +533,24 @@ int choose_keymap (char *arch, char *keymap)
 /**
  *  @brief set the keymap, and debconf database
  */
-void set_keymap (char *keymap)
+void set_keymap (struct debconfclient *client, char *keymap)
 {
 	client->command (client, "set", "debian-installer/keymap",
 			 keymap, NULL);
 	// "seen" Used by scripts to decide not to call us again
 	client->command (client, "fset", "debian-installer/keymap",
 			 "seen", "yes", NULL);
+	fprintf (stderr, "FIXME: Entering loadkeys_wrappe\n");
 	loadkeys_wrapper (keymap);
+	 printf ("FIXME: Exiting loadkeys_wrappe\n");
+
 }
 
 int main (int argc, char **argv)
 {
 	char *kbd_priority, *arch = NULL, keymap[LINESIZE], buf[LINESIZE], *s;
 	enum { CHOOSE_ARCH, CHOOSE_KEYMAP } state = CHOOSE_ARCH;
+	struct debconfclient *client;
 	int res;
 
 	client = debconfclient_new ();
@@ -555,17 +558,17 @@ int main (int argc, char **argv)
 	// As a form of debugging, allow a keyboard map to 
 	// be named on command-line
 	if (argc == 2)  {
-		set_keymap (argv[1]);
+		set_keymap (client, argv[1]);
 		exit (0);
 	}
 
 	client->command (client, "capb", "backup", NULL);
 	client->command (client, "title", "Select a Keyboard Layout", NULL);
 
-	read_keymap_files (KEYMAPLISTDIR);
+	read_keymap_files (client, KEYMAPLISTDIR);
 
-	check_if_serial_console ();
-	kbd_priority = ponder_keyboard_choices ();
+	check_if_serial_console (client);
+	kbd_priority = ponder_keyboard_choices (client);
 
 	s = buf;
 
@@ -575,7 +578,7 @@ int main (int argc, char **argv)
 
 			// First select a keyboard arch. 
 		case CHOOSE_ARCH:				 
-			res = my_debconf_input (kbd_priority, "console-tools/archs", &s);
+			res = my_debconf_input (client, kbd_priority, "console-tools/archs", &s);
 			if (res != CMDSTATUS_SUCCESS) {
 				exit (res == CMDSTATUS_GOBACK ? 0 : 1);
 			}
@@ -590,11 +593,11 @@ int main (int argc, char **argv)
 
 			// Then a keymap within that arch.
 		case CHOOSE_KEYMAP:
-			if (choose_keymap (arch, keymap) == CMDSTATUS_GOBACK) {
+			if (choose_keymap (client, arch, keymap) == CMDSTATUS_GOBACK) {
 				state = CHOOSE_ARCH;
 				break;
 			}
-			set_keymap (keymap);
+			set_keymap (client, keymap);
 			exit (0);
 			break;			
 		}	
