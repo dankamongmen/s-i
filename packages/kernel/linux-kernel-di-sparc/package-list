@@ -4,20 +4,22 @@
 # It overwrites specifications from /usr/share/kernel-wedge/package-list.
 #
 Package: kernel-image
-Provides_sparc32: ext2-modules, ext3-modules
-Provides_sparc64: ext2-modules, ext3-modules, reiserfs-modules
+Provides_sparc32: ext2-modules
+Provides_sparc64: ext2-modules
 
-Package: nic-sbus-modules
+Package: nic-modules
 Priority: standard
-Description: SBus network card modules for Sparc32/64 kernels
+Description: SBus/PCI network card modules for Sparc32/64 kernels
  This package contains the drivers for the Happy Meal/Big Mac 10/100BaseT,
  Sun QuadEthernet and MyriCOM Gigabit Ethernet SBus devices for SPARC
- systems. Do not install this package on a real Debian system! You probably
+ systems, as well as various PCI network adapters for Sparc64 only.
+ .
+ Do not install this package on a real Debian system! You probably
  want a kernel-image package instead.
 
-Package: nic-pci-modules
+Package: scsi-modules
 Priority: standard
-Description: PCI network card modules for Sparc64 kernels
- This package contains various device drivers for PCI network cards. PCI is 
- only supported with the 64-bit Ultra architecture so there's no corresponding
- sparc32 version.
+Depends: scsi-core-modules
+Description: SBus/PCI SCSI card modules for Sparc32/64 kernels
+ This package contains drivers for various SBus-based SCSI adapters, as well
+ as drivers for PCI-based SCSI adapters, on Sparc64 only.
