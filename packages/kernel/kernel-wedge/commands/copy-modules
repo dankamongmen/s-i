@@ -37,7 +37,6 @@ processmodules() {
 	local moddir=$2
 	
 	cp $list $tmpdir/work
-	local missing=0
 	(
 		while read file; do
 			if echo "$file" | grep -q -- '^#' || [ -z "$file" ]; then
@@ -61,7 +60,9 @@ processmodules() {
 				fi
 			fi
 		done
-	) < $tmpdir/work | sort > $list
+	) < $tmpdir/work > $list.new
+	sort < $list.new > $list
+	rm -f $list.new
 }
 
 version=$1-$2
