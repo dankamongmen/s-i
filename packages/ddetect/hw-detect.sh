@@ -35,6 +35,22 @@ is_not_loaded() {
           (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
 }
 
+is_available () {
+	find /lib/modules/$(uname -r)/ | sed 's!.*/!!' | cut -d . -f 1 | \
+	grep -q "^$1$"
+}
+
+# Module as first parameter, description of device the second.
+missing_module () {
+	log "Missing module '$module'."
+	if ! in_list "$1" "$MISSING_MODULES_LIST"; then
+		if [ -n "$MISSING_MODULES_LIST" ]; then
+			MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
+		fi
+		MISSING_MODULES_LIST="$MISSING_MODULES_LIST$1 ($2)"
+	fi
+}
+
 # The list can be delimited with spaces or spaces and commas.
 in_list() {
 	echo "$2" | grep -q "\(^\| \)$1\(,\| \|$\)"
@@ -105,11 +121,15 @@ load_module() {
 
 load_sr_mod () {
 	if is_not_loaded "sr_mod"; then
-		db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
-		db_subst hw-detect/load_progress_step MODULE "sr_mod"
-		db_progress INFO hw-detect/load_progress_step
-		load_module sr_mod
-		register-module sr_mod
+		if is_available "sr_mod"; then
+			db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
+			db_subst hw-detect/load_progress_step MODULE "sr_mod"
+			db_progress INFO hw-detect/load_progress_step
+			load_module sr_mod
+			register-module sr_mod
+		else
+			missing_module sr_mod "SCSI CDROM"
+		fi
 	fi
 }
 
@@ -306,13 +326,7 @@ for device in $ALL_HW_INFO; do
 			LIST="$LIST$module ($(echo "$cardname" | sed 's/,/ /g'))"
 			PROCESSED="$PROCESSED $module"
 		else
-			log "Missing module '$module'."
-			if ! in_list "$module" "$MISSING_MODULES_LIST"; then
-				if [ -n "$MISSING_MODULES_LIST" ]; then
-					MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
-				fi
-				MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
-			fi
+			missing_module "$module"
 		fi
 	fi
 done
@@ -396,11 +410,15 @@ if [ -e /proc/scsi/scsi ] && ! grep -q "Attached devices: none" /proc/scsi/scsi;
 	if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi && \
 	   is_not_loaded "sd_mod" && \
 	   ! grep -q '^[^[:alpha:]]\+sd$' /proc/devices; then
-		db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
-		db_subst hw-detect/load_progress_step MODULE "sd_mod"
-		db_progress INFO hw-detect/load_progress_step
-		load_module sd_mod
-		register-module sd_mod
+	   	if is_available "sd_mod"; then
+			db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
+			db_subst hw-detect/load_progress_step MODULE "sd_mod"
+			db_progress INFO hw-detect/load_progress_step
+			load_module sd_mod
+			register-module sd_mod
+		else
+			missing_module sd_mod "SCSI disk"
+		fi
 	fi
 	db_progress STEP $OTHER_STEPSIZE
 	if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi && \
@@ -413,10 +431,14 @@ fi
 if ! is_not_loaded ohci1394; then
 	# if firewire was found, try to enable firewire cd support
 	if is_not_loaded sbp2; then
-		db_subst hw-detect/load_progress_step CARDNAME "FireWire CDROM support"
-		db_subst hw-detect/load_progress_step MODULE "sbp2"
-		db_progress INFO hw-detect/load_progress_step
-		load_module sbp2
+		if is_available sbp2; then
+			db_subst hw-detect/load_progress_step CARDNAME "FireWire CDROM support"
+			db_subst hw-detect/load_progress_step MODULE "sbp2"
+			db_progress INFO hw-detect/load_progress_step
+			load_module sbp2
+		else
+			missing_module sbp2 "FireWire CDROM"
+		fi
 	fi
 	register-module sbp2
 	db_progress STEP $OTHER_STEPSIZE
@@ -433,11 +455,15 @@ if ! is_not_loaded ohci1394; then
 	# also try to enable firewire ethernet (The right way to do this is
 	# really to catch the hotplug events from the kernel.)
 	if is_not_loaded eth1394; then
-		db_subst hw-detect/load_progress_step CARDNAME "FireWire ethernet support"
-		db_subst hw-detect/load_progress_step MODULE "eth1394"
-		db_progress INFO hw-detect/load_progress_step
-		load_module eth1394
-		register-module eth1394
+		if is_available eth1394; then
+			db_subst hw-detect/load_progress_step CARDNAME "FireWire ethernet support"
+			db_subst hw-detect/load_progress_step MODULE "eth1394"
+			db_progress INFO hw-detect/load_progress_step
+			load_module eth1394
+			register-module eth1394
+		else
+			missing_module eth1394 "FireWire ethernet"
+		fi
 	fi
 fi
 
