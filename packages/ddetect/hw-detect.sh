@@ -15,6 +15,8 @@ NEWLINE="
 MISSING_MODULES_LIST=""
 SUBARCH="$(archdetect)"
 
+prebaseconfig=/usr/lib/prebaseconfig.d/30hw-detect
+
 # This is a hack, but we don't have a better idea right now.
 # See Debian bug #136743
 if [ -x /sbin/depmod ]; then
@@ -194,6 +196,7 @@ get_manual_hw_info() {
         case "$SUBARCH" in
           sparc/sparc32)
             echo "sunhme:Sun Happy Meal 10/100 Ethernet driver"
+            echo "echo sunhme >> /target/etc/modules" >> $prebaseconfig
           ;;
         esac
 	# ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
@@ -548,7 +551,6 @@ if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>
 	log "Detected PCMCIA, installing pcmcia-cs."
 	apt-install pcmcia-cs || true
 
-	prebaseconfig=/usr/lib/prebaseconfig.d/30hw-detect
 	echo "mkdir /target/etc/pcmcia 2>/dev/null || true" \
 		>>$prebaseconfig
 	echo "cp /etc/pcmcia/config.opts /target/etc/pcmcia/config.opts" \

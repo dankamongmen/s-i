@@ -1,5 +1,6 @@
 #include "archdetect.h"
 #include <sys/utsname.h>
+#include <string.h>
 
 const char *subarch_analyze(void) 
 {
