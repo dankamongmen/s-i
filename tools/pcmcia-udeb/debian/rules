@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+PACKAGE=$(shell dh_listpackages)
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=$(shell dpkg --print-architecture)
+FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
+
+build:
+	dh_testdir
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
+
+binary-arch: build
+
+# Note that this builds a .udeb, which is not policy compliant or anything.
+binary-indep: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdeb
+	dh_shlibdeps
+	# Don't write your stupid guesses to debian/files.
+	dh_gencontrol -- -fdebian/files~
+	# Register file manually.
+	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
+	dh_builddeb --filename=$(FILENAME)
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
