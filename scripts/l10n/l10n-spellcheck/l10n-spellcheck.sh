@@ -17,6 +17,7 @@ NEW="check_$(date '+%Y%m%d')"
 svn up $LOCAL_REPOSITORY
 
 # spellcheck and move data to public_html
+cd  ~/l10n-spellcheck
 sh check_all.sh $LOCAL_REPOSITORY
 mv $NEW $OUT_DIR
 
