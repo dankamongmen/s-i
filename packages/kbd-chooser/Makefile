@@ -32,10 +32,6 @@ ifeq ($(ARCH),amd64)
 CFLAGS += -DAT_KBD  -DUSB_KBD
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),amd64)
-CFLAGS += -DAT_KBD  -DUSB_KBD 
-KEYBOARDS := at usb
-endif
 ifeq ($(ARCH),ia64)
 CFLAGS += -DAT_KBD  -DUSB_KBD 
 KEYBOARDS := at usb
