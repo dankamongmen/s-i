@@ -1,64 +1,80 @@
 #include "main-menu.h"
 
-#include <stdio.h>
-#include <search.h>
-#include <string.h>
-#include <ctype.h>
 #include <stdlib.h>
+#include <search.h>
+#include <stdio.h>
 
-static void depends_sort_visit(struct package_t **ordered,
-		struct package_t *pkgs, struct package_t *pkg) {
-	/* Topological sort algorithm:
-	 * ordered is the output list, pkgs is the dependency graph, pkg is
-	 * the current node
-	 *
-	 * recursively add all the adjacent nodes to the ordered list,
-	 * marking each one as visited along the way
-	 *
-	 * yes, this algorithm looks a bit odd when all the params have the
-	 * same type :-)
-	 */
-	unsigned short i;
-	struct package_t *newnode;
-
-	/* mark node as processing */
-	pkg->color = COLOR_GRAY;
-
-	/* visit each not-yet-visited node */
-	for (i = 0; i < pkg->requiredcount; i++)
-		if (pkg->requiredfor[i]->color == COLOR_WHITE)
-			depends_sort_visit(ordered, pkgs, pkg->requiredfor[i]);
-	
-	/* add it to the list */
-	newnode = (struct package_t *)malloc(sizeof(struct package_t));
-	/* make a shallow copy */
-	*newnode = *pkg;
-	newnode->next = *ordered;
-	*ordered = newnode;
-
-	/* mark node as done */
-	pkg->color = COLOR_BLACK;
+/*
+ * qsort comparison function (sort by menu item values, fallback to lexical
+ * sort to resolve ties deterministically).
+ */
+int compare (const void *a, const void *b) {
+	int r=((struct package_t *)a)->installer_menu_item -
+	      ((struct package_t *)b)->installer_menu_item;
+	if (r) return r;
+	return strcmp(((struct package_t *)a)->package,
+		      ((struct package_t *)b)->package);
 }
 
-static struct package_t *depends_sort(struct package_t *pkgs) {
-	struct package_t *ordered = NULL;
-	struct package_t *pkg;
+/* For btree. */
+int package_compare (const void *p1, const void *p2) {
+	return strcmp(((struct package_t *)p1)->package,
+		      ((struct package_t *)p2)->package);
+}
 
-	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
-		pkg->color = COLOR_WHITE;
-
-	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
-		if (pkg->color == COLOR_WHITE)
-			depends_sort_visit(&ordered, pkgs, pkg);
+static void order(struct package_t *p, void *packages,
+	            struct package_t **head, struct package_t **tail) {
+	struct package_t dep, *d;
+	int i;
 	
-	/* Leaks the old list... return the new one... */
-	return ordered;
+	if (p->processed)
+		return;
+	
+	for (i=0; p->depends[i] != 0; i++) {
+		dep.package = p->depends[i];
+		if ((d=tfind(&dep, &packages, package_compare)))
+			order(d, packages, head, tail);
+	}
+	
+	if (*head)
+		(*tail)->next = *tail = p;
+	else
+		*head = *tail = p;
+	p->processed = 1;
+}
+
+/* Orders the main menu. Returns a linked list of packages. */
+struct package_t *main_menu(struct package_t *package_list) {
+	struct package_t *p, *head = NULL, *tail = NULL;
+	void *ptree = 0;
+	
+	/* Find number of packages and also generate btree of them. */
+	for (p = package_list; p->package != 0; p++) {
+		tsearch(p, &ptree, package_compare);
+	}
+		
+	/* Sort by menu number. */
+	qsort(package_list, p - package_list, sizeof(struct package_t), compare);
+
+	/* Order menu so depended-upon packages come first (topo-sort). */
+	/* The menu number is really only used to break ties. */
+	for (p = package_list; p->package != 0; p++) {
+		if (p->installer_menu_item)
+			order(p, ptree, &head, &tail);
+	}
+
+	return head;
 }
 
 int main (int argc, char **argv) {
-	void *status;
+	struct package_t *packages, *first, *p;
 	
-	status = status_read();
-		
+	packages = status_read();	
+	first = main_menu(packages);
+	
+	for (p = first; p; p=p->next) {
+		printf("--%s\n", p->package);
+	}
+	
 	return(0);
 }

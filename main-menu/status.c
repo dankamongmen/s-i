@@ -1,72 +1,19 @@
+#include "main-menu.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <search.h>
 
-#include "main-menu.h"
-
-static char **depends_split(const char *dependsstr) {
-	static char *dependsvec[DEPENDSMAX];
-	char *p;
-	int i = 0;
-
-	dependsvec[0] = 0;
-
-	if (dependsstr != 0) {
-		p = strdup(dependsstr);
-		while (*p != 0 && *p != '\n') {
-			if (*p != ' ') {
-				if (*p == ',') {
-					*p = 0;
-					dependsvec[++i] = 0;
-				}
-				else if (dependsvec[i] == 0)
-					dependsvec[i] = p;
-			}
-			else
-				*p = 0; /* eat the space... */
-			p++;
-		}
-		*p = 0;
-	}
-	dependsvec[i+1] = 0;
-	return dependsvec;
-}
-
-int package_compare(const void *p1, const void *p2) {
-	return strcmp(((struct package_t *)p1)->package,
-			((struct package_t *)p2)->package);
-}
-
-/* Adds a new package to the tree, unless it already exists. */
-struct package_t *_newpackage (const char *packagename, void **status) {
-	struct package_t *p, *t = 0;
-
-	p = (struct package_t *)malloc(sizeof(struct package_t));
-	memset(p, 0, sizeof(struct package_t));
-	p->package = strdup(packagename);
-	t = *(struct package_t **)tsearch(p, status, package_compare);
-	if (t->refcount++ > 0) {
-		free(p->package);
-		free(p);
-	}
-	else {
-		printf("new package %s\n", t->package);
-	}
-	return t;
-}
-
-/* 
- * Read status file into memory as a binary tree, preserving only those
- * fields that are needed.
+/*
+ * Read status file into memory as an array, preserving only those fields
+ * that are needed. The array is terminated with an empty package_t struct.
  */
-void *status_read(void) {
+struct package_t *status_read(void) {
 	FILE *f;
-	char buf[BUFSIZE];
-	void *status = 0;
-	struct package_t *p = 0, *t = 0;
-	char **dependsvec;
-	int i;
+	char *b, buf[BUFSIZE];
+	int i, alloced=PACKAGECHUNK;
+	struct package_t *packages = malloc(sizeof(struct package_t) * alloced);
+	struct package_t *p = packages;
 
 	if ((f = fopen(STATUSFILE, "r")) == NULL) {
 		perror(STATUSFILE);
@@ -76,11 +23,17 @@ void *status_read(void) {
 	while (fgets(buf, BUFSIZE, f) && !feof(f)) {
 		buf[strlen(buf)-1] = 0;
 		if (*buf == 0) {
-			p = 0;
+			p++;
+			if (p == packages + alloced) {
+printf("realloc at %i\n", p-packages);
+				packages=realloc(packages, sizeof(struct package_t) * (alloced + PACKAGECHUNK));
+				p = packages + alloced;
+				alloced += PACKAGECHUNK;
+			}
 		}
 		else if (strstr(buf, "Package: ") == buf) {
-			p = _newpackage(buf+9, &status);
-printf("%s\n", buf+9);
+			memset(p, 0, sizeof(struct package_t));
+			p->package = strdup(buf+9);
 		}
 		else if (strstr(buf, "Installer-Menu-Item: ") == buf) {
 			p->installer_menu_item=atoi(buf+21);
@@ -91,26 +44,41 @@ printf("%s\n", buf+9);
 		}
 		else if (strstr(buf, "Depends: ") == buf) {
 			/*
-			 * A "Depends" triggers the insertation of
-			 * stub packages into the status binary-tree (if
-			 * the depended-upon package doesn't already exist).
-			 * The stubs will be filled out in due course.
-			 *
-			 * This assumes that the status database is
-			 * consistent.
+			 * Basic depends line parser. Can ignore versioning
+			 * info since the depends are already satisfied.
 			 */
-			dependsvec = depends_split(buf+9);
-			i=0;
-			while (dependsvec[i] != 0) {
-				t = _newpackage(dependsvec[i], &status);
-				t->requiredfor[t->requiredcount++] = p;
-				i++;
+			b=strdup(buf+9);
+			i = 0;
+			while (*b != 0 && *b != '\n') {
+				if (*b != ' ') {
+					if (*b == ',') {
+						*b = 0;
+						p->depends[++i] = 0;
+					}
+					else if (p->depends[i] == 0) {
+						p->depends[i] = b;
+					}
+				}
+				else {
+					*b = 0; /* eat the space... */
+				}
+				b++;
 			}
+			*b = 0;
+			p->depends[i+1] = 0;
 		}
 		else if (strstr(buf, "Provides: ") == buf) {
-			/* Um, how do we handle provides? TODO */
+			/*
+			 * A provides causes a fake package to be made,
+			 * that depends on the package that provides it. If
+			 * the fake package already exists, just add the
+			 * providing package to its dependancy list. This
+			 * means that virtual packages are actually ANDed
+			 * for the purposes of this program.
+			 */
 		}
 	}
 	fclose(f);
-	return status;
+	
+	return packages;
 }
