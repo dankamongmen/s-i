@@ -64,18 +64,32 @@ addinfos_pv() {
 }
 
 #
+# return the free space of a volume group
+#
+getfree_vg() {
+	cmdout=`vgdisplay "$1" 2>&1`
+	echo "$cmdout" | grep '^Free  PE' | sed -e 's,^.*/ ,,'
+}
+
+#
+# return the size of a volume group
+#
+getsize_vg() {
+	cmdout=`vgdisplay "$1" 2>&1`
+	echo "$cmdout" | grep '^VG Size' | sed -e 's/^VG Size \+//'
+}
+
+#
 # return extra informations (like size, current lv) for the
 # volume group
 #
 addinfos_vg() {
 	cmdout=`vgdisplay "$1" 2>&1`
 
-	RET2=`echo "$cmdout" | grep '^Free  PE' | \
-		sed -e 's,.*/ \(.*\),Free: \1,'`
+	RET2="Free: `getfree_vg "$1"`"
 	RET="${RET2}"
 
-	RET2=`echo "$cmdout" | grep '^VG Size' | \
-		sed -e 's/^VG Size \+\(.*\)/Size: \1/'`
+	RET2="Size: `getsize_vg "$1"`"
 	RET="${RET}/ ${RET2}"
 
 	RET2=`echo "$cmdout" | grep '^Cur LV' | \
@@ -504,6 +518,9 @@ lv_create() {
 		return
 	fi
 
+	MAX_SIZE=`getfree_vg "$VG"`
+	db_set lvmcfg/lvcreate_size "$MAX_SIZE"
+	db_fset lvmcfg/lvcreate_size seen false
 	db_input high lvmcfg/lvcreate_size
 	db_go
 	db_get lvmcfg/lvcreate_size
