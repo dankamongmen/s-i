@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
 		debconf_subst(debconf, "partitioner/disc", "DISCS", choices);
 		debconf_fset(debconf, "partitioner/disc", "seen", "false");
 		debconf_set(debconf, "partitioner/disc", "false");
-		debconf_input(debconf, "high", "partitioner/disc");
+		debconf_input(debconf, "critical", "partitioner/disc");
 		debconf_go(debconf);
 		debconf_get(debconf, "partitioner/disc");
 
