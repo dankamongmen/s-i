@@ -20,15 +20,15 @@ for dev in $DEVICES/*; do
 	[ -f $id/acting_filesystem ] || continue
 	filesystem=$(cat $id/acting_filesystem)
 	case "$filesystem" in
-	    ext3)
+	    ext2r0)
 		[ ! -f "$id/mountpoint" ] || continue
-		db_fset partman-ext3/no_mount_point seen false
-		db_subst partman-ext3/no_mount_point PARTITION "$num"
-		db_subst partman-ext3/no_mount_point FILESYSTEM "$filesystem"
-		db_subst partman-ext3/no_mount_point DEVICE $(humandev $(cat device))
-		db_input critical partman-ext3/no_mount_point || true
+		db_fset partman-ext2r0/no_mount_point seen false
+		db_subst partman-ext2r0/no_mount_point PARTITION "$num"
+		db_subst partman-ext2r0/no_mount_point FILESYSTEM "$filesystem"
+		db_subst partman-ext2r0/no_mount_point DEVICE $(humandev $(cat device))
+		db_input critical partman-ext2r0/no_mount_point || true
 		db_go || exit 1
-		db_get partman-ext3/no_mount_point
+		db_get partman-ext2r0/no_mount_point
 		if [ "$RET" = 'Resume partitioning' ]; then
 		    exit 1
 		fi
