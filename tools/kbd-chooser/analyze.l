@@ -1,4 +1,5 @@
 %{
+#include "config.h"
 #include <stdlib.h>
 #include <linux/kd.h>
 #include "ksyms.h"
@@ -15,8 +16,6 @@ char *filename;
 extern int yywrap(void);
 extern int yyerror(const char *s);
 extern void stringovfl(void);
-extern void lkfatal(const char *s);
-extern void lkfatal1(const char *s, const char *s2);
 extern void open_include(char *s);
 %}
 

@@ -1,12 +1,14 @@
 /* @file  kbd-chooser.c
- * @brief Choose a keyboard.
+ * @brief Cxhoose a keyboard.
  *
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.2 2003/01/19 12:23:31 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.3 2003/01/21 18:38:58 mckinstry Exp $
  */
 
+#include "config.h"
+#include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h> // Needed ATM for toupper()
@@ -16,16 +18,16 @@
 #include <errno.h> 
 #include <debian-installer.h>
 #include <cdebconf/common.h>
+#include <cdebconf/commands.h>
 #include <cdebconf/debconfclient.h>
 #include "nls.h"
 #include "kbd-chooser.h"
-
 
 kbd_t *keyboards = NULL;
 static maplist_t *maplists = NULL;
 static struct debconfclient *client;
 
-extern int loadkeys_wrapper (char *map); /* in loadkeys.y */
+extern int loadkeys_wrapper (char *map); // in loadkeys.y
 
 
 /**
@@ -36,20 +38,18 @@ void unselect_console_packages (void)
 	// FIXME Write this.
 }
 
-char *
-my_debconf_input (char *priority, char *template)
+
+int my_debconf_input (char *priority, char *template, char **result)
 {
-  printf ("DEBUG: in mdi\n");
-
-  client->command (client, "metaget", template, "description", NULL);
-  printf ("DEB: value %s\n", client->value);
-
+	int res;
 	client->command (client, "fset", template, "seen", "false", NULL);
 	client->command (client, "input", priority, template, NULL);
-	client->command (client, "go", NULL);
-	client->command (client, "get", template, NULL);
-	printf ("DEBUG: leaving mdi\n");
-	return client->value;
+	res = client->command (client, "go", NULL);
+	if (res != CMDSTATUS_SUCCESS)
+		return res;
+	res = client->command (client, "get", template, NULL);
+	*result = client->value;
+	return res;
 }
 
 /*
@@ -197,19 +197,20 @@ void select_keymap (maplist_t *maplist)
 	*s = '\0';
 	STRCPY (template, "console-data/keymap/");
 	STRCPY (template + 20, maplist->name);
-	client->command (client, "subst", template, "choices", STRDUP (buf), NULL);	
+	client->command (client, "subst", template, "choices", buf, NULL);	
 	// set the default
 	client->command (client, "fget", template, "seen", NULL);
 	if (strcmp(client->value, "false") == 0) {
 		s = insert_description (deflt, preferred);
 		*s = '\0';
-		client->command (client, "set", template, STRDUP (deflt), NULL);
+		client->command (client, "set", template, deflt, NULL);
 	}
 }
 
 
 /**
  * @brief    Load the keymap files into memory
+ @ @name     keymap filename.
  * @warning  No error checking on file contents. Assumed correct by installation checks.
  */
 maplist_t *parse_keymap_file (const char *name)
@@ -265,7 +266,7 @@ void read_keymap_files (void)
 	struct dirent *ent;
 
 	d = opendir (KEYMAPLISTDIR);
-	p = buf + STRLEN (KEYMAPLISTDIR)+1; /* Constant. FIXME */
+	p = buf + STRLEN (KEYMAPLISTDIR)+1; 
 
 	if (DEBUG && d == NULL)
 		DIE ("Failed to open %s: %s\n", KEYMAPLISTDIR, strerror (errno));
@@ -290,6 +291,8 @@ char *ponder_keyboard_choices (void)
 	kbd_t *k = NULL, *kp = NULL, *preferred = NULL;
 	char buf [LINESIZE], *s = NULL;
 	int kboards = 0;
+
+	assert (maplists != NULL); // needed to choose default kbd in some cases
 
 #if defined (USB_KBD)
 	k = usb_kbd_get ();
@@ -324,9 +327,8 @@ char *ponder_keyboard_choices (void)
 	if (k->present == TRUE)
 		preferred = k;
 
-	kp = keyboards;
 	// Add the keyboards to debconf
-	while (kp) {
+	for (kp = keyboards; kp != NULL ; kp = kp->next) {
 		if (kp->present != FALSE) kboards++;
 		if (s) {
 			STRCPY (s, ", ");
@@ -339,7 +341,6 @@ char *ponder_keyboard_choices (void)
 		// select the known.
 		if (preferred == NULL && kp->present == TRUE)
 			preferred = kp;
-		kp = kp->next;
 	}	
 	*(++s) = '\0';
 	if (preferred == NULL)
@@ -364,34 +365,79 @@ char *ponder_keyboard_choices (void)
 		return "low";
 	return (preferred->present == TRUE) ? "medium" : "high";	
 }
-	
 
-int main (int argc, char **argv)
+/**
+ * @brief   choose a given keyboard
+ * @arch    keyboard architecture
+ * @keymap  ptr to buffer in which to store chosen keymap
+ * @returns CMDSTATUS_SUCCESS or CMDSTATUS_GOBACK, keymap set if SUCCESS
+ */
+int choose_keymap (char *arch, char *keymap)
 {
-	char *kbd_priority, *ptr, template[50], keymap[20];
-	int len;
-
-	client = debconfclient_new (); 
-	client->command (client, "title", "Select a Keyboard Layout", NULL);
-
-	read_keymap_files ();
-
-	// First select a keyboard arch. 
-	kbd_priority = ponder_keyboard_choices ();
-	ptr = my_debconf_input (kbd_priority, "console-tools/archs");
-
-	// Then a keymap within that arch.
+	char template[50], *ptr, preferred[1024], *s;
+	kbd_t *kb;
+	int len, res;
 	STRCPY (template, "console-data/keymap/");
-	STRCPY (template + 20, ptr);
+	STRCPY (template + 20, arch);
+
+	// If there is a default keymap for this keyboard, select it
+	for (kb = keyboards ; kb != NULL ; kb = kb->next) 
+		if (!strcmp(kb->name, arch))
+			break;
+	if (DEBUG && !kb)
+		DIE ("Keyboard not found\n");
+	if (kb->deflt) {
+		s = insert_description (preferred, kb->deflt);
+		*s = '\0';
+		client->command (client, "set", template, preferred, NULL);
+	}
 	
-	ptr = my_debconf_input ("medium", template);
+	res = my_debconf_input (kb->deflt ? "low" : "medium", 
+				template, &ptr);
+	if (res != CMDSTATUS_SUCCESS)
+		return res;
 	// Choice will be of the form "[name] description". Extract name
 	len = (int) (strchr (ptr, ']') - ptr) -1 ;	
 	strncpy (keymap, ptr+1, len);
 	keymap [ len ] = '\0';
+	return CMDSTATUS_SUCCESS;
+}	
 
-	loadkeys_wrapper (keymap);       
-       		
-	exit (0);
+
+int main (int argc, char **argv)
+{
+	char *kbd_priority, *arch, keymap[20];
+	enum { CHOOSE_ARCH, CHOOSE_KEYMAP } state = CHOOSE_ARCH;
+
+	client = debconfclient_new (); 
+	client->command (client, "capb", "backup", NULL);
+	client->command (client, "title", "Select a Keyboard Layout", NULL);
+
+	read_keymap_files ();
+
+	kbd_priority = ponder_keyboard_choices ();
+
+	while (1) {
+
+		switch (state) {
+
+			// First select a keyboard arch. 
+		case CHOOSE_ARCH:		
+			if (my_debconf_input (kbd_priority, "console-tools/archs", &arch) != CMDSTATUS_SUCCESS)
+				exit (0);
+			state = CHOOSE_KEYMAP;
+			break;
+
+			// Then a keymap within that arch.
+		case CHOOSE_KEYMAP:
+			if (choose_keymap (arch, keymap) == CMDSTATUS_GOBACK) {
+				state = CHOOSE_ARCH;
+				break;
+			}
+			loadkeys_wrapper (keymap);  
+			exit (0);
+			break;			
+		}	
+	}
 }
 

@@ -11,60 +11,8 @@
 #include "nls.h"
 
 char pathname[1024];
-static int ispipe;
-
-void fpclose(FILE *fp) {
-	if (ispipe)
-	     pclose(fp);
-	else
-	     fclose(fp);
-}
 
 #define SIZE(a) (sizeof(a)/sizeof(a[0]))
-
-static struct decompressor {
-	char *ext;		/* starts with `.', has no other dots */
-	char *cmd;
-} decompressors[] = {
-	{ ".gz", "gzip -d -c" },
-	{ ".bz2", "bzip2 -d -c" },
-	{ 0, 0 }
-};
-
-static FILE *
-pipe_open(struct decompressor *dc) {
-	char *pipe_cmd;
-	FILE *fp;
-
-	ispipe = 1;
-	pipe_cmd = xmalloc(strlen(dc->cmd) + strlen(pathname) + 2);
-	sprintf(pipe_cmd, "%s %s", dc->cmd, pathname);
-	fp = popen(pipe_cmd, "r");
-	if (fp == NULL)
-		fprintf(stderr, _("error executing  %s\n"), pipe_cmd);
-	return fp;
-}
-
-/* If a file PATHNAME exists, then open it.
-   If is has a `compressed' extension, then open a pipe reading it */
-static FILE *
-maybe_pipe_open(void) {
-	FILE *fp;
-	char *t;
-	struct decompressor *dc;
-
-	if ((fp = fopen(pathname, "r")) != NULL) {
-	    t = rindex(pathname, '.');
-	    if (t) {
-		for (dc = &decompressors[0]; dc->cmd; dc++)
-		    if (strcmp(t, dc->ext) == 0) {
-			fclose(fp);
-			return pipe_open(dc);
-		    }
-	    }
-	}
-	return fp;
-}
 
 static FILE *
 findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
@@ -72,10 +20,7 @@ findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
 	DIR *d;
 	struct dirent *de;
 	char *ff, *fdir, *p, *q, **sp;
-	struct decompressor *dc;
 	int secondpass = 0;
-
-	ispipe = 0;
 
 	ff = index(fnam, '/');
 	if (ff) {
@@ -141,17 +86,8 @@ findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
 	    /* Does tail consist of a known suffix and possibly
 	       a compression suffix? */
 	    for(sp = suf; *sp; sp++) {
-		    int l;
-
 		    if (!strcmp(p, *sp))
-			    return maybe_pipe_open();
-
-		    l = strlen(*sp);
-		    if (strncmp(p,*sp,l) == 0) {
-			for (dc = &decompressors[0]; dc->cmd; dc++)
-			    if (strcmp(p+l, dc->ext) == 0)
-				return pipe_open(dc);
-		    }
+		      return fopen (pathname, "r");
 	    }
 	}
 	closedir(d);
@@ -167,14 +103,14 @@ FILE *findfile(char *fnam, char **dirpath, char **suffixes) {
         char **dp, *dir, **sp;
 	FILE *fp;
 	int dl, recdepth;
-	struct decompressor *dc;
 
 	if (strlen(fnam) >= sizeof(pathname))
 		return NULL;
 
 	/* Try explicitly given name first */
 	strcpy(pathname, fnam);
-	fp = maybe_pipe_open();
+	// fp = maybe_pipe_open();
+	fp = fopen (pathname, "r");
 	if (fp)
 		return fp;
 
@@ -190,20 +126,6 @@ FILE *findfile(char *fnam, char **dirpath, char **suffixes) {
 		if((fp = fopen(pathname, "r")) != NULL)
 		    return fp;
 	    }
-
-	    for (sp = suffixes; *sp; sp++) {
-		for (dc = &decompressors[0]; dc->cmd; dc++) {
-		    if (strlen(fnam) + strlen(*sp)
-			+ strlen(dc->ext) + 1 > sizeof(pathname))
-			    continue;
-		    sprintf(pathname, "%s%s%s", fnam, *sp, dc->ext);
-		    if ((fp = fopen(pathname, "r")) != NULL) {
-			    fclose(fp);
-			    return pipe_open(dc);
-		    }
-		}
-	    }
-
 	    return NULL;
 	}
 

@@ -21,6 +21,7 @@
 #include <linux/keyboard.h>
 #include <sys/ioctl.h>
 #include <ctype.h>
+#include <debian-installer.h>
 #include "xmalloc.h"
 #include "paths.h"
 #include "getfd.h"
@@ -66,7 +67,6 @@ static void keypad_as_usual(char *keyboard);
 static void function_keys_as_usual(char *keyboard);
 static void consoles_as_usual(char *keyboard);
 static void compose_as_usual(char *charset);
-static void lkfatal0(const char *, int);
 extern int set_charset(const char *charset);
 extern int getfd(void);
 
@@ -77,8 +77,7 @@ int private_error_ct = 0;
 
 extern int rvalct;
 extern struct kbsentry kbs_buf;
-extern void lkfatal(const char *s);
-extern void lkfatal1(const char *s, const char *s2);
+
 
 #include "ksyms.h"
 %}
@@ -240,8 +239,6 @@ rvalue		: NUMBER
 #include "analyze.c"
 
 char *keymap_name;
-char **args;
-int quiet = 0;
 int nocompose = 0;
 
 void set_kbd_mode (int fd)
@@ -284,29 +281,6 @@ yyerror(const char *s) {
 	fprintf(stderr, "%s:%d: %s\n", filename, line_nr, s);
 	private_error_ct++;
 	return(0);
-}
-
-/* fatal errors - change to varargs next time */
-void
-lkfatal(const char *s) {
-	fprintf(stderr, "%s: %s:%d: %s\n", PROGNAME, filename, line_nr, s);
-	exit(1);
-}
-
-void
-lkfatal0(const char *s, int d) {
-	fprintf(stderr, "%s: %s:%d: ", PROGNAME, filename, line_nr);
-	fprintf(stderr, s, d);
-	fprintf(stderr, "\n");
-	exit(1);
-}
-
-void
-lkfatal1(const char *s, const char *s2) {
-	fprintf(stderr, "%s: %s:%d: ", PROGNAME, filename, line_nr);
-	fprintf(stderr, s, s2);
-	fprintf(stderr, "\n");
-	exit(1);
 }
 
 /* Include file handling - unfortunately flex-specific. */
@@ -501,7 +475,7 @@ lk_end_string(void) {
 }
 
 char *dirpath[] = { "", DATADIR "/" KEYMAPDIR "/**",  "/", 0 };
-char *suffixes[] = { "", ".map", 0 };
+char *suffixes[] = { "", ".kmap", 0 };
 extern FILE *findfile(char *fnam, char **dirpath, char **suffixes);
 
 #undef yywrap
@@ -525,7 +499,7 @@ yywrap(void) {
 	if (done)
 		return  1;
 	if ((f = findfile(keymap_name, dirpath, suffixes)) == NULL) {
-		fprintf(stderr, _("cannot open file %s\n"), *args);
+		fprintf(stderr, _("cannot open file %s\n"), keymap_name);
 		exit(1);
 	}
 	/*
@@ -534,8 +508,6 @@ yywrap(void) {
 		other situations, hence the flag.
 	*/
 	filename = xstrdup(pathname);
-	if (!quiet)
-		fprintf(stderr, _("Loading %s\n"), pathname);
 	if (first_file) {
 		yyin = f;
 		first_file = 0;
