@@ -274,7 +274,7 @@ static int satisfy_virtual(struct package_t *p) {
 	struct debconfclient *debconf;
 	struct package_t *dep, *defpkg = NULL;
 	int i;
-	char *choices, *tmp, *language = NULL;
+	char *choice = NULL, *choices, *tmp, *language = NULL;
 	size_t c_size = 1;
 	int is_menu_item = 0;
 
@@ -359,6 +359,7 @@ static int satisfy_virtual(struct package_t *p) {
 				return 0;
 			debconf->command(debconf, "CAPB", NULL);
 			debconf->command(debconf, "GET", MISSING_PROVIDE, NULL);
+			choice = strdup(debconf->value);
 		}
 		/* Go through the dependencies again */
 		for (i = 0; p->depends[i] != 0; i++) {
@@ -368,7 +369,7 @@ static int satisfy_virtual(struct package_t *p) {
 			if (!di_pkg_provides(dep, p))
 				continue;
 			entry = menu_entry(debconf, language, dep);
-			if (!is_menu_item || strcmp(debconf->value, entry) == 0) {
+			if (!is_menu_item || strcmp(choice, entry) == 0) {
 				free(entry);
 				/* Ick. If we have a menu item it has to match the
 				 * debconf choice, otherwise we configure all of
@@ -382,6 +383,7 @@ static int satisfy_virtual(struct package_t *p) {
 		}
 	}
 	debconfclient_delete(debconf);
+	free(choice);
 	free(choices);
 	free(language);
 	/* It doesn't make sense to configure virtual packages,
