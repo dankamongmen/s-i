@@ -9,6 +9,7 @@ realinclude_HEADERS = \
 	log.h \
 	macros.h \
 	mem.h \
+	mem_chunk.h \
 	package.h \
 	packages.h \
 	parser.h \
