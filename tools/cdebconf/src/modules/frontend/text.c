@@ -16,9 +16,9 @@ static void texthandler_displaydesc(struct frontend *obj, struct question *q) {
 		printf("=");
 	}
 	printf("\n\n");
-	printf("%s", q->template->extended_description);
+	printf("%s", question_description(q));
 	printf("\n");
-	printf("%s\n", q->template->description);
+	printf("%s\n", question_extended_description(q));
 }
 
 static int texthandler_boolean(struct frontend *obj, struct question *q)
@@ -61,7 +61,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 
 	texthandler_displaydesc(obj, q);
 
-	count = strchoicesplit(q->template->choices, choices, sizeof(choices)/sizeof(choices[0]));
+	count = strchoicesplit(question_choices(q), choices, sizeof(choices)/sizeof(choices[0]));
 
 	while(1)
 	{
@@ -144,7 +144,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 
 	texthandler_displaydesc(obj, q);
 
-	count = strchoicesplit(q->template->choices, choices, sizeof(choices)/sizeof(choices[0]));
+	count = strchoicesplit(question_choices(q), choices, sizeof(choices)/sizeof(choices[0]));
 
 	do
 	{

@@ -234,9 +234,9 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 	{
 		buf[0] = 0;
 		for (i = 3; i <= argc; i++)
-			strvacat(buf, sizeof(buf), argv[i], 0);	
+			strvacat(buf, sizeof(buf), argv[i], " ", 0);	
 
-		/* TODO */
+		question_variable_add(q, variable, buf);
 
 		if (mod->db->question_set(mod->db, q) != 0)
 			snprintf(out, outsize, "%u variable substituted",
@@ -311,7 +311,9 @@ int command_fget(struct confmodule *mod, int argc, char **argv,
 int command_fset(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	return DC_NOTOK;
+	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	return DC_OK;
+	// return DC_NOTOK;
 }
 
 int command_exist(struct confmodule *mod, int argc, char **argv, 

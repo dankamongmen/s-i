@@ -44,5 +44,8 @@ void question_variable_delete(struct question *q, const char *var,
 	const char *value);
 void question_owner_add(struct question *q, const char *owner);
 void question_owner_delete(struct question *q, const char *owner);
+const char *question_description(struct question *q);
+const char *question_extended_description(struct question *q);
+const char *question_choices(struct question *q);
 
 #endif

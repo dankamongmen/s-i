@@ -284,9 +284,12 @@ static int textdb_question_set(struct database *db, struct question *q)
 	{
 		fprintf(outf, "\tvariables {\n");
 		do {
-			fprintf(outf, "\t\t%s \"%s\"\n", escapestr(var->variable), escapestr(var->value));
+			/* escapestr uses a static buf, so we do this in
+			 * two steps */
+			fprintf(outf, "\t\t%s ", escapestr(var->variable));
+			fprintf(outf, "\"%s\";\n", escapestr(var->value));
 		} while ((var = var->next));
-		fprintf(outf, "};\n");
+		fprintf(outf, "\t};\n");
 	}
 	if ((owner = q->owners))
 	{
@@ -309,6 +312,7 @@ static struct question *textdb_question_get(struct database *db,
 	struct configuration *rec;
 	struct question *q;
 	char *filename;
+	struct configitem *node;
 
 	if (ltag == NULL) return DC_NOTOK;
 	filename = question_filename(db->config, ltag);
@@ -328,7 +332,22 @@ static struct question *textdb_question_get(struct database *db,
 	q->flags = rec->geti(rec, "question::flags", 0);
 	q->template = textdb_template_get(db,
 		unescapestr(rec->get(rec, "question::template", 0)));
+
 	/* TODO: variables and owners */
+	if ((node = rec->tree(rec, "question::variables")) != 0)
+	{
+		node = node->child;
+		for (; node != 0; node = node->next)
+			question_variable_add(q, node->tag, node->value);
+	}
+
+	if ((node = rec->tree(rec, "question::owners")) != 0)
+	{
+		node = node->child;
+		for (; node != 0; node = node->next)
+			question_owner_add(q, node->tag);
+	}
+
 	if (q->tag == 0 || q->value == 0 || q->template == 0)
 	{
 		question_deref(q);
