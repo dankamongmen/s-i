@@ -12,11 +12,13 @@ all: $(BIN) debian/choose-mirror.templates
 
 # Freshen Mirrors.masterlist file, but allow failure.
 Mirrors.masterlist: force-try-update
-	if wget -nv '$(MIRRORLISTURL)' -O - > $@.new && \
-	   test -s $@.new; then \
-        	mv $@.new $@; \
-	else \
-		rm -f $@.new; \
+	if [ "$$ONLINE" != n ]; then \
+		if wget -nv '$(MIRRORLISTURL)' -O - > $@.new && \
+		   test -s $@.new; then \
+        		mv $@.new $@; \
+		else \
+			rm -f $@.new; \
+		fi; \
 	fi
 force-try-update: ;
 
@@ -65,5 +67,4 @@ demo: choose-mirror demo.templates
 	DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./demo
 
 demo.templates: debian/choose-mirror.templates
-	sed -e 's/_Description:/Description:/' -e 's/__Choices:/Choices:/' \
-	    -e 's/_Default:/Default:/' -e '/^#/d' < $< > $@
+	po2debconf $< > $@

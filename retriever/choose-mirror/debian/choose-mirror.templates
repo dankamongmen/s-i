@@ -75,15 +75,32 @@ _Description: HTTP proxy information (blank for none):
  The proxy information should be the standard form of
  "http://[[user][:pass]@]host[:port]/".
 
-Template: mirror/distribution
+Template: mirror/suite
 Type: select
 _Choices: stable, testing, unstable
-Default: testing
 _Description: Debian version to install:
  Debian comes in several flavors. Stable is well-tested and rarely changes.
  Unstable is untested and frequently changing. Testing is a middle ground,
  that receives many of the new versions from unstable if they are not too
  buggy.
+
+Template: mirror/distribution
+Type: string
+Description: The distribution to install (internal use)
+
+Template: mirror/checking_title
+Type: test
+Description: Checking the mirror
+
+Template: mirror/checking_download
+Type: test
+Description: Downloading the Release file ...
+
+Template: mirror/bad
+Type: error
+Description: Bad mirror
+ The specified mirror is either not available, or does not have a valid
+ Release file on it. Please try a different mirror.
 
 Template: debian-installer/choose-mirror/title
 Type: text

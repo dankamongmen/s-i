@@ -1,6 +1,6 @@
-/*
- * Mirror selection via debconf.
- */
+/* This is the codename of the preferred distribution; the one that the
+ * current version of d-i is targeted at installing. */
+#define PREFERRED_DISTRIBUTION "sarge"
 
 #include <cdebconf/debconfclient.h>
 #include <string.h>
@@ -15,12 +15,8 @@
 #include "mirrors_ftp.h"
 #endif
 #if ! defined (WITH_HTTP) && ! defined (WITH_FTP)
-#error Must compile with at least one of FTP and HTTP
+#error Must compile with at least one of FTP or HTTP
 #endif
-
-typedef enum { CM_NONE = -1, CM_PROTOCOL, CM_COUNTRY, CM_MIRROR, CM_PROXY, CM_VALIDATE, CM_DISTRIBUTION, CM_FINISHED } cm_state;
-
-static cm_state last_asked = CM_NONE, asked = CM_NONE;
 
 static struct debconfclient *debconf;
 static char *protocol = NULL;
@@ -65,9 +61,7 @@ static char *debconf_list(char *list[]) {
  * set to http or ftp.  Do NOT free the structure - it is a pointer to
  * the static list in mirrors_protocol.h
  */
-
 static struct mirror_t *mirror_list(void) {
-
 	assert(protocol != NULL);
 
 #ifdef WITH_HTTP
@@ -103,8 +97,7 @@ static char **mirrors_in(char *country) {
 	return ret;
 }
 
-static inline int has_mirror(char *country)
-{
+static inline int has_mirror(char *country) {
 	char **mirrors;
 	mirrors = mirrors_in(country);
 	return  (mirrors[0] == NULL) ? 0 : 1;
@@ -127,7 +120,7 @@ static int choose_country(void) {
 		free(country);
 	country = NULL;
 
-	/* Pick a default country from elsewhere, eg languagechooser,*/
+	/* Pick a default country from elsewhere, eg countrychooser,*/
 	if (debconf_get(debconf, DEBCONF_BASE "country") == 0) {
 		// Not set yet. Seed with a default value
 		if ((debconf_get(debconf, "debian-installer/country") == 0) &&
@@ -135,20 +128,21 @@ static int choose_country(void) {
 				country = strdup (debconf->value);
 				debconf_set (debconf, DEBCONF_BASE "country", country);
 		}
-	} else 
+	} else {
 		country = debconf->value;
+	}
 
-	// Ensure 'country' set to something
-	if (country == NULL || *country == 0)
+	/* Ensure 'country' is set to something. */
+	if (country == NULL || *country == 0) {
 		country = "US";
+	}
 
 #ifdef WITH_HTTP
 	if (strcasecmp(protocol,"http") == 0) {
 		if (has_mirror(country)) {
 			debconf_set(debconf, DEBCONF_BASE "http/countries", country);
 		}
-		if (debconf_input(debconf, "high", DEBCONF_BASE "http/countries") == 0)
-			asked =  CM_COUNTRY;
+		debconf_input(debconf, "high", DEBCONF_BASE "http/countries");
 	}
 #endif
 #ifdef WITH_FTP
@@ -156,33 +150,32 @@ static int choose_country(void) {
 		if (has_mirror(country)) {
 			debconf_set(debconf, DEBCONF_BASE "ftp/countries", country);
 		}
- 		if (debconf_input(debconf, "high", DEBCONF_BASE "ftp/countries") == 0)
-			asked = CM_COUNTRY;
+ 		debconf_input(debconf, "high", DEBCONF_BASE "ftp/countries");
 	}
 #endif
-
-	if (debconf_go (debconf))
-		return 30; // goback
 	
-	debconf_get (debconf,  (strcasecmp(protocol,"http") == 0 ) ? 
-			DEBCONF_BASE "http/countries" : DEBCONF_BASE "ftp/countries");
+	return 0;
+}
+
+static int set_country(void) {
+	debconf_get(debconf, (strcasecmp(protocol,"http") == 0 ) ? 
+	            DEBCONF_BASE "http/countries" : DEBCONF_BASE "ftp/countries");
 	country = strdup(debconf->value);
 	debconf_set (debconf, DEBCONF_BASE "country", country);
 	return 0;
 }
 
-/** 
- * @brief   Choose which protocol to use.
- * @returns retcode from debconf asking the question
- */ 
 static int choose_protocol(void) {
-	int ret = 0;  
 #if defined (WITH_HTTP) && defined (WITH_FTP)
 	/* Both are supported, so ask. */
 	debconf_subst(debconf, DEBCONF_BASE "protocol", "protocols", "http, ftp");
-	if (debconf_input(debconf, "medium", DEBCONF_BASE "protocol") == 0)
-		asked = CM_PROTOCOL;
-	ret = debconf_go(debconf);
+	debconf_input(debconf, "medium", DEBCONF_BASE "protocol");
+#endif
+	return 0;
+}
+
+static int get_protocol(void) {
+#if defined (WITH_HTTP) && defined (WITH_FTP)
 	debconf_get(debconf, DEBCONF_BASE "protocol");
 	protocol = strdup(debconf->value);
 #else
@@ -195,24 +188,18 @@ static int choose_protocol(void) {
 	protocol = "ftp";
 #endif
 #endif /* WITH_HTTP && WITH_FTP */
-	
-	return ret;
+	return 0;
 }
 
-/* Choose which distribution to install. */
-static int choose_distribution(void) {
-
-	if (debconf_input(debconf, "high", DEBCONF_BASE "distribution"))
-		asked = CM_DISTRIBUTION;
-	return debconf_go (debconf);
+static int choose_suite(void) {
+	debconf_input(debconf, "high", DEBCONF_BASE "suite");
+	return 0;
 }
-
 
 static int manual_entry;
 
 static int choose_mirror(void) {
 	char *list;
-	int ret;
 
 	debconf_get(debconf, DEBCONF_BASE "country");
 	manual_entry = ! strcmp(debconf->value, "enter information manually");
@@ -224,33 +211,22 @@ static int choose_mirror(void) {
 		debconf_subst(debconf, mir, "mirrors", list);
 		free(list);
 		
-		if (debconf_input(debconf, "high", mir) == 0)
-			asked = CM_MIRROR;
+		debconf_input(debconf, "high", mir);
 		free(mir);
-		ret = debconf_go(debconf);
-	} else {
+	}
+	else {
 		char *host = add_protocol("hostname");
 		char *dir = add_protocol("directory");
 
 		/* Manual entry. */
-		asked = CM_MIRROR;
-		while (1) {
-			debconf_input(debconf, "critical", host);
-			if (debconf_go(debconf) == 0) {
-				debconf_input(debconf, "critical", dir);
-				if (debconf_go(debconf) == 0) {
-					ret = 0;
-					break;
-				}
-			} else {
-				ret = 30;
-				break;
-			}
-		}
+		debconf_input(debconf, "critical", host);
+		debconf_input(debconf, "critical", dir);
+		
 		free(host);
 		free(dir);
 	}
-	return ret;
+
+	return 0;
 }
 
 static int choose_proxy(void) {
@@ -259,10 +235,10 @@ static int choose_proxy(void) {
 	px = add_protocol("proxy");
 
 	/* Always ask about a proxy. */
-	if (debconf_input (debconf, "high", px) == 0)
-		asked = CM_PROXY;
+	debconf_input(debconf, "high", px);
 	free(px);
-	return debconf_go(debconf);
+
+	return 0;
 }
 
 static int validate_mirror(void) {
@@ -294,13 +270,65 @@ static int validate_mirror(void) {
 		/* Manual entry - check that the mirror is somewhat valid */
 		debconf_get(debconf, host);
 		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
-			debconf_fset(debconf, host, "seen", "false");
 			ret = 1;
 		}
 		debconf_get(debconf, dir);
 		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
-			debconf_fset(debconf, dir, "seen", "false");
 			ret = 1;
+		}
+	}
+
+	if (ret == 0) {
+		/* Download and parse the Release file for the preferred
+		 * distribution, to make sure that the mirror works, and to
+		 * work out which suite it is currently in. Note that this
+		 * assumes that mirrors w/o the preferred distribution are
+		 * broken. */
+		char *command;
+		FILE *f = NULL;
+		char *hostname, *directory;
+
+		debconf_progress_start(debconf, 0, 1, DEBCONF_BASE "checking_title");
+		debconf_progress_info(debconf, DEBCONF_BASE "checking_download");
+		
+		debconf_get(debconf, host);
+		hostname = strdup(debconf->value);
+		debconf_get(debconf, dir);
+		directory = strdup(debconf->value);
+		
+		asprintf(&command, "wget -q %s://%s%s%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+		                   protocol, hostname, directory,
+				   "dists/" PREFERRED_DISTRIBUTION);
+		
+		//fprintf(stderr, "command is %s\n", command);
+		
+		free(hostname);
+		free(directory);
+		
+		f = popen(command, "r");
+		if (f != NULL) {
+			char suite[32];
+			if (fgets(suite, 31, f)) {
+				if (suite[strlen(suite)] == '\n')
+					suite[strlen(suite)] = '\0';
+				debconf_set(debconf, DEBCONF_BASE "suite", suite);
+			}
+			else {
+				ret = 1;
+			}
+			fclose(f);
+		}
+		else {
+			ret = 1;
+		}
+
+		debconf_progress_step(debconf, 1);
+		debconf_progress_stop(debconf);
+	
+		if (ret == 1) {
+			debconf_input(debconf, "critical", DEBCONF_BASE "bad");
+			if (debconf_go(debconf) == 30)
+				exit(10); /* back up to menu */
 		}
 	}
 
@@ -313,15 +341,16 @@ static int validate_mirror(void) {
 
 int main (void) {
 	/* Use a state machine with a function to run in each state */
-	cm_state state = CM_PROTOCOL;
-	int ret;
+	int state = 0;
 	int (*states[])() = {
 		choose_protocol,
+		get_protocol,
 		choose_country,
+		set_country,
 		choose_mirror,
 		choose_proxy,
 		validate_mirror,
-                choose_distribution,
+                choose_suite,
 		NULL,
 	};
 
@@ -329,20 +358,16 @@ int main (void) {
 	debconf_capb(debconf, "backup");
 	debconf_version(debconf, 2);
 
-	last_asked = asked = CM_NONE;
-
-	/*
-	 * It's a pretty brain-dead state machine though. 
-	 */
 	while (state >= 0 && states[state]) {
-		ret = states[state]();
-		
-		if (ret)  // goback signalled
-			state = (asked == last_asked) ? last_asked -1 : last_asked; 
+		if (states[state]() != 0) { /* back up to start */
+			state = 0;
+		}
+		else if (debconf_go(debconf)) { /* back up */
+			state = state - 1;
+		}
 		else  {
-			last_asked = asked;
 			state++;
 		}
 	}
-	return (state >= 0) ? 0 : 10 /* backed all the way out */;
+	return (state >= 0) ? 0 : 10; /* backed all the way out */
 }
