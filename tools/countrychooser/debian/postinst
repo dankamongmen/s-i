@@ -5,6 +5,11 @@ set -e
 
 db_capb backup
 
+set -x
+
+# This should match the INDENT variable in mktemplates.
+INDENT="   "
+
 localecode="debian-installer/locale"
 languagecode="debian-installer/language"
 countrycode="debian-installer/country"
@@ -31,6 +36,7 @@ code2country() {
 	if [ -n "$line" ]; then
 		# Remember that country names may have spaces so the code
 		# is different than in countrymap.
+		printf "$INDENT"
 		echo $line | cut -b 4-
 	else
 		error "Unable to locate info on country '$COUNTRYCODE'"
@@ -38,7 +44,7 @@ code2country() {
 }
 
 country2code() {
-	COUNTRYNAME="$1"
+	COUNTRYNAME=$(echo "$1" | sed "s/^$INDENT//")
 	line=`grep "$COUNTRYNAME$" $countries`
 
 	if [ -n "$line" ]; then
@@ -46,8 +52,6 @@ country2code() {
 		if [ -n "$1" ]; then
 			echo "$1"
 		fi
-	else
-		error "Unable to locate info on country '$COUNTRYNAME'"
 	fi
 }
 
@@ -61,43 +65,52 @@ if [ -n "$RET" ]; then
 	db_set "countrychooser/country-name" "$COUNTRYCODE_LANGUAGECHOOSER"
 fi
 
-db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
-if ! db_go; then
-	exit 10 # back up
-fi
+while :; do
+	#db_fset countrychooser/country-name seen false
+	db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
+	if ! db_go; then
+		exit 10 # back up
+	fi
 
-db_get "countrychooser/country-name"
+	db_get "countrychooser/country-name"
+	CODE="$(country2code "$RET")" || true
+	if [ -n "$CODE" ]; then
+		break
+	else
+		# If the code cannot be found, the user probably
+		# selected a while region.
+		# TODO display error message?
+		:
+	fi
+done
+
+db_set "$countrycode"  "$CODE"
+db_get "$languagecode" || true
 if [ -n "$RET" ]; then
-	db_set "$countrycode"  "$(country2code "$RET")"
-	db_get "$languagecode"
-	if [ -n "$RET" ]; then
-		LANGUAGECODE=$RET
-		# Locale setting
-		# Keep locale inherited from languagechooser
-		# if the country wasn't changed. Otherwise,
-		# add "language_COUNTRY" to the original locale
-		# This allows keeping the fallback values
-		# Make sure locale is at least "C"
-		if [ "$LANGUAGECODE" != "C" ]; then
-			db_get "$localecode"
-			if [ -n "$RET" ]; then
-				LOCALE="$RET"
-			else
-				LOCALE="C"
-			fi
-			if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ]; then
-				LOCALE=${LANGUAGECODE}_${COUNTRYCODE}:${LOCALE}
-			fi
+	LANGUAGECODE=$RET
+	# Locale setting
+	# Keep locale inherited from languagechooser
+	# if the country wasn't changed. Otherwise,
+	# add "language_COUNTRY" to the original locale
+	# This allows keeping the fallback values
+	# Make sure locale is at least "C"
+	if [ "$LANGUAGECODE" != "C" ]; then
+		db_get "$localecode"
+		if [ -n "$RET" ]; then
+			LOCALE="$RET"
 		else
-			LOCALE=C
+			LOCALE="C"
+		fi
+		if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ]; then
+			LOCALE=${LANGUAGECODE}_${COUNTRYCODE}:${LOCALE}
 		fi
 	else
 		LOCALE=C
 	fi
-	db_set "$localecode" "$LOCALE"
 else
-	error "Got empty value for country name!"
+	LOCALE=C
 fi
+db_set "$localecode" "$LOCALE"
 
 log "$countrycode = '$COUNTRYCODE'"
 log "$localecode = '$LOCALE'"

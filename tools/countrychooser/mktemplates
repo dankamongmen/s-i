@@ -9,28 +9,31 @@ ISO3166TAB=/usr/share/iso-codes/iso_3166.tab
 # Translations location (relative to the build root directory)
 ISO3166TRANSLATIONS=debian/iso-codes
 
-# First of all, we build the choices list from the iso 3166 table
-# from the iso-codes packages
-# The "&" character needs escaping
-# We need to replace all commas by something : ' -'
-# as the comma is the choices list separator for debconf templates
-CHOICES=`cat $ISO3166TAB | \
-	 cut -b 4- | \
-	 sort | \
-         sed 's/\&/\\\\\\\\\&/g' | \
+# This string can be anything; it is used as a standin for the actual
+# string used to indent countries inside regions.
+INDENTMARKER="[INDENT]"
+# This is the actual indentation string. It cannot begin with whitespace,
+# as debconf eats that, but non-breaking whitespace should be ok.
+# Unfortunatly, non-breaking whitespace confuses po-debconf, which is why
+# the indentmarker is used in its place until the end.
+# This should match the INDENT variable in the postinst.
+INDENT="   "
+
+# Get the ordered list of countries from the iso_3166.tab, sorted
+# according to the regionmap.
+#
+# We need to replace all commas by something : ' -' as the comma is
+# the choices list separator for debconf templates
+CHOICES=$(./countrylist $ISO3166TAB ./regionmap "$INDENTMARKER" | \
          sed 's/,/ -/g' | \
-         (read a; echo -n "$a"; while read b; do echo -n ", $b"; done; echo)`
-
-# If the above fails, the following also works
-# CHOICES=`cat ../$ISO3166TRANSLATIONS/iso-3166.tab | sed 's/\&/\\\\\\\\\&/g' | sed 's/,/ - /g' |cut -f2 -d"	" | awk 'BEGIN { FS = "\n" } { printf NR == 1 ? "%s" : ",%s", $1 } END { printf "\n" }'`
-
+         (read a; echo -n "$a"; while read b; do echo -n ", $b"; done; echo))
+	 
 # Now put this list as the choices in the templates
 # and defined this field as translatable (__Choices hack)
 cat debian/templates-in | \
-    sed "s/@countrylist@/$CHOICES/g" | \
+    perl -pe 's/\@countrylist\@/'"$CHOICES"'/g' | \
     sed "s/Choices:/__Choices:/g" \
     >debian/templates.tmp
-
 
 # Create a temporary "pobuild" directory
 rm -rf debian/pobuild >/dev/null 2>&1
@@ -57,19 +60,24 @@ for pofile in debian/po/*.po ; do
     printf "$pofilename "
     # If the country names are translated, we need to merge
     # the translation with the templates translations
-    if [ -f $ISO3166TRANSLATIONS/`basename $pofile` ]
+    if [ -f $ISO3166TRANSLATIONS/$pofilename ]
     then
-	# the temporary po files will be UTF-8 encoded
-	# We put back commas in msgid's
 	cat debian/pobuild/templates.pot | 
+	    # the temporary po files will be UTF-8 encoded
 	    sed '/^\"Content-Type/s/CHARSET/UTF-8/' | 
+	    # We put back commas in msgid's
 	    sed '/^msgid/s/ -/,/' \
-	    >debian/pobuild/$pofilename.temp
+	    > debian/pobuild/$pofilename.temp
 	
 	cp debian/pobuild/$pofilename.temp debian/pobuild/templates.pot.temp
 
+	# Munge the po file to have the indentmarker in its strings.
+	perl -pe 'BEGIN { $marker=shift } s/^msg(id|str) "(.+)"/msg$1 "$marker$2"/' "$INDENTMARKER" \
+		< $ISO3166TRANSLATIONS/$pofilename \
+		> $ISO3166TRANSLATIONS/$pofilename.munged
+	
 	msgmerge -C debian/po/$pofilename \
-                 -C $ISO3166TRANSLATIONS/$pofilename \
+                 -C $ISO3166TRANSLATIONS/$pofilename.munged \
                  debian/pobuild/$pofilename.temp \
                  debian/pobuild/templates.pot.temp | \
                  sed '/^msgid/s/,/ -/' \
@@ -82,3 +90,6 @@ done
 
 # and now we generate the templates file from all this
 po2debconf --podir debian/pobuild debian/templates.tmp >debian/templates
+
+# Replace the indent marker with the actual indent.
+perl -i -pe "s/\Q$INDENTMARKER\E/$INDENT/g" debian/templates
