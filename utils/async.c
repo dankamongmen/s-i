@@ -1,5 +1,5 @@
 /*
- * Usage: async  [-n] "program" template
+ * Usage: async  [-n] "program" title_template
  * Execute the command, cancelling it if cdebconf tells us to.
  * -n means the command doesn't do any output, so we put up a progress bar
  * ourselves.
@@ -7,7 +7,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: async.c,v 1.1 2003/07/16 09:12:43 mckinstry Exp $
+ * $Id: async.c,v 1.2 2003/07/16 12:56:11 mckinstry Exp $
  */
 
 #include <stdio.h>
@@ -22,12 +22,14 @@
 #include <debian-installer.h>
 #include <cdebconf/debconfclient.h>
 
+#define MAX_LINE	1024	/* Max title size */
+
 pid_t pid; // pid of the process we've started
 
 void do_exit (void) ;
-void start_progress_bar();
+void start_progress_bar(char *template);
 void stop_progress_bar();
-
+static struct debconfclient *debconf = NULL;
 int finish_up = 0;
 
 /* FDs:
@@ -41,6 +43,8 @@ int main (int argc, char **argv)
 	int ret = 0, r;
 	fd_set rfds;
 	sigset_t sigmask;
+	int toconfig[2], fromconfig[2]; /* 0=read, 1=write */
+
 
 	if (argc != 3 && argc != 4) {
 		di_logf ("async: wrong number of parameters \n");
@@ -59,15 +63,18 @@ int main (int argc, char **argv)
 		template = argv[4];
 	}
 
-	if ((pid = fork()) < 0) {
-			di_logf ("async: fork failed");
-			exit (1);
-	}
-	if (pid == 0) {
 
+	pipe(toconfig);
+	pipe(fromconfig);
+	
+	switch (pid = fork())  {
+	case -1:
+		di_logf ("async: fork failed");
+		exit (1);
+		break;
+	case 0:	
 		if (do_spinner)
-			start_progress_bar();
-
+			start_progress_bar(template);
 
 		// Ok, we set up the select; monitor stdin from 
 		// cdebconf and the output from 
@@ -86,7 +93,9 @@ int main (int argc, char **argv)
 		if (do_spinner)
 			stop_progress_bar();
 
-	} else {
+		break;
+
+	default:
 		// Run the child. Pass the status back via the exit call
 		exit (system (cmd));
 	}
@@ -107,9 +116,15 @@ void chld_handler (int x)
 	finish_up = 1;
 }
 
-void start_progress_bar (void)
+void start_progress_bar (char *title_template)
 {
+	char buffer[MAX_LINE];
 	// FIXME
+	debconf = debconfclient_new();
+	debconf->command (debconf, "CAPB", "backup", NULL);
+	snprintf (buffer, MAX_LINE,"PROGRESS START 0 1 %s", title_template); 
+	debconf->command (debconf, buffer, NULL);
+	
 }
 
 void stop_progress_bar (void)
