@@ -1,5 +1,4 @@
 /*
-/* 
 
    lvm.c - Part of autopartkit, a module to partition devices
                   for debian-installer.
@@ -323,6 +322,7 @@ struct lvm_lv_info { /* Store vgname, lvname and mbsize in list */
     struct lvm_lv_info *next;
     char *vgname;
     char *lvname;
+    char *fstype;
     unsigned int mbsize;
 };
 
@@ -358,6 +358,7 @@ lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
         return -1;
     elem->vgname = strdup(vgname);
     elem->lvname = strdup(lvname);
+    elem->fstype = strdup(fstype);
     elem->mbsize = mbsize;
 
     elem->next = head->next;
@@ -381,6 +382,7 @@ lvm_lv_stack_pop(void *stack, char **vgname, char **lvname, char **fstype,
 
     *vgname = elem->vgname;
     *lvname = elem->lvname;
+    *fstype = elem->fstype;
     *mbsize = elem->mbsize;
 
     free(elem);
