@@ -32,6 +32,10 @@
 
 #define MAXLINE 512
 
+/* di_execlog():
+   execute the command, log the result
+   */
+
 int
 di_execlog (const char *incmd)
 {
@@ -56,6 +60,11 @@ di_execlog (const char *incmd)
      executed, not sure how to do that cleanly */
   return (pclose (output));
 }
+
+/* di_log() :
+  write a message to the debian-installer log.  This should be used for
+  interesting events, especially anything that will help debug.
+  */
 
 void
 di_log(char *msg){

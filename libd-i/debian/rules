@@ -59,11 +59,12 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_movefiles -plibd-i $(LIBNAME) $(SONAME)
-	dh_movefiles -plibd-i-dev $(LIB)
+	dh_movefiles -plibd-i usr/lib/$(LIBNAME) usr/lib/$(SONAME)
+	dh_movefiles -plibd-i-dev usr/lib/$(LIB) usr/include/d-i.h
 	dh_strip
 	dh_compress
 	dh_fixperms
+	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol -- -fdebian/files~ 
