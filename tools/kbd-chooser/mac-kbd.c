@@ -5,28 +5,25 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: mac-kbd.c,v 1.5 2003/10/03 22:02:49 mckinstry Exp $
+ * $Id: mac-kbd.c,v 1.6 2003/10/14 20:15:34 mckinstry Rel $
  */
 
 #include "config.h"
-#include <assert.h>
 #include <debian-installer.h>
 #include "xmalloc.h"
-#include "nls.h"
 #include "kbd-chooser.h"
 
 /**
  * @brief list of keyboards present
  */
-kbd_t *mac_kbd_get (kbd_t *keyboards)
+kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 {
 	kbd_t *k = xmalloc (sizeof (kbd_t));
 
-	// /proc must be mounted by this point
-	assert (di_check_dir ("/proc") == 1);
+	if (strstr (subarch, "mac") == NULL)
+		return keyboards;
 
 	k->name = "mac"; // This must match the name "mac" in console-keymaps-mac
-	k->description = _("Mac Keyboard");
 	k->deflt = NULL;
 	k->fd = -1;
 	k->present = UNKNOWN;
