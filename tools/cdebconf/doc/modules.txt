@@ -1,9 +1,16 @@
+General APIs
+~~~~~~~~~~~~
+struct configuration stuff -- XXX
+struct template stuff -- XXX
+struct question stuff -- XXX
+
 Writing modules
 ~~~~~~~~~~~~~~~
 
 cdebconf is designed to allow frontend and database modules to be plugged
 in as needed. Modules can be built to support different database backends
 (e.g. postgres, ldap, etc) and frontends (e.g. ncurses, gtk, etc).
+
 
 Database modules:
 
@@ -32,29 +39,101 @@ struct database_module {
 	dcd_question_iterate_t question_iterate;
 };
 
+General
+~~~~~~~
+In "common.h", two constants are defined: DC_OK and DC_NOTOK.
+Every method which returns an int, unless specified otherwise, should
+return DC_OK if it succeeds and DC_NOTOK if it fails.
+
 Each of these methods have a signature defined in database.h. All methods
 have a sensible default implementation (usually doing nothing) so that 
 you only need to override the ones you need.
 
+All methods are passed the database as a first argument. The database,
+besides the methods, contains the following attributes:
+
+const char *modname -- the name of the module this database was loaded from XXX
+void *handle -- a handle to the shared library. you should probably not use
+                this XXX
+struct configuration *config -- the configuration of the database. See later
+                                about how to use this XXX
+void *data -- this is a pointer the database can use to keep it's own private
+              data, by allocating some structure and keeping a pointer here
+              on initialization, and deleting it on deletion.
+
 Method descriptions:
+int initialize(struct database *, struct configuration *): 
+    initialize data structures, like cache.
+    Get information form the configuration, if you need to.
+    XXX WHY? Can't you get the configuration from database->config
 
-initialize: initialize data structures, like cache
-shutdown: free data structures, like cache
-load: read in the database structure from a file
-save: save the database structure back to a file
+int shutdown(struct database *):
+    free data structures, like cache
 
-template_set, question_set: 
- Don't think that you can view the template pointer as a linked list
- -- the only one you are supposed to touch is the template you have
- been given a pointer to.  Ditto for question_set.  Be sure not return
- a pointer into any private data structures (use
- template_dup/question_dup).
+int load(struct database *):
+    read in the database structure from a file
+    (this is to optimize parsing. if you have no parsing to do, just
+    do nothing here)
 
-template_iterate, question_iterate:
- Iterate over all the questions/templates using the void** as a mean
- to knowing where in the list of templates you are.
+int save(struct database *): 
+    save the database structure back to a file
+    This is so not every change will get saved immediately, to optimize
+    deserialization. If saving each change immediately is easier, do nothing
+    here.
 
-/* TODO: describe each method */
+int template_set(struct database *, struct template *):
+    save the given template (or, just keep all the information for
+    saving later in save())
+
+struct template *template_get(struct database *, char *name):
+    return a newly allocated template with the contents of the template whose
+    name is "name".
+    XXX should return NULL if fails?
+
+int *template_remove(struct database *, char *name):
+    remove a template from the database
+
+int *(template|question)_[un]lock(struct database *, char *name):
+    XXX WTF? Nothing implements this right now
+
+struct templete *template_iterate(struct database *, void **iter):
+    Return "Next template"
+    When beginning to iterate, *iter will be NULL.
+    On consecutive iterations, it will keep its value.
+    It is your reponsibility to free any allocated structure when
+    returning NULL, to signify end of iteration.
+    Otherwise, return whatever would have been returned by
+    calling template_get() with the template's name.
+
+struct question *question_get(struct database *, const char *name):
+    Return a newly initialized question object, corresponding to the name.
+
+int question_set(struct database *, struct question *):
+    Save the data about the question in the database.
+
+struct question *question_iterate(struct database *, void **iter):
+    Return "Next question"
+    When beginning to iterate, *iter will be NULL.
+    On consecutive iterations, it will keep its value.
+    It is your reponsibility to free any allocated structure when
+    returning NULL, to signify end of iteration.
+    Otherwise, return whatever would have been returned by
+    calling question_get() with the question's name.
+
+struct question *question_disown(struct database *, char *name, char *owner):
+    Remove the owner from the question.
+    XXX - WTF this is done here instead of the caller getting the question, 
+    removing the owner and setting the question is a mystery. Perhaps there
+    are cases where it will be much less efficient?
+
+struct question *question_disown_all(struct database *, char *owner):
+    Remove the owner from all questions.
+    Semantically, this should be the same as iterating, and for each question
+    removing the owner and resetting it. However, you might be able to avoid
+    iterating on some of the question, if the backend is structured correctly.
+
+int question_visible(struct database *, char *name, char *priority)
+    XXX - WTF, nothing implements this either.
 
 See modules/db/* for some examples.
 
@@ -82,4 +161,4 @@ you only need to override the ones you need.
 
 See modules/frontend/* for examples.
 
-$Id: modules.txt,v 1.2 2002/05/18 22:36:01 tfheen Exp $
+$Id: modules.txt,v 1.3 2002/05/28 11:41:24 tfheen Exp $
