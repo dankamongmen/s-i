@@ -13,68 +13,52 @@
 #include <unistd.h>
 #include "anna.h"
 
-/* helper function for chosen_retriever() */
-static char *
-get_retriever_names()
-{
-	DIR *retrdir;
-	struct dirent *d_ent;
-	int retstr_size = 1, fname_len;
-	char *ret_choices;
-	char *fname;
-	struct stat st;
+#define STATUS_FILE "/var/lib/dpkg/status"
 
-	/* Find out which retrievers are available */
-	retrdir = opendir(RETRIEVER_DIR);
+static struct package_t *
+get_retriever_packages()
+{
+	FILE *fp;
+	struct package_t *p, *q;
+
+	fp = fopen(STATUS_FILE, "r");
+	p = di_pkg_parse(fp);
+	fclose(fp);
+	while (p->provides == NULL || strstr(p->provides, "retriever") == NULL)
+		p = p->next;
+	q = p;
+	while (q != NULL && q->next != NULL)
+	{
+		while (q->next != NULL && (q->next->provides == NULL
+			|| strstr(q->next->provides, "retriever") == NULL))
+			q->next = q->next->next;
+		q = q->next;
+	}
+	return p;
+}
+
+/* helper function for chosen_retriever() */
+/* TODO: i18n */
+static char *
+get_retriever_choices(struct package_t *p)
+{
+	int retstr_size = 1;
+	char *ret_choices;
+
 	ret_choices = malloc(1);
 	ret_choices[0] = '\0';
-	while ((d_ent = readdir(retrdir)) != NULL) {
-		fname_len = strlen(d_ent->d_name);
-		fname = (char *)malloc(strlen(RETRIEVER_DIR) + 1 + 
-				fname_len);
-		strcpy(fname, RETRIEVER_DIR "/");
-		strcat(fname, d_ent->d_name);
-		stat(fname, &st);
-		free(fname);
-		if (S_ISREG(st.st_mode)) {
-			/* Should we check for x flag too? */
-			retstr_size += fname_len + 2;
-			ret_choices = realloc(ret_choices, retstr_size);
-			strcat(ret_choices, d_ent->d_name);
-			strcat(ret_choices, ", ");
-		}
+	for (; p != NULL; p = p->next)
+	{
+		retstr_size += strlen(p->package) + 2 + strlen(p->description) + 2;
+		ret_choices = realloc(ret_choices, retstr_size);
+		strcat(ret_choices, p->package);
+		strcat(ret_choices, ": ");
+		strcat(ret_choices, p->description);
+		strcat(ret_choices, ", ");
 	}
-	closedir(retrdir);
 	if (retstr_size >= 3)
 		ret_choices[retstr_size-3] = '\0';
 	return ret_choices;
-}
-
-/* TODO: i18n */
-static char *
-get_retriever_descriptions()
-{
-	FILE *fp;
-	struct package_t *p;
-	char *descriptions;
-	int desc_len = 1;
-
-	descriptions = malloc(1);
-	descriptions[0] = '\0';
-	fp = fopen("/var/lib/dpkg/status", "r");
-	p = di_pkg_parse(fp);
-	for (; p != NULL; p = p->next)
-	{
-		if (p->provides == NULL || strstr(p->provides, "retriever") == NULL)
-			continue;
-		desc_len += 1 + strlen(p->package) + strlen(": ") + 
-			strlen(p->description) + 1;
-		descriptions = realloc(descriptions, desc_len);
-		di_snprintfcat(descriptions, 2*desc_len, " %s: %s\n",
-				p->package, p->description);
-	}
-	fclose(fp);
-	return descriptions;
 }
 
 /* Returns the filename of the retriever to use. */
@@ -84,35 +68,32 @@ char *chosen_retriever (void) {
 
 	if (retriever == NULL) {
 		struct debconfclient *debconf;
+		struct package_t *ret_pkgs;
 		char *ret_choices, *ret_default;
-		char *descriptions;
+		char *colon_p;
 
-		ret_choices = get_retriever_names();
+		ret_pkgs = get_retriever_packages();
+		ret_choices = get_retriever_choices(ret_pkgs);
 		ret_default = strrchr(ret_choices, ',');
 		if (ret_default != NULL)
 			ret_default += 2;
 
-		descriptions = get_retriever_descriptions();
-		if (descriptions != NULL && descriptions[0] != '\0')
-			descriptions += 1; /* Leading space */
-
 		debconf = debconfclient_new();
 		debconf->command(debconf, "TITLE", "Choose Retriever", NULL);
-		debconf->command(debconf, "SET", ANNA_RETRIEVER, ret_default, 
+		debconf->command(debconf, "SET", ANNA_RETRIEVER, ret_default,
 				NULL);
-		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "RETRIEVER", 
+		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES",
 				ret_choices, NULL);
-		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT", 
+		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT",
 				ret_default, NULL);
-		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DESCRIPTIONS",
-				descriptions, NULL);
 		debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
 		debconf->command(debconf, "GO", NULL);
 		debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
-		retriever = malloc(strlen(RETRIEVER_DIR) + 1 + 
-                                   strlen(debconf->value));
+		colon_p = strchr(debconf->value, ':');
+		retriever = malloc(strlen(RETRIEVER_DIR) + 1 +
+				   colon_p - debconf->value);
 		strcpy(retriever, RETRIEVER_DIR "/");
-		strcat(retriever, debconf->value);
+		strncat(retriever, debconf->value, colon_p - debconf->value);
 		debconfclient_delete(debconf);
                 
 		free(ret_choices);
