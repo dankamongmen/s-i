@@ -42,8 +42,12 @@ CFLAGS += -DARM -DAT_KBD -DUSB_KBD
 OBJS += acorn-kbd.o at-kbd.o usb-kbd.o
 endif
 ifeq ($(ARCH),m68k)
-CFLAGS += -DAMIGA_KBD
-OBJS += amiga-kbd.o
+CFLAGS += -DAMIGA_KBD -DATARI_KBD -DMAC_KBD -DAT_KBD
+OBJS += amiga-kbd.o atari-kbd.o mac-kbd.o at-kbd.o
+endif
+ifeq ($(ARCH),hppa)
+CFLAGS += -DAT_KBD -DUSB_KBD
+OBJS += at-kbd.o usb-kbd.o
 endif
 
 all: kbd-chooser
