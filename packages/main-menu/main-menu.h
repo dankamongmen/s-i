@@ -11,7 +11,10 @@
 
 #define MAIN_MENU	"debian-installer/main-menu"
 #define MISSING_PROVIDE "debian-installer/missing-provide"
+#define ITEM_FAILURE	"debian-installer/main-menu/item-failure"
 
 #include <debian-installer.h>
 
 #define NEVERDEFAULT 900
+
+#define BACKUP	10

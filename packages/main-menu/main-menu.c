@@ -1,7 +1,7 @@
 /*
  * Debian Installer main menu program.
  *
- * Copyright 2000  Joey Hess <joeyh@debian.org>
+ * Copyright 2000,2004  Joey Hess <joeyh@debian.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,10 @@ const int RAISE = 1;
 const int LOWER = 0;
 
 int last_successful_item = -1;
+
+/* Did the last item signal a backup? This is evil and should be removed.
+ * See the TODO. */
+int last_item_backup = 0;
 
 /* Save default priority, to be able to return to it when we have to lower it */
 int default_priority = 1;
@@ -144,8 +148,7 @@ static size_t menu_entry(struct debconfclient *debconf, char *language, di_syste
 				end = lang + strlen(lang);
 		        strncpy(field+12, lang, end-lang);
 		        strcpy(field+12+(end-lang), ".UTF-8");
-			if (!debconf_metaget(debconf, question, field))
-			{
+			if (!debconf_metaget(debconf, question, field)) {
 				strncpy(buf, debconf->value, size);
 				return strlen (buf);
 			}
@@ -154,8 +157,7 @@ static size_t menu_entry(struct debconfclient *debconf, char *language, di_syste
 			if (und != NULL && (und - lang) < (end - lang)) {
 		        	strncpy(field+12, lang, und-lang);
 		        	strcpy(field+12+(und-lang), ".UTF-8");
-				if (!debconf_metaget(debconf, question, field))
-	                	{
+				if (!debconf_metaget(debconf, question, field)) {
 	                        	strncpy(buf, debconf->value, size);
 	                        	return strlen (buf);
 	                	}
@@ -163,8 +165,7 @@ static size_t menu_entry(struct debconfclient *debconf, char *language, di_syste
 			lang = end+1;
 		} while (*end != '\0');
 	}
-	if (!debconf_metaget(debconf, question, "Description"))
-	{
+	if (!debconf_metaget(debconf, question, "Description")) {
 		strncpy(buf, debconf->value, size);
 		return strlen (buf);
 	}
@@ -363,9 +364,10 @@ static int satisfy_virtual(di_system_package *p) {
 			if (defpkg != NULL) {
 				menu_entry(debconf, language, defpkg, buf, sizeof(buf));
 				debconf_set(debconf, MISSING_PROVIDE, buf);
-			} else
+			} else {
 				/* TODO: How to figure out a default? */
 				priority = "critical";
+			}
 			debconf_capb(debconf, "backup");
 			debconf_subst(debconf, MISSING_PROVIDE, "CHOICES", menu);
 			debconf_input(debconf, priority, MISSING_PROVIDE);
@@ -454,8 +456,13 @@ int do_menu_item(di_system_package *p) {
 		ret = di_exec_mangle_status(ret);
 		free(configcommand);
 		check_special(p);
-		if (ret)
-			di_log(DI_LOG_LEVEL_WARNING, "Reconfiguring '%s' failed with error code %d", p->p.package, ret);
+		last_item_backup = 0;
+		if (ret) {
+			if (ret == BACKUP)
+				last_item_backup = 1;
+			else
+				di_log(DI_LOG_LEVEL_WARNING, "Reconfiguring '%s' failed with error code %d", p->p.package, ret);
+		}
 		ret = !ret;
 	}
 	else if (p->p.status == di_package_status_unpacked || p->p.status == di_package_status_half_configured) {
@@ -531,6 +538,21 @@ static void adjust_default_priority (void) {
 	}
 }
 
+void notify_user_of_failure (di_system_package *p) {
+	char *language = NULL;
+	char buf[256];
+	
+	debconf_capb(debconf);
+	debconf_get(debconf,"debian-installer/language");
+	if (debconf->value)
+		language = strdup(debconf->value);
+	menu_entry(debconf, language, p, buf, sizeof (buf));
+	debconf_subst(debconf, ITEM_FAILURE, "ITEM", buf);
+	debconf_input(debconf, "critical", ITEM_FAILURE);
+	debconf_go(debconf);
+	debconf_capb(debconf, "backup");
+}
+
 int main (int argc __attribute__ ((unused)), char **argv) {
 	di_system_package *p;
 	di_packages *packages;
@@ -549,26 +571,26 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 		ret = do_menu_item(p);
 		adjust_default_priority();
 		if (!ret) {
-			if (ret == 10)
+			if (last_item_backup) {
 				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' succeeded but requested to be left unconfigured.", p->p.package); 
-			else
+				last_item_backup = 0;
+			}
+			else {
 				di_log(DI_LOG_LEVEL_WARNING, "Menu item '%s' failed.", p->p.package);
-			/* Something went wrong.  Lower debconf
-			   priority limit to try to give the user more
-			   control over the situation. */
+				notify_user_of_failure(p);
+			}
 			modify_debconf_priority(LOWER);
 		}
-		else
-		{
-		  /* Success */
-		  if (p->installer_menu_item < NEVERDEFAULT)
-		  {
-		    last_successful_item = p->installer_menu_item;
-		    modify_debconf_priority(RAISE);
-		    //di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
-		  }
-		  else
-		   // di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
+		else {
+			/* Success */
+			if (p->installer_menu_item < NEVERDEFAULT) {
+				last_successful_item = p->installer_menu_item;
+				modify_debconf_priority(RAISE);
+				//di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
+			}
+			else {
+				// di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
+			}
 		}
 		
 		di_packages_free (packages);
@@ -626,12 +648,16 @@ static int di_config_package(di_system_package *p,
 	ret = di_exec_shell_log(configcommand);
 	ret = di_exec_mangle_status(ret);
 	free(configcommand);
+	last_item_backup = 0;
 	if (ret == 0) {
 		p->p.status = di_package_status_installed;
 		if (walkfunc != NULL)
 			walkfunc(p);
 	} else {
-		di_log(DI_LOG_LEVEL_WARNING, "Configuring '%s' failed with error code %d", p->p.package, ret);
+		if (ret == 10)
+			last_item_backup = 1;
+		else
+			di_log(DI_LOG_LEVEL_WARNING, "Configuring '%s' failed with error code %d", p->p.package, ret);
 		p->p.status = di_package_status_half_configured;
 		return 0;
 	}

@@ -1,4 +1,4 @@
-CFLAGS=-Wall -W -g -D_GNU_SOURCE -ggdb
+CFLAGS=-Wall -W -g -D_GNU_SOURCE
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=main-menu
 LIBS=-ldebconfclient -ldebian-installer
