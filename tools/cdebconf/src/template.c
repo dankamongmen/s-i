@@ -7,7 +7,7 @@
  *
  * Description: interface to debconf templates
  *
- * $Id: template.c,v 1.13 2002/11/20 23:47:16 barbier Exp $
+ * $Id: template.c,v 1.14 2002/11/20 23:50:04 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -62,7 +62,7 @@ const char *template_fields_list[] = {
 static const char *getlanguage(void)
 {
         /*  NULL is a valid return value  */
-	return getenv("DEBCONF_LANG");
+	return getenv("LANGUAGE");
 }
 
 /*
