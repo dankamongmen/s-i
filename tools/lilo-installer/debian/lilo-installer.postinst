@@ -10,19 +10,19 @@ rootfs=`sed -ne '/^[^ ]* \/target /s/ .*//p' /etc/mtab`
 
 # detect which hard drive has /target/boot mounted on it. this does *not*
 # have to be the same as the drive /target is mounted on.
-bootdev=`sed -ne '/^[^ ]* \/target/boot /s/ .*//p' /etc/mtab`
+bootdev=`sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' /etc/mtab`
 
-if [ $bootfs = '' ]; then
+if [ "$bootfs" = '' ]; then
 	bootdev=$rootfs
 fi
 
-bootdev=`echo $bootdev | sed 's/[0-9]+$//'`
+bootdev=`echo $bootdev | sed 's/[0-9]+$//'` 
 
-db_subst lilo/bootdev default $bootdev
-db_input high lilo/bootdev
+db_subst lilo-installer/bootdev bootdev "$bootdev"
+db_input high lilo-installer/bootdev
 db_go
 
-db_get lilo/bootdev
+db_get lilo-installer/bootdev
 bootdev=$RET
 
 #write out lilo.conf
