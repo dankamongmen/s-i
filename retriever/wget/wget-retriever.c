@@ -2,9 +2,7 @@
  * Retrieve files via busybox wget.
  * Copyright 2000 Joey Hess <joeyh@debian.org>, GPL'd
  *
- * TODO: enable continuation if not going to stdout.
  * TODO: proxy support
- * TODO: could stand to be a little more stable when it encounters NULLs.
  */
 
 #include <debconfclient.h>
