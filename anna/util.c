@@ -141,10 +141,29 @@ is_installed(di_package *p, di_packages *status)
     return ret;
 }
 
+static size_t 
+choice_strcpy(char *dest, char *src, size_t size)
+{
+    size_t n=0;
+    
+    while (*src && (n < size-2)) {
+        if (*src == ',')
+            dest[n++] = '\\';
+        dest[n++] = *src++;
+    }
+    dest[n] = '\0';
+
+    return n;
+}
+
 size_t
 package_to_choice(di_package *package, char *buf, size_t size)
 {
-  return snprintf(buf, size, "%s: %s", package->package, package->short_description);
+    int n;
+    n  = choice_strcpy(buf, package->package, size);
+    n += choice_strcpy(buf+n, ": ", size-n);
+    n += choice_strcpy(buf+n, package->short_description, size-n);
+    return n;
 }
 
 char *
