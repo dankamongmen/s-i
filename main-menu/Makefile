@@ -7,5 +7,8 @@ all: $(BIN)
 $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LIBS)
 
+demo: $(BIN)
+	/usr/share/debconf/frontend ./$(BIN)
+
 clean:
 	-rm -f $(BIN) $(OBJS) *~

@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <search.h>
-#include <stdio.h>
 
 /* For btree. */
 int package_compare (const void *p1, const void *p2) {
@@ -46,11 +45,12 @@ static void order(struct package_t *p, void *package_tree,
 	p->processed = 1;
 }
 
-/* Orders the main menu. Returns a linked list of packages. */
-struct package_t *main_menu(struct package_t *packages) {
+/* Displays the main menu via debconf. */
+void main_menu(struct package_t *packages) {
 	struct package_t **package_list, *p, *head = NULL, *tail = NULL;
 	int i = 0, num = 0;
 	void *package_tree = NULL;
+	char *s, menutext[1024] = "SUBST " MAIN_MENU " MENU ";
 	
 	/* Make a flat list of the packages, plus a btree for name lookup. */
 	for (p = packages; p; p = p->next) {
@@ -73,20 +73,34 @@ struct package_t *main_menu(struct package_t *packages) {
 			order(package_list[i], package_tree, &head, &tail);
 		}
 	}
-
-	return head;
+	
+	/* Make debconf display it. */
+	s = menutext + strlen(menutext);
+	for (p = head; p; p=p->next) {
+		if (p->installer_menu_item) {
+			strcpy(s, p->description);
+			s += strlen(p->description);
+			*s++ = ',';
+			*s++ = ' ';
+		}
+	}
+	s = s - 2;
+	*s = 0;
+	/*
+	 * TODO: save some executable size by not hard coding the MAIN_MENU
+	 * string everwhere
+	 */
+	debconf_command("FSET " MAIN_MENU " isdefault true");
+	debconf_command(menutext);
+	debconf_command("INPUT medium " MAIN_MENU);
+	debconf_command("GO");
 }
 
 int main (int argc, char **argv) {
-	struct package_t *first, *p, *packages;
+	struct package_t *packages;
 	
 	packages = status_read();
-	first = main_menu(packages);
-
-	for (p = first; p; p=p->next) {
-		if (p->installer_menu_item)
-			printf("--%s\n", p->description);
-	}
+	main_menu(packages);
 	
 	return(0);
 }

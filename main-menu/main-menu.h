@@ -3,6 +3,8 @@
 
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
 
+#define MAIN_MENU	"debian-installer/main-menu"
+
 /* data structures */
 struct package_t {
 	char *package;
@@ -15,3 +17,4 @@ struct package_t {
 
 struct package_t *status_read(void);
 int package_compare (const void *, const void *);
+int debconf_command (char *);
