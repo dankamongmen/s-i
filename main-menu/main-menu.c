@@ -157,7 +157,7 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
 	if (menudefault)
 		debconf->command(debconf, "SET", MAIN_MENU, menudefault, NULL);
-	debconf->command(debconf, "FSET", MAIN_MENU, "isdefault", "true", NULL);
+	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
 	debconf->command(debconf, "INPUT medium", MAIN_MENU, NULL);
 	debconf->command(debconf, "GO", NULL);
