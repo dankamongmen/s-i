@@ -14,8 +14,6 @@
 #include <unistd.h>
 #include <time.h>
 
-static time_t changed;
-
 static char *unescapestr(const char *in)
 {
 	static char buf[8192];
@@ -30,27 +28,6 @@ static char *escapestr(const char *in)
 	if (in == 0) return 0;
 	strescape(in, buf, sizeof(buf));
 	return buf;
-}
-
-static char *strip_ws(char *string)
-{
-        char *wc = strdup(string);
-        char *begin = wc;
-        char *end = wc + strlen(wc);
-        char *ret;
-        if (!wc)
-        {
-                free(wc);
-                return NULL;
-        }
-        while (*begin == ' ' || *begin == '\t')
-                begin++;
-        while (end > begin && (*end == ' ' || *end == '\t' || *end == '\0'))
-                end--;
-        end++;
-        *end = '\0';
-        ret = strdup(begin);
-        return ret;
 }
 
 static void parse_variables(struct question *q, char *string)
@@ -140,7 +117,7 @@ static int parse_flags(char *string)
 static int rfc822db_initialize(struct database *db, struct configuration *cfg)
 {
 	struct db_cache *dbdata;
-        fprintf(stderr,"rfc822db_initialize(db,cfg)\n");
+        /*        fprintf(stderr,"rfc822db_initialize(db,cfg)\n");*/
 	dbdata = malloc(sizeof(struct db_cache));
 
 	if (dbdata == NULL)
@@ -167,7 +144,7 @@ static struct rfc822_header* rfc822db_parse_stanza(FILE *file)
         struct rfc822_header *head;
         struct rfc822_header *ret = NULL;
         char buf[8192+1];
-        fprintf(stderr,"rfc822db_parse_stanza(file)\n");
+        /*        fprintf(stderr,"rfc822db_parse_stanza(file)\n");*/
         while (!feof(file)) 
         {
                 /* don't free tmp, it will point inside buf */
@@ -197,7 +174,7 @@ static struct rfc822_header* rfc822db_parse_stanza(FILE *file)
                         head->header = strdup(buf);
                         while(*tmp == ' ' || *tmp == '\t')
                                 tmp++;
-                        head->value = strip_ws(unescapestr(tmp));
+                        head->value = strstrip(unescapestr(tmp));
                         head->next = ret;
                         ret = head;
                 }
@@ -234,7 +211,7 @@ static struct template* rfc822db_parse_templates(struct template *templates,
                                                  FILE* file)
 {
         struct rfc822_header *header = NULL;
-        fprintf(stderr,"rfc822db_parse_templates(templates,file)\n");
+        /*        fprintf(stderr,"rfc822db_parse_templates(templates,file)\n");*/
         while ((header = rfc822db_parse_stanza(file)) != NULL)
         {
                 struct template *tmp;
@@ -268,7 +245,7 @@ static struct question* rfc822db_parse_questions(struct question *questions,
                                                  FILE* file)
 {
         struct rfc822_header *header = NULL;
-        fprintf(stderr,"rfc822db_parse_questions(questions, file)\n");
+        /*        fprintf(stderr,"rfc822db_parse_questions(questions, file)\n");*/
         while ((header = rfc822db_parse_stanza(file)) != NULL)
         {
                 struct question *tmp;
@@ -297,6 +274,17 @@ static struct template *find_template(struct template *t, const char *name)
         return NULL;
 }
 
+static struct question *find_question(struct question *q, const char *name)
+{
+        while (q != NULL)
+        {
+                if (strcmp(name,q->tag) == 0)
+                        return q;
+                q = q->next;
+        }
+        return NULL;
+}
+
 static void rfc822db_connect_questions_templates(struct db_cache *dbdata)
 {
         struct template *t = dbdata->templates;
@@ -306,6 +294,17 @@ static void rfc822db_connect_questions_templates(struct db_cache *dbdata)
                 q->template = find_template(t,q->tag);
                 q = q->next;
         }
+        while (t != NULL)
+        {
+                if (find_question(dbdata->questions, t->tag) == NULL)
+                {
+                        q = question_new(t->tag);
+                        q->template = t;
+                        q->next = dbdata->questions;
+                        dbdata->questions = q;
+                }
+                t = t->next;
+        }
 }
 
 static int rfc822db_load(struct database *db)
@@ -313,7 +312,7 @@ static int rfc822db_load(struct database *db)
         struct db_cache *dbdata = db->data;
         FILE *inf;
 
-        fprintf(stderr,"rfc822db_load(db)\n");
+        /*        fprintf(stderr,"rfc822db_load(db)\n");*/
         if ((inf = fopen(db->config->get(
                                  db->config, 
                                  "database::driver::rfc822db::templatepath", 
@@ -336,11 +335,11 @@ static int rfc822db_load(struct database *db)
 
 static int rfc822db_dump_templates(struct template *t, FILE *outf)
 {
-        fprintf(stderr,"rfc822db_dump_templates(t=%p, outf=%p)\n",t,outf);
+  /*        fprintf(stderr,"rfc822db_dump_templates(t=%p, outf=%p)\n",t,outf);*/
         while (t)
         {
                 struct language_description *langdesc;
-                fprintf(stderr,"dumping template %s\n",t->tag);
+                /*                fprintf(stderr,"dumping template %s\n",t->tag);*/
                 fprintf(outf, "Name: %s\n", escapestr(t->tag));
                 fprintf(outf, "Type: %s\n", escapestr(t->type));
 /*	if (t->defaultval != NULL)
@@ -383,10 +382,10 @@ static int rfc822db_dump_questions(struct question *q, FILE *outf)
 {
 	struct questionvariable *var;
 	struct questionowner *owner;
-        fprintf(stderr,"rfc822db_dump_questions(q, outf)\n");
+        /*        fprintf(stderr,"rfc822db_dump_questions(q, outf)\n");*/
         while (q)
         {
-                fprintf(stderr, "Dumping question: %s\n", q->tag);
+          /*                fprintf(stderr, "Dumping question: %s\n", q->tag);*/
                 fprintf(outf, "Name: %s\n", escapestr(q->tag));
                 fprintf(outf, "Value: %s\n", (q->value ? escapestr(q->value) : ""));
 /*	if (q->defaultval)
@@ -417,7 +416,7 @@ static int rfc822db_dump_questions(struct question *q, FILE *outf)
                         fprintf(outf, "\n");
                 }
                 fprintf(outf, "\n");
-                fprintf(stderr, "Dumped: %s, next: %p\n", q->tag, q->next);
+                /*                fprintf(stderr, "Dumped: %s, next: %p\n", q->tag, q->next);*/
                 q = q->next;
 
         }
@@ -428,11 +427,11 @@ static int rfc822db_save(struct database *db)
 {
         struct db_cache *dbdata = db->data;
         FILE *outf = NULL;
-        fprintf(stderr,"rfc822save(db)\nwriting to %s\n", 
+        /*        fprintf(stderr,"rfc822save(db)\nwriting to %s\n", 
                 db->config->get(
                         db->config, 
                         "database::driver::rfc822db::templatepath", 
-                        RFC822DB_TEMPLATE_PATH));
+                        RFC822DB_TEMPLATE_PATH));*/
         if ((outf = fopen(db->config->get(
                                  db->config, 
                                  "database::driver::rfc822db::templatepath", 
@@ -450,7 +449,6 @@ static int rfc822db_save(struct database *db)
         rfc822db_dump_questions(dbdata->questions,outf);
         if (fclose(outf) == EOF)
                 perror("closing after dump_questions");
-        time(&changed);
 	return DC_OK;
 }
 
@@ -458,13 +456,9 @@ static int rfc822db_template_set(struct database *db, struct template *template)
 {
         struct template *t = template_dup(template);
         struct db_cache *dbdata = db->data;
-        struct template *db_prev = NULL;
-                
+        struct template *db_prev = dbdata->templates;
         /* the template in the db, if already there */
         struct template *db_t = dbdata->templates;
-                
-        /* is the processing finished for the current template? */
-        int finished = 0;
 
         fprintf(stderr,"rfc822db_template_set(db,t=%s)\n", t->tag);
         while (db_t)
@@ -472,60 +466,22 @@ static int rfc822db_template_set(struct database *db, struct template *template)
                 if (strcmp(t->tag,db_t->tag) == 0) 
                 {
                         /* match, replace */
-                        if (db_prev)
-                        {
-                                /* leak a template FIXME */
-                                /* point prev's next to t, and
-                                 * point t's next to real next
-                                 * (that means db_t->next).
-                                 */
-                                db_prev->next = t;
-                                t = t->next;
-                                db_prev->next->next = db_t->next;
-                                template_deref(db_t);
-                        }
-                        else
-                        {
-                                dbdata->templates = t;
-                                t = t->next;
-                                dbdata->templates->next = db_t->next;
-                        }
-                        finished = 1;
-                        break;
+                        /* leak a template FIXME */
+                        
+                        db_prev->next = t;
+                        t->next = db_t->next;
+                        return DC_OK;
                 }
                 db_prev = db_t;
                 db_t = db_t->next;
         }
-        if (!finished)
-        {
-                /* not in the list yet, so..  insert t at the
-                   beginning, detach t and increment t. */
-                fprintf(stderr,"\t%s not found, inserting at head\n",t->tag);
-                db_t = dbdata->templates;
-                dbdata->templates = t;
-                t = t->next;
-                dbdata->templates->next = db_t;
-                
-        }
-        rfc822db_save(db);
+
+        /* not in the list yet, so..  insert t at the beginning */
+
+/*                fprintf(stderr,"\t%s not found, inserting at head\n",t->tag);*/
+        t->next = dbdata->templates;
+        dbdata->templates = t;
 	return DC_OK;
-}
-
-/* This is a ugly hack */
-
-void rfc822db_reload_if_changed(struct database *db)
-{
-        struct stat sb;
-        stat(db->config->get(
-                     db->config, 
-                     "database::driver::rfc822db::templatepath", 
-                     RFC822DB_TEMPLATE_PATH), &sb);
-        if (sb.st_mtime > changed)
-        {
-                changed = sb.st_mtime;
-                rfc822db_load(db);
-        }
-
 }
 
 static struct template *rfc822db_template_get(struct database *db, 
@@ -533,8 +489,7 @@ static struct template *rfc822db_template_get(struct database *db,
 {
         struct db_cache *dbdata = db->data;
         struct template *t = dbdata->templates;
-        fprintf(stderr,"rfc822db_template_get(db,ltag=%s)\n",ltag);
-        rfc822db_reload_if_changed(db);
+        /*        fprintf(stderr,"rfc822db_template_get(db,ltag=%s)\n",ltag);*/
         return find_template(t, ltag);
 }
 
@@ -543,7 +498,7 @@ static int rfc822db_template_remove(struct database *db, const char *tag)
         struct db_cache *dbdata = db->data;
         struct template *t = dbdata->templates;
         struct template *prev = NULL;
-        fprintf(stderr,"rfc822db_template_remove(db,tag=%s)\n",tag);
+        /*        fprintf(stderr,"rfc822db_template_remove(db,tag=%s)\n",tag);*/
         while (t)
         {
                 if (strcmp(t->tag, tag) == 0)
@@ -573,43 +528,31 @@ static int rfc822db_question_set(struct database *db, struct question *question)
 {
         struct question *q = question_dup(question);
         struct db_cache *dbdata = db->data;
-        struct question *db_prev = NULL;
-                
+        struct question *db_prev = dbdata->questions;
+
         /* the question in the db, if already there */
         struct question *db_q = dbdata->questions;
-        
+
         fprintf(stderr,"rfc822db_question_set(db,t=%s)\n", q->tag);
+
+        q->template = find_template(dbdata->templates, q->tag);
         while (db_q)
         {
                 if (strcmp(q->tag,db_q->tag) == 0) 
                 {
                         /* match, replace */
-                        if (db_prev)
-                        {
-                                /* leak a question FIXME */
-                                /* point prev's next to q, and
-                                 * point q's next to real next
-                                 * (that means db_q->next).
-                                 */
-                                db_prev->next = q;
-                                q->next = db_q->next;
-                        }
-                        else
-                        {
-                                q->next = dbdata->questions;
-                                dbdata->questions = q;
-                        }
-                        rfc822db_save(db);
+                        q->next = db_q->next;
+                        /* leak a question FIXME */
+                        db_prev->next = q;
                         return DC_OK;
                 }
                 db_prev = db_q;
                 db_q = db_q->next;
         }
         /* not in the list yet, so insert q at the beginning */
-        fprintf(stderr,"\t%s not found, inserting at head\n",q->tag);
+        /*        fprintf(stderr,"\t%s not found, inserting at head\n",q->tag);*/
         q->next = dbdata->questions;
         dbdata->questions = q;
-        rfc822db_save(db);
         return DC_OK;
 }
 
@@ -620,8 +563,7 @@ static struct question *rfc822db_question_get(struct database *db,
 {
         struct db_cache *dbdata = db->data;
         struct question *q = dbdata->questions;
-        fprintf(stderr,"rfc822db_question_get(db,ltag=%s)\n",ltag);
-        rfc822db_reload_if_changed(db);
+        /*        fprintf(stderr,"rfc822db_question_get(db,ltag=%s)\n",ltag);*/
         while (q)
         {
                 if (strcmp(q->tag,ltag) == 0)
@@ -633,7 +575,7 @@ static struct question *rfc822db_question_get(struct database *db,
                 }
                 q = q->next;
         }
-        fprintf(stderr,"rfc822db_question_get: couldn't find: %s\n", ltag);
+        /*        fprintf(stderr,"rfc822db_question_get: couldn't find: %s\n", ltag);*/
         return NULL;
 }
 
@@ -641,8 +583,8 @@ static int rfc822db_question_disown(struct database *db, const char *tag,
 	const char *owner)
 {
 	struct question *q = rfc822db_question_get(db, tag);
-        fprintf(stderr,"rfc822db_question_disown(db, tag=%s, owner=%s)\n",
-                tag,owner);
+        /*        fprintf(stderr,"rfc822db_question_disown(db, tag=%s, owner=%s)\n",
+                  tag,owner);*/
 	if (q == NULL) return DC_NOTOK;
 	question_owner_delete(q, owner);
 	rfc822db_question_set(db, q);
@@ -653,7 +595,7 @@ static int rfc822db_question_disown(struct database *db, const char *tag,
 static struct question *rfc822db_question_iterate(struct database *db,
 	void **iter)
 {
-        fprintf(stderr,"rfc822db_question_iterate stub\n");
+          fprintf(stderr,"rfc822db_question_iterate stub\n");
         return NULL;
 }
 
