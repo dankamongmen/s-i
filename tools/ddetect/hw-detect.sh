@@ -29,13 +29,13 @@ is_not_loaded() {
 }
 
 snapshot_devs() {
-  DEVS=$(echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`)
+  echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`
 }
 
 compare_devs() {
-  OLDDEVS=$DEVS
-  snapshot_devs
-  NEWDEV=$(echo "${DEVS#$OLDDEVS}" | sed -e 's/^ //')
+  local olddevs="$1"
+  local devs="$2"
+  echo "${devs#$olddevs}" | sed -e 's/^ //'
 }
 
 NETDISCOVER="/tmp/discover-net"
@@ -43,46 +43,55 @@ NETDISCOVER="/tmp/discover-net"
 get_modinfo()
 {
   local module="$1"
-
-  MODINFO=""
+  local modinfo=""
 
   [ -f "$NETDISCOVER" ] || return
 
   if grep -q "^$1" $NETDISCOVER; then
     lines=$(grep "^$1" $NETDISCOVER | wc -l)
     if [ $lines -eq 1 ]; then
-      MODINFO=$(grep "^$1" $NETDISCOVER | cut -d':' -f2 | sed 's/,//g')
+      modinfo=$(grep "^$1" $NETDISCOVER | cut -d':' -f2 | sed 's/,//g')
     elif [ $lines -eq 0 ]; then
       return
     else
-      MODINFOTMP=$(grep -n "^$1" $NETDISCOVER | head -n 1)
-      MODINFO=$(echo "$MODINFOTMP" | cut -d':' -f3- | sed 's/,//g')
-      linenum=$(echo "$MODINFOTMP" | cut -d':' -f1)
+      modinfo_tmp=$(grep -n "^$1" $NETDISCOVER | head -n 1)
+      modinfo=$(echo "$modinfo_tmp" | cut -d':' -f3- | sed 's/,//g')
+      linenum=$(echo "$modinfo_tmp" | cut -d':' -f1)
       # Write out the tmp file without the line just used.
       grep -n . $NETDISCOVER | grep -v ^${linenum} | cut -f2- -d':' > $NETDISCOVER~
       mv $NETDISCOVER~ $NETDISCOVER
     fi
+
+    echo "$modinfo"
   fi
 }
 
 load_module() {
     local module="$1"
+    local devs=""
+    local olddevs=""
+    local newdev=""
+    local modinfo=""
+    
     db_fset hw-detect/module_params seen false
     db_subst hw-detect/module_params MODULE "$module"
     db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
     db_get hw-detect/module_params
-    snapshot_devs
+    devs="$(snapshot_devs)"
     if modprobe -v "$module" "$RET" >> /var/log/messages 2>&1 ; then
     	if [ "$RET" != "" ]; then
 		register-module "$module" "$RET"
 	fi
-	compare_devs
+	olddevs="$devs"
+	devs="$(snapshot_devs)"
+	
+	newdev="$(compare_devs "$olddevs" "$devs")"
 
-        if [ -n "$NEWDEV" ]; then
-          get_modinfo $module #stored into $MODINFO
-          if [ -n "$MODINFO" ]; then
-            echo "${NEWDEV}:${MODINFO}" >> /etc/network/devnames
+        if [ -n "$newdev" ]; then
+          modinfo="$(get_modinfo "$module")"
+          if [ -n "$modinfo" ]; then
+            echo "${newdev}:${modinfo}" >> /etc/network/devnames
           fi
         fi
     else   

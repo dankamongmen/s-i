@@ -32,57 +32,34 @@ load_module() {
 }
 
 snapshot_devs() {
-  DEVS=$(echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`)
+  echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`
 }
 
 compare_devs() {
-  OLDDEVS=$DEVS
-  snapshot_devs
-  NEWDEV=$(echo ${DEVS#$OLDDEVS} | sed -e 's/^ //')
-}
-
-NETDISCOVER="/tmp/discover-net"
-
-get_modinfo()
-{
-  local module="$1"
-
-  MODINFO=""
-
-  [ -f "$NETDISCOVER" ] || return
-
-  if grep -q "^$1" $NETDISCOVER; then
-    lines=$(grep "^$1" $NETDISCOVER | wc -l)
-    if [ $lines -eq 1 ]; then
-      MODINFO=$(grep "^$1" $NETDISCOVER | cut -d':' -f2 | sed 's/,//g')
-    elif [ $lines -eq 0 ]; then
-      return
-    else
-      MODINFOTMP=$(grep -n "^$1" $NETDISCOVER | head -n 1)
-      MODINFO=$(echo "$MODINFOTMP" | cut -d':' -f3- | sed 's/,//g')
-      linenum=$(echo "$MODINFOTMP" | cut -d':' -f1)
-      # Write out the tmp file without the line just used.
-      grep -n . $NETDISCOVER | grep -v ^${linenum} | cut -f2- -d':' > $NETDISCOVER
-      mv $NETDISCOVER~ $NETDISCOVER
-    fi
-  fi
+  local olddevs="$1"
+  local devs="$2"
+  echo ${devs#$olddevs} | sed -e 's/^ //'
 }
 
 DEVNAMES=/etc/network/devnames.gz
 get_static_modinfo() {
   local module="$1"
-  MODINFO=""
+  local modinfo=""
   if zcat $DEVNAMES | grep -q $module; then 
-    MODINFO=$(zcat $DEVNAMES | grep ^${module} | head -n 1 | cut -d':' -f2-)
+    modinfo=$(zcat $DEVNAMES | grep ^${module} | head -n 1 | cut -d':' -f2-)
   fi
+  echo "$modinfo"
 }
 
 module_probe() {
     local module="$1"
     local priority="$2"
-    local is_manual="$3"
     local template="ethdetect/module_params"
     local question="$template/$module"
+    local modinfo=""
+    local devs=""
+    local olddevs=""
+    local newdev=""
 
     db_register "$template" "$question"
     db_subst "$question" MODULE "$module"
@@ -90,22 +67,19 @@ module_probe() {
     db_input $priority "$question" || [ $? -eq 30 ]
     db_go
     db_get "$question"
-    snapshot_devs
+    devs="$(snapshot_devs)"
     if modprobe -v "$module" $RET ; then
 	if [ "$RET" != "" ]; then
 		register-module "$module" $RET
 	fi
-	compare_devs # stores ifname $NEWDEV
+	olddevs="$devs"
+	devs="$(snapshot_devs)"
+	newdev="$(compare_devs "$olddevs" "$devs")"
 
-	if [ -n "$NEWDEV" ]; then
-	  if [ -n "$is_manual" ]; then
-	    get_static_modinfo $module
-	  else
-	    get_modinfo $module #stored into $MODINFO
-	  fi
-
-	  if [ -n "$MODINFO" ]; then
-            echo "${NEWDEV}:${MODINFO}" >> /etc/network/devnames
+	if [ -n "$newdev" ]; then
+	  modinfo=$(get_static_modinfo $module)
+	  if [ -n "$modinfo" ]; then
+            echo "${newdev}:${modinfo}" >> /etc/network/devnames
 	  fi
 	fi
     else
@@ -150,7 +124,7 @@ do
         fi
         module="$RET"
         if [ -n "$module" ] && is_not_loaded "$module" ; then
-		load_module "$module" 1
+		load_module "$module"
         fi
 	continue
     fi
