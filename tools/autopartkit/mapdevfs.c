@@ -129,7 +129,8 @@ mapdevfs(const char *path, char *buf, size_t n)
 char *normalize_devfs(const char* path)
 {
     char buf[1024];
-    int retval = mapdevfs(path, buf, sizeof(buf));
+    if (0 == mapdevfs(path, buf, sizeof(buf)))
+      return NULL;
     return strdup(buf);
 }
 
