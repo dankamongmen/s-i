@@ -104,12 +104,12 @@ if [ -n "$RET" ]; then
 			LOCALE="C"
 		fi
 		# If the country was changed from the default one
-		# then add the built locale before the one we inherited from
+		# then replace the locale we inherited from
 		# languagechooser
 		#
 		# This locale should be validated, however
-		if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ]; then
-			LOCALE=${LANGUAGECODE}_${COUNTRYCODE}:${LOCALE}
+		if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n $LANGUAGECODE ]; then
+			LOCALE=${LANGUAGECODE}_${COUNTRYCODE}
 		fi
 	else
 		LOCALE=C
