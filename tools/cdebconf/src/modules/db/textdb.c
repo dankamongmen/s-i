@@ -284,7 +284,9 @@ static struct question *textdb_question_get(struct database *db,
 
 	q->tag = STRDUP(rec->get(rec, "question::tag", 0));
 	q->value = STRDUP(rec->get(rec, "question::value", 0));
-	if (q->tag == 0 || q->value == 0)
+	q->template = textdb_template_get(db,
+		rec->get(rec, "question::template", 0));
+	if (q->tag == 0 || q->value == 0 || q->template == 0)
 	{
 		question_delete(q);
 		q = 0;
