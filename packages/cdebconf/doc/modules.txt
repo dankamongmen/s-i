@@ -304,10 +304,11 @@ All methods returning int should be returning DC_OK/DC_NOTOK, as above.
 * int set_title(struct frontend *, char *title):
   Set the title variable. "title" is owned by caller, so you should
   copy it. The default implementation sets the title attribute.
-* int set_backtitle(struct frontend *, char *backtitle);
-  Set the backdrop title variable. "backtitle" is owned by caller, so
-  you should copy it. The default implementation sets the backtitle
-  attribute.
+* int set_backtitle(struct frontend *, struct question *);
+  Set the backdrop title variable. This takes a question rather than a
+  string because the locale could be changed after this command, and the
+  displayed text should be changed when that happens. The default
+  implementation sets the backtitle attribute.
 * cangoforward/cangoback -- XXX I don't understand what these do.
 
 Each of these methods have a signature defined in frontend.h. All methods
