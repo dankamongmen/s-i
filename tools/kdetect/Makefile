@@ -39,10 +39,13 @@ install-bin: libkdetect.so
 	install -d $(DESTDIR)/usr/lib
 	install libkdetect.so.0.1 $(DESTDIR)/usr/lib
 	install -m644 libkdetect.so.0.1 $(DESTDIR)/usr/lib
+	ln -s libkdetect.so.0.1 $(DESTDIR)/usr/lib/libkdetect.so.0
 
 install-dev: 
 	install -d $(DESTDIR)/usr/include
 	install libkdetect.h $(DESTDIR)/usr/include
 	install -m644 libkdetect.h $(DESTDIR)/usr/include
+	install -d $(DESTDIR)/usr/lib
+	ln -s libkdetect.so.0.1 $(DESTDIR)/usr/lib/libkdetect.so
 
 install: install-bin install-dev
