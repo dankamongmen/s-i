@@ -6,6 +6,7 @@ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 files_menu =
 files_term = 
+files_keyboard =
 
 extra_files =
 
@@ -29,6 +30,11 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
     files_term += \
 	S35framebuffer-linux
   endif
+
+  ifeq ($(DEB_HOST_GNU_CPU),powerpc)
+    files_keyboard += \
+	S45keyboard-linux-powerpc
+  endif
 endif
 
 files = \
@@ -40,6 +46,7 @@ files = \
 files += \
 	$(files_menu) \
 	$(files_term) \
+	$(files_keyboard) \
 	$(extra_files)
 
 include ../../../Makefile.inc
