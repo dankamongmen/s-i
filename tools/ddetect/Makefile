@@ -1,4 +1,5 @@
 bindir=$(DESTDIR)/bin/
+didir=$(DESTDIR)/lib/debian-installer.d
 
 INSTALL=install
 INSTALL_SCRIPT = ${INSTALL}
@@ -12,8 +13,9 @@ clean:
 install: install-hw-detect install-ethdetect 
 
 install-hw-detect: hw-detect.sh
-	$(INSTALL) -d $(DESTDIR)/bin
+	$(INSTALL) -d $(bindir) $(didir)
 	$(INSTALL_SCRIPT) hw-detect.sh $(bindir)/hw-detect
+	$(INSTALL_SCRIPT) S60hw-detect $(didir)/S60hw-detect
 
 install-hw-detect-full:
 
