@@ -340,6 +340,8 @@ static int validate_mirror(void) {
 			ret = 1;
 		}
 
+		free(command);
+		
 		debconf_progress_step(debconf, 1);
 		debconf_progress_stop(debconf);
 	
