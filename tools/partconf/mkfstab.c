@@ -85,7 +85,8 @@ void insert_line(const char *line) {
 	} else if(strcmp(options, "rw") != 0) {
 		dummy->options = strdup(options);
 	} else {
-		if(strcmp(dummy->mountpoint, "/") == 0) {
+		if((strcmp(dummy->mountpoint, "/") == 0) &&
+		  ((strcmp(dummy->typ, "ext2") == 0) || (strcmp(dummy->typ, "ext3") == 0))) {
 			dummy->options = strdup("defaults,errors=remount-ro");
 		} else {
 			dummy->options = strdup("defaults");
