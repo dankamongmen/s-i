@@ -209,7 +209,7 @@ get_detected_hw_info() {
 		discover-mac-io
 	fi
 	if [ ${SUBARCH##*/} = chrp_rs6k ]; then
-		discover-rs6k-io
+		discover-rs6k
 	fi
 	discover_hw
 	if [ -d /proc/bus/usb ]; then
