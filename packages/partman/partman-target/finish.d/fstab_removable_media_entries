@@ -9,8 +9,8 @@ addfstab () {
 
 addfstab "#/dev/floppy" "/floppy" "auto" "ro,user,noauto" "0" "0"
 
-CDDEV=$(grep /cdrom /proc/mounts | cut -d ' ' -f 1 | grep ^/dev)
-if [ -z "$CDDEV" ]; then
+CDDEV=$(grep /cdrom /proc/mounts | cut -d ' ' -f 1 | grep -v ^/dev/loop)
+if [ -n "$CDDEV" ]; then
 	addfstab "$(mapdevfs $CDDEV)" "/cdrom" "iso9660" "ro,user,noauto" "0" "0"
 else
 	addfstab "#/dev/cdrom" "/cdrom" "iso9660" "ro,user,noauto" "0" "0"
