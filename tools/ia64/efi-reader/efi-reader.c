@@ -4,7 +4,7 @@
  * Copyright (C) 2003, Alastair McKinstry <mckinstry@debian.org>
  * Released under the GNU Public License; see file COPYING for details
  *
- * $Id: efi-reader.c,v 1.3 2003/09/24 20:27:08 mckinstry Exp $
+ * $Id: efi-reader.c,v 1.4 2003/10/04 09:43:02 mckinstry Exp $
  */
 
 #include <sys/types.h>
@@ -52,8 +52,8 @@ int get_efi_lang_code (char *lang_code)
 	fd = open ("/proc/efi/vars/Lang-8be4df61-93ca-11d2-aa0d-00e098032b8c", O_RDONLY);
 	if (fd < 0) {
 		err = errno;
-		di_log ("Failed to open /proc/efi/vars/Lang-*");
-		di_log (strerror (err));
+		di_error ("Failed to open /proc/efi/vars/Lang-*");
+		di_error (strerror (err));
 		return 1;
 	}
 	sz = read (fd, &var_data, sizeof (efi_variable_t));
@@ -89,11 +89,11 @@ int main (int argc, char *argv[])
 	char lang_code[4];
 	static struct debconfclient *client;
 
+	di_system_init("efi-reader");
 	client = debconfclient_new ();
 	if (get_efi_lang_code(lang_code)) 
 		exit (1);
-	client->command (client, "set", "debian-installer/language",
-			two_code (lang_code), NULL);
+	debian_set (client, "debian-installer/language", two_code (lang_code));
 	exit (0);
 }  
 
