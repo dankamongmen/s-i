@@ -15,96 +15,115 @@ General things to keep an eye on:
 	- Keep this progress file up-to-date as you complete various parts 
 	  of it.
 
-Still Todo:
+Status for different parts of debian-installer.  The numbers are
+approximate (as in +/- 50%) and may change in any direction, at any
+time.
 
+[0%]     - Not begun
+---------------------------------------------------------------------
 	- Some kind of a machanism for udebs to declare what parts of
 	  busybox they need, so we can ensure that all deps are met while
 	  keeping the busybox footprint small.
           Packages depending on base-installer should use the
 	  utilities in /target so we can keep busybox's size down.          
-	- sort out Raphael's changes to rootskel and build/Makefile;
-	  devices are made by both right now, and then devfs provides some
-	  too. This all needs to be dealt with; rootskel shouldn't need to
-	  make any devices, maybe it sets up symlinks though? And the
-	  Makefile should not make any devices, for sure.
 	- polish everything so it is actually usable
 	- translations
 		(Waiting until there is i18n and final text to translate,
 		and until we have figured out where the translations go.)
         - user documentation
 		(Waiting until we have something to document..)
-	- cd installs, etc, etc, etc
+        - GUI frontend to cdebconf.  There has been talk about using
+          gtk-fb as a frontend to cdebconf, but so far nobody has
+          actually gotten anything working well.  [Michael Cardenas?]
 
-Under development:
-
-        - disk formatter
-                Formats disks, turns on swap, etc.  mkfs is in udeb
-                format, but nothing calls it.  swap is not begun.
-        - {lilo,grub} installer [Moshe Zadka, Tollef Fog Heen]
-                moshez has a preliminary lilo-installer package in
-                tools/lilo-installer, and a pre-preliminary grub-installer
-                package in grub-installer.  lilo-installer seems to work.
-        - disk selector, partitioner [Raphael Hertzog, Raphael Hertzog]
-		There are two of them, autopartkit and partkit.
-		Autopartkit is a bit more advanced ATM.
-        - cdebconf [Randolph Chung]
-                In progress, has two working database backends and one
-		working text-based frontend, with progress on a slang
-		frontend. Quite usable by now.
-	- dhcp [Matt Kraai]
-		We're using dhclient, but should keep an eye on udhcpc,
-		which is smaller.
-	- anna (retreiver control program) [Joey Hess, Glenn McGrath]
-		About 10% done realistically, but it does work.
-        - choose-mirror [Joey Hess]
-		80% done
-        - install media build system [David Whedon]
-		We can build chrootable, library-reduced trees. It 
-		boots too (CHECK: does it still?). Dns does not work though.
-	- i18n [Tollef Fog Heen, probably more people needed]
-                Work in cdebconf, we need to make sure all templates
-                are in UTF8 and make the frontends handle UTF8 in a
-                sane way.
-
-More or less done, for now anyway:
-
-	- design [Joey Hess, debian-boot]
-                80% done. Enough to know what the big pieces are 
-                and how they fit together.
-        - udpkg (tiny dpkg clone) [Randolph Chung, Joey Hess]
-		Usable. One todo item (localized descriptions)
-		May be replaced with busybox dpkg.
-        - main-menu (main menu generator) [Joey Hess]
-                90% done (one non-trivial todo item)
+[30%]   - Might need large rewrites.  Current implementation might
+          work by accident
+---------------------------------------------------------------------
+        - netcfg [David Whedon]
+		Working, pending rewrite for IPv6 and multiple devices
+                support.
         - busybox integration [Erik Andersen]
 		TODO: seems we need touch, head, sort, and wc back on for
 		debootstrap.
-	- kernel-package integration [Herbert Xu]
-		Udebs are built automatically; this is well in hand.
- 	- net retriever [Joey Hess]
-		Needs proxy and general testing.  Will soon have
-		ftp support.
-	- cdrom retriever [Raphael Hertzog]
-   		Working
+	- i18n [Denis Barbier, Tollef Fog Heen]
+                Works in cdebconf, we need to make sure all templates
+                are in UTF8 and make the frontends handle UTF8 in a
+                sane way.
+        - disk selector, partitioner [Raphael Hertzog, Raphael Hertzog]
+		There are two of them, autopartkit and partkit.
+		Autopartkit is a bit more advanced ATM.
+
+[60%]   - Needs some work, but does its grunt work
+---------------------------------------------------------------------
+        - {lilo,grub} installer [Moshe Zadka, Tollef Fog Heen]
+                moshez has a preliminary lilo-installer package in
+                tools/lilo-installer, and a pre-preliminary grub-installer
+                package in grub-installer.  lilo-installer seems to
+                work.  grub-installer seems to work.
+        - disk formatter
+                Formats disks, turns on swap, etc.  mkfs is in udeb
+                format, but nothing calls it.  swap is not begun.
+        - base system installer [Anthony Towns, Tollef Fog Heen]
+		debootstrap is stable, and has quite good support in
+                base-installer
 	- archive setup
                 Mostly done, we probably want to separate testing and
                 unstable at some point.
+        - cdebconf [Randolph Chung]
+                In progress, has multiple working database backends
+                and one working text-based frontend, with progress on
+                a slang frontend. Quite usable by now.
+	- design [Joey Hess, debian-boot]
+                80% done. Enough to know what the big pieces are 
+                and how they fit together.
+        - install media build system [David Whedon]
+		We can build chrootable, library-reduced trees. It 
+		boots too.  CD-ROM build system might some work.
+	- dhcp [Matt Kraai]
+		We're using dhclient, but should keep an eye on udhcpc,
+		which is smaller.  We need to decide on one dhcp
+                client.
+         - floppy retriever [Martin Sjögren]
+                Seems to work, at least for the time being.
+
+[90%]  - Single missing important feature or bug.
+---------------------------------------------------------------------
+	- anna (retreiver control program) [Martin Sjögren]
+		Works, mostly.  Needs support for Releases files.
+		Support for signed Release files would be cool, but
+		needs gpgv-udeb.
+        - main-menu (main menu generator) [Martin Sjögren, Joey Hess]
+                - support for multiple provides are missing.
+                - what happens when one step fails?
+        - choose-mirror [Joey Hess]
+		works, needs some polish and merging of ftp/http
+                questions.
+
+[100%] - Those shouldn't need to be touched any more 
+         (except for wishlist features)
+---------------------------------------------------------------------
+        - udpkg (tiny dpkg clone) [Randolph Chung, Joey Hess]
+		May be replaced with busybox dpkg.
+	- cd installs
+                Works mostly.
+	- kernel-package integration [Herbert Xu]
+		Udebs are built automatically; this is well in hand.
+ 	- net retriever [Joey Hess]
+		Seems to work.  FTP support missing.
+	- cdrom retriever [Raphael Hertzog]
+   		Working
+        - ethdetect [David Whedon]
+		Working
+        - library reduction
+		mklibs.py works, and is packaged, and used by the
+                build process.
+	- generate treecompare data for each daily build and put or mail it
+	  somewhere [Joey Hess]
+	  	http://people.debian.org/~joeyh/debian-installer/
 	- post-reboot configuration [Joey Hess]
 		base-cofig is stable, though stuff may need to be added to
 		it to handle things d-i doesn't bother with.  i18n is
                 needed.
-        - ethdetect [David Whedon]
-		Working
-        - netcfg [David Whedon]
-		Working
-	- generate treecompare data for each daily build and put or mail it
-	  somewhere [Joey Hess]
-	  	http://people.debian.org/~joeyh/debian-installer/
-        - base system installer [Anthony Towns, Tollef Fog Heen]
-		debootstrap is stable, and has quite good support in
-        - library reduction
-		mklibs.py works, and is packaged, and used by the
-                build process.
 
 
 Maybe, if somebody picks it up:
