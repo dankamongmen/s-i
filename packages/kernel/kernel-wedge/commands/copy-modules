@@ -122,6 +122,12 @@ perl -lne '
 ' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
 unset moddir_awk
 
+if [ ! -s $tmpdir/deps ] && [ ! -e $home/no-modules ]; then
+	echo "No module interdependencies found. This probably means your modules.dep is broken." >&2
+	echo "If this is intentional, touch $home/no-modules" >&2
+	exit 1
+fi
+
 mkdir $tmpdir/module-deps $tmpdir/module-list
 
 # generate module interealationships from package-list file

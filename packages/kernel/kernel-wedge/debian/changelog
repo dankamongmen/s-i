@@ -9,6 +9,12 @@ kernel-wedge (1.26) UNRELEASED; urgency=low
   * Joey Hess
     - Fix subshell error code loss when throwing a missing modules error.
     - Make usb-modules usable on sparc 2.4 which has no ehci or usb-core.
+    - Add a check in copy-modules for a modules.dep file that contains no
+      module dependencies or is empty. This is probaly due to eg, running
+      depmod on a sparc32 kernel on sparc64 (w/o running it in the sparc32
+      environemnt), or some other similar goof up. Since it typically causes
+      broken udebs, exit with an error, but do allow a file to be touched to
+      continue on.
 
  -- Colin Watson <cjwatson@debian.org>  Wed, 24 Nov 2004 14:12:54 +0000
 
