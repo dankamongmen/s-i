@@ -2,6 +2,12 @@
 
 . /usr/share/debconf/confmodule
 
+# The C@utf-8 locale is not usable inside /target/.  Unset it here to avoid
+# warnings like 'perl: warning: Setting locale failed.'.
+if [ "$LANG" = "C@utf-8" ] ; 
+	unset LANG
+fi
+
 if [ ! -f /target/etc/apt/sources.list ] ; then
     # Only queue the package, it will be installed by base-installer
     # postinst.
