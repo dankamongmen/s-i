@@ -37,8 +37,8 @@ CFLAGS += -DAT_KBD -DUSB_KBD
 KEYBOARDS := at usb
 endif
 ifeq ($(ARCH),mipsel)
-CFLAGS += -DAT_KBD -DUSB_KBD
-KEYBOARDS := at usb
+CFLAGS += -DAT_KBD -DUSB_KBD -DDEC_KBD
+KEYBOARDS := at usb dec
 endif
 ifeq ($(ARCH),sparc)
 CFLAGS += -DSPARC_KBD -DUSB_KBD 

@@ -533,6 +533,9 @@ keyboards_get (void)
 #if defined (SERIAL_KBD)
 	keyboards = serial_kbd_get (keyboards, subarch);
 #endif
+#if defined (DEC_KBD)
+	keyboards = dec_kbd_get (keyboards, subarch);
+#endif
 
 	// Did we forget to compile in a keyboard ???
 	if (DEBUG && keyboards == NULL) {
