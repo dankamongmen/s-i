@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.4 2003/09/30 19:22:07 waldi Exp $
+ * $Id: log.c,v 1.5 2003/10/03 13:57:12 waldi Exp $
  */
 
 #include <debian-installer/log.h>
@@ -202,11 +202,11 @@ void di_log (di_log_level_flags log_level, const char *format, ...)
   va_list args;
 
   va_start (args, format);
-  di_logv (log_level, format, args);
+  di_vlog (log_level, format, args);
   va_end (args);
 }
 
-void di_logv (di_log_level_flags log_level, const char *format, va_list args)
+void di_vlog (di_log_level_flags log_level, const char *format, va_list args)
 {
   char buf[1024];
   int fatal = log_level & DI_LOG_FATAL_MASK;

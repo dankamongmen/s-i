@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.6 2003/10/02 14:27:06 waldi Exp $
+ * $Id: exec.c,v 1.7 2003/10/03 13:57:12 waldi Exp $
  */
 
 #include <debian-installer/exec.h>
@@ -182,7 +182,7 @@ int di_exec_prepare_chroot (pid_t pid __attribute__ ((unused)), void *user_data)
  */
 int di_exec_io_log (const char *buf, size_t len __attribute__ ((unused)), void *user_data __attribute__ ((unused)))
 {
-  di_log (DI_LOG_LEVEL_OUTPUT, buf);
+  di_log (DI_LOG_LEVEL_OUTPUT, "%s", buf);
   return 0;
 }
 

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.h,v 1.2 2003/09/29 14:08:48 waldi Exp $
+ * $Id: log.h,v 1.3 2003/10/03 13:57:12 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__LOG_H
@@ -59,7 +59,7 @@ typedef void di_log_handler (di_log_level_flags log_level, const char *message, 
 #define di_warning(format...) di_log (DI_LOG_LEVEL_WARNING, format)
 
 void di_log (di_log_level_flags log_level, const char *format, ...) __attribute__ ((format(printf,2,3)));
-void di_logv (di_log_level_flags log_level, const char *format, va_list args);
+void di_vlog (di_log_level_flags log_level, const char *format, va_list args);
 
 unsigned int di_log_set_handler (di_log_level_flags log_levels, di_log_handler *log_func, void *user_data);
 

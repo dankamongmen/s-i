@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.6 2003/09/30 14:28:45 waldi Exp $
+ * $Id: packages.c,v 1.7 2003/10/03 13:57:12 waldi Exp $
  */
 
 #include <debian-installer/system/packages.h>
@@ -25,6 +25,8 @@
 #include <debian-installer/package_internal.h>
 #include <debian-installer/packages_internal.h>
 #include <debian-installer/parser_rfc822.h>
+
+#include <ctype.h>
 
 const di_parser_fieldinfo
   internal_di_system_package_parser_field_installer_menu_item =
@@ -77,6 +79,38 @@ di_packages *di_system_packages_alloc (void)
 
   ret = di_new0 (di_packages, 1);
   ret->table = di_hash_table_new_full (di_rstring_hash, di_rstring_equal, NULL, internal_di_system_package_destroy_func);
+
+  return ret;
+}
+
+int di_system_package_check_subarchitecture (di_package *package, const char *subarchitecture)
+{
+  char *string, *begin, *end, *temp;
+  int ret = 1;
+
+  string = begin = strdup (package->package);
+  end = begin + strlen (begin);
+
+  while (begin < end)
+  {
+    while (begin < end && isspace (*begin))
+      begin++;
+    temp = begin;
+    while (temp < end && !isspace (*++temp));
+    *temp = '\0';
+
+    printf ("get: %s\n", begin);
+    if (!strcmp (begin, subarchitecture))
+    {
+      printf ("found it\n");
+      ret = 1;
+      goto cleanup;
+    }
+    begin = temp + 1;
+  }
+
+cleanup:
+  free (string);
 
   return ret;
 }
