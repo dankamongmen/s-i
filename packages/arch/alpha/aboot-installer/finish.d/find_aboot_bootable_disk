@@ -45,6 +45,7 @@ do
 	open_dialog PARTITIONS
 	while { read_line num id size type fs path name; [ "$id" ]; }; do
 		if [ -d $id -a "$path" = "$boot_fs" ]; then
+			ourdev=$dev
 			disk="$(cat ${dev}/device)"
 		fi
 	done
@@ -56,6 +57,28 @@ done
 # If we can't figure out the parent dev, let it slide for now.
 if [ -n "$disk" ]
 then
+	cd $ourdev
+	open_dialog PARTITIONS
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+		start=${id%-*}
+		if [ "$start" -le 1024 -a -d "$id" ]; then
+			if [ "$(cat $id/method)" = "aboot" ]; then
+				partnum="$num"
+			else
+				non_aboot_partition=yes
+			fi
+		fi
+	done
+	close_dialog
+
+	if [ -n "$non_aboot_partition" ]; then
+		db_input critical aboot-installer/no-space-for-aboot
+		db_go
+		if [ "$RET" = "false" ]; then
+			exit 1
+		fi
+	fi
+
 	label=$(parted "$disk" print | sed -n 's/Disk label type: //p')
 	if [ "$label" != "bsd" ]; then
 		. /usr/share/debconf/confmodule
@@ -66,6 +89,7 @@ then
 			exit 1
 		fi
 	fi
+
 fi
 
 if [ "$boot_type" != "ext2" ]
@@ -78,4 +102,13 @@ then
 	if [ "$RET" = "false" ]; then
 		exit 1
 	fi
+fi
+
+# Save the number of our aboot dummy partition, so we have it
+# later when parted_server is no longer available
+if [ -n "$partnum" ]; then
+	mkdir -p /var/lib/aboot-installer
+	echo $partnum > /var/lib/aboot-installer/aboot-partnum
+else
+	rm -f /var/lib/aboot-installer/aboot-partnum
 fi
