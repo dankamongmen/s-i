@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.42 2004/01/26 12:53:47 kraai Exp $
+ * $Id: kbd-chooser.c,v 1.43 2004/01/28 01:29:51 kraai Exp $
  */
 
 #include "config.h"
@@ -723,6 +723,7 @@ main (int argc, char **argv)
 				if (strcmp (arch, "none") == 0)	 {
 					di_info ("kbd-chooser: not setting keymap (kbd == none selected)");
 					state = QUIT;
+					break;
 				}
 				state  = CHOOSE_KEYMAP;
 			}
