@@ -1,4 +1,4 @@
-/* Autopartkit -- SkoleLinux -- customized version of autopartkit
+/* Autopartkit -- debian-edu -- customized version of autopartkit
    from debian-installer.
 
    Author: Tollef Fog Heen <tollef@add.no>
