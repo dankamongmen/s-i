@@ -134,11 +134,11 @@ foreach my $build (@buildlist) {
 	}
 	my @lines=<LOG>;
 	if (! close LOG) {
-		print "<b>failed to download <a href=\"$logurl\">build log</a>";
+		print "<b>failed</b> to download <a href=\"$logurl\">build log</a>";
 		next;
 	}
 	if (! @lines) {
-		print "<b>empty <a href=\"$logurl\">build log</a>";
+		print "<b>empty</b> <a href=\"$logurl\">build log</a>";
 	}
 	else {
 		print "<ul>\n";
@@ -148,7 +148,7 @@ foreach my $build (@buildlist) {
 		my ($arch, $date, $builder, $ident, $status) = 
 			$line =~ /^(.*?)\s+\((.*?)\)\s+(.*?)\s+(.*?)\s+(.*?)$/;
 		if (! defined $status) {
-			print "<li><i>unparsable entry:</i> $line\n";
+			print "<li><b>unparsable</b> entry:</i> $line\n";
 		}
 		else {
 			$date=~s/[^A-Za-z0-9: ]//g; # untrusted string
