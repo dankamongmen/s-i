@@ -282,11 +282,14 @@ static int satisfy_virtual(struct package_t *p) {
 			else
 				/* TODO: How to figure out a default? */
 				priority = "critical";
+			debconf->command(debconf, "CAPB backup", NULL);
 			debconf->command(debconf, "SUBST", MISSING_PROVIDE,
 					"CHOICES", choices, NULL);
 			debconf->command(debconf, "INPUT", priority, MISSING_PROVIDE,
 					NULL);
-			debconf->command(debconf, "GO", NULL);
+			if (debconf->command(debconf, "GO", NULL) != 0)
+				return 0;
+			debconf->command(debconf, "CAPB", NULL);
 			debconf->command(debconf, "GET", MISSING_PROVIDE, NULL);
 		}
 		/* Go through the dependencies again */
