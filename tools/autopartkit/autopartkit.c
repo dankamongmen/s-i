@@ -1029,15 +1029,29 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
 		    /* Create filesystem */
 		    /*
+		      Something like this might work:
+
 		      const char *parted_fs = linux_fstype_to_parted(info[3]); 
 		      fs_type = ped_file_system_type_get(parted_fs);
-
-		      part_geom from devpath.
+		      part_geom = map_from_devpath(devpath).
 		      fs = ped_file_system_create(&part_geom, fs_type, NULL);
-
 		      ped_file_system_close(fs);
 		    */
-
+		    { /* Do it like this for now */
+		      char *cmd = NULL;
+		      int retval;
+		      asprintf(&cmd, "mke2fs -j %s >> /var/log/messages 2>&1",
+			       devpath);
+		      if (cmd)
+		      {
+			  retval = system(cmd);
+			  free(cmd);
+			  if (0 != retval)
+			      autopartkit_log(0,
+					      "Failed to create ext3 fs on %s",
+					      devpath);
+		      }
+		    }
 		}
 	    }
 	    else
