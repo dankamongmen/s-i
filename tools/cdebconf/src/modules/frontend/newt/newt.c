@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.31 2003/10/14 21:46:07 barbier Exp $
+ * $Id: newt.c,v 1.32 2003/10/16 23:53:11 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -333,7 +333,6 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     int win_width, win_height = -1, t_height, sel_height, sel_width;
     char **choices, **choices_trans, **defvals, *answer;
     int count = 0, defcount, i, k, ret, def;
-    const char *p;
     char *q_ext_text;
     int *tindex = NULL;
     const char *listorder = q_get_listorder(q);
@@ -342,22 +341,15 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
 #endif
 
     newtGetScreenSize(&width, &height);
-    p = q_get_choices_vals(q);
-    if (*p)
-    {
-        count++;
-        for (; *p; p++)
-            if (*p == ',') // won't work with escaping \, :-(
-                count++;
-    }
+    count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
-    count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_trans = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices(q), listorder, choices_trans, tindex, count) != count)
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
+
     defvals = malloc(sizeof(char *) * count);
     defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
     answer = malloc(sizeof(char) * count);
@@ -471,7 +463,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     int win_width, win_height = -1, t_height, sel_height, sel_width;
     char **choices, **choices_trans, *defval;
     int count = 0, i, ret, defchoice = -1;
-    const char *p, *q_ext_text;
+    const char *q_ext_text;
     int *tindex = NULL;
     const char *listorder = q_get_listorder(q);
 #ifdef HAVE_LIBTEXTWRAP
@@ -479,22 +471,15 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
 #endif
 
     newtGetScreenSize(&width, &height);
-    p = q_get_choices_vals(q);
-    if (p && *p)
-    {
-        count++;
-        for (; *p; p++)
-            if (*p == ',') // won't work with escaping \, :-(
-                count++;
-    }
+    count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
-    count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_trans = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices(q), listorder, choices_trans, tindex, count) != count)
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
+
     win_width = width-7;
     sel_height = count;
     form = create_form(NULL);

@@ -178,6 +178,23 @@ int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 	return 1;
 }
 
+int strgetargc(const char *inbuf)
+{
+    int count = 1;
+    const char *s;
+
+    if (inbuf == 0 || *inbuf == 0)
+        return 0;
+    for (s=inbuf; *s != 0; s++)
+    {
+        if (*s == '\\' && *(s+1) == ',')
+            s++;
+        else if (*s == ',')
+            count++;
+    }
+    return count;
+}
+
 int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
 {
     int argc = 0, i;
@@ -232,49 +249,97 @@ static int mystrcmp_lexicographic(const void *p1, const void *p2)
 	return strcmp(((sort_str_t *) p1)->string, ((sort_str_t *) p2)->string);
 }
 
-int strchoicesplitsort(const char *inbuf, const char *listorder, char **argv, int *tindex, size_t maxnarg)
+static char *
+extractonechoice(const char *inbuf, const char **next, int skip_exclam)
 {
-    int argc = 0, i;
     const char *s = inbuf, *e, *c;
-    sort_str_t *sorted_string = NULL;
-    char *p;
+    char *p, *argv;
 
-    assert(tindex);
-    assert(argv);
-    if (inbuf == 0) return 0;
+    /* find end */
+    e = s;
+    while (*e != 0)
+    {
+        if (*e == '\\' && *(e+1) == ',')
+            e += 2;
+        else if (*e == ',')
+            break;
+        else
+            e++;
+    }
+
+    if (*s == '!' && skip_exclam)
+        s++;
+    argv = malloc(e-s+1);
+    p = argv;
+    for (c = s; c < e; c++, p++)
+    {
+        if (*c == '\\' && c < (e-1) && *(c+1) == ',')
+            c++;
+        *p = *c;
+    }
+    *p-- = 0;
+    c--;
+    /* strip off trailing spaces */
+    while (c > s && isspace(*p))
+    {
+        *p-- = 0;
+        c--;
+    }
+    *next = e;
+    return argv;
+}
+
+int strchoicesplitsort(const char *origbuf, const char *transbuf, const char *listorder, char **oargv, char **targv, int *oindex, size_t maxnarg)
+{
+    int argc, i, offset;
+    const char *s, *e;
+    sort_str_t *sorted_string = NULL;
+
+    assert(oindex);
+    assert(oargv);
+    assert(targv);
+    assert(origbuf);
+    assert(transbuf);
 
     sorted_string = malloc(sizeof(sort_str_t) * maxnarg);
-    INFO(INFO_VERBOSE, "Splitting [%s]\n", inbuf);
+
+    /*  First split translated choices field  */
+    argc = 0;
+    s = transbuf;
+    INFO(INFO_VERBOSE, "Splitting [%s]\n", s);
     while (*s != 0 && argc < maxnarg)
     {
         /* skip initial spaces */
-        while (isspace(*s)) s++;
+        while (isspace(*s))
+            s++;
 
-        /* find end */
-        e = s;
-        while (*e != 0)
-        {
-            if (*e == '\\' && *(e+1) == ',')
-                e += 2;
-            else if (*e == ',')
-                break;
-            else
-                e++;
-        }
-
-        sorted_string[argc].string = malloc(e-s+1);
+        targv[argc] = extractonechoice(s, &e, 0);
         sorted_string[argc].index = argc;
-        p = sorted_string[argc].string;
-        for (c = s; c < e; c++, p++)
-        {
-            if (*c == '\\' && c < (e-1) && *(c+1) == ',')
-                c++;
-            *p = *c;
-        }
-        *p-- = 0;
-        /* strip off trailing spaces */
-        while (p > sorted_string[argc].string && *p == ' ') *p-- = 0;
+        sorted_string[argc].string = targv[argc];
+        argc++;
+        s = e;
+        if (*s == ',') s++;
+    }
 
+    /*  Next split original choices field  */
+    argc = 0;
+    s = origbuf;
+    INFO(INFO_VERBOSE, "Splitting [%s]\n", s);
+    while (*s != 0 && argc < maxnarg)
+    {
+        /* skip initial spaces */
+        while (isspace(*s))
+            s++;
+
+        oargv[argc] = extractonechoice(s, &e, 1);
+        oindex[argc] = argc;
+        if (*s == '!')
+        {
+            /*  The string must be inserted at this exact position  */
+            oindex[argc] = -1;
+            sorted_string[argc].index = -1;
+            sorted_string[argc].string = "";
+        }
         argc++;
         s = e;
         if (*s == ',') s++;
@@ -282,10 +347,20 @@ int strchoicesplitsort(const char *inbuf, const char *listorder, char **argv, in
     if (strcmp(listorder, "lexicographic") == 0)
         qsort(sorted_string, argc, sizeof(sort_str_t), mystrcmp_lexicographic);
 
+    for (offset = 0; offset < argc && sorted_string[offset].index < 0; offset++)
+            ;
     for (i = 0; i < argc; i++)
     {
-        argv[i] = sorted_string[i].string;
-        tindex[i] = sorted_string[i].index;
+        if (oindex[i] == -1)
+        {
+            oindex[i] = i;
+            offset--;
+        }
+        else
+        {
+            oindex[i] = sorted_string[i+offset].index;
+            targv[i] = sorted_string[i+offset].string;
+        }
     }
     free(sorted_string);
     return argc;

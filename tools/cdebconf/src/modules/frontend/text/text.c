@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.49 2003/10/14 21:46:07 barbier Exp $
+ * $Id: text.c,v 1.50 2003/10/16 23:53:11 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -250,25 +250,16 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char *selected;
 	char answer[4096] = {0};
 	int i, j, line, count = 0, dcount, choice;
-        const char *p;
         int *tindex = NULL;
         const char *listorder = q_get_listorder(q);
 
-    p = q_get_choices_vals(q);
-    if (*p)
-    {
-        count++;
-        for (; *p; p++)
-            if (*p == ',') // won't work with escaping \, :-(
-                count++;
-    }
+    count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
-    count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_translated = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices(q), listorder, choices_translated, tindex, count) != count)
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, count) != count)
         return DC_NOTOK;
 
     defaults = malloc(sizeof(char *) * count);
@@ -427,25 +418,16 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	char answer[10];
 	int i, line, count = 0, choice = 1, def = -1;
 	const char *defval = question_getvalue(q, "");
-        const char *p;
 	int *tindex = NULL;
 	const char *listorder = q_get_listorder(q);
 
-	p = q_get_choices_vals(q);
-	if (*p)
-	{
-		count++;
-		for (; *p; p++)
-            		if (*p == ',') // won't work with escaping \, :-(
-                		count++;
-	}
-	if (count <= 0)
-		return DC_NOTOK;
+	count = strgetargc(q_get_choices_vals(q));
+        if (count <= 0)
+        	return DC_NOTOK;
 	choices = malloc(sizeof(char *) * count);
-	count = strchoicesplit(q_get_choices_vals(q), choices, count);
 	choices_translated = malloc(sizeof(char *) * count);
 	tindex = malloc(sizeof(int) * count);
-	if (strchoicesplitsort(q_get_choices(q), listorder, choices_translated, tindex, count) != count)
+	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, count) != count)
         	return DC_NOTOK;
 
 	if (count == 1)

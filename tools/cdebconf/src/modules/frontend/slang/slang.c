@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.30 2003/10/14 21:47:24 barbier Exp $
+ * $Id: slang.c,v 1.31 2003/10/16 23:53:11 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -433,9 +433,11 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	struct slwindow *win = &uid->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit(q_get_choices_vals(q), choices, DIM(choices));
+	count = strgetargc(q_get_choices_vals(q));
+	if (count <= 0)
+		return DC_NOTOK;
 	tindex = malloc(sizeof(int) * count);
-	strchoicesplitsort(q_get_choices(q), listorder, choices_translated, tindex, DIM(choices_translated));
+	strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, DIM(choices_translated));
 	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
 	if (count <= 0) return DC_NOTOK;
