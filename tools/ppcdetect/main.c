@@ -5,7 +5,7 @@ char *machine = NULL;
 char *generation = NULL;
 
 static void detect_newworld() {
-	if(check_value(generation, "NewWorld", NULL))
+	if(check_value(generation, "NewWorld", "NewWorld PowerMac"))
 		exit(0);
 }
 
