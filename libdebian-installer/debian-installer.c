@@ -130,7 +130,7 @@ di_log(const char *msg){
 void
 di_logf(const char *fmt, ...){
     va_list ap;
-    openlog ("installer", LOG_PID | LOG_PERROR, LOG_USER);
+    openlog ("installer", LOG_PID, LOG_USER);
     va_start(ap, fmt);
     vsyslog (LOG_DEBUG, fmt, ap);
     va_end(ap);
