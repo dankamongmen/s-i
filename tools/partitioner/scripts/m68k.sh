@@ -26,5 +26,9 @@ case "`/bin/archdetect`" in
 	;;
 esac
 
+if [ "`uname -r | grep '^2.2.'`" != "" ] && [ -x /usr/bin/update-dev ]; then
+	update-dev
+fi
+
 exit $?
 
