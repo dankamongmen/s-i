@@ -214,12 +214,11 @@ static int satisfy_virtual(struct package_t *p) {
 	struct debconfclient *debconf;
 	struct package_t *dep, *defpkg = NULL;
 	int i;
-	char *choices, *defval;
+	char *choices, *tmp;
 	size_t c_size = 1;
 	int is_menu_item = 0;
 
-	choices = malloc(1);
-	choices[0] = '\0';
+        asprintf(&choices, "");
 	/* Compile a list of providing package. The default choice will be the
 	 * package with highest priority. If we have ties, menu items are
 	 * preferred. If we still have ties, the default choice is arbitrary */
@@ -246,25 +245,28 @@ static int satisfy_virtual(struct package_t *p) {
 		 * is a menu item */
 		if (dep->installer_menu_item)
 			is_menu_item = 1;
-		c_size += strlen(dep->description) + 2;
-		choices = realloc(choices, c_size);
-		strcat(choices, dep->description);
-		strcat(choices, ", ");
+		if (dep == defpkg)
+			/* We want the default to be the first item */
+			asprintf(&tmp, "%s, %s", dep->description, choices);
+		else
+			asprintf(&tmp, "%s%s, ", choices, dep->description);
+		free(choices);
+		choices = tmp;
 	}
-	if (c_size >= 3)
-		choices[c_size-3] = '\0';
+	c_size = strlen(choices);
+	if (c_size >= 2)
+		choices[c_size-2] = '\0';
 	if (choices[0] != '\0') {
 		if (is_menu_item) {
 			/* Only let the user choose if one of them is a menu item */
-			if (defpkg != NULL)
-				defval = defpkg->description;
-			else
-				defval = "";
 			debconf = debconfclient_new();
+			debconf->command(debconf, "FSET", MISSING_PROVIDE, "seen",
+					"false", NULL);
+			if (defpkg != NULL)
+				debconf->command(debconf, "SET", MISSING_PROVIDE,
+						defpkg->description, NULL);
 			debconf->command(debconf, "SUBST", MISSING_PROVIDE,
 					"CHOICES", choices, NULL);
-			debconf->command(debconf, "SET", MISSING_PROVIDE,
-					defval, NULL);
 			debconf->command(debconf, "INPUT medium", MISSING_PROVIDE,
 					NULL);
 			debconf->command(debconf, "GO", NULL);
@@ -304,20 +306,21 @@ config_package(struct package_t *p) {
 	int ret, i;
 	struct package_t *dep;
 
+	if (di_pkg_is_virtual(p)) {
+		if (!satisfy_virtual(dep))
+			return 0;
+	}
+
 	for (i = 0; p->depends[i] != 0; i++) {
 		if ((dep = p->depends[i]->ptr) == NULL)
 			continue;
 		if (dep->status == installed)
 			continue;
-		if (di_pkg_is_virtual(dep)) {
-			if (!satisfy_virtual(dep))
-				return 0;
-		} else {
-			/* Recursively configure this package */
-			if (!config_package(dep))
-				return 0;
-		}
+		/* Recursively configure this package */
+		if (!config_package(dep))
+			return 0;
 	}
+
 	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
 	ret = SYSTEM(configcommand);
 	free(configcommand);
