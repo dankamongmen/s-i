@@ -20,8 +20,7 @@ if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
 
-# Which discover binary and version to use.  Updated by discover_version()
-DISCOVER=/sbin/discover
+# Which discover version to use.  Updated by discover_version()
 DISCOVER_VERSION=1
 
 log () {
@@ -87,12 +86,9 @@ load_module() {
 }
 
 discover_version () {
-	if [ -f /usr/bin/discover ] ; then
-		DISCOVER=/usr/bin/discover
-	fi
 	# Ugh, Discover 1.x didn't exit with nonzero status if given an
 	# unrecognized option!
-	DISCOVER_TEST=$($DISCOVER --version 2> /dev/null) || true
+	DISCOVER_TEST=$(discover --version 2> /dev/null) || true
 	if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
 		log "Testing experimental discover version 2."
 		DISCOVER_VERSION=2
@@ -124,12 +120,12 @@ discover_hw () {
 			scsi bridge broadband fixeddisk humaninput modem \
 			network optical removabledisk"
 
-		MODEL_INFOS=$($DISCOVER -t $dflags)
-		MODULES=$($DISCOVER --data-path=$dpath --data-version=$dver $dflags)
+		MODEL_INFOS=$(discover -t $dflags)
+		MODULES=$(discover --data-path=$dpath --data-version=$dver $dflags)
 		dumb_join_discover $MODULES
 		;;
 	1)
-		$DISCOVER --format="%m:%V %M\n" --disable-all \
+		discover --format="%m:%V %M\n" --disable-all \
 		          --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
 			sed 's/ $//'
 		;;
@@ -348,11 +344,11 @@ if [ -x /etc/init.d/pcmcia ] && \
 				dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
 				dflags="-d all -e pci scsi fixeddisk modem network removabledisk"
 		
-				echo `$DISCOVER --data-path=$dpath --data-version=$dver $dflags` \
+				echo `discover --data-path=$dpath --data-version=$dver $dflags` \
 					| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
 				;;
 			1)
-				$DISCOVER --format="%m " --disable-all --enable=pci \
+				discover --format="%m " --disable-all --enable=pci \
 					scsi ide ethernet \
 					| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
 				;;
