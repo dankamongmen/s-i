@@ -2,10 +2,10 @@
  *
  * @brief Report keyboards present on Mac
  *
- * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
+ * Copyright (C) 2003,2004 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: mac-kbd.c,v 1.8 2004/03/13 09:17:19 mckinstry Exp $
+ * $Id$
  */
 
 #include "config.h"
@@ -27,26 +27,40 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 	k->name = "mac"; // This must match the name "mac" in console-keymaps-mac
 	k->deflt = NULL;
 	k->fd = -1;
-	k->present = UNKNOWN;
 	k->next = keyboards;
 	keyboards = k;
-	
-#if defined (KERNEL_2_6)
-	/* In 2.6 series, we can detect keyboard via /proc/bus/input
-	 *
-	 * FIXME: Write this code
-	 */
-#warning "Kernel 2.6 code not written yet"
-	if (check_dir ("/proc/bus/input") >= 0) {
-		// this dir only present in 2.6
+
+	// if we send linux keycodes, don't use ADB keymaps
+	// pretend we don't have an ADB keyboard
+	switch (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes","1")) {
+	case 0:
+		k->present = FALSE;
+		break;
+	case 1:
+		k->present = TRUE;
+		break;
+	default:
+		k->present = UNKNOWN;
 	}
 
+	if (k->present != UNKNOWN)
+		return keyboards;
+	
+	// In 2.6 series, we can detect keyboard via /proc/bus/input
+	// This bit of code should be superflous; 
+	switch (grep ("/proc/bus/input/devices","ADB keyboard")) {
+	case 0:
+		k->present = TRUE;
+		break;
+	case 1:
+		k->present = FALSE;
+		break;
+	default:
+		k->present = UNKNOWN;
+	}
 
-#endif // KERNEL_2_6
-
-	/* ***  Only reached if KERNEL_2_6 not present ***  */
-
-	/* For 2.4, assume a keyboard is present
-	 */
+	// TODO:
+	// We should be able to read the keyboard type from /proc/bus/input/devices too.
+	//
 	return keyboards;	
 }
