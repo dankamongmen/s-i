@@ -25,7 +25,7 @@ fi
 # most generic architecture first (386 above 686).
 
 # Using 'uniq' to avoid listing the same kernel more then once.
-kernels=`$chroot apt-cache search kernel-image | grep ^kernel-image | sort | cut -d" " -f1 | /target/usr/bin/uniq | tr '\n' ',' | sed -e 's/,$//'`
+kernels=`$chroot apt-cache search kernel-image | grep ^kernel-image | /target/usr/bin/sort -r | cut -d" " -f1 | /target/usr/bin/uniq | tr '\n' ',' | sed -e 's/,$//'`
 
 log "info: Found kernels '$kernels'"
 
@@ -38,9 +38,14 @@ else
     exit 1
 fi
 
-# Make current rootskel setting the default
-if [ "$kernel" ] ; then
-    db_set kernel-chooser/which-kernel "$kernel"
+# Try to make current rootskel setting the default, make sure it is
+# available first.
+if echo "$kernels" | grep -q "$kernel" ; then
+    # Current selection is available, nothing to do
+    :
+else
+    # Pick the first in the list
+    kernel=`echo "$kernels" | cut -d, -f1`
 fi
 
 # Pick a good default choice, based on the available kernels and
@@ -50,14 +55,13 @@ ARCH=`udpkg --print-architecture`
 # Should this be located in small script fragments, named after their
 # architecture?  Something like this:
 #   [ -f /usr/lib/kernel-chooser/$ARCH ] && . /usr/lib/kernel-chooser/$ARCH
-DEFAULT=
 case "$ARCH" in
     i386*)
         version=2.4.20-1
         MODEL=`grep 'model name' /proc/cpuinfo | cut -d: -f2`
 	case "$MODEL" in 
 	    "Intel(R) Pentium(R) 4"*)
-	    DEFAULT=kernel-image-$version-686
+	    kernel=kernel-image-$version-686
 	    ;;
 	esac
         ;;
@@ -65,8 +69,8 @@ case "$ARCH" in
         log "warning: Unknown arcitecture '$ARCH'."
 	;;
 esac
-if [ "$DEFAULT" ] ; then
-    db_set kernel-chooser/which-kernel "$DEFAULT"
+if [ "$kernel" ] ; then
+    db_set kernel-chooser/which-kernel "$kernel"
 fi
 
 db_input medium kernel-chooser/which-kernel || [ $? -eq 30 ]
