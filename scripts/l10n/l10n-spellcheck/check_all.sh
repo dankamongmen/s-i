@@ -80,7 +80,7 @@ fi
 # create HTML table
 echo "<table cellpadding=\"5\" cellspacing=\"1\" border=\"2\">" > $STATS.html
 cat $STATS.txt |\
-sed "s:\(^[0-9]*\)\( [a-z_a-zA-Z ]*$\):<tr><td> <a href=\"check/\2.tar.gz\">\2</a></td> <td>\1</td></tr>:"|\
+sed "s:\(^[0-9]*\)\( [a-z_a-zA-Z ]*$\):<tr><td> <a href=\"zip/\2.tar.gz\">\2</a></td> <td>\1</td></tr>:"|\
 sed "s:/ :/:" >> $STATS.html
 echo "<tr><td><b>Total<b></td> <td><b>$TOTAL<b></td></tr>" >> $STATS.html
 echo "<tr><td><b>Average<b></td> <td><b>$AVERAGE<b></td></tr>" >> $STATS.html
