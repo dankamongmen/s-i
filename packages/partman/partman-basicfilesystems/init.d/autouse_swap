@@ -28,6 +28,13 @@ for part in $partitions; do
     dev=${part%,*}
     id=${part#*,}
     [ -d $dev/$id ] || continue
+    if [ -f $dev/$id/method ]; then
+	method="$(cat $dev/$id/method)"
+	if [ "$method" ] && [ "$method" != swap ]; then
+	    # Already used for something else, e.g. RAID.
+	    continue
+	fi
+    fi
     echo swap >$dev/$id/method
     > $dev/$id/format
     update_partition $dev $id
