@@ -17,14 +17,9 @@ rootfs=$(mapdevfs `/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`)
 # have to be the same as the drive /target is mounted on.
 bootpart=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
 
+# Nothing is mounted on /boot, so assume $rootfs = $bootpart
 if [ -z "$bootpart" ]; then
-	bootpart=$rootfs
-fi
-
-bootpart=`/target/bin/echo $bootpart | /target/bin/sed 's/.*\/part\([0-9]\+\)$/\1/'`
-
-if [ -z "$bootpart" ]; then
-	bootpart=1
+	boot="/boot"
 fi
 
 if [ -e "/target/boot/initrd.img" ]; then
@@ -38,10 +33,10 @@ default=Linux
 read-only
 timeout=100
 ${initrd}
-image=/boot/vmlinuz
+image=${boot}/vmlinuz
 	label=Linux
 	
-image=/boot/vmlinuz.old
+image=${boot}/vmlinuz.old
 	label=LinuxOLD
 EOF
 
