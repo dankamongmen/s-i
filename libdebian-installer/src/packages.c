@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.8 2003/10/09 12:18:46 waldi Exp $
+ * $Id: packages.c,v 1.9 2003/10/10 19:34:02 joeyh Exp $
  */
 
 #include <debian-installer/packages_internal.h>
@@ -216,7 +216,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
 
       case di_package_type_non_existent:
         if (!shutup)
-          di_log (DI_LOG_LEVEL_WARNING, "package %s don't exists", package->package);
+          di_log (DI_LOG_LEVEL_WARNING, "package %s doesn't exist", package->package);
         break;
     }
   }
