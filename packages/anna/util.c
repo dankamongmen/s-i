@@ -219,6 +219,7 @@ list_to_choices(di_package **packages)
 }
 
 /* Ask the chosen retriever to download a particular package to to dest. */
+/* Note return is inverted (shell-style). */
 int
 get_package (di_package *package, char *dest)
 {

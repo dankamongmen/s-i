@@ -81,6 +81,7 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 
     while (*packages == NULL) {
 	int status=retriever_handle_error("packages");
+        di_log(DI_LOG_LEVEL_WARNING, "bad d-i Packages file");
 	if (status == -1) {
             /* Fallback error message for retreivers w/o error handling. */
             debconf_fset(debconf, ANNA_NO_MODULES, "seen", "false");
@@ -196,6 +197,14 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     return 0;
 }
 
+void resume_progress_bar (int progress_step, int pkg_count, di_package *package) {
+    debconf_progress_start(debconf, 0, 2*pkg_count,  "anna/progress_title");
+    debconf_progress_set(debconf, progress_step);
+    debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
+    debconf_subst(debconf, "anna/progress_step_inst", "PACKAGE", package->package);
+    debconf_progress_info(debconf, "anna/progress_step_retr");
+}
+
 static int
 install_modules(di_packages *status, di_packages *packages, di_packages_allocator *status_allocator __attribute__ ((unused)))
 {
@@ -203,6 +212,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
     di_package *package;
     char *f, *fp, *dest_file;
     int ret = 0, pkg_count = 0;
+    int progress_step=0;
 
     debconf_get(debconf, ANNA_CHOOSE_MODULES);
     if (debconf->value != NULL) {
@@ -229,6 +239,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
     if (pkg_count <= 0)
         return 0;
     debconf_progress_start(debconf, 0, 2*pkg_count,  "anna/progress_title");
+    
     for (node = packages->list.head; node; node = node->next) {
         package = node->data;
         if (package->type == di_package_type_real_package && package->status_want == di_package_status_want_install) {
@@ -246,26 +257,51 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
             debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
             debconf_subst(debconf, "anna/progress_step_inst", "PACKAGE", package->package);
             debconf_progress_info(debconf, "anna/progress_step_retr");
-            if (get_package(package, dest_file)) {
-                debconf_progress_stop(debconf);
-                debconf_subst(debconf, "anna/retrieve_failed", "PACKAGE", package->package);
-                debconf_input(debconf, "critical", "anna/retrieve_failed");
-                debconf_go(debconf);
-                free(dest_file);
-                ret = 6;
-                break;
-            }
-            if (!md5sum(package->md5sum, dest_file)) {
-                debconf_progress_stop(debconf);
-                debconf_subst(debconf, "anna/md5sum_failed", "PACKAGE", package->package);
-                debconf_input(debconf, "critical", "anna/md5sum_failed");
-                debconf_go(debconf);
-                unlink(dest_file);
-                free(dest_file);
-                ret = 7;
-                break;
+	    for (;;) {
+                if (get_package(package, dest_file)) {
+                    di_log(DI_LOG_LEVEL_WARNING, "get_package failed");
+                    debconf_progress_stop(debconf); /* error handling may use a progress bar, so stop the current one */
+		    switch (retriever_handle_error("retrieve")) {
+		    case -1: /* Fallback error message for retreivers w/o error handling. */
+                        debconf_subst(debconf, "anna/retrieve_failed", "PACKAGE", package->package);
+                        debconf_input(debconf, "critical", "anna/retrieve_failed");
+                        debconf_go(debconf);
+		        /* fallthrough */
+		    case 0: /* Failed to handle error. */
+                        free(dest_file);
+                        ret = 6;
+                        goto OUT;
+		    default: /* Handled error, retry. */
+			resume_progress_bar(progress_step, pkg_count, package);
+		        continue;
+		    }
+                }
+                
+		if (! md5sum(package->md5sum, dest_file)) {
+                    di_log(DI_LOG_LEVEL_WARNING, "bad md5sum");
+                    debconf_progress_stop(debconf); /* error handling may use a progress bar, so stop the current one */
+		    switch (retriever_handle_error("retrieve")) {
+		    case -1: /* Fallback error message for retreivers w/o error handling. */
+                        debconf_subst(debconf, "anna/md5sum_failed", "PACKAGE", package->package);
+                        debconf_input(debconf, "critical", "anna/md5sum_failed");
+                        debconf_go(debconf);
+			/* fallthrough */
+		    case 0: /* Failed to handle error. */
+                        unlink(dest_file);
+                        free(dest_file);
+                        ret = 7;
+			goto OUT;
+		    default: /* Handled error, retry. */
+			/* Restart progress bar. */
+			resume_progress_bar(progress_step, pkg_count, package);
+			continue;
+		    }
+                }
+
+		break;
             }
             debconf_progress_step(debconf, 1);
+	    progress_step++;
             debconf_progress_info(debconf, "anna/progress_step_inst");
 #ifdef LIBDI_SYSTEM_DPKG
             if (di_system_dpkg_package_unpack(status, package->package, dest_file, status_allocator)) {
@@ -296,11 +332,14 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
             unlink(dest_file);
             free(dest_file);
             debconf_progress_step(debconf, 1);
+	    progress_step++;
         }
     }
 
-    debconf_progress_stop(debconf);
 
+    debconf_progress_stop(debconf);
+    
+OUT:
     return ret;
 }
 
