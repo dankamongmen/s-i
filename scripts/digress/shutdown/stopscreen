@@ -6,7 +6,8 @@ session=digress-$MACHINE-$SCHEME
 # Check to see if this session is still running
 existing=$(screen -ls $session | grep "$session	(") || true
 if [ -n "$existing" ]; then
-	kill -9 $(echo "$existing" | cut -d . -f 1)
+	kill -9 $(echo "$existing" | cut -d . -f 1) || true
 fi
 
-rm -f $DI_TESTDIR/state/bochs-$MACHINE-$SCHEME.screenrc
+rm -f $DI_TESTDIR/state/$MACHINE-$SCHEME.screenrc
+rm -f $DI_TESTDIR/state/$MACHINE-$SCHEME.screenlog
