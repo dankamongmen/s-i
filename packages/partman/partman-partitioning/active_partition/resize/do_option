@@ -7,20 +7,51 @@ oldid=$3
 
 cd $dev
 
-open_dialog GET_RESIZE_RANGE $oldid
-read_line minsize cursize maxsize
+open_dialog VIRTUAL $oldid
+read_line virtual
 close_dialog
 
-[ "$maxsize" ] || exit 1
+if \
+    [ "$virtual" = no -a -f $oldid/detected_filesystem ] \
+    && [ "$(cat $oldid/detected_filesystem)" = ntfs ]
+then
+    open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
+    read_line minsize cursize maxsize
+    close_dialog
+    # A weird way to get the real device path.  The partition numbers
+    # in parted_server may be changed and the partition table is still
+    # not commited to the disk
+    backupdev=/var/lib/partman/backup/${dev#/var/lib/partman/}
+    if [ -f $backupdev/$oldid/view -a -f $backupdev/device ]; then
+	num=$(sed 's/^[^0-9]*\([0-9]*\)[^0-9].*/\1/' $backupdev/$oldid/view)
+	dev=$(cat $backupdev/device)
+	dev=${dev%/disc}/part$num
+	if [ -b $dev ]; then
+	    size=$(ntfsresize -f -i $dev \
+		| grep '^You may resize at' \
+		| sed 's/^You may resize at \([0-9]*\) bytes.*/\1/' \
+		| grep '^[0-9]*$')
+	    if [ "$size" ]; then
+		minsize=$size
+	    fi
+	fi
+    fi
+else
+    open_dialog GET_RESIZE_RANGE $oldid
+    read_line minsize cursize maxsize
+    close_dialog
+fi
+
+if [ -z "$maxsize" ]; then
+    db_input critical partman-partitioning/impossible_resize || true
+    db_go || true
+    exit 1
+fi
 
 hminsize=$(longint2human $minsize)
 hcursize=$(longint2human $cursize)
 hmaxsize=$(longint2human $maxsize)
 minpercent=$((100 * $minsize / $maxsize))
-
-open_dialog VIRTUAL $oldid
-read_line virtual
-close_dialog
 
 if [ "$virtual" = no ]; then
     db_set partman-partitioning/confirm_resize 'false'
@@ -97,10 +128,45 @@ perform_resizing () {
 	done
     fi
 
-    name_progress_bar partman-partitioning/progress_resizing
-    open_dialog RESIZE_PARTITION $oldid $newsize
-    read_line newid
-    close_dialog
+    disable_swap
+
+    if \
+	[ "$virtual" = no ] \
+	&& [ -f $oldid/detected_filesystem ] \
+	&& [ "$(cat $oldid/detected_filesystem)" = ntfs ]
+    then
+	# resize NTFS
+	if longint_le "$cursize" "$newsize"; then
+	    open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
+	    read_line newid
+	    close_dialog
+	    open_dialog COMMIT
+	    close_dialog
+	    open_dialog PARTITION_INFO $newid
+	    read_line x1 x2 x3 x4 x5 path x7
+	    close_dialog
+	    echo y | ntfsresize -f $path
+	else
+	    open_dialog COMMIT
+	    close_dialog
+	    open_dialog PARTITION_INFO $oldid
+	    read_line x1 x2 x3 x4 x5 path x7
+	    close_dialog
+	    if echo y | ntfsresize -f --size "$newsize" $path; then
+		open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
+		read_line newid
+		close_dialog
+		echo y | ntfsresize -f $path
+	    fi
+	fi
+    else
+	# resize virtual partitions, ext2, ext3, swap, fat16, fat32
+	# and probably reiserfs 
+	name_progress_bar partman-partitioning/progress_resizing
+	open_dialog RESIZE_PARTITION $oldid $newsize
+	read_line newid
+	close_dialog
+    fi
 
     if [ -n "$newid" -a "$newid" != "$oldid" ]; then
 	[ ! -e "$newid" ] || rm -rf $newid
