@@ -14,6 +14,13 @@ SYSTEM=debian-installer
 LABEL="boot floppy"
 ROOT_LABEL="root floppy"
 
+abort () {
+	echo $1 >&2
+	echo "Giving up!" > &2
+	sleep 5000
+	exit
+}
+
 debugshell () {
 	if [ "$BOOT_DEBUG" -gt 2 ]; then
 		echo "This is a debug shell ($1)."
@@ -148,10 +155,7 @@ while [ "$LOADED" = 0 ]; do
 		(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) > mnt/tmp-initrd
 	fi
 	if [ "$?" ]; then
-		# Writing to the ram disk apparently failed.
-		echo "failed to extract initrd (may be out of space on ram disk)" >&2
-		sleep 5000
-		exit
+		abort "failed to extract initrd (may be out of space on ram disk)" >&2
 	fi
 	if [ ! -e /tmp/zcat_failure ]; then
 		LOADED=1
@@ -167,7 +171,7 @@ done
 echo "Setting up filesystem..."
 umount /initrd # the original initrd
 mount -o loop mnt/tmp-initrd /initrd
-cp -a /initrd/* mnt
+cp -a /initrd/* mnt || abort "failed copying filesystem (may be out of space on ram disk)"
 rm -f mnt/tmp-initrd
 umount /initrd
 
@@ -184,9 +188,7 @@ mount -t devfs devfs dev
 
 # If this is missing, things can get *really* weird.
 if [ ! -x /usr/sbin/chroot ]; then
-	echo "Bad initrd! Cannot chroot."
-	sleep 5000
-	exit
+	abort "Bad initrd! Cannot chroot."
 fi
 
 # Close all open files on the initrd, and run busybox init.
