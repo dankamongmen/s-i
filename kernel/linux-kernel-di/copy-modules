@@ -49,7 +49,7 @@ else
 	moddir=/lib/modules/$installedname
 fi
 
-# The direcotry of modules lists to use.
+# The directory of modules lists to use.
 if [ -d modules/$arch-$flavour ]; then
 	modlistdir=modules/$arch-$flavour
 else
@@ -79,16 +79,13 @@ mkdir $tmpdir/module-deps $tmpdir/module-list
 # generate module interealationships from package-list file
 ./gen-deps $flavour > $tmpdir/module-deps.packages
 
-# loop over all udebs, sort that all 
-# dependent modules are processed before
-# the module
+# loop over all udebs, sort that all dependent modules are processed first
 for i in $(
 	{
 		find $modlistdir -maxdepth 1 \( -type f -or -type l \) -not -name '*.lnk' -printf "%f\t%f\n"
 		cat $tmpdir/module-deps.packages
 	} | tsort | tac
 ); do
-
 	# write dependent (direct and indirect) udebs to exclude
 	# write dependencies to module-deps/$i
 	echo $i | join -o 2.2 - $tmpdir/module-deps.packages | { # dependent modules
@@ -98,8 +95,9 @@ for i in $(
 		cd $tmpdir/module-list
 		xargs -r cat
 	} | sort -u > $tmpdir/exclude			# modules to exclude
-
-	cp $home/$modlistdir/$i $tmpdir/module-list
+	# Sort so that the joins work, no matter what the order of the
+	# input file.
+	sort $home/$modlistdir/$i > $tmpdir/module-list/$i
 
 	# exclude modules in exclude from dependency list
 	join -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |
