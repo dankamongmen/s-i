@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+# To exit the installer, kill main-menu. Walk up the process tree from this
+# process, find the first process by that name, and kill it.
+PID=$$
+while [ "$PID" ]; do
+	name=`grep -i ^Name: /proc/$PID/status | cut -f 2`
+	if [ "$name" = "main-menu" ]; then
+		kill $PID
+		exit 0
+	else
+		PID=`grep -i ^PPid: /proc/$PID/status | cut -f 2`
+	fi
+done
+
+logger "Couldn't find main-menu".
+exit 1
