@@ -33,7 +33,7 @@ do_mkfs() {
 }
 
 # activate ext3 if possible
-modprobe ext3
+modprobe ext3 1>/dev/null 2>&1
 
 # collection infos from system
 get_partitions
