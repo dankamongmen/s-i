@@ -686,5 +686,39 @@ char *command_x_save(struct confmodule *mod, char *arg)
     return out;
 }
 
+/*
+ * Set a backdrop title. Use this to describe top-level modes of the
+ * system as a whole.
+ *
+ * Takes a template name and sets the backdrop title to the description
+ * of the template.
+ */
+char *
+command_x_setbacktitle(struct confmodule *mod, char *arg)
+{
+    struct question *q = NULL;
+    const char *value;
+    char *out;
+
+    q = mod->questions->methods.get(mod->questions, arg);
+    if (q == NULL)
+    {
+        asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, arg);
+        return out;
+    }
+    value = question_get_field(q, "", "description");
+    if (value == NULL)
+    {
+        asprintf(&out, "%u %s description field does not exist",
+                 CMDSTATUS_BADQUESTION, arg);
+        return out;
+    }
+
+    mod->frontend->methods.set_backtitle(mod->frontend, value);
+
+    asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
+    return out;
+}
+
 /* vim: expandtab sw=4
 */

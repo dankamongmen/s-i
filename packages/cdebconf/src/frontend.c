@@ -78,6 +78,12 @@ static void frontend_set_title(struct frontend *f, const char *title)
 	f->title = STRDUP(title);
 }
 
+static void frontend_set_backtitle(struct frontend *f, const char *backtitle)
+{
+	DELETE(f->backtitle);
+	f->backtitle = STRDUP(backtitle);
+}
+
 static bool frontend_can_go_back(struct frontend *ui, struct question *q)
 {
 	return false;
@@ -178,6 +184,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	SETMETHOD(shutdown);
 	SETMETHOD(query_capability);
 	SETMETHOD(set_title);
+	SETMETHOD(set_backtitle);
 	SETMETHOD(add);
 	SETMETHOD(go);
 	SETMETHOD(clear);
@@ -211,6 +218,7 @@ void frontend_delete(struct frontend *obj)
 	DELETE(obj->questions);
 	DELETE(obj->capb);
 	DELETE(obj->title);
+	DELETE(obj->backtitle);
     DELETE(obj->progress_title);
 	DELETE(obj);
 }

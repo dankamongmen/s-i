@@ -214,4 +214,14 @@ char *command_x_save(struct confmodule *, char *);
  */
 char *command_settitle(struct confmodule *mod, char *arg);
 
+/**
+ * @brief handler for the X_SETBACKTITLE debconf command
+ *
+ * Set the debconf backdrop title to the description of the template
+ * specified
+ *
+ * @warning This is not in the debconf spec
+ */
+char *command_x_setbacktitle(struct confmodule *mod, char *);
+
 #endif
