@@ -60,12 +60,18 @@ int isdefault(di_system_package *p) {
 	int check;
 
 	check = di_system_dpkg_package_control_file_exec(&p->p, "menutest", 0, NULL);
-	if (!check || p->p.status == di_package_status_unpacked || p->p.status == di_package_status_half_configured) {
-		return 1;
-	}
-	else {
-		return 0;
-	}
+	if (check <= 0 || p->p.status == di_package_status_unpacked || p->p.status == di_package_status_half_configured)
+		return true;
+	return false;
+}
+
+bool isinstallable(di_system_package *p) {
+	int check;
+
+	check = di_system_dpkg_package_control_file_exec(&p->p, "isinstallable", 0, NULL);
+	if (check <= 0)
+		return true;
+	return false;
 }
 
 int provides_installed_virtual_package(di_package *p) {
@@ -100,7 +106,7 @@ get_default_menu_item(di_slist *list)
 		p = node->data;
 		if (!p->installer_menu_item ||
 		    p->p.status == di_package_status_installed ||
-		    !di_system_dpkg_package_control_file_exec(&p->p, "isinstallable", 0, NULL))
+		    !isinstallable(p))
 			continue;
 		/* If menutest says this item should be default, make it so */
 		if (!isdefault(p))
@@ -216,7 +222,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	for (node = list->head; node != NULL; node = node->next) {
 		p = node->data;
 		if (!p->installer_menu_item ||
-		    !di_system_dpkg_package_control_file_exec(&p->p, "isinstallable", 0, NULL))
+		    !isinstallable(p))
 			continue;
 		size = menu_entry(debconf, language, p, buf, sizeof (buf));
 		if (menu_used + size + 2 > menu_size)
