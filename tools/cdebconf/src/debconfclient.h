@@ -16,7 +16,6 @@
 struct debconfclient {
     /** internal use only */
 	char *value;
-	FILE *out;
 
 	/* methods */
     /**
@@ -42,6 +41,9 @@ struct debconfclient {
      * @return char * - return value
      */
 	char *(*ret)(struct debconfclient *client);
+
+    /* Added to the end so we don't have to change the SONAME */
+        FILE *out;
 };
 
 /**
