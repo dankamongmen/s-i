@@ -109,7 +109,7 @@ discover_hw () {
 get_ide_chipset_info() {
 	for ide_module in $(find /lib/modules/*/kernel/drivers/ide/pci/ -type f 2>/dev/null); do
     	if [ -e $ide_module ]; then
-		baseidemod=$(echo $ide_module | sed s/\.o$// | sed s/\.ko$// | sed 's/.*\///')
+		baseidemod=$(echo $ide_module | sed 's/\.o$//' | sed 's/\.ko$//' | sed 's/.*\///')
 		echo "$baseidemod:IDE chipset support"
     	fi
     done
