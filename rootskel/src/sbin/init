@@ -2,19 +2,26 @@
 # Set up filesystem as root and pivot into it.
 echo "Setting up filesystem, please wait ..."
 mount -t proc proc proc
-umount initrd || true
-if grep -q tmpfs /proc/filesystems; then
-	mount -t tmpfs -o size=100M tmpfs mnt
+
+if [ "`uname -r | grep '^2.2.'`" = "" ]; then
+	umount initrd || true
+	if grep -q tmpfs /proc/filesystems; then
+		mount -t tmpfs -o size=100M tmpfs mnt
+	else
+		mount -t shm shm mnt
+	fi
+	umount proc
+	cp -a $(ls -1 / |grep -v '\(dev\|lost+found\|mnt\|proc\)') /mnt
+	cd mnt
+	mkdir proc dev
+	pivot_root . initrd
+	mount -t proc proc proc
+	mount -t devfs devfs dev
 else
-	mount -t shm shm mnt
+	rm /sbin/init
+	/etc/init.d/rcS
 fi
-umount proc
-cp -a $(ls -1 / |grep -v '\(dev\|lost+found\|mnt\|proc\)') /mnt
-cd mnt
-mkdir proc dev
-pivot_root . initrd
-mount -t proc proc proc
-mount -t devfs devfs dev
+
 # Close all open files on the initrd, and run busybox init.
 ln -sf ../bin/busybox sbin/init
 exec /usr/sbin/chroot . /sbin/init <dev/console >dev/console 2>&1
