@@ -1,12 +1,6 @@
 #!/usr/bin/make -f
-# -*- coding: utf-8 -*-
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
-# Copyright © 2002 Colin Walters <walters@debian.org>
 
 #export DH_VERBOSE=1
-
-export DH_COMPAT=4
 
 PACKAGE=yaboot-installer
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
@@ -50,7 +44,7 @@ binary-arch: build install
 	dh_testroot
 	dh_installdebconf
 	dh_installdeb 
-	cp choose-yaboot-disk debian/yaboot-installer/usr/sbin
+	install -m755 choose-yaboot-disk debian/postinst
 	cp powerpc-type debian/yaboot-installer/usr/sbin
 	cp debian/isinstallable debian/yaboot-installer/DEBIAN/
 	dh_gencontrol -- -fdebian/files~
