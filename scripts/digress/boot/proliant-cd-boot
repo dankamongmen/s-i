@@ -1,0 +1,24 @@
+#!/usr/bin/expect
+# Expect script to boot from a CD on a proloant.
+
+spawn -noecho $env(CONSOLECOMMAND)
+
+set timeout 360
+
+# This means that it's gotten to the boot menu.
+expect "F12"
+
+# This means that the CD has, presumably, now booted and the logo is
+# showing.
+expect "The Server is in Graphics Mode"
+
+sleep 1
+
+puts "Sending $env(BOOTCOMMAND)"
+set send_slow {1 0.2}
+send -s "$env(BOOTCOMMAND)\r"
+
+set timeout 60
+expect "booting the kernel"
+
+exit

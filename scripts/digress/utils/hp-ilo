@@ -17,17 +17,17 @@ use Expect;
 my $action=shift;
 if ($action eq 'reset') {
 	print "Resetting..\n";
-	send_command(qq{<RESET_SERVER/>});
+	send_command('server_info', qq{<RESET_SERVER/>});
 	exit process_result();
 }
 elsif ($action eq 'poweron') {
 	print "Powering on..\n";
-	send_command(qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
+	send_command('server_info', qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
 	exit process_result();
 }
 elsif ($action eq 'poweroff') {
 	print "Powering off..\n";
-	send_command(qq{<SET_HOST_POWER HOST_POWER="No"/>});
+	send_command('server_info', qq{<SET_HOST_POWER HOST_POWER="No"/>});
 	exit process_result();
 }
 elsif ($action eq 'force_restart') {
@@ -64,8 +64,18 @@ elsif ($action eq 'force_restart') {
 	$exp->interact;
 }
 elsif ($action eq 'get_host_power') {
-	send_command(qq{<GET_HOST_POWER_STATUS/>});
+	send_command('server_info', qq{<GET_HOST_POWER_STATUS/>});
 	print "Power: ".scan_result("HOST_POWER")."\n";
+}
+elsif ($action eq 'connect_cd') {
+	send_command('rib_info', qq{<EJECT_VIRTUAL_MEDIA DEVICE="CDROM"/>});
+	process_result();
+	send_command('rib_info', qq{<INSERT_VIRTUAL_MEDIA DEVICE="CDROM" IMAGE_URL="$ENV{HP_ILO_ISO_URL}"/>});
+	process_result();
+	send_command('rib_info', qq{<SET_VM_STATUS DEVICE="CDROM">
+		<VM_BOOT_OPTION VALUE="BOOT_ONCE"/>
+	</SET_VM_STATUS>});
+	exit process_result();
 }
 else {
 	print STDERR "unknown action $action\n";
@@ -129,14 +139,15 @@ sub process_result {
 }
 
 sub gen_command {
+	my $type=uc(shift);
 	my $password=getpassword();
 	my $user=getuser();
 	return <<"EOF"
 <RIBCL VERSION="2.0">
 	<LOGIN USER_LOGIN="$user" PASSWORD="$password">
-		<SERVER_INFO MODE="write">
+		<$type MODE="write">
 			@_
-		</SERVER_INFO>
+		</$type>
 	</LOGIN>
 </RIBCL>
 EOF
