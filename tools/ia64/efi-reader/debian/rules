@@ -1,0 +1,54 @@
+#!/usr/bin/make -f
+#
+# debian/rules file for efi-reader
+# Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
+# $Id: rules,v 1.1 2003/03/08 14:07:58 mckinstry Exp $
+
+export DH_VERBOSE=1
+PACKAGE=efi-reader
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=ia64
+FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+
+export DH_COMPAT=3
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	-$(MAKE) clean
+	dh_clean
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	touch configure-stamp
+
+build: configure-stamp build-stamp
+build-stamp:
+	dh_testdir
+	$(MAKE)
+	touch build-stamp
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean
+	dh_installdirs
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/efi-reader
+
+# Build architecture-independent files here.
+binary-indep:
+
+# Build arch-dependent files here
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_fixperms
+	dh_installdep
+	dh_gencontrol -- -n$(FILENAME)
+	dh_builddep --filename=$(FILENAME)
+
+binary: binary-indep binary-arch
+.PHONY build clean binary-indep binary-arch binary install configure
