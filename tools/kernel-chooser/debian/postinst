@@ -65,6 +65,27 @@ case "$ARCH" in
 	    ;;
 	esac
         ;;
+    sparc)
+        version=2.4.21
+	MODEL=`uname -m`
+	CPUS=`grep 'ncpus probed' /proc/cpuinfo | cut -d: -f2`
+	case "$MODEL" in
+	    sparc)
+		if [ "$CPUS" -eq 1 ]; then
+			kernel=kernel-image-$version-sun4cdm
+		else
+			kernel=kernel-image-$version-sun4dm-smp
+		fi
+		;;
+	    sparc64)
+		if [ "$CPUS" -eq 1 ]; then
+			kernel=kernel-image-$version-sun4u
+		else
+			kernel=kernel-image-$version-sun4u-smp
+		fi
+		;;
+	esac
+	;;
     *)
         log "warning: Unknown arcitecture '$ARCH'."
 	;;
