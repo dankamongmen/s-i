@@ -23,7 +23,7 @@ while (<KVERS>) {
 	chomp;
 	next if /^#/ || ! length;
 
-	my ($arch, $kernelversion, $flavour, $installedname, $multkern, $builddep)=split(' ', $_, 6);
+	my ($arch, $kernelversion, $flavour, $installedname, $suffix, $builddep)=split(' ', $_, 6);
 	if (! length $arch || ! length $kernelversion ||
 	    ! length $installedname || ! length $flavour || 
 	    ! length $builddep ) {
@@ -32,11 +32,11 @@ while (<KVERS>) {
 	next unless $arch eq $hostarch;
 
 	my $extraname="";
-	if ($multkern =~ /^[yY]/) {
+	if ($suffix =~ /^[yY]/) {
 		$extraname="-$kernelversion-$flavour";
 	}
-	elsif ($multkern =~ /^-/) {
-	        $extraname="$multkern" if $multkern ne "-";
+	elsif ($suffix =~ /^-.+/) {
+		$extraname="$suffix";
 	}
 	
 	if (-e "$sourcedir/boot/vmlinuz-$installedname") {
