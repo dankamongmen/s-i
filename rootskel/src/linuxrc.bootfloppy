@@ -1,8 +1,17 @@
 #!/bin/sh
-# This is a special linuxrc for the boot floppy image. It just loads the
-# next floppy.
+# This is a special linuxrc for the boot floppy image.
+# It loads the main d-i initrd from either a second floppy, or a USB
+# storage device.
+#
 # Throughout we use BOOT_DEBUG to turn on debugging. 1 = minimal,
-# with 2 you'll get shells in strategic places.
+# 2 = set -x, with 3 you'll get shells in strategic places.
+
+debugshell () {
+	if [ "$BOOT_DEBUG" -gt 2 ]; then
+		echo "This is a debug shell ($1)."
+		sh
+	fi
+}
 
 if [ "$BOOT_DEBUG" -gt 1 ]; then
 	set -x
@@ -11,23 +20,22 @@ fi
 mount -t proc proc proc
 mount -t devfs devfs dev
 
-modprobe floppy
 modprobe vfat
 modprobe loop
 
-if [ ! -d /dev/floppy ]; then
-	echo
-	echo "Linux cannot find your floppy drive."
-	echo
-	echo "Perhaps it is a USB floppy. If so, you should use the usbfloppy"
-	echo "boot disk instead of this one."
-	echo
-	echo "Giving up.."
-	while :; do
-		sleep 100
-	done
+# Hardware detection.
+modprobe floppy
+if [ -x /usr/sbin/usb-discover ]; then
+	/usr/sbin/usb-discover
 fi
+# This is currently needed or usb-storage won't load (for ide_fix_driveid).
+modprobe ide-core
+modprobe usb-storage
+modprobe sd_mod
 
+debugshell "after hardware detection"
+
+FIRST_PASS=1
 LOADED=0
 while [ "$LOADED" = 0 ]; do
 	echo
@@ -36,8 +44,7 @@ while [ "$LOADED" = 0 ]; do
 	echo
 	echo
 	echo
-	echo -n "Please insert the second floppy ..."
-	MOUNTED=0
+	echo -n "Please insert the second floppy or plug in a USB storage device..."
 
 	if [ 1 -gt "$BOOT_DEBUG" ]; then
 		# Shut up kernel errors if the disk is inserted at wrong time, etc.
@@ -45,17 +52,37 @@ while [ "$LOADED" = 0 ]; do
 		echo 0 > /proc/sys/kernel/printk
 	fi
 	
+	MOUNTED=0
 	while [ "$MOUNTED" = 0 ]; do
-		# avoid thrashing the floppy drive too much
-		sleep 5
-		echo -n "."
+		if [ "$FIRST_PASS" = 0 ]; then
+			# avoid thrashing the floppy drive too much
+			sleep 5
+			echo -n "."
+		fi
+		FIRST_PASS=0
 		
-		for dev in dev/floppy/?; do
-			if [ -b $dev ]; then
+		# Look for any storage devices we can find.
+		# Only ones that we have modules loaded for should exist,
+		# so this is not at brute-force as it may seem.
+		# It's done each time through the loop as USB devices may
+		# be inserted at any time.
+		DEVS=""
+		if [ -d dev/floppy ]; then
+			DEVS=dev/floppy/?
+		fi
+		if [ -d /dev/scsi ]; then
+			DEVS="$DEVS `find /dev/scsi`"
+		fi
+		
+		for dev in $DEVS; do
+			if [ "$MOUNTED" = 0 ] && [ -b $dev ]; then
+				# XXX as a mount point, /floppy is not
+				# quite right, as this may be USB storage,
+				# whatever.
 				if mount $dev -o ro -tvfat floppy 2>/dev/null; then
 					if [ -e floppy/initrd.gz -a ! -e floppy/linux ]; then
 						MOUNTED=1
-						echo " floppy mounted."
+						echo " mounted."
 					else
 						umount floppy || echo "umount failed!"
 					fi
@@ -72,22 +99,19 @@ while [ "$LOADED" = 0 ]; do
 	fi
 	
 	# TODO progress display, this can take quite some time!
-	echo "Loading the second floppy, please wait ..."
+	echo "Loading the Debian installer, please wait...."
 	mount -t shm shm mnt
 	if zcat floppy/initrd.gz > mnt/tmp-initrd; then
 		LOADED=1
 	else
-		echo "This floppy seems to be bad."
-		if [ "$BOOT_DEBUG" -gt 0 ]; then
-			echo "This is ia debug shell."
-			sh
-		fi
+		echo "This install media seems to be bad."
+		debugshell "bad media mounted"
 		umount mnt
 	fi
 	umount floppy
 done
 
-echo "Setting up filesystem, please wait ..."
+echo "Setting up filesystem, please wait..."
 mount -o loop mnt/tmp-initrd initrd
 cp -a initrd/* mnt
 umount initrd
@@ -95,7 +119,7 @@ umount initrd
 # dev will be unmounted by rcS
 umount proc
 
-echo "Starting the installer.."
+echo "Starting the installer..."
 cd mnt
 pivot_root . initrd
 mount -t proc proc proc
@@ -110,8 +134,5 @@ fi
 # Close all open files on the initrd, and run busybox init.
 rm -f linuxrc # probably not busybox init
 ln -s /sbin/init linuxrc
-if [ "$BOOT_DEBUG" -gt 0 ]; then
-	echo "This is ia debug shell, just before running the new linuxrc."
-	sh
-fi
+debugshell "before chroot"
 exec /usr/sbin/chroot . /linuxrc <dev/console >dev/console 2>&1
