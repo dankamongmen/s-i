@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 # Kernel version.
-KVERS=2.4.1
+KVERS=2.4.2
 # Kernel flavor.
 FLAVOUR=di
 
@@ -45,17 +45,17 @@ unpack-stamp:
 	touch unpack-stamp
 
 # Use kernel-package to do the actual building.
-build: fixcontrol unpack build-stamp
-build-stamp:
+build: build-stamp
+build-stamp: fixcontrol unpack
 	cd kernel-source-$(KVERS); make-kpkg --flavour di build
 	touch build-stamp
 
+# Ensure that the control file has up-to-date substitutions for kernel
+# version. This must be done at package clean time so dpkg-gencontrol
+# generates a valid .dsc.
 fixcontrol:
-	-mv -f debian/control.pristine debian/control
-	@if ! grep -q '$${kernel:Version}' debian/control; then \
-		echo "** debian/control is bogus" >&2; \
-		exit 1; \
-	fi
+	sed 's/$${kernel:Version}/$(KVERS)-$(FLAVOUR)/g' \
+		< debian/control.template > debian/control
 
 clean:
 	rm -f build-stamp unpack-stamp
@@ -81,13 +81,8 @@ binary-udebs: build
 	
 	cd kernel-source-$(KVERS); \
 		FLAVOUR=di make INSTALL_MOD_PATH=`pwd`/modules modules_install
-	# Actually installs all the modules into place, and
-	# generates debian/control.out.
+	# Actually installs all the modules into place.
 	./copy-modules kernel-source-$(KVERS)/modules $(KVERS) $(FLAVOUR)
-	if [ ! -e debian/control.pristine ]; then \
-		mv -f debian/control debian/control.pristine; \
-	fi
-	mv -f debian/control.out debian/control
 	
 	install -d debian/kernel-image-$(KVERS)-$(FLAVOUR)-udeb/boot
 	# Copy in the kernel image. Since make-kpkg has complex logic about
@@ -116,4 +111,4 @@ binary-arch: binary-image binary-udebs
 binary-indep:
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install unpack
+.PHONY: build clean binary-indep binary-arch binary install unpack fixcontrol

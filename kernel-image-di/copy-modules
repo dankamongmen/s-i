@@ -1,15 +1,11 @@
 #!/usr/bin/perl -w
 #
-# This program reads a debian/control, and generates from it the real
-# control file, control.out. At the same time, it populates temporary
-# directories with the appropriate set of modules.
+# This program reads a debian/control and modules list files and installs
+# the modules.
 #
 # The debian/control is rather special. The first package in the file is a
 # kernel image, which will be built with make-kpkg. The next is a kernel image
 # udeb. All of the remainder are kernel module udebs.
-#
-# All occurrances of ${kernel:Version} are replaced with the version of the
-# kernel that is being built.
 #
 # To specify what modules no in the kernel module udebs, list them in
 # files named debian/<packagename>.list, where <packagename> is
@@ -73,29 +69,20 @@ close DEP;
 # Process the control file, and begin to write out the processed version.
 $/="\n\n"; # read in a stanza at a time
 open IN, "debian/control" or die "debian/control: $!";
-open OUT, ">debian/control.out" or die "debian/control.out: $!";
 my $stanza;
 
 # Source stanza and then kernel-image stanzas.
 for (1..3) {
 	$stanza=<IN>;
-	$stanza =~ s/\$\{kernel:Version\}/$kvers-$flavour/g;
-	print OUT $stanza;
 }
 
-# Now read in all the module packages and store their stanzas in this hash.
-my %stanzas;
-# Also, build up a hash of package name and the things it depends on as we go.
+# Build up a hash of package name and the things it depends on as we go.
 my %packagedep;
-# And also, read in the debian/package.list files and parse them,
+# Also, read in the debian/package.list files and parse them,
 # generating a list of the modules that belong in each package.
 my %packagemodules;
 while ($stanza = <IN>) {
-	$stanza =~ s/\$\{kernel:Version\}/$kvers-$flavour/g;
-
 	my ($package) = $stanza =~ /^Package:\s+(.*)/m;
-	$stanzas{$package}=$stanza;
-	
 	my ($deps) = $stanza =~ /^Depends:\s+(.*)/m;
 	# Ignore dependancy versioning.
 	$packagedep{$package} = [map {s/\(.*\)//;$_} split(/,\s/, $deps)];
@@ -163,16 +150,12 @@ foreach my $package (keys %packagemodules) {
 }
 die "Module dependancies not satisfied; aborting.\n" if $bad;
 
-# Write out the remainder of the control file, skipping
-# packages that have no modules at all. At the same time, build up
-# the directory structure of the package, and copy in its modules.
+# Build up the directory structure of each package, and copy in its modules.
 foreach my $package (keys %packagemodules) {
 	if (! @{$packagemodules{$package}}) {
 		warn "$package: would be empty; skipping!\n";
 		next;
 	}
-
-	print OUT $stanzas{$package};
 
 	# Make directory structure.
 	my %dirs;
@@ -191,4 +174,3 @@ foreach my $package (keys %packagemodules) {
 			"debian/$package/$filename{$module}";
 	}
 }
-close OUT;
