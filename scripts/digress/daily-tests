@@ -37,8 +37,8 @@ fi
 datestamp=$(date +%Y%m%d%H%M)
 mkdir $DI_TESTDIR/logs/$datestamp
 
-rm -f $DI_TESTDIR/logs/summary.log
-touch $DI_TESTDIR/logs/summary.log
+rm -f $DI_TESTDIR/logs/overview.log
+touch $DI_TESTDIR/logs/overview.log
 
 . $DI_TESTDIR/config
 
@@ -51,5 +51,5 @@ for SCHEME in $@; do
 	else
 		overview failed >> $DI_TESTDIR/logs/overview.log
 	fi
-	ln -sf $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log $DI_TESTDIR/logs/$MACHINE-$SCHEME.log
+	ln -f $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log $DI_TESTDIR/logs/$MACHINE-$SCHEME.log
 done
