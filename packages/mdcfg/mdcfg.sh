@@ -22,7 +22,6 @@ md_delete_verify() {
 	DEVICES=`echo ${INFO}|sed -e "s/.*:\(.*\)/\1/"`
 	NUMBER=`echo ${DEVICE}|sed -e "s/^md//"`
 	db_set mdcfg/deleteverify "false"
-	db_fset mdcfg/deleteverify "seen" "false"
 	db_subst mdcfg/deleteverify DEVICE "/dev/${DEVICE}"
 	db_subst mdcfg/deleteverify TYPE "${TYPE}"
 	db_subst mdcfg/deleteverify DEVICES "${DEVICES}"
@@ -56,7 +55,6 @@ md_delete() {
 		return
 	fi
 	db_set mdcfg/deletemenu "false"
-	db_fset mdcfg/deletemenu "seen" "false"
 	db_subst mdcfg/deletemenu DEVICES "${DEVICES}"
 	db_input high mdcfg/deletemenu
 	db_go
@@ -71,7 +69,6 @@ md_delete() {
 
 md_createmain() {
 	db_set mdcfg/createmain "false"
-	db_fset mdcfg/createmain "seen" "false"
 	db_input high mdcfg/createmain
 	db_go
 	if [ $? -ne "30" ]; then
@@ -116,7 +113,6 @@ get_partitions() {
 	done
 
 	if [ -z "${PARTITIONS}" ] ; then
-		db_fset mdcfg/noparts "seen" "false"
 		db_input critical mdcfg/noparts
 		db_go
 		return
@@ -150,7 +146,6 @@ prune_partitions() {
 md_create_raid0() {
 	db_subst mdcfg/raid0devs PARTITIONS "${PARTITIONS}"
 	db_set mdcfg/raid0devs ""
-	db_fset mdcfg/raid0devs "seen" "false"
 	db_input high mdcfg/raid0devs
 	db_go
 
@@ -186,7 +181,6 @@ md_create_raid1() {
 
 	# Get the count of active devices
 	while [ "${OK}" -eq 0 ]; do
-		db_fset mdcfg/raid1devcount "seen" "false"
 		db_input high mdcfg/raid1devcount
 		db_go
 		if [ "$?" -eq "30" ]; then
@@ -209,7 +203,6 @@ md_create_raid1() {
 	# this time.
 	# TODO: Make a general function for this kind of stuff
 	while [ "${OK}" -eq 0 ]; do
-		db_fset mdcfg/raid1sparecount "seen" "false"
 		db_input high mdcfg/raid1sparecount
 		db_go
 		if [ "$?" -eq "30" ]; then
@@ -228,7 +221,6 @@ md_create_raid1() {
 	SPARE_COUNT="${RET}"
 	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
 	if [ "$DEV_COUNT" -gt "$NUM_PART" ] ; then
-		db_fset mdcfg/notenoughparts "seen" "false"
 		db_subst mdcfg/notenoughparts NUM_PART "${NUM_PART}"
 		db_subst mdcfg/notenoughparts REQUIRED "${DEV_COUNT}"
 		db_input critical mdcfg/notenoughparts
@@ -241,7 +233,6 @@ md_create_raid1() {
 
 	# Loop until the correct amount of active devices has been selected
 	while [ "${SELECTED}" -ne "${DEV_COUNT}" ]; do
-		db_fset mdcfg/raid1devs "seen" "false"
 		db_subst mdcfg/raid1devs COUNT "${DEV_COUNT}"
 		db_subst mdcfg/raid1devs PARTITIONS "${PARTITIONS}"
 		db_input high mdcfg/raid1devs
@@ -271,7 +262,6 @@ md_create_raid1() {
 	  # That means any number less than or equal to the spare count
 		while [ "${SELECTED}" -gt "${SPARE_COUNT}" -o "${FIRST}" -eq 1 ]; do
 			FIRST=0
-			db_fset mdcfg/raid1sparedevs "seen" "false"
 			db_subst mdcfg/raid1sparedevs COUNT "${SPARE_COUNT}"
 			db_subst mdcfg/raid1sparedevs PARTITIONS "${PARTITIONS}"
 			db_input high mdcfg/raid1sparedevs
@@ -324,7 +314,6 @@ md_create_raid1() {
 md_mainmenu() {
 	while [ 1 ]; do
 		db_set mdcfg/mainmenu "false"
-		db_fset mdcfg/mainmenu "seen" "false"
 		db_input high mdcfg/mainmenu
 		db_go
 		if [ $? -eq "30" ]; then
