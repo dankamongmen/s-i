@@ -125,21 +125,35 @@ get_hw_info() {
     #echo "usb-storage:Linux Unknown"
 }
 
-log "Detecting hardware..."
 
 db_settitle hw-detect/title
 
-set -- `get_hw_info | wc -l`
-count="$1"
-#log "Progress bar from 0 to $count"
-db_progress START 0 $count hw-detect/progress_title
-
+log "Detecting hardware..."
+# Put up a progress bar just to have something on screen if the hardware
+# detection should hang.
+db_progress START 0 1 hw-detect/detect_progress_title
+db_progress INFO hw-detect/detect_progress_step
+HW_INFO=$(get_hw_info)
+db_progress STEP 1
+count=0
 # Setting IFS to adjust how the for loop splits the values
 IFS_SAVE="$IFS"
 IFS="
 "
-for device in `get_hw_info`
-do
+# HW_INFO must be unquoted in these loops.
+for device in $HW_INFO; do
+	count=$(expr $count + 1)
+done
+IFS="$IFS_SAVE"
+db_progress STOP
+
+log "Loading modules..."
+db_progress START 0 $count hw-detect/load_progress_title
+# Setting IFS to adjust how the for loop splits the values
+IFS_SAVE="$IFS"
+IFS="
+"
+for device in $HW_INFO; do
     module="`echo $device | cut -d: -f1`"
     cardname="`echo $device | cut -d: -f2`"
     # Restore IFS after extracting the fields.
@@ -150,10 +164,10 @@ do
 
     log "Detected load module '$module' for '$cardname'"
 
-    db_subst hw-detect/progress_step CARDNAME "$cardname"
-    db_subst hw-detect/progress_step MODULE "$module"
+    db_subst hw-detect/load_progress_step CARDNAME "$cardname"
+    db_subst hw-detect/load_progress_step MODULE "$module"
 
-    db_progress INFO hw-detect/progress_step
+    db_progress INFO hw-detect/load_progress_step
 
     if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] &&
 	is_not_loaded $module
@@ -179,12 +193,12 @@ do
 
     db_progress STEP 1
 
+    # XXX why is this ere? Paranioa?
     IFS="
 "
 done
 IFS="$IFS_SAVE"
 
-#log "Progress bar stop"
 db_progress STOP
 
 # always load sd_mod and sr_mod if a scsi controller module was loaded.
