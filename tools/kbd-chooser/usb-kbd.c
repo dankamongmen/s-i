@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.2 2003/01/19 12:23:31 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.3 2003/01/22 19:09:14 mckinstry Exp $
  */
 
 #include "config.h"
@@ -84,8 +84,13 @@ kbd_t *usb_kbd_get (void)
 			}
 		}
 		err = system ("mount -t  usbdevfs usbdevfs /proc/bus/usb");
-		if (err != 0)
-			DIE ("Failed to mount USB filesystem");
+		if (err != 0) {
+			di_log ("Failed to mount USB filesystem");
+			k->present = UNKNOWN;
+			k->next = keyboards;
+			keyboards = k;
+			return k;
+		}
 		mounted_fs = 1;
 	}
 	if (grep ("/proc/bus/usb/drivers", "keyboard") == 0) {
