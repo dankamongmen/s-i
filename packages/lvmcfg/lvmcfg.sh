@@ -140,7 +140,7 @@ addinfos_lv() {
 #
 get_pvs() {
 	PARTITIONS=""
-	for i in `/usr/lib/partconf/find-partitions 2>/dev/null | grep LVM | cut -f1`; do
+	for i in `/usr/lib/partconf/find-partitions --ignore-fstype 2>/dev/null | grep LVM | cut -f1`; do
 		# skip already assigned
 		found=no
 		for pv in $(vgdisplay -v | grep "[ ]*PV Name" | sed -e "s/ \+PV Name \+//"); do
