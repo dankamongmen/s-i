@@ -549,6 +549,8 @@ default_disk_label () {
 		    echo amiga;;
 		chrp)
 		    echo msdos;; # guess
+		chrp_rs6k)
+		    echo msdos;; # guess
 		chrp_pegasos)
 		    echo amiga;;
 		prep)
