@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
+#include <debian-installer.h>
 
 #define TARGET "/target"
 #define MAX_ENTRIES 256
