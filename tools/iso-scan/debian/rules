@@ -1,12 +1,5 @@
 #!/usr/bin/make -f
 
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
-PACKAGES=$(shell dh_listpackages)
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=all
-
 build:
 	dh_testdir
 
@@ -26,10 +19,8 @@ binary-arch: build
 	dh_fixperms
 	dh_installdeb 
 	dh_shlibdeps
-	$(foreach PACKAGE, $(PACKAGES), \
-		dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
-		dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
-	)
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary
