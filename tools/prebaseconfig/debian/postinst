@@ -1,5 +1,7 @@
 #! /bin/sh
 
+. /usr/share/debconf/confmodule
+
 set -e
 
 log() {
@@ -10,8 +12,16 @@ log() {
 # parts will unmount /target/
 run_parts() {
     partsdir="$1"
+    scriptcount=`ls "$partsdir"/* | wc -l`
+
+    db_progress START 0 $scriptcount prebaseconfig/runparts-progress/title
+
     tmpfile=/tmp/prebaseconfig.stderr.log
     for script in "$partsdir"/*; do
+
+	db_subst prebaseconfig/runparts-progress/step SCRIPT "$script"
+	db_progress INFO prebaseconfig/runparts-progress/step
+
         if [ -x "$script" ] ; then
             log "info: Running $script"
             if "$script" 2> $tmpfile ; then
@@ -26,7 +36,10 @@ run_parts() {
         else
             log "error: Unable to execute $script"
         fi
+
+	db_progress STEP 1
     done
+    db_progress STOP
 }
 
 run_parts /usr/lib/prebaseconfig.d
