@@ -1,6 +1,4 @@
 #!/bin/sh
-. /usr/share/debconf/confmodule
-db_get debian-installer/probe/usb || true
-if [ "$ret" != false ]; then
+if [ "$(debconf-get debian-installer/probe/usb)" != false ]; then
 	/usr/sbin/usb-discover
 fi
