@@ -196,4 +196,13 @@ char *command_progress(struct confmodule *, char *);
  */
 char *command_x_loadtemplatefile(struct confmodule *, char *);
 
+/**
+ * @brief handler for the SETTITLE debconf command
+ *
+ * Set the debconf title to the discription of the template specified
+ *
+ * @warning This is not in the debconf spec
+ */
+char *command_settitle(struct confmodule *mod, char *arg);
+
 #endif

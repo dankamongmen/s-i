@@ -37,6 +37,7 @@ static commands_t commands[] = {
     { "stop",	    command_stop },
     { "progress",   command_progress },
     { "x_loadtemplatefile", command_x_loadtemplatefile },
+    { "settitle",   command_settitle },
     { 0, 0 }
 };
 

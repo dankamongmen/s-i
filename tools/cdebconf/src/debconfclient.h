@@ -144,4 +144,7 @@ void debconfclient_delete(struct debconfclient *client);
 #define debconf_x_loadtemplate(_client, _template) \
     _client->commandf(_client, "X_LOADTEMPLATEFILE %s", _template)
 
+#define debconf_settitle(_client, _title) \
+    _client->commandf(_client, "SETTITLE %s", _title)
+
 #endif

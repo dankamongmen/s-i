@@ -658,3 +658,39 @@ command_progress(struct confmodule *mod, char *arg)
     return out;
 }
 
+/*
+ * takes a template name and sets the debconf title to the description
+ * of the template. This will allow us to localise titles.
+ */
+char *
+command_settitle(struct confmodule *mod, char *arg)
+{
+    struct question *q = NULL;
+    const char *value;
+    char *argv[6];
+    int argc;
+    char *out;
+
+    argc = strcmdsplit(arg, argv, DIM(argv));
+
+    CHECKARGC(== 1);
+    q = mod->questions->methods.get(mod->questions, argv[0]);
+    if (q == NULL)
+    {
+        asprintf(&out, "%u %s does not exist",
+		 CMDSTATUS_BADQUESTION, argv[0]);
+	return out;
+    }
+    value = question_get_field(q, "", "description");
+    if (value == NULL)
+    {
+	asprintf(&out, "%u %s description field does not exist",
+		 CMDSTATUS_BADQUESTION, argv[0]);
+	return out;
+    }
+
+    mod->frontend->methods.set_title(mod->frontend, value);
+
+    asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
+    return out;
+}
