@@ -10,7 +10,10 @@ lilo-installer (0.40) UNRELEASED; urgency=low
     - Install /target/etc/lilo.conf before apt-installing lilo to suppress
       the debconf note due to lilo.conf not existing. (Closes: #239627)
     - Revamp postinst to use a select for the boot partition selection,
-      make the question friendlier.
+      make the question friendlier, and make sure the MBR option chooses
+      the MBR of the very first disk of the same type as we installed
+      the base system on. This mimics Woody's behavior because there is
+      absolutely no sane default on x86 PCs. (Closes: #220192)
     - Still allow user to manually enter partition if he/she so desires.
     - Add a progress bar after all user input is complete.
     - Fix LinuxOLD again, if there's no initrd.
