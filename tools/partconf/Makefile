@@ -15,7 +15,7 @@ partconf: $(PARTCONF_OBJS)
 find-partitions: partconf.h find-parts.c util.o
 	$(CC) $(CFLAGS) -o $@ -DFIND_PARTS_MAIN find-parts.c util.o $(LIBS)
 
-mkfstab: mkfstab.c mkfstab.c
+mkfstab: mkfstab.c mkfstab.h
 	$(CC) $(CFLAGS) -o $@ mkfstab.c $(LIBS)
 
 util.o: util.c
