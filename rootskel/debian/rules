@@ -44,7 +44,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	install -d -o 0 -g 0 -m755 debian/rootskel/DEBIAN
-	po2debconf debian/templates | debian/templates-build.pl $(ARCH) > debian/rootskel/DEBIAN/templates
+	debian/templates-build.pl $(ARCH) < debian/templates > debian/rootskel/DEBIAN/templates
 	chown 0:0 debian/rootskel/DEBIAN/templates
 	chmod 644 debian/rootskel/DEBIAN/templates
 	dh_strip
