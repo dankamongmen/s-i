@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.29 2003/10/13 22:56:32 barbier Exp $
+ * $Id: newt.c,v 1.30 2003/10/14 05:41:07 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -335,6 +335,8 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     int count = 0, defcount, i, k, ret, def;
     const char *p;
     char *q_ext_text;
+    int *tindex = NULL;
+    const char *listorder = q_get_listorder(q);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
 #endif
@@ -353,7 +355,8 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     choices = malloc(sizeof(char *) * count);
     count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_trans = malloc(sizeof(char *) * count);
-    if (strchoicesplit(q_get_choices(q), choices_trans, count) != count)
+    tindex = malloc(sizeof(int *) * count);
+    if (strchoicesplitsort(q_get_choices(q), listorder, choices_trans, tindex, count) != count)
         return DC_NOTOK;
     defvals = malloc(sizeof(char *) * count);
     defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
@@ -418,9 +421,9 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     for (i = 0; i < count; i++) {
         def = 0;
         for (k = 0; k < defcount; k++)
-            if (strcmp(choices[i], defvals[k]) == 0)
+            if (strcmp(choices[tindex[i]], defvals[k]) == 0)
                 def = 1;
-        newtFormAddComponent(sform, newtCheckbox((win_width-sel_width-5)/2, 1+t_height+1+i, choices_trans[i], def ? '*' : ' ', " *", &answer[i]));
+        newtFormAddComponent(sform, newtCheckbox((win_width-sel_width-5)/2, 1+t_height+1+i, choices_trans[i], def ? '*' : ' ', " *", &answer[tindex[i]]));
     }
     newtFormAddComponent(form, sform);
     newtFormSetCurrent(form, sform);
@@ -443,6 +446,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         }
         free(choices);
         free(choices_trans);
+        free(tindex);
         free(answer);
         question_setvalue(q, ans);
         for (i = 0; i < defcount; i++)
@@ -468,6 +472,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     char **choices, **choices_trans, *defval;
     int count = 0, i, ret, defchoice = -1;
     const char *p, *q_ext_text;
+    int *tindex = NULL;
+    const char *listorder = q_get_listorder(q);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
 #endif
@@ -486,7 +492,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     choices = malloc(sizeof(char *) * count);
     count = strchoicesplit(q_get_choices_vals(q), choices, count);
     choices_trans = malloc(sizeof(char *) * count);
-    if (strchoicesplit(q_get_choices(q), choices_trans, count) != count)
+    tindex = malloc(sizeof(int *) * count);
+    if (strchoicesplitsort(q_get_choices(q), listorder, choices_trans, tindex, count) != count)
         return DC_NOTOK;
     win_width = width-7;
     sel_height = count;
@@ -537,10 +544,11 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
-        newtListboxAppendEntry(listbox, choices_trans[i], choices[i]);
-        if (defval != NULL && strcmp(defval, choices[i]) == 0)
+        newtListboxAppendEntry(listbox, choices_trans[i], choices[tindex[i]]);
+        if (defval != NULL && strcmp(defval, choices[tindex[i]]) == 0)
             defchoice = i;
     }
+    free(tindex);
     free(choices);
     free(choices_trans);
     if (count == 1)
