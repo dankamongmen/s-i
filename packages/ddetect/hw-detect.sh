@@ -306,7 +306,7 @@ db_go || exit 10 # back up
 db_get hw-detect/select_modules
 LIST="$RET"
 
-db_input high prompt_module_params || true
+db_input low prompt_module_params || true
 db_go || exit 10 # back up
 db_get prompt_module_params
 if [ "$RET" = true ]; then
