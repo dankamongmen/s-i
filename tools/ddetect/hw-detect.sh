@@ -36,6 +36,7 @@ load_module() {
 	return
     fi
 
+    db_fset hw-detect/module_params seen false
     db_subst hw-detect/module_params MODULE "$module"
     db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
@@ -47,6 +48,7 @@ load_module() {
 	#echo "echo \"$module $RET\" >> /target/etc/modules" >> $prebaseconfig
 	:
     else
+	db_fset hw-detect/modprobe_error seen false
 	db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $RET"
 	db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
 	db_go
@@ -215,7 +217,7 @@ fi
 if [ -n "$MISSING_MODULES" ]; then
 	# Tell the user to try to load more modules from floppy
 	template=hw-detect/missing_modules
-	db_fset "$template" seen false || true
+	db_fset "$template" seen false
 	db_subst "$template" MISSING_MODULES "$MISSING_MODULES" || true
 	db_input low "$template"
 	db_go || true

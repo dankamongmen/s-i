@@ -59,7 +59,7 @@ do
 
     db_get ethdetect/module_select
     if [ "$RET" = "none of the above" ]; then
-	    break
+	    exit 1
     fi
     module="$RET"
     if [ -n "$module" ] && is_not_loaded "$module" ; then
