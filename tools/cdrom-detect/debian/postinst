@@ -60,7 +60,10 @@ echo $old >/proc/sys/kernel/printk
 
 load_floppy_driver() {
     if [ ! -d /dev/floppy ] ; then
-        modprobe floppy || true
+        modprobe floppy >> /var/log/messages 2>&1 || true
+    fi
+    if [ ! -d /dev/floppy ] ; then
+        log "Unable to load floppy device driver"
     fi
     floppydev=/dev/floppy/0
 }
@@ -88,8 +91,10 @@ do
 
     if [ -n "$module" -a "$module" != "ignore" ]
     then
-        if [ ! -f /lib/modules/*/*/"$module".o ]
+        if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
+            :
+        else
             while true
             do
 		db_fset cdrom-detect/not_included seen false || true
@@ -127,7 +132,7 @@ do
             fi
         fi
 
-        if [ -f /lib/modules/*/*/"$module".o ]
+        if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
 	    old=`cat /proc/sys/kernel/printk`
 	    echo 0 >/proc/sys/kernel/printk
