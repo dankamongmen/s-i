@@ -18,19 +18,3 @@ if [ -n "$USER" ]; then
 	echo "passwd passwd/username string $USER" >> $f
 	echo "passwd passwd/user-fullname string $USER" >> $f
 fi
-
-if [ -n "$HP_ILO_STAGE2_CD" ]; then
-	# This is a hack, the right way to do it would be to have iLO
-	# connect the virtual CD but not boot from it when booting stage2.
-	# Unfortunatly, my attempts to do that so far have failed. This
-	# might even be due to a d-i bug, it does not seem to load
-	# usb-storage in base-config, however, even with that loaded, the
-	# virtual CD does not show up. There's also a message from hotplug
-	# about "Bad USB agent invocation"..
-	# 
-	# So the hack is to preseed base-config to wget the whole cd image
-	# and loop mount it, and make apt-setup use it as a file uri. Ugh.
-	echo "base-config base-config/early_command string wget $HP_ILO_ISO_URL -O /var/tmp/install.iso; mount -o loop /var/tmp/install.iso /cdrom" >> $f
-	echo "apt-setup apt-setup/uri_type select filesystem" >> $f
-	echo "apt-setup apt-setup/directory string /cdrom" >> $f
-fi
