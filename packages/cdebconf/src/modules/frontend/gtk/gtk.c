@@ -870,6 +870,7 @@ static int gtk_go(struct frontend *obj)
         q = q->next;
     }
     q = obj->questions;
+    gtk_window_set_title(GTK_WINDOW(data->window), obj->title);
     gtk_widget_set_sensitive (data->button_prev, obj->methods.can_go_back(obj, q));
     gtk_widget_show_all(data->window);
     gtk_main();
