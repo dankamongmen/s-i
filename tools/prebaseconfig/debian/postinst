@@ -18,36 +18,10 @@ FQDN=${HOSTNAME}.$RET
 echo "$HOSTNAME" > /target/etc/hostname
 echo "127.0.0.1 $FQDN $HOSTNAME localhost" > /target/etc/hosts
 
+interfaces=/target/etc/network/interfaces
 
-if test "$PROFILE" = "Workstation"; then
-    cat > /target/etc/network/interfaces <<EOF
-# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
-
-# The loopback interface
-auto lo
-iface lo inet loopback
-
-# The first network card - this entry was created during the Debian installation
-iface eth0 inet dhcp
-
-EOF
-elif test "$PROFILE" = "Server"; then
-    cat > /target/etc/network/interfaces <<EOF
-# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
-
-# The loopback interface
-auto lo
-iface lo inet loopback
-
-# The first network card - this entry was created during the Debian installation
-auto eth0
-iface eth0 inet static
-    address 192.168.0.1
-    netmask 255.255.255.0
-
-EOF
-else 
-    cat > /target/etc/network/interfaces <<EOF
+# Every host need the loopback interface
+cat > $interfaces <<EOF
 # /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
 
 # The loopback interface
@@ -56,7 +30,59 @@ iface lo inet loopback
 
 EOF
 
-fi
+# Should it get the information from the netcfg package instead?
+  
+# Hm, what if both server and workstation is choosen?  Choose the
+# server config for eth0.
+for value in `echo $PROFILE |sed 's/ /-/g' | sed 's/,-/ /g'`; do
+    case $value in
+	Workstation)
+ 	    # Use this unless Server also was choosen.
+	    if test -z "$eth0" then
+		eth0=dhcp
+	    fi
+	    ;;
+	Server)
+	    # Override for workstations combining as servers
+	    eth0=10.0.2.2
+	    ;;
+	LTSP-server)
+	    eth1=192.168.0.254
+	    ;;
+     esac
+done
+  
+for interface in eth0 eth1 ; do
+    eval "ifinfo=\$$interface"
+    case $ifinfo in
+	dhcp)
+	    cat >> $interfaces <<EOF
+
+# This entry was created during the Debian installation
+auto $interface
+iface $interface inet dhcp
+EOF
+
+	    ;;
+	[0-9]*)
+	    cat >> $interfaces <<EOF
+
+# This entry was created during the Debian installation
+auto $interface
+iface $interface inet static
+    address $ifinfo
+    netmask 255.255.254.0
+  
+# The commented lines below is to be used if a DHCP server is in use
+#auto $interface
+#iface $interface inet dhcp
+EOF
+	    ;;
+	*)
+	    # Nothing to do?
+	    ;;
+    esac
+done
 
 chroot /target /sbin/grub-install '(hd0)'
 # Pipe from 'yes' to tell grub to create menu.lst when it is missing
