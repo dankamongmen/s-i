@@ -271,12 +271,17 @@ static int check_special(struct package_t *p);
  * just fed recursively through di_config_package.
  */
 static int satisfy_virtual(struct package_t *p) {
-	struct debconfclient *debconf = NULL;
+	struct debconfclient *debconf;
 	struct package_t *dep, *defpkg = NULL;
 	int i;
-	char *choices, *tmp;
+	char *choices, *tmp, *language = NULL;
 	size_t c_size = 1;
 	int is_menu_item = 0;
+
+	debconf = debconfclient_new();
+	debconf->command(debconf, "GET", "debian-installer/language", NULL);
+	if (debconf->value)
+		language = strdup(debconf->value);
 
         if (asprintf(&choices, "") == -1) {
 		return 0;
@@ -309,13 +314,19 @@ static int satisfy_virtual(struct package_t *p) {
 			is_menu_item = 1;
 		if (dep == defpkg) {
 			/* We want the default to be the first item */
-			if (asprintf(&tmp, "%s, %s", dep->description, choices) == -1) {
+			char *entry;
+			entry = menu_entry(debconf, language, dep);
+			if (asprintf(&tmp, "%s, %s", entry, choices) == -1) {
 				return 0;
 			}
+			free(entry);
 		} else {
-			if (asprintf(&tmp, "%s%s, ", choices, dep->description) == -1) {
+			char *entry;
+			entry = menu_entry(debconf, language, dep);
+			if (asprintf(&tmp, "%s%s, ", choices, entry) == -1) {
 				return 0;
 			}
+			free(entry);
 		}
 		free(choices);
 		choices = tmp;
@@ -330,10 +341,13 @@ static int satisfy_virtual(struct package_t *p) {
 			debconf = debconfclient_new();
 			debconf->command(debconf, "FSET", MISSING_PROVIDE, "seen",
 					"false", NULL);
-			if (defpkg != NULL)
-				debconf->command(debconf, "SET", MISSING_PROVIDE,
-						defpkg->description, NULL);
-			else
+			if (defpkg != NULL) {
+				char *entry;
+				entry = menu_entry(debconf, language, defpkg);
+				debconf->command(debconf, "SET",
+						 MISSING_PROVIDE, entry, NULL);
+				free(entry);
+			} else
 				/* TODO: How to figure out a default? */
 				priority = "critical";
 			debconf->command(debconf, "CAPB backup", NULL);
@@ -348,11 +362,14 @@ static int satisfy_virtual(struct package_t *p) {
 		}
 		/* Go through the dependencies again */
 		for (i = 0; p->depends[i] != 0; i++) {
+			char *entry;
 			if ((dep = p->depends[i]->ptr) == NULL)
 				continue;
 			if (!di_pkg_provides(dep, p))
 				continue;
-			if (!is_menu_item || strcmp(debconf->value, dep->description) == 0) {
+			entry = menu_entry(debconf, language, dep);
+			if (!is_menu_item || strcmp(debconf->value, entry) == 0) {
+				free(entry);
 				/* Ick. If we have a menu item it has to match the
 				 * debconf choice, otherwise we configure all of
 				 * the providing packages */
@@ -360,12 +377,13 @@ static int satisfy_virtual(struct package_t *p) {
 					return 0;
 				if (is_menu_item)
 					break;
-			}
+			} else
+				free(entry);
 		}
 	}
-	if (debconf)
-		debconfclient_delete(debconf);
+	debconfclient_delete(debconf);
 	free(choices);
+	free(language);
 	/* It doesn't make sense to configure virtual packages,
 	 * since they are, well, virtual. */
 	p->status = installed;
