@@ -6,17 +6,6 @@
 #include <debian-installer.h>
 #include "anna.h"
 
-static int
-length(struct linkedlist_t *list)
-{
-    struct list_node *node;
-    int i = 0;
-
-    for (node = list->head; node != NULL; node = node->next)
-        i++;
-    return i;
-}
-
 static struct debconfclient *debconf = NULL;
 
 
@@ -34,7 +23,7 @@ choose_retriever(void)
         return 2;
     debconf->command(debconf, "FGET", ANNA_RETRIEVER, "seen", NULL);
     if (strcmp(debconf->value, "false") == 0) {
-        char *defval = get_default_retriever(ret_choices);
+        char *defval = (char *)get_default_retriever(ret_choices);
         struct package_t *p;
 
         if (defval != NULL && (p = di_pkg_find(ret_pkgs, defval))) {
