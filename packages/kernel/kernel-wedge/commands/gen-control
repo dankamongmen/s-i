@@ -140,7 +140,6 @@ foreach my $ver (@versions) {
 		$pkg{Architecture}=$arch;
 		$pkg{orig_package}=$package->("Package");
 		$pkg{Package}=$package->("Package")."-".$kernelversion."-".$flavour."-di";
-		$pkg{Section}="debian-installer";
 		$pkg{'XC-Package-Type'}="udeb";
 		$pkg{'XB-Kernel-Version'}=$kernelversion."-".$flavour;
 
@@ -148,6 +147,10 @@ foreach my $ver (@versions) {
 		
 		print "\n";
 		
+		if ($package->("Section") !~ /debian-installer$/) {
+			$pkg{Section}="debian-installer";
+		}
+
 		if (defined $package->("Depends")) {
 			$pkg{Depends}=join(", ",
 				map { $_."-".$kernelversion."-".$flavour."-di" }
