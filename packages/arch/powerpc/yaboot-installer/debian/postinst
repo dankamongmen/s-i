@@ -260,9 +260,20 @@ disk="`printf %s "$root" | sed 's/[0-9].*//'`"
 
 ofpath="`chroot /target ofpath "$disk"`"
 
-initrd=
-if [ -e /target/initrd.img ]; then
+# TODO: deal with /boot on separate partition
+
+if [ -e /target/boot/vmlinux ]; then
+    kernel=/boot/vmlinux
+else
+    kernel=/vmlinux
+fi
+
+if [ -e /target/boot/initrd.img ]; then
+    initrd=/boot/initrd.img
+elif [ -e /target/initrd.img ]; then
     initrd=/initrd.img
+else
+    initrd=
 fi
 
 # we generate our own yaboot.conf kernel (yabootconfig is horribly broken)
@@ -302,7 +313,7 @@ fi
 
 writeyabootconf <<EOF
 
-image=/vmlinux
+image=$kernel
 	label=linux
 	read-only
 EOF
@@ -318,7 +329,7 @@ EOF
 fi
 writeyabootconf <<EOF
 
-image=/vmlinux.old
+image=$kernel.old
 	label=old
 	read-only
 EOF
