@@ -36,7 +36,6 @@ int get_all_disks(PedDevice *discs[], int max_disks) {
 
 	while((direntry = readdir(devdir)) != NULL) {
 		char *fullname = NULL;
-		PedDevice *pdev;
 
 		if(direntry->d_name[0] == '.')
 			continue;
@@ -44,8 +43,8 @@ int get_all_disks(PedDevice *discs[], int max_disks) {
 		asprintf(&fullname, "%s/%s/%s", "/dev/discs",
 			direntry->d_name, "disc");
 
-		pdev = ped_device_get(fullname);
-		discs[disk_count++] = pdev;
+		if ((discs[disk_count] = ped_device_get(fullname)))
+			disk_count++;
 	}
 
 	closedir(devdir);
