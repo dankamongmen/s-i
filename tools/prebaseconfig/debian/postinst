@@ -67,10 +67,17 @@ logsavedir=/target/var/log/debian-installer
 test -d $logsavedir || mkdir $logsavedir
 cp /var/log/* $logsavedir
 
+# Copy current debconf databse into /target
 cp -a /var/lib/cdebconf /target/root
+
+# Prepare to run base-config after reboot
 mv /target/etc/inittab /target/etc/inittab.real
 cp /usr/share/prebaseconfig/inittab /target/etc/inittab
-umount -a || true
 touch /target/root/dbootstrap_settings
-/sbin/reboot
 
+umount -a || true
+
+# Throw out the CD if installing from CD.
+eject || true
+
+/sbin/reboot
