@@ -4,18 +4,29 @@
  * Copyright (C) 2003, Alastair McKinstry <mckinstry@debian.org>
  * Released under the GNU Public License; see file COPYING for details
  *
- * $Id: efi-reader.c,v 1.1 2003/03/08 14:07:58 mckinstry Exp $
+ * $Id: efi-reader.c,v 1.2 2003/07/29 21:26:22 mckinstry Exp $
  */
 
-#include <linux/efi.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <string.h>
 #include <debian-installer.h>
 #include <cdebconf/common.h>
 #include <cdebconf/commands.h>
 #include <cdebconf/debconfclient.h>
 
+#include "table.h"
+
 /* snarfed from linux kernel efivars.c
  */
+typedef u_int16_t efi_char16_t;
+typedef u_int8_t __u8;
+typedef u_int32_t __u32;
+typedef struct { __u8 b[16]; } efi_guid_t;
+typedef unsigned long efi_status_t;
+
 typedef struct _efi_variable_t {
 	efi_char16_t  VariableName[1024/sizeof(efi_char16_t)];
 	efi_guid_t    VendorGuid;
@@ -35,20 +46,19 @@ int get_efi_lang_code (char *lang_code)
 {
 	int fd, err, sz;
 	efi_variable_t var_data;
-	char *result;
 
 	/* Snarfed variable def. from linux/arch/ia64/kernel/efivars.c
 	 * Probably should check out a more official interface, in case the format
 	 * of /proc changes.
 	 */
-	fd = open ("/proc/efi/vars/Lang-8be4df61-93ca-11d2-aa0d-00e098032b8c");
+	fd = open ("/proc/efi/vars/Lang-8be4df61-93ca-11d2-aa0d-00e098032b8c", O_RDONLY);
 	if (fd < 0) {
 		err = errno;
 		di_log ("Failed to open /proc/efi/vars/Lang-*");
-		di_log (perror (errno));
+		di_log (strerror (err));
 		return 1;
 	}
-	sz = read (fd, (void *) var_data, sizeof (efi_variable_t));
+	sz = read (fd, &var_data, sizeof (efi_variable_t));
 	close (fd);
 	if (sz == sizeof (efi_variable_t)) { // success
 		strncpy (lang_code, var_data.Data, 3);
@@ -65,7 +75,7 @@ char *two_code (char *three_code)
 {
 	int t = 0;
 	while (trans_table[t].threecode != '\0' ) {
-		if (strcmp (argv[1], trans_table[t].threecode) == 0) 
+		if (strcmp (three_code, trans_table[t].threecode) == 0) 
 			return trans_table[t].twocode;
 		t++;
 	}
@@ -79,14 +89,14 @@ char *two_code (char *three_code)
 int main (int argc, char *argv[])
 {
 	char lang_code[4];
-	static struct denconfclient *client;
+	static struct debconfclient *client;
 
 	client = debconfclient_new ();
-	if (get_efi_lang_code[lang_code]) 
+	if (get_efi_lang_code(lang_code)) 
 		exit (1);
 	client->command (client, "set", "debian-installer/language",
 			two_code (lang_code), NULL);
-
+	exit (0);
 }  
 
 
