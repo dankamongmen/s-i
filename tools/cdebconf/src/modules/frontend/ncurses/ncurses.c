@@ -237,17 +237,11 @@ static int nchandler_boolean(struct frontend *ui, struct question *q)
 	char *value = "true";
 	int ret = 0, ans, pos = 2;
 	int ybut = UIDATA(ui)->qrylines - 6;
-	char *dft;
+	char *dft = question_getvalue(q, "");
 	WINDOW *win = UIDATA(ui)->qrywin;
 
-	if (q->value != 0 && *q->value != 0)
-		value = q->value;
-	else
-	{
-		dft = (char *) q->template->lget(q->template, NULL, "value");
-		if (dft != 0 && *dft != 0)
-			value = dft;
-	}
+	if (dft)
+		value = dft;
 
 	ans = (strcmp(value, "true") == 0);
 
