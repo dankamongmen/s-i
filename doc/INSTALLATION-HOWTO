@@ -105,29 +105,32 @@ floppy-image on it.
 2.3 USB memory stick
 
 It's also possible to install from removable USB storage devices. For
-example a USB keychain can make a handy Debian install medium you can take
-with you anywhere. Your USB memory stick must have a DOS partition on it
-for this method to work. Most come with such a partition by default.
+example a USB keychain can make a handy Debian install media the you
+can take with you anywhere.
 
-To prepare your USB memory stick, download hd-media-initrd.gz and
-save it to a file named "initrd.gz" on the USB device. Make sure that the
-compressed image is not transparently decompressed by your browser.
+The easiest way to prepare your USB memory stick is to download
+hd-media-image.img.gz, and use gunzip to extract the 128 MB image from that
+file. Write this image directly to your memory stick, which must be at
+least 128 mb in size. Of course this will destroy anything already on the
+memory stick. Then mount the memory stick, which will now have a FAT
+filesystem on it. Next, download a Debian netinst CD image, and copy that
+file to the memory stick; any filename is ok as long as it ends in ".iso".
 
-You must also include a Debian netinst CD image on your memory stick. See
-section 2.1 for details. Place the downloaded ISO on your memory stick; 
-any filename is ok as long as it ends in ".iso".
+Alternatively, if you're using linux and familiar with loopback mounting,
+it can be quicker to loop mount the disk image, copy the iso into it, and
+only then write the complete image to the memory stick.
 
-Some BIOSes can boot USB storage directly, and some cannot.
+There are other, more flexible ways to set up a memory stick to use the
+Debian installer, and it's possible to get it to work with smaller memory
+sticks. This web page has more complete directions for using
+debian-installer and a bootable USB stick: http://d-i.pascal.at/
 
 2.3.1 Booting directly from USB storage
 
-Copy the debian-installer kernel (the vmlinuz file in the same place you
-got the initrd) onto the memory stick. Then install syslinux or another
-boot loader. You may need to configure your BIOS to allow booting from the
-USB device.
-
-This web page has more complete directions for using debian-installer
-and a bootable USB stick: http://d-i.pascal.at/
+Some BIOSes can boot USB storage directly, and some cannot. You may need
+to configure your BIOS to boot from a "removable drive" or even a "ZIP
+disk" to get it to boot from the USB device. The web site above has more
+information and some helpful hints about booting.
 
 2.3.2 Using USB storage and a boot floppy
 
@@ -136,8 +139,7 @@ to access your USB memory stick. To boot the installer this way, you will
 need to put the bootfloppy-image.img on a floppy (see section 2.2).
 
 Now boot from the floppy with the bootfloppy-image on it. It should detect
-your USB device and mount the initrd.gz, which will in turn find the ISO.
-After that things will proceed the same as if you had booted from CD.
+your USB device and proceed with booting from it.
 
 2.4 Booting from Network
 
@@ -190,9 +192,7 @@ you select "Finish". Do this when you are sure that you have found a
 suitable setup for your partitions and answer the next question with "Yes".
 
 Now debian-installer starts to install the base system which can take a
-while. After that you will be prompted for the kernel to install which will
-leave you most probably with only one choice. Select it and wait until the
-kernel is installed on your harddisk.
+while. That is followed by installing a kernel.
 
 The last step is to install a boot loader. You will be prompted for
 the bootblock, where LILO should be installed. It defaults to the
