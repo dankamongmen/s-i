@@ -17,7 +17,37 @@ AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_ISC_POSIX
 
-dnl Checks for libraries.
+AC_CHECK_PROG(HAVESED,sed,yes,no)
+
+test "$HAVESED" = "yes" || exit 1
+
+dnl setup source and build paths
+TOPDIR=$(dirname $0)
+if [[ "$TOPDIR" = "${TOPDIR#/}" ]]; then
+	# not absolute, resolve it 
+	TOPDIR=$(readlink -f $(dirname $(pwd)/$0))
+fi
+AC_SUBST(TOPDIR)
+BUILDDIR=$(pwd)
+AC_SUBST(BUILDDIR)
+
+if [[ "$TOPDIR" != "$BUILDDIR" ]]; then
+	echo "Symlinking source tree..."
+	for f in $(find "$TOPDIR" -path "$BUILDDIR" -prune -o -path "*CVS*" -prune -o -type f); do
+		destdir=$(dirname $(echo $f | sed -e "s,$TOPDIR,$BUILDDIR,"))
+		[[ -d $destdir ]] || mkdir -p $destdir
+		[[ -e $destdir/$(basename $f) ]] || ln -s $f $destdir
+	done
+fi
+
+dnl udeb or regular build?
+AC_ARG_WITH(target,[  --with-target          normal (default) or udeb])
+if test "$withval" = "udeb"; then
+  TARGET=udeb
+else
+  TARGET=normal
+fi
+AC_SUBST(TARGET)
 
 dnl Enable debugging?
 AC_ARG_WITH(debug,[  --without-debug         turn off debugging?])

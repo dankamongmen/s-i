@@ -8,34 +8,62 @@
 # This is the debhelper compatability version to use.
 export DH_COMPAT=2
 
-PACKAGE=$(shell dh_listpackages)
+topdir=$(shell pwd)
+udebbuild=$(topdir)/debian/build-udeb
+debbuild=$(topdir)/debian/build
+
+PACKAGE=cdebconf
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
-
-build: build-stamp
-build-stamp:
-	dh_testdir
-	CFLAGS="-Os -fomit-frame-pointer" \
-		./configure --without-rpath --with-conffile=etc/debconf.conf
-	#	./configure --without-rpath --with-conffile=/etc/debconf.conf
-	$(MAKE)
-	touch build-stamp
+CONFFILE=etc/debconf.conf
+#CONFFILE=/etc/debconf.conf
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
+	rm -f *-stamp
 	-$(MAKE) distclean
+	-rm -rf $(udebbuild)
+	-rm -rf $(debbuild)
 	dh_clean
+
+build-udeb: build-udeb-stamp
+build-udeb-stamp:
+	dh_testdir
+	[ -d $(udebbuild) ] || mkdir -p $(udebbuild)
+	(cd $(udebbuild); CFLAGS="-Os -fomit-frame-pointer" \
+		$(topdir)/configure --prefix=/usr --without-rpath \
+		--with-target=udeb --with-conffile=$(CONFFILE))
+	(cd $(udebbuild); $(MAKE) clean; $(MAKE))
+	touch $@
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	[ -d $(debbuild) ] || mkdir -p $(debbuild)
+	(cd $(debbuild); CFLAGS="-O2" \
+		$(topdir)/configure --prefix=/usr --without-rpath \
+		--with-conffile=$(CONFFILE))
+	(cd $(debbuild); $(MAKE) clean; $(MAKE))
+	touch $@
+
+install-udeb: build-udeb
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	(cd $(udebbuild); $(MAKE) install prefix=$(shell pwd)/debian/cdebconf-udeb/usr)
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs 
-	$(MAKE) install prefix=$(shell pwd)/debian/cdebconf
+	(cd $(debbuild); $(MAKE) install prefix=$(shell pwd)/debian/cdebconf/usr)
+	dh_movefiles -pcdebconf-dev --sourcedir=debian/cdebconf \
+		usr/lib/*.so usr/include/cdebconf
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -44,19 +72,51 @@ binary-indep: build install
 # Build architecture-dependent files here.
 #
 # Note that this builds a .udeb, which is not policy compliant or anything.
-binary-arch: build install
+binary-arch: cdebconf cdebconf-udeb
+
+cdebconf: install
+	@echo "Building $@"
 	dh_testdir
 	dh_testroot
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
+	dh_installdirs
+	dh_installdocs		-p$@ doc/*
+	dh_installchangelogs	-p$@
+	dh_strip		-p$@
+	dh_compress		-p$@
+	dh_fixperms		-p$@
+	dh_installdeb		-p$@
+	dh_shlibdeps		-p$@
+	dh_gencontrol		-p$@
+	dh_md5sums		-p$@
+	dh_builddeb		-p$@
+
+	dh_installdocs		-p$@-dev
+	dh_installchangelogs	-p$@-dev
+	#dh_strip		-p$@-dev
+	dh_compress		-p$@-dev
+	dh_fixperms		-p$@-dev
+	dh_installdeb		-p$@-dev
+	#dh_shlibdeps		-p$@-dev
+	dh_gencontrol		-p$@-dev
+	dh_md5sums		-p$@-dev
+	dh_builddeb		-p$@-dev
+
+cdebconf-udeb: install-udeb
+	@echo "Building $@"
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	dh_strip		-p$@
+	dh_compress		-p$@
+	dh_fixperms		-p$@
+	dh_installdeb		-p$@
+	dh_shlibdeps		-p$@
 	# Don't write your stupid guesses to debian/files.
-	dh_gencontrol -- -fdebian/files~
+	dh_gencontrol 		-p$@ -- -fdebian/files~
 	# Register file manually.
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
+	dpkg-distaddfile	$(FILENAME) debian-installer $(PRIORITY)
+	dh_md5sums		-p$@
+	dh_builddeb		-p$@ --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

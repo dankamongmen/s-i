@@ -44,6 +44,10 @@ install:
 	install -m 644 debconf.conf-dist ${etcdir}/debconf.conf
 	install -m 644 client/confmodule ${sharedir}
 	ln -sf ../../bin/$(DEBCONF) ${sharedir}/frontend
+ifneq ($(TARGET),udeb)
+	install -d -m 755 ${incdir}
+	install -m 644 *.h ${incdir}
+endif
 	@$(MAKE) -C modules $@
 
 clean:
