@@ -30,6 +30,8 @@
 const int RAISE = 1;
 const int LOWER = 0;
 
+#define UNUSED_VARIABLE(var) (void)var
+
 /* Save default priority, to be able to return to it when we have to lower it */
 int default_priority = 1;
 
@@ -237,7 +239,7 @@ static int check_special(di_system_package *p);
 static int satisfy_virtual(di_system_package *p) {
 	di_slist_node *node;
 	di_system_package *dep, *defpkg = NULL;
-	char *choice = NULL, *language = NULL;
+	char *language = NULL;
 	char buf[256], *menu, *s = NULL;
 	size_t menu_size, menu_used, size;
 	int is_menu_item = 0;
@@ -426,7 +428,7 @@ static void modify_debconf_priority (int raise_or_lower) {
 	if ( ! debconf->value )
 		pri = 1;
 	else
-		for (pri = 0; pri < ARRAY_SIZE(debconf_priorities); ++pri) {
+		for (pri = 0; (size_t)pri < ARRAY_SIZE(debconf_priorities); ++pri) {
 			if (0 == strcmp(debconf->value,
 					debconf_priorities[pri]) )
 				break;
@@ -457,7 +459,7 @@ static void adjust_default_priority (void) {
 	if ( ! debconf->value )
 		pri = 1;
 	else
-	    for (pri = 0; pri < ARRAY_SIZE(debconf_priorities); ++pri) {
+	    for (pri = 0; (size_t)pri < ARRAY_SIZE(debconf_priorities); ++pri) {
 		if (0 == strcmp(debconf->value,
 				debconf_priorities[pri]) )
 		    break;
@@ -475,6 +477,7 @@ int main (int argc, char **argv) {
 	di_packages *packages;
 	di_packages_allocator *allocator;
 	int ret;
+	UNUSED_VARIABLE(argc);
 
 	debconf = debconfclient_new();
 	di_system_init(basename(argv[0]));
