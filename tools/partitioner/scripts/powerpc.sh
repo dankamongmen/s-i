@@ -9,6 +9,8 @@ case "`/usr/bin/ppcdetect`" in
 "CHRP Pegasos")
 	parted $DISK
 	;;
+"Amiga")
+	parted $DISK
 *)
 	fdisk $DISK
 	;;
