@@ -55,12 +55,6 @@ done
 
 echo "$available" >$dev/$id/available_filesystems
 
-if [ -f $id/acting_filesystem ]; then
-    old_acting=$(cat $id/acting_filesystem)
-else
-    old_acting=''
-fi
-
 # The outer echo removes the spaces
 case $(echo $(echo "$available" | wc -l)) in
     0)
@@ -82,14 +76,18 @@ case $(echo $(echo "$available" | wc -l)) in
 	;;
 esac
 
+
+open_dialog PARTITION_INFO $id
+read_line num id size type fs path name
+close_dialog
+
 if
     [ -f $dev/$id/acting_filesystem ] \
 	&& new_acting=$(cat $dev/$id/acting_filesystem) \
-	&& [ "$old_acting" != "$new_acting" ] \
-	&& [ -f /lib/partman/parted_names/$new_acting ]
+	&& [ -f /lib/partman/parted_names/$new_acting ] \
+	&& new_fs=$(cat /lib/partman/parted_names/$new_acting) \
+	&& [ "$fs" != "$new_fs" ]
 then
-    parted_name=$(cat /lib/partman/parted_names/$new_acting)
-    open_dialog CHANGE_FILE_SYSTEM $id $parted_name
+    open_dialog CHANGE_FILE_SYSTEM $id $new_fs
     close_dialog
 fi
-
