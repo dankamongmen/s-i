@@ -23,7 +23,6 @@ close IN;
 # Slurp in the mirror file.
 my %data;
 my $site;
-my %used_country;
 open (IN, "Mirrors.masterlist") or die "Mirrors.masterlist: $!";
 while (<IN>) {
 	chomp;
@@ -36,7 +35,6 @@ while (<IN>) {
 		elsif (lc $key eq 'country') {
 			$value =~ s/ .*//;
 			$value = lc $value;
-			$used_country{$value}=1;
 			$data{$site}->{$key} = $codetocountry{$value};
 		}
 		else {
@@ -46,25 +44,10 @@ while (<IN>) {
 }
 close IN;
 
-# Output an array of all the countries that have mirrors. It is sorted
-# lexically.
-#
-# FIXME:  It should only print countries which have mirrors of $type.  
-#
-# Test case: Norway, only has FTP, not HTTP.
-#
 open (OUT, ">mirrors_$type.h") or die "mirrors_$type.h: $!";
 print OUT "/* Automatically generated; do not edit. */\n";
-print OUT "static char *countries_$type\[] = {\n";
-foreach my $country (sort map $codetocountry{$_}, keys %used_country) {
-	print OUT "\t\"$country\",\n";
-}
-# TODO: not only do we need to support i18n of this next line, but all the
-# country names need to be i8n'd too (sigh).
-print OUT "\t\"enter information manually\",\n";
-print OUT "\tNULL\n};\n";
 
-# Rate mirrors -- push-primary mirrors are best, primary are second best.
+# Rate mirrors: push-primary mirrors are best, primary are second best.
 foreach my $site (keys %data) {
 	my $rating=0;
 	if (exists $data{$site}->{type}) {
@@ -75,13 +58,30 @@ foreach my $site (keys %data) {
 }
 
 # Now output the mirror list. It is ordered with better mirrors near the top.
+my %used_country;
 print OUT "static struct mirror_t mirrors_$type\[] = {\n";
 my $q='"';
 foreach my $site (sort { $data{$b}->{rating} <=> $data{$a}->{rating} } keys %data) {
+	next unless exists $data{$site}->{"archive-$type"} and
+		    exists $data{$site}->{country};
 	print OUT "\t{",
 		  join(", ", $q.$site.$q, $q.$data{$site}->{country}.$q,
 			$q.$data{$site}->{"archive-$type"}.$q),
-		  "},\n" if exists $data{$site}->{"archive-$type"};
+		  "},\n";
+	$used_country{$data{$site}->{country}}=1;
 }
 print OUT "\t{NULL, NULL, NULL}\n";
 print OUT "};\n";
+
+# Output an array of all the countries that have mirrors of the given type. 
+# It is sorted lexically.
+print OUT "static char *countries_$type\[] = {\n";
+foreach my $country (sort keys %used_country) {
+	print OUT "\t\"$country\",\n";
+}
+# TODO: not only do we need to support i18n of this next line, but all the
+# country names need to be i8n'd too (sigh).
+print OUT "\t\"enter information manually\",\n";
+print OUT "\tNULL\n};\n";
+
+close OUT;
