@@ -492,8 +492,21 @@ humandev () {
 	    db_metaget partman/text/raid_device description
 	    printf "$RET" ${type} ${device}
 	    ;;
+	/dev/mapper/*)
+	    # LVM2 devices are found as /dev/mapper/<vg>-<lv>.  If the vg
+	    # or lv contains a dash, the dash is replaced by two dashes.
+	    # In order to decode this into vg and lv, first find the
+	    # occurance of one single dash to split the string into vg and
+	    # lv, and then replace two dashes next to each other with one.
+	    vglv=${1#/dev/mapper/}
+	    vglv=`echo "$vglv" | sed -e 's/\([^-]\)-\([^-]\)/\1 \2/' | sed -e 's/--/-/g'`
+	    vg=`echo "$vglv" | cut -d" " -f1`
+	    lv=`echo "$vglv" | cut -d" " -f2`
+	    db_metaget partman/text/lvm_lv description
+	    printf "$RET" $vg $lv
+	    ;;
 	*)
-	    # Check if it's an LVM device
+	    # Check if it's an LVM1 device
 	    vg=`echo "$1" | sed -e 's,/dev/\([^/]\+\).*,\1,'`
 	    lv=`echo "$1" | sed -e 's,/dev/[^/]\+/,,'`
 	    if [ -e "/proc/lvm/VGs/$vg/LVs/$lv" ] ; then
