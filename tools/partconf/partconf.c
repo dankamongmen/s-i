@@ -425,7 +425,8 @@ mountpoint(void)
 
     debconf->command(debconf, "GET", curr_q, NULL);
     if (strcmp(debconf->value, "Leave the file system intact") == 0) {
-        // Do nothing
+        free(curr_part->op.filesystem);
+        curr_part->op.filesystem = NULL;
     }
     else if (strcmp(debconf->value, "Create swap space") == 0) {
         free(curr_part->op.filesystem);
