@@ -39,15 +39,17 @@ ttyS*)
 	echo "$console" >> /target/etc/securetty
     fi
 
-    sed -e "s/^\([23]\):/#\1:/" \
-        -e "s#CONSOLEDEV#/dev/$console#g" \
-	/usr/share/prebaseconfig/inittab > /target/etc/inittab
+# Post beta4
+#    sed -e "s/^\([23]\):/#\1:/" \
+#        -e "s#CONSOLEDEV#/dev/$console#g" \
+#	/usr/share/prebaseconfig/inittab > /target/etc/inittab
 ;;
 *)
     mv /target/etc/inittab /target/etc/inittab.real
-    sed -e "s#CONSOLEDEV#/dev/$console#g" /usr/share/prebaseconfig/inittab \
-        > /target/etc/inittab
+#    sed -e "s#CONSOLEDEV#/dev/$console#g" /usr/share/prebaseconfig/inittab \
+#        > /target/etc/inittab
 ;;
 esac
 
-
+# Remove this post beta4
+cp /usr/share/prebaseconfig/inittab /target/etc/inittab
