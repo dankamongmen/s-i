@@ -222,7 +222,7 @@ void di_vlog (di_log_level_flags log_level, const char *format, va_list args)
   char buf[1024];
   int fatal = log_level & DI_LOG_FATAL_MASK;
   di_log_handler *log_func;
-  void *user_data;
+  void *user_data=0;
 
   vsnprintf (buf, sizeof (buf), format, args);
 
