@@ -36,35 +36,30 @@ int default_priority = 1;
 /* Save priority set by main-menu to detect priority changes from the user */
 int local_priority = -1;
 
-static int check_script(struct package_t *p, char *scriptname);
-
 static struct linkedlist_t *packages;
 
-#ifdef DODEBUG
-static int do_system(const char *cmd) {
-	DPRINTF("cmd is %s\n", cmd);
-	return system(cmd);
-}
-#endif
+static struct debconfclient *debconf;
 
 /*
  * qsort comparison function (sort by menu item values, fall back to
  * lexical sort to resolve ties deterministically).
  */
-int compare (const void *a, const void *b) {
-	/* Sometimes, I wish I was writing perl. */
-	int r=(*(struct package_t **)a)->installer_menu_item -
-	      (*(struct package_t **)b)->installer_menu_item;
+int package_array_compare (const void *v1, const void *v2) {
+        di_system_package *p1, *p2;
+
+        p1 = *(di_system_package **)v1;
+        p2 = *(di_system_package **)v2;
+
+	int r = p1->installer_menu_item - p2->installer_menu_item;
 	if (r) return r;
-	return strcmp((*(struct package_t **)b)->package,
-		      (*(struct package_t **)a)->package);
+	return strcmp(p1->p.package, p2->p.package);
 }
 
-int isdefault(struct package_t *p) {
+int isdefault(di_package *p) {
 	int check;
 
-	check = check_script(p, "menutest");
-	if (check == 1 || p->status == unpacked || p->status == half_configured) {
+        check = di_system_dpkg_package_control_file_exec(p, "menutest", 0, NULL);
+	if (!check || p->status == di_package_status_unpacked || p->status == di_package_status_half_configured) {
 		return 1;
 	}
 	else {
@@ -72,47 +67,18 @@ int isdefault(struct package_t *p) {
 	}
 }
 
-
-/* Calls a control skript and passes its exit status
- * Returns :
- *  0  if selected script returns false or something goes wrong
- *  1  if selected script return true
- * -1 if selected script is not present 
- */
-static int check_script(struct package_t *p, char *scriptname) {
-	char *script, *cmd;
-	struct stat statbuf;
-	int ret;
-
-	if (asprintf(&script, DPKGDIR "info/%s.%s", p->package, scriptname) == -1) {
-		return 0;
-	}
-	if (stat(script, &statbuf) == 0) {
-		if (asprintf(&cmd, "exec %s >/dev/null 2>&1", script) == -1) {
-			return 0;
-		}
-		ret = !SYSTEM(cmd);
-		free(cmd);
-	}
-	else {
-		ret = -1;
-	}
-	free(script);
-	return ret;
-}
-
 /* Expects a topologically ordered linked list of packages. */
-static struct package_t *
-get_default_menu_item(struct linkedlist_t *list)
+static di_package *
+get_default_menu_item(di_slist *list)
 {
-	struct package_t *p, *q;
-	struct list_node *node;
-	int i, cont;
+	di_package *p;
+	di_slist_node *node, *node1;
+	int cont;
 
 	/* Traverse the list, return the first menu item that isn't installed */
 	for (node = list->head; node != NULL; node = node->next) {
-		p = (struct package_t *)node->data;
-		if (!p->installer_menu_item || p->status == installed || !check_script(p, "isinstallable"))
+		p = node->data;
+		if (!((di_system_package *)p)->installer_menu_item || p->status == di_package_status_installed || !di_system_dpkg_package_control_file_exec(p, "isinstallable", 0, NULL))
 			continue;
 		/* If menutest says this item should be default, make it so */
 		if (!isdefault(p))
@@ -121,9 +87,9 @@ get_default_menu_item(struct linkedlist_t *list)
                 /* Check if a "parallel" package is installed
 		 * (netcfg-{static,dhcp} and {lilo,grub}-installer are
 		 * examples of parallel packages */
-		for (i = 0; p->provides[i] != NULL; i++) {
-			q = p->provides[i]->ptr;
-			if (q != NULL && di_pkg_is_installed(q)) {
+                for (node1 = p->depends.head; node1; node1 = node1->next) {
+                        di_package_dependency *d = node->data;
+                        if (d->type == di_package_dependency_type_provides && d->ptr->status == di_package_status_installed) {
 				cont = 1;
 				break;
 			}
@@ -137,107 +103,104 @@ get_default_menu_item(struct linkedlist_t *list)
 
 /* Return the text of the menu entry for PACKAGE, translated to
    LANGUAGE if possible.  */
-static char *menu_entry(struct debconfclient *debconf, char *language,
-			struct package_t *package)
+static size_t menu_entry(struct debconfclient *debconf, char *language, di_package *package, char *buf, size_t size)
 {
-	char *entry = NULL, *question;
+	char question[256];
 
-	asprintf(&question, "debian-installer/%s/title", package->package);
+	snprintf(question, sizeof(question), "debian-installer/%s/title", package->package);
 	if (language) {
-		char *field;
+		char field[128];
 
-		asprintf(&field, "Description-%s.UTF-8", language);
+		snprintf(field, sizeof (128), "Description-%s.UTF-8", language);
 		if (!debconf_metaget(debconf, question, field))
-			entry = strdup(debconf->value);
-		free(field);
+                {
+			strncpy(buf, debconf->value, size);
+                        return strlen (buf);
+                }
 	}
-	if (entry == NULL && !debconf_metaget(debconf, question, "Description"))
-		entry = strdup(debconf->value);
-	free(question);
+	if (!debconf_metaget(debconf, question, "Description"))
+        {
+                strncpy(buf, debconf->value, size);
+                return strlen (buf);
+        }
 
 	/* The following fallback case can go away once all packages
 	   have transitioned to the new form.  */
-	if (entry == NULL) {
-		di_logf("Falling back to the package description for %s",
-			package->package);
-		entry = strdup(package->description);
-	}
-	return entry;
+        di_log(DI_LOG_LEVEL_INFO, "Falling back to the package description for %s", package->package);
+        strncpy(buf, package->description, size);
+        return strlen (buf);
 }
 
 /* Displays the main menu via debconf and returns the selected menu item. */
-struct package_t *show_main_menu(struct linkedlist_t *list) {
-	static struct debconfclient *debconf = NULL;
+di_package *show_main_menu(di_packages *packages, di_packages_allocator *allocator) {
 	char *language = NULL;
-	struct package_t **package_list, *p;
-	struct linkedlist_t *olist;
-	struct list_node *node;
-        struct package_t *menudefault = NULL, *ret = NULL;
+	di_package **package_array, *p;
+	di_slist *list;
+	di_slist_node *node;
+        di_package *menudefault = NULL, *ret = NULL;
 	int i = 0, num = 0;
-	char *s;
-	char menutext[1024];
+	char buf[256], *menu, *s;
+        int menu_size, menu_used, size;
 
-	if (! debconf)
-		debconf = debconfclient_new();
-	
 	debconf->command(debconf, "GET", "debian-installer/language", NULL);
 	if (language)
 		free(language);
         if (debconf->value)
           language = strdup(debconf->value);
-	/* Make a flat list of the packages. */
-	for (node = list->head; node; node = node->next) {
-		p = (struct package_t *)node->data;
-		if (p->installer_menu_item)
+
+	for (node = packages->list.head; node; node = node->next) {
+		p = node->data;
+		if (((di_system_package *)p)->installer_menu_item)
 			num++;
 	}
-	package_list = malloc(num * sizeof(struct package_t *));
-	for (node = list->head; node; node = node->next) {
-		p = (struct package_t *)node->data;
-		if (p->installer_menu_item)
-			package_list[i++] = (struct package_t *)node->data;
+	package_array = di_new (di_package *, num + 1);
+        package_array[num] = NULL;
+	for (node = packages->list.head; node; node = node->next) {
+		p = node->data;
+		if (((di_system_package *)p)->installer_menu_item)
+			package_array[i++] = node->data;
 	}
 	
 	/* Sort by menu number. */
-	qsort(package_list, num, sizeof(struct package_t *), compare);
-	
+	qsort(package_array, num, sizeof (di_package *), package_array_compare);
+
 	/* Order menu so depended-upon packages come first. */
 	/* The menu number is really only used to break ties. */
-	olist = di_pkg_toposort_arr(package_list, num);
+	list = di_packages_resolve_dependencies_array (packages, package_array, allocator);
 
 	/*
 	 * Generate list of menu choices for debconf.
 	 */
-	s = menutext;
-	for (node = olist->head; node != NULL; node = node->next) {
-		char *entry;
-		p = (struct package_t *)node->data;
-		if (!p->installer_menu_item || !check_script(p, "isinstallable"))
+        menu = di_malloc(1024);
+        menu[0] = '\0';
+        menu_size = 1024;
+        menu_used = 1;
+	for (node = list->head; node != NULL; node = node->next) {
+		p = node->data;
+		if (!((di_system_package *)p)->installer_menu_item || !check_script(p, "isinstallable"))
 			continue;
-		entry = menu_entry(debconf, language, p);
-		strcpy(s, entry);
-		s += strlen(entry);
-		*s++ = ',';
-		*s++ = ' ';
-		free(entry);
+		size = menu_entry(debconf, language, p, buf, sizeof (buf));
+                if (menu_used + size + 2 > menu_size)
+                {
+                  menu_size += 1024;
+                  menu = di_realloc(ret, menu_size);
+                }
+                strcat(menu, buf);
+                menu_used += size + 2;
+                if (node->next)
+                  strcat(menu, ", ");
 	}
-	/* Trim trailing ", " */
-	if (s > menutext)
-		s = s - 2;
-	*s = 0;
-	s = menutext;
-	menudefault = get_default_menu_item(olist);
-	free(olist);
+	menudefault = get_default_menu_item(list);
+	di_slist_free(list);
 
 	/* Make debconf show the menu and get the user's choice. */
         debconf->command(debconf, "SETTITLE", "debian-installer/main-menu-title", NULL);
 	debconf->command(debconf, "CAPB", NULL);
 	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
-	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
+	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menu, NULL);
 	if (menudefault) {
-		char *entry = menu_entry(debconf, language, menudefault);
-		debconf->command(debconf, "SET", MAIN_MENU, entry, NULL);
-		free(entry);
+                menu_entry(debconf, language, menudefault, buf, sizeof (buf));
+		debconf->command(debconf, "SET", MAIN_MENU, buf, NULL);
 	}
 	debconf->command(debconf, "INPUT", "medium", MAIN_MENU, NULL);
 	debconf->command(debconf, "GO", NULL);
@@ -246,23 +209,19 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	
 	/* Figure out which menu item was selected. */
 	for (i = 0; i < num; i++) {
-		char *entry;
-		p = package_list[i];
-		entry = menu_entry(debconf, language, p);
-		if (strcmp(entry, s) == 0) {
-			free(entry);
+		p = package_array[i];
+		menu_entry(debconf, language, p, buf, sizeof (buf));
+		if (strcmp(buf, s) == 0) {
 			ret = p;
 			break;
 		}
-		free(entry);
 	}
-	free(s);
 	free(language);
-	free(package_list);
+	free(package_array);
 	return ret;
 }
 
-static int check_special(struct package_t *p);
+static int check_special(di_package *p);
 
 /*
  * Satisfy the dependencies of a virtual package. Its dependencies
@@ -270,7 +229,7 @@ static int check_special(struct package_t *p);
  * question for the user to pick and choose. Other dependencies are
  * just fed recursively through di_config_package.
  */
-static int satisfy_virtual(struct package_t *p) {
+static int satisfy_virtual(di_package *p) {
 	struct debconfclient *debconf;
 	struct package_t *dep, *defpkg = NULL;
 	int i;
@@ -283,9 +242,6 @@ static int satisfy_virtual(struct package_t *p) {
 	if (debconf->value)
 		language = strdup(debconf->value);
 
-        if (asprintf(&choices, "") == -1) {
-		return 0;
-	}
 	/* Compile a list of providing package. The default choice will be the
 	 * package with highest priority. If we have ties, menu items are
 	 * preferred. If we still have ties, the default choice is arbitrary */
@@ -521,9 +477,13 @@ static void adjust_default_priority (void) {
 }
 
 int main (int argc, char **argv) {
-	struct package_t *p;
+	di_package *p;
+        di_packages *packages;
+        di_packages_allocator *allocator;
 	int ret;
 
+        debconf = debconfclient_new();
+	
 	/* This spawns a process that traps all stderr from the rest of
 	 * main-menu and the programs it calls, storing it in STDERR_LOG. */
 	intercept_stderr();
@@ -531,7 +491,7 @@ int main (int argc, char **argv) {
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
 
-	packages = di_status_read();
+	packages = di_system_packages_status_read_file();
 	while ((p=show_main_menu(packages))) {
 		ret = do_menu_item(p);
 		adjust_default_priority();
