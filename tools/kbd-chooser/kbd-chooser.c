@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.20 2003/03/25 18:49:06 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.21 2003/03/25 21:26:23 mckinstry Exp $
  */
 
 #include "config.h"
@@ -219,7 +219,6 @@ void maplist_select (maplist_t *maplist)
 			s = buf;
 		s = insert_description (s, mp->name, mp->description);
 		score = locale_list_compare (mp->langs);
-		printf ("FIXME: Comparing %s, score %d\n", mp->langs, score);
 		if (score > best) {
 			best = score;
 			preferred = mp;
@@ -234,7 +233,6 @@ void maplist_select (maplist_t *maplist)
 	if (best > 0) {
 		s = insert_description (deflt, preferred->name, preferred->description);
 		*s = '\0';
-		printf ("FIXME: Setting default : %s %s \n", template, deflt);
 		mydebconf_default_set (template, deflt);
 	}
 }
@@ -553,7 +551,7 @@ int keymap_select (char *arch, char *keymap)
 		mydebconf_default_set (template, preferred);
 	}
 	
-	res = mydebconf_ask (kb->deflt ? "low" : "medium", template, &ptr);
+	res = mydebconf_ask ("medium", template, &ptr);
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
 	keymap = ( strlen(ptr) == 0) ? "none" : extract_name (keymap, ptr);
