@@ -1,10 +1,8 @@
-# TODO: the ../../tools/cdebconf bits are temporary, until there is a -dev
-# package.
 ARCH=$(shell dpkg --print-architecture)
-CFLAGS=-Wall -g -D_GNU_SOURCE -I../../tools/cdebconf/src -DARCH=\"$(ARCH)\"
+CFLAGS=-Wall -g -D_GNU_SOURCE -DARCH=\"$(ARCH)\"
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=wget-retriever
-LIBS=-L../../tools/cdebconf/src -ldebconf
+LIBS=-ldebconf
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG

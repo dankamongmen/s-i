@@ -3,7 +3,7 @@
  * Copyright 2000 Joey Hess <joeyh@debian.org>, GPL'd
  */
 
-#include <debconfclient.h>
+#include <cdebconf/debconfclient.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

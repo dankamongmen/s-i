@@ -2,7 +2,7 @@
  * Mirror selection via debconf.
  */
 
-#include <debconfclient.h>
+#include <cdebconf/debconfclient.h>
 #include <string.h>
 #include <stdlib.h>
 #include "mirrors.h"
