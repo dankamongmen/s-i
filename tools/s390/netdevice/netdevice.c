@@ -37,10 +37,10 @@ static char *my_debconf_input (char *priority, char *question)
 
 	snprintf (template, 256, TEMPLATE_PREFIX "%s", question);
 
-	client->command(client, "fset", template, "seen", "false", NULL);
-	client->command(client, "input", priority, template, NULL);
-	client->command(client, "go", NULL);
-	client->command(client, "get", template, NULL);
+	debconf_fset(client, template, "seen", "false");
+	debconf_input(client, priority, template);
+	debconf_go(client);
+	debconf_get(client, template);
 	return client->value;
 }
 
@@ -78,7 +78,7 @@ int main (int argc, char *argv[])
 	char line[255], *type_text = "", chandev_parm[255], chandev_module_parm[255], *ptr, *ptr2;
 
 	client = debconfclient_new ();
-	client->command (client, "title", "Network Device Configuration", NULL);
+	// client->command (client, "title", "Network Device Configuration", NULL);
 
 	ptr = my_debconf_input ("high", "choose_networktype");
 
@@ -253,12 +253,12 @@ int main (int argc, char *argv[])
 		else if (type == type_qeth)
 			ptr2 = TEMPLATE_PREFIX "qeth/choose";
 
-		client->command (client, "subst", ptr2, "choices", ptr, NULL);
+		debconf_subst (client, ptr2, "choices", ptr);
 		free (ptr);
-		client->command (client, "fset", ptr2, "seen", "false", NULL);
-		client->command (client, "input", "medium", ptr2, NULL);
-		client->command (client, "go", NULL);
-		client->command (client, "get", ptr2, NULL);
+		debconf_fset (client, ptr2, "seen", "false");
+		debconf_input (client, "medium", ptr2);
+		debconf_go (client);
+		debconf_get (client, ptr2);
 
 		if (!strcmp (client->value, "Other"))
 			exit (1);
@@ -284,7 +284,7 @@ int main (int argc, char *argv[])
 				j = 3;
 
 			sprintf (line, "%x", devices[i].device_data);
-			client->command (client, "subst", ptr, "protocol", ptr2, NULL);
+			debconf_subst (client, ptr, "protocol", ptr2);
 
 			snprintf (chandev_module_parm, sizeof (chandev_module_parm), "ctc-1,0x%x,0x%x,0,%d",
 				  devices[i].device_read, devices[i].device_write, j);
@@ -296,19 +296,19 @@ int main (int argc, char *argv[])
 			ptr2 =  my_debconf_input ("high", "lcs/port");
 			sscanf (ptr2, "port %d", &j);
 			sprintf (line, "%d", j);
-			client->command (client, "subst", ptr, "port", line, NULL);
+			debconf_subst (client,  ptr, "port", line);
 		}
 		else if (type == type_qeth)
 		{
 			ptr = TEMPLATE_PREFIX "qeth/confirm";
 
 			sprintf (line, "0x%x", devices[i].device_data);
-			client->command (client, "subst", ptr, "device_data", line, NULL);
+			debconf_subst (client,  ptr, "device_data", line);
 
 			ptr2 =  my_debconf_input ("high", "qeth/port");
 			sscanf (ptr2, "port %d", &j);
 			sprintf (line, "%d", j);
-			client->command (client, "subst", ptr, "port", line, NULL);
+			debconf_subst (client,  ptr, "port", line);
 
 			snprintf (chandev_module_parm, sizeof (chandev_module_parm), "qeth-1,0x%x,0x%x,0x%x,0,%d",
 				  devices[i].device_read, devices[i].device_write, devices[i].device_data, j);
@@ -324,19 +324,19 @@ int main (int argc, char *argv[])
 			}
 			else
 				ptr2 = "-";
-			client->command (client, "subst", ptr, "portname", ptr2, NULL);
+			debconf_subst (client,  ptr, "portname", ptr2);
 		}
 
 		sprintf (line, "0x%x", devices[i].device_read);
-		client->command (client, "subst", ptr, "device_read", line, NULL);
+		debconf_subst (client,  ptr, "device_read", line);
 		sprintf (line, "0x%x", devices[i].device_write);
-		client->command (client, "subst", ptr, "device_write", line, NULL);
+		debconf_subst (client, ptr, "device_write", line);
 
-		client->command (client, "set", ptr, "true", NULL);
-		client->command (client, "fset", ptr, "seen", "false", NULL);
-		client->command (client, "input", "medium", ptr, NULL);
-		client->command (client, "go", NULL);
-		client->command (client, "get", ptr, NULL);
+		debconf_set (client, ptr, "true");
+		debconf_fset (client, ptr, "seen", "false");
+		debconf_input (client, "medium", ptr);
+		debconf_go (client);
+		debconf_get (client, ptr);
 
 		if (!strcmp (client->value, "false"))
 			exit (1);
