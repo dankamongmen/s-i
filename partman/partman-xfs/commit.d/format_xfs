@@ -2,6 +2,8 @@
 
 . /lib/partman/definitions.sh
 
+enable_swap
+
 for dev in $DEVICES/*; do
     [ -d "$dev" ] || continue
     cd $dev
@@ -30,6 +32,7 @@ for dev in $DEVICES/*; do
 		db_subst partman-xfs/progress_formatting DEVICE $(humandev $(cat device))
 		mkfs.xfs -f $device >/dev/null 2>>/var/log/messages
 		code=$?
+		sync
 		db_progress STOP
 		if [ "$code" != 0 ]; then
 		    db_fset partman-xfs/create_failed seen false
@@ -37,9 +40,12 @@ for dev in $DEVICES/*; do
 		    db_subst partman-xfs/create_failed DEVICE $(humandev $(cat device))
 		    db_input critical partman-xfs/create_failed || true
 		    db_go || true
+		    disable_swap
 		    exit 1
 		fi
 		;;
 	esac
     done
 done
+
+disable_swap
