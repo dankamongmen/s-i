@@ -11,8 +11,8 @@ $(SOBJ): $(OBJS)
 	@$(CC) $(CFLAGS) -shared -o $@ $^ $(LDFLAGS)
 
 install:
-	install -d -m 755 ${moddir}/db
-	install -m 755 $(SOBJ) ${moddir}/db
+	install -d -m 755 $(DESTDIR)${moddir}/db
+	install -m 755 $(SOBJ) $(DESTDIR)${moddir}/db
 
 clean:
 	-@rm -f $(SOBJ) $(OBJS) *~

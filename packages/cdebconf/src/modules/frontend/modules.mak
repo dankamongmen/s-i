@@ -11,8 +11,8 @@ $(SOBJ): $(OBJS)
 	$(CC) $(CFLAGS) -shared -o $@ $^ $(LDFLAGS)
 
 install:
-	install -d -m 755 ${moddir}/frontend
-	install -m 755 $(SOBJ) ${moddir}/frontend
+	install -d -m 755 $(DESTDIR)${moddir}/frontend
+	install -m 755 $(SOBJ) $(DESTDIR)${moddir}/frontend
 
 clean:
 	-@rm -f $(SOBJ) $(OBJS) *~

@@ -13,10 +13,10 @@ $(MANPAGES):
 	@$(POD2MAN) --section=$(SFX) --center=$(CENTER) -d$(CENTER) $(srcdir)/man/$(basename $@).pod > $(basename $@).$(SFX)
 
 install: $(MANPAGES)
-	install -d -m 755 ${mandir}/man7
-	install -d -m 755 ${mandir}/man8
+	install -d -m 755 $(DESTDIR)${mandir}/man7
+	install -d -m 755 $(DESTDIR)${mandir}/man8
 	@for m in $(MANPAGES); do \
-		install -m 644 $$m ${mandir}/man$${m#*.}/; \
+		install -m 644 $$m $(DESTDIR)${mandir}/man$${m#*.}/; \
 	done
 
 clean:

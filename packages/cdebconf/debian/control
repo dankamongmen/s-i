@@ -1,5 +1,6 @@
 Source: cdebconf
 Section: utils
+Priority: optional
 Build-Depends: dpkg-dev (>= 1.7.0), debhelper (>= 4.2), libperl-dev, d-shlibs (>= 0.3), po-debconf (>= 0.5.0), libnewt-dev, libtextwrap-dev
 Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
 Uploaders: Randolph Chung <tausq@debian.org>, Martin Sjogren <sjogren@debian.org>, Petter Reinholdtsen <pere@debian.org>, Joey Hess <joeyh@debian.org>, Denis Barbier <barbier@debian.org>, Colin Watson <cjwatson@debian.org>, Matt Kraai <kraai@debian.org>
@@ -35,7 +36,7 @@ Description: Debian Configuration Management System (C-implementation)
 Package: libdebconfclient0-dev
 Architecture: any
 Section: libdevel
-Depends: libdebconfclient0 (= ${Source-Version}), ${devlibs:Depends}
+Depends: libdebconfclient0 (= ${Source-Version})
 Conflicts: libdebconfclient-dev, libdebconf-dev, libcdebconf-dev, cdebconf-dev
 Provides: libdebconfclient-dev
 Replaces: libdebconf-dev
@@ -51,6 +52,7 @@ Package: cdebconf-udeb
 Architecture: any
 Section: debian-installer
 Priority: standard
+Depends: ${shlibs:Depends}
 XC-Package-Type: udeb
 Description: Debian Configuration Management System (C-implementation)
  Debconf is a configuration management system for Debian packages. It is
@@ -62,7 +64,7 @@ Description: Debian Configuration Management System (C-implementation)
  debian-installer
 
 Package: cdebconf-priority
-Architecture: any
+Architecture: all
 Section: debian-installer
 Priority: standard
 Depends: cdebconf-udeb
@@ -76,7 +78,7 @@ Package: libdebconfclient0-udeb
 Architecture: any
 Section: debian-installer
 Priority: optional
-Depends: cdebconf-udeb
+Depends: ${shlibs:Depends}, cdebconf-udeb
 Provides: libdebconfclient0
 XC-Package-Type: udeb
 Description: Debian Configuration Management System (C-implementation)
@@ -88,7 +90,7 @@ Description: Debian Configuration Management System (C-implementation)
  This is a udeb version of libdebconfclient0.
 
 Package: cdebconf-slang-udeb
-Architecture: any
+Architecture: disabled
 Section: debian-installer
 Priority: optional
 Depends: cdebconf-udeb, di-utils-terminfo, ${shlibs:Depends}
@@ -121,6 +123,7 @@ Package: cdebconf-text-udeb
 Architecture: any
 Section: debian-installer
 Priority: optional
+Depends: cdebconf-udeb, ${shlibs:Depends}
 XC-Package-Type: udeb
 Description: Plain text frontend for Debian Configuration Management System
  Debconf is a configuration management system for Debian packages. It is
@@ -132,7 +135,7 @@ Description: Plain text frontend for Debian Configuration Management System
  by the debian-installer.
 
 Package: cdebconf-gtk-udeb
-Architecture: any
+Architecture: disabled
 Section: debian-installer
 Priority: optional
 Depends: cdebconf-udeb, ${shlibs:Depends}

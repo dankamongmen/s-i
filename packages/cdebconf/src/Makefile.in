@@ -50,26 +50,26 @@ $(CLISONAME) $(CLILIB): $(CLILIBNAME)
 	-@ln -sf $^ $@
 
 install:
-	install -d -m 755 ${bindir}
-	install -d -m 755 ${sbindir}
-	install -d -m 755 ${etcdir}
-	install -d -m 755 ${libdir}
-	install -d -m 755 ${moddir}
-	install -d -m 755 ${sharedir}
-	install -m 755 debconf debconf-loadtemplate ${bindir}
-	install -m 755 dpkg-reconfigure ${sbindir}
-	install -m 644 $(LIBNAME) ${moddir}
-	install -m 644 $(CLILIBNAME) ${libdir}
-	ln -sf $(CLILIBNAME) ${libdir}/$(CLISONAME)
-	ln -sf $(CLILIBNAME) ${libdir}/$(CLILIB)
-	install -m 644 $(CLILIBNAME_A) ${libdir}
-	install -m 644 cdebconf.conf-dist ${etcdir}/cdebconf.conf
-	install -m 644 ${srcdir}/src/client/confmodule ${sharedir}
-	ln -sf ../../bin/$(DEBCONF) ${sharedir}/frontend
+	install -d -m 755 $(DESTDIR)${bindir}
+	install -d -m 755 $(DESTDIR)${sbindir}
+	install -d -m 755 $(DESTDIR)${etcdir}
+	install -d -m 755 $(DESTDIR)${libdir}
+	install -d -m 755 $(DESTDIR)${moddir}
+	install -d -m 755 $(DESTDIR)${sharedir}
+	install -m 755 debconf debconf-loadtemplate $(DESTDIR)${bindir}
+	install -m 755 dpkg-reconfigure $(DESTDIR)${sbindir}
+	install -m 644 $(LIBNAME) $(DESTDIR)${moddir}
+	install -m 644 $(CLILIBNAME) $(DESTDIR)${libdir}
+	ln -sf $(CLILIBNAME) $(DESTDIR)${libdir}/$(CLISONAME)
+	ln -sf $(CLILIBNAME) $(DESTDIR)${libdir}/$(CLILIB)
+	install -m 644 $(CLILIBNAME_A) $(DESTDIR)${libdir}
+	install -m 644 cdebconf.conf-dist $(DESTDIR)${etcdir}/cdebconf.conf
+	install -m 644 ${srcdir}/src/client/confmodule $(DESTDIR)${sharedir}
+	ln -sf ../../bin/$(DEBCONF) $(DESTDIR)${sharedir}/frontend
 ifneq ($(TARGET),udeb)
-	install -m 755 debconf debconf-copydb debconf-dumpdb ${bindir}
-	install -d -m 755 ${incdir}
-	install -m 644 ${srcdir}/src/debconfclient.h ${incdir}
+	install -m 755 debconf debconf-copydb debconf-dumpdb $(DESTDIR)${bindir}
+	install -d -m 755 $(DESTDIR)${incdir}
+	install -m 644 ${srcdir}/src/debconfclient.h $(DESTDIR)${incdir}
 endif
 	@$(MAKE) -C modules $@
 
