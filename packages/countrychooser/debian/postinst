@@ -232,6 +232,9 @@ log "LOCALE_LANGUAGECHOOSER = '$LOCALE_LANGUAGECHOOSER'"
 
 for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
 	     ${LANGUAGE}_${COUNTRYCODE}; do
+	# Is the locale we inherited from languagechooser
+	# really a complete locale?
+        LOCALE_LANGUAGECHOOSER_COMPLETE=$(echo ${LOCALE_LANGUAGECHOOSER} | grep "_")
 	if grep -q "^${entry}$" $SUPPORTEDLOCALES; then
 		# Special handling of cases where the locale
 		# in languagechooser is NOT the combination of
@@ -245,7 +248,7 @@ for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
 		      -a \
 		      "${LANGUAGE}_${COUNTRYCODE}" != "${LOCALE_LANGUAGECHOOSER}" \
 		      -a \
-		      grep -q "_" "${LOCALE_LANGUAGECHOOSER}" \
+		      -z ${LOCALE_LANGUAGECHOOSER_COMPLETE} \
 		    ] ;  then
 		    # In details : we revert back to the locale
 		    # defined in languagechooser if countrychooser
