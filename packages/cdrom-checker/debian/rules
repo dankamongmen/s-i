@@ -1,14 +1,5 @@
 #!/usr/bin/make -f
 
-#export DH_VERBOSE=1
-
-# Make debhelper not generate any maint scripts.
-export DH_OPTIONS=-n
-
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
-PACKAGE=cdrom-checker
-
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -26,22 +17,18 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs
-	install -m755 cdrom-checker debian/$(PACKAGE)/bin/cdrom-checker
+	dh_install cdrom-checker bin
 
-# Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
 
-# Build architecture-dependent files here.
 binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf	
 	dh_fixperms
 	dh_installdeb
-	dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-	cd debian && dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
