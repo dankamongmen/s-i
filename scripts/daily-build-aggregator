@@ -159,7 +159,7 @@ foreach my $build (@buildlist) {
 	print "<li><a href=\"".$build->{url}."\">".$build->{description}."</a><br>\n";
 	my $logurl=$build->{logurl}."overview".$build->{logext}."\n";
 	if ($logurl=~m#.*://#) {
-		if (! open (LOG, "wget --quiet -O - $logurl |")) {
+		if (! open (LOG, "wget --tries=3 --timeout=5 --quiet -O - $logurl |")) {
 			print "<b>wget error</b>\n";
 		}
 	}
