@@ -389,6 +389,7 @@ skip_package(struct package_t *p)
         "main-menu",
         "busybox-udeb",
         "busybox-cvs-udeb",
+        "busybox-cvs-net-udeb",
         "rootskel",
         "kernel-image-",
         NULL
