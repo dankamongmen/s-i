@@ -32,17 +32,12 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 
 	// if we send linux keycodes, don't use ADB keymaps
 	// pretend we don't have an ADB keyboard
-	switch (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes","1")) {
-	case 0:
-		k->present = FALSE;
-		break;
-	case 1:
+	if (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes","0"))
 		k->present = TRUE;
-		break;
-	default:
-		k->present = UNKNOWN;
-	}
+	else
+		k->present =  FALSE;
 
+#if 0
 	if (k->present != UNKNOWN)
 		return keyboards;
 	
@@ -58,7 +53,7 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 	default:
 		k->present = UNKNOWN;
 	}
-
+#endif
 	// TODO:
 	// We should be able to read the keyboard type from /proc/bus/input/devices too.
 	//
