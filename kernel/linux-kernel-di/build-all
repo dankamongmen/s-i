@@ -10,7 +10,7 @@
 set -e
 
 buildpackage () {
-	dpkg-buildpackage -us -uc -rfakeroot -tc -ICVS -I.svn $@
+	dpkg-buildpackage -d -us -uc -rfakeroot -tc -ICVS -I.svn $@
 }
 
 # Build source package. Binaries are built below.
@@ -41,20 +41,19 @@ for arch in $(cut -d ' ' -f 1 kernel-versions | grep -v ^# | uniq); do
 		unset CC
 	fi
 	
-	for flavour in $(grep "^$arch" kernel-versions | awk '{print $3}'); do
-		if [ -d ../$arch-$flavour ]; then
-			export SOURCEDIR=`pwd`/../$arch-$flavour
-		elif [ -d ../$arch ]; then
-			export SOURCEDIR=`pwd`/../$arch
-		else
-			echo "** Warning: no SOURCEDIR for arch $arch, flavour $flavour" >&2
-		fi
+	if [ -d ../$arch ]; then
+		export SOURCEDIR=`pwd`/../$arch
+	else
+		unset SOURCEDIR
+	fi
 
-		if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ]; then
-			buildpackage -b -a$arch
-		else
-			# native build
-			buildpackage
-		fi	
-	done
+	if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ]; then
+		if [ -z "$SOURCEDIR" ]; then
+			echo "** Warning: no SOURCEDIR for arch $arch" >&2
+		fi
+		buildpackage -b -a$arch
+	else
+		# native build
+		buildpackage
+	fi	
 done
