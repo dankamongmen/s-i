@@ -18,23 +18,22 @@
 #error Must compile with at least one of FTP and HTTP
 #endif
 
-typedef enum { CM_NONE = -1, CM_PROTOCOL,  CM_COUNTRY, CM_MIRROR, CM_PROXY, CM_VALIDATE, CM_DISTRIBUTION, CM_FINISHED } cm_state;
+typedef enum { CM_NONE = -1, CM_PROTOCOL, CM_COUNTRY, CM_MIRROR, CM_PROXY, CM_VALIDATE, CM_DISTRIBUTION, CM_FINISHED } cm_state;
 
-cm_state last_asked = CM_NONE, asked = CM_NONE;
+static cm_state last_asked = CM_NONE, asked = CM_NONE;
 
-struct debconfclient *debconf;
-char *protocol = NULL;
-char *country  = NULL;
+static struct debconfclient *debconf;
+static char *protocol = NULL;
+static char *country  = NULL;
 
 /*
  * Returns a string on the form "DEBCONF_BASE/protocol/supplied".  The
  * calling function is responsible for freeing the string afterwards.
  */
-
-char *add_protocol(char *string) {
+static char *add_protocol(char *string) {
 	char *ret;
 
-	assert (protocol != NULL); /* Fetched by choose_protocol */
+	assert(protocol != NULL); /* Fetched by choose_protocol */
 	asprintf(&ret,DEBCONF_BASE "%s/%s",protocol,string);
 	return ret;
 }
@@ -43,7 +42,7 @@ char *add_protocol(char *string) {
  * Generates a list, suitable to be passed into debconf, from a
  * NULL-terminated string array.
  */
-char *debconf_list(char *list[]) {
+static char *debconf_list(char *list[]) {
 	int len, i, size = 1;
 	char *ret = 0;
 	
@@ -67,9 +66,9 @@ char *debconf_list(char *list[]) {
  * the static list in mirrors_protocol.h
  */
 
-struct mirror_t *mirror_list(void) {
+static struct mirror_t *mirror_list(void) {
 
-	assert (protocol != NULL);
+	assert(protocol != NULL);
 
 #ifdef WITH_HTTP
 	if (strcasecmp(protocol,"http") == 0) {
@@ -85,7 +84,7 @@ struct mirror_t *mirror_list(void) {
 }
 
 /* Returns an array of hostnames of mirrors in the specified country. */
-char **mirrors_in(char *country) {
+static char **mirrors_in(char *country) {
         static char **ret;
 	int i, j, num = 1;
 	struct mirror_t *mirrors = mirror_list();
@@ -104,7 +103,7 @@ char **mirrors_in(char *country) {
 	return ret;
 }
 
-inline int has_mirror(char *country)
+static inline int has_mirror(char *country)
 {
 	char **mirrors;
 	mirrors = mirrors_in(country);
@@ -112,7 +111,7 @@ inline int has_mirror(char *country)
 }
 
 /* Returns the root of the mirror, given the hostname. */
-char *mirror_root(char *mirror) {
+static char *mirror_root(char *mirror) {
 	int i;
 
 	struct mirror_t *mirrors = mirror_list();
@@ -123,7 +122,7 @@ char *mirror_root(char *mirror) {
 	return NULL;
 }
 
-int choose_country(void) {
+static int choose_country(void) {
 	if (country)
 		free(country);
 	country = NULL;
@@ -176,7 +175,7 @@ int choose_country(void) {
  * @brief   Choose which protocol to use.
  * @returns retcode from debconf asking the question
  */ 
-int choose_protocol(void) {
+static int choose_protocol(void) {
 	int ret = 0;  
 #if defined (WITH_HTTP) && defined (WITH_FTP)
 	/* Both are supported, so ask. */
@@ -201,7 +200,7 @@ int choose_protocol(void) {
 }
 
 /* Choose which distribution to install. */
-int choose_distribution(void) {
+static int choose_distribution(void) {
 
 	if (debconf_input(debconf, "high", DEBCONF_BASE "distribution"))
 		asked = CM_DISTRIBUTION;
@@ -209,89 +208,110 @@ int choose_distribution(void) {
 }
 
 
-int manual_entry;
+static int manual_entry;
 
-int choose_mirror(void) {
+static int choose_mirror(void) {
 	char *list;
+	int ret;
 
 	debconf_get(debconf, DEBCONF_BASE "country");
 	manual_entry = ! strcmp(debconf->value, "enter information manually");
 	if (! manual_entry) {
-                /* Prompt for mirror in selected country. */
+		char *mir = add_protocol("mirror");
 
+                /* Prompt for mirror in selected country. */
 		list=debconf_list(mirrors_in(country));
-		debconf_subst(debconf, add_protocol("mirror"), "mirrors", list);
+		debconf_subst(debconf, mir, "mirrors", list);
 		free(list);
 		
-		if (debconf_input(debconf, "high", add_protocol("mirror")) == 0)
+		if (debconf_input(debconf, "high", mir) == 0)
 			asked = CM_MIRROR;
-		return debconf_go (debconf);
-	}
-	else {
+		free(mir);
+		ret = debconf_go(debconf);
+	} else {
+		char *host = add_protocol("hostname");
+		char *dir = add_protocol("directory");
+
 		/* Manual entry. */
 		asked = CM_MIRROR;
 		while (1) {
-			debconf_input(debconf, "critical", add_protocol("hostname"));
-			if (debconf_go (debconf) == 0) {
-				debconf_input(debconf, "critical", add_protocol("directory"));
-				if (debconf_go (debconf) == 0)
-					return 0;
-			} else
-				return 30;
+			debconf_input(debconf, "critical", host);
+			if (debconf_go(debconf) == 0) {
+				debconf_input(debconf, "critical", dir);
+				if (debconf_go(debconf) == 0) {
+					ret = 0;
+					break;
+				}
+			} else {
+				ret = 30;
+				break;
+			}
 		}
+		free(host);
+		free(dir);
 	}
-	return 0; /* not reached */
+	return ret;
 }
 
+static int choose_proxy(void) {
+	char *px;
 
-int choose_proxy(void) {
+	px = add_protocol("proxy");
 
 	/* Always ask about a proxy. */
-	if (debconf_input (debconf, "high", add_protocol("proxy")) == 0)
+	if (debconf_input (debconf, "high", px) == 0)
 		asked = CM_PROXY;
+	free(px);
 	return debconf_go(debconf);
-	
 }
 
+static int validate_mirror(void) {
+	char *mir;
+	char *host;
+	char *dir;
+	int ret = 0;
 
-int validate_mirror(void) {
-	char *mirror;
-
-	assert (protocol != NULL);
+	mir = add_protocol("mirror");
+	host = add_protocol("hostname");
+	dir = add_protocol("directory");
 
 	if (! manual_entry) {
+		char *mirror;
+
 		/*
 		 * Copy information about the selected
 		 * mirror into mirror/{protocol}/{hostname,directory},
 		 * which is the standard location other
 		 * tools can look at.
 		 */
-		debconf_get(debconf, add_protocol("mirror"));
-		mirror=strdup(debconf->value);
-		debconf_set(debconf, add_protocol("hostname"), mirror);
-		debconf_set(debconf, add_protocol("directory"),
-		            mirror_root(mirror));
+		debconf_get(debconf, mir);
+		mirror = strdup(debconf->value);
+		debconf_set(debconf, host, mirror);
+		debconf_set(debconf, dir, mirror_root(mirror));
 		free(mirror);
-		return 0;
 	} else {
-		int not_ok = 0; /* Is 0 if everything is ok, 1 else, aka retval */
+		/* ret is 0 if everything is ok, 1 else, aka retval */
 		/* Manual entry - check that the mirror is somewhat valid */
-		debconf_get(debconf,  add_protocol("hostname"));
+		debconf_get(debconf, host);
 		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
-			debconf_fset(debconf, add_protocol("hostname"), "seen", "false");
-			not_ok = 1;
+			debconf_fset(debconf, host, "seen", "false");
+			ret = 1;
 		}
-		debconf_get(debconf,  add_protocol("directory"));	
+		debconf_get(debconf, dir);
 		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
-			debconf_fset(debconf, add_protocol("directory"), "seen", "false");
-			not_ok = 1;
+			debconf_fset(debconf, dir, "seen", "false");
+			ret = 1;
 		}
-		return not_ok;
 	}
-	return 0;
+
+	free(mir);
+	free(host);
+	free(dir);
+
+	return ret;
 }
 
-int main (int argc, char **argv) {
+int main (void) {
 	/* Use a state machine with a function to run in each state */
 	cm_state state = CM_PROTOCOL;
 	int ret;
@@ -324,8 +344,5 @@ int main (int argc, char **argv) {
 			state++;
 		}
 	}
-	if (state >= 0) 
-		exit(0);
-	else
-		exit(10); /* backed all the way out */
+	return (state >= 0) ? 0 : 10 /* backed all the way out */;
 }
