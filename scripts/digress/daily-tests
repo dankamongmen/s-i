@@ -44,13 +44,22 @@ touch $DI_TESTDIR/logs/overview.log
 . $DI_TESTDIR/config
 
 for SCHEME in $@; do
+	RETRY=""
 	use common
 	use $SCHEME
 	
 	if $DIGRESSDIR/test-harness $MACHINE $SCHEME > $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
 		overview success
 	else
-		overview failed
+		if [ -n "$RETRY" ]; then
+			if $DIGRESSDIR/test-harness $MACHINE $SCHEME > $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
+				overview "success (second try)"
+			else
+				overview failed
+			fi
+		else
+			overview failed
+		fi
 	fi
 	ln -f $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log $DI_TESTDIR/logs/$MACHINE-$SCHEME.log
 done
