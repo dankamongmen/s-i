@@ -21,15 +21,15 @@ then
     # A weird way to get the real device path.  The partition numbers
     # in parted_server may be changed and the partition table is still
     # not commited to the disk
-    backupdev=/var/lib/partman/backup/${dev#/var/lib/partman/}
+    backupdev=/var/lib/partman/backup/${dev#/var/lib/partman/devices/}
     if [ -f $backupdev/$oldid/view -a -f $backupdev/device ]; then
 	num=$(sed 's/^[^0-9]*\([0-9]*\)[^0-9].*/\1/' $backupdev/$oldid/view)
 	dev=$(cat $backupdev/device)
 	dev=${dev%/disc}/part$num
 	if [ -b $dev ]; then
 	    size=$(ntfsresize -f -i $dev \
-		| grep '^You may resize at' \
-		| sed 's/^You may resize at \([0-9]*\) bytes.*/\1/' \
+		| grep '^You might resize at' \
+		| sed 's/^You might resize at \([0-9]*\) bytes.*/\1/' \
 		| grep '^[0-9]*$')
 	    if [ "$size" ]; then
 		minsize=$size
