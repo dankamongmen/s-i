@@ -621,7 +621,7 @@ main(int argc, char *argv[])
             state = 0;
     }
     if (state < 0)
-        ret = 30;
+        ret = 10;
     return ret;
 }
 #else
