@@ -20,4 +20,19 @@ clean:
 	done
 	-@rm -f $(SOBJS)
 
-.PHONY: all
+XGETTEXT = xgettext
+TEMPLATES = \
+   $(srcdir)/debian/cdebconf-gtk-udeb.templates \
+   $(srcdir)/debian/cdebconf-slang-udeb.templates \
+   $(srcdir)/debian/cdebconf-text-udeb.templates
+
+templates: $(TEMPLATES)
+
+$(srcdir)/debian/cdebconf-gtk-udeb.templates: gtk/gtk.c
+$(srcdir)/debian/cdebconf-slang-udeb.templates: slang/slang.c
+$(srcdir)/debian/cdebconf-text-udeb.templates: text/text.c
+
+$(TEMPLATES):
+	$(XGETTEXT) -c --keyword=get_text:2,3 --omit-header --no-location $? -o - | $(srcdir)/debian/po2templates > $@
+
+.PHONY: all templates
