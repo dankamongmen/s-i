@@ -138,7 +138,7 @@ discover_hw () {
 		;;
 	1)
 		discover --format="%m:%V %M\n" --disable-all \
-		          --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet bridge |
+		          --enable=pci,ide,scsi,sbus,pcmcia scsi cdrom ethernet bridge |
 			sed 's/ $//'
 		;;
 	esac
