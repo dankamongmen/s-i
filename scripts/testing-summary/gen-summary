@@ -15,6 +15,7 @@ my %seenpackages;
 my %pooldirs;
 my %poolfiles;
 my %lastbinfromsource;
+my %inconsistent;
 my @annotations;
 
 sub markup {
@@ -94,8 +95,11 @@ foreach my $dist (@dists) {
 				if ($dist eq 'testing' && 
 				    exists $packageversions{$source}{$dist}{$arch} &&
 				    $packageversions{$source}{$dist}{$arch} ne $version) {
-					push @annotations, {package => $source, annotation => "inconsistent binary versions in testing" };
-					push @annotations, {detail => 1, package => $source, annotation => "binary package $package at version $version on arch $arch, while $lastbinfromsource{$source} is version $packageversions{$source}{$dist}{$arch}" };
+					if (! $inconsistent{$source}) {
+						$inconsistent{$source}=1;
+						push @annotations, {arch => $arch, package => $source, annotation => "inconsistent binary versions in testing" };
+					}
+					push @annotations, {arch => $arch, detail => 1, package => $source, annotation => "binary package $package at version $version on arch $arch, while $lastbinfromsource{$source} is version $packageversions{$source}{$dist}{$arch}" };
 				}
 				$packageversions{$source}{$dist}{$arch} = $version;
 				$lastbinfromsource{$source}=$package;
@@ -203,7 +207,8 @@ foreach my $withdetail (0,1) {
 			foreach my $ann (@annotations) {
 				if ($package eq $ann->{package} && 
 				    (! exists $ann->{version} || between_versions($ann->{version}, $vers[0], $vers[1])) &&
-				    ($withdetail || ! exists $ann->{detail})) {
+				    ($withdetail || ! exists $ann->{detail}) &&
+				    (! exists $ann->{arch} || grep $ann->{arch}, @{$transitions{$package}{$transition}}[0])) {
 					print "<tr><td></td><td colspan=".($numcols-1)."><b>$ann->{annotation}</b>";
 					if (exists $ann->{user}) {
 						print " <i>-- $ann->{user}</i>";
