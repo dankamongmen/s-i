@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.12 2000/11/20 23:43:34 bug1 Exp $ */
+/* $Id: status.c,v 1.13 2000/11/29 02:44:30 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -34,8 +34,8 @@ static const char *statuswords[][10] = {
 
 int package_compare(const void *p1, const void *p2)
 {
-	return strcmp(((package_t *)p1)->package, 
-		((package_t *)p2)->package);
+	return strcmp(((struct package_t *)p1)->package, 
+		((struct package_t *)p2)->package);
 }
 
 static unsigned long status_parse(const char *line)
@@ -96,7 +96,7 @@ static const char *status_print(unsigned long flags)
  * Read a control file (or a stanza of a status file) and parse it,
  * filling parsed fields into the package structure
  */
-void control_read(FILE *f, package_t *p)
+void control_read(FILE *f, struct package_t *p)
 {
 	char buf[BUFSIZE];
 	while (fgets(buf, BUFSIZE, f) && !feof(f))
@@ -121,7 +121,7 @@ void control_read(FILE *f, package_t *p)
 			p->provides = strdup(buf+10);
 		}
 		/* This is specific to the Debian Installer. Ifdef? */
-		else if (strstr(buf, "Installer-Menu-Item: ") == buf) 
+		else if (strstr(buf, "installer-menu-item: ") == buf) 
 		{
 			p->installer_menu_item = atoi(buf+21);
 		}
@@ -137,7 +137,7 @@ void *status_read(void)
 {
 	FILE *f;
 	void *status = 0;
-	package_t *m = 0, *p = 0, *t = 0;
+	struct package_t *m = 0, *p = 0, *t = 0;
 
 	if ((f = fopen(STATUSFILE, "r")) == NULL)
 	{
@@ -147,8 +147,8 @@ void *status_read(void)
 	printf("(Reading database...)\n");
 	while (!feof(f))
 	{
-		m = (package_t *)malloc(sizeof(package_t));
-		memset(m, 0, sizeof(package_t));
+		m = (struct package_t *)malloc(sizeof(struct package_t));
+		memset(m, 0, sizeof(struct package_t));
 		control_read(f, m);
 		if (m->package)
 		{
@@ -160,10 +160,10 @@ void *status_read(void)
 				 * of a pseudo package into the status
 				 * binary-tree.
 				 */
-				p = (package_t *)malloc(sizeof(package_t));
-				memset(p, 0, sizeof(package_t));
+				p = (struct package_t *)malloc(sizeof(struct package_t));
+				memset(p, 0, sizeof(struct package_t));
 				p->package = strdup(m->provides);
-				t = *(package_t **)tsearch(p, &status, package_compare);
+				t = *(struct package_t **)tsearch(p, &status, package_compare);
 				if (!(t == p))
 				{
 					printf("already provided, freeing\n");
@@ -192,12 +192,12 @@ void *status_read(void)
 	return status;
 }
 
-int status_merge(void *status, package_t *pkgs)
+int status_merge(void *status, struct package_t *pkgs)
 {
 	FILE *fin, *fout;
 	char buf[BUFSIZE];
-	package_t *pkg = 0, *statpkg = 0;
-	package_t locpkg;
+	struct package_t *pkg = 0, *statpkg = 0;
+	struct package_t locpkg;
 	int r = 0;
 
 	if ((fin = fopen(STATUSFILE, "r")) == NULL)
@@ -234,7 +234,7 @@ int status_merge(void *status, package_t *pkgs)
 			 * file was changed while we are processing (no locking
 			 * is currently done...
 			 */
-			if (statpkg != 0) statpkg = *(package_t **)statpkg;
+			if (statpkg != 0) statpkg = *(struct package_t **)statpkg;
 		}
 		if (pkg != 0) continue;
 
@@ -256,7 +256,7 @@ int status_merge(void *status, package_t *pkgs)
 		if (pkg->provides)
 			fprintf(fout, "Provides: %s\n", pkg->provides);
 		if (pkg->installer_menu_item)
-			fprintf(fout, "Installer-Menu-Item: %i\n", pkg->installer_menu_item);
+			fprintf(fout, "installer-menu-item: %i\n", pkg->installer_menu_item);
 		if (pkg->description)
 			fprintf(fout, "Description: %s\n", pkg->description);
 		fputc('\n', fout);

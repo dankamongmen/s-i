@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.16 2000/11/20 23:43:34 bug1 Exp $ */
+/* $Id: udpkg.c,v 1.17 2000/11/29 02:44:30 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -11,12 +11,6 @@
 #include <utime.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
-
-#define UDPKG_CONFIGURE 1
-#define UDPKG_INSTALL	2
-#define UDPKG_REMOVE	4
-#define UDPKG_UNPACK	8	
 
 /* 
  * Main udpkg implementation routines
@@ -41,7 +35,7 @@ static int is_file(const char *fn)
 }
 
 #if 0
-static int dpkg_doinstall(package_t *pkg)
+static int dpkg_doinstall(struct package_t *pkg)
 {
 	char buf[1024];
 	int r = 0;
@@ -96,7 +90,7 @@ static int dpkg_copyfile(const char *src, const char *dest)
 	return 1;
 }
 
-static int dpkg_doconfigure(package_t *pkg)
+static int dpkg_doconfigure(struct package_t *pkg)
 {
 	int r;
 	char buf[1024];
@@ -118,14 +112,14 @@ static int dpkg_doconfigure(package_t *pkg)
 	return 0;
 }
 
-static int dpkg_dounpack(package_t *pkg)
+static int dpkg_dounpack(struct package_t *pkg)
 {
 	int r = 0;
 	char *cwd, *p;
 	FILE *infp, *outfp;
 	char buf[1024], buf2[1024];
 	int i;
-	char *adminscripts[] = { "premm", "postrm", "preinst", "postinst",
+	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
 	                         "conffiles", "md5sums", "shlibs", 
 				 "templates" };
 
@@ -133,7 +127,7 @@ static int dpkg_dounpack(package_t *pkg)
 
 	cwd = getcwd(0, 0);
 	/* chdir("/"); */
-	chdir("tmp/"); /* testing */
+	//chdir("tmp/"); /* testing */
 	snprintf(buf, sizeof(buf), "ar p %s data.tar.gz|zcat|tar -xf -", pkg->file);
 	if (SYSTEM(buf) == 0)
 	{
@@ -209,13 +203,13 @@ static int dpkg_dounpack(package_t *pkg)
 	return r;
 }
 
-static int dpkg_doinstall(package_t *pkg)
+static int dpkg_doinstall(struct package_t *pkg)
 {
 	DPRINTF("Installing %s\n", pkg->package);
 	return (dpkg_dounpack(pkg) || dpkg_doconfigure(pkg));
 }
 
-static int dpkg_unpackcontrol(package_t *pkg)
+static int dpkg_unpackcontrol(struct package_t *pkg)
 {
 	int r = 1;
 	char *cwd = 0;
@@ -250,110 +244,36 @@ static int dpkg_unpackcontrol(package_t *pkg)
 	return r;
 }
 
-/* delete all contents of the specified directory */ 
-static int delete_dir_contents(const char *directory_path)
+static int dpkg_unpack(struct package_t *pkgs)
 {
-	DIR *dir;
-	struct dirent *next;
-	struct stat dir_stat;	
-	char *fullpath;
-	int path_length = strlen(directory_path);
-
-	if ( (dir = opendir(directory_path)) == NULL) {
-		printf("Cannot read directory %s\n", directory_path);
-		return(EXIT_FAILURE);
-	}
-
-	while( (next=readdir(dir)) != NULL) {
-		fullpath = malloc(path_length+strlen(next->d_name));
-		strcpy(fullpath, directory_path);
-		strcat(fullpath, next->d_name);
-		stat(fullpath, &dir_stat);
-		if ( S_ISDIR(dir_stat.st_mode) ) 
-			if (delete_dir_contents(directory_path)==EXIT_FAILURE)
-				return(EXIT_FAILURE);
-		unlink(fullpath);	
-	}
-	return(EXIT_SUCCESS);
-}
-
-/* check path is accessable then delete its contents */
-static int prepare_directory(const char *path)
-{
-	struct stat dir_stat;
-
-	/* try to create directory if it doesnt exist */
-	if ( stat(path, &dir_stat) == -1) {
-		if ( (errno!=ENOENT) && (errno!=ENOTDIR))
-			return(EXIT_FAILURE); 
-		if (mkdir(path, S_IRWXU) == 0) 
-			return(prepare_directory(path));
-		else
-			return(EXIT_FAILURE);
-	}
-
-	/* make sure its a dir */ 
-	if ( !S_ISDIR(dir_stat.st_mode) ) 
-		return(EXIT_FAILURE);
-	
-	/* delete_dir_contents does the dirty work */ 	
-	return(delete_dir_contents(path));
-}
-
-extern package_t *build_package_struct(const char **name_list, int funct)
-{
-        int i = 0;
-	package_t *packages, *pkg;
-
-	packages = (package_t *) malloc(sizeof(package_t));
-        while(name_list[++i] != NULL) {
-                pkg = (package_t *) malloc(sizeof(package_t));
-                memset(pkg, 0, sizeof(package_t));
-		if ( (funct&UDPKG_INSTALL) || (funct&UDPKG_UNPACK) ) {
-                	pkg->file = (char *) malloc(sizeof(package_t));
-			strcpy(pkg->file, name_list[i]);
-		}
-		else if ( (funct&UDPKG_CONFIGURE) || (funct&UDPKG_REMOVE) ) {
-			pkg->package = (char *) malloc(sizeof(package_t));
-			strcpy(pkg->package, name_list[i]);
-		}
-		pkg->next = packages;
-                packages = pkg;
-        }
-	return(packages);
-}
-
-extern int dpkg_unpack(package_t *pkgs)
-{
-	int result=EXIT_SUCCESS;
-	package_t *pkg;
+	int r = 0;
+	struct package_t *pkg;
 	void *status = status_read();
 
-	/* delete directory */
-	if (prepare_directory(DPKGCIDIR)==EXIT_FAILURE)
-		return(EXIT_FAILURE); 
+	if (SYSTEM("rm -rf -- " DPKGCIDIR) != 0 ||
+	    mkdir(DPKGCIDIR, S_IRWXU) != 0)
+	{
+		perror("mkdir");
+		return 1;
+	}
 	
 	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
 	{
 		dpkg_unpackcontrol(pkg);
-		if ((result = dpkg_dounpack(pkg)) == EXIT_FAILURE)
-			break;
+		r = dpkg_dounpack(pkg);
+		if (r != 0) break;
 	}
 	status_merge(status, pkgs);
-
-	/* do cleanups */
-	delete_dir_contents(DPKGCIDIR);
-
-	return result;
+	SYSTEM("rm -rf -- " DPKGCIDIR);
+	return r;
 }
 
-extern int dpkg_configure(package_t *pkgs)
+static int dpkg_configure(struct package_t *pkgs)
 {
 	int r = 0;
 	void *found;
-	package_t *pkg;
+	struct package_t *pkg;
 	void *status = status_read();
-
 	for (pkg = pkgs; pkg != 0 && r == 0; pkg = pkg->next)
 	{
 		found = tfind(pkg, &status, package_compare);
@@ -366,23 +286,24 @@ extern int dpkg_configure(package_t *pkgs)
 		{
 			/* configure the package listed in the status file;
 			 * not pkg, as we have info only for the latter */
-			r = dpkg_doconfigure(*(package_t **)found);
+			r = dpkg_doconfigure(*(struct package_t **)found);
 		}
 	}
 	status_merge(status, 0);
 	return r;
 }
 
-extern int dpkg_install(package_t *pkgs)
+static int dpkg_install(struct package_t *pkgs)
 {
-	package_t *p, *ordered = 0;
+	struct package_t *p, *ordered = 0;
 	void *status = status_read();
-
-
-        /* delete directory */
-        if (prepare_directory(DPKGCIDIR)==EXIT_FAILURE)
-                return(EXIT_FAILURE);
-
+	if (SYSTEM("rm -rf -- " DPKGCIDIR) != 0 ||
+	    mkdir(DPKGCIDIR, S_IRWXU) != 0)
+	{
+		perror("mkdir");
+		return 1;
+	}
+	
 	/* Stage 1: parse all the control information */
 	for (p = pkgs; p != 0; p = p->next)
 		if (dpkg_unpackcontrol(p) != 0)
@@ -419,16 +340,13 @@ extern int dpkg_install(package_t *pkgs)
 	
 	if (ordered != 0)
 		status_merge(status, pkgs);
-
-        /* do cleanups */
-        delete_dir_contents(DPKGCIDIR);
-
+	SYSTEM("rm -rf -- " DPKGCIDIR);
 	return 0;
 }
 
-extern int dpkg_remove(package_t *pkgs)
+static int dpkg_remove(struct package_t *pkgs)
 {
-	package_t *p;
+	struct package_t *p;
 	void *status = status_read();
 	for (p = pkgs; p != 0; p = p->next)
 	{
@@ -437,3 +355,48 @@ extern int dpkg_remove(package_t *pkgs)
 	return 0;
 }
 
+#ifdef UDPKG_MODULE
+int udpkg(int argc, char **argv)
+#else
+int main(int argc, char **argv)
+#endif
+{
+	char opt = 0;
+	struct package_t *p, *packages = NULL;
+	char *cwd = getcwd(0, 0);
+	while (*++argv)
+	{
+		if (**argv == '-')
+			opt = *(*argv+1);
+		else
+		{
+			p = (struct package_t *)malloc(sizeof(struct package_t));
+			memset(p, 0, sizeof(struct package_t));
+			if (**argv == '/')
+				p->file = *argv;
+			else if (opt != 'c')
+			{
+				p->file = malloc(strlen(cwd) + strlen(*argv) + 2);
+				sprintf(p->file, "%s/%s", cwd, *argv);
+			}
+			else {
+				p->package = strdup(*argv);
+			}
+			p->next = packages;
+			packages = p;
+		}
+			
+	}
+	switch (opt)
+	{
+		case 'i': return dpkg_install(packages); break;
+		case 'r': return dpkg_remove(packages); break;
+		case 'u': return dpkg_unpack(packages); break;
+		case 'c': return dpkg_configure(packages); break;
+	}
+
+	/* if it falls through to here, some of the command line options were
+	   wrong */
+	printf("udpkg <-i|-r|-u|-c> my.deb\n");
+	return 0;
+}

@@ -1,4 +1,4 @@
-/* $Id: depends.c,v 1.5 2000/11/20 23:43:34 bug1 Exp $ */
+/* $Id: depends.c,v 1.6 2000/11/29 02:44:30 joeyh Rel $ */
 #include "udpkg.h"
 
 #ifdef DODEPENDS
@@ -41,8 +41,8 @@ static char **depends_split(const char *dependsstr)
 	return dependsvec;
 }
 
-static void depends_sort_visit(package_t **ordered, 
-	package_t *pkgs, package_t *pkg)
+static void depends_sort_visit(struct package_t **ordered, 
+	struct package_t *pkgs, struct package_t *pkg)
 {
 	/* Topological sort algorithm:
 	 * ordered is the output list, pkgs is the dependency graph, pkg is 
@@ -55,7 +55,7 @@ static void depends_sort_visit(package_t **ordered,
 	 * same type :-)
 	 */
 	unsigned short i;
-	package_t *newnode;
+	struct package_t *newnode;
 
 	/* mark node as processing */
 	pkg->color = COLOR_GRAY;
@@ -80,12 +80,12 @@ static void depends_sort_visit(package_t **ordered,
 	pkg->color = COLOR_BLACK;
 }
 
-static package_t *depends_sort(package_t *pkgs)
+static struct package_t *depends_sort(struct package_t *pkgs)
 {
 	/* TODO: it needs to break cycles in the to-be-installed package 
 	 * graph... */
-	package_t *ordered = NULL;
-	package_t *pkg;
+	struct package_t *ordered = NULL;
+	struct package_t *pkg;
 
 	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
 		pkg->color = COLOR_WHITE;
@@ -110,10 +110,10 @@ static package_t *depends_sort(package_t *pkgs)
  * efficient algorithm, but given that at any one time you are unlikely
  * to install a very large number of packages it doesn't really matter
  */
-package_t *depends_resolve(package_t *pkgs, void *status)
+struct package_t *depends_resolve(struct package_t *pkgs, void *status)
 {
-	package_t *pkg, *chk;
-	package_t dependpkg;
+	struct package_t *pkg, *chk;
+	struct package_t dependpkg;
 	char **dependsvec;
 	int i;
 	void *found;
