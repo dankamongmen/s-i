@@ -15,12 +15,12 @@ db_settitle languagechooser/title
 #   debconf/language is an alias for debian-installer/language
 db_register "$languagecode" "debconf/language"
 
-# Only display the translated texts when in UTF-8 mode.
+# Only display the translated texts (ie the English "translation")
+# when in UTF-8 mode.
 if [ C.UTF-8 = "$LANG" ] ; then
-  # If we are lucky, this might change the language imediately
   db_set debconf/language en
 else
-  db_set debconf/language "C"
+  db_set debconf/language C
 fi
 
 db_fset "languagechooser/language-name" seen false

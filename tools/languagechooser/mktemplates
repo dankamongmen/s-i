@@ -1,4 +1,9 @@
 #!/usr/bin/perl
+#
+# Author: Petter Reinholdtsen
+# Date:   2003-09-27
+#
+# Extract language options for debian-installer
 
 use strict;
 use warnings;
@@ -47,14 +52,17 @@ my @languagenames   = get_language_names($list);
 my %translationmap  = get_translations($listl10n);
 
 my @translations;
-for my $name (@languagenames) {
+my @sortedlanguagenames;
+for my $name (sort { $translationmap{$a} cmp $translationmap{$b} }
+	      @languagenames) {
     if (exists $translationmap{$name}) {
 	push(@translations, $translationmap{$name});
+	push(@sortedlanguagenames, $name);
     } else {
 	print "Missing $name in $listl10n\n";
     }
 }
-my $langstr=join(", ", @languagenames);
+my $langstr=join(", ", @sortedlanguagenames);
 my $nativemessages=join(", ", @translations);
 
 open(TIN, "< $templatein") || die "Unable to read $templatein";

@@ -3,7 +3,7 @@ all: debian/templates check-scripts check-data
 LIST=languagelist
 
 debian/templates: mktemplates debian/templates-in $(LIST) $(LIST).l10n
-	./mktemplates $(LIST) $(LIST).l10n $@ $@-in
+	LC_COLLATE=C ./mktemplates $(LIST) $(LIST).l10n $@ $@-in
 
 check-scripts:
 	if [ -x /bin/ash ] ; then SH=ash ; else SH=dash; fi ; \
