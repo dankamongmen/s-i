@@ -99,7 +99,7 @@ case "x$cmd" in
 		# This could take a while, so a progress bar.
 		db_progress START 0 $FILE_COUNT retriever/floppy/packages/progress
 		for filename in $FILES; do
-			udpkg -f "$filename" >> "$1"
+			udpkg -f "$filename" | sed 's/Priority: .*/Priority: standard/' >> "$1"
 			path="`echo "$filename" | sed 's,^/floppy/,,'`"
 			echo "Filename: $path" >> "$1"
 			echo >> "$1"
