@@ -8,6 +8,14 @@ my @controlfields=qw(Package XC-Package-Type Provides Depends Architecture XB-Ke
 my @versions;
 my @packages;
 my @builddeps;
+my %excluded;
+
+open(EXCLUDED, "exclude-packages");
+while (<EXCLUDED>) {
+	chomp;
+	$excluded{$_}=1;
+}
+close EXCLUDED;
 
 open(KVERS, "kernel-versions") || die "kernel-versions: $!";
 while (<KVERS>) {
@@ -92,9 +100,8 @@ foreach my $ver (@versions) {
 		else {
 			$modlistdir="modules/$arch";
 		}
-		next unless -e "$modlistdir/".$package->("Package");
 		
-		print "\n";
+		next unless -e "$modlistdir/".$package->("Package");
 		
 		$pkg{Architecture}=$arch;
 		$pkg{Provides}=$package->("Package");
@@ -102,6 +109,10 @@ foreach my $ver (@versions) {
 		$pkg{'XC-Package-Type'}="udeb";
 		$pkg{'XB-Kernel-Version'}=$kernelversion."-".$flavour;
 
+		next if $excluded{$pkg{Package}};
+		
+		print "\n";
+		
 		if (defined $package->("Depends")) {
 			$pkg{Depends}=join(", ",
 				map { $_."-".$kernelversion."-".$flavour."-di" }

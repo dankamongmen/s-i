@@ -11,8 +11,9 @@
 set -e
 
 deplist() {
-	deps=$1
-	list=$2
+	local deps=$1
+	local list=$2
+	
 	cp $list $tmpdir/work
 
 	# recursively append external dependencies to $list
@@ -29,6 +30,37 @@ deplist() {
 		# append work to $list
 		sort -um -o $list $list $tmpdir/work
 	done
+}
+
+processmodules() {
+	local list=$1
+	local moddir=$2
+	
+	cp $list $tmpdir/work
+	local missing=0
+	(
+		while read file; do
+			if echo "$file" | grep -q -- '^#' || [ -z "$file" ]; then
+				continue
+			fi
+
+			if echo "$file" | grep -q -- '^-'; then
+				optional=1
+				file=$(echo $file | sed 's/^-//');
+			else
+				optional=0
+			fi
+			
+			if [ -e $moddir/$file ]; then
+				echo $file
+			else
+				if [ "$optional" = 0 ]; then
+					echo "missing module $file" >&2
+					exit 1
+				fi
+			fi
+		done
+	) < $tmpdir/work > $list
 }
 
 version=$1-$2
@@ -111,22 +143,27 @@ for i in $(
 	# dependent udeb into module-list/$i
 	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
 
-	# copy kernel modules to package build dir
-	cd $moddir/kernel
-	ret=$( ( (
-		set +e
-		tar cfT - $tmpdir/module-list/$i
-		printf $? >&3
-	) | (
-		set +e
-		dir=$home/debian/$i-$version-di/lib/modules/$installedname/kernel
-		mkdir -p $dir
-		cd $dir
-		tar xf -
-		printf $? >&3
-	) ) 3>&1)
-	if [ "$ret" != "00" ]; then
-		echo "tar failed" >&2
-		exit $ret
+	# deal with modules marked as optional
+	processmodules $tmpdir/module-list/$i $moddir/kernel
+
+	if [ -s $tmpdir/module-list/$i ]; then
+		# copy kernel modules to package build dir
+		cd $moddir/kernel
+		ret=$( ( (
+			set +e
+			tar cfT - $tmpdir/module-list/$i
+			printf $? >&3
+		) | (
+			set +e
+			dir=$home/debian/$i-$version-di/lib/modules/$installedname/kernel
+			mkdir -p $dir
+			cd $dir
+			tar xf -
+			printf $? >&3
+		) ) 3>&1)
+		if [ "$ret" != "00" ]; then
+			echo "tar failed" >&2
+			exit $ret
+		fi
 	fi
 done
