@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.11 2002/07/01 06:58:37 tausq Exp $
+ * $Id: database.c,v 1.12 2002/07/31 21:48:55 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -263,9 +263,9 @@ static int question_db_is_visible(struct question_db *db, const char *name,
 	    if ((q = db->methods.get(db, "debconf/priority")) != NULL)
             wantprio = q->value;
 
-    /* error; no priority specified */
+    /* error; no priority specified -- last resort fallback to medium */
     if (wantprio == NULL || strlen(wantprio) == 0)
-        ret = DC_NO;
+        wantprio = "medium";
     else if (priority_compare(priority, wantprio) < 0)
 		ret = DC_NO;
 
