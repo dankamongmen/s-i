@@ -26,6 +26,18 @@ if [ -e /proc/bus/pci/devices ]; then
 		fi
 	done  <  /usr/lib/usb-discover/ehci-pci.lst 
 
+	# Also try PCI class detection using sysfs on 2.6.
+	if [ -d /sys/bus/pci/devices ]; then
+		for classfile in /sys/bus/pci/devices/*/class; do
+			class="$(cat "$classfile")" || continue
+			case $class in
+				0x0c0300)	UHCI=yes ;;
+				0x0c0310)	OHCI=yes ;;
+				0x0c0320)	EHCI=yes ;;
+			esac
+		done
+	fi
+
 	kver=`uname -r | cut -d. -f1,2` # Kernel version (e.g. 2.4)
 	
 	if [ "$OHCI" = yes ] ; then
