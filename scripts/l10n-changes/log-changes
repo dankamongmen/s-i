@@ -45,9 +45,16 @@ OLD_DATE=`date -d "$DATE" +%s`
 
 for i in $POS/*.po
 do
-  if [ -e $i ]
+  if [ -f "$i" ]
   then
     DATE=`grep PO-Revision "$i" | cut -d ":" -f 2,3 | sed 's/^ //g' | cut -d '\' -f 1`
+
+    # Workaround for some weird date formatting
+    if [ ! "`echo "$DATE" | sed 's/GMT+//g'`" = "$DATE" ]
+    then
+	DATE="`echo "$DATE" | sed 's/GMT//g'`"
+    fi
+
     if date --date "$DATE" 2>/dev/null 1>&2 
     then
 	NEW_DATE=`date -d "$DATE" +%s`
@@ -71,7 +78,8 @@ do
 	    echo "$CSN.po:$trans" >> $PACKAGE/debian/.credits_log
 	    sort $PACKAGE/debian/.credits_log | uniq > t
 	    mv t $PACKAGE/debian/.credits_log
-        fi
+        
+	fi
     fi
   fi
 done
