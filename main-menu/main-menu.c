@@ -376,18 +376,24 @@ check_special(di_system_package *p)
 	return 0;
 }
 
-int do_menu_item(di_system_package *p) {
-	char *configcommand, *title;
-	int ret = 0;
-
-	di_log(DI_LOG_LEVEL_DEBUG, "Menu item '%s' selected", p->p.package);
+static void set_package_title(di_system_package *p) {
+	char *title;
 
 	asprintf(&title, "debian-installer/%s/title", p->p.package);
 	if (debconf_settitle(debconf, title))
 		di_log(DI_LOG_LEVEL_WARNING, "Unable to set title for %s.", p->p.package);
 	free(title);
+}
+
+int do_menu_item(di_system_package *p) {
+	char *configcommand;
+	int ret = 0;
+
+	di_log(DI_LOG_LEVEL_DEBUG, "Menu item '%s' selected", p->p.package);
 
 	if (p->p.status == di_package_status_installed) {
+		set_package_title(p);
+
 		/* The menu item is already configured, so reconfigure it. */
 		if (asprintf(&configcommand, "exec udpkg --configure --force-configure %s", p->p.package) == -1) {
 			return 0;
@@ -553,6 +559,7 @@ static int di_config_package(di_system_package *p,
 			return 0;
 	}
 
+	set_package_title(p);
 	if (asprintf(&configcommand, "exec udpkg --configure %s", p->p.package) == -1) {
 		return 0;
 	}
