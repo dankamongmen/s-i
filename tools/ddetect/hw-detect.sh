@@ -154,7 +154,7 @@ db_settitle hw-detect/title
 # Should be greater than the number of kernel modules we can reasonably
 # expect it will ever need to load.
 MAX_STEPS=1000
-OTHER_STEPS=4
+OTHER_STEPS=5
 # Use 1/10th of the progress bar for the non-module-load steps.
 OTHER_STEPSIZE=$(expr $MAX_STEPS / 10 / $OTHER_STEPS)
 db_progress START 0 $MAX_STEPS hw-detect/detect_progress_title
@@ -295,11 +295,11 @@ fi
 
 # get pcmcia running if possible
 if [ -x /etc/init.d/pcmcia ]; then
+	db_progress INFO hw-detect/pcmcia_step
 	CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 2>&1 | logger -t hw-detect
+	db_progress STEP $OTHER_STEPSIZE
 fi
-
 if [ -d /proc/bus/pccard ]; then
-	# Ask for pcmcia-cs to be installed into target
 	apt-install pcmcia-cs || true
 fi
 
