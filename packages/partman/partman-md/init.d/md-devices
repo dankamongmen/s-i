@@ -3,7 +3,7 @@
 . /lib/partman/definitions.sh
 
 # Create the raid devices
-for i in `cat /proc/mdstat|grep md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'`; do
+for i in `cat /proc/mdstat|grep ^md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'`; do
 	NUMBER=`echo ${i}|sed -e "s/^md//"`
 	DEVICE="/var/lib/partman/devices/=dev=md=${NUMBER}"
 	mkdir ${DEVICE}
