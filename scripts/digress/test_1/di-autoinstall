@@ -8,7 +8,9 @@ spawn -noecho $env(CONSOLECOMMAND)
 set timeout $env(STAGE_1_MAX_TIME)
 
 expect {
-	"Prompt:" {
+	-re "ep.*failed" {
+		exit 1
+	} "Prompt:" {
 		sleep 2
 		send "\r"
 		exp_continue -continue_timer
@@ -22,8 +24,6 @@ expect {
 		exit
 	} -re "Sending.*SIGTERM" {
 		exit
-	} -re "Installation.*step.*failed" {
-		exit 1
 	} timeout {
 		puts "timeout!"
 		exit 1
