@@ -1,0 +1,33 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+MOUNTPOINT="/target"
+
+PARTS=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
+
+db_subst di-utils-mount-partitions/which-partition PARTITIONS $PARTS
+
+db_input critical di-utils-mount-partitions/which-partition
+db_go
+
+db_get di-utils-mount-partitions/which-partition
+PARTITION="$RET"
+db_subst di-utils-mount-partitions/mountpoint PARTITION $PARTITION
+db_input critical di-utils-mount-partitions/mountpoint
+db_go
+
+db_get di-utils-mount-partitions/mountpoint
+MOUNTPOINT="$RET"
+
+if [ "$MOUNTPOINT" = "manual" ]; then
+    db_subst di-utils-mount-partitions/manual-mountpoint PARTITION $PARTITION
+    db_input critical di-utils-mount-partitions/manual-mountpoint
+    db_go
+
+    db_get di-utils-mount-partitions/manual-mountpoint
+    MOUNTPOINT="$RET"
+fi
+
+mount "$PARTITION" "$MOUNTPOINT"
+exit 0
