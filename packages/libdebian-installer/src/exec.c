@@ -38,7 +38,7 @@
 
 #define MAXLINE 1024
 
-int di_exec_full (const char *path, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
+int di_exec_env_full (const char *path, const char *const argv[], const char *const envp[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
 {
   char line[MAXLINE];
   pid_t pid;
@@ -107,7 +107,10 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
       if (child_prepare_handler (pid, child_prepare_user_data))
         exit (255);
 
-    execv (path, (char *const *) argv);
+    if (envp)
+      execve (path, (char *const *) argv, (char *const *) envp);
+    else
+      execv (path, (char *const *) argv);
     exit (127);
   }
   else if (pid < 0)
@@ -192,6 +195,11 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
   }
 
   return -1;
+}
+
+int di_exec_full (const char *path, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
+{
+  return di_exec_env_full (path, argv, NULL, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data);
 }
 
 int di_exec_shell_full (const char *const cmd, di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)

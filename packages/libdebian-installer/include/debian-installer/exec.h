@@ -54,6 +54,38 @@ di_process_handler
   di_exec_prepare_chroot;
 
 /**
+ * execve like call
+ *
+ * @param path executable with path
+ * @param argv NULL-terminated area of char pointer
+ * @param envp NULL-terminated area of char pointer
+ * @param stdout_handler di_io_handler which gets stdout (and to stderr if stderr_handler is NULL)
+ * @param stderr_handler di_io_handler which gets stderr
+ * @param io_user_data user_data for di_io_handler
+ * @param parent_prepare_handler di_process_handler which is called after the fork in the parent
+ * @param parent_prepare_user_data user_data for parent_prepare_handler
+ * @param child_prepare_handler di_process_handler which is called after the fork in the child
+ * @param child_prepare_user_data user_data for child_prepare_handler
+ *
+ * @return status or error
+ */
+int di_exec_env_full (const char *path, const char *const argv[], const char *const envp[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data);
+
+/**
+ * execve like call
+ *
+ * @param path executable with path
+ * @param argv NULL-terminated area of char pointer
+ * @param envp NULL-terminated area of char pointer
+ *
+ * @return status or error
+ */
+static inline int di_exec_env (const char *path, const char *const argv[], const char *const envp[])
+{
+  return di_exec_env_full (path, argv, envp, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+}
+
+/**
  * execv like call
  *
  * @param path executable with path
