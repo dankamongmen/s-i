@@ -14,8 +14,6 @@ if [ ! -f $KEY_FILE ]; then
 fi
 
 while [ -z "$PASSWORD" ]; do
-  db_set $TEMPLATE_ROOT/password ""
-  db_set $TEMPLATE_ROOT/password-again ""
 
   db_input critical $TEMPLATE_ROOT/password || true
   db_go
@@ -37,6 +35,9 @@ while [ -z "$PASSWORD" ]; do
     continue
   fi
   PASSWORD=$ROOT_PW
+
+  db_set $TEMPLATE_ROOT/password ""
+  db_set $TEMPLATE_ROOT/password-again ""
 done
 
 echo "installer:$(gen-crypt $PASSWORD):1:0:99999:7:::" >> /etc/shadow
