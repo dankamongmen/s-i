@@ -280,7 +280,7 @@ static int validate_mirror(void) {
 		/* ret is 0 if everything is ok, 1 else, aka retval */
 		/* Manual entry - check that the mirror is somewhat valid */
 		debconf_get(debconf, host);
-		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
+		if (debconf->value == NULL || strcmp(debconf->value,"") == 0 || strchr(debconf->value, '/') != NULL) {
 			ret = 1;
 		}
 		debconf_get(debconf, dir);
