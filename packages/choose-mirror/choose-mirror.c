@@ -333,7 +333,12 @@ static int validate_mirror(void) {
 			if (fgets(suite, 31, f)) {
 				if (suite[strlen(suite) - 1] == '\n')
 					suite[strlen(suite) - 1] = '\0';
-				debconf_set(debconf, DEBCONF_BASE "suite", suite);
+				/* Don't set the suite if the question
+				 * already has a value, to allow for
+				 * preseeding. */
+				debconf_get(debconf, DEBCONF_BASE "suite");
+				if (strlen(debconf->value) == 0)
+					debconf_set(debconf, DEBCONF_BASE "suite", suite);
 			}
 			else {
 				ret = 1;
