@@ -560,7 +560,7 @@ fixup(void)
 int
 main(int argc, char *argv[])
 {
-    int state = 0, ret;
+    int i, state = 0, ret;
     int (*states[])() = {
         partition_menu,
         filesystem,
@@ -569,10 +569,17 @@ main(int argc, char *argv[])
         fixup, // never does an INPUT, just handles the manual mountpoint result
         NULL
     };
+
+    /* FIXME: How can we tell which file system modules to load?  */
+    char *file_system_modules[] = {"ext3", "reiserfs", "jfs", "xfs", NULL};
+
     debconf = debconfclient_new();
     debconf->command(debconf, "CAPB", "backup", NULL);
     ped_exception_set_handler(my_exception_handler);
-    modprobe("ext3 reiserfs jfs xfs"); // FIXME: Any others?
+
+    for (i = 0; file_system_modules[i]; i++)
+	modprobe(file_system_modules[i]);
+
     if (check_proc_mounts("")) {
         // Chicken out if /target is already mounted
         debconf->command(debconf, "SET", "partconf/already-mounted", "no", NULL);
