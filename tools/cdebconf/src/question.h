@@ -18,8 +18,8 @@ struct questionowner {
 };
 
 struct question {
-	unsigned int ref;
 	char *tag;
+	unsigned int ref;
 	char *value;
 	char *defaultval;
 	unsigned int flags;

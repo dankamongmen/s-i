@@ -12,8 +12,8 @@ struct language_description
 
 struct template
 {
-	unsigned int ref;
 	char *tag;
+	unsigned int ref;
 	char *type;
 	char *defaultval;
 	char *choices;
