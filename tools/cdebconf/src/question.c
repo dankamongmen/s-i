@@ -194,7 +194,7 @@ const char *question_get_field(struct question *q, const char *lang,
 {
 	static char buf[4096] = {0};
 	assert(q);
-	assert(lang);
+	/* assert(lang); - lang is NULL when cdebconf starts */
 	assert(field);
 	if (strcmp(field, "value") == 0)
 		question_expand_vars(q,
