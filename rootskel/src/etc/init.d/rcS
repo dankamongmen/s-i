@@ -1,10 +1,11 @@
 #!/bin/sh
-
-mount /proc
+# Cleanup after the first /linuxrc, which left the initrd mounted
+# on /initrd.
+umount /initrd/dev
+umount /initrd
+freeramdisk /dev/rd/0
 
 echo -n "Starting system log daemon: "
 
 /sbin/syslogd -m 0
 echo "syslogd."
-
-

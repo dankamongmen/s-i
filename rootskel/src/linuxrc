@@ -1,0 +1,14 @@
+#!/bin/sh
+# Set up ramfs filesystem as root and pivot into it.
+echo "Setting up ramfs, please wait ..."
+mount -t ramfs ramfs mnt
+cp -a `ls -1 | grep -v mnt | grep -v proc | grep -v dev | grep -v lost+found` mnt
+cd mnt
+mkdir initrd proc dev
+pivot_root . initrd
+mount -t proc proc proc
+mount -t devfs devfs dev
+# Close all open files on the initrd, and run busybox init.
+rm -f linuxrc # this program
+ln -s /sbin/init linuxrc
+exec chroot . /linuxrc <dev/console >dev/console 2>&1
