@@ -150,52 +150,6 @@ do
 
         if find /lib/modules/`uname -r`/ | grep -q ${module}\\.o
         then
-                :
-        else
-	    if [ ! -d /dev/floppy ] ; then
-		log "error: Unable to load floppy device driver"
-		log "error: no way to load extra modules from floppy"
-	    else
-		while true
-		do
-		    template=hw-detect/not_included
-		    db_fset "$template" seen false || true
-		    db_subst "$template" CARDNAME "$cardname" || true
-		    db_subst "$template" MODULE "$module" || true
-		    db_input medium "$template" || [ $? -eq 30 ]
-		    db_go || true
-		    db_get "$template" || true
-		    mounted=0
-		    if [ "$RET" != "true" ]
-			then
-			break
-		    fi
-
-		    if mount -t ext2 /dev/floppy/0 /mnt
-		    then
-			if [ -f /mnt/modules.tgz ]
-			then
-			    mounted=1
-			    break
-			fi
-			umount /mnt
-		    fi
-		done
-	    fi
-
-            if [ "$mounted" = "1" ]
-            then
-                log "Copying modules.tgz from ext2 modules disk... "
-                gunzip -c /mnt/modules.tgz | tar xf - ${module}.o
-                umount /mnt
-                # Make sure 'depmod -a' accepts the new module
-                chown -R root /lib/modules
-                depmod -a
-            fi
-        fi
-
-        if find /lib/modules/`uname -r`/ | grep -q ${module}\\.o
-        then
             if load_modules "$module"
             then
                 :
@@ -204,6 +158,14 @@ do
 	    fi
         else
             log "Could not locate driver '$module' for $vendor $model."
+
+	    # Tell the user to try to load more modules from floppy
+	    template=hw-detect/not_included
+	    db_fset "$template" seen false || true
+	    db_subst "$template" CARDNAME "$cardname" || true
+	    db_subst "$template" MODULE "$module" || true
+	    db_input low "$template" || [ $? -eq 30 ]
+	    db_go || true
         fi
     fi
 
