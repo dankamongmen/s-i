@@ -1,9 +1,29 @@
 #!/bin/sh -e
 
+findfs () {
+    mount | grep "on /target${1%/} " | cut -d' ' -f1
+}
+
 . /usr/share/debconf/confmodule
 
 db_get debian-installer/kernel/commandline
 PARAMETER=$RET
+
+PARMFILE="ro noinitrd vmpoff=\"LOGOFF\""
+DASD="dasd="
+set -- `cut -b 1-4 /proc/dasd/devices`
+while [ $1 ]; do
+    DASD=${DASD}$1
+    shift;
+    if [ $1 ]; then
+        DASD=${DASD}","
+    fi
+done
+
+ROOTDEV="$(findfs /)"
+ROOT="$(mapdevfs "$ROOTDEV")"
+
+PARMFILE="$PARMFILE root=$ROOT $DASD"
 
 cat > /target/etc/zipl.conf << EOF
 [defaultboot]
@@ -30,3 +50,5 @@ optional = 1
 EOF
 
 chroot /target /sbin/zipl
+
+

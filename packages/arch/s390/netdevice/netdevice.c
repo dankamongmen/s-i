@@ -298,7 +298,7 @@ static int get_channel (void)
 static int get_ctc_protocol (void)
 {
 	char *ptr;
-	int ret = my_debconf_input ("medium", TEMPLATE_PREFIX "ctc/protocol", &ptr);
+	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "ctc/protocol", &ptr);
 	if (ret)
 		return ret;
 
@@ -476,7 +476,7 @@ static int confirm (void)
 static int setup (void)
 {
 	FILE *f;
-	char buf[256], buf1[256] = "", *ptr = NULL;
+	char buf[256], buf1[256] = "", buf2[256], *ptr = NULL;
 
 	if (mkdir ("/etc/modutils", 777) && errno != EEXIST)
 		return 1;
@@ -486,6 +486,7 @@ static int setup (void)
 		case TYPE_QETH:
 		case TYPE_CTC:
 		case TYPE_LCS:
+                        strncpy(buf2,type_text,sizeof(type_text));
 			if (strlen (chandev_parm))
 				ptr = chandev_parm;
 
@@ -521,6 +522,10 @@ static int setup (void)
 			break;
 
 		case TYPE_IUCV:
+                        strncpy(buf2,"netiucv",sizeof("netiucv"));
+			/* This is necessary because the "iucv" module */
+                        /*  provides the basic IUCV functions, but the */
+			/* "netiucv" module provides TCP/IP support.   */
 			f = fopen("/etc/modutils/netiucv", "a");
 			if (!f)
 				 return 1;
@@ -532,7 +537,7 @@ static int setup (void)
 			break;
 	}
 
-	snprintf (buf, sizeof (buf), "modprobe %s %s", type_text, buf1);
+	snprintf (buf, sizeof (buf), "modprobe %s %s", buf2, buf1);
 
 	di_exec_shell_log (buf);
 
