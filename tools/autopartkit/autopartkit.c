@@ -96,7 +96,10 @@
 
 
 /* Ignore devfs devices, used in choose_dev */
-#define IGNORE_DEVFS_DEVICES
+#define IGNORE_DEVFS_DEVICES 1
+
+/* Create fstab or not? */
+#define CREATE_FSTAB 1
 
 #if defined(TEST)
 #define FSTAB   "fstab"
@@ -699,7 +702,9 @@ static void
 fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 {
     int i;
+#if defined(CREATE_FSTAB)
     FILE *fstab;
+#endif /* CREATE_FSTAB */
 
     /* Mount partitions and write fstab */
     if (0 != mkdir("/target", 0755))
@@ -730,6 +735,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     }
     log_line();
 
+#if defined(CREATE_FSTAB)
     /*
      * /etc/ is needed to be able to open fstab for writing.  What if
      * /target/etc/ is a partition?  [/etc/ should always be on the
@@ -738,6 +744,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     if (0 != mkdir("/target/etc", 0755))
         autopartkit_error(1, "Unable to mkdir /target/etc: %s",
 			  strerror(errno));
+#endif /* CREATE_FSTAB */
 
     /* Are these really needed?  Who will create them if they are missing? */
     if (0 != mkdir("/target/floppy", 0755))
@@ -746,7 +753,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     if (0 != mkdir("/target/cdrom", 0755))
         autopartkit_error(1, "Unable to mkdir /target/cdrom: %s",
 			  strerror(errno));
-    
+#if defined(CREATE_FSTAB)
     fstab = fopen(FSTAB, "w");
 
     if ( ! fstab) {
@@ -764,6 +771,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     fprintf(fstab, "%s\tnone\tswap\tsw\t\t0\t0\n",
 	    normalize_devfs(find_partition_by_mountpoint(mountmap,"swap")));
     fprintf(fstab, "proc\t/proc\tproc\tdefaults\t\t0\t0\n");
+#endif /* CREATE_FSTAB */
 
     for (i = 0; i < partcount; i++)
     {
@@ -785,6 +793,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 
 	devpath = normalize_devfs(mountmap[i].devpath);
 
+#if defined(CREATE_FSTAB)
 	/* No use running fsck on filesystems without a device */
 	if (devpath && 0 == strcmp("none", devpath))
 	    fsckpass = 0;
@@ -794,6 +803,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 	fprintf(fstab, "%s\t%s\t%s\tdefaults\t\t0\t%d\n", 
 		devpath, mountmap[i].mountpoint->mountpoint,
 		mountmap[i].mountpoint->fstype,	fsckpass);
+#endif /* CREATE_FSTAB */
 	asprintf(&tmpmnt, "/target%s", mountmap[i].mountpoint->mountpoint);
 	make_path(tmpmnt, 0755);
 	mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
@@ -805,10 +815,12 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
        mounted device after it is mounted. */
     chmod("/target/tmp", 01777);
    
+#if defined(CREATE_FSTAB)
     fprintf(fstab, "/dev/fd0\t/floppy\tauto\trw,user,noauto\t\t0\t0\n");
     fprintf(fstab, "/dev/cdrom\t/cdrom\tiso9660\tro,user,noauto\t\t0\t0\n");
     
     fclose(fstab);
+#endif /* CREATE_FSTAB */
 }
 
 /*
