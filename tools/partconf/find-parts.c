@@ -107,6 +107,28 @@ test_raid(struct partition *p)
     fclose(fp);
 }
 
+static void
+get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev)
+{
+    if (PART_SIZE_BYTES(dev, part) > 0)
+        p->size = PART_SIZE_BYTES(dev, part);
+    if (part->fs_type != NULL) {
+        if (strcmp(part->fs_type->name, "linux-swap") == 0)
+            p->fstype = strdup("swap");
+        else
+            p->fstype = strdup(part->fs_type->name);
+    } else {
+        if (ped_partition_is_flag_available(part, PED_PARTITION_LVM) &&
+                ped_partition_get_flag(part, PED_PARTITION_LVM)) {
+            p->fstype = strdup("LVM");
+        }
+        if (ped_partition_is_flag_available(part, PED_PARTITION_RAID) &&
+                ped_partition_get_flag(part, PED_PARTITION_RAID)) {
+            p->fstype = strdup("RAID");
+        }
+    }
+}
+
 
 int
 get_all_partitions(struct partition *parts[], const int max_parts)
@@ -189,10 +211,7 @@ get_all_partitions(struct partition *parts[], const int max_parts)
             continue;
         if ((part = ped_disk_next_partition(disk, NULL)) == NULL)
             continue;
-        if (part->fs_type != NULL)
-            p->fstype = strdup(part->fs_type->name);
-        if (PART_SIZE_BYTES(dev, part) > 0)
-            p->size = PART_SIZE_BYTES(dev, part);
+        get_partition_info(p, part, dev);
     }
     // Add partitions from all the disks we found
     for (i = 0; i < disc_count; i++) {
@@ -215,22 +234,11 @@ get_all_partitions(struct partition *parts[], const int max_parts)
             p->path = ped_partition_get_path(part);
             p->fstype = NULL;
             p->fsid = NULL;
-            p->size = PART_SIZE_BYTES(dev, part);
+            p->size = 0L;
             p->op.filesystem = NULL;
             p->op.mountpoint = NULL;
             p->op.done = 0;
-            if (part->fs_type != NULL)
-                p->fstype = strdup(part->fs_type->name);
-            else {
-                if (ped_partition_is_flag_available(part, PED_PARTITION_LVM) &&
-                        ped_partition_get_flag(part, PED_PARTITION_LVM)) {
-                    p->fstype = strdup("LVM");
-                }
-                if (ped_partition_is_flag_available(part, PED_PARTITION_RAID) &&
-                        ped_partition_get_flag(part, PED_PARTITION_RAID)) {
-                    p->fstype = strdup("RAID");
-                }
-            }
+            get_partition_info(p, part, dev);
             parts[part_count++] = p;
         }
     }
