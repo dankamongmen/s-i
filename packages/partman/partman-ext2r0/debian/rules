@@ -5,7 +5,18 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
+
 PACKAGE = partman-ext2r0
+
+# list all sub-architectures which need this package (space separated)
+ifeq ($(ARCH),arm)
+SUBARCH=netwinder
+endif
+ifeq ($(ARCH),mipsel)
+SUBARCH=cobalt
+endif
+
 
 build:
 # Ye olde no-op.
@@ -39,7 +50,7 @@ binary-indep: build install
 	dh_installdebconf
 	dh_fixperms
 	dh_installdeb
-	dh_gencontrol
+	dh_gencontrol -- -Vsubarch='$(SUBARCH)'
 	dh_builddeb
 
 binary: binary-indep binary-arch
