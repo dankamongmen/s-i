@@ -22,24 +22,8 @@ if [ "$KEYMAP" = "trfu" ]; then
 
 db_get debian-installer/serial-console
 if [ "$RET" = "false" ] ; then
-	if apt-install console-tools console-data console-common; then
-		chroot /target install-keymap $KEYMAP
-		db_get debian-installer/consoledisplay || true
-		consolefont=`echo $RET | sed -e 's/^kbd=//'`
-		if [ "$consolefont" != "$RET" ]; then
-			acm=`echo $consolefont | sed -e 's/.*(//' -e 's/).*//'`
-			[ "$acm" = utf8 ] && acm=
-			consolefont=`echo $consolefont | sed -e 's/(.*//'`
-			[ -n "$consolefont" ] && \
-				sed -e "s/^#SCREEN_FONT=iso01.f16/SCREEN_FONT=$consolefont/" \
-					/target/etc/console-tools/config > /target/etc/console-tools/config.tmp && \
-				mv /target/etc/console-tools/config.tmp /target/etc/console-tools/config
-			[ -n "$acm" ] && \
-				sed -e "s/^#SCREEN_FONT_MAP=iso01/SCREEN_FONT_MAP=$acm/" \
-					/target/etc/console-tools/config > /target/etc/console-tools/config.tmp && \
-				mv /target/etc/console-tools/config.tmp /target/etc/console-tools/config
-		fi
-	fi
+	apt-install console-tools console-data console-common 
+	chroot /target install-keymap $KEYMAP
 fi
 
 
