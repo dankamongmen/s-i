@@ -8,7 +8,7 @@
  * Description: simple utility to load a template file into the 
  *              database
  *
- * $Id: debconf-loadtemplate.c,v 1.5 2002/07/22 22:55:02 tfheen Exp $
+ * $Id: debconf-loadtemplate.c,v 1.6 2002/08/07 16:38:19 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -107,7 +107,7 @@ int main(int argc, char **argv)
     tdb->methods.load(tdb);
     qdb->methods.load(qdb);
 
-    while (i <= argc)
+    while (i < argc)
     {
         t = template_load(argv[i++]);
         while (t)
