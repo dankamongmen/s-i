@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.29 2003/10/13 22:56:32 barbier Exp $
+ * $Id: slang.c,v 1.30 2003/10/14 21:47:24 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -425,6 +425,8 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	char *defaults[100] = {0};
 	char selected[100] = {0};
 	char answer[1024] = {0};
+	int *tindex = NULL;
+	const char *listorder = q_get_listorder(q);
 	int i, j, count, dcount, ret = 0, val = 0, pos = 2, xpos, ypos;
 	int top, bottom, longest, ch;
 	struct uidata *uid = UIDATA(ui);
@@ -432,7 +434,8 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 
 	/* Parse out all the choices */
 	count = strchoicesplit(q_get_choices_vals(q), choices, DIM(choices));
-	strchoicesplit(q_get_choices(q), choices_translated, DIM(choices_translated));
+	tindex = malloc(sizeof(int) * count);
+	strchoicesplitsort(q_get_choices(q), listorder, choices_translated, tindex, DIM(choices_translated));
 	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
 	if (count <= 0) return DC_NOTOK;
@@ -449,9 +452,9 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	 */
 	for (i = count-1; i >=0; i--)
 		for (j = 0; j < dcount; j++)
-			if (strcmp(choices[i], defaults[j]) == 0)
+			if (strcmp(choices[tindex[i]], defaults[j]) == 0)
 			{
-				selected[i] = 1;
+				selected[tindex[i]] = 1;
 				val = i;
 			}
 
@@ -471,10 +474,10 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 		{
 			slang_printf(ypos++, xpos, ((pos == 2 && i == val) ?
 				win->selectedcolor : win->drawcolor),
-				"(%c) %-*s ", (selected[i] ? '*' : ' '), 
+				"(%c) %-*s ", (selected[tindex[i]] ? '*' : ' '), 
 				longest, choices_translated[i]);
 
-			INFO(INFO_VERBOSE, "(%c) %-*s\n", (selected[i] ? '*' : 
+			INFO(INFO_VERBOSE, "(%c) %-*s\n", (selected[tindex[i]] ? '*' : 
 				' '), longest, choices_translated[i]);
 		}
 
@@ -521,11 +524,11 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 				if (multi == 0)
 				{
 					memset(selected, 0, sizeof(selected));
-					selected[val] = 1;
+					selected[tindex[val]] = 1;
 				}
 				else
 				{
-					selected[val] = !selected[val];
+					selected[tindex[val]] = !selected[tindex[val]];
 				}
 			}
 		}
@@ -546,6 +549,8 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	for (i = 0; i < dcount; i++)
 		free(defaults[i]);
 	question_setvalue(q, answer);
+
+	free(tindex);
 
 	return DC_OK;
 }
