@@ -1,0 +1,87 @@
+<!-- retain these comments for translator revision tracking -->
+<!-- $Id: arm.xml,v 1.1 2003/10/22 14:43:55 toff Exp $ -->
+
+
+  <sect2 arch="arm"><title>Booting from TFTP on NetWinder</title>
+
+<para>
+
+NetWinders have two network interfaces: The 10Mbps NE2000-compatible
+card is <filename>eth0</filename> and the 100Mbps Tulip card is
+<filename>eth1</filename>. 
+
+<para>
+
+NOTE: You need NeTTrom 2.2.1 or later to boot the
+installation system. NeTTrom 2.3.3 is recommended: get these files
+from 
+<ulink url="ftp://ftp.netwinder.org/pub/netwinder/firmware/">>:
+<itemizedlist> |<file/nettrom-2.3-3.armv4l.rpm/
+|<file/nettrom-2.3.3.bin/ |<file/nettrom-2.3.3.bin.md5sum/
+</itemizedlist>
+
+<para>
+
+After rebooting and interrupting the boot process during the countdown, you 
+must first configure the network either with a static address:
+<informalexample><screen>
+
+    NeTTrom command-> setenv eth0_ip 192.168.0.10/24
+
+</screen></informalexample>
+where 24 is the number of set bits in the netmask, or a dynamic address:
+<informalexample><screen>
+
+    NeTTrom command-> boot diskless
+
+</screen></informalexample>
+
+<para>
+
+You may also need to configure the <userinput>route1</userinput> settings if the TFTP
+server is not on the local subnet.  The rest of the config is pretty 
+standard (the save-all step is optional):
+<informalexample><screen>
+
+    NeTTrom command-> setenv kerntftpserver 192.168.0.1
+    NeTTrom command-> setenv kerntftpfile tftpboot.img
+    NeTTrom command-> save-all
+    NeTTrom command-> setenv netconfig_eth0 flash
+    NeTTrom command-> setenv kernconfig tftp
+
+</screen></informalexample>
+
+<para>
+
+Only the last two of these interfere with normal disk booting, so it is 
+safe to "save-all" right before it, which will store the network settings 
+in case you need to boot from the network again. Use the "printenv" 
+command to review your environment settings. Finally, if your 
+"cmdappend" NeTTrom variable has the "noinitrd" option (which is 
+necessary to boot 2.4 kernels), you must remove it so the downloaded 
+kernel can boot with its attached ramdisk.
+
+</para>
+  </sect2>
+
+  <sect2 arch="arm"><title>Booting from TFTP on CATS</title>
+
+<para>
+
+On CATS machines, use <command>boot de0:</command> or similar at the Cyclone prompt.
+
+</para>
+  </sect2>
+
+
+  <sect2 arch="arm"><title>Booting from CD-ROM</title>
+
+&intro-cd.xml;
+
+<para>
+
+To boot a CD-ROM from the Cyclone console prompt, use the command
+<command>boot cd0:cats.bin</command>
+
+</para>
+  </sect2>

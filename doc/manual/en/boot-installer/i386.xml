@@ -1,0 +1,360 @@
+<!-- retain these comments for translator revision tracking -->
+<!-- $Id: i386.xml,v 1.1 2003/10/22 14:43:55 toff Exp $ -->
+
+  <sect2 arch="i386"><title>Booting from a CD-ROM</title>
+
+&intro-cd.xml;
+
+<para>
+
+You may need to configure your hardware as indicated in 
+<xref linkend="boot-dev-select"></xref>. Then put the CD-ROM into the drive,
+and reboot.  The system should boot up, and you should be presented
+with the <command>boot:</command> prompt.  Here you can enter your
+boot arguments, or just hit <emphasis>enter</emphasis>.
+
+<para>
+
+CD #1 of official Debian CD-ROM sets for &arch-title; will present a
+<command>boot:</command> prompt on most hardware. Press
+<userinput>F3</userinput> to see the list of kernel options available
+from which to boot. Just type your chosen flavor name (idepci,
+vanilla, compact, bf24) at the <command>boot:</command> prompt
+followed by return.
+
+<para>
+
+If your hardware doesn't support booting of multiple images, put one
+of the other CDs in the drive. It appears that most SCSI CD-ROM drives 
+do not support <command>isolinux</command> multiple image booting, so users
+with SCSI CD-ROMs should try either CD2 (vanilla) or CD3 (compact), 
+or CD5 (bf2.4). 
+
+<para>
+
+CD's 2 through 5 will each boot a 
+different ``flavor'' depending on which CD-ROM is
+inserted. See <xref linkend="kernel-choice"></xref> for a discussion of the
+different flavors.  Here's how the flavors are laid out on the
+different CD-ROMs:
+<variablelist>
+        <varentry><term>
+CD 1</term>
+        |
+Allows a selection of kernel images to boot from (the idepci flavor is
+the default if no selection is made). 
+        
+
+</para></listitem>
+
+        <varentry><term>
+CD 2</term>
+        |
+Boots the `vanilla' flavor.
+        
+
+</para></listitem>
+
+        <varentry><term>
+CD 3</term>
+        |
+Boots the `compact' flavor.
+        
+
+</para></listitem>
+
+        <varentry><term>
+CD 4</term>
+        |
+Boots the `idepci' flavor.
+        
+
+</para></listitem>
+
+        <varentry><term>
+CD 5</term>
+        |
+Boots the `bf2.4' flavor.
+        
+
+</para></listitem>
+
+      </variablelist>
+
+<para>
+
+If your system can't boot directly from CD-ROM, or you simply can't
+seem to get it to work, don't despair; you can simply run
+<command>E:\install\boot.bat</command> under DOS (replace
+<userinput>E:</userinput> with whatever drive letter DOS assigns to
+your CD-ROM drive) to start the installation process. Then, skip down
+to <xref linkend="init-config"></xref>.
+
+</para><para>
+
+Also, if you're going to be installing from a FAT (DOS) partition, you
+have the option of booting the installer from the hard disk. See 
+<xref id="install-from-dos"></xref> for more information on 
+installing via this method.
+
+</para><para>
+
+USB CD-ROM drives are supported by the `bf2.4' flavor. FireWire devices that
+are supported by the ohci1394 and sbp2 drivers may also be useable with the
+`bf2.4' flavor.
+
+</para>
+  </sect2>
+
+
+
+  <sect2 id="install-from-dos"><title>Booting from a DOS partition</title>
+<para>
+
+Boot into DOS (not Windows) without any drivers being loaded.  To do
+this, you have to press <emphasis>F8</emphasis> at exactly the right
+moment (and optionally select the `safe mode command prompt only'
+option).  Enter the subdirectory for the flavor you chose, e.g.,
+
+<informalexample><screen>
+
+cd c:\current\compact
+
+</screen></informalexample>.  
+
+Next, execute <command>install.bat</command>.
+The kernel will load and launch the installer system. 
+
+</para><para>
+
+Please note, there is currently a loadlin problem (#142421) which
+precludes <filename>install.bat</filename> from being used with the
+bf2.4 flavor. The symptom of the problem is an `invalid compressed
+format' error.
+
+</para>
+  </sect2>
+
+
+  <sect2 id="boot-initrd">Booting from linux using <command>LILO</command>
+
+<para>
+
+One <emphasis>initrd=</emphasis> line in <filename>/etc/lilo.conf</filename> is enough to
+configure two essentials things:
+<itemizedlist>
+|
+tell <command>LILO</command> to load the <file/root.bin/ installer as a
+RAM disk at boot time;
+|
+tell the <file/linux.bin/ kernel to use this RAM disk as its root partition.
+</itemizedlist>
+Here is a <filename>/etc/lilo.conf</filename> example:
+
+<para>
+
+<informalexample><screen>
+
+image=/boot/newinstall/linux.bin
+       label=newinstall
+       initrd=/boot/newinstall/root.bin
+
+</screen></informalexample>
+<emphasis>root=/dev/hdXYZ</emphasis> options in <file/lilo.conf/ will be ignored
+in this case.
+For more details, refer to the <manref name="initrd" section="4"> and
+<manref name="lilo.conf" section="5"> man pages. Now run <userinput>lilo</userinput>
+and reboot.
+
+<para>
+
+You can trace the <filename>initrd</filename> magic at work several times during
+the boot.
+<itemizedlist>
+|
+before the kernel has even been loaded, <command>LILO</command> displays a
+much longer <userinput>Loading <replaceable>imagelabel</replaceable>......</userinput> line with
+more dots than usual, showing the progression of the RAM disk image
+loading.
+|
+You should see the <userinput>RAM disk driver initialized</userinput> notice, near
+the real time clock initialization, proving that your kernel supports
+the RAM disk feature.
+|
+Finally, if you don't see <userinput>RAMDISK: ext2 filesystem found at block
+0</userinput> immediately after the partition checks, it's probably because
+your kernel miss the <filename>initrd</filename> feature.
+</itemizedlist>
+
+<para>
+
+You should now see the debian installer <qref id="dbootstrap-intro">
+<command>dbootstrap</command></qref> running. If you do not use any
+removable medium, you want to check very early that your network
+connection is working and <emphasis>before</emphasis> irreversibly partitioning
+your hard disk. So you maybe need to <userinput>insmod</userinput> some additional
+kernel modules for this, for instance for your network interface. It's
+time <emphasis>not</emphasis> to follow the order of steps suggested by
+<command>dbootstrap</command>. Leap directly to <userinput>Mount a
+Previously-Initialized Partition</userinput>, and mount the partition where
+you stored the modules that <qref id="files-lilo">you extracted from
+<filename>drivers.tgz</filename></qref>.
+
+<!-- Ideally, configure Device Driver Modules should support the
+following (insmod-ing from the hard-disk) and not only from a floppy.
+That would avoid the need to open a shell -->
+
+Then switch to an other virtual terminal and use a shell (see <xref
+id="dbootstrap-shell-log">) to find drivers
+in the just mounted <filename>/target</filename> directory. <userinput>insmod</userinput>
+the ones you need.
+
+<para>
+
+Go to <xref linkend="configure-network"></xref> in the <command>dbootstrap</command>
+installer menus, and <userinput>ping</userinput> your favorite debian mirror at
+last. Congratulations!
+
+<para>
+
+Use <userinput>Unmount a Partition</userinput> if you have mounted one in the previous
+paragraph, safely go back to the partitioning steps at the start of
+<command>dbootstrap</command> and follow the regular procedure,
+with the network as a bonus. At this stage, it is even possible
+(only a bit risky) to completely wipe out all the previous partitions
+on your hard drive for a very clean installation. The only risk is that
+your hard drive will be un-bootable for a short period of time.
+
+</para>
+  </sect2>
+
+
+  <sect2 id="boot-from-floppies"><title>Booting from Floppies</title>
+<para>
+
+You will have already downloaded the floppy images you needed and
+created floppies from the images in <xref linkend="create-floppy"></xref>.  If you
+need to, you can also modify the rescue floppy; see <xref
+id="rescue-replace-kernel">.
+
+<para>
+
+Booting from the rescue floppy is easy: place the rescue floppy in
+the primary floppy drive, and shut down the system as you normally
+would, then turn it back on. 
+
+<para>
+
+For booting from an USB floppy drive, you need a third-party version of
+boot-floppies, available on  
+<ulink url="http://www-user.rhrk.uni-kl.de/~blochedu/usb-install/">>.
+
+<para>
+
+For installing from a LS-120 drive (ATAPI version) with a set of
+floppies, you need to specify the virtual location for the floppy device.
+This is done with the <emphasis>root=</emphasis> boot argument, giving the device that
+the ide-floppy driver maps the device to. For example, if your is connected
+as first IDE device on second cable, you enter "linux.bin root=/dev/hdc" on
+the boot prompt. Installation from LS120 is only supported by the `bf2.4'
+flavor.  
+
+<para>
+
+Note that on some machines, <userinput>Control-Alt-Delete</userinput> does not
+properly reset the machine, so a ``hard'' reboot is recommended.  If
+you are installing from an existing operating system (e.g., from a DOS
+box) you don't have a choice. Otherwise, please do a hard reboot when
+booting.
+
+<para>
+
+The floppy disk will be accessed, and you should then see a screen
+that introduces the rescue floppy and ends with the <command>boot:</command>
+prompt.
+
+<para>
+
+If you are using an alternative way to boot the system, follow the
+instructions, and wait for the <command>boot:</command> prompt to come up.  If
+you boot from floppies smaller than 1.44MB, <![
+%rescue-needs-root-disk [ or, in fact, whenever you boot from floppy
+on your architecture, ]]> you have to use a ramdisk boot method, and
+you will need the Root Disk.
+
+<para>
+
+You can do two things at the <command>boot:</command> prompt. You can press the
+function keys <emphasis>F1</emphasis> through <emphasis>F10</emphasis> to view a few pages of
+helpful information, or you can boot the system.
+
+<para>
+
+Information on boot parameters which might be useful can be found by
+pressing <emphasis>F4</emphasis> and <emphasis>F5</emphasis>.  If you add any parameters to
+the boot command line, be sure to type the boot method (the default is
+<userinput>linux</userinput>) and a space before the first parameter (e.g.,
+<userinput>linux floppy=thinkpad</userinput>). If you simply press &enterkey;,
+that's the same as typing <userinput>linux</userinput> without any special
+parameters.
+
+<para>
+
+The disk is called the rescue floppy because you can use it to boot
+your system and perform repairs if there is ever a problem that makes
+your hard disk unbootable. Thus, you should save this floppy after
+you've installed your system. Pressing <emphasis>F3</emphasis> will give further
+information on how to use the rescue floppy.
+
+<para>
+
+Once you press &enterkey;, you should see the message
+<userinput>Loading...</userinput>, followed by <userinput>Uncompressing Linux...</userinput>, and
+then a screenful or so of information about the hardware in your
+system.  More information on this phase of the boot process can be
+found below in <xref linkend="kernel-msgs"></xref>.
+
+<para>
+
+If you choose a non-default boot method, e.g., ``ramdisk'' or
+``floppy'', you will be prompted to insert the Root Floppy. Insert the
+Root Floppy into the first disk drive and press &enterkey;.  (If
+you choose floppy1 insert the Root Floppy into the second disk drive.)
+
+<para>
+
+After booting from the rescue floppy, the root floppy is
+requested. Insert the root floppy and press &enterkey;, and the
+contents are loaded into memory. The installer program
+<command>dbootstrap</command> is automatically launched.
+
+  </sect2>
+  
+  <sect2 arch="i386"><title>i386 Boot Parameters</title>
+<para>
+
+If you are booting from the rescue floppy or from CD-ROM you will be
+presented with the boot prompt, <command>boot:</command>.  Details
+about how to use boot parameters with the rescue floppy can be found
+in <xref id="boot-from-floppies"/>.  If you are booting from an
+existing operating system, you'll have to use other means to set boot
+parameters.  For instance, if you are installing from DOS, you can
+edit the <filename>install.bat</filename> file with any text editor.
+
+</para><para>
+
+Some systems have floppies with ``inverted DCLs''. If you receive
+errors reading from the floppy, even when you know the floppy is good,
+try the parameter <userinput>floppy=thinkpad</userinput>.
+
+</para><para>
+
+On some systems, such as the IBM PS/1 or ValuePoint (which have ST-506
+disk drivers), the IDE drive may not be properly recognized.  Again,
+try it first without the parameters and see if the IDE drive is
+recognized properly.  If not, determine your drive geometry
+(cylinders, heads, and sectors), and use the parameter
+<userinput>hd=<replaceable>cylinders</replaceable>,<replaceable>heads</replaceable>,<replaceable>sectors</replaceable></userinput>.
+
+</para>
+  </sect2>

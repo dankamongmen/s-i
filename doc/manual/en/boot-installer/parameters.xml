@@ -1,0 +1,152 @@
+<!-- retain these comments for translator revision tracking -->
+<!-- $Id: parameters.xml,v 1.1 2003/10/22 14:43:55 toff Exp $ -->
+
+ <sect1 id="boot-parms"><title>Boot Parameters</title>
+<para>
+
+Boot parameters are Linux kernel parameters which are generally used
+to make sure that peripherals are dealt with properly.  For the most
+part, the kernel can auto-detect information about your peripherals.
+However, in some cases you'll have to help the kernel a bit.
+
+</para><para>
+
+If this is the first time you're booting the system, try the default
+boot parameters (i.e., don't try setting arguments) and see if it works
+correctly. It probably will.  If not, you can reboot later and look for
+any special parameters that inform the system about your hardware.
+
+</para><para>
+
+Full information on boot parameters can be found in the <ulink
+url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html"> Linux
+BootPrompt HOWTO</ulink>, including tips for obscure hardware.  This
+section contains only a sketch of the most salient parameters.  Some
+common gotchas are included below in 
+<xref linkend="boot-troubleshooting"></xref>.
+
+</para><para>
+
+When the kernel boots, a message 
+
+<informalexample><screen>
+
+Memory:<replaceable>avail</replaceable>k/<replaceable>total</replaceable>k available 
+
+</screen></informalexample>
+
+should be emitted early in the process.
+<replaceable>total</replaceable> should match the total amount of RAM,
+in kilobytes.  If this doesn't match the actual amount of RAM you have
+installed, you need to use the
+<userinput>mem=<replaceable>ram</replaceable></userinput> parameter,
+where <replaceable>ram</replaceable> is set to the amount of memory,
+suffixed with ``k'' for kilobytes, or ``m'' for megabytes.  For
+example, both <userinput>mem=65536k</userinput> and
+<userinput>mem=64m</userinput> mean 64MB of RAM.
+
+</para><para>
+
+If your monitor is only capable of black-and-white, use the
+<userinput>mono</userinput> boot argument.  Otherwise, your
+installation will use color, which is the default.
+
+</para><para condition="supports-serial-console">
+
+If you are booting with a serial console, generally the kernel will
+autodetect this 
+<phrase arch="mipsel">(although not on DECstations)</phrase>
+If you have a videocard (framebuffer) and a keyboard also attached to
+the computer which you wish to boot via serial console, you may have
+to pass the
+<userinput>console=<replaceable>device</replaceable></userinput>
+argument to the kernel, where <replaceable>device</replaceable> is
+your serial device, which is usually something like ``ttyS0''.
+
+</para><para arch="sparc">"
+
+for &arch-title; the serial devices are ``ttya'' or ``ttyb''.
+Alternatively, set the <replaceable>input-device</replaceable> and
+<replaceable>output-device</replaceable> OpenPROM variables to
+``ttya''.
+
+</para>
+
+
+  <sect2 id="installer-args"><title>Debian Installer Arguments</title>
+<para>
+
+The installation system recognizes a few boot arguments which may be
+useful. 
+
+</para>
+
+<variablelist>
+<varlistentry>
+<term>DEBCONF_PRIORITY=CRITICAL</term>
+<listitem><para>
+
+This will cause the installation system to
+display only critical messages and try to do the right thing without
+fuss.  If problems are encountered, the installer adjusts the priority
+as needed.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>DEBCONF_PRIORITY=HIGH</term>
+<term>DEBCONF_PRIORITY=MEDIUM</term>
+<term>DEBCONF_PRIORITY=LOW</term>
+
+<listitem><para>
+
+These parameter settings will similarly set the highest priority of
+messages to be displayed. For example, with the priority set to HIGH,
+both high and critical priority messages are shown, but medium and 
+low priority messages are skipped.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>debug</term>
+<listitem><para>
+
+Emit additional debug messages to the installation system log (see
+<xref linkend="dbootstrap-shell-log"></xref>), including every command run.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>nofb</term>
+<listitem><para>
+
+Some architectures use the kernel framebuffer to offer installation in
+a number of languages. If framebuffer causes a problem on your system
+you can use this option to disable the feature. Problem symptoms are
+error messages about bterm or bogl, a blank screen, or a freeze within
+a few minutes after starting the install.
+
+</para><para arch="i386">
+
+The video=vga16:off argument may also be used to disable
+the framebuffer. Such problems have been reported on a Dell Inspiron with
+Mobile Radeon card.
+
+</para><para arch="m68k">
+
+Such problems have been reported on the Amiga 1200 and SE/30.
+
+</para><para arch="hppa">
+
+Such problems have been reported on hppa.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+  </sect2>
+ </sect1>
+
