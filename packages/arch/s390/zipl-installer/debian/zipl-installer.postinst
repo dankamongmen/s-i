@@ -8,9 +8,18 @@ findfs () {
 
 ROOTDEV="$(findfs /)"
 ROOT="$(mapdevfs "$ROOTDEV")"
+DASD="dasd="
+set -- `cut -b 1-4 /proc/dasd/devices`
+while [ $1 ]; do
+    DASD=${DASD}$1
+    shift;
+    if [ $1 ]; then
+        DASD=${DASD}","
+    fi
+done
 
 db_get debian-installer/kernel/commandline
-PARAMETER="$RET root=$ROOT"
+PARAMETER="$RET root=$ROOT $DASD"
 
 cat > /target/etc/zipl.conf << EOF
 [defaultboot]
