@@ -124,8 +124,7 @@ fs_to_choice(char *fs)
 
     // Cache the format string
     if (choicefmt == NULL) {
-        debconf->command(debconf, "METAGET",
-                "partconf/internal-create-fs-choice", "description", NULL);
+        debconf_metaget(debconf, "partconf/internal-create-fs-choice", "description");
         choicefmt = strdup(debconf->value);
     }
     asprintf(&tmp, choicefmt, fs);
@@ -208,8 +207,8 @@ sanity_checks(void)
             }
         }
         if (!ok) {
-            debconf->command(debconf, "INPUT critical", "partconf/sanity-no-root", NULL);
-            debconf->command(debconf, "GO", NULL);
+            debconf_input(debconf,"critical", "partconf/sanity-no-root");
+            debconf_go(debconf);
             return 0;
         }
     }
@@ -220,10 +219,10 @@ sanity_checks(void)
             continue;
         for (j = 0; bad_mounts[j] != NULL; j++) {
             if (strcmp(parts[i]->op.mountpoint, bad_mounts[j]) == 0) {
-                debconf->command(debconf, "SUBST", "partconf/sanity-bad-mount",
-                        "MOUNT", parts[i]->op.mountpoint, NULL);
-                debconf->command(debconf, "INPUT critical", "partconf/sanity-bad-mount", NULL);
-                debconf->command(debconf, "GO", NULL);
+                debconf_subst(debconf, "partconf/sanity-bad-mount", 
+			     "MOUNT", parts[i]->op.mountpoint);
+                debconf_input(debconf, "critical", "partconf/sanity-bad-mount");
+                debconf_go(debconf);
                 ok = 0;
                 break;
             }
@@ -237,10 +236,10 @@ sanity_checks(void)
         if (parts[i]->op.mountpoint == NULL)
             continue;
         if (check_proc_mounts(parts[i]->op.mountpoint)) {
-            debconf->command(debconf, "SUBST", "partconf/sanity-double-mount",
-                    "MOUNT", parts[i]->op.mountpoint, NULL);
-            debconf->command(debconf, "INPUT critical", "partconf/sanity-double-mount", NULL);
-            debconf->command(debconf, "GO", NULL);
+            debconf_subst(debconf, "partconf/sanity-double-mount",
+                          "MOUNT", parts[i]->op.mountpoint);
+            debconf_input(debconf, "critical", "partconf/sanity-double-mount");
+            debconf_go(debconf);
             ok = 0;
         }
         else
@@ -248,11 +247,11 @@ sanity_checks(void)
                 if (parts[j]->op.mountpoint == NULL)
                     continue;
                 if (strcmp(parts[i]->op.mountpoint, parts[j]->op.mountpoint) == 0) {
-                    debconf->command(debconf, "SUBST", "partconf/sanity-double-mount",
-                            "MOUNT", parts[i]->op.mountpoint, NULL);
-                    debconf->command(debconf, "INPUT critical",
-                            "partconf/sanity-double-mount", NULL);
-                    debconf->command(debconf, "GO", NULL);
+                    debconf_subst(debconf,"partconf/sanity-double-mount",
+                                  "MOUNT", parts[i]->op.mountpoint);
+                    debconf_input(debconf, "critical",
+                                  "partconf/sanity-double-mount");
+                    debconf_go(debconf);
                     ok = 0;
                     break;
                 }
@@ -266,11 +265,11 @@ sanity_checks(void)
         // XXX something like "Partitions 1, 3 and 7 on IDE3 master", but this
         // XXX is probably hard, especially for i18n. :-( If multi-line
         // XXX substitutions worked, we could just list the partitions.
-        debconf->command(debconf, "SET", "partconf/confirm", "false", NULL);
-        debconf->command(debconf, "INPUT critical", "partconf/confirm", NULL);
-        if (debconf->command(debconf, "GO", NULL) == 30)
+        debconf_set(debconf, "partconf/confirm", "false");
+        debconf_input(debconf, "critical", "partconf/confirm");
+        if (debconf_go(debconf) == 30)
             return 0;
-        debconf->command(debconf, "GET", "partconf/confirm", NULL);
+        debconf_get(debconf, "partconf/confirm");
         if (strcmp(debconf->value, "false") == 0)
             return 0;
     }
@@ -361,7 +360,7 @@ finish(void)
                 free(cmd);
                 if (ret != 0) {
                     errq = "partconf/failed-mkfs";
-                    debconf->command(debconf, "SUBST", errq, "FS", parts[i]->op.filesystem, NULL);
+                    debconf_subst(debconf,errq, "FS", parts[i]->op.filesystem);
                     break;
                 }
             }
@@ -393,7 +392,7 @@ finish(void)
                 if (ret < 0 && errno != ENODEV) {
                     append_message("mount: %s\n", strerror(errno));
                     errq = "partconf/failed-mount";
-                    debconf->command(debconf, "SUBST", errq, "MOUNT", mntpt, NULL);
+                    debconf_subst(debconf, errq, "MOUNT", mntpt);
                     free(mntpt);
                     break;
                 }
@@ -402,9 +401,9 @@ finish(void)
         }
     }
     if (errq != NULL) {
-        debconf->command(debconf, "SUBST", errq, "PARTITION", parts[i]->path, NULL);
-        debconf->command(debconf, "INPUT critical", errq, NULL);
-        debconf->command(debconf, "GO", NULL);
+        debconf_subst(debconf, errq, "PARTITION", parts[i]->path);
+        debconf_input(debconf,"critical", errq);
+        debconf_go(debconf);
         exit(30);
     }
     else
@@ -422,9 +421,9 @@ partition_menu(void)
     /* Get partition information */
     choices = build_part_choices(parts, part_count);
     //printf("Choices: <%s>\n", choices);
-    debconf->command(debconf, "SUBST", "partconf/partitions", "PARTITIONS", choices, NULL);
+    debconf_subst(debconf, "partconf/partitions", "PARTITIONS", choices);
     free(choices);
-    debconf->command(debconf, "INPUT critical", "partconf/partitions", NULL);
+    debconf_input(debconf, "critical", "partconf/partitions");
     curr_part = NULL;
     return 0;
 }
@@ -449,7 +448,7 @@ filesystem(void)
     int i;
     char *partname;
 
-    debconf->command(debconf, "GET", "partconf/partitions", NULL);
+    debconf_get(debconf, "partconf/partitions");
     if (strcmp(debconf->value, "Finish") == 0) {
         if (!sanity_checks())
             return 1; // will back up
@@ -471,13 +470,13 @@ filesystem(void)
         return -1;
     if (curr_part->fstype != NULL) {
         curr_q = "partconf/existing-filesystem";
-        debconf->command(debconf, "SUBST", curr_q, "FSTYPE", curr_part->fstype, NULL);
-        debconf->command(debconf, "SET", curr_q, "Leave the file system intact", NULL);
+        debconf_subst(debconf, curr_q, "FSTYPE", curr_part->fstype);
+        debconf_set(debconf, curr_q, "Leave the file system intact");
     } else
         curr_q = "partconf/create-filesystem";
-    debconf->command(debconf, "SUBST", curr_q, "FSCHOICES", fschoices, NULL);
-    debconf->command(debconf, "SUBST", curr_q, "PARTITION", curr_part->path, NULL);
-    debconf->command(debconf, "INPUT critical", curr_q, NULL);
+    debconf_subst(debconf, curr_q, "FSCHOICES", fschoices);
+    debconf_subst(debconf, curr_q, "PARTITION", curr_part->path);
+    debconf_input(debconf, "critical", curr_q);
     return 0;
 }
 
@@ -486,7 +485,7 @@ mountpoint(void)
 {
     int i;
 
-    debconf->command(debconf, "GET", curr_q, NULL);
+    debconf_get(debconf, curr_q);
     if (strcmp(debconf->value, "Leave the file system intact") == 0) {
         free(curr_part->op.filesystem);
         curr_part->op.filesystem = NULL;
@@ -514,9 +513,8 @@ mountpoint(void)
     }
     if (curr_part->op.filesystem == NULL || strcmp(curr_part->op.filesystem, "swap") != 0) {
         // TODO: default to current mount point, if any
-        debconf->command(debconf, "SUBST", "partconf/mountpoint", "PARTITION",
-                curr_part->path, NULL);
-        debconf->command(debconf, "INPUT critical", "partconf/mountpoint", NULL);
+        debconf_subst(debconf, "partconf/mountpoint", "PARTITION", curr_part->path);
+        debconf_input(debconf, "critical", "partconf/mountpoint");
     }
     return 0;
 }
@@ -529,14 +527,13 @@ mountpoint_manual(void)
     if (curr_part->op.filesystem != NULL && strcmp(curr_part->op.filesystem, "swap") == 0)
         return 0;
     do_mount_manual = 0;
-    debconf->command(debconf, "GET", "partconf/mountpoint", NULL);
+    debconf_get(debconf, "partconf/mountpoint");
     if (strcmp(debconf->value, "Don't mount it") == 0) {
         free(curr_part->op.mountpoint);
         curr_part->op.mountpoint = NULL;
     } else if (strcmp(debconf->value, "Enter manually") == 0) {
-        debconf->command(debconf, "SUBST", "partconf/mountpoint-manual", "PARTITION",
-                curr_part->path, NULL);
-	debconf->command(debconf, "INPUT critical", "partconf/mountpoint-manual", NULL);
+        debconf_subst(debconf, "partconf/mountpoint-manual", "PARTITION", curr_part->path);
+	debconf_input(debconf, "critical", "partconf/mountpoint-manual");
 	do_mount_manual = 1;
     } else {
 	//printf("Setting mountpoint to %s\n", debconf->value);
@@ -551,7 +548,7 @@ fixup(void)
 {
     if (!do_mount_manual)
 	return 0;
-    debconf->command(debconf, "GET", "partconf/mountpoint-manual", NULL);
+    debconf_get(debconf,"partconf/mountpoint-manual");
     free(curr_part->op.mountpoint);
     curr_part->op.mountpoint = strdup(debconf->value);
     return 0;
@@ -574,7 +571,7 @@ main(int argc, char *argv[])
     char *file_system_modules[] = {"ext3", "reiserfs", "jfs", "xfs", NULL};
 
     debconf = debconfclient_new();
-    debconf->command(debconf, "CAPB", "backup", NULL);
+    debconf_capb(debconf, "backup");
     ped_exception_set_handler(my_exception_handler);
 
     for (i = 0; file_system_modules[i]; i++)
@@ -582,26 +579,26 @@ main(int argc, char *argv[])
 
     if (check_proc_mounts("")) {
         // Chicken out if /target is already mounted
-        debconf->command(debconf, "SET", "partconf/already-mounted", "no", NULL);
-        debconf->command(debconf, "INPUT critical", "partconf/already-mounted", NULL);
-        debconf->command(debconf, "GO", NULL);
-        debconf->command(debconf, "GET", "partconf/already-mounted", NULL);
+        debconf_set(debconf,"partconf/already-mounted", "no");
+        debconf_input(debconf, "critical", "partconf/already-mounted");
+        debconf_go(debconf);
+        debconf_get(debconf,"partconf/already-mounted");
         if (strcmp(debconf->value, "false") == 0)
             return 0;
     }
     if (!umount_target()) {
-        debconf->command(debconf, "INPUT critical", "partconf/umount-failed", NULL);
-        debconf->command(debconf, "GO", NULL);
+        debconf_input(debconf, "critical", "partconf/umount-failed");
+        debconf_go(debconf);
         return 1;
     }
     if ((part_count = get_all_partitions(parts, MAX_PARTS)) <= 0) {
-        debconf->command(debconf, "INPUT critical", "partconf/no-partitions", NULL);
-        debconf->command(debconf, "GO", NULL);
+        debconf_input(debconf, "critical", "partconf/no-partitions");
+        debconf_go(debconf);
         return 1;
     }
     if (get_all_filesystems() <= 0) {
-        debconf->command(debconf, "INPUT critical", "partconf/no-filesystems", NULL);
-        debconf->command(debconf, "GO", NULL);
+        debconf_input(debconf, "critical", "partconf/no-filesystems");
+        debconf_go(debconf);
         return 1;
     }
     fschoices = build_fs_choices();
@@ -609,7 +606,7 @@ main(int argc, char *argv[])
         ret = states[state]();
         if (ret < 0)
             state = -1;
-        else if (ret == 0 && debconf->command(debconf, "GO", NULL) == 0)
+        else if (ret == 0 && debconf_go(debconf) == 0)
             state++;
         else
             state--;
