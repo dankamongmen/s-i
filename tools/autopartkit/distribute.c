@@ -55,9 +55,6 @@
       reduced by (max-min) to make sure the free space number is
       comparable to the requested diskspace.
 
-This code is not finished yet, as it must be integrated into
-autopartkit.
-
 */
 
 #include "config.h"
