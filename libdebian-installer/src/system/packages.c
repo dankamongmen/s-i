@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.8 2003/10/03 18:25:02 waldi Exp $
+ * $Id: packages.c,v 1.9 2003/10/05 10:09:19 waldi Exp $
  */
 
 #include <debian-installer/system/packages.h>
@@ -83,6 +83,7 @@ di_packages *di_system_packages_alloc (void)
   return ret;
 }
 
+#if 0
 bool di_system_package_check_subarchitecture (di_package *package, const char *subarchitecture)
 {
   char *string, *begin, *end, *temp;
@@ -115,6 +116,7 @@ cleanup:
 
   return false;
 }
+#endif
 
 di_parser_info *di_system_package_parser_info (void)
 {

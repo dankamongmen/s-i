@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.c,v 1.6 2003/09/30 19:22:07 waldi Exp $
+ * $Id: dpkg.c,v 1.7 2003/10/05 10:09:19 waldi Exp $
  */
 
 #include <config.h>
@@ -88,7 +88,8 @@ int di_system_dpkg_package_control_file_exec (di_package *package, const char *n
   for (i = 0; i < argc; i++)
     real_argv[i+1] = argv[i];
 
-  return di_exec (buf, real_argv);
+  i = di_exec (buf, real_argv);
+  return di_exec_mangle_status (i);
 }
 
 #if 0
