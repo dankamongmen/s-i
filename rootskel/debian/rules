@@ -27,7 +27,7 @@ clean:
 	dh_clean
 
 # cvs update -P will remove these dirs if they are empty
-DIRS=dev proc var/log mnt floppy usr/lib/prebaseconfig.d
+DIRS=dev proc var/log var/lib/apt-install mnt floppy usr/lib/prebaseconfig.d
 
 install: build
 	dh_testdir
@@ -37,6 +37,7 @@ install: build
 	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
 	$(foreach DIR, $(DIRS), \
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
+	touch debian/rootskel/var/lib/apt-install/queue
 
 # Build architecture-independent files here.
 binary-indep: build install
