@@ -28,11 +28,11 @@ checks()
 	exit 1
     fi
 
-    dpkg -l gnuplot | grep -q "^ii" 
-    if  [ $? != 0 ] ; then
-	echo "gnuplot is not installed on your system"
-	exit 1
-    fi
+#     dpkg -l gnuplot | grep -q "^ii" 
+#     if  [ $? != 0 ] ; then
+# 	echo "gnuplot is not installed on your system"
+# 	exit 1
+#     fi
 }
 
 if [ -z "$1" ]
@@ -98,7 +98,8 @@ XTICS=`echo $XTICS | sed "s:^":\(":" | sed "s:,$:):"`
 cat $STATS.txt | sort | awk '{print $1}' > $GNUPLOT_DATA
 
 rm -f $GNUPLOT_SCRIPT
-echo "set terminal png size 640,480" >> $GNUPLOT_SCRIPT
+#echo "set terminal png size 640,480" >> $GNUPLOT_SCRIPT
+echo "set terminal png" >> $GNUPLOT_SCRIPT
 echo "set output \"$DEST_DIR/graph.png\"" >> $GNUPLOT_SCRIPT
 echo "set title \"Statistics for the $i languages with an Aspell dictionary\"" >> $GNUPLOT_SCRIPT
 echo "set key left" >> $GNUPLOT_SCRIPT
