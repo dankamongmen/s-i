@@ -41,19 +41,26 @@ log "Detecting hardware..."
 
 # Manually load modules to enable things we can't detect.
 # XXX: This isn't the best way to do this; we should autodetect.
-manual_load="ide-mod ide-probe-mod ide-cd ide-disk isofs"
+manual_load="ide-mod ide-probe-mod ide-disk ide-cd isofs"
 #manual_load=i82365 usb-storage
 #manual_load=i82365 sr_mod usb-storage
+
+get_hw_info() {
+    /sbin/discover --format="%m\t%V\t%M\n" \
+	--disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom
+}
+set -- `get_hw_info | wc -l`
+count="$1"
+db_progress START 0 $count cdrom-detect/progress_title
 
 IFS_SAVE="$IFS"
 IFS="
 "
-for device in `/sbin/discover --disable-all --enable=pci,ide,scsi,pcmcia \
-                --format="%m\t%V\t%M\n" scsi cdrom`
+for device in `get_hw_info`
 do
+    module="`echo $device | cut -f1`"
     vendor="`echo $device | cut -f2`"
     model="`echo $device | cut -f3`"
-    module="`echo $device | cut -f1`"
     IFS="$IFS_SAVE"
 
     if [ "$vendor" != "Unknown" ]
@@ -63,9 +70,15 @@ do
         name="$model"
     fi
 
+    log "Detected load module '$module' for '$name'"
+
+    db_subst cdrom-detect/progress_step MODULE "$module"
+    db_subst cdrom-detect/progress_step CARDNAME "$name"
+    db_progress STEP 1 cdrom-detect/progress_step
+
     if [ -n "$module" -a "$module" != "ignore" ]
     then
-        log "Trying to load module '$module' for '$name'"
+        log "Trying to load module '$module'"
 
         if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
@@ -124,6 +137,8 @@ do
 "
 done
 IFS="$IFS_SAVE"
+
+db_progress STOP
 
 load_modules $manual_load
 
