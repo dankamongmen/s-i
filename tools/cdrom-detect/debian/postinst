@@ -283,10 +283,11 @@ do
 done
 
 # Set the distribution used by base-installer, test in priority order
-for dist in woody sarge sid ; do
+for dist in stable testing unstable ; do
     if [ -e /cdrom/dists/$dist ] ; then
-	db_set mirror/distribution $dist
-	log "Detected CD with '$dist' distribution"
+	CODENAME=`sed -n 's/^Codename: *//p' /cdrom/dists/$dist/Release`
+	db_set mirror/distribution $CODENAME
+	log "Detected CD with '$CODENAME' distribution"
 	break
     fi
 done
