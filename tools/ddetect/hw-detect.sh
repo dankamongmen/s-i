@@ -215,7 +215,8 @@ for device in $(list_to_lines); do
 
     log "Detected module '$module' for '$cardname'"
 
-    if [ "$module" != "ignore" -a "$module" != "[Unknown]" ]; then
+    if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] && \
+       is_not_loaded "$module"; then
     	db_subst hw-detect/load_progress_step CARDNAME "$cardname"
         db_subst hw-detect/load_progress_step MODULE "$module"
         db_progress INFO hw-detect/load_progress_step
