@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# - Search all PO files under the current directory 
+# - Merge each language file into one big file
+#
+#
+# WORK IN PROGRESS. You have been warned!
+
+if [ -z $1 ]
+then
+  echo Usage $0 destination_directory
+  exit 1
+fi
+
+# Also build a general templates.pot file
+msgcat `find . -name templates.pot|grep "debian/po"` >$1/templates.pot
+
+# Search all debconf translations files
+filelist=`find . -name \*.po | grep "debian/po"`
+
+# From this list, build the languages list
+langlist=`(for i in $filelist ; do basename $i .po ; done) | sort | uniq`
+
+# For each language, build the general PO file
+for i in $langlist ; do
+    # msgcat merges all files together
+    # msgattrib removes all entries marked as "osbolete"
+    # msgmerge updates all the stuff regarding templates.pot
+    msgcat `find . -name $i.po | grep "debian/po"` | msgattrib --no-obsolete - >$1/$i.po
+    msgmerge --backup=none -U $1/$i.po $1/templates.pot
+done
+
+
+
+
