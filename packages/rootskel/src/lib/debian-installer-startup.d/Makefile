@@ -13,7 +13,7 @@ files = \
 ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
   ifeq ($(DEB_HOST_GNU_CPU),powerpc)
     files += \
-	S45-keyboard-linux-powerpc
+	S45keyboard-linux-powerpc
   endif
 endif
 
