@@ -129,6 +129,9 @@ get_all_hw_info() {
 # The order of these modules are important. [pere 2003-03-16]
 get_manual_hw_info() {
     echo "floppy:Linux Floppy"
+    # ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
+    echo "ide-mod:Linux IDE driver"
+    echo "ide-probe-mod:Linux IDE probe driver"
     get_ide_chipset_info
     echo "ide-detect:Linux IDE detection"
     echo "ide-floppy:Linux IDE floppy"
