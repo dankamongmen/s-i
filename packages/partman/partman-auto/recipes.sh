@@ -19,7 +19,6 @@ update_all () {
 }
 
 autopartitioning_failed () {
-    db_fset partman-auto/autopartitioning_failed seen false
     db_input critical partman-auto/autopartitioning_failed || true
     db_go || true
     update_all
@@ -321,14 +320,12 @@ choose_recipe () {
 #    db_metaget partman-auto/text/expert_recipe description
 #    choices="${choices}expert${TAB}${RET}"
     
-    db_fset partman-auto/choose_recipe seen false
     debconf_select high partman-auto/choose_recipe "$choices" "$first_recipe"
     if [ "$?" = 255 ]; then
 	exit 0
     fi
     
     if [ "$RET" = expert ]; then
-	db_fset partman-auto/expert_recipe seen false
 	db_input critical partman-auto/expert_recipe || true
 	if ! db_go; then
 	    exit 1
