@@ -322,7 +322,7 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 	WINDOW *win = UIDATA(ui)->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit(question_choices(q), choices, DIM(choices));
+	count = strchoicesplit((char *)question_choices(q), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 
 	/* See what the currently selected value should be -- either a
