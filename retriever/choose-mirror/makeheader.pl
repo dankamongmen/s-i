@@ -75,7 +75,7 @@ if ($type eq 'template') {
 
 	print TEMPLATE "Template: mirror/ftp/countries\n";
 	print TEMPLATE "Type: select\n";
-	print TEMPLATE "#  NOTE: Translate the ISO country codes below into localised country names.\n";
+	print TEMPLATE "#  [NOTE] Translate the ISO country codes below into localised country names.\n";
         print TEMPLATE "__Choices: enter information manually";
 	foreach  my $country (sort (keys %ftp_countries)) {
                 print TEMPLATE ", ${country}";
