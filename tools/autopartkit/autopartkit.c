@@ -228,7 +228,7 @@ void disable_kmsg(int disable)
  */
 
 /*                      01234567890123456789012345678901234567890123456789012345678901234567890123456789 */
-#define TABLE_HEADER _("Device    Model               Size   Free   FreeFat NbPart")
+#define TABLE_HEADER _("Device    Model               Size   Free   FreeFat NbPart")
 #define TABLE_SIZE 2048
 #define LIST_SIZE 512
 PedDevice* choose_device()
