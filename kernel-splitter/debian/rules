@@ -13,7 +13,7 @@ ARCH=$(shell dpkg --print-architecture)
 build:
 	# unpack all available deb files into unpacked/
 	install -d unpacked
-	for file in `find debs/ -type f -or -type l -maxdepth 1`; do \
+	for file in `find debs/ -maxdepth 1 -name '*.deb'`; do \
 		dpkg-deb -x $$file unpacked/; \
 	done
 
@@ -27,12 +27,9 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-
 	# Actually installs all the modules into place, and
 	# generates a proper control file.
 	./copy-modules
-
-	dh_installdirs
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -61,8 +58,6 @@ binary-arch: build install
 		dh_builddeb --package=$${package} \
 			--filename=$${package}_$(VERSION)_$(ARCH).udeb; \
 	done
-	# Have to do it now.
-	dh_clean
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
