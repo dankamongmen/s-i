@@ -33,9 +33,20 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	cp shell debian/di-utils-shell.postinst
-	mkdir -p debian/di-utils-mapdevfs/usr/bin
-	cp mapdevfs debian/di-utils-mapdevfs/usr/bin
+	install -m755 shell debian/di-utils-shell.postinst
+	install -m755 mkswap.sh debian/di-utils-mkswap.postinst
+	install -m755 mkfs.sh debian/di-utils-mkfs.postinst
+	install -m755 mount.sh debian/di-utils-mount-partitions.postinst
+	install -m755 partitioner.sh debian/di-utils-partitioner.postinst
+	mkdir -p debian/di-utils-mount-partitions/usr/bin
+	cp mapdevfs debian/di-utils-mount-partitions/usr/bin
+	# di-utils-generic
+	install -d debian/di-utils-generic/usr/share/debian-installer/overrides
+	install -m644 functions.sh \
+		debian/di-utils-generic/usr/share/debian-installer
+	install -d debian/di-utils-generic/usr/lib/prebaseconfig.d
+	install -m755 fstab.sh \
+		debian/di-utils-generic/usr/lib/prebaseconfig.d/40fstab
 
 # Build architecture-independent files here.
 binary-indep: build install
