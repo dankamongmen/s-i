@@ -31,7 +31,6 @@ void
 list_dump(diskspace_req_t *list)
 {
   int total = 0;
-  float percent_total = 0.0;
   int i;
   if (!list)
   {
@@ -42,11 +41,10 @@ list_dump(diskspace_req_t *list)
   for (i=0; list && list[i].mountpoint; i++)
   {
     printf(" %s %s %d %d %f\n", list[i].mountpoint, list[i].fstype,
-	   list[i].minsize, list[i].maxsize, list[i].percent_total);
+	   list[i].minsize, list[i].maxsize);
     total += list[i].minsize;
-    percent_total += list[i].percent_total;
   }
-  printf(" total %d - %f\n", total, percent_total);
+  printf(" total %d\n", total);
 }
 
 int
