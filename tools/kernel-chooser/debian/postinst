@@ -20,15 +20,7 @@ log() {
 # most generic architecture first (386 above 686).
 
 # Using 'uniq' to avoid listing the same kernel more then once.
-if [ -x /usr/bin/uniq ] ; then
-    kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" |
-      sort | uniq | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' |
-      sed 's/, $//'`
-else
-    kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" |
-      sort | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' |
-      sed 's/, $//'`
-fi
+kernels=`$chroot apt-cache search kernel-image | grep ^kernel-image | sort | cut -d" " -f1 | /target/usr/bin/uniq | tr '\n' ',' | sed -e 's/,$//'`
 
 log "info: Found kernels '$kernels'"
 
