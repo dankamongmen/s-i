@@ -21,6 +21,7 @@ small: CFLAGS=-Os $(CFLAGS) -DSMALL
 small: clean $(BIN)
 	strip --remove-section=.comment --remove-section=.note \
 		--strip-unneeded $(BIN)
+	ls -l $(BIN)
 
 clean:
 	-rm -f $(BIN) $(OBJS) *~
