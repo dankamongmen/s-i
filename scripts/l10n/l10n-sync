@@ -20,6 +20,10 @@ KEEP_REVISION=N
 svn=svn
 debconfupdatepo=debconf-updatepo
 
+# The packages we want to see first in template.pot and PO files
+sortedpackages="languagechooser countrychooser kbd-chooser"
+
+
 usage() {
 echo  "Usage:"
 echo  "$0 [--keep-revision=lang] [--online] [--atomic] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
@@ -129,6 +133,11 @@ packages=$(echo $pots |\
           sed 's/\.\///g'|\
           sed 's/\/debian\/po\/templates\.pot//g')
 echo Done.
+
+otherpackages=`for i in $packages ; do if ! (echo $sortedpackages | grep $i  >/dev/null 2>&1) ; then echo $i ; fi ; done`
+
+packages="$sortedpackages $otherpackages"
+
 
 # Loop over packages
 #  1a) sync the debian/ directory
