@@ -41,6 +41,7 @@ void cleanup()
 void sighandler(int sig)
 {
 	cleanup();
+	exit(1);
 }
 
 void help(const char *exename)

@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.31 2002/11/23 00:37:20 barbier Exp $
+ * $Id: commands.c,v 1.32 2002/11/23 21:30:06 waldi Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -336,7 +336,7 @@ int command_get(struct confmodule *mod, int argc, char **argv,
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 		snprintf(out, outsize, "%u %s",
-			CMDSTATUS_SUCCESS, q->value ? q->value : "");
+			CMDSTATUS_SUCCESS, question_getvalue(q, NULL));
 	question_deref(q);
 
 	return DC_OK;
