@@ -5,7 +5,7 @@ set -e
 #set -x
 
 if [ -z "$1" ]; then
-	PROGRESSBAR=hw-detect/detect_progress_title
+	PROGRESSBAR=hw-detect/detect_progress_step
 else
 	PROGRESSBAR=$1
 fi
