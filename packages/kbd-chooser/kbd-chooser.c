@@ -187,9 +187,9 @@ locale_list_compare (char *langs)
 			*colon = '\0';
 		locale_parse (s, &lang2, &territory2, &modifier2, &charset2);
 		if (!strcmp (lang1, lang2))    {
-			score = 2;
+			score = 3;
 			if (territory1  && territory2 && !strcmp (territory1, territory2))  	{
-				score++;
+				score+=2;
 			}
 			// Favour 'generic' locales; ie 'fr' matches 'fr' better
 			// than 'fr_BE' does
@@ -198,7 +198,7 @@ locale_list_compare (char *langs)
 			if (territory1 && !territory2)
 				score++;
 			if (charset1 && !charset2 && !strcmp (charset1, charset2))	       	{
-				score += 2;	// charset more important than territory
+				score += 3;	// charset more important than territory
 			}
 		}
 		best = (score > best) ? score : best;

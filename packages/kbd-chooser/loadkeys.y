@@ -279,8 +279,8 @@ void loadkeys_wrapper (char *map)
 		exit (1);
 	}
 	do_constant();
-	loadkeys (fd);
 	set_kbd_mode (fd);
+	loadkeys (fd);
 	exit (0);
 }
 
