@@ -5,21 +5,20 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: acorn-kbd.c,v 1.4 2003/10/03 22:02:48 mckinstry Exp $
+ * $Id: acorn-kbd.c,v 1.5 2003/10/14 20:23:09 mckinstry Exp $
  */
 
 #include "config.h"
 #include <assert.h>
 #include <debian-installer.h>
 #include "xmalloc.h"
-#include "nls.h"
 #include "kbd-chooser.h"
 
 
 /**
  * @brief list of keyboards present
  */
-kbd_t *acorn_kbd_get (kbd_t *keyboards)
+kbd_t *acorn_kbd_get (kbd_t *keyboards, const char *subarch)
 {
 	kbd_t *k = xmalloc (sizeof (kbd_t));
 	int res;
@@ -28,7 +27,6 @@ kbd_t *acorn_kbd_get (kbd_t *keyboards)
 	assert (di_check_dir ("/proc") == 1);
 
 	k->name = "acorn"; // This must match the name "acorn" in console-keymaps-acorn
-	k->description = _("Acorn Keyboard");
 	k->deflt = "us";
 	k->fd = -1;
 	k->present = UNKNOWN;
@@ -37,7 +35,7 @@ kbd_t *acorn_kbd_get (kbd_t *keyboards)
 
 	res = grep ("/proc/cpuinfo", "Acorn");
 	if (res < 0) {
-		di_warning ("amiga-kbd: failed to open /proc/cpuinfo.");
+		di_warning ("acorn-kbd: failed to open /proc/cpuinfo.");
 		return keyboards;
 	}
 	if (res != 0) { // Not an acorn
