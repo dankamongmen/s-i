@@ -34,7 +34,12 @@ for file in cpuinfo ioports iomem interrupts meminfo ; do
 	fi
 done
 
-disks=`cat /proc/partitions|egrep 'ide|scsi'|awk '{print $4}'|grep '/disc'|sed 's%^%/dev/%'`
-for disk in $disks ; do
-	/sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
+for disk in `sed -ne '/\(ide\|scsi\).*\/disc/s%[^/]* \([^ ]*\).*%/dev/\1%p' /proc/partitions` ; do 
+    /sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
 done
+
+#grep /disc < /proc/partitions | while read line; do
+#    part=`echo $line | cut -f4 -d' '`
+#    disk="/dev/$part"
+#    /sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
+#done
