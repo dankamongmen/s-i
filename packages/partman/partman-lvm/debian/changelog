@@ -1,6 +1,6 @@
 partman-lvm (27) UNRELEASED; urgency=low
 
-  * Joey Hess
+  * Joey Hess and Alex Owen
     - Pass "partman" option to lvmcfg so it knows it is running under
       partman and can use partman to find devices for lvm (including raid
       devices).
@@ -9,6 +9,10 @@ partman-lvm (27) UNRELEASED; urgency=low
     - Add special case into choose_method/lvm/choices to allow raid devices to
       be used for lvm, despite not having lvm listed in VALID_FLAGS.
       Closes: #275586, #265252, #265868, #270424
+    - In init.d/lvm, mark devices that pvdisplay shows as being used for
+      lvm as having the lvm flag set. This is a workaround to make raid
+      devices that are used as lvm continue to show as such when the
+      partitioner restarts after lvmcfg.
 
  -- Joey Hess <joeyh@debian.org>  Fri, 15 Oct 2004 14:19:07 -0400
 

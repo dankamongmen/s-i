@@ -32,6 +32,14 @@ for dev in /var/lib/partman/devices/*; do
 
     for id in $partitions; do
 	lvm=no
+
+	# If the device is in fact being used for lvm, mark it as such.
+	# This is a hack and it only works for full block devices, not
+	# partitions. It makes raid devices used for lvm show up as such.
+	if pvdisplay $(cat $dev/device) >/dev/null 2>&1 ; then
+		lvm=yes
+	fi
+	
 	open_dialog GET_FLAGS $id
 	while { read_line flag; [ "$flag" ]; }; do
 	    if [ "$flag" = lvm ]; then
