@@ -6,11 +6,10 @@
 <!-- These are now obsolete, translators can use something similar to -->
 <!-- the following in their language directory to replace them: -->
 <!-- perl -pi -e "s|&RESCUE-FLOPPY;|rescue floppy|g" *.sgml  -->
-<!ENTITY RESCUE-FLOPPY "Rescue Floppy">
-<!ENTITY DRIVER-FLOPPY "Driver Floppies">
 
 <!-- proper (long) name to use for Debian -->
 <!ENTITY debian "Debian GNU/Linux">
+<!ENTITY d-i    "<classname>debian-installer</classname>">
 
 <!-- name for the enter key -->
 <![ %lang-fr   [ <!ENTITY enterkey "<emphasis>Entrée</emphasis>"> ]]>
@@ -155,6 +154,9 @@
 <![ %powerpc [ <!ENTITY % bootable-disk "INCLUDE"> ]]>
                <!ENTITY % bootable-disk "IGNORE">
 
+<!-- is this a new architecture for this Debian release -->
+               <!ENTITY % new-arch "IGNORE">
+
 <!-- whether this architecture supports floppy boot -->
 <![ %i386    [ <!ENTITY % supports-floppy-boot "INCLUDE"> ]]>
 <![ %m68k    [ <!ENTITY % supports-floppy-boot "INCLUDE"> ]]>
@@ -250,7 +252,6 @@
 <!-- version of X11 shipping with the current release -->
 <!ENTITY x11ver "4.1.0">
 
-
 <!-- an example of adding another image to lilo.conf, cf
      en/post-install.sgml etc. -->
 <!ENTITY additional-lilo-image
@@ -259,7 +260,9 @@
   append="mcd=0x320,11"
   read-only'>
 
-
+<![ %i386     [ <!ENTITY boot-loader-installer "lilo"> ]]>
+<![ %powerpc  [ <!ENTITY boot-loader-installer "yaboot or quik"> ]]>
+                <!ENTITY boot-loader-installer "boot loader installer">
 
 <!-- prefix for files that can be downloaded -->
 <![ %official-web-build [ <!ENTITY downloadable-file "&url-boot-floppies;"> ]]>
