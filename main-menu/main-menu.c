@@ -167,14 +167,15 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	return NULL;
 }
 
-void do_menu_item(struct package_t *p) {
+int do_menu_item(struct package_t *p) {
 	char configcommand[1024];
 	struct package_t *head = NULL, *tail = NULL;
 	
 	if (p->status == installed) {
+		printf("already installed\n");
 		/* The menu item is already configured, so reconfigure it. */
 		sprintf(configcommand, "dpkg-reconfigure %s", p->package);
-		SYSTEM(configcommand);
+		return ! SYSTEM(configcommand);
 	}
 	else if (p->status == unpacked) {
 		/*
@@ -187,10 +188,12 @@ void do_menu_item(struct package_t *p) {
 			if (p->status == unpacked) {
 				sprintf(configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
 				if (SYSTEM(configcommand) != 0)
-					return; /* give up on failure */
+					return 0; /* give up on failure */
 			}
 		}
 	}
+
+	return 1;
 }
 
 int main (int argc, char **argv) {
