@@ -1028,7 +1028,8 @@ newt_go(struct frontend *obj)
                 else if (ret == DC_GOBACK && q->prev != NULL)
                     q = q->prev;
                 else {
-                    newtFinished();
+                    if (cleared && !data->scale_form)
+                        newtFinished();
                     return ret;
                 }
                 break;
