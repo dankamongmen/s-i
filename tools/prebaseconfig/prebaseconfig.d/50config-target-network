@@ -1,0 +1,92 @@
+#! /bin/sh -e
+#
+# Write a functional /target/etc/network/interfaces
+
+. /usr/share/debconf/confmodule
+
+if db_get debian-installer/profile && [ "$RET" ]; then
+	PROFILE=$RET
+else
+	PROFILE=Workstation
+fi
+
+# Default hostname is 'localhost'
+HOSTNAME=localhost
+NAMES=localhost
+if db_get netcfg/get_hostname && [ "$RET" ]; then
+    NAMES="$RET $NAMES"
+    HOSTNAME=$RET
+fi
+ 
+if db_get netcfg/get_domain && [ "$RET" -a "$HOSTNAME" ] ; then
+    NAMES="${HOSTNAME}.$RET $NAMES"
+fi
+
+echo "$HOSTNAME" > /target/etc/hostname
+echo "127.0.0.1 $NAMES" > /target/etc/hosts
+
+interfaces=/target/etc/network/interfaces
+
+# Every host need the loopback interface
+cat > $interfaces <<EOF
+# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
+
+# The loopback interface
+auto lo
+iface lo inet loopback
+
+EOF
+
+# Should it get the information from the netcfg package instead?
+  
+# Hm, what if both server and workstation is choosen?  Choose the
+# server config for eth0.
+for value in `echo $PROFILE |sed 's/ /-/g' | sed 's/,-/ /g'`; do
+    case $value in
+	Workstation)
+ 	    # Use this unless Server also was choosen.
+	    if [ -z "$eth0" ] ; then
+		eth0=dhcp
+	    fi
+	    ;;
+	Server)
+	    # Override for workstations combining as servers
+	    eth0=10.0.2.2
+	    ;;
+	LTSP-server)
+	    eth1=192.168.0.254
+	    ;;
+     esac
+done
+  
+for interface in eth0 eth1 ; do
+    eval "ifinfo=\$$interface"
+    case $ifinfo in
+	dhcp)
+	    cat >> $interfaces <<EOF
+
+# This entry was created during the Debian installation
+auto $interface
+iface $interface inet dhcp
+EOF
+
+	    ;;
+	[0-9]*)
+	    cat >> $interfaces <<EOF
+
+# This entry was created during the Debian installation
+auto $interface
+iface $interface inet static
+    address $ifinfo
+    netmask 255.255.254.0
+  
+# The commented lines below is to be used if a DHCP server is in use
+#auto $interface
+#iface $interface inet dhcp
+EOF
+	    ;;
+	*)
+	    # Nothing to do?
+	    ;;
+    esac
+done

@@ -14,6 +14,8 @@ PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 # This is the debhelper compatability version to use.
 export DH_COMPAT=3
 
+DESTDIR = debian/prebaseconfig
+
 build: 
 
 clean:
@@ -26,8 +28,17 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_installdirs
-	install -m0644 inittab.install debian/prebaseconfig/usr/share/prebaseconfig/inittab
-	install -m0644 install-report.template debian/prebaseconfig/usr/share/prebaseconfig/install-report.template
+	install -m0644 inittab.install $(DESTDIR)/usr/share/prebaseconfig/inittab
+	install -m0644 install-report.template $(DESTDIR)/usr/share/prebaseconfig/install-report.template
+
+	for file in 10eject-cdrom \
+		50config-target-network \
+		60reportbug-template \
+		80save-install-log \
+		90prepare-base-config; \
+	do \
+	    install -m0755 prebaseconfig.d/$$file $(DESTDIR)/usr/lib/prebaseconfig.d/$$file; \
+	done
 
 # Build architecture-independent files here.
 binary-indep: build install
