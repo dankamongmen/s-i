@@ -606,6 +606,7 @@ esac
 if [ -f /proc/sys/kernel/hotplug ]; then 
 	log "Detected hotplug support, installing hotplug."
 	apt-install hotplug || true
+	apt-install usbutils || true
 fi
 
 db_progress SET $MAX_STEPS
