@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.22 2003/04/10 15:02:36 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.23 2003/04/30 17:51:33 mckinstry Exp $
  */
 
 #include "config.h"
@@ -489,22 +489,24 @@ kbd_t *keyboards_get (void)
 /**
  * @brief set debian-installer/serial console as to whether we are using a serial console
  * This is then passed via prebaseconfig to base-config
+ * @return 1 if present, 0 if absent, 2 if unknown.
  */
-void check_if_serial_console (void)
+int check_if_serial_console (void)
 {
 	int fd;
 	struct serial_struct sr;
-	char *present;
+	int present;
 	struct debconfclient *client = mydebconf_get ();
 
 	fd = open("/dev/console", O_NONBLOCK);
 	if (fd == -1) 
-		return;
-	present = ( ioctl(fd, TIOCGSERIAL, &sr) == 0) ? "yes" : "no" ;
+		return 2;
+	present = ( ioctl(fd, TIOCGSERIAL, &sr) == 0) ? 1 : 0 ;
 	client->command (client, "set", "debian-installer/serial-console",
-			 present, NULL);
+			 present ? "yes" : "no" , NULL);
 	close (fd);
 	/* di_logf ("Setting debian-installer/serial-console to %d", present); */
+	return present;
 }
 		
 /**
@@ -567,7 +569,8 @@ char *keyboard_select (void)
 			}
 		}	
 	}	
-	if ((preferred == NULL) || (preferred->present == UNKNOWN)) {
+	if (((preferred == NULL) || (preferred->present == UNKNOWN))
+			&& check_if_serial_console()) {
 		s = s ? ( strcpy (s, ", ") + 2) : buf ;
 		di_log ("Can't tell if kbd present; add no keyboard option\n");
 		add_no_keyboard_case (s, &preference );
