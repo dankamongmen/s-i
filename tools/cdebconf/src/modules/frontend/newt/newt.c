@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.27 2003/09/27 16:38:38 kraai Exp $
+ * $Id: newt.c,v 1.28 2003/09/28 07:46:42 kraai Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -63,8 +63,9 @@
 struct newt_data {
     newtComponent scale_form,
                   scale_bar,
-                  scale_label,
+                  scale_textbox,
                   perc_label;
+    int           scale_textbox_height;
 };
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
@@ -872,9 +873,14 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
     int width = 80, win_width;
+#ifdef HAVE_LIBTEXTWRAP
+    int flags = 0;
+#else
+    int flags = NEWT_FLAG_WRAP;
+#endif
 
     DELETE(obj->progress_title);
-    obj->progress_title = NULL;
+    obj->progress_title = strdup(title);
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
@@ -884,9 +890,10 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     win_width = width-7;
     newtCenteredWindow(win_width, 5, title);
     data->scale_bar = newtScale(1, 1, win_width-2, obj->progress_max);
-    data->scale_label = newtLabel(1, 3, "");
+    data->scale_textbox = newtTextbox(1, 3, win_width-2, 1, flags);
+    data->scale_textbox_height = 1;
     data->scale_form = create_form(NULL);
-    newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_label, NULL);
+    newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
     newtDrawForm(data->scale_form);
     newtRefresh();
 }
@@ -921,7 +928,38 @@ newt_progress_info(struct frontend *obj, const char *info)
     struct newt_data *data = (struct newt_data *)obj->data;
 
     if (data->scale_form != NULL) {
-	newtLabelSetText(data->scale_label, info);
+	int width, win_width, text_height;
+#ifdef HAVE_LIBTEXTWRAP
+	textwrap_t tw;
+	char *wrappedtext;
+	int flags = 0;
+#else
+	int flags = NEWT_FLAG_WRAP;
+#endif
+
+	newtGetScreenSize(&width, NULL);
+	win_width = width-7;
+	text_height = get_text_height(info, win_width-2);
+	if (text_height != data->scale_textbox_height) {
+	    newtFormDestroy(data->scale_form);
+	    newtPopWindow();
+	    newtCenteredWindow(win_width, 4 + text_height, obj->progress_title);
+	    data->scale_bar = newtScale(1, 1, win_width-2, obj->progress_max);
+	    newtScaleSet(data->scale_bar, obj->progress_cur);
+	    data->scale_textbox = newtTextbox(1, 3, win_width-2, text_height, flags);
+	    data->scale_textbox_height = text_height;
+	    data->scale_form = create_form(NULL);
+	    newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
+	}
+#ifdef HAVE_LIBTEXTWRAP
+	textwrap_init(&tw);
+	textwrap_columns(&tw, width-9);
+	wrappedtext = textwrap(&tw, info);
+	newtTextboxSetText(data->scale_textbox, wrappedtext);
+	free(wrappedtext);
+#else
+	newtTextboxSetText(data->scale_textbox, info);
+#endif
 	newtDrawForm(data->scale_form);
 	newtRefresh();
     }
@@ -936,7 +974,7 @@ newt_progress_stop(struct frontend *obj)
         newtFormDestroy(data->scale_form);
         newtPopWindow();
         newtFinished();
-        data->scale_form = data->scale_bar = data->perc_label = data->scale_label = NULL;
+        data->scale_form = data->scale_bar = data->perc_label = data->scale_textbox = NULL;
     }
 }
 
