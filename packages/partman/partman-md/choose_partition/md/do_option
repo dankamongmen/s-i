@@ -42,15 +42,16 @@ if [ "$items" ]; then
 $items"
 
     # Confirm
-    db_reset partman-md/confirm
     db_subst partman-md/confirm ITEMS "$items"
 
     db_input critical partman-md/confirm
     db_go || true
     db_get partman-md/confirm
     if [ "$RET" = false ]; then
+        db_reset partman-md/confirm
         exit 0
     fi
+    db_reset partman-md/confirm
 fi
 
 # Commit the changes
@@ -58,7 +59,6 @@ fi
 for s in /lib/partman/commit.d/*; do
     if [ -x $s ]; then
 	$s || {
-	    db_fset partman-md/commit_failed seen false
 	    db_input high partman-md/commit_failed || true
 	    db_go || true
 	    for s in /lib/partman/init.d/*; do
