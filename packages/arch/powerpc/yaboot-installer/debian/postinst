@@ -212,11 +212,23 @@ writeyabootconf <<EOF
 image=/vmlinux
 	label=linux
 	read-only
+EOF
+if [ "$video" ]; then
+    writeyabootconf <<EOF
+	append="video=$video"
+EOF
+fi
+writeyabootconf <<EOF
 
 image=/vmlinux.old
 	label=old
 	read-only
 EOF
+if [ "$video" ]; then
+    writeyabootconf <<EOF
+	append="video=$video"
+EOF
+fi
 
 # Install into bootstrap partition
 
