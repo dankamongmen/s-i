@@ -26,6 +26,7 @@ install:
 
 	mkdir -p $(DESTDIR)/usr/lib/prebaseconfig.d
 	cp prebaseconfig $(DESTDIR)/usr/lib/prebaseconfig.d/40ethdetect
+	chmod a+x $(DESTDIR)/usr/lib/prebaseconfig.d/40ethdetect
 	  
 
 ethpci.lst:
