@@ -2,18 +2,18 @@
 
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 
-cat /proc/modules | 
+cat /proc/modules |
 while read module_name x; do
-    if [ "$module_name" = ext3 ]; then
-	>/var/lib/partman/ext3
+    if [ "$module_name" = ext2 ]; then
+	>/var/lib/partman/ext2r0
 	exit 0
     fi
 done
 
-if modprobe ext3 >/dev/null 2>/dev/null; then
-    >/var/lib/partman/ext3
+if modprobe ext2 >/dev/null 2>/dev/null; then
+    >/var/lib/partman/ext2r0
 fi
 
-if grep -q ext3 /proc/filesystems; then
-    >/var/lib/partman/ext3
+if grep -q ext2 /proc/filesystems; then
+    >/var/lib/partman/ext2r0
 fi
