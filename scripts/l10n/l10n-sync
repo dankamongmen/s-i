@@ -338,7 +338,7 @@ EOF
         else
           # We put the old Revision-Date back if asked for
 	  # or if only a comment changed
-	  if [ ( "$KEEP_REVISION" != "N" -a "$KEEP_REVISION" = "$lang" ) -o $(diff --ignore-matching-lines="^#" $lang.po $lang.po.new | wc -l) = 0 ] ; then
+	  if [ "$KEEP_REVISION" != "N" -a "$KEEP_REVISION" = "$lang" -o $(diff --ignore-matching-lines="^#" $lang.po $lang.po.new | wc -l) = 0 ] ; then
 	    # We grab back the PO-Revision-Date from the old file
 	    old_revision=`cat $lang.po| grep -e "^\"PO-Revision-Date:" | sed 's/\\\\n\"//g'`
 	    # And we replace the one from the new file by it
