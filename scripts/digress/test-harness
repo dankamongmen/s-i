@@ -108,6 +108,14 @@ if [ -n "$ROOT_PASSWORD_FILE" ]; then
 	export ROOT_PASSWORD # yikes!
 fi
 
+if [ -n "$USER_PASSWORD_FILE" ]; then
+	USER_PASSWORD=$(cat $USER_PASSWORD_FILE) || true
+	if [ -z "$USER_PASSWORD" ]; then
+		error "USER_PASSWORD_FILE contains no password"
+	fi
+	export USER_PASSWORD
+fi
+
 if [ -n "$HP_ILO_PASSWORD_FILE" ]; then
 	HP_ILO_PASSWORD=$(cat $HP_ILO_PASSWORD_FILE) || true
 	export HP_ILO_PASSWORD
