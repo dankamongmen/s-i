@@ -24,7 +24,6 @@ close_dialog
 
 if [ "$virtual" = no ]; then
     db_set partman-partitioning/confirm_resize 'false'
-    db_fset partman-partitioning/confirm_resize seen false
     db_input critical partman-partitioning/confirm_resize || true
     db_go || exit 0
     db_get partman-partitioning/confirm_resize
@@ -38,7 +37,6 @@ ask_for_size () {
 	newsize=''
 	while [ ! "$newsize" ]; do
 	    db_set partman-partitioning/new_size "$hcursize"
-	    db_fset partman-partitioning/new_size seen false
 	    db_subst partman-partitioning/new_size MINSIZE "$hminsize"
 	    db_subst partman-partitioning/new_size MAXSIZE "$hmaxsize"
 	    db_subst partman-partitioning/new_size PERCENT "$minpercent%"
@@ -64,16 +62,13 @@ ask_for_size () {
 		    ;;
 	    esac
 	    if [ -z "$newsize" ]; then
-		db_fset partman-partitioning/bad_new_size seen false
 		db_input high partman-partitioning/bad_new_size || true
 		db_go || true
 	    elif ! longint_le "$newsize" "$maxsize"; then
-		db_fset partman-partitioning/big_new_size seen false
 		db_input high partman-partitioning/big_new_size || true
 		db_go || true
 		newsize=''
 	    elif ! longint_le "$minsize" "$newsize"; then
-		db_fset partman-partitioning/small_new_size seen false
 		db_input high partman-partitioning/small_new_size || true
 		db_go || true
 		newsize=''
@@ -89,7 +84,6 @@ perform_resizing () {
 	for s in /lib/partman/commit.d/*; do
 	    if [ -x $s ]; then
 		$s || {
-		    db_fset partman-partitioning/new_size_commit_failed seen false
 		    db_input high partman-partitioning/new_size_commit_failed || true
 		    db_go || true
 		    for s in /lib/partman/init.d/*; do

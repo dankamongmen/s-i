@@ -24,7 +24,6 @@ ask_for_size () {
 	size=''
 	while [ ! "$size" ]; do
 	    db_set partman-partitioning/new_partition_size "$freehsize"
-	    db_fset partman-partitioning/new_partition_size seen false
 	    db_subst partman-partitioning/new_partition_size MAXSIZE "$freehsize"
 	    db_input high partman-partitioning/new_partition_size ||
 	    $noninteractive
@@ -58,7 +57,6 @@ ask_for_size () {
 	    esac
 	    
 	    if [ -z "$size" ]; then
-		db_fset partman-partitioning/bad_new_partition_size seen false
 		db_input high partman-partitioning/bad_new_partition_size || true
 		db_go || true
 	    fi
@@ -91,7 +89,6 @@ ask_for_type () {
 			type=Logical
 			;;
 		pri/log)
-			db_fset partman-partitioning/new_partition_type seen false
 			if [ "$has_extended" = yes ]; then
 			    db_set partman-partitioning/new_partition_type Logical
 			else
@@ -116,7 +113,6 @@ ask_for_place () {
 			$noninteractive
 			place=full
 		else
-			db_fset partman-partitioning/new_partition_place seen false
 			db_input high partman-partitioning/new_partition_place ||
 				$noninteractive
 			db_go || return 1

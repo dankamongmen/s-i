@@ -8,7 +8,6 @@ id=$3
 cd $dev
 
 db_set partman-partitioning/confirm_copy 'false'
-db_fset partman-partitioning/confirm_copy seen false
 db_input high partman-partitioning/confirm_copy || true
 db_go || exit 0
 db_get partman-partitioning/confirm_copy
@@ -22,7 +21,6 @@ ask_for_source () {
 	source_dev=''
 	source_id=''
 	while [ ! "$source_id" ]; do
-	    db_fset partman-partitioning/source_partition seen false
 	    choices=$(partition_tree_choices)
 	    debconf_select critical partman-partitioning/source_partition "$choices" asdfasdfasdf
 	    case $? in
@@ -47,7 +45,6 @@ perform_copying () {
     for s in /lib/partman/commit.d/*; do
 	if [ -x $s ]; then
 	    $s || {
-		db_fset partman-partitioning/copy_commit_failed seen false
 		db_input high partman-partitioning/copy_commit_failed || true
 		db_go || true
 		for s in /lib/partman/init.d/*; do
