@@ -145,12 +145,12 @@ for i in $(
 	join -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |
 		sort -k 1,1 > $tmpdir/tmpdeps
 
+	# deal with modules marked as optional and other transformations
+	processmodules $tmpdir/module-list/$i $moddir$kernel_modules
+
 	# include dependent modules which are not in a
 	# dependent udeb into module-list/$i
 	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
-
-	# deal with modules marked as optional and other transformations
-	processmodules $tmpdir/module-list/$i $moddir$kernel_modules
 
 	if [ -s $tmpdir/module-list/$i ]; then
 		# copy kernel modules to package build dir
