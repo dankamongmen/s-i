@@ -17,7 +17,8 @@ PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 build: build-stamp
 build-stamp:
 	dh_testdir
-	./configure --without-depends --without-debug
+	./configure --without-depends --without-debug \
+		--with-admindir=./var/lib/dpkg
 	$(MAKE) small
 	touch build-stamp
 
