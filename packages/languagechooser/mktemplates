@@ -51,9 +51,13 @@ sub get_translations {
 	my ($name, $translation) = split(/: /);
 	$translation =~ s/,/\\,/g;
         if ($show_locales && defined $locales{$name}) {
-             $translation = $locales{$name}.
-                            (" " x (5 - length($locales{$name}))).
-                            " - $translation";
+# C. Perrier 2004/05/09 change layout
+#             $translation = $locales{$name}.
+#                            (" " x (5 - length($locales{$name}))).
+#                            " - $name - $translation";
+             $translation = $name .
+                            (" " x (22 - length($name))).
+			    "- $translation";
         }
 	$translations{$name} = $translation;
     }
