@@ -219,14 +219,9 @@ md_create_raid1() {
 	PARTITIONS=$NEW_PARTITIONS
 
 	db_set mdcfg/raid1sparedevs ""
-	SELECTED=99
-
-	if [ "${SPARE_COUNT}" -eq "0" ]; then
-		SELECTED=0
-	fi
-
+	SELECTED=0
 	# Loop until the correct amount of devices has been selected
-	while [ "${SELECTED}" -gt "${SPARE_COUNT}" ]; do
+	while [ "${SELECTED}" -ne "${SPARE_COUNT}" ]; do
 		db_fset mdcfg/raid1sparedevs "seen" "false"
 		db_subst mdcfg/raid1sparedevs COUNT "${SPARE_COUNT}"
 		db_subst mdcfg/raid1sparedevs PARTITIONS "${PARTITIONS}"
