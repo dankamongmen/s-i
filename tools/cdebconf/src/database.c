@@ -227,7 +227,7 @@ static int question_db_is_visible(struct question_db *db, const char *name,
 
 	if (wantprio == NULL)
 		if ((q = db->methods.get(db, "debconf/priority")) != NULL)
-			wantprio = q->value;
+			wantprio = question_getvalue(q, NULL);	
 
 	/* error; no priority specified -- last resort fallback to medium */
 	if (wantprio == NULL || strlen(wantprio) == 0)
