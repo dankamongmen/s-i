@@ -79,15 +79,15 @@ case "x$cmd" in
 
     xerror)
 	T="retriever/net/error"
-	db_set "$T" retry
+	db_set "$T" "Retry"
 	db_input high "$T" || true
 	
 	db_capb # no backup
 	db_go || true
 	db_get "$T"
-	if [ "$RET" = retry ]; then
+	if [ "$RET" = "Retry" ]; then
 		exit 0
-	elif [ "$RET" = "change mirror" ]; then
+	elif [ "$RET" = "Change mirror" ]; then
 		choose-mirror || true
 		exit 0
 	elif [ "$RET" = cancel ]; then
