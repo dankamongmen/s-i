@@ -15,7 +15,6 @@
  */
 
 #include "main-menu.h"
-#include "stderr-log.h"
 #include <cdebconf/debconfclient.h>
 #include <stdlib.h>
 #include <search.h>
@@ -538,10 +537,6 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	debconf = debconfclient_new();
 	di_system_init(basename(argv[0]));
 	
-	/* This spawns a process that traps all stderr from the rest of
-	 * main-menu and the programs it calls, storing it in STDERR_LOG. */
-	intercept_stderr();
-	
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
 
@@ -563,11 +558,6 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 		else
 			modify_debconf_priority(RAISE);
 		
-		/* Check for pending stderr in the stderr log, and
-		 * display it in a nice debconf dialog. */
-		/* XXX Pass in a title */
-		display_stderr_log(p->p.package);
-
 		di_packages_free (packages);
 		di_packages_allocator_free (allocator);
 		allocator = di_system_packages_allocator_alloc ();
