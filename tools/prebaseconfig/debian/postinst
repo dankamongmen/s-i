@@ -6,11 +6,12 @@ run_parts() {
     partsdir="$1"
     for script in "$partsdir"/*; do
         if [ -x "$script" ] ; then
+            echo "prebaseconfig: info: Running $script" 1>&2
             "$script" || true
         else
-            echo "error: Unable to execute $script" 1>&2
+            echo "prebaseconfig: error: Unable to execute $script" 1>&2
         fi
     done
 }
 
-run_parts /usr/lib/prebaseconfig.d
+run_parts /usr/lib/prebaseconfig.d 2>> /var/log/messages
