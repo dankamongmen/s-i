@@ -1,0 +1,80 @@
+#!/bin/sh -e
+
+log=/var/log/messages
+queue=/var/lib/apt-install/queue
+
+# The C.UTF-8 locale is not usable inside /target/.  Unset it here to avoid
+# warnings like 'perl: warning: Setting locale failed.'.
+if [ "$LANG" = "C.UTF-8" ] ; then
+	unset LANG
+fi
+
+# Add to list of extra packages (to be) installed into /target/.
+mkdir -p /var/lib/apt-install
+touch $queue
+for pkg in $@ ; do
+    if ! grep -q "^$pkg$" $queue; then
+        echo "$pkg" >> $queue
+    fi
+done
+
+if [ ! -f /target/etc/apt/sources.list ] ; then
+    # The package was only queued, and will be installed by the
+    # postinst in base-installer.
+    exit 1 # Return error as the package is not ready to be used yet.
+fi
+
+# Try to enable proxy when using HTTP.  What about using ftp_proxy for
+# FTP sources?  (This code is in both apt-install and base-installer)
+RET=`debconf-get mirror/protocol || true`
+if [ "http" = "$RET" ]; then
+    # try to find http proxy
+    RET=`debconf-get mirror/http/proxy || true`
+    if [ "$RET" ] ; then
+	http_proxy="$RET"
+	export http_proxy
+    fi
+fi
+
+# Unset to avoid problems with packages using debconf.  This should
+# avoid the following error when installing dash:
+# "/var/lib/dpkg/info/ash/config: 1: Bad file descriptor"
+# The problem only appear if /usr/share/debconf/confmodule is sourced
+# into this script.
+unset DEBIAN_HAS_FRONTEND
+unset DEBIAN_FRONTEND
+unset DEBCONF_FRONTEND
+unset DEBCONF_REDIR
+
+mountpoints () {
+	cut -d" " -f2 /proc/mounts | sort | uniq
+}
+
+# Record the current mounts
+mountpoints > /tmp/mount.pre
+
+# Some packages (eg. the kernel-image package) require a mounted /proc/
+# Only mount it if it isn't mounted already
+if [ ! -f /target/proc/cmdline ] ; then
+    mount -t proc proc /target/proc
+fi
+
+DEBIAN_FRONTEND=noninteractive \
+chroot /target apt-get -y install $@ < /dev/null >> $log 2>&1
+
+# Undo the mounts done by the packages during installation.
+# Reverse sorting to umount the deepest mount points first.
+# Items with count of 1 are new.
+for dir in $( (cat /tmp/mount.pre /tmp/mount.pre; mountpoints ) | \
+	     sort -r | uniq -c | grep "[[:space:]]1[[:space:]]" | \
+	     sed "s/[[:space:]]*[0-9][[:space:]]//"); do
+    if umount $dir ; then
+	:
+    else
+	logger -t apt-install "warning: Unable to umount '$dir'"
+    fi
+done
+
+rm -f /tmp/mount.pre
+
+exit 0

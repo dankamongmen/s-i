@@ -1,0 +1,11 @@
+#!/bin/sh
+DIR=/var/lib/register-module
+QUEUE=$DIR/queue
+MODULE=$1
+
+mkdir -p $DIR
+touch $QUEUE
+grep -v "^$MODULE " $QUEUE > $QUEUE.new
+mv $QUEUE.new $QUEUE
+# Trailing whitespace is significant.
+echo "$@ " >> $QUEUE

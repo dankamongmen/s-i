@@ -5,7 +5,7 @@
 
 #include <debian-installer.h>
 
-int mapdevfs_main(int argc, char **argv) {
+int main (int argc, char **argv) {
     static char buf[256];
     size_t len = sizeof(buf);
 

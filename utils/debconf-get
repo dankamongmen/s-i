@@ -1,0 +1,10 @@
+#!/bin/sh -e
+# TODO move to cdebconf, reimplement so it's not shite
+
+if [ -n "$TO_GET" ]; then
+	. /usr/share/debconf/confmodule
+	db_get "$TO_GET"
+	echo $RET 1>&2
+else
+	(TO_GET=$1 $0 >/dev/null) 2>&1
+fi

@@ -1,13 +1,29 @@
 These are simple utils for debian-installer:
 
-di-utils-shell: interactive shell. Appears in the main menu, and the
+di-utils-shell: Interactive shell. Appears in the main menu, and the
 postinst does all the work. Only funny trick is we need to steal control
 from debconf by grabbing back the original stdio file descriptors.
 
-pipe_progress: copies stdin to stdout. Each second, if there has been any
+pipe_progress: Copies stdin to stdout. Each second, if there has been any
 activity on the pipe, outputs a dot to stderr. This is used for a progress
 display when the boot floppy is loading the second floppy.
 
-mapdevfs: given a devfs device name, returns the name that would be used on
+mapdevfs: Given a devfs device name, returns the name that would be used on
 a non devfs system. Only works for some deviced, used by eg, boot loader
 installers.
+
+anna-install: Each parameter is a udeb that anna should install. When anna
+is run it will add the queued udebs.
+
+apt-install: The parameter is a deb to queue for installation into /target.
+Or, if /target is already set up, the package will be installed
+straightaway.
+
+debconf-get: Prints out the value of a debconf question.
+
+debconf-set: Sets a debconf question to a value.
+
+register-module: Register a module to go in /etc/modules on the target.
+May be called before the target is mounted. Can optionally pass parameters
+that should be passed to the module on load; these are added to
+/etc/modules.conf.

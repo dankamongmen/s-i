@@ -1,7 +1,6 @@
 ifndef TARGETS
-TARGETS=di-utils debian/di-utils-shell.postinst pipe_progress
+TARGETS=mapdevfs debian/di-utils-shell.postinst pipe_progress
 endif
-OBJECTS = mapdevfs.o utils.o
 
 # Where to create device entries for di-utils-devicefiles
 ifndef DEVDIR
@@ -15,7 +14,7 @@ STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 
 all: $(TARGETS)
 
-di-utils: $(OBJECTS)
+mapdevfs: mapdevfs.c
 	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
 
 debian/di-utils-shell.postinst: debian/di-utils-shell.postinst.c
