@@ -14,7 +14,7 @@ findfs () {
 # detect the partitions /target and /target/boot
 rootfs=$(findfs /)
 bootfs=$(findfs /boot)
-[ "$bootfs" ] || bootfs="$rootfs"
+[ -n "$bootfs" ] || bootfs="$rootfs"
 bootpart=${bootfs#${bootfs%?}}
 
 if [ "$rootfs" = "$bootfs" ]; then
