@@ -7,7 +7,7 @@ SONAME=$(LIB).$(MAJOR).$(MINOR)
 LIBS=$(LIB) $(SONAME) $(LIBNAME)
 
 
-OBJS=di_execlog.o di_log.o di_check_dir.o di_snprintfcat.o
+OBJS=di_prebaseconfig_append.o di_execlog.o di_log.o di_check_dir.o di_snprintfcat.o
 PIC_LIB=libdebian-installer_pic.a
 
 
@@ -38,7 +38,6 @@ di%.o: debian-installer.c
 	$(CC) -c $(CFLAGS) -DL__$(subst .o,,$@)__ -o $@ debian-installer.c
 
 $(LIBNAME): debian-installer.c
-#	$(CC) -c $(CFLAGS) $(DEFS) -o debian-installer.o debian-installer.c
 	@echo Creating $(LIBNAME)
 	$(CC) -shared -Wl,-soname,$(SONAME) -o $@ $^ $(DEFS) $(CFLAGS)
 	size $@ 

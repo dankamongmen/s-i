@@ -1,8 +1,8 @@
 /* 
-   d-i.c - common utilities for debian-installer
-   Author - David Whedon
+   debian-installer.c - common utilities for debian-installer
+   Author - David Kimdon
 
-   Copyright (C) 2000-2001  David Whedon <dwhedon@debian.org>
+   Copyright (C) 2000-2002  David Kimdon <dwhedon@debian.org>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
    
 */
 
-
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -29,7 +29,64 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <stdarg.h>
+#include <time.h>
 #include "debian-installer.h"
+
+
+
+#define PREBASECONFIG_D "/usr/lib/prebaseconfig.d"
+
+#ifdef L__di_prebaseconfig_append__
+/*
+   di_prebaseconfig_append()
+
+   Append to a script in /usr/lib/prebaseconfig.d/.  All the scripts in this
+   directory will be run immediately before the system is rebooted.  udebs drop
+   commands in here that they know need to be run at this time.  
+   
+   udeb - Identifier, most likely the udeb making the call
+   
+   format, . . . - printf formatted text that will be appended to
+   /usr/lib/prebaseconfig.d/<udeb>
+*/
+int
+di_prebaseconfig_append(const char *udeb, const char *fmt, ...)
+{
+        char *path = NULL;
+        FILE *fp = NULL;
+        int rv = -1;
+        va_list ap;
+        time_t t;
+
+        if (asprintf (&path, PREBASECONFIG_D "/%s", udeb) == -1) {
+                perror ("di_prebaseconfig_append: asprintf");
+                goto finished;
+        }
+        
+        if ( (fp = fopen (path, "a")) == NULL) {
+                perror ("di_prebaseconfig_append: fopen");
+                goto finished;
+        }
+
+        time(&t);
+        fprintf(fp, "\n# start entry %s\n", ctime(&t));
+
+        va_start(ap, fmt);
+        fprintf(fp, fmt, ap);
+        va_end(ap);
+        
+        fprintf(fp, "\n# end entry\n");
+
+        rv = 0;
+
+finished:
+       free(path);
+       if (fp)
+               fclose(fp);
+       return rv;
+}
+
+#endif /* L__di_prebaseconfig_append__ */
 
 
 #ifdef L__di_execlog__
