@@ -90,7 +90,7 @@ test_raid(struct partition *p)
 
     if (strstr(p->path, "/dev/md/") != p->path)
         return;
-    if ((fp = fopen("/proc/mdstats", "r")) == NULL)
+    if ((fp = fopen("/proc/mdstat", "r")) == NULL)
         return;
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (strstr(buf, "md") != buf)
