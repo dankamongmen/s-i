@@ -2,6 +2,8 @@ SUBDIRS = autopartkit.d
 
 bin_PROGRAMS = autopartkit
 
+bin_SCRIPTS = autopartkit autopartkit-gettable
+
 noinst_PROGRAMS = dumptable distribute-test
 
 autopartkit_SOURCES = \
@@ -21,9 +23,9 @@ distribute_test_SOURCES = \
 	loadpartitions.c \
 	distribute-test.c
 
-choosetable_test_SOURCES = \
-	choosetable.c \
-	choosetable-test.c
+#choosetable_test_SOURCES = \
+#	choosetable.c \
+#	choosetable-test.c
 
 tabledir = $(sysconfdir)/autopartkit
 table_DATA = \

@@ -1,7 +1,5 @@
 #! /bin/sh -e
 
-. /usr/share/debconf/confmodule
-
 run_parts() {
     partsdir="$1"
 
@@ -17,8 +15,8 @@ run_parts() {
 # Run all scripts to choose table file
 run_parts /usr/lib/autopartkit.d
 
-db_get autopartkit/partition_table
-table="$RET"
+# Using support script to work around bug in cdebconf.
+table=`autopartkit-gettable`
 
 if autopartkit "$table" ; then
     :
