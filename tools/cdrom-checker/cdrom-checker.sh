@@ -16,7 +16,7 @@ ask_mount() {
 		db_fset cdrom-checker/mntfailed seen false
 		db_input high cdrom-checker/mntfailed
 		db_go
-		exit 0
+		break
 	fi
 }
 
@@ -25,7 +25,7 @@ cd_check() {
 		db_fset cdrom-checker/wrongcd seen false
 		db_input high cdrom-checker/wrongcd
 		db_go
-		exit 0
+		break
 	fi
 }
 
@@ -87,14 +87,12 @@ while [ 1 ]; do
 		db_fset cdrom-checker/missmatch seen false
 		db_input critical cdrom-checker/missmatch
 		db_go
-		cleanup
-		exit 0
+	else	# notice the user about success
+		db_fset cdrom-checker/passed seen false
+		db_input high cdrom-checker/passed
+		db_go
 	fi
-
-	# notice the user about success
-	db_fset cdrom-checker/passed seen false
-	db_input high cdrom-checker/passed
-	db_go
+	cleanup
 
 	# ask for next cdrom
 	db_set cdrom-checker/nextcd "false"
@@ -108,6 +106,6 @@ done
 db_fset cdrom-checker/firstcd seen false
 db_input high cdrom-checker/firstcd
 db_go
-mount -t auto $DEVICE $TARGET -o ro
+udpkg --force-configure --configure cdrom-detect
 exit 0
 
