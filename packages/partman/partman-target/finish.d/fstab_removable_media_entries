@@ -1,0 +1,17 @@
+#!/bin/sh
+
+[ -f /target/etc/fstab ] || exit 0
+
+# dev, mountpoint, type, options, dump, pass
+addfstab () {
+	printf "%-15s %-15s %-7s %-15s %-7s %s\n" "$1" "$2" "$3" "$4" "$5" "$6" >> /target/etc/fstab
+}
+
+addfstab "#/dev/floppy" "/floppy" "auto" "ro,user,noauto" "0" "0"
+
+CDDEV=$(grep /cdrom /proc/mounts | cut -d ' ' -f 1 | grep ^/dev)
+if [ -z "$CDDEV" ]; then
+	addfstab "$(mapdevfs $CDDEV)" "/cdrom" "iso9660" "ro,user,noauto" "0" "0"
+else
+	addfstab "#/dev/cdrom" "/cdrom" "iso9660" "ro,user,noauto" "0" "0"
+fi
