@@ -76,15 +76,20 @@ md_createmain() {
 	db_go
 	if [ $? -ne "30" ]; then
 		db_get mdcfg/createmain
+		
+		get_partitions
 
 		case $RET in
 			"RAID1")
 			md_create_raid1;;
+			"RAID0")
+			md_create_raid0;;
 		esac
 	fi
 }
 
-md_create_raid1() {
+# this will set PARTITIONS and NUM_PART global variables.
+get_partitions() {
 	PARTITIONS=""
 
 	# Get a list of RAID partitions. This only works if there is no 
@@ -113,10 +118,67 @@ md_create_raid1() {
 	if [ -z "${PARTITIONS}" ] ; then
 		db_fset mdcfg/noparts "seen" "false"
 		db_input critical mdcfg/noparts
-		db_go mdcfg/noparts
+		db_go
 		return
 	fi
+}
 
+prune_partitions() {
+	OLDIFS="$IFS"
+	IFS=,
+	NEW_PARTITIONS=""
+	for i in $PARTITIONS; do
+		found=0
+		for j in "$1"; do
+			if [ "$i" = "$j" ]; then
+				found=1
+			fi
+		done
+		if [ $found -eq 0 ]; then
+			if [ -z "$NEW_PARTITIONS" ]; then
+				NEW_PARTITIONS="$i"
+			else
+				NEW_PARTITIONS="${NEW_PARTITIONS},$i"
+			fi
+		fi
+	done
+	IFS=$OLDIFS
+	PARTITIONS=$NEW_PARTITIONS
+}
+
+md_create_raid0() {
+	db_subst mdcfg/raid0devs "${PARTITIONS}"
+	db_set mdcfg/raid0devs ""
+	db_fset mdcfg/raid0devs "seen" "false"
+	db_input high mdcfg/raid0devs
+	db_go
+
+	if [ "$?" -eq 30 ]; then return; fi
+
+	db_get mdcfg/raid0devs
+	SELECTED=0
+	for i in $RET; do
+		let SELECTED++
+	done
+
+	prune_partitions "$RET"
+
+	MD_NUM=`grep ^md /proc/mdstat|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -1`
+
+	if [ -z "${MD_NUM}" ]; then
+		MD_NUM=0
+	else
+		let MD_NUM++
+	fi
+
+	echo "Number of devices in the RAID0 array md${MD_NUM}: ${SELECTED}"
+
+	RAID_DEVICES="$(echo ${RET} | sed -e "s/,//")"
+	echo "Commandline:"
+	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid0 -n ${SELECTED} ${RAID_DEVICES}"`
+}
+
+md_create_raid1() {
 	OK=0
 
 	db_set mdcfg/raid1devcount "2"
@@ -168,8 +230,6 @@ md_create_raid1() {
 		db_fset mdcfg/notenoughparts "seen" "false"
 		db_subst mdcfg/notenoughparts NUM_PART "${NUM_PART}"
 		db_subst mdcfg/notenoughparts REQUIRED "${DEV_COUNT}"
-#db_subst mdcfg/notenoughparts DEV "${DEV_COUNT}"
-#db_subst mdcfg/notenoughparts SPARE "${SPARE_COUNT}"
 		db_input critical mdcfg/notenoughparts
 		db_go mdcfg/notenoughparts
 		return
@@ -199,26 +259,8 @@ md_create_raid1() {
 
 	# Remove partitions selected in raid1devs from the PARTITION list
 	db_get mdcfg/raid1devs
-	OLDIFS="$IFS"
-	IFS=,
-	NEW_PARTITIONS=""
-	for i in $PARTITIONS; do
-		found=0
-		for j in $RET; do
-			if [ "$i" = "$j" ]; then
-				found=1
-			fi
-		done
-		if [ $found -eq 0 ]; then
-			if [ -z "$NEW_PARTITIONS" ]; then
-				NEW_PARTITIONS="$i"
-			else
-				NEW_PARTITIONS="${NEW_PARTITIONS},$i"
-			fi
-		fi
-	done
-	IFS=$OLDIFS
-	PARTITIONS=$NEW_PARTITIONS
+
+	prune_partitions "$RET"
 
 	db_set mdcfg/raid1sparedevs ""
 	SELECTED=0
@@ -305,6 +347,7 @@ md_mainmenu() {
 # As we only support raid1 at this point, only that module is loaded.
 depmod -a 1>/dev/null 2>&1
 modprobe md 1>/dev/null 2>&1
+modprobe raid0 >/dev/null 2>&1
 modprobe raid1 1>/dev/null 2>&1
 
 # Try to detect MD devices, and start them
