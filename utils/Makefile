@@ -12,6 +12,8 @@ all: $(TARGETS)
 shell: shell.c
 	$(CC) $(CFLAGS) $@.c  -o $@  -ldebconf
 
+strip: $(TARGETS)
+	$(STRIP) $^
 
 clean:
-	rm -f shell
+	rm -f $(TARGETS)
