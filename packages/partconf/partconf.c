@@ -324,6 +324,15 @@ makedirs(const char *dir)
     }
 }
 
+static int
+mkfstab(void)
+{
+    char *cmd = "/usr/lib/partconf/mkfstab";
+
+    append_message("partconf: Create fstab\n");
+    return system(cmd);
+}
+
 // This is a swap partition IFF
 //   The new fs is swap
 // or
@@ -418,8 +427,9 @@ finish(void)
         debconf_go(debconf);
         exit(30);
     }
-    else
-        exit(0);
+    mkfstab();
+
+    exit(0);
 }
 
 static struct partition *curr_part = NULL;
@@ -566,16 +576,9 @@ fixup(void)
     return 0;
 }
 
-static int
-mkfstab(void)
-{
-    system("/usr/lib/partconf/mkfstab");
-    return 0;
-}
-
 #ifndef TEST
 int
-main(int argc, char *argv[])
+main(void)
 {
     int i, state = 0, ret;
     int (*states[])() = {
@@ -584,7 +587,6 @@ main(int argc, char *argv[])
         mountpoint,
         mountpoint_manual,
         fixup, // never does an INPUT, just handles the manual mountpoint result
-	mkfstab,
         NULL
     };
 
@@ -626,16 +628,14 @@ main(int argc, char *argv[])
     while (state >= 0) {
         ret = states[state]();
         if (ret < 0)
-            state = -1;
+	    return 10;
         else if (ret == 0 && debconf_go(debconf) == 0)
             state++;
         else
             state--;
-        if (state >= 0 && states[state] == NULL)
+        if (states[state] == NULL)
             state = 0;
     }
-    if (state < 0)
-        ret = 10;
     return ret;
 }
 #else
