@@ -148,9 +148,13 @@ while [ "$LOADED" = 0 ]; do
 done
 
 echo "Setting up filesystem..."
-mount -o loop mnt/tmp-initrd initrd
-cp -a initrd/* mnt
-umount initrd
+umount /initrd # the original initrd
+mount -o loop mnt/tmp-initrd /initrd
+cp -a /initrd/* mnt
+rm -f mnt/tmp-initrd
+umount /initrd
+
+debugshell "filesystem loaded and set up"
 
 # dev will be unmounted by rcS
 umount proc
