@@ -307,8 +307,7 @@ config_package(struct package_t *p) {
 	struct package_t *dep;
 
 	if (di_pkg_is_virtual(p)) {
-		if (!satisfy_virtual(p))
-			return 0;
+		return satisfy_virtual(p);
 	}
 
 	for (i = 0; p->depends[i] != 0; i++) {
