@@ -31,6 +31,8 @@ struct question {
 	struct questionvariable *variables;
 	struct questionowner *owners;
 	struct question *prev, *next;
+
+        char *priority;
 };
 
 struct question *question_new(const char *tag);

@@ -14,6 +14,7 @@ struct question *question_new(const char *tag)
 	memset(q, 0, sizeof(struct question));
 	q->ref = 1;
 	q->tag = STRDUP(tag);
+        q->priority = NULL;
 
 	return q;
 }
@@ -22,6 +23,8 @@ void question_delete(struct question *question)
 {
     if (question->template)
         template_deref(question->template);
+    if (question->priority != NULL)
+        free(question->priority);
     DELETE(question);
 }
 

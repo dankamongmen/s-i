@@ -66,6 +66,10 @@ command_input(struct confmodule *mod, char *arg, char *out, size_t outsize)
     if (visible)
         visible = mod->frontend->methods.add(mod->frontend, q);
 
+    if (q->priority != NULL)
+        free(q->priority);
+    q->priority = strdup(priority);
+
     if (visible) 
         snprintf(out, outsize, "%u question will be asked",
                 CMDSTATUS_SUCCESS);

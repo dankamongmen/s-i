@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.11 2003/05/11 11:59:15 sjogren Exp $
+ * $Id: newt.c,v 1.12 2003/05/11 14:00:51 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -98,6 +98,36 @@ no_text(void)
     return "No";
 }
 
+static void
+create_window(const int width, const int height, const char *title, const char *priority)
+{
+    static const char *sigils[][2] = {
+        { "low",      "." },
+        { "medium",   "?" },
+        { "high",     "!" },
+        { "critical", "!!" },
+        { NULL, NULL }
+    };
+    char *buf = NULL;
+    int i = -1;
+
+    if (priority != NULL) {
+        for (i = 0; sigils[i][0] != NULL; i++) {
+            if (strcmp(priority, sigils[i][0]) == 0)
+                break;
+        }
+        if (sigils[i][0] != NULL)
+            if (asprintf(&buf, "[%s] %s", sigils[i][1], title) == -1)
+                buf = NULL;
+    }
+    if (buf != NULL) {
+        newtCenteredWindow(width, height, buf);
+        free(buf);
+    } else {
+        newtCenteredWindow(width, height, title);
+    }
+}
+
 static int
 get_text_height(const char *text, int win_width)
 {
@@ -159,7 +189,7 @@ show_separate_window(struct frontend *obj, struct question *q)
         flags |= NEWT_FLAG_SCROLL;
     }
     t_height = win_height-extra;
-    newtCenteredWindow(width-7, win_height, obj->title);
+    create_window(width-7, win_height, obj->title, q->priority);
     form = create_form(NULL);
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
@@ -199,7 +229,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         tflags |= NEWT_FLAG_SCROLL;
     }
     t_height = win_height - 6;
-    newtCenteredWindow(width-7, win_height, obj->title);
+    create_window(width-7, win_height, obj->title, q->priority);
     form = create_form(NULL);
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, tflags);
@@ -267,7 +297,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
             sel_width = strwidth(choices_trans[i]);
         }
     }
-    newtCenteredWindow(win_width, win_height, obj->title);
+    create_window(win_width, win_height, obj->title, q->priority);
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
     bOk     = newtCompactButton(5, win_height-2, continue_text());
     bCancel = newtCompactButton(win_width - 9 - strwidth(goback_text()), win_height-2, goback_text());
@@ -364,7 +394,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
             sel_width = strwidth(choices_trans[i]);
         }
     }
-    newtCenteredWindow(win_width, win_height, obj->title);
+    create_window(win_width, win_height, obj->title, q->priority);
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
     listbox = newtListbox((win_width - sel_width)/2, 1+t_height+1, sel_height, listflags);
     bOk     = newtCompactButton(5, win_height-2, continue_text());
@@ -420,7 +450,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
         flags |= NEWT_FLAG_SCROLL;
     }
     t_height = win_height - 4;
-    newtCenteredWindow(width-7, win_height, obj->title);
+    create_window(width-7, win_height, obj->title, q->priority);
     form = create_form(NULL);
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
