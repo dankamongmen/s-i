@@ -1,8 +1,14 @@
-#! /bin/sh -e
+#! /bin/sh -ex
 
 . /usr/share/debconf/confmodule
 
-TMP=`find /dev/ide /dev/scsi -name disc`
+DIRS=
+
+for d in /dev/ide /dev/scsi; do
+    [ -d "$d" ] && DIRS="$DIRS $d"
+done
+
+TMP=`find $DIRS -name disc`
 for D in $TMP; do
     if [ "$DISCS" ]; then
         DISCS="$DISCS, $D"
@@ -17,12 +23,12 @@ db_subst di-utils-partitioner/disc DISCS $DISCS
 db_input critical di-utils-partitioner/disc
 db_go
 
-FDISK=/sbin/cfdisk
+FDISK=fdisk
 
 if [ "$DEBIAN_FRONTEND" = "slang" ]; then
-    [ -x "/sbin/fdisk" ] && FDISK=/sbin/cfdisk
+    type -p cfdisk > /dev/null && FDISK=cfdisk
 elif [ "$DEBIAN_FRONTEND" = "text" ]; then
-    [ -x "/sbin/fdisk" ] && FDISK=/sbin/fdisk
+    type -p fdisk > /dev/null && FDISK=fdisk
 fi
 
 db_get di-utils-partitioner/disc

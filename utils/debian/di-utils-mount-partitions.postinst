@@ -4,7 +4,16 @@
 
 MOUNTPOINT="/target"
 
-PARTS=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
+TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
+
+for P in $TMP; do
+    if [ "$PARTS" ]; then
+        PARTS="$PARTS, $P"
+    else
+        PARTS="$P"
+    fi
+done
+PARTS=`echo "$PARTS" | sed 's/, $//'`
 
 db_subst di-utils-mount-partitions/which-partition PARTITIONS $PARTS
 
@@ -28,6 +37,8 @@ if [ "$MOUNTPOINT" = "manual" ]; then
     db_get di-utils-mount-partitions/manual-mountpoint
     MOUNTPOINT="$RET"
 fi
+MOUNTPOINT="/target/$MOUNTPOINT"
+mkdir -p "$MOUNTPOINT"
 
 mount "$PARTITION" "$MOUNTPOINT"
 exit 0
