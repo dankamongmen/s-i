@@ -11,6 +11,7 @@ case "`/usr/bin/ppcdetect`" in
 	;;
 "Amiga")
 	parted $DISK
+	;;
 *)
 	fdisk $DISK
 	;;
