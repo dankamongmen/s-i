@@ -465,7 +465,9 @@ int main (int argc, char **argv) {
 
 		di_list_free(packages, di_pkg_free);
 		packages = di_status_read();
-	
+
+		/* tell cdebconf to save the database */
+		kill(getppid(), SIGUSR1);
 	}
 	
 	return(0);
