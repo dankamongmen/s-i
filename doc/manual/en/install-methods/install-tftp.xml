@@ -1,7 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: install-tftp.xml,v 1.5 2003/09/20 03:47:46 toff Exp $ -->
+<!-- $Id: install-tftp.xml,v 1.6 2003/09/22 04:45:52 toff Exp $ -->
 
- <sect1 id="install-tftp">
+ <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparing Files for TFTP Net Booting</title>
 <para>
 
@@ -14,42 +14,33 @@ and the machine configured to support booting of your specific machine.
 </para><para>
 
 You need to setup a TFTP server, and for CATS machines, a BOOTP server
-<![ %supports-rarp; [, or RARP server]]>
-<![ %supports-dhcp; [, or DHCP server]]>.
+<phrase condition="supports-rarp">, or RARP server</phrase>
+<phrase condition="supports-dhcp">, or DHCP server</phrase>.
 
 </para><para>
 
-<![ %supports-rarp; [ The Reverse Address Resolution Protocol (RARP) is
+<phrase condition="supports-rarp">The Reverse Address Resolution Protocol (RARP) is
 one way to tell your client what IP address to use for itself. Another
-way is to use the BOOTP protocol. ]]>
+way is to use the BOOTP protocol. </phrase>
 
-<![ %supports-bootp; [ BOOTP is an IP protocol that
+<phrase condition="supports-bootp">BOOTP is an IP protocol that
 informs a computer of its IP address and where on the network to obtain
-a boot image. <para arch="m68k"> Yet another alternative exists on VMEbus
-systems: the IP address can be manually configured in boot ROM. ]]> ]]>
+a boot image. </phrase>
 
-<![ %supports-dhcp; [ The DHCP (Dynamic Host Configuration Protocol) is
-a more flexible, backwards-compatible extension of BOOTP.  Some
-systems can only be configured via DHCP. ]]>
+<phrase arch="m68k"> Yet another alternative exists on VMEbus
+systems: the IP address can be manually configured in boot ROM. </phrase>
 
-</para>
+<phrase condition="supports-dhcp">The DHCP (Dynamic Host Configuration
+Protocol) is a more flexible, backwards-compatible extension of BOOTP.
+Some systems can only be configured via DHCP. </phrase>
 
-<![ %supports-dhcp; [
-<para arch="powerpc">
-
-<para>
+</para><para arch="powerpc">
 
 For PowerPC, if you have a NewWorld Power Macintosh machine, it is a
 good idea to use DHCP instead of BOOTP.  Some of the latest machines
 are unable to boot using BOOTP.
 
-</para>
-]]>
-
-]]>
-
-<para arch="alpha"> 
-<para>
+</para><para arch="alpha"> 
 
 Unlike the Open Firmware found on Sparc and PowerPC machines, the SRM
 console will <emphasis>not</emphasis> use RARP to obtain its IP
@@ -66,19 +57,12 @@ local OpenVMS operator will be happy to assist you should you have
 some burning need to use MOP to boot Linux on your Alpha.
 
 </para>
-</footnote></para>
-]]>
-
-<para arch="hppa"> 
-<para>
+</footnote></para><para arch="hppa"> 
 
 Some older HPPA machines (e.g. 715/75) use RBOOTD rather than BOOTP.
 An RBOOTD package is available on the parisc-linux web site.
 
-</para>
-]]>
-
-<para>
+</para><para>
 
 The Trivial File Transfer Protocol (TFTP) is used to serve the boot
 image to the client.  Theoretically, any server, on any platform,
@@ -88,11 +72,9 @@ this section, we shall provide commands for SunOS 4.x, SunOS 5.x
 
 </para>
 
-<![ %supports-rarp; [ &tftp-rarp.xml; ]]>
-
-<![ %supports-bootp; [ &tftp-bootp.xml; ]]>
-
-<![ %supports-dhcp; [ &tftp-dhcp.xml; ]]>
+&tftp-rarp.xml;
+&tftp-bootp.xml;
+&tftp-dhcp.xml;
 
   <sect2 id="tftpd">
   <title>Enabling the TFTP Server</title>
@@ -121,20 +103,13 @@ reload</userinput> (for potato/2.2 and newer systems use
 find out the process ID for <command>inetd</command>, and run
 <userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>.
 
-</para>
-
-<para arch="i386">
-<para>
+</para><para arch="i386">
 
 To use the Pre-boot Execution Environment (PXE) method of TFTP
 booting, you will need a TFTP server with <userinput>tsize</userinput>
 support.  On a &debian; server, <command>tftp-hpa</command> qualifies.
 
-</para>
-]]>
-
-<para arch="mips">
-<para>
+</para><para arch="mips">
 
 If your TFTP server is a GNU/Linux box running Linux 2.4.X you'll need
 to set the following on your server:
@@ -160,8 +135,6 @@ echo "2048 32767" > /proc/sys/net/ipv4/ip_local_port_range
 to adjust the range of source ports the Linux TFTP server uses.
 
 </para>
-]]>
-
   </sect2>
 
   <sect2 id="tftp-images">
@@ -176,10 +149,7 @@ file to the file which <command>tftpd</command> will use for booting a
 particular client.  Unfortunately, the file name is determined by the
 TFTP client, and there are no strong standards.
 
-</para>
-
-<para arch="powerpc">
-<para>
+</para><para arch="powerpc">
 
 On NewWorld Power Macintosh machines, you will need to set up the
 <command>yaboot</command> boot loader as the TFTP boot image.
@@ -188,11 +158,7 @@ images via TFTP itself.  For net booting, use the
 <filename>yaboot-netboot.conf</filename>.  Just rename this to
 <filename>yaboot.conf</filename> in the TFTP directory.
 
-</para>
-]]>
-
-<![ %not-powerpc; [
-<para>
+</para><para arch="not-powerpc">"
 
 Often, the file that the TFTP client will look for is
 <replaceable>client-ip-in-hexclient-architecture</replaceable>.  To
@@ -204,11 +170,7 @@ command to set the output to hex, then enter the individual components
 of the client IP one at a time.  As for
 <replaceable>client-architecture</replaceable>, try out some values.
 
-</para>
-]]>
-
-<para arch="i386">
-<para>
+</para><para arch="i386">
 
 For PXE booting, you can use the boot loader included with
 <command>syslinux</command>: <filename>pxelinux.0</filename>. The boot
@@ -234,7 +196,7 @@ label lanlinux
 there may be problems mounting the root.bin file system once the
 kernel is booted.
 
-</para><para>
+</para><para arch="i386">
 
 Finally, copy the <filename>tftpboot.img</filename> and
 <filename>root.bin</filename> files from the Debian ftp archive into
@@ -242,9 +204,10 @@ the <filename>/tftpboot</filename> folder, where the bootloader will
 be looking for them.
 
 </para>
-]]>
 
-<para arch="mipsel">
+
+   <sect3 arch="mipsel">
+   <title>DECstation TFTP Images</title>
 <para>
 
 For DECstations, there are tftpimage files for each subarchitecture,
@@ -307,11 +270,11 @@ NetBSD web pages:
 <userinput>http://www.netbsd.org/Ports/pmax/board-list.html#proms</userinput>.
 
 </para>
-]]>
+   </sect3>
 
-<para arch="alpha">
+   <sect3 arch="alpha">
+   <title>Alpha TFTP Booting</title>
 <para>
-
 On Alpha, you must specify the filename (as a relative path to the
 boot image directory) using the <userinput>-file</userinput> argument
 to the SRM <userinput>boot</userinput> command, or by setting the
@@ -323,9 +286,10 @@ you <emphasis>must</emphasis> specify a filename by either one of
 these methods.
 
 </para>
-]]>
+   </sect3>
 
-<para arch="sparc">
+   <sect3 arch="sparc">
+   <title>SPARC TFTP Booting</title>
 <para>
 
 SPARC architectures for instance use the subarchitecture names, such
@@ -343,9 +307,10 @@ by adding it to the end of the OpenPROM boot command, such as
 in the directory that the TFTP server looks in.
 
 </para>
-]]>
+   </sect3>
 
-<para arch="m68k">
+   <sect3 arch="m68k">
+   <title>BVM/Motorola TFTP Booting</title>
 <para>
 
 For BVM and Motorola VMEbus systems copy the files
@@ -360,9 +325,10 @@ to the <filename>tftplilo.txt</filename> file for your subarchitecture
 for additional system-specific configuration information.
 
 </para>
-]]>
+   </sect3>
 
-<para arch="mips">
+   <sect3 arch="mips">
+   <title>SGI Indys TFTP Booting</title>
 <para>
 
 On SGI Indys you can rely on the <command>bootpd</command> to supply
@@ -372,8 +338,7 @@ the <userinput> filename=</userinput> option in
 <filename>/etc/dhcpd.conf</filename>.
 
 </para>
-]]>
-
+   </sect3>
   </sect2>
 
   <sect2 id="tftp-low-memory">

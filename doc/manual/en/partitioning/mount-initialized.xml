@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: mount-initialized.xml,v 1.2 2003/09/19 02:01:40 toff Exp $ -->
+<!-- $Id: mount-initialized.xml,v 1.3 2003/09/22 04:45:53 toff Exp $ -->
 
 
  <sect1 id="mount-initialized">
@@ -12,10 +12,7 @@ are resuming an installation that was broken off, or if you want to
 mount partitions that have already been initialized or have data on it
 which you wish to preserve.  
 
-</para>
-
-<![ %supports-nfsroot; [
-<para>
+</para><para condition="supports-nfsroot">
 
 If you are installing a diskless workstation, at this point, you want
 to NFS mount your root partition from the remote NFS server. Specify
@@ -28,7 +25,7 @@ the path to the NFS server in standard NFS syntax, namely,
 If you need to mount additional file systems as well, you can do that
 at this time.
 
-<![ %m68k; [ 
+</para><para arch="m68k"> 
 
 The <replaceable>server-share-path</replaceable> for the BVM and
 Motorola VMEbus systems should match the path specified in
@@ -40,9 +37,7 @@ system is booted.  The default path in
 replaced by the IP address, in dotted quad notation, of the booting
 client system. 
 
-]]>
-
-</para><para>
+</para><para condition="supports-nfsroot">
 
 If you have not already set up your network as described in 
 <xref linkend="configure-network"></xref>, then selecting an NFS install
@@ -50,10 +45,10 @@ will prompt you to do so.
 
 </para>
 
-  <sect2>
+  <sect2 condition="supports-nfsroot">
   <title>NFS Root Installation Workaround</title>
 <para>
-FIXME: still applicable in debian-installer?
+<phrase condition="FIXME">FIXME: still applicable in debian-installer?</phrase>
 
 Unfortunately, the woody release of <command>boot-floppies</command> does
 not support <command>dpkg</command> locking on NFS root installs. To work
@@ -136,9 +131,5 @@ share on /target, enable NFS locking, chroot /target, do what you forgot
 to do, back out cleanly, and reboot.  If it fails, try again.  Good luck.
 
 </para>
-
-]]>
-
   </sect2>
-
  </sect1>
