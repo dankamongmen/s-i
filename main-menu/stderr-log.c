@@ -90,7 +90,7 @@ void display_stderr_log(const char *package) {
 		while ((p = strchr(ret, '\n')))
 			p[0]=' ';
 	
-		debconf->command(debconf, "TITLE", "Error running ", package, NULL);
+		debconf->command(debconf, "TITLE", "Error running", package, NULL);
 		debconf->command(debconf, "SUBST", "debian-installer/generic_error", "PACKAGE", package, NULL);
 		debconf->command(debconf, "SUBST", "debian-installer/generic_error", "ERROR", ret, NULL);
 		debconf->command(debconf, "INPUT", "high", "debian-installer/generic_error", NULL);
