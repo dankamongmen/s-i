@@ -2,7 +2,7 @@ SUBDIRS = autopartkit.d
 
 bin_PROGRAMS = autopartkit
 
-noinst_PROGRAMS = autopartkit_test dumptable distribute_test
+noinst_PROGRAMS = autopartkit_test dumptable distribute_test lvm_test
 
 if TEST
 DUMMYCDEBCONF = \
@@ -22,6 +22,11 @@ autopartkit_SOURCES = \
 
 autopartkit_test_SOURCES = \
 	$(autopartkit_SOURCES)
+
+lvm_test_SOURCES = \
+	lvm.c \
+	dummylog.c \
+	lvm_test.c
 
 dumptable_SOURCES = \
 	dummylog.c \

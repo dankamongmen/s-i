@@ -24,10 +24,13 @@
 
 */
 
+#define _GNU_SOURCE /* for asprintf() in <stdio.h> */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <stdlib.h>
 
 #include "autopartkit.h"
 
@@ -85,8 +88,7 @@ vg_exists(const char *vgname)
     if (NULL == vgname)
         return FALSE;
 
-    asprintf(&devpath, "/proc/lvm/VGs/%s", vgname);
-    if ( ! devpath)
+    if ( -1 == asprintf(&devpath, "/proc/lvm/VGs/%s", vgname) )
         autopartkit_error(0, "Unable to allocate string for vg '%s'", vgname);
     else
     {
@@ -209,4 +211,164 @@ lvm_create_logicalvolume(const char *vgname, const char *lvname,
     }
     else 
         return NULL;
+}
+
+/* LVM stack operations */
+struct lvm_pv_info {
+    struct lvm_pv_info *next;
+    char *vgname;
+    char *devpath;
+};
+
+void *
+lvm_pv_stack_new()
+{
+    struct lvm_pv_info *head;
+    head = malloc(sizeof(*head));
+    if (NULL != head)
+    {
+        head->next = head;
+	head->vgname = NULL;
+	head->devpath = NULL;
+    }
+    return head;
+}
+int
+lvm_pv_stack_isempty(void *stack)
+{
+    struct lvm_pv_info *head = stack;
+    return head->next == head;
+}
+int
+lvm_pv_stack_push(void *stack, const char *vgname, const char *devpath)
+{
+    struct lvm_pv_info *head = stack;
+    struct lvm_pv_info *elem;
+
+    elem = malloc(sizeof(*elem));
+    if (NULL == elem)
+        return -1;
+    elem->vgname = strdup(vgname);
+    elem->devpath = strdup(devpath);
+
+    elem->next = head->next;
+    head->next = elem;
+
+    return 0;
+}
+int
+lvm_pv_stack_pop(void *stack, char **vgname, char **devpath)
+{
+    struct lvm_pv_info *head = stack;
+    struct lvm_pv_info *elem;
+
+    elem = head->next;
+
+    if (elem == head)
+        return -1;
+
+    head->next = elem->next;
+
+    *vgname = elem->vgname;
+    *devpath = elem->devpath;
+
+    free(elem);
+  
+    return 0;
+}
+int
+lvm_pv_stack_delete(void *stack)
+{
+    char *vgname;
+    char *devpath;
+    while ( ! lvm_pv_stack_isempty(stack) )
+    {
+	lvm_pv_stack_pop(stack, &vgname, &devpath);
+	free(vgname);
+	free(devpath);
+    }
+    free(stack);
+    return 0;
+}
+
+struct lvm_lv_info { /* Store vgname, lvname and mbsize in list */
+    struct lvm_lv_info *next;
+    char *vgname;
+    char *lvname;
+    unsigned int mbsize;
+};
+
+void *
+lvm_lv_stack_new()
+{
+    struct lvm_lv_info *head;
+    head = malloc(sizeof(*head));
+    if (NULL != head)
+    {
+	head->next = head;
+	head->vgname = NULL;
+	head->lvname = NULL;
+	head->mbsize = 0;
+    }
+    return head;
+}
+int
+lvm_lv_stack_isempty(void *stack)
+{
+    struct lvm_lv_info *head = stack;
+    return head->next == head;
+}
+int
+lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
+		  unsigned int mbsize)
+{
+    struct lvm_lv_info *head = stack;
+    struct lvm_lv_info *elem;
+
+    elem = malloc(sizeof(*elem));
+    if (NULL == elem)
+        return -1;
+    elem->vgname = strdup(vgname);
+    elem->lvname = strdup(lvname);
+    elem->mbsize = mbsize;
+
+    elem->next = head->next;
+    head->next = elem;
+
+    return 0;
+}
+int
+lvm_lv_stack_pop(void *stack, char **vgname, char **lvname, unsigned int *mbsize)
+{
+    struct lvm_lv_info *head = stack;
+    struct lvm_lv_info *elem;
+
+    elem = head->next;
+
+    if (elem == head)
+        return -1;
+
+    head->next = elem->next;
+
+    *vgname = elem->vgname;
+    *lvname = elem->lvname;
+    *mbsize = elem->mbsize;
+
+    free(elem);
+  
+    return 0;
+}
+int
+lvm_lv_stack_delete(void *stack)
+{
+    char *vgname;
+    char *lvname;
+    while ( ! lvm_lv_stack_isempty(stack) )
+    {
+	lvm_pv_stack_pop(stack, &vgname, &lvname);
+	free(vgname);
+	free(lvname);
+    }
+    free(stack);
+    return 0;
 }

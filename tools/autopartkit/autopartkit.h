@@ -69,4 +69,18 @@ int lvm_volumegroup_add_dev(const char *vgname, const char *devpath);
 char *lvm_create_logicalvolume(const char *vgname, const char *lvname,
 			       unsigned int mbsize);
 
+void *lvm_pv_stack_new(void);
+int lvm_pv_stack_isempty(void *stack);
+int lvm_pv_stack_push(void *stack, const char *vgname, const char *devpath);
+int lvm_pv_stack_pop(void *stack, char **vgname, char **devpath);
+int lvm_pv_stack_delete(void *);
+
+void *lvm_lv_stack_new(void);
+int lvm_lv_stack_isempty(void *stack);
+int lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
+		      unsigned int mbsize);
+int lvm_lv_stack_pop(void *stack, char **vgname, char **lvname,
+		     unsigned int *mbsize);
+int lvm_lv_stack_delete(void *);
+
 #endif /* AUTOPARTKIT_H */

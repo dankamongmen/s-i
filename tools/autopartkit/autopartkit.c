@@ -93,7 +93,8 @@
 #define WRITE_WINDOWS_PART
 */
 
-/* Ignore devfs devices */
+
+/* Ignore devfs devices, used in choose_dev */
 #define IGNORE_DEVFS_DEVICES
 
 #if defined(TEST)
@@ -950,6 +951,14 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     int partcount = 0;
     struct disk_info_t *spaceinfo = NULL;
 
+#if defined(LVM_HACK)
+    void *lvm_pv_stack;
+    void *lvm_lv_stack;
+
+    lvm_pv_stack = lvm_pv_stack_new();
+    lvm_lv_stack = lvm_lv_stack_new();
+#endif /* LVM_HACK */
+
     memset(mountmap,0,sizeof(device_mntpoint_map_t)*MAX_PARTITIONS);
 
     normalize_requirements(requirements, space_reqs, MAX_PARTITIONS);
@@ -986,7 +995,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	if (req_tmp->minsize == -1)
 	    break;
 
-	assert(req_tmp->curdisk);
+	assert(req_tmp->curdisk); /* XXX fails for shmfs */
 
 	autopartkit_log(1, "  device path '%s' [%lld-%lld]\n",
 			req_tmp->curdisk->path,
@@ -1028,36 +1037,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 				    req_tmp->fstype);
 		else
 		{
-
-	            /* Create lv, using minimum size (?) */
-		    devpath = lvm_create_logicalvolume(info[1], info[2], mbsize);
-
-		    /* Create filesystem */
-		    /*
-		      Something like this might work:
-
-		      const char *parted_fs = linux_fstype_to_parted(info[3]); 
-		      fs_type = ped_file_system_type_get(parted_fs);
-		      part_geom = map_from_devpath(devpath).
-		      fs = ped_file_system_create(&part_geom, fs_type, NULL);
-		      ped_file_system_close(fs);
-		    */
-		    { /* Do it like this for now */
-		      char *cmd = NULL;
-		      int retval;
-		      asprintf(&cmd, "mke2fs -j %s >> /var/log/messages 2>&1",
-			       devpath);
-		      if (cmd)
-		      {
-			  retval = system(cmd);
-			  free(cmd);
-			  if (0 != retval)
-			      autopartkit_error(1,
-						"Failed to create ext3 fs "
-						"on '%s'",
-						devpath);
-		      }
-		    }
+		    /* Store vgname, lvname and size in stack */
+		    lvm_lv_stack_push(lvm_lv_stack, info[1], info[2], mbsize);
 		}
 	    }
 	    else
@@ -1193,14 +1174,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		   it. */
 		ped_disk_commit(disk_maybe);
 
-                /* Initialize LVM partition, if the LVM tools are available */
-                if ( 0 == lvm_init_dev(devpath) )
-		{
-		    const char *mountpoint;
-		    autopartkit_log(1, "  lvm_init_dev() successfull.\n");
-		    mountpoint = req_tmp->mountpoint;
-		    lvm_volumegroup_add_dev(mountpoint, devpath);
-		}
+		lvm_pv_stack_push(lvm_pv_stack, req_tmp->mountpoint, devpath);
 	    }
 	    else
 #endif /* LVM_HACK */
@@ -1248,6 +1222,70 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     disable_kmsg(0);
 
     free(spaceinfo);
+
+#if defined(LVM_HACK)
+    /* Initialize LVM partitions and volumes, if the LVM tools are available */
+    while ( ! lvm_pv_stack_isempty(lvm_pv_stack) )
+    {
+        char *vgname;
+        char *devpath;
+        lvm_pv_stack_pop(lvm_pv_stack, &vgname, &devpath);
+	autopartkit_log(1, "  Init LVM pv name %s, devpath=%s\n",
+			vgname, devpath);
+        if ( 0 == lvm_init_dev(devpath) )
+        {
+            autopartkit_log(1, "  lvm_init_dev(%s) successful.\n", devpath);
+            lvm_volumegroup_add_dev(vgname, devpath);
+        }
+        free(vgname);
+        free(devpath);
+    }
+
+    while ( ! lvm_lv_stack_isempty(lvm_lv_stack) )
+    {
+        char *vgname;
+        char *lvname;
+        unsigned int mbsize;
+        char *devpath;
+
+        lvm_lv_stack_pop(lvm_lv_stack, &vgname, &lvname, &mbsize);
+
+	autopartkit_log(1, "  Init LVM lv on vg=%s, lvname=%s mbsize=%ud\n",
+			vgname, lvname, mbsize);
+
+        /* Create lv, using minimum size (?) */
+        devpath = lvm_create_logicalvolume(vgname, lvname, mbsize);
+
+        autopartkit_log(1, " LVM lv created ok, devpath=%s\n", devpath);
+
+        /* Create filesystem */
+        /*
+          Something like this might work:
+
+          const char *parted_fs = linux_fstype_to_parted(info[3]); 
+          fs_type = ped_file_system_type_get(parted_fs);
+          part_geom = map_from_devpath(devpath).
+          fs = ped_file_system_create(&part_geom, fs_type, NULL);
+          ped_file_system_close(fs);
+        */
+        { /* Do it like this for now */
+            char *cmd = NULL;
+            int retval;
+            retval = asprintf(&cmd, "mke2fs -j %s >> /var/log/messages 2>&1",
+                              devpath);
+            if (-1 != retval)
+            {
+                retval = system(cmd);
+                free(cmd);
+                if (0 != retval)
+                  autopartkit_error(1, "Failed to create ext3 fs on '%s'",
+                                    devpath);
+            }
+        }
+    }
+    lvm_lv_stack_delete(lvm_lv_stack);
+    lvm_pv_stack_delete(lvm_pv_stack);
+#endif /* LVM_HACK */
 
     fix_mounting(mountmap, partcount);
 
