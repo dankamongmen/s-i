@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
         {
                 struct debconfclient *debconf;
 		debconf = debconfclient_new();
-		debconf->command(debconf, "set", "debian-installer/kernel/subarchitecture", subarch, NULL);
+		debconf_set(debconf, "debian-installer/kernel/subarchitecture", subarch);
 	}
         else
 		printf("%s/%s\n", CPU_TEXT, subarch);
