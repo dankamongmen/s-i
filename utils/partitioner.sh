@@ -21,14 +21,13 @@ db_go
 db_get $DEBCONF_BASE/disc
 DISCS="$RET"
 
-# which fdisk version should we use?
-FDISK="fdisk"
-[ "$DEBIAN_FRONTEND" = "slang" ] && FDISK="cfdisk"
-# handle different on s390 :)
-[ "$ARCH" = "s390" -o "$ARCH" = "s390x" ] && FDISK="fdasd"
-
-# finally start the fdisk program
-$FDISK $DISCS < /dev/console >/dev/console 2>/dev/console
+# try to run a architecture script or use the common ones
+export DEBIAN_FRONTEND
+if [ -f /usr/share/debian-installer/partapps/$ARCH ]; then
+	sh /usr/share/debian-installer/partapps/$ARCH "$DISCS"
+else
+	sh /usr/share/debian-installer/partapps/common "$DISCS"
+fi
 if [ $? -ne 0 ]; then
 	db_subst $DEBCONF_BASE/fdiskerr DISC $DISCS
 	db_input critical $DEBCONF_BASE/fdiskerr
