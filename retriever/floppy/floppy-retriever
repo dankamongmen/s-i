@@ -6,14 +6,24 @@ FLOPPYMNT=/floppy
 
 db_capb BACKUP
 
-# FIXME FIXME FIXME
 mountfloppy()
 {
     if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
-        if [ ! -d /dev/floppy ]; then
+	# The INSTALL_MEDIA_DEV is set by the linuxrc on the boot
+	# floppy to the device it loaded the initrd from. It's also
+	# documented so the user may set it at the boot prompt.
+	# That is (probably) the floppy drive, which may be a USB floppy.
+	if [ -n "$INSTALL_MEDIA_DEV" ]; then
+	    FLOPPYDEV=$INSTALL_MEDIA_DEV
+        else
+	    # XXX not ideal. Fails if the floppy is USB.
+	    FLOPPYDEV=/dev/floppy/0
+	fi
+	    
+        if [ ! -e $FLOPPYDEV ]; then
             modprobe floppy >> /var/log/messages 2>&1
         fi
-        if [ ! -d /dev/floppy ]; then
+        if [ ! -e $FLOPPYDEV ]; then
             exit 1
         fi
         if ! grep -q ^vfat /proc/modules ; then
@@ -27,7 +37,7 @@ mountfloppy()
         fi
         db_capb
 
-        mount /dev/floppy/0 -tauto $FLOPPYMNT
+        mount $FLOPPYDEV -tauto $FLOPPYMNT
     fi
 }
 
@@ -61,14 +71,28 @@ case "x$cmd" in
         touch "$1"
         # Check for regular debs, udebs, and to be on the safe side,
         # check for *.ude files (msdos file names...)
+	FILES=""
+	FILE_COUNT=0
         for filename in $FLOPPYMNT/*.deb $FLOPPYMNT/*.udeb $FLOPPYMNT/*.ude; do
             if [ -f "$filename" ]; then
-                udpkg -f "$filename" >> "$1"
-                path="`echo "$filename" | sed 's,^/floppy/,,'`"
-                echo "Filename: $path" >> "$1"
-                echo >> "$1"
-            fi
+	    	FILES="$FILES $filename"
+		FILE_COUNT=$(expr $FILE_COUNT + 1)
+	    fi
+	done
+	if [ "$FILE_COUNT" = 0 ]; then
+		# Probably not a legitimate driver floppy.
+		exit 1
+	fi
+	# This could take a while, so a progress bar.
+	db_progress START 0 $FILE_COUNT retriever/floppy/packages/progress
+	for filename in $FILES; do
+            udpkg -f "$filename" >> "$1"
+            path="`echo "$filename" | sed 's,^/floppy/,,'`"
+            echo "Filename: $path" >> "$1"
+            echo >> "$1"
+	    db_progress STEP 1
         done
+	db_progress STOP
         ;;
 
     xcleanup)
