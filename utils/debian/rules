@@ -5,7 +5,6 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-
 PACKAGES=$(shell dh_listpackages)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
@@ -13,25 +12,17 @@ ARCH=$(shell dpkg --print-architecture)
 # This is the debhelper compatability version to use.
 export DH_COMPAT=2
 
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-	
-
-	touch configure-stamp
-
-build: configure-stamp build-stamp
+build: build-stamp
 build-stamp:
 	dh_testdir
-
 	$(MAKE)
-
+	$(MAKE) strip
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
+	rm -f build-stamp
 	rm -f debian/di-utils-shell.postinst
 	-$(MAKE) clean
 
@@ -45,7 +36,7 @@ install: build
 
 # Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
+# We have nothing to do
 
 # Build architecture-dependent files here.
 binary-arch: build install
@@ -66,4 +57,4 @@ binary-arch: build install
 		); )
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
+.PHONY: build clean binary-indep binary-arch binary install
