@@ -14,9 +14,12 @@ expect "The Server is in Graphics Mode"
 
 sleep 1
 
-puts "Sending $env(BOOTCOMMAND)"
-set send_slow {1 0.2}
-send -s "$env(BOOTCOMMAND)\r"
+# Send a F1, which will get it out of graphics mode.
+puts "OP"
+
+sleep 2
+
+send "$env(BOOTCOMMAND)\r"
 
 set timeout 60
 expect -re "booting.*kernel"
