@@ -3,6 +3,7 @@
 
 #include <parted/parted.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 #define FS_ID_SWAP      "82"
 #define FS_ID_LINUX     "83"
@@ -43,6 +44,6 @@ int      strcount(const char *s, int c);
 int      umount_target(void);
 
 /* find-parts.c */
-int      get_all_partitions(struct partition *parts[], const int max_parts);
+int      get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_fs_type);
 
 #endif /* PARTCONF_H_ */

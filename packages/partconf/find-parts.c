@@ -143,11 +143,11 @@ block_partition(const char *part)
 #endif
 
 static void
-get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev)
+get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev, bool ignore_fs_type)
 {
     if (PART_SIZE_BYTES(dev, part) > 0)
         p->size = PART_SIZE_BYTES(dev, part);
-    if (part->fs_type != NULL) {
+    if (!ignore_fs_type && part->fs_type != NULL) {
         if (strcmp(part->fs_type->name, "linux-swap") == 0)
             p->fstype = strdup("swap");
         else
@@ -165,7 +165,7 @@ get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev)
 }
 
 int
-get_all_partitions(struct partition *parts[], const int max_parts)
+get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_fs_type)
 {
     char buf[1024], *ptr, partname[1024], tmp[1024];
     FILE *fp, *fptmp;
@@ -254,7 +254,7 @@ get_all_partitions(struct partition *parts[], const int max_parts)
             continue;
         if ((part = ped_disk_next_partition(disk, NULL)) == NULL)
             continue;
-        get_partition_info(p, part, dev);
+        get_partition_info(p, part, dev, ignore_fs_type);
     }
     // Add partitions from all the disks we found
     for (i = 0; i < disc_count; i++) {
@@ -310,7 +310,7 @@ get_all_partitions(struct partition *parts[], const int max_parts)
             p->op.filesystem = NULL;
             p->op.mountpoint = NULL;
             p->op.done = 0;
-            get_partition_info(p, part, dev);
+            get_partition_info(p, part, dev, ignore_fs_type);
             parts[part_count++] = p;
         }
     }
@@ -325,8 +325,12 @@ main(int argc, char *argv[])
 {
     struct partition *parts[MAX_PARTS];
     int part_count, i;
+    bool ignore_fs_type = false;
 
-    if ((part_count = get_all_partitions(parts, MAX_PARTS)) <= 0)
+    if (argc == 2 && strcmp(argv[1], "--ignore-fstype") == 0) {
+        ignore_fs_type = true;
+    }
+    if ((part_count = get_all_partitions(parts, MAX_PARTS, ignore_fs_type)) <= 0)
         return 1;
     for (i = 0; i < part_count; i++) {
         printf("%s\t%s\t%s\n",

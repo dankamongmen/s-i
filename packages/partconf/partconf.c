@@ -612,7 +612,7 @@ main(int argc, char *argv[])
         debconf_go(debconf);
         return 1;
     }
-    if ((part_count = get_all_partitions(parts, MAX_PARTS)) <= 0) {
+    if ((part_count = get_all_partitions(parts, MAX_PARTS, false)) <= 0) {
         debconf_input(debconf, "critical", "partconf/no-partitions");
         debconf_go(debconf);
         return 1;
