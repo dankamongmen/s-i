@@ -251,10 +251,12 @@ command_set(struct confmodule *mod, char *arg)
             asprintf(&out, "%u value set", CMDSTATUS_SUCCESS);
             if (0 == strcmp("debconf/language", argv[0]))
             { /* Pass the value on to getlanguage() in templates.c */
+                debug_printf(0, "Setting debconf/language to %s", argv[1]);
                 setenv("LANGUAGE", argv[1], 1);
             }
             else if (strcmp(argv[0], "debconf/priority") == 0)
             {
+                debug_printf(0, "Setting debconf/priority to %s", argv[1]);
                 setenv("DEBCONF_PRIORITY", argv[1], 1);
             }
         }
