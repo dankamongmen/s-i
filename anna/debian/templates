@@ -1,25 +1,25 @@
 Template: anna/retriever
 Type: select
 Choices: ${CHOICES}
-_Description: Choose the retriever to use
- The retriever is responsible for fetching the modules to be
- installed.
+_Description: Choose the retriever to use:
+ The retriever is responsible for fetching installer components to be
+ loaded.
 
 Template: anna/choose_modules
 Type: multiselect
 Choices: ${CHOICES}
-_Description: Choose the Debian installer modules to install
- Most modules you will need will be installed automatically. The listed modules
- all have low priority and are probably not necessary, but may be interesting
- to some users.
+_Description: Choose the installer components to load:
+ Most things you will need will be loaded automatically. The listed
+ installer components all have low priority and are probably not necessary,
+ but may be interesting to some users.
  .
- Note that if you select a module that requires other modules, those modules
- will also be installed.
+ Note that if you select a compontent that requires others, those
+ components will also be loaded.
 
 Template: anna/progress_title
 Type: text
-# Progress bar: title displayed when installing packages
-_Description: Installing Debian installer modules
+# Progress bar: title displayed when loading udebs
+_Description: Loading components of the Debian installer
 
 Template: anna/progress_step_retr
 Type: text
@@ -27,32 +27,27 @@ _Description: Retrieving ${PACKAGE}
 
 Template: anna/progress_step_inst
 Type: text
-_Description: Installing ${PACKAGE}
+_Description: Unpacking ${PACKAGE}
 
 Template: anna/retrieve_failed
 Type: error
-_Description: Failed to retrieve installer module
- Retrieving the module ${PACKAGE} failed for unknown reasons. Aborting.
+_Description: Failed to retrieve installer component
+ Retrieving the component ${PACKAGE} failed for unknown reasons. Aborting.
 
 Template: anna/md5sum_failed
 Type: error
 _Description: Integrity check failed
- The integrity check for module ${PACKAGE} failed. It is most likely corrupt.
+ The integrity check for ${PACKAGE} failed. It is most likely corrupt.
  Aborting.
 
 Template: anna/install_failed
 Type: error
-_Description: Failed to install module
- Installing the module ${PACKAGE} failed for unknown reasons. Aborting.
+_Description: Failed to load installer component
+ Loading ${PACKAGE} failed for unknown reasons. Aborting.
 
 Template: anna/no_modules
 Type: error
-_Description: No installer modules found
- No installer modules were found. If you are installing from CD, it may be
- corrupt. If you are installing from a network, please try another
- mirror.
-
-Type: debian-installer/anna/title
-Type: text
-#  Item in the main menu to select this package
-_Description: Load installer modules
+_Description: No installer components found
+ If you are installing from CD, it may be corrupt. If you are installing
+ from a network, please try another mirror. If you are installing from 
+ floppy, make sure you have a driver floppy in the correct drive.
