@@ -27,3 +27,11 @@ register-module: Register a module to go in /etc/modules on the target.
 May be called before the target is mounted. Can optionally pass parameters
 that should be passed to the module on load; these are added to
 /etc/modules.conf.
+
+user-params: Output the parameters the user passed to the kernel on boot,
+one per line. This should include only parameters the user entered by hand,
+and will skip over parameters used to pre-seed debconf values. For any of
+the user's parameters to be recognised, the kernel command line must
+include "--" in it, and then all parameters after the -- are assumed to be
+user input. Therefore, the installer's boot loader should pass "--" at the
+end of its kernel command line to make this work.
