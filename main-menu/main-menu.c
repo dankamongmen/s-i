@@ -411,7 +411,7 @@ static char *debconf_priorities[] =
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 static void lower_debconf_priority (void) {
 	int pri;
-	const char *template = "debconf/priority"
+	const char *template = "debconf/priority";
 	struct debconfclient *debconf = debconfclient_new();
 	debconf->command(debconf, "GET", template, NULL);
 	if ( ! debconf->value )
