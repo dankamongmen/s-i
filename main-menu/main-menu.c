@@ -412,11 +412,7 @@ static void update_language (void) {
 	debconf = debconfclient_new();
 	debconf->command(debconf, "GET", "debian-installer/language", NULL);
 	if (*debconf->value != 0)
-	{
 		setenv("LANGUAGE", debconf->value, 1);
-		/*  debconf backend must also be updated  */
-		kill(getppid(), SIGUSR1);
-	}
 	debconfclient_delete(debconf);
 }
 
