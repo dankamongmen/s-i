@@ -28,10 +28,10 @@ is_not_loaded() {
 
 load_module() {
     module="$1"
-    db_subst hwdetect/module_params MODULE "$module"
-    db_input low hwdetect/module_params || [ $? -eq 30 ]
+    db_subst hw-detect/module_params MODULE "$module"
+    db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
-    db_get hwdetect/module_params
+    db_get hw-detect/module_params
     if modprobe -v "$module" $RET >> /var/log/messages 2>&1 ; then
 	# Not sure if this is usefull.  After all, 'discover' is installed
 	# in /target/. [pere 2003-04-18]
@@ -39,8 +39,8 @@ load_module() {
 	#echo "echo \"$module $RET\" >> /target/etc/modules" >> $prebaseconfig
 	:
     else
-	db_subst hwdetect/modprobe_error CMD_LINE "modprobe -v $module $RET"
-	db_input critical hwdetect/modprobe_error || [ $? -eq 30 ]
+	db_subst hw-detect/modprobe_error CMD_LINE "modprobe -v $module $RET"
+	db_input critical hw-detect/modprobe_error || [ $? -eq 30 ]
 	db_go
     fi
 }
@@ -82,7 +82,7 @@ db_title "Detecting HW and loading kernel modules"
 set -- `get_hw_info | wc -l`
 count="$1"
 #log "Progress bar from 0 to $count"
-db_progress START 0 $count hwdetect/progress_title
+db_progress START 0 $count hw-detect/progress_title
 
 # Setting IFS to adjust how the for loop splits the values
 IFS_SAVE="$IFS"
@@ -108,10 +108,10 @@ do
 
     log "Detected load module '$module' for '$name'"
 
-    db_subst hwdetect/progress_step CARDNAME "$name"
-    db_subst hwdetect/progress_step MODULE "$module"
+    db_subst hw-detect/progress_step CARDNAME "$name"
+    db_subst hw-detect/progress_step MODULE "$module"
 
-    db_progress STEP 1 hwdetect/progress_step
+    db_progress STEP 1 hw-detect/progress_step
 
     if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] &&
 	is_not_loaded $module
@@ -128,7 +128,7 @@ do
 	    else
 		while true
 		do
-		    template=hwdetect/not_included
+		    template=hw-detect/not_included
 		    db_fset "$template" seen false || true
 		    db_subst "$template" vendor "$name" || true
 		    db_subst "$template" module "$module" || true
