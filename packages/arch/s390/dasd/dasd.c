@@ -248,7 +248,17 @@ static enum state_wanted confirm (void)
 	if (ptr)
 	{
 		char buf1[256] = "", buf2[256] = "";
-		while (!isspace (*++ptr) && *ptr);
+		while (*ptr++ != '=');
+		while (1)
+		{ 
+			unsigned int a = 0;
+			sscanf (ptr, "%x", &a);
+			if (a == dasd_current->device)
+				return WANT_NEXT;;
+			while (*++ptr && *ptr != ',' && !isspace (*ptr));
+			if (*ptr != ',')
+				break;
+		}
 		strncpy (buf1, buf, ptr - buf);
 		strncpy (buf2, ptr, sizeof (buf2));
 		snprintf (buf, sizeof (buf), "%s,%04x%s", buf1, dasd_current->device, buf2);
