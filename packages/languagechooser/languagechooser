@@ -53,7 +53,7 @@ db_set "debconf/language" "$LANGUAGELIST"
 log "Asking for language specific packages to be Installed."
 
 case "$LANGUAGELIST" in
-    ar|el|he|ja|ko|tr|zh)
+    ar|el|he|ja|ko|zh)
 	anna-install bterm-unifont
 	;;
 esac
@@ -69,15 +69,19 @@ if [ "$LANGUAGELIST" != "en" ]; then
 fi
 
 case "`echo $LANGUAGELIST | sed 's/:.*//'`" in
-    ja|ko|ko_KR|el|zh|zh_CN|zh_TW|bg|ar|he|tr|uk|uk_UA)
+    ja|ko|ko_KR|el|zh|zh_CN|zh_TW|bg|ar|he|uk|uk_UA)
         # Japanese, Korean, Greek, Chinese, Bulgarian, Arabic, Hebrew,
-        # Turkish, Ukranian
+        # Ukrainian
         apt-install jfbterm || true
         apt-install unifont || true
         ;;
     ru)
         # Russian
         apt-install console-cyrillic || true
+        apt-install console-terminus || true
+        ;;
+    tr)
+        # Turkish
         apt-install console-terminus || true
         ;;
     *)
