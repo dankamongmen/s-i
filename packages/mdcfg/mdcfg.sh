@@ -372,7 +372,8 @@ apt-install mdadm
 md_mainmenu
 
 # Dump everything out to /etc/mdadm.conf, whatever got configured
-mdadm --detail --scan > /etc/mdadm.conf
+echo "DEVICE partitions" > /etc/mdadm.conf
+mdadm --detail --scan >> /etc/mdadm.conf
 
 #db_stop
 exit 0
