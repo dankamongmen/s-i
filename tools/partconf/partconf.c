@@ -12,6 +12,7 @@
 #include <errno.h>
 
 #include <cdebconf/debconfclient.h>
+#include <debian-installer.h>
 
 #include "partconf.h"
 
@@ -77,27 +78,19 @@ build_part_choices(struct partition *parts[], const int part_count)
     }
     max_len = strlen("n/a");
     for (i = 0; i < part_count; i++) {
-        if (parts[i]->fstype != NULL && strlen(parts[i]->fstype) > max_len)
+        if (parts[i]->op.filesystem != NULL) {
+            if (strlen(parts[i]->op.filesystem) > max_len)
+                max_len = strlen(parts[i]->op.filesystem);
+        } else if (parts[i]->fstype != NULL && strlen(parts[i]->fstype) > max_len)
             max_len = strlen(parts[i]->fstype);
     }
     for (i = 0; i < part_count; i++) {
         asprintf(&tmp, "%s  %-*s", list[i], max_len,
+                (parts[i]->op.filesystem != NULL) ? parts[i]->op.filesystem :
                 (parts[i]->fstype != NULL) ? parts[i]->fstype : "n/a");
         free(list[i]);
         list[i] = tmp;
     }
-    max_len = 0;
-    for (i = 0; i < part_count; i++) {
-        if (parts[i]->op.filesystem != NULL && strlen(parts[i]->op.filesystem) > max_len)
-            max_len = strlen(parts[i]->op.filesystem);
-    }
-    if (max_len > 0)
-        for (i = 0; i < part_count; i++) {
-            asprintf(&tmp, "%s  %-*s", list[i], max_len,
-                    (parts[i]->op.filesystem != NULL) ? parts[i]->op.filesystem : "");
-            free(list[i]);
-            list[i] = tmp;
-        }
     max_len = 0;
     for (i = 0; i < part_count; i++) {
         if (parts[i]->op.mountpoint != NULL && strlen(parts[i]->op.mountpoint) > max_len)
@@ -467,7 +460,7 @@ filesystem(void)
     partname = strdup(debconf->value);
     curr_part = NULL;
     for (i = 0; i < part_count; i++) {
-        fprintf(stderr, "pname='%s', pdesc='%s'\n", partname, parts[i]->description);
+        //fprintf(stderr, "pname='%s', pdesc='%s'\n", partname, parts[i]->description);
         if (streqcomma(parts[i]->description, partname)) {
 //        if (strstr(partname, parts[i]->description) == partname) {
             curr_part = parts[i];
@@ -497,10 +490,15 @@ mountpoint(void)
     if (strcmp(debconf->value, "Leave the file system intact") == 0) {
         free(curr_part->op.filesystem);
         curr_part->op.filesystem = NULL;
+        if (curr_part->fstype != NULL && strcmp(curr_part->fstype, "swap") == 0)
+            return 0;
     }
     else if (strcmp(debconf->value, "Create swap space") == 0) {
         free(curr_part->op.filesystem);
         curr_part->op.filesystem = strdup("swap"); // special case
+        free(curr_part->op.mountpoint);
+        curr_part->op.mountpoint = NULL;
+        return 0;
     } else {
         char *tmp = strdup(debconf->value);
 
@@ -575,6 +573,20 @@ main(int argc, char *argv[])
     debconf->command(debconf, "CAPB", "backup", NULL);
     ped_exception_set_handler(my_exception_handler);
     modprobe("ext3 reiserfs jfs xfs"); // FIXME: Any others?
+    if (check_proc_mounts("")) {
+        // Chicken out if /target is already mounted
+        debconf->command(debconf, "SET", "partconf/already-mounted", "no", NULL);
+        debconf->command(debconf, "INPUT critical", "partconf/already-mounted", NULL);
+        debconf->command(debconf, "GO", NULL);
+        debconf->command(debconf, "GET", "partconf/already-mounted", NULL);
+        if (strcmp(debconf->value, "false") == 0)
+            return 0;
+    }
+    if (!umount_target()) {
+        debconf->command(debconf, "INPUT critical", "partconf/umount-failed", NULL);
+        debconf->command(debconf, "GO", NULL);
+        return 1;
+    }
     if ((part_count = get_all_partitions(parts, MAX_PARTS)) <= 0) {
         debconf->command(debconf, "INPUT critical", "partconf/no-partitions", NULL);
         debconf->command(debconf, "GO", NULL);

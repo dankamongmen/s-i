@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <sys/mount.h>
 
 char *
 size_desc(long long bytes)
@@ -132,3 +133,53 @@ strcount(const char *s, int c)
     }
     return ret;
 }
+
+/*
+ * 
+ */
+int
+umount_target(void)
+{
+    FILE *fp;
+    char buf[1024], mnt[1024];
+    char *mounts[1024];
+    int i, m_count = 0;
+    int sort_func(const void *v1, const void *v2)
+    {
+	char *m1, *m2;
+
+	m1 = *(char **)v1;
+	m2 = *(char **)v2;
+	if (m1 == NULL && m2 == NULL)
+	    return 0;
+	else if (m1 == NULL)
+	    return -1;
+	else if (m2 == NULL)
+	    return 1;
+	if (strstr(m1, m2) == m1)
+	    return -1;
+	else if (strstr(m2, m1) == m2)
+	    return 1;
+	else
+	    return strcmp(m2, m1);
+    }
+
+    if ((fp = fopen("/proc/mounts", "r")) == NULL)
+        return 0;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        sscanf(buf, "%*s %s", mnt);
+	if (strstr(mnt, "/target") != mnt)
+	    continue;
+	mounts[m_count++] = strdup(mnt);
+    }
+    fclose(fp);
+    if (m_count == 0)
+	return 1;
+    qsort(mounts, m_count, sizeof(char *), sort_func);
+    for (i = 0; i < m_count; i++) {
+	if (umount(mounts[i]) < 0)
+	    return 0;
+    }
+    return 1;
+}
+

@@ -18,8 +18,8 @@ _Description: Select a partition
  a partition to configure. No actual changes will be made until you select
  "Finish". If you select "Abort", no changes will be made.
  .
- The information shown is, in turn: device name, size, existing file
- system, file system to create, and mount point.
+ The information shown is, in turn: device name, size, file system, and
+ mount point.
 
 Template: partconf/existing-filesystem
 Type: select
@@ -51,23 +51,37 @@ Type: string
 _Description: Where do you want to mount ${PARTITION}?
  Please enter where the partition should be mounted.
 
+Template: partconf/already-mounted
+Type: boolean
+Default: false
+_Description: Partitions have already been mounted!
+ Since the partitions have already been mounted, you cannot do any
+ changes. Do you want to unmount the partitions so you can make
+ changes? Note that if you do, you cannot abort this. If you change
+ your mind, you will have to restore the old mounts yourself.
+
+Template: partconf/umount-failed
+Type: error
+_Description: Failed to unmount partitions
+ An error occurred while unmounting the partitions. Cannot continue.
+
 Template: partconf/internal-create-fs-choice
 Type: text
 _Description: Create %s file system
 
 Template: partconf/sanity-no-root
-Type: note
+Type: error
 _Description: No root partition (/)
  You need a root partition. Please assign a partition to the root mount
  point before continuing.
 
 Template: partconf/sanity-bad-mount
-Type: note
+Type: error
 _Description: You have assigned a partition to ${MOUNT}
  It makes no sense to mount a partition on ${MOUNT}. Please change this.
 
 Template: partconf/sanity-double-mount
-Type: note
+Type: error
 _Description: You have assigned several partitions to ${MOUNT}
  You cannot assign several partitions to the same mount point. Please
  change all but one of them.
@@ -80,25 +94,25 @@ _Description: Ready to create file systems and mount partitions?
  file systems to!
 
 Template: partconf/failed-mkswap
-Type: note
+Type: error
 _Description: Failed to create swap space on ${PARTITION}
  An error occurred when the swap space was created on ${PARTITION}. Please
  see tty3 or /var/log/messages for more information.
 
 Template: partconf/failed-swapon
-Type: note
+Type: error
 _Description: Failed to activate the swap space on ${PARTITION}
  An error occurred when the swap space on ${PARTITION} was activated.
  Please see tty3 or /var/log/messages for more information.
 
 Template: partconf/failed-mkfs
-Type: note
+Type: error
 _Description: Failed to create ${FS} file system on ${PARTITION}
  An error occurred when the ${FS} file system was created on ${PARTITION}.
  Please see tty3 or /var/log/messages for more information.
 
 Template: partconf/failed-mount
-Type: note
+Type: error
 _Description: Failed to mount ${PARTITION} on ${MOUNT}
  An error occurred when ${PARTITION} was mounted on ${MOUNT} Please see
  tty3 or /var/log/messages for more information.

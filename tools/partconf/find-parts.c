@@ -11,6 +11,7 @@
 #include <errno.h>
 
 #include "partconf.h"
+#include <debian-installer.h>
 
 // If it's an LVM volume, it's on the form
 // /dev/<group>/<volume> and there's info in
@@ -162,7 +163,6 @@ get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev)
         }
     }
 }
-
 
 int
 get_all_partitions(struct partition *parts[], const int max_parts)
