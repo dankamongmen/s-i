@@ -149,12 +149,13 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	        continue; /* Ignore zero-size partitions */
 	    if (reqs[j].curdisk == &diskinfo[i])
 	    {
+	        int64_t span;
 		if ((PedSector)-1 == reqs[j].max_blk)
 		    reqs[j].max_blk = maxmax_blk;
-		total_wanted += reqs[j].max_blk - reqs[j].min_blk;
+		span = reqs[j].max_blk - reqs[j].min_blk
+		total_wanted += span;
 		autopartkit_log(0, "Adding %ld to total_wanted, now %ld\n",
-				(long)(reqs[j].max_blk - reqs[j].min_blk),
-				(long)total_wanted);
+				(long)span, (long)total_wanted);
 	    }
 	}
         if (total_wanted == 0)
@@ -167,20 +168,23 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	    if (reqs[j].curdisk == &diskinfo[i])
 	    {
 		PedSector newsize;
-		/* These calculations can overflow if the numbers are
-		   too big. */
 		newsize = reqs[j].max_blk - reqs[j].min_blk;
-		newsize *= diskinfo[i].freespace;
-		assert(total_wanted);
-		newsize /= total_wanted;
-		newsize += reqs[j].blocks;
-		if (newsize > reqs[j].max_blk)
-		    newsize = reqs[j].max_blk;
+		if (newsize) /* Only resize if min < max */
+		{
+		    /* These calculations can overflow if the numbers
+		       are too big. */
+		    newsize *= diskinfo[i].freespace;
+		    assert(total_wanted);
+		    newsize /= total_wanted;
+		    newsize += reqs[j].blocks;
+		    if (newsize > reqs[j].max_blk)
+		        newsize = reqs[j].max_blk;
 
-		/* We know the new size.  Activate it */
-		total_wanted -= reqs[j].max_blk - reqs[j].min_blk;
-		diskinfo[i].freespace -= newsize - reqs[j].blocks;
-		reqs[j].blocks = newsize;
+		    /* We know the new size.  Activate it */
+		    total_wanted -= reqs[j].max_blk - reqs[j].min_blk;
+		    diskinfo[i].freespace -= newsize - reqs[j].blocks;
+		    reqs[j].blocks = newsize;
+		}
 	    }
 	}
     }
