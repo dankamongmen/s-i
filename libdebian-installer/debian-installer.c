@@ -171,6 +171,53 @@ di_stristr(const char *haystack, const char *needle)
     return NULL;
 }
 
+struct package_t *
+di_pkg_alloc(const char *name)
+{
+    struct package_t *p;
+
+    p = (struct package_t *)malloc(sizeof(struct package_t));
+    memset(p, 0, sizeof(struct package_t));
+    p->package = strdup(name);
+    return p;
+}
+
+void
+di_pkg_free(struct package_t *p)
+{
+    struct language_description *l1, *l2;
+    int i;
+
+    /* No-op if p is NULL, like free(3) */
+    if (p == NULL)
+        return;
+    free(p->package);
+    free(p->filename);
+    free(p->md5sum);
+    free(p->description);
+    for (i = 0; p->depends[i] != NULL; i++)
+    {
+        free(p->depends[i]->name);
+        free(p->depends[i]);
+    }
+    for (i = 0; p->provides[i] != NULL; i++)
+    {
+        free(p->provides[i]->name);
+        free(p->provides[i]);
+    }
+    l1 = p->localized_descriptions;
+    while (l1 != NULL)
+    {
+        l2 = l1;
+        l1 = l1->next;
+        free(l2->language);
+        free(l2->description);
+        free(l2);
+    }
+    free(p->version);
+    free(p);
+}
+
 #define BUFSIZE         4096
 struct linkedlist_t *
 di_pkg_parse(FILE *f)
@@ -190,9 +237,7 @@ di_pkg_parse(FILE *f)
         buf[strlen(buf)-1] = 0;
         if (di_stristr(buf, "Package: ") == buf)
         {
-            p = (struct package_t *)malloc(sizeof(struct package_t));
-            memset(p, 0, sizeof(struct package_t));
-            p->package = strdup(strchr(buf, ' ') + 1);
+            p = di_pkg_alloc(strchr(buf, ' ') + 1);
             node = (struct list_node *)malloc(sizeof(struct list_node));
             node->next = NULL;
             node->data = p;
@@ -283,7 +328,7 @@ di_pkg_parse(FILE *f)
              * Basic depends line parser. Can ignore versioning
              * info since the depends are already satisfied.
              */
-            b = strdup(strchr(buf, ' ') + 1);
+            b = strchr(buf, ' ') + 1;
             i = 0;
             while (*b != 0 && *b != '\n')
             {
@@ -297,7 +342,7 @@ di_pkg_parse(FILE *f)
                     else if (p->depends[i] == 0)
                     {
                         dep = malloc(sizeof(struct package_dependency));
-                        dep->name = b;
+                        dep->name = strdup(b);
                         dep->ptr = NULL;
                         p->depends[i] = dep;
                     }
@@ -311,7 +356,7 @@ di_pkg_parse(FILE *f)
         }
         else if (di_stristr(buf, "Provides: ") == buf)
         {
-            b = strdup(strchr(buf, ' ') + 1);
+            b = strchr(buf, ' ') + 1;
             i = 0;
             while (*b != 0 && *b != '\n')
             {
@@ -325,7 +370,7 @@ di_pkg_parse(FILE *f)
                     else if (p->provides[i] == 0)
                     {
                         dep = malloc(sizeof(struct package_dependency));
-                        dep->name = b;
+                        dep->name = strdup(b);
                         dep->ptr = NULL;
                         p->provides[i] = dep;
                     }
@@ -422,9 +467,7 @@ di_pkg_resolve_deps(struct linkedlist_t *ptr)
         {
             if ((q = di_pkg_find(ptr, p->provides[i]->name)) == NULL)
             {
-                q = (struct package_t *)malloc(sizeof(struct package_t));
-                memset(q, 0, sizeof(struct package_t));
-                q->package = strdup(p->provides[i]->name);
+                q = di_pkg_alloc(p->provides[i]->name);
                 newnode = (struct list_node *)malloc(sizeof(struct list_node));
                 newnode->data = q;
                 newnode->next = ptr->head;
@@ -434,7 +477,7 @@ di_pkg_resolve_deps(struct linkedlist_t *ptr)
             for (j = 0; q->depends[j] != NULL; j++)
                 ;
             dep = malloc(sizeof(struct package_dependency));
-            dep->name = p->package;
+            dep->name = strdup(p->package);
             dep->ptr = p;
             q->depends[j] = dep;
             q->depends[j+1] = NULL;
@@ -638,5 +681,21 @@ di_compare_version(const struct version_t *a, const struct version_t *b)
     if (r != 0)
         return r;
     return verrevcmp(a->revision, b->revision);
+}
+
+void
+di_list_free(struct linkedlist_t *list, void (*freefunc)(void *))
+{
+    struct list_node *node, *next;
+
+    if (list == NULL)
+        return;
+    for (node = list->head; node != NULL; node = next)
+    {
+        next = node->next;
+        freefunc(node->data);
+        free(node);
+    }
+    free(list);
 }
 

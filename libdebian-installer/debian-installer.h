@@ -68,6 +68,8 @@ void di_log(const char *msg);
 int di_check_dir (const char *dirname);
 int di_snprintfcat (char *str, size_t size, const char *format, ...);
 char *di_stristr(const char *haystack, const char *needle);
+struct package_t *di_pkg_alloc(const char *name);
+void di_pkg_free(struct package_t *p);
 struct linkedlist_t *di_pkg_parse(FILE *fp);
 struct package_t *di_pkg_find(struct linkedlist_t *ptr, const char *package);
 int di_pkg_provides(struct package_t *p, struct package_t *target);
@@ -78,5 +80,6 @@ struct linkedlist_t *di_pkg_toposort_arr(struct package_t **packages, const int 
 struct linkedlist_t *di_pkg_toposort_list(struct linkedlist_t *list);
 int di_parse_version(struct version_t *rversion, const char *string);
 int di_compare_version(const struct version_t *a, const struct version_t *b);
+void di_list_free(struct linkedlist_t *list, void (*freefunc)(void *));
 
 #endif /* _DEBIAN_INSTALLER_H_ */
