@@ -1621,7 +1621,11 @@ command_create_file_system()
                 critical_error("Bad file system type: %s", s_fstype);
         ped_partition_set_system(part, fstype);
         deactivate_exception_handler();
-        fs = timered_file_system_create(&(part->geom), fstype);
+        if ((fs = timered_file_system_create(&(part->geom), fstype)) != NULL)
+        {
+                ped_file_system_close(fs);
+                ped_disk_commit_to_dev(disk);
+        }
         activate_exception_handler();
         oprintf("OK\n");
         if (fs != NULL)
