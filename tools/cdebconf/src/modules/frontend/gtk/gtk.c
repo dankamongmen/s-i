@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.23 2003/08/18 21:55:36 sley Exp $
+ * $Id: gtk.c,v 1.24 2003/08/18 22:55:25 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -714,8 +714,7 @@ static int gtkhandler_custom(struct frontend *obj, struct question *q, GtkWidget
 
     asprintf(&tmp, "%s_gtk", symname);
 
-    custom_func = (custom_func_t*) dlsym(custom_module, tmp);
-    custom_func = (custom_func_t*) dlsym(NULL, tmp);
+    custom_func = (custom_func_t*) dlsym(q->custom_module, tmp);
     free(tmp);
     free(symname);
 
@@ -737,8 +736,8 @@ struct question_handlers {
     { "select",	        gtkhandler_select },
     { "string",	        gtkhandler_string },
     { "error",	        gtkhandler_note },
-    //	{ "custom",	gtkhandler_custom },
-    //	{ "text",	gtkhandler_text }
+//  { "custom",         gtkhandler_custom },
+//  { "text",           gtkhandler_text }
 };
 
 void set_window_properties(GtkWidget *window)
