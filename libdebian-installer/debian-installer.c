@@ -932,3 +932,49 @@ di_mapdevfs(const char *path, char *buf, size_t n)
 
   return ret;
 }
+
+/*
+ * Configure all dependencies, special case for virtual packages.
+ * This is done depth-first.
+ */
+int di_config_package(struct package_t *p,
+                      int (*virtfunc)(struct package_t *),
+	              int (*walkfunc)(struct package_t *)) {
+	char *configcommand;
+	int ret, i;
+	struct package_t *dep;
+
+	if (virtfunc != NULL && di_pkg_is_virtual(p)) {
+		return virtfunc(p);
+	}
+
+	for (i = 0; p->depends[i] != 0; i++) {
+		if ((dep = p->depends[i]->ptr) == NULL)
+			continue;
+		if (dep->status == installed)
+			continue;
+		/* Recursively configure this package */
+		if (!di_config_package(dep, virtfunc, walkfunc))
+			return 0;
+	}
+
+	if (asprintf(&configcommand, "exec " DPKG_CONFIGURE_COMMAND " %s", p->package) == -1) {
+		return 0;
+	}
+	ret = system(configcommand);
+	free(configcommand);
+        if (ret == 0) {
+            p->status = installed;
+	    if (walkfunc != NULL)
+		    walkfunc(p);
+        } else {
+            char buf[256];
+            snprintf(buf, sizeof(buf),
+                     "Configuring '%s' failed with error code %d",
+                     p->package, ret);
+            di_log(buf);
+            p->status = half_configured;
+	    return 0;
+	}
+	return !ret;
+}

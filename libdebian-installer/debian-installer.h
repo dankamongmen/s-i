@@ -92,5 +92,8 @@ int di_parse_version(struct version_t *rversion, const char *string);
 int di_compare_version(const struct version_t *a, const struct version_t *b);
 void di_list_free(struct linkedlist_t *list, void (*freefunc)(void *));
 ssize_t di_mapdevfs(const char *path, char *ret, size_t len);
+int di_config_package(struct package_t *p,
+                      int (*virtfunc)(struct package_t *),
+                      int (*walkfunc)(struct package_t *));
 
 #endif /* _DEBIAN_INSTALLER_H_ */
