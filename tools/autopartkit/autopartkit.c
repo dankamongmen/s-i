@@ -111,12 +111,8 @@
 #define FSTAB   "/target/etc/fstab"
 #endif /* not TEST */
 
-#if defined(HAVE_PED_DISK_COMMIT) /* libparted 1.6 */
-#  define DEFAULT_FS "ext3"
-#else /* not HAVE_PED_DISK_COMMIT (libparted 1.4) */
-/* ext3 is not supported by libparted v1.4. */
-#  define DEFAULT_FS "ext2"
-#endif /* not HAVE_PED_DISK_COMMIT */
+/* ext3 is not supported by libparted v1.4, nor v1.6. */
+#define DEFAULT_FS "ext2"
 
 #if 0
 #define log_line() \
