@@ -11,8 +11,6 @@ struct diskspace_req_s {
   char *fstype;
   int minsize; /* In MB */
   int maxsize; /* In MB */
-  /* suggested percent of total diskspace for all disks */
-  float percent_total; /* 0.0 - 100.0, 0.0 = ignore */
 
   /* Used by the allocation algorithm in distribute.c */
   PedSector min_blk;

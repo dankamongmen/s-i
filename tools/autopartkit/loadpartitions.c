@@ -50,8 +50,7 @@ list_makeroom(struct partition_list *list, unsigned int room)
 
 static int
 list_add_entry(struct partition_list *list, char *mountpoint, 
-	       char *fstype, int minsize, int maxsize,
-	       float percent_total)
+	       char *fstype, int minsize, int maxsize)
 {
   if (0 != list_makeroom(list, 1))
     return -1;
@@ -66,7 +65,6 @@ list_add_entry(struct partition_list *list, char *mountpoint,
   list->disk_reqs[list->count].fstype = fstype;
   list->disk_reqs[list->count].minsize = minsize;
   list->disk_reqs[list->count].maxsize = maxsize;
-  list->disk_reqs[list->count].percent_total = percent_total;
   (list->count)++;
 
   return 0;
@@ -99,7 +97,6 @@ add_partition(struct partition_list *list, char *line)
   char fstype[1024];
   int minsize;
   int maxsize;
-  float percent_total;
 
   if (!line || ! *line) /* Ignore empty lines */
     return -1;
@@ -110,15 +107,14 @@ add_partition(struct partition_list *list, char *line)
   autopartkit_log("Adding '%s'\n", line);
 #endif /* DEBUG */
 
-  if (5 != sscanf(line, "%s %s %d %d %f ", mountpoint, fstype, &minsize,
-		  &maxsize, &percent_total))
+  if (5 != sscanf(line, "%s %s %d %d ", mountpoint, fstype, &minsize,
+		  &maxsize))
     return -1; /* error */
 
-  autopartkit_log(2, "Fetched partition info %s %s %d %d %f\n",
-                  mountpoint, fstype, minsize, maxsize, percent_total);
+  autopartkit_log(2, "Fetched partition info %s %s %d %d\n",
+                  mountpoint, fstype, minsize, maxsize);
 
-  return list_add_entry(list, mountpoint, fstype, minsize, maxsize,
-		        percent_total);
+  return list_add_entry(list, mountpoint, fstype, minsize, maxsize);
 }
 
 diskspace_req_t *
@@ -151,7 +147,7 @@ load_partitions(const char *filename)
   fclose(fp);
 
   /* Terminate list */
-  list_add_entry(&list, NULL, NULL, -1, -1, 0.0);
+  list_add_entry(&list, NULL, NULL, -1, -1);
 
   return list.disk_reqs; /* Transfering resposibility for this memory block */
 }
