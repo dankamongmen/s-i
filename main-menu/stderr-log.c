@@ -51,7 +51,7 @@ void intercept_stderr(void) {
 		FILE *f = fdopen(filedes[0], "r");
 
 		close(filedes[1]);
-		while ((fgets(&buf, 1024, f))) {
+		while ((fgets(buf, 1024, f))) {
 			log_error(buf);
 		}
 		exit(0);
@@ -60,8 +60,8 @@ void intercept_stderr(void) {
 
 void display_stderr_log(const char *package) {
 	static struct debconfclient *debconf = NULL;
-	statuc const char *titletemplate = "debian-installer/generic_error-title";
-	statuc const char *template = "debian-installer/generic_error";
+	static const char *titletemplate = "debian-installer/generic_error-title";
+	static const char *template = "debian-installer/generic_error";
 	FILE *f;
 
 	assert(package);
@@ -104,7 +104,7 @@ void display_stderr_log(const char *package) {
 		debconf->command(debconf, "SETTITLE",  titletemplate, NULL);
 		debconf->command(debconf, "SUBST", template, "PACKAGE", package, NULL);
 		debconf->command(debconf, "SUBST", template, "ERROR", ret, NULL);
-p		debconf->command(debconf, "INPUT", "high", template, NULL);
+		debconf->command(debconf, "INPUT", "high", template, NULL);
 		debconf->command(debconf, "GO", NULL);
 
 		fclose(f);
