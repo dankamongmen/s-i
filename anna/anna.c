@@ -14,6 +14,8 @@
 #include <cdebconf/debconfclient.h>
 #include "anna.h"
 
+static struct debconfclient *debconf = NULL;
+
 static int
 is_installed(struct package_t *p, struct linkedlist_t *installed)
 {
@@ -36,6 +38,12 @@ is_installed(struct package_t *p, struct linkedlist_t *installed)
  *
  * - Don't install packages that are already installed
  * - Ask for which packages with priority below standard to install
+ *
+ * Packages to install:
+ * (1) priority >= standard
+ * (2) dependency of a (1), unless a parallel package is priority >= standard
+ * Packages to ask about:
+ *   priority < standard that aren't dependencies
  */
 struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 	struct list_node *node, *next, *prev = NULL;
@@ -83,7 +91,6 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
                 prev = node;
         }
 	if (lowpri_p->head != NULL) {
-		struct debconfclient *debconf;
 		char *choices;
 		char *tmp;
 		size_t choices_size = 1;
@@ -101,7 +108,6 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 		}
 		if (choices_size >= 3)
 			choices[choices_size-3] = '\0';
-		debconf = debconfclient_new();
 		debconf->command(debconf, "FSET", ANNA_CHOOSE_LOWPRI_PACKAGES,
 				"seen", "false", NULL);
 		debconf->command(debconf, "SUBST", ANNA_CHOOSE_LOWPRI_PACKAGES,
@@ -196,8 +202,13 @@ int install_packages (struct linkedlist_t *packages) {
 	struct package_t *p;
 	char *f, *fp, *dest_file;
 	char *emsg;
-	int ret = 1;
+	int ret = 1, pkg_count = 0;
 
+	for (node = packages->head; node != NULL; node = node->next) {
+		if (((struct package_t *)node->data)->filename)
+			pkg_count++;
+	}
+	debconf->commandf(debconf, "PROGRESS START 0 %d Installing modules", 2*pkg_count);
 	for (node = packages->head; node != NULL; node = node->next) {
 		p = (struct package_t *)node->data;
 		if (p->filename) {
@@ -211,6 +222,7 @@ int install_packages (struct linkedlist_t *packages) {
 					f = ++fp;
 			asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f);
 
+			debconf->commandf(debconf, "PROGRESS STEP 1 Retrieving %s", p->package);
 			if (! get_package(p, dest_file)) {
 				asprintf(&emsg, "anna: error getting %s!\n",
 					p->filename);
@@ -218,7 +230,8 @@ int install_packages (struct linkedlist_t *packages) {
 				free(emsg);
 				ret = 0;
 				break;
-			} else if (! md5sum(p->md5sum, dest_file)) {
+			}
+			if (! md5sum(p->md5sum, dest_file)) {
 				asprintf(&emsg, "anna: md5sum mismatch on %s!\n",
 					p->filename);
 				di_log(emsg);
@@ -226,7 +239,9 @@ int install_packages (struct linkedlist_t *packages) {
 				unlink(dest_file);
 				ret = 0;
 				break;
-			} else if (! unpack_package(dest_file)) {
+			}
+			debconf->commandf(debconf, "PROGRESS STEP 1 Installing %s", p->package);
+			if (! unpack_package(dest_file)) {
 				unlink(dest_file);
 				ret = 0;
 				break;
@@ -235,6 +250,9 @@ int install_packages (struct linkedlist_t *packages) {
 			free(dest_file);
 		}
 	}
+
+	debconf->command(debconf, "PROGRESS STEP 0 Done", NULL);
+	debconf->command(debconf, "PROGRESS STOP", NULL);
 
 	cleanup();
 
@@ -245,5 +263,6 @@ int main (int argc, char **argv) {
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
 	
+	debconf = debconfclient_new();
 	return ! install_packages(select_packages(get_packages()));
 }
