@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: amiga-kbd.c,v 1.9 2003/11/14 20:53:16 mckinstry Rel $
+ * $Id: amiga-kbd.c,v 1.10 2004/03/13 09:17:19 mckinstry Exp $
  */
 
 #include "config.h"
@@ -21,10 +21,10 @@
  */
 kbd_t *amiga_kbd_get (kbd_t *keyboards, const char *subarch)
 {
-	kbd_t *k = xmalloc (sizeof (kbd_t));
+	kbd_t *k = NULL;
 
 #if defined(__m68k__)
-	if (strstr (subarch, "amiga")== NULL)
+	if (strstr (subarch, "amiga") ==NULL)
 		return keyboards;
 #endif
 #if defined(__powerpc__)
@@ -32,6 +32,7 @@ kbd_t *amiga_kbd_get (kbd_t *keyboards, const char *subarch)
 		return keyboards;
 #endif
 
+	k =  xmalloc (sizeof (kbd_t));
 	k->name = "amiga"; // This must match the name "amiga" in console-keymaps-amiga
 	k->deflt = NULL;
 	k->fd = -1;

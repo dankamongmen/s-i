@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: mac-kbd.c,v 1.7 2003/11/14 20:53:16 mckinstry Rel $
+ * $Id: mac-kbd.c,v 1.8 2004/03/13 09:17:19 mckinstry Exp $
  */
 
 #include "config.h"
@@ -18,11 +18,12 @@
  */
 kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 {
-	kbd_t *k = xmalloc (sizeof (kbd_t));
+	kbd_t *k = NULL;
 
 	if (strstr (subarch, "mac") == NULL)
 		return keyboards;
 
+	k = xmalloc (sizeof (kbd_t)); 
 	k->name = "mac"; // This must match the name "mac" in console-keymaps-mac
 	k->deflt = NULL;
 	k->fd = -1;

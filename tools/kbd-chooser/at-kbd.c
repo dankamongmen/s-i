@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.13 2003/11/14 20:53:16 mckinstry Rel $
+ * $Id: at-kbd.c,v 1.14 2004/03/13 09:17:19 mckinstry Exp $
  */
 
 #include "config.h"
@@ -19,11 +19,11 @@
  */
 kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 {
-	kbd_t *k = xmalloc (sizeof(kbd_t));
+	kbd_t *k = NULL;
 
 #if defined(__m68k__)
 	// on m68k only mvme and bvme have PC-style keyboards
-	if (strstr(subarch, "vme") == NULL)
+	if (strstr(subarch, "vme") != NULL)
 		return keyboards;
 #endif
 #if defined(__powerpc__)
@@ -32,7 +32,8 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 	    (strstr(subarch, "chrp") == NULL))
 		return keyboards;
 #endif
-	
+
+	k =  xmalloc (sizeof(kbd_t));	
 	k->name = "at"; // This must match the name "at" in console-keymaps-at
 	k->deflt = NULL;
 	k->fd = -1;
