@@ -36,10 +36,12 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
+	install -m755 -d debian/partconf/var/lib/partconf/fstab.d \
+			 debian/partconf-find-partitions/usr/lib/partconf \
+			 debian/partconf-mkfstab/usr/lib/partconf \
+			 debian/partconf-mkfstab/var/lib/partconf/fstab.d
 	install -m755 partconf debian/partconf.postinst
-	install -d -m755 debian/partconf-find-partitions/usr/lib/partconf
 	install -m755 find-partitions debian/partconf-find-partitions/usr/lib/partconf
-	install -d -m755 debian/partconf-mkfstab/usr/lib/partconf/fstab.d
 	install -m755 mkfstab debian/partconf-mkfstab/usr/lib/partconf
 
 # Build architecture-dependent files here.
