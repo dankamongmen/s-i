@@ -15,6 +15,7 @@ is_not_loaded() {
 
 module_insmod() {
     module="$1"
+    db_subst ethdetect/module_params MODULE "$module"
     db_input low ethdetect/module_params || [ $? -eq 30 ]
     db_go
     db_get ethdetect/module_params
@@ -22,7 +23,8 @@ module_insmod() {
 	prebaseconfig=/usr/lib/prebaseconfig.d/40ethdetect
 	echo "echo \"$module $RET\" >> /target/etc/modules" >> $prebaseconfig
     else
-	db_input critical ethdetect/error || [ $? -eq 30 ]
+	db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
+	db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
 	db_go
     fi
 }

@@ -45,13 +45,17 @@ static int ethdetect_insmod(char *modulename) {
      char buffer[128];
      char *params = NULL;
     
+     client->command(client, "subst", "ethdetect/module_params",
+                     "MODULE", modulename, NULL);
      params = my_debconf_input("low", "ethdetect/module_params");
      snprintf(buffer, sizeof(buffer), "modprobe -v %s %s", modulename,
               (params ? params : " "));
      
      if (di_execlog(buffer) != 0) {
-          client->command(client, "input", "critical", "ethdetect/error",
-                          NULL);
+          client->command(client, "subst", "ethdetect/modprobe_error",
+                          "CMD_LINE_PARAM", buffer, NULL);
+          client->command(client, "input", "critical",
+                          "ethdetect/modprobe_error", NULL);
           client->command(client, "go", NULL);
           return 1;
      } else {
