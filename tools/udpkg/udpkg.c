@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.7 2000/11/01 23:48:09 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.8 2000/11/01 23:55:28 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -116,10 +116,10 @@ static int dpkg_dounpack(struct package_t *pkg)
 		for (i = 0; i < sizeof(adminscripts) / sizeof(adminscripts[0]);
 		     i++)
 		{
-			snprintf(buf, sizeof(buf), DPKGCIDIR "%s/%s", 
-				pkg->package, adminscripts[i]);
-			snprintf(buf2, sizeof(buf), INFODIR "%s.%s", 
-				pkg->package, adminscripts[i]);
+			snprintf(buf, sizeof(buf), "%s%s/%s",
+				DPKGCIDIR, pkg->package, adminscripts[i]);
+			snprintf(buf2, sizeof(buf), "%s%s.%s", 
+				INFODIR, pkg->package, adminscripts[i]);
 			if (dpkg_copyfile(buf, buf2) < 0)
 			{
 				fprintf(stderr, "Cannot copy %s to %s: %s\n", 
@@ -139,7 +139,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 					"ar p %s data.tar.gz|zcat|tar -tf -", 
 					pkg->file);
 				snprintf(buf2, sizeof(buf2),
-					INFODIR "%s.list", pkg->package);
+					"%s%s.list", INFODIR, pkg->package);
 				if ((infp = popen(buf, "r")) == NULL ||
 				    (outfp = fopen(buf2, "w")) == NULL)
 				{
@@ -201,7 +201,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	*p = 0;
 
 	cwd = getcwd(0, 0);
-	snprintf(buf, sizeof(buf), DPKGCIDIR "%s", pkg->package);
+	snprintf(buf, sizeof(buf), "%s%s", DPKGCIDIR, pkg->package);
 	DPRINTF("dir = %s\n", buf);
 	if (mkdir(buf, S_IRWXU) == 0 && chdir(buf) == 0)
 	{
