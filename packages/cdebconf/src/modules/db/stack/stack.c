@@ -69,6 +69,7 @@ static int stack_template_db_initialize(struct template_db *db, struct configura
                db->data = tstack;
           }
           tstack->db = template_db_new(cfg, child->value);
+          tstack->next = NULL;
      }
 
      return DC_OK;
@@ -202,6 +203,7 @@ static int stack_question_db_initialize(struct question_db *db, struct configura
                db->data = qstack;
           }
           qstack->db = question_db_new(cfg, db->tdb, child->value);
+          qstack->next = NULL;
      }
      return DC_OK;
 }
