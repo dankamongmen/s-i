@@ -8,7 +8,7 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.11 2002/08/13 16:18:54 tfheen Exp $
+ * $Id: dpkg-reconfigure.c,v 1.12 2002/09/16 23:36:09 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -307,7 +307,15 @@ int reconfigure(char **pkgs, int i, int max)
 		if (!file_exists(filename, S_IXUSR|S_IXGRP|S_IXOTH))
 		{
 			INFO(INFO_WARN, "%s is not installed, or does not use debconf", pkg);
-			continue;
+
+                        /* Don't die, though this doesn't have a
+                        config script.. we might be doing stuff with
+                        debian-installer, which doesn't use .config
+                        scripts.  Don't uncomment this without talking
+                        to -boot first
+                        -- tfheen, 2002-09-17 */
+
+                        /* continue; */
 		}
 		/* startup the confmodule; run the config script and talk to it */
 		g_frontend->methods.set_title(g_frontend, pkg);
