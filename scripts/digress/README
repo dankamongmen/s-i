@@ -1,0 +1,38 @@
+This directory contains settings that I use for automatic installations
+and test installs on my home network. It's provided in case others find it
+to be a useful example. 
+
+To use the preseed files, point preseed/file or preseed/url at
+preseed/main.cfg at boot time.
+
+The automatic testing is accomplished by the test-harness script. This
+script reads global configs from the file config, and takes the name of a
+test scheme. Schemes are defined by files in the schemes/ directory, which
+has subdirs for each machine, that contain a common file with common
+settings for the machines, and other files defining each scheme. These
+files can set config options or use other schemes. These config options
+should always be set:
+
+DESCRIPTION		Short description of what's being tested.
+ARCH			Architecture of the test machine.
+TFTP_DIR		Path to your tftpboot directory. You need write access.
+PRESEED_URL		URL to the preseed file to use.
+INSTALL_LANGUAGE	Language to run the install in.
+PREBOOT			Commands to run before booting.
+BOOT			Command to run to boot the installer.
+TEST_1			Commands to use to test the first stage of the install.
+TEST_2			Commands to use to test the second stage of the install.
+
+Some others that can be set:
+
+BOOT_OPTS		Options to pass to the kernel.
+NETBOOT_IMAGE		Path to netboot.tar.gz to boot.
+NETBOOT_IMAGE_ALT	Alternate netboot.tar.gz to boot (if it's newer).
+NETBOOT_IMAGE_DIR	Directory to set $TFTP_DIR/$ARCH-boot to (netboot-links)
+BOOT_SELECTION		Boot option to select in boot loader (bootloader-setup)
+EFI_MENUENTRY		Option to choose in the efi boot menu (ia64-boot)
+CONSOLECOMMAND		Command to run to get access to the console (ia64-boot)
+CONSERVER_CONSOLE	Conserver console to connect to if using that.
+STAGE_1_MAX_TIME	Maximum number of seconds before failure.
+
+-- Joey Hess <joeyh@debian.org>
