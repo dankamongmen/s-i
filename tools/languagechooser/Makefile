@@ -3,16 +3,7 @@ all: debian/templates check-scripts check-data
 LIST=languagelist
 
 debian/templates: Makefile debian/templates-in $(LIST)
-	languagenames=`grep -v "^#" $(LIST) | cut -d\; -f1 | tr "\n" "," | sed "s/,$$//g"`; \
-	save_IFS=$$IFS; IFS=','; \
-	for l in $$languagenames; do \
-	  msg=`grep "^$${l}: " languagelist.l10n | sed -e "s/^$${l}: //"`;\
-	  if [ -n "$$msg" ]; then nativemessages=$$nativemessages", "$$msg; else { echo Missing $$l in languagelist.l10n; exit 2;} fi; \
-	done; \
-	IFS=$$save_IFS; \
-	languagenames=`echo $$languagenames | sed -e 's/^,//' -e 's/,/, /g'`; \
-	nativemessages=`echo $$nativemessages | sed -e 's/^, //'`; \
-	sed -e "s/@languagenames@/$$languagenames/" -e "s/@nativemessages@/$$nativemessages/" < debian/templates-in > $@
+	./mktemplates $(LIST) $(LIST).l10n $@ $@-in
 
 check-scripts:
 	if [ -x /bin/ash ] ; then SH=ash ; else SH=dash; fi ; \

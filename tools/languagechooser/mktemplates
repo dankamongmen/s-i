@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $list       = shift;
+my $listl10n   = shift;
+my $template   = shift;
+my $templatein = shift;
+
+my $debug = 0;
+
+sub get_language_names {
+    my $list = shift;
+    my @names;
+    print "Loading $list\n" if ($debug);
+    open(L, "< $list") || die "Unable to read $list";
+    while (<L>) {
+	print if ($debug);
+	chomp;
+	next if m/^\#/;
+	my ($name) = split(/;/);
+	push(@names, $name);
+    }
+    close(L);
+    return @names;
+}
+
+sub get_translations {
+    my ($listl10n, @names) = @_;
+    my %translations;
+    print "Loading $listl10n\n" if ($debug);
+    open(L, "< $listl10n") || die "Unable to read $listl10n";
+    while (<L>) {
+	print if ($debug);
+	chomp;
+	next if m/^\#/;
+	my ($name, $translation) = split(/: /);
+	$translations{$name} = $translation;
+    }
+    close(L);
+    return %translations;
+}
+
+my @languagenames   = get_language_names($list);
+my %translationmap  = get_translations($listl10n);
+
+my @translations;
+for my $name (@languagenames) {
+    if (exists $translationmap{$name}) {
+	push(@translations, $translationmap{$name});
+    } else {
+	print "Missing $name in $listl10n\n";
+    }
+}
+my $langstr=join(", ", @languagenames);
+my $nativemessages=join(", ", @translations);
+
+open(TIN, "< $templatein") || die "Unable to read $templatein";
+open(TOUT, "> $template") || die "Unable to write $template";
+while (<TIN>) {
+    s/\@languagenames\@/$langstr/;
+    s/\@nativemessages\@/$nativemessages/;
+    print TOUT;
+}
+close(TOUT) || warn;
+close(TIN) || warn;
