@@ -19,6 +19,7 @@ findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
 	FILE *fp = NULL;
 	DIR *d;
 	struct dirent *de;
+	struct stat sb;
 	char *ff, *fdir, *p, *q, **sp;
 	int secondpass = 0;
 
@@ -86,8 +87,11 @@ findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
 	    /* Does tail consist of a known suffix and possibly
 	       a compression suffix? */
 	    for(sp = suf; *sp; sp++) {
-		    if (!strcmp(p, *sp))
+		    if (!strcmp(p, *sp))  {
+			    if (stat(pathname, &sb)==0 && S_ISDIR(sb.st_mode))
+				    continue;
 		      return fopen (pathname, "r");
+		    }
 	    }
 	}
 	closedir(d);

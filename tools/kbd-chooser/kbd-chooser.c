@@ -1,10 +1,9 @@
-/* @file  kbd-chooser.c
- * @brief Choose a keyboard.
+/* @brief Choose a keyboard.
  * 
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.10 2003/02/26 21:54:17 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.11 2003/03/02 12:58:05 mckinstry Exp $
  */
 
 #include "config.h"
@@ -315,7 +314,6 @@ maplist_t *parse_keymap_file (const char *name)
 		*tab2 = '\0';
 		*nl = '\0';
 		
-		printf ("DEBUG: tab1 %s tab2 %s buf %s\n", tab1+1, tab2+1, buf);
 		map = keymap_get (maplist, tab1+1);
 		if (! map->langs) { // new keymap
 			map->langs = STRDUP (buf);
@@ -342,7 +340,6 @@ void read_keymap_files (char *listdir)
 	strncpy (fullname, listdir, LINESIZE); 
 	p = fullname + STRLEN (listdir);
 	*p++ = '/';
-	printf ("DEBUG: Examining %s\n", fullname);
 
 	d = opendir (listdir);
 
@@ -351,7 +348,6 @@ void read_keymap_files (char *listdir)
 	
 	ent = readdir (d);
 	for (; ent ; ent = readdir (d)) {
-		printf ("FIXME: Examining %s\n", ent->d_name);
 		if ((strcmp (ent->d_name, ".") == 0) ||
 		    (strcmp (ent->d_name, "..") == 0))
 			continue;
@@ -541,7 +537,10 @@ int choose_keymap (char *arch, char *keymap)
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
 
-	keymap = extract_name (keymap, ptr);
+	if (strlen (ptr) == 0)
+		keymap = STRDUP ("none");
+	else
+		keymap = extract_name (keymap, ptr);
 	
 	return CMDSTATUS_SUCCESS;
 }	
@@ -581,6 +580,7 @@ int main (int argc, char **argv)
 			if (res != CMDSTATUS_SUCCESS) {
 				exit (res == CMDSTATUS_GOBACK ? 0 : 1);
 			}
+
 			arch = extract_name (xmalloc (LINESIZE), s);
 			if (strcmp (arch, "none") == 0) {
 				di_log ("not setting keymap");

@@ -3,7 +3,7 @@ ifdef DEBUG
 DEB_BUILD_OPTIONS := debug:${DEB_BUILD_OPTIONS}
 endif
 
-CFLAGS := -Wall -Os -I.
+CFLAGS := -Wall  -I.
 ARCH := $(shell dpkg --print-architecture)
 
 OBJS := loadkeys.o findfile.o ksyms.o  getfd.o
@@ -13,7 +13,7 @@ CFLAGS += -g  -DDEBUG=1
 OBJS += xmalloc.o
 STRIP= /bin/true
 else
-CFLAGS +=  -fomit-frame-pointer
+CFLAGS +=  -fomit-frame-pointer -Os
 STRIPTOOL=strip
 STRIP= $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 endif
@@ -61,3 +61,14 @@ clean:
 install:
 	mkdir -p ${DESTDIR}/usr/bin
 	cp kbd-chooser ${DESTDIR}/usr/bin/kbd-chooser
+
+.PHONY: demo
+demo:
+	ln -sf debian/templates demo.templates
+	chmod a+x debian/postinst
+	rm -f demo
+	ln -s debian/postinst demo
+	DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./demo
+	rm -f demo.templates demo
+
+

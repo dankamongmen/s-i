@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.4 2003/01/29 09:52:15 mckinstry Exp $
+ * $Id: at-kbd.c,v 1.5 2003/03/02 12:58:05 mckinstry Exp $
  */
 
 #include "config.h"
@@ -34,7 +34,8 @@ void at_kbd_get ()
 	k->present = UNKNOWN;
 	k->next = keyboards;
 	keyboards = k;
-	
+
+
 #if defined (KERNEL_2_5)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
 	 *
