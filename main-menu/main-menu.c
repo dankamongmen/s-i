@@ -421,10 +421,18 @@ check_special(struct package_t *p)
 }
 
 int do_menu_item(struct package_t *p) {
-	char *configcommand;
+	struct debconfclient *debconf;
+	char *configcommand, *title;
 	int ret = 0;
 
 	di_logf("Menu item '%s' selected", p->package);
+
+	debconf = debconfclient_new();
+	asprintf(&title, "debian-installer/%s/title", p->package);
+	if (debconf_settitle(debconf, title))
+		di_logf("Unable to set title for %s.", p->package);
+	free(title);
+	debconfclient_delete(debconf);
 
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
