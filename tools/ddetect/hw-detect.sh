@@ -238,4 +238,8 @@ fi
 
 # Hey, we're done
 
+# Ask for discover to be installed into /target/, to make sure the
+# required drivers are loaded.
+apt-install discover || true
+
 exit 0
