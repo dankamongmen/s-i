@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.42 2003/10/06 19:03:18 mckinstry Exp $
+ * $Id: text.c,v 1.43 2003/10/08 21:07:09 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -220,6 +220,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 				(def == 0 ? get_text(obj, "debconf/default-yes", ", default=Yes") :
 				            get_text(obj, "debconf/default-no", ", default=No"))));
 		fgets(buf, sizeof(buf), stdin);
+		CHOMP(buf);
 		if (strcasecmp(buf, get_text(obj, "debconf/cancel", "Cancel")) == 0)
 			return DC_GOBACK;
 		if (strcasecmp(buf, get_text(obj, "debconf/yes", "Yes")) == 0)
@@ -302,6 +303,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	    }
 
 	    fgets(answer, sizeof(answer), stdin);
+	    CHOMP(answer);
 	    MAKE_UPPER(answer[0]); 
 	    if (answer[0] == *(get_text(obj,"debconf/quit-key", "Q"))) break;
 	    if (answer[0] == *(get_text(obj,"debconf/next-key", "N"))) continue;
