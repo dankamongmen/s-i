@@ -5,6 +5,11 @@ use warnings;
 use strict;
 
 sub aggregate {
+	my $success=0;
+	my $failed=0;
+	my $total=0;
+	my $old=0;
+	
 	foreach my $log (@_) {
 		print "<li><a href=\"".$log->{url}."\">".$log->{description}."</a><br>\n";
 		my $logurl=$log->{logurl}."overview".$log->{logext}."\n";
@@ -45,10 +50,16 @@ sub aggregate {
 				if (length $unixdate && 
 				    (time - $unixdate) > ($log->{frequency}+1) * 60*60*24)  {
 					$shortdate="<b>$shortdate</b>";
+					$old++;
 				}
 				if ($status eq 'failed') {
 					$status='<b>failed</b>';
+					$failed++;
 				}
+				elsif ($status eq 'success') {
+					$success++;
+				}
+				$total++;
 				if (defined $notes && length $notes) {
 					$notes="($notes)";
 				}
@@ -60,6 +71,8 @@ sub aggregate {
 		}
 		print "</ul>\n";
 	}
+
+	return ($total, $failed, $success, $old);
 }
 
 1

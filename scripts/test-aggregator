@@ -78,12 +78,14 @@ print <<EOS;
 <ul>
 EOS
 
-aggregate(@buildlist);
+my ($total, $failed, $success, $old) = aggregate(@buildlist);
 
 my $date=`LANG=C TZ=GMT date`;
 chomp $date;
 print <<"EOS"
 </ul>
+
+Totals: $total tests ($failed failed, $old old)
 
 <hr>
 $date
