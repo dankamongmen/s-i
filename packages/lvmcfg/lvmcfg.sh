@@ -292,7 +292,7 @@ vg_delete() {
 	db_input high lvmcfg/vgdelete_names
 	db_go
 	db_get lvmcfg/vgdelete_names
-	[ "$RET" = "Leave" ] && return
+	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
 	VG=`echo "$RET" | cut -d " " -f1`
 
 	# confirm message
@@ -341,7 +341,7 @@ vg_extend() {
 	db_input high lvmcfg/vgextend_names
 	db_go
 	db_get lvmcfg/vgextend_names
-	[ "$RET" = "Leave" ] && return
+	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
 	VG=`echo "$RET" | cut -d " " -f1`
 
 	db_subst lvmcfg/vgextend_parts PARTITIONS $PARTITIONS
@@ -391,7 +391,7 @@ vg_reduce() {
 	db_input high lvmcfg/vgreduce_names
 	db_go
 	db_get lvmcfg/vgreduce_names
-	[ "$RET" = "Leave" ] && return
+	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
 	VG=`echo "$RET" | cut -d " " -f1`
 
 	# check, if the vg has more then one pv's
@@ -480,7 +480,7 @@ lv_create() {
 	db_input high lvmcfg/lvcreate_vgnames
 	db_go
 	db_get lvmcfg/lvcreate_vgnames
-	[ "$RET" = "Leave" ] && return
+	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
 	VG=`echo "$RET" | cut -d " " -f1`
 
 	# make sure, the name isn't already in use
@@ -530,7 +530,7 @@ lv_delete() {
 	db_input high lvmcfg/lvdelete_vgnames
 	db_go
 	db_get lvmcfg/lvdelete_vgnames
-	[ "$RET" = "Leave" ] && return
+	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
 	VG=`echo "$RET" | cut -d " " -f1`
 
 	get_vglvs "$VG"
@@ -547,7 +547,7 @@ lv_delete() {
 	db_input high lvmcfg/lvdelete_lvnames
 	db_go
 	db_get lvmcfg/lvdelete_lvnames
-	[ "$RET" = "Leave" ] && return
+	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
 	LV=`echo "$RET" | cut -d " " -f1`
 
 	lvremove -f /dev/${VG}/${LV} >>/var/log/messages 2>&1
