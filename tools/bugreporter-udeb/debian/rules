@@ -1,0 +1,58 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 2003 by Petter Reinholdtsen
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This is the debhelper compatability version to use.
+export DH_COMPAT=3
+
+INSTALL      = install -m0755
+INSTALL_DATA = install -m0644
+
+PACKAGES=$(shell dh_listpackages)
+
+BUGREPORTERUDEB=bugreporter-udeb
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=all
+BUGREPORTERUDEBFILENAME=$(BUGREPORTERUDEB)_$(VERSION)_$(ARCH).udeb
+
+build:
+# Nothing to do.
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	$(MAKE) clean
+	dh_clean
+
+install-common: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+install-bugreporter-udeb: install-common
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/bugreporter-udeb
+
+# Build architecture-independent files here.
+binary-indep: install bugreporter-udeb
+
+bugreporter-udeb: install-bugreporter-udeb
+	dh_testdir -p$@
+	dh_testroot -p$@
+	dh_installdebconf -p$@
+	dh_strip -p$@
+	dh_compress -p$@
+	dh_fixperms -p$@
+	dh_installdeb -p$@
+	dh_gencontrol -p$@ -- -n$(BUGREPORTERUDEBFILENAME)
+	dh_builddeb -p$@ --filename=$(BUGREPORTERUDEBFILENAME)
+
+# Build architecture-dependent files here.
+binary-arch: build install
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

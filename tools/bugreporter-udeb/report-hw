@@ -1,0 +1,40 @@
+#!/bin/sh -e
+#
+# Report the detected HW
+
+if [ -x /sbin/discover ] ; then
+	/sbin/discover -f "info: $0: discover: %m;%S;%D;%V;%M;%d\n" all || true
+else
+	echo "error: $0: Unable to find /sbin/discover"
+fi
+
+if [ -x /sbin/lspci ] ; then
+	(
+		/sbin/lspci -v -t || true
+		/sbin/lspci -n || true
+		/sbin/lspci -v || true
+		echo "For use with 'lspci -F':"
+		/sbin/lspci -x || true
+	)| sed "s%^%info: $0: lspci: %"
+else
+	echo "error: $0: Unable to find /sbin/lspci"
+fi
+
+if [ -x /sbin/lsmod ] ; then
+	/sbin/lsmod | sed "s%^%info: $0: lsmod: %"
+else
+	echo "error: $0: Unable to find /sbin/lsmod"
+fi
+
+for file in cpuinfo ioports iomem interrupts meminfo ; do
+	if [ -e /proc/$file ] ; then
+		cat /proc/$file | sed "s%^%info: $0: $file: %"
+	else
+		echo "error: $0: Unable to find /proc/$file"
+	fi
+done
+
+disks=`cat /proc/partitions|egrep 'ide|scsi'|awk '{print $4}'|grep '/disc'|sed 's%^%/dev/%'`
+for disk in $disks ; do
+	/sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
+done
