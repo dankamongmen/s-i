@@ -6,7 +6,7 @@ FLOPPYMNT=/floppy
 
 ask_dev() {
 	DEVS=""
-	for dev in `find /dev/floppy /dev/scsi /dev/ide`; do
+	for dev in `find /dev/floppy /dev/scsi /dev/ide /dev/disk`; do
 		if [ -b "$dev" ]; then
 			if [ -z "$DEVS" ]; then
 				DEVS="$dev"
@@ -26,34 +26,27 @@ ask_dev() {
 	echo $RET
 }
 
-mountfloppy()
-{
-    if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
-	# The INSTALL_MEDIA_DEV is set by the linuxrc on the boot
-	# floppy to the device it loaded the initrd from. It's also
-	# documented so the user may set it at the boot prompt.
-	# That is (probably) the floppy drive, which may be a USB floppy.
-	if [ -n "$INSTALL_MEDIA_DEV" ]; then
-	    FLOPPYDEV=$INSTALL_MEDIA_DEV
-        else
-	    FLOPPYDEV=/dev/floppy/0
-	fi
-	  
-        if [ ! -e $FLOPPYDEV ]; then
-            modprobe floppy >> /var/log/messages 2>&1 || true
-        fi
+mountfloppy() {
+	if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
+		# This is a good reasonable default, but will fail for
+		# USB floppys.
+		FLOPPYDEV=/dev/floppy/0
+		
+		if [ ! -e $FLOPPYDEV ]; then
+			modprobe floppy >> /var/log/messages 2>&1 || true
+		fi
 	
-        if ! grep -q ^vfat /proc/modules ; then
-            modprobe vfat >> /var/log/messages 2>&1 || true
-        fi
+		if ! grep -q ^vfat /proc/modules ; then
+			modprobe vfat >> /var/log/messages 2>&1 || true
+		fi
 
-	if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
-		# Cannot find a device, or found the wrong device. Ask for
-		# help from the user and try it again.
-		FLOPPYDEV=$(ask_dev)
-		mount $FLOPPYDEV -tauto $FLOPPYMNT
+		if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
+			# Cannot find a device, or found the wrong device.
+			# Ask for help from the user and try it again.
+			FLOPPYDEV=$(ask_dev)
+			mount $FLOPPYDEV -tauto $FLOPPYMNT
+		fi
 	fi
-    fi
 }
 
 cmd="$1"
