@@ -37,6 +37,7 @@ const char *subarch_analyze(void)
 	char line[1024];
 	char model[256];
 	char *pos;
+	int i;
 
 	file = fopen("/proc/hardware", "r");
 	if (file == NULL)
@@ -49,7 +50,7 @@ const char *subarch_analyze(void)
 	        pos = strchr(line, ':');
 		if (pos == NULL)
 			   continue;
-		while (*++pos && isblank(*pos));
+		while (*++pos && (*pos == ' ' || *pos == '\t'));
 
 		strncpy(model, pos, sizeof(model));
 		break;
@@ -58,7 +59,7 @@ const char *subarch_analyze(void)
 
 	fclose(file);
 
-	for (int i=0; map_model[i].model; i++)
+	for (i = 0; map_model[i].model; i++)
 	{
 	    if (!strncasecmp(map_model[i].model, model, 
 			strlen(map_model[i].model)))

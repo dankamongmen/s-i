@@ -90,6 +90,7 @@ const char *subarch_analyze(void)
 	char line[1024];
 	char entry[256];
 	char *pos;
+	int i;
 
 	cpuinfo = fopen("/proc/cpuinfo", "r");
 	if (cpuinfo == NULL)
@@ -102,7 +103,7 @@ const char *subarch_analyze(void)
 	        pos = strchr(line, ':');
 		if (pos == NULL)
 			   continue;
-		while (*++pos && isblank(*pos));
+		while (*++pos && (*pos == '\t' || *pos == ' '));
 
 		strncpy(entry, pos, sizeof(entry));
 		break;
@@ -111,7 +112,7 @@ const char *subarch_analyze(void)
 
 	fclose(cpuinfo);
 
-	for (int i=0; map_hardware[i].entry; i++)
+	for (i = 0; map_hardware[i].entry; i++)
 	{
 	    if (!strncasecmp(map_hardware[i].entry, entry,
 			strlen(map_hardware[i].entry)))
