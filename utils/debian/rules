@@ -33,34 +33,18 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
+	dh_installdirs
 	install -m755 shell debian/di-utils-shell.postinst
 	install -m755 mkswap.sh debian/di-utils-mkswap.postinst
 	install -m755 mkfs.sh debian/di-utils-mkfs.postinst
 	install -m755 mount.sh debian/di-utils-mount-partitions.postinst
-	install -m755 partitioner.sh debian/di-utils-partitioner.postinst
-	mkdir -p debian/di-utils-mount-partitions/usr/bin
-	cp mapdevfs debian/di-utils-mount-partitions/usr/bin
-	# di-utils-partitioner
-	install -d \
-		debian/di-utils-partitioner/usr/share/debian-installer/partapps
-	for f in `find partapps/* -type f -a ! -name "archmaps.txt" -maxdepth 0 -print`; do \
-		cp -v $$f \
-		debian/di-utils-partitioner/usr/share/debian-installer/partapps; \
-	done
-	cd debian/di-utils-partitioner/usr/share/debian-installer/partapps && \
-	cat partapps/archmaps.txt | while read LINE; do \
-		set -- $$LINE; \
-		ln -s $$2 $$1; \
-	done
+	install  mapdevfs debian/di-utils-mapdevfs/usr/bin
 	# di-utils-generic
-	install -d debian/di-utils-generic/usr/share/debian-installer/overrides
 	install -m644 functions.sh \
 		debian/di-utils-generic/usr/share/debian-installer
-	install -d debian/di-utils-generic/usr/lib/prebaseconfig.d
 	install -m755 fstab.sh \
 		debian/di-utils-generic/usr/lib/prebaseconfig.d/40fstab
 	# di-utils-mount-partitions
-	install -d debian/di-utils-mount-partitions/usr/share/debian-installer/mount
 	install -m644 mount-mount.sh \
 		debian/di-utils-mount-partitions/usr/share/debian-installer/mount/mount.sh
 	install -m644 mount-umount.sh \
@@ -70,7 +54,6 @@ install: build
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installdirs
 	dh_installdebconf
 	dh_strip
 	dh_compress
