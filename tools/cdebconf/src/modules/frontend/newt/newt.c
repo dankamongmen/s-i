@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.2 2003/02/23 14:50:51 sjogren Exp $
+ * $Id: newt.c,v 1.3 2003/02/24 13:17:59 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -188,7 +188,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     newtFormAddComponent(form, newtLabel((win_width - strlen(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, tflags);
     newtTextboxSetText(textbox, q_get_extended_description(q));
-    if (eflags & NEWT_FLAG_HIDDEN)
+    if (eflags & NEWT_FLAG_HIDDEN || question_getvalue(q, "") == NULL)
         defval = "";
     else
         defval = (char *)question_getvalue(q, "");
@@ -221,7 +221,10 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
 
     newtGetScreenSize(&width, &height);
     count = strchoicesplit(q_get_choices_vals(q), choices, 100);
-    strchoicesplit(q_get_choices(q), choices_trans, 100);
+    if (count <= 0)
+        return DC_NOTOK;
+    if (strchoicesplit(q_get_choices(q), choices_trans, 100) != count)
+        return DC_NOTOK;
     defcount = strchoicesplit(question_getvalue(q, ""), defvals, 100);
     win_width = width-7;
     sel_height = count;
@@ -316,7 +319,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     count = strchoicesplit(q_get_choices_vals(q), choices, 100);
     if (count <= 0)
         return DC_NOTOK;
-    strchoicesplit(q_get_choices(q), choices_trans, 100);
+    if (strchoicesplit(q_get_choices(q), choices_trans, 100) != count)
+        return DC_NOTOK;
     win_width = width-7;
     sel_height = count;
     form = create_form(NULL);
@@ -333,7 +337,6 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         win_height = height-5;
         sel_height = win_height - t_height - 5;
     }
-    //fprintf(stderr, "count=%d, sel_height=%d\n", count, sel_height);
     if (count > sel_height)
         listflags |= NEWT_FLAG_SCROLL;
     sel_width = 0;
@@ -347,13 +350,13 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     }
     newtCenteredWindow(win_width, win_height, obj->title);
     label   = newtLabel((win_width - strlen(q_get_description(q)))/2, 0, q_get_description(q));
-    listbox = newtListbox((win_width - sel_width)/2, 1+t_height+1, sel_height, listflags); // TODO: Center
+    listbox = newtListbox((win_width - sel_width)/2, 1+t_height+1, sel_height, listflags);
     bOk     = newtCompactButton(5, win_height-2, _("OK"));
     bCancel = newtCompactButton(win_width - 9 - strlen(_("Cancel")), win_height-2, _("Cancel"));
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
         newtListboxAppendEntry(listbox, choices_trans[i], choices[i]);
-        if (strcmp(defval, choices[i]) == 0)
+        if (defval != NULL && strcmp(defval, choices[i]) == 0)
             defchoice = i;
     }
     if (count == 1)
@@ -366,7 +369,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     if (cRet == bCancel)
         ret = DC_GOBACK;
     else {
-        question_setvalue(q, newtListboxGetCurrent(listbox));
+        if (newtListboxGetCurrent(listbox) != NULL)
+            question_setvalue(q, newtListboxGetCurrent(listbox));
         ret = DC_OK;
     }
     newtFormDestroy(form);
@@ -643,8 +647,8 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     scale_label = newtLabel(1, 3, "");
     scale_form = create_form(NULL);
     newtFormAddComponents(scale_form, scale_bar, scale_label, NULL);
-    newtFormSetTimer(scale_form, 1);
-    newtRunForm(scale_form);
+    newtDrawForm(scale_form);
+    newtRefresh();
 }
 
 static void
@@ -652,8 +656,8 @@ newt_progress_step(struct frontend *obj, int step, const char *info)
 {
     newtLabelSetText(scale_label, info);
     newtScaleSet(scale_bar, obj->progress_cur);
-    newtFormSetTimer(scale_form, 1);
-    newtRunForm(scale_form);
+    newtDrawForm(scale_form);
+    newtRefresh();
     obj->progress_cur += step;
 }
 
