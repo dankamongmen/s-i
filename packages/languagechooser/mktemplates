@@ -52,12 +52,23 @@ sub get_translations {
 	$translation =~ s/,/\\,/g;
         if ($show_locales && defined $locales{$name}) {
 # C. Perrier 2004/05/09 change layout
+#
+# Layout 1 : xx_YY : Translated name
+# This is beta4 layout
 #             $translation = $locales{$name}.
 #                            (" " x (5 - length($locales{$name}))).
 #                            " - $name - $translation";
+# Layout 2 : English name     - Translated name
+# Pro : "natural" sorting
+# Con : English looks useless
              $translation = $name .
                             (" " x (22 - length($name))).
 			    "- $translation";
+# Layout 3 : Translated name
+# Pro : no useless English
+# Con : no sorting....giving a confusing screen
+#            no change to $translation
+#	      $translation = $translation;
         }
 	$translations{$name} = $translation;
     }
