@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+if [ -f /etc/mtab ]; then
+    MTAB=/etc/mtab
+else
+    MTAB=/proc/mounts
+fi
+
+# detect which is the root partition: /target
+# ugh, I wanted to use awk, but sed has better chance of being in
+# busybox
+rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
+
+rootfs=`mapdevfs $rootfs`
+
+db_subst nobootloader/confirmation ROOT "${rootfs}"
+db_input high nobootloader/confirmation || true
+db_go || true
