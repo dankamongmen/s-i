@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.19 2003/07/24 22:15:04 mckinstry Exp $
+ * $Id: newt.c,v 1.20 2003/07/28 12:23:21 pere Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -137,6 +137,8 @@ get_text_height(const char *text, int win_width)
     // Create a dummy testbox to find out how many lines the text in the
     // question will occupy
     textbox = newtTextbox(1, 2, win_width - 4, 10, NEWT_FLAG_SCROLL|NEWT_FLAG_WRAP);
+    assert(textbox);
+    assert(text);
     newtTextboxSetText(textbox, text);
     t_height = newtTextboxGetNumLines(textbox);
     // This is needed so the textbox gets freed...ick
@@ -198,6 +200,8 @@ show_separate_window(struct frontend *obj, struct question *q)
     form = create_form(NULL);
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
+    assert(textbox);
+    assert(q_get_extended_description(q));
     newtTextboxSetText(textbox, q_get_extended_description(q));
     bOk     = newtCompactButton( win_width - 9 - strwidth(continue_text()), win_height-2, continue_text());
     bCancel = newtCompactButton(5,  win_height-2, goback_text());
@@ -242,6 +246,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     form = create_form(NULL);
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, tflags);
+    assert(textbox);
     if (q_ext_text != NULL)
         newtTextboxSetText(textbox, q_ext_text);
     if (eflags & NEWT_FLAG_HIDDEN || question_getvalue(q, "") == NULL)
@@ -302,6 +307,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     q_ext_text = q_get_extended_description(q);
     if (show_ext_desc && q_ext_text) {
         textbox = newtTextbox(1, 1, win_width-4, 10, NEWT_FLAG_WRAP);
+        assert(textbox);
         newtTextboxSetText(textbox, q_ext_text);
         t_height = newtTextboxGetNumLines(textbox);
         newtTextboxSetHeight(textbox, t_height);
@@ -413,6 +419,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     q_ext_text = q_get_extended_description(q);
     if (show_ext_desc && q_ext_text) {
         textbox = newtTextbox(1, 1, win_width-4, 10, NEWT_FLAG_WRAP);
+        assert(textbox);
         newtTextboxSetText(textbox, q_ext_text);
         t_height = newtTextboxGetNumLines(textbox);
         newtTextboxSetHeight(textbox, t_height);
@@ -502,6 +509,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     form = create_form(NULL);
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
+    assert(textbox);
     if (q_ext_text != NULL)
         newtTextboxSetText(textbox, q_ext_text);
     bCancel  = newtCompactButton(5, win_height-2, goback_text());
