@@ -7,7 +7,7 @@
  *
  * Description: routines to handle priority field parsing and comparison
  *
- * $Id: priority.c,v 1.4 2001/01/07 05:05:12 tausq Exp $
+ * $Id: priority.c,v 1.5 2001/01/20 02:36:34 tausq Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -36,6 +36,7 @@
  * SUCH DAMAGE.
  *
  ***********************************************************************/
+#include "common.h"
 #include "priority.h"
 #include <string.h>
 
@@ -73,6 +74,9 @@ int priority_compare(const char *p1, const char *p2)
 
 	i1 = priority_code(p1);
 	i2 = priority_code(p2);
+
+	INFO(INFO_VERBOSE, "Comparing priorities %s (%d) with %s (%d)\n",
+		p1, i1, p2, i2);
 
 	if (i1 > i2)
 		return 1;

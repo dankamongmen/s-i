@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.6 2001/01/07 05:05:12 tausq Exp $
+ * $Id: database.c,v 1.7 2001/01/20 02:36:34 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -142,14 +142,31 @@ static int database_question_unlock(struct database *db, const char *name)
 static int database_question_visible(struct database *db, const char *name,
 	const char *priority)
 {
-	struct question *q = db->question_get(db, "debconf/priority");
-	if (q != NULL)
+	struct question *q, *q2 = 0;
+	int ret = DC_YES;
+
+	if (getenv("DEBCONF_PRIORITY") != NULL &&
+	    priority_compare(priority, getenv("DEBCONF_PRIORITY")) < 0)
+		return DC_NO;
+
+	if ((q = db->question_get(db, "debconf/priority")) != NULL)
 	{
 		if (priority_compare(priority, q->value) < 0)
-			return DC_NO;
-		question_delete(q);
+			ret = DC_NO;
+		question_deref(q);
+		if (ret != DC_YES) return ret;
 	}
-	return DC_YES;
+	
+	if ((q = db->question_get(db, name)) != NULL &&
+	    (q->flags & DC_QFLAG_SEEN) != 0)
+	{
+		if ((q2 = db->question_get(db, "debconf/showold")) != NULL &&
+			strcmp(q2->value, "false") == 0)
+			ret = DC_NO;
+	}
+	question_deref(q);
+	question_deref(q2);
+	return ret;
 }
 
 static struct question *database_question_iterate(struct database *db,

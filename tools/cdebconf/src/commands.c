@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.15 2001/01/07 05:05:12 tausq Exp $
+ * $Id: commands.c,v 1.16 2001/01/20 02:36:34 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -102,7 +102,6 @@ int command_input(struct confmodule *mod, int argc, char **argv,
 	/* check priority */
 	visible = (mod->frontend->interactive && mod->db->question_visible(mod->db, qtag, priority));
 
-	
 	if (visible)
 	{
 		q = mod->db->question_get(mod->db, qtag);

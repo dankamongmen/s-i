@@ -20,6 +20,7 @@
 #define INFO_ERROR	0
 #define INFO_WARN	1
 #define INFO_DEBUG	5
+#define INFO_VERBOSE	20
 
 #define DIE(fmt, args...) 					\
  	do {							\
