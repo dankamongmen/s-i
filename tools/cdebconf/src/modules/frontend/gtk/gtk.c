@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.29 2003/10/16 23:53:10 barbier Exp $
+ * $Id: gtk.c,v 1.30 2003/11/06 22:27:08 barbier Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -69,7 +69,7 @@
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_listorder(q)		question_get_field((q), NULL, "listorder")
+#define q_get_listorder(q)		question_get_field((q), "", "listorder")
 
 /* A struct to let a question handler store appropriate set functions that will be called after
    gtk_main has quit */

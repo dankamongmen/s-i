@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.38 2003/11/05 06:27:40 barbier Exp $
+ * $Id: newt.c,v 1.39 2003/11/06 22:27:08 barbier Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -74,7 +74,7 @@ struct newt_data {
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_listorder(q)		question_get_field((q), NULL, "listorder")
+#define q_get_listorder(q)		question_get_field((q), "", "listorder")
 
 #define create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
 

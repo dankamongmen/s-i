@@ -15,7 +15,7 @@
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_listorder(q)		question_get_field((q), NULL, "listorder")
+#define q_get_listorder(q)		question_get_field((q), "", "listorder")
 
 #define WIN_QUERY	1
 #define WIN_DESC	2

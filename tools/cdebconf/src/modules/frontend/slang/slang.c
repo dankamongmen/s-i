@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.32 2003/11/04 23:48:52 barbier Exp $
+ * $Id: slang.c,v 1.33 2003/11/06 22:27:08 barbier Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -62,7 +62,7 @@
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_listorder(q)		question_get_field((q), NULL, "listorder")
+#define q_get_listorder(q)		question_get_field((q), "", "listorder")
 
 /* Private variables */
 struct uidata {
