@@ -941,7 +941,7 @@ static int gtk_go(struct frontend *obj)
     return ((struct frontend_data*)obj->data)->button_val;
 }
 
-static int gtk_can_go_back(struct frontend *obj, struct question *q)
+static bool gtk_can_go_back(struct frontend *obj, struct question *q)
 {
     return (obj->capability & DCF_CAPB_BACKUP);
 }
