@@ -2,6 +2,10 @@
 
 set -e
 
+# Create parm file with any additional boot options.
+parm=$DI_TESTDIR/state/hercules-$MACHINE-$SCHEME.parmfile
+echo $(cat $S390_IMAGE_DIR/parmfile.debian) "$BOOT_OPTS" > $parm
+
 # Set up config file. 
 rc=$DI_TESTDIR/state/hercules-$MACHINE-$SCHEME.cnf
 if [ -e $DI_TESTDIR/hercules/$HERCULESCFG ]; then
@@ -13,7 +17,7 @@ fi
 echo >> $rc
 
 # Add card deck to boot d-i.
-echo "000C	3505	$S390_IMAGE_DIR/kernel.debian $S390_IMAGE_DIR/parmfile.debian $S390_IMAGE_DIR/initrd.debian autopad eof" >> $rc
+echo "000C	3505	$S390_IMAGE_DIR/kernel.debian $parm $S390_IMAGE_DIR/initrd.debian autopad eof" >> $rc
 
 # Create a disk image and add to config file.
 if [ -n "$DASDINIT" ]; then
