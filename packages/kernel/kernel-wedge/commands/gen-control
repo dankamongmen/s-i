@@ -111,7 +111,7 @@ foreach my $ver (@versions) {
 		next unless -e "$modlistdir/".$package->("Package");
 		
 		$pkg{Architecture}=$arch;
-		$pkg{Provides}=$package->("Package");
+		$pkg{orig_package}=$package->("Package");
 		$pkg{Package}=$package->("Package")."-".$kernelversion."-".$flavour."-di";
 		$pkg{'XC-Package-Type'}="udeb";
 		$pkg{'XB-Kernel-Version'}=$kernelversion."-".$flavour;
@@ -130,8 +130,18 @@ foreach my $ver (@versions) {
 		}
 		
 		foreach my $field (@controlfields) {
-			print $field.": ".$package->($field)."\n"
-				if defined $package->($field);
+			if ($field eq 'Provides') {
+				if (defined $package->("Provides")) {
+					print $field.": ".$package->("orig_package").", ".$package->("Provides")."\n";
+				}
+				else {
+					print $field.": ".$package->("orig_package")."\n";
+				}
+			}
+			else {
+				print $field.": ".$package->($field)."\n"
+					if defined $package->($field);
+			}
 		}
 	}
 }
