@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.42 2004/01/25 23:52:05 barbier Exp $
+ * $Id: newt.c,v 1.43 2004/02/01 16:22:00 waldi Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -987,7 +987,7 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     newtGetScreenSize(&width, NULL);
     win_width = width-7;
     newtCenteredWindow(win_width, 5, title);
-    data->scale_bar = newtScale(1, 1, win_width-2, obj->progress_max);
+    data->scale_bar = newtScale(1, 1, win_width-2, obj->progress_max - obj->progress_min);
     data->scale_textbox = newtTextbox(1, 3, win_width-2, 1, flags);
     data->scale_textbox_height = 1;
     data->scale_form = create_form(NULL);
@@ -1014,7 +1014,7 @@ newt_progress_set(struct frontend *obj, int val)
 	    sprintf(buf, "%3d%%", (int)perc);
 	    newtLabelSetText(data->perc_label, buf);
 	} */
-	newtScaleSet(data->scale_bar, obj->progress_cur);
+	newtScaleSet(data->scale_bar, obj->progress_cur - obj->progress_min);
 	newtDrawForm(data->scale_form);
 	newtRefresh();
     }
