@@ -2,9 +2,6 @@
 
 . /usr/share/debconf/confmodule
 
-# Pass kbd information needed by base-config into
-# /target/root/dboostrap-settings
-
 db_get debian-installer/keymap
 KEYMAP=$RET
 if [ -z "$KEYMAP" ]; 
@@ -19,6 +16,9 @@ if [ "$RET" = "false" ] ; then
 	chroot /target install-keymap $KEYMAP
 fi
 
+
+# Pass kbd information needed by old versions of base-config into
+# /target/root/dboostrap-settings. Here only for skolelinux.
 if [ ! -d /target/root ] ; then
 	if mkdir /target/root ; then
 		:
@@ -26,7 +26,6 @@ if [ ! -d /target/root ] ; then
 		echo "error: unable to create /target/root"
 	fi
 fi
-
 # Map no-latin1 to i386/qwerty/no-latin1
 KEYBD=`find /usr/share/keymaps/ -name "$KEYMAP.kmap*" | sed -e 's%/usr/share/keymaps/%%' -e 's/.kmap.gz$//' -e 's/.kmap$//' `
 (
