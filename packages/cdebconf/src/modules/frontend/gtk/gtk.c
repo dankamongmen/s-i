@@ -558,7 +558,10 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     data->q = q;
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
-    g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
+    /* TODO: showing description on keyboard focus grab makes it impossible
+     * to enter a password.
+     */
+    /* g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data); */
 	
     register_setter(entry_setter, entry, q, obj);
 
