@@ -27,6 +27,16 @@ do
 done
 echo $old >/proc/sys/kernel/printk
 
+load_floppy_driver() {
+    if [ ! -d /dev/floppy ] ; then
+        modprobe floppy >> /var/log/messages 2>&1 || true
+    fi
+    if [ ! -d /dev/floppy ] ; then
+        log "error: Unable to load floppy device driver"
+    fi
+    floppydev=/dev/floppy/0
+}
+
 IFS_SAVE="$IFS"
 IFS="
 "
@@ -65,7 +75,8 @@ do
                 then
                     break
                 fi
-                mount -t ext2 /dev/fd0 /mnt
+                load_floppy_driver
+                mount -t ext2 $floppydev /mnt
                 if [ "$?" = "0" ]
                 then
                     if [ -f /mnt/modules.tgz ]
@@ -121,7 +132,8 @@ then
             then
                 break
             fi
-            mount -t ext2 /dev/fd0 /mnt
+            load_floppy_driver
+            mount -t ext2 $floppydev /mnt
             if [ "$?" = "0" ]
             then
                 if [ -f /mnt/pcmcia.tgz ]
