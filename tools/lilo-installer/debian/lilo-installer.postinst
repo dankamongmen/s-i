@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+. /usr/share/debconf/confmodule
+db_capb backup
+
 if [ -f /etc/mtab ]; then
     MTAB=/etc/mtab
 else
@@ -25,11 +28,10 @@ if [ "$defaultbootdev" = '' ]; then
 	defaultbootdev='/dev/hda'
 fi
 
-. /usr/share/debconf/confmodule
 db_fget lilo-installer/bootdev seen
 [ "$RET" = true ] || db_set lilo-installer/bootdev "$defaultbootdev"
 db_input high lilo-installer/bootdev || [ $? -eq 30 ]
-db_go || true
+db_go || exit 10 # back up
 
 db_get lilo-installer/bootdev
 bootdev=$RET
@@ -48,7 +50,7 @@ if echo "${bootdev}" | grep -q '[0-9]$'; then
     if ! fdisk -l ${disc} | grep "^${bootdev}" | grep -q '\*'; then
         # partition is not marked active, offer to make it so
         db_input high lilo-installer/activate-part || [ $? -eq 30 ]
-        db_go || true
+        db_go || exit 10 # back up
         db_get lilo-installer/activate-part
         if [ "${RET}" = "true"]; then
             pnum=$(echo ${bootdev} | sed 's/^.*\([0-9]\+\)$/\1/')
@@ -70,7 +72,7 @@ if echo "${defconsole}" | grep -q console=ttyS; then
     db_subst lilo-installer/serial-console PORT "ttyS${PORT}"
     db_subst lilo-installer/serial-console SPEED "${SPEED}"
     db_input medium lilo-installer/serial-console || [ $? -eq 30 ]
-    db_go || true
+    db_go || exit 10 # back up
 fi
 
 #write out lilo.conf
@@ -95,7 +97,7 @@ else
     ERRCODE=$?
     db_subst lilo-installer/failed ERRCODE "$ERRCODE"
     db_input critical lilo-installer/failed || [ $? -eq  30 ]
-    db_go || true
+    db_go || exit 10 # back up
     exit 1
 fi
 
