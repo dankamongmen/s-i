@@ -131,34 +131,32 @@ int main(int argc, char *argv[])
         client->command(client, "title", "Network Hardware Configuration",
                         NULL);
 
-        ptr = my_debconf_input("high", "ethdetect/detection_type");
+        ptr = my_debconf_input("low", "ethdetect/detection_type");
 
-        if (strstr(ptr, "false")) {
-                if ((module = ethdetect_prompt()) == NULL)
-                        return 1;
-                rv = ethdetect_insmod(module);
-                free(module);
-        } else {
-                ethernet = ethdetect_detect(lst);
-                for (; ethernet; ethernet = ethernet->next) {
-                     if (module_loaded(ethernet->module))
-                          continue;
-                     
-                        client->command(client, "subst",
-                                        "ethdetect/load_module", "bus",
-                                        bus2str(ethernet->bus), NULL);
-                        client->command(client, "subst",
-                                        "ethdetect/load_module", "module",
-                                        ethernet->module, NULL);
-
-                        ptr =
-                            my_debconf_input("high", "ethdetect/load_module");
-                        if (strstr(ptr, "true")) {
-                                if (ethdetect_insmod(ethernet->module) ==
-                                    0)
-                                        rv = 0;
-                        }
-                }
+        ethernet = ethdetect_detect(lst);
+        if (!ethernet) {
+          /* No module detected -- run manual */
+          if ((module = ethdetect_prompt()) == NULL)
+            return 1;
+          rv = ethdetect_insmod(module);
+          free(module);
+        }
+        for (; ethernet; ethernet = ethernet->next) {
+          if (module_loaded(ethernet->module))
+            continue;
+          
+          client->command(client, "subst",
+                          "ethdetect/load_module", "bus",
+                          bus2str(ethernet->bus), NULL);
+          client->command(client, "subst",
+                          "ethdetect/load_module", "module",
+                          ethernet->module, NULL);
+          
+          ptr = my_debconf_input("medium", "ethdetect/load_module");
+          if (strstr(ptr, "true")) {
+            if (ethdetect_insmod(ethernet->module) == 0)
+              rv = 0;
+          }
         }
         return rv;
 }
