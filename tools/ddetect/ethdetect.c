@@ -55,7 +55,7 @@ static int ethdetect_insmod(char *modulename) {
           client->command(client, "go", NULL);
           return 1;
      } else {
-          di_prebaseconfig_append("ethdetect",
+          di_prebaseconfig_append("40ethdetect",
                                   "echo \"%s %s\" >> /target/etc/modules",
                                   modulename,
                                   (params ? params : " "));
