@@ -12,11 +12,27 @@ CURDIR=`dirname $0`
 
 if [ "x$1" = "x" ]
 then
-  echo "Usage: $0 <package-directory>"
+  echo "Usage: $0 <package-directory> [-d]"
+  echo 
+  echo "-d: remove the .credits_log file after the output"
+  echo
   exit
 fi
 
-P=$1;
+if [ "$1" = "-d" ]
+then 
+    P=$2;
+    DELETE="true";
+else
+    P=$1;
+    if [ "$2" = "-d" ]
+    then
+	DELETE="true";
+    fi
+
+fi
+
+
 PACKAGE=`echo $P | sed 's/\/$//g'` 
 
 if [ ! -d $PACKAGE ]
@@ -100,4 +116,8 @@ do
   fi
   PREV=$L
 done < $PACKAGE/debian/.credits_log
+if [ "x$DELETE" != "x" ]
+then
+    rm $PACKAGE/debian/.credits_log
+fi
 echo
