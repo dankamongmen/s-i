@@ -189,7 +189,15 @@ get_all_partitions(struct partition *parts[], const int max_parts)
         snprintf(buf, sizeof(buf)-1, "/dev/discs/%s", dent->d_name);
         size = readlink(buf, tmp, sizeof(tmp)-1);
         if (size < 0) {
-            discs[disc_count] = strdup(buf);
+            snprintf(buf, sizeof(buf)-1, "/dev/discs/%s/disc", dent->d_name);
+            size = readlink(buf, tmp, sizeof(tmp)-1);
+            if (size < 0) {
+                discs[disc_count] = strdup(buf);
+            } else {
+                tmp[size] = 0;
+            // 2.2.x simulated devfs support 
+                asprintf(&discs[disc_count], "/dev/%s", tmp);
+            }
         } else {
             tmp[size] = 0;
             // Assumes the symlink starts with '../'
