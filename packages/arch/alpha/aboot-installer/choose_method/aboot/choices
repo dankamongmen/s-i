@@ -9,10 +9,11 @@ id="$2"
 # we should only give this option if the device is at the front of the
 # disk and has the right partition number.
 open_dialog PARTITION_INFO "$id"
-read_line part_num start end length type fs path name
+read_line part_num range end length type fs path name
 close_dialog
 
-if [ "$part_num" != 1 -o "$start" -gt 512 ]; then
+start=${range%-*}
+if [ "$start" -gt 1024 ]; then
 	exit 0
 fi
 
