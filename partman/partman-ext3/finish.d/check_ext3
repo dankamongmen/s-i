@@ -32,10 +32,10 @@ for dev in $DEVICES/*; do
 		    db_fset partman-ext3/check_failed seen false
 		    db_subst partman-ext3/check_failed PARTITION "$num"
 		    db_subst partman-ext3/check_failed DEVICE $(humandev $(cat device))
-		    db_set partman-ext3/check_failed 'Return to the partitioning menu'
+		    db_set partman-ext3/check_failed 'true'
 		    db_input critical partman-ext3/check_failed || true
 		    db_go || true
-		    if [ "$RET" = 'Return to the partitioning menu' ]; then
+		    if [ "$RET" = 'true' ]; then
 			exit 1
 		    fi
 		fi
