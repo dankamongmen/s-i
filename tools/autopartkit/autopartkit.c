@@ -1233,7 +1233,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	    autopartkit_log(1, "  LVM lv creation failed\n");
 	else
 	{
-	    autopartkit_log(1, "  LVM lv created ok, devpath=%s\n", devpath);
+            char *mkfs;
+            autopartkit_log(1, "  LVM lv created ok, devpath=%s\n", devpath);
 
         /* Create filesystem */
         /*
@@ -1246,9 +1247,22 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
           ped_file_system_close(fs);
         */
             /* Do it like this for now */
-            retval = asprintf(&cmd,
-                              "/sbin/mkfs.ext3 %s >> /var/log/messages 2>&1",
-                              devpath);
+            if (0 == strcmp("swap", fstype))
+                mkfs = "/sbin/mkswap";
+            else if (0 == strcmp("ext2", fstype))
+                mkfs = "/sbin/mkfs.ext2";
+            else if (0 == strcmp("ext3", fstype))
+                mkfs = "/sbin/mkfs.ext3";
+            else if (0 == strcmp("reiserfs", fstype))
+                mkfs = "/sbin/mkfs.reiserfs";
+            else /* Any default fs will have to do for now */
+            {
+                autopartkit_log(1, "  Unknown filesystem %s on LVM volume\n",
+                                fstype);
+                mkfs = "/sbin/mkfs.ext2";
+            }
+            retval = asprintf(&cmd, "%s %s >> /var/log/messages 2>&1", mkfs,
+			      devpath);
             if (-1 != retval)
             {
                 retval = system(cmd);
