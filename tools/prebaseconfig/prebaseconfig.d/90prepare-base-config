@@ -13,29 +13,27 @@ fi
     echo "SUITE=\"$SUITE\""
 ) >> /target/root/dbootstrap_settings
 
-# Look in /proc/cmdline for console=ttyS*, indicating a serial console
-# and fix inittab if so.
-console=$( echo " " $( cat /proc/cmdline ) " " | sed -n 's/^.* console=\([^ ]*\) .*$/\1/p' )
-if ( echo "$console" | grep -q "^ttyS" )
-then
-    # serial console, fix inittab and /etc/securetty.  This edits the
-    # ttyS0 entry for whichever ttySn is used, rather than trying to
-    # enable the right one.  Allows for ttySn for n>1 that way.
-    ttyspeed=$( echo "$console" | sed -n 's/^[^,]*,\([0-9]\+\).*$/\1/p' )
-    ttyname=$( echo "$console" | sed 's/,.*//' )
-    ttyline=$( echo "$ttyname" | sed 's/^ttyS//' )
-    ttyterm=$TERM
-    [ -z "$ttyterm" ] && ttyterm=vt100
-    [ -z "$ttyspeed" ] && ttyspeed=9600
+console=$(chroot /target tty | sed 's/\/dev\///g')
+
+case "$console" in
+ttyS*)
+    ttyspeed=$(chroot /target stty speed)
+    ttyline=$(echo "$console" | sed 's/^ttyS//')
+    ttyterm="$TERM"
+
+    if [ -z "$ttyterm" ]; then ttyterm=vt100; fi
+    if [ -z "$ttyspeed" ]; then ttyspeed=9600; fi
     cat /target/etc/inittab | sed \
         -e "s/^\([1-6]\):/#\1:/" \
 	-e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
             > /target/etc/inittab.real
-    echo "# $ttyname added by debian-installer" >> /target/etc/securetty
-    echo "$ttyname" >> /target/etc/securetty
-else
+    echo "# $console added by debian-installer" >> /target/etc/securetty
+    echo "$console" >> /target/etc/securetty
+;;
+*)
     # graphical console, leave inittab alone
     mv /target/etc/inittab /target/etc/inittab.real
-fi
+;;
+esac
 
 cp /usr/share/prebaseconfig/inittab /target/etc/inittab
