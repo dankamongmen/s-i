@@ -105,6 +105,7 @@ get_hw_info() {
     echo "ide-mod:Linux IDE Driver"
     echo "ide-probe-mod:Linux IDE probe Driver"
     echo "ide-detect:Linux IDE detection Driver"
+    echo "ide-floppy:Linux IDE Floppy Driver"
     echo "ide-disk:Linux ATA DISK Driver"
     echo "ide-cd:Linux ATAPI CD-ROM Driver"
     echo "isofs:Linux ISO 9660 Filesystem Driver"
