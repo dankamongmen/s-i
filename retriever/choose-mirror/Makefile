@@ -20,7 +20,7 @@ Mirrors.masterlist: force-try-update
 	fi
 force-try-update: ;
 
-debian/choose-mirror.templates:  Mirrors.masterlist
+debian/choose-mirror.templates:  Mirrors.masterlist debian/templates-in
 	./makeheader.pl template
 	cat debian/templates-in debian/templates-countries > debian/choose-mirror.templates
 
