@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+#
+# This program reads a debian/control, and generates from it the real
+# control file, control.out. At the same time, it populates temporary
+# directories with the appropriate set of modules.
+#
+# This debian/control is rather special. It has two types of packages in
+# it. The first package in the file is a kernel image, which will be built
+# with make-kpkg. All of the remainder are kernel module udebs.
+#
+# All occurrances of ${kernel:Version} are replaced with the version of the
+# kernel that is being built.
+#
+# To specify what modules go in the kernel module udebs, list the modules in
+# its Provides: line (these are technically legal package names, more or less
+# -- good enough for the purposes of the debian installer). Each module so
+# listed is found, and copied into the appropriate location in the temporary
+# build directory. If a module is not found, the provides entry for it is
+# removed.
+
+use v5.6;
+use strict;
+
+my $kdir=shift;
+my $kvers=shift or die "No kernel version string specified\n";
+my $flavour=shift;
+
+# Make a list of all available modules and a hash from module names to
+# their full filenames (sans $kdir).
+my @files=map { s/$kdir//; s/\n//; $_ } `find $kdir -type f -name '*.o'`;
+my %filename=map { m#.*/([^/]*)# => $_ } @files;
+my @available=map { s#.*/##; $_ } @files;
+
+$/="\n\n"; # read in a stanza at a time
+open IN, "debian/control" or die "debian/control: $!";
+open OUT, ">debian/control.out" or die "debian/control.out: $!";
+
+# Source stanza.
+my $stanza=<IN>;
+print OUT $stanza;
+
+# Skip kernel-image stanza
+$stanza=<IN>;
+
+# Now the modules.
+while ($stanza = <IN>) {
+	$stanza =~ s/\$\{kernel:Version\}/$kvers-$flavour/g;
+	my ($package) = $stanza =~ /^Package:\s+(.*)/m;
+	if ($stanza =~ /^Provides:\s+(.*)/m) {
+		my @modules;
+		foreach my $module (split(/,\s+/, $1)) {
+			# Note use of grep here allows regexps to be
+			# used to specify modules.
+			if (grep(/$module/, @available)) {
+				push @modules, grep(/$module/, @available);
+			}
+			else {
+				warn "$package: $module is not available; skipping\n";
+			}
+		}
+		if (@modules) {
+			# Make directory structure.
+			my %dirs;
+			foreach my $module (@modules) {
+				$_=$filename{$module};
+				s#[^/]*$##;
+				$dirs{$_}=1;
+				$dirs{$_}=1 while s![^/]*/$!! and $_;
+			}
+			mkdir "debian/$package";
+			mkdir "debian/$package/$_" foreach sort keys %dirs;
+			# Copy in the modules.
+			foreach (@modules) {
+				system "cp", $kdir.$filename{$_}, 
+					"debian/$package/$filename{$_}";
+			}
+			# Set the Provides: line to list whatever was
+			# actually installed.
+			$stanza =~ s{^Provides:\s+.*}{
+				"Provides: ".join(', ',
+					map { s:.*/::; $_ } @modules)
+			}em;
+		}
+		else {
+			warn "$package: none of the provided modules are available!\n";
+			next;
+		}
+	}
+
+	print OUT $stanza;
+}
+close OUT;
+close IN;

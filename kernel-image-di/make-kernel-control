@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+#
+# This program reads a debian/control, and generates from it a
+# kernel control file. All stanzas but the first two are removed, and
+# all occurrances of ${kernel:Version} are replaced with the version of the
+# kernel that is being built.
+#
+# Pass in the kernel version string as the first parameter, and the
+# location to write the file to as the second.
+
+use v5.6;
+use strict;
+
+my $kvers=shift or die "No kernel version string specified\n";
+my $flavour=shift;
+my $out=shift or die "No output file specified\n";
+
+$/="\n\n"; # read in a stanza at a time
+open IN, "debian/control" or die "debian/control: $!";
+open OUT, ">$out" or die "$out: $!";
+
+for (1..2) {
+	my $stanza=<IN>;
+	$stanza=~s/\$\{kernel:Version\}/$kvers-$flavour/g;
+	print OUT $stanza;
+}
+close IN;
+close OUT;
