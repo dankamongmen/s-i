@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: mem.h,v 1.2 2003/09/29 14:08:48 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__MEM_H
@@ -33,9 +33,9 @@
  * @{
  */
 
-void *di_malloc (size_t n_bytes);
-void *di_malloc0 (size_t n_bytes);
-void *di_realloc (void *mem, size_t n_bytes);
+void *di_malloc (size_t n_bytes) __attribute__ ((malloc));
+void *di_malloc0 (size_t n_bytes) __attribute__ ((malloc));
+void *di_realloc (void *mem, size_t n_bytes) __attribute__ ((malloc));
 void di_free (void *mem);
 
 /**

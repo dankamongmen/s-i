@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.5 2003/09/29 12:10:00 waldi Exp $
+ * $Id: packages.c,v 1.6 2003/09/29 14:08:48 waldi Exp $
  */
 
 #include <debian-installer/packages_internal.h>
@@ -100,14 +100,10 @@ void di_packages_append_package (di_packages *packages, di_package *package, di_
 
   tmp = di_packages_get_package (packages, package->package, 0);
 
-  if (tmp)
-    /* FIXME */
-    ;
-  else
-  {
-    di_hash_table_insert (packages->table, &package->key, package);
+  if (!tmp)
     di_slist_append_chunk (&packages->list, package, allocator->slist_node_mem_chunk);
-  }
+
+  di_hash_table_insert (packages->table, &package->key, package);
 }
 
 /**
@@ -129,6 +125,7 @@ di_package *di_packages_get_package (di_packages *packages, const char *name, si
   else
     size = strlen (name);
 
+  /* i know that is bad, but i know it is not written by the lookup */
   key.string = (char *) name;
   key.size = size;
 
@@ -151,12 +148,9 @@ di_package *di_packages_get_package_new (di_packages *packages, di_packages_allo
 
   if (!ret)
   {
-    char *temp;
-    temp = di_stradup (name, n);
     ret = di_package_alloc (allocator);
-    ret->key.string = temp;
+    ret->key.string = di_stradup (name, n);
     ret->key.size = n;
-    di_log (DI_LOG_LEVEL_WARNING, "new package: %s\n", temp);
 
     di_hash_table_insert (packages->table, &ret->key, ret);
   }

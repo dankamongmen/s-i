@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: prebaseconfig.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: prebaseconfig.c,v 1.3 2003/09/29 14:08:48 waldi Exp $
  */
 
 #include <debian-installer/system/prebaseconfig.h>
@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-int di_system_prebaseconfig_append (const char *udeb, const char *fmt, ...)
+int di_system_prebaseconfig_append (const char *udeb, const char *format, ...)
 {
   char path[128];
   FILE *fp;
@@ -41,8 +41,8 @@ int di_system_prebaseconfig_append (const char *udeb, const char *fmt, ...)
 
   fputs ("\n# start entry\n", fp);
 
-  va_start(ap, fmt);
-  vfprintf(fp, fmt, ap);
+  va_start(ap, format);
+  vfprintf(fp, format, ap);
   va_end(ap);
 
   fputs ("\n# end entry\n", fp);
@@ -51,4 +51,6 @@ int di_system_prebaseconfig_append (const char *udeb, const char *fmt, ...)
 
   return 0;
 }
+
+int di_prebaseconfig_append (const char *udeb, const char *fmt, ...) __attribute__ ((alias("di_system_prebaseconfig_append")));
 

@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: log.c,v 1.3 2003/09/29 14:08:48 waldi Exp $
  */
 
 #include <debian-installer/log.h>
@@ -93,18 +93,18 @@ void mklevel_prefix (char *level_prefix, di_log_level_flags log_level)
       break;
   }
 
-  strcpy (level_prefix, prefix);
+  strcat (level_prefix, prefix);
   strcat (level_prefix, log_level & ALERT_LEVELS ? " **: " : ": ");
 }
 
-static void di_log_handler_default (di_log_level_flags log_level, const char *message, void *user_data __attribute__ ((unused)))
+void di_log_handler_default (di_log_level_flags log_level, const char *message, void *user_data __attribute__ ((unused)))
 {
   char buf[1280];
   const char *progname = di_progname_get ();
 
-  snprintf (buf, sizeof (buf), "(%s:%lu): ", progname ? progname : "process", (unsigned long) getpid ());
+  snprintf (buf, sizeof (buf), "(%s:%d): ", progname ? progname : "process", getpid ());
   mklevel_prefix (buf, log_level);
-  strcat (buf, message ? message : "(NULL)");
+  strcat (buf, message);
   strcat (buf, "\n");
 
   fputs (buf, log_level & ALERT_LEVELS ? stderr : stdout);
@@ -120,22 +120,23 @@ void di_log_handler_syslog (di_log_level_flags log_level, const char *message, v
   if (!log_open)
   {
     if (user_data)
-      strncpy (ident_buf, user_data, 128);
+      strncpy (ident_buf, user_data, sizeof (ident_buf));
     else
     {
       const char *progname = di_progname_get ();
-      snprintf (ident_buf, sizeof (ident_buf), "%s[%lu]", progname ? progname : "process", (unsigned long) getpid ());
+      snprintf (ident_buf, sizeof (ident_buf), "%s[%d]", progname ? progname : "process", getpid ());
     }
 
     openlog (ident_buf, 0, LOG_USER);
     log_open = 1;
   }
 
+  buf[0] = '\0';
   mklevel_prefix (buf, log_level);
-  strcat (buf, message ? message : "(NULL)");
+  strcat (buf, message);
   strcat (buf, "\n");
 
-  switch (log_level)
+  switch (log_level & DI_LOG_LEVEL_MASK)
   {
     case DI_LOG_LEVEL_ERROR:
       syslog_level = LOG_ALERT;
@@ -150,9 +151,9 @@ void di_log_handler_syslog (di_log_level_flags log_level, const char *message, v
       syslog_level = LOG_NOTICE;
       break;
     case DI_LOG_LEVEL_INFO:
+    case DI_LOG_LEVEL_OUTPUT:
       syslog_level = LOG_INFO;
       break;
-    case DI_LOG_LEVEL_DEBUG:
     default:
       syslog_level = LOG_DEBUG;
       break;

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.h,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: exec.h,v 1.3 2003/09/29 14:08:48 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__EXEC_H
@@ -101,6 +101,12 @@ static inline int di_exec_shell (const char *const cmd)
 inline static int di_exec_shell_log (const char *const cmd)
 {
   return di_exec_shell_full (cmd, di_exec_io_log, di_exec_io_log, NULL, NULL, NULL);
+}
+
+inline static int di_execlog (const char *const cmd) __attribute__ ((deprecated));
+inline static int di_execlog (const char *const cmd)
+{
+  return di_exec_shell_log (cmd);
 }
 
 /** @} */

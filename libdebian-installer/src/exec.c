@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.3 2003/09/29 12:10:00 waldi Exp $
+ * $Id: exec.c,v 1.4 2003/09/29 14:08:48 waldi Exp $
  */
 
 #include <debian-installer/exec.h>
@@ -80,7 +80,7 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
   }
   else
   {
-    int i, n, status;
+    int i, status;
     struct pollfd fds[2] =
     {
       { pipeout[0], POLLIN, 0 },
@@ -108,13 +108,9 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
       {
         if (fds[i].revents & POLLIN)
         {
-          while (fgets (line, MAXLINE, files[i].file) != NULL)
-          {
-            n = strlen (line);
-            line[n - 1] = '\0';
+          while (fgets (line, sizeof (line), files[i].file) != NULL)
             if (files[i].handler)
-              files[i].handler (line, n, io_user_data);
-          }
+              files[i].handler (line, io_user_data);
           exit = 1;
         }
       }
@@ -166,7 +162,7 @@ int di_exec_prepare_chroot (void *user_data)
 /**
  * logs to di_log
  */
-int di_exec_io_log (const char *buf, size_t n __attribute__ ((unused)), void *user_data __attribute__ ((unused)))
+int di_exec_io_log (const char *buf, void *user_data __attribute__ ((unused)))
 {
   di_log (DI_LOG_LEVEL_OUTPUT, buf);
   return 0;

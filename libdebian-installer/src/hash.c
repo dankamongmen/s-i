@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.c,v 1.3 2003/09/29 12:10:00 waldi Exp $
+ * $Id: hash.c,v 1.4 2003/09/29 14:08:48 waldi Exp $
  */
 
 #include <debian-installer/hash.h>
@@ -241,12 +241,6 @@ void di_hash_table_insert (di_hash_table *hash_table, void *key, void *value)
 
   if (*node)
   {
-    /* do not reset node->key in this place, keeping
-     * the old key is the intended behaviour.
-     * g_hash_table_replace() can be used instead.
-     */
-
-    /* free the passed key */
     if (hash_table->key_destroy_func)
       hash_table->key_destroy_func (key);
 

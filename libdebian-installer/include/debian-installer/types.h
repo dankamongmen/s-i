@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: types.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: types.h,v 1.2 2003/09/29 14:08:48 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__TYPES_H
@@ -40,7 +40,7 @@ typedef void di_hfunc (void *key, void *value, void *user_data);
 typedef void di_func (void *data, void *user_data);
 
 typedef int di_handler (void *user_data);
-typedef int di_io_handler (const char *buf, size_t n, void *user_data);
+typedef int di_io_handler (const char *buf, void *user_data);
 
 /**
  * small size type used in many internal structures
