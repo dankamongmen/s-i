@@ -277,7 +277,8 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
 	    for (;;) {
                 if (get_package(package, dest_file)) {
                     di_log(DI_LOG_LEVEL_WARNING, "get_package failed");
-                    debconf_progress_stop(debconf); /* error handling may use a progress bar, so stop the current one */
+		    /* error handling may use a progress bar, so stop the current one */
+                    debconf_progress_stop(debconf);
 		    if (retriever_handle_error("retrieve") != 1) {
 		    	/* Failed to handle error. */
                         free(dest_file);
@@ -293,7 +294,8 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
                 
 		if (! md5sum(package->md5sum, dest_file)) {
                     di_log(DI_LOG_LEVEL_WARNING, "bad md5sum");
-                    debconf_progress_stop(debconf); /* error handling may use a progress bar, so stop the current one */
+		    /* error handling may use a progress bar, so stop the current one */
+                    debconf_progress_stop(debconf);
 		    if (retriever_handle_error("retrieve") != 1) {
 		        /* Failed to handle error. */
                         unlink(dest_file);
