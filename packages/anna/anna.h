@@ -41,5 +41,6 @@ int new_retrievers(di_package **retrievers_before, di_package **retrievers_after
 int unpack_package (const char *pkgfile);
 #endif
 int configure_package (const char *package);
+signed int retriever_handle_error (const char *failing_command);
 
 #endif /* ANNA_H_ */

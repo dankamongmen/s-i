@@ -79,6 +79,26 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     *packages_allocator = di_system_packages_allocator_alloc();
     *packages = get_packages(*packages_allocator);
 
+    while (*packages == NULL) {
+	int status=retriever_handle_error("packages");
+	if (status == -1) {
+            /* Fallback error message for retreivers w/o error handling. */
+            debconf_fset(debconf, ANNA_NO_MODULES, "seen", "false");
+            debconf_input(debconf, "critical", ANNA_NO_MODULES);
+            debconf_go(debconf);
+            return 4;
+	}
+	else if (status == 0) {
+	    /* Failed to handle error. */
+	    return 4;
+	}
+	else {
+            /* Error handled, retry. */
+            *packages_allocator = di_system_packages_allocator_alloc();
+            *packages = get_packages(*packages_allocator);
+	}
+    }
+	
     if (*packages == NULL) {
         debconf_fset(debconf, ANNA_NO_MODULES, "seen", "false");
         debconf_input(debconf, "critical", ANNA_NO_MODULES);
