@@ -47,32 +47,34 @@ fi
 db_progress STEP 2
 db_progress INFO sibyl-installer/conf
 
+# The kernel path should not start with a / because SiByl cannot handle
+# that.
 if [ -e /target/boot/vmlinux ]; then
-	kernel=/boot/vmlinux
+	kernel=vmlinux
 else
-	if [ "$rootfs" = "$bootfs" ] ; then
-		kernel=/vmlinux
-	else
-		kernel=`find /target/boot -name 'vmlinu*cobalt*' | tail -1`
-		kernel=${kernel#/target}
-	fi
-fi
-
-# Is /boot on a separate partition?
-if [ "$rootfs" != "$bootfs" ] ; then
-	kernel="${kernel#/boot}"
+	kernel=`find /target/boot -name 'vmlinu*sb1-swarm-bn' | tail -1`
+	kernel=${kernel#/target/boot/}
 fi
 info "Using kernel '$kernel'"
 
-cat > /target/boot/default.colo <<EOF
-#:CoLo:#
-#
-# load the Debian kernel from $bootfs_no_dev
-#
-mount $bootfs_no_dev
-load $kernel
-lcd "Booting Debian"
-execute root=$rootfs console=ttyS0,{console-speed}
+# /boot has to be on a separate partition because SiByl can only
+# read from the top-level directory.
+cat > /target/boot/sibyl.conf <<EOF
+timeout=5;
+default=debian;
+prompt;
+
+config debian {
+    kernel=ext2:ide0.0:*:$kernel;
+    root_dev=$rootfs;
+    #extra_args=console=duart0;
+}
+
+config debianttyS0 {
+    kernel=ext2:ide0.0:*:$kernel;
+    root_dev=$rootfs;
+    extra_args=console=duart0;
+}
 EOF
 
 db_progress STEP 1
