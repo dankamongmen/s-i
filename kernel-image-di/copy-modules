@@ -5,8 +5,9 @@
 # directories with the appropriate set of modules.
 #
 # This debian/control is rather special. It has two types of packages in
-# it. The first package in the file is a kernel image, which will be built
-# with make-kpkg. All of the remainder are kernel module udebs.
+# it. The first 1 package in the file is a kernel image, which will be built
+# with make-kpkg. The next is a kernel image udeb. All of the remainder are
+# kernel module udebs.
 #
 # All occurrances of ${kernel:Version} are replaced with the version of the
 # kernel that is being built.
@@ -35,14 +36,14 @@ $/="\n\n"; # read in a stanza at a time
 open IN, "debian/control" or die "debian/control: $!";
 open OUT, ">debian/control.out" or die "debian/control.out: $!";
 
-# Source stanza.
-my $stanza=<IN>;
-print OUT $stanza;
+my $stanza;
 
-# Kernel-image stanza.
-$stanza=<IN>;
-$stanza =~ s/\$\{kernel:Version\}/$kvers-$flavour/g;
-print OUT $stanza;
+# Source stanza and then kernel-image stanzas.
+for (1..3) {
+	$stanza=<IN>;
+	$stanza =~ s/\$\{kernel:Version\}/$kvers-$flavour/g;
+	print OUT $stanza;
+}
 
 # Now the modules.
 while ($stanza = <IN>) {
