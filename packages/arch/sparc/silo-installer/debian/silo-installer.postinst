@@ -27,6 +27,18 @@ if [ -e "/target/boot/initrd.img" ]; then
 	initrd="initrd=${boot}/initrd.img"
 fi
 
+# Install silo
+if ! apt-install silo; then
+        db_input critical silo-installer/apt-install-failed || [ $? -eq 30 ]
+        db_go
+        db_get silo-installer/apt-install-failed
+        if [ "$RET" = false ]; then
+                db_stop
+                exit 1
+        fi
+fi
+         
+
 # Write out silo.conf
 cat > /target/boot/silo.conf << EOF
 root=${rootfs}
