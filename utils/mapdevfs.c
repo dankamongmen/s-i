@@ -122,7 +122,7 @@ char *normalize_devfs(const char* path)
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "Wrong number of args: mapdevfs <path>\n");
-        exit(1);
+        return 1;
     }
     printf("%s\n", normalize_devfs(argv[1]));
     return 0;
