@@ -44,8 +44,8 @@ for dev in /var/lib/partman/devices/*; do
 
 	# Next, check if the device is a part of an MD setup
 #	if [ -f device ]; then
-#		DEVICE=`cat device | sed -e "s/\/dev\///"`
-#		cat /proc/mdstat | grep -q "${DEVICE}"
+#		DEVICE=`sed -e "s/\/dev\///" device`
+#		grep -q "${DEVICE}" /proc/mdstat
 #		if [ $? -eq 0 ]; then
 #			open_dialog NEW_LABEL loop
 #			close_dialog
@@ -54,7 +54,7 @@ for dev in /var/lib/partman/devices/*; do
 done
 
 # Create the raid devices
-#for i in `cat /proc/mdstat|grep md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'`; do
+#for i in `grep md /proc/mdstat|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'`; do
 #	NUMBER=`echo ${i}|sed -e "s/^md//"`
 #	DEVICE="/var/lib/partman/devices/=dev=md=${NUMBER}"
 #	mkdir ${DEVICE}
