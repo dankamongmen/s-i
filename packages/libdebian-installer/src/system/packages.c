@@ -159,34 +159,57 @@ di_slist *di_system_packages_resolve_dependencies_array_permissive (di_packages 
     di_packages_resolve_dependencies_check_non_existant_permissive,
     { NULL, NULL },
     allocator,
-    0
+    0,
+    NULL,
   };
 
   return di_packages_resolve_dependencies_array_special (packages, array, &s);
 }
 
-static di_package *check_virtual_kernel (di_package *package __attribute__ ((unused)), di_package *best, di_package_dependency *d)
+struct check
 {
-  struct utsname uts;
-  if (uname(&uts) == 0)
-    if (((di_system_package *)d->ptr)->kernel_version &&
-        strcmp (((di_system_package *)d->ptr)->kernel_version, uts.release))
-      return best;
-  return di_packages_resolve_dependencies_check_virtual (package, best, d);
+  const char *subarchitecture;
+  const char *kernel;
+};
+
+static di_package *check_virtual_anna (di_package *package __attribute__ ((unused)), di_package *best, di_package_dependency *d, void *data)
+{
+  struct check *sc = data;
+  if (((di_system_package *)d->ptr)->kernel_version &&
+      strcmp (((di_system_package *)d->ptr)->kernel_version, sc->kernel))
+    return best;
+  if (!di_system_package_check_subarchitecture (d->ptr, sc->subarchitecture))
+    return best;
+  return di_packages_resolve_dependencies_check_virtual (package, best, d, NULL);
 }
 
-void di_system_packages_resolve_dependencies_mark_kernel (di_packages *packages)
+void di_system_packages_resolve_dependencies_mark_anna (di_packages *packages, const char *subarchitecture, const char *kernel)
 {
+  struct check sc =
+  {
+    subarchitecture,
+    kernel,
+  };
   struct di_packages_resolve_dependencies_check s =
   {
     di_packages_resolve_dependencies_check_real,
-    check_virtual_kernel,
+    check_virtual_anna,
     di_packages_resolve_dependencies_check_non_existant,
     { NULL, NULL },
     NULL,
-    0
+    0,
+    &sc,
   };
 
   return di_packages_resolve_dependencies_mark_special (packages, &s);
 }
 
+void di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable (di_packages *packages) __attribute__ ((unused));
+void di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable (di_packages *packages)
+{
+  struct utsname uts;
+  uname (&uts);
+  di_system_packages_resolve_dependencies_mark_anna (packages, NULL, uts.release);
+}
+
+__asm__ (".symver di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable,di_system_packages_resolve_dependencies_mark_kernel@LIBDI_4.2_UNSTABLE");

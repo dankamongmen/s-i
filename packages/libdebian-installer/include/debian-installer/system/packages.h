@@ -115,7 +115,7 @@ static inline int di_system_packages_status_write_file (di_packages *packages, c
 }
 
 di_slist *di_system_packages_resolve_dependencies_array_permissive (di_packages *packages, di_package **array, di_packages_allocator *allocator);
-void di_system_packages_resolve_dependencies_mark_kernel (di_packages *packages);
+void di_system_packages_resolve_dependencies_mark_anna (di_packages *packages, const char *subarchitecture, const char *kernel);
 
 /** @} */
 #endif

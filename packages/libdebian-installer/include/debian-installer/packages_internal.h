@@ -35,7 +35,7 @@ typedef struct di_packages_resolve_dependencies_check di_packages_resolve_depend
 di_packages_allocator *internal_di_packages_allocator_alloc (void);
 
 typedef bool di_packages_resolve_dependencies_check_package (di_packages_resolve_dependencies_check *r, di_package *package, di_package_dependency *d);
-typedef di_package *di_packages_resolve_dependencies_check_provide (di_package *package, di_package *best, di_package_dependency *d);
+typedef di_package *di_packages_resolve_dependencies_check_provide (di_package *package, di_package *best, di_package_dependency *d, void *data);
 
 struct di_packages_resolve_dependencies_check
 {
@@ -45,6 +45,7 @@ struct di_packages_resolve_dependencies_check
   di_slist install;
   di_packages_allocator *allocator;
   unsigned int resolver;
+  void *check_virtual_data;
 };
 
 di_slist *di_packages_resolve_dependencies_special (di_packages *packages, di_slist *list, di_packages_resolve_dependencies_check *s);

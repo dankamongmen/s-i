@@ -220,7 +220,7 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
           if (d->type == di_package_dependency_type_reverse_provides)
           {
             if (!(package->resolver & (r->resolver << 2)))
-              best_provide = r->check_virtual (package, best_provide, d);
+              best_provide = r->check_virtual (package, best_provide, d, r->check_virtual_data);
           }
         }
 
@@ -296,7 +296,7 @@ bool di_packages_resolve_dependencies_check_real_dependency (di_packages_resolve
 }
 #endif
 
-di_package *di_packages_resolve_dependencies_check_virtual (di_package *package __attribute__ ((unused)), di_package *best, di_package_dependency *d)
+di_package *di_packages_resolve_dependencies_check_virtual (di_package *package __attribute__ ((unused)), di_package *best, di_package_dependency *d, void  *data __attribute__ ((unused)))
 {
   if (!best || best->priority < d->ptr->priority ||
       (d->ptr->status == di_package_status_installed && best->status != di_package_status_installed))
@@ -307,23 +307,13 @@ di_package *di_packages_resolve_dependencies_check_virtual (di_package *package 
 bool di_packages_resolve_dependencies_check_non_existant (di_packages_resolve_dependencies_check *r __attribute__ ((unused)), di_package *package, di_package_dependency *d __attribute__ ((unused)))
 {
   di_log (DI_LOG_LEVEL_WARNING, "package %s doesn't exist", package->package);
-#if 1
-  /* Backward compatiblity */
-  return true;
-#else
   return false;
-#endif
 }
 
 bool di_packages_resolve_dependencies_check_non_existant_quiet (di_packages_resolve_dependencies_check *r __attribute__ ((unused)), di_package *package __attribute__ ((unused)), di_package_dependency *d __attribute__ ((unused)))
 {
   di_log (DI_LOG_LEVEL_DEBUG, "package %s doesn't exist", package->package);
-#if 1
-  /* Backward compatiblity */
-  return true;
-#else
   return false;
-#endif
 }
 
 bool di_packages_resolve_dependencies_check_non_existant_permissive (di_packages_resolve_dependencies_check *r __attribute__ ((unused)), di_package *package __attribute__ ((unused)), di_package_dependency *d __attribute__ ((unused)))
@@ -380,7 +370,8 @@ di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *lis
     di_packages_resolve_dependencies_check_non_existant,
     { NULL, NULL },
     allocator,
-    0
+    0,
+    NULL,
   };
 
   return di_packages_resolve_dependencies_special (packages, list, &s);
@@ -410,7 +401,8 @@ di_slist *di_packages_resolve_dependencies_array (di_packages *packages, di_pack
     di_packages_resolve_dependencies_check_non_existant,
     { NULL, NULL },
     allocator,
-    0
+    0,
+    NULL,
   };
 
   return di_packages_resolve_dependencies_array_special (packages, array, &s);
@@ -441,7 +433,8 @@ void di_packages_resolve_dependencies_mark (di_packages *packages)
     di_packages_resolve_dependencies_check_non_existant_quiet,
     { NULL, NULL },
     NULL,
-    0
+    0,
+    NULL,
   };
 
   di_packages_resolve_dependencies_mark_special (packages, &s);
