@@ -19,7 +19,7 @@ if [ "$defaultbootdev" = '' ]; then
 	defaultbootdev=$rootfs
 fi
 
-defaultbootdev=`/target/bin/echo $defaultbootdev | /target/bin/sed 's/[0-9]\+$//'` 
+defaultbootdev=`/target/bin/echo $defaultbootdev | /target/bin/sed 's/part[0-9]\+$/disc/'` 
 
 if [ "$defaultbootdev" = '' ]; then
 	defaultbootdev='/dev/hda'
@@ -41,14 +41,28 @@ fi
 bootdev=`mapdevfs $bootdev`
 rootfs=`mapdevfs $rootfs`
 
+# serial support
+
+if grep -q console=ttyS /proc/cmdline; then
+    PORT=$(sed -e 's%.*console=ttyS%%' -e 's%,.*%%' /proc/cmdline)
+    SPEED=$(sed -e 's%.*console=ttyS[0-9]\+,%%' -e 's% .*%%' /proc/cmdline)
+    SERIAL="${PORT},${SPEED}"
+fi
+
 #write out lilo.conf
-/target/bin/echo "boot=$bootdev" > /target/etc/lilo.conf
-/target/bin/echo "root=$rootfs" >> /target/etc/lilo.conf
-/target/bin/echo 'install=/boot/boot.b' >> /target/etc/lilo.conf
-/target/bin/echo 'map=/boot/map' >> /target/etc/lilo.conf
-/target/bin/echo 'image=/vmlinuz' >> /target/etc/lilo.conf
-/target/bin/echo '	label=Linux' >> /target/etc/lilo.conf
+echo "boot=$bootdev" > /target/etc/lilo.conf
+echo "root=$rootfs" >> /target/etc/lilo.conf
+echo 'install=/boot/boot.b' >> /target/etc/lilo.conf
+echo 'map=/boot/map' >> /target/etc/lilo.conf
+if [ "${SERIAL}" ]; then
+    echo "serial=${SERIAL}" >> /target/etc/lilo.conf
+fi
+echo 'image=/vmlinuz' >> /target/etc/lilo.conf
+echo '	label=Linux' >> /target/etc/lilo.conf
 if [ -L /target/initrd.img -o -f /target/initrd.img ]; then
-/target/bin/echo '	initrd=/initrd.img' >> /target/etc/lilo.conf
+    echo '	initrd=/initrd.img' >> /target/etc/lilo.conf
+fi
+if [ "${SERIAL}" ]; then
+    echo "	append=\"console=ttyS${SERIAL}\"" >> /target/etc/lilo.conf
 fi
 chroot /target /sbin/lilo
