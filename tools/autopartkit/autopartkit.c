@@ -931,9 +931,17 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 #if defined(LVM_HACK)
     void *lvm_pv_stack;
     void *lvm_lv_stack;
+#endif /* LVM_HACK */
 
+    memset(mountmap,0,sizeof(device_mntpoint_map_t)*MAX_PARTITIONS);
+
+    normalize_requirements(requirements, space_reqs, MAX_PARTITIONS);
+
+#if defined(LVM_HACK)
     lvm_pv_stack = lvm_pv_stack_new();
     lvm_lv_stack = lvm_lv_stack_new();
+
+    autopartkit_log(1, "  Created LVM stacks\n");
 
     /* Do not make LVM logical volumes on the disk */
     for (partnum = 0; partnum < MAX_PARTITIONS && requirements[partnum].fstype;
@@ -941,10 +949,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
         if ( 0 == strncmp("lvm:", requirements[partnum].fstype, 4) )
 	    requirements[partnum].ondisk = 0;
 #endif /* LVM_HACK */
-
-    memset(mountmap,0,sizeof(device_mntpoint_map_t)*MAX_PARTITIONS);
-
-    normalize_requirements(requirements, space_reqs, MAX_PARTITIONS);
 
     spaceinfo = get_free_space_list();
     if ( ! spaceinfo )
