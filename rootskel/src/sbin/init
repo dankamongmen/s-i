@@ -5,8 +5,8 @@ mount -t proc proc proc
 
 if [ "`uname -r | grep '^2.2.'`" = "" ]; then
 	umount initrd || true
-	if grep -q tmpfs /proc/filesystems; then
-		mount -t tmpfs -o size=100M tmpfs mnt
+	if mount -t tmpfs -o size=100M tmpfs mnt ; then
+		:
 	else
 		mount -t shm shm mnt
 	fi
