@@ -1,0 +1,99 @@
+Template: cdrom-detect/not_included
+Type: boolean
+Default: false
+Description: Do you want to load the missing module from a drivers floppy ?
+ The module required for ${vendor} (${module}) is missing from this
+ installation disk. If you want to load it from a driver floppy, then
+ insert this floppy disk in the floppy drive and choose yes. Otherwise
+ choose no.
+Description-pt_BR: Deseja carregar o módulo que falta a partir de um disquete de controladores ?
+ O módulo requerido para ${vendor} (${module}) não existe nesse disco de
+ instalação. Caso você deseje carregá-lo a partir de um disquete de
+ controladores, insira o disquete no drive e escolha sim. Caso contrário
+ escolha não.
+
+Template: cdrom-detect/manual_config
+Type: boolean
+Default: true
+Description: Do you want to manually select the CDROM module and device ?
+ Apparently, we couldn't detect any common CDROM reader. But you may have
+ an old Mitsumi or another non-IDE, non-SCSI CDROM reader. In that case you
+ can indicate which module to load and which devide to use. If you know
+ what module we have to use, answer yes, otherwise look for some
+ documentation or try a net install instead of a CDROM install.
+Description-pt_BR: Deseja selecionar manualmente o módulo e dispositivo de CDROM ?
+ Aparentemente não foi possível detectar nenhum leitor de CDROM. No
+ entanto você pode possuir um antigo leitor Mitsumi ou outro leitor
+ não-IDE ou não-SCSI. Neste caso você pode indicar qual módulo carregar
+ e qual dispositivo utilizar. Caso você saiba qual módulo precisa ser
+ usado, responda si, caso contrário procure por documentação ou tente
+ uma instalação via rede ao invés de instalação por CDROM.
+
+Template: cdrom-detect/is_cd_inserted
+Type: boolean
+Default: false
+Description: Is the installation CD in the CDROM reader ?
+ We couldn't mount your installation CD. That probably means that the CD is
+ not yet inserted. If that's the case, please insert it and answer no.
+ Otherwise answer yes and you'll be prompted for a manual configuration.
+Description-pt_BR: O CD de instalação está no leitor de CDROM ?
+ Não foi possível montar seu CD de instalação. Isso provavelmente
+ significa que o CD ainda não foi inserido. Caso seja este o caso, por
+ favor insira-o e responda não. Caso contrário responda sim e informações
+ sobre configuração manual lhe serão questionadas.
+
+Template: cdrom-detect/cdrom_module
+Type: select
+Choices: ${choices}
+Default: ${default}
+Description: Select a module to load for the CDROM support
+ Apprently the autodetection didn't find any CDROM reader. You can try to
+ load one of the modules if you have a specific CDROM reader (that is
+ neither IDE nor SCSI).
+Description-pt_BR: Selecione um módulo para carregar o suporte ao CDROM
+ Aparentemente a autodetecção não encontrou nenhum leitor de CDROM. Você
+ pode tentar carregar um dos módulos caso você possua um leitor cd CDROM
+ específico (ou seja nem IDE nem SCSI).
+
+Template: cdrom-detect/cdrom_device
+Type: string
+Default: ${default}
+Description: Give the corresponding device file
+ In order to get access to your CDROM reader, I must know which device file
+ should be used since non-standard CDROM reader use non-standard device
+ files like /dev/mcdx for example.
+ .
+ You may switch to the shell on the second terminal (ALT+F2) to check the
+ available devices in /dev with "ls /dev". You can come back here with
+ ALT+F1.
+Description-pt_BR: Informe o arquivo de dispositivo correspondente
+ Para que seja possível ter acesso ao seu leitor de CDROM, é necessário
+ que o instalador saiba qual arquivo de dispositivo deverá ser usado uma
+ vez leitores de CDROM fora do padrão utilizam arquivo de dispositivos
+ tambpem fora do padrão, como /dev/mcdx, por exemplo.
+ .
+ Você pode alternar para o shell no segundo terminal (use ALT+F2) para
+ checar os dispositivos disponíevis em /dev com o comando "ls /dev". E
+ então você pode voltar aqui com ALT+F1.
+
+Template: cdrom-detect/success
+Type: note
+Description: A CDROM has been detected.
+ The autodetection worked. A CDROM reader has been found. It contains the
+ following CD : ${cdname} You can continue the install.
+Description-pt_BR: Um CDROM foi detectado.
+ A autodetecção funcionou. Um leitor de CDROM foi encontrado. O mesmo
+ contém o seguinte CD : ${cdname} . Você pode continuar a instalar.
+
+Template: cdrom-detect/skip_autodetection
+Type: boolean
+Default: false
+Description: Do you want to skip CDROM autodetection ?
+ You may want to try that if autodetection is causing troubles. Otherwise
+ you really shouldn't as it won't let you go any further without manual
+ intervention to mount the CDROM on /cdrom.
+Description-pt_BR: Deseja pular a autodetecção de CDROM ?
+ Você pode desejar tentar isso caso a autodetecção esteja causando
+ problemas. Caso contrário você não deveria fazer isso uma vez que isso
+ não lhe deixará prosseguir sem intervenção manual para montar o CDROM em
+ /cdrom.
