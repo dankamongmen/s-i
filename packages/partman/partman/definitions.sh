@@ -575,6 +575,7 @@ device_name () {
 
 enable_swap () {
     local swaps dev num id size type fs path name method
+    local startdir="$(pwd)"
     # do swapon only when we will be able to swapoff afterwards
     [ -f /proc/swaps ] || return 0
     swaps=''
@@ -595,6 +596,7 @@ enable_swap () {
     for path in $swaps; do
 	swapon $path || true
     done
+    cd "$startdir"
 }
 
 disable_swap () {
