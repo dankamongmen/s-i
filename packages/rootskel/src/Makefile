@@ -8,6 +8,7 @@ subdirs = \
 	mnt \
 	proc \
 	sbin \
+	sys \
 	var \
 	initrd
 
