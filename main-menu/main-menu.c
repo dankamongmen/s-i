@@ -159,6 +159,8 @@ struct package_t *show_main_menu(struct package_t *packages) {
 		debconf->command(debconf, "SET", MAIN_MENU, menudefault, NULL);
 	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
+	if (menudefault)
+		debconf->command(debconf, "SUBST", MAIN_MENU, "DEFAULT", menudefault, NULL);
 	debconf->command(debconf, "INPUT medium", MAIN_MENU, NULL);
 	debconf->command(debconf, "GO", NULL);
 	debconf->command(debconf, "GET", MAIN_MENU, NULL);
