@@ -168,7 +168,7 @@ root="`mapdevfs "$rootdev"`"
 partnr="`printf %s "$root" | sed 's/[^0-9]*\([0-9]\)/\1/'`"
 disk="`printf %s "$root" | sed 's/[0-9].*//'`"
 
-ofpath="`chroot /target /usr/sbin/ofpath "$disk"`"
+ofpath="`chroot /target ofpath "$disk"`"
 
 # we generate our own yaboot.conf kernel (yabootconfig is horribly broken)
 # cjwatson: a little more justification of that would have been nice ...
@@ -223,7 +223,7 @@ EOF
 db_progress STEP 1
 db_progress INFO yaboot-installer/ybin
 
-chroot /target /usr/sbin/mkofboot -v -f || \
+chroot /target mkofboot -v -f || \
     die yaboot-installer/ybinerr 'mkofboot failed'
 
 # Done!
