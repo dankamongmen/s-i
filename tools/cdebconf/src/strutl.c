@@ -7,7 +7,7 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.7 2000/12/03 19:14:54 tausq Exp $
+ * $Id: strutl.c,v 1.8 2000/12/09 04:22:30 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -36,6 +36,7 @@
  * SUCH DAMAGE.
  *
  ***********************************************************************/
+#include "common.h"
 #include "strutl.h"
 #include <stdio.h>
 #include <stdarg.h>
@@ -302,3 +303,58 @@ void strescape(const char *inbuf, char *outbuf, const size_t maxlen)
 	}
 	outbuf[i] = 0;
 }
+
+#if 0
+int strwrap(const char *str, const int width, char **lines, int maxlines)
+{
+	/* Simple greedy line-wrapper */
+	int len = STRLEN(str);
+	int l = 0;
+	const char *s, *e, *end, *lb;
+
+	if (str == 0) return 0;
+
+	s = e = str;
+	end = str + len;
+	
+	while (len > 0)
+	{
+		/* try to fit the most characters */
+		e = s + width;
+		
+		if (e >= end) 
+		{
+			e = end;
+		}
+		else
+		{
+			while (e > s)
+			{
+				if ((isspace(*e) || ispunct(*e)) &&
+				    (*(e+1) == 0 || (!isspace(*(e+1)) 
+					&& !ispunct(*(e+1)))))
+					break;
+				e--;
+
+			}
+
+		}
+		/* no word-break point found, so just break the line */
+		if (e == s) e = s + width;
+
+		/* if there's an explicit linebreak, honor it */
+		lb = strchr(s, '\n');
+		if (lb != NULL && lb < e) e = lb + 1;
+
+		strncpy(lines[l], s, e-s+1);
+		lines[l][e-s+1] = 0;
+		CHOMP(lines[l]);
+
+		len -= (e-s+1);
+		s = e+1;
+		while (*s == ' ') s++;
+		if (++l >= maxlines) break;
+	}
+	return l;
+}
+#endif

@@ -14,9 +14,9 @@ ac_default_prefix=/usr/local
 ac_help="$ac_help
   --without-debug         turn off debugging?"
 ac_help="$ac_help
-  --with-rpath       use rpath? (for testing)"
+  --with-rpath            use rpath? (for testing)"
 ac_help="$ac_help
-  --with-admindir=DIR     store dpkg data in DIR [/var/lib/dpkg]"
+  --with-conffile=PATH    cdebconf config file [/etc/debconf.conf]"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -527,7 +527,7 @@ else
 fi
 
 
-CFLAGS="-Wall $CFLAGS"
+CFLAGS="-Wall $CFLAGS -D_GNU_SOURCE"
 ac_aux_dir=
 for ac_dir in . $srcdir/.; do
   if test -f $ac_dir/install-sh; then
@@ -855,18 +855,18 @@ if test "$with_rpath" != "no"; then
   
 fi
 
-ADMINDIR="/var/lib/dpkg"
-# Check whether --with-admindir or --without-admindir was given.
-if test "${with_admindir+set}" = set; then
-  withval="$with_admindir"
+DEBCONFCONFIG="/etc/debconf.conf"
+# Check whether --with-conffile or --without-conffile was given.
+if test "${with_conffile+set}" = set; then
+  withval="$with_conffile"
   case "$withval" in
-  "") { echo "configure: error: invalid admindir specified" 1>&2; exit 1; } ;;
-  *) ADMINDIR="$withval" ;;
+  "") { echo "configure: error: invalid conffile specified" 1>&2; exit 1; } ;;
+  *) DEBCONFCONFIG="$withval" ;;
  esac
 fi
 
-cat >> confdefs.h <<\EOF
-#define ADMINDIR 1
+cat >> confdefs.h <<EOF
+#define DEBCONFCONFIG "$DEBCONFCONFIG"
 EOF
  
 

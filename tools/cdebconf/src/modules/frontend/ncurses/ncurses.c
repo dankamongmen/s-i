@@ -436,6 +436,8 @@ static int ncurses_initialize(struct frontend *obj, struct configuration *cfg)
 	if (uid->qrywin == NULL || uid->descwin == NULL)
 		return DC_NOTOK;
 
+	init_pair(COLOR_FRAME, COLOR_YELLOW, COLOR_BLUE);
+	init_pair(COLOR_DESC, COLOR_WHITE, COLOR_BLUE);
 	init_pair(COLOR_QUERY, COLOR_WHITE, COLOR_BLUE);
 	init_pair(COLOR_DESC, COLOR_WHITE, COLOR_BLUE);
 
@@ -466,26 +468,43 @@ static int ncurses_shutdown(struct frontend *obj)
 static int ncurses_go(struct frontend *obj)
 {
 	struct question *q = obj->questions;
+	struct question *qlast = 0;
 	int i;
 	int ret;
 
-	for (; q != 0; q = q->next)
+	while (q != 0)
 	{
+		ret = DC_OK;
 		for (i = 0; i < sizeof(question_handlers) / sizeof(question_handlers[0]); i++)
 			if (strcasecmp(q->template->type, question_handlers[i].type) == 0)
 			{
 				drawdesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
-				if (ret == DC_OK)
+				switch (ret)
+				{
+				case DC_OK:
 					obj->db->question_set(obj->db, q);
-				else
+					break;
+				case DC_GOBACK:
+					if (qlast != 0)
+						q = qlast;
+					else
+						return ret;
+					break;
+				default:
 					return ret;
+				}
 				break;
 			}
+		if (ret == DC_OK)
+		{
+			qlast = q;
+			q = q->next;
+		}
 		
 	}
 
-	return 0;
+	return DC_OK;
 }
 
 struct frontend_module debconf_frontend_module =

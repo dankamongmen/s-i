@@ -7,6 +7,11 @@ all:
 		cp $$module/$$module.so .; \
 	done
 
+install:
+	@for module in $(MODULES); do \
+		$(MAKE) -C $$module $@; \
+	done
+
 clean:
 	@for module in $(MODULES); do \
 		$(MAKE) -C $$module clean; \

@@ -11,6 +11,9 @@ cdebconf: globalmakeflags
 configure: configure.in
 	autoconf
 
+install:
+	$(MAKE) -C src $@
+
 clean: 
 	-rm -f *-stamp
 	-$(MAKE) -C src $@

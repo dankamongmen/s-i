@@ -5,7 +5,7 @@ dnl linux architectures and configurations, it is not used to make the
 dnl code more portable
 
 AC_INIT(configure.in)
-CFLAGS="-Wall $CFLAGS"
+CFLAGS="-Wall $CFLAGS -D_GNU_SOURCE"
 AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_HEADER(src/config.h:src/config.h.in)
 
@@ -27,20 +27,20 @@ if test "$with_debug" != "no"; then
 fi
 
 dnl Use rpath? (for testing mostly)
-AC_ARG_WITH(depends,[  --with-rpath       use rpath? (for testing)])
+AC_ARG_WITH(depends,[  --with-rpath            use rpath? (for testing)])
 if test "$with_rpath" != "no"; then
   RPATH="-Wl,-rpath,\$(shell pwd)"
   AC_SUBST(RPATH)
 fi
 
-dnl dpkg library directory
-ADMINDIR="/var/lib/dpkg"
-AC_ARG_WITH(admindir,[  --with-admindir=DIR     store dpkg data in DIR [/var/lib/dpkg]],
+dnl debconf config file
+DEBCONFCONFIG="/etc/debconf.conf"
+AC_ARG_WITH(conffile,[  --with-conffile=PATH    cdebconf config file [/etc/debconf.conf]],
 [case "$withval" in
-  "") AC_MSG_ERROR(invalid admindir specified) ;;
-  *) ADMINDIR="$withval" ;;
+  "") AC_MSG_ERROR(invalid conffile specified) ;;
+  *) DEBCONFCONFIG="$withval" ;;
  esac])
-AC_DEFINE(ADMINDIR) 
+AC_DEFINE_UNQUOTED(DEBCONFCONFIG, "$DEBCONFCONFIG") 
 
 dnl Check for libraries
 AC_CHECK_LIB(ncurses, initscr)

@@ -7,7 +7,7 @@
  *
  * Description: interface to debconf templates
  *
- * $Id: template.c,v 1.3 2000/12/02 07:15:14 tausq Exp $
+ * $Id: template.c,v 1.4 2000/12/09 04:22:30 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -110,11 +110,10 @@ struct template *template_load(const char *filename)
 			while (fgets(buf, sizeof(buf), fp))
 			{
 				if (buf[0] != ' ') break;
-				strstrip(buf);
 				if (buf[1] == '.')
 					strvacat(extdesc, sizeof(extdesc), "\n\n", 0);
 				else
-					strvacat(extdesc, sizeof(extdesc), buf+1, " ",  0);
+					strvacat(extdesc, sizeof(extdesc), buf+1, "\n",  0);
 			}
 			if (*extdesc != 0)
 				t->extended_description = strdup(extdesc);

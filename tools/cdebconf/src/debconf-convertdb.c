@@ -3,12 +3,12 @@
  * cdebconf - An implementation of the Debian Configuration Management
  *            System
  *
- * File: loadtemplate.c
+ * File: convertdb.c
  *
- * Description: simple utility to load a template file into the 
- *              database
+ * Description: Allows the user to load template/question infrom from
+ *              one database to another
  *
- * $Id: loadtemplate.c,v 1.3 2000/12/02 07:15:14 tausq Exp $
+ * $Id: debconf-convertdb.c,v 1.1 2000/12/09 04:22:29 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -37,68 +37,86 @@
  * SUCH DAMAGE.
  *
  ***********************************************************************/
-#include "common.h"
+#include "confmodule.h"
 #include "configuration.h"
+#include "frontend.h"
 #include "database.h"
-#include "question.h"
-#include "template.h"
+#include <getopt.h>
+#include <unistd.h>
 
-#include <stdio.h>
-#include <string.h>
+static struct option g_dpc_args[] = {
+	{ "help", 0, NULL, 'h' },
+	{ "from", 1, NULL, 'f' },
+	{ "to", 1, NULL, 't' },
+	{ 0, 0, 0, 0 }
+};
 
-void parsecmdline(struct configuration *config, int argc, char **argv)
+void usage(void)
 {
-	if (argc < 3)
-	{
-		fprintf(stderr, "%s <owner> <template>\n", argv[0]);
-		exit(-1);
-	}
+	printf("convertdb <-f fromdb> <-t todb> [-h]\n");
+	printf("convertdb <--from fromdb> <--to todb> [--help]\n");
+	printf("\tfromdb, todb - database modules to convert from/to\n");
+	printf("\t-h, --help - this help message\n");
+	exit(0);
 }
 
 int main(int argc, char **argv)
 {
-	struct configuration *config = NULL;
-	struct database *db = NULL;
-	struct template *t = NULL;
-	struct question *q = NULL;
-	int i = 2;
+	struct configuration *config;
+	struct database *db1, *db2;
+	struct question *q;
+	struct template *t;
+	char *db1name = 0, *db2name = 0;
+	void *iter;
+	int c;
 
-	config = config_new();
-	parsecmdline(config, argc, argv);
-
-	/* parse the configuration info */
-	if (config->read(config, DEBCONFCONFIG) == 0)
-		DIE("Error reading configuration information");
-
-	/* initialize database and frontend modules */
-	if ((db = database_new(config)) == 0)
-		DIE("Cannot initialize DebConf database");
-
-	while (i <= argc)
+	while ((c = getopt_long(argc, argv, "hf:t:", g_dpc_args, NULL) > 0))
 	{
-		t = template_load(argv[i++]);
-		while (t)
+		switch (c)
 		{
-			if (db->template_set(db, t) != DC_OK)
-				INFO(INFO_ERROR, "Cannot add template %s", t->tag);
-
-			q = db->question_get(db, t->tag);
-			if (q == NULL)
-			{
-				q = question_new(t->tag);
-				q->template = t;
-			}
-			question_owner_add(q, argv[1]);
-			if (db->question_set(db, q) != DC_OK)
-				INFO(INFO_ERROR, "Cannot add template %s", t->tag);
-			question_deref(q);
-			t = t->next;
+		case 'h': usage(); break;
+		case 'f': db1name = optarg; break;
+		case 't': db2name = optarg; break;
 		}
 	}
 
-	db->save(db);
-	database_delete(db);
-	config_delete(config);
+	if (db1name == NULL || db2name == NULL)
+		usage();
+
+	/* parse the configuration info */
+	config = config_new();
+	if (config->read(config, "debconf.conf") == 0)
+		DIE("Error reading configuration information");
+
+	/* initialize database and frontend modules */
+	setenv("DEBCONF_DB", db1name, 1);
+	if ((db1 = database_new(config)) == 0)
+		DIE("Cannot initialize first DebConf database");
+	setenv("DEBCONF_DB", db2name, 1);
+	if ((db2 = database_new(config)) == 0)
+		DIE("Cannot initialize second DebConf database");
+
+	/* load database */
+	db1->load(db1);
+	
+	/* Iterate through all the questions and templates, and 
+	 * put them into db2
+	 */
+	/* TODO: error checking */
+	iter = 0;
+	while ((t = db1->template_iterate(db1, &iter)) != NULL)
+	{
+		db2->template_set(db2, t);
+	}
+	iter = 0;
+	while ((q = db1->question_iterate(db1, &iter)) != NULL)
+	{
+		db2->question_set(db2, q);
+	}
+
+	db2->save(db2);
+	database_delete(db1);
+	database_delete(db2);
 
 	return 0;
 }

@@ -8,7 +8,7 @@ LIB=libdebconf.so
 LIBNAME=libdebconf.so.$(MAJOR).$(MINOR).$(MICRO)
 SONAME=libdebconf.so.$(MAJOR).$(MINOR)
 DEBCONF=debconf
-TOOLS=loadtemplate convertdb dpkg-reconfigure
+TOOLS=debconf-loadtemplate debconf-convertdb dpkg-reconfigure
 BIN=$(DEBCONF) $(TOOLS)
 
 LIBOBJS=commands.opic confmodule.opic frontend.opic priority.opic strutl.opic \
@@ -29,6 +29,21 @@ $(LIBNAME): $(LIBOBJS)
 
 $(SONAME) $(LIB): $(LIBNAME)
 	-@ln -sf $^ $@
+
+install:
+	install -d -m 755 ${bindir}
+	install -d -m 755 ${etcdir}
+	install -d -m 755 ${libdir}
+	install -d -m 755 ${moddir}
+	install -d -m 755 ${sharedir}
+	install -m 755 $(BIN) ${bindir}
+	install -m 644 $(LIBNAME) ${libdir}
+	ln -sf $(LIBNAME) ${libdir}/$(SONAME)
+	ln -sf $(LIBNAME) ${libdir}/$(LIB)
+	install -m 644 debconf.conf-dist ${etcdir}/debconf.conf
+	install -m 644 client/confmodule ${sharedir}
+	ln -sf ../../bin/$(DEBCONF) ${sharedir}/frontend
+	@$(MAKE) -C modules $@
 
 clean:
 	-@rm -f $(BIN) $(LIB) $(LIBNAME) $(SONAME) *~ *.o *.opic

@@ -6,80 +6,57 @@
 #export DH_VERBOSE=1
 
 # This is the debhelper compatability version to use.
-export DH_COMPAT=1
+export DH_COMPAT=2
 
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-	# Add here commands to configure the package.
-	./configure --without-rpath
+PACKAGE=$(shell dh_listpackages)
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=$(shell dpkg --print-architecture)
+FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
-	touch configure-stamp
-
-build: configure-stamp build-stamp
+build: build-stamp
 build-stamp:
 	dh_testdir
-
-	# Add here commands to compile the package.
+	CFLAGS="-Os -fomit-frame-pointer" \
+		./configure --without-rpath --with-conffile=etc/debconf.conf
+	#	./configure --without-rpath --with-conffile=/etc/debconf.conf
 	$(MAKE)
-	#/usr/bin/docbook-to-man debian/cdebconf.sgml > cdebconf.1
-
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
-
-	# Add here commands to clean up after the build process.
-	-$(MAKE) clean
-
+	rm -f build-stamp
+	-$(MAKE) distclean
 	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs
-
-	# Add here commands to install the package into debian/tmp.
-	$(MAKE) install DESTDIR=`pwd`/debian/tmp
-
+	dh_installdirs 
+	$(MAKE) install prefix=$(shell pwd)/debian/cdebconf
 
 # Build architecture-independent files here.
 binary-indep: build install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
+#
+# Note that this builds a .udeb, which is not policy compliant or anything.
 binary-arch: build install
-#	dh_testversion
 	dh_testdir
 	dh_testroot
-#	dh_installdebconf	
-	dh_installdocs
-	dh_installexamples
-	dh_installmenu
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installinit
-	dh_installcron
-	dh_installmanpages
-	dh_installinfo
-#	dh_undocumented
-	dh_installchangelogs 
-	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
-	# You may want to make some executables suid here.
-	dh_suidregister
-#	dh_makeshlibs
 	dh_installdeb
-#	dh_perl
 	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	# Don't write your stupid guesses to debian/files.
+	dh_gencontrol -- -fdebian/files~
+	# Register file manually.
+	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
+	dh_builddeb --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
