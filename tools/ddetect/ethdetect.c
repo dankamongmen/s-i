@@ -56,7 +56,7 @@ static int ethdetect_insmod(char *modulename) {
           return 1;
      } else {
           di_prebaseconfig_append("ethdetect",
-                                  "echo \"%s %s\" >> /etc/modules",
+                                  "echo \"%s %s\" >> /target/etc/modules",
                                   modulename,
                                   (params ? params : " "));
           return 0;

@@ -23,6 +23,9 @@ install:
 	
 	mkdir -p $(DESTDIR)/usr/share/ddetect/
 	cp *.lst $(DESTDIR)/usr/share/ddetect/
+
+	mkdir -p $(DESTDIR)/usr/lib/prebaseconfig.d
+	cp prebaseconfig $(DESTDIR)/usr/lib/prebaseconfig.d/ethdetect
 	  
 
 ethpci.lst:
