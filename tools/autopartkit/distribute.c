@@ -154,6 +154,8 @@ distribute_partitions(struct disk_info_t diskinfo[],
 		total_wanted += reqs[j].max_blk - reqs[j].min_blk;
 	    }
 	}
+        if (total_wanted == 0)
+            continue;
 	/* This is where we decide the new size of the partitions */
 	for (j = 0; reqs[j].mountpoint; ++j)
         {
@@ -174,7 +176,6 @@ distribute_partitions(struct disk_info_t diskinfo[],
 
 		/* We know the new size.  Activate it */
 		diskinfo[i].freespace -= newsize - reqs[j].blocks;
-		total_wanted -= reqs[j].max_blk - reqs[j].min_blk;
 		reqs[j].blocks = newsize;
 	    }
 	}
