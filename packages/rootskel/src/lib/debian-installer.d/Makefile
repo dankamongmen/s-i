@@ -5,7 +5,8 @@ DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 files += \
-	S60frontend
+	S60frontend \
+	S72menu-exit
 
 ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
   ifeq ($(DEB_HOST_GNU_CPU),s390)
@@ -13,8 +14,7 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
 	S30term-linux-s390
   else
     files += \
-	S30term-linux \
-	S35framebuffer-linux
+	S30term-linux
   endif
   ifeq ($(DEB_HOST_GNU_CPU),i386)
     files += \
@@ -22,10 +22,11 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
   endif
 
   files += \
-	S40utf8-linux \
-	S70menu-linux \
-	S72menu-exit \
-	S90utf8-linux
+	S40term-linux \
+	S70menu-linux
+else
+  files += \
+	S70menu
 endif
 
 include ../../../Makefile.inc

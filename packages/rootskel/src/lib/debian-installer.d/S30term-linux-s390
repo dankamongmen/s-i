@@ -1,16 +1,23 @@
-case `readlink /proc/self/fd/0` in
-	/dev/console)
+if [ -z "$TERM_TYPE" ]; then
+	case `readlink /proc/self/fd/0` in
+		/dev/console)
+			TERM_TYPE=serial
+			;;
+		/dev/pts/*)
+			TERM_TYPE=pts
+			;;
+	esac
+fi
+
+case "$TERM_TYPE" in
+	serial)
 		TERM=dumb
-		TERM_TYPE=serial
 		DEBIAN_FRONTEND=text
 		;;
-	/dev/pts/*)
-		TERM=linux
-		TERM_TYPE=pts
+	*)
 		DEBIAN_FRONTEND=
 		;;
 esac
 
 export TERM
 export TERM_TYPE
-export DEBIAN_FRONTEND
