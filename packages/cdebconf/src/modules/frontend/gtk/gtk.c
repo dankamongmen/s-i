@@ -603,6 +603,12 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
     return DC_OK;
 }
 
+static int gtkhandler_text(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    /* FIXME: text probably shouldn't be quite so interactive as note */
+    return gtkhandler_note(obj, q, qbox);
+}
+
 static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *entry;
@@ -817,7 +823,7 @@ struct question_handlers {
     { "string",	        gtkhandler_string },
     { "error",	        gtkhandler_note },
 //  { "custom",         gtkhandler_custom },
-//  { "text",           gtkhandler_text }
+    { "text",           gtkhandler_text }
 };
 
 void set_window_properties(GtkWidget *window)
