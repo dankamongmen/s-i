@@ -12,26 +12,31 @@
 
 use strict;
 use IPC::Open2;
-	
+
 my $action=shift;
 if ($action eq 'reset') {
+	print "Resetting..\n";
 	send_command(qq{<RESET_SERVER/>});
 	exit process_result();
 }
 elsif ($action eq 'poweron') {
+	print "Powering on..\n";
 	send_command(qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
 	exit process_result();
 }
 elsif ($action eq 'poweroff') {
+	print "Powering off..\n";
 	send_command(qq{<SET_HOST_POWER HOST_POWER="No"/>});
 	exit process_result();
 }
 elsif ($action eq 'force_restart') {
 	send_command(qq{<GET_HOST_POWER_STATUS/>});
 	if (scan_result("HOST_POWER") eq 'OFF') {
+		print "Powering on..\n";
 		send_command(qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
 	}
 	else {
+		print "Restarting..\n";
 		send_command(qq{<RESET_SERVER/>});
 	}
 	exit process_result();
@@ -53,7 +58,7 @@ sub send_command {
 
 	my $pid = open2 (\*RDRFH, \*WTRFH, "locfg.pl", "-s", $ENV{HP_ILO_HOST}, "-f", "-");
 	if (! $pid) {
-		die "failed to run locfg.pl: $!";
+		die "failed to run locfg.pl: $!\n";
 	}
 
 	print WTRFH $command;
@@ -122,7 +127,7 @@ sub getpassword {
 	else {
 		open (PW, $ENV{HP_ILO_PASSWORD_FILE}) || die "Please set HP_ILO_PASSWORD or HP_ILO_PASSWORD_FILE\n";
 		my $password=<PW>;
-		chomp;
+		chomp $password;
 		close PW;
 		return $password;
 	}
