@@ -48,15 +48,17 @@ for ROW in `cat ${NEW} | sed 's: :,:'`
   if [ $? = 0 ]; then
       OLD_UNKN=`echo ${OLD_UNKN} | awk '{print $1}'`
       DELTA=`expr ${UNKN} - ${OLD_UNKN}`
+      NEW_ENTRY=0
   else
       OLD_UNKN="N/A" # new language not present in <old stats>
-      DELTA=-1 
+      NEW_ENTRY=1
   fi
 
- 
-  if [ $DELTA = -1 ]; then
+
+  if [ $NEW_ENTRY = 1 ]; then
       DELTA=${UNKN}
   fi
+  
   if [ $DELTA = 0 ]; then
       DELTA="."
   fi
