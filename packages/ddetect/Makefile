@@ -9,6 +9,7 @@ LDFLAGS = -ldebconfclient
 
 bindir=$(DESTDIR)/bin/
 didir=$(DESTDIR)/lib/debian-installer.d
+pbcdir=$(DESTDIR)/usr/lib/prebaseconfig.d
 
 INSTALL=install
 INSTALL_DATA = ${INSTALL} -m 644
@@ -26,6 +27,8 @@ install-hw-detect: hw-detect.sh
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) hw-detect.sh $(bindir)/hw-detect
 	$(INSTALL) hotplug-pcmcia.sh $(bindir)/hotplug-pcmcia
+	$(INSTALL) -d $(pbcdir)
+	$(INSTALL) hw-detect.prebaseconfig $(pbcdir)/30hw-detect
 
 install-hw-detect-full:
 

@@ -466,6 +466,12 @@ if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>
 	log "Detected PCMCIA, installing pcmcia-cs."
 	apt-install pcmcia-cs || true
 
+	prebaseconfig=/usr/lib/prebaseconfig.d/30hw-detect
+	echo "mkdir /target/etc/pcmcia 2>/dev/null || true" \
+		>>$prebaseconfig
+	echo "cp /etc/pcmcia/config.opts /target/etc/pcmcia/config.opts" \
+		>>$prebaseconfig
+
 	# Determine devnames.
         if [ -f /var/run/stab ]; then
                 mkdir -p /etc/network
