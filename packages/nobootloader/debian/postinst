@@ -12,28 +12,29 @@ findfs () {
 	mount | grep "on /target${1%/} " | cut -d' ' -f1
 }
 
-rootfs=$(findfs /)
-bootfs=$(findfs /boot)
+rootfs_devfs=$(findfs /)
+bootfs_devfs=$(findfs /boot)
 
-if [ "" = "$bootfs" ]; then
-	bootfs=$rootfs
+if [ "bootfs_devfs" = "" ]; then
+	bootfs_devfs=$rootfs_devfs
 	boot="boot/"
 else
 	boot=""
 fi
 
-rootfs=`mapdevfs $rootfs`
+rootfs=$(mapdevfs $rootfs_devfs)
+bootfs=$(mapdevfs $bootfs_devfs)
 
 case "$ARCH","$SUBARCH" in
 	powerpc,chrp_pegasos)
 		kernel=`ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%'`
 
-		kind=`echo $bootfs | sed -e 's%/dev/%%' -e 's%/host.*$%%'`
-		host=`echo $bootfs | sed -e 's%^.*host%%' -e 's%/bus.*$%%'`
-		bus=`echo $bootfs | sed -e 's%^.*bus%%' -e 's%/target.*$%%'`
-		target=`echo $bootfs | sed -e 's%^.*target%%' -e 's%/lun.*$%%'`
-		lun=`echo $bootfs | sed -e 's%^.*lun%%' -e 's%/part.*$%%'`
-		part=$((`echo $bootfs | sed -e 's%^.*part%%'`-1))
+		kind=`echo $bootfs_devfs | sed -e 's%/dev/%%' -e 's%/host.*$%%'`
+		host=`echo $bootfs_devfs | sed -e 's%^.*host%%' -e 's%/bus.*$%%'`
+		bus=`echo $bootfs_devfs | sed -e 's%^.*bus%%' -e 's%/target.*$%%'`
+		target=`echo $bootfs_devfs | sed -e 's%^.*target%%' -e 's%/lun.*$%%'`
+		lun=`echo $bootfs_devfs | sed -e 's%^.*lun%%' -e 's%/part.*$%%'`
+		part=$((`echo $bootfs_devfs | sed -e 's%^.*part%%'`-1))
 
 		# We don't know how to map non ide or scsi disks
 		# and we have trouble when there is more than one such controller.
@@ -64,7 +65,6 @@ case "$ARCH","$SUBARCH" in
 		db_input high nobootloader/confirmation_powerpc_chrp_pegasos || true
 	;;
 	arm,netwinder)
-		bootfs=`mapdevfs $bootfs`
 		kernel="/vmlinuz"
 		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNDEV "$bootfs"
 		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNFILE "$kernel"
@@ -74,8 +74,6 @@ case "$ARCH","$SUBARCH" in
 		db_input high nobootloader/confirmation_arm_netwinder_nettrom || true
 	;;
 	*)
-		bootfs=`mapdevfs $bootfs`
-
 		db_get debian-installer/kernel/linux/link_in_boot
 		link_in_boot="$RET"
 		if [ "$link_in_boot" = "true" ]; then
