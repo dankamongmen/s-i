@@ -31,79 +31,72 @@
 
 static struct debconfclient *client;
 
-static char *
-debconf_input (char *priority, char *template)
+static char *debconf_input(char *priority, char *template)
 {
-  client->command (client, "fset", template, "seen", "false", NULL);
-  client->command (client, "input", priority, template, NULL);
-  client->command (client, "go", NULL);
-  client->command (client, "get", template, NULL);
-  return client->value;
+        client->command(client, "fset", template, "seen", "false", NULL);
+        client->command(client, "input", priority, template, NULL);
+        client->command(client, "go", NULL);
+        client->command(client, "get", template, NULL);
+        return client->value;
 }
 
 
-static int
-ethdetect_insmod (char *modulename)
+static int ethdetect_insmod(char *modulename)
 {
-  char buffer[128];
-  char *params = NULL;
-  params = debconf_input ("high", "ethdetect/module_params");
-  snprintf (buffer, sizeof (buffer), "modprobe -v %s %s", modulename,
-	    (params ? params : " "));
+        char buffer[128];
+        char *params = NULL;
+        params = debconf_input("high", "ethdetect/module_params");
+        snprintf(buffer, sizeof(buffer), "modprobe -v %s %s", modulename,
+                 (params ? params : " "));
 
-  if (di_execlog (buffer) != 0)
-    {
-      client->command (client, "input", "high", "ethdetect/error", NULL);
-      client->command (client, "go", NULL);
-      return 1;
-    }
-  else 
-    {
-      di_prebaseconfig_append ("ethdetect", "echo \"%s %s\" >> /etc/modules",
-                               modulename, (params ? params : " "));  
-      return 0;
-    }
+        if (di_execlog(buffer) != 0) {
+                client->command(client, "input", "high", "ethdetect/error",
+                                NULL);
+                client->command(client, "go", NULL);
+                return 1;
+        } else {
+                di_prebaseconfig_append("ethdetect",
+                                        "echo \"%s %s\" >> /etc/modules",
+                                        modulename,
+                                        (params ? params : " "));
+                return 0;
+        }
 }
 
 
-char *
-ethdetect_prompt (void)
+char *ethdetect_prompt(void)
 {
-  char *ptr;
-  char *module = NULL;
+        char *ptr;
+        char *module = NULL;
 
-  ptr = debconf_input ("high", "ethdetect/module_select");
-  if (strstr (ptr, "other"))
-    ptr = debconf_input ("high", "ethdetect/module_prompt");
-  if (ptr)
-    {
-      module = strdup (ptr);
-      return module;
-    }
-  else
-    return NULL;
+        ptr = debconf_input("high", "ethdetect/module_select");
+        if (strstr(ptr, "other"))
+                ptr = debconf_input("high", "ethdetect/module_prompt");
+        if (ptr) {
+                module = strdup(ptr);
+                return module;
+        } else
+                return NULL;
 }
 
 
-static struct ethernet_info *
-ethdetect_detect (struct cards_lst *lst)
+static struct ethernet_info *ethdetect_detect(struct cards_lst *lst)
 {
 
-  struct bus_lst bus = { 0 };
-  struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
+        struct bus_lst bus = { 0 };
+        struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
 
-  sync ();
-  bus.pci = pci_detect (lst);
-  bus.pcmcia = pcmcia_detect (lst);
+        sync();
+        bus.pci = pci_detect(lst);
+        bus.pcmcia = pcmcia_detect(lst);
 
-  if (((ethernet = ethernet_detect (&bus)) == NULL))
-    {
-      client->command (client, "input", "high", "ethdetect/nothing_detected",
-		       NULL);
-      client->command (client, "go", NULL);
-      return NULL;
-    }
-  return ethernet;
+        if (((ethernet = ethernet_detect(&bus)) == NULL)) {
+                client->command(client, "input", "high",
+                                "ethdetect/nothing_detected", NULL);
+                client->command(client, "go", NULL);
+                return NULL;
+        }
+        return ethernet;
 }
 
 
@@ -111,69 +104,68 @@ ethdetect_detect (struct cards_lst *lst)
 
 #define ETHDETECT_PCI_LIST "/usr/share/ddetect/ethpci.lst"
 
-int
-main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  char *ptr = NULL;
-  int rv = 1;
-  struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
-  char *module;
-  struct cards_lst *lst = NULL;
+        char *ptr = NULL;
+        int rv = 1;
+        struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
+        char *module;
+        struct cards_lst *lst = NULL;
 
-  lst = init_lst(ETHDETECT_PCI_LIST, NULL, NULL);
+        lst = init_lst(ETHDETECT_PCI_LIST, NULL, NULL);
 
-  client = debconfclient_new ();
-  client->command (client, "title", "Network Hardware Configuration", NULL);
+        client = debconfclient_new();
+        client->command(client, "title", "Network Hardware Configuration",
+                        NULL);
 
-  ptr = debconf_input ("high", "ethdetect/detection_type");
+        ptr = debconf_input("high", "ethdetect/detection_type");
 
-  if (strstr (ptr, "no"))
-    {
-      if ((module = ethdetect_prompt ()) == NULL)
-	return 1;
-      rv = ethdetect_insmod (module);
-      free (module);
-    }
-  else
-    {
-      ethernet = ethdetect_detect (lst);
-      for (; ethernet; ethernet = ethernet->next)
-	{
-	  client->command (client, "subst", "ethdetect/load_module", "bus",
-			   bus2str (ethernet->bus), NULL);
-	  client->command (client, "subst", "ethdetect/load_module", "module",
-			   ethernet->module, NULL);
+        if (strstr(ptr, "no")) {
+                if ((module = ethdetect_prompt()) == NULL)
+                        return 1;
+                rv = ethdetect_insmod(module);
+                free(module);
+        } else {
+                ethernet = ethdetect_detect(lst);
+                for (; ethernet; ethernet = ethernet->next) {
+                        client->command(client, "subst",
+                                        "ethdetect/load_module", "bus",
+                                        bus2str(ethernet->bus), NULL);
+                        client->command(client, "subst",
+                                        "ethdetect/load_module", "module",
+                                        ethernet->module, NULL);
 
-	  ptr = debconf_input ("high", "ethdetect/load_module");
-	  if (strstr (ptr, "true"))
-	    {
-	      if (ethdetect_insmod (ethernet->module) == 0)
-		rv = 0;
-	    }
-	}
-    }
-  return rv;
+                        ptr =
+                            debconf_input("high", "ethdetect/load_module");
+                        if (strstr(ptr, "true")) {
+                                if (ethdetect_insmod(ethernet->module) ==
+                                    0)
+                                        rv = 0;
+                        }
+                }
+        }
+        return rv;
 }
 
 #else
 
 #define ETHDETECT_PCI_LIST "ethpci.lst"
 
-int
-main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
-  struct cards_lst *lst = NULL;
-  
-  lst = init_lst(ETHDETECT_PCI_LIST, NULL, NULL);
-  
-  ethernet = ethdetect_detect(lst);
-  for (; ethernet; ethernet = ethernet->next) {
-    fprintf(stderr, "%s\n", ethernet->module);
-  };
-      
-  di_prebaseconfig_append ("ethdetect", "echo \"foo bar\" >> /etc/modules");
-  return (0);
+        struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
+        struct cards_lst *lst = NULL;
+
+        lst = init_lst(ETHDETECT_PCI_LIST, NULL, NULL);
+
+        ethernet = ethdetect_detect(lst);
+        for (; ethernet; ethernet = ethernet->next) {
+                fprintf(stderr, "%s\n", ethernet->module);
+        };
+
+        di_prebaseconfig_append("ethdetect",
+                                "echo \"foo bar\" >> /etc/modules");
+        return (0);
 }
 
 #endif
