@@ -1,9 +1,11 @@
-#!/bin/sh
-set -e
+#!/bin/sh -e
 
-echo 'ro noinitrd vmpoff="LOGOFF"' > /target/boot/parmfile
+. /usr/share/debconf/confmodule
 
-echo > /target/etc/zipl.conf << EOF
+db_get debian-installer/kernel/commandline
+echo $RET > /target/boot/parmfile
+
+cat > /target/etc/zipl.conf << EOF
 [defaultboot]
 default=debian
 
