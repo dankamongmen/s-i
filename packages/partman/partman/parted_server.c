@@ -53,7 +53,7 @@ char const program_name[] = "parted_server";
         (dump_info(logfile, dev, disk), fflush(logfile))
 
 /**********************************************************************
-   Reading from infifo and writting to outfifo
+   Reading from infifo and writing to outfifo
 **********************************************************************/
 
 /* This directory contains infifo and outfifo */
@@ -63,7 +63,7 @@ char my_directory[] = "/var/lib/partman";
 FILE *outfifo = NULL;
 
 /* Open the output FIFO.  After this function the global variable
-   outfifo can be used for writting. */
+   outfifo can be used for writing. */
 void
 open_out()
 {
@@ -105,7 +105,7 @@ open_in()
         free(str);
 }
 
-/* Do fscanf from the intput FIFO.  The arguments are the same as in
+/* Do fscanf from the input FIFO.  The arguments are the same as in
    the function `scanf' */
 #define iscanf(...) fscanf(infifo,__VA_ARGS__)
 
@@ -125,7 +125,7 @@ synchronise_with_client()
 /* This function closes infifo and outfifo.  Then in order to
    synchronise with the clients it opens and closes first outfifo and
    afterwards infifo but in oposite direction -- outfifo for reading
-   and infifo for writting. */
+   and infifo for writing. */
 void
 close_fifos_and_synchronise()
 {
