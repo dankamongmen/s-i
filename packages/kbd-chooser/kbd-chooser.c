@@ -427,7 +427,7 @@ keyboards_sort (kbd_t ** keyboards)
 	kbd_t *p = *keyboards, **prev;
 	int in_order = 1;
 
-// Yes, its bubblesort. But for this size of list, its efficient
+// Yes, it's bubblesort. But for this size of list, it's efficient
 	while (!in_order) {
 		in_order = 1;
 		p = *keyboards;
