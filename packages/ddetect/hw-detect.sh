@@ -384,7 +384,7 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 	esac
 fi
 
-# If firewire was found, try to enable firewire cd support.
+# if firewire was found, try to enable firewire cd support
 if ! is_not_loaded ohci1394; then
 	# TODO: update progress bar here (after string freeze)
 	if is_not_loaded sbp2; then
@@ -397,14 +397,12 @@ if ! is_not_loaded ohci1394; then
 	register-module sr_mod
 	case "$(uname -r)" in
 	2.4*)
-		# Rescan bus for firewire CD after loading sr_mod.
+		# rescan bus for firewire CD after loading sr_mod
 		# (Sometimes this echo fails.)
 		echo "scsi add-single-device 0 0 0 0" > /proc/scsi/scsi || true
 	;;
 	esac
 fi
-
-# get pcmcia running if possible
 
 apply_pcmcia_resource_opts() {
 	local config_opts=/etc/pcmcia/config.opts
@@ -444,6 +442,7 @@ apply_pcmcia_resource_opts() {
 	done
 }
 
+# get pcmcia running if possible
 if [ -x /etc/init.d/pcmcia ]; then
 	if ! [ -e /var/run/cardmgr.pid ]; then
 		db_input medium hw-detect/start_pcmcia || true
@@ -465,14 +464,14 @@ if [ -x /etc/init.d/pcmcia ]; then
 			rm -f /var/run/cardmgr.pid
 		fi
 
-		# If hotplugging is available in the kernel, we can use it to load
-		# modules for Cardbus cards and tell which network interfaces belong
-		# to PCMCIA devices. The former is only necessary on 2.4 kernels,
-		# though.
+		# If hotplugging is available in the kernel, we can use it to
+		# load modules for Cardbus cards and tell which network
+		# interfaces belong to PCMCIA devices. The former is only
+		# necessary on 2.4 kernels, though.
 		if [ -f /proc/sys/kernel/hotplug ]; then
-			# Snapshot discover information so we can detect modules for
-			# Cardbus cards by later comparison in the hotplug handler.
-			# (Only on 2.4 kernels.)
+			# Snapshot discover information so we can detect
+			# modules for Cardbus cards by later comparison in
+			# the hotplug handler. (Only on 2.4 kernels.)
 			if expr `uname -r` : "2.4.*" >/dev/null 2>&1; then
 				case "$DISCOVER_VERSION" in
 				2)
@@ -491,7 +490,8 @@ if [ -x /etc/init.d/pcmcia ]; then
 				esac
 			fi
 		
-			# Simple handling of hotplug events during PCMCIA detection
+			# Simple handling of hotplug events during PCMCIA
+			# detection
 			saved_hotplug=`cat /proc/sys/kernel/hotplug`
 			echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
 		fi
@@ -548,7 +548,7 @@ case "$(uname -r)" in
   ;;
 esac
 
-# Find Cardbus network cards on 2.6 kernels
+# find Cardbus network cards on 2.6 kernels
 cardbus_check_netdev()
 {
 	local socket="$1"
