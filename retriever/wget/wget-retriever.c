@@ -52,10 +52,10 @@ int main(int argc, char **argv) {
 #endif
 	}
 	
-	command=malloc( 20 /* wget --quiet http:// */ + strlen(hostname) +
+	command=malloc( 15 /* wget -q http:// */ + strlen(hostname) +
 			strlen(directory) + 1 /* / */ + strlen(src) +
 			4 /*  -O  */ + strlen(argv[2]) + 1);
-	sprintf(command, "wget --quiet http://%s%s/%s -O %s", hostname,
+	sprintf(command, "wget -q http://%s%s/%s -O %s", hostname,
 			directory, src, argv[2]);
 	ret=system(command);
 	if (ret == 256)
