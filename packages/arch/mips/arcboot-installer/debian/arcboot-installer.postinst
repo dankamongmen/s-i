@@ -59,10 +59,14 @@ fi
 # The arcboot postinst wants to read $bootdev from debconf _in the chroot_,
 # which is still empty. We ignore the resulting apt-install error and do the
 # install ourself. If apt-install fails for a different reason, we are lost.
+#
+# mount proc since arcboot needs it to find out the subarchitecture
+mount -t proc proc /target/proc
 set +e
 apt-install arcboot
 chroot /target /usr/sbin/arcboot $bootdev
 set -e
+umount /target/proc
 
 #if ! apt-install arcboot; then
 #	log "Calling 'apt-install arcboot' failed"
