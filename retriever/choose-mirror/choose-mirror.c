@@ -124,19 +124,14 @@ char *mirror_root(char *mirror) {
 }
 
 int choose_country(void) {
-
-
 	if (country)
 		free(country);
 	country = NULL;
 
 	/* Pick a default country from elsewhere, eg languagechooser,*/
-	debconf_get(debconf, DEBCONF_BASE "country");
-
-	if (strcmp(debconf->value, "question will be asked") == 0) {
+	if (debconf_get(debconf, DEBCONF_BASE "country") == 0) {
 		// Not set yet. Seed with a default value
 		if ((debconf_get(debconf, "debian-installer/country") == 0) &&
-		    (strcmp(debconf->value, "question will be asked") != 0) &&
 		    (debconf->value != NULL) ) {
 				country = strdup (debconf->value);
 				debconf_set (debconf, DEBCONF_BASE "country", country);
@@ -145,7 +140,7 @@ int choose_country(void) {
 		country = debconf->value;
 
 	// Ensure 'country' set to something
-	if (strlen(country) == 0)
+	if (country && strlen(country) == 0)
 		country = NULL;
 	if (country == NULL)
 		country = "US";

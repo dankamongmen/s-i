@@ -2,6 +2,7 @@ CFLAGS=-Wall -g -D_GNU_SOURCE -DWITH_HTTP -DWITH_FTP
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=choose-mirror
 LIBS=-ldebconfclient
+MIRRORLISTURL=http://cvs.debian.org/*checkout*/webwml/english/mirror/Mirrors.masterlist?rev=HEAD&cvsroot=webwml&content-type=text/plain
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG
@@ -9,12 +10,15 @@ endif
 
 all: $(BIN) debian/choose-mirror.templates
 
-Mirrors.masterlist:
-	if wget -nv 'http://cvs.debian.org/*checkout*/webwml/english/mirror/Mirrors.masterlist?rev=HEAD&cvsroot=webwml&content-type=text/plain' -O - > $@.new; then \
-           if test -s $@.new; then \
-              mv $@.new $@; \
-           fi; \
-        fi
+# Freshen Mirrors.masterlist file, but allow failure.
+Mirrors.masterlist: force-try-update
+	if wget -nv '$(MIRRORLISTURL)' -O - > $@.new && \
+	   test -s $@.new; then \
+        	mv $@.new $@; \
+	else \
+		rm -f $@.new; \
+	fi
+force-try-update: ;
 
 debian/choose-mirror.templates:  Mirrors.masterlist
 	./makeheader.pl template
