@@ -10,7 +10,7 @@ fstab=$(
     while read fs mp type options dump pass; do
 	case "$fs" in
 	    /dev/ide/host*/bus[01]/target[01]/lun0/part*|/dev/scsi/host*/bus*/target*/lun*/part*)
-                echo "\$$fs ${mp} $type $options $dump $pass"
+                echo "$(map_devfs $fs) ${mp} $type $options $dump $pass"
 		;;
 	esac 
     done
