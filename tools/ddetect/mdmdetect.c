@@ -39,15 +39,13 @@ main (int argc, char *argv[])
 
   if (((modem = modem_detect (&bus)) != NULL) && (debug == 1))
     {
-      printf ("%s:%s:%s:%s:%s:%s\n",
-	      "bus", "vendor", "model", "device", "speed", "module");
+      printf ("bus:device:speed:module\n");
     }				/*endif */
   for (; modem; modem = modem->next)
     {
-      printf ("%s:%s:%s:%s:%ld:%s\n",
+      printf ("%s:%s:%ld:%s\n",
 	      bus2str (modem->bus),
-	      modem->vendor,
-	      modem->model, modem->device, modem->speed, modem->module);
+	      modem->device, modem->speed, modem->module);
     }				/*next modem */
 
   return 0;

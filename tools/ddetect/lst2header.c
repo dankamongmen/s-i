@@ -84,6 +84,8 @@ main (int argc, char *argv[])
 
   printf ("*/\n\n\n\n");
 
+  printf ("static char unknown_str[]=\"unknown\";\n\n");
+  
   printf ("struct cards_lst lst[] = {\n");
   ptr = lst;
   while (ptr)
@@ -94,9 +96,7 @@ main (int argc, char *argv[])
 	  || (ptr->type == MODEM && modem_flag))
 	{
 	  printf
-	    ("{\"%s\", \t\"%s\", \t\"%s\", \t%d,\t\"%s\", \t%d, \t%d, \t%d, \tNULL},\n",
-	     (ptr->vendor ? ptr->vendor : "unknown"),
-	     (ptr->model ? ptr->model : "unknown"),
+	    ("{ unknown_str, \tunknown_str, \t\"%s\", \t%d,\t\"%s\", \t%d, \t%d, \t%d, \tNULL},\n",
 	     (ptr->modulename ? ptr->modulename : "unknown"), ptr->bus,
 	     (ptr->dev_id ? ptr->dev_id : "unknown"), ptr->long_id, ptr->type,
 	     ptr->options);
@@ -105,5 +105,6 @@ main (int argc, char *argv[])
     }
   printf ("{NULL}};\n");
 
+  return 0;
 
 }

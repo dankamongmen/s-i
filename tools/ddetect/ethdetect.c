@@ -39,13 +39,13 @@ main (int argc, char *argv[])
 
   if (((ethernet = ethernet_detect (&bus)) != NULL) && (debug == 1))
     {
-      printf ("\n%s:%s:%s:%s\n", "bus", "vendor", "model", "module");
+      printf ("\nbus:module\n");
     }				/*endif */
   for (; ethernet; ethernet = ethernet->next)
     {
-      printf ("%s:%s:%s:%s\n",
+      printf ("%s:%s\n",
 	      bus2str (ethernet->bus),
-	      ethernet->vendor, ethernet->model, ethernet->module);
+	      ethernet->module);
     }				/*next ethernet */
 
 

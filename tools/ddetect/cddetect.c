@@ -37,13 +37,13 @@ main (int argc, char *argv[])
 
   if (((cdrom = cdrom_detect (&bus)) != NULL) && (debug == 1))
     {
-      printf ("\n%s:%s:%s:%s\n", "bus", "vendor", "model", "device");
+      printf ("\nbus:model:device\n");
     }				/*endif */
   for (; cdrom; cdrom = cdrom->next)
     {
-      printf ("%s:%s:%s:%s\n",
+      printf ("%s:%s:%s\n",
 	      bus2str (cdrom->bus),
-	      cdrom->vendor, cdrom->model, cdrom->device);
+	      cdrom->model, cdrom->device);
     }				/*next cdrom */
 
 
