@@ -79,7 +79,7 @@ void insert_line(const char *line) {
 	} else if(strstr(dummy->typ, "swap")) {
 		dummy->options = strdup("sw");
 	} else {
-		if(!strcasecmp(mountpoint, TARGET)) {
+		if(strcmp(dummy->mountpoint, "/") == 0) {
 			dummy->options = strdup("defaults,errors=remount-ro");
 		} else {
 			dummy->options = strdup("defaults");
