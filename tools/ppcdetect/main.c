@@ -5,28 +5,36 @@ char *machine = NULL;
 char *generation = NULL;
 
 static void detect_newworld() {
-	if(strstr(generation, "NewWorld") > 0) {
-		printf("NewWorld\n");
+	if(check_value(generation, "NewWorld", NULL))
 		exit(0);
-	}
 }
 
 static void detect_prep() {
-	if(strstr(machine, "PReP") > 0) {
-		printf("PReP\n");
+	if(check_value(machine, "PReP", NULL))
 		exit(0);
-	}
 }
 
 static void detect_chrp() {
-	if(strstr(machine, "CHRP Pegasos") > 0) {
-		printf("CHRP Pegasos\n");
+	if(check_value(machine, "CHRP Pegasos", NULL))
 		exit(0);
-	}
-	if(strstr(machine, "CHRP") > 0) {		/* fallback to CHRP */
-		printf("CHRP\n");
+	if(check_value(machine, "CHRP", NULL))
 		exit(0);
+}
+
+int check_value(const char *key, const char* value, const char *msg) {
+	/* make NULL-pointer sanity */
+	if((key == NULL) || (value == NULL))
+		return(FALSE);
+
+	if(strstr(key, value) > 0) {
+		if(msg != NULL)
+			printf("%s\n", msg);
+		else
+			printf("%s\n", value);
+		return(TRUE);
 	}
+
+	return(FALSE);
 }
 
 int main(int argc, char *argv[]) {
@@ -48,22 +56,27 @@ int main(int argc, char *argv[]) {
 	}
 
 	while(fgets(line, 1024, cpuinfo) != NULL) {
-		char key[1024], value[1024];
+		char *pos = NULL;
+		int buflen = 0;
 
-		sscanf(line, "%s : %s", key, value);
-		if((key == NULL) || (strlen(key) < 0)) {
-			printf("break me\n");
-			break;
+		if(line == NULL)
+			continue;
+		pos = strchr(line, ':');
+		if(pos == NULL)
+			continue;
+		pos++;
+		while(pos != NULL && pos[0] == 32)
+			pos++;
+		buflen = strlen(pos)-1;
+
+		if(strstr(line, "machine") == line) {
+			machine = (char*)malloc(sizeof(char)*buflen);
+			strncpy(machine, pos, buflen);
 		}
 
-		if(strstr(key, "machine") > 0) {
-			machine = (char*)malloc(sizeof(char)*1024);
-			strncpy(machine, value, 1024);
-		}
-
-		if(strstr(key, "pmac-generation") > 0) {
-			generation = (char*)malloc(sizeof(char)*1024);
-			strncpy(generation, value, 1024);
+		if(strstr(line, "pmac-generation") == line) {
+			generation = (char*)malloc(sizeof(char)*buflen);
+			strncpy(generation, pos, buflen);
 		}
 	}
 
