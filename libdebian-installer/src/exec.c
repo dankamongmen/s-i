@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.4 2003/09/29 14:08:48 waldi Exp $
+ * $Id: exec.c,v 1.5 2003/09/30 14:28:45 waldi Exp $
  */
 
 #include <debian-installer/exec.h>
@@ -69,13 +69,15 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
 #endif
 
     if (prepare_handler)
-      prepare_handler (prepare_user_data);
+      if (prepare_handler (prepare_user_data))
+        exit (255);
 
     execv (path, (char *const *) argv);
     exit (127);
   }
   else if (pid < 0)
   {
+    di_log (DI_LOG_LEVEL_WARNING, "fork failed");
     return -1;
   }
   else

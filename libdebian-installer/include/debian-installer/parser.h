@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.h,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: parser.h,v 1.3 2003/09/30 14:28:45 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PARSER_H
@@ -110,15 +110,10 @@ struct di_parser_fieldinfo
 };
 
 /**
- * generate a single di_parser_fieldinfo
+ * generates a di_parser_fieldinfo
  */
 #define DI_PARSER_FIELDINFO(name, read, write, integer) \
   { { name, sizeof (name) - 1 }, read, write, integer }
-/**
- * generate a terminator di_parser_fieldinfo
- */
-#define DI_PARSER_FIELDINFO_END \
-  { { NULL, 0 }, NULL, NULL, 0 }
 
 /** @} */
 

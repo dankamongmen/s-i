@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.5 2003/09/29 12:10:00 waldi Exp $
+ * $Id: packages.c,v 1.6 2003/09/30 14:28:45 waldi Exp $
  */
 
 #include <debian-installer/system/packages.h>
@@ -33,11 +33,19 @@ const di_parser_fieldinfo
       di_parser_read_int,
       di_parser_write_int,
       offsetof (di_system_package, installer_menu_item)
+    ),
+  internal_di_system_package_parser_field_subarchitecture =
+    DI_PARSER_FIELDINFO (
+      "Subarchitecture",
+      di_parser_read_string,
+      di_parser_write_string,
+      offsetof (di_system_package, subarchitecture)
     );
 
 const di_parser_fieldinfo *di_system_package_parser_fieldinfo[] =
 {
   &internal_di_system_package_parser_field_installer_menu_item,
+  &internal_di_system_package_parser_field_subarchitecture,
   NULL
 };
 
@@ -77,8 +85,7 @@ di_parser_info *di_system_package_parser_info (void)
 {
   di_parser_info *info;
 
-  info = di_parser_info_alloc ();
-  di_parser_info_add (info, di_package_parser_fieldinfo);
+  info = di_package_parser_info ();
   di_parser_info_add (info, di_system_package_parser_fieldinfo);
 
   return info;
@@ -88,8 +95,7 @@ di_parser_info *di_system_packages_parser_info (void)
 {
   di_parser_info *info;
 
-  info = di_parser_info_alloc ();
-  di_parser_info_add (info, di_packages_parser_fieldinfo);
+  info = di_packages_parser_info ();
   di_parser_info_add (info, di_system_package_parser_fieldinfo);
 
   return info;
@@ -99,8 +105,7 @@ di_parser_info *di_system_packages_status_parser_info (void)
 {
   di_parser_info *info;
 
-  info = di_parser_info_alloc ();
-  di_parser_info_add (info, di_packages_status_parser_fieldinfo);
+  info = di_packages_status_parser_info ();
   di_parser_info_add (info, di_system_package_parser_fieldinfo);
 
   return info;
