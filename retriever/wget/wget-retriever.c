@@ -3,21 +3,20 @@
  * Copyright 2000 Joey Hess <joeyh@debian.org>, GPL'd
  *
  * TODO: enable continuation if not going to stdout.
+ * TODO: proxy support
+ * TODO: could stand to be a little more stable when it encounters NULLs.
  */
 
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include "debconf.h"
 
 #define DEBCONF_BASE "mirror/"
 
 int main(int argc, char **argv) {
-	int status;
-	char *hostname, *directory, *dest, *url;
+	int ret;
+	char *hostname, *directory, *dest, *command;
 					    // TODO: what about ftp?
 	debconf_command("GET", DEBCONF_BASE "http/hostname", NULL);
 	hostname=strdup(debconf_ret());
@@ -29,16 +28,13 @@ int main(int argc, char **argv) {
 	else
 		dest=argv[2];
 	
-	url=malloc( 7 /* http:// */ + strlen(hostname) + strlen(directory) +
-		   1 /* / */ + strlen(argv[1]) + 1);
-	sprintf(url, "http://%s%s/%s", hostname, directory, argv[1]);
-
-	if (fork() == 0) {
-		execlp("echo", "echo", "wget", url, "-O", dest, NULL);
-		return 127;
-	}
-	else {
-		wait(&status);
-		return status;
-	}
+	command=malloc( 20 /* wget --quiet http:// */ + strlen(hostname) +
+			strlen(directory) + 1 /* / */ + strlen(argv[1]) +
+			4 /*  -O  */ + strlen(dest) + 1);
+	sprintf(command, "wget --quiet http://%s%s/%s -O %s", hostname,
+			directory, argv[1], dest);
+	ret=system(command);
+	if (ret == 256)
+		return 1;
+	return ret;
 }
