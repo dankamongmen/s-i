@@ -17,7 +17,6 @@ do_mountpoint () {
 	else
 	    old_mountpoint=/
 	fi
-	db_fset partman-basicfilesystems/mountpoint seen false
 	db_set partman-basicfilesystems/mountpoint "$old_mountpoint"
 	db_input critical partman-basicfilesystems/mountpoint || $noninteractive
 	db_go || return 1
@@ -50,7 +49,6 @@ do_mountpoint_manual () {
 	    else
 		old_mountpoint=/
 	    fi
-	    db_fset partman-basicfilesystems/mountpoint_manual seen false
 	    db_set partman-basicfilesystems/mountpoint_manual "$old_mountpoint"
 	    db_input critical partman-basicfilesystems/mountpoint_manual \
 		|| $noninteractive
@@ -60,7 +58,6 @@ do_mountpoint_manual () {
 	    if expr "$RET" : '/[^ ]*' >/dev/null; then
 		new_mountpoint=$RET
 	    else
-		db_fset partman-basicfilesystems/bad_mountpoint seen false
 		db_input high partman-basicfilesystems/bad_mountpoint || true
 		db_go || true
 	    fi
