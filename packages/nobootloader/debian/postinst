@@ -80,6 +80,16 @@ case "$ARCH","$SUBARCH" in
 		db_subst nobootloader/confirmation_powerpc_chrp_pegasos OF_BOOT_FILE "${boot}${kernel} root=${rootfs}"
 		db_input high nobootloader/confirmation_powerpc_chrp_pegasos || true
 	;;
+	arm,netwinder)
+		bootfs=`mapdevfs $bootfs`
+		kernel="/vmlinuz"
+		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNDEV "$bootfs"
+		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNFILE "$kernel"
+		db_subst nobootloader/confirmation_arm_netwinder_nettrom ROOTDEV "$rootfs"
+		# TODO: handle serial console
+		db_subst nobootloader/confirmation_arm_netwinder_nettrom CMDAPPEND "root=$rootfs"
+		db_input high nobootloader/confirmation_arm_netwinder_nettrom || true
+	;;
 	*)
 		bootfs=`mapdevfs $bootfs`
 

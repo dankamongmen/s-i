@@ -18,6 +18,26 @@ _Description: No boot loader installed
   setenv auto-boot-timeout 5000
   setenv auto-boot? true
 
+Template: nobootloader/confirmation_arm_netwinder_nettrom
+Type: note
+_Description: Setting firmware variables for automatic boot
+ Some variables need to be set in the Netwinder NeTTrom firmware in
+ order for your system to boot Debian automatically.  At the end of
+ this installation stage, the system will reboot, and the firmware
+ will attempt to autoboot.  You can abort this by pressing any key.
+ You will then be dropped into the NeTTrom command system where you
+ have to execute the following commands:
+ .
+    setenv kernconfig fs
+    setenv kerndev ${KERNDEV}
+    setenv kernfile ${KERNFILE}
+    setenv rootdev ${ROOTDEV}
+    setenv cmdappend ${CMDAPPEND}
+    save-all
+ .
+ You will only need to do this once.  Afterwards, enter the "boot" command
+ or reboot the system to proceed to the next Debian installation stage.
+
 Template: nobootloader/confirmation_common
 Type: note
 _Description: No boot loader installed
