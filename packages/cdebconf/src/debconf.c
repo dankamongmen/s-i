@@ -47,8 +47,12 @@ static void cleanup()
 
 void sighandler(int sig)
 {
+	int status = 1;
 	if (sig == SIGCHLD)
-		wait(NULL);
+	{
+		wait(&status);
+		status = di_exec_mangle_status(status);
+	}
 	save();
 	/*
 	 * SIGUSR1 used to reconfigure the language. Now it
@@ -57,7 +61,7 @@ void sighandler(int sig)
 	if (sig == SIGUSR1)
 		return;
 	cleanup();
-	exit(1);
+	exit(status);
 }
 
 void help(const char *exename)

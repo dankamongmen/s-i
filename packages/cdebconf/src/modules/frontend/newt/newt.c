@@ -1167,6 +1167,7 @@ static int
 newt_shutdown(struct frontend *obj)
 {
     newt_progress_stop(obj);
+    newtFinished();
     return DC_OK;
 }
 
