@@ -1,3 +1,5 @@
+WARNING: This translation is out of date.
+
 	Πώς να εγκαταστήσετε την Debian Sarge με τον καινούριο debian-install
 	---------------------------------------------------------------------
 	
