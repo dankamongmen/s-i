@@ -18,6 +18,10 @@
 #error Must compile with at least one of FTP and HTTP
 #endif
 
+typedef enum { CM_NONE = -1, CM_PROTOCOL,  CM_COUNTRY, CM_MIRROR, CM_PROXY, CM_VALIDATE, CM_DISTRIBUTION, CM_FINISHED } cm_state;
+
+cm_state last_asked = CM_NONE, asked = CM_NONE;
+
 struct debconfclient *debconf;
 char *protocol = NULL;
 char *country  = NULL;
@@ -116,7 +120,6 @@ char *mirror_root(char *mirror) {
 	for (i = 0; mirrors[i].site != NULL; i++)
 		if (strcmp(mirrors[i].site, mirror) == 0)
 			return mirrors[i].root;
-
 	return NULL;
 }
 
@@ -152,7 +155,8 @@ int choose_country(void) {
 		if (has_mirror(country)) {
 			debconf_set(debconf, DEBCONF_BASE "http/countries", country);
 		}
-		debconf_input(debconf, "medium", DEBCONF_BASE "http/countries");
+		if (debconf_input(debconf, "high", DEBCONF_BASE "http/countries") == 0)
+			asked =  CM_COUNTRY;
 	}
 #endif
 #ifdef WITH_FTP
@@ -160,7 +164,8 @@ int choose_country(void) {
 		if (has_mirror(country)) {
 			debconf_set(debconf, DEBCONF_BASE "ftp/countries", country);
 		}
- 		debconf_input(debconf, "medium", DEBCONF_BASE "ftp/countries");
+ 		if (debconf_input(debconf, "high", DEBCONF_BASE "ftp/countries") == 0)
+			asked = CM_COUNTRY;
 	}
 #endif
 
@@ -183,7 +188,8 @@ int choose_protocol(void) {
 #if defined (WITH_HTTP) && defined (WITH_FTP)
 	/* Both are supported, so ask. */
 	debconf_subst(debconf, DEBCONF_BASE "protocol", "protocols", "http, ftp");
-	debconf_input(debconf, "medium", DEBCONF_BASE "protocol");
+	if (debconf_input(debconf, "medium", DEBCONF_BASE "protocol") == 0)
+		asked = CM_PROTOCOL;
 	ret = debconf_go(debconf);
 	debconf_get(debconf, DEBCONF_BASE "protocol");
 	protocol = strdup(debconf->value);
@@ -197,16 +203,16 @@ int choose_protocol(void) {
 	protocol = "ftp";
 #endif
 #endif /* WITH_HTTP && WITH_FTP */
+	
 	return ret;
 }
 
 /* Choose which distribution to install. */
 int choose_distribution(void) {
-	int ret = 0;
 
-	ret = debconf_input(debconf, "high", DEBCONF_BASE "distribution");
-	ret = debconf_go (debconf);
-	return ret;
+	if (debconf_input(debconf, "high", DEBCONF_BASE "distribution"))
+		asked = CM_DISTRIBUTION;
+	return debconf_go (debconf);
 }
 
 
@@ -214,7 +220,6 @@ int manual_entry;
 
 int choose_mirror(void) {
 	char *list;
-	int ret = 0;
 
 	debconf_get(debconf, DEBCONF_BASE "country");
 	manual_entry = ! strcmp(debconf->value, "enter information manually");
@@ -225,25 +230,36 @@ int choose_mirror(void) {
 		debconf_subst(debconf, add_protocol("mirror"), "mirrors", list);
 		free(list);
 		
-		ret = debconf_input(debconf, "medium", add_protocol("mirror"));
-		
+		if (debconf_input(debconf, "high", add_protocol("mirror")) == 0)
+			asked = CM_MIRROR;
+		return debconf_go (debconf);
 	}
 	else {
 		/* Manual entry. */
-		ret = debconf_input(debconf, "critical", add_protocol("hostname"));
-		if (ret == 0) {
-			ret = debconf_input(debconf, "critical", add_protocol("directory"));
+		asked = CM_MIRROR;
+		while (1) {
+			debconf_input(debconf, "critical", add_protocol("hostname"));
+			if (debconf_go (debconf) == 0) {
+				debconf_input(debconf, "critical", add_protocol("directory"));
+				if (debconf_go (debconf) == 0)
+					return 0;
+			} else
+				return 30;
 		}
 	}
-	/* Always ask about a proxy. */
-	if (!ret) {
-		ret = debconf_input(debconf,"high", add_protocol("proxy"));
-	}
-
-	ret = debconf_go (debconf);
-
-	return ret;
+	return 0; /* not reached */
 }
+
+
+int choose_proxy(void) {
+
+	/* Always ask about a proxy. */
+	if (debconf_input (debconf, "high", add_protocol("proxy")) == 0)
+		asked = CM_PROXY;
+	return debconf_go(debconf);
+	
+}
+
 
 int validate_mirror(void) {
 	char *mirror;
@@ -284,12 +300,13 @@ int validate_mirror(void) {
 
 int main (int argc, char **argv) {
 	/* Use a state machine with a function to run in each state */
-	int state = 0;
+	cm_state state = CM_PROTOCOL;
 	int ret;
 	int (*states[])() = {
 		choose_protocol,
 		choose_country,
 		choose_mirror,
+		choose_proxy,
 		validate_mirror,
                 choose_distribution,
 		NULL,
@@ -299,19 +316,22 @@ int main (int argc, char **argv) {
 	debconf_capb(debconf, "backup");
 	debconf_version(debconf, 2);
 
+	last_asked = asked = CM_NONE;
+
 	/*
-	 * It's a pretty brain-dead state machine though. It advances
-	 * forward and back by one state always. Enough for our purposes.
+	 * It's a pretty brain-dead state machine though. 
 	 */
 	while (state >= 0 && states[state]) {
 		ret = states[state]();
-			
-		if (!ret) 
+		
+		if (ret)  // goback signalled
+			state = (asked == last_asked) ? last_asked -1 : last_asked; 
+		else  {
+			last_asked = asked;
 			state++;
-		else
-			state = (state == 4) ? 2 : (state-1); // Ugh. Fix.
+		}
 	}
-	if (state >= 0)
+	if (state >= 0) 
 		exit(0);
 	else
 		exit(10); /* backed all the way out */
