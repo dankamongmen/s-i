@@ -36,6 +36,9 @@ void insert_line(const char *line) {
 	char typ[1024];
 	char options[1024];
 
+	if(line[0] == '#')
+		return;
+
 	dummy = malloc(sizeof(*dummy));
 	if(dummy == NULL) {
 		fprintf(stderr, "Unable to allocate memory!\n");
