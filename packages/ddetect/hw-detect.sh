@@ -205,8 +205,11 @@ get_ide_chipset_info() {
 
 # Return list of lines formatted "module:Description"
 get_detected_hw_info() {
-	if [ "`udpkg --print-architecture`" = powerpc ]; then
+	if [ ${SUBARCH%%/*} = powerpc ]; then
 		discover-mac-io
+	fi
+	if [ ${SUBARCH##*/} = chrp_rs6k ]; then
+		discover-rs6k-io
 	fi
 	discover_hw
 	if [ -d /proc/bus/usb ]; then

@@ -32,6 +32,7 @@ install-hw-detect: hw-detect.sh
 	$(INSTALL) hw-detect.prebaseconfig $(pbcdir)/30hw-detect
 ifeq ($(DEB_HOST_ARCH),powerpc)
 	$(INSTALL) discover-mac-io.sh $(bindir)/discover-mac-io
+	$(INSTALL) discover-rs6k-io.sh $(bindir)/discover-rs6k-io
 endif
 
 install-hw-detect-full:
