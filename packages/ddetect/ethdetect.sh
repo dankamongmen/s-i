@@ -18,7 +18,6 @@ is_not_loaded() {
 load_module() {
 	local module="$1"
 	local priority=low
-	local is_manual="$2"
     
 	case "$module" in
 	"plip")
@@ -30,7 +29,7 @@ load_module() {
 		;;
 	esac
 	
-	module_probe "$module" "$priority" "$is_manual"
+	module_probe "$module" "$priority"
 }
 
 snapshot_devs() {
