@@ -1,4 +1,4 @@
-debian-installer-utils (0.28) UNRELEASED; urgency=low
+debian-installer-utils (0.28) unstable; urgency=low
 
   * Claus Hindsgaul
     - Update da (Danish) translation.
@@ -10,8 +10,33 @@ debian-installer-utils (0.28) UNRELEASED; urgency=low
     - Add a comment in templates file to flag the main menu item.
   * Kęstutis Biliūnas
     - Add Lithuanian (lt.po) translation.
+  * Joey Hess
+    - Add a postinst for di-utils-shell. Closes: #215158
+    - Set DH_OPTIONS=-n to remove eg, debconf-generated postrm files.
+    - Fix build-dependency on libdebconfclient-dev (add 0).
+    - Clarified the wording of di-utils-shell/do-shell.
+    - Add myself to uploaders.
+    - Remove udpkg.c. Put it back when it works and is ready to be used, for
+      now it is just confusing.
+    - Remove exec binary. It doesn't work, and the name is wrong (exec is a
+      shell builtin!)
+    - Add usage message to di-utils if it's run directly.
+    - Remove di-utils-fake-*. There are better approaches.
+    - Remove standard-version, udebs are not standards-compliant.
+    - Removed various unreferenced files in debian/.
+    - Update to debhelper v4.
+    - Trim cruft from .cvsignore.
+    - Bump the priority of the di-utils-shell/do-shell to high.
+      It is an informational message, and those running at high priority
+      levels are the ones who need to read it most, probably.
+    - Simplified rules file; use dh_builddeb, dh_gencontrol.
+    - Break shell back out of the multicall binary (which is now a single-call
+      binary, whee!), and make di-utils-shell use a compiled postinst.
+    - Fix debhelper command invocations for split arch/indep package.
+      Although it's all arch dep right now, there will be an indep package
+      soon.
 
- -- Alastair McKinstry <mckinstry@debian.org>  Sun, 12 Oct 2003 13:46:18 +0100
+ -- Joey Hess <joeyh@debian.org>  Thu, 16 Oct 2003 15:09:06 -0400
 
 debian-installer-utils (0.27) unstable; urgency=low
 
