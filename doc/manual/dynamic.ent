@@ -1,0 +1,1894 @@
+<!-- -*- DocBook -*- -->
+<!-- These entries should be language independent.  -->
+<!-- The *first* definition of an ENTITY wins.      -->
+
+<!-- nouns to refer to the core floppies -->
+<!-- These are now obsolete, translators can use something similar to -->
+<!-- the following in their language directory to replace them: -->
+<!-- perl -pi -e "s|&RESCUE-FLOPPY;|rescue floppy|g" *.sgml  -->
+<!ENTITY RESCUE-FLOPPY "Rescue Floppy">
+<!ENTITY DRIVER-FLOPPY "Driver Floppies">
+
+<!-- proper (long) name to use for Debian -->
+<!ENTITY debian "Debian GNU/Linux">
+
+<!-- name for the enter key -->
+<![ %lang-fr   [ <!ENTITY enterkey "<emphasis>Entrée</emphasis>"> ]]>
+<![ %lang-da   [ <!ENTITY enterkey "<emphasis>retur</emphasis>"> ]]>
+<!ENTITY enterkey '<emphasis>Enter</emphasis>'>
+
+<!-- architecture list; conditional definitions are used to emit 
+     the proper version of the documentation.  You should be able to run
+     your SGML processor with '-i <arch>' in order to change the
+     architecture.  Note the comments are magic; they help the
+     Makefile so it knows the available architectures, so don't mess
+     with em. -->
+<!ENTITY % alpha   "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % arm     "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % hppa    "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % i386    "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % ia64    "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % m68k    "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % mips    "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % mipsel  "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % powerpc "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % s390    "IGNORE"><!-- ARCHMAGIC do not remove -->
+<!ENTITY % sparc   "IGNORE"><!-- ARCHMAGIC do not remove -->
+
+<!-- proper nouns for architectures -->
+
+<![ %alpha   [ <!ENTITY arch-title "Alpha"         > ]]>
+<![ %arm     [ <!ENTITY arch-title "ARM"           > ]]>
+<![ %hppa    [ <!ENTITY arch-title "PA-RISC"       > ]]>
+<![ %i386    [ <!ENTITY arch-title "Intel x86"     > ]]>
+<![ %ia64    [ <!ENTITY arch-title "IA-64"         > ]]>
+<![ %m68k    [ <!ENTITY arch-title "Motorola 680x0"> ]]>
+<![ %mips    [ <!ENTITY arch-title "Mips"          > ]]>
+<![ %mipsel  [ <!ENTITY arch-title "Mipsel"        > ]]>
+<![ %powerpc [ <!ENTITY arch-title "PowerPC"       > ]]>
+<![ %sparc   [ <!ENTITY arch-title "SPARC"         > ]]>
+<![ %s390    [ <!ENTITY arch-title "S/390"         > ]]>
+               <!ENTITY arch-title "lame arch with no title">
+
+<!-- default 2.2 kernel version series for woody release -->
+<![ %alpha   [ <!ENTITY % default-kernel-2.2 "INCLUDE"> ]]>
+<![ %arm     [ <!ENTITY % default-kernel-2.2 "INCLUDE"> ]]>
+<![ %i386    [ <!ENTITY % default-kernel-2.2 "INCLUDE"> ]]>
+<![ %m68k    [ <!ENTITY % default-kernel-2.2 "INCLUDE"> ]]>
+<![ %sparc   [ <!ENTITY % default-kernel-2.2 "INCLUDE"> ]]>
+<![ %powerpc [ <!ENTITY % default-kernel-2.2 "INCLUDE"> ]]>
+               <!ENTITY % default-kernel-2.2 "IGNORE">
+
+<!-- available language codes for 'setlang [code]' -->
+<!ENTITY setlang-language-code-list "ca cs da de eo es fi fr gl hr hu it ko ja pl pt ru sk sv tr zh_CN">
+
+<!-- negatives about architectures -->
+<![ %alpha   [ <!ENTITY % not-alpha   "IGNORE"> ]]>
+               <!ENTITY % not-alpha   "INCLUDE">
+<![ %arm     [ <!ENTITY % not-arm     "IGNORE"> ]]>
+               <!ENTITY % not-arm     "INCLUDE">
+<![ %hppa    [ <!ENTITY % not-hppa    "IGNORE"> ]]>
+               <!ENTITY % not-hppa    "INCLUDE">
+<![ %i386    [ <!ENTITY % not-i386    "IGNORE"> ]]>
+               <!ENTITY % not-i386    "INCLUDE">
+<![ %ia64    [ <!ENTITY % not-ia64    "IGNORE"> ]]>
+               <!ENTITY % not-ia64    "INCLUDE">
+<![ %m68k    [ <!ENTITY % not-m68k    "IGNORE"> ]]>
+               <!ENTITY % not-m68k    "INCLUDE">
+<![ %mips    [ <!ENTITY % not-mips    "IGNORE"> ]]>
+               <!ENTITY % not-mips    "INCLUDE">
+<![ %mipsel  [ <!ENTITY % not-mipsel  "IGNORE"> ]]>
+               <!ENTITY % not-mipsel  "INCLUDE">
+<![ %powerpc [ <!ENTITY % not-powerpc "IGNORE"> ]]>
+               <!ENTITY % not-powerpc "INCLUDE">
+<![ %s390    [ <!ENTITY % not-s390    "IGNORE"> ]]>
+               <!ENTITY % not-s390    "INCLUDE">
+<![ %sparc   [ <!ENTITY % not-sparc   "IGNORE"> ]]>
+               <!ENTITY % not-sparc   "INCLUDE">
+
+<!-- notation used for 'megabytes' -->
+<![ %lang-fr   [ <!ENTITY notation-megabytes "&nbsp;Mo"> ]]>
+<!ENTITY notation-megabytes "MB">
+
+<!-- minimum memory -->
+<![ %alpha   [ <!ENTITY minimum-memory "16&notation-megabytes;"> ]]>
+<![ %powerpc [ <!ENTITY minimum-memory "16&notation-megabytes;"> ]]>
+<![ %mips    [ <!ENTITY minimum-memory "16&notation-megabytes;"> ]]>
+<![ %i386    [ <!ENTITY minimum-memory "12&notation-megabytes;"> ]]>
+<![ %s390    [ <!ENTITY minimum-memory "16&notation-megabytes;"> ]]>
+<![ %arm     [ <!ENTITY minimum-memory "16&notation-megabytes;"> ]]>
+               <!ENTITY minimum-memory "12&notation-megabytes;">
+
+<!-- minimum hard disk size for base system -->
+<!-- As measured on a completed woody install, work space included. -->
+<!ENTITY minimum-fs-size "110&notation-megabytes;">
+
+<!-- minimum total memory (RAM + swap is ok) needed, i.e., for kernel -->
+<!-- module config -->
+<!ENTITY minimum-memory-with-swap "9&notation-megabytes;">
+
+<!-- minimum memory for diskless workstations (NFS root) -->
+<!ENTITY minimum-memory-with-nfsroot "12&notation-megabytes;">
+
+
+<!-- number of packages, approx, in the main distribution -->
+<!-- do:  grep '^Package:' Packages | wc -l -->
+<!-- might be fun to generate this dynamically -->
+<![ %alpha   [ <!ENTITY num-of-distrib-pkgs "7900"> ]]>
+<![ %arm     [ <!ENTITY num-of-distrib-pkgs "7800"> ]]>
+<![ %hppa    [ <!ENTITY num-of-distrib-pkgs "7500"> ]]>
+<![ %i386    [ <!ENTITY num-of-distrib-pkgs "8300"> ]]>
+<![ %ia64    [ <!ENTITY num-of-distrib-pkgs "7700"> ]]>
+<![ %m68k    [ <!ENTITY num-of-distrib-pkgs "7850"> ]]>
+<![ %mips    [ <!ENTITY num-of-distrib-pkgs "7650"> ]]>
+<![ %mipsel  [ <!ENTITY num-of-distrib-pkgs "7650"> ]]>
+<![ %powerpc [ <!ENTITY num-of-distrib-pkgs "8000"> ]]>
+<![ %sparc   [ <!ENTITY num-of-distrib-pkgs "7950"> ]]>
+<![ %s390    [ <!ENTITY num-of-distrib-pkgs "8100"> ]]>
+               <!ENTITY num-of-distrib-pkgs "7000">
+
+<!-- Number of current Debian developers -->
+<!-- Source www.debian.org/intro/about, 2001-11-21 --> 
+<!ENTITY num-of-debian-developers "800">
+
+
+<!-- whether this architecture supports boot from CD -->
+<!-- you only need to add a conditional if not -->
+<![ %m68k  [ <!ENTITY % supports-bootable-cd "IGNORE"> ]]>
+<![ %mips  [ <!ENTITY % supports-bootable-cd "IGNORE"> ]]>
+               <!ENTITY % supports-bootable-cd "INCLUDE">
+
+<!-- whether this architecture uses syslinux on the rescue disk, see -->
+<!--  rescue-boot.sgml -->
+<![ %i386    [ <!ENTITY % supports-syslinux "INCLUDE"> ]]>
+               <!ENTITY % supports-syslinux "IGNORE">
+
+<!-- threshold, below which, we are a low memory system  -->
+               <!ENTITY low-mem-threshold "5&notation-megabytes;">
+<!-- whether this architecture supports a special low-memory installation -->
+<!-- this is DEAD DEAD DEAD so don't even use this -->
+               <!ENTITY % supports-lowmem "IGNORE">
+
+<!-- whether this architecture supports installer boot from hard disk -->
+<![ %i386    [ <!ENTITY % bootable-disk "INCLUDE"> ]]>
+<![ %m68k    [ <!ENTITY % bootable-disk "INCLUDE"> ]]>
+<![ %powerpc [ <!ENTITY % bootable-disk "INCLUDE"> ]]>
+               <!ENTITY % bootable-disk "IGNORE">
+
+<!-- whether this architecture supports floppy boot -->
+<![ %i386    [ <!ENTITY % supports-floppy-boot "INCLUDE"> ]]>
+<![ %m68k    [ <!ENTITY % supports-floppy-boot "INCLUDE"> ]]>
+<![ %alpha   [ <!ENTITY % supports-floppy-boot "INCLUDE"> ]]>
+<![ %sparc   [ <!ENTITY % supports-floppy-boot "INCLUDE"> ]]>
+<![ %powerpc [ <!ENTITY % supports-floppy-boot "INCLUDE"> ]]>
+               <!ENTITY % supports-floppy-boot "IGNORE">
+
+<!-- list of architectures that do *NOT* support tftp -->
+<![ %s390    [ <!ENTITY % supports-tftp "IGNORE"> ]]>
+               <!ENTITY % supports-tftp "INCLUDE">
+
+<!-- list of architectures that don't support RARP  -->	       
+<![ %supports-tftp [
+<![ %alpha   [ <!ENTITY % supports-rarp "IGNORE"> ]]>
+<![ %mips    [ <!ENTITY % supports-rarp "IGNORE"> ]]>
+<![ %mipsel  [ <!ENTITY % supports-rarp "IGNORE"> ]]>
+<![ %powerpc [ <!ENTITY % supports-rarp "IGNORE"> ]]>
+  <!-- does i386 support rarp? -->
+               <!ENTITY % supports-rarp "INCLUDE">
+]]>
+               <!ENTITY % supports-rarp "IGNORE">
+
+<!-- list of architectures that don't support BOOTP  -->	       
+<![ %supports-tftp [
+<![ %alpha   [ <!ENTITY % supports-bootp "IGNORE"> ]]>
+<![ %mips    [ <!ENTITY % supports-bootp "IGNORE"> ]]>
+               <!ENTITY % supports-bootp "INCLUDE">
+]]>
+               <!ENTITY % supports-bootp "IGNORE">
+
+<!-- list of architectures that don't support DHCP -->
+<![ %supports-tftp [
+<![ %alpha   [ <!ENTITY % supports-dhcp "IGNORE"> ]]>
+<![ %mips    [ <!ENTITY % supports-dhcp "IGNORE"> ]]>
+               <!ENTITY % supports-dhcp "INCLUDE">
+]]>
+               <!ENTITY % supports-dhcp "IGNORE">
+	       
+
+<!-- whether this architecture supports diskless installation -->
+<!--   cf NFSROOT in ../utilities/dbootstrap/dbootstrap.h -->
+               <!ENTITY % supports-nfsroot "INCLUDE">
+
+<!-- whether this architecture supports PCMCIA -->
+<![ %i386    [ <!ENTITY % supports-pcmcia "INCLUDE"> ]]>
+<![ %powerpc [ <!ENTITY % supports-pcmcia "INCLUDE"> ]]>
+               <!ENTITY % supports-pcmcia "IGNORE">
+
+<!-- architectures that do *NOT* support SMP or ship with SMP kernels -->
+<![ %arm     [ <!ENTITY % supports-smp "IGNORE"> ]]>
+<![ %m68k    [ <!ENTITY % supports-smp "IGNORE"> ]]>
+<![ %mips    [ <!ENTITY % supports-smp "IGNORE"> ]]>
+<![ %mipsel  [ <!ENTITY % supports-smp "IGNORE"> ]]>
+<![ %s390    [ <!ENTITY % supports-smp "IGNORE"> ]]>
+<![ %s390    [ <!ENTITY % defaults-smp "INCLUDE"> ]]>
+               <!ENTITY % supports-smp "INCLUDE">
+               <!ENTITY % defaults-smp "IGNORE">
+
+<!-- whether this architecture supports a serial console -->
+<!--   cf SERIAL_CONSOLE in ../utilities/dbootstrap/dbootstrap.h -->
+<![ %s390    [ <!ENTITY % supports-serial-console "IGNORE"> ]]>
+               <!ENTITY % supports-serial-console "INCLUDE">
+
+<!-- whether this architecture supports language chooser capaiblities -->
+<![ %i386    [ <!ENTITY % supports-lang-chooser "INCLUDE"> ]]>
+<![ %arm     [ <!ENTITY % supports-lang-chooser "INCLUDE"> ]]>
+<![ %powerpc [ <!ENTITY % supports-lang-chooser "INCLUDE"> ]]>
+<![ %ia64    [ <!ENTITY % supports-lang-chooser "INCLUDE"> ]]>
+<![ %m68k    [ <!ENTITY % supports-lang-chooser "INCLUDE"> ]]>
+<![ %hppa    [ <!ENTITY % supports-lang-chooser "INCLUDE"> ]]>
+               <!ENTITY % supports-lang-chooser "IGNORE">
+
+<!-- some rescue disks need root disk as well -->
+               <!ENTITY % rescue-needs-root-disk "INCLUDE">
+
+<!-- working around bugs, get rid of these when the bugs are closed -->
+<!ENTITY % workaround-bug-99926 "INCLUDE">
+
+<!-- OBSOLETE PARAMETERS -->
+<!ENTITY % supports-tecra "IGNORE">
+
+<!-- fdisk flavors, no fdisk flavor should *not* appear on this list -->
+<!ENTITY % fdisk.txt		"IGNORE">
+<!ENTITY % cfdisk.txt		"IGNORE">
+<!ENTITY % atari-fdisk.txt	"IGNORE">
+<!ENTITY % amiga-fdisk.txt	"IGNORE">
+<!ENTITY % mac-fdisk.txt	"IGNORE">
+<!ENTITY % pmac-fdisk.txt	"IGNORE">
+<!ENTITY % fdasd.txt		"IGNORE">
+<!ENTITY % parted.txt		"IGNORE">
+
+<!-- version of X11 shipping with the current release -->
+<!ENTITY x11ver "4.1.0">
+
+
+<!-- an example of adding another image to lilo.conf, cf
+     en/post-install.sgml etc. -->
+<!ENTITY additional-lilo-image
+'image=/boot/vmlinuz.new
+  label=new
+  append="mcd=0x320,11"
+  read-only'>
+
+
+
+<!-- prefix for files that can be downloaded -->
+<![ %official-web-build [ <!ENTITY downloadable-file "&url-boot-floppies;"> ]]>
+                          <!ENTITY downloadable-file "&path-to-top-level;">
+
+<!-- which image sizes this architecture has; you only need to have an -->
+<!-- entry if you have images-2.88 or images-1.20 -->
+<![ %i386  [ <!ENTITY % has-images-1.20 "INCLUDE">
+             <!ENTITY % has-images-2.88 "INCLUDE">
+             <!ENTITY % has-images-1.44-only "IGNORE">
+]]>
+<![ %m68k  [ <!ENTITY % has-images-2.88 "INCLUDE">
+             <!ENTITY % has-images-1.44-only "IGNORE">
+]]>
+<!-- default values -->
+             <!ENTITY % has-images-1.20 "IGNORE">
+             <!ENTITY % has-images-2.88 "IGNORE">
+             <!ENTITY % has-images-1.44-only "INCLUDE">
+
+
+<!-- Note: including names in all the downloadable-file urls keeps the
+   displayed urls from getting too long, they get cut off in pdf and
+   web browser versions of the document and are not readable,
+   especially if printed out. Added note to appendix explaining the
+   .../current/ notation.  -->
+
+
+<!--  -->
+<!--  root tarballs -->
+<!--  -->
+
+<!-- alpha root fs archive 3.0.17-2001-11-20 -->
+<![ %alpha [
+  <!ENTITY list-root-disk-tarball '
+    
+<ulink url="&downloadable-file;root.tar.gz">.../current/root.tar.gz</ulink>
+  '>
+]]>
+
+<!-- arm root fs archive 3.0.20-2002-03-05 -->
+<![ %arm [
+  <!ENTITY list-root-disk-tarball '
+    
+<ulink url="&downloadable-file;netwinder/root.tar.gz">.../current/netwinder/root.tar.gz</ulink>,
+    |
+<ulink url="&downloadable-file;lart/root.tar.gz">.../current/lart/root.tar.gz</ulink>
+  '>
+]]>
+
+<!-- m68k root fs archive 3.0.19-2002-02-09 -->
+<![ %m68k  [
+  <!ENTITY list-root-disk-tarball '
+   
+<ulink url="&downloadable-file;amiga/root.bin">.../current/amiga/root.bin</ulink>
+   |
+<ulink url="&downloadable-file;atari/root.bin">.../current/atari/root.bin</ulink>
+   |
+<ulink url="&downloadable-file;bvme6000/rootbvme6000.bin">.../current/bvme6000/rootbvme6000.bin</ulink>
+   |
+<ulink url="&downloadable-file;mac/root.bin">.../current/mac/root.bin</ulink>
+   |
+<ulink url="&downloadable-file;mvme147/rootmvme147.bin">.../current/mvme147/rootmvme147.bin</ulink>
+   |
+<ulink url="&downloadable-file;mvme16x/rootmvme16x.bin">.../current/mvme16x/rootmvme16x.bin</ulink>
+  '>
+]]>
+
+<!-- mips root fs archive 3.0.20-2002-03-14 -->
+<![ %mips [
+  <!ENTITY list-root-disk-tarball '
+   
+<ulink url="&downloadable-file;root.tar.gz">.../current/root.tar.gz</ulink>
+  '>
+]]>
+
+<!-- mipsel root fs archive 3.0.20-2002-03-1 -->
+<![ %mipsel [
+  <!ENTITY list-root-disk-tarball '
+   
+<ulink url="&downloadable-file;root.tar.gz">.../current/root.tar.gz</ulink>
+  '>
+]]>
+
+<!-- sparc root fs archive 2002-03-15 -->
+<![ %sparc [
+  <!ENTITY list-root-disk-tarball '
+    
+<ulink url="&downloadable-file;root.tar.gz">.../current/root.tar.gz</ulink>
+  '>
+]]>
+
+<!-- default -->
+  <!ENTITY list-root-disk-tarball "">
+
+
+<!--  -->
+<!--  root diskette images -->
+<!--  -->
+
+<!-- alpha root checked 2002-03-15 -->
+<![ %alpha [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;images-1.44/root.bin">.../current/images-1.44/root.bin</ulink>
+  '>
+]]>
+
+<!-- arm root checked 2002-03-15 -->
+<![ %arm [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;netwinder/images-1.44/root.bin">.../current/netwinder/images-1.44/root.bin</ulink>
+  '>
+]]>
+
+<!-- hppa root checked 2002-03-15 -->
+<![ %hppa [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;root.bin">.../current/root.bin</ulink>
+  '>
+]]>
+
+<!-- i386 root checked 2002-03-15 -->
+<![ %i386 [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;images-1.20/root.bin">.../current/images-1.20/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/root.bin">.../current/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/compact/root.bin">.../current/images-1.44/compact/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/idepci/root.bin">.../current/images-1.44/idepci/root.bin</ulink> 
+    |
+<ulink url="&downloadable-file;images-1.44/bf2.4/root.bin">.../current/images-1.44/bf2.4/root.bin</ulink>
+  '>
+]]>
+
+<!-- ia64 root checked 2002-03-15 -->
+<![ %ia64 [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;root.bin">.../current/root.bin</ulink>
+  '>
+]]>
+
+<!-- m68k root checked 2002-03-15 -->
+<![ %m68k [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;amiga/images-1.44/root.bin">.../current/amiga/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;atari/images-1.44/root.bin">.../current/atari/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/images-1.44/root.bin">.../current/bvme6000/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;mac/images-1.44/root.bin">.../current/mac/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;mvme147/images-1.44/root.bin">.../current/mvme147/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;mvme16x/images-1.44/root.bin">.../current/mvme16x/images-1.44/root.bin</ulink>
+  '>
+]]>
+
+<!-- mips root checked 2002-03-15 -->
+<![ %mips [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;root.bin">.../current/root.bin</ulink>
+  '>
+]]>
+
+<!-- mipsel root checked 2002-03-15 -->
+<![ %mipsel [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;root.bin">.../current/root.bin</ulink>
+  '>
+]]>
+
+<!-- powerpc root checked 2002-03-15 -->
+<![ %powerpc [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;apus/images-1.44/root.bin">.../current/apus/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;chrp/images-1.44/root.bin">.../current/chrp/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/images-1.44/root.bin">.../current/new-powermac/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;powermac/images-1.44/root.bin">.../current/powermac/images-1.44/root.bin</ulink>
+    |
+<ulink url="&downloadable-file;prep/images-1.44/root.bin">.../current/prep/images-1.44/root.bin</ulink>
+  '>
+]]>
+
+<!-- s390 root checked 2002-04-08 -->
+<![ %s390 [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;tape/initrd.debian">.../current/tape/initrd.debian</ulink>
+    |
+<ulink url="&downloadable-file;vmrdr/initrd.debian">.../current/vmrdr/initrd.debian</ulink>
+  '>
+]]>
+
+<!-- sparc root checked 2002-03-15 -->
+<![ %sparc [
+  <!ENTITY list-root-images '
+    
+<ulink url="&downloadable-file;images-1.44/root.bin">.../current/images-1.44/root.bin</ulink>
+  '>
+]]>
+
+<!-- default -->
+  <!ENTITY list-root-images "">
+
+
+<!--  -->
+<!--  base system tarballs -->
+<!--  -->
+
+  <!ENTITY list-base-tarball '
+    
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/basedebs.tar">.../base-images-current/basedebs.tar</ulink>
+  '>
+
+
+<!--  -->
+<!--  base system images -->
+<!--  -->
+
+<!-- i386 base system checked 2002-04-08 -->
+<![ %i386 [
+  <!ENTITY list-base-images '
+    
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-1.bin">.../base-images-current/images-1.2/base-1.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-2.bin">.../base-images-current/images-1.2/base-2.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-3.bin">.../base-images-current/images-1.2/base-3.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-4.bin">.../base-images-current/images-1.2/base-4.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-5.bin">.../base-images-current/images-1.2/base-5.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-6.bin">.../base-images-current/images-1.2/base-6.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-7.bin">.../base-images-current/images-1.2/base-7.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-8.bin">.../base-images-current/images-1.2/base-8.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-9.bin">.../base-images-current/images-1.2/base-9.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-10.bin">.../base-images-current/images-1.2/base-10.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-11.bin">.../base-images-current/images-1.2/base-11.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-12.bin">.../base-images-current/images-1.2/base-12.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-13.bin">.../base-images-current/images-1.2/base-13.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-14.bin">.../base-images-current/images-1.2/base-14.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-15.bin">.../base-images-current/images-1.2/base-15.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-16.bin">.../base-images-current/images-1.2/base-16.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-17.bin">.../base-images-current/images-1.2/base-17.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-18.bin">.../base-images-current/images-1.2/base-18.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-19.bin">.../base-images-current/images-1.2/base-19.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-20.bin">.../base-images-current/images-1.2/base-20.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-21.bin">.../base-images-current/images-1.2/base-21.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-22.bin">.../base-images-current/images-1.2/base-22.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.2/base-23.bin">.../base-images-current/images-1.2/base-23.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-1.bin">.../base-images-current/images-1.44/base-1.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-2.bin">.../base-images-current/images-1.44/base-2.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-3.bin">.../base-images-current/images-1.44/base-3.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-4.bin">.../base-images-current/images-1.44/base-4.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-5.bin">.../base-images-current/images-1.44/base-5.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-6.bin">.../base-images-current/images-1.44/base-6.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-7.bin">.../base-images-current/images-1.44/base-7.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-8.bin">.../base-images-current/images-1.44/base-8.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-9.bin">.../base-images-current/images-1.44/base-9.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-10.bin">.../base-images-current/images-1.44/base-10.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-11.bin">.../base-images-current/images-1.44/base-11.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-12.bin">.../base-images-current/images-1.44/base-12.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-13.bin">.../base-images-current/images-1.44/base-13.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-14.bin">.../base-images-current/images-1.44/base-14.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-15.bin">.../base-images-current/images-1.44/base-15.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-16.bin">.../base-images-current/images-1.44/base-16.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-17.bin">.../base-images-current/images-1.44/base-17.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-18.bin">.../base-images-current/images-1.44/base-18.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-19.bin">.../base-images-current/images-1.44/base-19.bin</ulink>
+    |
+<ulink url="&disturl;main/disks-&architecture;/base-images-current/images-1.44/base-20.bin">.../base-images-current/images-1.44/base-20.bin</ulink>
+  '>
+]]>
+
+
+<!--  -->
+<!--  rescue diskette images  -->
+<!--  -->
+
+<!-- alpha rescue images checked 2002-03-15 -->
+<![ %alpha [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;images-1.44/rescue.bin">.../current/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;jensen/images-1.44/rescue.bin">.../current/jensen/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;nautilus/images-1.44/rescue.bin">.../current/nautilus/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- arm rescue images checked 2002-03-15 -->
+<![ %arm [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;lart/images-1.44/rescue.bin">.../current/lart/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;riscpc/images-1.44/rescue.bin">.../current/riscpc/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;netwinder/images-2.88/rescue.bin">.../current/netwinder/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- hppa rescue images checked 2002-03-15 -->
+<![ %hppa [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;32/images-1.44/rescue.bin">.../current/32/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;64/images-1.44/rescue.bin">.../current/64/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- i386 rescue images checked 2002-03-15 -->
+<![ %i386 [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;images-1.20/rescue.bin">.../current/images-1.20/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/safe/rescue.bin">.../current/images-1.20/safe/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/rescue.bin">.../current/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/bf2.4/rescue.bin">.../current/images-1.44/bf2.4/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/compact/rescue.bin">.../current/images-1.44/compact/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/idepci/rescue.bin">.../current/images-1.44/idepci/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/safe/rescue.bin">.../current/images-1.44/safe/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-2.88/rescue.bin">.../current/images-2.88/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-2.88/bf2.4/rescue.bin">.../current/images-2.88/bf2.4/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-2.88/compact/rescue.bin">.../current/images-2.88/compact/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-2.88/idepci/rescue.bin">.../current/images-2.88/idepci/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- ia64 rescue images checked 2002-03-15 -->
+<![ %ia64 [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;images-1.44/rescue.bin">.../current/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- m68k rescue images checked 2002-03-15 -->
+<![ %m68k [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;amiga/images-1.44/rescue.bin">.../current/amiga/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;atari/images-1.44/rescue.bin">.../current/atari/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/images-1.44/rescue.bin">.../current/bvme6000/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/images-2.88/rescue.bin">.../current/bvme6000/images-2.88/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;mac/images-1.44/rescue.bin">.../current/mac/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;mvme147/images-1.44/rescue.bin">.../current/mvme147/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;mvme16x/images-1.44/rescue.bin">.../current/mvme16x/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- mips rescue images checked 2002-03-15 -->
+<![ %mips [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;r4k-ip22/images-1.44/rescue.bin">.../current/r4k-ip22/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- mipsel rescue images checked 2002-03-15 -->
+<![ %mipsel [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;r3k-kn02/images-1.44/rescue.bin">.../current/r3k-kn02/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;r3k-kn02/images-2.88/rescue.bin">.../current/r3k-kn02/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;r4k-kn04/images-1.44/rescue.bin">.../current/r4k-kn04/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;r4k-kn04/images-2.88/rescue.bin">.../current/r4k-kn04/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- powerpc rescue images checked 2002-03-15 -->
+<![ %powerpc [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;apus/images-1.44/rescue.bin">.../current/apus/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;chrp/images-1.44/rescue.bin">.../current/chrp/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/images-2.88/rescue.bin">.../current/new-powermac/images-2.88/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;powermac/images-1.44/rescue.bin">.../current/powermac/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;prep/images-1.44/rescue.bin">.../current/prep/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- s390 rescue images checked 2002-04-08 -->
+<![ %s390 [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;images-1.44/rescue.bin">.../current/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- sparc rescue images checked 2002-03-15 -->
+<![ %sparc [
+  <!ENTITY list-rescue-images '
+    
+<ulink url="&downloadable-file;sun4cdm/images-1.44/rescue.bin">.../current/sun4cdm/images-1.44/rescue.bin</ulink>
+    |
+<ulink url="&downloadable-file;sun4u/images-1.44/rescue.bin">.../current/sun4u/images-1.44/rescue.bin</ulink>
+  '>
+]]>
+
+<!-- default for unset arches -->
+  <!ENTITY list-rescue-images 'unknown'>
+
+
+
+<!--  -->
+<!--  device driver tarballs -->
+<!--  -->
+
+<!-- alpha driver tarballs checked 2002-03-15 -->
+<![ %alpha [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;drivers.tgz">.../current/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;jensen/drivers.tgz">.../current/jensen/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;nautilus/drivers.tgz">.../current/nautilus/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- arm driver tarballs checked 2002-03-15 -->
+<![ %arm [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;lart/drivers.tgz">.../current/lart/drivers.tgz</ulink>
+    
+<ulink url="&downloadable-file;netwinder/drivers.tgz">.../current/netwinder/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;riscpc/drivers.tgz">.../current/riscpc/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- hppa driver tarballs checked 2002-03-15 -->
+<![ %hppa [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;32/drivers.tgz">.../current/32/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;64/drivers.tgz">.../current/64/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- i386 driver tarballs checked 2002-03-15 -->
+<![ %i386 [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;drivers.tgz">.../current/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;bf2.4/drivers.tgz">.../current/bf2.4/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;compact/drivers.tgz">.../current/compact/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;idepci/drivers.tgz">.../current/idepci/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- ia64 driver tarballs checked 2002-03-15 -->
+<![ %ia64 [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;drivers.tgz">.../current/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- m68k driver tarballs checked 2002-03-15 -->
+<![ %m68k [
+  <!ENTITY list-driver-disk-tarball '
+     
+<ulink url="&downloadable-file;amiga/drivers.tgz">.../current/amiga/drivers.tgz</ulink>
+     |
+<ulink url="&downloadable-file;atari/drivers.tgz">.../current/atari/drivers.tgz</ulink>
+     |
+<ulink url="&downloadable-file;bvme6000/drivers.tgz">.../current/bvme6000/drivers.tgz</ulink>
+     |
+<ulink url="&downloadable-file;mac/drivers.tgz">.../current/mac/drivers.tgz</ulink>
+     |
+<ulink url="&downloadable-file;mvme147/drivers.tgz">.../current/mvme147/drivers.tgz</ulink>
+     |
+<ulink url="&downloadable-file;mvme16x/drivers.tgz">.../current/mvme16x/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- mips driver tarballs checked 2002-03-15 -->
+<![ %mips [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;r4k-ip22/drivers.tgz">.../current/r4k-ip22/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- mipsel driver tarballs checked 2002-03-15 -->
+<![ %mipsel [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;r3k-kn02/drivers.tgz">.../current/r3k-kn02/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;r4k-kn04/drivers.tgz">.../current/r4k-kn04/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- powerpc driver tarballs checked 2002-03-15 -->
+<![ %powerpc [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;apus/drivers.tgz">.../current/apus/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;chrp/drivers.tgz">.../current/chrp/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/drivers.tgz">.../current/new-powermac/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;powermac/drivers.tgz">.../current/powermac/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;prep/drivers.tgz">.../current/prep/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- s390 driver tarballs checked 2002-03-15 -->
+<![ %s390 [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;drivers.tgz">.../current/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- sparc driver tarballs checked 2002-03-15 -->
+<![ %sparc [
+  <!ENTITY list-driver-disk-tarball '
+    
+<ulink url="&downloadable-file;sun4cdm/drivers.tgz">.../current/sun4cdm/drivers.tgz</ulink>
+    |
+<ulink url="&downloadable-file;sun4u/drivers.tgz">.../current/sun4u/drivers.tgz</ulink>
+  '>
+]]>
+
+<!-- default if not set -->
+
+  <!ENTITY list-driver-disk-tarball 'unknown'>
+
+
+
+<!--  -->
+<!--  driver diskette images -->
+<!--  -->
+
+<!-- alpha driver images checked 2002-03-15 -->
+<![ %alpha [
+  <!ENTITY list-driver-images '
+    
+<ulink url="&downloadable-file;images-1.44/driver-1.bin">.../current/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/driver-2.bin">.../current/images-1.44/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;jensen/images-1.44/driver-1.bin">.../current/jensen/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;jensen/images-1.44/driver-2.bin">.../current/jensen/images-1.44/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;nautilus/images-1.44/driver-1.bin">.../current/nautilus/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;nautilus/images-1.44/driver-2.bin">.../current/nautilus/images-1.44/driver-2.bin</ulink>
+  '>
+]]>
+
+<!-- arm driver images checked 2002-03-15 -->
+<![ %arm [
+  <!ENTITY list-driver-images '
+    
+<ulink url="&downloadable-file;lart/images-1.44/driver-1.bin">.../current/lart/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;netwinder/images-1.44/driver-1.bin">.../current/netwinder/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;netwinder/images-1.44/driver-2.bin">.../current/netwinder/images-1.44/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;netwinder/images-1.44/driver-3.bin">.../current/netwinder/images-1.44/driver-3.bin</ulink>
+    |
+<ulink url="&downloadable-file;riscpc/images-1.44/driver-1.bin">.../current/riscpc/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;riscpc/images-1.44/driver-2.bin">.../current/riscpc/images-1.44/driver-2.bin</ulink>
+
+  '>
+]]>
+
+<!-- i386 driver images checked 2002-03-15 -->
+<![ %i386 [
+  <!ENTITY list-driver-images '
+    
+<ulink url="&downloadable-file;images-1.20/driver-1.bin">.../current/images-1.20/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/driver-2.bin">.../current/images-1.20/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/driver-3.bin">.../current/images-1.20/driver-3.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/driver-4.bin">.../current/images-1.20/driver-4.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/driver-5.bin">.../current/images-1.20/driver-5.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/safe/driver-1.bin">.../current/images-1.20/safe/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/safe/driver-2.bin">.../current/images-1.20/safe/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/safe/driver-3.bin">.../current/images-1.20/safe/driver-3.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/safe/driver-4.bin">.../current/images-1.20/safe/driver-4.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/safe/driver-5.bin">.../current/images-1.20/safe/driver-5.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/driver-1.bin">.../current/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/driver-2.bin">.../current/images-1.44/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/driver-3.bin">.../current/images-1.44/driver-3.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/driver-4.bin">.../current/images-1.44/driver-4.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/bf2.4/driver-1.bin">.../current/images-1.44/bf2.4/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/bf2.4/driver-2.bin">.../current/images-1.44/bf2.4/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/bf2.4/driver-3.bin">.../current/images-1.44/bf2.4/driver-3.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/bf2.4/driver-4.bin">.../current/images-1.44/bf2.4/driver-4.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/bf2.4/driver-5.bin">.../current/images-1.44/bf2.4/driver-5.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/compact/driver-1.bin">.../current/images-1.44/compact/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/compact/driver-2.bin">.../current/images-1.44/compact/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/idepci/driver-1.bin">.../current/images-1.44/idepci/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/safe/driver-1.bin">.../current/images-1.44/safe/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/safe/driver-2.bin">.../current/images-1.44/safe/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/safe/driver-3.bin">.../current/images-1.44/safe/driver-3.bin</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/safe/driver-4.bin">.../current/images-1.44/safe/driver-4.bin</ulink>
+  '>
+]]>
+
+<!-- m68k driver images checked 2002-03-15 -->
+<![ %m68k [
+  <!ENTITY list-driver-images '
+    
+<ulink url="&downloadable-file;amiga/images-1.44/driver.bin">.../current/amiga/images-1.44/driver.bin</ulink>
+    |
+<ulink url="&downloadable-file;atari/images-1.44/driver.bin">.../current/atari/images-1.44/driver.bin</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/images-1.44/driver.bin">.../current/bvme6000/images-1.44/driver.bin</ulink>
+    |
+<ulink url="&downloadable-file;mac/images-1.44/driver.bin">.../current/mac/images-1.44/driver.bin</ulink>
+    |
+<ulink url="&downloadable-file;mvme147/images-1.44/driver.bin">.../current/mvme147/images-1.44/driver.bin</ulink>
+    |
+<ulink url="&downloadable-file;mvme16x/images-1.44/driver.bin">.../current/mvme16x/images-1.44/driver.bin</ulink>
+  '>
+]]>
+
+<!-- mips driver images checked 2002-03-15 -->
+<![ %mips [
+  <!ENTITY list-driver-images '
+    
+<ulink url="&downloadable-file;r4k-ip22/images-1.44/driver-1.bin">.../current/r4k-ip22/images-1.44/driver-1.bin</ulink>
+  '>
+]]>
+
+<!-- mipsel driver images checked 2002-03-15 -->
+<![ %mipsel [
+  <!ENTITY list-driver-images '
+    
+<ulink url="&downloadable-file;r3k-kn02/images-1.44/driver-1.bin">.../current/r3k-kn02/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;r4k-kn04/images-1.44/driver-1.bin">.../current/r4k-kn04/images-1.44/driver-1.bin</ulink>
+  '>
+]]>
+
+<!-- powerpc driver images checked 2002-03-15 -->
+<![ %powerpc [
+  <!ENTITY list-driver-images '
+    
+<ulink url="&downloadable-file;apus/images-1.44/driver-1.bin">.../current/apus/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;chrp/images-1.44/driver-1.bin">.../current/chrp/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;chrp/images-1.44/driver-2.bin">.../current/chrp/images-1.44/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/images-1.44/driver-1.bin">.../current/new-powermac/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/images-1.44/driver-2.bin">.../current/new-powermac/images-1.44/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/images-1.44/driver-3.bin">.../current/new-powermac/images-1.44/driver-3.bin</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/images-1.44/driver-4.bin">.../current/new-powermac/images-1.44/driver-4.bin</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/images-1.44/driver-5.bin">.../current/new-powermac/images-1.44/driver-5.bin</ulink>
+    |
+<ulink url="&downloadable-file;powermac/images-1.44/driver-1.bin">.../current/powermac/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;powermac/images-1.44/driver-2.bin">.../current/powermac/images-1.44/driver-2.bin</ulink>
+    |
+<ulink url="&downloadable-file;prep/images-1.44/driver-1.bin">.../current/prep/images-1.44/driver-1.bin</ulink>
+  '>
+]]>
+
+<!-- sparc driver images checked 2002-03-15 -->
+<![ %sparc [
+  <!ENTITY list-driver-images '
+    
+<ulink url="&downloadable-file;sun4cdm/images-1.44/driver-1.bin">.../current/sun4cdm/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;sun4u/images-1.44/driver-1.bin">.../current/sun4u/images-1.44/driver-1.bin</ulink>
+    |
+<ulink url="&downloadable-file;sun4u/images-1.44/driver-2.bin">.../current/sun4u/images-1.44/driver-2.bin</ulink>
+  '>
+]]>
+
+<!-- default if not set -->
+
+  <!ENTITY list-driver-images 'unknown'>
+
+
+
+<!--  -->
+<!--  loose kernel images -->
+<!--  -->
+
+<!-- alpha kernels 2.2.20-2000-12-03 -->
+<![ %alpha [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;linux.bin">.../current/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;jensen/linux.bin">.../current/jensen/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;nautilus/linux.bin">.../current/nautilus/linux.bin</ulink>
+  '>
+]]>
+
+<!-- arm kernels 2.2.24-2001-04-14 -->
+<![ %arm [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;lart/linux.bin">.../current/lart/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;netwinder/linux.bin">.../current/netwinder/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;riscpc/linux.bin">.../current/riscpc/linux.bin</ulink>
+  '>
+]]>
+
+<!-- hppa kernels 3.0.?-2001-07-29 --> 
+<![ %hppa [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;32/linux.bin">.../current/32/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;64/linux.bin">.../current/64/linux.bin</ulink>
+  '> 
+]]>
+
+<!-- i386 kernels 2.2.20.0.1-2000-12-03 -->
+<![ %i386  [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;linux.bin">.../current/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;bf2.4/linux.bin">.../current/bf2.4/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;compact/linux.bin">.../current/compact/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;idepci/linux.bin">.../current/idepci/linux.bin</ulink>
+  '>
+]]>
+
+<!-- ia64 kernels 3.0.?-2001-07-29 --> 
+<![ %ia64 [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;linux.bin">.../current/linux.bin</ulink>
+  '> 
+]]>
+
+<!-- m68k kernels 2.2.19-2000-12-03 -->
+<![ %m68k [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;amiga/linux.bin">.../current/amiga/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;atari/linux.bin">.../current/atari/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/linuxbvme6000.bin">.../current/bvme6000/linuxbvme6000.bin</ulink>
+    |
+<ulink url="&downloadable-file;mac/linux.bin">.../current/mac/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;mvme147/linuxmvme147.bin">.../current/mvme147/linuxmvme147.bin</ulink>
+    |
+<ulink url="&downloadable-file;mvme16x/linuxmvme16x.bin">.../current/mvme16x/linuxmvme16x.bin</ulink>
+  '>
+]]>
+
+<!-- mips kernels 2.4.9-2001-10-12 --> 
+<![ %mips [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;r4k-ip22/linux.bin">.../current/r4k-ip22/linux.bin</ulink>
+  '> 
+]]>
+
+<!-- mipsel kernels 2.4.9-2001-10-12 --> 
+<![ %mipsel [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;r3k-kn02/linux.bin">.../current/r3k-kn02/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;r4k-kn04/linux.bin">.../current/r4k-kn04/linux.bin</ulink>
+  '> 
+]]>
+
+<!-- powerpc kernels 2.2.19-2000-12-03 -->
+<![ %powerpc [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;apus/linux.bin">.../current/apus/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;chrp/linux.bin">.../current/chrp/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;new-powermac/linux.bin">.../current/new-powermac/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;powermac/linux.bin">.../current/powermac/linux.bin</ulink>
+    |
+<ulink url="&downloadable-file;prep/linux.bin">.../current/prep/linux.bin</ulink>
+  '>
+]]>
+
+<!-- s390 kernels 3.0.22-2002-04-03 -->
+<![ %s390 [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;tape/kernel.debian">.../current/tape/kernel.debian</ulink>
+    |
+<ulink url="&downloadable-file;tape/kernel.debian-nolabel">.../current/tape/kernel.debian-nolabel</ulink>
+    |
+<ulink url="&downloadable-file;vmrdr/kernel.debian">.../current/vmrdr/kernel.debian</ulink>
+  '>
+]]>
+
+<!-- sparc kernels 2.2.20-2000-12-03 -->
+<![ %sparc [
+  <!ENTITY list-kernel-files '
+    
+<ulink url="&downloadable-file;sun4cdm/linux-a.out">.../current/sun4cdm/linux-a.out</ulink>
+    |
+<ulink url="&downloadable-file;sun4u/linux-a.out">.../current/sun4u/linux-a.out</ulink>
+  '>
+]]>
+
+<!-- default -->
+  <!ENTITY list-kernel-files "">
+
+
+
+<!--  -->
+<!--  tftp disk images -->
+<!--  -->
+
+<!-- alpha tftp files checked 2002-03-15 -->
+<![ %alpha   [ 
+  <!ENTITY list-tftp-images '
+    
+<ulink url="&downloadable-file;tftpboot.img">.../current/tftpboot.img</ulink>
+  '>
+]]>
+
+<!-- arm tftp files checked 2002-03-15 -->
+<![ %arm     [
+  <!ENTITY list-cats-boot-img '
+     
+<ulink url="&downloadable-file;cats/tftpboot.img">.../current/cats/tftpboot.img</ulink>
+  '>
+  <!ENTITY list-netwinder-boot-img '
+     
+<ulink url="&downloadable-file;netwinder/tftpboot.img">.../current/netwinder/tftpboot.img</ulink>
+  '>
+  <!ENTITY list-tftp-images '
+     &cats-boot-img;
+     &netwinder-boot-img;
+  '>
+]]>
+
+<!-- hppa tftp images checked 2002-03-15 -->
+<![ %hppa [
+  <!ENTITY list-tftp-images '
+    
+<ulink url="&downloadable-file;lifimage">.../current/lifimage</ulink>
+  '>
+]]>
+
+<!-- i386 tftp images checked 2002-03-15 -->
+<![ %i386 [
+  <!ENTITY list-tftp-images '
+    
+<ulink url="&downloadable-file;bf2.4/tftpboot.img">.../current/bf2.4/tftpboot.img</ulink>
+    |
+<ulink url="&downloadable-file;compact/tftpboot.img">.../current/compact/tftpboot.img</ulink>
+    |
+<ulink url="&downloadable-file;idepci/tftpboot.img">.../current/idepci/tftpboot.img</ulink>
+  '>
+]]>
+
+<!-- m68k tftp images checked 2002-03-15 -->
+<![ %m68k    [
+  <!ENTITY list-tftp-images '
+    
+<ulink url="&downloadable-file;bvme6000/tftplilo.bvme">.../current/bvme6000/tftplilo.bvme</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/tftplilo.conf">.../current/bvme6000/tftplilo.conf</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/tftplilo.txt">.../current/bvme6000/tftplilo.txt</ulink>
+    |
+<ulink url="&downloadable-file;mvme16x/tftplilo.mvme">.../current/mvme16x/tftplilo.mvme</ulink>
+    |
+<ulink url="&downloadable-file;mvme16x/tftplilo.conf">.../current/mvme16x/tftplilo.conf</ulink>
+    |
+<ulink url="&downloadable-file;mvme16x/tftplilo.txt">.../current/mvme16x/tftplilo.txt</ulink>
+  '>
+
+  <!-- these are a bit redundant but convenient -->
+  <!ENTITY list-bvme6000-tftp-files '
+    
+<ulink url="&downloadable-file;bvme6000/linuxbvme6000.bin">.../current/bvme6000/linuxbvme6000.bin</ulink>, 
+    
+<ulink url="&downloadable-file;bvme6000/rootbvme6000.bin">.../current/bvme6000/rootbvme6000.bin</ulink>,
+    
+<ulink url="&downloadable-file;bvme6000/tftplilo.bvme">.../current/bvme6000/tftplilo.bvme</ulink>, and
+    
+<ulink url="&downloadable-file;bvme6000/tftplilo.conf">.../current/bvme6000/tftplilo.conf</ulink>
+  '>
+
+  <!ENTITY list-mvme16x-tftp-files '
+    
+<ulink url="&downloadable-file;mvme16x/linuxmvme16x.bin">.../current/mvme16x/linuxmvme16x.bin</ulink>,
+    
+<ulink url="&downloadable-file;mvme16x/rootmvme16x.bin">.../current/mvme16x/rootmvme16x.bin</ulink>,
+    
+<ulink url="&downloadable-file;mvme16x/tftplilo.mvme">.../current/mvme16x/tftplilo.mvme</ulink>, and
+    
+<ulink url="&downloadable-file;mvme16x/tftplilo.conf">.../current/mvme16x/tftplilo.conf</ulink>
+  '>
+
+]]>
+
+<!-- mips tftp images checked 2002-03-15 -->
+<![ %mips [
+  <!ENTITY list-tftp-images '
+    
+<ulink url="&downloadable-file;r4k-ip22/tftpboot.img">.../current/r4k-ip22/tftpboot.img</ulink>
+  '>
+]]>
+
+<!-- mipsel tftp images checked 2002-03-15 -->
+<![ %mipsel [
+  <!ENTITY list-tftp-images '
+    
+<ulink url="&downloadable-file;tftpimage-r3k-kn02">.../current/tftpimage-r3k-kn02</ulink>
+    |
+<ulink url="&downloadable-file;tftpimage-r4k-kn04">.../current/tftpimage-r4k-kn04</ulink>
+  '>
+]]>
+
+<!-- powerpc tftp images checked 2002-03-15 -->
+<![ %powerpc [
+  <!ENTITY list-tftp-images '
+    
+<ulink url="&downloadable-file;prep/images-1.44/boot.bin">.../current/prep/images-1.44/boot.bin</ulink>
+  '>
+]]>
+
+<!-- sparc tftp files 2.2.20-2000-12-03 -->
+<![ %sparc   [
+  <!ENTITY list-tftp-images '
+    
+<ulink url="&downloadable-file;sun4cdm/tftpboot.img">.../current/sun4cdm/tftpboot.img</ulink>
+    |
+<ulink url="&downloadable-file;sun4u/tftpboot.img">.../current/sun4u/tftpboot.img</ulink>
+  '>
+]]>
+
+<!-- default if not set -->
+
+  <!ENTITY list-tftp-images 'unknown'>
+
+
+<!--  -->
+<!--  documentation  -->
+<!--  -->
+
+<!-- install manual files -->
+<!--  these files should be relative -->
+<!ENTITY list-install-manual-files '
+    
+<ulink url="install&langext;.txt">>
+    |
+<ulink url="install&langext;.html">>
+    |
+<ulink url="install&langext;.pdf">>
+'>
+
+
+<!-- platform-specific Installation Notes -->
+<!-- editorial: I think these files should go away, that is, be merged -->
+<!-- into the main install manual -->
+
+<!ENTITY % has-non-merged-docs "IGNORE">
+
+
+<!--  -->
+<!--  misc other entities -->
+<!--  -->
+
+<!-- md5sum file -->
+<!ENTITY list-md5sum.txt '
+  
+<ulink url="&downloadable-file;md5sum.txt">.../current/md5sum.txt</ulink>
+'>
+
+<!-- base-contents not used anymore, but still defined for legacy -->
+<!-- <!ENTITY list-base-contents-file 'no longer exists'> -->
+
+
+<!--  -->
+<!--  Miscellaneous files -->
+<!--  A catch-all, so that every file in -->
+<!--  .../disks-<arch>/current can be referred to with a URL, -->
+<!--  with the exception of the files in doc/. -->
+<!--  -->
+
+<!-- alpha misc files checked 2002-03-15 -->
+<![ %alpha [
+  <!ENTITY list-alpha-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+  <!ENTITY list-alpha-install-files "">
+  <!ENTITY list-apb-files '
+    
+<ulink url="&downloadable-file;APB/README.txt">.../current/APB/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;APB/install.txt">.../current/APB/install.txt</ulink>
+    |
+<ulink url="&downloadable-file;APB/apb.cfg">.../current/APB/apb.cfg</ulink>
+    |
+<ulink url="&downloadable-file;APB/apb.exe">.../current/APB/apb.exe</ulink>
+    |
+<ulink url="&downloadable-file;APB/up1000.pal">.../current/APB/up1000.pal</ulink>
+  '>
+  <!ENTITY list-milo-files '
+    
+<ulink url="&downloadable-file;MILO/ldmilo.exe">.../current/MILO/ldmilo.exe</ulink>
+    |
+<ulink url="&downloadable-file;MILO/linload.exe">.../current/MILO/linload.exe</ulink>
+    |
+<ulink url="&downloadable-file;MILO/alcor">.../current/MILO/alcor</ulink>
+    |
+<ulink url="&downloadable-file;MILO/avanti">.../current/MILO/avanti</ulink>
+    |
+<ulink url="&downloadable-file;MILO/book1">.../current/MILO/book1</ulink>
+    |
+<ulink url="&downloadable-file;MILO/cabriolet">.../current/MILO/cabriolet</ulink>
+    |
+<ulink url="&downloadable-file;MILO/eb164">.../current/MILO/eb164</ulink>
+    |
+<ulink url="&downloadable-file;MILO/eb64p">.../current/MILO/eb64p</ulink>
+    |
+<ulink url="&downloadable-file;MILO/eb66">.../current/MILO/eb66</ulink>
+    |
+<ulink url="&downloadable-file;MILO/eb66p">.../current/MILO/eb66p</ulink>
+    |
+<ulink url="&downloadable-file;MILO/lx164">.../current/MILO/lx164</ulink>
+    |
+<ulink url="&downloadable-file;MILO/miata">.../current/MILO/miata</ulink>
+    |
+<ulink url="&downloadable-file;MILO/mikasa">.../current/MILO/mikasa</ulink>
+    |
+<ulink url="&downloadable-file;MILO/noname">.../current/MILO/noname</ulink>
+    |
+<ulink url="&downloadable-file;MILO/p2k">.../current/MILO/p2k</ulink>
+    |
+<ulink url="&downloadable-file;MILO/pc164">.../current/MILO/pc164</ulink>
+    |
+<ulink url="&downloadable-file;MILO/ruffian">.../current/MILO/ruffian</ulink>
+    |
+<ulink url="&downloadable-file;MILO/sx164">.../current/MILO/sx164</ulink>
+    |
+<ulink url="&downloadable-file;MILO/takara">.../current/MILO/takara</ulink>
+    |
+<ulink url="&downloadable-file;MILO/xl">.../current/MILO/xl</ulink>
+    |
+<ulink url="&downloadable-file;MILO/xlt">.../current/MILO/xlt</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_alcor">.../current/MILO/milo_alcor</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_avanti">.../current/MILO/milo_avanti</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_book1">.../current/MILO/milo_book1</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_cabriolet">.../current/MILO/milo_cabriolet</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_eb164">.../current/MILO/milo_eb164</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_eb64p">.../current/MILO/milo_eb64p</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_eb66">.../current/MILO/milo_eb66</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_eb66p">.../current/MILO/milo_eb66p</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_lx164">.../current/MILO/milo_lx164</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_miata">.../current/MILO/milo_miata</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_mikasa">.../current/MILO/milo_mikasa</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_noname">.../current/MILO/milo_noname</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_p2k">.../current/MILO/milo_p2k</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_pc164">.../current/MILO/milo_pc164</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_ruffian">.../current/MILO/milo_ruffian</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_sx164">.../current/MILO/milo_sx164</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_takara">.../current/MILO/milo_takara</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_xl">.../current/MILO/milo_xl</ulink>
+    |
+<ulink url="&downloadable-file;MILO/milo_xlt">.../current/MILO/milo_xlt</ulink>
+
+  '>
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &alpha-install-docs;
+    |&apb-files;
+    |&milo-files;
+  '>
+]]>
+
+<!-- arm misc files checked 2002-03-15 -->
+<![ %arm [
+  <!ENTITY list-arm-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+  <!ENTITY list-rpc-install-kit '
+<ulink url="&downloadable-file;dinstall.zip">.../current/riscpc/dinstall.zip</ulink>'>
+  <!ENTITY list-arm-install-files "" >
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &rpc-install-kit;
+    &arm-install-docs;
+  '>
+]]>
+
+<!-- hppa misc files checked 2002-03-15 -->
+<![ %hppa [
+  <!ENTITY list-hppa-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &hppa-install-docs;
+  '>
+]]>
+
+<!-- i386 misc files checked 2002-03-15 -->
+<![ %i386 [
+  <!ENTITY list-i386-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;images-1.20/safe/README.txt">.../current/images-1.20/safe/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/bf2.4/README.txt">.../current/images-1.44/bf2.4/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/compact/README.txt">.../current/images-1.44/compact/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/idepci/README.txt">.../current/images-1.44/idepci/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;images-1.44/safe/README.txt">.../current/images-1.44/safe/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;images-2.88/bf2.4/README.txt">.../current/images-2.88/bf2.4/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;images-2.88/compact/README.txt">.../current/images-2.88/compact/README.txt</ulink>
+    |
+<ulink url="&downloadable-file;images-2.88/idepci/README.txt">.../current/images-2.88/idepci/README.txt</ulink>
+  '>
+  <!ENTITY list-i386-install-files "">
+
+<!-- make this a hard link so other arches can find it too -->
+  <!ENTITY list-rawrite.exe '
+    
+<ulink url="&disturl;main/disks-i386/current/dosutils/rawrite2.exe">>
+  '>
+  <!ENTITY list-rawrite.txt '
+    
+<ulink url="&disturl;main/disks-i386/current/dosutils/rawrite2.txt">>
+  '>
+  <!ENTITY list-loadlin.exe '
+    
+<ulink url="&downloadable-file;dosutils/loadlin.exe">.../current/dosutils/loadlin.exe</ulink>
+  '>
+  <!ENTITY list-install.bat '
+    
+<ulink url="&downloadable-file;install.bat">.../current/install.bat</ulink>
+    |
+<ulink url="&downloadable-file;bf2.4/install.bat">.../current/bf2.4/install.bat</ulink>
+    |
+<ulink url="&downloadable-file;compact/install.bat">.../current/compact/install.bat</ulink>
+    |
+<ulink url="&downloadable-file;idepci/install.bat">.../current/idepci/install.bat</ulink>
+  '>
+<!-- we don't need all the kernel config, just use the one in the flavor top-level dirs -->
+  <!ENTITY list-kernel-configs '
+    
+<ulink url="&downloadable-file;kernel-config">.../current/kernel-config</ulink>
+    |
+<ulink url="&downloadable-file;bf2.4/kernel-config">.../current/bf2.4/kernel-config</ulink>
+    |
+<ulink url="&downloadable-file;compact/kernel-config">.../current/compact/kernel-config</ulink>
+    |
+<ulink url="&downloadable-file;idepci/kernel-config">.../current/idepci/kernel-config</ulink>
+  '>
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &i386-install-docs;
+    |&rawrite.exe;
+    |&rawrite.txt;
+    |&loadlin.exe;
+    |&install.bat;
+    |&kernel-configs;
+  '>
+]]>
+
+<!-- ia64 misc files checked 2002-03-15 -->
+<![ %ia64 [
+  <!ENTITY list-ia64-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &ia64-install-docs;
+  '>
+]]>
+
+<!-- m68k misc files checked 2002-03-15 -->
+<![ %m68k [
+  <!ENTITY list-m68k-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+  <!ENTITY list-m68k-install-files '
+    
+<ulink url="&downloadable-file;source/m68k-support.tar.gz">.../current/source/m68k-support.tar.gz</ulink>
+  '>
+  <!ENTITY list-rawrite2.exe '
+    
+<ulink url="&downloadable-file;rawrite2.exe">.../current/rawrite2.exe</ulink>
+  '>
+  <!ENTITY list-rawwrite.ttp '
+    
+<ulink url="&downloadable-file;rawwrite.ttp">.../current/rawwrite.ttp</ulink>
+  '>
+  <!ENTITY list-system-maps '
+    
+<ulink url="&downloadable-file;amiga/sysmap.gz">.../current/amiga/sysmap.gz</ulink>
+    |
+<ulink url="&downloadable-file;atari/sysmap.gz">.../current/atari/sysmap.gz</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/sysmap.gz">.../current/bvme6000/sysmap.gz</ulink>
+    |
+<ulink url="&downloadable-file;mac/sysmap.gz">.../current/mac/sysmap.gz</ulink>
+    |
+<ulink url="&downloadable-file;mvme16x/sysmap.gz">.../current/mvme16x/sysmap.gz</ulink>
+  '>
+  <!ENTITY list-amiga-install-docs '
+    
+<ulink url="&downloadable-file;amiga.info">.../current/amiga.info</ulink>
+    |
+<ulink url="&downloadable-file;dmesg.readme">.../current/dmesg.readme</ulink>
+    |
+<ulink url="&downloadable-file;amiga/ReadMe_First">.../current/amiga/ReadMe_First</ulink>
+    |
+<ulink url="&downloadable-file;amiga/ReadMe_First.info">.../current/amiga/ReadMe_First.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/clgen.txt">.../current/amiga/clgen.txt</ulink>
+    |
+<ulink url="&downloadable-file;amiga/clgen.txt.info">.../current/amiga/clgen.txt.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/cv3d.txt">.../current/amiga/cv3d.txt</ulink>
+    |
+<ulink url="&downloadable-file;amiga/cv3d.txt.info">.../current/amiga/cv3d.txt.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/cv64.txt">.../current/amiga/cv64.txt</ulink>
+    |
+<ulink url="&downloadable-file;amiga/cv64.txt.info">.../current/amiga/cv64.txt.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/install.doc">.../current/amiga/install.doc</ulink>
+    |
+<ulink url="&downloadable-file;amiga/install.doc.info">.../current/amiga/install.doc.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/ocs_ecs_aga.txt">.../current/amiga/ocs_ecs_aga.txt</ulink>
+    |
+<ulink url="&downloadable-file;amiga/ocs_ecs_aga.txt.info">.../current/amiga/ocs_ecs_aga.txt.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/retz3.txt">.../current/amiga/retz3.txt</ulink>
+    |
+<ulink url="&downloadable-file;amiga/retz3.txt.info">.../current/amiga/retz3.txt.info</ulink>
+  '>
+  <!ENTITY list-amiga-install-tarball '
+<ulink url="&downloadable-file;amigainstall.tar.gz">.../current/amigainstall.tar.gz</ulink>'>
+  <!ENTITY list-amiga-install-files '
+    &amiga-install-tarball;
+    |
+<ulink url="&downloadable-file;dmesg">.../current/dmesg</ulink>
+    |
+<ulink url="&downloadable-file;amiga/amiboot-5.6">.../current/amiga/amiboot-5.6</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall">.../current/amiga/StartInstall</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall.info">.../current/amiga/StartInstall.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall_CV3D">.../current/amiga/StartInstall_CV3D</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall_CV3D.info">.../current/amiga/StartInstall_CV3D.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall_CV64">.../current/amiga/StartInstall_CV64</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall_CV64.info">.../current/amiga/StartInstall_CV64.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall_clgen">.../current/amiga/StartInstall_clgen</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall_clgen.info">.../current/amiga/StartInstall_clgen.info</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall_retz3">.../current/amiga/StartInstall_retz3</ulink>
+    |
+<ulink url="&downloadable-file;amiga/StartInstall_retz3.info">.../current/amiga/StartInstall_retz3.info</ulink>
+  '>
+  <!ENTITY list-atari-install-docs '
+    
+<ulink url="&downloadable-file;atari/install.doc">.../current/atari/install.doc</ulink>
+  '>
+  <!ENTITY list-atari-install-tarball '
+<ulink url="&downloadable-file;atariinstall.tar.gz">.../current/atariinstall.tar.gz</ulink>'>
+  <!ENTITY list-atari-install-files '
+    &atari-install-tarball;
+    |
+<ulink url="&downloadable-file;atari/bootstra.prg">.../current/atari/bootstra.prg</ulink>
+    |
+<ulink url="&downloadable-file;atari/bootargs">.../current/atari/bootargs</ulink>
+  '>
+  <!ENTITY list-bvme6000-install-docs '
+    
+<ulink url="&downloadable-file;bvme6000/install.txt">.../current/bvme6000/install.txt</ulink>
+    |
+<ulink url="&downloadable-file;bvme6000/bvmbug.txt">.../current/bvme6000/bvmbug.txt</ulink>
+  '>
+  <!ENTITY list-bvme6000-install-files '
+    
+<ulink url="&downloadable-file;bvme6000/bvmbug-G.bin">.../current/bvme6000/bvmbug-G.bin</ulink>
+  '>
+  <!ENTITY list-mac-install-tarball '
+<ulink url="&downloadable-file;macinstall.tar.gz">.../current/macinstall.tar.gz</ulink>'>
+  <!ENTITY list-mac-install-files '
+    &mac-install-tarball;
+    |
+<ulink url="&downloadable-file;mac/Penguin-19.hqx">.../current/mac/Penguin-19.hqx</ulink>
+    |
+<ulink url="&downloadable-file;mac/Penguin-Colors.hqx">.../current/mac/Penguin-Colors.hqx</ulink>
+    |
+<ulink url="&downloadable-file;mac/Penguin.doc.hqx">.../current/mac/Penguin.doc.hqx</ulink>
+  '>
+  <!ENTITY list-mvme16x-install-docs '
+    
+<ulink url="&downloadable-file;mvme16x/install.txt">.../current/mvme16x/install.txt</ulink>
+  '>
+  <!ENTITY list-mvme16x-install-files "" >
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &m68k-install-docs;
+    |&m68k-install-files;
+    |&rawrite2.exe;
+    |&rawwrite.ttp;
+    |&system-maps;
+    |&amiga-install-docs;
+    |&amiga-install-files;
+    |&atari-install-docs;
+    |&atari-install-files;
+    |&bvme6000-install-docs;
+    |&bvme6000-install-files;
+    |&mac-install-files;
+    |&mvme16x-install-docs;
+  '>
+]]>
+
+<!-- mips misc files 2.3.0-2001-04-15 -->
+<![ %mips [
+  <!ENTITY list-mips-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+]]>
+
+<!-- mipsel misc files 2.3.0-2001-06-04 -->
+<![ %mipsel [
+  <!ENTITY list-mipsel-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+]]>
+
+<!-- powerpc misc files 2.2.15-2000-06-07 -->
+<![ %powerpc [
+  <!ENTITY list-powerpc-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+  <!ENTITY list-powerpc-install-files "">
+  <!ENTITY list-system-maps '
+    
+<ulink url="&downloadable-file;apus/sysmap.gz">.../current/apus/sysmap.gz</ulink>
+    |
+<ulink url="&downloadable-file;chrp/sysmap.gz">.../current/chrp/sysmap.gz</ulink>
+    |
+<ulink url="&downloadable-file;powermac/sysmap.gz">.../current/powermac/sysmap.gz</ulink>
+    |
+<ulink url="&downloadable-file;prep/sysmap.gz">.../current/prep/sysmap.gz</ulink>
+  '>
+  <!ENTITY list-apus-install-docs '
+    
+<ulink url="&downloadable-file;apus/install.txt">.../current/apus/install.txt</ulink>
+  '>
+  <!ENTITY list-apus-install-files '
+    
+<ulink url="&downloadable-file;apus/bootstrap/Linux">.../current/apus/bootstrap/Linux</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/Linux.info">.../current/apus/bootstrap/Linux.info</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/Linux.ramdisk">.../current/apus/bootstrap/Linux.ramdisk</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/Linux.ramdisk.bak">.../current/apus/bootstrap/Linux.ramdisk.bak</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/Linux.ramdisk.info">.../current/apus/bootstrap/Linux.ramdisk.info</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/bootmesg">.../current/apus/bootstrap/bootmesg</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/bootstrap">.../current/apus/bootstrap/bootstrap</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/debian.info">.../current/apus/bootstrap/debian.info</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/dmesg">.../current/apus/bootstrap/dmesg</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/ppcboot_pup">.../current/apus/bootstrap/ppcboot_pup</ulink>
+    |
+<ulink url="&downloadable-file;apus/bootstrap/ppcboot_wup">.../current/apus/bootstrap/ppcboot_wup</ulink>
+  '>
+  <!ENTITY list-chrp-install-docs '
+    
+<ulink url="&downloadable-file;chrp/install.txt">.../current/chrp/install.txt</ulink>
+  '>
+  <!ENTITY list-chrp-install-files '
+    
+<ulink url="&downloadable-file;chrp/bootargs">.../current/chrp/bootargs</ulink>
+  '>
+  <!ENTITY list-powermac-install-docs '
+    
+<ulink url="&downloadable-file;powermac/install.txt">.../current/powermac/install.txt</ulink>
+  '>
+  <!ENTITY list-powermac-install-files '
+    
+<ulink url="&downloadable-file;powermac/BootX_1.2.2.sit">.../current/powermac/BootX_1.2.2.sit</ulink>
+    |
+<ulink url="&downloadable-file;powermac/bootargs">.../current/powermac/bootargs</ulink>
+    |
+<ulink url="&downloadable-file;powermac/bootvars1.3b.sit.hqx">.../current/powermac/bootvars1.3b.sit.hqx</ulink>
+    |
+<ulink url="&downloadable-file;powermac/ramdisk.image.gz">.../current/powermac/ramdisk.image.gz</ulink>
+    |
+<ulink url="&downloadable-file;powermac/images-1.44/boot-floppy-hfs.img">.../current/powermac/images-1.44/boot-floppy-hfs.img</ulink>
+  '>
+  <!ENTITY list-prep-install-docs '
+    
+<ulink url="&downloadable-file;prep/install.txt">.../current/prep/install.txt</ulink>
+  '>
+  <!ENTITY list-prep-install-files '
+    
+<ulink url="&downloadable-file;prep/bootfull.bin">.../current/prep/bootfull.bin</ulink>
+    |
+<ulink url="&downloadable-file;prep/images-1.44/boot.bin">.../current/prep/images-1.44/boot.bin</ulink>
+  '>
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &powerpc-install-docs;
+    |&powerpc-install-files;
+    |&system-maps;
+    |&apus-install-docs;
+    |&apus-install-files;
+    |&chrp-install-docs;
+    |&chrp-install-files;
+    |&powermac-install-docs;
+    |&powermac-install-files;
+    |&prep-install-docs;
+    |&prep-install-files;
+  '>
+]]>
+
+<!-- s390 misc files 3.0.16-2001-10-27 -->
+<![ %s390 [
+  <!ENTITY list-s390-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+  <!ENTITY list-s390-vmipl '
+    
+<ulink url="&downloadable-file;vmrdr/debian.exec">.../current/vmrdr/debian.exec</ulink>
+  '>
+  <!ENTITY list-s390-parmfiles '
+    
+<ulink url="&downloadable-file;tape/parmfile.debian">.../current/tape/parmfile.debian</ulink>
+    |
+<ulink url="&downloadable-file;vmrdr/parmfile.debian">.../current/vmrdr/parmfile.debian</ulink>
+  '>
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &s390-install-docs;
+    |&s390-vmipl;
+    |&s390-parmfiles;
+  '>
+]]>
+
+<!-- sparc misc files 2.2.15-2000-06-10 -->
+<![ %sparc [
+  <!ENTITY list-sparc-install-docs '
+    
+<ulink url="&downloadable-file;README.txt">.../current/README.txt</ulink>
+  '>
+  <!ENTITY list-sparc-install-files "">
+  <!ENTITY % has-misc-files "INCLUDE">
+  <!ENTITY list-misc-files '
+    &sparc-install-docs;
+  '>
+]]>
+
+<!-- catch any architecture that does not have misc-files -->
+  <!ENTITY % has-misc-files "IGNORE">
+

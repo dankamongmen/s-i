@@ -1,0 +1,263 @@
+<!-- retain these comments for translator revision tracking -->
+<!-- $Id: installation-media.xml -->
+
+
+ <sect1 id="installation-media">
+ <title>Installation Media</title>
+
+<![ %supports-floppy-boot; [
+<para>
+In many cases, you'll have to do your first boot from floppy disks,
+using the rescue floppy.  Generally, all you will need is a
+high-density (1440 kilobytes) 3.5 inch floppy drive.
+
+<![ %i386; [ High-density, 5.25 inch installation floppy images (1200
+k) are also provided. ]]>
+
+<![ %m68k; [ Double-density installation floppy images (720 k) are also
+provided for Ataris. ]]>
+
+<![ %powerpc; [ For CHRP, floppy support is currently broken. ]]>
+</para>
+]]>
+
+<para>
+CD-ROM based installation is supported for some architectures.
+On machines which support bootable CD-ROMs, you should be able to do a
+completely
+<![ %not-s390; [ floppy-less]]>
+<![ %s390; [ tape-less]]>
+installation.  Even if your system doesn't
+support booting from a CD-ROM, you can use the CD-ROM in conjunction
+with the other techniques to install your system, once you've booted
+up by other means; see <xref linkend="install-cd"></xref>.
+<![ %mips; [ Mips does currently not support booting off a cdrom. ]]>
+</para>
+
+<![ %i386; [ 
+<para>
+Both SCSI and IDE/ATAPI CD-ROMs are supported.  In
+addition, all non-standard CD interfaces supported by Linux are
+supported by the boot disks (such as Mitsumi and Matsushita drives).
+However, these models might require special boot parameters or other
+massaging to get them to work, and booting off these non-standard
+interfaces is unlikely.  The 
+<ulink url="&url-cd-howto;">Linux CD-ROM HOWTO</ulink>
+contains in-depth information on using CD-ROMs with
+Linux.  
+</para>
+]]>
+
+<![ %arm; [ 
+<para>
+IDE/ATAPI CD-ROMs are supported on all ARM machines.
+On RiscPCs, SCSI CD-ROMs are also supported.  ]]>
+</para>
+
+<![ %mipsel; [ 
+<para>
+On DECstations, booting from CD-ROM requires a SCSI CD-ROM
+drive capable of working with a logical blocksize of 512 bytes. Many
+of the SCSI CD-DROM drives sold for the PC market do not have this
+capability. If your CD-ROM drive has a jumper labeled "Unix/PC" or
+"512/2048", place it in the "Unix" or "512" position.
+</para>
+
+<para>
+CD 1 contains the installer for the r3k-kn02 subarchitecture
+(the R3000-based DECstations 5000/1xx and 5000/240 as well as
+the R3000-based Personal DECstation models), CD 2 the
+installer for the r4k-kn04 subarchitecture (the R4x00-based
+DECstations 5000/150 and 5000/260 as well as the Personal DECstation
+5000/50).
+</para>
+
+<para>
+To boot from CD, issue the command <userinput>boot <replaceable>#</replaceable>/rz<replaceable>id</replaceable></userinput>
+on the firmware prompt, where <replaceable>#</replaceable> is the number of the TurboChannel
+device from which to boot (3 on most DECstations) and <replaceable>id</replaceable>
+is the SCSI ID of the CD-ROM drive.
+If you need to pass additional parameters, they can optionally be appended
+with the following syntax:
+</para>
+
+<para>
+<userinput>boot <replaceable>#</replaceable>/rz<replaceable>id</replaceable> param1=value1 param2=value2 ...</userinput>
+</para>
+
+]]>
+
+<para>
+Installation system booting from a hard disk is another option for
+many architectures.
+
+<![ %m68k; [ In fact, installation from your local disk is the preferred
+installation technique for most &architecture; machines. ]]>
+
+<![ %sparc; [ Although the &arch-title; does not allow booting from SunOS 
+(Solaris), you can install from a SunOS partiton (UFS slices).]]>
+
+<![ %supports-tftp; [ You can also <emphasis>boot</emphasis> your system
+over the network.
+  <![ %mips; [ This is the preferred installation technique for Mips. 
+  ]]>
+]]>
+
+<![ %supports-nfsroot; [
+Diskless installation, using network booting
+from a local area network and NFS-mounting of all local filesystems,
+is another option &mdash; you'll probably need at least 16MB of RAM for a
+diskless installation.
+]]>
+
+After the operating system kernel is installed, you can install the
+rest of your system via any sort of network connection (including
+PPP after installation of the base system), via FTP, HTTP, or NFS.
+</para>
+
+  <sect2><title>Supported Storage Systems</title>
+
+<para>The Debian boot disks contain a kernel which is built to maximize the
+number of systems it runs on.  Unfortunately, this makes for a larger
+kernel, which includes many drivers that won't be used for your
+machine (see <xref linkend="kernel-baking"></xref> to learn how to build your own
+kernel).  Support for the widest possible range of devices is
+desirable in general, to ensure that Debian can be installed on the
+widest array of hardware.
+</para>
+
+<![ %i386; [
+<para>
+Generally, the Debian installation system includes support for
+floppies, IDE drives, IDE floppies, parallel port IDE devices, SCSI
+controllers and drives.  The file systems supported include MINIX,
+FAT, Win-32 FAT extensions (VFAT), among others (note that NTFS is not
+supported by the installation system; you can add it later, as
+described in <xref linkend="kernel-baking"></xref>).
+</para>
+
+<para>
+The disk interfaces that emulate the ``AT'' hard disk interface which
+are often called MFM, RLL, IDE, or ATA are supported.  Very old 8 bit
+hard disk controllers used in the IBM XT computer are supported only
+as a module. SCSI disk controllers from many different manufacturers
+are supported. See the 
+<ulink url="&url-hardware-howto;">Linux Hardware Compatibility HOWTO</ulink> 
+for more details.
+</para>
+
+<para>
+Not supported are IDE SCSI drives and some SCSI controllers, including
+<itemizedlist>
+  <listitem><para>
+EATA-DMA protocol compliant SCSI Host Adapters like the SmartCache
+III/IV, SmartRAID controller families and the DPT PM2011B and PM2012B
+controllers.
+  </para></listitem>
+  <listitem><para>
+The 53c7 NCR family of SCSI controllers (but 53c8 and 5380 controllers
+are supported)
+  </para></listitem>
+</itemizedlist>
+</para>
+]]>
+
+<![ %m68k; [
+<para>
+Pretty much all storage systems supported by the Linux kernel are
+supported by the Debian installation system.  Note that the current
+Linux kernel does not support floppies on the Macintosh at all, and
+the Debian installation system doesn't support floppies for Amigas.
+Also supported on the Atari is the Macintosh HFS system, and AFFS as a
+module.  Macs support the Atari (FAT) file system.  Amigas support the
+FAT file system, and HFS as a module.
+</para>
+]]>
+
+<![ %sparc; [ 
+<para>
+Any storage system supported by the Linux kernel is also supported by
+the boot system. The following SCSI drivers are supported in the default
+kernel:
+
+<itemizedlist>
+    <listitem><para>
+Sparc ESP
+    </para></listitem>
+    <listitem><para>
+PTI Qlogic,ISP
+    </para></listitem>
+    <listitem><para>
+Adaptec AIC7xxx
+    </para></listitem>
+    <listitem><para>
+NCR and Symbios 53C8XX
+    </para></listitem>
+</itemizedlist>
+
+IDE systems (such as the UltraSPARC 5) are also supported. See <ulink
+url="&url-sparc-linux-faq;">Linux for SPARC Processors FAQ</ulink> for more
+information on SPARC hardware supported by the Linux kernel.
+</para>
+]]>
+
+<![ %alpha; [
+<para>
+Any storage system supported by the Linux kernel is also supported by
+the boot system.  The following SCSI drivers are supported in the default
+kernel:
+
+<itemizedlist>
+    <listitem><para>
+Qlogic ISP
+    </para></listitem>
+    <listitem><para>
+NCR and Symbios 53c8xx
+    </para></listitem>
+    <listitem><para>
+Adaptec AIC7xxx
+    </para></listitem>
+</itemizedlist>
+
+IDE disks are also supported.  Note, however, that on many systems,
+the SRM console is unable to boot from IDE drives, and the Jensen is
+unable to boot from floppies.  (see 
+<ulink url="&url-jensen-howto;"></ulink>for
+more information on booting the Jensen)
+</para>
+]]>
+
+<![ %powerpc; [ 
+<para>
+Any storage system supported by the Linux kernel is also supported by
+the boot system.  Note that the current Linux kernel does not support
+floppies on CHRP systems at all. 
+</para>
+]]>
+
+<![ %hppa; [
+<para>
+Any storage system supported by the Linux kernel is also supported by
+the boot system.  Note that the current Linux kernel does not support
+the floppy drive.
+</para>
+]]>
+
+<![ %mips; [
+<para>
+Any storage system supported by the Linux kernel is also supported by
+the boot system.
+</para>
+]]>
+
+<![ %s390; [
+<para>Any storage system supported by the Linux kernel is also supported by
+the boot system.  This means that FBA and ECKD DASDs are supported with
+the old Linux disk layout (ldl) and the new common S/390 disk layout (cdl).
+</para>
+]]>
+
+
+  </sect2>
+
+ </sect1>
