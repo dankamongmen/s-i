@@ -23,6 +23,24 @@
  * packages and skip those.
  */
 struct package_t *select_packages (struct package_t *packages) {
+        struct package_t *p = packages;
+        struct package_t *prev = NULL;
+        while (p)
+        {
+                if (strcmp(p->package,"cdebconf-udeb") == 0 ||
+                    strcmp(p->package,"anna") == 0 ||
+                    strcmp(p->package,"rootskel") == 0 )
+                {
+                        if (prev)
+                                prev->next = p->next;
+                        else
+                                packages = p->next;
+                        p = p->next;
+                        continue;
+                }
+                prev = p;
+                p = p->next;
+        }
 	return packages;
 }
 
@@ -54,7 +72,7 @@ int md5sum(char* sum, char *file) {
         line[1023] = '\0';
         if (strlen(line) < 32) {
                 /* not a success, return */
-                return -1;
+                return 0;
         }
         line[32] = '\0';
         /* line now contains just the md5sum */

@@ -11,7 +11,8 @@
 /* Returns the filename of the retriever to use. */
 /* TODO: handle more than one, and don't hard-code. */
 char *chosen_retriever (void) {
-	return "/usr/lib/debian-installer/retriever/wget/wget-retriever";
+        
+	return "/usr/lib/debian-installer/retriever/cdrom-retriever";
 }
 
 /* Ask the chosen retriever to download a particular package to to dest. */
