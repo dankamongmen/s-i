@@ -239,8 +239,6 @@ fi
 
 # get pcmcia running if possible
 if [ -x /etc/init.d/pcmcia ]; then
-	# avoid debconf daemon issues..
-	db_stop
 	/etc/init.d/pcmcia start </dev/null 2>&1 | logger -t hw-detect
 fi
 
