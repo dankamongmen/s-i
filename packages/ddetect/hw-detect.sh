@@ -429,6 +429,16 @@ if ! is_not_loaded ohci1394; then
 		echo "scsi add-single-device 0 0 0 0" > /proc/scsi/scsi || true
 	;;
 	esac
+
+	# also try to enable firewire ethernet (The right way to do this is
+	# really to catch the hotplug events from the kernel.)
+	if is_not_loaded eth1394; then
+		db_subst hw-detect/load_progress_step CARDNAME "FireWire ethernet support"
+		db_subst hw-detect/load_progress_step MODULE "eth1394"
+		db_progress INFO hw-detect/load_progress_step
+		load_module eth1394
+		register-module eth1394
+	fi
 fi
 
 apply_pcmcia_resource_opts() {
