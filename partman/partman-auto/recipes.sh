@@ -1,6 +1,4 @@
 
-. /lib/partman/definitions.sh
-
 # If you are curious why partman-auto is so slow, it is because
 # update-all is slow
 update_all () {
