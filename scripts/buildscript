@@ -103,63 +103,65 @@ ARCH="$(dpkg-architecture -qDEB_BUILD_ARCH)"
 
 # Build and install packages with debs first, others build-depend on it.
 #
-build packages-build
-install_deb . di-packages-build
+build packages/packages-build
+install_deb packages di-packages-build
 
 # build d-i library
-build libdebian-installer
-install_deb . libdebian-installer4 libdebian-installer-extra4 libdebian-installer4-dev
-supply_udeb libdebian-installer4 libdebian-installer-extra4
+build packages/libdebian-installer
+install_deb packages libdebian-installer4 libdebian-installer-extra4 libdebian-installer4-dev
+supply_udeb packages/libdebian-installer4 packages/libdebian-installer-extra4
 
 # build cdebconf
-build tools/cdebconf
-install_deb tools libdebconfclient0 libdebconfclient0-dev
-supply_udeb tools/cdebconf
+build packages/cdebconf
+install_deb packages libdebconfclient0 libdebconfclient0-dev
+supply_udeb packages/cdebconf
 
 # build kernel-wedge
-build kernel/kernel-wedge
-install_deb kernel kernel-wedge
+build packages/kernel/kernel-wedge
+install_deb packages/kernel kernel-wedge
 
 # Build all other udebs.
-do_subdir anna
-do_subdir kernel/linux-kernel-di-$ARCH
-do_subdir main-menu
+do_subdir packages/kernel/linux-kernel-di-$ARCH
 
-do_subdir partman/partman partman/partman-auto \
-	partman/partman-basicfilesystems partman/partman-basicmethods \
-	partman/partman-ext3 partman/partman-lvm partman/partman-reiserfs \
-	partman/partman-xfs partman/partman-partitioning \
-	partman/partman-target
+do_subdir packages/partman/partman packages/partman/partman-auto \
+	packages/partman/partman-basicfilesystems \
+	packages/partman/partman-basicmethods \
+	packages/partman/partman-ext3 packages/partman/partman-lvm \
+	packages/partman/partman-reiserfs packages/partman/partman-xfs \
+	packages/partman/partman-partitioning \
+	packages/partman/partman-target
 
-[ "$ARCH" = "hppa" ] && do_subdir partman/partman-palo
+[ "$ARCH" = "hppa" ] && do_subdir packages/partman/partman-palo
 
-do_subdir retriever/choose-mirror retriever/cdrom retriever/floppy retriever/net
+do_subdir packages/retriever/choose-mirror packages/retriever/cdrom \
+	packages/retriever/floppy packages/retriever/net
 
-do_subdir rootskel
-
-do_subdir tools/autopartkit tools/base-installer tools/baseconfig-udeb \
-	tools/bterm-unifont tools/bugreporter tools/cdrom-checker \
-	tools/cdrom-detect tools/countrychooser tools/ddetect tools/iso-scan \
-	tools/kbd-chooser tools/languagechooser tools/lowmem tools/lvmcfg \
-	tools/netcfg tools/nobootloader tools/partconf tools/partitioner \
-	tools/prebaseconfig tools/udpkg tools/usb-discover tools/userdevfs
-
-do_subdir utils
+do_subdir packages/anna packages/autopartkit packages/base-installer \
+	packages/baseconfig-udeb packages/bterm-unifont \
+	packages/bugreporter-udeb packages/cdrom-checker \
+	packages/cdrom-detect packages/countrychooser \
+	packages/ddetect packages/debian-installer-utils \
+	packages/iso-scan packages/kbd-chooser \
+	packages/languagechooser packages/lowmem \
+	packages/lvmcfg packages/main-menu packages/netcfg packages/nobootloader \
+	packages/partconf packages/partitioner \
+	packages/prebaseconfig packages/rootskel packages/udpkg \
+	packages/usb-discover packages/userdevfs
 
 # Arch dependent udebs, which may not build cleanly elsewhere.
-[ "$ARCH" = "alpha" ] && do_subdir tools/aboot-installer \
-	tools/alpha/srm-reader
-[ "$ARCH" = "powerpc" ] && do_subdir tools/yaboot-installer
-[ "$ARCH" = "hppa" ] && do_subdir tools/hppa/palo-installer
-[ "$ARCH" = "hurd-i386" ] && do_subdir tools/grub-installer
-[ "$ARCH" = "i386" ] && do_subdir tools/grub-installer tools/lilo-installer
-[ "$ARCH" = "ia64" ] && do_subdir tools/ia64/efi-reader \
-	tools/ia64/elilo-installer
-[ "$ARCH" = "mips" ] && do_subdir tools/mips/arcboot-installer
-[ "$ARCH" = "mipsel" ] && do_subdir tools/mipsel/delo-installer
-[ "$ARCH" = "s390" ] && do_subdir tools/s390/dasd tools/s390/netdevice \
-	tools/s390/zipl-installer
-[ "$ARCH" = "sparc" ] && do_subdir tools/sparc/silo-installer
+[ "$ARCH" = "alpha" ] && do_subdir packages/arch/alpha/aboot-installer \
+	packages/arch/alpha/srm-reader
+[ "$ARCH" = "powerpc" ] && do_subdir packages/arch/powerpc/yaboot-installer
+[ "$ARCH" = "hppa" ] && do_subdir packages/arch/hppa/palo-installer
+[ "$ARCH" = "i386" ] && do_subdir packages/arch/i386/grub-installer \
+	packages/arch/i386/lilo-installer
+[ "$ARCH" = "ia64" ] && do_subdir packages/arch/ia64/efi-reader \
+	packages/arch/ia64/elilo-installer
+[ "$ARCH" = "mips" ] && do_subdir packages/arch/mips/arcboot-installer
+[ "$ARCH" = "mipsel" ] && do_subdir packages/arch/mipsel/delo-installer
+[ "$ARCH" = "s390" ] && do_subdir packages/arch/s390/dasd \
+	packages/arch/s390/netdevice packages/arch/s390/zipl-installer
+[ "$ARCH" = "sparc" ] && do_subdir packages/arch/sparc/silo-installer
 
 # Build the installer boot image.
 build installer
