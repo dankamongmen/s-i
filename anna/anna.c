@@ -59,9 +59,7 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 	{
 		next = node->next;
 		p = (struct package_t *)node->data;
-		if (di_pkg_is_virtual(p))
-			continue;
-		if (is_installed(p, status_p)) {
+		if (p->filename == NULL || is_installed(p, status_p)) {
                         if (prev)
                                 prev->next = next;
                         else
