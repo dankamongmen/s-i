@@ -36,7 +36,13 @@ struct package_t *tree_add(const char *packagename) {
 	struct package_t *pkg=malloc(sizeof(struct package_t));
 	memset(pkg, 0, sizeof(struct package_t));
 	pkg->package = strdup(packagename);
-	return tsearch(pkg, &root, tree_compare);
+	/* 
+	 * I should just be able to return tsearch's return code, but this
+	 * makes my code fail horribly later on. I think tsearch has
+	 * issues.
+	 */
+	tsearch(pkg, &root, tree_compare);
+	return pkg;
 }
 
 /* Clears out the entire tree, freeing all package stucts contained it in. */

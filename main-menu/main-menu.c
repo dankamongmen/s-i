@@ -56,7 +56,7 @@ void order(struct package_t *p, struct package_t **head, struct package_t **tail
 		return;
 	
 	for (i=0; p->depends[i] != 0; i++) {
-		if ((found = tree_find(p->depends[1])))
+		if ((found = tree_find(p->depends[i])))
 			order(found, head, tail);
 	}
 	
