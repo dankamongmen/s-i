@@ -16,7 +16,7 @@
 #define STATUS_FILE "/var/lib/dpkg/status"
 
 static struct package_t *
-get_retriever_packages()
+get_retriever_packages(void)
 {
 	FILE *fp;
 	struct package_t *p, *q;
@@ -29,9 +29,19 @@ get_retriever_packages()
 	q = p;
 	while (q != NULL && q->next != NULL)
 	{
-		while (q->next != NULL && (q->next->provides == NULL
-			|| strstr(q->next->provides, "retriever") == NULL))
-			q->next = q->next->next;
+		while (1)
+		{
+			if (q->next == NULL)
+				break;
+			if (q->next->provides == NULL
+					||  strstr(q->next->provides, "retriever") == NULL
+					||  (q->next->status != unpacked &&
+						q->next->status != installed)
+			   )
+				q->next = q->next->next;
+			else
+				break;
+		}
 		q = q->next;
 	}
 	return p;
@@ -61,53 +71,76 @@ get_retriever_choices(struct package_t *p)
 	return ret_choices;
 }
 
-/* Returns the filename of the retriever to use. */
-/* TODO: error handling */
-char *chosen_retriever (void) {
-	static char *retriever = NULL;
+static char *
+get_chosen_retriever(void)
+{
+	struct debconfclient *debconf;
+	char *retriever = NULL, *colon_p = NULL;
 
-	if (retriever == NULL) {
-		struct debconfclient *debconf;
-		struct package_t *ret_pkgs;
-		char *ret_choices, *ret_default;
-		char *colon_p;
+	debconf = debconfclient_new();
+	debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
+	if (debconf->value != NULL)
+		colon_p = strchr(debconf->value, ':');
+	if (colon_p != NULL)
+	{
+		retriever = malloc(strlen(RETRIEVER_DIR "/") +
+				colon_p - debconf->value);
+		strcpy(retriever, RETRIEVER_DIR "/");
+		strncat(retriever, debconf->value, colon_p - debconf->value);
+	}
+	debconfclient_delete(debconf);
+	return retriever;
+}
 
-		ret_pkgs = get_retriever_packages();
-		ret_choices = get_retriever_choices(ret_pkgs);
+static int
+choose_retriever(void)
+{
+	struct debconfclient *debconf;
+	struct package_t *ret_pkgs;
+	char *ret_choices, *ret_default;
+
+	ret_pkgs = get_retriever_packages();
+	if (ret_pkgs == NULL)
+		return 0;
+	ret_choices = get_retriever_choices(ret_pkgs);
+	if (ret_choices[0] == '\0')
+		return 0;
+	debconf = debconfclient_new();
+	debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
+	if (debconf->value != NULL)
+		ret_default = debconf->value;
+	else
+	{
 		ret_default = strrchr(ret_choices, ',');
 		if (ret_default != NULL)
 			ret_default += 2;
+	}
 
-		debconf = debconfclient_new();
-		debconf->command(debconf, "TITLE", "Choose Retriever", NULL);
-		debconf->command(debconf, "SET", ANNA_RETRIEVER, ret_default,
-				NULL);
-		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES",
-				ret_choices, NULL);
-		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT",
-				ret_default, NULL);
-		debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
-		debconf->command(debconf, "GO", NULL);
-		debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
-		colon_p = strchr(debconf->value, ':');
-		retriever = malloc(strlen(RETRIEVER_DIR) + 1 +
-				   colon_p - debconf->value);
-		strcpy(retriever, RETRIEVER_DIR "/");
-		strncat(retriever, debconf->value, colon_p - debconf->value);
-		debconfclient_delete(debconf);
-                
-		free(ret_choices);
-        }
-        return retriever;
+	debconf->command(debconf, "TITLE", "Choose Retriever", NULL);
+	debconf->command(debconf, "SET", ANNA_RETRIEVER, ret_default,
+			NULL);
+	debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES",
+			ret_choices, NULL);
+	debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT",
+			ret_default, NULL);
+	debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
+	debconf->command(debconf, "GO", NULL);
+
+	free(ret_choices);
+
+	return 1;
 }
+
 
 /* Ask the chosen retriever to download a particular package to to dest. */
 int get_package (struct package_t *package, char *dest) {
 	int ret;
-	char *retriever=chosen_retriever();
+	char *retriever;
 	char *command;
 
+	retriever = get_chosen_retriever();
 	asprintf(&command, "%s %s %s", retriever, package->filename, dest);
+	free(retriever);
 	ret=! system(command);
 	free(command);
 	return ret;
@@ -120,7 +153,7 @@ int get_package (struct package_t *package, char *dest) {
  * TODO: compressed Packages files?
  */
 struct package_t *get_packages (void) {
-	char *retriever=chosen_retriever();
+	char *retriever;
 	FILE *packages;
 	struct package_t *p = NULL, *newp, *plast;
 	static char tmp_packages[] = DOWNLOAD_DIR "/Packages";
@@ -129,6 +162,9 @@ struct package_t *get_packages (void) {
         char *suites[] =  { "main", "local", 0 };
         char *suite;
         int currsuite = 0;
+
+	choose_retriever();
+	retriever = get_chosen_retriever();
         suite = suites[currsuite];
         while (suite != NULL) {
 		char *command;
@@ -162,6 +198,7 @@ struct package_t *get_packages (void) {
 
                 suite = suites[++currsuite];
         }
+	free(retriever);
 	return p;
 }
 
