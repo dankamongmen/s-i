@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# Author: Petter Reinholdtsen <pere@hungry.com>
+# Date:   2003-01-17
+#
+# Combine several .po files into on large file, or spread the
+# translations from the large file into the small files.
+
+# Run it like this in the toplevel directory:
+#   ./scripts/gettext-helper export nb
+# Translate nb.po
+#   ./scripts/gettext-helper import nb
+# Commit new translations.
+
+cmd="$1"
+langcode="$2"
+
+pots=`find . -name '*.pot'`
+pos=`find . -name "$langcode".po`
+
+case "$cmd" in
+    import)
+        if test ! -f $langcode.po ; then
+	    echo "error: Unable to find $langcode.po.  Aborting."
+	    exit 1
+	fi
+        for pot in $pots ; do
+	    echo $pot
+	    dir=`dirname $pot`
+	    msgmerge -q $langcode.po $pot > $dir/$langcode.po.new
+	    # Should drop unused (and outcommented) text blocks
+	    grep -v '^#~' $dir/$langcode.po.new | tr "\n" "|" | 
+	    sed 's/|*$/|/g' | tr "|" "\n" > $dir/$langcode.po
+	    rm $dir/$langcode.po.new
+	    msgfmt --statistics $dir/$langcode.po 2>&1 | sed 's/^/    /'
+	done
+        ;;
+    export)
+        msgcat $pots > template.pot
+	msgcat $pos > $langcode.po.new
+	msgmerge $langcode.po.new template.pot > $langcode.po
+	rm $langcode.po.new
+	msgfmt --statistics $langcode.po
+	;;
+    *)
+        echo "error: Unable to understand cmd '$cmd'"
+	exit 1
+        ;;
+esac
+
+exit 0
