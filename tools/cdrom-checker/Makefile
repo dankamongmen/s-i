@@ -18,7 +18,7 @@
 
 
 CC = gcc
-CFLAGS = -Wall -O0 -g -ggdb
+CFLAGS = -Wall -O3
 LD = gcc
 LDLFAGS =
 LDLIBS = -ldebconf -ldebian-installer
@@ -31,6 +31,9 @@ cdrom-checker: main.o
 
 main.o: main.c main.h
 	${CC} ${CFLAGS} -c main.c
+
+strip: all
+	strip --remove-section=.comment --remove-section=.note ${APP}
 
 clean:
 	rm -f *.o
