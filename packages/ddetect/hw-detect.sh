@@ -373,27 +373,27 @@ if [ -x /etc/init.d/pcmcia ]; then
 fi
 
 gen_pcmcia_devnames() {
-  while read line; do
-    log "Reading line: $line"
-    line="$(echo $line | tr '\t' ' ')"
+	while read line; do
+		log "Reading line: $line"
+		line="$(echo $line | tr '\t' ' ')"
 
-    case "$line" in
-      Socket*)
-        devname="$(echo $line | cut -d' ' -f3-)"
-      ;;
-      [0-9]*)
-        class="$(echo $line | cut -d' ' -f2)"
-        dev="$(echo $line | cut -d' ' -f5)"
+		case "$line" in
+			Socket*)
+			devname="$(echo $line | cut -d' ' -f3-)"
+		;;
+		[0-9]*)
+			class="$(echo $line | cut -d' ' -f2)"
+			dev="$(echo $line | cut -d' ' -f5)"
 
-        if [ "$class" != "network" ]; then
-          devname=""
-          return
-        else
-          echo "$dev:$devname" >> /etc/network/devnames
-        fi
-      ;;
-    esac
-  done
+			if [ "$class" != "network" ]; then
+				devname=""
+				return
+			else
+				echo "$dev:$devname" >> /etc/network/devnames
+			fi
+		;;
+		esac
+	done
 }
 
 if [ -e /proc/bus/pccard/drivers ]; then
