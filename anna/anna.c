@@ -46,9 +46,9 @@ struct package_t *select_packages (struct package_t *packages) {
 
 /* Calls udpkg to unpack a package. */
 int unpack_package (char *pkgfile) {
-	char *command=malloc(strlen(DPKG_UNPACK_COMMAND) + 1 +
-			     strlen(pkgfile) + 1);
-	sprintf(command, "%s %s", DPKG_UNPACK_COMMAND, pkgfile);
+	char *command;
+
+	asprintf(&command, "%s %s", DPKG_UNPACK_COMMAND, pkgfile);
 	return ! system(command);
 }
 
@@ -98,9 +98,7 @@ int install_packages (struct package_t *packages) {
 			for(f = fp = p->filename; *fp != 0; fp++)
 				if (*fp == '/')
 					f = ++fp;
-			dest_file=malloc(strlen(DOWNLOAD_DIR) + 1 +
-					 strlen(f) + 1);
-			sprintf(dest_file, "%s/%s", DOWNLOAD_DIR, f);
+			asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f);
 
 			if (! get_package(p, dest_file)) {
 				fprintf(stderr, "anna: error getting %s!\n",

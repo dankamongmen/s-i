@@ -81,9 +81,9 @@ char *chosen_retriever (void) {
 int get_package (struct package_t *package, char *dest) {
 	int ret;
 	char *retriever=chosen_retriever();
-	char *command=malloc(strlen(retriever) + 1 + strlen(package->filename) +
-				     1 + strlen(dest) + 1);
-	sprintf(command, "%s %s %s", retriever, package->filename, dest);
+	char *command;
+
+	asprintf(&command, "%s %s %s", retriever, package->filename, dest);
 	ret=! system(command);
 	free(command);
 	return ret;
@@ -108,11 +108,10 @@ struct package_t *get_packages (void) {
         int currsuite = 0;
         suite = suites[currsuite];
         while (suite != NULL) {
-          char *command=malloc(strlen(retriever) + 10 + 
-                               sizeof(tmp_packages) + 1 + strlen(suite));
+		char *command;
 
                 unlink(tmp_packages);
-                sprintf(command, "%s Packages %s %s", retriever, tmp_packages, 
+                asprintf(&command, "%s Packages %s %s", retriever, tmp_packages, 
                         suite);
                 fprintf(stderr,"%s\n", command);
                 if (system(command) != 0) {
