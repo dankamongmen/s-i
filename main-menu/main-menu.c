@@ -110,7 +110,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	struct package_t **package_list, *p;
 	struct linkedlist_t *olist;
 	struct list_node *node;
-        struct package_t *menudefault = NULL, *ret;
+        struct package_t *menudefault = NULL, *ret = NULL;
 	struct language_description *langdesc;
 	int i = 0, num = 0;
 	char *s;
