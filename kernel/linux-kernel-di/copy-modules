@@ -111,11 +111,20 @@ for i in $(
 
 	# copy kernel modules to package build dir
 	cd $moddir/kernel
-	tar cfT - $tmpdir/module-list/$i |
-	(
+	ret=$(((
+		set +e
+		tar cfT - $tmpdir/module-list/$i
+		printf $? >&3
+	) | (
+		set +e
 		dir=$home/debian/$i-$version-di/lib/modules/$installedname/kernel
 		mkdir -p $dir
 		cd $dir
 		tar xf -
-	)
+		printf $? >&3
+	)) 3>&1)
+	if [ "$ret" != "00" ]; then
+		echo "tar failed" >&2
+		exit $ret
+	fi
 done
