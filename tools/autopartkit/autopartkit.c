@@ -1193,10 +1193,10 @@ int main (int argc, char *argv[])
     disable_kmsg(0);
 
     if (argc > 1)
-        tablefile = argv[1];
+        tablefile = mydebconf_get(argv[1]);
 
     if ( ! tablefile )
-        autopartkit_err(1, "usage: %s <partition-table>\n", argv[0]);
+        autopartkit_err(1, "usage: %s <debconf-template>\n", argv[0]);
 
     disk_reqs = load_partitions(tablefile);
 
