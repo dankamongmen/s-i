@@ -15,7 +15,6 @@ install: install-hw-detect install-ethdetect
 install-hw-detect: hw-detect.sh
 	$(INSTALL) -d $(bindir) $(didir)
 	$(INSTALL_SCRIPT) hw-detect.sh $(bindir)/hw-detect
-	$(INSTALL_SCRIPT) S60hw-detect $(didir)/S60hw-detect
 
 install-hw-detect-full:
 
