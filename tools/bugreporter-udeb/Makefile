@@ -4,7 +4,7 @@ INSTALL     = install
 INSTALL_DATA= install -m 644
 
 bindir      = /bin
-libdir      = /usr/lib
+libdir      = /usr/share
 pkglibdir   = $(libdir)/bugreporter-udeb
 
 all:
