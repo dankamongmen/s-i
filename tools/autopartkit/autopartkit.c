@@ -1209,6 +1209,7 @@ int main (int argc, char *argv[])
     diskspace_req_t *disk_reqs = NULL;
     const char *profiles;
     const char *tablefile;
+    int retval = 1;
     
     autopartkit_log(1, "Using %d default disk label type\n",
 		    default_disk_label());
@@ -1252,12 +1253,11 @@ int main (int argc, char *argv[])
 	free_partition_list(disk_reqs);
     }
 
-    debconfclient_delete(client);
-    return 0;
-    
+    retval = 0;
+
 end:
     PED_DONE();
 
     debconfclient_delete(client);
-    return 1;
+    return retval;
 }
