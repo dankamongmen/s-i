@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.7 2003/09/30 19:22:07 waldi Exp $
+ * $Id: packages.c,v 1.8 2003/10/09 12:18:46 waldi Exp $
  */
 
 #include <debian-installer/packages_internal.h>
@@ -170,7 +170,6 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
     switch (package->type)
     {
       case di_package_type_real_package:
-        di_log (DI_LOG_LEVEL_DEBUG, "consider package %s on %p\n", package->package, package);
         for (node = package->depends.head; node; node = node->next)
         {
           di_package_dependency *d = node->data;
