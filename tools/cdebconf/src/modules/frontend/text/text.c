@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.67 2004/03/12 00:19:04 barbier Exp $
+ * $Id: text.c,v 1.68 2004/03/13 18:01:59 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -51,6 +51,8 @@
 #include <signal.h>
 #include <string.h>
 #include <limits.h>
+#include <wchar.h>
+#include <stdlib.h>
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -74,6 +76,30 @@
 #else
 #define ISEMPTY(buf) (buf[0] == 0)
 #endif
+
+/*  This function will be moved to strutl.c  */
+/*
+ * Add spaces at the end of string so that strwidth(that) == maxsize
+ * Input string must have been allocated with enough space.
+ */
+int
+strpad (char *what, size_t maxsize)
+{
+    size_t pos;
+    int k;
+    char *p;
+    wchar_t c;
+
+    pos = 0;
+    for (p = what; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0; p += k)
+        pos += wcwidth (c);
+    if (pos > maxsize)
+        return 0;
+    for (k = pos; k < maxsize; k++, p++)
+        *p = ' ';
+    *p = '\0';
+    return 1;
+}  
 
 /*
  * Function: getwidth

@@ -504,26 +504,3 @@ strtruncate (char *what, size_t maxsize)
     return 1;
 }  
 
-/*
- * Add spaces at the end of string so that strwidth(that) == maxsize
- * Input string must have been allocated with enough space.
- */
-int
-strpad (char *what, size_t maxsize)
-{
-    size_t pos;
-    int k;
-    char *p;
-    wchar_t c;
-
-    pos = 0;
-    for (p = what; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0; p += k)
-        pos += wcwidth (c);
-    if (pos > maxsize)
-        return 0;
-    for (k = pos; k < maxsize; k++, p++)
-        *p = ' ';
-    *p = '\0';
-    return 1;
-}  
-
