@@ -114,9 +114,7 @@ int main(int argc, char **argv)
         while (t)
         {
             oldt = tdb->methods.get(tdb, t->tag);
-            if (oldt != NULL && merge != 0)
-                template_l10nmerge(oldt, t);
-            else
+            if (oldt == NULL || merge == 0 || NULL == template_l10nmerge(oldt, t))
             {
                 if (tdb->methods.set(tdb, t) != DC_OK)
                     INFO(INFO_ERROR, "Cannot add template %s", t->tag);
