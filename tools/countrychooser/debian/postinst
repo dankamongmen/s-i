@@ -94,12 +94,8 @@ else
 	# Just in case
 	DEFAULTLOCALE="C"
 fi
-# Keep track of the charset we got from languagechooser
-if [ -n "$DEFAULTLOCALE" ]; then
-        if (echo $DEFAULTLOCALE | grep -q "\.") ; then
-	  CHARSET_LANGUAGECHOOSER=`echo $DEFAULTLOCALE | cut -f2 -d\.`
-	fi
-fi
+# If present, keep track of charset or modifier we got from languagechooser
+EXTRA_LANGUAGECHOOSER=`echo $DEFAULTLOCALE | sed -e 's/^[^.@]*//'`
 
 # At this step we should have either xx, or xx_YY in LANGNAME
 if [ "$LANGUAGE" != "C" ]; then
@@ -183,11 +179,7 @@ log "$countrycode = '$COUNTRYCODE'"
 
 # If the country forms a supported locale, set the locale.
 if grep -q "^${LANGUAGE}_${COUNTRYCODE}$" $SUPPORTEDLOCALES; then
-	LOCALE=${LANGUAGE}_${COUNTRYCODE}
-	# If we inherited a charset form languagechooser, keep it
-	if [ -n "$CHARSET_LANGUAGECHOOSER" ] ; then
-	   LOCALE=${LOCALE}.${CHARSET_LANGUAGECHOOSER}
-	fi
+	LOCALE=${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER}
 	db_set "$localecode" "${LOCALE}"
 	log "$localecode = '${LOCALE}'"
 fi
