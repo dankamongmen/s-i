@@ -9,13 +9,12 @@ endif
 
 all: $(BIN)
 
-# This is evil. There is no decent way to download this file.
 Mirrors.masterlist:
-	if cvs -d":pserver:anonymous@cvs.debian.org:/cvs/webwml" \
-	   co -p webwml/english/mirror/Mirrors.masterlist > Mirrors.masterlist.0 \
-	   && [ -s "Mirrors.masterlist.0" ]; then \
-		mv -f Mirrors.masterlist.0 Mirrors.masterlist > /dev/null 2>&1; \
-	fi
+	if wget -nv 'http://cvs.debian.org/*checkout*/webwml/english/mirror/Mirrors.masterlist?rev=HEAD&cvsroot=webwml&content-type=text/plain' -O - > $@.new; then \
+           if test -s $@.new; then \
+              mv $@.new $@; \
+           fi; \
+        fi
 
 mirrors_http.h: Mirrors.masterlist
 	./makeheader.pl http
