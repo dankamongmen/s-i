@@ -480,3 +480,27 @@ strwidth (const char *what)
     return res;
 }  
 
+int
+strtruncate (char *what, size_t maxsize)
+{
+    size_t pos;
+    int k;
+    char *p;
+    wchar_t c;
+
+    if (strwidth(what) <= maxsize)
+        return 0;
+
+    /*  Replace end of string with ellipsis "..."; as the last character
+     *  may have a double width, stops 4 characters before the end
+     */
+    pos = 0;
+    for (p = what; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 && pos < maxsize-5; p += k)
+        pos += wcwidth (c);
+
+    for (k=0; k < 3; k++, p++)
+        *p = '.';
+    *p = '\0';
+    return 1;
+}  
+

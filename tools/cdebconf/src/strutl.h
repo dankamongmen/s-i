@@ -49,5 +49,6 @@ int strwrap(const char *str, const int width, char *lines[], int maxlines);
 int strlongest(char **strs, int count);
 
 size_t strwidth(const char *width);
+int strtruncate (char *what, size_t maxsize);
 
 #endif
