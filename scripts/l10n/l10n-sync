@@ -163,6 +163,7 @@ if ! grep "svn/d-i/trunk" $DI_COPY/.svn/entries >/dev/null 2>&1 ; then
   exit 1
 fi
 
+# Do not accept working on an unclean copy
 if [ $(find $DI_COPY/packages -name \*.mine | wc -l) != 0 ] ; then
   echo $DI_COPY seems to contain some SVN conflict files
   echo Please fix this before lauching the script again...
@@ -179,6 +180,13 @@ if [ "$ONLINE" = "Y" ] ; then
   else
     $svn update >/dev/null 2>&1 || svnerr
   fi
+fi
+
+# Let's check the thing again....ceinture et bretelles as we say in French
+if [ $(find $DI_COPY/packages -name \*.mine | wc -l) != 0 ] ; then
+  echo $DI_COPY seems to contain some SVN conflict files
+  echo Please fix this before lauching the script again...
+  exit 1
 fi
 
 # Build a list of all D-I packages with i18n material
