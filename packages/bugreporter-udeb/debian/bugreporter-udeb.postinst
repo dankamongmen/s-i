@@ -72,9 +72,12 @@ if mountfloppy ; then
 	for file in \
 	    /var/log/messages \
 	    /var/log/syslog \
+	    /var/log/partman \
 	    $DILOGDIR/hardware-summary \
 	    $DILOGDIR/package-versions; do 
-		cp $file /floppy/
+	        if [ -e $file ]; then
+			cp $file /floppy/
+		fi
     	done
 
 	umount /floppy
