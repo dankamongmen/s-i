@@ -314,7 +314,9 @@ vg_create() {
 	db_set lvmcfg/vgcreate_name ""
 	db_input high lvmcfg/vgcreate_name
 	db_go
+	[ $? -eq 30 ] && return
 	db_get lvmcfg/vgcreate_name
+	[ "$RET" = "false" ] && return
 	NAME="$RET"
 
 	# check, if the vg name is already in use
@@ -556,6 +558,7 @@ lv_create() {
 	db_set lvmcfg/lvcreate_name ""
 	db_input high lvmcfg/lvcreate_name
 	db_go
+	[ $? -eq 30 ] && return
 	db_get lvmcfg/lvcreate_name
 	NAME="$RET"
 
