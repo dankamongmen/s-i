@@ -17,7 +17,7 @@ log () {
 }
 
 is_not_loaded() {
-    module="$1"
+    local module="$1"
     if cut -d" " -f1 /proc/modules | grep -q "^${module}\$" ; then
 	false
     else
@@ -26,7 +26,7 @@ is_not_loaded() {
 }
 
 load_module() {
-    module="$1"
+    local module="$1"
     db_fset hw-detect/module_params seen false
     db_subst hw-detect/module_params MODULE "$module"
     db_input low hw-detect/module_params || [ $? -eq 30 ]
@@ -218,12 +218,24 @@ if [ -e /proc/scsi/scsi ] ; then
     if grep -q "Attached devices: none" /proc/scsi/scsi ; then
         :
     else
-	for module in sd_mod sr_mod; do
-		if is_not_loaded "$module" ; then
-			load_modules $module
-			register-module $module
+    	if grep -q "Type:.*Direct-Access" /proc/scsi/scsi ; then
+	    if is_not_loaded "sd_mod" ; then
+		if [ "$(cat /proc/devices | sed -e 's/[^[:alpha:]]*//' |grep sd|head -n 1)" = "sd" ]; then
+		    log "Module sd_mod is compiled in statically"
+		else
+		    load_modules sd_mod
 		fi
-	done
+	    fi
+	fi
+    	if grep -q "Type:.*CD-ROM" /proc/scsi/scsi ; then
+	    if is_not_loaded "sr_mod" ; then
+		if [ "$(cat /proc/devices | sed -e 's/[^[:alpha:]]*//' |grep sr|head -n 1)" = "sr" ]; then
+		    log "Module sr_mod is compiled in statically"
+		else
+		    load_modules sr_mod
+		fi
+	    fi
+	fi
     fi
 fi
 
