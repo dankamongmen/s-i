@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.39 2003/09/27 12:32:49 ley Exp $ */
+/* $Id: udpkg.c,v 1.40 2003/10/14 06:30:11 kraai Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -201,7 +201,8 @@ static int dpkg_dounpack(struct package_t *pkg)
 					snprintf(buf, sizeof(buf),
 						 "debconf-loadtemplate %s %s",
 						 pkg->package, buf2);
-					SYSTEM(buf);
+					if (SYSTEM(buf) != 0)
+						r = 1;
 				}
 #endif
 
@@ -261,6 +262,8 @@ static int dpkg_dounpack(struct package_t *pkg)
 		else
 			pkg->status |= STATUS_STATUSHALFINSTALLED;
 	}
+	else
+		r = 1;
 	chdir(cwd);
 	return r;
 }
@@ -326,7 +329,8 @@ static int dpkg_unpack(struct package_t *pkgs)
 		if (r != 0) break;
 	}
 	status_merge(status, pkgs);
-	SYSTEM("rm -rf -- " DPKGCIDIR);
+	if (SYSTEM("rm -rf -- " DPKGCIDIR) != 0)
+		r = 1;
 	return r;
 }
 
@@ -402,8 +406,7 @@ static int dpkg_install(struct package_t *pkgs)
 	
 	if (ordered != 0)
 		status_merge(status, pkgs);
-	SYSTEM("rm -rf -- " DPKGCIDIR);
-	return 0;
+	return SYSTEM("rm -rf -- " DPKGCIDIR);
 }
 
 static int dpkg_fields(struct package_t *pkg)
