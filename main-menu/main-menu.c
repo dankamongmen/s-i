@@ -233,8 +233,18 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 			break;
 		}
 	}
+	
+	if (! ret) {
+		/* This could happen because of a debconf protocol problem
+		 * (for example, leading whitespace in menu items can
+		 * be stripped and confuse the comparisons), or other
+		 * problem. */
+		di_log(DI_LOG_LEVEL_INFO, "Internal error! Cannot find \"%s\" in menu.", s);
+	}
+	
 	free(language);
 	free(package_array);
+
 	return ret;
 }
 
