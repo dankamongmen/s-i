@@ -491,6 +491,7 @@ humandev () {
 	    type=`cat /proc/mdstat|grep "^md${device}[ :]" | sed -e "s/^.* : active raid\([[:alnum:]]\).*/\1/"`
 	    db_metaget partman/text/raid_device description
 	    printf "$RET" ${type} ${device}
+	    ;;
 	*)
 	    # Check if it's an LVM device
 	    vg=`echo "$1" | sed -e 's,/dev/\([^/]\+\).*,\1,'`
