@@ -64,41 +64,44 @@ discover_hw () {
         # Discover 2.x
         # XXX: This is copied from xfree86, and do not work yet
 
-	log "Using discover2 do not work yet."
+        log "Using discover2 do not work yet."
 
-        #VENDOR_MODEL_FILE=$(tempfile)
-        #SERVER_FILE=$(tempfile)
-        #DRIVER_FILE=$(tempfile)
-        #discover --type-summary display > $VENDOR_MODEL_FILE
-        #discover --data-path=xfree86/server/name --data-version=${SOURCE_VERSION%-*} display > $SERVER_FILE
-        #discover --data-path=xfree86/server/device/driver --data-version=${SOURCE_VERSION%-*} display > $DRIVER_FILE
-        #DISCOVERED_VIDEO=$(paste $VENDOR_MODEL_FILE $SERVER_FILE $DRIVER_FILE)
-        #rm -f $VENDOR_MODEL_FILE $SERVER_FILE $DRIVER_FILE
+        dpath=linux/module/name
+        dver=2.4 # Kernel version
+        dflags="-t -d all -e ata -e pci -e pcmcia -e scsi display"
+
+        VENDOR_MODEL_FILE=$(tempfile)
+        DRIVER_FILE=$(tempfile)
+        discover --type-summary $dflags > $VENDOR_MODEL_FILE
+        discover --data-path=$dpath --data-version=$dver $dflags > $DRIVER_FILE
+        paste $VENDOR_MODEL_FILE $DRIVER_FILE
+        rm -f $VENDOR_MODEL_FILE $DRIVER_FILE
     else
         # must be Discover 1.x
-        /sbin/discover --format="%m\t%V\t%M\n" \
-            --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom
+        /sbin/discover --format="%m\t%V %M\n" \
+            --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom |
+	  sed 's/ $//'
     fi
 }
 
 # Return list of lines with "Kernel module<tab>Vendor<tab>Model"
 get_hw_info() {
     # Try to make sure the floppy driver is available
-    echo "floppy	Linux	Floppy Driver"
+    echo "floppy	Linux Floppy Driver"
 
     discover_hw
 
     # Manually load modules to enable things we can't detect.
     # XXX: This isn't the best way to do this; we should autodetect.
     # The order of these packages are important. [pere 2003-03-16]
-    echo "ide-mod	Linux	IDE Driver"
-    echo "ide-probe-mod	Linux	IDE probe Driver"
-    echo "ide-disk	Linux	ATA DISK Driver"
-    echo "ide-cd	Linux	ATAPI CD-ROM Driver"
-    echo "isofs	Linux	ISO 9660 Filesystem Driver"
-    #echo "i82365	Linux	Unknown"
-    #echo "sr_mod	Linux	Unknown"
-    #echo "usb-storage	Linux	Unknown"
+    echo "ide-mod	Linux IDE Driver"
+    echo "ide-probe-mod	Linux IDE probe Driver"
+    echo "ide-disk	Linux ATA DISK Driver"
+    echo "ide-cd	Linux ATAPI CD-ROM Driver"
+    echo "isofs	Linux ISO 9660 Filesystem Driver"
+    #echo "i82365	Linux Unknown"
+    #echo "sr_mod	Linux Unknown"
+    #echo "usb-storage	Linux Unknown"
 }
 
 log "Detecting hardware..."
@@ -117,17 +120,9 @@ IFS="
 for device in `get_hw_info`
 do
     module="`echo $device | cut -f1`"
-    vendor="`echo $device | cut -f2`"
-    model="`echo $device | cut -f3`"
+    cardname="`echo $device | cut -f2`"
     # Restore IFS after extracting the fields.
     IFS="$IFS_SAVE"
-
-    if [ "$vendor" != "Unknown" ]
-    then
-        cardname="$vendor $model"
-    else
-        cardname="$model"
-    fi
 
     if [ -z "$module" ] ; then module="[Unknown]" ; fi
     if [ -z "$cardname" ] ;   then cardname="[Unknown]" ; fi
