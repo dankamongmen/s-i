@@ -35,10 +35,10 @@ int main(int argc, char **argv) {
 	 * root directory.)
 	 */
 	if (strcmp(src, "Packages") == 0) {
-		/* TODO: obviously this path is woody specific. FIXME */
+		/* TODO: obviously this path is sid specific. FIXME */
 		/* One way to fix this is choose-mirror could prompt for
 		 * what version to install */
-		src="dists/woody/main/debian-installer/binary-" ARCH "/Packages";
+		src="dists/sid/main/debian-installer/binary-" ARCH "/Packages";
 	}
 	
 	command=malloc( 18 /* wget -c -q http:// */ + strlen(hostname) +
