@@ -126,7 +126,6 @@ int main(int argc, char *argv[]) {
         di_system_init(basename(argv[0]));
 	/* initialize debconf */
 	debconf = debconfclient_new();
-	debconf->command(debconf, "title", "Partition a hard drive", NULL);
 
 	/* hide libparted errors */
 	ped_exception_set_handler(my_exception_handler);
@@ -134,11 +133,10 @@ int main(int argc, char *argv[]) {
 	/* collect all discs from system, and build choices list */
 	disks_count = get_all_disks(discs, MAX_DISKS);
 	if(disks_count < 1) {
-		debconf->command(debconf, "fset", "partitioner/nodiscs",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "partitioner/nodiscs", "false", NULL);
-		debconf->command(debconf, "input", "high", "partitioner/nodiscs", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_fset(debconf, "partitioner/nodiscs", "seen", "false");
+		debconf_set(debconf, "partitioner/nodiscs", "false");
+		debconf_input(debconf, "high", "partitioner/nodiscs");
+		debconf_go(debconf);
 		return(EXIT_SUCCESS);
 	}
 
@@ -164,14 +162,12 @@ int main(int argc, char *argv[]) {
 		char *cmd = NULL;
 		char *disk = NULL;
 
-		debconf->command(debconf, "subst", "partitioner/disc",
-			"DISCS", choices, NULL);
-		debconf->command(debconf, "fset", "partitioner/disc",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "partitioner/disc", "false", NULL);
-		debconf->command(debconf, "input", "high", "partitioner/disc", NULL);
-		debconf->command(debconf, "go", NULL);
-		debconf->command(debconf, "get", "partitioner/disc", NULL);
+		debconf_subst(debconf, "partitioner/disc", "DISCS", choices);
+		debconf_fset(debconf, "partitioner/disc", "seen", "false");
+		debconf_set(debconf, "partitioner/disc", "false");
+		debconf_input(debconf, "high", "partitioner/disc");
+		debconf_go(debconf);
+		debconf_get(debconf, "partitioner/disc");
 
 		/* exit the endless loop */
 		if(strstr(debconf->value, "Finish"))
@@ -183,15 +179,11 @@ int main(int argc, char *argv[]) {
 
 		i = system(cmd);
 		if(i != 0) {
-			debconf->command(debconf, "subst", "partitioner/fdiskerr",
-				"DISC", disk, NULL);
-			debconf->command(debconf, "fset", "partitioner/fdiskerr",
-				"seen", "false", NULL);
-			debconf->command(debconf, "set", "partitioner/fdiskerr",
-				"false", NULL);
-			debconf->command(debconf, "input", "high",
-				"partitioner/fdiskerr", NULL);
-			debconf->command(debconf, "go", NULL);
+			debconf_subst(debconf, "partitioner/fdiskerr", "DISC", disk);
+			debconf_fset(debconf, "partitioner/fdiskerr", "seen", "false");
+			debconf_set(debconf, "partitioner/fdiskerr", "false");
+			debconf_input(debconf, "high", "partitioner/fdiskerr");
+			debconf_go(debconf);
 		}
 
 		if(disk != NULL) {
