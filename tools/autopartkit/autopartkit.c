@@ -815,12 +815,9 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     fprintf(fstab, "# /etc/fstab: static file system information\n#\n");
     fprintf(fstab, "# <file system> <mount point> <type> <options>"
 		   "\t<dump>\t<pass>\n");
-    fprintf(fstab, "%s\t/\t%s\tdefaults\t\t1\t1\n", 
+    fprintf(fstab, "%s\t/\t%s\tdefaults,errors=remount-ro\t\t1\t1\n", 
 	    normalize_devfs(find_partition_by_mountpoint(mountmap,"/")),
 	    DEFAULT_FS);
-    fprintf(fstab, "%s\tnone\tswap\tsw\t\t0\t0\n",
-	    normalize_devfs(find_partition_by_mountpoint(mountmap,"swap")));
-    fprintf(fstab, "proc\t/proc\tproc\tdefaults\t\t0\t0\n");
 #endif /* CREATE_FSTAB */
 
     for (i = 0; i < partcount; i++)
@@ -872,8 +869,11 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     chmod("/target/tmp", 01777);
    
 #if defined(CREATE_FSTAB)
+    fprintf(fstab, "%s\tnone\tswap\tsw\t\t0\t0\n",
+	    normalize_devfs(find_partition_by_mountpoint(mountmap,"swap")));
     fprintf(fstab, "/dev/fd0\t/floppy\tauto\trw,user,noauto\t\t0\t0\n");
     fprintf(fstab, "/dev/cdrom\t/cdrom\tiso9660\tro,user,noauto\t\t0\t0\n");
+    fprintf(fstab, "proc\t/proc\tproc\tdefaults\t\t0\t0\n");
     
     fclose(fstab);
 #endif /* CREATE_FSTAB */
