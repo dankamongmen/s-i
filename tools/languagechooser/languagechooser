@@ -119,6 +119,11 @@ while [ "$STATE" -gt 0 ]; do
     esac
 done
 
+#   debconf/language is an alias for debian-installer/language
+db_register "$languagecode" "debconf/language"
+db_get "$languagecode"
+db_set "debconf/language" "$RET"
+
 [ $STATE = -1 ] || exit 0
 
 log "debian-installer/locale   = '$locale'"
