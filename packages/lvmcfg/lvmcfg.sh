@@ -145,8 +145,11 @@ get_pvs() {
 	PARTITIONS=""
 	for i in `/usr/lib/partconf/find-partitions 2>/dev/null | grep LVM | cut -f1`; do
 		# skip already assigned
-		vgdisplay -v | grep -q "$i"
-		[ $? -eq 0 ] && continue
+		found=no
+		for pv in $(vgdisplay -v | grep "[ ]*PV Name" | sed -e "s/ \+PV Name \+//"); do
+			[ "$(realpath "$pv")" = "$(realpath "$i")" ] && found=yes
+		done
+		[ "$found" = "yes" ] && continue
 
 		addinfos_pv "$i"
 		i=`printf "%-15s (%s)" "$i" "$RET"`
