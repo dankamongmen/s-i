@@ -32,6 +32,8 @@ clean:
 	rm -f build-stamp configure-stamp
 	dh_clean
 
+# cvs update -P will remove these dirs if they are empty
+DIRS=proc var/log mnt floppy
 
 install: build
 	dh_testdir
@@ -39,6 +41,10 @@ install: build
 	mkdir -p debian/rootskel/
 	cp -a src/* debian/rootskel/
 	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
+	$(foreach DIR, $(DIRS), \
+	(mkdir -p debian/rootskel/$(DIR) ) ; )
+
+
 
 # Build architecture-independent files here.
 binary-indep: build install
