@@ -62,7 +62,9 @@ then
 
 		db_input critical aboot-installer/non-bsd-partitions
 		db_go
-		exit 1
+		if [ "$RET" = "false" ]; then
+			exit 1
+		fi
 	fi
 fi
 
@@ -73,5 +75,7 @@ then
 	db_subst aboot-installer/non-ext2-boot PARTTYPE $boot_type 
 	db_input critical aboot-installer/non-ext2-boot
 	db_go
-	exit 1
+	if [ "$RET" = "false" ]; then
+		exit 1
+	fi
 fi
