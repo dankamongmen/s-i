@@ -138,6 +138,7 @@ static int textdb_template_set(struct database *db, struct template *t)
 {
 	FILE *outf;
 	char *filename;
+	struct language_description *langdesc;
 
 	if (t->tag == NULL) return DC_NOTOK;
 	filename = template_filename(db->config, t->tag);
@@ -158,6 +159,19 @@ static int textdb_template_set(struct database *db, struct template *t)
 	if (t->extended_description != NULL)
 		fprintf(outf, "\textended_description \"%s\";\n", escapestr(t->extended_description));
 
+	langdesc = t->localized_descriptions;
+	while (langdesc) 
+	{
+		if (langdesc->description != NULL) 
+			fprintf(outf, "\tdescription-%s \"%s\";\n", langdesc->language, escapestr(langdesc->description));
+		if (langdesc->extended_description != NULL)
+			fprintf(outf, "\textended_description-%s \"%s\";\n", langdesc->language, escapestr(langdesc->extended_description));
+		if (langdesc->choices != NULL) 
+			fprintf(outf, "\tchoices-%s \"%s\";\n", langdesc->language, escapestr(langdesc->choices));
+
+		langdesc = langdesc->next;
+	}
+
 	fprintf(outf, "};\n");
 	fclose(outf);
 	
@@ -170,6 +184,8 @@ static struct template *textdb_template_get_real(struct database *db,
 	struct configuration *rec;
 	struct template *t;
 	char *filename;
+	char a,b, langtmp[128];
+	const char *tmp;
 
 	if (ltag == NULL) return DC_NOTOK;
 	filename = template_filename(db->config, ltag);
@@ -196,7 +212,38 @@ static struct template *textdb_template_get_real(struct database *db,
 		t->choices = STRDUP(unescapestr(rec->get(rec, "template::choices", 0)));
 		t->description = STRDUP(unescapestr(rec->get(rec, "template::description", 0)));
 		t->extended_description = STRDUP(unescapestr(rec->get(rec, "template::extended_description", 0)));
+
+		/* We can't ask for all the localized descriptions so we need to
+		 * brute-force this.
+		 * This is stupid and ugly and should be fixed, FIXME
+		 */
+		for (a = 'a'; a <= 'z'; a++)
+			for (b = 'a'; b <= 'z'; b++)
+			{
+				sprintf(langtmp, "template::description-%c%c", a, b);
+				tmp = rec->get(rec, langtmp, 0);
+				if (tmp)
+				{
+					struct language_description *langdesc = malloc(sizeof(struct language_description));
+					memset(langdesc,0,sizeof(struct language_description));
+					langdesc->language = malloc(3);
+					sprintf(langdesc->language,"%c%c", a, b);
+					langdesc->description = STRDUP(unescapestr(tmp));
+					sprintf(langtmp,"template::extended_description-%c%c", a, b);
+					langdesc->extended_description = STRDUP(unescapestr(rec->get(rec, langtmp, 0)));
+					sprintf(langtmp,"template::choices-%c%c", a, b);
+					langdesc->choices = STRDUP(unescapestr(rec->get(rec, langtmp, 0)));
+					if (strcmp(langdesc->choices,"") == 0)
+					{
+						free(langdesc->choices);
+						langdesc->choices = NULL;
+					}
+					langdesc->next = t->localized_descriptions;
+					t->localized_descriptions = langdesc;
+				}
+			}
 	}
+		
 
 	config_delete(rec);
 
@@ -215,6 +262,7 @@ static struct template *textdb_template_get(struct database *db,
 		result->next = dbdata->templates;
 		dbdata->templates = result;
 	}
+
 	return result;
 }
 
