@@ -1,0 +1,24 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+totalsize=0
+
+for dev in $DEVICES/*; do
+    [ -d $dev ] || continue
+    cd $dev
+    open_dialog PARTITIONS
+    while { read_line num id size type fs path name; [ "$id" ]; }; do
+	if [ "$fs" = free ]; then
+	    mysize=$size
+	    mysize=$(expr 0000000"$mysize" : '0*\(..*\)......$') # convert to megabytes
+	    totalsize=$(($totalsize + $mysize))
+	fi
+    done
+    close_dialog
+done
+
+if [ "$totalsize" -ne 0 ]; then
+    db_metaget partman-auto-lvm/text/vg_all_free description
+    printf "$totalsize\t$RET"
+fi

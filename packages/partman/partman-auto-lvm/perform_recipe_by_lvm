@@ -1,0 +1,145 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+. /lib/partman/recipes.sh
+. /lib/partman/lvm_tools.sh
+
+VG_name=$1
+recipe=$2
+
+decode_recipe $recipe
+
+# The following had to be part of decode_recipe, but lets not make
+# changes in partman-auto and copy/past for now.
+
+# Make factors small numbers so we can multiply on them.
+# Also ensure that fact, max and fs are valid
+# (Ofcourse in valid recipes they must be valid.)
+factsum=$(($(factor_sum) - $(min_size)))
+scheme=$(
+    foreach_partition '
+        local min fact max fs
+        min=$1
+	fact=$((($2 - $min) * 100 / $factsum))
+	max=$3
+	fs=$4
+        case "$fs" in
+	    ext2|ext3|linux-swap|fat16|fat32)
+		true
+		;;
+	    *)
+		fs=ext2
+		;;
+        esac
+	shift; shift; shift; shift
+	echo $min $fact $max $fs $*'
+)
+
+oldscheme=''
+while [ "$scheme" != "$oldscheme" ]; do
+    oldscheme="$scheme"
+    factsum=$(factor_sum)
+    unallocated=$(($free_size - $(min_size)))
+    if [ $unallocated -lt 0 ]; then
+	unallocated=0
+    fi
+    scheme=$(
+	foreach_partition '
+	    local min fact max newmin
+	    min=$1
+	    fact=$2
+	    max=$3
+	    shift; shift; shift
+	    newmin=$(($min + $unallocated * $fact / $factsum))
+	    if [ $newmin -le $max ]; then
+		echo $newmin $fact $max $*
+	    else
+		echo $max 0 $max $*
+	    fi'
+    )
+done
+
+for device in $DEVICES/*; do
+    [ -d "$device" ] || continue
+    cd $device
+    open_dialog PARTITIONS
+    while { read_line num id size type fs path name; [ "$id" ]; }; do
+        if [ -f $id/method ]; then
+            rm $id/method
+        fi
+    done
+    close_dialog
+done
+
+name_number=1
+foreach_partition '
+
+    if echo $* | grep -q "mountpoint{"; then
+	lvname=$(echo $* | sed \
+	    -e "s/.*mountpoint{  *\([^ }]*\) *}.*/\1/g" \
+	    -e "s!//!/!g" \
+	    -e '\''s!/$!!g'\'' \
+	    -e "s/@/@@/g" \
+	    -e "s/+/@+/g" \
+	    -e "s/-/@dash/g" \
+	    -e "s/ /@space/g" \
+	    -e '\''s!^/root$!@root!g'\'' \
+	    -e '\''s!^$!/root!g'\'' \
+	    -e "s!^/!!" \
+	    -e "s!/!+!g"
+	)
+    else
+	lvname=@$name_number
+	name_number=$(($name_number + 1))
+    fi
+
+    if [ "$last" = yes ]; then
+        new_LV $VG_name full "$lvname" || autopartitioning_failed
+    else
+        new_LV $VG_name "$1" "$lvname" || autopartitioning_failed
+    fi
+
+    device=/dev/"$VG_name"/"$lvname" # is this true?
+
+    dirname=$(echo "$device" | sed "s:/:=:g")
+    dev=$DEVICES/$dirname
+
+    rm -rf $dev
+    mkdir $dev || autopartitioning_failed
+    printf "%s" "$device" >$dev/device
+    printf "%s" "$4" >$dev/size
+    printf "%s" "$VG_name - $lvname" >$dev/model
+    
+    cd $dev
+    open_dialog OPEN "$(cat $dev/device)"
+    read_line responce
+    close_dialog
+    if [ "$responce" = failed ]; then
+	cd /
+	rm -rf $dev
+	autopartitioning_failed
+    fi
+    
+    open_dialog NEW_LABEL loop
+    close_dialog
+    # find the free space
+    open_dialog PARTITIONS
+    free_space=""
+    while { read_line num id size type fs path name; [ "$id" ]; }; do
+	if [ "$fs" = free ]; then
+	    free_space=$id
+	    free_size=$size
+	fi
+    done
+    close_dialog
+    # create partition in the free space
+    [ "$free_space" ] || autopartitioning_failed
+    open_dialog NEW_PARTITION primary ext2 $free_space full $free_size
+    read_line num id size type fs path name
+    close_dialog
+    
+    shift; shift; shift; shift
+    setup_partition $id $*
+'
+
+update_all

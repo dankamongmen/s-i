@@ -1,0 +1,105 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+. /lib/partman/recipes.sh
+. /lib/partman/lvm_tools.sh
+
+total_size=$1
+
+choose_recipe "$total_size" || exit $?
+
+# We have to write the changes in the partition table that the user
+# has made, let him confirm
+confirm_changes || exit 0
+
+# perform the recipe
+
+# Create partitions in all free spaces
+
+all_free=''
+for dev in $DEVICES/*; do
+    [ -d $dev ] || continue
+    cd $dev
+    open_dialog PARTITIONS
+    while { read_line num id size type fs path name; [ "$id" ]; }; do
+	if [ "$fs" = free ]; then
+	    all_free="$all_free $dev//$id"
+	fi
+    done
+    close_dialog
+done
+pv_list=''
+for free in $all_free; do
+    dev=${free%//*}
+    freeid=${free#*//}
+    cd $dev
+    open_dialog PARTITION_INFO $freeid
+    read_line x1 freeid freesize freetype x2 x3 x4
+    close_dialog
+    [ "$freeid" ] || continue
+    
+    if [ "$freetype" = pri/log ]; then
+	type=logical
+    else
+	type=$freetype
+    fi
+    open_dialog NEW_PARTITION $type ext2 $freeid full $freesize
+    id=''
+    read_line num id size type fs path name
+    close_dialog
+    [ "$id" ] || continue
+
+    open_dialog GET_FLAGS $id
+    flags=$(read_paragraph)
+    close_dialog
+    open_dialog SET_FLAGS $id
+    write_line "$flags"
+    write_line lvm
+    write_line NO_MORE
+    close_dialog
+
+    pv_list="$pv_list $dev//$id"    
+done
+
+# write the partition tables
+disable_swap
+for dev in $DEVICES/*; do
+    [ -d "$dev" ] || continue
+    cd $dev
+    open_dialog COMMIT
+    close_dialog
+done
+
+# Reread device names as some of them may have changed
+pv_devices=''
+for part in $pv_list; do
+    dev=${part%//*}
+    id=${part#*//}
+    cd $dev
+    open_dialog PARTITION_INFO $id
+    read_line x1 id size type x2 path x4
+    close_dialog
+    [ "$id" ] || continue
+    pv_devices="$pv_devices $path"
+done
+
+modprobe dm-mod  >>/var/log/messages 2>&1 || true
+modprobe lvm-mod  >>/var/log/messages 2>&1 || true
+
+# Choose name, create VG and atach each partition as a phisical volume
+noninteractive=true
+while true; do
+    db_input medium partman-auto-lvm/new_vg_name || $noninteractive
+    db_go || exit 1
+    db_get partman-auto-lvm/new_vg_name
+    VG_name="$RET"
+
+    if new_VG "$VG_name" $pv_devices; then break; fi
+    noninteractive="exit 1"
+done
+
+perform_recipe_by_lvm $VG_name $recipe
+
+# default to accepting the autopartitioning
+menudir_default_choice /lib/partman/choose_partition finish finish || true
+
