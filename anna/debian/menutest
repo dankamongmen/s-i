@@ -1,5 +1,11 @@
 #! /bin/sh
 
-ifconfig eth0 | grep -q UP
-exit $?
+if [ -n "`cat /proc/net/dev | sed -e "s/lo://" | grep "[a-z0-9]*:[ ]*[0-9]*"`"  ]; then
+    if [ -n "`grep -v '^Iface' /proc/net/route | grep '^eth[0-9]'`" ]; then
+        if [ ! -x "/usr/sbin/debootstrap" ]; then
+            exit 0
+        fi
+    fi
+fi
 
+exit 1
