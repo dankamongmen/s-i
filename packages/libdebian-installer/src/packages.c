@@ -231,8 +231,10 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
           else
             package->resolver |= (r->resolver << 2);
         }
-        else
+        else if (!r->check_non_existant (r, package, NULL))
           goto error;
+        else
+          break;
       }
 
       break;
