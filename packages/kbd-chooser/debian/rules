@@ -1,23 +1,8 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
 
-# Uncomment this to turn on verbose mode.
-export DH_VERBOSE=1
 PACKAGE=kbd-chooser
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-	touch configure-stamp
-
-build: configure-stamp build-stamp
+build: build-stamp
 build-stamp:
 	dh_testdir
 	$(MAKE)
@@ -39,10 +24,8 @@ install: build
 	install -m0755 debian/prebaseconfig  debian/$(PACKAGE)/usr/lib/prebaseconfig.d/70kbd-chooser
 	install -m0755 debian/S55kbd-chooser debian/$(PACKAGE)/lib/debian-installer-startup.d/S55kbd-chooser
 
-# Build architecture-independent files here.
 binary-indep: 
 
-# Build architecture-dependent files here.
 binary-arch: build install
 	dh_testdir
 	dh_testroot
@@ -53,8 +36,8 @@ binary-arch: build install
 	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps
-	dh_gencontrol -- -n$(FILENAME)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
