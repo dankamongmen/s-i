@@ -9,8 +9,9 @@ else
 	PROFILE=Workstation
 fi
 
-db_get debian-installer/locale || true
-LANG_INST="$RET"
+if db_get debian-installer/locale && [ "$RET" ] ; then
+    LANG_INST="$RET"
+fi
 
 # Default hostname is 'localhost'
 HOSTNAME=localhost
