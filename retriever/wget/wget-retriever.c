@@ -14,7 +14,7 @@
 int main(int argc, char **argv) {
 	int ret;
 	char *src;
-	char *hostname, *directory, *command;
+	char *hostname, *directory, *command, *distribution;
 	struct debconfclient *debconf = debconfclient_new();
 	
 	if (argc < 3)
@@ -23,10 +23,12 @@ int main(int argc, char **argv) {
 	/* Suck in data from the debconf database, which will be primed
 	 * with the mirror to use by choose-mirror */
 	// TODO: what about ftp?
+	debconf->command(debconf, "GET", DEBCONF_BASE "distribution", NULL);
+	distribution = strdup(debconf->value);
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/hostname", NULL);
-	hostname=strdup(debconf->value);
+	hostname = strdup(debconf->value);
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/directory", NULL);
-	directory=strdup(debconf->value);
+	directory = strdup(debconf->value);
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/proxy", NULL);
 	if (debconf->value && strcmp(debconf->value,"") != 0) {
 		if (setenv("http_proxy", debconf->value, 1) == -1)
@@ -40,18 +42,23 @@ int main(int argc, char **argv) {
 	 * root directory.)
 	 */
 	if (strcmp(src, "Packages") == 0) {
-		/* TODO: obviously this path is sid specific. FIXME */
-		/* One way to fix this is choose-mirror could prompt for
-		 * what version to install */
                 if (argc == 4) {
                         /* third argument is which suite we want */
-                        src = malloc(strlen("dists/sid/") + strlen(argv[3]) + 
+                        src = malloc(strlen("dists/") + strlen(distribution)
+                                     + 1 /* / */ +
+                                     + strlen(argv[3]) + 
                                      strlen("/debian-installer/binary-" 
                                             ARCH "/Packages") + 1);
-                        sprintf(src,"dists/sid/%s/debian-installer/binary-" 
-                                ARCH "/Packages", argv[3]);
+                        sprintf(src,"dists/%s/%s/debian-installer/binary-" 
+                                ARCH "/Packages", distribution, argv[3]);
                 } else {
-                        src="dists/sid/main/debian-installer/binary-" ARCH "/Packages";
+                        src = malloc(strlen("dists/") + strlen(distribution)
+                                     + 1 /* / */ +
+                                     + strlen("main") + 
+                                     strlen("/debian-installer/binary-" 
+                                            ARCH "/Packages") + 1);
+                        sprintf(src,"dists/%s/main/debian-installer/binary-" 
+                                ARCH "/Packages", distribution);
                 }
         }
 	
@@ -60,6 +67,7 @@ int main(int argc, char **argv) {
 			4 /*  -O  */ + strlen(argv[2]) + 1);
 	sprintf(command, "wget -c -q http://%s%s/%s -O %s", hostname,
 			directory, src, argv[2]);
+        fprintf(stderr,"wget: %s\n", command);
 	ret=system(command);
 	if (ret == 256)
 		return 1;
