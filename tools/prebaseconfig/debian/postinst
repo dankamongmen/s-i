@@ -7,7 +7,11 @@ run_parts() {
     for script in "$partsdir"/*; do
         if [ -x "$script" ] ; then
             echo "prebaseconfig: info: Running $script" 1>&2
-            "$script" || true
+            if "$script" ; then
+		:
+	    else
+		echo "prebaseconfig: warning: $script returned error code" 1>&2
+	    fi
         else
             echo "prebaseconfig: error: Unable to execute $script" 1>&2
         fi
