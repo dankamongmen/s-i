@@ -28,9 +28,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <syslog.h>
-
-
-#define MAXLINE 512
+#include "d-i.h"
 
 
 #ifdef L__di_execlog__
@@ -65,11 +63,6 @@ di_execlog (const char *incmd)
 #endif /* L__di_execlog__ */
 
 #ifdef L__di_log__
-
-/* di_log() :
-  write a message to the debian-installer log.  This should be used for
-  interesting events, especially anything that will help debug.
-  */
 
 void
 di_log(char *msg){
