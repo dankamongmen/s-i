@@ -78,6 +78,11 @@ int main(int argc, char** argv) {
 	  return 0;
      }
      
+     /* test if lowmem is activated */
+     if( rename(STATUS_FILE, STATUS_FILE) != 0) { 
+       return 0;
+     } 
+     
      if (S_ISDIR(buf.st_mode)) {
 	  DIR  *dip = NULL;
 	  struct dirent *dit = NULL;
@@ -85,11 +90,6 @@ int main(int argc, char** argv) {
 	  char abs_path_file_name[FILENAME_LENGTH];
 
 	  dir = argv[1];
-       
-	  /* test if lowmem is activated */
-	  if( rename(STATUS_FILE, STATUS_FILE) != 0) { 
-	       return 0;
-	  } 
        
 	  if ((dip = opendir(dir)) == NULL) {
 	       return 0;
