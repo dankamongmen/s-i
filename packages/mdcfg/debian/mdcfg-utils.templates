@@ -36,7 +36,7 @@ _Description: Not enough RAID partitions available
 
 Template: mdcfg/createmain
 Type: select
-__Choices: RAID0, RAID1, Cancel
+__Choices: RAID0, RAID1, RAID5, Cancel
 _Description: Multidisk device type:
  Please choose the type of the multidisk device to be created.
 
@@ -64,6 +64,31 @@ _Description: Spare devices for the RAID1 multidisk device:
  devices, the remaining partitions will be added to the array as "missing".
  You will be able to add them later to the array.
 
+Template: mdcfg/raid5devcount
+Type: string
+_Description: Number of active devices for the RAID5 array:
+ The RAID5 array will consist of both active and spare partitions. The active
+ partitions are those used, while the spare devices will only be used if one or
+ more of the active devices fail. A minimum of three active devices is
+ required.
+ .
+ NOTE: this setting cannot be changed later.
+
+Template: mdcfg/raid5sparecount
+Type: string
+_Description: Number of spare devices for the RAID5 array:
+
+Template: mdcfg/raid5sparedevs
+Type: multiselect
+Choices: ${PARTITIONS}
+_Description: Spare devices for the RAID5 multidisk device:
+ You have chosen to create an RAID5 array with ${COUNT} spare devices.
+ .
+ Please choose which partitions will be used as spare devices.
+ You may choose up to ${COUNT} partitions. If you choose less than ${COUNT}
+ devices, the remaining partitions will be added to the array as "missing".
+ You will be able to add them later to the array.
+
 Template: mdcfg/raid0devs
 Type: multiselect
 Choices: ${PARTITIONS}
@@ -76,6 +101,15 @@ Type: multiselect
 Choices: ${PARTITIONS}
 _Description: Active devices for the RAID1 multidisk device:
  You have chosen to create an RAID1 array with ${COUNT} active devices.
+ .
+ Please choose which partitions are active devices.
+ You must select exactly ${COUNT} partitions.
+
+Template: mdcfg/raid5devs
+Type: multiselect
+Choices: ${PARTITIONS}
+_Description: Active devices for the RAID5 multidisk device:
+ You have chosen to create an RAID5 array with ${COUNT} active devices.
  .
  Please choose which partitions are active devices.
  You must select exactly ${COUNT} partitions.

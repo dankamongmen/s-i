@@ -77,6 +77,8 @@ md_createmain() {
 		get_partitions
 
 		case $RET in
+			"RAID5")
+			md_create_raid5;;
 			"RAID1")
 			md_create_raid1;;
 			"RAID0")
@@ -220,9 +222,9 @@ md_create_raid1() {
 	db_get mdcfg/raid1sparecount
 	SPARE_COUNT="${RET}"
 	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
-	if [ "$DEV_COUNT" -gt "$NUM_PART" ] ; then
+	if [ "$REQUIRED" -gt "$NUM_PART" ] ; then
 		db_subst mdcfg/notenoughparts NUM_PART "${NUM_PART}"
-		db_subst mdcfg/notenoughparts REQUIRED "${DEV_COUNT}"
+		db_subst mdcfg/notenoughparts REQUIRED "${REQUIRED}"
 		db_input critical mdcfg/notenoughparts
 		db_go mdcfg/notenoughparts
 		return
@@ -311,6 +313,146 @@ md_create_raid1() {
 	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid1 -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}`
 }
 
+md_create_raid5() {
+	OK=0
+
+	db_set mdcfg/raid5devcount "3"
+
+	# Get the count of active devices
+	while [ "${OK}" -eq 0 ]; do
+		db_input critical mdcfg/raid5devcount
+		db_go
+		if [ "$?" -eq "30" ]; then
+			# If the user has pressed "Cancel", return
+			return
+		fi
+
+		# Figure out, if the user entered a number
+		db_get mdcfg/raid5devcount
+		RET=`echo ${RET}|sed -e "s/[[:space:]]//g"`
+		if [ ! -z "${RET}" ]; then
+			let "OK=${RET}>0 && ${RET}<99"
+		fi
+	done
+
+	db_set mdcfg/raid5sparecount "0"
+	OK=0
+
+	# Same procedure as above, but get the number of spare partitions
+	# this time.
+	# TODO: Make a general function for this kind of stuff
+	while [ "${OK}" -eq 0 ]; do
+		db_input critical mdcfg/raid5sparecount
+		db_go
+		if [ "$?" -eq "30" ]; then
+			return
+		fi
+		db_get mdcfg/raid5sparecount
+		RET=`echo ${RET}|sed -e "s/[[:space:]]//g"`
+		if [ ! -z "${RET}" ]; then
+			let "OK=${RET}>=0 && ${RET}<99"
+		fi
+	done
+
+	db_get mdcfg/raid5devcount
+	DEV_COUNT="${RET}"
+	if [ "$DEV_COUNT" -lt 3 ] ; then
+		DEV_COUNT=3 # Minimum number for RAID5
+	fi
+	db_get mdcfg/raid5sparecount
+	SPARE_COUNT="${RET}"
+	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
+	if [ "$REQUIRED" -gt "$NUM_PART" ] ; then
+		db_subst mdcfg/notenoughparts NUM_PART "${NUM_PART}"
+		db_subst mdcfg/notenoughparts REQUIRED "${REQUIRED}"
+		db_input critical mdcfg/notenoughparts
+		db_go mdcfg/notenoughparts
+		return
+	fi
+
+	db_set mdcfg/raid5devs ""
+	SELECTED=0
+
+	# Loop until the correct amount of active devices has been selected
+	while [ "${SELECTED}" -ne "${DEV_COUNT}" ]; do
+		db_subst mdcfg/raid5devs COUNT "${DEV_COUNT}"
+		db_subst mdcfg/raid5devs PARTITIONS "${PARTITIONS}"
+		db_input critical mdcfg/raid5devs
+		db_go
+		if [ "$?" -eq "30" ]; then
+			return
+		fi
+
+		db_get mdcfg/raid5devs
+		SELECTED=0
+		for i in $RET; do
+			DEVICE=`echo ${i}|sed -e "s/,//"`
+			let SELECTED++
+		done
+	done
+
+	# Remove partitions selected in raid5devs from the PARTITION list
+	db_get mdcfg/raid5devs
+
+	prune_partitions "$RET"
+
+	db_set mdcfg/raid5sparedevs ""
+	SELECTED=0
+	if [ "${SPARE_COUNT}" -gt 0 ]; then  
+		FIRST=1
+		# Loop until the correct amount of devices has been selected.
+	  # That means any number less than or equal to the spare count
+		while [ "${SELECTED}" -gt "${SPARE_COUNT}" -o "${FIRST}" -eq 1 ]; do
+			FIRST=0
+			db_subst mdcfg/raid5sparedevs COUNT "${SPARE_COUNT}"
+			db_subst mdcfg/raid5sparedevs PARTITIONS "${PARTITIONS}"
+			db_input critical mdcfg/raid5sparedevs
+			db_go
+			if [ "$?" -eq "30" ]; then
+				return
+			fi
+	
+			db_get mdcfg/raid5sparedevs
+			SELECTED=0
+			for i in $RET; do
+				DEVICE=`echo ${i}|sed -e "s/,//"`
+				let SELECTED++
+			done
+		done
+	fi
+
+	# The amount of spares, the user has selected
+	NAMED_SPARES=${SELECTED}
+
+	db_get mdcfg/raid5devs
+	RAID_DEVICES=`echo ${RET}|sed -e "s/,//g"`
+
+	db_get mdcfg/raid5sparedevs
+	SPARE_DEVICES=`echo ${RET}|sed -e "s/,//g"`
+
+	MISSING_SPARES=""
+
+	COUNT=${NAMED_SPARES}
+	while [ "${COUNT}" -lt "${SPARE_COUNT}" ]; do
+		MISSING_SPARES="${MISSING_SPARES} missing"
+		let COUNT++
+	done
+
+	# Find the next available md-number
+	MD_NUM=`grep ^md /proc/mdstat|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -n 1`
+	if [ -z "${MD_NUM}" ]; then
+		MD_NUM=0
+	else
+		let MD_NUM++
+	fi
+
+	echo "Selected spare count: ${NAMED_SPARES}"
+	echo "Raid devices count: ${DEV_COUNT}"
+	echo "Spare devices count: ${SPARE_COUNT}"
+	echo "Commandline:"
+	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid5 -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}`
+}
+
 md_mainmenu() {
 	while [ 1 ]; do
 		db_set mdcfg/mainmenu "false"
@@ -334,11 +476,12 @@ md_mainmenu() {
 ### Main of script ###
 
 # Try to load the necesarry modules.
-# Supported schemes: RAID 0, RAID 1
+# Supported schemes: RAID 0, RAID 1, RAID 5
 depmod -a 1>/dev/null 2>&1
 modprobe md 1>/dev/null 2>&1
 modprobe raid0 >/dev/null 2>&1
 modprobe raid1 1>/dev/null 2>&1
+modprobe raid5 >/dev/null 2>&1
 
 # Try to detect MD devices, and start them
 /sbin/mdrun
