@@ -98,8 +98,8 @@
 /* Ignore devfs devices, used in choose_dev */
 #define IGNORE_DEVFS_DEVICES 1
 
-/* Create fstab or not? */
-#define CREATE_FSTAB 1
+/* Create fstab or not? - not */
+/* #define CREATE_FSTAB 1 */
 
 #if defined(TEST)
 #define FSTAB   "fstab"
