@@ -29,6 +29,25 @@ load_module() {
 	module_probe "$module" "$priority"
 }
 
+list_modules_dir() {
+	find $1 -type f | sed -e 's/\.k\?o$//' -e 's/.*\///'
+}
+
+list_nic_modules() {
+	list_modules_dir /lib/modules/*/kernel/drivers/net
+	if [ -d /lib/modules/$(uname -r)/kernel/drivers/usb/net ]; then
+		list_modules_dir /lib/modules/$(uname -r)/kernel/drivers/usb/net
+	else
+		# usb nic modules not separated from non-nic. List all
+		# usb modules that have an entry in devnames.
+		for module in $(list_modules_dir /lib/modules/*/kernel/drivers/usb); do
+			if [ -n "$(get_static_modinfo $module)" ]; then
+				echo $module
+			fi
+		done
+	fi
+}
+
 snapshot_devs() {
 	echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`
 }
@@ -129,7 +148,7 @@ hw-detect ethdetect/detect_progress_title || true
 while [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`" ]
 do
 	CHOICES=""
-	for mod in $(find /lib/modules/*/kernel/drivers/net -type f | sed -e 's/\.k\?o$//' -e 's/.*\///' | sort); do
+	for mod in $(list_nic_modules | sort); do
 		modinfo=$(get_static_modinfo $mod)
 		if [ -n "$modinfo" ]; then
 			if [ "$modinfo" = BLACKLIST ]; then
