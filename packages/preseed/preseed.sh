@@ -27,7 +27,12 @@ preseed_location () {
 
 	db_set preseed/include ""
 	db_set preseed/include_command ""
-	if ! debconf-set-selections $tmp; then
+	UNSEEN=
+	db_get preseed/interactive
+	if [ "$RET" = true ]; then
+		UNSEEN=--unseen
+	fi
+	if ! debconf-set-selections $UNSEEN $tmp; then
 		error load_error "$location"
 	fi
 		
