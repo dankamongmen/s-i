@@ -216,6 +216,7 @@ int choose_mirror(void) {
 	char *list;
 	int ret = 0;
 
+	debconf_get(debconf, DEBCONF_BASE "country");
 	manual_entry = ! strcmp(debconf->value, "enter information manually");
 	if (! manual_entry) {
                 /* Prompt for mirror in selected country. */
