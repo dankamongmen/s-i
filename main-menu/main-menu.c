@@ -27,6 +27,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+static int check_script(struct package_t *p, char *scriptname);
+
 static struct linkedlist_t *packages;
 
 #ifdef DODEBUG
@@ -74,7 +76,7 @@ int isdefault(struct package_t *p) {
  *  1  if selected script return true
  * -1 if selected script is not present 
  */
-int check_script(struct package_t *p, char *scriptname) {
+static int check_script(struct package_t *p, char *scriptname) {
 	char *script, *cmd;
 	struct stat statbuf;
 	int ret;
@@ -240,7 +242,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	return ret;
 }
 
-static void check_special(struct package_t *p);
+static int check_special(struct package_t *p);
 
 /*
  * Satisfy the dependencies of a virtual package. Its dependencies
@@ -360,7 +362,7 @@ static void update_language (void) {
 	debconfclient_delete(debconf);
 }
 
-static void
+static int
 check_special(struct package_t *p)
 {
 	int i;
@@ -375,6 +377,7 @@ check_special(struct package_t *p)
 			update_language();
 			break;
 		}
+	return 0;
 }
 
 int do_menu_item(struct package_t *p) {
@@ -431,7 +434,7 @@ static void lower_debconf_priority (void) {
 		pri = 0;
 	di_logf("Lowering debconf priority limit from '%s' to '%s'",
 		debconf->value ? debconf->value : "(null)",
-		debconf_priorities[pri] ? debconf_priorities[pri] : "(null)")
+		debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
 
 	debconf->command(debconf, "SET", template,
 			 debconf_priorities[pri], NULL);

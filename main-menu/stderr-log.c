@@ -2,11 +2,13 @@
 
 #include "stderr-log.h"
 #include <cdebconf/debconfclient.h>
+#include <debian-installer.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <assert.h>
 
 /* The log file is opened anew for each error, because it may be removed in
  * between. Not efficient, but the idea is that stderr should not happen. */
