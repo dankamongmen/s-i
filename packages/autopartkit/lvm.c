@@ -280,7 +280,164 @@ lvm_lv_add(void *stack, const char *fstype, unsigned int mbminsize,
     return NULL;
 }
 
+/* (andread@linpro.no) */
+void *
+lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
+{
+    FILE *vgdisplay = NULL;
+    char buf[160];
+    char *command = NULL;
+
+    spaceinfo->path = strdup(vgname);
+    spaceinfo->capacity = (PedSector)0;
+    spaceinfo->freespace = (PedSector)0;
+    memset(&(spaceinfo->geom), 0, sizeof(spaceinfo->geom));
+    autopartkit_log(2, "  Locating free space on volumegroup %s\n", vgname);
+
+    asprintf(&command, "/sbin/vgdisplay -c %s 2>&1", vgname);
+    autopartkit_log(2, "  Running command: %s\n", command);
+    vgdisplay = popen(command, "r");
+    if (! vgdisplay ){
+        autopartkit_log(0, "Failed to run vgdisplay\n");
+	free(spaceinfo);
+	free(command);
+	return NULL;
+    }
+    if (fgets(buf, 160, vgdisplay) != NULL){
+	char *token = NULL;
+	int i = 0;
+	int pe_size = 0;
+	int free_pe = 0;
+	int vg_size = 0;
+
+        autopartkit_log(3, "  Vgdisplay: %s", buf);
+	token = strtok(buf, ":");
+	if (token) {
+	  while (token){
+	    i++;
+	    /*
+	      We expect the tokenized output fields to be like this:
+	      12 - size of volume group in kilobytes
+	      13 - physical extent size
+	      16 - free number of physical extents for this volume group
+	    */
+	    /* printf("DEBUG (%i): %s\n", i, token); */
+	    if (i == 12) vg_size = atoi(token);
+	    else if (i == 13) pe_size = atoi(token);
+	    else if (i == 16)free_pe = atoi(token);
+	    token = strtok(NULL, ":");
+	  }
+	} 
+	else {
+	  /* No tokens */
+	  free(spaceinfo);
+	  free(command);
+	  return NULL;
+	}
+	/* FIXME: Some problems with the data from vgdisplay -c. Using
+           field 12 for now instead */
+	/*
+	spaceinfo->capacity = 
+	  (PedSector)(MiB_TO_BLOCKS(pe_size * free_pe / (1024) ));
+	spaceinfo->freespace = 
+	  (PedSector)(MiB_TO_BLOCKS(pe_size * free_pe / (1024) ));
+	*/
+	spaceinfo->capacity = 
+	  (PedSector)(MiB_TO_BLOCKS(vg_size / (1024) ));
+	spaceinfo->freespace = 
+	  (PedSector)(MiB_TO_BLOCKS(vg_size / (1024) ));
+    }
+    else {
+        autopartkit_log(0, "Failed to find vg size\n");
+        free(spaceinfo);
+	free(command);
+        return NULL;
+    }
+    free(command);
+    return 1;
+}
+
 /* LVM stack operations */
+
+/* vg-stack (andread@linpro.no) */
+
+struct lvm_vg_info {
+    struct lvm_vg_info *next;
+    char *vgname;
+};
+
+void *
+lvm_vg_stack_new()
+{
+    struct lvm_vg_info *head;
+    head = malloc(sizeof(*head));
+    if (NULL != head)
+      {
+          head->next = head;
+	  head->vgname = NULL;
+      }
+    return head;
+}
+
+int
+lvm_vg_stack_isempty(void *stack)
+{
+    struct lvm_vg_info *head = stack;
+    return head->next == head;
+}
+
+int
+lvm_vg_stack_push(void *stack, const char *vgname)
+{
+    struct lvm_vg_info *head = stack;
+    struct lvm_vg_info *elem;
+
+    elem = malloc(sizeof(*elem));
+    if (NULL == elem)
+        return -1;
+    elem->vgname = strdup(vgname);
+
+    elem->next = head->next;
+    head->next = elem;
+
+    return 0;
+}
+
+int
+lvm_vg_stack_pop(void *stack, char **vgname)
+{
+    struct lvm_vg_info *head = stack;
+    struct lvm_vg_info *elem;
+
+    elem = head->next;
+
+    if (elem == head)
+        return -1;
+
+    head->next = elem->next;
+
+    *vgname = elem->vgname;
+
+    free(elem);
+  
+    return 0;
+}
+
+int
+lvm_vg_stack_delete(void *stack)
+{
+    char *vgname;
+    while ( ! lvm_vg_stack_isempty(stack) )
+    {
+	lvm_vg_stack_pop(stack, &vgname);
+	free(vgname);
+    }
+    free(stack);
+    return 0;
+}
+
+/* --- */
+
 struct lvm_pv_info {
     struct lvm_pv_info *next;
     char *vgname;
