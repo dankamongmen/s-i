@@ -1,0 +1,55 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+TEMPLATE_ROOT=debian-installer/network-console
+
+KEY_FILE=/etc/ssh/ssh_host_rsa_key
+
+if [ ! -f $KEY_FILE ]; done
+  db_progress START 0 1 $TEMPLATE_ROOT/generate_key
+  ssh-keygen -b 2048 -t rsa -N '' -f $KEY_FILE -q
+  db_progress STOP
+fi
+
+while [ -z "$PASSWORD" ]; do
+  db_set $TEMPLATE_ROOT/password ""
+  db_fset $TEMPLATE_ROOT/password seen false
+  db_set $TEMPLATE_ROOT/password-again ""
+  db_fset $TEMPLATE_ROOT/password-again seen false
+
+  db_input critical $TEMPLATE_ROOT/password || true
+  COMPARE_PW=''
+  db_input high $TEMPLATE_ROOT/password-again && COMPARE_PW=1 || true
+
+  db_get $TEMPLATE_ROOT/password
+  ROOT_PW="$RET"
+  if [ -z "$ROOT_PW" ]; then
+    db_fset $TEMPLATE_ROOT/password-empty seen false
+    db_input critical $TEMPLATE_ROOT/password-empty
+    continue
+  fi
+  db_get $TEMPLATE_ROOT/password-again
+  if [ "$COMPARE_PW" ] && [ "$ROOT_PW" != "$RET" ]; then
+    db_fset $TEMPLATE_ROOT/password-mismatch seen false
+    db_input critical $TEMPLATE_ROOT/password-mismatch
+    continue
+  fi
+  PASSWORD=$ROOT_PW
+done
+
+chpasswd << EOF
+root:$PASSWORD
+EOF
+
+KEY_FINGERPRINT=`ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' '`
+
+sshd
+
+db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
+db_fset $TEMPLATE_ROOT/start seen false
+db_input critical $TEMPLATE_ROOT/start
+
+killall sshd
+
