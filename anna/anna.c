@@ -96,7 +96,11 @@ choose_modules(void)
             continue;
         }
         pkg_kernel = udeb_kernel_version(p);
-        if (running_kernel && pkg_kernel && strcmp(running_kernel, pkg_kernel) != 0) {
+        // Ignore
+        // - kernel image packages
+        // - kernel module packages with inappropriate versions
+        if (strstr(p->package, "kernel-image-") == p->package ||
+                (running_kernel && pkg_kernel && strcmp(running_kernel, pkg_kernel) != 0)) {
             /* Bad kernel version, skip */
             if (prev)
                 prev->next = next;
