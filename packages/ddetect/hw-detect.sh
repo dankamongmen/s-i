@@ -99,7 +99,7 @@ discover_version () {
 		log "Testing experimental discover version 2."
 		DISCOVER_VERSION=2
 	else
-		log "Using  discover version 1."
+		log "Using discover version 1."
 		DISCOVER_VERSION=1
 		# must be Discover 1.x
 	fi
