@@ -261,7 +261,7 @@ md_create_raid1() {
 	echo "Raid devices count: ${DEV_COUNT}"
 	echo "Spare devices count: ${SPARE_COUNT}"
 	echo "Commandline:"
-	`mdadm --create /dev/md/${MD_NUM} --force -l raid1 -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}`
+	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid1 -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}`
 }
 
 md_mainmenu() {
