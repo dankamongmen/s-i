@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.6 2002/11/22 22:33:16 barbier Exp $
+ * $Id: gtk.c,v 1.7 2002/11/24 17:51:32 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -656,6 +656,8 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 
 	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
+	if (count == 1)
+		defval = choices[0];
 
 	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
 

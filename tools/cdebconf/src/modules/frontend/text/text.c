@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.22 2002/11/22 22:33:17 barbier Exp $
+ * $Id: text.c,v 1.23 2002/11/24 17:51:32 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -313,6 +313,8 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 
 	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
+	if (count == 1)
+		defval = choices[0];
 
 	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
         /* fprintf(stderr,"In texthandler_select, count is: %d\n", count);*/

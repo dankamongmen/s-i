@@ -362,6 +362,8 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 	/* Parse out all the choices */
 	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
+	if (count == 1)
+		defval = choices[0];
 
 	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
 	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));

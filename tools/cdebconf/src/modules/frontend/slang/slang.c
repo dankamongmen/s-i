@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.15 2002/11/21 22:40:11 barbier Exp $
+ * $Id: slang.c,v 1.16 2002/11/24 17:51:32 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -388,6 +388,11 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
 	if (count <= 0) return DC_NOTOK;
+	if (count == 1 && !multi)
+	{
+		dcount = 1;
+		defaults[0] = choices[0];
+	}
 
 	/* See what the currently selected value should be -- either a
 	 * previously selected value, or the default for the question
