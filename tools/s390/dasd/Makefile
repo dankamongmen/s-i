@@ -8,13 +8,22 @@
 
 CC := gcc
 CFLAGS := -Wall -pipe -Os
-#LDFLAGS := -ldebconf
-LDFLAGS := /usr/lib/libdebconf.a
+LDFLAGS := -ldebconf -ldebian-installer
+
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+CFLAGS += -g
+STRIP = /bin/true
+else
+CFLAGS += -fomit-frame-pointer
+STRIPTOOL=strip
+STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
+endif
 
 all: dasd
 
 dasd: dasd.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(STRIP) $@
 
 clean:
 	rm -f dasd

@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include <cdebconf/debconfclient.h>
+#include <debian-installer.h>
 
 static struct debconfclient *client;
 
@@ -41,12 +42,15 @@ void state (struct d_dasd *dasds, int i)
 	char line[255];
 	int j;
 
-	if (f) {
+	if (f)
+	{
 		while (fgets (line, sizeof (line), f))
 			for (j = 0; j < i; j++)
-				if (!strncasecmp(line, dasds[j].device, 4)) {
-					if (!strncmp(line + 40, "active", 6)) {
-						if (!strncmp(line + 47, "n/f", 3))
+				if (!strncasecmp (line, dasds[j].device, 4))
+				{
+					if (!strncmp (line + 40, "active", 6))
+					{
+						if (!strncmp (line + 47, "n/f", 3))
 							dasds[j].state = 2;
 						else
 							dasds[j].state = 3;
@@ -66,23 +70,27 @@ int main(int argc, char *argv[])
 	int items = 0, ret, i;
 	char line[255], *ptr;
 
-	client = debconfclient_new();
-	client->command(client, "title", "DASD Configuration", NULL);
+	client = debconfclient_new ();
+	client->command (client, "title", "DASD Configuration", NULL);
 
-	dasds = malloc(5*sizeof(struct d_dasd));
+	dasds = malloc (5*sizeof (struct d_dasd));
 
 	f = fopen("/proc/subchannels", "r");
-	if (f) {
+	if (f)
+	{
 		char device[5];
 		char devtype[5];
 		char inuse[4];
-		fgets(line, sizeof line, f);
-		fgets(line, sizeof line, f);
+		fgets (line, sizeof line, f);
+		fgets (line, sizeof line, f);
 		while (fgets (line, sizeof (line), f))
-			if (sscanf(line, "%4s %*4s %4s/%*2s %*4s/%*2s %s ", device, devtype, inuse) == 3)
-				if(!strncmp (devtype, "3390", 4) || !strncmp (devtype, "3380", 4) ||
-						!strncmp (devtype, "9345", 4) || !strncmp (devtype, "9336", 4) ||
-						!strncmp (devtype, "3370", 4)) {
+			if (sscanf (line, "%4s %*4s %4s/%*2s %*4s/%*2s %s ", device, devtype, inuse) == 3)
+				if(!strncmp (devtype, "3390", 4) ||
+						!strncmp (devtype, "3380", 4) ||
+						!strncmp (devtype, "9345", 4) ||
+						!strncmp (devtype, "9336", 4) ||
+						!strncmp (devtype, "3370", 4))
+				{
 					strncpy (dasds[items].device, device, 5);
 					strncpy (dasds[items].devtype, devtype, 5);
 					if (!strncmp(inuse, "yes", 3))
@@ -90,30 +98,34 @@ int main(int argc, char *argv[])
 					else
 						dasds[items].state = 1;
 					items++;
-					if ((items%5)==0) {
-						dasds = realloc(dasds,(items+5)*sizeof(struct d_dasd));
-					}
+					if ((items%5)==0)
+						dasds = realloc (dasds,(items+5)*sizeof (struct d_dasd));
 				}
-		fclose(f);
+		fclose (f);
 	}
 	else
 		perror ("fopen");
 
 	state (dasds, items);
 
-	if (items > 10) {
-		ptr = debconf_input ("critical", "s390/dasd/choose");
+	if (items > 10)
+	{
+		ptr = debconf_input ("high", "debian-installer/s390/dasd/choose");
 
-		if (!(cur = find_dasd (dasds, items, ptr))) {
-			client->command(client, "input", "critical", "s390/dasd/choose_invalid", NULL);
+		if (!(cur = find_dasd (dasds, items, ptr)))
+		{
+			client->command (client, "input", "high", "debian-installer/s390/dasd/choose_invalid", NULL);
 			return 3;
 		}
 	}
-	else if (items > 1) {
+	else if (items > 1)
+	{
 		line[0] = '\0';
-		for (i = 0; i < items; i++) {
+		for (i = 0; i < items; i++)
+		{
 			strcat (line, dasds[i].device);
-			switch (dasds[i].state) {
+			switch (dasds[i].state)
+			{
 				case 1:
 					strcat (line, " (new)");
 					break;
@@ -129,62 +141,51 @@ int main(int argc, char *argv[])
 			strcat (line, ", ");
 		}
 
-		client->command(client, "subst", "s390/dasd/choose_select", "choices", line, NULL);
-		client->command(client, "input", "critical", "s390/dasd/choose_select", NULL);
-		client->command(client, "go", NULL);
-		client->command(client, "get", "s390/dasd/choose_select", NULL);
+		client->command (client, "subst", "debian-install/s390/dasd/choose_select", "choices", line, NULL);
+		debconf_input ("high", "debian-install/s390/dasd/choose_select");
+
+		if (!strcmp (client->value, "Quit"))
+			exit (0);
 
 		cur = find_dasd (dasds, items, client->value);
 	}
 	else if (items)
 		cur = dasds;
-	else {
-		fprintf (stderr, "no dasd found\n");
-		return 2;
-	}
+	else
+		goto error;
 
-	if (cur->state == 1) {
+	if (!cur)
+		goto error;
+
+	if (cur->state == 1)
+	{
 		snprintf (line, sizeof (line), "echo add %s >/proc/dasd/devices", cur->device);
 		ret = system (line);
 		state (dasds, items);
 	}
-	if (cur->state == 2) {
-		client->command(client, "subst", "s390/dasd/format", "device", cur->device, NULL);
-		ptr = debconf_input ("critical", "s390/dasd/format");
+	if (cur->state == 2)
+	{
+		client->command (client, "subst", "debian-install/s390/dasd/format", "device", cur->device, NULL);
+		ptr = debconf_input ("high", "debian-install/s390/dasd/format");
 	}
-	else if (cur->state == 3) {
-		client->command(client, "subst", "s390/dasd/format_unclean", "device", cur->device, NULL);
-		ptr = debconf_input ("critical", "s390/dasd/format_unclean");
+	else if (cur->state == 3)
+	{
+		client->command (client, "subst", "debian-install/s390/dasd/format_unclean", "device", cur->device, NULL);
+		ptr = debconf_input ("critical", "debian-install/s390/dasd/format_unclean");
 	}
 	else
-		return 1;
+		goto error;
 
-	if (!strncmp (ptr, "true", 3)) {
-		pid_t child = fork ();
-		if (!child) {
-			int fd;
-			if ((fd = open ("/tmp/dasdfmt.log", O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
-				perror ("open");
-			if (close (1) < 0)
-				perror ("close");
-			if (close (2) < 0)
-				perror ("close");
-			if (dup (fd) < 0)
-				perror ("dup");
-			if (dup (fd) < 0)
-				perror ("dup");
-			snprintf (line, sizeof(line), "LX%s", cur->device);
-			execlp ("dasdfmt", "-l", line, "-b", "4096", "-n", cur->device, "-y", NULL);
-		}
-		else if (child < 0) {
-		}
-		else {
-			int status;
-			wait (&status);
-		}
-		//snprintf (line, sizeof(line), "dasdfmt -l LX%s -b 4096 -n %s >/tmp/dasdfmt.log 2>&1", cur->device, cur->device);
-		//ret = system (line);
+	if (!strncmp (ptr, "true", 3))
+	{
+		snprintf (line, sizeof (line), "dasdfmt -l LX%s -b 4096 -n %s -y", cur->device, cur->device);
+		di_execlog (line);
 	}
 
 	return 0;
+
+error:
+	debconf_input ("high", "debian-install/s390/dasd/error");
+	return 1;
 }
+
