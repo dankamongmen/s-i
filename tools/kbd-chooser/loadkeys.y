@@ -77,6 +77,9 @@ extern struct kbsentry kbs_buf;
 
 
 #include "ksyms.h"
+
+int yyerror(const char *s);
+int yylex(void);
 %}
 
 %%
