@@ -1,6 +1,6 @@
 all: debian/templates check-scripts
 
-debian/templates: Makefile debian/templates.in languagelist
+debian/templates: Makefile debian/templates-in languagelist
 	languagenames=`grep -v "^#" languagelist | cut -d\; -f1 | tr "\n" "," | sed "s/,$$//g"`; \
 	save_IFS=$$IFS; IFS=','; \
 	for l in $$languagenames; do \
@@ -10,7 +10,7 @@ debian/templates: Makefile debian/templates.in languagelist
 	IFS=$$save_IFS; \
 	languagenames=`echo $$languagenames | sed -e 's/^,//' -e 's/,/, /g'`; \
 	nativemessages=`echo $$nativemessages | sed -e 's/^, //'`; \
-	sed -e "s/@languagenames@/$$languagenames/" -e "s/@nativemessages@/$$nativemessages/" < debian/templates.in > $@
+	sed -e "s/@languagenames@/$$languagenames/" -e "s/@nativemessages@/$$nativemessages/" < debian/templates-in > $@
 
 check-scripts:
 	if [ -x /bin/ash ] ; then SH=ash ; else SH=dash; fi ; \
