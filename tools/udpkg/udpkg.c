@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.33 2002/11/24 22:55:07 tausq Exp $ */
+/* $Id: udpkg.c,v 1.34 2003/01/31 05:59:25 kraai Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -139,7 +139,8 @@ static int dpkg_doconfigure(struct package_t *pkg)
 		snprintf(buf, sizeof(buf), "%s configure", postinst);
 		if ((r = do_system(buf)) != 0)
 		{
-			fprintf(stderr, "postinst exited with status %d\n", r);
+			fprintf(stderr, "%s's postinst exited with status %d\n",
+				pkg->package, r);
 			pkg->status |= STATUS_STATUSHALFCONFIGURED;
 			return 1;
 		}
