@@ -14,6 +14,7 @@ main.o: main.c main.h
 
 clean:
 	rm -f *.o
+	rm -f core
 
 distclean: clean
 	rm -f ppcdetect
