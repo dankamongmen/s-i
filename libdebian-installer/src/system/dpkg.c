@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.c,v 1.7 2003/10/05 10:09:19 waldi Exp $
+ * $Id: dpkg.c,v 1.8 2003/11/09 00:49:05 pere Exp $
  */
 
 #include <config.h>
@@ -33,6 +33,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+/* PATH_MAX is missing on GNU/Hurd */
+#ifndef PATH_MAX
+#define PATH_MAX 4096
+#endif
 
 #if 0
 int di_system_dpkg_package_configure (di_packages *status, const char *_package, bool force)
