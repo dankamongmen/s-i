@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.27 2002/12/18 06:24:04 tausq Exp $
+ * $Id: text.c,v 1.28 2002/12/20 17:00:17 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -491,15 +491,15 @@ static void text_progress_step(struct frontend *ui, int step, const char *info)
     int width = getwidth();
     char out[256];
 
-    if (strlen(info) > width - 15)
-        info[width - 15] = 0;
-
     ui->progress_cur += step;
 
     snprintf(out, sizeof(out), "[%.1f%%] %s",
         (double)(ui->progress_cur - ui->progress_min) / 
         (double)(ui->progress_max - ui->progress_min) * 100.0, info);
-    printf("%*s\r", -width+1, out);
+    if (strlen(out) > width - 7)
+        out[width - 7] = 0;
+
+    printf("%s\r", out);
     fflush(stdout);
 }
 
