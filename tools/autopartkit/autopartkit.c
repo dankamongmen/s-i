@@ -877,6 +877,35 @@ nuke_all_partitions(void)
 }
 
 /*
+ * Zero out the start of a device, filling 'length' bytes with
+ * 0-bytes.  This is used to remove old headers from LVM partitions.
+ */
+static int
+zero_dev(char *devpath, unsigned int length)
+{
+    FILE *fp = fopen(devpath, "w");
+    char buf[10240]; /* 10 KiB blocks */
+    unsigned int i;
+
+    if (!fp)
+        return -1;
+
+    memset(buf, 0, sizeof(buf));
+    for (i = 0; i < length; )
+    {
+        unsigned int size = length - i;
+	if (size > sizeof(buf))
+	    size = sizeof(buf);
+
+        fwrite(buf, size, 1, fp);
+
+	i += size;
+    }
+    fclose(fp);
+    return 0;
+}
+
+/*
  * Create all the partitions on the disk
  *
  */
@@ -1055,6 +1084,9 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		
 	    ped_constraint_destroy(any);
 
+	    mountmap[partcount].devpath = get_device_path(disk_maybe->dev,
+							  newpart);
+
 #if defined(LVM_HACK)
 	    /*
 	     * It is currently not possible to create LVM partitions,
@@ -1065,10 +1097,14 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	    {
 	        autopartkit_log(1, "  converting partition type to LVM\n");
 		ped_partition_set_flag(newpart,PED_PARTITION_LVM,1);
+                /*
+                 * Zero out old LVM headers if present.  Is 100 KiB a good
+                 * value?
+                 */
+                zero_dev(mountmap[partcount].devpath, 100 * 1024);
 	    }
 #endif /* LVM_HACK */
-	    mountmap[partcount].devpath = get_device_path(disk_maybe->dev,
-							  newpart);
+
 	    /* disable_kmsg(1); */
 	    log_line();
 	    /* disable_kmsg(0); */
