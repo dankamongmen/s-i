@@ -254,9 +254,11 @@ if [ -e /proc/scsi/scsi ] ; then
     if grep -q "Attached devices: none" /proc/scsi/scsi ; then
         :
     else
-    	if grep -q "Type:.*Direct-Access" /proc/scsi/scsi ; then
+	if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi ; then
 	    if is_not_loaded "sd_mod" ; then
-		if ! [ "$(cat /proc/devices | sed 's/[^[:alpha:]]*//' |grep sd|head -n 1)" = "sd" ]; then
+		if grep -q '^[^[:alpha:]]\+sd$' /proc/devices ; then
+		    :
+		else
                     db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
                     db_subst hw-detect/load_progress_step MODULE "sd_mod"
                     db_progress INFO hw-detect/load_progress_step
@@ -266,9 +268,11 @@ if [ -e /proc/scsi/scsi ] ; then
 	    fi
 	fi
 	db_progress STEP $OTHER_STEPSIZE
-    	if grep -q "Type:.*CD-ROM" /proc/scsi/scsi ; then
+    	if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi ; then
 	    if is_not_loaded "sr_mod" ; then
-		if ! [ "$(cat /proc/devices | sed 's/[^[:alpha:]]*//' |grep sr|head -n 1)" = "sr" ]; then
+		if grep -q '^[^[:alpha:]]\+sr$' /proc/devices ; then
+		    :
+		else
                     db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
                     db_subst hw-detect/load_progress_step MODULE "sr_mod"
                     db_progress INFO hw-detect/load_progress_step
