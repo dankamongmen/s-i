@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.16 2003/03/27 12:44:46 sley Exp $
+ * $Id: gtk.c,v 1.17 2003/03/27 12:58:04 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -254,10 +254,17 @@ gboolean need_continue_button(struct frontend *obj)
 
 gboolean is_first_question(struct question *q)
 {
-    if (q->prev == NULL)
-	return TRUE;
-    else
-	return FALSE;
+    struct question *crawl;
+
+    crawl = q;
+
+    while (crawl->prev != NULL)
+    {
+	if (strcmp(crawl->prev->template->type, "note") != 0)
+	    return FALSE;
+	crawl = crawl->prev;
+    }
+    return TRUE;
 }
 
 void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
@@ -299,7 +306,11 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 	    gtk_box_pack_start (GTK_BOX(button_box), back_button, FALSE, FALSE, 5);
 
 	if (continue_button) 
+	{
 	    gtk_box_pack_start (GTK_BOX(button_box), continue_button, FALSE, FALSE, 5);
+	    GTK_WIDGET_SET_FLAGS (continue_button, GTK_CAN_DEFAULT);
+	    gtk_widget_grab_default(continue_button);
+	}
     }
 }
 
