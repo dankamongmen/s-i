@@ -176,11 +176,15 @@ get_packages(void)
         if (try_get_Packages_file(".gz", suites[i])) {
             if (system("gunzip " DOWNLOAD_DIR "/Packages.gz") == 0)
                 fp = fopen(DOWNLOAD_DIR "/Packages", "r");
+            else
+                unlink(DOWNLOAD_DIR "/Packages.gz");
         }
         if (fp == NULL && try_get_Packages_file("", suites[i]))
             fp = fopen(DOWNLOAD_DIR "/Packages", "r");
-        if (fp == NULL)
+        if (fp == NULL) {
+            unlink(DOWNLOAD_DIR "/Packages");
             continue;
+        }
         tmplist = di_pkg_parse(fp);
         fclose(fp);
         unlink(DOWNLOAD_DIR "/Packages");
