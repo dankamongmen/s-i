@@ -401,7 +401,9 @@ if [ -e /proc/bus/pccard/drivers ]; then
 	apt-install pcmcia-cs || true
 
 	# Determine devnames.
-	gen_pcmcia_devnames < /var/run/stab
+        if [ -f /var/run/stab ]; then
+	        gen_pcmcia_devnames < /var/run/stab
+        fi
 fi
 
 # Ask for discover to be installed into /target/, to make sure the
