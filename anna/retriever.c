@@ -10,16 +10,19 @@
 /* Returns the filename of the retriever to use. */
 /* TODO: handle more than one, and don't hard-code. */
 char *chosen_retriever (void) {
-	return "./fake-retriever";
+	return "usr/lib/debian-installer/retriever/file-retriever";
 }
 
 /* Ask the chosen retriever to download a package from src to dest. */
 int get_package (char *src, char *dest) {
+	int ret;
 	char *retriever=chosen_retriever();
 	char *command=malloc(strlen(retriever) + 1 + strlen(src) +
 				     strlen(dest) + 1);
 	sprintf(command, "%s %s %s", retriever, src, dest);
-	return ! system(command);
+	ret=! system(command);
+	free(command);
+	return ret;
 }
 
 /*
