@@ -605,10 +605,8 @@ default_disk_label () {
 		*vme*)
 		    echo msdos;;
 		q40)
-		    echo UNSUPPORTED;; # atari (same as atari)
-		sun)
-	    	    echo sun;;
-		sunx)
+		    echo UNSUPPORTED;; # (same as atari)
+		sun*)
 	    	    echo sun;;
 		*)
 		    echo UNKNOWN;;
