@@ -205,11 +205,11 @@ get_ide_chipset_info() {
 
 # Return list of lines formatted "module:Description"
 get_detected_hw_info() {
-	if [ ${SUBARCH%%/*} = powerpc ]; then
+	if [ "${SUBARCH%%/*}" = powerpc ]; then
 		discover-mac-io
-	fi
-	if [ ${SUBARCH##*/} = chrp_rs6k ]; then
-		discover-rs6k
+		if [ "$SUBARCH" = powerpc/chrp_rs6k ]; then
+			discover-rs6k
+		fi
 	fi
 	discover_hw
 	if [ -d /proc/bus/usb ]; then
