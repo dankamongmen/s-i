@@ -282,6 +282,7 @@ struct confmodule *confmodule_new(struct configuration *config,
 	mod->questions = questions;
 	mod->frontend = frontend;
 	mod->seen_questions = NULL;
+	mod->backed_up = 0;
 	mod->run = confmodule_run;
 	mod->communicate = confmodule_communicate;
 	mod->process_command = confmodule_process_command;

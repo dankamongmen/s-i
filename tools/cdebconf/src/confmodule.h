@@ -35,6 +35,7 @@ struct confmodule {
 	pid_t pid;
 	int infd, outfd;
 	int exitcode;
+	int backed_up;
 	char *owner;
 	char **seen_questions;
 

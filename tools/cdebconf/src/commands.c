@@ -211,13 +211,15 @@ command_go(struct confmodule *mod, char *arg)
 	mod->frontend->questions = q;
     }
 
-    if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
+    if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK || mod->backed_up != 0)
     {
+        mod->backed_up = 1;
         asprintf(&out, "%u backup", CMDSTATUS_GOBACK);
         mod->update_seen_questions(mod, STACK_SEEN_REMOVE);
     }
     else
     {
+        mod->backed_up = 0;
         asprintf(&out, "%u ok", CMDSTATUS_SUCCESS);
         mod->update_seen_questions(mod, STACK_SEEN_ADD);
     }
