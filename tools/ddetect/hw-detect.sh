@@ -55,13 +55,39 @@ load_modules()
     echo $old > /proc/sys/kernel/printk
 }
 
+# wrapper for discover command that can distinguish Discover 1.x and 2.x
+discover_hw () {
+    # Ugh, Discover 1.x didn't exit with nonzero status if given an
+    # unrecongized option!
+    DISCOVER_TEST=$(discover --version 2> /dev/null)
+    if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
+        # Discover 2.x
+        # XXX: This is copied from xfree86, and do not work yet
+
+	log "Using discover2 do not work yet."
+
+        #VENDOR_MODEL_FILE=$(tempfile)
+        #SERVER_FILE=$(tempfile)
+        #DRIVER_FILE=$(tempfile)
+        #discover --type-summary display > $VENDOR_MODEL_FILE
+        #discover --data-path=xfree86/server/name --data-version=${SOURCE_VERSION%-*} display > $SERVER_FILE
+        #discover --data-path=xfree86/server/device/driver --data-version=${SOURCE_VERSION%-*} display > $DRIVER_FILE
+        #DISCOVERED_VIDEO=$(paste $VENDOR_MODEL_FILE $SERVER_FILE $DRIVER_FILE)
+        #rm -f $VENDOR_MODEL_FILE $SERVER_FILE $DRIVER_FILE
+    else
+        # must be Discover 1.x
+        /sbin/discover --format="%m\t%V\t%M\n" \
+            --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom
+    fi
+}
+
 # Return list of lines with "Kernel module<tab>Vendor<tab>Model"
 get_hw_info() {
     # Try to make sure the floppy driver is available
     echo "floppy	Linux	Floppy Driver"
 
-    /sbin/discover --format="%m\t%V\t%M\n" \
-	--disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom
+    discover_hw
+
     # Manually load modules to enable things we can't detect.
     # XXX: This isn't the best way to do this; we should autodetect.
     # The order of these packages are important. [pere 2003-03-16]
