@@ -74,6 +74,7 @@ append_message(const char *fmt, ...)
         return;
     va_start(ap, fmt);
     vfprintf(fp, fmt, ap);
+    fclose(fp);
     va_end(ap);
 }
 
