@@ -60,12 +60,6 @@ get_partitions() {
 		fi
 	done
 
-	if [ -z "$RET" ]; then
-		db_input high $DEBCONF_BASE/noparts
-		db_go
-		exit 1
-	fi
-
 	return 0
 }
 
