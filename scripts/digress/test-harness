@@ -63,11 +63,7 @@ config () {
 	var="$1"
 	shift 1
 #	echo "$var=\"$@\""
-	if [ -z "$var" ]; then
-		eval "export $var='$@'"
-	else
-		echo "not overriding $var"
-	fi
+	eval "export $var='$@'"
 }
 
 use () {
@@ -98,9 +94,9 @@ if [ ! -e "$DI_TESTDIR/schemes/$MACHINE" ]; then
 	error "Unknown machine $MACHINE"
 fi
 
-use $SCHEME
-use common
 . $DI_TESTDIR/config
+use common
+use $SCHEME
 
 trap sigout INT QUIT
 
