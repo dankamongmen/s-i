@@ -39,11 +39,14 @@ build-stamp:
 		make-kpkg --flavour di build
 	touch build-stamp
 
+fixcontrol:
+	-mv -f debian/control.orig debian/control
+
 clean:
 	rm -f build-stamp unpack-stamp
 	-rm -rf kernel-source-$(KVERS)
 	-dh_clean
-	-mv -f debian/control.orig debian/control
+	$(MAKE) fixcontrol
 	dh_clean
 
 # Use kernel-package to build the kernel image.
@@ -93,6 +96,8 @@ binary-udebs: build
 		dh_builddeb --package=$${package} \
 			--filename=$${package}_$(VERSION)_$(ARCH).udeb; \
 	done
+
+	$(MAKE) fixcontrol
 
 binary-arch: binary-image binary-udebs
 binary-indep:
