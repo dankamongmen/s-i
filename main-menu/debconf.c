@@ -2,7 +2,7 @@
  * Debconf communication routines.
  */
 
-#include "main-menu.h"
+#include "debconf.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -19,7 +19,7 @@ char *debconf_ret (void) {
 
 /* Talks to debconf and returns the numeric return code. */
 int debconf_command (const char *fmt, ...) {
-	char buf[BUFSIZE];
+	char buf[DEBCONF_BUFSIZE];
 	va_list ap;
 	
 	va_start(ap, fmt);
@@ -28,7 +28,7 @@ int debconf_command (const char *fmt, ...) {
 	printf("\n");
 	fflush(stdout); /* make sure debconf sees it to prevent deadlock */
 
-	fgets(buf, BUFSIZE, stdin);
+	fgets(buf, DEBCONF_BUFSIZE, stdin);
 	buf[strlen(buf)-1] = 0;
 	if (strlen(buf)) {
 		strtok(buf, " \t\n");
