@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.c,v 1.5 2004/02/01 16:38:11 waldi Exp $
+ * $Id: package.c,v 1.6 2004/02/22 16:36:06 waldi Exp $
  */
 
 #include <config.h>
@@ -147,7 +147,7 @@ di_package_version *di_package_version_parse (di_package *package)
   return version;
 }
 
-static const char *priority_text[] =
+const char *const di_package_priority_text[] =
 {
   "unspecified",
   "extra",                              /* == di_package_priority_extra */
@@ -158,25 +158,56 @@ static const char *priority_text[] =
   NULL
 };
 
-di_package_priority di_package_priority_text_from (const char *text)
+const char *const di_package_status_want_text[] =
+{
+  "unknown",                            /* == di_package_status_want_unknown */
+  "install",                            /* == di_package_status_want_install */
+  "hold",                               /* == di_package_status_want_hold */
+  "deinstall",                          /* == di_package_status_want_deinstall */
+  "purge",                              /* == di_package_status_want_purge */
+  NULL
+};
+
+const char *const di_package_status_text[] =
+{
+  "undefined",                          /* == di_package_status_undefined */
+  "not-installed",                      /* == di_package_status_not_installed */
+  "unpacked",                           /* == di_package_status_unpacked */
+  "installed",                          /* == di_package_status_installed */
+  "half-configured",                    /* == di_package_status_half_configured */
+  "config-files",                       /* == di_package_status_config_files */
+  NULL
+};
+
+int di_package_array_text_from (const char *const *array, const char *text)
 {
   const di_rstring temp = { (char *) text, strlen (text) };
-  return internal_di_package_priority_text_from_rstring (&temp);
+  return internal_di_package_array_text_from_rstring (array, &temp);
 }
 
-di_package_priority internal_di_package_priority_text_from_rstring (const di_rstring *text)
+int internal_di_package_array_text_from_rstring (const char *const *array, const di_rstring *text)
 {
   int i;
-  for (i = 1; priority_text[i]; i++)
-    if (strncmp (priority_text[i], text->string, text->size) == 0)
+  for (i = 1; array[i]; i++)
+    if (strncmp (array[i], text->string, text->size) == 0)
     {
       return i;
     }
   return 0;
 }
 
-const char *di_package_priority_text_to (const di_package_priority priority)
+di_package_priority di_package_priority_text_from_real_4_1 (const char *text) __attribute__ ((unused));
+di_package_priority di_package_priority_text_from_real_4_1 (const char *text)
 {
-  return priority_text[priority];
+  return di_package_priority_text_from (text);
 }
+
+const char *di_package_priority_text_to_real_4_1 (const di_package_priority priority) __attribute__ ((unused));
+const char *di_package_priority_text_to_real_4_1 (const di_package_priority priority)
+{
+  return di_package_priority_text_to (priority);
+}
+
+__asm__ (".symver di_package_priority_text_from_real_4_1,di_package_priority_text_from@LIBDI_4.1");
+__asm__ (".symver di_package_priority_text_to_real_4_1,di_package_priority_text_to@LIBDI_4.1");
 

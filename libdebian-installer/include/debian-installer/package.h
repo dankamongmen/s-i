@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.h,v 1.6 2004/02/01 16:38:11 waldi Exp $
+ * $Id: package.h,v 1.7 2004/02/22 16:36:06 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_H
@@ -174,8 +174,41 @@ void di_package_version_free (di_package_version *version);
 int di_package_version_compare (const di_package_version *a, const di_package_version *b);
 di_package_version *di_package_version_parse (di_package *package);
 
-di_package_priority di_package_priority_text_from (const char *text);
-const char *di_package_priority_text_to (const di_package_priority priority);
+extern const char *const di_package_priority_text[];
+extern const char *const di_package_status_want_text[];
+extern const char *const di_package_status_text[];
+
+int di_package_array_text_from (const char *const *array, const char *text);
+
+static inline di_package_priority di_package_priority_text_from (const char *text)
+{
+  return di_package_array_text_from (di_package_priority_text, text);
+}
+
+static inline di_package_status_want di_package_status_want_text_from (const char *text)
+{
+  return di_package_array_text_from (di_package_status_want_text, text);
+}
+
+static inline di_package_status di_package_status_text_from (const char *text)
+{
+  return di_package_array_text_from (di_package_status_text, text);
+}
+
+static inline const char *di_package_priority_text_to (const di_package_priority priority)
+{
+  return di_package_priority_text[priority];
+}
+
+static inline const char *di_package_status_want_text_to (const di_package_status_want status)
+{
+  return di_package_status_want_text[status];
+}
+
+static inline const char *di_package_status_text_to (const di_package_status status)
+{
+  return di_package_status_text[status];
+}
 
 /** @} */
 

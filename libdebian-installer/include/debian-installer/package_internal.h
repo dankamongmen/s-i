@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_internal.h,v 1.4 2004/02/01 16:38:11 waldi Exp $
+ * $Id: package_internal.h,v 1.5 2004/02/22 16:36:06 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_INTERNAL_H
@@ -82,7 +82,12 @@ struct internal_di_package_parser_data
 di_destroy_notify
   internal_di_package_destroy_func;
 
-di_package_priority internal_di_package_priority_text_from_rstring (const di_rstring *text);
+int internal_di_package_array_text_from_rstring (const char *const *array, const di_rstring *text);
+
+static inline di_package_priority internal_di_package_priority_text_from_rstring (const di_rstring *text)
+{
+  return internal_di_package_array_text_from_rstring (di_package_priority_text, text);
+}
 
 /** @} */
 #endif
