@@ -13,23 +13,26 @@ for dev in $DEVICES/*; do
     open_dialog PARTITIONS
     while { read_line num id size type fs path name; [ "$id" ]; }; do
 	[ "$fs" = hfs ] || continue
-	partitions="$partitions $id,$size"
+	partitions="$partitions $id,$size,$path"
     done
     close_dialog
     
     for part in $partitions; do
-	id=${part%,*}
+	id="${part%%,*}"
 	[ -f $id/method ] || continue
 	method=$(cat $id/method)
 	if [ "$method" = newworld ]; then
-	    size=${part#*,}
+	    cdr="${part#*,}"
+	    size="${cdr%%,*}"
 	    have_newworld=yes
 	    if longint_le "$size" 819199; then
 		good_size=no
+	    else
+		path="${cdr#*,}"
+		good_paths="${good_paths:+$good_paths,}$path"
 	    fi
 	fi
     done
-    
 done
 
 if [ "$have_newworld" = no ]; then
@@ -49,5 +52,7 @@ elif [ "$good_size" = no ]; then
 	exit 1
     fi
 fi
+
+db_set partman-newworld/boot_partitions "$good_paths"
 
 exit 0
