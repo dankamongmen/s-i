@@ -1,8 +1,12 @@
 #! /bin/sh
 
-set -e
-
+#set -e
 . /usr/share/debconf/confmodule
+#set -x
+
+# workaround for now
+rmdir /usr/share/discover
+ln -s /usr/share/detect /usr/share/discover
 
 log () {
     echo "$0: $@" >>/var/log/messages
@@ -74,7 +78,7 @@ do
 
     if [ -n "$module" -a "$module" != "ignore" ]
     then
-        if [ ! -f /lib/modules/*/*/$module.o ]
+        if [ ! -f /lib/modules/*/*/"$module".o ]
         then
             while true
             do
@@ -109,7 +113,7 @@ do
             fi
         fi
 
-        if [ -f /lib/modules/*/*/$module.o ]
+        if [ -f /lib/modules/*/*/"$module".o ]
         then
 	    old=`cat /proc/sys/kernel/printk`
 	    echo 0 >/proc/sys/kernel/printk
@@ -124,6 +128,8 @@ do
             log "Could not locate driver for $vendor $model."
         fi
     fi
+    IFS="
+"
 done
 IFS="$IFS_SAVE"
 
@@ -183,7 +189,10 @@ do
     mounted=0
 
     # What about ISA cdroms ?
-    devices=`/sbin/discover --disable-all --enable=pci,ide,scsi --device cdrom`
+    # discover doesn't do devfs, :/
+
+    # devices=`/sbin/discover --disable-all --enable=pci,ide,scsi --device cdrom`
+    devices="`echo /dev/cdroms/*`"
     for device in $devices
     do
         mount -t iso9660 -o ro,exec $device /cdrom 2>/dev/null
