@@ -79,25 +79,21 @@ foreach_partition '
 	    -e "s/.*mountpoint{  *\([^ }]*\) *}.*/\1/g" \
 	    -e "s!//!/!g" \
 	    -e '\''s!/$!!g'\'' \
-	    -e "s/@/@@/g" \
-	    -e "s/+/@+/g" \
-	    -e "s/-/@dash/g" \
-	    -e "s/ /@space/g" \
-	    -e '\''s!^/root$!@root!g'\'' \
+	    -e "s/_/__/g" \
+	    -e "s/+/_+/g" \
+	    -e "s/-/_dash/g" \
+	    -e "s/ /_space/g" \
+	    -e '\''s!^/root$!_root!g'\'' \
 	    -e '\''s!^$!/root!g'\'' \
 	    -e "s!^/!!" \
 	    -e "s!/!+!g"
 	)
     else
-	lvname=@$name_number
+	lvname=_$name_number
 	name_number=$(($name_number + 1))
     fi
 
-    if [ "$last" = yes ]; then
-        new_LV $VG_name full "$lvname" || autopartitioning_failed
-    else
-        new_LV $VG_name "$1"000000 "$lvname" || autopartitioning_failed
-    fi
+    new_LV $VG_name "$1"000000 "$lvname" || autopartitioning_failed
 
     device=/dev/"$VG_name"/"$lvname" # is this true?
 

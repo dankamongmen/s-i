@@ -71,11 +71,13 @@ attach_PV () {
 # $2 = size in bytes
 # $3 = name of the LV to create
 new_LV () {
-    if [ "$2" = full ]; then
-	lvcreate -l$() -n $3 $1 >>/var/log/messages 2>&1
-    else
+#    if [ "$2" = full ]; then
+# Using full VG not implemented until we have a way to get the free size of
+# a VG
+#	lvcreate -l$() -n $3 $1 >>/var/log/messages 2>&1
+#   else
 	lvcreate -L${2%???}k -n $3 $1 >>/var/log/messages 2>&1
-    fi
+#    fi
 }
 
 # Delete a LV
