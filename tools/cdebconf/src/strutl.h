@@ -46,4 +46,6 @@ void strescape(const char *inbuf, char *outbuf, const size_t maxlen, const int q
 int strwrap(const char *str, const int width, char *lines[], int maxlines);
 int strlongest(char **strs, int count);
 
+size_t strwidth(const char *width);
+
 #endif

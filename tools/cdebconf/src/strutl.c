@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <limits.h>
+#include <wchar.h>
 
 int strcountcmp(const char *s1, const char *e1, const char *s2, const char *e2)
 {
@@ -341,3 +343,18 @@ int strlongest(char **strs, int count)
 	}
 	return max;
 }
+
+size_t
+strwidth (const char *what)
+{
+    size_t res;
+    int k;
+    const char *p;
+    wchar_t c;
+
+    for (res = 0, p = what ; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 ; p += k)
+        res += wcwidth (c);
+
+    return res;
+}  
+
