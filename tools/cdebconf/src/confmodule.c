@@ -119,7 +119,8 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 		for (i = 1; i < argc; i++)
 			args[i-1] = argv[i];
 		args[argc-1] = NULL;
-		execv(argv[1], args);
+		if (execv(argv[1], args) != 0)
+			perror("execv");
 		/* execv failed :( */
 		exit(1);
 	default:

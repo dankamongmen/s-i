@@ -247,7 +247,7 @@ int runconfmodule(int argc, char **argv)
 int reconfigure(char **pkgs, int i, int max)
 {
 	int ret;
-	char *argv[3] = {0};
+	char *argv[5] = {0};
 	char filename[1024];
 	char *pkg;
 
@@ -275,10 +275,10 @@ int reconfigure(char **pkgs, int i, int max)
 		{
 			if (is_confmodule(filename))
 			{
-				argv[0] = filename;
-				argv[1] = "configure";
-				argv[2] = getfield(pkg, VERSIONFIELD);
-				if ((ret = runconfmodule(3, argv)) != DC_OK)
+				argv[1] = filename;
+				argv[2] = "configure";
+				argv[3] = getfield(pkg, VERSIONFIELD);
+				if ((ret = runconfmodule(4, argv)) != DC_OK)
 					return ret;
 			}
 			else
@@ -295,10 +295,10 @@ int reconfigure(char **pkgs, int i, int max)
 		snprintf(filename, sizeof(filename), INFODIR "/%s.config", pkg);
 		if (file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
 		{
-			argv[0] = filename;
-			argv[1] = "reconfigure";
-			argv[2] = getfield(pkg, VERSIONFIELD);
-			if ((ret = runconfmodule(3, argv)) != DC_OK)
+			argv[1] = filename;
+			argv[2] = "reconfigure";
+			argv[3] = getfield(pkg, VERSIONFIELD);
+			if ((ret = runconfmodule(4, argv)) != DC_OK)
 				return ret;
 		}
 
@@ -347,7 +347,7 @@ int main(int argc, char **argv)
 		DIE("Cannot initialize DebConf frontend");
 
 	g_db->load(g_db);
-	ret = reconfigure(argv, argc, optind);
+	ret = reconfigure(argv, optind, argc);
 	/* shutting down .... sync the database and shutdown the modules */
 	cleanup();
 	return ret;
