@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 # Kernel version.
-KVERS=2.4.0
+KVERS=2.4.1
 # Kernel flavor.
 FLAVOUR=di
 
@@ -34,12 +34,14 @@ unpack-stamp:
 	cp debian/changelog kernel-source-$(KVERS)/debian
 	echo official > kernel-source-$(KVERS)/debian/official
 	cp config.$(ARCH) kernel-source-$(KVERS)/.config
-	# Hack up the Makefile for flavour support.
-	cd kernel-source-$(KVERS); \
-		if [ ! -e Makefile.pristine ]; then \
-			cp Makefile Makefile.pristine; \
-		fi; \
-		sed 's/^\(KERNELRELEASE=.*\)$$/\1-$$(FLAVOUR)/' Makefile.pristine > Makefile; \
+	# Hack up the Makefile for flavour support. Not necessary with
+	# recent debian kernel source packages, which are pre-hacked..
+	#
+	#cd kernel-source-$(KVERS); \
+	#	if [ ! -e Makefile.pristine ]; then \
+	#		cp Makefile Makefile.pristine; \
+	#	fi; \
+	#	sed 's/^\(KERNELRELEASE=.*\)$$/\1-$$(FLAVOUR)/' Makefile.pristine > Makefile; \
 	touch unpack-stamp
 
 # Use kernel-package to do the actual building.
