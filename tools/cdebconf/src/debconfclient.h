@@ -58,6 +58,9 @@ struct debconfclient *debconfclient_new(void);
  */
 void debconfclient_delete(struct debconfclient *client);
 
+#define DEBCONF_OLD_STDIN_FD    4
+#define DEBCONF_OLD_STDOUT_FD   5
+
 /**
  * @}
  */

@@ -4,6 +4,7 @@
 #include "database.h"
 #include "question.h"
 #include "strutl.h"
+#include "debconfclient.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,6 +159,7 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 	int pid;
 	int i;
 	char **args;
+	int oldstdin = -1, oldstdout = -1;
 	int toconfig[2], fromconfig[2]; /* 0=read, 1=write */
 	pipe(toconfig);
 	pipe(fromconfig);
@@ -168,11 +170,21 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 		DIE("Cannot execute client config script");
 		break;
 	case 0:
-		close(fromconfig[0]); close(toconfig[1]);
+		oldstdout = dup(1);
 		if (toconfig[0] != 0) { /* if stdin is closed initially */
+			oldstdin = dup(0);
 			dup2(toconfig[0], 0); close(toconfig[0]);
 		}
+		close(fromconfig[0]); close(toconfig[1]);
 		dup2(fromconfig[1], 1); close(fromconfig[1]);
+		if (oldstdin != -1 && oldstdin != DEBCONF_OLD_STDIN_FD) {
+			dup2(oldstdin, DEBCONF_OLD_STDIN_FD);
+			close(oldstdin);
+		}
+		if (oldstdout != -1 && oldstdout != DEBCONF_OLD_STDOUT_FD) {
+			dup2(oldstdout, DEBCONF_OLD_STDOUT_FD);
+			close(oldstdout);
+		}
 
 		args = (char **)malloc(sizeof(char *) * argc);
 		for (i = 1; i < argc; i++)
