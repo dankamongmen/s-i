@@ -4,7 +4,7 @@ DISK="$1"
 
 case "`archdetect`" in
 "m68k/amiga")
-	parted $DISK
+	amiga-fdisk $DISK
 	;;
 "m68k/atari")
 	atari-fdisk $DISK
@@ -20,6 +20,15 @@ case "`archdetect`" in
 	;;
 "m68k/mvme16x")
 	pmac-fdisk $DISK
+	;;
+"m68k/q40")
+	atari-fdisk $DISK
+	;;
+"m68k/sun")
+	parted $DISK
+	;;
+"m68k/sun3x")
+	parted $DISK
 	;;
 *)
 	parted $DISK
