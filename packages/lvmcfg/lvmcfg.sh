@@ -62,14 +62,15 @@ addinfos_pv() {
 		return
 	fi
 
-	RET2=`echo "$cmdout" | grep '^[ ]*VG Name' | \
-		sed -e 's/^[ ]*VG Name \+\(.*\)/VG: \1/'`
-	RET="${RET2}"
+	RET=""
+	VG=`echo "$cmdout" | grep '^[ ]*VG Name' | \
+		sed -e 's/^[ ]*VG Name \+//'`
+	[ "$VG" != ""] && RET="VG: ${VG}/ "
 
 	RET2=`echo "$cmdout" | grep '^[ ]*PV Size' | \
 		sed -e 's/^[ ]*PV Size \+\(.*\)/Size: \1/' | \
 		cut -d "[" -f 1 | cut -d "/" -f 1 | sed -e 's/ $//'`
-	RET="${RET}/ ${RET2}"
+	RET="${RET}${RET2}"
 }
 
 #
