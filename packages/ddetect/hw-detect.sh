@@ -92,7 +92,7 @@ discover_version () {
 	fi
 	# Ugh, Discover 1.x didn't exit with nonzero status if given an
 	# unrecognized option!
-	DISCOVER_TEST=$($DISCOVER --version 2> /dev/null)
+	DISCOVER_TEST=$($DISCOVER --version 2> /dev/null) || true
 	if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
 		log "Testing experimental discover version 2."
 		DISCOVER_VERSION=2

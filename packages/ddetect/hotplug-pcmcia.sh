@@ -42,7 +42,7 @@ case $TYPE in
 
 		modules_before=`cat /tmp/pcmcia-discover-snapshot`
 
-		DISCOVER_TEST=$(discover --version 2> /dev/null)
+		DISCOVER_TEST=$(discover --version 2> /dev/null) || true
 		if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
 			dpath=linux/module/name
 			dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
