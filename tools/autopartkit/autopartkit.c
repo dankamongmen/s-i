@@ -1406,13 +1406,13 @@ int main (int argc, char *argv[])
     dev = choose_device();
     if (! dev)
     {
-        autopartkit_log(1, "Unable to find any hard drives to partition!\n");
+        autopartkit_error(0, "Unable to find any hard drives to partition!");
         goto end;
     }
 
     if (NULL == disk_reqs)
     {
-        autopartkit_error( 0, "Unable to load partition table '%s'.\n",
+        autopartkit_error( 0, "Unable to load partition table '%s'.",
 			   tablefile);
 	goto end;
     }
