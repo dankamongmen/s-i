@@ -39,7 +39,7 @@ build-udeb-stamp:
 	[ -d $(udebbuild) ] || mkdir -p $(udebbuild)
 	(cd $(udebbuild); CFLAGS="-Os -fomit-frame-pointer" \
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
-		--without-rpath --with-db="textdb" \
+		--without-rpath --with-db="textdb rfc822db" \
 		--with-frontend="text" \
 		--with-conffile=$(CONFFILE))
 	(cd $(udebbuild); $(MAKE) clean; $(MAKE))
@@ -140,7 +140,8 @@ cdebconf-udeb: install-udeb
 	dh_gencontrol 		-p$@ -- -fdebian/files~
 	# Register file manually.
 	dpkg-distaddfile	$(FILENAME) debian-installer $(PRIORITY)
-	dh_md5sums		-p$@
+# udebs shouldn't have md5sums.
+#	dh_md5sums		-p$@
 	dh_builddeb		-p$@ --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
