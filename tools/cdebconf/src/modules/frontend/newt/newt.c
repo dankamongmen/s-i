@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.22 2003/09/23 15:11:00 sesse Exp $
+ * $Id: newt.c,v 1.23 2003/09/27 11:49:33 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -74,32 +74,33 @@ struct newt_data {
 
 #define create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
 
-/* To be i18ned */
+/* gettext would be much nicer :-( */
 static char *
-continue_text(void)
+continue_text(struct frontend *obj)
 {
-    return "Continue";
+    struct question *q = obj->qdb->methods.get(obj->qdb, "debconf/button-continue");
+    return q ? q_get_description(q) : "Continue";
 }
 
-/* To be i18ned */
 static char *
-goback_text(void)
+goback_text(struct frontend *obj)
 {
-    return "Go Back";
+    struct question *q = obj->qdb->methods.get(obj->qdb, "debconf/button-goback");
+    return q ? q_get_description(q) : "Go Back";
 }
 
-/* To be i18ned */
 static char *
-yes_text(void)
+yes_text(struct frontend *obj)
 {
-    return "Yes";
+    struct question *q = obj->qdb->methods.get(obj->qdb, "debconf/button-yes");
+    return q ? q_get_description(q) : "Yes";
 }
 
-/* To be i18ned */
 static char *
-no_text(void)
+no_text(struct frontend *obj)
 {
-    return "No";
+    struct question *q = obj->qdb->methods.get(obj->qdb, "debconf/button-no");
+    return q ? q_get_description(q) : "No";
 }
 
 static void
@@ -236,8 +237,8 @@ show_separate_window(struct frontend *obj, struct question *q)
 #else
     newtTextboxSetText(textbox, q_get_extended_description(q));
 #endif
-    bOk     = newtCompactButton( win_width - 9 - strwidth(continue_text()), win_height-2, continue_text());
-    bCancel = newtCompactButton(5,  win_height-2, goback_text());
+    bOk     = newtCompactButton( win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
+    bCancel = newtCompactButton(5,  win_height-2, goback_text(obj));
     newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
     newtFormAddComponents(form, textbox, bCancel, bOk, NULL);
     cRet = newtRunForm(form);
@@ -298,8 +299,8 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     else
         defval = (char *)question_getvalue(q, "");
     entry   = newtEntry(1, 1+t_height+1, defval, win_width-4, &result, eflags);
-    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text()),  win_height-2, continue_text());
-    bCancel = newtCompactButton(5 , win_height-2, goback_text());
+    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)),  win_height-2, continue_text(obj));
+    bCancel = newtCompactButton(5 , win_height-2, goback_text(obj));
     newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
     newtFormAddComponents(form, textbox, bCancel, bOk, entry, NULL);
     newtFormSetCurrent(form, entry);
@@ -390,8 +391,8 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     }
     create_window(win_width, win_height, obj->title, q->priority);
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
-    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text()), win_height-2, continue_text());
-    bCancel = newtCompactButton(5, win_height-2, goback_text());
+    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
+    bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
     newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q) || !show_ext_desc);
     newtFormAddComponents(form, label, bCancel, bOk, NULL);
     if (count > sel_height) {
@@ -521,8 +522,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     create_window(win_width, win_height, obj->title, q->priority);
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
     listbox = newtListbox((win_width - sel_width)/2, 1+t_height+1, sel_height, listflags);
-    bCancel = newtCompactButton(5, win_height-2, goback_text());
-    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text()), win_height-2, continue_text());
+    bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
+    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
         newtListboxAppendEntry(listbox, choices_trans[i], choices[i]);
@@ -602,9 +603,9 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     assert(textbox);
     if (q_ext_text != NULL)
         newtTextboxSetText(textbox, q_ext_text);
-    bCancel  = newtCompactButton(5, win_height-2, goback_text());
-    bYes     = newtCompactButton((win_width - strwidth(yes_text()) - 2)/2, win_height-2, yes_text());
-    bNo      = newtCompactButton(win_width - 9 - strwidth(no_text()), win_height-2, no_text());
+    bCancel  = newtCompactButton(5, win_height-2, goback_text(obj));
+    bYes     = newtCompactButton((win_width - strwidth(yes_text(obj)) - 2)/2, win_height-2, yes_text(obj));
+    bNo      = newtCompactButton(win_width - 9 - strwidth(no_text(obj)), win_height-2, no_text(obj));
     newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
     newtFormAddComponents(form, textbox, bCancel, bYes, bNo, NULL);
     if (strcmp(question_getvalue(q, ""), "true") == 0)
