@@ -27,3 +27,16 @@ if ! debconf-set-selections "/var/log/debconf-seed"; then
 fi
 
 log "successfully loaded $FILE"
+
+db_get preseed/command
+command="$RET"
+if [ "$command" != "" ]; then
+	log "running preseed command: $command"
+	eval $command || code=$?
+	if [ "$code" != 0 ]; then
+		db_subst preseed/command_failed COMMAND "$command"
+		db_subst preseed/command_failed CODE "$code"
+		db_input critical preseed/command_failed || true
+		db_go || true
+	fi
+fi
