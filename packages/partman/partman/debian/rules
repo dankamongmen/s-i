@@ -10,21 +10,11 @@ ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 PACKAGE=partman
 
 PROVIDES=made-filesystems, mounted-partitions, partitioned-harddrives, created-fstab
-# parted can not edit properly dvh disk labels, do not provide
-# partitioned-harddrives
-ifeq ($(ARCH),mips)
-PROVIDES=made-filesystems, mounted-partitions, created-fstab
-endif
 
 MENUITEMNUM=42
 # slow and doesn't support the atari subarch
 ifeq ($(ARCH),m68k)
 MENUITEMNUM=49
-endif
-# Use `partitioner' for partitioned-harddrives and `partman'
-# instead of `partconf' for made-filesystems and mounted-partitions.
-ifeq ($(ARCH),mips)
-MENUITEMNUM=44
 endif
 # ibm disk labels are completely unsupported
 ifeq ($(ARCH),s390)
@@ -75,6 +65,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
+	cp debian/isinstallable debian/${PACKAGE}/DEBIAN/
 	dh_fixperms
 	dh_installdeb
 	dh_gencontrol -- -Vmenuitemnum=$(MENUITEMNUM) -Vprovides='$(PROVIDES)'
