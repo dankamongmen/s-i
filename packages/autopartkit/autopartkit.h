@@ -62,6 +62,9 @@ void autopartkit_error (int isfatal, const char * format, ...);
 #define MiB_TO_BLOCKS(mb) ((mb) * 2048l)
 #define BLOCKS_TO_MiB(b)  ((b)  / 2048l)
 
+/* from mapdevfs.c */
+char *normalize_devfs(const char* path);
+
 /* from lvm.c */
 int lvm_init(void);
 int lvm_init_dev(const char *devpath);

@@ -749,7 +749,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     /* Find and mount the root fs */
       
     autopartkit_log( 1, "device for /: %s\n",
-		     di_system_devfs_map_from(find_partition_by_mountpoint(mountmap,"/")));
+		     normalize_devfs(find_partition_by_mountpoint(mountmap,"/")));
 
     /* FIXME Should use fstype for /, not DEFAULT_FS */
     if (mount(find_partition_by_mountpoint(mountmap,"/"), 
@@ -799,7 +799,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 			   mountmap[i].mountpoint->mountpoint : "[null]" ),
 			 mountmap[i].mountpoint->fstype);
 
-	devpath = di_system_devfs_map_from(mountmap[i].devpath);
+	devpath = normalize_devfs(mountmap[i].devpath);
 
 	asprintf(&tmpmnt, "/target%s", mountmap[i].mountpoint->mountpoint);
 	make_path(tmpmnt, 0755);

@@ -29,7 +29,6 @@ fi
 
 # Checks for libraries.
 AC_CHECK_LIB([debconfclient], [debconfclient_new])
-AC_CHECK_LIB([debian-installer], [di_system_devfs_map_from])
 AC_CHECK_LIB([dl], [dlopen])
 AC_CHECK_LIB([uuid], [uuid_generate])
 AC_CHECK_LIB([parted], [ped_constraint_any])
