@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.24 2003/08/18 22:55:25 sley Exp $
+ * $Id: gtk.c,v 1.25 2003/08/18 23:34:36 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -200,6 +200,8 @@ static void multi_setter(void *check_container, struct question *q)
 	}
 	check_list = g_list_next(check_list);
     }
+    if(!result)
+	result = g_strdup("");
     question_setvalue(q, result);
     g_list_free(check_list);
     free(result);
@@ -676,7 +678,8 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     const char *defval = question_getvalue(q, "");
 	
     entry = gtk_entry_new ();
-    gtk_entry_set_text (GTK_ENTRY(entry), defval);
+    if (defval)
+	gtk_entry_set_text (GTK_ENTRY(entry), defval);
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
     frame = gtk_frame_new(question_get_field(q, "", "description"));
     gtk_container_add(GTK_CONTAINER (frame), entry);	
