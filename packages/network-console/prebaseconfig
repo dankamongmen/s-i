@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-[ "$TERM_TYPE" != network ] && exit 0
-
 log() {
     logger -t prebaseconfig "$@"
 }
@@ -10,17 +8,27 @@ log() {
 . /usr/share/debconf/confmodule
 
 TEMPLATE_ROOT=debian-installer/network-console
+PACKAGE=network-console-config
 
-if chroot /target dpkg -l network-console-config 2>/dev/null | grep "^ii" ; then
-    log "Package network-console-config was installed into /target"
+if [ "$TERM_TYPE" != network ]; then
+    # Apparently the user has decided not to install over SSH after all,
+    # so base-configuration should be started on the console from inittab.
+    # Purge the network-console-config package (if it was installed)
+    log "Installation is not over SSH; purging $PACKAGE from /target"
+    chroot /target dpkg --purge $PACKAGE >/dev/null 2>&1 || true
+    exit 0
+fi
+
+if chroot /target dpkg -l $PACKAGE 2>/dev/null | grep "^ii" ; then
+    log "Setting up the system to allow base-configuration to be run over SSH"
     db_input critical $TEMPLATE_ROOT/prebaseconfig-reminder
     db_go
 else
     ## FIXME (see #279090) ##
     # There really should be a dialog shown here
     # Not implemented yet because of string freeze for RC2 release
-    log "Package network-console-config was not installed into /target;"
-    log "aborting configuration of base-configuration over SSH"
+    log "Package $PACKAGE was not installed into /target;"
+    log "the system will not be set up to run base-configuration over SSH"
     exit 0
 fi
 
