@@ -299,7 +299,7 @@ if [ -x /etc/init.d/pcmcia ]; then
 	CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 2>&1 | logger -t hw-detect
 	db_progress STEP $OTHER_STEPSIZE
 fi
-if [ -d /proc/bus/pccard ]; then
+if [ -e /proc/bus/pccard/drivers ]; then
 	apt-install pcmcia-cs || true
 fi
 
