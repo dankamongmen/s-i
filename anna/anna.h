@@ -22,5 +22,6 @@ int get_package (struct package_t *package, char *dest);
 int unpack_package (char *pkgfile);
 int md5sum(char* sum, char *file);
 void cleanup(void);
+char *udeb_kernel_version(struct package_t *p);
 
 #endif /* ANNA_H_ */

@@ -322,3 +322,28 @@ cleanup(void)
     free(retriever);
     free(command);
 }
+
+/* 
+ * Simply return the XYZ in foo-modules-XYZ-udeb
+ * Returns NULL if the match fails
+ * FIXME: Should we cross-check against the package version?
+ */
+char *
+udeb_kernel_version(struct package_t *p)
+{
+    char *name = strdup(p->package);
+    char *t1, *t2;
+
+    if ((t1 = strstr(name, "-modules-")) == NULL)
+        return NULL;
+    t1 += strlen("-modules-");
+    if ((t2 = strstr(t1, "-udeb")) == NULL)
+        return NULL;
+    if (t2[strlen("-udeb")] != '\0')
+        return NULL;
+    *t2 = '\0';
+    t2 = strdup(t1);
+    free(name);
+    return t2;
+}
+

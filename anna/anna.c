@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/utsname.h>
 #include <cdebconf/debconfclient.h>
 #include <debian-installer.h>
 #include "anna.h"
@@ -54,8 +55,11 @@ choose_modules(void)
     struct list_node *node, *prev, *next;
     struct package_t *p;
     FILE *fp;
-    char *choices;
+    char *choices, *pkg_kernel, *running_kernel = NULL;
+    struct utsname uts;
 
+    if (uname(&uts) == 0)
+        running_kernel = uts.release;
     pkglist = get_packages();
     if (pkglist == NULL || pkglist->head == NULL) {
         debconf->command(debconf, "INPUT critical", ANNA_NO_MODULES, NULL);
@@ -80,9 +84,9 @@ choose_modules(void)
     for (node = pkglist->head; node != NULL; node = next) {
         next = node->next;
         p = (struct package_t *)node->data;
-        if (p->filename == NULL || is_installed(p, status_p)) {
-            /* Packages without filenames(!) or packages already installed
-             * will be brutally skipped. */
+        if (p->filename == NULL || p->package == NULL || is_installed(p, status_p)) {
+            /* Packages without filenames or names (!) or packages already
+             * installed will be brutally skipped. */
             if (prev)
                 prev->next = next;
             else
@@ -91,7 +95,19 @@ choose_modules(void)
             free(node);
             continue;
         }
-        if (p->priority >= standard) {
+        pkg_kernel = udeb_kernel_version(p);
+        if (running_kernel && pkg_kernel && strcmp(running_kernel, pkg_kernel) != 0) {
+            /* Bad kernel version, skip */
+            if (prev)
+                prev->next = next;
+            else
+                pkglist->head = next;
+            /* FIXME: When is it safe to free p? */
+            free(node);
+            continue;
+        }
+        if (p->priority >= standard || (running_kernel && pkg_kernel &&
+                    strcmp(running_kernel, pkg_kernel) == 0)) {
             /* These packages will automatically be installed */
             if (prev != NULL)
                 prev->next = next;
