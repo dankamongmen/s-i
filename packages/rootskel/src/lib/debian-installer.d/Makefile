@@ -14,7 +14,8 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
 	S30term-linux-s390
   else
     files += \
-	S30term-linux
+	S30term-linux \
+	S35framebuffer-linux
   endif
   ifeq ($(DEB_HOST_GNU_CPU),i386)
     files += \
