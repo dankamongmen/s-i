@@ -920,8 +920,10 @@ nuke_all_partitions(void)
     do {
         PedDisk *p;
 	p = ped_disk_new_fresh(dev, ped_disk_type_get(DISK_LABEL));
-	ped_disk_destroy(p);
+#if defined(HAVE_PED_DISK_COMMIT) /* libparted 1.6 */
 	ped_disk_commit(p);
+#endif
+	ped_disk_destroy(p);
 	dev = ped_device_get_next(dev);
     } while (dev != NULL);
 }
@@ -1086,11 +1088,16 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	        req_tmp->curdisk->geom.start = newpart->geom.end + 1;
 
 	        fs = ped_file_system_create(&newpart->geom,fs_type, NULL);
-		ped_file_system_close(fs);
-		autopartkit_log(1, "  Created partition on %lld-%lld "
-				"length %lld\n", 
-				newpart->geom.start, newpart->geom.end,
-				newpart->geom.length);
+		if ( ! fs )
+		  autopartkit_error (1, "  ped_file_system_create failed\n");
+		else
+		{
+		  ped_file_system_close(fs);
+		  autopartkit_log(1, "  Created partition on %lld-%lld "
+				  "length %lld\n", 
+				  newpart->geom.start, newpart->geom.end,
+				  newpart->geom.length);
+		}
 	    }
 	    else
 	    {
