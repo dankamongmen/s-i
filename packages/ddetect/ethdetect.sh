@@ -167,9 +167,14 @@ do
 	done
 
 	if [ -n "$CHOICES" ]; then
+		db_capb backup
 		db_subst ethdetect/module_select CHOICES "$CHOICES"
 		db_input high ethdetect/module_select || [ $? -eq 30 ]
-		db_go || break
+		if ! db_go; then
+			rm -f $TEMP_EXTRACT
+			exit 10
+		fi
+		db_capb
 
 		db_get ethdetect/module_select
 		if [ "$RET" = "no ethernet card" ]; then
@@ -185,8 +190,13 @@ do
 	fi
 
 	if [ -e /usr/lib/debian-installer/retriever/floppy-retriever ]; then
+		db_capb backup
 		db_input critical ethdetect/load_floppy
-		db_go || continue # back up
+		if ! db_go; then
+			rm -f $TEMP_EXTRACT
+			exit 10
+		fi
+		db_capb
 		db_get ethdetect/load_floppy
 		if [ "$RET" = true ] && \
 		   anna floppy-retriever && \
@@ -195,8 +205,13 @@ do
 		fi
 	fi
 
+	db_capb backup
 	db_input high ethdetect/cannot_find
-	db_go || break
+	if ! db_go; then
+		rm -f $TEMP_EXTRACT
+		exit 10
+	fi
+	db_capb
 
 	if [ -z "$CHOICES" ]; then
 		rm -f $TEMP_EXTRACT
