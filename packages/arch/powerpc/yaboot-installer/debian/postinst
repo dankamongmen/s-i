@@ -101,11 +101,12 @@ if [ -z "$PARTITIONS" ]; then
 	dev="`parted -s "$i" print | sed -n 's,^Disk geometry for \([^:]*\)/disc:.*$,\1,p'`"
 	# Look for partitions with the boot flag set.
 	for part in `parted -s "$i" print | sed -n 's,^\([0-9]\+\) .* boot$,'"$dev"'/part\1,p'`; do
+	    mappart="$(mapdevfs "$part")"
 	    if [ -z "$PARTITIONS" ]; then
-		DEFAULT="$part"
-		PARTITIONS="$part"
+		DEFAULT="$mappart"
+		PARTITIONS="$mappart"
 	    else
-		PARTITIONS="$PARTITIONS,$part"
+		PARTITIONS="$PARTITIONS,$mappart"
 	    fi
 	done
 	info "guessed bootstrap partitions: $PARTITIONS"
@@ -127,7 +128,8 @@ db_get yaboot-installer/bootdev
 if [ "$RET" = false ]; then
     die yaboot-installer/nopart 'No bootstrap partition selected (?)'
 fi
-bootdev="$RET"
+# already devfs-mapped
+boot="$RET"
 
 # Find the root partition
 
@@ -266,7 +268,6 @@ IFS="$OLDIFS"
 db_progress STEP 1
 db_progress INFO yaboot-installer/conf
 
-boot="`mapdevfs "$bootdev"`"
 root="`mapdevfs "$rootdev"`"
 slashboot="`mapdevfs "$slashbootdev"`"
 
