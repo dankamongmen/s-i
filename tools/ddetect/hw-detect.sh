@@ -28,6 +28,43 @@ is_not_loaded() {
     fi
 }
 
+snapshot_devs() {
+  DEVS=$(echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`)
+}
+
+compare_devs() {
+  OLDDEVS=$DEVS
+  snapshot_devs
+  NEWDEV=$(echo "${DEVS#$OLDDEVS}" | sed -e 's/^ //')
+}
+
+NETDISCOVER="/tmp/discover-net"
+
+get_modinfo()
+{
+  local module="$1"
+
+  MODINFO=""
+
+  [ -f "$NETDISCOVER" ] || return
+
+  if grep -q "^$1" $NETDISCOVER; then
+    lines=$(grep "^$1" $NETDISCOVER | wc -l)
+    if [ $lines -eq 1 ]; then
+      MODINFO=$(grep "^$1" $NETDISCOVER | cut -d':' -f2 | sed 's/,//g')
+    elif [ $lines -eq 0 ]; then
+      return
+    else
+      MODINFOTMP=$(grep -n "^$1" $NETDISCOVER | head -n 1)
+      MODINFO=$(echo "$MODINFOTMP" | cut -d':' -f3- | sed 's/,//g')
+      linenum=$(echo "$MODINFOTMP" | cut -d':' -f1)
+      # Write out the tmp file without the line just used.
+      grep -n . $NETDISCOVER | grep -v ^${linenum} | cut -f2- -d':' > $NETDISCOVER~
+      mv $NETDISCOVER~ $NETDISCOVER
+    fi
+  fi
+}
+
 load_module() {
     local module="$1"
     db_fset hw-detect/module_params seen false
@@ -35,10 +72,19 @@ load_module() {
     db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
     db_get hw-detect/module_params
+    snapshot_devs
     if modprobe -v "$module" "$RET" >> /var/log/messages 2>&1 ; then
     	if [ "$RET" != "" ]; then
 		register-module "$module" "$RET"
 	fi
+	compare_devs
+
+        if [ -n "$NEWDEV" ]; then
+          get_modinfo $module #stored into $MODINFO
+          if [ -n "$MODINFO" ]; then
+            echo "${NEWDEV}:${MODINFO}" >> /etc/network/devnames
+          fi
+        fi
     else   
 	db_fset hw-detect/modprobe_error seen false
 	db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
@@ -102,6 +148,8 @@ discover_hw () {
         $DISCOVER --format="%m:%V %M\n" \
             --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
 	  sed 's/ $//'
+	$DISCOVER --format="%m:%V %M\n" \
+	    --disable-all --enable=pci,pcmcia ethernet | sed 's/ $//' > $NETDISCOVER
     fi
 }
 

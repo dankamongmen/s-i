@@ -7,12 +7,13 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 	$(MAKE)
+	gzip -9c devnames.txt > devnames.gz
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp 
+	rm -f build-stamp devnames.gz
 	-$(MAKE) clean
 	dh_clean
 
@@ -23,6 +24,7 @@ install: build
 	dh_installdirs
 	$(foreach PACKAGE, $(shell dh_listpackages), \
 	  $(MAKE) install-$(PACKAGE) DESTDIR=`pwd`/debian/$(PACKAGE);)
+	cp devnames.gz debian/ethdetect/etc/network/ 
 
 binary-indep: build install
 	dh_testdir
