@@ -47,10 +47,12 @@ lvm_isinstalled(void)
     struct stat statbuf;
     static int isinstalled = -1;
 
+#if 0
     /* Disabled until I find a way to create both LVM partitions and
        real partitions without the kernel caching an incorrect
        partition table. */
     isinstalled = FALSE;
+#endif
 
     if (isinstalled != -1)
       return isinstalled;

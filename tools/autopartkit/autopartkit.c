@@ -1235,16 +1235,16 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
         lvm_lv_stack_pop(lvm_lv_stack, &vgname, &lvname, &fstype, &mbsize);
 
-	autopartkit_log(1, "  Init LVM lv on vg=%s, lvname=%s mbsize=%ud\n",
+	autopartkit_log(1, "  Init LVM lv on vg=%s, lvname=%s mbsize=%u\n",
 			vgname, lvname, mbsize);
 
         /* Create lv, using minimum size (?) */
         devpath = lvm_create_logicalvolume(vgname, lvname, mbsize);
 	if (NULL == devpath)
-	    autopartkit_log(1, " LVM lv creation failed\n");
+	    autopartkit_log(1, "  LVM lv creation failed\n");
 	else
 	{
-	    autopartkit_log(1, " LVM lv created ok, devpath=%s\n", devpath);
+	    autopartkit_log(1, "  LVM lv created ok, devpath=%s\n", devpath);
 
         /* Create filesystem */
         /*
