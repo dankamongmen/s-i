@@ -15,25 +15,23 @@ LIBOBJS=commands.opic confmodule.opic frontend.opic priority.opic strutl.opic \
 	configuration.opic database.opic question.opic template.opic
 
 all: $(BIN) $(LIB) $(SONAME)
-	(cd modules && make all)
+	@$(MAKE) -C modules $@
 
-debconf: debconf.o $(LIB)
-	$(CC) $(CFLAGS) -o $@ debconf.o $(LDFLAGS)
-
-loadtemplate: loadtemplate.o $(LIB)
-	$(CC) $(CFLAGS) -o $@ loadtemplate.o $(LDFLAGS)
-
-dpkg-reconfigure: dpkg-reconfigure.o $(LiB)
-	$(CC) $(CFLAGS) -o $@ dpkg-reconfigure.o $(LDFLAGS)
+$(BIN): $(LIB) $(addsuffix .o,$(BIN))
+	@for bin in $(BIN); do \
+		echo Compiling tool $$bin; \
+		$(CC) $(CFLAGS) -o $$bin $$bin.o $(LDFLAGS); \
+	done
 
 $(LIBNAME): $(LIBOBJS)
-	$(CC) $(CFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $^ -ldl
+	@echo Creating shared library $@
+	@$(CC) $(CFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $^ -ldl
 
 $(SONAME) $(LIB): $(LIBNAME)
-	-ln -sf $^ $@
+	-@ln -sf $^ $@
 
 clean:
-	-rm -f $(BIN) $(LIB) $(LIBNAME) $(SONAME) *~ *.o *.opic
-	(cd modules && make clean)
+	-@rm -f $(BIN) $(LIB) $(LIBNAME) $(SONAME) *~ *.o *.opic
+	@$(MAKE) -C modules clean
 
 .PHONY: clean lib

@@ -12,6 +12,7 @@ configure: configure.in
 	autoconf
 
 clean: 
+	-rm -f *-stamp
 	-$(MAKE) -C src $@
 
 distclean: clean

@@ -1,14 +1,14 @@
-include ../../../globalmakeflags
-
-SOBJS=textdb.so
-OBJS=textdb.opic
-
-CFLAGS += -I../..
+MODULES=textdb perldb
+SOBJS=$(addsuffix .so,$(MODULES))
 
 all: $(SOBJS)
 
-textdb.so: textdb.opic
-	$(CC) $(CFLAGS) -shared -o $@ $^
+%.so:
+	@$(MAKE) -C $*
+	@cp $*/$*.so .
 
 clean:
-	-rm -f $(SOBJS) $(OBJS) *~
+	@for module in $(MODULES); do \
+		$(MAKE) -C $$module clean; \
+	done
+	-@rm -f $(SOBJS)
