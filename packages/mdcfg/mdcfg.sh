@@ -25,7 +25,7 @@ md_delete_verify() {
 	db_subst mdcfg/deleteverify DEVICE "/dev/${DEVICE}"
 	db_subst mdcfg/deleteverify TYPE "${TYPE}"
 	db_subst mdcfg/deleteverify DEVICES "${DEVICES}"
-	db_input high mdcfg/deleteverify
+	db_input critical mdcfg/deleteverify
 	db_go
 	db_get mdcfg/deleteverify
 
@@ -56,7 +56,7 @@ md_delete() {
 	fi
 	db_set mdcfg/deletemenu "false"
 	db_subst mdcfg/deletemenu DEVICES "${DEVICES}"
-	db_input high mdcfg/deletemenu
+	db_input critical mdcfg/deletemenu
 	db_go
 	db_get mdcfg/deletemenu
 
@@ -69,7 +69,7 @@ md_delete() {
 
 md_createmain() {
 	db_set mdcfg/createmain "false"
-	db_input high mdcfg/createmain
+	db_input critical mdcfg/createmain
 	db_go
 	if [ $? -ne "30" ]; then
 		db_get mdcfg/createmain
@@ -146,7 +146,7 @@ prune_partitions() {
 md_create_raid0() {
 	db_subst mdcfg/raid0devs PARTITIONS "${PARTITIONS}"
 	db_set mdcfg/raid0devs ""
-	db_input high mdcfg/raid0devs
+	db_input critical mdcfg/raid0devs
 	db_go
 
 	if [ "$?" -eq 30 ]; then return; fi
@@ -181,7 +181,7 @@ md_create_raid1() {
 
 	# Get the count of active devices
 	while [ "${OK}" -eq 0 ]; do
-		db_input high mdcfg/raid1devcount
+		db_input critical mdcfg/raid1devcount
 		db_go
 		if [ "$?" -eq "30" ]; then
 			# If the user has pressed "Cancel", return
@@ -203,7 +203,7 @@ md_create_raid1() {
 	# this time.
 	# TODO: Make a general function for this kind of stuff
 	while [ "${OK}" -eq 0 ]; do
-		db_input high mdcfg/raid1sparecount
+		db_input critical mdcfg/raid1sparecount
 		db_go
 		if [ "$?" -eq "30" ]; then
 			return
@@ -235,7 +235,7 @@ md_create_raid1() {
 	while [ "${SELECTED}" -ne "${DEV_COUNT}" ]; do
 		db_subst mdcfg/raid1devs COUNT "${DEV_COUNT}"
 		db_subst mdcfg/raid1devs PARTITIONS "${PARTITIONS}"
-		db_input high mdcfg/raid1devs
+		db_input critical mdcfg/raid1devs
 		db_go
 		if [ "$?" -eq "30" ]; then
 			return
@@ -264,7 +264,7 @@ md_create_raid1() {
 			FIRST=0
 			db_subst mdcfg/raid1sparedevs COUNT "${SPARE_COUNT}"
 			db_subst mdcfg/raid1sparedevs PARTITIONS "${PARTITIONS}"
-			db_input high mdcfg/raid1sparedevs
+			db_input critical mdcfg/raid1sparedevs
 			db_go
 			if [ "$?" -eq "30" ]; then
 				return
@@ -314,7 +314,7 @@ md_create_raid1() {
 md_mainmenu() {
 	while [ 1 ]; do
 		db_set mdcfg/mainmenu "false"
-		db_input high mdcfg/mainmenu
+		db_input critical mdcfg/mainmenu
 		db_go
 		if [ $? -eq "30" ]; then
 			exit 30
