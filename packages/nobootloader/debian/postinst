@@ -4,6 +4,10 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+ARCH=`udpkg --print-architecture`
+db_get debian-installer/kernel/subarchitecture
+SUBARCH="$RET"
+
 if [ -f /etc/mtab ]; then
     MTAB=/etc/mtab
 else
@@ -21,6 +25,47 @@ if [ "" = "$rootfs" ]; then
 fi
 rootfs=`mapdevfs $rootfs`
 
-db_subst nobootloader/confirmation ROOT "${rootfs}"
-db_input high nobootloader/confirmation_common || true
+# detect if /boot is a separate partition and if so which partition it is.
+bootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
+
+# some combination of partconf and kernel 2.2 ends up with /target/.
+if [ "" = "$bootfs" ]; then
+	bootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/boot\/ /s/ .*//p' $MTAB`
+fi
+
+if [ "" = "$bootfs" ]; then
+	separateboot="false"
+	bootfs=$rootfs
+	boot="boot/"
+else
+	separateboot="true"
+	bootfs=`mapdevfs $bootfs`
+	boot=""
+fi
+
+if [ "$ARCH" = "powerpc" -a "$SUBARCH" = "chrp_pegasos" ]; then
+	kernel=`ls /target/boot/vmlinuz-2.* | /target/bin/sed -e 's%/target/boot/%%'`
+	bootcmd="boot ${bootfs} ${boot}${kernel} root=${rootfs}"
+
+	db_subst nobootloader/confirmation KERNEL_BOOT "${bootcmd}"
+	db_input high nobootloader/confirmation || true
+else 
+	db_get debian-installer/kernel/linux/link_in_boot
+	link_in_boot="$RET"
+	if [ "$link_in_boot" = "true" ]; then
+		boot="boot/"
+	else
+		boot=""
+	fi
+	if [ -e /target$boot/vmlinuz ]; then
+		kernel="/${boot}vmlinuz"
+	else if [ -e /target$boot/vmlinux ]; then
+		kernel="/${boot}vmlinux"
+	fi
+	fi
+	db_subst nobootloader/confirmation_common ROOT "${rootfs}"
+	db_subst nobootloader/confirmation_common KERNEL_LOC "${kernel}"
+	db_input high nobootloader/confirmation_common || true
+fi
+
 db_go || true
