@@ -4,7 +4,7 @@ ifdef DEBUG
 DEB_BUILD_OPTIONS := debug:${DEB_BUILD_OPTIONS}
 endif
 
-CFLAGS := -Wall -Os
+CFLAGS := -Wall -Os -I.
 ARCH := $(shell dpkg --print-architecture)
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
