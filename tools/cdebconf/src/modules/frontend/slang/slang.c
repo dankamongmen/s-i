@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.19 2002/11/29 22:19:33 barbier Exp $
+ * $Id: slang.c,v 1.20 2002/11/30 15:57:58 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -344,8 +344,8 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 		{
 		case 0: ret = DC_OK; break;
 		case 1: ret = DC_GOBACK; break;
-		case 2: ans = 1; ret = DC_OK; break;
-		case 3: ans = 0; ret = DC_OK; break;
+		case 2: ans = 1; break;
+		case 3: ans = 0; break;
 		}
 	}
 
@@ -476,7 +476,6 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 				{
 					memset(selected, 0, sizeof(selected));
 					selected[val] = 1;
-					ret = DC_OK;
 				}
 				else
 				{
