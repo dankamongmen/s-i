@@ -29,7 +29,7 @@ static int database_save(struct database *db)
 	return DC_OK;
 }
 
-static int database_template_add(struct database *db, struct template *t)
+static int database_template_set(struct database *db, struct template *t)
 {
 	return DC_NOTIMPL;
 }
@@ -59,11 +59,6 @@ static struct template *database_template_iterate(struct database *db,
 	void **iter)
 {
 	return 0;
-}
-
-static int database_question_add(struct database *db, struct question *q)
-{
-	return DC_NOTIMPL;
 }
 
 static struct question *database_question_get(struct database *db, 
@@ -155,13 +150,12 @@ struct database *database_new(struct configuration *cfg)
 	SETMETHOD(shutdown);
 	SETMETHOD(load);
 	SETMETHOD(save);
-	SETMETHOD(template_add);
+	SETMETHOD(template_set);
 	SETMETHOD(template_get);
 	SETMETHOD(template_remove);
 	SETMETHOD(template_lock);
 	SETMETHOD(template_unlock);
 	SETMETHOD(template_iterate);
-	SETMETHOD(question_add);
 	SETMETHOD(question_get);
 	SETMETHOD(question_set);
 	SETMETHOD(question_disown);

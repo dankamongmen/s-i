@@ -13,7 +13,7 @@ typedef int (*dcd_initialize_t)(struct database *, struct configuration *);
 typedef int (*dcd_shutdown_t)(struct database *);
 typedef int (*dcd_load_t)(struct database *);
 typedef int (*dcd_save_t)(struct database *);
-typedef int (*dcd_template_add_t)(struct database *, struct template *t);
+typedef int (*dcd_template_set_t)(struct database *, struct template *t);
 typedef struct template *(*dcd_template_get_t)(struct database *, 
 	const char *name);
 typedef int (*dcd_template_remove_t)(struct database *, const char *name);
@@ -21,7 +21,6 @@ typedef int (*dcd_template_lock_t)(struct database *, const char *name);
 typedef int (*dcd_template_unlock_t)(struct database *, const char *name);
 typedef struct template *(*dcd_template_iterate_t)(struct database *,
 		void **iter);
-typedef int (*dcd_question_add_t)(struct database *, struct question *q);
 typedef struct question *(*dcd_question_get_t)(struct database *, 
 	const char *name);
 typedef int (*dcd_question_set_t)(struct database *, struct question *q);
@@ -50,13 +49,12 @@ struct database {
 	dcd_shutdown_t shutdown;
 	dcd_load_t load;
 	dcd_save_t save;
-	dcd_template_add_t template_add;
+	dcd_template_set_t template_set;
 	dcd_template_get_t template_get;
 	dcd_template_remove_t template_remove;
 	dcd_template_lock_t template_lock;
 	dcd_template_unlock_t template_unlock;
 	dcd_template_iterate_t template_iterate;
-	dcd_question_add_t question_add;
 	dcd_question_get_t question_get;
 	dcd_question_set_t question_set;
 	dcd_question_disown_t question_disown;
@@ -75,13 +73,12 @@ struct database_module {
 	dcd_shutdown_t shutdown;
 	dcd_load_t load;
 	dcd_save_t save;
-	dcd_template_add_t template_add;
+	dcd_template_set_t template_set;
 	dcd_template_get_t template_get;
 	dcd_template_remove_t template_remove;
 	dcd_template_lock_t template_lock;
 	dcd_template_unlock_t template_unlock;
 	dcd_template_iterate_t template_iterate;
-	dcd_question_add_t question_add;
 	dcd_question_get_t question_get;
 	dcd_question_set_t question_set;
 	dcd_question_disown_t question_disown;

@@ -7,17 +7,21 @@ LDFLAGS=-L. -ldebconf -Wl,-rpath,$(shell pwd)
 LIB=libdebconf.so
 LIBNAME=libdebconf.so.$(MAJOR).$(MINOR).$(MICRO)
 SONAME=libdebconf.so.$(MAJOR).$(MINOR)
-BIN=debconf
+DEBCONF=debconf
+TOOLS=loadtemplate
+BIN=$(DEBCONF) $(TOOLS)
 
 LIBOBJS=commands.o confmodule.o frontend.o priority.o strutl.o configuration.o\
 	database.o question.o template.o
-BINOBJS=debconf.o
 
 all: $(BIN) $(LIB) $(SONAME)
 	(cd modules && make all)
 
-$(BIN): $(BINOBJS) $(LIB)
-	$(CC) $(CFLAGS) -o $@ $(BINOBJS) $(LDFLAGS)
+debconf: debconf.o $(LIB)
+	$(CC) $(CFLAGS) -o $@ debconf.o $(LDFLAGS)
+
+loadtemplate: loadtemplate.o $(LIB)
+	$(CC) $(CFLAGS) -o $@ loadtemplate.o $(LDFLAGS)
 
 $(LIBNAME): $(LIBOBJS)
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $^ -ldl

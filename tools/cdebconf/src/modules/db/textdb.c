@@ -114,7 +114,7 @@ static int textdb_save(struct database *db)
 	return DC_OK;
 }
 
-static int textdb_template_add(struct database *db, struct template *t)
+static int textdb_template_set(struct database *db, struct template *t)
 {
 	FILE *outf;
 	char *filename;
@@ -139,7 +139,7 @@ static int textdb_template_add(struct database *db, struct template *t)
 		fprintf(outf, "\textended_description \"%s\";\n", 
 			t->extended_description);
 
-	fprintf(outf, "}\n");
+	fprintf(outf, "};\n");
 	fclose(outf);
 	
 	return DC_OK;
@@ -243,7 +243,7 @@ static struct template *textdb_template_iterate(struct database *db,
 	return textdb_template_get(db, ent->d_name);
 }
 
-static int textdb_question_add(struct database *db, struct question *q)
+static int textdb_question_set(struct database *db, struct question *q)
 {
 	FILE *outf;
 	char *filename;
@@ -258,7 +258,7 @@ static int textdb_question_add(struct database *db, struct question *q)
 
 	fprintf(outf, "question {\n");
 	fprintf(outf, "\ttag \"%s\";\n", q->tag);
-	fprintf(outf, "\tvalue \"%s\";\n", q->value);
+	fprintf(outf, "\tvalue \"%s\";\n", (q->value ? q->value : ""));
 	if (q->defaultval)
 		fprintf(outf, "\tdefault \"%s\";\n", q->defaultval);
 	fprintf(outf, "\tflags 0x%08X;\n", q->flags);
@@ -281,7 +281,7 @@ static int textdb_question_add(struct database *db, struct question *q)
 		fprintf(outf, "};\n");
 	}
 
-	fprintf(outf, "}\n");
+	fprintf(outf, "};\n");
 	fclose(outf);
 	
 	return DC_OK;
@@ -330,7 +330,7 @@ static int textdb_question_disown(struct database *db, const char *tag,
 	struct question *q = textdb_question_get(db, tag);
 	if (q == NULL) return DC_NOTOK;
 	question_owner_delete(q, owner);
-	textdb_question_add(db, q);
+	textdb_question_set(db, q);
 	question_delete(q);
 	return DC_OK;
 }
@@ -370,14 +370,13 @@ struct database_module debconf_database_module =
 	load: textdb_load,
 	save: textdb_save,
 
-	template_add: textdb_template_add,
+	template_set: textdb_template_set,
 	template_get: textdb_template_get,
 	template_remove: textdb_template_remove,
 	template_iterate: textdb_template_iterate,
 
-	question_add: textdb_question_add,
 	question_get: textdb_question_get,
-	question_set: textdb_question_add,	/* no separate set method */
+	question_set: textdb_question_set,
 	question_disown: textdb_question_disown,
 	question_iterate: textdb_question_iterate
 };

@@ -3,10 +3,6 @@
 
 #include "common.h"
 
-/* #define DEBCONFCONFIG "/etc/debconf.conf" */
-#define DEBCONFCONFIG	"debconf.conf"
-#define DEBCONF_VERSION	2.0
-
 struct configuration;
 struct database;
 struct frontend;
