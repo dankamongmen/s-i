@@ -26,6 +26,6 @@ extern int set_charset(const char *name);
 extern int ksymtocode(const char *s);
 extern const char *codetoksym(int code);
 extern int add_number(int code);
-extern int add_capslock(int code);
+extern int add_capslock(int code, int fd);
 
 #endif

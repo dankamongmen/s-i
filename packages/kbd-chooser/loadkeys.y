@@ -240,11 +240,11 @@ rvalue		: NUMBER
 		| UNUMBER
 			{$$=add_number($1);}
                 | PLUS NUMBER
-                        {$$=add_capslock($2);}
+                        {$$=add_capslock($2,file_descriptor);}
 		| PLUS UNUMBER
-			{$$=add_capslock($2);}
+			{$$=add_capslock($2,file_descriptor);}
                 | PLUS LITERAL
-                        {$$=add_capslock($2);}
+                        {$$=add_capslock($2,file_descriptor);}
 		;
 %%			
 
