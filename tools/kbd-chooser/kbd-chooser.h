@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.5 2003/01/26 17:06:45 mckinstry Exp $
+ * $Id: kbd-chooser.h,v 1.6 2003/01/28 11:02:36 mckinstry Exp $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -49,5 +49,7 @@ extern void sparc_kbd_get (void);
 extern void amiga_kbd_get (void);
 extern void serial_kbd_get (void);
 extern void atari_kbd_get (void);
+
+extern int grep (const char *file, const char *string);
 
 #endif

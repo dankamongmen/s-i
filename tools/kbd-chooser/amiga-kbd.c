@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: amiga-kbd.c,v 1.1 2003/01/27 22:54:00 mckinstry Exp $
+ * $Id: amiga-kbd.c,v 1.2 2003/01/28 11:02:36 mckinstry Exp $
  */
 
 #include "config.h"
@@ -23,6 +23,7 @@ extern kbd_t *keyboards;
 void amiga_kbd_get ()
 {
 	kbd_t *k = xmalloc (sizeof (kbd_t));
+	int res;
 
 	// /proc must be mounted by this point
 	assert (di_check_dir ("/proc") == 1);
@@ -31,7 +32,11 @@ void amiga_kbd_get ()
 	k->description = N_("Amiga Keyboard");
 	k->deflt = NULL;
 	k->fd = -1;
-	
+	k->present = UNKNOWN;
+	k->next = keyboards;
+	keyboards = k;
+
+		
 #if defined (KERNEL_2_5)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
 	 *
@@ -48,9 +53,5 @@ void amiga_kbd_get ()
 	/* ***  Only reached if KERNEL_2_5 not present ***  */
 
 	/* For 2.4, assume a keyboard is present
-	 */
-	k->present = UNKNOWN;
-	k->next = keyboards;
-	keyboards = k;
-	
+	 */	
 }

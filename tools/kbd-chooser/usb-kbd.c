@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.4 2003/01/26 17:06:45 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.5 2003/01/28 11:02:36 mckinstry Exp $
  */
 
 #include "config.h"
@@ -20,26 +20,6 @@
 
 extern kbd_t *keyboards;	/* in kbd-chooser.c */
 
-/**
- * @brief  Do a grep for a string
- * @return 0 if present, 1 if not, errno if error
- */
-int grep (const char *file, const char *string)
-{
-	FILE *fp = fopen (file, "r");	
-	char buf[LINESIZE];
-	if (!fp)
-		return errno;
-	while (!feof (fp)) {
-		fgets (buf, LINESIZE, fp);
-		if (strstr (buf, string) != NULL) {
-			fclose (fp);
-			return 0;
-		}
-	}
-	fclose (fp);
-	return 1;
-}
 
 /**
  * @brief list of keyboards present

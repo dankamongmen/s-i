@@ -30,9 +30,14 @@ CFLAGS += -DSPARC -DUSB_KBD
 OBJS   += sparc-kbd.o
 endif
 ifeq ($(ARCH),powerpc)
-CFLAGS += -DPOWERPC -DUSB_KBD
-OBJS += mac-kbd.o amiga-kbd.o
+CFLAGS += -DPOWERPC -DUSB_KBD -DAT_KBD
+OBJS += mac-kbd.o amiga-kbd.o at-kbd.o
 endif
+ifeq ($(ARCH),arm)
+CFLAGS += -DARM -DAT_KBD -DUSB_KBD
+OBJS += acorn-kbd.o at-kbd.o usb-kbd.o
+endif
+
 
 all: kbd-chooser
 

@@ -4,7 +4,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: sparc-kbd.c,v 1.1 2003/01/26 14:21:55 mckinstry Exp $
+ * $Id: sparc-kbd.c,v 1.2 2003/01/28 11:02:36 mckinstry Exp $
  */
 
 #include "config.h"
@@ -31,6 +31,9 @@ void at_kbd_get ()
 	k->description = N_("Sun Keyboard");
 	k->deflt = NULL;
 	k->fd = -1;
+	k->present = UNKNOWN;
+	k->next = keyboards;
+	keyboards = k;
 	
 #if defined (KERNEL_2_5)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
@@ -49,8 +52,5 @@ void at_kbd_get ()
 
 	/* For 2.4, assume a keyboard is present
 	 */
-	k->present = UNKNOWN;
-	k->next = keyboards;
-	keyboards = k;
 	
 }
