@@ -494,13 +494,13 @@ static void adjust_default_priority (void) {
 
 	pri = 1;
 	if ( debconf->value ) {
-	    for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
+		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
 			if (0 == strcmp(debconf->value,
 					debconf_priorities[i]) ) {
 				pri = i;
-		    	break;
+				break;
 			}
-	    }
+		}
 	}
 	
 	if ( pri != local_priority ) {
