@@ -38,7 +38,9 @@ choice_options () {
     fi
     case "$filesystem" in
 	ext2r0)
-	    printf "options\t%.45s\n" "$options"
+	    db_metaget partman-ext2r0/text/options description
+	    RET=$(stralign -25 "$RET")
+	    printf "options\t%s%.45s\n" "$RET" "$options"
 	    ;;
     esac
 }
