@@ -72,6 +72,10 @@ case $TYPE in
 		fi
 	;;
 
+	pcmcia_socket)
+		log "Got pcmcia_socket event"
+	;;
+	
 	*)
 		log "Got unsupported event type \"$TYPE\""
 	;;
