@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.23 2000/12/08 06:25:40 joeyh Rel $ */
+/* $Id: udpkg.c,v 1.24 2000/12/21 22:28:26 joeyh Rel $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -104,8 +104,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 	DPRINTF("Unpacking %s\n", pkg->package);
 
 	cwd = getcwd(0, 0);
-	/* chdir("/"); */
-	//chdir("tmp/"); /* testing */
+	chdir("/");
 	snprintf(buf, sizeof(buf), "ar -p %s data.tar.gz|zcat|tar -xf -", pkg->file);
 	if (SYSTEM(buf) == 0)
 	{
