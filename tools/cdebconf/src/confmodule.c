@@ -233,6 +233,8 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
 				return DC_OK;
 			DELETE(*(mod->seen_questions + narg - 1));
 			narg --;
+			if (narg == 0)
+				DELETE(mod->seen_questions);
 		}
 		break;
 	case STACK_SEEN_SAVE:
