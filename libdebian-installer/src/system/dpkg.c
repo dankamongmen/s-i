@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.c,v 1.3 2003/09/24 11:49:52 waldi Exp $
+ * $Id: dpkg.c,v 1.4 2003/09/26 00:18:10 waldi Exp $
  */
 
 #include <config.h>
@@ -155,9 +155,12 @@ int internal_di_system_dpkg_package_unpack_control (di_package **package, const 
     if (strlen (tmpdirent->d_name) > (tmpdir_rest_len < infodir_rest_len ? tmpdir_rest_len : infodir_rest_len))
       continue;
     if (!strcmp (tmpdirent->d_name, "control"))
-      if (*package)
-        di_package_destroy (*package);
-      *package = di_system_package_read_file (buf_tmpdir, allocator);
+      if (allocator)
+      {
+        if (*package)
+          di_package_destroy (*package);
+        *package = di_system_package_read_file (buf_tmpdir, allocator);
+      }
       continue;
 
     strcpy (infodir_rest, tmpdirent->d_name);
@@ -187,10 +190,15 @@ int di_system_dpkg_package_unpack (di_packages *status, const char *_package, co
   di_package *package;
   int ret;
 
-  package = di_packages_get_package (status, _package, 0);
+  if (_package)
+  {
+    package = di_packages_get_package (status, _package, 0);
 
-  if (package && package->status != di_package_status_not_installed)
-    return 1;
+    if (package && package->status != di_package_status_not_installed)
+      return 1;
+  }
+  else
+    package = NULL;
 
   ret = internal_di_system_dpkg_package_unpack_control (&package, filename, allocator);
   ret = internal_di_system_dpkg_package_unpack_data (package, filename);

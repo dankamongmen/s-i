@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.3 2003/09/24 11:49:52 waldi Exp $
+ * $Id: packages.c,v 1.4 2003/09/26 00:18:10 waldi Exp $
  */
 
 #include <debian-installer/system/packages.h>
@@ -73,7 +73,7 @@ di_parser_info *di_system_packages_parser_info (void)
   return info;
 }
 
-di_parser_info *internal_di_system_packages_status_parser_info (void)
+di_parser_info *di_system_packages_status_parser_info (void)
 {
   di_parser_info *info;
 

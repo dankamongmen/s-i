@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: exec.c,v 1.2 2003/09/26 00:18:09 waldi Exp $
  */
 
 #include <debian-installer/exec.h>
@@ -114,14 +114,14 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
       FILE *file;
       di_io_handler *handler;
     }
-    files[2];
+    files[] =
+    {
+      { fdopen (pipeout[0], "r"), stdout_handler },
+      { fdopen (pipeerr[0], "r"), stderr_handler },
+    };
 
     fcntl (pipeout[0], F_SETFL, O_NONBLOCK);
     fcntl (pipeerr[0], F_SETFL, O_NONBLOCK);
-    files[0].file = fdopen (pipeout[0], "r");
-    files[1].file = fdopen (pipeerr[0], "r");
-    files[0].handler = stdout_handler;
-    files[1].handler = stderr_handler;
 
     while (poll (fds, 2, -1) >= 0)
     {
