@@ -31,8 +31,16 @@ i386)
 		sed -i -e 's/display .*//' $CFG
 	fi
 ;;
+mipsel)
+	cfg="$NFSROOT_DIR/nfsroot/default.colo"
+	if [ ! -e "$cfg" ]; then
+		echo "cannot find $cfg" >&2
+		exit 1
+	fi
+	perl -i -pe 's/(^execute.*)/$1 $ENV{BOOT_OPTS}/' $cfg
+;;
 *)
-	echo "$0 does not support $ARCH"
+	echo "$0 does not support $ARCH" >&2
 	exit 1
 ;;
 esac
