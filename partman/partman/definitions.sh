@@ -338,8 +338,12 @@ error_handler () {
 		type='A bug has been discovered!!!'
 		priority=critical
 		;;
+	    No?Implementation)
+		type='Not yet implemented!'
+		priority=critical
+		;;
 	    *)
-		type="$exception_type???"
+		type="??? $exception_type ???"
 		priority=critical
 		;;
 	esac
@@ -351,16 +355,18 @@ error_handler () {
 	db_subst partman/exception_handler DESCRIPTION "$message"
 	db_fset partman/exception_handler seen false
 	db_subst partman/exception_handler CHOICES "$options"
-	if db_input $priority partman/exception_handler && db_go; then
-	    db_get partman/exception_handler
-	    write_line "$RET"
+	if
+	    expr "$options" : '.*,.*' >/dev/null \
+	    && db_input $priority partman/exception_handler
+	then
+	    if db_go; then
+		db_get partman/exception_handler
+		write_line "$RET"
+	    else
+		write_line "unhandled"
+	    fi
 	else
 	    write_line "unhandled"
-	    # cdebconf (unlike debconf) shows questions even when
-	    # there is only one choice to choose from.  May be in
-	    # future this will change so we need to show the message
-	    # to the user using a note template.  But at present the
-	    # following 6 lines are useless.
 	    db_subst partman/exception_handler_note TYPE "$type"
 	    db_subst partman/exception_handler_note DESCRIPTION "$message"
 	    db_fset partman/exception_handler_note seen false

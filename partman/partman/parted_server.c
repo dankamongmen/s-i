@@ -556,6 +556,8 @@ resize_partition(PedDisk *disk, PedPartition *part,
         if (old_start == start && old_end == end)
                 return true;
         fs = ped_file_system_open(&(part->geom));
+        if (NULL == fs && NULL != ped_file_system_probe(&(part->geom)))
+                return false;
         if (NULL != fs && !timered_file_system_check(fs)) {
                 /* TODO: inform the user. */
                 ped_file_system_close(fs);
@@ -1554,6 +1556,7 @@ command_get_resize_range()
         open_out();
         if (1 != iscanf("%as", &id))
                 critical_error("Expected partition id");
+        deactivate_exception_handler();
         part = partition_with_id(disk, id);
         if (part == NULL)
                 critical_error("No such partition");
@@ -1580,6 +1583,7 @@ command_get_resize_range()
         ped_geometry_destroy(max_geom);
         ped_constraint_destroy(constraint);
         /* TODO: Probably there are memory leaks because of constraints. */
+        activate_exception_handler();
         free(id);
 }
 
