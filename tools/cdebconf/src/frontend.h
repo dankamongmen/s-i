@@ -23,6 +23,10 @@ struct frontend_module {
     void (*clear)(struct frontend *);
     int (*can_go_back)(struct frontend *, struct question *);
     int (*can_go_forward)(struct frontend *, struct question *);
+
+    void (*progress_start)(struct frontend *fe, int min, int max, const char *title);
+    void (*progress_step)(struct frontend *fe, int step, const char *info);
+    void (*progress_stop)(struct frontend *fe);
 };
 
 struct frontend {
@@ -45,6 +49,8 @@ struct frontend {
 	int interactive;
 	char *capb;
 	char *title;
+	char *progress_title;
+    int progress_min, progress_max, progress_cur;
 	
 	/* methods */
     struct frontend_module methods;

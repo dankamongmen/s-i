@@ -32,6 +32,7 @@ static commands_t commands[] = {
     { "fset",	    command_fset },
     { "exist",	    command_exist },
     { "stop",	    command_stop },
+    { "progress",   command_progress },
     { "x_loadtemplatefile", command_x_loadtemplatefile },
     { 0, 0 }
 };

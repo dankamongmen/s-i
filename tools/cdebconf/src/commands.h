@@ -179,6 +179,15 @@ int command_exist(struct confmodule *, int, char **, char *, size_t);
 int command_stop(struct confmodule *, int, char **, char *, size_t);
 
 /**
+ * @brief handler for the PROGRESS debconf command
+ *
+ * Progress bar handling
+ *
+ * @warning This is not yet in the debconf spec
+ */
+int command_progress(struct confmodule *, int, char **, char *, size_t);
+
+/**
  * @brief handler for the X_LOADTEMPLATE debconf command
  *
  * Loads a new template into the debconf database

@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.23 2002/11/24 17:51:32 barbier Exp $
+ * $Id: text.c,v 1.24 2002/12/08 00:38:07 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -479,8 +479,46 @@ static int text_go(struct frontend *obj)
 	return DC_OK;
 }
 
+static void text_progress_start(struct frontend *ui, int min, int max, const char *title)
+{
+    DELETE(ui->progress_title);
+	ui->progress_title = STRDUP(title);
+    ui->progress_min = min;
+    ui->progress_max = max;
+    ui->progress_cur = min;
+
+    printf("%s\n", title);
+}
+
+static void text_progress_step(struct frontend *ui, int step, const char *info)
+{
+    int width = getwidth();
+    char out[256];
+
+    if (strlen(info) > width - 15)
+        info[width - 15] = 0;
+
+    ui->progress_cur += step;
+
+    snprintf(out, sizeof(out), "%s: [%.1f%%]", info, 
+        (double)(ui->progress_cur - ui->progress_min) / 
+        (double)(ui->progress_max - ui->progress_min) * 100.0);
+    printf("%*s\r", -width+1, out);
+    fflush(stdout);
+}
+
+static void text_progress_stop(struct frontend *ui)
+{
+    INFO(INFO_DEBUG, "%s\n", __FUNCTION__);
+
+    printf("\n");
+}
+
 struct frontend_module debconf_frontend_module =
 {
 	initialize: text_initialize,
 	go: text_go,
+    progress_start: text_progress_start,
+    progress_step: text_progress_step,
+    progress_stop: text_progress_stop,
 };
