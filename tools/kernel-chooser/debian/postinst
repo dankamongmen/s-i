@@ -6,6 +6,7 @@ chroot="chroot /target"
 
 # find all packages implementing 'kernel-image'.  Is there a better
 # way? [pere 2003-02-16]
+# the busybox 'sort' do not support '-ur' at the moment [pere 2003-02-06]
 kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" | sort -ur | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' | sed 's/, $//'`
 
 if [ "$kernels" ] ; then
