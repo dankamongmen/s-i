@@ -2,28 +2,36 @@
 // Comments can be in C or C++ style, blank lines are ignored
 // This file is in a bind-8 like format.
 
+global {
+  module_path {
+    frontend "/usr/lib/cdebconf/frontend";
+    database "/usr/lib/cdebconf/db";
+  };
+
+  default {
+    frontend "default_fe";
+    template "template_db";
+    config "config_db";
+  };
+};
+
 frontend {
-  default {
-    driver "slang"; 
-  };
-
-  driver "text" {
-    module "/usr/lib/cdebconf/frontend/text.so";
-  };
-
-  driver "slang" {
-    module "/usr/lib/cdebconf/frontend/slang.so";
+  instance "default_fe" {
+    driver "slang";
   };
 };
 
-database {
-  default {
-    driver "textdb"; // use the textdb database backend by default
-  };
-
-  driver "textdb" {
-    module "/usr/lib/cdebconf/db/textdb.so";
-    templatepath "/var/lib/cdebconf/templates";
-    questionpath "/var/lib/cdebconf/questions";
+template {
+  instance "template_db" {
+    driver "textdb";
+    path "/var/lib/cdebconf/templates";
   };
 };
+
+config {
+  instance "config_db" {
+    driver "textdb";
+    path "/var/lib/cdebconf/questions";
+  };
+};
+
