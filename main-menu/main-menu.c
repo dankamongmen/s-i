@@ -15,6 +15,7 @@
  */
 
 #include "main-menu.h"
+#include "stderr-log.h"
 #include <cdebconf/debconfclient.h>
 #include <stdlib.h>
 #include <search.h>
@@ -431,6 +432,10 @@ static void lower_debconf_priority (void) {
 int main (int argc, char **argv) {
 	struct package_t *p;
 
+	/* This spawns a process that traps all stderr from the rest of
+	 * main-menu and the programs it calls, storing it in STDERR_LOG. */
+	intercept_stderr();
+	
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
 
@@ -446,8 +451,15 @@ int main (int argc, char **argv) {
 			   control over the situation. */
 			lower_debconf_priority();
 		}
+		
+		/* Check for pending stderr in the stderr log, and
+		 * display it in a nice debconf dialog. */
+		/* XXX Pass in a title */
+		display_stderr_log(p->package);
+
 		di_list_free(packages, di_pkg_free);
 		packages = di_status_read();
+	
 	}
 	
 	return(0);
