@@ -104,9 +104,6 @@
 #define FSTAB   "/target/etc/fstab"
 #endif /* not TEST */
 
-/* ext3 is not supported by libparted v1.4, nor v1.6. */
-#define DEFAULT_FS "ext2"
-
 #if 0
 #define log_line() \
   autopartkit_log("  Error bounding: %s %d\n",__FILE__,__LINE__)

@@ -94,6 +94,9 @@ int lvm_lv_stack_delete(void *);
 #include <sys/types.h>
 int make_path(const char *pathname, mode_t mode);
 
+/* ext3 is not supported by libparted v1.4, nor v1.6. */
+#define DEFAULT_FS "ext2"
+
 /* from evaulator.c */
 void eval_error(void);
 double evaluate(char *expression);

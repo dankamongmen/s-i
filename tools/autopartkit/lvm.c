@@ -254,6 +254,17 @@ lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize)
         autopartkit_log(0, "  Failed to parse '%s'\n", fstype);
 	return NULL;
     }
+    if (0 == strcmp("default", info[3]))
+    {
+        char *s = strdup(DEFAULT_FS);
+	if (!s)
+	    return NULL;
+	else
+	{
+	    free(info[3]);
+	    info[3] = s;
+	}
+    }
     autopartkit_log(2, "  Stacking LVM lv %s on vg %s "
 		    "fstype %s\n", info[1], info[2], info[3]);
     /* Store vgname, lvname and size in stack */
