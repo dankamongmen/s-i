@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem.h,v 1.2 2003/09/29 14:08:48 waldi Exp $
+ * $Id: mem.h,v 1.3 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__MEM_H
@@ -29,7 +29,7 @@
 #include <stdio.h>
 
 /**
- * @defgroup di_mem Memory management
+ * @addtogroup di_mem
  * @{
  */
 
@@ -57,23 +57,6 @@ void di_free (void *mem);
  */
 #define di_renew(struct_type, mem, n_structs) \
   ((struct_type *) di_realloc ((mem), sizeof (struct_type) * (n_structs)))
-
-/**
- * @defgroup di_mem_chunk Memory chunk allocer
- */
-/** @} */
-
-typedef struct di_mem_chunk di_mem_chunk;
-
-/**
- * @addtogroup di_mem_chunk
- * @{
- */
-
-di_mem_chunk* di_mem_chunk_new (di_ksize_t atom_size, di_ksize_t area_size) __attribute__ ((nonnull));
-void *di_mem_chunk_alloc (di_mem_chunk *mem_chunk);
-void *di_mem_chunk_alloc0 (di_mem_chunk *mem_chunk);
-void di_mem_chunk_destroy (di_mem_chunk *mem_chunk);
 
 /** @} */
 #endif

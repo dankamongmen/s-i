@@ -17,10 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.c,v 1.3 2003/11/06 07:52:16 waldi Exp $
+ * $Id: parser.c,v 1.4 2003/11/19 09:24:14 waldi Exp $
  */
 
 #include <debian-installer/parser.h>
+
+#include <debian-installer/mem.h>
 
 di_parser_info *di_parser_info_alloc (void)
 {
@@ -35,6 +37,7 @@ di_parser_info *di_parser_info_alloc (void)
 void di_parser_info_free (di_parser_info *info)
 {
   di_hash_table_destroy (info->table);
+  di_slist_destroy (&info->list, NULL);
   di_free (info);
 }
 

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.10 2003/11/06 07:52:16 waldi Exp $
+ * $Id: packages.h,v 1.11 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__PACKAGES_H
@@ -31,18 +31,18 @@
 typedef struct di_system_package di_system_package;
 
 /**
- * @defgroup di_system_packages System - Packages file
+ * @addtogroup di_system_packages
  * @{
  */
 
 /**
- * @brief Package
+ * @brief Package - System
  */
 struct di_system_package
 {
-  di_package p;
-  int installer_menu_item;
-  char *subarchitecture;
+  di_package p;                                         /**< standard package */
+  int installer_menu_item;                              /**< Installer-Menu-Item field */
+  char *subarchitecture;                                /**< Subarchitecture field */
 };
 
 void di_system_package_destroy (di_system_package *package);
@@ -64,6 +64,7 @@ di_parser_info *di_system_packages_status_parser_info (void);
  * Read a standard package control file
  *
  * @param file file to read
+ * @param allocator the allocator for the packages structure
  */
 static inline di_package *di_system_package_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator)
 {
@@ -74,6 +75,7 @@ static inline di_package *di_system_package_read_file (const char *file, di_pack
  * Read a standard Packages file
  *
  * @param file file to read
+ * @param allocator the allocator for the packages structure
  */
 static inline di_packages *di_system_packages_read_file (const char *file, di_packages_allocator *allocator)
 {
@@ -84,6 +86,7 @@ static inline di_packages *di_system_packages_read_file (const char *file, di_pa
  * Read a standard status file
  *
  * @param file file to read
+ * @param allocator the allocator for the packages structure
  */
 static inline di_packages *di_system_packages_status_read_file (const char *file, di_packages_allocator *allocator)
 {
@@ -93,6 +96,7 @@ static inline di_packages *di_system_packages_status_read_file (const char *file
 /**
  * Write a standard Packages file
  *
+ * @param packages the packages structure
  * @param file file to read
  */
 static inline int di_system_packages_write_file (di_packages *packages, const char *file)
@@ -103,6 +107,7 @@ static inline int di_system_packages_write_file (di_packages *packages, const ch
 /**
  * Write a standard status file
  *
+ * @param packages the packages structure
  * @param file file to read
  */
 static inline int di_system_packages_status_write_file (di_packages *packages, const char *file)

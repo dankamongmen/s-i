@@ -18,14 +18,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: utils.h,v 1.2 2003/11/03 13:46:12 waldi Exp $
+ * $Id: utils.h,v 1.3 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__UTILS_H
 #define DEBIAN_INSTALLER__UTILS_H
 
 /**
- * @defgroup di_utils Utils
+ * @addtogroup di_utils
  * @{
  */
 

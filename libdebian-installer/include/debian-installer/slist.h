@@ -17,19 +17,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: slist.h,v 1.4 2003/11/13 21:28:57 waldi Exp $
+ * $Id: slist.h,v 1.5 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SLIST_H
 #define DEBIAN_INSTALLER__SLIST_H
 
-#include <debian-installer/mem.h>
+#include <debian-installer/mem_chunk.h>
 
 typedef struct di_slist di_slist;
 typedef struct di_slist_node di_slist_node;
 
 /**
- * @defgroup di_slist Single-linked list
+ * @addtogroup di_slist
  * @{
  */
  
@@ -38,16 +38,8 @@ typedef struct di_slist_node di_slist_node;
  */
 struct di_slist
 {
-  union
-  {
-    di_slist_node *head;                                  /**< first node */
-    di_slist_node *first __attribute__ ((deprecated));    /**< first node */
-  };
-  union
-  {
-    di_slist_node *bottom;                                /**< last node */
-    di_slist_node *last __attribute__ ((deprecated));     /**< last node */
-  };
+  di_slist_node *head;                                  /**< head of list */
+  di_slist_node *bottom;                                /**< bottom of list */
 };
 
 /**
@@ -59,11 +51,73 @@ struct di_slist_node
   void *data;                                           /**< data */
 };
 
+/**
+ * Allocate a single-linked list
+ *
+ * @return a di_slist
+ */
 di_slist *di_slist_alloc (void);
+
+/**
+ * Destroy the contents of a single-linked list
+ *
+ * @warning never use this function with a list which makes use of the chunk allocator
+ *
+ * @param slist a di_slist
+ */
+void di_slist_destroy (di_slist *slist, di_destroy_notify destroy_func) __attribute__ ((nonnull(1)));
+
+/**
+ * Free a single-linked list
+ *
+ * @param slist a di_slist
+ */
 void di_slist_free (di_slist *slist);
+
+/**
+ * Append to a single-linked list
+ *
+ * @warning don't mix with di_slist_append_chunk
+ *
+ * @param slist a di_slist
+ * @param data the data
+ */
 void di_slist_append (di_slist *slist, void *data) __attribute__ ((nonnull(1)));
+
+/**
+ * Append to a single-linked list
+ *
+ * @warning don't mix with di_slist_append
+ *
+ * @param slist a di_slist
+ * @param data the data
+ * @param mem_chunk a di_mem_chunk for allocation of new nodes
+ *
+ * @pre the di_mem_chunk must return chunks with at least the size of di_slist_node
+ */
 void di_slist_append_chunk (di_slist *slist, void *data, di_mem_chunk *mem_chunk) __attribute__ ((nonnull(1,3)));
+
+/**
+ * Prepend to a single-linked list
+ *
+ * @warning don't mix with di_slist_prepend_chunk
+ *
+ * @param slist a di_slist
+ * @param data the data
+ */
 void di_slist_prepend (di_slist *slist, void *data) __attribute__ ((nonnull(1)));
+
+/**
+ * Prepend to a single-linked list
+ *
+ * @warning don't mix with di_slist_prepend
+ *
+ * @param slist a di_slist
+ * @param data the data
+ * @param mem_chunk a di_mem_chunk for allocation of new nodes
+ *
+ * @pre the di_mem_chunk must return chunks with at least the size of di_slist_node
+ */
 void di_slist_prepend_chunk (di_slist *slist, void *data, di_mem_chunk *mem_chunk) __attribute__ ((nonnull(1,3)));
 
 /** @} */

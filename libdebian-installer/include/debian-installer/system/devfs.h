@@ -17,14 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: devfs.h,v 1.4 2003/11/06 07:52:16 waldi Exp $
+ * $Id: devfs.h,v 1.5 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__DEVFS_H
 #define DEBIAN_INSTALLER__SYSTEM__DEVFS_H
 
 /**
- * @defgroup di_system_devfs System - DevFS
+ * @addtogroup di_system_devfs
  * @{
  */
 
@@ -38,7 +38,6 @@
 ssize_t di_system_devfs_map_from (const char *path, char *ret, size_t len);
 
 /**
- * @deprecated
  * Deprecated alias of di_system_devfs_map_from
  */
 ssize_t di_mapdevfs (const char *path, char *ret, size_t len) __attribute__ ((deprecated));

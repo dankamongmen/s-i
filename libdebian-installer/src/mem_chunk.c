@@ -18,12 +18,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem_chunk.c,v 1.1 2003/11/13 21:28:57 waldi Exp $
+ * $Id: mem_chunk.c,v 1.2 2003/11/19 09:24:14 waldi Exp $
  */
 
-#include <debian-installer/mem.h>
+#include <debian-installer/mem_chunk.h>
 
 #include <debian-installer/macros.h>
+#include <debian-installer/mem.h>
 #include <debian-installer/log.h>
 
 #include <stdlib.h>

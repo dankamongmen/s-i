@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: string.h,v 1.2 2003/11/06 07:52:16 waldi Exp $
+ * $Id: string.h,v 1.3 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__STRING_H
@@ -30,7 +30,7 @@
 typedef struct di_rstring di_rstring;
 
 /**
- * @defgroup di_string String
+ * @addtogroup di_string
  * @{
  */
 

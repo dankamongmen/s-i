@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.h,v 1.4 2003/11/03 13:46:12 waldi Exp $
+ * $Id: package.h,v 1.5 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_H
@@ -41,15 +41,12 @@ typedef enum di_package_type di_package_type;
 #include <debian-installer/packages.h>
 
 /**
- * @defgroup di_package Package
+ * @addtogroup di_package
  * @{
- */
-/**
- * @defgroup di_package_parser Package - Parser
  */
 
 /**
- * Packages file - Priority field
+ * Priority field
  */
 enum di_package_priority
 {
@@ -61,7 +58,7 @@ enum di_package_priority
 };
 
 /**
- * Packages file - Status field, third part
+ * Status field, third part
  */
 enum di_package_status
 {
@@ -74,7 +71,7 @@ enum di_package_status
 };
 
 /**
- * Packages file - Status field, first part
+ * Status field, first part
  */
 enum di_package_status_want
 {
@@ -86,7 +83,7 @@ enum di_package_status_want
 };
 
 /**
- * Packages file - type of package
+ * type of package
  */
 enum di_package_type
 {
@@ -96,7 +93,7 @@ enum di_package_type
 };
 
 /**
- * @brief Packages file - Package
+ * @brief Package
  */
 struct di_package
 {
@@ -224,8 +221,15 @@ di_parser_fields_function_write
    */
   di_package_parser_write_status;
 
+/**
+ * Standard package control file
+ */
 extern const di_parser_fieldinfo *di_package_parser_fieldinfo[];
 
+/**
+ * @internal
+ * Get parser info for standard control file
+ */
 di_parser_info *di_package_parser_info (void);
 
 /**
@@ -234,7 +238,6 @@ di_parser_info *di_package_parser_info (void);
  * @param file file to read
  * @param packages di_packages which the package is add to
  * @param allocator the corresponding allocator
- * @param info info function
  */
 di_package *di_package_special_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator, di_parser_info *(info) (void));
 

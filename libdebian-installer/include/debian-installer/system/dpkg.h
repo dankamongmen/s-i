@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.h,v 1.6 2003/11/06 07:52:16 waldi Exp $
+ * $Id: dpkg.h,v 1.7 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__DPKG_H
@@ -28,7 +28,7 @@
 #include <stdbool.h>
 
 /**
- * @defgroup di_system_dpkg System - DPKG
+ * @addtogroup di_system_dpkg
  * @{
  */
 

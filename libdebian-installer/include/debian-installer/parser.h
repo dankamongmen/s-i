@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.h,v 1.4 2003/11/06 07:52:16 waldi Exp $
+ * $Id: parser.h,v 1.5 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PARSER_H
@@ -36,11 +36,8 @@ typedef struct di_parser_info di_parser_info;
 typedef struct di_parser_fieldinfo di_parser_fieldinfo;
 
 /**
- * @defgroup di_parser Generic Parser
+ * @addtogroup di_parser
  * @{
- */
-/** 
- * @defgroup di_parser_rfc822 RFC822 parser
  */
 
 /**

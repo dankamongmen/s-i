@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.7 2003/11/12 17:27:50 waldi Exp $
+ * $Id: package_parser.c,v 1.8 2003/11/19 09:24:14 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -198,9 +198,6 @@ const di_parser_fieldinfo
       0
     );
 
-/**
- * Standard package control file
- */
 const di_parser_fieldinfo *di_package_parser_fieldinfo[] =
 {
   &internal_di_package_parser_field_package,
@@ -233,10 +230,6 @@ void *internal_di_package_parser_new (void *user_data)
   return parser_data->package;
 }
 
-/**
- * @internal
- * Get parser info for standard control file
- */
 di_parser_info *di_package_parser_info (void)
 {
   di_parser_info *info;
@@ -247,12 +240,6 @@ di_parser_info *di_package_parser_info (void)
   return info;
 }
 
-/**
- * Read a special package control file
- *
- * @param file file to read
- * @param info parser info
- */
 di_package *di_package_special_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator, di_parser_info *(get_info) (void))
 {
   di_parser_info *info = get_info ();

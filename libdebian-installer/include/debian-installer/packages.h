@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.8 2003/11/06 07:52:16 waldi Exp $
+ * $Id: packages.h,v 1.9 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGES_H
@@ -34,11 +34,8 @@ typedef struct di_packages di_packages;
 typedef struct di_packages_allocator di_packages_allocator;
 
 /**
- * @defgroup di_packages Packages file
+ * @addtogroup di_packages
  * @{
- */
-/**
- * @defgroup di_packages_parser Packages file - Parser
  */
 
 /**
@@ -117,6 +114,7 @@ int di_packages_special_write_file (di_packages *packages, const char *file, di_
  * Read a standard Packages file
  *
  * @param file file to read
+ * @param allocator the allocator for the packages structure
  */
 static inline di_packages *di_packages_read_file (const char *file, di_packages_allocator *allocator)
 {
@@ -127,6 +125,7 @@ static inline di_packages *di_packages_read_file (const char *file, di_packages_
  * Read a minimal Packages file
  *
  * @param file file to read
+ * @param allocator the allocator for the packages structure
  */
 static inline di_packages *di_packages_minimal_read_file (const char *file, di_packages_allocator *allocator)
 {
@@ -137,6 +136,7 @@ static inline di_packages *di_packages_minimal_read_file (const char *file, di_p
  * Read a standard status file
  *
  * @param file file to read
+ * @param allocator the allocator for the packages structure
  */
 static inline di_packages *di_packages_status_read_file (const char *file, di_packages_allocator *allocator)
 {

@@ -1,5 +1,5 @@
-AC_INIT(libdebian-installer,0.1.0)
-AM_INIT_AUTOMAKE(libdebian-installer,0.1.0)
+AC_INIT(libdebian-installer,0.18)
+AM_INIT_AUTOMAKE(libdebian-installer,0.18)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 
@@ -29,4 +29,6 @@ include/debian-installer/Makefile
 include/debian-installer/system/Makefile
 src/Makefile
 src/system/Makefile
+libdebian-installer.pc
+libdebian-installer-extra.pc
 ])

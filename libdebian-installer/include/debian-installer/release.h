@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: release.h,v 1.2 2003/09/30 19:22:07 waldi Exp $
+ * $Id: release.h,v 1.3 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__RELEASE_H
@@ -31,11 +31,8 @@ typedef struct di_release di_release;
 typedef struct di_release_file di_release_file;
 
 /**
- * @defgroup di_release Release file
+ * @addtogroup di_release
  * @{
- */
-/**
- * @defgroup di_release_parser Release file - Parser
  */
 
 /**

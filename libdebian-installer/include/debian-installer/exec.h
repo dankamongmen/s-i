@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.h,v 1.7 2003/11/06 07:52:16 waldi Exp $
+ * $Id: exec.h,v 1.8 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__EXEC_H
@@ -35,7 +35,7 @@ di_process_handler
   di_exec_prepare_chroot;
 
 /**
- * @defgroup di_exec Exec functions
+ * @addtogroup di_exec
  * @{
  */
 

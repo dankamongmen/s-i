@@ -1,7 +1,8 @@
 /*
- * utils.h
+ * mem_chunk.h
  *
- * Copyright (C) 2003 Bastian Blank <waldi@debian.org>
+ * Copyright (C) 1995-1997 Peter Mattis, Spencer Kimball and Josh MacDonald
+ *               2003 Bastian Blank <waldi@debian.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +18,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: utils.h,v 1.3 2003/11/19 09:24:14 waldi Exp $
+ * $Id: mem_chunk.h,v 1.1 2003/11/19 09:24:14 waldi Exp $
  */
 
-#ifndef DEBIAN_INSTALLER__SYSTEM__UTILS_H
-#define DEBIAN_INSTALLER__SYSTEM__UTILS_H
+#ifndef DEBIAN_INSTALLER__MEM_CHUNK_H
+#define DEBIAN_INSTALLER__MEM_CHUNK_H
+
+#include <debian-installer/types.h>
+
+typedef struct di_mem_chunk di_mem_chunk;
 
 /**
- * @addtogroup di_system_utils
+ * @addtogroup di_mem_chunk
  * @{
  */
 
-/**
- * Inits the lib.
- * In addition to di_init, this functions sets a syslog log handler.
- * @param progname name of the called binary
- */
-void di_system_init (const char *progname);
+di_mem_chunk* di_mem_chunk_new (di_ksize_t atom_size, di_ksize_t area_size) __attribute__ ((nonnull));
+void *di_mem_chunk_alloc (di_mem_chunk *mem_chunk);
+void *di_mem_chunk_alloc0 (di_mem_chunk *mem_chunk);
+void di_mem_chunk_destroy (di_mem_chunk *mem_chunk);
 
 /** @} */
 #endif

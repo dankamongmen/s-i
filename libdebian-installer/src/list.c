@@ -17,10 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: list.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: list.c,v 1.2 2003/11/19 09:24:14 waldi Exp $
  */
 
 #include <debian-installer/list.h>
+
+#include <debian-installer/mem.h>
 
 static di_mem_chunk *node_mem_chunk;
 

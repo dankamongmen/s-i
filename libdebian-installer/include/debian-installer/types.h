@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: types.h,v 1.6 2003/11/13 21:28:57 waldi Exp $
+ * $Id: types.h,v 1.7 2003/11/19 09:24:14 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__TYPES_H
@@ -29,9 +29,10 @@
 #include <sys/types.h>
 
 /**
- * @defgroup di_types Types definitions
+ * @addtogroup di_types
  * @{
  */
+
 /**
  * Checks the equality of key1 and key2
  * @param key1 first key
