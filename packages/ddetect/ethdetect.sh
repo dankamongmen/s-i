@@ -127,12 +127,12 @@ do
 		fi
 		module="$RET"
 		if [ -n "$module" ] && is_not_loaded "$module" ; then
+			register-module "$module"
 			load_module "$module"
 		fi
 		continue
 	fi
 
-	# No ethernet interface. Try manual loading.
 	db_fset ethdetect/cannot_find seen false
 	db_input high ethdetect/cannot_find
 	db_go || break
