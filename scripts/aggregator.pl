@@ -29,8 +29,8 @@ sub aggregate {
 		}
 		foreach my $line (@lines) {
 			chomp $line;
-			my ($arch, $date, $builder, $ident, $status) = 
-				$line =~ /^(.*?)\s+\((.*?)\)\s+(.*?)\s+(.*?)\s+(.*?)$/;
+			my ($arch, $date, $builder, $ident, $status, $notes) = 
+				$line =~ /^(.*?)\s+\((.*?)\)\s+(.*?)\s+(.*?)\s+(.*?)\s*(.*?)$/;
 			if (! defined $status) {
 				print "<li><b>unparsable</b> entry:</i> $line\n";
 			}
@@ -49,7 +49,7 @@ sub aggregate {
 				if ($status eq 'failed') {
 					$status='<b>failed</b>';
 				}
-				print "<li>$arch $shortdate $builder <a href=\"".$log->{logurl}."$ident".$log->{logext}."\">$status</a> $ident\n";
+				print "<li>$arch $shortdate $builder <a href=\"".$log->{logurl}."$ident".$log->{logext}."\">$status</a> $ident ($notes)\n";
 			}
 		}
 		print "</ul>\n";
