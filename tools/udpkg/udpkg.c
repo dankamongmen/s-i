@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.4 2000/10/30 01:03:44 tausq Exp $ */
+/* $Id: udpkg.c,v 1.5 2000/11/01 20:39:47 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -190,7 +190,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 {
 	int r = 1;
 	char *cwd = 0;
-	char *p;
+	char *p, *q;
 	int fd;
 	char buf[1024];
 	struct stat statbuf;
@@ -210,8 +210,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 			pkg->file);
 		if (SYSTEM(buf) == 0)
 		{
-			snprintf(buf, sizeof(buf), DPKGCIDIR "%s/control", 
-				pkg->package);
+			snprintf(buf, sizeof(buf), "control");
 			if (stat(buf, &statbuf) == 0)
 			{
 				pkg->control = (char *)malloc(statbuf.st_size+1);
