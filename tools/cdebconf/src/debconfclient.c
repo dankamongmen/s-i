@@ -7,7 +7,7 @@
  *
  * Description: debconf client support interface
  *
- * $Id: debconfclient.c,v 1.1 2000/12/09 07:19:11 tausq Exp $
+ * $Id: debconfclient.c,v 1.2 2000/12/11 05:16:38 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -52,7 +52,7 @@ static int debconfclient_command(struct debconfclient *client,
 {
 	char buf[2048];
 	va_list ap;
-	char *c;
+	char *c, *v;
 	
 	fputs(command, stdout);
 	va_start(ap, command);
@@ -72,7 +72,8 @@ static int debconfclient_command(struct debconfclient *client,
 		/* strip off the return code */
 		strtok(buf, " \t\n");
 		DELETE(client->value);
-		client->value = STRDUP(strtok(NULL, "\n"));
+		v = strtok(NULL, "\n");
+		client->value = STRDUP(v);
 		return atoi(buf);
 	}
 	else 
