@@ -51,8 +51,13 @@ case "x$cmd" in
     xpackages)
         rm -f "$1"
         touch "$1"
-        db_get mirror/suite
+	
+        db_get mirror/udeb/suite || true
+	if [ -z "$RET" ]; then
+		db_get mirror/suite
+	fi
         suite="$RET"
+	
         Release="/tmp/net-retriever-$$-Release"
         fetch "dists/$suite/Release" "$Release" || exit $?
         ARCH=`udpkg --print-architecture`
