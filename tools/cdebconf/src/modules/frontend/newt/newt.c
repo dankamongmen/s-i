@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.40 2003/11/08 22:39:41 barbier Exp $
+ * $Id: newt.c,v 1.41 2003/11/11 23:56:03 barbier Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -344,7 +344,8 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
 #else
     int tflags = NEWT_FLAG_WRAP;
 #endif
-    char *defval, *result;
+    char *defval;
+    const char *result;
     char *full_description = get_full_description(q);
 
     eflags |= NEWT_ENTRY_SCROLL | NEWT_FLAG_RETURNEXIT;
