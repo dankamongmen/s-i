@@ -27,10 +27,10 @@ if [ ! -d /target/root ] ; then
 	fi
 fi
 
-A=`find /usr/share/keymaps/ -name '$KEYMAP.*' | sed 's/\/usr\/share\/keymaps\///' `
-KDIR=`dirname $A`
+# Map no-latin1 to i386/qwerty/no-latin1
+KBD=`find /usr/share/keymaps/ -name "$KEYMAP.kmap*" | sed 's%/usr/share/keymaps/%%' | sed 's/.kmap.gz$//' `
 (
 	echo "# Inserted by kbd-chooser."
-	echo "KBD=\"$KDIR/$KEYMAP\""
+	echo "KBD=\"$KBD\""
 ) >> /target/root/dbootstrap_settings
 
