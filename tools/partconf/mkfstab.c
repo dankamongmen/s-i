@@ -1,9 +1,32 @@
 
 #include "mkfstab.h"
 
-extern int errno;
-struct fstab_entry *entries[MAX_ENTRIES];
-int count_entries = 0;
+char *find_mountdevice(const char *mountpoint, char *default_device) {
+	FILE *fmounts = NULL;
+	char line[1024];
+	char *newdevice = NULL;
+
+	newdevice = default_device+(sizeof(char));
+
+	fmounts = fopen("/proc/mounts", "r");
+	if(fmounts == NULL) {
+		fprintf(stderr, "%s: %s\n", strerror(errno), "/proc/mounts");
+		return(strdup(newdevice));
+	}
+
+	while(fgets(line, 1024, fmounts) != NULL) {
+		char filesystem[1024];
+		char mntpoint[1024];
+
+		sscanf(line, "%s %s %*s", filesystem, mntpoint);
+		if(strcasecmp(mntpoint, mountpoint) == 0) {
+			return(strdup(filesystem));
+		}
+	}
+
+	fclose(fmounts);
+	return(strdup(newdevice));
+}
 
 void insert_line(const char *line) {
 	int i = 0;
@@ -29,8 +52,13 @@ void insert_line(const char *line) {
 	sscanf(line, "%s %s %s %s %*s %*s",
 		filesystem, mountpoint, typ, options);
 
-	if(strlen(filesystem) > 0)
-		dummy->filesystem = strdup(filesystem);
+	if(strlen(filesystem) > 0) {
+		if(filesystem[0] == '$') {
+			dummy->filesystem = find_mountdevice(mountpoint, filesystem);
+		} else {
+			dummy->filesystem = strdup(filesystem);
+		}
+	}
 	if(strlen(mountpoint) > 0)
 		dummy->mountpoint = strdup(mountpoint);
 	if(strlen(typ) > 0)

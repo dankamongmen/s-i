@@ -38,6 +38,11 @@ struct fstab_entry {
 	int pass;
 };
 
+extern int errno;
+struct fstab_entry *entries[MAX_ENTRIES];
+int count_entries = 0;
+
+char *find_mountdevice(const char *mountpoint, char *default_device);
 void insert_line(const char *line);
 void get_fstab_d_dir();
 void get_filesystems();
