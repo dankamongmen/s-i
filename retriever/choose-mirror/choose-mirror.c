@@ -140,9 +140,7 @@ int choose_country(void) {
 		country = debconf->value;
 
 	// Ensure 'country' set to something
-	if (country && strlen(country) == 0)
-		country = NULL;
-	if (country == NULL)
+	if (country == NULL || *country == 0)
 		country = "US";
 
 #ifdef WITH_HTTP
