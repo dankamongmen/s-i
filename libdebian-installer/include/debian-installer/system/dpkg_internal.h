@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg_internal.h,v 1.1 2003/09/26 00:18:09 waldi Exp $
+ * $Id: dpkg_internal.h,v 1.2 2003/10/02 14:27:06 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__DPKG_INTERNAL_H
@@ -25,6 +25,5 @@
 
 #include <debian-installer/system/dpkg.h>
 
-int internal_di_system_dpkg_package_control_file_exec (di_package *package, const char *name, int argc, const char *const argv[]);
 
 #endif

@@ -16,10 +16,10 @@ libdebian_installer_la_SOURCES = \
 	packages_parser.c \
 	parser.c \
 	parser_rfc822.c \
-	release.c \
 	slist.c \
 	string.c \
 	utils.c
+#	release.c
 #	list.c
 
 libdebian_installer_la_LIBADD = \

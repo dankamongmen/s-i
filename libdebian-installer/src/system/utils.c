@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: utils.c,v 1.1 2003/09/29 12:10:00 waldi Exp $
+ * $Id: utils.c,v 1.2 2003/10/02 14:27:06 waldi Exp $
  */
 
 #include <debian-installer/system/utils.h>
@@ -25,6 +25,7 @@
 #include <debian-installer/log.h>
 #include <debian-installer/utils.h>
 
+#include <stdbool.h>
 #include <unistd.h>
 
 void di_system_init (const char *_progname)
@@ -32,4 +33,5 @@ void di_system_init (const char *_progname)
   di_init (_progname);
   di_log_set_handler (DI_LOG_LEVEL_MASK, di_log_handler_syslog, NULL);
 }
+
 

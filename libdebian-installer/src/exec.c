@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.5 2003/09/30 14:28:45 waldi Exp $
+ * $Id: exec.c,v 1.6 2003/10/02 14:27:06 waldi Exp $
  */
 
 #include <debian-installer/exec.h>
@@ -34,7 +34,7 @@
 
 #define MAXLINE 1024
 
-int di_exec_full (const char *path, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_handler *prepare_handler, void *prepare_user_data)
+int di_exec_full (const char *path, const char *const argv[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
 {
   char line[MAXLINE];
   pid_t pid;
@@ -68,8 +68,8 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
     close (i);
 #endif
 
-    if (prepare_handler)
-      if (prepare_handler (prepare_user_data))
+    if (child_prepare_handler)
+      if (child_prepare_handler (pid, child_prepare_user_data))
         exit (255);
 
     execv (path, (char *const *) argv);
@@ -82,7 +82,7 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
   }
   else
   {
-    int i, status;
+    int i, status = -1;
     struct pollfd fds[2] =
     {
       { pipeout[0], POLLIN, 0 },
@@ -102,6 +102,13 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
     fcntl (pipeout[0], F_SETFL, O_NONBLOCK);
     fcntl (pipeerr[0], F_SETFL, O_NONBLOCK);
 
+    if (parent_prepare_handler)
+      if (parent_prepare_handler (pid, parent_prepare_user_data))
+      {
+        kill (pid, 9);
+        goto cleanup;
+      }
+
     while (poll (fds, 2, -1) >= 0)
     {
       int exit = 0;
@@ -112,7 +119,15 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
         {
           while (fgets (line, sizeof (line), files[i].file) != NULL)
             if (files[i].handler)
-              files[i].handler (line, io_user_data);
+            {
+              size_t len = strlen (line);
+              if (line[len - 1] == '\n')
+              {
+                line[len - 1] = '\0';
+                len--;
+              }
+              files[i].handler (line, len, io_user_data);
+            }
           exit = 1;
         }
       }
@@ -128,11 +143,12 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
         break;
     }
 
-    fclose (files[0].file); /* closes pipeout[0] */
-    fclose (files[1].file); /* closes pipeerr[0] */
-
     if (!waitpid (pid, &status, 0))
       return -1;
+
+cleanup:
+    fclose (files[0].file); /* closes pipeout[0] */
+    fclose (files[1].file); /* closes pipeerr[0] */
 
     return status;
   }
@@ -140,10 +156,10 @@ int di_exec_full (const char *path, const char *const argv[], di_io_handler *std
   return -1;
 }
 
-int di_exec_shell_full (const char *const cmd, di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_handler *prepare_handler, void *prepare_user_data)
+int di_exec_shell_full (const char *const cmd, di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
 {
   const char *const argv[] = { "sh", "-c", cmd, NULL };
-  return di_exec_full ("/bin/sh", argv, stdout_handler, stderr_handler, io_user_data, prepare_handler, prepare_user_data); 
+  return di_exec_full ("/bin/sh", argv, stdout_handler, stderr_handler, io_user_data, parent_prepare_handler, parent_prepare_user_data, child_prepare_handler, child_prepare_user_data); 
 }
 
 /**
@@ -151,7 +167,7 @@ int di_exec_shell_full (const char *const cmd, di_io_handler *stdout_handler, di
  *
  * @param user_data path
  */
-int di_exec_prepare_chroot (void *user_data)
+int di_exec_prepare_chroot (pid_t pid __attribute__ ((unused)), void *user_data)
 {
   char *path = user_data;
   if (chroot (path))
@@ -164,7 +180,7 @@ int di_exec_prepare_chroot (void *user_data)
 /**
  * logs to di_log
  */
-int di_exec_io_log (const char *buf, void *user_data __attribute__ ((unused)))
+int di_exec_io_log (const char *buf, size_t len __attribute__ ((unused)), void *user_data __attribute__ ((unused)))
 {
   di_log (DI_LOG_LEVEL_OUTPUT, buf);
   return 0;
