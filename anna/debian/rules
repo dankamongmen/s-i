@@ -17,7 +17,12 @@ PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 build: build-stamp
 build-stamp:
 	dh_testdir
+# Make small unless we are building a debug package.
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+	$(MAKE)
+else
 	$(MAKE) small
+endif
 	touch build-stamp
 
 clean:
