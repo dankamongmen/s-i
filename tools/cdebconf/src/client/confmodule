@@ -10,10 +10,7 @@ if [ ! "$DEBIAN_HAS_FRONTEND" ]; then
 	# Ok, this is pretty crazy. Since there is no FrontEnd, this
 	# program execs a FrontEnd. It will then run a new copy of $0 that
 	# can talk to it.
-	#exec /usr/share/debconf/frontend $0 "$@"
-	# For C-debconf, we'd want to do something similar to:
-	#exec /usr/bin/debconf $0 "$@"
-	true
+	exec /usr/share/debconf/frontend $0 "$@"
 fi
 
 # Only do this once.
@@ -35,7 +32,7 @@ fi
 # Each command must be listed twice, once in lower case, once in upper.
 # Doing that saves us a lot of calls to tr at load time. I just wish shell had
 # an upper-case function.
-old_opts="$@"
+_old_opts="$@"
 for i in "capb CAPB" "set SET" "reset RESET" "title TITLE" \
          "input INPUT" "beginblock BEGINBLOCK" "endblock ENDBLOCK" "go GO" \
 	 "get GET" "register REGISTER" "unregister UNREGISTER" "subst SUBST" \
@@ -44,24 +41,25 @@ for i in "capb CAPB" "set SET" "reset RESET" "title TITLE" \
 	 "progress PROGRESS"; do
 	# Break string up into words.
 	set -- $i
-	# Generate function on the fly.
+	# Generate functions on the fly.
 	eval "db_$1 () {
-		local _RET
 		echo \"$2 \$@\" >&3
-		read _RET
-		set -- \$_RET
-		_RET=\$1
-		shift
-		RET="\$@"
-		return \$_RET
+		# Set to newline to get whole line.
+		local IFS='
+'
+		local _LINE
+		read -r _LINE
+		# Disgusting, but it's the only good way to split the line,
+		# preserving all other whitespace.
+		RET=\"\${_LINE#[! 	][ 	]}\"
+		return \${_LINE%%[ 	]*}
 	      }"
 done
 # $@ was clobbered above, unclobber.
-set -- $old_opts
-unset old_opts
+set -- $_old_opts
+unset _old_opts
 
-# Just an alias for input. It tends to make more sense to use this to display
-# text, since displaying text isn't really asking for input.
+# Just an old alias for input.
 db_text () {
 	db_input $@
 }
