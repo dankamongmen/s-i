@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.33 2002/11/23 22:29:42 waldi Exp $
+ * $Id: commands.c,v 1.34 2002/11/29 20:08:06 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -99,27 +99,26 @@ int command_input(struct confmodule *mod, int argc, char **argv,
 	priority = argv[1];
 	qtag = argv[2];
 
+	q = mod->questions->methods.get(mod->questions, qtag);
+	if (q == NULL) 
+	{
+		snprintf(out, outsize, "%u \"%s\" doesn't exist",
+			CMDSTATUS_BADQUESTION, qtag);
+		return DC_OK;
+	}
+
 	/* check priority */
 	visible = (mod->frontend->interactive && 
                mod->questions->methods.is_visible(mod->questions, qtag, priority));
 
 	if (visible)
-	{
-		q = mod->questions->methods.get(mod->questions, qtag);
-		if (q == NULL) 
-		{
-			snprintf(out, outsize, "%u No such question",
-				CMDSTATUS_BADQUESTION);
-			return DC_OK;
-		}
 		visible = mod->frontend->methods.add(mod->frontend, q);
-	}
 
 	if (visible) 
-		snprintf(out, outsize, "%u Question will be asked",
+		snprintf(out, outsize, "%u question will be asked",
 			 CMDSTATUS_SUCCESS);
 	else
-		snprintf(out, outsize, "%u Question skipped",
+		snprintf(out, outsize, "%u question skipped",
 			CMDSTATUS_INPUTINVISIBLE);
         question_deref(q);
 	return DC_OK;
@@ -143,7 +142,7 @@ int command_clear(struct confmodule *mod, int argc, char **argv,
 	CHECKARGC(== 0);
 
 	mod->frontend->methods.clear(mod->frontend);
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }
 
@@ -176,7 +175,7 @@ int command_version(struct confmodule *mod, int argc, char **argv,
 		snprintf(out, outsize, "%u Version too high (%d)",
 			CMDSTATUS_BADVERSION, ver);
 	else
-		snprintf(out, outsize, "%u %.0f", CMDSTATUS_SUCCESS,
+		snprintf(out, outsize, "%u %.1f", CMDSTATUS_SUCCESS,
 			DEBCONF_VERSION);
 	return DC_OK;
 }
@@ -197,10 +196,8 @@ int command_version(struct confmodule *mod, int argc, char **argv,
 int command_capb(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	/* TODO: tell frontend about confmodule capabilities and return
-	 * frontend capability to the confmodule 
-	 */
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	/* TODO: tell frontend about confmodule capabilities */
+	snprintf(out, outsize, "%u multiselect backup", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }
 
@@ -238,7 +235,7 @@ int command_title(struct confmodule *mod, int argc, char **argv,
         }
 
 	mod->frontend->methods.set_title(mod->frontend, buf);
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }
 
@@ -257,7 +254,7 @@ int command_title(struct confmodule *mod, int argc, char **argv,
 int command_beginblock(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }
 
@@ -276,7 +273,7 @@ int command_beginblock(struct confmodule *mod, int argc, char **argv,
 int command_endblock(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }
 
@@ -302,7 +299,7 @@ int command_go(struct confmodule *mod, int argc, char **argv,
 	if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
 		snprintf(out, outsize, "%u backup", CMDSTATUS_GOBACK);
 	else {
-		snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+		snprintf(out, outsize, "%u ok", CMDSTATUS_SUCCESS);
 		/* FIXME  questions should be tagged when closing session */
 		for (q = mod->frontend->questions; q != NULL; q = q->next)
 			q->flags |= DC_QFLAG_SEEN;
@@ -332,7 +329,7 @@ int command_get(struct confmodule *mod, int argc, char **argv,
 
 	q = mod->questions->methods.get(mod->questions, argv[1]);
 	if (q == NULL)
-		snprintf(out, outsize, "%u %s does not exist",
+		snprintf(out, outsize, "%u %s doesn't exist",
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else {
 		const char *value = question_getvalue(q, NULL);
@@ -373,7 +370,7 @@ int command_set(struct confmodule *mod, int argc, char **argv,
 
 	q = mod->questions->methods.get(mod->questions, argv[1]);
 	if (q == NULL)
-		snprintf(out, outsize, "%u %s does not exist",
+		snprintf(out, outsize, "%u %s doesn't exist",
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 	{
@@ -426,7 +423,7 @@ int command_reset(struct confmodule *mod, int argc, char **argv,
 
 	q = mod->questions->methods.get(mod->questions, argv[1]);
 	if (q == NULL)
-		snprintf(out, outsize, "%u %s does not exist",
+		snprintf(out, outsize, "%u %s doesn't exist",
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 	{
@@ -434,8 +431,7 @@ int command_reset(struct confmodule *mod, int argc, char **argv,
 		q->flags &= ~DC_QFLAG_SEEN;
 
 		if (mod->questions->methods.set(mod->questions, q) != 0)
-			snprintf(out, outsize, "%u value reset",
-				CMDSTATUS_SUCCESS);
+			snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
 		else
 			snprintf(out, outsize, "%u cannot reset value",
 				CMDSTATUS_INTERNALERROR);
@@ -478,7 +474,7 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 	q = mod->questions->methods.get(mod->questions, argv[1]);
 
 	if (q == NULL)
-		snprintf(out, outsize, "%u %s does not exist",
+		snprintf(out, outsize, "%u %s doesn't exist",
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 	{
@@ -497,10 +493,9 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 		question_variable_add(q, variable, buf);
 
 		if (mod->questions->methods.set(mod->questions, q) != 0)
-			snprintf(out, outsize, "%u variable substituted",
-				CMDSTATUS_SUCCESS);
+			snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
 		else
-			snprintf(out, outsize, "%u cannot set variable",
+			snprintf(out, outsize, "%u substitution failed",
 				CMDSTATUS_INTERNALERROR);
 	}
 	question_deref(q);
@@ -517,27 +512,35 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
  *        size_t outsize - output buffer size
  * Output: int - DC_NOTOK if error, DC_OK otherwise
  * Description: handler for the debconf REGISTER command
- * Assumptions: TODO
+ * Assumptions: none
  */
 int command_register(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-        struct question *q;
+	struct question *q;
+	struct template *t;
 	CHECKARGC(== 2);
 
+	t = mod->templates->methods.get(mod->templates, argv[1]);
+	if (t == NULL) {
+		snprintf(out, outsize, "%u No such template, \"%s\"",
+			CMDSTATUS_BADQUESTION, argv[1]);
+		return DC_OK;
+	}
 	q = mod->questions->methods.get(mod->questions, argv[2]);
-        if (q) {
-                /* Duplicate, just add me as an owner as well */
-                question_owner_add(q, mod->owner);
-                snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
-                return DC_OK;
-        }
-        q = question_new(argv[2]);
-        q->template = mod->templates->methods.get(mod->templates, argv[1]);
-        template_ref(mod->templates->methods.get(mod->templates, argv[1]));
-        mod->questions->methods.set(mod->questions, q);
-	snprintf(out, outsize, "%u Question added", CMDSTATUS_SUCCESS);
-        return DC_OK;
+	if (q == NULL)
+		q = question_new(argv[2]);
+	if (q == NULL) {
+		snprintf(out, outsize, "%u Internal error making question",
+			CMDSTATUS_INTERNALERROR);
+		return DC_OK;
+	}
+	question_owner_add(q, mod->owner);
+	q->template = t;
+	template_ref(t);
+	mod->questions->methods.set(mod->questions, q);
+	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
+	return DC_OK;
 }
 
 /*
@@ -549,15 +552,22 @@ int command_register(struct confmodule *mod, int argc, char **argv,
  *        size_t outsize - output buffer size
  * Output: int - DC_NOTOK if error, DC_OK otherwise
  * Description: handler for the debconf UNREGISTER command
- * Assumptions: TODO
+ * Assumptions: none
  */
 int command_unregister(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
+	struct question *q;
 	CHECKARGC(== 1);
 
-	mod->questions->methods.disown(mod->questions, argv[1], mod->owner);
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	q = mod->questions->methods.get(mod->questions, argv[1]);
+	if (q == NULL) {
+		snprintf(out, outsize, "%u %s doesn't exist",
+			CMDSTATUS_BADQUESTION, argv[1]);
+		return DC_OK;
+	}
+	question_owner_delete(q, mod->owner);
+	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
 
 	return DC_OK;
 }
@@ -578,7 +588,7 @@ int command_purge(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	mod->questions->methods.disownall(mod->questions, mod->owner);
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }
 
@@ -597,17 +607,23 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	struct question *q;
+	const char *value;
 
 	CHECKARGC(== 2);
 	q = mod->questions->methods.get(mod->questions, argv[1]);
 	if (q == NULL)
-		snprintf(out, outsize, "%u %s does not exist",
-			CMDSTATUS_BADQUESTION, argv[1]);
-	else
 	{
-		const char *value = question_get_field(q, NULL, argv[2]);
-		snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, value ? value : "");
+		snprintf(out, outsize, "%u %s doesn't exist",
+			CMDSTATUS_BADQUESTION, argv[1]);
+		return DC_OK;
 	}
+
+	value = question_get_field(q, NULL, argv[2]);
+	if (value == NULL)
+		snprintf(out, outsize, "%u %s does not exist",
+			CMDSTATUS_BADQUESTION, argv[2]);
+	else
+		snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, value);
 
 	return DC_OK;
 }
@@ -633,28 +649,22 @@ int command_fget(struct confmodule *mod, int argc, char **argv,
 	CHECKARGC(== 2);
 	q = mod->questions->methods.get(mod->questions, argv[1]);
 	if (q == NULL)
-		snprintf(out, outsize, "%u %s does not exist",
-			CMDSTATUS_BADQUESTION, argv[1]);
-	else
 	{
-		field = argv[2];
-		
-		/* 
-		 * the spec is very vague here, what fields are we supposed 
-		 * to recognize?
-		 */
-
-		/* isdefault is for backward compability only */
-		if (strcmp(field, "seen") == 0)
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
-				((q->flags & DC_QFLAG_SEEN) ? "true" : "false"));
-                else if (strcmp(field, "isdefault") == 0)
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
-				((q->flags & DC_QFLAG_SEEN) ? "false" : "true"));
-		else
-			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
-
+		snprintf(out, outsize, "%u %s doesn't exist",
+			CMDSTATUS_BADQUESTION, argv[1]);
+		return DC_OK;
 	}
+
+	field = argv[2];
+	/* isdefault is for backward compability only */
+	if (strcmp(field, "seen") == 0)
+		snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
+			((q->flags & DC_QFLAG_SEEN) ? "true" : "false"));
+	else if (strcmp(field, "isdefault") == 0)
+		snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
+			((q->flags & DC_QFLAG_SEEN) ? "false" : "true"));
+	else
+		snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
 	question_deref(q);
 
 	return DC_OK;
@@ -681,30 +691,27 @@ int command_fset(struct confmodule *mod, int argc, char **argv,
 	CHECKARGC(== 3);
 	q = mod->questions->methods.get(mod->questions, argv[1]);
 	if (q == NULL)
-		snprintf(out, outsize, "%u %s does not exist",
-			CMDSTATUS_BADQUESTION, argv[1]);
-	else
 	{
-		field = argv[2];
-		if (strcmp(field, "seen") == 0)
-		{
-			q->flags &= ~DC_QFLAG_SEEN;
-			if (strcmp(argv[3], "true") == 0)
-				q->flags |= DC_QFLAG_SEEN;
-			mod->questions->methods.set(mod->questions, q);
-			snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
-		}
-		else if (strcmp(field, "isdefault") == 0)
-		{
-			q->flags &= ~DC_QFLAG_SEEN;
-			if (strcmp(argv[3], "false") == 0)
-				q->flags |= DC_QFLAG_SEEN;
-			mod->questions->methods.set(mod->questions, q);
-			snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
-		}
-		else
-			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
+		snprintf(out, outsize, "%u %s doesn't exist",
+			CMDSTATUS_BADQUESTION, argv[1]);
+		return DC_OK;
 	}
+
+	field = argv[2];
+	if (strcmp(field, "seen") == 0)
+	{
+		q->flags &= ~DC_QFLAG_SEEN;
+		if (strcmp(argv[3], "true") == 0)
+			q->flags |= DC_QFLAG_SEEN;
+	}
+	else if (strcmp(field, "isdefault") == 0)
+	{
+		q->flags &= ~DC_QFLAG_SEEN;
+		if (strcmp(argv[3], "false") == 0)
+			q->flags |= DC_QFLAG_SEEN;
+	}
+	snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, argv[3]);
+
 	question_deref(q);
 	return DC_OK;
 }
@@ -727,7 +734,7 @@ int command_exist(struct confmodule *mod, int argc, char **argv,
 	struct question *q;
 	CHECKARGC(== 1);
 
-    q = mod->questions->methods.get(mod->questions, argv[1]);
+	q = mod->questions->methods.get(mod->questions, argv[1]);
 	if (q)
 	{
 		question_deref(q);
@@ -737,7 +744,6 @@ int command_exist(struct confmodule *mod, int argc, char **argv,
 	{
 		snprintf(out, outsize, "%u false", CMDSTATUS_SUCCESS);
 	}
-	question_deref(q);
 	return DC_OK;
 }
 
