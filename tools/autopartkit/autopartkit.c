@@ -749,7 +749,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     /* FIXME Should use fstype for /, not DEFAULT_FS */
     if (mount(find_partition_by_mountpoint(mountmap,"/"), 
 	      "/target", DEFAULT_FS, MS_MGC_VAL, NULL) == -1)
-        autopartkit_error(0, strerror(errno));
+        autopartkit_error(1, strerror(errno));
     log_line();
     
     /* Find and turn on swap */
@@ -837,8 +837,9 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 #endif /* CREATE_FSTAB */
 	asprintf(&tmpmnt, "/target%s", mountmap[i].mountpoint->mountpoint);
 	make_path(tmpmnt, 0755);
-	mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
-	      MS_MGC_VAL, NULL);
+	if (mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
+		  MS_MGC_VAL, NULL))
+	    autopartkit_error(1, strerror(errno));
 	free(tmpmnt);
     }
 
