@@ -1,7 +1,6 @@
 #!/bin/sh
 
 . /usr/share/debconf/confmodule
-. /usr/share/debian-installer/functions.sh
 
 #
 # convert the return values from "xx (yy)" => "xx"
