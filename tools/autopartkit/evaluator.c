@@ -61,6 +61,7 @@ static double factor(void)
 
         /* add more variables here as we need them */
         if (strcmp(buf, "RAMSIZE") == 0) {
+	    assert(get_ram_size());
             temp = get_ram_size();
         } else {
             autopartkit_error(1, "Unknown variable $%s\n", buf);
