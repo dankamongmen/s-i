@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.16 2003/07/15 18:39:31 sjogren Exp $
+ * $Id: newt.c,v 1.17 2003/07/16 09:32:25 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -687,6 +687,7 @@ newt_shutdown(struct frontend *obj)
 static int
 newt_go(struct frontend *obj)
 {
+    struct newt_data *data = (struct newt_data *)obj->data;
     struct question *q = obj->questions;
     int i, ret = DC_OK, cleared;
 
@@ -694,7 +695,7 @@ newt_go(struct frontend *obj)
     while (q != NULL) {
         for (i = 0; i < DIM(question_handlers); i++) {
             if (strcmp(q->template->type, question_handlers[i].type) == 0) {
-                if (!cleared) {
+                if (!cleared && !data->scale_form) {
                     cleared = 1;
                     newtInit();
                     newtCls();
@@ -714,7 +715,7 @@ newt_go(struct frontend *obj)
         if (ret == DC_OK)
             q = q->next;
     }
-    if (cleared)
+    if (cleared && !data->scale_form)
         newtFinished();
     return DC_OK;
 }
