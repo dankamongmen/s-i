@@ -838,7 +838,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 	asprintf(&tmpmnt, "/target%s", mountmap[i].mountpoint->mountpoint);
 	make_path(tmpmnt, 0755);
 	if (mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
-		  MS_MGC_VAL, NULL))
+		  MS_MGC_VAL, NULL) == -1)
 	    autopartkit_error(1, strerror(errno));
 	free(tmpmnt);
     }
