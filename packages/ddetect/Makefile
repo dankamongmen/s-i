@@ -4,7 +4,7 @@ DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
 DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 CC = gcc
-CFLAGS = -Wall -O2 -g --std=c99 -DARCH=$(DEB_HOST_ARCH) -DCPU=$(DEB_HOST_GNU_CPU) -DCPU_TEXT='"$(DEB_HOST_GNU_CPU)"' -DSYSTEM=$(DEB_HOST_GNU_SYSTEM)
+CFLAGS = -Wall -O2 -g --std=c99 -DARCH=$(DEB_HOST_ARCH) -DCPU=$(DEB_HOST_GNU_CPU) -DCPU_TEXT='"$(DEB_HOST_ARCH)"' -DSYSTEM=$(DEB_HOST_GNU_SYSTEM)
 LDFLAGS = -ldebconfclient
 
 bindir=$(DESTDIR)/bin/
