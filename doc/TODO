@@ -1,31 +1,75 @@
-- cdebconf		[Randolph Chung <tausq@debian.org>,
-			Anthony Towns <aj@azure.humbug.org.au>]
-- udpkg			[Randolph Chung <tausq@debian.org>]
-- main menu		[Joey Hess <joeyh@debian.org>]
-- more detailed design docs that other people besides Joey Hess can
-  understand		[Joey Hess <joeyh@debian.org and debian-boot]
- 	- The main menu design has some issues. If a step is failing
-	  because some step above it did something wrong, but thought it
-	  succeeded (a disk was partitioned, but very badly, and installing
-	  the base system to it fails), there is no way to force the user
-	  to back up. This seems to preclude linear install mode. I posted
-	  a longer example to -boot. Three possible fixes:
-	  	- Detect loops, and have code to figure out what went wrong
-		  and back up to the appropriate step that can fix it
-		- Detect loops, and back up to the beginning of the menu
-		- Detect whenever any menu item fails, and leave linear
-		  mode. (BEST)
-	- Need to define module subsystems for network/hardware support,
-	  network configuration, target media support, etc.
-- Cobble together a demonstration system that can install onto some very
-  limited set of machines, in some very limited fashion. Here are the
-  things we would need for such a system:
-	- mini-debconf
-	- one debconf ui
-	- one retreiver and whatever it depends on
-	- main menu
-	- disk partitioner
-	- disk formatter
-	- base system extractor
-	- lilo setup
-	- reboot
+	 - design [Joey Hess, debian-boot]
+                75% done. Enough to know what the big peices are 
+                and how they fit together.
+		- The main menu design has some issues. If a step is failing
+		  because some step above it did something wrong, but thought it
+		  succeeded (a disk was partitioned, but very badly, and installing
+		  the base system to it fails), there is no way to force the user
+		  to back up. This seems to preclude linear install mode. I posted
+		  a longer example to -boot. Three possible fixes:
+		  	- Detect loops, and have code to figure out what went wrong
+			  and back up to the appropriate step that can fix it
+			- Detect loops, and back up to the beginning of the menu
+			- Detect whenever any menu item fails, and leave linear
+			  mode. (BEST)
+		- Need to define module subsystems for network/hardware support,
+		  network configuration, target media support, etc.
+        - udeb archive setup [James Troup, Anthony Towns]
+                Near 100% support in new package pools code.
+                That code will go live soon after Debian 2.2r1 is
+                released.
+        - udeb building [Joey Hess, Wichert Akkerman]
+                99% done. udebs can be built, but a 2 line patch to
+                dpkg-genchanges is required. A new version of dpkg-dev
+                was promised for last weekend.
+        - cdebconf (miniature debconf in C) [Randolph Chung, Anthony Towns]
+                In progress. Infrastructure is 70% done. have one working
+                (sick) database backend, have a conceptual text-based
+                frontend that is ~1/4 done.
+        - udpkg (tiny dpkg clone) [Randolph Chung, Joey Hess]
+                Usable. Can install packages and update the status file,
+                though there is one known bug related to that. Needs to
+                support Pre-Depends and localized descriptions. --unpack
+                and --configure code needs testing.
+        - main-menu (main menu generator) [Joey Hess]
+                90% done (one non-trivial todo item).
+        - busybox integration [Erik Anderson?]
+                Not started. Busybox needs to build one or more .udebs.
+                Probably more than one.
+        - network card detector [UNCLAIMED]
+                Not started. Detect the NIC in a computer by safe autoprobing,
+                and by prompting otherwise.
+        - network setup [UNCLAIMED]
+                Not started. Set up the network, via dhcp or via prompting;
+                implementor decides.
+        - retreiver control program [UNCLAIMED]
+                Not started. Sort of like apt, except tons dumber, this
+                uses retreiver(s) to download Packages files and then udebs,
+                and calls udpkg to install them.
+        - http retreiver [UNCLAMED]
+                Not started. Download udebs, other files from network.
+        - install target media detector [UNCLAIMED]
+                Not started. Just has to figure out what media to install to.
+                Probably trivial; most support already in the kernel.
+        - disk partitioner [UNCLAIMED]
+                Not started. Some kind of a UI to let the user partition their
+                disks and decide what the partitions are used for.
+        - disk formatter [UNCLAIMED]
+                Not started. Formats disks, turns on swap, etc.
+        - base system installer [UNCLAIMED]
+                Not started. Installs the base system, probably from base.tgz
+                for now, and does any necessary setup.
+        - {lilo,grub} installer [UNCLAIMED]
+                Not started. Sets up {lilo,grub}.
+        - kernel module udebs [UNCLAIMED]
+                Not started. We will need various sets of kernel modules;
+                one such set is NIC drivers. Each set goes in a udeb; there
+                probably has to be a system to build the whole kernel and
+                udebs.
+        - library reduction [UNCLAIMED]
+                Not started. There is code in the boot-floppies that may
+                be usable, but this is one of the hardest parts.
+        - install media build system [UNCLAIMED]
+                Not started. Puts all the peices together and makes
+                install media.
+
