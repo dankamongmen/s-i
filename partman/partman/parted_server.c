@@ -532,7 +532,8 @@ add_primary_partition(PedDisk *disk, PedFileSystemType *fs_type,
 {
         PedPartition *part;
         assert(disk != NULL);
-        log("add_primary_partition()");
+        log("add_primary_partition(disk(%lli),%lli-%lli)", 
+            disk->dev->length, start, end);
         if (has_extended_partition(disk)) {
                 /* Minimise the extended partition.  If there is an
                    extended partition, but no logical partitions, this

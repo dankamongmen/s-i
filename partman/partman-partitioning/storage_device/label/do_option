@@ -5,6 +5,14 @@
 dev="$2"
 cd $dev
 
+db_reset partman/confirm_new_label
+db_input high partman/confirm_new_label
+db_go || exit 0
+db_get partman/confirm_new_label
+if [ "$RET" = false ]; then
+    exit 1
+fi
+
 open_dialog LABEL_TYPES
 types=$(read_list)
 close_dialog
@@ -21,8 +29,29 @@ db_input $PRIORITY partman-partitioning/choose_label || true
 db_go || exit 1
 db_get partman-partitioning/choose_label
 
-open_dialog NEW_LABEL "$RET"
+chosen_type="$RET"
+
+if [ "$chosen_type" = sun ]; then
+    db_reset partman/confirm_write_new_label
+    db_input high partman/confirm_write_new_label
+    db_go || exit 0
+    db_get partman/confirm_write_new_label
+    if [ "$RET" = false ]; then
+	exit 1
+    fi
+fi
+
+open_dialog NEW_LABEL "$chosen_type"
 close_dialog
+
+if [ "$chosen_type" = sun ]; then
+    # write the partition table to the disk
+    open_dialog COMMIT
+    close_dialog
+    # reread it from there
+    open_dialog UNDO
+    close_dialog
+fi
 
 # Different types partition tables support different visuals.  Some
 # have partition names other don't have, some have extended and
@@ -42,3 +71,11 @@ close_dialog
 for id in $partitions; do
     update_partition $dev $id
 done
+
+if [ "$chosen_type" = sun ]; then
+    backupdir=../../backup/`basename $dev`
+    if [ -d "$backupdir" ]; then
+	rm -r "$backupdir"
+    fi
+    cp -a . "$backupdir"
+fi

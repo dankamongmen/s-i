@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /usr/share/debconf/confmodule
+
 cd $1
 
 num=$2
@@ -10,4 +12,6 @@ fs=$6
 path=$7
 name=$8
 
-printf " %-8s" "$type"
+db_metaget "partman/text/$type" description
+
+printf " %-8s" "$RET"
