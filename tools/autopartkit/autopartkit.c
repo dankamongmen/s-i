@@ -1168,6 +1168,11 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                  */
                 zero_dev(devpath, 100 * 1024);
 
+		/* We must commit before calling lvm_init_dev() to
+		   make sure the device file is available when we need
+		   it. */
+		ped_disk_commit(disk_maybe);
+
                 /* Initialize LVM partition, if the LVM tools are available */
                 if ( 0 == lvm_init_dev(devpath) )
 		{
@@ -1177,12 +1182,14 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		    lvm_volumegroup_add_dev(mountpoint, devpath);
 		}
 	    }
+	    else
 #endif /* LVM_HACK */
-
-	    /* disable_kmsg(1); */
-	    log_line();
-	    /* disable_kmsg(0); */
-	    ped_disk_commit(disk_maybe);
+	    {
+	        /* disable_kmsg(1); */
+	        log_line();
+		/* disable_kmsg(0); */
+		ped_disk_commit(disk_maybe);
+	    }
 	}
 	mountmap[partcount].mountpoint = req_tmp;
 
