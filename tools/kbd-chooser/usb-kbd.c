@@ -1,10 +1,10 @@
 /* @file  usb-kbd.c
  * @brief Report keyboards present on PC
  *
- * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
+ * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.11 2003/10/03 22:02:49 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.12 2003/10/14 20:43:17 mckinstry Exp $
  */
 
 #include "config.h"
@@ -17,20 +17,18 @@
 #include <string.h>
 #include <debian-installer.h>
 #include "xmalloc.h"
-#include "nls.h"
 #include "kbd-chooser.h"
 
 /**
  * @brief list of keyboards present
  */
-kbd_t *usb_kbd_get (kbd_t *keyboards)
+kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 {
 	kbd_t *k = xmalloc(sizeof(kbd_t));
 	int serr, res, mounted_fs = 0 ;
 
 	// Set up default entries.
 	k->name = "usb";
-	k->description = _("USB keyboard");
 	k->fd = -1;
 	k->deflt = "mac-usb-us";
 	k->present = UNKNOWN;
