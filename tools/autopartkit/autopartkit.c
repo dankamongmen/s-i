@@ -83,7 +83,6 @@
 
 #include "autopartkit.h"
 
-#define _(ARG) ARG
 #define FAT_MINSIZE_FACTOR 1.33
 
 #define MAX_PARTITIONS 10
@@ -315,7 +314,6 @@ static int is_root(const char *mountpoint)
  */
 
 #if defined(fordebian)
-#define TABLE_HEADER _("Device    Model               Size   Free   FreeFat NbPart")
 #define TABLE_SIZE 2048
 #define LIST_SIZE 512
 #endif /* fordebian */
@@ -427,8 +425,6 @@ static PedDevice* choose_device(void)
                             default_device, NULL);
         client->command(client, "SUBST", "autopartkit/choose_device", 
                         "CHOICES", device_list, NULL);
-        client->command(client, "SUBST", "autopartkit/choose_device", 
-                        "TABLEHEADER", TABLE_HEADER, NULL);
         client->command(client, "SUBST", "autopartkit/choose_device", 
                         "TABLE", table, NULL);
 
