@@ -23,10 +23,12 @@ autopartkit_test_SOURCES = \
 	$(autopartkit_SOURCES)
 
 dumptable_SOURCES = \
+	dummylog.c \
 	loadpartitions.c \
 	dumptable.c
 
 distribute_test_SOURCES = \
+	dummylog.c \
 	distribute.c \
 	loadpartitions.c \
 	distribute-test.c
