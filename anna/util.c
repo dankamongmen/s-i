@@ -189,10 +189,8 @@ list_to_choices(di_package **packages)
         if (packages[count])
           strcat(ret, ", ");
     }
-    if (ret_used)
-        return ret;
-    free(ret);
-    return NULL;
+
+    return ret;
 }
 
 /* Ask the chosen retriever to download a particular package to to dest. */
