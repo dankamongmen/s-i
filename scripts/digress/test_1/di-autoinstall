@@ -12,10 +12,15 @@ expect {
 		sleep 2
 		send "\r"
 		exp_continue -continue_timer
+	} -re "enter.*to.*continue" {
+		sleep 1
+		puts "\r"
 	} -re "rebooting.*the.*system." {
 		exit
 	} -re "down.*NOW" {
 		exit
+	} -re "Installation.*step.*failed" {
+		exit 1
 	} timeout {
 		puts "timeout!"
 		exit 1
