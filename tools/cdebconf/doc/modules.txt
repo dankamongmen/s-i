@@ -1,5 +1,5 @@
 XXX -- General things which are missing
-XXX Documentation of frontend API
+XXX Consistentify typographical convnetions
 XXX Refactoring to be more readable -- sections will need to be moved.
 
 General APIs
@@ -114,8 +114,8 @@ cdebconf is designed to allow frontend and database modules to be plugged
 in as needed. Modules can be built to support different database backends
 (e.g. postgres, ldap, etc) and frontends (e.g. ncurses, gtk, etc).
 
-
 Database modules:
+~~~~~~~~~~~~~~~~
 
 database.h defines the database module interface. Each database module
 needs to export a struct named debconf_database_module of type 
@@ -152,7 +152,7 @@ Each of these methods have a signature defined in database.h. All methods
 have a sensible default implementation (usually doing nothing) so that 
 you only need to override the ones you need.
 
-All methods are passed the database as a first argument. The database,
+All methods are passed a database object as a first argument. The database,
 besides the methods, contains the following attributes:
 
 const char *modname -- the name of the module this database was loaded from XXX
@@ -241,7 +241,7 @@ int question_visible(struct database *, char *name, char *priority)
 See modules/db/* for some examples.
 
 Frontend modules
-
+~~~~~~~~~~~~~~~~
 Similarly, frontend modules have an interface defined in frontend.h.
 Modules export a struct called debconf_frontend_module of type 
 struct frontend_module, defined as:
@@ -256,12 +256,49 @@ struct frontend_module {
 	dcf_clear_t clear;
 };
 
+All methods will be passed a struct frontend as a first argument.
+
+The structure has the following public attributes:
+
+* struct configuration *config -- Use this to get configuration information
+                                  (XXX colors for GTK+ would go here, right?)
+* void *data -- private data. 
+* struct *question questions -- list of questions to ask
+* struct *database db -- database object
+* char *title -- title
+* XXX: Are the rest of things public?
+
+Methods:
+
+All methods returning int should be returnin DC_OK/DC_NOTOK, as above.
+
+* int initialize(struct frontend *, struct configuration *):
+  Initialize the structure. (For example, connect to X server)
+* int shutdown(struct frontend *)
+  Destroy all resources owned by object
+* unsigned long query_capability(struct frontend *)
+  Return all capabilities you support, as an | of flags.
+  Currently, the only capability supported is DCF_CAPB_BACKUP, which
+  means the front end is capable of backing up, so return either
+  0 of DCF_CAPB_BACKUP.
+* int add(struct frontend *, struct question *):
+  Add question. Default implementation adds the question to "questions"
+  attribute
+* int go(struct frontend *):
+  Ask all questions you need to, and notify the database object of the
+  answers.
+* int clear(struct frontend *):
+  Clear queue of pending questions. Default implementation clears the
+  "questions" queue.
+* int set_title(struct frontend *, char *title):
+  Set the title variable. "title" is owned by caller, so you should
+  copy it. The default implementation sets the title attribute.
+* cangoforward/cangoback -- XXX I don't understand what these do.
+
 Each of these methods have a signature defined in frontend.h. All methods
 have a sensible default implementation (usually doing nothing) so that 
 you only need to override the ones you need.
 
-/* TODO: describe each method */
-
 See modules/frontend/* for examples.
 
-$Id: modules.txt,v 1.4 2002/05/28 12:36:57 moshez Exp $
+$Id: modules.txt,v 1.5 2002/05/28 14:56:19 moshez Exp $
