@@ -73,7 +73,35 @@ do_mountpoint_manual () {
 }
 
 do_options () {
-    local old_options
+    local tpl seen_marker old_options
+    tpl=$1
+    seen_marker=$DEVICES/`basename $tpl`_seen
+    if [ ! -f "$seen_marker" ]; then
+	db_input high ${tpl}_help || true
+	db_go || exit
+	>"$seen_marker"
+    fi
+    db_fset $tpl seen false
+    if [ -f $part/mountoptions ]; then
+	old_options=$(cat $part/mountoptions)
+    else
+	old_options=''
+    fi
+    db_set $tpl "$old_options"
+    db_input critical $tpl || true
+    db_go || exit
+    db_get $tpl
+    echo "$RET" >$part/mountoptions
+}
+
+do_options () {
+    local seen_marker old_options
+    seen_marker=$DEVICES/options_seen
+    if [ ! -f "$seen_marker" ]; then
+	db_input high partman-basicfilesystems/options_help || true
+	db_go || exit
+	>"$seen_marker"
+    fi
     db_fset partman-ext3/options seen false
     if [ -f $part/mountoptions ]; then
 	old_options=$(cat $part/mountoptions)

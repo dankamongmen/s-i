@@ -82,10 +82,14 @@ do_mountpoint_manual () {
 }
 
 do_options () {
-    local tpl old_options
-#    db_input high ${tpl}_help || true
-#    db_go || exit
+    local tpl seen_marker old_options
     tpl=$1
+    seen_marker=$DEVICES/`basename $tpl`_seen
+    if [ ! -f "$seen_marker" ]; then
+	db_input high ${tpl}_help || true
+	db_go || exit
+	>"$seen_marker"
+    fi
     db_fset $tpl seen false
     if [ -f $part/mountoptions ]; then
 	old_options=$(cat $part/mountoptions)

@@ -49,7 +49,7 @@ install: build
 	strip --remove-section=.note --remove-section=.comment `pwd`/debian/${PACKAGE}/bin/parted_devices
 	rm -rf `find debian/$(PACKAGE) -name CVS`
 
-binary-indep: build install
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
@@ -59,7 +59,7 @@ binary-indep: build install
 	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
 	dh_builddeb --filename=$(FILENAME)
 
-binary-arch: build install
+binary-indep: build install
 
 binary: binary-indep binary-arch
 
