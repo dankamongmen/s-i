@@ -820,10 +820,11 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 	{
 	    continue;
 	}
-	autopartkit_log( 1, "Mounting %s on %s\n",
+	autopartkit_log( 1, "Mounting %s on %s as fs %s.\n",
 			 mountmap[i].devpath ? mountmap[i].devpath : "[null]",
 			 ( mountmap[i].mountpoint->mountpoint ?
-			   mountmap[i].mountpoint->mountpoint : "[null]" ) );
+			   mountmap[i].mountpoint->mountpoint : "[null]" ),
+			 mountmap[i].mountpoint->fstype);
 
 	devpath = normalize_devfs(mountmap[i].devpath);
 
