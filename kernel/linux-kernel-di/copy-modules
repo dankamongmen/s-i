@@ -6,7 +6,7 @@
 #
 # Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
 #
-# $Id: copy-modules,v 1.3 2003/10/21 15:46:40 joeyh Exp $
+# Usage: copy-modules flavour version
 
 set -e
 
@@ -32,6 +32,7 @@ deplist() {
 }
 
 flavour=$1
+version=$2
 version=$version-$flavour
 home=$PWD
 
@@ -40,26 +41,27 @@ tmpdir=$(tempfile)
 rm $tmpdir
 mkdir $tmpdir
 
-moddir=/lib/modules/$version
+# MODDIR may be set externally to change the module directory.
+if [ -n "$MODDIR" ]; then
+	moddir=$MODDIR
+else
+	moddir=/lib/modules/$version
+fi
 
 # get module dependencies from modules.dep
-# sort it by by field 2
-moddir_awk="\/lib\/modules\/$version\/kernel\/"
-awk '
-	{
-		gsub(/'"$moddir_awk"'/, "", $0)
-	}
-
-	$1 ~ /:$/ {
-		module = substr($1, 1, length($1) - 1)
-		if ($2) {
-			print module "\t" $2
+# sort it by field 2
+perl -lne '
+	@words=split(" ");
+	s!.*/kernel/!! foreach (@words);
+	if ($words[0] =~ /:$/) {
+		$words[0]=~s/:$//;
+		$module=$words[0];
+		if ($words[1]) {
+			print "$module\t$words[1]";
 		}
-		next
 	}
-
-	$1 {
-		print module "\t" $1
+	elsif ($words[0]) { # continuation
+		print "$module\t$words[0]";
 	}
 ' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
 unset moddir_awk

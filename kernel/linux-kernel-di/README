@@ -14,7 +14,7 @@ sure that all of a module's dependencies are included in its package, or in
 a package on which it depends. If necessary, extra modules will be added to
 a package to make sure the dependencies are satisfied.
 
-The dependency information in the modules is compared with the module-deps
+The dependency information from modules.dep is compared with the module-deps
 file, which lists interrelationships between packages, in a form used by
 tsort. As such, it must be kept sorted. The same dependency information is
 redundantly included in debian/control too, and these two need to be kept
@@ -23,3 +23,10 @@ in sync.
 The modules packages are named with the version of the kernel in their
 package name, since that can be useful during kernel transitions. The -di
 prefix is used to prevent any posible collisions in names with real debs.
+
+MODDIR can be set to a directory containing a tree of kernel modules, and
+it will be used instead of the usual tree /lib/modules/<kernel-version>.
+That directory will need to have a modules.dep file already generated for
+this to work though -- but the modules.dep can even be copied from another
+system and it'll work. This can be useful if you cannot install the
+required kernel-image package, or are cross-compiling.

@@ -6,7 +6,7 @@ export DH_OPTIONS=-n
 SHELL := sh -e
 
 khsed := s/^Package: kernel-image-\(.*\)-386.*/\1/
-export version := $(shell sed -n '$(khsed); t e; b; :e; p; q' debian/control)
+version := $(shell sed -n '$(khsed); t e; b; :e; p; q' debian/control)
 fullversion := $(shell \
 	dpkg-parsechangelog | sed -n 's/^Version: //p; t e; b; :e; q' \
 )
@@ -27,7 +27,7 @@ binary-arch:
 	dh_clean -k
 	dh_installdirs
 
-	./copy-modules 386
+	./copy-modules 386 $(version)
 	./find-dups
 
 	install -D -m 644 /boot/vmlinuz-$(version)-386 $(kdst)/boot/vmlinuz
