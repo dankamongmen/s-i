@@ -1,4 +1,4 @@
-SH = ash
+SH = dash
 
 all: debian/templates check-scripts
 
