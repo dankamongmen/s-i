@@ -9,6 +9,11 @@
 # INSTALL_MEDIA_DEV can be passed as a boot parameter to force only 
 # one device or set of devices to be scanned.
 
+# The identification of this floppy and the desired root floppy.
+SYSTEM=debian-installer
+LABEL="boot floppy"
+ROOT_LABEL="root floppy"
+
 debugshell () {
 	if [ "$BOOT_DEBUG" -gt 2 ]; then
 		echo "This is a debug shell ($1)."
@@ -50,17 +55,18 @@ fi
 
 debugshell "after hardware detection"
 
+echo
+echo
+echo
+echo
+echo
+
 LOADED=0
 while [ "$LOADED" = 0 ]; do
 	MOUNTED=0
 	while [ "$MOUNTED" = 0 ]; do
 		echo
-		echo
-		echo
-		echo
-		echo
-		echo
-		echo "Insert the second floppy or plug in a USB storage device."
+		echo "Insert the $ROOT_LABEL or plug in a USB storage device."
 		GOTLINE=0
 		while [ "$GOTLINE" = 0 ]; do
 			echo -n "Press Enter when ready, or type a command: "
@@ -90,33 +96,47 @@ while [ "$LOADED" = 0 ]; do
 			DEVS="`find $INSTALL_MEDIA_DEV`"
 		fi
 		
+		ERR=""
 		for dev in $DEVS; do
 			if [ "$MOUNTED" = 0 ] && [ -b $dev ]; then
 				# XXX as a mount point, /floppy is not
 				# quite right, as this may be USB storage,
 				# whatever.
 				if mount $dev -o ro -tvfat floppy 2>/dev/null; then
-					if [ -e floppy/initrd.gz -a ! -e floppy/linux ]; then
-						MOUNTED=1
-
-						# Export a variable
-						# pointing to the device.
-						# This is used by eg, the
-						# floppy retreiver.
-						INSTALL_MEDIA_DEV=$dev
-						export INSTALL_MEDIA_DEV
+					if [ -e floppy/disk.lbl ] && grep -q "^System: " floppy/disk.lbl; then
+						if ! grep -q "^System: $SYSTEM$" floppy/disk.lbl; then
+							ERR="$ERR; $dev: not a $SYSTEM floppy"
+						elif grep -q "^Label: $LABEL$" floppy/disk.lbl; then
+							ERR="$ERR; $dev: still the $LABEL"
+						else
+							cat floppy/disk.lbl
+							MOUNTED=1
+						fi
 					else
+						echo "The disk has no label, continuing anyway."
+						MOUNTED=1
+					fi
+					if [ "$MOUNTED" = 0 ]; then
 						umount floppy || echo "umount failed!"
 					fi
 				else
-					echo -n ""
+					ERR="$ERR; $dev: cannot mount"
 				fi
 			fi
 		done
+
+		if [ "$MOUNTED" = 0 ]; then
+			if [ -n "$ERR" ]; then
+				# ERR begins with a semicolon
+				echo "Cannot find $ROOT_LABEL$ERR"
+			else
+				echo "No devices found!"
+			fi
+		fi
 	done
 
 	mount -t shm shm mnt
-	echo -n "Loading the Debian installer.."
+	echo -n "Loading.."
 	# pipe_progress adds dots to the above line while there is
 	# activity. But we must be sure to catch errors from the zcat.
 	# Hard to do in a pipeline..
