@@ -13,8 +13,8 @@ buildpackage () {
 	dpkg-buildpackage -rfakeroot -tc -ICVS -I.svn $@
 }
 
-# Native build first.
-buildpackage
+# Build source package. Binaries are built below.
+buildpackage -S
 
 # Directory for stubs, added to PATH.
 trap 'rm -rf $tmpdir' EXIT 
@@ -36,8 +36,25 @@ for arch in $(cut -d ' ' -f 1 kernel-versions | grep -v ^# | uniq); do
 		# Not only must it be in the path, but CC needs to be
 		# exported as well.
 		export CC
-		
-		export SOURCEDIR=`pwd`/../$arch
-		buildpackage -b -a$arch
+	else
+		# native build
+		unset CC
 	fi
+	
+	for flavour in $(grep "^$arch" kernel-versions | awk '{print $3}'); do
+		if [ -d ../$arch-$flavour ]; then
+			export SOURCEDIR=`pwd`/../$arch-$flavour
+		elif [ -d ../$arch ]; then
+			export SOURCEDIR=`pwd`/../$arch
+		else
+			echo "** Warning: no SOURCEDIR for arch $arch, flavour $flavour" >&2
+		fi
+
+		if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ]; then
+			buildpackage -b -a$arch
+		else
+			# native build
+			buildpackage
+		fi	
+	done
 done
