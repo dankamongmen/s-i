@@ -10,16 +10,19 @@
 #include "config.h"
 #include <assert.h>
 #include <debian-installer.h>
+#include <sys/utsname.h>
 #include "xmalloc.h"
 #include "kbd-chooser.h"
-
 
 /**
  * @brief list of keyboards present
  */
 kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
 {
-    	kbd_t *k = NULL;
+	kbd_t *k = NULL;
+	struct utsname buf;
+
+	uname(&buf);
 
 #if defined(__m68k__)
 	// on m68k only sun3(x) have PC-style keyboards
@@ -29,7 +32,11 @@ kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
     
 	k = xmalloc (sizeof(kbd_t));
 
-	k->name = "sun"; // This must match the name "sun" in console-keymaps-sun
+	/* 2.6 enumerates AT keymap */
+	if (strncmp(buf.version, "2.6", 3) == 0)
+		k->name = "at";
+	else
+		k->name = "sun"; // This must match the name "sun" in console-keymaps-sun
 	k->deflt = NULL;
 	k->data = NULL;
 	k->present = UNKNOWN;
