@@ -167,7 +167,6 @@ install_modules(void)
     debconf->command(debconf, "GET", ANNA_CHOOSE_MODULES, NULL);
     if (debconf->value != NULL) {
         char *choices = debconf->value;
-        struct list_node *prev = NULL, *next;
 
         for (i = 0; i < ask_count; i++) {
             p = askpkgs[i];
