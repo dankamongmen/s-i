@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.36 2003/03/14 13:00:33 mckinstry Exp $
+ * $Id: text.c,v 1.37 2003/03/14 21:31:42 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -181,7 +181,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 			(defval == NULL ? "" : (def == 0 ? _(", default=no") : _(", default=yes"))));
 
 		fgets(buf, sizeof(buf), stdin);
-		if (strcmp (buf,_("cancel\n")) == 0) || (strcmp(buf,_("CANCEL")) ==0))
+		if ((strcmp (buf,_("cancel\n")) == 0) || (strcmp(buf,_("CANCEL")) == 0))
 			return DC_GOBACK;
 		if ((strcmp(buf, _("yes\n")) == 0) || (strcmp(buf, _("YES\n")) == 0))
 			ans = 1;
@@ -296,7 +296,7 @@ static int texthandler_note(struct frontend *obj, struct question *q)
 		printf(_("[Press enter to continue]\n"));
 	do { 
 		c = fgetc(stdin); 
-		if (obj->methods.can_go_back (obj, q)) &&  ((c == 'c' ) || (c == 'C'))
+		if ((obj->methods.can_go_back (obj, q)) &&  ((c == 'c' ) || (c == 'C')))
 			return DC_GOBACK;
 	} while (c != '\r' && c != '\n');
 	return DC_OK;
