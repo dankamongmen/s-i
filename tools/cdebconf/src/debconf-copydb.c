@@ -3,12 +3,12 @@
  * cdebconf - An implementation of the Debian Configuration Management
  *            System
  *
- * File: convertdb.c
+ * File: debconf-copydb.c
  *
  * Description: Allows the user to load template/question infrom from
  *              one database to another
  *
- * $Id: debconf-copydb.c,v 1.1 2002/07/01 06:58:37 tausq Exp $
+ * $Id: debconf-copydb.c,v 1.2 2002/08/26 12:11:37 pere Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
