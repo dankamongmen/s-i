@@ -103,9 +103,10 @@ echo "set terminal png" >> $GNUPLOT_SCRIPT
 echo "set output \"$DEST_DIR/graph.png\"" >> $GNUPLOT_SCRIPT
 echo "set title \"Statistics for the $i languages with an Aspell dictionary\"" >> $GNUPLOT_SCRIPT
 echo "set key left" >> $GNUPLOT_SCRIPT
-echo "set xlabel \"Languages\"" >> $GNUPLOT_SCRIPT
+echo "set xlabel \"Languages\" 0,-1" >> $GNUPLOT_SCRIPT
 echo "set ylabel \"Unknown words\"" >> $GNUPLOT_SCRIPT
-echo "set xtics $XTICS" >> $GNUPLOT_SCRIPT
+echo "set origin 0,0.01" >> $GNUPLOT_SCRIPT
+echo "set xtics rotate $XTICS" >> $GNUPLOT_SCRIPT
 echo "set xrange [-1:$i]" >> $GNUPLOT_SCRIPT
 echo "plot \"$GNUPLOT_DATA\" with impulses,$AVERAGE t \"Average: $AVERAGE words\"" >> $GNUPLOT_SCRIPT
 
