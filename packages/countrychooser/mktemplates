@@ -25,7 +25,7 @@ INDENT='\\  '
 CHOICES=$(./countrylist $ISO3166TAB ./regionmap "$INDENTMARKER" | \
          sed 's/,/\\\\\\\\,/g' | \
          (read a; echo -n "$a"; while read b; do echo -n ", $b"; done; echo))
-	 
+
 # Now put this list as the choices in the templates
 # and defined this field as translatable (__Choices hack)
 cat debian/templates-in | \
@@ -52,7 +52,6 @@ EOF
 # -->this will create pobuild/templates.pot
 debconf-updatepo --podir debian/pobuild
 
-# The following takes place for each language
 # (each existing file in debian/po
 for pofile in debian/po/*.po ; do
     pofilename=`basename $pofile`

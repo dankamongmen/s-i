@@ -8,6 +8,7 @@ db_capb backup
 INDENT="  "
 
 localecode="debian-installer/locale"
+fallbacklocalecode="debian-installer/fallbacklocale"
 languagechooserlocalecode="languagechooser/locale"
 languagecode="debian-installer/language"
 countrycode="debian-installer/country"
@@ -215,14 +216,15 @@ fi
 db_set "$countrycode"  "$COUNTRYCODE"
 log "$countrycode = '$COUNTRYCODE'"
 
-# If language_COUNTRY==supported locale, set the locale
-# Do this *only* if languagechooser's locale didn't have any country code
+# If the country forms a supported locale, set the locale.
 if grep -q "^${LANGUAGE}_${COUNTRYCODE}$" $SUPPORTEDLOCALES; then
-	if ! (echo $DEFAULTLOCALE | grep "_" >/dev/null 2>&1) ; then	
-	    LOCALE=${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER}
-	    db_set "$localecode" "${LOCALE}"
-	    log "$localecode = '${LOCALE}'"
-	fi
+	LOCALE=${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER}
+	db_set "$localecode" "${LOCALE}"
+	log "$localecode = '${LOCALE}'"
+else
+	# We fall back to a supported locale
+	db_set "$localecode" "${FALLBACKLOCALE}"
+	log "$localecode = '${FALLBACKLOCALE}'"
 fi
 
 # The code below tries to add lang_COUNTRY at the beginning of the language

@@ -15,8 +15,11 @@ for file in debian/po/*.po en.po; do
   lang=$(echo "$lang_variant" | sed -e 's/_.*$//')
   tabfile=debian/short-tmp/$lang_variant.tab
   # create TAB file for this language
-  msgconv debian/iso-codes/$lang_variant.po -t UTF-8 --stringtable-output | tail -n +3 | \
-     sed -e 's/" = "/	/' -e 's/^"//' -e 's/";$//' | awk '/^.+$/{print}'> $tabfile
+  # Only if iso-codes have some translations
+  if [ -f debian/iso-codes/$lang_variant.po ] ; then
+    msgconv debian/iso-codes/$lang_variant.po -t UTF-8 --stringtable-output | tail -n +3 | \
+      sed -e 's/" = "/	/' -e 's/^"//' -e 's/";$//' | awk '/^.+$/{print}'> $tabfile
+  fi
   outfile=debian/short-tmp/$lang_variant.short
   lastlocale=C
   :> $outfile
