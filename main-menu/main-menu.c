@@ -85,22 +85,24 @@ void order_done(struct package_t *head) {
 
 /* Returns true if the given package could be the default menu item. */
 int isdefault(struct package_t *p) {
-	char *menutest;
+	char *menutest, *cmd;
 	struct stat statbuf;
 	int ret;
 
-	asprintf(&menutest, DPKGDIR "info/%s.menutest >/dev/null", p->package);
+	asprintf(&menutest, DPKGDIR "info/%s.menutest", p->package);
 	if (stat(menutest, &statbuf) == 0) {
-		ret = SYSTEM(menutest);
-		free(menutest);
-		return !ret;
+		asprintf(&cmd, "%s >/dev/null 2>&1", menutest);
+		ret = !SYSTEM(menutest);
+		free(cmd);
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
-		free(menutest);
-		return 1;
+		ret = 1;
+	}
+	else {
+		ret = 0;
 	}
 	free(menutest);
-	return 0;
+	return ret;
 }
 
 /* Displays the main menu via debconf and returns the selected menu item. */
