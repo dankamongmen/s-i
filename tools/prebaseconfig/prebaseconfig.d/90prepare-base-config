@@ -36,17 +36,6 @@ if db_get mirror/distribution && [ "$RET" ] ; then
 #
 #	SUITE=`wget -O - ${PROTOCOL}://${MIRROR}${DIRECTORY}/dists/$SUITE/Release | sed -n 's/^Suite: *//p'`
 #    fi
-
-    # Map from woody/sarge/sid to stable/testing/unstable, fixing bug
-    # #177459.  A better way to do this is to move the above code into
-    # cdrom-detect and perhaps choose-mirror, storing both 'woody' and
-    # 'stable' into two different debconf answers.  We need both, as
-    # debootstrap needs 'woody', while base-config needs 'stable'.
-    case "$SUITE" in 
-	woody) SUITE=stable ;;
-	sarge) SUITE=testing ;;
-	sid)   SUITE=unstable ;;
-    esac
 fi
 
 # Look in /proc/cmdline for console=ttyS*, indicating a serial console
