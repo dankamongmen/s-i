@@ -40,7 +40,7 @@ struct package_t *status_read(void) {
 			newp->next = p;
 			p = newp;
 		}
-		else if (strstr(buf, "Installer-Menu-Item: ") == buf) {
+		else if (strstr(buf, "installer-menu-item: ") == buf) {
 			p->installer_menu_item = atoi(buf + 21);
 		}
 		else if (strstr(buf, "Status: ") == buf) {
