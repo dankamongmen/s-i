@@ -19,3 +19,4 @@ demo: languagechooser.templates languagechooser
 	DEBIAN_FRONTEND=dialog DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./languagechooser
 
 clean:
+	$(RM) languagechooser.templates debian/templates
