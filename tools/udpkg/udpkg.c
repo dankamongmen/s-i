@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.19 2000/11/29 21:25:54 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.20 2000/12/07 23:03:33 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -34,32 +34,6 @@ static int is_file(const char *fn)
 	return S_ISREG(statbuf.st_mode);
 }
 
-#if 0
-static int dpkg_doinstall(struct package_t *pkg)
-{
-	char buf[1024];
-	int r = 0;
-	char *cwd = 0;
-
-	cwd = getcwd(0, 0);
-	/* chdir("/"); */
-	chdir("tmp"); /* testing! */
-	snprintf(buf, sizeof(buf), "ar p %s data.tar.gz|zcat|tar -xf -", pkg->file);
-	if ((r = SYSTEM(buf)) != 0) goto cleanup;
-	
-	chdir(cwd);
-	if (is_file(DPKGCIDIR "postinst"))
-	{
-		snprintf(buf, sizeof(buf), DPKGCIDIR "postinst configure %s", pkg->version);
-	}
-
-cleanup:
-	chdir(cwd);
-	free(cwd);
-	return r;
-}
-#endif
-
 static int dpkg_copyfile(const char *src, const char *dest)
 {
 	/* copy a (regular) file if it exists, preserving the mode, mtime 
@@ -93,15 +67,18 @@ static int dpkg_copyfile(const char *src, const char *dest)
 static int dpkg_doconfigure(struct package_t *pkg)
 {
 	int r;
+	char postinst[1024];
 	char buf[1024];
 	DPRINTF("Configuring %s\n", pkg->package);
 	pkg->status &= STATUS_STATUSMASK;
-	if (is_file(DPKGCIDIR "postinst"))
+	snprintf(postinst, sizeof(postinst), "%s%s.postinst", INFODIR, pkg->package);
+	if (is_file(postinst))
 	{
-		snprintf(buf, sizeof(buf), DPKGCIDIR "postinst configure %s", pkg->version);
+
+		snprintf(buf, sizeof(buf), "%s configure", postinst);
 		if ((r = do_system(buf)) != 0)
 		{
-			fprintf(stderr, "postinstallation script exited with status %d\n", r);
+			fprintf(stderr, "postinst exited with status %d\n", r);
 			pkg->status |= STATUS_STATUSPOSTINSTFAILED;
 			return 1;
 		}
