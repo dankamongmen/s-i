@@ -23,9 +23,9 @@ extern const int syms_size;
 extern const int syn_size;
 
 extern int set_charset(const char *name);
-extern int ksymtocode(const char *s);
+extern int ksymtocode(const char *s, int fd);
 extern const char *codetoksym(int code);
-extern int add_number(int code);
+extern int add_number(int code, int fd);
 extern int add_capslock(int code);
 
 #endif

@@ -85,6 +85,7 @@ int private_error_ct = 0;
 
 extern int rvalct;
 extern struct kbsentry kbs_buf;
+extern int file_descriptor;	/* File descriptor of current console.  */
 
 
 #include "ksyms.h"
@@ -235,11 +236,11 @@ rvalue1		: rvalue
 			}
 		;
 rvalue		: NUMBER
-			{$$=add_number($1);}
+			{$$=add_number($1,file_descriptor);}
 		| LITERAL
-			{$$=add_number($1);}
+			{$$=add_number($1,file_descriptor);}
 		| UNUMBER
-			{$$=add_number($1);}
+			{$$=add_number($1,file_descriptor);}
                 | PLUS NUMBER
                         {$$=add_capslock($2);}
 		| PLUS UNUMBER
@@ -254,11 +255,18 @@ rvalue		: NUMBER
 char *keymap_name;
 int nocompose = 0;
 
+/* File descriptor referring to the current console.  */
+int file_descriptor = -1;
+
+void get_file_descriptor (void)
+{
+	file_descriptor = getfd ();
+}
 
 void loadkeys_wrapper (char *map)
 {
-	int fd;
-	fd = getfd();
+	/* File descriptor will be used repeatedly for symbol conversions.  */
+	get_file_descriptor ();
 
 	keymap_name = map;
 	yywrap ();
@@ -267,7 +275,7 @@ void loadkeys_wrapper (char *map)
 		exit (1);
 	}
 	do_constant();
-	loadkeys (fd);
+	loadkeys (file_descriptor);
 	exit (0);
 }
 

@@ -73,10 +73,14 @@ endif
 TEMPLATES := debian/templates-in $(patsubst %, debian/keyboard-%.templates, $(KEYBOARDS))
 OBJS += $(patsubst %, %-kbd.o, $(KEYBOARDS))
 
-all: kbd-chooser debian/kbd-chooser.templates
+all: kbd-chooser kbd-mode debian/kbd-chooser.templates
 
 kbd-chooser: ${OBJS} kbd-chooser.c
 	$(CC) $(CFLAGS) kbd-chooser.c -o $@ $(OBJS) $(LDOPTS)
+	$(STRIP) $@
+
+kbd-mode: getfd.o kbd-mode.c
+	$(CC) $(CFLAGS) kbd-mode.c -o $@ getfd.o $(LDOPTS)
 	$(STRIP) $@
 
 debian/kbd-chooser.templates:  $(TEMPLATES)
@@ -87,12 +91,13 @@ loadkeys.o:     loadkeys.c analyze.c
 	$(CC) -c $(CFLAGS) $(DEFS) $<
 
 clean:
-	rm -f *~ *.o kbd-chooser analyze.c loadkeys.c demo demo.templates *#
+	rm -f *~ *.o kbd-mode kbd-chooser analyze.c loadkeys.c demo demo.templates *#
 	rm -f debian/kbd-chooser.templates
 
 install:
 	mkdir -p $(DESTDIR)/usr/bin
 	cp kbd-chooser $(DESTDIR)/usr/bin/kbd-chooser
+	cp kbd-mode $(DESTDIR)/usr/bin/kbd-mode
 
 .PHONY: demo
 demo.templates: debian/kbd-chooser.templates

@@ -1,7 +1,13 @@
 #!/bin/sh
 kbdchooser=/usr/bin/kbd-chooser
+kbdmode=/usr/bin/kbd-mode
 
 set -e
+
+# Set console mode to unicode
+if [ -x "$kbdmode" ] ; then
+	$kbdmode -u || true
+fi
 
 # Set the kbd early, if necessary
 if [ -x "$kbdchooser" -a "$bootkbd" ] ; then
