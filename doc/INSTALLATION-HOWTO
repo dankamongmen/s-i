@@ -8,7 +8,7 @@ Debian release, codename: sarge.
 For the most current version of this document or more information on
 the debian-installer project: http://www.debian.org/devel/debian-installer
 
-Last change to this document: December 22nd, 2003
+Last change to this document: February 7th, 2004
 
 
 1. Preliminaries
@@ -67,7 +67,7 @@ Download whichever type you prefer and burn it to a CD.
 If you have a SCSI CD drive and a relatively uncommon SCSI controller (not
 an aic7xxx, BusLogic, or sym53c8xx), then you may also need one driver
 floppy to let the installer see your CD drive. See section 2.2 for
-information about floppys, and download the cd_drivers floppy image and
+information about floppys, and download the cd-drivers floppy image and
 write it to disk. You will be given an opportunity to load drivers from the
 floppy if the installer fails to see your SCSI CD drive, and after
 loading the floppy, the installer will see your CD ROM.
@@ -75,14 +75,14 @@ loading the floppy, the installer will see your CD ROM.
 2.2 The dreaded floppies
 
 If you can't boot from CD, you can download floppy images to install
-Debian. You need the bootfloppy-image.img, the floppy-image.img and
-possibly one of the driver disks.
+Debian. You need the floppy/boot.img, the floppy/root.img and possibly
+one of the driver disks.
 
-- net_drivers
+- floppy/net-drivers.img
   To do an install over the network with a few common ethernet cards,
   you do not need this driver floppy. If you have a less common ethernet
   card, or pcmcia, you will need it.
-- cd_drivers
+- floppy/cd-drivers.img
   If you have a cdrom, but cannot boot from it, you can boot from floppies,
   and use this driver disk to complete the install using the cdrom.
 
@@ -94,9 +94,9 @@ floppy disk with the image. If it fails throw that floppy away and try
 again. Since you'll have more than one floppy, it's a good idea to label
 them.
 
-The boot floppy is the one with bootfloppy-image on it. This floppy, when
+The boot floppy is the one with boot.img on it. This floppy, when
 booted, will prompt you to insert a second floppy -- use the one with
-floppy-image on it. 
+root.img on it. 
 
 2.3 USB memory stick
 
@@ -105,7 +105,7 @@ example a USB keychain can make a handy Debian install media the you
 can take with you anywhere.
 
 The easiest way to prepare your USB memory stick is to download
-hd-media-image.img.gz, and use gunzip to extract the 128 MB image from that
+hd-media/boot.img.gz, and use gunzip to extract the 128 MB image from that
 file. Write this image directly to your memory stick, which must be at
 least 128 mb in size. Of course this will destroy anything already on the
 memory stick. Then mount the memory stick, which will now have a FAT
@@ -132,10 +132,10 @@ and some helpful hints about booting.
 
 The debian-installer can be booted off a single floppy, which will be able
 to access your USB memory stick. To boot the installer this way, you will
-need to put the bootfloppy-image.img on a floppy (see section 2.2).
+need to put the floppy/boot.img on a floppy (see section 2.2).
 
-Now boot from the floppy with the bootfloppy-image on it. It should detect
-your USB device and proceed with booting from it.
+Now boot from the floppy. It should detect your USB device and proceed
+with booting from it.
 
 2.4 Booting from Network
 
@@ -145,11 +145,9 @@ They are not explaind here. For an explanation of how to do PXE netbooting
 (on i386), see this web page:
 http://wiki.debian.net/index.cgi?DebianInstallerNetbootPXE
 
-The "netboot-initrd.gz" is needed to netboot debian-installer. It contains 
-only essential d-i modules to get the network up and running, everything 
-else (d-i components and base packages) will be retrieved from network.
-If you don't have a netboot setup, you can also make a bootable CD with 
-this image and have a minimal netinst CD.
+The files in netboot/ can be used to netboot debian-installer.
+If you don't have a netboot setup, you can also make a bootable CD
+and have a minimal netinst CD.
 
 
 3. Installation
