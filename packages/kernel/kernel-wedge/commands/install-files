@@ -39,15 +39,15 @@ while (<KVERS>) {
 		$extraname="$suffix";
 	}
 	
-	if (-e "$sourcedir/boot/vmlinuz-$installedname") {
-		doit("install", "-D", "-m", 644,
-			"$sourcedir/boot/vmlinuz-$installedname",
-			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinuz$extraname");
-	}
-	else {
+	if (-e "$sourcedir/boot/vmlinux-$installedname") {
 		doit("install", "-D", "-m", 644,
 			"$sourcedir/boot/vmlinux-$installedname",
 			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinux$extraname");
+	}
+	else {
+		doit("install", "-D", "-m", 644,
+			"$sourcedir/boot/vmlinuz-$installedname",
+			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinuz$extraname");
 	}
 	doit("install", "-D", "-m", 644,
 		"$sourcedir/boot/System.map-$installedname",
