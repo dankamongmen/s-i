@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.4 2000/11/01 22:26:22 joeyh Exp $ */
+/* $Id: status.c,v 1.5 2000/11/01 22:31:42 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -207,15 +207,14 @@ int status_merge(void *status, struct package_t *pkgs)
 
 		if (strstr(buf, "Status: ") == buf && statpkg != 0)
 		{
-			  snprintf(buf, sizeof(buf), "Status: %s\n",
+			  snprintf(buf, sizeof(buf), "Status: %s",
 				 status_print(statpkg->status));
 		}
 		// TODO: handle Description and translated description here.
 		// TODO: handle Depends and Pre-Depends and Provides here.
-		else {
-			fputs(buf, fout);
-			fputc('\n', fout);
-		}
+
+		fputs(buf, fout);
+		fputc('\n', fout);
 	}
 
 	// Print out packages we processed.
