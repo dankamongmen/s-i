@@ -1,15 +1,19 @@
 #!/bin/sh
-# get the ide controller driver to the head of the line
+# Get the ide controller driver to the head of the line
 # in /etc/modules on ia64 class machines.
-# we have to put it here because 50prebaseconfig (
-# from debian-installer-utils) adds modules in file name
-# sort order and the 2.4.x ide is not module load order
-# friendly. 2.6 is however.
+# We have to put it here because 50register-module
+# (from debian-installer-utils) adds ide-detect and ide-generic
+# and if they are loaded first the ide controller driver will not
+# be used (with the 2.4 kernel; it will with 2.6).
 #
 # NOTE: this is a workaround for many things.  This
 # should be deprecated once 2.6 becomes the oldest supported
 # kernel or the structure of /etc/rcS.d is restructured to load
 # hardware drivers before modutils is run (might not be possible).
+#
+# Another possibility is moving the code from here that detects the
+# ide controller driver to hw-detect, and using register-module with that
+# driver before the other ide modules.
 
 # Only for ia64 (at this point)
 if [ `uname -m` != ia64 ] ; then
