@@ -1,0 +1,47 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+PACKAGE=usb-discover
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=$(shell dpkg --print-architecture)
+PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
+FILENAME=$(PACKAGE)_$(VERSION)_any.udeb
+
+# This is the debhelper compatability version to use.
+export DH_COMPAT=2
+
+build: 
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf *-stamp
+	rm -f debian/files~
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+
+binary-arch:
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	mkdir -p debian/$(PACKAGE)/usr/lib/usb-discover
+	mkdir -p debian/$(PACKAGE)/lib/debian-installer.d
+	install -m0755  S45usb-linux debian/$(PACKAGE)/lib/debian-installer.d
+	install -m0644 ohci-pci.lst debian/$(PACKAGE)/usr/lib/usb-discover
+	install -m0644 uhci-pci.lst debian/$(PACKAGE)/usr/lib/usb-discover
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol -- -n$(FILENAME)
+	dh_builddeb --filename=$(FILENAME)
+
+binary: build install binary-indep
