@@ -19,4 +19,4 @@ fetest: ../strutl.o ../configuration.o ../priority.o ../template.o ../question.o
 #	$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
-	-rm -f $(BIN) $(OBJS) *~
+	-rm -f $(BIN) $(OBJS) *.dat *~
