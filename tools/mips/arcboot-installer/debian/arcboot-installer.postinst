@@ -1,6 +1,19 @@
 #!/bin/sh
 set -e
 
+if apt-install arcboot ; then
+	:
+else
+	log "Calling 'apt-install arcboot' failed"
+	# What to do now?
+	db_input critical arcboot-installer/apt-install-failed || [$? -eq 30]
+	db_go
+	db_get
+	if [ true != "$RET" ] ; then
+		exit 1
+	fi
+fi
+
 if [ -f /etc/mtab ]; then
     MTAB=/etc/mtab
 else
