@@ -72,7 +72,7 @@ This package should behave as follows:
       This value may be pre-feeded with an ISO-3166 name for a country
       This should be done when only one country has a valid locale
       for the given language. For other languages, with several
-      possible countries ("possible" here ountry or reis "supported by locales"),
+      possible countries ("possible" here is "supported by locales"),
       the country must NOT be set by languagechooser
      -debian-installer/locale
       This should be a single entry such as fr_CA
@@ -96,7 +96,42 @@ The language code is passed into cdebconf.  The locale, country code
 and priority list of languages are passed to base-config/termwrap 
 via the cdebconf database.
 
-THe countrychooser package will later
+The countrychooser package will later refine the choice for the country
+part of the locale.
+
+Countrychooser mechanism is the following:
+
+1) If a country code was set by languagechooser
+   ("mono country" languages....that is, languages for which only one
+     country gives a valid locale)
+
+-always keep the valid locale inherited from languagechooser for
+ debian-installer/locale
+
+-present user, at medium priority only, with a screen listing all
+ world countries
+ This value will see the debian-installer/country value with the ISO-3166
+ code of the country. This value will onyl be used as a default for
+ location related choices such as the timezone or the mirror
+
+2) If NO country code was set by langaugechooser
+   (language with at least two countries with a valid locale
+    for this language)
+
+-always prompt the user (high priority) with a *short* list of all
+ countries for which a valid locale exists for this language
+ THIS LIST IS BUILT AT BUILD TIME for countrychooser, not on the fly
+ at install time. It is build only for languages which have a debconf
+ translation for countrychooser
+
+ This short list includes an "other" choice.
+
+2a) If the user picks up one of the countries in the short list
+    the debian-installer/locale value is CHANGED to language_COUNTRY
+
+2b) If the user picks up the "other" choice
+    the debian-installer/locale is set to the "fallback-locale" value
+    debian-installer/fallbacklocale
 
 If LANG (locale) and/or LANGUAGE (priority list of language codes) was
 passed as arguments to the kernel from the boot prompt, these values
@@ -124,14 +159,103 @@ Information passed into other modules
 
   choose-mirror
 
-   - The country set here or in countrychooser is used as a default choice
+   - The country set in countrychooser is used as a default choice
 
   base-config
 
    - Locale and list of language codes to use when choosing
      translations.
    - Timezone restricted list of choices based on the selected country
-     (here or in countrychooser)
+
+Interaction with the lowmem package
+-----------------------------------
+
+The lowmem package is triggered when the available memory prevents
+from using translations, because they eat lot of space on the ramdisk.
+
+For this to achieve, lowmem must preseed the following variables:
+
+languagechooser/language-name : the value of the "English" entry
+Then it must:
+db_fset languagechooser/language-name seen true
+
+debian-installer/locale : "en_US"
+
+countrychooser/country : "US"
+Then it must:
+db_fset countrychooser/country-name seen true
+db_fset countrychooser/country-name-shortlist seen true
+
+
+With these, the installation will continue with English and USA as
+values for language and country and the user will not be prompted for
+language and country.
+
+Technical details
+-----------------
+
+Languagechooser
+---------------
+
+The core of the package are the languagelist/languagelist.l10n files.
+For a language to appear in the languagechooser screen it must have entries in both these files.
+
+  languagelist
+  ------------
+The format if the following:
+
+Language;locale;fallbacklocale;langcode;countrycode;langlist;console-data
+ where:
+
+   -Language        =language name, in English
+                     It is recommended to refer to ISO-639
+   -locale          =default locale
+                     xx for languages with multiple countries
+                     i.e. languages for which a valid locale may exist
+                     with several different countries-->type 1 (see below)
+                     xx_YY when only one country code leads to a supported
+                     locale-->type 2 (see below)
+                     
+		     IMPORTANT: using xx alone here is the way to choose
+                     whether the countrychooser *short* list will be
+                     shown to users
+                     If xx_YY is found, users will NOT be prompted for
+                     a country at default priority
+               
+                     You should first check in /usr/share/i18n/SUPPORTED
+                     whether one or more countries are supported for this
+		     language when building this entry
+
+                     Language translators are requested to closely follow
+                     the evolution of locales if their language only uses
+                     one country.
+
+   -fallbacklocale  =fallback locale (MUST be valid)
+                     This locale will be used in case the user goes to
+                     the "other" choice in countrychooser and chooses a
+                     country with "unsupported" locale
+
+		     It is recommended to use here the country where
+                     the language is most widely spoken
+
+   -langcode        =iso-639 TWO characters language code
+                     
+                     DO NOT GUESS IT. Please check in the iso-codes
+                     and locales packages
+
+   -countrycode     =default value for country choice in countrychoose
+                     MUST be a valid ISO-3166 alpha-2 code
+
+                     DO NOT GUESS IT. Please check in the iso-codes
+                     package
+
+   -langlist        =colon-separated list of possible fallback languages
+                     this will be used in the LANGUAGE variable
+                     this DOES NOT be empty
+
+   -console-data    =special options for the console-data package
+                     (mostly keyboard or temrinal settings)
+
 
 
 
