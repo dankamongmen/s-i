@@ -63,13 +63,19 @@ these from the web if you are using the business card image.
 
 Download whichever type you prefer, burn it to a CD, and boot it.
 
-2.2 Floppy and other images
+2.2 The dreaded floppies
 
 If you can't boot from CD, you can download floppy images to install
-Debian. You need the bootfloppy-image.ing, the floppy-image.img and one of
-the drivers disks net_drivers-image.img or cd_drivers-image.img. The
-drivers disks contain the necessary modules to do the actual installation
-from CD or over the network.
+Debian. You need the bootfloppy-image.ing, the floppy-image.img and
+possibly one of the driver disks.
+
+- net_drivers
+  To do an install over the network with a few common ethernet cards,
+  you do not need this driver floppy. If you have a less common ethernet
+  card, or pcmcia, you will need it.
+- cd_drivers
+  If you have a cdrom, but cannot boot from it, you can boot from floppies,
+  and use this driver disk to complete the install using the cdrom.
 
 Floppy disks are one of the least reliable media around, so be prepared for
 lots of bad disks. Each .img file you downloaded goes on a single floppy;
@@ -81,11 +87,45 @@ them.
 
 The boot floppy is the one with bootfloppy-image on it. This floppy, when
 booted, will prompt you to insert a second floppy -- use the one with
-floppy-image on it. The driver floppies can be loaded in any order, and
-then you'll have a debian-installer system not unlike what you get if you
-boot from a CD.
+floppy-image on it. 
 
 Note that the rest of this document only covers installation from CD!
+
+2.3 USB memory stick
+
+It's also possible to install from removable USB storage devices. For
+example a USB keychain can make a handy Debian install medium you can take
+with you anywhere. Your USB memory stick must have a DOS partition on it
+for this method to work. Most come with such a partition by default.
+
+To prepare your USB memory stick, download hd-media-initrd.gz and
+save it to a file named "initrd.gz" on the USB device. Make sure that the
+compressed image is not transparently decompressed by your browser.
+
+You must also include a Debian netinst CD image on your memory stick. See
+section 2.1 for details. Place the downloaded ISO on your memory stick; 
+any filename is ok as long as it ends in ".iso".
+
+Some BIOSes can boot USB storage directly, and some cannot.
+
+2.3.1 Booting directly from USB storage
+
+The author of this section has not yet succeeded in booting directly from
+USB storage, as all his hardware has too old a BIOS, but in theory you just
+need to put a kernel on the USB device, and set up a boot loader. The
+kernel can be gotten from the same place you'd get floppy images (see
+section 2.2), and is named vmlinuz. If you succeed, please post details to
+debian-boot@lists.debian.org so this section can be fixed.
+
+2.3.2 Using USB storage and a boot floppy
+
+The debian-installer can be booted off a single floppy, which will be able
+to access your USB memory stick. To boot the installer this way, you will
+need to put the bootfloppy-image.img on a floppy (see section 2.2).
+
+Now boot from the floppy with the bootfloppy-image on it. It should detect
+your USB device and mount the initrd.gz, which will in turn find the ISO.
+After that things will proceed the same as if you had booted from CD.
 
 
 3. Installation
