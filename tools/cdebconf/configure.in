@@ -33,7 +33,9 @@ AC_SUBST(BUILDDIR)
 
 if [[ "$TOPDIR" != "$BUILDDIR" ]]; then
 	echo "Symlinking source tree..."
-	for f in $(find "$TOPDIR" -path "$BUILDDIR" -prune -o -path "*CVS*" -prune -o -type f); do
+	for f in $(find "$TOPDIR" -path "$BUILDDIR" -prune -o -path "*CVS*" -prune \
+			-o -type f -print);
+	do
 		destdir=$(dirname $(echo $f | sed -e "s,$TOPDIR,$BUILDDIR,"))
 		[[ -d $destdir ]] || mkdir -p $destdir
 		[[ -e $destdir/$(basename $f) ]] || ln -s $f $destdir
