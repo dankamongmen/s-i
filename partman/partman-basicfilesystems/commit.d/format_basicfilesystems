@@ -30,30 +30,42 @@ for dev in $DEVICES/*; do
 		db_subst partman-basicfilesystems/progress_formatting DEVICE $(humandev $(cat device))
 		case $filesystem in
 		    ext2)
-			db_progress START 0 3 partman/text/please_wait
-			db_progress INFO partman-basicfilesystems/progress_formatting
-			db_progress SET 1
-			if
-			    mkfs.ext2 $device >/dev/null 2>>/var/log/messages
-			then
-			    status=OK
-			else
-			    status=failed
+			name_progress_bar partman-basicfilesystems/progress_formatting
+			open_dialog CREATE_FILE_SYSTEM $id $filesystem
+			read_line status
+			close_dialog
+			if [ "$status" != OK ]; then
+			    db_progress START 0 3 partman/text/please_wait
+			    db_progress INFO partman-basicfilesystems/progress_formatting
+			    db_progress SET 1
+			    if
+				mkfs.ext2 $device >/dev/null 2>>/var/log/messages
+			    then
+				status=OK
+			    else
+				status=failed
+			    fi
+			    db_progress STOP
 			fi
-			db_progress STOP
 			;;
 		    linux-swap)
-			db_progress START 0 3 partman/text/please_wait
-			db_progress INFO partman-basicfilesystems/progress_formatting
-			db_progress SET 1
-			if
-			    mkswap $device >/dev/null 2>>/var/log/messages
-			then
-			    status=OK
-			else
-			    status=failed
+			name_progress_bar partman-basicfilesystems/progress_formatting
+			open_dialog CREATE_FILE_SYSTEM $id $filesystem
+			read_line status
+			close_dialog
+			if [ "$status" != OK ]; then
+			    db_progress START 0 3 partman/text/please_wait
+			    db_progress INFO partman-basicfilesystems/progress_formatting
+			    db_progress SET 1
+			    if
+				mkswap $device >/dev/null 2>>/var/log/messages
+			    then
+				status=OK
+			    else
+				status=failed
+			    fi
+			    db_progress STOP
 			fi
-			db_progress STOP
 			;;
 		    fat16|fat32)
 			name_progress_bar partman-basicfilesystems/progress_formatting

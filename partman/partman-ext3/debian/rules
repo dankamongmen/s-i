@@ -8,7 +8,7 @@ export DH_COMPAT=4
 
 PACKAGE=$(shell dh_listpackages)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=all
+ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
@@ -44,7 +44,7 @@ install: build
 	dh_install parted_names lib/partman
 	rm -rf `find debian/$(PACKAGE) -name CVS`
 
-binary-indep: build install
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
@@ -54,7 +54,7 @@ binary-indep: build install
 	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
 	dh_builddeb --filename=$(FILENAME)
 
-binary-arch: build install
+binary-indep: build install
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
