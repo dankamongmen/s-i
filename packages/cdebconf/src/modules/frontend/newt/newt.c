@@ -270,7 +270,7 @@ show_separate_window(struct frontend *obj, struct question *q)
     // buttons
     int extra = 3;
     int format_note = 0;
-    char *full_description;;
+    char *full_description;
     int ret;
 #ifdef HAVE_LIBTEXTWRAP
     int flags = 0;
