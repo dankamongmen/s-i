@@ -26,7 +26,8 @@ mount -t proc proc $targetdir/proc
 
 # Make sure to enable devfsd if installed.  It is needed to get CDROM
 # symlinks pointing to the right spot.  We must start it before we
-# make dummy start-stop-daemon
+# make dummy start-stop-daemon, to avoid that the dummy daemon block
+# devfsd from starting.
 if [ -x $targetdir/etc/init.d/devfsd ] ; then
     chroot $targetdir /etc/init.d/devfsd start
 fi
@@ -46,6 +47,11 @@ if [ "$TERM" = bterm ] ; then
    TERM=vt100
 fi
 
+# Disable the C.UTF-8 locale used in debian-installer.  This do not
+# quite work yet, because the console is in UTF-8 mode, while a lot of
+# the locales are using other charsets. [pere 2003-11-05]
+unset LANG
+
 # tty=/dev/console do not work any more.  Not sure why [pere 2003-10-21]
 tty=/dev/tty
 chroot $targetdir /usr/sbin/termwrap /usr/sbin/base-config new < $tty > $tty
@@ -53,6 +59,7 @@ chroot $targetdir /usr/sbin/termwrap /usr/sbin/base-config new < $tty > $tty
 # Undo hack to avoid starting daemons
 mv $targetdir/sbin/start-stop-daemon.debian $targetdir/sbin/start-stop-daemon
 
+# Stop devfsd using the real start-stop-daemon
 if [ -x $targetdir/etc/init.d/devfsd ] ; then
     chroot $targetdir /etc/init.d/devfsd stop
 fi
