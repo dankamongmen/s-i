@@ -4,6 +4,113 @@
 . /usr/share/debian-installer/functions.sh
 
 #
+# convert the return values from "xx (yy)" => "xx"
+#
+convert_return() {
+	RET=""
+
+	#TODO: don't need this external file here: ugly
+
+	echo "$1" | tr ',' '\n' | \
+	while read LINE; do
+		part=`echo "$LINE" | cut -d " " -f1`
+		echo "$part" >>/tmp/lvmcfg.tmp
+	done
+
+	[ ! -f /tmp/lvmcfg.tmp ] && return
+
+	for i in `cat /tmp/lvmcfg.tmp`; do
+		if [ -z "$RET" ]; then
+			RET="$i"
+		else
+			RET="$RET, $i"
+		fi
+	done
+
+	rm -f /tmp/lvmcfg.tmp
+}
+
+#
+# return extra informations (like size, current lv) for the
+# volume group
+#
+addinfos_pv() {
+	cmdout=`pvdisplay "$1" 2>&1`
+
+	echo "$cmdout" | grep -q 'is a new physical volume'
+	if [ $? -eq 0 ]; then
+		RET2=`echo "$cmdout" | sed -e 's/.*of \(.*\)$/Size: \1/'`
+		RET="${RET2}"
+		return
+	fi
+
+	echo "$cmdout" | grep -q '^pvdisplay'
+	if [ $? -eq 0 ]; then
+		RET="unknown"
+		return
+	fi
+
+	RET2=`echo "$cmdout" | grep '^VG Name' | \
+		sed -e 's/^VG Name \+\(.*\)/VG: \1/'`
+	RET="${RET2}"
+
+	RET2=`echo "$cmdout" | grep '^Cur LV' | \
+		sed -e 's/^Cur LV \+\(.*\)/LVs: \1/'`
+	RET="${RET}/ ${RET2}"
+
+	RET2=`echo "$cmdout" | grep '^PV Size' | \
+		sed -e 's/^PV Size \+\(.*\)/Size: \1/' | \
+		cut -d "[" -f 1 | sed -e 's/ $//'`
+	RET="${RET}/ ${RET2}"
+}
+
+#
+# return extra informations (like size, current lv) for the
+# volume group
+#
+addinfos_vg() {
+	cmdout=`vgdisplay "$1" 2>&1`
+
+	RET2=`echo "$cmdout" | grep '^Free  PE' | \
+		sed -e 's,.*/ \(.*\),Free: \1,'`
+	RET="${RET2}"
+
+	RET2=`echo "$cmdout" | grep '^VG Size' | \
+		sed -e 's/^VG Size \+\(.*\)/Size: \1/'`
+	RET="${RET}/ ${RET2}"
+
+	RET2=`echo "$cmdout" | grep '^Cur LV' | \
+		sed -e 's/^Cur LV \+\(.*\)/LVs: \1/'`
+	RET="${RET}/ ${RET2}"
+
+	RET2=`echo "$cmdout" | grep '^Cur PV' | \
+		sed -e 's/^Cur PV \+\(.*\)/PVs: \1/'`
+	RET="${RET}/ ${RET2}"
+}
+
+#
+# return extra informations (like size, fs type) for the
+# logical volume
+#
+addinfos_lv() {
+	cmdout=`lvdisplay "$1" 2>&1`
+
+	RET2=`echo "$cmdout" | grep '^LV Size' | \
+		sed -e 's/^LV Size \+\(.*\)/Size: \1/'`
+	RET="${RET2}"
+
+	cmdout=`parted $1 print | grep '^1' | \
+		sed -e 's/ \+/ /g' | cut -d " " -f 4`
+	[ -z "$cmdout" ] && cmdout="unknown"
+	RET="${RET}/ FS: ${cmdout}"
+
+	cmdout=`grep "^$1" /proc/mounts | cut -d " " -f2 | \
+		sed -e 's,/target,,'`
+	[ -z "$cmdout" ] && cmdout="n/a"
+	RET="${RET}/ Mount: ${cmdout}"
+}
+
+#
 # get all unused available physical volumes
 # 	in this case all partitions with 0x8e,
 #	or all other non-lvm devices from /proc/partitions
@@ -16,6 +123,9 @@ get_pvs() {
 		vgdisplay -v | grep -q "$i"
 		[ $? -eq 0 ] && continue
 
+		addinfos_pv "$i"
+		i=`printf "%-15s (%s)" "$i" "$RET"`
+		
 		if [ -z "$PARTITIONS" ]; then
 			PARTITIONS="$i"
 		else
@@ -31,6 +141,10 @@ get_vgs() {
 	GROUPS=""
 	for i in `vgdisplay | grep '^VG Name' | 
 		sed -e 's/.*[[:space:]]\(.*\)$/\1/' | sort`; do
+		
+		addinfos_vg "$i"
+		i=`printf "%-15s (%s)" "$i" "$RET"`
+		
 		if [ -z "$GROUPS" ]; then
 			GROUPS="$i"
 		else
@@ -46,6 +160,10 @@ get_vgpvs() {
 	PARTITIONS=""
 	for i in `vgdisplay -v $1 | grep '^PV Name' | 
 		sed -e 's,.*/dev\(.*\)(.*,/dev\1,' | sort`; do
+
+		addinfos_pv "$i"
+		i=`printf "%-15s (%s)" "$i" "$RET"`
+		
 		if [ -z "$PARTITIONS" ]; then
 			PARTITIONS="$i"
 		else
@@ -61,6 +179,10 @@ get_vglvs() {
 	LVS=""
 	for i in `vgdisplay -v $1 | grep '^LV Name' | 
 		sed -e 's,.*/\(.*\),\1,' | sort`; do
+
+		addinfos_lv "/dev/$1/$i"
+		i=`printf "%-15s (%s)" "$i" "$RET"`
+		
 		if [ -z "$LVS" ]; then
 			LVS="$i"
 		else
@@ -91,7 +213,7 @@ vg_mainmenu() {
 			vg_delete
 			;;
 		"extend")
-			vg_expand
+			vg_extend
 			;;
 		"reduce")
 			vg_reduce
@@ -121,6 +243,8 @@ vg_create() {
 	db_input high lvmcfg/vgcreate_parts
 	db_go
 	db_get lvmcfg/vgcreate_parts
+
+	convert_return "$RET"
 	PARTITIONS="$RET"
 
 	if [ -z "$RET" ]; then
@@ -171,7 +295,7 @@ vg_delete() {
 	db_go
 	db_get lvmcfg/vgdelete_names
 	[ "$RET" = "Leave" ] && return
-	VG="$RET"
+	VG=`echo "$RET" | cut -d " " -f1`
 
 	# confirm message
 	db_subst lvmcfg/vgdelete_confirm VG $VG
@@ -196,7 +320,7 @@ vg_delete() {
 #
 # allow expanding of existing volume groups
 #
-vg_expand() {
+vg_extend() {
 	# searching for available partitions (0x8e)
 	get_pvs
 	if [ -z "$PARTITIONS" ]; then
@@ -220,14 +344,17 @@ vg_expand() {
 	db_go
 	db_get lvmcfg/vgextend_names
 	[ "$RET" = "Leave" ] && return
-	GROUP="$RET"
+	VG=`echo "$RET" | cut -d " " -f1`
 
 	db_subst lvmcfg/vgextend_parts PARTITIONS $PARTITIONS
 	db_set lvmcfg/vgextend_parts "false"
 	db_input high lvmcfg/vgextend_parts
 	db_go
 	db_get lvmcfg/vgextend_parts
+
+	convert_return "$RET"
 	PARTITIONS="$RET"
+
 	if [ -z "$RET" ]; then
 		db_set lvmcfg/vgextend_nosel "false"
 		db_input high lvmcfg/vgextend_nosel
@@ -237,10 +364,10 @@ vg_expand() {
 
 	for p in `echo "$PARTITIONS" | sed -e 's/,/ /g'`; do
 		pvcreate -ff -y $p >>/var/log/messages 2>&1 && \
-			vgextend $GROUP $p >>/var/log/messages 2>&1
+			vgextend $VG $p >>/var/log/messages 2>&1
 		if [ $? -ne 0 ]; then	# on error
 			db_subst lvmcfg/vgextend_error PARTITION $p
-			db_subst lvmcfg/vgextend_error VG $GROUP
+			db_subst lvmcfg/vgextend_error VG $VG
 			db_set lvmcfg/vgextend_error "false"
 			db_input high lvmcfg/vgextend_error
 			db_go
@@ -267,7 +394,7 @@ vg_reduce() {
 	db_go
 	db_get lvmcfg/vgreduce_names
 	[ "$RET" = "Leave" ] && return
-	VG="$RET"
+	VG=`echo "$RET" | cut -d " " -f1`
 
 	# check, if the vg has more then one pv's
 	set -- `vgdisplay $VG | grep '^Cur PV'`
@@ -285,7 +412,7 @@ vg_reduce() {
 	db_input high lvmcfg/vgreduce_parts
 	db_go
 	db_get lvmcfg/vgreduce_parts
-	PARTITIONS="$RET"
+	PARTITIONS=`echo "$RET" | cut -d " " -f1`
 
 	vgreduce $VG $PARTITIONS >>/var/log/messages 2>&1
 	if [ $? -ne 0 ]; then
@@ -356,7 +483,7 @@ lv_create() {
 	db_go
 	db_get lvmcfg/lvcreate_vgnames
 	[ "$RET" = "Leave" ] && return
-	VG="$RET"
+	VG=`echo "$RET" | cut -d " " -f1`
 
 	# make sure, the name isn't already in use
 	vgdisplay -v $VG | grep '^LV Name' | grep -q "${VG}/${NAME}$"
@@ -406,7 +533,7 @@ lv_delete() {
 	db_go
 	db_get lvmcfg/lvdelete_vgnames
 	[ "$RET" = "Leave" ] && return
-	VG="$RET"
+	VG=`echo "$RET" | cut -d " " -f1`
 
 	get_vglvs "$VG"
 	if [ -z "$LVS" ]; then
@@ -416,13 +543,14 @@ lv_delete() {
 		return
 	fi
 
+	db_subst lvmcfg/lvdelete_lvnames VG "$VG"
 	db_subst lvmcfg/lvdelete_lvnames LVS "${LVS}, Leave"
 	db_set lvmcfg/lvdelete_lvnames "false"
 	db_input high lvmcfg/lvdelete_lvnames
 	db_go
 	db_get lvmcfg/lvdelete_lvnames
 	[ "$RET" = "Leave" ] && return
-	LV="$RET"
+	LV=`echo "$RET" | cut -d " " -f1`
 
 	lvremove -f /dev/${VG}/${LV} >>/var/log/messages 2>&1
 	if [ $? -ne 0 ]; then
@@ -443,6 +571,14 @@ lv_delete() {
 # load required kernel modules
 depmod -a 1>/dev/null 2>&1
 modprobe lvm-mod >/dev/null 2>&1
+
+# make sure, lvm is available
+if [ ! -d /proc/lvm ]; then
+	db_set lvmcfg/nolvm "false"
+	db_input high lvmcfg/nolvm
+	db_go
+	exit 0
+fi
 
 # scan for logical volumes
 pvscan >>/var/log/messages 2>&1
