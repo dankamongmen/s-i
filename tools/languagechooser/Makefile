@@ -2,11 +2,7 @@ all:
 
 .PHONY: demo
 demo:
-	ln -sf debian/templates demo.templates
-	chmod a+x debian/postinst
-	rm -f demo
-	ln -s debian/postinst demo
-	DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./demo
-	rm -f demo.templates demo
+	(cd debian; po2debconf templates) > languagechooser.templates
+	DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./languagechooser
 
 clean:
