@@ -1,28 +1,42 @@
 #!/bin/sh
-QUEUE=/var/lib/register-module/queue
+QUEUE=/var/lib/register-module
 MODFILE=/target/etc/modules
-MODCONFILE=/target/etc/modutils/local
+MODCONFDIR=/target/etc/modutils/
 
-if [ -e $QUEUE ]; then
-	touch $MODFILE
-
-	IFS="
-"
-	for line in $(cat $QUEUE); do
-		module=`echo "$line" | cut -d\  -f1`
-		echo $module >> $MODFILE
-		param=`echo $line | cut -d\  -f2`
-		if [ "$param" != "" ]; then
-			if [ ! -e $MODCONFILE ]; then
-				echo "# Local modules settings." > $MODCONFILE
-				echo "# Created by the Debian installer" >> $MODCONFILE
-			fi
-			echo "options $line" >> $MODCONFILE
-		fi
-	done
-	rm $QUEUE
-
-	if [ -e $MODCONFILE ]; then
-		chroot /target update-modules < /dev/null 2>&1 | logger "register-modules"
+create () {
+	if [ ! -e $1 ]; then
+		echo "# Local modules settings." > $1
+		echo "# Created by the Debian installer" >> $1
+		echo "" >> $1
 	fi
-fi
+}
+
+OLDIFS=$IFS
+
+for QUEUEFILE in $QUEUE/*; do
+	[ ! -e $QUEUEFILE ] && break
+	MODULE=$(basename $QUEUEFILE)
+
+	create $MODFILE
+	echo "$MODULE" >> $MODFILE
+
+	IFS=":"
+	while read TYPE PARAMS; do
+		case $TYPE in
+		options)
+			FILE=$MODCONFDIR/local
+			create $FILE
+			echo "options $MODULE $PARAMS" >> $FILE
+			;;
+		chandev)
+			FILE=$MODCONFDIR/local.chandev
+			create $FILE
+			echo "$PARAMS" >> $FILE
+			;;
+		esac
+	done < $QUEUEFILE
+	IFS=$OLDIFS
+	rm $QUEUEFILE
+done
+
+chroot /target update-modules < /dev/null 2>&1 | logger "register-modules"

@@ -1,11 +1,20 @@
 #!/bin/sh
-DIR=/var/lib/register-module
-QUEUE=$DIR/queue
-MODULE=$1
+QUEUE=/var/lib/register-module
+TYPE=options
 
-mkdir -p $DIR
-touch $QUEUE
-grep -v "^$MODULE " $QUEUE > $QUEUE.new
-mv $QUEUE.new $QUEUE
-# Trailing whitespace is significant.
-echo "$@ " >> $QUEUE
+if [ "$1" = "-t" ]; then
+	TYPE=$2
+	shift 2
+fi
+
+MODULE=$1
+shift
+PARAMS="$@"
+
+QUEUEFILE=$QUEUE/$MODULE
+
+mkdir -p $QUEUE
+touch $QUEUEFILE
+grep -v "^$TYPE:" $QUEUEFILE > $QUEUEFILE.new
+[ -n "$PARAMS" ] && echo "$TYPE:$PARAMS" >> $QUEUEFILE.new
+mv $QUEUEFILE.new $QUEUEFILE
