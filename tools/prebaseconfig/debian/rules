@@ -14,14 +14,13 @@ install: build
 	dh_testroot
 	dh_installdirs
 	install -m0644 inittab.install $(DESTDIR)/usr/share/prebaseconfig/inittab
-	for file in \
+	set -e ; for file in \
 		50config-target-network \
 		50mtab-hack \
 		51framebuffer-module-linux-i386 \
 		90prepare-base-config \
 		93save-install-log \
 		95umount \
-		98final-message \
 		99reboot ; \
 	do \
 	    install -m0755 prebaseconfig.d/$$file $(DESTDIR)/usr/lib/prebaseconfig.d/$$file; \
