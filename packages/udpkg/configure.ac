@@ -1,5 +1,6 @@
-AC_INIT([udpk],[0.1])
-AM_INIT_AUTOMAKE([foreign no-define])
+AC_INIT([udpkg],[0.1])
+AC_CONFIG_SRCDIR([udpkg.c])
+AM_INIT_AUTOMAKE([foreign 1.8 no-define no-dist no-installinfo no-installman -Wall])
 AC_CONFIG_HEADER([config.h])
 AM_MAINTAINER_MODE
 

@@ -76,13 +76,12 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	char buf[1024];
 	DPRINTF("Configuring %s [force=%d]\n", pkg->package, force_configure);
 
-	if ((pkg->status & STATUS_STATUSINSTALLED) != 0 &&
-        !force_configure)
-    {
-        PRINTF("Package %s is already installed and configured\n",
-                pkg->package);
-        return 1;
-    }
+	if ((pkg->status & STATUS_STATUSINSTALLED) != 0 && !force_configure)
+	{
+		PRINTF("Package %s is already installed and configured\n",
+		       pkg->package);
+		return 1;
+	}
 
 	pkg->status &= STATUS_STATUSMASK;
 
@@ -121,7 +120,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 	int r = 0;
 	char *cwd;
 	char buf[1024], buf2[1024];
-	int i;
+	unsigned int i;
 	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
 	                         "conffiles", "md5sums", "shlibs", 
 				 "templates", "menutest", "isinstallable",
@@ -387,17 +386,18 @@ static int dpkg_install(struct package_t *pkgs)
 
 static int dpkg_fields(struct package_t *pkg)
 {
-	char *command;
 	int ret;
+	char buf[1024];
 
 	if (pkg == NULL)
 	{
 		FPRINTF(stderr, "udpkg: The -f flag requires an argument.\n");
 		return 1;
 	}
-	asprintf(&command, "ar -p %s control.tar.gz|tar -xzOf - ./control", pkg->file);
-	ret = system(command);
-	free(command);
+	snprintf(buf, sizeof(buf), "ar -p %s control.tar.gz|tar -xzOf - ./control", pkg->file);
+	if ((ret = di_exec_shell_log(buf)) != 0)
+		FPRINTF(stderr, "field extraction failed with status %d\n", ret);
+
 	return ret;
 }
 
@@ -408,6 +408,8 @@ static int dpkg_remove(struct package_t *pkgs)
 	void *status = status_read();
 	for (p = pkgs; p != 0; p = p->next)
 	{
+		FPRINTF(stderr, "udpkg: Support for -r not implemented.\n");
+		return 1;
 	}
 	status_merge(status, 0);
 	return 0;
@@ -426,52 +428,55 @@ int main(int argc, char **argv)
 	int opt = 0;
 	struct package_t *p, *packages = NULL;
 	char *cwd = getcwd(0, 0);
-    char **origargv = argv;
-    struct option longopts[] = {
+	char **origargv = argv;
+	struct option longopts[] = {
         /* name, has_arg, flag, val */
-	    { "unpack", 0, 0, 'u' },
-        { "configure", 0, 0, 'c' },
-        { "print-architecture", 0, 0, 'p' } ,
-        { "force-configure", 0, &force_configure, 1 },
-        { 0, 0, 0, 0 },
-    };
+		{ "unpack", 0, 0, 'u' },
+		{ "configure", 0, 0, 'c' },
+		{ "print-architecture", 0, 0, 'p' } ,
+		{ "force-configure", 0, &force_configure, 1 },
+		{ 0, 0, 0, 0 },
+	};
 
 	while (*++argv)
 	{
 		if (**argv != '-') 
 		{
-			p = (struct package_t *)malloc(sizeof(struct package_t));
-			memset(p, 0, sizeof(struct package_t));
+			p = (struct package_t *)calloc(1, sizeof(struct package_t));
 			if (**argv == '/')
 				p->file = *argv;
-            else
-				asprintf(&p->file, "%s/%s", cwd, *argv);
+			else
+			{
+				size_t len = strlen(cwd) + strlen(*argv) + 2;
+				p->file = (char *)malloc(len);
+				snprintf(p->file, len, "%s/%s", cwd, *argv);
+			}
 			p->package = strdup(*argv);
 			p->next = packages;
 			packages = p;
 		}
 	}
 
-    /* let's do this in a silly way, the first pass let's us
-     * set flags (e.g. --force-configure), whereas the second
-     * will actually do stuff
-     */
-    while (getopt_long(argc, origargv, "irf", longopts, 0) >= 0)
-        /* nothing */;
-    optind = 1;
+	/* let's do this in a silly way, the first pass let's us
+	 * set flags (e.g. --force-configure), whereas the second
+	 * will actually do stuff
+	 */
+	while (getopt_long(argc, origargv, "irf", longopts, 0) >= 0)
+		/* nothing */;
+	optind = 1;
 
-    while ((opt = getopt_long(argc, origargv, "irf", longopts, 0)) >= 0)
-    {
+	while ((opt = getopt_long(argc, origargv, "irf", longopts, 0)) >= 0)
+	{
         switch (opt)
-        {
-            case 'i': return dpkg_install(packages); break;
-            case 'r': return dpkg_remove(packages); break;
-            case 'u': return dpkg_unpack(packages); break;
-            case 'c': return dpkg_configure(packages); break;
-            case 'p': return dpkg_print_architecture(); break;
-            case 'f': return dpkg_fields(packages); break;
-            case 0: /* option, not action */; break;
-        }
+		{
+		case 'i': return dpkg_install(packages); break;
+		case 'r': return dpkg_remove(packages); break;
+		case 'u': return dpkg_unpack(packages); break;
+		case 'c': return dpkg_configure(packages); break;
+		case 'p': return dpkg_print_architecture(); break;
+		case 'f': return dpkg_fields(packages); break;
+		case 0: /* option, not action */; break;
+		}
 	}
 
 	/* if it falls through to here, some of the command line options were
