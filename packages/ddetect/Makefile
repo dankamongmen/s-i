@@ -25,6 +25,7 @@ install: install-hw-detect install-ethdetect install-archdetect
 install-hw-detect: hw-detect.sh
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) hw-detect.sh $(bindir)/hw-detect
+	$(INSTALL) hotplug-pcmcia.sh $(bindir)/hotplug-pcmcia
 
 install-hw-detect-full:
 
