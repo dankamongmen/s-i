@@ -135,10 +135,10 @@ if [ "$LANGUAGE" != "C" ]; then
 	fi
 	db_get "countrychooser/country-name-shortlist"
 	if [ -z "$RET" ]; then
-	    # Should not happen, but fall back to Others
-	    RET="Others"
+	    # Should not happen, but fall back to other
+	    RET="other"
 	fi
-        if [ "$RET" = "Others" ]; then
+        if [ "$RET" = "other" ]; then
 	    db_subst "countrychooser/country-name" DEFAULTLOCALE "${DEFAULTLOCALE}"
 	    db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
 	    if ! db_go; then
@@ -171,7 +171,7 @@ log "$countrycode = '$COUNTRYCODE'"
 #
 # We do this only if one of the supported countries has been chosen
 db_get "countrychooser/country-name-shortlist"
-if [ "$RET" != "Others" ]; then
+if [ "$RET" != "other" ]; then
    LOCALE=${LANGUAGE}_${COUNTRYCODE}
    db_set "$localecode" "${LOCALE}"
    log "$localecode = '${LOCALE}'"
