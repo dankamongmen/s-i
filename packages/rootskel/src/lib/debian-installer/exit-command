@@ -3,10 +3,9 @@ set -e
 export DEBIAN_FRONTEND=none
 . /usr/share/debconf/confmodule
 
-CMD=reboot
 db_get debian-installer/exit/always_halt
-[ "$RET" = "true" ] && CMD=halt
+[ "$RET" = "true" ] && return 1
 db_get debian-installer/exit/halt
-[ "$RET" = "true" ] && CMD=halt
+[ "$RET" = "true" ] && return 1
 
-echo $CMD
+return 0

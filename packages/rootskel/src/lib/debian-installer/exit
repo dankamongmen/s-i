@@ -1,9 +1,13 @@
 #!/bin/sh
-set -e
+set +e
 
-CMD=$(/lib/debian-installer/exit-command)
+/lib/debian-installer/exit-command
+CMD=$?
 
 /bin/umount -a -r
 /sbin/swapoff -a
 
-$CMD
+case "$EXIT" in
+  0) reboot;;
+  1) halt;;
+esac
