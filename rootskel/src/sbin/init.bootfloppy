@@ -148,15 +148,7 @@ while [ "$LOADED" = 0 ]; do
 	# activity. But we must be sure to catch errors from the zcat.
 	# Hard to do in a pipeline..
 	rm -f /tmp/zcat_failure
-	if [ -e /bin/pipe_progress ]; then
-		(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) | pipe_progress > mnt/tmp-initrd
-	else
-		# TODO remove after pipe_progress is available in the archive
-		(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) > mnt/tmp-initrd
-	fi
-	if [ "$?" ]; then
-		abort "failed to extract initrd (may be out of space on ram disk)" >&2
-	fi
+	(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) | pipe_progress > mnt/tmp-initrd || abort "failed to extract initrd (may be out of space on ram disk)"
 	if [ ! -e /tmp/zcat_failure ]; then
 		LOADED=1
 	else
