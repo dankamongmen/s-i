@@ -36,18 +36,6 @@ load_module() {
 	return
     fi
 
-    # Hack to make it load up all the IDE PCI modules before ide-detect,
-    # some chipsets need this to avoid DMA problems.
-    if [ "$module" = "ide-detect" ]; then
-	for ide_module in /lib/modules/*/kernel/drivers/ide/pci/*.o; do
-		if [ -e $ide_module ]; then
-			baseidemod=$(echo $ide_module | sed s/\.o$// | sed 's/.*\///')
-			echo "Loading IDE PCI driver $baseidemod" >> /var/log/messages
-			modprobe $baseidemod >> /var/log/messages 2>&1 || true
-		fi
-	done
-    fi
-    
     db_subst hw-detect/module_params MODULE "$module"
     db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
@@ -116,13 +104,20 @@ get_hw_info() {
     # Manually load modules to enable things we can't detect.
     # XXX: This isn't the best way to do this; we should autodetect.
     # The order of these packages are important. [pere 2003-03-16]
-    echo "ide-mod:Linux IDE Driver"
-    echo "ide-probe-mod:Linux IDE probe Driver"
-    echo "ide-detect:Linux IDE detection Driver"
-    echo "ide-floppy:Linux IDE Floppy Driver"
-    echo "ide-disk:Linux ATA DISK Driver"
-    echo "ide-cd:Linux ATAPI CD-ROM Driver"
-    echo "isofs:Linux ISO 9660 Filesystem Driver"
+    echo "ide-mod:Linux IDE driver"
+    echo "ide-probe-mod:Linux IDE probe driver"
+    # Some pci chipsets are needed or there can be DMA or other problems.
+    for ide_module in /lib/modules/*/kernel/drivers/ide/pci/*.o; do
+    	if [ -e $ide_module ]; then
+		baseidemod=$(echo $ide_module | sed s/\.o$// | sed 's/.*\///')
+		echo "$baseidemod:IDE chipset support"
+    	fi
+    done
+    echo "ide-detect:Linux IDE detection driver"
+    echo "ide-floppy:Linux IDE floppy driver"
+    echo "ide-disk:Linux ATA DISK driver"
+    echo "ide-cd:Linux ATAPI CD-ROM driver"
+    echo "isofs:Linux ISO 9660 filesystem driver"
     #echo "i82365:Linux Unknown"
     #echo "sr_mod:Linux Unknown"
     #echo "usb-storage:Linux Unknown"
