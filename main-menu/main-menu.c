@@ -308,6 +308,7 @@ static int satisfy_virtual(struct package_t *p) {
 	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
 	ret = SYSTEM(configcommand);
 	free(configcommand);
+        p->status = (ret == 0) ? installed : half_configured;
 	return !ret;
 }
 
@@ -355,6 +356,7 @@ config_package(struct package_t *p) {
 	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
 	ret = SYSTEM(configcommand);
 	free(configcommand);
+        p->status = (ret == 0) ? installed : half_configured;
 	return !ret;
 }
 
