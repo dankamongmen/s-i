@@ -196,9 +196,12 @@ get_ide_floppy_info() {
 
 get_input_info() {
 	case $SUBARCH in
-		powerpc/chrp_pegasos)
+		powerpc/chrp*)
+		powerpc/prep)
 		  echo "i8042:i8042 PC Keyboard controller"
+		  register-module i8042
 		  echo "atkbd:AT keyboard support"
+		  register-module atkbd
 		;;
 		*) ;;
 	esac
