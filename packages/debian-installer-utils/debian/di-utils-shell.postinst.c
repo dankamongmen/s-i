@@ -40,8 +40,6 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
     if (dup2(DEBCONF_OLD_FD_BASE + i, i) == -1)
       exit(1);
 
-  system("clear");
-
   t1 = new_envp;
   while (*t1)
   {
