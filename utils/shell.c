@@ -20,8 +20,8 @@ main ()
 		   NULL);
   client->command (client, "go", NULL);
 
-  if ((freopen ("/dev/vc/0", "r", stdin) == NULL)
-      || (freopen ("/dev/vc/0", "w", stdout) == NULL))
+  if ((freopen ("/dev/console", "r", stdin) == NULL)
+      || (freopen ("/dev/console", "w", stdout) == NULL))
     {
       return -1;
     }
