@@ -62,6 +62,14 @@ PARTITIONS="$RET"
 get_premounts
 PREMOUNTS="$RET"
 
+# print a note, if no partitions are found
+if [ -z "$PARTITIONS" ]; then
+	db_set $DEBCONF_BASE/nopart "false"
+	db_input high $DEBCONF_BASE/nopart
+	db_go
+	exit 1
+fi
+
 # if we have not yet mounted the root partition
 grep " ${TARGET} " /proc/mounts 2>/dev/null
 if [ $? -ne 0 ]; then
