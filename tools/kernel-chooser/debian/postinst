@@ -2,18 +2,24 @@
 
 . /usr/share/debconf/confmodule
 
+chroot="chroot /target"
+
 # find all packages implementing 'kernel-image'.  Is there a better
 # way? [pere 2003-02-16]
-kernels=`chroot /target apt-cache search kernel-image | grep "^kernel-image" | sort -ur | awk '{print $1}' | tr "\n" "," | sed 's/,/, /g'`
+kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" | sort -ur | awk '{print $1}' | tr "\n" "," | sed 's/,/, /g' | sed 's/, $//'`
 
 if [ "$kernels" ] ; then
     db_subst kernel-chooser/which-kernel kernels "$kernels"
 fi
 
+# Make current rootskel setting the default
+if db_get debian-installer/kernel/image && [ "$RET" ] ; then
+    db_set kernel-chooser/which-kernel "$RET"
+fi
 
 # Pick a good default choice, and set it
 
-db_input low kernel-chooser/which-kernel || true
+db_input medium kernel-chooser/which-kernel || true
 db_go || true
 
 db_get kernel-chooser/which-kernel
