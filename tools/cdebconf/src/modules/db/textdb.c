@@ -56,7 +56,7 @@ static char *unescapestr(const char *in)
 	static char buf[8192];
 	char *p = (char *)in;
 	if (in == 0) return 0;
-	strparsequoteword(&p, buf, sizeof(buf));
+	strunescape(p, buf, sizeof(buf));
 	return buf;
 }
 
@@ -179,7 +179,7 @@ static struct template *textdb_template_get_real(struct database *db,
 		return NULL;
 	}
 
-	t = NEW(struct template);
+	t = template_new(0);
 
 	t->tag = STRDUP(unescapestr(rec->get(rec, "template::tag", 0)));
 	if (t->tag == 0)
@@ -320,7 +320,7 @@ static struct question *textdb_question_get(struct database *db,
 		return NULL;
 	}
 
-	q = NEW(struct question);
+	q = question_new(0);
 
 	q->tag = STRDUP(unescapestr(rec->get(rec, "question::tag", 0)));
 	q->value = STRDUP(unescapestr(rec->get(rec, "question::value", 0)));

@@ -30,6 +30,12 @@ struct uidata {
 	WINDOW *qrywin, *descwin;
 };
 
+static void ncurses_drawdesc(struct frontend *ui, struct question *q)
+{
+	struct uidata *data = UIDATA(ui);
+
+}
+
 static int nchandler_boolean(struct frontend *ui, struct question *q)
 {
 	while(1);

@@ -184,13 +184,37 @@ int strcmdsplit(char *inbuf, char **argv, size_t maxnarg)
 	return argc;
 }
 
+void strunescape(const char *inbuf, char *outbuf, const size_t maxlen)
+{
+	char *p = inbuf;
+	int i = 0;
+	char tmp[3];
+	while (*p != 0 && i < maxlen-1)
+	{
+		if (*p == '%')
+		{
+			if (i + 4 >= maxlen) break;
+			tmp[0] = *(p+1);
+			tmp[1] = *(p+2);
+			tmp[2] = 0;
+			outbuf[i++] = atoi(tmp);
+			p += 3;
+		}
+		else
+		{
+			outbuf[i++] = *p++;
+		}
+	}
+	outbuf[i] = 0;
+}
+
 void strescape(const char *inbuf, char *outbuf, const size_t maxlen)
 {
 	char *p = inbuf;
 	int i = 0;
 	while (*p != 0 && i < maxlen-1)
 	{
-		if (*p == '\\' || *p == '"')
+		if (*p == '%' || *p == '"')
 		{
 			if (i + 4 >= maxlen) break;
 			outbuf[i] = '%';
