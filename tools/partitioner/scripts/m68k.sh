@@ -22,7 +22,7 @@ case "`/bin/archdetect`" in
 	pmac-fdisk $DISK
 	;;
 *)
-	fdisk $DISK
+	parted $DISK
 	;;
 esac
 
