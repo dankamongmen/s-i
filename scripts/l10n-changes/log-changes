@@ -1,0 +1,77 @@
+#!/bin/sh
+# 
+# A script to find out which .po files has been updated since the last
+# update, according to the PO-Revision flag and the Debian changelog
+# 
+# Copyright (c) 2004 Nikolai Prokoschenko (nikolai@prokoschenko.de)
+#
+# This script is available under the GNU Public License
+# (http://www.gnu.org/licenses/gpl.txt) 
+
+CURDIR=`dirname $0`
+
+if [ "x$1" = "x" ]
+then
+  echo "Usage: $0 <package-directory>"
+  exit
+fi
+
+P=$1;
+PACKAGE=`echo $P | sed 's/\/$//g'` 
+
+if [ ! -d $PACKAGE ]
+then
+  echo "Cannot access the directory $PACKAGE!"
+  exit
+fi
+
+
+CHANGELOG="$PACKAGE/debian/changelog"
+POS="$PACKAGE/debian/po"
+RELEASE="unstable"
+
+if [ ! -e $CHANGELOG ]
+then
+  echo "Cannot find the changelog file!"
+  exit
+fi
+
+# Line number of the changelog's old date
+LINE=`grep "; urgency=" "$CHANGELOG" | grep -n "$RELEASE" | head -n 1 | sed 's/:.*//g'`
+
+# Date of the last release
+DATE=`grep "^ --" "$CHANGELOG" | head -n $LINE | tail -n 1 | sed 's/.*>  //g'`
+OLD_DATE=`date -d "$DATE" +%s`
+
+for i in $POS/*.po
+do
+  if [ -e $i ]
+  then
+    DATE=`grep PO-Revision "$i" | cut -d ":" -f 2,3 | sed 's/^ //g' | cut -d '\' -f 1`
+    if date --date "$DATE" 2>/dev/null 1>&2 
+    then
+	NEW_DATE=`date -d "$DATE" +%s`
+	if [ $NEW_DATE -gt $OLD_DATE ]
+	then
+	    
+	    CSN=`basename $i | sed 's/\.po//g'`
+
+	    # Get the translator's name
+
+	    translator=`grep "Last-Translator" $i| sed 's/\"//g' | sed 's/Last-Translator: //g' |sed 's/<.*$//g'`		
+	    
+	    # Convert to UTF-8 -- the changelogs should be UTF-8, the
+	    # translations need not.
+
+	    encoding=`grep "charset=" $i | sed 's/\"//g' | sed 's/^.*charset=//g' | sed 's/n//g'`
+	    trans=`echo $translator | iconv -f $encoding -t utf-8`
+	    
+	    # And output the changelog line
+	    
+	    echo "$CSN.po:$trans" >> $PACKAGE/debian/.credits_log
+	    sort $PACKAGE/debian/.credits_log | uniq > t
+	    mv t $PACKAGE/debian/.credits_log
+        fi
+    fi
+  fi
+done
