@@ -245,12 +245,18 @@ static int question_db_is_visible(struct question_db *db, const char *name,
 	if ((q = db->methods.get(db, name)) != NULL &&
 	    (q->flags & DC_QFLAG_SEEN) != 0)
 	{
-		if ((q2 = db->methods.get(db, "debconf/showold")) != NULL &&
-			strcmp(q2->value, "false") == 0)
-			ret = DC_NO;
+		ret = DC_NO;
 		showold = getenv("DEBCONF_SHOWOLD");
-		if (showold == NULL || strcmp(showold, "true") != 0)
-			ret = DC_NO;
+		if (showold == NULL)
+			if ((q2 = db->methods.get(db, "debconf/showold")) != NULL)
+				showold = question_getvalue(q2, NULL);	
+		if (showold != NULL)
+		{
+			if (strcmp(showold, "true") == 0)
+				ret = DC_YES;
+			else
+				ret = DC_NO;
+		}
 	}
 
 	question_deref(q);
