@@ -1,6 +1,3 @@
-
-
-
 OBJS=utils.o
 
 ifndef PROGS
@@ -15,7 +12,7 @@ INSTALL=install
 STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment 
 INCS=-I../cdebconf/src/
-LDFLAGS=-L../cdebconf/src/ -ldetect -lisapnp -ldebconf
+LDFLAGS=-L../cdebconf/src/ -ldiscover -lisapnp -ldebconf
 
 
 all: lst2header $(OBJS) $(PROGS)
@@ -26,12 +23,14 @@ mdmdetect: mdmdetect.c ddetect.o
 #	$(CC) mdmdetect.c -o mdmdetect -lisapnp objs/modem.o objs/serial.o objs/utils.o ddetect.o objs/conv.o
 cddetect : cddetect.c ddetect.o
 
+diskdetect : diskdetect.c
+	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(INCS) $(LDFLAGS)
 
 ethdetect :ethdetect.c
 	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(INCS) $(LDFLAGS)
 
 lst2header: lst2header.c
-	$(CC) lst2header.c -o lst2header -ldetect -lisapnp 
+	$(CC) lst2header.c -o lst2header -ldiscover -lisapnp 
 
 clean:
 	$(RM) *.o $(PROGS) lst2header
