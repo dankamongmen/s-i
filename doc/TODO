@@ -56,6 +56,13 @@ code base:
     These should perhaps be used consistently throughout the code for
     clarity.
 
+  * There needs to be a centralised logging method. Syslog will do, but
+    we currently have a lot of nasty code that appends messages to
+    /var/log/messages directly. All of that would be converted to pipe it
+    to logger. However, this is a problem, because piping a command to
+    logger loses the exit status of the command. Need some way to run a
+    command, logging the ouput to syslog, w/o losing exit status.
+
 Finished items:
 
  * Unbreak netinst CDs
