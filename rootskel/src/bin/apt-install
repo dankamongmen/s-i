@@ -3,6 +3,11 @@
 log=/var/log/messages
 queue=/var/lib/apt-install/queue
 
+# Need a sort with support for -u
+SORT=/target/usr/bin/sort
+# busybox is missing 'comm'
+COMM=/target/usr/bin/comm
+
 # The C.UTF-8 locale is not usable inside /target/.  Unset it here to avoid
 # warnings like 'perl: warning: Setting locale failed.'.
 if [ "$LANG" = "C.UTF-8" ] ; then
@@ -46,6 +51,9 @@ unset DEBIAN_FRONTEND
 unset DEBCONF_FRONTEND
 unset DEBCONF_REDIR
 
+# Record the current mounts
+cut -d" " -f2 /proc/mounts | $SORT -u > /tmp/mount.pre
+
 # Some packages (eg. the kernel-image package) require a mounted /proc/
 # Only mount it if it isn't mounted already
 if [ ! -f /target/proc/cmdline ] ; then
@@ -55,6 +63,16 @@ fi
 DEBIAN_FRONTEND=noninteractive \
 chroot /target apt-get -y install $@ < /dev/null >> $log 2>&1
 
-umount /target/proc
+# Undo the mounts done by the packages during installation.
+cut -d" " -f2 /proc/mounts | $SORT -u > /tmp/mount.post
+# Reverse sorting to umount the deepest mount points first.
+for dir in `$COMM -13 /tmp/mount.pre /tmp/mount.post|$SORT -r`; do
+    if umount $dir ; then
+	:
+    else
+	logger -t apt-install "warning: Unable to umount '$dir'"
+    fi
+done
+rm -f /tmp/mount.pre /tmp/mount.post
 
 exit 0
