@@ -12,7 +12,18 @@ free_size=$(expr 000000"$free_size" : '0*\(.*\)......$') # convert to megabytes
 choose_recipe "$free_size" || exit $?
 
 cd $dev
-open_dialog NEW_LABEL msdos # FIXME: defaults for non-i386
+
+open_dialog LABEL_TYPES
+types=$(read_list)
+close_dialog
+
+label_type=$(default_disk_label)
+
+if ! expr "$types" : ".*${label_type}.*" >/dev/null; then
+    label_type=msdos # most widely used
+fi
+
+open_dialog NEW_LABEL "$label_type"
 close_dialog
 
 # Different types partition tables support different visuals.  Some

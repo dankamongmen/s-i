@@ -434,6 +434,10 @@ log () {
     echo $0: "$@" >>/var/log/partman
 }
 
+####################################################################
+# The functions below are not yet documented
+####################################################################
+
 # TODO: this should not be global
 humandev () {
     local host bus target part lun idenum targtype scsinum
@@ -493,6 +497,77 @@ humandev () {
 device_name () {
     cd $1
     printf "%s - %s %s" "$(humandev $(cat device))" "$(longint2human $(cat size))" "$(cat model)"
+}
+
+default_disk_label () {
+    if [ -x /bin/archdetect ]; then
+	archdetect=$(archdetect)
+    else
+	archdetect=unknown/generic
+    fi
+    arch=${archdetect%/*}
+    sub=${archdetect#*/}
+    case "$arch" in
+	alpha)
+	    # Load srm_env.o if we can; this should fail on ARC-based systems.
+	    (modprobe srm_env || true) 2> /dev/null
+	    if [ -f /proc/srm_environment/named_variables/booted_dev ]; then
+                # Have SRM, so need BSD disklabels
+		echo bsd
+	    else
+		echo msdos
+	    fi;;	    
+	arm)
+	    echo msdos;;
+	amd64)
+	    echo msdos;;
+	hppa)
+	    echo msdos;;
+	ia64)
+	    echo gpt;;
+	i386)
+	    echo msdos;;
+	m68k)
+	    case "$sub" in
+		amiga)
+		    echo amiga;;
+		atari)
+		    echo UNKNOWN;; # atari is unsupported by parted
+		mac)
+		    echo mac;;
+		*vme*)
+		    echo msdos;;
+		*)
+		    echo UNKNOWN;;
+	    esac;;
+	mips)
+	    echo dvh;;
+	mipsel)
+	    echo msdos;;
+	powerpc)
+	    case "$sub" in
+		apus)
+		    echo amiga;;
+		chrp)
+		    echo UNKNOWN;;
+		chrp_pegasos)
+		    echo UNKNOWN;;
+		prep)
+		    echo msdos;; # guess
+		newworld)
+		    echo mac;;
+		oldworld)
+		    echo mac;;
+		*)
+		    echo UNKNOWN;;
+	    esac;;
+	s390)
+	    echo UNKNOWN;; # ibm is unsupported by parted
+	sparc)
+	    echo sun;;
+	*)
+	    echo UNKNOWN;;
+    esac
 }
 
 # Local Variables:
