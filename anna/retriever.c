@@ -30,13 +30,17 @@ get_retriever_packages(void)
 	FILE *fp;
 	struct package_t *p;
 	struct linkedlist_t *list;
-	struct list_node *node;
+	struct list_node *node, *tmp;
 
 	fp = fopen(STATUS_FILE, "r");
 	list = di_pkg_parse(fp);
 	fclose(fp);
-	while (!is_retriever((struct package_t *)list->head->data))
-		list->head = list->head->next;
+	while (list->head != NULL && !is_retriever((struct package_t *)list->head->data)) {
+		di_pkg_free((struct package_t *)list->head->data);
+		tmp = list->head->next;
+		free(list->head);
+		list->head = tmp;
+	}
 	node = list->head;
 	while (node != NULL && node->next != NULL)
 	{
@@ -44,11 +48,15 @@ get_retriever_packages(void)
 		{
 			if (node->next == NULL)
 				break;
-			// FIXME: Explain why it can't be half-configured
+			/* half_configured means we have tried to configure
+			 * it before, and that failed. */
 			p = (struct package_t *)node->next->data;
-			if (!is_retriever(p) || p->status == half_configured)
-				node->next = node->next->next;
-			else
+			if (!is_retriever(p) || p->status == half_configured) {
+				di_pkg_free(p);
+				tmp = node->next->next;
+				free(node->next);
+				node->next = tmp;
+			} else
 				break;
 		}
 		node = node->next;
@@ -115,6 +123,7 @@ choose_retriever(void)
 	if (ret_pkgs == NULL)
 		return 0;
 	ret_choices = get_retriever_choices(ret_pkgs);
+	di_list_free(ret_pkgs, di_pkg_free);
 	if (ret_choices[0] == '\0')
 		return 0;
 

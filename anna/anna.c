@@ -72,6 +72,12 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
                                 prev->next = next;
                         else
                                 packages->head = next;
+			/* FIXME: These packages may be pulled in again later,
+			 * by the toposort. How do we find and free the
+			 * packages that are NOT pulled in?
+			 */
+			//di_pkg_free(p);
+			//free(node);
                         continue;
                 } else if (p->priority < standard) {
 			/* Unlink these packages temporarily */
@@ -142,6 +148,9 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 		next = node->next;
 		p = (struct package_t *)node->data;
 		if (p->filename == NULL || is_installed(p, status_p)) {
+			/* These should be safe to free */
+			di_pkg_free(p);
+			free(node);
 			if (prev)
 				prev->next = next;
 			else
@@ -150,6 +159,8 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 		}
 		prev = node;
 	}
+
+	di_list_free(status_p, di_pkg_free);
 
 	return packages;
 }
@@ -255,6 +266,8 @@ int install_packages (struct linkedlist_t *packages) {
 	debconf->command(debconf, "PROGRESS STOP", NULL);
 
 	cleanup();
+
+	di_list_free(packages, di_pkg_free);
 
 	return ret;
 }
