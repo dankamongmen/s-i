@@ -67,6 +67,7 @@ do
     	    register-module "$module"
     	    module_probe "$module"
         fi
+	continue
     fi
     
     # No ethernet interface. Try manual loading.
