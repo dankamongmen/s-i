@@ -4,17 +4,12 @@ Important things to do before preview release
 Here's a list of urgent things we need to do before issuing a preview
 release.
 
-  * Get the severities of the linux-kernel-di package fixed, they are
-    overrdidden to bad values and this makes some hardware and filesystems
-    unavailable by default in the installer.
+  * Get the load-* stuff out of NEW.
 
   * Fix mkreiserfs to not hang. (#213314)
 
   * Finish the libdebian-installer transition, get a working install again.
     (Done or nearly so.)
-
-  * Split off hostname configuration from netcfg.
-    See #201707 and #201869.
 
   * Error handling.  We need to make sure the user is told so when
     something goes wrong. It's especially bad for debootstrap.
@@ -22,6 +17,9 @@ release.
   * Progress bar when running mkfs.
 
   * bogl-term refresh problem
+
+  * Is cfdisk really the best partitioner we can come up with on i386, 
+    aside from autopartkit?
 
   * Get some new successful CD installation reports with builds newer than
     the Oct 8th build.
@@ -36,10 +34,10 @@ Current status
 	successful installs (and many bugs).
 	Some success with other install methods: floppy, netboot, etc.
 
-	debian-installer install images are built daily for i386, powerpc.
+	debian-installer images are built daily for i386, powerpc.
 	This includes CD images.
 
-	debian-installer install images (i386, powerpc) are available in
+	debian-installer boot images (i386, powerpc) are available in
 	the Debian archive, in unstable.
 	
 Status for different parts of debian-installer.  The numbers are
@@ -57,6 +55,9 @@ time.
 	- lintian support for udebs, to catch all the common gotchas
 	- ppp support
 	  Not as important for analog dialup, as for ISDN, pppoe.
+	- wireless support
+	  If you're lucky, you may just get a nearby AP by default, but
+	  there is no wireless-tools, no way to configure it
 	- some architectures
 		arm
 		hurd-i386
@@ -64,7 +65,7 @@ time.
 		s/390
 		sparc
 
-[30%] Might need large rewrites.  Current implementation might
+[30%] Might need large rewrites. Current implementation might
       work by accident
 ---------------------------------------------------------------------
         - user documentation
@@ -78,9 +79,12 @@ time.
 	- cdrom-checker
 		apparently broken (#213054)
 	- pcmcia support
-		Needs integration with the rest of the hardware detection,
-		instead of being a (broken) toplevel menu item.
-		Works sometimes, but only with vast pain.
+		may work, may not..
+		pcmcia-modules are not installed onto the target 
+		pcmcia-cs-udeb has a broken (reduced?) pcmcia config
+		which makes it not work with eg, orinoco
+		Probably need to re-run hw-detect after loading pcmcia from
+		the net_driver floppy.
 	- some architectures
 		alpha
 		hppa
@@ -140,8 +144,8 @@ time.
 		There is currently no mechanism to promote boot media
 		or udebs from unstable to testing.
 	- some architectures
-		powerpc (some subarches)
 		i386
+		powerpc (some subarches)
 
 [90%] Single missing important feature or bug.
 ---------------------------------------------------------------------
