@@ -308,7 +308,9 @@ fi
 apt-install discover || true
 
 # Install hotplug as well (for USB, IEEE1394, CardBus, and some SCSI)
-apt-install hotplug || true
+if [ -f /proc/sys/kernel/hotplug ]; then 
+	apt-install hotplug || true
+fi
 
 db_progress SET $MAX_STEPS
 db_progress STOP
