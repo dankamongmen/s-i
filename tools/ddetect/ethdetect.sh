@@ -62,8 +62,7 @@ get_modinfo()
       MODINFO=$(echo "$MODINFOTMP" | cut -d':' -f3- | sed 's/,//g')
       linenum=$(echo "$MODINFOTMP" | cut -d':' -f1)
       # Write out the tmp file without the line just used.
-      grep -n . $NETDISCOVER | grep -v ^${linenum} | cut -f2- -d':' > $NETDISCOV
-ER~
+      grep -n . $NETDISCOVER | grep -v ^${linenum} | cut -f2- -d':' > $NETDISCOVER
       mv $NETDISCOVER~ $NETDISCOVER
     fi
   fi
