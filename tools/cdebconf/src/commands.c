@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.28 2002/11/19 21:54:12 barbier Exp $
+ * $Id: commands.c,v 1.29 2002/11/21 22:40:01 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -585,14 +585,12 @@ int command_purge(struct confmodule *mod, int argc, char **argv,
  * Output: int - DC_NOTOK if error, DC_OK otherwise
  * Description: handler for the METAGET debconf command; retrieves given 
  *              attributes for a template
- * Assumptions: only supports retrieving the following attributes:
- *              value, description, extended_description, choices
  */
 int command_metaget(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
 	struct question *q;
-	char *field;
+	char *value;
 
 	CHECKARGC(== 2);
 	q = mod->questions->methods.get(mod->questions, argv[1]);
@@ -601,26 +599,8 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 	{
-		field = argv[2];
-		
-		/* 
-		 * the spec is very vague here, what fields are we supposed 
-		 * to recognize? default? localized description fields?
-		 * name of the question? type of the question?
-		 */
-		if (strcmp(field, "value") == 0)
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, q->value);
-		else if (strcmp(field, "description") == 0)
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_field(q, "", field));
-		else if (strcmp(field, "extended_description") == 0)
-			/* NOTE: this probably is wrong, because the extended
-			 * description is likely multiline
-			 */
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_field(q, "", field));
-		else if (strcmp(field, "choices") == 0)
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_field(q, "", field));
-		else
-			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
+		value = question_get_field(q, "", argv[2]);
+		snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, value);
 	}
 
 	return DC_OK;

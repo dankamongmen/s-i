@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.19 2002/11/19 23:18:44 barbier Exp $
+ * $Id: question.c,v 1.20 2002/11/21 22:40:03 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -231,12 +231,19 @@ const char *question_get_field(struct question *q, const char *lang,
 	const char *field)
 {
 	static char buf[4096] = {0};
-	if (strcmp(field, "default") == 0 && q->value != 0 && *q->value != 0)
-		return q->value;
+	if (strcmp(field, "value") == 0)
+	{
+		if (q->value != 0)
+			return q->value;
 
-	question_expand_vars(q,
-		q->template->lget(q->template, lang, field),
-		buf, sizeof(buf));
+		question_expand_vars(q,
+			q->template->lget(q->template, lang, "default"),
+			buf, sizeof(buf));
+	}
+        else
+		question_expand_vars(q,
+			q->template->lget(q->template, lang, field),
+			buf, sizeof(buf));
 	return buf;
 }
 

@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.14 2002/11/19 21:54:12 barbier Exp $
+ * $Id: slang.c,v 1.15 2002/11/21 22:40:11 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -319,7 +319,7 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	const char *value = "true";
 	int ret = 0, ans, pos = 2;
 
-	value = question_get_field(q, NULL, "default");
+	value = question_get_field(q, NULL, "value");
 
 	ans = (strcmp(value, "true") == 0);
 
@@ -385,7 +385,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	/* Parse out all the choices */
 	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, NULL, "default"), defaults, DIM(defaults));
+	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
 	if (count <= 0) return DC_NOTOK;
 
@@ -507,7 +507,7 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 	int cursor;
 	char *tmp;
 
-	STRCPY(value, question_get_field(q, NULL, "default"));
+	STRCPY(value, question_get_field(q, NULL, "value"));
 	cursor = strlen(value);
 
 	/* TODO: scrolling */

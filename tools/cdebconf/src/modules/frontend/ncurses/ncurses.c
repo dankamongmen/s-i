@@ -244,7 +244,7 @@ static int nchandler_boolean(struct frontend *ui, struct question *q)
 		value = q->value;
 	else
 	{
-		dft = (char *) q->template->lget(q->template, NULL, "default");
+		dft = (char *) q->template->lget(q->template, NULL, "value");
 		if (dft != 0 && *dft != 0)
 			value = dft;
 	}
@@ -359,7 +359,7 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 	char *choices[100] = {0};
 	char *choices_translated[100] = {0};
 	char *defaults[100] = {0};
-	const char *defval = question_get_field(q, NULL, "default");
+	const char *defval = question_get_field(q, NULL, "value");
 
 	int i, count, dcount, ret = 0, def = -1, pos = 2, xpos, ypos;
 	int top, bottom, longest;
@@ -370,7 +370,7 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 	if (count <= 0) return DC_NOTOK;
 
 	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, NULL, "default"), defaults, DIM(defaults));
+	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
 
 	/* See what the currently selected value should be -- either a
 	 * previously selected value, or the default for the question

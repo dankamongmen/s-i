@@ -142,11 +142,11 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 	memset(selected, ' ', count);
 
 	dcount = 1;
-	for(p = question_get_field(q, NULL, "default"); *p; p++)
+	for(p = question_get_field(q, NULL, "value"); *p; p++)
 		if(*p == ',')
 		  	dcount++;
 	defaults = malloc(sizeof(char *) * dcount);
-	dcount = strchoicesplit(question_get_field(q, NULL, "default"), defaults, dcount);
+	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, dcount);
 	for(j = 0; j < dcount; j++)
 	{
 		for(i = 0; i < count; i++)
@@ -197,7 +197,7 @@ int bogl_handler_string(struct frontend *ui, struct question *q)
 
 	bowl_flush();
 	drawdesctop(ui, q);
-	bowl_new_input(&s, question_get_field(q, NULL, "default"));
+	bowl_new_input(&s, question_get_field(q, NULL, "value"));
 	drawnavbuttons(ui, q);
 	drawdescbot(ui, q);
 	bowl_layout();
