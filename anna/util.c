@@ -418,7 +418,7 @@ get_initial_package_list(struct linkedlist_t *pkglist)
 
     list = malloc(sizeof(struct linkedlist_t));
     list->head = list->tail = NULL;
-    if ((fp = fopen(AUTOINST_FILE, "r")) == NULL)
+    if ((fp = fopen(INCLUDE_FILE, "r")) == NULL)
         return list;
     while (fgets(buf, sizeof(buf), fp) != NULL) {
         if (buf[0] == '#')
@@ -449,3 +449,34 @@ get_initial_package_list(struct linkedlist_t *pkglist)
     return list;
 }
 
+void
+drop_excludes(struct linkedlist_t *pkglist)
+{
+    struct list_node *node, *next, *prev;
+    struct package_t *p;
+    FILE *fp;
+    char buf[1024], *ptr;
+
+    if ((fp = fopen(EXCLUDE_FILE, "r")) == NULL)
+        return;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        if (buf[0] == '#')
+            continue;
+        if ((ptr = strchr(buf, '\n')) != NULL)
+            *ptr = '\0';
+        for (node = pkglist->head; node != NULL; node = next) {
+            next = node->next;
+            p = (struct package_t *)node->data;
+            if (strcmp(buf, p->package) == 0) {
+                if (prev)
+                    prev->next = next;
+                else
+                    pkglist->head = next;
+                continue;
+            }
+            prev = node;
+        }
+    }
+    fclose(fp);
+    return;
+}

@@ -72,7 +72,6 @@ choose_modules(void)
         free(pkglist);
         return 4;
     }
-    di_pkg_resolve_deps(pkglist);
     /* OK. We have a list of packages. What we want to do is partition it in
      * two parts. One with packages that will be installed and one with
      * packages that *might* be installed */
@@ -126,6 +125,10 @@ choose_modules(void)
         package_count++;
         prev = node;
     }
+    /* Drop files in udeb_exclude */
+    drop_excludes(instlist);
+    /* Resolve provides */
+    di_pkg_resolve_deps(instlist);
     /* Pull in dependencies */
     tmplist = di_pkg_toposort_list(instlist);
     /* Free up the memory used by the nodes in the old instlist */
