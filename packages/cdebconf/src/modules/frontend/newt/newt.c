@@ -457,7 +457,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     int t_width_title, t_width_buttons;
     char **choices, **choices_trans, **defvals, *answer;
     int count = 0, defcount, i, k, ret, def;
-    const char *p;
+    char *p;
     size_t res;
     wchar_t c;
     int *tindex = NULL;
@@ -510,7 +510,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
             if (strwidth(choices_trans[i]) > sel_width) {
                 for (res = 0, p = choices_trans[i]; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 && res < sel_width; p += k)
                     res += wcwidth (c);
-                choices_trans[i][res] = 0;
+                *p = 0;
             }
         }
     }
@@ -610,7 +610,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     int *tindex = NULL;
     const char *indices = q_get_indices(q);
     char *full_description = get_full_description(q);
-    const char *p;
+    char *p;
     size_t res;
     int k;
     wchar_t c;
@@ -658,7 +658,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
             if (strwidth(choices_trans[i]) > sel_width) {
                 for (res = 0, p = choices_trans[i]; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 && res < sel_width; p += k)
                     res += wcwidth (c);
-                choices_trans[i][res] = 0;
+                *p = 0;
             }
         }
     }
