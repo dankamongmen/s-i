@@ -65,6 +65,11 @@ load_modules()
 # wrapper for discover command that can distinguish Discover 1.x and 2.x
 discover_hw () {
     DISCOVER=/sbin/discover
+    if [ -f /usr/bin/didiscover ] ; then
+        log "Testing experimental discover2 package."
+
+        DISCOVER=/usr/bin/didiscover
+    fi
     # Ugh, Discover 1.x didn't exit with nonzero status if given an
     # unrecongized option!
     DISCOVER_TEST=$($DISCOVER --version 2> /dev/null)
@@ -78,15 +83,8 @@ discover_hw () {
         dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
         dflags="-d all -e ata -e pci -e pcmcia -e scsi all"
 
-	# Use fixed name temp files, as 'tempfile' is missing from busybox
-        VENDOR_MODEL_FILE=/tmp/discover-vendor.txt
-        DRIVER_FILE=/tmp/discover-driver.txt
-
-        $DISCOVER --type-summary $dflags > $VENDOR_MODEL_FILE
-        $DISCOVER --data-path=$dpath --data-version=$dver $dflags > $DRIVER_FILE
-        # 'paste' is missing from busybox-cvs-udeb [pere 2003-06-01]
-        paste -d: $VENDOR_MODEL_FILE $DRIVER_FILE
-        rm -f $VENDOR_MODEL_FILE $DRIVER_FILE
+        $DISCOVER --data-path=$dpath --data-version=$dver \
+	    --data-vendor --data-model --format='%s:%s %s' $dflags
     else
         # must be Discover 1.x
         $DISCOVER --format="%m:%V %M\n" \
