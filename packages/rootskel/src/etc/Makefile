@@ -1,6 +1,6 @@
 dir = etc
 
-# backward compatiblity
+# backward compatibility
 subdirs_empty = rcS.d
 
 files = \
