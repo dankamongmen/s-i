@@ -69,6 +69,11 @@ echo  " <D-I repository path>: path to the local copy of the D-I repository"
 
 svnerr() {
 echo "Error in a SVN operation, please investigate"
+echo "Trying to cleanup locks..."
+if "$DI_COPY" ;  then
+  cd $DI_COPY
+  $svn cleanup
+fi
 exit 1
 }
 
