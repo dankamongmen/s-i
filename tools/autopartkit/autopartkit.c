@@ -233,8 +233,6 @@ void autopartkit_log(const int level, const char * format, ...)
     }
     va_end(ap);
 }
-#define autopartkit_err autopartkit_log
-
 static void autopartkit_confirm(void)
 {
     static int confirm = 0;
@@ -790,7 +788,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     fstab = fopen(FSTAB, "w");
 
     if ( ! fstab) {
-        autopartkit_err( 0, "Unable to open /target/etc/fstab for writing!\n");
+        autopartkit_error(0,"Unable to open /target/etc/fstab for writing!\n");
 	return; /* FIXME: what now?  crash and burn!*/
     }
 
@@ -1335,7 +1333,7 @@ int main (int argc, char *argv[])
 #endif /* TEST */
 
     if ( ! tablefile )
-        autopartkit_err(1, "usage: %s <debconf-template>\n", argv[0]);
+        autopartkit_error(1, "usage: %s <debconf-template>\n", argv[0]);
 
     disk_reqs = load_partitions(tablefile);
 
@@ -1349,8 +1347,8 @@ int main (int argc, char *argv[])
 
     if (NULL == disk_reqs)
     {
-        autopartkit_err( 0, "Unable to load partition table '%s'.\n",
-			 tablefile);
+        autopartkit_error( 0, "Unable to load partition table '%s'.\n",
+			   tablefile);
 	goto end;
     }
     else
