@@ -1,6 +1,4 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
@@ -13,40 +11,30 @@ endif
 
 export CFLAGS
 
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
-configure: configure-stamp
-configure-stamp:
+config.status:
 	dh_testdir
 
-	if ./configure --prefix=/usr --sysconfdir=/etc \
-			--enable-small --enable-lvm; then \
-		: ; \
-	else \
-		echo "Dump of config.log: " ; cat config.log ; echo ; \
-		exit 1 ; \
-	fi
+	./configure \
+		--prefix=/usr \
+		--sysconfdir=/etc \
+		--enable-small \
+		--enable-lvm
 
 	touch configure-stamp
 
-build: configure-stamp build-stamp
-build-stamp:
+build: build-stamp
+build-stamp: config.status
 	dh_testdir
-
-	# Make sure we do not ship symlinks in the source package (#232610)
-	for file in install-sh mkinstalldirs depcomp missing ; do \
-	    cp $$file $$file.new; mv $$file.new $$file; \
-	done
 
 	$(MAKE)
 
-	touch build-stamp
+	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
+
+	rm -f build-stamp
 	rm -f debian/autopartkit.postinst
 
 	-$(MAKE) distclean
@@ -58,15 +46,13 @@ install: build
 	dh_testroot
 	dh_installdirs etc/autopartkit usr/bin
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/autopartkit
-	strip --remove-section=.note --remove-section=.comment `pwd`/debian/autopartkit/usr/bin/autopartkit
 
 # Build architecture-independent files here.
 binary-indep: build install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install autopartkit
-autopartkit:
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf

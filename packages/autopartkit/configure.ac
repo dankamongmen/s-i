@@ -1,9 +1,8 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT([autopartkit],[0.76],[debian-boot@lists.debian.org])
-AM_INIT_AUTOMAKE(autopartkit, 0.76)
+AM_INIT_AUTOMAKE([foreign no-define])
 
-AC_CONFIG_SRCDIR([autopartkit.c])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC
