@@ -228,6 +228,37 @@ di_pkg_free(struct package_t *p)
     free(p);
 }
 
+static char *
+parse_dependency(char *buf, struct package_dependency **dep)
+{
+    char *b;
+
+    /*
+     * Basic depends line parser. Can ignore versioning
+     * info since the depends are already satisfied.
+     */
+    while (*buf != 0 && *buf != '\n')
+    {
+        if (*buf != ' ' && *buf != ',')
+        {
+            b = buf;
+            while (*b != 0 && *b != '\n' && *b != ',')
+            {
+                if (*b == ' ')
+                    *b = 0;
+                b++;
+            }
+            *b = 0;
+            *dep = malloc(sizeof(struct package_dependency));
+            (*dep)->name = strdup(buf);
+            (*dep)->ptr = NULL;
+            return b+1;
+        }
+        buf++;
+    }
+    return NULL;
+}
+
 #define BUFSIZE         4096
 struct linkedlist_t *
 di_pkg_parse(FILE *f)
@@ -236,7 +267,6 @@ di_pkg_parse(FILE *f)
     struct linkedlist_t *list;
     struct list_node *node;
     struct package_t *p = NULL;
-    struct package_dependency *dep;
     char *b;
     int i;
 
@@ -334,75 +364,60 @@ di_pkg_parse(FILE *f)
         }
         else if (di_stristr(buf, "Depends: ") == buf)
         {
-            /*
-             * Basic depends line parser. Can ignore versioning
-             * info since the depends are already satisfied.
-             */
-            b = strchr(buf, ' ') + 1;
+            b = strchr(buf, ' ')+1;
             i = 0;
-            while (*b != 0 && *b != '\n')
-            {
-                if (*b != ' ' && *b != ',')
+            while (b != NULL) {
+                b = parse_dependency(b, &p->depends[i++]);
+                if (i == DEPENDSMAX)
                 {
-                    dep = malloc(sizeof(struct package_dependency));
-                    dep->name = b;
-                    while (*b != 0 && *b != '\n' && *b != ',')
-                    {
-                        if (*b == ' ')
-                            *b = 0;
-                        b++;
-                    }
-                    *b = 0;
-                    dep->name = strdup(dep->name);
-                    dep->ptr = NULL;
-                    p->depends[i] = dep;
-                    p->depends[++i] = 0;
-                    if (i == DEPENDSMAX)
-                    {
-                        char *emsg;
+                    char *emsg;
 
-                        asprintf(&emsg, "Package %s has more than %d dependencies!",
-                                p->package, DEPENDSMAX-1);
-                        di_log(emsg);
-                        free(emsg);
-                    }
+                    asprintf(&emsg, "Package %s has more than %d dependencies!",
+                            p->package, DEPENDSMAX-1);
+                    di_log(emsg);
+                    free(emsg);
+                    break;
                 }
-                b++;
             }
+            p->depends[i] = NULL;
         }
         else if (di_stristr(buf, "Provides: ") == buf)
         {
-            b = strchr(buf, ' ') + 1;
+            b = strchr(buf, ' ')+1;
             i = 0;
-            while (*b != 0 && *b != '\n')
-            {
-                if (*b != ' ' && *b != ',')
+            while (b != NULL) {
+                b = parse_dependency(b, &p->provides[i++]);
+                if (i == PROVIDESMAX)
                 {
-                    dep = malloc(sizeof(struct package_dependency));
-                    dep->name = b;
-                    while (*b != 0 && *b != '\n' && *b != ',')
-                    {
-                        if (*b == ' ')
-                            *b = 0;
-                        b++;
-                    }
-                    *b = 0;
-                    dep->name = strdup(dep->name);
-                    dep->ptr = NULL;
-                    p->provides[i] = dep;
-                    p->provides[++i] = 0;
-                    if (i == PROVIDESMAX)
-                    {
-                        char *emsg;
+                    char *emsg;
 
-                        asprintf(&emsg, "Package %s has more than %d provides!",
-                                p->package, PROVIDESMAX-1);
-                        di_log(emsg);
-                        free(emsg);
-                    }
+                    asprintf(&emsg, "Package %s has more than %d provides!",
+                            p->package, PROVIDESMAX-1);
+                    di_log(emsg);
+                    free(emsg);
+                    break;
                 }
-                b++;
             }
+            p->provides[i] = NULL;
+        }
+        else if (di_stristr(buf, "Recommends: ") == buf)
+        {
+            b = strchr(buf, ' ')+1;
+            i = 0;
+            while (b != NULL) {
+                b = parse_dependency(b, &p->recommends[i++]);
+                if (i == RECOMMENDSMAX)
+                {
+                    char *emsg;
+
+                    asprintf(&emsg, "Package %s has more than %d recommends!",
+                            p->package, RECOMMENDSMAX-1);
+                    di_log(emsg);
+                    free(emsg);
+                    break;
+                }
+            }
+            p->recommends[i] = NULL;
         }
     }
 
@@ -532,6 +547,13 @@ dfs_visit(struct package_t *p, struct linkedlist_t *queue)
     p->processed = 1;
     for (i = 0; p->depends[i] != NULL; i++) {
         q = p->depends[i]->ptr;
+        if (q == NULL)
+            continue;
+        if (!q->processed)
+            dfs_visit(q, queue);
+    }
+    for (i = 0; p->recommends[i] != NULL; i++) {
+        q = p->recommends[i]->ptr;
         if (q == NULL)
             continue;
         if (!q->processed)
