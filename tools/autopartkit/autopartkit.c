@@ -127,24 +127,12 @@ struct _DeviceStats {
 };
 
 /* Pre-declarations */
-static void mydebconf_debug(const char*, const char*);
 static const char* mydebconf_input(char*, char*);
 static PedDevice* choose_device(void);
 static void fix_mounting(device_mntpoint_map_t mountmap[], int partcount);
 #if defined(fordebian)
 static DeviceStats* get_device_stats(PedDevice*);
 #endif /* fordebian */
-
-static void mydebconf_debug (const char* variable, const char* value)
-{
-    const char *template = "autopartkit/debug";
-    autopartkit_log(2, "debug: %s = %s\n", variable, value);
-    client->command(client, "FSET", template, "seen", "false", NULL);
-    client->command(client, "SUBST", template, "variable", variable, NULL);
-    client->command(client, "SUBST", template, "value", value, NULL);
-    client->command(client, "INPUT high", template, NULL);
-    client->command(client, "GO", NULL);
-}
 
 void
 autopartkit_error (int isfatal, const char * format, ...)
@@ -162,10 +150,10 @@ autopartkit_error (int isfatal, const char * format, ...)
     va_end(ap);
 
     autopartkit_log(1, "error: %d, %s\n", isfatal, msg);
-    client->command(client, "FSET", template, "seen", "false", NULL);
-    client->command(client, "SUBST", template, "error", msg, NULL);
-    client->command(client, "INPUT high", template, NULL);
-    client->command(client, "GO", NULL);
+    debconf_fset(client, template, "seen", "false");
+    debconf_subst(client, template, "error", msg);
+    debconf_input(client, "high", template);
+    debconf_go(client);
 
     if (msg)
         free(msg);
@@ -176,29 +164,17 @@ autopartkit_error (int isfatal, const char * format, ...)
 
 static const char * mydebconf_input (char *priority, char *template)
 {
-    client->command (client, "FSET", template, "seen", "false", NULL);
-    client->command (client, "INPUT", priority, template, NULL);
-    client->command (client, "GO", NULL);
-    client->command (client, "GET", template, NULL);
+    debconf_fset (client, template, "seen", "false");
+    debconf_input (client, priority, template);
+    debconf_go (client);
+    debconf_get (client, template);
     return client->value;
-}
-
-static void mydebconf_note(char * template)
-{
-    client->command(client, "FSET", template, "seen", "false", NULL);
-    client->command(client, "INPUT high", template, NULL);
-    client->command(client, "GO", NULL);
 }
 
 static const char * mydebconf_get(const char *template)
 {
-    client->command(client, "GET", template, NULL);
+    debconf_get(client, template);
     return client->value;
-}
-
-static void mydebconf_settitle(const char *template)
-{
-    client->command(client, "SETTITLE", template, NULL);
 }
 
 void autopartkit_log(const int level, const char * format, ...)
@@ -216,15 +192,15 @@ void autopartkit_log(const int level, const char * format, ...)
 static void autopartkit_confirm(void)
 {
     const char *template = "autopartkit/confirm";
-    client->command (client, "INPUT", "critical", template, NULL);
-    client->command (client, "GO", NULL);
-    client->command (client, "GET", template, NULL);
+    debconf_input (client, "critical", template);
+    debconf_go (client);
+    debconf_get (client, template);
     if (strstr(client->value, "true"))
         return;
     else
     {
 	/* Make sure the question is displayed the next time too */
-	client->command (client, "FSET", template, "seen", "false", NULL);
+	debconf_fset (client, template, "seen", "false");
         exit(EXIT_FAILURE);
     }
 }
@@ -414,12 +390,11 @@ static PedDevice* choose_device(void)
     {
         const char *template = "autopartkit/choose_device";
         const char *value;
-        client->command(client, "FGET", template, "seen", NULL);
+        debconf_fget(client, template, "seen");
         if (strcmp(client->value, "false") == 0)
-            client->command(client, "SET", template, default_device, NULL);
-        client->command(client, "SUBST", template, "CHOICES", device_list,
-			NULL);
-        client->command(client, "SUBST", template, "TABLE", table, NULL);
+	    debconf_set(client, template, default_device);
+        debconf_subst(client, template, "CHOICES", device_list);
+        debconf_subst(client, template, "TABLE", table);
 
         value = mydebconf_input("critical", template);
         disable_kmsg(1);
@@ -1279,7 +1254,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     fix_mounting(mountmap, partcount);
 
     log_line();
-    /* mydebconf_note("autopartkit/success"); */
 }
 
 /* 
@@ -1319,7 +1293,7 @@ int main (int argc, char *argv[])
 			"Continuing anyway.\n");
 #endif /* LVM_HACK */
 
-    mydebconf_settitle("autopartkit/title");
+    debconf_settitle(client, "autopartkit/title");
 
     disable_kmsg(1);
     ped_exception_set_handler(exception_handler);
