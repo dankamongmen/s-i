@@ -9,6 +9,9 @@ else
 	PROFILE=Workstation
 fi
 
+db_get debian-installer/locale || true
+LANG_INST="$RET"
+
 db_get netcfg/get_hostname 
 HOSTNAME=$RET
 
@@ -99,7 +102,9 @@ cp -a /var/lib/cdebconf /target/root
 # Prepare to run base-config after reboot
 mv /target/etc/inittab /target/etc/inittab.real
 cp /usr/share/prebaseconfig/inittab /target/etc/inittab
-touch /target/root/dbootstrap_settings
+(
+    echo LANG_INST="$LANG_INST"
+) >> /target/root/dbootstrap_settings
 
 umount -a || true
 
