@@ -1,0 +1,67 @@
+Writing modules
+~~~~~~~~~~~~~~~
+
+cdebconf is designed to allow frontend and database modules to be plugged
+in as needed. Modules can be built to support different database backends
+(e.g. postgres, ldap, etc) and frontends (e.g. ncurses, gtk, etc).
+
+Database modules:
+
+database.h defines the database module interface. Each database module
+needs to export a struct named debconf_database_module of type 
+struct database_module, defined as:
+
+struct database_module {
+	dcd_initialize_t initialize;
+	dcd_shutdown_t shutdown;
+	dcd_load_t load;
+	dcd_save_t save;
+	dcd_template_set_t template_set;
+	dcd_template_get_t template_get;
+	dcd_template_remove_t template_remove;
+	dcd_template_lock_t template_lock;
+	dcd_template_unlock_t template_unlock;
+	dcd_template_iterate_t template_iterate;
+	dcd_question_get_t question_get;
+	dcd_question_set_t question_set;
+	dcd_question_disown_t question_disown;
+	dcd_question_disownall_t question_disownall;
+	dcd_question_lock_t question_lock;
+	dcd_question_unlock_t question_unlock;
+	dcd_question_visible_t question_visible;
+	dcd_question_iterate_t question_iterate;
+};
+
+Each of these methods have a signature defined in database.h. All methods
+have a sensible default implementation (usually doing nothing) so that 
+you only need to override the ones you need.
+
+/* TODO: describe each method */
+
+See modules/db/* for some examples.
+
+Frontend modules
+
+Similarly, frontend modules have an interface defined in frontend.h.
+Modules export a struct called debconf_frontend_module of type 
+struct frontend_module, defined as:
+
+struct frontend_module {
+	dcf_initialize_t initialize;
+	dcf_shutdown_t shutdown;
+	dcf_query_capability_t query_capability;
+	dcf_set_title_t set_title;
+	dcf_add_t add;
+	dcf_go_t go;
+	dcf_clear_t clear;
+};
+
+Each of these methods have a signature defined in frontend.h. All methods
+have a sensible default implementation (usually doing nothing) so that 
+you only need to override the ones you need.
+
+/* TODO: describe each method */
+
+See modules/frontend/* for examples.
+
+$Id: modules.txt,v 1.1 2000/12/09 07:52:16 tausq Exp $
