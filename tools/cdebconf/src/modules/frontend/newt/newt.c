@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.46 2004/03/04 00:26:24 barbier Exp $
+ * $Id: newt.c,v 1.47 2004/03/04 00:32:41 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -1042,8 +1042,9 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     win_width = width-7;
     newtCenteredWindow(win_width, 5, title);
     data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max - obj->progress_min);
-    data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, 1, flags);
-    data->scale_textbox_height = 1;
+    /*  Minimal height set to 2 to prevent box flashing */
+    data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, 2, flags);
+    data->scale_textbox_height = 2;
     data->scale_form = create_form(NULL);
     newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
     newtDrawForm(data->scale_form);
@@ -1091,7 +1092,9 @@ newt_progress_info(struct frontend *obj, const char *info)
 
 	newtGetScreenSize(&width, NULL);
 	win_width = width-7;
-	text_height = get_text_height(info, win_width-2);
+	text_height = get_text_height(info, win_width);
+	if (text_height < 2)
+	    text_height = 2;
 	if (text_height != data->scale_textbox_height) {
 	    newtFormDestroy(data->scale_form);
 	    newtPopWindow();
@@ -1105,7 +1108,7 @@ newt_progress_info(struct frontend *obj, const char *info)
 	}
 #ifdef HAVE_LIBTEXTWRAP
 	textwrap_init(&tw);
-	textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING - 5);
+	textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
 	wrappedtext = textwrap(&tw, info);
 	newtTextboxSetText(data->scale_textbox, wrappedtext);
 	free(wrappedtext);
