@@ -457,6 +457,7 @@ gen_pcmcia_devnames() {
 				return
 			else
 				echo "$dev:$devname" >> /etc/network/devnames
+				echo "$dev" >> /etc/network/devhotplug
 			fi
 		;;
 		esac
