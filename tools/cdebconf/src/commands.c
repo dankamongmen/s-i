@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.10 2000/12/09 08:01:18 tausq Exp $
+ * $Id: commands.c,v 1.11 2000/12/09 08:18:07 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -145,7 +145,7 @@ int command_title(struct confmodule *mod, int argc, char **argv,
 	char buf[1024] = {0};
 	int i;
 	for (i = 1; i <= argc; i++)
-		strvacat(buf, sizeof(buf), argv[i], 0);	
+		strvacat(buf, sizeof(buf), argv[i], " ", 0);	
 
 	mod->frontend->set_title(mod->frontend, buf);
 	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);

@@ -209,31 +209,34 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 {
 	char *choices[100] = {0};
 	char answer[10];
-	int i, count, choice, def = -1;
+	int i, count, choice = 1, def = -1;
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
-	if (q->template->defaultval != NULL)
+	if (count > 1)
 	{
-		for (i = 0; i < count; i++)
-			if (strcmp(choices[i], q->template->defaultval) == 0)
-				def = i + 1;
+		if (q->template->defaultval != NULL)
+		{
+			for (i = 0; i < count; i++)
+				if (strcmp(choices[i], q->template->defaultval) == 0)
+					def = i + 1;
+		}
+
+		do
+		{
+			for (i = 0; i < count; i++)
+				printf("%3d) %s\n", i+1, choices[i]);
+
+			if (def > 0)
+				printf("1 - %d [default = %d]> ", count, def);
+			else
+				printf("1 - %d> ", count);
+			fgets(answer, sizeof(answer), stdin);
+			if (answer[0] == '\n')
+				choice = def;
+			else
+				choice = atoi(answer);
+		} while (choice <= 0 || choice > count);
 	}
-
-	do
-	{
-		for (i = 0; i < count; i++)
-			printf("%3d) %s\n", i+1, choices[i]);
-
-		if (def > 0)
-			printf("1 - %d [default = %d]> ", count, def);
-		else
-			printf("1 - %d> ", count);
-		fgets(answer, sizeof(answer), stdin);
-		if (answer[0] == '\n')
-			choice = def;
-		else
-			choice = atoi(answer);
-	} while (choice <= 0 || choice > count);
 
 	question_setvalue(q, choices[choice - 1]);
 	for (i = 0; i < count; i++) 
