@@ -111,6 +111,7 @@ void question_owner_add(struct question *q, const char *owner)
 	}
 
 	*ownerp = NEW(struct questionowner);
+	memset(*ownerp, 0, sizeof(struct questionowner));
 	(*ownerp)->owner = STRDUP(owner);
 	(*ownerp)->next = 0;
 }

@@ -160,6 +160,7 @@ struct template *template_dup(struct template *t)
                 return ret;
 
         ret->fields = NEW(struct template_l10n_fields);
+        memset(ret->fields, 0, sizeof(struct template_l10n_fields));
 
         from = t->fields;
         to = ret->fields;
@@ -177,6 +178,7 @@ struct template *template_dup(struct template *t)
                         break;
                 }
                 to->next = NEW(struct template_l10n_fields);
+                memset(to->next, 0, sizeof(struct template_l10n_fields));
                 from = from->next;
                 to = to->next;
         }

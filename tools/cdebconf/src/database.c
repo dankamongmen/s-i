@@ -102,6 +102,7 @@ struct template_db *template_db_new(struct configuration *cfg, char *instance)
 		DIE("Malformed template database module %s", modname);
 
 	db = NEW(struct template_db);
+	memset(db, 0, sizeof(struct template_db));
 	db->handle = dlh;
 	db->modname = modname;
 	db->data = NULL;
@@ -304,6 +305,7 @@ struct question_db *question_db_new(struct configuration *cfg,
 		DIE("Malformed config database module %s", modname);
 
 	db = NEW(struct question_db);
+	memset(db, 0, sizeof(struct question_db));
 	db->handle = dlh;
 	db->modname = modname;
 	db->data = NULL;

@@ -42,6 +42,7 @@ static struct configitem *config_lookuphlp(struct configitem *head,
 		return 0;
 
 	newitem = NEW(struct configitem);
+	memset(newitem, 0, sizeof(struct configitem));
 	newitem->tag = malloc(len+1);
 	newitem->tag[len] = 0;
 	memcpy(newitem->tag, tag, len);
@@ -456,6 +457,7 @@ static struct configitem *config_tree(struct configuration *cfg, const char *tag
 struct configuration *config_new(void)
 {
 	struct configuration *config = NEW(struct configuration);
+	memset(config, 0, sizeof(struct configuration));
 	config->root = NEW(struct configitem);
 	memset(config->root, 0, sizeof(struct configitem));
 	config->get = config_get;

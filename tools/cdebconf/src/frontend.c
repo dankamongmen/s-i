@@ -136,8 +136,8 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 		DIE("Malformed frontend module %s", modname);
 	
 	obj = NEW(struct frontend);
+	memset(obj, 0, sizeof(struct frontend));
 	obj->handle = dlh;
-	obj->data = NULL;
 	obj->config = cfg;
 	obj->tdb = tdb;
 	obj->qdb = qdb;

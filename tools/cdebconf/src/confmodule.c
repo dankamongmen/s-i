@@ -175,7 +175,7 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 		}
 		dup2(fromconfig[1], 1); close(fromconfig[1]);
 
-		args = (char **)malloc(sizeof(char *) * argc-1);
+		args = (char **)malloc(sizeof(char *) * argc);
 		for (i = 1; i < argc; i++)
 			args[i-1] = argv[i];
 		args[argc-1] = NULL;
@@ -212,7 +212,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
 		if (narg == 0)
 			return DC_OK;
 
-		mod->seen_questions = (char **) realloc(mod->seen_questions, narg);
+		mod->seen_questions = (char **) realloc(mod->seen_questions, sizeof(char *) * narg);
 		for (q = mod->frontend->questions; q != NULL; q = q->next)
 		{
 			*(mod->seen_questions+i) = strdup(q->tag);
@@ -265,6 +265,7 @@ struct confmodule *confmodule_new(struct configuration *config,
     struct frontend *frontend)
 {
 	struct confmodule *mod = NEW(struct confmodule);
+	memset(mod, 0, sizeof(struct confmodule));
 
 	mod->config = config;
 	mod->templates = templates;
