@@ -17,8 +17,8 @@ $exp->expect($ENV{STAGE_2_MAX_TIME}, "ogin:");
 
 # Login to network-console.
 my $ssh_exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no installer\@$ENV{S390_IP}") or die "failed to start ssh: $!";
-#$ssh_exp->debug(2);
-#$ssh_exp->exp_internal(1);
+$ssh_exp->debug(2);
+$ssh_exp->exp_internal(1);
 $ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "assword:");
 $ssh_exp->send("$ENV{ROOT_PASSWORD}\r");
 
@@ -27,25 +27,13 @@ $ssh_exp->expect($ENV{STAGE_2_MAX_TIME},
 	[	"Root password:" =>
 		sub {
 			$ssh_exp->send("$ENV{ROOT_PASSWORD}\r");
-			exp_continue;
-		}
-	],
-	[	"enter the same root password again:" =>
-		sub {
+			$ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "enter the same root password again");
 			$ssh_exp->send("$ENV{ROOT_PASSWORD}\r");
-			exp_continue;
-		}
-	],
-	[	"Enter a password for the new user:" =>
-		sub {
+			$ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "Enter a password for the new user");
 			$ssh_exp->send("$ENV{USER_PASSWORD}\r");
-			exp_continue;
-		}
-	],
-	[	"enter the same user password again:" =>
-		sub {
+			$ssh_exp->expect($ENV{STAGE_2_MAX_TIME}, "enter the same user password again");
 			$ssh_exp->send("$ENV{USER_PASSWORD}\r");
-			exp_continue;
+			exp_continue_timeout;
 		}
 	],
 	[	"<Ok>" =>
