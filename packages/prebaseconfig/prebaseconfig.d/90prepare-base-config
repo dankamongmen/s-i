@@ -39,13 +39,14 @@ ttyS*)
 	echo "$console" >> /target/etc/securetty
     fi
 
-    sed -e "s/^\([23]\):#\1:/" /usr/share/prebaseconfig/inittab \
-       > /target/etc/inittab
+    sed -e "s/^\([23]\):#\1:/" \
+        -e "s#CONSOLEDEV#/dev/$console#g" \
+	/usr/share/prebaseconfig/inittab > /target/etc/inittab
 ;;
 *)
-    # graphical console, leave inittab alone
     mv /target/etc/inittab /target/etc/inittab.real
-    cp /usr/share/prebaseconfig/inittab /target/etc/inittab
+    sed -e "s#CONSOLEDEV#/dev/$console#g" /usr/share/prebaseconfig/inittab \
+        > /target/etc/inittab
 ;;
 esac
 
