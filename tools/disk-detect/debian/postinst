@@ -13,23 +13,18 @@ depmod || true
 log () {
     echo "$0: $@" >>/var/log/messages
 }
-log "Detecting disks..."
 
-# Manually load modules to enable things we can't detect.
-manual_load="ide-mod ide-probe-mod ide-disk"
-#manual_load=i82365 usb-storage
-#manual_load=i82365 sr_mod usb-storage
-old=`cat /proc/sys/kernel/printk`
-echo 0 >/proc/sys/kernel/printk
-for module in $manual_load
-do
-    modprobe $module >>/var/log/messages 2>&1
-done
-echo $old >/proc/sys/kernel/printk
+load_module()
+{
+    old=`cat /proc/sys/kernel/printk`
+    echo 0 > /proc/sys/kernel/printk
+    modprobe $1 >> /var/log/messages 2>&1
+    echo $old > /proc/sys/kernel/printk
+}
 
 load_floppy_driver() {
     if [ ! -d /dev/floppy ] ; then
-        modprobe floppy >> /var/log/messages 2>&1 || true
+        load_module floppy
     fi
     if [ ! -d /dev/floppy ] ; then
         log "error: Unable to load floppy device driver"
@@ -37,9 +32,21 @@ load_floppy_driver() {
     floppydev=/dev/floppy/0
 }
 
+log "Detecting disks..."
+
+# Manually load modules to enable things we can't detect.
+manual_load="ide-mod ide-probe-mod ide-disk"
+#manual_load=i82365 usb-storage
+#manual_load=i82365 sr_mod usb-storage
+for module in $manual_load
+do
+    load_module $module
+done
+
 IFS_SAVE="$IFS"
 IFS="
 "
+found_scsi=
 for device in `/sbin/discover --disable-all --enable=pci,ide,scsi,pcmcia \
                 --format="%m\t%V\t%M\n" scsi | sort -u`
 do
@@ -103,10 +110,8 @@ do
 
         if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
-	    old=`cat /proc/sys/kernel/printk`
-	    echo 0 >/proc/sys/kernel/printk
-            modprobe $module >>/var/log/messages 2>&1
-	    echo $old >/proc/sys/kernel/printk
+            found_scsi=true
+            load_module $module
             if [ "$?" != "0" ]
             then
                 log "Error loading driver for $vendor $model!"
@@ -119,6 +124,12 @@ do
 "
 done
 IFS="$IFS_SAVE"
+
+# always load sd_mod if a scsi controller module was loaded
+if [ "$found_scsi" ] ; then
+    load_module sd_mod
+fi
+
 
 # If PCMCIA was detected, load the PCMCIA drivers and load cardmgr
 if [ -e /proc/bus/pccard ]
