@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.40 2003/11/18 19:45:40 mckinstry Rel $
+ * $Id: kbd-chooser.c,v 1.41 2003/12/22 17:55:22 joeyh Rel $
  */
 
 #include "config.h"
@@ -709,7 +709,7 @@ main (int argc, char **argv)
 		switch (state)	{
 		case GOBACK:
 			di_info ("kbdchooser: GOBACK recieved; leaving");
-			exit (30);
+			exit (10);
 		case CHOOSE_ARCH: // First select a keyboard arch.
 			if (mydebconf_ask (kbd_priority, "console-tools/archs", &s)) {
 				state = GOBACK;
