@@ -1,9 +1,21 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
+ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+# Add ntfstools-udeb for arches that have recent versions of windows.
+FS_DEPENDS=
+ifeq ($(ARCH), i386)
+FS_DEPENDS=ntfstools-udeb
+endif
+ifeq ($(ARCH), amd64)
+FS_DEPENDS=ntfstools-udeb
+endif
+ifeq ($(ARCH), ia64)
+FS_DEPENDS=ntfstools-udeb
+endif
+ifeq ($(ARCH), alpha)
+FS_DEPENDS=ntfstools-udeb
+endif
 
 PACKAGE = partman-partitioning
 
@@ -26,16 +38,16 @@ install: build
 	rm -rf `find debian/$(PACKAGE) -name CVS`
 	rm -rf `find debian/$(PACKAGE) -name .svn`
 
-binary-indep: build install
+binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
 	dh_fixperms
 	dh_installdeb
-	dh_gencontrol
+	dh_gencontrol -- -Vfs:Depends=$(FS_DEPENDS)
 	dh_builddeb
 
-binary-arch: build install
+binary-indep: build install
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
