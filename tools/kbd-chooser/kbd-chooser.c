@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.7 2003/01/31 21:13:55 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.8 2003/02/04 04:45:24 kraai Exp $
  */
 
 #include "config.h"
@@ -296,6 +296,7 @@ void read_keymap_files (void)
 		}		
 		ent = readdir (d);
 	}	
+	closedir (d);
 }
 
 void collect_keyboards (void)
