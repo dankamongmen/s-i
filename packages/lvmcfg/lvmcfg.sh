@@ -267,6 +267,16 @@ vg_create() {
 		return
 	fi
 
+	# check if the vg name overlaps with an existing device
+	# FIXME: d-i uses devfs while Debian doesn't, so ideally we
+	# would also check against a regular /dev tree.
+	if [ -e "/dev/$NAME" ]; then
+		db_set lvmcfg/vgcreate_devnameused "false"
+		db_input high lvmcfg/vgcreate_devnameused
+		db_go
+		return
+	fi
+
 	for p in `echo "$PARTITIONS" | sed -e 's/,/ /g'`; do
 		pvcreate -ff -y $p >>/var/log/messages 2>&1
 	done
