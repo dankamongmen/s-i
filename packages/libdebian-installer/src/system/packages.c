@@ -185,7 +185,7 @@ static bool check_real_anna (di_packages_resolve_dependencies_check *r, di_packa
     di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): accept %s, already installed", package->package, d->ptr->package);
     return true;
   }
-#if 0
+#ifdef ENABLE_EXTENSIVE_DEBUG
   di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): check recursive %s", package->package, d->ptr->package);
 #endif
   return di_packages_resolve_dependencies_recurse (r, d->ptr, package);
@@ -197,19 +197,19 @@ static di_package_dependency *check_virtual_anna (di_package *package __attribut
   if (((di_system_package *)d->ptr)->kernel_version &&
       strcmp (((di_system_package *)d->ptr)->kernel_version, sc->kernel))
   {
-#if 0
+#ifdef ENABLE_EXTENSIVE_DEBUG
     di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): discard %s: wrong kernel", package->package, d->ptr->package);
 #endif
     return best;
   }
   if (!di_system_package_check_subarchitecture (d->ptr, sc->subarchitecture))
   {
-#if 0
+#ifdef ENABLE_EXTENSIVE_DEBUG
     di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): discard %s: wrong architecture", package->package, d->ptr->package);
 #endif
     return best;
   }
-#if 0
+#ifdef ENABLE_EXTENSIVE_DEBUG
   if (!best)
     di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): select %s: first try", package->package, d->ptr->package);
   else if (best->ptr->priority < d->ptr->priority)
@@ -220,7 +220,7 @@ static di_package_dependency *check_virtual_anna (di_package *package __attribut
   if (!best || best->ptr->priority < d->ptr->priority ||
       (d->ptr->status >= di_package_status_unpacked && best->ptr->status < di_package_status_unpacked))
     return d;
-#if 0
+#ifdef ENABLE_EXTENSIVE_DEBUG
   di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): discard %s", package->package, d->ptr->package);
 #endif
   return best;
@@ -237,7 +237,7 @@ void di_system_packages_resolve_dependencies_mark_anna (di_packages *packages, c
   {
     check_real_anna,
     check_virtual_anna,
-    di_packages_resolve_dependencies_check_non_existant,
+    di_packages_resolve_dependencies_check_non_existant_permissive,
     di_packages_resolve_dependencies_do_real_mark,
     0,
     &sc,

@@ -175,7 +175,7 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
   package->resolver |= r->resolver;
   package->resolver |= (r->resolver << 1);
 
-#if 0
+#ifdef ENABLE_EXTENSIVE_DEBUG
   di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): start", package->package);
 #endif
 
@@ -251,7 +251,7 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
   return true;
 
 error:
-#if 0
+#ifdef ENABLE_EXTENSIVE_DEBUG
   di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): not okay", package->package);
 #endif
   package->resolver &= ~(r->resolver << 1);
