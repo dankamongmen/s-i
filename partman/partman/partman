@@ -3,12 +3,6 @@
 . /lib/partman/definitions.sh
 
 abort () {
-    # This loop is probably unnecessary
-    for s in /lib/partman/undo.d/*; do
-	if [ -x $s ]; then
-	    $s || true
-	fi
-    done
     open_infifo
     write_line "QUIT"
     close_infifo
