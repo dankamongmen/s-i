@@ -11,7 +11,9 @@ mount | grep -q ^/dev/cdroms/ && exit 0
 # unwillingness to run depmod in kernel-image's postinst.  See Debian
 # bug #136743
 
-depmod -a || true 2>&1 > /dev/null
+if [ -x /sbin/depmod ]; then
+	depmod -a || true 2>&1 > /dev/null
+fi
 
 log () {
     echo "$0: $@" >>/var/log/messages
