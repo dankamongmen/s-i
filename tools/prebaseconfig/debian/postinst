@@ -12,14 +12,20 @@ fi
 db_get debian-installer/locale || true
 LANG_INST="$RET"
 
-db_get netcfg/get_hostname 
-HOSTNAME=$RET
-
-db_get netcfg/get_domain
-FQDN=${HOSTNAME}.$RET
+# Default hostname is 'localhost'
+HOSTNAME=localhost
+NAMES=localhost
+if db_get netcfg/get_hostname && [ "$RET" ]; then
+    NAMES="$RET $NAMES"
+    HOSTNAME=$RET
+fi
+ 
+if db_get netcfg/get_domain && [ "$RET" -a "$HOSTNAME" ] ; then
+    NAMES="${HOSTNAME}.$RET $NAMES"
+fi
 
 echo "$HOSTNAME" > /target/etc/hostname
-echo "127.0.0.1 $FQDN $HOSTNAME localhost" > /target/etc/hosts
+echo "127.0.0.1 $NAMES" > /target/etc/hosts
 
 interfaces=/target/etc/network/interfaces
 
@@ -41,7 +47,7 @@ for value in `echo $PROFILE |sed 's/ /-/g' | sed 's/,-/ /g'`; do
     case $value in
 	Workstation)
  	    # Use this unless Server also was choosen.
-	    if test -z "$eth0" then
+	    if [ -z "$eth0" ] ; then
 		eth0=dhcp
 	    fi
 	    ;;
