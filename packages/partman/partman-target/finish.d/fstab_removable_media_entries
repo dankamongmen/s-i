@@ -55,7 +55,9 @@ for dev in /dev/cdroms/*; do
 	CDDEVICES="$CDDEVICES $mapdev"
     fi
 done
-CDDEVICES="$MAPCDDEV $CDDEVICES" # first the mounted cdrom
+if [ -n "$MAPCDDEV" ]; then
+    CDDEVICES="$MAPCDDEV $CDDEVICES" # first the mounted cdrom
+fi
 
 populate_media cdrom iso9660 ro,user,noauto $CDDEVICES
 # Compatability link to keep things working; sarge is not migrated away
