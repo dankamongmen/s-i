@@ -1,16 +1,15 @@
 /* @brief Choose a keyboard.
  * 
- * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
+ * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.13 2003/03/06 23:34:21 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.14 2003/03/14 22:49:33 mckinstry Exp $
  */
 
 #include "config.h"
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <ctype.h> // Needed ATM for toupper()
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -43,7 +42,7 @@ extern int loadkeys_wrapper (char *map); // in loadkeys.y
 int my_debconf_input (char *priority, char *template, char **result)
 {
 	int res;
-	client->command (client, "fset", template, "seen", "false", NULL);
+	// client->command (client, "fset", template, "seen", "false", NULL);
 	client->command (client, "input", priority, template, NULL);
 	res = client->command (client, "go", NULL);
 	if (res != CMDSTATUS_SUCCESS)
@@ -199,9 +198,6 @@ void select_keymap (maplist_t *maplist)
 		if (score > best) {
 			best = score;
 			preferred = mp;
-			printf ("FIXME: comparing %s (%s) and %s, best %d score %d \n", mp->name, mp->langs,
-		                                                              get_locale(), best, score);
-
 		}
 		mp = mp->next;
 	}
@@ -211,34 +207,35 @@ void select_keymap (maplist_t *maplist)
 	client->command (client, "subst", template, "choices", buf, NULL);	
 	// set the default
 	client->command (client, "fget", template, "seen", NULL);
-	if (strcmp(client->value, "false") == 0) {
+	if (score > 0 && (strcmp(client->value, "false") == 0)) {
 		s = insert_description (deflt, preferred->name, preferred->description);
 		*s = '\0';
 		client->command (client, "set", template, deflt, NULL);
 	}
 }
 
+
 /**
  * @brief	Get a maplist "name", creating if necessary
  */
 maplist_t *maplist_get (char *name)
 {
-	maplist_t *p = maplists;
+maplist_t *p = maplists;
 	
-	while (p) {
-		if (strcmp(p->name, name) == 0)
-			break;
-		p = p->next;
-	}	
-	if (p) return p;
-	p = NEW (maplist_t);
-	if (DEBUG && p==NULL)
-	  DIE ("Failed to create maplist\n");
-	p->next = maplists;
-	p->maps = NULL;
-	p->name = STRDUP (name);
-	maplists = p;
-	return p;
+while (p) {
+if (strcmp(p->name, name) == 0)
+break;
+p = p->next;
+}	
+if (p) return p;
+p = NEW (maplist_t);
+if (DEBUG && p==NULL)
+DIE ("Failed to create maplist\n");
+p->next = maplists;
+p->maps = NULL;
+p->name = STRDUP (name);
+maplists = p;
+return p;
 }
 
 /**
@@ -251,15 +248,15 @@ keymap_t *keymap_get (maplist_t *list, char *name)
 	keymap_t *mp = list->maps;
 
 	while (mp) { 
-	  if (strcmp (mp->name, name) == 0)
+		if (strcmp (mp->name, name) == 0)
 			break;
 		mp = mp->next;
 	}
 	if (mp)  
-	  return mp;
+		return mp;
 	mp = NEW (keymap_t);
 	if (DEBUG && mp == NULL)
-	  DIE ("Failed to malloc keymap_t");
+		DIE ("Failed to malloc keymap_t");
 	mp->langs = NULL;
 	mp->name = STRDUP (name);
 	mp->description = NULL;
@@ -357,8 +354,8 @@ void read_keymap_files (char *listdir)
 			 */
 			if (strncmp (ent->d_name, "console-keymaps-", 16) == 0) 
 				STRCPY (p, ent->d_name);
-			 else 
-				 strncpy (p, ent->d_name, strchr (ent->d_name, '.') - p);			
+			else 
+				strncpy (p, ent->d_name, strchr (ent->d_name, '.') - p);			
 			select_keymap (parse_keymap_file (fullname));
 		}
 	}
@@ -534,6 +531,18 @@ int choose_keymap (char *arch, char *keymap)
 	return CMDSTATUS_SUCCESS;
 }	
 
+/**
+ *  @brief set the keymap, and debconf database
+ */
+void set_keymap (char *keymap)
+{
+	client->command (client, "set", "debian-installer/keymap",
+			 keymap, NULL);
+	// "seen" Used by scripts to decide not to call us again
+	client->command (client, "fset", "debian-installer/keymap",
+			 "seen", "yes", NULL);
+	loadkeys_wrapper (keymap);
+}
 
 int main (int argc, char **argv)
 {
@@ -543,8 +552,8 @@ int main (int argc, char **argv)
 	
 	// As a form of debugging, allow a keyboard map to 
 	// be named on command-line
-	if (argc == 2) {
-		loadkeys_wrapper (argv[1]);
+	if (argc == 2)  {
+		set_keymap (argv[1]);
 		exit (0);
 	}
 
@@ -584,9 +593,7 @@ int main (int argc, char **argv)
 				state = CHOOSE_ARCH;
 				break;
 			}
-			client->command (client, "set", "debian-installer/keymap", 
-					 keymap, NULL);
-			loadkeys_wrapper (keymap);  
+			set_keymap (keymap);
 			exit (0);
 			break;			
 		}	
