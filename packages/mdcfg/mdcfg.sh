@@ -158,10 +158,10 @@ md_create_raid1() {
 	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
 	if [ "$REQUIRED" -gt "$NUM_PART" ] ; then
 		db_fset mdcfg/notenoughparts "seen" "false"
-		db_subst mdcfg/raid1devs NUM_PART "${NUM_PART}"
-		db_subst mdcfg/raid1devs REQUIRED "${REQUIRED}"
-		db_subst mdcfg/raid1devs DEV "${DEV_COUNT}"
-		db_subst mdcfg/raid1devs SPARE "${SPARE_COUNT}"
+		db_subst mdcfg/notenoughparts NUM_PART "${NUM_PART}"
+		db_subst mdcfg/notenoughparts REQUIRED "${REQUIRED}"
+		db_subst mdcfg/notenoughparts DEV "${DEV_COUNT}"
+		db_subst mdcfg/notenoughparts SPARE "${SPARE_COUNT}"
 		db_input critical mdcfg/notenoughparts
 		db_go mdcfg/notenoughparts
 		return
