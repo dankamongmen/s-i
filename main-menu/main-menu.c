@@ -92,7 +92,7 @@ int isdefault(struct package_t *p) {
 	asprintf(&menutest, DPKGDIR "info/%s.menutest", p->package);
 	if (stat(menutest, &statbuf) == 0) {
 		asprintf(&cmd, "%s >/dev/null 2>&1", menutest);
-		ret = !SYSTEM(menutest);
+		ret = !SYSTEM(cmd);
 		free(cmd);
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
