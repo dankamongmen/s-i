@@ -41,10 +41,10 @@ int main(int argc, char **argv) {
 		src="dists/woody/main/debian-installer/binary-" ARCH "/Packages";
 	}
 	
-	command=malloc( 15 /* wget -q http:// */ + strlen(hostname) +
+	command=malloc( 18 /* wget -c -q http:// */ + strlen(hostname) +
 			strlen(directory) + 1 /* / */ + strlen(src) +
 			4 /*  -O  */ + strlen(argv[2]) + 1);
-	sprintf(command, "wget -q http://%s%s/%s -O %s", hostname,
+	sprintf(command, "wget -c -q http://%s%s/%s -O %s", hostname,
 			directory, src, argv[2]);
 	ret=system(command);
 	if (ret == 256)
