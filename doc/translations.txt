@@ -18,6 +18,7 @@ Suggested translation order:
 -languagechooser
   (read debian-installer/tools/languagechooser/README.trans for details)
 -countrychooser and iso-codes (see APPENDIX)
+-core udebs and console-data (see APPENDIX)
 -common udebs
 -supported architectures udebs
 -second stage
@@ -164,7 +165,7 @@ PACKAGES LIST
  tools/cdebconf
  anna
  main-menu
- tools/kbd-chooser
+ tools/kbd-chooser (plus console-data, see APPENDIX)
  tools/base-installer
  tools/prebaseconfig
  utils (package: di-utils)
@@ -229,30 +230,17 @@ PACKAGES LIST
  team, so other methods (CVS commits and -boot filing) may apply for it.
  Note that it is a separate project on alioth.
   
-<<<<<<< translations.txt
- base-config (debconf) TO CHECK
- shadow (debconf+programs) debconf DONE, programs TODO
- console-data (debconf) TO CHECK
- discover (debconf) DONE
- tasksel (debconf) DONE
- aptitude (programs) TODO
- dselect (programs) -> in dkpkg source package
- apt (programs) DONE
- dpkg (programs) TODO
- exim4-config (debconf) DONE
-=======
  base-config (debconf)
  shadow (debconf+programs)
  console-data (debconf)
  discover (debconf)
  tasksel (debconf)
  aptitude (programs)
- dselect (programs)
+ dselect (programs) -> in dpkg source package
  apt (programs)
  dpkg (programs)
  exim4-config (debconf)
  passwd (debconf)
->>>>>>> 1.12
 
  As 2nd stage install uses debconf, you also need to translate the
  interface widgets used by debconf. On mosts systems, the "dialog" interface
@@ -314,6 +302,23 @@ tools/countrychooser/iso-codes.updates and commit it. However, when
 the upstream iso-codes package includes your translation, please
 REMOVE the interim file from debian-installer CVS.
 
+ kbd-chooser/console-data
+ ------------------------
+
+The kbd-chooser package uses keyboard names from the console-data package.
+Thus, in order to get it completely translated, translators need to
+translate console-data debconf templates.
+
+First check on http://people.debian.org/~barbier/intl/l10n/po-debconf/<code>
+(where <code> is your language code) if this file is already translated.
+
+If it is not shown, then you may get the templates.pot file at:
+http://people.debian.org/~barbier/intl/l10n/po-debconf/pot#console-data
+
+Pick up the templates.pot file, modify it and send it back with a
+bugreport to the package "console-data, with the "l10n" and "patch"
+tag, severity wishlist.
+
 --------------------------------------------------------------------------
 
 This guide is supposed to be be a first start for translators.  There
@@ -322,6 +327,10 @@ you discover such packages, and fix it if you find errors.
 
 --------------------------------------------------------------------------
 Changelog:
+
+2004/01/30 Christian Perrier
+ - give details about kbd-chooser/console-data
+ - mention *core* udebs in translation order
 
 2004/01/22 Christian Perrier
  - updated packages information (countrychooser and partman-* added)
