@@ -1,4 +1,4 @@
-/* $Id: depends.c,v 1.3 2000/10/08 03:23:44 tausq Exp $ */
+/* $Id: depends.c,v 1.4 2000/11/02 04:14:31 tausq Exp $ */
 #include "udpkg.h"
 
 #ifdef DODEPENDS
@@ -65,12 +65,16 @@ static void depends_sort_visit(struct package_t **ordered,
 		if (pkg->requiredfor[i]->color == COLOR_WHITE)
 			depends_sort_visit(ordered, pkgs, pkg->requiredfor[i]);
 
+#if 0
 	/* add it to the list */
 	newnode = (struct package_t *)malloc(sizeof(struct package_t));
 	/* make a shallow copy */
 	*newnode = *pkg;
 	newnode->next = *ordered;
 	*ordered = newnode;
+#endif
+	pkg->next = *ordered;
+	*ordered = pkg;
 
 	/* mark node as done */
 	pkg->color = COLOR_BLACK;

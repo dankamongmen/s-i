@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.8 2000/11/01 23:55:28 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.9 2000/11/02 04:14:31 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -261,7 +261,6 @@ static int dpkg_install(struct package_t *pkgs)
 {
 	struct package_t *p, *ordered = 0;
 	void *status = status_read();
-	if (status == 0) return -1;
 	if (SYSTEM("rm -rf -- " DPKGCIDIR) != 0 ||
 	    mkdir(DPKGCIDIR, S_IRWXU) != 0)
 	{
@@ -287,6 +286,16 @@ static int dpkg_install(struct package_t *pkgs)
 	
 	/* Stage 3: install */			
 	for (p = ordered; p != 0; p = p->next)
+	{
+		p->status &= STATUS_WANTMASK;
+		p->status |= STATUS_WANTINSTALL;
+
+		/* for now the flag is always set to ok... this is probably
+		 * not what we want
+		 */
+		p->status &= STATUS_FLAGMASK;
+		p->status |= STATUS_FLAGOK;
+
 		if (dpkg_doinstall(p) != 0)
 		{
 			perror(p->file);
@@ -296,6 +305,7 @@ static int dpkg_install(struct package_t *pkgs)
 			p->status &= STATUS_STATUSMASK;
 			p->status |= STATUS_STATUSINSTALLED;
 		}
+	}
 	
 	status_merge(status, pkgs);
 	SYSTEM("rm -rf -- " DPKGCIDIR);
