@@ -60,6 +60,7 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     *packages = get_packages(*packages_allocator);
 
     if (*packages == NULL) {
+        debconf_fset(debconf, ANNA_NO_MODULES, "seen", "false");
         debconf_input(debconf, "critical", ANNA_NO_MODULES);
         debconf_go(debconf);
         return 4;
