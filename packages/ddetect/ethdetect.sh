@@ -50,7 +50,7 @@ get_static_modinfo() {
 	fi
 	
 	if grep -q "$module:" $TEMP_EXTRACT; then 
-		modinfo=$(zcat $DEVNAMES | grep ^${module} | head -n 1 | cut -d':' -f2-)
+		modinfo=$(zcat $DEVNAMES | grep ^${module}: | head -n 1 | cut -d':' -f2-)
 	fi
 	echo "$modinfo"
 }
