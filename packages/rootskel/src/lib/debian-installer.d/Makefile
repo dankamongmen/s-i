@@ -5,16 +5,13 @@ DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 files += \
+	S30term \
 	S60frontend \
 	S72menu-exit
 
 ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
-  ifeq ($(DEB_HOST_GNU_CPU),s390)
+  ifneq ($(DEB_HOST_GNU_CPU),s390)
     files += \
-	S30term-linux-s390
-  else
-    files += \
-	S30term-linux \
 	S35framebuffer-linux
   endif
   ifeq ($(DEB_HOST_GNU_CPU),i386)

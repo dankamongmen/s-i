@@ -12,6 +12,6 @@ files = \
 	passwd
 
 install-local:: $(outdir)
-	ln -s /proc/mounts $(outdir)/mtab
+	ln -fs /proc/mounts $(outdir)/mtab
 
 include ../../Makefile.inc

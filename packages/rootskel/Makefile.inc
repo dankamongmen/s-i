@@ -22,18 +22,28 @@ install-auto-dirs:
 	  install -d -m755 $(outdir)/$$file; \
 	done
 
-install-auto-files: $(files)
+install-auto-files:
 	$(call check_destdir)
 	@list='$(files)'; for file in $$list; do \
-	  echo "install -m644 $$file $(outdir)"; \
-	  install -m644 $$file $(outdir); \
+	  case $$file in \
+	    *:*) in=`echo "$$file" | sed 's,[^:]*:,,'` \
+	         out=$(outdir)/`echo "$$file" | sed 's,:.*,,'`;; \
+	    *) in=$$file out=$(outdir);; \
+	  esac; \
+	  echo "install -m644 $$in $$out"; \
+	  install -m644 $$in $$out; \
 	done
 
-install-auto-files-exec: $(files_exec)
+install-auto-files-exec:
 	$(call check_destdir)
 	@list='$(files_exec)'; for file in $$list; do \
-	  echo "install -m755 $$file $(outdir)"; \
-	  install -m755 $$file $(outdir); \
+	  case $$file in \
+	    *:*) in=`echo "$$file" | sed 's,[^:]*:,,'` \
+	         out=$(outdir)/`echo "$$file" | sed 's,:.*,,'`;; \
+	    *) in=$$file out=$(outdir);; \
+	  esac; \
+	  echo "install -m755 $$in $$out"; \
+	  install -m755 $$in $$out; \
 	done
 
 install-local::
