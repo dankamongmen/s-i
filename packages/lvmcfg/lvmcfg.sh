@@ -170,11 +170,10 @@ list_vgs() {
 # check if any VGs have free space
 #
 any_free_vgs() {
-	free=1
 	for i in $(list_vgs); do
-		[ "$(getfree_vg "$i")" = "0" ] || free=0
+		[ "$(getfree_vg "$i")" = "0" ] || return 0
 	done
-	return $free
+	return 1
 }
 
 #
