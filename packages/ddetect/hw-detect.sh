@@ -194,6 +194,23 @@ OTHER_STEPS=5
 OTHER_STEPSIZE=$(expr $MAX_STEPS / 10 / $OTHER_STEPS)
 db_progress START 0 $MAX_STEPS $PROGRESSBAR
 
+# Load queued Cardbus modules, if any, and catch hotplug events.
+# We need to do this before the regular PCI detection so that we can
+# determine which network cards are Cardbus.
+if [ -f /etc/pcmcia/cb_mod_queue ]; then
+	if [ -f /proc/sys/kernel/hotplug ]; then
+		saved_hotplug=`cat /proc/sys/kernel/hotplug`
+		echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
+	fi
+	for module in $(cat /etc/pcmcia/cb_mod_queue); do
+		log "Loading queued Cardbus module $module"
+		modprobe -v $module | logger -t hw-detect
+	done
+	if [ -f /proc/sys/kernel/hotplug ]; then
+		echo $saved_hotplug >/proc/sys/kernel/hotplug
+	fi
+fi
+
 log "Detecting hardware..."
 db_progress INFO hw-detect/detect_progress_step
 ALL_HW_INFO=$(get_detected_hw_info; get_manual_hw_info)

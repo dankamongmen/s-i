@@ -61,7 +61,12 @@ case $TYPE in
 
 		if [ -n "$module" ]; then
 			log "Found module $module, loading"
-			modprobe -v $module 2>&1 | logger -t hotplug-pcmcia
+			if modprobe $module >/dev/null 2>&1; then
+				log "Module $module loaded successfully"
+			else
+				log "Failed loading $module (queuing)"
+				echo "$module" >>/etc/pcmcia/cb_mod_queue
+			fi
 		else
 			log "No module found for Cardbus device at $PCI_SLOT_NAME"
 		fi
