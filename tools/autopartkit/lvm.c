@@ -42,21 +42,29 @@ static BOOLEAN
 lvm_isinstalled(void)
 {
     struct stat statbuf;
+    static int isinstalled = -1;
+
+    if (isinstalled != -1)
+      return isinstalled;
+
     /* Is /proc/lvm a directory? */
     if ( 0 != stat("/proc/lvm", &statbuf)
-	 || ! S_ISDIR(statbuf.st_mode) )
+         || ! S_ISDIR(statbuf.st_mode) )
     {
         autopartkit_error(0, "Missing /proc/lvm/, no LVM support available.");
-	return FALSE;
+        isinstalled = FALSE;
+        return FALSE;
     }
   
     /* Is /bin/vgscan available? */
     if (0 != stat(VGSCAN, &statbuf) || ! S_ISREG(statbuf.st_mode))
     {
         autopartkit_error(0, "Missing %s, no LVM support available.", VGSCAN);
+        isinstalled = FALSE;
         return FALSE;
     }
 
+    isinstalled = TRUE;
     return TRUE;
 }
 
@@ -68,21 +76,24 @@ vg_exists(const char *vgname)
 {
     struct stat statbuf;
     char *cmd = NULL;
+    int retval = FALSE;
 
     if (NULL == vgname)
         return FALSE;
 
     asprintf(&cmd, "/proc/lvm/VGs/%s", vgname);
-    if ( ! cmd ||
-	 0 != stat(cmd, &statbuf)
-	 || ! S_ISDIR(statbuf.st_mode) )
-    {
-        autopartkit_error(0, "Missing volume group '%s'", cmd);
-	if (cmd)
-	    free(cmd);
-	return FALSE;
-    }
-    return FALSE;
+    if ( cmd
+         && 0 == stat(cmd, &statbuf)
+         && S_ISDIR(statbuf.st_mode) )
+        retval = TRUE;
+    else
+        autopartkit_error(0, "Missing volume group '%s'",
+                          cmd ? cmd : "(null)");
+
+    if (cmd)
+      free(cmd);
+
+    return retval;
 }
 
 int
@@ -105,6 +116,9 @@ lvm_init_dev(const char *devpath)
     if ( ! lvm_isinstalled())
         return -1;
 
+    autopartkit_log(1, "Initializing LVM pv '%s'\n",
+                    devpath ? devpath : "(null)");
+
     asprintf(&cmd, "pvcreate %s > /var/log/messages 2>&1", devpath);
     retval = system(cmd);
     if (cmd)
@@ -126,13 +140,17 @@ lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
     if ( ! lvm_isinstalled())
         return -1;
 
+    autopartkit_log(1, "Adding LVM pv '%s' to vg '%s'\n",
+                    devpath ? devpath : "(null)",
+                    vgname ? vgname : "(null)");
+
     if (vg_exists(vgname))
         progname = "vgextend";
     else
         progname = "vgcreate";
 
     asprintf(&cmd, "%s %s %s > /var/log/messages 2>&1", progname,
-	     vgname, devpath);
+             vgname, devpath);
     retval = system(cmd);
 
     if (cmd)
@@ -147,7 +165,7 @@ lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
  */
 char *
 lvm_create_logicalvolume(const char *vgname, const char *lvname,
-		       unsigned int mbsize)
+                       unsigned int mbsize)
 {
     char * str = NULL;
     int retval;
@@ -156,8 +174,13 @@ lvm_create_logicalvolume(const char *vgname, const char *lvname,
     if ( ! lvm_isinstalled())
         return NULL;
 
+    autopartkit_log(1, "Creating LVM lv '%s' on vg '%s' (size=%d MiB)\n",
+                    lvname ? lvname : "(null)",
+                    vgname ? vgname : "(null)",
+                    mbsize);
+
     asprintf(&str, "lvcreate -n%s -L%d %s > /var/log/messages 2>&1",
-	     lvname, mbsize, vgname);
+             lvname, mbsize, vgname);
 
     retval = system(str);
 
@@ -167,8 +190,8 @@ lvm_create_logicalvolume(const char *vgname, const char *lvname,
 
     if (0 == retval)
     {
-	asprintf(&str, "/dev/%s/%s", vgname, lvname);
-	return str;
+        asprintf(&str, "/dev/%s/%s", vgname, lvname);
+        return str;
     }
     else 
         return NULL;
