@@ -22,7 +22,7 @@ use () {
 overview () {
 	logdir=$1
 	shift 1
-	grep -v "$MACHINE-$SCHEME " $LOGDIR/overview.log > $LOGDIR/overview.log.new
+	grep -v "$MACHINE-$SCHEME " $LOGDIR/overview.log > $LOGDIR/overview.log.new || true
 	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $LOGDIR/overview.log.new
 	mv $LOGDIR/overview.log.new $LOGDIR/overview.log
 }
