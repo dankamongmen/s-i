@@ -17,9 +17,11 @@ binary-indep:
 	dh_testroot
 	dh_clean -k
 	dh_installdebconf
+	set -e; \
 	for pkg in $(shell dh_listpackages); do \
 		(echo; po2debconf debian/common.templates ) \
 			>> debian/$$pkg/DEBIAN/templates; \
+		cp debian/$$pkg.menutest debian/$$pkg/DEBIAN/menutest; \
 	done
 	dh_compress
 	dh_fixperms
