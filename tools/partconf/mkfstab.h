@@ -24,12 +24,10 @@
 #ifdef LOCAL
 #define FSTAB_FILE "/tmp/fstab"
 #define FSTAB_D "/tmp/fstab.d"
-#define MAPDEVFS "../../utils/mapdevfs"
 #else
 #define FSTAB_DIR "/target/etc"
 #define FSTAB_FILE "/target/etc/fstab"
 #define FSTAB_D "/var/lib/partconf/fstab.d"
-#define MAPDEVFS "/usr/bin/mapdevfs"
 #endif
 
 struct fstab_entry {
