@@ -51,11 +51,29 @@ debconf_input (char *priority, char *template)
   return client->value;
 }
 
+
+/*
+ * return a malloc'ed string properly formatted for inclusion in the debconf
+ * 'Choices' field.  The string indicated what operations we are able to
+ * perform on the specified device (remove partitions, delete resize, etc.).
+ * Always end the string with the special option "exit"
+ */
 char *
 partkit_get_operations (PedDevice * dev)
 {
-  return "create partitions, delete partitions, exit";
+  char *ops;
+
+  if ((ops = malloc (256)) == NULL)
+    partkit_error (1);
+  snprintf (ops, 256, "create partitions, delete partitions, exit");
+  return ops;
 }
+
+/*
+ * return a malloc'ed string properly formated for debconf containing the
+ * partition table for the device specified.  If an error occurs return a
+ * string indicating an error.
+ */
 
 char *
 partkit_get_table (PedDevice ** dev)
@@ -70,11 +88,11 @@ partkit_get_table (PedDevice ** dev)
 
   if ((table = malloc (PARTKIT_TABLE_SIZE + 1)) == NULL)
     goto error;
-  
+
   ptr = table;
 
   disk = ped_disk_open (*dev);
-  
+
   if (!disk)
     goto error;
 
@@ -98,11 +116,11 @@ partkit_get_table (PedDevice ** dev)
 		     _("Type      "));
   ptr += snprintf (ptr, PARTKIT_TABLE_SIZE - (ptr - table),
 		   _("Filesystem  "));
-  
+
   if (has_name)
     ptr += snprintf (ptr, PARTKIT_TABLE_SIZE - (ptr - table),
 		     _("Name                  "));
-  
+
   ptr += snprintf (ptr, PARTKIT_TABLE_SIZE - (ptr - table), _("Flags"));
   ptr += snprintf (ptr, PARTKIT_TABLE_SIZE - (ptr - table), "\n");
 
@@ -163,7 +181,9 @@ error:
   return table;
 }
 
-
+/*
+ * return a list of partitions on dev
+ */
 
 
 char *
@@ -204,11 +224,10 @@ partkit_get_partitions (PedDevice * dev)
   return part_list;
 
 error:
-
-  snprintf (part_list, PARTKIT_PART_LIST_SIZE,
-	    "<Partition List Not Available>");
+  if (part_list)
+    free (part_list);
   partkit_error (0);
-  return part_list;
+  return NULL;
 }
 
 
@@ -220,7 +239,8 @@ partkit_create (PedDevice * dev)
   PedPartitionType part_type;
   PedSector start, end;
   PedConstraint *constraint;
-  char *ptr;
+  char *ptr, *endptr = NULL;
+  char *table;
 
   disk = ped_disk_open (dev);
   if (!disk)
@@ -229,14 +249,12 @@ partkit_create (PedDevice * dev)
   if (!constraint)
     goto error_close_disk;
 
-  ptr = partkit_get_partitions (dev);
   client->command (client, "subst", "partkit/create_part_type", "choices",
 		   "primary, logical, extended", NULL);
 
-  ptr = partkit_get_table (&dev);
-  client->command (client, "subst", "partkit/create_part_type", "table", ptr,
-		   NULL);
-  free (ptr);
+  table = partkit_get_table (&dev);
+  client->command (client, "subst", "partkit/create_part_type", "table",
+		   table, NULL);
 
   ptr = debconf_input ("critical", "partkit/create_part_type");
 
@@ -255,11 +273,52 @@ partkit_create (PedDevice * dev)
       goto error_destroy_constraint;
     }
 
-  /* FIXME: do some error checking here */
-  ptr = debconf_input ("critical", "partkit/create_start");
-  start = (atof (ptr)) * MEGABYTE_SECTORS;
-  ptr = debconf_input ("critical", "partkit/create_end");
-  end = (atof (ptr)) * MEGABYTE_SECTORS;
+  client->command (client, "subst", "partkit/create_start",
+		   "table", table, NULL);
+
+  do
+    {
+      ptr = debconf_input ("critical", "partkit/create_start");
+      start = (strtod (ptr, &endptr)) * MEGABYTE_SECTORS;
+      if (ptr == endptr)
+	{
+	  client->command (client, "input", "high", "partkit/create_bad_num",
+			   NULL);
+	  client->command (client, "go", NULL);
+	  endptr = NULL;
+	}
+      else
+	client->command (client, "subst", "partkit/create_confirm",
+			 "start", start, NULL);
+    }
+  while (endptr == NULL);
+
+  client->command (client, "subst", "partkit/create_end",
+		   "table", table, NULL);
+  do
+    {
+      ptr = debconf_input ("critical", "partkit/create_end");
+      end = (strtod (ptr, &endptr)) * MEGABYTE_SECTORS;
+      if (ptr == endptr)
+	{
+	  client->command (client, "input", "high", "partkit/create_bad_num",
+			   NULL);
+	  client->command (client, "go", NULL);
+	  endptr = NULL;
+	}
+      else
+	client->command (client, "subst", "partkit/create_confirm",
+			 "end", end, NULL);
+
+    }
+  while (endptr == NULL);
+
+  client->command (client, "subst", "partkit/create_confirm",
+		   "table", table, NULL);
+
+  ptr = debconf_input ("critical", "partkit/create_confirm");
+  if (!strstr (ptr, "true"))
+    return 1;
 
   part = ped_partition_new (disk, part_type, NULL, start, end);
   if (!part)
@@ -291,11 +350,15 @@ partkit_delete (PedDevice * dev)
   char *ptr;
 
   disk = ped_disk_open (dev);
-  
+
   if (!disk)
     goto error;
 
-  ptr = partkit_get_partitions (dev);
+  if ((ptr = partkit_get_partitions (dev)) == NULL)
+    {
+      partkit_error (0);
+      return -1;
+    }
   client->command (client, "subst", "partkit/delete_choice", "choices", ptr,
 		   NULL);
 
@@ -305,6 +368,13 @@ partkit_delete (PedDevice * dev)
   free (ptr);
 
   ptr = debconf_input ("critical", "partkit/delete_choice");
+
+  client->command (client, "subst", "partkit/delete_confirm",
+		   "partition", ptr, NULL);
+
+  ptr = debconf_input ("critical", "partkit/delete_confirm");
+  if (!strstr (ptr, "true"))
+    return 1;
 
   part = ped_disk_get_partition (disk, atoi (ptr));
 
@@ -332,7 +402,7 @@ error_close_disk:
   ped_disk_close (disk);
 error:
   partkit_error (0);
-return -1;
+  return -1;
 
 }
 
@@ -346,13 +416,15 @@ main (int argc, char *argv[])
   client = debconfclient_new ();
   client->command (client, "title", "Partition Editor", NULL);
 
-  dev = ped_device_get (argv[1]);
+  if ((dev = ped_device_get (argv[1])) == NULL)
+    partkit_error (1);
 
   do
     {
       ptr = partkit_get_operations (dev);
       client->command (client, "subst", "partkit/choose_operation", "choices",
 		       ptr, NULL);
+      free (ptr);
 
       ptr = partkit_get_table (&dev);
       client->command (client, "subst", "partkit/choose_operation", "table",
