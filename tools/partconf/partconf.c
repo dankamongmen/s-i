@@ -264,6 +264,31 @@ sanity_checks(void)
     return 1;
 }
 
+static int
+mountpoint_sort_func(const void *v1, const void *v2)
+{
+    struct partition *p1, *p2;
+    char *m1, *m2;
+
+    p1 = *(struct partition **)v1;
+    p2 = *(struct partition **)v2;
+    m1 = p1->op.mountpoint;
+    m2 = p2->op.mountpoint;
+    // have to sort the NULLs too, because of how quicksort works
+    if (m1 == NULL && m2 == NULL)
+        return 0;
+    else if (m1 == NULL)
+        return -1;
+    else if (m2 == NULL)
+        return 1;
+    if (strstr(m1, m2) == m1)
+        return 1;
+    else if (strstr(m2, m1) == m2)
+        return -1;
+    else
+        return strcmp(m1, m2);
+}
+
 /*
  * Like mkdir -p
  */
@@ -292,6 +317,7 @@ finish(void)
     int i, ret;
     char *cmd, *mntpt, *errq = NULL;
 
+    qsort(parts, part_count, sizeof(struct partition *), mountpoint_sort_func);
     for (i = 0; i < part_count; i++) {
         if (parts[i]->op.filesystem == NULL)
             continue;
