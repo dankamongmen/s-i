@@ -3,7 +3,7 @@ DISK="$1"
 [ -z "$DISK" ] && exit 1
 
 case "`/usr/bin/ppcdetect`" in
-"NewWorld PowerMac")
+"NewWorld PowerMac"|"OldWorld PowerMac")
 	mac-fdisk $DISK
 	;;
 "CHRP Pegasos")
