@@ -1,0 +1,71 @@
+#!/bin/sh
+
+# This script removes the lvm flag for partitions whose method is not
+# lvm and sets it for partition whose method is lvm
+
+. /lib/partman/definitions.sh
+
+dev=$1
+num=$2
+id=$3
+size=$4
+type=$5
+fs=$6
+path=$7
+
+cd $dev
+
+if [ $fs = free ]; then
+    exit 0
+fi
+
+method=
+if [ -f $id/method ]; then
+    method=$(cat $id/method)
+fi
+
+has_lvm=no
+flags=''
+open_dialog GET_FLAGS $id
+while { read_line flag; [ "$flag" ]; }; do
+    if [ "$flag" != lvm ]; then
+	if [ "$flags" ]; then
+	    flags="$flags
+$flag"
+	else
+	    flags="$flag"
+	fi
+    else
+	has_lvm=yes
+    fi
+done
+close_dialog
+
+if [ "$method" = lvm -a "$has_lvm" = no ]; then
+    open_dialog SET_FLAGS $id
+    write_line "$flags"
+    write_line lvm
+    write_line NO_MORE
+    close_dialog
+elif [ "$method" != lvm -a "$has_lvm" = yes ]; then
+    open_dialog SET_FLAGS $id
+    write_line "$flags"
+    write_line NO_MORE
+    close_dialog
+fi
+
+
+# The following is a hack and will be removed in future versions of
+# partman.  It ensures that the lvm partition can not be used for
+# some regular file system.
+if [ "$method" = lvm ]; then
+    if [ -f $id/format ]; then
+        # we want to use the existing file system in the partition
+	rm $id/format
+    fi
+    if [ -f $id/detected_filesystem ]; then
+        # however no existing file system is detected :-)
+	rm $id/detected_filesystem
+    fi
+fi
+
