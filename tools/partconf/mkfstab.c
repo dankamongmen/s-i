@@ -24,6 +24,11 @@ char *find_mountdevice(const char *mountpoint, char *default_device) {
 		char mntpoint[1024];
 
 		sscanf(line, "%s %s %*s", filesystem, mntpoint);
+		
+		/* skip loopback mount cdrom */
+		if(strcmp(mountpoint, "/cdrom") == 0
+		  && (NULL != strstr(filesystem, "loop")))
+			continue;
 		if(strcasecmp(mntpoint, mountpoint) == 0) {
 			return(strdup(filesystem));
 		}
