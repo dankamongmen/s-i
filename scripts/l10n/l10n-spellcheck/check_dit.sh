@@ -35,18 +35,21 @@ if [ ! -f $GATHER_STRINGS_SCRIPT ] ; then
     exit 1
 fi
 
-dpkg -l aspell | grep -q "^ii"
-if [ $? != 0 ] ; then
-    echo "aspell is not installed"
-    echo "you need some packages (aspell, aspell-bin, aspell-${LANG})"
-    exit 1
-fi
+# This has to be commented in order to run this script on a system (like Alioth) 
+# where we have a custom installation for aspell, or on a non-debian system
 
-dpkg -l aspell-${DICT} | grep -q "^ii" 
-if  [ $? != 0 ] ; then
-    echo "There was an error during the detection of aspell-${DICT}"
-    exit 1
-fi
+# dpkg -l aspell | grep -q "^ii"
+# if [ $? != 0 ] ; then
+#     echo "aspell is not installed"
+#     echo "you need some packages (aspell, aspell-bin, aspell-${LANG})"
+#     exit 1
+# fi
+
+# dpkg -l aspell-${DICT} | grep -q "^ii" 
+# if  [ $? != 0 ] ; then
+#     echo "There was an error during the detection of aspell-${DICT}"
+#     exit 1
+# fi
 
 
 if [ ! -d $DEST_DIR ] ; then
@@ -118,9 +121,9 @@ mv $DEST_DIR/no_home.txt $ALL_STRINGS
 grep -e "^-" $ALL_STRINGS | sed s/\$\{[a-zA-Z0-9_]*\}//g > $NO_VARS
 
 # spell check the selected strings eventually using a custom wl and utf-8 encoding (works?)
-cat $NO_VARS | aspell -l --lang=$LANG --encoding=utf-8 $WL_PARAM > $ALL_UNKNOWN
+cat $NO_VARS | aspell list --lang=$LANG --encoding=utf-8 $WL_PARAM > $ALL_UNKNOWN
 
-# sort all the unrecognized words (don't care about uppe/lower case)
+# sort all the unrecognized words (don't care about upper/lower case)
 # count duplicates
 # take note of unknown words
 cat $ALL_UNKNOWN | sort -f | uniq -c > $UNKN
