@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.27 2002/08/30 15:20:50 tfheen Exp $ */
+/* $Id: udpkg.c,v 1.28 2002/10/14 03:52:21 tfheen Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -33,6 +33,18 @@ static int is_file(const char *fn)
 	if (stat(fn, &statbuf) < 0) return 0;
 	return S_ISREG(statbuf.st_mode);
 }
+
+int dpkg_print_architecture()
+{
+#ifdef __i386__
+        printf("i386\n");
+#else
+        return 1;
+#endif
+        return 0;
+
+}
+
 
 static int dpkg_copyfile(const char *src, const char *dest)
 {
@@ -402,10 +414,11 @@ int main(int argc, char **argv)
 		case 'r': return dpkg_remove(packages); break;
 		case 'u': return dpkg_unpack(packages); break;
 		case 'c': return dpkg_configure(packages); break;
+                case 'p': return dpkg_print_architecture(); break;
 	}
 
 	/* if it falls through to here, some of the command line options were
 	   wrong */
-	fprintf(stderr, "udpkg <-i|-r|--unpack|--configure> my.deb\n");
+	fprintf(stderr, "udpkg <-i|-r|--unpack|--configure|--print-architecture> my.deb\n");
 	return 0;
 }
