@@ -1,0 +1,12 @@
+#!/bin/sh
+# Register a module to go in /etc/modules on the target. May be called
+# before the target is mounted. Can optionally pass parameters that should
+# be passed to the module on load; these are added to /etc/modules.conf.
+QUEUE=/var/lib/register-module/queue
+MODULE=$1
+
+touch $QUEUE
+grep -v "^$MODULE " $QUEUE > $QUEUE.new
+mv $QUEUE.new $QUEUE
+# Trialing whitespace is significant.
+echo "$@ " >> $QUEUE

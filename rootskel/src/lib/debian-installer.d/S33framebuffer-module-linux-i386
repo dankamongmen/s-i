@@ -1,3 +1,4 @@
-echo "info: Trying to enable linux framebuffer."
-modprobe -q vesafb || modprobe -q vga16fb || true
-
+if [ "`debconf-get debian-installer/framebuffer`" = true ]; then
+	echo "Trying to enable the frame buffer.."
+	modprobe -q vesafb >/dev/null || modprobe -q vga16fb >/dev/null || true
+fi

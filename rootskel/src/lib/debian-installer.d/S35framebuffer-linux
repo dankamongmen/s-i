@@ -1,4 +1,5 @@
-if [ "$TERM_TYPE" = virtual -a -e /dev/fb/0 ] ; then
-	TERM_FRAMEBUFFER=yes
+if [ "$TERM_TYPE" = virtual -a -e /dev/fb/0 ]; then
+	if [ "`debconf-get debian-installer/framebuffer`" = true ]; then
+		TERM_FRAMEBUFFER=yes
+	fi
 fi
-

@@ -31,6 +31,7 @@ endif
 
 files = \
 	S20templates \
+	S25env2debconf \
 	S50frontend \
 	S50priority
 

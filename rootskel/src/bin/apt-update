@@ -15,10 +15,10 @@ fi
 
 # Try to enable proxy when using HTTP.  What about using ftp_proxy for
 # FTP sources?  (This code is in both apt-update and apt-install)
-RET=`debconf-get mirror/protocol 2>&1 || true`
+RET=`debconf-get mirror/protocol || true`
 if [ "http" = "$RET" ]; then
     # try to find http proxy
-    RET=`debconf-get mirror/http/proxy 2>&1 || true`
+    RET=`debconf-get mirror/http/proxy || true`
     if [ "$RET" ] ; then
 	http_proxy="$RET"
 	export http_proxy

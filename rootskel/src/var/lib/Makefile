@@ -1,5 +1,5 @@
 dir = var/lib
 
-subdirs = apt-install
+subdirs = apt-install register-module
 
 include ../../Makefile.inc

@@ -1,0 +1,17 @@
+# Import foo/bar=baz from environment variables into the debconf db,
+OLDIFS=$IFS
+IFS='
+'
+for line in $(set); do
+	var="${line%=*}"
+	val="${line#[!=]*=}"
+	# grep out the normal variables with no slashes
+	varnoslash="${var##*/*}"
+	if [ "$var" != "" ] && [ "$val" != "" ] && [ "$varnoslash" = "" ]; then
+		# remove single quotes from around value
+		val="${val#\'}"
+		val="${val%\'}"
+		debconf-set "$var" "$val" >/dev/null
+	fi
+done
+IFS=$OLDIFS

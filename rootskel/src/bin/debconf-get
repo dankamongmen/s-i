@@ -1,10 +1,12 @@
 #!/bin/sh -e
 #
-# Usage: var=`debconf-get template 2>&1`
+# Usage: var=`debconf-get template`
+# TODO move to cdebconf, reimplement so it's not shite
 
-. /usr/share/debconf/confmodule
-
-db_get "$1"
-
-# stdout is sent to debconf.  using stderr instead
-echo $RET 1>&2
+if [ -n "$TO_GET" ]; then
+	. /usr/share/debconf/confmodule
+	db_get "$TO_GET"
+	echo $RET 1>&2
+else
+	(TO_GET=$1 $0 >/dev/null) 2>&1
+fi
