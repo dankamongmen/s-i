@@ -82,7 +82,7 @@ module_probe() {
 		# hence they'll have same description
 		
 		if [ -n "$newdevs" ]; then
-			local devcount=1
+			local devcount=0
 			modinfo=$(get_static_modinfo $module)
 
 			if [ -n "$modinfo" ]; then break; fi
