@@ -32,13 +32,11 @@ load_module() {
     db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
     db_get hw-detect/module_params
-    if modprobe -v "$module" $RET >> /var/log/messages 2>&1 ; then
-	# Not sure if this is useful.  After all, 'discover' is installed
-	# in /target/. [pere 2003-04-18]
-	#prebaseconfig=/usr/lib/prebaseconfig.d/40ethdetect
-	#echo "echo \"$module $RET\" >> /target/etc/modules" >> $prebaseconfig
-	:
-    else
+    if modprobe -v "$module" "$RET" >> /var/log/messages 2>&1 ; then
+    	if [ "$RET" != "" ]; then
+		register-module "$module" "$RET"
+	fi
+    else   
 	db_fset hw-detect/modprobe_error seen false
 	db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 	db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
@@ -98,31 +96,26 @@ get_ide_chipset_info() {
 }
 
 # Return list of lines with "Kernel module<tab>Vendor<tab>Model"
-get_hw_info() {
-    # Try to make sure the floppy driver is available
-    echo "floppy:Linux Floppy Driver"
-
+get_all_hw_info() {
     discover_hw
-
-    # Manually load modules to enable things we can't detect.
-    # XXX: This isn't the best way to do this; we should autodetect.
-    # The order of these packages are important. [pere 2003-03-16]
-    echo "ide-mod:Linux IDE driver"
-    echo "ide-probe-mod:Linux IDE probe driver"
-
-    get_ide_chipset_info
-
-    echo "ide-detect:Linux IDE detection driver"
-    echo "ide-floppy:Linux IDE floppy driver"
-    echo "ide-disk:Linux ATA DISK driver"
-    echo "ide-cd:Linux ATAPI CD-ROM driver"
-    echo "isofs:Linux ISO 9660 filesystem driver"
-
     if [ -d /proc/bus/usb ]; then
     	echo "usb-storage:USB storage"
     fi
+    get_manual_hw_info
 }
-
+   
+# Manually load modules to enable things we can't detect.
+# XXX: This isn't the best way to do this; we should autodetect.
+# The order of these modules are important. [pere 2003-03-16]
+get_manual_hw_info() {
+    echo "floppy:Linux Floppy"
+    get_ide_chipset_info
+    echo "ide-detect:Linux IDE detection"
+    echo "ide-floppy:Linux IDE floppy"
+    echo "ide-disk:Linux ATA DISK"
+    echo "ide-cd:Linux ATAPI CD-ROM"
+    echo "isofs:Linux ISO 9660 filesystem"
+}
 
 db_settitle hw-detect/title
 
@@ -131,7 +124,8 @@ log "Detecting hardware..."
 # detection should hang.
 db_progress START 0 2 hw-detect/detect_progress_title
 db_progress INFO hw-detect/detect_progress_step
-ALL_HW_INFO=$(get_hw_info)
+MANUAL_HW_INFO=$(get_manual_hw_info)
+ALL_HW_INFO=$(get_all_hw_info)
 db_progress STEP 1
 # Remove modules that are already loaded, and count how many are left.
 LOADED_MODULES=$(cat /proc/modules | cut -f 1 -d ' ')
@@ -195,10 +189,14 @@ if [ "$count" != 0 ]; then
 	            db_subst hw-detect/load_progress_skip_step MODULE "$module"
 	            db_progress INFO hw-detect/load_progress_skip_step
 	            log "Could not load driver '$module' for '$cardname'."
-		    if [ -n "$MISSING_MODULES_LIST" ]; then
-			    MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
+		    # Only add the module to the missing list if it was not
+		    # manually added to the list of modules to load.
+		    if ! echo "$MANUAL_HW_INFO" | grep -q "$module:"; then
+			    if [ -n "$MISSING_MODULES_LIST" ]; then
+				    MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
+			    fi
+			    MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
 		    fi
-		    MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
 	        fi
 	    fi
 	
@@ -222,9 +220,17 @@ if [ -e /proc/scsi/scsi ] ; then
 	for module in sd_mod sr_mod; do
 		if is_not_loaded "$module" ; then
 			load_modules $module
+			register-module $module
 		fi
 	done
     fi
+fi
+
+# if there is an ide bus, then register the ide CD modules so they'll be
+# available on the target system for base-config
+if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
+	register-module ide-cd
+	register-module ide-detect
 fi
 
 if [ -n "$MISSING_MODULES_LIST" ]; then

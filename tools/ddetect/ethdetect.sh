@@ -20,8 +20,9 @@ module_probe() {
     db_go
     db_get ethdetect/module_params
     if modprobe -v "$module" $RET ; then
-	prebaseconfig=/usr/lib/prebaseconfig.d/40ethdetect
-	echo "echo \"$module $RET\" >> /target/etc/modules" >> $prebaseconfig
+	if [ "$RET" != "" ]; then
+		register-module "$module" $RET
+	fi
     else
 	db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 	db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
@@ -62,6 +63,7 @@ do
     fi
     module="$RET"
     if [ -n "$module" ] && is_not_loaded "$module" ; then
+	register-module "$module"
 	module_probe "$module"
     fi
     
