@@ -58,6 +58,13 @@ echo $old >/proc/sys/kernel/printk
 # mknod /dev/hdc b 22 0
 # mknod /dev/hdd b 22 64
 
+load_floppy_driver() {
+  if [ ! -d /dev/floppy ] ; then
+  	modprobe floppy || true
+  fi
+  floppydev=/dev/floppy/0
+}
+
 IFS_SAVE="$IFS"
 IFS="
 "
@@ -96,7 +103,8 @@ do
                 then
                     break
                 fi
-                mount -t ext2 /dev/fd0 /mnt
+                load_floppy_driver
+                mount -t ext2 $floppydev /mnt
                 if [ "$?" = "0" ]
                 then
                     if [ -f /mnt/modules.tgz ]
@@ -152,7 +160,7 @@ IFS="$IFS_SAVE"
 #            then
 #                break
 #            fi
-#            mount -t ext2 /dev/fd0 /mnt
+#            mount -t ext2 /dev/floppy/0 /mnt
 #            if [ "$?" = "0" ]
 #            then
 #                if [ -f /mnt/pcmcia.tgz ]
