@@ -1,18 +1,17 @@
 debian-installer language chooser
 =================================
 
-This package should behava as follows:
+This package should behave as follows:
 
-  0. extract available languages from list of available locales
-     (mapping language code -> language name)
+  0. Ask the user to pick one of the available languages.
 
-  1. present list of language names, and ask the user to pick one.
+  1. Change presentation language in debconf.
 
-  2. if the language is available in several regions (maps to several
-     locales), ask which region / language variant to use.  (allow
-     user to [back] off to the language list.
+  2. If the language is available in several variants / regions, ask
+     which of the available regions the user wants to use.  (allow
+     user to [back] off to the language list.)
 
-  3. pass the locale information on to the parts that needs it.
+  3. pass the locale information on to the modules that needs it.
 
 Based on this information a locale is selected.  This locale maps to
 one language, one region, a priority list of fallback languages, and a
@@ -29,3 +28,41 @@ available:
   - country code (part of locale)
   - priority list of fallback languages to use as translations
   - default keymap to use
+
+There have been request for the possibility of editing the priority
+list of language codes to use.  This might be done, with debconf
+priority 'low' to make sure the question will be invisible for most
+users.  I [pere 2003-02-28] do not think this is needed in the general
+installation, and will keep it out of the first version.
+
+See also
+--------
+
+The language chooser in boot-floppies contains some logic to make a
+list of languages and variants available.  We need to check if we can
+reuse the code and information.
+
+Information passed into other modules
+-------------------------------------
+
+  cdebconf
+
+   - (List of?) language codes to use when choosing which translation
+     to use.  Inserted into the 'debconf/language' debconf template.
+
+  kbd-chooser
+
+   - Information on default keyboard to use.  How should it be passed
+     on?  This information is passed on to base-config and
+     console-tools.
+
+  base-config
+
+   - Locale and list of language codes to use when choosing
+     translations.  This is placed in
+     /target/root/dbootstrap_settings, like this:
+
+       LANG_INST=locale
+       LANGUAGE_INST=code:code:code:code
+
+  other?
