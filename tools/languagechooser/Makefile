@@ -1,5 +1,3 @@
-SH = dash
-
 all: debian/templates check-scripts
 
 debian/templates: Makefile debian/templates.in languagelist
@@ -7,9 +5,10 @@ debian/templates: Makefile debian/templates.in languagelist
 	sed "s/@languagenames@/$$languagenames/" < debian/templates.in > $@
 
 check-scripts:
+	if [ -x /bin/ash ] ; then SH=ash ; else SH=dash; fi ; \
 	for s in debian/postinst prebaseconfig \
 	   languagemap languagechooser ; do \
-		$(SH) -n $$s ; \
+		$$SH -n $$s ; \
 	done
 
 .PHONY: demo
