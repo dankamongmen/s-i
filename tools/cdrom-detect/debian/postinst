@@ -39,16 +39,21 @@ load_floppy_driver() {
 
 log "Detecting hardware..."
 
-# Manually load modules to enable things we can't detect.
-# XXX: This isn't the best way to do this; we should autodetect.
-manual_load="ide-mod ide-probe-mod ide-disk ide-cd isofs"
-#manual_load=i82365 usb-storage
-#manual_load=i82365 sr_mod usb-storage
-
 get_hw_info() {
     /sbin/discover --format="%m\t%V\t%M\n" \
 	--disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom
+    # Manually load modules to enable things we can't detect.
+    # XXX: This isn't the best way to do this; we should autodetect.
+    echo "ide-mod	Unknown	Unknown"
+    echo "ide-probe-mod	Unknown	Unknown"
+    echo "ide-disk	Unknown	Unknown"
+    echo "ide-cd	Unknown	Unknown"
+    echo "isofs	Unknown	Unknown"
+    #echo "i82365	Unknown	Unknown"
+    #echo "sr_mod	Unknown	Unknown"
+    #echo "usb-storage	Unknown	Unknown"
 }
+
 set -- `get_hw_info | wc -l`
 count="$1"
 db_progress START 0 $count cdrom-detect/progress_title
@@ -72,8 +77,18 @@ do
 
     log "Detected load module '$module' for '$name'"
 
-    db_subst cdrom-detect/progress_step MODULE "$module"
-    db_subst cdrom-detect/progress_step CARDNAME "$name"
+    if [ "$module" ]
+    then
+	db_subst cdrom-detect/progress_step MODULE "$module"
+    else
+	db_subst cdrom-detect/progress_step MODULE "[Unknown]"
+    fi
+    if [ "$name" ]
+    then
+	db_subst cdrom-detect/progress_step CARDNAME "$name"
+    else
+	db_subst cdrom-detect/progress_step CARDNAME "[Unknown]"
+    fi
     db_progress STEP 1 cdrom-detect/progress_step
 
     if [ -n "$module" -a "$module" != "ignore" ]
@@ -99,8 +114,7 @@ do
                     break
                 fi
                 load_floppy_driver
-                mount -t ext2 $floppydev /mnt
-                if [ "$?" = "0" ]
+                if mount -t ext2 $floppydev /mnt
                 then
                     if [ -f /mnt/modules.tgz ]
                     then
@@ -124,23 +138,21 @@ do
 
         if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
-            load_modules $module
-            if [ "$?" != "0" ]
+            if load_modules $module
             then
+                :
+            else
                 log "Error loading driver '$module' for $vendor $model!"
 	    fi
         else
             log "Could not locate driver '$module' for $vendor $model."
         fi
+        db_progress STOP
     fi
     IFS="
 "
 done
 IFS="$IFS_SAVE"
-
-db_progress STOP
-
-load_modules $manual_load
 
 log "Searching for Debian installation media..."
 
@@ -157,10 +169,10 @@ do
     devices="`echo /dev/cdroms/*`"
     for device in $devices
     do
-        mount -t iso9660 -o ro,exec $device /cdrom 2>/dev/null
-        if [ "$?" = "0" ]
+        if mount -t iso9660 -o ro,exec $device /cdrom 2>/dev/null
         then
             mounted=1
+            break
         fi
     done
 
@@ -218,8 +230,7 @@ do
 	then
 	    modprobe $module
 	fi
-	mount -t iso9660 -o ro,exec $device /cdrom
-	if [ "$?" = "0" ]
+	if mount -t iso9660 -o ro,exec $device /cdrom
 	then
 	    mounted=1
 	    break
