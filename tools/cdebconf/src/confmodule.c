@@ -50,19 +50,18 @@ static commands_t commands[] = {
  */
 static int _confmodule_process(struct confmodule *mod, char *in, char *out, size_t outsize)
 {
-	int i = 0, argc;
-	char *argv[10];
+	int i;
+	char *argv[2] = { "", "" };
 
 	out[0] = 0;
 	if (*in == '#') return 1;
 
-	memset(argv, 0, sizeof(char *) * DIM(argv));
-	argc = strcmdsplit(in, argv, DIM(argv) - 1);
+	strcmdsplit(in, argv, DIM(argv));
 
-	for (; commands[i].command != 0; i++)
+	for (i = 0; commands[i].command != 0; i++)
 	{
 		if (strcasecmp(argv[0], commands[i].command) == 0) {
-			return (*commands[i].handler)(mod, argc - 1, argv, 
+			return (*commands[i].handler)(mod, argv[1], 
 							out, outsize);
 		}
 	}
