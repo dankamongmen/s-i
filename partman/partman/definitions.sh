@@ -306,7 +306,7 @@ error_handler () {
 		else
 		    info=partman/processing
 		fi
-		db_progress START 0 1000 partman/please_wait
+		db_progress START 0 1000 partman/text/please_wait
 		db_progress INFO $info
 		while { read_line frac state; [ "$frac" != ready ]; }; do
 		    if [ "$state" ]; then

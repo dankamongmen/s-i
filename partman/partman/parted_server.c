@@ -174,26 +174,6 @@ timered_file_system_create(PedGeometry *geom, PedFileSystemType *type)
 {
         PedFileSystem *result;
         PedTimer *timer;
-/* DEBUG start */
-        PedConstraint *constr;
-        constr = ped_file_system_get_create_constraint(type, geom->dev);
-        log("AAAAAA min_size=%lli", constr->min_size);
-        log("AAAAAA max_size=%lli", constr->max_size);
-        log("AAAAAA start_range=%lli-%lli", constr->start_range->start, 
-            constr->start_range->end);
-        log("AAAAAA end_range=%lli-%lli", constr->end_range->start, 
-            constr->end_range->end);
-        log("AAAAAA start_align=%lli-%lli", constr->start_align->offset, 
-            constr->start_align->grain_size);
-        log("AAAAAA end_align=%lli-%lli", constr->end_align->offset, 
-            constr->end_align->grain_size);
-        log("AAAAAA geom.start=%lli", geom->start);
-        log("AAAAAA geom.end=%lli", geom->end);
-        if (ped_constraint_is_solution(constr, geom))
-                log("AAAAAA geom is a solution");
-        else
-                log("AAAAAA geom is NOT a solution");
-/* DEBUG end */
         start_timer();
         timer = ped_timer_new(&timer_handler, NULL);
         result = ped_file_system_create(geom, type, timer);
@@ -1165,8 +1145,8 @@ command_set_flags()
 {
         char *id, *str;
         PedPartition *part;
-        PedPartitionFlag flag;
-        bool states[PED_PARTITION_LAST_FLAG + 1];
+        PedPartitionFlag first, last, flag;
+        bool *states;
         SETUP_DEV_DISK;
         log("command_set_flags()");
         open_out();
@@ -1178,9 +1158,12 @@ command_set_flags()
         log("Partition found (%s)", id);
         oprintf("OK\n");
         deactivate_exception_handler();
-        for (flag = PED_PARTITION_FIRST_FLAG;
-             flag <= PED_PARTITION_LAST_FLAG; flag++)
-                states[flag] = false;
+        first = ped_partition_flag_next(0);
+        for (flag = first; flag != 0; flag = ped_partition_flag_next(flag))
+                last = flag;
+        states = malloc(sizeof(bool[last - first + 1]));
+        for (flag = first; flag <= last; flag++)
+                states[flag - first] = false;
         while (1) {
                 if (1 != iscanf(" %a[^\n]", &str))
                         critical_error("No data in infifo!");
@@ -1188,17 +1171,17 @@ command_set_flags()
                         break;
                 log("Processing flag %s", str);
                 flag = ped_partition_flag_get_by_name(str);
-                if (flag < PED_PARTITION_FIRST_FLAG
-                    || flag > PED_PARTITION_LAST_FLAG)
+                if (flag < first || flag > last)
                         critical_error("No such a flag: %s", str);
-                states[flag] = true;
+                states[flag - first] = true;
                 free(str);
         }
-        for (flag = PED_PARTITION_FIRST_FLAG;
-             flag <= PED_PARTITION_LAST_FLAG; flag++)
-                if (ped_partition_is_flag_available(part, flag))
-                        ped_partition_set_flag(part, flag, states[flag]);
         free(str);
+        for (flag = 0; 0 != (flag = ped_partition_flag_next(flag));)
+                if (ped_partition_is_flag_available(part, flag))
+                        ped_partition_set_flag(part, flag,
+                                               states[flag - first]);
+        free(states);
         activate_exception_handler();
         free(id);
 }
