@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.h,v 1.6 2003/12/31 16:38:41 waldi Exp $
+ * $Id: parser.h,v 1.7 2004/02/23 23:38:34 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PARSER_H
@@ -129,6 +129,10 @@ di_parser_fields_function_read
    */
   di_parser_read_int,
   /**
+   * Read function for a di_rstring
+   */
+  di_parser_read_rstring,
+  /**
    * Read function for a string
    */
   di_parser_read_string;
@@ -142,6 +146,10 @@ di_parser_fields_function_write
    * Write function for an int
    */
   di_parser_write_int,
+  /**
+   * Write function for a di_string
+   */
+  di_parser_write_rstring,
   /**
    * Write function for a string
    */

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.h,v 1.7 2004/02/22 16:36:06 waldi Exp $
+ * $Id: package.h,v 1.8 2004/02/23 23:38:34 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_H
@@ -226,10 +226,6 @@ di_parser_fields_function_read
    * Read function for Description field
    */
   di_package_parser_read_description,
-  /**
-   * Read function for Package field
-   */
-  di_package_parser_read_name,
   /**
    * Read function for Priority field
    */

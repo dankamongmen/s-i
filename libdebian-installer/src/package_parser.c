@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.11 2004/02/01 16:38:11 waldi Exp $
+ * $Id: package_parser.c,v 1.12 2004/02/23 23:38:34 waldi Exp $
  */
 
 #include <config.h>
@@ -35,8 +35,8 @@ const di_parser_fieldinfo
     DI_PARSER_FIELDINFO
     (
       "Package",
-      di_package_parser_read_name,
-      di_parser_write_string,
+      di_parser_read_rstring,
+      di_parser_write_rstring,
       offsetof (di_package, package)
     ),
   internal_di_package_parser_field_status =
@@ -229,6 +229,7 @@ static void *internal_di_package_parser_new (void *user_data)
 {
   internal_di_package_parser_data *parser_data = user_data;
   parser_data->package = di_package_alloc (parser_data->allocator);
+  parser_data->package->type = di_package_type_real_package;
   return parser_data->package;
 }
 
@@ -373,6 +374,12 @@ void di_package_parser_read_description (
   {
     p->short_description = di_stradup (value->string, temp - value->string);
     p->description = di_stradup (temp + 1, value->string + value->size - temp - 1);
+#if 0
+    fwrite (value->string, value->size, 1, stdout);
+    fputs ("\n-----\n", stdout);
+    fwrite (temp + 1, value->string + value->size - temp - 1, 1, stdout);
+    fputs ("\n=====\n", stdout);
+#endif
   }
   else
     p->short_description = di_stradup (value->string, value->size);
@@ -388,23 +395,34 @@ void di_package_parser_write_description (
   di_package *p = *data;
   di_rstring value;
 
-  if (p->description)
+  if (p->short_description)
   {
-    value.size = strlen (p->short_description) + strlen (p->description) + 1;
-    value.string = di_malloc (value.size + 1);
-    snprintf (value.string, value.size + 1, "%s\n%s", p->short_description, p->description);
+    if (p->description)
+    {
+      value.size = strlen (p->short_description) + strlen (p->description) + 1;
+      value.string = di_malloc (value.size + 1);
+      snprintf (value.string, value.size + 1, "%s\n%s", p->short_description, p->description);
+#if 0
+      fprintf(stdout, "%s", p->description);
+      fputs ("\n-----\n", stdout);
+      fprintf(stdout, "%s", value.string);
+      fputs ("\n=====\n", stdout);
+#endif
+    }
+    else
+    {
+      value.size = strlen (p->short_description);
+      value.string = p->short_description;
+    }
+    callback (&fip->key, &value, callback_data);
+    if (p->description)
+      di_free (value.string);
   }
-  else
-  {
-    value.size = strlen (p->short_description);
-    value.string = p->short_description;
-  }
-  callback (&fip->key, &value, callback_data);
-  if (p->description)
-    di_free (value.string);
 }
 
-void di_package_parser_read_name (data, fip, field_modifier, value, user_data)
+di_parser_fields_function_read di_package_parser_read_name_real_4_0 __attribute__ ((unused));
+
+void di_package_parser_read_name_real_4_0 (data, fip, field_modifier, value, user_data)
   void **data;
   const di_parser_fieldinfo *fip __attribute__ ((unused));
   di_rstring *field_modifier __attribute__ ((unused));
@@ -414,8 +432,9 @@ void di_package_parser_read_name (data, fip, field_modifier, value, user_data)
   di_package *p = *data;
   p->key.string = di_stradup (value->string, value->size);
   p->key.size = value->size;
-  p->type = di_package_type_real_package;
 }
+
+__asm__ (".symver di_package_parser_read_name_real_4_0,di_package_parser_read_name@LIBDI_4.0");
 
 void di_package_parser_read_priority (
   void **data,
@@ -443,27 +462,6 @@ void di_package_parser_write_priority (
   callback (&fip->key, &value, callback_data);
 }
 
-static const char *status_want_text[] =
-{
-  "unknown",                            /* == di_package_status_want_unknown */
-  "install",                            /* == di_package_status_want_install */
-  "hold",                               /* == di_package_status_want_hold */
-  "deinstall",                          /* == di_package_status_want_deinstall */
-  "purge",                              /* == di_package_status_want_purge */
-  NULL
-};
-
-static const char *status_text[] =
-{
-  "undefined",                          /* == di_package_status_undefined */
-  "not-installed",                      /* == di_package_status_not_installed */
-  "unpacked",                           /* == di_package_status_unpacked */
-  "installed",                          /* == di_package_status_installed */
-  "half-configured",                    /* == di_package_status_half_configured */
-  "config-files",                       /* == di_package_status_config_files */
-  NULL
-};
-
 void di_package_parser_read_status (
   void **data,
   const di_parser_fieldinfo *fip __attribute__ ((unused)),
@@ -472,24 +470,19 @@ void di_package_parser_read_status (
   void *user_data __attribute__ ((unused)))
 {
   di_package *p = *data;
+  di_rstring temp;
   char *next;
-  int i;
-
-  for (i = 0; status_want_text[i]; i++)
-    if (strncmp (status_want_text[i], value->string, value->size) == 0)
-    {
-      p->status_want = i;
-      break;
-    }
 
   next = memchr (value->string, ' ', value->size);
-  next = memchr (next + 1, ' ', value->size - (next - value->string) - 1) + 1;
-  for (i = 0; status_text[i]; i++)
-    if (strncmp (status_text[i], next, value->size - (next - value->string) - 1) == 0)
-    {
-      p->status = i;
-      break;
-    }
+  temp.string = value->string;
+  temp.size = next - value->string;
+  p->status_want = internal_di_package_status_want_text_from_rstring (&temp);
+
+  next = memchr (next + 1, ' ', value->size - (next - value->string)) + 1;
+  temp.string = next;
+  temp.size = value->size - (next - value->string);
+
+  p->status = internal_di_package_status_text_from_rstring (&temp);
 }
 
 void di_package_parser_write_status (
@@ -504,8 +497,8 @@ void di_package_parser_write_status (
   di_rstring value = { value_buf, 0 };
 
   value.size = snprintf (value.string, sizeof (value_buf), "%s ok %s", 
-      status_want_text[p->status_want], 
-      status_text[p->status]);
+      di_package_status_want_text_to(p->status_want),
+      di_package_status_text_to(p->status));
   callback (&fip->key, &value, callback_data);
 }
 

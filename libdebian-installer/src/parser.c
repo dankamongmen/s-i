@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.c,v 1.5 2003/12/11 19:29:50 waldi Exp $
+ * $Id: parser.c,v 1.6 2004/02/23 23:38:34 waldi Exp $
  */
 
 #include <config.h>
@@ -82,35 +82,6 @@ void di_parser_write_boolean (
     callback (&fip->key, &value, callback_data);
 }
 
-void di_parser_read_string (
-  void **data,
-  const di_parser_fieldinfo *fip __attribute__ ((unused)),
-  di_rstring *field_modifier __attribute__ ((unused)),
-  di_rstring *value,
-  void *user_data __attribute__ ((unused)))
-{
-  char **f = (char **)((char *)*data + fip->integer);
-  *f = di_stradup (value->string, value->size);
-}
-
-void di_parser_write_string (
-  void **data,
-  const di_parser_fieldinfo *fip,
-  di_parser_fields_function_write_callback callback,
-  void *callback_data,
-  void *user_data __attribute__ ((unused)))
-{
-  char **f = (char **)((char *)*data + fip->integer);
-  di_rstring value;
-
-  if (*f)
-  {
-    value.string = *f;
-    value.size = strlen (*f);
-    callback (&fip->key, &value, callback_data);
-  }
-}
-
 void di_parser_read_int (
   void **data,
   const di_parser_fieldinfo *fip __attribute__ ((unused)),
@@ -140,4 +111,59 @@ void di_parser_write_int (
   }
 }
 
+void di_parser_read_rstring (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
+{
+  di_rstring *f = (di_rstring *)((char *)*data + fip->integer);
+  if (f->string)
+    di_free (f->string);
+  f->string = di_stradup (value->string, value->size);
+  f->size = value->size;
+}
+
+void di_parser_write_rstring (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
+{
+  di_rstring *f = (di_rstring *)((char *)*data + fip->integer);
+  callback (&fip->key, f, callback_data);
+}
+
+void di_parser_read_string (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
+{
+  char **f = (char **)((char *)*data + fip->integer);
+  if (*f)
+    di_free (*f);
+  *f = di_stradup (value->string, value->size);
+}
+
+void di_parser_write_string (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
+{
+  char **f = (char **)((char *)*data + fip->integer);
+  di_rstring value;
+
+  if (*f)
+  {
+    value.string = *f;
+    value.size = strlen (*f);
+    callback (&fip->key, &value, callback_data);
+  }
+}
 

@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.13 2004/01/06 15:25:37 waldi Exp $
+ * $Id: log.c,v 1.14 2004/02/23 23:38:34 waldi Exp $
  */
 
 #include <config.h>
@@ -206,8 +206,6 @@ unsigned int di_log_set_handler (di_log_level_flags log_levels, di_log_handler *
   return handler_id;
 }
 
-void di_log_real_4_0 (di_log_level_flags log_level, const char *format, ...) __attribute__ ((alias("di_log")));
-
 void di_log (di_log_level_flags log_level, const char *format, ...)
 {
   va_list args;
@@ -216,6 +214,8 @@ void di_log (di_log_level_flags log_level, const char *format, ...)
   di_vlog (log_level, format, args);
   va_end (args);
 }
+
+__asm__ (".symver di_log,di_log_real_4_0@LIBDI_4.0");
 
 void di_vlog (di_log_level_flags log_level, const char *format, va_list args)
 {
