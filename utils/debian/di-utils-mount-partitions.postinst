@@ -12,6 +12,11 @@ if [ "$ARCH" = "i386" -o "$ARCH" = "hppa" ]; then
     TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
 elif [ "$ARCH" = "s390" -o "$ARCH" = "s390x" ]; then
     TMP=`for i in /dev/dasd/*/disc; do fdasd -p $i | grep "Linux native" | cut -d\  -f 2; done`
+elif [ "$ARCH" = "ia64" ]; then
+    TMP=$(for i in /dev/discs/*/disc; do
+		dev=$(parted $i print | sed -n "s|^Disk geometry for \([^:]*\)/disc:.*$|\1|p")
+		parted $i print | sed -n "s|^\([0-9]\+\) \+[0-9\.]\+ \+[0-9\.]\+ \+ext[23].*$|$dev/part\1|p"
+	done)
 fi
 
 for P in $TMP; do
