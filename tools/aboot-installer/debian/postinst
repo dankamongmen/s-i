@@ -123,7 +123,10 @@ chroot /target /sbin/abootconf $bootdisk $partnum
 ABOOTCONF=/target/etc/aboot.conf
 
 sed -e"/^0:/ c\
-0:$partnum/vmlinuz ro initrd=/initrd.img root=/dev/ram" < $ABOOTCONF > ${ABOOTCONF}.new
+0:$partnum/vmlinuz ro initrd=/initrd.img root=/dev/ram
+/^1:/ c\
+1:$partnum/vmlinuz.old ro initrd=/initrd.img root=/dev/ram
+" < $ABOOTCONF > ${ABOOTCONF}.new
 mv ${ABOOTCONF}.new $ABOOTCONF
 
 db_progress STEP 1
