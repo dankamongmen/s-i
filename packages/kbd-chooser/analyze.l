@@ -6,7 +6,6 @@
 #include "xmalloc.h"
 
 extern int line_nr;
-extern int file_descriptor;
 
 int	yylval;
 int	rvalct;
@@ -80,7 +79,7 @@ To                      to|To|TO
 \+			{return(PLUS);}
 {Unicode}		{yylval=strtol(yytext+1,NULL,16) ^ 0xf000;return(UNUMBER);}
 {Decimal}|{Octal}|{Hex}	{yylval=strtol(yytext,NULL,0);return(NUMBER);}
-<RVALUE>{Literal}	{return((yylval=ksymtocode(yytext,file_descriptor))==-1?ERROR:LITERAL);
+<RVALUE>{Literal}	{return((yylval=ksymtocode(yytext))==-1?ERROR:LITERAL);
 			}
 {Charset}		{return(CHARSET);}
 {Keymaps}		{return(KEYMAPS);}

@@ -45,7 +45,10 @@ open_a_console(char *fnam) {
 }
 
 int getfd() {
-    int fd;
+    static int fd = -1;
+
+    if (fd >= 0)
+	return fd;
 
     fd = open_a_console("/dev/tty");
     if (fd >= 0)

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <debian-installer.h>
 #include "ksyms.h"
+#include "getfd.h"
 #include "nls.h"
 
 
@@ -1686,6 +1687,8 @@ codetoksym(int code) {
 
 	if (KTYP(code) == KT_META)
 		return NULL;
+	if (KTYP(code) == KT_LETTER)
+		code = K(KT_LATIN, KVAL(code));
 	if (KTYP(code) < syms_size)
 		return syms[KTYP(code)].table[KVAL(code)];
 	code = code ^ 0xf000;
@@ -1706,10 +1709,11 @@ codetoksym(int code) {
 /* Functions for loadkeys. */
 
 int
-ksymtocode(const char *s, int fd) {
+ksymtocode(const char *s) {
 	int i;
 	int j;
 	int keycode;
+	int fd;
 	int kbd_mode;
 	int syms_start = 0;
 	sym *p;
@@ -1719,12 +1723,14 @@ ksymtocode(const char *s, int fd) {
                return -1;
         }
 
+	fd = getfd();
+
 	ioctl(fd, KDGKBMODE, &kbd_mode);
 	if (!strncmp(s, "Meta_", 5)) {
 		/* Temporarily change kbd_mode to ensure that keycode is
 		 * right. */
 		ioctl(fd, KDSKBMODE, K_XLATE);
-		keycode = ksymtocode(s+5, fd);
+		keycode = ksymtocode(s+5);
 		ioctl(fd, KDSKBMODE, kbd_mode);
 		if (KTYP(keycode) == KT_LATIN)
 			return K(KT_META, KVAL(keycode));
@@ -1745,7 +1751,7 @@ ksymtocode(const char *s, int fd) {
 
 	for (i = 0; i < syn_size; i++)
 		if (!strcmp(s, synonyms[i].synonym))
-			return ksymtocode(synonyms[i].official_name, fd);
+			return ksymtocode(synonyms[i].official_name);
 
 	if (kbd_mode == K_UNICODE) {
 		for (i = 0; i < sizeof(charsets)/sizeof(charsets[0]); i++) {
@@ -1800,14 +1806,14 @@ ksymtocode(const char *s, int fd) {
 }
 
 int
-add_number(int code, int fd)
+add_number(int code)
 {
-        int kbd_mode;
+	int kbd_mode;
 
         if (KTYP(code) == KT_META)
                 return code;
 
-        ioctl(fd, KDGKBMODE, &kbd_mode);
+	ioctl(getfd(), KDGKBMODE, &kbd_mode);
         if (kbd_mode == K_UNICODE && KTYP(code) >= syms_size) {
 		if ((code ^ 0xf000) < 0x80)
 		      return K(KT_LATIN, code ^ 0xf000);
@@ -1816,14 +1822,15 @@ add_number(int code, int fd)
         }
         if (kbd_mode != K_UNICODE && KTYP(code) < syms_size)
                 return code;
-        return ksymtocode(codetoksym(code), fd);
+        return ksymtocode(codetoksym(code));
 }
 
 int
 add_capslock(int code)
 {
 	if (KTYP(code) == KT_LATIN)
-                return K(KT_LETTER, KVAL(code));
-        return code;
+		code = K(KT_LETTER, KVAL(code));
+
+	return add_number(code);
 }
 
