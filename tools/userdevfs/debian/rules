@@ -40,6 +40,8 @@ install: install-dirs
 	install init-dev debian/$(PACKAGE)/usr/bin
 
 # Build architecture-independent files here.
+#
+# Note that this builds a .udeb, which is not policy compliant or anything.
 binary-indep: install
 	dh_testdir
 	dh_testroot
@@ -49,9 +51,8 @@ binary-indep: install
 	dh_builddeb --filename=$(FILENAME)
 
 # Build architecture-dependent files here.
-#
-# Note that this builds a .udeb, which is not policy compliant or anything.
-binary-arch: binary-indep
+# No such packages, so don't do anything.
+binary-arch: 
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
