@@ -59,6 +59,7 @@ static int longestlen(char **strs, int count)
 	return max;
 }
 
+/* not needed (yet?) 
 static void attrprintf(WINDOW *win, int y, int x, chtype attr, char *fmt, ...)
 {
 	char *buf = 0;
@@ -71,6 +72,7 @@ static void attrprintf(WINDOW *win, int y, int x, chtype attr, char *fmt, ...)
 	while (*buf)
 		mvwaddch(win, y, x++, ((unsigned char)(*buf++))|attr);
 }
+*/
 
 static int wrapprint(WINDOW *win, const char *str, int ystart, const int width)
 {
