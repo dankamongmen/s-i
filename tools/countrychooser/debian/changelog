@@ -1,5 +1,40 @@
 countrychooser (0.003) UNRELEASED; urgency=low
 
+  * Christian Perrier
+    - Commented menu entry in templates
+    - Removed Czech and Russian translations for iso-codes as they
+      now are in the main iso-codes package
+    - No more alternative locales use. Locale is now untouched
+      by countrychooser. Closes: #230463
+    - debian-installer/language now keeps the language list
+      inherited from languagechooser PLUS language_COUNTRY where
+      COUNTRY is the chosen country code. This variable is aimed
+      at filling the LANGUAGE environment variable
+    - mktemplates: Added correction copy destination when no iso_3166 translation
+      exists
+    - added Serbia and Montenegro to regionmap
+    - Two-step country choosing introduced:
+      - first choose among "valid" countries (with regards to SUPPORTED from
+        the locales package)
+      - if the user really wants another country, bring the full world
+        country list
+      - when a "valid" country is chosen, change locale accordingly
+      - current drawback : the first country list is not translated
+    - Now uses iso_3166.tab file:
+      - Pre-Depends: iso-3166-udeb
+      - Modified postinst
+      - Removed local iso_3166.tab in /etc
+  * Joey Hess
+    - Fix strange source stanza pre-depends.
+    - Remove unnecessary dirs from udeb.
+  * Christian Perrier
+    - New scheme for asking country:
+      - if a country is chosen from languagechooser, no country choice
+        except at medium priority
+      - if only language inherited from languagechooser, short country
+        list shown at high and then long if "Other" selected
+  * Eugen Meshcheryakov : added Ukrainian translation (uk.po)
+
   * Translations
     - Bartosz Fenski
       - Updated Polish (pl) translation
@@ -39,40 +74,6 @@ countrychooser (0.003) UNRELEASED; urgency=low
       - Updated Brazilian Portuguese (pt_BR) translation.
     - Miroslav Kure
       - Updated Czech translation
-  * Christian Perrier
-    - Commented menu entry in templates
-    - Removed Czech and Russian translations for iso-codes as they
-      now are in the main iso-codes package
-    - No more alternative locales use. Locale is now untouched
-      by countrychooser. Closes: #230463
-    - debian-installer/language now keeps the language list
-      inherited from languagechooser PLUS language_COUNTRY where
-      COUNTRY is the chosen country code. This variable is aimed
-      at filling the LANGUAGE environment variable
-    - mktemplates: Added correction copy destination when no iso_3166 translation
-      exists
-    - added Serbia and Montenegro to regionmap
-    - Two-step country choosing introduced:
-      - first choose among "valid" countries (with regards to SUPPORTED from
-        the locales package)
-      - if the user really wants another country, bring the full world
-        country list
-      - when a "valid" country is chosen, change locale accordingly
-      - current drawback : the first country list is not translated
-    - Now uses iso_3166.tab file:
-      - Pre-Depends: iso-3166-udeb
-      - Modified postinst
-      - Removed local iso_3166.tab in /etc
-  * Joey Hess
-    - Fix strange source stanza pre-depends.
-    - Remove unnecessary dirs from udeb.
-  * Christian Perrier
-    - New scheme for asking country:
-      - if a country is chosen from languagechooser, no country choice
-        except at medium priority
-      - if only language inherited from languagechooser, short country
-        list shown at high and then long if "Other" selected
-  * Eugen Meshcheryakov : added Ukrainian translation (uk.po)
 
  -- Christian Perrier <bubulle@debian.org>  Sun,  8 Feb 2004 20:26:33 +0100
 
