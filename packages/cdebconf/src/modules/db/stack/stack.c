@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: stack.c,v 1.1 2002/11/17 21:21:20 tfheen Rel $
+ * $Id$
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.

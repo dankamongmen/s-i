@@ -2,7 +2,7 @@
  * cdebconf frontend, corba servant, text frontend main program, will
  * only work in an xterm, haha
  *
- * $Id: dcf-text.c,v 1.5 2002/07/01 06:58:38 tausq Rel $
+ * $Id$
  */
 
 /*

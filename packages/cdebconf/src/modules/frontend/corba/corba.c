@@ -1,7 +1,7 @@
 /*
  * cdebconf frontend, corba client
  *
- * $Id: corba.c,v 1.4 2003/07/14 12:52:47 sjogren Rel $
+ * $Id$
  */
 
 #include "common.h"

@@ -1,7 +1,7 @@
 /*
  * cdebconf frontend, corba servant, text frontend implementation
  *
- * $Id: dcf-textimpl.c,v 1.5 2002/07/01 06:58:38 tausq Rel $
+ * $Id$
  */
 
 #include "common.h"

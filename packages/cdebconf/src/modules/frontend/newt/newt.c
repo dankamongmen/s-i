@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.51 2004/03/04 11:06:54 barbier Exp $
+ * $Id$
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.

@@ -7,7 +7,7 @@
  *
  * Description: mysql DB module for cdebconf
  *
- * $Id: mysql.c,v 1.2 2002/09/06 15:58:03 pere Rel $
+ * $Id$
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.

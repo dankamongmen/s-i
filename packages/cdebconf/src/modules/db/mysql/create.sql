@@ -1,4 +1,4 @@
--- $Id: create.sql,v 1.1 2001/01/21 23:56:54 tausq Rel $
+-- $Id$
 -- Database creation script for cdebconf MySQL backend
 -- Note: This depends on a fairly recent version of mysql
 

@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.49 2004/03/08 21:49:20 joeyh Exp $ */
+/* $Id$ */
 #include "udpkg.h"
 
 #include <errno.h>

@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.27 2003/02/12 03:12:39 kraai Rel $ */
+/* $Id$ */
 #include "udpkg.h"
 
 #include <stdio.h>

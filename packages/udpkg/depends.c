@@ -1,4 +1,4 @@
-/* $Id: depends.c,v 1.7 2000/12/21 23:58:12 bug1 Rel $ */
+/* $Id$ */
 #include "udpkg.h"
 
 #ifdef DODEPENDS

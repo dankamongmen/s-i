@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.3 2002/07/09 05:25:04 tausq Rel $
+# $Id$
 
 # This is wrong 8:P  (Hey, big nose? Or girlie hair?)
 MODULE=corba
