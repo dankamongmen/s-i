@@ -3,7 +3,7 @@
 set -e
 for dir in $(find $1 -type d | grep /debian\$ |grep -v svn); do
 	base=$(echo $dir | sed 's/\/debian$//');
-	if SCAN_TRANS=1 scripts/l10n-changes/output-l10n-changes -d $base; then
+	if SCAN_TRANS=1 scripts/l10n/output-l10n-changes -d $base; then
 		if head -n 1 $dir/changelog | grep -q UNRELEASED; then
 			echo "   (Plus other UNRELEASED changes.)"
 		fi
