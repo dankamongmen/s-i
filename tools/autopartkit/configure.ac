@@ -9,6 +9,25 @@ AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_INSTALL
 
+if test "$GCC" = yes; then
+  # Can not use -ansi, need 'long long'
+  #      -ansi \
+  for flag in \
+      -pedantic \
+      -W \
+      -Wall \
+      -Wcast-align \
+      -Wcast-qual \
+      -Wmissing-declarations \
+      -Wmissing-prototypes \
+      -Wpointer-arith \
+      -Wreturn-type \
+      -Wstrict-prototypes 
+  do
+    JAPHAR_GREP_CFLAGS($flag, [ CFLAGS="$CFLAGS $flag" ])
+  done
+fi
+
 # Checks for libraries.
 AC_CHECK_LIB([debconfclient], [debconfclient_new])
 AC_CHECK_LIB([dl], [dlopen])
@@ -38,24 +57,13 @@ AC_CHECK_FUNCS([memset mkdir strchr strdup strerror strstr])
 # libparted 1.6 got ped_disk_commit, but no ped_disk_write
 AC_CHECK_FUNCS([ped_disk_commit ped_disk_write])
 
-if eval "test x$GCC = xyes"; then
-   # Can not use -ansi, need 'long long'
-   #      -ansi \
-  for flag in \
-      -pedantic \
-      -W \
-      -Wall \
-      -Wcast-align \
-      -Wcast-qual \
-      -Wmissing-declarations \
-      -Wmissing-prototypes \
-      -Wpointer-arith \
-      -Wreturn-type \
-      -Wstrict-prototypes 
-  do
-    JAPHAR_GREP_CFLAGS($flag, [ CFLAGS="$CFLAGS $flag" ])
-  done
-fi
+AC_ARG_ENABLE(test,
+[  --enable-test            Enable test code [default=no]],
+[case "${enableval}" in
+      yes) AC_DEFINE(TEST, 1, [Enable test code]) CFLAGS="$CFLAGS -DTEST" ;;
+      no)  ;;
+      *)   AC_MSG_ERROR(bad value ${enableval} for --enable-test) ;;
+ esac],[])
 
 AC_ARG_ENABLE(lvm,
 [  --enable-lvm            Enable hack to make LVM partitions [default=no]],
