@@ -58,20 +58,20 @@ change. ]
 /usr/lib/debian-installer/retriever/<retriever name> is a executable. It
 is run with the following parameters:
 
-filename dest-directory
-	Download the specified file to the specified destination
-	directory[2]. The filename is the Filename field of a Packages
-	file.
+filename [dest-filename]
+	Download the specified file to the specified destination.
+	If the destination is unspecified, use stdout. The filename 
+	is the Filename field of a Packages file.
 
-	Thus, retrieving the Packages file itself is something like this:
-		program Packages /tmp/
+	Thus, retrieving the Packages file itself to stdout is 
+	something like this:
+		program Packages
 	
 	While retrieving a deb is something like this:
-		program retrievers/http-retriever.deb /tmp/
+		program retrievers/http-retriever.deb /tmp/http-retriever.deb
 
 If the destination file already exists, the retriever may want to attempt
-to continue a download. Note that the destination file may also be a fifo
-or a named pipe.
+to continue a download[2].
 
 Once ran, retrievers are free to prompt the user, or do whatever else is 
 necessary to retrieve the file.
@@ -92,8 +92,13 @@ This is another module, that makes use of the retrievers. It depends on the
 "retreiver" virtual package, and it generates an item in the main menu.
 When the item is picked, one of the retrievers gets configured, and then
 the retriever controller tells it to go get the Packages file. The
-controller parses the file, and uses the retreiver to download each module,
-verifies md5sums (optional), and unpacks them all.
+controller parses the file, and uses the retreiver to download each needed 
+module, verifies md5sums (optional), and unpacks them all.
+
+Which modules are needed is an interesting question. One simplistic
+technique is to simply download and unpack all available modules. Another
+technique would be to only retreive modules that will appear on the main
+menu, and retreive their dependancies if they are used.
 
 Footnotes
 ---------
