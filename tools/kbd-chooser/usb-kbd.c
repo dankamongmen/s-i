@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.8 2003/03/06 10:30:31 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.9 2003/03/19 20:49:31 mckinstry Exp $
  */
 
 #include "config.h"
@@ -20,13 +20,10 @@
 #include "nls.h"
 #include "kbd-chooser.h"
 
-extern kbd_t *keyboards;	/* in kbd-chooser.c */
-
-
 /**
  * @brief list of keyboards present
  */
-void usb_kbd_get (void)
+kbd_t *usb_kbd_get (kbd_t *keyboards)
 {
 	kbd_t *k = xmalloc(sizeof(kbd_t));
 	int serr, res, mounted_fs = 0 ;
@@ -35,7 +32,7 @@ void usb_kbd_get (void)
 	k->name = "usb";
 	k->description = N_("USB");
 	k->fd = -1;
-	k->deflt = NULL;
+	k->deflt = "mac-usb-us";
 	k->present = UNKNOWN;
 	k->next = keyboards;
 	keyboards = k;
@@ -76,7 +73,7 @@ void usb_kbd_get (void)
 		if (system ("mount -t  usbdevfs usbdevfs /proc/bus/usb") != 0) {		 
 			di_log ("Failed to mount USB filesystem to autodetect USB keyboard;");
 			di_log ("Will add USB keyboard option just in case");
-			return;
+			return keyboards;
 		}
 		// restore stderr
 		close (2);
@@ -93,7 +90,7 @@ void usb_kbd_get (void)
 		k->present = FALSE;
 	if (mounted_fs)
 		system ("umount /proc/bus/usb");
-	
+	return keyboards;	
 }
 
 /*

@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: amiga-kbd.c,v 1.3 2003/01/29 09:52:15 mckinstry Exp $
+ * $Id: amiga-kbd.c,v 1.4 2003/03/19 20:49:31 mckinstry Exp $
  */
 
 #include "config.h"
@@ -15,12 +15,11 @@
 #include "nls.h"
 #include "kbd-chooser.h"
 
-extern kbd_t *keyboards;
 
 /**
  * @brief list of keyboards present
  */
-void amiga_kbd_get ()
+kbd_t *amiga_kbd_get (kbd_t *keyboards)
 {
 	kbd_t *k = xmalloc (sizeof (kbd_t));
 	int res;
@@ -30,7 +29,7 @@ void amiga_kbd_get ()
 
 	k->name = "amiga"; // This must match the name "amiga" in console-keymaps-amiga
 	k->description = N_("Amiga Keyboard");
-	k->deflt = NULL;
+	k->deflt = "amiga-us";
 	k->fd = -1;
 	k->present = UNKNOWN;
 	k->next = keyboards;
@@ -45,10 +44,10 @@ void amiga_kbd_get ()
 		res = grep ("/proc/bus/input/devices", "Amiga keyboard");
 		if (res < 0) {
 			di_log ("amiga-kbd: Failed to open /proc/bus/input/devicves");
-			return;
+			return keyboards;
 		}
 		k->present = ( res == 0) ? TRUE : FALSE;
-		return;
+		return keyboards;
 	}
 
 
@@ -58,4 +57,5 @@ void amiga_kbd_get ()
 
 	/* For 2.4, assume a keyboard is present
 	 */	
+	return keyboards;
 }
