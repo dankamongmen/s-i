@@ -140,10 +140,12 @@ do
 
         if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
-            found_scsi=true
             if load_modules $module
             then
-                :
+                case "$module" in
+                    ide-*);;
+                    *) found_scsi=true;;
+                esac
             else
                 log "Error loading driver '$module' for $vendor $model!"
 	    fi
