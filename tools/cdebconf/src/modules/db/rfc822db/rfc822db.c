@@ -313,8 +313,8 @@ static int rfc822db_template_save(struct template_db *db)
         return DC_NOTOK;
     }
 
-    table_first(dbdata->hash, (void **)&key, NULL, (void **)&t, NULL);
-
+    ret = table_first(dbdata->hash, (void **)&key, NULL, (void **)&t, NULL);
+/*    fprintf(stderr,"rfc822db_template_save::ret == %d\n", ret);*/
     while (ret == TABLE_ERROR_NONE && t != NULL)
     {
         struct language_description *langdesc;
