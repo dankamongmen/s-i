@@ -101,6 +101,11 @@ else
 	modlistdir=modules/$arch
 fi
 
+if [ ! -e "$moddir/modules.dep" ]; then
+	echo "no $moddir/modules.dep. This file is required by kernel-wedge" >&2
+	exit 1
+fi
+
 # get module dependencies from modules.dep
 # sort it by field 2
 perl -lne '
