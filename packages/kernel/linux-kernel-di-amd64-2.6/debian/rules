@@ -1,2 +1,17 @@
 #!/usr/bin/make -f
+
+DEB_BUILD_ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
+
 include /usr/share/kernel-wedge/generic-rules
+
+clean: cleanup
+
+cleanup:
+	rm kernel-versions
+
+debian/control: configure
+
+configure:
+	sed "s/@arch@/$(DEB_BUILD_ARCH)/g" kernel-versions.in >kernel-versions
+
+.PHONY: cleanup configure
