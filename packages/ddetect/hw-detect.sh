@@ -28,7 +28,8 @@ log () {
 }
 
 is_not_loaded() {
-       ! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
+       ! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || \
+          (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
 }
 
 # The list can be delimited with spaces or spaces and commas.
@@ -200,7 +201,7 @@ db_progress STEP $OTHER_STEPSIZE
 LIST=""
 PROCESSED=""
 AVAIL_MODULES="$(find /lib/modules/$(uname -r)/ | sed 's!.*/!!' | cut -d . -f 1)"
-LOADED_MODULES="$(cut -d " " -f 1 /proc/modules)"
+LOADED_MODULES="$(cut -d " " -f 1 /proc/modules) $(cut -d " " -f 1 /proc/modules | sed -e 's/_/-/g')"
 IFS_SAVE="$IFS"
 IFS="$NEWLINE"
 for device in $ALL_HW_INFO; do
