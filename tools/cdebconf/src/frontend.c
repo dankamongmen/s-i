@@ -137,29 +137,33 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
                      modname);
             modname = cfg->get(cfg, tmp, 0);
     }
-    modpath = cfg->get(cfg, "global::module_path::frontend", 0);
-    if (modpath == NULL)
-        DIE("Frontend module path not defined (global::module_path::frontend)");
-
     if (modname == NULL)
         DIE("Frontend instance driver not defined (%s)", tmp);
 
-    setenv("DEBIAN_FRONTEND",modname,1);
-    q = qdb->methods.get(qdb, "debconf/frontend");
-    if (q)
-	question_setvalue(q, modname);
-    question_deref(q);
-    snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, modname);
-    //Frontend switching works when dlopening with RTLD_LAZY
-    //The real reason why it segfaultes with RTLD_NOW has yet to be found
+    setenv("DEBIAN_FRONTEND", modname, 1);
+    obj = NEW(struct frontend);
+    memset(obj, 0, sizeof(struct frontend));
+    if (strcmp(modname, "none") != 0)
+    {
+        modpath = cfg->get(cfg, "global::module_path::frontend", 0);
+        if (modpath == NULL)
+            DIE("Frontend module path not defined (global::module_path::frontend)");
+
+        q = qdb->methods.get(qdb, "debconf/frontend");
+        if (q)
+	    question_setvalue(q, modname);
+        question_deref(q);
+        snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, modname);
+        //Frontend switching works when dlopening with RTLD_LAZY
+        //The real reason why it segfaultes with RTLD_NOW has yet to be found
 	if ((dlh = dlopen(tmp, RTLD_LAZY)) == NULL)
 		DIE("Cannot load frontend module %s: %s", tmp, dlerror());
 
 	if ((mod = (struct frontend_module *)dlsym(dlh, "debconf_frontend_module")) == NULL)
 		DIE("Malformed frontend module %s", modname);
 	
-	obj = NEW(struct frontend);
-	memset(obj, 0, sizeof(struct frontend));
+	memcpy(&obj->methods, mod, sizeof(struct frontend_module));
+    }
 	obj->handle = dlh;
 	obj->config = cfg;
 	obj->tdb = tdb;
@@ -167,7 +171,6 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
     snprintf(obj->configpath, sizeof(obj->configpath),
         "frontend::instance::%s", modname);
 
-    memcpy(&obj->methods, mod, sizeof(struct frontend_module));
 
 #define SETMETHOD(method) if (obj->methods.method == NULL) obj->methods.method = frontend_##method
 
