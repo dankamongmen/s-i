@@ -8,7 +8,6 @@ make_path(const char *pathname, mode_t mode)
 {
     char *dirpath;
     char *slash;
-    int pos = 0;
 
     dirpath = alloca(strlen(pathname) + 1);
     strcpy(dirpath, pathname);
@@ -22,25 +21,24 @@ make_path(const char *pathname, mode_t mode)
     {
 	slash = strchr(slash, '/');
 	if (slash)
-	  *slash = '\0';
-
-	printf("D: %s\n", dirpath);
+	    *slash = '\0';
 
 	if (mkdir(dirpath, mode))
-	  {
+	{
 	    struct stat statbuf;
 	    if (stat(dirpath, &statbuf))
-	      return -1;
+	        return -1;
 	    if (!S_ISDIR(statbuf.st_mode))
-	      return -1;
-	  }
+	        return -1;
+	}
 
 	if (slash)
-	  {
+	{
 	    *slash = '/';
 	    slash++;
-	  }
+	}
 	else
-	  break;
+	    break;
     }
+    return 0;
 }
