@@ -5,8 +5,14 @@ CC=gcc
 
 all: libkdetect.so
 
+test: test.o libkdetect.a
+	$(CC) $(CFLAGS) -o test test.o libkdetect.a
+
 libkdetect.so: libkdetect.o common.o proc_devices.o proc_ide.o proc_mdstat.o
 	$(CC) -fPIC -shared -Wl,-soname,libkdetect.so.0 -o libkdetect.so.0.1 libkdetect.o common.o proc_devices.o proc_ide.o proc_mdstat.o
+
+libkdetect.a: libkdetect.o common.o proc_devices.o proc_ide.o proc_mdstat.o
+	ar crv libkdetect.a libkdetect.o common.o proc_devices.o proc_ide.o proc_mdstat.o
 
 libkdetect.o: libkdetect.c
 	$(CC) $(CFLAGS) -c libkdetect.c
@@ -22,6 +28,9 @@ proc_ide.o: proc_ide.c common.c
 
 proc_mdstat.o: proc_mdstat.c common.c
 	$(CC) $(CFLAGS) -c proc_mdstat.c
+
+test.o: test.c
+	$(CC) $(CFLAGS) -c test.c
 
 clean:
 	rm -f libkdetect.so.0.1 libkdetect.a kdetect *.o 
