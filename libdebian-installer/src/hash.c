@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.c,v 1.10 2003/12/31 16:38:41 waldi Exp $
+ * $Id: hash.c,v 1.11 2003/12/31 16:46:30 waldi Exp $
  */
 
 #include <config.h>
@@ -75,7 +75,7 @@ if ((hash_table->size >= 3 * hash_table->nnodes &&      \
       hash_table->size > HASH_TABLE_MIN_SIZE) ||        \
     (3 * hash_table->size <= hash_table->nnodes &&      \
      hash_table->size < HASH_TABLE_MAX_SIZE))           \
-     di_hash_table_resize (hash_table);
+     internal_di_hash_table_resize (hash_table);
 
 /**
  * @internal
@@ -98,15 +98,15 @@ if ((hash_table->size >= 3 * hash_table->nnodes &&      \
  */
 #define CLAMP(x, low, high)  (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
-static void di_hash_table_resize (di_hash_table *hash_table);
-static di_hash_node **di_hash_table_lookup_node (di_hash_table *hash_table, const void *key);
-static di_hash_node *di_hash_node_new (di_hash_table *hash_table, void *key, void *value);
-static void di_hash_node_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func) __attribute__ ((unused));
-static void di_hash_nodes_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func);
+static void internal_di_hash_table_resize (di_hash_table *hash_table);
+static di_hash_node **internal_di_hash_table_lookup_node (di_hash_table *hash_table, const void *key);
+static di_hash_node *internal_di_hash_node_new (di_hash_table *hash_table, void *key, void *value);
+static void internal_di_hash_node_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func) __attribute__ ((unused));
+static void internal_di_hash_nodes_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func);
 
 /** @} */
 
-static unsigned int di_spaced_primes_closest (unsigned int num);
+static unsigned int internal_di_spaced_primes_closest (unsigned int num);
 
 di_hash_table *di_hash_table_new (di_hash_func hash_func, di_equal_func key_equal_func)
 {
@@ -139,7 +139,7 @@ void di_hash_table_destroy (di_hash_table *hash_table)
   size_t i;
 
   for (i = 0; i < hash_table->size; i++)
-    di_hash_nodes_destroy (hash_table->nodes[i], hash_table->key_destroy_func, hash_table->value_destroy_func);
+    internal_di_hash_nodes_destroy (hash_table->nodes[i], hash_table->key_destroy_func, hash_table->value_destroy_func);
 
   di_mem_chunk_destroy (hash_table->mem_chunk);
 
@@ -147,7 +147,7 @@ void di_hash_table_destroy (di_hash_table *hash_table)
   di_free (hash_table);
 }
 
-static inline di_hash_node** di_hash_table_lookup_node (di_hash_table *hash_table, const void *key)
+static inline di_hash_node** internal_di_hash_table_lookup_node (di_hash_table *hash_table, const void *key)
 {
   di_hash_node **node;
 
@@ -173,7 +173,7 @@ void *di_hash_table_lookup (di_hash_table *hash_table, const void *key)
 {
   di_hash_node *node;
 
-  node = *di_hash_table_lookup_node (hash_table, key);
+  node = *internal_di_hash_table_lookup_node (hash_table, key);
 
   return node ? node->value : NULL;
 }
@@ -182,7 +182,7 @@ void di_hash_table_insert (di_hash_table *hash_table, void *key, void *value)
 {
   di_hash_node **node;
 
-  node = di_hash_table_lookup_node (hash_table, key);
+  node = internal_di_hash_table_lookup_node (hash_table, key);
 
   if (*node)
   {
@@ -196,13 +196,13 @@ void di_hash_table_insert (di_hash_table *hash_table, void *key, void *value)
   }
   else
   {
-    *node = di_hash_node_new (hash_table, key, value);
+    *node = internal_di_hash_node_new (hash_table, key, value);
     hash_table->nnodes++;
     HASH_TABLE_RESIZE (hash_table);
   }
 }
 
-static di_hash_node* di_hash_node_new (di_hash_table *hash_table, void *key, void *value)
+static di_hash_node* internal_di_hash_node_new (di_hash_table *hash_table, void *key, void *value)
 {
   di_hash_node *hash_node;
 
@@ -215,7 +215,7 @@ static di_hash_node* di_hash_node_new (di_hash_table *hash_table, void *key, voi
   return hash_node;
 }
 
-static void di_hash_node_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func)
+static void internal_di_hash_node_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func)
 {
   if (key_destroy_func)
     key_destroy_func (hash_node->key);
@@ -223,7 +223,7 @@ static void di_hash_node_destroy (di_hash_node *hash_node, di_destroy_notify key
     value_destroy_func (hash_node->value);
 }
 
-static void di_hash_nodes_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func)
+static void internal_di_hash_nodes_destroy (di_hash_node *hash_node, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func)
 {
   if (hash_node)
   {
@@ -261,7 +261,7 @@ di_ksize_t di_hash_table_size (di_hash_table *hash_table)
   return hash_table->size;
 }
 
-static void di_hash_table_resize (di_hash_table *hash_table)
+static void internal_di_hash_table_resize (di_hash_table *hash_table)
 {
   di_hash_node **new_nodes;
   di_hash_node *node;
@@ -270,7 +270,7 @@ static void di_hash_table_resize (di_hash_table *hash_table)
   size_t new_size;
   size_t i;
 
-  new_size = di_spaced_primes_closest (hash_table->nnodes);
+  new_size = internal_di_spaced_primes_closest (hash_table->nnodes);
   new_size = CLAMP (new_size, HASH_TABLE_MIN_SIZE, HASH_TABLE_MAX_SIZE);
 
   new_nodes = di_new0 (di_hash_node*, new_size);
@@ -291,7 +291,7 @@ static void di_hash_table_resize (di_hash_table *hash_table)
   hash_table->size = new_size;
 }
 
-static const unsigned int di_primes[] =
+static const unsigned int internal_di_primes[] =
 {
   11,
   19,
@@ -329,16 +329,16 @@ static const unsigned int di_primes[] =
   13845163,
 };
 
-static const unsigned int di_nprimes = sizeof (di_primes) / sizeof (di_primes[0]);
+static const unsigned int internal_di_nprimes = sizeof (internal_di_primes) / sizeof (internal_di_primes[0]);
 
-static unsigned int di_spaced_primes_closest (unsigned int num)
+static unsigned int internal_di_spaced_primes_closest (unsigned int num)
 {
   unsigned int i;
 
-  for (i = 0; i < di_nprimes; i++)
-    if (di_primes[i] > num)
-      return di_primes[i];
+  for (i = 0; i < internal_di_nprimes; i++)
+    if (internal_di_primes[i] > num)
+      return internal_di_primes[i];
 
-  return di_primes[di_nprimes - 1];
+  return internal_di_primes[internal_di_nprimes - 1];
 }
 
