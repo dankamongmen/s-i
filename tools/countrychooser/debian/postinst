@@ -3,6 +3,8 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+db_capb backup
+
 localecode="debian-installer/locale"
 languagecode="debian-installer/language"
 countrycode="debian-installer/country"
@@ -22,10 +24,10 @@ countrycodemap() {
 
 	if [ "$line" ] ; then
 		# Remember that country names may have spaces so the code
-		# here different than countrymap
-		COUNTRYNAME=`echo $line|cut -b 4-`
+		# is different than in countrymap.
+		COUNTRYNAME=`echo $line | cut -b 4-`
 	else
-	    echo "error: Unable to locate info on country '$COUNTRYCODE'"
+		echo "error: Unable to locate info on country '$COUNTRYCODE'"
 	fi
 }
 
@@ -56,45 +58,44 @@ fi
 COUNTRYCODE_LANGUAGECHOOSER=$COUNTRYCODE
 
 db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
-if db_go; then
-	db_get "countrychooser/country-name"
+if ! db_go; then
+	exit 10 # back up
+fi
+
+db_get "countrychooser/country-name"
+if test "$RET" ; then
+	COUNTRYNAME="$RET"
+	countrymap
+	db_set "$countrycode"  "$COUNTRYCODE"
+	db_get "$languagecode"
 	if test "$RET" ; then
-		COUNTRYNAME="$RET"
-		countrymap
-		db_set "$countrycode"  "$COUNTRYCODE"
-		db_get "$languagecode"
-		if test "$RET" ; then
-			LANGUAGECODE=$RET
-			# Locale setting
-			# Keep locale inherited from languagechooser
-			# if the country wasn't changed. Otherwise,
-			# add "language_COUNTRY" to the original locale
-			# This allows keeping the fallback values
-			# Make sure locale is at least "C"
-			if [ "$LANGUAGECODE" != "C" ]; then
-				db_get "$localecode"
-				if test "$RET" ; then
-					LOCALE="$RET"
-				else
-					LOCALE="C"
-				fi
-				if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ] ; then
-					LOCALE=${LANGUAGECODE}_${COUNTRYCODE}:${LOCALE}
-				fi
+		LANGUAGECODE=$RET
+		# Locale setting
+		# Keep locale inherited from languagechooser
+		# if the country wasn't changed. Otherwise,
+		# add "language_COUNTRY" to the original locale
+		# This allows keeping the fallback values
+		# Make sure locale is at least "C"
+		if [ "$LANGUAGECODE" != "C" ]; then
+			db_get "$localecode"
+			if test "$RET" ; then
+				LOCALE="$RET"
 			else
-				LOCALE=C
+				LOCALE="C"
+			fi
+			if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ] ; then
+				LOCALE=${LANGUAGECODE}_${COUNTRYCODE}:${LOCALE}
 			fi
 		else
 			LOCALE=C
 		fi
-		db_set "$localecode"   "$LOCALE"
 	else
-		# Error, not sure how to handle it
-		:
+		LOCALE=C
 	fi
+	db_set "$localecode"   "$LOCALE"
 else
-    # Error, not sure how to handle it
-    :
+	# Error, not sure how to handle it
+	:
 fi
 
 log "$countrycode   = '$COUNTRYCODE'"
