@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.9 2000/11/02 06:55:37 joeyh Exp $ */
+/* $Id: status.c,v 1.10 2000/11/02 20:36:01 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -145,27 +145,46 @@ void *status_read(void)
 		return 0;
 	}
 	printf("(Reading database...)\n");
-	while (!feof(f)) {
+	while (!feof(f))
+	{
 		m = (struct package_t *)malloc(sizeof(struct package_t));
 		memset(m, 0, sizeof(struct package_t));
-		m->refcount = 1;
 		control_read(f, m);
 		if (m->package)
+		{
 			tsearch(m, &status, package_compare);
-		if (m->provides) {
-			/* 
-			 * A "Provides" triggers the insertion of a pseudo 
-			 * package into the status binary-tree.
-			 */
-			p = (struct package_t *)malloc(sizeof(struct package_t));
-			memset(p, 0, sizeof(struct package_t));
-			p->package = strdup(m->provides);
-			t = *(struct package_t **)tsearch(p, &status, package_compare);
-			if (t->refcount++ > 0)
+			if (m->provides)
 			{
-				free(p->package);
-				free(p);
+				/* 
+				 * A "Provides" triggers the insertion
+				 * of a pseudo package into the status
+				 * binary-tree.
+				 */
+				p = (struct package_t *)malloc(sizeof(struct package_t));
+				memset(p, 0, sizeof(struct package_t));
+				p->package = strdup(m->provides);
+				t = *(struct package_t **)tsearch(p, &status, package_compare);
+				if (! t == p)
+				{
+					free(p->package);
+					free(p);
+				}
+				else {
+					/*
+					 * Pseudo package status is the
+					 * same as the status of the
+					 * package providing it 
+					 * (not quite right, if 2 packages
+					 * of different statuses provide
+					 * it).
+					 */
+					t->status = m->status;
+				}
 			}
+		}
+		else
+		{
+			free(m);
 		}
 	}
 	fclose(f);

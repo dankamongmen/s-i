@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.5 2000/11/02 04:14:31 tausq Exp $ */
+/* $Id: udpkg.h,v 1.6 2000/11/02 20:36:01 joeyh Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -64,7 +64,6 @@ struct package_t {
 	int installer_menu_item;
 	unsigned long status;
 	char color; /* for topo-sort */
-	char refcount;
 	struct package_t *requiredfor[DEPENDSMAX]; 
 	unsigned short requiredcount;
 	struct package_t *next;
