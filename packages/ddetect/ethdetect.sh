@@ -103,7 +103,7 @@ module_probe() {
 		fi
 	fi
 
-	# Module loaed successfully
+	# Module loaded successfully
 	if [ "$params" != "" ]; then
 		register-module "$module" "$params"
 	fi
