@@ -18,7 +18,7 @@
 #define MAIN_MENU	"debian-installer/main-menu"
 #define DPKG_CONFIGURE_COMMAND "/usr/bin/udpkg --configure"
 
-typedef enum { unpacked, installed, other } package_status;
+typedef enum { unpacked, installed, half_configured, other } package_status;
 
 struct package_t {
 	char *package;

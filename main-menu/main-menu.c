@@ -91,7 +91,7 @@ int isdefault(struct package_t *p) {
 	if (stat(menutest, &statbuf) == 0) {
 		return ! SYSTEM(menutest);
 	}
-	else if (p->status == unpacked) {
+	else if (p->status == unpacked || p->status == half_configured) {
 		return 1;
 	}
 	return 0;
@@ -176,12 +176,11 @@ int do_menu_item(struct package_t *p) {
 	struct package_t *head = NULL, *tail = NULL;
 	
 	if (p->status == installed) {
-		printf("already installed\n");
 		/* The menu item is already configured, so reconfigure it. */
 		sprintf(configcommand, "dpkg-reconfigure %s", p->package);
 		return ! SYSTEM(configcommand);
 	}
-	else if (p->status == unpacked) {
+	else if (p->status == unpacked || p->status == half_configured) {
 		/*
 		 * The menu item is not yet configured. Make sure everything
 		 * it depends on is configured, then configure it.

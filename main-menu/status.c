@@ -47,6 +47,9 @@ struct package_t *status_read(void) {
 			if (strstr(buf, " unpacked")) {
 				p->status = unpacked;
 			}
+			else if (strstr(buf, " half-configured")) {
+				p->status = half_configured;
+			}
 			else if (strstr(buf, " installed")) {
 				p->status = installed;
 			}
