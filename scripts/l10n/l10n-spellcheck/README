@@ -1,0 +1,57 @@
+The following files should help translators to find typos in po files:
+
+check_dit.sh 
+check_all.sh
+lang2dict.txt
+msgstr_extract.awk
+
+
+Run the following command in order to spellcheck the languages listed
+in lang2dict.txt:
+
+	 sh check_all.sh
+
+
+This will create a subdirectory "check_${TODAY}" containing various
+files.
+
+check_dit.sh 
+	Usage: check_dit <lang> <aspell-suffix> <D-I repository> <out dir>
+
+	is the "heart" of the project: it spell checks one single language of
+	installer and writes the results inside an output dir.
+	Optional word lists are expected to be found in the "wls" subdir
+
+check_all.sh
+	Usage: check_all.sh
+
+	this is the top-level scripts that loops through the languages and
+	creates a png graph, a table in text and HTML formats
+
+lang2dict.txt
+	contains the language code to aspell-suffix conversion:
+	it is used for 
+	"pt_BR" --> "pt-br"
+	"nb" --> "no"
+	"uk" --> "ukr"
+	
+msgstr_extract.awk
+	Usage: find . -name ${LANG}.po |\
+	xargs awk -f ~/bin/msgstr_extract > [outputfile]
+
+	script originally sent to me by Frans Pop and slightly modified
+	in order to work with all languages
+
+More details about the ideas behind this scripts can be found
+here:
+
+http://www.webalice.it/zinosat/
+
+As you can see I'm not an HTML guru! 
+It would probably make more sense if the results could be included 
+somewhere like
+http://people.debian.org/~seppy/d-i/translation-status.html
+
+Please send your comments to 
+
+Davide Viti (zinosat@tiscali.it)
