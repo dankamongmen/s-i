@@ -124,20 +124,30 @@ while [ "$LOADED" = 0 ]; do
 		echo $OLD_PRINTK > /proc/sys/kernel/printk
 	fi
 	
-	# TODO progress display, this can take quite some time!
-	echo "Loading the Debian installer, please wait...."
 	mount -t shm shm mnt
-	if zcat floppy/initrd.gz > mnt/tmp-initrd; then
+	echo -n "Loading the Debian installer.."
+	# pipe_progress adds dots to the above line while there is
+	# activity. But we must be sure to catch errors from the zcat.
+	# Hard to do in a pipeline..
+	rm -f /tmp/zcat_failure
+	if [ -e /bin/pipe_progress ]; then
+		(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) | pipe_progress > mnt/tmp-initrd
+	else
+		# TODO remove after pipe_progress is available in the archive
+		(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) > mnt/tmp-initrd
+	fi
+	if [ ! -e /tmp/zcat_failure ]; then
 		LOADED=1
 	else
-		echo "This install media seems to be bad."
+		rm -f /tmp/zcat_failure
+		echo "install media seems to be bad!" >&2
 		debugshell "bad media mounted"
 		umount mnt
 	fi
 	umount floppy
 done
 
-echo "Setting up filesystem, please wait..."
+echo "Setting up filesystem..."
 mount -o loop mnt/tmp-initrd initrd
 cp -a initrd/* mnt
 umount initrd
