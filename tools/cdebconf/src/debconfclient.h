@@ -8,12 +8,15 @@
 #ifndef _DEBCONFCLIENT_H_
 #define _DEBCONFCLIENT_H_
 
+#include <stdio.h>
+
 /**
  * @brief debconf client object
  */
 struct debconfclient {
     /** internal use only */
 	char *value;
+	FILE *out;
 
 	/* methods */
     /**

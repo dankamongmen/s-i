@@ -45,16 +45,16 @@ static int debconfclient_command(struct debconfclient *client,
 	va_list ap;
 	char *c;
 	
-	fputs(command, stdout);
+	fputs(command, client->out);
 	va_start(ap, command);
 	while ((c = va_arg(ap, char *)) != NULL) 
 	{
-		fputs(" ", stdout);
-		fputs(c, stdout);
+		fputs(" ", client->out);
+		fputs(c, client->out);
 	}
 	va_end(ap);
-	fputs("\n", stdout);
-	fflush(stdout); /* make sure debconf sees it to prevent deadlock */
+	fputs("\n", client->out);
+	fflush(client->out); /* make sure debconf sees it to prevent deadlock */
 
     return debconfclient_handle_rsp(client);
 }
@@ -64,10 +64,10 @@ int debconf_commandf(struct debconfclient *client, const char *cmd, ...)
 	va_list ap;
     
     va_start(ap, cmd);
-    vfprintf(stdout, cmd, ap);
+    vfprintf(client->out, cmd, ap);
     va_end(ap);
-    fprintf(stdout, "\n");
-    fflush(stdout);
+    fprintf(client->out, "\n");
+    fflush(client->out);
 
     return debconfclient_handle_rsp(client);
 }
@@ -82,9 +82,17 @@ struct debconfclient *debconfclient_new(void)
 	struct debconfclient *client = NEW(struct debconfclient);
 	memset(client, 0, sizeof(struct debconfclient));
 
+	if (getenv("DEBCONF_REDIR") == NULL)
+	{
+		dup2(1, 3);
+		dup2(2, 1);
+		setenv("DEBCONF_REDIR", "1", 1);
+	}
+
 	client->command = debconfclient_command;
 	client->commandf = debconf_commandf;
 	client->ret = debconfclient_ret;
+	client->out = fdopen(3, "a");
 
 	return client;
 }
