@@ -444,7 +444,7 @@ fi
 
 if ! is_not_loaded ohci1394; then
 	# if firewire was found, try to enable firewire cd support
-	if is_not_loaded sbp2; then
+	if is_not_loaded sbp2 && is_available scsi_mod; then
 		if is_available sbp2; then
 			db_subst hw-detect/load_progress_step CARDNAME "FireWire CDROM support"
 			db_subst hw-detect/load_progress_step MODULE "sbp2"
