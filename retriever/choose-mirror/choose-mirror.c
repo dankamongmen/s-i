@@ -5,6 +5,7 @@
 #include <cdebconf/debconfclient.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "mirrors.h"
 #ifdef WITH_HTTP
 #include "mirrors_http.h"
@@ -81,7 +82,7 @@ struct mirror_t *mirror_list(void) {
 		return mirrors_ftp;
 	}
 #endif
-
+	return 0; // should never happen
 }
 
 /* Returns an array of hostnames of mirrors in the specified country. */
