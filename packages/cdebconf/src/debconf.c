@@ -4,7 +4,6 @@
  */
 #include "confmodule.h"
 #include "configuration.h"
-#include "debconf.h"
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
@@ -29,15 +28,9 @@ static struct option options[] = {
     { 0, 0, 0, 0 },
 };
 
-int save(void)
+static int save(void)
 {
-	if (confmodule != NULL)
-		confmodule->update_seen_questions(confmodule, STACK_SEEN_SAVE);
-	if (questions != NULL)
-		questions->methods.save(questions);
-	if (templates != NULL)
-		templates->methods.save(templates);
-        return 0;
+	return confmodule->save(confmodule);
 }
 
 static void cleanup()

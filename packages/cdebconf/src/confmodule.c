@@ -256,6 +256,17 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
     return DC_OK;
 }
 
+static int confmodule_save(struct confmodule *mod)
+{
+    int ret = DC_OK;
+    ret |= mod->update_seen_questions(mod, STACK_SEEN_SAVE);
+    if (mod->questions)
+        ret |= mod->questions->methods.save(mod->questions);
+    if (mod->templates)
+        ret |= mod->templates->methods.save(mod->templates);
+    return ret != DC_OK ? DC_NOTOK : DC_OK;
+}
+
 struct confmodule *confmodule_new(struct configuration *config,
         struct template_db *templates, struct question_db *questions, 
         struct frontend *frontend)
@@ -275,6 +286,7 @@ struct confmodule *confmodule_new(struct configuration *config,
     mod->process_command = confmodule_process_command;
     mod->shutdown = confmodule_shutdown;
     mod->update_seen_questions = confmodule_update_seen_questions;
+    mod->save = confmodule_save;
 
     /* TODO: I wish we don't need gross hacks like this.... */
     setenv("DEBIAN_HAS_FRONTEND", "1", 1);

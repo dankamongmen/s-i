@@ -81,6 +81,12 @@ struct confmodule {
      * @return int - DC_OK, DC_NOTOK
      */
 	int (*update_seen_questions)(struct confmodule *mod, enum seen_action action);
+
+    /**
+     * @param struct confmodule *mod - confmodule object
+     * @return int - DC_OK, DC_NOTOK
+     */
+	int (*save)(struct confmodule *mod);
 };
 
 /**

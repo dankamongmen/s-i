@@ -1,6 +1,5 @@
 #include "common.h"
 #include "commands.h"
-#include "debconf.h"
 #include "frontend.h"
 #include "database.h"
 #include "question.h"
@@ -670,12 +669,6 @@ command_settitle(struct confmodule *mod, char *arg)
     return out;
 }
 
-int save(void) __attribute__ ((weak));
-int save(void)
-{
-    return DC_NOTOK;
-}
-
 char *command_x_save(struct confmodule *mod, char *arg)
 {
     char *argv[2];
@@ -684,11 +677,12 @@ char *command_x_save(struct confmodule *mod, char *arg)
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 0);
-    ret = save();
+    if (mod)
+        ret = mod->save(mod);
     if (ret == DC_OK)
         asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     else
-        asprintf(&out, "%u not implemented", CMDSTATUS_INTERNALERROR);
+        asprintf(&out, "%u not OK", CMDSTATUS_INTERNALERROR);
     return out;
 }
 
