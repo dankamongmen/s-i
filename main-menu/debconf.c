@@ -1,3 +1,7 @@
+/*
+ * Debconf communication routines.
+ */
+
 #include "main-menu.h"
 
 #include <stdio.h>
@@ -8,6 +12,12 @@
 /* Holds the textual return code of the last command. */
 char *text;
 
+/* Returns the last command's textual return code. */
+char *debconf_ret (void) {
+	return text;
+}
+
+/* Talks to debconf and returns the numeric return code. */
 int debconf_command (const char *fmt, ...) {
 	char buf[BUFSIZE];
 	va_list ap;
@@ -19,13 +29,15 @@ int debconf_command (const char *fmt, ...) {
 	fflush(stdout); /* make sure debconf sees it to prevent deadlock */
 
 	fgets(buf, BUFSIZE, stdin);
-	/* TODO: this could be more robust */
-	strtok(buf, " \t\n");
-	text=strtok(NULL, "\n");
-	
-	return atoi(buf);
-}
-
-char *debconf_ret (void) {
-	return text;
+	buf[strlen(buf)-1] = 0;
+	if (strlen(buf)) {
+		strtok(buf, " \t\n");
+		text=strtok(NULL, "\n");
+		return atoi(buf);
+	}
+	else {
+		/* Nothing was entered; never really happens. */
+		text=buf;
+		return 0;
+	}
 }

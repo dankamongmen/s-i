@@ -1,3 +1,7 @@
+/*
+ * dpkg status file reading routines
+ */
+
 #include "main-menu.h"
 
 #include <stdio.h>
@@ -12,9 +16,7 @@ struct package_t *status_read(void) {
 	FILE *f;
 	char *b, buf[BUFSIZE];
 	int i;
-	struct package_t virt, *newp, *p = 0;
-	void *package_tree = NULL;
-	void *found;
+	struct package_t *found, *newp, *p = 0;
 
 	if ((f = fopen(STATUSFILE, "r")) == NULL) {
 		perror(STATUSFILE);
@@ -24,12 +26,9 @@ struct package_t *status_read(void) {
 	while (fgets(buf, BUFSIZE, f) && !feof(f)) {
 		buf[strlen(buf)-1] = 0;
 		if (strstr(buf, "Package: ") == buf) {
-			newp = malloc(sizeof(struct package_t));
-			memset(newp, 0, sizeof(struct package_t));
+			newp = tree_add(buf + 9);
 			newp->next = p;
 			p = newp;
-			p->package = strdup(buf+9);
-			tsearch(p, &package_tree, package_compare);
 		}
 		else if (strstr(buf, "Installer-Menu-Item: ") == buf) {
 			p->installer_menu_item = atoi(buf+21);
@@ -87,17 +86,13 @@ struct package_t *status_read(void) {
 			 * means that virtual packages are actually ANDed
 			 * for the purposes of this program.
 			 */
-			virt.package = buf+10;
-			if ((found = tfind(&virt, &package_tree, package_compare))) {
-				newp=*(struct package_t **)found;
+			if ((found = tree_find(buf + 10))) {
+				newp=found;
 			}
 			else {
-				newp = malloc(sizeof(struct package_t));
-				memset(newp, 0, sizeof(struct package_t));
+				newp = tree_add(buf + 10);
 				newp->next=p->next;
 				p->next=newp;
-				newp->package = strdup(virt.package);
-				tsearch(newp, &package_tree, package_compare);
 			}
 			for (i=0; newp->depends[i] != 0; i++);
 			newp->depends[i] = p->package;

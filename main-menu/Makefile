@@ -2,6 +2,10 @@ CFLAGS=-Wall -g
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=main-menu
 
+ifdef DEBUG
+CFLAGS:=$(CFLAGS) -DDODEBUG
+endif
+
 all: $(BIN)
 
 $(BIN): $(OBJS)
