@@ -67,7 +67,8 @@ discover_hw () {
     DISCOVER_TEST=$($DISCOVER --version 2> /dev/null)
     if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
         # Discover 2.x, see <URL:http://hackers.progeny.com/discover/> for doc
-        # XXX: This is copied from xfree86, and do not work yet
+        # This worked with jeff's didiscover utility, which progeny removed from
+        # the discover subversion repository :-(
 
         log "Using discover2 do not work yet."
 
