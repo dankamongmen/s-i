@@ -129,10 +129,12 @@ chroot /target /sbin/abootconf $bootdisk $partnum
 # Edit /etc/aboot.conf to point to partnum.
 ABOOTCONF=/target/etc/aboot.conf
 
+rootdev=`chroot /target df / | sed -n -e'/^\/dev/ { s/[[:space:]].*//; p }'`
+
 sed -e"/^0:/ c\
-0:$partnum/vmlinuz ro initrd=/initrd.img root=/dev/ram
+0:$partnum/vmlinuz ro initrd=/initrd.img root=$rootdev
 /^1:/ c\
-1:$partnum/vmlinuz.old ro initrd=/initrd.img root=/dev/ram
+1:$partnum/vmlinuz.old ro initrd=/initrd.img root=$rootdev
 " < $ABOOTCONF > ${ABOOTCONF}.new
 mv ${ABOOTCONF}.new $ABOOTCONF
 
@@ -155,7 +157,6 @@ db_progress STEP 1
 # If we've been given a partition that matches neither /boot nor /,
 # do a full copy of the bits we need.
 #
-rootdev=`chroot /target df / | sed -n -e'/^\/dev/ { s/[[:space:]].*//; p }'`
 if [ "$bootdev" = "$realbootdev" ] ; then
     if [ "$rootdev" != "$bootdev" ] ; then
         db_subst aboot-installer/progress/step_copy_kernel BOOTDEV $bootdev
