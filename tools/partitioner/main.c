@@ -175,15 +175,17 @@ int main(int argc, char *argv[]) {
 
 		cmd_script = execute_fdisk();
 		disk = extract_choice(debconf->value);
-		asprintf(&cmd, "/bin/sh %s %s </dev/tty >/dev/tty 2>/dev/tty", cmd_script, disk);
+		if (strcmp(disk,"false") != 0) {
+			asprintf(&cmd, "/bin/sh %s %s </dev/tty >/dev/tty 2>/dev/tty", cmd_script, disk);
 
-		i = system(cmd);
-		if(i != 0) {
-			debconf_subst(debconf, "partitioner/fdiskerr", "DISC", disk);
-			debconf_fset(debconf, "partitioner/fdiskerr", "seen", "false");
-			debconf_set(debconf, "partitioner/fdiskerr", "false");
-			debconf_input(debconf, "high", "partitioner/fdiskerr");
-			debconf_go(debconf);
+			i = system(cmd);
+			if(i != 0) {
+				debconf_subst(debconf, "partitioner/fdiskerr", "DISC", disk);
+				debconf_fset(debconf, "partitioner/fdiskerr", "seen", "false");
+				debconf_set(debconf, "partitioner/fdiskerr", "false");
+				debconf_input(debconf, "high", "partitioner/fdiskerr");
+				debconf_go(debconf);
+			}
 		}
 
 		if(disk != NULL) {
