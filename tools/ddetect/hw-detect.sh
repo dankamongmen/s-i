@@ -6,10 +6,8 @@ set -e
 
 MISSING_MODULES_LIST=""
 
-# This is a gross and stupid hack, but needed because of Xu's
-# unwillingness to run depmod in kernel-image's postinst.  See Debian
-# bug #136743
-
+# This is a gross and stupid hack, but we don't have a better idea right
+# now. See Debian bug #136743
 if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
@@ -29,13 +27,6 @@ is_not_loaded() {
 
 load_module() {
     module="$1"
-    if is_not_loaded "$module" ; then
-	:
-    else
-	log "Module $module is already loaded.  Ignoring load request."
-	return
-    fi
-
     db_fset hw-detect/module_params seen false
     db_subst hw-detect/module_params MODULE "$module"
     db_input low hw-detect/module_params || [ $? -eq 30 ]
@@ -137,83 +128,101 @@ db_settitle hw-detect/title
 log "Detecting hardware..."
 # Put up a progress bar just to have something on screen if the hardware
 # detection should hang.
-db_progress START 0 1 hw-detect/detect_progress_title
+db_progress START 0 2 hw-detect/detect_progress_title
 db_progress INFO hw-detect/detect_progress_step
-HW_INFO=$(get_hw_info)
+ALL_HW_INFO=$(get_hw_info)
 db_progress STEP 1
+# Remove modules that are already loaded, and count how many are left.
+LOADED_MODULES=$(cat /proc/modules | cut -f 1 -d ' ')
 count=0
 # Setting IFS to adjust how the for loop splits the values
 IFS_SAVE="$IFS"
 IFS="
 "
-# HW_INFO must be unquoted in these loops.
-for device in $HW_INFO; do
-	count=$(expr $count + 1)
+for device in $ALL_HW_INFO; do
+    	module="`echo $device | cut -d: -f1`"
+	loaded=0
+	for m in $LOADED_MODULES; do
+		if [ "$m" = "$module" ]; then
+			loaded=1
+			break
+		fi
+	done
+	if [ "$loaded" = 0 ]; then
+		count=$(expr $count + 1)
+		HW_INFO="$HW_INFO
+$device"
+	fi
 done
 IFS="$IFS_SAVE"
+db_progress STEP 1
 db_progress STOP
 
-log "Loading modules..."
-db_progress START 0 $count hw-detect/load_progress_title
-# Setting IFS to adjust how the for loop splits the values
-IFS_SAVE="$IFS"
-IFS="
-"
-for device in $HW_INFO; do
-    module="`echo $device | cut -d: -f1`"
-    cardname="`echo $device | cut -d: -f2`"
-    # Restore IFS after extracting the fields.
-    IFS="$IFS_SAVE"
-
-    if [ -z "$module" ] ; then module="[Unknown]" ; fi
-    if [ -z "$cardname" ] ;   then cardname="[Unknown]" ; fi
-
-    log "Detected load module '$module' for '$cardname'"
-
-    db_subst hw-detect/load_progress_step CARDNAME "$cardname"
-    db_subst hw-detect/load_progress_step MODULE "$module"
-
-    db_progress INFO hw-detect/load_progress_step
-
-    if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] &&
-	is_not_loaded $module
-    then
-        log "Trying to load module '$module'"
-
-        if find /lib/modules/`uname -r`/ | grep -q /${module}\\.o
-        then
-            if load_modules "$module"
-            then
-                :
-            else
-                log "Error loading driver '$module' for '$cardname'!"
+if [ "$count" != 0 ]; then
+	log "Loading modules..."
+	db_progress START 0 $count hw-detect/load_progress_title
+	IFS_SAVE="$IFS"
+	IFS="
+	"
+	for device in $HW_INFO; do
+	    module="`echo $device | cut -d: -f1`"
+	    cardname="`echo $device | cut -d: -f2`"
+	    # Restore IFS after extracting the fields.
+	    IFS="$IFS_SAVE"
+	
+	    if [ -z "$module" ] ; then module="[Unknown]" ; fi
+	    if [ -z "$cardname" ] ;   then cardname="[Unknown]" ; fi
+	
+	    log "Detected module '$module' for '$cardname'"
+	
+	    if [ "$module" != "ignore" -a "$module" != "[Unknown]" ]; then
+	    	db_subst hw-detect/load_progress_step CARDNAME "$cardname"
+	        db_subst hw-detect/load_progress_step MODULE "$module"
+	        db_progress INFO hw-detect/load_progress_step
+	        log "Trying to load module '$module'"
+	
+	        if find /lib/modules/`uname -r`/ | grep -q /${module}\\.o
+	        then
+	            if load_modules "$module"
+	            then
+	                :
+	            else
+	                log "Error loading driver '$module' for '$cardname'!"
+		    fi
+	        else
+	       	    db_subst hw-detect/load_progress_skip_step CARDNAME "$cardname"
+	            db_subst hw-detect/load_progress_skip_step MODULE "$module"
+	            db_progress INFO hw-detect/load_progress_skip_step
+	            log "Could not load driver '$module' for '$cardname'."
+		    if [ -n "$MISSING_MODULES_LIST" ]; then
+			    MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
+		    fi
+		    MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
+	        fi
 	    fi
-        else
-            log "Could not load driver '$module' for '$cardname'."
-	    if [ -n "$MISSING_MODULES_LIST" ]; then
-		    MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
-	    fi
-	    MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
-        fi
-    fi
+	
+	    db_progress STEP 1
 
-    db_progress STEP 1
-
-    # XXX why is this ere? Paranioa?
-    IFS="
-"
-done
-IFS="$IFS_SAVE"
-
-db_progress STOP
-
+	    # XXX why is this ere? Paranioa?
+	    IFS="
+	"
+	done
+	IFS="$IFS_SAVE"
+	
+	db_progress STOP
+fi
+	
 # always load sd_mod and sr_mod if a scsi controller module was loaded.
 # sd_mod to find the disks, and sr_mod to find the CD-ROMs
 if [ -e /proc/scsi/scsi ] ; then
     if grep -q "Attached devices: none" /proc/scsi/scsi ; then
         :
     else
-        load_modules sd_mod sr_mod
+	for module in sd_mod sr_mod; do
+		if is_not_loaded "$module" ; then
+			load_modules $module
+		fi
+	done
     fi
 fi
 
