@@ -163,7 +163,7 @@ md_create_raid0() {
 
 	prune_partitions "$RET"
 
-	MD_NUM=`grep ^md /proc/mdstat|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -1`
+	MD_NUM=`grep ^md /proc/mdstat|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -n 1`
 
 	if [ -z "${MD_NUM}" ]; then
 		MD_NUM=0
@@ -306,7 +306,7 @@ md_create_raid1() {
 	done
 
 	# Find the next available md-number
-	MD_NUM=`grep ^md /proc/mdstat|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -1`
+	MD_NUM=`grep ^md /proc/mdstat|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -n 1`
 	if [ -z "${MD_NUM}" ]; then
 		MD_NUM=0
 	else
