@@ -48,24 +48,24 @@ void _tree_dump(const void *nodep, const VISIT which, const int depth) {
         struct package_t *p = *(struct package_t **)nodep;
 
 	for (i=0; i < depth; i++)
-		printf("    ");
+		fprintf(stderr, "    ");
 	
         switch(which) {
                 case postorder:
-                        printf("    at"); /* false indent */
+                        fprintf(stderr, "    at"); /* false indent */
                         break;
                 case preorder:
-                        printf("begin");
+                        fprintf(stderr, "begin");
                         break;
                 case endorder:
-                        printf("end");
+                        fprintf(stderr, "end");
                         break;
                 case leaf:
-                        printf("leaf");
+                        fprintf(stderr, "leaf");
                         break;
         }
 
-	printf(" %s\n", p->package);
+	fprintf(stderr, " %s\n", p->package);
 }
 
 /* Dump out the tree. */
