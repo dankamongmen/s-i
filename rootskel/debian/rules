@@ -23,6 +23,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
+	rm -f debian/files~
 	dh_clean
 
 # cvs update -P will remove these dirs if they are empty
@@ -45,6 +46,10 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
+	install -d -o 0 -g 0 -m755 debian/rootskel/DEBIAN
+	perl -ne "if(m#^Default-(\w+): (.+\$$)#){if( \$$1 eq '$(ARCH)'){print 'Default: '.\$$2.\"\n\";}}else{print \$$_;}" < debian/templates > debian/rootskel/DEBIAN/templates
+	chown 0:0 debian/rootskel/DEBIAN/templates
+	chmod 644 debian/rootskel/DEBIAN/templates
 	dh_strip
 	dh_compress
 	dh_fixperms
