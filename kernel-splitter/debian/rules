@@ -21,14 +21,14 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -rf unpacked
-	dh_clean debian/control.out
+	DH_CONTROL=debian/control.out dh_clean debian/control.out || dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	# Actually installs all the modules into place, and
-	# generates a proper control file.
+	# generates debian/control.out.
 	./copy-modules
 
 # Build architecture-independent files here.
