@@ -250,7 +250,11 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 	/*  Set string arrays  */
 	for (i=0; i < count; i++)
 	{
-		asprintf(&(fchoices[i]), "  %d. %s", i+1, choices_translated[i]);
+		/*  Trailing spaces are a placeholder to add [*] for
+		    selected values */
+		asprintf(&(fchoices[i]), "  %d. %s    ", i+1, choices_translated[i]);
+		if (selected[tindex[i]])
+			strcpy(fchoices[i]+strlen(fchoices[i])-3, "[*]");
 		if (strwidth(fchoices[i]) < choice_min || choice_min == -1)
 			choice_min = strwidth(fchoices[i]);
 		if (strwidth(fchoices[i]) > width)
@@ -352,8 +356,8 @@ static int text_handler_boolean(struct frontend *obj, struct question *q)
 	}
 
 	do {
-		printf("  %d. %s", 1, get_text(obj, "debconf/yes", "Yes"));
-		printf("  %d. %s", 2, get_text(obj, "debconf/no", "No"));
+		printf("  %d. %s%s", 1, get_text(obj, "debconf/yes", "Yes"), (1 == def ? " [*]" : "    "));
+		printf("  %d. %s%s", 2, get_text(obj, "debconf/no", "No"), (2 == def ? " [*]" : ""));
 		printf("\n");
 		if (def)
 			printf(get_text(obj, "debconf/text-prompt-default",
