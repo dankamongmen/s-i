@@ -5,6 +5,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 all:
 
 install:
+	$(INSTALL) -d $(DESTDIR)/bin
 	$(INSTALL_SCRIPT) hwdetect $(DESTDIR)/bin/hwdetect
 	$(INSTALL) -d $(DESTDIR)/usr/lib/prebaseconfig.d
 	$(INSTALL_SCRIPT) prebaseconfig \
