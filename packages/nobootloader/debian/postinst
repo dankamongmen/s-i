@@ -86,18 +86,20 @@ case "$ARCH","$SUBARCH" in
 		db_get debian-installer/kernel/linux/link_in_boot
 		link_in_boot="$RET"
 		if [ "$link_in_boot" = "true" ]; then
-			boot="boot/"
+			boot_link="boot/"
 		else
+			boot_link=""
 			boot=""
+			bootfs=${rootfs}
 		fi
-		if [ -e /target/${boot}vmlinuz ]; then
+		if [ -e /target/${boot_link}vmlinuz ]; then
 			kernel="/${boot}vmlinuz"
-		else if [ -e /target/${boot}vmlinux ]; then
+		else if [ -e /target/${boot_link}vmlinux ]; then
 			kernel="/${boot}vmlinux"
 		fi
 		fi
 
-		db_subst nobootloader/confirmation_common ROOT "${rootfs}"
+		db_subst nobootloader/confirmation_common ROOT "root=${rootfs}"
 		db_subst nobootloader/confirmation_common BOOT "${bootfs}"
 		db_subst nobootloader/confirmation_common KERNEL "${kernel}"
 		db_input high nobootloader/confirmation_common || true
