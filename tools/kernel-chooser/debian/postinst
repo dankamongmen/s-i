@@ -1,31 +1,43 @@
 #! /bin/sh -e
 
-. /usr/share/debconf/confmodule
-
-chroot="chroot /target"
-
 # find all packages implementing 'kernel-image'.  Is there a better
 # way? [pere 2003-02-16]
 
-# the busybox 'sort' do not support '-ur' at the moment [pere 2003-02-06]
+. /usr/share/debconf/confmodule
+
+log=/var/log/messages
+chroot="chroot /target"
+
+log() {
+    echo "kernel-chooser: $*" >> $log
+}
+
+# the busybox  do not support 'uniq' and 'sort -r' at
+# the moment [pere 2003-02-06]
 
 # Using 'sort -r' to get the newest kernel version at the start of the
 # list (ie 2.4.20 above 2.2.20).  This is in conflict with getting the
 # most generic architecture first (386 above 686).
 
-# Using 'sort -u' to avoid listing the same kernel more then once.
+# Using 'uniq' to avoid listing the same kernel more then once.
 if [ -x /usr/bin/uniq ] ; then
     kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" |
-      sort -r | uniq | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' |
+      sort | uniq | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' |
       sed 's/, $//'`
 else
     kernels=`$chroot apt-cache search kernel-image | grep "^kernel-image" |
-      sort -r | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' |
+      sort | cut -d" " -f1 | tr "\n" "," | sed 's/,/, /g' |
       sed 's/, $//'`
 fi
 
+log "info: Found kernels '$kernels'"
+
 if [ "$kernels" ] ; then
     db_subst kernel-chooser/which-kernel kernels "$kernels"
+else
+    db_input critical kernel-chooser/no-kernels-found || [ $? -eq 30 ]
+    db_go
+    exit 1
 fi
 
 # Make current rootskel setting the default
@@ -35,7 +47,7 @@ fi
 
 # Pick a good default choice, based on the available kernels and
 # perhaps /proc/cpuinfo.
-ARCH=`$chroot dpkg --print-architecture`
+ARCH=`udpkg --print-architecture`
 
 # Should this be located in small script fragments, named after their
 # architecture?  Something like this:
@@ -46,24 +58,26 @@ case "$ARCH" in
         version=2.4.20-1
         MODEL=`grep 'model name' /proc/cpuinfo | cut -d: -f2`
 	case "$MODEL" in 
-	    "Intel(R) Pentium(R) 4")
+	    "Intel(R) Pentium(R) 4"*)
 	    DEFAULT=kernel-image-$version-686
 	    ;;
 	esac
         ;;
     *)
-        echo "warning: Unknown arcitecture '$ARCH'." 1>&2
+        log "warning: Unknown arcitecture '$ARCH'."
 	;;
 esac
 if [ "$DEFAULT" ] ; then
     db_set kernel-chooser/which-kernel "$DEFAULT"
 fi
 
-db_input medium kernel-chooser/which-kernel || true
+db_input medium kernel-chooser/which-kernel || [ $? -eq 30 ]
 db_go || true
 
 db_get kernel-chooser/which-kernel
 kernel=$RET
+
+log "info: Using kernel '$kernel'"
 
 # Pass the kernel name on to kernel-installer
 db_set debian-installer/kernel/image "$kernel"
