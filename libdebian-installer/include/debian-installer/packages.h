@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: packages.h,v 1.2 2003/09/06 21:11:46 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGES_H
@@ -189,7 +189,7 @@ int di_packages_status_write_file (di_packages *packages, const char *file);
  * @{
  */
 
-di_package *di_packages_get_package (di_packages *packages, char *name, size_t n);
+di_package *di_packages_get_package (di_packages *packages, const char *name, size_t n);
 di_package *di_packages_get_package_new (di_packages *packages, char *name, size_t n);
 
 di_package_dependency *di_package_dependency_alloc (di_packages *packages);

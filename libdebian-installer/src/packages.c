@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: packages.c,v 1.2 2003/09/06 21:11:46 waldi Exp $
  */
 
 #include <debian-installer/packages.h>
@@ -491,7 +491,7 @@ void *internal_di_packages_parser_write_entry_next (void **state_data, void *use
  *
  * @return the package or NULL
  */
-di_package *di_packages_get_package (di_packages *packages, char *name, size_t n)
+di_package *di_packages_get_package (di_packages *packages, const char *name, size_t n)
 {
   di_rstring key;
   size_t size;
@@ -501,7 +501,7 @@ di_package *di_packages_get_package (di_packages *packages, char *name, size_t n
   else
     size = strlen (name);
 
-  key.string = name;
+  key.string = (char *) name;
   key.size = size;
 
   return di_hash_table_lookup (packages->table, &key);

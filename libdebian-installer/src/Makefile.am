@@ -27,5 +27,6 @@ libdebian_installer_la_LDFLAGS = \
 	-Wl,--version-script=$(srcdir)/libdebian-installer.ver
 
 libdebian_installer_la_DEPENDENCIES = \
-	$(srcdir)/libdebian-installer.ver
+	$(srcdir)/libdebian-installer.ver \
+	system/libsystem.la
 

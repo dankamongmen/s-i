@@ -15,7 +15,8 @@ realinclude_HEADERS = \
 	release.h \
 	slist.h \
 	string.h \
-	types.h
+	types.h \
+	utils.h
 
 noinst_HEADERS = \
 	packages_internal.h
