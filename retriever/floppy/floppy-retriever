@@ -77,7 +77,9 @@ case "x$1" in
         mountfloppy
         rm -f "$2"
         touch "$2"
-        for filename in /floppy/*.deb /floppy/*.udeb; do
+        # Check for regular debs, udebs, and to be on the safe side,
+        # check for *.ude files (msdos file names...)
+        for filename in /floppy/*.deb /floppy/*.udeb /floppy/*.ude; do
             if [ -f "$filename" ]; then
                 udpkg -f "$filename" >> "$2"
                 path="`echo "$filename" | sed 's,^/floppy/,,'`"
