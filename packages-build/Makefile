@@ -5,7 +5,6 @@ INSTALL = install
 
 SUBDIRS = \
 	Debian \
-	config \
 	make
 
 DEBONLY = \
