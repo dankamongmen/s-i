@@ -9,6 +9,11 @@ static void detect_newworld() {
 		exit(0);
 }
 
+static void detect_oldworld() {
+	if(check_value(generation, "OldWorld", "OldWorld PowerMac"))
+		exit(0);
+}
+
 static void detect_prep() {
 	if(check_value(machine, "PReP", NULL))
 		exit(0);
@@ -45,6 +50,7 @@ int main(int argc, char *argv[]) {
 		detect_prep,
 		detect_chrp,
 		detect_newworld,
+		detect_oldworld,
 		NULL
 	};
 
