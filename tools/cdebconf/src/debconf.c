@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 			pkg[strlen(pkg) - 7] = '\0';
 		}
 		snprintf(buf, sizeof(buf), "Configuring %s", pkg);
-		frontend->title = STRDUP(buf);
+		frontend->set_title(frontend, buf);
 	}
 
 	/* load templates */

@@ -1,4 +1,5 @@
 #include "strutl.h"
+#include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -215,7 +216,7 @@ int strcmdsplit(char *inbuf, char **argv, size_t maxnarg)
 
 void strunescape(const char *inbuf, char *outbuf, const size_t maxlen)
 {
-	char *p = inbuf;
+	const char *p = inbuf;
 	int i = 0;
 	char tmp[3];
 	while (*p != 0 && i < maxlen-1)
@@ -239,7 +240,7 @@ void strunescape(const char *inbuf, char *outbuf, const size_t maxlen)
 
 void strescape(const char *inbuf, char *outbuf, const size_t maxlen)
 {
-	char *p = inbuf;
+	const char *p = inbuf;
 	int i = 0;
 	while (*p != 0 && i < maxlen-1)
 	{

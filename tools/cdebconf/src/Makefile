@@ -8,7 +8,7 @@ LIB=libdebconf.so
 LIBNAME=libdebconf.so.$(MAJOR).$(MINOR).$(MICRO)
 SONAME=libdebconf.so.$(MAJOR).$(MINOR)
 DEBCONF=debconf
-TOOLS=loadtemplate
+TOOLS=loadtemplate dpkg-reconfigure
 BIN=$(DEBCONF) $(TOOLS)
 
 LIBOBJS=commands.opic confmodule.opic frontend.opic priority.opic strutl.opic \
@@ -22,6 +22,9 @@ debconf: debconf.o $(LIB)
 
 loadtemplate: loadtemplate.o $(LIB)
 	$(CC) $(CFLAGS) -o $@ loadtemplate.o $(LDFLAGS)
+
+dpkg-reconfigure: dpkg-reconfigure.o $(LiB)
+	$(CC) $(CFLAGS) -o $@ dpkg-reconfigure.o $(LDFLAGS)
 
 $(LIBNAME): $(LIBOBJS)
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $^ -ldl

@@ -12,6 +12,7 @@ struct frontend;
 typedef int (*dcf_initialize_t)(struct frontend *, struct configuration *);
 typedef int (*dcf_shutdown_t)(struct frontend *);
 typedef unsigned long (*dcf_query_capability_t)(struct frontend *);
+typedef void (*dcf_set_title_t)(struct frontend *, const char *title);
 typedef int (*dcf_add_t)(struct frontend *, struct question *q);
 typedef int (*dcf_go_t)(struct frontend *);
 typedef void (*dcf_clear_t)(struct frontend *);
@@ -38,6 +39,7 @@ struct frontend {
 	dcf_initialize_t initialize;
 	dcf_shutdown_t shutdown;
 	dcf_query_capability_t query_capability;
+	dcf_set_title_t set_title;
 	dcf_add_t add;
 	dcf_go_t go;
 	dcf_clear_t clear;
@@ -50,6 +52,7 @@ struct frontend_module {
 	dcf_initialize_t initialize;
 	dcf_shutdown_t shutdown;
 	dcf_query_capability_t query_capability;
+	dcf_set_title_t set_title;
 	dcf_add_t add;
 	dcf_go_t go;
 	dcf_clear_t clear;

@@ -102,7 +102,7 @@ int command_capb(struct confmodule *mod, int argc, char **argv,
 int command_title(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	mod->frontend->title = strdup(argv[1]);
+	mod->frontend->set_title(mod->frontend, argv[1]);
 	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
 	return DC_OK;
 }

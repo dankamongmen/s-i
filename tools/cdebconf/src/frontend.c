@@ -5,6 +5,7 @@
 #include "question.h"
 
 #include <dlfcn.h>
+#include <string.h>
 
 #define SETMETHOD(method) obj->method = (mod->method ? mod->method : frontend_ ## method)
 
@@ -55,6 +56,12 @@ static unsigned long frontend_query_capability(struct frontend *f)
 	return 0;
 }
 
+static void frontend_set_title(struct frontend *f, const char *title)
+{
+	DELETE(f->title);
+	f->title = STRDUP(title);
+}
+
 struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 {
 	struct frontend *obj = NULL;
@@ -85,6 +92,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 	SETMETHOD(initialize);
 	SETMETHOD(shutdown);
 	SETMETHOD(query_capability);
+	SETMETHOD(set_title);
 	SETMETHOD(add);
 	SETMETHOD(go);
 	SETMETHOD(clear);
