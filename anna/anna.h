@@ -6,5 +6,7 @@
 #define ANNA_RETRIEVER	"anna/retriever"
 #define RETRIEVER_DIR	"/usr/lib/debian-installer/retriever"
 
+#define STATUS_FILE "/var/lib/dpkg/status"
+
 int get_package (struct package_t *package, char *dest);
 struct package_t *get_packages (void);

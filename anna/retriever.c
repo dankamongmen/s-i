@@ -13,8 +13,6 @@
 #include <unistd.h>
 #include "anna.h"
 
-#define STATUS_FILE "/var/lib/dpkg/status"
-
 static struct package_t *
 get_retriever_packages(void)
 {
