@@ -297,13 +297,20 @@ For this reason, you need to translate the iso_3166.tab file in the
 iso-codes package:
  - apt-get source iso-codes (from unstable)
  - cd iso-codes-<version>/iso_3166
- - get templates.pot file and translate country names there or complete
+ - "make iso_3166.pot"
+ - copy templates.pot file to xx.po and translate country names there or complete
    the existing translation
  - send the new file as a bug report against the iso-codes package with
    the "l10n" and "patch" tag, severity wishlist
 
+If a file already exists for your language, do the following:
+
+ - "make iso_3166.pot"
+ - msgmerge -U xx.po iso_3166.pot
+ - update xx.po
+
 The countrychooser package includes a mechanism for using an interim
-translted file instead of iso-codes package translations. This allows
+translated file instead of iso-codes package translations. This allows
 you to immediately test your translations. Just drop your file in
 tools/countrychooser/iso-codes.updates and commit it. However, when
 the upstream iso-codes package includes your translation, please
@@ -334,6 +341,9 @@ you discover such packages, and fix it if you find errors.
 
 --------------------------------------------------------------------------
 Changelog:
+
+2004/02/14 Christian Perrier
+ - Corrected instructions for iso-codes
 
 2004/01/30 Christian Perrier
  - give details about kbd-chooser/console-data
