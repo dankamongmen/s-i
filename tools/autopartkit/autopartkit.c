@@ -201,7 +201,7 @@ static const char * mydebconf_get(const char *template)
 
 static void mydebconf_settitle(const char *template)
 {
-    client->command(client, "SETTITLE", new_title, NULL);
+    client->command(client, "SETTITLE", template, NULL);
 }
 
 void autopartkit_log(const int level, const char * format, ...)
