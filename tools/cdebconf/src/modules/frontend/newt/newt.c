@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.34 2003/10/17 22:12:35 barbier Exp $
+ * $Id: newt.c,v 1.35 2003/10/18 00:32:16 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -52,6 +52,8 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <limits.h>
+#include <wchar.h>
 #include <assert.h>
 
 #include <newt.h>
@@ -171,6 +173,28 @@ get_text_height(const char *text, int win_width)
 }
 
 static int
+get_text_width(const char *text)
+{
+    int t_width = 0;
+    const char *p = text;
+    size_t res;
+    int k;
+    wchar_t c;
+
+    p = text;
+    do {
+        for (res = 0; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 && c != L'\n'; p += k)
+            res += wcwidth (c);
+        if (res > t_width)
+            t_width = res;
+        if (*p)
+            p++;
+    } while (*p);
+
+    return t_width;
+}
+
+static int
 min_window_height(struct question *q, int win_width)
 {
     int height = 3;
@@ -217,17 +241,18 @@ static int
 show_separate_window(struct frontend *obj, struct question *q)
 {
     newtComponent form, textbox, bOk, bCancel, cRet;
-    int width = 80, height = 24, t_height, win_width, win_height;
+    int width = 80, height = 24, t_height, t_width, win_width, win_height;
     // buttons
     int extra = 3;
     int format_note = 0;
     char *full_description;;
+    int ret;
 #ifdef HAVE_LIBTEXTWRAP
-    int flags = 0, ret;
+    int flags = 0;
     textwrap_t tw;
     char *wrappedtext;
 #else
-    int flags = NEWT_FLAG_WRAP, ret;
+    int flags = NEWT_FLAG_WRAP;
 #endif
 
     assert(q_get_extended_description(q));
@@ -250,21 +275,23 @@ show_separate_window(struct frontend *obj, struct question *q)
         flags |= NEWT_FLAG_SCROLL;
     }
     t_height = win_height-extra;
-    create_window(width-7, win_height, obj->title, q->priority);
-    form = create_form(NULL);
-    if (format_note)
-        newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
-    textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
-    assert(textbox);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 4);
     wrappedtext = textwrap(&tw, full_description);
-    newtTextboxSetText(textbox, wrappedtext);
-    free(wrappedtext);
-#else
-    newtTextboxSetText(textbox, full_description);
+    free(full_description);
+    full_description = wrappedtext;
 #endif
+    t_width = get_text_width(full_description);
+    if (win_width > t_width + 4)
+        win_width = t_width + 4;
+    create_window(win_width, win_height, obj->title, q->priority);
+    form = create_form(NULL);
+    if (format_note)
+        newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
+    textbox = newtTextbox(1, 1, t_width, t_height, flags);
+    assert(textbox);
+    newtTextboxSetText(textbox, full_description);
     free(full_description);
     bOk     = newtCompactButton( win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
     if (obj->methods.can_go_back(obj, q))
@@ -288,14 +315,16 @@ static int
 generic_handler_string(struct frontend *obj, struct question *q, int eflags)
 {
     newtComponent form, textbox, bOk, bCancel, entry, cRet;
-    int width = 80, height = 24, t_height, win_width, win_height;
+    int width = 80, height = 24, t_height, t_width, win_width, win_height;
+    int ret;
 #ifdef HAVE_LIBTEXTWRAP
-    int ret, tflags = 0;
+    int tflags = 0;
     textwrap_t tw;
+    char *wrappedtext;
 #else
-    int ret, tflags = NEWT_FLAG_WRAP;
+    int tflags = NEWT_FLAG_WRAP;
 #endif
-    char *defval, *result, *q_ext_text;
+    char *defval, *result;
     char *full_description = get_full_description(q);
 
     eflags |= NEWT_ENTRY_SCROLL | NEWT_FLAG_RETURNEXIT;
@@ -304,12 +333,12 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 4);
-    q_ext_text = textwrap(&tw, full_description);
-#else
-    q_ext_text = full_description;
+    wrappedtext = textwrap(&tw, full_description);
+    free(full_description);
+    full_description = wrappedtext;
 #endif
-    if (q_ext_text != NULL)
-        t_height = get_text_height(q_ext_text, win_width);
+    if (full_description != NULL)
+        t_height = get_text_height(full_description, win_width);
     else
         t_height = 0;
     if (t_height + 6 <= height-5)
@@ -319,17 +348,23 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         tflags |= NEWT_FLAG_SCROLL;
     }
     t_height = win_height - 6;
-    create_window(width-7, win_height, obj->title, q->priority);
+    t_width = get_text_width(full_description);
+    if (win_width > t_width + 4)
+        win_width = t_width + 4;
+    create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
-    textbox = newtTextbox(1, 1, win_width-4, t_height, tflags);
+    textbox = newtTextbox(1, 1, t_width, t_height, tflags);
     assert(textbox);
-    if (q_ext_text != NULL)
-        newtTextboxSetText(textbox, q_ext_text);
+    if (full_description != NULL)
+    {
+        newtTextboxSetText(textbox, full_description);
+        free(full_description);
+    }
     if (eflags & NEWT_FLAG_HIDDEN || question_getvalue(q, "") == NULL)
         defval = "";
     else
         defval = (char *)question_getvalue(q, "");
-    entry   = newtEntry(1, 1+t_height+1, defval, win_width-4, &result, eflags);
+    entry   = newtEntry(1, 1+t_height+1, defval, t_width, &result, eflags);
     bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)),  win_height-2, continue_text(obj));
     if (obj->methods.can_go_back(obj, q))
         bCancel = newtCompactButton(5 , win_height-2, goback_text(obj));
@@ -346,10 +381,6 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     }
     newtFormDestroy(form);
     newtPopWindow();
-#ifdef HAVE_LIBTEXTWRAP
-    free(q_ext_text);
-#endif
-    free(full_description);
     return ret;
 }
 
@@ -358,15 +389,21 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
 {
     newtComponent form, sform = NULL, scrollbar, textbox, bOk, bCancel, cRet;
     int width = 80, height = 24;
-    int win_width, win_height = -1, t_height, sel_height, sel_width;
+    int win_width, win_height = -1, t_height, t_width, sel_height, sel_width;
     char **choices, **choices_trans, **defvals, *answer;
     int count = 0, defcount, i, k, ret, def;
-    char *q_ext_text;
+    const char *p;
+    size_t res;
+    wchar_t c;
     int *tindex = NULL;
     const char *listorder = q_get_listorder(q);
     char *full_description = get_full_description(q);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
+    char *wrappedtext;
+    int tflags = 0;
+#else
+    int tflags = NEWT_FLAG_WRAP;
 #endif
 
     newtGetScreenSize(&width, &height);
@@ -388,18 +425,30 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 4);
-    q_ext_text = textwrap(&tw, full_description);
-#else
-    q_ext_text = full_description;
+    wrappedtext = textwrap(&tw, full_description);
+    free(full_description);
+    full_description = wrappedtext;
 #endif
-    if (show_ext_desc && q_ext_text) {
-#ifdef HAVE_LIBTEXTWRAP
-        textbox = newtTextbox(1, 1, win_width-4, 10, 0); 
-#else
-        textbox = newtTextbox(1, 1, win_width-4, 10, NEWT_FLAG_WRAP);
-#endif
+    sel_width = strlongest(choices_trans, count);
+    t_width = get_text_width(full_description);
+    if (sel_width > win_width-8) {
+        sel_width = win_width-8;
+        for (i = 0; i < count; i++) {
+            if (strwidth(choices_trans[i]) > sel_width) {
+                for (res = 0, p = choices_trans[i]; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 && res < sel_width; p += k)
+                    res += wcwidth (c);
+                choices_trans[i][res] = 0;
+            }
+        }
+    }
+    if (t_width < sel_width)
+        t_width = sel_width;
+    if (win_width > t_width + 8)
+        win_width = t_width + 8;
+    if (show_ext_desc && full_description) {
+        textbox = newtTextbox(1, 1, t_width, 10, tflags);
         assert(textbox);
-        newtTextboxSetText(textbox, q_ext_text);
+        newtTextboxSetText(textbox, full_description);
         t_height = newtTextboxGetNumLines(textbox);
         newtTextboxSetHeight(textbox, t_height);
         newtFormAddComponent(form, textbox);
@@ -411,15 +460,6 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         win_height = height-5;
         sel_height = win_height - t_height - 5;
     }
-    sel_width = 0;
-    for (i = 0; i < count; i++) {
-        if (strwidth(choices_trans[i]) > win_width-10) {
-            sel_width = win_width-10;
-            choices_trans[i][sel_width] = 0; // How do we handle wide characters here?
-        } else if (strwidth(choices_trans[i]) > sel_width) {
-            sel_width = strwidth(choices_trans[i]);
-        }
-    }
     create_window(win_width, win_height, obj->title, q->priority);
     bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
     if (obj->methods.can_go_back(obj, q) || !show_ext_desc)
@@ -428,7 +468,6 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         bCancel = NULL;
     newtFormAddComponents(form, bOk, bCancel, NULL);
     if (count > sel_height) {
-        
         scrollbar = newtVerticalScrollbar((win_width+sel_width+5)/2, 1+t_height+1, sel_height,
                 NEWT_COLORSET_WINDOW, NEWT_COLORSET_ACTCHECKBOX);
         newtFormAddComponent(form, scrollbar);
@@ -444,7 +483,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         for (k = 0; k < defcount; k++)
             if (strcmp(choices[tindex[i]], defvals[k]) == 0)
                 def = 1;
-        newtFormAddComponent(sform, newtCheckbox((win_width-sel_width-5)/2, 1+t_height+1+i, choices_trans[i], def ? '*' : ' ', " *", &answer[tindex[i]]));
+        newtFormAddComponent(sform, newtCheckbox((win_width-sel_width-3)/2, 1+t_height+1+i, choices_trans[i], def ? '*' : ' ', " *", &answer[tindex[i]]));
     }
     newtFormAddComponent(form, sform);
     newtFormSetCurrent(form, sform);
@@ -477,9 +516,6 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     }
     newtFormDestroy(form);
     newtPopWindow();
-#ifdef HAVE_LIBTEXTWRAP
-    free(q_ext_text);
-#endif
     return ret;
 }
 
@@ -489,15 +525,22 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     newtComponent form, listbox, textbox, bOk, bCancel, cRet;
     int listflags = NEWT_FLAG_RETURNEXIT;
     int width = 80, height = 24;
-    int win_width, win_height = -1, t_height, sel_height, sel_width;
+    int win_width, win_height = -1, t_height, t_width, sel_height, sel_width;
     char **choices, **choices_trans, *defval;
     int count = 0, i, ret, defchoice = -1;
-    const char *q_ext_text;
     int *tindex = NULL;
     const char *listorder = q_get_listorder(q);
     char *full_description = get_full_description(q);
+    const char *p;
+    size_t res;
+    int k;
+    wchar_t c;
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
+    char *wrappedtext;
+    int tflags = 0;
+#else
+    int tflags = NEWT_FLAG_WRAP;
 #endif
 
     newtGetScreenSize(&width, &height);
@@ -516,18 +559,30 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 4);
-    q_ext_text = textwrap(&tw, full_description);
-#else
-    q_ext_text = full_description;
+    wrappedtext = textwrap(&tw, full_description);
+    free(full_description);
+    full_description = wrappedtext;
 #endif
-    if (show_ext_desc && q_ext_text) {
-#ifdef HAVE_LIBTEXTWRAP
-        textbox = newtTextbox(1, 1, win_width-4, 10, 0);
-#else
-        textbox = newtTextbox(1, 1, win_width-4, 10, NEWT_FLAG_WRAP);
-#endif
+    sel_width = strlongest(choices_trans, count);
+    t_width = get_text_width(full_description);
+    if (sel_width > win_width-6) {
+        sel_width = win_width-6;
+        for (i = 0; i < count; i++) {
+            if (strwidth(choices_trans[i]) > sel_width) {
+                for (res = 0, p = choices_trans[i]; (k = mbtowc (&c, p, MB_LEN_MAX)) > 0 && res < sel_width; p += k)
+                    res += wcwidth (c);
+                choices_trans[i][res] = 0;
+            }
+        }
+    }
+    if (t_width < sel_width)
+        t_width = sel_width;
+    if (win_width > t_width + 6)
+        win_width = t_width + 6;
+    if (show_ext_desc && full_description) {
+        textbox = newtTextbox(1, 1, t_width, 10, tflags);
         assert(textbox);
-        newtTextboxSetText(textbox, q_ext_text);
+        newtTextboxSetText(textbox, full_description);
         t_height = newtTextboxGetNumLines(textbox);
         newtTextboxSetHeight(textbox, t_height);
         newtFormAddComponent(form, textbox);
@@ -541,22 +596,13 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     }
     if (count > sel_height)
         listflags |= NEWT_FLAG_SCROLL;
-    sel_width = 0;
-    for (i = 0; i < count; i++) {
-        if (strwidth(choices_trans[i]) > win_width-10) {
-            sel_width = win_width-10;
-            choices_trans[i][sel_width] = 0; // How do we handle wide characters here?
-        } else if (strwidth(choices_trans[i]) > sel_width) {
-            sel_width = strwidth(choices_trans[i]);
-        }
-    }
     create_window(win_width, win_height, obj->title, q->priority);
-    listbox = newtListbox((win_width - sel_width)/2, 1+t_height+1, sel_height, listflags);
+    listbox = newtListbox((win_width-sel_width-3)/2, 1+t_height+1, sel_height, listflags);
     if (obj->methods.can_go_back(obj, q) || !show_ext_desc)
         bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
     else
         bCancel = NULL;
-    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
+    bOk = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
         newtListboxAppendEntry(listbox, choices_trans[i], choices[tindex[i]]);
@@ -581,9 +627,6 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     }
     newtFormDestroy(form);
     newtPopWindow();
-#ifdef HAVE_LIBTEXTWRAP
-    free(q_ext_text);
-#endif
     return ret;
 }
 
@@ -600,27 +643,28 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
 {
     newtComponent form, bYes, bNo, bCancel, textbox, cRet;
     int width = 80, height = 24;
-    int win_width, win_height = -1, t_height;
+    int win_width, win_height = -1, t_height, t_width;
+    int ret;
 #ifdef HAVE_LIBTEXTWRAP
-    int flags = 0, ret;
     textwrap_t tw;
+    char *wrappedtext;
+    int flags = 0;
 #else
-    int flags = NEWT_FLAG_WRAP, ret;
+    int flags = NEWT_FLAG_WRAP;
 #endif
     char *full_description = get_full_description(q);
-    char *q_ext_text;
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 4);
-    q_ext_text = textwrap(&tw, full_description);
-#else
-    q_ext_text = full_description;
+    wrappedtext = textwrap(&tw, full_description);
+    free(full_description);
+    full_description = wrappedtext;
 #endif
-    if (q_ext_text != NULL)
-        t_height = get_text_height(q_ext_text, win_width);
+    if (full_description != NULL)
+        t_height = get_text_height(full_description, win_width);
     else
         t_height = 0;
     if (t_height + 4 <= height-5)
@@ -630,12 +674,15 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
         flags |= NEWT_FLAG_SCROLL;
     }
     t_height = win_height - 4;
-    create_window(width-7, win_height, obj->title, q->priority);
+    t_width = get_text_width(full_description);
+    if (win_width > t_width + 4)
+        win_width = t_width + 4;
+    create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
-    textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
+    textbox = newtTextbox(1, 1, t_width, t_height, flags);
     assert(textbox);
-    if (q_ext_text != NULL)
-        newtTextboxSetText(textbox, q_ext_text);
+    if (full_description != NULL)
+        newtTextboxSetText(textbox, full_description);
     free(full_description);
     if (obj->methods.can_go_back(obj, q))
         bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
@@ -661,9 +708,6 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
         ret = DC_NOTOK;
     newtFormDestroy(form);
     newtPopWindow();
-#ifdef HAVE_LIBTEXTWRAP
-    free(q_ext_text);
-#endif
     return ret;
 }
 
