@@ -7,7 +7,7 @@
  *
  * Description: debconf client support interface
  *
- * $Id: debconfclient.c,v 1.4 2001/01/07 05:05:12 tausq Rel $
+ * $Id: debconfclient.c,v 1.5 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.

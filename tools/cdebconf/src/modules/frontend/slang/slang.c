@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.8 2001/01/21 01:12:40 tausq Rel $
+ * $Id: slang.c,v 1.9 2002/07/01 06:58:38 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.

@@ -1,92 +1,82 @@
 #ifndef _DATABASE_H_
 #define _DATABASE_H_
 
-/* Debconf database interface */
+#define DEBCONF_MAX_CONFIGPATH_LEN  128
+
+/* Debconf database interfaces */
 
 struct configuration;
-struct question;
-struct database;
 struct template;
+struct template_db;
+struct question;
+struct question_db;
 
-/* Method prototypes */
-typedef int (*dcd_initialize_t)(struct database *, struct configuration *);
-typedef int (*dcd_shutdown_t)(struct database *);
-typedef int (*dcd_load_t)(struct database *);
-typedef int (*dcd_save_t)(struct database *);
-typedef int (*dcd_template_set_t)(struct database *, struct template *t);
-typedef struct template *(*dcd_template_get_t)(struct database *, 
-	const char *name);
-typedef int (*dcd_template_remove_t)(struct database *, const char *name);
-typedef int (*dcd_template_lock_t)(struct database *, const char *name);
-typedef int (*dcd_template_unlock_t)(struct database *, const char *name);
-typedef struct template *(*dcd_template_iterate_t)(struct database *,
-		void **iter);
-typedef struct question *(*dcd_question_get_t)(struct database *, 
-	const char *name);
-typedef int (*dcd_question_set_t)(struct database *, struct question *q);
-typedef int (*dcd_question_disown_t)(struct database *, const char *name, 
-	const char *owner);
-typedef int (*dcd_question_disownall_t)(struct database *, const char *owner);
-typedef int (*dcd_question_lock_t)(struct database *, const char *name);
-typedef int (*dcd_question_unlock_t)(struct database *, const char *name);
-typedef int (*dcd_question_visible_t)(struct database *, const char *name, 
-	const char *priority);
-typedef struct question *(*dcd_question_iterate_t)(struct database *,
-		void **iter);
+struct template_db_module {
+    int (*initialize)(struct template_db *db, struct configuration *cfg);
+    int (*shutdown)(struct template_db *db);
+    int (*load)(struct template_db *db);
+    int (*save)(struct template_db *db);
+    int (*set)(struct template_db *db, struct template *t);
+    struct template *(*get)(struct template_db *db, const char *name);
+    int (*remove)(struct template_db *, const char *name);
+    int (*lock)(struct template_db *, const char *name);
+    int (*unlock)(struct template_db *, const char *name);
+    struct template *(*iterate)(struct template_db *db, void **iter);
+};
 
-struct database {
+struct question_db_module {
+    int (*initialize)(struct question_db *db, struct configuration *cfg);
+    int (*shutdown)(struct question_db *db);
+    int (*load)(struct question_db *db);
+    int (*save)(struct question_db *db);
+    int (*set)(struct question_db *, struct question *q);
+    struct question *(*get)(struct question_db *db, const char *name);
+    int (*disown)(struct question_db *, const char *name, const char *owner);
+    int (*disownall)(struct question_db *, const char *owner);
+    int (*lock)(struct question_db *, const char *name);
+    int (*unlock)(struct question_db *, const char *name);
+    int (*is_visible)(struct question_db *, const char *name, const char *priority);
+    struct question *(*iterate)(struct question_db *, void **iter);
+};
+
+struct template_db {
 	/* db module name */
 	const char *modname;
 	/* db module handle */
 	void *handle;
 	/* configuration data */
 	struct configuration *config;
+    /* config path - base of instance configuration */
+    char configpath[DEBCONF_MAX_CONFIGPATH_LEN];
 	/* private data */
 	void *data; 
 
 	/* methods */
-	dcd_initialize_t initialize;
-	dcd_shutdown_t shutdown;
-	dcd_load_t load;
-	dcd_save_t save;
-	dcd_template_set_t template_set;
-	dcd_template_get_t template_get;
-	dcd_template_remove_t template_remove;
-	dcd_template_lock_t template_lock;
-	dcd_template_unlock_t template_unlock;
-	dcd_template_iterate_t template_iterate;
-	dcd_question_get_t question_get;
-	dcd_question_set_t question_set;
-	dcd_question_disown_t question_disown;
-	dcd_question_disownall_t question_disownall;
-	dcd_question_lock_t question_lock;
-	dcd_question_unlock_t question_unlock;
-	dcd_question_visible_t question_visible;
-	dcd_question_iterate_t question_iterate;
+    struct template_db_module methods;
 };
 
-struct database *database_new(struct configuration *);
-void database_delete(struct database *db);
+struct question_db {
+    /* db module name */
+	const char *modname;
+	/* db module handle */
+	void *handle;
+	/* configuration data */
+	struct configuration *config;
+    /* config path - base of instance configuration */
+    char configpath[DEBCONF_MAX_CONFIGPATH_LEN];
+	/* private data */
+	void *data; 
+    /* template database */
+    struct template_db *tdb;
 
-struct database_module {
-	dcd_initialize_t initialize;
-	dcd_shutdown_t shutdown;
-	dcd_load_t load;
-	dcd_save_t save;
-	dcd_template_set_t template_set;
-	dcd_template_get_t template_get;
-	dcd_template_remove_t template_remove;
-	dcd_template_lock_t template_lock;
-	dcd_template_unlock_t template_unlock;
-	dcd_template_iterate_t template_iterate;
-	dcd_question_get_t question_get;
-	dcd_question_set_t question_set;
-	dcd_question_disown_t question_disown;
-	dcd_question_disownall_t question_disownall;
-	dcd_question_lock_t question_lock;
-	dcd_question_unlock_t question_unlock;
-	dcd_question_visible_t question_visible;
-	dcd_question_iterate_t question_iterate;
+	/* methods */
+    struct question_db_module methods;
 };
+
+struct template_db *template_db_new(struct configuration *);
+void template_db_delete(struct template_db *db);
+
+struct question_db *question_db_new(struct configuration *, struct template_db *tdb);
+void question_db_delete(struct question_db *db);
 
 #endif

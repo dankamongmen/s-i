@@ -7,14 +7,15 @@ moddir=${libdir}/cdebconf
 sharedir=${prefix}/share/debconf
 incdir=${prefix}/include/cdebconf
 
-srcdir=@TOPDIR@/src
-builddir=@BUILDDIR@/src
+srcdir=@TOPDIR@
+builddir=@BUILDDIR@
 
-DBMODULES=@DBMODULES@
-FRONTENDMODULES=@FRONTENDMODULES@
+DB_MODULES=@DB_MODULES@
+FRONTEND_MODULES=@FRONTEND_MODULES@
 
 CC=@CC@
 CFLAGS=@CFLAGS@
+POD2MAN=@POD2MAN@
 
 %.o: %.c
 	@echo "Compiling $< to $@"
@@ -23,3 +24,7 @@ CFLAGS=@CFLAGS@
 %.opic: %.c
 	@echo "Compiling $< to $@"
 	@$(CC) $(CFLAGS) -I$(builddir) -fPIC -o $@ -c $<
+
+%/Makefile:
+	@test -d $(dir $@) || mkdir -p $(dir $@)
+	@cp $(srcdir)/$@ $@

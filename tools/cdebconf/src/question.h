@@ -2,6 +2,7 @@
 #define _QUESTION_H_
 
 #define DC_QFLAG_SEEN		(1 << 0)
+#define DC_QFLAG_DONTPARSE	(1 << 1)
 
 struct template;
 

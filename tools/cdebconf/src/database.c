@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.10 2002/05/30 11:11:29 tfheen Rel $
+ * $Id: database.c,v 1.11 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -47,121 +47,238 @@
 #include <unistd.h>
 #include <string.h>
 
-#define SETMETHOD(method) db->method = (mod->method ? mod->method : database_ ## method)
+/****************************************************************************
+ *
+ * Template database 
+ *
+ ***************************************************************************/
 
-static int database_initialize(struct database *db, struct configuration *cfg)
+static int template_db_initialize(struct template_db *db, struct configuration *cfg)
 {
-	return DC_OK;
+    return DC_OK;
 }
 
-static int database_shutdown(struct database *db)
+static int template_db_shutdown(struct template_db *db)
 {
-	return DC_OK;
+    return DC_OK;
 }
 
-static int database_load(struct database *db)
+static int template_db_load(struct template_db *db)
 {
-	return DC_OK;
+    return DC_OK;
 }
 
-static int database_save(struct database *db)
+static int template_db_save(struct template_db *db)
 {
-	return DC_OK;
+    return DC_OK;
 }
 
-static int database_template_set(struct database *db, struct template *t)
+static int template_db_set(struct template_db *db, struct template *t)
 {
 	return DC_NOTIMPL;
 }
 
-static struct template *database_template_get(struct database *db, 
+static struct template *template_db_get(struct template_db *db, 
 	const char *name)
 {
 	return 0;
 }
 
-static int database_template_remove(struct database *db, const char *name)
+static int template_db_remove(struct template_db *db, const char *name)
 {
 	return DC_NOTIMPL;
 }
 
-static int database_template_lock(struct database *db, const char *name)
+static int template_db_lock(struct template_db *db, const char *name)
 {
 	return DC_NOTIMPL;
 }
 
-static int database_template_unlock(struct database *db, const char *name)
+static int template_db_unlock(struct template_db *db, const char *name)
 {
 	return DC_NOTIMPL;
 }
 
-static struct template *database_template_iterate(struct database *db, 
+static struct template *template_db_iterate(struct template_db *db, 
 	void **iter)
 {
 	return 0;
 }
 
-static struct question *database_question_get(struct database *db, 
+struct template_db *template_db_new(struct configuration *cfg)
+{
+	struct template_db *db;
+	void *dlh;
+	struct template_db_module *mod;
+	char tmp[256];
+	const char *modpath, *modname, *driver;
+
+    modname = cfg->get(cfg, "global::default::template", getenv("DEBCONF_TEMPLATE"));
+
+    if (modname == NULL)
+		DIE("No template database instance defined");
+
+    modpath = cfg->get(cfg, "global::module_path::database", 0);
+    if (modpath == NULL)
+        DIE("Database module path not defined (global::module_path::database)");
+
+    snprintf(tmp, sizeof(tmp), "template::instance::%s::driver",
+        modname);
+    driver = cfg->get(cfg, tmp, 0);
+
+    if (driver == NULL)
+        DIE("Template instance driver not defined (%s)", tmp);
+
+    snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, driver);
+	if ((dlh = dlopen(tmp, RTLD_NOW)) == NULL)
+		DIE("Cannot load template database module %s: %s", tmp, dlerror());
+
+	if ((mod = (struct template_db_module *)dlsym(dlh, "debconf_template_db_module")) == NULL)
+		DIE("Malformed template database module %s", modname);
+
+	db = NEW(struct template_db);
+	db->handle = dlh;
+	db->modname = modname;
+	db->data = NULL;
+	db->config = cfg;
+    snprintf(db->configpath, sizeof(db->configpath), 
+        "template::instance::%s", modname);
+
+    memcpy(&db->methods, mod, sizeof(struct template_db_module));
+
+#define SETMETHOD(method) if (db->methods.method == NULL) db->methods.method = template_db_##method
+
+	SETMETHOD(initialize);
+	SETMETHOD(shutdown);
+	SETMETHOD(load);
+	SETMETHOD(save);
+	SETMETHOD(set);
+	SETMETHOD(get);
+	SETMETHOD(remove);
+	SETMETHOD(lock);
+	SETMETHOD(unlock);
+	SETMETHOD(iterate);
+
+#undef SETMETHOD
+
+	if (db->methods.initialize(db, cfg) == 0)
+	{
+		template_db_delete(db);
+		return NULL;
+	}
+
+	return db;
+}
+
+void template_db_delete(struct template_db *db)
+{
+	db->methods.shutdown(db);
+	dlclose(db->handle);
+
+	DELETE(db);
+}
+
+/****************************************************************************
+ *
+ * Config database 
+ *
+ ***************************************************************************/
+
+static int question_db_initialize(struct question_db *db, struct configuration *cfg)
+{
+    return DC_OK;
+}
+
+static int question_db_shutdown(struct question_db *db)
+{
+    return DC_OK;
+}
+
+static int question_db_load(struct question_db *db)
+{
+    return DC_OK;
+}
+
+static int question_db_save(struct question_db *db)
+{
+    return DC_OK;
+}
+
+static int question_db_set(struct question_db *db, struct question *t)
+{
+	return DC_NOTIMPL;
+}
+
+static struct question *question_db_get(struct question_db *db, 
 	const char *name)
 {
 	return 0;
 }
 
-static int database_question_set(struct database *db, struct question *q)
-{
-	return DC_NOTIMPL;
-}
-
-static int database_question_disown(struct database *db, const char *name, 
+static int question_db_disown(struct question_db *db, const char *name, 
 	const char *owner)
 {
 	return DC_NOTIMPL;
 }
 
-static int database_question_disownall(struct database *db, const char *owner)
+static int question_db_disownall(struct question_db *db, const char *owner)
 {
 	struct question *q;
 	void *iter = 0;
 
-	while ((q = db->question_iterate(db, &iter)))
+	while ((q = db->methods.iterate(db, &iter)))
 	{
-		db->question_disown(db, q->tag, owner);
+		db->methods.disown(db, q->tag, owner);
 	}
 	return 0;
 }
 
-static int database_question_lock(struct database *db, const char *name)
+static int question_db_lock(struct question_db *db, const char *name)
 {
 	return DC_NOTIMPL;
 }
 
-static int database_question_unlock(struct database *db, const char *name)
+static int question_db_unlock(struct question_db *db, const char *name)
 {
 	return DC_NOTIMPL;
 }
 
-static int database_question_visible(struct database *db, const char *name,
+static int question_db_is_visible(struct question_db *db, const char *name,
 	const char *priority)
 {
-	struct question *q, *q2 = 0;
+	struct question *q = 0, *q2 = 0;
+	struct configuration *config = db->config;
+    const char *wantprio = NULL;
 	int ret = DC_YES;
 
-	if (getenv("DEBCONF_PRIORITY") != NULL &&
-	    priority_compare(priority, getenv("DEBCONF_PRIORITY")) < 0)
-		return DC_NO;
+    /* priority can either come from the command line, environment
+     * or from debconf configuration
+     */
+    wantprio = config->get(config, "_cmdline::priority", NULL);
 
-	if ((q = db->question_get(db, "debconf/priority")) != NULL)
-	{
-		if (priority_compare(priority, q->value) < 0)
-			ret = DC_NO;
+    if (wantprio == NULL)
+	    wantprio = getenv("DEBCONF_PRIORITY");
+
+    if (wantprio == NULL)
+	    if ((q = db->methods.get(db, "debconf/priority")) != NULL)
+            wantprio = q->value;
+
+    /* error; no priority specified */
+    if (wantprio == NULL || strlen(wantprio) == 0)
+        ret = DC_NO;
+    else if (priority_compare(priority, wantprio) < 0)
+		ret = DC_NO;
+
+    if (q != NULL)
 		question_deref(q);
-		if (ret != DC_YES) return ret;
-	}
+
+	if (ret != DC_YES)
+        return ret;
 	
-	if ((q = db->question_get(db, name)) != NULL &&
+	if ((q = db->methods.get(db, name)) != NULL &&
 	    (q->flags & DC_QFLAG_SEEN) != 0)
 	{
-		if ((q2 = db->question_get(db, "debconf/showold")) != NULL &&
+		if ((q2 = db->methods.get(db, "debconf/showold")) != NULL &&
 			strcmp(q2->value, "false") == 0)
 			ret = DC_NO;
 	}
@@ -170,73 +287,85 @@ static int database_question_visible(struct database *db, const char *name,
 	return ret;
 }
 
-static struct question *database_question_iterate(struct database *db,
+static struct question *question_db_iterate(struct question_db *db,
 	void **iter)
 {
 	return 0;
 }
 
-struct database *database_new(struct configuration *cfg)
+struct question_db *question_db_new(struct configuration *cfg, struct template_db *tdb)
 {
-	struct database *db;
+	struct question_db *db;
 	void *dlh;
-	struct database_module *mod;
-	char modlabel[256];
-	const char *modname;
+	struct question_db_module *mod;
+	char tmp[256];
+	const char *modpath, *modname, *driver;
 
-	modname = getenv("DEBCONF_DB");
-	if (modname == NULL)
-		if ((modname = cfg->get(cfg, "database::default::driver", 0)) == NULL)
-			DIE("No database driver defined");
+    modname = getenv("DEBCONF_CONFIG");
+    if (modname == NULL)
+        modname = cfg->get(cfg, "global::default::config", 0);
 
-	snprintf(modlabel, sizeof(modlabel), "database::driver::%s::module",
-		modname);
-	
-	modname = cfg->get(cfg, modlabel, 0);
-	if ((dlh = dlopen(modname, RTLD_NOW)) == NULL)
-		DIE("Cannot load database module %s: %s", modname, dlerror());
+    if (modname == NULL)
+		DIE("No question database instance defined");
 
-	if ((mod = (struct database_module *)dlsym(dlh, "debconf_database_module")) == NULL)
-		DIE("Malformed database module %s", modname);
+    modpath = cfg->get(cfg, "global::module_path::database", 0);
+    if (modpath == NULL)
+        DIE("Database module path not defined (global::module_path::database)");
 
-	db = NEW(struct database);
+    snprintf(tmp, sizeof(tmp), "config::instance::%s::driver",
+        modname);
+    driver = cfg->get(cfg, tmp, 0);
+
+    if (driver == NULL)
+        DIE("Config instance driver not defined (%s)", tmp);
+
+    snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, driver);
+	if ((dlh = dlopen(tmp, RTLD_NOW)) == NULL)
+		DIE("Cannot load config database module %s: %s", tmp, dlerror());
+
+	if ((mod = (struct question_db_module *)dlsym(dlh, "debconf_question_db_module")) == NULL)
+		DIE("Malformed config database module %s", modname);
+
+	db = NEW(struct question_db);
 	db->handle = dlh;
 	db->modname = modname;
 	db->data = NULL;
 	db->config = cfg;
+    db->tdb = tdb;
+    snprintf(db->configpath, sizeof(db->configpath), 
+        "config::instance::%s", modname);
+
+    memcpy(&db->methods, mod, sizeof(struct question_db_module));
+
+#define SETMETHOD(method) if (db->methods.method == NULL) db->methods.method = question_db_##method
 
 	SETMETHOD(initialize);
 	SETMETHOD(shutdown);
 	SETMETHOD(load);
 	SETMETHOD(save);
-	SETMETHOD(template_set);
-	SETMETHOD(template_get);
-	SETMETHOD(template_remove);
-	SETMETHOD(template_lock);
-	SETMETHOD(template_unlock);
-	SETMETHOD(template_iterate);
-	SETMETHOD(question_get);
-	SETMETHOD(question_set);
-	SETMETHOD(question_disown);
-	SETMETHOD(question_disownall);
-	SETMETHOD(question_lock);
-	SETMETHOD(question_unlock);
-	SETMETHOD(question_visible);
-	SETMETHOD(question_iterate);
+	SETMETHOD(set);
+	SETMETHOD(get);
+	SETMETHOD(disown);
+	SETMETHOD(disownall);
+	SETMETHOD(lock);
+	SETMETHOD(unlock);
+	SETMETHOD(is_visible);
+	SETMETHOD(iterate);
 
-	if (db->initialize(db, cfg) == 0)
+#undef SETMETHOD
+
+	if (db->methods.initialize(db, cfg) == 0)
 	{
-		database_delete(db);
+		question_db_delete(db);
 		return NULL;
 	}
 
 	return db;
-
 }
 
-void database_delete(struct database *db)
+void question_db_delete(struct question_db *db)
 {
-	db->shutdown(db);
+	db->methods.shutdown(db);
 	dlclose(db->handle);
 
 	DELETE(db);

@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.10 2002/05/18 22:35:05 tfheen Rel $
+ * $Id: question.c,v 1.11 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -43,9 +43,6 @@
 #include "configuration.h"
 #include "database.h"
 
-static struct database *db = NULL;
-static struct configuration *config = NULL;
-
 struct question *question_new(const char *tag)
 {
 	struct question *q;
@@ -60,6 +57,8 @@ struct question *question_new(const char *tag)
 
 void question_delete(struct question *question)
 {
+    if (question->template)
+        template_deref(question->template);
 	DELETE(question);
 }
 
@@ -240,6 +239,9 @@ static int question_expand_vars(struct question *q, const char *field,
 
 const char *getlanguage()
 {
+#if 0   /* FIXME */
+    static struct database *db = NULL;
+    static struct configuration *config = NULL;
 	static char language[3];
 	/* We need to directly access the configuration, since I couldn't
 	   get debconfclient to work from in here. */
@@ -264,6 +266,9 @@ const char *getlanguage()
                 question_deref(q2);
         }
 	return language;
+#else
+    return "";
+#endif
 }
 
 const char *question_description(struct question *q)

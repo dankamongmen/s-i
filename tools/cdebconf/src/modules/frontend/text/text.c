@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.9 2002/05/18 22:31:02 tfheen Rel $
+ * $Id: text.c,v 1.10 2002/07/01 06:58:38 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.

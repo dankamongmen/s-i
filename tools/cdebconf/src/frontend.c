@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.10 2002/05/30 11:04:50 tfheen Rel $
+ * $Id: frontend.c,v 1.11 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -45,8 +45,6 @@
 #include <dlfcn.h>
 #include <string.h>
 #include <unistd.h>
-
-#define SETMETHOD(method) obj->method = (mod->method ? mod->method : frontend_ ## method)
 
 /*
  * Function:
@@ -167,7 +165,7 @@ static void frontend_set_title(struct frontend *f, const char *title)
  * Description:
  * Assumptions:
  */
-static int frontend_cangoback(struct frontend *ui, struct question *q)
+static int frontend_can_go_back(struct frontend *ui, struct question *q)
 {
 	return 1;
 }
@@ -179,7 +177,7 @@ static int frontend_cangoback(struct frontend *ui, struct question *q)
  * Description:
  * Assumptions:
  */
-static int frontend_cangoforward(struct frontend *ui, struct question *q)
+static int frontend_can_go_forward(struct frontend *ui, struct question *q)
 {
 	return 1;
 }
@@ -192,25 +190,36 @@ static int frontend_cangoforward(struct frontend *ui, struct question *q)
  * Assumptions:
  */
 
-struct frontend *frontend_new(struct configuration *cfg, struct database *db)
+struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb, struct question_db *qdb)
 {
 	struct frontend *obj = NULL;
 	void *dlh;
 	struct frontend_module *mod;
-	char modlabel[256];
-	const char *modname;
+	char tmp[256];
+	const char *modpath, *modname;
 
-	modname = getenv("DEBCONF_FRONTEND");
+    modname = getenv("DEBCONF_FRONTEND");
+    if (modname == NULL)
+        modname = cfg->get(cfg, "_cmdline::frontend", 0);
 	if (modname == NULL)
-		if ((modname = cfg->get(cfg, "frontend::default::driver", 0)) == NULL)
-			DIE("No frontend driver defined");
+		modname = cfg->get(cfg, "global::default::frontend", 0);
+    if (modname == NULL)
+		DIE("No frontend instance defined");
 
-	snprintf(modlabel, sizeof(modlabel), "frontend::driver::%s::module",
+    modpath = cfg->get(cfg, "global::module_path::frontend", 0);
+    if (modpath == NULL)
+		DIE("Frontend module path not defined (global::module_path::frontend)");
+
+	snprintf(tmp, sizeof(tmp), "frontend::instance::%s::driver",
 		modname);
+	modname = cfg->get(cfg, tmp, 0);
 
-	modname = cfg->get(cfg, modlabel, 0);
-	if ((dlh = dlopen(modname, RTLD_NOW)) == NULL)
-		DIE("Cannot load frontend module %s: %s", modname, dlerror());
+    if (modname == NULL)
+        DIE("Frontend instance driver not defined (%s)", tmp);
+
+    snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, modname);
+	if ((dlh = dlopen(tmp, RTLD_NOW)) == NULL)
+		DIE("Cannot load frontend module %s: %s", tmp, dlerror());
 
 	if ((mod = (struct frontend_module *)dlsym(dlh, "debconf_frontend_module")) == NULL)
 		DIE("Malformed frontend module %s", modname);
@@ -219,7 +228,12 @@ struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 	obj->handle = dlh;
 	obj->data = NULL;
 	obj->config = cfg;
-	obj->db = db;
+	obj->tdb = tdb;
+	obj->qdb = qdb;
+
+    memcpy(&obj->methods, mod, sizeof(struct frontend_module));
+
+#define SETMETHOD(method) if (obj->methods.method == NULL) obj->methods.method = frontend_##method
 
 	SETMETHOD(initialize);
 	SETMETHOD(shutdown);
@@ -228,16 +242,18 @@ struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 	SETMETHOD(add);
 	SETMETHOD(go);
 	SETMETHOD(clear);
-	SETMETHOD(cangoback);
-	SETMETHOD(cangoforward);
+	SETMETHOD(can_go_back);
+	SETMETHOD(can_go_forward);
 
-	if (obj->initialize(obj, cfg) == 0)
+#undef SETMETHOD
+
+	if (obj->methods.initialize(obj, cfg) == 0)
 	{
 		frontend_delete(obj);
 		return NULL;
 	}
 
-	obj->capability = obj->query_capability(obj);
+	obj->capability = obj->methods.query_capability(obj);
 	INFO(INFO_VERBOSE, "Capability: 0x%08X\n", obj->capability);
 
 	return obj;
@@ -252,7 +268,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct database *db)
  */
 void frontend_delete(struct frontend *obj)
 {
-	obj->shutdown(obj);
+	obj->methods.shutdown(obj);
 	dlclose(obj->handle);
 	DELETE(obj->questions);
 	DELETE(obj->capb);

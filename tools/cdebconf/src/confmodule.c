@@ -9,7 +9,7 @@
  *              of client configuration modules and communications
  *              between the debconf frontend and the confmodule
  *
- * $Id: confmodule.c,v 1.12 2002/05/27 14:23:31 tfheen Rel $
+ * $Id: confmodule.c,v 1.13 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -183,7 +183,7 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 	switch ((pid = fork()))
 	{
 	case -1:
-		mod->frontend->shutdown(mod->frontend);
+		mod->frontend->methods.shutdown(mod->frontend);
 		DIE("Cannot execute client config script");
 		break;
 	case 0:
@@ -220,12 +220,14 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
  * Assumptions: none
  */
 struct confmodule *confmodule_new(struct configuration *config,
-	struct database *db, struct frontend *frontend)
+	struct template_db *templates, struct question_db *questions, 
+    struct frontend *frontend)
 {
 	struct confmodule *mod = NEW(struct confmodule);
 
 	mod->config = config;
-	mod->db = db;
+	mod->templates = templates;
+	mod->questions = questions;
 	mod->frontend = frontend;
 	mod->run = confmodule_run;
 	mod->communicate = confmodule_communicate;

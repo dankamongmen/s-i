@@ -8,7 +8,7 @@
  * Description: configuration file parsing and access routines
  *              (adapted from APT's Configuration class)
  *
- * $Id: configuration.c,v 1.6 2001/01/07 06:39:25 tausq Rel $
+ * $Id: configuration.c,v 1.7 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.

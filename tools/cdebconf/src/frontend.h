@@ -2,30 +2,33 @@
 #define _FRONTEND_H_
 
 struct configuration;
-struct database;
+struct template_db;
+struct question_db;
 struct question;
 struct frontend;
 
 #define DCF_CAPB_BACKUP		(1UL << 0)
 
-/* frontend method function prototypes */
-typedef int (*dcf_initialize_t)(struct frontend *, struct configuration *);
-typedef int (*dcf_shutdown_t)(struct frontend *);
-typedef unsigned long (*dcf_query_capability_t)(struct frontend *);
-typedef void (*dcf_set_title_t)(struct frontend *, const char *title);
-typedef int (*dcf_add_t)(struct frontend *, struct question *q);
-typedef int (*dcf_go_t)(struct frontend *);
-typedef void (*dcf_clear_t)(struct frontend *);
-typedef int (*dcf_cangoback_t)(struct frontend *, struct question *);
-typedef int (*dcf_cangoforward_t)(struct frontend *, struct question *);
+struct frontend_module {
+    int (*initialize)(struct frontend *, struct configuration *);
+    int (*shutdown)(struct frontend *);
+    unsigned long (*query_capability)(struct frontend *);
+    void (*set_title)(struct frontend *, const char *title);
+    int (*add)(struct frontend *, struct question *q);
+    int (*go)(struct frontend *);
+    void (*clear)(struct frontend *);
+    int (*can_go_back)(struct frontend *, struct question *);
+    int (*can_go_forward)(struct frontend *, struct question *);
+};
 
 struct frontend {
 	/* module handle */
 	void *handle;
 	/* configuration data */
 	struct configuration *config;
-	/* database handle */
-	struct database *db;
+	/* database handle for templates and config */
+	struct template_db *tdb;
+	struct question_db *qdb;
 	/* frontend capabilities */
 	unsigned long capability;
 	/* private data */
@@ -38,30 +41,10 @@ struct frontend {
 	char *title;
 	
 	/* methods */
-	dcf_initialize_t initialize;
-	dcf_shutdown_t shutdown;
-	dcf_query_capability_t query_capability;
-	dcf_set_title_t set_title;
-	dcf_add_t add;
-	dcf_go_t go;
-	dcf_clear_t clear;
-	dcf_cangoback_t cangoback;
-	dcf_cangoforward_t cangoforward;
+    struct frontend_module methods;
 };
 
-struct frontend *frontend_new(struct configuration *, struct database *);
+struct frontend *frontend_new(struct configuration *, struct template_db *, struct question_db *);
 void frontend_delete(struct frontend *);
-
-struct frontend_module {
-	dcf_initialize_t initialize;
-	dcf_shutdown_t shutdown;
-	dcf_query_capability_t query_capability;
-	dcf_set_title_t set_title;
-	dcf_add_t add;
-	dcf_go_t go;
-	dcf_clear_t clear;
-	dcf_cangoback_t cangoback;
-	dcf_cangoforward_t cangoforward;
-};
 
 #endif

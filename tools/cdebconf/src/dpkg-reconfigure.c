@@ -8,7 +8,7 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.8 2001/01/07 05:05:12 tausq Rel $
+ * $Id: dpkg-reconfigure.c,v 1.9 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -66,14 +66,17 @@ struct option g_dpc_args[] = {
 	{ "frontend", 1, NULL, 'f' },
 	{ "priority", 1, NULL, 'p' },
 	{ "default-priority", 1, NULL, 'd' },
-	{ "all", 0, NULL, 'a' },
+	{ "all", 0, NULL, 'A' },
 	{ "unseen-only", 0, NULL, 'u' },
+    { "force", 0, NULL, 'F' },
 	{ 0, 0, 0, 0 }
 };
 
-static struct configuration *g_config = NULL;
-static struct frontend *g_frontend = NULL;
-static struct database *g_db = NULL;
+static struct configuration *g_config;
+static struct frontend *g_frontend;
+static struct template_db *g_templates;
+static struct question_db *g_questions;
+static int opt_all, opt_force;
 
 /************************************************************************
  * Function: cleanup
@@ -84,12 +87,18 @@ static struct database *g_db = NULL;
  ************************************************************************/
 static void cleanup(void)
 {
-	if (g_db != NULL)
-		g_db->save(g_db);
 	if (g_frontend != NULL)
 		frontend_delete(g_frontend);
-	if (g_db != NULL)
-		database_delete(g_db);
+    if (g_templates != NULL)
+    {
+        g_templates->methods.save(g_templates);
+        template_db_delete(g_templates);
+    }
+    if (g_questions != NULL)
+    {
+        g_questions->methods.save(g_questions);
+        question_db_delete(g_questions);
+    }
 	if (g_config != NULL)
 		config_delete(g_config);
 }
@@ -153,18 +162,18 @@ void loadtemplate(const char *filename, const char *owner)
 	t = template_load(filename);
 	while (t)
 	{
-		if (g_db->template_set(g_db, t) != DC_OK)
+		if (g_templates->methods.set(g_templates, t) != DC_OK)
 			INFO(INFO_ERROR, "Cannot add template %s", t->tag);
 
-		q = g_db->question_get(g_db, t->tag);
+		q = g_questions->methods.get(g_questions, t->tag);
 		if (q == NULL)
 		{
 			q = question_new(t->tag);
 			q->template = t;
 		}
 		question_owner_add(q, owner);
-		if (g_db->question_set(g_db, q) != DC_OK)
-			INFO(INFO_ERROR, "Cannot add template %s", t->tag);
+		if (g_questions->methods.set(g_questions, q) != DC_OK)
+			INFO(INFO_ERROR, "Cannot add question %s", t->tag);
 		question_deref(q);
 		t = t->next;
 	}
@@ -265,7 +274,7 @@ int runconfmodule(int argc, char **argv)
 	struct confmodule *confmodule = NULL;
 	int ret;
 
-	confmodule = confmodule_new(g_config, g_db, g_frontend);
+	confmodule = confmodule_new(g_config, g_templates, g_questions, g_frontend);
 	confmodule->run(confmodule, argc, argv);
 	confmodule->communicate(confmodule);
 	ret = confmodule->exitcode;
@@ -300,7 +309,7 @@ int reconfigure(char **pkgs, int i, int max)
 			continue;
 		}
 		/* startup the confmodule; run the config script and talk to it */
-		g_frontend->set_title(g_frontend, pkg);
+		g_frontend->methods.set_title(g_frontend, pkg);
 		if (strstr(getfield(pkg, STATUSFIELD), " ok installed") == 0)
 			DIE("%s is not fully installed", pkg);
 
@@ -321,12 +330,14 @@ int reconfigure(char **pkgs, int i, int max)
 			}
 			else
 			{
-				g_db->save(g_db);
+				g_templates->methods.save(g_templates);
+				g_questions->methods.save(g_questions);
 				strvacat(filename, sizeof(filename), " configure ", getfield(pkg, VERSIONFIELD), NULL);
 
 				ret = system(filename);
 				if (ret != 0) return DC_NOTOK;
-				g_db->load(g_db);
+				g_templates->methods.load(g_templates);
+				g_questions->methods.load(g_questions);
 			}
 		}
 
@@ -355,36 +366,40 @@ int reconfigure(char **pkgs, int i, int max)
 int main(int argc, char **argv)
 {
 	int opt, ret;
-	char *opt_frontend = NULL, *opt_priority = NULL;
 
 	signal(SIGINT, sighandler);
 
-	while ((opt = getopt_long(argc, argv, "dhf:p:", g_dpc_args, NULL) > 0))
+	g_config = config_new();
+
+	while ((opt = getopt_long(argc, argv, "dhf:p:AF", g_dpc_args, NULL) > 0))
 	{
 		switch (opt)
 		{
 		case 'h': usage(); break;
-		case 'f': opt_frontend = optarg; break;
-		case 'p': opt_priority = optarg; break;
+		case 'f': setenv("DEBCONF_FRONTEND", optarg, 1); break;
+        case 'p': g_config->set(g_config, "_cmdline::priority", optarg); break;
 		case 'd': break;
-		case 'a': break;
 		case 'u': break;
+		case 'A': opt_all = 1; break;
+        case 'F': opt_force = 1; break;
 		}
 	}
-
-	g_config = config_new();
 
 	/* parse the configuration info */
 	if (g_config->read(g_config, DEBCONFCONFIG) == 0)
 		DIE("Error reading configuration information");
 
 	/* initialize database and frontend modules */
-	if ((g_db = database_new(g_config)) == 0)
-		DIE("Cannot initialize DebConf database");
-	if ((g_frontend = frontend_new(g_config, g_db)) == 0)
+	if ((g_templates = template_db_new(g_config)) == 0)
+		DIE("Cannot initialize DebConf templates database");
+    if ((g_questions = question_db_new(g_config, g_templates)) == 0)
+		DIE("Cannot initialize DebConf config database");
+	if ((g_frontend = frontend_new(g_config, g_templates, g_questions)) == 0)
 		DIE("Cannot initialize DebConf frontend");
 
-	g_db->load(g_db);
+	g_templates->methods.load(g_templates);
+	g_questions->methods.load(g_questions);
+
 	setenv("DEBIAN_HAS_FRONTEND", "1", 1);
 	ret = reconfigure(argv, optind, argc);
 	/* shutting down .... sync the database and shutdown the modules */

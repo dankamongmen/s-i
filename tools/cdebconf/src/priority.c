@@ -7,7 +7,7 @@
  *
  * Description: routines to handle priority field parsing and comparison
  *
- * $Id: priority.c,v 1.5 2001/01/20 02:36:34 tausq Rel $
+ * $Id: priority.c,v 1.6 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.

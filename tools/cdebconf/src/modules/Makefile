@@ -1,5 +1,5 @@
 SUBDIRS=db frontend
 
-all install clean:
+all install clean: $(addsuffix /Makefile,$(SUBDIRS))
 	@for d in $(SUBDIRS); do $(MAKE) -C $$d $@; done
 	

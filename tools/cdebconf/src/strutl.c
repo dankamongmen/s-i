@@ -7,7 +7,7 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.14 2001/01/21 01:12:40 tausq Rel $
+ * $Id: strutl.c,v 1.15 2002/07/01 06:58:37 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -119,15 +119,15 @@ void strvacat(char *buf, size_t maxlen, ...)
 
 int strparsecword(char **inbuf, char *outbuf, size_t maxlen)
 {
-	char buffer[1024];
+	char buffer[maxlen];
 	char *buf = buffer;
-	const char *c = *inbuf;
+	char *c = *inbuf;
 
-	for (; *c != 0 && *c == ' '; c++);
+	for (; *c != 0 && isspace(*c); c++);
 
 	if (*c == 0) 
 		return 0;
-	if (strlen(*inbuf) > sizeof(buffer)) 
+	if (strlen(*inbuf) > maxlen)
 		return 0;
 	for (; *c != 0; c++)
 	{
@@ -148,20 +148,24 @@ int strparsecword(char **inbuf, char *outbuf, size_t maxlen)
 	}
 	*buf = 0;
 	strncpy(outbuf, buffer, maxlen);
-	*inbuf = (char *)c;
+	*inbuf = c;
 
 	return 1;
 }
 
 int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 {
-	char buffer[1024];
+	char buffer[maxlen];
 	char tmp[3];
 	char *start, *i;
-	const char *c = *inbuf;
-	for (; *c != 0 && *c == ' '; c++); 
+	char *c = *inbuf;
+
+    /* skip ws, return if empty */
+	for (; *c != 0 && isspace(*c); c++); 
 	if (*c == 0)
 		return 0;
+
+    start = c;
 	
 	for (; *c != 0 && isspace(*c) == 0; c++)
 	{
@@ -180,8 +184,7 @@ int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 	}
 
 	/* dequote the string */
-	start = *inbuf;
-	for (i = buffer; i < buffer + sizeof(buffer) && start != c; i++)
+	for (i = buffer; i < buffer + maxlen && start < c; i++)
 	{
 		if (*start == '%' && start + 2 < c)
 		{
@@ -202,8 +205,10 @@ int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 	
 	strncpy(outbuf, buffer, maxlen);
 
+    /* skip trailing spaces */
 	for (; *c != 0 && isspace(*c); c++);
-	*inbuf = (char *)c;
+	*inbuf = c;
+
 	return 1;
 }
 
