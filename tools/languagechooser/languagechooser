@@ -3,7 +3,6 @@
 . /usr/share/debconf/confmodule
 
 logfile=/var/log/messages
-logfile=messages
 
 localecode="debian-installer/locale"
 languagecode="debian-installer/language"
@@ -29,9 +28,14 @@ db_input critical "$languagenamecode" || [ $? -eq 30 ]
 db_go || true
 db_get "$languagenamecode" || true
 language=`echo $RET | sed -e 's/ .*//'`
-db_set "$languagecode" "$language" || true
+
+if [ -z "$language" ] ; then
+    language=`echo $lowret | sed -e 's/\(..\).*/\1/'`
+fi
 
 country=`echo $lowret | sed -e 's/\(...\)\(.*\)/\2/'`
+
+db_set "$languagecode" "$language" || true
 db_set "$countrycode" "$country" || true
 
 log "debian-installer/locale   = '$locale'"
