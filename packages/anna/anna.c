@@ -82,14 +82,7 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     while (*packages == NULL) {
 	int status=retriever_handle_error("packages");
         di_log(DI_LOG_LEVEL_WARNING, "bad d-i Packages file");
-	if (status == -1) {
-            /* Fallback error message for retreivers w/o error handling. */
-            debconf_fset(debconf, ANNA_NO_MODULES, "seen", "false");
-            debconf_input(debconf, "critical", ANNA_NO_MODULES);
-            debconf_go(debconf);
-            return 4;
-	}
-	else if (status == 0) {
+	if (status != 1) {
 	    /* Failed to handle error. */
 	    return 4;
 	}
@@ -98,13 +91,6 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
             *packages_allocator = di_system_packages_allocator_alloc();
             *packages = get_packages(*packages_allocator);
 	}
-    }
-	
-    if (*packages == NULL) {
-        debconf_fset(debconf, ANNA_NO_MODULES, "seen", "false");
-        debconf_input(debconf, "critical", ANNA_NO_MODULES);
-        debconf_go(debconf);
-        return 4;
     }
 
     /* XXX enhances is not a legal field for udebs, so why is this here?
@@ -261,17 +247,14 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
                 if (get_package(package, dest_file)) {
                     di_log(DI_LOG_LEVEL_WARNING, "get_package failed");
                     debconf_progress_stop(debconf); /* error handling may use a progress bar, so stop the current one */
-		    switch (retriever_handle_error("retrieve")) {
-		    case -1: /* Fallback error message for retreivers w/o error handling. */
-                        debconf_subst(debconf, "anna/retrieve_failed", "PACKAGE", package->package);
-                        debconf_input(debconf, "critical", "anna/retrieve_failed");
-                        debconf_go(debconf);
-		        /* fallthrough */
-		    case 0: /* Failed to handle error. */
+		    if (retriever_handle_error("retrieve") != 1) {
+		    	/* Failed to handle error. */
                         free(dest_file);
                         ret = 6;
                         goto OUT;
-		    default: /* Handled error, retry. */
+		    }
+		    else {
+			/* Handled error, retry. */
 			resume_progress_bar(progress_step, pkg_count, package);
 		        continue;
 		    }
@@ -280,19 +263,15 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
 		if (! md5sum(package->md5sum, dest_file)) {
                     di_log(DI_LOG_LEVEL_WARNING, "bad md5sum");
                     debconf_progress_stop(debconf); /* error handling may use a progress bar, so stop the current one */
-		    switch (retriever_handle_error("retrieve")) {
-		    case -1: /* Fallback error message for retreivers w/o error handling. */
-                        debconf_subst(debconf, "anna/md5sum_failed", "PACKAGE", package->package);
-                        debconf_input(debconf, "critical", "anna/md5sum_failed");
-                        debconf_go(debconf);
-			/* fallthrough */
-		    case 0: /* Failed to handle error. */
+		    if (retriever_handle_error("retrieve") != 1) {
+		        /* Failed to handle error. */
                         unlink(dest_file);
                         free(dest_file);
                         ret = 7;
 			goto OUT;
-		    default: /* Handled error, retry. */
-			/* Restart progress bar. */
+		    }
+		    else {
+		        /* Handled error, retry. */
 			resume_progress_bar(progress_step, pkg_count, package);
 			continue;
 		    }
