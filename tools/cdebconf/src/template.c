@@ -7,7 +7,7 @@
  *
  * Description: interface to debconf templates
  *
- * $Id: template.c,v 1.12 2002/11/19 23:18:44 barbier Exp $
+ * $Id: template.c,v 1.13 2002/11/20 23:47:16 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -461,7 +461,12 @@ struct template *template_load(const char *filename)
 							bufp+=2;
 						}
 						else if (*(bufp+1) != ' ')
-							*bufp = ' ';
+						{
+							if (*(bufp+1) != 0)
+								*bufp = ' ';
+                                                        else
+								*bufp = 0;
+						}
 					}
 					
 				template_lset(t, NULL, "extended_description", extdesc);
@@ -517,12 +522,17 @@ struct template *template_load(const char *filename)
 					{
 						if (*(bufp+1) == '.' &&
 						    *(bufp+2) == '\n')
-					    {
-						    *(bufp+1) = ' ';
-						    bufp+=2;
-					    }
+						{
+							*(bufp+1) = ' ';
+							bufp+=2;
+						}
 						else if (*(bufp+1) != ' ')
-							*bufp = ' ';
+						{
+							if (*(bufp+1) != 0)
+								*bufp = ' ';
+                                                        else
+								*bufp = 0;
+						}
 					}
 				
 				if (lang)
