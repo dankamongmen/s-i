@@ -22,8 +22,14 @@ static int frontend_add(struct frontend *obj, struct question *q)
 	}
 	else
 	{
-		while (qlast->next != NULL)
+		while (qlast != q && qlast->next != NULL)
+		{
 			qlast = qlast->next;
+		}
+		/* Question asked twice. debconf ignores the second question and
+		   will we. */
+		if (qlast == q)
+			return DC_OK;
 		qlast->next = q;
 		q->prev = qlast;
 	}
