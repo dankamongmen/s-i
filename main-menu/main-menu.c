@@ -98,7 +98,6 @@ get_default_menu_item(di_slist *list)
 {
 	di_system_package *p;
 	di_slist_node *node;
-	int cont;
 
 	/* Traverse the list, return the first menu item that isn't installed */
 	for (node = list->head; node != NULL; node = node->next) {
@@ -110,7 +109,6 @@ get_default_menu_item(di_slist *list)
 		/* If menutest says this item should be default, make it so */
 		if (!isdefault(p))
 			continue;
-		cont = 0;
 		/* Do not default to a package that provides a virtual
 		   package that is provided by a package that is
 		   already installed.  */
