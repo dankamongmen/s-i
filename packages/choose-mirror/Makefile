@@ -28,9 +28,13 @@ debian/choose-mirror.templates:  Mirrors.masterlist debian/templates-in
 
 mirrors_http.h: Mirrors.masterlist
 	./makeheader.pl http
+	# Unused yet
+	./makeheader.pl httplist
 	
 mirrors_ftp.h: Mirrors.masterlist
 	./makeheader.pl ftp
+	# Unused yet
+	./makeheader.pl ftplist
 
 choose-mirror.o: mirrors_http.h mirrors_ftp.h
 
