@@ -250,7 +250,7 @@ static int validate_mirror(void) {
 	char *host;
 	char *dir;
 	char *prx;
-	char *proxy;
+	char *proxy, *proxy_var;
 	int ret = 0;
 
 	mir = add_protocol("mirror");
@@ -259,10 +259,16 @@ static int validate_mirror(void) {
 	prx = add_protocol("proxy");
 	
 	debconf_get(debconf, prx);
-	if (NULL != debconf->value)
+	if (NULL != debconf->value) {
 		proxy = strdup(debconf->value);
-	else
+		if (proxy && *proxy == '\0')
+			proxy=NULL;
+		if (proxy)
+			asprintf(&proxy_var, "%s_proxy", protocol);
+	}
+	else {
 		proxy = NULL;
+	}
 	free(prx);
 
 	if (! manual_entry) {
@@ -310,17 +316,12 @@ static int validate_mirror(void) {
 		debconf_get(debconf, dir);
 		directory = strdup(debconf->value);
 	
-		if ( NULL == proxy || (proxy && *proxy == '\0'))
-			asprintf(&command, "wget -q %s://%s%s/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-		                   protocol, hostname, directory,
-				   "dists/" PREFERRED_DISTRIBUTION);
-		else
-			asprintf(&command, "%s_proxy=%s wget -q %s://%s%s/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-		                   protocol, proxy, 
-				   protocol, hostname, directory,
-				   "dists/" PREFERRED_DISTRIBUTION);
+		if (proxy)
+			setenv(proxy_var, proxy, 1);
 		
-		//fprintf(stderr, "command is %s\n", command);
+		asprintf(&command, "wget -q %s://%s%s/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+		         protocol, hostname, directory,
+		         "dists/" PREFERRED_DISTRIBUTION);
 		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
 		
 		free(hostname);
@@ -344,6 +345,12 @@ static int validate_mirror(void) {
 		}
 
 		free(command);
+		
+		if (proxy) {
+			unsetenv(proxy_var);
+			free(proxy_var);
+			free(proxy);
+		}
 		
 		debconf_progress_step(debconf, 1);
 		debconf_progress_stop(debconf);
