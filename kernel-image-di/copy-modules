@@ -39,8 +39,10 @@ open OUT, ">debian/control.out" or die "debian/control.out: $!";
 my $stanza=<IN>;
 print OUT $stanza;
 
-# Skip kernel-image stanza
+# Kernel-image stanza.
 $stanza=<IN>;
+$stanza =~ s/\$\{kernel:Version\}/$kvers-$flavour/g;
+print OUT $stanza;
 
 # Now the modules.
 while ($stanza = <IN>) {

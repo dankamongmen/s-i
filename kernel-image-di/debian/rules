@@ -50,10 +50,12 @@ clean:
 binary-image: build
 	cd kernel-source-$(KVERS); \
 		CLEAN_SOURCE=no make-kpkg --flavour di kernel-image
-	cp kernel-source-$(KVERS)/debian/files debian/
+	cat kernel-source-$(KVERS)/debian/files >> debian/files
 	mv *.deb ..
 
-# Build module udebs.
+# Build module udebs. Skip processing the kernel image deb.
+export DH_OPTIONS=
+binary-udebs: DH_OPTIONS=-Nkernel-image-$(KVERS)-$(FLAVOUR)
 binary-udebs: build
 	dh_testversion 2.1.18
 	dh_testdir
