@@ -22,6 +22,7 @@ following types will eventually be implemented:
 
 A retriever must be able to do the following:
 
+- Provides: retriever
 - Set itself up so it can access the cdrom, mirror, or whatever.
 - Get a list of the modules that are available. This will be done by
   retrieving a standard Packages file.
@@ -83,6 +84,16 @@ http retriever will need to know what version of Debian is being installed,
 what site to install from, and probably what version of the debian-installer
 is being used as well. The user will likely have to be prompted for some of
 this data during retriever setup.
+
+Retriever controller
+--------------------
+
+This is another module, that makes use of the retrievers. It depends on the
+"retreiver" virtual package, and it generates an item in the main menu.
+Then the item is picked, one of the retrievers gets configured, and then
+the retriever controller tells it to go get the Packages file. The
+controller parses the file, and uses the retreiver to download each module
+and unpacks them all.
 
 Footnotes
 ---------
