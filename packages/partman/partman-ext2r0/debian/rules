@@ -43,8 +43,6 @@ install: build
 	rm -rf `find debian/$(PACKAGE) -name .svn`
 
 binary-arch: build install
-
-binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
@@ -52,6 +50,8 @@ binary-indep: build install
 	dh_installdeb
 	dh_gencontrol -- -Vsubarch='$(SUBARCH)'
 	dh_builddeb
+
+binary-indep: build install
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
