@@ -47,7 +47,7 @@
 
 #define NEW(type) (type *)malloc(sizeof(type))
 #define DELETE(x) do { free(x); x = 0; } while (0)
-#define CHOMP(s) if (s[strlen(s)-1] == '\n') s[strlen(s)-1] = 0 
+#define CHOMP(s) if (s[strlen(s)-1] == '\n') s[strlen(s)-1] = '\0'
 
 /* Be careful with these macros; they evaluate the string arguments multiple
    times!
