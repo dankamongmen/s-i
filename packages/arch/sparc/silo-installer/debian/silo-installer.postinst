@@ -17,7 +17,9 @@ rootpart=${rootfs#$foo}
 
 # detect which hard drive has /target/boot mounted on it. this does *not*
 # have to be the same as the drive /target is mounted on.
-bootpart=$(mapdevfs `/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`)
+bootfs=$(mapdevfs `/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`)
+foo=${bootfs%?}
+bootpart=${bootfs#$foo}
 
 if [ $rootpart -ne $bootpart ]; then
 	boot="${bootpart}"
