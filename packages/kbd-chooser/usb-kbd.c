@@ -132,27 +132,13 @@ static kbd_t *usb_parse_proc (kbd_t *keyboards)
 				p = strstr(buf, "ProdID=");
 				productid = DEHEX(p + strlen("ProdID="));
 			}
-			if ((p = strstr(buf, "usbkbd")) != NULL) {
-					// This stanza refers to a usbkbd. We can use the
-					// latest Vendor=XXXX ProdID=XXXX results
-					di_debug ("Found usbkbd kdb: 0x%hx:0x%hx\n", vendorid, productid);
-					k = usb_new_entry (keyboards);
-					data = xmalloc(sizeof(usb_data));
-					k->data = (usb_data *) data;
-					data->vendorid = vendorid;
-					data->productid = productid;
-					k->present = TRUE;
-					keyboards = k;
-			}
-			if (((p = strstr(buf, "usbhid")) != NULL) &&
-			    ((p = strstr(buf, "Cls=03")) != NULL) &&    // Human Interface Device
+			// The combination of Cls=03, Sub=01, Prot=01 seems a very reliable
+			// test to see that an usb keyboard is present. The Driver=...
+			// information varies (hid, usbkbd, usbhid) and is ignored
+			if (((p = strstr(buf, "Cls=03")) != NULL) &&    // Human Interface Device
 			    ((p = strstr(buf, "Sub=01")) != NULL) &&    // Boot Interface Subclass
 			    ((p = strstr(buf, "Prot=01")) != NULL))  {  // Keyboard
-					// This stanza refers to a usbhid with a keyboard
-					// attached. Unfortunately AFAICT there's no info
-					// on the keyboard itself. For now let's assume
-					// we can use the Vendor & ProdID of the HID itself.
-					di_debug ("Found usbhid kbd: 0x%hx:0x%hx\n", vendorid, productid);
+					di_debug ("Found usb keyboard: 0x%hx:0x%hx\n", vendorid, productid);
 					k = usb_new_entry (keyboards);
 					data = xmalloc(sizeof(usb_data));
 					k->data = (usb_data *) data;
