@@ -219,7 +219,7 @@ int main(int argc, char **argv) {
 		debconf->command(debconf, "fset", "yaboot-installer/wrongmac",
 			"seen", "false", NULL);
 		debconf->command(debconf, "set", "yaboot-installer/wrongmac", "false", NULL);
-		debconf->command(debconf, "input", "yaboot-installer/wrongmac", NULL);
+		debconf->command(debconf, "input", "critical", "yaboot-installer/wrongmac", NULL);
 		debconf->command(debconf, "go", NULL);
 		exit(1);
 	}
@@ -233,7 +233,7 @@ int main(int argc, char **argv) {
 		debconf->command(debconf, "fset", "yaboot-installer/nopart",
 			"seen", "false", NULL);
 		debconf->command(debconf, "set", "yaboot-installer/nopart", "false", NULL);
-		debconf->command(debconf, "input", "yaboot-installer/nopart", NULL);
+		debconf->command(debconf, "input", "critical", "yaboot-installer/nopart", NULL);
 		debconf->command(debconf, "go", NULL);
 		exit(1);
 	}
@@ -243,7 +243,7 @@ int main(int argc, char **argv) {
 		debconf->command(debconf, "fset", "yaboot-installer/noroot",
 			"seen", "false", NULL);
 		debconf->command(debconf, "set", "yaboot-installer/noroot", "false", NULL);
-		debconf->command(debconf, "input", "yaboot-installer/noroot", NULL);
+		debconf->command(debconf, "input", "critical", "yaboot-installer/noroot", NULL);
 		debconf->command(debconf, "go", NULL);
 		exit(1);
 	}
@@ -270,14 +270,16 @@ int main(int argc, char **argv) {
 	debconf->command(debconf, "fset", "yaboot-installer/bootdev",
 		"seen", "false", NULL);
 	debconf->command(debconf, "set", "yaboot-installer/bootdev", "false", NULL);
-	debconf->command(debconf, "input", "yaboot-installer/bootdev", NULL);
+	debconf->command(debconf, "input", "low", "yaboot-installer/bootdev", NULL);
 	debconf->command(debconf, "go", NULL);
+	debconf->command(debconf, "get", "yaboot-installer/bootdev", NULL);
 	if(strcmp(debconf->value, "") == 0) {
 		debconf->command(debconf, "fset", "yaboot-installer/nopart",
 			"seen", "false", NULL);
 		debconf->command(debconf, "set", "yaboot-installer/nopart", "false", NULL);
-		debconf->command(debconf, "input", "yaboot-installer/nopart", NULL);
+		debconf->command(debconf, "input", "critical", "yaboot-installer/nopart", NULL);
 		debconf->command(debconf, "go", NULL);
+                exit(1);
 	}
 
 	/* update the kernel config file */
@@ -286,7 +288,7 @@ int main(int argc, char **argv) {
 		debconf->command(debconf, "fset", "yaboot-installer/kconferr",
 			"seen", "false", NULL);
 		debconf->command(debconf, "set", "yaboot-installer/kconferr", "false", NULL);
-		debconf->command(debconf, "input", "yaboot-installer/kconferr", NULL);
+		debconf->command(debconf, "input", "high", "yaboot-installer/kconferr", NULL);
 		debconf->command(debconf, "go", NULL);
 	}
 
@@ -296,8 +298,9 @@ int main(int argc, char **argv) {
 		debconf->command(debconf, "fset", "yaboot-installer/conferr",
 			"seen", "false", NULL);
 		debconf->command(debconf, "set", "yaboot-installer/conferr", "false", NULL);
-		debconf->command(debconf, "input", "yaboot-installer/conferr", NULL);
+		debconf->command(debconf, "input", "critical", "yaboot-installer/conferr", NULL);
 		debconf->command(debconf, "go", NULL);
+                exit(1);
 	}
 	
 	/* running "ybin" */
@@ -306,14 +309,14 @@ int main(int argc, char **argv) {
 		debconf->command(debconf, "fset", "yaboot-installer/ybinerr",
 			"seen", "false", NULL);
 		debconf->command(debconf, "set", "yaboot-installer/ybinerr", "false", NULL);
-		debconf->command(debconf, "input", "yaboot-installer/ybinerr", NULL);
+		debconf->command(debconf, "input", "critical", "yaboot-installer/ybinerr", NULL);
 		debconf->command(debconf, "go", NULL);
 		return(1);
 	}
 	
 	debconf->command(debconf, "fset", "yaboot-installer/success", "seen", "false", NULL);
 	debconf->command(debconf, "set", "yaboot-installer/success", "false", NULL);
-	debconf->command(debconf, "input", "yaboot-installer/success", NULL);
+	debconf->command(debconf, "input", "medium", "yaboot-installer/success", NULL);
 	debconf->command(debconf, "go", NULL);
 	return(0);
 }
