@@ -1,29 +1,21 @@
 #!/usr/bin/make -f
 
-PACKAGES=$(shell dh_listpackages)
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
-export DH_COMPAT=2
-
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
-build: build-stamp
-build-stamp: debian/rootskel-locale/usr/lib/locale/C.UTF-8
-	touch build-stamp
+build: debian/rootskel-locale/usr/lib/locale/C.UTF-8 debian/templates
 
 debian/rootskel-locale/usr/lib/locale/C.UTF-8: debian/C.UTF-8
 	mkdir -p debian/rootskel-locale/usr/lib/locale
 	localedef -i "debian/C.UTF-8" -f "UTF-8" \
 	  "debian/rootskel-locale/usr/lib/locale/C.UTF-8" 
 
+debian/templates: debian/templates-arch
+	debian/templates-build.pl $(ARCH) < $< > $@
+
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
-	dh_clean
+	dh_clean debian/templates
 
 install: build
 	dh_testdir
@@ -40,20 +32,15 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	install -d -o 0 -g 0 -m755 debian/rootskel/DEBIAN
-	debian/templates-build.pl $(ARCH) < debian/templates-arch > debian/rootskel/DEBIAN/templates
-	chown 0:0 debian/rootskel/DEBIAN/templates
-	chmod 644 debian/rootskel/DEBIAN/templates
+	dh_installdebconf
 	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_installdeb
 	dh_shlibdeps
 	dh_link /proc/mounts /etc/mtab 
-	for p in $(PACKAGES); do \
-		dh_gencontrol -p $$p -- -n$${p}_$(VERSION)_$(ARCH).udeb; \
-		dh_builddeb -p $$p --filename=$${p}_$(VERSION)_$(ARCH).udeb; \
-	done
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
