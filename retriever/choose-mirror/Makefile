@@ -27,10 +27,20 @@ choose-mirror.c: mirrors_http.h mirrors_ftp.h
 $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LIBS) $(LDFLAGS)
 
+strip: $(BIN)
+	strip --remove-section=.comment --remove-section=.note $(BIN)
+
 # Size optimized and stripped binary target.
 small: CFLAGS:=-Os $(CFLAGS) -DSMALL
-small: clean $(BIN)
-	strip --remove-section=.comment --remove-section=.note $(BIN)
+small: clean strip
+	ls -l $(BIN)
+
+ftp: CFLAGS:=-Os -Wall -g -D_GNU_SOURCE -DWITH_FTP -DSMALL
+ftp: clean strip
+	ls -l $(BIN)
+
+http: CFLAGS:=-Os -Wall -g -D_GNU_SOURCE -DWITH_HTTP -DSMALL
+http: clean strip
 	ls -l $(BIN)
 
 clean:
