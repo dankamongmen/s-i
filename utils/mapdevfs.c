@@ -117,6 +117,11 @@ char *normalize_devfs(const char* path)
         }
         de++;
     }
+    if ( ! de->name )
+    { /* Pass unknown devices on without changes.  This fixes LVM devices */
+        retval = strdup(path);
+        return retval;
+    }
     partnum = minor(statbuf.st_rdev) - de->minor;
 
     if (0 == partnum)
