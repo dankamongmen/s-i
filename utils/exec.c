@@ -1,4 +1,10 @@
 /*
+ * Runs a program, capturing output and logging to syslog. Returns its exit
+ * code.
+ *
+ * This is a safer replacement for shell commands like:
+ *    command | logger
+ * Since that loses the exit code.
  */
 
 #include <stdio.h>
