@@ -81,7 +81,6 @@ extern int getfd(void);
 
 int key_buf[MAX_NR_KEYMAPS];
 int mod;
-extern int unicode_used;
 int private_error_ct = 0;
 
 extern int rvalct;
@@ -236,13 +235,15 @@ rvalue1		: rvalue
 			}
 		;
 rvalue		: NUMBER
-			{$$=$1;}
+			{$$=add_number($1);}
+		| LITERAL
+			{$$=add_number($1);}
 		| UNUMBER
-			{$$=($1 ^ 0xf000); unicode_used=1;}
+			{$$=add_number($1);}
                 | PLUS NUMBER
                         {$$=add_capslock($2);}
-		| LITERAL
-			{$$=$1;}
+		| PLUS UNUMBER
+			{$$=add_capslock($2);}
                 | PLUS LITERAL
                         {$$=add_capslock($2);}
 		;
@@ -253,18 +254,6 @@ rvalue		: NUMBER
 char *keymap_name;
 int nocompose = 0;
 
-void set_kbd_mode (int fd)
-{
-	// Set kd mode as Unicode if required
-	if (unicode_used) {
-		int e;
-		e = ioctl (fd, KDSKBMODE, K_UNICODE);
-		if (DEBUG && e) {
-			di_error ("kbd-chooser: Failed to set kbd to unicode modei : %s", strerror(errno));
-			exit (1);
-		}
-	}
-}
 
 void loadkeys_wrapper (char *map)
 {
@@ -272,14 +261,12 @@ void loadkeys_wrapper (char *map)
 	fd = getfd();
 
 	keymap_name = map;
-	unicode_used = 0;
 	yywrap ();
 	if (yyparse() || private_error_ct) {
 		di_error ("kbd-chooser: Syntax error in keymap\n");
 		exit (1);
 	}
 	do_constant();
-	set_kbd_mode (fd);
 	loadkeys (fd);
 	exit (0);
 }
@@ -666,14 +653,6 @@ defkeys(int fd) {
 	int i,j,fail, warnings=0;
 	int oldm;
 
-	if (unicode_used) {
-	     /* Switch keyboard mode for a moment -
-		do not complain about errors.
-		Do not attempt a reset if the change failed. */
-	     if (ioctl(fd, KDGKBMODE, &oldm)
-	        || (oldm != K_UNICODE && ioctl(fd, KDSKBMODE, K_UNICODE)))
-		  oldm = K_UNICODE;
-	}
 
 	for(i=0; i<MAX_NR_KEYMAPS; i++) {
 	    if (key_map[i]) {
@@ -732,14 +711,6 @@ defkeys(int fd) {
 	    }
 	}
 
-	if(unicode_used && oldm != K_UNICODE) {
-	     if (ioctl(fd, KDSKBMODE, oldm)) {
-		  di_error("%s: failed to restore keyboard mode\n", PROGNAME);
-	     }
-	     di_error ( "%s: warning: this map uses Unicode symbols\n"
-		             "    (perhaps you want to do `kbd_mode -u'?)\n",
-		     PROGNAME);
-	}
 	return ct;
 }
 
