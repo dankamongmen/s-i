@@ -23,21 +23,6 @@ method=
 if [ -f $id/method ]; then
     method=$(cat $id/method)
 fi
-filesys=
-if [ -f $id/filesystem ]; then
-    filesys=$(cat $id/filesystem)
-fi
-
-if [ "$method" = keep -a "$filesys" = efi -a "$filesys" != "$fs" ]; then
-    method=format
-fi
-
-if [ "$method" = format -a "$filesys" = efi ]; then
-    echo efi >$id/method
-    method=efi
-    rm $id/mountpoint
-    rm $id/visual_mountpoint
-fi
 
 flags=''
 open_dialog GET_FLAGS $id
