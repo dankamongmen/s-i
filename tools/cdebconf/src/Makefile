@@ -14,6 +14,7 @@ LIBOBJS=commands.o confmodule.o frontend.o priority.o strutl.o configuration.o\
 BINOBJS=debconf.o
 
 all: $(BIN) $(LIB) $(SONAME)
+	(cd modules && make all)
 
 $(BIN): $(BINOBJS) $(LIB)
 	$(CC) $(CFLAGS) -o $@ $(BINOBJS) $(LDFLAGS)
@@ -26,5 +27,6 @@ $(SONAME) $(LIB): $(LIBNAME)
 
 clean:
 	-rm -f $(LIBOBJS) $(BINOBJS) $(BIN) $(LIB) $(LIBNAME) $(SONAME) *~
+	(cd modules && make clean)
 
 .PHONY: clean lib
