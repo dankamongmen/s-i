@@ -58,7 +58,8 @@ while (<KVERS>) {
 		"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname$extraname");
 	doit("install", "-D", "-m", 644,
 		"$sourcedir/boot/System.map-$installedname",
-		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname");
+		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname")
+	      if -e "$sourcedir/boot/System.map-$installedname";
 	doit("./copy-modules", $kernelversion, $flavour, $installedname);
 	doit("./find-dups", "$kernelversion-$flavour");
 }
