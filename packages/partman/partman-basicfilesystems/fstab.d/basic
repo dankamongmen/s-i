@@ -20,7 +20,17 @@ for dev in $DEVICES/*; do
 		    [ -f "$id/mountpoint" ] || continue
 		    mountpoint=$(cat $id/mountpoint)
 		    if [ -f "$id/mountoptions" ]; then
-			options=$(cat $id/mountoptions | sed 's/ //g')
+			if [ "$mountpoint" != /tmp ]; then
+			    options=$(cat $id/mountoptions | sed 's/ //g')
+			else
+			    # due to #249322, #255135, #258117:
+			    options=$(cat $id/mountoptions |
+				     sed  -e 's/ //g' \
+					 -e 's/noexec//g' \
+					 -e 's/,,/,/g' \
+					 -e 's/^,//g' \
+					 -e 's/,$//g' )
+			fi
 		    else
 			options=''
 		    fi

@@ -41,7 +41,13 @@ $flag"
 done
 close_dialog
 
-if [ "$method" = lvm -a "$has_lvm" = no ]; then
+if [ "$method" = '' -a "$has_lvm" = yes ]; then
+    echo lvm >$dev/$id/method
+    if [ -f $dev/$id/use_filesystem ]; then
+	rm $dev/$id/use_filesystem
+    fi
+    >$dev/$id/format
+elif [ "$method" = lvm -a "$has_lvm" = no ]; then
     open_dialog SET_FLAGS $id
     write_line "$flags"
     write_line lvm

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+dev="$2"
+id=$3
+
+[ -f $dev/$id/method ] || exit 0
+method=$(cat $dev/$id/method)
+
+case "$method" in
+    keep)
+	echo format >$dev/$id/method
+	> $dev/$id/format
+	> $dev/$id/use_filesystem
+	;;
+    format)
+	echo keep >$dev/$id/method
+	if [ -f $dev/$id/format ]; then
+	    rm $dev/$id/format
+	fi
+	> $dev/$id/use_filesystem
+	;;
+esac
+
+update_partition $dev $id

@@ -1,7 +1,3 @@
-Template: partman-lvm/text/method
-Type: text
-_Description: Use the partition as a physical volume for LVM
-
 Template: partman-lvm/text/configure_lvm
 Type: text
 _Description: Configure the Logical Volume Manager
@@ -9,10 +5,10 @@ _Description: Configure the Logical Volume Manager
 Template: partman-lvm/confirm
 Type: boolean
 Default: false
-_Description: Write the changes to the storage devices and configure LVM?
+_Description: Write the changes to disks and configure LVM?
  Before the Logical Volume Manager can be configured, the current
- paritioning scheme has to be written to disk. These changes cannot be
- undone.
+ paritioning scheme has to be written to disk.  These changes cannot
+ be undone. 
  .
  After the Logical Volume Manager is configured, no additional changes
  to the partitions in the disks containing physical volumes are
@@ -21,10 +17,19 @@ _Description: Write the changes to the storage devices and configure LVM?
  .
  ${ITEMS}
 
+Template: partman-lvm/confirm_nochanges
+Type: boolean
+Default: false
+_Description: Ready with partitioning?
+ After the Logical Volume Manager is configured, no additional changes
+ to the partitions in the disks containing physical volumes are
+ allowed. Please decide if you are satisfied with the current
+ partitioning scheme in these disks before continuing.
+
 Template: partman-lvm/commit_failed
 Type: error
 _Description: LVM configuration failure
- An error occurred while writing the changes to the storage devices.
+ An error occurred while writing the changes to the disks.
  .
  The configuration of the Logical Volume Manager is aborted.
 

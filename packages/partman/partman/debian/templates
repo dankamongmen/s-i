@@ -83,16 +83,26 @@ _Description: Write a new empty partition table?
  Confirm whether you actually want to create a new partition table and
  write it to disk.
 
+Template: partman/confirm_nochanges
+Type: boolean
+Default: false
+_Description: Continue with the installation?
+ It seams there are no changes in the partition tables and no file
+ systems will be created.
+ .
+ If you are going to use already created file systems then be sure
+ that there are no files that can prevent the installation of the base
+ packages.
+
 Template: partman/confirm
 Type: boolean
 Default: false
-_Description: Write these changes to disk?
- If you continue, these changes to the partition table will be
- written to disk.
+_Description: Write the changes to disks?
+ If you continue, all changes in the partition tables will be
+ written to the disks.
  .
  WARNING: This will destroy all data on any partitions you have
- removed as well as on the partitions on which you have chosen to
- create new file systems.
+ removed as well as on the partitions that are going to be formatted.
  .
  ${ITEMS}
 
@@ -104,6 +114,22 @@ Template: partman/text/confirm_item
 Type: text
 # for example: "partition #6 of IDE0 master as ext3 journalling file system"
 _Description: partition #${PARTITION} of ${DEVICE} as ${TYPE}
+
+Template: partman/text/confirm_partitem_header
+Type: text
+_Description: The partition tables of the following devices are changed:
+
+Template: partman/confirm_abort
+Type: boolean
+Default: false
+_Description: Abort the partitioning and specify the next step?
+ If you abort the partitioning, you will be given more controll over
+ the installation process and you will be able to specify the next
+ step.
+ .
+ If you want to use the guided partitioning tool, do not abort the
+ partitioning, but choose "Guided partitioning" from inside the
+ partitioner. 
 
 Template: partman/storage_device
 Type: select
@@ -119,7 +145,7 @@ Template: partman/active_partition
 Type: select
 Choices: ${CHOICES}
 _Description: Partition settings:
- You are editing partition #${PARTITION} of ${DEVICE}. ${OTHERINFO}
+ You are editing partition #${PARTITION} of ${DEVICE}. ${OTHERINFO} ${DESTROYED}
 
 Template: partman/text/there_is_detected
 Type: text
@@ -128,6 +154,10 @@ _Description: This partition is formatted with the ${FILESYSTEM}.
 Template: partman/text/none_detected
 Type: text
 _Description: No existing file system was detected in this partition.
+
+Template: partman/text/destroyed
+Type: text
+_Description: All data in it WILL BE DESTROYED!
 
 Template: partman/show_partition_chs
 Type: note
@@ -140,6 +170,10 @@ _Description: The free space starts from ${FROMCHS} and ends at ${TOCHS}.
 Template: partman/text/please_wait
 Type: text
 _Description: Please wait...
+
+Template: partman/text/formatting
+Type: text
+_Description: Partitions formatting
 
 Template: partman/text/processing
 Type: text

@@ -12,15 +12,23 @@ else
     method=dont_use
 fi
 
-
-db_metaget partman/method_long/$method description || RET=''
-
-if [ "$RET" ]; then
-    description="$RET"
+if [ -f $id/filesystem -a '(' "$method" = keep -o "$method" = format ')' ]; then
+    fs=$(cat $id/filesystem)
+    db_metaget partman/filesystem_long/$fs description || RET=''
+    if [ "$RET" ]; then
+	description="$RET"
+    else
+	description="$fs"
+    fi
 else
-    description="$method"
+    db_metaget partman/method_long/$method description || RET=''
+    if [ "$RET" ]; then
+	description="$RET"
+    else
+	description="$method"
+    fi
 fi
-	
+
 db_metaget partman-target/text/method description
 RET=$(stralign -25 "$RET")
 printf "method\t%s%s\n" "${RET}" "$description"

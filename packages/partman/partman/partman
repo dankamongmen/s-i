@@ -12,6 +12,96 @@ abort () {
     exit $1
 }
 
+confirm_changes () {
+    local dev x part partitions num id size type fs path name filesystem partitems items
+    # Compute the changes we are going to do
+    partitems=''
+    items=''
+    for dev in $DEVICES/*; do
+	[ -d "$dev" ] || continue
+	cd $dev
+
+	open_dialog IS_CHANGED
+	read_line x
+	close_dialog
+	if [ "$x" = yes ]; then
+	    partitems="${partitems}   $(humandev $(cat device))
+"
+	fi
+
+	partitions=
+	open_dialog PARTITIONS
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+	    [ "$fs" != free ] || continue
+	    partitions="$partitions $id,$num"
+	done
+	close_dialog
+	
+	for part in $partitions; do
+	    id=${part%,*}
+	    num=${part#*,}
+            [ -f $id/method -a -f $id/format \
+                -a -f $id/visual_filesystem ] || continue
+            [ -f $id/filesystem -o ! -f $id/formatted \
+                -o $id/formatted -ot $id/method ] || continue
+            [ ! -f $id/filesystem -o ! -f $id/formatted \
+                -o $id/formatted -ot $id/method \
+                -o $id/formatted -ot $id/filesystem ] || continue
+	    filesystem=$(cat $id/visual_filesystem)
+	    db_subst partman/text/confirm_item TYPE "$filesystem"
+	    db_subst partman/text/confirm_item PARTITION "$num"
+	    db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
+	    db_metaget partman/text/confirm_item description
+	    
+	    items="${items}   ${RET}
+"
+	done
+    done
+
+    if [ "$items" ]; then
+	db_metaget partman/text/confirm_item_header description
+	items="$RET
+$items"
+    fi
+    
+    if [ "$partitems" ]; then
+	db_metaget partman/text/confirm_partitem_header description
+	partitems="$RET
+$partitems"
+    fi
+    
+    if [ "$partitems$items" ]; then
+	if [ -z "$items" ]; then
+	    x="$partitems"
+	elif [ -z "$partitems" ]; then
+	    x="$items"
+	else
+	    x="$partitems
+$items"
+	fi
+	db_reset partman/confirm
+	db_subst partman/confirm ITEMS "$x"
+	db_input critical partman/confirm
+	db_go || true
+	db_get partman/confirm
+	if [ "$RET" = false ]; then
+	    return 1
+	else
+	    return 0
+	fi
+    else
+	db_reset partman/confirm_nochanges
+	db_input high partman/confirm_nochanges
+	db_go || true
+	db_get partman/confirm_nochanges
+	if [ "$RET" = false ]; then
+	    return 1
+	else
+	    return 0
+	fi
+    fi
+}
+
 db_capb backup
 
 # Measure the width of partman/text/number here to make things faster.
@@ -48,12 +138,12 @@ while true; do
 	    # Not every init script has, or needs, its own progress
 	    # template. Add them to slow init scripts only.
 	    if ! db_progress INFO partman/progress/init/$base; then
-		    db_progress INFO partman/progress/init/fallback
-            fi
+		db_progress INFO partman/progress/init/fallback
+	    fi
 	    if ! $s; then
-	        db_progress STOP
-                abort 10
-            fi
+		db_progress STOP
+		abort 10
+	    fi
 	fi
 	db_progress STEP 1
     done
@@ -62,62 +152,20 @@ while true; do
     while true; do
 	ask_user /lib/partman/choose_partition
 	exitcode=$?
-	[ $exitcode -ge 100 ] && break
-    done
-    
-    if [ $exitcode -eq 255 ]; then
-	abort 10
-    fi
-    
-    # Compute the changes we are going to do
-    items=''
-    for dev in $DEVICES/*; do
-	[ -d "$dev" ] || continue
-	cd $dev
-	partitions=
-	open_dialog PARTITIONS
-	while { read_line num id size type fs path name; [ "$id" ]; }; do
-	    [ "$fs" != free ] || continue
-	    partitions="$partitions $id,$num"
-	done
-	close_dialog
-	
-	for part in $partitions; do
-	    id=${part%,*}
-	    num=${part#*,}
-            [ -f $id/method -a -f $id/format \
-                -a -f $id/visual_filesystem ] || continue
-            [ -f $id/filesystem -o ! -f $id/formatted \
-                -o $id/formatted -ot $id/method ] || continue
-            [ ! -f $id/filesystem -o ! -f $id/formatted \
-                -o $id/formatted -ot $id/method \
-                -o $id/formatted -ot $id/filesystem ] || continue
-	    filesystem=$(cat $id/visual_filesystem)
-	    db_subst partman/text/confirm_item TYPE "$filesystem"
-	    db_subst partman/text/confirm_item PARTITION "$num"
-	    db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
-	    db_metaget partman/text/confirm_item description
-	    
-	    items="${items}   ${RET}
-"
-	done
+	if [ $exitcode -eq 255 ]; then
+	    db_reset partman/confirm_abort
+	    db_subst partman/confirm_abort ITEMS "$items"
+	    db_input high partman/confirm_abort
+	    db_go || true
+	    db_get partman/confirm_abort
+	    if [ "$RET" = true ]; then
+		abort 10 # back up to main menu
+	    fi
+	elif [ $exitcode -ge 100 ] && confirm_changes; then
+	    break
+	fi
     done
 
-    if [ "$items" ]; then
-	db_metaget partman/text/confirm_item_header description
-	items="$RET
-$items"
-    fi
-    
-    db_reset partman/confirm
-    db_subst partman/confirm ITEMS "$items"
-    db_input critical partman/confirm
-    db_go || true
-    db_get partman/confirm
-    if [ "$RET" = false ]; then
-	    abort 10 # back up to main menu
-    fi
-    
     for s in /lib/partman/commit.d/*; do
 	if [ -x $s ]; then
 	    $s || continue 2

@@ -44,6 +44,13 @@ else
 		fi
 		db_subst partman/active_partition OTHERINFO "${RET}"
 
+		if [ -f $id/detected_filesystem -a -f $id/format ]; then
+		    db_metaget partman/text/destroyed description
+		    db_subst partman/active_partition DESTROYED "${RET}"
+		else
+		    db_subst partman/active_partition DESTROYED ''
+		fi
+
 		ask_user /lib/partman/active_partition "$dev" "$id"
 		exitcode="$?"
 		if [ "$exitcode" -ge 100 ]; then

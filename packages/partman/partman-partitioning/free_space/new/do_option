@@ -18,31 +18,54 @@ close_dialog
 freehsize=$(longint2human $freesize)
 
 ask_for_size () {
-	local noninteractive
-	noninteractive=true
-	while true; do
-		size=''
-		while [ ! "$size" ]; do
-			db_set partman-partitioning/new_partition_size "$freehsize"
-			db_fset partman-partitioning/new_partition_size seen false
-			db_subst partman-partitioning/new_partition_size MAXSIZE "$freehsize"
-			db_input high partman-partitioning/new_partition_size ||
-				$noninteractive
-			noninteractive="return 1"
-			db_go || return 1
-			db_get partman-partitioning/new_partition_size
-			if valid_human "$RET"; then
-				hsize="$RET"
-				size=$(human2longint "$hsize")
-			else
-				db_fset partman-partitioning/bad_new_partition_size seen false
-				db_input high partman-partitioning/bad_new_partition_size || true
-				db_go || true
-			fi
-		done
-		if ask_for_type; then break; fi
+    local noninteractive
+    noninteractive=true
+    while true; do
+	size=''
+	while [ ! "$size" ]; do
+	    db_set partman-partitioning/new_partition_size "$freehsize"
+	    db_fset partman-partitioning/new_partition_size seen false
+	    db_subst partman-partitioning/new_partition_size MAXSIZE "$freehsize"
+	    db_input high partman-partitioning/new_partition_size ||
+	    $noninteractive
+	    noninteractive="return 1"
+	    db_go || return 1
+	    db_get partman-partitioning/new_partition_size
+	    
+	    case "$RET" in
+		max)
+		    size=$freesize
+		    hsize="$freehsize"
+		    ;;
+		*%)
+		    digits=$(expr "$RET" : '\([1-9][0-9]*\) *%$')
+		    if [ "$digits" ]; then
+			maxmb=$(expr 0000000"$freesize" : '0*\(..*\)......$')
+			size=$(($digits * $maxmb / 100))000000
+		    fi
+		    if [ "$digits" = 100 ]; then
+			hsize="$freehsize"
+		    else
+			hsize=some_number
+		    fi
+		    ;;
+		*)
+		    if valid_human "$RET"; then
+			size=$(human2longint "$RET")
+		    fi
+		    hsize="$RET"
+		    ;;
+	    esac
+	    
+	    if [ -z "$size" ]; then
+		db_fset partman-partitioning/bad_new_partition_size seen false
+		db_input high partman-partitioning/bad_new_partition_size || true
+		db_go || true
+	    fi
 	done
-	return 0
+	if ask_for_type; then break; fi
+    done
+    return 0
 }
 
 ask_for_type () {

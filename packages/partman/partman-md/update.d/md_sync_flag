@@ -41,7 +41,13 @@ $flag"
 done
 close_dialog
 
-if [ "$method" = raid -a "$has_raid" = no ]; then
+if [ "$method" = '' -a "$has_raid" = yes ]; then
+    echo raid >$dev/$id/method
+    if [ -f $dev/$id/use_filesystem ]; then
+       rm $dev/$id/use_filesystem
+    fi
+    >$dev/$id/format
+elif [ "$method" = raid -a "$has_raid" = no ]; then
     open_dialog SET_FLAGS $id
     write_line "$flags"
     write_line raid

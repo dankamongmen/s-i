@@ -1,0 +1,21 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+dev=$1
+id=$2
+
+filesystems=$(
+    for i in /lib/partman/valid_filesystems/*; do
+	[ -x $i ] || continue
+	$i $dev $id existing
+	$i $dev $id formatable
+    done | sort | uniq
+)
+
+for fs in $filesystems; do
+    db_metaget partman/filesystem_long/$fs description || RET=''
+    RET=${RET:-$fs}
+    printf "${fs}\t${RET}\n"
+done
+

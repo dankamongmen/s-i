@@ -16,6 +16,7 @@ close_dialog
 hminsize=$(longint2human $minsize)
 hcursize=$(longint2human $cursize)
 hmaxsize=$(longint2human $maxsize)
+minpercent=$((100 * $minsize / $maxsize))
 
 open_dialog VIRTUAL $oldid
 read_line virtual
@@ -40,6 +41,7 @@ ask_for_size () {
 	    db_fset partman-partitioning/new_size seen false
 	    db_subst partman-partitioning/new_size MINSIZE "$hminsize"
 	    db_subst partman-partitioning/new_size MAXSIZE "$hmaxsize"
+	    db_subst partman-partitioning/new_size PERCENT "$minpercent%"
 	    db_input high partman-partitioning/new_size || $noninteractive
 	    noninteractive="return 1"
 	    db_go || return 1
@@ -51,8 +53,8 @@ ask_for_size () {
 		*%)
 		    digits=$(expr "$RET" : '\([1-9][0-9]*\) *%$')
 		    if [ "$digits" ]; then
-			minmb=$(expr 0000000"$minsize" : '0*\(..*\)......$')
-			newsize=$((((1 + $minmb) * (100 + $digits))/100))000000
+			maxmb=$(expr 0000000"$maxsize" : '0*\(..*\)......$')
+			newsize=$(($digits * $maxmb / 100))000000
 		    fi
 		    ;;
 		*)

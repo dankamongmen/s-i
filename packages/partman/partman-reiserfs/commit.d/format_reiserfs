@@ -54,14 +54,27 @@ for dev in $DEVICES/*; do
  		open_dialog CREATE_FILE_SYSTEM $id reiserfs
  		read_line status
  		close_dialog
-                sync
+		sync
 		if [ "$status" != OK ]; then
-		    db_progress START 0 3 partman/text/please_wait
+		    db_progress START 0 3 partman/text/formatting
 		    db_progress INFO $template
 		    db_progress SET 1
-		    if
+
+		    if [ -f $id/label ]; then
+			label=$(cat $id/label|sed 's/\(................\).*/\1/g')
+		    elif [ -f $id/mountpoint ]; then
+			label=$(cat $id/mountpoint|sed 's/.*\(................\)/\1/g')
+		    else
+			label=''
+		    fi
+		    if [ "$label" ]; then
+			mkfs.reiserfs -l "$label" -f -q $device >/dev/null 2>>/var/log/messages
+			code=$?
+		    else
 			mkfs.reiserfs -f -q $device >/dev/null 2>>/var/log/messages
-		    then
+			code=$?
+		    fi
+		    if [ "$code" = 0 ]; then
 			sync
 			status=OK
 		    else
@@ -69,7 +82,7 @@ for dev in $DEVICES/*; do
 		    fi
 		    db_progress STOP
 		fi
-                if [ "$status" != OK ]; then
+		if [ "$status" != OK ]; then
 		    db_fset partman-reiserfs/create_failed seen false
 		    db_subst partman-reiserfs/create_failed PARTITION "$num"
 		    db_subst partman-reiserfs/create_failed DEVICE $(humandev $(cat device))

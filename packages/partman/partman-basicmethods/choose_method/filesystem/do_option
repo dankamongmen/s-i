@@ -1,0 +1,38 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+fs=$1
+dev=$2
+id=$3
+
+[ -d $dev/$id ] || mkdir $dev/$id
+
+existing=no
+for j in \
+    $(
+        for i in /lib/partman/valid_filesystems/*; do
+            [ -x $i ] || continue
+	   $i $dev $id existing
+        done
+    )
+do
+    if [ "$j" = "$fs" ]; then
+        existing=yes
+    fi
+done
+
+if [ $existing = yes ]; then
+    echo keep >$dev/$id/method
+    if [ -f $dev/$id/format ]; then
+	rm $dev/$id/format
+    fi
+    > $dev/$id/use_filesystem
+else
+    echo format >$dev/$id/method
+    > $dev/$id/format
+    > $dev/$id/use_filesystem
+fi
+
+echo $fs >$dev/$id/filesystem
+update_partition $dev $id

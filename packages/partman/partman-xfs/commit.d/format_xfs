@@ -48,11 +48,23 @@ for dev in $DEVICES/*; do
 		db_subst $template PARTITION "$num"
 		db_subst $template DEVICE $(humandev $(cat device))
 
-		db_progress START 0 3 partman/text/please_wait
+		db_progress START 0 3 partman/text/formatting
 		db_progress INFO $template
 		db_progress SET 1
-		mkfs.xfs -f $device >/dev/null 2>>/var/log/messages
-		code=$?
+		if [ -f $id/label ]; then
+		    label=$(cat $id/label|sed 's/\(............\).*/\1/g')
+		elif [ -f $id/mountpoint ]; then
+		    label=$(cat $id/mountpoint|sed 's/.*\(............\)/\1/g')
+		else
+		    label=''
+		fi
+		if [ "$label" ]; then
+		    mkfs.xfs -L "$label" -f $device >/dev/null 2>>/var/log/messages
+		    code=$?
+		else
+		    mkfs.xfs -f $device >/dev/null 2>>/var/log/messages
+		    code=$?
+		fi
 		sync
 		db_progress STOP
 

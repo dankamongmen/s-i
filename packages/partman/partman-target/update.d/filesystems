@@ -19,77 +19,57 @@ if [ $fs = free -a -f $id/method ]; then
     rm $id/method
 fi
 
-if [ ! -f $id/method ]; then
+if [ ! -f $id/method -o ! -f $id/use_filesystem ]; then
     [ ! -f $id/acting_filesystem ] || rm $id/acting_filesystem
-    >$id/available_filesystems
     exit 0
 fi
 
-method=$(cat $id/method)
-
-if [ ! -f $id/use_filesystem ]; then
-    property="$method"
-elif [ -f $id/format ]; then
-    property=formatable
+if [ -f $id/filesystem ]; then
+    cp $id/filesystem $id/acting_filesystem
 else
-    property=existing
-fi
-
-# sed can be removed here
-filesystems=$(
-    for i in /lib/partman/valid_filesystems/*; do
-	if [ -x $i ]; then $i $dev $id "$property"; fi
-    done | sed "s/${TAB}.*//"
-)
-
-available=''
-for fs in $filesystems; do
-    if [ "$fs" ]; then
-	db_metaget partman/filesystem_long/$fs description || RET=''
-	RET=${RET:-$fs}
-	if [ "$available" ]; then
-	    available="${available}${NL}${fs}${TAB}${RET}"
-	else
-	    available="${fs}${TAB}${RET}"
-	fi
+    if [ -f $id/acting_filesystem ]; then
+	rm $id/acting_filesystem
     fi
-done
-
-echo "$available" >$dev/$id/available_filesystems
-
-# The outer echo removes the spaces
-case $(echo $(echo "$available" | wc -l)) in
-    0)
-	if [ -f $id/acting_filesystem ]; then
-	    rm $id/acting_filesystem
-	fi
-	;;
-    1)
-	echo ${available%$TAB*} >$id/acting_filesystem
-	;;
-    *)
-	if [ -f $id/filesystem ]; then
-	    cp $id/filesystem $id/acting_filesystem
-	else
-	    if [ -f $id/acting_filesystem ]; then
-		rm $id/acting_filesystem
-	    fi
-	fi
-	;;
-esac
-
+fi
 
 open_dialog PARTITION_INFO $id
 read_line num id size type fs path name
 close_dialog
 
+acting_filesystem=''
 if
-    [ -f $dev/$id/acting_filesystem ] \
-	&& new_acting=$(cat $dev/$id/acting_filesystem) \
-	&& [ -f /lib/partman/parted_names/$new_acting ] \
-	&& new_fs=$(cat /lib/partman/parted_names/$new_acting) \
+    [ -f $id/acting_filesystem ] \
+	&& acting_filesystem=$(cat $id/acting_filesystem) \
+	&& [ -f /lib/partman/parted_names/$acting_filesystem ] \
+	&& new_fs=$(cat /lib/partman/parted_names/$acting_filesystem) \
 	&& [ "$fs" != "$new_fs" ]
 then
     open_dialog CHANGE_FILE_SYSTEM $id $new_fs
     close_dialog
 fi
+
+existing=no
+formatable=no
+
+for i in /lib/partman/valid_filesystems/*; do
+    [ -x $i ] || continue
+    if [ "`$i $dev $id existing`" = "$acting_filesystem" ]; then
+	existing=yes
+    fi
+    if [ "`$i $dev $id formatable`" = "$acting_filesystem" ]; then
+	formatable=yes
+    fi
+done
+
+if [ $existing = yes ]; then
+    > $dev/$id/existing
+else
+    [ ! -f $dev/$id/existing ] || rm $dev/$id/existing
+fi
+
+if [ $formatable = yes ]; then
+    > $dev/$id/formatable
+else
+    [ ! -f $dev/$id/formatable ] || rm $dev/$id/formatable
+fi
+

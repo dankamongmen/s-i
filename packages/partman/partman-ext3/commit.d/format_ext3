@@ -61,7 +61,7 @@ for dev in $DEVICES/*; do
 		    fi
 		fi
 		if [ "$status" != OK ]; then
-		    db_progress START 0 3 partman/text/please_wait
+		    db_progress START 0 3 partman/text/formatting
 		    db_progress INFO $template
 		    db_progress SET 1
 		    if
@@ -74,7 +74,21 @@ for dev in $DEVICES/*; do
 		    fi
 		    db_progress STOP
 		fi
-                if [ "$status" != OK ]; then
+		if [ "$status" = OK ]; then
+		    if [ -f $id/label ]; then
+			label=$(cat $id/label|
+			    sed 's/\(................\).*/\1/g')
+		    elif [ -f $id/mountpoint ]; then
+			label=$(cat $id/mountpoint|
+			    sed 's/.*\(................\)/\1/g')
+		    else
+			label=''
+		    fi
+		    if [ "$label" ]; then
+			tune2fs -L "$label" $device
+		    fi
+		fi
+		if [ "$status" != OK ]; then
 		    db_fset partman-ext3/create_failed seen false
 		    db_subst partman-ext3/create_failed PARTITION "$num"
 		    db_subst partman-ext3/create_failed DEVICE $(humandev $(cat device))

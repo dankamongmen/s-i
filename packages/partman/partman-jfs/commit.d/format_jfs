@@ -48,13 +48,28 @@ for dev in $DEVICES/*; do
 		db_subst $template PARTITION "$num"
 		db_subst $template DEVICE $(humandev $(cat device))
 
-		db_progress START 0 3 partman/text/please_wait
+		db_progress START 0 3 partman/text/formatting
 		db_progress INFO $template
 		db_progress SET 1
 		mkfs.jfs -q $device >/dev/null 2>>/var/log/messages
 		code=$?
 		sync
 		db_progress STOP
+
+		if [ "$code" = 0 ]; then
+		    if [ -f $id/label ]; then
+			label=$(cat $id/label|
+			    sed 's/\(................\).*/\1/g')
+		    elif [ -f $id/mountpoint ]; then
+			label=$(cat $id/mountpoint|
+			    sed 's/.*\(................\)/\1/g')
+		    else
+			label=''
+		    fi
+		    if [ "$label" ]; then
+			jfs_tune -L "$label" $device
+		    fi
+		fi
 
 		if [ "$code" != 0 ]; then
 		    db_fset partman-jfs/create_failed seen false

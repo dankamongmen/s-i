@@ -675,8 +675,8 @@ resize_partition(PedDisk *disk, PedPartition *part,
                 fs = ped_file_system_open(&(part->geom));
                 activate_exception_handler();
                 log("opened file system: %s", NULL != fs ? "yes" : "no");
-                if (NULL != fs && (fs->geom->start != (part->geom).start
-                                   || fs->geom->end != (part->geom).end)) {
+                if (NULL != fs && (fs->geom->start < (part->geom).start
+                                   || fs->geom->end > (part->geom).end)) {
                         ped_file_system_close(fs);
                         fs = NULL;
                 }
@@ -1081,6 +1081,21 @@ command_disk_unchanged()
         open_out();
         oprintf("OK\n");
         unchange_named(device_name);
+}
+
+void
+command_is_changed()
+{
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        log("command_is_changed(%s)", device_name);
+        open_out();
+        oprintf("OK\n");
+        if (named_is_changed(device_name))
+                oprintf("yes\n");
+        else
+                oprintf("no\n");
 }
 
 /* Print in /var/log/partition_dump information about the disk, the
@@ -1766,6 +1781,7 @@ command_resize_partition()
                 critical_error("No such partition");
         if (1 != iscanf(" %lli", &new_size))
                 critical_error("Expected new size");
+        log("New size: %lli", new_size);
         start = (part->geom).start;
         end = start + new_size / PED_SECTOR_SIZE - 1;
         if (named_partition_is_virtual(device_name, 
@@ -1905,6 +1921,8 @@ main_loop()
                         command_virtual();
                 else if (!strcasecmp(str, "DISK_UNCHANGED"))
                         command_disk_unchanged();
+                else if (!strcasecmp(str, "IS_CHANGED"))
+                        command_is_changed();
                 else if (!strcasecmp(str, "DUMP"))
                         command_dump();
                 else if (!strcasecmp(str, "COMMIT"))

@@ -533,7 +533,7 @@ device_name () {
 }
 
 enable_swap () {
-    local swaps dev num id size type fs path name method filesystem
+    local swaps dev num id size type fs path name method
     # do swapon only when we will be able to swapoff afterwards
     [ -f /proc/swaps ] || return 0
     swaps=''
@@ -544,9 +544,8 @@ enable_swap () {
 	while { read_line num id size type fs path name; [ "$id" ]; }; do
 	    [ $fs != free ] || continue
 	    [ -f "$id/method" ] || continue
-	    [ -f "$id/acting_filesystem" ] || continue
-	    filesystem=$(cat $id/acting_filesystem)
-	    if [ "$filesystem" = linux-swap ]; then
+	    method=$(cat $id/method)
+	    if [ "$method" = swap ]; then
 		swaps="$swaps $path"
 	    fi
 	done

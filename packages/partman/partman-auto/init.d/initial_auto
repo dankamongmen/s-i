@@ -2,12 +2,8 @@
 
 . /usr/share/debconf/confmodule
 
-# Only run at >= high priority the first time.
+# Only run the first time.
 if [ -f /var/lib/partman/initial_auto ]; then
-	exit 0
-fi
-db_get debconf/priority
-if [ "$RET" != high ] && [ "$RET" != critical ]; then
 	exit 0
 fi
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
@@ -18,6 +14,3 @@ echo "partman-auto/init_automatically_partition" > /lib/partman/automatically_pa
 ask_user /lib/partman/automatically_partition 
 code=$?
 echo "partman-auto/automatically_partition" > /lib/partman/automatically_partition/question
-if [ "$code" = 255 ]; then
-    exit 1
-fi

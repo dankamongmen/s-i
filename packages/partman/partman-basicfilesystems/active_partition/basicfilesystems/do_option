@@ -124,5 +124,28 @@ case $1 in
 	    update_partition $dev $id
 	fi
 	;;
+    label)
+	if [ -f $part/label ]; then
+	    label=$(cat $part/label)
+	elif [ -f $part/mountpoint ]; then
+	    if [ "$filesystem" = ext2 ]; then
+		label=$(cat $part/mountpoint)
+	    else
+		label=$(sed s,.*/,, $part/mountpoint | tr a-z A-Z)
+	    fi
+	else
+	    label=''
+	fi
+	db_reset partman-basicfilesystems/choose_label
+	db_set partman-basicfilesystems/choose_label "$label"
+	db_input critical partman-basicfilesystems/choose_label || true
+	db_go || exit 1
+	db_get partman-basicfilesystems/choose_label
+	if [ "$RET" ]; then
+	    echo "$RET" >$part/label
+	else
+	    [ ! -f $part/label ] || rm $part/label
+	fi
+	;;
 esac
 

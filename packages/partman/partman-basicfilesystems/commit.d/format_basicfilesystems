@@ -55,7 +55,7 @@ for dev in $DEVICES/*; do
 			close_dialog
 			sync
 			if [ "$status" != OK ]; then
-			    db_progress START 0 3 partman/text/please_wait
+			    db_progress START 0 3 partman/text/formatting
 			    db_progress INFO $template
 			    db_progress SET 1
 			    if
@@ -67,6 +67,20 @@ for dev in $DEVICES/*; do
 				status=failed
 			    fi
 			    db_progress STOP
+			fi
+			if [ "$status" = OK ]; then
+			    if [ -f $id/label ]; then
+				label=$(cat $id/label|
+				    sed 's/\(................\).*/\1/g')
+			    elif [ -f $id/mountpoint ]; then
+				label=$(cat $id/mountpoint|
+				    sed 's/.*\(................\)/\1/g')
+			    else
+				label=''
+			    fi
+			    if [ "$label" ]; then
+				tune2fs -L "$label" $device
+			    fi
 			fi
 			;;
 		    fat16|fat32)
