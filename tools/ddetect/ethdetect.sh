@@ -6,7 +6,7 @@ set -e
 
 is_not_loaded() {
     module="$1"
-    if cut -d" " -f1 /proc/modules | grep -q "$module" ; then
+    if cut -d" " -f1 /proc/modules | grep -q "^${module}\$" ; then
 	false
     else
 	true
