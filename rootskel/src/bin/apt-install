@@ -46,23 +46,6 @@ unset DEBIAN_FRONTEND
 unset DEBCONF_FRONTEND
 unset DEBCONF_REDIR
 
-# first copy the files into /target/, then install in chroot
-# environment. This works around a bug in glibc, and make sure the
-# packages run their postinst script in their target environment.
-
-PATH=$PATH:/target/usr/bin:/target/bin:/target/usr/sbin:/target/sbin \
-LD_LIBRARY_PATH=/target/usr/lib:/target/lib \
-/target/usr/bin/apt-get \
-    -o Dir::State=/target/var/lib/apt \
-    -o Dir::State::status=/target/var/lib/dpkg/status \
-    -o Dir::Cache=/target/var/cache/apt \
-    -o Dir::Etc=/target/etc/apt \
-    -o Dir::Bin::methods=/target/usr/lib/apt/methods \
-    -o Dir::Bin::gzip=/target/bin/gzip \
-    -o Dir::Bin::dpkg=/target/usr/bin/dpkg \
-    -o Dpkg::Options::=--root=/target \
-    -y --download-only install $@ >> $log 2>&1
-
 # Some packages (eg. the kernel-image package) require a mounted /proc/
 # Only mount it if it isn't mounted already
 if [ ! -f /target/proc/cmdline ] ; then
@@ -70,7 +53,7 @@ if [ ! -f /target/proc/cmdline ] ; then
 fi
 
 DEBIAN_FRONTEND=noninteractive \
-chroot /target apt-get --no-download -y install $@ < /dev/null >> $log 2>&1
+chroot /target apt-get -y install $@ < /dev/null >> $log 2>&1
 
 umount /target/proc
 
