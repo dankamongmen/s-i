@@ -566,6 +566,13 @@ fixup(void)
     return 0;
 }
 
+static int
+mkfstab(void)
+{
+    system("/usr/lib/partconf/mkfstab");
+    return 0;
+}
+
 #ifndef TEST
 int
 main(int argc, char *argv[])
@@ -577,6 +584,7 @@ main(int argc, char *argv[])
         mountpoint,
         mountpoint_manual,
         fixup, // never does an INPUT, just handles the manual mountpoint result
+	mkfstab,
         NULL
     };
 
