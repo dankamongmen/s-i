@@ -28,6 +28,13 @@ is_not_loaded() {
 
 load_module() {
     module="$1"
+    if is_not_loaded "$module" ; then
+	:
+    else
+	log "Module $module is already loaded.  Ignoring load request."
+	return
+    fi
+
     db_subst hw-detect/module_params MODULE "$module"
     db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
