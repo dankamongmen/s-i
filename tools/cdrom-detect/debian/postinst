@@ -273,6 +273,14 @@ do
     fi
 done
 
+# Set the distribution used by base-installer, test in priority order
+for dist in stable testing unstable woody sarge sid ; do
+    if [ -e /cdrom/dists/$dist ] ; then
+	db_set mirror/distribution $dist
+	break
+    fi
+done
+
 # Hey, we're done
 db_fset cdrom-detect/success seen false
 db_subst cdrom-detect/success cdname "`cat /cdrom/.disk/info`"
