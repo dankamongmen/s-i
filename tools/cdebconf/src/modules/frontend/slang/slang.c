@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.17 2002/11/26 23:59:33 barbier Exp $
+ * $Id: slang.c,v 1.18 2002/11/28 00:41:22 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -295,16 +295,16 @@ static void slang_navbuttons(struct frontend *ui, struct question *q,
 	/* draw the actual buttons, note that these are drawn in the
 	 * query window instead of in the parent (like the frame) */
 
-	if (ui->methods.can_go_back(ui, q))
-	{
-		slang_printf(ybut - 1, 2, (selected == 0 ? win->selectedcolor :
-			win->drawcolor), _(" <Previous> "));
-	}
-
 	if (ui->methods.can_go_forward(ui, q))
 	{
-		slang_printf(ybut - 1, COLS-10, (selected == 1 ? 
+		slang_printf(ybut - 1, 2, (selected == 0 ? 
 			win->selectedcolor : win->drawcolor), _(" <Next> "));
+	}
+
+	if (ui->methods.can_go_back(ui, q))
+	{
+		slang_printf(ybut - 1, COLS-12, (selected == 1 ? win->selectedcolor :
+			win->drawcolor), _(" <Cancel> "));
 	}
 
 	/* caller should call slang_flush() ! */
@@ -339,10 +339,10 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 
 		switch (slang_keyhandler(ui, q, &pos, 3, 0))
 		{
-		case 0: ret = DC_GOBACK; break;
-		case 1: ret = DC_OK; break;
-		case 2: ans = 1; break;
-		case 3: ans = 0; break;
+		case 0: ret = DC_OK; break;
+		case 1: ret = DC_GOBACK; break;
+		case 2: ans = 1; ret = DC_OK; break;
+		case 3: ans = 0; ret = DC_OK; break;
 		}
 	}
 
@@ -363,8 +363,8 @@ static int slang_note(struct frontend *ui, struct question *q)
 
 		switch (slang_keyhandler(ui, q, &pos, 1, 0))
 		{
-		case 0: ret = DC_GOBACK; break;
-		case 1: ret = DC_OK; break;
+		case 0: ret = DC_OK; break;
+		case 1: ret = DC_GOBACK; break;
 		}
 	}
 	return ret;
@@ -396,11 +396,16 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 
 	/* See what the currently selected value should be -- either a
 	 * previously selected value, or the default for the question
+	 * Loop in descending order so that cursor is at the first
+	 * selected value
 	 */
-	for (j = 0; j < dcount; j++)
-		for (i = 0; i < count; i++)
+	for (i = count-1; i >=0; i--)
+		for (j = 0; j < dcount; j++)
 			if (strcmp(choices[i], defaults[j]) == 0)
+			{
 				selected[i] = 1;
+				val = i;
+			}
 
 	longest = strlongest(choices, count);
 	top = 0;
@@ -460,13 +465,15 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 		default:
 			switch (slang_keyhandler(ui, q, &pos, 2, ch))
 			{
-			case 0: ret = DC_GOBACK; break;
-			case 1: ret = DC_OK; break;
+			case 0: ret = DC_OK; break;
+			case 1: ret = DC_GOBACK; break;
+			case -1: break;
 			default: 
 				if (multi == 0)
 				{
 					memset(selected, 0, sizeof(selected));
 					selected[val] = 1;
+					ret = DC_OK;
 				}
 				else
 				{
@@ -551,6 +558,7 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 
 		if (isprint(ch))
 		{	
+			memmove(&value[cursor+1], &value[cursor], sizeof(value)-cursor-1);
 			value[cursor] = (char)ch;
 			if (cursor < sizeof(value))
 				cursor++;
@@ -572,15 +580,15 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 				cursor = 0;
 				break;
 			case SL_KEY_BACKSPACE:
-				/* TODO */
 				if (cursor > 0)
 				{
-					tmp = &value[cursor];
-					do {
-						*(tmp-1) = *tmp;
-					} while (*tmp++ != 0);
+					memmove(&value[cursor-1], &value[cursor], sizeof(value)-cursor-1);
 					cursor--;
 				}
+				break;
+			case SL_KEY_DELETE:
+				if (cursor < sizeof(value))
+					memmove(&value[cursor], &value[cursor+1], sizeof(value)-cursor-1);
 				break;
 			case SL_KEY_LEFT:
 				if (cursor > 0) cursor--; 
@@ -591,9 +599,9 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 			default:
 				switch (slang_keyhandler(ui, q, &pos, 2, ch))
 				{
-				case 0: ret = DC_GOBACK; break;
-				case 1: ret = DC_OK; break;
-				case 2: pos = 1; break;  /*  switch to GO */
+				case 0: ret = DC_OK; break;
+				case 1: ret = DC_GOBACK; break;
+				case 2: ret = DC_OK; break;  /*  Enter key */
 				}
 			}
 		}
