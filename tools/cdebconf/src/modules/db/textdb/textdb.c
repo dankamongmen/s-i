@@ -95,6 +95,7 @@ static void textdb_remove_cached_template(struct database *db,
 	}
 }
 
+/*
 static struct question *textdb_lookup_cached_question(
 	const struct database *db, const char *tag)
 {
@@ -106,6 +107,7 @@ static struct question *textdb_lookup_cached_question(
 	}
 	return result;
 }
+*/
 
 static int textdb_initialize(struct database *db, struct configuration *cfg)
 {
