@@ -40,11 +40,28 @@ do
     fi
     for device in $devices
     do
-        if mount -t iso9660 -o ro,exec $device /cdrom 2>/dev/null
+        if mount -t iso9660 -o ro,exec $device /cdrom
         then
+            log "CDROM-mount succeeded: device=$device"
             mounted=1
 	    db_set cdrom-detect/cdrom_device $device
             break
+        else
+            log "CDROM-mount failed (error=$?): device=$device"
+            log "Unmounting CD just to be sure."
+            umount /cdrom || true
+            log "Trying it again."
+            if mount -t iso9660 -o ro,exec $device /cdrom
+            then
+                log "CDROM-mount succeeded: device=$device"
+                mounted=1
+                db_set cdrom-detect/cdrom_device $device
+                break
+            else
+                log "CDROM-mount failed again (error=$?): device=$device"
+                log "Unmounting CD just to be sure and giving it up."
+                umount /cdrom || true
+            fi
         fi
     done
 
@@ -111,8 +128,13 @@ do
 	fi
 	if mount -t iso9660 -o ro,exec $device /cdrom
 	then
+            log "CDROM-mount succeeded: device=$device"
 	    mounted=1
 	    break
+        else
+            log "CDROM-mount failed (error=$?): device=$device"
+            log "Unmounting CD just to be sure and giving it up."
+            umount /cdrom || true
 	fi
     else
 	fail
