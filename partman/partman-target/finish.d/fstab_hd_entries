@@ -1,0 +1,19 @@
+#!/bin/sh
+
+[ -f /target/etc/fstab ] || exit 0
+
+fstab=$(
+    for i in /lib/partman/fstab.d/*; do
+	[ -x "$i" ] || continue
+	$i
+    done |
+    while read fs mp type options dump pass; do
+	case "$fs" in
+	    /dev/ide/host*/bus[01]/target[01]/lun0/part*|/dev/scsi/host*/bus*/target*/lun*/part*)
+		printf "%-15s %-15s %-7s %-15s %-7s %s\n" "$(mapdevfs $fs)" "${mp}" "$type" "$options" "$dump" "$pass"
+		;;
+	esac
+    done
+)
+
+echo "$fstab" >>/target/etc/fstab
