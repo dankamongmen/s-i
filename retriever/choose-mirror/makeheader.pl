@@ -46,6 +46,7 @@ close IN;
 
 open (OUT, ">mirrors_$type.h") or die "mirrors_$type.h: $!";
 print OUT "/* Automatically generated; do not edit. */\n";
+print OUT "\n#define N_(TEXT) TEXT\n\n";
 
 # Poor man's mirror rating system: push-primary, push* (-secondary), others
 foreach my $site (keys %data) {
@@ -77,11 +78,11 @@ print OUT "};\n";
 # It is sorted lexically.
 print OUT "static char *countries_$type\[] = {\n";
 foreach my $country (sort keys %used_country) {
-	print OUT "\t\"$country\",\n";
+	print OUT "\tN_(\"$country\"),\n";
 }
 # TODO: not only do we need to support i18n of this next line, but all the
 # country names need to be i18n'd too (sigh).
-print OUT "\t\"enter information manually\",\n";
+print OUT "\tN_(\"enter information manually\"),\n";
 print OUT "\tNULL\n};\n";
 
 close OUT;
