@@ -998,12 +998,6 @@ newt_initialize(struct frontend *obj, struct configuration *conf)
     return DC_OK;
 }
 
-static int
-newt_shutdown(struct frontend *obj)
-{
-    return DC_OK;
-}
-
 
 /*
  * Function: newt_go
@@ -1167,6 +1161,13 @@ newt_progress_stop(struct frontend *obj)
         newtFinished();
         data->scale_form = data->scale_bar = data->perc_label = data->scale_textbox = NULL;
     }
+}
+
+static int
+newt_shutdown(struct frontend *obj)
+{
+    newt_progress_stop(obj);
+    return DC_OK;
 }
 
 struct frontend_module debconf_frontend_module =
