@@ -99,8 +99,10 @@ int main(int argc, char **argv)
         }
     }
 
-    tdb->methods.save(tdb);
-    qdb->methods.save(qdb);
+    if (tdb->methods.save(tdb))
+	exit(1);
+    if (qdb->methods.save(qdb))
+	exit(1);
     template_db_delete(tdb);
     question_db_delete(qdb);
     config_delete(config);
