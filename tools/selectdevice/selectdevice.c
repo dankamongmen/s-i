@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "//usr/local/include/cdebconf/debconfclient.h"
+#include <cdebconf/debconfclient.h>
 
 int main(int argc, char **argv)
 {
