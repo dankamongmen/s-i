@@ -42,12 +42,8 @@ gtk_udebpriority=$(shell grep '^Package: cdebconf-gtk-udeb' debian/control -A 10
 LIBDEBCONFDEV=libdebconfclient0-dev
 LIBDEBCONF=libdebconfclient0
 
-FRONTENDS=text slang newt gtk
-ifeq (,$(findstring hurd-,$(DEB_HOST_ARCH)))
-FRONTENDS += bogl
-endif
-
-UDEB_FRONTENDS=text slang newt gtk
+FRONTENDS=text newt
+UDEB_FRONTENDS=text newt
 
 SIZEOPTFLAG=-Os
 SPEEDOPTFLAG=-O2
@@ -106,9 +102,7 @@ install-udeb: build-udeb install-dirs
 		etcdir=$(shell pwd)/debian/cdebconf-udeb/etc )
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/include
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/share/man
-	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/cdebconf/frontend/slang.so
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/cdebconf/frontend/newt.so
-	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/cdebconf/frontend/gtk.so
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/cdebconf/frontend/text.so
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/lib*.a
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/libdebconfclient.so
@@ -177,8 +171,7 @@ binary-indep: build install
 #
 # Note that this builds a .udeb, which is not policy compliant or anything.
 binary-arch: cdebconf cdebconf-udeb cdebconf-priority libdebconfclient0-udeb \
-	cdebconf-slang-udeb cdebconf-newt-udeb cdebconf-gtk-udeb \
-	cdebconf-text-udeb
+	cdebconf-newt-udeb cdebconf-text-udeb
 
 $(LIBDEBCONF): install
 	dh_testdir
