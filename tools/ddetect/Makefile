@@ -9,11 +9,10 @@ LDFLAGS= -ldiscover -ldebconf -ldebian-installer
 
 
 all: $(OBJS) $(PROGS)
-	$(foreach PROG, $(PROGS), \
-	($(STRIP) $(PROG)) ; )	
 
-ethdetect: ethdetect.c pcieth.lst
+ethdetect: ethdetect.c ethpci.lst
 	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(LDFLAGS)
+	$(STRIP) $@
 
 clean:
 	$(RM) *.o $(PROGS) *.lst
@@ -26,6 +25,6 @@ install:
 	cp *.lst $(DESTDIR)/usr/share/ddetect/
 	  
 
-pcieth.lst:
+ethpci.lst:
 	./lstgen -p > ethpci.lst
 

@@ -20,7 +20,6 @@
 
 */
 
-
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -58,8 +57,12 @@ ethdetect_insmod (char *modulename)
       client->command (client, "go", NULL);
       return 1;
     }
-  else
-    return 0;
+  else 
+    {
+      di_prebaseconfig_append ("ethdetect", "echo \"%s %s\" >> /etc/modules",
+                               modulename, (params ? params : " "));  
+      return 0;
+    }
 }
 
 
@@ -168,6 +171,8 @@ main (int argc, char *argv[])
   for (; ethernet; ethernet = ethernet->next) {
     fprintf(stderr, "%s\n", ethernet->module);
   };
+      
+  di_prebaseconfig_append ("ethdetect", "echo \"foo bar\" >> /etc/modules");
   return (0);
 }
 
