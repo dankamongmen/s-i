@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.1 2003/01/19 11:37:56 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.2 2003/01/19 12:23:31 mckinstry Exp $
  */
 
 #include <stdio.h>
@@ -379,7 +379,6 @@ int main (int argc, char **argv)
 	// First select a keyboard arch. 
 	kbd_priority = ponder_keyboard_choices ();
 	ptr = my_debconf_input (kbd_priority, "console-tools/archs");
-	printf ("DEBUG: pri %s, ptr %s\n", kbd_priority, ptr);
 
 	// Then a keymap within that arch.
 	STRCPY (template, "console-data/keymap/");
@@ -390,8 +389,7 @@ int main (int argc, char **argv)
 	len = (int) (strchr (ptr, ']') - ptr) -1 ;	
 	strncpy (keymap, ptr+1, len);
 	keymap [ len ] = '\0';
-	if (DEBUG) printf ("DEBUG: choice %s\n", keymap);
-	
+
 	loadkeys_wrapper (keymap);       
        		
 	exit (0);

@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.1 2003/01/19 11:37:56 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.2 2003/01/19 12:23:31 mckinstry Exp $
  */
 
 #include "config.h"
@@ -13,7 +13,7 @@
 #include <string.h>
 #include <debian-installer.h>
 #include <cdebconf/common.h>  // for NEW()
-
+#include "nls.h"
 #include "kbd-chooser.h"
 
 extern kbd_t *keyboards;	/* in kbd-chooser.c */
@@ -49,7 +49,9 @@ kbd_t *usb_kbd_get (void)
 	struct stat sbuf;
 
 	k->name = "usb";
+	k->description = N_("USB");
 	k->fd = -1;
+	k->deflt = NULL;
 	
 #if defined (KERNEL_2_5)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
@@ -101,4 +103,8 @@ kbd_t *usb_kbd_get (void)
 	return k;
 }
 
-
+/*
+ * TODO:
+ * USB keyboards should be able to figure out  a default
+ * (read lang/country code from USB code) and set default.
+ */

@@ -3,16 +3,13 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.1 2003/01/19 11:37:56 mckinstry Exp $
+ * $Id: kbd-chooser.h,v 1.2 2003/01/19 12:23:31 mckinstry Exp $
  */
 
 #ifndef KBD_CHOOSER_H
 #define KBD_CHOOSER_H
 
-#define PROGNAME "kbd-chooser"
-#define DATADIR  "/usr/share/"
 #define DEFMAP "us" /* Default Map */
-#define KERNDIR "XXX"
 #define KEYMAPDIR "keymaps"
 #define KEYMAPLISTDIR "/usr/share/console/lists"
 
@@ -36,6 +33,8 @@ typedef struct maplist_s {
 
 typedef struct kbd_s { 
 	char *name;
+	char *description;
+	char *deflt;
 	exists present;
 	int fd;
 	keymap_t *keymap_list;
