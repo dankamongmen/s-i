@@ -19,6 +19,8 @@ findfs () {
 	df /target$1 | sed '1d;s/ .*//'
 }
 
+db_progress START 0 3 colo-installer/progress
+
 # detect the partitions /target and /target/boot
 rootfs_devfs=$(findfs /)
 bootfs_devfs=$(findfs /boot)
@@ -26,6 +28,8 @@ bootfs_devfs=$(findfs /boot)
 rootfs=$(mapdevfs $rootfs_devfs)
 bootfs=$(mapdevfs $bootfs_devfs)
 bootfs_no_dev=${bootfs#/dev/}
+
+db_progress INFO colo-installer/apt-install
 
 if ! apt-install colo ; then
 	info "Calling 'apt-install colo' failed"
@@ -38,6 +42,9 @@ if ! apt-install colo ; then
 		exit 1
 	fi
 fi
+
+db_progress STEP 2
+db_progress INFO colo-installer/conf
 
 # find the kernel
 if [ "$rootfs" = "$bootfs" ] ; then
@@ -57,4 +64,7 @@ mount $bootfs_no_dev
 load $kernel
 execute root=$rootfs console=ttyS0,{console-speed}
 EOF
+
+db_progress STEP 1
+db_progress STOP
 
