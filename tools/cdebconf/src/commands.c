@@ -59,7 +59,10 @@ command_input(struct confmodule *mod, char *arg)
     q->priority = strdup(priority);
 
     if (visible) 
+    {
+        mod->backed_up = 0;
         asprintf(&out, "%u question will be asked", CMDSTATUS_SUCCESS);
+    }
     else
         asprintf(&out, "%u question skipped", CMDSTATUS_INPUTINVISIBLE);
     question_deref(q);
