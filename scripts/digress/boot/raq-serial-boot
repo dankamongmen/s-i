@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+# Boots up a cobalt raq using serial and, hopefully, CoLo.
+use strict;
+use Expect;
+
+my $exp = new Expect;
+#$exp->exp_internal(1);
+$exp->raw_pty(1);
+
+$exp->spawn($ENV{CONSOLECOMMAND}) or die "cannot start console: $!\n";
+
+if (! $exp->expect(120, "CoLo")) {
+	die "did not see CoLo boot";
+}
+
+$exp->send(" "); # break
+if (! $exp->expect(60, "> ")) {
+	die "failed to break to command shell";
+}
+
+$exp->send("boot $ENV{RAQ_BOOTNUM}\r");
+
+$exp->expect(10, "1>");
+
+exit;
