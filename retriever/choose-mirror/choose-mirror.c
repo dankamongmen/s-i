@@ -152,6 +152,13 @@ int choose_protocol(void) {
 	return 0;
 }
 
+/* Choose which distribution to install. */
+int choose_distribution(void) {
+	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "distribution", NULL);
+        return 0;
+}
+
+
 int manual_entry;
 
 int choose_mirror(void) {
@@ -234,6 +241,7 @@ int main (int argc, char **argv) {
 		choose_country,
 		choose_mirror,
 		validate_mirror,
+                choose_distribution,
 		NULL,
 	};
 
