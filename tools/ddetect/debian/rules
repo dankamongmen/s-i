@@ -54,10 +54,10 @@ binary-indep: build install
 	$(foreach PACKAGE, $(PACKAGES), \
 	  ( dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
 	  -Tdebian/$(PACKAGE).substvars \
-	  -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb ) ; )
+	  -n$(PACKAGE)_$(VERSION)_all.udeb ) ; )
 	$(foreach PACKAGE, $(PACKAGES), \
 	  (cd debian ; \
-		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb \
+		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_all.udeb \
 		); )
 
 # Build architecture-dependent files here.
