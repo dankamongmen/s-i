@@ -359,7 +359,7 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 	char *choices[100] = {0};
 	char *choices_translated[100] = {0};
 	char *defaults[100] = {0};
-	const char *defval = question_get_field(q, NULL, "value");
+	const char *defval = question_getvalue(q, "");
 
 	int i, count, dcount, ret = 0, def = -1, pos = 2, xpos, ypos;
 	int top, bottom, longest;

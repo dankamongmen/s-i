@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.21 2002/11/21 22:40:12 barbier Exp $
+ * $Id: text.c,v 1.22 2002/11/22 22:33:17 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -138,7 +138,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	int def = -1;
 	const char *defval;
 
-	defval = question_get_field(q, NULL, "value");
+	defval = question_getvalue(q, "");
 	if (defval)
 	{
 		if (strcmp(defval, "true") == 0)
@@ -309,7 +309,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	char *choices_translated[100] = {0};
 	char answer[10];
 	int i, count, choice = 1, def = -1;
-	const char *defval = question_get_field(q, NULL, "value");
+	const char *defval = question_getvalue(q, "");
 
 	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
@@ -363,7 +363,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 static int texthandler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
-	const char *defval = question_get_field(q, NULL, "value");
+	const char *defval = question_getvalue(q, "");
 	if (defval)
 		printf(_("[default = %s]"), defval);
 	printf("> "); fflush(stdout);

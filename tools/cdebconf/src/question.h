@@ -37,6 +37,7 @@ void question_ref(struct question *);
 void question_deref(struct question *);
 
 void question_setvalue(struct question *q, const char *value);
+const char *question_getvalue(struct question *q, const char *lang);
 
 void question_variable_add(struct question *q, const char *var, 	
 	const char *value);

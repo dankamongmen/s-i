@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.5 2002/11/21 22:40:05 barbier Exp $
+ * $Id: gtk.c,v 1.6 2002/11/22 22:33:16 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -364,7 +364,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q)
 	GtkWidget *hboxtop, *hboxbottom, *bigbox;
 	gboolean gbool;
 
-	defval = question_get_field(q, NULL, "value");
+	defval = question_getvalue(q, "");
 
 	if (defval)
 	{
@@ -647,7 +647,7 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 	char *choices_translated[100] = {0};
 	char answer[10];
 	int i, count, choice = 1, def = -1;
-	const char *defval = question_get_field(q, NULL, "value");
+	const char *defval = question_getvalue(q, "");
 	GtkWidget *window;
 	GtkWidget *hboxtop, *hboxbottom, *bigbox;
 	GtkWidget **choiceButtons;
