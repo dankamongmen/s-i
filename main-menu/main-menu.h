@@ -24,3 +24,4 @@ struct package_t {
 struct package_t *status_read(void);
 int package_compare (const void *, const void *);
 int debconf_command (const char *, ...);
+char *debconf_ret (void);

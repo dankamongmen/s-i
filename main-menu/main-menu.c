@@ -64,7 +64,7 @@ int isdefault(struct package_t *p) {
 }
 
 /* Displays the main menu via debconf. */
-void main_menu(struct package_t *packages) {
+struct package_t *show_main_menu(struct package_t *packages) {
 	struct package_t **package_list, *p, *head = NULL, *tail = NULL;
 	int i = 0, num = 0;
 	void *package_tree = NULL;
@@ -114,19 +114,31 @@ void main_menu(struct package_t *packages) {
 	*s = 0;
 	s = menutext;
 	
+	/* Make debconf show the menu and get the user's choice. */
 	if (menudefault)
 		debconf_command("SET %s %s", MAIN_MENU, menudefault);
 	debconf_command("FSET %s isdefault true", MAIN_MENU);
 	debconf_command("SUBST %s MENU %s", MAIN_MENU, menutext);
 	debconf_command("INPUT medium %s", MAIN_MENU);
 	debconf_command("GO");
+	debconf_command("GET %s", MAIN_MENU);
+	s=debconf_ret();
+
+	/* Figure out which menu item was selected. */
+	for (p = head; p; p = p->next) {
+		if (p->installer_menu_item && strcmp(p->description, s) == 0)
+			return p;
+	}
+	return 0; // should never happen
 }
 
 int main (int argc, char **argv) {
-	struct package_t *packages;
+	struct package_t *p, *packages;
 	
 	packages = status_read();
-	main_menu(packages);
+	p=show_main_menu(packages);
+
+	fprintf(stderr, "%s\n", p->package);
 	
 	return(0);
 }
