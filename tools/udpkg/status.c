@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.7 2000/11/01 23:48:09 joeyh Exp $ */
+/* $Id: status.c,v 1.8 2000/11/02 06:48:24 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -112,12 +112,10 @@ void control_read(FILE *f, struct package_t *p)
 		{
 			p->status = status_parse(buf+8);
 		}
-#if 0
 		else if (strstr(buf, "Depends: ") == buf)
 		{
 			p->depends = strdup(buf+9);
 		}
-#endif
 		else if (strstr(buf, "Provides: ") == buf)
 		{
 			p->provides = strdup(buf+10);
@@ -236,11 +234,9 @@ int status_merge(void *status, struct package_t *pkgs)
 	for (pkg = pkgs; pkg != 0; pkg = pkg->next) {
 		fprintf(fout, "Package: %s\nStatus: %s\n", 
 			pkg->package, status_print(pkg->status));
-#if 0
 		if (pkg->depends)
 			fprintf(fout, "Depends: %s\n", pkg->depends);
-#endif
-		if (pkg->depends)
+		if (pkg->provides)
 			fprintf(fout, "Provides: %s\n", pkg->provides);
 		if (pkg->installer_menu_item)
 			fprintf(fout, "Installer-Menu-Item: %i\n", pkg->installer_menu_item);
