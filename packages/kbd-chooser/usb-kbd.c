@@ -135,7 +135,7 @@ static void usb_parse_proc (kbd_t *keyboards)
 kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 {
 
-#if defined(__mipsel__)
+#if defined(__MIPSEL__)
         // DECstations do not have USB keyboards
          if (strstr(subarch, "r3k-kn02") || strstr(subarch,"r4k-kn04"))
                return keyboards;
