@@ -62,6 +62,7 @@ static struct systype system_type[] = {
 	{"SGI Origin", system_sgi_origin_cpu },
 	/* SGI O2 (ip32) */
 	{"SGI IP32", system_sgi_o2_cpu },
+	{"SGI O2", system_sgi_o2_cpu },
 	/* match the Broadcom SWARM development board */
 	{"SiByte BCM91250A", system_sibyte_sb1_cpu },
 	/* SNI RM200C */
