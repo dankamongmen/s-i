@@ -47,7 +47,7 @@ if echo "${bootdev}" | grep -q '[0-9]$'; then
     disc=$(echo ${bootdev} | sed 's/part[0-9]\+$/disc/')
     if ! fdisk -l ${disc} | grep "^${bootdev}" | grep -q '\*'; then
         # partition is not marked active, offer to make it so
-        db_input high lilo-installer/activate-part || true
+        db_input high lilo-installer/activate-part || [ $? -eq 30 ]
         db_go || true
         db_get lilo-installer/activate-part
         if [ "${RET}" = "yes"]; then
