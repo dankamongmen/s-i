@@ -44,22 +44,12 @@ static handler_t handler(const char *type)
 	return NULL;
 }
 
-static int cangoback(struct frontend *ui, struct question *q)
-{
-	return 1;
-}
-
-static int cangoforward(struct frontend *ui, struct question *q)
-{
-	return 1;
-}
-
 /* FIXME: Needs disabled button widget. */
 static void drawnavbuttons(struct frontend *ui, struct question *q)
 {
-	if(cangoback(ui, q))
+	if(ui->cangoback(ui, q))
 		bowl_new_button(_("Previous"), DC_GOBACK);
-	if(cangoforward(ui, q))
+	if(ui->cangoforward(ui, q))
 		bowl_new_button(_("Next"), DC_OK);
 }
 
