@@ -2,9 +2,11 @@
 
 . /usr/share/debconf/confmodule
 
+# set -x
+
 ARCH=`udpkg --print-architecture`
 MOUNTPOINT="/target"
-DEFAULT=
+DEFAULT=/
 
 if [ "$ARCH" = "i386" -o "$ARCH" = "hppa" ]; then
     TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
@@ -36,6 +38,18 @@ db_go
 db_get di-utils-mount-partitions/which-partition
 PARTITION="$RET"
 db_subst di-utils-mount-partitions/mountpoint PARTITION $PARTITION
+
+db_metaget di-utils-mount-partitions/mountpoint choices
+MPS=$(echo "$RET" | sed -e 's%,%%g')
+for M in $MPS; do
+    if mount | grep -q " on /target${M%/}"; then
+        continue
+    fi
+
+    db_set di-utils-mount-partitions/mountpoint "$M"
+    break
+done
+
 db_input critical di-utils-mount-partitions/mountpoint
 db_go
 
@@ -57,7 +71,6 @@ else
     pass=2
 fi
 
-MOUNTPOINT="$MOUNTPOINT"
 mkdir -p "/target$MOUNTPOINT"
 
 mount "$PARTITION" "/target$MOUNTPOINT"
