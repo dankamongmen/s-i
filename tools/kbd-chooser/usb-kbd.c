@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.13 2003/10/31 22:55:54 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.14 2003/11/06 21:55:02 mckinstry Rel $
  */
 
 #include "config.h"
@@ -30,11 +30,15 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 	// Set up default entries.
 	k->name = "usb";
 	k->fd = -1;
-	k->deflt = "mac-usb-us";
+	k->deflt = NULL;
 	k->present = UNKNOWN;
 	k->next = keyboards;
 	keyboards = k;
-	
+
+#if 0
+	/* Disable autodetection of USB keyboards for the moment;
+	 * something has changed in the recent kernel(s)
+	 */
 #if defined (KERNEL_2_6)
 	/* In 2.6 series, we can detect keyboard via /proc/bus/input
 	 *
@@ -88,6 +92,9 @@ kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 		k->present = FALSE;
 	if (mounted_fs)
 		system ("umount /proc/bus/usb");
+
+#endif /* ifdef 0 */
+
 	return keyboards;	
 }
 
