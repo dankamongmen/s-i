@@ -103,7 +103,7 @@ lvm_init(void)
     if ( ! lvm_isinstalled())
         return -1;
     /* Call vgscan */
-    retval = system("vgscan > /var/log/messages 2>&1");
+    retval = system("vgscan >> /var/log/messages 2>&1");
     return 0;
 }
 
@@ -119,7 +119,7 @@ lvm_init_dev(const char *devpath)
     autopartkit_log(1, "Initializing LVM pv '%s'\n",
                     devpath ? devpath : "(null)");
 
-    asprintf(&cmd, "pvcreate %s > /var/log/messages 2>&1", devpath);
+    asprintf(&cmd, "pvcreate %s >> /var/log/messages 2>&1", devpath);
     retval = system(cmd);
     if (cmd)
         free(cmd);
@@ -149,7 +149,7 @@ lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
     else
         progname = "vgcreate";
 
-    asprintf(&cmd, "%s %s %s > /var/log/messages 2>&1", progname,
+    asprintf(&cmd, "%s %s %s >> /var/log/messages 2>&1", progname,
              vgname, devpath);
     retval = system(cmd);
 
@@ -179,7 +179,7 @@ lvm_create_logicalvolume(const char *vgname, const char *lvname,
                     vgname ? vgname : "(null)",
                     mbsize);
 
-    asprintf(&str, "lvcreate -n%s -L%d %s > /var/log/messages 2>&1",
+    asprintf(&str, "lvcreate -n%s -L%d %s >> /var/log/messages 2>&1",
              lvname, mbsize, vgname);
 
     retval = system(str);
