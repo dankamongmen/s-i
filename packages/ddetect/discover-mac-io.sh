@@ -13,7 +13,7 @@ else
 	exit 0
 fi
 
-for dir in $(find "$macio" -type d); do
+for dir in $(find "$macio/" -type d); do
 	name="$(cat "$dir/name" 2>/dev/null || true)"
 	device_type="$(cat "$dir/device_type" 2>/dev/null || true)"
 	compatible="$(cat "$dir/compatible" 2>/dev/null || true)"
