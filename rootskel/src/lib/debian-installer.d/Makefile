@@ -29,12 +29,12 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
   endif
 endif
 
-files = \
+files_exec = \
 	S20templates \
 	S50frontend \
 	S50priority
 
-files += \
+files_exec += \
 	$(files_menu) \
 	$(files_term) \
 	$(extra_files)
