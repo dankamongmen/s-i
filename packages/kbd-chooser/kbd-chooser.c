@@ -739,7 +739,7 @@ main (int argc, char **argv)
 	while (state != QUIT)   {
 		switch (state)	{
 		case GOBACK:
-			di_info ("kbdchooser: GOBACK recieved; leaving");
+			di_info ("kbdchooser: GOBACK received; leaving");
 			exit (10);
 		case CHOOSE_ARCH: // First select a keyboard arch.
 			if (mydebconf_ask (kbd_priority, "console-tools/archs", &s)) {
