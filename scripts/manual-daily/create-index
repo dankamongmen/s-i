@@ -1,5 +1,6 @@
 #!/bin/bash
 ROOT=/home/rfjp/d-i
+source=$ROOT/manual
 destination=$ROOT/build
 logdir=$ROOT/log
 
@@ -20,7 +21,7 @@ build_link_table () {
     echo "  <tr>" >>$pagefile
     echo "    <th class=\"col1\">Architecture</th>" >>$pagefile
     for lang in $languages ; do
-        langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 9`
+        langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 8`
         echo "    <th class=\"t1\">$langname</th>" >>$pagefile
     done
 
@@ -33,7 +34,7 @@ build_link_table () {
         echo "    <td class=\"col1\">$archname</td>" >>$pagefile
 
         for lang in $languages ; do
-            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 9`
+            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 8`
             destsuffix="${lang}.${arch}"
             echo "    <td>" >>$pagefile
             echo "      <a href=\"$destsuffix/index.html\">html</a>" >>$pagefile
@@ -62,8 +63,7 @@ cat $ROOT/bin/index.head >$pagefile
 # First, we build the table for the languages that have all architectures built
 
 # Order of languages is alphabetic on name.
-# Select only languages for which all architectures are built.
-languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 9,9 | cut -f 1,2 | \
+languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 8,8 | cut -f 1,2 | \
            egrep "Y$" | cut -f 1`
 
 # Order of architectures is alphabetic on name.
@@ -76,8 +76,7 @@ cat $ROOT/bin/index.single >>$pagefile
 # Next, we build the table for the languages that have only i386 built
 
 # Order of languages is alphabetic on name.
-# Select only languages dor which all architectures are built.
-languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 9,9 | cut -f 1,2 | \
+languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 8,8 | cut -f 1,2 | \
            egrep "S$" | cut -f 1`
 
 # Order of architectures is alphabetic on name.
@@ -107,21 +106,48 @@ if [ -f $logdir/tr-stats ] ; then
     echo "  </tr>" >>$pagefile
 
     for lang in `egrep -v "^en" $logdir/tr-stats | cut -f 1` ; do
-        langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 9`
-        echo "" >>$pagefile
-        echo "  <tr>" >>$pagefile
-        echo "    <td class=\"col1\">$langname</td>" >>$pagefile
+        # For languages that have XML translations
+        if [ -d "$source/$lang/.svn" ] ; then
+            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 8`
+            echo "  <tr>" >>$pagefile
+            echo "    <td class=\"col1\">$langname</td>" >>$pagefile
 
-        for col in 2 4 6 9 8 ; do
-            value=`egrep "^$lang[[:space:]]" $logdir/tr-stats | cut -f $col`
-            echo "    <td class=\"stats\">$value</td>" >>$pagefile
-        done
-
-        echo "  </tr>" >>$pagefile
+            for col in 2 4 6 9 8 ; do
+                value=`egrep "^$lang[[:space:]]" $logdir/tr-stats | cut -f $col`
+                echo "    <td class=\"stats\">$value</td>" >>$pagefile
+            done
+            echo "  </tr>" >>$pagefile
+        fi
     done
 
     echo "" >>$pagefile
     echo "</table>" >>$pagefile
+
+    echo "<p>" >>$pagefile
+    echo "For languages using PO files for their translation, please see the" >>$pagefile
+    echo "<a href=\"http://people.debian.org/~seppy/d-i/translation-status.html#manual\" target=\"_blank\">PO translation statistics</a>" >>$pagefile
+    echo "for an overview, or use the links in the table below for per language details." >>$pagefile
+    echo "</p>" >>$pagefile
+    echo "" >>$pagefile
+
+    echo "<table>" >>$pagefile
+    echo "  <tr>" >>$pagefile
+    echo "    <th class=\"col1\">Language</th>" >>$pagefile
+    echo "  </tr>" >>$pagefile
+
+    for lang in `egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 8,8 | cut -f 1` ; do
+        # For languages that have PO translations
+        if [ -d "$source/po/$lang/.svn" ] ; then
+            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 8`
+            echo "  <tr>" >>$pagefile
+            echo "    <td class=\"col1\"><a href=\"http://people.debian.org/~seppy/d-i/manual/$lang.txt\" target=\"_blank\">$langname</a></td>" >>$pagefile
+            echo "  </tr>" >>$pagefile
+        fi
+    done
+
+    echo "" >>$pagefile
+    echo "</table>" >>$pagefile
+    
 fi
 
 #cat $ROOT/bin/index.tail >>$pagefile

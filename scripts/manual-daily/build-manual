@@ -154,18 +154,17 @@ for lang in $languages; do
         [ -n "$LANG_UPDATED" ] && \
             echo "Preparing build for language $lang - `date -u`" >>$langlog
 
-        if [ -z "$USES_PO" ] ; then
-            [ -n "$LANG_UPDATED" ] && \
+        if [ -n "$LANG_UPDATED" ] || [ -n "$EN_UPDATED" ] ; then
+            echo "Info: updating PO files for $lang" >>$mainlog
+            update_po $lang >>$langlog 2>&1
+            checkfatal "$?" "updating po for $lang"
+        fi
+
+        if [ -n "$LANG_UPDATED" ] ; then
+            if [ -z "$USES_PO" ] ; then
                 echo "Info: building manual from XML files" >>$langlog
-        else
-            [ -n "$LANG_UPDATED" ] && \
+            else
                 echo "Info: building manual from PO files" >>$langlog
-            if [ -n "$LANG_UPDATED" ] || [ -n "$EN_UPDATED" ] ; then
-                echo "Info: updating PO files for $lang" >>$mainlog
-                update_po $lang >>$langlog 2>&1
-                checkfatal "$?" "updating po for $lang"
-            fi
-            if [ -n "$LANG_UPDATED" ] ; then
                 generate_xml $lang >>$langlog 2>&1
                 checkfatal "$?" "generating xml for $lang"
                 echo "Info: generation of XML files complete" >>$langlog
