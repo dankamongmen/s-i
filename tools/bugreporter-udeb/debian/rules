@@ -40,7 +40,9 @@ install-common: build
 install-bugreporter-udeb: install-common
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/$(PACKAGE)
 
-	# Install it after 93save-install-log and before 95umount
+	# Install it after 93save-install-log to make sure
+	# /var/log/debian-installer/ exist, and before 95umount
+	# to make sure it is still mounted.
 	$(INSTALL) debian/$(PACKAGE).prebaseconfig debian/$(PACKAGE)/usr/lib/prebaseconfig.d/94$(PACKAGE)
 
 # Build architecture-independent files here.

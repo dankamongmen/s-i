@@ -14,6 +14,7 @@ install:
 	for p in $(PROGS) ; do \
 	    $(INSTALL) $$p $(DESTDIR)$(bindir)/$$p ; \
 	done
+	$(INSTALL_DATA) install-report.template $(DESTDIR)$(pkglibdir)/install-report.template
 
 dist:
 	debuild -us -uc
