@@ -54,13 +54,11 @@ int mount_cdrom() {
 		return(EXIT_SUCCESS);
 
 	/* ask if we should mount the device */
-	debconf->command(debconf, "fset", "cdrom-checker/askmount",
-		"seen", "false", NULL);
-	debconf->command(debconf, "set", "cdrom-checker/askmount",
-		"false", NULL);
-	debconf->command(debconf, "input", "high", "cdrom-checker/askmount", NULL);
-	debconf->command(debconf, "go", NULL);
-	debconf->command(debconf, "get", "cdrom-checker/askmount", NULL);
+	debconf_fset(debconf, "cdrom-checker/askmount", "seen", "false");
+	debconf_set(debconf, "cdrom-checker/askmount", "false");
+	debconf_input(debconf, "high", "cdrom-checker/askmount");
+	debconf_go(debconf);
+	debconf_get(debconf, "cdrom-checker/askmount");
 	
 	asprintf(&cmd, "mount -t iso9660 %s %s -o ro 1>/dev/null 2>&1",
 		cdrom_device, TARGET);
@@ -70,12 +68,10 @@ int mount_cdrom() {
 		return(EXIT_SUCCESS);
 
 	/* unable to mount the cdrom device */
-	debconf->command(debconf, "fset", "cdrom-checker/mntfailed",
-		"seen", "false", NULL);
-	debconf->command(debconf, "SUBST", "cdrom-checker/mntfailed",
-		"CDROM", cdrom_device, NULL);
-	debconf->command(debconf, "input", "high", "cdrom-checker/mntfailed", NULL);
-	debconf->command(debconf, "go", NULL);
+	debconf_fset(debconf, "cdrom-checker/mntfailed", "seen", "false");
+	debconf_subst(debconf,"cdrom-checker/mntfailed", "CDROM", cdrom_device);
+	debconf_input(debconf, "high", "cdrom-checker/mntfailed");
+	debconf_go(debconf);
 	return(EXIT_FAILURE);
 }
 
@@ -122,15 +118,13 @@ int check_cdrom() {
 
 	md5file = fopen("md5sum.txt", "r");
 	if(md5file == NULL) {
-		debconf->command(debconf, "input", "high",
-			"cdrom-checker/md5file_failed", NULL);
-		debconf->command(debconf, "go", NULL);
+		debconf_input(debconf, "high", "cdrom-checker/md5file_failed");
+		debconf_go(debconf);
 		exit(EXIT_FAILURE);
 	}
 
 	lines = md5file_getlines(md5file);
-	debconf->commandf(debconf,
-		"PROGRESS START 0 %d cdrom-checker/progress_title", lines);
+	debconf_progress_start(debconf, 0, lines,  "cdrom-checker/progress_title");
 
 	rewind(md5file);
 	while(fgets(line, sizeof(line), md5file) != 0) {
@@ -138,36 +132,29 @@ int check_cdrom() {
 
 		status = 0;
 		sscanf(line, "%*s %s", filename);
-		debconf->command(debconf, "SUBST", "cdrom-checker/progress_step",
-				"FILE", filename, NULL);
-		debconf->command(debconf, "PROGRESS", "INFO",
-				"cdrom-checker/progress_step", NULL);
+		debconf_subst(debconf, "cdrom-checker/progress_step", "FILE", filename);
+		debconf_progress_info(debconf, "cdrom-checker/progress_step");
 		asprintf(&cmd, "echo '%s' | md5sum -c 1>/dev/null 2>&1", line);
 		if(system(cmd) != 0) {
 			status = 1;
 			break;
 		}
-		debconf->command(debconf, "PROGRESS", "STEP", "1", NULL);
+		debconf_progress_step(debconf, 1);
 	}
 
 	fclose(md5file);
-	debconf->command(debconf, "PROGRESS STOP", NULL);
+	debconf_progress_stop(debconf);
 
 	/* print the result of the command */
 	if(status != 0) {
-		debconf->command(debconf, "fset", "cdrom-checker/missmatch",
-			"seen", "false", NULL);
-		debconf->command(debconf, "SUBST", "cdrom-checker/missmatch",
-			"FILE", filename, NULL);
-		debconf->command(debconf, "input", "high",
-			"cdrom-checker/missmatch", NULL);
+		debconf_fset(debconf,"cdrom-checker/missmatch", "seen", "false");
+		debconf_subst(debconf, "cdrom-checker/missmatch", "FILE", filename);
+		debconf_input(debconf, "high", "cdrom-checker/missmatch");
 	} else {
-		debconf->command(debconf, "fset", "cdrom-checker/passed",
-			"seen", "false", NULL);
-		debconf->command(debconf, "input", "high",
-			"cdrom-checker/passed", NULL);
+		debconf_fset(debconf, "cdrom-checker/passed", "seen", "false");
+		debconf_input(debconf, "high", "cdrom-checker/passed");
 	}
-	debconf->command(debconf, "go", NULL);
+	debconf_go(debconf);
 
 	return(status);
 }
@@ -176,15 +163,13 @@ int main(int argc, char **argv) {
         di_system_init(basename(argv[0]));
 	/* initialize the debconf frontend */
 	debconf = debconfclient_new();
-	debconf->command(debconf, "title", "CD-ROM Checker", NULL);
 
 	/* ask if we should proceed the checking */
-	debconf->command(debconf, "fset", "cdrom-checker/start",
-		"seen", "false", NULL);
-	debconf->command(debconf, "set", "cdrom-checker/start", "false", NULL);
-	debconf->command(debconf, "input", "high", "cdrom-checker/start", NULL);
-	debconf->command(debconf, "go", NULL);
-	debconf->command(debconf, "get", "cdrom-checker/start", NULL);
+	debconf_fset(debconf, "cdrom-checker/start", "seen", "false");
+	debconf_set(debconf, "cdrom-checker/start", "false");
+	debconf_input(debconf, "high", "cdrom-checker/start");
+	debconf_go(debconf);
+	debconf_get(debconf, "cdrom-checker/start");
 	if(!strstr(debconf->value, "true")) {	/* return to main-menu */
 		return(EXIT_SUCCESS);
 	}
@@ -202,11 +187,10 @@ int main(int argc, char **argv) {
 
 		/* is this a valid Debian cdrom? */
 		if(valid_cdrom() != EXIT_SUCCESS) {
-			debconf->command(debconf, "fset", "cdrom-checker/wrongcd", "seen",
-				"false", NULL);
-			debconf->command(debconf, "set", "cdrom-checker/wrongcd", "false", NULL);
-			debconf->command(debconf, "input", "high", "cdrom-checker/wrongcd", NULL);
-			debconf->command(debconf, "go", NULL);
+			debconf_fset(debconf, "cdrom-checker/wrongcd", "seen", "false");
+			debconf_set(debconf, "cdrom-checker/wrongcd", "false");
+			debconf_input(debconf, "high", "cdrom-checker/wrongcd");
+			debconf_go(debconf);
 			break;
 		}
 
@@ -216,23 +200,19 @@ int main(int argc, char **argv) {
 		chdir("/");
 		di_exec_shell_log("umount /cdrom");
 
-		debconf->command(debconf, "fset", "cdrom-checker/nextcd",
-			"seen", "false", NULL);
-		debconf->command(debconf, "set", "cdrom-checker/nextcd",
-			"false", NULL);
-		debconf->command(debconf, "input", "high",
-			"cdrom-checker/nextcd", NULL);
-		debconf->command(debconf, "go", NULL);
-		debconf->command(debconf, "get", "cdrom-checker/nextcd", NULL);
+		debconf_fset(debconf, "cdrom-checker/nextcd", "seen", "false");
+		debconf_set(debconf, "cdrom-checker/nextcd", "false");
+		debconf_input(debconf, "high", "cdrom-checker/nextcd");
+		debconf_go(debconf);
+		debconf_get(debconf,"cdrom-checker/nextcd");
 		if(!strstr(debconf->value, "true"))
 			break;
 	}
 
-	debconf->command(debconf, "fset", "cdrom-checker/firstcd",
-		"seen", "false", NULL);
-	debconf->command(debconf, "set", "cdrom-checker/firstcd", "false", NULL);
-	debconf->command(debconf, "input", "high", "cdrom-checker/firstcd", NULL);
-	debconf->command(debconf, "go", NULL);
+	debconf_fset(debconf,"cdrom-checker/firstcd", "seen", "false");
+	debconf_set(debconf, "cdrom-checker/firstcd", "false");
+	debconf_input(debconf, "high", "cdrom-checker/firstcd");
+	debconf_go(debconf);
 	di_exec_shell_log("udpkg --force-configure --configure cdrom-detect");
 
 	return(EXIT_SUCCESS);
