@@ -73,8 +73,8 @@ while :; do
 	fi
 
 	db_get "countrychooser/country-name"
-	CODE="$(country2code "$RET")" || true
-	if [ -n "$CODE" ]; then
+	COUNTRYCODE="$(country2code "$RET")" || true
+	if [ -n "$COUNTRYCODE" ]; then
 		break
 	else
 		# If the code cannot be found, the user probably
@@ -84,42 +84,42 @@ while :; do
 	fi
 done
 
-db_set "$countrycode"  "$CODE"
-db_get "$languagecode" || true
-if [ -n "$RET" ]; then
-	LANGUAGECODE=$RET
-	# Locale setting
-	# Keep locale inherited from languagechooser
-	# if the country wasn't changed. Otherwise,
-	# add "language_COUNTRY" to the original locale
-	# This allows keeping a valid locale in the fallback values
-	# as languagechooser/locale is supposed to be valid
-	#
-	# Make sure locale is at least "C"
-	if [ "$LANGUAGECODE" != "C" ]; then
-		db_get "$languagechooserlocalecode"
-		if [ -n "$RET" ]; then
-			LOCALE="$RET"
-		else
-			LOCALE="C"
-		fi
-		# If the country was changed from the default one
-		# then replace the locale we inherited from
-		# languagechooser
-		#
-		# This locale should be validated, however
-		if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n $LANGUAGECODE ]; then
-			LOCALE=${LANGUAGECODE}_${COUNTRYCODE}
-		fi
-	else
-		LOCALE=C
-	fi
-else
-	LOCALE=C
-fi
-db_set "$localecode" "$LOCALE"
-
+db_set "$countrycode"  "$COUNTRYCODE"
 log "$countrycode = '$COUNTRYCODE'"
-log "$localecode = '$LOCALE'"
+
+# The code below tries to add lang_COUNTRY at the beginning of the language
+# list we got from languagechooser
+# Example:
+#   -user chooses "Arabic" at languagechooser-->she gets "ar_EG:ar:en_US:en"
+#    (see the languagelist file from languagechooser)
+#   -shes chooses "Syria" as country-->then we end up with 
+#    "ar_SY:ar_EG:ar:en_UC:en"
+# We shouldn't just add this before the former list in case the country 
+# is changed several times.
+#
+# First re-get the language list from languagechooser
+db_get "$languagechooserlanguage"
+# If we get nothing, do not change anything
+if test "$RET" ; then
+    LANGNAME="$RET"
+    # languagemap is a script from languagechooser	    
+    # languagemap returns the language list in LANGUAGELIST
+    # languagemap returns the language alone in LANGUAGE
+    # if languagemap couldn't be found
+    # do nothing
+    if . languagemap ; then
+	# If the country was changed from the default one
+	# then add xx_YY at the beginning of the languagelist we got
+	# from languagechooser
+	if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n $LANGUAGE ]; then
+		LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:${LANGUAGELIST}
+		# Languagelist setting
+		db_set "$languagecode" "$LANGUAGELIST"
+		log "$languagecode = '$LANGUAGELIST'"
+	fi
+
+    fi
+fi
+
 
 exit 0
