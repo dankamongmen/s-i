@@ -13,12 +13,13 @@ ONLINE=N
 ATOMIC_COMMITS=N
 BIG_COMMITS=N
 DEBUG=N
+KEEP_REVISION=N
 svn=svn
 debconfupdatepo=debconf-updatepo
 
 usage() {
 echo  "Usage:"
-echo  "$0 [--online] [--atomic] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
+echo  "$0 [--keep-revision=lang] [--online] [--atomic] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
 }
 
 ##  Command line parsing
@@ -27,6 +28,14 @@ while $MORETODO ; do
     case "$1" in
     "--online")
         ONLINE=Y
+        shift
+        ;;
+    "--keep-revision"*)
+        KEEP_REVISION=`echo $1|cut -f2 -d=`
+	if [ -z "$KEEP_REVISION" ] ; then
+	    usage
+	    exit 1
+	fi
         shift
         ;;
     "--debug")
@@ -276,8 +285,16 @@ for package in $packages ; do
         if [ $(diff --ignore-matching-lines="PO-Revision-Date" $lang.po $lang.po.new | wc -l) = 0 ] ; then
 	  rm $lang.po.new
         else
-	  mv $lang.po.new $lang.po
-	  echo -n "(CHANGED) "
+	  if [ "$KEEP_REVISION" != "N" -a "$KEEP_REVISION" = "$lang" ] ; then
+	    # We grab back the PO-Revision-Date from the old file
+	    old_revision=`cat $lang.po| grep -e "^\"PO-Revision-Date:" | sed 's/\\\\n\"//g'`
+	    # And we replace the one from the new file by it
+	    # then put all this as a result
+	    cat $lang.po.new | sed "s/\"PO-Revision-Date:.*/$old_revision\\\\n\"/g" >$lang.po	    
+	  else
+	    mv $lang.po.new $lang.po
+	    echo -n "(CHANGED) "
+	  fi
         fi
       else
 	mv $lang.po.new $lang.po
