@@ -345,7 +345,7 @@ md_mainmenu() {
 ### Main of script ###
 
 # Try to load the necesarry modules.
-# As we only support raid1 at this point, only that module is loaded.
+# Supported schemes: RAID 0, RAID 1
 depmod -a 1>/dev/null 2>&1
 modprobe md 1>/dev/null 2>&1
 modprobe raid0 >/dev/null 2>&1
