@@ -577,6 +577,12 @@ default_disk_label () {
 		    echo mac;;
 		*vme*)
 		    echo msdos;;
+		q40)
+		    echo UNSUPPORTED;; # atari (same as atari)
+		sun)
+	    	    echo sun;;
+		sunx)
+	    	    echo sun;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
