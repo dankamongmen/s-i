@@ -497,7 +497,6 @@ set_disk_named(char *name, PedDisk *disk)
         if (NULL != old_disk)
                 ped_disk_destroy(old_disk);
         devices[index_of_name(name)].disk = disk;
-        remember_geometries_named(name);
 }
 
 /* True iff the partition doesn't exist on the storage device */
@@ -510,14 +509,17 @@ named_partition_is_virtual(char *name, PedSector start, PedSector end)
         log("named_partition_is_virtual(%s,%lli,%lli)", name, start, end);
         geometries = devices[index_of_name(name)].geometries;
         last = devices[index_of_name(name)].number_geometries;
-        if (NULL == geometries)
+        if (NULL == geometries) {
+                log("yes");
                 return true;
-        for (i=0; i<last; i++) {
-                log("comparing against %lli-%lli",
-                    geometries[i].start, geometries[i].end);
-                if (start == geometries[i].start && end == geometries[i].end)
-                        return false;
         }
+        for (i=0; i<last; i++) {
+                if (start == geometries[i].start && end == geometries[i].end) {
+                        log("no");
+                        return false;
+                }
+        }
+        log("yes");
         return true;
 }
 
@@ -542,6 +544,7 @@ unchange_named(char *name)
 {
         log("Note %s as unchanged", name);
         devices[index_of_name(name)].changed = false;
+        remember_geometries_named(name);
 }
 
 
@@ -1045,34 +1048,39 @@ command_opened()
 }
 
 void
-command_commit()
+command_virtual()
 {
+        char *id;
+        PedPartition *part;
         scan_device_name();
         if (dev == NULL)
                 critical_error("The device %s is not opened.", device_name);
-        log("command_commit()");
+        log("command_virtual()");
         open_out();
-        if (disk != NULL && named_is_changed(device_name))
-                ped_disk_commit(disk);
-        unchange_named(device_name);
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("is virtual partition with id %s", id);
+        part = partition_with_id(disk, id);
         oprintf("OK\n");
+        if (named_partition_is_virtual(device_name, 
+                                       part->geom.start, part->geom.end)) {
+                oprintf("yes\n");
+        } else {
+                oprintf("no\n");
+        }
+        free(id);
 }
 
 void
-command_undo()
+command_disk_unchanged()
 {
         scan_device_name();
         if (dev == NULL)
                 critical_error("The device %s is not opened.", device_name);
-        log("command_undo()");
+        log("command_disk_unchanged(%s)", device_name);
         open_out();
-        log("Rereading disk label");
-        deactivate_exception_handler();
-        if (dev != NULL)
-                set_disk_named(device_name, ped_disk_new(dev));
-        activate_exception_handler();
-        unchange_named(device_name);
         oprintf("OK\n");
+        unchange_named(device_name);
 }
 
 /* Print in /var/log/partition_dump information about the disk, the
@@ -1096,6 +1104,39 @@ command_dump()
                 dump_info(dumpfile, dev, disk);
                 fclose(dumpfile);
         }
+        oprintf("OK\n");
+}
+
+void
+command_commit()
+{
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        log("command_commit()");
+        open_out();
+        if (disk != NULL && named_is_changed(device_name))
+                ped_disk_commit(disk);
+        unchange_named(device_name);
+        oprintf("OK\n");
+}
+
+void
+command_undo()
+{
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        log("command_undo()");
+        open_out();
+        log("Rereading disk label");
+        deactivate_exception_handler();
+        if (dev != NULL) {
+                set_disk_named(device_name, NULL);
+                set_disk_named(device_name, ped_disk_new(dev));
+        }
+        activate_exception_handler();
+        unchange_named(device_name);
         oprintf("OK\n");
 }
 
@@ -1225,30 +1266,6 @@ command_get_chs()
         }
         free(id);
         activate_exception_handler();
-}
-
-void
-command_virtual()
-{
-        char *id;
-        PedPartition *part;
-        scan_device_name();
-        if (dev == NULL)
-                critical_error("The device %s is not opened.", device_name);
-        log("command_virtual()");
-        open_out();
-        if (1 != iscanf("%as", &id))
-                critical_error("Expected partition id");
-        log("is virtual partition with id %s", id);
-        part = partition_with_id(disk, id);
-        oprintf("OK\n");
-        if (named_partition_is_virtual(device_name, 
-                                       part->geom.start, part->geom.end)) {
-                oprintf("yes\n");
-        } else {
-                oprintf("no\n");
-        }
-        free(id);
 }
 
 void
@@ -1758,7 +1775,6 @@ command_resize_partition()
                 if (resize_partition(disk, part, start, end, true)) {
                         ped_disk_commit(disk);
                         unchange_named(device_name);
-                        remember_geometries_named(device_name);
                 }
         }
         oprintf("OK\n");
@@ -1885,6 +1901,10 @@ main_loop()
                         command_close();
                 else if (!strcasecmp(str, "OPENED"))
                         command_opened();
+                else if (!strcasecmp(str, "VIRTUAL"))
+                        command_virtual();
+                else if (!strcasecmp(str, "DISK_UNCHANGED"))
+                        command_disk_unchanged();
                 else if (!strcasecmp(str, "DUMP"))
                         command_dump();
                 else if (!strcasecmp(str, "COMMIT"))
@@ -1897,8 +1917,6 @@ main_loop()
                         command_partition_info();
                 else if (!strcasecmp(str, "GET_CHS"))
                         command_get_chs();
-                else if (!strcasecmp(str, "VIRTUAL"))
-                        command_virtual();
                 else if (!strcasecmp(str, "LABEL_TYPES"))
                         command_label_types();
                 else if (!strcasecmp(str, "VALID_FLAGS"))

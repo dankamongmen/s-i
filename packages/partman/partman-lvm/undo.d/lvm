@@ -85,7 +85,18 @@ for dev in /var/lib/partman/devices/*; do
 		open_dialog NEW_PARTITION primary ext2 $free_space full $free_size
 		read_line num id size type fs path name
 		close_dialog
+		if [ "$id" ]; then
+		    open_dialog GET_FILE_SYSTEM $id 
+		    read_line filesystem
+		    close_dialog
+		    if [ "$filesystem" != none ]; then
+			open_dialog CHANGE_FILE_SYSTEM $id $filesystem
+			close_dialog
+		    fi
+		fi
 	    fi
+	    open_dialog DISK_UNCHANGED
+	    close_dialog
 	fi
     fi
 done

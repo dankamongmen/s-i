@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+if [ -f $DEVICES ] && [ `ls $DEVICES | wc -l` -ge 1 ]; then
+    exit 0
+fi
+
+db_reset partman/no_partitionable_media
+db_input critical partman/no_partitionable_media
+db_go || exit 10
+#db_get partman/no_partitionable_media
+RET=false
+if [ "$RET" = false ]; then
+    exit 10
+fi
+exit 0

@@ -24,10 +24,9 @@ for dev in $DEVICES/*; do
 	case $filesystem in
 	    ext2|fat16|fat32)
 		if 
-		    [ -f $id/formatted_as_$filesystem \
-		      -a $id/formatted_as_$filesystem -nt $id/method \
+		    [ -f $id/formatted -a $id/formatted -nt $id/method ] \
 		    && [ ! -f $id/filesystem \
-		         -o $id/formatted_as_$filesystem -nt $id/filesystem ]
+		         -o $id/formatted -nt $id/filesystem ]
 		then
 		    continue
 		fi
@@ -89,7 +88,7 @@ for dev in $DEVICES/*; do
 		    disable_swap
 		    exit 1
 		fi
-		>$id/formatted_as_$filesystem
+		>$id/formatted
 		;;
 	esac
     done

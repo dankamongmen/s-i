@@ -24,10 +24,9 @@ for dev in $DEVICES/*; do
 	case $filesystem in
 	    xfs)
 		if 
-		    [ -f $id/formatted_as_xfs \
-		      -a $id/formatted_as_xfs -nt $id/method \
+		    [ -f $id/formatted -a $id/formatted -nt $id/method ] \
 		    && [ ! -f $id/filesystem \
-		         -o $id/formatted_as_xfs -nt $id/filesystem ]
+		         -o $id/formatted -nt $id/filesystem ]
 		then
 		    continue
 		fi
@@ -66,7 +65,7 @@ for dev in $DEVICES/*; do
 		    disable_swap
 		    exit 1
 		fi
-		>$id/formatted_as_xfs
+		>$id/formatted
 		;;
 	esac
     done

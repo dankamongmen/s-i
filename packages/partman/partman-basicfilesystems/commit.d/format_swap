@@ -20,8 +20,7 @@ for dev in $DEVICES/*; do
 	method=$(cat $id/method)
 	if [ "$method" = swap ]; then
 	    if 
-		[ -f $id/formatted_as_swap \
-		  -a $id/formatted_as_swap -nt $id/method ]
+		[ -f $id/formatted -a $id/formatted -nt $id/method ]
 	    then
 		continue
 	    fi
@@ -61,7 +60,7 @@ for dev in $DEVICES/*; do
 		db_go || true
 		exit 1
 	    fi
-	    >$id/formatted_as_swap
+	    >$id/formatted
 	fi
     done
 done

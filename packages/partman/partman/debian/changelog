@@ -1,9 +1,39 @@
 partman (38) UNRELEASED; urgency=low
 
+  * Anton Zinoviev
+     - parted_server.c (command_undo): destroy the old disk before
+       reopening.  It is possible that this fixes #239300 
+     - init.d/unsupported: exit 10 when the user presses <back> (instead
+       of continuing the partitioner).  Thanks to Martin Michlmayr,
+       closes: #243374
+     - templates (partman/choose_partition): specify precisely that
+       selecting a partition allows to assign a file system, mount point,
+       etc.  Thanks to Eric Zupunski, closes: #245027
+     - choose_partition/partition_tree/do_option: do not rely on the
+       existence of partman/filesystem_long/"$filesystem" template.
+       Thanks to Havard Korsvoll, closes: #248104
+     - definitions.sh (humandev): include the usual linux device names in
+       the text representations of the devices.  Thanks to Ricardo Corral,
+       closes: #244821
+     - move the "Finish partitioning" item again at the bottom.  Thanks to
+       Martin Michlmayr, closes: #245524.
+     - New script init.d/69no_media: warn the user when there is no
+       partitionable media.  Thanks to Matt Weatherford, Martin Michlmayr
+       and Brad Langhorst, closes: #240937, #246723, #247027.
+     - parted_server.c (named_partition_is_virtual): write in the log file
+       whether the partition was virtual or not.  Do not trace in the log
+       file all comparisons with existing partitions.
+     - parted_server.c: do not invoke remember_geometries_named() in
+       set_disk_named, invoke it in unchange_named() instead
+     - parted_server.c: new command DISK_UNCHANGED.
+     - partman: in the confirmation dialog do not show as formatable
+       partitions that have been already formatted.  Thanks to Martin
+       Michlmayr, closes: #248063
+     - init.d/backup: never rely on old backup directory
   * Christian Perrier
     - Fix ellipsis typography
-
- -- Christian Perrier <bubulle@debian.org>  Thu, 13 May 2004 20:22:33 +0200
+  
+ -- Anton Zinoviev <zinoviev@debian.org>  Fri, 14 May 2004 11:55:32 +0300
 
 partman (37) unstable; urgency=low
 

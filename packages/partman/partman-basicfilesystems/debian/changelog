@@ -4,8 +4,17 @@ partman-basicfilesystems (25) UNRELEASED; urgency=low
     - Make sure the ext2 module is loaded, to support non-ext2 initrds.
     - Add dependencies on filesystem modules and e2fsprogs-udeb.
     - Depend on partman.
-
- -- Colin Watson <cjwatson@debian.org>  Sun,  9 May 2004 19:13:38 +0100
+  * Anton Zinoviev
+    - send the output of modprobe to /dev/null
+    - commit.d/format_{swap,basicfilesystems}: do not use timestamps of
+      the form "formatted_as_$filesystem", but use just "formatted".  This
+      allows other parts of partma to know whether some partition is going
+      to be formatted again or not.
+    - remove dependency on partman as otherwise main-menu falls in
+      infinite loop - partman depends on partman-target, partman-target
+      depends on partman-basicfilesystems
+  
+ -- Anton Zinoviev <zinoviev@debian.org>  Thu, 13 May 2004 11:48:17 +0300
 
 partman-basicfilesystems (24) unstable; urgency=low
 

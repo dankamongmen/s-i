@@ -85,8 +85,13 @@ while true; do
 	for part in $partitions; do
 	    id=${part%,*}
 	    num=${part#*,}
-	    [ -f $id/method -a -f $id/format \
-		-a -f $id/visual_filesystem ] || continue
+            [ -f $id/method -a -f $id/format \
+                -a -f $id/visual_filesystem ] || continue
+            [ -f $id/filesystem -o ! -f $id/formatted \
+                -o $id/formatted -ot $id/method ] || continue
+            [ ! -f $id/filesystem -o ! -f $id/formatted \
+                -o $id/formatted -ot $id/method \
+                -o $id/formatted -ot $id/filesystem ] || continue
 	    filesystem=$(cat $id/visual_filesystem)
 	    db_subst partman/text/confirm_item TYPE "$filesystem"
 	    db_subst partman/text/confirm_item PARTITION "$num"

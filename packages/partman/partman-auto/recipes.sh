@@ -246,21 +246,67 @@ setup_partition () {
 }
 
 choose_recipe () {
-    local free_size choices min_size
+    local recipes archdetect arch sub free_size choices min_size
+    
+#     recipes=$(
+# 	if [ -x /bin/archdetect ]; then
+# 	    archdetect=$(archdetect)
+# 	else
+# 	    archdetect=unknown/generic
+# 	fi
+# 	arch=${archdetect%/*}
+# 	sub=${archdetect#*/}
+# 	for recipe in \
+# 	    /lib/partman/recipes/* \
+# 	    /lib/partman/recipes-$arch/* \
+# 	    /lib/partman/recipes-$arch-$sub/*
+# 	do
+# 	    [ -f $recipe ] || continue
+# 	    echo ${recipe##*/} ${recipe#/lib/partman/recipes} $recipe
+# 	done |
+# 	sort | {
+# 	    oldname=''
+# 	    while read name recipe; do
+# 		if [ "$name" != "$oldname" ]; then
+# 		    echo $recipe
+# 		    oldname="$name"
+# 		fi
+# 	    done
+# 	}
+#     )
+
+    if [ -x /bin/archdetect ]; then
+	archdetect=$(archdetect)
+    else
+	archdetect=unknown/generic
+    fi
+    arch=${archdetect%/*}
+    sub=${archdetect#*/}
+
+    for recipedir in \
+	/lib/partman/recipes-$arch-$sub \
+	/lib/partman/recipes-$arch \
+	/lib/partman/recipes
+    do
+        if [ -d $recipedir ]; then
+	    break
+	fi
+    done
+
     free_size=$1
     choices=''
-    first_recipe=''
-    for recipe in /lib/partman/recipes/*; do
+    first_recipe=no
+    for recipe in $recipedir/*; do
 	[ -f "$recipe" ] || continue
 	decode_recipe $recipe
 	if [ $(min_size) -le $free_size ]; then
 	    choices="${choices}${recipe}${TAB}${name}${NL}"
-	fi
-	if [ -z "$first_recipe" ]; then
-	    first_recipe="$recipe"
+	    if [ no = "$first_recipe" ]; then
+		first_recipe="$recipe"
+	    fi
 	fi
     done
-
+    
     if [ -z "$choices" ]; then
        db_input critical partman-auto/no_recipe || true
        db_go || true # TODO handle backup right

@@ -438,19 +438,21 @@ log () {
 
 # TODO: this should not be global
 humandev () {
-    local host bus target part lun idenum targtype scsinum
+    local host bus target part lun idenum targtype scsinum linux
     case "$1" in
 	/dev/ide/host*/bus[01]/target[01]/lun0/disc)
 	    host=`echo $1 | sed 's,/dev/ide/host\(.*\)/bus.*/target[01]/lun0/disc,\1,'`
 	    bus=`echo $1 | sed 's,/dev/ide/host.*/bus\(.*\)/target[01]/lun0/disc,\1,'`
 	    target=`echo $1 | sed 's,/dev/ide/host.*/bus.*/target\([01]\)/lun0/disc,\1,'`
 	    idenum=$((2 * $host + $bus + 1))
+	    linux=$(mapdevfs $1)
+	    linux=${linux#/dev/}
 	    if [ "$target" = 0 ]; then
 		db_metaget partman/text/ide_master_disk description
-		printf "$RET" ${idenum}
+		printf "$RET" ${idenum} ${linux}
 	    else
 		db_metaget partman/text/ide_slave_disk description
-		printf "$RET" ${idenum}
+		printf "$RET" ${idenum} ${linux}
 	    fi
 	    ;;
 	/dev/ide/host*/bus[01]/target[01]/lun0/part*)
@@ -459,12 +461,14 @@ humandev () {
 	    target=`echo $1 | sed 's,/dev/ide/host.*/bus.*/target\([01]\)/lun0/part.*,\1,'`
 	    part=`echo $1 | sed 's,/dev/ide/host.*/bus.*/target[01]/lun0/part\(.*\),\1,'`
 	    idenum=$((2 * $host + $bus + 1))
+	    linux=$(mapdevfs $1)
+	    linux=${linux#/dev/}
 	    if [ "$target" = 0 ]; then
 		db_metaget partman/text/ide_master_partition description
-		printf "$RET" ${idenum} "$part"
+		printf "$RET" ${idenum} "$part" "${linux}"
 	    else
 		db_metaget partman/text/ide_slave_partition description
-		printf "$RET" ${idenum} "$part"
+		printf "$RET" ${idenum} "$part" "${linux}"
 	    fi
 	    ;;
 	/dev/scsi/host*/bus*/target*/lun*/disc)
@@ -473,8 +477,10 @@ humandev () {
 	    target=`echo $1 | sed 's,/dev/scsi/host.*/bus.*/target\(.*\)/lun.*/disc,\1,'`
 	    lun=`echo $1 | sed 's,/dev/scsi/host.*/bus.*/target.*/lun\(.*\)/disc,\1,'`
 	    scsinum=$(($host + 1))
+	    linux=$(mapdevfs $1)
+	    linux=${linux#/dev/}
 	    db_metaget partman/text/scsi_disk description
-	    printf "$RET" ${scsinum} ${bus} ${target} ${lun}
+	    printf "$RET" ${scsinum} ${bus} ${target} ${lun} ${linux}
 	    ;;
 	/dev/scsi/host*/bus*/target*/lun*/part*)
 	    host=`echo $1 | sed 's,/dev/scsi/host\(.*\)/bus.*/target.*/lun.*/part.*,\1,'`
@@ -483,8 +489,10 @@ humandev () {
 	    lun=`echo $1 | sed 's,/dev/scsi/host.*/bus.*/target.*/lun\(.*\)/part.*,\1,'`
 	    part=`echo $1 | sed 's,/dev/scsi/host.*/bus.*/target.*/lun.*/part\(.*),\1,'`
 	    scsinum=$(($host + 1))
+	    linux=$(mapdevfs $1)
+	    linux=${linux#/dev/}
 	    db_metaget partman/text/scsi_partition description
-	    printf "$RET" ${scsinum} ${bus} ${target} ${lun} ${part}
+	    printf "$RET" ${scsinum} ${bus} ${target} ${lun} ${part} ${linux}
 	    ;;
 	/dev/md/*)
 	    device=`echo "$1" | sed -e "s/.*md\/\?\(.*\)/\1/"`

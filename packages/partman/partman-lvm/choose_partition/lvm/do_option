@@ -2,13 +2,58 @@
 
 . /lib/partman/definitions.sh
 
+# Compute the changes we are going to do
+items=''
+for dev in $DEVICES/*; do
+    [ -d "$dev" ] || continue
+    cd $dev
+    partitions=
+    open_dialog PARTITIONS
+    while { read_line num id size type fs path name; [ "$id" ]; }; do
+	[ "$fs" != free ] || continue
+	partitions="$partitions $id,$num"
+    done
+    close_dialog
+    
+    for part in $partitions; do
+	id=${part%,*}
+	num=${part#*,}
+	[ -f $id/method -a -f $id/format \
+	    -a -f $id/visual_filesystem ] || continue
+	[ -f $id/filesystem -o ! -f $id/formatted \
+	    -o $id/formatted -ot $id/method ] || continue
+	[ ! -f $id/filesystem -o ! -f $id/formatted \
+	    -o $id/formatted -ot $id/method \
+	    -o $id/formatted -ot $id/filesystem ] || continue
+	filesystem=$(cat $id/visual_filesystem)
+	db_subst partman/text/confirm_item TYPE "$filesystem"
+	db_subst partman/text/confirm_item PARTITION "$num"
+	db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
+	db_metaget partman/text/confirm_item description
+	
+	items="${items}   ${RET}
+"
+    done
+done
+
+if [ "$items" ]; then
+    db_metaget partman/text/confirm_item_header description
+    items="$RET
+$items"
+fi
+
+# Confirm
+
 db_reset partman-lvm/confirm
+db_subst partman-lvm/confirm ITEMS "$items"
 db_input critical partman-lvm/confirm
 db_go || true
 db_get partman-lvm/confirm
 if [ "$RET" = false ]; then
     exit 0
 fi
+
+# Commit the changes
 
 for s in /lib/partman/commit.d/*; do
     if [ -x $s ]; then
