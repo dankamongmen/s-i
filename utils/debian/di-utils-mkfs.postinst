@@ -1,0 +1,34 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+MOUNTPOINT="/target"
+
+TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
+
+for P in $TMP; do
+    if [ "$PARTS" ]; then
+        PARTS="$PARTS, $P"
+    else
+        PARTS="$P"
+    fi
+done
+PARTS=`echo "$PARTS" | sed 's/, $//'`
+
+db_subst di-utils-mkfs/which-partition PARTITIONS $PARTS
+db_input critical di-utils-mkfs/which-partition
+db_go
+
+db_get di-utils-mkfs/which-partition
+PARTITION="$RET"
+
+db_subst di-utils-mkfs/filesystem PARTITION $PARTITION
+db_input medium di-utils-mkfs/filesystem
+db_go
+
+db_get di-utils-mkfs/filesystem
+FSTYPE="$RET"
+
+mkfs.$FSTYPE "$PARTITION"
+
+exit 0
