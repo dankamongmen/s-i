@@ -51,27 +51,48 @@ int compare (const void *a, const void *b) {
 
 /* Returns true if the given package could be the default menu item. */
 int isdefault(struct package_t *p) {
-	char *menutest, *cmd;
+	int check;
+
+	check = check_script(p, "menutest");
+	if (check == -1) {
+		if (p->status == unpacked || p->status == half_configured) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+	else {
+		return check;
+	}
+}
+
+
+/* Calls a control skript and passes its exit status
+ * Returns :
+ *  0  if selected script returns false or something goes wrong
+ *  1  if selected script return true
+ * -1 if selected script is not present 
+ */
+int check_script(struct package_t *p, char *scriptname) {
+	char *script, *cmd;
 	struct stat statbuf;
 	int ret;
 
-	if (asprintf(&menutest, DPKGDIR "info/%s.menutest", p->package) == -1) {
+	if (asprintf(&script, DPKGDIR "info/%s.%s", p->package, scriptname) == -1) {
 		return 0;
 	}
-	if (stat(menutest, &statbuf) == 0) {
-		if (asprintf(&cmd, "exec %s >/dev/null 2>&1", menutest) == -1) {
+	if (stat(script, &statbuf) == 0) {
+		if (asprintf(&cmd, "exec %s >/dev/null 2>&1", script) == -1) {
 			return 0;
 		}
 		ret = !SYSTEM(cmd);
 		free(cmd);
 	}
-	else if (p->status == unpacked || p->status == half_configured) {
-		ret = 1;
-	}
 	else {
-		ret = 0;
+		ret = -1;
 	}
-	free(menutest);
+	free(script);
 	return ret;
 }
 
@@ -86,7 +107,7 @@ get_default_menu_item(struct linkedlist_t *list)
 	/* Traverse the list, return the first menu item that isn't installed */
 	for (node = list->head; node != NULL; node = node->next) {
 		p = (struct package_t *)node->data;
-		if (!p->installer_menu_item || p->status == installed)
+		if (!p->installer_menu_item || p->status == installed || !check_script(p, "isinstallable"))
 			continue;
 		/* If menutest says this item should be default, make it so */
 		if (isdefault(p))
@@ -157,7 +178,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	for (node = olist->head; node != NULL; node = node->next) {
 		int ok = 0;
 		p = (struct package_t *)node->data;
-		if (!p->installer_menu_item)
+		if (!p->installer_menu_item || !check_script(p, "isinstallable"))
 			continue;
 		if (language) {
 			langdesc = p->localized_descriptions;
