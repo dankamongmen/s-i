@@ -117,6 +117,12 @@ int module_loaded(char *module) {
      return 0;
 }
 
+void update_depmod() {
+	if(access("/sbin/depmod", R_OK|X_OK) == 0) {
+		system("/sbin/depmod -a");
+	}
+}
+
 int main(int argc, char *argv[])
 {
         char *ptr = NULL;
@@ -124,6 +130,8 @@ int main(int argc, char *argv[])
         struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
         char *module;
         struct cards_lst *lst = NULL;
+
+		update_depmod();
 
         lst = init_lst(ETHDETECT_PCI_LIST, NULL, NULL);
 
@@ -169,6 +177,8 @@ int main(int argc, char *argv[])
 {
         struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
         struct cards_lst *lst = NULL;
+
+		update_depmod();
 
         lst = init_lst(ETHDETECT_PCI_LIST, NULL, NULL);
 
