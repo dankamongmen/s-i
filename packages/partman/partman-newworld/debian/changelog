@@ -1,3 +1,30 @@
+partman-newworld (3) UNRELEASED; urgency=low
+
+  * Anton Zinoviev
+    - changelog: add local variable "coding" for Emacs
+    - choose_method/_numbers: renumber the newworld method (20->45).
+      The other method numbers in partman currently are format (20),
+      keep and reuse (30), swap area (40), lvm (50), do not use (70).
+    - templates:
+       1. change the required size for yaboot partition (800KB->820KB).
+          This is because partman measures sizes using metric multipliers
+          and 800KB means 800000B rather than 819200B
+       2. add partman/method_long/newworld and partman/method_short/newworld 
+    - new file update.d/newworld_visuals: give value of the field for file
+      system in the main partitioning menu
+    - update.d/newworld:
+       1. rename as newworld_sync_flag
+       2. remove the unnecessary hack at the end of the file
+       3. read the flags from parted_server only when we have to change
+          the state of boot flag (the scripts in update.d have to be as
+          fast as possible)
+       4. unset the boot flag of non-newworld partitions made bootable by
+          partman-newworld 
+    - remove valid_filesystem directory and its contents: this hack is no
+      more necessary
+  
+ -- Anton Zinoviev <zinoviev@debian.org>  Sat, 10 Apr 2004 14:16:42 +0300
+
 partman-newworld (2) unstable; urgency=low
 
   * Set debconf template output encoding to UTF-8.
@@ -33,3 +60,7 @@ partman-newworld (1) unstable; urgency=low
     - Slovak (sk.po) by Peter KLFMANiK Mann
 
  -- Colin Watson <cjwatson@debian.org>  Wed,  7 Apr 2004 14:11:17 +0100
+
+Local Variables:
+coding: utf-8
+End:
