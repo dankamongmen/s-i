@@ -101,7 +101,7 @@ int valid_cdrom() {
 	if(!S_ISDIR(dir.st_mode))
 		return(EXIT_FAILURE);
 
-	/* test "md5sum.txt" directory */
+	/* test "md5sum.txt" file */
 	if(stat("md5sum.txt", &dir) != 0)
 		return(EXIT_FAILURE);
 	if(!S_ISREG(dir.st_mode))
