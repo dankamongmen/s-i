@@ -1,3 +1,4 @@
+#!/bin/bash
 PATH=~/aspell:~/gnuplot/bin:$PATH
 export PATH
 
@@ -19,6 +20,7 @@ cd  $OUT_DIR
 # save symlink destinations
 PREVIOUS=`ls -l previous | sed "s:.*-> ::"`
 LATEST=`ls -l latest | sed "s:.*-> ::"`
+SAVED_STATS=`echo ${NEW}.txt | sed "s:check_:stats_:"`
 
 rm previous
 rm -r $PREVIOUS
@@ -27,9 +29,9 @@ rm latest
 ln -s $NEW latest
 ln -s $LATEST previous
 
-cp $NEW/stats.txt history/stats_${NEW}.txt
+cp $NEW/stats.txt history/$SAVED_STATS
 
 echo ""
-echo "***  stats_${NEW}.txt  ***"
+echo "***  $SAVED_STATS  ***"
 echo ""
-cat history/stats_${NEW}.txt
+cat history/$SAVED_STATS

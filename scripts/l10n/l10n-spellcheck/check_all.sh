@@ -67,7 +67,7 @@ fi
 i=0
 TOTAL=0
 AVERAGE=0
-for VAL in `cat $STATS.txt | sort | awk '{print $1}'`; do
+for VAL in `cat $STATS.txt | sort -n | awk '{print $1}'`; do
     TOTAL=`expr $TOTAL + $VAL`
     i=`expr $i + 1`
 done
@@ -88,14 +88,14 @@ echo "</table>" >> $STATS.html
 
 # create plot using gnuplot
 i=0
-for ROW in `cat $STATS.txt | sort | awk '{print $2}'`; do
+for ROW in `cat $STATS.txt | sort -n | awk '{print $2}'`; do
     XTICS=$(echo "$XTICS \"$ROW\" $i,")
     i=`expr $i + 1`
 done
 
 XTICS=`echo $XTICS | sed "s:^":\(":" | sed "s:,$:):"`
 
-cat $STATS.txt | sort | awk '{print $1}' > $GNUPLOT_DATA
+cat $STATS.txt | sort -n | awk '{print $1}' > $GNUPLOT_DATA
 
 rm -f $GNUPLOT_SCRIPT
 #echo "set terminal png size 640,480" >> $GNUPLOT_SCRIPT
@@ -112,3 +112,4 @@ echo "plot \"$GNUPLOT_DATA\" with impulses,$AVERAGE t \"Average: $AVERAGE words\
 gnuplot $GNUPLOT_SCRIPT
 
 rm -f $GNUPLOT_DATA
+rm -f $GNUPLOT_SCRIPT

@@ -132,6 +132,16 @@ echo `wc -l $UNKN | awk '{print $1}'` $LANG >> ${DEST_DIR}/stats.txt
 
 rm $NO_VARS $ALL_UNKNOWN
 
+if [ ! -d  $DEST_DIR/zip ] ; then
+mkdir $DEST_DIR/zip
+fi
+
+if [ ! -d  $DEST_DIR/nozip ] ; then
+mkdir $DEST_DIR/nozip
+fi
+
 tar czf $DEST_DIR/${LANG}.tar.gz $ALL_STRINGS $UNKN
-rm $ALL_STRINGS $UNKN
+mv $DEST_DIR/${LANG}.tar.gz $DEST_DIR/zip
+
+mv $ALL_STRINGS $UNKN $DEST_DIR/nozip
 
