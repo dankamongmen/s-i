@@ -40,7 +40,7 @@ list_dump(diskspace_req_t *list)
   printf("Dumping diskspace_request list:\n");
   for (i=0; list && list[i].mountpoint; i++)
   {
-    printf(" %s %s %d %d %f\n", list[i].mountpoint, list[i].fstype,
+    printf(" %s %s %d %d\n", list[i].mountpoint, list[i].fstype,
 	   list[i].minsize, list[i].maxsize);
     total += list[i].minsize;
   }
@@ -55,7 +55,7 @@ main(int argc, char *argv[])
   if (2 == argc)
     infile = argv[1];
   else
-    infile = "workstation.table";
+    infile = "default.table";
 
   list = load_partitions(infile);
   list_dump(list);

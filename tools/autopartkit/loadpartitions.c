@@ -26,10 +26,8 @@ list_makeroom(struct partition_list *list, unsigned int room)
   assert(list);
   if (list->capacity > list->count + room)
   {
-#ifdef DEBUG
-    autopartkit_log("Enough room in list %d > %d + %d\n",
+    autopartkit_log(4, "Enough room in list %d > %d + %d\n",
 	            list->capacity, list->count, room);
-#endif /* DEBUG */
     return 0;
   }
 
@@ -103,13 +101,14 @@ add_partition(struct partition_list *list, char *line)
 
   assert(list);
 
-#ifdef DEBUG
-  autopartkit_log("Adding '%s'\n", line);
-#endif /* DEBUG */
+  autopartkit_log(3, "Adding '%s'\n", line);
 
-  if (5 != sscanf(line, "%s %s %d %d ", mountpoint, fstype, &minsize,
+  if (4 != sscanf(line, "%s %s %d %d ", mountpoint, fstype, &minsize,
 		  &maxsize))
-    return -1; /* error */
+  {
+    autopartkit_log(3, "Failed to parse line.\n");
+      return -1; /* error */
+  }
 
   autopartkit_log(2, "Fetched partition info %s %s %d %d\n",
                   mountpoint, fstype, minsize, maxsize);

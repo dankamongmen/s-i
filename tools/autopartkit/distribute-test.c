@@ -80,7 +80,7 @@ main(int argc, char *argv[])
     if (2 == argc)
         infile = argv[1];
     else
-        infile = "Workstation.table";
+        infile = "default.table";
 
     reqs = load_partitions(infile);
 
@@ -93,12 +93,15 @@ main(int argc, char *argv[])
     spaceinfo = get_free_space_list();
 
     if (NULL == spaceinfo)
-      spaceinfo = diskinfo;
+      {
+        autopartkit_log(0, "no free space list, using hardcoded table.\n");
+	spaceinfo = diskinfo;
+      }
 
     retval = distribute_partitions(spaceinfo, reqs);
 
     if (retval)
-        fprintf(stderr, "partitioning failed.\n");
+        autopartkit_log(0, "partitioning failed.\n");
     else
         print_list(spaceinfo, reqs);
 
