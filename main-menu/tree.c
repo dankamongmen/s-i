@@ -45,6 +45,32 @@ struct package_t *tree_add(const char *packagename) {
 	return pkg;
 }
 
+#if DODEBUG
+void _tree_dump(const void *nodep, const VISIT which, const int depth) {
+        struct package_t *p = *(struct package_t **)nodep;
+
+        switch(which) {
+                case postorder:
+                        DPRINTF("[%i] postorder %p %s\n", depth, nodep, p->package);
+                        break;
+                case preorder:
+                        DPRINTF("[%i] preorder %p %s\n", depth, nodep, p->package);
+                        break;
+                case endorder:
+                        DPRINTF("[%i] endorder %p %s\n", depth, nodep, p->package);
+                        break;
+                case leaf:
+                        DPRINTF("[%i] leaf %p %s\n", depth, nodep, p->package);
+                        break;
+        }
+}
+
+/* Dump out the tree. */
+void tree_dump() {
+        twalk(root, _tree_dump);
+}
+#endif
+
 void _tree_delete(const void *nodep, const VISIT which, const int depth) {
 	struct package_t *p;
 
@@ -64,7 +90,7 @@ void _tree_delete(const void *nodep, const VISIT which, const int depth) {
 		case leaf:
 			p = *(struct package_t **)nodep;
 			printf("[%i] delete %p %s\n", depth, nodep, p->package);
-			tdelete(&p, &root, _tree_compare);
+			tdelete((void *)p, &root, _tree_compare);
 			if (p->package)
 				free(p->package);
 			if (p->description)
@@ -83,30 +109,20 @@ void tree_clear() {
 #if DODEBUG
 	tree_dump();
 #endif
-}
 
 #if DODEBUG
-void _tree_dump(const void *nodep, const VISIT which, const int depth) {
-	struct package_t *p = *(struct package_t **)nodep;
-
-	switch(which) {
-		case postorder:
-			DPRINTF("[%i] postorder %p %s\n", depth, nodep, p->package);
-			break;
-		case preorder:
-			DPRINTF("[%i] preorder %p %s\n", depth, nodep, p->package);
-			break;
-		case endorder:
-			DPRINTF("[%i] endorder %p %s\n", depth, nodep, p->package);
-			break;
-		case leaf:
-			DPRINTF("[%i] leaf %p %s\n", depth, nodep, p->package);
-			break;
-	}
-}
-
-/* Dump out the tree. */
-void tree_dump() {
-	twalk(root, _tree_dump);
-}
+        tree_dump();
 #endif
+        twalk(root, _tree_delete);
+#if DODEBUG
+        tree_dump();
+#endif
+
+#if DODEBUG
+        tree_dump();
+#endif
+        twalk(root, _tree_delete);
+#if DODEBUG
+        tree_dump();
+#endif
+}
