@@ -72,7 +72,9 @@ cat > /target/boot/default.colo <<EOF
 mount $bootfs_no_dev
 load $kernel
 lcd "Booting Debian"
-execute root=$rootfs console=ttyS0,{console-speed}
+var cons_opts ''
+-var cons_opts console=ttyS0,{console-speed}
+execute root=$rootfs {cons_opts}
 EOF
 
 db_progress STEP 1
