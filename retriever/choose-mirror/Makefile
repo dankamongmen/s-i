@@ -49,8 +49,11 @@ http: clean strip
 
 clean:
 	rm -f $(BIN) $(OBJS) *~ mirrors_*.h
-	rm -f debian/choose-mirror.templates debian/templates-countries
+	rm -f debian/templates-countries
 	rm -f demo demo.templates
+
+reallyclean:
+	rm -f debian/choose-mirror.templates Mirrors.masterlist
 
 .PHONY: demo
 demo: choose-mirror demo.templates
