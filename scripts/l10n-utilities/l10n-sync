@@ -1,0 +1,227 @@
+#!/bin/bash
+# (there may be some bashisms in this script)
+#
+# This script synchronises the D-I packages maintainers templates
+# and translators translations
+#
+# See installer/doc/i18n/technical.txt for details about 
+# "l10n synchronisation windows"
+
+# Define ONLINE="YES_I_KNOW_WHAT_I_DO"
+# for doing automatic commits
+# Define ONLINE="Y"
+# for doing automatic updates but no commits
+if [ ! $ONLINE ]; then
+	ONLINE="N"
+fi
+
+# Define DEBUG=Y for more output from debconf-updatepo and msg* utilities
+# as well as SVN updates/commits output
+if [ ! $DEBUG ]; then
+        DEBUG=N
+fi
+
+# Just in case someone may want to use some SVN options
+if [ -z "$svn" ] ; then
+  svn=`which svn`
+fi
+
+# Waiting for the "--potonly" option to be added to debconf-updatepo
+# This allows using a specially crafted debconf-updatepo which allows for
+# this option for just updating templates.pot and NOT the PO files
+# which speeds up the process a lot
+if [ -z "$debconfupdatepo" ] ; then
+  debconfupdatepo=`which debconf-updatepo`
+fi
+
+if [ -z "$1" ]
+then
+  echo Usage: $0 D-I_directory
+  echo        D-I directory: local copy of Debian Installer SVN repository
+  exit 1
+fi
+
+DI_COPY=$1
+
+# A few checks about the D-I copy directory
+if [ ! -d $DI_COPY ] ; then
+  echo $DI_COPY does not exist
+  exit 1
+fi
+
+if [ ! -d $DI_COPY/.svn ] ; then
+  echo No $DI_COPY/.svn directory found
+  echo $DI_COPY may not be a copy of Debian Installer SVN repository
+  exit 1
+fi
+
+if ! grep "svn/d-i/trunk" $DI_COPY/.svn/entries >/dev/null 2>&1 ; then
+  echo $DI_COPY does not seem to be a complete Debian Installer SVN copy
+  echo Please check it before...
+  exit 1
+fi
+
+# First, update the copy of D-I repository
+cd $DI_COPY
+if [ "$ONLINE" = "Y" -o "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+  echo Synchronising $DI_COPY:
+  if [ "$DEBUG" = "Y" ] ; then
+    $svn update
+  else
+    $svn update >/dev/null 2>&1
+  fi
+  echo Done.
+fi
+
+# Build a list of all D-I packages with i18n material
+cd packages
+echo -n Building a list of all packages with i18n material...
+pots=$(find . -mindepth 3 -name templates.pot |\
+          grep /debian/po/templates.pot\$)
+packages=$(echo $pots |\
+          sed 's/\.\///g'|\
+          sed 's/\/debian\/po\/templates\.pot//g')
+echo Done.
+
+# Loop over packages
+#  1a) sync the debian/ directory
+#  1b) run debconf-updatepo
+#  1c) commit back the changes
+echo Run debconf-updatepo for all packages:
+for i in  $packages ; do 
+ echo "  $i:"
+ cd $DI_COPY/packages/$i/debian
+ if [ "$ONLINE" = "Y" -o "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+   echo -n "    - Update..."
+   if [ "$DEBUG" = "Y" ] ; then
+     $svn update
+   else
+     $svn update >/dev/null 2>&1
+   fi
+   echo Done.
+ fi
+ echo -n "    - Debconf-updatepo..."
+ cd $DI_COPY/packages/$i/debian
+ if [ "$DEBUG" = "Y" ] ; then
+   $debconfupdatepo
+ else
+   $debconfupdatepo >/dev/null 2>&1
+ fi
+ echo Done.
+ if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+   echo -n "    - Commit..."
+   cd $DI_COPY/packages/$i/debian/po
+   if [ "$DEBUG" = "Y" ] ; then
+     $svn commit -m"Run debconf-updatepo" 
+   else
+     $svn commit -m"Run debconf-updatepo" >/dev/null 2>&1
+   fi
+   echo Done.
+ fi
+done
+
+# 2) Merge all templates.pot file together
+cd $DI_COPY/packages
+echo -n "Creating the general template.pot file..."
+if [ "$DEBUG" = "Y" ] ; then
+  msgcat $pots >$DI_COPY/packages/po/template.pot
+else
+  msgcat $pots >$DI_COPY/packages/po/template.pot 2>/dev/null
+fi
+echo Done.
+if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+  echo -n "Commiting the general template.pot file..."
+  cd $DI_COPY/packages/po
+  if [ "$DEBUG" = "Y" ] ; then
+    $svn commit -m"Update from the l10n synchronisation script" template.pot
+  else
+    $svn commit -m"Update from the l10n synchronisation script" template.pot >/dev/null 2>&1
+  fi
+  echo Done.
+fi
+
+# For each PO file in packages/po:
+# 3a) Synchronize with D-I SVN
+# 3b) Update with template.pot
+# 3c) commit back the changed file
+echo Updating general PO files:
+cd $DI_COPY/packages/po
+languages=$(ls -1 *.po | sed 's/\.po//g')
+for po in *.po ; do
+ lang=$(basename $po .po)
+ echo "   $lang:"
+ if [ "$ONLINE" = "Y" -o "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+   echo -n "     - Update from SVN..."
+   if [ "$DEBUG" = "Y" ] ; then
+     $svn update
+   else
+     $svn update >/dev/null 2>&1
+   fi
+   echo Done.
+ fi
+ echo "     - Merge with template.pot:"
+ if [ "$DEBUG" = "Y" ] ; then
+   msgmerge -U $po template.pot
+ else
+   msgmerge -U $po template.pot >/dev/null 2>&1
+ fi
+ if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+   echo -n "     - Commit back to SVN..."
+   if [ "$DEBUG" = "Y" ] ; then
+     $svn commit -m"Updated with general template.pot" $i
+   else
+     $svn commit -m"Updated with general template.pot" $i >/dev/null 2>&1
+   fi
+   echo Done.
+ fi
+done
+
+
+# Loop over D-I packages:
+# 4a) synchronize the local copy with the D-I SVN 
+# 4b) update debian/po/*.po files with files in packages/po/
+# 4c) commit back the changes to D-I SVN
+echo Updating D-I packages:
+for package in $packages ; do
+ echo "   $package:"
+ cd $DI_COPY/packages/$package/debian/po
+ if [ "$ONLINE" = "Y" -o "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+   echo -n "      - synchronize with D-I repository..."
+   if [ "$DEBUG" = "Y" ] ; then
+     $svn update
+   else
+     $svn update >/dev/null 2>&1
+   fi
+   echo Done.
+ fi
+ echo -n "      - rebuild languages files: "
+ # For each languages listed in packages/po, update PO files
+ for lang in $languages ; do
+      echo -n "$lang "
+      if [ "$DEBUG" = "Y" ] ; then
+        msgmerge $DI_COPY/packages/po/$lang.po templates.pot |\
+           msgattrib --no-obsolete - >$lang.po.new
+      else
+        msgmerge $DI_COPY/packages/po/$lang.po templates.pot 2>/dev/null |\
+           msgattrib --no-obsolete - >$lang.po.new 2>/dev/null
+      fi
+      # We use the new file only if the changes are more than just 
+      # changing the PO-Revision-Date line
+      if [ $(diff --ignore-matching-lines="PO-Revision-Date" $lang.po $lang.po.new | wc -l) = 0 ] ; then
+	rm $lang.po.new
+      else
+	mv $lang.po.new $lang.po
+      fi
+ done
+ echo ""
+ if [ "$ONLINE" = "YES_I_KNOW_WHAT_I_DO" ] ; then
+   echo -n "      - commiting back updated files..."
+   if [ "$DEBUG" = "Y" ] ; then
+     $svn commit -m"Synchronising with files from packages/po" *.po
+   else
+     $svn commit -m"Synchronising with files from packages/po" *.po >/dev/null 2>&1
+   fi
+   echo Done.
+ fi
+done
+
