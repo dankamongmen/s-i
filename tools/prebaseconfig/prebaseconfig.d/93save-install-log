@@ -6,11 +6,19 @@ set -e
 
 logsavedir=/target/var/log/debian-installer
 
+# Make sure the debconf priority is in questions.dat for base-config.
+# (Gross hack; there must be a better way.)
+. /usr/share/debconf/confmodule
+db_get debconf/priority
+db_set debconf/priority $RET
+# Make sure cdebconf has saved the database.
+kill -USR1 $(ps | grep [d]ebconf/frontend | sed 's/ root.*//')
+# Make sure we wait until after it is done saving to copy the db, to avoid
+# racing. This should block until it does..
+db_get debconf/priority
+
 test -d $logsavedir || mkdir $logsavedir
 cp /var/log/* $logsavedir
-
-# Make sure the debconf priority is in questions.dat for base-config.
-debconf-set debconf/priority $(debconf-get debconf/priority)
 
 # Copy current debconf database
 cp -a /var/lib/cdebconf $logsavedir
