@@ -33,6 +33,18 @@
 #define KT_LETTER KT_LATIN
 #endif
 
+/* Unfortunately NR_KEYS, defined in kernel-headers, changes
+ * with kernel. Its
+ *  128 on 2.4.*
+ *  512 on 2.6.*
+ *  256 on 2.6.1 (+?)
+ * We redefine it here, for safety
+ */
+#ifdef NR_KEYS
+#undef NR_KEYS
+#endif
+#define NR_KEYS 256
+
 /* What keymaps are we defining? */
 char defining[MAX_NR_KEYMAPS];
 char keymaps_line_seen = 0;
@@ -651,7 +663,7 @@ static int
 defkeys(int fd) {
 	struct kbentry ke;
 	int ct = 0;
-	int i,j,fail;
+	int i,j,fail, warnings=0;
 	int oldm;
 
 	if (unicode_used) {
@@ -678,7 +690,11 @@ defkeys(int fd) {
 				j = NR_KEYS;
 				continue;
 			    }
-			    di_error ("kbd_chooser: KDSKBENT : %s", strerror(errno));
+			    if (errno == EINVAL) {
+			    	if (warnings++ == 0)
+				    	di_warning ("kbd-chooser: Ignoring invalid keys\n");
+				continue;
+			    }
 			} else
 			  ct++;
 			if (fail)
