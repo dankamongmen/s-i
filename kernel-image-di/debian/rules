@@ -42,14 +42,8 @@ build-stamp:
 clean:
 	rm -f build-stamp unpack-stamp
 	-rm -rf kernel-source-$(KVERS)
-	DH_CONTROL=debian/control.out dh_clean debian/control.out || dh_clean
-
-install: build
-	cd kernel-source-$(KVERS); \
-		FLAVOUR=di make INSTALL_MOD_PATH=`pwd`/modules modules_install
-	# Actually installs all the modules into place, and
-	# generates debian/control.out.
-	./copy-modules kernel-source-$(KVERS)/modules $(KVERS) $(FLAVOUR)
+	-mv -f debian/control.orig debian/control
+	dh_clean
 
 # Use kernel-package to build the kernel image.
 binary-image: build
@@ -59,14 +53,21 @@ binary-image: build
 	mv *.deb ..
 
 # Build module udebs.
-# Make debhelper use this processed control file.
-export DH_CONTROL=
-binary-arch: DH_CONTROL=debian/control.out
-binary-arch: install binary-image
-	dh_testversion 2.2.15
+binary-udebs: build
+	dh_testversion 2.1.18
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	
+	cd kernel-source-$(KVERS); \
+		FLAVOUR=di make INSTALL_MOD_PATH=`pwd`/modules modules_install
+	# Actually installs all the modules into place, and
+	# generates debian/control.out.
+	./copy-modules kernel-source-$(KVERS)/modules $(KVERS) $(FLAVOUR)
+	if [ ! -e debian/control.orig ]; then \
+		mv -f debian/control debian/control.orig; \
+	fi
+	mv -f debian/control.out debian/control
+	
 	dh_compress
 	dh_fixperms
 	dh_installdeb
@@ -76,11 +77,12 @@ binary-arch: install binary-image
 	# Register udebs manually and build udebs.
 	for package in `dh_listpackages`; do \
 		dpkg-distaddfile $${package}_$(VERSION)_$(ARCH).udeb \
-			debian-installer $(PRIORITY); \
+			admin $(PRIORITY); \
 		dh_builddeb --package=$${package} \
 			--filename=$${package}_$(VERSION)_$(ARCH).udeb; \
 	done
 
+binary-arch: binary-image binary-udebs
 binary-indep:
 
 binary: binary-indep binary-arch
