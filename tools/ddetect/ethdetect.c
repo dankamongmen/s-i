@@ -31,7 +31,7 @@
 
 static struct debconfclient *client;
 
-static char *debconf_input(char *priority, char *template)
+static char *my_debconf_input(char *priority, char *template)
 {
         client->command(client, "fset", template, "seen", "false", NULL);
         client->command(client, "input", priority, template, NULL);
@@ -45,7 +45,7 @@ static int ethdetect_insmod(char *modulename) {
      char buffer[128];
      char *params = NULL;
     
-     params = debconf_input("low", "ethdetect/module_params");
+     params = my_debconf_input("low", "ethdetect/module_params");
      snprintf(buffer, sizeof(buffer), "modprobe -v %s %s", modulename,
               (params ? params : " "));
      
@@ -69,9 +69,9 @@ char *ethdetect_prompt(void)
         char *ptr;
         char *module = NULL;
 
-        ptr = debconf_input("high", "ethdetect/module_select");
+        ptr = my_debconf_input("high", "ethdetect/module_select");
         if (strstr(ptr, "other"))
-                ptr = debconf_input("high", "ethdetect/module_prompt");
+                ptr = my_debconf_input("high", "ethdetect/module_prompt");
         if (ptr) {
                 module = strdup(ptr);
                 return module;
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
         client->command(client, "title", "Network Hardware Configuration",
                         NULL);
 
-        ptr = debconf_input("high", "ethdetect/detection_type");
+        ptr = my_debconf_input("high", "ethdetect/detection_type");
 
         if (strstr(ptr, "false")) {
                 if ((module = ethdetect_prompt()) == NULL)
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
                                         ethernet->module, NULL);
 
                         ptr =
-                            debconf_input("high", "ethdetect/load_module");
+                            my_debconf_input("high", "ethdetect/load_module");
                         if (strstr(ptr, "true")) {
                                 if (ethdetect_insmod(ethernet->module) ==
                                     0)
