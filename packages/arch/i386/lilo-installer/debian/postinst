@@ -42,8 +42,11 @@ db_go || exit 10 # back up
 db_get lilo-installer/bootdev
 
 case "$RET" in
-  *Master*) bootdev=$disc_offered_devfs ;;
-  *Debian*) bootdev=$bootfs_devfs ;;
+  *Master*) bootdev=$(mapdevfs $disc_offered_devfs)  ;;
+  *Debian*)
+    bootdev=$(mapdevfs $bootfs_devfs)
+    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
+  ;;
   *Advanced*)
     not_done=1
     db_set lilo-installer/manual_bootdev "$disc_offered_devfs" || true
@@ -55,7 +58,16 @@ case "$RET" in
 
       if [ -b "$RET" ]; then
         case "$RET" in
-          /dev/ide*|/dev/discs/*|/dev/scsi/*) bootdev="$RET"; not_done=0 ;;
+          /dev/ide*|/dev/discs/*|/dev/scsi/*)
+	    bootdev="$(mapdevfs $RET)"
+	    not_done=0
+	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
+	  ;;
+	  /dev/[hs]d[a-z][0-9])
+	    bootdev=$RET;
+	    not_done=0
+	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
+	  ;;
 	esac
       fi
 
@@ -79,7 +91,7 @@ db_progress info lilo-installer/progress_active
 # If installing to a partition (not MBR), offer to make it active
 if echo "${bootdev}" | grep -q '[0-9]$'; then
     # Installing to a partition, check if it is already marked active
-    if ! fdisk -l ${disc_offered_devfs} | grep "^${bootdev}" | grep -q '\*'; then
+    if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+${part} " | grep -q '\*'; then
         # partition is not marked active, offer to make it so
         db_input high lilo-installer/activate-part || [ $? -eq 30 ]
         if ! db_go; then
@@ -87,7 +99,7 @@ if echo "${bootdev}" | grep -q '[0-9]$'; then
 	  exit 10 # back up
 	fi
         db_get lilo-installer/activate-part
-        if [ "${RET}" = "true"]; then
+        if [ "${RET}" = "true" ]; then
             pnum=$(echo ${bootdev} | sed 's/^.*\([0-9]\+\)$/\1/')
             echo -n "I: Setting partition to active..." >&2
             sfdisk -A${pnum} ${disc_offered_devfs}
@@ -95,9 +107,6 @@ if echo "${bootdev}" | grep -q '[0-9]$'; then
         fi
     fi
 fi
-
-# LILO would like this
-bootdev=$(mapdevfs "$bootdev")
 
 db_progress step 1
 
@@ -278,18 +287,18 @@ IFS="$newline"
 if [ -n "$probed" ]; then
   for os in $probed; do
     IFS="$OLDIFS"
-    partition=$(mapdevfs $(echo "$os" | cut -d: -f1))
+    partition=$(echo "$os" | cut -d: -f1)
+    mappedpartition=$(mapdevfs $partition)
     label=$(echo "$os" | cut -d: -f3)
     type=$(echo "$os" | cut -d: -f4)
     case "$type" in
         chain)
             cat >> /target/etc/lilo.conf <<EOF
-other=$partition
+other=$mappedpartition
 	label=$label
 #	restricted
 #	alias=$count
 EOF
-            count=$((count + 1))
         ;;
 	*)
 	    info "unhandled: $os"
