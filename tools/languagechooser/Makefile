@@ -26,7 +26,7 @@ check-data:
 
 .PHONY: demo
 languagechooser.templates: debian/templates
-	cat $^ > $@
+	grep -v '#' $^ > $@
 demo: languagechooser.templates languagechooser
 	DEBIAN_FRONTEND=dialog DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./languagechooser
 
