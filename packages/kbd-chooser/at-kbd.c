@@ -62,6 +62,5 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 		else
 			k->present = FALSE;
 	}
-
 	return keyboards;
 }

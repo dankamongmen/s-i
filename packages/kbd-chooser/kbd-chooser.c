@@ -624,6 +624,40 @@ check_if_serial_console (void)
 }
 
 /**
+ * @brief  Make sure there are no double values in the arch selection dialog.
+ * Because usb-kbd.c adds a keyboard for each keyboard detected and
+ * because usb-kbd.c may add keyboard type 'at' in some situations when an
+ * usb keyboard is detected, it is possible the types 'usb' and 'at' could
+ * be present more than once.
+ * The functions add_kbdtype and kbdtype_present test for this situation.
+ * FIXME: This could maybe be removed when the problems with keymap types for
+ *        usb keyboards have been resolved.
+ */
+
+typedef struct kbdtype_s {
+	char *name;		// short name of kbd arch
+	struct kbdtype_s *next;
+} kbdtype_t;
+
+static inline kbdtype_t *add_kbdtype (kbdtype_t *archlist, char *name) {
+	kbdtype_t *ka = xmalloc (sizeof(kbdtype_t));
+	ka->name = name;
+	ka->next = archlist;
+	archlist = ka;
+	return archlist;
+}
+
+int kbdtype_present (kbdtype_t *archlist, char *name) {
+	kbdtype_t *ka = NULL;
+
+	for (ka = archlist; ka != NULL; ka = ka->next) {
+		if (strcmp (ka->name, name) == 0)
+			return TRUE;
+	}
+	return FALSE;
+}
+
+/**
  * @brief  Pick a keyboard, adding it to debconf.
  * @return const char *  - priority of question
  */
@@ -631,6 +665,7 @@ char *
 keyboard_select (void)
 {
 	kbd_t *kp = NULL, *preferred = NULL;
+	kbdtype_t *archlist = NULL;
 	char buf[LINESIZE], *s = NULL, *none = NULL;
 	int choices = 0, first_entry = 1;
 	sercon_state sercon;
@@ -649,15 +684,17 @@ keyboard_select (void)
 		di_info ("keyboard type %s: present: %s \n", kp->name,
 			kp->present == UNKNOWN ? "unknown ": 
 			(kp->present == TRUE ? "true: " : "false" ));
-		if (kp->present != FALSE) {
+		if ((kp->present != FALSE) &&
+		    (kbdtype_present (archlist, kp->name) == FALSE)) {
 			choices++;
 			s = insert_description (s,  kp->description, &first_entry);
+			archlist = add_kbdtype (archlist, kp->name);
 			if (strcmp (PREFERRED_KBD, kp->name) == 0) {
 				if ((preferred == NULL) || (preferred->present == UNKNOWN)
 				    || (kp->present == TRUE))
 					preferred = kp;
 			} else {
-				if (preferred == NULL || 
+				if ((preferred == NULL) || 
 				    (preferred->present != TRUE && kp->present == TRUE))
 					preferred = kp;
 			}
@@ -672,17 +709,17 @@ keyboard_select (void)
 		mydebconf_default_set ("console-tools/archs", none);
 	} else {
 		if (((preferred == NULL) || (preferred->present == UNKNOWN))
-		    && (sercon == SERIAL_UNKNOWN)) {
+		    && (sercon != SERIAL_PRESENT) && (umlcon != SERIAL_PRESENT)) {
 			di_info ("Can't tell if kbd present; add no keyboard option\n");
-			s = insert_description (s, none, &first_entry);
 			choices++;
+			s = insert_description (s, none, &first_entry);
 		}
 		mydebconf_default_set ("console-tools/archs",  
 				      preferred ? preferred->description : none);
 	}
 	debconf_subst (client, "console-tools/archs", "choices", buf);
 	free(none);
-	return ((sercon == SERIAL_PRESENT) || 
+	return ((sercon == SERIAL_PRESENT) || (umlcon == SERIAL_PRESENT) ||
 		(preferred && preferred->present == TRUE)) ? "low" : "medium";
 }
 

@@ -24,7 +24,7 @@
 #define DEHEX(s) ( ((*(s) - '0') << 12) + ((*(s+1) -'0') << 8) + ((*(s+2)-'0') << 4) + ((*(s+3)-'0')))
 
 // Arch-specific information about USB Keyboards
-typedef struct usb_data_s { 
+typedef struct usb_data_s {
 	uint16_t vendorid;
 	uint16_t productid;
 } usb_data;
@@ -64,19 +64,19 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 //			usb_present = 1;
 			data = (usb_data *) p->data;
 			if (data->vendorid == 0x05ac) { // APPLE
-				di_debug ("Apple USB keyboard detected");
+				di_debug ("Apple USB keyboard detected\n");
 				p->present = TRUE;
 			} else {
-				di_debug ("non-Apple USB keyboard detected");
-				p->present = FALSE;
+				di_debug ("non-Apple USB keyboard detected\n");
+				p->present = UNKNOWN;     // Is this really an USB/Mac keyboard?
 #if defined(__i386__) && defined (AT_KBD)
-				di_debug ("Forcing keymap list to AT (i386)");
+				di_debug ("Forcing keymap list to AT (i386)\n");
 				p->name = "at";           // Force installer to show AT keymaps
 				p->present = TRUE;
 #endif
 #if defined(__powerpc__) && defined (AT_KBD)
 				if (strstr (subarch, "mac") == NULL) {
-					di_debug ("Forcing keymap list to AT (powerpc)");
+					di_debug ("Forcing keymap list to AT (powerpc)\n");
 					p->name = "at";   // Force installer to show AT keymaps
 					p->present = TRUE;
 				}
@@ -88,8 +88,9 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 	}
 	// Ensure at least 1 USB entry
 	if (!usb_present) {
-		di_debug ("Adding generic entry for USB keymaps");
-		keyboards = usb_new_entry (keyboards);
+		di_debug ("Adding generic entry for USB keymaps\n");
+		p = usb_new_entry (keyboards);
+		keyboards = p;
 	}
 	return keyboards;
 }
@@ -108,7 +109,7 @@ static kbd_t *usb_parse_proc (kbd_t *keyboards)
 
 	fp = fopen ("/proc/bus/usb/devices", "r");
 	if (fp == NULL) {	// try harder.
-		di_debug ("Mounting usbdevfs to look for kbd");
+		di_debug ("Mounting usbdevfs to look for kbd\n");
 		// redirect stderr for the moment
 		serr = dup(2);
 		close (2);
@@ -123,7 +124,7 @@ static kbd_t *usb_parse_proc (kbd_t *keyboards)
 		fp = fopen("/proc/bus/usb/devices", "r");
 	}
 	if (fp) {
-		di_debug ("Parsing /proc/bus/usb/devices");
+		di_debug ("Parsing /proc/bus/usb/devices\n");
 		while (!feof(fp)) {
 			fgets(buf, LINESIZE, fp);
 			if ((p = strstr (buf, "Vendor=")) != NULL) {
@@ -134,7 +135,7 @@ static kbd_t *usb_parse_proc (kbd_t *keyboards)
 			if ((p = strstr(buf, "usbkbd")) != NULL) {
 					// This stanza refers to a usbkbd. We can use the
 					// latest Vendor=XXXX ProdID=XXXX results
-					di_debug ("Found usbkbd kdb: 0x%hx:0x%hx", vendorid, productid);
+					di_debug ("Found usbkbd kdb: 0x%hx:0x%hx\n", vendorid, productid);
 					k = usb_new_entry (keyboards);
 					data = xmalloc(sizeof(usb_data));
 					k->data = (usb_data *) data;
@@ -151,7 +152,7 @@ static kbd_t *usb_parse_proc (kbd_t *keyboards)
 					// attached. Unfortunately AFAICT there's no info
 					// on the keyboard itself. For now let's assume
 					// we can use the Vendor & ProdID of the HID itself.
-					di_debug ("Found usbhid kbd: 0x%hx:0x%hx", vendorid, productid);
+					di_debug ("Found usbhid kbd: 0x%hx:0x%hx\n", vendorid, productid);
 					k = usb_new_entry (keyboards);
 					data = xmalloc(sizeof(usb_data));
 					k->data = (usb_data *) data;
