@@ -7,6 +7,13 @@ LIBS=
 
 all: $(BIN)
 
+# Size optimized and stripped binary target.
+small: CFLAGS=-Os $(CFLAGS) -DSMALL
+small: clean $(BIN)
+	strip --remove-section=.comment --remove-section=.note \
+		--strip-unneeded $(BIN)
+	ls -l $(BIN)
+
 $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LIBS)
 
