@@ -25,7 +25,7 @@ ask_for_size () {
 	while [ ! "$size" ]; do
 	    db_set partman-partitioning/new_partition_size "$freehsize"
 	    db_subst partman-partitioning/new_partition_size MAXSIZE "$freehsize"
-	    db_input high partman-partitioning/new_partition_size ||
+	    db_input critical partman-partitioning/new_partition_size ||
 	    $noninteractive
 	    noninteractive="return 1"
 	    db_go || return 1
@@ -94,7 +94,7 @@ ask_for_type () {
 			else
 			    db_set partman-partitioning/new_partition_type Primary
 			fi
-			db_input high partman-partitioning/new_partition_type ||
+			db_input critical partman-partitioning/new_partition_type ||
 				$noninteractive
 			db_go || return 1
 			db_get partman-partitioning/new_partition_type
@@ -113,7 +113,7 @@ ask_for_place () {
 			$noninteractive
 			place=full
 		else
-			db_input high partman-partitioning/new_partition_place ||
+			db_input critical partman-partitioning/new_partition_place ||
 				$noninteractive
 			db_go || return 1
 			db_get partman-partitioning/new_partition_place
