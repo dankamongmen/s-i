@@ -254,7 +254,7 @@ get_vglvs() {
 vg_mainmenu() {
 	while [ 1 ]; do
 		db_set lvmcfg/vgmenu "false"
-		db_input high lvmcfg/vgmenu
+		db_input critical lvmcfg/vgmenu
 		db_go
 		db_get lvmcfg/vgmenu
 
@@ -313,7 +313,7 @@ vg_create() {
 
 	db_subst lvmcfg/vgcreate_parts PARTITIONS $PARTITIONS
 	db_set lvmcfg/vgcreate_parts "false"
-	db_input high lvmcfg/vgcreate_parts
+	db_input critical lvmcfg/vgcreate_parts
 	db_go
 	db_get lvmcfg/vgcreate_parts
 	[ "$RET" = "false" ] && return
@@ -329,7 +329,7 @@ vg_create() {
 	fi
 
 	db_set lvmcfg/vgcreate_name ""
-	db_input high lvmcfg/vgcreate_name
+	db_input critical lvmcfg/vgcreate_name
 	db_go
 	[ $? -eq 30 ] && return
 	db_get lvmcfg/vgcreate_name
@@ -384,7 +384,7 @@ vg_delete() {
 
 	db_subst lvmcfg/vgdelete_names GROUPS "${GROUPS}, Leave"
 	db_set lvmcfg/vgdelete_names "false"
-	db_input high lvmcfg/vgdelete_names
+	db_input critical lvmcfg/vgdelete_names
 	db_go
 	db_get lvmcfg/vgdelete_names
 	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
@@ -393,7 +393,7 @@ vg_delete() {
 	# confirm message
 	db_subst lvmcfg/vgdelete_confirm VG $VG
 	db_set lvmcfg/vgdelete_confirm "false"
-	db_input high lvmcfg/vgdelete_confirm
+	db_input critical lvmcfg/vgdelete_confirm
 	db_go
 	db_get lvmcfg/vgdelete_confirm
 	[ "$RET" != "true" ] && return
@@ -433,7 +433,7 @@ vg_extend() {
 
 	db_subst lvmcfg/vgextend_names GROUPS "${GROUPS}, Leave"
 	db_set lvmcfg/vgextend_names "false"
-	db_input high lvmcfg/vgextend_names
+	db_input critical lvmcfg/vgextend_names
 	db_go
 	db_get lvmcfg/vgextend_names
 	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
@@ -441,7 +441,7 @@ vg_extend() {
 
 	db_subst lvmcfg/vgextend_parts PARTITIONS $PARTITIONS
 	db_set lvmcfg/vgextend_parts "false"
-	db_input high lvmcfg/vgextend_parts
+	db_input critical lvmcfg/vgextend_parts
 	db_go
 	db_get lvmcfg/vgextend_parts
 
@@ -483,7 +483,7 @@ vg_reduce() {
 
 	db_subst lvmcfg/vgreduce_names GROUPS "${GROUPS}, Leave"
 	db_set lvmcfg/vgreduce_names "false"
-	db_input high lvmcfg/vgreduce_names
+	db_input critical lvmcfg/vgreduce_names
 	db_go
 	db_get lvmcfg/vgreduce_names
 	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
@@ -502,7 +502,7 @@ vg_reduce() {
 	get_vgpvs "$VG"
 	db_subst lvmcfg/vgreduce_parts PARTITIONS $PARTITIONS
 	db_set lvmcfg/vgreduce_parts "false"
-	db_input high lvmcfg/vgreduce_parts
+	db_input critical lvmcfg/vgreduce_parts
 	db_go
 	db_get lvmcfg/vgreduce_parts
 	PARTITIONS=`echo "$RET" | cut -d " " -f1`
@@ -525,7 +525,7 @@ lv_mainmenu() {
 	FIRST=yes
 	while [ 1 ]; do
 		db_set lvmcfg/lvmenu "false"
-		db_input high lvmcfg/lvmenu
+		db_input critical lvmcfg/lvmenu
 		db_go
 		db_get lvmcfg/lvmenu
 
@@ -587,7 +587,7 @@ lv_create() {
 	fi
 
 	db_set lvmcfg/lvcreate_name ""
-	db_input high lvmcfg/lvcreate_name
+	db_input critical lvmcfg/lvcreate_name
 	db_go
 	[ $? -eq 30 ] && return
 	db_get lvmcfg/lvcreate_name
@@ -603,7 +603,7 @@ lv_create() {
 
 	db_subst lvmcfg/lvcreate_vgnames GROUPS "${GROUPS}, Leave"
 	db_set lvmcfg/lvcreate_vgnames "false"
-	db_input high lvmcfg/lvcreate_vgnames
+	db_input critical lvmcfg/lvcreate_vgnames
 	db_go
 	db_get lvmcfg/lvcreate_vgnames
 	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
@@ -623,7 +623,7 @@ lv_create() {
 	MAX_SIZE=$(human2lvm "$(getfree_vg "$VG")")
 	db_set lvmcfg/lvcreate_size "$MAX_SIZE"
 	db_fset lvmcfg/lvcreate_size seen false
-	db_input high lvmcfg/lvcreate_size
+	db_input critical lvmcfg/lvcreate_size
 	db_go
 	db_get lvmcfg/lvcreate_size
 	SIZE=$(human2lvm "$RET")
@@ -665,7 +665,7 @@ lv_delete() {
 
 	db_subst lvmcfg/lvdelete_vgnames GROUPS "${GROUPS}, Leave"
 	db_set lvmcfg/lvdelete_vgnames "false"
-	db_input high lvmcfg/lvdelete_vgnames
+	db_input critical lvmcfg/lvdelete_vgnames
 	db_go
 	db_get lvmcfg/lvdelete_vgnames
 	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
@@ -682,7 +682,7 @@ lv_delete() {
 	db_subst lvmcfg/lvdelete_lvnames VG "$VG"
 	db_subst lvmcfg/lvdelete_lvnames LVS "${LVS}, Leave"
 	db_set lvmcfg/lvdelete_lvnames "false"
-	db_input high lvmcfg/lvdelete_lvnames
+	db_input critical lvmcfg/lvdelete_lvnames
 	db_go
 	db_get lvmcfg/lvdelete_lvnames
 	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
@@ -726,7 +726,7 @@ set -- `vgdisplay -v | grep 'NOT \(active\|available\)' | wc -l`
 if [ $1 -gt 0 -a ! -f /var/cache/lvmcfg/first ]; then
 	db_subst lvmcfg/activevg COUNT $1
 	db_set lvmcfg/activevg "false"
-	db_input high lvmcfg/activevg
+	db_input critical lvmcfg/activevg
 	db_go
 	db_get lvmcfg/activevg
 	[ "$RET" = "true" ] && vgchange -a y >>/var/log/messages 2>&1
@@ -744,7 +744,7 @@ OVERRIDE=yes
 # main-loop
 while [ 1 ]; do
 	[ "$OVERRIDE" = "yes" ] && db_set lvmcfg/mainmenu "false"
-	db_input high lvmcfg/mainmenu
+	db_input critical lvmcfg/mainmenu
 	db_go
 	db_get lvmcfg/mainmenu
 	MAINRET=`echo "$RET" | sed -e 's,.*(\(.*\)).*,\1,'`
