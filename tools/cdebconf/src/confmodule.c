@@ -9,7 +9,7 @@
  *              of client configuration modules and communications
  *              between the debconf frontend and the confmodule
  *
- * $Id: confmodule.c,v 1.7 2000/12/02 07:52:01 tausq Exp $
+ * $Id: confmodule.c,v 1.8 2000/12/02 08:33:39 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -183,6 +183,9 @@ struct confmodule *confmodule_new(struct configuration *config,
 	mod->run = confmodule_run;
 	mod->communicate = confmodule_communicate;
 	mod->shutdown = confmodule_shutdown;
+
+	/* TODO: I wish we don't need gross hacks like this.... */
+	setenv("DEBIAN_HAS_FRONTEND", "1", 1);
 
 	return mod;
 }
