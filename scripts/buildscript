@@ -157,9 +157,16 @@ do_subdir packages/anna packages/autopartkit packages/base-installer \
 	packages/iso-scan packages/kbd-chooser \
 	packages/languagechooser packages/lowmem \
 	packages/lvmcfg packages/main-menu packages/netcfg packages/nobootloader \
-	packages/os-prober packages/partconf packages/partitioner \
+	packages/os-prober packages/partconf \
 	packages/prebaseconfig packages/rootskel packages/udpkg \
 	packages/usb-discover packages/userdevfs
+
+# Partitioning special for architectures that don't yet use partman.
+case $ARCH in
+    m68k|mips|s390)
+	do_subdir packages/partitioner
+	;;
+esac
 
 # Arch dependent udebs, which may not build cleanly elsewhere.
 case $ARCH in
