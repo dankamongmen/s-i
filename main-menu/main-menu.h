@@ -26,7 +26,6 @@ struct package_t {
 	char *package;
 	int installer_menu_item;
 	char *description; /* short only, and only for menu items */
-	char *description_ll;
 	char *depends[DEPENDSMAX];
 	int status;
 	int processed;

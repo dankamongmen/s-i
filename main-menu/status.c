@@ -23,7 +23,7 @@ struct package_t *status_read(void) {
 		return 0;
 	}
 	
-	lingua = getenv("LINGUA");
+	lingua = getenv("LINGUA"); /* Gross hack here. FIXME */
 
 	while (fgets(buf, BUFSIZE, f) && !feof(f)) {
 		buf[strlen(buf)-1] = 0;
@@ -47,22 +47,31 @@ struct package_t *status_read(void) {
 			}
 		}
 		else if (strstr(buf, "Description: ") == buf) {
-			/* Short description only. */
 			/*
-			 * TODO: need to get translated data from
-			 * somewhere, if in a different locale.
+			 * If there is already a description, it must be
+			 * the translated one, which we prefer to use if
+			 * possible.
 			 */
-			p->description = strdup(buf+13);
+			if (! p->description)
+				p->description = strdup(buf+13); 
 		}
-                else if (strstr(buf, "Description-") == buf && lingua) {
-	                if (strlen(buf) >= 16 && buf[14] == ':') {
-	                       lang_code = (char *) malloc(3);
-	                       memcpy(lang_code, buf + 12, 2);
-	                       if (strcmp(lang_code, lingua) == 0)
-	                          p->description_ll = strdup(buf + 16);
-	                       free(lang_code);
-                        }
-                }
+		else if (strstr(buf, "Description-") == buf && lingua &&
+			 strlen(buf) >= 16 && buf[14] == ':') {
+			lang_code = (char *) malloc(3);
+			memcpy(lang_code, buf + 12, 2);
+			if (strcmp(lang_code, lingua) == 0) {
+				/* 
+				 * Store the translated description in
+				 * the description field (evil). But the
+				 * field may already filled (from a
+				 * Description: line).
+				 */
+				if (p->description)
+					free(p->description);
+				p->description = strdup(buf + 16);
+			}
+			free(lang_code);
+		}
 		else if (strstr(buf, "Depends: ") == buf) {
 			/*
 			 * Basic depends line parser. Can ignore versioning

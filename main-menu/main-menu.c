@@ -120,24 +120,13 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	s = menutext;
 	for (p = head; p; p = p->next) {
 		if (p->installer_menu_item) {
-			if (p->description_ll) {
-			    strcpy(s, p->description_ll);
-			    s += strlen(p->description_ll);
-			}
-			else 
-			{
-			    strcpy(s, p->description);
-			    s += strlen(p->description);
-			}    
+			strcpy(s, p->description);
+			s += strlen(p->description);
 			*s++ = ',';
 			*s++ = ' ';
 
-			if (! menudefault && isdefault(p)) {
-			    if (p->description_ll)
-			        menudefault = p->description_ll;
-			    else
-			        menudefault = p->description;
-			}	
+			if (! menudefault && isdefault(p))
+				menudefault = p->description;
 		}
 	}
 	/* Trim trailing ", " */
@@ -157,13 +146,8 @@ struct package_t *show_main_menu(struct package_t *packages) {
 
 	/* Figure out which menu item was selected. */
 	for (p = head; p; p = p->next) {
-		if (p->description_ll) {
-		    if (p->installer_menu_item && strcmp(p->description_ll, s) == 0)
-			    return p;
-		}	    
-		else
-		    if (p->installer_menu_item && strcmp(p->description, s) == 0)
-			    return p;
+		if (p->installer_menu_item && strcmp(p->description, s) == 0)
+			return p;
 	}
 	return 0;
 }
