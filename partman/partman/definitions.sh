@@ -548,9 +548,9 @@ default_disk_label () {
 		apus)
 		    echo amiga;;
 		chrp)
-		    echo UNKNOWN;;
+		    echo msdos;; # guess
 		chrp_pegasos)
-		    echo UNKNOWN;;
+		    echo amiga;;
 		prep)
 		    echo msdos;; # guess
 		newworld)
