@@ -40,7 +40,6 @@ distribute_test_SOURCES = \
 	distribute.c \
 	loadpartitions.c \
 	distribute-test.c \
-	lvm.c \
 	evaluator.c
 
 tabledir = $(sysconfdir)/autopartkit

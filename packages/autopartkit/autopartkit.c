@@ -84,13 +84,6 @@
 
 #include "autopartkit.h"
 
-/* 
- * How much of the "excess" LVM space should be spent on the LVM
- * logical volumes.  This accounts for LVM overhead, and make sure
- * some VG space is available for later use.
- */
-#define LVM_SPEND_FACTOR (0.5)
-
 #define FAT_MINSIZE_FACTOR 1.33
 
 #define MAX_PARTITIONS 10
@@ -897,7 +890,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 #if defined(LVM_HACK)
     void *lvm_pv_stack;
     void *lvm_lv_stack;
-    void *lvm_vg_stack;
 #endif /* LVM_HACK */
 
     memset(mountmap,0,sizeof(device_mntpoint_map_t)*MAX_PARTITIONS);
@@ -1144,7 +1136,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 			 mountmap[partcount].devpath);
 
 	newpart = NULL;
-	// req_tmp->minsize = -1; /* Why? */
+	req_tmp->minsize = -1;
 	partcount++;
     }
 
@@ -1178,7 +1170,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 #if defined(LVM_HACK)
     /* Initialize LVM partitions and volumes, if the LVM tools are available */
     autopartkit_log(1, "Initializing LVM.\n");
-
+    
     while ( ! lvm_pv_stack_isempty(lvm_pv_stack) )
     {
         char *vgname;
@@ -1197,7 +1189,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
         free(devpath);
     }
 
-    /* Ok - I'll remove this later.... 
     while ( ! lvm_lv_stack_isempty(lvm_lv_stack) )
     {
         char *vgname;
@@ -1215,6 +1206,9 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	autopartkit_log(1, "  Init LVM lv on vg=%s, lvname=%s mbsize=%u\n",
 			vgname, lvname, mbminsize);
 
+	/* XXX The LVM logical volume size should be calculated based
+	   on the size of the volume group.  At the moment we just use
+	   the minimum size */
         devpath = lvm_create_logicalvolume(vgname, lvname, mbminsize);
 	if (NULL == devpath)
 	    autopartkit_log(1, "  LVM lv creation failed\n");
@@ -1223,6 +1217,17 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
             char *mkfs;
             autopartkit_log(1, "  LVM lv created ok, devpath=%s\n", devpath);
 
+        /* Create filesystem */
+        /*
+          Something like this might work:
+
+          const char *parted_fs = linux_fstype_to_parted(info[3]); 
+          fs_type = ped_file_system_type_get(parted_fs);
+          part_geom = map_from_devpath(devpath).
+          fs = ped_file_system_create(&part_geom, fs_type, NULL);
+          ped_file_system_close(fs);
+        */
+            /* Do it like this for now */
             if (0 == strcmp("swap", fstype))
                 mkfs = "/sbin/mkswap";
             else if (0 == strcmp("ext2", fstype))
@@ -1231,7 +1236,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                 mkfs = "/sbin/mkfs.ext3";
             else if (0 == strcmp("reiserfs", fstype))
                 mkfs = "/sbin/mkfs.reiserfs";
-            else 
+            else /* Any default fs will have to do for now */
             {
                 autopartkit_log(1, "  Unknown filesystem '%s' on LVM volume\n",
                                 fstype);
@@ -1247,7 +1252,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                     autopartkit_error(1, "  Failed to create '%s' fs on '%s'",
                                       fstype, devpath);
                 else
-                {
+                { /* Replace devpath placeholder with real path */
                     char buf[1024];
                     int i;
                     autopartkit_log(1, "  FS '%s' created ok on '%s'",
@@ -1265,149 +1270,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	    else
 	        autopartkit_error(1,
 				  "Unable to allocate memory for mkfs call");
-	}
-    }
-    */
-    /* Distribute logical volumes (andread@linpro.no) */
-    lvm_vg_stack = lvm_vg_stack_new();
-
-    /* Store vgnames on stack */
-    for (partnum = 0; partnum < MAX_PARTITIONS && requirements[partnum].fstype;
-	 ++partnum)
-    {
-        if ( 0 == strncmp("lvm\0", requirements[partnum].fstype, 4) ){
-	    lvm_vg_stack_push(lvm_vg_stack, requirements[partnum].mountpoint);
-      }
-    }
-
-    /* Loop vg-stack, get disk_info and create request-array */
-    while ( ! lvm_vg_stack_isempty(lvm_vg_stack) ){
-        struct disk_info_t vg[2];
-        struct diskspace_req_s lvm_reqs[MAX_PARTITIONS];
-        int lvm_reqs_index = 0;
-        char *vgname;
-
-        lvm_vg_stack_pop(lvm_vg_stack, &vgname);
-        if ( ! lvm_get_free_space_list(vgname, &vg[0]) ){
-            printf("ERROR: No vg %s\n", vgname);
-            continue;
-        }
-        vg[1].capacity = 0;
-        /* loop requests... */
-        for (partnum = 0; partnum < MAX_PARTITIONS && 
-	       requirements[partnum].fstype; 
-	     ++partnum){   
-            char *identmatch;
-            char *elements[4];
-
-            asprintf(&identmatch, "lvm:%s:", vgname);
-            if ( 0 == strncmp(identmatch, requirements[partnum].fstype, 
-                              strlen(identmatch) ) ) {
-                /* Insert into request array */
-                lvm_split_fstype(requirements[partnum].fstype, ':', 
-				 4, elements);
-                lvm_reqs[lvm_reqs_index].mountpoint = strdup(elements[2]);
-                lvm_reqs[lvm_reqs_index].ondisk = 1;
-                lvm_reqs[lvm_reqs_index].fstype = strdup(elements[3]);
-                lvm_reqs[lvm_reqs_index].minsize = 
-		    requirements[partnum].minsize;
-                lvm_reqs[lvm_reqs_index].maxsize = 
-		    requirements[partnum].maxsize;
-		autopartkit_log(2, "  LVM request array: %s, %d, %d\n",
-				lvm_reqs[lvm_reqs_index].mountpoint,
-				lvm_reqs[lvm_reqs_index].minsize,
-				lvm_reqs[lvm_reqs_index].maxsize);
-                lvm_reqs_index++;
-            }
-            lvm_reqs[lvm_reqs_index].mountpoint = NULL;
-            free(identmatch);
-        }
-
-        /* Reduce vg size by LVM_SPEND_FACTOR... */
-	autopartkit_log(1, "Vg %s - %d to use\n",
-			vg[0].path, vg[0].freespace);
-	autopartkit_log(1, "Reducing...\n");
-        reduce_disk_usage_size(&vg[0], lvm_reqs, LVM_SPEND_FACTOR);
-	autopartkit_log(1, "Vg %s - %d to use\n",
-			vg[0].path, vg[0].freespace);
-        /* Call distribute_partitions */
-	autopartkit_log(1, "  LVM distribute_partitions...\n");
-        distribute_partitions(vg, lvm_reqs);
-	autopartkit_log(1, "Layout lits:\n");
-        print_list(vg, lvm_reqs);
-        /* Make logical volumes */
-        for (partnum = 0; partnum < 10 && 
-               lvm_reqs[partnum].mountpoint; ++partnum){
-            char *lvname;
-            int mbsize;
-	    char *devpath = NULL;
-	    char *fstype;
-	    char *cmd = NULL;
-	    int retval;
-
-            lvname = lvm_reqs[partnum].mountpoint;
-            mbsize = BLOCKS_TO_MiB(lvm_reqs[partnum].blocks);
-	    fstype = lvm_reqs[partnum].fstype;
-	    
-	    autopartkit_log(2, "  LVM creating %s, %s, %d\n", 
-			    vgname, lvname, mbsize);
-	    devpath = lvm_create_logicalvolume(vgname, lvname, mbsize);
-	    if (NULL == devpath)
-	      autopartkit_log(1, "  LVM lv creation failed\n");
-	    else
-	      {
-		char *mkfs;
-		autopartkit_log(1, "  LVM lv created ok, devpath=%s\n", 
-				devpath);
-		autopartkit_log(1, "  LVM creating fs: %s\n", fstype);
-		/* Create filesystem */
-		/* Do it like this for now */
-		if (0 == strcmp("swap", fstype))
-		  mkfs = "/sbin/mkswap";
-		else if (0 == strcmp("ext2", fstype))
-		  mkfs = "/sbin/mkfs.ext2";
-		else if (0 == strcmp("ext3", fstype))
-		  mkfs = "/sbin/mkfs.ext3";
-		else if (0 == strcmp("reiserfs", fstype))
-		  mkfs = "/sbin/mkfs.reiserfs";
-		else /* Any default fs will have to do for now */
-		  {
-		    autopartkit_log(1, "  Unknown fs '%s' on LVM vol\n",
-				    fstype);
-		    mkfs = "/sbin/mkfs.ext2";
-		    fstype = lvm_reqs[partnum].fstype = "ext2";
-		  }
-		retval = asprintf(&cmd, "%s %s >> /var/log/messages 2>&1", 
-				  mkfs, devpath);
-		autopartkit_log(1, "Running command: %s\n", cmd);
-		if (-1 != retval)
-		  {
-		    retval = system(cmd);
-		    free(cmd);
-		    if (0 != retval)
-		      autopartkit_error(1, "  Failed to create '%s' fs on '%s'",
-					fstype, devpath);
-		    else
-		      { /* Replace devpath placeholder with real path */
-			char buf[1024];
-			int i;
-			autopartkit_log(1, "  FS '%s' created ok on '%s'",
-					fstype, devpath);
-			snprintf(buf, sizeof(buf), "%s:%s", vgname, lvname);
-			for (i = 0; i < partcount; i++)
-			  if (0 == strcmp(buf, mountmap[i].devpath))
-			    {
-			      free(mountmap[i].devpath);
-			      mountmap[i].mountpoint->fstype = strdup(fstype);
-			      mountmap[i].devpath = devpath;
-			    }
-		      }
-		  }
-		else
-		  autopartkit_error(1,
-				    "Unable to allocate memory for mkfs call");
-	      }
-	    autopartkit_log(1, "LVM done\n");
 	}
     }
     lvm_lv_stack_delete(lvm_lv_stack);

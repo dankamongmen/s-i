@@ -149,13 +149,12 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	        continue; /* Ignore zero-size partitions */
 	    if (reqs[j].curdisk == &diskinfo[i])
 	    {
-	        int64_t span;
 		if ((PedSector)-1 == reqs[j].max_blk)
 		    reqs[j].max_blk = maxmax_blk;
-		span = reqs[j].max_blk - reqs[j].min_blk;
-		total_wanted += span;
+		total_wanted += reqs[j].max_blk - reqs[j].min_blk;
 		autopartkit_log(0, "Adding %ld to total_wanted, now %ld\n",
-				(long)span, (long)total_wanted);
+				(long)(reqs[j].max_blk - reqs[j].min_blk),
+				(long)total_wanted);
 	    }
 	}
         if (total_wanted == 0)
@@ -168,23 +167,19 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	    if (reqs[j].curdisk == &diskinfo[i])
 	    {
 		PedSector newsize;
+		/* These calculations can overflow if the numbers are
+		   too big. */
 		newsize = reqs[j].max_blk - reqs[j].min_blk;
-		if (newsize) /* Only resize if min < max */
-		{
-		    /* These calculations can overflow if the numbers
-		       are too big. */
-		    newsize *= diskinfo[i].freespace;
-		    assert(total_wanted);
-		    newsize /= total_wanted;
-		    newsize += reqs[j].blocks;
-		    if (newsize > reqs[j].max_blk)
-		        newsize = reqs[j].max_blk;
+		newsize *= diskinfo[i].freespace;
+		assert(total_wanted);
+		newsize /= total_wanted;
+		newsize += reqs[j].blocks;
+		if (newsize > reqs[j].max_blk)
+		    newsize = reqs[j].max_blk;
 
-		    /* We know the new size.  Activate it */
-		    total_wanted -= reqs[j].max_blk - reqs[j].min_blk;
-		    diskinfo[i].freespace -= newsize - reqs[j].blocks;
-		    reqs[j].blocks = newsize;
-		}
+		/* We know the new size.  Activate it */
+		diskinfo[i].freespace -= newsize - reqs[j].blocks;
+		reqs[j].blocks = newsize;
 	    }
 	}
     }
@@ -302,20 +297,4 @@ get_free_space_list(void)
         free(spaceinfo);
         return NULL;
     }
-}
-
-/* andread@linpro.no */
-void *
-reduce_disk_usage_size(struct disk_info_t *vg, 
-                     struct diskspace_req_s reqs[],
-                     double percent){
-    /* Reduce free vg space to sum(min values) + percent of free space */
-    int i;
-    int minimum = 0;
-    int newsize = 0;
-    for(i=0; i<10 && reqs[i].mountpoint; i++){
-      minimum = minimum + MiB_TO_BLOCKS(reqs[i].minsize);
-    }
-    newsize = ((vg->capacity) - minimum) * percent;
-    vg->freespace = newsize + minimum;
 }

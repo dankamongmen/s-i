@@ -2,7 +2,7 @@
 AC_INIT([autopartkit],[0.76],[debian-boot@lists.debian.org])
 AM_INIT_AUTOMAKE([foreign no-define])
 
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC

@@ -37,10 +37,10 @@
 #define EMPTYGEOMETRY {NULL, 0, 0, 0}
 
 struct disk_info_t diskinfo[] = {
-    { "/dev/hda", EMPTYGEOMETRY,  MiB_TO_BLOCKS(11264), MiB_TO_BLOCKS(8192) },
-    { "/dev/hdb", EMPTYGEOMETRY,  MiB_TO_BLOCKS(1000),  MiB_TO_BLOCKS(1000) },
-    { "/dev/hdc", EMPTYGEOMETRY,  MiB_TO_BLOCKS(2000),  MiB_TO_BLOCKS(2000) },
-    { NULL,       EMPTYGEOMETRY,  MiB_TO_BLOCKS(   0),  MiB_TO_BLOCKS(   0) }
+    { "/dev/hda", EMPTYGEOMETRY,   MiB_TO_BLOCKS( 400), MiB_TO_BLOCKS( 400) },
+    { "/dev/hdb", EMPTYGEOMETRY,   MiB_TO_BLOCKS(1000), MiB_TO_BLOCKS(1000) },
+    { "/dev/hdc", EMPTYGEOMETRY,   MiB_TO_BLOCKS(2000), MiB_TO_BLOCKS(2000) },
+    { NULL,       EMPTYGEOMETRY,   MiB_TO_BLOCKS(   0), MiB_TO_BLOCKS(   0) }
 };
 
 static int
