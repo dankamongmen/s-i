@@ -101,13 +101,15 @@ foreach my $dist (@dists) {
 					}
 					push @annotations, {arch => $arch, detail => 1, package => $source, annotation => "binary package $package at version $version on arch $arch, while $lastbinfromsource{$source} is version $packageversions{$source}{$dist}{$arch}" };
 				}
-				$packageversions{$source}{$dist}{$arch} = $version;
-				$lastbinfromsource{$source}=$package;
-				$seenpackages{$source}=1;
-				my ($filename)=m/Filename: (.*)\n/;
-				push @{$poolfiles{$source}{$arch}}, $filename;
-				my ($pooldir)=m/Filename: (.*)\/.*?\n/;
-				$pooldirs{$source}=$pooldir;
+				else {
+					$packageversions{$source}{$dist}{$arch} = $version;
+					$lastbinfromsource{$source}=$package;
+					$seenpackages{$source}=1;
+					my ($filename)=m/Filename: (.*)\n/;
+					push @{$poolfiles{$source}{$arch}}, $filename;
+					my ($pooldir)=m/Filename: (.*)\/.*?\n/;
+					$pooldirs{$source}=$pooldir;
+				}
 			}
 		}
 	}
