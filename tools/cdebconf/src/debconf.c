@@ -52,8 +52,6 @@ static void cleanup()
 
 void sighandler(int sig)
 {
-	struct question *q = NULL;
-
 	save();
 	/*
 	 * SIGUSR1 used to reconfigure the language. Now it

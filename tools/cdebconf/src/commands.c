@@ -20,34 +20,6 @@
     } \
 })
 
-/**
- * @brief Checks to see if a given predicate is true; and if not
- *        write an appropriate message into the output buffer.
- *        Used in conjunction with the CHECKARGC macro above
- * @param int pred - predicate
- * @param char *out - output buffer
- * @param size_t outsize - output buffer size
- * @return int - DC_OK if pred is true, DC_NOTOK otherwise
- * @warning  static, to be used by command_* functions below
- */
-static char *_command_checkargc(int pred)
-{
-    char *out = NULL;
-
-    if (!pred)
-    {
-        if (asprintf(&out, "%u Incorrect number of arguments",
-                CMDSTATUS_SYNTAXERROR) == -1)
-            return strdup("1");
-        else
-            return out;
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
 char *
 command_input(struct confmodule *mod, char *arg)
 {
