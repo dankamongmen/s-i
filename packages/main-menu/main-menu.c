@@ -108,21 +108,32 @@ get_default_menu_item(di_slist *list)
 	/* Traverse the list, return the first menu item that isn't installed */
 	for (node = list->head; node != NULL; node = node->next) {
 		p = node->data;
+		//di_log(DI_LOG_LEVEL_DEBUG, "find default; on: %s", p->p.package);
 		if (!p->installer_menu_item ||
 		    p->p.status == di_package_status_installed ||
-		    !isinstallable(p))
+		    !isinstallable(p)) {
+			//di_log(DI_LOG_LEVEL_DEBUG, "not menu item; or not installed");
 			continue;
+		}
 		if (p->installer_menu_item < last_successful_item &&
-		    p->installer_menu_item < NEVERDEFAULT)
+		    p->installer_menu_item < NEVERDEFAULT) {
+			//di_log(DI_LOG_LEVEL_DEBUG, "not in range to be default");
 			continue;
+		}
 		/* If menutest says this item should be default, make it so */
-		if (!isdefault(p))
+		if (!isdefault(p)) {
+			//di_log(DI_LOG_LEVEL_DEBUG, "isdefalt says no");
 			continue;
+		}
 		/* Do not default to a package that provides a virtual
 		   package that is provided by a package that is
 		   already installed.  */
-		if (!provides_installed_virtual_package(&p->p))
+		if (!provides_installed_virtual_package(&p->p)) {
+			//di_log(DI_LOG_LEVEL_DEBUG, "success on this one");
 			return p;
+		}
+
+		//di_log(DI_LOG_LEVEL_DEBUG, "not default");
 	}
 	/* Severely broken, there are no menu items in the sorted list */
 	return NULL;
