@@ -229,7 +229,7 @@ di_pkg_alloc(const char *name)
 {
   struct package_t *p;
 
-  p = (struct package_t *)malloc(sizeof(struct package_t));
+  p = malloc(sizeof(struct package_t));
   memset(p, 0, sizeof(struct package_t));
   p->package = strdup(name);
   return p;
@@ -313,7 +313,7 @@ di_pkg_parse(FILE *f)
   char *b;
   int i;
 
-  list = (struct linkedlist_t *)malloc(sizeof(struct linkedlist_t));
+  list = malloc(sizeof(struct linkedlist_t));
   list->head = list->tail = NULL;
   while (fgets(buf, BUFSIZE, f) && !feof(f))
   {
@@ -321,7 +321,7 @@ di_pkg_parse(FILE *f)
     if (di_stristr(buf, "Package: ") == buf)
     {
       p = di_pkg_alloc(strchr(buf, ' ') + 1);
-      node = (struct list_node *)malloc(sizeof(struct list_node));
+      node = malloc(sizeof(struct list_node));
       node->next = NULL;
       node->data = p;
       if (list->head != NULL)
@@ -393,7 +393,7 @@ di_pkg_parse(FILE *f)
       if ((colon_idx = strstr(buf, ": ")) != NULL)
       {
         lang_code_len = colon_idx - dash_idx;
-        lang_code = (char *)malloc(lang_code_len);
+        lang_code = malloc(lang_code_len);
         memcpy(lang_code, dash_idx + 1, lang_code_len-1);
         lang_code[lang_code_len-1] = '\0';
         langdesc = malloc(sizeof(struct language_description));
@@ -567,7 +567,7 @@ di_pkg_resolve_deps(struct linkedlist_t *ptr)
       if ((q = di_pkg_find(ptr, p->provides[i]->name)) == NULL)
       {
         q = di_pkg_alloc(p->provides[i]->name);
-        newnode = (struct list_node *)malloc(sizeof(struct list_node));
+        newnode = malloc(sizeof(struct list_node));
         newnode->data = q;
         newnode->next = ptr->head;
         ptr->head = newnode;
@@ -621,7 +621,7 @@ dfs_visit(struct package_t *p, struct linkedlist_t *queue)
     if (!q->processed)
       dfs_visit(q, queue);
   }
-  node = (struct list_node *)malloc(sizeof(struct list_node));
+  node = malloc(sizeof(struct list_node));
   node->data = p;
   node->next = NULL;
   if (queue->tail == NULL)
@@ -642,7 +642,7 @@ di_pkg_toposort_arr(struct package_t **packages, const int pkg_count)
   struct linkedlist_t *queue;
   int i;
 
-  queue = (struct linkedlist_t *)malloc(sizeof(struct linkedlist_t));
+  queue = malloc(sizeof(struct linkedlist_t));
   queue->head = queue->tail = NULL;
   for (i = 0; i < pkg_count; i++)
     packages[i]->processed = 0;
