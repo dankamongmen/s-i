@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+dev=$1
+id=$2
+property=$3
+
+db_metaget partman-palo/text/palo description
+
+# The imaginery file system "palo" is available only for palo partitions
+[ -f $id/method ] || exit 0
+method=$(cat $id/method)
+if [ "$method" = palo ]; then
+	printf "palo\t${RET}\n"
+fi
