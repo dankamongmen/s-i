@@ -134,6 +134,13 @@ static void usb_parse_proc (kbd_t *keyboards)
  */
 kbd_t *usb_kbd_get (kbd_t *keyboards, const char *subarch)
 {
+
+#if defined(__mipsel__)
+        // DECstations do not have USB keyboards
+         if (strstr(subarch, "r3k-kn02") || strstr(subarch,"r4k-kn04"))
+               return keyboards;
+#endif
+
 	// Find all USB keyboards via /proc/bus/usb/devices
 	usb_parse_proc (keyboards);	
 	// Mark the default keymaps for each USB keyboard

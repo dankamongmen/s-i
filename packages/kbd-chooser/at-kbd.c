@@ -33,6 +33,11 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 	    (strstr(subarch, "chrp") == NULL))
 		return keyboards;
 #endif
+#if defined(__mipsel__)
+	// DECstations do not have AT keyboards
+	if (strstr(subarch, "r3k-kn02") || strstr(subarch,"r4k-kn04"))
+		return keyboards;
+#endif
 
 	k =  xmalloc (sizeof(kbd_t));	
 	k->name = "at"; // This must match the name "at" in console-keymaps-at
