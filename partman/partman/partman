@@ -3,10 +3,12 @@
 . /lib/partman/definitions.sh
 
 abort () {
-    open_infifo
-    write_line "QUIT"
-    close_infifo
-    rm /var/run/parted_server.pid
+    if [ -f /var/run/parted_server.pid ]; then
+	open_infifo
+	write_line "QUIT"
+	close_infifo
+	rm /var/run/parted_server.pid
+    fi
     exit $1
 }
 
@@ -41,7 +43,7 @@ while true; do
             fi
 	    if ! $s; then
 	        db_progress STOP
-                exit 1
+                abort 10
             fi
 	fi
 	db_progress STEP 1

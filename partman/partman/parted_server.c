@@ -129,7 +129,7 @@ void
 close_fifos_and_synchronise()
 {
         char *str;
-        char c;
+        int c;
         log("Closing infifo and outfifo");
         fclose(infifo);
         fclose(outfifo);

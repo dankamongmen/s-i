@@ -531,7 +531,7 @@ default_disk_label () {
 		amiga)
 		    echo amiga;;
 		atari)
-		    echo UNKNOWN;; # atari is unsupported by parted
+		    echo UNSUPPORTED;; # atari is unsupported by parted
 		mac)
 		    echo mac;;
 		*vme*)
@@ -561,7 +561,7 @@ default_disk_label () {
 		    echo UNKNOWN;;
 	    esac;;
 	s390)
-	    echo UNKNOWN;; # ibm is unsupported by parted
+	    echo UNSUPPORTED;; # ibm is unsupported by parted
 	sparc)
 	    echo sun;;
 	*)
