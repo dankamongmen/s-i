@@ -13,7 +13,7 @@ log() {
     logger -t languagechooser "info: $@"
 }
 
-#   debconf/language is an alias for debian-installer/language
+# debconf/language is an alias for debian-installer/language
 db_register "$languagecode" "debconf/language"
 
 # Only display the translated texts (ie the English "translation")
@@ -24,8 +24,6 @@ else
   db_set debconf/language C
 fi
 
-db_fset "languagechooser/language-name" seen false
-db_fset "$languagecode" seen false
 db_input critical "languagechooser/language-name" || [ $? -eq 30 ]
 if db_go; then
     db_get "languagechooser/language-name"
