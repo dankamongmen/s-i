@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.49 2004/03/04 10:39:46 barbier Exp $
+ * $Id: newt.c,v 1.50 2004/03/04 10:47:10 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -284,7 +284,8 @@ show_separate_window(struct frontend *obj, struct question *q)
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
-    strtruncate(obj->title, win_width-8);
+    /*  There 5 characters for sigils, plus 4 for borders */
+    strtruncate(obj->title, win_width-9);
     t_height = get_text_height(full_description, win_width);
     if (t_height+extra <= height-5)
         win_height = t_height+extra;
@@ -369,8 +370,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     eflags |= NEWT_ENTRY_SCROLL | NEWT_FLAG_RETURNEXIT;
     newtGetScreenSize(&width, &height);
     win_width = width-7;
-    /*  There 5 characters for sigils, plus 3 for borders */
-    strtruncate(obj->title, win_width-8);
+    strtruncate(obj->title, win_width-9);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
@@ -463,7 +463,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
-    strtruncate(obj->title, win_width-8);
+    strtruncate(obj->title, win_width-9);
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
@@ -614,7 +614,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
-    strtruncate(obj->title, win_width-8);
+    strtruncate(obj->title, win_width-9);
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
@@ -741,7 +741,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
-    strtruncate(obj->title, win_width-8);
+    strtruncate(obj->title, win_width-9);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
@@ -1060,7 +1060,7 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     newtCls();
     newtGetScreenSize(&width, NULL);
     win_width = width-7;
-    strtruncate(obj->progress_title, win_width-3);
+    strtruncate(obj->progress_title, win_width-4);
     newtCenteredWindow(win_width, 5, obj->progress_title);
     data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max - obj->progress_min);
     /*  Minimal height set to 2 to prevent box flashing */
