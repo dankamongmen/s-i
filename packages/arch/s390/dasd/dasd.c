@@ -267,8 +267,8 @@ static enum state_wanted confirm (void)
 			return WANT_ERROR;
 		close (fd);
 
-		debconf_subst (client, TEMPLATE_PREFIX "formating", "device", buf);
-		debconf_progress_start (client, 0, drive_geo.cylinders, TEMPLATE_PREFIX "formating");
+		debconf_subst (client, TEMPLATE_PREFIX "formatting", "device", buf);
+		debconf_progress_start (client, 0, drive_geo.cylinders, TEMPLATE_PREFIX "formatting");
 
 		snprintf (buf, sizeof (buf), "dasdfmt -l LX%04x -b 4096 -m 1 -f %s -y", dasd_current->device, dev);
 		ret = di_exec_shell_full (buf, format_handler, NULL, NULL, NULL, NULL, NULL, NULL);
