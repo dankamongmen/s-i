@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.35 2003/04/21 16:02:05 waldi Exp $ */
+/* $Id: udpkg.c,v 1.36 2003/04/26 22:12:56 sjogren Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -207,6 +207,8 @@ static int dpkg_dounpack(struct package_t *pkg)
 			}
 		}
 
+// Only generate .list files when we need --remove support
+#ifdef DOREMOVE
 		/* ugly hack to create the list file; should
 		 * probably do something more elegant
 		 *
@@ -246,6 +248,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 			}
 		fclose(infp);
 		fclose(outfp);
+#endif
 
 		pkg->status &= STATUS_WANTMASK;
 		pkg->status |= STATUS_WANTINSTALL;
@@ -420,6 +423,7 @@ static int dpkg_fields(struct package_t *pkg)
 
 static int dpkg_remove(struct package_t *pkgs)
 {
+#ifdef DOREMOVE
 	struct package_t *p;
 	void *status = status_read();
 	for (p = pkgs; p != 0; p = p->next)
@@ -427,6 +431,10 @@ static int dpkg_remove(struct package_t *pkgs)
 	}
 	status_merge(status, 0);
 	return 0;
+#else
+	fprintf(stderr, "udpkg: No support for -r.\n");
+	return 1;
+#endif
 }
 
 #ifdef UDPKG_MODULE
