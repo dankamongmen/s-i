@@ -199,9 +199,9 @@ static const char * mydebconf_get(const char *template)
     return client->value;
 }
 
-static void mydebconf_set_title(const char *new_title)
+static void mydebconf_settitle(const char *template)
 {
-    client->command(client, "TITLE", new_title, NULL);
+    client->command(client, "SETTITLE", new_title, NULL);
 }
 
 void autopartkit_log(const int level, const char * format, ...)
@@ -1324,7 +1324,7 @@ int main (int argc, char *argv[])
 			"Continuing anyway.\n");
 #endif /* LVM_HACK */
 
-    mydebconf_set_title("Automatic Partitionner");
+    mydebconf_settitle("autopartkit/title");
 
     disable_kmsg(1);
     ped_exception_set_handler(exception_handler);
