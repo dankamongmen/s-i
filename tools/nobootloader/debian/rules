@@ -7,7 +7,7 @@ export DH_OPTIONS=-n
 
 PACKAGE=nobootloader
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
+ARCH=all
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
@@ -36,20 +36,19 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
-	dh_installdirs
+	dh_clean -k -i
+	dh_installdirs -i
 
 binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf
-	dh_installdeb 
-	dh_gencontrol -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
 
 binary-indep: build install
-
+	dh_testdir
+	dh_testroot
+	dh_installdebconf -i
+	dh_installdeb -i
+	dh_gencontrol -i -- -fdebian/files~
+	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
+	dh_builddeb -i --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
