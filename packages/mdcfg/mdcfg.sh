@@ -124,12 +124,13 @@ get_partitions() {
 }
 
 prune_partitions() {
+	CHOSEN="$1"
 	OLDIFS="$IFS"
 	IFS=,
 	NEW_PARTITIONS=""
 	for i in $PARTITIONS; do
 		found=0
-		for j in "$1"; do
+		for j in $CHOSEN; do
 			if [ "$i" = "$j" ]; then
 				found=1
 			fi
