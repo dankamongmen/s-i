@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: boot-drive-files.xml,v 1.6 2003/10/02 01:11:21 toff Exp $ -->
+<!-- $Id: boot-drive-files.xml,v 1.7 2004/03/11 17:29:52 mck-guest Exp $ -->
 
  <sect1 condition="bootable-disk" id="boot-drive-files">
  <title>Preparing Files for Hard Disk Booting</title>
@@ -40,15 +40,17 @@ model.
 </para>
 
   <sect2 arch="i386" id="files-lilo">
-  <title>Hard disk installer booting using <command>LILO</command></title>
+  <title>Hard disk installer booting using <command>LILO</command> or
+  <command>GRUB</command></title>
 <para>
 
 This section explains how to add to or even replace an existing linux
-installation  using <command>LILO</command>.
+installation using either <command>LILO</command> or
+<command>GRUB</command>.
 
 </para><para>
 
-At boot time, <command>LILO</command> supports loading in memory not
+At boot time, both bootloaders support loading in memory not
 only the kernel, but also a disk image. This RAM disk can be used as
 the root file-system by the kernel. Choose the flavor in 
 <xref linkend="kernel-choice"/> that best fits your taste, and you 
@@ -63,12 +65,12 @@ convenient location on your hard drive, for instance in
 <itemizedlist>
 <listitem><para>
 
-<filename>linux.bin</filename> (kernel binary)
+<filename>vmlinuz</filename> (kernel binary)
 
 </para></listitem>
 <listitem><para>
 
-<filename>root.bin</filename> (root image)
+<filename>initrd.gz</filename> (ramdisk image)
 
 </para></listitem>
 <listitem><para>
@@ -85,7 +87,7 @@ drivers you just extracted from <filename>drivers.tgz</filename>.
 
 </para><para>
 
-You can also replace <filename>linux.bin</filename> and
+You can also replace <filename>vmlinuz</filename> and
 <filename>drivers.tgz</filename> by your custom kernel and the
 carefully chosen drivers that you will need for the installation, for
 instance a module for your exotic and unsupported network interface.
@@ -99,7 +101,7 @@ irrelevant to you.
 
 </para><para>
 
-Finally, to configure <command>LILO</command> proceed to 
+Finally, to configure the bootloader proceed to 
 <xref linkend="boot-initrd"/>.
 
 </para>

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: installation-media.xml,v 1.11 2004/03/03 17:23:51 philbat-guest Exp $ -->
+<!-- $Id: installation-media.xml,v 1.12 2004/03/11 17:29:52 mck-guest Exp $ -->
 
  <sect1 id="installation-media">
  <title>Installation Media</title>
@@ -8,14 +8,9 @@
 
 <para>
 
-In many cases, you'll have to do your first boot from floppy disks,
-using the rescue floppy.  Generally, all you will need is a
+In many cases, you'll have to do your first boot from floppy disks.
+Generally, all you will need is a
 high-density (1440 kilobytes) 3.5 inch floppy drive.
-
-</para><para arch="i386">
-
-High-density, 5.25 inch installation floppy images (1200
-k) are also provided.
 
 </para><para arch="m68k">
 
@@ -29,9 +24,16 @@ For CHRP, floppy support is currently broken.
 </para>
   </sect2>
 
-  <sect2><title>CD-ROM</title>
+  <sect2><title>CD-ROM/DVD-ROM</title>
 
-<para>
+<note><para>
+
+Whenever you see <quote>CD-ROM</quote> in this manual, read it like
+<quote>CD-ROM or DVD-ROM</quote>, because both technologies are realy
+the same from the operating system's point of view. (Except some very
+old nonstandard neither SCSI nor IDE/ATAPI CD-ROM drives.)
+
+</para></note><para>
 
 CD-ROM based installation is supported for some architectures.
 On machines which support bootable CD-ROMs, you should be able to do a
@@ -56,6 +58,11 @@ models might require special boot parameters or other massaging to get
 them to work, and booting off these non-standard interfaces is
 unlikely.  The <ulink url="&url-cd-howto;">Linux CD-ROM HOWTO</ulink>
 contains in-depth information on using CD-ROMs with Linux.
+
+</para><para arch="i386"> 
+
+Supported are also external USB CD-ROM drives. FireWire devices that
+are supported by the ohci1394 and sbp2 drivers may also be useable.
 
 </para><para arch="arm"> 
 
@@ -118,6 +125,20 @@ Although the &arch-title; does not allow booting from SunOS
 </para>
   </sect2>
 
+  <sect2 condition="bootable-usb"><title>USB Memory Stick</title>
+
+<para>
+
+Many Debian boxes need their floppy and/or CD-ROM drives only for
+setting up the system and for rescue purposes. If you operate some
+servers, you will probably already have thought about omitting those
+drives and using an USB memory stick for installing and (when
+necessary) for recovering the system. This is also useful for small
+systems which have no room for unnecessary drives.
+
+</para>
+  </sect2>
+
   <sect2><title>Network</title>
 
 <para condition="supports-tftp">
@@ -130,7 +151,8 @@ Mips.</phrase>
 
 Diskless installation, using network booting from a local area network
 and NFS-mounting of all local filesystems, is another option &mdash;
-you'll probably need at least 16MB of RAM for a diskless installation.
+you'll probably need at least &minimum-memory-with-nfsroot; of RAM for
+a diskless installation.
 
 </para><para>
 

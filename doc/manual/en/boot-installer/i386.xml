@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: i386.xml,v 1.10 2004/03/11 14:50:07 stappers-guest Exp $ -->
+<!-- $Id: i386.xml,v 1.11 2004/03/11 17:29:52 mck-guest Exp $ -->
 
   <sect2 arch="i386"><title>Booting from a CD-ROM</title>
 
@@ -93,12 +93,6 @@ have the option of booting the installer from the hard disk. See
 <xref linkend="install-from-dos"/> for more information on 
 installing via this method.
 
-</para><para>
-
-USB CD-ROM drives are supported by the `bf2.4' flavor. FireWire devices that
-are supported by the ohci1394 and sbp2 drivers may also be useable with the
-`bf2.4' flavor.
-
 </para>
   </sect2>
 
@@ -137,7 +131,8 @@ bf2.4 flavor. The symptom of the problem is an
 
 
   <sect2 arch="i386" id="boot-initrd">
-  <title>Booting from linux using <command>LILO</command></title>
+  <title>Booting from linux using <command>LILO</command> or
+  <command>GRUB</command></title>
 <para>
 
 One <emphasis>initrd=</emphasis> line in
@@ -146,13 +141,13 @@ essentials things:
 <itemizedlist>
 <listitem><para>
 
-tell <command>LILO</command> to load the <filename>root.bin</filename>
+tell <command>LILO</command> to load the <filename>initrd.gz</filename>
 installer as a RAM disk at boot time;
 
 </para></listitem>
 <listitem><para>
 
-tell the <filename>linux.bin</filename> kernel to use this RAM disk as
+tell the <filename>vmlinuz</filename> kernel to use this RAM disk as
 its root partition.
 
 </para></listitem>
@@ -164,9 +159,9 @@ Here is a <filename>/etc/lilo.conf</filename> example:
 
 <informalexample><screen>
 
-image=/boot/newinstall/linux.bin
+image=/boot/newinstall/vmlinuz
        label=newinstall
-       initrd=/boot/newinstall/root.bin
+       initrd=/boot/newinstall/initrd.gz
 
 </screen></informalexample>
 
@@ -178,6 +173,24 @@ For more details, refer to the
 <citerefentry><refentrytitle>lilo.conf</refentrytitle>
 <manvolnum>5</manvolnum></citerefentry> man pages. Now run
 <userinput>lilo</userinput> and reboot.
+
+</para><para>
+
+Procedure for <command>GRUB</command> is quite similar. Locate your
+<filename>menu.lst</filename> in the <filename>/boot/grub/</filename>
+directory (sometimes in the <filename>/boot/boot/grub/</filename>),
+add the following lines:
+
+<informalexample><screen>
+
+title  New Install
+kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram ramdisk_size=8192 devfs=mount,dall
+initrd (hd0,0)/boot/newinstall/initrd.gz
+
+</screen></informalexample>
+
+and reboot. From now on, there should be no difference between
+<command>GRUB</command> or <command>LILO</command>.
 
 </para><para>
 
@@ -260,13 +273,36 @@ your hard drive will be un-bootable for a short period of time.
 </para>
   </sect2>
 
+  <sect2 arch="i386" id="usb-boot">
+  <title>Booting from USB memory stick</title>
+<para>
 
-  <sect2 arch="i386"><title>Booting from Floppies</title>
+Lets assume you have prepared everything from <xref
+linkend="boot-dev-select"/> and <xref linkend="boot-usb-files"/>.  Now
+just plug your USB stick into some free USB connector and reboot the
+computer.  The system should boot up, and you should be presented with
+the <prompt>boot:</prompt> prompt.  Here you can enter optional boot
+arguments, or just hit &enterkey;.
+
+</para><para>
+
+In case your computer doesn't support booting from USB memory devices,
+you can still use a single floppy to do the initial boot and then
+switch to USB. Advance according to <xref linkend="floppy-boot"/>; the
+kernel on boot floppy should detect your USB stick automatically. When
+it asks for the root floppy, simply press &enterkey;. You should see
+&d-i; starting.
+
+</para>
+  </sect2>
+
+  <sect2 arch="i386" id="floppy-boot">
+  <title>Booting from Floppies</title>
 <para>
 
 You will have already downloaded the floppy images you needed and
 created floppies from the images in <xref linkend="create-floppy"/>.
-If you need to, you can also modify the rescue floppy; see 
+If you need to, you can also modify the boot floppy; see 
 <xref linkend="rescue-replace-kernel"/>.
 
 </para><para>
@@ -298,18 +334,8 @@ booting.
 </para><para>
 
 The floppy disk will be accessed, and you should then see a screen
-that introduces the rescue floppy and ends with the <prompt>boot:</prompt>
+that introduces the boot floppy and ends with the <prompt>boot:</prompt>
 prompt.
-
-</para><para>
-
-If you are using an alternative way to boot the system, follow the
-instructions, and wait for the <prompt>boot:</prompt> prompt to come up.
-If you boot from floppies smaller than 1.44MB,
-<phrase condition="rescue-needs-root-disk">
-or, in fact, whenever you boot from floppy on your architecture,
-</phrase> you have to use a ramdisk boot method, and you will need the
-Root Disk.
 
 </para><para>
 
@@ -348,14 +374,7 @@ found below in <xref linkend="kernel-msgs"/>.
 
 </para><para>
 
-If you choose a non-default boot method, e.g., ``ramdisk'' or
-``floppy'', you will be prompted to insert the Root Floppy. Insert the
-Root Floppy into the first disk drive and press &enterkey;.  (If
-you choose floppy1 insert the Root Floppy into the second disk drive.)
-
-</para><para>
-
-After booting from the rescue floppy, the root floppy is
+After booting from the boot floppy, the root floppy is
 requested. Insert the root floppy and press &enterkey;, and the
 contents are loaded into memory. The installer program
 <command>debian-installer</command> is automatically launched.
@@ -407,10 +426,10 @@ Please refer to this document.
   <sect2 arch="i386"><title>i386 Boot Parameters</title>
 <para>
 
-If you are booting from the rescue floppy or from CD-ROM you will be
+If you are booting from the boot floppy or from CD-ROM you will be
 presented with the boot prompt, <prompt>boot:</prompt>.  Details
-about how to use boot parameters with the rescue floppy can be found
-in <xref linkend="boot-from-floppies"/>.  If you are booting from an
+about how to use boot parameters with the boot floppy can be found
+in <xref linkend="floppy-boot"/>.  If you are booting from an
 existing operating system, you'll have to use other means to set boot
 parameters.  For instance, if you are installing from DOS, you can
 edit the <filename>install.bat</filename> file with any text editor.
@@ -493,7 +512,7 @@ now return to the main menu and run the PCMCIA configuration part
   <title>System freeze while loading the USB modules</title>
 <para>
 
-The bf2.4 flavor normaly tries to install the USB and USB keyboard driver in
+The kernel normaly tries to install the USB and USB keyboard driver in
 order to allow the installation for users of some non-standard USB keyboards.
 However, there are few broken USB systems where the driver hangs on loading. A
 possible workaround may be disabling of the USB controller in your mainboard
