@@ -140,19 +140,19 @@ static DeviceStats* get_device_stats(PedDevice*);
 
 static void mydebconf_debug (const char* variable, const char* value)
 {
+    const char *template = "autopartkit/debug";
     autopartkit_log(2, "debug: %s = %s\n", variable, value);
-    client->command(client, "FSET", "autopartkit/debug", "seen", "false", NULL);
-    client->command(client, "SUBST", "autopartkit/debug", 
-		    "variable", variable, NULL);
-    client->command(client, "SUBST", "autopartkit/debug",
-		    "value", value, NULL);
-    client->command(client, "INPUT high", "autopartkit/debug", NULL);
+    client->command(client, "FSET", template, "seen", "false", NULL);
+    client->command(client, "SUBST", template, "variable", variable, NULL);
+    client->command(client, "SUBST", template, "value", value, NULL);
+    client->command(client, "INPUT high", template, NULL);
     client->command(client, "GO", NULL);
 }
 
 void
 autopartkit_error (int isfatal, const char * format, ...)
 {
+    const char *template = "autopartkit/error";
     char *msg = NULL;
     va_list ap;
 
@@ -165,10 +165,9 @@ autopartkit_error (int isfatal, const char * format, ...)
     va_end(ap);
 
     autopartkit_log(1, "error: %d, %s\n", isfatal, msg);
-    client->command(client, "FSET", "autopartkit/error", "seen", "false", NULL);
-    client->command(client, "SUBST", "autopartkit/error", "error",
-			    msg, NULL);
-    client->command(client, "INPUT high", "autopartkit/error", NULL);
+    client->command(client, "FSET", template, "seen", "false", NULL);
+    client->command(client, "SUBST", template, "error", msg, NULL);
+    client->command(client, "INPUT high", template, NULL);
     client->command(client, "GO", NULL);
 
     if (msg)
@@ -219,22 +218,18 @@ void autopartkit_log(const int level, const char * format, ...)
 /* note: only fsets seen=true if the user answered yes */
 static void autopartkit_confirm(void)
 {
-    client->command (client, "FGET", "autopartkit/confirm", "seen", NULL);
-    if (!strstr(client->value, "true")) {
-        client->command (client, "INPUT", "critical", "autopartkit/confirm", NULL);
-        client->command (client, "GO", NULL);
-    }
-    
-    client->command (client, "GET", "autopartkit/confirm", NULL);
+    const char *template = "autopartkit/confirm";
+    client->command (client, "INPUT", "critical", template, NULL);
+    client->command (client, "GO", NULL);
+    client->command (client, "GET", template, NULL);
     if (strstr(client->value, "true"))
         return;
-
-    client->command (client, "FSET", "autopartkit/confirm", "seen", "false", NULL);
-    
-    if (strstr(client->value, "false"))
+    else
+    {
+	/* Make sure the question is displayed the next time too */
+	client->command (client, "FSET", template, "seen", "false", NULL);
         exit(EXIT_FAILURE);
-    mydebconf_debug("unknown bool value", client->value);
-    exit(EXIT_FAILURE);
+    }
 }
 
 static void disable_kmsg(int disable)
@@ -420,18 +415,16 @@ static PedDevice* choose_device(void)
     nb_try = 0;
     while (dev == NULL)
     {
+        const char *template = "autopartkit/choose_device";
         const char *value;
-        client->command(client, "FGET", "autopartkit/choose_device", "seen",
-                        NULL);
+        client->command(client, "FGET", template, "seen", NULL);
         if (strcmp(client->value, "false") == 0)
-            client->command(client, "SET", "autopartkit/choose_device",
-                            default_device, NULL);
-        client->command(client, "SUBST", "autopartkit/choose_device", 
-                        "CHOICES", device_list, NULL);
-        client->command(client, "SUBST", "autopartkit/choose_device", 
-                        "TABLE", table, NULL);
+            client->command(client, "SET", template, default_device, NULL);
+        client->command(client, "SUBST", template, "CHOICES", device_list,
+			NULL);
+        client->command(client, "SUBST", template, "TABLE", table, NULL);
 
-        value = mydebconf_input("critical", "autopartkit/choose_device");
+        value = mydebconf_input("critical", template);
         disable_kmsg(1);
         dev = ped_device_get(value);
         disable_kmsg(0);
