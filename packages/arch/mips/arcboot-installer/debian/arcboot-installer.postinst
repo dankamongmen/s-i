@@ -11,9 +11,8 @@ fi
 
 # detect which is the root partition: /target
 rootfs=`grep ' /target ' $MTAB |cut -d' ' -f1 -s`
-defaultbootdev=`echo $rootfs |sed 's/part[0-9]\+$/disc/'`
 rootfs=`mapdevfs $rootfs`
-defaultbootdev=`mapdevfs $defaultbootdev`
+defaultbootdev=`echo $rootfs |sed 's/[0-9]\+$//'`
 
 db_fget arcboot/boot_device seen
 [ "$RET" = true ] || db_set arcboot/boot_device "$defaultbootdev"
@@ -62,8 +61,8 @@ fi
 # install ourself. If apt-install fails for a different reason, we are lost.
 set +e
 apt-install arcboot
-set -e
 chroot /target /usr/sbin/arcboot $bootdev
+set -e
 
 #if ! apt-install arcboot; then
 #	log "Calling 'apt-install arcboot' failed"
@@ -75,3 +74,29 @@ chroot /target /usr/sbin/arcboot $bootdev
 #		exit 1
 #	fi
 #fi
+
+# Fill the necessary PROM variables that will need to be set before the
+# system can be booted.
+bootmin=$((`echo $bootdev |sed 's+/dev/sd++' |tr [a-h] [0-7]` * 16))
+bootdevline=`grep "^\ \+8\ \+$bootmin\ \+" /proc/partitions`
+BOOTBUS=`echo $bootdevline |cut -d/ -f3 |sed 's/^bus//'`
+BOOTID=`echo $bootdevline |cut -d/ -f4 |sed 's/^target//'`
+BOOTLUN=`echo $bootdevline |cut -d/ -f5 |sed 's/^lun//'`
+
+rootmin=`echo $rootfs |sed 's+/dev/sd.++'`
+rootdevline=`grep "^\ \+8\ \+$rootmin\ \+" /proc/partitions`
+ROOTBUS=`echo $rootdevline |cut -d/ -f3 |sed 's/^bus//'`
+ROOTID=`echo $rootdevline |cut -d/ -f4 |sed 's/^target//'`
+ROOTLUN=`echo $rootdevline |cut -d/ -f5 |sed 's/^lun//'`
+
+ROOTPART=$(($rootmin - 1))
+
+db_subst arcboot-installer/prom-variables BOOTBUS "${BOOTBUS}"
+db_subst arcboot-installer/prom-variables BOOTID "${BOOTID}"
+db_subst arcboot-installer/prom-variables BOOTLUN "${BOOTLUN}"
+db_subst arcboot-installer/prom-variables ROOTBUS "${ROOTBUS}"
+db_subst arcboot-installer/prom-variables ROOTID "${ROOTID}"
+db_subst arcboot-installer/prom-variables ROOTLUN "${ROOTLUN}"
+db_subst arcboot-installer/prom-variables ROOTPART "${ROOTPART}"
+db_input high arcboot-installer/prom-variables || [ $? -eq 30 ]
+db_go || true
