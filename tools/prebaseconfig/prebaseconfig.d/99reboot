@@ -1,0 +1,9 @@
+#! /bin/sh -e
+#
+# Reboot the system, and ask the user to wait while this happens
+
+/sbin/reboot
+
+db_fset prebaseconfig/reboot_in_progress seen false || true
+db_input critical prebaseconfig/reboot_in_progress || true
+db_go || true

@@ -2,25 +2,22 @@
 
 . /usr/share/debconf/confmodule
 
-# run-parts is part of debianutils, is it available in d-i? [pere 2002-11-02]
-if /target/bin/run-parts --report /usr/lib/prebaseconfig.d ; then
-    :
-else
-    echo "error: run-parts failed.  Using shell script loop instead." 1>&2
-    # Using this until run-parts is available.
-    for f in /usr/lib/prebaseconfig.d/*; do
-        if [ -x $f ] ; then
-            $f || true
-        else
-            echo "error: Unable to execute $f" 1>&2
-        fi
-    done
-fi
+run_parts() {
+    partsdir="$1"
+    # run-parts is part of debianutils, is it available in d-i? [pere 2002-11-02]
+    if /target/bin/run-parts --report "$partsdir" ; then
+	:
+    else
+	echo "error: run-parts failed.  Using shell script loop instead." 1>&2
+        # Using this until run-parts is available.
+	for script in "$partsdir"/*; do
+	    if [ -x "$script" ] ; then
+		"$script" || true
+	    else
+		echo "error: Unable to execute $script" 1>&2
+	    fi
+	done
+    fi
+}
 
-umount -a || true
-
-/sbin/reboot
-
-db_fset prebaseconfig/reboot_in_progress seen false || true
-db_input critical prebaseconfig/reboot_in_progress || true
-db_go || true
+run_parts /usr/lib/prebaseconfig.d
