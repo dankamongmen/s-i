@@ -1,6 +1,7 @@
 #!/bin/sh
 
 . /usr/share/debconf/confmodule
+. /lib/partman/definitions.sh
 
 dev="$1"
 id="$2"
@@ -11,7 +12,7 @@ open_dialog PARTITION_INFO "$id"
 read_line part_num start end length type fs path name
 close_dialog
 
-if [ "$part_num" != 0 -o "$start" != 0 ]; then
+if [ "$part_num" != 1 -o "$start" -gt 512 ]; then
 	exit 0
 fi
 
