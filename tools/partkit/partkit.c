@@ -486,8 +486,7 @@ main (int argc, char *argv[])
 
       ptr = partkit_get_default_device();
       
-      client->command (client, "subst", "partkit/select_device", "default",
-		       ptr, NULL);
+      client->command (client, "set", "partkit/select_device", ptr, NULL);
 
       free(ptr);
 

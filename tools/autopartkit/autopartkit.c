@@ -333,8 +333,8 @@ PedDevice* choose_device()
 			"false", NULL);
 	client->command(client, "SUBST", "autopartkit/choose_device", 
 			"CHOICES", device_list, NULL);
-	client->command(client, "SUBST", "autopartkit/choose_device", 
-			"DEFAULT", default_device, NULL);
+	client->command(client, "SET", "autopartkit/choose_device", 
+			default_device, NULL);
 	client->command(client, "SUBST", "autopartkit/choose_device", 
 			"TABLEHEADER", TABLE_HEADER, NULL);
 	client->command(client, "SUBST", "autopartkit/choose_device", 

@@ -124,8 +124,7 @@ choose_retriever(void)
 	debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES",
 			ret_choices, NULL);
 	if (ret_default != NULL && ret_default[0] != '\0')
-		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT",
-				ret_default, NULL);
+		debconf->command(debconf, "SET", ANNA_RETRIEVER, ret_default, NULL);
 	debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
 	debconf->command(debconf, "GO", NULL);
 

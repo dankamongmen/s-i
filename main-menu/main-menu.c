@@ -199,7 +199,7 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
 	if (menudefault)
-		debconf->command(debconf, "SUBST", MAIN_MENU, "DEFAULT", menudefault->description, NULL);
+		debconf->command(debconf, "SET", MAIN_MENU, menudefault->description, NULL);
 	debconf->command(debconf, "INPUT medium", MAIN_MENU, NULL);
 	debconf->command(debconf, "GO", NULL);
 	debconf->command(debconf, "GET", MAIN_MENU, NULL);
@@ -292,8 +292,8 @@ static int satisfy_virtual(struct package_t *p) {
 			debconf = debconfclient_new();
 			debconf->command(debconf, "SUBST", MISSING_PROVIDE,
 					"CHOICES", choices, NULL);
-			debconf->command(debconf, "SUBST", MISSING_PROVIDE,
-					"DEFAULT", defval, NULL);
+			debconf->command(debconf, "SET", MISSING_PROVIDE,
+					defval, NULL);
 			debconf->command(debconf, "INPUT medium", MISSING_PROVIDE,
 					NULL);
 			debconf->command(debconf, "GO", NULL);
