@@ -1,0 +1,48 @@
+#!/bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+# FIXME FIXME FIXME
+mountfloppy()
+{
+    if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
+        mount /dev/floppy/0 /floppy
+    fi
+}
+
+case "x$1" in
+    xretrieve)
+        mountfloppy
+        if [ -e /floppy/$2 ]; then
+            ln -sf /floppy/$2 "$3"
+            exit $?
+        else
+            exit 1
+        fi
+        ;;
+    xpackages)
+        # generate a Packages file based on what udebs are on the floppy
+        if [ -n "$3" ]; then
+            # sorry, no compressed files
+            exit 1
+        fi
+        mountfloppy
+        rm -f "$2"
+        touch "$2"
+        for filename in /floppy/*.deb /floppy/*.udeb; do
+            if [ -f "$filename" ]; then
+                udpkg -f "$filename" >> "$2"
+                path="`echo "$filename" | sed 's,^/floppy/,,'`"
+                echo "Filename: $path" >> "$2"
+                echo >> "$2"
+            fi
+        done
+        ;;
+    xcleanup)
+        umount /floppy || true
+        ;;
+    *)
+        # unknown command
+        exit 1
+        ;;
+esac
