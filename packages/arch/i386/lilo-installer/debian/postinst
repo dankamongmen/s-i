@@ -373,8 +373,6 @@ if ! apt-install lilo ; then
 	fi
 fi
 
-umount /target/proc || true
-
 db_progress step 1
 
 db_progress info lilo-installer/progress_running
@@ -387,6 +385,8 @@ if ! chroot /target /sbin/lilo ; then
     db_go || exit 10 # back up
     exit 1
 fi
+
+umount /target/proc || true
 
 db_progress step 1
 
