@@ -2,6 +2,13 @@
 
 . /usr/share/debconf/confmodule
 
+log() {
+    logger -t net-retriever "$@"
+}
+error() {
+    log "error: $@"
+}
+
 db_get mirror/protocol
 protocol="$RET"
 db_get mirror/$protocol/hostname
