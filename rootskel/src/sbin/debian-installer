@@ -7,11 +7,6 @@
 bterm=/usr/bin/bterm
 font=/unifont.bgf
 
-# Load framebuffer and enable it for bterm
-if [ -x "$bterm" -a -e "$font" ] && enable-fb ; then
-    use_bterm=true
-fi
-
 /usr/bin/debconf-loadtemplate debian /var/lib/dpkg/info/*.templates 
 
 # Enable UTF-8 locale if it is available
@@ -23,6 +18,11 @@ if [ -d /usr/lib/locale/C.UTF-8 ] ; then
         echo -n "\033%G" # Enable UTF-8 console
         export TERM
     fi
+fi
+
+# Load framebuffer and enable it for bterm
+if [ -x "$bterm" -a -e "$font" -a C.UTF-8 = "$LANG" ] && enable-fb ; then
+    use_bterm=true
 fi
 
 # Use boot variable, but make it possible to change it in main-menu
