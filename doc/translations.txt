@@ -51,7 +51,7 @@ How to translate
 ----------------
 This document is not intended to be a tutorial for gettext-related
 stuff. Please look for documentation of PO editing software such as
-KBabel, PoEdit, EMacs PO-mode, etc.
+KBabel, gtranslator, PoEdit, EMacs PO-mode, etc.
 
 Please use a dedicated PO-editing tool unless you become very familiar
 with translation work.
@@ -67,6 +67,38 @@ For general translation issues or for finding other translators for
 your language, you may also use the debian-i18n mailing list (don't
 post translations there, however).
 
+How to update existing translations
+-----------------------------------
+
+If you want to update a translation, please always contact the previous
+translator in order to prevent duplication of work.  His mail address can
+be found in the PO file.
+
+How to test your work
+---------------------
+
+When you have finished your translation, always re-read your file at
+least once to correct all meaning-, spelling-, grammar-, typo-, etc-
+mistakes (maybe your po-editor does include a spellchecker or a
+translation helper like acheck).  Running
+  msgfmt --check --statistics <YOUR LANGUAGE CODE>.po
+(from the gettext package) before committing is also a good idea to
+check that your file is valid and will be integrated without trouble.
+
+You could also run podebconf-display-po (from po-debconf >= 0.8.3)
+on your file:
+  podebconf-display-po -fdialog debian/po/<YOUR LANGUAGE CODE>.po
+to have a rough idea on how your translation will look like.  But
+as cdebconf and debconf displays slightly differ, and as some scripts
+do heavy use of text substitution, do not fully rely on this program.
+Running debian-installer is the only solution to test translations.
+
+How to get help
+---------------
+
+If you need further assistance, do not hesitate to ask for help on
+debian-boot (for debian-installer related stuff) or debian-i18n (for
+l10n related questions) Debian mailing lists.
 
 How to get your work included in debian-installer
 -------------------------------------------------
@@ -79,6 +111,14 @@ an alioth account and ask in -boot for getting write access.
 If you have CVS write access, don't forget to update changelogs and
 remember: changelog files use UTF-8!! The debian-installer CVS is hosted on
 alioth.debian.org ("debian-installer" and "base-config" projects).
+
+If the distribution in the first line of debian/changelog is
+UNRELEASED, this means that it has been patched since the last upload.
+In this case all you have to do is to add an entry at the end of this
+revision.  Otherwise distribution is unstable, and you have then to
+bump version number.  You can do it by hand, or by running dch -i but
+in any case remember to replace unstable by UNRELEASED in the
+distribution field.  Then add a comment about your contribution.
 
  File a bug
  ----------
