@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh 
 
 . /usr/share/debconf/confmodule
 
@@ -7,9 +7,14 @@
 
 db_get debian-installer/keymap
 KEYMAP=$RET
+if [ $? -eq 10 ]; 
+then
+	# keymap not set; probably didn't call kbd-chooser
+	exit 0
+fi
 
 db_get debian-installer/serial-console
-if [ $RET == "no" ] ; then
+if [ $RET = "no" ] ; then
 	apt-install console-tools console-data console-common 
 	chroot /target install-keymap $KEYMAP
 fi
