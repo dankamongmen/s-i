@@ -143,8 +143,19 @@ else
    exit 1 
 fi
 
-# Get all the directories into the dentry cache, to cut down on seek times.
-find /cdrom/ >/dev/null
+# Get all the pool directories into the dentry cache, to cut down on seek
+# times.
+poolcount="$(set -- /cdrom/pool/*/*; echo $#)"
+db_progress START 0 "$poolcount" cdrom-detect/scanning_progress_title
+for pooldir in /cdrom/pool/*/*; do
+	if [ -d "$pooldir" ]; then
+		db_subst cdrom-detect/scanning_progress_step DIR "$pooldir"
+		db_progress INFO cdrom-detect/scanning_progress_step
+		find "$pooldir/" >/dev/null 2>&1
+	fi
+	db_progress STEP 1
+done
+db_progress STOP
 
 # Set the suite used by base-installer and base-config to
 # the suite that is on the CD. This assumes that there will
