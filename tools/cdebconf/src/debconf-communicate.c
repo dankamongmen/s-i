@@ -56,7 +56,7 @@ void help(const char *exename)
 int main(int argc, char **argv)
 {
     int code = 127;
-    char buf[1024], ret[1024];
+    char buf[1024], *ret;
 
 	signal(SIGINT, sighandler);
 	signal(SIGTERM, sighandler);
@@ -95,12 +95,13 @@ int main(int argc, char **argv)
     /* start feeding user commands to debconf ... */
     while (fgets(buf, sizeof(buf), stdin))
     {
-        confmodule->process_command(confmodule, buf, ret, sizeof(ret));
+        ret = confmodule->process_command(confmodule, buf);
 
         /* extract the first number as the return code */
         code = atoi(ret);
 
         printf ("%s\n", ret);
+        free(ret);
     }
 
 	/* shutting down .... sync the database and shutdown the modules */

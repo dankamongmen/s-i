@@ -49,24 +49,22 @@ static commands_t commands[] = {
  * @param size_t outsize - reply buffer length
  * @return int - DC_OK, DC_NOTOK, DC_NOTIMPL
  */
-static int _confmodule_process(struct confmodule *mod, char *in, char *out, size_t outsize)
+static char *_confmodule_process(struct confmodule *mod, char *in)
 {
 	int i;
 	char *argv[2] = { "", "" };
 
-	out[0] = 0;
-	if (*in == '#') return 1;
+	if (*in == '#') return NULL;
 
 	strcmdsplit(in, argv, DIM(argv));
 
 	for (i = 0; commands[i].command != 0; i++)
 	{
 		if (strcasecmp(argv[0], commands[i].command) == 0) {
-			return (*commands[i].handler)(mod, argv[1], 
-							out, outsize);
+			return (*commands[i].handler)(mod, argv[1]);
 		}
 	}
-	return DC_NOTOK;
+	return NULL;
 }
 
 /* public functions */
@@ -75,22 +73,22 @@ static int confmodule_communicate(struct confmodule *mod)
     char buf[1023];
     char *in;
     size_t insize = 1024;
-  	char *out;
-    size_t outsize = 1024;
-	char *inp;
-	int ret = 0;
+    char *out;
+//    size_t outsize = 4096;
+    char *inp;
+    int ret = 0;
 
     in = malloc(insize);
     if (!in)
         return DC_NOTOK;
     memset(in, 0, insize);
 
-    out = malloc(outsize);
-    if (!out)
-        return DC_NOTOK;
-    memset(out, 0, outsize);
+//    out = malloc(outsize);
+//    if (!out)
+//        return DC_NOTOK;
+//    memset(out, 0, outsize);
 
-	while (1) {
+    while (1) {
         buf[0] = 0;
         in[0] = 0;
         while (strchr(buf, '\n') == NULL) {
@@ -104,40 +102,40 @@ static int confmodule_communicate(struct confmodule *mod)
             }
             strcat(in, buf);
         }
-        
+
         inp = strstrip(in);
         INFO(INFO_DEBUG, "--> %s\n", inp);
-        ret = _confmodule_process(mod, inp, out, outsize);
-        if (ret == DC_NOTIMPL) {
+        out = _confmodule_process(mod, inp);
+        if (out == NULL) {
             fprintf(stderr, "E: Unimplemented function\n");
             continue;
         }
         /*		if (out[0] == 0) break; // STOP called*/
         INFO(INFO_DEBUG, "<-- %s\n", out);
-		strcat(out, "\n");
-		write(mod->outfd, out, strlen(out));
-	}
-	return ret;
+        write(mod->outfd, out, strlen(out));
+        write(mod->outfd, "\n", 1);
+        free(out);
+    }
+    return ret;
 }
 
-static int confmodule_process_command(struct confmodule *mod, char *cmd, 
-        char *out, size_t outsize)
+static char *confmodule_process_command(struct confmodule *mod, char *cmd)
 {
-    int ret;
     char *inp;
+    char *out;
 
     inp = strstrip(cmd);
 
     INFO(INFO_DEBUG, "--> %s\n", inp);
-    ret = _confmodule_process(mod, inp, out, outsize);
-    if (ret == DC_NOTIMPL) {
+    out = _confmodule_process(mod, inp);
+    if (out == NULL) {
         fprintf(stderr, "E: Unimplemented function\n");
-        snprintf(out, outsize, "%u Not implemented", ret);
+        asprintf(&out, "%u Not implemented", DC_NOTOK);
     }
     /*		if (out[0] == 0) break; // STOP called*/
     INFO(INFO_DEBUG, "<-- %s\n", out);
 
-    return ret;
+    return out;
 }
 
 static int confmodule_shutdown(struct confmodule *mod)

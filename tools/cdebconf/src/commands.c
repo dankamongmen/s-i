@@ -7,9 +7,16 @@
 #include "strutl.h"
 
 #define CHECKARGC(pred) \
-	if (_command_checkargc(argc pred, out, outsize) == DC_NOTOK) \
-		return DC_OK
-
+({\
+    char *out; \
+    if (!(argc pred)) {\
+        if (asprintf(&out, "%u Incorrect number of arguments", \
+                CMDSTATUS_SYNTAXERROR) == -1) \
+            return strdup("1"); \
+        else \
+            return out; \
+    } \
+})
 
 /**
  * @brief Checks to see if a given predicate is true; and if not
@@ -21,28 +28,33 @@
  * @return int - DC_OK if pred is true, DC_NOTOK otherwise
  * @warning  static, to be used by command_* functions below
  */
-static int _command_checkargc(int pred, char *out, size_t outsize)
+static char *_command_checkargc(int pred)
 {
-	if (!pred)
-	{
-		snprintf(out, outsize, "%u Incorrect number of arguments", 
-			CMDSTATUS_SYNTAXERROR);
-		return DC_NOTOK;
-	}
-	else
-	{
-		return DC_OK;
-	}
+    char *out = NULL;
+
+    if (!pred)
+    {
+        if (asprintf(&out, "%u Incorrect number of arguments",
+                CMDSTATUS_SYNTAXERROR) == -1)
+            return strdup("1");
+        else
+            return out;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
-int
-command_input(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_input(struct confmodule *mod, char *arg)
 {
     int visible = 1;
     struct question *q = 0;
     char *qtag;
     char *priority;
     char *argv[3];
+    char *out;
     int argc;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
@@ -54,9 +66,11 @@ command_input(struct confmodule *mod, char *arg, char *out, size_t outsize)
     q = mod->questions->methods.get(mod->questions, qtag);
     if (q == NULL) 
     {
-        snprintf(out, outsize, "%u \"%s\" doesn't exist",
-                CMDSTATUS_BADQUESTION, qtag);
-        return DC_OK;
+        if (asprintf(&out, "%u \"%s\" doesn't exist",
+                CMDSTATUS_BADQUESTION, qtag) == -1)
+            return strdup("1");
+        else
+            return out;
     }
 
     /* check priority */
@@ -71,155 +85,162 @@ command_input(struct confmodule *mod, char *arg, char *out, size_t outsize)
     q->priority = strdup(priority);
 
     if (visible) 
-        snprintf(out, outsize, "%u question will be asked",
-                CMDSTATUS_SUCCESS);
+        asprintf(&out, "%u question will be asked", CMDSTATUS_SUCCESS);
     else
-        snprintf(out, outsize, "%u question skipped",
-                CMDSTATUS_INPUTINVISIBLE);
+        asprintf(&out, "%u question skipped", CMDSTATUS_INPUTINVISIBLE);
     question_deref(q);
-    return DC_OK;
+    return out;
 }
 
-int
-command_clear(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_clear(struct confmodule *mod, char *arg)
 {
-	char *argv[3];
-	int argc;
+    char *argv[3];
+    int argc;
+    char *out;
 
-	argc = strcmdsplit(arg, argv, DIM(argv));
-	CHECKARGC(== 0);
+    argc = strcmdsplit(arg, argv, DIM(argv));
+    CHECKARGC(== 0);
 
-	mod->frontend->methods.clear(mod->frontend);
-	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
-	return DC_OK;
+    mod->frontend->methods.clear(mod->frontend);
+    asprintf(&out, "%u", CMDSTATUS_SUCCESS);
+    return out;
 }
 
-int
-command_version(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_version(struct confmodule *mod, char *arg)
 {
-	int ver;
-	char *argv[3];
-	int argc;
+    int ver;
+    char *argv[3];
+    int argc;
+    char *out;
 
-	argc = strcmdsplit(arg, argv, DIM(argv));
-	CHECKARGC(== 1);
+    argc = strcmdsplit(arg, argv, DIM(argv));
+    CHECKARGC(== 1);
 
-	ver = atoi(argv[0]);
+    ver = atoi(argv[0]);
 
-	if (ver < DEBCONF_VERSION)
-		snprintf(out, outsize, "%u Version too low (%d)",
-			CMDSTATUS_BADVERSION, ver);
-	else if (ver > DEBCONF_VERSION)
-		snprintf(out, outsize, "%u Version too high (%d)",
-			CMDSTATUS_BADVERSION, ver);
-	else
-		snprintf(out, outsize, "%u %.1f", CMDSTATUS_SUCCESS,
-			DEBCONF_VERSION);
-	return DC_OK;
+    if (ver < DEBCONF_VERSION)
+        asprintf(&out, "%u Version too low (%d)", CMDSTATUS_BADVERSION, ver);
+    else if (ver > DEBCONF_VERSION)
+        asprintf(&out, "%u Version too high (%d)", CMDSTATUS_BADVERSION, ver);
+    else
+        asprintf(&out, "%u %.1f", CMDSTATUS_SUCCESS, DEBCONF_VERSION);
+    return out;
 }
 
-int
-command_capb(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_capb(struct confmodule *mod, char *arg)
 {
-	int i;
-	char *argv[32];
-	int argc;
+    int i;
+    char *argv[32];
+    int argc;
+    char *out;
 
-	argc = strcmdsplit(arg, argv, DIM(argv));
-	/* FIXME: frontend.h should provide a method to prevent direct
-	 *        access to capability membre */
-	mod->frontend->capability = 0;
-	for (i = 0; i < argc; i++)
-		if (strcmp(argv[i], "backup") == 0)
-			mod->frontend->capability |= DCF_CAPB_BACKUP;
+    argc = strcmdsplit(arg, argv, DIM(argv));
+    /* FIXME: frontend.h should provide a method to prevent direct
+     *        access to capability membre */
+    mod->frontend->capability = 0;
+    for (i = 0; i < argc; i++)
+        if (strcmp(argv[i], "backup") == 0)
+            mod->frontend->capability |= DCF_CAPB_BACKUP;
 
-	snprintf(out, outsize, "%u multiselect backup", CMDSTATUS_SUCCESS);
-	return DC_OK;
+    asprintf(&out, "%u multiselect backup", CMDSTATUS_SUCCESS);
+    return out;
 }
 
-int
-command_title(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_title(struct confmodule *mod, char *arg)
 {
-	mod->frontend->methods.set_title(mod->frontend, arg);
-	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
-	return DC_OK;
+    char *out;
+
+    mod->frontend->methods.set_title(mod->frontend, arg);
+    asprintf(&out, "%u", CMDSTATUS_SUCCESS);
+    return out;
 }
 
-int
-command_beginblock(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_beginblock(struct confmodule *mod, char *arg)
 {
-	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
-	return DC_OK;
+    char *out;
+
+    asprintf(&out, "%u", CMDSTATUS_SUCCESS);
+    return out;
 }
 
-int
-command_endblock(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_endblock(struct confmodule *mod, char *arg)
 {
-	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
-	return DC_OK;
+    char *out;
+
+    asprintf(&out, "%u", CMDSTATUS_SUCCESS);
+    return out;
 }
 
-int
-command_go(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_go(struct confmodule *mod, char *arg)
 {
-	char *argv[3];
-	int argc;
+    char *argv[3];
+    int argc;
+    char *out;
 
-	argc = strcmdsplit(arg, argv, DIM(argv) - 1);
-	CHECKARGC(== 0);
-	if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
-	{
-		snprintf(out, outsize, "%u backup", CMDSTATUS_GOBACK);
-		mod->update_seen_questions(mod, STACK_SEEN_REMOVE);
-	}
-	else
-	{
-		snprintf(out, outsize, "%u ok", CMDSTATUS_SUCCESS);
-		mod->update_seen_questions(mod, STACK_SEEN_ADD);
-	}
-	mod->frontend->methods.clear(mod->frontend);
+    argc = strcmdsplit(arg, argv, DIM(argv) - 1);
+    CHECKARGC(== 0);
+    if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
+    {
+        asprintf(&out, "%u backup", CMDSTATUS_GOBACK);
+        mod->update_seen_questions(mod, STACK_SEEN_REMOVE);
+    }
+    else
+    {
+        asprintf(&out, "%u ok", CMDSTATUS_SUCCESS);
+        mod->update_seen_questions(mod, STACK_SEEN_ADD);
+    }
+    mod->frontend->methods.clear(mod->frontend);
 
-	return DC_OK;
+    return out;
 }
 
-int
-command_get(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_get(struct confmodule *mod, char *arg)
 {
-	struct question *q;
-	char *argv[3];
-	int argc;
+    struct question *q;
+    char *argv[3];
+    int argc;
+    char *out;
 
-	argc = strcmdsplit(arg, argv, DIM(argv));
-	CHECKARGC(== 1);
+    argc = strcmdsplit(arg, argv, DIM(argv));
+    CHECKARGC(== 1);
 
-	q = mod->questions->methods.get(mod->questions, argv[0]);
-	if (q == NULL)
-		snprintf(out, outsize, "%u %s doesn't exist",
-			CMDSTATUS_BADQUESTION, argv[0]);
-	else 
-	{
-		const char *value = question_getvalue(q, NULL);
-		snprintf(out, outsize, "%u %s",
-			CMDSTATUS_SUCCESS, value ? value : "");
-	}
-	question_deref(q);
+    q = mod->questions->methods.get(mod->questions, argv[0]);
+    if (q == NULL)
+        asprintf(&out, "%u %s doesn't exist",
+                CMDSTATUS_BADQUESTION, argv[0]);
+    else 
+    {
+        const char *value = question_getvalue(q, NULL);
+        asprintf(&out, "%u %s",
+                CMDSTATUS_SUCCESS, value ? value : "");
+    }
+    question_deref(q);
 
-	return DC_OK;
+    return out;
 }
 
-int
-command_set(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_set(struct confmodule *mod, char *arg)
 {
     struct question *q;
     char *argv[2] = { "", "" };
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(>= 1);
 
     q = mod->questions->methods.get(mod->questions, argv[0]);
     if (q == NULL)
-        snprintf(out, outsize, "%u %s doesn't exist",
+        asprintf(&out, "%u %s doesn't exist",
                 CMDSTATUS_BADQUESTION, argv[0]);
     else
     {
@@ -227,64 +248,62 @@ command_set(struct confmodule *mod, char *arg, char *out, size_t outsize)
 
         if (mod->questions->methods.set(mod->questions, q) != 0)
         {
-            snprintf(out, outsize, "%u value set",
-                    CMDSTATUS_SUCCESS);
+            asprintf(&out, "%u value set", CMDSTATUS_SUCCESS);
             if (0 == strcmp("debconf/language", argv[0]))
-	    { /* Pass the value on to getlanguage() in templates.c */
+            { /* Pass the value on to getlanguage() in templates.c */
                 setenv("LANGUAGE", argv[1], 1);
-	    }
+            }
             else if (strcmp(argv[0], "debconf/priority") == 0)
             {
                 setenv("DEBCONF_PRIORITY", argv[1], 1);
             }
         }
         else
-            snprintf(out, outsize, "%u cannot set value",
-                    CMDSTATUS_INTERNALERROR);
+            asprintf(&out, "%u cannot set value", CMDSTATUS_INTERNALERROR);
     }
     question_deref(q);
 
-    return DC_OK;
+    return out;
 }
 
-int
-command_reset(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_reset(struct confmodule *mod, char *arg)
 {
-	struct question *q;
-	char *argv[2];
-	int argc;
+    struct question *q;
+    char *argv[2];
+    int argc;
+    char *out;
 
-	argc = strcmdsplit(arg, argv, DIM(argv));
-	CHECKARGC(== 1);
+    argc = strcmdsplit(arg, argv, DIM(argv));
+    CHECKARGC(== 1);
 
-	q = mod->questions->methods.get(mod->questions, argv[0]);
-	if (q == NULL)
-		snprintf(out, outsize, "%u %s doesn't exist",
-			CMDSTATUS_BADQUESTION, argv[0]);
-	else
-	{
-		DELETE(q->value);
-		q->flags &= ~DC_QFLAG_SEEN;
+    q = mod->questions->methods.get(mod->questions, argv[0]);
+    if (q == NULL)
+        asprintf(&out, "%u %s doesn't exist", CMDSTATUS_BADQUESTION, argv[0]);
+    else
+    {
+        DELETE(q->value);
+        q->flags &= ~DC_QFLAG_SEEN;
 
-		if (mod->questions->methods.set(mod->questions, q) != 0)
-			snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
-		else
-			snprintf(out, outsize, "%u cannot reset value",
-				CMDSTATUS_INTERNALERROR);
-	}
-	question_deref(q);
+        if (mod->questions->methods.set(mod->questions, q) != 0)
+            asprintf(&out, "%u", CMDSTATUS_SUCCESS);
+        else
+            asprintf(&out, "%u cannot reset value", CMDSTATUS_INTERNALERROR);
+    }
+    question_deref(q);
 
-	return DC_OK;
+    return out;
 }
 
-int
-command_subst(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_subst(struct confmodule *mod, char *arg)
 {
     struct question *q;
     struct questionvariable;
     char *variable;
     char *argv[3] = { "", "", "" };
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(>= 2);
@@ -293,163 +312,161 @@ command_subst(struct confmodule *mod, char *arg, char *out, size_t outsize)
     q = mod->questions->methods.get(mod->questions, argv[0]);
 
     if (q == NULL)
-        snprintf(out, outsize, "%u %s doesn't exist",
-                CMDSTATUS_BADQUESTION, argv[0]);
+        asprintf(&out, "%u %s doesn't exist", CMDSTATUS_BADQUESTION, argv[0]);
     else
     {
         question_variable_add(q, variable, argv[2]);
 
         if (mod->questions->methods.set(mod->questions, q) != 0)
-            snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
+            asprintf(&out, "%u", CMDSTATUS_SUCCESS);
         else
-            snprintf(out, outsize, "%u substitution failed",
-                    CMDSTATUS_INTERNALERROR);
+            asprintf(&out, "%u substitution failed", CMDSTATUS_INTERNALERROR);
     }
     question_deref(q);
 
-    return DC_OK;
+    return out;
 }
 
-int
-command_register(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_register(struct confmodule *mod, char *arg)
 {
     struct question *q;
     struct template *t;
     char *argv[4];
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 2);
 
     t = mod->templates->methods.get(mod->templates, argv[0]);
     if (t == NULL) {
-        snprintf(out, outsize, "%u No such template, \"%s\"",
-                CMDSTATUS_BADQUESTION, argv[0]);
-        return DC_OK;
+        asprintf(&out, "%u No such template, \"%s\"", CMDSTATUS_BADQUESTION, argv[0]);
+        return out;
     }
     q = mod->questions->methods.get(mod->questions, argv[1]);
     if (q == NULL)
         q = question_new(argv[1]);
     if (q == NULL) {
-        snprintf(out, outsize, "%u Internal error making question",
-                CMDSTATUS_INTERNALERROR);
-        return DC_OK;
+        asprintf(&out, "%u Internal error making question", CMDSTATUS_INTERNALERROR);
+        return out;
     }
     question_owner_add(q, mod->owner);
     q->template = t;
     template_ref(t);
     mod->questions->methods.set(mod->questions, q);
-    snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
-    return DC_OK;
+    asprintf(&out, "%u", CMDSTATUS_SUCCESS);
+    return out;
 }
 
-int
-command_unregister(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_unregister(struct confmodule *mod, char *arg)
 {
     struct question *q;
     char *argv[3];
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 1);
 
     q = mod->questions->methods.get(mod->questions, argv[0]);
     if (q == NULL) {
-        snprintf(out, outsize, "%u %s doesn't exist",
-                CMDSTATUS_BADQUESTION, argv[0]);
-        return DC_OK;
+        asprintf(&out, "%u %s doesn't exist", CMDSTATUS_BADQUESTION, argv[0]);
+        return out;
     }
     question_owner_delete(q, mod->owner);
-    snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
+    asprintf(&out, "%u", CMDSTATUS_SUCCESS);
 
-    return DC_OK;
+    return out;
 }
 
-int
-command_purge(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_purge(struct confmodule *mod, char *arg)
 {
-	mod->questions->methods.disownall(mod->questions, mod->owner);
-	snprintf(out, outsize, "%u", CMDSTATUS_SUCCESS);
-	return DC_OK;
+    char *out;
+
+    mod->questions->methods.disownall(mod->questions, mod->owner);
+    asprintf(&out, "%u", CMDSTATUS_SUCCESS);
+    return out;
 }
 
-int
-command_metaget(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_metaget(struct confmodule *mod, char *arg)
 {
     struct question *q;
     const char *value;
     char *argv[4];
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 2);
     q = mod->questions->methods.get(mod->questions, argv[0]);
     if (q == NULL)
     {
-        snprintf(out, outsize, "%u %s doesn't exist",
-                CMDSTATUS_BADQUESTION, argv[0]);
-        return DC_OK;
+        asprintf(&out, "%u %s doesn't exist", CMDSTATUS_BADQUESTION, argv[0]);
+        return out;
     }
 
     value = question_get_field(q, NULL, argv[1]);
     if (value == NULL)
-        snprintf(out, outsize, "%u %s does not exist",
-                CMDSTATUS_BADQUESTION, argv[1]);
+        asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, argv[1]);
     else
-        snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, value);
+        asprintf(&out, "%u %s", CMDSTATUS_SUCCESS, value);
 
-    return DC_OK;
+    return out;
 }
 
-int
-command_fget(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_fget(struct confmodule *mod, char *arg)
 {
     struct question *q;
     char *field;
     char *argv[4];
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 2);
     q = mod->questions->methods.get(mod->questions, argv[0]);
     if (q == NULL)
     {
-        snprintf(out, outsize, "%u %s doesn't exist",
-                CMDSTATUS_BADQUESTION, argv[0]);
-        return DC_OK;
+        asprintf(&out, "%u %s doesn't exist", CMDSTATUS_BADQUESTION, argv[0]);
+        return out;
     }
 
     field = argv[1];
     /* isdefault is for backward compability only */
     if (strcmp(field, "seen") == 0)
-        snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
+        asprintf(&out, "%u %s", CMDSTATUS_SUCCESS,
                 ((q->flags & DC_QFLAG_SEEN) ? "true" : "false"));
     else if (strcmp(field, "isdefault") == 0)
-        snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
+        asprintf(&out, "%u %s", CMDSTATUS_SUCCESS,
                 ((q->flags & DC_QFLAG_SEEN) ? "false" : "true"));
     else
-        snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
+        asprintf(&out, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
     question_deref(q);
 
-    return DC_OK;
+    return out;
 }
 
-int
-command_fset(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_fset(struct confmodule *mod, char *arg)
 {
     struct question *q;
     char *field;
     char *argv[5];
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 3);
     q = mod->questions->methods.get(mod->questions, argv[0]);
     if (q == NULL)
     {
-        snprintf(out, outsize, "%u %s doesn't exist",
-                CMDSTATUS_BADQUESTION, argv[0]);
-        return DC_OK;
+        asprintf(&out, "%u %s doesn't exist", CMDSTATUS_BADQUESTION, argv[0]);
+        return out;
     }
 
     field = argv[1];
@@ -465,18 +482,19 @@ command_fset(struct confmodule *mod, char *arg, char *out, size_t outsize)
         if (strcmp(argv[2], "false") == 0)
             q->flags |= DC_QFLAG_SEEN;
     }
-    snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, argv[2]);
+    asprintf(&out, "%u %s", CMDSTATUS_SUCCESS, argv[2]);
 
     question_deref(q);
-    return DC_OK;
+    return out;
 }
 
-int
-command_exist(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_exist(struct confmodule *mod, char *arg)
 {
     struct question *q;
     char *argv[3];
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 1);
@@ -485,33 +503,34 @@ command_exist(struct confmodule *mod, char *arg, char *out, size_t outsize)
     if (q)
     {
         question_deref(q);
-        snprintf(out, outsize, "%u true", CMDSTATUS_SUCCESS);
+        asprintf(&out, "%u true", CMDSTATUS_SUCCESS);
     }
     else
     {
-        snprintf(out, outsize, "%u false", CMDSTATUS_SUCCESS);
+        asprintf(&out, "%u false", CMDSTATUS_SUCCESS);
     }
-    return DC_OK;
+    return out;
 }
 
-int
-command_stop(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_stop(struct confmodule *mod, char *arg)
 {
-	char *argv[3];
-	int argc;
+    char *argv[3];
+    int argc;
 
-	argc = strcmdsplit(arg, argv, DIM(argv));
-	CHECKARGC(== 0);
-	return DC_OK;
+    argc = strcmdsplit(arg, argv, DIM(argv));
+    CHECKARGC(== 0);
+    return strdup("");
 }
 
-int
-command_x_loadtemplatefile(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_x_loadtemplatefile(struct confmodule *mod, char *arg)
 {
     struct template *t = NULL;
     struct question *q = NULL;
     char *argv[3];
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 1);
@@ -528,18 +547,19 @@ command_x_loadtemplatefile(struct confmodule *mod, char *arg, char *out, size_t 
         mod->questions->methods.set(mod->questions, q);
         t = t->next;
     }
-    snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
-    return DC_OK;
+    asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
+    return out;
 }
 
-int
-command_progress(struct confmodule *mod, char *arg, char *out, size_t outsize)
+char *
+command_progress(struct confmodule *mod, char *arg)
 {
     int min, max;
     struct question *q = NULL;
     const char *value;
     char *argv[6];
     int argc;
+    char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(>= 1);
@@ -553,27 +573,27 @@ command_progress(struct confmodule *mod, char *arg, char *out, size_t outsize)
 
         if (min > max)
         {
-		    snprintf(out, outsize, "%u min (%d) > max (%d)", 
-			    CMDSTATUS_SYNTAXERROR, min, max);
-            return DC_NOTOK;
+            asprintf(&out, "%u min (%d) > max (%d)", 
+                    CMDSTATUS_SYNTAXERROR, min, max);
+            return out;
         }
 
         q = mod->questions->methods.get(mod->questions, argv[3]);
         if (q == NULL)
         {
-            snprintf(out, outsize, "%u %s does not exist",
+            asprintf(&out, "%u %s does not exist",
                     CMDSTATUS_BADQUESTION, argv[3]);
-            return DC_NOTOK;
+            return out;
         }
         value = question_get_field(q, "", "description");
         if (value == NULL)
         {
-            snprintf(out, outsize, "%u %s description field does not exist",
+            asprintf(&out, "%u %s description field does not exist",
                     CMDSTATUS_BADQUESTION, argv[3]);
-            return DC_NOTOK;
+            return out;
         }
         mod->frontend->methods.progress_start(mod->frontend,
-            min, max, value);
+                min, max, value);
     }
     else if (strcasecmp(argv[0], "set") == 0)
     {
@@ -591,16 +611,16 @@ command_progress(struct confmodule *mod, char *arg, char *out, size_t outsize)
         q = mod->questions->methods.get(mod->questions, argv[1]);
         if (q == NULL)
         {
-            snprintf(out, outsize, "%u %s does not exist",
+            asprintf(&out, "%u %s does not exist",
                     CMDSTATUS_BADQUESTION, argv[1]);
-            return DC_NOTOK;
+            return out;
         }
         value = question_get_field(q, "", "description");
         if (value == NULL)
         {
-            snprintf(out, outsize, "%u %s description field does not exist",
+            asprintf(&out, "%u %s description field does not exist",
                     CMDSTATUS_BADQUESTION, argv[1]);
-            return DC_NOTOK;
+            return out;
         }
         mod->frontend->methods.progress_info(mod->frontend, value);
     }
@@ -609,7 +629,7 @@ command_progress(struct confmodule *mod, char *arg, char *out, size_t outsize)
         mod->frontend->methods.progress_stop(mod->frontend);
     }
 
-    snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
-    return DC_OK;
+    asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
+    return out;
 }
 

@@ -63,8 +63,7 @@ struct confmodule {
      * @param size_t outsize - size of return buffer
      * @return int - DC_OK, DC_NOTOK
      */
-    int (*process_command)(struct confmodule *mod, char *cmd, 
-        char *out, size_t outsize);
+    int (*process_command)(struct confmodule *mod, char *cmd);
 
     /**
      * @brief Shuts down the confmodule
