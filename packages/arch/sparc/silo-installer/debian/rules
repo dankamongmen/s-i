@@ -22,7 +22,6 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
-	rm -f debian/files~
 	dh_clean
 
 install: build
@@ -38,9 +37,8 @@ binary-indep: build install
 	dh_installdebconf
 	cp debian/isinstallable debian/silo-installer/DEBIAN/
 	dh_installdeb 
-	dh_gencontrol -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 # Build architecture-dependent files here.
 binary-arch: build install
