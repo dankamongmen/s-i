@@ -36,6 +36,13 @@ struct package_t {
         struct language_description *localized_descriptions;
         struct package_t *next;
         package_priority priority;
+	char *version;
+};
+
+struct version_t {
+    unsigned long epoch;
+    const char *version;
+    const char *revision;
 };
 
 int di_prebaseconfig_append (const char *udeb, const char *format, ...);
@@ -45,5 +52,7 @@ int di_check_dir (const char *dirname);
 int di_snprintfcat (char *str, size_t size, const char *format, ...);
 char *di_stristr(const char *haystack, const char *needle);
 struct package_t *di_pkg_parse(FILE *fp);
+int di_parse_version(struct version_t *rversion, const char *string);
+int di_compare_version(const struct version_t *a, const struct version_t *b);
 
 #endif /* _DEBIAN_INSTALLER_H_ */

@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <syslog.h>
 #include <stdarg.h>
+#include <ctype.h>
 #include <time.h>
 #include "debian-installer.h"
 
@@ -190,6 +191,10 @@ di_pkg_parse(FILE *f)
             newp->next = p;
             p = newp;
         }
+	else if (di_stristr(buf, "Version: ") == buf)
+        {
+            p->version = strdup(strchr(buf, ' ') + 1);
+        }
         else if (di_stristr(buf, "Filename: ") == buf)
         {
             p->filename = strdup(strchr(buf, ' ') + 1);
@@ -310,3 +315,116 @@ di_pkg_parse(FILE *f)
 
     return p;
 }
+
+
+/* Version parsing and comparison is taken from dpkg 1.10.9 */
+
+/* assume ascii; warning: evaluates x multiple times! */
+#define order(x) ((x) == '~' ? -1 \
+                : isdigit((x)) ? 0 \
+                : !(x) ? 0 \
+                : isalpha((x)) ? (x) \
+                : (x) + 256)
+
+static int
+verrevcmp(const char *val, const char *ref)
+{
+    if (!val)
+        val = "";
+    if (!ref)
+        ref = "";
+
+    while (*val || *ref) {
+        int first_diff = 0;
+
+        while ((*val && !isdigit(*val)) || (*ref && !isdigit(*ref))) {
+            int vc = order(*val), rc = order(*ref);
+            if (vc != rc)
+                return vc - rc;
+            val++;
+            ref++;
+        }
+
+        while (*val == '0')
+            val++;
+        while (*ref == '0')
+            ref++;
+        while (isdigit(*val) && isdigit(*ref)) {
+            if (!first_diff)
+                first_diff = *val - *ref;
+            val++;
+            ref++;
+        }
+        if (isdigit(*val))
+            return 1;
+        if (isdigit(*ref))
+            return -1;
+        if (first_diff)
+            return first_diff;
+    }
+    return 0;
+}
+
+
+int
+di_parse_version(struct version_t *rversion, const char *string)
+{
+    char *hyphen, *colon, *eepochcolon;
+    const char *end, *ptr;
+    unsigned long epoch;
+
+    if (!*string)
+        return 0;
+
+    /* trim leading and trailing space */
+    while (*string && (*string == ' ' || *string == '\t'))
+        string++;
+    /* string now points to the first non-whitespace char */
+    end = string;
+    /* find either the end of the string, or a whitespace char */
+    while (*end && *end != ' ' && *end != '\t')
+        end++;
+    /* check for extra chars after trailing space */
+    ptr = end;
+    while (*ptr && (*ptr == ' ' || *ptr == '\t'))
+        ptr++;
+    if (*ptr)
+        return 0;
+
+    colon = strchr(string,':');
+    if (colon) {
+        epoch = strtoul(string, &eepochcolon, 10);
+        if (colon != eepochcolon)
+            return 0;
+        if (!*++colon)
+            return 0;
+        string = colon;
+        rversion->epoch = epoch;
+    } else {
+        rversion->epoch = 0;
+    }
+    rversion->version = strndup(string, end-string);
+    hyphen = strrchr(rversion->version, '-');
+    if (hyphen)
+        *hyphen++ = 0;
+    rversion->revision = hyphen ? hyphen : "";
+
+    return 1;
+}
+
+
+int
+di_compare_version(const struct version_t *a, const struct version_t *b)
+{
+    int r;
+
+    if (a->epoch > b->epoch)
+        return 1;
+    if (a->epoch < b->epoch)
+        return -1;
+    r = verrevcmp(a->version, b->version);
+    if (r != 0)
+        return r;
+    return verrevcmp(a->revision, b->revision);
+}
+
