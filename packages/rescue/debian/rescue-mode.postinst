@@ -40,6 +40,17 @@ try_load_module vfat
 
 db_capb backup
 
+PARTITIONS="$(find /dev/discs -follow -name part\* | sort | tr '\n' , | \
+	sed 's/,$//; s/,/, /g')"
+if [ -z "$PARTITIONS" ]; then
+	# TODO: need a sensible error here, or perhaps drop through to a
+	# fallback shell?
+	log "no partitions found!"
+	exit 1
+fi
+log "partitions found: $PARTITIONS"
+db_subst rescue/root PARTITIONS "$PARTITIONS"
+
 while :; do
 	db_input critical rescue/root
 	db_go || exit 10
