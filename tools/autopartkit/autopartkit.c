@@ -837,7 +837,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 		devpath, mountmap[i].mountpoint->mountpoint,
 		mountmap[i].mountpoint->fstype,	fsckpass);
 	asprintf(&tmpmnt, "/target%s", mountmap[i].mountpoint->mountpoint);
-	mkdir(tmpmnt, 0755);
+	make_path(tmpmnt, 0755);
 	mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
 	      MS_MGC_VAL, NULL);
 	free(tmpmnt);

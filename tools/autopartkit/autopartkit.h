@@ -88,4 +88,9 @@ int lvm_lv_stack_pop(void *stack, char **vgname, char **lvname,
 		     char **fstype, unsigned int *mbsize);
 int lvm_lv_stack_delete(void *);
 
+/* from makepath.c */
+#include <sys/stat.h>
+#include <sys/types.h>
+int make_path(const char *pathname, mode_t mode);
+
 #endif /* AUTOPARTKIT_H */
