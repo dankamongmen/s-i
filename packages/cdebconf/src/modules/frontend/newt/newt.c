@@ -125,7 +125,7 @@ no_text(struct frontend *obj)
 }
 
 static void
-create_window(const int width, const int height, const char *backtitle, const char *title, const char *priority)
+create_window(const int width, const int height, const char *title, const char *priority)
 {
     static const char *sigils[][2] = {
         { "low",      "." },
@@ -136,9 +136,6 @@ create_window(const int width, const int height, const char *backtitle, const ch
     };
     char *buf = NULL;
     int i = -1;
-
-    if (backtitle != NULL)
-        newtDrawRootText(0, 0, backtitle);
 
     if (priority != NULL) {
         for (i = 0; sigils[i][0] != NULL; i++) {
@@ -332,7 +329,7 @@ show_separate_window(struct frontend *obj, struct question *q)
     t_width_title = get_text_width(obj->title);
     if (t_width_title > win_width)
         win_width = t_width_title;
-    create_window(win_width, win_height, obj->backtitle, obj->title, q->priority);
+    create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     if (format_note)
         newtFormAddComponent(form, newtLabel((win_width - strwidth(descr))/2, 0, descr));
@@ -417,7 +414,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     t_width_title = get_text_width(obj->title);
     if (t_width_title > win_width)
         win_width = t_width_title;
-    create_window(win_width, win_height, obj->backtitle, obj->title, q->priority);
+    create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, tflags);
     assert(textbox);
@@ -542,7 +539,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         win_height = height-5;
         sel_height = win_height - t_height - 5;
     }
-    create_window(win_width, win_height, obj->backtitle, obj->title, q->priority);
+    create_window(win_width, win_height, obj->title, q->priority);
     if (count > sel_height) {
         scrollbar = newtVerticalScrollbar((win_width+sel_width+5)/2, 1+t_height+1, sel_height,
                 NEWT_COLORSET_WINDOW, NEWT_COLORSET_ACTCHECKBOX);
@@ -697,7 +694,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     }
     if (count > sel_height)
         listflags |= NEWT_FLAG_SCROLL;
-    create_window(win_width, win_height, obj->backtitle, obj->title, q->priority);
+    create_window(win_width, win_height, obj->title, q->priority);
     listbox = newtListbox((win_width-sel_width-3)/2, 1+t_height+1, sel_height, listflags);
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
@@ -795,7 +792,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     t_width_title = get_text_width(obj->title);
     if (t_width_title > win_width)
         win_width = t_width_title;
-    create_window(win_width, win_height, obj->backtitle, obj->title, q->priority);
+    create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, flags);
     assert(textbox);
@@ -1027,6 +1024,8 @@ newt_go(struct frontend *obj)
                     newtInit();
                     newtCls();
                 }
+                if (obj->backtitle != NULL)
+                    newtDrawRootText(0, 0, obj->backtitle);
                 ret = question_handlers[i].handler(obj, q);
                 if (ret == DC_OK)
                     obj->qdb->methods.set(obj->qdb, q);
@@ -1072,6 +1071,8 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     obj->progress_cur = min;
     newtInit();
     newtCls();
+    if (obj->backtitle != NULL)
+        newtDrawRootText(0, 0, obj->backtitle);
     newtGetScreenSize(&width, NULL);
     win_width = width-7;
     strtruncate(obj->progress_title, win_width-4);
