@@ -2,7 +2,7 @@ Template: cdrom-detect/manual_config
 Type: boolean
 Default: true
 _Description: Manually select a CD-ROM module and device?
- No common CD-ROM drive was detected. 
+ No common CD-ROM drive was detected.
  .
  Your CD-ROM drive may be an old Mitsumi or another non-IDE, non-SCSI
  CD-ROM drive. In that case you should choose which module to load and
@@ -10,18 +10,12 @@ _Description: Manually select a CD-ROM module and device?
  needed, look for some documentation or try a network installation
  instead of a CD-ROM installation.
 
-Template: cdrom-detect/is_cd_inserted
+Template: cdrom-detect/retry
 Type: boolean
-Default: false
-_Description: Perform manual CD-ROM configuration?
- Your installation CD-ROM couldn't be mounted. 
- .
- This probably means that the CD-ROM has not yet been inserted. If
- that is the case, just insert it and don't perform the manual
- configuration. The CD-ROM mount will be re-tried.
- .
- If your CD-ROM is already in the drive, there was another problem. You
- should try the manual CD-ROM configuration.
+Default: true
+_Description: Try again to mount the CD-ROM?
+ Your installation CD-ROM couldn't be mounted. This probably means that
+ the CD-ROM was not in the drive. If so you can insert it and try again.
 
 Template: cdrom-detect/cdrom_module
 Type: select
@@ -50,10 +44,11 @@ _Description: CD-ROM detected
  The CD-ROM autodetection was successful. A CD-ROM drive has been found and it
  currently contains the CD ${cdname}. The installation will now continue.
 
-Template: cdrom-detect/no-cd
+Template: cdrom-detect/failure
 Type: error
-_Description: No CD detected
- Please check that a CD has been inserted into the CD-ROM drive.
+_Description: Failed to find and mount a Debian CD-ROM.
+ You may be able to install Debian without a CD-ROM, by using an alternate
+ source such as a network.
 
 Template: cdrom-detect/wrong-cd
 Type: error
@@ -61,14 +56,6 @@ _Description: Non-Debian CD-ROM detected
  The CD-ROM drive contains a non-Debian CD.
  .
  Please insert a Debian CD to continue with the installation.
-
-Template: cdrom-detect/skip_autodetection
-Type: boolean
-Default: false
-_Description: Skip CD-ROM automatic detection?
- If the CD-ROM automatic detection causes trouble, you may skip this
- step.  However, you will need to manually mount the CD-ROM on /cdrom
- before you can proceed.
 
 Template: mirror/distribution
 Type: select

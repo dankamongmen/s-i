@@ -8,6 +8,13 @@ log() {
     logger -t cdrom-detect "$@"
 }
 
+fail () {
+    log "CDROM-detect failed."
+    db_input critical cdrom-detect/failure || [ $? -eq 30 ]
+    db_go
+    exit 1
+}
+
 # Is a cdrom already mounted?  If so, assume it's the right one..
 mount | grep -q ^/dev/cdroms/ && exit 0
 
@@ -22,10 +29,6 @@ while true
 do
     mounted=0
 
-    # What about ISA cdroms ?
-    # discover doesn't do devfs, :/
-
-    # devices=`/sbin/discover --disable-all --enable=pci,ide,scsi --device cdrom`
     if [ -d /dev/cdroms ]; then
         devices="`echo /dev/cdroms/*`"
     else
@@ -45,16 +48,18 @@ do
         break
     fi
 
-    # If device was detect but mount failed, ask for inserting the CD
+    # If a device was detected but the mount failed, ask for the CD.
     if [ -n "$devices" ]
     then
-	db_fset cdrom-detect/is_cd_inserted seen false
-	db_input critical cdrom-detect/is_cd_inserted || [ $? -eq 30 ]
+	db_fset cdrom-detect/retry seen false
+	db_input critical cdrom-detect/retry || [ $? -eq 30 ]
 	db_go
-	db_get cdrom-detect/is_cd_inserted
-	if [ "$RET" = "false" ]
+	db_get cdrom-detect/retry
+	if [ "$RET" = "true" ]
 	then
 	    continue
+	else
+            fail
 	fi
     fi
     
@@ -69,9 +74,6 @@ do
     do
 	modules="$modules, $i"
     done
-    
-    # Here's the list of device
-    # UPDATE IT HERE if you want to add some devices
     
     if [ "$RET" = "true" ]
     then
@@ -100,10 +102,7 @@ do
 	    break
 	fi
     else
-	log "CDROM-detect failed."
-	db_input critical cdrom-detect/no-cd || [ $? -eq 30 ]
-	db_go
-	exit 1
+	fail
     fi
 done
 
@@ -130,11 +129,6 @@ done
 # Ask for eject to be installed into /target/, to be able to use it in
 # the prebaseconfig script.
 apt-install eject || true
-
-# Ask for discover to be installed into /target/, to make sure the
-# required drivers are loaded when base-config is looking for the
-# install CD
-apt-install discover || true
 
 # Hey, we're done
 db_fset cdrom-detect/success seen false

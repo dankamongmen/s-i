@@ -1,24 +1,11 @@
 #! /bin/sh -e
-#
-# Throw out the CD if installing from CD.
-
-cdromdev=/dev/cdroms/cdrom0
-
-umount /cdrom
-
 if test -x /target/usr/bin/eject ; then
-
-    if test ! -e /etc/mtab ; then
-        # stupid eject refuses to work unless /etc/mtab exists
-	touch /etc/mtab
-	dummymtab=yes
-    else
-	dummymtab=no
-    fi
-    
-    /target/usr/bin/eject $cdromdev || true
-
-    if test yes = "$dummymtab" ; then
-	rm /etc/mtab
-    fi
+	# Cannot just tell eject to eject /cdrom as it is not compatable
+	# with busybox umount. Instead, unmount the cdrom first, and then
+	# eject the device.
+	CDDEV=$(mount | grep "on /cdrom" | cut -d ' ' -f 1)
+	if [ -n "$CDDEV" ]; then
+		umount /cdrom || true
+		/target/usr/bin/eject $CDDEV || true
+	fi
 fi
