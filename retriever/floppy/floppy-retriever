@@ -18,17 +18,13 @@ mountfloppy()
             modprobe vfat >> /var/log/messages 2>&1
         fi
 
-        choices="`echo /dev/floppy/[0-9] | sed 's/ /, /g'`"
-        db_subst retriever/floppy/device CHOICES "$choices" || true
-        db_fset retriever/floppy/device seen false || true
+        db_fset retriever/floppy/insert seen false || true
         db_fset retriever/floppy/fstype seen false || true
 
-        db_input medium retriever/floppy/device || true
+        db_input critical retriever/floppy/insert || true
         db_input low retriever/floppy/fstype || true
         db_go # no '|| true', we want it to exit on 30 (backup)
 
-        db_get retriever/floppy/device
-        floppydev=$RET
         db_get retriever/floppy/fstype
         case x$RET in
             xFAT)
@@ -45,7 +41,7 @@ mountfloppy()
                 ;;
         esac
 
-        mount $floppydev -t$fstype /floppy
+        mount /dev/floppy/0 -t$fstype /floppy
     fi
 }
 
