@@ -47,10 +47,20 @@ fi
 db_progress STEP 2
 db_progress INFO colo-installer/conf
 
-kernel=/boot/vmlinux
+if [ -e /target/boot/vmlinux ]; then
+	kernel=/boot/vmlinux
+else
+	if [ "$rootfs" = "$bootfs" ] ; then
+		kernel=/vmlinux
+	else
+		kernel=`find /target/boot -name 'vmlinu*cobalt*' | tail -1`
+		kernel=${kernel#/target}
+	fi
+fi
+
 # Is /boot on a separate partition?
 if [ "$rootfs" != "$bootfs" ] ; then
-    kernel="${kernel#/boot}"
+	kernel="${kernel#/boot}"
 fi
 info "Using kernel '$kernel'"
 
