@@ -61,7 +61,16 @@ name 'netinst'. The difference between the two images is, that on the full
 netinst image the base packages are included, whereas you have to download
 these from the web if you are using the business card image.
 
-Download whichever type you prefer, burn it to a CD, and boot it.
+Download whichever type you prefer and burn it to a CD.
+
+2.1.1 SCSI CD drives
+
+If you have a SCSI CD drive, then you will also currently need one driver
+floppy to let the installer see your CD drive. See section 2.2 for
+information about floppys, and download the scsi_drivers floppy image and
+write it to disk. You will be given an opportunity to load drivers from the
+floppy after the installer fails to see your SCSI CD drive, and after
+loading the floppy, the installer will see your CD ROM
 
 2.2 The dreaded floppies
 
@@ -142,40 +151,29 @@ language and press ENTER to continue.
 Sit back while debian-installer detects some of your hardware, and
 loads additional installer modules from the cd.
 
-The next thing you will be confronted with is a note, that
-debian-installer could not find a network interface. This is a known
-bug but can be easily worked around. Select continue and watch the
-main menu which will appear everytime if something went wrong, so you
-have more control over the situation. Select "Detect network hardware
-and load kernel drivers for it" and debian-installer will continue
-gracefully. If you have a pcmcia network card try using the menu entry
-"Start PC card services (PCMCIA)".
-
-The next questions will help you to configure your mirror. First
-select the protocol to access your mirror. If unsure use "http" as the
-help text suggests. If you know a mirror which will be fast for you,
-you can enter it by selecting the last entry "enter information
-manually" on the next screen. If not, just select the country where
-you are located. After selecting the mirror you will be asked for your
-proxy configuration. If unsure just hit ENTER. To complete your mirror
-setup you have to select the distribution you wish to install. You
-have to select "sarge" here, "woody" and "sid" won't work (if you want
-to install sid directly, you may want to try the businesscard image,
-where selecting "sid" actually works).
+Next the installer will try to detect your network hardware and set up
+networking by DHCP. If you are not on a network or do not have DHCP, you
+will see an error message. You do not need a network to continue the
+install so this can be easily worked around. Select continue and watch the
+main menu which will appear everytime if something went wrong, so you have
+more control over the situation. Proceed to "Partition a hard drive".
 
 Now it is time to partition your harddisks. Select the disk you want
 to partition and a partitioning program suitable for your architecture
 will be started. Partition the harddisk to your needs and quit the
 program. Select "Finish" to proceed.
 
-On the next screens you have to configure and mount your
-partitions. Select the partitions you want to use in the system you
-wish to install and select a filesystem and a mount point for
-them. Remember to assign at least one partition for swap space and to
-mount a partition on "/". Please note the debian-installer will do no
-changes to your harddisks until you select "Finish". Do this when you
-are sure that you have found a suitable setup for your partitions and
-answer the next question with "Yes".
+On the next screen you have to configure and mount your partitions. Select
+the partitions you want to use in the system you wish to install and select
+a filesystem and a mount point for them. Remember to assign at least one
+partition for swap space and to mount a partition on "/". You will be
+prompted for the type of filesystem to create. ext2 and ext3 work, but
+reiserfs does not currently and will hang creating the partition. This is,
+of course, a bug. 
+
+Please note the debian-installer will do no changes to your harddisks until
+you select "Finish". Do this when you are sure that you have found a
+suitable setup for your partitions and answer the next question with "Yes".
 
 Now debian-installer starts to install the base system which can take a
 while. After that you will be prompted for the kernel to install which will
@@ -184,9 +182,8 @@ kernel is installed on your harddisk.
 
 The last step is to install a boot loader. You will be prompted for
 the bootblock, where LILO should be installed. It defaults to the
-bootrecord of the first harddrive which is generally a good
-choice. Hit ENTER and ignore the following warning that
-/proc/partitions does not exist.
+boot record of the first harddrive which is generally a good
+choice.
 
 Debian-installer will now tell you that the installation has
 finished. Remove the cdrom from your drive and hit ENTER to reboot
@@ -225,28 +222,27 @@ Select that entry and observe that the installer tries to set a
 reasonable default based upon your language selection. Select your
 preferred keymap and continue.
 
-The next step is "Detect CDROM devices and mount the CD in
-/cdrom". This step does not require user interaction, everything
-happens automatically.
+The next step is "Detect CDROM devices and mount the CD".
+This step does not require user interaction, everything happens
+automatically.
 
-Now we are able to access additional modules. Select the corresponding
-entry "Load installer modules". Since the modules we want to access
-are on the CD, select "cdrom-retriever". The floppy-retriever can be
-used to load additional modules from a floppy, e.g. if you have exotic
-hardware.
+Now we are able to load the rest of the installer. Select the corresponding
+entry "Load installer components". Since the modules we want to access are
+on the CD, select "cdrom-retriever". The floppy-retriever can be used to
+load additional modules from a floppy, e.g. if you have exotic hardware.
+See section 2.1.1 if you have a SCSI CDROM.
 
-You are presented a long list with optional modules to install. We
-only want to install the standard modules, which are selected
+You are presented a long list with optional components to install. We
+only want to install the standard components, which are selected
 automatically, so just hit "Continue". Wait and watch until all
-modules have been installed.
+components have been loaded.
 
 Main-menu appears again, but with the additional modules there are new
 entries. The next default step would be to configure a network. We are
 breaking out of the default route, because we do not need networking
 since the base debs are on the CD.
 
-Select "Detect hardware and load kernel drivers for it (full
-version)". This step again involves no user interaction.
+Select "Detect hardware". This step again involves no user interaction.
 
 Now it is time to partition your disk. There are basically two ways to
 do that. The first one is to use cfdisk, which will be started upon
@@ -260,8 +256,10 @@ unimportant data on your harddrives.
 
 After finishing partitioning, select the entry "Configure and mount
 partitions". Since autopartkit creates filesystems and mounts them
-automatically you can skip this step if you used autopartkit to
-partition your harddrive.
+automatically you can skip this step if you used autopartkit to partition
+your harddrive. You will be prompted for the type of filesystem to create.
+ext2 and ext3 work, but reiserfs does not currently and will hang creating
+the partition. This is, of course, a bug.
 
 Configuring the partitions is pretty straightforward. You are
 presented with a list with all partitions, their sizes and a filesystem
