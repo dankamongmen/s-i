@@ -4,12 +4,13 @@ ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 
 links:
-	./make-links
 
-debian/control: links gen-control debian/control.stub package-list kernel-versions
+debian/control: gen-control debian/control.stub package-list kernel-versions
+	./make-links
 	./gen-control > debian/control
 
-build: links debian/control
+build: debian/control
+	./make-links
 	dh_testdir
 
 clean: debian/control
@@ -18,7 +19,7 @@ clean: debian/control
 
 binary-indep:
 
-binary-arch: links debian/control
+binary-arch: debian/control
 	dh_testdir
 	dh_clean -k
 	
@@ -30,5 +31,5 @@ binary-arch: links debian/control
 		dh_builddeb -p $$p --filename=$${p}_$(VERSION)_$(ARCH).udeb; \
 	done
 
-binary: binary-indep binary-arch
+binary: build binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary links
