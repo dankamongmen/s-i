@@ -742,7 +742,8 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     FILE *fstab;
 
     /* Mount partitions and write fstab */
-    mkdir("/target", 0755);
+    if (0 != mkdir("/target", 0755))
+        autopartkit_error(1, "Unable to mkdir /target: %s", strerror(errno)); 
 
     /* Find and mount the root fs */
       
@@ -774,11 +775,17 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
      * /target/etc/ is a partition?  [/etc/ should always be on the
      * root partition.
      */
-    mkdir("/target/etc", 0755);
+    if (0 != mkdir("/target/etc", 0755))
+        autopartkit_error(1, "Unable to mkdir /target/etc: %s",
+			  strerror(errno));
 
     /* Are these really needed?  Who will create them if they are missing? */
-    mkdir("/target/floppy", 0755);
-    mkdir("/target/cdrom", 0755);
+    if (0 != mkdir("/target/floppy", 0755))
+        autopartkit_error(1, "Unable to mkdir /target/floppy: %s",
+			  strerror(errno));
+    if (0 != mkdir("/target/cdrom", 0755))
+        autopartkit_error(1, "Unable to mkdir /target/cdrom: %s",
+			  strerror(errno));
     
     fstab = fopen(FSTAB, "w");
 

@@ -23,7 +23,7 @@ make_path(const char *pathname, mode_t mode)
 	if (slash)
 	    *slash = '\0';
 
-	if (mkdir(dirpath, mode))
+	if (0 != mkdir(dirpath, mode))
 	{
 	    struct stat statbuf;
 	    if (stat(dirpath, &statbuf))
