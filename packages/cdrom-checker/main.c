@@ -95,7 +95,7 @@ int valid_cdrom() {
 	if(!S_ISDIR(dir.st_mode))
 		return(EXIT_FAILURE);
 
-	/* test ".disk" directory */
+	/* test "debian" directory */
 	if(stat("debian", &dir) != 0)
 		return(EXIT_FAILURE);
 	if(!S_ISDIR(dir.st_mode))
@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
 	debconf = debconfclient_new();
 	system("logger after");
 
-	/* ask if we should proceed the checking */
+	/* ask if we should proceed with the checking */
 	debconf_fset(debconf, "cdrom-checker/start", "seen", "false");
 	debconf_set(debconf, "cdrom-checker/start", "false");
 	debconf_input(debconf, "high", "cdrom-checker/start");
@@ -200,7 +200,7 @@ int main(int argc, char **argv) {
 
 		check_cdrom();
 
-		/* make sure cdrom isn't bussy anymore, then umount it */
+		/* make sure cdrom isn't busy anymore, then umount it */
 		chdir("/");
 		di_exec_shell_log("umount /cdrom");
 
