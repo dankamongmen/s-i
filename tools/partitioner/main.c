@@ -123,6 +123,7 @@ int main(int argc, char *argv[]) {
 	PedDevice *discs[MAX_DISKS];
 	char *choices = NULL;
 
+        di_system_init(basename(argv[0]));
 	/* initialize debconf */
 	debconf = debconfclient_new();
 	debconf->command(debconf, "title", "Partition a hard drive", NULL);
