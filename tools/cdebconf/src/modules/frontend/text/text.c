@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.35 2003/03/04 18:26:05 mckinstry Exp $
+ * $Id: text.c,v 1.36 2003/03/14 13:00:33 mckinstry Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -152,7 +152,7 @@ static void texthandler_displaydesc(struct frontend *obj, struct question *q)
  * Function: texthandler_boolean
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
- * Output: int - DC_OK, DC_NOTOK
+ * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
  * Description: handler for the boolean question type
  * Assumptions: none
  */
@@ -176,10 +176,13 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	 * get very messy
 	 */
 	do {
-		printf("%s%s> ", _("Prompt: yes/no"), (defval == NULL ? "" :
-			(def == 0 ? _(", default=no") : _(", default=yes"))));
+		printf("%s%s> ", 
+			obj->methods.can_go_back(obj, q) ? _("Prompt: yes/no/cancel") : _("Prompt: yes/no"), 
+			(defval == NULL ? "" : (def == 0 ? _(", default=no") : _(", default=yes"))));
 
 		fgets(buf, sizeof(buf), stdin);
+		if (strcmp (buf,_("cancel\n")) == 0) || (strcmp(buf,_("CANCEL")) ==0))
+			return DC_GOBACK;
 		if ((strcmp(buf, _("yes\n")) == 0) || (strcmp(buf, _("YES\n")) == 0))
 			ans = 1;
 		else if ((strcmp(buf, _("no\n")) == 0) || (strcmp(buf, _("NO\n")) == 0))
@@ -280,15 +283,22 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
  * Function: texthandler_note
  * Input: struct frontend *obj - frontend object
  *        struct question *q - question to ask
- * Output: int - DC_OK, DC_NOTOK
+ * Output: int - DC_OK, DC_NOTOK, DC_GOBACK
  * Description: handler for the note question type
  * Assumptions: none
  */
 static int texthandler_note(struct frontend *obj, struct question *q)
 {
 	int c;
-	printf(_("[Press enter to continue]\n"));
-	do { c = fgetc(stdin); } while (c != '\r' && c != '\n');
+	if (obj->methods.can_go_back (obj, q))
+		printf (_("[Press enter to continue, or 'c to cancel]"));
+	else
+		printf(_("[Press enter to continue]\n"));
+	do { 
+		c = fgetc(stdin); 
+		if (obj->methods.can_go_back (obj, q)) &&  ((c == 'c' ) || (c == 'C'))
+			return DC_GOBACK;
+	} while (c != '\r' && c != '\n');
 	return DC_OK;
 }
 
