@@ -72,7 +72,7 @@ char *lvm_create_logicalvolume(const char *vgname, const char *lvname,
 			       unsigned int mbsize);
 int lvm_split_fstype(const char *str, int separator, int elemcount,
 		     char *elements[]);
-int lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize);
+char *lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize);
 
 void *lvm_pv_stack_new(void);
 int lvm_pv_stack_isempty(void *stack);

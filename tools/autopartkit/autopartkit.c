@@ -688,12 +688,6 @@ normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
 	else
 	    dest[count].fstype = strdup(source[count].fstype);
 
-#if 0
-        /* Hm, these should not be nessesary.  Testing... */
-        dest[count].ondisk = source[count].ondisk;
-        dest[count].minsize = source[count].minsize;
-        dest[count].maxsize = source[count].maxsize;
-#endif
         /* Make sure minsize <= maxsize, unless maxsize == -1 (unlimited) */
 	if (-1 != dest[count].maxsize)
 	{
@@ -999,8 +993,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 			    req_tmp->fstype);
 #if defined(LVM_HACK)
 	    if ( 0 == strncmp("lvm:", req_tmp->fstype, 4) )
-                lvm_lv_add(lvm_lv_stack, req_tmp->fstype,
-                                req_tmp->minsize);
+                devpath = lvm_lv_add(lvm_lv_stack, req_tmp->fstype,
+                                     req_tmp->minsize);
 	    else
 #endif /* LVM_HACK */
 	    {
@@ -1227,6 +1221,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 	char *fstype;
         unsigned int mbsize;
         char *devpath;
+        char *cmd = NULL;
+        int retval;
 
         lvm_lv_stack_pop(lvm_lv_stack, &vgname, &lvname, &fstype, &mbsize);
 
@@ -1251,21 +1247,30 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
           fs = ped_file_system_create(&part_geom, fs_type, NULL);
           ped_file_system_close(fs);
         */
-        { /* Do it like this for now */
-            char *cmd = NULL;
-            int retval;
+            /* Do it like this for now */
             retval = asprintf(&cmd,
-			      "/sbin/mkfs.ext3 %s >> /var/log/messages 2>&1",
+                              "/sbin/mkfs.ext3 %s >> /var/log/messages 2>&1",
                               devpath);
             if (-1 != retval)
             {
                 retval = system(cmd);
                 free(cmd);
                 if (0 != retval)
-                  autopartkit_error(1, "Failed to create ext3 fs on '%s'",
-                                    devpath);
+                    autopartkit_error(1, "Failed to create ext3 fs on '%s'",
+                                      devpath);
+                else
+                { /* Replace devpath placeholder with real path */
+                    char buf[1024];
+                    int i;
+                    snprintf(buf, sizeof(buf), "%s:%s", vgname, lvname);
+                    for (i = 0; i < partcount; i++)
+                        if (0 == strcmp(buf, mountmap[i].devpath))
+                        {
+                            free(mountmap[i].devpath);
+                            mountmap[i].devpath = devpath;
+                        }
+                }
             }
-        }
 	}
     }
     lvm_lv_stack_delete(lvm_lv_stack);

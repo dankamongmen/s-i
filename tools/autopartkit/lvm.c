@@ -240,7 +240,7 @@ lvm_split_fstype(const char *str, int separator, int elemcount,
     return 0;
 }
 
-int
+char *
 lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize)
 {
     /* Create LVM logical volume with given FS.  Assuming LVM volume
@@ -252,16 +252,19 @@ lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize)
     if (0 != lvm_split_fstype(fstype, ':', 4, info))
     {
         autopartkit_log(0, "  Failed to parse '%s'\n", fstype);
-	return -1;
+	return NULL;
     }
-    else
+    autopartkit_log(2, "  Stacking LVM lv %s on vg %s "
+		    "fstype %s\n", info[1], info[2], info[3]);
+    /* Store vgname, lvname and size in stack */
+    if (0 == lvm_lv_stack_push(stack, info[1], info[2], info[3], mbsize))
     {
-	autopartkit_log(2, "  Stacking LVM lv %s on vg %s "
-			"fstype %s\n", info[1], info[2], info[3]);
-	/* Store vgname, lvname and size in stack */
-	return lvm_lv_stack_push(stack, info[1], info[2], info[3],
-				 mbsize);
+        char buf[1024];
+	snprintf(buf, sizeof(buf), "%s:%s", info[1], info[2]);
+	return strdup(buf);
+	
     }
+    return NULL;
 }
 
 /* LVM stack operations */
