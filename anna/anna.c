@@ -235,8 +235,6 @@ install_modules(void)
 
     debconf->command(debconf, "PROGRESS STOP", NULL);
 
-    cleanup();
-
     di_list_free(instlist, di_pkg_free);
 
     return ret;
@@ -256,12 +254,17 @@ main()
     debconf->command(debconf, "CAPB", "backup", NULL);
     while (state >= 0 && states[state] != NULL) {
         ret = states[state]();
-        if (ret == 0 && debconf->command(debconf, "GO", NULL) == 0)
+        if (ret != 0)
+            state = -1;
+        else if (debconf->command(debconf, "GO", NULL) == 0)
             state++;
         else
             state--;
     }
     if (state < 0)
-        return 10; /* back to the menu */
-    return install_modules();
+        ret = 10; /* back to the menu */
+    else
+        ret = install_modules();
+    cleanup();
+    return ret;
 }
