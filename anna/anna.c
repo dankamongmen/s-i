@@ -46,7 +46,7 @@ choose_retriever(di_packages *status, di_packages **packages __attribute__((unus
 static int
 choose_modules(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator)
 {
-    char *choices, *package_kernel, *running_kernel = NULL;
+    char *choices, *package_kernel, *running_kernel = NULL, *subarchitecture;
     int package_count = 0;
     di_package *package, *status_package, **package_array;
     di_slist_node *node, *node1;
