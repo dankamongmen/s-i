@@ -18,6 +18,7 @@ fulllist="countrychooser/country-name"
 # This is the iso_3166.tab file location
 ISO3166TAB=/usr/share/iso-codes/iso_3166.tab
 SUPPORTEDLOCALES=/etc/SUPPORTED-short
+SHORTLISTS=/etc/shortlists
 
 for list in $ISO3166TAB ; do 
 	if [ -f "$list" ]; then
@@ -52,6 +53,33 @@ country2code() {
 	COUNTRYNAME=$(echo "$1" | sed "s/^$INDENT//" | sed 's/\\,/,/g')
 	line=`grep "$COUNTRYNAME$" $countries`
 
+	if [ -n "$line" ]; then
+		set $line
+		if [ -n "$1" ]; then
+			echo "$1"
+		fi
+	fi
+}
+
+cat_shortlist() {
+	(out = ""
+	IFS='
+'
+	while read line; do
+		if $(echo "$line" | grep -q "^:$1\$"); then
+			out=1
+		elif $(echo "$line" | grep -q "^:"); then
+			out=""
+		elif [ "$out" ]; then
+			echo "$line"
+		fi
+	done
+	) < $SHORTLISTS
+}
+
+loccountry2code() {
+	COUNTRYNAME=$(echo "$1" | sed "s/^$INDENT//" | sed 's/\\,/,/g')
+	line=`cat_shortlist $2| grep "$COUNTRYNAME\$"`
 	if [ -n "$line" ]; then
 		set $line
 		if [ -n "$1" ]; then
@@ -97,6 +125,16 @@ fi
 # If present, keep track of charset or modifier we got from languagechooser
 EXTRA_LANGUAGECHOOSER=`echo $DEFAULTLOCALE | sed -e 's/^[^.@]*//'`
 
+FIRST_LANG=$(echo $LANGUAGELIST | sed -e 's/:.*$//')
+
+if grep -q "^:$FIRST_LANG\$" $SHORTLISTS; then
+  use_lang=$FIRST_LANG
+elif grep -q "^:$LANGUAGE\$" $SHORTLISTS; then
+  use_lang=$LANGUAGE
+else
+  use_lang=""
+fi
+
 # At this step we should have either xx, or xx_YY in LANGNAME
 if [ "$LANGUAGE" != "C" ]; then
 	STATE=1
@@ -112,35 +150,35 @@ if [ "$LANGUAGE" != "C" ]; then
 				askedshort=0
 				fullprio=medium
 			else
-				# Build a short list of supported locales fo
-				# the language.
-				SHORTLIST=''
-				for code in $(grep -e "^$LANGUAGE" $SUPPORTEDLOCALES | cut -b 4-5 | sort | uniq); do
-					line=`grep -e "^$code" $ISO3166TAB`
-					if [ "$line" ] ; then
-						OLD_IFS="$IFS"
-						IFS='	'
-						set $line
-						IFS="$OLD_IFS"
-						if [ "$2" ]; then
-							countryname=$(echo "${INDENT}$2" | sed 's/,/\\,/g');
-						fi
+				if [ "$use_lang" ]; then
+					# Build a short list of supported locales for
+					# the language.
+					OLD_IFS="$IFS"
+					IFS='
+'
+					COUNTRIES=$(cat_shortlist $use_lang | sed -e 's/^.*	//');
+					SHORTLIST=""
+					for name in $COUNTRIES; do
 						if [ ! -z "${SHORTLIST}" ]; then
 							SHORTLIST="${SHORTLIST}, "
 						fi
+						countryname=$(echo "${INDENT}${name}" | sed -e 's/,/\\,/')
 						SHORTLIST="${SHORTLIST}${countryname}"
-					fi
-				done
-				db_subst $shortlist SHORTLIST "${SHORTLIST}"
-				db_subst $shortlist DEFAULTLOCALE "${DEFAULTLOCALE}"
-				db_input critical $shortlist || [ $? -eq 30 ]
-				askedshort=1
+					done
+					IFS="$OLD_IFS"	
+					db_subst $shortlist SHORTLIST "${SHORTLIST}"
+					db_subst $shortlist DEFAULTLOCALE "${DEFAULTLOCALE}"
+					db_input critical $shortlist || [ $? -eq 30 ]
+					askedshort=1
+				else
+					askedshort=0
+				fi
 			fi
 		;;
 		2)
 			db_get $shortlist
 			if [ "$askedshort" = 1 ] && [ "$RET" != "other" ]; then
-     				COUNTRYCODE="$(country2code "$RET")" || true
+     				COUNTRYCODE="$(loccountry2code "$RET" $use_lang )" || true
 				if [ -n "$COUNTRYCODE" ]; then
 					break
 				fi

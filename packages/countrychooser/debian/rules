@@ -11,18 +11,22 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 	# Grab ISO codes from iso-codes package
+	chmod u+x ./get-iso-codes
 	./get-iso-codes
 	# Pick up SUPPORTED list of locales and keep only relevant information
+	chmod u+x ./get-SUPPORTED
 	./get-SUPPORTED
 	# Build the templates
+	chmod u+x ./mktemplates ./mkshort
 	./mktemplates
+	./mkshort
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
-	rm -rf debian/pobuild debian/iso-codes
+	rm -rf debian/pobuild debian/iso-codes debian/short-tmp
 	dh_clean debian/templates.tmp debian/templates debian/SUPPORTED-short
 
 install: build
@@ -33,6 +37,7 @@ install: build
 	# The following while we have no other way to get SUPPORTED
 	# Should become useless when we will have it
 	install -m644 debian/SUPPORTED-short debian/$(PACKAGE)/etc/SUPPORTED-short
+	install -m644 debian/short-tmp/shortlists debian/$(PACKAGE)/etc/shortlists
 
 # Build architecture-independent files here.
 binary-indep: build install
