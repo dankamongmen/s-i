@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+. /usr/share/debconf/confmodule
+
 newline="
 "
 
@@ -46,7 +48,6 @@ prefix=$(echo "$bootfs_devfs" | sed 's/\(\/dev\/[a-z]\+\).*/\1/')
 disc_offered_devfs=$(find $prefix -name disc | head -n 1)
 disc_offered=$(mapdevfs "$disc_offered_devfs")
 
-. /usr/share/debconf/confmodule
 db_capb backup
 
 db_subst lilo-installer/bootdev disc "$disc_offered"
