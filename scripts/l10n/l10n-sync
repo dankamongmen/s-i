@@ -274,9 +274,9 @@ for package in $packages ; do
  if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
    echo -n "      - commiting back updated files..."
    if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"${COMMIT_MARKER} Synchronising with files from packages/po" *.po
+     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po
    else
-     $svn commit -m"${COMMIT_MARKER} Synchronising with files from packages/po" *.po >/dev/null 2>&1
+     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po >/dev/null 2>&1
    fi
    echo Done.
  fi
@@ -286,7 +286,7 @@ done
 if [ "$BIG_COMMITS" = "Y" ] ; then
   cd $DI_COPY/packages
   for lang in $languages ; do
-     $svn commit -m"${COMMIT_MARKER} Synchronising with files from packages/po" $(find . -mindepth 3 -name $lang.po |\
+     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" $(find . -mindepth 3 -name $lang.po |\
               grep /debian/po/$lang.po\$)
   done
 fi
