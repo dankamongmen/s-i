@@ -30,9 +30,13 @@ struct partition {
     struct operation     op;
 };
 
-extern char     *size_desc(long long bytes);
-extern void      modprobe(const char *mod);
-extern int       check_proc_mounts(const char *mntpoint);
-extern void      append_message(const char *fmt, ...);
+/* util.h */
+char    *size_desc(long long bytes);
+void     modprobe(const char *mod);
+int      check_proc_mounts(const char *mntpoint);
+void     append_message(const char *fmt, ...);
+
+/* find-parts.c */
+int      get_all_partitions(struct partition *parts[], const int max_parts);
 
 #endif /* PARTCONF_H_ */

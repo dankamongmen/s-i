@@ -5,10 +5,10 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PACKAGE=$(shell dh_listpackages)
+PACKAGES=$(shell dh_listpackages)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+#FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
 build: build-stamp
@@ -27,14 +27,18 @@ clean:
 	rm -f build-stamp
 	-$(MAKE) clean
 	dh_clean
-	-rm -f debian/$(PACKAGE).postinst
+	-for p in $(PACKAGES); do \
+	    -rm -f debian/$p.postinst; \
+	done
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-	install -m755 $(PACKAGE) debian/$(PACKAGE).postinst
+	install -m755 partconf debian/partconf.postinst
+	install -d -m755 debian/partconf-find-partitions/usr/lib/partconf
+	install -m755 find-partitions debian/partconf-find-partitions/usr/lib/partconf
 
 # Build architecture-dependent files here.
 binary-arch: build install
@@ -46,8 +50,11 @@ binary-arch: build install
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
+	for p in $(PACKAGES); do \
+	    FILENAME=$${p}_$(VERSION)_$(ARCH).udeb; \
+	    dpkg-distaddfile $$FILENAME debian-installer $(PRIORITY); \
+	    dh_builddeb --filename=$$FILENAME; \
+	done
 
 binary: binary-arch
 .PHONY: build clean binary-arch binary install
