@@ -1,5 +1,10 @@
 if [ "`debconf-get debian-installer/framebuffer`" = true ]; then
-	echo "Trying to enable the frame buffer.."
-	modprobe -q vesafb >/dev/null 2>&1 || modprobe -q vga16fb 2>&1 >/dev/null || true
-	modprobe -q fbcon >/dev/null 2>&1 || true
+	printf "Trying to enable the frame buffer..."
+	if modprobe -q vesafb >/dev/null 2>&1 && modprobe -q fbcon >/dev/null 2>&1; then
+		echo vesafb
+	elif modprobe -q vga16fb 2>&1 >/dev/null && modprobe -q fbcon >/dev/null 2>&1; then
+		echo vga16fb
+	else
+		echo failed
+	fi
 fi
