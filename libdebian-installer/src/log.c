@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.8 2003/11/02 20:58:49 waldi Exp $
+ * $Id: log.c,v 1.9 2003/11/06 07:52:16 waldi Exp $
  */
 
 #include <debian-installer/log.h>
@@ -55,7 +55,7 @@ static di_slist handlers;
 
 #define ALERT_LEVELS (DI_LOG_LEVEL_ERROR | DI_LOG_LEVEL_CRITICAL | DI_LOG_LEVEL_WARNING)
 
-void mklevel_prefix (char *level_prefix, di_log_level_flags log_level)
+static void mklevel_prefix (char *level_prefix, di_log_level_flags log_level)
 {
   char *prefix = NULL;
   char buf[16];
@@ -110,7 +110,7 @@ void di_log_handler_default (di_log_level_flags log_level, const char *message, 
   fputs (buf, log_level & ALERT_LEVELS ? stderr : stdout);
 }
 
-void di_log_handler_syslog (di_log_level_flags log_level, const char *message, void *user_data __attribute__ ((unused)))
+void di_log_handler_syslog (di_log_level_flags log_level, const char *message, void *user_data)
 {
   char buf[1280];
   static char ident_buf[128];
@@ -159,7 +159,7 @@ void di_log_handler_syslog (di_log_level_flags log_level, const char *message, v
       break;
   }
 
-  syslog (syslog_level, buf);
+  syslog (syslog_level, "%s", buf);
 }
 
 static di_log_handler *di_log_get_handler (di_log_level_flags log_level, void **user_data)

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser_rfc822.c,v 1.5 2003/09/30 19:22:07 waldi Exp $
+ * $Id: parser_rfc822.c,v 1.6 2003/11/06 07:52:16 waldi Exp $
  */
 
 #include <config.h>
@@ -38,16 +38,6 @@
 
 #define READSIZE 16384
 
-/**
- * Parse a rfc822 formated file
- *
- * @param begin begin of memory segment
- * @param size size of memory segment
- * @param info parser info
- * @param user_data user_data for parser functions
- *
- * @return number of parsed entries
- */
 int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_parser_read_entry_new entry_new, di_parser_read_entry_finish entry_finish, void *user_data)
 {
   char *cur, *end;
@@ -208,15 +198,6 @@ next:
   return nr;
 }
 
-/**
- * Parse a rfc822 formated file
- *
- * @param file filename
- * @param info parser info
- * @param user_data user_data for parser functions
- *
- * @return number of parsed entries
- */
 int di_parser_rfc822_read_file (const char *file, di_parser_info *info, di_parser_read_entry_new entry_new, di_parser_read_entry_finish entry_finish, void *user_data)
 {
   struct stat statbuf;
@@ -251,15 +232,6 @@ static void callback (const di_rstring *field, const di_rstring *value, void *da
   fputs ("\n", f);
 }
 
-/**
- * Dump a rfc822 formated file
- *
- * @param file filename
- * @param info parser info
- * @param user_data user_data for parser functions
- *
- * @return number of dumped entries
- */
 int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_parser_write_entry_next entry_next, void *user_data)
 {
   int nr = 0;

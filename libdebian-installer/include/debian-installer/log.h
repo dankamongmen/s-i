@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.h,v 1.8 2003/11/03 13:46:12 waldi Exp $
+ * $Id: log.h,v 1.9 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__LOG_H
@@ -30,20 +30,23 @@
  * @{
  */
 
+/**
+ * @brief Log levels and other flags
+ */
 typedef enum
 {
-  DI_LOG_FLAG_FATAL             = 1 << 1,
+  DI_LOG_FLAG_FATAL             = 1 << 1,       /**< flag as fatal */
 
-  DI_LOG_LEVEL_ERROR            = 1 << 2,       /* always fatal */
-  DI_LOG_LEVEL_CRITICAL         = 1 << 3,
-  DI_LOG_LEVEL_WARNING          = 1 << 4,
-  DI_LOG_LEVEL_MESSAGE          = 1 << 5,
-  DI_LOG_LEVEL_INFO             = 1 << 6,
-  DI_LOG_LEVEL_DEBUG            = 1 << 7,
-  DI_LOG_LEVEL_OUTPUT           = 1 << 8,
+  DI_LOG_LEVEL_ERROR            = 1 << 2,       /**< error level, always fatal */
+  DI_LOG_LEVEL_CRITICAL         = 1 << 3,       /**< critical level */
+  DI_LOG_LEVEL_WARNING          = 1 << 4,       /**< warning level */
+  DI_LOG_LEVEL_MESSAGE          = 1 << 5,       /**< message level */
+  DI_LOG_LEVEL_INFO             = 1 << 6,       /**< information level */
+  DI_LOG_LEVEL_DEBUG            = 1 << 7,       /**< debug level */
+  DI_LOG_LEVEL_OUTPUT           = 1 << 8,       /**< command output */
 
-  DI_LOG_LEVEL_MASK             = ~DI_LOG_FLAG_FATAL,
-  DI_LOG_FATAL_MASK             = DI_LOG_LEVEL_ERROR,
+  DI_LOG_LEVEL_MASK             = ~DI_LOG_FLAG_FATAL,   /**< defines mask for levels */
+  DI_LOG_FATAL_MASK             = DI_LOG_LEVEL_ERROR,   /**< defines always fatal levels */
 }
 di_log_level_flags;
 
@@ -92,7 +95,15 @@ void di_vlog (di_log_level_flags log_level, const char *format, va_list args);
 unsigned int di_log_set_handler (di_log_level_flags log_levels, di_log_handler *log_func, void *user_data);
 
 di_log_handler
+  /**
+   * Default log handler.
+   * Logs to STDOUT and STDERR.
+   */
   di_log_handler_default,
+  /**
+   * SYSLOG log handler.
+   * Logs to SYSLOG.
+   */
   di_log_handler_syslog;
 
 /** @} */

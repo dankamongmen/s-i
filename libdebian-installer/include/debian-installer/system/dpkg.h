@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.h,v 1.5 2003/09/30 19:22:07 waldi Exp $
+ * $Id: dpkg.h,v 1.6 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__DPKG_H
@@ -26,6 +26,11 @@
 #include <debian-installer/packages.h>
 
 #include <stdbool.h>
+
+/**
+ * @defgroup di_system_dpkg System - DPKG
+ * @{
+ */
 
 #define DI_SYSTEM_DPKG_ADMINDIR "/var/lib/dpkg/"
 #define DI_SYSTEM_DPKG_INFODIR DI_SYSTEM_DPKG_ADMINDIR "info/"
@@ -40,4 +45,5 @@ int di_system_dpkg_package_control_file_exec (di_package *package, const char *n
 int di_system_dpkg_package_unpack (di_packages *status, const char *_package, const char *filename, di_packages_allocator *allocator);
 #endif
 
+/** @} */
 #endif

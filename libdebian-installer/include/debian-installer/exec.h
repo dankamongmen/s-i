@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.h,v 1.6 2003/11/03 13:46:12 waldi Exp $
+ * $Id: exec.h,v 1.7 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__EXEC_H
@@ -125,6 +125,10 @@ inline static int di_exec_mangle_status (int status)
   return status;
 }
 
+/**
+ * @deprecated
+ * Alias of di_exec_shell_log
+ */
 inline static int di_execlog (const char *const cmd) __attribute__ ((deprecated));
 inline static int di_execlog (const char *const cmd)
 {

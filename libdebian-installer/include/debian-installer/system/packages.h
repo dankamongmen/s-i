@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.9 2003/10/05 10:09:19 waldi Exp $
+ * $Id: packages.h,v 1.10 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__PACKAGES_H
@@ -31,7 +31,7 @@
 typedef struct di_system_package di_system_package;
 
 /**
- * @defgroup di_system_packages Packages file - system
+ * @defgroup di_system_packages System - Packages file
  * @{
  */
 

@@ -17,15 +17,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: prebaseconfig.h,v 1.3 2003/09/29 14:08:48 waldi Exp $
+ * $Id: prebaseconfig.h,v 1.4 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__PREBASECONFIG_H
 #define DEBIAN_INSTALLER__SYSTEM__PREBASECONFIG_H
 
+/**
+ * @defgroup di_system_prebaseconfig System - Prebaseconfig
+ * @{
+ */
+
 #define DI_SYSTEM_PREBASECONFIG_DIR "/usr/lib/prebaseconfig.d"
 
 int di_system_prebaseconfig_append (const char *udeb, const char *format, ...) __attribute__ ((format(printf,2,3)));
+
+/**
+ * @deprecated
+ * Alias of di_system_prebaseconfig_append
+ */
 int di_prebaseconfig_append (const char *udeb, const char *format, ...) __attribute__ ((format(printf,2,3),deprecated));
 
+/** @} */
 #endif

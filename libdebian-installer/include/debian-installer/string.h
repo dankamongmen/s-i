@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: string.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: string.h,v 1.2 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__STRING_H
@@ -43,7 +43,23 @@ struct di_rstring
   di_ksize_t size;                                      /**< size of string */
 };
 
+/**
+ * cat resolved format to str
+ *
+ * @param str string
+ * @param size len of str
+ * @param format printf compatible string
+ * @return append chars
+ */
 int di_snprintfcat (char *str, size_t size, const char *format, ...);
+
+/**
+ * Copies n bytes from s, without calculating the lenght of s themself.
+ *
+ * @param s source
+ * @param n len of source without delimiter
+ * @return malloced string
+ */
 char *di_stradup (const char *s, size_t n);
 
 /** @} */

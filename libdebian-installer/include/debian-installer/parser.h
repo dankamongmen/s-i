@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.h,v 1.3 2003/09/30 14:28:45 waldi Exp $
+ * $Id: parser.h,v 1.4 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PARSER_H
@@ -54,6 +54,13 @@ typedef struct di_parser_fieldinfo di_parser_fieldinfo;
  */
 typedef void di_parser_fields_function_read (void **data, const di_parser_fieldinfo *fip, di_rstring *field_modifier, di_rstring *value, void *user_data);
 
+/**
+ * Write a single field - callback
+ *
+ * @param field the field
+ * @param value the value of the field
+ * @param data the callback_data
+ */
 typedef void di_parser_fields_function_write_callback (const di_rstring *field, const di_rstring *value, void *data);
 
 /**
@@ -115,8 +122,6 @@ struct di_parser_fieldinfo
 #define DI_PARSER_FIELDINFO(name, read, write, integer) \
   { { name, sizeof (name) - 1 }, read, write, integer }
 
-/** @} */
-
 di_parser_fields_function_read
   di_parser_read_boolean,
   di_parser_read_int,
@@ -126,11 +131,6 @@ di_parser_fields_function_write
   di_parser_write_boolean,
   di_parser_write_int,
   di_parser_write_string;
-
-/**
- * @addtogroup di_parser
- * @{
- */
 
 di_parser_info *di_parser_info_alloc (void);
 void di_parser_info_free (di_parser_info *info);

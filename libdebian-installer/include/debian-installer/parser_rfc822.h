@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser_rfc822.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: parser_rfc822.h,v 1.2 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PARSER_RFC822_H
@@ -33,8 +33,43 @@
  * @{
  */
 
+/**
+ * Parse a rfc822 formated file
+ *
+ * @param begin begin of memory segment
+ * @param size size of memory segment
+ * @param fieldinfo parser info
+ * @param entry_new function which is called before each entry, may return the new entry or return NULL
+ * @param entry_finish function which is called after each entry, return non-0 aborts the parsing
+ * @param user_data user_data for parser functions
+ *
+ * @return number of parsed entries
+ */
 int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *fieldinfo, di_parser_read_entry_new entry_new, di_parser_read_entry_finish entry_finish, void *user_data);
+
+/**
+ * Parse a rfc822 formated file
+ *
+ * @param file filename
+ * @param fieldinfo parser info
+ * @param entry_new function which is called before each entry, may return the new entry or return NULL
+ * @param entry_finish function which is called after each entry, return non-0 aborts the parsing
+ * @param user_data user_data for parser functions
+ *
+ * @return number of parsed entries
+ */
 int di_parser_rfc822_read_file (const char *file, di_parser_info *fieldinfo, di_parser_read_entry_new entry_new, di_parser_read_entry_finish entry_finish, void *user_data);
+
+/**
+ * Dump a rfc822 formated file
+ *
+ * @param file filename
+ * @param fieldinfo parser info
+ * @param entry_next function which is called to gather the next entry
+ * @param user_data user_data for parser functions
+ *
+ * @return number of dumped entries
+ */
 int di_parser_rfc822_write_file (const char *file, di_parser_info *fieldinfo, di_parser_write_entry_next entry_next, void *user_data);
   
 /** @} */

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.7 2003/09/30 19:22:07 waldi Exp $
+ * $Id: packages.h,v 1.8 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGES_H
@@ -96,7 +96,21 @@ di_parser_info *di_packages_parser_info (void);
 di_parser_info *di_packages_minimal_parser_info (void);
 di_parser_info *di_packages_status_parser_info (void);
 
+/**
+ * Read a special Packages file
+ *
+ * @param file file to read
+ */
 di_packages *di_packages_special_read_file (const char *file, di_packages_allocator *allocator, di_parser_info *(info) (void));
+
+/**
+ * Write a special Packages file
+ *
+ * @param packages the packages structure
+ * @param file file to write
+ *
+ * @return number of written entries
+ */
 int di_packages_special_write_file (di_packages *packages, const char *file, di_parser_info *(info) (void));
 
 /**
@@ -132,7 +146,10 @@ static inline di_packages *di_packages_status_read_file (const char *file, di_pa
 /**
  * Write a standard Packages file
  *
- * @param file file to read
+ * @param packages the packages structure
+ * @param file file to write
+ *
+ * @return number of written entries
  */
 static inline int di_packages_write_file (di_packages *packages, const char *file)
 {
@@ -142,7 +159,10 @@ static inline int di_packages_write_file (di_packages *packages, const char *fil
 /**
  * Write a standard status file
  *
- * @param file file to read
+ * @param packages the packages structure
+ * @param file file to write
+ *
+ * @return number of written entries
  */
 static inline int di_packages_status_write_file (di_packages *packages, const char *file)
 {

@@ -3,7 +3,7 @@ SUBDIRS = system
 INCLUDES = \
 	-I$(top_srcdir)/include
 
-lib_LTLIBRARIES = libdebian-installer.la
+lib_LTLIBRARIES = libdebian-installer.la libdebian-installer-extra.la
 
 libdebian_installer_la_SOURCES = \
 	exec.c \
@@ -19,17 +19,32 @@ libdebian_installer_la_SOURCES = \
 	slist.c \
 	string.c \
 	utils.c
-#	release.c
-#	list.c
+
+libdebian_installer_extra_la_SOURCES = \
+	list.c \
+	release.c
 
 libdebian_installer_la_LIBADD = \
 	system/libsystem.la
 
+libdebian_installer_extra_la_LIBADD = \
+	libdebian-installer.la
+
 libdebian_installer_la_LDFLAGS = \
-	-version-number 4:0:1 \
-	-Wl,--version-script=$(srcdir)/libdebian-installer.ver
+	-version-number $(LIBRARY_VERSION) \
+	-Wl,--version-script=$(srcdir)/libdebian-installer.ver \
+	-Wl,--no-undefined-version
+
+libdebian_installer_extra_la_LDFLAGS = \
+	-version-number $(LIBRARY_VERSION) \
+	-Wl,--version-script=$(srcdir)/libdebian-installer-extra.ver \
+	-Wl,--no-undefined-version
 
 libdebian_installer_la_DEPENDENCIES = \
 	$(srcdir)/libdebian-installer.ver \
 	system/libsystem.la
+
+libdebian_installer_extra_la_DEPENDENCIES = \
+	$(srcdir)/libdebian-installer-extra.ver \
+	libdebian-installer.la
 

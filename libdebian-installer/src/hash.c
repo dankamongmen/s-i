@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.c,v 1.5 2003/11/03 13:46:12 waldi Exp $
+ * $Id: hash.c,v 1.6 2003/11/06 07:52:16 waldi Exp $
  */
 
 #include <debian-installer/hash.h>
@@ -120,7 +120,7 @@ di_hash_table *di_hash_table_new (di_hash_func hash_func, di_equal_func key_equa
 }
 
 /**
- * Creates a new di_hash_table like di_hash_table_new() and allows to specify
+ * Creates a new di_hash_table like di_hash_table_new and allows to specify
  * functions to free the memory allocated for the key and value that get
  * called when removing the entry from the di_hash_table
  *
@@ -162,7 +162,7 @@ di_hash_table *di_hash_table_new_full (di_hash_func hash_func, di_equal_func key
 /**
  * Destroys the di_hash_table. If keys and/or values are dynamically
  * allocated, you should either free them first or create the di_hash_table
- * using di_hash_table_new_full(). In the latter case the destroy functions
+ * using di_hash_table_new_full. In the latter case the destroy functions
  * you supplied will be called on all keys and values before destroying
  * the di_hash_table.
  *

@@ -17,17 +17,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: utils.h,v 1.1 2003/09/29 12:10:00 waldi Exp $
+ * $Id: utils.h,v 1.2 2003/11/06 07:52:16 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__UTILS_H
 #define DEBIAN_INSTALLER__SYSTEM__UTILS_H
 
 /**
- * @defgroup di_system_utils Utils
+ * @defgroup di_system_utils System - Utils
  * @{
  */
 
+/**
+ * Inits the lib.
+ * In addition to di_init, this functions sets a syslog log handler.
+ * @param progname name of the called binary
+ */
 void di_system_init (const char *progname);
 
 /** @} */

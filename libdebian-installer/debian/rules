@@ -33,13 +33,14 @@ build-stamp:  build/config.status
 	dh_testdir
 
 	$(MAKE) -C build
+	$(MAKE) -C build/doc doc
 
-	touch build-stamp
+	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp 
+	rm -f build-stamp
 
 	rm -rf build
 
@@ -60,8 +61,7 @@ install: build
 
 	$(MAKE) -C build install DESTDIR=$(CURDIR)/debian/tmp
 
-	d-shlibmove --commit --movedev debian/tmp/usr/include/ usr debian/tmp/usr/lib/lib*.so
-
+	dh_install --sourcedir=debian/tmp
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -74,7 +74,6 @@ binary-arch: build install
 	dh_installchangelogs 
 	dh_installdocs
 	dh_installexamples
-#	dh_install
 #	dh_installmenu
 #	dh_installdebconf	
 #	dh_installlogrotate
@@ -94,9 +93,13 @@ binary-arch: build install
 #	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	dh_gencontrol $(foreach PACKAGE,$(UDEB_PACKAGES),-N$(PACKAGE))
+	dh_md5sums $(foreach PACKAGE,$(UDEB_PACKAGES),-N$(PACKAGE))
+	dh_builddeb $(foreach PACKAGE,$(UDEB_PACKAGES),-N$(PACKAGE))
+	$(foreach PACKAGE,$(UDEB_PACKAGES), \
+	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_$(DEB_BUILD_ARCH).udeb; \
+	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_$(DEB_BUILD_ARCH).udeb; \
+	)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install 

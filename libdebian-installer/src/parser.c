@@ -17,14 +17,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: parser.c,v 1.3 2003/11/06 07:52:16 waldi Exp $
  */
 
 #include <debian-installer/parser.h>
 
-/**
- * @return a di_parser_info
- */
 di_parser_info *di_parser_info_alloc (void)
 {
   di_parser_info *info;
@@ -35,9 +32,6 @@ di_parser_info *di_parser_info_alloc (void)
   return info;
 }
 
-/**
- * @param info info to free
- */
 void di_parser_info_free (di_parser_info *info)
 {
   di_hash_table_destroy (info->table);
@@ -55,12 +49,12 @@ void di_parser_info_add (di_parser_info *info, const di_parser_fieldinfo *fieldi
   }
 }
 
-void di_parser_read_boolean (data, fip, field_modifier, value, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip __attribute__ ((unused));
-  di_rstring *field_modifier __attribute__ ((unused));
-  di_rstring *value;
-  void *user_data __attribute__ ((unused));
+void di_parser_read_boolean (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
 {
   int *f = (int *)((char *)*data + fip->integer);
   if (strncasecmp (value->string, "yes", 3) == 0)
@@ -69,12 +63,12 @@ void di_parser_read_boolean (data, fip, field_modifier, value, user_data)
     *f = 0;
 }
 
-void di_parser_write_boolean (data, fip, callback, callback_data, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip;
-  di_parser_fields_function_write_callback callback;
-  void *callback_data;
-  void *user_data __attribute__ ((unused));
+void di_parser_write_boolean (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
 {
   int *f = (int *)((char *)*data + fip->integer);
   di_rstring value = { "Yes", 3 };
@@ -83,23 +77,23 @@ void di_parser_write_boolean (data, fip, callback, callback_data, user_data)
     callback (&fip->key, &value, callback_data);
 }
 
-void di_parser_read_string (data, fip, field_modifier, value, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip __attribute__ ((unused));
-  di_rstring *field_modifier __attribute__ ((unused));
-  di_rstring *value;
-  void *user_data __attribute__ ((unused));
+void di_parser_read_string (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
 {
   char **f = (char **)((char *)*data + fip->integer);
   *f = di_stradup (value->string, value->size);
 }
 
-void di_parser_write_string (data, fip, callback, callback_data, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip;
-  di_parser_fields_function_write_callback callback;
-  void *callback_data;
-  void *user_data __attribute__ ((unused));
+void di_parser_write_string (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
 {
   char **f = (char **)((char *)*data + fip->integer);
   di_rstring value;
@@ -112,23 +106,23 @@ void di_parser_write_string (data, fip, callback, callback_data, user_data)
   }
 }
 
-void di_parser_read_int (data, fip, field_modifier, value, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip __attribute__ ((unused));
-  di_rstring *field_modifier __attribute__ ((unused));
-  di_rstring *value;
-  void *user_data __attribute__ ((unused));
+void di_parser_read_int (
+  void **data,
+  const di_parser_fieldinfo *fip __attribute__ ((unused)),
+  di_rstring *field_modifier __attribute__ ((unused)),
+  di_rstring *value,
+  void *user_data __attribute__ ((unused)))
 {
   int *f = (int *)((char *)*data + fip->integer);
   *f = strtol (value->string, NULL, 10);
 }
 
-void di_parser_write_int (data, fip, callback, callback_data, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip;
-  di_parser_fields_function_write_callback callback;
-  void *callback_data;
-  void *user_data __attribute__ ((unused));
+void di_parser_write_int (
+  void **data,
+  const di_parser_fieldinfo *fip,
+  di_parser_fields_function_write_callback callback,
+  void *callback_data,
+  void *user_data __attribute__ ((unused)))
 {
   int *f = (int *)((char *)*data + fip->integer);
   char value_buf[32];
@@ -136,7 +130,7 @@ void di_parser_write_int (data, fip, callback, callback_data, user_data)
 
   if (*f)
   {
-    value.size = snprintf (value_buf, 32, "%d", *f);
+    value.size = snprintf (value_buf, sizeof (value_buf), "%d", *f);
     callback (&fip->key, &value, callback_data);
   }
 }
