@@ -20,6 +20,10 @@ if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
 
+# Which discover binary and version to use.  Updated by discover_version()
+DISCOVER=/sbin/discover
+DISCOVER_VERSION=1
+
 log () {
 	logger -t hw-detect "$@"
 }
@@ -82,6 +86,23 @@ load_module() {
 	echo $old > /proc/sys/kernel/printk
 }
 
+discover_version () {
+	if [ -f /usr/bin/discover ] ; then
+		DISCOVER=/usr/bin/discover
+	fi
+	# Ugh, Discover 1.x didn't exit with nonzero status if given an
+	# unrecognized option!
+	DISCOVER_TEST=$($DISCOVER --version 2> /dev/null)
+	if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
+		log "Testing experimental discover version 2."
+		DISCOVER_VERSION=2
+	else
+		log "Using  discover version 1."
+		DISCOVER_VERSION=1
+		# must be Discover 1.x
+	fi
+}
+
 # join hack for discover 2
 dumb_join_discover (){
 	IFS_SAVE="$IFS"
@@ -95,15 +116,8 @@ dumb_join_discover (){
 
 # wrapper for discover command that can distinguish Discover 1.x and 2.x
 discover_hw () {
-	DISCOVER=/sbin/discover
-	if [ -f /usr/bin/discover ] ; then
-		DISCOVER=/usr/bin/discover
-	fi
-	# Ugh, Discover 1.x didn't exit with nonzero status if given an
-	# unrecongized option!
-	DISCOVER_TEST=$($DISCOVER --version 2> /dev/null)
-	if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
-		log "Testing experimental discover2 package."
+	case "$DISCOVER_VERSION" in
+	2)
 		dpath=linux/module/name
 		dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
 		dflags="-d all -e ata -e pci -e pcmcia -e \
@@ -113,12 +127,13 @@ discover_hw () {
 		MODEL_INFOS=$($DISCOVER -t $dflags)
 		MODULES=$($DISCOVER --data-path=$dpath --data-version=$dver $dflags)
 		dumb_join_discover $MODULES
-	else
-		# must be Discover 1.x
+		;;
+	1)
 		$DISCOVER --format="%m:%V %M\n" --disable-all \
 		          --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
 			sed 's/ $//'
-	fi
+		;;
+	esac
 }
 
 # Some pci chipsets are needed or there can be DMA or other problems.
@@ -163,6 +178,9 @@ get_manual_hw_info() {
 		fi
 	fi
 }
+
+# Detect discover version
+discover_version
 
 # Should be greater than the number of kernel modules we can reasonably
 # expect it will ever need to load.
@@ -324,19 +342,21 @@ if [ -x /etc/init.d/pcmcia ] && \
 		# Cardbus cards by later comparison in the hotplug handler.
 		# (Only on 2.4 kernels.)
 		if expr `uname -r` : "2.4.*" >/dev/null 2>&1; then
-			DISCOVER_TEST=$(discover --version 2> /dev/null)
-			if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
+			case "$DISCOVER_VERSION" in
+			2)
 				dpath=linux/module/name
 				dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
 				dflags="-d all -e pci scsi fixeddisk modem network removabledisk"
 		
-				echo `discover --data-path=$dpath --data-version=$dver $dflags` \
+				echo `$DISCOVER --data-path=$dpath --data-version=$dver $dflags` \
 					| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
-			else
-				discover --format="%m " --disable-all --enable=pci \
+				;;
+			1)
+				$DISCOVER --format="%m " --disable-all --enable=pci \
 					scsi ide ethernet \
 					| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
-			fi
+				;;
+			esac
 		fi
 	
 		# Simple handling of hotplug events during PCMCIA detection
@@ -361,7 +381,23 @@ fi
 
 # Ask for discover to be installed into /target/, to make sure the
 # required drivers are loaded.
-apt-install discover || true
+case "$DISCOVER_VERSION" in
+	2)
+		log "Detected discover version 2, installing discover."
+		apt-install discover || true
+		;;
+	1)
+		# Install discover1 when it enter testing/sarge.
+
+		# This will break woody install, as discover1 is
+		# missing in woody.  We should try to find out which
+		# packages are available when selecting it for
+		# installation. [pere 2004-04-23]
+
+		log "Detected discover version 1, installing discover."
+		apt-install discover || true
+		;;
+esac
 
 # Install hotplug as well (for USB, IEEE1394, CardBus, and some SCSI)
 if [ -f /proc/sys/kernel/hotplug ]; then 
