@@ -48,15 +48,16 @@ binary-arch: build install disk-detect
 disk-detect: build install
 	dh_testdir
 	dh_testroot
-	dh_installdebconf
-	cp debian/menutest debian/disk-detect/DEBIAN/menutest
-	chmod 0755 debian/disk-detect/DEBIAN/menutest
 	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_installdeb 
 	dh_shlibdeps
 	dh_gencontrol -- -fdebian/files~
+
+	cp debian/menutest debian/disk-detect/DEBIAN/menutest
+	chmod 0755 debian/disk-detect/DEBIAN/menutest
+
 	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
 # no md5sums for udebs
 #	dh_md5sums
