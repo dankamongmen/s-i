@@ -97,24 +97,28 @@ int check_dir (const char *dirname)
 
 /**
  * @brief  Do a grep for a string
- * @return 0 if present, 1 if not, -errno if error
+ * @return 0 if not found, -errno if error, 
+ *   and LINESIZE * (line - 1) + pos, when found at line, pos.
  */
 int
 grep (const char *file, const char *string)
 {
 	FILE *fp = fopen (file, "r");
 	char buf[LINESIZE];
+	char * ret;
+	int lines = 0;
 	if (!fp)
 		return -errno;
 	while (!feof (fp))	{
 		fgets (buf, LINESIZE, fp);
-		if (strstr (buf, string) != NULL)	{
+		if ((ret = strstr (buf, string)) != NULL)	{
 			fclose (fp);
-			return 0;
+			return ((int) (ret - buf) + 1 + (lines * LINESIZE));
 		}
+		lines ++;
 	}
 	fclose (fp);
-	return 1;
+	return 0;
 }
 
 /*
@@ -582,7 +586,7 @@ check_if_uml_console (void)
 	sercon_state present = SERIAL_UNKNOWN;
 	struct debconfclient *client = mydebconf_get ();
 
-	if (grep("/proc/cpuinfo", "User Mode Linux") == 0)
+	if (grep("/proc/cpuinfo", "User Mode Linux") > 0)
 		present = SERIAL_PRESENT;
 	else
 		present = SERIAL_ABSENT;
@@ -604,11 +608,16 @@ check_if_serial_console (void)
 	struct debconfclient *client = mydebconf_get ();
 	int fd;
 	struct serial_struct sr;
+	int rets, ret1, ret2, ret;
 
 	// Some UARTs don't support the TIOCGSERIAL ioctl(), so also
         // try to detect serial console via cmdline
-	if ((grep("/proc/cmdline","console=ttyS") == 0) ||
-	    (grep("/proc/cmdline","console=ttys") == 0)) {
+	ret1 = grep("/proc/cmdline","console=ttyS");
+	ret2 = grep("/proc/cmdline","console=ttys");
+	rets = ret1 > ret2 ? ret1 : ret2;
+	ret = grep("/proc/cmdline","console=tty0");
+
+	if ((rets > 0) && (rets > ret)) {
 		present = SERIAL_PRESENT;
 	} else {
                 fd = open ("/dev/console", O_NONBLOCK);
