@@ -19,21 +19,21 @@ static int
 is_installed(struct package_t *package, struct package_t *installed)
 {
 	struct package_t *q;
+	struct version_t pv, qv;
 
+	/* If we don't understand the version number, we play safe
+	 * and assume we should install it */
+	if (!di_parse_version(&pv, package->version))
+		return 0;
 	for (q = installed; q != NULL; q = q->next) {
-		if (strcmp(package->package, q->package) == 0)
-			return 1;
+		if (strcmp(package->package, q->package) == 0) {
+			if (!di_parse_version(&qv, q->version))
+				return 0;
+			else
+				return (di_compare_version(&pv, &qv) <= 0);
+		}
 	}
 	return 0;
-}
-
-static char *
-debconf_ask_one(struct debconfclient *d, const char *pri, const char *template)
-{
-	d->command(d, "INPUT", pri, template, NULL);
-	d->command(d, "GO", NULL);
-	d->command(d, "GET", template, NULL);
-	return d->value;
 }
 
 /*
