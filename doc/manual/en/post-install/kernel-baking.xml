@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: kernel-baking.xml,v 1.3 2003/09/19 02:07:12 toff Exp $ -->
+<!-- $Id: kernel-baking.xml,v 1.4 2003/09/22 04:45:53 toff Exp $ -->
 
  <sect1 id="kernel-baking"><title>Compiling a New Kernel</title>
 <para>
@@ -23,15 +23,12 @@ APM or SMP
 
 </para></listitem>
 
-<![ %i386; [ 
-<listitem><para>
+<listitem arch="i386"><para>
  
 The compact and idepci flavors don't come with sound. Although
 the vanilla kernel does, it might not work for other reasons.  
 
 </para></listitem>
-]]>
-
 <listitem><para>
 
 optimize the kernel by removing useless drivers to speed up boot
@@ -99,10 +96,7 @@ Note that you'll find complete documentation on using
 <filename>/usr/share/doc/kernel-package</filename>.  This section just
 contains a brief tutorial.
 
-</para>
-
-<![ %sparc; [
-<para>
+</para><para arch="sparc">
 
 If you are compiling a kernel for UltraSPARC you will need to be sure
 you have installed the <classname>egcs64</classname> package. This is
@@ -116,10 +110,7 @@ be sure to run <userinput>update-alternatives --config
 sparc64-linux-gcc</userinput> as root, and be sure that
 <classname>egcs64</classname> is being used for this program. 
 
-</para>
-]]>
-
-<para>
+</para><para>
 
 Hereafter, we'll assume your kernel source will be located in
 <filename>/usr/local/src</filename> and that your kernel version is
@@ -147,9 +138,9 @@ specific hardware, should be left at the default value if you do not
 understand them.  Do not forget to select ``Kernel module loader'' in
 ``Loadable module support''
 
-<![ %alpha; [ and ``Enhanced Real Time
-Clock Support'' in ``Character devices'' (they are ]]>
-<![ %not-alpha; [ (it is ]]>
+<phrase arch="alpha"> and ``Enhanced Real Time
+Clock Support'' in ``Character devices'' (they are </phrase>
+<phrase arch="not-alpha"> (it is </phrase>
 
 not selected by default).  If not included, your Debian installation
 will experience problems.
@@ -169,10 +160,7 @@ Likewise, you can put any word you like in place of ``custom'' (e.g.,
 a host name).  Kernel compilation may take quite a while, depending on
 the power of your machine.
 
-</para>
-
-<![ %supports-pcmcia; [
-<para>
+</para><para condition="supports-pcmcia">
 
 If you require PCMCIA support, you'll also need to install the
 <classname>pcmcia-source</classname> package.  Unpack the gzipped tar file
@@ -181,17 +169,15 @@ modules are found where they are expected to be found, namely,
 <filename>/usr/src/modules</filename>).  Then, as root, do <userinput>make-kpkg
 modules_image</userinput>.  
 
-</para>
-]]>
-
-<para>
+</para><para>
 
 Once the compilation is complete, you can install your custom kernel
 like any package.  As root, do <userinput>dpkg -i
 ../kernel-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
 The <replaceable>subarchitecture</replaceable> part is an optional
 sub-architecture,
-<![ %i386; [ such as ``i586'', ]]> depending on what kernel options you set.
+<phrase arch="i386"> such as ``i586'', </phrase>
+depending on what kernel options you set.
 <userinput>dpkg -i kernel-image...</userinput> will install the
 kernel, along with some other nice supporting files.  For instance,
 the <filename>System.map</filename> will be properly installed
@@ -216,5 +202,4 @@ the fine documentation in <filename>/usr/share/doc/kernel-package</filename>.
 
 </para>
   </sect2>
-
  </sect1>
