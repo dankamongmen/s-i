@@ -213,6 +213,12 @@ get_all_partitions(struct partition *parts[], const int max_parts)
                 continue;
             p = malloc(sizeof(*p));
             p->path = ped_partition_get_path(part);
+            p->fstype = NULL;
+            p->fsid = NULL;
+            p->size = PART_SIZE_BYTES(dev, part);
+            p->op.filesystem = NULL;
+            p->op.mountpoint = NULL;
+            p->op.done = 0;
             if (part->fs_type != NULL)
                 p->fstype = strdup(part->fs_type->name);
             else {
@@ -225,11 +231,6 @@ get_all_partitions(struct partition *parts[], const int max_parts)
                     p->fstype = strdup("RAID");
                 }
             }
-            p->fsid = NULL;
-            p->size = PART_SIZE_BYTES(dev, part);
-            p->op.filesystem = NULL;
-            p->op.mountpoint = NULL;
-            p->op.done = 0;
             parts[part_count++] = p;
         }
     }
