@@ -8,16 +8,17 @@ if [ "$LANG" = "C@utf-8" ] ; then
 	unset LANG
 fi
 
+# Add to list of extra packages (to be) installed into /target/.
+mkdir -p /var/lib/apt-install
+touch /var/lib/apt-install/queue
+for pkg in $@ ; do
+    echo "$pkg" >> /var/lib/apt-install/queue
+done
+
 if [ ! -f /target/etc/apt/sources.list ] ; then
-    # Only queue the package, it will be installed by base-installer
-    # postinst.
-    mkdir -p /var/lib/apt-install
-    touch /var/lib/apt-install/queue
-    for pkg in $@ ; do
-	echo "$pkg" >> /var/lib/apt-install/queue
-    done
-    # Return error as the package is not ready to be used yet.
-    exit 1
+    # The package was only queued, and will be installed by the
+    # postinst in base-installer.
+    exit 1 # Return error as the package is not ready to be used yet.
 fi
 
 # Try to enable proxy when using HTTP.  What about using ftp_proxy for
