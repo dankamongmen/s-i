@@ -91,7 +91,7 @@ get_default_menu_item(di_slist *list)
 		 * (netcfg-{static,dhcp} and {lilo,grub}-installer are
 		 * examples of parallel packages */
 		for (node1 = p->p.depends.head; node1; node1 = node1->next) {
-			di_package_dependency *d = node->data;
+			di_package_dependency *d = node1->data;
 			if (d->type == di_package_dependency_type_provides && d->ptr->status == di_package_status_installed) {
 				cont = 1;
 				break;
