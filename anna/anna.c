@@ -14,7 +14,6 @@
 #include <cdebconf/debconfclient.h>
 #include "anna.h"
 
-/* TODO: Version check? */
 static int
 is_installed(struct package_t *package, struct package_t *installed)
 {
@@ -106,6 +105,8 @@ struct package_t *select_packages (struct package_t *packages) {
 		if (choices_size >= 3)
 			choices[choices_size-3] = '\0';
 		debconf = debconfclient_new();
+		debconf->command(debconf, "FSET", ANNA_CHOOSE_LOWPRI_PACKAGES,
+				"seen", "false", NULL);
 		debconf->command(debconf, "SUBST", ANNA_CHOOSE_LOWPRI_PACKAGES,
 				"CHOICES", choices, NULL);
 		debconf->command(debconf, "INPUT medium", ANNA_CHOOSE_LOWPRI_PACKAGES,

@@ -111,24 +111,21 @@ choose_retriever(void)
 	ret_choices = get_retriever_choices(ret_pkgs);
 	if (ret_choices[0] == '\0')
 		return 0;
-	debconf = debconfclient_new();
-	debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
-	if (debconf->value != NULL)
-		ret_default = debconf->value;
+	ret_default = strrchr(ret_choices, ',');
+	if (ret_default != NULL)
+		ret_default += 2;
 	else
-	{
-		ret_default = strrchr(ret_choices, ',');
-		if (ret_default != NULL)
-			ret_default += 2;
-	}
+		ret_choices;
 
+	debconf = debconfclient_new();
 	debconf->command(debconf, "TITLE", "Choose Retriever", NULL);
-	debconf->command(debconf, "SET", ANNA_RETRIEVER, ret_default,
-			NULL);
+	debconf->command(debconf, "FSET", ANNA_RETRIEVER, "seen", "false",
+		NULL);
 	debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES",
 			ret_choices, NULL);
-	debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT",
-			ret_default, NULL);
+	if (ret_default != NULL && ret_default[0] != '\0')
+		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT",
+				ret_default, NULL);
 	debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
 	debconf->command(debconf, "GO", NULL);
 
