@@ -23,23 +23,74 @@ To differentiate them from normal Debian packages, modules have filenames
 ending in ".udeb". However, modules must not have the same package name as
 any regular Debian package.
 
+Here is a short rundown on differences between deb packages and udebs:
+
+All udeb packages should be able to build debug versions if
+DEB_BUILD_OPTIONS="debug".
+
+Misc.Differences
+================
+
+* Udebs should not include .md5sum files.
+* Udebs should declare dependancies on everything they
+  depend on (this includes depending on ash, busybox, etc).
+
+New Control Scripts
+===================
+
+menutest
+--------
+Menutest scripts should return a true value (0) if they think it would be a
+good idea if their menu item was default, and a false value if it seems making
+their menu item the default would not be a smart decision.
+
+Menutest scripts are optional. If a module does not have one, a simpler
+default test is used.
+
+isinstallable (not supported yet in main-menu)
+-------------
+
+If this script exists, and when run returns a non-zero value, then
+its menu item is not displayed.
+
+New Headers
+===========
+
+installer-menu-item
+-------------------
+
+A priority (a number). The priority number influsences the
+ordering of items in the menu; higher numbered items are closer to the
+end of the menu. If this field does not appear, or has a value of 0, a module
+will not appear on the main menu.
+
 Modules will not be installed by a full-fledged dpkg implementation, so the
 following features of regular debs will not be supported:
 
-[ This is not set in stone, but let's not implement this stuff unless we
-need it. ]
+Disallowed Control Files
+========================
 
-	- pre-dependancies
-	- preinst, postrm and prerm
-	- conflicts
-	- versioned dependancies
-	- essential or required packages
-	- suggests
-	- recommends
-	- `|' in dependancies.
+preinst, postrm and prerm
 
-The following will be supported:
-	- simple dependancies
-	- postinst
-	- debconf
-	- provides
+Disallowed Headers
+==================
+
+* pre-dependancies
+* conflicts
+* essential or required packages
+* suggests
+* recommends
+
+Disallowed Header Options
+=========================
+
+* versioned dependancies
+* `|' in dependancies.
+
+Supported Headers
+=================
+
+* simple dependancies
+* postinst
+* debconf
+* provides
