@@ -1,0 +1,21 @@
+if [ "$TERM" = linux ] ; then
+	if [ "$TERM_TYPE" = virtual ]; then
+		echo -ne "\033[9;0]" # Turn off console blanking.
+	fi
+
+	# Enable UTF-8 locale if it is available
+	if [ -d /usr/lib/locale/C.UTF-8 ]; then
+		if [ -z "$TERM_UTF8" -a "$TERM_TYPE" = virtual ]; then
+			TERM_UTF8=yes
+		fi
+	else
+		TERM_UTF8=no
+	fi
+
+	if [ "$TERM_UTF8" = yes ] ; then
+	LANG=C.UTF-8
+	export LANG
+	    echo -ne "\033%G" # Enable UTF-8 console
+	fi
+fi
+
