@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.12 2002/07/09 05:25:03 tausq Exp $
+ * $Id: frontend.c,v 1.13 2002/08/13 16:18:54 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -198,7 +198,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	char tmp[256];
 	const char *modpath, *modname;
 
-    modname = getenv("DEBCONF_FRONTEND");
+    modname = getenv("DEBIAN_FRONTEND");
     if (modname == NULL)
         modname = cfg->get(cfg, "_cmdline::frontend", 0);
 	if (modname == NULL)
@@ -217,6 +217,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
     if (modname == NULL)
         DIE("Frontend instance driver not defined (%s)", tmp);
 
+    setenv("DEBIAN_FRONTEND",modname,1);
     snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, modname);
 	if ((dlh = dlopen(tmp, RTLD_NOW)) == NULL)
 		DIE("Cannot load frontend module %s: %s", tmp, dlerror());

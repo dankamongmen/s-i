@@ -8,7 +8,7 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.10 2002/08/07 16:36:40 tfheen Exp $
+ * $Id: dpkg-reconfigure.c,v 1.11 2002/08/13 16:18:54 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -377,7 +377,7 @@ int main(int argc, char **argv)
 		switch (opt)
 		{
 		case 'h': usage(); break;
-		case 'f': setenv("DEBCONF_FRONTEND", optarg, 1); break;
+		case 'f': setenv("DEBIAN_FRONTEND", optarg, 1); break;
         case 'p': g_config->set(g_config, "_cmdline::priority", optarg); break;
 		case 'd': break;
 		case 'u': break;
