@@ -16,6 +16,12 @@ my %pooldirs;
 my %poolfiles;
 my @annotations;
 
+sub markup {
+	my $text=shift;
+	$text=~s/\#(\d\d\d\d+)/<a href="http:\/\/bugs.debian.org\/$1">#$1<\/a>/;
+	return $text;
+}
+
 sub between_versions {
 	my $version=shift;
 	my $low=shift;
@@ -127,7 +133,7 @@ while (<ANN>) {
 	my ($user, $package, $version, $annotation) = split(' ', $_, 4);
 	next unless defined $annotation && length $annotation;
 	push @annotations, {user => $user, package => $package,
-		version => $version, annotation => $annotation};
+		version => $version, annotation => markup($annotation)};
 }
 close ANN;
 
@@ -207,6 +213,7 @@ foreach my $withchangelog (0,1) {
 				$changelog=~s/^\+//mg;
 				$changelog=~s/^ --.*\n//mg;
 				$changelog=~s/^\n//mg;
+				$changelog=markup($changelog);
 				print "<tr><td></td><td colspan=".($numcols-1)."><pre>$changelog</pre></td></tr>\n";
 			}
 		}
