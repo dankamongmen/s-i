@@ -1,0 +1,35 @@
+This package is used to build a kernel-image.deb and a bunch of associated
+udebs for the debian-installer project. The kernel image is built with
+the bare minumum compiled in (initrd and ext2fs support, mostly). Every
+module that can be sanely turned on, is.
+
+The kernel config is stored in this package, in config.$ARCH. The actual
+kernel source is pulled in by build dependancies, and kernel-package is
+used to do the building.
+
+As a convenience, you can use 'debian/rules configure' to run xconfig on
+the appropriate config file.
+
+The debian/control file is preprocessed prior to use, which is why we can
+get away with using ${kernel:Version} substitutions everywhere in it,
+including in package names. The first package in the control file is the
+kernel-image.deb to build. The second is the kernel-image.udeb to build
+(this contains only a vmlinu[xz] file). All remaining packages are module
+.udebs, which contain a logical set of modules. The Provides: field
+lists the .o files which go in the udeb. If a particular .o file is not
+available for some reason, it will be skipped with a warning. If every .o
+file in a given package is skipped, the entire package is skipped too.
+
+We will probably move the data from Provides: out into a set of files,
+as the current method is not aging very well, and it feels too much like a
+hack.
+
+If you are a porter, make a new config.$ARCH for your architecture.
+If you need various flavors, talk to JoeyH, a mechanism for these is not
+yet in place, but is planned. You will also need to add the modules
+particular to your port to the module udeb Provides: lines.
+
+If you are a user who wants to build a custom kernel, I hope the above
+provides enough information for you to make a stab at it.
+
+-- Joey Hess <joeyh@debian.org>
