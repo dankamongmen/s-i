@@ -55,8 +55,8 @@ install:
 	install -d  ${incdir}
 	install -m 755 $(LIBNAME) ${libdir}
 	install -m 755 $(LIBNAME_A) ${libdir}
-	ln -s $(LIBNAME) ${libdir}/$(SONAME)
-	ln -s $(LIBNAME) ${libdir}/$(LIB)
+	ln -sf $(LIBNAME) ${libdir}/$(SONAME)
+	ln -sf $(LIBNAME) ${libdir}/$(LIB)
 	install -m 755 $(PIC_LIB) ${libdir}
 	install -m 644 debian-installer.h ${incdir}
 
