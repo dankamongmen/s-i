@@ -57,6 +57,7 @@ for d in /dev/discs/*/disc; do
 done	
 if [ -s /tmp/efi_boot.list ]; then
     for d in `cat /tmp/efi_boot.list`; do
+	d=`mapdevfs $d`
 	if [ -n "$BOOTPARTS" ]; then
 	    BOOTPARTS="$BOOTPARTS, $d"
 	else
@@ -76,8 +77,6 @@ db_go || true
 
 db_get elilo-installer/bootpart
 bootpart=$RET
-
-bootpart=`mapdevfs $bootpart`
 rootfs=`mapdevfs $rootfs`
 
 # Write out elilo.conf
@@ -135,6 +134,7 @@ fi
 
 chroot /target /usr/sbin/elilo --autoconf --boot $bootpart \
       --root $rootfs --efiboot
+errcode=$?
 
 ## umount sysfs if we mounted it above
 if [ $sysmount -eq 1 ]; then
@@ -143,7 +143,6 @@ if [ $sysmount -eq 1 ]; then
   fi
 fi
 
-errcode=$?
 if [ "$errcode" = 0 ] ; then
 	info "Boot loader successfully installed into EFI partition"
 else
