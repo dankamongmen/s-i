@@ -22,3 +22,5 @@ $(name).html/: $(name).sgml
 %.tov: %.sgml
 	debiandoc2textov $<
 
+clean:
+	rm -rf $(name).html
