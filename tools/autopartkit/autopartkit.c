@@ -306,8 +306,8 @@ default_disk_label()
 /* Only supported in libparted 1.6.3? */
     return "mips"; /* SGI disklabel */
 #else /* not __i386__ */
-#  error "Default DISK_LABEL is not known or not supported on this platform"
-    return 0;
+#  warning "Default DISK_LABEL is not known or not supported on this platform"
+    return "msdos";
 #endif /* not __i386__ */
 }
 
