@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.4 2000/12/02 07:15:14 tausq Exp $
+ * $Id: frontend.c,v 1.5 2000/12/03 19:14:54 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -44,6 +44,7 @@
 
 #include <dlfcn.h>
 #include <string.h>
+#include <unistd.h>
 
 #define SETMETHOD(method) obj->method = (mod->method ? mod->method : frontend_ ## method)
 
@@ -108,8 +109,10 @@ struct frontend *frontend_new(struct configuration *cfg, struct database *db)
 	char modlabel[256];
 	const char *modname;
 
-	if ((modname = cfg->get(cfg, "frontend::default::driver", 0)) == NULL)
-		DIE("No frontend driver defined");
+	modname = getenv("DEBCONF_FRONTEND");
+	if (modname == NULL)
+		if ((modname = cfg->get(cfg, "frontend::default::driver", 0)) == NULL)
+			DIE("No frontend driver defined");
 
 	snprintf(modlabel, sizeof(modlabel), "frontend::driver::%s::module",
 		modname);

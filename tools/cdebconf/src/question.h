@@ -1,8 +1,7 @@
 #ifndef _QUESTION_H_
 #define _QUESTION_H_
 
-#define DC_QFLAG_ISDEFAULT		(1 << 0)
-#define DC_QFLAG_HASSEEN		DC_QFLAG_ISDEFAULT
+#define DC_QFLAG_SEEN		(1 << 0)
 
 struct template;
 

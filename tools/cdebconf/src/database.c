@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.4 2000/12/02 07:15:14 tausq Exp $
+ * $Id: database.c,v 1.5 2000/12/03 19:14:54 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -44,6 +44,7 @@
 #include "priority.h"
 
 #include <dlfcn.h>
+#include <unistd.h>
 
 #define SETMETHOD(method) db->method = (mod->method ? mod->method : database_ ## method)
 
@@ -165,8 +166,10 @@ struct database *database_new(struct configuration *cfg)
 	char modlabel[256];
 	const char *modname;
 
-	if ((modname = cfg->get(cfg, "database::default::driver", 0)) == NULL)
-		DIE("No database driver defined");
+	modname = getenv("DEBCONF_DB");
+	if (modname == NULL)
+		if ((modname = cfg->get(cfg, "database::default::driver", 0)) == NULL)
+			DIE("No database driver defined");
 
 	snprintf(modlabel, sizeof(modlabel), "database::driver::%s::module",
 		modname);

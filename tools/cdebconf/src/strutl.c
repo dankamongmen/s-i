@@ -7,7 +7,7 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.6 2000/12/02 07:15:14 tausq Exp $
+ * $Id: strutl.c,v 1.7 2000/12/03 19:14:54 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -81,6 +81,13 @@ char *strstrip(char *buf)
 		*end = 0;
 		end--;
 	}
+	return buf;
+}
+
+char *strlower(char *buf)
+{
+	char *p = buf;
+	while (*p != 0) *p = tolower(*p);
 	return buf;
 }
 

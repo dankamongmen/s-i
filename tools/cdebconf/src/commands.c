@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.8 2000/12/02 07:15:14 tausq Exp $
+ * $Id: commands.c,v 1.9 2000/12/03 19:14:54 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -240,7 +240,7 @@ int command_reset(struct confmodule *mod, int argc, char **argv,
 	{
 		DELETE(q->value);
 		q->value = STRDUP(q->defaultval);
-		q->flags |= DC_QFLAG_ISDEFAULT;
+		q->flags |= DC_QFLAG_SEEN;
 
 		if (mod->db->question_set(mod->db, q) != 0)
 			snprintf(out, outsize, "%u value reset",
@@ -291,6 +291,8 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 int command_register(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
+	struct question *q;
+	struct template *t;
 	CHECKARGC(== 2);
 	
 	return DC_NOTOK;
@@ -318,19 +320,32 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	struct question *q;
-	char field[1024];
+	char *field;
 
 	CHECKARGC(== 2);
-
 	q = mod->db->question_get(mod->db, argv[1]);
 	if (q == NULL)
 		snprintf(out, outsize, "%u %s does not exist",
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 	{
-		field[0] = 0;
-
-		snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, field);
+		field = argv[2];
+		
+		/* 
+		 * the spec is very vague here, what fields are we supposed 
+		 * to recognize? default? localized description fields?
+		 * name of the question? type of the question?
+		 */
+		if (strcmp(field, "value") == 0)
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, q->value);
+		else if (strcmp(field, "description") == 0)
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_description(q));
+		else if (strcmp(field, "extended_description") == 0)
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_extended_description(q));
+		else if (strcmp(field, "choices") == 0)
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_choices(q));
+		else
+			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
 	}
 
 	return DC_OK;
@@ -339,21 +354,62 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 int command_fget(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	char buf[256];
-	if (argc == 2)
+	struct question *q;
+	char *field;
+
+	CHECKARGC(== 2);
+	q = mod->db->question_get(mod->db, argv[1]);
+	if (q == NULL)
+		snprintf(out, outsize, "%u %s does not exist",
+			CMDSTATUS_BADQUESTION, argv[1]);
+	else
 	{
-		snprintf(buf, sizeof(buf), "flag_%s", argv[2]);
-		argv[2] = buf;
+		field = argv[2];
+		
+		/* 
+		 * the spec is very vague here, what fields are we supposed 
+		 * to recognize?
+		 */
+
+		/* isdefault is for backward compability only */
+		if (strcmp(field, "seen") == 0 ||
+		    strcmp(field, "isdefault") == 0)
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
+				((q->flags & DC_QFLAG_SEEN) ? "true" : "false"));
+		else
+			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
 	}
-	return command_metaget(mod, argc, argv, out, outsize);
+
+	return DC_OK;
 }
 
 int command_fset(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+	struct question *q;
+	char *field;
+
+	CHECKARGC(== 3);
+	q = mod->db->question_get(mod->db, argv[1]);
+	if (q == NULL)
+		snprintf(out, outsize, "%u %s does not exist",
+			CMDSTATUS_BADQUESTION, argv[1]);
+	else
+	{
+		field = argv[2];
+		if (strcmp(field, "seen") == 0 ||
+		    strcmp(field, "isdefault") == 0)
+		{
+			q->flags &= ~DC_QFLAG_SEEN;
+			if (strcmp(argv[3], "true") == 0)
+				q->flags |= DC_QFLAG_SEEN;
+			mod->db->question_set(mod->db, q);
+			snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+		}
+		else
+			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
+	}
 	return DC_OK;
-	// return DC_NOTOK;
 }
 
 int command_exist(struct confmodule *mod, int argc, char **argv, 

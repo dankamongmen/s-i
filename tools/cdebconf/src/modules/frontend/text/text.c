@@ -90,7 +90,6 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	char buf[30];
 	int ans = -1;
 	int def = -1;
-	texthandler_displaydesc(obj, q);
 	if (q->template->defaultval)
 	{
 		if (strcmp(q->template->defaultval, "true") == 0)
@@ -126,8 +125,6 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char selected[100] = {0};
 	char answer[1024];
 	int i, j, count, dcount, choice;
-
-	texthandler_displaydesc(obj, q);
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	dcount = strchoicesplit(q->template->defaultval, defaults, DIM(defaults));
@@ -180,7 +177,6 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 static int texthandler_note(struct frontend *obj, struct question *q)
 {
 	int c;
-	texthandler_displaydesc(obj, q);
 	printf("[Press enter to continue]\n");
 	do { c = fgetc(stdin); } while (c != '\r' && c != '\n');
 	return DC_OK;
@@ -191,8 +187,6 @@ static int texthandler_password(struct frontend *obj, struct question *q)
 	struct termios oldt, newt;
 	char passwd[256] = {0};
 	int i = 0, c;
-
-	texthandler_displaydesc(obj, q);
 
 	tcgetattr(0, &oldt);
 	memcpy(&newt, &oldt, sizeof(struct termios));
@@ -216,8 +210,6 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	char *choices[100] = {0};
 	char answer[10];
 	int i, count, choice, def = -1;
-
-	texthandler_displaydesc(obj, q);
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	if (q->template->defaultval != NULL)
@@ -253,7 +245,6 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 static int texthandler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
-	texthandler_displaydesc(obj, q);
 	fgets(buf, sizeof(buf), stdin);
 	CHOMP(buf);
 	question_setvalue(q, buf);
@@ -265,7 +256,6 @@ static int texthandler_text(struct frontend *obj, struct question *q)
 	char *out = 0;
 	char buf[1024];
 	int sz = 1;
-	texthandler_displaydesc(obj, q);
 	while (fgets(buf, sizeof(buf), stdin))
 	{
 		sz += strlen(buf);
@@ -316,6 +306,7 @@ static int text_go(struct frontend *obj)
 		for (i = 0; i < DIM(question_handlers); i++)
 			if (strcmp(q->template->type, question_handlers[i].type) == 0)
 			{
+				texthandler_displaydesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
 				if (ret == DC_OK)
 					obj->db->question_set(obj->db, q);

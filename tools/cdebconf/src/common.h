@@ -11,6 +11,8 @@
 #define DC_NOTIMPL	2
 #define DC_AUTHNEEDED	3
 
+#define DC_GOBACK	30
+
 #define DC_NO		0
 #define DC_YES		1
 
@@ -36,5 +38,7 @@
 #define STRDUP(s) ((s) == NULL ? NULL : strdup(s))
 #define STRLEN(s) ((s) == NULL ? 0 : strlen(s))
 #define DIM(ar) (sizeof(ar)/sizeof(ar[0]))
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
 
 #endif
