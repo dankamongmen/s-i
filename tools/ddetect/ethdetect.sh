@@ -44,12 +44,11 @@ fi
 while [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`" ]
 do
     CHOICES=""
-    for net_module in $(find /lib/modules/*/kernel/drivers/net -type f); do
-	basemod=$(echo $net_module | sed s/\.o$// | sed 's/.*\///')
+    for mod in $(find /lib/modules/*/kernel/drivers/net -type f | sed s/\.o$// | sed 's/.*\///' | sort); do
 	if [ -z "$CHOICES" ]; then
-		CHOICES="$basemod"
+		CHOICES="$mod"
 	else
-		CHOICES="$basemod, $CHOICES"
+		CHOICES="$mod, $CHOICES"
 	fi
     done
 
