@@ -10,6 +10,10 @@ if db_get debian-installer/locale && [ "$RET" ] ; then
     LANG_INST="$RET"
 fi
 
+if db_get mirror/distribution && [ "$RET" ] ; then
+    SUITE="$RET"
+fi
+
 # Look in /proc/cmdline for console=ttyS*, indicating a serial console
 # and fix inittab if so.
 console=$( echo " " $( cat /proc/cmdline ) " " | sed -n 's/^.* console=\([^ ]*\) .*$/\1/p' )
@@ -36,7 +40,10 @@ else
 fi
 
 cp /usr/share/prebaseconfig/inittab /target/etc/inittab
+
 (
-    echo LANG_INST="$LANG_INST"
+    echo "# inserted by prebaseconfig"
+    echo "LANG_INST=\"$LANG_INST\""
+    echo "SUITE=\"$SUITE\""
 ) >> /target/root/dbootstrap_settings
 
