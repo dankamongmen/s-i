@@ -7,6 +7,7 @@ set -e
 if [ ! -f /var/run/parted_server.pid ]; then
     mknod /var/lib/partman/infifo p || true
     mknod /var/lib/partman/outfifo p || true
+    mknod /var/lib/partman/stopfifo p || true
     [ -d /var/run ] || mkdir /var/run
     parted_server &
     echo $! >/var/run/parted_server.pid

@@ -108,6 +108,19 @@ open_in()
    the function `scanf' */
 #define iscanf(...) fscanf(infifo,__VA_ARGS__)
 
+void
+synchronise_with_client()
+{
+        char *str;
+        FILE *stopfifo;
+        asprintf(&str, "%s/stopfifo", my_directory);
+        stopfifo = fopen(str, "r");
+        if (stopfifo == NULL)
+                critical_error("Can't open stopfifo for synchronisation");
+        free(str);
+        fclose(stopfifo);
+}
+
 /* This function closes infifo and outfifo.  Then in order to
    synchronise with the clients it opens and closes first outfifo and
    afterwards infifo but in oposite direction -- outfifo for reading
@@ -120,6 +133,7 @@ close_fifos_and_synchronise()
         log("Closing infifo and outfifo");
         fclose(infifo);
         fclose(outfifo);
+        synchronise_with_client();
         asprintf(&str, "%s/outfifo", my_directory);
         outfifo = fopen(str, "r");
         if (outfifo == NULL)
@@ -128,12 +142,14 @@ close_fifos_and_synchronise()
         while (EOF != (c = fgetc(outfifo))) {
         }
         fclose(outfifo);
+        synchronise_with_client();
         asprintf(&str, "%s/infifo", my_directory);
         infifo = fopen(str, "w");
         if (infifo == NULL)
                 critical_error("Can't open infifo for synchronisation");
         free(str);
         fclose(infifo);
+        synchronise_with_client();
 }
 
 /**********************************************************************

@@ -10,7 +10,17 @@ id=${1#*//}
 cd $dev
 
 if [ -z "$id" ]; then
-    ask_user /lib/partman/storage_device "$dev" "$id" || true
+#    ask_user /lib/partman/storage_device "$dev" "$id" || true
+    mklabel=$(echo /lib/partman/storage_device/[0-9][0-9]label/do_option)
+    [ -x "$mklabel" ] || exit 0
+    db_reset partman/confirm_new_label
+    db_input high partman/confirm_new_label
+    db_go || exit 0
+    db_get partman/confirm_new_label
+    if [ "$RET" = false ]; then
+	exit 0
+    fi
+    $mklabel label "$dev"
 else
     open_dialog PARTITION_INFO $id
     read_line num id size type fs path name

@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# Only run the first time.
+if [ -f /var/lib/partman/autouse_swap ]; then
+	exit 0
+fi
+[ -d /var/lib/partman ] || mkdir /var/lib/partman
+touch /var/lib/partman/autouse_swap
+
 . /lib/partman/definitions.sh
 
 partitions=

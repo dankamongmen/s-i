@@ -20,6 +20,14 @@ partman (13) UNRELEASED; urgency=low
       returns true.  Closes: #235372.
     - parted_server.c (command_new_label): free the variable device.
     - templates: add partman/progress/init/update_partitions.
+    - definitiions.sh, parted_server.c: use third fifo file (stopfifo) in
+      order not to rely on suppositions how libc works during
+      synchronisation.
+    - new file: init.d/dump.  It saves complete information about the
+      partition tables in the log file of partman
+    - don't show the menu storage_device.  Instead show a boolean question
+      asking the users if they want to create a new, empty partition table
+      on the selected disk.  Closes: #235365.
   * Joey Hess
     - Changed the menu item text again, removing the "(partman)".
     - Unfuzzy all translations.
@@ -30,7 +38,10 @@ partman (13) UNRELEASED; urgency=low
       it, to allow for database preseeding.
     - Stop using non-breaking spaces, using new space escape code in
       recent cdebconf. Fixes display on non-framebuffer terminal.
-
+      (Anton Zinoviev: I reenabled non-breaking spaces as I can not use
+      escaped spaces.  Properly setup non-framebuffer terminal must be
+      able to display non-break spaces.)  
+  
  -- Christian Perrier <bubulle@kheops.frmug.org>  Thu,  4 Mar 2004 08:45:08 +0100
 
 partman (12) unstable; urgency=low

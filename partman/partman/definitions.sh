@@ -38,7 +38,9 @@ debconf_select () {
 		local key option
 		restore_ifs
 		key=$(echo ${x%$TAB*})
-		option=$(echo "${x#*$TAB}" | sed 's/ *$//g')
+# I can not use escaped spaces, lets return non-break spaces for now (anton)
+#		option=$(echo "${x#*$TAB}" | sed 's/ *$//g')
+		option=$(echo "${x#*$TAB}" | sed 's/ / /g')
 		newchoices="${newchoices}${NL}${key}${TAB}${option}"
 		if [ "$key" = "$default_choice" ]; then
 		    default="$option"
@@ -287,6 +289,11 @@ read_line () {
     read "$@" <&7
 }
 
+synchronise_with_server () {
+    exec 6>/var/lib/partman/stopfifo
+    exec 6>&-
+}
+
 read_paragraph () {
     local line
     while { read_line line; [ "$line" ]; }; do
@@ -409,11 +416,17 @@ open_dialog () {
 close_dialog () {
     close_outfifo
     close_infifo
+    exec 6>/var/lib/partman/stopfifo
+    exec 6>&-
     exec 7>/var/lib/partman/outfifo
     exec 7>&-
+    exec 6>/var/lib/partman/stopfifo
+    exec 6>&-
     exec 6</var/lib/partman/infifo
     cat <&6 >/dev/null
     exec 6<&-
+    exec 6>/var/lib/partman/stopfifo
+    exec 6>&-
 }
 
 log () {
