@@ -50,10 +50,38 @@ fi
 db_get "$languagecode"
 db_set "debconf/language" "$LANGUAGELIST"
 
-case "$LANGUAGE" in
+info "Asking for language specific packages to be Installed."
+
+case "$LANGUAGELIST" in
     ar|el|he|ja|ko|tr|zh)
 	anna-install bterm-unifont
 	;;
+esac
+
+# Enable translations (if this is present, base-config generated the
+# required locale on boot)
+apt-install locales || true
+
+if [ "$LANGUAGELIST" != "en" ]; then
+    # Package iso-codes is missing in Woody.  Do not fail if it is
+    # missing to make d-i capable of installing Woody and Skolelinux.
+    apt-install iso-codes || true
+fi
+
+case "`echo $LANGUAGELIST | sed 's/:.*//'`" in
+    ja|ko|ko_KR|el|zh|zh_CN|zh_TW|bg|ar|he|tr|uk|uk_UA)
+        # Japanese, Korean, Greek, Chinese, Bulgarian, Arabic, Hebrew,
+        # Turkish, Ukranian
+        apt-install jfbterm || true
+        apt-install unifont || true
+        ;;
+    ru)
+        # Russian
+        apt-install console-cyrillic || true
+        apt-install console-terminus || true
+        ;;
+    *)
+        ;;
 esac
 
 log "$localecode   = '$LOCALE'"
