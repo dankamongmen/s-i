@@ -8,7 +8,7 @@ debian/templates: mktemplates debian/templates-in $(LIST) $(L10NLIST)
 
 check-scripts:
 	if [ -x /bin/ash ] ; then SH=ash ; else SH=dash; fi ; \
-	for s in debian/postinst languagemap languagechooser ; do \
+	for s in prebaseconfig debian/postinst languagemap languagechooser ; do \
 		$$SH -n $$s ; \
 	done
 
@@ -16,7 +16,7 @@ check-utf8: $(L10NLIST)
 	iconv -f utf-8 -t unicode $(L10NLIST) > /dev/null
 
 check-data:
-	# Check that the listed locale is supported, to make sure base-config know
+	# Check that the listed locale is supported, to make sure base-config knows
 	# how to handle it.
 	@for locale in `grep -v "^#" $(LIST) | cut -d\; -f2` ; do \
 		if grep -q "^$$locale " /usr/share/i18n/SUPPORTED ; then \
