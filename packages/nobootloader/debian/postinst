@@ -8,29 +8,12 @@ ARCH=`udpkg --print-architecture`
 db_get debian-installer/kernel/subarchitecture
 SUBARCH="$RET"
 
-if [ -f /etc/mtab ]; then
-    MTAB=/etc/mtab
-else
-    MTAB=/proc/mounts
-fi
+findfs () {
+	mount | grep "on /target${1%/} " | cut -d' ' -f1
+}
 
-# detect which is the root partition: /target
-# ugh, I wanted to use awk, but sed has better chance of being in
-# busybox
-rootfs=`sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
-
-# some combination of partconf and kernel 2.2 ends up with /target/.
-if [ "" = "$rootfs" ]; then
-	rootfs=`sed -ne '/^[^ ]* \/target\/ /s/ .*//p' $MTAB`
-fi
-
-# detect if /boot is a separate partition and if so which partition it is.
-bootfs=`sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
-
-# some combination of partconf and kernel 2.2 ends up with /target/.
-if [ "" = "$bootfs" ]; then
-	bootfs=`sed -ne '/^[^ ]* \/target\/boot\/ /s/ .*//p' $MTAB`
-fi
+rootfs=$(findfs /)
+bootfs=$(findfs /boot)
 
 if [ "" = "$bootfs" ]; then
 	bootfs=$rootfs
