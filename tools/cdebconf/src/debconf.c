@@ -115,14 +115,14 @@ int main(int argc, char **argv)
 		DIE("Error reading configuration information");
 
 	/* initialize database and frontend modules */
-    if ((templates = template_db_new(config, NULL)) == 0)
-        DIE("Cannot initialize DebConf template database");
+	if ((templates = template_db_new(config, NULL)) == 0)
+        	DIE("Cannot initialize debconf template database");
     	templates->methods.load(templates);
 	if ((questions = question_db_new(config, templates, NULL)) == 0)
-		DIE("Cannot initialize DebConf configuration database");
+		DIE("Cannot initialize debconf configuration database");
 	questions->methods.load(questions);
 	if ((frontend = frontend_new(config, templates, questions)) == 0)
-		DIE("Cannot initialize DebConf frontend");
+		DIE("Cannot initialize debconf frontend");
 	/* set title */
 	{
 		char buf[100], pkg[100];
