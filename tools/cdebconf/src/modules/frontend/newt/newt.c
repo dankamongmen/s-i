@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.26 2003/09/27 16:31:11 kraai Exp $
+ * $Id: newt.c,v 1.27 2003/09/27 16:38:38 kraai Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -921,13 +921,7 @@ newt_progress_info(struct frontend *obj, const char *info)
     struct newt_data *data = (struct newt_data *)obj->data;
 
     if (data->scale_form != NULL) {
-        int width;
-        char *label = strdup(info);
-	newtGetScreenSize(&width, NULL);
-	if (strlen(label) >= width - 9)
-	    label[width-9] = '\0';
-	newtLabelSetText(data->scale_label, label);
-	free(label);
+	newtLabelSetText(data->scale_label, info);
 	newtDrawForm(data->scale_form);
 	newtRefresh();
     }
