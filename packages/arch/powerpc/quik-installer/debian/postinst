@@ -138,6 +138,15 @@ if [ "${realkernel#/}" = "$realkernel" ]; then
     realkernel="${kernel%/*}/$realkernel"
 fi
 
+# TODO: throw an error here rather than just forgetting about the initrd;
+# can't fix this now due to the string freeze.
+realinitrd="$(readlink "/target$initrd")" || \
+    realinitrd=
+if [ "$realinitrd" ] && [ "${realinitrd#/}" = "$realinitrd" ]; then
+    # target symlink is relative
+    realinitrd="${initrd%/*}/$realinitrd"
+fi
+
 rm -f /target/etc/quik.conf
 
 writequikconf() {
@@ -158,9 +167,9 @@ image=$realkernel
 	label=Linux
 	read-only
 EOF
-if [ "$initrd" ]; then
+if [ "$realinitrd" ]; then
     writequikconf <<EOF
-	ramdisk=$initrd
+	ramdisk=$realinitrd
 EOF
 fi
 if [ "$video" ]; then
