@@ -241,8 +241,7 @@ static int provides(struct package_t *p, const char *what)
 static int satisfy_virtual(struct package_t *p) {
 	struct debconfclient *debconf;
 	struct package_t *dep, *defpkg = NULL;
-	char *configcommand;
-	int i, ret;
+	int i;
 	char *choices, *defval;
 	size_t c_size = 1;
 	int is_menu_item = 0;
@@ -317,12 +316,10 @@ static int satisfy_virtual(struct package_t *p) {
 		}
 	}
 	free(choices);
-	/* And finally configure the virtual package itself */
-	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
-	ret = SYSTEM(configcommand);
-	free(configcommand);
-        p->status = (ret == 0) ? installed : half_configured;
-	return !ret;
+	/* It doesn't make sense to configure virtual packages,
+	 * since they are, well, virtual. */
+	p->status = installed;
+	return 1;
 }
 
 /*
