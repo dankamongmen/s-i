@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.h,v 1.9 2003/12/31 16:57:28 waldi Exp $
+ * $Id: exec.h,v 1.10 2004/01/06 15:24:53 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__EXEC_H
@@ -128,16 +128,7 @@ inline static int di_exec_shell_log (const char *const cmd)
  * * if signaled: 128 + signal
  * * else return code
  */
-inline static int di_exec_mangle_status (int status)
-{
-  if (WIFEXITED (status))
-    return WEXITSTATUS (status);
-  if (WIFSIGNALED (status))
-    return 128 + WTERMSIG (status);
-  if (WIFSTOPPED (status))
-    return 128 + WSTOPSIG (status);
-  return status;
-}
+int di_exec_mangle_status (int status);
 
 /**
  * @deprecated

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.10 2003/12/31 16:57:28 waldi Exp $
+ * $Id: exec.c,v 1.11 2004/01/06 15:24:52 waldi Exp $
  */
 
 #include <config.h>
@@ -188,5 +188,16 @@ int di_exec_io_log (const char *buf, size_t len __attribute__ ((unused)), void *
 {
   di_log (DI_LOG_LEVEL_OUTPUT, "%s", buf);
   return 0;
+}
+
+int di_exec_mangle_status (int status)
+{
+  if (WIFEXITED (status))
+    return WEXITSTATUS (status);
+  if (WIFSIGNALED (status))
+    return 128 + WTERMSIG (status);
+  if (WIFSTOPPED (status))
+    return 128 + WSTOPSIG (status);
+  return status;
 }
 
