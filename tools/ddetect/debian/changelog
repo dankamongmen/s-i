@@ -1,8 +1,14 @@
-ddetect (0.68) UNRELEASED; urgency=low
+ddetect (0.68) unstable; urgency=low
 
   * Joey Hess
     - Update to debhelper v4, and use its udeb support.
     - Remove empty and apparently unused prebaseconfig script from ethdetect.
+    - Check to see if each module is already loaded before loading it.
+      Some earlier loaded module may have pulled it in, and that would cause
+      a failure when it's re-loaded. Happens with ide-disk and hpt366.
+    - Make missing_modules a note, not an error, since it is not really an
+      error (I suppose), and since we don't want it shown during high
+      priority installs.
   * Thiemo Seufer
     - Cleanup match pattern for sd_mod, sr_mod in hw-detect.sh.
   * Sylvain Ferriol
