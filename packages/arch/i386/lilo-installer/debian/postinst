@@ -247,6 +247,25 @@ ${INITRD}.old
 #	alias=3
 EOF
 
+# OK, now the os-prober stuff runs
+
+probed="$(cat /var/lib/os-prober/probed)"
+count=2
+
+if [ -n "$probed" ]; then
+  for os in $probed; do
+    partition=$(echo $os | cut -d: -f1)
+    label=$(echo $os | cut -d: -f3)
+    cat >> /target/etc/lilo.conf <<EOF
+other=$partition
+	label=$label
+	restricted
+	alias=$count
+EOF
+    count=$((count + 1))
+  done
+fi
+
 if chroot /target /sbin/lilo ; then
     :
 else
