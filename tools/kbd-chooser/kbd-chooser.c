@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.39 2003/11/14 20:53:16 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.40 2003/11/18 19:45:40 mckinstry Rel $
  */
 
 #include "config.h"
@@ -658,7 +658,7 @@ keymap_select (char *arch, char *keymap)
 		def = keymap_get (maplist_get (arch), kb->deflt);
 		mydebconf_default_set (template, def->description);
 	}
-	res = mydebconf_ask ( kb->deflt ? "low" : "medium", template, &ptr);
+	res = mydebconf_ask ( kb->deflt ? "low" : "high", template, &ptr);
 	if (res != CMD_SUCCESS)
 		return res;
 	strcpy (keymap, (strlen (ptr) == 0) ? "none" : ptr);
