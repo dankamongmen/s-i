@@ -8,7 +8,7 @@
  * Description: Allows the user to load template/question infrom from
  *              one database to another
  *
- * $Id: debconf-copydb.c,v 1.2 2002/08/26 12:11:37 pere Exp $
+ * $Id: debconf-copydb.c,v 1.3 2002/09/19 17:14:14 dancer Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -45,6 +45,7 @@
 
 #include <getopt.h>
 #include <unistd.h>
+#include <locale.h>
 
 static struct option g_dpc_args[] = {
     { "help", 0, NULL, 'h' },
@@ -72,6 +73,8 @@ int main(int argc, char **argv)
     void *iter;
     int c;
 
+    setlocale(LC_ALL, "");
+    
     while ((c = getopt_long(argc, argv, "h", g_dpc_args, NULL) > 0))
     {
         switch (c)

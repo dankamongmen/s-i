@@ -8,7 +8,7 @@
  * Description: simple utility to load a template file into the 
  *              database
  *
- * $Id: debconf-loadtemplate.c,v 1.6 2002/08/07 16:38:19 tfheen Exp $
+ * $Id: debconf-loadtemplate.c,v 1.7 2002/09/19 17:14:14 dancer Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -47,6 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <locale.h>
 
 void parsecmdline(struct configuration *config, int argc, char **argv)
 {
@@ -79,6 +80,8 @@ int main(int argc, char **argv)
     struct template *t = NULL;
     struct question *q = NULL;
     int i = 2;
+
+    setlocale(LC_ALL, "");
 
     config = config_new();
     parsecmdline(config, argc, argv);

@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <string.h>
 #include <getopt.h>
+#include <locale.h>
 
 static struct configuration *config = NULL;
 static struct frontend *frontend = NULL;
@@ -77,6 +78,7 @@ void parsecmdline(struct configuration *config, int argc, char **argv)
 int main(int argc, char **argv)
 {
 	signal(SIGINT, sighandler);
+	setlocale (LC_ALL, "");
 
 	config = config_new();
 	if (!config) {

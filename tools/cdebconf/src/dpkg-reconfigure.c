@@ -8,7 +8,7 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.12 2002/09/16 23:36:09 tfheen Exp $
+ * $Id: dpkg-reconfigure.c,v 1.13 2002/09/19 17:14:14 dancer Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -47,6 +47,8 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <locale.h>
+
 
 #include "confmodule.h"
 #include "configuration.h"
@@ -377,6 +379,7 @@ int main(int argc, char **argv)
 	int opt, ret;
 
 	signal(SIGINT, sighandler);
+	setlocale (LC_ALL, "");
 
 	g_config = config_new();
 
