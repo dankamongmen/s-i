@@ -550,7 +550,16 @@ default_disk_label () {
 		echo msdos
 	    fi;;	    
 	arm)
-	    echo msdos;;
+	    case "$sub" in
+		riscstation)
+		    echo msdos;;
+		netwinder)
+		    echo msdos;;
+		bast)
+		    echo msdos;;
+		*)
+		    echo UNKNOWN;;
+	    esac;;
 	amd64)
 	    echo msdos;;
 	hppa)
