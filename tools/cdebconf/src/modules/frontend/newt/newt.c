@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.23 2003/09/27 11:49:33 sjogren Exp $
+ * $Id: newt.c,v 1.24 2003/09/27 12:21:23 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -238,13 +238,15 @@ show_separate_window(struct frontend *obj, struct question *q)
     newtTextboxSetText(textbox, q_get_extended_description(q));
 #endif
     bOk     = newtCompactButton( win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
-    bCancel = newtCompactButton(5,  win_height-2, goback_text(obj));
-    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
-    newtFormAddComponents(form, textbox, bCancel, bOk, NULL);
+    if (obj->methods.can_go_back(obj, q))
+        bCancel = newtCompactButton(5,  win_height-2, goback_text(obj));
+    else
+        bCancel = NULL;
+    newtFormAddComponents(form, textbox, bOk, bCancel, NULL);
     cRet = newtRunForm(form);
     if (cRet == bOk)
         ret = DC_OK;
-    else if (cRet == bCancel)
+    else if (bCancel != NULL && cRet == bCancel)
         ret = DC_GOBACK;
     else
         ret = DC_NOTOK;
@@ -300,12 +302,14 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         defval = (char *)question_getvalue(q, "");
     entry   = newtEntry(1, 1+t_height+1, defval, win_width-4, &result, eflags);
     bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)),  win_height-2, continue_text(obj));
-    bCancel = newtCompactButton(5 , win_height-2, goback_text(obj));
-    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
-    newtFormAddComponents(form, textbox, bCancel, bOk, entry, NULL);
+    if (obj->methods.can_go_back(obj, q))
+        bCancel = newtCompactButton(5 , win_height-2, goback_text(obj));
+    else
+        bCancel = NULL;
+    newtFormAddComponents(form, textbox, bOk, entry, bCancel, NULL);
     newtFormSetCurrent(form, entry);
     cRet = newtRunForm(form);
-    if (cRet == bCancel)
+    if (bCancel != NULL && cRet == bCancel)
         ret = DC_GOBACK;
     else {
         ret = DC_OK;
@@ -392,9 +396,11 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     create_window(win_width, win_height, obj->title, q->priority);
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
     bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
-    bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
-    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q) || !show_ext_desc);
-    newtFormAddComponents(form, label, bCancel, bOk, NULL);
+    if (obj->methods.can_go_back(obj, q) || !show_ext_desc)
+        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
+    else
+        bCancel = NULL;
+    newtFormAddComponents(form, label, bOk, bCancel, NULL);
     if (count > sel_height) {
         
         scrollbar = newtVerticalScrollbar((win_width+sel_width+5)/2, 1+t_height+1, sel_height,
@@ -417,7 +423,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     newtFormAddComponent(form, sform);
     newtFormSetCurrent(form, sform);
     cRet = newtRunForm(form);
-    if (cRet == bCancel)
+    if (bCancel != NULL && cRet == bCancel)
         ret = DC_GOBACK;
     else {
         char *ans = strdup(""), *tmp;
@@ -522,7 +528,10 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     create_window(win_width, win_height, obj->title, q->priority);
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
     listbox = newtListbox((win_width - sel_width)/2, 1+t_height+1, sel_height, listflags);
-    bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
+    if (obj->methods.can_go_back(obj, q) || !show_ext_desc)
+        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
+    else
+        bCancel = NULL;
     bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
@@ -536,10 +545,9 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         defchoice = 0;
     if (defchoice >= 0)
         newtListboxSetCurrent(listbox, defchoice);
-    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q) || !show_ext_desc);
-    newtFormAddComponents(form, label, listbox, bCancel, bOk, NULL);
+    newtFormAddComponents(form, label, listbox, bOk, bCancel, NULL);
     cRet = newtRunForm(form);
-    if (cRet == bCancel)
+    if (bCancel != NULL && cRet == bCancel)
         ret = DC_GOBACK;
     else {
         if (newtListboxGetCurrent(listbox) != NULL)
@@ -603,11 +611,13 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     assert(textbox);
     if (q_ext_text != NULL)
         newtTextboxSetText(textbox, q_ext_text);
-    bCancel  = newtCompactButton(5, win_height-2, goback_text(obj));
+    if (obj->methods.can_go_back(obj, q))
+        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
+    else
+        bCancel = NULL;
     bYes     = newtCompactButton((win_width - strwidth(yes_text(obj)) - 2)/2, win_height-2, yes_text(obj));
     bNo      = newtCompactButton(win_width - 9 - strwidth(no_text(obj)), win_height-2, no_text(obj));
-    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
-    newtFormAddComponents(form, textbox, bCancel, bYes, bNo, NULL);
+    newtFormAddComponents(form, textbox, bYes, bNo, bCancel, NULL);
     if (strcmp(question_getvalue(q, ""), "true") == 0)
         newtFormSetCurrent(form, bYes);
     else
@@ -619,7 +629,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     } else if (cRet == bNo) {
         ret = DC_OK;
         question_setvalue(q, "false");
-    } else if (cRet == bCancel)
+    } else if (bCancel != NULL && cRet == bCancel)
         ret = DC_GOBACK;
     else
         ret = DC_NOTOK;
