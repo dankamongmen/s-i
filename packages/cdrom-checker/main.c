@@ -54,7 +54,7 @@ int mount_cdrom() {
 
 	/* ask if we should mount the device */
 	debconf_set(debconf, "cdrom-checker/askmount", "false");
-	debconf_input(debconf, "high", "cdrom-checker/askmount");
+	debconf_input(debconf, "critical", "cdrom-checker/askmount");
 	debconf_go(debconf);
 	debconf_get(debconf, "cdrom-checker/askmount");
 	
@@ -147,7 +147,7 @@ int check_cdrom() {
 		debconf_subst(debconf, "cdrom-checker/mismatch", "FILE", filename);
 		debconf_input(debconf, "high", "cdrom-checker/mismatch");
 	} else {
-		debconf_input(debconf, "high", "cdrom-checker/passed");
+		debconf_input(debconf, "critical", "cdrom-checker/passed");
 	}
 	debconf_go(debconf);
 
@@ -164,7 +164,7 @@ int main(int argc, char **argv) {
 
 	/* ask if we should proceed with the checking */
 	debconf_set(debconf, "cdrom-checker/start", "false");
-	debconf_input(debconf, "high", "cdrom-checker/start");
+	debconf_input(debconf, "critical", "cdrom-checker/start");
 	debconf_go(debconf);
 	debconf_get(debconf, "cdrom-checker/start");
 	if(!strstr(debconf->value, "true")) {	/* return to main-menu */
