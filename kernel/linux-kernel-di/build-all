@@ -5,16 +5,38 @@
 # ../alpha, etc. modules.dep files have to be put in there too if they are
 # not shipped in the .deb (varies)
 #
-# dpkg-cross must be installed, and so must a cross compiler, or at least
-# something named alpha-linux-gcc that outputs "alpha-linux", etc.
+# dpkg-cross must be installed, but you do not need a cross compiler.
+
 set -e
+
 buildpackage () {
 	dpkg-buildpackage -rfakeroot -tc -ICVS -I.svn $@
 }
 
+# Native build first.
 buildpackage
-for arch in i386 alpha; do
+
+# Directory for stubs, added to PATH.
+trap 'rm -rf $tmpdir' EXIT 
+tmpdir=$(tempfile)
+rm $tmpdir
+mkdir $tmpdir
+PATH=$PATH:$tmpdir
+export PATH
+
+for arch in $(cut -d ' ' -f 1 kernel-versions | grep -v ^# | uniq); do
 	if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ]; then
+		# Generate cross-compiler stub, this is needed to get the
+		# debian build system to cross-build the given arch w/o a
+		# real cross compiler.
+		CC=$tmpdir/$arch-linux-gcc
+		echo "#!/bin/sh" > $CC
+		echo "echo $arch-linux" >> $CC
+		chmod +x $CC
+		# Not only must it be in the path, but CC needs to be
+		# exported as well.
+		export CC
+		
 		export SOURCEDIR=`pwd`/../$arch
 		buildpackage -b -a$arch
 	fi
