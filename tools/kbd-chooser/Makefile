@@ -87,7 +87,7 @@ install:
 
 .PHONY: demo
 demo.templates: debian/kbd-chooser.templates
-	sed -e 's/_Description:/Description:/' -e '/^#/d' < $< > $@
+	po2debconf $< > $@
 
 demo: demo.templates kbd-chooser
 	rm -f demo
