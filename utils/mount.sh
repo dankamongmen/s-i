@@ -50,6 +50,8 @@ do_mount() {
 		return 1
 	fi
 
+	# update fstab for baseinstaller
+	sh /usr/lib/prebaseconfig.d/40fstab
 	return 0
 }
 
