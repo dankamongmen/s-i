@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.29 2002/10/18 15:49:50 waldi Exp $ */
+/* $Id: udpkg.c,v 1.30 2002/11/13 19:17:41 sjogren Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -362,6 +362,22 @@ static int dpkg_install(struct package_t *pkgs)
 	return 0;
 }
 
+static int dpkg_fields(struct package_t *pkg)
+{
+	char *command;
+	int ret;
+
+	if (pkg == NULL)
+	{
+		fprintf(stderr, "udpkg: The -f flag requires an argument.\n");
+		return 1;
+	}
+	asprintf(&command, "ar -p %s control.tar.gz|zcat|tar -xOf - ./control", pkg->file);
+	ret = SYSTEM(command);
+	free(command);
+	return ret;
+}
+
 static int dpkg_remove(struct package_t *pkgs)
 {
 	struct package_t *p;
@@ -417,10 +433,11 @@ int main(int argc, char **argv)
 		case 'u': return dpkg_unpack(packages); break;
 		case 'c': return dpkg_configure(packages); break;
                 case 'p': return dpkg_print_architecture(); break;
+		case 'f': return dpkg_fields(packages); break;
 	}
 
 	/* if it falls through to here, some of the command line options were
 	   wrong */
-	fprintf(stderr, "udpkg <-i|-r|--unpack|--configure|--print-architecture> my.deb\n");
+	fprintf(stderr, "udpkg <-i|-r|--unpack|--configure|--print-architecture|-f> my.deb\n");
 	return 0;
 }
