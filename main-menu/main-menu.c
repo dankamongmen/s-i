@@ -447,7 +447,14 @@ int main (int argc, char **argv) {
 
 	packages = status_read();
 	while ((p=show_main_menu(packages))) {
-		if (!do_menu_item(p)) {
+		int retval;
+		retval = do_menu_item(p);
+		if (!retval) {
+			char buf[256];
+			snprintf(buf, sizeof(buf),
+				"Menu item '%s' failed with value %d.",
+				 p->package, retval);
+			di_log(buf);
 			/* Something went wrong.  Lower debconf
 			   priority limit to try to give the user more
 			   control over the situation. */
