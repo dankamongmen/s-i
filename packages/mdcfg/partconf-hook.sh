@@ -6,8 +6,9 @@ DEVICE=`echo $1 | sed -e "s/\/dev\///"`
 
 echo ${DEVICE}
 
-cat /proc/mdstat | grep -q "${DEVICE}"
-[ $? -eq 0 ] && exit 1
-
-exit 0
+if grep -q "${DEVICE}" /proc/mdstat; then
+  exit 1
+else
+  exit 0
+fi
 
