@@ -1,5 +1,7 @@
 #! /bin/sh -e
 
+ARCH=`udpkg --print-architecture`
+
 . /usr/share/debconf/confmodule
 
 if db_get debian-installer/profile && [ "$RET" ]; then
@@ -101,8 +103,33 @@ cp /var/log/* $logsavedir
 # Copy current debconf databse into /target
 cp -a /var/lib/cdebconf /target/root
 
+# Look in /proc/cmdline for console=ttyS*, indicating a serial console
+# and fix inittab if so.
+console=$( echo " " $( cat /proc/cmdline ) " " | sed -n 's/^.* console=\([^ ]*\) .*$/\1/p' )
+# XXX limited to hppa so far, until tested elsewhere
+if [ "$ARCH" = "hppa" ] && ( echo "$console" | grep -q "^ttyS" )
+then
+    # serial console, fix inittab and /etc/securetty.  This edits the
+    # ttyS0 entry for whichever ttySn is used, rather than trying to
+    # enable the right one.  Allows for ttySn for n>1 that way.
+    ttyspeed=$( echo "$console" | sed -n 's/^[^,]*,\([0-9]\+\).*$/\1/p' )
+    ttyname=$( echo "$console" | sed 's/,.*//' )
+    ttyline=$( echo "$ttyname" | sed 's/^ttyS//' )
+    ttyterm=$TERM
+    [ -z "$ttyterm" ] && ttyterm=vt100
+    [ -z "$ttyspeed" ] && ttyspeed=9600
+    cat /target/etc/inittab | sed \
+        -e "s/^\([1-6]\):/#\1:/" \
+	-e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
+            > /target/etc/inittab.real
+    echo "# $ttyname added by debian-installer" >> /target/etc/securetty
+    echo "$ttyname" >> /target/etc/securetty
+else
+    # graphical console, leave inittab alone
+    mv /target/etc/inittab /target/etc/inittab.real
+fi
+
 # Prepare to run base-config after reboot
-mv /target/etc/inittab /target/etc/inittab.real
 cp /usr/share/prebaseconfig/inittab /target/etc/inittab
 (
     echo LANG_INST="$LANG_INST"
