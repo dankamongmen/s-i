@@ -9,5 +9,8 @@ logsavedir=/target/var/log/debian-installer
 test -d $logsavedir || mkdir $logsavedir
 cp /var/log/* $logsavedir
 
+# Make sure the debconf priority is in questions.dat for base-config.
+debconf-set debconf/priority $(debconf-get debconf/priority)
+
 # Copy current debconf database
 cp -a /var/lib/cdebconf $logsavedir

@@ -4,39 +4,15 @@
 
 set -e
 
-ARCH=`udpkg --print-architecture`
-
+# XXX Obsolete, to be removed.
 . /usr/share/debconf/confmodule
-
 if db_get mirror/distribution && [ "$RET" ] ; then
     SUITE="$RET"
-
-# This code try to fix bug #177459, but fail to work on CDROM installs
-# as /cdrom/ is umounted at this point.
-#    if [ -f /cdrom/.disk/base_installable ] ; then
-#	SUITE=`sed -n 's/^Suite: *//p' /cdrom/dists/$SUITE/Release`
-#    else
-#	db_get mirror/protocol
-#	PROTOCOL="$RET"
-#
-#	db_get mirror/$PROTOCOL/hostname
-#	MIRROR="$RET"
-#
-#	db_get mirror/$PROTOCOL/directory
-#	DIRECTORY="$RET"
-#
-#	if [ "$PROTOCOL" = "http" ]; then
-#            # try to find http proxy
-#	    db_get mirror/http/proxy
-#	    http_proxy="$RET" || true
-#	    if [ "$http_proxy" ]; then
-#		export http_proxy
-#	    fi
-#	fi
-#
-#	SUITE=`wget -O - ${PROTOCOL}://${MIRROR}${DIRECTORY}/dists/$SUITE/Release | sed -n 's/^Suite: *//p'`
-#    fi
 fi
+(
+    echo "# inserted by prebaseconfig"
+    echo "SUITE=\"$SUITE\""
+) >> /target/root/dbootstrap_settings
 
 # Look in /proc/cmdline for console=ttyS*, indicating a serial console
 # and fix inittab if so.
@@ -64,9 +40,4 @@ else
 fi
 
 cp /usr/share/prebaseconfig/inittab /target/etc/inittab
-
-(
-    echo "# inserted by prebaseconfig"
-    echo "SUITE=\"$SUITE\""
-) >> /target/root/dbootstrap_settings
 
