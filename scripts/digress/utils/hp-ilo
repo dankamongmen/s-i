@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+# This is a wrapper around the locfg.pl from HP. It's pretty silly to do
+# this as a wrapper, but that program is not licensed and I didn't feel
+# like doing a clean room reimplementation of it.
+# 
+# This wrapper knows how to do different simple actions, controlled by the
+# first parameter. It generates the XML commands and feeds them to
+# locfg.pl. See the top-level README for documentation of the environment
+# variables it expects to be set.
+#
+# GPL Copyright 2004 by Joey Hess.
+
+use strict;
+use IPC::Open2;
+
+my $action=shift;
+if ($action eq 'reset') {
+	exit send_command(qq{<RESET_SERVER/>});
+}
+elsif ($action eq 'poweron') {
+	exit send_command(qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
+}
+elsif ($action eq 'poweroff') {
+	exit send_command(qq{<SET_HOST_POWER HOST_POWER="No"/>});
+}
+else {
+	print STDERR "unnown action $action\n";
+}
+
+sub send_command {
+	my $command=gen_command(@_);
+	
+	if (! defined $ENV{HP_ILO_HOST}) {
+		die "Please set HP_ILO_HOST\n";
+	}
+	my $pid = open2 (\*RDRFH, \*WTRFH, "locfg.pl", 
+		"-s", $ENV{HP_ILO_HOST}, "-f", "-");
+	if (! $pid) {
+		die "failed to run locfg.pl: $!";
+	}
+	print WTRFH $command;
+	close WTRFH;
+	
+	# This assumes the last response will be an error if there was some
+	# error.
+	my $error;
+	while (<RDRFH>) {
+		if (/MESSAGE='(.*?)'/) {
+			if (lc($1) eq 'no error' || ! defined $error) {
+				$error=0;
+			}
+			else {
+				$error=1;
+			}
+		}
+	}
+	close RDRFH;
+
+	if (! defined $error) {
+		print STDERR "Parse failure or locfg run failed.\n";
+	}
+	
+	if (! defined $error || $error) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+sub gen_command {
+	my $password=getpassword();
+	my $user=getuser();
+	return <<"EOF"
+<RIBCL VERSION="2.0">
+	<LOGIN USER_LOGIN="$user" PASSWORD="$password">
+		<SERVER_INFO MODE="write">
+			@_
+		</SERVER_INFO>
+	</LOGIN>
+</RIBCL>
+EOF
+}
+
+sub getpassword {
+	if (exists $ENV{HP_ILO_PASSWORD}) {
+		return $ENV{HP_ILO_PASSWORD};
+	}
+	else {
+		open (PW, $ENV{HP_ILO_PASSWORD_FILE}) || die "Please set HP_ILO_PASSWORD or HP_ILO_PASSWORD_FILE\n";
+		my $password=<PW>;
+		chomp;
+		close PW;
+		return $password;
+	}
+}
+
+sub getuser {
+	if (exists $ENV{HP_ILO_USER}) {
+		return $ENV{HP_ILO_USER}
+	}
+	die "Please set HP_ILO_USER\n";
+}
