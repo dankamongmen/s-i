@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e
+
+# Set up config file. 
+rc=$DI_TESTDIR/state/hercules-$MACHINE-$SCHEME.cnf
+if [ -e $DI_TESTDIR/hercules/$HERCULESCFG ]; then
+	cat $DI_TESTDIR/hercules/$HERCULESCFG > $rc
+else
+	cat $DIGRESSDIR/hercules/$HERCULESCFG > $rc
+fi
+
+echo >> $rc
+
+# Add card deck to boot d-i.
+echo "000C	3505	$S390_IMAGE_DIR/kernel.debian $S390_IMAGE_DIR/parmfile.debian $S390_IMAGE_DIR/initrd.debian autopad eof" >> $rc
+
+# Create a disk image and add to config file.
+if [ -n "$DASDINIT" ]; then
+	disk=$DI_TESTDIR/state/hercules-$MACHINE-$SCHEME.img
+	rm -f $disk
+	dasdinit $disk $DASDINIT
+	echo "0120	3390	$disk" >> $rc
+fi
+
+# Add network setup to config file.
+if [ -n "$S390_IP" ] && [ -n "$S390_PTP_IP" ]; then
+	echo "0A00	3088	CTCI /dev/net/tun 1500 $S390_IP $S390_PTP_IP 255.255.255.0" >> $rc
+	echo "0A01	3088	CTCI /dev/net/tun 1500 $S390_IP $S390_PTP_IP 255.255.255.0" >> $rc
+fi
+
