@@ -105,9 +105,9 @@ static int dpkg_doconfigure(struct package_t *pkg)
 		if ((r = di_exec_shell_log(buf)) != 0)
 		{
 			FPRINTF(stderr, "%s's postinst exited with status %d\n",
-				pkg->package, WEXITSTATUS(r));
+				pkg->package, di_exec_mangle_status(r));
 			pkg->status |= STATUS_STATUSHALFCONFIGURED;
-			return WEXITSTATUS(r);
+			return di_exec_mangle_status(r);
 		}
 	}
 
