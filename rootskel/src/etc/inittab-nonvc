@@ -1,0 +1,13 @@
+# /etc/inittab
+# busybox init configuration for debian-installer
+
+# main rc script
+null::sysinit:/etc/init.d/rcS
+
+# main setup program
+::respawn:/sbin/debian-installer
+
+# Stuff to do before rebooting
+::ctrlaltdel:/bin/umount -a -r > /dev/null 2>&1
+::ctrlaltdel:/sbin/swapoff -a > /dev/null 2>&1
+
