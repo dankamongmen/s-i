@@ -51,14 +51,17 @@ int compare (const void *a, const void *b) {
 		      (*(struct package_t **)a)->package);
 }
 
-/* Returns true if the given package could be the default menu item. */
+/*
+ * Returns 1 if the given package _should_ be the default menu item (the
+ * menutest script said so), 2 if the given package _could_ be the default
+ * menu item (it is unpacked or half-configured). */
 int isdefault(struct package_t *p) {
 	int check;
 
 	check = check_script(p, "menutest");
 	if (check == -1) {
 		if (p->status == unpacked || p->status == half_configured) {
-			return 1;
+			return 2;
 		}
 		else {
 			return 0;
@@ -104,7 +107,7 @@ get_default_menu_item(struct linkedlist_t *list)
 {
 	struct package_t *p, *q;
 	struct list_node *node;
-	int i, cont;
+	int i, cont, def;
 
 	/* Traverse the list, return the first menu item that isn't installed */
 	for (node = list->head; node != NULL; node = node->next) {
@@ -112,7 +115,10 @@ get_default_menu_item(struct linkedlist_t *list)
 		if (!p->installer_menu_item || p->status == installed || !check_script(p, "isinstallable"))
 			continue;
 		/* If menutest says this item should be default, make it so */
-		if (isdefault(p))
+		def = isdefault(p);
+		if (def == 0)
+			continue;
+		if (def == 1)
 			return p;
 		cont = 0;
                 /* Check if a "parallel" package is installed
