@@ -101,6 +101,8 @@ test_raid(struct partition *p)
                 break;
             sscanf(buf, "%lld", &blocks);
             p->size = blocks * 512L;
+            free(p->description);
+            asprintf(&p->description, "RAID logical volume %d", volno);
             break;
         }
     }
@@ -224,6 +226,7 @@ get_all_partitions(struct partition *parts[], const int max_parts)
             break;
         p = malloc(sizeof(*p));
         p->path = strdup(partname);
+        p->description = strdup(p->path);
         p->fstype = NULL;
         p->fsid = NULL;
         p->size = 0L;
@@ -271,6 +274,27 @@ get_all_partitions(struct partition *parts[], const int max_parts)
 
             p = malloc(sizeof(*p));
             p->path = ped_partition_get_path(part);
+            if (strstr(p->path, "/dev/ide/") == p->path) {
+                static char *targets[] = { "master", "slave" };
+                int host, bus, target, lun, part;
+
+                if (sscanf(p->path, "/dev/ide/host%d/bus%d/target%d/lun%d/part%d",
+                            &host, &bus, &target, &lun, &part) == 5
+                        && target >= 0 && target <= 1)
+                    asprintf(&p->description, "IDE%d %s\\, part. %d",
+                            2*host + bus + 1, targets[target], part);
+                else
+                    p->description = strdup(p->path);
+            } else if (strstr(p->path, "/dev/scsi/") == p->path) {
+                int host, bus, target, lun, part;
+
+                if (sscanf(p->path, "/dev/scsi/host%d/bus%d/target%d/lun%d/part%d",
+                            &host, &bus, &target, &lun, &part) == 5)
+                    asprintf(&p->description, "SCSI%d (%d\\,%d\\,%d) part. %d",
+                            host + 1, bus, target, lun, part);
+                else
+                    p->description = strdup(p->path);
+            }
             p->fstype = NULL;
             p->fsid = NULL;
             p->size = 0L;

@@ -42,12 +42,12 @@ build_part_choices(struct partition *parts[], const int part_count)
         return NULL;
     max_len = 0;
     for (i = 0; i < part_count; i++) {
-        if (strlen(parts[i]->path) > max_len)
-            max_len = strlen(parts[i]->path);
+        if (strlen(parts[i]->description) > max_len)
+            max_len = strlen(parts[i]->description);
     }
     // pad with spaces
     for (i = 0; i < part_count; i++) {
-        asprintf(&list[i], "%-*s", max_len, parts[i]->path);
+        asprintf(&list[i], "%-*s", max_len, parts[i]->description);
     }
     max_len = strlen("n/a");
     for (i = 0; i < part_count; i++) {
@@ -418,11 +418,25 @@ partition_menu(void)
     return 0;
 }
 
+int
+streqcomma(const char *s1, const char *s2)
+{
+    while (*s1 && *s2) {
+        if (*s1 == '\\')
+            s1++;
+        if (*s1 != *s2)
+            return 0;
+        s1++;
+        s2++;
+    }
+    return 1;
+}
+
 static int
 filesystem(void)
 {
     int i;
-    char *partname, *ptr;
+    char *partname;
 
     debconf->command(debconf, "GET", "partconf/partitions", NULL);
     if (strcmp(debconf->value, "Finish") == 0) {
@@ -433,15 +447,15 @@ filesystem(void)
     if (strcmp(debconf->value, "Abort") == 0)
         return -1;
     partname = strdup(debconf->value);
-    if ((ptr = strchr(partname, ' ')) == NULL)
-        return -1;
-    *ptr = '\0';
     curr_part = NULL;
-    for (i = 0; i < part_count; i++)
-        if (strcmp(parts[i]->path, partname) == 0) {
+    for (i = 0; i < part_count; i++) {
+        fprintf(stderr, "pname='%s', pdesc='%s'\n", partname, parts[i]->description);
+        if (streqcomma(parts[i]->description, partname)) {
+//        if (strstr(partname, parts[i]->description) == partname) {
             curr_part = parts[i];
             break;
         }
+    }
     if (curr_part == NULL)
         return -1;
     if (curr_part->fstype != NULL) {

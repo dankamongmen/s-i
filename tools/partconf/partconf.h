@@ -26,6 +26,7 @@ struct operation {
 /* Represents a partition */
 struct partition {
     char                *path;
+    char                *description;
     char                *fstype;
     char                *fsid;
     long long            size;
