@@ -185,7 +185,11 @@ get_ide_chipset_info() {
 	for ide_module in $(find /lib/modules/*/kernel/drivers/ide/pci/ -type f 2>/dev/null); do
 		if [ -e $ide_module ]; then
 			baseidemod=$(echo $ide_module | sed 's/\.o$//' | sed 's/\.ko$//' | sed 's/.*\///')
-			echo "$baseidemod:IDE chipset support"
+			# hpt366 is in the discover database, and causes
+			# problems with some other hardware (bug #269823)
+			if [ "$baseidemod" != hpt366 ]; then
+				echo "$baseidemod:IDE chipset support"
+			fi
 		fi
 	done
 }
