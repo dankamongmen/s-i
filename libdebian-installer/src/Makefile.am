@@ -32,12 +32,12 @@ libdebian_installer_extra_la_LIBADD = \
 	libdebian-installer.la
 
 libdebian_installer_la_LDFLAGS = \
-	-version-number $(LIBRARY_VERSION) \
+	-version-number $(LIBRARY_VERSION_LIBTOOL) \
 	-Wl,--version-script=$(srcdir)/libdebian-installer.ver \
 	-Wl,--no-undefined-version
 
 libdebian_installer_extra_la_LDFLAGS = \
-	-version-number $(LIBRARY_VERSION) \
+	-version-number $(LIBRARY_VERSION_LIBTOOL) \
 	-Wl,--version-script=$(srcdir)/libdebian-installer-extra.ver \
 	-Wl,--no-undefined-version
 

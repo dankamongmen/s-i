@@ -1,5 +1,7 @@
 #define LIBDEBIAN_INSTALLER_MAP_REAL
 
+#include <debian-installer/config.h>
+
 #include <debian-installer/exec.h>
 #include <debian-installer/hash.h>
 #include <debian-installer/list.h>

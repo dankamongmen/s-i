@@ -17,8 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.10 2003/11/13 21:28:57 waldi Exp $
+ * $Id: packages.c,v 1.11 2003/12/11 19:29:50 waldi Exp $
  */
+
+#include <config.h>
 
 #include <debian-installer/packages_internal.h>
 

@@ -17,8 +17,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.c,v 1.4 2003/11/19 09:24:14 waldi Exp $
+ * $Id: parser.c,v 1.5 2003/12/11 19:29:50 waldi Exp $
  */
+
+#include <config.h>
 
 #include <debian-installer/parser.h>
 
