@@ -8,37 +8,62 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/* Base of the debconf question hierary used by this program. */
+/* Base of the debconf question hierarchy used by this program. */
 #define DEBCONF_BASE "mirror/"
+
+/*
+ * Get a protocol question value from the debconf mirror hierarchy.
+ * Returns the result in the value field of debconfclient.
+ */
+static void get_mirror_protocol_value(struct debconfclient *debconf,
+		char *protocol, char *string)
+{
+	char *question;
+
+	asprintf(&question, DEBCONF_BASE "%s/%s", protocol, string);
+	debconf->command(debconf, "GET", question, NULL);
+	free(question);
+}
 
 int main(int argc, char **argv) {
 	int ret;
 	char *src;
 	char *hostname, *directory, *command;
 	struct debconfclient *debconf = debconfclient_new();
-	
+
 	if (argc < 2)
 		exit(1);
 	if (strcmp(argv[1], "retrieve") == 0) {
+		char *protocol;
+
 		if (argc < 4)
 			exit(1);
+
+		debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+		protocol = strdup(debconf->value);
+
 		/* Suck in data from the debconf database, which will be primed
 		 * with the mirror to use by choose-mirror */
-		// TODO: what about ftp?
-		debconf->command(debconf, "GET", DEBCONF_BASE "http/hostname", NULL);
+		get_mirror_protocol_value(debconf, protocol, "hostname");
 		hostname = strdup(debconf->value);
-		debconf->command(debconf, "GET", DEBCONF_BASE "http/directory", NULL);
+
+		get_mirror_protocol_value(debconf, protocol, "directory");
 		directory = strdup(debconf->value);
-		debconf->command(debconf, "GET", DEBCONF_BASE "http/proxy", NULL);
+
+		get_mirror_protocol_value(debconf, protocol, "proxy");
 		if (debconf->value && strcmp(debconf->value,"") != 0) {
-			if (setenv("http_proxy", debconf->value, 1) == -1)
+			char *env_variable;
+
+			asprintf(&env_variable, "%s_proxy", protocol);
+			if (setenv(env_variable, debconf->value, 1) == -1)
 				exit(1);
+			free(env_variable);
 		}
-		src=argv[2];
-		asprintf(&command, "wget -c -q http://%s%s/%s -O %s", hostname,
-				directory, src, argv[3]);
-		fprintf(stderr,"wget: %s\n", command);
-		ret=system(command);
+		src = argv[2];
+		asprintf(&command, "wget -c -q %s://%s%s/%s -O %s", protocol,
+			 hostname, directory, src, argv[3]);
+		fprintf(stderr, "wget: %s\n", command);
+		ret = system(command);
 		if (ret == 256)
 			return 1;
 		return ret;
@@ -47,3 +72,4 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 }
+
