@@ -53,14 +53,17 @@ use () {
 	. $DI_TESTDIR/schemes/$MACHINE/$1
 }
 
+export DIGRESSDIR=$(dirname $0)
+
 if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
-	export DI_TESTDIR=$(dirname $0)
+	export DI_TESTDIR=$DIGRESSDIR
 	if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
 		error "Cannot determine DI_TESTDIR"
 	fi
 fi
 
-PATH=$PATH:$DI_TESTDIR/boot:$DI_TESTDIR/preboot:$DI_TESTDIR/console:$DI_TESTDIR/test_1:$DI_TESTDIR/test_2
+PATH=$PATH:$DIGRESSDIR/boot:$DIGRESSDIR/preboot:$DIGRESSDIR/console:$DIGRESSDIR/test_1:$DIGRESSDIR/test_2
+export PATH
 
 if [ -z "$SCHEME" ]; then
 	SCHEME=d-i
