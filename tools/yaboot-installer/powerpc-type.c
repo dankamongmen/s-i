@@ -10,7 +10,7 @@
 
 char * get_powerpc_type(void) {
   int status;
-  status = system("test -f /proc/cpuinfo && grep -q \"pmac-generation.*NewWorld\" /proc/cpuinfo");
+  status = system("/target/bin/test -f /proc/cpuinfo && grep -q \"pmac-generation.*NewWorld\" /proc/cpuinfo");
   
   if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
     return "NewWorld PowerMac";
