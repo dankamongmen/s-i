@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.19 2000/12/31 01:24:51 joeyh Rel $ */
+/* $Id: status.c,v 1.20 2001/02/10 00:22:22 bug1 Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -153,6 +153,12 @@ void *status_read(void)
 		control_read(f, m);
 		if (m->package)
 		{
+			/*
+			 * If there is an item in the tree by this name,
+			 * it must be a virtual package; insert real
+			 * package in preference.
+			 */
+			tdelete(m, &status, package_compare);
 			tsearch(m, &status, package_compare);
 			if (m->provides)
 			{
@@ -164,6 +170,7 @@ void *status_read(void)
 				p = (struct package_t *)malloc(sizeof(struct package_t));
 				memset(p, 0, sizeof(struct package_t));
 				p->package = strdup(m->provides);
+
 				t = *(struct package_t **)tsearch(p, &status, package_compare);
 				if (!(t == p))
 				{
