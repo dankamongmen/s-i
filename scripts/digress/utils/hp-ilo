@@ -12,6 +12,7 @@
 
 use strict;
 use IPC::Open2;
+use Expect;
 
 my $action=shift;
 if ($action eq 'reset') {
@@ -30,23 +31,44 @@ elsif ($action eq 'poweroff') {
 	exit process_result();
 }
 elsif ($action eq 'force_restart') {
-	send_command(qq{<GET_HOST_POWER_STATUS/>});
-	if (scan_result("HOST_POWER") eq 'OFF') {
-		print "Powering on..\n";
-		send_command(qq{<SET_HOST_POWER HOST_POWER="Yes"/>});
+	# This is done using the telnet interface and expect because
+	# I do not know how to accomplish a warm boot using the xml
+	# interface. it requires iLO 1.60.
+	my $exp = new Expect;
+	$exp->raw_pty(1);
+
+	$exp->spawn("nc", $ENV{HP_ILO_HOST}, "telnet") or die "cannot spawn nc: $!\n";
+
+	$exp->expect(60, "Login Name:");
+	$exp->send(getuser()."\r");
+
+	$exp->expect(10, "Password:");
+	$exp->send(getpassword()."\r");
+
+	$exp->expect(10, "iLO>");
+	$exp->send("power\r");
+
+	my $power;
+	$exp->expect(10, 
+		[ "Off" => sub { $power=0 } ],
+		[ "On" => sub { $power=1 } ],
+	);
+	if ($power) {
+		$exp->send("power warm\r");
 	}
 	else {
-		print "Restarting..\n";
-		send_command(qq{<RESET_SERVER/>});
+		$exp->send("power on\r");
 	}
-	exit process_result();
+	$exp->expect(10, "iLO>");
+	$exp->send("exit\r");
+	$exp->interact;
 }
 elsif ($action eq 'get_host_power') {
 	send_command(qq{<GET_HOST_POWER_STATUS/>});
 	print "Power: ".scan_result("HOST_POWER")."\n";
 }
 else {
-	print STDERR "unnown action $action\n";
+	print STDERR "unknown action $action\n";
 }
 
 sub send_command {
