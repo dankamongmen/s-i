@@ -638,8 +638,6 @@ static int di_config_package(di_system_package *p,
 	free(configcommand);
 	switch (ret) {
 		case EXIT_OK:
-		case EXIT_QUIT:
-		case EXIT_RESTART:
 			p->p.status = di_package_status_installed;
 			if (walkfunc != NULL)
 				walkfunc(p);
