@@ -7,5 +7,17 @@ MANPAGES=dpkg-preconfigure.8 dpkg-reconfigure.8 debconf.7
 
 all: $(MANPAGES)
 
+$(MANPAGES): SFX=$(subst .,,$(suffix $@))
+
 $(MANPAGES):
-	@$(POD2MAN) --section=$(subst .,,$(suffix $@)) --center=$(CENTER) -d$(CENTER) $(srcdir)/man/$(basename $@).pod > $(basename $@).man
+	@$(POD2MAN) --section=$(SFX) --center=$(CENTER) -d$(CENTER) $(srcdir)/man/$(basename $@).pod > $(basename $@).$(SFX)
+
+install: $(MANPAGES)
+	install -d -m 755 ${mandir}/man7
+	install -d -m 755 ${mandir}/man8
+	@for m in $(MANPAGES); do \
+		install -m 644 $$m ${mandir}/man$${m#*.}/; \
+	done
+
+clean:
+	rm -f *.[0-9]

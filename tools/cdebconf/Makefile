@@ -1,6 +1,6 @@
 # This is just the bootstrapping makefile
 
-all: cdebconf
+all: cdebconf man
 
 globalmakeflags:
 	./configure
@@ -8,11 +8,15 @@ globalmakeflags:
 cdebconf: globalmakeflags
 	$(MAKE) -C src
 
+man:
+	$(MAKE) -C man
+
 configure: configure.in
 	autoconf
 
 install:
 	$(MAKE) -C src $@
+	$(MAKE) -C man $@
 
 clean: 
 	-rm -f *-stamp

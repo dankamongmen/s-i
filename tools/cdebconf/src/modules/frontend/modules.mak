@@ -2,6 +2,7 @@ include ../../../../globalmakeflags
 
 CFLAGS  += $(MODCFLAGS)
 LDFLAGS  = $(MODLDFLAGS)
+SUBDIR   = src/modules/frontend/$(MODULE)
 
 all: $(SOBJ)
 

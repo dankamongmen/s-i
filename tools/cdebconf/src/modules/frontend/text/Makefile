@@ -1,3 +1,4 @@
+MODULE=text
 SOBJ=text.so
 OBJS=text.opic
 

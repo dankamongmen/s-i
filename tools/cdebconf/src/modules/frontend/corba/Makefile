@@ -1,6 +1,7 @@
-# $Id: Makefile,v 1.2 2001/02/22 09:22:39 zw Rel $
+# $Id: Makefile,v 1.3 2002/07/09 05:25:04 tausq Rel $
 
 # This is wrong 8:P  (Hey, big nose? Or girlie hair?)
+MODULE=corba
 SOBJ = corba.so
 OBJS = corba.opic
 include ../modules.mak

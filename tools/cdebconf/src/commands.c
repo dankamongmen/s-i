@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.19 2002/07/01 06:58:37 tausq Exp $
+ * $Id: commands.c,v 1.20 2002/07/09 05:25:03 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -354,7 +354,11 @@ int command_set(struct confmodule *mod, int argc, char **argv,
 	{
 		buf[0] = 0;
 		for (i = 2; i <= argc; i++)
-			strvacat(buf, sizeof(buf), argv[i], 0);	
+			strvacat(buf, sizeof(buf), argv[i], " ", 0);	
+
+        /* remove the last space added */
+        if (buf[0] != 0)
+            buf[strlen(buf)-1] = 0;
 
 		question_setvalue(q, buf);
 

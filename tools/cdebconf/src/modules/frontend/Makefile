@@ -3,18 +3,18 @@ include ../../../globalmakeflags
 MODULES=$(FRONTEND_MODULES)
 SOBJS=$(addsuffix .so,$(FRONTEND_MODULES))
 
-all: $(addsuffix /Makefile,$(SUBDIRS))
+all:
 	@for module in $(MODULES); do \
 		$(MAKE) -C $$module; \
 		cp $$module/$$module.so .; \
 	done
 
-install: $(addsuffix /Makefile,$(SUBDIRS))
+install:
 	@for module in $(MODULES); do \
 		$(MAKE) -C $$module $@; \
 	done
 
-clean: $(addsuffix /Makefile,$(SUBDIRS))
+clean:
 	@for module in $(MODULES); do \
 		$(MAKE) -C $$module clean; \
 	done

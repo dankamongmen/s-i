@@ -6,11 +6,6 @@
  * \brief Definitions of question_db and template_db objects
  */
 
-/**
- * \def DEBCONF_MAX_CONFIGPATH_LEN
- * \brief maximum length of a configuration path to a database config
- */
-#define DEBCONF_MAX_CONFIGPATH_LEN  128
 
 /* Debconf database interfaces */
 

@@ -1,3 +1,4 @@
+MODULE=perldb
 SOBJ=perldb.so
 OBJS=perldb.opic
 

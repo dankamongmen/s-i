@@ -67,6 +67,7 @@ install-udeb: build-udeb
 		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf-udeb/usr \
 		etcdir=$(shell pwd)/debian/cdebconf-udeb/etc )
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/include
+	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/share/man
 
 install: build
 	dh_testdir
@@ -102,7 +103,7 @@ cdebconf: install
 	dh_fixperms		-p$@
 	dh_makeshlibs		-p$@
 	dh_installdeb		-p$@
-	dh_shlibdeps		-p$@
+	dh_shlibdeps		-p$@ -ldebian/$@/usr/lib
 	dh_gencontrol		-p$@
 	dh_md5sums		-p$@
 	dh_builddeb		-p$@
@@ -127,7 +128,7 @@ cdebconf-udeb: install-udeb
 	dh_compress		-p$@
 	dh_fixperms		-p$@
 	dh_installdeb		-p$@
-	dh_shlibdeps		-p$@
+	dh_shlibdeps		-p$@ -ldebian/$@/usr/lib
 	# Don't write your stupid guesses to debian/files.
 	dh_gencontrol 		-p$@ -- -fdebian/files~
 	# Register file manually.

@@ -1,3 +1,4 @@
+MODULE=mysql
 SOBJ=mysql.so
 OBJS=mysql.opic
 

@@ -1,3 +1,4 @@
+MODULE=bogl
 SOBJ=bogl.so
 OBJS=bogl.opic
 

@@ -7,7 +7,7 @@
  *
  * Description: debconf frontend interface routines
  *
- * $Id: frontend.c,v 1.11 2002/07/01 06:58:37 tausq Exp $
+ * $Id: frontend.c,v 1.12 2002/07/09 05:25:03 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -230,6 +230,8 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	obj->config = cfg;
 	obj->tdb = tdb;
 	obj->qdb = qdb;
+    snprintf(obj->configpath, sizeof(obj->configpath),
+        "frontend::instance::%s", modname);
 
     memcpy(&obj->methods, mod, sizeof(struct frontend_module));
 

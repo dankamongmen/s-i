@@ -7,6 +7,12 @@
 #include "config.h"
 #include "debug.h"
 
+/**
+ * \def DEBCONF_MAX_CONFIGPATH_LEN
+ * \brief maximum length of a configuration path to a configuration
+ */
+#define DEBCONF_MAX_CONFIGPATH_LEN  128
+
 #define DC_NOTOK	0
 #define DC_OK		1
 #define DC_NOTIMPL	2

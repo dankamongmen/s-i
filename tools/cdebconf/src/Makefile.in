@@ -1,7 +1,6 @@
 include ../globalmakeflags
 
-vpath *.c $(srcdir)/src
-vpath *.h $(srcdir)/src
+SUBDIR=src
 
 MAJOR=0
 MINOR=1
@@ -46,8 +45,8 @@ install:
 	install -m 755 $(LIBNAME) ${libdir}
 	ln -sf $(LIBNAME) ${libdir}/$(SONAME)
 	ln -sf $(LIBNAME) ${libdir}/$(LIB)
-	install -m 644 cdebconf.conf-dist ${etcdir}/cdebconf.conf
-	install -m 644 client/confmodule ${sharedir}
+	install -m 644 ${srcdir}/src/cdebconf.conf-dist ${etcdir}/cdebconf.conf
+	install -m 644 ${srcdir}/src/client/confmodule ${sharedir}
 	ln -sf ../../bin/$(DEBCONF) ${sharedir}/frontend
 ifneq ($(TARGET),udeb)
 	install -m 755 debconf debconf-copydb ${bindir}

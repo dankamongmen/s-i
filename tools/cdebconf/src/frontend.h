@@ -26,6 +26,8 @@ struct frontend {
 	void *handle;
 	/* configuration data */
 	struct configuration *config;
+    /* config path - base of instance configuration */
+    char configpath[DEBCONF_MAX_CONFIGPATH_LEN];
 	/* database handle for templates and config */
 	struct template_db *tdb;
 	struct question_db *qdb;

@@ -1,3 +1,4 @@
+MODULE=ncurses
 SOBJ=ncurses.so
 OBJS=ncurses.opic
 

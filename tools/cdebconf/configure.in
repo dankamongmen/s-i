@@ -37,7 +37,11 @@ AC_SUBST(BUILDDIR)
 
 if [[ "$TOPDIR" != "$BUILDDIR" ]]; then
 	echo "Setting up build directory"
-    cp $TOPDIR/Makefile $BUILDDIR
+    for d in `(cd $TOPDIR; find . -type d -a -not -name CVS -a -not -name debian)`; do
+      mkdir -p $BUILDDIR/$d
+      test -f $TOPDIR/$d/Makefile && cp $TOPDIR/$d/Makefile $BUILDDIR/$d/
+      test -f $TOPDIR/$d/modules.mak && cp $TOPDIR/$d/modules.mak $BUILDDIR/$d/
+    done
 fi
 
 dnl Enable debugging?

@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.10 2002/07/02 06:53:47 tausq Exp $
+ * $Id: slang.c,v 1.11 2002/07/09 05:25:04 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -43,7 +43,7 @@
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
-#include "slang.h"
+#include "slang_fe.h"
 #include "strutl.h"
 
 #include <ctype.h>
@@ -51,7 +51,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define CONFIGPREFIX	"frontend::driver::slang::"
 #define WIN_QUERY	1
 #define WIN_DESC	2
 #define LINES		(SLtt_Screen_Rows ? SLtt_Screen_Rows : 24)
@@ -91,8 +90,8 @@ static void slang_setcolor(struct frontend *ui, int *handle, const char *obj,
 	static int colorsused = 0;
 	char fgname[50], bgname[50];
 
-	snprintf(fgname, sizeof(fgname), CONFIGPREFIX "%s_fg", obj);
-	snprintf(bgname, sizeof(bgname), CONFIGPREFIX "%s_bg", obj);
+	snprintf(fgname, sizeof(fgname), "%s::%s_fg", ui->configpath, obj);
+	snprintf(bgname, sizeof(bgname), "%s::%s_bg", ui->configpath, obj);
 	*handle = colorsused++;
 	SLtt_set_color(*handle, 0, (char *)ui->config->get(ui->config, fgname, 
 		defaultfg), (char *)ui->config->get(ui->config, bgname, 

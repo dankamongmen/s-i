@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.11 2002/07/02 06:53:47 tausq Exp $
+ * $Id: text.c,v 1.12 2002/07/09 05:25:05 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -310,7 +310,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 		if (defval != NULL)
 		{
 			for (i = 0; i < count; i++)
-				if (strcmp(choices[i], defval))
+				if (strcmp(choices[i], defval) == 0)
 					def = i + 1;
 		}
 
@@ -318,7 +318,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 		{
 			for (i = 0; i < count; i++)
 				printf("%3d. %s%s\n", i+1, choices_translated[i],
-					(def == i ? _(" (default)") : ""));
+					(def == i + 1 ? _(" (default)") : ""));
 
 			printf(_("Prompt: 1 - %d> "), count);
 			fgets(answer, sizeof(answer), stdin);

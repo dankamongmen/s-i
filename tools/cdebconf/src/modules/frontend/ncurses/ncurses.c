@@ -3,7 +3,7 @@
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
-#include "ncurses.h"
+#include "ncurses_fe.h"
 #include "strutl.h"
 
 #include <ctype.h>

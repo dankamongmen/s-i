@@ -1,3 +1,4 @@
+MODULE=slang
 SOBJ=slang.so
 OBJS=slang.opic
 
