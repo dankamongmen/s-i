@@ -1,4 +1,1 @@
-#include <stdbool.h>
-
-const char *subarch_analyze (void);
-
+const char *subarch_analyze(void);

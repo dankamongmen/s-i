@@ -1,7 +1,6 @@
 #include "archdetect.h"
 
-const char *subarch_analyze (void) 
+const char *subarch_analyze(void) 
 {
-  return "generic";
+	return "generic";
 }
-
