@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# First, copy any modutils stuff we need from the install system to the
+# target.  This is only valid for S390 and S390x, so:
+
+ARCH=`udpkg --print-architecture`
+case "$ARCH" in
+    s390)
+        ;;
+    s390x)
+        ;;
+    *)
+        exit 0
+        ;;
+esac
+
+# (there will be no subdirectories in /etc/modutils yet)
+cp /etc/modutils/* /target/etc/modutils
+
+# This script gets a list of ethX and trX devices on a given (S/390) host
+#  and walks through them determining which are lcs and which are qeth
+#  (more precisely, which are qeth, and which are not)
+# It then adds the appropriate lines to the modutils config.
+
+IFLIST=`ifconfig | grep '^[eth|tr]' | cut -d ' ' -f 1`
+OUTPUT=/target/etc/modutils/arch/s390
+if [ $IFLIST ]; then
+    echo "### Autodetected in prebaseconfig ###" >> $OUTPUT
+    for i in $IFLIST; do
+        grep $i /proc/qeth 2>&1 > /dev/null 
+        if [ $? -eq 0 ]; then
+            echo "alias $i qeth" >> $OUTPUT
+        else
+            echo "alias $i lcs" >> $OUTPUT
+        fi
+    done
+fi
+
+chroot /target /sbin/update-modules
+
