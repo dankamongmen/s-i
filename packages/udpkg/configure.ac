@@ -50,7 +50,7 @@ AC_ARG_WITH(admindir,AS_HELP_STRING([--with-admindir=DIR],[store dpkg data in DI
   "") AC_MSG_ERROR(invalid admindir specified) ;;
   *) ADMINDIR="$withval" ;;
  esac])
-AC_DEFINE(ADMINDIR,[],[Admindir])
+AC_DEFINE_UNQUOTED(ADMINDIR,"$ADMINDIR",[Admindir])
 
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h string.h sys/time.h unistd.h)
