@@ -58,12 +58,12 @@ static void drawnavbuttons(struct frontend *ui, struct question *q)
 static void drawdesctop(struct frontend *ui, struct question *q)
 {
 	bowl_title(ui->title);
-	bowl_new_text(question_get_translated_field(q, "description"));
+	bowl_new_text(question_get_field(q, "", "description"));
 }
 
 static void drawdescbot(struct frontend *ui, struct question *q)
 {
-	bowl_new_text(question_get_translated_field(q, "extended_description"));
+	bowl_new_text(question_get_field(q, "", "extended_description"));
 }
 
 /* boolean requires a new widget, the radio button :( */
@@ -71,7 +71,7 @@ static void drawdescbot(struct frontend *ui, struct question *q)
 int bogl_handler_boolean(struct frontend *ui, struct question *q)
 {
 	/* Should just make bowl_new_checkbox be properly const-qualified. */
-	char *desc = strdup(question_get_translated_field(q, "description"));
+	char *desc = strdup(question_get_field(q, "", "description"));
 	int ret;
 	
 #if 0
@@ -123,7 +123,7 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 	const char *p;
 
 	count = 0;
-	p = question_get_field(q, "choices");
+	p = question_get_field(q, NULL, "choices");
 	if (*p)
 	{
 		count++;
@@ -135,18 +135,18 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 	if (count <= 0) return DC_NOTOK;
 
 	choices = malloc(sizeof(char *) * count);
-	strchoicesplit(question_get_field(q, "choices"), choices, count);
+	strchoicesplit(question_get_field(q, NULL, "choices"), choices, count);
 	choices_translated = malloc(sizeof(char *) * count);
-	strchoicesplit(question_get_field(q, "choices"), choices_translated, count);
+	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, count);
 	selected = malloc(sizeof(char) * count);
 	memset(selected, ' ', count);
 
 	dcount = 1;
-	for(p = question_get_field(q, "default"); *p; p++)
+	for(p = question_get_field(q, NULL, "default"); *p; p++)
 		if(*p == ',')
 		  	dcount++;
 	defaults = malloc(sizeof(char *) * dcount);
-	dcount = strchoicesplit(question_get_field(q, "default"), defaults, dcount);
+	dcount = strchoicesplit(question_get_field(q, NULL, "default"), defaults, dcount);
 	for(j = 0; j < dcount; j++)
 	{
 		for(i = 0; i < count; i++)
@@ -171,7 +171,7 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 	if(ret == DC_OK)
 	{
 		/* Be safe - allow for commas and spaces. */
-		char *answer = malloc(strlen(question_get_translated_field(q, "choices")) + 1 + count);
+		char *answer = malloc(strlen(question_get_field(q, "", "choices")) + 1 + count);
 		answer[0] = 0;
 		for(i = 0; i < count; i++)
 			if (selected[i] == '*')
@@ -197,7 +197,7 @@ int bogl_handler_string(struct frontend *ui, struct question *q)
 
 	bowl_flush();
 	drawdesctop(ui, q);
-	bowl_new_input(&s, question_get_field(q, "default"));
+	bowl_new_input(&s, question_get_field(q, NULL, "default"));
 	drawnavbuttons(ui, q);
 	drawdescbot(ui, q);
 	bowl_layout();

@@ -223,8 +223,8 @@ static void drawdesc(struct frontend *ui, struct question *q)
 	WINDOW *descwin = UIDATA(ui)->descwin;
 
 	drawframe(ui, WIN_QUERY, ui->title);
-	wrapprint(qrywin, question_get_translated_field(q, "description"), 0, COLS-2);
-	wrapprint(descwin, question_get_translated_field(q, "extended_description"), 0, COLS-2);
+	wrapprint(qrywin, question_get_field(q, "", "description"), 0, COLS-2);
+	wrapprint(descwin, question_get_field(q, "", "extended_description"), 0, COLS-2);
 	wclrtobot(qrywin);
 	wclrtobot(descwin);
 	wrefresh(stdscr);
@@ -244,7 +244,7 @@ static int nchandler_boolean(struct frontend *ui, struct question *q)
 		value = q->value;
 	else
 	{
-		dft = (char *) q->template->get(q->template, "default");
+		dft = (char *) q->template->get(q->template, NULL, "default");
 		if (dft != 0 && *dft != 0)
 			value = dft;
 	}
@@ -359,18 +359,18 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 	char *choices[100] = {0};
 	char *choices_translated[100] = {0};
 	char *defaults[100] = {0};
-	const char *defval = question_get_field(q, "default");
+	const char *defval = question_get_field(q, NULL, "default");
 
 	int i, count, dcount, ret = 0, def = -1, pos = 2, xpos, ypos;
 	int top, bottom, longest;
 	WINDOW *win = UIDATA(ui)->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
+	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 
-	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, "default"), defaults, DIM(defaults));
+	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
+	dcount = strchoicesplit(question_get_field(q, NULL, "default"), defaults, DIM(defaults));
 
 	/* See what the currently selected value should be -- either a
 	 * previously selected value, or the default for the question

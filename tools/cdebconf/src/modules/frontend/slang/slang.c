@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.13 2002/11/18 00:37:10 barbier Exp $
+ * $Id: slang.c,v 1.14 2002/11/19 21:54:12 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -197,8 +197,8 @@ static void slang_drawdesc(struct frontend *ui, struct question *q)
 	slang_drawwin(&uid->qrywin);
 	slang_drawwin(&uid->descwin);
 	/* Draw in the descriptions */
-	slang_wrapprint(&uid->qrywin, question_get_translated_field(q, "description"), 0);
-	slang_wrapprint(&uid->descwin, question_get_translated_field(q, "extended_description"),
+	slang_wrapprint(&uid->qrywin, question_get_field(q, "", "description"), 0);
+	slang_wrapprint(&uid->descwin, question_get_field(q, "", "extended_description"),
 		uid->descstart);
 
 	/* caller should call slang_flush() ! */
@@ -319,7 +319,7 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	const char *value = "true";
 	int ret = 0, ans, pos = 2;
 
-	value = question_get_field(q, "default");
+	value = question_get_field(q, NULL, "default");
 
 	ans = (strcmp(value, "true") == 0);
 
@@ -383,9 +383,9 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	struct slwindow *win = &uid->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
-	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, "default"), defaults, DIM(defaults));
+	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
+	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
+	dcount = strchoicesplit(question_get_field(q, NULL, "default"), defaults, DIM(defaults));
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
 	if (count <= 0) return DC_NOTOK;
 
@@ -507,7 +507,7 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 	int cursor;
 	char *tmp;
 
-	STRCPY(value, question_get_field(q, "default"));
+	STRCPY(value, question_get_field(q, NULL, "default"));
 	cursor = strlen(value);
 
 	/* TODO: scrolling */

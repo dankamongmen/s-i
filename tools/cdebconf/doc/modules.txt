@@ -56,17 +56,16 @@ XXX not covering memory management or deletion
 
 Publically accessible methods:
 
-const char *lget(struct template *, const char *lang, const char *field):
-   Return a string value for given field in a language, or NULL if not found
+const char *get(struct template *, const char *lang, const char *field):
+   Return a string value for given field.
+   - If lang is NULL, English field is returned.
+   - If lang is empty, field in the current language is returned.
+   - If lang is not NULL and not empty, or if localized value does not
+     exist, English field is returned.
 
-void lset(struct template *, const char *lang, const char *field, const char *value):
-   Save string value at field for a given language
-
-const char *get(struct template *, const char *field):
-   Return a string value for given field in English
-
-void set(struct template *, const char *field, const char *value):
-   Save string value at English field
+void set(struct template *, const char *lang, const char *field, const char *value):
+   Save string value at field, see above for details about the lang
+   attribute.
 
 question API
 ~~~~~~~~~~~~
@@ -108,11 +107,9 @@ The following functions are supported:
   add an owner
 - void question_owner_delete(struct question *q, const char *owner)
   remove an owner
-- const char *question_get_field(struct question *q, const char *field):
-  return the English field from the question
-- const char *question_get_translated_field(struct question *q, const char *field):
-  return the translated (in the current language, or English if it does
-  not exist) field from the question
+- const char *question_get_field(struct question *q, const char *lang,
+        const char *field):
+  return a string field from the question
 
 XXX not dealing with variables
 XXX not dealing with memory management
@@ -311,4 +308,4 @@ you only need to override the ones you need.
 
 See modules/frontend/* for examples.
 
-$Id: modules.txt,v 1.9 2002/11/18 00:44:14 barbier Exp $
+$Id: modules.txt,v 1.10 2002/11/19 21:54:11 barbier Exp $

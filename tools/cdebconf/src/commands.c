@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.27 2002/11/18 02:00:00 tfheen Exp $
+ * $Id: commands.c,v 1.28 2002/11/19 21:54:12 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -611,14 +611,14 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 		if (strcmp(field, "value") == 0)
 			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, q->value);
 		else if (strcmp(field, "description") == 0)
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_translated_field(q, field));
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_field(q, "", field));
 		else if (strcmp(field, "extended_description") == 0)
 			/* NOTE: this probably is wrong, because the extended
 			 * description is likely multiline
 			 */
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_translated_field(q, field));
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_field(q, "", field));
 		else if (strcmp(field, "choices") == 0)
-			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_translated_field(q, field));
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS, question_get_field(q, "", field));
 		else
 			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
 	}

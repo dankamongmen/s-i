@@ -44,7 +44,7 @@ void question_variable_delete(struct question *q, const char *var,
 	const char *value);
 void question_owner_add(struct question *q, const char *owner);
 void question_owner_delete(struct question *q, const char *owner);
-const char *question_get_field(struct question *q, const char *field);
-const char *question_get_translated_field(struct question *q, const char *field);
+const char *question_get_field(struct question *q, const char *lang,
+	const char *field);
 
 #endif

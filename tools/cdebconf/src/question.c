@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.17 2002/11/18 02:00:00 tfheen Exp $
+ * $Id: question.c,v 1.18 2002/11/19 21:54:12 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -42,8 +42,6 @@
 #include "strutl.h"
 #include "configuration.h"
 #include "database.h"
-
-static char *cur_lang = NULL;
 
 struct question *question_new(const char *tag)
 {
@@ -229,42 +227,16 @@ static int question_expand_vars(struct question *q, const char *field,
 	return DC_OK;
 }
 
-const char *getlanguage(void)
-{
-	if (cur_lang == NULL)
-	{
-		if (getenv("DEBCONF_LANG")) 
-			cur_lang = strdup(getenv("DEBCONF_LANG"));
-		else
-			cur_lang = strdup("C");
-	}
-	return cur_lang;
-}
-
-const char *question_get_field(struct question *q, const char *field)
+const char *question_get_field(struct question *q, const char *lang,
+	const char *field)
 {
 	static char buf[4096] = {0};
-	if (strcmp(field, "default") == 0) {
-		if (q->value != 0 && *q->value != 0)
-			return q->value;
-		else
-			return q->template->get(q->template, field);
-	}
+	if (strcmp(field, "default") == 0 && q->value != 0 && *q->value != 0)
+		return q->value;
+
 	question_expand_vars(q,
-		q->template->get(q->template, field),
+		q->template->get(q->template, lang, field),
 		buf, sizeof(buf));
 	return buf;
 }
 
-const char *question_get_translated_field(struct question *q, const char *field)
-{
-	static char buf[4096] = {0};
-	if (strcmp(field, "default") == 0) {
-		if (q->value != 0 && *q->value != 0)
-			return q->value;
-	}
-	question_expand_vars(q,
-		q->template->lget(q->template, getlanguage(), field),
-		buf, sizeof(buf));
-	return buf;
-}

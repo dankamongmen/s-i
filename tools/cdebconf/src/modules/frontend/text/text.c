@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.18 2002/11/19 21:19:59 waldi Exp $
+ * $Id: text.c,v 1.19 2002/11/19 21:54:12 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -119,8 +119,8 @@ static void wrap_print(const char *str)
  */
 static void texthandler_displaydesc(struct frontend *obj, struct question *q) 
 {
-	wrap_print(question_get_translated_field(q, "description"));
-	wrap_print(question_get_translated_field(q, "extended_description"));
+	wrap_print(question_get_field(q, "", "description"));
+	wrap_print(question_get_field(q, "", "extended_description"));
 }
 
 /*
@@ -138,7 +138,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	int def = -1;
 	const char *defval;
 
-	defval = question_get_field(q, "default");
+	defval = question_get_field(q, NULL, "default");
 	if (defval)
 	{
 		if (strcmp(defval, "true") == 0)
@@ -190,11 +190,11 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char answer[1024] = {0};
 	int i, j, count, dcount, choice;
 
-	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
+	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 
-	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, "default"), defaults, DIM(defaults));
+	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
+	dcount = strchoicesplit(question_get_field(q, NULL, "default"), defaults, DIM(defaults));
 
 	for (j = 0; j < dcount; j++)
 		for (i = 0; i < count; i++)
@@ -309,12 +309,12 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	char *choices_translated[100] = {0};
 	char answer[10];
 	int i, count, choice = 1, def = -1;
-	const char *defval = question_get_field(q, "default");
+	const char *defval = question_get_field(q, NULL, "default");
 
-	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
+	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 
-	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
+	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
         /* fprintf(stderr,"In texthandler_select, count is: %d\n", count);*/
 	if (defval != NULL)
 	{
@@ -363,7 +363,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 static int texthandler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
-	const char *defval = question_get_field(q, "default");
+	const char *defval = question_get_field(q, NULL, "default");
 	if (defval)
 		printf(_("[default = %s]"), defval);
 	printf("> "); fflush(stdout);

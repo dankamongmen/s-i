@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.3 2002/11/18 00:37:10 barbier Exp $
+ * $Id: gtk.c,v 1.4 2002/11/19 21:54:12 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -286,7 +286,7 @@ void add_common_buttons(GtkWidget *window, GtkWidget *box, GtkWidget *bigbox, st
 	GtkWidget *descbox, *label, *elabel, *separator;
 
 	gtk_window_set_title(GTK_WINDOW(window),
-			question_get_translated_field(q, "description"));
+			question_get_field(q, "", "description"));
 
 	//set up window signal handlers
 	//TODO: move this out of here!
@@ -300,8 +300,8 @@ void add_common_buttons(GtkWidget *window, GtkWidget *box, GtkWidget *bigbox, st
 	//add question descriptions
 	descbox = gtk_vbox_new(0, 0);
 
-	label = gtk_label_new(question_get_translated_field(q, "description"));
-	elabel = gtk_label_new(question_get_translated_field(q, "extended_description"));
+	label = gtk_label_new(question_get_field(q, "", "description"));
+	elabel = gtk_label_new(question_get_field(q, "", "extended_description"));
 	gtk_box_pack_start(GTK_BOX(descbox), label, FALSE, 5, 5);
 	gtk_box_pack_start(GTK_BOX(descbox), elabel, FALSE, 5, 5);
 	gtk_widget_show(label);
@@ -364,7 +364,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q)
 	GtkWidget *hboxtop, *hboxbottom, *bigbox;
 	gboolean gbool;
 
-	defval = question_get_field(q, "default");
+	defval = question_get_field(q, NULL, "default");
 
 	if (defval)
 	{
@@ -385,7 +385,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q)
 	// but this is a start, in the future, I'll have to step through the questions and make
 	// intelligent groupings
 
-	boolButton = gtk_check_button_new_with_label ( (gchar *)question_get_translated_field(q, "description") );
+	boolButton = gtk_check_button_new_with_label ( (gchar *)question_get_field(q, "", "description") );
 	g_signal_connect (G_OBJECT (boolButton), "clicked",
 			  G_CALLBACK (check_callback), &gbool);
 	gtk_box_pack_start(GTK_BOX(hboxtop), boolButton, FALSE, 5, 5);
@@ -437,11 +437,11 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q)
 
 	memset(&call_data.choices, 0, sizeof(call_data.multiChoices));
 
-	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
+	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 
-	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, "default"), defaults, DIM(defaults));
+	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
+	dcount = strchoicesplit(question_get_field(q, NULL, "default"), defaults, DIM(defaults));
 
 	choiceButtons = (GtkWidget **)malloc( (count + 1) * (sizeof(GtkWidget *)) );
 	choiceButtons[count] = 0;
@@ -647,17 +647,17 @@ static int gtkhandler_select(struct frontend *obj, struct question *q)
 	char *choices_translated[100] = {0};
 	char answer[10];
 	int i, count, choice = 1, def = -1;
-	const char *defval = question_get_field(q, "default");
+	const char *defval = question_get_field(q, NULL, "default");
 	GtkWidget *window;
 	GtkWidget *hboxtop, *hboxbottom, *bigbox;
 	GtkWidget **choiceButtons;
 	GtkWidget *firstButton, *nextButton;
 	GtkWidget *radio;
 
-	count = strchoicesplit(question_get_field(q, "choices"), choices, DIM(choices));
+	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 
-	strchoicesplit(question_get_translated_field(q, "choices"), choices_translated, DIM(choices_translated));
+	strchoicesplit(question_get_field(q, "", "choices"), choices_translated, DIM(choices_translated));
 
 	choiceButtons = (GtkWidget **)malloc(  (count+1) * ( sizeof(GtkWidget *) )  );
 
