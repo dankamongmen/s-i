@@ -106,7 +106,7 @@ static char *execute_fdisk(void) {
 	/* try to run arch fdisk command */
 	asprintf(&fdiskcmd, "%s/%s.sh", FDISK_PATH, get_architecture());
 	if(access(fdiskcmd, R_OK) == 0) {
-		di_log(DI_LOG_LEVEL_INFO, "Using architecture depend fdisk configuration!");
+		di_log(DI_LOG_LEVEL_INFO, "Using architecture-dependent fdisk configuration!");
 		return(fdiskcmd);
 	}
 
