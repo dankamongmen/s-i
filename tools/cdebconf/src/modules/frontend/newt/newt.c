@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.1 2003/02/22 14:35:44 sjogren Exp $
+ * $Id: newt.c,v 1.2 2003/02/23 14:50:51 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -62,15 +62,17 @@
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
 
 static void
-init_and_cls(void)
+init_and_cls(int scroll)
 {
     int i, width = 80, height = 24;
 
     newtInit();
-    newtGetScreenSize(&width, &height);
-    // Fill the screen so people can shift-pgup properly
-    for (i = 0; i < height; i++)
-        putchar('\n');
+    if (scroll) {
+        newtGetScreenSize(&width, &height);
+        // Fill the screen so people can shift-pgup properly
+        for (i = 0; i < height; i++)
+            putchar('\n');
+    }
     newtCls();
 }
 
@@ -569,6 +571,8 @@ static int
 newt_initialize(struct frontend *obj, struct configuration *conf)
 {
     obj->interactive = 1;
+    init_and_cls(1);
+    newtFinished();
     return DC_OK;
 }
 
@@ -590,15 +594,9 @@ static int
 newt_go(struct frontend *obj)
 {
     struct question *q = obj->questions;
-    int i, ret, width = 80, height = 24;
+    int i, ret;
 
-    init_and_cls();
-/*    newtInit();
-    newtGetScreenSize(&width, &height);
-    // Fill the screen so people can shift-pgup properly
-    for (i = 0; i < height; i++)
-        putchar('\n');
-    newtCls(); */
+    init_and_cls(0);
     while (q != NULL) {
         for (i = 0; i < DIM(question_handlers); i++)
             if (strcmp(q->template->type, question_handlers[i].type) == 0) {
@@ -631,20 +629,15 @@ static newtComponent scale_form = NULL, scale_bar = NULL, scale_label = NULL;
 static void
 newt_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
-    int width = 80, height = 24, i;
+    int width = 80;
 
     DELETE(obj->progress_title);
     obj->progress_title = NULL;
     obj->progress_min = 0;
     obj->progress_max = max-min;
     obj->progress_cur = 0;
-    init_and_cls();
-/*    newtInit();
-    newtGetScreenSize(&width, &height);
-    // Fill the screen so people can shift-pgup properly
-    for (i = 0; i < height; i++)
-        putchar('\n');
-    newtCls(); */
+    init_and_cls(0);
+    newtGetScreenSize(&width, NULL);
     newtCenteredWindow(width-7, 5, title);
     scale_bar = newtScale(2, 1, width-11, obj->progress_max);
     scale_label = newtLabel(1, 3, "");
