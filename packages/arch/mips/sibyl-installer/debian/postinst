@@ -4,7 +4,7 @@ set -e
 . /usr/share/debconf/confmodule
 
 log() {
-	logger -t colo-installer "$@"
+	logger -t sibyl-installer "$@"
 }
 
 error() {
@@ -19,7 +19,7 @@ findfs () {
 	mount | grep "on /target${1%/} " | cut -d' ' -f1
 }
 
-db_progress START 0 3 colo-installer/progress
+db_progress START 0 3 sibyl-installer/progress
 
 # detect the partitions /target and /target/boot
 rootfs_devfs=$(findfs /)
@@ -30,22 +30,22 @@ rootfs=$(mapdevfs $rootfs_devfs)
 bootfs=$(mapdevfs $bootfs_devfs)
 bootfs_no_dev=${bootfs#/dev/}
 
-db_progress INFO colo-installer/apt-install
+db_progress INFO sibyl-installer/apt-install
 
 if ! apt-install colo ; then
 	info "Calling 'apt-install colo' failed"
-	db_input critical colo-installer/apt-install-failed || [ $? -eq 30 ]
+	db_input critical sibyl-installer/apt-install-failed || [ $? -eq 30 ]
 	if ! db_go; then
 		exit 10 # back up to menu
 	fi
-	db_get colo-installer/apt-install-failed
+	db_get sibyl-installer/apt-install-failed
 	if [ true != "$RET" ] ; then
 		exit 1
 	fi
 fi
 
 db_progress STEP 2
-db_progress INFO colo-installer/conf
+db_progress INFO sibyl-installer/conf
 
 if [ -e /target/boot/vmlinux ]; then
 	kernel=/boot/vmlinux
