@@ -32,10 +32,12 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 
 	// if we send linux keycodes, don't use ADB keymaps
 	// pretend we don't have an ADB keyboard
-	if (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes","0"))
-		k->present = TRUE;
+	// If keyboard_sends_linux_keycodes isn't present, then ADB keymap
+	// support is not even compiled into the kernel.
+	if (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes","1"))
+		k->present = FALSE;
 	else
-		k->present =  FALSE;
+		k->present = TRUE;
 
 #if 0
 	if (k->present != UNKNOWN)
