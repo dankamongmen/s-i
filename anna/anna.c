@@ -83,10 +83,12 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
         }
     }
 
+#if 0
     if (debconf_get(debconf, "debian-installer/kernel/subarchitecture"))
       subarchitecture = strdup("generic");
     else
       subarchitecture = strdup(debconf->value);
+#endif
 
     for (node = (*packages)->list.head; node; node = node->next) {
         package = node->data;
@@ -100,8 +102,10 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
           continue;
         if (is_installed(package, status))
           continue;
+#if 0
         if (!di_system_package_check_subarchitecture(package, subarchitecture))
           continue;
+#endif
 
         if (running_kernel && package_kernel && strcmp(running_kernel, package_kernel) == 0)
         {
