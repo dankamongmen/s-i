@@ -42,6 +42,26 @@ choose_retriever(di_packages *status, di_packages **packages __attribute__((unus
     return 0;
 }
 
+static int
+is_queued(di_package *package)
+{
+    FILE *fp;
+    char buf[1024];
+
+    if ((fp = fopen("/var/lib/anna-install/queue")) != NULL) {
+	while (fgets(buf, sizeof(buf), fp)) {
+	    buf[strlen(buf) - 1] = '\0';
+
+	    if (strcmp(buf, package->package) == 0) {
+		fclose(fp);
+		return 1;
+	    }
+	}
+	fclose(fp);
+    }
+
+    return 0;
+}
 
 static int
 choose_modules(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator)
@@ -112,7 +132,7 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
         }
 	else if (package_kernel)
 	  continue;
-        if (package->priority >= di_package_priority_standard)
+        if (package->priority >= di_package_priority_standard || is_queued(package))
         {
             package->status_want = di_package_status_want_install;
             di_log (DI_LOG_LEVEL_DEBUG, "install %s, priority >= standard", package->package);
