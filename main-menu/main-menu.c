@@ -27,6 +27,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+const int RAISE = 1;
+const int LOWER = 0;
+
+/* Save default priority, to be able to return to it when we have to lower it */
+int default_priority = 1;
+
+/* Save priority set by main-menu to detect priority changes from the user */
+int local_priority = -1;
+
 static int check_script(struct package_t *p, char *scriptname);
 
 static struct linkedlist_t *packages;
@@ -51,24 +60,15 @@ int compare (const void *a, const void *b) {
 		      (*(struct package_t **)a)->package);
 }
 
-/*
- * Returns 1 if the given package _should_ be the default menu item (the
- * menutest script said so), 2 if the given package _could_ be the default
- * menu item (it is unpacked or half-configured). */
 int isdefault(struct package_t *p) {
 	int check;
 
 	check = check_script(p, "menutest");
-	if (check == -1) {
-		if (p->status == unpacked || p->status == half_configured) {
-			return 2;
-		}
-		else {
-			return 0;
-		}
+	if (check == 1 || p->status == unpacked || p->status == half_configured) {
+		return 1;
 	}
 	else {
-		return check;
+		return 0;
 	}
 }
 
@@ -107,7 +107,7 @@ get_default_menu_item(struct linkedlist_t *list)
 {
 	struct package_t *p, *q;
 	struct list_node *node;
-	int i, cont, def;
+	int i, cont;
 
 	/* Traverse the list, return the first menu item that isn't installed */
 	for (node = list->head; node != NULL; node = node->next) {
@@ -115,11 +115,8 @@ get_default_menu_item(struct linkedlist_t *list)
 		if (!p->installer_menu_item || p->status == installed || !check_script(p, "isinstallable"))
 			continue;
 		/* If menutest says this item should be default, make it so */
-		def = isdefault(p);
-		if (def == 0)
+		if (!isdefault(p))
 			continue;
-		if (def == 1)
-			return p;
 		cont = 0;
                 /* Check if a "parallel" package is installed
 		 * (netcfg-{static,dhcp} and {lilo,grub}-installer are
@@ -422,7 +419,7 @@ static char *debconf_priorities[] =
   };
 
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
-static void lower_debconf_priority (void) {
+static void modify_debconf_priority (int raise_or_lower) {
 	int pri;
 	const char *template = "debconf/priority";
 	struct debconfclient *debconf = debconfclient_new();
@@ -435,20 +432,52 @@ static void lower_debconf_priority (void) {
 					debconf_priorities[pri]) )
 				break;
 		}
-	--pri;
+	if (raise_or_lower == LOWER)
+		--pri;
+	else if (raise_or_lower == RAISE)
+		++pri;
 	if (0 > pri)
 		pri = 0;
-	di_logf("Lowering debconf priority limit from '%s' to '%s'",
-		debconf->value ? debconf->value : "(null)",
-		debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
+	if (pri > default_priority)
+		pri = default_priority;
+	if (local_priority != pri) {
+		di_logf("Modifying debconf priority limit from '%s' to '%s'",
+			debconf->value ? debconf->value : "(null)",
+			debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
+		local_priority = pri;
+	    
+		debconf->command(debconf, "SET", template,
+				 debconf_priorities[pri], NULL);
+	}
+	debconfclient_delete(debconf);
 
-	debconf->command(debconf, "SET", template,
-			 debconf_priorities[pri], NULL);
+}
+	
+static void adjust_default_priority (void) {
+	int pri;
+	const char *template = "debconf/priority";
+	struct debconfclient *debconf = debconfclient_new();
+	debconf->command(debconf, "GET", template, NULL);	
+	if ( ! debconf->value )
+		pri = 1;
+	else
+	    for (pri = 0; pri < ARRAY_SIZE(debconf_priorities); ++pri) {
+		if (0 == strcmp(debconf->value,
+				debconf_priorities[pri]) )
+		    break;
+	    }
+	if ( pri != local_priority ) {
+		di_logf("Priority changed externally, setting main-menu default to '%s'",
+			debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
+		local_priority = pri;
+		default_priority = pri;
+	}
 	debconfclient_delete(debconf);
 }
 
 int main (int argc, char **argv) {
 	struct package_t *p;
+	int ret;
 
 	/* This spawns a process that traps all stderr from the rest of
 	 * main-menu and the programs it calls, storing it in STDERR_LOG. */
@@ -459,13 +488,17 @@ int main (int argc, char **argv) {
 
 	packages = di_status_read();
 	while ((p=show_main_menu(packages))) {
-		if (!do_menu_item(p)) {
+		ret = do_menu_item(p);
+		adjust_default_priority();
+		if (!ret) {
 			di_logf("Menu item '%s' failed.", p->package);
 			/* Something went wrong.  Lower debconf
 			   priority limit to try to give the user more
 			   control over the situation. */
-			lower_debconf_priority();
+			modify_debconf_priority(LOWER);
 		}
+		else
+			modify_debconf_priority(RAISE);
 		
 		/* Check for pending stderr in the stderr log, and
 		 * display it in a nice debconf dialog. */
