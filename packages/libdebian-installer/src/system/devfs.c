@@ -82,14 +82,14 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 69,	0,	"sd",		ENTRY_TYPE_DISC,	80,	4 },
     { 70,	0,	"sd",		ENTRY_TYPE_DISC,	96,	4 },
     { 71,	0,	"sd",		ENTRY_TYPE_DISC,	112,	4 },
-    { 72,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	0,	3 },
-    { 73,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	1,	3 },
-    { 74,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	2,	3 },
-    { 75,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	3,	3 },
-    { 76,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	4,	3 },
-    { 77,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	5,	3 },
-    { 78,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	6,	3 },
-    { 79,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	7,	3 },
+    { 72,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	0,	4 },
+    { 73,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	1,	4 },
+    { 74,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	2,	4 },
+    { 75,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	3,	4 },
+    { 76,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	4,	4 },
+    { 77,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	5,	4 },
+    { 78,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	6,	4 },
+    { 79,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	7,	4 },
     { 88,	0,	"hd",		ENTRY_TYPE_DISC,	12,	6 },
     { 89,	0,	"hd",		ENTRY_TYPE_DISC,	14,	6 },
     { 90,	0,	"hd",		ENTRY_TYPE_DISC,	16,	6 },
@@ -148,9 +148,6 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
 
     case ENTRY_TYPE_NUMBER:
       disc = minor (s.st_rdev) - e->minor + e->entry_first;
-
-      ret = di_snprintfcat (buf, n, "%s%d", e->name, disc);
-      break;
 
     case ENTRY_TYPE_DISC:
     case ENTRY_TYPE_DISC_ARRAY:
