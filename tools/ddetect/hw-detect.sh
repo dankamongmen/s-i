@@ -79,7 +79,7 @@ discover_hw () {
     else
         # must be Discover 1.x
         /sbin/discover --format="%m\t%V %M\n" \
-            --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom |
+            --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
 	  sed 's/ $//'
     fi
 }
