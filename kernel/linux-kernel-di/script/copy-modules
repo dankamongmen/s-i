@@ -6,7 +6,7 @@
 #
 # Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
 #
-# $Id: copy-modules,v 1.1 2003/10/11 16:17:15 joeyh Rel $
+# $Id: copy-modules,v 1.2 2003/10/12 16:55:11 joeyh Rel $
 
 set -e
 
@@ -56,7 +56,6 @@ unset moddir_awk
 
 mkdir $tmpdir/module-deps $tmpdir/module-list
 
-mkfifo $tmpdir/fifo
 for i in $(
 	{
 		find modules/ -maxdepth 1 -type f -printf "%f\t%f\n"
@@ -78,12 +77,11 @@ for i in $(
 	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
 
 	cd $moddir/kernel
-	tar cfT - $tmpdir/module-list/$i > $tmpdir/fifo&
-	{
+	tar cfT - $tmpdir/module-list/$i |
+	(
 		dir=$home/debian/$i-$version-di/lib/modules/$version/kernel
 		mkdir -p $dir
 		cd $dir
 		tar xf -
-	} < $tmpdir/fifo
-	wait $!
+	)
 done
