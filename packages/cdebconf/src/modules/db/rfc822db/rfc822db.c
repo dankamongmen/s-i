@@ -438,8 +438,8 @@ void rfc822db_question_dump(const void *node, const VISIT which, const int depth
         INFO(INFO_VERBOSE, "dumping question %s\n", (q)->tag); 
         fprintf(outf, "Name: %s\n", escapestr((q)->tag));
         fprintf(outf, "Template: %s\n", escapestr((q)->template->tag));
-        if (((q)->flags & DC_QFLAG_SEEN) || (q)->value)
-            fprintf(outf, "Value: %s\n", ((q)->value ? escapestr((q)->value) : ""));
+        if ((q)->value)
+            fprintf(outf, "Value: %s\n", escapestr((q)->value));
 
         if ((owner = (q)->owners))
         {
