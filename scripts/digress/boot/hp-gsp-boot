@@ -1,0 +1,41 @@
+#!/usr/bin/expect
+# Uses the GSP to reset the system. The system may be powered off, it will
+# be turned on if so. After reset, gets to the boot menu and sends the
+# defined boot command.
+spawn -noecho "hp-gsp-prompt"
+
+send "\r"
+expect "GSP>"
+
+send "rs\r"
+expect {
+	"SPU power is down" {
+		send "pc\r"
+		expect "Do you wish to turn power On"
+		send "y\nr"
+		expect "Enter delay"
+		send "0\r"
+		expect "Confirm?"
+		send "y\r"
+		expect "System has been powered On"
+	} "Type Y to confirm your intention to restart the system" {
+		send "y\r"
+	}
+}
+
+set timeout 120
+expect "System Boot detected"
+set timeout 600
+expect "End of early boot detected"
+set timeout 120
+expect "Processor is booting from first available device"
+send "\r"
+expect "Main Menu:"
+send $env(HP_GSP_BOOTCOMMAND)
+send "\r"
+expect "Interact with IPL"
+expect ">"
+send "n\r"
+expect "Booting..."
+
+exit

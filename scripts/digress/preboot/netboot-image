@@ -23,8 +23,8 @@ if [ ! -e "$NETBOOT_IMAGE" ]; then
 fi
 
 (
-	if [ "$ARCH" = sparc ]; then
-		cp "$NETBOOT_IMAGE" $TFTP_DIR
+	if [ "$ARCH" = sparc ] || [ "$ARCH" = hppa ]; then
+		cp "$NETBOOT_IMAGE" $TFTP_DIR/$TFTP_IMAGE
 	else
 		cd $TFTP_DIR
 		if ! tar zxf $NETBOOT_IMAGE; then
