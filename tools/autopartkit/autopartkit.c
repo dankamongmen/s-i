@@ -160,7 +160,7 @@ autopartkit_error (int isfatal, const char * format, ...)
     if (-1 == vasprintf(&msg, format, ap))
     {
         /* fatal error */
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     va_end(ap);
 
@@ -238,7 +238,7 @@ static void autopartkit_confirm(void)
 	confirm = 1;
 	return;
     } else {
-	exit(1);
+	exit(EXIT_FAILURE);
     }
 }
 
