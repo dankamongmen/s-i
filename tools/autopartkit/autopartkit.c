@@ -1267,6 +1267,8 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                         if (0 == strcmp(buf, mountmap[i].devpath))
                         {
                             free(mountmap[i].devpath);
+                            /* XXX Should not hardcode fstype */
+                            mountmap[i].mountpoint->fstype = "ext3";
                             mountmap[i].devpath = devpath;
                         }
                 }
