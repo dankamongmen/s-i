@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Probe and setup USB 
+if [ -e /proc/bus/pci/devices ]; then
+
+	OHCI=no
+	UHCI=no
+
+	# Probe for OHCI first
+	while read REPLY ; do 
+	if  grep -q $REPLY /proc/bus/pci/devices ; then
+		OHCI=yes
+	fi
+	done <  /usr/lib/usb-discover/ohci-pci.lst 
+
+	while read REPLY ; do 
+		if  grep -q $REPLY /proc/bus/pci/devices ; then
+			UHCI=yes
+		fi
+	done  <  /usr/lib/usb-discover/uhci-pci.lst 
+
+	if [ "$OHCI" = yes ] ; then
+		modprobe usb-ohci
+	fi
+	if [ "$UHCI" = yes ] ; then
+		modprobe usb-uhci
+	fi
+
+	/sbin/modprobe usbkbd  || true
+	/sbin/modprobe keybdev || true 
+	/sbin/modprobe usbserial  || true
+fi
