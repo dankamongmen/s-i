@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
-AC_INIT([autopartkit],[0.75],[linuxiskolen@skolelinux.no])
-AM_INIT_AUTOMAKE(autopartkit, 0.75)
+AC_INIT([autopartkit],[0.76],[debian-boot@lists.debian.org])
+AM_INIT_AUTOMAKE(autopartkit, 0.76)
 
 AC_CONFIG_SRCDIR([autopartkit.c])
 AM_CONFIG_HEADER(config.h)
@@ -31,7 +31,7 @@ fi
 # Checks for libraries.
 AC_CHECK_LIB([debconfclient], [debconfclient_new])
 AC_CHECK_LIB([dl], [dlopen])
-#AC_CHECK_LIB([uuid], [uuid_generate])
+AC_CHECK_LIB([uuid], [uuid_generate])
 AC_CHECK_LIB([parted], [ped_constraint_any])
 AC_CHECK_LIB([m], [floor])
 
