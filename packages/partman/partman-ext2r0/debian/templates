@@ -1,0 +1,73 @@
+Template: partman-ext3/progress_checking
+Type: text
+_Description: Checking the ext3 file system in partition #${PARTITION} of ${DEVICE}...
+
+Template: partman-ext3/check_failed
+Type: boolean
+_Description: Go back to the menu and correct errors?
+ The test of the file system with type ext3 in partition #${PARTITION}
+ of ${DEVICE} found uncorrected errors.
+ .
+ If you do not go back to the partitioning menu and correct these errors,
+ the partition will not be used at all.
+
+Template: partman-ext3/create_failed
+Type: error
+_Description: Failed to create a file system
+ The ext3 file system creation in partition
+ #${PARTITION} of ${DEVICE} failed.
+
+Template: partman-ext3/no_mount_point
+Type: boolean
+_Description: Do you want to return to the partitioning menu?
+ No mount point is assigned for the ext3 filesystem in partition
+ #${PARTITION} of ${DEVICE}.
+ .
+ If you do not go back to the partitioning menu and assign a mount point
+ from there, this partition will not be used at all.
+
+Template: partman-ext3/mountpoint
+Type: select
+_Choices: /, /boot, /home, /tmp, /usr, /usr/local, /var, Enter manually, Do not mount it
+_Description: Mount point for this partition:
+
+Template: partman-ext3/mountpoint_manual
+Type: string
+_Description: Mount point for this partition:
+
+Template: partman-ext3/bad_mountpoint
+Type: error
+_Description: Invalid mount point
+ The mount point you entered is invalid.
+ .
+ Mount points must start with "/". They cannot contain spaces.
+
+Template: partman-ext3/text/specify_mountpoint
+Type: text
+# This is an item in the menu "Action on the partition"
+_Description: Mount point:
+
+Template: partman-ext3/text/ext3
+Type: text
+# File system name (untranslatable in many languages)
+_Description: ext3
+
+Template: partman-ext3/text/options
+Type: text
+_Description: Mount options:
+
+Template: partman-ext3/options
+Type: multiselect
+__Choices: noatime - do not update inode access times at each access, nodev - do not support character or block special devices, nosuid - ignore set-user-identifier or set-group-identifier bits, noexec - do not allow execution of any binaries, ro - mount the file system read-only, sync - all input/output activities occur synchronously, usrquota - user disk quota accounting enabled, grpquota - group disk quota accounting enabled
+_Description: Mount options:
+ Mount options can tune the behavior of the file system.
+
+Template: partman/filesystem_long/ext3
+Type: text
+# File system name
+_Description: ext3 journalling file system
+
+Template: partman/filesystem_short/ext3
+Type: text
+# Short file system name (untranslatable in many languages)
+_Description: ext3
