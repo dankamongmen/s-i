@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.21 2000/12/07 23:09:07 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.22 2000/12/08 05:59:10 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -80,7 +80,7 @@ static int dpkg_doconfigure(struct package_t *pkg)
 		if ((r = do_system(buf)) != 0)
 		{
 			fprintf(stderr, "postinst exited with status %d\n", r);
-			pkg->status |= STATUS_STATUSPOSTINSTFAILED;
+			pkg->status |= STATUS_STATUSHALFCONFIGURED;
 			return 1;
 		}
 	}

@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.17 2000/11/29 21:25:54 joeyh Exp $ */
+/* $Id: status.c,v 1.18 2000/12/08 05:59:10 joeyh Rel $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -27,7 +27,7 @@ static const char *statuswords[][10] = {
 	{ (char *)STATUS_FLAGSTART, "ok", "reinstreq", "hold", 
 		"hold-reinstreq", 0 },
 	{ (char *)STATUS_STATUSSTART, "not-installed", "unpacked", 
-		"half-configured", "installed", "half-installed",
+		"installed", "half-installed",
 		"config-files", "post-inst-failed", 
 		"removal-failed", 0 }
 };
