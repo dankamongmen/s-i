@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: release.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: release.h,v 1.2 2003/09/30 19:22:07 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__RELEASE_H
@@ -55,7 +55,11 @@ struct di_release
  */
 struct di_release_file
 {
-  di_rstring key;                               /**< name */
+  union
+  {
+    char *filename;                             /**< filename */
+    di_rstring key;                             /**< @internal */
+  };
   unsigned int size;                            /**< size */
   char *sum;                                    /**< checksum, currently md5 or sha */
 };

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: package_parser.c,v 1.3 2003/09/30 19:22:07 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -334,7 +334,7 @@ void di_package_parser_write_dependency (data, fip, callback, callback_data, use
   di_rstring value = { NULL, 0 };
   di_ksize_t value_size = 0, value_size_needed;
 
-  for (node = p->depends.first; node; node = node->next)
+  for (node = p->depends.head; node; node = node->next)
   {
     di_package_dependency *d = node->data;
 

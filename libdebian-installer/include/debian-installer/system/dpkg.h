@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.h,v 1.4 2003/09/26 00:18:09 waldi Exp $
+ * $Id: dpkg.h,v 1.5 2003/09/30 19:22:07 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__DPKG_H
@@ -32,8 +32,12 @@
 #define DI_SYSTEM_DPKG_STATUSFILE DI_SYSTEM_DPKG_ADMINDIR "status"
 #define DI_SYSTEM_DPKG_TMPCONTROLDIR DI_SYSTEM_DPKG_ADMINDIR "tmp.ci/"
 
+#if 0
 int di_system_dpkg_package_configure (di_packages *status, const char *package, bool force);
-int di_system_dpkg_package_control_file_exec (di_packages *status, const char *package, const char *name, int argc, const char *const argv[]);
+#endif
+int di_system_dpkg_package_control_file_exec (di_package *package, const char *name, int argc, const char *const argv[]);
+#if 0
 int di_system_dpkg_package_unpack (di_packages *status, const char *_package, const char *filename, di_packages_allocator *allocator);
+#endif
 
 #endif

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.6 2003/09/29 14:08:48 waldi Exp $
+ * $Id: packages.c,v 1.7 2003/09/30 19:22:07 waldi Exp $
  */
 
 #include <debian-installer/packages_internal.h>
@@ -171,7 +171,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
     {
       case di_package_type_real_package:
         di_log (DI_LOG_LEVEL_DEBUG, "consider package %s on %p\n", package->package, package);
-        for (node = package->depends.first; node; node = node->next)
+        for (node = package->depends.head; node; node = node->next)
         {
           di_package_dependency *d = node->data;
 
@@ -179,7 +179,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
           {
 #if 1
             if (!shutup && package->priority > d->ptr->priority)
-              di_log (DI_LOG_LEVEL_INFO, "broken dependency: %s to %s", package->key.string, d->ptr->key.string);
+              di_log (DI_LOG_LEVEL_INFO, "broken dependency: %s to %s", package->package, d->ptr->package);
 #endif
             resolve_dependencies_recurse (install, d->ptr, package, allocator, resolver, shutup);
           }
@@ -197,7 +197,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
       case di_package_type_virtual_package:
         best_provide = NULL;
 
-        for (node = package->depends.first; node; node = node->next)
+        for (node = package->depends.head; node; node = node->next)
         {
           di_package_dependency *d = node->data;
 
@@ -217,7 +217,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
 
       case di_package_type_non_existent:
         if (!shutup)
-          di_log (DI_LOG_LEVEL_WARNING, "package %s don't exists", package->key.string);
+          di_log (DI_LOG_LEVEL_WARNING, "package %s don't exists", package->package);
         break;
     }
   }
@@ -230,7 +230,7 @@ static void resolve_dependencies_marker (di_packages *packages)
   else if (packages->resolver > INT_MAX)
   {
     di_slist_node *node;
-    for (node = packages->list.first; node; node = node->next)
+    for (node = packages->list.head; node; node = node->next)
     {
       di_package *p = node->data;
       p->resolver = 0;
@@ -249,11 +249,23 @@ di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *lis
 
   resolve_dependencies_marker (packages);
 
-  for (node = list->first; node; node = node->next)
+  for (node = list->head; node; node = node->next)
   {
     di_package *p = node->data;
     resolve_dependencies_recurse (install, p, NULL, allocator, packages->resolver, 0);
   }
+
+  return install;
+}
+
+di_slist *di_packages_resolve_dependencies_array (di_packages *packages, di_package **array, di_packages_allocator *allocator)
+{
+  di_slist *install = di_slist_alloc ();
+
+  resolve_dependencies_marker (packages);
+
+  while (*array)
+    resolve_dependencies_recurse (install, *array++, NULL, allocator, packages->resolver, 0);
 
   return install;
 }
@@ -264,7 +276,7 @@ void di_packages_resolve_dependencies_mark (di_packages *packages)
 
   resolve_dependencies_marker (packages);
 
-  for (node = packages->list.first; node; node = node->next)
+  for (node = packages->list.head; node; node = node->next)
   {
     di_package *package = node->data;
     if (!(package->resolver & packages->resolver) && package->status_want == di_package_status_want_install)

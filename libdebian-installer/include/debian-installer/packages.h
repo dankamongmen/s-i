@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.6 2003/09/29 12:10:00 waldi Exp $
+ * $Id: packages.h,v 1.7 2003/09/30 19:22:07 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGES_H
@@ -75,6 +75,7 @@ di_package *di_packages_get_package (di_packages *packages, const char *name, si
 di_package *di_packages_get_package_new (di_packages *packages, di_packages_allocator *allocator, char *name, size_t n);
 
 di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *list, di_packages_allocator *allocator);
+di_slist *di_packages_resolve_dependencies_array (di_packages *packages, di_package **array, di_packages_allocator *allocator);
 void di_packages_resolve_dependencies_mark (di_packages *packages);
 
 /** @} */
@@ -95,8 +96,8 @@ di_parser_info *di_packages_parser_info (void);
 di_parser_info *di_packages_minimal_parser_info (void);
 di_parser_info *di_packages_status_parser_info (void);
 
-di_packages *di_packages_special_read_file (const char *file, di_packages_allocator *allocator, di_parser_info *(info)(void));
-int di_packages_special_write_file (di_packages *packages, const char *file, di_parser_info *(info)(void));
+di_packages *di_packages_special_read_file (const char *file, di_packages_allocator *allocator, di_parser_info *(info) (void));
+int di_packages_special_write_file (di_packages *packages, const char *file, di_parser_info *(info) (void));
 
 /**
  * Read a standard Packages file

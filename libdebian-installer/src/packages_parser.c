@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages_parser.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: packages_parser.c,v 1.3 2003/09/30 19:22:07 waldi Exp $
  */
 
 #include <debian-installer/packages_internal.h>
@@ -40,7 +40,7 @@ const di_parser_fieldinfo
       "Package",
       di_packages_parser_read_name,
       di_parser_write_string,
-      offsetof (di_package, key.string)
+      offsetof (di_package, package)
     );
 
 /**
@@ -133,7 +133,7 @@ di_parser_info *di_packages_parser_info (void)
  * @internal
  * Get parser info for minimal Packages file
  */
-di_parser_info *di_packages_minimal_parser_info (void)
+di_parser_info *di_packages_minimal_parser_info ()
 {
   di_parser_info *info;
 
@@ -205,10 +205,10 @@ void *internal_di_packages_parser_write_entry_next (void **state_data, void *use
   if (!*state_data)
   {
     di_packages *p = user_data;
-    if (p->list.first)
+    if (p->list.head)
     {
-      *state_data = p->list.first;
-      return p->list.first->data;
+      *state_data = p->list.head;
+      return p->list.head->data;
     }
     else
       return NULL;

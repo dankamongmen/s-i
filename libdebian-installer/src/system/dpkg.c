@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.c,v 1.5 2003/09/29 12:10:00 waldi Exp $
+ * $Id: dpkg.c,v 1.6 2003/09/30 19:22:07 waldi Exp $
  */
 
 #include <config.h>
@@ -34,11 +34,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#if 0
 int di_system_dpkg_package_configure (di_packages *status, const char *_package, bool force)
 {
   di_package *package;
   /* i don't think that is correct, but who cares? */
-  const char *argv_config[] = { "configure", NULL };
   const char *argv_postinst[] = { "configure", NULL };
   int ret;
 
@@ -60,10 +60,7 @@ int di_system_dpkg_package_configure (di_packages *status, const char *_package,
 
   package->status = di_package_status_half_configured;
 
-  ret = internal_di_system_dpkg_package_control_file_exec (package, "config", sizeof (argv_config), argv_config);
-  if (ret)
-    return -2;
-  ret = internal_di_system_dpkg_package_control_file_exec (package, "postinst", sizeof (argv_postinst), argv_postinst);
+  ret = di_system_dpkg_package_control_file_exec (package, "postinst", sizeof (argv_postinst), argv_postinst);
   if (ret)
     return -3;
 
@@ -71,20 +68,21 @@ int di_system_dpkg_package_configure (di_packages *status, const char *_package,
 
   return 0;
 }
+#endif
 
-int internal_di_system_dpkg_package_control_file_exec (di_package *package, const char *name, int argc, const char *const argv[])
+int di_system_dpkg_package_control_file_exec (di_package *package, const char *name, int argc, const char *const argv[])
 {
   char buf[PATH_MAX];
   const char *real_argv[argc + 1];
   int i;
   struct stat statbuf;
 
-  snprintf (buf, sizeof (buf), "%s%s.%s", DI_SYSTEM_DPKG_INFODIR, package->key.string, name);
+  snprintf (buf, sizeof (buf), "%s%s.%s", DI_SYSTEM_DPKG_INFODIR, package->package, name);
 
   if (stat (buf, &statbuf))
-    return 0;
+    return -1;
   if (!S_ISREG (statbuf.st_mode))
-    return 0;
+    return -1;
 
   real_argv[0] = buf;
   for (i = 0; i < argc; i++)
@@ -93,17 +91,7 @@ int internal_di_system_dpkg_package_control_file_exec (di_package *package, cons
   return di_exec (buf, real_argv);
 }
 
-int di_system_dpkg_package_control_file_exec (di_packages *status, const char *_package, const char *name, int argc, const char *const argv[])
-{
-  di_package *package;
-
-  package = di_packages_get_package (status, _package, 0);
-  if (!package)
-    return -1;
-
-  return internal_di_system_dpkg_package_control_file_exec (package, name, argc, argv);
-}
-
+#if 0
 int internal_di_system_dpkg_package_unpack_control (di_packages *status, di_package **package, const char *_package, const char *filename, di_packages_allocator *allocator)
 {
   const char *argv_rm[] = { "/bin/rm", "-rf", NULL, NULL };
@@ -221,4 +209,5 @@ int di_system_dpkg_package_unpack (di_packages *status, const char *_package, co
 
   return ret;
 }
+#endif
 

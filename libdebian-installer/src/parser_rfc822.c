@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser_rfc822.c,v 1.4 2003/09/29 12:10:00 waldi Exp $
+ * $Id: parser_rfc822.c,v 1.5 2003/09/30 19:22:07 waldi Exp $
  */
 
 #include <config.h>
@@ -289,7 +289,7 @@ int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_pars
 
     nr++;
 
-    for (node = info->list.first; node; node = node->next)
+    for (node = info->list.head; node; node = node->next)
     {
       fip = node->data;
       if (fip->write)

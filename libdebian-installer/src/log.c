@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.3 2003/09/29 14:08:48 waldi Exp $
+ * $Id: log.c,v 1.4 2003/09/30 19:22:07 waldi Exp $
  */
 
 #include <debian-installer/log.h>
@@ -166,7 +166,7 @@ static di_log_handler *di_log_get_handler (di_log_level_flags log_level, void **
 {
   di_slist_node *node;
 
-  for (node = handlers.first; node; node = node->next)
+  for (node = handlers.head; node; node = node->next)
   {
     di_log_handler_struct *handler = node->data;
 

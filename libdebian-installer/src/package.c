@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: package.c,v 1.3 2003/09/30 19:22:07 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -33,7 +33,7 @@ void internal_di_package_destroy_func (void *data)
 
 void di_package_destroy (di_package *package)
 {
-  di_free (package->key.string);
+  di_free (package->package);
   di_free (package->section);
   di_free (package->maintainer);
   di_free (package->architecture);

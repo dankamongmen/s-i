@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: release.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: release.c,v 1.3 2003/09/30 19:22:07 waldi Exp $
  */
 
 #include <debian-installer/release.h>
@@ -88,7 +88,7 @@ static void di_release_file_destroy_func (void *data)
 {
   di_release_file *file = data;
 
-  di_free (file->key.string);
+  di_free (file->filename);
   di_free (file->sum);
 }
 
