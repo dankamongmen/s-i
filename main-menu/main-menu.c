@@ -411,8 +411,9 @@ static char *debconf_priorities[] =
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 static void lower_debconf_priority (void) {
 	int pri;
+	const char *template = "debconf/priority"
 	struct debconfclient *debconf = debconfclient_new();
-	debconf->command(debconf, "GET", "debconf/priority", NULL);
+	debconf->command(debconf, "GET", template, NULL);
 	if ( ! debconf->value )
 		pri = 1;
 	else
@@ -424,10 +425,16 @@ static void lower_debconf_priority (void) {
 	--pri;
 	if (0 > pri)
 		pri = 0;
+	{ /* XXX This code can be rewritten when di_logf() is available */
+		char buf[256];
+		snprintf(buf, sizeof(buf),
+			 "Lowering debconf priority limit from '%s' to '%s'",
+			 debconf->value ? debconf->value : "(null)",
+			 debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
+		di_log(buf);
+	}
 
-	di_log("Lowering debconf priority limit");
-
-	debconf->command(debconf, "SET", "debconf/priority",
+	debconf->command(debconf, "SET", template,
 			 debconf_priorities[pri], NULL);
 	debconfclient_delete(debconf);
 }
