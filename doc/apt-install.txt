@@ -54,6 +54,9 @@ and in this case will run 'apt-get install' try to fetch and install
 the packages.  If base-installer isn't completed, it will add the
 package name to /var/lib/apt-install/queue.
 
+To make sure apt-install is available as early as possible, the script
+is included in the rootskel package.
+
 At the end of the base-installer postinst script, it will check this
 file and install the packages listed in the file, something like this:
 
@@ -64,14 +67,15 @@ file and install the packages listed in the file, something like this:
 Files
 -----
 
-  /usr/bin/apt-install         - request a package installed into /target/
+  /bin/apt-install             - request a package installed into /target/
   /var/lib/apt-install/queue   - package queue, installed by base-installer
   /target/etc/apt/sources.list - file created when base-installer completes
 
 Open questions
 --------------
 
- - Which udeb should contain apt-install? [rootskel?]
+ - Which udeb should contain apt-install? [The first package,
+   rootskel, seem like a good choice.]
 
  - Should apt-update from base-installer be in the same package as
    apt-install?
@@ -80,7 +84,7 @@ Open questions
    successfully?  A flag file, or some other mechanism?  [I believe
    /target/apt/sources.list is a good choice.]
 
- - What names should the programs have?
+ - What names should the programs have? [I go with apt-install for now]
 
  - Where should the queue file be located, and what should it be
    called? [I believe /var/lib/apt-install/queue is a good place]
