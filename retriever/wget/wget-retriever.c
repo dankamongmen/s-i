@@ -13,7 +13,6 @@
 #include <stdio.h>
 
 #define DEBCONF_BASE "mirror/"
-#define DEMO 1
 
 int main(int argc, char **argv) {
 	int ret;
@@ -30,15 +29,6 @@ int main(int argc, char **argv) {
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/directory", NULL);
 	directory=debconf->value;
 	
-#ifdef DEMO
-	/*
-	 * For the demo system, ignore this, and use the only repository we 
-	 * have.
-	 */
-	hostname="people.debian.org";
-	directory="/~joeyh/debian-installer/udebs";
-#endif
-	
 	src=argv[1];
 	/*
 	 * Intercept requests for a Packages file, and
@@ -47,17 +37,10 @@ int main(int argc, char **argv) {
 	 * root directory.)
 	 */
 	if (strcmp(src, "Packages") == 0) {
-#ifndef DEMO
 		/* TODO: obviously this path is woody specific. FIXME */
-		/*
-		 * It's also probably not right, but we won't know until
-		 * elmo gets off his ass.
-		 */
-		src="dists/woody/main/installer-" ARCH "/Packages";
-#else
-		/* For the demo system, I just hardcode this. */
-		src="Packages";
-#endif
+		/* One way to fix this is choose-mirror could prompt for
+		 * what version to install */
+		src="dists/woody/main/debian-installer/binary-" ARCH "/Packages";
 	}
 	
 	command=malloc( 15 /* wget -q http:// */ + strlen(hostname) +
