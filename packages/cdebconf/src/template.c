@@ -12,6 +12,8 @@ static char *template_get_internal(struct template *t, const char *lang,
 static void template_lset(struct template *t, const char *lang,
                 const char *field, const char *value);
 static char *template_next_lang(struct template *t, const char *l);
+static struct template_l10n_fields *template_cur_l10n_fields(struct template *t,
+                const char *lang);
 static char *getlanguage(void);
 static void remove_newlines(char *);
 
@@ -168,6 +170,7 @@ struct template *template_dup(struct template *t)
         /*  Iterate over available languages  */
         while (1)
         {
+                to->language = STRDUP(from->language);
                 to->defaultval = STRDUP(from->defaultval);
                 to->choices = STRDUP(from->choices);
                 to->indices = STRDUP(from->indices);
@@ -183,6 +186,74 @@ struct template *template_dup(struct template *t)
                 memset(to->next, 0, sizeof(struct template_l10n_fields));
                 from = from->next;
                 to = to->next;
+        }
+        return ret;
+}
+
+struct template *template_l10nmerge(struct template *ret, struct template *t)
+{
+        struct template_l10n_fields *from, *to;
+        int same_choices, same_description;
+
+        if (strcmp(ret->type, t->type) != 0)
+                return NULL;
+        if (t->fields == NULL)
+                return ret;
+
+        if (ret->fields == NULL)
+        {
+                ret->fields = NEW(struct template_l10n_fields);
+                memset(ret->fields, 0, sizeof(struct template_l10n_fields));
+        }
+
+        from = t->fields;
+        to = ret->fields;
+        same_choices = (to->choices == NULL || from->choices == NULL || strcmp(from->choices, to->choices) == 0);
+        same_description = (strcmp(from->description, to->description) == 0 &&
+                            strcmp(from->extended_description, to->extended_description) == 0);
+        /*  Delete outdated translations */
+        if (!same_choices || !same_description)
+        {
+                while (to->next != NULL)
+                {
+                        to = to->next;
+                        if (!same_choices)
+                        {
+                                DELETE(to->choices);
+                                DELETE(to->indices);
+                        }
+                        if (!same_description)
+                        {
+                                DELETE(to->description);
+                                DELETE(to->extended_description);
+                        }
+                }
+        }
+
+        /*  Iterate over available languages  */
+        for (from = t->fields; from != NULL; from = from->next)
+        {
+                to = template_cur_l10n_fields(ret, from->language);
+                if (to == NULL)
+                {
+                        to = ret->fields;
+                        while (to->next != NULL)
+                                to = to->next;
+                        to->next = NEW(struct template_l10n_fields);
+                        memset(to->next, 0, sizeof(struct template_l10n_fields));
+                        to = to->next;
+                        to->language = STRDUP(from->language);
+                }
+                if (from->defaultval != NULL && *(from->defaultval) != '\0')
+                        to->defaultval = STRDUP(from->defaultval);
+                if (from->choices != NULL && *(from->choices) != '\0')
+                        to->choices = STRDUP(from->choices);
+                if (from->indices != NULL && *(from->indices) != '\0')
+                        to->indices = STRDUP(from->indices);
+                if (from->description != NULL && *(from->description) != '\0')
+                        to->description = STRDUP(from->description);
+                if (from->extended_description != NULL && *(from->extended_description) != '\0')
+                        to->extended_description = STRDUP(from->extended_description);
         }
         return ret;
 }
@@ -410,7 +481,8 @@ static void template_lset(struct template *t, const char *lang,
     template_field_set(p, field, value);
 }
 
-static char *template_next_lang(struct template *t, const char *lang)
+static struct template_l10n_fields *template_cur_l10n_fields(struct template *t,
+                const char *lang)
 {
     struct template_l10n_fields *p;
 
@@ -418,13 +490,17 @@ static char *template_next_lang(struct template *t, const char *lang)
     while (p != NULL)
     {
         if (lang == NULL || strcmp(p->language, lang) == 0)
-        {
-            if (p->next == NULL)
-                return NULL;
-            return p->next->language;
-        }
+            return p;
         p = p->next;
     }
+    return NULL;
+}
+
+static char *template_next_lang(struct template *t, const char *lang)
+{
+    struct template_l10n_fields *p = template_cur_l10n_fields(t, lang);
+    if (p != NULL && p->next != NULL)
+        return p->next->language;
     return NULL;
 }
 

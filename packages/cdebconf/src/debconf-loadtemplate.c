@@ -12,16 +12,44 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <getopt.h>
 #include <stdlib.h>
 #include <locale.h>
 
-void parsecmdline(struct configuration *config, int argc, char **argv)
+int merge = 0;
+static struct option options[] = {
+    { "merge", 0, &merge, 'm' },
+    { "help", 0, 0, 'h' },
+    { 0, 0, 0, 0 },
+};
+
+static void usage(char *progname, int rc)
 {
-    if (argc < 3)
+    fprintf(stderr, "Usage: %s [--merge] <owner> <template>\n", progname);
+    exit(rc);
+}
+
+static void parsecmdline(struct configuration *config, int argc, char **argv)
+{
+    int c;
+
+    while ((c = getopt_long(argc, argv, "hm", options, NULL)) > 0)
     {
-        fprintf(stderr, "%s <owner> <template>\n", argv[0]);
-        exit(-1);
+        switch(c)
+        {
+            case 'h':
+                usage(argv[0], 0);
+                break;
+            case 'm':
+                break;
+            default:
+                fprintf(stderr, "Try '%s --help' for more information.\n", argv[0]);
+                exit(-1);
+                break;
+        }
     }
+    if (argc < 2+optind)
+        usage(argv[0], -1);
 }
 
 void add_questions_debconf(int argc, char **argv)
@@ -30,7 +58,7 @@ void add_questions_debconf(int argc, char **argv)
     struct debconfclient *client;
     client = debconfclient_new ();
         
-    for (i = 2; i <= argc; i++)
+    for (i = optind; i <= argc; i++)
     {
         if (argv[i])
             client->command (client, "X_LOADTEMPLATEFILE", 
@@ -45,7 +73,9 @@ int main(int argc, char **argv)
     struct template_db *tdb = NULL;
     struct template *t = NULL;
     struct question *q = NULL;
-    int i = 2;
+    struct template *oldt = NULL;
+    char *owner;
+    int i;
 
     setlocale(LC_ALL, "");
 
@@ -76,13 +106,21 @@ int main(int argc, char **argv)
     tdb->methods.load(tdb);
     qdb->methods.load(qdb);
 
+    owner = argv[optind];
+    i = optind + 1;
     while (i < argc)
     {
         t = template_load(argv[i++]);
         while (t)
         {
-            if (tdb->methods.set(tdb, t) != DC_OK)
-                INFO(INFO_ERROR, "Cannot add template %s", t->tag);
+            oldt = tdb->methods.get(tdb, t->tag);
+            if (oldt != NULL && merge != 0)
+                template_l10nmerge(oldt, t);
+            else
+            {
+                if (tdb->methods.set(tdb, t) != DC_OK)
+                    INFO(INFO_ERROR, "Cannot add template %s", t->tag);
+            }
 
             q = qdb->methods.get(qdb, t->tag);
             if (q == NULL)
@@ -91,7 +129,7 @@ int main(int argc, char **argv)
                 q->template = t;
                 template_ref(t);
             }
-            question_owner_add(q, argv[1]);
+            question_owner_add(q, owner);
             if (qdb->methods.set(qdb, q) != DC_OK)
                 INFO(INFO_ERROR, "Cannot add config %s", t->tag);
             question_deref(q);

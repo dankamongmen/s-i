@@ -37,6 +37,7 @@ void template_delete(struct template *t);
 void template_ref(struct template *t);
 void template_deref(struct template *t);
 struct template *template_dup(struct template *t);
+struct template *template_l10nmerge(struct template *ret, struct template *t);
 struct template *template_load(const char *filename);
 
 #endif
