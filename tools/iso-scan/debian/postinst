@@ -33,12 +33,11 @@ is_debian_iso () {
 
 register_cd () {
 	# Set the distribution used by base-installer, test in priority order
-	for dist in stable testing unstable ; do
+	for dist in testing stable unstable ; do
 		if [ -e /cdrom/dists/$dist ] ; then
-			CODENAME=`sed -n 's/^Codename: *//p' /cdrom/dists/$dist/Release`
-			log "Detected ISO with '$CODENAME' distribution"
-			db_set mirror/distribution $CODENAME
-			db_subst iso-scan/success DISTRIBUTION $CODENAME
+			log "Detected ISO with '$dist' distribution"
+			db_set mirror/distribution $dist
+			db_subst iso-scan/success DISTRIBUTION $dist
 			
 			DESCRIPTION=`sed -n 's/^Description: *//p' /cdrom/dists/$dist/Release`
 			db_subst iso-scan/success DESCRIPTION $DESCRIPTION
