@@ -226,7 +226,7 @@ static int mystrcmp_lexicographic(const void *p1, const void *p2)
 	return strcmp(*((char **) p1), *((char **) p2));
 }
 
-int strchoicesplit2(const char *inbuf, const char *listorder, char **argv, int *tindex, size_t maxnarg)
+int strchoicesplitsort(const char *inbuf, const char *listorder, char **argv, int *tindex, size_t maxnarg)
 {
     int argc = 0, i;
     const char *s = inbuf, *e, *c;
