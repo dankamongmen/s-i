@@ -669,25 +669,19 @@ command_settitle(struct confmodule *mod, char *arg)
 {
     struct question *q = NULL;
     const char *value;
-    char *argv[6];
-    int argc;
     char *out;
 
-    argc = strcmdsplit(arg, argv, DIM(argv));
-
-    CHECKARGC(== 1);
-    q = mod->questions->methods.get(mod->questions, argv[0]);
+    q = mod->questions->methods.get(mod->questions, arg);
     if (q == NULL)
     {
-        asprintf(&out, "%u %s does not exist",
-		 CMDSTATUS_BADQUESTION, argv[0]);
+        asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, arg);
 	return out;
     }
     value = question_get_field(q, "", "description");
     if (value == NULL)
     {
 	asprintf(&out, "%u %s description field does not exist",
-		 CMDSTATUS_BADQUESTION, argv[0]);
+		 CMDSTATUS_BADQUESTION, arg);
 	return out;
     }
 
