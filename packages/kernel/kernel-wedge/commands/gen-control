@@ -84,8 +84,10 @@ sub read_package_list
 			$pkg{$field}=$val;
 		}
 		elsif (/^$/) {
-			merge_package(\%pkg);
-			%pkg=();
+			if (%pkg) {
+				merge_package(\%pkg);
+				%pkg=();
+			}
 		}
 		elsif (/^(\s+.*)/) {
 			# continued field
