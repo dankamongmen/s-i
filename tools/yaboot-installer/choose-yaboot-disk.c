@@ -249,6 +249,7 @@ int main(int argc, char **argv) {
 	int i = 0;
 	char *rootpart = NULL;
 	char *choices = NULL;
+   char *default_bootdev = NULL;
 
 	/* initialize debconf */
 	debconf = debconfclient_new();
@@ -297,9 +298,10 @@ int main(int argc, char **argv) {
 		if(tmp == NULL)
 			continue;
 
-		if(choices == NULL)
+		if(choices == NULL) {
 			asprintf(&choices, "%s", tmp);
-		else
+         asprintf(&default_bootdev, "%s", tmp);
+		} else
 			asprintf(&choices, "%s, %s", choices, tmp);
 
 		free(tmp);
@@ -310,8 +312,8 @@ int main(int argc, char **argv) {
 		"DEVICES", choices, NULL);
 	debconf->command(debconf, "fset", "yaboot-installer/bootdev",
 		"seen", "false", NULL);
-	debconf->command(debconf, "set", "yaboot-installer/bootdev", "false", NULL); 
-	debconf->command(debconf, "input", "critical", "yaboot-installer/bootdev", NULL);
+	debconf->command(debconf, "set", "yaboot-installer/bootdev", default_bootdev, NULL); 
+	debconf->command(debconf, "input", "low", "yaboot-installer/bootdev", NULL);
 	debconf->command(debconf, "go", NULL);
 	debconf->command(debconf, "get", "yaboot-installer/bootdev", NULL);
 	if(strcmp(debconf->value, "false") == 0) {
