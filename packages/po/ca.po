@@ -2605,7 +2605,7 @@ msgstr ""
 
 #. Type: note
 #. Description
-#: ../arcboot-installer.templates:29 ../nobootloader.templates:28
+#: ../arcboot-installer.templates:29 ../nobootloader.templates:29
 msgid ""
 "You will only need to do this once.  Afterwards, enter the \"boot\" command "
 "or reboot the system to proceed to the next Debian installation stage."
@@ -4312,16 +4312,38 @@ msgstr "Continua sense un carregador"
 #. Type: note
 #. Description
 #: ../nobootloader.templates:8
+#, fuzzy
 msgid ""
 "Some variables need to be set in the Pegasos OpenFirmware in order for your "
 "system to boot Debian automatically. At the end of the installation, the "
-"system will reboot. At the Pegasos OpenFirmware prompt, you will be able to "
-"either boot the kernel manually with :"
+"system will reboot. At the Pegasos OpenFirmware prompt, set the following "
+"OpenFirmware variables to enable auto-booting:"
 msgstr ""
 "Es necessita establir algunes variables al Pegasos OpenFirmware per a poder "
 "arrencar el sistema Debian automàticament. A final de la instal·lació, el "
 "sistema arrencarà de nou. A l'indicatiu de Pegasos OpenFirmware, podreu "
 "arrencar el nucli automàticament amb:"
+
+#: ../nobootloader.templates:8
+msgid ""
+" setenv boot-device ${OF_BOOT_DEVICE}\n"
+" setenv boot-file ${OF_BOOT_FILE}\n"
+" setenv auto-boot-timeout 5000\n"
+" setenv auto-boot? true"
+msgstr ""
+" setenv boot-device ${OF_BOOT_DEVICE}\n"
+" setenv boot-file ${OF_BOOT_FILE}\n"
+" setenv auto-boot-timeout 5000\n"
+" setenv auto-boot? true"
+
+#. Type: note
+#. Description
+#: ../nobootloader.templates:8
+#, fuzzy
+msgid "Alternatively, you will be able to boot the kernel manually with:"
+msgstr ""
+"Necessitareu arrencar el nucli a mà amb:\n"
+" ${KERNEL_BOOT}"
 
 #. Type: note
 #. Description
@@ -4331,27 +4353,7 @@ msgstr " ${KERNEL_BOOT}"
 
 #. Type: note
 #. Description
-#: ../nobootloader.templates:8
-msgid "Or set the following OpenFirmware variables to enable auto-booting :"
-msgstr ""
-"O establiu les següents variables del microprogramari per a habilitar "
-"l'arrencada automàtica:"
-
-#: ../nobootloader.templates:8
-msgid ""
-" setenv boot-device ${OF_BOOT_DEVICE}\n"
-" setenv boot-file ${OF_BOOT_FILE}\n"
-" setenv auto-boot-timeout 5000\n"
-" setenv auto-boot? true"
-msgstr ""
-" setenv boot-device ${OF_BOOT_DEVICE}\n"
-" setenv boot-file ${OF_BOOT_FILE}\n"
-" setenv auto-boot-timeout 5000\n"
-" setenv auto-boot? true"
-
-#. Type: note
-#. Description
-#: ../nobootloader.templates:28
+#: ../nobootloader.templates:29
 msgid "Setting firmware variables for automatic boot"
 msgstr ""
 "S'estan establint les variables del microprogramari per a l'arrencada "
@@ -4359,7 +4361,7 @@ msgstr ""
 
 #. Type: note
 #. Description
-#: ../nobootloader.templates:28
+#: ../nobootloader.templates:29
 msgid ""
 "Some variables need to be set in the Netwinder NeTTrom firmware in order for "
 "your system to boot Debian automatically.  At the end of this installation "
@@ -4373,7 +4375,7 @@ msgstr ""
 "d'arrencar. Podeu avortar això prement qualsevol tecla. Aleshores, entrareu "
 "al sistema d'ordres de NeTTrom on podeu executar les següents ordres:"
 
-#: ../nobootloader.templates:28
+#: ../nobootloader.templates:29
 msgid ""
 "   setenv kernconfig fs\n"
 "   setenv kerndev ${KERNDEV}\n"
@@ -4391,13 +4393,13 @@ msgstr ""
 
 #. Type: note
 #. Description
-#: ../nobootloader.templates:48
+#: ../nobootloader.templates:49
 msgid "No boot loader installed"
 msgstr "No s'ha instal·lat cap carregador"
 
 #. Type: note
 #. Description
-#: ../nobootloader.templates:48
+#: ../nobootloader.templates:49
 msgid ""
 "No boot loader has been installed, either because you chose not to or "
 "because your specific architecture doesn't support a boot loader yet."
@@ -4407,7 +4409,7 @@ msgstr ""
 
 #. Type: note
 #. Description
-#: ../nobootloader.templates:48
+#: ../nobootloader.templates:49
 msgid ""
 "You will need to boot manually with the ${KERNEL} kernel on partition "
 "${BOOT} and ${ROOT} passed as kernel argument."
@@ -9542,6 +9544,11 @@ msgstr "Descarrega un fitxer de llavor de debconf"
 msgid "Load debconf preseed file"
 msgstr "Carrega un fitxer de llavor de debconf"
 
+#~ msgid "Or set the following OpenFirmware variables to enable auto-booting :"
+#~ msgstr ""
+#~ "O establiu les següents variables del microprogramari per a habilitar "
+#~ "l'arrencada automàtica:"
+
 #~ msgid "Really use LVM?"
 #~ msgstr "Esteu segur de voler usar LVM?"
 
@@ -9552,13 +9559,6 @@ msgstr "Carrega un fitxer de llavor de debconf"
 #~ "Actualment, Debian no suporta l'ús de LVM per al sistema de fitxers de la "
 #~ "partició arrel o /boot. Els sistemes instal·lats d'aquesta manera no "
 #~ "arrencaran."
-
-#~ msgid ""
-#~ "You will need to boot the kernel manually with:\n"
-#~ " ${KERNEL_BOOT}"
-#~ msgstr ""
-#~ "Necessitareu arrencar el nucli a mà amb:\n"
-#~ " ${KERNEL_BOOT}"
 
 #~ msgid ""
 #~ "/, /boot, /home, /tmp, /usr, /usr/local, /var, Enter manually, Do not "
