@@ -55,6 +55,28 @@ case "x$cmd" in
         exit $ret
         ;;
 
+	xerror)
+		T="retriever/cdrom/error"
+		db_input high "$T" || true
+		db_go || true
+		db_get "$T"
+		if [ "$RET" = true ]; then
+			exit 0
+		else
+			exit 2
+		fi
+	;;
+	
+	xcleanup)
+		umount $FLOPPYMNT || true
+	;;
+
+	*)
+		# unknown command
+		exit 1
+	;;
+esac
+	
     xcleanup)
         rm -f /var/cache/anna/{include,exclude}
         ;;
