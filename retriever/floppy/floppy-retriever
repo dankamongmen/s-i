@@ -2,6 +2,8 @@
 
 . /usr/share/debconf/confmodule
 
+FLOPPYMNT=/floppy
+
 db_capb BACKUP
 
 # FIXME FIXME FIXME
@@ -43,54 +45,64 @@ mountfloppy()
         if [ "$STATE" = 0 ]; then
             exit 30 # backed out
         fi
+        db_capb
 
-        db_get retriever/floppy/fstype
-        if [ "$RET" = "Enter manually" ]; then
-            db_get retriever/floppy/fstype-manual
-        fi
-        fstype="$RET"
-
-        mount /dev/floppy/0 -t"$fstype" /floppy
+        mount /dev/floppy/0 -tauto $FLOPPYMNT
     fi
 }
 
-case "x$1" in
+cmd="$1"
+shift
+
+case "x$cmd" in
+    xconfig)
+        mountfloppy
+        for f in include exclude; do
+            if [ -e $FLOPPYMNT/udeb_$f ]; then
+                ln -sf $FLOPPYMNT/udeb_$f /var/cache/anna/$f
+            fi
+        done
+        ;;
+
     xretrieve)
         mountfloppy
-        if [ -e /floppy/$2 ]; then
-            ln -sf /floppy/$2 "$3"
+        if [ -e $FLOPPYMNT/$1 ]; then
+            ln -sf $FLOPPYMNT/$1 "$2"
             exit $?
         else
             exit 1
         fi
         ;;
+
     xpackages)
         # generate a Packages file based on what udebs are on the floppy
-        if [ "$3" != "." ]; then
+        if [ "$2" != "." ]; then
             # sorry, no compressed files
             exit 1
         fi
-        if [ -n "$4" -a "$4" != "main" ]; then
+        if [ -n "$3" -a "$3" != "main" ]; then
             # only do 'main'
             exit 1
         fi
         mountfloppy
-        rm -f "$2"
-        touch "$2"
+        rm -f "$1"
+        touch "$1"
         # Check for regular debs, udebs, and to be on the safe side,
         # check for *.ude files (msdos file names...)
-        for filename in /floppy/*.deb /floppy/*.udeb /floppy/*.ude; do
+        for filename in $FLOPPYMNT/*.{deb,udeb,ude}; do
             if [ -f "$filename" ]; then
-                udpkg -f "$filename" >> "$2"
+                udpkg -f "$filename" >> "$1"
                 path="`echo "$filename" | sed 's,^/floppy/,,'`"
-                echo "Filename: $path" >> "$2"
-                echo >> "$2"
+                echo "Filename: $path" >> "$1"
+                echo >> "$1"
             fi
         done
         ;;
+
     xcleanup)
-        umount /floppy || true
+        umount $FLOPPYMNT || true
         ;;
+
     *)
         # unknown command
         exit 1

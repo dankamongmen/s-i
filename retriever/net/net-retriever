@@ -1,47 +1,57 @@
 #!/bin/sh
 
-CDMNT=/cdrom
+. /usr/share/debconf/confmodule
+
+db_get mirror/protocol
+protocol="$RET"
+db_get mirror/$protocol/hostname
+hostname="$RET"
+db_get mirror/$protocol/directory
+directory="$RET"
+db_get mirror/$protocol/proxy
+proxy="$RET"
+if [ -n "$proxy" ]; then
+    if [ "$protocol" = http ]; then
+        export http_proxy="$proxy"
+    elif [ "$protocol" = ftp ]; then
+        export ftp_proxy="$proxy"
+    fi
+fi
+
+fetch() {
+    wget -c -q "${protocol}://${hostname}${directory}/$1" -O "$2"
+    return $?
+}
 
 cmd="$1"
 shift
 
 case "x$cmd" in
-    xconfig)
-        for f in include exclude; do
-            if [ -e $CDMNT/.disk/udeb_$f ]; then
-                ln -sf $CDMNT/.disk/udeb_$f /var/cache/anna/$f
-            fi
-        done
-        ;;
-
     xretrieve)
-        if [ -e $CDMNT/$1 ]; then
-            ln -sf $CDMNT/$1 "$2"
-            exit $?
-        else
-            exit 1
-        fi
+        fetch "$@"
+        exit $?
         ;;
 
     xpackages)
         rm -f "$1"
         touch "$1"
-        # We can use 'stable' since there are always symlinks
-        Release="$CDMNT/dists/stable/Release"
+        db_get mirror/distribution
+        suite="$RET"
+        Release="/tmp/net-retriever-$$-Release"
+        fetch "dists/$suite/Release" "$Release" || exit $?
         ARCH=`udpkg --print-architecture`
         components="`grep ^Components: $Release | cut -d' ' -f2-`"
         ret=1
         for comp in $components; do
-            for ext in '' '.gz'; do
+            for ext in '.gz' ''; do
                 pkgfile="$comp/debian-installer/binary-$ARCH/Packages$ext"
                 line=`grep $pkgfile\$ $Release 2>/dev/null`
                 if [ $? != 0 ]; then
                     continue
                 fi
-                Packages="$CDMNT/dists/stable/$pkgfile"
-                if [ ! -e "$Packages" ]; then
-                    continue
-                fi
+                Packages="/tmp/net-retriever-$$-Packages"
+                rm -f "$Packages"
+                fetch "dists/$suite/$pkgfile" "$Packages" || continue
                 # TODO: Verify the integrity
                 if [ "$ext" = '' ]; then
                     cat "$Packages" >> "$1"
@@ -53,10 +63,6 @@ case "x$cmd" in
             done
         done
         exit $ret
-        ;;
-
-    xcleanup)
-        rm -f /var/cache/anna/{include,exclude}
         ;;
 
     *)

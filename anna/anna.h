@@ -6,6 +6,7 @@
 #define STATUS_FILE             "/var/lib/dpkg/status"
 #define RETRIEVER_DIR           "/usr/lib/debian-installer/retriever"
 #define DOWNLOAD_DIR            "/var/cache/anna"
+#define DOWNLOAD_PACKAGES       DOWNLOAD_DIR "/Packages"
 #define INCLUDE_FILE            DOWNLOAD_DIR "/include"
 #define EXCLUDE_FILE            DOWNLOAD_DIR "/exclude"
 #define DPKG_UNPACK_COMMAND     "udpkg --unpack"

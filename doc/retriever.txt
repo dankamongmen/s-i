@@ -65,32 +65,24 @@ Currently, there are four commands:
 
 retriever config
         Perform retriever-specific configuration. This may include creating
-        a /var/cache/anna/autoinst file that contains a list of udebs to be
+        a /var/cache/anna/include file that contains a list of udebs to be
         installed automatically.
 
-retriever retrieve [source-filename] [dest-filename] [suite]
-	Download the specified file to the specified destination from
-	the specified suite.  The suite parameter is optional and
-	defaults to main.
+retriever retrieve [source-filename] [dest-filename]
+	Download the specified file to the specified destination.
 	The source-filename is the Filename field of a Packages file.
 
-	Thus, retrieving the Packages file itself is something like this:
-		retriever Packages /tmp/Packages
-	
-	While retrieving a deb is something like this:
-		retriever retrievers/http-retriever.deb /tmp/http-retriever.deb
-
-retriever packages [dest-filename] [extension] [optional suite]
+retriever packages [dest-filename]
 	Download a Packages file, or a Packages-like file. The fields used by
 	anna are:
 	- Package
 	- Version
 	- Filename
 	Whether other fields are needed is currently undecided. A retriever
-	doesn't have to support the 'packages' command, if it fails, anna will
-	try to guess the location of a Packages file and try to retrieve it.
-	If no extension is used, it must be '.'
-	The suite should default to 'main'
+        now must support this command, because it is supposed to download and
+        parse a Release file if appropriate. This means that the result of
+        this command can (and often will be) a concatenation of several
+        Packages files from the install medium.
 
 retriever cleanup
 	Clean up after a retriever round. This is used by e.g. the floppy

@@ -148,83 +148,27 @@ config_retriever(void)
     return ret;
 }
 
-/* First try the 'packages' command, then guess a location */
-static int
-try_get_Packages_file(const char *ext, const char *suite)
-{
-    char *retriever, *command;
-    int ret;
-
-    retriever = get_retriever();
-    if (asprintf(&command, "%s packages " DOWNLOAD_DIR "/Packages%s %s %s",
-            retriever, ext, ext[0] == '\0' ? "." : ext, suite) == -1)
-        return 0;
-    ret = system(command);
-    free(command);
-    if (ret != 0) {
-	/* For retreivers that do not implement the packages command,
-	 * fall back to doing a retrieve with a path to the Packages file
-	 * as it is on the mirror. */
-        static struct debconfclient *debconf = NULL;
-        char *dist, *file;
-
-        if (debconf == NULL)
-            debconf = debconfclient_new();
-	if (debconf->command(debconf, "GET", "mirror/distribution", NULL) == 0) {
-        	dist = debconf->value;
-        	if (asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages%s",
-	                dist, suite, ARCH, ext) == -1)
-	            return 0;
-	        if (asprintf(&command, "%s retrieve %s " DOWNLOAD_DIR "/Packages%s",
-	                retriever, file, ext) == -1)
-	            return 0;
-	        free(file);
-	        ret = system(command);
-	        free(command);
-	}
-    }
-    return !ret;
-}
-
 struct linkedlist_t *
 get_packages(void)
 {
     FILE *fp;
-    int i = 0;
-    struct linkedlist_t *pkglist = NULL, *tmplist;
-    /* TODO: This is a hack. But are Release files really a suitable replacement? */
-    static const char *suites[] = { "main", "local", NULL };
+    struct linkedlist_t *pkglist;
+    char *retriever, *command;
+    int ret;
 
-    for (i = 0; suites[i] != NULL; i++) {
-        fp = NULL;
-        if (try_get_Packages_file(".gz", suites[i])) {
-            if (system("gunzip " DOWNLOAD_DIR "/Packages.gz") == 0)
-                fp = fopen(DOWNLOAD_DIR "/Packages", "r");
-            else
-                unlink(DOWNLOAD_DIR "/Packages.gz");
-        }
-        if (fp == NULL && try_get_Packages_file("", suites[i]))
-            fp = fopen(DOWNLOAD_DIR "/Packages", "r");
-        if (fp == NULL) {
-            unlink(DOWNLOAD_DIR "/Packages");
-            continue;
-        }
-        tmplist = di_pkg_parse(fp);
-        fclose(fp);
-        unlink(DOWNLOAD_DIR "/Packages");
-        if (tmplist != NULL) {
-            if (pkglist == NULL)
-                pkglist = tmplist;
-            else if (pkglist->tail == NULL) {
-                free(pkglist);
-                pkglist = tmplist;
-            } else {
-                pkglist->tail->next = tmplist->head;
-                pkglist->tail = tmplist->tail;
-                free(tmplist);
-            }
-        }
-    }
+    retriever = get_retriever();
+    if (asprintf(&command, "%s packages " DOWNLOAD_PACKAGES, retriever) == -1)
+        return NULL;
+    ret = system(command);
+    free(command);
+    if (ret != 0)
+        return NULL;
+    fp = fopen(DOWNLOAD_PACKAGES, "r");
+    if (fp == NULL)
+        return NULL;
+    pkglist = di_pkg_parse(fp);
+    fclose(fp);
+    unlink(DOWNLOAD_PACKAGES);
     return pkglist;
 }
 
