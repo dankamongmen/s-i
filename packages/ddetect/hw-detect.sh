@@ -459,7 +459,7 @@ if ! is_not_loaded ohci1394; then
 			db_subst hw-detect/load_progress_step CARDNAME "FireWire ethernet support"
 			db_subst hw-detect/load_progress_step MODULE "eth1394"
 			db_progress INFO hw-detect/load_progress_step
-			load_module eth1394
+			load_module eth1394 "FireWire ethernet"
 			register-module eth1394
 		else
 			missing_module eth1394 "FireWire ethernet"
