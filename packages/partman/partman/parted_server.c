@@ -2000,7 +2000,22 @@ command_copy_partition()
         free(srcid);
 }
 
-
+void command_get_disk_type()
+{
+	log("command_get_disk_type()");
+	scan_device_name();
+	open_out();
+	oprintf("OK\n");
+	deactivate_exception_handler();
+	if((disk == NULL) || (disk->type == NULL) 
+			  || (disk->type->name == NULL)) {
+		oprintf("unknown\n");
+	} else {
+		oprintf("%s\n", disk->type->name);
+	}
+	activate_exception_handler();
+}
+	
 /**********************************************************************
    Main
 **********************************************************************/
@@ -2085,6 +2100,8 @@ main_loop()
                         command_get_virtual_resize_range();
                 else if (!strcasecmp(str, "COPY_PARTITION"))
                         command_copy_partition();
+		else if (!strcasecmp(str, "GET_DISK_TYPE"))
+			command_get_disk_type();
                 else
                         critical_error("Unknown command %s", str);
                 free(str);
