@@ -486,8 +486,8 @@ humandev () {
 	    db_metaget partman/text/scsi_partition description
 	    printf "$RET" ${scsinum} ${bus} ${target} ${lun} ${part}
 	    ;;
-	/dev/md[0-9]*)
-	    device=`echo "$1" | sed -e "s/.*md\(.*\)/\1/"`
+	/dev/md/*)
+	    device=`echo "$1" | sed -e "s/.*md\/\?\(.*\)/\1/"`
 	    type=`cat /proc/mdstat|grep "^md${device}[ :]" | sed -e "s/^.* : active raid\([[:alnum:]]\).*/\1/"`
 	    db_metaget partman/text/raid_device description
 	    printf "$RET" ${type} ${device}
