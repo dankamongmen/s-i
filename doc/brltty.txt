@@ -1,0 +1,32 @@
+Braille display support for d-i:
+--------------------------------
+
+Currently, only the cdrom (2.88MB) i386 includes brltty by default.
+For a experimental netinst floppy with brltty, see
+http://people.debian.org/~mlang/net-brl-1440.img.
+
+To activate Braille display support during the installation,
+you need to pass a boot parameter to the boot loader.  Here is the format:
+
+brltty=driver-code,device,text-table
+
+driver-code: A two-letter code which identifies the display model being in use.
+  See brltty documentation for a complete list.
+device: The device where the display is connected at.  If tts/0, this
+  field can be left blank since that is the default.
+
+text-table: The braille translation table to be used.  Default is the
+ us table.  Examples might be de, fr, it, ru ...
+
+Example:
+
+For a PowerBraille display on tts/1 with a german braille translation table:
+brltty=ts,tts/1,de
+
+For a HandyTech display on tts/0 with us translation table:
+brltty=ht
+
+
+
+  -- Mario Lang <mlang@debian.org>
+
