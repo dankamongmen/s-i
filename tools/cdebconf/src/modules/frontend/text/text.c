@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.34 2003/02/23 15:52:27 sjogren Exp $
+ * $Id: text.c,v 1.35 2003/03/04 18:26:05 mckinstry Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -180,9 +180,9 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 			(def == 0 ? _(", default=no") : _(", default=yes"))));
 
 		fgets(buf, sizeof(buf), stdin);
-		if (strcmp(buf, _("yes\n")) == 0)
+		if ((strcmp(buf, _("yes\n")) == 0) || (strcmp(buf, _("YES\n")) == 0))
 			ans = 1;
-		else if (strcmp(buf, _("no\n")) == 0)
+		else if ((strcmp(buf, _("no\n")) == 0) || (strcmp(buf, _("NO\n")) == 0))
 			ans = 0;
 #if defined(__s390__) || defined (__s390x__)
 		else if (defval && (strcmp(buf, "\n") == 0 || strcmp(buf, ".\n") == 0))
