@@ -1,0 +1,298 @@
+<!-- retain these comments for translator revision tracking -->
+<!-- $Id: using-d-i.xml,v 1.1 2003/10/27 03:09:13 toff Exp $ -->
+
+
+ <chapter id="d-i-intro"><title>Using the Debian Installer</title>
+
+ <sect1><title>How the Installer Works</title>
+<para>
+
+The Debian Installer consists of a number of special-purpose modules
+to perform each installation task. Each module performs its task,
+asking the user questions as necessary to do its job. If there is no
+problem, the next module in line takes over. When there is a problem,
+the user will see an error screen, and the installer menu will be
+shown in order to select some alternative action. If there are no
+problems, the user will never see the installer menu, but will simply
+answer questions for each module in turn.
+
+</para><para>
+
+The questions themselves are given priorities, and the priority
+of questions to be asked can be set. Thus if the installer knows
+what to do, and the user need not be aware of other choices which
+are available, then the installer will make the choice and not
+display the question.
+The <emphasis>Enter</emphasis> to activate choices.
+
+</para><para>
+
+The normal installer display is character-based rather than the more
+familiar graphical interface. Here are the keys you can use to
+navigate within the various dialogs.  The right arrow or Tab key move
+`forward', and left arrow or Shift-Tab move `backward' between
+displayed buttons and selections. The up and down arrow select
+different items within a scrollable list, and also scroll the list
+itself. In addition, in long lists, you can type a letter to cause the
+list to scroll directly to the section with items starting with the
+letter you typed and use Pg-Up and Pg-Down to scroll the list in
+sections. The space bar selects an item such as a checkbox.
+
+</para><para arch="s390">
+
+S/390 does not support virtual consoles. You may open a second and third
+telnet session to view the logs described below.
+
+</para><para>
+
+Error messages are redirected to the third virtual terminal (known as
+<userinput>tty3</userinput>).  You can access this terminal by
+pressing <keycombo><keycap>Left Alt</keycap><keycap>F3</keycap></keycombo>
+(hold the <keycap>Alt</keycap> key while pressing the
+<keycap>F3</keycap> function key); get back to
+the main installer process with 
+<keycombo><keycap>Left Alt</keycap><keycap>F1</keycap></keycombo>.
+
+</para><para>
+
+These messages can also be found in
+<filename>/var/log/messages</filename>.  After installation, this log
+is copied to <filename>/var/log/installer.log</filename> on your new
+system.
+
+</para>
+ </sect1>
+
+
+  <sect1 id="modules-list"><title>Modules Introduction</title>
+<para>
+
+Here is a list of installer modules with a brief description
+of each module's purpose. Details you might need to know about
+using a particular module are in <xref linkend="module-details"/>.
+
+</para>
+
+<variablelist>
+<varlistentry>
+
+<term>main-menu</term><listitem><para>
+
+Shows the list of modules to the user during installer operation, and
+starts a selected module when it is selected. Main- menu's questions
+are set to priority MEDIUM, so if your priority is set to HIGH or
+CRITICAL (HIGH is the default), you will not see the menu (unless
+there is an error which requires your intervention).
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>languagechooser</term><listitem><para>
+
+Shows a list of languages and language variants. The installer will
+display messages in the chosen language, unless the translation for
+that language is not complete. When a translation is not complete,
+English messages are shown.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>ddetect</term><listitem><para>
+
+Detects hard disks, either installed or attached to the computer.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>pcmcia</term><listitem><para>
+
+Allows the user to configure PCMCIA cards used in laptops for 
+networking.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>kbd-chooser</term><listitem><para>
+
+Shows a list of keyboards, from which the user chooses the model which
+matches his own.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>netcfg</term><listitem><para>
+
+Configures the computer's network connections so it can communicate
+over the internet.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>iso-scan</term><listitem><para>
+
+Looks for ISO file systems, which may be on a CD-ROM or on the 
+hard drive.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>choose-mirror</term><listitem><para>
+
+Presents a list of Debian archive mirrors. The user may choose
+the source of his installation packages. Commonly, a CD-ROM or 
+network mirror are chosen.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>cdrom-detect</term><listitem><para>
+
+Detects CD-ROM drives, either installed or attached to the computer.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>anna</term><listitem><para>
+
+Anna's Not Mearly APT. Installs packages which have been retrieved
+from the chosen mirror.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>autopartkit</term><listitem><para>
+
+Automatically partitions an entire disk according to preset 
+user preferences.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>partitioner</term><listitem><para>
+
+Allows the user to partition disks attached to the system. A 
+partitioning program appropriate to your computer's architecture
+is chosen.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>partconf</term><listitem><para>
+
+Displays a list of partitions, and creates file systems on 
+the selected partitions according to user instructions.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>base-installer</term><listitem><para>
+
+Installs the most basic set of packages which would allow
+the computer to operate under Linux when rebooted. 
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>kernel-chooser</term><listitem><para>
+
+Allows the user to choose an operating system kernel version,
+if there is more than one version available.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>bootloader-installer</term><listitem><para>
+
+Installs a boot loader program on the hard disk, which is necessary
+for the computer to start up using Linux without using a floppy or
+CD-ROM.  Many boot loaders allow the user to choose an alternate
+operating system each time the computer boots.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>baseconfig</term><listitem><para>
+
+Provides dialogs for setting up the base system packages according
+to user preferences. This is normally done after rebooting the 
+computer; it is the 'first run' of the new Debian system. 
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>shell</term><listitem><para>
+
+Allows the user to execute a shell from the menu, or in the second
+console.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>bugreporter</term><listitem><para>
+
+Provides a way for the user to record information when trouble is
+encountered, and report installer software problems to Debian
+developers.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+ </sect1>
+
+ <sect1 id="module-details"><title>Using Individual Modules</title>
+
+&module-languagechooser.xml;
+&module-s390-netdevice.xml;
+&module-s390-dasd.xml;
+&module-ddetect.xml;
+&module-pcmcia.xml;
+&module-kbd-chooser.xml;
+&module-netcfg.xml;
+&module-iso-scan.xml;
+&module-choose-mirror.xml;
+&module-cdrom-detect.xml;
+&module-anna.xml;
+&module-autopartkit.xml;
+&module-partitioner.xml;
+&module-partconf.xml;
+&module-prebaseconfig.xml;
+&module-base-installer.xml;
+&module-kernel-chooser.xml;
+
+&module-mips-arcboot-installer.xml;
+&module-alpha-aboot-installer.xml;
+&module-i386-grub-installer.xml;
+&module-i386-lilo-installer.xml;
+&module-hppa-palo-installer.xml;
+&module-ia64-elilo-installer.xml;
+&module-s390-zipl-installer.xml;
+&module-powerpc-yaboot-installer.xml;
+&module-sparc-silo-installer.xml;
+
+&module-baseconfig.xml;
+&module-bugreporter.xml;
+&module-shell.xml;
+
+ </sect1>
+</chapter>
+
