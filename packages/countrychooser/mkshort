@@ -1,0 +1,56 @@
+#! /bin/sh
+
+set -e
+
+ISO3166TAB=/usr/share/iso-codes/iso_3166.tab
+SUPPORTED=/usr/share/i18n/SUPPORTED
+
+if [ ! -d debian/short-tmp ]; then
+   mkdir debian/short-tmp
+fi
+
+rm -f debian/short-tmp/*.tab
+rm -f debian/short-tmp/*.short
+
+for file in debian/po/*.po en.po; do
+  lang_variant=`basename $file .po`
+  lang=$(echo "$lang_variant" | sed -e 's/_.*$//')
+  tabfile=debian/short-tmp/$lang_variant.tab
+  # create TAB file for this language
+  msgconv debian/iso-codes/$lang_variant.po -t UTF-8 --stringtable-output | tail -n +3 | \
+     sed -e 's/" = "/	/' -e 's/^"//' -e 's/";$//' | awk '/^.+$/{print}'> $tabfile
+  outfile=debian/short-tmp/$lang_variant.short
+  :>$outfile
+  (for code in $(grep -e "^$lang" $SUPPORTED | cut -b 4-5 | sort | uniq); do
+      line=`grep -e "^$code" $ISO3166TAB`
+      if [ "$line" ]; then
+         OLD_IFS="$IFS"
+	 IFS='	'
+	 set $line
+	 IFS="$OLD_IFS"
+	 if [ "$2" ]; then
+	   translation=$(grep "^$2	" $tabfile| sed -e 's/^.*	//')
+	   if [ "$translation" ]; then
+	      echo "$1	$translation" >> $outfile
+	   else
+	      echo "$1	$2" >> $outfile
+	   fi
+	 fi
+      fi
+   done)
+   if [ $(wc -l < $outfile) -le 1 ]; then
+      rm -f $outfile
+   fi
+done
+
+# make one file from parts
+
+SHORTLISTS=debian/short-tmp/shortlists
+:>$SHORTLISTS
+
+for file in debian/short-tmp/*.short; do
+   lang=`basename $file .short`
+   echo ":$lang" >> $SHORTLISTS
+   cat $file >> $SHORTLISTS
+done
+
