@@ -6,6 +6,9 @@ case "$DEBIAN_FRONTEND" in
 "slang")
 	cfdisk $DISK
 	;;
+"newt")
+	cfdisk $DISK
+	;;
 *)
 	fdisk $DISK
 	;;
