@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.h,v 1.5 2003/10/03 18:25:02 waldi Exp $
+ * $Id: log.h,v 1.6 2003/11/02 18:19:27 mckinstry Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__LOG_H
@@ -57,6 +57,14 @@ typedef void di_log_handler (di_log_level_flags log_level, const char *message, 
  * logs a warning
  */
 #define di_warning(format...) di_log (DI_LOG_LEVEL_WARNING, format)
+/**
+ * logs information
+ */
+#define di_info(format...) di_log (DI_LOG_LEVEL_INFO, format)
+/**
+ * logs debug info
+ */
+#define di_debug(format...) di_log (DI_LOG_LEVEL_DEBUG, format)
 
 #ifdef LIBDEBIAN_INSTALLER_MAP_REAL
 #define di_log(attr...) di_log_real_4_0(attr)
