@@ -21,6 +21,7 @@ while (<KVERS>) {
 		push @builddeps, "$pkg [$arch]";
 	}
 }
+close KVERS;
 
 open(STUB, "debian/control.stub") || die "debian/control.stub: $!";
 while (<STUB>) {
@@ -66,7 +67,14 @@ foreach my $ver (@versions) {
 		%pkg=(@$pkg); # copy for modification
 		# Check for a modules list file for this architecture and
 		# package.
-		next unless -e "modules/$arch/$pkg{Package}";
+		my $modlistdir="";
+		if (-d "modules/$arch-$flavour") {
+			$modlistdir="modules/$arch-$flavour";
+		}
+		else {
+			$modlistdir="modules/$arch";
+		}
+		next unless -e "$modlistdir/$pkg{Package}";
 		
 		print "\n";
 		
@@ -78,7 +86,7 @@ foreach my $ver (@versions) {
 				map { $_."-".$kernelversion."-".$flavour."-di" }
 				# If the dep is not built for this arch,
 				# skip it.
-				grep { -e "modules/$arch/$_" } 
+				grep { -e "$modlistdir/$_" } 
 				split(", ", $pkg{Depends}));
 		}
 		
@@ -88,4 +96,3 @@ foreach my $ver (@versions) {
 		}
 	}
 }
-close KVERS;

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Generate symlinks from .lnk files.
+set -e
+for lnk in $(find modules -type f -name \*.lnk); do
+	file=$(echo $lnk | sed s/.lnk//)
+	rm -f $file
+	ln -sf $(cat $lnk) $file
+done

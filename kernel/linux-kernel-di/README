@@ -11,12 +11,13 @@ useful during kernel transitions. The -di prefix is used to prevent any
 posible collisions in names with real debs.
 
 The modules to put in each udeb are listed in the files in the
-modules/<arch> directory. If module lists are the same across
-architectures, they can be put in modules/common, and symlinked to
-modules/<arch>[1]. The files contain paths relative to the top-level kernel
-modules directory (/lib/modules/<kernel-version>/). In fact these files are
-used as the input to a tar command, and can list either files, or whole
-directories, though the latter is rarely used.
+modules/<arch> directory (if modules/<arch>-<flavour> exists, it is used
+instead). If module lists are the same across architectures, they can be
+put in modules/common, and symlinked to modules/<arch>[1]. The files
+contain paths relative to the top-level kernel modules directory
+(/lib/modules/<kernel-version>/). In fact these files are used as the input
+to a tar command, and can list either files, or whole directories, though
+the latter is rarely used.
 
 The copy-modules script does the actual copying of modules to the temp dirs
 that are used to build the package. It is complicated by the need to make

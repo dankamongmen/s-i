@@ -6,7 +6,7 @@
 #
 # Copyright (c) 2001-2002 Herbert Xu <herbert@debian.org>
 #
-# Usage: copy-modules version-flavour
+# Usage: copy-modules version flavour
 
 set -e
 
@@ -31,7 +31,8 @@ deplist() {
 	done
 }
 
-version=$1
+version=$1-$2
+flavour=$2
 arch=$(dpkg-architecture -qDEB_HOST_ARCH)
 home=$PWD
 
@@ -45,6 +46,12 @@ if [ -n "$SOURCEDIR" ]; then
 	moddir=$SOURCEDIR/lib/modules/$version
 else
 	moddir=/lib/modules/$version
+fi
+
+if [ -d modules/$arch-$flavour ]; then
+	modlistdir=modules/$arch-$flavour
+else
+	modlistdir=modules/$arch
 fi
 
 # get module dependencies from modules.dep
@@ -75,7 +82,7 @@ mkdir $tmpdir/module-deps $tmpdir/module-list
 # the module
 for i in $(
 	{
-		find modules/$arch -maxdepth 1 \( -type f -or -type l \) -not -name '*.lnk' -printf "%f\t%f\n"
+		find $modlistdir -maxdepth 1 \( -type f -or -type l \) -not -name '*.lnk' -printf "%f\t%f\n"
 		cat $tmpdir/module-deps.packages
 	} | tsort | tac
 ); do
@@ -90,7 +97,7 @@ for i in $(
 		xargs -r cat
 	} | sort -u > $tmpdir/exclude			# modules to exclude
 
-	cp $home/modules/$arch/$i $tmpdir/module-list
+	cp $home/$modlistdir/$i $tmpdir/module-list
 
 	# exclude modules in exclude from dependency list
 	join -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |

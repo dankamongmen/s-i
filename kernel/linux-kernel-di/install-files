@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+# Create and populate the package build directories.
+
+sub doit {
+	print "\t".join(" ", @_)."\n";
+	my $ret=(system(@_) >> 8);
+	if ($ret != 0) {
+		die "command exited with status $ret\n";
+	}
+}
+
+my $hostarch=`dpkg-architecture -qDEB_HOST_ARCH`;
+chomp $hostarch;
+
+my $kname;
+open(NAMES, "kernel-names") || die "kernel-names: $!";
+while (<NAMES>) {
+	chomp;
+	next if /^#/ || ! length;
+
+	my ($arch, $name)=split(' ', $_, 2);
+	if ($arch eq $hostarch) {
+		$kname=$name;
+		last;
+	}
+}
+close NAMES;
+if (! defined $kname) {
+	die "could not find $hostarch in kernel-names";
+}
+
+open(KVERS, "kernel-versions") || die "kernel-versions: $!";
+while (<KVERS>) {
+	chomp;
+	next if /^#/ || ! length;
+
+	my ($arch, $kernelversion, $flavour, $installedname, $builddep)=split(' ', $_, 5);
+	if (! length $arch || ! length $kernelversion ||
+	    ! length $installedname || ! length $flavour) {
+		die "parse error";
+	}
+	next unless $arch eq $hostarch;
+
+	doit("install", "-D", "-m", 644,
+		$ENV{SOURCEDIR}."/boot/$kname-$installedname",
+		"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname");
+	doit("install", "-D", "-m", 644,
+		$ENV{SOURCEDIR}."/lib/modules/$installedname/modules.dep",
+		"debian/kernel-image-$kernelversion-$flavour-di/lib/modules/$installedname/modules.dep");
+	doit("./copy-modules", $kernelversion, $flavour);
+	doit("./find-dups", "$kernelversion-$flavour");
+}

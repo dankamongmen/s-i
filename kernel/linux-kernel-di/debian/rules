@@ -4,13 +4,7 @@ ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 
 links:
-	# Generate symlinks from .lnk files.
-	set -e; \
-	for lnk in $$(find modules -type f -name \*.lnk); do \
-		file=$$(echo $$lnk | sed s/.lnk//); \
-		rm -f $$file; \
-		ln -sf $$(cat $$lnk) $$file; \
-	done
+	./make-links
 
 debian/control: links gen-control debian/control.stub package-list kernel-versions
 	./gen-control > debian/control
@@ -20,25 +14,15 @@ build: links debian/control
 
 clean: debian/control
 	dh_testdir
-	find modules -type l | xargs rm -f
-	dh_clean
+	dh_clean `find modules -type l`
 
 binary-indep:
 
 binary-arch: links debian/control
 	dh_testdir
 	dh_clean -k
-
-	set -e; \
-	for kernel in `grep '^$(ARCH)[ 	]' kernel-versions | awk '{print $$4 }'`; do \
-		echo $$kernel; \
-		name=`grep '^$(ARCH)[ 	]' kernel-names | awk '{print $$2 }'`; \
-		install -D -m 644 $(SOURCEDIR)/boot/$$name-$$kernel debian/kernel-image-$$kernel-di/boot/$$name; \
-		install -D -m 644 $(SOURCEDIR)/lib/modules/$$kernel/modules.dep \
-			debian/kernel-image-$$kernel-di/lib/modules/$$kernel/modules.dep; \
-		./copy-modules $$kernel; \
-		./find-dups $$kernel; \
-	done
+	
+	./install-files
 
 	dh_fixperms -s
 	for p in $$(dh_listpackages -s); do \

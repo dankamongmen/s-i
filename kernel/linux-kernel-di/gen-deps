@@ -19,11 +19,18 @@ while (<LIST>) {
 	elsif (/Depends:\s*(.*)/) {
 		my @depends=split(", ", $1);
 		# Skip packages that are not built for this architecture.
-		next unless -e "modules/$arch/$package";
+		my $modlistdir="";
+		if (-d "modules/$arch-$flavour") {
+			$modlistdir="modules/$arch-$flavour";
+		}
+		else {
+			$modlistdir="modules/$arch";
+		}
+		next unless -e "$modlistdir/$package";
 		foreach my $dep (@depends) {
 			# Skip depends that are not built for this
 			# architecture.
-			next unless -e "modules/$arch/$dep";
+			next unless -e "$modlistdir/$dep";
 			push @out, "$package\t$dep\n";
 		}
 	}
