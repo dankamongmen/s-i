@@ -4,8 +4,14 @@ font=/unifont.bgf
 if [ -x "$bterm" -a -e "$font" -a -n "$TERM_UTF8" -a -n "$TERM_FRAMEBUFFER" ] ; then
 	TERM=bterm
 	export TERM
+	set +e
 	$bterm -f $font -l $LANG /lib/debian-installer/menu
+	EXIT=$?
+	set -e
 else
 	rm -f $font
+	set +e
 	/lib/debian-installer/menu
+	EXIT=$?
+	set -e
 fi
