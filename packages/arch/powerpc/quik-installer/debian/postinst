@@ -94,6 +94,7 @@ if [ "${root#/dev/hd}" != "$root" ] && [ "${root#/dev/hda}" = "$root" ]; then
 fi
 
 boot_devfs="$(findfs /boot)"
+[ "$boot_devfs" ] || boot_devfs="$root_devfs"
 info "boot partition: $boot"
 if [ "$boot_devfs" != "$root_devfs" ]; then
     # TODO: Is this still required, now that we put kernel symlinks in
