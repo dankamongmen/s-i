@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: device-names.xml,v 1.2 2003/09/19 02:01:40 toff Exp $ -->
+<!-- $Id: device-names.xml,v 1.3 2003/09/22 04:45:53 toff Exp $ -->
 
 
  <sect1 id="device-names">
@@ -11,9 +11,7 @@ systems.  You need to know the names that Linux uses when you create
 and mount partitions. Here's the basic naming scheme:
 
 </para>
-<itemizedlist>
-
-<![ %not-s390; [
+<itemizedlist arch="not-s390">
 <listitem><para>
 
 The first floppy drive is named ``/dev/fd0''.
@@ -56,38 +54,32 @@ The master and slave disks of the secondary controller can be called
 can actually have two channels, effectively acting like two
 controllers.
 
-<![ %m68k; [
+<phrase arch="m68k">
 The letters may differ from what shows in the mac program pdisk (i.e. what
 shows up as /dev/hdc on pdisk may show up as /dev/hda in Debian).
-]]>
+</phrase>
 
 </para></listitem>
 
-<![ %i386; [
-<listitem><para>
+<listitem arch="i386"><para>
 
 The first XT disk is named ``/dev/xda''.
 
 </para></listitem>
-<listitem><para>
+<listitem arch="i386"><para>
 
 The second XT disk is named ``/dev/xdb''.
 
 </para></listitem>
-]]>
-
-<![ %m68k; [
-<listitem><para>
+<listitem arch="m68k"><para>
 
 The first ACSI device is named ``/dev/ada'', the second is named
 ``/dev/adb''.  
 
 </para></listitem>
-]]>
+</itemizedlist>
 
-<!-- end of not-s390 --> ]]>
-
-<![ %s390; [
+<itemizedlist arch="s390">
 <listitem><para>
 
 The DASD devices are named ``/dev/dasd/xxxx/device'' where xxxx is the
@@ -99,18 +91,15 @@ chapter 3 in
 Device Drivers and Installation Commands</ulink> for more information about this.
 
 </para></listitem>
-]]>
-
 </itemizedlist>
 
-<![ %not-s390; [
-<para>
+<para arch="not-s390">
 
 The partitions on each disk are represented by appending a decimal
 number to the disk name: ``sda1'' and ``sda2'' represent the first and
 second partitions of the first SCSI disk drive in your system.
 
-</para><para>
+</para><para arch="not-s390">
 
 Here is a real-life example.  Let's assume you have a system with 2
 SCSI disks, one at SCSI address 2 and the other at SCSI address 4.
@@ -119,18 +108,14 @@ The first disk (at address 2) is then named ``sda'', and the second
 named ``sda1'', ``sda2'', and ``sda3''.  The same applies to the
 ``sdb'' disk and its partitions.
 
-</para><para>
+</para><para arch="not-s390">
 
 Note that if you have two SCSI host bus adapters (i.e., controllers),
 the order of the drives can get confusing.  The best solution in this
 case is to watch the boot messages, assuming you know the drive models
 and/or capacities.
 
-</para>
-]]>
-
-<![ %i386; [
-<para>
+</para><para arch="i386">
 
 Linux represents the primary partitions as the drive name, plus the
 numbers 1 through 4.  For example, the first primary partition on the
@@ -141,38 +126,24 @@ partition, that is, the primary partition holding the logical
 partitions, is not usable by itself.  This applies to SCSI disks as
 well as IDE disks.
 
-</para>
-]]>
-
-<![ %m68k; [
-<para>
+</para><para arch="m68k">
 
 VMEbus systems using the TEAC FC-1 SCSI floppy drive will see it as normal
 SCSI disk. To make identification of the drive simpler the installation
 software will create a symbolic link to the appropriate device and name
 it ``/dev/sfd0''.
 
-</para>
-]]>
-
-<![ %sparc; [
-<para>
+</para><para arch="sparc">
 
 Sun disk partitions allow for 8 separate partitions (or slices). The
 third partition is usually (and is preferred to have) the ``Whole Disk''
 partition. This partition references all of the sectors of the disk, and
 is used by the boot loader (either SILO, or Sun's).
 
-</para>
-]]>
-
-<![ %s390; [
-<para>
+</para><para arch="s390">
 
 &arch-title; disk partitions allow for 3 separate partitions. They are called
 /dev/dasd/xxxx/part1, /dev/dasd/xxxx/part2 and /dev/dasd/xxxx/part3.
 
 </para>
-]]>
-
  </sect1>
