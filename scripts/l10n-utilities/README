@@ -1,20 +1,7 @@
 l10n-utilities README, debian-installer SVN
 
-The following files may be usefull regarding translations in debian-installer.
-
-
-merge-translations
-  - Search all PO files under the current directory 
-  - Merge each language file into one big file
-  
-  WORK IN PROGRESS. You have been warned!
-
-
-update-translations
-  - Search all packages needing translations under the current directory
-  - Add or update these with tranlations originated from a reference file
- 
-  WORK IN PROGRESS. You have been warned!
+The following files may be useful regarding the handling of
+internationalisation and localisation in debian-installer.
 
 
 grep-translators
@@ -26,11 +13,75 @@ grep-translators
   If LANGUAGECODE is given, only translators for LANGUAGEGODE are grepped,
   otherwise all po-files.
 
+l10n-sync
+  Usage: l10n-sync <D-I_copy>
 
+  This script synchronises the translations in all D-I packages with
+  the translators work in packages/po.
 
+  Define DEBUG=Y for more output
+  Define ONLINE="YES_I_KNOW_WHAT_I_DO" if SVN commits/updates can be made
 
+  The use of this script is VERY DANGEROUS when used with the
+  ONLINE variable properly defined. The script will then COMMIT the
+  changes it makes.
+
+  The only use for this script is for periodical synchronisations made
+  by the D-I i18n coordinator.
+
+l10n-release
+  Usage: l10n-release
+
+  This script should be run by package maintainers before building
+  and releasing a D-I package.
+
+  It will make a last synchronisation of the package's translations
+  with the translators work in packages/po
+
+output-l10n-changes
+  Usage: output-l10n-changes <package-directory> [-d]
+         -d: remove the .credits_log file after the output, 
+             please use while releasing
+
+  This script takes the debian/.credits_log (if it does not exist,
+  log-changes is run to create it), outputs the changes in the
+  translations since the last release in a form suitable for
+  copy&pasting into the package's changelog. The script doesn't modify
+  any files apart from .credits_log.
+
+  The use of this script alone is obsoleted by l10n-release.
+
+log-changes
+  Usage: log-changes <package-directory>
+
+  This script is intended to be run just after the debconf-updatepo
+  run, to log the changed translations with the names of the
+  translators. Logging is done to the debian/.credits_log file. This
+  file is used by output-l10n-changes.
+
+  The use of this script alone is obsoleted by l10n-release.
+
+scan-trans
+  Usage: scan-trans <directory>
+
+  This script scans a whole tree for translations. It is basically a wrapper
+  for calling output-l10n-changes for several packages.
+
+gettext-helper
+  Usage gettext-helper export|import <language_code>
+
+  This script combines several .po files into on large file, or spread
+  the translations from the large file into the small files.
+
+  It will operate on all PO files contained in current directory
+  subdirectories, no matter whether they are debconf translations or not.
 
 Changelog
 
-  Dennis Stampfer, Sa Jul 24 16:36:12 CEST 2004
+  Dennis Stampfer, Sat Jul 24 16:36:12 CEST 2004
     * begin
+  Christian Perrier, Wed Aug 11 08:34:26 CEST 2004
+    * remove reference to obsoleted merge-translations and update-translations
+    * move l10n-changes scripts to this directory
+    * add reference to l10n-sync and l10n-release
+    * add reference to gettext-helper
