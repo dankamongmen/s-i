@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.11 2003/03/02 12:58:05 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.12 2003/03/05 21:03:35 mckinstry Exp $
  */
 
 #include "config.h"
@@ -84,28 +84,14 @@ int grep (const char *file, const char *string)
  */
 char *get_locale (void)
 {
-	char *lang, locale[LINESIZE];
-	lang = getenv ("LANGUAGE");
+	// languagechooser sets locale of the form xx_YY
+	// NO encoding used.
 	
-	/* LANGUAGE may be set as a colon seperated list by languagechooser;
-	 * for the moment, only take the first language
-	 */
-	if (lang && strlen (lang) > 0)
-		strncpy (locale, lang, 2);
+	client->command (client, "get", "debian-installer/locale",  NULL);
+	if (client->value && (strlen (client->value) > 0))
+		return STRDUP (client->value);
 	else
-		strncpy (locale, "en", 2);
-	locale[2] = '_';
-	locale[5] = '\0';
-	client->command (client, "get", "debian-installer/country", NULL);
-	if (client->value && ( strlen (client->value)  >= 2)) {
-		strncpy (locale + 3, client->value, 2);
-		// FIXME Workaround for languagechooser bug
-		locale[3] = toupper (locale[3]);
-		locale[4] = toupper (locale[4]);
-	}
-	else
-		strncpy (locale + 3, "US", 2);
-	return STRDUP (locale);
+		return STRDUP ("en_US");
 }
 
 
@@ -503,7 +489,7 @@ char *ponder_keyboard_choices (void)
 	// Should we prompt the user?
 	if (choices < 2)		
 		return "low";
-	return (preferred->present == TRUE) ? "medium" : "high";	
+	return (preferred->present == TRUE) ? "low" : "medium";	
 }
 
 /**
