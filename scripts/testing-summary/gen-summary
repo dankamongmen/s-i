@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+# Summary of udebs in testing vs those in unstable.
+use strict;
+use warnings;
+
+my $mirror=shift || "/org/ftp.debian.org/ftp/";
+# extracted changelogs in a pool structure
+my $changelogs=shift || "/org/packages.debian.org/www/changelogs/";
+# only the arches we care about
+my @arches=qw(alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc);
+my @dists=qw(testing unstable);
+
+my %packageversions;
+my %source2bin;
+my %seenpackages;
+my %pooldirs;
+my @annotations;
+
+sub between_versions {
+	my $version=shift;
+	my $low=shift;
+	my $high=shift;
+	if ((! length $low || system('dpkg','--compare-versions', $low, '<<', $version) == 0) &&
+	    (! length $high || system('dpkg','--compare-versions', $high, '>=', $version) == 0)) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+sub older_version {
+	my $version=shift;
+	my $high=shift;
+	if (length $high && system('dpkg','--compare-versions', $high, '>>', $version) == 0) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+sub changelogfile {
+	my $package=shift;
+	my $version=shift;
+	$version=~s/^\d+://; # no epoch
+	return "$changelogs/$pooldirs{$package}/${package}_$version/changelog";
+}
+
+sub archname {
+	my %arch=map { $_ => 1 } @_;
+	my %seen;
+	my %unseen=map { $_ => 1 } @arches;
+	foreach my $arch (@arches) {
+		if (exists $arch{$arch}) {
+			$seen{$arch}=1;
+			delete $unseen{$arch}
+		}
+	}
+	if (! %unseen) {
+		return "all";
+	}
+	elsif (keys %unseen > keys %seen) {
+		return join(",", keys %seen);
+	}
+	else {
+		return join(",", map { "!$_" } keys %unseen);
+	}
+}
+
+foreach my $dist (@dists) {
+	foreach my $arch (@arches) {
+		my $pkgfile="$mirror/dists/$dist/main/debian-installer/binary-$arch/Packages";
+		open(PKG, $pkgfile) || die "cannot open $pkgfile: $!";
+		local $/="\n\n";
+		while (<PKG>) {
+			my ($package)=m/Package: (.*)\n/;
+			my ($version)=m/Version: (.*)\n/;
+			if (! length $package || ! length $version) {
+				print STDERR "Parse failure. Stanza: $_";
+			}
+			else {
+				my ($source)=m/Source: (.*)\n/;
+				if (! defined $source) {
+					$source=$package;
+				}
+				$packageversions{$source}{$dist}{$arch} = $version;
+				push @{$source2bin{$source}}, $package;
+				$seenpackages{$source}=1;
+				my ($pooldir)=m/Filename: (.*)\/.*?\n/;
+				$pooldirs{$source}=$pooldir;
+			}
+		}
+	}
+	close PKG;
+}
+
+# collate transitions for multiple arches
+my %transitions;
+foreach my $package (keys %seenpackages) {
+	foreach my $arch (@arches) {
+		my $key="$package";
+		my %seen;
+		foreach my $dist (@dists) {
+			if (exists $packageversions{$package}{$dist}{$arch}) {
+				my $version=$packageversions{$package}{$dist}{$arch};
+				$key.=" $version";
+				$seen{$version}++;
+			}
+		}
+		my $dup=0;
+		foreach my $key (keys %seen) {
+			$dup=1 if $seen{$key} > 1;
+		}
+		
+		push @{$transitions{$package}{$key}}, $arch if ! $dup && %seen;
+	}
+}
+
+open (ANN, "annotations") || print STDERR "failed to read annotations: $!";
+while (<ANN>) {
+	chomp;
+	next if /^#/;
+	next unless length;
+	
+	my ($user, $package, $version, $annotation) = split(' ', $_, 4);
+	next unless defined $annotation && length $annotation;
+	push @annotations, {user => $user, package => $package,
+		version => $version, annotation => $annotation};
+}
+close ANN;
+
+print "<html><head><title>udeb testing summary</title></head><body>\n";
+
+foreach my $withchangelog (0,1) {
+	print "<table><tr align=left><th>package</th><th>notes</th><th>arches</th>";
+	foreach my $dist (@dists) {
+		print "<th>$dist</th>";
+	}
+	print "<th>age</th></tr>\n";
+	my $numcols=4 + @dists;
+	
+	foreach my $package (sort keys %seenpackages) {
+		foreach my $transition (keys %{$transitions{$package}}) {
+			print "<tr><td>$package</td><td></td>";
+			print "<td>".archname(@{$transitions{$package}{$transition}})."</td>";
+			my $some_arch=@{$transitions{$package}{$transition}}[0];
+			my @vers;
+			foreach my $dist (@dists) {
+				my $version=$packageversions{$package}{$dist}{$some_arch};
+				if (! defined $version) {
+					$version="-";
+					push @vers, '';
+				}
+				else {
+					push @vers, $version;
+				}
+				if ($dist eq $dists[-1]) {
+					if ($withchangelog) {
+						print "<td><a name=\"$transition\"><a href=\"#nochangelog $transition\">$version</a>";
+					}
+					else {
+						print "<td><a name=\"nochangelog $transition\" href=\"#$transition\">$version</a>";
+					}
+				}
+				else {
+					print "<td>$version</td>";
+				}
+			}
+			print "</tr>\n";
+			
+			foreach my $ann (@annotations) {
+				if ($package eq $ann->{package} &&
+				    between_versions($ann->{version}, $vers[0], $vers[1])) {
+					print "<tr><td></td><td colspan=".($numcols-1)."><b>$ann->{annotation}</b> <i>-- $ann->{user}</i>";
+					if (older_version($ann->{version}, $vers[1])) {
+						print " (re an older version)";
+					}
+					print "</td></tr>\n";
+				}
+			}
+			
+			if ($withchangelog && length $vers[0] && length $vers[1]) {
+				my $ch_a=changelogfile($package, $vers[0]);
+				my $ch_b=changelogfile($package, $vers[1]);
+				my $changelog=`diff -U 0 $ch_a $ch_b `;
+				$changelog=~s/^\+\+\+.*\n//mg;
+				$changelog=~s/^\-\-\-.*\n//mg;
+				$changelog=~s/^\@\@.*\n//mg;
+				$changelog=~s/^\+//mg;
+				$changelog=~s/^ --.*\n//mg;
+				$changelog=~s/^\n//mg;
+				print "<tr><td></td><td colspan=".($numcols-1)."><pre>$changelog</pre></td></tr>\n";
+			}
+		}
+	}
+	
+	print "</table><hr>\n";
+}
