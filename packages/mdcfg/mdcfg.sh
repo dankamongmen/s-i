@@ -34,11 +34,11 @@ md_delete_verify() {
 		"true")
 			# Stop the MD device, and zero the superblock
 			# of all the component devices
+                        DEVICES=`mdadm -Q --detail /dev/md/${NUMBER} | grep "\(active\|spare\) | sed -e 's/.* //'`
 			#echo "mdadm --stop /dev/${DEVICE}"
 			mdadm --stop /dev/md/${NUMBER}
 			for DEV in $DEVICES; do
-				DEV=`echo ${DEV}|sed -e "s/\\[.*\\]//g"`
-				mdadm --zero-superblock "/dev/${DEV}"
+				mdadm --zero-superblock ${DEV}
 				#echo "mdadm --zero-superblock /dev/${DEV}"
 			done
 			;;
@@ -95,9 +95,9 @@ md_create_raid1() {
 	NUM_PART=0
 	for i in ${RAW_PARTITIONS}; do
 		DEV=`echo ${i}|sed -e "s/\/dev\///"`
-		cat /proc/mdstat | grep -q "${DEV}"
+		MAPPEDDEV=`mapdevfs ${i} | sed -e "s/\/dev\///"`
 
-		if [ "$?" -eq "0" ] ; then
+		if grep -q "\(${DEV}\|${MAPPEDDEV}\)" /proc/mdstat; then
 			continue
 		fi
 
