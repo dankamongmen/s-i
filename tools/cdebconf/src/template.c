@@ -18,9 +18,9 @@ static void remove_newlines(char *);
 const char *template_fields_list[] = {
         "tag",
         "type",
-        "listorder",
         "default",
         "choices",
+        "indices",
         "description",
         "extended_description",
         NULL
@@ -117,7 +117,6 @@ void template_delete(struct template *t)
 
 	DELETE(t->tag);
 	DELETE(t->type);
-	DELETE(t->listorder);
 	p = t->fields;
 	DELETE(t);
 	while (p != NULL)
@@ -125,6 +124,7 @@ void template_delete(struct template *t)
 		q = p->next;
 		DELETE(p->defaultval);
 		DELETE(p->choices);
+		DELETE(p->indices);
 		DELETE(p->description);
 		DELETE(p->extended_description);
 		DELETE(p);
@@ -157,7 +157,6 @@ struct template *template_dup(struct template *t)
         struct template_l10n_fields *from, *to;
 
         ret->type = STRDUP(t->type);
-        ret->listorder = STRDUP(t->listorder);
         if (t->fields == NULL)
                 return ret;
 
@@ -171,6 +170,7 @@ struct template *template_dup(struct template *t)
         {
                 to->defaultval = STRDUP(from->defaultval);
                 to->choices = STRDUP(from->choices);
+                to->indices = STRDUP(from->indices);
                 to->description = STRDUP(from->description);
                 to->extended_description = STRDUP(from->extended_description);
 
@@ -194,6 +194,8 @@ static char *template_field_get(struct template_l10n_fields *p,
         return p->defaultval;
     else if (strcasecmp(field, "choices") == 0)
         return p->choices;
+    else if (strcasecmp(field, "indices") == 0)
+        return p->indices;
     else if (strcasecmp(field, "description") == 0)
         return p->description;
     else if (strcasecmp(field, "extended_description") == 0)
@@ -214,6 +216,11 @@ static void template_field_set(struct template_l10n_fields *p,
         DELETE(p->choices);
         p->choices = STRDUP(value);
     }
+    else if (strcasecmp(field, "indices") == 0)
+    {
+        DELETE(p->indices);
+        p->indices = STRDUP(value);
+    }
     else if (strcasecmp(field, "description") == 0)
     {
         DELETE(p->description);
@@ -232,8 +239,8 @@ static void template_field_set(struct template_l10n_fields *p,
  * Input: a language name
  * Input: a field name
  * Output: the value of the given field in the given language, field
- *         name may be any of type, default, choices, description and
- *         extended_description
+ *         name may be any of type, default, choices, indices,
+ *         description and extended_description
  * Description: get field value
  * Assumptions: 
  */
@@ -251,8 +258,6 @@ static char *template_lget(struct template *t, const char *lang,
         return t->tag;
     else if (strcasecmp(field, "type") == 0)
         return t->type;
-    else if (strcasecmp(field, "listorder") == 0)
-        return t->listorder;
 
     /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
@@ -305,8 +310,8 @@ static char *template_lget(struct template *t, const char *lang,
  * Input: a language name
  * Input: a field name
  * Output: the value of the given field in the given language, field
- *         name may be any of type, default, choices, description and
- *         extended_description
+ *         name may be any of type, default, choices, indices,
+ *         description and extended_description
  * Description: get field value
  * Assumptions: Arguments have been previously checked, lang and field
  *              are not MULL
@@ -354,11 +359,6 @@ static void template_lset(struct template *t, const char *lang,
     else if (strcasecmp(field, "type") == 0)
     {
         t->type = STRDUP(value);
-        return;
-    }
-    else if (strcasecmp(field, "listorder") == 0)
-    {
-        t->listorder = STRDUP(value);
         return;
     }
 
@@ -510,8 +510,6 @@ struct template *template_load(const char *filename)
 			t = template_new(p+10);
 		else if (strstr(p, "Type: ") == p && t != 0)
 			template_lset(t, NULL, "type", p+6);
-		else if (strstr(p, "Listorder: ") == p && t != 0)
-			template_lset(t, NULL, "listorder", p+11);
 		else if (strstr(p, "Default: ") == p && t != 0)
 			template_lset(t, NULL, "default", p+9);
 		else if (strstr(p, "Default-") == p && t != 0) 
@@ -539,6 +537,24 @@ struct template *template_load(const char *filename)
 			{
 				lang = strndup(p+8, (int) (cp - p - 8));
 				template_lset(t, lang, "choices", cp+8);
+			}
+			else
+			{
+#ifndef NODEBUG
+				fprintf(stderr, "Unknown localized field:\n%s\n", p);
+#endif
+                                continue;
+			}
+		}
+		else if (strstr(p, "Indices: ") == p && t != 0)
+			template_lset(t, NULL, "indices", p+9);
+		else if (strstr(p, "Indices-") == p && t != 0) 
+		{
+			cp = strstr(p, ".UTF-8: ");
+			if (cp != NULL && cp != p+8)
+			{
+				lang = strndup(p+8, (int) (cp - p - 8));
+				template_lset(t, lang, "indices", cp+8);
 			}
 			else
 			{

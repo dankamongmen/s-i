@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.30 2003/11/06 22:27:08 barbier Rel $
+ * $Id: gtk.c,v 1.31 2004/01/25 23:52:04 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -69,7 +69,7 @@
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_listorder(q)		question_get_field((q), "", "listorder")
+#define q_get_indices(q)		question_get_field((q), "", "indices")
 
 /* A struct to let a question handler store appropriate set functions that will be called after
    gtk_main has quit */
@@ -147,13 +147,13 @@ static void combo_setter(void *entry, struct question *q)
     gchar *choices_translated[100] = {0};
     int i, count;
     int *tindex = NULL;
-    const gchar *listorder = q_get_listorder(q);
+    const gchar *indices = q_get_indices(q);
     
     count = strgetargc(q_get_choices_vals(q));
     if (count > DIM(choices))
         count = DIM(choices);
     tindex = malloc(sizeof(int) * count);
-    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, DIM(choices_translated));
+    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
 
     for (i = 0; i < count; i++)
     {
@@ -175,7 +175,7 @@ static void multi_setter(void *check_container, struct question *q)
     gchar *choices[100] = {0};
     gchar *choices_translated[100] = {0};
     int *tindex = NULL;
-    const gchar *listorder = q_get_listorder(q);
+    const gchar *indices = q_get_indices(q);
 
     check_list = gtk_container_get_children(GTK_CONTAINER(check_container));
     while(check_list)
@@ -186,7 +186,7 @@ static void multi_setter(void *check_container, struct question *q)
             if (count > DIM(choices))
                 count = DIM(choices);
             tindex = malloc(sizeof(int) * count);
-            strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, DIM(choices_translated));
+            strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
 
 	    for (i = 0; i < count; i++)
             {
@@ -239,13 +239,13 @@ void button_single_callback(GtkWidget *button, struct frontend_question_data* da
     gchar *choices_translated[100] = {0};
     int i, count;
     int *tindex = NULL;
-    const gchar *listorder = q_get_listorder(q);
+    const gchar *indices = q_get_indices(q);
 
     count = strgetargc(q_get_choices_vals(q));
     if (count > DIM(choices))
         count = DIM(choices);
     tindex = malloc(sizeof(int) * count);
-    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, DIM(choices_translated));
+    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
     for (i = 0; i < count; i++)
     {
 	if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0)
@@ -494,7 +494,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     int i, j, count, dcount;
     struct frontend_question_data *data;
     int *tindex = NULL;
-    const gchar *listorder = q_get_listorder(q);
+    const gchar *indices = q_get_indices(q);
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -504,7 +504,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     if (count > DIM(choices))
         count = DIM(choices);
     tindex = malloc(sizeof(int) * count);
-    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, DIM(choices_translated));
+    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
     tmp = question_get_field(q, NULL, "value");
     dcount = strchoicesplit(tmp, defvals, DIM(defvals));
     free(tmp);
@@ -597,7 +597,7 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
-    const gchar *listorder = q_get_listorder(q);
+    const gchar *indices = q_get_indices(q);
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -607,7 +607,7 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     if (count > DIM(choices))
         count = DIM(choices);
     tindex = malloc(sizeof(int) * count);
-    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, DIM(choices_translated));
+    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
     if (count <= 0) return DC_NOTOK;
 
     button_box = gtk_vbutton_box_new();
@@ -646,13 +646,13 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     int i, count;
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
-    const gchar *listorder = q_get_listorder(q);
+    const gchar *indices = q_get_indices(q);
     
     count = strgetargc(q_get_choices_vals(q));
     if (count > DIM(choices))
         count = DIM(choices);
     tindex = malloc(sizeof(int) * count);
-    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, DIM(choices_translated));
+    strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
     free(tindex);
     if (count <= 0) return DC_NOTOK;
 

@@ -11,6 +11,16 @@ cdebconf (0.54) UNRELEASED; urgency=low
     - Update Bosnian translation (bs.po).
   * Denis Barbier
     - Steal code from debconf to go back over skipped questions.
+    - As locales are not installed during early stage of installation,
+      sorting cannot be performed at run-time, and templates must
+      contain sorting order.  Thus the Listorder fields is removed and
+      replaced by a new Indices field.  If a template contains
+        Choices: a, b, c
+        Choices-ll.UTF-8: x, y, z
+        Indices-ll.UTF-8: 3, 2, 1
+      this means that 'a' is translated into 'x', 'b' into 'y' and 'c'
+      into 'z' for the language 'll', but they are displayed in reverse
+      order.
 
  -- Martin Sjogren <sjogren@debian.org>  Tue,  6 Jan 2004 23:39:01 +0100
 

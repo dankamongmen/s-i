@@ -10,6 +10,7 @@ struct template_l10n_fields
 	char *language;
 	char *defaultval;
 	char *choices;
+	char *indices;
 	char *description;
 	char *extended_description;
 	struct template_l10n_fields *next;
@@ -20,7 +21,6 @@ struct template
 	char *tag;
 	unsigned int ref;
 	char *type;
-	char *listorder;
 	struct template_l10n_fields *fields;
 	struct template *next;
 	char *(*lget)(struct template *, const char *l, const char *f);

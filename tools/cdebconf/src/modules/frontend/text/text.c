@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.55 2003/11/13 21:29:50 barbier Rel $
+ * $Id: text.c,v 1.56 2004/01/25 23:52:05 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -60,7 +60,7 @@
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_listorder(q)		question_get_field((q), "", "listorder")
+#define q_get_indices(q)		question_get_field((q), "", "indices")
 
 #define MAKE_UPPER(C) do { if (islower((int) C)) { C = (char) toupper((int) C); } } while(0)
 /*
@@ -256,7 +256,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char answer[4096] = {0};
 	int i, j, line, count = 0, dcount, choice;
         int *tindex = NULL;
-        const char *listorder = q_get_listorder(q);
+        const char *indices = q_get_indices(q);
 
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
@@ -264,7 +264,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
     choices = malloc(sizeof(char *) * count);
     choices_translated = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, count) != count)
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
         return DC_NOTOK;
 
     defaults = malloc(sizeof(char *) * count);
@@ -432,7 +432,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	int i, line, count = 0, choice = 1, def = -1;
 	const char *defval = question_getvalue(q, "");
 	int *tindex = NULL;
-	const char *listorder = q_get_listorder(q);
+	const char *indices = q_get_indices(q);
 
 	count = strgetargc(q_get_choices_vals(q));
         if (count <= 0)
@@ -440,7 +440,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	choices = malloc(sizeof(char *) * count);
 	choices_translated = malloc(sizeof(char *) * count);
 	tindex = malloc(sizeof(int) * count);
-	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, count) != count)
+	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
         	return DC_NOTOK;
 
 	if (count == 1)

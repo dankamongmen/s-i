@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.41 2003/11/11 23:56:03 barbier Rel $
+ * $Id: newt.c,v 1.42 2004/01/25 23:52:05 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -74,7 +74,7 @@ struct newt_data {
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_listorder(q)		question_get_field((q), "", "listorder")
+#define q_get_indices(q)		question_get_field((q), "", "indices")
 
 #define create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
 
@@ -419,7 +419,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     size_t res;
     wchar_t c;
     int *tindex = NULL;
-    const char *listorder = q_get_listorder(q);
+    const char *indices = q_get_indices(q);
     char *full_description = get_full_description(q);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
@@ -436,7 +436,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     choices = malloc(sizeof(char *) * count);
     choices_trans = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_trans, tindex, count) != count)
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
 
     defvals = malloc(sizeof(char *) * count);
@@ -553,7 +553,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     char **choices, **choices_trans, *defval;
     int count = 0, i, ret, defchoice = -1;
     int *tindex = NULL;
-    const char *listorder = q_get_listorder(q);
+    const char *indices = q_get_indices(q);
     char *full_description = get_full_description(q);
     const char *p;
     size_t res;
@@ -574,7 +574,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     choices = malloc(sizeof(char *) * count);
     choices_trans = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_trans, tindex, count) != count)
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
 
     win_width = width-7;

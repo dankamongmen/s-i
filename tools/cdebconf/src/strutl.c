@@ -244,56 +244,11 @@ int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
     return argc;
 }
 
-static int mystrcmp_lexicographic(const void *p1, const void *p2)
+int strchoicesplitsort(const char *origbuf, const char *transbuf, const char *indices, char **oargv, char **targv, int *oindex, size_t maxnarg)
 {
-	return strcmp(((sort_str_t *) p1)->string, ((sort_str_t *) p2)->string);
-}
-
-static char *
-extractonechoice(const char *inbuf, const char **next, int skip_exclam)
-{
-    const char *s = inbuf, *e, *c;
-    char *p, *argv;
-
-    /* find end */
-    e = s;
-    while (*e != 0)
-    {
-        if (*e == '\\' && *(e+1) == ',')
-            e += 2;
-        else if (*e == ',')
-            break;
-        else
-            e++;
-    }
-
-    if (*s == '!' && skip_exclam)
-        s++;
-    argv = malloc(e-s+1);
-    p = argv;
-    for (c = s; c < e; c++, p++)
-    {
-        if (*c == '\\' && c < (e-1) && *(c+1) == ',')
-            c++;
-        *p = *c;
-    }
-    *p-- = 0;
-    c--;
-    /* strip off trailing spaces */
-    while (c > s && isspace(*p))
-    {
-        *p-- = 0;
-        c--;
-    }
-    *next = e;
-    return argv;
-}
-
-int strchoicesplitsort(const char *origbuf, const char *transbuf, const char *listorder, char **oargv, char **targv, int *oindex, size_t maxnarg)
-{
-    int argc, i, offset;
-    const char *s, *e;
-    sort_str_t *sorted_string = NULL;
+    int i;
+    char **cindex;
+    char **sorted_targv;
 
     assert(oindex);
     assert(oargv);
@@ -301,69 +256,32 @@ int strchoicesplitsort(const char *origbuf, const char *transbuf, const char *li
     assert(origbuf);
     assert(transbuf);
 
-    sorted_string = malloc(sizeof(sort_str_t) * maxnarg);
-
-    /*  First split translated choices field  */
-    argc = 0;
-    s = transbuf;
-    INFO(INFO_VERBOSE, "Splitting [%s]\n", s);
-    while (*s != 0 && argc < maxnarg)
-    {
-        /* skip initial spaces */
-        while (isspace(*s))
-            s++;
-
-        targv[argc] = extractonechoice(s, &e, 0);
-        sorted_string[argc].index = argc;
-        sorted_string[argc].string = targv[argc];
-        argc++;
-        s = e;
-        if (*s == ',') s++;
-    }
-
-    /*  Next split original choices field  */
-    argc = 0;
-    s = origbuf;
-    INFO(INFO_VERBOSE, "Splitting [%s]\n", s);
-    while (*s != 0 && argc < maxnarg)
-    {
-        /* skip initial spaces */
-        while (isspace(*s))
-            s++;
-
-        oargv[argc] = extractonechoice(s, &e, 1);
-        oindex[argc] = argc;
-        if (*s == '!')
-        {
-            /*  The string must be inserted at this exact position  */
-            oindex[argc] = -1;
-            sorted_string[argc].index = -1;
-            sorted_string[argc].string = "";
-        }
-        argc++;
-        s = e;
-        if (*s == ',') s++;
-    }
-    if (strcmp(listorder, "lexicographic") == 0)
-        qsort(sorted_string, argc, sizeof(sort_str_t), mystrcmp_lexicographic);
-
-    for (offset = 0; offset < argc && sorted_string[offset].index < 0; offset++)
-            ;
-    for (i = 0; i < argc; i++)
-    {
-        if (oindex[i] == -1)
-        {
+    if (strchoicesplit(origbuf, oargv, maxnarg) != maxnarg)
+        return DC_NOTOK;
+    if (strchoicesplit(transbuf, targv, maxnarg) != maxnarg)
+        return DC_NOTOK;
+    if (indices == NULL || *indices == '\0') {
+        for (i = 0; i < maxnarg; i++)
             oindex[i] = i;
-            offset--;
+    } else {
+        cindex = malloc(sizeof(char *) * maxnarg);
+        if (strchoicesplit(indices, cindex, maxnarg) != maxnarg)
+            return DC_NOTOK;
+        sorted_targv = malloc(sizeof(char *) * maxnarg);
+        for (i = 0; i < maxnarg; i++) {
+            oindex[i] = strtol(cindex[i], NULL, 10) - 1;
+            if (oindex[i] < 0 || oindex[i] >= maxnarg)
+                return DC_NOTOK;
+            sorted_targv[oindex[i]] = STRDUP(targv[i]);
         }
-        else
-        {
-            oindex[i] = sorted_string[i+offset].index;
-            targv[i] = sorted_string[i+offset].string;
+        for (i = 0; i < maxnarg; i++) {
+            free(targv[i]);
+            targv[i] = sorted_targv[i];
         }
+        free(sorted_targv);
+        free(cindex);
     }
-    free(sorted_string);
-    return argc;
+    return maxnarg;
 }
 
 int strcmdsplit(char *inbuf, char **argv, size_t maxnarg)

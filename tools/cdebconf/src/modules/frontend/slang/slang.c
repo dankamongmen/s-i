@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.33 2003/11/06 22:27:08 barbier Rel $
+ * $Id: slang.c,v 1.34 2004/01/25 23:52:05 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -62,7 +62,7 @@
 #define q_get_description(q)  		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_listorder(q)		question_get_field((q), "", "listorder")
+#define q_get_indices(q)		question_get_field((q), "", "indices")
 
 /* Private variables */
 struct uidata {
@@ -429,7 +429,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	char selected[100] = {0};
 	char answer[1024] = {0};
 	int *tindex = NULL;
-	const char *listorder = q_get_listorder(q);
+	const char *indices = q_get_indices(q);
 	int i, j, count, dcount, ret = 0, val = 0, pos = 2, xpos, ypos;
 	int top, bottom, longest, ch;
 	struct uidata *uid = UIDATA(ui);
@@ -440,7 +440,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	if (count <= 0)
 		return DC_NOTOK;
 	tindex = malloc(sizeof(int) * count);
-	strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), listorder, choices, choices_translated, tindex, DIM(choices_translated));
+	strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
 	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
 	if (count <= 0) return DC_NOTOK;
