@@ -1390,11 +1390,11 @@ int main (int argc, char *argv[])
 #if defined(TEST)
         tablefile = "default.table";
 #else
-        tablefile = mydebconf_get(argv[1]);
+        tablefile = argv[1];
 #endif /* TEST */
 
     if ( ! tablefile )
-        autopartkit_error(1, "usage: %s <debconf-template>\n", argv[0]);
+        autopartkit_error(1, "usage: %s <table-file>\n", argv[0]);
 
     disk_reqs = load_partitions(tablefile);
     

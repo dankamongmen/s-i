@@ -3,14 +3,22 @@
 log=/var/log/messages
 template=autopartkit/partition_table
 
+log() {
+    logger -t autopartkit "$@"
+}
+
 run_parts() {
     partsdir="$1"
 
     for script in "$partsdir"/*; do
 	if [ -x "$script" ] ; then
-	    "$script" "$template" || true
+	    if "$script" "$template" ; then
+		:
+	    else
+		log "error: Fragment '$script' returned an error: $?."
+	    fi
 	else
-	    echo "error: Unable to execute $script" 1>&2
+	    log "error: Fragment '$script' is not executable."
 	fi
     done
 }
@@ -24,11 +32,18 @@ apt-install lvm10 || true
 # Run all scripts to choose table file
 run_parts /usr/lib/autopartkit.d
 
-if autopartkit "$template" ; then
-    :
+tablefile=`debconf-get $template 2>&1`
+
+if [ -z "$tablefile" -o ! -f "$tablefile" ] ; then
+    log "Unable to find table file '$tablefile'"
+    exit 1
+fi
+
+if autopartkit "$tablefile" ; then
+    log "info: autoparkit ran successfully using table file '$tablefile'."
 else
     # This should use debconf to report the error.
-    echo "error: autopartkit failed." >> $log
+    log "error: autopartkit failed."
     exit 1
 fi
 
