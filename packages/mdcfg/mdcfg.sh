@@ -222,19 +222,12 @@ md_create_raid1() {
 	db_get mdcfg/raid1sparecount
 	SPARE_COUNT="${RET}"
 	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
-	if [ "$REQUIRED" -gt "$NUM_PART" ] ; then
-		db_subst mdcfg/notenoughparts NUM_PART "${NUM_PART}"
-		db_subst mdcfg/notenoughparts REQUIRED "${REQUIRED}"
-		db_input critical mdcfg/notenoughparts
-		db_go mdcfg/notenoughparts
-		return
-	fi
 
 	db_set mdcfg/raid1devs ""
 	SELECTED=0
 
-	# Loop until the correct amount of active devices has been selected
-	while [ "${SELECTED}" -ne "${DEV_COUNT}" ]; do
+	# Loop until at least one device has been selected
+	until [ "${SELECTED}" -gt "0" -a "${SELECTED}" -le "${DEV_COUNT}" ]; do
 		db_subst mdcfg/raid1devs COUNT "${DEV_COUNT}"
 		db_subst mdcfg/raid1devs PARTITIONS "${PARTITIONS}"
 		db_input critical mdcfg/raid1devs
@@ -249,6 +242,12 @@ md_create_raid1() {
 			DEVICE=`echo ${i}|sed -e "s/,//"`
 			let SELECTED++
 		done
+	done
+
+	# Add "missing" for as many devices as weren't selected
+	while [ "${SELECTED}" -lt "${DEV_COUNT}" ]; do
+		MISSING_DEVICES="${MISSING_DEVICES} missing"
+		let SELECTED++
 	done
 
 	# Remove partitions selected in raid1devs from the PARTITION list
@@ -310,7 +309,7 @@ md_create_raid1() {
 	echo "Raid devices count: ${DEV_COUNT}"
 	echo "Spare devices count: ${SPARE_COUNT}"
 	echo "Commandline:"
-	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid1 -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}`
+	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid1 -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${MISSING_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}`
 }
 
 md_create_raid5() {
