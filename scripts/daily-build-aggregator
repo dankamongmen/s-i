@@ -1,0 +1,170 @@
+#!/usr/bin/perl
+# This program downloads summary.log files for the daily image builds, and
+# constructs a web page overview of the d-i builds. If you run a daily
+# build, add the info for your build to the list. 
+#
+# The url field points to the url your build can be downloaded from, the
+# email address is a contact address, the description is a breif
+# description of the build. The logurl points to wherever log files are.
+#
+# In the log directory you should have a summary.log file, that contains
+# lines in the following format:
+#    arch (date) user@host ident status
+#    
+# Where ident describes what is being built, arch is the architecture that
+# it is being built for, date is the output of the date command at the end
+# of the build (in the C locale), user@host is who did the build, and
+# status describes how it went (usually "success" or "failed"). A log file
+# for the build should in in the file named ident.log in the log directory.
+#
+# Example:
+# i386 (Thu Apr 22 21:08:03 EDT 2004) joey@kite build_floppy_boot success
+# i386 (Thu Apr 22 21:08:33 EDT 2004) joey@kite build_floppy_speakup success
+# i386 (Thu Apr 22 21:09:29 EDT 2004) joey@kite build_floppy_root success
+
+my @buildlist = (
+	{
+		url => 'http://people.debian.org/~vorlon/d-i/images/daily/netboot/',
+		logurl => 'http://people.debian.org/~vorlon/d-i/images/daily/netboot/',
+		email => 'vorlon@debian.org',
+		description => 'daily alpha images build',
+	},
+
+	{
+		url => 'http://people.debian.org/~vince/d-i/images/daily/riscstation/',
+		logurl => 'http://people.debian.org/~vince/d-i/images/daily/riscstation/',
+		email => 'vince@debian.org',
+		description => 'daily arm images build',
+	},
+	
+	{
+		url => 'http://people.debian.org/~jbailey/d-i/hppa/daily/',
+		logurl => 'http://people.debian.org/~jbailey/d-i/hppa/daily/',
+		email => 'jbailey@debian.org',
+		description => 'daily hppa images build',
+	},
+	
+	{
+		url => 'http://people.debian.org/~joeyh/d-i/images/daily/',
+		logurl => 'http://people.debian.org/~joeyh/d-i/images/daily/',
+		email => 'joeyh@debian.org',
+		description => 'daily i386 images build',
+	},
+	
+	{
+		url => 'http://people.debian.org/~jbailey/d-i/ia64/daily/netboot/',
+		logurl => 'http://people.debian.org/~jbailey/d-i/ia64/daily/netboot/',
+		email => 'jbailey@debian.org',
+		description => 'daily ia64 images build',
+	},
+
+	{
+		url => 'http://people.debian.org/~smarenka/d-i/images-m68k/daily/',
+		logurl => 'http://people.debian.org/~smarenka/d-i/images-m68k/daily/',
+		email => 'smarenka@debian.org',
+		description => 'daily m68k images build',
+	},
+
+	{
+		url => 'http://people.debian.org/~tbm/d-i/images/mips/daily/',
+		logurl => 'http://people.debian.org/~tbm/d-i/images/mips/daily/',
+		email => 'tbm@debian.org',
+		description => 'daily mips images build',
+	},
+
+	{
+		url => 'http://people.debian.org/~tbm/d-i/images/mipsel/daily/',
+		logurl => 'http://people.debian.org/~tbm/d-i/images/mipsel/daily/',
+		email => 'tbm@debian.org',
+		description => 'daily mipsel images build',
+	},
+
+	{
+		url => 'http://people.debian.org/~luther/debian-installer/daily-powerpc-built/current/',
+		logurl => 'http://people.debian.org/~luther/debian-installer/daily-powerpc-built/curent/',
+		email => 'luther@debian.org',
+		description => 'daily powerpc images build',
+	},
+
+	{
+		url => 'http://raptor.debian.org/d-i/images/daily/',
+		logurl => 'http://raptor.debian.org/d-i/images/daily/',
+		email => 'waldi@debian.org',
+		description => 'daily s390 images build',
+	},
+
+	{
+		url => 'http://people.debian.org/~jbailey/d-i/sparc/daily/',
+		logurl => 'http://people.debian.org/~jbailey/d-i/sparc/daily/',
+		email => 'jbailey@debian.org',
+		description => 'daily sparc images build',
+	},
+	
+	{
+		url => 'http://june.voxel.net/~joshk/d-i/images/daily/',
+		logurl => 'http://june.voxel.net/~joshk/d-i/images/daily/',
+		email => 'joshk@debian.org',
+		description => 'daily sparc floppy build',
+	},
+
+#	{
+#		url => 'http://somehost/',
+#		email => 'you@debian.org',
+#		description => 'put something informative here',
+#	},
+);
+
+use warnings;
+use strict;
+
+print <<EOS;
+<html>
+<head>
+<title>debian-installer build overview</title>
+</head>
+<body>
+<ul>
+EOS
+
+foreach my $build (@buildlist) {
+	print "<li><a href=\"".$build->{url}."\">".$build->{description}."</a><br>\n";
+	my $logurl=$build->{logurl}."overview.log\n";
+	if (! open (LOG, "wget --quiet -O - $logurl |")) {
+		print "<b>wget error</b>\n";
+	}
+	my @lines=<LOG>;
+	if (! close LOG) {
+		print "<b>failed to download <a href=\"$logurl\">build log</a>";
+		next;
+	}
+	if (! @lines) {
+		print "<b>empty <a href=\"$logurl\">build log</a>";
+	}
+	else {
+		print "<ul>\n";
+	}
+	foreach my $line (@lines) {
+		chomp $line;
+		my ($arch, $date, $builder, $ident, $status) = 
+			$line =~ /^(.*?)\s+\((.*?)\)\s+(.*?)\s+(.*?)\s+(.*?)$/;
+		if (! defined $status) {
+			print "<li><i>unparsable entry:</i> $line\n";
+		}
+		else {
+			$date=~s/[^A-Za-z0-9: ]//g; # untrusted string
+			my $shortdate=`TZ=GMT LANG=C date -d '$date' '+%b %d %H:%M'`;
+			chomp $shortdate;
+			if (! length $shortdate) {
+				$shortdate=$date;
+			}
+			print "<li>$arch $shortdate $builder <a href=\"".$build->{logurl}."$ident.log\">$status</a> $ident\n";
+		}
+	}
+	print "</ul>\n";
+}
+
+print <<EOS
+</ul>
+</body>
+</html>
+EOS
