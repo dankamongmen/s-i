@@ -60,6 +60,8 @@ void intercept_stderr(void) {
 
 void display_stderr_log(const char *package) {
 	static struct debconfclient *debconf = NULL;
+	statuc const char *titletemplate = "debian-installer/generic_error-title";
+	statuc const char *template = "debian-installer/generic_error";
 	FILE *f;
 
 	assert(package);
@@ -98,10 +100,11 @@ void display_stderr_log(const char *package) {
 		while ((p = strchr(ret, '\n')))
 			p[0]=' ';
 	
-		debconf->command(debconf, "TITLE", "Error running", package, NULL);
-		debconf->command(debconf, "SUBST", "debian-installer/generic_error", "PACKAGE", package, NULL);
-		debconf->command(debconf, "SUBST", "debian-installer/generic_error", "ERROR", ret, NULL);
-		debconf->command(debconf, "INPUT", "high", "debian-installer/generic_error", NULL);
+		debconf->command(debconf, "SUBST", titletemplate, "PACKAGE", package, NULL);
+		debconf->command(debconf, "SETTITLE",  titletemplate, NULL);
+		debconf->command(debconf, "SUBST", template, "PACKAGE", package, NULL);
+		debconf->command(debconf, "SUBST", template, "ERROR", ret, NULL);
+p		debconf->command(debconf, "INPUT", "high", template, NULL);
 		debconf->command(debconf, "GO", NULL);
 
 		fclose(f);

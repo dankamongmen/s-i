@@ -230,7 +230,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	free(olist);
 
 	/* Make debconf show the menu and get the user's choice. */
-        debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
+        debconf->command(debconf, "SETTITLE", "debian-installer/main-menu-title", NULL);
 	debconf->command(debconf, "CAPB", NULL);
 	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
