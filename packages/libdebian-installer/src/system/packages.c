@@ -24,6 +24,7 @@
 
 #include <debian-installer/system/packages.h>
 
+#include <debian-installer/log.h>
 #include <debian-installer/package_internal.h>
 #include <debian-installer/packages_internal.h>
 #include <debian-installer/parser_rfc822.h>
@@ -152,18 +153,23 @@ di_parser_info *di_system_packages_status_parser_info (void)
 
 di_slist *di_system_packages_resolve_dependencies_array_permissive (di_packages *packages, di_package **array, di_packages_allocator *allocator)
 {
+  struct di_packages_resolve_dependencies_do_real_list_append_data data =
+  {
+    { NULL, NULL },
+    allocator,
+  };
   struct di_packages_resolve_dependencies_check s =
   {
     di_packages_resolve_dependencies_check_real,
     di_packages_resolve_dependencies_check_virtual,
     di_packages_resolve_dependencies_check_non_existant_permissive,
-    { NULL, NULL },
-    allocator,
+    di_packages_resolve_dependencies_do_real_list_append,
     0,
     NULL,
+    &data,
   };
 
-  return di_packages_resolve_dependencies_array_special (packages, array, &s);
+  return di_packages_resolve_dependencies_array_special (packages, array, &s, allocator);
 }
 
 struct check
@@ -172,15 +178,52 @@ struct check
   const char *kernel;
 };
 
-static di_package *check_virtual_anna (di_package *package __attribute__ ((unused)), di_package *best, di_package_dependency *d, void *data)
+static bool check_real_anna (di_packages_resolve_dependencies_check *r, di_package *package, di_package_dependency *d)
+{
+  if (d->ptr->status >= di_package_status_unpacked)
+  {
+    di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): accept %s, already installed", package->package, d->ptr->package);
+    return true;
+  }
+#if 0
+  di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): check recursive %s", package->package, d->ptr->package);
+#endif
+  return di_packages_resolve_dependencies_recurse (r, d->ptr, package);
+}
+
+static di_package_dependency *check_virtual_anna (di_package *package __attribute__ ((unused)), di_package_dependency *best, di_package_dependency *d, void *data)
 {
   struct check *sc = data;
   if (((di_system_package *)d->ptr)->kernel_version &&
       strcmp (((di_system_package *)d->ptr)->kernel_version, sc->kernel))
+  {
+#if 0
+    di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): discard %s: wrong kernel", package->package, d->ptr->package);
+#endif
     return best;
+  }
   if (!di_system_package_check_subarchitecture (d->ptr, sc->subarchitecture))
+  {
+#if 0
+    di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): discard %s: wrong architecture", package->package, d->ptr->package);
+#endif
     return best;
-  return di_packages_resolve_dependencies_check_virtual (package, best, d, NULL);
+  }
+#if 0
+  if (!best)
+    di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): select %s: first try", package->package, d->ptr->package);
+  else if (best->ptr->priority < d->ptr->priority)
+    di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): select %s: better priority", package->package, d->ptr->package);
+  else if (d->ptr->status >= di_package_status_unpacked && best->ptr->status < di_package_status_unpacked)
+    di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): select %s: installed", package->package, d->ptr->package);
+#endif
+  if (!best || best->ptr->priority < d->ptr->priority ||
+      (d->ptr->status >= di_package_status_unpacked && best->ptr->status < di_package_status_unpacked))
+    return d;
+#if 0
+  di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): discard %s", package->package, d->ptr->package);
+#endif
+  return best;
 }
 
 void di_system_packages_resolve_dependencies_mark_anna (di_packages *packages, const char *subarchitecture, const char *kernel)
@@ -192,24 +235,15 @@ void di_system_packages_resolve_dependencies_mark_anna (di_packages *packages, c
   };
   struct di_packages_resolve_dependencies_check s =
   {
-    di_packages_resolve_dependencies_check_real,
+    check_real_anna,
     check_virtual_anna,
     di_packages_resolve_dependencies_check_non_existant,
-    { NULL, NULL },
-    NULL,
+    di_packages_resolve_dependencies_do_real_mark,
     0,
     &sc,
+    NULL,
   };
 
   return di_packages_resolve_dependencies_mark_special (packages, &s);
 }
 
-void di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable (di_packages *packages) __attribute__ ((unused));
-void di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable (di_packages *packages)
-{
-  struct utsname uts;
-  uname (&uts);
-  di_system_packages_resolve_dependencies_mark_anna (packages, "unknown", uts.release);
-}
-
-__asm__ (".symver di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable,di_system_packages_resolve_dependencies_mark_kernel@LIBDI_4.2_UNSTABLE");
