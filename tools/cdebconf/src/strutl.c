@@ -7,7 +7,7 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.9 2000/12/09 07:19:11 tausq Exp $
+ * $Id: strutl.c,v 1.10 2000/12/11 00:22:44 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -307,57 +307,55 @@ void strescape(const char *inbuf, char *outbuf, const size_t maxlen)
 	outbuf[i] = 0;
 }
 
-#if 0
-int strwrap(const char *str, const int width, char **lines, int maxlines)
+int strwrap(const char *str, const int width, char *lines[], int maxlines)
 {
-	/* Simple greedy line-wrapper */
+	/* "Simple" greedy line-wrapper */
 	int len = STRLEN(str);
 	int l = 0;
 	const char *s, *e, *end, *lb;
 
 	if (str == 0) return 0;
 
+	/*
+	 * s = first character of current line, 
+	 * e = last character of current line
+	 * end = last character of the input string (the trailing \0)
+	 */
 	s = e = str;
 	end = str + len;
 	
 	while (len > 0)
 	{
 		/* try to fit the most characters */
-		e = s + width;
+		e = s + width - 1;
 		
+		/* simple case: we got everything */
 		if (e >= end) 
 		{
 			e = end;
 		}
 		else
 		{
-			while (e > s)
-			{
-				if ((isspace(*e) || ispunct(*e)) &&
-				    (*(e+1) == 0 || (!isspace(*(e+1)) 
-					&& !ispunct(*(e+1)))))
-					break;
+			/* find a breaking point */
+			while (e > s && !isspace(*e) && *e != '.' && *e != ',')
 				e--;
-
-			}
-
 		}
-		/* no word-break point found, so just break the line */
+		/* no word-break point found, so just unconditionally break 
+		 * the line */
 		if (e == s) e = s + width;
 
 		/* if there's an explicit linebreak, honor it */
 		lb = strchr(s, '\n');
-		if (lb != NULL && lb < e) e = lb + 1;
+		if (lb != NULL && lb < e) e = lb;
 
+		lines[l] = (char *)malloc(e-s+2);
 		strncpy(lines[l], s, e-s+1);
 		lines[l][e-s+1] = 0;
 		CHOMP(lines[l]);
 
 		len -= (e-s+1);
-		s = e+1;
-		while (*s == ' ') s++;
+		s = e + 1;
 		if (++l >= maxlines) break;
 	}
 	return l;
 }
-#endif
