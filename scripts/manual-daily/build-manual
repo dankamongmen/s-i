@@ -154,10 +154,12 @@ for lang in $languages; do
         [ -n "$LANG_UPDATED" ] && \
             echo "Preparing build for language $lang - `date -u`" >>$langlog
 
-        if [ -n "$LANG_UPDATED" ] || [ -n "$EN_UPDATED" ] ; then
-            echo "Info: updating PO files for $lang" >>$mainlog
-            update_po $lang >>$langlog 2>&1
-            checkfatal "$?" "updating po for $lang"
+        if [ -d "./po/$lang" ] ; then
+            if [ -n "$LANG_UPDATED" ] || [ -n "$EN_UPDATED" ] ; then
+                echo "Info: updating PO files for $lang" >>$mainlog
+                update_po $lang >>$langlog 2>&1
+                checkfatal "$?" "updating po for $lang"
+            fi
         fi
 
         if [ -n "$LANG_UPDATED" ] ; then
