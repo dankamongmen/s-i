@@ -1,0 +1,267 @@
+#! /bin/sh
+
+. /usr/share/debconf/confmodule
+
+log () {
+    echo "$0: $@" >>/var/log/messages
+}
+log "Detecting hardware..."
+
+# Manually load modules to enable things we can't detect.
+# XXX: This isn't the best way to do this; we should autodetect.
+manual_load="ide-mod ide-probe-mod ide-cd ide-disk isa-pnp isofs"
+#manual_load=i82365 usb-storage
+#manual_load=i82365 sr_mod usb-storage
+old=`cat /proc/sys/kernel/printk`
+echo 0 >/pros/sys/kernel/printk
+for module in $manual_load
+do
+    modprobe $module >>/var/log/messages 2>&1
+done
+echo $old >/proc/sys/kernel/printk
+
+# Creating devices for CDROM (devfs is used)
+mknod() {
+    test -e "$1" || /bin/mknod $1 $2 $3 $4
+}
+for i in 0 1 2 3 4
+do
+    mknod /dev/scd$i b 11 $i  # Scsi
+    mknod /dev/mcdx$i b 20 $i # Mitsumi
+    mknod /dev/pcd$i b 46 $i
+done
+# Special devices
+mknod /dev/mcd b 23 0
+mknod /dev/sonycd b 15 0
+mknod /dev/cdu535 b 24 0
+mknod /dev/lmscd b 24 0
+mknod /dev/sbpcd b 25 0
+mknod /dev/aztcd b 29 0
+mknod /dev/cm206cd b 30 0
+mknod /dev/gscd b 16 0
+mknod /dev/bpcd b 41 0
+mknod /dev/optcd b 17 0
+mknod /dev/sjcd b 18 0
+# Standard IDE
+mknod /dev/hda b 3 0
+mknod /dev/hdb b 3 64
+mknod /dev/hdc b 22 0
+mknod /dev/hdd b 22 64
+
+IFS_SAVE=$IFS
+IFS="
+"
+for device in `/sbin/discover --disable-all --enable=pci,ide,scsi,pcmcia \
+                --format="%m\t%V\t%M\n" scsi cdrom`
+do
+    vendor=`echo $device | cut -f2`
+    model=`echo $device | cut -f3`
+    module=`echo $device | cut -f1`
+
+    if [ "$vendor" != "Unknown" ]
+    then
+        name="$vendor $model"
+    else
+        name="$model"
+    fi
+
+    echo
+    echo $name
+
+    if [ -n "$module" -a "$module" != "ignore" ]
+    then
+        if [ ! -f /lib/modules/*/*/$module.o ]
+        then
+            while true
+            do
+		db_fset cdrom-detect/not_included seen false
+		db_subst cdrom-detect/not_included vendor "$name"
+		db_subst cdrom-detect/not_included module $module
+		db_input critical cdrom-detect/not_included
+		db_go
+		db_get cdrom-detect/not_included
+                mounted=0
+                if [ "$RET" != "true" ]
+                then
+                    break
+                fi
+                mount -t ext2 /dev/fd0 /mnt
+                if [ "$?" = "0" ]
+                then
+                    if [ -f /mnt/modules.tgz ]
+                    then
+                        mounted=1
+                        break
+                    fi
+                    umount /mnt
+                fi
+            done
+
+            if [ "$mounted" = "1" ]
+            then
+                log "Copying drivers from modules disk... "
+                gunzip -c /mnt/modules.tgz | tar xf - $module.o
+                umount /mnt
+            fi
+        fi
+
+        if [ -f /lib/modules/*/*/$module.o ]
+        then
+	    old=`cat /proc/sys/kernel/printk`
+	    echo 0 >/pros/sys/kernel/printk
+            modprobe $module >>/var/log/messages 2>&1
+	    echo $old >/proc/sys/kernel/printk
+            if [ "$?" != "0" ]
+            then
+                log "Error loading driver for $vendor $model!"
+            else
+	    fi
+        else
+            log "Could not locate driver for $vendor $model."
+        fi
+    fi
+done
+IFS=$IFS_SAVE
+
+# If PCMCIA was detected, load the PCMCIA drivers and load cardmgr
+#if [ -e /proc/bus/pccard ]
+#then
+#    pcmcia=0
+#    if [ -e /lib/modules/*/pcmcia ]
+#    then
+#	echo "PCMCIA was detected on this system."
+#	while true
+#        do
+#	    echo "Please insert the modules disk and press Enter to continue, or type"
+#            echo -n "\`q' to skip loading PCMCIA drivers: "
+#            read input
+#            mounted=0
+#            if [ "$input" = "q" ]
+#            then
+#                break
+#            fi
+#            mount -t ext2 /dev/fd0 /mnt
+#            if [ "$?" = "0" ]
+#            then
+#                if [ -f /mnt/pcmcia.tgz ]
+#                then
+#                    mounted=1
+#                    break
+#                fi
+#                umount /mnt
+#            fi
+#        done
+#        if [ "$mounted" = "1" ]
+#        then
+#            echo -n "Copying drivers from modules disk... "
+#            gunzip -c /mnt/pcmcia.tgz | tar xf -
+#            echo "done."
+#            umount /mnt
+#	    pcmcia=1
+#        fi
+#    else
+#	pcmcia=1
+#    fi
+#
+#    if [ "$pcmcia" = "1" ]
+#    then
+#	gunzip /etc/pcmcia/config.gz
+#	/sbin/cardmgr
+#    fi
+#fi
+
+log "Searching for Debian installation media..."
+
+mkdir /cdrom 2>/dev/null || true
+
+while true
+do
+    mounted=0
+
+    # What about ISA cdroms ?
+    devices=`/sbin/discover --disable-all --enable=pci,ide,scsi --device cdrom`
+    for device in $devices
+    do
+        mount -t iso9660 -o ro,exec $device /cdrom 2>/dev/null
+        if [ "$?" = "0" ]
+        then
+            mounted=1
+        fi
+    done
+
+    if [ "$mounted" = "1" ]
+    then
+        break
+    fi
+
+    # If device was detect but mount failed, ask for inserting the CD
+    if [ -n "$devices" ]
+    then
+	db_fset cdrom-detect/is_cd_inserted seen false
+	db_input critical cdrom-detect/is_cd_inserted
+	db_go
+	db_get cdrom-detect/is_cd_inserted
+	if [ "$RET" = "false" ]
+	then
+	    continue
+	fi
+    fi
+    
+    # Otherwise manual configuration may be needed
+    db_fset cdrom-detect/manual_config seen false
+    db_input critical cdrom-detect/manual_config
+    db_go
+    db_get cdrom-detect/manual_config
+
+    modules=none
+    for i in `ls -1 /lib/modules/*/kernel/drivers/cdrom/ | sed -e 's/.o$//'`
+    do
+	modules="$modules, $i"
+    done
+    
+    # Here's the list of device
+    # UPDATE IT HERE if you want to add some devices
+    
+    if [ "$RET" = "true" ]
+    then
+	db_fset cdrom-detect/cdrom_module seen false
+	db_subst cdrom-detect/cdrom_module choices "$modules"
+	db_subst cdrom-detect/cdrom_module default none
+	db_input critical cdrom-detect/cdrom_module
+	db_go
+
+	db_get cdrom-detect/cdrom_module
+	module="$RET"
+
+	db_fset cdrom-detect/cdrom_device seen false
+	db_subst cdrom-detect/cdrom_device default /dev/cdrom
+	db_input critical cdrom-detect/cdrom_device
+	db_go
+
+	db_get cdrom-detect/cdrom_device
+	device="$RET"
+
+	if [ "$module" != "none" ]
+	then
+	    modprobe $module
+	fi
+	mount -t iso9660 -o ro,exec $device /cdrom
+	if [ "$?" = "0" ]
+	then
+	    mounted=1
+	    break
+	fi
+    else
+	log "CDROM-detect failed."
+	exit 1
+    fi
+done
+
+# Hey, we're done
+db_fset cdrom-detect/success seen false
+db_subst cdrom-detect/success cdname "`cat /cdrom/.disk/info`"
+db_input medium cdrom-detect/success || true
+db_go
+
+exit 0
+
