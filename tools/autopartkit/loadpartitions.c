@@ -136,10 +136,10 @@ load_partitions(const char *filename)
   fp = fopen(filename, "r");
   if (NULL == fp)
   {
-    autopartkit_error(0, "Failed to open %s\n", filename);
+    autopartkit_error(0, "Failed to open table file '%s'\n", filename);
     return NULL;
   }
-  autopartkit_log(2, "Loading %s\n", filename);
+  autopartkit_log(2, "Loading table file '%s'\n", filename);
   while ( ! feof(fp) )
   {
     if (NULL != fgets(buf, sizeof(buf), fp))
