@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.5 2003/01/28 11:02:36 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.6 2003/01/29 09:52:15 mckinstry Exp $
  */
 
 #include "config.h"
@@ -42,9 +42,12 @@ void usb_kbd_get (void)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
 	 *
 	 * FIXME: Write this code	 
+	 *   Need to search /proc/bus/input/devices
+	 
 	 */	
+	if (di_check_dir ("/proc/bus/input") >= 0) { // 2.5 kernel
 #warning "Kernel 2.5 code not written yet"
-
+	}
 #else /* 2.4 code */
 
 	/* In 2.4, if "keyboard" is present in /proc/bus/usb/drivers,
@@ -62,25 +65,21 @@ void usb_kbd_get (void)
 	res = grep ("/proc/bus/usb/drivers", "keyboard");
 	if (res < 0) {
 		if (DEBUG) 
-			di_log ("Failed to grep /proc/bus/usb/drivers; assuming usbdevfs not present");		
-		res = system ("mount -t  usbdevfs usbdevfs /proc/bus/usb");
-		if (res != 0) {
+			di_log ("mounting usbdevfs to look for kbd");		
+		if (system ("mount -t  usbdevfs usbdevfs /proc/bus/usb") != 0) {		 
 			di_log ("Failed to mount USB filesystem");
 			return;
 		}
 		mounted_fs = 1;
 		res = grep ("/proc/bus/usb/drivers", "keyboard");
-		if (DEBUG && res < 0) 
-			perror ("Failed to grep /proc/bus/usb/drivers");
+		if (res < 0) {
+			di_log ("Failed to grep /proc/bus/usb/drivers");
+		}
 	}	
-	if (res >  0) {
-		if (DEBUG) di_log ("Found USB Keyboard\n");
-		k->present = TRUE;		
-	}
-	if (res == 0) {
-		if (DEBUG) di_log ("No USB keyboard present\n");
+	if (res == 0) 
+		k->present = TRUE;
+	if (res == 1)
 		k->present = FALSE;
-	}
 	if (mounted_fs)
 		system ("umount /proc/bus/usb");
 	

@@ -4,7 +4,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: sparc-kbd.c,v 1.2 2003/01/28 11:02:36 mckinstry Exp $
+ * $Id: sparc-kbd.c,v 1.3 2003/01/29 09:52:15 mckinstry Exp $
  */
 
 #include "config.h"
@@ -38,12 +38,21 @@ void at_kbd_get ()
 #if defined (KERNEL_2_5)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
 	 *
-	 * FIXME: Write this code
+	 * TODO:
+	 * Its possible to read the keyboard type; use this to preselect
+	 * keymap (edit the keymaps list)
 	 */
 #warning "Kernel 2.5 code not written yet"
 	if (di_check_dir ("/proc/bus/input") >= 0) {
+		int res;
 		// this dir only present in 2.5
-	}
+		res = grep ("/proc/bus/input/devices","Sun Type");
+		if (res < 0) {
+			di_log ("sparc-kbd: Failed to open /proc/bus/input/devices");
+			return;
+		}
+		k->present = (res == 0) ? TRUE : FALSE;
+	}	
 
 
 #endif // KERNEL_2_5

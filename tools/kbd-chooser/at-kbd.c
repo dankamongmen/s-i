@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.3 2003/01/26 17:06:45 mckinstry Exp $
+ * $Id: at-kbd.c,v 1.4 2003/01/29 09:52:15 mckinstry Exp $
  */
 
 #include "config.h"
@@ -31,17 +31,24 @@ void at_kbd_get ()
 	k->description = N_("PC Style (PS2/connector)");
 	k->deflt = NULL;
 	k->fd = -1;
+	k->present = UNKNOWN;
+	k->next = keyboards;
+	keyboards = k;
 	
 #if defined (KERNEL_2_5)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
 	 *
-	 * FIXME: Write this code
 	 */
-#warning "Kernel 2.5 code not written yet"
 	if (di_check_dir ("/proc/bus/input") >= 0) {
-		// this dir only present in 2.5
+	        // this dir only present in 2.5
+		res = grep ("/proc/bus/input/devices","AT Set ");
+		if (res < 0) {
+			di_log ("at-kbd: Failed to open /proc/bus/input/devices");
+			return;
+		}
+		k->present = ( res == 0) ? TRUE : FALSE;
+		return;
 	}
-
 
 #endif // KERNEL_2_5
 
@@ -49,8 +56,4 @@ void at_kbd_get ()
 
 	/* For 2.4, assume a PC keyboard is present
 	 */
-	k->present = UNKNOWN;
-	k->next = keyboards;
-	keyboards = k;
-	
 }
