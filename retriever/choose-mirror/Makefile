@@ -1,6 +1,6 @@
 CFLAGS=-Wall -g -D_GNU_SOURCE
 OBJS=$(subst .c,.o,$(wildcard *.c))
-BIN=choose_mirror
+BIN=choose-mirror
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG
@@ -22,7 +22,7 @@ mirrors_http.h: Mirrors.masterlist
 mirrors_ftp.h: Mirrors.masterlist
 	./makeheader.pl ftp
 
-choose_mirror.c: mirrors_http.h
+choose-mirror.c: mirrors_http.h
 
 $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LIBS)
