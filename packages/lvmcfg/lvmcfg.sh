@@ -1,6 +1,13 @@
 #!/bin/sh
 
-. /usr/share/debconf/confmodule
+if [ "$1" = partman ]; then
+	# Use partman if possible.
+	. /lib/partman/definitions.sh
+	partman_avail=1
+else
+	. /usr/share/debconf/confmodule
+	partman_avail=0
+fi
 
 #
 # convert the return values from "xx (yy)" => "xx"
@@ -141,14 +148,41 @@ addinfos_lv() {
 	RET="${RET}/ Mount: ${cmdout}"
 }
 
-#
+# get all available physical volumes
+enum_pvs() {
+	if [ ! "$partman_avail" ]; then
+		# Not in partman, so use partconf's find-partitions to find
+		# partitions marked as lvm volumes.
+		/usr/lib/partconf/find-partitions --ignore-fstype 2>/dev/null | grep "[[:space:]]LVM[[:space:]]" | cut -f1
+	else
+		# In partman, so scan the partman devices and find
+		# partitions that have their method set to lvm. We don't
+		# rely on the partition flags since that does not work for
+		# raid partitions.
+		for dev in $DEVICES/*; do
+			[ -d "$dev" ] || continue
+			cd $dev
+			open_dialog PARTITIONS
+			while { read_line num id size type fs path name; [ "$id" ]; }; do
+				[ -f $id/method ] || continue
+				method=$(cat $id/method)
+				if [ "$method" = lvm ]; then
+					echo $path
+				fi
+			done
+			close_dialog
+		done
+	fi
+}
+	
+
 # get all unused available physical volumes
 # 	in this case all partitions with 0x8e,
 #	or all other non-lvm devices from /proc/partitions
 #
 get_pvs() {
 	PARTITIONS=""
-	for i in `/usr/lib/partconf/find-partitions --ignore-fstype 2>/dev/null | grep "[[:space:]]LVM[[:space:]]" | cut -f1`; do
+	for i in $(enum_pvs); do
 		# skip already assigned
 		found=no
 		for pv in $(vgdisplay -v | grep "[ ]*PV Name" | sed -e "s/ \+PV Name \+//"); do
@@ -771,4 +805,3 @@ set -- `vgdisplay -v | grep -i "Logical volume ---" | wc -l`
 [ $1 -gt 0 ] && apt-install lvm2
 
 exit 0
-

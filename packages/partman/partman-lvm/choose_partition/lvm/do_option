@@ -113,6 +113,8 @@ for s in /lib/partman/commit.d/*; do
     fi
 done
 
+lvmcfg partman
+
 # Restart partman.
 
 open_infifo
@@ -120,8 +122,6 @@ write_line "QUIT"
 close_infifo
 
 rm /var/run/parted_server.pid
-
-lvmcfg
 
 initcount=`ls /lib/partman/init.d/* | wc -l`
 db_progress START 0 $initcount partman/progress/init/title
