@@ -24,9 +24,6 @@ load_module() {
 		module_probe parport_pc high
 		priority=high		
 		;;
-	"ne")
-		priority=high
-		;;
 	esac
 	
 	module_probe "$module" "$priority"
@@ -61,39 +58,63 @@ module_probe() {
 	local devs=""
 	local olddevs=""
 	local newdev=""
+	
+	devs="$(snapshot_devs)"
 
 	db_register "$template" "$question"
 	db_subst "$question" MODULE "$module"
-
 	db_input $priority "$question" || [ $? -eq 30 ]
 	db_go
 	db_get "$question"
-	devs="$(snapshot_devs)"
-	if modprobe -v "$module" $RET ; then
-		if [ "$RET" != "" ]; then
-			register-module "$module" $RET
-		fi
-		
-		olddevs="$devs"
-		devs="$(snapshot_devs)"
-		newdevs="$(compare_devs "$olddevs" "$devs")"
+	local params="$RET"
+	
+	if ! modprobe -v "$module" "$params"; then
+		if [ -z "$params" ]; then
+			# Prompt the user for parameters for the module.
+			template="ethdetect/retry_params"
+			db_unregister "$question"
+			db_register "$template" "$question"
+			db_subst "$question" MODULE "$module"
+			db_input critical "$question" || [ $? -eq 30 ]
+			db_go
+			db_get "$question"
+			params="$RET"
 
-		# Pick up multiple cards that were loaded by a single module
-		# hence they'll have same description
-		
-		modinfo=$(get_static_modinfo $module)
-		
-		if [ -n "$newdevs" -a -n "$modinfo" ]; then
-			for ndev in $newdevs; do
-				echo "${ndev}:${modinfo}" >> /etc/network/devnames
-			done
+			if [ -n "$params" ] && \
+			   ! modprobe -v "$module" $params ; then
+				db_unregister "$question"
+				db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
+				db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
+				db_go
+				false
+			fi
+		else
+			db_unregister "$question"
+			db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
+			db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
+			db_go
+			false
 		fi
-	else
-		db_unregister "$question"
-		db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
-		db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
-		db_go
-		false
+	fi
+
+	# Module loaed successfully
+	if [ "$params" != "" ]; then
+		register-module "$module" "$params"
+	fi
+	
+	olddevs="$devs"
+	devs="$(snapshot_devs)"
+	newdevs="$(compare_devs "$olddevs" "$devs")"
+
+	# Pick up multiple cards that were loaded by a single module
+	# hence they'll have same description
+		
+	modinfo=$(get_static_modinfo $module)
+		
+	if [ -n "$newdevs" -a -n "$modinfo" ]; then
+		for ndev in $newdevs; do
+			echo "${ndev}:${modinfo}" >> /etc/network/devnames
+		done
 	fi
 }
 
