@@ -228,7 +228,7 @@ list_to_choices(struct linkedlist_t *list)
 {
     struct list_node *node;
     struct package_t *p;
-    char *choices;
+    char *choices, *ptr;
     size_t choices_size = 1;
 
     choices = malloc(choices_size);
@@ -239,6 +239,9 @@ list_to_choices(struct linkedlist_t *list)
         choices = realloc(choices, choices_size);
         strcat(choices, p->package);
         strcat(choices, ": ");
+        /* If ', ' is in the description, drop it and everything after it */
+        if ((ptr = strstr(p->description, ", ")) != NULL)
+            *ptr = '\0';
         strcat(choices, p->description);
         strcat(choices, ", ");
     }
