@@ -1,13 +1,15 @@
 #!/bin/sh
-set +e
 
 /lib/debian-installer/exit-command
-CMD=$?
+CMDN=$?
+
+case "$CMDN" in
+  20) CMD=reboot;;
+  21) CMD=halt;;
+  *) echo "got weird return code $CMDN";;
+esac
 
 /bin/umount -a -r
 /sbin/swapoff -a
 
-case "$EXIT" in
-  0) reboot;;
-  1) halt;;
-esac
+$CMD
