@@ -30,11 +30,14 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 	k->next = keyboards;
 	keyboards = k;
 
+	// Handle 2.2 kernel.
+	if (grep("/proc/version","2.2."))
+		k->present = TRUE;
 	// if we send linux keycodes, don't use ADB keymaps
 	// pretend we don't have an ADB keyboard
 	// If keyboard_sends_linux_keycodes isn't present, then ADB keymap
 	// support is not even compiled into the kernel.
-	if (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes","1"))
+	else if (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes","1"))
 		k->present = FALSE;
 	else
 		k->present = TRUE;
