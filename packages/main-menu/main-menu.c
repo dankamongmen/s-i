@@ -251,10 +251,10 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 			menu_size += 1024;
 			menu = di_realloc(menu, menu_size);
 		}
+		if (*menu)
+			strcat(menu, ", ");
 		strcat(menu, buf);
 		menu_used += size + 2;
-		if (node->next)
-			strcat(menu, ", ");
 	}
 	menudefault = get_default_menu_item(list);
 	di_slist_free(list);
