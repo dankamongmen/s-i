@@ -11,7 +11,11 @@ pass=$6
 
 case $type in
     reiserfs)
-	mount -t reiserfs $fs /target$mp || exit 1
+	if expr "$options" : '.*notail.*' >/dev/null; then
+	    mount -o notail $fs /target$mp || exit 1
+	else
+	    mount $fs /target$mp || exit 1
+	fi
 	echo "umount /target$mp"
 	exit 0
 	;;

@@ -28,11 +28,26 @@ for dev in $DEVICES/*; do
 		db_subst partman-reiserfs/progress_formatting TYPE "$filesystem"
 		db_subst partman-reiserfs/progress_formatting PARTITION "$num"
 		db_subst partman-reiserfs/progress_formatting DEVICE $(humandev $(cat device))
-		# TODO let parted try to do it, fallback on failure
-		mkreiserfs -f -q $device >/dev/null 2>>/var/log/messages
-		code=$?
-		db_progress STOP
-		if [ "$code" != 0 ]; then
+# libreiserfs has not yet been packaged as udeb
+		status=failed
+# 		name_progress_bar partman-reiserfs/progress_formatting
+# 		open_dialog CREATE_FILE_SYSTEM $id reiserfs
+# 		read_line status
+# 		close_dialog
+		if [ "$status" != OK ]; then
+		    db_progress START 0 3 partman/text/please_wait
+		    db_progress INFO partman-reiserfs/progress_formatting
+		    db_progress SET 1
+		    if
+			mkfs.reiserfs -f -q $device >/dev/null 2>>/var/log/messages
+		    then
+			status=OK
+		    else
+			status=failed
+		    fi
+		    db_progress STOP
+		fi
+                if [ "$status" != OK ]; then
 		    db_fset partman-reiserfs/create_failed seen false
 		    db_subst partman-reiserfs/create_failed PARTITION "$num"
 		    db_subst partman-reiserfs/create_failed DEVICE $(humandev $(cat device))
