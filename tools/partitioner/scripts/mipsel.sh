@@ -3,15 +3,13 @@ DISK="$1"
 [ -z "$DISK" ] && exit 1
 
 case "`/bin/archdetect`" in
-"mips/r4k-ip22")
-        # SGI dvh disklabels are best supported by fdisk.
+"mipsel/r3k-kn02")
         fdisk $DISK
         ;;
-"mips/r5k-ip22")
-        # SGI dvh disklabels are best supported by fdisk.
+"mipsel/r4k-kn04")
         fdisk $DISK
         ;;
-"mips/sb1-swarm-bn")
+"mipsel/sb1-swarm-bn")
         # The Broadcom is a normal ATX board with standard IDE/SCSI devices
         cfdisk $DISK
         ;;
