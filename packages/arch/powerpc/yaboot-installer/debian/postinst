@@ -68,8 +68,8 @@ db_progress INFO yaboot-installer/part
 
 for i in /dev/discs/*/disc; do
     dev="`parted -s "$i" print | sed -n 's,^Disk geometry for \([^:]*\)/disc:.*$,\1,p'`"
-    # Look for partitions with hfs or msdos filesystems and the boot flag set.
-    for part in `parted -s "$i" print | sed -n 's,^\([0-9]\+\) \+[0-9.]\+ \+[0-9.]\+ \+\(hfs\|msdos\) \+.\+ \+boot$,'"$dev"'/part\1,p'`; do
+    # Look for partitions with hfs filesystems and the boot flag set.
+    for part in `parted -s "$i" print | sed -n 's,^\([0-9]\+\) \+[0-9.]\+ \+[0-9.]\+ \+hfs \+.\+ \+boot$,'"$dev"'/part\1,p'`; do
 	if [ -z "$PARTITIONS" ]; then
 	    DEFAULT="$part"
 	    PARTITIONS="$part"
