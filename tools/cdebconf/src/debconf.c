@@ -80,6 +80,7 @@ void parsecmdline(struct configuration *config, int argc, char **argv)
 int main(int argc, char **argv)
 {
 	signal(SIGINT, sighandler);
+	signal(SIGTERM, sighandler);
 	setlocale (LC_ALL, "");
 
 	config = config_new();
