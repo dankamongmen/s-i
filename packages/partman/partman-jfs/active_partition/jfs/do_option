@@ -1,0 +1,105 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+dev=$2
+id=$3
+part=$dev/$id
+
+cd $dev
+
+[ -f $part/method -a -f $part/acting_filesystem ] || return 0
+filesystem=$(cat $part/acting_filesystem)
+
+do_mountpoint () {
+    local noninteractive
+    noninteractive=true
+    while true; do
+	if [ -f "$part/mountpoint" ]; then
+	    old_mountpoint=$(cat $part/mountpoint)
+	else
+	    old_mountpoint=/
+	fi
+	db_fset partman-jfs/mountpoint seen false
+	db_set partman-jfs/mountpoint "$old_mountpoint"
+	db_input critical partman-jfs/mountpoint || $noninteractive
+	db_go || return 1
+	db_get partman-jfs/mountpoint
+
+	case "$RET" in
+	    Do?not?mount?it)
+                [ ! -f "$part/mountpoint" ] || rm $part/mountpoint
+		break
+		;;
+	    Enter?manually)
+		if do_mountpoint_manual; then break; fi
+		noninteractive="return 1"
+		;;
+	    *)
+		echo $RET >$part/mountpoint
+		break
+	esac
+    done
+}
+
+do_mountpoint_manual () {
+    local noninteractive
+    noninteractive=true
+    while true; do
+	new_mountpoint=''
+	while [ ! "$new_mountpoint" ]; do
+	    if [ -f "$part/mountpoint" ]; then
+		old_mountpoint=$(cat $part/mountpoint)
+	    else
+		old_mountpoint=/
+	    fi
+	    db_fset partman-jfs/mountpoint_manual seen false
+	    db_set partman-jfs/mountpoint_manual "$old_mountpoint"
+	    db_input critical partman-jfs/mountpoint_manual || $noninteractive
+	    db_go || return 1
+	    db_get partman-jfs/mountpoint_manual
+	    
+	    if expr "$RET" : '/[^ ]*' >/dev/null; then
+		new_mountpoint=$RET
+	    else
+		db_fset partman-jfs/bad_mountpoint seen false
+		db_input high partman-jfs/bad_mountpoint || true
+		db_go || true
+	    fi
+	done
+	echo $RET >$part/mountpoint
+	break
+    done
+}
+
+do_options () {
+    local seen_marker full_options
+    if [ -f $part/mountoptions ]; then
+	full_options=$(cat $part/full_mountoptions)
+    else
+	full_options=''
+    fi
+    db_fset partman-jfs/options seen false
+    db_set partman-jfs/options "$full_options"
+    db_input critical partman-jfs/options || true
+    db_go || exit
+    db_get partman-jfs/options
+    if [ "$RET" ]; then
+	echo "$RET" | sed 's/ *-[^,]*//g' >$part/mountoptions
+	echo "$RET" >$part/full_mountoptions
+    else
+	[ ! -f $part/mountoptions ] || rm $part/mountoptions
+	[ ! -f $part/full_mountoptions ] || rm $part/full_mountoptions
+    fi
+}
+
+case $1 in
+    mountpoint)
+	do_mountpoint
+	update_partition $dev $id
+	;;
+    options)
+	do_options
+	;;
+esac
+

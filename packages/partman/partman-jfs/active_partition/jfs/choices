@@ -1,0 +1,51 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+set -e
+
+dev=$1
+id=$2
+part=$dev/$id
+
+cd $dev
+
+[ -f $part/method -a -f $part/acting_filesystem ] || exit 0
+
+filesystem=$(cat $part/acting_filesystem)
+
+choice_mountpoint () {
+    case "$filesystem" in
+	jfs)
+	    if [ -f $part/mountpoint ]; then
+		mp=$(cat $part/mountpoint)
+	    else
+		db_metaget partman-basicfilesystems/text/no_mountpoint description
+		mp="$RET"
+	    fi
+	    db_metaget partman-jfs/text/specify_mountpoint description
+	    RET=$(stralign -25 "$RET")
+	    printf "mountpoint\t%s%s\n" "$RET" "$mp"
+	    ;;
+    esac
+}
+
+choice_options () {
+    if [ -f $part/mountoptions ]; then
+	options=$(cat $part/mountoptions|sed 's/ //g')
+    else
+	options=defaults
+    fi
+    case "$filesystem" in
+	jfs)
+	    db_metaget partman-jfs/text/options description
+	    RET=$(stralign -25 "$RET")
+	    printf "options\t%s%.45s\n" "$RET" "$options"
+	    ;;
+    esac
+}
+
+choice_mountpoint
+
+choice_options
+
