@@ -1,149 +1,185 @@
 
 #include "mkfstab.h"
 
-int get_filesystems(struct fstab_entry *entries[], int pos, int max_entries) {
-	FILE *fmounts = NULL;
-	char line[1024];
-	int count_entries = pos;
-	struct fstab_entry *dummy;
+extern int errno;
+struct fstab_entry *entries[MAX_ENTRIES];
+int count_entries = 0;
 
-	fmounts = fopen("/proc/mounts", "r");
-	if(fmounts == NULL)
-		return(0);
+void insert_line(const char *line) {
+	int i = 0;
+	struct fstab_entry *dummy = NULL;
+	char filesystem[1024];
+	char mountpoint[1024];
+	char typ[1024];
+	char options[1024];
 
-	while(fgets(line, 1024, fmounts) != NULL) {
-		char filesystem[1024];
-		char mountpoint[1024];
-		char typ[1024];
-		char options[1024];
+	dummy = malloc(sizeof(*dummy));
+	if(dummy == NULL) {
+		fprintf(stderr, "Unable to allocate memory!\n");
+		exit(EXIT_FAILURE);
+	}
 
-		if(count_entries >= MAX_ENTRIES)
-			break;
+	dummy->filesystem = NULL;
+	dummy->mountpoint = NULL;
+	dummy->typ = NULL;
+	dummy->options = NULL;
+	dummy->dump = 0;
+	dummy->pass = 0;
 
-		dummy = malloc(sizeof(*dummy));
-		if(dummy == NULL)
-			break;
+	sscanf(line, "%s %s %s %s %*s %*s",
+		filesystem, mountpoint, typ, options);
 
-		dummy->filesystem = NULL;
-		dummy->mountpoint = NULL;
-		dummy->typ = NULL;
-		dummy->options = NULL;
-		dummy->dump = 0;
-		dummy->pass = 0;
+	if(strlen(filesystem) > 0)
+		dummy->filesystem = strdup(filesystem);
+	if(strlen(mountpoint) > 0)
+		dummy->mountpoint = strdup(mountpoint);
+	if(strlen(typ) > 0)
+		dummy->typ = strdup(typ);
+	if(strlen(options) > 0) {
+		dummy->options = strdup(options);
+	} else {
+		dummy->options = strdup("defaults");
+	}
 
-		sscanf(line, "%s %s %s %s %*s %*s",
-			filesystem, mountpoint, typ, options);
+#ifdef DEBUG
+	printf("%s %s", dummy->filesystem, dummy->mountpoint);
+#endif
 
-		if(strlen(filesystem) > 0)
-			dummy->filesystem = strdup(filesystem);
-		if(strlen(mountpoint) > 0)
-			dummy->mountpoint = strdup(mountpoint);
-		if(strlen(typ) > 0)
-			dummy->typ = strdup(typ);
+	/* check if an record with this entry already exists */
+	for(i=0; i<count_entries; i++) {
+		if(strcasecmp(dummy->filesystem, entries[i]->filesystem) == 0) {
+#ifdef DEBUG
+			printf(" -> insert (fs): %d\n", i);
+#endif
+			free(entries[i]);
+			entries[i] = dummy;
+			return;
+		}
+		if(strcasecmp(dummy->mountpoint, entries[i]->mountpoint) == 0) {
+#ifdef DEBUG
+			printf(" -> insert (mnt): %d\n", i);
+#endif
+			free(entries[i]);
+			entries[i] = dummy;
+			return;
+		}
+	}
 
-		/* handle reiserfs */
-		if(strstr(dummy->typ, "reiserfs") && strstr(dummy->mountpoint, "/boot")) {
-			dummy->options = strdup("notail");
-		} else {
-			if(strlen(options) > 0) {
-				dummy->options = strdup(options);
-			} else {
-				dummy->options = strdup("defaults");
-			}
+#ifdef DEBUG
+	printf(" -> pos: %d\n", i);
+#endif
+
+	if(count_entries >= MAX_ENTRIES) {
+		fprintf(stderr, "Unable to add entry... max entry count reached!\n");
+		return;
+	}
+
+	entries[i] = dummy;
+	count_entries++;
+}
+
+void get_fstab_d_dir() {
+	DIR *fstab_d = NULL;
+	struct dirent *dentry;
+
+	fstab_d = opendir(FSTAB_D);
+	if(fstab_d == NULL) {
+		fprintf(stderr, "%s: %s\n", strerror(errno), FSTAB_D);
+		return;
+	}
+
+	while((dentry = readdir(fstab_d)) != NULL) {
+		struct stat sbuf;
+		char *fullname = NULL;
+		FILE *file = NULL;
+		char line[1024];
+		
+		/* ignore dot-files */
+		if(dentry->d_name[0] == '.')
+			continue;
+
+		/* skipping directories */
+		asprintf(&fullname, "%s/%s", FSTAB_D, dentry->d_name);
+		if(stat(fullname, &sbuf) == -1) {
+			fprintf(stderr, "%s: %s\n", strerror(errno), fullname);
+			continue;
+		}
+		if(!S_ISREG(sbuf.st_mode))
+			continue;
+
+		file = fopen(fullname, "r");
+		if(file == NULL) {
+			fprintf(stderr, "%s: %s\n", strerror(errno), fullname);
+			continue;
 		}
 
-		entries[count_entries++] = dummy;
+		while(fgets(line, 1024, file) != NULL) {
+			insert_line(line);
+		}
+
+		fclose(file);
+		free(fullname);
+	}
+
+	closedir(fstab_d);
+}
+
+void get_filesystems() {
+	FILE *fmounts = NULL;
+	char line[1024];
+
+	fmounts = fopen("/proc/mounts", "r");
+	if(fmounts == NULL) {
+		fprintf(stderr, "%s: %s\n", strerror(errno), "/proc/mounts");
+		return;
+	}
+
+	while(fgets(line, 1024, fmounts) != NULL) {
+		char mountpoint[1024];
+		char *pos = NULL;
+		int i = 0;
+
+		sscanf(line, "%*s %s %*s", mountpoint);
+		if((pos = strstr(mountpoint, TARGET)) == NULL)
+			continue;
+
+		/* remove the leading /target string; very ugly :) */
+		pos = strstr(line, TARGET);
+		for(i=0; i<strlen(TARGET); i++) {
+			pos[i] = 32;
+		}
+		if(pos[i] == 32)
+			pos[i-1] = '/';
+
+		insert_line(line);
 	}
 
 	fclose(fmounts);
-	return(count_entries);
 }
 
-int get_swapspaces(struct fstab_entry *entries[], int pos, int max_entries) {
+void get_swapspaces() {
 	FILE *fswaps = NULL;
 	char line[1024];
-	int count_entries = pos;
 
 	fswaps = fopen("/proc/swaps", "r");
-	if(fswaps == NULL)
-		return(0);
+	if(fswaps == NULL) {
+		fprintf(stderr, "%s: %s\n", strerror(errno), "/proc/swaps");
+		return;
+	}
 
 	while(fgets(line, 1024, fswaps) != NULL) {
 		char filesystem[1024];
-		struct fstab_entry *dummy;
+		char *swline = NULL;
 
-		if(count_entries >= MAX_ENTRIES)
-			break;
-
-		dummy = malloc(sizeof(*dummy));
-		if(dummy == NULL)
-			break;
-
-		dummy->filesystem = NULL;
-		dummy->mountpoint = NULL;
-		dummy->typ = NULL;
-		dummy->options = NULL;
-		dummy->dump = 0;
-		dummy->pass = 0;
-
-		sscanf(line, "%s %*s %*s %*s %*s", filesystem);
-
-		/* skip first header line */
-		if(filesystem[0] != '/')
+		if(line[0] != '/')
 			continue;
 
-		if(strlen(filesystem) > 0)
-			dummy->filesystem = strdup(filesystem);
-		dummy->mountpoint = strdup("none");
-		dummy->typ = strdup("swap");
-		dummy->options = strdup("sw");
-
-		entries[count_entries++] = dummy;
+		sscanf(line, "%s %*s %*s %*s %*s", filesystem);
+		asprintf(&swline, "%s\tnone\tswap\tsw", filesystem);
+		insert_line(swline);
 	}
 
 	fclose(fswaps);
-	return(count_entries);
-}
-
-int get_otherdevices(struct fstab_entry *entries[], int pos, int max_entries) {
-	int count_entries = pos;
-	struct fstab_entry *entry = NULL;
-
-	entry = static_entries;
-	while(entry->filesystem != NULL) {
-		struct fstab_entry *dummy = NULL;
-
-		if(count_entries >= MAX_ENTRIES)
-			break;
-
-		dummy = malloc(sizeof(*dummy));
-		if(dummy == NULL)
-			break;
-
-		dummy->filesystem = NULL;
-		dummy->mountpoint = NULL;
-		dummy->typ = NULL;
-		dummy->options = NULL;
-		dummy->dump = 0;
-		dummy->pass = 0;
-
-		if(strlen(entry->filesystem) > 0)
-			dummy->filesystem = strdup(entry->filesystem);
-		if(strlen(entry->mountpoint) > 0)
-			dummy->mountpoint = strdup(entry->mountpoint);
-		if(strlen(entry->typ) > 0)
-			dummy->typ = strdup(entry->typ);
-		if(strlen(entry->options) > 0) {
-			dummy->options = strdup(entry->options);
-		} else {
-			dummy->options = strdup("defaults");
-		}
-
-		entries[count_entries++] = dummy;
-		entry++;
-	}
-
-	return(count_entries);
 }
 
 void mapdevfs(struct fstab_entry *entry) {
@@ -154,7 +190,7 @@ void mapdevfs(struct fstab_entry *entry) {
 	if(entry->filesystem == NULL)
 		return;
 
-	asprintf(&cmd, "%s %s 2>/dev/null", "mapdevfs", strdup(entry->filesystem));
+	asprintf(&cmd, "%s %s 2>/dev/null", MAPDEVFS, strdup(entry->filesystem));
 
 	pfile = popen(cmd, "r");
 	if(pfile == NULL)
@@ -170,27 +206,39 @@ void mapdevfs(struct fstab_entry *entry) {
 }
 
 int main(int argc, char *argv[]) {
-	struct fstab_entry *entries[MAX_ENTRIES];
-	int count = 0, i = 0;
+	int i = 0;
 	FILE *outfile = NULL;
 
-	count = get_filesystems(entries, count, MAX_ENTRIES);
-	count = get_swapspaces(entries, count, MAX_ENTRIES);
-	count = get_otherdevices(entries, count, MAX_ENTRIES);
+#ifdef LOCAL
+	printf("W: using local mode!\n\n");
+#endif
+
+	get_filesystems();
+	get_swapspaces();
+	get_fstab_d_dir();
 
 	outfile = fopen(FSTAB_FILE, "w");
 	if(outfile == NULL)
 		return(0);
 
+#ifdef DEBUG
+	printf("---------------------------------\n");
+#endif
 	fprintf(outfile, HEADER, FSTAB_FILE);
-	for(i=0; i<count; i++) {
+	for(i=0; i<count_entries; i++) {
 		int pass = 2;
 
-		mapdevfs(entries[i]);
+		//mapdevfs(entries[i]);
 		if((strlen(entries[i]->mountpoint) == 1) && 
 		(entries[i]->mountpoint[0] == '/')) {
 			pass = 1;
 		}
+#ifdef DEBUG
+		fprintf(stdout, "%s\t%s\t%s\t%s\t%d %d\n",
+			entries[i]->filesystem, entries[i]->mountpoint,
+			entries[i]->typ, entries[i]->options,
+			0, pass);
+#endif
 		fprintf(outfile, "%s\t%s\t%s\t%s\t%d %d\n",
 			entries[i]->filesystem, entries[i]->mountpoint,
 			entries[i]->typ, entries[i]->options,
