@@ -1177,7 +1177,6 @@ int main (int argc, char *argv[])
 {
     PedDevice *dev = NULL;
     diskspace_req_t *disk_reqs = NULL;
-    const char *profiles;
     const char *tablefile = NULL;
     int retval = 1;
     
@@ -1210,9 +1209,8 @@ int main (int argc, char *argv[])
 
     if (NULL == disk_reqs)
     {
-        autopartkit_err( 0,
-			 "Unable to load partition table for profile '%s'.\n",
-			 profiles ? profiles : "[null]");
+        autopartkit_err( 0, "Unable to load partition table '%s'.\n",
+			 tablefile);
 	goto end;
     }
     else
