@@ -305,7 +305,7 @@ void *
 reduce_disk_usage_size(struct disk_info_t *vg, 
                      struct diskspace_req_s reqs[],
                      double percent){
-    /* Reduce vg size to sum(min values) + 2/3 of free space */
+    /* Reduce free vg space to sum(min values) + percent of free space */
     int i;
     int minimum = 0;
     int newsize = 0;
@@ -313,6 +313,5 @@ reduce_disk_usage_size(struct disk_info_t *vg,
       minimum = minimum + MiB_TO_BLOCKS(reqs[i].minsize);
     }
     newsize = ((vg->capacity) - minimum) * percent;
-    vg->capacity = newsize + minimum;
     vg->freespace = newsize + minimum;
 }
