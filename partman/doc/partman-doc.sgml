@@ -49,7 +49,7 @@ installer of GNU/Linux and that are related to partitioning:
 <item> It should be able to resize partitions and move their contents
 from one place to another.
 
-<item> The users should be protected from mistakes &mdash; by allowing
+<item> The users should be protected from mistakes &ndash; by allowing
 them to undo their partitioning operations.
 
 <item> The partitioner should discover that there is already some
@@ -63,7 +63,7 @@ them to undo their partitioning operations.
   relatively independent development process.  This document describes
   how we can solve all mentioned tasks keeping the Debian installer as
   modular as it is now.  Ideally in order to add some new feature only
-  few new udebs must be all that is needed &mdash; no changes in the
+  few new udebs must be all that is needed &ndash; no changes in the
   existing udebs and no recompilation.
 
 <p> The script <file>partman</file> from the package
@@ -155,7 +155,7 @@ automatic partitioning, then correct or customise the automatic
 partitioning, perform some other arbitrary operations being still
 allowed to undo everithing.
 
-<p> There is one obvious solution of these two problems &mdash; we
+<p> There is one obvious solution of these two problems &ndash; we
 keep the data structures of libparted in a daemon process and
 communicate with it in order to make changes in these data structures.
 This process is <file>/bin/parted_server</file> from the package
@@ -239,7 +239,7 @@ partitioning will be aborted.
 <prgn>parted_server</prgn> that the device is to be edited (`opens'
 the device).  All udebs that provide storage device (software RAID,
 LVM, encrypted partitions) must do the same.  This subdirectory must
-contain at least three files &mdash; <prgn>device</prgn>,
+contain at least three files &ndash; <prgn>device</prgn>,
 <prgn>model</prgn> and <prgn>size</prgn>.  The first contains the name
 of a device file (for example
 <file>/dev/ide/host0/bus0/target0/lun0/disc</file>).  The second
@@ -298,7 +298,7 @@ Choices: ${CHOICES}
  menu.  For example the udebs for software RAID volumes can install in
  the menu of the editing operations an item to resize the chosen
  partition to have the same size as another.  These subdirectories
- must contain two scripts &mdash; <prgn>choices</prgn> and
+ must contain two scripts &ndash; <prgn>choices</prgn> and
  <prgn>do_option</prgn>.  The purpose of the first script is to print
  menu items.  For every menu item <prgn>choices</prgn> must print a
  line having the form
@@ -327,10 +327,10 @@ to the users.  If they choose this particular menu item the script
   Debconf-template with type `select' and description `Please choose
   what to do with this partition'.  The package
   <package>partman-partitioning</package> installs in this
-  menu-directory some subdirectories &mdash;
+  menu-directory some subdirectories &ndash;
   <prgn>62change_name</prgn>, <prgn>65toggle_bootable</prgn> and
   <prgn>85delete</prgn>.  The script
-  <file>62change_name/choices</file> is given two arguments &mdash;
+  <file>62change_name/choices</file> is given two arguments &ndash;
   the hard disk we edit and the id of the partition.  It checks if the
   type of the partition table supports partition names in which case
   it prints the line
@@ -701,7 +701,7 @@ of lines in the form
 <example>
 <var>menu_item_id</var>&lt;TAB&gt;The text for the user
 </example>
-&mdash; one for every storage device and one for every partition.  The
+&ndash; one for every storage device and one for every partition.  The
 <var><tt>menu_item_id</tt></var> of the storage devices is their
 storage directory.  The <var><tt>menu_item_id</tt></var> of the
 partitions has the form
@@ -802,7 +802,7 @@ $10,... are not defined.
 
 <sect> Communication with <prgn>parted_server</prgn>
 
-<p> The package <package>partman</package> creates two FIFOs &mdash;
+<p> The package <package>partman</package> creates two FIFOs &ndash;
 <file>/var/lib/partman/infifo</file> and
 <file>/var/lib/partman/outfifo</file>.  <prgn>Parted_server</prgn>
 reads instructions from <prgn>infifo</prgn> and responds by writting
@@ -864,6 +864,13 @@ The rest arguments are arguments for the command.
 <p> You use the function <prgn>close_dialog</prgn> in order to
 terminate the communication dialog.
 
+<p> When you sent to <prgn>parted_server</prgn> an order to do some
+long operation (check, create, resize or copy file system) the user
+will be shown a progress bar.  You may give name to it by the function
+<prgn>name_progress_bar</prgn>.  It may be used right before the
+command <prgn>open_dialog</prgn> and accepts only one argument &ndash;
+a template with type text that describes what is being doing.
+
 <p> The function <prgn>log</prgn> appends its arguments to the file
 <file>/var/log/partman</file>.  This file is used as log-file also by
 <prgn>parted_server</prgn>.
@@ -909,8 +916,8 @@ close_dialog
 </example>
 
 After this command you may not issue commands about the device of
-<var><tt>device_directory</tt></var>.  This command does _not_ invoke
-the command COMMIT.
+<var><tt>device_directory</tt></var>.  This command does
+<strong>not</strong> invoke the command COMMIT.
 
 <sect> Write partitioning to the disk
 
@@ -1216,7 +1223,7 @@ fi
 <p> Synopsis:
 <example>
 cd <var>device_directory</var>
-open_dialog GET_FILE_SYSTEM <var>partition_id</var> <var>new_filesystem</var>
+open_dialog CHANGE_FILE_SYSTEM <var>partition_id</var> <var>new_filesystem</var>
 end_dialog
 </example>
 
@@ -1233,6 +1240,7 @@ that are swap spaces receive type 82.
 <p> Synopsis:
 <example>
 cd <var>device_directory</var>
+name_progress_bar <var>some/debconf/template</var>
 open_dialog CHECK_FILE_SYSTEM <var>partition_id</var>
 read_line result
 end_dialog
@@ -1249,11 +1257,16 @@ case $result in
 esac
 </example>
 
+The command <prgn>name_progress_bar</prgn> may be omited.  The debconf
+template must has type text.  It will be used to give the user
+information of what is being doing.
+
 <sect> Create a file system in a partition
 
 <p> Synopsis:
 <example>
 cd <var>device_directory</var>
+name_progress_bar <var>some/debconf/template</var>
 open_dialog CREATE_FILE_SYSTEM <var>partition_id</var> <var>new_filesystem</var>
 read_line result
 end_dialog
@@ -1266,6 +1279,10 @@ case $result in
         ;;
 esac
 </example>
+
+The command <prgn>name_progress_bar</prgn> may be omited.  The debconf
+template must has type text.  It will be used to give the user
+information of what is being doing.
 
 <sect> Create a new partition
 
@@ -1312,6 +1329,7 @@ close_dialog
 <p> Synopsis:
 <example>
 cd <var>device_directory</var>
+name_progress_bar <var>some/debconf/template</var>
 open_dialog RESIZE_PARTITION <var>partition_id</var> <var>new_size</var>
 read_line new_id
 close_dialog
@@ -1324,6 +1342,10 @@ always.  If it fails $new_id will be the same as
 
 <p> This command doesn't move the start of the partition but only its
 end.
+
+<p> The command <prgn>name_progress_bar</prgn> may be omited.  The
+debconf template must has type text.  It will be used to give the user
+information of what is being doing.
 
 <sect> Get resize range
 
@@ -1343,6 +1365,7 @@ $current_size and $maximal_size are measured in bytes.
 <p> Synopsis:
 <example>
 cd <var>destination_device_directory</var>
+name_progress_bar <var>some/debconf/template</var>
 open_dialog COPY <var>destination_id</var> <var>source_device</var> <var>source_id</var>
 close_dialog
 </example>
@@ -1351,6 +1374,9 @@ This command copies into the partition with id
 id <var><tt>source_id</tt></var>.  <var><tt>source_device</tt></var>
 is <tt>$(basename <var>source_device_directory</var>)</tt>.
 
+<p> The command <prgn>name_progress_bar</prgn> may be omited.  The
+debconf template must has type text.  It will be used to give the user
+information of what is being doing.
 
 
 <chapt> Bugs and limitations
