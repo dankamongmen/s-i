@@ -1,18 +1,7 @@
-if [ -z "$TERM_TYPE" ]; then
-	case `readlink /proc/self/fd/0` in
-		/dev/console|/dev/tts/*)
-			TERM_TYPE=serial
-			;;
-		/dev/vc/*)
-			TERM_TYPE=virtual
-			if [ "`debconf-get debian-installer/framebuffer`" = true ]; then
-				TERM_FRAMEBUFFER_TRY=yes
-			fi
-			;;
-		/dev/pts/*)
-			TERM_TYPE=pts
-			;;
-	esac
-fi
+#!/bin/sh
+# Source the script that does the actual work. Done this way so that
+# userdevfs can source it too, from debian-installer-startup.d
+
+. /lib/debian-installer/detect-console
 
 export TERM_TYPE
