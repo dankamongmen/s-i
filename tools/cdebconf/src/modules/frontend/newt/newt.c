@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.44 2004/03/03 23:43:29 barbier Exp $
+ * $Id: newt.c,v 1.45 2004/03/03 23:57:29 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -1041,8 +1041,8 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     newtGetScreenSize(&width, NULL);
     win_width = width-7;
     newtCenteredWindow(win_width, 5, title);
-    data->scale_bar = newtScale(1, 1, win_width-2, obj->progress_max - obj->progress_min);
-    data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2, 1, flags);
+    data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max - obj->progress_min);
+    data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, 1, flags);
     data->scale_textbox_height = 1;
     data->scale_form = create_form(NULL);
     newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
@@ -1096,9 +1096,9 @@ newt_progress_info(struct frontend *obj, const char *info)
 	    newtFormDestroy(data->scale_form);
 	    newtPopWindow();
 	    newtCenteredWindow(win_width, 4 + text_height, obj->progress_title);
-	    data->scale_bar = newtScale(1, 1, win_width-2, obj->progress_max);
+	    data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max);
 	    newtScaleSet(data->scale_bar, obj->progress_cur);
-	    data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2, text_height, flags);
+	    data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, text_height, flags);
 	    data->scale_textbox_height = text_height;
 	    data->scale_form = create_form(NULL);
 	    newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
