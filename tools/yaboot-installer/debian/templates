@@ -1,61 +1,73 @@
 Template: yaboot-installer/wrongmac
-Type: note
-_Description: No NewWorld PowerMac
+Type: error
+_Description: This machine is not a NewWorld PowerMac
  Yaboot can only be used on NewWorld PowerMac's. Please use the correct
- boot-loader for your ppc-architecture.
+ boot loader for your ppc-architecture.
 
 Template: yaboot-installer/nopart
-Type: note
+Type: error
 _Description: No bootstrap partition found
  No hard disks were found which have an "Apple_Bootstrap" partition. 
  You must create an 800k partition named "bootstrap", with type
  "Apple_Bootstrap".
 
 Template: yaboot-installer/noroot
-Type: note
+Type: error
 _Description: No root partition found
- No partition was found which is mounted as your new root partition.
+ No partition is mounted as your new root partition.
  You must mount a root partition first.
 
 Template: yaboot-installer/bootdev
 Type: select
 Choices: ${DEVICES}
 Default: invaliddevice
-_Description: On which device should yaboot be installed?
- Yaboot (the Linux bootloader) needs to be installed on a hard disk in
- order for your system to be bootable.  You must pick from the available
- hard disks which have "Apple_Bootstrap" partitions available.
+_Description: Device for boot loader installation:
+ Yaboot (the Linux boot loader) needs to be installed on a hard disk 
+ partition in order for your system to be bootable.  Please choose 
+ the destination partition among these "Apple_Bootstrap" partitions.
 
 Template: yaboot-installer/kconferr
-Type: note
-_Description: Failed to create kernel-image config
- Unable to create a new kernel image config file. Please check systemlog and/or
- the output on the third console (tty3).
+Type: error
+_Description: Failed to create kernel-image configuration
+ The creation of a new kernel image configuration file failed. 
+ .
+ Please check the system log or the output on the third console (tty3).
 
 Template: yaboot-installer/conferr
-Type: note
-_Description: Failed to create yaboot config
- Unable to create the main yaboot config file. Please check systemlog and/or
- the output on the third console (tty3).
+Type: error
+_Description: Failed to create yaboot configuration
+ The creation of the main yaboot configuration file failed. 
+ .
+ Please check the systemlog or the output on the third console (tty3).
+ .
  Warning: Your system may be unbootable!
 
 Template: yaboot-installer/ybinerr
 Type: note
 _Description: Failed to install bootloader
- Unable to install the yaboot bootloader. Please check systemlog and/or
- the output on the third console (tty3).
+ The installation of the yaboot boot loader failed.
+ .
+ Please check the system log or the output on the third console (tty3).
+ .
  Warning: Your system may be unbootable!
 
 Template: yaboot-installer/success
 Type: note
 _Description: Successfully installed yaboot
- Yaboot was successfully installed!
+ The yaboot boot loader was successfully installed.
+ .
  The system is now ready to boot the new Debian GNU/Linux system.
 
 Template: yaboot-installer/mounterr
-Type: note
+Type: error
 _Description: Failed to mount /target/proc
- Unable to mount proc filesystem on /target/proc.
- Please check systemlog and/or
- the output on the third console (tty3).
+ Mounting the proc filesystem on /target/proc failed.
+ .
+ Please check the system log or the output on the third console (tty3).
+ .
  Warning: Your system will maybe be unbootable!
+
+Template: debian-installer/yaboot-installer/title
+Type: text
+#  Main menu item
+_Description: Install yaboot on a hard disk
