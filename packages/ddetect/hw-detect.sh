@@ -196,12 +196,12 @@ get_ide_chipset_info() {
 
 # Return list of lines formatted "module:Description"
 get_detected_hw_info() {
+	if [ "`udpkg --print-architecture`" = powerpc ]; then
+		discover-mac-io
+	fi
 	discover_hw
 	if [ -d /proc/bus/usb ]; then
 		echo "usb-storage:USB storage"
-	fi
-	if [ "`udpkg --print-architecture`" = powerpc ]; then
-		discover-mac-io
 	fi
 }
 
