@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.19 2003/03/25 07:18:35 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.20 2003/03/25 18:49:06 mckinstry Exp $
  */
 
 #include "config.h"
@@ -20,6 +20,7 @@
 #include <cdebconf/commands.h>
 #include <cdebconf/debconfclient.h>
 #include <linux/serial.h>
+#include <locale.h>
 #include <sys/ioctl.h>
 #include "nls.h"
 #include "xmalloc.h"
@@ -64,15 +65,12 @@ int mydebconf_default_set (char *template, char *value)
 	int res;
 	struct debconfclient *client = mydebconf_get ();
 	res = client->command (client, "get", template, NULL);
-	printf ("FIXME: back from get\n");
 	if (res) return res;
 
 	if (client->value == NULL  || (strlen (client->value) == 0)) {
-		printf ("FIXME: doing set \n");
-		res = client->command (client, "set", template, value);
-		printf ("FIXME: done\n");
-	//	if (res) return res;
-	// 	res = client->command (client, "fset", template, "seen", "false", NULL);
+		res = client->command (client, "set", template, STRDUP (value), NULL);
+		if (res) return res;
+	 	res = client->command (client, "fset", template, "seen", "false", NULL);
 	} 
 	return res;
 }
@@ -115,9 +113,9 @@ char *locale_get (void)
 	
 	client->command (client, "get", "debian-installer/locale",  NULL);
 	if (client->value && (strlen (client->value) > 0))
-		return STRDUP (client->value);
+		return client->value;
 	else
-		return STRDUP ("en_US");
+		return "en_US";
 }
 
 
@@ -128,22 +126,22 @@ char *locale_get (void)
 void locale_parse (char *locale, 
 		   char **lang, char **territory, char **charset)
 {
-	char *und, *at;
+	char *und, *at , *loc = STRDUP(locale);
 
-	und = strchr (locale, '_');
-	at  = strchr (locale, '@');	
+	und = strchr (loc, '_');
+	at  = strchr (loc, '@');	
 	if (at) {
 		*at = '\0';
-		*charset = STRDUP (at+1);
+		*charset = at+1;
 	} else
 		*charset = NULL;
 	
 	if (und) {
 		*und = '\0';
-		*territory = STRDUP (und+1);
+		*territory = und+1;
 	} else 
 		*territory = NULL;
-	*lang = STRDUP (locale);
+	*lang = loc;
 }
 
 /**
@@ -221,6 +219,7 @@ void maplist_select (maplist_t *maplist)
 			s = buf;
 		s = insert_description (s, mp->name, mp->description);
 		score = locale_list_compare (mp->langs);
+		printf ("FIXME: Comparing %s, score %d\n", mp->langs, score);
 		if (score > best) {
 			best = score;
 			preferred = mp;
@@ -232,9 +231,10 @@ void maplist_select (maplist_t *maplist)
 	STRCPY (template + 20, maplist->name);
 	client->command (client, "subst", template, "choices", buf, NULL);	
 	// set the default
-	if (score > 0) {
+	if (best > 0) {
 		s = insert_description (deflt, preferred->name, preferred->description);
 		*s = '\0';
+		printf ("FIXME: Setting default : %s %s \n", template, deflt);
 		mydebconf_default_set (template, deflt);
 	}
 }
@@ -517,7 +517,7 @@ char *keyboard_select (void)
 	}		
 	client->command (client, "subst", "console-tools/archs", "choices", buf, NULL);		      
 	mydebconf_default_set ("console-tools/archs", preference);
-	
+	free (preference);	
 	// Should we prompt the user?
 	if (choices < 2)		
 		return "low";
@@ -556,7 +556,7 @@ int keymap_select (char *arch, char *keymap)
 	res = mydebconf_ask (kb->deflt ? "low" : "medium", template, &ptr);
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
-	keymap = ( strlen(ptr) == 0) ? STRDUP ("none") : extract_name (keymap, ptr);
+	keymap = ( strlen(ptr) == 0) ? "none" : extract_name (keymap, ptr);
 	
 	return CMDSTATUS_SUCCESS;
 }	
@@ -587,6 +587,7 @@ int main (int argc, char **argv)
 	struct debconfclient *client;
 	int res;
 
+	setlocale (LC_ALL, "");
 	client = mydebconf_get ();
 
 	// As a form of debugging, allow a keyboard map to 
@@ -598,7 +599,7 @@ int main (int argc, char **argv)
 
 	client->command (client, "capb", "backup", NULL);
 	client->command (client, "version", "2.0", NULL);
-	client->command (client, "title", "Select a Keyboard Layout", NULL);
+	client->command (client, "title", N_("Select a Keyboard Layout"), NULL);
 
 	read_keymap_files (KEYMAPLISTDIR);
 	check_if_serial_console ();
@@ -620,12 +621,12 @@ int main (int argc, char **argv)
 					exit (res);
 			}
 			if (s == NULL || (strlen(s) == 0)) {
-				di_log("not setting keymap");
+				di_log("kbd-chooser: not setting keymap (console-tools/archs not set)");
 				exit (0);
 			}
 			arch = extract_name (xmalloc (LINESIZE), s);
 			if (strcmp (arch, "none") == 0) {
-				di_log ("not setting keymap");
+				di_log ("kbd-chooser: not setting keymap (kbd == none selected)");
 				exit (0);
 			}
 			state = CHOOSE_KEYMAP;
