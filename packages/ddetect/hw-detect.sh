@@ -175,7 +175,6 @@ get_detected_hw_info() {
 				register-module airport
 			fi
 		fi
-		if 
 	fi
 }
 
