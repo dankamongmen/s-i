@@ -56,3 +56,5 @@ int di_system_prebaseconfig_append (const char *udeb, const char *format, ...)
 
 int di_prebaseconfig_append (const char *udeb, const char *fmt, ...) __attribute__ ((alias("di_system_prebaseconfig_append")));
 
+__asm__ (".symver di_system_prebaseconfig_append,di_system_prebaseconfig_append@LIBDI_4.0");
+__asm__ (".symver di_prebaseconfig_append,di_prebaseconfig_append@LIBDI_4.0");
