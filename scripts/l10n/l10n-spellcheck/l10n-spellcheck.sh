@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+# usage: l10n-spellcheck.sh
+#
+# l10n-spellcheck.sh - this script triggers all the spellchecking process
+#
+# Author: Davide Viti <zinosat@tiscali.it> 2005, for the Debian Project
+#
+
 PATH=~/aspell:~/gnuplot/bin:$PATH
 export PATH
 
@@ -31,9 +39,11 @@ ln -s $LATEST previous
 
 cp $NEW/stats.txt history/$SAVED_STATS
 
+mv $NEW/index.html .
+
+cd ~/l10n-spellcheck
+
 echo ""
 echo "***  $SAVED_STATS  ***"
-echo ""
-cat history/$SAVED_STATS
 
-mv $NEW/index.html .
+sh diff_stats.sh $OUT_DIR/$LATEST/stats.txt $OUT_DIR/$NEW/stats.txt
