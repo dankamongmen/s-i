@@ -122,8 +122,18 @@ di_execlog (const char *incmd)
 
 void
 di_log(const char *msg){
+    di_logf("%s", msg);
+}
+
+
+
+void
+di_logf(const char *fmt, ...){
+    va_list ap;
     openlog ("installer", LOG_PID | LOG_PERROR, LOG_USER);
-    syslog (LOG_DEBUG, "%s", msg);
+    va_start(ap, fmt);
+    vsyslog (LOG_DEBUG, fmt, ap);
+    va_end(ap);
     closelog ();
 }
 

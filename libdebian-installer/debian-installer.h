@@ -65,6 +65,7 @@ struct linkedlist_t
 int di_prebaseconfig_append (const char *udeb, const char *format, ...);
 int di_execlog (const char *incmd);
 void di_log(const char *msg);
+void di_logf(const char *fmt, ...);
 int di_check_dir (const char *dirname);
 int di_snprintfcat (char *str, size_t size, const char *format, ...);
 char *di_stristr(const char *haystack, const char *needle);
