@@ -23,6 +23,14 @@ info() {
     log "info: $@"
 }
 
+debug() {
+    log "debug: $@"
+}
+
+writefile () {
+    cat >>"$1" || die yaboot-installer/conferr "Error writing $2"
+}
+
 db_progress START 0 6 yaboot-installer/progress
 
 die() {
@@ -118,46 +126,123 @@ db_progress INFO yaboot-installer/root
 rootdev="`sed -n -e '/^[^[:space:]]\+[[:space:]]\+\/target[[:space:]]/ { s/[[:space:]].*//; p }' /proc/mounts`"
 [ "$rootdev" ] || die yaboot-installer/noroot 'No root partition found'
 
+mountvirtfs () {
+    fstype="$1"
+    path="$2"
+    if grep -q "[[:space:]]$fstype\$" /proc/filesystems && \
+       ! grep -q "^[^ ]\+ \+$path " /proc/mounts; then
+	mkdir -p "$path" || \
+	    die yaboot-installer/mounterr "Error creating $path"
+	mount -t "$fstype" "$fstype" "$path" || \
+	    die yaboot-installer/mounterr "Error mounting $path"
+	trap "umount $path" HUP INT QUIT KILL PIPE TERM EXIT
+    fi
+}
+
 # mkofboot needs proc in /target
-if ! [ -e /target/proc/cmdline ]; then
-    mkdir -p /target/proc || \
-	die yaboot-installer/mounterr 'Error creating /target/proc'
-    mount -t proc proc /target/proc || \
-	die yaboot-installer/mounterr 'Error mounting /target/proc'
-    trap 'umount /target/proc' HUP INT QUIT KILL PIPE TERM EXIT
-fi
+mountvirtfs proc /target/proc
+# ofpath needs sysfs in /target for 2.6
+mountvirtfs sysfs /target/sys
 
 # Probe for other OSes.
 
 db_progress STEP 1
 db_progress INFO yaboot-installer/os-probing
 
-newline="
-"
+os-prober >/tmp/os-probed || true
 
-probed="$(os-prober)"
+extraglobals=/tmp/yaboot.conf.extraglobals
+rm -f "$extraglobals"
+extraimages=/tmp/yaboot.conf.extraimages
+rm -f "$extraimages"
 
-if [ "$probed" ]; then
-    OLDIFS="$IFS"
-    IFS="$newline"
-    for os in $probed; do
-	IFS="$OLDIFS"
-	info "probed: $os"
-	partition="$(echo "$os" | cut -d: -f1)"
-	mappedpartition="$(mapdevfs "$partition")"
-	label="$(echo "$os" | cut -d: -f3)"
-	loadertype="$(echo "$os" | cut -d: -f4)"
-	# You only get the first of each non-Linux OS here, as that's all
-	# yaboot supports without painful hacking. Sorry.
-	case $loadertype in
-	    macosx)	[ "$macosx" ] || macosx="$mappedpartition" ;;
-	    macos)	[ "$macos" ]  || macos="$mappedpartition"  ;;
-	    *)		info "unhandled: $os" ;;
-	esac
-	IFS="$newline"
-    done
+writeglobals() {
+    writefile "$extraglobals" 'extra global settings'
+}
+
+writeimages() {
+    writefile "$extraimages" 'extra image records'
+}
+
+# Get the Open Firmware path for a device. Requires non-devfs syntax.
+map_of_path() {
+    chroot /target ofpath "$1" || return 1
+}
+
+OLDIFS="$IFS"
+IFS=:
+# Note that this creates a subshell, so variables set inside this loop won't
+# persist outside it.
+cat /tmp/os-probed | while read partition title label loadertype; do
     IFS="$OLDIFS"
-fi
+    info "probed: $partition:$title:$label:$loadertype"
+    mappedpartition="$(mapdevfs "$partition")"
+    debug "mapped: $mappedpartition"
+    # You only get the first of each non-Linux OS here, as that's all
+    # yaboot supports without painful hacking. Sorry.
+    case $loadertype in
+	linux)
+	    IFS=:
+	    linux-boot-prober "$partition" | while read \
+		    rootpart bootpart label kernel initrd params; do
+		IFS="$OLDIFS"
+		info "linux-boot-probed:" \
+		     "$rootpart:$bootpart:$label:$kernel:$initrd:$params"
+		ofrootpart="$(map_of_path "$mappedpartition")" || continue
+		debug "OF root partition: $ofrootpart"
+		# bootpart may or may not be in devfs syntax.
+		mappedbootpart="$(mapdevfs "$bootpart")" || \
+		    mappedbootpart="$bootpart"
+		debug "mapped boot partition: $mappedbootpart"
+		ofbootpart="$(map_of_path "$mappedbootpart")" || continue
+		debug "OF boot partition: $ofbootpart"
+		if [ -z "$label" ]; then
+		    label="$title"
+		fi
+		# TODO: uniquify label?
+		if echo "$kernel" | grep -q '^/boot/' && \
+		   [ "$mappedbootpart" != "$mappedpartition" ]; then
+		    # separate /boot partition
+		    kernel="${kernel#/boot}"
+		    initrd="${initrd#/boot}"
+		fi
+		writeimages <<EOF
+
+# This entry automatically added by the Debian installer for an existing
+# Linux installation on $mappedpartition.
+image=$ofbootpart,$kernel
+    label=$label
+    root=$ofrootpart
+    append="$params"
+EOF
+		if [ -n "$initrd" ]; then
+		    writeimages <<EOF
+    initrd=$ofbootpart,$initrd
+EOF
+		fi
+		IFS=:
+	    done
+	    IFS="$OLDIFS"
+	    ;;
+	macosx)
+	    if ! [ "$macosx" ]; then
+		macosx=1
+		echo "macosx=$mappedpartition" | writeglobals
+	    fi
+	    ;;
+	macos)
+	    if ! [ "$macos" ]; then
+		macos=1
+		echo "macos=$mappedpartition" | writeglobals
+	    fi
+	    ;;
+	*)
+	    info "unhandled: $partition:$title:$label:$loadertype"
+	    ;;
+    esac
+    IFS=:
+done
+IFS="$OLDIFS"
 
 # Generate yaboot.conf
 
@@ -174,13 +259,13 @@ ofpath="`chroot /target ofpath "$disk"`"
 
 # we generate our own yaboot.conf kernel (yabootconfig is horribly broken)
 # cjwatson: a little more justification of that would have been nice ...
+# but it does seem clear that yabootconfig isn't flexible enough for our
+# needs, e.g. OS probing.
 
->/target/etc/yaboot.conf \
-    || die yaboot-installer/conferr 'Error writing to yaboot.conf'
+rm -f /target/etc/yaboot.conf
 
-writeyabootconf () {
-    cat >>/target/etc/yaboot.conf \
-	|| die yaboot-installer/conferr 'Error writing to yaboot.conf'
+writeyabootconf() {
+    writefile /target/etc/yaboot.conf yaboot.conf
 }
 
 writeyabootconf <<EOF
@@ -202,11 +287,9 @@ magicboot=/usr/lib/yaboot/ofboot
 enablecdboot
 EOF
 
-if [ "$macos" ]; then
-    echo "macos=$macos" | writeyabootconf
-fi
-if [ "$macosx" ]; then
-    echo "macosx=$macosx" | writeyabootconf
+if [ -s "$extraglobals" ]; then
+    cat "$extraglobals" | writeyabootconf
+    rm -f "$extraglobals"
 fi
 
 writeyabootconf <<EOF
@@ -230,6 +313,11 @@ if [ "$video" ]; then
     writeyabootconf <<EOF
 	append="video=$video"
 EOF
+fi
+
+if [ -s "$extraimages" ]; then
+    cat "$extraimages" | writeyabootconf
+    rm -f "$extraimages"
 fi
 
 # Install into bootstrap partition
