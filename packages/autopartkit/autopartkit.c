@@ -84,6 +84,13 @@
 
 #include "autopartkit.h"
 
+/* 
+ * How much of the "excess" LVM space should be spent on the LVM
+ * logical volumes.  This accounts for LVM overhead, and make sure
+ * some VG space is available for later use.
+ */
+#define LVM_SPEND_FACTOR (0.5)
+
 #define FAT_MINSIZE_FACTOR 1.33
 
 #define MAX_PARTITIONS 10
@@ -1316,11 +1323,11 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
             free(identmatch);
         }
 
-        /* Reduce vg size to 2/3... */
+        /* Reduce vg size by LVM_SPEND_FACTOR... */
 	autopartkit_log(1, "Vg %s - %d to use\n",
 			vg[0].path, vg[0].freespace);
 	autopartkit_log(1, "Reducing...\n");
-        reduce_disk_usage_size(&vg[0], lvm_reqs, 0.50);
+        reduce_disk_usage_size(&vg[0], lvm_reqs, LVM_SPEND_FACTOR);
 	autopartkit_log(1, "Vg %s - %d to use\n",
 			vg[0].path, vg[0].freespace);
         /* Call distribute_partitions */
