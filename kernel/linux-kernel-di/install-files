@@ -49,19 +49,22 @@ while (<KVERS>) {
 	}
 	next unless $arch eq $hostarch;
 
-	if ($arch eq "m68k") {
-		$sourcedir="$ENV{PWD}/../m68k/$flavour";
-		$ENV{SOURCEDIR}=$sourcedir
-	}
-
 	my $extraname="";
 	if ($multkern =~ /^[yY]/) {
 		$extraname="-$kernelversion-$flavour";
 	}
 	
-	doit("install", "-D", "-m", 644,
-		"$sourcedir/boot/$kname-$installedname",
-		"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname$extraname");
+	# Temporary gross hack for netwinder, has only a vmlinux.
+	if ($installedname =~ /netwinder/) {
+		doit("install", "-D", "-m", 644,
+			"$sourcedir/boot/vmlinux-$installedname",
+			"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname$extraname");
+	}
+	else {
+		doit("install", "-D", "-m", 644,
+			"$sourcedir/boot/$kname-$installedname",
+			"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname$extraname");
+	}
 	doit("install", "-D", "-m", 644,
 		"$sourcedir/boot/System.map-$installedname",
 		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname")
