@@ -3,6 +3,10 @@ CFLAGS=-Wall -g -D_GNU_SOURCE -DARCH=\"$(ARCH)\"
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=wget-retriever
 LIBS=-ldebconf
+# We're sticking at sid for now, since the udebs are not in woody.
+# This must be kept up-to-date to whatever the name of the release of
+# debian is. TODO: paramterize somehow, outside of this retreiver?
+DISTNAME=sid
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG

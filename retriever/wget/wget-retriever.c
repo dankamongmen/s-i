@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* Base of the debconf question hierary used by this program. */
 #define DEBCONF_BASE "mirror/"
 
 int main(int argc, char **argv) {
@@ -19,6 +20,8 @@ int main(int argc, char **argv) {
 	if (argc < 3)
 		exit(1);
 	
+	/* Suck in data from the debconf database, which will be primed
+	 * with the mirror to use by choose-mirror */
 	// TODO: what about ftp?
 	debconf->command(debconf, "GET", DEBCONF_BASE "http/hostname", NULL);
 	hostname=strdup(debconf->value);
