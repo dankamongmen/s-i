@@ -138,7 +138,7 @@ discover_hw () {
 		;;
 	1)
 		discover --format="%m:%V %M\n" --disable-all \
-		          --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
+		          --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet bridge |
 			sed 's/ $//'
 		;;
 	esac
@@ -478,14 +478,14 @@ if [ -x /etc/init.d/pcmcia ]; then
 				2)
 					dpath=linux/module/name
 					dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
-					dflags="-d all -e pci scsi fixeddisk modem network removabledisk"
+					dflags="-d all -e pci scsi fixeddisk modem network removabledisk bridge"
 			
 					echo `discover --data-path=$dpath --data-version=$dver $dflags` \
 						| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
 					;;
 				1)
 					discover --format="%m " --disable-all --enable=pci \
-						scsi ide ethernet \
+						scsi ide ethernet bridge \
 						| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
 					;;
 				esac
