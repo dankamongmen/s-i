@@ -1,13 +1,15 @@
-/* $Id: udpkg.c,v 1.1 2000/08/24 06:23:56 tausq Exp $ */
+/* $Id: udpkg.c,v 1.2 2000/08/26 21:11:27 tausq Exp $ */
 #include "udpkg.h"
 
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <utime.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 /* 
  * Main udpkg implementation routines
@@ -55,9 +57,34 @@ cleanup:
 }
 #endif
 
-static int copyfile(const char *src, const char *dest)
+static int dpkg_copyfile(const char *src, const char *dest)
 {
-	return 0;
+	/* copy a (regular) file if it exists, preserving the mode, mtime 
+	 * and atime */
+	char buf[8192];
+	int infd, outfd;
+	int r;
+	struct stat srcStat;
+	struct utimbuf times;
+
+	if (stat(src, &srcStat) < 0) 
+	{
+		if (errno == 2) return 0; else return -1;
+	}
+	if ((infd = open(src, O_RDONLY)) < 0) 
+		return -1;
+	if ((outfd = open(dest, O_WRONLY|O_CREAT|O_TRUNC, srcStat.st_mode)) < 0)
+		return -1;
+	while ((r = read(infd, buf, sizeof(buf))) > 0)
+	{
+		if (write(outfd, buf, r) < 0)
+			return -1;
+	}
+	if (r < 0) return -1;
+	times.actime = srcStat.st_atime;
+	times.modtime = srcStat.st_mtime;
+	if (utime(dest, &times) < 0) return -1;
+	return 1;
 }
 
 static int dpkg_doconfigure(struct package_t *pkg)
@@ -68,14 +95,15 @@ static int dpkg_doconfigure(struct package_t *pkg)
 
 static int dpkg_dounpack(struct package_t *pkg)
 {
-	int r = 1;
-	char *cwd;
+	int r = 0;
+	char *cwd, *p;
 	FILE *infp, *outfp;
-	char buf[1024];
-	struct stat statbuf;
+	char buf[1024], buf2[1024];
+	int i;
+	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
+	                         "conffiles", "md5sums", "shlibs" };
 
 	DPRINTF("Unpacking %s\n", pkg->package);
-	return 0;
 
 	cwd = getcwd(0, 0);
 	/* chdir("/"); */
@@ -83,11 +111,69 @@ static int dpkg_dounpack(struct package_t *pkg)
 	snprintf(buf, sizeof(buf), "ar p %s data.tar.gz|zcat|tar -xf -", pkg->file);
 	if (SYSTEM(buf) == 0)
 	{
-		pkg->status &= STATUS_STATUSMASK;
-		pkg->status |= STATUS_STATUSUNPACKED;
-
 		/* Installs the package scripts into the info directory */
-
+		for (i = 0; i < sizeof(adminscripts) / sizeof(adminscripts[0]);
+		     i++)
+		{
+			snprintf(buf, sizeof(buf), DPKGCIDIR "%s/%s", 
+				pkg->package, adminscripts[i]);
+			snprintf(buf2, sizeof(buf), INFODIR "%s.%s", 
+				pkg->package, adminscripts[i]);
+			if (dpkg_copyfile(buf, buf2) < 0)
+			{
+				fprintf(stderr, "Cannot copy %s to %s: %s\n", 
+					buf, buf2, strerror(errno));
+				r = 1;
+				break;
+			}
+			else
+			{
+				/* ugly hack to create the list file; should
+				 * probably do something more elegant
+				 *
+				 * why oh why does dpkg create the list file
+				 * so oddly...
+				 */
+				snprintf(buf, sizeof(buf), 
+					"ar p %s data.tar.gz|zcat|tar -tf -", 
+					pkg->file);
+				snprintf(buf2, sizeof(buf2),
+					INFODIR "%s.list", pkg->package);
+				if ((infp = popen(buf, "r")) == NULL ||
+				    (outfp = fopen(buf2, "w")) == NULL)
+				{
+					fprintf(stderr, "Cannot create %s\n",
+						buf2);
+					r = 1;
+					break;
+				}
+				while (fgets(buf, sizeof(buf), infp) &&
+				       !feof(infp))
+				{
+					p = buf;
+					if (*p == '.') p++;
+					if (*p == '/' && *(p+1) == '\n')
+					{
+						*(p+1) = '.';
+						*(p+2) = '\n';
+						*(p+3) = 0;
+					}
+					if (p[strlen(p)-2] == '/')
+					{
+						p[strlen(p)-2] = '\n';
+						p[strlen(p)-1] = 0;
+					}
+					fputs(p, outfp);
+				}
+				fclose(infp);
+				fclose(outfp);
+			}
+		}
+		pkg->status &= STATUS_STATUSMASK;
+		if (r == 0)
+			pkg->status |= STATUS_STATUSUNPACKED;
+		else
+			pkg->status |= STATUS_STATUSHALFINSTALLED;
 	}
 	chdir(cwd);
 	return r;
@@ -134,11 +220,14 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 					read(fd, pkg->control, statbuf.st_size);
 					close(fd);
 
-					if ((p = strstr(pkg->control, "\nVersion: ")) != 0)
+					if ((p = strstr(pkg->control, 
+						"\nVersion: ")) != 0)
 						pkg->version = p+10;
-					if ((p = strstr(pkg->control, "\nDepends: ")) != 0)
+					if ((p = strstr(pkg->control, 
+						"\nDepends: ")) != 0)
 						pkg->depends = p+10;
-					if ((p = strstr(pkg->control, "\nProvides: ")) != 0)
+					if ((p = strstr(pkg->control, 
+						"\nProvides: ")) != 0)
 						pkg->provides = p+11;
 
 					r = 0;
@@ -152,6 +241,33 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	return r;
 }
 
+static int dpkg_unpack(struct package_t *pkgs)
+{
+	int r = 0;
+	struct package_t *pkg;
+	void *status = status_read();
+	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
+	{
+		r = dpkg_dounpack(pkg);
+		if (r != 0) break;
+	}
+	status_merge(status, pkgs);
+	return r;
+}
+
+static int dpkg_configure(struct package_t *pkgs)
+{
+	int r = 0;
+	struct package_t *pkg;
+	void *status = status_read();
+	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
+	{
+		r = dpkg_doconfigure(pkg);
+		if (r != 0) break;
+	}
+	status_merge(status, pkgs);
+	return r;
+}
 
 static int dpkg_install(struct package_t *pkgs)
 {
@@ -209,7 +325,11 @@ static int dpkg_remove(struct package_t *pkgs)
 	return 0;
 }
 
+#ifdef UDPKG_MODULE
+int udpkg(int argc, char **argv)
+#else
 int main(int argc, char **argv)
+#endif
 {
 	char opt = 0;
 	struct package_t *p, *packages = NULL;
@@ -238,10 +358,12 @@ int main(int argc, char **argv)
 	{
 		case 'i': return dpkg_install(packages); break;
 		case 'r': return dpkg_remove(packages); break;
+		case 'u': return dpkg_unpack(packages); break;
+		case 'c': return dpkg_configure(packages); break;
 	}
 
 	/* if it falls through to here, some of the command line options were
 	   wrong */
-	printf("udpkg <-i|-r> my.deb\n");
+	printf("udpkg <-i|-r|-u|-c> my.deb\n");
 	return 0;
 }

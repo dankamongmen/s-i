@@ -31,14 +31,31 @@ if test "$with_depends" != "no"; then
 fi
 
 dnl dpkg library directory
-admindir="/var/lib/dpkg"
+ADMINDIR="/var/lib/dpkg"
 AC_ARG_WITH(admindir,[  --with-admindir=DIR     store dpkg data in DIR [/var/lib/dpkg]],
 [case "$withval" in
   "") AC_MSG_ERROR(invalid admindir specified) ;;
-  *) admindir="$withval" ;;
+  *) ADMINDIR="$withval" ;;
  esac])
-ADMINDIR="$admindir"
 AC_SUBST(ADMINDIR) 
+
+dnl use busybox?
+AC_ARG_WITH(busybox,[  --with-busybox=DIR      link with busybox in DIR [/usr/src/busybox]])
+
+if test -n "$with_busybox"; then
+  BUSYBOXDIR="/usr/src/busybox"
+  if test "$with_busybox" != "yes"; then
+    BUSYBOXDIR="$with_busybox"
+  fi
+  AC_MSG_CHECKING(for busybox in $BUSYBOXDIR)
+  if test -f "$BUSYBOXDIR/busybox.def.h"; then 
+    AC_MSG_RESULT(yes)
+  else 
+    AC_MSG_RESULT(no)
+    exit 1
+  fi
+fi
+AC_SUBST(BUSYBOXDIR)
 
 dnl Checks for header files.
 AC_HEADER_SYS_WAIT
