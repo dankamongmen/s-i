@@ -24,7 +24,7 @@ static void translate_tag_name(char *buf)
 static char *template_filename(struct template_db *db, const char *tag)
 {
 	static char filename[1024];
-    static char tmp[1024];
+	static char tmp[1024];
 	char tagname[1024];
 	filename[0] = 0;
 
@@ -96,6 +96,7 @@ static void textdb_remove_cached_template(struct template_db *db,
 	{
 		if (strcmp((*result)->tag, tag) == 0)
 		{
+			template_deref(*result);
 			*result = (*result)->next;
 			break;
 		}
@@ -258,7 +259,7 @@ static struct template *textdb_template_get(struct template_db *db,
 		result->next = dbdata->templates;
 		dbdata->templates = result;
 	}
-
+	template_ref(result);
 	return result;
 }
 
@@ -394,7 +395,7 @@ static struct question *textdb_question_get(struct question_db *db,
 	q->flags = rec->geti(rec, "question::flags", 0);
 	q->template = db->tdb->methods.get(db->tdb,
 		unescapestr(rec->get(rec, "question::template", "")));
-
+	
 	/* TODO: variables and owners */
 	if ((node = rec->tree(rec, "question::variables")) != 0)
 	{
@@ -493,3 +494,10 @@ struct question_db_module debconf_question_db_module = {
     iterate: textdb_question_iterate,
 };
 
+/*
+  Local Variables:
+  c-basic-offset: 8
+  tab-width: 8
+  indent-tabs-mode: t
+  End:
+*/
