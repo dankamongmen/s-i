@@ -80,7 +80,7 @@ void strvacat(char *buf, size_t maxlen, ...)
 int strparsecword(char **inbuf, char *outbuf, size_t maxlen)
 {
 	char buffer[maxlen];
-char *buf = buffer;
+	char *buf = buffer;
 	char *c = *inbuf;
 	char *start;
 
