@@ -68,10 +68,12 @@ discover_hw () {
 
         dpath=linux/module/name
         dver=`uname -r|cut -d. -f1,2` # Kernel version (ie 2.4)
-        dflags="-t -d all -e ata -e pci -e pcmcia -e scsi display"
+        dflags="-d all -e ata -e pci -e pcmcia -e scsi display"
 
-        VENDOR_MODEL_FILE=$(tempfile)
-        DRIVER_FILE=$(tempfile)
+	# Use fixed name temp files, as 'tempfile' is missing from busybox
+        VENDOR_MODEL_FILE=/tmp/discover-vendor.txt
+        DRIVER_FILE=/tmp/discover-driver.txt
+
         discover --type-summary $dflags > $VENDOR_MODEL_FILE
         discover --data-path=$dpath --data-version=$dver $dflags > $DRIVER_FILE
         paste $VENDOR_MODEL_FILE $DRIVER_FILE
