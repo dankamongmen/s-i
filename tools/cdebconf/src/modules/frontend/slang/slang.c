@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.22 2002/12/17 23:07:44 barbier Exp $
+ * $Id: slang.c,v 1.23 2003/01/12 18:04:00 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -703,6 +703,8 @@ static int slang_go(struct frontend *obj)
 	int i;
 	int ret;
 
+	SLsmg_init_smg();
+	SLang_init_tty(-1, 0, 0);
 	while (q != 0)
 	{
 		ret = DC_OK;
@@ -729,6 +731,8 @@ static int slang_go(struct frontend *obj)
 					}
 					/* fallthrough */
 				default:
+					SLsmg_reset_smg();
+					SLang_reset_tty();
 					return ret;
 				}
 				break;
@@ -737,6 +741,8 @@ static int slang_go(struct frontend *obj)
 		if (ret == DC_OK)
 			q = q->next;
 	}
+	SLsmg_reset_smg();
+	SLang_reset_tty();
 
 	return DC_OK;
 }
