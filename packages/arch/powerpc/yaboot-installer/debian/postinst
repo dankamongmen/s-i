@@ -79,6 +79,8 @@ esac
 info "allowing partition types matching '$ALLOWED_PTYPES'"
 
 for i in /dev/discs/*/disc; do
+    info "parted dump of partition table on $i:"
+    parted -s "$i" print | logger -t yaboot-installer
     dev="`parted -s "$i" print | sed -n 's,^Disk geometry for \([^:]*\)/disc:.*$,\1,p'`"
     # Look for partitions with an appropriate partition type and with the
     # boot flag set.
