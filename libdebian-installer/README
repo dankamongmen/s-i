@@ -1,0 +1,29 @@
+libdebian-installer: library used internally by debian-installer
+
+purpose: this library provides a common set of debian-installer
+specific services/symbols that can (probably should) be used by
+debian-installer modules.
+
+Feel free to add things to this if you see something that needs to be
+added.
+
+Currently implemented functions:
+
+int di_execlog (const char *incmd)
+
+ execute incmd, log any output to debian-installer log. Return value is pid of
+ process executed or -1 on error. (FIXME: wouldbe better to get the exit status
+ of the process?)
+
+
+void di_log(char *msg)
+
+ write a message to the debian-installer log.  This should be used for
+ interesting events, especially anything that will help debug.
+
+
+int di_check_dir (const char *dirname)
+
+ verify that dirname exists and is a directory. Return -1 on error, otherwise the
+ return value of S_ISDIR().
+
