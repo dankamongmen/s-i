@@ -73,7 +73,8 @@ char *lvm_create_logicalvolume(const char *vgname, const char *lvname,
 			       unsigned int mbsize);
 int lvm_split_fstype(const char *str, int separator, int elemcount,
 		     char *elements[]);
-char *lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize);
+char *lvm_lv_add(void *stack, const char *fstype, unsigned int mbminsize,
+		 unsigned int mbmaxsize);
 
 void *lvm_pv_stack_new(void);
 int lvm_pv_stack_isempty(void *stack);
@@ -84,9 +85,11 @@ int lvm_pv_stack_delete(void *);
 void *lvm_lv_stack_new(void);
 int lvm_lv_stack_isempty(void *stack);
 int lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
-		      const char *fstype, unsigned int mbsize);
+		      const char *fstype, unsigned int mbminsize,
+		      unsigned int mbmaxsize);
 int lvm_lv_stack_pop(void *stack, char **vgname, char **lvname,
-		     char **fstype, unsigned int *mbsize);
+		     char **fstype, unsigned int *mbminsize,
+		     unsigned int *mbmaxsize);
 int lvm_lv_stack_delete(void *);
 
 /* from makepath.c */

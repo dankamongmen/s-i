@@ -40,23 +40,26 @@ test_lv_stack(void)
     char *vgname;
     char *lvname;
     char *fstype;
-    unsigned int mbsize;
+    unsigned int mbminsize;
+    unsigned int mbmaxsize;
 
     pv_stack = lvm_lv_stack_new();
 
     assert(lvm_lv_stack_isempty(pv_stack));
-    lvm_lv_stack_push(pv_stack, "vgname0", "lvname0", "fstype0", 10);
+    lvm_lv_stack_push(pv_stack, "vgname0", "lvname0", "fstype0", 10, 20);
     assert(!lvm_lv_stack_isempty(pv_stack));
 
-    lvm_lv_stack_pop(pv_stack, &vgname, &lvname, &fstype, &mbsize);
+    lvm_lv_stack_pop(pv_stack, &vgname, &lvname, &fstype, &mbminsize,
+		     &mbmaxsize);
     assert(0 == strcmp(vgname, "vgname0"));
     free(vgname);
     free(lvname);
 
-    lvm_lv_stack_push(pv_stack, "vgname0", "lvname0", "fstype0", 10);
-    lvm_lv_stack_push(pv_stack, "vgname1", "lvname1", "fstype1", 11);
+    lvm_lv_stack_push(pv_stack, "vgname0", "lvname0", "fstype0", 10, 21);
+    lvm_lv_stack_push(pv_stack, "vgname1", "lvname1", "fstype1", 11, 22);
 
-    lvm_lv_stack_pop(pv_stack, &vgname, &lvname, &fstype, &mbsize);
+    lvm_lv_stack_pop(pv_stack, &vgname, &lvname, &fstype, &mbminsize,
+		     &mbmaxsize);
     assert(0 == strcmp(vgname, "vgname1"));
     free(vgname);
     free(lvname);

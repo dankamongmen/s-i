@@ -1024,7 +1024,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 #if defined(LVM_HACK)
 	    if ( 0 == strncmp("lvm:", req_tmp->fstype, 4) )
                 devpath = lvm_lv_add(lvm_lv_stack, req_tmp->fstype,
-                                     req_tmp->minsize);
+                                     req_tmp->minsize, req_tmp->maxsize);
 	    else
 #endif /* LVM_HACK */
 	    {
@@ -1260,19 +1260,23 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     {
         char *vgname;
         char *lvname;
-	char *fstype;
-        unsigned int mbsize;
+        char *fstype;
+        unsigned int mbminsize;
+        unsigned int mbmaxsize;
         char *devpath;
         char *cmd = NULL;
         int retval;
 
-        lvm_lv_stack_pop(lvm_lv_stack, &vgname, &lvname, &fstype, &mbsize);
+        lvm_lv_stack_pop(lvm_lv_stack, &vgname, &lvname, &fstype, &mbminsize,
+			 &mbmaxsize);
 
 	autopartkit_log(1, "  Init LVM lv on vg=%s, lvname=%s mbsize=%u\n",
-			vgname, lvname, mbsize);
+			vgname, lvname, mbminsize);
 
-        /* Create lv, using minimum size (?) */
-        devpath = lvm_create_logicalvolume(vgname, lvname, mbsize);
+	/* XXX The LVM logical volume size should be calculated based
+	   on the size of the volume group.  At the moment we just use
+	   the minimum size */
+        devpath = lvm_create_logicalvolume(vgname, lvname, mbminsize);
 	if (NULL == devpath)
 	    autopartkit_log(1, "  LVM lv creation failed\n");
 	else

@@ -241,7 +241,8 @@ lvm_split_fstype(const char *str, int separator, int elemcount,
 }
 
 char *
-lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize)
+lvm_lv_add(void *stack, const char *fstype, unsigned int mbminsize,
+	   unsigned int mbmaxsize)
 {
     /* Create LVM logical volume with given FS.  Assuming LVM volume
        group is already created. */
@@ -268,7 +269,8 @@ lvm_lv_add(void *stack, const char *fstype, unsigned int mbsize)
     autopartkit_log(2, "  Stacking LVM lv %s on vg %s "
 		    "fstype %s\n", info[1], info[2], info[3]);
     /* Store vgname, lvname and size in stack */
-    if (0 == lvm_lv_stack_push(stack, info[1], info[2], info[3], mbsize))
+    if (0 == lvm_lv_stack_push(stack, info[1], info[2], info[3],
+			       mbminsize, mbmaxsize))
     {
         char buf[1024];
 	snprintf(buf, sizeof(buf), "%s:%s", info[1], info[2]);
@@ -361,7 +363,8 @@ struct lvm_lv_info { /* Store vgname, lvname and mbsize in list */
     char *vgname;
     char *lvname;
     char *fstype;
-    unsigned int mbsize;
+    unsigned int mbminsize;
+    unsigned int mbmaxsize;
 };
 
 void *
@@ -374,7 +377,8 @@ lvm_lv_stack_new()
 	head->next = head;
 	head->vgname = NULL;
 	head->lvname = NULL;
-	head->mbsize = 0;
+	head->mbminsize = 0;
+	head->mbmaxsize = 0;
     }
     return head;
 }
@@ -386,7 +390,8 @@ lvm_lv_stack_isempty(void *stack)
 }
 int
 lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
-		  const char *fstype, unsigned int mbsize)
+		  const char *fstype, unsigned int mbminsize,
+		  unsigned int mbmaxsize)
 {
     struct lvm_lv_info *head = stack;
     struct lvm_lv_info *elem;
@@ -397,7 +402,8 @@ lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
     elem->vgname = strdup(vgname);
     elem->lvname = strdup(lvname);
     elem->fstype = strdup(fstype);
-    elem->mbsize = mbsize;
+    elem->mbminsize = mbminsize;
+    elem->mbmaxsize = mbmaxsize;
 
     elem->next = head->next;
     head->next = elem;
@@ -406,7 +412,7 @@ lvm_lv_stack_push(void *stack, const char *vgname, const char *lvname,
 }
 int
 lvm_lv_stack_pop(void *stack, char **vgname, char **lvname, char **fstype,
-		 unsigned int *mbsize)
+		 unsigned int *mbminsize, unsigned int *mbmaxsize)
 {
     struct lvm_lv_info *head = stack;
     struct lvm_lv_info *elem;
@@ -421,7 +427,8 @@ lvm_lv_stack_pop(void *stack, char **vgname, char **lvname, char **fstype,
     *vgname = elem->vgname;
     *lvname = elem->lvname;
     *fstype = elem->fstype;
-    *mbsize = elem->mbsize;
+    *mbminsize = elem->mbminsize;
+    *mbmaxsize = elem->mbmaxsize;
 
     free(elem);
   
