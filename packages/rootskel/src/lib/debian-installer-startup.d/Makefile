@@ -12,10 +12,10 @@ files = \
 	S35term
 
 ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
-  ifeq ($(DEB_HOST_GNU_CPU),i386)
+  ifneq (,$(filter i386 x86_64,$(DEB_HOST_GNU_CPU)))
     files += \
-	S05acpi-i386 \
-	S40framebuffer-module-linux-i386
+	S05acpi-linux-x86 \
+	S40framebuffer-module-linux-x86
    endif
 
   ifeq ($(DEB_HOST_GNU_CPU),powerpc)
