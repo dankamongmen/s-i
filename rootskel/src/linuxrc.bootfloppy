@@ -28,54 +28,64 @@ if [ ! -d /dev/floppy ]; then
 	done
 fi
 
-echo
-echo
-echo
-echo
-echo
-echo
-echo -n "Please insert the second floppy ..."
-MOUNTED=0
+LOADED=0
+while [ "$LOADED" = 0 ]; do
+	echo
+	echo
+	echo
+	echo
+	echo
+	echo
+	echo -n "Please insert the second floppy ..."
+	MOUNTED=0
 
-if [ 1 -gt "$BOOT_DEBUG" ]; then
-	# Shut up kernel errors if the disk is inserted at wrong time, etc.
-	OLD_PRINTK=`cat /proc/sys/kernel/printk`
-	echo 0 > /proc/sys/kernel/printk
-fi
-
-while [ "$MOUNTED" = 0 ]; do
-	# avoid thrashing the floppy drive too much
-	sleep 5
-	echo -n "."
+	if [ 1 -gt "$BOOT_DEBUG" ]; then
+		# Shut up kernel errors if the disk is inserted at wrong time, etc.
+		OLD_PRINTK=`cat /proc/sys/kernel/printk`
+		echo 0 > /proc/sys/kernel/printk
+	fi
 	
-	for dev in dev/floppy/?; do
-		if [ -b $dev ]; then
-			if mount $dev -o ro -tvfat floppy 2>/dev/null; then
-				if [ -e floppy/initrd.gz -a ! -e floppy/linux ]; then
-					MOUNTED=1
-					echo " floppy mounted."
+	while [ "$MOUNTED" = 0 ]; do
+		# avoid thrashing the floppy drive too much
+		sleep 5
+		echo -n "."
+		
+		for dev in dev/floppy/?; do
+			if [ -b $dev ]; then
+				if mount $dev -o ro -tvfat floppy 2>/dev/null; then
+					if [ -e floppy/initrd.gz -a ! -e floppy/linux ]; then
+						MOUNTED=1
+						echo " floppy mounted."
+					else
+						umount floppy || echo "umount failed!"
+					fi
 				else
-					umount floppy
+					echo -n ""
 				fi
-			else
-				echo -n ""
 			fi
-		fi
+		done
 	done
-done
 
-if [ 1 -gt "$BOOT_DEBUG" ]; then
-	# Restore kernel errors.
-	echo $OLD_PRINTK > /proc/sys/kernel/printk
-fi
+	if [ 1 -gt "$BOOT_DEBUG" ]; then
+		# Restore kernel errors.
+		echo $OLD_PRINTK > /proc/sys/kernel/printk
+	fi
 	
-# TODO progress display, this can take quite some time!
-# TODO also, catching an error and retrying it would be good. These are
-# floppies..
-echo "Loading the second floppy, please wait ..."
-mount -t shm shm mnt
-zcat floppy/initrd.gz > mnt/tmp-initrd
-umount floppy
+	# TODO progress display, this can take quite some time!
+	echo "Loading the second floppy, please wait ..."
+	mount -t shm shm mnt
+	if zcat floppy/initrd.gz > mnt/tmp-initrd; then
+		LOADED=1
+	else
+		echo "This floppy seems to be bad."
+		if [ "$BOOT_DEBUG" -gt 0 ]; then
+			echo "This is ia debug shell."
+			sh
+		fi
+		umount mnt
+	fi
+	umount floppy
+done
 
 echo "Setting up filesystem, please wait ..."
 mount -o loop mnt/tmp-initrd initrd
