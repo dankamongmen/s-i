@@ -171,8 +171,8 @@ fi
 
 # Install bootstrap loader
 
-db_progress INFO 1
-db_progress STEP quik-installer/progress/install
+db_progress STEP 1
+db_progress INFO quik-installer/progress/install
 
 db_get debian-installer/kernel/subarchitecture
 SUBARCH="$RET"
@@ -188,7 +188,8 @@ case $SUBARCH in
 	;;
 esac
 db_input critical "$WARNING_TEMPLATE" || [ $? -eq 30 ]
-db_go
+db_go || exit 10
+db_get "$WARNING_TEMPLATE"
 [ "$RET" = true ] || exit 10
 
 chroot /target quik -v -f || \
@@ -196,8 +197,8 @@ chroot /target quik -v -f || \
 
 # Configure OpenFirmware (OldWorld only)
 
-db_progress INFO 1
-db_progress STEP quik-installer/progress/openfirmware
+db_progress STEP 1
+db_progress INFO quik-installer/progress/openfirmware
 
 if [ "$SUBARCH" = powermac_oldworld ]; then
     ofpath="`chroot /target ofpath "$disk"`"
