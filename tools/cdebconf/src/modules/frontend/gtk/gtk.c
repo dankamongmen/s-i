@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.22 2003/07/14 12:52:47 sjogren Exp $
+ * $Id: gtk.c,v 1.23 2003/08/18 21:55:36 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -50,6 +50,7 @@
 #include "frontend.h"
 #include "database.h"
 #include "strutl.h"
+#include "cdebconf_gtk.h"
 
 #include <ctype.h>
 #include <fcntl.h>
@@ -60,143 +61,33 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <dlfcn.h>
 
 #include <gtk/gtk.h>
-
-/* Use this struct to store data that shall live between the questions */
-struct frontend_data
-{
-    GtkWidget *window; //Main window of the frontend
-    GtkWidget *description_label; //Pointer to the Description Field
-    GtkWidget *target_box; //Pointer to the box, where question widgets shall be stored in
-    GtkWidget *progress_bar; //Pointer to the Progress Bar, when initialized
-    struct setter_struct *setters; //Struct to register the Set Functions of the Widgets
-    int button_val; //Value of the button pressed to leave a form
-};
-
-/* Embed frontend ans question in this object to pass it through an event handler */
-struct frontend_question_data
-{
-    struct frontend *obj;
-    struct question *q;
-};
 
 /* A struct to let a question handler store appropriate set functions that will be called after
    gtk_main has quit */
 struct setter_struct
 {
-    void (*func) (GtkWidget *, struct question *);
-    GtkWidget *widget;
+    void (*func) (void*, struct question*);
+    void *data;
     struct question *q;
     struct setter_struct *next;
 };
 
-static void bool_setter(GtkWidget *check, struct question *q)
-{
-    question_setvalue(q, (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check)) ? "true" : "false"));
-}	
+typedef int (custom_func_t)(struct frontend*, struct question*, GtkWidget*);
 
-static void entry_setter(GtkWidget *entry, struct question *q)
-{
-    question_setvalue(q, gtk_entry_get_text(GTK_ENTRY(entry)));
-}
-
-static void combo_setter(GtkWidget *entry, struct question *q)
-{
-    gchar *choices[100] = {0};
-    gchar *choices_translated[100] = {0};
-    int i, count;
-    
-    //FIXME: use user-data property of GtkObject to transport the choicename
-    count = strchoicesplit(question_get_field(q, NULL, "choices"),
-			   choices, DIM(choices));
-    strchoicesplit(question_get_field(q, "", "choices"),
-		   choices_translated, DIM(choices_translated));
-    for (i = 0; i < count; i++)
-    {
-        if (strcmp(gtk_entry_get_text(GTK_ENTRY(entry)), choices_translated[i]) == 0)
-        {
-	    question_setvalue(q, choices[i]);
-            free(choices[i]);
-            free(choices_translated[i]);
-	}
-    }
-}	
-
-static void multi_setter(GtkWidget *check_container, struct question *q)
-{
-    gchar *result = NULL;
-    gchar *copy = NULL;
-    GList *check_list;
-    int i, count;
-    gchar *choices[100] = {0};
-    gchar *choices_translated[100] = {0};
-
-    check_list = gtk_container_get_children(GTK_CONTAINER(check_container));
-    while(check_list)
-    {
-	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_list->data)))
-	{
-	    //FIXME: use user-data property of GtkObject to transport the choicename
-	    count = strchoicesplit(question_get_field(q, NULL, "choices"),
-				   choices, DIM(choices));
-	    strchoicesplit(question_get_field(q, "", "choices"),
-			   choices_translated, DIM(choices_translated));
-		
-	    for (i = 0; i < count; i++)
-            {
-		if (strcmp(gtk_button_get_label(GTK_BUTTON(check_list->data)), choices_translated[i]) == 0)
-		{
-		    if(result != NULL)
-		    {
-			copy = g_strdup(result);
-			free(result);
-			result = g_strconcat(copy, ", ", choices[i], NULL);
-			free(copy);
-                        free(choices[i]);
-                        free(choices_translated[i]);
-		    }
-		    else
-                    {
-			result = g_strdup(choices[i]);
-                        free(choices[i]);
-                        free(choices_translated[i]);
-                    }
-		}    
-            }
-	}
-	check_list = g_list_next(check_list);
-    }
-    question_setvalue(q, result);
-    g_list_free(check_list);
-    free(result);
-}
-
-void register_setter(void (*func)(GtkWidget *, struct question *), 
-		     GtkWidget *w, struct question *q, struct frontend *obj)
+void register_setter(void (*func)(void*, struct question*), 
+		     void *data, struct question *q, struct frontend *obj)
 {
     struct setter_struct *s;
     
     s = malloc(sizeof(struct setter_struct));
     s->func = func;
-    s->widget = w;
+    s->data = data;
     s->q = q;
     s->next = ((struct frontend_data*)obj->data)->setters;
     ((struct frontend_data*)obj->data)->setters = s;
-}
-
-void call_setters(struct frontend *obj)
-{
-    struct setter_struct *s, *p;
-
-    s = ((struct frontend_data*)obj->data)->setters;
-    while (s != NULL)
-    {
-        (*s->func)(s->widget, s->q);
-        p = s;
-        s = s->next;
-        free(p);
-    }
 }
 
 void free_description_data( GtkObject *obj, struct frontend_question_data* data )
@@ -204,28 +95,7 @@ void free_description_data( GtkObject *obj, struct frontend_question_data* data 
     free(data);
 }
 
-void button_single_callback(GtkWidget *button, struct frontend_question_data* data)
-{
-    struct frontend *obj = data->obj;
-    struct question *q = data->q;
-
-    question_setvalue(q, (gchar*) gtk_object_get_user_data(GTK_OBJECT(button)) );
-    ((struct frontend_data*)obj->data)->button_val = DC_OK;
-
-    free(data);
-   
-    gtk_main_quit();
-}
-
-void exit_button_callback(GtkWidget *button, struct frontend* obj)
-{
-    ((struct frontend_data*)obj->data)->button_val =
-	*((int*)gtk_object_get_user_data(GTK_OBJECT(button))) ;
-
-    gtk_main_quit();
-}
-
-static gboolean show_description( GtkWidget *widget, struct frontend_question_data* data )
+gboolean show_description( GtkWidget *widget, struct frontend_question_data* data )
 {
     struct question *q;
     struct frontend *obj;
@@ -238,6 +108,174 @@ static gboolean show_description( GtkWidget *widget, struct frontend_question_da
     gtk_label_set_text(GTK_LABEL(target), question_get_field(q, "", "extended_description"));
 
     return FALSE;
+}
+
+gboolean is_first_question(struct question *q)
+{
+    struct question *crawl;
+
+    crawl = q;
+
+    while (crawl->prev != NULL)
+    {
+	if (strcmp(crawl->prev->template->type, "note") != 0)
+	    return FALSE;
+	crawl = crawl->prev;
+    }
+    return TRUE;
+}
+
+static void bool_setter(void *check, struct question *q)
+{
+    question_setvalue(q, (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check)) ? "true" : "false"));
+}	
+
+static void entry_setter(void *entry, struct question *q)
+{
+    question_setvalue(q, gtk_entry_get_text(GTK_ENTRY(entry)));
+}
+
+static void combo_setter(void *entry, struct question *q)
+{
+    gchar *choices[100] = {0};
+    gchar *choices_translated[100] = {0};
+    char *tmp;
+    int i, count;
+    
+    tmp = question_get_field(q, NULL, "choices");
+    count = strchoicesplit(tmp, choices, DIM(choices));
+    free(tmp);
+    tmp = question_get_field(q, "", "choices");
+    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    free(tmp);
+    for (i = 0; i < count; i++)
+    {
+        if (strcmp(gtk_entry_get_text(GTK_ENTRY(entry)), choices_translated[i]) == 0)
+	    question_setvalue(q, choices[i]);
+
+	free(choices[i]);
+	free(choices_translated[i]);
+    }
+}	
+
+static void multi_setter(void *check_container, struct question *q)
+{
+    gchar *result = NULL;
+    gchar *copy = NULL;
+    GList *check_list;
+    int i, count;
+    gchar *choices[100] = {0};
+    gchar *choices_translated[100] = {0};
+    char *tmp;
+
+    check_list = gtk_container_get_children(GTK_CONTAINER(check_container));
+    while(check_list)
+    {
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_list->data)))
+	{
+	    tmp = question_get_field(q, NULL, "choices");
+	    count = strchoicesplit(tmp, choices, DIM(choices));
+	    free(tmp);
+	    tmp = question_get_field(q, "", "choices");
+	    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+	    free(tmp);
+	    for (i = 0; i < count; i++)
+            {
+		if (strcmp(gtk_button_get_label(GTK_BUTTON(check_list->data)), choices_translated[i]) == 0)
+		{
+		    if(result != NULL)
+		    {
+			copy = g_strdup(result);
+			free(result);
+			result = g_strconcat(copy, ", ", choices[i], NULL);
+			free(copy);
+		    }
+		    else
+			result = g_strdup(choices[i]);
+		}    
+		free(choices[i]);
+		free(choices_translated[i]);
+            }
+
+	}
+	check_list = g_list_next(check_list);
+    }
+    question_setvalue(q, result);
+    g_list_free(check_list);
+    free(result);
+}
+
+void call_setters(struct frontend *obj)
+{
+    struct setter_struct *s, *p;
+
+    s = ((struct frontend_data*)obj->data)->setters;
+    while (s != NULL)
+    {
+        (*s->func)(s->data, s->q);
+        p = s;
+        s = s->next;
+        free(p);
+    }
+}
+
+void button_single_callback(GtkWidget *button, struct frontend_question_data* data)
+{
+    struct frontend *obj = data->obj;
+    struct question *q = data->q;
+    char *tmp;
+    gchar *choices[100] = {0};
+    gchar *choices_translated[100] = {0};
+    int i, count;
+
+    tmp = question_get_field(q, NULL, "choices");
+    count = strchoicesplit(tmp, choices, DIM(choices));
+    free(tmp);
+    tmp = question_get_field(q, "", "choices");
+    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    free(tmp);
+    for (i = 0; i < count; i++)
+    {
+	if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0)
+	    question_setvalue(q, choices[i]);
+
+	free(choices[i]);
+	free(choices_translated[i]);
+
+    }
+    ((struct frontend_data*)obj->data)->button_val = DC_OK;
+    free(data);
+   
+    gtk_main_quit();
+}
+
+void boolean_single_callback(GtkWidget *button, struct frontend_question_data* data )
+{
+    struct frontend *obj = data->obj;
+    struct question *q = data->q;
+    char *ret;
+    
+    ret = (char*) gtk_object_get_user_data(GTK_OBJECT(button));
+    question_setvalue(q, ret);
+    free(ret);
+
+    ((struct frontend_data*)obj->data)->button_val = DC_OK;;
+    
+    gtk_main_quit();
+}
+
+void exit_button_callback(GtkWidget *button, struct frontend* obj)
+{
+    int value;
+    void *ret;
+    
+    ret = gtk_object_get_user_data(GTK_OBJECT(button));
+    value = *(int*) ret;
+    free(ret);
+
+    ((struct frontend_data*)obj->data)->button_val = value;
+    
+    gtk_main_quit();
 }
 
 gboolean need_continue_button(struct frontend *obj)
@@ -262,26 +300,11 @@ gboolean need_back_button(struct frontend *obj)
     return TRUE;
 }
 
-gboolean is_first_question(struct question *q)
-{
-    struct question *crawl;
-
-    crawl = q;
-
-    while (crawl->prev != NULL)
-    {
-	if (strcmp(crawl->prev->template->type, "note") != 0)
-	    return FALSE;
-	crawl = crawl->prev;
-    }
-    return TRUE;
-}
-
 void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *separator, *button_box;
-    GtkWidget *continue_button = NULL;
-    GtkWidget *back_button = NULL;
+    GtkWidget *continue_button;
+    GtkWidget *back_button;
     int *ret_val;
 
     if (need_continue_button(obj))
@@ -292,6 +315,8 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 	gtk_object_set_user_data(GTK_OBJECT(continue_button), ret_val);
 	g_signal_connect (G_OBJECT (continue_button), "clicked", G_CALLBACK (exit_button_callback), obj);
     }
+    else
+	continue_button = NULL;
 
     if (need_back_button(obj))
     {
@@ -306,6 +331,8 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 	    gtk_widget_set_sensitive(back_button, FALSE);
 	}
     }
+    else
+	back_button = NULL;
 
     if (continue_button || back_button)
     {
@@ -352,8 +379,8 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
     gtk_object_set_user_data(GTK_OBJECT(no_button), g_strdup("false"));
 
     g_signal_connect (G_OBJECT (back_button), "clicked", G_CALLBACK (exit_button_callback), obj);
-    g_signal_connect (G_OBJECT (yes_button), "clicked", G_CALLBACK (button_single_callback), data);
-    g_signal_connect (G_OBJECT (no_button), "clicked", G_CALLBACK (button_single_callback), data);
+    g_signal_connect (G_OBJECT (yes_button), "clicked", G_CALLBACK (boolean_single_callback), data);
+    g_signal_connect (G_OBJECT (no_button), "clicked", G_CALLBACK (boolean_single_callback), data);
 
     if (obj->methods.can_go_back(obj, q) == FALSE)
     {
@@ -443,6 +470,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     char *choices[100] ={0};
     char *choices_translated[100] = {0};
     char *defvals[100] = {0};
+    char *tmp;
     int i, j, count, dcount;
     struct frontend_question_data *data;
 
@@ -450,14 +478,15 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     data->obj = obj;
     data->q = q;
 
-    count = strchoicesplit(question_get_field(q, NULL, "choices"),
-                           choices, DIM(choices));
-
-    strchoicesplit(question_get_field(q, "", "choices"),
-                   choices_translated, DIM(choices_translated));
-
-    dcount = strchoicesplit(question_get_field(q, NULL, "value"),
-                            defvals, DIM(defvals));
+    tmp = question_get_field(q, NULL, "choices");
+    count = strchoicesplit(tmp, choices, DIM(choices));
+    free(tmp);
+    tmp = question_get_field(q, "", "choices");
+    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    free(tmp);
+    tmp = question_get_field(q, NULL, "value");
+    dcount = strchoicesplit(tmp, defvals, DIM(defvals));
+    free(tmp);
     if (count <= 0) return DC_NOTOK;	
 
     check_container = gtk_vbox_new (FALSE, 0);
@@ -467,17 +496,20 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     for (i = 0; i < count; i++) 
     {
 	check = gtk_check_button_new_with_label(choices_translated[i]);
-	free(choices_translated[i]);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), FALSE);
 	for (j = 0; j < dcount; j++)
         {
 	    if (strcmp(choices[i], defvals[j]) == 0)
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
+	    if (i == count-1)
+		free(defvals[j]);
         }
         g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
         gtk_box_pack_start(GTK_BOX(check_container), check, FALSE, FALSE, 0);
 	if (is_first_question(q) && (i == 0) )
 	    gtk_widget_grab_focus(check);
+
+	free(choices[i]);
     }
 
     frame = gtk_frame_new(question_get_field(q, "", "description"));
@@ -542,17 +574,18 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     int i, count;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
+    char *tmp;
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
 
-    count = strchoicesplit(question_get_field(q, NULL, "choices"),
-                           choices, DIM(choices));
-	
-    strchoicesplit(question_get_field(q, "", "choices"),
-		   choices_translated, DIM(choices_translated));
-
+    tmp = question_get_field(q, NULL, "choices");
+    count = strchoicesplit(tmp, choices, DIM(choices));
+    free(tmp);
+    tmp = question_get_field(q, "", "choices");
+    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    free(tmp);
     if (count <= 0) return DC_NOTOK;
 
     button_box = gtk_vbutton_box_new();
@@ -574,8 +607,7 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
 	    gtk_widget_grab_focus(button);
 	    gtk_widget_grab_default(button);
 	}
-
-	free(choices_translated);
+	free(choices[i]);
     }
 
     return DC_OK;
@@ -589,10 +621,11 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     struct frontend_question_data *data;
     int i, count;
     const char *defval = question_getvalue(q, "");
-
-    count = strchoicesplit(question_get_field(q, "", "choices"),
-                           choices_translated, DIM(choices_translated));
-	
+    char * tmp;
+    
+    tmp = question_get_field(q, "", "choices");
+    count = strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    free(tmp);
     if (count <= 0) return DC_NOTOK;
 
     for (i = 0; i < count; i++)
@@ -665,6 +698,33 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     return DC_OK;
 }
 
+/*
+static int gtkhandler_custom(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    custom_func_t *custom_func;
+    char *symname, *tmp;
+    int ret, i;
+    
+    symname = strdup(q->template->tag);
+    for (i = 0; i < strlen(symname); i++) 
+    {
+	if (symname[i] == '/')
+	    symname[i] = '_';
+    }
+
+    asprintf(&tmp, "%s_gtk", symname);
+
+    custom_func = (custom_func_t*) dlsym(custom_module, tmp);
+    custom_func = (custom_func_t*) dlsym(NULL, tmp);
+    free(tmp);
+    free(symname);
+
+    ret = custom_func(obj, q, qbox);
+
+    return ret;
+}
+*/
+
 /* ----------------------------------------------------------------------- */
 struct question_handlers {
     const char *type;
@@ -677,6 +737,7 @@ struct question_handlers {
     { "select",	        gtkhandler_select },
     { "string",	        gtkhandler_string },
     { "error",	        gtkhandler_note },
+    //	{ "custom",	gtkhandler_custom },
     //	{ "text",	gtkhandler_text }
 };
 
@@ -778,7 +839,7 @@ static int gtk_go(struct frontend *obj)
             }
         q = q->next;
     }
-
+    q = obj->questions;
     add_buttons(obj, q, questionbox);
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
     gtk_main();
