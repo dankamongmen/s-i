@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.48 2004/03/04 09:44:09 barbier Exp $
+ * $Id: newt.c,v 1.49 2004/03/04 10:39:46 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -254,7 +254,7 @@ show_separate_window(struct frontend *obj, struct question *q)
 {
     newtComponent form, textbox, bOk, bCancel, cRet;
     int width = 80, height = 24, t_height, t_width, win_width, win_height;
-    int t_width_scroll = 0, t_width_descr, t_width_buttons;
+    int t_width_scroll = 0, t_width_title, t_width_descr, t_width_buttons;
     // buttons
     int extra = 3;
     int format_note = 0;
@@ -284,6 +284,7 @@ show_separate_window(struct frontend *obj, struct question *q)
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
+    strtruncate(obj->title, win_width-8);
     t_height = get_text_height(full_description, win_width);
     if (t_height+extra <= height-5)
         win_height = t_height+extra;
@@ -312,6 +313,9 @@ show_separate_window(struct frontend *obj, struct question *q)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
+    t_width_title = get_text_width(obj->title);
+    if (t_width_title > win_width)
+        win_width = t_width_title;
     create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     if (format_note)
@@ -349,7 +353,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
 {
     newtComponent form, textbox, bOk, bCancel, entry, cRet;
     int width = 80, height = 24, t_height, t_width, win_width, win_height;
-    int t_width_scroll = 0, t_width_buttons;
+    int t_width_scroll = 0, t_width_title, t_width_buttons;
     int ret;
 #ifdef HAVE_LIBTEXTWRAP
     int tflags = 0;
@@ -365,6 +369,8 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     eflags |= NEWT_ENTRY_SCROLL | NEWT_FLAG_RETURNEXIT;
     newtGetScreenSize(&width, &height);
     win_width = width-7;
+    /*  There 5 characters for sigils, plus 3 for borders */
+    strtruncate(obj->title, win_width-8);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
@@ -393,6 +399,9 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
+    t_width_title = get_text_width(obj->title);
+    if (t_width_title > win_width)
+        win_width = t_width_title;
     create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, tflags);
@@ -435,7 +444,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     newtComponent form, sform = NULL, scrollbar, textbox, bOk, bCancel, cRet;
     int width = 80, height = 24;
     int win_width, win_height = -1, t_height, t_width, sel_height, sel_width;
-    int t_width_buttons;
+    int t_width_title, t_width_buttons;
     char **choices, **choices_trans, **defvals, *answer;
     int count = 0, defcount, i, k, ret, def;
     const char *p;
@@ -453,6 +462,8 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
 #endif
 
     newtGetScreenSize(&width, &height);
+    win_width = width-7;
+    strtruncate(obj->title, win_width-8);
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
@@ -465,7 +476,6 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     defvals = malloc(sizeof(char *) * count);
     defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
     answer = malloc(sizeof(char) * count);
-    win_width = width-7;
     sel_height = count;
     form = create_form(NULL);
 #ifdef HAVE_LIBTEXTWRAP
@@ -498,6 +508,9 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         t_width = sel_width;
     if (win_width > t_width + 8)
         win_width = t_width + 8;
+    t_width_title = get_text_width(obj->title);
+    if (t_width_title > win_width)
+        win_width = t_width_title;
     if (show_ext_desc && full_description) {
         textbox = newtTextbox(TEXT_PADDING, 1, t_width, 10, tflags);
         assert(textbox);
@@ -581,7 +594,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     int listflags = NEWT_FLAG_RETURNEXIT;
     int width = 80, height = 24;
     int win_width, win_height = -1, t_height, t_width, sel_height, sel_width;
-    int t_width_buttons;
+    int t_width_title, t_width_buttons;
     char **choices, **choices_trans, *defval;
     int count = 0, i, ret, defchoice = -1;
     int *tindex = NULL;
@@ -600,6 +613,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
 #endif
 
     newtGetScreenSize(&width, &height);
+    win_width = width-7;
+    strtruncate(obj->title, win_width-8);
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
@@ -609,7 +624,6 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
 
-    win_width = width-7;
     sel_height = count;
     form = create_form(NULL);
 #ifdef HAVE_LIBTEXTWRAP
@@ -642,6 +656,9 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         t_width = sel_width;
     if (win_width > t_width + 8)
         win_width = t_width + 8;
+    t_width_title = get_text_width(obj->title);
+    if (t_width_title > win_width)
+        win_width = t_width_title;
     if (show_ext_desc && full_description) {
         textbox = newtTextbox(TEXT_PADDING, 1, t_width, 10, tflags);
         assert(textbox);
@@ -711,7 +728,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     newtComponent form, bYes, bNo, bCancel, textbox, cRet;
     int width = 80, height = 24;
     int win_width, win_height = -1, t_height, t_width;
-    int t_width_scroll = 0, t_width_buttons;
+    int t_width_scroll = 0, t_width_title, t_width_buttons;
     int ret;
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
@@ -724,6 +741,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
+    strtruncate(obj->title, win_width-8);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
@@ -755,6 +773,9 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
+    t_width_title = get_text_width(obj->title);
+    if (t_width_title > win_width)
+        win_width = t_width_title;
     create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, flags);
@@ -1039,7 +1060,8 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     newtCls();
     newtGetScreenSize(&width, NULL);
     win_width = width-7;
-    newtCenteredWindow(win_width, 5, title);
+    strtruncate(obj->progress_title, win_width-3);
+    newtCenteredWindow(win_width, 5, obj->progress_title);
     data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max - obj->progress_min);
     /*  Minimal height set to 2 to prevent box flashing */
     data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, 2, flags);
