@@ -1211,7 +1211,7 @@ int main (int argc, char *argv[])
     const char *tablefile;
     int retval = 1;
     
-    autopartkit_log(1, "Using %d default disk label type\n",
+    autopartkit_log(1, "Using '%s' default disk label type\n",
 		    default_disk_label());
 
     client = debconfclient_new ();
