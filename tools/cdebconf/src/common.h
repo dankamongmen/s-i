@@ -24,15 +24,16 @@
 
 #define DIE(fmt, args...) 					\
  	do {							\
+		fprintf(stderr, "%s:%d: ", __FILE__, __LINE__); \
 		fprintf(stderr, fmt, ##args);			\
-		fprintf(stderr, " at %s line %u\n", __FILE__, __LINE__); \
+		fprintf(stderr, "\n");				\
 		exit(1);					\
 	} while(0)
 
 #ifndef NODEBUG
 #define INFO(level, fmt, args...)					\
 	debug_printf(level, fmt, ##args)
-#define ASSERT(cond) if (!(cond)) DIE("Assertion failed: %s", #cond)
+#define ASSERT(cond) if (!(cond)) DIE("%s:%d: Assertion failed: %s", __FILE__, __LINE__, #cond)
 #else
 #define INFO(level, fmt, args...)	/* nothing */
 #define ASSERT(cond)

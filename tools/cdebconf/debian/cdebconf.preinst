@@ -1,0 +1,21 @@
+#!/bin/sh
+# This is ugly.... but we need to divert some of debconf's files if we
+# are going to be installable...
+
+if [ install = "$1" ]; then
+	dpkg-divert --package cdebconf --add --rename \
+		--divert /usr/share/debconf/confmodule-debconf \
+		/usr/share/debconf/confmodule
+
+	dpkg-divert --package cdebconf --add --rename \
+		--divert /usr/share/debconf/frontend-debconf \
+		/usr/share/debconf/frontend
+
+	dpkg-divert --package cdebconf --add --rename \
+		--divert /usr/bin/debconf-loadtemplate-debconf \
+		/usr/bin/debconf-loadtemplate
+
+	dpkg-divert --package cdebconf --add --rename \
+		--divert /usr/sbin/dpkg-reconfigure-debconf \
+		/usr/sbin/dpkg-reconfigure
+fi

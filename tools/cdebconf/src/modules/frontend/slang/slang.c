@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.7 2001/01/20 02:36:34 tausq Exp $
+ * $Id: slang.c,v 1.8 2001/01/21 01:12:40 tausq Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -54,8 +54,8 @@
 #define CONFIGPREFIX	"frontend::driver::slang::"
 #define WIN_QUERY	1
 #define WIN_DESC	2
-#define LINES		SLtt_Screen_Rows
-#define COLS		SLtt_Screen_Cols
+#define LINES		(SLtt_Screen_Rows ? SLtt_Screen_Rows : 24)
+#define COLS		(SLtt_Screen_Cols ? SLtt_Screen_Cols : 80)
 #define UIDATA(obj) 	((struct uidata *)(obj)->data)
 
 #ifndef _
@@ -193,6 +193,7 @@ static void slang_wrapprint(struct slwindow *win, const char *str, int start)
 static void slang_drawdesc(struct frontend *ui, struct question *q)
 {
 	struct uidata *uid = UIDATA(ui);
+
 	/* Clear the windows */
 	slang_drawwin(&uid->qrywin);
 	slang_drawwin(&uid->descwin);
@@ -384,6 +385,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	/* Parse out all the choices */
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
+	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
 	if (count <= 0) return DC_NOTOK;
 
 	/* See what the currently selected value should be -- either a
@@ -405,12 +407,18 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	{
 		ypos = 3;
 		bottom = top + MIN(count, win->h - 7);
+
+		INFO(INFO_VERBOSE, "[val; %d, top: %d, bottom: %d]\n", val,
+			top, bottom);
 		for (i = top; i < bottom; i++)
 		{
 			slang_printf(ypos++, xpos, ((pos == 2 && i == val) ?
 				win->selectedcolor : win->drawcolor),
 				"(%c) %-*s ", (selected[i] ? '*' : ' '), 
 				longest, choices[i]);
+
+			INFO(INFO_VERBOSE, "(%c) %-*s\n", (selected[i] ? '*' : 
+				' '), longest, choices[i]);
 		}
 
 		slang_navbuttons(ui, q, pos);
@@ -479,6 +487,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 
 static int slang_select(struct frontend *ui, struct question *q)
 {
+	INFO(INFO_VERBOSE, "calling getselect\n");
 	return slang_getselect(ui, q, 0);
 }
 
@@ -617,14 +626,19 @@ static struct question_handlers {
 static int slang_initialize(struct frontend *obj, struct configuration *cfg)
 {
 	struct uidata *uid = NEW(struct uidata);
+	int ret;
+
 	memset(uid, 0, sizeof(struct uidata));
 	obj->interactive = 1;
 	obj->data = uid;
 
 	SLtt_get_terminfo();
-	SLsmg_init_smg();
-	SLang_init_tty(-1, 0, 0);
-	SLkp_init();
+	ret = SLsmg_init_smg();
+	INFO(INFO_DEBUG, "SLsmg_init_smg returned %d\n", ret);
+	ret = SLang_init_tty(-1, 0, 0);
+	INFO(INFO_DEBUG, "SLang_init_tty returned %d\n", ret);
+	ret = SLkp_init();
+	INFO(INFO_DEBUG, "SLkp_init returned %d\n", ret);
 
 	slang_initwin(obj, WIN_QUERY, &uid->qrywin);
 	slang_initwin(obj, WIN_DESC, &uid->descwin);
@@ -657,11 +671,15 @@ static int slang_go(struct frontend *obj)
 	{
 		ret = DC_OK;
 		for (i = 0; i < DIM(question_handlers); i++)
+		{
+			INFO(INFO_VERBOSE, "For question [%s], comparing question type [%s] against handler %d (%s)\n", q->tag, q->template->type, i, question_handlers[i].type);
 			if (strcasecmp(q->template->type, question_handlers[i].type) == 0)
 			{
+				INFO(INFO_VERBOSE, "Found one!\n");
 				UIDATA(obj)->descstart = 0;
 				slang_drawdesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
+				INFO(INFO_VERBOSE, "Return code = %d\n", ret);
 				switch (ret)
 				{
 				case DC_OK:
@@ -679,6 +697,7 @@ static int slang_go(struct frontend *obj)
 				}
 				break;
 			}
+		}
 		if (ret == DC_OK)
 			q = q->next;
 	}

@@ -7,7 +7,7 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.13 2001/01/08 00:44:32 tausq Exp $
+ * $Id: strutl.c,v 1.14 2001/01/21 01:12:40 tausq Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -215,6 +215,7 @@ int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
 
 	if (inbuf == 0) return 0;
 
+	INFO(INFO_VERBOSE, "Splitting [%s]\n", inbuf);
 	while (*s != 0 && argc < maxnarg)
 	{
 		/* skip initial spaces */

@@ -5,8 +5,5 @@ OBJS=ncurses.opic
 #MODLDFLAGS=-lslang
 MODLDFLAGS=-lncurses
 
-# install always
-INSTALLOBJ=$(SOBJ)
-
 include ../modules.mak
 

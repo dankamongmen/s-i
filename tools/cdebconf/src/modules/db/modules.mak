@@ -10,10 +10,8 @@ $(SOBJ): $(OBJS)
 	@$(CC) $(CFLAGS) -shared -o $@ $^ $(LDFLAGS)
 
 install:
-ifneq ($(INSTALLOBJ),)
 	install -d -m 755 ${moddir}/db
-	install -m 644 $(INSTALLOBJ) ${moddir}/db
-endif
+	install -m 755 $(SOBJ) ${moddir}/db
 
 clean:
 	-@rm -f $(SOBJ) $(OBJS) *~

@@ -42,15 +42,6 @@ if [[ "$TOPDIR" != "$BUILDDIR" ]]; then
 	done
 fi
 
-dnl udeb or regular build?
-AC_ARG_WITH(target,[  --with-target          normal (default) or udeb])
-if test "$withval" = "udeb"; then
-  TARGET=udeb
-else
-  TARGET=normal
-fi
-AC_SUBST(TARGET)
-
 dnl Enable debugging?
 AC_ARG_WITH(debug,[  --without-debug         turn off debugging?])
 if test "$with_debug" != "no"; then
@@ -64,6 +55,25 @@ if test "$with_rpath" != "no"; then
   RPATH="-Wl,-rpath,\$(shell pwd)"
   AC_SUBST(RPATH)
 fi
+
+dnl What db modules to build?
+AC_ARG_WITH(db,[  --with-db               db modules to build])
+if test -n "$with_db"; then
+  DBMODULES=$with_db
+else
+  DBMODULES="textdb perldb"
+fi
+AC_SUBST(DBMODULES)
+
+dnl What frontend modules to build?
+AC_ARG_WITH(frontend,[  --with-frontend         frontend modules to build])
+if test -n "$with_frontend"; then
+  FRONTENDMODULES="$with_frontend"
+else
+  FRONTENDMODULES="text slang"
+fi
+AC_SUBST(FRONTENDMODULES)
+
 
 dnl debconf config file
 DEBCONFCONFIG="/etc/debconf.conf"

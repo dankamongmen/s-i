@@ -1,4 +1,6 @@
-MODULES=text ncurses slang bogl
+include ../../../globalmakeflags
+
+MODULES:=$(FRONTENDMODULES)
 SOBJS=$(addsuffix .so,$(MODULES))
 
 all:

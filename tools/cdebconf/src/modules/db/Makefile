@@ -1,4 +1,6 @@
-MODULES=textdb perldb
+include ../../../globalmakeflags
+
+MODULES:=$(DBMODULES)
 SOBJS=$(addsuffix .so,$(MODULES))
 
 all:

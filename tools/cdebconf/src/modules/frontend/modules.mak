@@ -7,13 +7,11 @@ all: $(SOBJ)
 
 $(SOBJ): $(OBJS)
 	@echo Creating DSO $@ from $^
-	@$(CC) $(CFLAGS) -shared -o $@ $^ $(LDFLAGS)
+	$(CC) $(CFLAGS) -shared -o $@ $^ $(LDFLAGS)
 
 install:
-ifneq ($(INSTALLOBJ),)
 	install -d -m 755 ${moddir}/frontend
-	install -m 644 $(INSTALLOBJ) ${moddir}/frontend
-endif
+	install -m 755 $(SOBJ) ${moddir}/frontend
 
 clean:
 	-@rm -f $(SOBJ) $(OBJS) *~

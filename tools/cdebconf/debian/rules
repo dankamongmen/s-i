@@ -34,8 +34,9 @@ build-udeb-stamp:
 	[ -d $(udebbuild) ] || mkdir -p $(udebbuild)
 	(cd $(udebbuild); CFLAGS="-Os -fomit-frame-pointer" \
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
-		--without-rpath \
-		--with-target=udeb --with-conffile=$(CONFFILE))
+		--without-rpath --with-db="textdb" \
+		--with-frontend="text slang" \
+		--with-conffile=$(CONFFILE))
 	(cd $(udebbuild); $(MAKE) clean; $(MAKE))
 	touch $@
 
@@ -46,6 +47,8 @@ build-stamp:
 	(cd $(debbuild); CFLAGS="-O2" \
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
 		--without-rpath \
+		--with-db="textdb perldb" \
+		--with-frontend="text slang bogl" \
 		--with-conffile=$(CONFFILE))
 	(cd $(debbuild); $(MAKE) clean; $(MAKE))
 	touch $@
@@ -58,6 +61,7 @@ install-udeb: build-udeb
 	(cd $(udebbuild); \
 		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf-udeb/usr \
 		etcdir=$(shell pwd)/debian/cdebconf-udeb/etc )
+	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/include
 
 install: build
 	dh_testdir

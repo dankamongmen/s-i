@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.7 2001/01/20 02:36:34 tausq Exp $
+ * $Id: database.c,v 1.8 2001/01/21 01:12:40 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -192,6 +192,7 @@ struct database *database_new(struct configuration *cfg)
 		modname);
 	
 	modname = cfg->get(cfg, modlabel, 0);
+	INFO(INFO_DEBUG, "Trying to load %s\n", modname);
 	if ((dlh = dlopen(modname, RTLD_NOW)) == NULL)
 		DIE("Cannot load database module %s: %s", modname, dlerror());
 

@@ -33,12 +33,14 @@ $(SONAME) $(LIB): $(LIBNAME)
 
 install:
 	install -d -m 755 ${bindir}
+	install -d -m 755 ${sbindir}
 	install -d -m 755 ${etcdir}
 	install -d -m 755 ${libdir}
 	install -d -m 755 ${moddir}
 	install -d -m 755 ${sharedir}
-	install -m 755 $(BIN) ${bindir}
-	install -m 644 $(LIBNAME) ${libdir}
+	install -m 755 debconf debconf-loadtemplate debconf-convertdb ${bindir}
+	install -m 755 dpkg-reconfigure ${sbindir}
+	install -m 755 $(LIBNAME) ${libdir}
 	ln -sf $(LIBNAME) ${libdir}/$(SONAME)
 	ln -sf $(LIBNAME) ${libdir}/$(LIB)
 	install -m 644 debconf.conf-dist ${etcdir}/debconf.conf
