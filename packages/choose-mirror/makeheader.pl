@@ -11,6 +11,7 @@ my $type = shift || die "please specify mirror type\n";
 
 # Slurp in the mirror file.
 my %data;
+my %countries;
 my %http_countries;
 my %ftp_countries;
 my $site;
@@ -90,6 +91,34 @@ if ($type eq 'template') {
 	print TEMPLATE " The goal is to find a mirror of the Debian archive that is close to you on the network -- be\n";
         print TEMPLATE " aware that nearby countries, or even your own, may not be the best choice.\n\n";
 	close TEMPLATE;
+	exit 0;
+}
+
+if ($type eq 'httplist') { 
+ 	open (LIST, ">debian/httplist-countries") or die "debian/httplist-countries: $!";
+	foreach my $site (sort keys %data) {
+		next unless exists $data{$site}->{"archive-http"} and
+		                    exists $data{$site}->{country};
+		$countries{$data{$site}->{country}} = 1;
+	}
+	foreach  my $country (sort (keys %countries)) {
+		print LIST "${country}\n";
+	}
+	close LIST;
+	exit 0;
+}
+
+if ($type eq 'ftplist') { 
+ 	open (LIST, ">debian/ftplist-countries") or die "debian/ftplist-countries: $!";
+	foreach my $site (sort keys %data) {
+		next unless exists $data{$site}->{"archive-ftp"} and
+		                    exists $data{$site}->{country};
+		$countries{$data{$site}->{country}} = 1;
+	}
+	foreach  my $country (sort (keys %countries)) {
+		print LIST "${country}\n";
+	}
+	close LIST;
 	exit 0;
 }
 
