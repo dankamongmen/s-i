@@ -285,6 +285,9 @@ fi
 # required drivers are loaded.
 apt-install discover || true
 
+# Install hotplug as well (for USB, IEEE1394, CardBus, and some SCSI)
+apt-install hotplug || true
+
 db_progress SET $MAX_STEPS
 db_progress STOP
 
