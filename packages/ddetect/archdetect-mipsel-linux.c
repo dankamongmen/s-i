@@ -25,6 +25,11 @@ static struct cpu system_sibyte_sb1_ind_cpu[] = {
 	{ NULL, "unknown" }
 };
 
+static struct cpu system_cobalt_cpu[] = {
+	{ "Nevada", "cobalt" },
+	{ NULL, "unknown" }
+};
+
 /* add new system types here */
 
 static struct cpu system_unknown_cpu[] = {
@@ -42,6 +47,8 @@ static struct system system_type[] = {
 	{"Digital ", system_dec_decs_cpu },
 	/* match the Broadcom SWARM development board */
 	{"SiByte BCM91250A", system_sibyte_sb1_ind_cpu },
+	/* match MIPS based Cobalt machines */
+	{"MIPS Cobalt", system_cobalt_cpu },
 	/* add new system types here */
 	{ NULL, system_unknown_cpu }
 };
