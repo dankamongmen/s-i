@@ -1,0 +1,34 @@
+#!/bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+logfile=/var/log/messages
+logfile=messages
+
+localecode="debian-installer/locale"
+languagecode="debian-installer/language"
+countrycode="debian-installer/country"
+
+log() {
+  echo "languagechooser: info: $*" >> $logfile
+}
+
+db_title "Choose locale"
+
+db_fset "$localecode" seen false || true
+db_input critical "$localecode" || [ $? -eq 30 ]
+db_go || true
+db_get "$localecode" || true
+locale="$RET"
+
+lowret=`echo $locale | tr [:upper:] [:lower:]`
+
+language=`echo $lowret | sed -e 's/\(..\).*/\1/'`
+db_set "$languagecode" "$language" || true
+
+country=`echo $lowret | sed -e 's/\(...\)\(.*\)/\2/'`
+db_set "$countrycode" "$country" || true
+
+log "debian-installer/locale   = '$locale'"
+log "debian-installer/language = '$language'"
+log "debian-installer/country  = '$country'"
