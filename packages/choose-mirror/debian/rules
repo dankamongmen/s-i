@@ -3,10 +3,6 @@
 build: build-stamp
 build-stamp:
 	dh_testdir
-	# Sort countries (including in translations)
-	# Uncomment to activate
-	# chmod u+x ./sort-countries
-	# ./sort-countries
 	$(MAKE) small
 	touch build-stamp
 
@@ -29,6 +25,10 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
+	# Sort countries (including in translations)
+	# MUST be after dh_installdebconf
+	chmod u+x ./sort-countries
+	./sort-countries
 	dh_strip
 	dh_compress
 	dh_fixperms
