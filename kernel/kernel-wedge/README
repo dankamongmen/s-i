@@ -18,7 +18,7 @@ any other, as is the copyright. The debian/rules can be something as simple
 as this:
 
   #!/usr/bin/make -f
-  include /usr/lib/kernel-wedge/generic-rules
+  include /usr/share/kernel-wedge/generic-rules
 
 Or you can use the kernel-wedge command directly in your own rules file.
 Run it for some semblance of usage help.
@@ -67,7 +67,7 @@ Suppose we want a different set of modules in the speakup flavored kernel.
 Then create a modules/<arch>-<flavor>/nic-modules instead, it will be used
 by preference. One udeb will be created for each modules list file,
 containing the listed modules. The names of the files should match the
-names of the various modules listed in /usr/lib/kernel-wedge/package-list.
+names of the various modules listed in /usr/share/kernel-wedge/package-list.
 
 You will also want a special modules list file for the kernel-image udeb.
 If you need to include no modules with your kernel, it can be an empty file.
@@ -79,7 +79,7 @@ appended to prevent any posible collisions in names with real debs.
 
 kernel-wedge includes its own modules lists for some common sets of modules
 that are unlikely to differ between kernels. These are stored in
-/usr/lib/kernel-wedge/modules. If you would like to build one, you need
+/usr/share/kernel-wedge/modules. If you would like to build one, you need
 only make a symlink to it in your modules/<arch> directory.
 
 Since many version control programs have issues with symlinks, kernel-wedge
@@ -88,7 +88,7 @@ include support for creating symlinks for you, based on .lnk files, via the
 modules/i386/scsi-core-modules.lnk will result in a
 modules/i386/scsi-core-modules. The content of the file becomes the
 destination of the symlink. To link to common module lists, just use
-"common/module-list", instead of hardcoding "/usr/lib/kernel-wedge/modules".
+"common/module-list", instead of hardcoding "/usr/share/kernel-wedge/modules".
 
 More on the content of the modules lists. The files contain paths relative
 to the top-level kernel modules directory (/lib/modules/<kernel-version>/).

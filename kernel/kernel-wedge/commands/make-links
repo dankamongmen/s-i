@@ -9,7 +9,7 @@ foreach my $link (`find modules -type f -name \\*.lnk`) {
 	open (LINK, $link) || die "$link: $!\n";
 	my $target=<LINK>;
 	chomp $target;
-	$target=~s#^common/#/usr/lib/kernel-wedge/modules/#;
+	$target=~s#^common/#/usr/share/kernel-wedge/modules/#;
 	symlink($target, $file) || die "symlink $target $file: $!";
 	if (! -e $file) {
 		die "$file is a broken link\n";
