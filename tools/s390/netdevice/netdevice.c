@@ -31,7 +31,7 @@ struct device {
 
 #define TEMPLATE_PREFIX	"debian-installer/s390/netdevice/"
 
-static char *debconf_input (char *priority, char *question)
+static char *my_debconf_input (char *priority, char *question)
 {
 	char template[256];
 
@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
 	client = debconfclient_new ();
 	client->command (client, "title", "Network Device Configuration", NULL);
 
-	ptr = debconf_input ("high", "choose_networktype");
+	ptr = my_debconf_input ("high", "choose_networktype");
 
 	if (!strncmp (ptr, "iucv", 4))
 		type_text = "iucv";
@@ -226,11 +226,11 @@ int main (int argc, char *argv[])
 		if (!items)
 		{
 			if (type == type_ctc)
-				debconf_input ("high", "ctc/no");
+				my_debconf_input ("high", "ctc/no");
 			else if (type == type_lcs)
-				debconf_input ("high", "lcs/no");
+				my_debconf_input ("high", "lcs/no");
 			else if (type == type_qeth)
-				debconf_input ("high", "qeth/no");
+				my_debconf_input ("high", "qeth/no");
 			exit (0);
 		}
 
@@ -274,7 +274,7 @@ int main (int argc, char *argv[])
 		{
 			ptr = TEMPLATE_PREFIX "ctc/confirm";
 
-			ptr2 = debconf_input ("medium", "ctc/protocol");
+			ptr2 = my_debconf_input ("medium", "ctc/protocol");
 			j = 0;
 			if (!strcmp (ptr2, "Linux (1)"))
 				j = 1;
@@ -293,7 +293,7 @@ int main (int argc, char *argv[])
 		{
 			ptr = TEMPLATE_PREFIX "lcs/confirm";
 
-			ptr2 =  debconf_input ("high", "lcs/port");
+			ptr2 =  my_debconf_input ("high", "lcs/port");
 			sscanf (ptr2, "port %d", &j);
 			sprintf (line, "%d", j);
 			client->command (client, "subst", ptr, "port", line, NULL);
@@ -305,7 +305,7 @@ int main (int argc, char *argv[])
 			sprintf (line, "0x%x", devices[i].device_data);
 			client->command (client, "subst", ptr, "device_data", line, NULL);
 
-			ptr2 =  debconf_input ("high", "qeth/port");
+			ptr2 =  my_debconf_input ("high", "qeth/port");
 			sscanf (ptr2, "port %d", &j);
 			sprintf (line, "%d", j);
 			client->command (client, "subst", ptr, "port", line, NULL);
@@ -313,7 +313,7 @@ int main (int argc, char *argv[])
 			snprintf (chandev_module_parm, sizeof (chandev_module_parm), "qeth-1,0x%x,0x%x,0x%x,0,%d",
 				  devices[i].device_read, devices[i].device_write, devices[i].device_data, j);
 
-			ptr2 =  debconf_input ("high", "qeth/portname");
+			ptr2 =  my_debconf_input ("high", "qeth/portname");
 			j = strlen (ptr2);
 			if (j)
 			{

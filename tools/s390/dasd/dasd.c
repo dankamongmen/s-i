@@ -18,7 +18,7 @@ struct d_dasd {
 	int state;
 };
 
-char *debconf_input(char *priority, char *template)
+char *my_debconf_input(char *priority, char *template)
 {
 	client->command(client, "fset", template, "seen", "false", NULL);
 	client->command(client, "input", priority, template, NULL);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
 	if (items > 10)
 	{
-		ptr = debconf_input ("high", "debian-installer/s390/dasd/choose");
+		ptr = my_debconf_input ("high", "debian-installer/s390/dasd/choose");
 
 		if (!(cur = find_dasd (dasds, items, ptr)))
 		{
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 		}
 
 		client->command (client, "subst", "debian-install/s390/dasd/choose_select", "choices", line, NULL);
-		debconf_input ("high", "debian-install/s390/dasd/choose_select");
+		my_debconf_input ("high", "debian-install/s390/dasd/choose_select");
 
 		if (!strcmp (client->value, "Quit"))
 			exit (0);
@@ -166,12 +166,12 @@ int main(int argc, char *argv[])
 	if (cur->state == 2)
 	{
 		client->command (client, "subst", "debian-install/s390/dasd/format", "device", cur->device, NULL);
-		ptr = debconf_input ("high", "debian-install/s390/dasd/format");
+		ptr = my_debconf_input ("high", "debian-install/s390/dasd/format");
 	}
 	else if (cur->state == 3)
 	{
 		client->command (client, "subst", "debian-install/s390/dasd/format_unclean", "device", cur->device, NULL);
-		ptr = debconf_input ("critical", "debian-install/s390/dasd/format_unclean");
+		ptr = my_debconf_input ("critical", "debian-install/s390/dasd/format_unclean");
 	}
 	else
 		goto error;
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 	return 0;
 
 error:
-	debconf_input ("high", "debian-install/s390/dasd/error");
+	my_debconf_input ("high", "debian-install/s390/dasd/error");
 	return 1;
 }
 
