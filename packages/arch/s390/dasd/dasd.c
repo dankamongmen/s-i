@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -197,6 +198,7 @@ static enum state_wanted confirm (void)
 {
 	char buf[256], *ptr;
 	int ret;
+	bool needs_format = false;
 
 	if (dasd_current->state == NEW)
 	{
@@ -213,6 +215,7 @@ static enum state_wanted confirm (void)
 	{
 		case UNFORMATTED:
 		case READY:
+			needs_format = true;
 			debconf_subst (client, "debian-install/s390/dasd/format", "device", buf);
 			debconf_set (client, "debian-install/s390/dasd/format", "true");
 			ret = my_debconf_input ("medium", "debian-install/s390/dasd/format", &ptr);
@@ -226,24 +229,35 @@ static enum state_wanted confirm (void)
 			return WANT_ERROR;
 	}
 
-	di_log (DI_LOG_LEVEL_WARNING, "ret: %d, ptr: %s", ret, ptr);
-	if (ret == 10 || strncmp (ptr, "true", 4))
+	if (ret == 10 || (strcmp (ptr, "true") && needs_format))
 		return WANT_BACKUP;
+
+	if (strcmp (ptr, "true") == 0)
+	{
+		snprintf (buf, sizeof (buf), "dasdfmt -l LX%04x -b 4096 -n %04x -y", dasd_current->device, dasd_current->device);
+		ret = di_exec_shell_log (buf);
+
+		if (ret)
+			return WANT_ERROR;
+	}
+
+	debconf_get (client, "debian-installer/kernel/commandline");
+	strncpy (buf, client->value, sizeof (buf));
+
+	ptr = strstr (buf, "dasd=");
+	if (ptr)
+	{
+		char buf1[256] = "", buf2[256] = "";
+		while (!isspace (*++ptr) && *ptr);
+		strncpy (buf1, buf, ptr - buf);
+		strncpy (buf2, ptr, sizeof (buf2));
+		snprintf (buf, sizeof (buf), "%s,%04x%s", buf1, dasd_current->device, buf2);
+	}
+	else
+		di_snprintfcat (buf, sizeof (buf), " dasd=%04x", dasd_current->device);
+	debconf_set (client, "debian-installer/kernel/commandline", buf);
+
 	return WANT_NEXT;
-}
-
-static enum state_wanted setup (void)
-{
-	char buf[256];
-	int ret;
-
-	snprintf (buf, sizeof (buf), "dasdfmt -l LX%04x -b 4096 -n %04x -y", dasd_current->device, dasd_current->device);
-	ret = di_exec_shell_log (buf);
-
-	if (!ret)
-		return WANT_NEXT;
-
-	return WANT_ERROR;
 }
 
 static void error (void)
@@ -263,7 +277,7 @@ int main(int argc, char *argv[])
 	enum
 	{
 		BACKUP, GET_CHANNEL,
-		CONFIRM, SETUP, ERROR, QUIT
+		CONFIRM, ERROR, QUIT
 	}
 	state = GET_CHANNEL;
 
@@ -281,9 +295,6 @@ int main(int argc, char *argv[])
 			case CONFIRM:
 				state_want = confirm ();
 				break;
-			case SETUP:
-				state_want = setup ();
-				break;
 			case ERROR:
 				error ();
 				state_want = WANT_QUIT;
@@ -299,9 +310,6 @@ int main(int argc, char *argv[])
 						state = CONFIRM;
 						break;
 					case CONFIRM:
-						state = SETUP;
-						break;
-					case SETUP:
 						state = GET_CHANNEL;
 						break;
 					default:
@@ -316,7 +324,6 @@ int main(int argc, char *argv[])
 						state = BACKUP;
 						break;
 					case CONFIRM:
-					case SETUP:
 						state = GET_CHANNEL;
 						break;
 					default:
@@ -333,3 +340,5 @@ int main(int argc, char *argv[])
 	}
 }
 
+/* vim: noexpandtab sw=8
+*/
