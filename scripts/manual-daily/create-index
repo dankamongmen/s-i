@@ -1,0 +1,130 @@
+#!/bin/bash
+ROOT=/home/rfjp/d-i
+destination=$ROOT/build
+logdir=$ROOT/log
+
+mainlog=$logdir/main.log
+pagefile=$destination/index.html
+
+[ -f "$ROOT/bin/langlist" ] || exit 1
+[ -f "$ROOT/bin/archlist" ] || exit 1
+
+build_link_table () {
+    # Count languages
+    num_lang=0
+    for lang in $languages; do
+        num_lang=$(($num_lang + 1))
+    done
+
+    echo "<table>" >>$pagefile
+    echo "  <tr>" >>$pagefile
+    echo "    <th class=\"col1\">Architecture</th>" >>$pagefile
+    for lang in $languages ; do
+        langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 9`
+        echo "    <th class=\"t1\">$langname</th>" >>$pagefile
+    done
+
+    echo "  </tr>" >>$pagefile
+
+    for arch in $architectures ; do
+        archname=`egrep "^$arch[[:space:]]" $ROOT/bin/archlist | cut -f 2`
+        echo "" >>$pagefile
+        echo "  <tr>" >>$pagefile
+        echo "    <td class=\"col1\">$archname</td>" >>$pagefile
+
+        for lang in $languages ; do
+            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 9`
+            destsuffix="${lang}.${arch}"
+            echo "    <td>" >>$pagefile
+            echo "      <a href=\"$destsuffix/index.html\">html</a>" >>$pagefile
+            SEP="<BR>"
+            if [ "$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 4)" = "Y" ] ; then
+                echo "      $SEP<a href=\"$destsuffix/install.${lang}.pdf\">pdf</a>" >>$pagefile
+                SEP=""
+            fi
+            if [ "$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 6)" = "Y" ] ; then
+                echo "      $SEP<a href=\"$destsuffix/install.${lang}.txt\">text</a>" >>$pagefile
+            fi
+            echo "    </td>" >>$pagefile
+        done
+
+        echo "  </tr>" >>$pagefile
+    done
+
+    echo "" >>$pagefile
+    echo "</table>" >>$pagefile
+}
+
+# MAINLINE
+
+cat $ROOT/bin/index.head >$pagefile
+
+# First, we build the table for the languages that have all architectures built
+
+# Order of languages is alphabetic on name.
+# Select only languages for which all architectures are built.
+languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 9,9 | cut -f 1,2 | \
+           egrep "Y$" | cut -f 1`
+
+# Order of architectures is alphabetic on name.
+architectures=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/archlist | sort -k 2,2 | cut -f 1`
+
+build_link_table
+
+cat $ROOT/bin/index.single >>$pagefile
+
+# Next, we build the table for the languages that have only i386 built
+
+# Order of languages is alphabetic on name.
+# Select only languages dor which all architectures are built.
+languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 9,9 | cut -f 1,2 | \
+           egrep "S$" | cut -f 1`
+
+# Order of architectures is alphabetic on name.
+architectures="i386"
+
+build_link_table
+
+if [ -f $logdir/tr-stats ] ; then
+    echo "" >>$pagefile
+    echo "<br>" >>$pagefile
+    echo "<h3>Translation status</h3>" >>$pagefile
+    echo "" >>$pagefile
+    echo "<p>" >>$pagefile
+    echo "This table shows how much of the manual has been translated for each language.<br>" >>$pagefile
+    echo "The column 'Files needing update' gives a rough indication of whether the translation is up to date." >>$pagefile
+    echo "</p>" >>$pagefile
+    echo "" >>$pagefile
+
+    echo "<table>" >>$pagefile
+    echo "  <tr>" >>$pagefile
+    echo "    <th class=\"col1\">Language</th>" >>$pagefile
+    echo "    <th class=\"t2\">% complete</th>" >>$pagefile
+    echo "    <th class=\"t2\">Translated files</th>" >>$pagefile
+    echo "    <th class=\"t2\">Untranslated files</th>" >>$pagefile
+    echo "    <th class=\"t2\">Files needing update</th>" >>$pagefile
+    echo "    <th class=\"t2\">Missing files</th>" >>$pagefile
+    echo "  </tr>" >>$pagefile
+
+    for lang in `egrep -v "^en" $logdir/tr-stats | cut -f 1` ; do
+        langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 9`
+        echo "" >>$pagefile
+        echo "  <tr>" >>$pagefile
+        echo "    <td class=\"col1\">$langname</td>" >>$pagefile
+
+        for col in 2 4 6 9 8 ; do
+            value=`egrep "^$lang[[:space:]]" $logdir/tr-stats | cut -f $col`
+            echo "    <td class=\"stats\">$value</td>" >>$pagefile
+        done
+
+        echo "  </tr>" >>$pagefile
+    done
+
+    echo "" >>$pagefile
+    echo "</table>" >>$pagefile
+fi
+
+#cat $ROOT/bin/index.tail >>$pagefile
+sed "s/%date%/`date -u`/" $ROOT/bin/index.tail >>$pagefile
+
+exit 0

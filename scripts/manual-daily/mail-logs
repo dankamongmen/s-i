@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# Note: this script should be run from _outside_ the chroot
+
+ROOT=/home/rfjp/d-i
+logdir=$ROOT/log
+mainlog=$logdir/main.log
+builddate=`date +"%d %b %Y"`
+
+[ -e "$logdir" ] && cd $logdir || exit 1
+
+add-svnlog () {
+    echo "" >>$mainlog
+    echo "" >>$mainlog
+    echo "=============== snv up ===============" >>$mainlog
+    cat $logdir/svn_up.log >>$mainlog
+}
+
+if [ -f $ROOT/do_not_build ] ; then
+    echo "" >>$mainlog
+    echo "Build or upload failed; no mails sent!" >>$mainlog
+    add-svnlog
+
+    mutt -s "D-I Manual build failed ($builddate)" fjp@fjphome.nl <$mainlog
+    exit 0
+fi
+
+# Only create mails for languages that were built
+for lang in `egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -f 2`; do
+    grepexp="^$lang[[:space:]]"
+    mailaddress=`egrep "$grepexp" $ROOT/bin/langlist | cut -f 10`
+
+    # Check for errors during build
+    BUILD_ERRORS=0
+    egrep -v "^(Writing|Info:|Warning:|dvips:)" \
+             $logdir/$lang.log >/tmp/build_log.$$
+    if egrep -v -q "^(|Error: no ID for constraint linkend:.*|Starting build.*|Building manual.*)$" \
+                /tmp/build_log.$$ ; then
+        BUILD_ERRORS=1
+    fi
+
+    # Create header file
+    echo "From: Frans Pop <aragorn@tiscali.nl>" >/tmp/header.$$
+    echo "To: $mailaddress" >>/tmp/header.$$
+#   echo "BCC: fjp@fjphome.nl" >>/tmp/header.$$
+    echo "Reply-To: Frans Pop <aragorn@tiscali.nl>" >>/tmp/header.$$
+    if [ "$BUILD_ERRORS" = "0" ] ; then
+        echo "Subject: [D-I Manual] Build log for $lang ($builddate)" >>/tmp/header.$$
+    else
+        echo "Subject: [D-I Manual] Build log for $lang ($builddate) - ERRORS DURING BUILD" >>/tmp/header.$$
+    fi
+
+    # Create message file
+    if [ "$BUILD_ERRORS" = "0" ] ; then
+        cat $ROOT/bin/msgtxt.ok >/tmp/message.$$
+    else
+        cat $ROOT/bin/msgtxt.fail >/tmp/message.$$
+    fi
+
+    ATTACHMENT=""
+    # Check whether upload of logfile to home.tiscali.nl was successful
+    if egrep -q "Upload of $lang.log success" $mainlog ; then
+        echo "A log of the build is available at:" >>/tmp/message.$$
+        echo "- http://home.tiscali.nl/isildur/d-i/log/$lang.log" >>/tmp/message.$$
+    else
+        echo "A log of the build has been attached." >>/tmp/message.$$
+        # Create attachment
+        gzip -c $logdir/$lang.log >$logdir/$lang.log.gz
+        ATTACHMENT="-a $logdir/$lang.log.gz"
+    fi
+
+    cat $ROOT/bin/msgtxt.common >>/tmp/message.$$
+    grepexp="^([UAD][[:space:]]*${lang}/|Updated to revision)"
+    egrep "$grepexp" $logdir/svn_up.log >>/tmp/message.$$
+    if [ -f $logdir/svn_ci.log ] ; then
+        echo "" >>/tmp/message.$$
+        cat logdir/svn_ci.log >>/tmp/message.$$
+    fi
+
+    # Mail message
+    mutt -H /tmp/header.$$ $ATTACHMENT </tmp/message.$$
+
+    rm $logdir/$lang.log.gz &>/dev/null
+done
+
+echo "" >>$mainlog
+echo "Build successfull; logmails have been sent!" >>$mainlog
+add-svnlog
+
+mutt -s "D-I Manual build success ($builddate)" fjp@fjphome.nl <$mainlog
+
+rm /tmp/*.$$ &>/dev/null
+exit 0
+
