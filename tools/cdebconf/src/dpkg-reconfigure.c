@@ -8,7 +8,7 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.5 2000/12/02 07:15:14 tausq Exp $
+ * $Id: dpkg-reconfigure.c,v 1.6 2000/12/03 19:42:38 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -386,6 +386,7 @@ int main(int argc, char **argv)
 		DIE("Cannot initialize DebConf frontend");
 
 	g_db->load(g_db);
+	setenv("DEBIAN_HAS_FRONTEND", "1", 1);
 	ret = reconfigure(argv, optind, argc);
 	/* shutting down .... sync the database and shutdown the modules */
 	cleanup();
