@@ -53,19 +53,3 @@ elif [ "$method" != palo -a "$has_palo" = yes ]; then
     write_line NO_MORE
     close_dialog
 fi
-
-
-# The following is a hack and will be removed in future versions of
-# partman.  It ensures that the palo partition can not be used for
-# some regular file system.
-if [ "$method" = palo ]; then
-    if [ -f $id/format ]; then
-        # we want to use the existing file system in the partition
-	rm $id/format
-    fi
-    if [ -f $id/detected_filesystem ]; then
-        # however no existing file system is detected :-)
-	rm $id/detected_filesystem
-    fi
-fi
-
