@@ -113,7 +113,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
         struct package_t *menudefault = NULL;
 	struct language_description *langdesc;
 	int i = 0, num = 0;
-	char *s;
+	char *s, *ret;
 	char menutext[1024];
 
 	if (! debconf)
@@ -179,6 +179,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	*s = 0;
 	s = menutext;
 	menudefault = get_default_menu_item(olist);
+	free(olist);
 
 	/* Make debconf show the menu and get the user's choice. */
         debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
@@ -194,17 +195,21 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	/* Figure out which menu item was selected. */
 	for (i = 0; i < num; i++) {
 		p = package_list[i];
-		if (strcmp(p->description, s) == 0)
-			return p;
-		else if (language) {
+		if (strcmp(p->description, s) == 0) {
+			ret = p;
+			break;
+		} else if (language) {
 			for (langdesc = p->localized_descriptions; langdesc; langdesc = langdesc->next)
 				if (strcmp(langdesc->language,language) == 0 &&
 				    strcmp(langdesc->description,s) == 0) {
-					return p;
+					ret = p;
+					break;
 				}
 		}
 	}
-	return NULL;
+	free(language);
+	free(package_list);
+	return ret;
 }
 
 static int config_package(struct package_t *);
@@ -385,6 +390,7 @@ int main (int argc, char **argv) {
 				break;
 			}
 		di_list_free(packages, di_pkg_free);
+		exit(0);
 		packages = status_read();
 	}
 	

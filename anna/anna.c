@@ -21,6 +21,7 @@ is_installed(struct package_t *p, struct linkedlist_t *installed)
 {
 	struct package_t *q;
 	struct version_t pv, qv;
+	int ret;
 
 	/* If we don't understand the version number, we play safe
 	 * and assume we should install it */
@@ -29,7 +30,12 @@ is_installed(struct package_t *p, struct linkedlist_t *installed)
 	q = di_pkg_find(installed, p->package);
 	if (q == NULL || q->version == NULL || !di_parse_version(&qv, q->version))
 		return 0;
-	return (di_compare_version(&pv, &qv) <= 0);
+	ret = (di_compare_version(&pv, &qv) <= 0);
+	free(pv.version);
+	free(pv.revision);
+	free(qv.version);
+	free(qv.revision);
+	return ret;
 }
 
 /*
@@ -77,7 +83,7 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 			 * packages that are NOT pulled in?
 			 */
 			//di_pkg_free(p);
-			//free(node);
+			free(node);
                         continue;
                 } else if (p->priority < standard) {
 			/* Unlink these packages temporarily */
@@ -133,11 +139,13 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 				if (tmp != NULL && strstr(debconf->value, tmp) != NULL) {
 					node->next = packages->head;
 					packages->head = node;
-				}
+				} else
+					free(node);
 				free(tmp);
 			}
 		}
 	}
+	free(lowpri_p);
 
 	/* pull in needed dependencies */
 	packages = di_pkg_toposort_list(packages);

@@ -177,8 +177,8 @@ try_get_packages(char *dist, char *suite, char *ext, char *unpack_cmd)
 	int ret;
 
 	retriever = get_chosen_retriever();
-	unlink(tmp_packages_ext);
 	asprintf(&tmp_packages_ext, "%s%s", tmp_packages, ext);
+	unlink(tmp_packages_ext);
         /* First try the packages command. If that doesn't work, fall back to
          * retrieving the normal location of a Packages file. */
 	asprintf(&command, "%s packages %s %s %s", retriever, tmp_packages_ext,
@@ -204,6 +204,7 @@ try_get_packages(char *dist, char *suite, char *ext, char *unpack_cmd)
 			unlink(tmp_packages);
 	}
 	free(tmp_packages_ext);
+	free(retriever);
 
 	return ret;
 }
@@ -243,7 +244,10 @@ struct linkedlist_t *get_packages (void) {
 		if (tmplist != NULL) {
 			if (list == NULL)
 				list = tmplist;
-			else if (list->tail != NULL) {
+			else if (list->tail == NULL) {
+				free(list);
+				list = tmplist;
+			} else if (list->tail != NULL) {
 				list->tail->next = tmplist->head;
 				list->tail = tmplist->tail;
 				free(tmplist);
