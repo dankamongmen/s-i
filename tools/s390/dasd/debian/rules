@@ -3,9 +3,6 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -16,7 +13,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
-	rm -f debian/$(PACKAGE).postinst
+	rm -f debian/postinst
 	$(MAKE) clean
 	dh_clean
 
@@ -24,7 +21,7 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	cp dasd debian/$(PACKAGE).postinst
+	cp dasd debian/postinst
 
 # Build architecture-independent files here.
 binary-indep: build install

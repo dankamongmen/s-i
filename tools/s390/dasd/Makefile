@@ -7,7 +7,7 @@
 #
 
 CC := gcc
-CFLAGS := -Wall -pipe -Os
+CFLAGS := -Wall -W -pipe -Os
 LDFLAGS := -ldebconfclient -ldebian-installer
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
