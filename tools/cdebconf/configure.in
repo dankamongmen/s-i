@@ -61,7 +61,7 @@ AC_ARG_WITH(db,[  --with-db               db modules to build])
 if test -n "$with_db"; then
   DBMODULES=$with_db
 else
-  DBMODULES="textdb perldb"
+  DBMODULES="rfc822db textdb perldb"
 fi
 AC_SUBST(DBMODULES)
 
@@ -85,8 +85,20 @@ AC_ARG_WITH(conffile,[  --with-conffile=PATH    cdebconf config file [/etc/debco
 AC_DEFINE_UNQUOTED(DEBCONFCONFIG, "$DEBCONFCONFIG") 
 
 dnl Check for libraries
-AC_CHECK_LIB(ncurses, initscr)
 AC_CHECK_LIB(dl, dlopen)
+
+dnl Frontends - which to include.
+
+FRONTEND_MODULES=text
+
+AC_CHECK_LIB(ncurses, initscr, FRONTEND_MODULES="$FRONTEND_MODULES ncurses",
+ echo "*** Cannot build ncurses frontend ***")
+AC_CHECK_LIB(bogl, bogl_flush, FRONTEND_MODULES="$FRONTEND_MODULES bogl",
+ echo "*** Cannot build BOGL frontend ***")
+AC_CHECK_LIB(slang, SLang_init_all, FRONTEND_MODULES="$FRONTEND_MODULES slang",
+ echo "*** Cannot build SLang frontend ***")
+
+AC_SUBST(FRONTEND_MODULES)
 
 dnl Checks for header files.
 AC_HEADER_DIRENT
@@ -110,4 +122,4 @@ AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(socket strdup strstr strtol)
 
-AC_OUTPUT(globalmakeflags src/makefile)
+AC_OUTPUT(globalmakeflags src/makefile src/modules/frontend/Makefile)
