@@ -10,7 +10,9 @@ db_go
 db_get $TEMPLATE_ROOT/login
 
 if [ "$RET" = 'Start menu' ]; then
-  exec /usr/bin/main-menu
+  exec main-menu
 elif [ "$RET" = 'Start shell' ]; then
+  # WORKAROUND
+  UDPKG_QUIET=1
   exec udpkg --configure --force-configure di-utils-shell
 fi
