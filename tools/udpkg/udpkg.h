@@ -1,6 +1,8 @@
-/* $Id: udpkg.h,v 1.3 2000/11/01 23:16:16 joeyh Exp $ */
+/* $Id: udpkg.h,v 1.4 2000/11/01 23:48:09 joeyh Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
+
+#include <stdio.h>
 
 #include "config.h"
 
@@ -60,7 +62,6 @@ struct package_t {
 	char *provides;
 	char *description;
 	int installer_menu_item;
-	char *control;
 	unsigned long status;
 	char color; /* for topo-sort */
 	char refcount;
@@ -71,6 +72,7 @@ struct package_t {
 
 /* function prototypes */
 void *status_read(void);
+void control_read(FILE *f, struct package_t *p);
 int status_merge(void *status, struct package_t *pkgs);
 int package_compare(const void *p1, const void *p2);
 struct package_t *depends_resolve(struct package_t *pkgs, void *status);

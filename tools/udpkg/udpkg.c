@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.6 2000/11/01 21:54:02 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.7 2000/11/01 23:48:09 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -191,9 +191,8 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	int r = 1;
 	char *cwd = 0;
 	char *p;
-	int fd;
 	char buf[1024];
-	struct stat statbuf;
+	FILE *f;
 
 	p = strrchr(pkg->file, '/');
 	if (p) p++; else p = pkg->file;
@@ -210,28 +209,9 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 			pkg->file);
 		if (SYSTEM(buf) == 0)
 		{
-			snprintf(buf, sizeof(buf), "control");
-			if (stat(buf, &statbuf) == 0)
-			{
-				pkg->control = (char *)malloc(statbuf.st_size+1);
-				pkg->control[statbuf.st_size] = 0;
-				if ((fd = open(buf, O_RDONLY)) > 0)
-				{
-					read(fd, pkg->control, statbuf.st_size);
-					close(fd);
-
-					if ((p = strstr(pkg->control, 
-						"\nVersion: ")) != 0)
-						pkg->version = p+10;
-					if ((p = strstr(pkg->control, 
-						"\nDepends: ")) != 0)
-						pkg->depends = p+10;
-					if ((p = strstr(pkg->control, 
-						"\nProvides: ")) != 0)
-						pkg->provides = p+11;
-
-					r = 0;
-				}
+			if ((f = fopen("control", "r")) != NULL) {
+				control_read(f, pkg);
+				r = 0;
 			}
 		}
 	}
@@ -311,6 +291,10 @@ static int dpkg_install(struct package_t *pkgs)
 		{
 			perror(p->file);
 			break;
+		}
+		else {
+			p->status &= STATUS_STATUSMASK;
+			p->status |= STATUS_STATUSINSTALLED;
 		}
 	
 	status_merge(status, pkgs);

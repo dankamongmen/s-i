@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.6 2000/11/01 23:16:16 joeyh Exp $ */
+/* $Id: status.c,v 1.7 2000/11/01 23:48:09 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -234,12 +234,18 @@ int status_merge(void *status, struct package_t *pkgs)
 
 	// Print out packages we processed.
 	for (pkg = pkgs; pkg != 0; pkg = pkg->next) {
-		fprintf(fout, "Package: %s\nStatus: %s\nVersion: %s\n", 
-			pkg->package, status_print(pkg->status), pkg->version);
+		fprintf(fout, "Package: %s\nStatus: %s\n", 
+			pkg->package, status_print(pkg->status));
+#if 0
 		if (pkg->depends)
 			fprintf(fout, "Depends: %s\n", pkg->depends);
+#endif
 		if (pkg->depends)
 			fprintf(fout, "Provides: %s\n", pkg->provides);
+		if (pkg->installer_menu_item)
+			fprintf(fout, "Installer-Menu-Item: %i\n", pkg->installer_menu_item);
+		if (pkg->description)
+			fprintf(fout, "Description: %s\n", pkg->description);
 		fputc('\n', fout);
 	}
 	
