@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.7 2003/03/28 11:26:00 sjogren Exp $
+ * $Id: newt.c,v 1.8 2003/05/09 17:49:58 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -243,7 +243,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
     bOk     = newtCompactButton(5, win_height-2, _("OK"));
     bCancel = newtCompactButton(win_width - 9 - strwidth(_("Cancel")), win_height-2, _("Cancel"));
-    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
+    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q) || !show_ext_desc);
     newtFormAddComponents(form, label, bOk, bCancel, NULL);
     if (count > sel_height) {
         
@@ -351,7 +351,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         defchoice = 0;
     if (defchoice >= 0)
         newtListboxSetCurrent(listbox, defchoice);
-    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
+    newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q) || !show_ext_desc);
     newtFormAddComponents(form, label, listbox, bOk, bCancel, NULL);
     cRet = newtRunForm(form);
     if (cRet == bCancel)
