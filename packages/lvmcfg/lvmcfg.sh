@@ -299,6 +299,7 @@ vg_create() {
 	db_input high lvmcfg/vgcreate_parts
 	db_go
 	db_get lvmcfg/vgcreate_parts
+	[ "$RET" = "false" ] && return
 
 	convert_return "$RET"
 	PARTITIONS="$RET"
