@@ -459,7 +459,8 @@ static void remove_newlines(char *text)
 
 struct template *template_load(const char *filename)
 {
-	char buf[2048], extdesc[8192];
+	char buf[4096];/* XXX This buffer limits the length of template files */
+	char extdesc[8192];
 	char *lang;
 	char *p;
 	char *cp;
