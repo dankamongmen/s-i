@@ -2,11 +2,19 @@
 # First stage install on s390. This is special in a number of ways.
 use Expect;
 
+my $down="OB";
+my $left="OD";
+
+# Allow running from cron.
+if ($ENV{TERM} eq "" || $ENV{TERM} eq "dumb") {
+	$ENV{TERM}="vt100";
+}
+
 my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
 #$exp->debug(2);
 #$exp->exp_internal(1);
 
-sub question {
+sub console_question {
 	my $question=shift;
 	my $response=shift;
 
@@ -20,72 +28,62 @@ sub question {
 }
 
 # Setting up point to point network and network-console:
-question("Network device type:", 1);
-question("CTC device:", 1);
-question("Protocol for this connection:", 1);
-question("Primary network interface:", 2); # ctc0
-question("IP address:", $ENV{S390_IP});
-question("Point-to-point address:", $ENV{S390_PTP_IP});
-question("Name server addresses:", $env{S390_NAMESERVER_IP});
-question("Hostname:");
-question("Domain name:");
-question("Remote installation password:", $ENV{ROOT_PASSWORD}); # root will do
-question("Password confirmation:", $ENV{ROOT_PASSWORD});
-question("To continue the installation, please use an SSH client to log in");
-# We won't though, it's easier to automate things at the console since it
-# uses the text frontend.
-
-# Format first (only) dasd.
-question("Available disks:", 1);
-# Due to redraws involved in hercules's scrolling, it's hard to find the
-# next prompt, which looks exactly the same. So look for a "(formatted)",
-# which indicates the disk was formatted, and then for the prompt.
-$exp->expect($ENV{STAGE_1_MAX_TIME}, "(formatted)");
-# And then stop.
-question("Available disks:", 2);
-
-# Partition first dasd.
-question("Disk to partition:", 1);
-# In fdasd..
-question("Command (m for help):", "n");
-question("First track", 2);
-question("Last track", "+500M");
-question("Command (m for help):", "w");
-# And stop.
-question("Disk to partition:", 2);
-
-# Partition configuration.
-question("Select a partition", 1);
-question("Action on"); # make default filesystem type
-question("Mount point for", 1);
-question("Select a partition", 2);
-question("Ready to create file systems and mount partitions?", 1);
-
-# Wait for the base system install.
-$exp->expect($ENV{STAGE_1_MAX_TIME}, "Installation complete") or die "timeout waiting for install";
+console_question("Network device type:", 1);
+console_question("CTC device:", 1);
+console_question("Protocol for this connection:", 1);
+console_question("Primary network interface:", 2); # ctc0
+console_question("IP address:", $ENV{S390_IP});
+console_question("Point-to-point address:", $ENV{S390_PTP_IP});
+console_question("Name server addresses:", $env{S390_NAMESERVER_IP});
+console_question("Hostname:");
+console_question("Domain name:");
+console_question("Remote installation password:", $ENV{ROOT_PASSWORD}); # root will do
+console_question("Password confirmation:", $ENV{ROOT_PASSWORD});
+$exp->expect($ENV{STAGE_1_MAX_TIME}, "To continue the installation, please use an SSH client to log in");
 
 # Now use ssh to log in to d-i and finish the installation.
-# If ssh is not used to run prebaseconfig at the end, network-console
-# will not be set up for base-config. Since base-config is otherwise
-# unusable on s390, we need to use network-console there.
 my $ssh_exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no installer\@$ENV{S390_IP}") or die "failed to start ssh: $!";
 #$ssh_exp->debug(2);
 #$ssh_exp->exp_internal(1);
-$ssh_exp->expect($timeout, "password:");
-$ssh_exp->send("$ENV{ROOT_PASSWORD}\r");
-$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}, "Network console option:");
-$ssh_exp->send("\r");
 
-# These questions are asked because a few udes were loaded that have menu
-# items. This does not happen in a more ususal s390 install.
-$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}, "English");
-$ssh_exp->send("\r");
-$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}, "<Go Back>");
-$ssh_exp->send("\r");
+sub ssh_question {
+	my $question=shift;
+	my $response=shift;
+	
+	$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}, $question) or die "failed to find $question";
+	sleep 1;
+	$ssh_exp->send($response."\r");
+}
 
+ssh_question("password:", $ENV{ROOT_PASSWORD});
+ssh_question("Network console option:");
 
-$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}, "Installation complete");
-$ssh_exp->send("\r");
+# Format first (only) dasd.
+ssh_question("Available disks:");
+ssh_question("(formatted)", $down);
+
+# Partition first dasd.
+ssh_question("Disk to partition:");
+# In fdasd..
+ssh_question("Command (m for help):", "n");
+ssh_question("First track", 2);
+ssh_question("Last track", "+500M");
+ssh_question("Command (m for help):", "w");
+# And stop.
+ssh_question("Disk to partition:", $down);
+
+# Partition configuration.
+ssh_question("Select a partition");
+ssh_question("Action on"); # make default filesystem type
+ssh_question("Mount point for");
+ssh_question("Select a partition", $down);
+ssh_question("Ready to create file systems and mount partitions?", $left);
+
+# Wait for the base system install.
+ssh_question("Installation is complete");
+ssh_question("To finish the installation");
+
+$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}. 'eof');
 
 # Wait for it to finish.
 $exp->expect($ENV{STAGE_1_MAX_TIME}, "System halted.") or die "timeout waiting for halt";
