@@ -1,0 +1,8 @@
+#!/bin/sh
+# Hack around bug #250427
+set -e
+FILE=/target/etc/mdadm/debian.conf
+if [ -e $FILE ]; then
+	sed 's/AUTOSTART=false/AUTOSTART=true/' < $FILE > $FILE.new
+	mv -f $FILE.new $FILE
+fi
