@@ -98,6 +98,8 @@ choose_modules(void)
         prev = node;
     }
 
+    /* Resolve provides */
+    di_pkg_resolve_deps(pkglist);
     /* Figure out which packages we definitely want to install */
     prev = NULL;
     instlist = get_initial_package_list(pkglist);
@@ -127,8 +129,6 @@ choose_modules(void)
     }
     /* Drop files in udeb_exclude */
     drop_excludes(instlist);
-    /* Resolve provides */
-    di_pkg_resolve_deps(instlist);
     /* Pull in dependencies */
     tmplist = di_pkg_toposort_list(instlist);
     /* Free up the memory used by the nodes in the old instlist */
@@ -145,7 +145,8 @@ choose_modules(void)
     for (node = asklist->head; node != NULL; node = next) {
         next = node->next;
         p = (struct package_t *)node->data;
-        if (di_pkg_find(instlist, p->package) == NULL)
+        /* If p->filename is NULL, it's a virtual package */
+        if (p->filename != NULL && di_pkg_find(instlist, p->package) == NULL)
             askpkgs[ask_count++] = p;
         free(node);
     }
