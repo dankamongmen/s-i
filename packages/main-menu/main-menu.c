@@ -266,7 +266,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 		menu_entry(debconf, language, menudefault, buf, sizeof (buf));
 		debconf_set(debconf, MAIN_MENU, buf);
 	}
-	debconf_input(debconf, "medium", MAIN_MENU);
+	debconf_input(debconf, MENU_PRIORITY, MAIN_MENU);
 	debconf_go(debconf);
 	debconf_get(debconf, MAIN_MENU);
 	s = strdup(debconf->value);
@@ -472,9 +472,20 @@ static char *debconf_priorities[] =
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 static void modify_debconf_priority (int raise_or_lower) {
 	int pri, i;
+	static int menu_pri = -1;
 	const char *template = "debconf/priority";
 	debconf_get(debconf, template);
 	
+	if (menu_pri == -1) {
+		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
+			if (0 == strcmp(MENU_PRIORITY,
+					debconf_priorities[i]) ) {
+				menu_pri = i;
+				break;
+			}
+		}
+	}
+
 	pri = 1;
 	if ( debconf->value ) {
 		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
@@ -485,8 +496,14 @@ static void modify_debconf_priority (int raise_or_lower) {
 			}
 		}
 	}
-	if (raise_or_lower == LOWER)
+	if (raise_or_lower == LOWER) {
 		--pri;
+		/* Make sure the menu is always displayed after a single
+		 * backing up.
+		 */
+		if (menu_pri != -1 && pri > menu_pri)
+			pri = menu_pri;
+	}
 	else if (raise_or_lower == RAISE)
 		++pri;
 	if (0 > pri)

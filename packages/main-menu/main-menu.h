@@ -23,5 +23,8 @@ enum
 	EXIT_BACKUP		= 10,
 };
 
+/* Priority at which the menu is displayed */
+#define MENU_PRIORITY	"medium"
+
 /* vim: noexpandtab sw=8
  */
