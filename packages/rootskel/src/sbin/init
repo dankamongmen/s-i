@@ -4,7 +4,7 @@ echo "Setting up filesystem, please wait ..."
 
 if [ "`uname -r | grep '^2.2.'`" = "" ]; then
 	mount /proc
-	umount initrd || true
+	umount initrd 2>/dev/null || true
 	if mount -t tmpfs -o size=100M tmpfs /mnt ; then
 		:
 	else
@@ -26,4 +26,3 @@ else
 	mount /proc
 	exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
 fi
-
