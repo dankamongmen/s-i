@@ -59,7 +59,7 @@ void sighandler(int sig)
 	{
 		if (questions != NULL)
 		{
-			q = questions->methods.get(questions, "debconf/language");
+			q = questions->methods.get(questions, "debian-installer/language");
 			if (q != NULL)
 				setenv("LANGUAGE", question_getvalue(q, NULL), 1);
 		}
