@@ -64,7 +64,12 @@ if ($type eq 'template') {
 	foreach  my $country (sort (keys %http_countries)) {
 		print TEMPLATE ", ${country}";
 	}
-	print TEMPLATE "\n_Default: US\n";
+	print TEMPLATE "\n";
+	print TEMPLATE "#  Translators, you must not translate this value, but you can change it\n".
+"#  to one of those listed above, e.g. msgstr \"GB\".  Square brackets are\n".
+"#  ignored and appear here only to distinguish this msgid from the same\n".
+"#  one in the Choices field.\n";
+	print TEMPLATE "_Default: US[ Default value]\n";
 	print TEMPLATE "_Description: Use a mirror from what country?\n";
 	print TEMPLATE " The goal is to find a mirror that is close to you on the network -- be\n";
 	print TEMPLATE " aware that nearby countries, or even your own, may not be the best choice.\n\n";
@@ -77,7 +82,12 @@ if ($type eq 'template') {
 	foreach  my $country (sort (keys %ftp_countries)) {
                 print TEMPLATE ", ${country}";
         }
-	print TEMPLATE "\n_Default: US\n";
+	print TEMPLATE "\n";
+	print TEMPLATE "#  Translators, you must not translate this value, but you can change it\n".
+"#  to one of those listed above, e.g. msgstr \"GB\".  Square brackets are\n".
+"#  ignored and appear here only to distinguish this msgid from the same\n".
+"#  one in the Choices field.\n";
+	print TEMPLATE "_Default: US[ Default value]\n";
         print TEMPLATE "_Description: Use a mirror from what country?\n";
         print TEMPLATE " The goal is to find a mirror that is close to you on the network -- be\n";
         print TEMPLATE " aware that nearby countries, or even your own, may not be the best choice.\n\n";
