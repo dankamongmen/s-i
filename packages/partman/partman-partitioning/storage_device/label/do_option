@@ -46,12 +46,14 @@ close_dialog
 
 if [ "$chosen_type" = sun ]; then
     # write the partition table to the disk
+    disable_swap
     open_dialog COMMIT
     close_dialog
     sync
     # reread it from there
     open_dialog UNDO
     close_dialog
+    enable_swap
 fi
 
 # Different types partition tables support different visuals.  Some
