@@ -1,6 +1,6 @@
 
 CC = gcc
-CFLAGS = -Wall -O0 -g -ggdb
+CFLAGS = -W -Wall -Os
 LD = gcc
 LDFLAGS = -ldebconfclient -ldebian-installer -lparted -ldl
 

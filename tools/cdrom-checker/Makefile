@@ -18,7 +18,7 @@
 
 
 CC = gcc
-CFLAGS = -Wall -O3
+CFLAGS = -W -Wall -Os
 LD = gcc
 LDLFAGS =
 LDLIBS = -ldebconfclient -ldebian-installer
