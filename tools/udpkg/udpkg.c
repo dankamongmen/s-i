@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.14 2000/11/06 21:29:01 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.15 2000/11/06 22:15:02 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -95,18 +95,20 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	int r;
 	char buf[1024];
 	DPRINTF("Configuring %s\n", pkg->package);
+	pkg->status &= STATUS_STATUSMASK;
 	if (is_file(DPKGCIDIR "postinst"))
 	{
 		snprintf(buf, sizeof(buf), DPKGCIDIR "postinst configure %s", pkg->version);
 		if ((r = do_system(buf)) != 0)
 		{
 			fprintf(stderr, "postinstallation script exited with status %d\n", r);
-			pkg->status &= STATUS_STATUSMASK;
 			pkg->status |= STATUS_STATUSPOSTINSTFAILED;
 			return 1;
 		}
 	}
 
+	pkg->status |= STATUS_STATUSINSTALLED;
+	
 	return 0;
 }
 
@@ -269,19 +271,22 @@ static int dpkg_unpack(struct package_t *pkgs)
 static int dpkg_configure(struct package_t *pkgs)
 {
 	int r = 0;
-	struct package_t *pkg, *statpkg;
+	void *found;
+	struct package_t *pkg;
 	void *status = status_read();
 	for (pkg = pkgs; pkg != 0 && r == 0; pkg = pkg->next)
 	{
-		statpkg = tfind(pkg, &status, package_compare);
-		if (statpkg == 0)
+		found = tfind(pkg, &status, package_compare);
+		if (found == 0)
 		{
 			fprintf(stderr, "Trying to configure %s, but it is not installed\n", pkg->package);
 			r = 1;
 		}
 		else
 		{
-			r = dpkg_doconfigure(pkg);
+			/* configure the package listed in the status file;
+			 * not pkg, as we have info only for the latter */
+			r = dpkg_doconfigure(*(struct package_t **)found);
 		}
 	}
 	status_merge(status, 0);
@@ -330,10 +335,6 @@ static int dpkg_install(struct package_t *pkgs)
 		if (dpkg_doinstall(p) != 0)
 		{
 			perror(p->file);
-		}
-		else {
-			p->status &= STATUS_STATUSMASK;
-			p->status |= STATUS_STATUSINSTALLED;
 		}
 	}
 	
