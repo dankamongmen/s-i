@@ -28,14 +28,12 @@ done
 close_dialog
 
 db_metaget partman-partitioning/text/bootable description
-description="$RET"
+description=$(stralign -25 "$RET")
 
 if [ $bootable = yes ]; then
     db_metaget partman-partitioning/text/on description
-    RET=$(stralign -25 "$RET")
     printf "unbootable\t%s%s\n" "$description" "${RET}"
 else
     db_metaget partman-partitioning/text/off description
-    RET=$(stralign -25 "$RET")
     printf "bootable\t%s%s\n" "$description" "${RET}"
 fi
