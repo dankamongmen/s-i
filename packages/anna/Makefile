@@ -1,16 +1,18 @@
 CFLAGS=-Wall -W -ggdb -D_GNU_SOURCE
+LDFLAGS=
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=anna
 LIBS=-ldebconfclient -ldebian-installer
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -g3 -DDODEBUG
+LDFLAGS:=-g
 endif
 
 all: $(BIN)
 
 $(BIN): $(OBJS)
-	$(CC) -o $(BIN) $(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $(BIN) $(OBJS) $(LIBS)
 
 # Size optimized and stripped binary target.
 small: CFLAGS:=-Os $(CFLAGS) -DSMALL
