@@ -146,12 +146,18 @@ choose_modules(void)
 static int
 install_modules(void)
 {
-    struct linkedlist_t *tmplist;
+    FILE *sfp;
+    struct linkedlist_t *tmplist, *status_p;
     struct list_node *node;
     struct package_t *p;
     char *f, *fp, *dest_file;
     int ret = 0, pkg_count = 0;
 
+    sfp = fopen(STATUS_FILE, "r");
+    if (sfp == NULL)
+        return 5;
+    status_p = di_pkg_parse(sfp);
+    fclose(sfp);
     debconf->command(debconf, "GET", ANNA_CHOOSE_MODULES, NULL);
     if (debconf->value != NULL) {
         char *choices = debconf->value;
@@ -187,13 +193,14 @@ install_modules(void)
     instlist = tmplist;
 
     for (node = instlist->head; node != NULL; node = node->next) {
-        if (((struct package_t *)node->data)->filename != NULL)
+        p = (struct package_t *)node->data;
+        if (p->filename != NULL && !is_installed(p, status_p))
             pkg_count++;
     }
     debconf->commandf(debconf, "PROGRESS START 0 %d anna/progress_title", 2*pkg_count);
     for (node = instlist->head; node != NULL; node = node->next) {
         p = (struct package_t *)node->data;
-        if (p->filename) {
+        if (p->filename != NULL && !is_installed(p, status_p)) {
             /*
              * Come up with a destination filename.. let's use
              * the filename we're getting, minus any path
@@ -245,6 +252,7 @@ install_modules(void)
     debconf->command(debconf, "PROGRESS STOP", NULL);
 
     di_list_free(instlist, di_pkg_free);
+    di_list_free(status_p, di_pkg_free);
 
     return ret;
 }
