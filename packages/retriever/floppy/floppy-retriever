@@ -112,8 +112,10 @@ case "x$cmd" in
 
 		T="retriever/floppy/error"
 		db_set "$T" true
-		db_input high "$T" || true
-		db_go || true
+		db_input critical "$T" || true
+		if ! db_go; then
+			exit 2
+		fi
 		db_get "$T"
 		if [ "$RET" = true ]; then
 			exit 0
