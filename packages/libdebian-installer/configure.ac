@@ -43,7 +43,7 @@ AC_CHECK_DECLS(PATH_MAX,[],[AC_DEFINE(PATH_MAX,4096)],[
 ])
 
 AC_ARG_ENABLE(extensive-debug,AS_HELP_STRING([--enable-extensive-debug],[Enable extensive debugging output]))
-if test $enable_extensive_debug = yes; then
+if test "$enable_extensive_debug" = yes; then
 	AC_DEFINE_UNQUOTED(ENABLE_EXTENSIVE_DEBUG,1,[Define to 1 to enable extensive debugging output])
 fi
 
