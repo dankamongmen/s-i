@@ -19,14 +19,31 @@ if [ -e /proc/bus/pci/devices ]; then
 		fi
 	done  <  /usr/lib/usb-discover/uhci-pci.lst 
 
+	kver=`uname -r | cut -d. -f1,2` # Kernel version (e.g. 2.4)
+	
 	if [ "$OHCI" = yes ] ; then
-		modprobe usb-ohci
+		if [ "$kver" = 2.6 ]; then
+			modprobe ohci-hcd
+		else
+			modprobe usb-ohci
+		fi
 	fi
 	if [ "$UHCI" = yes ] ; then
-		modprobe usb-uhci
+		if [ "$kver" = 2.6 ]; then
+			modprobe uhci-hcd
+		else
+			modprobe usb-uhci
+		fi
 	fi
 
-	modprobe usbkbd  || true
-	modprobe keybdev || true 
+	# TODO ehci?
+
+	if [ "$kver" = 2.6 ]; then
+		modprobe usbkbd || tre
+		modprobe hid || true
+	else
+		modprobe usbkbd  || true
+		modprobe keybdev || true 
+	fi
 	modprobe usbserial || true
 fi
