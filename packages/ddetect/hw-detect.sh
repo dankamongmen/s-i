@@ -331,7 +331,14 @@ fi
 # available on the target system for base-config
 if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 	register-module ide-cd
-	register-module ide-detect
+	case "$(uname -r)" in
+	2.4*)
+		register-module ide-detect
+	;;
+	2.6*)
+		register-module ide-generic
+	;;
+	esac
 fi
 
 # get pcmcia running if possible
