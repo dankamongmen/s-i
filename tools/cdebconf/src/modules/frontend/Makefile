@@ -1,16 +1,16 @@
 include ../../../globalmakeflags
 
 SOBJS=ncurses.so text.so
-OBJS=ncurses.o text.o
+OBJS=ncurses.opic text.opic
 
 CFLAGS += -I../..
 
 all: $(SOBJS)
 
-ncurses.so: ncurses.o
+ncurses.so: ncurses.opic
 	$(CC) $(CFLAGS) -shared -o $@ $^ -lncurses
 
-text.so: text.o
+text.so: text.opic
 	$(CC) $(CFLAGS) -shared -o $@ $^
 
 clean:

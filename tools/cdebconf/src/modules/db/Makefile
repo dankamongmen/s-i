@@ -1,13 +1,13 @@
 include ../../../globalmakeflags
 
 SOBJS=textdb.so
-OBJS=textdb.o
+OBJS=textdb.opic
 
 CFLAGS += -I../..
 
 all: $(SOBJS)
 
-textdb.so: textdb.o
+textdb.so: textdb.opic
 	$(CC) $(CFLAGS) -shared -o $@ $^
 
 clean:
