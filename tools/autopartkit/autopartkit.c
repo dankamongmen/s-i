@@ -750,7 +750,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     if (mount(find_partition_by_mountpoint(mountmap,"/"), 
 	      "/target", DEFAULT_FS, MS_MGC_VAL, NULL) == -1)
         autopartkit_error(1,
-			  "Unable to mount '%' on '/target' as fstype %s: %s",
+			  "Unable to mount '%s' on '/target' as fstype '%s': %s",
 			  find_partition_by_mountpoint(mountmap,"/"),
 			  DEFAULT_FS, strerror(errno));
     log_line();
@@ -843,7 +843,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 	if (mount(mountmap[i].devpath, tmpmnt, mountmap[i].mountpoint->fstype,
 		  MS_MGC_VAL, NULL) == -1)
 	    autopartkit_error(1,
-			      "Unable to mount '%s' on '%s' as fstype %s: %s",
+			      "Unable to mount '%s' on '%s' as fstype '%s': %s",
 			      mountmap[i].devpath, tmpmnt,
 			      mountmap[i].mountpoint->fstype,
 			      strerror(errno));
@@ -1295,12 +1295,14 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                 retval = system(cmd);
                 free(cmd);
                 if (0 != retval)
-                    autopartkit_error(1, "Failed to create ext3 fs on '%s'",
-                                      devpath);
+                    autopartkit_error(1, "Failed to create '%s' fs on '%s'",
+                                      fstype, devpath);
                 else
                 { /* Replace devpath placeholder with real path */
                     char buf[1024];
                     int i;
+                    autopartkit_log(1, "  FS '%s' created ok on '%s'",
+                                    fstype, devpath);
                     snprintf(buf, sizeof(buf), "%s:%s", vgname, lvname);
                     for (i = 0; i < partcount; i++)
                         if (0 == strcmp(buf, mountmap[i].devpath))
@@ -1312,6 +1314,9 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                         }
                 }
             }
+	    else
+	        autopartkit_error(1,
+				  "Unable to allocate memory for mkfs call");
 	}
     }
     lvm_lv_stack_delete(lvm_lv_stack);
