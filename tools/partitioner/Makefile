@@ -9,7 +9,7 @@ all: partitioner
 partitioner: main.o
 	${LD} ${LDFLAGS} -o partitioner $?
 
-main.o: main.c main.h
+main.o: main.c
 	${CC} ${CFLAGS} -c main.c
 
 clean:

@@ -1,5 +1,22 @@
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <string.h>
+#include <sys/utsname.h>
+#include <debian-installer.h>
+#include <cdebconf/debconfclient.h>
+#include <parted/parted.h>
 
-#include "main.h"
+#define MEGABYTE (1024 * 1024)
+#define MEGABYTE_SECTORS (MEGABYTE / 512)
+#define MAX_DISKS 128
+
+#define FDISK_PATH "/usr/share/partitioner"
+
+static struct debconfclient *debconf;
 
 static PedExceptionOption my_exception_handler(PedException* ex) {
 	if (ex->type < PED_EXCEPTION_ERROR) {
@@ -9,7 +26,7 @@ static PedExceptionOption my_exception_handler(PedException* ex) {
 	return PED_EXCEPTION_CANCEL;
 }
 
-char *get_architecture() {
+static char *get_architecture(void) {
 	FILE *pcmd;
 	char arch[256];
 
@@ -23,7 +40,7 @@ char *get_architecture() {
 	return(strdup(arch));
 }
 
-int get_all_disks(PedDevice *discs[], int max_disks) {
+static int get_all_disks(PedDevice *discs[], int max_disks) {
 	DIR *devdir;
 	struct dirent *direntry;
 	int disk_count = 0;
@@ -40,6 +57,11 @@ int get_all_disks(PedDevice *discs[], int max_disks) {
 		if(direntry->d_name[0] == '.')
 			continue;
 
+		if (disk_count >= max_disks) {
+			di_log(DI_LOG_LEVEL_INFO, "More than %d discs", max_disks);
+			break;
+		}
+
 		asprintf(&fullname, "%s/%s/%s", "/dev/discs",
 			direntry->d_name, "disc");
 
@@ -52,7 +74,7 @@ int get_all_disks(PedDevice *discs[], int max_disks) {
 	return(disk_count);
 }
 
-char *build_choice(PedDevice *dev) {
+static char *build_choice(PedDevice *dev) {
 	char *string = NULL;
 	int i;
 
@@ -61,7 +83,7 @@ char *build_choice(PedDevice *dev) {
 		(dev->length-1)*1.0/MEGABYTE_SECTORS);
 
 	/* remove ",", this will confuse debconf */
-	for(i=0; i<strlen(string); i++) {
+	for(i=0; string[i]; i++) {
 		if(string[i] == ',')
 			string[i] = ';';
 	}
@@ -69,25 +91,11 @@ char *build_choice(PedDevice *dev) {
 	return(strdup(string));
 }
 
-char *extract_choice(const char *choice) {
-	char *blank = NULL;
-	char device[PATH_MAX];
-	int i;
-
-	/* FIXME: something is wrong here */
-	for(i=0; i<PATH_MAX; i++)
-		device[i] = '\0';
-
-	blank = strchr(choice, 32);
-	if(blank == NULL) {
-		return(strdup(choice));
-	}
-
-	strncpy(device, choice, blank-choice);
-	return(strdup(device));
+static char *extract_choice(const char *choice) {
+	return strndup(choice, strcspn(choice, " "));
 }
 
-char *execute_fdisk() {
+static char *execute_fdisk(void) {
 	char *fdiskcmd = NULL;
 
 	/*
@@ -196,4 +204,3 @@ int main(int argc, char *argv[]) {
 
 	return(EXIT_SUCCESS);
 }
-
