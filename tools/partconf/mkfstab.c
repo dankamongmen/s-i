@@ -76,9 +76,11 @@ void insert_line(const char *line) {
 	/* handle reiserfs */
 	if(strstr(dummy->typ, "reiserfs") && strstr(dummy->mountpoint, "/boot")) {
 		dummy->options = strdup("notail");
+	} else if(strstr(dummy->typ, "swap")) {
+		dummy->options = strdup("sw");
 	} else {
-		if(strlen(options) > 0) {
-			dummy->options = strdup(options);
+		if(strlen(mountpoint) == strlen(TARGET)) {
+			dummy->options = strdup("defaults,errors=remount-ro");
 		} else {
 			dummy->options = strdup("defaults");
 		}
