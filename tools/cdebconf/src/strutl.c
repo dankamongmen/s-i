@@ -7,7 +7,7 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.15 2002/07/01 06:58:37 tausq Exp $
+ * $Id: strutl.c,v 1.16 2002/11/24 18:40:07 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -283,7 +283,7 @@ void strunescape(const char *inbuf, char *outbuf, const size_t maxlen)
 			tmp[0] = *(p+1);
 			tmp[1] = *(p+2);
 			tmp[2] = 0;
-			outbuf[i++] = atoi(tmp);
+			outbuf[i++] = strtol(tmp, (char **)NULL, 16);
 			p += 3;
 		}
 		else
