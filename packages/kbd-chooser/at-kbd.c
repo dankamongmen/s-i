@@ -48,7 +48,7 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 	/* In 2.6 series, we can detect keyboard via /proc/bus/input
 	 *
 	 */
-	if (check_dir ("/proc/bus/input") >= 0) {
+	if (check_dir ("/proc/bus/input")) {
 		if ((grep ("/proc/bus/input/devices","AT Set ") == 0) ||
 		    (grep ("/proc/bus/input/devices","AT Translated Set") == 0) ||
 		    (grep ("/proc/bus/input/devices","AT Raw Set") ==0))
