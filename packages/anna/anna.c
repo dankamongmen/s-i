@@ -79,6 +79,7 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
     di_package *package, *status_package, **package_array, *test_package;
     di_slist_node *node, *node1, *node2;
     int reverse_depend=0;
+    bool kernel_packages_present = false;
 
     config_retriever();
 
@@ -97,6 +98,32 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
             *packages_allocator = di_system_packages_allocator_alloc();
             *packages = get_packages(*packages_allocator);
 	}
+    }
+        
+    /* Go through the available packages to see if it contains at least
+       one package that is valid for the subarchitecture and corresponds
+       to the kernel version we are running */
+    for (node = (*packages)->list.head; node; node = node->next) {
+        package = node->data;
+        
+        if (!di_system_package_check_subarchitecture(package, subarchitecture))
+            continue;
+        if (((di_system_package *)package)->kernel_version) {
+            if (running_kernel && strcmp(running_kernel, ((di_system_package *)package)->kernel_version) == 0) {
+                kernel_packages_present = true;
+                break;
+            }
+        }
+    }
+
+    if (!kernel_packages_present) {
+        di_log(DI_LOG_LEVEL_WARNING, "no packages for kernel in archive");
+        debconf_input(debconf, "critical", "anna/no_kernel_modules");
+        if (debconf_go(debconf) == 30)
+	    return 4; /* back to main menu */
+        debconf_get(debconf, "anna/no_kernel_modules");
+        if (strcmp(debconf->value, "false") == 0)
+    	    return 4;
     }
 
     for (node = status->list.head; node; node = node->next) {
