@@ -496,7 +496,7 @@ humandev () {
 	    ;;
 	/dev/md/*)
 	    device=`echo "$1" | sed -e "s/.*md\/\?\(.*\)/\1/"`
-	    type=`cat /proc/mdstat|grep "^md${device}[ :]" | sed -e "s/^.* : active raid\([[:alnum:]]\).*/\1/"`
+	    type=`grep "^md${device}[ :]" /proc/mdstat | sed -e "s/^.* : active raid\([[:alnum:]]\).*/\1/"`
 	    db_metaget partman/text/raid_device description
 	    printf "$RET" ${type} ${device}
 	    ;;
@@ -558,7 +558,7 @@ enable_swap () {
 
 disable_swap () {
     [ -f /proc/swaps ] || return 0
-    cat /proc/swaps | grep '^/dev' \
+    grep '^/dev' /proc/swaps \
 	| while read path x; do
 	      swapoff $path
           done
