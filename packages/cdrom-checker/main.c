@@ -46,8 +46,7 @@ int mount_cdrom() {
 	int status = 0;
 	char *cmd = NULL;
 
-	asprintf(&cmd, "/bin/grep -q '^%s' /proc/mounts",
-		cdrom_device);
+	asprintf(&cmd, "grep -q '^%s' /proc/mounts", cdrom_device);
 	status = di_exec_shell(cmd);
         di_free(cmd);
 	if(WIFEXITED(status) && WEXITSTATUS(status) == 0)
