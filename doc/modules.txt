@@ -8,9 +8,10 @@ system, plus some metadata.
 
 Because there is already so much infrastructure to build and manage debian
 packages, and because it allows metadata to accompany the files in a module,
-we have decided to use debian packages as the modules for the installer. To
-differentiate from "real" debian packages, installer modules should have an
-extention of ".udeb"
+we have decided to use debian packages as the modules for the installer. To 
+differentiate them from normal Debian packages, modules have filenames
+ending in ".udeb". However, modules must not have the same package name as
+any regular Debian package.
 
 Unlike regular debian packages, modules for the installer will not be
 policy compliant. They will not contain documentation in /usr/share/doc.
@@ -18,10 +19,6 @@ They need not comply with the FHS. They may be statically linked. They may
 conflict with essential "real" debian packages, and thus be non-installable
 on a real debian system, although it is recommended that if possible, this
 be avoided.
-
-To differentiate them from normal Debian packages, modules have filenames
-ending in ".udeb". However, modules must not have the same package name as
-any regular Debian package.
 
 Here is a short rundown on differences between deb packages and udebs:
 
@@ -32,7 +29,7 @@ Misc.Differences
 ================
 
 * Udebs should not include .md5sum files.
-* Udebs should declare dependancies on everything they
+* Udebs should declare dependencies on everything they
   depend on (this includes depending on ash, busybox, etc).
 
 New Control Scripts
@@ -62,7 +59,7 @@ New Headers
 installer-menu-item
 -------------------
 
-A priority (a number). The priority number influsences the ordering of
+A priority (a number). The priority number influences the ordering of
 items in the menu; higher numbered items are closer to the end of the
 menu.  See the file menu-item-number.txt for the currently used
 numbers.  If this field does not appear, or has a value of 0, a module
@@ -79,7 +76,7 @@ preinst, postrm and prerm
 Disallowed Headers
 ==================
 
-* pre-dependancies
+* pre-dependencies
 * conflicts
 * essential or required packages
 * suggests
@@ -88,13 +85,13 @@ Disallowed Headers
 Disallowed Header Options
 =========================
 
-* versioned dependancies
-* `|' in dependancies.
+* versioned dependencies
+* `|' in dependencies.
 
 Supported Headers
 =================
 
-* simple dependancies
+* simple dependencies
 * postinst
 * debconf
 * provides
@@ -106,7 +103,7 @@ A 5 minute primer on building udebs.
 FIXME: Is this up-to-date?
 
 I build udebs by asking debhelper to build a normal .deb, except at the
-very last step, I force it to use the ".udeb' extention. The problems
+very last step, I force it to use the ".udeb' extension. The problems
 that show up are:
 
 1. dpkg-gencontrol has an annoying habit of guessing what .deb you are

@@ -55,7 +55,7 @@ All retrievers should support the following interface.
 ramdisk allocation scheme used by the installer, and so the locations may
 change. ]
 
-/usr/lib/debian-installer/retriever/<retriever name> is a executable (the
+/usr/lib/debian-installer/retriever/<retriever name> is an executable (the
 name of the exectable must be the same as the name of the module that
 contains it). It is run with the following parameters:
 
@@ -75,10 +75,10 @@ retriever retrieve [source-filename] [dest-filename] [suite]
 	The source-filename is the Filename field of a Packages file.
 
 	Thus, retrieving the Packages file itself is something like this:
-		retreiver Packages /tmp/Packages
+		retriever Packages /tmp/Packages
 	
 	While retrieving a deb is something like this:
-		retreiver retrievers/http-retriever.deb /tmp/http-retriever.deb
+		retriever retrievers/http-retriever.deb /tmp/http-retriever.deb
 
 retriever packages [dest-filename] [extension] [optional suite]
 	Download a Packages file, or a Packages-like file. The fields used by
@@ -99,7 +99,7 @@ retriever cleanup
 If the destination file already exists, the retriever may optionally attempt
 to continue a download.
 
-Once ran, retrievers are free to prompt the user, or do whatever else is 
+Once run, retrievers are free to prompt the user, or do whatever else is 
 necessary to retrieve the file[2].
 
 Note that this simple interface requires that retrievers know the location
@@ -111,8 +111,8 @@ what site to install from, and probably what version of the debian-installer
 is being used as well. The user will likely have to be prompted for some of
 this data during retriever setup.
 
-TODO: it might make sense to break some of this out into the retreiver
-controller, and expand the interface. It's stilly that all the retreivers
+TODO: it might make sense to break some of this out into the retriever
+controller, and expand the interface. It's silly that all the retrievers
 need to know the distribution code name for instance.
 
 Retriever controller (anna)
@@ -120,12 +120,12 @@ Retriever controller (anna)
 
 This is another module, that makes use of the retrievers. It doesn't
 actually depend on any though. What it does is, when it is picked from the
-menu, it builds a list of all available retreivers, and has the user pick
-one from the list. That retreiver is then configured, and is used to 
-retreive whatever seems appropriate. Thus, the menu item can be picked
-multiple times, using a different retreiver every time. And if a retreiver
-downloads a second retreiver, it will show up in future displays of the
-retreivers menu.
+menu, it builds a list of all available retrievers, and has the user pick
+one from the list. That retriever is then configured, and is used to 
+retrieve whatever seems appropriate. Thus, the menu item can be picked
+multiple times, using a different retriever every time. And if a retriever
+downloads a second retriever, it will show up in future displays of the
+retrievers menu.
 
 The default retriever (if more than one is available, and it's the first
 time the question is asked) will be, in turn and if they exist:
@@ -138,8 +138,8 @@ time the question is asked) will be, in turn and if they exist:
 
 Which modules are needed is an interesting question. One simplistic
 technique is to simply download and unpack all available modules. Another
-technique would be to only retreive modules that will appear on the main
-menu, and retreive their dependancies if they are used.
+technique would be to only retrieve modules that will appear on the main
+menu, and retrieve their dependencies if they are used.
 
 The controller also needs to verify md5sums of downloaded files.
 

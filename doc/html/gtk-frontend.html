@@ -32,7 +32,7 @@ a patch.<p>
 <b>07.03.2003</b>: Akira Tagoh has uploaded atk, glib and pango. Freetype has been
 uploaded as well.<p>
 <b>06.03.2003</b>: Changed rules for udeb-dev packages: Libraries should be installed
-into /usr/lib/udeblib instead of a subdir dependant on the library name.<p>
+into /usr/lib/udeblib instead of a subdir dependent on the library name.<p>
 <b>05.03.2003</b>: Made udebs for libexpat and libfontconfig.<p>
 <b>04.03.2003</b>: Pango now uses libfontconfig for the freetype backend.
 So we have to package this as well, and since it uses libexpat, we have another
@@ -246,15 +246,15 @@ string "-udeb" added after it. For example libc6 will have a
 libc6-udeb counterpart and libglib2.0-0 becomes libglib2.0-0-udeb. It
 is important to include the soname number in the module name, because
 an ABI change of the library will break all modules that depend on
-that library and breaks net installs until the dependant modules are
+that library and breaks net installs until the dependent modules are
 rebuild.
 
-<h4>Dependancies</h4>
+<h4>Dependencies</h4>
 
-The normal way for a debian package to find out its dependancies is
+The normal way for a debian package to find out its dependencies is
 the shlibs system. Each library installed provides a shlibs file that
 states the package which provides this library. This does not work to
-figure out the dependancies for installer modules, since the shlibs
+figure out the dependencies for installer modules, since the shlibs
 files will point to the deb packages providing the library in
 question, not the installer module providing it.
 <p>
@@ -296,7 +296,7 @@ library, this library must be present on the build system.
 Since modules should not be installed on normal systems there is need
 for a deb package providing this library as well as the necessary
 devekopment link. The package should be named libfoo-udeb-dev and
-declare a dependancy on libfoo-dev. The only files libfoo-udeb-dev
+declare a dependency on libfoo-dev. The only files libfoo-udeb-dev
 should provide is the ABI-changed library and the necessary
 symlinks. Since the development link is identically to the development
 link in libfoo-dev, the library and the links should be installed into
@@ -310,7 +310,7 @@ libfoo first. This procedure should be documented in the README.Debian
 file for libfoo-udeb-dev.
 <p>
 To get everything handled correctly by the shlibs system some minor
-tweaking has to be done. To get correct dependancies for installer
+tweaking has to be done. To get correct dependencies for installer
 modules depending on libfoo-udeb, provide the libfoo-udeb-dev package
 with a shlibs file that points to the libfoo-udeb package. For
 libdirectfb-udeb-dev the shlibs file contains:
@@ -320,7 +320,7 @@ libdirectfb-udeb-dev the shlibs file contains:
 There is only one problem lasting. If there is an installer module
 libbar-udeb depending on libfoo-udeb, that itself also has a
 libbar-udeb-dev because of binary incompatibilities, libbar-udeb-dev
-will be dependant on libfoo-udeb, which is a installer module and must
+will be dependent on libfoo-udeb, which is a installer module and must
 not be installed on the build system. To tackle this problem each
 udeb-dev should provide the corresponding udeb package,
 i.e. libdirectfb-udeb-dev should have a
