@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: mac-kbd.c,v 1.3 2003/03/19 20:49:31 mckinstry Exp $
+ * $Id: mac-kbd.c,v 1.4 2003/04/10 14:59:22 mckinstry Exp $
  */
 
 #include "config.h"
@@ -26,7 +26,7 @@ kbd_t *mac_kbd_get (kbd_t *keyboards)
 	assert (di_check_dir ("/proc") == 1);
 
 	k->name = "mac"; // This must match the name "mac" in console-keymaps-mac
-	k->description = N_("Mac Keyboard");
+	k->description = _("Mac Keyboard");
 	k->deflt = NULL;
 	k->fd = -1;
 	k->present = UNKNOWN;

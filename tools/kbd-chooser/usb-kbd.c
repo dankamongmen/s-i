@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.9 2003/03/19 20:49:31 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.10 2003/04/10 14:59:22 mckinstry Exp $
  */
 
 #include "config.h"
@@ -30,7 +30,7 @@ kbd_t *usb_kbd_get (kbd_t *keyboards)
 
 	// Set up default entries.
 	k->name = "usb";
-	k->description = N_("USB");
+	k->description = _("USB keyboard");
 	k->fd = -1;
 	k->deflt = "mac-usb-us";
 	k->present = UNKNOWN;

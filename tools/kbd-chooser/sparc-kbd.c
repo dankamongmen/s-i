@@ -4,7 +4,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: sparc-kbd.c,v 1.4 2003/03/19 20:49:31 mckinstry Exp $
+ * $Id: sparc-kbd.c,v 1.5 2003/04/10 14:59:22 mckinstry Exp $
  */
 
 #include "config.h"
@@ -26,7 +26,7 @@ kbd_t *at_kbd_get (kbd_t *keyboards)
 	assert (di_check_dir ("/proc") == 1);
 
 	k->name = "sparc"; // This must match the name "sparc" in console-keymaps-sparc
-	k->description = N_("Sun Keyboard");
+	k->description = _("Sun Keyboard");
 	k->deflt = "sunkeymap";
 	k->fd = -1;
 	k->present = UNKNOWN;
