@@ -28,10 +28,12 @@ case "x$cmd" in
     xpackages)
         rm -f "$1"
         touch "$1"
-        # We can use 'stable' since there are always symlinks
-        # Not always.  picax do not create the symlinks by default.
-        # Should we depend on them? [pere 2004-06-01]
-        Release="$CDMNT/dists/stable/Release"
+	if db_get mirror/suite; then
+		suite=$RET
+	else
+		suite=stable
+	fi
+        Release="$CDMNT/dists/$suite/Release"
         ARCH=`udpkg --print-architecture`
         components="`grep ^Components: $Release | cut -d' ' -f2-`"
         ret=1
