@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.65 2004/03/11 01:26:31 barbier Exp $
+ * $Id: text.c,v 1.66 2004/03/11 22:17:46 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -50,6 +50,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <string.h>
+#include <limits.h>
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -206,7 +207,7 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 {
 	int choice_min = -1;
 	int num_cols, num_lines;
-	int i, k, l, w;
+	int i, k, l;
 	int logcount = 0;
 	int *col_width;
 	int total_width = 0;
@@ -226,8 +227,8 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 		asprintf(&(fchoices[i]), "  %d. %s", i+1, choices_translated[i]);
 		if (strwidth(fchoices[i]) < choice_min || choice_min == -1)
 			choice_min = strwidth(fchoices[i]);
-		if (strlen(fchoices[i]) > width)
-			width = strlen(fchoices[i]);
+		if (strwidth(fchoices[i]) > width)
+			width = strwidth(fchoices[i]);
 	}
 	num_cols = width / choice_min;
 	if (num_cols > count)
@@ -246,9 +247,9 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 		for (i = 0; i < count; i++)
 		{
 			int current_col = i / num_lines;
-			if (strlen(fchoices[i]) > col_width[current_col])
+			if (strwidth(fchoices[i]) > col_width[current_col])
 			{
-				col_width[current_col] = strlen(fchoices[i]);
+				col_width[current_col] = strwidth(fchoices[i]);
 				total_width = 0;
 				for (k = 0; k < num_cols; k++)
 					total_width += col_width[k];
@@ -266,14 +267,14 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 	output = malloc(sizeof(char *) * num_lines);
 	for (i = 0; i < num_lines; i++)
 	{
-		output[i] = malloc(width+1);
+		output[i] = malloc(MB_LEN_MAX * width + 1);
 		*(output[i]) = '\0';
 	}
 	for (i = 0; i < count; i++)
 	{
 		strcat(output[line], fchoices[i]);
-		if (strlen(output[line]) > max_len)
-			max_len = strlen(output[line]);
+		if (strwidth(output[line]) > max_len)
+			max_len = strwidth(output[line]);
 		line++;
 		if (line >= num_lines)
 		{
@@ -281,12 +282,7 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 			if (col != num_cols)
 			{
 				for (l = 0; l < num_lines; l++)
-				{
-					w = strlen(output[l]);
-					for (k = w; k < max_len; k++)
-						output[l][k] = ' ';
-					output[l][max_len] = '\0';
-				}
+					strpad(output[l], max_len);
 			}
 
 			line = 0;
