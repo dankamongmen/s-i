@@ -1,4 +1,4 @@
-all: debian/templates check-scripts
+all: debian/templates check-scripts check-data
 
 LIST=languagelist
 
@@ -19,6 +19,17 @@ check-scripts:
 	for s in debian/postinst prebaseconfig \
 	   languagemap languagechooser ; do \
 		$$SH -n $$s ; \
+	done
+
+check-data:
+	# Check that the listed locale is supported, to make sure base-config know
+	# how to handle it.
+	@for locale in `grep -v "^#" languagelist | cut -d\; -f2` ; do \
+		if grep -q "^$$locale " /usr/share/i18n/SUPPORTED ; then \
+			: ; \
+		else \
+			echo "warning: locale $$locale not listed in /usr/share/i18n/SUPPORTED" ; \
+		fi ; \
 	done
 
 .PHONY: demo
