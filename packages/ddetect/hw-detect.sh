@@ -175,6 +175,7 @@ get_detected_hw_info() {
 				register-module airport
 			fi
 		fi
+		if 
 	fi
 }
 
@@ -194,6 +195,16 @@ get_ide_floppy_info() {
 	esac
 }
 
+get_input_info() {
+	case $SUBARCH in
+		powerpc/chrp_pegasos)
+		  echo "i8042:i8042 PC Keyboard controller"
+		  echo "atkbd:AT keyboard support"
+		;;
+		*) ;;
+	esac
+}
+
 # Manually load modules to enable things we can't detect.
 # XXX: This isn't the best way to do this; we should autodetect.
 # The order of these modules are important.
@@ -209,6 +220,7 @@ get_manual_hw_info() {
 	echo "ide-disk:Linux ATA DISK"
 	echo "ide-cd:Linux ATAPI CD-ROM"
 	echo "isofs:Linux ISO 9660 filesystem"
+	get_input_info
 }
 
 # Detect discover version
