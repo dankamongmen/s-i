@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.12 2003/03/05 21:03:35 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.13 2003/03/06 23:34:21 mckinstry Exp $
  */
 
 #include "config.h"
@@ -129,7 +129,7 @@ int compare_locale_list (char *langs)
 {
 	static char *locale = NULL, *lang1= NULL, *territory1 = NULL, *charset1 = NULL;
 	char *lang2 = NULL, *territory2 = NULL, *charset2 = NULL, buf [LINESIZE], *s, *colon;
-	int score = 0, best = 0;
+	int score = 0, best = -1;
 
 	if (locale == NULL) {
 		locale = get_locale ();
@@ -185,7 +185,7 @@ void select_keymap (maplist_t *maplist)
 {
 	char buf[4 * LINESIZE], template[LINESIZE], *s= NULL , deflt[LINESIZE];
 	keymap_t *mp, *preferred = NULL;
-	int score = 0, best = 0;
+	int score = 0, best = -1;
 	
 	mp = maplist->maps;
 	while (mp) {
@@ -199,6 +199,9 @@ void select_keymap (maplist_t *maplist)
 		if (score > best) {
 			best = score;
 			preferred = mp;
+			printf ("FIXME: comparing %s (%s) and %s, best %d score %d \n", mp->name, mp->langs,
+		                                                              get_locale(), best, score);
+
 		}
 		mp = mp->next;
 	}
@@ -473,7 +476,7 @@ char *ponder_keyboard_choices (void)
 	}	
 	if ((preferred == NULL) || (preferred->present == UNKNOWN)) {
 		s = s ? ( strcpy (s, ", ") + 2) : buf ;
-		di_log ("Setting no keybd case\n");
+		di_log ("Can't tell if kbd present; add no keyboard option\n");
 		add_no_keyboard_case (s, &preference );
 		choices++;
 	}		
