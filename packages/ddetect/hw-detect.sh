@@ -155,8 +155,8 @@ get_manual_hw_info() {
 	echo "ide-cd:Linux ATAPI CD-ROM"
 	echo "isofs:Linux ISO 9660 filesystem"
 	if [ "`udpkg --print-architecture`" = powerpc ]; then
-		if [ -d /proc/device-tree/aliases ]; then
-			if [ -e /proc/device-tree`cat /proc/device-tree/aliases/mac-io`/radio ]; then
+		if [ -f /proc/device-tree/aliases/mac-io ]; then
+			if [ -e "/proc/device-tree`cat /proc/device-tree/aliases/mac-io`/radio" ]; then
 				echo "airport:Airport wireless"
 			fi
 		fi
