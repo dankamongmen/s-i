@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.41 2003/10/16 00:39:42 kraai Exp $ */
+/* $Id: udpkg.c,v 1.42 2003/11/01 13:35:52 merker Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -16,6 +16,23 @@
 #include <debian-installer.h>
 
 static int force_configure = 0;
+
+/*
+ * helper routine to correctly detect mips and mipsel
+ */
+
+int is_little_endian()
+{
+  unsigned char numarray[]={0x12,0x34,0x56,0x78};
+  unsigned long value = *(unsigned long*) numarray;
+  if (value == 0x78563412)
+  {
+    return(-1);
+  } else {
+    return(0);
+  }
+}
+
 
 /* 
  * Main udpkg implementation routines
@@ -58,7 +75,15 @@ int dpkg_print_architecture()
         }
     }
 
-    printf("%s\n", name.machine);
+    /* uname gives "mips" for both mips and mipsel, so we need to  */ 
+    /* distinguish between both by checking the actual endianess   */
+
+    if ((strcmp(name.machine, "mips") == 0) && is_little_endian())
+    {
+        printf("mipsel\n");
+    } else { 
+        printf("%s\n", name.machine);
+    }
     return 0;
 }
 
