@@ -5,7 +5,8 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PACKAGES=$(shell dh_listpackages)
+ARCH_PACKAGES=$(shell dh_listpackages -a)
+INDEP_PACKAGES=$(shell dh_listpackages -i)
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
 
@@ -38,7 +39,21 @@ install: build
 
 # Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	$(foreach PACKAGE, $(INDEP_PACKAGES), \
+	( dpkg-gencontrol -Pdebian/$(PACKAGE) -p$(PACKAGE) \
+	-n$(PACKAGE)_$(VERSION)_all.udeb ) ; )
+	@$(foreach PACKAGE, $(INDEP_PACKAGES), \
+	(cd debian ; \
+		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_all.udeb \
+		); )
 
 # Build architecture-dependent files here.
 binary-arch: build install
@@ -50,10 +65,10 @@ binary-arch: build install
 	dh_fixperms
 	dh_installdeb
 	dh_shlibdeps
-	$(foreach PACKAGE, $(PACKAGES), \
+	$(foreach PACKAGE, $(ARCH_PACKAGES), \
 	( dpkg-gencontrol -Pdebian/$(PACKAGE) -p$(PACKAGE) \
 	-n$(PACKAGE)_$(VERSION)_$(ARCH).udeb ) ; )
-	@$(foreach PACKAGE, $(PACKAGES), \
+	@$(foreach PACKAGE, $(ARCH_PACKAGES), \
 	(cd debian ; \
 		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb \
 		); )
