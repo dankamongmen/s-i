@@ -1,7 +1,7 @@
 INSTALL_DIR=$(DESTDIR)/usr/bin/
 CFLAGS=-Wall  -Os -fomit-frame-pointer 
 STRIP = strip --remove-section=.note --remove-section=.comment 
-LDFLAGS=-ldebconfclient -lparted
+LDFLAGS=-ldebconfclient -lparted -ldebian-installer
 CC=gcc
 
 all: choose-yaboot-disk powerpc-type

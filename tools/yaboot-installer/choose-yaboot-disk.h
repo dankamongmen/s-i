@@ -16,6 +16,7 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <cdebconf/debconfclient.h>
+#include <debian-installer.h>
 #include "powerpc-type.h"
 
 #define MAX_DISCS 64
@@ -30,7 +31,7 @@ int read_physical_discs();
 int read_all_partitions(const char *devname);
 int is_bootable(const PedPartition *part);
 char *find_rootpartition();
-int generate_yabootconf(const char *boot, const char *root);
+int generate_yabootconf(const char *boot_devfs, const char *root_devfs);
 int update_kernelconf();
 char *build_choice(PedPartition *part);
 char *extract_choice(const char *choice);
