@@ -50,6 +50,33 @@ get_retriever_names()
 	return ret_choices;
 }
 
+/* TODO: i18n */
+static char *
+get_retriever_descriptions()
+{
+	FILE *fp;
+	struct package_t *p;
+	char *descriptions;
+	int desc_len = 1;
+
+	descriptions = malloc(1);
+	descriptions[0] = '\0';
+	fp = fopen("/var/lib/dpkg/status", "r");
+	p = di_pkg_parse(fp);
+	for (; p != NULL; p = p->next)
+	{
+		if (p->provides == NULL || strstr(p->provides, "retriever") == NULL)
+			continue;
+		desc_len += 1 + strlen(p->package) + strlen(": ") + 
+			strlen(p->description) + 1;
+		descriptions = realloc(descriptions, desc_len);
+		di_snprintfcat(descriptions, 2*desc_len, " %s: %s\n",
+				p->package, p->description);
+	}
+	fclose(fp);
+	return descriptions;
+}
+
 /* Returns the filename of the retriever to use. */
 /* TODO: error handling */
 char *chosen_retriever (void) {
@@ -58,11 +85,16 @@ char *chosen_retriever (void) {
 	if (retriever == NULL) {
 		struct debconfclient *debconf;
 		char *ret_choices, *ret_default;
+		char *descriptions;
 
 		ret_choices = get_retriever_names();
 		ret_default = strrchr(ret_choices, ',');
 		if (ret_default != NULL)
 			ret_default += 2;
+
+		descriptions = get_retriever_descriptions();
+		if (descriptions != NULL && descriptions[0] != '\0')
+			descriptions += 1; /* Leading space */
 
 		debconf = debconfclient_new();
 		debconf->command(debconf, "TITLE", "Choose Retriever", NULL);
@@ -72,6 +104,8 @@ char *chosen_retriever (void) {
 				ret_choices, NULL);
 		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT", 
 				ret_default, NULL);
+		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DESCRIPTIONS",
+				descriptions, NULL);
 		debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
 		debconf->command(debconf, "GO", NULL);
 		debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
