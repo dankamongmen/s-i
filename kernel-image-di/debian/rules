@@ -2,8 +2,10 @@
 
 # Kernel version.
 KVERS=2.4.0
-# Kenrel flavor.
+# Kernel flavor.
 FLAVOUR=di
+
+ARCH=$(shell dpkg --print-architecture)
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
@@ -29,7 +31,7 @@ build-stamp:
 		kernel-source-$(KVERS)/debian/control
 	cp debian/changelog kernel-source-$(KVERS)/debian
 	echo official > kernel-source-$(KVERS)/debian/official
-	cp config kernel-source-$(KVERS)/.config
+	cp config.$(ARCH) kernel-source-$(KVERS)/.config
 	# Hack up the Makefile for flavour support.
 	cd kernel-source-$(KVERS); \
 		if [ ! -e Makefile.pristine ]; then \
