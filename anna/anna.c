@@ -121,9 +121,9 @@ choose_modules(void)
                 instlist->tail = node;
             }
             node->next = NULL;
-            package_count++;
             continue;
         }
+        package_count++;
         prev = node;
     }
     /* Pull in dependencies */
