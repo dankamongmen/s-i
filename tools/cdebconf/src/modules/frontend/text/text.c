@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.19 2002/11/19 21:54:12 barbier Exp $
+ * $Id: text.c,v 1.20 2002/11/21 00:27:14 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -155,9 +155,9 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 			(def == 0 ? _(", default=no") : _(", default=yes"))));
 
 		fgets(buf, sizeof(buf), stdin);
-		if (strcmp(buf, "yes\n") == 0)
+		if (strcmp(buf, _("yes\n")) == 0)
 			ans = 1;
-		else if (strcmp(buf, "no\n") == 0)
+		else if (strcmp(buf, _("no\n")) == 0)
 			ans = 0;
 #if defined(__s390__) || defined (__s390x__)
 		else if (defval && (strcmp(buf, "\n") == 0 || strcmp(buf, ".\n") == 0))
@@ -254,7 +254,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 static int texthandler_note(struct frontend *obj, struct question *q)
 {
 	int c;
-	printf("[Press enter to continue]\n");
+	printf(_("[Press enter to continue]\n"));
 	do { c = fgetc(stdin); } while (c != '\r' && c != '\n');
 	return DC_OK;
 }
