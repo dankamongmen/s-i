@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-09-06 18:32+0200\n"
-"PO-Revision-Date: 2004-08-30 14:52+0200\n"
-"Last-Translator:  Matjaz Horvat <matjaz@owca.info>\n"
+"PO-Revision-Date: 2004-09-07 00:17+0100\n"
+"Last-Translator: Jure Čuhalev <gandalf@owca.info>\n"
 "Language-Team:  LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,6 +35,9 @@ msgid ""
 "system will reboot.  At the Pegasos OpenFirmware prompt, set the following "
 "OpenFirmware variables to enable auto-booting:"
 msgstr ""
+"Če želite samodejno zagnati Debian, je potrebno nastaviti nekaj spremenljivk "
+"v Pegasos OpenFirmware.  Na koncu namestitve se bo sistem ponovno zagnal.  "
+"Ob pozivniku Pegasos OpenFirmware boste lahko ročno zagnali jedro z:"
 
 #: ../nobootloader.templates:8
 msgid ""
@@ -43,34 +46,35 @@ msgid ""
 " setenv auto-boot-timeout 5000\n"
 " setenv auto-boot? true"
 msgstr ""
+" setenv boot-device ${OF_BOOT_DEVICE}\n"
+" setenv boot-file ${OF_BOOT_FILE}\n"
+" setenv auto-boot-timeout 5000\n"
+" setenv auto-boot? true"
 
 #. Type: note
 #. Description
 #: ../nobootloader.templates:8
-#, fuzzy
 msgid ""
 "Alternatively, you will be able to boot the kernel manually by entering :"
-msgstr ""
-"Vedite, da boste lahko pozneje razveljavili to opravilo, če boste želeli."
+msgstr "Vedite, da boste lahko pozneje zagnali jedro ročno z ukazom :"
 
 #. Type: note
 #. Description
 #: ../nobootloader.templates:8
 msgid " ${KERNEL_BOOT}"
-msgstr ""
+msgstr " ${KERNEL_BOOT}"
 
 #. Type: note
 #. Description
 #: ../nobootloader.templates:8
-#, fuzzy
 msgid "at the OpenFirmware prompt."
-msgstr "Nastavljam OpenFirmware"
+msgstr "na OpenFirware pozivniku."
 
 #. Type: note
 #. Description
 #: ../nobootloader.templates:30
 msgid "Setting firmware variables for automatic boot"
-msgstr ""
+msgstr "Nastavljanje strojnoprogramskih spremenljivk za samodejni zagon"
 
 #. Type: note
 #. Description
@@ -82,6 +86,11 @@ msgid ""
 "You can abort this by pressing any key. You will then be dropped into the "
 "NeTTrom command system where you have to execute the following commands:"
 msgstr ""
+"Če želite samodejno zagnati Debian, je potrebno nastaviti nekaj spremenljivk "
+"v strojnoprogramski opremi Netwinder NeTTrom.  Na koncu namestitve se bo "
+"sistem ponovno zagnal in poskusil s samozagonom.  Prekličete ga lahko s "
+"poljubno tipko.  Pristali boste v ukaznem sistemu NeTTrom, kjer morate "
+"izvesti naslednje ukaze:"
 
 #: ../nobootloader.templates:30
 msgid ""
@@ -92,6 +101,12 @@ msgid ""
 "   setenv cmdappend ${CMDAPPEND}\n"
 "   save-all"
 msgstr ""
+"   setenv kernconfig fs\n"
+"   setenv kerndev ${KERNDEV}\n"
+"   setenv kernfile ${KERNFILE}\n"
+"   setenv rootdev ${ROOTDEV}\n"
+"   setenv cmdappend ${CMDAPPEND}\n"
+"   save-all"
 
 #. Type: note
 #. Description
@@ -127,3 +142,5 @@ msgid ""
 "You will need to boot manually with the ${KERNEL} kernel on partition "
 "${BOOT} and ${ROOT} passed as kernel argument."
 msgstr ""
+"Zagnati boste mogli ročno z jedrom ${KERNEL} na razdelkih ${BOOT} in "
+"${ROOT}, podanih kot argumenti jedra."
