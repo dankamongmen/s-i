@@ -355,6 +355,7 @@ if [ -x /etc/init.d/pcmcia ] && \
 	db_progress STEP $OTHER_STEPSIZE
 fi
 if [ -e /proc/bus/pccard/drivers ]; then
+	log "Detected PCMCIA, installing pcmcia-cs."
 	apt-install pcmcia-cs || true
 fi
 
@@ -364,6 +365,7 @@ apt-install discover || true
 
 # Install hotplug as well (for USB, IEEE1394, CardBus, and some SCSI)
 if [ -f /proc/sys/kernel/hotplug ]; then 
+	log "Detected hotplug support, installing hotplug."
 	apt-install hotplug || true
 fi
 
