@@ -1,9 +1,11 @@
 #! /bin/sh -e
 
 . /usr/share/debconf/confmodule
-
+# set -x
 ARCH=`udpkg --print-architecture`
 MOUNTPOINT="/target"
+MKFS=
+DEFAULT=
 
 if [ "$ARCH" = "i386" -o "$ARCH" = "hppa" ]; then
     TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
@@ -11,7 +13,21 @@ elif [ "$ARCH" = "s390" -o "$ARCH" = "s390x" ]; then
     TMP=`for i in /dev/dasd/*/disc; do fdasd -p $i | grep "Linux native" | cut -d\  -f 2; done`
 fi
 
+for M in /sbin/mkfs.*; do
+    t=`echo "$M" | sed 's%/sbin/mkfs.%%'`
+    if [ "$MKFS" ]; then
+        MKFS="$MKFS, $t"
+    else
+        MKFS="$t"
+    fi
+done
+
 for P in $TMP; do
+    if mount | grep -q "^${DEFAULT}" && 
+     [ ! -e /var/lib/di-utils-mkfs/`echo "$P" | sed 's%/%_%g'` ]; then
+        DEFAULT="${P}"
+    fi
+                
     if [ "$PARTS" ]; then
         PARTS="$PARTS, $P"
     else
@@ -21,6 +37,11 @@ done
 PARTS=`echo "$PARTS" | sed 's/, $//'`
 
 db_subst di-utils-mkfs/which-partition PARTITIONS $PARTS
+
+if [ "$DEFAULT" ]; then
+    db_set di-utils-mkfs/which-partition "$DEFAULT"
+fi
+
 db_input critical di-utils-mkfs/which-partition
 db_go
 
@@ -28,6 +49,7 @@ db_get di-utils-mkfs/which-partition
 PARTITION="$RET"
 
 db_subst di-utils-mkfs/filesystem PARTITION $PARTITION
+db_subst di-utils-mkfs/filesystem MKFS "$MKFS"
 db_input medium di-utils-mkfs/filesystem
 db_go
 
@@ -35,5 +57,5 @@ db_get di-utils-mkfs/filesystem
 FSTYPE="$RET"
 
 mkfs.$FSTYPE "$PARTITION"
-
+touch /var/lib/di-utils-mkfs/`echo "$PARTITION" | sed 's%/%_%g'`
 exit 0

@@ -4,6 +4,7 @@
 
 ARCH=`udpkg --print-architecture`
 MOUNTPOINT="/target"
+DEFAULT=
 
 if [ "$ARCH" = "i386" -o "$ARCH" = "hppa" ]; then
     TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
@@ -12,6 +13,9 @@ elif [ "$ARCH" = "s390" -o "$ARCH" = "s390x" ]; then
 fi
 
 for P in $TMP; do
+    if mount | grep -q "^${DEFAULT}"; then
+        DEFAULT="${P}"
+    fi
     if [ "$PARTS" ]; then
         PARTS="$PARTS, $P"
     else
@@ -21,6 +25,10 @@ done
 PARTS=`echo "$PARTS" | sed 's/, $//'`
 
 db_subst di-utils-mount-partitions/which-partition PARTITIONS $PARTS
+
+if [ "$DEFAULT" ]; then
+    db_set di-utils-mount-partitions/which-partition "$DEFAULT"
+fi
 
 db_input critical di-utils-mount-partitions/which-partition
 db_go

@@ -13,6 +13,12 @@ else
     done
 fi
 
+if [ -z "$DIRS" ]; then
+    db_input critical di-utils-partitioner/no-discs
+    db_go
+    exit 1
+fi
+
 TMP=`find $DIRS -name disc`
 for D in $TMP; do
     if [ "$DISCS" ]; then
