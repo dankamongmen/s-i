@@ -179,9 +179,7 @@ int main(int argc, char *argv[]) {
 
 		cmd_script = execute_fdisk();
 		disk = extract_choice(debconf->value);
-		//asprintf(&cmd, "/bin/sh %s %s </dev/console >/dev/console 2>/dev/console",
-		asprintf(&cmd, "/bin/sh %s %s </dev/tty >/dev/tty 2>/dev/tty",
-			cmd_script, disk);
+		asprintf(&cmd, "/bin/sh %s %s </dev/tty >/dev/tty 2>/dev/tty", cmd_script, disk);
 
 		i = system(cmd);
 		if(i != 0) {
