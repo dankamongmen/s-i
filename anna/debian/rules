@@ -6,11 +6,6 @@ export DH_COMPAT=2
 # Make debhelper not generate any maint scripts.
 export DH_OPTIONS=-n
 
-ARCH_PACKAGES=$(shell dh_listpackages -a)
-INDEP_PACKAGES=$(shell dh_listpackages -i)
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -37,10 +32,8 @@ binary-indep: build
 	dh_compress -i
 	dh_fixperms -i
 	dh_installdeb -i
-	$(foreach PACKAGE, $(INDEP_PACKAGES), \
-	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_all.udeb; \
-	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_all.udeb; \
-	)
+	dh_di_gencontrol -i --udeb
+	dh_di_builddeb -i --udeb
 
 binary-arch: build
 	dh_testdir
@@ -55,10 +48,8 @@ binary-arch: build
 ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 	dh_strip -a
 endif
-	$(foreach PACKAGE, $(ARCH_PACKAGES), \
-	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
-	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_$(ARCH).udeb; \
-	)
+	dh_di_gencontrol -a --udeb
+	dh_di_builddeb -a --udeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary
