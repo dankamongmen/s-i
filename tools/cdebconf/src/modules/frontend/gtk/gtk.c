@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.31 2004/01/25 23:52:04 barbier Exp $
+ * $Id: gtk.c,v 1.32 2004/02/15 21:21:31 kov Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -101,22 +101,52 @@ void free_description_data( GtkObject *obj, struct frontend_question_data* data 
     free(data);
 }
 
-gboolean show_description( GtkWidget *widget, struct frontend_question_data* data )
+gboolean 
+show_description (GtkWidget *widget, struct frontend_question_data* data)
 {
-    struct question *q;
-    struct frontend *obj;
-    GtkWidget *target;
+  struct question *q;
+  struct frontend *obj;
 
-    obj = data->obj;
-    q = data->q;
-    target = ((struct frontend_data*)obj->data)->description_label;
+  GtkWidget *main_window;
+  GtkWidget *dialog;
+  
+  obj = data->obj;
+  q = data->q;
 
-    gtk_label_set_text(GTK_LABEL(target), q_get_extended_description(q));
+  main_window = ((struct frontend_data*) obj->data)->window;
 
+  dialog = gtk_message_dialog_new (GTK_WINDOW(main_window), GTK_DIALOG_MODAL,
+				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+				   q_get_extended_description(q));
+
+  gtk_dialog_run (GTK_DIALOG(dialog));
+  gtk_widget_destroy (dialog);
+
+    /* FIXME: no longer has a description frame
+       GtkWidget *target;
+       
+       obj = data->obj;
+       q = data->q;
+       target = ((struct frontend_data*)obj->data)->description_label;
+       
+       gtk_label_set_text(GTK_LABEL(target), q_get_extended_description(q));
+    */
     return FALSE;
 }
 
-gboolean is_first_question(struct question *q)
+GtkWidget*
+create_help_button (struct frontend_question_data *data)
+{
+  GtkWidget *button;
+
+  button = gtk_button_new_from_stock (GTK_STOCK_HELP);
+  g_signal_connect (G_OBJECT(button), "clicked",
+		    G_CALLBACK(show_description), data);
+
+  return button;
+}
+
+gboolean is_first_question (struct question *q)
 {
     struct question *crawl;
 
@@ -262,6 +292,30 @@ void button_single_callback(GtkWidget *button, struct frontend_question_data* da
     gtk_main_quit();
 }
 
+void check_toggled_callback (GtkWidget *toggle, gpointer data)
+{
+  struct question *q = (struct question*)data;
+  gboolean value;
+
+  value = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(toggle));
+  bool_setter (toggle, q);
+}
+
+void next_callback (GtkWidget *button, struct frontend_question_data *data)
+{
+    struct frontend *obj = data->obj;
+    struct question *q = data->q;
+    char *ret;
+    
+    ret = (char*) gtk_object_get_user_data(GTK_OBJECT(button));
+    question_setvalue(q, ret);
+    free(ret);
+
+    ((struct frontend_data*)obj->data)->button_val = DC_OK;;
+    
+    gtk_main_quit();
+}
+
 void boolean_single_callback(GtkWidget *button, struct frontend_question_data* data )
 {
     struct frontend *obj = data->obj;
@@ -376,72 +430,43 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
     }
 }
 
-static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
+static int 
+gtkhandler_boolean_single(struct frontend *obj, struct question *q, 
+			  GtkWidget *qbox)
 {
-    GtkWidget *frame, *yes_button, *no_button, *back_button, *button_box, *vbox, *description_label;
-    struct frontend_question_data *data;
-    const char *defval = question_getvalue(q, "");
-    int *ret_val;
+  GtkWidget *hbox;
+  GtkWidget *check_button;
+  GtkWidget *help_button;
+  struct frontend_question_data *data;
+  const char *defval = question_getvalue(q, "");
+  
+  data = NEW(struct frontend_question_data);
+  data->obj = obj;
+  data->q = q;
+  
+  hbox = gtk_hbox_new (FALSE, 5);
+  gtk_box_pack_start (GTK_BOX(qbox), hbox, TRUE, TRUE, 5);
 
-    data = NEW(struct frontend_question_data);
-    data->obj = obj;
-    data->q = q;
-	
-    yes_button = gtk_button_new_with_label(get_text(obj, "debconf/button-yes", "Yes"));
-    no_button = gtk_button_new_with_label(get_text(obj, "debconf/button-no", "No"));
-    back_button = gtk_button_new_with_label(get_text(obj, "debconf/button-goback", "Go Back"));
+  check_button = gtk_check_button_new_with_label (q_get_description (q));
+  g_signal_connect (G_OBJECT(check_button), "toggled",
+		    G_CALLBACK(check_toggled_callback),
+		    q);
+  gtk_box_pack_start (GTK_BOX(hbox), check_button, TRUE, TRUE, 5);
+  
+  help_button = create_help_button (data);
+  gtk_box_pack_start (GTK_BOX(hbox), help_button, FALSE, FALSE, 3);
 
-    ret_val = NEW(int);
-    *ret_val = DC_GOBACK;
-
-    gtk_object_set_user_data(GTK_OBJECT(back_button), ret_val);
-    gtk_object_set_user_data(GTK_OBJECT(yes_button), g_strdup("true"));
-    gtk_object_set_user_data(GTK_OBJECT(no_button), g_strdup("false"));
-
-    g_signal_connect (G_OBJECT (back_button), "clicked", G_CALLBACK (exit_button_callback), obj);
-    g_signal_connect (G_OBJECT (yes_button), "clicked", G_CALLBACK (boolean_single_callback), data);
-    g_signal_connect (G_OBJECT (no_button), "clicked", G_CALLBACK (boolean_single_callback), data);
-
-    if (obj->methods.can_go_back(obj, q) == FALSE)
-    {
-	gtk_widget_set_sensitive(back_button, FALSE);
-    }
-
-    button_box = gtk_hbutton_box_new();
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
-    gtk_box_pack_start(GTK_BOX(button_box), back_button, FALSE, FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(button_box), yes_button, FALSE, FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(button_box), no_button, FALSE, FALSE, 5);
-
-    description_label = gtk_label_new(q_get_extended_description(q));
-    gtk_misc_set_alignment(GTK_MISC (description_label), 0.0, 0.0);
-    gtk_label_set_line_wrap(GTK_LABEL (description_label), TRUE);
-
-    vbox = gtk_vbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), description_label, FALSE, FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(vbox), button_box, FALSE, FALSE, 5);
-
-    frame = gtk_frame_new(q_get_description(q));
-    gtk_container_add(GTK_CONTAINER (frame), vbox);
-
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
-
-    if (strcmp (defval, "true") == 0)
-    {
-	GTK_WIDGET_SET_FLAGS (yes_button, GTK_CAN_DEFAULT);
-	gtk_widget_grab_default(yes_button);
-	gtk_widget_grab_focus(yes_button);
-    }
-    else
-    {
-	GTK_WIDGET_SET_FLAGS (no_button, GTK_CAN_DEFAULT);
-	gtk_widget_grab_default(no_button);
-	gtk_widget_grab_focus(no_button);
-    }
-
-    gtk_label_set_text(GTK_LABEL(((struct frontend_data*) obj->data)->description_label), "");
-	
-    return DC_OK;
+  /* FIXME: sensitive to the druid button 
+     if (obj->methods.can_go_back(obj, q) == FALSE)
+     {
+     gtk_widget_set_sensitive(back_button, FALSE);
+     }
+  */
+  
+  if (strcmp (defval, "true") == 0)
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(check_button), TRUE);
+  
+  return DC_OK;
 }
 
 static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
@@ -779,33 +804,34 @@ void set_window_properties(GtkWidget *window)
 
 void set_design_elements(struct frontend *obj, GtkWidget *window)
 {
-    GtkWidget *mainbox, *targetbox, *description_area, *description_frame,
-        *description_scroll, *targetbox_scroll;
+    GtkWidget *mainbox;
+    GtkWidget *targetbox, *targetbox_scroll;
+    GtkWidget *actionbox;
+    GtkWidget *button_next, *button_prev;
 
-    description_area = gtk_label_new("");
-    gtk_misc_set_alignment(GTK_MISC (description_area), 0.0, 0.0);
-    gtk_label_set_line_wrap(GTK_LABEL (description_area), TRUE);
-
-    ((struct frontend_data*) obj->data)->description_label = description_area;
-    description_scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (description_scroll),
-                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (description_scroll), description_area);
-    gtk_widget_set_size_request (description_scroll, 600, 100);
-
-    description_frame = gtk_frame_new("Description");
-    gtk_container_add(GTK_CONTAINER (description_frame), description_scroll);
-	
-    mainbox = gtk_vbox_new(FALSE, 10);
-    gtk_container_set_border_width(GTK_CONTAINER(mainbox), 5);
-    gtk_box_pack_end(GTK_BOX (mainbox), description_frame, FALSE, FALSE, 5);
-    targetbox = gtk_vbox_new(FALSE, 10);
+    mainbox = gtk_vbox_new (FALSE, 10);
+    gtk_container_set_border_width (GTK_CONTAINER(mainbox), 5);
+    targetbox = gtk_vbox_new (FALSE, 10);
     ((struct frontend_data*) obj->data)->target_box = targetbox;
 
     targetbox_scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (targetbox_scroll), targetbox);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (targetbox_scroll),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+
+    actionbox = gtk_hbutton_box_new();
+    gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END); 
+    gtk_box_pack_end (GTK_BOX(mainbox), actionbox, FALSE, FALSE, 5);
+
+    button_prev = gtk_button_new_from_stock (GTK_STOCK_GO_BACK);
+    gtk_box_pack_start (GTK_BOX(actionbox), button_prev, TRUE, TRUE, 2);
+    button_next = gtk_button_new_from_stock (GTK_STOCK_GO_FORWARD);
+    /* the question is held by a gtk_main thing */
+    g_signal_connect (G_OBJECT(button_next), "clicked",
+		      G_CALLBACK(gtk_main_quit), NULL);
+    gtk_box_pack_start (GTK_BOX(actionbox), button_next, TRUE, TRUE, 2);
+    ((struct frontend_data*) obj->data)->button_prev = button_prev;
+    ((struct frontend_data*) obj->data)->button_next = button_next;
 
     gtk_box_pack_start(GTK_BOX (mainbox), targetbox_scroll, TRUE, TRUE, 5);
     gtk_container_add(GTK_CONTAINER(window), mainbox);
@@ -851,9 +877,11 @@ static int gtk_go(struct frontend *obj)
     gtk_box_pack_start(GTK_BOX (((struct frontend_data*)obj->data)->target_box),
                        questionbox, FALSE, FALSE, 5);
 
-    if (strcmp(q->template->type, "note") != 0 )
-        gtk_label_set_text(GTK_LABEL( ((struct frontend_data*)obj->data)->description_label), 
-                           q_get_extended_description(q)); 
+    /* FIXME: no more description frame
+       if (strcmp(q->template->type, "note") != 0 )
+       gtk_label_set_text(GTK_LABEL( ((struct frontend_data*)obj->data)->description_label), 
+       q_get_extended_description(q)); 
+    */
     while (q != 0)
     {
         for (i = 0; i < DIM(question_handlers); i++)
@@ -882,7 +910,10 @@ static int gtk_go(struct frontend *obj)
 	}
     }
     gtk_widget_destroy(questionbox);
-    gtk_label_set_text(GTK_LABEL( ((struct frontend_data*)obj->data)->description_label),""); 
+
+    /* FIXME
+      gtk_label_set_text(GTK_LABEL( ((struct frontend_data*)obj->data)->description_label),""); 
+    */
 
     return ((struct frontend_data*)obj->data)->button_val;
 }

@@ -22,12 +22,22 @@
 /* Use this struct to store data that shall live between the questions */
 struct frontend_data
 {
-    GtkWidget *window; //Main window of the frontend
-    GtkWidget *description_label; //Pointer to the Description Field
-    GtkWidget *target_box; //Pointer to the box, where question widgets shall be stored in
-    GtkWidget *progress_bar; //Pointer to the Progress Bar, when initialized
-    struct setter_struct *setters; //Struct to register the Set Functions of the Widgets
-    int button_val; //Value of the button pressed to leave a form
+  /* Main window of the frontend */
+  GtkWidget *window;
+  /* Pointer to the box, where question widgets shall be stored in */
+  GtkWidget *target_box; 
+
+  /* Buttons for the duid-like interface */
+  GtkWidget *button_next;
+  GtkWidget *button_prev;
+
+  /* Pointer to the Progress Bar, when initialized */
+  GtkWidget *progress_bar; 
+
+  /* Struct to register the Set Functions of the Widgets */
+  struct setter_struct *setters; 
+  /* Value of the button pressed to leave a form */
+  int button_val;
 };
 
 /* Embed frontend ans question in this object to pass it through an event handler */
