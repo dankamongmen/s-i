@@ -2,7 +2,7 @@
 DISK="$1"
 [ -z "$DISK" ] && exit 1
 
-case "`/bin/archdetect`" in
+case "`archdetect`" in
 "mips/r4k-ip22")
         # SGI dvh disklabels are best supported by fdisk.
         fdisk $DISK

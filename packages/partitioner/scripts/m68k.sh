@@ -2,7 +2,7 @@
 DISK="$1"
 [ -z "$DISK" ] && exit 1
 
-case "`/bin/archdetect`" in
+case "`archdetect`" in
 "m68k/amiga")
 	parted $DISK
 	;;
