@@ -6,7 +6,7 @@
 #export DH_VERBOSE=1
 
 
-PACKAGE=parted-tiny
+PACKAGE=partkit
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
@@ -47,7 +47,7 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	$(MAKE) install DESTDIR=`pwd`/debian/parted-tiny
+	$(MAKE) install DESTDIR=`pwd`/debian/partkit
 
 
 # Build architecture-independent files here.
@@ -55,12 +55,12 @@ binary-indep: build install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install parted-tiny
-parted-tiny:
+binary-arch: build install partkit
+partkit:
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
-#	cp debian/menutest debian/parted-tiny/DEBIAN/menutest	
+#	cp debian/menutest debian/partkit/DEBIAN/menutest	
 	dh_strip
 	dh_compress
 	dh_fixperms
@@ -72,4 +72,4 @@ parted-tiny:
 	dh_builddeb --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure parted-tiny
+.PHONY: build clean binary-indep binary-arch binary install configure partkit

@@ -416,6 +416,7 @@ main (int argc, char *argv[])
   client = debconfclient_new ();
   client->command (client, "title", "Partition Editor", NULL);
 
+
   if ((dev = ped_device_get (argv[1])) == NULL)
     partkit_error (1);
 
