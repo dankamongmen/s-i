@@ -34,10 +34,10 @@ for dev in $DEVICES/*; do
 		    db_subst partman-basicfilesystems/check_failed TYPE "$filesystem"
 		    db_subst partman-basicfilesystems/check_failed PARTITION "$num"
 		    db_subst partman-basicfilesystems/check_failed DEVICE $(humandev $(cat device))
-		    db_set partman-basicfilesystems/check_failed 'Return to the partitioning menu'
+		    db_set partman-basicfilesystems/check_failed 'true'
 		    db_input critical partman-basicfilesystems/check_failed || true
 		    db_go || true
-		    if [ "$RET" = 'Return to the partitioning menu' ]; then
+		    if [ "$RET" = 'true' ]; then
 			exit 1
 		    fi
 		fi
