@@ -383,7 +383,7 @@ DeviceStats* get_device_stats(PedDevice* dev)
     stats->has_extended = 0;
     
     stats->size = (PedSector) ((dev->length * dev->sector_size) / MEGABYTE);
-    disk = ped_disk_open(dev);
+    disk = ped_disk_new(dev);
     if (! disk)
     {
 	/* There's no partition table */
@@ -409,8 +409,7 @@ DeviceStats* get_device_stats(PedDevice* dev)
 	    stats->free_space += space;
 	    continue;
 	}
-	if (part->type == PED_PARTITION_PRIMARY ||
-	    part->type == PED_PARTITION_LOGICAL)
+	if (part->type == PED_PARTITION_LOGICAL)
 	{
 	    stats->nb_part++;
 	    fs_type = part->fs_type;
@@ -460,7 +459,7 @@ DeviceStats* get_device_stats(PedDevice* dev)
 	    }
 	}
     }
-    ped_disk_close(disk);
+    ped_disk_destroy(disk);
     return stats;
 }
 
@@ -471,12 +470,12 @@ DeviceStats* get_device_stats(PedDevice* dev)
 PedDisk* open_disk(PedDevice* dev)
 {
     PedDisk* disk;
-    disk = ped_disk_open(dev);
+    disk = ped_disk_new(dev);
 
     if (disk == NULL)
     {
 	/* Need to create a partition table */
-	disk = ped_disk_create(dev, ped_disk_type_get(DISK_LABEL));
+	disk = ped_disk_new_fresh(dev, ped_disk_type_get(DISK_LABEL));
     }
     return disk;
 }
@@ -496,8 +495,7 @@ int resize_fat_partitions(PedDisk *disk)
     for(part = ped_disk_next_partition(disk, NULL); part;
 	part = ped_disk_next_partition(disk, part))
     {
-	if (part->type != PED_PARTITION_PRIMARY &&
-	    part->type != PED_PARTITION_LOGICAL)
+	if (part->type != PED_PARTITION_LOGICAL)
 	    continue;
 
 	fs_type = (PedFileSystemType*) part->fs_type;
@@ -513,12 +511,15 @@ int resize_fat_partitions(PedDisk *disk)
 		continue;
 	    constraint = ped_file_system_get_resize_constraint(
 						(const PedFileSystem*) fs);
-
+		
+	    /* Well, we can use a timer feature of file_system_resize, but now
+	     * it's NULL
+	     */
 	    if ((! ped_disk_set_partition_geom(disk, part, constraint,
 		     part->geom.start, part->geom.start + 
 		     (PedSector)(constraint->min_size * MINSIZE_FACTOR)))
 	        ||
-		(! ped_file_system_resize(fs, &part->geom))
+		(! ped_file_system_resize(fs, &part->geom, NULL))
 	       )
 	    {
 		autopartkit_error(0, "Error while resizing a FAT partition.");
@@ -530,7 +531,7 @@ int resize_fat_partitions(PedDisk *disk)
 	    ped_partition_set_system (part, fs_type);	    
 	}
     }
-    ped_disk_write(disk);
+    ped_disk_commit(disk);
     return 1;
 }
 
@@ -576,7 +577,7 @@ void create_partitions(PedDisk *disk)
     autopartkit_log("Creating parts on disk having sectors %d - %d\n", 
 		    0, disk->dev->length);
     /* Create a big extended partition in where i'll put all other parts */
-    any = ped_constraint_any(disk);
+    any = ped_constraint_any(disk->dev);
     autopartkit_log("Trying to create extented part on %d - %d\n", 
 		    free->geom.start, free->geom.end);
     free = ped_partition_new(disk, PED_PARTITION_EXTENDED, NULL,
@@ -590,12 +591,12 @@ void create_partitions(PedDisk *disk)
     /* Create / */
     start = new->geom.start + 1;
     end = new->geom.start + 1 + (SIZE_ROOT * MEGABYTE) / disk->dev->sector_size;
-    any = ped_constraint_any(disk);
+    any = ped_constraint_any(disk->dev);
     autopartkit_log("Trying to create root (/) part on %d - %d\n", start, end);
     new = ped_partition_new(disk, PED_PARTITION_LOGICAL,
 			    fs_type_ext2, start, end);
     ped_disk_add_partition(disk, new, any);
-    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2));
+    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2, NULL));
     autopartkit_log("Created root (/) part on %d - %d\n", 
 		    new->geom.start, new->geom.end);
     ped_constraint_destroy(any);
@@ -604,12 +605,12 @@ void create_partitions(PedDisk *disk)
     /* Create swap */
     start = new->geom.end + 1;
     end = start + (SIZE_SWAP * MEGABYTE) / disk->dev->sector_size;
-    any = ped_constraint_any(disk);
+    any = ped_constraint_any(disk->dev);
     autopartkit_log("Trying to create swap part on %d - %d\n", start, end);
     new = ped_partition_new(disk, PED_PARTITION_LOGICAL,
 			    fs_type_swap, start, end);
     ped_disk_add_partition(disk, new, any);
-    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_swap));
+    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_swap, NULL));
     autopartkit_log("Created swap part on %d - %d\n", 
 		    new->geom.start, new->geom.end);
     ped_constraint_destroy(any);
@@ -618,12 +619,12 @@ void create_partitions(PedDisk *disk)
     /* Create /tmp */
     start = new->geom.end + 1;
     end = start + (SIZE_TEMP * MEGABYTE) / disk->dev->sector_size;
-    any = ped_constraint_any(disk);
+    any = ped_constraint_any(disk->dev);
     autopartkit_log("Trying to create /tmp part on %d - %d\n", start, end);
     new = ped_partition_new(disk, PED_PARTITION_LOGICAL,
 			    fs_type_ext2, start, end);
     ped_disk_add_partition(disk, new, any);
-    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2));
+    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2, NULL));
     autopartkit_log("Created /tmp part on %d - %d\n", 
 		    new->geom.start, new->geom.end);
     ped_constraint_destroy(any);
@@ -632,12 +633,12 @@ void create_partitions(PedDisk *disk)
     /* Create /var */
     start = new->geom.end + 1;
     end = start + (SIZE_VAR * MEGABYTE) / disk->dev->sector_size;
-    any = ped_constraint_any(disk);
+    any = ped_constraint_any(disk->dev);
     autopartkit_log("Trying to create /var part on %d - %d\n", start, end);
     new = ped_partition_new(disk, PED_PARTITION_LOGICAL,
 			    fs_type_ext2, start, end);
     ped_disk_add_partition(disk, new, any);
-    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2));
+    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2, NULL));
     autopartkit_log("Created /var part on %d - %d\n", 
 		    new->geom.start, new->geom.end);
     ped_constraint_destroy(any);
@@ -648,12 +649,12 @@ void create_partitions(PedDisk *disk)
     end = start + (MIN_SIZE_USR * MEGABYTE) / disk->dev->sector_size + 
 	  (PedSector)(0.20 * (free->geom.end -
 	  (start + (MIN_SIZE_USR * MEGABYTE) / disk->dev->sector_size)));
-    any = ped_constraint_any(disk);
+    any = ped_constraint_any(disk->dev);
     autopartkit_log("Trying to create /usr part on %d - %d\n", start, end);
     new = ped_partition_new(disk, PED_PARTITION_LOGICAL,
 			    fs_type_ext2, start, end);
     ped_disk_add_partition(disk, new, any);
-    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2));
+    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2, NULL));
     autopartkit_log("Created /usr part on %d - %d\n", 
 		    new->geom.start, new->geom.end);
     ped_constraint_destroy(any);
@@ -662,12 +663,12 @@ void create_partitions(PedDisk *disk)
     /* Create /home */
     start = new->geom.end + 1;
     end = free->geom.end;
-    any = ped_constraint_any(disk);
+    any = ped_constraint_any(disk->dev);
     autopartkit_log("Trying to create /home part on %d - %d\n", start, end);
     new = ped_partition_new(disk, PED_PARTITION_LOGICAL,
 			    fs_type_ext2, start, end);
     ped_disk_add_partition(disk, new, any);
-    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2));
+    ped_file_system_close(ped_file_system_create(&new->geom, fs_type_ext2, NULL));
     autopartkit_log("Created /home part on %d - %d\n", 
 		    new->geom.start, new->geom.end);
     ped_constraint_destroy(any);
@@ -675,12 +676,8 @@ void create_partitions(PedDisk *disk)
 
     /* Finish the work */
     disable_kmsg(1);
-    ped_disk_write(disk);
-    ped_disk_close(disk);
-    /* Close libparted, needs to do it here just to let the kernel
-     * know of the new partition table so that mounts call actually work
-     */
-    ped_done();
+    ped_disk_commit(disk);
+    ped_disk_destroy(disk);
     disable_kmsg(0);
 
     /* Mount partitions and write fstab */
@@ -771,7 +768,6 @@ int main (int argc, char *argv[])
 
     disable_kmsg(1);
     ped_exception_set_handler(exception_handler);
-    ped_init();
     disable_kmsg(0);
     /* Step 1 & 2 : discover & choose device */
     dev = choose_device();
@@ -827,10 +823,8 @@ int main (int argc, char *argv[])
     return 0;
     
 endclose:
-    ped_disk_close(disk);
+    ped_disk_destroy(disk);
 end:
-    ped_done();
-
     debconfclient_delete(client);
     return 1;
 }
