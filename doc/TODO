@@ -25,10 +25,7 @@ Still Todo:
 	  Makefile should not make any devices, for sure.
         - disk formatter
                 Formats disks, turns on swap, etc.
-	- debootstrap interface
-        - {lilo,grub} installer
 	- polish everything so it is actually usable
-	- i18n
 	- translations
 		(Waiting until there is i18n and final text to translate,
 		and until we have figured out where the translations go.)
@@ -38,11 +35,16 @@ Still Todo:
 
 Under development:
 
+        - {lilo,grub} installer [Moshe Zadka, Tollef Fog Heen]
+                moshez has a preliminary lilo-installer package in
+                tools/lilo-installer.  prebaseconfig installs grub at
+                the moment; that will be moved to a separate
+                grub-installer package.
         - disk selector, partitioner [Raphael Hertzog, Raphael Hertzog]
 		There are two of them, autopartkit and partkit.
 		Autopartkit is a bit more advanced ATM.
         - cdebconf [Randolph Chung]
-                In progress, has one working database backend and one
+                In progress, has two working database backends and one
 		working text-based frontend, with progress on a slang
 		frontend. Quite usable by now.
 	- dhcp [Matt Kraai]
@@ -52,15 +54,16 @@ Under development:
 		About 10% done realistically, but it does work.
         - choose-mirror [Joey Hess]
 		80% done
-        - base system installer [Anthony Towns]
-		debootstrap is stable, but needs to be integrated into d-i;
-		udebs are not available yet.
         - library reduction
-		mklibs.sh works, but it is not packaged. This is a pain in
-		the ass.
+		mklibs.sh works, and is packaged, but not integrated
+                into the build process yet.
         - install media build system [David Whedon]
 		We can build chrootable, library-reduced trees. It 
 		boots too (CHECK: does it still?). Dns does not work though.
+	- i18n [Tollef Fog Heen, probably more people needed]
+                Work in cdebconf, we need to make sure all templates
+                are in UTF8 and make the frontends handle UTF8 in a
+                sane way.
 
 More or less done, for now anyway:
 
@@ -86,7 +89,8 @@ More or less done, for now anyway:
 		Done.
 	- post-reboot configuration [Joey Hess]
 		base-cofig is stable, though stuff may need to be added to
-		it to handle things d-i doesn't bother with
+		it to handle things d-i doesn't bother with.  i18n is
+                needed.
         - ethdetect [David Whedon]
 		Working
         - netcfg [David Whedon]
@@ -94,3 +98,6 @@ More or less done, for now anyway:
 	- generate treecompare data for each daily build and put or mail it
 	  somewhere [Joey Hess]
 	  	http://people.debian.org/~joey/debian-installer/
+        - base system installer [Anthony Towns, Tollef Fog Heen]
+		debootstrap is stable, and has quite good support in
+                d-i. udebs are available, but might need a little more work.
