@@ -29,13 +29,10 @@ struct package_t *tree_find(char *packagename) {
 }
 
 /* 
- * Adds a package to the tree. Just feed in the package's name; the
- * struct to hold it is automatically created.
+ * Adds a package to the tree. Note that the structure is now created
+ * by e.g. di_pkg_parse.
  */
-struct package_t *tree_add(const char *packagename) {
-	struct package_t *pkg=malloc(sizeof(struct package_t));
-	memset(pkg, 0, sizeof(struct package_t));
-	pkg->package = strdup(packagename);
+struct package_t *tree_add(struct package_t *pkg) {
 	/* 
 	 * I should just be able to return tsearch's return code, but this
 	 * makes my code fail horribly later on. I think tsearch has

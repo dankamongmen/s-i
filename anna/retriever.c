@@ -98,8 +98,7 @@ int get_package (struct package_t *package, char *dest) {
 struct package_t *get_packages (void) {
 	char *retriever=chosen_retriever();
 	FILE *packages;
-	char buf[BUFSIZE];
-	struct package_t *p = NULL, *newp;
+	struct package_t *p = NULL, *newp, *plast;
 	static char tmp_packages[] = DOWNLOAD_DIR "/Packages";
         /* This is a workaround until d-i gets Release files, at which point
            we should parse them instead */
@@ -123,27 +122,20 @@ struct package_t *get_packages (void) {
                 }
                 packages=fopen(tmp_packages, "r");
                 free(command);
-                
-                while (fgets(buf, BUFSIZE, packages) && !feof(packages)) {
-                        buf[strlen(buf)-1] = 0;
-                        if (strstr(buf, "Package: ") == buf) {
-                                newp=(struct package_t *) malloc(sizeof(struct package_t));
-                                newp->next = p;
-                                p = newp;
-                                p->package = strdup(buf + 9);
-                        }
-                        else if (strstr(buf, "Installer-Menu-Item: ") == buf) {
-                                p->installer_menu_item = atoi(buf + 21);
-                        }
-                        else if (strstr(buf, "Filename: ") == buf) {
-                                p->filename = strdup(buf + 10);
-                        }
-                        else if (strstr(buf, "MD5sum: ") == buf) {
-                                p->md5sum = strdup(buf + 8);
-                        }
-                }
-                
+                newp = di_pkg_parse(packages);
+                fclose(packages);
                 unlink(tmp_packages);
+
+                if (newp != NULL) {
+                    if (p == NULL) {
+                        p = newp;
+                        plast = newp;
+                    } else
+                        plast->next = newp;
+                    while (plast->next != NULL)
+                        plast = plast->next;
+                }
+
                 suite = suites[++currsuite];
         }
 	return p;
