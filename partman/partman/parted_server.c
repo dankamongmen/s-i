@@ -1227,9 +1227,10 @@ command_set_flags()
                         break;
                 log("Processing flag %s", str);
                 flag = ped_partition_flag_get_by_name(str);
-                if (flag < first || flag > last)
-                        critical_error("No such a flag: %s", str);
-                states[flag - first] = true;
+                if (flag >= first && flag <= last) {
+                        log("The flag set true.");
+                        states[flag - first] = true;
+                }
                 free(str);
         }
         free(str);
@@ -1363,7 +1364,6 @@ command_change_file_system()
         scan_device_name();
         if (dev == NULL)
                 critical_error("The device %s is not opened.", device_name);
-        change_named(device_name);
         open_out();
         if (2 != iscanf("%as %as", &id, &s_fstype))
                 critical_error("Expected partition id and file system");
