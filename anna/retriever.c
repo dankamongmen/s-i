@@ -133,7 +133,7 @@ choose_retriever(void)
 		NULL);
 	debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "CHOICES",
 			ret_choices, NULL);
-	debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
+	debconf->command(debconf, "INPUT critical", ANNA_RETRIEVER, NULL);
 	debconf->command(debconf, "GO", NULL);
 
 	free(ret_choices);
