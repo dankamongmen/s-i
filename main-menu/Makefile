@@ -12,8 +12,9 @@ $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LIBS)
 
 demo: $(BIN)
-	debconf-loadtemplate debian/templates
+	ln -sf debian/templates main-menu.template
 	/usr/share/debconf/frontend ./$(BIN)
+	rm -f main-menu.template
 
 # Size optimized and stripped binary target.
 small: CFLAGS=-Os $(CFLAGS) -DSMALL
