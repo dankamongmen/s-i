@@ -78,6 +78,22 @@ db_get debian-installer/kernel/subarchitecture
 SUBARCH="$RET"
 info "subarchitecture: $SUBARCH"
 
+db_progress INFO vmelilo-installer/apt-install
+
+if ! apt-install vmelilo; then
+    info "Calling 'apt-install vmelilo' failed"
+    db_input critical vmelilo-installer/apt-install-failed || [ $? -eq 30 ]
+    if ! db_go; then
+	db_progress STOP
+	exit 10 # back up to menu
+    fi
+    db_get vmelilo-installer/apt-install-failed
+    if [ "$RET" != true ]; then
+	db_progress STOP
+	exit 1
+    fi
+fi
+
 db_progress STEP 1
 db_progress INFO vmelilo-installer/root
 
