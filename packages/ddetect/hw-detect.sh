@@ -419,6 +419,7 @@ IFS="$IFS_SAVE"
 # not ide but ide is still used.
 if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 	register-module ide-cd
+	register-module ide-disk
 	case "$(uname -r)" in
 	2.4*)
 		register-module ide-detect
@@ -427,7 +428,6 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 		register-module ide-generic
 	;;
 	esac
-	register-module ide-disk
 fi
 
 # always load sd_mod and sr_mod if a scsi controller module was loaded.
