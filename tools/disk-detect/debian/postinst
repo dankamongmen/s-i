@@ -8,7 +8,7 @@
 # unwillingness to run depmod in kernel-image's postinst.  See Debian
 # bug #136743
 
-depmod || true
+depmod -a || true
 
 log () {
     echo "$0: $@" >>/var/log/messages
@@ -71,12 +71,13 @@ do
         else
             while true
             do
-		db_fset disk-detect/not_included seen false || true
-		db_subst disk-detect/not_included vendor "$name" || true
-		db_subst disk-detect/not_included module $module || true
-		db_input critical disk-detect/not_included || true
+	        template=disk-detect/not_included
+		db_fset "$template" seen false || true
+		db_subst "$template" vendor "$name" || true
+		db_subst "$template" module $module || true
+		db_input critical "$template" || true
 		db_go || true
-		db_get disk-detect/not_included || true
+		db_get "$template" || true
                 mounted=0
                 if [ "$RET" != "true" ]
                 then
