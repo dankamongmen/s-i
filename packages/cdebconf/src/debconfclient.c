@@ -90,7 +90,7 @@ struct debconfclient *debconfclient_new(void)
 	if (getenv("DEBCONF_REDIR") == NULL)
 	{
 		dup2(1, 3);
-		dup2(2, 1);
+		dup2(DEBCONF_OLD_STDOUT_FD, 1);
 		setenv("DEBCONF_REDIR", "1", 1);
 	}
 
