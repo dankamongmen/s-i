@@ -34,7 +34,8 @@ build-udeb-stamp:
 	dh_testdir
 	[ -d $(udebbuild) ] || mkdir -p $(udebbuild)
 	(cd $(udebbuild); CFLAGS="-Os -fomit-frame-pointer" \
-		$(topdir)/configure --prefix=/usr --without-rpath \
+		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
+		--without-rpath \
 		--with-target=udeb --with-conffile=$(CONFFILE))
 	(cd $(udebbuild); $(MAKE) clean; $(MAKE))
 	touch $@
@@ -44,7 +45,8 @@ build-stamp:
 	dh_testdir
 	[ -d $(debbuild) ] || mkdir -p $(debbuild)
 	(cd $(debbuild); CFLAGS="-O2" \
-		$(topdir)/configure --prefix=/usr --without-rpath \
+		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
+		--without-rpath \
 		--with-conffile=$(CONFFILE))
 	(cd $(debbuild); $(MAKE) clean; $(MAKE))
 	touch $@
@@ -54,14 +56,18 @@ install-udeb: build-udeb
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-	(cd $(udebbuild); $(MAKE) install prefix=$(shell pwd)/debian/cdebconf-udeb/usr)
+	(cd $(udebbuild); \
+		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf-udeb/usr \
+		etcdir=$(shell pwd)/debian/cdebconf/etc )
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs 
-	(cd $(debbuild); $(MAKE) install prefix=$(shell pwd)/debian/cdebconf/usr)
+	(cd $(debbuild); \
+		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf/usr \
+		etcdir=$(shell pwd)/debian/cdebconf/etc )
 	dh_movefiles -pcdebconf-dev --sourcedir=debian/cdebconf \
 		usr/lib/*.so usr/include/cdebconf
 
