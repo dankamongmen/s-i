@@ -19,6 +19,11 @@ build-stamp:
 	dh_testdir
 	touch build-stamp
 
+build-locale:
+	mkdir -p debian/rootskel/usr/lib/locale
+	localedef -i "debian/C-at-utf-8.in" -f "UTF-8" \
+	  "debian/rootskel/usr/lib/locale/C@utf-8" 
+
 clean:
 	dh_testdir
 	dh_testroot
@@ -29,7 +34,7 @@ clean:
 # cvs update -P will remove these dirs if they are empty
 DIRS=dev proc var/log var/lib/apt-install mnt floppy usr/lib/prebaseconfig.d
 
-install: build
+install: build build-locale
 	dh_testdir
 	dh_testroot
 	mkdir -p debian/rootskel/

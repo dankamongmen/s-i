@@ -10,6 +10,12 @@ echo "\033[9;0]"
 
 /usr/bin/debconf-loadtemplate debian /var/lib/dpkg/info/*.templates 
 
+# Enable UTF-8 locale if it is available
+if [ -d /usr/lib/locale/C@utf-8 ] ; then
+	LANG=C@utf-8
+	export LANG
+fi
+
 # init will restart this script when it exits.  This will let us pick another
 # frontend every time main-menu exits
 if [ -z "$DEBIAN_FRONTEND" ] ; then
