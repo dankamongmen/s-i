@@ -1,0 +1,18 @@
+#!/bin/sh
+# The debian initrd does not currently support lvm root or boot.
+
+. /usr/share/debconf/confmodule
+
+for dir in $(find /var/lib/partman/devices/*mapper* -type d 2>/dev/null); do
+	if [ -d "$dir" ] && [ -e "$dir/mountpoint" ]; then
+		mpoint=$(cat "$dir/mountpoint")
+		if [ "$mpoint" = "/" ] || [ "$mpoint" = "/boot" ]; then
+			db_input critical partman-lvm/lvm_root_boot || true
+			db_go || exit 1
+			db_get partman-lvm/lvm_root_boot
+			if [ "$RET" = false ]; then
+				exit 1
+			fi
+		fi
+	fi
+done
