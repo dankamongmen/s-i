@@ -7,84 +7,119 @@ udebs, next translate the common udebs, and finally complete the rest
 of the udebs.  The second stage installer should also be translated,
 but it consists of normal deb-packages, and not udebs.
 
+Suggested translation order:
+
+-languagechooser
+-common udebs
+-supported architectures udebs
+-second stage
+-future architectures udebs
+
 You may send your translations as bug reports against the given
 packages.  The packages names are the last part of the lines below
 (for instance, "languagechooser" for tools/languagechooser).
-Some packages have different names which are given below.
+Some packages have different names which are mentioned when needed.
 
-You may also send the translations to the debian-boot mailing
-list.  Please use [INTL] [xx] in Subjects where xx is your language
-code (xx_yy for some languages such as brazilian portuguese).
+For bug reports, please use the "d-i" tag.
+
+You may also send the translations to the debian-boot mailing list.
+Please use [INTL] [xx] in Subjects where xx is your language code
+(xx_yy for some languages such as brazilian portuguese).
 
 If you have CVS write access, don't forget to update changelogs and
-remember: changelog files use UTF-8!!
+remember: changelog files use UTF-8!! The debian-installer CVS is hosted on
+alioth.debian.org ("debian-installer" and "base-config" projects).
 
 For getting up-to-date files for your language and know the
-translations status, use the following URL:
+translation status for the d-i core packages, use the following URL:
 http://people.debian.org/~barbier/d-i/l10n/
 
-Language choice
----------------
+If a translation team exists for your language, WORK WITH THEM. First
+check the debian-l10n-xxxxx mailing list where xxxxx is your language
+name in english (e.g. debian-l10n-polish, debian-l10n-portuguese...).
 
-tools/languagechooser
+For general translation issues or for finding other translators for
+your language, you may also use the debian-i18n mailing list (don't
+post translations there, however).
 
-Core udebs
-----------
+PACKAGES LIST
+-------------
 
-tools/cdebconf
-anna
-main-menu
-tools/kbd-chooser
-tools/base-installer
-tools/prebaseconfig
-utils (package: di-utils)
+ Language choice 
+ ---------------
 
-Common udebs
-------------
+ tools/languagechooser
 
-tools/ddetect
-tools/cdrom-detect
-retriever/cdrom (cdrom-retriever)
-retriever/floppy (floppy-retriever)
-tools/netcfg
-retriever/net (net-retriever)
-retriever/choose-mirror
-tools/cdrom-checker
-tools/grub-installer
-tools/lilo-installer
-tools/iso-scan
-tools/bugreporter-udeb
-tools/partitioner
-tools/partconf
-tools/baseconfig-udeb
-tools/lvmcfg
-tools/autopartkit
-tools/mips/arcboot-installer
-tools/yaboot-installer
+ Core udebs
+ ----------
 
-Second stage
-------------
+ tools/cdebconf
+ anna
+ main-menu
+ tools/kbd-chooser
+ tools/base-installer
+ tools/prebaseconfig
+ utils (package: di-utils)
 
-base-config
-passwd
-console-data
-discover
-tasksel
-aptitude
-dselect
-apt
-dpkg
-exim4-config
+ Common udebs
+ ------------
 
-Udebs for architecture which will be supported in the future
-------------------------------------------------------------
+ tools/ddetect
+ tools/cdrom-detect
+ retriever/cdrom (cdrom-retriever)
+ retriever/floppy (floppy-retriever)
+ tools/netcfg
+ retriever/net (net-retriever)
+ retriever/choose-mirror
+ tools/cdrom-checker
+ tools/iso-scan
+ tools/bugreporter-udeb
+ tools/partitioner
+ tools/partconf
+ tools/baseconfig-udeb
+ tools/lvmcfg
+ tools/autopartkit
 
-tools/aboot-installer
-tools/ia64/elilo-installer
-tools/hppa/palo-installer
-tools/sparc/silo-installer
-tools/s390/netdevice
-tools/s390/dasd
+ Architecture-dependent udebs
+ ----------------------------
+
+ 1) Already supported architectures
+
+  tools/grub-installer
+  tools/lilo-installer
+  tools/mips/arcboot-installer
+  tools/yaboot-installer
+
+ 2) Will be supported soon/in the future
+ ---------------------------------------
+
+  tools/aboot-installer
+  tools/ia64/elilo-installer
+  tools/hppa/palo-installer
+  tools/sparc/silo-installer
+  tools/s390/netdevice
+  tools/s390/dasd
+
+ Second stage
+ ------------
+
+ (some of these packages  do not only need debconf-type translation, but
+ also program translation)
+
+ Except for base-config, translations MUST be reported as wishlist bugs
+ against these packages.
+
+ base-config (debconf)
+ shadow (debconf+programs)
+ console-data (debconf)
+ discover (debconf)
+ tasksel (debconf)
+ aptitude (programs)
+ dselect (programs)
+ apt (programs)
+ dpkg (programs)
+ exim4-config (debconf)
+
 
 
 
@@ -93,4 +128,4 @@ are probably errors, and some packages we forgot.  Please add them if
 you discover such packages, and fix it if you find errors.
 
   Petter Reinholdtsen, 2003-11-08
-  Christian Perrier, 2003-12-20 (updated packages list)
+  Christian Perrier, 2003-12-20 (updated packages list and more information)
