@@ -61,11 +61,14 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	char buf[30];
 	int ans = -1;
 	int def = -1;
-	if (q->template->defaultval)
+	const char *defval;
+
+	defval = question_defaultval(q);
+	if (defval)
 	{
-		if (strcmp(q->template->defaultval, "true") == 0)
+		if (strcmp(defval, "true") == 0)
 			def = 1;
-		else if (strcmp(q->template->defaultval, "false") == 0)
+		else if (strcmp(defval, "false") == 0)
 			def = 0;
 	}
 
@@ -81,7 +84,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 			ans = 1;
 		else if (strcmp(buf, "no\n") == 0)
 			ans = 0;
-		else if (q->template->defaultval && strcmp(buf, "\n") == 0)
+		else if (defval && strcmp(buf, "\n") == 0)
 			ans = def;
 	} while (ans < 0);
 
@@ -98,7 +101,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	int i, j, count, dcount, choice;
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
-	dcount = strchoicesplit(q->template->defaultval, defaults, DIM(defaults));
+	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
 
 	if (dcount > 0)
 		for (i = 0; i < count; i++)
@@ -181,14 +184,15 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	char *choices[100] = {0};
 	char answer[10];
 	int i, count, choice = 1, def = -1;
+	const char *defval = question_defaultval(q);
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	if (count > 1)
 	{
-		if (q->template->defaultval != NULL)
+		if (defval != NULL)
 		{
 			for (i = 0; i < count; i++)
-				if (strcmp(choices[i], q->template->defaultval) == 0)
+				if (strcmp(choices[i], defval))
 					def = i + 1;
 		}
 
@@ -219,13 +223,14 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 static int texthandler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
-	if (q->template->defaultval)
-		printf("[%s]", q->template->defaultval);
+	const char *defval = question_defaultval(q);
+	if (defval)
+		printf("[%s]", defval);
 	printf("> "); fflush(stdout);
 	fgets(buf, sizeof(buf), stdin);
 	CHOMP(buf);
-	if (buf[0] == 0 && q->template->defaultval != 0)
-		question_setvalue(q, q->template->defaultval);
+	if (buf[0] == 0 && defval != 0)
+		question_setvalue(q, defval);
 	else
 		question_setvalue(q, buf);
 	return DC_OK;

@@ -46,5 +46,6 @@ void question_owner_delete(struct question *q, const char *owner);
 const char *question_description(struct question *q);
 const char *question_extended_description(struct question *q);
 const char *question_choices(struct question *q);
+const char *question_defaultval(struct question *q);
 
 #endif

@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.7 2000/12/13 04:47:11 tausq Exp $
+ * $Id: question.c,v 1.8 2000/12/17 06:16:05 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -71,8 +71,12 @@ void question_deref(struct question *q)
 
 void question_setvalue(struct question *q, const char *value)
 {
-	free(q->value);
-	q->value = STRDUP(value);
+	/* Be careful about the self-assignment case... */
+	if (q->value != value)
+	{
+		DELETE(q->value);
+		q->value = STRDUP(value);
+	}
 }
 
 void question_variable_add(struct question *q, const char *var, 	
@@ -83,7 +87,7 @@ void question_variable_add(struct question *q, const char *var,
 
 	INFO(INFO_DEBUG, "Adding [%s] -> [%s]\n", var, value);
 	for (; qvi != 0; qlast = &qvi->next, qvi = qvi->next)
-		if (strcmp(qvi->variable, var) == 0)
+		if (strcmp(qvi->variable, var) == 0 && qvi->value != value)
 		{
 			DELETE(qvi->value);
 			qvi->value = STRDUP(value);
@@ -204,4 +208,12 @@ const char *question_choices(struct question *q)
 	static char buf[4096] = {0};
 	question_expand_vars(q, q->template->choices, buf, sizeof(buf));
 	return buf;
+}
+
+const char *question_defaultval(struct question *q)
+{
+	if (q->value != 0 && *q->value != 0)
+		return q->value;
+	else
+		return q->template->defaultval;
 }
