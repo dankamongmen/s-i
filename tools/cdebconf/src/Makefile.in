@@ -2,14 +2,15 @@ include ../globalmakeflags
 
 SUBDIR=src
 
-MAJOR=1
-MINOR=2
+MAJOR=0
+MINOR=0
 MICRO=0
 LDFLAGS=-L. -ldebconf @RPATH@
-LIB=libdebconf.so
-LIBNAME_A=libdebconf.a
-LIBNAME=libdebconf.so.$(MAJOR).$(MINOR).$(MICRO)
-SONAME=libdebconf.so.$(MAJOR)
+LIBNAME=libdebconf.so
+CLILIB=libdebconfclient.so
+CLILIBNAME_A=libdebconfclient.a
+CLILIBNAME=$(CLILIB).$(MAJOR).$(MINOR).$(MICRO)
+CLISONAME=$(CLILIB).$(MAJOR)
 DEBCONF=debconf
 TOOLS=debconf-loadtemplate debconf-copydb debconf-communicate dpkg-reconfigure #dpkg-preconfigure
 BIN=$(DEBCONF) $(TOOLS)
@@ -18,26 +19,32 @@ LIBOBJS=commands.opic configuration.opic confmodule.opic debug.opic \
 	database.opic debconfclient.opic frontend.opic priority.opic \
 	strutl.opic question.opic template.opic rfc822.opic
 
-LIBOBJS_A=$(LIBOBJS:.opic=.o)
+CLILIBOBJS=debconfclient.opic
 
-all: $(BIN) $(LIB) $(SONAME) modules/Makefile
+CLILIBOBJS_A=$(CLILIBOBJS:.opic=.o)
+
+all: $(BIN) $(LIBNAME) $(CLILIBNAME) $(CLILIBNAME_A) modules/Makefile
 	@$(MAKE) -C modules $@
 
-$(BIN): $(LIB) $(LIBNAME_A) $(addsuffix .o,$(BIN))
+$(BIN): $(LIBNAME) $(addsuffix .o,$(BIN))
 	@for bin in $(BIN); do \
 		echo Compiling tool $$bin; \
-		$(CC) $(CFLAGS) -o $$bin $$bin.o $(LDFLAGS); \
+		$(CC) $(CFLAGS) -o $$bin $$bin.o -Wl,-rpath,${moddir} $(LDFLAGS); \
 	done
 
 $(LIBNAME): $(LIBOBJS)
-	@echo Creating shared library $@
-	@$(CC) $(CFLAGS) -shared -Wl,-soname,$(SONAME) -o $@ $^ -ldl
+	@echo Creating library $@
+	$(CC) $(CFLAGS) -shared -Wl -o $@ $^ -ldl
 
-$(LIBNAME_A): $(LIBOBJS_A)
+$(CLILIBNAME): $(CLILIBOBJS)
+	@echo Creating shared library $@
+	$(CC) $(CFLAGS) -shared -Wl,-soname,$(CLISONAME) -o $@ $^ -ldl
+
+$(CLILIBNAME_A): $(CLILIBOBJS_A)
 	$(AR) cr $@ $^
 	ranlib $@
 
-$(SONAME) $(LIB): $(LIBNAME)
+$(CLISONAME) $(CLILIB): $(CLILIBNAME)
 	-@ln -sf $^ $@
 
 install:
@@ -49,22 +56,23 @@ install:
 	install -d -m 755 ${sharedir}
 	install -m 755 debconf debconf-loadtemplate ${bindir}
 	install -m 755 dpkg-reconfigure ${sbindir}
-	install -m 644 $(LIBNAME) ${libdir}
-	ln -sf $(LIBNAME) ${libdir}/$(SONAME)
-	ln -sf $(LIBNAME) ${libdir}/$(LIB)
-	install -m 644 $(LIBNAME_A) ${libdir}
+	install -m 644 $(LIBNAME) ${moddir}
+	install -m 644 $(CLILIBNAME) ${libdir}
+	ln -sf $(CLILIBNAME) ${libdir}/$(CLISONAME)
+	ln -sf $(CLILIBNAME) ${libdir}/$(CLILIB)
+	install -m 644 $(CLILIBNAME_A) ${libdir}
 	install -m 644 cdebconf.conf-dist ${etcdir}/cdebconf.conf
 	install -m 644 ${srcdir}/src/client/confmodule ${sharedir}
 	ln -sf ../../bin/$(DEBCONF) ${sharedir}/frontend
 ifneq ($(TARGET),udeb)
 	install -m 755 debconf debconf-copydb ${bindir}
 	install -d -m 755 ${incdir}
-	install -m 644 ${srcdir}/src/*.h ${incdir}
+	install -m 644 ${srcdir}/src/debconfclient.h ${incdir}
 endif
 	@$(MAKE) -C modules $@
 
 clean:
-	-@rm -f $(BIN) $(LIB) $(LIBNAME) $(LIBNAME_A) $(SONAME) *~ *.o *.opic
+	-@rm -f $(BIN) $(LIBNAME) $(CLILIB) $(CLILIBNAME) $(CLILIBNAME_A) $(CLISONAME) *~ *.o *.opic
 	@$(MAKE) -C modules clean
 
 .PHONY: clean lib

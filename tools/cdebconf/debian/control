@@ -3,7 +3,7 @@ Section: utils
 Build-Depends: dpkg-dev (>= 1.7.0), debhelper (>= 4.1.13), slang1-utf8-dev | slang1-dev, libbogl-dev [!hurd-i386], libperl-dev, d-shlibs (>= 0.3), po-debconf (>= 0.5.0), libnewt-utf8-dev | libnewt-dev, libgtk2.0-dev
 Priority: optional
 Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
-Uploaders: Randolph Chung <tausq@debian.org>, Tollef Fog Heen <tfheen@debian.org>, Bastian Blank <waldi@debian.org>, Martin Sjogren <sjogren@debian.org>
+Uploaders: Martin Sjogren <sjogren@debian.org>
 Standards-Version: 3.5.6.1
 
 Package: cdebconf
@@ -20,12 +20,24 @@ Description: Debian Configuration Management System (C-implementation)
  Installing this package is rather dangerous now. It will break debconf.
  You have been warned!
 
-Package: libdebconf1-dev
+Package: libdebconfclient0
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}
+Description: Debian Configuration Management System (C-implementation)
+ Debconf is a configuration management system for Debian packages. It is
+ used by some packages to prompt you for information before they are
+ installed. This is a reimplementation of the original debconf version
+ in C.
+ .
+ This is the libraries needed by libdebconfclient-dev and cdebconf.
+
+Package: libdebconfclient0-dev
 Architecture: any
 Section: libdevel
-Depends: libdebconf1 (= ${Source-Version}), ${devlibs:Depends}
-Conflicts: libdebconf-dev, libcdebconf-dev, cdebconf-dev
-Provides: libdebconf-dev, libcdebconf-dev
+Depends: libdebconfclient0 (= ${Source-Version}), ${devlibs:Depends}
+Conflicts: libdebconfclient-dev, libdebconf-dev, libcdebconf-dev, cdebconf-dev
+Provides: libdebconfclient-dev
 Replaces: libdebconf-dev
 Description: Development files for cdebconf
  Debconf is a configuration management system for Debian packages. It is
@@ -39,7 +51,6 @@ Package: cdebconf-udeb
 Architecture: any
 Section: debian-installer
 Priority: standard
-Provides: libdebconf1
 Description: Debian Configuration Management System (C-implementation)
  Debconf is a configuration management system for Debian packages. It is
  used by some packages to prompt you for information before they are
@@ -48,6 +59,20 @@ Description: Debian Configuration Management System (C-implementation)
  .
  cdebconf-udeb is a minimal cdebconf package used by the 
  debian-installer
+
+Package: libdebconfclient0-udeb
+Architecture: any
+Section: debian-installer
+Priority: optional
+Depends: cdebconf-udeb
+Provides: libdebconfclient0
+Description: Debian Configuration Management System (C-implementation)
+ Debconf is a configuration management system for Debian packages. It is
+ used by some packages to prompt you for information before they are
+ installed. This is a reimplementation of the original debconf version
+ in C.
+ .
+ This is a udeb version of libdebconfclient0.
 
 Package: cdebconf-slang-udeb
 Architecture: any
@@ -88,15 +113,3 @@ Description: Gtk+ frontend for Debian Configuration Management System
  cdebconf-gtk-udeb is a minimal Gtk+ frontend cdebconf package used
  by the debian-installer.
                                                                             
-
-Package: libdebconf1
-Architecture: any
-Section: libs
-Depends: ${shlibs:Depends}
-Description: Debian Configuration Management System (C-implementation)
- Debconf is a configuration management system for Debian packages. It is
- used by some packages to prompt you for information before they are
- installed. This is a reimplementation of the original debconf version
- in C.
- .
- This is the libraries needed by libdebconf-dev and cdebconf.
