@@ -31,6 +31,7 @@ open (L, $iso3166tab) || die "$iso3166tab: $!";
 while (<L>) {
 	chomp;
 	my ($code, $country) = split(' ', $_, 2);
+	$country=~s/Å/A/g; # HACK!!
 	$code2country{$code}=$country;
 	$codes_listed{$code}=0;
 }
