@@ -211,45 +211,54 @@ static int question_db_unlock(struct question_db *db, const char *name)
 static int question_db_is_visible(struct question_db *db, const char *name,
 	const char *priority)
 {
-	struct question *q = 0, *q2 = 0;
+	struct question *q = 0, *qp = 0, *qs = 0;
 	struct configuration *config = db->config;
 	const char *wantprio = NULL;
 	const char *showold = NULL;
 	int ret = DC_YES;
 
-    /* priority can either come from the command line, environment
-     * or from debconf configuration
-     */
+	/* Always display error messages */
+	q = db->methods.get(db, name);
+	if (q != NULL && q->template != NULL && q->template->type != NULL && strcmp(q->template->type, "error") == 0)
+	{
+		question_deref(q);
+		return DC_YES;
+	}
+	/* priority can either come from the command line, environment
+	 * or from debconf configuration
+	 */
 	wantprio = config->get(config, "_cmdline::priority", NULL);
 
 	if (wantprio == NULL)
 		wantprio = getenv("DEBCONF_PRIORITY");
 
 	if (wantprio == NULL)
-		if ((q = db->methods.get(db, "debconf/priority")) != NULL)
-			wantprio = question_getvalue(q, NULL);	
+		if ((qp = db->methods.get(db, "debconf/priority")) != NULL)
+		{
+			wantprio = question_getvalue(qp, NULL);	
+			question_deref(qp);
+		}
 
 	/* error; no priority specified -- last resort fallback to medium */
 	if (wantprio == NULL || strlen(wantprio) == 0)
 		wantprio = "medium";
 
 	if (priority_compare(priority, wantprio) < 0)
-		ret = DC_NO;
-
-	if (q != NULL)
+	{
 		question_deref(q);
-
-	if (ret != DC_YES)
-        	return ret;
+        	return DC_NO;
+	}
 	
-	if ((q = db->methods.get(db, name)) != NULL &&
-	    (q->flags & DC_QFLAG_SEEN) != 0)
+	if (q != NULL && (q->flags & DC_QFLAG_SEEN) != 0)
 	{
 		ret = DC_NO;
 		showold = getenv("DEBCONF_SHOWOLD");
 		if (showold == NULL)
-			if ((q2 = db->methods.get(db, "debconf/showold")) != NULL)
-				showold = question_getvalue(q2, NULL);	
+			if ((qs = db->methods.get(db, "debconf/showold")) != NULL)
+			{
+				showold = question_getvalue(qs, NULL);	
+				question_deref(qs);
+			}
 		if (showold != NULL)
 		{
 			if (strcmp(showold, "true") == 0)
@@ -260,7 +269,6 @@ static int question_db_is_visible(struct question_db *db, const char *name,
 	}
 
 	question_deref(q);
-	question_deref(q2);
 	return ret;
 }
 
