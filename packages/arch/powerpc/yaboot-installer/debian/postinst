@@ -75,7 +75,7 @@ db_progress INFO yaboot-installer/part
 # not currently used, but will be later
 db_get debian-installer/kernel/subarchitecture
 SUBARCH="$RET"
-info "subarchitecture $SUBARCH"
+info "subarchitecture: $SUBARCH"
 
 # Telling parted to create an Apple_Bootstrap partition doesn't work as well
 # as we might like: parted's probe function isn't intelligent enough to know
@@ -374,7 +374,7 @@ db_progress STEP 1
 db_progress INFO yaboot-installer/ybin
 
 chroot /target mkofboot -v -f || \
-    die yaboot-installer/ybinerr 'mkofboot failed'
+    die yaboot-installer/ybinerr "mkofboot failed with exit status $?"
 
 # Done!
 
