@@ -129,6 +129,7 @@ db_progress step 1
 
 # Use a serial console if current default console is a serial port.
 # default console is last listed
+OLDIFS="$IFS"
 IFS=" "
 for arg in $(cat /proc/cmdline); do
   case "$arg" in
@@ -137,6 +138,7 @@ for arg in $(cat /proc/cmdline); do
     ;;
   esac
 done
+IFS="$OLDIFS"
 
 defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
 if echo "${defconsole}" | grep -q console=ttyS; then
@@ -155,6 +157,11 @@ fi
 
 db_progress info lilo-installer/progress_lilo_conf
 
+user_params=$(echo $(user-params)) || true
+if [ -n "$user_params" ]; then
+  APPEND="    append=\"$user_params\""
+fi
+
 #write out lilo.conf
 
 if [ "${SERIAL}" ]; then
@@ -164,7 +171,11 @@ else
 fi
 
 if [ "${SERIAL}" ]; then
-  SERIAL_CONSOLE_APPEND="	append=\"console=ttyS${SERIAL}\""
+  if [ -n "$user_params" ]; then
+    APPEND="	append=\"$user_params console=ttyS${SERIAL}\""
+  else
+    APPEND="	append=\"console=ttyS${SERIAL}\""
+  fi
 fi
 
 if [ -e "/target/initrd.img" ]; then
@@ -280,7 +291,7 @@ image=/vmlinuz
 	read-only
 #	restricted
 #	alias=1
-${SERIAL_CONSOLE_APPEND}
+${APPEND}
 ${INITRD}
 
 image=/vmlinuz.old
@@ -289,9 +300,9 @@ image=/vmlinuz.old
 	optional
 #	restricted
 #	alias=2
-${SERIAL_CONSOLE_APPEND}
+${APPEND}
 ${OLD_INITRD}
-	
+
 
 # If you have another OS on this machine to boot, you can uncomment the
 # following lines, changing the device name on the \`other' line to
@@ -304,7 +315,7 @@ ${OLD_INITRD}
 EOF
 
 # Add other OSes.
-probed="$(os-prober)"
+probed="$(os-prober)" || true
 count=2
 
 OLDIFS="$IFS"
