@@ -19,6 +19,11 @@ please direct them to the debian-boot mailing list
 (debian-boot@lists.debian.org) or ask on irc (#debian-boot on the
 freenode network).
 
+For better debugging handling, the installer is now configured to show
+much more questions than it will in the release version.  Presently
+the debconf priority is set to medium, for the release it will be high
+or critical which will resolve most steps automatically.
+
 
 2. Getting images
 
@@ -63,7 +68,12 @@ Some general remarks:
 The main-menu is not static. New entries are added when new installer
 modules are loaded. However main-menu tries to resolve the next best
 choice and presents that as default selection. If that selection does
-not suit your needs just select another entry.
+not suit your needs just select another entry. If you select an entry
+that requires the configuration of an entry you did not yet choose,
+the main-menu will try to resolve these dependencies automatically.
+This can be used to automate the install process. If you want to try
+that, use the menu item sequence of section 3.1 instead of the
+sequence described now.
 
 When main-menu first is shown, the default will be "Choose language".
 Hit return and choose your language from the list that now is
@@ -138,10 +148,11 @@ Next you will presented a list of all available kernel images on the
 CD. Select the most suitable for your system and wait until the
 installation has finished.
 
-Now we are almost done. Select "Install LILO on a hard disk" to make
-your harddisk bootable. You will be asked where LILO shall install the
-bootblock. A good idea is your first harddrive in your system which
-should be in fact the default selection.
+Now we are almost done. Select "Install LILO on a hard disk" or
+"Install GRUB on a hard disk" to make your harddisk bootable. You will
+be asked where LILO/GRUB shall install the bootblock. A good idea is
+your first harddrive in your system which should be in fact the
+default selection.
 
 If that last step has completed successfully select "Finish the
 installation and reboot", eject your CD and wait until your computer
@@ -150,6 +161,20 @@ wait until base-config is started.
 
 Stepping through base-config is not within the scope of this document
 as it is not part of debian-installer.
+
+
+3.1 More automatic install
+
+Now I will describe the steps you will have to do when you make use of
+main-menu's dependcy resolver. It will do some steps automatically.
+Select the steps in the order below and note the hints for the
+corresponding entries from the long description ins section 3.
+
+  1) "Choose language"
+  2) "Detect a keyboard and select layout"
+  3) "Load installer modules"
+  4) -> Partition your harddrives with one of the methods in section 3
+  5) "Finish the installation and reboot"
 
 
 4. Installation Report
@@ -184,6 +209,4 @@ The Debian-Installer Team always welcomes people who would like to
 work on the installer. We have plenty of work to do: fixing bugs,
 improve usability, create new modules and of course extensive
 testing. If you are interested to help, check out this page:
-http://people.debian.org/~pere/debian-installer/ 
-
-
+http://people.debian.org/~pere/debian-installer/
