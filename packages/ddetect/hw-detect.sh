@@ -211,6 +211,21 @@ if [ -f /etc/pcmcia/cb_mod_queue ]; then
 	fi
 fi
 
+# Load yenta_socket on 2.6 kernels, if hardware is available, so that
+# discover will see Cardbus cards.
+if [ -d /sys/bus/pci/devices ] && grep -q 0x060700 \
+	/sys/bus/pci/devices/*/class && \
+	! lsmod | grep -q ^yenta_socket; then
+	db_subst hw-detect/load_progress_step CARDNAME "Cardbus bridge"
+	db_subst hw-detect/load_progress_step MODULE "yenta_socket"
+	db_progress INFO hw-detect/load_progress_step
+	
+	log "Detected Cardbus bridge, loading yenta_socket"
+	modprobe -v yenta_socket | logger -t hw-detect
+	# Ugly hack, but what's the alternative?
+	sleep 3
+fi
+
 log "Detecting hardware..."
 db_progress INFO hw-detect/detect_progress_step
 ALL_HW_INFO=$(get_detected_hw_info; get_manual_hw_info)
