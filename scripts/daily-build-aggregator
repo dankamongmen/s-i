@@ -120,6 +120,14 @@ my @buildlist = (
 		logext => ".log",
 	},
 
+	{
+		url => 'http://cdimage.debian.org/pub/cdimage-testing/',
+		logurl => '/org/cdimage.debian.org/setup/log/',
+		email => 'manty@debian.org',
+		description => 'CD image builds',
+		logext => "",
+	},
+
 #	{
 #		url => 'http://somehost/',
 #		email => 'you@debian.org',
@@ -142,8 +150,13 @@ EOS
 foreach my $build (@buildlist) {
 	print "<li><a href=\"".$build->{url}."\">".$build->{description}."</a><br>\n";
 	my $logurl=$build->{logurl}."overview".$build->{logext}."\n";
-	if (! open (LOG, "wget --quiet -O - $logurl |")) {
-		print "<b>wget error</b>\n";
+	if ($logurl=~m#.*://#) {
+		if (! open (LOG, "wget --quiet -O - $logurl |")) {
+			print "<b>wget error</b>\n";
+		}
+	}
+	else {
+		open (LOG, $logurl) || print "<b>cannot open $logurl</b>\n";
 	}
 	my @lines=<LOG>;
 	if (! close LOG) {
