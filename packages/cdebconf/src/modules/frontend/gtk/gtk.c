@@ -545,6 +545,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
     gtk_entry_set_visibility (GTK_ENTRY (entry), FALSE);
+    gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
     frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), entry);	
 
@@ -695,6 +696,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     if (defval)
 	gtk_entry_set_text (GTK_ENTRY(entry), defval);
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
+    gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
     frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), entry);	
 
@@ -803,6 +805,8 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     g_signal_connect (G_OBJECT(button_next), "clicked",
                       G_CALLBACK(exit_button_callback), obj);
     gtk_box_pack_start (GTK_BOX(actionbox), button_next, TRUE, TRUE, 2);
+    GTK_WIDGET_SET_FLAGS (button_next, GTK_CAN_DEFAULT);
+
     ((struct frontend_data*) obj->data)->button_prev = button_prev;
     ((struct frontend_data*) obj->data)->button_next = button_next;
 
@@ -872,6 +876,7 @@ static int gtk_go(struct frontend *obj)
     q = obj->questions;
     gtk_window_set_title(GTK_WINDOW(data->window), obj->title);
     gtk_widget_set_sensitive (data->button_prev, obj->methods.can_go_back(obj, q));
+    gtk_widget_grab_default(data->button_next);
     gtk_widget_show_all(data->window);
     gtk_main();
     if (data->button_val == DC_OK) 
