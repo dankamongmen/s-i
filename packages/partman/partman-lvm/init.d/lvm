@@ -47,10 +47,25 @@ for dev in /var/lib/partman/devices/*; do
     done
 
     if [ -f device ]; then
-	if
-	    echo $vgroups \
-		| grep -- $(sed 's,^/[^/]*/\([^/]*\)/.*,\1,' device) >/dev/null
-	then
+	# Obtain the VG from the device name
+	device=`cat device`
+	case "$device" in
+	    # LVM2
+	    /dev/mapper/*)
+		vglv=${device#/dev/mapper/}
+		vglv=`echo "$vglv" | sed -e 's/\([^-]\)-\([^-]\)/\1 \2/' | sed -e 's/--/-/g'`
+		vg=`echo "$vglv" | cut -d" " -f1`
+		;;
+	    # LVM1
+	    *)
+		vg=$(sed 's,^/[^/]*/\([^/]*\)/.*,\1,' device)
+		;;
+	esac
+	is_vg=no
+	for vgs in $vgroups; do
+		[ "$vgs" = "$vg" ] && is_vg=yes
+	done
+	if [ "$is_vg" = "yes" ] ; then
 	    # this is an activated logical volume
 	    # lets create label on it
 	    open_dialog NEW_LABEL loop
