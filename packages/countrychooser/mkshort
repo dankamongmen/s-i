@@ -20,9 +20,9 @@ for file in debian/po/*.po en.po; do
   outfile=debian/short-tmp/$lang_variant.short
   lastlocale=C
   :> $outfile
-  for locale in $(grep -e "^$lang" $SUPPORTED | sed -e 's/[@. ].*//' | sort | uniq); do
+  for locale in $( (grep -e "^$lang" $SUPPORTED || true) | sed -e 's/[@. ].*//' | sort | uniq); do
       code=`echo "$locale" | sed -e 's/.*_//'`
-      line=`grep -e "^$code" $ISO3166TAB` || true
+      line=$(grep -e "^$code" $ISO3166TAB || true)
       lastlocale=$locale
       if [ "$line" ]; then
          OLD_IFS="$IFS"
@@ -30,7 +30,7 @@ for file in debian/po/*.po en.po; do
 	 set $line
 	 IFS="$OLD_IFS"
 	 if [ "$2" ]; then
-	   translation=$(grep "^$2	" $tabfile| sed -e 's/^.*	//')
+	   translation=$( (grep "^$2	" $tabfile || true) | sed -e 's/^.*	//')
 	   if [ "$translation" ]; then
 	      echo "$1	$translation" >> $outfile
 	   else
