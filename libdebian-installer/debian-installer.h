@@ -11,6 +11,7 @@
 #define MAXLINE 512
 
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
+#define PROVIDESMAX     16      /* maximum number of provides we can handle */
 typedef enum { unpacked, installed, half_configured, other } package_status;
 
 struct language_description
@@ -28,7 +29,7 @@ struct package_t {
         int installer_menu_item;
         char *description; /* short only, and only for menu items */
         char *depends[DEPENDSMAX];
-        char *provides;
+        char *provides[PROVIDESMAX];
         package_status status;
         int processed;
         struct language_description *localized_descriptions;

@@ -1,4 +1,4 @@
-MAJOR=1
+MAJOR=2
 MINOR=0
 MICRO=0
 LIB=libdebian-installer.so
@@ -9,7 +9,6 @@ LIBS=$(LIB) $(SONAME) $(LIBNAME) $(LIBNAME_A)
 
 
 OBJS=di_prebaseconfig_append.o di_execlog.o di_log.o di_check_dir.o di_snprintfcat.o di_stristr.o di_pkg_parse.o
-PIC_LIB=libdebian-installer_pic.a
 
 
 PREFIX=$(DESTDIR)/usr/
@@ -28,10 +27,7 @@ INSTALL=install
 STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 
-all: $(LIBS) $(PIC_LIB)
-
-$(PIC_LIB): $(OBJS)
-	ar cqv $(PIC_LIB) $(OBJS)
+all: $(LIBS)
 
 DEFS=$(addprefix -DL__, $(subst .o,__,$(OBJS)))
 
@@ -57,7 +53,6 @@ install:
 	install -m 755 $(LIBNAME_A) ${libdir}
 	ln -sf $(LIBNAME) ${libdir}/$(SONAME)
 	ln -sf $(LIBNAME) ${libdir}/$(LIB)
-	install -m 755 $(PIC_LIB) ${libdir}
 	install -m 644 debian-installer.h ${incdir}
 
 

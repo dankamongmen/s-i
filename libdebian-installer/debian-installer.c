@@ -282,7 +282,26 @@ di_pkg_parse(FILE *f)
         }
         else if (di_stristr(buf, "Provides: ") == buf)
         {
-            p->provides = strdup(strchr(buf, ' ') + 1);
+            b = strdup(strchr(buf, ' ') + 1);
+            i = 0;
+            while (*b != 0 && *b != '\n')
+            {
+                if (*b != ' ')
+                {
+                    if (*b == ',')
+                    {
+                        *b = 0;
+                        p->provides[++i] = 0;
+                    }
+                    else if (p->provides[i] == 0)
+                        p->provides[i] = b;
+                }
+                else
+                    *b = 0; /* eat the space... */
+                b++;
+            }
+            *b = 0;
+            p->provides[i+1] = 0;
         }
     }
 
