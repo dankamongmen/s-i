@@ -21,7 +21,7 @@ static struct dasd
 {
 	unsigned int device;
 	unsigned int devtype;
-	enum { UNKNOWN, NEW, UNFORMATED, FORMATED, READY } state;
+	enum { UNKNOWN, NEW, UNFORMATTED, FORMATTED, READY } state;
 }
 *dasds, *dasd_current;
 
@@ -59,9 +59,9 @@ static bool update_state (void)
 				if (!strncmp (buf + 40, "active", 6))
 				{
 					if (!strncmp (buf + 47, "n/f", 3))
-						dasds[i].state = UNFORMATED;
+						dasds[i].state = UNFORMATTED;
 					else
-						dasds[i].state = FORMATED;
+						dasds[i].state = FORMATTED;
 				}
 				else if (!strncmp (buf + 40, "ready", 5))
 					dasds[i].state = READY;
@@ -157,11 +157,11 @@ static enum state_wanted get_channel (void)
 				case NEW:
 					ptr = "(new)";
 					break;
-				case UNFORMATED:
-					ptr = "(unformated)";
+				case UNFORMATTED:
+					ptr = "(unformatted)";
 					break;
-				case FORMATED:
-					ptr = "(formated)";
+				case FORMATTED:
+					ptr = "(formatted)";
 					break;
 				case READY:
 					ptr = "(ready)";
@@ -211,13 +211,13 @@ static enum state_wanted confirm (void)
 
 	switch (dasd_current->state)
 	{
-		case UNFORMATED:
+		case UNFORMATTED:
 		case READY:
 			debconf_subst (client, "debian-install/s390/dasd/format", "device", buf);
 			debconf_set (client, "debian-install/s390/dasd/format", "true");
 			ret = my_debconf_input ("medium", "debian-install/s390/dasd/format", &ptr);
 			break;
-		case FORMATED:
+		case FORMATTED:
 			debconf_subst (client, "debian-install/s390/dasd/format_unclean", "device", buf);
 			debconf_set (client, "debian-install/s390/dasd/format_unclean", "false");
 			ret = my_debconf_input ("critical", "debian-install/s390/dasd/format_unclean", &ptr);
