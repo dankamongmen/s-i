@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.44 2004/02/05 20:32:06 barbier Exp $
+ * $Id: kbd-chooser.c,v 1.45 2004/03/13 09:04:47 mckinstry Exp $
  */
 
 #include "config.h"
@@ -624,7 +624,7 @@ keyboard_select (void)
 			      preferred ? preferred->description : none);
 	if (none)
 		free(none);
-	return (preferred->present == TRUE) ? "low" : "medium";
+	return  (preferred && (preferred->present == TRUE)) ? "low" : "medium";
 }
 
 /**
