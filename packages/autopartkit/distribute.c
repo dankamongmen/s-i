@@ -1,4 +1,4 @@
-/* 
+/*
 
    distribute.c - Part of autopartkit, a module to partition devices
                   for debian-installer.
@@ -6,17 +6,17 @@
    Author - Petter Reinholdtsen
 
    Copyright (C) 2002  Petter Reinholdtsen <pere@hungry.com>
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -70,7 +70,7 @@
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
-/* 
+/*
  * Find and return the first disk with size amount of free space.
  */
 static struct disk_info_t *
@@ -149,7 +149,7 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	        continue; /* Ignore zero-size partitions */
 	    if (reqs[j].curdisk == &diskinfo[i])
 	    {
-	        int64_t span;
+  	        int64_t span;
 		if ((PedSector)-1 == reqs[j].max_blk)
 		    reqs[j].max_blk = maxmax_blk;
 		span = reqs[j].max_blk - reqs[j].min_blk;
@@ -168,11 +168,11 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	    if (reqs[j].curdisk == &diskinfo[i])
 	    {
 		PedSector newsize;
+		/* These calculations can overflow if the numbers are
+		   too big. */
 		newsize = reqs[j].max_blk - reqs[j].min_blk;
-		if (newsize) /* Only resize if min < max */
-		{
-		    /* These calculations can overflow if the numbers
-		       are too big. */
+		if (newsize)
+		{ /* No need to resize if min == max */
 		    newsize *= diskinfo[i].freespace;
 		    assert(total_wanted);
 		    newsize /= total_wanted;
@@ -271,7 +271,7 @@ get_free_space_list(void)
 	    autopartkit_log( 2,
 			     "    part: %d, type: %d size: (%lld-%lld) %lld\n",
 			     part->num, part->type,
-			     part->geom.start,part->geom.end, 
+			     part->geom.start,part->geom.end,
 			     part->geom.length);
 
 	    if ((part->type & PED_PARTITION_FREESPACE) ==
@@ -306,7 +306,7 @@ get_free_space_list(void)
 
 /* andread@linpro.no */
 void
-reduce_disk_usage_size(struct disk_info_t *vg, 
+reduce_disk_usage_size(struct disk_info_t *vg,
                      struct diskspace_req_s reqs[],
                      double percent){
     /* Reduce free vg space to sum(min values) + percent of free space */
