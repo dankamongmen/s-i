@@ -379,7 +379,7 @@ int do_menu_item(struct package_t *p) {
 
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
-		asprintf(&configcommand, "dpkg-reconfigure %s", p->package);
+		asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package);
 		ret = SYSTEM(configcommand);
 		free(configcommand);
 		return !ret;
