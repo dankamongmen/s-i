@@ -6,67 +6,117 @@ logfile=/var/log/messages
 
 localecode="debian-installer/locale"
 languagecode="debian-installer/language"
-languagenamecode="debian-installer/language-name"
 countrycode="debian-installer/country"
-countrynamecode="debian-installer/country-name"
 
 log() {
-  echo "languagechooser: info: $*" >> $logfile
+    echo "languagechooser: info: $*" >> $logfile
 }
 
 db_capb backup
 
+db_metaget "languagechooser/language-first" choices
+db_subst "languagechooser/language-addtolist" list "$RET"
+
 STATE=1
 
 while [ "$STATE" -gt 0 ]; do
-case "$STATE" in
-  1)
-    db_fset "$languagenamecode" seen false
-    db_fset "$languagecode" seen false
-    db_input critical "$languagenamecode" || [ $? -eq 30 ]
-    if db_go; then
-        db_get "$languagenamecode"
-        language=`echo $RET | sed -e 's/ .*//'`
-        db_set "$languagecode" "$language"
-        STATE=$(($STATE + 1))
-    else
-        STATE=$(($STATE - 1))
-    fi
-    ;;
+    #   States 1 and 2 depend on $languagecode current value
+    db_get "$languagecode"
+    language="$RET"
+    case "${language}=$STATE" in
+      =[12])
+        STATE=1 ;;
+      *=[12])
+        STATE=2 ;;
+    esac
 
-  2)
-    db_fset "$countrynamecode" seen false
-    db_fset "$countrycode" seen false
-    db_input critical "$countrynamecode" || [ $? -eq 30 ]
-    if db_go; then
-        db_get "$countrynamecode"
-        if [ "$RET" != "Other" ]; then
-            country=`echo $RET | sed -e 's/ .*//'`
-            db_set "$countrycode" "$country"
+    case "$STATE" in
+      1)
+        db_fset "languagechooser/language-first" seen false
+        db_fset "$languagecode" seen false
+        db_input critical "languagechooser/language-first" || [ $? -eq 30 ]
+        if db_go; then
+            db_get "languagechooser/language-first"
+            language=`echo $RET | sed -e 's/ .*//'`
+            db_set "$languagecode" "$language"
+            db_fset "$languagecode" seen true
         else
-            country=unknown
+            STATE=$(($STATE - 1))
         fi
-        STATE=$(($STATE + 1))
-    else
-        STATE=$(($STATE - 1))
-    fi
-    ;;
+        ;;
 
-  3)
-    db_fset "$localecode" seen false
-    db_input critical "$localecode" || [ $? -eq 30 ]
-    if db_go; then
-        db_get "$localecode"
-        locale="$RET"
-        STATE=$(($STATE + 1))
-    else
-        STATE=$(($STATE - 1))
-    fi
-    ;;
-  *)
-    STATE=-1
-    ;;
-esac
+      2)
+        db_reset "languagechooser/language-addtolist"
+        db_subst "languagechooser/language-addtolist" LANGUAGE "$language"
+        db_input critical "languagechooser/language-addtolist" || [ $? -eq 30 ]
+        if db_go; then
+            db_get "languagechooser/language-addtolist"
+            case $RET in
+              Finish)
+                STATE=$(($STATE + 1))
+                ;;
+              Reset)
+                db_reset "$languagecode"
+                ;;
+              "Remove last entry")
+                language=`echo ":$language" | sed -e 's/:[^:]*$//' -e 's/^://'`
+                if [ -n "$language" ]; then
+                    db_set "$languagecode" "$language"
+                else
+                    db_reset "$languagecode"
+                fi
+                ;;
+              *)
+                language="${language}:"`echo $RET | sed -e 's/ .*//'`
+                db_set "$languagecode" "$language"
+                ;;
+            esac
+        else
+            STATE=99
+        fi
+        ;;
+
+      3)
+        db_fset "languagechooser/country-name" seen false
+        db_fset "$countrycode" seen false
+        db_input critical "languagechooser/country-name" || [ $? -eq 30 ]
+        if db_go; then
+            db_get "languagechooser/country-name"
+            if [ "$RET" != "Other" ]; then
+                country=`echo $RET | sed -e 's/ .*//'`
+                db_set "$countrycode" "$country"
+            else
+                country=unknown
+            fi
+            STATE=$(($STATE + 1))
+        else
+            STATE=$(($STATE - 1))
+        fi
+        ;;
+
+      4)
+        db_fset "$localecode" seen false
+        db_input critical "$localecode" || [ $? -eq 30 ]
+        if db_go; then
+            db_get "$localecode"
+            locale="$RET"
+            STATE=$(($STATE + 1))
+        else
+            STATE=$(($STATE - 1))
+        fi
+        ;;
+
+      99)
+        db_fset "languagechooser/no-backup" seen false
+        db_input critical "languagechooser/no-backup"
+        db_go
+        STATE=1
+        ;;
+
+      *)
+        STATE=-1
+        ;;
+    esac
 done
 
 [ $STATE = -1 ] || exit 0
