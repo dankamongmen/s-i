@@ -13,6 +13,7 @@ fi
 NEWLINE="
 "
 MISSING_MODULES_LIST=""
+SUBARCH="$(archdetect)"
 
 # This is a hack, but we don't have a better idea right now.
 # See Debian bug #136743
@@ -165,19 +166,35 @@ get_detected_hw_info() {
 		fi
 	fi
 }
-   
+
+# NewWorld PowerMacs don't want floppy or ide-floppy, and on some models
+# (e.g. G5s) the kernel hangs when loading the module.
+get_floppy_info() {
+	case $SUBARCH in
+		powerpc/powermac_newworld) ;;
+		*) echo "floppy:Linux Floppy" ;;
+	esac
+}
+
+get_ide_floppy_info() {
+	case $SUBARCH in
+		powerpc/powermac_newworld) ;;
+		*) echo "ide-floppy:Linux IDE floppy" ;;
+	esac
+}
+
 # Manually load modules to enable things we can't detect.
 # XXX: This isn't the best way to do this; we should autodetect.
 # The order of these modules are important.
 get_manual_hw_info() {
-	echo "floppy:Linux Floppy"
+	get_floppy_info
 	# ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
 	echo "ide-mod:Linux IDE driver"
 	echo "ide-probe-mod:Linux IDE probe driver"
 	get_ide_chipset_info
 	echo "ide-detect:Linux IDE detection" # 2.4.x > 20
 	echo "ide-generic:Linux IDE support" # 2.6
-	echo "ide-floppy:Linux IDE floppy"
+	get_ide_floppy_info
 	echo "ide-disk:Linux ATA DISK"
 	echo "ide-cd:Linux ATAPI CD-ROM"
 	echo "isofs:Linux ISO 9660 filesystem"
