@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.61 2004/03/09 12:56:50 waldi Exp $
+ * $Id: text.c,v 1.62 2004/03/09 22:08:49 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -156,9 +156,20 @@ static void text_handler_displaydesc(struct frontend *obj, struct question *q)
 {
 	char *descr = q_get_description(q);
 	char *ext_descr = q_get_extended_description(q);
-	if (*ext_descr)
-		wrap_print(ext_descr);
-	wrap_print(descr);
+	if (strcmp(q->template->type, "note") == 0 ||
+	    strcmp(q->template->type, "error") == 0)
+	{
+		wrap_print(descr);
+		printf("\n");
+		if (*ext_descr)
+			wrap_print(ext_descr);
+	}
+	else
+	{
+		if (*ext_descr)
+			wrap_print(ext_descr);
+		wrap_print(descr);
+	}
 	free(descr);
 	free(ext_descr);
 }
@@ -196,10 +207,10 @@ static void show_help (struct frontend *obj, struct question *q)
 	}
 	else if (strcmp(q->template->type, "select") == 0 ||
 	    strcmp(q->template->type, "multiselect") == 0) {
-		/* n for next page */
-		printf("\n  %c  ", *(get_text(obj,"debconf/next-key", "N")));
+		/* Move Forward */
+		printf("\n  %c  ", *(get_text(obj,"debconf/next-key", "F")));
 		printf("%s", get_text(obj, "debconf/text-help-next", "Display next page"));
-		/* b to back up */
+		/* Move Backward */
 		printf("\n  %c  ", *(get_text(obj,"debconf/prev-key", "B")));
 		printf("%s", get_text(obj, "debconf/text-help-prev", "Display previous page"));
 	}
@@ -340,13 +351,13 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 		/* q to quit select */
 		else if (answer[0] == *(get_text(obj,"debconf/quit-key", "Q")))
 			break;
-		/* n for next page */
-		else if (answer[0] == *(get_text(obj,"debconf/next-key", "N"))) {
+		/* Move Forward */
+		else if (answer[0] == *(get_text(obj,"debconf/next-key", "F"))) {
 			if (i == count)
 				i -= getheight()-1;
 			continue;
 		}
-		/* b to back up */
+		/* Move Backward */
 		else if (answer[0] == *(get_text(obj,"debconf/prev-key", "B"))) {
 			i -= 2*(getheight()-1);
 			continue;
@@ -461,13 +472,13 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 		if (obj->methods.can_go_back (obj, q) &&
 		         answer[0] == CHAR_GOBACK && answer[1] == 0)
 			return DC_GOBACK;
-		/* n for next page */
-		else if (answer[0] == *(get_text(obj,"debconf/next-key", "N"))) {
+		/* Move Forward */
+		else if (answer[0] == *(get_text(obj,"debconf/next-key", "F"))) {
 			if (i == count)
 				i -= getheight()-1;
 			continue;
 		}
-		/* b to back up */
+		/* Move Backward */
 		else if (answer[0] == *(get_text(obj,"debconf/prev-key", "B"))) {
 			i -= 2*(getheight()-1);
 			continue;
