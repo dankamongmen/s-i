@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.27 2003/07/15 08:29:40 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.28 2003/07/28 11:07:38 mckinstry Exp $
  */
 
 #include "config.h"
@@ -443,11 +443,10 @@ read_keymap_files (char *listdir)
 			/* two types of name allowed (for the moment; )
 			 * legacy 'console-keymaps-* names and *.keymaps names
 			 */
-			if (strncmp (ent->d_name, "console-keymaps-", 16) == 0)
+			if (strncmp (ent->d_name, "console-keymaps-", 16) == 0) {
 				strcpy (p, ent->d_name);
-			else
-				strncpy (p, ent->d_name, strchr (ent->d_name, '.') - p);
-			maplist_select (maplist_parse_file (fullname));
+				maplist_select (maplist_parse_file (fullname));
+			}
 		}
 	}
 
