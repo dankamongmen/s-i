@@ -124,27 +124,36 @@ static size_t menu_entry(struct debconfclient *debconf, char *language, di_syste
 
 	snprintf(question, sizeof(question), "debian-installer/%s/title", package->p.package);
 	if (language) {
-		char field[128];
+		/*  256 + strlen("Description-.UTF-8")  */
+		char field[256+18];
+		char *lang, *end, *und;
 
-		snprintf(field, sizeof (field), "Description-%s.UTF-8", language);
-		if (!debconf_metaget(debconf, question, field))
-		{
-			strncpy(buf, debconf->value, size);
-			return strlen (buf);
-		}
-		// Was the language of the form xx_YY ? 
-		if (strchr(language, '_')) {
-			char tempbuf[10];
-			strncpy (tempbuf, language, 10);
-			*(strchr(tempbuf,'_')) = '\0';
-			snprintf(field, sizeof (field), "Description-%s.UTF-8", tempbuf);
+		strcpy(field, "Description-");
+		lang = language;
+		do {
+			end = strchr(lang, ':');
+			if (end == NULL)
+				end = lang + strlen(lang);
+		        strncpy(field+12, lang, end-lang);
+		        strcpy(field+12+(end-lang), ".UTF-8");
 			if (!debconf_metaget(debconf, question, field))
-	                {
-	                        strncpy(buf, debconf->value, size);
-	                        return strlen (buf);
-	                }
-		}
-
+			{
+				strncpy(buf, debconf->value, size);
+				return strlen (buf);
+			}
+			// Was the language of the form xx_YY ? 
+			und = strchr(lang, '_');
+			if (und != NULL && (und - lang) < (end - lang)) {
+		        	strncpy(field+12, lang, und-lang);
+		        	strcpy(field+12+(und-lang), ".UTF-8");
+				if (!debconf_metaget(debconf, question, field))
+	                	{
+	                        	strncpy(buf, debconf->value, size);
+	                        	return strlen (buf);
+	                	}
+			}
+			lang = end+1;
+		} while (*end != '\0');
 	}
 	if (!debconf_metaget(debconf, question, "Description"))
 	{
