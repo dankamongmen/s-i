@@ -47,22 +47,28 @@ struct package_t *tree_add(const char *packagename) {
 
 #if DODEBUG
 void _tree_dump(const void *nodep, const VISIT which, const int depth) {
+	int i;
         struct package_t *p = *(struct package_t **)nodep;
 
+	for (i=0; i < depth; i++)
+		printf("    ");
+	
         switch(which) {
                 case postorder:
-                        DPRINTF("[%i] postorder %p %s\n", depth, nodep, p->package);
+                        printf("    at"); /* false indent */
                         break;
                 case preorder:
-                        DPRINTF("[%i] preorder %p %s\n", depth, nodep, p->package);
+                        printf("begin");
                         break;
                 case endorder:
-                        DPRINTF("[%i] endorder %p %s\n", depth, nodep, p->package);
+                        printf("end");
                         break;
                 case leaf:
-                        DPRINTF("[%i] leaf %p %s\n", depth, nodep, p->package);
+                        printf("leaf");
                         break;
         }
+
+	printf(" %s\n", p->package);
 }
 
 /* Dump out the tree. */
@@ -71,58 +77,27 @@ void tree_dump() {
 }
 #endif
 
-void _tree_delete(const void *nodep, const VISIT which, const int depth) {
-	struct package_t *p;
-
-	switch(which) {
-		case postorder:
-//			p = *(struct package_t **)nodep;
-//			printf("[%i] postorder %p %s\n", depth, nodep, p->package);
-			break;
-		case preorder:
-//			p = *(struct package_t **)nodep;
-//			printf("[%i] preorder %p %s\n", depth, nodep, p->package);
-			break;
-		case endorder:
-//			p = *(struct package_t **)nodep;
-//			printf("[%i] endorder %p %s\n", depth, nodep, p->package);
-//			break;
-		case leaf:
-			p = *(struct package_t **)nodep;
-			printf("[%i] delete %p %s\n", depth, nodep, p->package);
-			tdelete((void *)p, &root, _tree_compare);
-			if (p->package)
-				free(p->package);
-			if (p->description)
-				free(p->description);
-			free(p);
-			break;
-	}
+void _tree_free(void *nodep) {
+	struct package_t *p = (struct package_t **)nodep;
+	
+	if (p->description)
+		free(p->description);
+	if (p->package)
+		free(p->package);
+	free(p);
 }
 
 /* Clears out the entire tree, freeing all package stucts contained it in. */
 void tree_clear() {
-#if DODEBUG
-	tree_dump();
-#endif
-	twalk(root, _tree_delete);
-#if DODEBUG
-	tree_dump();
-#endif
-
-#if DODEBUG
-        tree_dump();
-#endif
-        twalk(root, _tree_delete);
-#if DODEBUG
-        tree_dump();
-#endif
-
-#if DODEBUG
-        tree_dump();
-#endif
-        twalk(root, _tree_delete);
-#if DODEBUG
-        tree_dump();
-#endif
+	/*
+	 * The correct way to do this is explained in the tsearch() man
+	 * page in the example. Unfortunatly, glibc is broken, and using a
+	 * twalk() with nested tdelete() calls will not delete the whole
+	 * tree (see Debian bug #63575).
+	 *
+	 * So what I do instead is use glibc's tdestroy function. 
+	 * WARNING: probably not portable!
+	 */
+	tdestroy(root, _tree_free);
+	root = NULL;
 }
