@@ -132,6 +132,20 @@ get_retriever(void)
     return retriever;
 }
 
+/* Corresponds to the 'config' retriever command */
+int
+config_retriever(void)
+{
+    char *retriever, *command;
+    int ret;
+
+    retriever = get_retriever();
+    asprintf(&command, "%s config", retriever);
+    ret = system(command);
+    free(command);
+    return ret;
+}
+
 /* First try the 'packages' command, then guess a location */
 static int
 try_get_Packages_file(const char *ext, const char *suite)
@@ -391,5 +405,47 @@ pkgname_cmp(const void *v1, const void *v2)
     p1 = *(struct package_t **)v1;
     p2 = *(struct package_t **)v2;
     return strcmp(p1->package, p2->package);
+}
+
+struct linkedlist_t *
+get_initial_package_list(struct linkedlist_t *pkglist)
+{
+    struct linkedlist_t *list;
+    struct list_node *node, *next, *prev;
+    struct package_t *p;
+    FILE *fp;
+    char buf[1024], *ptr;
+
+    list = malloc(sizeof(struct linkedlist_t));
+    list->head = list->tail = NULL;
+    if ((fp = fopen(AUTOINST_FILE, "r")) == NULL)
+        return list;
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        if (buf[0] == '#')
+            continue;
+        if ((ptr = strchr(buf, '\n')) != NULL)
+            *ptr = '\0';
+        for (node = pkglist->head; node != NULL; node = next) {
+            next = node->next;
+            p = (struct package_t *)node->data;
+            if (strcmp(buf, p->package) == 0) {
+                if (prev)
+                    prev->next = next;
+                else
+                    pkglist->head = next;
+                if (list->tail == NULL) {
+                    list->head = node;
+                    list->tail = node;
+                } else {
+                    list->tail->next = node;
+                    list->tail = node;
+                }
+                continue;
+            }
+            prev = node;
+        }
+    }
+    fclose(fp);
+    return list;
 }
 

@@ -61,6 +61,7 @@ choose_modules(void)
     struct utsname uts;
     int package_count = 0;
 
+    config_retriever();
     ask_count = 0;
     if (uname(&uts) == 0)
         running_kernel = uts.release;
@@ -81,9 +82,7 @@ choose_modules(void)
     status_p = di_pkg_parse(fp);
     fclose(fp);
 
-    /* Figure out which packages we definitely want to install */
-    instlist = malloc(sizeof(struct linkedlist_t));
-    instlist->head = instlist->tail = NULL;
+    /* First of all, do some sanity checks on the package list! */
     prev = NULL;
     for (node = pkglist->head; node != NULL; node = next) {
         next = node->next;
@@ -97,6 +96,15 @@ choose_modules(void)
             free(node);
             continue;
         }
+        prev = node;
+    }
+
+    /* Figure out which packages we definitely want to install */
+    prev = NULL;
+    instlist = get_initial_package_list(pkglist);
+    for (node = pkglist->head; node != NULL; node = next) {
+        next = node->next;
+        p = (struct package_t *)node->data;
         pkg_kernel = udeb_kernel_version(p);
         if (p->priority >= standard || (running_kernel && pkg_kernel &&
                     strcmp(running_kernel, pkg_kernel) == 0)) {
