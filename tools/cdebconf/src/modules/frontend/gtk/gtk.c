@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.7 2002/11/24 17:51:32 barbier Exp $
+ * $Id: gtk.c,v 1.8 2002/11/26 22:28:51 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -584,7 +584,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q)
 	char passwd[256] = {0};
 	GtkWidget *window, *hboxbottom, *hboxtop, *bigbox;
 	GtkWidget *entry;
-	char *callstring;
+	char *callstring = NULL;
 
 	//create the window for the question
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -768,7 +768,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q)
 	char passwd[256] = {0};
 	GtkWidget *window, *hboxbottom, *hboxtop, *bigbox;
 	GtkWidget *entry;
-	char *callstring;
+	char *callstring = NULL;
 
 	//create the window for the question
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
