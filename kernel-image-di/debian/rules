@@ -71,9 +71,15 @@ binary-udebs: build
 	fi
 	mv -f debian/control.out debian/control
 
-	# Install in the kernel image.
 	install -d debian/tmp/kernel-image-$(KVERS)-$(FLAVOUR)-udeb/boot
-	cp !!!some vmlinu[zx]/bZimage/zimage file!!! \
+	# Copy in the kernel image. Since make-kpkg has complex logic about
+	# what file is the kernel image that I do not care to duplicate,
+	# I use a nasty little hack to make its rules file echo the
+	# variable. I have talked to Manoj, and a better method may be
+	# forthcoming.
+	cp kernel-source-$(KVERS)/`\
+		  echo -e "include debian/rules\nall:\n\techo $$(kimagesrc)" | \
+		  make -f - 2>/dev/null | tail -1` \
 		debian/tmp/kernel-image-$(KVERS)-$(FLAVOUR)-udeb/boot
 	
 	dh_compress
