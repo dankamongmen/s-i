@@ -1,0 +1,27 @@
+#!/bin/sh -e
+
+# Pass kbd information needed by base-config into
+# /target/root/dboostrap-settings
+
+db_get debian-installer/keymap
+KEYMAP=$RET
+
+db_get debian-installer/serial-console
+if [ $RET == "no" ] ; then
+	apt-install console-tools console-data console-common 
+	chroot /target install-keymap $KEYMAP
+fi
+
+if [ ! -d /target/root ] ; then
+	if mkdir /target/root ; then
+		:
+	else
+		echo "error: unable to create /target/root"
+	fi
+fi
+
+(
+	echo "# Inserted by kbd-chooser."
+	echo "KBD_INST=\"$KEYMAP\""
+) >> /target/root/dbootstrap_settings
+
