@@ -9,7 +9,7 @@
  *              of client configuration modules and communications
  *              between the debconf frontend and the confmodule
  *
- * $Id: confmodule.c,v 1.6 2000/12/02 07:15:14 tausq Exp $
+ * $Id: confmodule.c,v 1.7 2000/12/02 07:52:01 tausq Exp $
  *
  * cdebconf is (c) 2000 Randolph Chung and others under the following
  * license.
@@ -83,8 +83,8 @@ static int _confmodule_process(struct confmodule *mod, char *in, char *out, size
 	out[0] = 0;
 	if (*in == '#') return 1;
 
-	memset(argv, 0, sizeof(char *) * sizeof(argv) / sizeof(argv[0]));
-	argc = strcmdsplit(in, argv, sizeof(argv)/sizeof(argv[0]) - 1);
+	memset(argv, 0, sizeof(char *) * DIM(argv));
+	argc = strcmdsplit(in, argv, DIM(argv) - 1);
 
 	for (; commands[i].command != 0; i++)
 	{

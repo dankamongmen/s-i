@@ -6,6 +6,7 @@
 #include "strutl.h"
 
 #include <fcntl.h>
+#include <signal.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
@@ -97,6 +98,9 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 			def = 0;
 	}
 
+	/* turn of SIGINT before asking for input, otherwise things
+	 * get very messy
+	 */
 	do {
 		printf("%s / %s> ", (def == 1 ? "[yes]" : "yes"),
 			(def == 0 ? "[no]" : "no"));
@@ -117,13 +121,21 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 static int texthandler_multiselect(struct frontend *obj, struct question *q)
 {
 	char *choices[100] = {0};
+	char *defaults[100] = {0};
 	char selected[100] = {0};
 	char answer[1024];
-	int i, count, choice;
+	int i, j, count, dcount, choice;
 
 	texthandler_displaydesc(obj, q);
 
-	count = strchoicesplit(question_choices(q), choices, sizeof(choices)/sizeof(choices[0]));
+	count = strchoicesplit(question_choices(q), choices, DIM(choices));
+	dcount = strchoicesplit(q->template->defaultval, defaults, DIM(defaults));
+
+	if (dcount > 0)
+		for (i = 0; i < count; i++)
+			for (j = 0; j < dcount; j++)
+				if (strcmp(choices[i], defaults[j]) == 0)
+					selected[i] = 1;
 
 	while(1)
 	{
@@ -202,21 +214,32 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 {
 	char *choices[100] = {0};
 	char answer[10];
-	int i, count, choice;
+	int i, count, choice, def = -1;
 
 	texthandler_displaydesc(obj, q);
 
-	count = strchoicesplit(question_choices(q), choices, sizeof(choices)/sizeof(choices[0]));
+	count = strchoicesplit(question_choices(q), choices, DIM(choices));
+	if (q->template->defaultval != NULL)
+	{
+		for (i = 0; i < count; i++)
+			if (strcmp(choices[i], q->template->defaultval) == 0)
+				def = i + 1;
+	}
 
 	do
 	{
 		for (i = 0; i < count; i++)
 			printf("%3d) %s\n", i+1, choices[i]);
 
-		printf("1 - %d> ", count);
+		if (def > 0)
+			printf("1 - %d [default = %d]> ", count, def);
+		else
+			printf("1 - %d> ", count);
 		fgets(answer, sizeof(answer), stdin);
-
-		choice = atoi(answer);
+		if (answer[0] == '\n')
+			choice = def;
+		else
+			choice = atoi(answer);
 	} while (choice <= 0 || choice > count);
 
 	question_setvalue(q, choices[choice - 1]);
@@ -271,6 +294,7 @@ struct question_handlers {
 static int text_initialize(struct frontend *obj, struct configuration *conf)
 {
 	obj->interactive = 1;
+	signal(SIGINT, SIG_IGN);
 	return DC_OK;
 }
 
@@ -288,7 +312,7 @@ static int text_go(struct frontend *obj)
 
 	for (; q != 0; q = q->next)
 	{
-		for (i = 0; i < sizeof(question_handlers) / sizeof(question_handlers[0]); i++)
+		for (i = 0; i < DIM(question_handlers); i++)
 			if (strcmp(q->template->type, question_handlers[i].type) == 0)
 			{
 				ret = question_handlers[i].handler(obj, q);
