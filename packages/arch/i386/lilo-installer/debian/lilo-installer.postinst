@@ -49,6 +49,8 @@ fi
 
 defaultbootdev=`/target/bin/echo $defaultbootdev | /target/bin/sed 's/part[0-9]\+$/disc/'` 
 
+defaultbootdev=$(mapdevfs $defaultbootdev)
+
 if [ "$defaultbootdev" = '' ]; then
 	defaultbootdev='/dev/hda'
 fi
@@ -65,7 +67,6 @@ if [ "$bootdev" = '' ]; then
 	bootdev=$defaultbootdev
 fi
 
-bootdev=`mapdevfs $bootdev`
 rootfs=`mapdevfs $rootfs`
 
 # If installing to a partition (not MBR), offer to make it active
