@@ -127,12 +127,19 @@ signed int retriever_handle_error (const char *failing_command) {
     char *retriever, *command;
     int ret;
     
+    /* There is no mechanism to handle backing up from here, so turn it
+     * off. */
+    debconf_capb(debconf, "");
+    
     retriever = get_retriever();
     if (asprintf(&command, "%s error %s", retriever, failing_command) == -1)
         return 0;
     ret = di_exec_shell_log(command);
     free(retriever);
     free(command);
+    
+    debconf_capb(debconf, "backup");
+    
     switch (ret) {
         case 0:
             return 1;
