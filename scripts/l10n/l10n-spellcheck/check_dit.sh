@@ -38,7 +38,7 @@ fi
 dpkg -l aspell | grep -q "^ii"
 if [ $? != 0 ] ; then
     echo "aspell is not installed"
-    echo "you need some packages (aspell, aspell-bin, and aspell-${LANG})"
+    echo "you need some packages (aspell, aspell-bin, aspell-${LANG})"
     exit 1
 fi
 
