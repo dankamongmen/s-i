@@ -7,7 +7,7 @@
  *
  * Description: misc. routines for string handling
  *
- * $Id: strutl.c,v 1.12 2001/01/07 05:05:12 tausq Exp $
+ * $Id: strutl.c,v 1.13 2001/01/08 00:44:32 tausq Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -207,10 +207,11 @@ int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 	return 1;
 }
 
-int strchoicesplit(char *inbuf, char **argv, size_t maxnarg)
+int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
 {
 	int argc = 0;
-	char *s = inbuf, *e, *p;
+	const char *s = inbuf, *e;
+	char *p;
 
 	if (inbuf == 0) return 0;
 

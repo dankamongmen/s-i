@@ -25,12 +25,14 @@ struct question_handlers {
 
 int bogl_handler_boolean(struct frontend *ui, struct question *q);
 int bogl_handler_multiselect(struct frontend *ui, struct question *q);
+int bogl_handler_select(struct frontend *ui, struct question *q);
 int bogl_handler_note(struct frontend *ui, struct question *q);
 int bogl_handler_string(struct frontend *ui, struct question *q);
 
 struct question_handlers question_handlers[] = {
 	{ "boolean", bogl_handler_boolean },
 	{ "multiselect", bogl_handler_multiselect },
+	{ "select", bogl_handler_select },
 	{ "note", bogl_handler_note },
 	{ "string", bogl_handler_string },
 };
@@ -85,7 +87,7 @@ int bogl_handler_boolean(struct frontend *ui, struct question *q)
 	drawdesctop(ui, q);
 
 	/* Should be:  bowl_new_radio(); drawnavbuttons(ui, q); */
-	if(cangoback(ui, q))
+	if(ui->cangoback(ui, q))
 		bowl_new_button(_("Previous"), 0);
 	bowl_new_button(_("Yes"), 1);
 	bowl_new_button(_("No"), 2);
@@ -111,6 +113,11 @@ int bogl_handler_note(struct frontend *ui, struct question *q)
 	return bowl_run();
 }
 
+int bogl_handler_select(struct frontend *ui, struct question *q)
+{
+	return DC_OK;
+}
+
 int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 {
 	int nchoices, ndefs, ret, i, j;
@@ -122,7 +129,7 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 		if(*p == ',')
 		  	nchoices++;
 	choices = malloc(sizeof(char *) * nchoices);
-	nchoices = strchoicesplit((char *)question_choices(q), choices, nchoices);
+	nchoices = strchoicesplit(question_choices(q), choices, nchoices);
 	selected = malloc(sizeof(char) * nchoices);
 	memset(selected, ' ', nchoices);
 
@@ -131,7 +138,7 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 		if(*p == ',')
 		  	ndefs++;
 	defaults = malloc(sizeof(char *) * ndefs);
-	ndefs = strchoicesplit((char *)question_defaultval(q), defaults, ndefs);
+	ndefs = strchoicesplit(question_defaultval(q), defaults, ndefs);
 	for(i = 0; i < ndefs; i++)
 	{
 		for(j = 0; j < nchoices; j++)

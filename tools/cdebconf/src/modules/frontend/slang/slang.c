@@ -52,8 +52,9 @@ static void slang_setcolor(struct frontend *ui, int *handle, const char *obj,
 	snprintf(fgname, sizeof(fgname), CONFIGPREFIX "%s_fg", obj);
 	snprintf(bgname, sizeof(bgname), CONFIGPREFIX "%s_bg", obj);
 	*handle = colorsused++;
-	SLtt_set_color(*handle, 0, ui->config->get(ui->config, fgname, 
-		defaultfg), ui->config->get(ui->config, bgname, defaultbg));
+	SLtt_set_color(*handle, 0, (char *)ui->config->get(ui->config, fgname, 
+		defaultfg), (char *)ui->config->get(ui->config, bgname, 
+		defaultbg));
 }
 
 /*
@@ -122,6 +123,7 @@ static void slang_wrapprint(struct slwindow *win, const char *str, int start)
 
 	lc = strwrap(str, win->w - win->border * 2 - 1, lines, DIM(lines));
 
+	SLsmg_set_color(win->drawcolor);
 	for (i = start; i < lc && (i - start) < (win->h - win->border * 2); i++)
 	{
 		SLsmg_gotorc(win->y + win->border + i - start, win->x + win->border);
@@ -289,7 +291,6 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 
 		slang_navbuttons(ui, q, pos);
 
-
 		slang_flush();
 
 		switch (slang_keyhandler(ui, q, &pos, 3, 0))
@@ -316,8 +317,6 @@ static int slang_note(struct frontend *ui, struct question *q)
 {
 	int ret = 0, pos = 0;
 
-	/* TODO scrolling support */
-
 	while (ret == 0)
 	{
 		slang_navbuttons(ui, q, pos);
@@ -342,7 +341,7 @@ static int slang_select(struct frontend *ui, struct question *q)
 	struct slwindow *win = &uid->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit((char *)question_choices(q), choices, DIM(choices));
+	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 
 	/* See what the currently selected value should be -- either a
@@ -357,15 +356,17 @@ static int slang_select(struct frontend *ui, struct question *q)
 	}
 
 	longest = strlongest(choices, count);
-	top = 0; bottom = MIN(count, win->h - 7);
+	top = val - win->h + 8;
+	if (top < 0) top = 0;
 	xpos = (COLS-longest)/2-1;
 
 	while (ret == 0)
 	{
 		ypos = 3;
+		bottom = top + MIN(count, win->h - 7);
 		for (i = top; i < bottom; i++)
 		{
-			slang_printf(ypos++, xpos, ((pos == 2 && i == val) ?
+			slang_printf(ypos++, xpos, (i == val ?
 				win->selectedcolor : win->drawcolor),
 				" %-*s ", longest, choices[i]);
 		}
@@ -378,13 +379,24 @@ static int slang_select(struct frontend *ui, struct question *q)
 		case SL_KEY_LEFT:
 		case SL_KEY_UP:
 			val--;
-			if (val < 0) val = count-1;
+			if (val < 0)
+			{
+				val = count-1;
+				top = val - win->h + 8;
+				if (top < 0) top = 0;
+			}
+			if (val < top) top = val;
 			/* TODO: check val against top/bottom */
 			break;
 		case SL_KEY_RIGHT:
 		case SL_KEY_DOWN:
 			val++;
-			if (val >= count) val = 0;
+			if (val >= count)
+			{
+				val = 0;
+				top = 0;
+			}
+			if (val >= bottom) top++;
 			/* TODO: check val against top/bottom */
 			break;
 		default:

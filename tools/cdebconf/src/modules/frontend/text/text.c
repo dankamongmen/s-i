@@ -1,3 +1,44 @@
+/***********************************************************************
+ *
+ * cdebconf - An implementation of the Debian Configuration Management
+ *            System
+ *
+ * File: text.c
+ *
+ * Description: text UI for cdebconf
+ * Some notes on the implementation - this is meant to be an accessibility-
+ * friendly implementation. I've taken care to make the prompts work well
+ * with screen readers and the like.
+ *
+ * $Id: text.c,v 1.8 2001/01/08 00:44:32 tausq Exp $
+ *
+ * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
+ * license.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ ***********************************************************************/
 #include "common.h"
 #include "template.h"
 #include "question.h"
@@ -14,6 +55,10 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#ifndef _
+#define _(x) x
+#endif
 
 /*
  * Function: getwidth
@@ -98,7 +143,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	{
 		if (strcmp(defval, "true") == 0)
 			def = 1;
-		else if (strcmp(defval, "false") == 0)
+		else 
 			def = 0;
 	}
 
@@ -106,8 +151,8 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	 * get very messy
 	 */
 	do {
-		printf("%s / %s> ", (def == 1 ? "[yes]" : "yes"),
-			(def == 0 ? "[no]" : "no"));
+		printf("%s%s> ", _("Prompt: yes/no"), (defval == NULL ? "" :
+			(def == 0 ? _(", default=no") : _(", default=yes"))));
 
 		fgets(buf, sizeof(buf), stdin);
 		if (strcmp(buf, "yes\n") == 0)
@@ -140,8 +185,8 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char answer[1024];
 	int i, j, count, dcount, choice;
 
-	count = strchoicesplit((char *)question_choices(q), choices, DIM(choices));
-	dcount = strchoicesplit((char *)question_defaultval(q), defaults, DIM(defaults));
+	count = strchoicesplit(question_choices(q), choices, DIM(choices));
+	dcount = strchoicesplit(question_defaultval(q), defaults, DIM(defaults));
 
 	if (dcount > 0)
 		for (i = 0; i < count; i++)
@@ -153,12 +198,12 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	{
 		for (i = 0; i < count; i++)
 		{
-			printf("%s %3d) %s\n", (selected[i] ? "*" : " "), i+1,
-			       choices[i]);
+			printf("%3d. %s%s\n", i+1, choices[i], 
+				(selected[i] ? _(" (selected)") : ""));
 			
 		}
 
-		printf("1 - %d, q to end> ", count);
+		printf(_("Prompt: 1 - %d, q to end> "), count);
 		fgets(answer, sizeof(answer), stdin);
 		if (answer[0] == 'q') break;
 
@@ -183,6 +228,8 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 		}
 		free(choices[i]);
 	}
+	for (i = 0; i < dcount; i++)
+		free(defaults[i]);
 	question_setvalue(q, answer);
 	
 	return DC_OK;
@@ -255,7 +302,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	int i, count, choice = 1, def = -1;
 	const char *defval = question_defaultval(q);
 
-	count = strchoicesplit((char *)question_choices(q), choices, DIM(choices));
+	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	if (count > 1)
 	{
 		if (defval != NULL)
@@ -268,12 +315,10 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 		do
 		{
 			for (i = 0; i < count; i++)
-				printf("%3d) %s\n", i+1, choices[i]);
+				printf("%3d. %s%s\n", i+1, choices[i],
+					(def == i ? _(" (default)") : ""));
 
-			if (def > 0)
-				printf("1 - %d [default = %d]> ", count, def);
-			else
-				printf("1 - %d> ", count);
+			printf(_("Prompt: 1 - %d> "), count);
 			fgets(answer, sizeof(answer), stdin);
 			if (answer[0] == '\n')
 				choice = def;
@@ -302,7 +347,7 @@ static int texthandler_string(struct frontend *obj, struct question *q)
 	char buf[1024] = {0};
 	const char *defval = question_defaultval(q);
 	if (defval)
-		printf("[%s]", defval);
+		printf(_("[default = %s]"), defval);
 	printf("> "); fflush(stdout);
 	fgets(buf, sizeof(buf), stdin);
 	CHOMP(buf);
@@ -326,8 +371,11 @@ static int texthandler_text(struct frontend *obj, struct question *q)
 	char *out = 0;
 	char buf[1024];
 	int sz = 1;
+
+	printf(_("Enter . on a line by itself when you are done\n"));
 	while (fgets(buf, sizeof(buf), stdin))
 	{
+		if (strcmp(buf, ".\n") == 0) break;
 		sz += strlen(buf);
 		out = realloc(out, sz);
 		memcpy(out + sz - strlen(buf) - 1, buf, strlen(buf));
@@ -383,11 +431,7 @@ static int text_go(struct frontend *obj)
 	int i;
 	int ret;
 
-	printf("%s\n", obj->title);
-	for (i = 0; i < strlen(obj->title); i++) {
-		printf("=");
-	}
-	printf("\n\n");
+	printf("%s\n\n", obj->title);
 
 	for (; q != 0; q = q->next)
 	{
