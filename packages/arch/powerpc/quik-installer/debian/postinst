@@ -130,7 +130,7 @@ else
     initrd=
 fi
 
-realkernel="$(readlink "$kernel")" || \
+realkernel="$(readlink "/target$kernel")" || \
     die quik-installer/resolve_vmlinux \
 	"readlink $kernel failed with exit status $?"
 if [ "${realkernel#/}" = "$realkernel" ]; then
@@ -154,7 +154,7 @@ root=$root
 partition=$partnr
 
 ## Do not point image= to a symlink, quik can't follow symlinks
-image=$kernel
+image=$realkernel
 	label=Linux
 	read-only
 EOF
