@@ -6,8 +6,24 @@
 #include <debian-installer.h>
 #include <cdebconf/debconfclient.h>
 
-int main () {
+char *new_argv[] = 
+{
+  "sh",
+  NULL
+};
+
+char *new_envp[] = 
+{
+  "PATH=",
+  "TERM=",
+  NULL
+};
+
+int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)), char *envp[]) {
 	struct debconfclient *client;
+        char **t1, **t2;
+        pid_t pid;
+
 	client = debconfclient_new();
 
 	debconf_capb(client, "backup");
@@ -23,14 +39,41 @@ int main () {
 	 * the first place.
 	 */
 	if ((dup2(DEBCONF_OLD_STDIN_FD, 0) == -1) ||
-	    (dup2(DEBCONF_OLD_STDOUT_FD, 1) == -1) ||
-	    (dup2(DEBCONF_OLD_STDOUT_FD, 2) == -1))
+	    (dup2(DEBCONF_OLD_STDOUT_FD, 1) == -1))
 		exit(1);
 
-	/*  clear screen and reset background color, if possible */
-	di_exec_shell("/usr/bin/clear");
+        system("clear");
 
-	chdir("/");
-	system("/bin/sh");
-	exit(0);
+        t1 = new_envp;
+        while (*t1)
+        {
+          t2 = envp;
+          while (*t2)
+          {
+            if (strncmp (*t1, *t2, strlen (*t1)) == 0)
+            {
+              *t1 = *t2;
+              break;
+            }
+            t2++;
+          }
+          t1++;
+        }
+
+        pid = fork ();
+
+        if (pid == 0)
+        {
+          chdir("/");
+
+          execve ("/bin/sh", new_argv, new_envp);
+        }
+        else if (pid > 0)
+        {
+          int status;
+          if (!waitpid (pid, &status, 0))
+            return 0;
+        }
+
+        return 0;
 }
