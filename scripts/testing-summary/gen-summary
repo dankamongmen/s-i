@@ -86,7 +86,8 @@ foreach my $dist (@dists) {
 				}
 				$packageversions{$source}{$dist}{$arch} = $version;
 				$seenpackages{$source}=1;
-				($poolfiles{$source}{$arch})=m/Filename: (.*)\n/;
+				my ($filename)=m/Filename: (.*)\n/;
+				push @{$poolfiles{$source}{$arch}}, $filename;
 				my ($pooldir)=m/Filename: (.*)\/.*?\n/;
 				$pooldirs{$source}=$pooldir;
 			}
@@ -176,8 +177,14 @@ foreach my $withchangelog (0,1) {
 			}
 			# Looking at the file modification date may not be
 			# safe. FIXME
-			print "<td>".(int -M $mirror.$poolfiles{$package}{$some_arch})."</td>\n";
-			print "</tr>\n";
+			my $minage;
+			foreach my $file (@{$poolfiles{$package}{$some_arch}}) {
+				my $age=-M $mirror.$poolfiles{$package}{$some_arch};
+				if (defined $age && (! defined $minage || $minage > $age)) {
+					$minage=$age;
+				}
+			}
+			print "<td>".int($minage)."</td></tr>\n";
 			
 			foreach my $ann (@annotations) {
 				if ($package eq $ann->{package} &&
