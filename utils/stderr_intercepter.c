@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 
 void display_error(char *buf) {
 	char *p;
@@ -23,7 +24,9 @@ void display_error(char *buf) {
 	 * The information that the user backed up will be lost.
 	 * Since there's always another GO coming along eventually, this
 	 * program will not bother to force immediate display of the
-	 * question. */
+	 * question. Of course, if something is really screwed up, there
+	 * may not be a next GO. So also log to syslog. */
+	syslog(LOG_USER | LOG_WARNING, "intercepted stderr: %s", buf);
 }
 
 int main (int argc, char **argv) {
