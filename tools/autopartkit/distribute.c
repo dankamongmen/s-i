@@ -33,7 +33,7 @@
 
    1. Calculate the sum of all additionally requrested diskspace
       (max-min).  Each disk with no limit to the maximum size
-      get maximum equal to the disk capasity to make sure this
+      get maximum equal to the disk capacity to make sure this
       partition will get the whole disk if there are no other
       partitions requesting more diskspace on this disk, and that
       the other partitions will get a share of the disk.  The other
@@ -80,7 +80,7 @@ static struct disk_info_t *
 find_disk_with_freespace(struct disk_info_t diskinfo[], PedSector blocks)
 {
     int i;
-    for (i = 0; diskinfo[i].capasity; i++)
+    for (i = 0; diskinfo[i].capacity; i++)
     {
 	if (diskinfo[i].freespace >= blocks)
 	    return &diskinfo[i];
@@ -130,7 +130,7 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	else
 	{
             maxmax_blk = MAX(maxmax_blk, reqs[i].max_blk);
-            maxmax_blk = MAX(maxmax_blk, disk->capasity);
+            maxmax_blk = MAX(maxmax_blk, disk->capacity);
 
 	    /* Found a usable disk.  Add this partition to the disk. */
 	    reqs[i].blocks  = reqs[i].min_blk;
@@ -140,7 +140,7 @@ distribute_partitions(struct disk_info_t diskinfo[],
     }
 
     /* Grow the partitions as much as possible on the allocated disk. */
-    for (i = 0; diskinfo[i].capasity; i++)
+    for (i = 0; diskinfo[i].capacity; i++)
     {
 	int j;
 	int64_t total_wanted = 0;
@@ -188,12 +188,12 @@ print_list(struct disk_info_t diskinfo[], struct diskspace_req_s reqs[])
 {
     int i;
     autopartkit_log(0, "Suggested partition distribution:\n");
-    for (i = 0; diskinfo[i].capasity; i++)
+    for (i = 0; diskinfo[i].capacity; i++)
     {
         int j;
 	autopartkit_log(0, "  free block '%s' [%llu,%llu]:\n",
 	       diskinfo[i].path ? diskinfo[i].path : "[null]",
-	       BLOCKS_TO_MiB(diskinfo[i].capasity),
+	       BLOCKS_TO_MiB(diskinfo[i].capacity),
 	       BLOCKS_TO_MiB(diskinfo[i].freespace));
 	for (j = 0; reqs[j].mountpoint; ++j)
 	{
@@ -226,9 +226,9 @@ get_free_space_list(void)
     PedPartition *part = NULL;
 
     int spacenum = 0;
-    const int spacecapasity = 10;
+    const int spacecapacity = 10;
 
-    struct disk_info_t *spaceinfo = calloc(sizeof(*spaceinfo), spacecapasity);
+    struct disk_info_t *spaceinfo = calloc(sizeof(*spaceinfo), spacecapacity);
 
     autopartkit_log(2, "Locating free space on all disks\n");
 
@@ -265,10 +265,10 @@ get_free_space_list(void)
 		spaceinfo[spacenum].path = disk->dev->path;
 		memcpy(&spaceinfo[spacenum].geom, &part->geom,
 		       sizeof(part->geom));
-		spaceinfo[spacenum].capasity = part->geom.length;
+		spaceinfo[spacenum].capacity = part->geom.length;
 		spaceinfo[spacenum].freespace = part->geom.length;
 		++spacenum;
-		assert(spacenum < spacecapasity);
+		assert(spacenum < spacecapacity);
 	    }
 	}
     }

@@ -669,11 +669,11 @@ dr_minsize_compare(const void *ap, const void *bp)
  */
 static void
 normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
-		       const size_t dest_capasity)
+		       const size_t dest_capacity)
 {
     int i;
     int count;
-    memset(dest,0,sizeof(diskspace_req_t)*dest_capasity);
+    memset(dest,0,sizeof(diskspace_req_t)*dest_capacity);
 
     for (count = 0; source[count].mountpoint != NULL; count++)
     {

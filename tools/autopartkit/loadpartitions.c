@@ -14,7 +14,7 @@
 
 struct partition_list {
   diskspace_req_t *disk_reqs;
-  unsigned int capasity;
+  unsigned int capacity;
   unsigned int count;
 };
 
@@ -24,16 +24,16 @@ list_makeroom(struct partition_list *list, unsigned int room)
   unsigned int newsize;
   void *mem;
   assert(list);
-  if (list->capasity > list->count + room)
+  if (list->capacity > list->count + room)
   {
 #ifdef DEBUG
     autopartkit_log("Enough room in list %d > %d + %d\n",
-	            list->capasity, list->count, room);
+	            list->capacity, list->count, room);
 #endif /* DEBUG */
     return 0;
   }
 
-  newsize = list->capasity * 2 ;
+  newsize = list->capacity * 2 ;
   if (room > newsize)
     newsize = room;
 
@@ -42,7 +42,7 @@ list_makeroom(struct partition_list *list, unsigned int room)
     return -1;
   else
   {
-    list->capasity = newsize;
+    list->capacity = newsize;
     list->disk_reqs = mem;
     return 0;
   }
@@ -77,7 +77,7 @@ list_init(struct partition_list *list)
 {
   assert(list);
   list->disk_reqs = NULL;
-  list->capasity = 0;
+  list->capacity = 0;
   list->count = 0;
   return 0;
 }

@@ -35,7 +35,7 @@ struct disk_info_t {
     const char *path; /* Path to device */
     PedGeometry geom; /* Location of free space */
 
-    PedSector capasity;
+    PedSector capacity;
     PedSector freespace;
 };
 
