@@ -4,15 +4,6 @@
 # Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
 # $Id$
 
-#export DH_VERBOSE=1
-PACKAGE=efi-reader
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=ia64
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
 clean:
 	dh_testdir
 	dh_testroot
@@ -48,8 +39,8 @@ binary-arch: build install
 	dh_testroot
 	dh_installdebconf
 	dh_fixperms
-	dh_gencontrol -- -n$(FILENAME)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
