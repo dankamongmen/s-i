@@ -14,7 +14,7 @@ mountfloppy()
         if [ ! -d /dev/floppy ]; then
             exit 1
         fi
-        if ! lsmod | grep -q ^vfat; then
+        if ! grep -q ^vfat /proc/modules ; then
             modprobe vfat >> /var/log/messages 2>&1
         fi
 
