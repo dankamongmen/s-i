@@ -79,23 +79,36 @@ bool isinstallable(di_system_package *p) {
 	return false;
 }
 
-int provides_installed_virtual_package(di_package *p) {
+/* Return nonzero if all of the virtual packages that P provides are
+   provided by installed packages.  */
+int provides_installed_virtual_packages(di_package *p) {
 	di_slist_node *node1, *node2;
+	int provides = 0;
 
 	for (node1 = p->depends.head; node1; node1 = node1->next) {
 		di_package_dependency *d = node1->data;
 
-		if (d->type == di_package_dependency_type_provides)
+		if (d->type == di_package_dependency_type_provides) {
+			int installed = 0;
+
+			provides = 1;
+
 			for (node2 = d->ptr->depends.head; node2; node2 = node2->next) {
 				d = node2->data;
 
 				if (d->type == di_package_dependency_type_reverse_provides
-				    && d->ptr->status == di_package_status_installed)
-					return 1;
+				    && d->ptr->status == di_package_status_installed) {
+					installed = 1;
+					break;
+				}
 			}
+
+			if (!installed)
+				return 0;
+		}
 	}
 
-	return 0;
+	return provides;
 }
 
 /* Expects a topologically ordered linked list of packages. */
@@ -125,10 +138,10 @@ get_default_menu_item(di_slist *list)
 			//di_log(DI_LOG_LEVEL_DEBUG, "isdefalt says no");
 			continue;
 		}
-		/* Do not default to a package that provides a virtual
-		   package that is provided by a package that is
-		   already installed.  */
-		if (!provides_installed_virtual_package(&p->p)) {
+		/* If all of the virtual packages provided by a
+		   package have already been satisfied, do not default
+		   to it.  */
+		if (!provides_installed_virtual_packages(&p->p)) {
 			//di_log(DI_LOG_LEVEL_DEBUG, "success on this one");
 			return p;
 		}
