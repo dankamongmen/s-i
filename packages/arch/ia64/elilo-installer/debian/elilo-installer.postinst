@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+. /usr/share/debconf/confmodule
+
 if [ -f /etc/mtab ]; then
     MTAB=/etc/mtab
 else
@@ -8,34 +10,48 @@ else
 fi
 
 # detect which is the root partition: /target
-rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
+rootfs=`grep ' /target ' $MTAB |cut -d' ' -f1 -s`
 
 # Find all partitions with fat filesystems and the boot flag set.  May be
 # enough just to look for one of those.  OTOH, elilo will convert any
 # partition you give it to FAT...  Also translates /dev/discs paths in to
 # real /dev/scsi (or ide) paths.
 
-p=$(for i in /dev/discs/*/disc; do
-	dev=$(parted $i print | sed -n "s|^Disk geometry for \([^:]*\)/disc:.*$|\1|p")
-	parted $i print | sed -n "s|^\([0-9]\+\) \+[0-9\.]\+ \+[0-9\.]\+ \+fat[0-9]* \+boot$|$dev/part\1|p"
-     done)
+rm -f /tmp/efi_boot.list
 
-if [ "$p" = '' ]; then
+for d in /dev/discs/*/disc; do
+    parted $d print | ( while read minor start end fs nameflags ; do
+      case "$minor" in
+      Disk)
+	if [ "$start" = geometry ]; then
+	    dev=$(echo $fs | sed -n "s|\([^:]*\)/disc:|\1|p")
+	fi
+	;;
+      [1-9])
+	case "$fs" in
+	fat16|fat32)
+	    if echo "$nameflags" | grep "boot" >/dev/null; then
+		echo ${dev}/part${minor} >> /tmp/efi_boot.list
+	    fi
+	    ;;
+	esac
+	;;
+      esac
+    done)
+done	
+if [ -s /tmp/efi_boot.list ]; then
+    for d in `cat /tmp/efi_boot.list`; do
+	if [ -n "$BOOTPARTS" ]; then
+	    BOOTPARTS="$BOOTPARTS, $d"
+	else
+	    BOOTPARTS=$d
+	fi
+    done
+else
 	db_input critical elilo-installer/no-bootpart
 	db_go
 	exit 1
 fi
-
-for i in $p; do
-	if [ $BOOTPARTS ]; then
-		BOOTPARTS="$BOOTPARTS, $i"
-	else
-		BOOTPARTS=$i
-	fi
-done
-
-. /usr/share/debconf/confmodule
-
 db_subst elilo-installer/bootpart BOOTPARTS $BOOTPARTS
 
 db_fset elilo-installer/bootpart seen false
