@@ -180,8 +180,8 @@ CD. Put it into your CD-drive and make your system boot from CD.
 You will be greeted by a welcome screen. Hit ENTER to boot. After a
 while you will be asked to select your language. This will affect
 translation of debian-installer (if already available for your
-language) as well as the choice of a keyboard layout. Select your
-language and press ENTER to continue.
+language) as well as the choice of country and keyboard layout. Select
+your language and press ENTER to continue.
 
 Sit back while debian-installer detects some of your hardware, and
 loads additional installer modules from the cd.
@@ -243,18 +243,23 @@ the main-menu will try to resolve these dependencies automatically.
 This can be used to automate the install process, by selecting always
 the last visible step. 
 
-When main-menu first is shown, the default will be "Choose language".
-Hit return and choose your language from the list that now is
-presented. You will be taken back to main-menu and the next item will
-be the default, which is "Detect a keyboard and select layout".
+When main-menu first is shown, the default will be "Choose language". Hit
+return and choose your language from the list that now is presented. You
+will be taken back to main-menu and the next item will be the default,
+which is "Choose country". Select that entry and observe that the installer
+tries to set a reasonable default based upon your language selection.
+Select your country and continue.
 
-Select that entry and observe that the installer tries to set a
-reasonable default based upon your language selection. Select your
-preferred keymap and continue.
+The next step is "Detect a keyboard and select layout". Again the installer
+will attempt to pick a reasonable default. Select your preferred keymap and
+continue.
 
-The next step is "Detect CDROM devices and mount the CD".
-This step does not require user interaction, everything happens
-automatically.
+The next step is "Detect CDROM devices and mount the CD". As part of this
+step, the installer will probe the system for hardware, and load kernel
+modules for detect hardware. You will be given a chance to veto the loading
+of kernel modules (in case they cause problems), and to specify parameters
+to pass to the kernel when the modules are loaded. After the hardware is
+detected, the CD should be found automatically in most cases.
 
 Now we are able to load the rest of the installer. Select the corresponding
 entry "Load installer components". Since the modules we want to access are
@@ -272,7 +277,8 @@ entries. The next default step would be to configure a network. We are
 breaking out of the default route, because we do not need networking
 since the base debs are on the CD.
 
-Select "Detect hardware". This step again involves no user interaction.
+Select "Detect hardware". This will repeat the hardware detection process,
+but now the installer has more kernel modules available to it.
 
 Now it is time to partition your disk. There are basically two ways to
 do that. The first one is to use cfdisk, which will be started upon
