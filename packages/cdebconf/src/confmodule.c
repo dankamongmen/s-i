@@ -263,7 +263,9 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
 			q = mod->questions->methods.get(mod->questions, *(mod->seen_questions+i));
 			if (q == NULL)
 				return DC_NOTOK;
+#ifndef DI_UDEB
 			q->flags |= DC_QFLAG_SEEN;
+#endif
 			DELETE(*(mod->seen_questions+i));
 		}
 		DELETE(mod->seen_questions);
