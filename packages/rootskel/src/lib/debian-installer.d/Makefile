@@ -17,6 +17,7 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
 	S30term-linux \
 	S35framebuffer-linux \
 	S40utf8-linux \
+	S60devpts-linux \
 	S90utf8-linux
 
   ifeq ($(DEB_HOST_GNU_CPU),i386)
