@@ -56,9 +56,10 @@ fi
 echo Synchronising repository
 svn up
 
-echo Running gettext-helper:
-$DI_COPY/scripts/l10n/gettext-helper export $LANG
-
+if [ ! -f $DI_COPY/packages/po/$LANG.po ] ; then
+  echo Running gettext-helper:
+  $DI_COPY/scripts/l10n/gettext-helper export $LANG
+fi
 
 if [ ! -f po/$LANG.po ] ; then
   echo No po/$LANG.po generated
