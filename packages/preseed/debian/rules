@@ -11,14 +11,11 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
-	dh_install debconf-set-selections bin
 
-binary-indep: build install
-
-binary-arch: build install
+buildpackage:
 	dh_testdir
 	dh_testroot
+	dh_clean -k
 	dh_installdebconf
 	dh_compress
 	dh_fixperms
@@ -26,6 +23,15 @@ binary-arch: build install
 	dh_shlibdeps
 	dh_gencontrol
 	dh_builddeb
+	dh_install debconf-set-selections bin
+
+binary-indep:
+	set -e; \
+	for package in $(shell dh_listpackages); do \
+		debian/rules buildpackage DH_OPTIONS="-p $$package"; \
+	done
+
+binary-arch:
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install

@@ -1,21 +1,24 @@
 #!/bin/sh
 set -e
 
+export DEBIAN_FRONTEND=none
 . /usr/share/debconf/confmodule
+
 
 file="$1"
 
 OLDIFS="$IFS"
 NEWLINE="
 "
-IFS="$newline"
+IFS="$NEWLINE"
 for line in $(grep -v '^#' "$file"); do
 	IFS="$OLDIFS"
-	set -- line
+	set -- $line
 	#package="$1"
 	var="$2"
 	#type="$3"
-	value="$4"
+	shift 3
+	val="$@"
 	if ! db_set "$var" "$val"; then
 		# Question does not exist yet.
 		db_register debian-installer/dummy "$var"

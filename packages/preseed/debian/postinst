@@ -3,6 +3,8 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+TMPFILE=$TMPFILE
+
 fetch() {
 	url="$1"
 	file="$2"
@@ -20,7 +22,7 @@ fetch() {
 db_get preseed/url
 url="$RET"
 if [ -n "$url" ]; then
-	if ! fetch $url /tmp/preseed; then
+	if ! fetch $url $TMPFILE; then
 		db_subst preseed/download_error URL "$url"
 		db_input critical preseed/download_error || true
 		db_go || true
@@ -28,4 +30,6 @@ if [ -n "$url" ]; then
 	fi
 fi
 
-debconf-set-selections /tmp/preseed
+debconf-set-selections $TMPFILE
+
+rm -f $TMPFILE
