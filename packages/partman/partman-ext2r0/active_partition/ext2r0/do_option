@@ -20,11 +20,11 @@ do_mountpoint () {
 	else
 	    old_mountpoint=/
 	fi
-	db_fset partman-ext3/mountpoint seen false
-	db_set partman-ext3/mountpoint "$old_mountpoint"
-	db_input critical partman-ext3/mountpoint || $noninteractive
+	db_fset partman-ext2r0/mountpoint seen false
+	db_set partman-ext2r0/mountpoint "$old_mountpoint"
+	db_input critical partman-ext2r0/mountpoint || $noninteractive
 	db_go || return 1
-	db_get partman-ext3/mountpoint
+	db_get partman-ext2r0/mountpoint
 
 	case "$RET" in
 	    Do?not?mount?it)
@@ -53,17 +53,17 @@ do_mountpoint_manual () {
 	    else
 		old_mountpoint=/
 	    fi
-	    db_fset partman-ext3/mountpoint_manual seen false
-	    db_set partman-ext3/mountpoint_manual "$old_mountpoint"
-	    db_input critical partman-ext3/mountpoint_manual || $noninteractive
+	    db_fset partman-ext2r0/mountpoint_manual seen false
+	    db_set partman-ext2r0/mountpoint_manual "$old_mountpoint"
+	    db_input critical partman-ext2r0/mountpoint_manual || $noninteractive
 	    db_go || return 1
-	    db_get partman-ext3/mountpoint_manual
+	    db_get partman-ext2r0/mountpoint_manual
 	    
 	    if expr "$RET" : '/[^ ]*' >/dev/null; then
 		new_mountpoint=$RET
 	    else
-		db_fset partman-ext3/bad_mountpoint seen false
-		db_input high partman-ext3/bad_mountpoint || true
+		db_fset partman-ext2r0/bad_mountpoint seen false
+		db_input high partman-ext2r0/bad_mountpoint || true
 		db_go || true
 	    fi
 	done
@@ -72,34 +72,12 @@ do_mountpoint_manual () {
     done
 }
 
-do_options () {
-    local seen_marker full_options
-    if [ -f $part/mountoptions ]; then
-	full_options=$(cat $part/full_mountoptions)
-    else
-	full_options=''
-    fi
-    db_fset partman-ext3/options seen false
-    db_set partman-ext3/options "$full_options"
-    db_input critical partman-ext3/options || true
-    db_go || exit
-    db_get partman-ext3/options
-    if [ "$RET" ]; then
-	echo "$RET" | sed 's/ *-[^,]*//g' >$part/mountoptions
-	echo "$RET" >$part/full_mountoptions
-    else
-	[ ! -f $part/mountoptions ] || rm $part/mountoptions
-	[ ! -f $part/full_mountoptions ] || rm $part/full_mountoptions
-    fi
-}
-
 case $1 in
     mountpoint)
 	do_mountpoint
 	update_partition $dev $id
 	;;
     options)
-	do_options
 	;;
 esac
 
