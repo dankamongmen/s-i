@@ -410,6 +410,10 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 		return DC_NOTOK;
 	choices = malloc(sizeof(char *) * count);
 	choices_translated = malloc(sizeof(char *) * count);
+	for (i = 0; i < count; ++i)
+	{
+		choices[i] = choices_translated[i] = NULL;
+	}
 	tindex = malloc(sizeof(int) * count);
 	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
 	{
@@ -533,6 +537,10 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 		return DC_NOTOK;
 	choices = malloc(sizeof(char *) * count);
 	choices_translated = malloc(sizeof(char *) * count);
+	for (i = 0; i < count; ++i)
+	{
+		choices[i] = choices_translated[i] = NULL;
+	}
 	tindex = malloc(sizeof(int) * count);
 	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
 	{
