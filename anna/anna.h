@@ -24,8 +24,8 @@ char *get_retriever(void);
 int config_retriever(void);
 di_packages *get_packages(di_packages_allocator *allocator);
 int is_installed(di_package *p, di_packages *status);
-size_t package_to_choice(di_package *package, const char *language, char *buf, size_t size);
-char *list_to_choices(di_package **packages, const char *language);
+size_t package_to_choice(di_package *package, char *buf, size_t size);
+char *list_to_choices(di_package **packages);
 int get_package (di_package *package, char *dest);
 int md5sum(const char* sum, const char *file);
 void cleanup(void);
@@ -35,5 +35,8 @@ int package_array_compare(const void *v1, const void *v2);
 void get_initial_package_list(di_packages *packages);
 void drop_excludes(di_packages *packages);
 int new_retrievers(di_package **retrievers_before, di_package **retrievers_after);
+#ifndef LIBDI_SYSTEM_DPKG
+int unpack_package (const char *pkgfile);
+#endif
 
 #endif /* ANNA_H_ */

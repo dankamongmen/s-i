@@ -22,7 +22,7 @@ get_retriever_packages(di_packages *status)
 
   ret = di_new0(di_package *, ret_size);
 
-  for (node = package->depends.first; node; node = node->next)
+  for (node = package->depends.head; node; node = node->next)
   {
     di_package_dependency *d = node->data;
 
@@ -52,7 +52,7 @@ get_default_retriever(const char *choices)
         if (strstr(choices, retrievers[i]) != NULL)
             return retrievers[i];
     }
-    di_log (DI_LOG_LEVEL_ERROR, "don't find retriever: %s", __PRETTY_FUNCTION__);
+    return NULL;
 }
 
 
@@ -138,15 +138,13 @@ is_installed(di_package *p, di_packages *status)
 }
 
 size_t
-package_to_choice(di_package *package, const char *language, char *buf, size_t size)
+package_to_choice(di_package *package, char *buf, size_t size)
 {
-  di_package_description *description;
-  description = di_package_get_description(package, language);
-  return snprintf(buf, size, "%s: %s", package->package, description ? description->short_description : "<none>");
+  return snprintf(buf, size, "%s: %s", package->package, package->short_description);
 }
 
 char *
-list_to_choices(di_package **packages, const char *language)
+list_to_choices(di_package **packages)
 {
     char buf[200], *ret;
     int count = 0;
@@ -156,7 +154,7 @@ list_to_choices(di_package **packages, const char *language)
     ret = malloc(1024);
     ret[0] = '\0';
     while ((p = packages[count])) {
-        size = package_to_choice(p, language, buf, 200);
+        size = package_to_choice(p, buf, 200);
         if (ret_used + size + 2 > ret_size)
         {
             ret_size += 1024;
@@ -194,7 +192,7 @@ get_package (di_package *package, char *dest)
 /* Calls udpkg to unpack a package. */
 #ifndef LIBDI_SYSTEM_DPKG
 int
-unpack_package (char *pkgfile)
+unpack_package (const char *pkgfile)
 {
     char *command;
     int ret;
@@ -339,10 +337,8 @@ new_retrievers(di_package **retrievers_before, di_package **retrievers_after)
 		match = 1;
 		break;
 	    }
-	}
 	if (!match)
 	    return 1;
-    }
     return 0;
 }
 
