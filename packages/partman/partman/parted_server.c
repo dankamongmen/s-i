@@ -819,7 +819,7 @@ partition_with_id(PedDisk *disk, char *id)
         return NULL;
 }
 
-/* Returns informational strung about `part' from `disk'.  Format:*/
+/* Returns informational string about `part' from `disk'.  Format:*/
 /* Number<TAB>id<TAB>length<TAB>type<TAB>fs<TAB>path<TAB>name */
 char *
 partition_info(PedDisk *disk, PedPartition *part)
