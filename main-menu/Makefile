@@ -1,7 +1,7 @@
 CFLAGS=-Wall -g -D_GNU_SOURCE
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=main-menu
-LIBS=-ldebconf -ldebian-installer
+LIBS=-ldebconfclient -ldebian-installer
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG=1

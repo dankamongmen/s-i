@@ -54,9 +54,13 @@ int isdefault(struct package_t *p) {
 	struct stat statbuf;
 	int ret;
 
-	asprintf(&menutest, DPKGDIR "info/%s.menutest", p->package);
+	if (asprintf(&menutest, DPKGDIR "info/%s.menutest", p->package) == -1) {
+		return 0;
+	}
 	if (stat(menutest, &statbuf) == 0) {
-		asprintf(&cmd, "%s >/dev/null 2>&1", menutest);
+		if (asprintf(&cmd, "%s >/dev/null 2>&1", menutest) == -1) {
+			return 0;
+		}
 		ret = !SYSTEM(cmd);
 		free(cmd);
 	}
@@ -227,7 +231,9 @@ static int satisfy_virtual(struct package_t *p) {
 	size_t c_size = 1;
 	int is_menu_item = 0;
 
-        asprintf(&choices, "");
+        if (asprintf(&choices, "") == -1) {
+		return 0;
+	}
 	/* Compile a list of providing package. The default choice will be the
 	 * package with highest priority. If we have ties, menu items are
 	 * preferred. If we still have ties, the default choice is arbitrary */
@@ -254,11 +260,16 @@ static int satisfy_virtual(struct package_t *p) {
 		 * is a menu item */
 		if (dep->installer_menu_item)
 			is_menu_item = 1;
-		if (dep == defpkg)
+		if (dep == defpkg) {
 			/* We want the default to be the first item */
-			asprintf(&tmp, "%s, %s", dep->description, choices);
-		else
-			asprintf(&tmp, "%s%s, ", choices, dep->description);
+			if (asprintf(&tmp, "%s, %s", dep->description, choices) == -1) {
+				return 0;
+			}
+		} else {
+			if (asprintf(&tmp, "%s%s, ", choices, dep->description) == -1) {
+				return 0;
+			}
+		}
 		free(choices);
 		choices = tmp;
 	}
@@ -365,7 +376,9 @@ config_package(struct package_t *p) {
 			return 0;
 	}
 
-	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
+	if (asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package) == -1) {
+		return 0;
+	}
 	ret = SYSTEM(configcommand);
 	free(configcommand);
         if (ret == 0) {
@@ -394,7 +407,9 @@ int do_menu_item(struct package_t *p) {
 
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
-		asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package);
+		if (asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package) == -1) {
+			return 0;
+		}
                 ret = SYSTEM(configcommand);
 		free(configcommand);
 		check_special(p);
