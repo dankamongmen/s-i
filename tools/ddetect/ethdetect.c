@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <discover.h>
-#include <debconfclient.h>
+#include <cdebconf/debconfclient.h>
 #include <string.h>
 #include "utils.h"
 #include "ddetect.h"
@@ -159,11 +159,13 @@ main (int argc, char *argv[])
 int
 main (int argc, char *argv[])
 {
-  char *modulename;
-
-  if ((module = ethdetect_module_detect (0)) != NULL)
-    printf (stderr, "%s\n", module);
-
+  struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
+  
+  ethernet = ethdetect_detect(0);
+  for (; ethernet; ethernet = ethernet->next) {
+    fprintf(stderr, "%s\n", ethernet->module);
+  };
+  return (0);
 }
 
 #endif

@@ -11,8 +11,7 @@ CFLAGS=-Wall  -Os -fomit-frame-pointer
 INSTALL=install
 STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment 
-INCS=-I../cdebconf/src/
-LDFLAGS=-L../cdebconf/src/ -ldiscover -lisapnp -ldebconf
+LDFLAGS= -ldiscover -ldebconf
 
 
 all: lst2header $(OBJS) $(PROGS)
@@ -24,13 +23,13 @@ mdmdetect: mdmdetect.c ddetect.o
 cddetect : cddetect.c ddetect.o
 
 diskdetect : diskdetect.c
-	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(INCS) $(LDFLAGS)
+	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(LDFLAGS)
 
 ethdetect :ethdetect.c
-	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(INCS) $(LDFLAGS)
+	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(LDFLAGS)
 
 lst2header: lst2header.c
-	$(CC) lst2header.c -o lst2header -ldiscover -lisapnp 
+	$(CC) lst2header.c -o lst2header -ldiscover
 
 clean:
 	$(RM) *.o $(PROGS) lst2header

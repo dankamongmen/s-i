@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "detect.h"
+#include "discover.h"
 
 
 #define PATH_ISA_LST "lst/isa.lst"
@@ -65,7 +65,7 @@ main (int argc, char *argv[])
     }
 
   /* Initialize hardware device list                                  */
-  lst = init_lst (PATH_ISA_LST, PATH_PCI_LST, PATH_PCMCIA_LST, PATH_USB_LST);
+  lst = init_lst (PATH_PCI_LST, PATH_PCMCIA_LST, PATH_USB_LST);
 
   time (&t);
   printf ("/* \tThis file generated on %s", ctime (&t));
