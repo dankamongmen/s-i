@@ -24,6 +24,12 @@ if [ "`uname -r | grep '^2.2.'`" != "" ]; then
 	    mknod $ROOT/dev/loop/$i b 7 $i 
 	done
     fi
+    
+    if [ ! -d $ROOT/dev/floppy ]; then
+	echo 'Creating floppy device(s) ...'
+	mkdir -p $ROOT/dev/floppy
+	mknod $ROOT/dev/floppy/0 b 2 0
+    fi
 
     if [ ! -d $ROOT/dev/cdroms ]; then
 	echo 'Creating cdrom devices ...'
