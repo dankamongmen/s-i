@@ -11,7 +11,7 @@
 #include <discover.h>
 #include <cdebconf/debconfclient.h>
 #include <string.h>
-#include "utils.h"
+#include <debian-installer.h>
 #include "ddetect.h"
 #include "ethdetect.h"
 
@@ -40,7 +40,7 @@ ethdetect_insmod (char *modulename)
   snprintf (buffer, sizeof (buffer), "modprobe -v %s %s", modulename,
 	    (params ? params : " "));
 
-  if (execlog (buffer) != 0)
+  if (di_execlog (buffer) != 0)
     {
       client->command (client, "input", "high", "ethdetect/error", NULL);
       client->command (client, "go", NULL);

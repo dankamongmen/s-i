@@ -1,4 +1,4 @@
-OBJS=utils.o
+OBJS=
 
 ifndef PROGS
 PROGS=ethdetect
@@ -11,7 +11,7 @@ CFLAGS=-Wall  -Os -fomit-frame-pointer
 INSTALL=install
 STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment 
-LDFLAGS= -ldiscover -ldebconf
+LDFLAGS= -ldiscover -ldebconf -ldebian-installer
 
 
 all: lst2header $(OBJS) $(PROGS)
