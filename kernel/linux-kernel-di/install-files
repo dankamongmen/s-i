@@ -49,11 +49,11 @@ while (<KVERS>) {
 	next unless $arch eq $hostarch;
 
 	doit("install", "-D", "-m", 644,
-		$sourcedir."/boot/$kname-$installedname",
+		"$sourcedir/boot/$kname-$installedname",
 		"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname");
 	doit("install", "-D", "-m", 644,
-		$sourcedir."/lib/modules/$installedname/modules.dep",
-		"debian/kernel-image-$kernelversion-$flavour-di/lib/modules/$installedname/modules.dep");
+		"$sourcedir/boot/System.map-$installedname",
+		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map");
 	doit("./copy-modules", $kernelversion, $flavour, $installedname);
 	doit("./find-dups", "$kernelversion-$flavour");
 }
