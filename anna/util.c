@@ -285,11 +285,12 @@ package_array_compare(const void *v1, const void *v2)
 }
 
 void
-get_initial_package_list(di_packages *packages)
+take_includes(di_packages *packages)
 {
     di_package *p;
     FILE *fp;
     char buf[1024], *ptr;
+    di_slist_node *node;
 
     if ((fp = fopen(INCLUDE_FILE, "r")) == NULL)
         return;
@@ -298,9 +299,17 @@ get_initial_package_list(di_packages *packages)
             continue;
         if ((ptr = strchr(buf, '\n')) != NULL)
             *ptr = '\0';
-        p = di_packages_get_package(packages, ptr, 0);
-        if (p)
-          p->status_want = di_package_status_want_install;
+
+	/* XXX old code had this, but it never seemed to find a package:
+	 * p = di_packages_get_package(packages, ptr, 0);
+	 * if (p)
+	 *   p->status_want = di_package_status_want_install;
+	 */
+	for (node = packages->list.head; node; node = node->next) {
+		p = node->data;
+		if (strcmp(p->package, buf) == 0)
+			p->status_want = di_package_status_want_install;
+	}
     }
     fclose(fp);
 }
@@ -311,6 +320,7 @@ drop_excludes(di_packages *packages)
     di_package *p;
     FILE *fp;
     char buf[1024], *ptr;
+    di_slist_node *node;
 
     if ((fp = fopen(EXCLUDE_FILE, "r")) == NULL)
         return;
@@ -319,9 +329,13 @@ drop_excludes(di_packages *packages)
             continue;
         if ((ptr = strchr(buf, '\n')) != NULL)
             *ptr = '\0';
-        p = di_packages_get_package(packages, ptr, 0);
-        if (p)
-          p->status_want = di_package_status_want_deinstall;
+	
+	/* XXX see comment in take_includes. */
+	for (node = packages->list.head; node; node = node->next) {
+		p = node->data;
+		if (strcmp(p->package, buf) == 0)
+			p->status_want = di_package_status_want_deinstall;
+	}
     }
     fclose(fp);
 }

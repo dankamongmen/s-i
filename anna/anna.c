@@ -65,8 +65,8 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
         return 4;
     }
 
-    get_initial_package_list(*packages);
-
+    /* XXX enhances is not a legal field for udebs, so why is this here?
+     *    -- JEH */
     for (node = status->list.head; node; node = node->next) {
         status_package = node->data;
         if (status_package->status == di_package_status_unpacked || status_package->status == di_package_status_installed) {
@@ -127,7 +127,10 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
         }
     }
 
-    /* Drop files in udeb_exclude */
+    /* Include packages in udeb_include */
+    take_includes(*packages);
+
+    /* Drop packages in udeb_exclude */
     drop_excludes(*packages);
 
     di_packages_resolve_dependencies_mark(*packages);
