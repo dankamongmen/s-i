@@ -28,10 +28,6 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
     files_term = \
 	S30term-linux-s390
   endif
-  ifeq ($(DEB_HOST_GNU_CPU),sparc)
-    files_term += \
-    	S30framebuffer-disable-sparc64
-  endif
 endif
 
 files = \
