@@ -6,6 +6,7 @@ files = \
 	fstab \
 	group \
 	inittab \
+	modules.conf \
 	nsswitch.conf \
 	passwd
 
