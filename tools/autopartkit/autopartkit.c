@@ -136,6 +136,38 @@ static void fix_mounting(device_mntpoint_map_t mountmap[], int partcount);
 #if defined(fordebian)
 static DeviceStats* get_device_stats(PedDevice*);
 #endif /* fordebian */
+#if defined(HAVE_PED_DISK_COMMIT)
+void autopartkit_handle_timer(PedTimer* timer, void* context);
+#endif
+
+#if defined(HAVE_PED_DISK_COMMIT) 
+/* update the debconf progress bar when given notice by autopartkit */
+void
+autopartkit_handle_timer(PedTimer* timer, void* context)
+{
+    int minutes_left = (timer->predicted_end - timer->now) / 60;
+    char hours[16], minutes[16];
+    char *template;
+
+    if (minutes_left < 1) {
+        template = "autopartkit/createfs-estimate-lessthanaminute";  
+    } else if (minutes_left < 60) {
+        template = "autopartkit/createfs-estimate-nohour";
+    } else {
+        template = "autopartkit/createfs-estimate";
+    }
+
+    sprintf(hours, "%u", minutes_left / 60);
+    sprintf(minutes, "%u", minutes_left % 60);
+    
+    debconf_subst(client, template, "STATUS", timer->state_name);
+    debconf_subst(client, template, "HOURS", hours);
+    debconf_subst(client, template, "MINUTES", minutes);
+
+    debconf_progress_info(client, template);
+    debconf_progress_set(client, (int)(timer->frac * 1000.0f));
+}
+#endif
 
 void
 autopartkit_error (int isfatal, const char * format, ...)
@@ -893,7 +925,11 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     diskspace_req_t requirements[MAX_PARTITIONS], *req_tmp = NULL;
     int partcount = 0;
     struct disk_info_t *spaceinfo = NULL;
-
+    
+#if defined(HAVE_PED_DISK_COMMIT)
+    PedTimer *timer = NULL;
+#endif /* HAVE_PED_DISK_COMMIT */
+    
 #if defined(LVM_HACK)
     void *lvm_pv_stack;
     void *lvm_lv_stack;
@@ -1064,7 +1100,19 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		  newpart->geom.end - newpart->geom.start; /* is this needed?*/
 	        req_tmp->curdisk->geom.start = newpart->geom.end + 1;
 
-	        fs = ped_file_system_create(&newpart->geom,fs_type, NULL);
+#if defined(HAVE_PED_DISK_COMMIT)
+                debconf_subst(client, "autopartkit/createfs-progress", "FSTYPE", req_tmp->fstype);
+                debconf_subst(client, "autopartkit/createfs-progress", "MOUNTPOINT", req_tmp->mountpoint);
+                debconf_progress_start(client, 0, 1000, "autopartkit/createfs-progress");
+
+		timer = ped_timer_new(autopartkit_handle_timer, NULL);
+                fs = ped_file_system_create(&newpart->geom,fs_type, timer);
+                ped_timer_destroy(timer);
+
+                debconf_progress_stop(client);            
+#else
+                fs = ped_file_system_create(&newpart->geom,fs_type, NULL);
+#endif
 		if ( ! fs )
 		  autopartkit_error (1, "  ped_file_system_create failed\n");
 		else
