@@ -4,8 +4,15 @@ set -e
 . /usr/share/debconf/confmodule
 . /lib/preseed/preseed.sh
 
+usedfloppy=
+
 # Used by preseed function.
 preseed_fetch () {
+	if [ "${1%/*}" = "/floppy" ]; then
+		mountfloppy || true
+		usedfloppy=1
+	fi
+	
 	if [ ! -e "$1" ] || ! cp "$1" $2; then
 		return 1
 	else
@@ -22,3 +29,7 @@ preseed_relative () {
 
 preseed preseed/file
 preseed_command preseed/early_command
+
+if [ "$usedfloppy" ]; then
+	umount /floppy || true
+fi
