@@ -30,9 +30,21 @@ $ssh_exp->expect($ENV{STAGE_2_MAX_TIME},
 			exp_continue;
 		}
 	],
-	[	"Re-enter password to verify:" =>
+	[	"enter the same root password again:" =>
 		sub {
 			$ssh_exp->send("$ENV{ROOT_PASSWORD}\r");
+			exp_continue;
+		}
+	],
+	[	"Enter a password for the new user:" =>
+		sub {
+			$ssh_exp->send("$ENV{USER_PASSWORD}\r");
+			exp_continue;
+		}
+	],
+	[	"enter the same user password again:" =>
+		sub {
+			$ssh_exp->send("$ENV{USER_PASSWORD}\r");
 			exp_continue;
 		}
 	],
