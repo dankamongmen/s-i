@@ -371,9 +371,37 @@ if [ -x /etc/init.d/pcmcia ]; then
 		db_progress STEP $OTHER_STEPSIZE
 	fi
 fi
+
+gen_pcmcia_devnames() {
+  while read line; do
+    log "Reading line: $line"
+    line="$(echo $line | tr '\t' ' ')"
+
+    case "$line" in
+      Socket*)
+        devname="$(echo $line | cut -d' ' -f3-)"
+      ;;
+      [0-9]*)
+        class="$(echo $line | cut -d' ' -f2)"
+        dev="$(echo $line | cut -d' ' -f5)"
+
+        if [ "$class" != "network" ]; then
+          devname=""
+          return
+        else
+          echo "$dev:$devname" >> /etc/network/devnames
+        fi
+      ;;
+    esac
+  done
+}
+
 if [ -e /proc/bus/pccard/drivers ]; then
 	log "Detected PCMCIA, installing pcmcia-cs."
 	apt-install pcmcia-cs || true
+
+	# Determine devnames.
+	gen_pcmcia_devnames < /var/run/stab
 fi
 
 # Ask for discover to be installed into /target/, to make sure the
