@@ -8,6 +8,11 @@ for item in $(cat $CMDLINE); do
 		continue
 	fi
 	
+	# init is not generally useful to pass on.
+	if [ "$var" = init ]; then
+		continue
+	fi
+
 	# Skip debconf variables.
 	varnoslash="${var##*/*}"
 	if [ "$varnoslash" = "" ]; then
