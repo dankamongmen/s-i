@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.21 2002/07/22 22:53:16 tfheen Exp $
+ * $Id: commands.c,v 1.22 2002/08/13 16:17:51 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -740,11 +740,15 @@ int command_x_loadtemplatefile(struct confmodule *mod, int argc, char **argv,
     while (t)
     {
         mod->templates->methods.set(mod->templates, t);
-        q = question_new(t->tag);
+        q = mod->questions->methods.get(mod->questions, t->tag);
+        if (q == NULL) {
+            q = question_new(t->tag);
+            q->template = t;
+            template_ref(t);
+        }
         mod->questions->methods.set(mod->questions, q);
-        question_deref(q);
         t = t->next;
     }
-	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
-	return DC_OK;
+    snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+    return DC_OK;
 }
