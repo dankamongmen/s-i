@@ -176,6 +176,18 @@ if $(svn st $DI_COPY/packages | grep -q "^C") ; then
   exit 1
 fi
 
+# First, update the copy of D-I repository
+cd $DI_COPY/packages
+if [ "$ONLINE" = "Y" ] ; then
+  if [ "$DEBUG" = "Y" ] ; then
+    echo Synchronising $DI_COPY/packages:
+    $svn update || svnerr
+    echo Done.
+  else
+    $svn update >/dev/null 2>&1 || svnerr
+  fi
+fi
+
 # Check the packages/po/run-l10n-sync file
 markerfile=${DI_COPY}/packages/po/run-l10n-sync
 if [ -f ${markerfile} ] ; then
@@ -189,18 +201,6 @@ if [ -f ${markerfile} ] ; then
 else
   echo No ${markerfile} file: aborting...
   exit 1
-fi
-
-# First, update the copy of D-I repository
-cd $DI_COPY/packages
-if [ "$ONLINE" = "Y" ] ; then
-  if [ "$DEBUG" = "Y" ] ; then
-    echo Synchronising $DI_COPY/packages:
-    $svn update || svnerr
-    echo Done.
-  else
-    $svn update >/dev/null 2>&1 || svnerr
-  fi
 fi
 
 # Let's check the thing again....ceinture et bretelles as we say in French
