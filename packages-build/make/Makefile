@@ -4,6 +4,7 @@ INSTALL = install -m644
 INSTALL_EXEC = install
 
 FILES = \
+	config \
 	rules
 
 FILES_EXEC = \
