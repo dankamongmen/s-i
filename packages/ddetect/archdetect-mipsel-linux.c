@@ -47,8 +47,16 @@ static struct system system_type[] = {
 	{"Digital ", system_dec_decs_cpu },
 	/* match the Broadcom SWARM development board */
 	{"SiByte BCM91250A", system_sibyte_sb1_ind_cpu },
-	/* match MIPS based Cobalt machines */
+	/* match MIPS based Cobalt machines (with old kernels) */
 	{"MIPS Cobalt", system_cobalt_cpu },
+	/* match MIPS based Cobalt machines (with new kernels),
+	 * that is, match any of
+	 *	"Cobalt RaQ"
+	 *	"Cobalt Qube"
+	 *	"Cobalt RaQ2"
+	 *	"Cobalt Qube2"
+	 */
+	{"Cobalt ", system_cobalt_cpu },
 	/* add new system types here */
 	{ NULL, system_unknown_cpu }
 };
