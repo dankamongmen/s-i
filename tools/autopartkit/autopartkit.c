@@ -1014,7 +1014,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 				    req_tmp->fstype);
 		else
 		{
-		    autopartkit_log("  Stacking LVM lv %s on vg %s "
+		    autopartkit_log(1, "  Stacking LVM lv %s on vg %s "
 				    "fstype %s\n", info[1], info[2], info[3]);
 		    /* Store vgname, lvname and size in stack */
 		    lvm_lv_stack_push(lvm_lv_stack, info[1], info[2], info[3],
