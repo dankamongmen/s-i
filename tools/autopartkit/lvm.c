@@ -82,18 +82,14 @@ vg_exists(const char *vgname)
         return FALSE;
 
     asprintf(&devpath, "/proc/lvm/VGs/%s", vgname);
-    if ( devpath
-         && 0 == stat(devpath, &statbuf)
-         && S_ISDIR(statbuf.st_mode) )
-        retval = TRUE;
+    if ( ! devpath)
+        autopartkit_error(0, "Unable to allocate string for vg '%s'", vgname);
     else
-        autopartkit_error(0, "Missing volume group '%s' (%s)",
-			  vgname, 
-                          devpath ? devpath : "(null)");
-
-    if (devpath)
+    {
+        if (0 == stat(devpath, &statbuf) && S_ISDIR(statbuf.st_mode) )
+	    retval = TRUE;
         free(devpath);
-
+    }
     return retval;
 }
 
@@ -103,8 +99,6 @@ lvm_init(void)
     int retval;
     if ( ! lvm_isinstalled())
         return -1;
-    /* Call vgscan */
-    retval = system("vgscan >> /var/log/messages 2>&1");
     return 0;
 }
 
@@ -136,7 +130,7 @@ lvm_init_dev(const char *devpath)
 int
 lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
 {
-    int retval = -1;
+    int retval;
     char *progname = NULL;
     char * cmd = NULL;
 
@@ -147,6 +141,10 @@ lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
                     devpath ? devpath : "(null)",
                     vgname ? vgname : "(null)");
 
+    /* Call vgscan first, it seem to be required for vgcreate to work. */
+    if (0 != (retval = system("vgscan >> /var/log/messages 2>&1")))
+        autopartkit_log(2, "Executing vgscan returned error code %d\n",retval);
+
     if (vg_exists(vgname))
         progname = "vgextend";
     else
@@ -154,6 +152,8 @@ lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
 
     asprintf(&cmd, "%s %s %s >> /var/log/messages 2>&1", progname,
              vgname, devpath);
+
+    retval = -1;
     if (cmd)
     {
 	retval = system(cmd);
