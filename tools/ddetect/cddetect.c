@@ -6,7 +6,7 @@
 
 
 #include <stdio.h>
-#include <detect.h>
+#include <discover.h>
 #include <unistd.h>
 
 #include "cddetect.h"

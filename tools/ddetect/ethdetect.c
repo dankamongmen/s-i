@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <detect.h>
+#include <discover.h>
 #include <debconfclient.h>
 #include <string.h>
 #include "utils.h"
