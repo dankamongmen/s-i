@@ -106,8 +106,44 @@ db_progress STEP 1
 db_subst elilo-installer/progress_running bootdev "$bootpart"
 db_progress INFO elilo-installer/progress_running
 
+## efibootmgr, which is called by elilo, needs this
+if [ ! -f /proc/efivars ] && [ ! -d /sys/firmware/efi/vars ] ; then
+  modprobe efivars
+  if ! modprobe efivars ; then
+    log "Couldn't load efivars module - is it statically linked?"
+  fi
+fi
+
+## efi variables (needed by efibootmgr) are exported via proc in 2.4,
+## or via sysfs in 2.6.  Make sure sysfs is mounted if it needs to be.
+## We should probably also make sure proc is mounted, since whatever is
+## mounting /proc today may not always do so in the future.
+sysmount=0
+
+if grep -q sysfs /proc/filesystems ; then
+  if [ ! -d /target/sys ] ; then
+    error "/target/sys does not exist"
+  fi
+  ## check to see if sysfs is already mounted in the target
+  if ! grep '^sysfs ' /proc/mounts | cut -d' ' -f2 | grep -q '^/target/sys$' ; then
+    if mount sysfs /target/sys -t sysfs ; then
+      sysmount=1
+    else
+      log "Couldn't mount sysfs, continuing in case its not needed"
+    fi
+  fi
+fi
+
 chroot /target /usr/sbin/elilo --autoconf --boot $bootpart \
       --root $rootfs --efiboot
+
+## umount sysfs if we mounted it above
+if [ $sysmount -eq 1 ]; then
+  if ! umount /target/sys; then
+    log "Couldn't umount sysfs, continuing in case that's ok"
+  fi
+fi
+
 errcode=$?
 if [ "$errcode" = 0 ] ; then
 	info "Boot loader successfully installed into EFI partition"
