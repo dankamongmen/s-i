@@ -2,6 +2,11 @@
  * Retriever interface code.
  */
 
+#include <cdebconf/debconfclient.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,10 +14,67 @@
 #include "anna.h"
 
 /* Returns the filename of the retriever to use. */
-/* TODO: handle more than one, and don't hard-code. */
+/* TODO: error handling */
 char *chosen_retriever (void) {
+	static char *retriever = NULL;
         
-	return "/usr/lib/debian-installer/retriever/cdrom-retriever";
+	if (retriever == NULL) {
+                DIR *retrdir;
+		struct dirent *d_ent;
+		struct debconfclient *debconf;
+		int retstr_size = 1, fname_len;
+		char *ret_choices, *ret_default = NULL;
+		char *fname;
+                struct stat st;
+
+		/* Find out which retrievers are available */
+		retrdir = opendir(RETRIEVER_DIR);
+		ret_choices = malloc(1);
+                ret_choices[0] = '\0';
+		while ((d_ent = readdir(retrdir)) != NULL) {
+			fname_len = strlen(d_ent->d_name);
+			fname = (char *)malloc(strlen(RETRIEVER_DIR) + 1 + 
+                                                      fname_len);
+			strcpy(fname, RETRIEVER_DIR "/");
+			strcat(fname, d_ent->d_name);
+			stat(fname, &st);
+			free(fname);
+			if (S_ISREG(st.st_mode)) {
+				/* Should we check for x flag too? */
+				retstr_size += fname_len + 2;
+                                ret_choices = realloc(ret_choices, retstr_size);
+				strcat(ret_choices, d_ent->d_name);
+				strcat(ret_choices, ", ");
+				/* Pick the first one to be default :) */
+				if (ret_default == NULL)
+					ret_default = strdup(d_ent->d_name);
+			}
+                }
+		closedir(retrdir);
+		if (retstr_size >= 3)
+			ret_choices[retstr_size-3] = '\0';
+
+		debconf = debconfclient_new();
+		debconf->command(debconf, "TITLE", "Choose Retriever", NULL);
+		debconf->command(debconf, "SET", ANNA_RETRIEVER, ret_default, 
+                                 NULL);
+		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "RETRIEVER", 
+                                 ret_choices, NULL);
+		debconf->command(debconf, "SUBST", ANNA_RETRIEVER, "DEFAULT", 
+                                 ret_default, NULL);
+                debconf->command(debconf, "INPUT medium", ANNA_RETRIEVER, NULL);
+		debconf->command(debconf, "GO", NULL);
+		debconf->command(debconf, "GET", ANNA_RETRIEVER, NULL);
+		retriever = malloc(strlen(RETRIEVER_DIR) + 1 + 
+                                   strlen(debconf->value));
+		strcpy(retriever, RETRIEVER_DIR "/");
+		strcat(retriever, debconf->value);
+		debconfclient_delete(debconf);
+                
+		free(ret_choices);
+		free(ret_default);
+        }
+        return retriever;
 }
 
 /* Ask the chosen retriever to download a particular package to to dest. */
@@ -47,7 +109,7 @@ struct package_t *get_packages (void) {
         suite = suites[currsuite];
         while (suite != NULL) {
           char *command=malloc(strlen(retriever) + 10 + 
-                               sizeof(tmp_packages) + 1);
+                               sizeof(tmp_packages) + 1 + strlen(suite));
 
                 unlink(tmp_packages);
                 sprintf(command, "%s Packages %s %s", retriever, tmp_packages, 
