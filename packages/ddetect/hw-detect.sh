@@ -232,7 +232,7 @@ get_ide_floppy_info() {
 
 get_input_info() {
 	case "$(udpkg --print-architecture)" in
-		i386|ia64)
+		i386|ia64|amd64)
 			register-module psmouse
 		;;
 	esac
