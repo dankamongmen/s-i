@@ -1,0 +1,31 @@
+debian-installer language chooser
+=================================
+
+This package should behava as follows:
+
+  0. extract available languages from list of available locales
+     (mapping language code -> language name)
+
+  1. present list of language names, and ask the user to pick one.
+
+  2. if the language is available in several regions (maps to several
+     locales), ask which region / language variant to use.  (allow
+     user to [back] off to the language list.
+
+  3. pass the locale information on to the parts that needs it.
+
+Based on this information a locale is selected.  This locale maps to
+one language, one region, a priority list of fallback languages, and a
+default keyboard layout.
+
+The language code is passed into cdebconf.  The locale and priority
+list of languages is passed to base-config/termwrap as LANG_INST and
+LANGUAGE_INST in /target/root/dbootstrap_settings.  The 
+
+For each supported locale, the following information must be
+available:
+
+  - language code (part of locale)
+  - country code (part of locale)
+  - priority list of fallback languages to use as translations
+  - default keymap to use
