@@ -1,0 +1,52 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+ARCH=$(shell dpkg --print-architecture)
+PACKAGE=partitioner
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	$(MAKE) all
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	rm -f debian/partitioner.postinst
+	-$(MAKE) distclean
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	install -m755 partitioner debian/partitioner.postinst
+	install -m755 -d debian/partitioner/usr/share/partitioner
+	for i in `find scripts/ -type f -print`; do \
+		install -m644 $$i debian/partitioner/usr/share/partitioner/; \
+	done
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf	
+	dh_fixperms
+	dh_installdeb
+	install debian/menutest debian/$(PACKAGE)/DEBIAN/menutest
+	dpkg-gencontrol -Pdebian/$(PACKAGE) -p$(PACKAGE) \
+		-n$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+	cd debian && dpkg-deb -b $(PACKAGE) \
+		../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
