@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
-<!-- $Id: boot-drive-files.xml,v 1.1 2003/11/14 05:20:01 mck Exp $ -->
-<!-- original version: 1.6 -->
+<!-- $Id: boot-drive-files.xml,v 1.2 2004/03/14 15:06:00 mck-guest Exp $ -->
+<!-- original version: 1.7 -->
 
  <sect1 condition="bootable-disk" id="boot-drive-files">
  <title>Příprava souborů pro zavedení z pevného disku</title>
@@ -43,15 +43,16 @@ novější (NewWorld) nebo starší (OldWorld) Macintosh.
 
   <sect2 arch="i386" id="files-lilo">
   <title>Zavedení instalačního systému programem
-  <command>LILO</command></title>
+  <command>LILO</command> nebo <command>GRUB</command></title>
 <para>
 
 Tato část vysvětluje, jak zavést instalaci z existující linuxové
-distribuce za pomoci programu <command>LILO</command>.
+distribuce za pomoci programu <command>LILO</command>, resp.
+<command>GRUB</command>.
 
 </para><para>
 
-<command>LILO</command> totiž kromě jádra umí zavést do paměti také
+Oba zavaděče totiž kromě jádra umí zavést do paměti také
 obraz disku. Ten pak můžete použít jako kořenový souborový systém.
 
 </para><para>
@@ -63,12 +64,12 @@ přesuňte je na vhodné místo (například do
 <itemizedlist>
 <listitem><para>
 
-<filename>linux.bin</filename> (vhodné jádro)
+<filename>vmlinuz</filename> (vhodné jádro)
 
 </para></listitem>
 <listitem><para>
 
-<filename>root.bin</filename> (kořenový obraz)
+<filename>initrd.gz</filename> (obraz ramdisku)
 
 </para></listitem>
 <listitem><para>
@@ -85,7 +86,7 @@ kam jste umístili takto získané moduly (soubory s příponou
 
 </para><para>
 
-Samozřejmě že můžete <filename>linux.bin</filename> a
+Samozřejmě že můžete <filename>vmlinux</filename> a
 <filename>drivers.tgz</filename> nahradit svými vlastními verzemi
 (například přidáte modul pro svou exotickou síťovou kartu).
 U vlastního jádra nezapomeňte zakompilovat podporu pro
@@ -95,8 +96,7 @@ naleznete na začátku <xref linkend="rescue-replace-kernel"/>.
 
 </para><para>
 
-Nastavení <command>LILA</command> popisuje
-<xref linkend="boot-initrd"/>.
+Nastavení zavaděče popisuje <xref linkend="boot-initrd"/>.
 
 </para>
   </sect2>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
-<!-- $Id: i386.xml,v 1.4 2004/03/06 10:01:53 mck-guest Exp $ -->
-<!-- original version: 1.8 -->
+<!-- $Id: i386.xml,v 1.5 2004/03/14 15:06:00 mck-guest Exp $ -->
+<!-- original version: 1.13 -->
 
   <sect2 arch="i386"><title>Zavedení z CD-ROM</title>
 
@@ -89,11 +89,6 @@ Pokud budete instalovat z oblasti FAT, můžete zavést instalační
 systém z pevného disku. Informace o této metodě naleznete v
 <xref linkend="install-from-dos"/>.
 
-</para><para>
-
-Jádro <quote>bf2.4</quote> podporuje i CD-ROM mechaniky na USB a
-FireWire zařízení podporovaná ovladači ohci1394 a sbp2.
-
 </para>
   </sect2>
 
@@ -133,7 +128,8 @@ bf2.4. Příznakem tohoto problému je chybová hláška
 
 
   <sect2 arch="i386" id="boot-initrd">
-  <title>Zavedení z Linuxu programem <command>LILO</command></title>
+  <title>Zavedení z Linuxu programem <command>LILO</command> nebo
+  <command>GRUB</command></title>
 <para>
 
 Jedinou řádkou <emphasis>initrd=</emphasis> v souboru
@@ -143,12 +139,12 @@ Jedinou řádkou <emphasis>initrd=</emphasis> v souboru
 <listitem><para>
 
 řeknete zavaděči <command>LILO</command>, že má při zavádění použít
-soubor <filename>root.bin</filename> jako RAMdisk,
+soubor <filename>initrd.gz</filename> jako RAMdisk,
 
 </para></listitem>
 <listitem><para>
 
-řeknete jádru <filename>linux.bin</filename>, že má tento RAMdisk
+řeknete jádru <filename>vmlinuz</filename>, že má tento RAMdisk
 použít jako svou kořenovou oblast.
 
 </para></listitem>
@@ -160,9 +156,9 @@ Následuje příklad <filename>/etc/lilo.conf</filename>:
 
 <informalexample><screen>
 
-image=/boot/newinstall/linux.bin
+image=/boot/newinstall/vmlinuz
        label=newinstall
-       initrd=/boot/newinstall/root.bin
+       initrd=/boot/newinstall/initrd.gz
 
 </screen></informalexample>
 
@@ -177,9 +173,26 @@ a restartovat počítač.
 
 </para><para>
 
+Postup pro <command>GRUB</command> je velmi podobný. Do souboru
+<filename>menu.lst</filename> v adresáři
+<filename>/boot/grub/</filename> (občas
+<filename>/boot/boot/grub/</filename>) přidejte následující řádky:
+
+<informalexample><screen>
+
+title  New Install
+kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram ramdisk_size=8192 devfs=mount,dall
+initrd (hd0,0)/boot/newinstall/initrd.gz
+
+</screen></informalexample>
+
+a restartujte počítač. Od teď by neměl být mezi oběma zavaděči žádný
+rozdíl.
+
+</para><para>
+
 Magii okolo <filename>initrd</filename> můžete během zavádění
 vystopovat na několika místech.
-
 
 <itemizedlist>
 <listitem><para>
@@ -233,7 +246,7 @@ nahrajete příkazem <userinput>insmod</userinput>.
 </para><para>
 
 Vraťte se zpět do <command>debian-installer</command>, z menu vyberte
-krok <xref linkend="configure-network"/> a
+krok <xref linkend="netcfg"/> a
 zkuste <userinput>ping</userinput>nout své oblíbené zrcadlo s Debianem.
 Povedlo se? Gratulujeme!
 
@@ -248,20 +261,42 @@ instalace nebudete moci z disku zavést systém.
 </para>
   </sect2>
 
+  <sect2 arch="i386" id="usb-boot">
+  <title>Zavedení z USB <quote>klíčenky</quote></title>
+<para>
 
-  <sect2 arch="i386"><title>Zavedení z disket</title>
+Předpokládejme, že jste si připravili vše nezbytné z <xref
+linkend="boot-dev-select"/> a <xref linkend="boot-usb-files"/>. Nyní
+jednoduše zapojte klíčenku do volného USB portu a restartujte
+počítač. Systém by měl nastartovat a měl by zobrazit úvodní obrazovku
+s výzvou <prompt>boot:</prompt>, kde můžete zadat volitelné parametry,
+nebo prostě zmáčknout &enterkey;.
+
+</para><para>
+
+Pokud váš počítač neumožňuje zavádění z USB zařízení, můžete pro
+zavedení použít disketu a poté přejít k USB. Poskupujte podle <xref
+linkend="floppy-boot"/> &mdash; jádro na disketě by mělo automaticky
+rozpoznat připojená USB zařízení. Až budete požádáni o vložení
+kořenové diskety, jednoduše stiskněte &enterkey; a &d-i; by měl
+nastartovat.
+
+</para>
+  </sect2>
+
+  <sect2 arch="i386" id="floppy-boot">
+  <title>Zavedení z disket</title>
 <para>
 
 Předpokládáme, že jste si již potřebné obrazy stáhli a podle
 <xref linkend="create-floppy"/> vytvořili příslušné diskety.
-Jestliže je to nutné, můžete si záchrannou disketu přizpůsobit,
+Jestliže je to nutné, můžete si zaváděcí disketu přizpůsobit,
 viz <xref linkend="rescue-replace-kernel"/>.
 
 </para><para>
 
-Zavedení ze záchranné diskety je jednoduché. Zasuňte disketu do
-primární disketové jednotky a normálně systém vypněte a znovu
-zapněte.
+Zavedení z diskety je jednoduché. Zasuňte disketu do první disketové
+jednotky a normálně systém vypněte a znovu zapněte.
 
 </para><para>
 
@@ -286,24 +321,10 @@ restart</quote> během zavádění.
 </para><para>
 
 Kontrolka disketové mechaniky se rozsvítí a měla by se zobrazit
-uvítací obrazovka končící výzvou <prompt>boot:</prompt>.
-
-</para><para>
-
-Pokud zavádíte systém alternativní cestou, postupujte podle instrukcí
-a počkejte, až se objeví výzva <prompt>boot:</prompt>.
-Při instalaci z disket o kapacitě menší než 1,44 MB
-<phrase condition="rescue-needs-root-disk">
-(nebo vlastně kdykoliv při instalaci z disket)
-</phrase> musíte použít zavádění s RAMdiskem a navíc budete ještě
-potřebovat disketu s kořenovým svazkem souborů.
-
-</para><para>
-
-Když je na obrazovce výzva <prompt>boot:</prompt>, můžete si buď
-přečíst informace dostupné po stisknutí funkčních kláves
-<keycap>F1</keycap> až <keycap>F10</keycap>, nebo rovnou spustit
-zavádění systému.
+uvítací obrazovka končící výzvou <prompt>boot:</prompt>.  Na této
+obrazovce si můžete buď přečíst informace dostupné po stisknutí
+funkčních kláves <keycap>F1</keycap> až <keycap>F10</keycap>, nebo
+rovnou spustit zavádění systému.
 
 </para><para>
 
@@ -316,14 +337,6 @@ pouze zmáčknete &enterkey;, je to jako byste napsali
 
 </para><para>
 
-Disketa se nazývá záchranná, poněvadž ji můžete použít i v nouzové
-situaci, kdy by váš nainstalovaný systém nešel spustit z pevného
-disku. Tuto disketu byste si raději měli schovat i po zdárném
-dokončení instalace. Více informací o použití záchranné diskety
-získáte klávesou <keycap>F3</keycap>.
-
-</para><para>
-
 Po stisknutí &enterkey; se objeví hlášení
 <computeroutput>Loading...</computeroutput> následované
 <computeroutput>Uncompressing Linux...</computeroutput> a několika
@@ -332,29 +345,71 @@ stranami o hardwaru vašeho počítače. O této fázi zavádění pojednává
 
 </para><para>
 
-Pokud zvolíte nestandardní zaváděcí postup
-(např. <quote>ramdisk</quote> nebo <quote>floppy</quote>), budete
-vyzváni k vložení diskety s kořenovým svazkem. Až vložíte disketu do
-první mechaniky, zmáčkněte &enterkey;. (Volba <quote>floppy1</quote>
-čte disketu z druhé disketové mechaniky.)
-
-</para><para>
-
-Po zavedení ze záchranné diskety je požadována kořenová
+Po zavedení ze zaváděcí diskety je požadována kořenová
 disketa. Vložte ji do mechaniky, zmáčkněte &enterkey; a počkejte, až
 se její obsah natáhne do paměti a automaticky se spustí program
-<command>debian-installer</command>.
+&d-i;.
 
 </para>
   </sect2>
-  
+
+  <sect2 arch="i386" id="boot-tftp"><title>Zavedení z TFTP</title>
+
+&boot-installer-intro-net.xml;
+ 
+<para>
+
+Na architektuře &architecture; existuje několik možností zavedení
+z TFTP.
+
+</para>
+
+   <sect3><title>Etherboot</title>
+<para>
+
+Projekt <ulink url="http://www.etherboot.org">Etherboot</ulink> nabízí
+kromě zaváděcích disket také paměti do síťových karet.
+
+</para>
+   </sect3>
+
+   <sect3><title>Síťová karta s bootROM</title>
+<para>
+
+Je možné, že vaše síťová karta nabízí možnost zavedení z TFTP.
+
+</para><para condition="FIXME">
+
+Pokud máte zkušenosti s tímto typem zavádění, neváhejte nám poslat
+vaše poznatky na adresu <email>&email-debian-boot-list;</email>.
+Text pište anglicky a odkažte v něm se na tento dokument.
+
+</para>
+   </sect3>
+
+   <sect3><title>Síťová karta s podporou PXE</title>
+<para>
+
+Novější síťové karty podporují zavádění metodou PXE, což je
+reimplementace TFTP od <trademark class="trade">Intel</trademark>u.
+
+</para><para condition="FIXME">
+
+Pokud máte zkušenosti s tímto typem zavádění, neváhejte nám poslat
+vaše poznatky na adresu <email>&email-debian-boot-list;</email>.
+Text pište anglicky a odkažte v něm se na tento dokument.
+
+</para>
+   </sect3>
+  </sect2>
+
   <sect2 arch="i386"><title>Zaváděcí parametry pro i386</title>
 <para>
 
-Pokud zavádíte systém ze záchranné diskety nebo z CD-ROM, objeví se
+Pokud zavádíte systém z diskety nebo z CD-ROM, objeví se
 vám tzv. boot prompt (zaváděcí výzva), <prompt>boot:</prompt>.
-Podrobnosti, jak používat zaváděcí parametry se záchrannou disketou,
-jsou k nalezení v <xref linkend="boot-from-floppies"/>.
+Podrobnosti o použití zaváděcích parametrů naleznete
+v <xref linkend="floppy-boot"/>.
 Pokud systém zavádíte ze stávajícího operačního systému, budete muset
 použít jiné způsoby, jak parametry nastavit. Například při instalaci z
 DOSu lze parametry změnit editací souboru
@@ -442,8 +497,8 @@ vraťte se do hlavního menu a pokračujte konfigurací PCMCIA
   <title>Systém zamrzne během nahrávání USB modulů</title>
 <para>
 
-Varianta jádro <quote>bf2.4</quote> se standardně snaží nahrát
-ovladače pro USB a konkrétně pro USB klávesnici, aby umožnila
+Jádro se standardně snaží nahrát ovladače pro USB a konkrétně pro USB
+klávesnice, aby umožnilo
 instalaci uživatelům s nestandardními USB klávesnicemi. Bohužel
 existují porouchané USB systémy, na kterých se ovladač při nahrávání
 zasekne. Obejít je můžete tím, že problémový USB řadič deaktivujete v

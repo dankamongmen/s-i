@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
-<!-- $Id: downloading-files.xml,v 1.4 2004/03/06 10:01:53 mck-guest Exp $ -->
-<!-- original version: 1.13 -->
+<!-- $Id: downloading-files.xml,v 1.5 2004/03/14 15:06:00 mck-guest Exp $ -->
+<!-- original version: 1.14 -->
 
  <sect1 id="downloading-files">
  <title>Stažení souborů z debianích zrcadel</title>
 
 <para>
+
+Nejbližší (a tedy pravděpodobně nejrychlejší) zrcadlo naleznete
+v <ulink url="&url-debian-mirrors;">seznamu zrcadel Debianu</ulink>.
+
+</para><para>
 
 Až budete stahovat soubory z debianího zrcadla, použijte
 <emphasis>binární</emphasis> mód, ne textový nebo automatický. Také je
@@ -19,10 +24,12 @@ diskety, nicméně pak požadované soubory naleznete rychleji.)
 </phrase>
 
 Svou lokální adresářovou strukturu byste měli budovat od adresáře
-<filename>disks-&architecture;</filename>. Například:
+<filename>installer-&architecture;</filename>. Například:
 
-<informalexample><screen>
-current/<replaceable>podarchitektura</replaceable>/images-1.44<replaceable arch="i386">/varianta</replaceable>/rescue.bin
+<informalexample><screen arch="i386">
+current/images/floppy/boot.img
+</screen><screen arch="not-i386">
+current/images/<replaceable>podarchitektura</replaceable>/netboot/initrd.gz
 </screen></informalexample>
 
 Samozřejmě, že nemusíte stahovat všechny soubory, ale pouze ty, které
@@ -87,9 +94,8 @@ V zásadě existují tři kategorie souborů:
 
 Soubory potřebné k zavedení instalačního systému (například
 <phrase arch="not-s390"> 
-<filename>rescue.bin</filename>, 
-<filename>linux.bin</filename> a
-<filename>root.bin</filename>).
+<filename>boot.img</filename> a <filename>root.img</filename>, nebo
+<filename>vmlinuz</filename> a <filename>initrd.gz</filename>).
 </phrase>
 
 <phrase arch="s390">
@@ -103,15 +109,14 @@ Soubory potřebné k zavedení instalačního systému (například
 
 Soubory, které bude instalační systém potřebovat po zavedení,
 aby mohl nainstalovat jádro a ovladače zařízení (například 
-<filename>rescue.bin</filename> a
-<filename>drivers.tgz</filename>).
+<filename>net-drivers.img</filename> a
+<filename>cd-drivers.img</filename>).
 
 </para></listitem>
 
 <listitem><para>
 
-Instalační soubory základního systému (například
-<filename>basedebs.tar</filename>).
+Instalační soubory základního systému.
 
 </para></listitem>
 </orderedlist>
@@ -120,19 +125,22 @@ Instalační soubory základního systému (například
 Pokud máte v počítači funkční ethernetové připojení a podpora pro vaši
 ethernetovou kartu je zakompilovaná v instalačním jádře, budou vám
 stačit soubory k zavedení instalačního systému. Instalační systém může
-instalovat jádro a ovladače ze sítě.
+instalovat ovladače a zbytek systému ze sítě.
 
 </para><para>
 
 Jestliže máte ethernetové připojení, pro které nemá instalační jádro
-podporu, budete potřebovat zaváděcí soubory instalačního systému,
-jádro a soubory s ovladači zařízení.
+podporu, budete potřebovat zaváděcí soubory instalačního systému
+a soubory s ovladači zařízení.
 
 </para><para>
 
 Pokud instalujete na systém bez funkčního připojení k síti, nebo
 jestliže jste připojeni přes PPP (modemem), budete si muset před
-instalací sehnat všechny tři typy souborů.
+instalací sehnat všechny tři typy souborů. Soubory základního systému
+jsou dostupné na prvním CD s Debianem (nebo na jeho menší 120MB
+variantě nazývané <firstterm>netinst</firstterm>). Toto CD nemusíte
+nemusíte mít ve fyzické podobě, stačí vám jen jeho obraz.
 
 </para><para>
 
@@ -140,15 +148,6 @@ Pokud si nejste jisti, které soubory potřebujete, začnete pouze se
 zaváděcími soubory instalačního systému. Jestliže se vám nepodaří
 nastavit síťové připojení, můžete instalaci ukončit, stáhnout si
 potřebné soubory a spustit instalaci znovu.
-
-</para><para>
-
-Instalační soubor základního systému
-<filename>basedebs.tar</filename> zabírá asi 27 megabajtů.
-Pokud můžete použít CD, nebo můžete nastavit síť ještě před instalací
-základního systému, je lepší toho využít a tento soubor nestahovat.
-Přesné umístění na síti naleznete v dodatku
-(<xref linkend="base-images"/>).
 
 </para>
   </sect2>
@@ -170,7 +169,7 @@ Standardní balík jádra dodávaný v Debianu. Obsahuje skoro všechny
 ovladače podporované Linuxem (přeložené jako moduly), což zahrnuje
 ovladače pro síťová zařízení, zařízení SCSI, zvukové karty,
 Video4Linux, atd. Varianta <quote>vanilla</quote> obsahuje jednu
-záchrannou disketu (rescue), jednu kořenovou disketu (root) a čtyři
+zaváděcí disketu (boot), jednu kořenovou disketu (root) a dvě
 diskety s ovladači.
 
 </para></listitem>
@@ -182,7 +181,8 @@ diskety s ovladači.
 
 Podobné jako <quote>vanilla</quote>, ale navíc zahrnuje podporu pro
 braillovy řádky. Přesný seznam podporovaných modelů naleznete
-v dokumentaci k <classname>brltty</classname>.
+v dokumentaci k <classname>brltty</classname>. Tato varianta se skládá
+z jedné zaváděcí diskety, jedné kořenové diskety a diskety s ovladači.
 
 </para></listitem>
 </varlistentry>
@@ -477,17 +477,11 @@ do jednoho souboru. Stačí, abyste si stáhli příslušný archiv ze sekce
 <xref linkend="mac-install-files"/>.
 Samostatné soubory jsou potřeba pouze pro VME.
 
-</para><para>
-
-Umístění instalačních souborů na síti je pro každou variantu
-&architecture; vyjmenováno v dodatku.
-Tyto soubory obsahují:
-
 </para>
 
 <variablelist>
 <varlistentry>
-<term>obraz záchranné diskety</term>
+<term>obraz zaváděcí diskety</term>
 <listitem>
 <itemizedlist>
 &list-rescue-images;
@@ -506,43 +500,35 @@ Tyto soubory obsahují:
 
 <varlistentry>
 <term>jádro</term>
-<listitem><para>
-
-<xref linkend="kernel-images"/>
-
-</para></listitem>
+<listitem>
+<itemizedlist>
+&list-kernel-files;
+</itemizedlist>
+</listitem>
 </varlistentry>
 
 <varlistentry>
 <term>obrazy disket (nebo archiv) s ovladači</term>
-<listitem><para>
-
-<xref linkend="driver-images"/>
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<term>obrazy (nebo archiv) základního systému</term>
-<listitem><para>
-
-<xref linkend="base-images"/>
-
-</para></listitem>
+<listitem>
+<itemizedlist>
+&list-driver-images;
+&list-driver-disk-tarball;
+</itemizedlist>
+</listitem>
 </varlistentry>
 </variablelist>
 
 <para arch="not-powerpc">
 
-Obraz záchranné diskety obsahuje komprimované linuxové jádro, které se
+Obraz zaváděcí diskety obsahuje komprimované linuxové jádro, které se
 použije při 
 <phrase arch="not-s390">zavádění z disket a později při</phrase>
 instalaci, kde se nainstaluje na pevný disk.
-Binární soubor <filename>linux.bin</filename> je nekomprimované jádro
+Binární soubor <filename>vmlinuz</filename> je nekomprimované jádro
 a používá se k zavedení instalačního systému z
 <phrase arch="not-s390">
-pevného disku nebo CD-ROM. Při zavádění instalačního systému z diskety
-není potřeba. 
+pevného disku, usb klíčenky nebo CD-ROM. Při zavádění instalačního
+systému z diskety není potřeba. 
 </phrase><phrase arch="s390">
 pásky, emulované pásky nebo VM readeru.
 </phrase>
@@ -557,12 +543,12 @@ jádro je potřeba k síťovému zavedení stanic DECstation.
 </para><para arch="powerpc"> 
 
 Obrazy <filename>boot-floppy-hfs</filename> i
-<filename>rescue.bin</filename> obsahují komprimované linuxové jádro.
+<filename>boot.img</filename> obsahují komprimované linuxové jádro.
 Jádro na disketě <filename>boot-floppy-hfs</filename> slouží k
 zavedení instalačního systému, zatímco jádro z
-<filename>rescue.bin</filename> se nainstaluje na pevný disk počítače.
+<filename>boot.img</filename> se nainstaluje na pevný disk počítače.
 Na architektuře &arch-title; se z diskety
-<filename>rescue.bin</filename> nedá zavádět. Třetí, nekomprimované,
+<filename>boot.img</filename> nedá zavádět. Třetí, nekomprimované,
 jádro <filename>linux.bin</filename> se používá k zavedení
 instalačního systému z pevného disku nebo CD-ROM. Při zavádění
 instalačního systému z diskety není potřeba.
@@ -576,14 +562,14 @@ staršími systémy bez přídavných grafických karet (třeba 7200 nebo
 alternativní obraz <filename>boot-video-ofonly.img</filename> (má
 přidán zaváděcí parametr video=ofonly).
 
-</para><para arch="not-s390">
+</para><para condition="supports-floppy-boot">
 
 O tom, jak správně vytvořit diskety z jejich obrazů, pojednává
 <xref linkend="create-floppy"/>.
 
 </para><para condition="rescue-needs-root-disk">
 
-Obraz kořenové diskety (<filename>root.bin</filename>) obsahuje
+Obraz kořenové diskety (<filename>root.img</filename>) obsahuje
 komprimovaný RAMdisk, který se po zavedení instalačního systému
 nahraje do paměti.
 
