@@ -8,13 +8,24 @@ discnr=-1
 do
   major=$(echo $line|cut -d' ' -f 1)
   minor=$(echo $line|cut -d' ' -f 2)
+  disc=$(echo $line|cut -d' ' -f 4)
   if [ $major -ne $lastdisc ]
   then
     discnr=$(( $discnr + 1 ))
-    mkdir -p /dev/discs/disc$discnr
-    mknod /dev/discs/disc$discnr/disc b $major $minor
+    mkdir -p $ROOT/dev/discs/disc$discnr
+    dir=`dirname $disc`
+    if [ "" != "$dir" ]; then
+    	mkdir -p $ROOT/dev/$dir
+    fi
+    if [ ! -e $ROOT/dev/$disc ]; then
+    	mknod $ROOT/dev/$disc b $major $minor
+    fi
+    ln -s $ROOT/dev/$disc $ROOT/dev/discs/disc$discnr/disc 
   else
-    mknod /dev/discs/disc$discnr/part$minor b $major $minor
+    if [ ! -e $ROOT/dev/$disc ]; then
+        mknod $ROOT/dev/$disc b $major $minor
+    fi
+    ln -s $ROOT/dev/$disc $ROOT/dev/discs/disc$discnr/part$minor
   fi
   lastdisc=$major
 done
