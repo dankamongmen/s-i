@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+echo 'ro noinitrd vmpoff="LOGOFF"' > /target/boot/parmfile
+
+echo > /target/etc/zipl.conf << EOF
+[defaultboot]
+default=debian
+
+[debian]
+target=/boot
+image=/vmlinuz
+parmfile=/boot/parmfile
+EOF
+
+chroot /target /sbin/zipl
