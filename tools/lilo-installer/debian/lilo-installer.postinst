@@ -1,20 +1,21 @@
 #!/bin/sh
 set -e
+export LD_LIBRARY_PATH="/target/lib:/target/usr/lib"
 
 
 # detect which is the root partition: /target
 # ugh, I wanted to use awk, but sed has better chance of being in busybox
-rootfs=`sed -ne '/^[^ ]* \/target /s/ .*//p' /etc/mtab`
+rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' /etc/mtab`
 
 # detect which hard drive has /target/boot mounted on it. this does *not*
 # have to be the same as the drive /target is mounted on.
-defaultbootdev=`sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' /etc/mtab`
+defaultbootdev=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' /etc/mtab`
 
 if [ "$defaultbootdev" = '' ]; then
 	defaultbootdev=$rootfs
 fi
 
-defaultbootdev=`echo $defaultbootdev | sed 's/[0-9]+$//'` 
+defaultbootdev=`/target/bin/echo $defaultbootdev | /target/bin/sed 's/[0-9]+$//'` 
 
 if [ "$defaultbootdev" = '' ]; then
 	defaultbootdev='/dev/hda'
@@ -33,10 +34,10 @@ if [ "$bootdev" = '' ]; then
 fi
 
 #write out lilo.conf
-echo "boot=$bootdev" > /target/etc/lilo.conf
-echo "root=$rootfs" >> /target/etc/lilo.conf
-echo 'install=/boot/boot.b' >> /target/etc/lilo.conf
-echo 'map=/boot/map' >> /target/etc/lilo.conf
-echo 'image=/vmlinuz' >> /target/etc/lilo.conf
-echo '	label=Linux' >> /target/etc/lilo.conf
+/target/bin/echo "boot=$bootdev" > /target/etc/lilo.conf
+/target/bin/echo "root=$rootfs" >> /target/etc/lilo.conf
+/target/bin/echo 'install=/boot/boot.b' >> /target/etc/lilo.conf
+/target/bin/echo 'map=/boot/map' >> /target/etc/lilo.conf
+/target/bin/echo 'image=/vmlinuz' >> /target/etc/lilo.conf
+/target/bin/echo '	label=Linux' >> /target/etc/lilo.conf
 chroot /target /sbin/lilo
