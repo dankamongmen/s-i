@@ -247,27 +247,33 @@ ${INITRD}.old
 #	alias=3
 EOF
 
-# OK, now the os-prober stuff runs
+# Add other OSes.
 probed="$(os-prober)"
 count=2
 
 if [ -n "$probed" ]; then
   for os in $probed; do
-    partition=$(mapdevfs $(echo $os | cut -d: -f1))
-    label=$(echo $os | cut -d: -f3)
-    cat >> /target/etc/lilo.conf <<EOF
+    partition=$(mapdevfs $(echo "$os" | cut -d: -f1))
+    label=$(echo "$os" | cut -d: -f3)
+    type=$(echo "$os" | cut -d: -f4)
+    case "$type" in
+        chain)
+            cat >> /target/etc/lilo.conf <<EOF
 other=$partition
 	label=$label
-	restricted
-	alias=$count
+#	restricted
+#	alias=$count
 EOF
-    count=$((count + 1))
+            count=$((count + 1))
+        ;;
+	*)
+	    info "unhandled: $os"
+	;;
+    esac
   done
 fi
 
-if chroot /target /sbin/lilo ; then
-    :
-else
+if ! chroot /target /sbin/lilo ; then
     ERRCODE=$?
     db_subst lilo-installer/failed ERRCODE "$ERRCODE"
     db_input critical lilo-installer/failed || [ $? -eq  30 ]
