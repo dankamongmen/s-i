@@ -23,7 +23,13 @@ findfs () {
 }
 
 lvm_vg () {
-	lvdisplay -c "$1"| sed 's/^[^:]*:\([^:]*\):.*$/\1/'
+	# Map from /dev/mapper/<vg>-<lv> to /dev/<vg>/<lv> for 
+	# Dup of code in partman.
+	vglv=${1#/dev/mapper/}
+	vglv=`echo "$vglv" | sed -e 's/\([^-]\)-\([^-]\)/\1 \2/' | sed -e 's/--/-/g'`
+	vg=`echo "$vglv" | cut -d" " -f1`
+	lv=`echo "$vglv" | cut -d" " -f2`
+	lvdisplay -c "/dev/$vg/$lv"| sed 's/^[^:]*:\([^:]*\):.*$/\1/'
 }
 
 first_pv () {
@@ -350,6 +356,8 @@ db_progress step 1
 
 db_progress info lilo-installer/progress_installing
 
+mount -t proc none /target/proc || true
+
 if ! apt-install lilo ; then
 	info "Calling 'apt-install lilo' failed"
 	# Hm, unable to install lilo into /target/, what should we do?
@@ -364,6 +372,8 @@ if ! apt-install lilo ; then
 		exit 1
 	fi
 fi
+
+umount /target/proc || true
 
 db_progress step 1
 
