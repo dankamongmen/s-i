@@ -54,7 +54,7 @@ struct di_rstring
 int di_snprintfcat (char *str, size_t size, const char *format, ...);
 
 /**
- * Copies n bytes from s, without calculating the lenght of s themself.
+ * Copies n bytes from s, without calculating the length of s itself.
  *
  * @param s source
  * @param n len of source without delimiter
