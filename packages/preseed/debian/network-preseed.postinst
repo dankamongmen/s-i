@@ -3,6 +3,10 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+log () {
+	logger -t preseed "$@"
+}
+
 error () {
 	ERROR="$1"
 	FILE="$2"
@@ -18,6 +22,7 @@ fetch() {
 	iters=0
 	while [ $iters -lt 3 ]; do
 		# TODO proxy support? Would it be useful?
+		# TODO add progress bar
 		if wget -q "$url" -O "$file"; then
 			return 0
 		fi
@@ -37,5 +42,7 @@ fi
 if ! debconf-set-selections /var/log/debconf-seed; then
 	error load_error "$URL"
 fi
+
+log "successfully loaded $TMPFILE"
 
 rm -f $TMPFILE

@@ -3,6 +3,10 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+log () {
+	logger -t preseed "$@"
+}
+
 error () {
 	ERROR="$1"
 	FILE="$2"
@@ -21,3 +25,5 @@ fi
 if ! debconf-set-selections "/var/log/debconf-seed"; then
 	error load_error "$FILE"
 fi
+
+log "successfully loaded $FILE"
