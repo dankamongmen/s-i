@@ -2,8 +2,12 @@
 
 case "x$1" in
     xretrieve)
-        ln -sf /cdrom/$2 "$3"
-        exit $?
+        if [ -e /cdrom/$2 ]; then
+            ln -sf /cdrom/$2 "$3"
+            exit $?
+        else
+            exit 1
+        fi
         ;;
     *)
         # unknown command
