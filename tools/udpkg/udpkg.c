@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.24 2000/12/21 22:28:26 joeyh Rel $ */
+/* $Id: udpkg.c,v 1.25 2002/04/20 16:10:49 tfheen Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -125,6 +125,18 @@ static int dpkg_dounpack(struct package_t *pkg)
 			}
 			else
 			{
+#ifdef DOLOADTEMPLATE
+				/* Is this the templates files?  If
+				 * so, call debconf-loadtemplate on it
+				 */
+				if (strcmp(adminscripts[i],"templates") == 0) {
+					snprintf(buf, sizeof(buf),
+						 "debconf-loadtemplate %s %s",
+						 pkg->package, buf2);
+					SYSTEM(buf);
+				}
+#endif
+
 				/* ugly hack to create the list file; should
 				 * probably do something more elegant
 				 *
