@@ -77,14 +77,15 @@ following special flag in their control file:
 
 Where nnn is a priority number. The priority number influsences the
 ordering of items in the menu; higher numbered items are closer to the
-end of the menu. If this field does not appear, a module will not
-appear on the main menu.
+end of the menu. If this field does not appear, or has a value of 0, a module
+will not appear on the main menu.
 
 Dependencies also influence the position of a module in the menu. A module
 will never appear before another module which it (directly or indirectly)
 depends on. Behaviour of circular dependances is undefined.
 
 The short description of the module is used as the text for its menu item.
+TODO: this does not allow for easy internationalization!!
 
 When a menu item is selected, the module that provides it is configured if
 it is not already configured (ie, if it is just unpacked onto the ramdisk).
@@ -93,7 +94,7 @@ run again.
 
 However, dependencies are honored before this configuration takes place. So
 if a module depends on two other modules, and it is selected, both of those
-modules will first be installed and configured (if they arn't already).
+modules will first be configured (if they arn't already).
 
 Note that if a module depends on a virtual package, and more than one
 package is available to satisfy that dependancy, and none of them are
@@ -101,6 +102,7 @@ configured yet, the installer will generate a submenu listing the candidate
 packages and let the user chose which to use. The submenu is generated
 and ordered similarly to main menu. (TODO: what do we use for the
 title and some help for the submenu?)
+[ This needs some more thought, I think. ]
 
 The above rules define what the menu looks like and the order of items on it.
 There is one other key peice to consider -- the installer has to be able
@@ -128,7 +130,7 @@ An example -- we have the following packages unpacked onto the installer's
 ramdisk (leaving out the parts of their control files that don't matter):
 
 Package: install-media
-Installer-Menu-Item: 0
+Installer-Menu-Item: 1
 Depends: retriever
 Description: Configure installation media
 
@@ -136,33 +138,33 @@ Package: floppy-retriever
 Provides: retriever
 
 Package: partitions
-Installer-Menu-Number: 1
+Installer-Menu-Item: 3
 Depends: disk-driver
 Description: Partition disk
 
 Package: disk-driver
 
 Package: format-partitions
-Installer-Menu-Number: 0
+Installer-Menu-Item: 1
 Depends: partitions, disk-driver
 Description: Format and mount partitions
 
 Package: install-base
-Installer-Menu-Number: 0
+Installer-Menu-Item: 2
 Depends: format-partitions, install-media
 Description: Install base system
 
 Package: install-lilo
-Installer-Menu-Number: 0
+Installer-Menu-Item: 2
 Depends: install-base
 Description: Install lilo
 
 Package: rescue-floppy
-Installer-Menu-Number: 2
+Installer-Menu-Item: 4
 Description: Make a rescue floppy
 
 Package: reboot
-Installer-Menu-Number: 3
+Installer-Menu-Item: 5
 Description: Reboot the system
 
 (Note that the above package and virtual package names are just examples.)
@@ -177,15 +179,15 @@ This set of package results in the following menu:
   - Make a rescue floppy
   - Reboot the system
 
-To understand why, order all the modules by their Installer-Menu-Number's:
+To understand why, order all the modules by their Installer-Menu-Item's:
 
-	install-media (0)
-	format-partitions (0)	Depends: partitions
-	install-base (0)	Depends: format-partitions, install-media
-	install-lilo (0)	Depends: install-base
-	partitions (1)
-	rescue-floppy (2)
-	reboot (3)
+	install-media (1)
+	format-partitions (2)	Depends: partitions
+	install-base (2)	Depends: format-partitions, install-media
+	install-lilo (2)	Depends: install-base
+	partitions (3)
+	rescue-floppy (4)
+	reboot (5)
 
 I've listed any dependencies on other modules that show up on the menu. In
 each such case, they have to show up before the item that depends on them.
