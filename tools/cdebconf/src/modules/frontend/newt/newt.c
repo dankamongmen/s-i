@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.6 2003/03/19 10:07:52 sjogren Exp $
+ * $Id: newt.c,v 1.7 2003/03/28 11:26:00 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -55,6 +55,13 @@
 #include <assert.h>
 
 #include <newt.h>
+
+struct newt_data {
+    newtComponent scale_form,
+                  scale_bar,
+                  scale_label,
+                  perc_label;
+};
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
 #define q_get_description(q)  		question_get_field((q), "", "description")
@@ -558,6 +565,7 @@ newt_initialize(struct frontend *obj, struct configuration *conf)
     int i, width = 80, height = 24;
 
     obj->interactive = 1;
+    obj->data = calloc(1, sizeof(struct newt_data));
     newtInit();
     newtGetScreenSize(&width, &height);
     // Fill the screen so people can shift-pgup properly
@@ -621,12 +629,10 @@ newt_can_go_back(struct frontend *obj, struct question *q)
     return (obj->capability & DCF_CAPB_BACKUP);
 }
 
-static newtComponent scale_form = NULL, scale_bar = NULL,
-                     scale_label = NULL, perc_label = NULL;
-
 static void
 newt_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
+    struct newt_data *data = (struct newt_data *)obj->data;
     int width = 80, win_width;
     char buf[64];
 
@@ -641,18 +647,22 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     win_width = width-7;
     newtCenteredWindow(win_width, 5, title);
     sprintf(buf, "%3d%%", 0);
-    perc_label = newtLabel(1, 1, buf);
-    scale_bar = newtScale(1 + strlen(buf) + 1, 1, win_width-strlen(buf)-3, obj->progress_max);
-    scale_label = newtLabel(1, 3, "");
-    scale_form = create_form(NULL);
-    newtFormAddComponents(scale_form, perc_label, scale_bar, scale_label, NULL);
-    newtDrawForm(scale_form);
+    data->perc_label = newtLabel(1, 1, buf);
+    data->scale_bar = newtScale(1 + strlen(buf) + 1, 1, win_width-strlen(buf)-3,
+            obj->progress_max);
+    data->scale_label = newtLabel(1, 3, "");
+    data->scale_form = create_form(NULL);
+    newtFormAddComponents(data->scale_form, data->perc_label, data->scale_bar,
+            data->scale_label, NULL);
+    newtDrawForm(data->scale_form);
     newtRefresh();
 }
 
 static void
 newt_progress_step(struct frontend *obj, int step, const char *info)
 {
+    struct newt_data *data = (struct newt_data *)obj->data;
+
     if (obj->progress_max > 0)
     {
         char buf[64];
@@ -660,11 +670,11 @@ newt_progress_step(struct frontend *obj, int step, const char *info)
 
         perc = 100.0 * (float)obj->progress_cur / (float)obj->progress_max;
         sprintf(buf, "%3d%%", (int)perc);
-        newtLabelSetText(perc_label, buf);
+        newtLabelSetText(data->perc_label, buf);
     }
-    newtLabelSetText(scale_label, info);
-    newtScaleSet(scale_bar, obj->progress_cur);
-    newtDrawForm(scale_form);
+    newtLabelSetText(data->scale_label, info);
+    newtScaleSet(data->scale_bar, obj->progress_cur);
+    newtDrawForm(data->scale_form);
     newtRefresh();
     obj->progress_cur += step;
 }
@@ -672,11 +682,13 @@ newt_progress_step(struct frontend *obj, int step, const char *info)
 static void
 newt_progress_stop(struct frontend *obj)
 {
+    struct newt_data *data = (struct newt_data *)obj->data;
+
     newt_progress_step(obj, 0, "");
-    newtFormDestroy(scale_form);
+    newtFormDestroy(data->scale_form);
     newtPopWindow();
     newtFinished();
-    scale_form = scale_bar = perc_label = scale_label = NULL;
+    data->scale_form = data->scale_bar = data->perc_label = data->scale_label = NULL;
 }
 
 struct frontend_module debconf_frontend_module =
