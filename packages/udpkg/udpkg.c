@@ -395,7 +395,7 @@ static int dpkg_fields(struct package_t *pkg)
 		return 1;
 	}
 	snprintf(buf, sizeof(buf), "ar -p %s control.tar.gz|tar -xzOf - ./control", pkg->file);
-	if ((ret = di_exec_shell_log(buf)) != 0)
+	if ((ret = system(buf)) != 0)
 		FPRINTF(stderr, "field extraction failed with status %d\n", ret);
 
 	return ret;
