@@ -67,6 +67,11 @@ echo  "                        (packages names relatively to packages)"
 echo  " <D-I repository path>: path to the local copy of the D-I repository"
 }
 
+svnerr() {
+echo "Error in a SVN operation, please investigate"
+exit 1
+}
+
 ##  Command line parsing
 MORETODO=true
 while $MORETODO ; do
@@ -163,10 +168,10 @@ cd $DI_COPY/packages
 if [ "$ONLINE" = "Y" ] ; then
   if [ "$DEBUG" = "Y" ] ; then
     echo Synchronising $DI_COPY/packages:
-    $svn update
+    $svn update || svnerr
     echo Done.
   else
-    $svn update >/dev/null 2>&1
+    $svn update >/dev/null 2>&1 || svnerr
   fi
 fi
 
@@ -220,9 +225,9 @@ for i in  $packages ; do
  if [ "$ATOMIC_UPDATES" = "Y" ] ; then
    if [ "$DEBUG" = "Y" ] ; then
      echo -n "    - Update..."
-     $svn update
+     $svn update || svnerr
    else
-     $svn update >/dev/null 2>&1
+     $svn update >/dev/null 2>&1 || svnerr
    fi
    if [ "$DEBUG" = "Y" ] ; then
     echo Done.
@@ -245,7 +250,7 @@ for i in  $packages ; do
      echo -n "    - Commit..."
    fi
    cd $DI_COPY/packages/$i/debian/po
-   $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on $DI_COPY/packages/$i" 
+   $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on $DI_COPY/packages/$i" || svnerr
    if [ "$DEBUG" = "Y" ] ; then
      echo Done.
    fi
@@ -254,7 +259,7 @@ done
 
 if [ "$BIG_COMMITS" = "Y" ] ; then
   cd $DI_COPY/packages
-  $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on all packages"
+  $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on all packages" || svnerr
 fi
 
 # 2) Merge all templates.pot file together
@@ -284,7 +289,7 @@ if [ "$ATOMIC_COMMITS" = "Y" ] ; then
     echo -n "Commiting the general template.pot file..."
   fi
   cd $DI_COPY/packages/po
-  $svn commit -m"${COMMIT_MARKER} Update general template file from the l10n synchronisation script" template.pot
+  $svn commit -m"${COMMIT_MARKER} Update general template file from the l10n synchronisation script" template.pot || svnerr
   if [ "$DEBUG" = "Y" ] ; then
     echo Done.
   fi
@@ -330,9 +335,9 @@ for po in *.po ; do
      echo -n "     - Update from SVN..."
    fi
    if [ "$DEBUG" = "Y" ] ; then
-     $svn update
+     $svn update ; then svnerr || svnerr
    else
-     $svn update >/dev/null 2>&1
+     $svn update >/dev/null 2>&1 || svnerr
    fi
    if [ "$DEBUG" = "Y" ] ; then
      echo Done.
@@ -362,7 +367,7 @@ for po in *.po ; do
    if [ "$DEBUG" = "Y" ] ; then
      echo -n "     - Commit back to SVN..."
    fi
-   $svn commit -m"${COMMIT_MARKER} Updated packages/po/$po with general template.pot" $po
+   $svn commit -m"${COMMIT_MARKER} Updated packages/po/$po with general template.pot" $po || svnerr
    if [ "$DEBUG" = "Y" ] ; then
      echo Done.
    fi
@@ -372,7 +377,7 @@ if [ "$BIG_COMMITS" = "Y" ] ; then
    if [ "$DEBUG" = "Y" ] ; then
      echo -n "Commit all general PO files to SVN..."
    fi
-   $svn commit -m"${COMMIT_MARKER} Updated packages/po/* with general template.pot" *.po template.pot
+   $svn commit -m"${COMMIT_MARKER} Updated packages/po/* with general template.pot" *.po template.pot || svnerr
    if [ "$DEBUG" = "Y" ] ; then
      echo Done.
    fi
@@ -395,9 +400,9 @@ for package in $packages ; do
      echo -n "      - synchronize with D-I repository..."
    fi
    if [ "$DEBUG" = "Y" ] ; then
-     $svn update
+     $svn update || svnerr
    else
-     $svn update >/dev/null 2>&1
+     $svn update >/dev/null 2>&1 || svnerr
    fi
    if [ "$DEBUG" = "Y" ] ; then
      echo Done.
@@ -482,9 +487,9 @@ EOF
      echo -n "      - commiting back updated files..."
    fi
    if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po
+     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po || svnerr
    else
-     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po >/dev/null 2>&1
+     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po >/dev/null 2>&1 || svnerr
    fi
    if [ "$DEBUG" = "Y" ] ; then
      echo Done.
@@ -494,5 +499,5 @@ done
 
 if [ "$BIG_COMMITS" = "Y" ] ; then
   cd $DI_COPY/packages
-  svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" 
+  svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" || svnerr
 fi
