@@ -74,7 +74,6 @@ fi
 db_progress STEP 1
 db_progress INFO yaboot-installer/part
 
-# not currently used, but will be later
 db_get debian-installer/kernel/subarchitecture
 SUBARCH="$RET"
 info "subarchitecture: $SUBARCH"
@@ -94,7 +93,31 @@ PARTITIONS=
 DEFAULT=
 bootdev_priority=critical
 
-# TODO: partman communication will go here, to improve the guesswork
+if [ "$SUBARCH" = powermac_newworld ] && \
+   db_get partman-newworld/boot_partitions && [ "$RET" ]; then
+    OLDIFS="$IFS"
+    IFS=,
+    for part in $RET; do
+	IFS="$OLDIFS"
+	mappart="$(mapdevfs "$part")"
+	if [ -z "$PARTITIONS" ]; then
+	    DEFAULT="$mappart"
+	    PARTITIONS="$mappart"
+	else
+	    PARTITIONS="$PARTITIONS,$mappart"
+	fi
+	IFS=,
+    done
+    IFS="$OLDIFS"
+    info "partman-supplied bootstrap partitions: $PARTITIONS"
+    info "partman-supplied default bootstrap partition: $DEFAULT"
+    if [ "$PARTITIONS" ]; then
+	# We have explicit information from partman-newworld about which
+	# bootstrap partitions are available, so it's safe to bypass this
+	# question.
+	bootdev_priority=medium
+    fi
+fi
 
 if [ -z "$PARTITIONS" ]; then
     for i in /dev/discs/*/disc; do
