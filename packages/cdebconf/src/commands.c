@@ -179,7 +179,8 @@ command_go(struct confmodule *mod, char *arg)
     if (requested_frontend && strcmp(running_frontend, requested_frontend) != 0) {
 	q = mod->frontend->questions;
 	mod->frontend->methods.shutdown(mod->frontend);
-	dlclose(mod->frontend->handle);
+	if (mod->frontend->handle != NULL)
+	    dlclose(mod->frontend->handle);
 	DELETE(mod->frontend);
 	setenv("DEBIAN_FRONTEND",requested_frontend,1);
 	mod->frontend = frontend_new(mod->config, mod->templates, mod->questions);

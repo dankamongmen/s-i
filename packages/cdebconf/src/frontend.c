@@ -118,7 +118,7 @@ static void frontend_progress_stop(struct frontend *ui)
 struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb, struct question_db *qdb)
 {
 	struct frontend *obj = NULL;
-	void *dlh;
+	void *dlh = NULL;
 	struct frontend_module *mod;
 	char tmp[256];
 	const char *modpath, *modname;
@@ -206,7 +206,8 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 void frontend_delete(struct frontend *obj)
 {
 	obj->methods.shutdown(obj);
-	dlclose(obj->handle);
+	if (obj->handle != NULL)
+		dlclose(obj->handle);
 	DELETE(obj->questions);
 	DELETE(obj->capb);
 	DELETE(obj->title);
