@@ -89,17 +89,21 @@ this data during retriever setup.
 Retriever controller
 --------------------
 
-This is another module, that makes use of the retrievers. It depends on the
-"retreiver" virtual package, and it generates an item in the main menu.
-When the item is picked, one of the retrievers gets configured, and then
-the retriever controller tells it to go get the Packages file. The
-controller parses the file, and uses the retreiver to download each needed 
-module, verifies md5sums (optional), and unpacks them all.
+This is another module, that makes use of the retrievers. It doesn't
+actually depend on any though. What it does is, when it is picked from the
+menu, it builds a list of all available retreivers, and has the user pick
+one from the list. That retreiver is then configured, and is used to 
+retreive whatever seems appropriate. Thus, the menu item can be picked
+multiple times, using a different retreiver every time. And if a retreiver
+downloads a second retreiver, it will show up in future displays of the
+retreivers menu.
 
 Which modules are needed is an interesting question. One simplistic
 technique is to simply download and unpack all available modules. Another
 technique would be to only retreive modules that will appear on the main
 menu, and retreive their dependancies if they are used.
+
+The controller also needs to verify md5sums of downloaded files.
 
 Footnotes
 ---------
