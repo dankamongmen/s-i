@@ -18,3 +18,9 @@ if [ -n "$USER" ]; then
 	echo "passwd passwd/username string $USER" >> $f
 	echo "passwd passwd/user-fullname string $USER" >> $f
 fi
+
+if [ -n "$HP_ILO_STAGE2_CD_HACK" ]; then
+	echo "base-config base-config/early_command string wget $HP_ILO_ISO_URL -O /var/tmp/install.iso; mount -o loop /var/tmp/install.iso /cdrom" >> $f
+	echo "apt-setup apt-setup/uri_type select filesystem" >> $f
+	echo "apt-setup apt-setup/directory string /cdrom" >> $f
+fi
