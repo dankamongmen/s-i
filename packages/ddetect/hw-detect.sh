@@ -527,7 +527,7 @@ if [ -x /etc/init.d/pcmcia ]; then
     
 		db_progress STEP $OTHER_STEPSIZE
 	fi
-	db_fset hw-detect/start_pcmcia seen true || true
+	#db_fset hw-detect/start_pcmcia seen true || true
 fi
 
 gen_pcmcia_devnames() {
