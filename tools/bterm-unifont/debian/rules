@@ -1,18 +1,4 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
-
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-PACKAGE=bterm-unifont
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-
-# This is the debhelper compatability version to use.
-export DH_COMPAT=3
 
 build: unifont.bgf
 unifont.bgf:
@@ -21,28 +7,23 @@ unifont.bgf:
 
 clean:
 	dh_testdir
-	rm -f unifont.bgf debian/files*
-	dh_clean -k
+	dh_clean unifont.bgf
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 
-binary-indep: unifont.bgf install
+binary-arch: unifont.bgf install
 	dh_testdir
 	dh_testroot
 	dh_installdeb
-	cp unifont.bgf debian/$(PACKAGE)/unifont.bgf
-	dh_gencontrol -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
-
+	dh_install unifont.bgf /
+	dh_gencontrol
+	dh_builddeb
 	
-binary-arch:
+binary-indep:
 
 binary: binary-indep binary-arch
 
 .PHONY: build clean binary-indep binary-arch binary install
-
-
