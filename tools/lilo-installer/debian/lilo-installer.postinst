@@ -1,6 +1,18 @@
 #!/bin/sh
 set -e
 
+log() {
+	logger -t grub-installer "$@"
+}
+
+error() {
+	log "error: $@"
+}
+
+info() {
+	log "info: $@"
+}
+
 . /usr/share/debconf/confmodule
 db_capb backup
 
@@ -8,6 +20,19 @@ if [ -f /etc/mtab ]; then
     MTAB=/etc/mtab
 else
     MTAB=/proc/mounts
+fi
+
+if ! apt-install lilo ; then
+	info "Calling 'apt-install lilo' failed"
+	# Hm, unable to install lilo into /target/, what should we do?
+	db_input critical lilo-installer/apt-install-failed || [ $? -eq 30 ]
+	if ! db_go; then
+		exit 10 # back up to menu
+	fi
+	db_get lilo-installer/apt-install-failed
+	if [ true != "$RET" ] ; then
+		exit 1
+	fi
 fi
 
 # detect which is the root partition: /target
