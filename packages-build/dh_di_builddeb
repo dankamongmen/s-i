@@ -24,19 +24,14 @@ filename.
 
 =cut
 
-my @args = Debian::Installer::fixup_arguments(@ARGV);
-
-init();
-
-my %packages = Debian::Installer::control();
-my @args2 = Debian::Installer::packages_args ("deb", \%packages, @{$dh{DOPACKAGES}});
-doit ("dh_builddeb", @args, @args2) if @args2;
+Debian::Installer::di_init ();
+my @args = Debian::Installer::packages_args ("deb", @{$dh{DOPACKAGES}});
+Debian::Installer::di_doit ("dh_builddeb", @args) if @args;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-  next if $packages{$package}->{type} ne "udeb";
-  @args2 = ();
-  push @args2, "--filename=" . $packages{$package}->{filename};
-  doit ("dh_builddeb", @args, "-p", $package, @args2);
+  next if $Debian::Installer::packages{$package}->{type} ne "udeb";
+  my $arg = "--filename=" . $Debian::Installer::packages{$package}->{filename};
+  doit ("dh_builddeb", "-p", $package, $arg);
 }
 
 =head1 SEE ALSO

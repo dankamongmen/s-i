@@ -35,17 +35,13 @@ Wrappers arround the debhelper commands which only affects debs.
 
 =cut
 
-my @args = Debian::Installer::fixup_arguments (@ARGV);
+Debian::Installer::di_init ();
+my @args = Debian::Installer::packages_args ("deb", @{$dh{DOPACKAGES}});
 
-init();
-
-my %packages = Debian::Installer::control();
-my @args2 = Debian::Installer::packages_args ("deb", \%packages, @{$dh{DOPACKAGES}});
-
-my $prog = basename($0);
+my $prog = basename ($0);
 if ($prog =~ m#^dh_di_(\w+)$#)
 {
-  doit ("dh_$1", @args2, @args);
+  Debian::Installer::di_doit ("dh_$1", @args);
 }
 else
 {

@@ -12,6 +12,9 @@ use Data::Dumper;
 my $configdir = "/usr/share/debian-installer/build/config";
 my $dir = "/usr/share/debian-installer/build";
 
+our @args;
+our %packages;
+
 sub get_arch
 {
   my $query = shift;
@@ -60,8 +63,6 @@ sub config_read
 
 sub control
 {
-  my %packages;
-
   my $package;
   my $arch;
   my $type;
@@ -113,51 +114,97 @@ sub control
   return %packages;
 }
 
-sub fixup_arguments
+sub di_doit
+{
+  my $prog = shift;
+  doit ($prog, @_, @args);
+}
+
+sub di_init
 {
   my @ret = ();
+  my $status = 1;
 
-  my $end = 0;
+  my @args_input = @ARGV;
+  my @args_package;
+  my $arg_type;
 
-  foreach (@_)
+  if (defined ($ENV{DH_OPTIONS}))
   {
-    if (not $end)
+    # Ignore leading/trailing whitespace.
+    $ENV{DH_OPTIONS} =~ s/^\s+//;
+    $ENV{DH_OPTIONS} =~ s/\s+$//;
+    unshift @args_input, split (/\s+/, $ENV{DH_OPTIONS});
+    undef $ENV{DH_OPTIONS};
+  }
+
+  my $i = 0;
+  while ($i <= $#args_input)
+  {
+    my $arg = $args_input[$i];
+
+    if ($status eq 1)
     {
-      if ($_ =~ /^(-[pN]|--(package|no-package))$/)
+      if ($arg =~ /^(-[pN]|--(package|no-package))$/)
       {
-        shift;
+        push @args_package, $arg, $args_input[$i+1];
+        $i++;
       }
-      elsif ($_ =~ /^(-[pN]|--(package|no-package))/)
-      { }
-      elsif ($_ =~ /^(-[ais]|--(arch|indeb|same-arch))/)
-      { }
-      elsif ($_ =~ /^--$/)
+      elsif ($arg =~ /^(-[pN]|--(package|no-package))/)
       {
-        $end = 1;
+        push @args_package, $arg;
+      }
+      elsif ($arg =~ /^(-[ais]|--(arch|indeb|same-arch))/)
+      {
+        push @args_package, $arg;
+      }
+      elsif ($arg =~ /^(-t|--type)$/)
+      {
+        $arg_type = $args_input[$i+1];
+        $i++;
+      }
+      elsif ($arg =~ /^(-t|--type)(.+)$/)
+      {
+        $arg_type = $2;
+      }
+      elsif ($arg =~ /^--$/)
+      {
+        $status = 2;
+        push @args, $arg;
       }
       else
       {
-        push @ret, $_;
+        push @args, $arg;
       }
     }
     else
     {
-      push @ret, $_;
+      push @args, $arg;
     }
+    $i++;
   }
 
-  return @ret;
+  control ();
+
+  if ($arg_type)
+  {
+    @args_package = packages_args ($arg_type, keys %packages);
+    exit 0 if $#args_package == -1;
+  }
+
+  @ARGV = @args;
+  push @ARGV, @args_package;
+  init ();
 }
 
 sub packages_args
 {
   my $type = shift;
-  my $packages = shift;
   my @ret;
 
   foreach (@_)
   {
-    push @ret, "-p", $_ if $type eq $packages->{$_}->{type};
+    push @ret, "-p", $_ if $type eq $packages{$_}->{type};
   }
 
   return @ret;
