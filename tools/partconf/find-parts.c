@@ -107,6 +107,43 @@ test_raid(struct partition *p)
     fclose(fp);
 }
 
+#ifndef FIND_PARTS_MAIN
+int
+block_partition(const char *part)
+{
+    DIR *dir = NULL;
+    struct dirent *entry = NULL;
+
+    dir = opendir(BLOCK_D);
+    if(dir == NULL) {
+        char *err = NULL;
+
+        asprintf(&err, "Failed to open block-directory: %s", BLOCK_D);
+        di_log(err);
+        return(0);
+    }
+
+    while((entry = readdir(dir)) != NULL) {
+        char *cmd = NULL;
+        int ret;
+
+        if(entry->d_name[0] == '.')
+            continue;
+
+        asprintf(&cmd, "/bin/sh %s/%s \"%s\" 1>/dev/null 2>&1",
+            BLOCK_D, entry->d_name, part);
+        ret = system(cmd);
+        if(ret != 0) {
+            closedir(dir);
+            return(1);
+        }
+    }
+
+    closedir(dir);
+    return(0);
+}
+#endif
+
 static void
 get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev)
 {
@@ -230,6 +267,13 @@ get_all_partitions(struct partition *parts[], const int max_parts)
         while ((part = ped_disk_next_partition(disk, part)) != NULL) {
             if (part->type & (PED_PARTITION_METADATA | PED_PARTITION_FREESPACE | PED_PARTITION_EXTENDED))
                 continue;
+
+#ifndef FIND_PARTS_MAIN
+            /* allow other udebs to block partitions */
+            if(block_partition(ped_partition_get_path(part)) != 0)
+                continue;
+#endif
+
             p = malloc(sizeof(*p));
             p->path = ped_partition_get_path(part);
             p->fstype = NULL;

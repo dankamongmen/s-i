@@ -14,6 +14,8 @@
 #define MAX_PARTS       1024
 #define MAX_FSES        64
 
+#define BLOCK_D "/var/lib/partconf/block.d"
+
 /* What we want to do with a partition */
 struct operation {
     char                *filesystem; /* 'swap' is special case */
