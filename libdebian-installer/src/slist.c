@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: slist.c,v 1.4 2003/11/19 09:24:14 waldi Exp $
+ * $Id: slist.c,v 1.5 2003/11/20 20:02:48 waldi Exp $
  */
 
 #include <debian-installer/slist.h>
@@ -53,7 +53,7 @@ void di_slist_free (di_slist *slist)
   di_free (slist);
 }
 
-void internal_di_slist_append (di_slist *slist, void *data, di_slist_node *new_node)
+static void internal_di_slist_append (di_slist *slist, void *data, di_slist_node *new_node)
 {
   new_node->data = data;
   new_node->next = NULL;
@@ -76,7 +76,7 @@ void di_slist_append_chunk (di_slist *slist, void *data, di_mem_chunk *mem_chunk
   return internal_di_slist_append (slist, data, di_mem_chunk_alloc (mem_chunk));
 }
 
-void internal_di_slist_prepend (di_slist *slist, void *data, di_slist_node *new_node)
+static void internal_di_slist_prepend (di_slist *slist, void *data, di_slist_node *new_node)
 {
   new_node->data = data;
   new_node->next = slist->head;

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.9 2003/10/05 10:09:19 waldi Exp $
+ * $Id: packages.c,v 1.10 2003/11/20 20:02:48 waldi Exp $
  */
 
 #include <debian-installer/system/packages.h>
@@ -51,7 +51,7 @@ const di_parser_fieldinfo *di_system_package_parser_fieldinfo[] =
   NULL
 };
 
-void internal_di_system_package_destroy_func (void *data)
+static void internal_di_system_package_destroy_func (void *data)
 {
   di_system_package_destroy (data);
 }

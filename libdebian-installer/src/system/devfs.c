@@ -17,13 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: devfs.c,v 1.3 2003/09/29 14:08:48 waldi Exp $
+ * $Id: devfs.c,v 1.4 2003/11/20 20:02:48 waldi Exp $
  */
+
+#include <debian-installer/system/devfs.h>
 
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 /* Returns the devfs path name normalized into a "normal" (hdaX, sdaX)

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.8 2003/11/19 09:24:14 waldi Exp $
+ * $Id: package_parser.c,v 1.9 2003/11/20 20:02:48 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -223,7 +223,7 @@ const di_parser_fieldinfo *di_package_parser_fieldinfo[] =
   NULL
 };
 
-void *internal_di_package_parser_new (void *user_data)
+static void *internal_di_package_parser_new (void *user_data)
 {
   internal_di_package_parser_data *parser_data = user_data;
   parser_data->package = di_package_alloc (parser_data->allocator);

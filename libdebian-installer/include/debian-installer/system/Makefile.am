@@ -7,3 +7,6 @@ realinclude_HEADERS = \
 	prebaseconfig.h \
 	utils.h
 
+noinst_HEADERS = \
+	dpkg_internal.h
+

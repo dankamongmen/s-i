@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem_chunk.h,v 1.1 2003/11/19 09:24:14 waldi Exp $
+ * $Id: mem_chunk.h,v 1.2 2003/11/20 20:02:48 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__MEM_CHUNK_H
@@ -37,6 +37,7 @@ di_mem_chunk* di_mem_chunk_new (di_ksize_t atom_size, di_ksize_t area_size) __at
 void *di_mem_chunk_alloc (di_mem_chunk *mem_chunk);
 void *di_mem_chunk_alloc0 (di_mem_chunk *mem_chunk);
 void di_mem_chunk_destroy (di_mem_chunk *mem_chunk);
+size_t di_mem_chunk_size (di_mem_chunk *mem_chunk);
 
 /** @} */
 #endif
