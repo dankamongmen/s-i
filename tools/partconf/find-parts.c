@@ -294,7 +294,8 @@ get_all_partitions(struct partition *parts[], const int max_parts)
                             host + 1, bus, target, lun, part);
                 else
                     p->description = strdup(p->path);
-            }
+            } else
+                p->description = strdup(p->path);
             p->fstype = NULL;
             p->fsid = NULL;
             p->size = 0L;
