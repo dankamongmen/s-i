@@ -13,7 +13,17 @@ if [ -x /sbin/depmod ]; then
 fi
 
 log () {
-    echo "$0: $@" >>/var/log/messages
+    log=/var/log/messages
+    echo "$0: $@" >> $log
+}
+
+is_not_loaded() {
+    module="$1"
+    if cut -d" " -f1 /proc/modules | grep -q "$module" ; then
+	false
+    else
+	true
+    fi
 }
 
 load_modules()
@@ -26,27 +36,29 @@ load_modules()
     echo $old > /proc/sys/kernel/printk
 }
 
-log "Detecting hardware..."
-
 # Return list of lines with "Kernel module<tab>Vendor<tab>Model"
 get_hw_info() {
     # Try to make sure the floppy driver is available
-    echo "floppy	Linux	Floppy driver"
+    echo "floppy	Linux	Floppy Driver"
 
     /sbin/discover --format="%m\t%V\t%M\n" \
 	--disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom
     # Manually load modules to enable things we can't detect.
     # XXX: This isn't the best way to do this; we should autodetect.
     # The order of these packages are important. [pere 2003-03-16]
-    echo "ide-mod	Linux	Unknown"
-    echo "ide-probe-mod	Linux	Unknown"
-    echo "ide-disk	Linux	Unknown"
-    echo "ide-cd	Linux	Unknown"
-    echo "isofs	Linux	ISO 9660 filesystem support"
+    echo "ide-mod	Linux	IDE Driver"
+    echo "ide-probe-mod	Linux	IDE probe Driver"
+    echo "ide-disk	Linux	ATA DISK Driver"
+    echo "ide-cd	Linux	ATAPI CD-ROM Driver"
+    echo "isofs	Linux	ISO 9660 Filesystem Driver"
     #echo "i82365	Linux	Unknown"
     #echo "sr_mod	Linux	Unknown"
     #echo "usb-storage	Linux	Unknown"
 }
+
+log "Detecting hardware..."
+
+db_title "Detecting HW and loading kernel modules"
 
 set -- `get_hw_info | wc -l`
 count="$1"
@@ -72,23 +84,18 @@ do
         name="$model"
     fi
 
+    if [ -z "$module" ] ; then module="[Unknown]" ; fi
+    if [ -z "$name" ] ;   then name="[Unknown]" ; fi
+
     log "Detected load module '$module' for '$name', progress step 1"
 
-    if [ "$module" ]
-    then
-	db_subst hwdetect/progress_step MODULE "$module"
-    else
-	db_subst hwdetect/progress_step MODULE "[Unknown]"
-    fi
-    if [ "$name" ]
-    then
-	db_subst hwdetect/progress_step CARDNAME "$name"
-    else
-	db_subst hwdetect/progress_step CARDNAME "[Unknown]"
-    fi
+    db_subst hwdetect/progress_step CARDNAME "$name"
+    db_subst hwdetect/progress_step MODULE "$module"
+
     db_progress STEP 1 hwdetect/progress_step
 
-    if [ -n "$module" -a "$module" != "ignore" ]
+    if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] &&
+	is_not_loaded $module
     then
         log "Trying to load module '$module'"
 
@@ -105,7 +112,7 @@ do
 		    template=hwdetect/not_included
 		    db_fset "$template" seen false || true
 		    db_subst "$template" vendor "$name" || true
-		    db_subst "$template" module $module || true
+		    db_subst "$template" module "$module" || true
 		    db_input medium "$template" || true
 		    db_go || true
 		    db_get "$template" || true
@@ -130,7 +137,7 @@ do
             if [ "$mounted" = "1" ]
             then
                 log "Copying modules.tgz from ext2 modules disk... "
-                gunzip -c /mnt/modules.tgz | tar xf - $module.o
+                gunzip -c /mnt/modules.tgz | tar xf - ${module}.o
                 umount /mnt
                 # Make sure 'depmod -a' accepts the new module
                 chown -R root /lib/modules
@@ -140,7 +147,7 @@ do
 
         if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
-            if load_modules $module
+            if load_modules "$module"
             then
                 :
             else
