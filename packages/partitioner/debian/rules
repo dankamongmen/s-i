@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 #export DH_VERBOSE=1
+ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 build: build-stamp
 build-stamp:
@@ -40,7 +41,13 @@ binary-arch: build install
 	dh_strip
 	dh_installdeb
 	dh_shlibdeps
+# fdisk-udeb is not standard priority so will not be installed by anna
+# unless partitioner depends on it
+ifeq ($(ARCH),mips)
+	dh_gencontrol -- -Vfdisk:Depends=fdisk-udeb
+else
 	dh_gencontrol
+endif
 	dh_builddeb
 
 binary: binary-indep binary-arch
