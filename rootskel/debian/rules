@@ -67,9 +67,9 @@ binary-arch: build install
 	$(foreach PACKAGE, $(PACKAGES), \
 	  (dpkg-gencontrol -p$(PACKAGE) -Pdebian/$(PACKAGE) -isp \
 	  -Tdebian/$(PACKAGE).substvars \
-	  -n$(PACKAGE)_$(VERSION)_all.udeb ) ; )
+	  -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb ) ; )
 	$(foreach PACKAGE, $(PACKAGES), \
-	  (dh_builddeb -p$(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_all.udeb \
+	  (dh_builddeb -p$(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_$(ARCH).udeb \
 		); )
 	dh_gencontrol -- -fdebian/files~ 
 
