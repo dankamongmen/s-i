@@ -32,15 +32,15 @@ build-stamp:
 	cp config kernel-source-$(KVERS)/.config
 	# Hack up the Makefile for flavour support.
 	cd kernel-source-$(KVERS); \
-		if [ ! -e Makefile.orig ]; then \
-			cp Makefile Makefile.orig; \
+		if [ ! -e Makefile.pristine ]; then \
+			cp Makefile Makefile.pristine; \
 		fi; \
-		sed 's/^\(KERNELRELEASE=.*\)$$/\1-$$(FLAVOUR)/' Makefile.orig > Makefile; \
+		sed 's/^\(KERNELRELEASE=.*\)$$/\1-$$(FLAVOUR)/' Makefile.pristine > Makefile; \
 		make-kpkg --flavour di build
 	touch build-stamp
 
 fixcontrol:
-	-mv -f debian/control.orig debian/control
+	-mv -f debian/control.pristine debian/control
 	@if ! grep -q '$${kernel:Version}' debian/control; then \
 		echo "** debian/control is bogus" >&2; \
 		exit 1; \
@@ -73,8 +73,8 @@ binary-udebs: build
 	# Actually installs all the modules into place, and
 	# generates debian/control.out.
 	./copy-modules kernel-source-$(KVERS)/modules $(KVERS) $(FLAVOUR)
-	if [ ! -e debian/control.orig ]; then \
-		mv -f debian/control debian/control.orig; \
+	if [ ! -e debian/control.pristine ]; then \
+		mv -f debian/control debian/control.pristine; \
 	fi
 	mv -f debian/control.out debian/control
 	
