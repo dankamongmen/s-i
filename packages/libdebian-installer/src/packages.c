@@ -170,7 +170,15 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
 
   /* did we already check this package? */
   if (package->resolver & r->resolver)
+  {
+#ifdef ENABLE_EXTENSIVE_DEBUG
+    if (package->resolver & (r->resolver << 1))
+      di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): already done, okay", package->package);
+    else
+      di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): already done, not okay", package->package);
+#endif
     return package->resolver & (r->resolver << 1);
+  }
 
   package->resolver |= r->resolver;
   package->resolver |= (r->resolver << 1);
