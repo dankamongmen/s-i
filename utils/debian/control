@@ -2,9 +2,14 @@ Source: debian-installer-utils
 Section: debian-installer
 Priority: standard
 Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
-Uploaders: David Kimdon <dwhedon@debian.org>, Tollef Fog Heen <tfheen@debian.org>, Matt Kraai <kraai@debian.org>
+Uploaders: David Kimdon <dwhedon@debian.org>, Tollef Fog Heen <tfheen@debian.org>, Matt Kraai <kraai@debian.org>, Thorsten Sauter <tsauter@gmx.net>
 Build-Depends: debhelper (>= 4.1.13), dpkg-dev (>= 1.9.0), libcdebconf-dev, po-debconf (>= 0.5.0)
 Standards-Version: 3.2.1
+
+Package: di-utils-generic
+Architecture: all
+Description: Generic scripts for di-utils
+ This package contains generic scripts used be the di-utilities.
 
 Package: di-utils-shell
 Architecture: any
@@ -15,6 +20,7 @@ Description: Execute a shell
 
 Package: di-utils-partitioner
 Architecture: all
+Depends: di-utils-generic
 Provides: partitioned-harddrives
 XB-installer-menu-item: 43
 Description: Partition a hard drive
@@ -28,10 +34,10 @@ Description: I have already partitioned the hard drive
 
 Package: di-utils-mkfs
 Architecture: all
-Depends: partitioned-harddrives, e2fsprogs-udeb
+Depends: di-utils-generic, partitioned-harddrives, e2fsprogs-udeb
 Provides: made-filesystems
 XB-installer-menu-item: 45
-Description: Create a file system
+Description: Create filesystems
  Use this module to mkfs the target partitions within debian-installer.
 
 Package: di-utils-fake-mkfs
@@ -42,9 +48,25 @@ Description: I have already created file systems
  Use this module if you have already made file systems on your 
  partitions.
 
+Package: di-utils-mkswap
+Architecture: all
+Depends: di-utils-generic, partitioned-harddrives, e2fsprogs-udeb
+Provides: made-swapspace
+XB-installer-menu-item: 47
+Description: Make swapspace
+ Use this module to mkswap the target partitions within debian-installer.
+ 
+Package: di-utils-fake-mkswap
+Architecture: all
+Depends: partitioned-harddrives
+Provides: made-swapspace
+Description: Already made swapspace
+ Use this module if you have already made swapspace on your
+ partitions.
+
 Package: di-utils-mount-partitions
 Architecture: all
-Depends: made-filesystems, di-utils-mapdevfs
+Depends: di-utils-generic, made-filesystems
 Provides: mounted-partitions
 XB-installer-menu-item: 55
 Description: Mount a partition
@@ -60,3 +82,4 @@ Description: I have already mounted the partitions
 Package: di-utils-mapdevfs
 Architecture: any
 Description: Translate a devfs device name to its non-devfs equivalent.
+
