@@ -463,7 +463,7 @@ linux_fstype_to_parted(const char *linux_fstype)
 #if defined(LVM_HACK)
   if (strcmp(linux_fstype,"lvm") == 0)
       /* Creating with default FS and converting to LVM below */
-      return DEFAULT_FS;
+      return "linux-swap"; /* Use any format that is fast to create. */
 #endif /* LVM_HACK */
   else
       return linux_fstype;
