@@ -47,4 +47,7 @@ rootfs=`mapdevfs $rootfs`
 /target/bin/echo 'map=/boot/map' >> /target/etc/lilo.conf
 /target/bin/echo 'image=/vmlinuz' >> /target/etc/lilo.conf
 /target/bin/echo '	label=Linux' >> /target/etc/lilo.conf
+if [ -L /target/initrd.img -o -f /target/initrd.img ]; then
+/target/bin/echo '	initrd=/initrd.img' >> /target/etc/lilo.conf
+fi
 chroot /target /sbin/lilo
