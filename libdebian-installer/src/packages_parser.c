@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages_parser.c,v 1.4 2003/12/11 19:29:50 waldi Exp $
+ * $Id: packages_parser.c,v 1.5 2004/02/01 15:39:11 waldi Exp $
  */
 
 #include <config.h>
@@ -105,6 +105,7 @@ const di_parser_fieldinfo *di_packages_minimal_parser_fieldinfo[] =
 {
   &internal_di_packages_parser_field_package,
   &internal_di_package_parser_field_essential,
+  &internal_di_package_parser_field_priority,
   &internal_di_package_parser_field_installed_size,
   &internal_di_package_parser_field_version,
   &internal_di_package_parser_field_provides,
@@ -112,6 +113,7 @@ const di_parser_fieldinfo *di_packages_minimal_parser_fieldinfo[] =
   &internal_di_package_parser_field_pre_depends,
   &internal_di_package_parser_field_filename,
   &internal_di_package_parser_field_md5sum,
+  &internal_di_package_parser_field_size,
   NULL
 };
 
