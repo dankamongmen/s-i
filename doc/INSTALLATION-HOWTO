@@ -43,9 +43,10 @@ ftp://ftp.debian.org/debian/dists/unstable/main/installer-i386/current/images/
 
 Daily builds of all non-ISO debian-installer images, including floppy images 
 and initrd's are available --
-for i386:    http://people.debian.org/~joeyh/d-i/images/daily/
-for powerpc: http://people.debian.org/~tsauter/d-i/images-powerpc/daily/
-             (cdrom and netboot only)
+for i386:      http://people.debian.org/~joeyh/d-i/images/daily/
+for powerpc:   http://people.debian.org/~tsauter/d-i/images-powerpc/daily/
+               (cdrom and netboot only)
+complete list: http://www.debian.org/devel/debian-installer/ports-status
 
 The subsections below will give the details about which images you should
 get for each possible means of installation.
@@ -137,7 +138,7 @@ need to put the floppy/boot.img on a floppy (see section 2.2).
 Now boot from the floppy. It should detect your USB device and proceed
 with booting from it.
 
-2.4 Booting from Network
+2.4 Booting from network
 
 It's also possible to boot debian-installer completely from the net. The 
 various methods to netboot depend on your architecture and netboot setup. 
@@ -148,6 +149,27 @@ http://wiki.debian.net/index.cgi?DebianInstallerNetbootPXE
 The files in netboot/ can be used to netboot debian-installer.
 If you don't have a netboot setup, you can write the netboot/mini.iso
 to a CD to produce a minimal netinst CD.
+
+2.5 Booting from hard disk
+
+It's possible to boot the installer using no removable media, but just an
+existing hard disk, which can have a different OS on it. These instructions
+are for i386 systems, such as those running windows. Download 
+hd-media/initrd.gz, hd-media/vmlinuz, and a Debian CD image to the top-level
+directory of the hard disk. Make sure that the CD image has a filename
+ending in ".iso". Now it's just a matter of booting linux with the initrd.
+
+If you have grub installed, boot grub, and do the following:
+
+grub>kernel (hd0,0)/vmlinuz root=/dev/ram ramdisk_size=8192 devfs=mount,dall
+grub>initrd (hd0,0)/initrd.gz
+grub>boot
+
+Or you can use loadlin to boot linux from inside DOS (or early versions of
+Windows) with the same parameters. Ater the installer boots , it should
+find the ISO you placed on the hard disk, and continue with the install.
+You will not be able to reformat the partition the installer was booted
+from if you use this technique.
 
 
 3. Installation
