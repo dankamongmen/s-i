@@ -1,7 +1,6 @@
 dir =
 
 subdirs = \
-	bin \
 	dev \
 	etc \
 	floppy \
@@ -9,7 +8,6 @@ subdirs = \
 	mnt \
 	proc \
 	sbin \
-	usr \
 	var \
 	initrd
 
