@@ -14,7 +14,7 @@ export DH_OPTIONS=-n
 INSTALL      = install -m0755
 INSTALL_DATA = install -m0644
 
-PACKAGES=$(shell dh_listpackages)
+PACKAGE=$(shell dh_listpackages)
 
 BUGREPORTERUDEB=bugreporter-udeb
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
@@ -38,7 +38,10 @@ install-common: build
 	dh_installdirs
 
 install-bugreporter-udeb: install-common
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/bugreporter-udeb
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/$(PACKAGE)
+
+	# Install it after 93save-install-log and before 95umount
+	$(INSTALL) debian/$(PACKAGE).prebaseconfig debian/$(PACKAGE)/usr/lib/prebaseconfig.d/94$(PACKAGE)
 
 # Build architecture-independent files here.
 binary-indep: install bugreporter-udeb

@@ -1,0 +1,11 @@
+#!/bin/sh
+(
+    while read tag content ; do
+	if [ "$tag" = "Package:" ] ; then
+	    package="$content"
+	fi
+	if [ "$tag" = "Version:" ] ; then
+	    echo "$package $content"
+	fi
+    done
+) < /var/lib/dpkg/status

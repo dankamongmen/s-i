@@ -13,26 +13,14 @@ copy_cdebconf_db() {
     cp -a /var/lib/cdebconf "$destdir"
 }
 
-package_versions() {
-    (
-        while read tag content ; do
-            if [ "$tag" = "Package:" ] ; then
-                package="$content"
-            fi
-            if [ "$tag" = "Version:" ] ; then
-                echo "$package $content"
-            fi
-        done
-    ) < /var/lib/dpkg/status
-}
-
 # generate files with HW info, debconf database info etc, and store
 # them in /var/log
 
 copy_cdebconf_db /var/log/cdebconf-copy
 
-/usr/lib/bugreporter-udeb/report-hw > /var/log/hardware-summary
-package_versions > /var/log/package-versions
+/bin/report-hw > /var/log/hardware-summary
+
+/bin/package-versions > /var/log/package-versions
 
 di_input important bugreporter-udeb/insert_floppy || [ $? -eq 30 ]
 di_go
