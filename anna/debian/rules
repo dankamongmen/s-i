@@ -1,11 +1,5 @@
 #!/usr/bin/make -f
 
-# This is the debhelper compatability version to use.
-export DH_COMPAT=2
-
-# Make debhelper not generate any maint scripts.
-export DH_OPTIONS=-n
-
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -45,11 +39,9 @@ binary-arch: build
 	dh_compress -a
 	dh_fixperms -a
 	dh_installdeb -a
-ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 	dh_strip -a
-endif
-	dh_di_gencontrol -a
-	dh_di_builddeb -a
+	dh_gencontrol -a
+	dh_builddeb -a
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary
