@@ -31,7 +31,7 @@
 
  2. Do the following for each disk:
 
-   1. Calculate the sum of all additionally requrested diskspace
+   1. Calculate the sum of all additionally requested diskspace
       (max-min).  Each disk with no limit to the maximum size
       get maximum equal to the disk capacity to make sure this
       partition will get the whole disk if there are no other
@@ -119,7 +119,7 @@ distribute_partitions(struct disk_info_t diskinfo[],
 	{
 	    /* Unable to find disk with enough free space */
 	    autopartkit_error(0, "Unable to find %llu blocks of "
-			      "free space requrested by %s on any disk.\n",
+			      "free space requested by %s on any disk.\n",
 			      reqs[i].min_blk,
 			      reqs[i].mountpoint);
 	    return -1;
