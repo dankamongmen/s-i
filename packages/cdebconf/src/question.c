@@ -122,24 +122,21 @@ void question_owner_add(struct question *q, const char *owner)
 
 void question_owner_delete(struct question *q, const char *owner)
 {
-	struct questionowner **ownerp, *nextp;
+	struct questionowner **ownerp;
 
-	for (ownerp = &q->owners; *ownerp != 0; ownerp = &(*ownerp)->next)
+	for (ownerp = &q->owners; *ownerp != 0;)
 	{
 		if (strcmp((*ownerp)->owner, owner) == 0)
 		{
-			nextp = (*ownerp)->next;
-			if (nextp == 0)
-			{
-				nextp = *ownerp;
-				*ownerp = 0;
-			}
-			else
-			{
-				**ownerp = *nextp;
-			}
-			DELETE(nextp->owner);
-			DELETE(nextp);
+			struct questionowner *currentp = *ownerp;
+
+			*ownerp = currentp->next;
+			DELETE(currentp->owner);
+			DELETE(currentp);
+		}
+		else
+		{
+			ownerp = &(*ownerp)->next;
 		}
 	}
 }
