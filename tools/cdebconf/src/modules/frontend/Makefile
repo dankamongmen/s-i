@@ -1,4 +1,4 @@
-MODULES=text ncurses
+MODULES=text ncurses bogl
 SOBJS=$(addsuffix .so,$(MODULES))
 
 all:
