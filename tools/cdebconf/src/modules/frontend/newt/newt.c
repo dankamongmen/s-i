@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.37 2003/11/04 23:48:51 barbier Exp $
+ * $Id: newt.c,v 1.38 2003/11/05 06:27:40 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -249,6 +249,7 @@ show_separate_window(struct frontend *obj, struct question *q)
 {
     newtComponent form, textbox, bOk, bCancel, cRet;
     int width = 80, height = 24, t_height, t_width, win_width, win_height;
+    int t_width_descr;
     // buttons
     int extra = 3;
     int format_note = 0;
@@ -261,13 +262,17 @@ show_separate_window(struct frontend *obj, struct question *q)
 #else
     int flags = NEWT_FLAG_WRAP;
 #endif
+    char *descr = q_get_description(q);
+    char *ext_descr = q_get_extended_description(q);
 
-    assert(q_get_extended_description(q));
+    assert(descr);
+    assert(ext_descr);
+
     if (strcmp(q->template->type, "note") == 0 || strcmp(q->template->type, "error") == 0)
     {
         format_note = 1;
         extra++;
-        full_description = strdup(q_get_extended_description(q));
+        full_description = strdup(ext_descr);
     }
     else
         full_description = get_full_description(q);
@@ -290,12 +295,15 @@ show_separate_window(struct frontend *obj, struct question *q)
     full_description = wrappedtext;
 #endif
     t_width = get_text_width(full_description);
+    t_width_descr = get_text_width(descr);
+    if (t_width_descr > t_width)
+        t_width = t_width_descr;
     if (win_width > t_width + 4)
         win_width = t_width + 4;
     create_window(win_width, win_height, obj->title, q->priority);
     form = create_form(NULL);
     if (format_note)
-        newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
+        newtFormAddComponent(form, newtLabel((win_width - strwidth(descr))/2, 0, descr));
     textbox = newtTextbox(1, 1, t_width, t_height, flags);
     assert(textbox);
     newtTextboxSetText(textbox, full_description);
@@ -315,6 +323,8 @@ show_separate_window(struct frontend *obj, struct question *q)
         ret = DC_NOTOK;
     newtFormDestroy(form);
     newtPopWindow();
+    free(descr);
+    free(ext_descr);
     return ret;
 }
 
