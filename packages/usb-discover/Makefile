@@ -1,24 +1,14 @@
-dir = usr/lib/hw-detect
+DISCDB=/usr/share/discover/pci.lst
 
-ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
-	files = \
-		ohci-pci.lst \
-		uhci-pci.lst \
-		ehci-pci.lst
-endif
+install:
+	(cat ohci-pci.lst ; \
+	 awk '$$3 ~ /usb-ohci/ { print $$1}' < $(DISCDB)) \
+	| sort > $(DESTDIR)/ohci-pci.lst
 
-all:
+	(cat uhci-pci.lst ; \
+	 awk '$$3 ~ /usb-uhci/ { print $$1}' < $(DISCDB)) \
+	| sort > $(DESTDIR)/uhci-pci.lst
 
-lists: $(files)
-
-ohci-pci.lst: /usr/share/discover/pci.lst
-	 awk '$$3 ~ /usb-ohci/ { print $$1}' < /usr/share/discover/pci.lst | \
-	 	sort > $@.new && mv $@.new $@
-
-uhci-pci.lst: /usr/share/discover/pci.lst
-	 awk '$$3 ~ /usb-uhci/ { print $$1}' < /usr/share/discover/pci.lst | \
-	 	sort > $@.new && mv $@.new $@
-
-ehci-pci.lst: /usr/share/discover/pci.lst
-	 awk '$$3 ~ /ehci-hcd/ { print $$1}' < /usr/share/discover/pci.lst | \
-	 	sort > $@.new && mv $@.new $@
+	(cat ehci-pci.lst ; \
+	 awk '$$3 ~ /ehci[-_]hcd/ { print $$1}' < $(DISCDB)) \
+	| sort > $(DESTDIR)/ehci-pci.lst

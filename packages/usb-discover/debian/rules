@@ -7,12 +7,16 @@ clean:
 	dh_testroot
 	dh_clean
 
-binary-indep: build
+install:
+	dh_testdir
+	dh_clean
+	dh_installdirs usr/lib/usb-discover
+	$(MAKE) install DESTDIR=debian/usb-discover/usr/lib/usb-discover
+
+binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_clean
 	dh_install S45usb-linux lib/debian-installer.d
-	dh_install ohci-pci.lst uhci-pci.lst ehci-pci.lst usr/lib/usb-discover
 	dh_install usb-discover usr/sbin
 	dh_installdebconf
 	dh_fixperms
