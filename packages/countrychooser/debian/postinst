@@ -62,54 +62,6 @@ country2code() {
 	fi
 }
 
-# This function performs several tasks:
-# - Search in $COUNTRY_SHORTLIST for either a coutrycode or a countryname
-# - Build a shortlist for the dialog
-get_shortlist() {
-	OLD_IFS="$IFS"
-	IFS=$(echo -en "\t")
-	SLIST=""
-	count=0
-	for value in $COUNTRY_SHORTLIST; do
-		count=$(($count+1))
-		if [ "$(($count % 2))" -eq 1 ] ; then
-			CCODE=$value
-		else
-			CNAME=$value
-			case "$1" in
-			code)
-				if [ "$CNAME" = "$2" ] ; then
-					echo $CCODE
-					break
-				fi
-				;;
-			name)
-				if [ "$CCODE" = "$2" ] ; then
-					echo $CNAME
-					break
-				fi
-				;;
-			shortlist)
-				if [ ! -z "${SLIST}" ]; then
-					SLIST="${SLIST}, "
-				fi
-				SL_NAME=$(echo "${INDENT}${CNAME}" | sed -e 's/,/\\,/')
-				SLIST="${SLIST}${SL_NAME}"
-				;;
-			esac
-		fi
-	done
-	if [ "$1" = "shortlist" ] ; then
-		echo "$SLIST"
-	fi
-	IFS="$OLD_IFS"
-}
-
-loccountry2code() {
-	COUNTRYNAME=$(echo "$1" | sed "s/^$INDENT//" | sed 's/\\,/,/g')
-	echo $(get_shortlist code "$COUNTRYNAME")
-}
-
 # First grab back the country we got from languagechooser
 # (or from elsewhere) and populate the debconf database with
 # it so that it becomes the default choice
@@ -120,7 +72,6 @@ if [ -n "$RET" ]; then
 	COUNTRYCODE_LANGUAGECHOOSER="$RET"
 	COUNTRY_LANGUAGECHOOSER="$(code2country "$RET")"
 	db_set "$fulllist" "${COUNTRY_LANGUAGECHOOSER}"
-	db_set "$shortlist" "${COUNTRY_LANGUAGECHOOSER}"
 fi
 
 
@@ -158,6 +109,11 @@ else
 	FALLBACKLOCALE="C"
 fi
 
+log "LANGUAGECODE_LANGUAGECHOOSER = '$LANGUAGECODE_LANGUAGECHOOSER'"
+log "COUNTRYCODE_LANGUAGECHOOSER = '$COUNTRYCODE_LANGUAGECHOOSER'"
+log "LOCALE_LANGUAGECHOOSER = '$LOCALE_LANGUAGECHOOSER'"
+log "FALLBACKLOCALE = '$FALLBACKLOCALE'"
+
 # If present, keep track of charset or modifier we got from languagechooser
 # This charset or modifier is in the fallback locale
 EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
@@ -165,6 +121,7 @@ EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
 
 FIRST_LANG=$(echo $LANGUAGELIST | sed -e 's/:.*$//')
 
+# We use /etc/shortlists to check if we should present a shortlist
 if grep -q "^$FIRST_LANG" $SHORTLISTS; then
   use_lang=$FIRST_LANG
 elif grep -q "^$LANGUAGE" $SHORTLISTS; then
@@ -190,15 +147,11 @@ if [ "$LANGUAGE" != "C" ]; then
 				fullprio=medium
 			else
 				if [ "$use_lang" ]; then
-					# Build a short list of supported locales for
-					# the language.
-					COUNTRY_SHORTLIST=$(grep "^$use_lang[[:space:]]" $SHORTLISTS | \
-							    sed -e "s/^$use_lang[[:space:]]//")
-					SHORTLIST=$(get_shortlist shortlist $use_lang)
-
-					db_subst $shortlist SHORTLIST "${SHORTLIST}"
-					db_subst $shortlist DEFAULTLOCALE "${DEFAULTLOCALE}"
-					db_input $shortprio $shortlist || [ $? -eq 30 ]
+                                        shortlist_template="$shortlist-$use_lang"
+                                        db_register $shortlist_template $shortlist
+                                        # Set the default
+                                        db_set $shortlist $COUNTRYCODE_LANGUAGECHOOSER
+                                        db_input $shortprio $shortlist || [ $? -eq 30 ]
 					askedshort=1
 				else
 					askedshort=0
@@ -208,13 +161,12 @@ if [ "$LANGUAGE" != "C" ]; then
 		2)
 			db_get $shortlist
 			if [ "$askedshort" = 1 ] && [ "$RET" != "other" ]; then
-     				COUNTRYCODE="$(loccountry2code "$RET" $use_lang )" || true
+     				COUNTRYCODE="$RET"
 				if [ -n "$COUNTRYCODE" ]; then
 					break
 				fi
 			fi
 			
-			db_subst $fulllist DEFAULTLOCALE "${DEFAULTLOCALE}"
 			db_input $fullprio $fulllist || [ $? -eq 30 ]
 		;;
 		3)
@@ -243,16 +195,12 @@ if [ "$LANGUAGE" != "C" ]; then
 fi
 
 db_set "$countrycode"  "$COUNTRYCODE"
-log "$countrycode = '$COUNTRYCODE'"
+log "Set $countrycode = '$COUNTRYCODE'"
 
 # Search for a supported locale which most closely resembles.
 LOCALE=""
 log "LANGUAGE = '$LANGUAGE'"
-log "LANGUAGECODE_LANGUAGECHOOSER = '$LANGUAGECODE_LANGUAGECHOOSER'"
 log "COUNTRYCODE = '$COUNTRYCODE'"
-log "COUNTRYCODE_LANGUAGECHOOSER = '$COUNTRYCODE_LANGUAGECHOOSER'"
-log "LOCALE_LANGUAGECHOOSER = '$LOCALE_LANGUAGECHOOSER'"
-log "FALLBACKLOCALE = '$FALLBACKLOCALE'"
 
 for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
 	     ${LANGUAGE}_${COUNTRYCODE}; do
@@ -294,12 +242,12 @@ if [ -z "${LOCALE}" ]; then
         else
                 LOCALE=`echo $FALLBACKLOCALE | sed -e 's/[.@].*$//'`
         fi
-        log "falling back to locale '${LOCALE}'"
+        log "Falling back to locale '${LOCALE}'"
 fi
 
 # Set the locale.
 db_set "$localecode" "${LOCALE}"
-log "$localecode = '${LOCALE}'"
+log "Set $localecode = '${LOCALE}'"
 
 # The code below tries to add lang_COUNTRY at the beginning of the language
 # list we got from languagechooser
@@ -314,7 +262,7 @@ if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n
 	LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:${LANGUAGELIST}
 	# Languagelist setting
 	db_set "$languagecode" "$LANGUAGELIST"
-	log "$languagecode = '$LANGUAGELIST'"
+	log "Set $languagecode = '$LANGUAGELIST'"
 fi
 
 exit 0

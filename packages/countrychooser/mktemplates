@@ -64,14 +64,14 @@ for pofile in debian/po/*.po ; do
 	perl -pe 'BEGIN { $marker=shift } s/^msg(id|str) "(.+)"/msg$1 "$marker$2"/' "$INDENTMARKER" \
 		< $ISO3166TRANSLATIONS/$pofilename \
 		> $ISO3166TRANSLATIONS/$pofilename.munged
-
+	
 	# msgcat will properly handle different encodings
 	msgcat debian/po/$pofilename \
-	       $ISO3166TRANSLATIONS/$pofilename.munged \
-	       > debian/pobuild/$pofilename
+		$ISO3166TRANSLATIONS/$pofilename.munged \
+		> debian/pobuild/$pofilename
 
 	msgmerge -U debian/pobuild/$pofilename \
-                 debian/pobuild/templates.pot
+		debian/pobuild/templates.pot
     # Else we just use what's translated
     else
 	cp $pofile debian/pobuild/$pofilename
@@ -79,7 +79,7 @@ for pofile in debian/po/*.po ; do
 done
 
 # and now we generate the templates file from all this
-PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates.tmp >debian/templates
+PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates.tmp >debian/templates.base
 
 # Replace the indent marker with the actual indent.
-perl -i -pe "s/\Q$INDENTMARKER\E/$INDENT/g" debian/templates
+perl -i -pe "s/\Q$INDENTMARKER\E/$INDENT/g" debian/templates.base
