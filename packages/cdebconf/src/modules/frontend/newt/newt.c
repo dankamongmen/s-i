@@ -451,7 +451,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
 static int
 show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_desc)
 {
-    newtComponent form, sform = NULL, scrollbar, textbox, bOk, bCancel, cRet;
+    newtComponent form, sform = NULL, scrollbar, textbox, checkbox, bOk, bCancel, cRet;
     int width = 80, height = 24;
     int win_width, win_height = -1, t_height, t_width, sel_height, sel_width;
     int t_width_title, t_width_buttons;
@@ -556,7 +556,9 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         for (k = 0; k < defcount; k++)
             if (strcmp(choices[tindex[i]], defvals[k]) == 0)
                 def = 1;
-        newtFormAddComponent(sform, newtCheckbox((win_width-sel_width-3)/2, 1+t_height+1+i, choices_trans[i], def ? '*' : ' ', " *", &answer[tindex[i]]));
+        checkbox = newtCheckbox((win_width-sel_width-3)/2, 1+t_height+1+i, choices_trans[i], def ? '*' : ' ', " *", &answer[tindex[i]]);
+        newtCheckboxSetFlags(checkbox, NEWT_FLAG_RETURNEXIT, NEWT_FLAGS_SET);
+        newtFormAddComponent(sform, checkbox);
     }
     if (obj->methods.can_go_back(obj, q) || !show_ext_desc) {
         bOk     = newtCompactButton(win_width - TEXT_PADDING - BUTTON_PADDING - strwidth(continue_text(obj)) - 3, win_height-2, continue_text(obj));
