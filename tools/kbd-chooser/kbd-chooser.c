@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.23 2003/04/30 17:51:33 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.24 2003/05/15 19:43:03 mckinstry Exp $
  */
 
 #include "config.h"
@@ -311,7 +311,7 @@ keymap_t *keymap_get (maplist_t *list, char *name)
 	if (mp)  
 		return mp;
 	mp = NEW (keymap_t);
-	if (DEBUG && mp == NULL)
+	if (mp == NULL)
 		DIE ("Failed to malloc keymap_t");
 	mp->langs = NULL;
 	mp->name = STRDUP (name);
@@ -335,7 +335,7 @@ maplist_t *maplist_parse_file (const char *name)
 	char buf[LINESIZE], *tab1, *tab2, *nl;
 	fp = fopen (name, "r");
 
-	if (DEBUG && fp == NULL)
+	if (fp == NULL)
 		DIE ("Failed to open %s: %s \n", name, strerror (errno));
 	maplist = maplist_get ((char *) (name + STRLEN (KEYMAPLISTDIR) + STRLEN ("console-keymaps-") + 1));
 
@@ -384,9 +384,9 @@ void read_keymap_files (char *listdir)
 	*p++ = '/';
 
 	d = opendir (listdir);
-
-	if (DEBUG && d == NULL)
-		DIE ("Failed to open %s: %s\n", listdir, strerror (errno));
+			
+	if (d == NULL)
+		DIE ("Failed to open %s: %s (keymap files probably not installed)\n", listdir, strerror (errno));
 	
 	ent = readdir (d);
 	for (; ent ; ent = readdir (d)) {
@@ -395,9 +395,8 @@ void read_keymap_files (char *listdir)
 			continue;
 		strcpy (p, ent->d_name);
 		if (stat (fullname, &sbuf) == -1) {
-			if (DEBUG) 			       
-				DIE ("Failed to stat %s: %s\n", fullname,
-				     strerror (errno));
+			DIE ("Failed to stat %s: %s\n", fullname,
+			     strerror (errno));
 			// otherwise continue
 			continue;
 		}
@@ -505,7 +504,7 @@ int check_if_serial_console (void)
 	client->command (client, "set", "debian-installer/serial-console",
 			 present ? "yes" : "no" , NULL);
 	close (fd);
-	/* di_logf ("Setting debian-installer/serial-console to %d", present); */
+	di_logf ("Setting debian-installer/serial-console to %d", present); 
 	return present;
 }
 		
