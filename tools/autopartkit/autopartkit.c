@@ -1394,7 +1394,7 @@ int main (int argc, char *argv[])
 #endif /* TEST */
 
     if ( ! tablefile )
-        autopartkit_error(1, "usage: %s <table-file>\n", argv[0]);
+        autopartkit_error(1, "usage: %s <table file>\n", argv[0]);
 
     disk_reqs = load_partitions(tablefile);
     
