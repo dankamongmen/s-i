@@ -115,13 +115,8 @@ block_partition(const char *part)
     struct dirent *entry = NULL;
 
     dir = opendir(BLOCK_D);
-    if(dir == NULL) {
-        char *err = NULL;
-
-        asprintf(&err, "Failed to open block-directory: %s", BLOCK_D);
-        di_log(err);
+    if(dir == NULL)
         return(0);
-    }
 
     while((entry = readdir(dir)) != NULL) {
         char *cmd = NULL;

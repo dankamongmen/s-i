@@ -10,7 +10,7 @@ PARTCONF_OBJS = util.o partconf.o find-parts.o
 all: partconf find-partitions mkfstab
 
 partconf: $(PARTCONF_OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS) -ldebconf
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS) -ldebconfclient
 
 find-partitions: partconf.h find-parts.c util.o
 	$(CC) $(CFLAGS) -o $@ -DFIND_PARTS_MAIN find-parts.c util.o $(LIBS)

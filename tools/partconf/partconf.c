@@ -496,6 +496,9 @@ static int do_mount_manual = 0;
 static int
 mountpoint_manual(void)
 {
+    if(strcmp(curr_part->op.filesystem, "swap") == 0)
+        return 0;
+
     do_mount_manual = 0;
     debconf->command(debconf, "GET", "partconf/mountpoint", NULL);
     if (strcmp(debconf->value, "Don't mount it") == 0) {
