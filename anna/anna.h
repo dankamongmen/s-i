@@ -21,6 +21,7 @@ extern struct debconfclient *debconf;
 
 di_package **get_retriever_packages(di_packages *status);
 const char *get_default_retriever(const char *choices);
+void set_retriever(const char *retriever);
 char *get_retriever(void);
 int config_retriever(void);
 di_packages *get_packages(di_packages_allocator *allocator);

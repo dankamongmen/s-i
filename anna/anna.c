@@ -28,7 +28,7 @@ choose_retriever(di_packages *status, di_packages **packages __attribute__((unus
 
         if (retriever && (p = di_packages_get_package(status, retriever, 0))) {
             package_to_choice(p, buf, 200);
-            debconf_set(debconf, ANNA_RETRIEVER, buf);
+	    set_retriever(buf);
         }
     }
 
@@ -46,7 +46,7 @@ choose_retriever(di_packages *status, di_packages **packages __attribute__((unus
 static int
 choose_modules(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator)
 {
-    char *choices, *package_kernel, *running_kernel = NULL, *subarchitecture;
+    char *choices, *package_kernel, *running_kernel = NULL;
     int package_count = 0;
     di_package *package, *status_package, **package_array;
     di_slist_node *node, *node1;
@@ -252,7 +252,7 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
 
 #ifndef TEST
 int
-main()
+main(int argc, char **argv)
 {
     int ret, state = 0;
     int (*states[])(di_packages *status, di_packages **packages, di_packages_allocator **packages_allocator) = {
@@ -273,6 +273,11 @@ main()
 
     di_package **retrievers_before = get_retriever_packages(status);
 
+    if (argc > 1) {
+	    set_retriever(argv[1]);
+	    state=1; /* skip manual setting and use the supplied retriever */
+    }
+    
     while (state >= 0 && states[state] != NULL) {
         ret = states[state](status, &packages, &packages_allocator);
         if (ret != 0)
@@ -300,7 +305,7 @@ main()
         di_system_packages_status_write_file(status, DI_SYSTEM_DPKG_STATUSFILE);
 #endif
     }
-    if (!ret) {
+    if (!ret && argc > 1) {
         di_package **retrievers_after = get_retriever_packages(status);
         if (new_retrievers(retrievers_before, retrievers_after))
             ret = 10;

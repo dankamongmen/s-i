@@ -55,6 +55,11 @@ get_default_retriever(const char *choices)
     return NULL;
 }
 
+/* Force use of a given retriever. */
+void
+set_retriever(const char *retriever) {
+    debconf_set(debconf, ANNA_RETRIEVER, retriever);
+}
 
 /*
  * Helper functions for choose_modules
@@ -68,13 +73,12 @@ get_retriever(void)
     debconf_get(debconf, ANNA_RETRIEVER);
     if (debconf->value != NULL)
         colon_p = strchr(debconf->value, ':');
-    if (colon_p != NULL) {
+    if (colon_p != NULL)
         *colon_p = '\0';
-        if (asprintf(&retriever, "%s/%s", RETRIEVER_DIR, debconf->value) == -1)
-            retriever = NULL;
-    }
+    if (asprintf(&retriever, "%s/%s", RETRIEVER_DIR, debconf->value) == -1)
+        retriever = NULL;
     if (!retriever)
-      di_log (DI_LOG_LEVEL_ERROR, "don't find retriever in %s, get %s", __PRETTY_FUNCTION__, debconf->value);
+      di_log (DI_LOG_LEVEL_ERROR, "can't find retriever in %s, got %s", __PRETTY_FUNCTION__, debconf->value);
     return retriever;
 }
 
