@@ -34,6 +34,9 @@ do_mkswap() {
 			return 1
 		fi
 	done
+
+        # update fstab for baseinstaller
+	sh /usr/lib/prebaseconfig.d/40fstab
 	return 0
 }
 
