@@ -26,6 +26,9 @@
 #define PARTKIT_TABLE_SIZE 2048
 #define PARTKIT_PART_LIST_SIZE 128
 
+/* I can't understand why they did removed it. */
+#define PED_PARTITION_PRIMARY 0
+
 #include <string.h>
 #include <parted/parted.h>
 #include <debconfclient.h>
@@ -91,7 +94,7 @@ partkit_get_table (PedDevice ** dev)
 
   ptr = table;
 
-  disk = ped_disk_open (*dev);
+  disk = ped_disk_new (*dev);
 
   if (!disk)
     goto error;
@@ -170,7 +173,7 @@ partkit_get_table (PedDevice ** dev)
       ptr += snprintf (ptr, PARTKIT_TABLE_SIZE - (ptr - table), "\n");
     }
 
-  ped_disk_close (disk);
+  ped_disk_destroy (disk);
   if ((ptr - table) > PARTKIT_TABLE_SIZE)
     goto error;
   return table;
@@ -199,7 +202,7 @@ partkit_get_partitions (PedDevice * dev)
 
   ptr = part_list;
 
-  disk = ped_disk_open (dev);
+  disk = ped_disk_new (dev);
 
   if (!disk)
     goto error;
@@ -217,7 +220,7 @@ partkit_get_partitions (PedDevice * dev)
 		       "%-5d ", part->num);
     }
 
-  ped_disk_close (disk);
+  ped_disk_destroy (disk);
 
   if ((ptr - part_list) > PARTKIT_PART_LIST_SIZE)
     goto error;
@@ -242,10 +245,10 @@ partkit_create (PedDevice * dev)
   char *ptr, *endptr = NULL;
   char *table;
 
-  disk = ped_disk_open (dev);
+  disk = ped_disk_new (dev);
   if (!disk)
     goto error;
-  constraint = ped_constraint_any (disk);
+  constraint = ped_constraint_any (disk->dev);
   if (!constraint)
     goto error_close_disk;
 
@@ -326,9 +329,9 @@ partkit_create (PedDevice * dev)
   if (!ped_disk_add_partition (disk, part, constraint))
     goto error_destroy_part;
 
-  ped_disk_write (disk);
+  ped_disk_commit (disk);
   ped_constraint_destroy (constraint);
-  ped_disk_close (disk);
+  ped_disk_destroy (disk);
   return 1;
 
 error_destroy_part:
@@ -336,7 +339,7 @@ error_destroy_part:
 error_destroy_constraint:
   ped_constraint_destroy (constraint);
 error_close_disk:
-  ped_disk_close (disk);
+  ped_disk_destroy (disk);
 error:
   return 0;
 }
@@ -349,7 +352,7 @@ partkit_delete (PedDevice * dev)
   PedPartition *part;
   char *ptr;
 
-  disk = ped_disk_open (dev);
+  disk = ped_disk_new (dev);
 
   if (!disk)
     goto error;
@@ -394,12 +397,12 @@ partkit_delete (PedDevice * dev)
     }
 
   ped_disk_delete_partition (disk, part);
-  ped_disk_write (disk);
-  ped_disk_close (disk);
+  ped_disk_commit (disk);
+  ped_disk_destroy (disk);
   return 1;
 
 error_close_disk:
-  ped_disk_close (disk);
+  ped_disk_destroy (disk);
 error:
   partkit_error (0);
   return -1;
