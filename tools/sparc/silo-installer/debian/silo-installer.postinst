@@ -52,10 +52,15 @@ ln -sf ../boot/silo.conf /target/etc/silo.conf
 ln -sf . /target/boot/boot
 ln -sf . /target/boot/etc
 
-if ! chroot /target /sbin/silo -f; then
+if chroot /target /sbin/silo -f; then
+	db_input medium silo-installer/success || [ $? -eq 30 ]
+	db_go || true
+	exit 0
+else
 	ERRCODE=$?
 	db_subst silo-installer/failed ERRCODE "$ERRCODE"
 	db_input critical silo-installer/failed || [ $? -eq 30 ]
 	db_go || exit 10 # back up
 	exit 1
 fi
+
