@@ -21,8 +21,6 @@ enum
 {
 	EXIT_OK			= 0,
 	EXIT_BACKUP		= 10,
-	EXIT_QUIT		= 11,
-	EXIT_RESTART		= 12,
 };
 
 /* vim: noexpandtab sw=8

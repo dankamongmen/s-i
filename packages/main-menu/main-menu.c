@@ -575,10 +575,6 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' succeeded but requested to be left unconfigured.", p->p.package); 
 				modify_debconf_priority(LOWER);
 				break;
-			case EXIT_QUIT:
-			case EXIT_RESTART:
-				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' requested exit with %d.", p->p.package, ret); 
-				return ret;
 			default:
 				di_log(DI_LOG_LEVEL_WARNING, "Menu item '%s' failed.", p->p.package);
 				notify_user_of_failure(p);
