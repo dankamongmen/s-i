@@ -12,11 +12,13 @@
 # replaced with the version of the kernel that is being used. Also, the
 # Provdes: lines are munged, so if a particular module could not be found,
 # it is not listed.
+#
+# Pass in the kernel version string.
 
 use v5.6;
 use strict;
 
-my $kvers="2.4.0";
+my $kvers=shift or die "No kernel version string specified\n";
 
 # Get a list of all available modules.
 my @available=map {s/^unpacked\///; s/\n//; $_}
