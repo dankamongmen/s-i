@@ -218,14 +218,13 @@ struct package_t *get_packages (void) {
 	dist = debconf->value;
         suite = suites[currsuite];
         for (; suite != NULL; suite = suites[++currsuite]) {
-		int ret;
-
-		ret = try_get_packages(dist, suite, ".gz", "gunzip");
-		if (ret != 0)
-			ret = try_get_packages(dist, suite, "", NULL);
-		if (ret != 0)
+                packages = NULL;
+		if (try_get_packages(dist, suite, ".gz", "gunzip") == 0)
+                    packages = fopen(tmp_packages, "r");
+		if (packages == NULL && try_get_packages(dist, suite, "", NULL) == 0)
+			packages = fopen(tmp_packages, "r");
+		if (packages == NULL)
 			continue;
-                packages = fopen(tmp_packages, "r");
                 newp = di_pkg_parse(packages);
                 fclose(packages);
                 unlink(tmp_packages);
