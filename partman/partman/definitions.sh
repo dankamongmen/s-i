@@ -580,6 +580,8 @@ default_disk_label () {
 	    case "$sub" in
 		apus)
 		    echo amiga;;
+		amiga)
+		    echo amiga;;
 		chrp)
 		    echo msdos;; # guess
 		chrp_rs6k)
@@ -588,9 +590,9 @@ default_disk_label () {
 		    echo amiga;;
 		prep)
 		    echo msdos;; # guess
-		newworld)
+		powermac_newworld)
 		    echo mac;;
-		oldworld)
+		powermac_oldworld)
 		    echo mac;;
 		*)
 		    echo UNKNOWN;;
