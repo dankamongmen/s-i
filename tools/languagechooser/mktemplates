@@ -68,6 +68,7 @@ my $nativemessages=join(", ", @translations);
 open(TIN, "< $templatein") || die "Unable to read $templatein";
 open(TOUT, "> $template") || die "Unable to write $template";
 while (<TIN>) {
+    next if m/^#/;
     s/\@languagenames\@/$langstr/;
     s/\@nativemessages\@/$nativemessages/;
     print TOUT;
