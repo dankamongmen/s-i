@@ -7,6 +7,7 @@ logfile=messages
 
 localecode="debian-installer/locale"
 languagecode="debian-installer/language"
+languagenamecode="debian-installer/language-name"
 countrycode="debian-installer/country"
 
 log() {
@@ -23,7 +24,11 @@ locale="$RET"
 
 lowret=`echo $locale | tr [:upper:] [:lower:]`
 
-language=`echo $lowret | sed -e 's/\(..\).*/\1/'`
+db_fset "$languagenamecode" seen false || true
+db_input critical "$languagenamecode" || [ $? -eq 30 ]
+db_go || true
+db_get "$languagenamecode" || true
+language=`echo $RET | sed -e 's/ .*//'`
 db_set "$languagecode" "$language" || true
 
 country=`echo $lowret | sed -e 's/\(...\)\(.*\)/\2/'`
