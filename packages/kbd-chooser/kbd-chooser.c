@@ -754,7 +754,7 @@ keymap_select (char *arch, char *keymap)
 		def = keymap_get (maplist_get (arch), kb->deflt);
 		mydebconf_default_set (template, kb->deflt);
 	}
-	res = mydebconf_ask ( kb->deflt ? "low" : "high", template, &ptr);
+	res = mydebconf_ask ( kb->deflt ? "low" : "critical", template, &ptr);
 	if (res != CMD_SUCCESS)
 		return res;
 	strcpy (keymap, (strlen (ptr) == 0) ? "none" : ptr);
