@@ -1,0 +1,157 @@
+#!/bin/sh
+. /usr/share/debconf/confmodule
+set -e
+
+ISO_COUNT=0
+ISO_MOUNT_COUNT=0
+MOUNTABLE_DEVS_COUNT=0
+
+log () {
+    logger -t hd-image-detect "$@"
+}
+
+# Finds all block devices that might have a filesystem on them.
+block_devices () {
+	for type in scsi ide; do
+		if [ -d /dev/$type ]; then
+			find /dev/$type -type b
+		fi
+	done
+}
+
+mount_device () {
+	mount -t auto -o ro $1 /hd-media 2>/dev/null
+}
+		
+is_debian_iso () {
+	test -e /cdrom/.disk/info
+}
+
+# Set the distribution used by base-installer, test in priority order
+register_cd () {
+	for dist in stable testing unstable ; do
+		if [ -e /cdrom/dists/$dist ] ; then
+			CODENAME=`sed -n 's/^Codename: *//p' /cdrom/dists/$dist/Release`
+			db_set mirror/distribution $CODENAME
+			log "Detected ISO with '$CODENAME' distribution"
+			break
+		fi
+	done
+}
+
+# Try to mount a file as an iso, and see if it's a Debian cd.
+try_iso () {
+	if mount -i iso9660 -o ro,exec $1 /cdrom 2>/dev/null; then
+		log "Mounted $1"
+		ISO_MOUNT_COUNT=$(expr $ISO_MOUNT_COUNT + 1)
+		if is_debian_cd; then
+			# This could be more sophisticated, and try to deal
+			# with multiple Debian ISO's. For now, once we've got
+			# a Debian ISO, any Debian ISO, we're done.
+			register_cd
+			exit 0
+		else
+			log "Not a Debian ISO"
+			umount /cdrom
+		fi
+	fi
+}
+
+# Is a cdrom already mounted?  If so, assume it's the right one..
+mount | grep -q ^/cdrom && exit 0
+
+# Hopefully this will find the drive.
+hw-detect || true
+
+# Main-menu should set the title, but hw-detect clobbers that.
+db_settitle debian-installer/iso-scan/title
+
+# Find all block devices, and get a count of them, for use in progress bar.
+DEVS=$(block_devices)
+DEV_COUNT=0
+for dev in $DEVS; do
+	DEV_COUNT=$(expr $DEV_COUNT + 1)
+done
+
+log "Searching for Debian installation media..."
+db_progress START 0 $(expr $DEV_COUNT \* 2) iso-scan/progress_title
+
+# Load up every filesystem known to man. The drive could have anything.
+FS="ext2 ext3 reiserfs fat vfat xfs iso9660"
+for fs in $FS; do
+	modprobe $fs 2>/dev/null || true
+done
+
+mkdir /cdrom 2>/dev/null || true
+mkdir /hd-media 2>/dev/null || true
+
+log "First pass: Look for *.iso in top-level of each filesystem."
+for dev in $DEVS; do
+	db_subst iso-scan/progress_pass1 DRIVE $dev
+	db_progress INFO iso-scan/progress_pass1
+	if mount_device $dev; then
+		log "Mounted $dev for first pass"
+		MOUNTABLE_DEVS="$MOUNTABLE_DEVS $dev"
+		MOUNTABLE_DEVS_COUNT=$(expr $MOUNTABLE_DEVS_COUNT + 1)
+		for iso in /hd-media/*.iso /hd-media/*.ISO; do
+			if [ -e $iso ]; then
+				log "Found ISO $iso on $dev"
+				ISO_COUNT=$(expr $ISO_COUNT + 1)
+				try_iso $iso
+			fi
+		done
+		umount /hd-media
+	fi
+
+	# It's possible that the ISO was written right to the front of a
+	# device, and not to a filesystem. (Hey, we may even be spinning
+	# a real CD here, though that would be pretty weird..)
+	try_iso $dev
+
+	db_progress STEP 1
+done
+
+log "Second pass: Search whole filesystems for isos."
+# To save time, only ones we mounted successfully before.
+for dev in $MOUNTABLE_DEVS; do
+	db_subst iso-scan/progress_pass2 DRIVE $dev
+	db_progress INFO iso-scan/progress_pass2
+	db_subst iso-scan/progress_pass2_dir DRIVE $dev
+	if mount_device $dev; then
+		log "Mounted $dev for second pass"
+		for toplevel in /hd-media/*; do
+			# Make the progess at least show top level dirs.
+			# Showing all dirs would probably be too much
+			# overhead.
+			db_subst iso-scan/progress_pass2_dir DIRECTORY $toplevel
+			db_progress INFO iso-scan/progress_pass2_dir
+			for iso in $(find /hd-media/$toplevel 2>/dev/null | grep -i '\.iso$'); do
+				log "Found ISO $iso on $dev"
+				ISO_COUNT=$(expr $ISO_COUNT + 1)
+				try_iso $iso
+			done
+		done
+		umount /hd-media
+	fi
+
+	db_progress STEP 1
+done
+
+db_progress STOP
+
+# Failure. Display the best message we can about what happened.
+# TODO manual filename entry
+if [ "$ISO_COUNT" = 0 ]; then
+	db_subst iso-scan/no-isos NUM_FILESYSTEMS $MOUNTABLE_DEVS_COUNT
+	db_input critical iso-scan/no-isos || true
+elif [ "$ISO_MOUNT_COUNT" != "$ISO_COUNT" ]; then
+	db_subst iso-scan/corrupt-isos ISO_COUNT $ISO_COUNT
+	db_subst iso-scan/corrupt-isos ISO_MOUNT_COUNT $ISO_MOUNT_COUNT
+	db_input critical iso-scan/corrupt-isos || true
+else
+	db_subst iso-scan/bad-isos ISO_COUNT $ISO_COUNT
+	db_input critical iso-scan/bad-isos || true
+fi
+db_go || true
+log "Aborting with ISO_COUNT = $ISO_COUNT, MOUNTABLE_DEVS_COUNT = $MOUNTABLE_DEVS_COUNT, ISO_MOUNT_COUNT = $ISO_MOUNT_COUNT"
+exit 1
