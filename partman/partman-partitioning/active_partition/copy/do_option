@@ -7,13 +7,13 @@ id=$3
 
 cd $dev
 
-db_set partman-partitioning/confirm_copy 'Cancel'
+db_set partman-partitioning/confirm_copy 'false'
 db_fset partman-partitioning/confirm_copy seen false
 db_input high partman-partitioning/confirm_copy || true
 db_go || exit 0
 db_get partman-partitioning/confirm_copy
 
-[ "$RET" = 'Continue' ] || exit 0
+[ "$RET" = 'true' ] || exit 0
 
 ask_for_source () {
     local noninteractive

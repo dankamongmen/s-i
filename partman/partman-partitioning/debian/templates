@@ -1,106 +1,114 @@
 Template: partman-partitioning/progress_resizing
 Type: text
-_Description: The partition is being resized...
+_Description: Resizing partition...
 
 Template: partman-partitioning/progress_copying
 Type: text
-_Description: The partition is being copied...
+_Description: Copying partitoon...
 
 Template: partman-partitioning/confirm_copy
-Type: select
-__Choices: Continue, Cancel
-_Description: Can not be undone.  Continue?
- In order to copy to this partition the data from another partition it is
- necessary to write to the storage devices the changes made.  You won't be
- able to undo them any more.  The copying can not be undone too.  Are you
- sure you want to continue?
+Type: boolean
+_Description: Write the changes to the storage devices and copy the data?
+ Before the copy operation takes place, the changes have to be written
+ to the storage devices.
+ .
+ These changes cannot be undone. The copy operation cannot be undone also.
+ .
+ Please confirm whether you really want to perform these operations.
 
 Template: partman-partitioning/source_partition
 Type: select
 Choices: ${CHOICES}
-_Description: Please choose the partition containing the data to copy
+_Description: Source partition:
+ Please choose the partition which contains the data you want to copy.
 
 Template: partman-partitioning/copy_commit_failed
-Type: note
-_Description: Impossible to copy
- The attempt to write to the storage devices the changes made failed. In
- such circumstances no atempts to copy partitions will be made.
+Type: error
+_Description: Copy operation failure
+ An error occurred while writing the changes to the storage devices.
+ .
+ The copy operation is aborted.
 
 Template: partman-partitioning/confirm_resize
-Type: select
-__Choices: Continue, Cancel
-_Description: Can not be undone.  Continue?
- In order to resize the partition it is necessary to write to the storage
- devices the changes made.  You won't be able to undo them any more.  The
- resizing can not be undone too.  Are you sure you want to continue?
+Type: boolean
+_Description: Write the changes to the storage devices and resize partitions?
+ Before the resize operation takes place, the changes have to be written
+ to the storage devices.
+ .
+ These changes cannot be undone. The resize operation cannot be undone also.
+ .
+ Please confirm whether you really want to perform these operations.
 
 Template: partman-partitioning/new_size
 Type: string
-_Default: some number
-_Description: Please enter the new size of the partition
- The minimal size you can use is ${MINSIZE} and the maximal size is
+_Default: Value between ${MINSIZE} and ${MAXSIZE}
+_Description: New partition size:
+ The minimum size you can use is ${MINSIZE} and the maximum size is
  ${MAXSIZE}.
 
 Template: partman-partitioning/bad_new_size
-Type: note
-_Description: This is not a valid size
+Type: error
+_Description: Invalid size
 
 Template: partman-partitioning/new_size_commit_failed
-Type: note
-_Description: Impossible to resize
- The attempt to write to the storage devices the changes made failed. In
- such circumstances no atempts to resize the partition will be made.
+Type: error
+_Description: Resize operation failure
+ An error occurred while writing the changes to the storage devices.
+ .
+ The resize operation is aborted.
 
 Template: partman-partitioning/new_partition_size
 Type: string
-_Default: some number
-_Description: Please enter the size of the new partition
- The maximal size you can use is ${MAXSIZE}
+_Default: Value below ${MAXSIZE}
+_Description: New partition size:
+ The maximum size you can use is ${MAXSIZE}.
 
 Template: partman-partitioning/bad_new_partition_size
-Type: note
-_Description: This is not a valid size
+Type: error
+_Description: Invalid size
 
 Template: partman-partitioning/new_partition_place
 Type: select
 __Choices: Beginning, End
-_Description: Please choose the place of the new partition
+_Description: Location for the new partition:
+ Please choose whether you want the new partition to be created at the
+ beginning or at the end of the available space.
 
 Template: partman-partitioning/new_partition_fs
 Type: select
 Choices: ${CHOICES}
-_Description: Please choose the file system for the new partition
+_Description: File system for the new partition:
 
 Template: partman-partitioning/new_partition_type
 Type: select
 __Choices: Primary, Logical
-_Description: Please choose the type of the new partition
+_Description: Type for the new partition:
 
 Template: partman-partitioning/set_flags
 Type: multiselect
 Choices: ${CHOICES}
-_Description: Please choose the flags of the partition
+_Description: Flags for the new partition:
 
 Template: partman-partitioning/set_name
 Type: string
-_Description: Please type the name of the partition
+_Description: Partition name:
 
 Template: partman-partitioning/choose_label
 Type: select
 Choices: ${CHOICES}
-_Description: Please choose the type of the new label
+_Description: Type for the new label:
 
 Template: partman-partitioning/text/set_flags
 Type: text
-_Description: Set the flags of the partition
+_Description: Set the partition flags
 
 Template: partman-partitioning/text/set_name
 Type: text
-_Description: Set the name of the partition
+_Description: Set the partition name
 
 Template: partman-partitioning/text/copy
 Type: text
-_Description: Copy to here the data from another partition
+_Description: Copy data from another partition
 
 Template: partman-partitioning/text/delete
 Type: text
@@ -120,9 +128,9 @@ _Description: Turn bootable flag on
 
 Template: partman-partitioning/text/new
 Type: text
-_Description: Create new partition
+_Description: Create a new partition
 
 Template: partman-partitioning/text/label
 Type: text
-_Description: Create new empty partition table on this device
+_Description: Create a new empty partition table on this device
 

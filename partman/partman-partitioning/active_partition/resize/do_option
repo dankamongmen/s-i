@@ -17,13 +17,13 @@ hminsize=$(longint2human $minsize)
 hcursize=$(longint2human $cursize)
 hmaxsize=$(longint2human $maxsize)
 
-db_set partman-partitioning/confirm_resize 'Cancel'
+db_set partman-partitioning/confirm_resize 'false'
 db_fset partman-partitioning/confirm_resize seen false
 db_input high partman-partitioning/confirm_resize || true
 db_go || exit 0
 db_get partman-partitioning/confirm_resize
 
-[ "$RET" = 'Continue' ] || exit 0
+[ "$RET" = 'true' ] || exit 0
 
 ask_for_size () {
     local noninteractive
