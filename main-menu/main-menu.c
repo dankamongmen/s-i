@@ -212,11 +212,125 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	return NULL;
 }
 
+static int config_package(struct package_t *);
+
+/*
+ * Satisfy the dependencies of a virtual package. Its dependencies that actually
+ * provide the package are presented in a debconf select question for the user
+ * to pick and choose. Other dependencies are just fed recursively through
+ * config_package.
+ */
+static int satisfy_virtual(struct package_t *p) {
+	struct debconfclient *debconf;
+	struct package_t *dep;
+	char *configcommand;
+	int i, ret;
+	char *choices, *defval;
+	size_t c_size = 1;
+
+	choices = malloc(1);
+	choices[0] = '\0';
+	for (i = 0; p->depends[i] != 0; i++) {
+		if ((dep = tree_find(p->depends[i])) == NULL)
+			continue;
+		if (strstr(dep->provides, p->package) == NULL) {
+			/* Non-providing dependency */
+			if (!config_package(dep))
+				return 0;
+		} else {
+			/* TODO: This only makes sense if dep is a menu item */
+			c_size += strlen(dep->description) + 2;
+			choices = realloc(choices, c_size);
+			strcat(choices, dep->description);
+			strcat(choices, ", ");
+		}
+	}
+	if (choices[0] != '\0') {
+		/* There were packages to choose from */
+		defval = strrchr(choices, ',');
+		if (defval != NULL && defval[1] != '\0')
+			defval += 2;
+		else
+			defval = "";
+		debconf = debconfclient_new();
+		debconf->command(debconf, "SUBST", MISSING_PROVIDE, "CHOICES", choices, NULL);
+		debconf->command(debconf, "SUBST", MISSING_PROVIDE, "DEFAULT", defval, NULL);
+		debconf->command(debconf, "INPUT medium", MISSING_PROVIDE, NULL);
+		debconf->command(debconf, "GO", NULL);
+		free(choices);
+		debconf->command(debconf, "GET", MISSING_PROVIDE, NULL);
+		for (i = 0; p->depends[i] != 0; i++) {
+			if ((dep = tree_find(p->depends[i])) == NULL)
+				continue;
+			if (strstr(dep->provides, p->package) == NULL)
+				continue;
+			if (strcmp(debconf->value, dep->description))
+			{
+				/* Recursively configure the chosen package */
+				if (!config_package(dep))
+					return 0;
+				break;
+			}
+		}
+	}
+	/* And finally configure the virtual package itself */
+	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
+	ret = SYSTEM(configcommand);
+	free(configcommand);
+	return !ret;
+}
+
+/*
+ * Simplistic test for virtual packages. A package is virtual if any
+ * of its dependencies provides it.
+ */
+static int is_virtual(struct package_t *p) {
+	int i;
+	struct package_t *dep;
+
+	for (i = 0; p->depends[i] != 0; i++) {
+		if ((dep = tree_find(p->depends[i])) == NULL)
+			continue;
+		if (strstr(dep->provides, p->package) != NULL)
+			return 1;
+	}
+	return 0;
+}
+
+/*
+ * Configure all dependencies, special case for virtual packages.
+ * This is done depth-first.
+ */
+static int
+config_package(struct package_t *p) {
+	char *configcommand;
+	int ret, i;
+	struct package_t *dep;
+
+	for (i = 0; p->depends[i] != 0; i++) {
+		if ((dep = tree_find(p->depends[i])) == NULL)
+			continue;
+		if (dep->status != unpacked && p->status == half_configured)
+			continue;
+		if (is_virtual(dep)) {
+			if (!satisfy_virtual(dep))
+				return 0;
+		} else {
+			/* Recursively configure this package */
+			if (!config_package(dep))
+				return 0;
+		}
+	}
+	asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
+	ret = SYSTEM(configcommand);
+	free(configcommand);
+	return !ret;
+}
+
 int do_menu_item(struct package_t *p) {
 	char *configcommand;
-	struct package_t *head = NULL, *tail = NULL;
 	int ret;
-	
+
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
 		asprintf(&configcommand, "dpkg-reconfigure %s", p->package);
@@ -225,21 +339,7 @@ int do_menu_item(struct package_t *p) {
 		return !ret;
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
-		/*
-		 * The menu item is not yet configured. Make sure everything
-		 * it depends on is configured, then configure it.
-		 */
-		order(p, &head, &tail);
-		order_done(head);
-		for (p = head; p; p = p->next) {
-			if (p->status == unpacked || p->status == half_configured) {
-				asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
-				ret = SYSTEM(configcommand);
-				free(configcommand);
-				if (ret != 0)
-					return 0; /* give up on failure */
-			}
-		}
+		config_package(p);
 	}
 
 	return 1;

@@ -14,6 +14,7 @@
 #define STATUSFILE	DPKGDIR "status"
 
 #define MAIN_MENU	"debian-installer/main-menu"
+#define MISSING_PROVIDE "debian-installer/missing-provide"
 #define DPKG_CONFIGURE_COMMAND "/usr/bin/udpkg --configure"
 
 #include <debian-installer.h>
