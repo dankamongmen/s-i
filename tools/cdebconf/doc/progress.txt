@@ -1,0 +1,36 @@
+Issues with the cdebconf progress bars
+======================================
+
+The cdebconf progress bars are currently driven by the following protocol:
+
+PROGRESS START <min> <max> <title-template>
+PROGRESS STEP <inc> <info-template>
+PROGRESS STOP
+
+
+
+This is wildly incompatible with what debootstrap uses, which is:
+
+P: <curr> <max> <title-string>
+I: <info-string>
+
+In debootstrap there is no concept of starting and stopping, a progress
+bar simply "is" and has a current and a max value. The info is decoupled
+from the actual stepping.
+
+
+
+Thus, I suggest we change the protocol to something that interacts more
+easily with debootstrap, something like:
+
+PROGRESS START <min> <max> <title-template>
+PROGRESS SET <val>
+PROGRESS INFO <info-template>
+PROGRESS STOP
+
+The quick&dirty way would be to just overlay this, since there are no
+conflicts in naming, but that feels like a bad solution. I would rather rip
+out the current code before it gets too widely used.
+
+
+-Martin
