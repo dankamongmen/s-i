@@ -11,13 +11,29 @@ $exp->spawn($ENV{CONSOLECOMMAND}) or die "cannot connect: $!\n";
 
 $exp->send("");
 $exp->expect(60,
-	["GSP>" => sub { $exp->interact; exit 0 } ],
+	["GSP>" => sub {
+		$exp->interact;
+		exit 0
+	}],
 	# Connected in the middle of booting..
-	["quit EARLY BOOT VFP" => sub { $exp->send("q"); sleep 1; exp_continue } ],
+	["quit EARLY BOOT VFP" => sub {
+		$exp->send("q");
+		sleep 1;
+		exp_continue;
+	}],
 	# Connected in the middle of some console error/warning.
-	["A: ack read of this entry" => sub { $exp->send("x\r"); sleep 1; exp_continue } ],
+	["A: ack read of this entry" => sub {
+		$exp->send("x");
+		$exp->send("");
+		sleep 1;
+		exp_continue;
+	}],
 	# Sometimes happens after above.
-	["Type Ctrl-B to access Guardian Service Processor Commands" => sub { $exp->send(""); sleep 1; exp_continue } ],
+	["Type Ctrl-B to access Guardian Service Processor Commands" => sub {
+		$exp->send("");
+		sleep 1;
+		exp_continue;
+	}],
 );
 print STDERR "failed to get to GSP prompt\n";
 exit 1;
