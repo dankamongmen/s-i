@@ -1,11 +1,9 @@
 #!/bin/sh -e
 
-# Ensure srm_env.o module is loaded
 (modprobe srm_env || true) 2> /dev/null
 
 . /usr/share/debconf/confmodule
 
-# If not present, leave
 [ -e /proc/srm_environment/named_variables/language ] || exit 0
 
 LANGCODE=`cat /proc/srm_environment/named_variables/language`
