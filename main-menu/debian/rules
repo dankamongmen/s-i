@@ -54,8 +54,7 @@ binary-arch: build install
 	dh_gencontrol -- -fdebian/files~
 	# Register file manually.
 	dpkg-distaddfile $(FILENAME) byhand $(PRIORITY)
-	# Ok, it's a hack, but debhelper needs an alias for this switch.
-	dh_builddeb --destdir=../$(FILENAME)
+	dh_builddeb --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
