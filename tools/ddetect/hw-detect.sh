@@ -144,7 +144,7 @@ do
     then
         log "Trying to load module '$module'"
 
-        if find /lib/modules/`uname -r`/ | grep ${module}\\.o > /dev/null
+        if find /lib/modules/`uname -r`/ | grep -q ${module}\\.o
         then
                 :
         else
@@ -190,7 +190,7 @@ do
             fi
         fi
 
-        if find /lib/modules/`uname -r`/ | grep ${module}\\.o > /dev/null
+        if find /lib/modules/`uname -r`/ | grep -q ${module}\\.o
         then
             if load_modules "$module"
             then
