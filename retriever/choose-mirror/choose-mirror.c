@@ -28,7 +28,7 @@ char *add_protocol(char *string) {
 	char *protocol;
 	char *ret;
 
-	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+	debconf_get(debconf, DEBCONF_BASE "protocol");
 	protocol = strdup(debconf->value);
 	
 	asprintf(&ret,"%s%s/%s",DEBCONF_BASE,protocol,string);
@@ -65,7 +65,7 @@ char *debconf_list(char *list[]) {
  */
 
 struct mirror_t *mirror_list(void) {
-	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+	debconf_get(debconf, DEBCONF_BASE "protocol");
 
 #ifdef WITH_HTTP
 	if (strcasecmp(debconf->value,"http") == 0) {
@@ -115,7 +115,7 @@ char *mirror_root(char *mirror) {
 
 int choose_country(void) {
 	char *list = 0;
-	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+	debconf_get(debconf, DEBCONF_BASE "protocol");
 #ifdef WITH_HTTP
 	if (debconf->value != NULL && strcasecmp(debconf->value,"http") == 0) {
 		list = debconf_list(countries_http);
@@ -127,9 +127,9 @@ int choose_country(void) {
 	}
 #endif
 
-	debconf->command(debconf, "SUBST", DEBCONF_BASE "country", "countries", list, NULL);
+	debconf_subst(debconf, DEBCONF_BASE "country", "countries", list);
 	free(list);
-	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "country", NULL);
+	debconf_input(debconf, "high", DEBCONF_BASE "country");
 	return 0;
 }
 
@@ -137,14 +137,14 @@ int choose_country(void) {
 int choose_protocol(void) {
 #if defined (WITH_HTTP) && defined (WITH_FTP)
 	/* Both are supported, so ask. */
-	debconf->command(debconf, "SUBST", DEBCONF_BASE "protocol", "protocols", "http, ftp", NULL);
-	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "protocol", NULL);
+	debconf_subst(debconf, DEBCONF_BASE "protocol", "protocols", "http, ftp");
+	debconf_input(debconf, "high", DEBCONF_BASE "protocol");
 #else
 #ifdef WITH_HTTP
-	debconf->command(debconf, "SET", DEBCONF_BASE "protocol", "http");
+	debconf_set(debconf, DEBCONF_BASE "protocol", "http");
 #endif
 #ifdef WITH_FTP
-	debconf->command(debconf, "SET", DEBCONF_BASE "protocol", "ftp");
+	debconf_set(debconf, DEBCONF_BASE "protocol", "ftp");
 #endif
 #endif /* WITH_HTTP && WITH_FTP */
 	return 0;
@@ -152,7 +152,7 @@ int choose_protocol(void) {
 
 /* Choose which distribution to install. */
 int choose_distribution(void) {
-	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "distribution", NULL);
+	debconf_input(debconf, "high", DEBCONF_BASE "distribution");
         return 0;
 }
 
@@ -162,10 +162,10 @@ int manual_entry;
 int choose_mirror(void) {
 	char *list;
 	char *protocol, *country;
-	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+	debconf_get(debconf, DEBCONF_BASE "protocol");
 	protocol = strdup(debconf->value);
 	
-	debconf->command(debconf, "GET", DEBCONF_BASE "country", NULL);
+	debconf_get(debconf, DEBCONF_BASE "country");
 	country = strdup(debconf->value);
 	manual_entry = ! strcmp(debconf->value, "enter information manually");
 	if (! manual_entry) {
@@ -173,18 +173,18 @@ int choose_mirror(void) {
 
 		list=debconf_list(mirrors_in(country));
 
-		debconf->command(debconf, "SUBST", add_protocol("mirror"), "mirrors", list, NULL);
+		debconf_subst(debconf, add_protocol("mirror"), "mirrors", list);
 		free(list);
-		debconf->command(debconf, "INPUT", "medium", add_protocol("mirror"), NULL);
+		debconf_input(debconf, "medium", add_protocol("mirror"));
 		
 	}
 	else {
 		/* Manual entry. */
-		debconf->command(debconf, "INPUT", "critical", add_protocol("hostname"), NULL);
-		debconf->command(debconf, "INPUT", "critical", add_protocol("directory"), NULL);
+		debconf_input(debconf, "critical", add_protocol("hostname"));
+		debconf_input(debconf, "critical", add_protocol("directory"));
 	}
 	/* Always ask about a proxy. */
-	debconf->command(debconf, "INPUT", "high", add_protocol("proxy"), NULL);
+	debconf_input(debconf,"high", add_protocol("proxy"));
 	free(protocol);
 	free(country);
 	return 0;
@@ -194,7 +194,7 @@ int validate_mirror(void) {
 	char *mirror;
 	char *protocol;
 
-	debconf->command(debconf, "GET", DEBCONF_BASE "protocol", NULL);
+	debconf_get(debconf, DEBCONF_BASE "protocol");
 	protocol = strdup(debconf->value);
 
 	if (! manual_entry) {
@@ -204,25 +204,24 @@ int validate_mirror(void) {
 		 * which is the standard location other
 		 * tools can look at.
 		 */
-		debconf->command(debconf, "GET", add_protocol("mirror"), NULL);
+		debconf_get(debconf, add_protocol("mirror"));
 		mirror=strdup(debconf->value);
-		debconf->command(debconf, "SET", add_protocol("hostname"), 
-				 mirror, NULL);
-		debconf->command(debconf, "SET", add_protocol("directory"),
-				 mirror_root(mirror), NULL);
+		debconf_set(debconf, add_protocol("hostname"), mirror);
+		debconf_set(debconf, add_protocol("directory"),
+		            mirror_root(mirror));
 		free(mirror);
 		return 0;
 	} else {
 		int not_ok = 0; /* Is 0 if everything is ok, 1 else, aka retval */
 		/* Manual entry - check that the mirror is somewhat valid */
-		debconf->command(debconf, "GET", add_protocol("hostname"), NULL);		
+		debconf_get(debconf,  add_protocol("hostname"));		
 		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
-			debconf->command(debconf, "fset", add_protocol("hostname"), "seen", "false", NULL);
+			debconf_fset(debconf, add_protocol("hostname"), "seen", "false");
 			not_ok = 1;
 		}
-		debconf->command(debconf, "GET", add_protocol("directory"), NULL);		
+		debconf_get(debconf,  add_protocol("directory"));		
 		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
-			debconf->command(debconf, "fset", add_protocol("directory"), "seen", "false", NULL);
+			debconf_fset(debconf, add_protocol("directory"), "seen", "false");
 			not_ok = 1;
 		}
 		return not_ok;
@@ -244,8 +243,7 @@ int main (int argc, char **argv) {
 	};
 
 	debconf = debconfclient_new();
-	debconf->command(debconf, "CAPB", "backup", NULL);
-	debconf->command(debconf, "TITLE", "Choose mirror", NULL); //TODO: i18n
+	debconf_capb(debconf, "backup");
 
 	/*
 	 * It's a pretty brain-dead state machine though. It advances
@@ -254,7 +252,7 @@ int main (int argc, char **argv) {
 	while (state >= 0 && states[state]) {
 		ret = states[state]();
 		
-		if (ret == 0 && debconf->command(debconf, "GO", NULL) == 0) 
+		if (ret == 0 && debconf_go(debconf) == 0) 
 			state++;
 		else
 			state--; /* back up */
