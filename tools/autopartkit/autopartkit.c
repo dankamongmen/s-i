@@ -1412,8 +1412,8 @@ int main (int argc, char *argv[])
 
     if (NULL == disk_reqs)
     {
-        autopartkit_error( 0, "Unable to load partition table '%s'.",
-			   tablefile);
+        autopartkit_error(0, "Unable to load partition table '%s'.",
+                          tablefile);
 	goto end;
     }
     else
