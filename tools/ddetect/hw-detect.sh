@@ -55,12 +55,18 @@ load_module() {
 	
 		olddevs="$devs"
 		devs="$(snapshot_devs)"
-		newdev="$(compare_devs "$olddevs" "$devs")"
+		newdevs="$(compare_devs "$olddevs" "$devs")"
 
-		if [ -n "$newdev" ]; then
-			if [ -n "$cardname" ]; then
-				echo "${newdev}:${cardname}" >> /etc/network/devnames
-			fi
+		if [ -n "$newdevs" -a -n "$cardname" ]; then
+			local devcount=0
+			for dev in $newdevs; do
+				devcount=$(($devcount + 1))
+				if [ $devcount -ge 2 ]; then
+					echo "${newdev}:${cardname} (${devcount})" >> /etc/network/devnames
+				else
+					echo "${newdev}:${cardname}" >> /etc/network/devnames
+				fi
+			done
 		fi
 	else   
 		log "Error loading '$module'"
