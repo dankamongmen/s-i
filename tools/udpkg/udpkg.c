@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.44 2003/11/02 15:55:30 joeyh Rel $ */
+/* $Id: udpkg.c,v 1.45 2003/12/13 00:17:49 joeyh Rel $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -60,7 +60,8 @@ int dpkg_print_architecture()
         { "pentium", "i386" },
         { "parisc", "hppa" },
         { "parisc64", "hppa" },
-        { "ppc", "powerpc"},
+        { "ppc", "powerpc" },
+	{ "ppc64", "powerpc" },
     };
 
     if (uname(&name) < 0)
