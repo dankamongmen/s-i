@@ -7,6 +7,8 @@ main(int argc, char *argv[])
         ped_exception_fetch_all();
         ped_device_probe_all();
         for (dev = NULL; NULL != (dev = ped_device_get_next(dev));) {
+		if (dev->read_only)
+			continue;
                 printf("%s\t%lli\t%s\n",
                        dev->path,
 		       dev->length * PED_SECTOR_SIZE,

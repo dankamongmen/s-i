@@ -927,9 +927,9 @@ dump_info(FILE *dumpfile, PedDevice *dev, PedDisk *disk)
         fprintf(dumpfile, "Path: %s\n", dev->path);
         fprintf(dumpfile, "Sector size: %i\n", dev->sector_size);
         fprintf(dumpfile, "Sectors: %lli\n", dev->length);
-        fprintf(dumpfile, "Sectors/track: %i\n", dev->sectors);
-        fprintf(dumpfile, "Heads: %i\n", dev->heads);
-        fprintf(dumpfile, "Cylinders: %i\n", dev->cylinders);
+        fprintf(dumpfile, "Sectors/track: %i\n", dev->bios_geom.sectors);
+        fprintf(dumpfile, "Heads: %i\n", dev->bios_geom.heads);
+        fprintf(dumpfile, "Cylinders: %i\n", dev->bios_geom.cylinders);
         if (disk == NULL) {
                 fprintf(dumpfile, "Partition table: no\n");
                 activate_exception_handler();
@@ -947,8 +947,8 @@ dump_info(FILE *dumpfile, PedDevice *dev, PedDisk *disk)
                 long long head_start, head_end;
                 long long sec_start, sec_end;
                 char *part_info = partition_info(disk, part);
-                track_size = dev->sectors;
-                cylinder_size = track_size * dev->heads;
+                track_size = dev->bios_geom.sectors;
+                cylinder_size = track_size * dev->bios_geom.heads;
                 start = (part->geom).start;
                 end = (part->geom).end;
                 cyl_start = start / cylinder_size;
@@ -1204,7 +1204,8 @@ command_partitions()
                 if (PED_PARTITION_FREESPACE & part->type
                     && ped_disk_type_check_feature(disk->type,
                                                    PED_DISK_TYPE_EXTENDED)
-                    && (part->geom).length < dev->sectors * dev->heads)
+                    && (part->geom).length
+                       < dev->bios_geom.sectors * dev->bios_geom.heads)
                         continue;
                 /* Another hack :) */
                 if (0 == strcmp(disk->type->name, "dvh")
@@ -1277,8 +1278,8 @@ command_get_chs()
                 long long head_start, head_end;
                 long long sec_start, sec_end;
                 log("command_get_chs: partition found");
-                track_size = dev->sectors;
-                cylinder_size = track_size * dev->heads;
+                track_size = dev->bios_geom.sectors;
+                cylinder_size = track_size * dev->bios_geom.heads;
                 start = (part->geom).start;
                 end = (part->geom).end;
                 cyl_start = start / cylinder_size;
