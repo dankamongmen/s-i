@@ -714,6 +714,9 @@ normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
  */
 static char *get_device_path(PedDevice *dev, PedPartition *freepart)
 { 
+#if defined(HAVE_PED_PARTITION_GET_PATH)
+    return ped_partition_get_path(freepart);
+#else /* not HAVE_PED_PARTITION_GET_PATH */ 
     char *retval;
     char *tmp;
     size_t slen;
@@ -735,6 +738,7 @@ static char *get_device_path(PedDevice *dev, PedPartition *freepart)
         tmp[4] = 't';
     }
     return retval;
+#endif /* not HAVE_PED_PARTITION_GET_PATH */ 
 }
 
 /*

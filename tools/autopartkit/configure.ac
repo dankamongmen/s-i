@@ -58,6 +58,8 @@ AC_CHECK_FUNCS([memset mkdir strchr strdup strerror strstr])
 # libparted 1.6 got ped_disk_commit, but no ped_disk_write
 AC_CHECK_FUNCS([ped_disk_commit ped_disk_write])
 
+AC_CHECK_FUNCS([ped_partition_get_path])
+
 AC_ARG_ENABLE(test,
 [  --enable-test            Enable test code [default=no]],
 [case "${enableval}" in
