@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.13 2001/02/14 18:13:26 bug1 Exp $ */
+/* $Id: udpkg.h,v 1.14 2002/01/23 16:17:56 tfheen Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -55,6 +55,14 @@
 #define COLOR_BLACK			2
 
 /* data structures */
+struct language_description_t
+{
+	char *language;
+	char *description;
+	char *long_description;
+	struct language_description_t *next;
+};
+
 struct package_t {
 	char *file;
 	char *package;
@@ -79,6 +87,7 @@ struct package_t {
 	char color; /* for topo-sort */
 	struct package_t *requiredfor[DEPENDSMAX]; 
 	unsigned short requiredcount;
+	struct language_description_t *localized_descriptions;
 	struct package_t *next;
 };
 

@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.23 2001/02/14 18:13:26 bug1 Exp $ */
+/* $Id: status.c,v 1.24 2002/01/23 16:17:56 tfheen Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -142,6 +142,20 @@ void control_read(FILE *f, struct package_t *p)
 			p->long_description = malloc(1);
 			read_block(f, p->long_description);
 		}
+		else if (strstr(buf, "Description-") == buf)
+		{
+			/* Localized description */
+			struct language_description_t *l;
+			fprintf(stderr,"FOUND LOCALIZED: %s\n",buf);
+			l = malloc(sizeof(struct language_description_t));
+			l->next = p->localized_descriptions;
+			p->localized_descriptions = l;
+			buf[14] = '\0';
+			l->language = strdup(buf+12);
+			l->description = strdup(buf+16);
+			l->long_description = malloc(1);
+			read_block(f, l->long_description);
+		}
 		/* This is specific to the Debian Installer. Ifdef? */
 		else if (strstr(buf, "installer-menu-item: ") == buf) 
 		{
@@ -181,7 +195,6 @@ void control_read(FILE *f, struct package_t *p)
 			read_block(f, p->conffiles);
 		}
 
-		/* TODO: localized descriptions */
 	}
 }
 
@@ -340,6 +353,17 @@ int status_merge(void *status, struct package_t *pkgs)
 			fprintf(fout, "Conffiles:\n %s\n", pkg->conffiles);
 		if (pkg->description)
 			fprintf(fout, "Description: %s\n%s\n", pkg->description, pkg->long_description);
+		if (pkg->localized_descriptions) {
+			struct language_description_t *ld;
+			ld = pkg->localized_descriptions;
+			while (ld) {
+				fprintf(fout, "Description-%s: %s\n%s\n", 
+					ld->language,
+					ld->description, 
+					ld->long_description);
+				ld = ld->next;
+			}
+		}
 		if (pkg->installer_menu_item)
 			fprintf(fout, "installer-menu-item: %i\n", pkg->installer_menu_item);
 		fputc('\n', fout);
