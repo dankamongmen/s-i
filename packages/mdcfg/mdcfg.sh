@@ -176,7 +176,7 @@ md_create_raid0() {
 
 	RAID_DEVICES="$(echo ${RET} | sed -e 's/,//g')"
 	echo "Commandline:"
-	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid0 -n ${SELECTED} ${RAID_DEVICES}"`
+	`mdadm --create /dev/md/${MD_NUM} --force -R -l raid0 -n ${SELECTED} ${RAID_DEVICES}`
 }
 
 md_create_raid1() {
