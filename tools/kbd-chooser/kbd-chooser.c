@@ -2,7 +2,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.37 2003/11/07 21:13:09 mckinstry Rel $
+ * $Id: kbd-chooser.c,v 1.38 2003/11/12 22:39:19 mckinstry Exp $
  */
 
 #include "config.h"
@@ -24,9 +24,6 @@
 #include "xmalloc.h"
 #include "kbd-chooser.h"
 
-// TODO These should be in cdebconf
-#define CMDSTATUS_SUCCESS 	0
-#define CMDSTATUS_GOBACK	30
 
 // TODO Move this into debian-installer.h
 
@@ -34,7 +31,7 @@
 #define di_info(format...)   di_log(DI_LOG_LEVEL_INFO, format)
 #endif
 #ifndef di_debug
-#define di_debug(format...)  di_log(DI_LOG_LEVEL_DEBUG, format)
+#define di_debug(format...)  di_log(DI_LOG_LEVEL_INFO, format)
 #endif
 
 extern int loadkeys_wrapper (char *map);	// in loadkeys.y
@@ -56,7 +53,7 @@ mydebconf_ask (char *priority, char *template, char **result)
 
 	debconf_input (client, priority, template);
 	res = debconf_go (client);
-	if (res != CMDSTATUS_SUCCESS)
+	if (res != CMD_SUCCESS)
 		return res;
 	res = debconf_get (client, template);
 	*result = client->value;
@@ -128,25 +125,21 @@ locale_get (void)
  *
  */
 void
-locale_parse (char *locale, char **lang, char **territory, char **charset)
+locale_parse (char *locale, char **lang, char **territory, char **modifier, char **charset)
 {
-	char *und, *at, *loc = strdup (locale);
+	char *und, *at, *dot, *loc = strdup (locale);
 
-	und = strchr (loc, '_');
-	at = strchr (loc, '@');
-	if (at)	{
+	if ((und = strchr (loc, '_')) != NULL)
+		*und = '\0';	
+	if ((at = strchr (loc, '@')) != NULL)
 		*at = '\0';
-		*charset = at + 1;
-	}   else
-		*charset = NULL;
+	if ((dot = strchr (loc, '.')) != NULL)
+		*dot = '\0';
 
-	if (und)	{
-		*und = '\0';
-		*territory = und + 1;
-	} else {
-		*territory = NULL;
-	}
 	*lang = loc;
+	*territory = und ? (und + 1) : NULL;
+	*modifier  = at  ? (at + 1 ) : NULL;
+	*charset   = dot ? (dot + 1) : NULL;
 }
 
 /**
@@ -157,15 +150,15 @@ locale_parse (char *locale, char **lang, char **territory, char **charset)
 int
 locale_list_compare (char *langs)
 {
-	static char *locale = NULL, *lang1 = NULL, *territory1 = NULL, *charset1 =
-		NULL;
-	char *lang2 = NULL, *territory2 = NULL, *charset2 =
-		NULL, buf[LINESIZE], *s, *colon;
+	static char *locale = NULL, *lang1 = NULL, *territory1 = NULL, 
+	  *modifier1 = NULL, *charset1 = NULL;
+	char *lang2 = NULL, *territory2 = NULL, *charset2 =	 
+		NULL, *modifier2 = NULL, buf[LINESIZE], *s, *colon;
 	int score = 0, best = -1;
 
 	if (!locale)	{
 		locale = locale_get ();
-		locale_parse (locale, &lang1, &territory1, &charset1);
+		locale_parse (locale, &lang1, &territory1, &modifier1, &charset1);
 	}
 	strcpy (buf, langs);
 	s = buf;
@@ -173,19 +166,19 @@ locale_list_compare (char *langs)
 		colon = strchr (s, ':');
 		if (colon)
 			*colon = '\0';
-		locale_parse (s, &lang2, &territory2, &charset2);
+		locale_parse (s, &lang2, &territory2, &modifier2, &charset2);
 		if (!strcmp (lang1, lang2))    {
 			score = 2;
-			if (territory1 != NULL && territory2 != NULL
-			    && !strcmp (territory1, territory2))  	{
+			if (territory1  && territory2 && !strcmp (territory1, territory2))  	{
 				score++;
 			}
 			// Favour 'generic' locales; ie 'fr' matches 'fr' better
 			// than 'fr_BE' does
-			if (territory1 == NULL && territory2 != NULL)
+			if (!territory1 && territory2)
 				score--;
-			if (charset1 != NULL && charset2 != NULL
-			    && !strcmp (charset1, charset2))	       	{
+			if (territory1 && !territory2)
+				score++;
+			if (charset1 && !charset2 && !strcmp (charset1, charset2))	       	{
 				score += 2;	// charset more important than territory
 			}
 		}
@@ -433,35 +426,37 @@ keyboards_sort (kbd_t ** keyboards)
  * @brief Get translated contents of a given template.
  * based on code from main-menu. 
  * TODO: merge into the cdebconf library someday
- * FIXME: Cope with sublangs : eg de_CH, de ?
  */
 char *
 translated_template_get(char *template)
 {
 	int ret = 0;
-	static char *language = NULL, *s;
+	static char *languages = NULL;
+	char *colon, *lang;
 	struct debconfclient *client = mydebconf_get();
 	
-	if (!language) {
+	if (!languages) {
 		 ret = debconf_get(client,"debian-installer/language");
 		 if (client->value && (ret != 10))
-			 language = strdup(client->value);
+			 languages = strdup(client->value);
 	}
-	if (language) {
+	lang = strdup (languages);
+	while  (lang) {
 		char field[128];
-		snprintf(field, sizeof (field), "Description-%s.UTF-8", language);
-		if (!debconf_metaget(client, template, field)) 
+		
+		colon = strchr (lang, ':');
+		if (colon)
+			*colon = '\0';
+		snprintf(field, sizeof (field), "Description-%s.UTF-8", lang);
+		if (!debconf_metaget(client, template, field))  {
+			free (lang);
 			return (strdup(client->value));
-		s = strchr (language, '_');
-		if (s)  {	// try primary language bit:
-			*s = '\0';
-			snprintf(field, sizeof (field), "Description-%s.UTF-8", language);
-			if (!debconf_metaget(client, template, field))
-				return (strdup(client->value));
 		}
+		lang = (colon) ? colon + 1 : NULL;
 	}
 	// Description must exist.
 	debconf_metaget(client, template, "Description");
+	free(lang);
         return strdup(client->value);
 }
 
@@ -624,7 +619,7 @@ keyboard_select (void)
  * @brief   choose a given keyboard
  * @arch    keyboard architecture
  * @keymap  ptr to buffer in which to store chosen keymap name
- * @returns CMDSTATUS_SUCCESS or CMDSTATUS_GOBACK, keymap set if SUCCESS
+ * @returns CMD_SUCCESS or CMD_GOBACK, keymap set if SUCCESS
  */
 
 int
@@ -652,11 +647,11 @@ keymap_select (char *arch, char *keymap)
 		mydebconf_default_set (template, def->description);
 	}
 	res = mydebconf_ask ( kb->deflt ? "low" : "medium", template, &ptr);
-	if (res != CMDSTATUS_SUCCESS)
+	if (res != CMD_SUCCESS)
 		return res;
 	strcpy (keymap, (strlen (ptr) == 0) ? "none" : ptr);
 
-	return CMDSTATUS_SUCCESS;
+	return CMD_SUCCESS;
 }
 
 /**
@@ -722,7 +717,7 @@ main (int argc, char **argv)
 			break;
 			
 		case CHOOSE_KEYMAP: // Then a keymap within that arch.
-			if (keymap_select (arch, keymap) == CMDSTATUS_GOBACK) {
+			if (keymap_select (arch, keymap) == CMD_GOBACK) {
 				state = CHOOSE_ARCH;
 			} else {
 				di_info ("choose_keymap: keymap = %s", keymap);
