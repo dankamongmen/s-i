@@ -13,7 +13,7 @@ is_not_loaded() {
     fi
 }
 
-module_insmod() {
+module_probe() {
     module="$1"
     db_subst ethdetect/module_params MODULE "$module"
     db_input low ethdetect/module_params || [ $? -eq 30 ]
@@ -30,7 +30,7 @@ module_insmod() {
     fi
 }
 
-db_settitle ethdetect/title
+db_settitle debian-installer/ethdetect/title
 
 db_input low ethdetect/detection_type || [ $? -eq 30 ]
 db_go
@@ -41,20 +41,33 @@ if [ true = "$RET" ] ; then
     hw-detect || true
 fi
 
-if [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`"  ]
-then
-    # No ethernet card.  Try manual loading
+while [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`" ]
+do
+    CHOICES=""
+    for net_module in $(find /lib/modules/*/kernel/drivers/net -type f); do
+	basemod=$(echo $net_module | sed s/\.o$// | sed 's/.*\///')
+	if [ -z "$CHOICES" ]; then
+		CHOICES="$basemod"
+	else
+		CHOICES="$basemod, $CHOICES"
+	fi
+    done
+
+    db_subst ethdetect/module_select CHOICES "$CHOICES"
     db_input high ethdetect/module_select || [ $? -eq 30 ]
-    db_go
+    db_go || break
 
     db_get ethdetect/module_select
-    if [ other = "$RET" ] ; then
-	db_input high ethdetect/module_prompt || [ $? -eq 30 ]
-	db_go
-	db_get ethdetect/module_prompt
+    if [ "$RET" = "none of the above" ]; then
+	    break
     fi
     module="$RET"
-    if is_not_loaded "$module" ; then
-	module_insmod "$module"
+    if [ -n "$module" ] && is_not_loaded "$module" ; then
+	module_probe "$module"
     fi
-fi
+    
+    # No ethernet interface. Try manual loading.
+    db_fset ethdetect/cannot_find seen false
+    db_input high ethdetect/cannot_find
+    db_go || break
+done

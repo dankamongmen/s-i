@@ -4,6 +4,8 @@ set -e
 . /usr/share/debconf/confmodule
 #set -x
 
+MISSING_MODULES=""
+
 # This is a gross and stupid hack, but needed because of Xu's
 # unwillingness to run depmod in kernel-image's postinst.  See Debian
 # bug #136743
@@ -34,6 +36,18 @@ load_module() {
 	return
     fi
 
+    # Hack to make it load up all the IDE PCI modules before ide-detect,
+    # some chipsets need this to avoid DMA problems.
+    if [ "$module" = "ide-detect" ]; then
+	for ide_module in /lib/modules/*/kernel/drivers/ide/pci/*.o; do
+		if [ -e $ide_module ]; then
+			baseidemod=$(echo $ide_module | sed s/\.o$// | sed 's/.*\///')
+			echo "Loading IDE PCI driver $baseidemod" >> /var/log/messages
+			modprobe $baseidemod >> /var/log/messages 2>&1 || true
+		fi
+	done
+    fi
+    
     db_subst hw-detect/module_params MODULE "$module"
     db_input low hw-detect/module_params || [ $? -eq 30 ]
     db_go
@@ -158,15 +172,11 @@ do
                 log "Error loading driver '$module' for '$cardname'!"
 	    fi
         else
-            log "Could not locate driver '$module' for '$cardname'."
-
-	    # Tell the user to try to load more modules from floppy
-	    template=hw-detect/not_included
-	    db_fset "$template" seen false || true
-	    db_subst "$template" CARDNAME "$cardname" || true
-	    db_subst "$template" MODULE "$module" || true
-	    db_input low "$template" || [ $? -eq 30 ]
-	    db_go || true
+            log "Could not load driver '$module' for '$cardname'."
+	    if [ -n "$MISSING_MODULES" ]; then
+		    MISSING_MODULES="$MISSING_MODULES, "
+	    fi
+	    MISSING_MODULES="$MISSING_MODULES$module ($cardname)"
         fi
     fi
 
@@ -207,8 +217,15 @@ then
     fi
 fi
 
-# Hey, we're done
-
+if [ -n "$MISSING_MODULES" ]; then
+	# Tell the user to try to load more modules from floppy
+	template=hw-detect/missing_modules
+	db_fset "$template" seen false || true
+	db_subst "$template" MISSING_MODULES "$MISSING_MODULES" || true
+	db_input low "$template"
+	db_go || true
+fi
+	    
 # Ask for discover to be installed into /target/, to make sure the
 # required drivers are loaded.
 apt-install discover || true

@@ -2,12 +2,15 @@ Template: hw-detect/title
 Type: text
 _Description: Detecting HW and loading kernel modules
 
-Template: hw-detect/not_included
+Template: hw-detect/missing_modules
 Type: note
-_Description: Unable to load module '${MODULE}' for '${CARDNAME}'.
- The '${MODULE}' module required for '${CARDNAME}' is missing.  If you
- want it loaded, you will need to load more kernel modules from a
- driver floppy.
+_Description: Unable to load some modules
+ Some modules required for some of your hardware did not load. If you need
+ to use this hardware to install, you will need to load more kernel modules
+ from a driver floppy.
+ .
+ The missing modules, and the devices that need them are:
+ ${MISSING_MODULES_LIST}
 
 Template: hw-detect/progress_title
 Type: text
@@ -15,7 +18,7 @@ _Description: Loading kernel modules
 
 Template: hw-detect/progress_step
 Type: text
-_Description: Detected module '${MODULE}' for '${CARDNAME}'
+_Description: Loading module '${MODULE}' for '${CARDNAME}'
 
 Template: hw-detect/module_params
 Type: string
@@ -24,6 +27,8 @@ _Description: Please enter any additional parameters for module ${MODULE}
  These parameters are often I/O port and IRQ numbers that vary from machine
  to machine and cannot be determined from the hardware. An example string
  looks something like "IRQ=7 IO=0x220"
+ .
+ If you don't know what to enter, leave it blank.
 
 Template: hw-detect/modprobe_error
 Type: note
