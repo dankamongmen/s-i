@@ -1,7 +1,7 @@
 /* @file  sparc-kbd.c
  * @brief Report keyboards present on Sun
  *
- * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
+ * Copyright (C) 2003,2004 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
  * $Id$
@@ -28,35 +28,26 @@ kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
 	k->next = keyboards;
 	keyboards = k;
 	
-#if defined (KERNEL_2_6)
 	/* In 2.6 series, we can detect keyboard via /proc/bus/input
 	 *
 	 * TODO:
 	 * Its possible to read the keyboard type; use this to preselect
 	 * keymap (edit the keymaps list)
 	 */
-#warning "Kernel 2.6 code not written yet"
 
 	  // /proc must be mounted by this point
-	  assert (check_dir ("/proc") == 1); 
+	  // assert (check_dir ("/proc") == 1); 
 	
-	  if (di_check_dir ("/proc/bus/input") >= 0) {
+	  if (check_dir ("/proc/bus/input")) {
 		int res;
 		// this dir only present in 2.6
 		res = grep ("/proc/bus/input/devices","Sun Type");
 		if (res < 0) {
-			di_warning ("sparc-kbd: Failed to open /proc/bus/input/devices");
+			di_info ("sparc-kbd: Could not open /proc/bus/input/devices");
 			return keyboards;
 		}
 		k->present = (res == 0) ? TRUE : FALSE;
 	}	
 
-
-#endif // KERNEL_2_6
-
-	/* ***  Only reached if KERNEL_2_6 not present ***  */
-
-	/* For 2.4, assume a keyboard is present
-	 */
 	return keyboards;
 }

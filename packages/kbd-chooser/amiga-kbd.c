@@ -40,30 +40,20 @@ kbd_t *amiga_kbd_get (kbd_t *keyboards, const char *subarch)
 	k->next = keyboards;
 	keyboards = k;
 
-		
-#if defined (KERNEL_2_6)
-
 	// /proc must be mounted by this point
-	assert (check_dir ("/proc") == 1);
+	// assert (check_dir ("/proc") == 1);
 	
 	// In 2.6 series, we can detect keyboard via /proc/bus/input
-	if (check_dir ("/proc/bus/input") >= 0) {
+	if (check_dir ("/proc/bus/input")) {
 		int res;
 		// this dir only present in 2.6
 		res = grep ("/proc/bus/input/devices", "Amiga keyboard");
 		if (res < 0) {
-			di_warning ("amiga-kbd: Failed to open /proc/bus/input/devicves");
+			di_info ("amiga-kbd: Could not open /proc/bus/input/devicves");
 			return keyboards;
 		}
 		k->present = ( res == 0) ? TRUE : FALSE;
-		return keyboards;
 	}
 
-
-#endif // KERNEL_2_6
-
-	/* ***  Only reached if KERNEL_2_6 not present *** 
-	 * For 2.4, assume a keyboard is present
-	 */	
 	return keyboards;
 }
