@@ -329,12 +329,15 @@ PedDevice* choose_device()
     nb_try = 0;
     while (dev == NULL)
     {
+	client->command(client, "FGET", "autopartkit/choose_device", "seen", 
+			NULL);
+	if (strcmp(client->value, "false"))
+		client->command(client, "SET", "autopartkit/choose_device", 
+			default_device, NULL);
 	client->command(client, "FSET", "autopartkit/choose_device", "seen", 
 			"false", NULL);
 	client->command(client, "SUBST", "autopartkit/choose_device", 
 			"CHOICES", device_list, NULL);
-	client->command(client, "SET", "autopartkit/choose_device", 
-			default_device, NULL);
 	client->command(client, "SUBST", "autopartkit/choose_device", 
 			"TABLEHEADER", TABLE_HEADER, NULL);
 	client->command(client, "SUBST", "autopartkit/choose_device", 
