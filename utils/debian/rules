@@ -35,20 +35,12 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	install -m755 shell debian/di-utils-shell.postinst
-	install -m755 mkswap.sh debian/di-utils-mkswap.postinst
-	install -m755 mkfs.sh debian/di-utils-mkfs.postinst
-	install -m755 mount.sh debian/di-utils-mount-partitions.postinst
 	install  mapdevfs debian/di-utils-mapdevfs/usr/bin
 	# di-utils-generic
 	install -m644 functions.sh \
 		debian/di-utils-generic/usr/share/debian-installer
 	install -m755 fstab.sh \
 		debian/di-utils-generic/usr/lib/prebaseconfig.d/40fstab
-	# di-utils-mount-partitions
-	install -m644 mount-mount.sh \
-		debian/di-utils-mount-partitions/usr/share/debian-installer/mount/mount.sh
-	install -m644 mount-umount.sh \
-		debian/di-utils-mount-partitions/usr/share/debian-installer/mount/umount.sh
 
 # Build architecture-independent files here.
 binary-indep: build install
