@@ -9,11 +9,13 @@ Find a recent revision of this document in the debian-installer cvs
 repository, browsable via web:
 http://cvs.debian.org/debian-installer/doc/INSTALLATION-HOWTO?rev=HEAD&content-type=text/vnd.viewcvs-markup
 
+Last change to this document: 06.10.2003
+
 1. Preliminaries
 
-Debian-installer images are currently only available for the i386
-architecture. Ports to other architectures are of course
-welcome. Please see section 6 if you want to help developing.
+Debian-installer images are currently only available for the i386,
+alpha and powerpc architectures. Ports to other architectures are of
+course welcome. Please see section 6 if you want to help developing.
 
 The debian-installer is still in its alpha state. If you encounter
 bugs during your install, please refer to section 5 on how to report
@@ -21,6 +23,13 @@ them. If you have questions which cannot be answered by this document,
 please direct them to the debian-boot mailing list
 (debian-boot@lists.debian.org) or ask on irc (#debian-boot on the
 freenode network).
+
+Recently the debian-installer has switched to ask only the important
+questions and confugure the rest automatically. This also involves
+that you won't get to see the main menu anymore, except when something
+goes wrong. If you want to restore the old configuration with more
+questions asked, set DEBCONF_PRIORITY=medium at the boot prompt. If
+you do so, refer to section 3.1. for installing rather than section 3.
 
 For better debugging handling, the installer is now configured to show
 much more questions than it will in the release version.  Presently
@@ -65,8 +74,86 @@ From here on, I assume you have downloaded and burnt the 'netinst'
 CD. Put it into your CD-drive and make your system boot from CD.
 
 You will be greeted by a welcome screen. Hit ENTER to boot. After a
-while you will be presented with the main-menu of the debian-installer.
-Some general remarks:
+while you will be asked to select your language. This will affect
+translation of debian-installer (if already available for your
+language) as well as the choice of a keyboard layout. Select your
+language and press ENTER to continue.
+
+Sit back while debian-installer detects some of your hardware, and
+loads additional installer modules from the cd.
+
+The next thing you will be confronted with is a note, that
+debian-installer could not find a network interface. This is a known
+bug but can be easily worked around. Select continue and watch the
+main menu which will appear everytime if something went wrong, so you
+have more control over the situation. Select "Detect network hardware
+and load kernel drivers for it" and debian-installer will continue
+gracefully. If you have a pcmcia network card try using the menu entry
+"Start PC card services (PCMCIA)".
+
+The next questions will help you to configure your mirror. First
+select the protocol to access your mirror. If unsure use "http" as the
+help text suggests. If you know a mirror which will be fast for you,
+you can enter it by selecting the last entry "enter information
+manually" on the next screen. If not, just select the country where
+you are located. After selecting the mirror you will be asked for your
+proxy configuration. If unsure just hit ENTER. To complete your mirror
+setup you have to select the distribution you wish to install. You
+have to select "sarge" here, "woody" and "sid" won't work (if you want
+to install sid directly, you may want to try the businesscard image,
+where selecting "sid" actually works).
+
+Now it is time to partition your harddisks. Select the disk you want
+to partition and a partitioning program suitable for your architecture
+will be started. Partition the harddisk to your needs and quit the
+program. Select "Finish" to proceed.
+
+On the next screens you have to configure and mount your
+partitions. Select the partitions you want to use in the system you
+wish to install and select a filesystem and a mount point for
+them. Remember to assign at least one partition for swap space and to
+mount a partition on "/". Please note the debian-installer will do no
+changes to your harddisks until you select "Finish". Do this when you
+are sure that you have found a suitable setup for your partitions and
+answer the next question with "Yes".
+
+Now debian-installer starts to install the base system which can take
+a while.
+
+The next thing you will see, is a little oddity which we will
+hopefully get rid of soon. Answer the question if you want to
+automatically partition your harddrives with "No", and you will see
+the main menu again. Select "Install the kernel" and answer the
+following question about how you want to generate you fstab with
+"debian-installer utility for creating fstab file". You will be
+prompted for the kernel to install which will leave you most probably
+with only one choice. Select it and wait until the kernel is installed
+on your harddisk.
+
+The last step is to install a boot loader. You will be prompted for
+the bootblock, where LILO should be installed. It defaults to the
+bootrecord of the first harddrive which is generally a good
+choice. Hit ENTER and ignore the following warning that
+/proc/partitions does not exist.
+
+Debian-installer will now tell you that the installation has
+finished. Remove the cdrom from your drive and hit ENTER to reboot
+your machine. Make sure it boots from harddisk, cross your fingers and
+wait until base-config is started.
+
+Stepping through base-config is not within the scope of this document
+as it is not part of debian-installer.
+
+
+3.1. Installation with DEBCONF_PRIORITY=medium
+
+From here on, I assume you have downloaded and burnt the 'netinst'
+CD. Put it into your CD-drive and make your system boot from CD.
+
+You will be greeted by a welcome screen. Type "linux
+DEBCONF_PRIORITY=medium" and hit ENTER to boot. After a while you will
+be presented with the main-menu of the debian-installer.  Some general
+remarks:
 
 The main-menu is not static. New entries are added when new installer
 modules are loaded. However main-menu tries to resolve the next best
@@ -162,21 +249,6 @@ wait until base-config is started.
 
 Stepping through base-config is not within the scope of this document
 as it is not part of debian-installer.
-
-
-3.1 More automatic install
-
-Now I will describe the steps you will have to do when you make use of
-main-menu's dependency resolver. It will do some steps automatically.
-Select the steps in the order below and note the hints for the
-corresponding entries from the long description ins section 3.
-
-  1) "Choose language"
-  2) "Detect a keyboard and select layout"
-  3) "Load installer modules"
-  4) -> Partition your harddrives with one of the methods in section 3
-  5) "Finish the installation and reboot"
-
 
 4. Installation Report
 
