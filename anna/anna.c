@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "anna.h"
 
 /* 
@@ -32,7 +33,7 @@ int unpack_package (char *pkgfile) {
 	}
 
 /*
- * Retrives and unpacks each package in the linked list.
+ * Retrives and unpacks each package in the linked list in turn.
  * 
  * Returns false on failure, and aborts the operation.
  */
@@ -53,13 +54,16 @@ int install_packages (struct package_t *packages) {
 			dest_file=malloc(strlen(DOWNLOAD_DIR) + 1 +
 					 strlen(f) + 1);
 			sprintf(dest_file, "%s/%s", DOWNLOAD_DIR, f);
+
 			if (! get_package(p->filename, dest_file)) {
 				fprintf(stderr, "anna: error getting %s!", p->filename);
 				perror("anna");
 			}
 			else if (! unpack_package(dest_file)) {
+				unlink(dest_file);
 				return(0);
 			}
+			unlink(dest_file);
 			free(dest_file);
 		}
 	}
