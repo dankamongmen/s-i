@@ -6,7 +6,8 @@
 #export DH_VERBOSE=1
 
 
-PACKAGES=$(shell dh_listpackages)
+PACKAGES_INDEP=$(shell dh_listpackages -i)
+PACKAGES_ARCH=$(shell dh_listpackages -a)
 MENUPACKAGES=ethdetect hw-detect-full
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
@@ -42,24 +43,39 @@ install: build
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installdebconf
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	$(foreach PACKAGE, $(PACKAGES), \
+	dh_installdebconf -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_shlibdeps -i
+	$(foreach PACKAGE, $(PACKAGES_INDEP), \
 	  ( dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
 	  -Tdebian/$(PACKAGE).substvars \
 	  -n$(PACKAGE)_$(VERSION)_all.udeb ) ; )
-	$(foreach PACKAGE, $(PACKAGES), \
+	$(foreach PACKAGE, $(PACKAGES_INDEP), \
 	  (cd debian ; \
 		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_all.udeb \
 		); )
 
 # Build architecture-dependent files here.
 binary-arch: build install
-# We have nothing to do by default.
+	dh_testdir
+	dh_testroot
+	dh_installdebconf -a
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	$(foreach PACKAGE, $(PACKAGES_ARCH), \
+	  ( dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
+	  -Tdebian/$(PACKAGE).substvars \
+	  -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb ) ; )
+	$(foreach PACKAGE, $(PACKAGES_ARCH), \
+	  (cd debian ; \
+		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb \
+		); )
+
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install 
