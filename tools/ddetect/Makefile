@@ -40,13 +40,13 @@ install-archdetect: archdetect
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) archdetect $(bindir)
 
-ARCHDETECT_TYPE_FILE = archdetect-$(DEB_HOST_GNU_TYPE).o
+ARCHDETECT_TYPE_FILE = archdetect-$(DEB_HOST_GNU_TYPE)
 
-ifeq (,$(wildcard $(ARCHDETECT_TYPE_FILE)))
-ARCHDETECT_TYPE_FILE = archdetect-generic.o
+ifeq ($(wildcard $(ARCHDETECT_TYPE_FILE).c),)
+ARCHDETECT_TYPE_FILE = archdetect-generic
 endif
 
-archdetect: $(ARCHDETECT_TYPE_FILE) archdetect.o
+archdetect: $(ARCHDETECT_TYPE_FILE).o archdetect.o 
 	${CC} ${LDFLAGS} -o archdetect $^
 
 %.o:%.c
