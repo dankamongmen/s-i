@@ -160,12 +160,29 @@ get_pvs() {
 }
 
 #
+# list all activated volume groups
+#
+list_vgs() {
+	echo `vgdisplay | grep '^VG Name' | sed -e 's/.*[[:space:]]\(.*\)$/\1/' | sort`
+}
+
+#
+# check if any VGs have free space
+#
+any_free_vgs() {
+	free=no
+	for i in $(list_vgs); do
+		[ "$(getfree_vg "$i")" = "0" ] || free=yes
+	done
+	echo $free
+}
+
+#
 # get all activated volume groups
 #
 get_vgs() {
 	GROUPS=""
-	for i in `vgdisplay | grep '^VG Name' | 
-		sed -e 's/.*[[:space:]]\(.*\)$/\1/' | sort`; do
+	for i in $(list_vgs); do
 		
 		addinfos_vg "$i"
 		i=`printf "%-15s (%s)" "$i" "$RET"`
@@ -480,6 +497,7 @@ vg_reduce() {
 # this is the LV main-menu
 #
 lv_mainmenu() {
+	FIRST=yes
 	while [ 1 ]; do
 		db_set lvmcfg/lvmenu "false"
 		db_input high lvmcfg/lvmenu
@@ -507,6 +525,20 @@ lv_mainmenu() {
 			break
 			;;
 		esac
+
+		# Leave the menu and default to "Leave" if there is no
+		# free space anymore after setting up LVs.
+		if [ "$FIRST" = "yes" ]; then
+			if [ "$LVRET" = "create" ]; then
+				if [ "$(any_free_vgs)" = "no" ] ; then
+					OVERRIDE=no
+					db_set lvmcfg/mainmenu "Leave"
+					break
+				fi
+			else
+				FIRST=no
+			fi
+		fi
 	done
 }
 
