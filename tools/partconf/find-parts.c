@@ -176,9 +176,9 @@ get_all_partitions(struct partition *parts[], const int max_parts)
         p->op.filesystem = NULL;
         p->op.mountpoint = NULL;
         p->op.done = 0;
-//        test_lvm(p);
-//        test_evms(p);
-//        test_raid(p);
+        test_lvm(p);
+        test_evms(p);
+        test_raid(p);
         // FIXME: Other tests?
         parts[part_count++] = p;
         // Open the partition/volume as if it was a disk, it should
@@ -191,7 +191,8 @@ get_all_partitions(struct partition *parts[], const int max_parts)
             continue;
         if (part->fs_type != NULL)
             p->fstype = strdup(part->fs_type->name);
-        p->size = PART_SIZE_BYTES(dev, part);
+        if (PART_SIZE_BYTES(dev, part) > 0)
+            p->size = PART_SIZE_BYTES(dev, part);
     }
     // Add partitions from all the disks we found
     for (i = 0; i < disc_count; i++) {
