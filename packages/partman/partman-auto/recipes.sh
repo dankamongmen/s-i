@@ -249,11 +249,15 @@ choose_recipe () {
     local free_size choices min_size
     free_size=$1
     choices=''
+    first_recipe=''
     for recipe in /lib/partman/recipes/*; do
 	[ -f "$recipe" ] || continue
 	decode_recipe $recipe
 	if [ $(min_size) -le $free_size ]; then
 	    choices="${choices}${recipe}${TAB}${name}${NL}"
+	fi
+	if [ -z "$first_recipe" ]; then
+	    first_recipe="$recipe"
 	fi
     done
 
@@ -267,7 +271,7 @@ choose_recipe () {
 #    choices="${choices}expert${TAB}${RET}"
     
     db_fset partman-auto/choose_recipe seen false
-    debconf_select high partman-auto/choose_recipe "$choices" no_default
+    debconf_select high partman-auto/choose_recipe "$choices" "$first_recipe"
     if [ "$?" = 255 ]; then
 	exit 0
     fi
@@ -281,4 +285,3 @@ choose_recipe () {
     fi
     recipe="$RET"
 }
-
