@@ -109,12 +109,12 @@ foreach my $ver (@versions) {
 		# architecture-specific fields.
 		my $package = sub {
 			my $field=shift;
+			return $pkg{$field."_".$flavour}
+				if exists $pkg{$field."_".$flavour};
 			return $pkg{$field."_".$arch."_".$flavour}
 				if exists $pkg{$field."_".$arch."_".$flavour};
 			return $pkg{$field."_".$arch}
 				if exists $pkg{$field."_".$arch};
-			return $pkg{$field."_".$flavour}
-				if exists $pkg{$field."_".$flavour};
 			return $pkg{$field}
 				if exists $pkg{$field};
 			return undef;
