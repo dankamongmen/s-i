@@ -3,16 +3,13 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-DEB_HOST_ARCH  ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+#include /usr/share/debian-installer/build/make/rules
+
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-VERSION = $(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-
-UDEB_PACKAGES = libdebian-installer-extra4-di
-DEB_PACKAGES_DEBHELPER = $(foreach PACKAGE,$(UDEB_PACKAGES),-N $(PACKAGE))
-
-CFLAGS = -Wall -W -Werror -gstabs
+#CFLAGS = -Wall -W -Werror -gstabs -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes
+CFLAGS = -Wall -W -Werror -gstabs -Wmissing-declarations
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -67,7 +64,8 @@ install: build
 
 	$(MAKE) -C build install DESTDIR=$(CURDIR)/debian/tmp
 
-	install $(CURDIR)/debian/tmp/usr/lib/libdebian-installer-extra.so.4 $(CURDIR)/debian/libdebian-installer-extra4-di/lib
+	install $(CURDIR)/debian/tmp/usr/lib/libdebian-installer.so.4 $(CURDIR)/debian/libdebian-installer4-udeb/lib
+	install $(CURDIR)/debian/tmp/usr/lib/libdebian-installer-extra.so.4 $(CURDIR)/debian/libdebian-installer-extra4-udeb/lib
 	dh_install --sourcedir=debian/tmp
 
 # Build architecture-independent files here.
@@ -78,9 +76,9 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs $(DEB_PACKAGES_DEBHELPER)
-	dh_installdocs $(DEB_PACKAGES_DEBHELPER)
-	dh_installexamples
+	dh_di_installchangelogs
+	dh_di_installdocs
+#	dh_installexamples
 #	dh_installmenu
 #	dh_installdebconf	
 #	dh_installlogrotate
@@ -90,24 +88,20 @@ binary-arch: build install
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
-	dh_installman
+#	dh_installman
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
 #	dh_perl
 #	d_python
-	dh_makeshlibs -n -V $(DEB_PACKAGES_DEBHELPER)
+	dh_di_makeshlibs -n -V
 	dh_installdeb
-	dh_shlibdeps -p libdebian-installer4 -p libdebian-installer4-dev
-	dh_shlibdeps -p libdebian-installer-extra4 -p libdebian-installer-extra4-di -- -L$(CURDIR)/debian/libdebian-installer-extra4.shlibs.local
-	dh_gencontrol $(DEB_PACKAGES_DEBHELPER)
-	dh_md5sums $(DEB_PACKAGES_DEBHELPER)
-	dh_builddeb $(DEB_PACKAGES_DEBHELPER)
-	@$(foreach PACKAGE,$(UDEB_PACKAGES), \
-	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_$(DEB_HOST_ARCH).udeb; \
-	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_$(DEB_HOST_ARCH).udeb; \
-	)
+	dh_shlibdeps -N libdebian-installer-extra4 -N libdebian-installer-extra4-udeb
+	dh_shlibdeps -p libdebian-installer-extra4 -p libdebian-installer-extra4-udeb -- -L$(CURDIR)/debian/libdebian-installer-extra4.shlibs.local
+	dh_di_gencontrol
+	dh_di_md5sums
+	dh_di_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install 

@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.11 2003/12/11 19:29:50 waldi Exp $
+ * $Id: log.c,v 1.12 2003/12/14 17:36:04 waldi Exp $
  */
 
 #include <config.h>
@@ -98,6 +98,12 @@ static void mklevel_prefix (char *level_prefix, di_log_level_flags log_level)
 
   strcat (level_prefix, prefix);
   strcat (level_prefix, log_level & ALERT_LEVELS ? " **: " : ": ");
+}
+
+static void handler_default (di_log_level_flags log_level, const char *message, void *user_data)
+{
+  if (log_level != DI_LOG_LEVEL_DEBUG)
+    di_log_handler_default (log_level, message, user_data);
 }
 
 void di_log_handler_default (di_log_level_flags log_level, const char *message, void *user_data __attribute__ ((unused)))
@@ -180,7 +186,7 @@ static di_log_handler *di_log_get_handler (di_log_level_flags log_level, void **
     }
   }
 
-  return di_log_handler_default;
+  return handler_default;
 }
 
 unsigned int di_log_set_handler (di_log_level_flags log_levels, di_log_handler *log_func, void *user_data)
