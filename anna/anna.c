@@ -124,6 +124,8 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
           continue;
         if (!di_system_package_check_subarchitecture(package, subarchitecture))
           continue;
+	if (strncmp(package->package, "kernel-image-", 13) == 0)
+	  continue;
 
         if (running_kernel && package_kernel && strcmp(running_kernel, package_kernel) == 0)
         {
