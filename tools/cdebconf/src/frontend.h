@@ -28,7 +28,10 @@ struct frontend_module {
     int (*can_go_forward)(struct frontend *, struct question *);
 
     void (*progress_start)(struct frontend *fe, int min, int max, const char *title);
-    void (*progress_step)(struct frontend *fe, int step, const char *info);
+    void (*progress_set) (struct frontend *fe, int val);
+    /* You do not have to implement _step, it will call _set by default */
+    void (*progress_step)(struct frontend *fe, int step);
+    void (*progress_info)(struct frontend *fe, const char *info);
     void (*progress_stop)(struct frontend *fe);
 };
 

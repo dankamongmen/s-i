@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.19 2003/04/08 22:33:55 sley Exp $
+ * $Id: gtk.c,v 1.20 2003/05/11 11:59:15 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -862,9 +862,9 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
 
     obj->progress_title = NULL;
-    obj->progress_min = 0;
-    obj->progress_max = max-min;
-    obj->progress_cur = 0;
+    obj->progress_min = min;
+    obj->progress_max = max;
+    obj->progress_cur = min;
 
     target_box = ((struct frontend_data*)obj->data)->target_box;
     progress_bar = gtk_progress_bar_new ();
@@ -879,21 +879,29 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
 }
 
-static void gtk_progress_step(struct frontend *obj, int step, const char *info)
+static void gtk_progress_set(struct frontend *obj, int val)
 {
     gdouble progress;
 
     pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
-    if (obj->progress_max > 0)
+    obj->progress_cur = val;
+    if (obj->progress_max - obj->progress_min > 0)
     {
 
-        progress = (gdouble)obj->progress_cur / (gdouble)obj->progress_max;
+        progress = (gdouble)(obj->progress_cur - obj->progress_min) /
+                   (gdouble)(obj->progress_max - obj->progress_min);
 	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(((struct frontend_data*)obj->data)->progress_bar),
 				      progress);
     }
+    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
+    pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
+}
+
+static void gtk_progress_info(struct frontend *obj, const char *info)
+{
+    pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(((struct frontend_data*)obj->data)->progress_bar), info);
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
-    obj->progress_cur += step;
     pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
 }
 
@@ -912,6 +920,7 @@ struct frontend_module debconf_frontend_module =
     go: gtk_go,
     can_go_back: gtk_can_go_back,
     progress_start: gtk_progress_start,
-    progress_step: gtk_progress_step,
+    progress_info: gtk_progress_info,
+    progress_set: gtk_progress_set,
     progress_stop: gtk_progress_stop,
 };

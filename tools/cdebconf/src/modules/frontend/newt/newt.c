@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.10 2003/05/11 10:23:41 sjogren Exp $
+ * $Id: newt.c,v 1.11 2003/05/11 11:59:15 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -666,9 +666,9 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
 
     DELETE(obj->progress_title);
     obj->progress_title = NULL;
-    obj->progress_min = 0;
-    obj->progress_max = max-min;
-    obj->progress_cur = 0;
+    obj->progress_min = min;
+    obj->progress_max = max;
+    obj->progress_cur = min;
     newtInit();
     newtCls();
     newtGetScreenSize(&width, NULL);
@@ -687,24 +687,34 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
 }
 
 static void
-newt_progress_step(struct frontend *obj, int step, const char *info)
+newt_progress_set(struct frontend *obj, int val)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
 
-    if (obj->progress_max > 0)
+    obj->progress_cur = val;
+    if (obj->progress_max - obj->progress_min > 0)
     {
         char buf[64];
         float perc;
 
-        perc = 100.0 * (float)obj->progress_cur / (float)obj->progress_max;
+        perc = 100.0 * (float)(obj->progress_cur - obj->progress_min) / 
+                       (float)(obj->progress_max - obj->progress_min);
         sprintf(buf, "%3d%%", (int)perc);
         newtLabelSetText(data->perc_label, buf);
     }
-    newtLabelSetText(data->scale_label, info);
     newtScaleSet(data->scale_bar, obj->progress_cur);
     newtDrawForm(data->scale_form);
     newtRefresh();
-    obj->progress_cur += step;
+}
+
+static void
+newt_progress_info(struct frontend *obj, const char *info)
+{
+    struct newt_data *data = (struct newt_data *)obj->data;
+
+    newtLabelSetText(data->scale_label, info);
+    newtDrawForm(data->scale_form);
+    newtRefresh();
 }
 
 static void
@@ -727,6 +737,7 @@ shutdown: newt_shutdown,
 go: newt_go,
 can_go_back: newt_can_go_back,
 progress_start: newt_progress_start,
-progress_step: newt_progress_step,
-progress_stop: newt_progress_stop,
+progress_set:   newt_progress_set,
+progress_info:  newt_progress_info,
+progress_stop:  newt_progress_stop,
 };

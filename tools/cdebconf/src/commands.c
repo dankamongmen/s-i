@@ -567,25 +567,34 @@ command_progress(struct confmodule *mod, char *arg, char *out, size_t outsize)
         mod->frontend->methods.progress_start(mod->frontend,
             min, max, value);
     }
+    else if (strcasecmp(argv[0], "set") == 0)
+    {
+        CHECKARGC(== 2);
+        mod->frontend->methods.progress_set(mod->frontend, atoi(argv[1]));
+    }
     else if (strcasecmp(argv[0], "step") == 0)
     {
-        CHECKARGC(== 3);
-        q = mod->questions->methods.get(mod->questions, argv[2]);
+        CHECKARGC(== 2);
+        mod->frontend->methods.progress_step(mod->frontend, atoi(argv[1]));
+    }
+    else if (strcasecmp(argv[0], "info") == 0)
+    {
+        CHECKARGC(== 2);
+        q = mod->questions->methods.get(mod->questions, argv[1]);
         if (q == NULL)
         {
             snprintf(out, outsize, "%u %s does not exist",
-                    CMDSTATUS_BADQUESTION, argv[2]);
+                    CMDSTATUS_BADQUESTION, argv[1]);
             return DC_NOTOK;
         }
         value = question_get_field(q, "", "description");
         if (value == NULL)
         {
             snprintf(out, outsize, "%u %s description field does not exist",
-                    CMDSTATUS_BADQUESTION, argv[2]);
+                    CMDSTATUS_BADQUESTION, argv[1]);
             return DC_NOTOK;
         }
-        mod->frontend->methods.progress_step(mod->frontend,
-            atoi(argv[1]), value);
+        mod->frontend->methods.progress_info(mod->frontend, value);
     }
     else if (strcasecmp(argv[0], "stop") == 0)
     {

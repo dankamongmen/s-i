@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.37 2003/03/14 21:31:42 sjogren Exp $
+ * $Id: text.c,v 1.38 2003/05/11 11:59:15 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -546,33 +546,43 @@ static void text_progress_start(struct frontend *ui, int min, int max, const cha
     printf("%s\n", title);
 }
 
-static void text_progress_step(struct frontend *ui, int step, const char *info)
+static void text_progress_set(struct frontend *ui, int val)
+{
+    char out[256];
+
+    ui->progress_cur = val;
+
+    snprintf(out, sizeof(out), "[%5.1f%%]",
+        (double)(ui->progress_cur - ui->progress_min) / 
+        (double)(ui->progress_max - ui->progress_min) * 100.0);
+
+    printf("\r%s", out);
+    fflush(stdout);
+}
+
+static void text_progress_info(struct frontend *ui, const char *info)
 {
     int width = getwidth(), i;
     char out[256];
 
-    snprintf(out, sizeof(out), "[%.1f%%] %s",
-        (double)(ui->progress_cur - ui->progress_min) / 
-        (double)(ui->progress_max - ui->progress_min) * 100.0, info);
-    if (strlen(out) > width - 7)
-        out[width - 7] = 0;
+    ui->methods.progress_step(ui, 0);
+    strncpy(out, info, sizeof(out)-1);
+    out[255] = '\0';
+    if (strlen(out) > width - 9)
+        out[width - 9] = '\0';
     else
     {
-        for (i = strlen(out); i < width - 7; i++)
+        for (i = strlen(out); i < width - 9; i++)
             out[i] = ' ';
-        out[i] = 0;
+        out[i] = '\0';
     }
-
-    ui->progress_cur += step;
-
-    printf("%s\r", out);
+    printf(" %s\r", out);
     fflush(stdout);
 }
 
 static void text_progress_stop(struct frontend *ui)
 {
     INFO(INFO_DEBUG, "%s\n", __FUNCTION__);
-    text_progress_step(ui, 0, "");
     printf("\n");
 }
 
@@ -581,6 +591,7 @@ struct frontend_module debconf_frontend_module =
 	initialize: text_initialize,
 	go: text_go,
     progress_start: text_progress_start,
-    progress_step: text_progress_step,
+    progress_set: text_progress_set,
+    progress_info: text_progress_info,
     progress_stop: text_progress_stop,
 };

@@ -91,9 +91,18 @@ static void frontend_progress_start(struct frontend *ui, int min, int max, const
     ui->progress_cur = min;
 }
 
-static void frontend_progress_step(struct frontend *ui, int step, const char *info)
+static void frontend_progress_set(struct frontend *ui, int val)
 {
-    ui->progress_cur += step;
+    ui->progress_cur = val;
+}
+
+static void frontend_progress_step(struct frontend *ui, int step)
+{
+    ui->methods.progress_set(ui, ui->progress_cur + step);
+}
+
+static void frontend_progress_info(struct frontend *ui, const char *info)
+{
 }
 
 static void frontend_progress_stop(struct frontend *ui)
@@ -159,7 +168,9 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	SETMETHOD(can_go_back);
 	SETMETHOD(can_go_forward);
     SETMETHOD(progress_start);
+    SETMETHOD(progress_set);
     SETMETHOD(progress_step);
+    SETMETHOD(progress_info);
     SETMETHOD(progress_stop);
 
 #undef SETMETHOD
