@@ -11,7 +11,30 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <cdebconf/debconfclient.h>
 #include "anna.h"
+
+/* TODO: Version check? */
+static int
+is_installed(struct package_t *package, struct package_t *installed)
+{
+	struct package_t *q;
+
+	for (q = installed; q != NULL; q = q->next) {
+		if (strcmp(package->package, q->package) == 0)
+			return 1;
+	}
+	return 0;
+}
+
+static char *
+debconf_ask_one(struct debconfclient *d, const char *pri, const char *template)
+{
+	d->command(d, "INPUT", pri, template, NULL);
+	d->command(d, "GO", NULL);
+	d->command(d, "GET", template, NULL);
+	return d->value;
+}
 
 /*
  * This function takes a linked list of available packages, decides which
@@ -21,28 +44,89 @@
  * it just returns all of the packages, putting the onus on whoever makes
  * the Packages file to make these decisions.
  *
- * TODO: one thing I know this needs to do is check for already-installed
- * packages and skip those.
+ * - Don't install packages that are already installed
+ * - Ask for which packages with priority below standard to install
  */
 struct package_t *select_packages (struct package_t *packages) {
-        struct package_t *p = packages;
-        struct package_t *prev = NULL;
-        while (p)
+	struct package_t *p, *prev = NULL, *q;
+	struct package_t *status_p;
+	struct package_t *lowpri_p = NULL, *lowpri_last = NULL;
+	FILE *fp;
+
+	fp = fopen(STATUS_FILE, "r");
+	if (fp == NULL)
+		return NULL;
+	status_p = di_pkg_parse(fp);
+	fclose(fp);
+
+        for (p = packages; p; p = q)
         {
-                if (strcmp(p->package,"cdebconf-udeb") == 0 ||
-                    strcmp(p->package,"anna") == 0 ||
-                    strcmp(p->package,"rootskel") == 0 )
-                {
+		q = p->next;
+		if (is_installed(p, status_p)) {
                         if (prev)
                                 prev->next = p->next;
                         else
                                 packages = p->next;
-                        p = p->next;
                         continue;
-                }
+                } else if (p->priority < standard) {
+			/* Unlink these packages temporarily */
+			if (prev)
+				prev->next = p->next;
+			else
+				packages = p->next;
+			if (lowpri_last == NULL) {
+				lowpri_p = p;
+				lowpri_last = p;
+				p->next = NULL;
+			} else {
+				lowpri_last->next = p;
+				p->next = NULL;
+				lowpri_last = p;
+			}
+			continue;
+		}
                 prev = p;
-                p = p->next;
         }
+	if (lowpri_p != NULL) {
+		struct debconfclient *debconf;
+		char *choices;
+		char *tmp;
+		size_t choices_size = 1;
+
+		choices = malloc(choices_size);
+		choices[0] = '\0';
+		for (p = lowpri_p; p != NULL; p = p->next) {
+			choices_size += strlen(p->package) + 2 + strlen(p->description) + 2;
+			choices = realloc(choices, choices_size);
+			strcat(choices, p->package);
+			strcat(choices, ": ");
+			strcat(choices, p->description);
+			strcat(choices, ", ");
+		}
+		if (choices_size >= 3)
+			choices[choices_size-3] = '\0';
+		debconf = debconfclient_new();
+		debconf->command(debconf, "SUBST", ANNA_CHOOSE_LOWPRI_PACKAGES,
+				"CHOICES", choices, NULL);
+		debconf->command(debconf, "INPUT medium", ANNA_CHOOSE_LOWPRI_PACKAGES,
+				NULL);
+		debconf->command(debconf, "GO", NULL);
+		free(choices);
+		debconf->command(debconf, "GET", ANNA_CHOOSE_LOWPRI_PACKAGES, NULL);
+		if (debconf->value != NULL) {
+			/* This is probably not the best way to do it,
+			 * but I'm feeling lazy. Feel free to improve it. */
+			for (p = lowpri_p; p != NULL; p = q) {
+				q = p->next;
+				asprintf(&tmp, "%s: %s", p->package, p->description);
+				if (tmp != NULL && strstr(debconf->value, tmp) != NULL) {
+					p->next = packages;
+					packages = p;
+				}
+				free(tmp);
+			}
+		}
+	}
 	return packages;
 }
 
