@@ -99,9 +99,9 @@ int main(int argc, char **argv)
         }
     }
 
-    if (tdb->methods.save(tdb))
+    if (tdb->methods.save(tdb) != DC_OK)
 	exit(1);
-    if (qdb->methods.save(qdb))
+    if (qdb->methods.save(qdb) != DC_OK)
 	exit(1);
     template_db_delete(tdb);
     question_db_delete(qdb);
