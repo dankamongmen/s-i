@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.6 2003/11/03 13:46:12 waldi Exp $
+ * $Id: package_parser.c,v 1.7 2003/11/12 17:27:50 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -382,8 +382,8 @@ void di_package_parser_read_description (
   temp = memchr (value->string, '\n', value->size);
   if (temp)
   {
-    p->short_description = di_stradup (value->string, temp - value->string - 1);
-    p->description = di_stradup (temp, (value->string + value->size) - temp - 1);
+    p->short_description = di_stradup (value->string, temp - value->string);
+    p->description = di_stradup (temp + 1, value->string + value->size - temp - 1);
   }
   else
     p->short_description = di_stradup (value->string, value->size);
@@ -399,11 +399,20 @@ void di_package_parser_write_description (
   di_package *p = *data;
   di_rstring value;
 
-  value.size = strlen (p->short_description) + strlen (p->description) + 2;
-  value.string = di_malloc (value.size);
-  snprintf (value.string, value.size, "%s\n%s", p->short_description, p->description);
+  if (p->description)
+  {
+    value.size = strlen (p->short_description) + strlen (p->description) + 1;
+    value.string = di_malloc (value.size + 1);
+    snprintf (value.string, value.size + 1, "%s\n%s", p->short_description, p->description);
+  }
+  else
+  {
+    value.size = strlen (p->short_description);
+    value.string = p->short_description;
+  }
   callback (&fip->key, &value, callback_data);
-  di_free (value.string);
+  if (p->description)
+    di_free (value.string);
 }
 
 void di_package_parser_read_name (data, fip, field_modifier, value, user_data)
