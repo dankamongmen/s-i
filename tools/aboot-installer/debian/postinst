@@ -51,14 +51,17 @@ fi
 db_progress STEP 1
 db_progress INFO aboot-installer/progress/step_bootdev
 
+
+# TODO: detect whether a given disk is using BSD disklabels
+
 for i in `/usr/lib/partconf/find-partitions 2>/dev/null \
 	| grep '[[:space:]]ext2[[:space:]]' | cut -f1`
 do
 	# add it to the list.
 	if [ -z "$PARTITIONS" ]; then
-		PARTITIONS="$i"
+		PARTITIONS="`mapdevfs $i`"
 	else
-		PARTITIONS="${PARTITIONS},$i"
+		PARTITIONS="${PARTITIONS},`mapdevfs $i`"
 	fi
 done
 
@@ -70,18 +73,19 @@ if [ -z "$PARTITIONS" ]; then
 	db_progress STOP
 fi
 
-# TODO: detect whether a given disk is using BSD disklabels
-
-# FIXME: what if "defaultbootdev" isn't the device that the kernels are
-# on?
-# Figure out the /boot partition, and set it as the default.
-# If the /boot partition isn't ext2, use the value of defaultbootdev if
-# any.
-# Else, just default to the first device found.
-
 # We'll need this to figure out which device /boot is on, just like
 # grub does
 update_mtab
+
+# Figure out the /boot partition
+realbootdev=`chroot /target df /boot \
+	| sed -n -e'/^\/dev/ { s/[[:space:]].*//; p }'`
+
+# If the /boot partition is ext2, set is as the default.
+if [ -n "`chroot /target mount | grep \"${realbootdev}.*ext2\"`" ]
+then
+    defaultbootdev="$realbootdev"
+fi
 
 if [ "$defaultbootdev" ]; then
     db_set aboot-installer/bootdev "$defaultbootdev"
@@ -94,9 +98,6 @@ db_go
 
 db_get aboot-installer/bootdev
 bootdev=$RET
-
-# Convert to something we can use in the chroot
-bootdev=`mapdevfs $bootdev`
 
 # Determine the name of the disk, and the partition number where
 # aboot.conf is located, from the name of the selected partition.
@@ -122,7 +123,7 @@ chroot /target /sbin/abootconf $bootdisk $partnum
 ABOOTCONF=/target/etc/aboot.conf
 
 sed -e"/^0:/ c\
-0:$partnum/vmlinuz ro root=/initrd" < $ABOOTCONF > ${ABOOTCONF}.new
+0:$partnum/vmlinuz ro initrd=/initrd.img root=/dev/ram" < $ABOOTCONF > ${ABOOTCONF}.new
 mv ${ABOOTCONF}.new $ABOOTCONF
 
 db_progress STEP 1
