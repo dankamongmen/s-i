@@ -1,7 +1,13 @@
 kver=`uname -r | cut -d. -f1,2` # Kernel version (e.g. 2.6)
 
 if [ "$kver" = 2.6 ]; then
-	echo "Loading AT keyboard modules..."
-	modprobe -q i8042 >/dev/null 2>&1 || true
-	modprobe -q atkbd >/dev/null 2>&1 || true
+	subarch="$(archdetect)"
+	subarch="${subarch#*/}"
+	case $subarch in
+		chrp|chrp_pegasos|prep)
+			echo "Loading AT keyboard modules..."
+			modprobe -q i8042 >/dev/null 2>&1 || true
+			modprobe -q atkbd >/dev/null 2>&1 || true
+			;;
+	esac
 fi
