@@ -259,7 +259,7 @@ vg_create() {
 	NAME="$RET"
 
 	# check, if the vg name is already in use
-	vgdisplay -v | grep '^VG Name' | grep -q "$NAME"
+	vgdisplay -v | grep '^VG Name' | sed -e 's/ *VG Name *//' | grep -q "^$NAME$"
 	if [ $? -eq 0 ]; then
 		db_set lvmcfg/vgcreate_nameused "false"
 		db_input high lvmcfg/vgcreate_nameused
