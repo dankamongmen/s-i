@@ -25,7 +25,7 @@ close_dialog
 if [ "$virtual" = no ]; then
     db_set partman-partitioning/confirm_resize 'false'
     db_fset partman-partitioning/confirm_resize seen false
-    db_input high partman-partitioning/confirm_resize || true
+    db_input critical partman-partitioning/confirm_resize || true
     db_go || exit 0
     db_get partman-partitioning/confirm_resize
     [ "$RET" = 'true' ] || exit 0
@@ -42,7 +42,7 @@ ask_for_size () {
 	    db_subst partman-partitioning/new_size MINSIZE "$hminsize"
 	    db_subst partman-partitioning/new_size MAXSIZE "$hmaxsize"
 	    db_subst partman-partitioning/new_size PERCENT "$minpercent%"
-	    db_input high partman-partitioning/new_size || $noninteractive
+	    db_input critical partman-partitioning/new_size || $noninteractive
 	    noninteractive="return 1"
 	    db_go || return 1
 	    db_get partman-partitioning/new_size
