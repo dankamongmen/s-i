@@ -151,12 +151,12 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	
 	/* Make debconf show the menu and get the user's choice. */
 	if (menudefault)
-		debconf_command("SET %s %s", MAIN_MENU, menudefault);
-	debconf_command("FSET %s isdefault true", MAIN_MENU);
-	debconf_command("SUBST %s MENU %s", MAIN_MENU, menutext);
-	debconf_command("INPUT medium %s", MAIN_MENU);
-	debconf_command("GO");
-	debconf_command("GET %s", MAIN_MENU);
+		debconf_command("SET", MAIN_MENU, menudefault, NULL);
+	debconf_command("FSET", MAIN_MENU, "isdefault", "true", NULL);
+	debconf_command("SUBST", MAIN_MENU, "MENU", menutext, NULL);
+	debconf_command("INPUT medium", MAIN_MENU, NULL);
+	debconf_command("GO", NULL);
+	debconf_command("GET", MAIN_MENU, NULL);
 	s=debconf_ret();
 
 	/* Figure out which menu item was selected. */

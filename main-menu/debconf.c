@@ -17,15 +17,23 @@ char *debconf_ret (void) {
 	return text;
 }
 
-/* Talks to debconf and returns the numeric return code. */
-int debconf_command (const char *fmt, ...) {
+/* 
+ * Talks to debconf and returns the numeric return code.
+ * Unfortunatly, you need to use a NULL - terminated list of commands.
+ */
+int debconf_command (const char *command, ...) {
 	char buf[DEBCONF_BUFSIZE];
 	va_list ap;
+	char *c;
 	
-	va_start(ap, fmt);
-	vprintf(fmt, ap);
+	fputs(command, stdout);
+	va_start(ap, command);
+	while ((c = va_arg(ap, char *)) != NULL) {
+		fputs(" ", stdout);
+		fputs(c, stdout);
+	}
 	va_end(ap);
-	printf("\n");
+	fputs("\n", stdout);
 	fflush(stdout); /* make sure debconf sees it to prevent deadlock */
 
 	fgets(buf, DEBCONF_BUFSIZE, stdin);
