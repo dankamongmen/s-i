@@ -185,23 +185,21 @@ loads additional installer modules from the cd.
 Next the installer will try to detect your network hardware and set up
 networking by DHCP. If you are not on a network or do not have DHCP, you
 will see an error message. You do not need a network to continue the
-install so this can be easily worked around. Select continue and watch the
+install, so this can be easily worked around. Select continue and watch the
 main menu which will appear everytime if something went wrong, so you have
-more control over the situation. Proceed to "Partition a hard drive".
+more control over the situation. Proceed to "Partition disks".
 
-Now it is time to partition your harddisks. Select the disk you want
-to partition and a partitioning program suitable for your architecture
-will be started. Partition the harddisk to your needs and quit the
-program. Select "Finish" to proceed.
+Now it is time to partition your disks. First you will be given the
+opportunity to automatically partition either an entire drive, or free
+space on a drive. If you do not want to autopartition, choose manual from
+the menu.
 
-On the next screen you have to configure and mount your partitions. Select
-the partitions you want to use in the system you wish to install and select
-a filesystem and a mount point for them. Remember to assign at least one
-partition for swap space and to mount a partition on "/".
-
-Please note the debian-installer will do no changes to your harddisks until
-you select "Finish". Do this when you are sure that you have found a
-suitable setup for your partitions and answer the next question with "Yes".
+On the next screen you will see your partition table, how the partitions
+will be formatted, and where they will be mounted. Select a partition to
+modify or delete it. If you did automatic partitioning, you should just be
+able to choose "Finished partitioning" from the menu to use what it set up.
+Remember to assign at least one partition for swap space and to mount a
+partition on "/".
 
 Now debian-installer starts to install the base system which can take a
 while. That is followed by installing a kernel.
@@ -276,31 +274,19 @@ since the base debs are on the CD.
 Select "Detect hardware". This will repeat the hardware detection process,
 but now the installer has more kernel modules available to it.
 
-Now it is time to partition your disk. There are basically two ways to
-do that. The first one is to use cfdisk, which will be started upon
-selecting the menu entry "Partition a harddrive". Be sure to create at
-least two partitions, one for swap and one for the root filesystem.
+Now it is time to partition your disk, so choose "Partition disks" from the
+menu. You will be presented with a display showing the partitions on your
+system. Select partitons from the list to modify or delete them. If you
+have free space it will also show up under a drive, and you can select it
+to create new partitions. When modifying a partition you will have the
+opportunity to choose the file system to use, and where to mount it. The
+partitioning menu also has a choice at the bottom that can be used to
+automatically partition a drive or existing free space on a drive, if you'd
+rather go that route. Be sure to create at least two partitions, one for
+swap and one for the root filesystem.
 
-The other possibility is to use the autopartitioner. Select
-"Automatically partition harddrives" which tries to determine a sane
-partitioning. WARNING: Use this option ONLY if you have no or
-unimportant data on your harddrives.
-
-After finishing partitioning, select the entry "Configure and mount
-partitions". Since autopartkit creates filesystems and mounts them
-automatically you can skip this step if you used autopartkit to partition
-your harddrive.
-
-Configuring the partitions is pretty straightforward. You are
-presented with a list with all partitions, their sizes and a filesystem
-if one was detected on that partition. Selecting a partition lets you
-choose which filesystem to create on that partition. If you select a
-non-swap filesystem, you are also asked for a mount point.
-
-Configure the partitions to your need, and remember to specify a
-partition with mount point "/". When you've made your choices, select
-"Finish" and confirm that the filesystems should be created as
-requested.
+After finishing partitioning, select "Finished partitioning" from the menu,
+and confirm that the filesystems should be created as requested.
 
 Now we are ready to install the base system. Select the corresponding entry
 ("Install the base system") and lean back. The packages are retrieved from
@@ -308,9 +294,9 @@ the CD and installed in the /target area. During this step, you will
 presented a list of all available kernel images on the CD. Select the most
 suitable for your system and wait until the installation has finished.
 
-Now we are almost done. Select "Install LILO on a hard disk" or
-"Install GRUB on a hard disk" to make your harddisk bootable. You will
-be asked where LILO/GRUB shall install the bootblock. A good idea is
+Now we are almost done. Select "Install GRUB on a hard disk" or
+"Install LILO on a hard disk" to make your harddisk bootable. You will
+be asked where GRUB/GRUB shall install the bootblock. A good idea is
 the first hard drive in your system which should be in fact the
 default selection.
 
