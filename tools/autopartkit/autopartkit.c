@@ -812,7 +812,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     }
 
     log_line();
-    fprintf(fstab, "# /etc/fstab: static file system information\n#\n");
+    fprintf(fstab, "# /etc/fstab: static file system information.\n#\n");
     fprintf(fstab, "# <file system> <mount point> <type> <options>"
 		   "\t<dump>\t<pass>\n");
     fprintf(fstab, "%s\t/\t%s\tdefaults,errors=remount-ro\t\t1\t1\n", 
