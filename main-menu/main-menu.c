@@ -109,7 +109,7 @@ get_default_menu_item(di_slist *list)
 		    !isinstallable(p))
 			continue;
 		if (p->installer_menu_item < last_successful_item &&
-		    p->installer_menu_item < 900)
+		    p->installer_menu_item < NEVERDEFAULT)
 			continue;
 		/* If menutest says this item should be default, make it so */
 		if (!isdefault(p))
@@ -575,13 +575,13 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 		  /* Success */
 		  modify_debconf_priority(RAISE);
 
-		  if (p->installer_menu_item < 900)
+		  if (p->installer_menu_item < NEVERDEFAULT)
 		  {
 		    last_successful_item = p->installer_menu_item;
 		    di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
 		  }
 		  else
-		    di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= 900", p->p.package, p->installer_menu_item);
+		    di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
 		}
 		
 		di_packages_free (packages);

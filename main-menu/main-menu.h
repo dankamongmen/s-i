@@ -14,3 +14,4 @@
 
 #include <debian-installer.h>
 
+#define NEVERDEFAULT 900
