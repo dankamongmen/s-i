@@ -111,9 +111,9 @@ if [ "$SUBARCH" = powermac_newworld ] && \
     IFS="$OLDIFS"
     info "partman-supplied bootstrap partitions: $PARTITIONS"
     info "partman-supplied default bootstrap partition: $DEFAULT"
-    if [ "$PARTITIONS" ]; then
-	# We have explicit information from partman-newworld about which
-	# bootstrap partitions are available, so it's safe to bypass this
+    if [ "$PARTITIONS" ] && [ "$DEFAULT" = "$PARTITIONS" ]; then
+	# We have explicit information from partman-newworld that only one
+	# bootstrap partition is available, so it's safe to bypass this
 	# question.
 	bootdev_priority=medium
     fi
