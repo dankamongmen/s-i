@@ -15,7 +15,7 @@ STRIPTOOL=strip
 STRIP= $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 endif
 
-LDOPTS = -ldebian-installer -ldebconf
+LDOPTS = -ldebian-installer -ldebconfclient
 
 
 all: efi-reader

@@ -4,7 +4,7 @@
  * Copyright (C) 2003, Alastair McKinstry <mckinstry@debian.org>
  * Released under the GNU Public License; see file COPYING for details
  *
- * $Id: efi-reader.c,v 1.2 2003/07/29 21:26:22 mckinstry Exp $
+ * $Id: efi-reader.c,v 1.3 2003/09/24 20:27:08 mckinstry Exp $
  */
 
 #include <sys/types.h>
@@ -13,8 +13,6 @@
 #include <errno.h>
 #include <string.h>
 #include <debian-installer.h>
-#include <cdebconf/common.h>
-#include <cdebconf/commands.h>
 #include <cdebconf/debconfclient.h>
 
 #include "table.h"
