@@ -4,6 +4,7 @@
 #include "strutl.h"
 #include "configuration.h"
 #include "database.h"
+#include <assert.h>
 
 struct question *question_new(const char *tag)
 {
@@ -192,6 +193,9 @@ const char *question_get_field(struct question *q, const char *lang,
 	const char *field)
 {
 	static char buf[4096] = {0};
+	assert(q);
+	assert(lang);
+	assert(field);
 	if (strcmp(field, "value") == 0)
 		question_expand_vars(q,
 			question_getvalue(q, lang),
