@@ -126,8 +126,7 @@ static char *execute_fdisk(void) {
 	return(fdiskcmd);
 }
 
-static int handler (pid_t pid, void *user_data)
-{
+static int handler(pid_t pid, void *user_data) {
 	if ((dup2(DEBCONF_OLD_STDIN_FD, 0) == -1) ||
 	    (dup2(DEBCONF_OLD_STDOUT_FD, 1) == -1) ||
 	    (dup2(DEBCONF_OLD_STDOUT_FD, 2) == -1))
@@ -199,7 +198,7 @@ int main(int argc, char *argv[]) {
 		/* not properly handling characters in translations  */
 		debconf_get(debconf, "debian-installer/language");
 		language = extract_choice(debconf->value);
-		setenv("LANGUAGE", language, "1");
+		setenv("LANGUAGE", language, 1);
 
 		if (strcmp(disk,"false") != 0) {
 		  asprintf(&cmd, "/bin/sh %s %s", cmd_script, disk);
