@@ -130,7 +130,7 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     }
     e++;
   }
-  if (!e->name || !S_ISBLK(s.st_mode)) {
+  if (!e->name) {
 #ifdef TEST
     fprintf(stderr, "(unknown device)\n");
 #endif
@@ -148,6 +148,9 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
 
     case ENTRY_TYPE_NUMBER:
       disc = minor (s.st_rdev) - e->minor + e->entry_first;
+
+      ret = di_snprintfcat (buf, n, "%s%d", e->name, disc);
+      break;
 
     case ENTRY_TYPE_DISC:
     case ENTRY_TYPE_DISC_ARRAY:
