@@ -151,25 +151,33 @@ int get_package (struct package_t *package, char *dest) {
  * TODO: compressed Packages files?
  */
 struct package_t *get_packages (void) {
+	struct debconfclient *debconf;
 	char *retriever;
 	FILE *packages;
 	struct package_t *p = NULL, *newp, *plast;
 	static char tmp_packages[] = DOWNLOAD_DIR "/Packages";
         /* This is a workaround until d-i gets Release files, at which point
            we should parse them instead */
+	char *dist;
         char *suites[] =  { "main", "local", 0 };
         char *suite;
         int currsuite = 0;
 
 	choose_retriever();
 	retriever = get_chosen_retriever();
+	debconf = debconfclient_new();
+	debconf->command(debconf, "GET", "mirror/distribution", NULL);
+	dist = debconf->value;
         suite = suites[currsuite];
         while (suite != NULL) {
+		char *file;
 		char *command;
 
                 unlink(tmp_packages);
-                asprintf(&command, "%s Packages %s %s", retriever, tmp_packages, 
-                        suite);
+		asprintf(&file, "dists/%s/%s/debian-installer/binary-%s/Packages",
+			dist, suite, ARCH);
+                asprintf(&command, "%s %s %s", retriever, file, tmp_packages);
+		free(file);
                 fprintf(stderr,"%s\n", command);
                 if (system(command) != 0) {
                         free(command);

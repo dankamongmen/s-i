@@ -1,4 +1,5 @@
-CFLAGS=-Wall -g -D_GNU_SOURCE
+ARCH=$(shell dpkg --print-architecture)
+CFLAGS=-Wall -g -D_GNU_SOURCE -DARCH=\"$(ARCH)\"
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=anna
 LIBS=-ldebconf -ldebian-installer
