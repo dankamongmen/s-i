@@ -2,7 +2,7 @@
 DISK="$1"
 [ -z "$DISK" ] && exit 1
 
-case "`/usr/bin/archdetect`" in
+case "`/bin/archdetect`" in
 "powerpc/powermac_newworld")
 	mac-fdisk $DISK
 	;;
