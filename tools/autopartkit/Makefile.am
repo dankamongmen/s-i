@@ -41,7 +41,7 @@ distribute_test_SOURCES = \
 
 tabledir = $(sysconfdir)/autopartkit
 table_DATA = \
-	default.table
+	default.table \
 	test.table
 
 EXTRA_DIST = $(table_DATA)
