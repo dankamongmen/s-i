@@ -7,7 +7,7 @@
  *
  * Description: database interface routines
  *
- * $Id: database.c,v 1.14 2002/11/18 02:00:00 tfheen Exp $
+ * $Id: database.c,v 1.15 2002/11/23 00:37:24 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -253,6 +253,7 @@ static int question_db_is_visible(struct question_db *db, const char *name,
 	struct question *q = 0, *q2 = 0;
 	struct configuration *config = db->config;
     const char *wantprio = NULL;
+	const char *showold = NULL;
 	int ret = DC_YES;
 
     /* priority can either come from the command line, environment
@@ -270,7 +271,12 @@ static int question_db_is_visible(struct question_db *db, const char *name,
     /* error; no priority specified -- last resort fallback to medium */
     if (wantprio == NULL || strlen(wantprio) == 0)
         wantprio = "medium";
-    else if (priority_compare(priority, wantprio) < 0)
+
+    if (priority_compare(priority, wantprio) < 0)
+		ret = DC_NO;
+
+	showold = getenv("DEBCONF_SHOWOLD");
+	if (showold != NULL && strcmp(showold, "false") == 0)
 		ret = DC_NO;
 
     if (q != NULL)

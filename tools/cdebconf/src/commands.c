@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.30 2002/11/21 23:21:46 barbier Exp $
+ * $Id: commands.c,v 1.31 2002/11/23 00:37:20 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -296,11 +296,16 @@ int command_endblock(struct confmodule *mod, int argc, char **argv,
 int command_go(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
+	struct question *q;
+
 	CHECKARGC(== 0);
 	if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
 		snprintf(out, outsize, "%u backup", CMDSTATUS_GOBACK);
 	else {
 		snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+		/* FIXME  questions should be tagged when closing session */
+		for (q = mod->frontend->questions; q != NULL; q = q->next)
+			q->flags |= DC_QFLAG_SEEN;
         }
 	mod->frontend->methods.clear(mod->frontend);
 
@@ -424,7 +429,7 @@ int command_reset(struct confmodule *mod, int argc, char **argv,
 	else
 	{
 		DELETE(q->value);
-		q->flags |= DC_QFLAG_SEEN;
+		q->flags &= ~DC_QFLAG_SEEN;
 
 		if (mod->questions->methods.set(mod->questions, q) != 0)
 			snprintf(out, outsize, "%u value reset",
@@ -639,10 +644,12 @@ int command_fget(struct confmodule *mod, int argc, char **argv,
 		 */
 
 		/* isdefault is for backward compability only */
-		if (strcmp(field, "seen") == 0 ||
-		    strcmp(field, "isdefault") == 0)
+		if (strcmp(field, "seen") == 0)
 			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
 				((q->flags & DC_QFLAG_SEEN) ? "true" : "false"));
+                else if (strcmp(field, "isdefault") == 0)
+			snprintf(out, outsize, "%u %s", CMDSTATUS_SUCCESS,
+				((q->flags & DC_QFLAG_SEEN) ? "false" : "true"));
 		else
 			snprintf(out, outsize, "%u %s does not exist", CMDSTATUS_BADPARAM, field);
 
@@ -678,13 +685,20 @@ int command_fset(struct confmodule *mod, int argc, char **argv,
 	else
 	{
 		field = argv[2];
-		if (strcmp(field, "seen") == 0 ||
-		    strcmp(field, "isdefault") == 0)
+		if (strcmp(field, "seen") == 0)
 		{
 			q->flags &= ~DC_QFLAG_SEEN;
 			if (strcmp(argv[3], "true") == 0)
 				q->flags |= DC_QFLAG_SEEN;
-            mod->questions->methods.set(mod->questions, q);
+			mod->questions->methods.set(mod->questions, q);
+			snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
+		}
+		else if (strcmp(field, "isdefault") == 0)
+		{
+			q->flags &= ~DC_QFLAG_SEEN;
+			if (strcmp(argv[3], "false") == 0)
+				q->flags |= DC_QFLAG_SEEN;
+			mod->questions->methods.set(mod->questions, q);
 			snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
 		}
 		else
