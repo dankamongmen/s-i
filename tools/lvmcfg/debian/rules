@@ -1,0 +1,44 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+export DH_COMPAT=4
+
+VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+PACKAGE=lvmcfg
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	rm -f debian/lvmcfg.postinst
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	install -m755 lvmcfg.sh debian/lvmcfg.postinst
+
+# Build architecture-independent files here.
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf	
+	dh_fixperms
+	dh_installdeb
+	install debian/menutest debian/$(PACKAGE)/DEBIAN/menutest
+	dpkg-gencontrol -Pdebian/$(PACKAGE) -p$(PACKAGE) -n$(PACKAGE)_$(VERSION)_all.udeb
+	cd debian && dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_all.udeb
+
+# Build architecture-dependent files here.
+binary-arch: build install
+# We have nothing to do by default.
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
