@@ -111,11 +111,10 @@ char *normalize_devfs(const char* path)
     }
     partnum = minor(statbuf.st_rdev) - de->minor;
 
-    retval = malloc(5 + strlen(de->name)+ 1); /* I hope this is long enough */
     if (0 == partnum)
-        sprintf(retval, "/dev/%s", de->name);
+        asprintf(&retval, "/dev/%s", de->name);
     else
-        sprintf(retval, "/dev/%s%d", de->name, partnum);
+        asprintf(&retval, "/dev/%s%d", de->name, partnum);
 
     return retval;
 }
