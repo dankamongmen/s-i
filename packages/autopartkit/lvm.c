@@ -321,7 +321,7 @@ lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
 	      13 - physical extent size
 	      16 - free number of physical extents for this volume group
 	    */
-	    // printf("DEBUG (%i): %s\n", i, token);
+	    /* printf("DEBUG (%i): %s\n", i, token); */
 	    if (i == 12) vg_size = atoi(token);
 	    else if (i == 13) pe_size = atoi(token);
 	    else if (i == 16)free_pe = atoi(token);
