@@ -390,7 +390,6 @@ int main (int argc, char **argv) {
 				break;
 			}
 		di_list_free(packages, di_pkg_free);
-		exit(0);
 		packages = status_read();
 	}
 	
