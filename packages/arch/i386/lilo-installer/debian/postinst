@@ -254,7 +254,7 @@ count=2
 
 if [ -n "$probed" ]; then
   for os in $probed; do
-    partition=$(echo $os | cut -d: -f1)
+    partition=$(mapdevfs $(echo $os | cut -d: -f1))
     label=$(echo $os | cut -d: -f3)
     cat >> /target/etc/lilo.conf <<EOF
 other=$partition
