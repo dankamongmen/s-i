@@ -6,6 +6,12 @@
 #   LANGNAME="langname"
 #   . languagemap
 
+for list in /etc/languagelist /usr/share/languagelist ./languagelist ; do 
+    if [ -f "$list" ] ; then
+	languages="$list"
+    fi
+done
+
 # The prefered locale (sent to base-config)
 LOCALE=C
 
@@ -19,170 +25,27 @@ LANGUAGELIST=
 # The assumed country (location)
 COUNTRY=us
 
-# echo "Testing '$LANGNAME'"
+# echo "Looking up '$LANGNAME'"
 
-case "$LANGNAME" in
-	'English (American)')
-		LOCALE=en_US
-		LANGUAGE=en
-		COUNTRY=US
-		;;
-	'English (British)')
-		LOCALE=en_UK
-		LANGUAGE=en
-		COUNTRY=UK
-		;;
-	'Catalan')
-		LOCALE=ca_ES
-		LANGUAGE=ca
-		LANGUAGELIST=ca:es
-		COUNTRY=ES
-		;;
-	'Chinese (Simplified)')
-		LOCALE=zh_CN
-		LANGUAGE=zh
-		COUNTRY=CN
-		;;
-	'Chinese (Traditional)')
-		LOCALE=zh_TW
-		LANGUAGE=zh
-		COUNTRY=TW
-		;;
-	'Croatian')
-		LOCALE=hr_HR
-		LANGUAGE=hr
-		COUNTRY=HR
-		;;
-	'Danish')
-		LOCALE=da_DK
-		LANGUAGE=da
-		COUNTRY=DK
-		;;
-	'Dutch')
-		LOCALE=nl_NL
-		LANGUAGE=nl
-		# FIXME Dutch also used in Belgium
-		COUNTRY=NL
-		;;
-	'Esperanto')
-		LOCALE=eo_XX
-		LANGUAGE=eo
-		COUNTRY=
-		;;
-	'Finnish')
-		LOCALE=fi_FI
-		LANGUAGE=fi
-		LANGUAGELIST=fi:se
-		COUNTRY=FI
-		;;
-	'French (France)')
-		LOCALE=fr_FR
-		LANGUAGE=fr
-		COUNTRY=FR
-		;;
-	'Galician')
-		LOCALE=gl_ES
-		LANGUAGE=gl
-		LANGUAGELIST=gl:es
-		COUNTRY=ES
-		;;
-	'German (Germany)')
-		LOCALE=de_DE
-		LANGUAGE=de
-		COUNTRY=DE
-		;;
-	'Hungarian')
-		LOCALE=hu_HU
-		LANGUAGE=hu
-		COUNTRY=HU
-		;;
-	'Irish')
-		LOCALE=ga_IE
-		LANGUAGE=ga
-		LANGUAGELIST=ga:en_IE
-		COUNTRY=IE
-		;;
-	'Italian')
-		LOCALE=it_IT
-		LANGUAGE=it
-		COUNTRY=IT
-		;;
-	'Japanese')
-		LOCALE=ja_JP
-		LANGUAGE=ja
-		COUNTRY=JP
-		;;
-	'Korean')
-		LOCALE=ko_KR
-		LANGUAGE=ko
-		# Could be both 'KR' (South) and 'KP' (North), but the
-		# locale is using 'KR' so we use it as the country.
-		COUNTRY=KR
-		;;
-	'Latvian')
-		LOCALE=lv_LV
-		LANGUAGE=lv
-		COUNTRY=LV
-		;;
-	'Northern Saami (Norway)')
-		LOCALE=se_NO
-		LANGUAGE=se
-		LANGUAGELIST=se:nb:no:nn:no_NY:da:sv
-		COUNTRY=NO
-		;;
-	'Norwegian Bokmaal')
-		LOCALE=no_NO
-		LANGUAGE=nb
-		LANGUAGELIST=nb:no:nn:no_NY:da:sv
-		COUNTRY=NO
-		;;
-	'Norwegian Nynorsk')
-		LOCALE=nn_NO
-		LANGUAGE=nn
-		LANGUAGELIST=nn:no_NY:nb:no:da:sv
-		COUNTRY=NO
-		;;
-	'Polish')
-		LOCALE=pl_PL
-		LANGUAGE=pl
-		COUNTRY=PL
-		;;
-	'Portuguese (Brazil)')
-		LOCALE=pt_PT
-		LANGUAGE=pt
-		LANGUAGELIST=pt_BR:pt:pt_PT
-		COUNTRY=BR
-		;;
-	'Portuguese (Portugal)')
-		LOCALE=pt_PT
-		LANGUAGE=pt
-		LANGUAGELIST=pt_PR:pt:pt_BR
-		COUNTRY=PT
-		;;
-	'Russian')
-		LOCALE=ru_RU
-		LANGUAGE=ru
-		COUNTRY=RU
-		;;
-	'Spanish (Spain)')
-		LOCALE=es_ES
-		LANGUAGE=es
-		COUNTRY=ES
-		;;
-	'Swedish (Sweden)')
-		LOCALE=sv_SE
-		LANGUAGE=sv
-		COUNTRY=SE
-		;;
-	'Turkish')
-		LOCALE=tr_TR
-		LANGUAGE=tr
-		COUNTRY=TR
-		;;
-	*)
-		;;
-esac
+line=`grep "^$LANGNAME" $languages`
+#echo L: $line 1>&2
 
-if [ -z "$LANGUAGELIST" ] ; then
-    LANGUAGELIST="$LANGUAGE"
+if [ "$line" ] ; then
+    OLD_IFS="$IFS"
+    IFS=';'
+    set $line
+    IFS="$OLD_IFS"
+
+    #echo "C: $*"
+
+    if [ "$2" ] ; then LOCALE="$2"; fi
+    if [ "$3" ] ; then LANGUAGE="$3"; fi
+    if [ "$4" ] ; then COUNTRY="$4"; fi
+    if [ "$5" ] ; then LANGUAGELIST="$5"; fi
+
+    if [ -z "$LANGUAGELIST" ] ; then
+	LANGUAGELIST="$LANGUAGE"
+    fi
+else
+    echo "error: Unable to locate info on language '$LANGNAME'"
 fi
