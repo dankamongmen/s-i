@@ -8,7 +8,7 @@
 #include "choose-yaboot-disk.h"
 
 void unmount_proc() {
-  system("umount /target/proc >>/var/log/messages 2>&1");
+  di_exec_shell_log("umount /target/proc");
 }
 
 PedExceptionOption exception_handler(PedException *ex) {
@@ -138,8 +138,8 @@ int generate_yabootconf(const char *boot_devfs, const char *root_devfs) {
   FILE *conf = NULL, *ofpath = NULL;
 
   /* convert paths to non-devfs */
-  di_mapdevfs(boot_devfs, boot, PATH_MAX);
-  di_mapdevfs(root_devfs, root, PATH_MAX);
+  di_system_devfs_map_from(boot_devfs, boot, PATH_MAX);
+  di_system_devfs_map_from(root_devfs, root, PATH_MAX);
 
   /* split disk device and partitionnr of root partition */ 
   len = strcspn(root, "0123456789");
@@ -254,6 +254,9 @@ int main(int argc, char **argv) {
 	/* initialize debconf */
 	debconf = debconfclient_new();
 
+   /* initialize libd-i */
+   di_system_init("yaboot-installer");
+
 	/* first, check if this machine as newworld */
    /* FIXME: this is currently broken (needs new subarch detection)	
      if(get_powerpc_type() != 0) {
@@ -334,7 +337,7 @@ int main(int argc, char **argv) {
 
    /* mkofboot needs proc
       running them in chroot /target */
-   i = system("mount -t proc none /target/proc >>/var/log/messages 2>&1");
+   i = di_exec_shell_log("mount -t proc none /target/proc");
    atexit((void*)unmount_proc);
    if (i != 0) {
      debconf_fset(debconf, "yaboot-installer/mounterr", "seen", "false");
@@ -356,7 +359,7 @@ int main(int argc, char **argv) {
 	}
 	
 	/* running "mkofboot" */
-	i = system("chroot /target /usr/sbin/mkofboot -v -f >>/var/log/messages 2>&1");
+	i = di_exec_shell_log("chroot /target /usr/sbin/mkofboot -v -f");
 	if(WEXITSTATUS(i) != 0) {
 		debconf_fset(debconf, "yaboot-installer/ybinerr",
 			     "seen", "false");
