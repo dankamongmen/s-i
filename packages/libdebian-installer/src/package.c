@@ -196,18 +196,3 @@ int internal_di_package_array_text_from_rstring (const char *const *array, const
   return 0;
 }
 
-di_package_priority di_package_priority_text_from_real_4_1 (const char *text) __attribute__ ((unused));
-di_package_priority di_package_priority_text_from_real_4_1 (const char *text)
-{
-  return di_package_priority_text_from (text);
-}
-
-const char *di_package_priority_text_to_real_4_1 (const di_package_priority priority) __attribute__ ((unused));
-const char *di_package_priority_text_to_real_4_1 (const di_package_priority priority)
-{
-  return di_package_priority_text_to (priority);
-}
-
-__asm__ (".symver di_package_priority_text_from_real_4_1,di_package_priority_text_from@LIBDI_4.1");
-__asm__ (".symver di_package_priority_text_to_real_4_1,di_package_priority_text_to@LIBDI_4.1");
-
