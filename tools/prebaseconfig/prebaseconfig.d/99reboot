@@ -1,17 +1,5 @@
 #! /bin/sh
 set -e
-. /usr/share/debconf/confmodule
-
-db_capb backup
-db_input critical prebaseconfig/reboot_in_progress || [ $? -eq 30 ]
-if ! db_go ; then
-    # abort
-    db_progress STOP
-    exit 10
-fi
-
-# Attempt to display the progress bar again before the reboot.
-db_progress STEP 1
 
 sync; sync; sync
 

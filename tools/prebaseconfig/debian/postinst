@@ -30,6 +30,11 @@ run_parts() {
             if "$script" 2> $tmpfile ; then
 		:
 	    else
+		if [ "$?" = 10 ]; then
+		    log "$script backed up"
+    		    db_progress STOP
+		    exit 10
+		fi
 		log "warning: $script returned error code $?"
 	    fi
 	    if [ -s "$tmpfile" ] ; then
