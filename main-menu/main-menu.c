@@ -215,13 +215,13 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	return ret;
 }
 
-static int config_package(struct package_t *);
+static void check_special(struct package_t *p);
 
 /*
  * Satisfy the dependencies of a virtual package. Its dependencies
  * that actually provide the package are presented in a debconf select
  * question for the user to pick and choose. Other dependencies are
- * just fed recursively through config_package.
+ * just fed recursively through di_config_package.
  */
 static int satisfy_virtual(struct package_t *p) {
 	struct debconfclient *debconf = NULL;
@@ -242,7 +242,7 @@ static int satisfy_virtual(struct package_t *p) {
 			continue;
 		if (!di_pkg_provides(dep, p)) {
 			/* Non-providing dependency */
-			if (dep->status != installed && !config_package(dep))
+			if (dep->status != installed && !di_config_package(dep, satisfy_virtual, check_special))
 				return 0;
 			continue;
 		}
@@ -309,7 +309,7 @@ static int satisfy_virtual(struct package_t *p) {
 				/* Ick. If we have a menu item it has to match the
 				 * debconf choice, otherwise we configure all of
 				 * the providing packages */
-				if (!config_package(dep))
+				if (!di_config_package(dep, satisfy_virtual, check_special))
 					return 0;
 				if (is_menu_item)
 					break;
@@ -352,49 +352,6 @@ check_special(struct package_t *p)
 		}
 }
 
-/*
- * Configure all dependencies, special case for virtual packages.
- * This is done depth-first.
- */
-static int
-config_package(struct package_t *p) {
-	char *configcommand;
-	int ret, i;
-	struct package_t *dep;
-
-	if (di_pkg_is_virtual(p)) {
-		return satisfy_virtual(p);
-	}
-
-	for (i = 0; p->depends[i] != 0; i++) {
-		if ((dep = p->depends[i]->ptr) == NULL)
-			continue;
-		if (dep->status == installed)
-			continue;
-		/* Recursively configure this package */
-		if (!config_package(dep))
-			return 0;
-	}
-
-	if (asprintf(&configcommand, "exec " DPKG_CONFIGURE_COMMAND " %s", p->package) == -1) {
-		return 0;
-	}
-	ret = SYSTEM(configcommand);
-	free(configcommand);
-        if (ret == 0) {
-            p->status = installed;
-	    check_special(p);
-        } else {
-            char buf[256];
-            snprintf(buf, sizeof(buf),
-                     "Configuring '%s' failed with error code %d",
-                     p->package, ret);
-            di_log(buf);
-            p->status = half_configured;
-	}
-	return !ret;
-}
-
 int do_menu_item(struct package_t *p) {
 	char *configcommand;
 	int ret = 0;
@@ -423,7 +380,7 @@ int do_menu_item(struct package_t *p) {
                 ret = !ret;
 	}
 	else if (p->status == unpacked || p->status == half_configured) {
-		ret = config_package(p);
+		ret = di_config_package(p, satisfy_virtual, check_special);
 	}
 
 	return ret;
