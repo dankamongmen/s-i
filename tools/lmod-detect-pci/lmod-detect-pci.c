@@ -58,7 +58,7 @@ int main(void)
 			while (module_list[i].id[j].vendor != 0) {
 				if ((dev->vendor_id == module_list[i].id[j].vendor) &&
 						(dev->device_id == module_list[i].id[j].device)) {
-					printf("%s.o\n", module_list[i].name);
+					printf("%s\n", module_list[i].name);
 //					printf("vendor %x, device %x\n", 
 //						module_list[i].id[j].vendor,
 //						module_list[i].id[j].device);
