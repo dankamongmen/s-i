@@ -115,7 +115,7 @@ choose_retriever(void)
 	if (ret_default != NULL)
 		ret_default += 2;
 	else
-		ret_choices;
+		ret_default = ret_choices;
 
 	debconf = debconfclient_new();
 	debconf->command(debconf, "TITLE", "Choose Retriever", NULL);
