@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: packages.c,v 1.2 2003/09/15 20:02:47 waldi Exp $
  */
 
 #include <debian-installer/system/packages.h>
@@ -40,19 +40,19 @@ const di_parser_fieldinfo *di_system_packages_parser_fieldinfo[] =
   NULL
 };
 
-di_packages *di_system_packages_alloc (void)
+di_packages_allocator *di_system_packages_allocator_alloc (void)
 {
-  di_packages *ret;
+  di_packages_allocator *ret;
 
-  ret = internal_di_packages_alloc ();
+  ret = internal_di_packages_allocator_alloc ();
   ret->package_mem_chunk = di_mem_chunk_new (sizeof (di_system_package), 16384);
 
   return ret;
 }
 
-void di_system_packages_free (di_packages *packages)
+void di_system_packages_allocator_free (di_packages_allocator *allocator)
 {
-  di_packages_free (packages);
+  di_packages_allocator_free (allocator);
 }
 
 di_parser_info *internal_di_system_packages_parser_info (void)

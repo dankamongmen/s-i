@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.2 2003/09/06 21:11:46 waldi Exp $
+ * $Id: packages.c,v 1.3 2003/09/15 20:02:47 waldi Exp $
  */
 
 #include <debian-installer/packages.h>
@@ -47,6 +47,14 @@ const di_parser_fieldinfo
     (
       "Package",
       di_packages_parser_read_name,
+      di_parser_write_string,
+      offsetof (di_package, key.string)
+    ),
+  internal_di_packages_parser_field_package_string = 
+    DI_PARSER_FIELDINFO
+    (
+      "Package",
+      di_parser_read_string,
       di_parser_write_string,
       offsetof (di_package, key.string)
     ),
@@ -240,6 +248,34 @@ const di_parser_fieldinfo *di_packages_parser_fieldinfo[] =
 };
 
 /**
+ * Standard package control file
+ */
+const di_parser_fieldinfo *di_packages_control_parser_fieldinfo[] =
+{
+  &internal_di_packages_parser_field_package_string,
+  &internal_di_packages_parser_field_essential,
+  &internal_di_packages_parser_field_priority,
+  &internal_di_packages_parser_field_section,
+  &internal_di_packages_parser_field_installed_size,
+  &internal_di_packages_parser_field_maintainer,
+  &internal_di_packages_parser_field_architecture,
+  &internal_di_packages_parser_field_version,
+  &internal_di_packages_parser_field_replaces,
+  &internal_di_packages_parser_field_provides,
+  &internal_di_packages_parser_field_depends,
+  &internal_di_packages_parser_field_pre_depends,
+  &internal_di_packages_parser_field_recommends,
+  &internal_di_packages_parser_field_suggests,
+  &internal_di_packages_parser_field_conflicts,
+  &internal_di_packages_parser_field_enhances,
+  &internal_di_packages_parser_field_filename,
+  &internal_di_packages_parser_field_size,
+  &internal_di_packages_parser_field_md5sum,
+  &internal_di_packages_parser_field_description,
+  NULL
+};
+
+/**
  * Standard status file
  */
 const di_parser_fieldinfo *di_packages_status_parser_fieldinfo[] =
@@ -288,6 +324,9 @@ static void di_package_destroy_func (void *data)
   di_package *package = data;
 
   di_free (package->key.string);
+  di_free (package->section);
+  di_free (package->maintainer);
+  di_free (package->architecture);
   di_free (package->version);
   di_free (package->filename);
   di_free (package->md5sum);
@@ -300,7 +339,20 @@ di_packages *di_packages_alloc (void)
 {
   di_packages *ret;
 
-  ret = internal_di_packages_alloc ();
+  ret = di_new0 (di_packages, 1);
+  ret->table = di_hash_table_new_full (di_rstring_hash, di_rstring_equal, NULL, di_package_destroy_func);
+
+  return ret;
+}
+
+/**
+ * Allocate di_packages_allocator
+ */
+di_packages_allocator *di_packages_allocator_alloc (void)
+{
+  di_packages_allocator *ret;
+
+  ret = internal_di_packages_allocator_alloc ();
   ret->package_mem_chunk = di_mem_chunk_new (sizeof (di_package), 16384);
 
   return ret;
@@ -308,16 +360,16 @@ di_packages *di_packages_alloc (void)
 
 /**
  * @internal
- * Partially allocate di_packages
+ * Partially allocate di_packages_allocator
  */
-di_packages *internal_di_packages_alloc (void)
+di_packages_allocator *internal_di_packages_allocator_alloc (void)
 {
-  di_packages *ret;
+  di_packages_allocator *ret;
 
-  ret = di_new0 (di_packages, 1);
-  ret->table = di_hash_table_new_full (di_rstring_hash, di_rstring_equal, NULL, di_package_destroy_func);
+  ret = di_new0 (di_packages_allocator, 1);
   ret->package_dependency_mem_chunk = di_mem_chunk_new (sizeof (di_package_dependency), 4096);
   ret->package_dependency_group_mem_chunk = di_mem_chunk_new (sizeof (di_package_dependency_group), 4096);
+  ret->package_description_mem_chunk = di_mem_chunk_new (sizeof (di_package_description), 4096);
   ret->slist_node_mem_chunk = di_mem_chunk_new (sizeof (di_slist_node), 4096);
 
   return ret;
@@ -329,11 +381,20 @@ di_packages *internal_di_packages_alloc (void)
 void di_packages_free (di_packages *packages)
 {
   di_hash_table_destroy (packages->table);
-  di_mem_chunk_destroy (packages->package_mem_chunk);
-  di_mem_chunk_destroy (packages->package_dependency_mem_chunk);
-  di_mem_chunk_destroy (packages->package_dependency_group_mem_chunk);
-  di_mem_chunk_destroy (packages->slist_node_mem_chunk);
   di_free (packages);
+}
+
+/**
+ * Free di_packages_allocator
+ */
+void di_packages_allocator_free (di_packages_allocator *allocator)
+{
+  di_mem_chunk_destroy (allocator->package_mem_chunk);
+  di_mem_chunk_destroy (allocator->package_dependency_mem_chunk);
+  di_mem_chunk_destroy (allocator->package_dependency_group_mem_chunk);
+  di_mem_chunk_destroy (allocator->package_description_mem_chunk);
+  di_mem_chunk_destroy (allocator->slist_node_mem_chunk);
+  di_free (allocator);
 }
 
 /**
@@ -346,6 +407,26 @@ di_parser_info *internal_di_packages_parser_info (void)
 
   info = di_parser_info_alloc ();
   di_parser_info_add_pointer (info, di_packages_parser_fieldinfo);
+
+  return info;
+}
+
+static void *control_parser_new (void *user_data)
+{
+  di_packages_parser_data *parser_data = user_data;
+  return parser_data->package;
+}
+
+/**
+ * @internal
+ * Get parser info for standard packages control file
+ */
+di_parser_info *internal_di_packages_control_parser_info (void)
+{
+  di_parser_info *info;
+
+  info = di_parser_info_alloc ();
+  di_parser_info_add_pointer (info, di_packages_control_parser_fieldinfo);
 
   return info;
 }
@@ -369,13 +450,13 @@ di_parser_info *internal_di_packages_status_parser_info (void)
  *
  * @param file file to read
  */
-di_packages *di_packages_read_file (const char *file)
+di_packages *di_packages_read_file (const char *file, di_packages_allocator *allocator)
 {
   di_packages *packages;
   di_parser_info *info;
 
   info = internal_di_packages_parser_info ();
-  packages = di_packages_read_file_special (file, info);
+  packages = di_packages_read_file_special (file, allocator, info);
   di_parser_info_free (info);
 
   return packages;
@@ -387,19 +468,46 @@ di_packages *di_packages_read_file (const char *file)
  * @param file file to read
  * @param info parser info
  */
-di_packages *di_packages_read_file_special (const char *file, di_parser_info *info)
+di_packages *di_packages_read_file_special (const char *file, di_packages_allocator *allocator, di_parser_info *info)
 {
-  di_packages *packages;
+  di_packages_parser_data data;
 
-  packages = di_packages_alloc ();
+  data.allocator = allocator;
+  data.packages = di_packages_alloc ();
 
-  if (di_parser_rfc822_read_file (file, info, NULL, NULL, packages) < 0)
+  if (di_parser_rfc822_read_file (file, info, NULL, NULL, &data) < 0)
   {
-    di_packages_free (packages);
+    di_packages_free (data.packages);
     return NULL;
   }
 
-  return packages;
+  return data.packages;
+}
+
+/**
+ * Read a package control file
+ *
+ * @param file file to read
+ */
+di_package *di_packages_control_read_file_special (const char *file, di_packages_allocator *allocator)
+{
+  di_packages_parser_data data;
+  di_parser_info *info;
+
+  data.allocator = allocator;
+  data.package = di_mem_chunk_alloc (allocator->package_mem_chunk);
+
+  info = internal_di_packages_control_parser_info ();
+
+  if (di_parser_rfc822_read_file (file, info, NULL, NULL, &data) < 0)
+  {
+    di_parser_info_free (info);
+    di_packages_free (data.packages);
+    return NULL;
+  }
+
+  di_parser_info_free (info);
+  return data.package;
 }
 
 /**
@@ -407,13 +515,13 @@ di_packages *di_packages_read_file_special (const char *file, di_parser_info *in
  *
  * @param file file to read
  */
-di_packages *di_packages_status_read_file (const char *file)
+di_packages *di_packages_status_read_file (const char *file, di_packages_allocator *allocator)
 {
   di_packages *packages;
   di_parser_info *info;
 
   info = internal_di_packages_status_parser_info ();
-  packages = di_packages_read_file_special (file, info);
+  packages = di_packages_read_file_special (file, allocator, info);
   di_parser_info_free (info);
 
   return packages;
@@ -517,7 +625,7 @@ di_package *di_packages_get_package (di_packages *packages, const char *name, si
  *
  * @return the package
  */
-di_package *di_packages_get_package_new (di_packages *packages, char *name, size_t n)
+di_package *di_packages_get_package_new (di_packages *packages, di_packages_allocator *allocator, char *name, size_t n)
 {
   di_package *ret = di_packages_get_package (packages, name, n);
 
@@ -525,7 +633,7 @@ di_package *di_packages_get_package_new (di_packages *packages, char *name, size
   {
     char *temp;
     temp = di_stradup (name, n);
-    ret = di_mem_chunk_alloc0 (packages->package_mem_chunk);
+    ret = di_mem_chunk_alloc0 (allocator->package_mem_chunk);
     ret->key.string = temp;
     ret->key.size = n;
 
@@ -535,17 +643,24 @@ di_package *di_packages_get_package_new (di_packages *packages, char *name, size
   return ret;
 }
 
-di_package_dependency *di_package_dependency_alloc (di_packages *packages)
+di_package_dependency *di_package_dependency_alloc (di_packages_allocator *allocator)
 {
   di_package_dependency *ret;
-  ret = di_mem_chunk_alloc0 (packages->package_dependency_mem_chunk);
+  ret = di_mem_chunk_alloc0 (allocator->package_dependency_mem_chunk);
   return ret;
 }
 
-di_package_dependency_group *di_package_dependency_group_alloc (di_packages *packages)
+di_package_dependency_group *di_package_dependency_group_alloc (di_packages_allocator *allocator)
 {
   di_package_dependency_group *ret;
-  ret = di_mem_chunk_alloc0 (packages->package_dependency_group_mem_chunk);
+  ret = di_mem_chunk_alloc0 (allocator->package_dependency_group_mem_chunk);
+  return ret;
+}
+
+di_package_description *di_package_description_alloc (di_packages_allocator *allocator)
+{
+  di_package_description *ret;
+  ret = di_mem_chunk_alloc0 (allocator->package_description_mem_chunk);
   return ret;
 }
 
@@ -556,13 +671,13 @@ void di_packages_parser_read_dependency (data, fip, field_modifier, value, user_
   di_rstring *value;
   void *user_data __attribute__ ((unused));
 {
+  di_packages_parser_data *parser_data = user_data;
   di_package *p = *data, *q;
   char *cur = value->string, *end = value->string + value->size;
   char *namebegin, *fieldend;
   size_t namelen;
   di_package_dependency *d, *d1;
   di_package_dependency_group *g, *g1;
-  di_packages *packages = user_data;
 
   /*
    * Basic depends line parser. Can ignore versioning
@@ -573,15 +688,15 @@ void di_packages_parser_read_dependency (data, fip, field_modifier, value, user_
     namebegin = cur;
     namelen = strcspn (cur, " \t\n(,|");
 
-    d = di_package_dependency_alloc (packages);
-    g = di_package_dependency_group_alloc (packages);
+    d = di_package_dependency_alloc (parser_data->allocator);
+    g = di_package_dependency_group_alloc (parser_data->allocator);
 
-    q = di_packages_get_package_new (packages, namebegin, namelen);
+    q = di_packages_get_package_new (parser_data->packages, parser_data->allocator, namebegin, namelen);
 
     d->ptr = q;
     g->type = fip->integer;
-    di_slist_append_chunk (&g->list, d, packages->slist_node_mem_chunk);
-    di_slist_append_chunk (&p->depends, g, packages->slist_node_mem_chunk);
+    di_slist_append_chunk (&g->list, d, parser_data->allocator->slist_node_mem_chunk);
+    di_slist_append_chunk (&p->depends, g, parser_data->allocator->slist_node_mem_chunk);
 
     if (g->type == di_package_dependency_type_provides)
     {
@@ -590,13 +705,13 @@ void di_packages_parser_read_dependency (data, fip, field_modifier, value, user_
       if (q->type == di_package_type_virtual_package && q->priority < p->priority)
         q->priority = p->priority;
 
-      d1 = di_package_dependency_alloc (packages);
-      g1 = di_package_dependency_group_alloc (packages);
+      d1 = di_package_dependency_alloc (parser_data->allocator);
+      g1 = di_package_dependency_group_alloc (parser_data->allocator);
 
       d1->ptr = p;
       g1->type = di_package_dependency_type_reverse_provides;
-      di_slist_append_chunk (&g1->list, d1, packages->slist_node_mem_chunk);
-      di_slist_append_chunk (&q->depends, g1, packages->slist_node_mem_chunk);
+      di_slist_append_chunk (&g1->list, d1, parser_data->allocator->slist_node_mem_chunk);
+      di_slist_append_chunk (&q->depends, g1, parser_data->allocator->slist_node_mem_chunk);
     }
 
     fieldend = cur + strcspn (cur, "\n,");
@@ -621,8 +736,37 @@ void di_packages_parser_read_description (data, fip, field_modifier, value, user
   di_rstring *value;
   void *user_data __attribute__ ((unused));
 {
-  di_package *p __attribute__ ((unused)) = *data;
-  (void) value->string;
+  di_packages_parser_data *parser_data = user_data;
+  di_package *p = *data;
+  di_package_description *d = di_package_description_alloc (parser_data->allocator);
+  char *temp;
+
+  d->language = di_stradup (field_modifier->string, field_modifier->size);
+
+  temp = memchr (value->string, '\n', value->size);
+  if (temp)
+  {
+    d->short_description = di_stradup (value->string, temp - value->string - 1);
+    d->description = di_stradup (temp, (value->string + value->size) - temp - 1);
+  }
+  else
+    d->short_description = di_stradup (value->string, value->size);
+}
+
+void di_packages_parser_write_description (data, fip, callback, callback_data, user_data)
+  void **data;
+  const di_parser_fieldinfo *fip;
+  di_parser_fields_function_write_callback callback;
+  void *callback_data;
+  void *user_data __attribute__ ((unused));
+{
+  di_packages_parser_data *parser_data = user_data;
+  di_package *p = *data;
+  di_slist_node *node;
+
+  for (node = p->descriptions.first; node; node = node->next)
+  {
+  }
 }
 
 void di_packages_parser_read_name (data, fip, field_modifier, value, user_data)
@@ -632,11 +776,11 @@ void di_packages_parser_read_name (data, fip, field_modifier, value, user_data)
   di_rstring *value;
   void *user_data __attribute__ ((unused));
 {
+  di_packages_parser_data *parser_data = user_data;
   di_package *p;
-  di_packages *packages = user_data;
-  p = di_packages_get_package_new (packages, value->string, value->size);
+  p = di_packages_get_package_new (parser_data->packages, parser_data->allocator, value->string, value->size);
   p->type = di_package_type_real_package;
-  di_slist_append (&packages->list, p);
+  di_slist_append_chunk (&parser_data->packages->list, p, parser_data->allocator->slist_node_mem_chunk);
   *data = p;
 }
 
@@ -770,7 +914,7 @@ void di_packages_parser_write_status (data, fip, callback, callback_data, user_d
     }
 }
 
-static void resolve_dependencies_recurse (di_slist *install, di_package *package, unsigned int resolver)
+static void resolve_dependencies_recurse (di_slist *install, di_package *package, di_packages_allocator *allocator, unsigned int resolver)
 {
   di_slist_node *node;
   di_package *last_provide;
@@ -794,11 +938,11 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
             if (package->priority > d->ptr->priority)
               fprintf (stderr, "broken dependency: %s to %s\n", package->key.string, d->ptr->key.string);
 #endif
-            resolve_dependencies_recurse (install, d->ptr, resolver);
+            resolve_dependencies_recurse (install, d->ptr, allocator, resolver);
           }
         }
 
-        di_slist_append (install, package);
+        di_slist_append_chunk (install, package, allocator->slist_node_mem_chunk);
         break;
 
       case di_package_type_virtual_package:
@@ -818,7 +962,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
         }
 
         if (last_provide)
-          resolve_dependencies_recurse (install, last_provide, resolver);
+          resolve_dependencies_recurse (install, last_provide, allocator, resolver);
         break;
 
       case di_package_type_non_existent:
@@ -828,7 +972,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
   }
 }
 
-di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *list)
+di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *list, di_packages_allocator *allocator)
 {
   di_slist *install = di_slist_alloc ();
   di_slist_node *node;
@@ -850,7 +994,7 @@ di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *lis
   for (node = list->first; node; node = node->next)
   {
     di_package *p = node->data;
-    resolve_dependencies_recurse (install, p, packages->resolver);
+    resolve_dependencies_recurse (install, p, allocator, packages->resolver);
   }
 
   return install;

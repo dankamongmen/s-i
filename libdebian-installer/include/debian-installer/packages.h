@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.2 2003/09/06 21:11:46 waldi Exp $
+ * $Id: packages.h,v 1.3 2003/09/15 20:02:46 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGES_H
@@ -35,6 +35,8 @@ typedef struct di_package_dependency di_package_dependency;
 typedef struct di_package_dependency_group di_package_dependency_group;
 typedef struct di_package_description di_package_description;
 typedef struct di_packages di_packages;
+typedef struct di_packages_allocator di_packages_allocator;
+typedef struct di_packages_parser_data di_packages_parser_data;
 
 typedef enum di_package_dependency_type di_package_dependency_type;
 typedef enum di_package_priority di_package_priority;
@@ -117,7 +119,7 @@ struct di_package
   char *filename;                                       /**< Filename field */
   size_t size;                                          /**< Size field */
   char *md5sum;                                         /**< MD5Sum field */
-  di_package_description *description;                  /**< Descriptions */
+  di_slist descriptions;                                /**< Description fields */
   unsigned int resolver;                                /**< @internal */
 };
 
@@ -134,7 +136,8 @@ enum di_package_dependency_type
   di_package_dependency_type_suggests,                  /**< Suggests field */
   di_package_dependency_type_conflicts,                 /**< Conflicts field */
   di_package_dependency_type_enhances,                  /**< Enhances field */
-  di_package_dependency_type_reverse_provides,          /**< @internal */
+  di_package_dependency_type_reverse_provides = 0x100,  /**< @internal */
+  di_package_dependency_type_reverse_enhances,          /**< @internal */
 };
 
 /**
@@ -155,21 +158,43 @@ struct di_package_dependency_group
 };
 
 /**
+ * @brief Package description
+ */
+struct di_package_description
+{
+  char *language;                                       /**< language for description, "" for default */
+  char *short_description;                              /**< description */
+  char *description;                                    /**< description */
+};
+
+/**
  * @brief Packages file
  */
 struct di_packages
 {
   di_hash_table *table;                                 /**< includes di_package */
   di_slist list;                                        /**< includes di_package */
+  unsigned int resolver;                                /**< @internal */
+};
+
+/**
+ * @internal
+ * @brief Packages file - Allocator
+ */
+struct di_packages_allocator
+{
   di_mem_chunk *package_mem_chunk;                      /**< @internal */
   di_mem_chunk *package_dependency_mem_chunk;           /**< @internal */
   di_mem_chunk *package_dependency_group_mem_chunk;     /**< @internal */
+  di_mem_chunk *package_description_mem_chunk;          /**< @internal */
   di_mem_chunk *slist_node_mem_chunk;                   /**< @internal */
-  unsigned int resolver;                                /**< @internal */
 };
 
 di_packages *di_packages_alloc (void);
 void di_packages_free (di_packages *packages);
+
+di_packages_allocator *di_packages_allocator_alloc (void);
+void di_packages_allocator_free (di_packages_allocator *packages);
 
 /**
  * @}
@@ -177,9 +202,20 @@ void di_packages_free (di_packages *packages);
  * @{
  */
 
-di_packages *di_packages_read_file (const char *file);
-di_packages *di_packages_read_file_special (const char *file, di_parser_info *info);
-di_packages *di_packages_status_read_file (const char *file);
+struct di_packages_parser_data
+{
+  union
+  {
+    di_package *package;
+    di_packages *packages;
+  };
+  di_packages_allocator *allocator;
+};
+
+di_packages *di_packages_read_file (const char *file, di_packages_allocator *allocator);
+di_packages *di_packages_read_file_special (const char *file, di_packages_allocator *allocator, di_parser_info *info);
+di_package *di_packages_control_read_file (const char *file, di_packages_allocator *allocator);
+di_packages *di_packages_status_read_file (const char *file, di_packages_allocator *allocator);
 int di_packages_write_file (di_packages *packages, const char *file);
 int di_packages_status_write_file (di_packages *packages, const char *file);
 
@@ -190,12 +226,13 @@ int di_packages_status_write_file (di_packages *packages, const char *file);
  */
 
 di_package *di_packages_get_package (di_packages *packages, const char *name, size_t n);
-di_package *di_packages_get_package_new (di_packages *packages, char *name, size_t n);
+di_package *di_packages_get_package_new (di_packages *packages, di_packages_allocator *allocator, char *name, size_t n);
 
-di_package_dependency *di_package_dependency_alloc (di_packages *packages);
-di_package_dependency_group *di_package_dependency_group_alloc (di_packages *packages);
+di_package_dependency *di_package_dependency_alloc (di_packages_allocator *allocator);
+di_package_dependency_group *di_package_dependency_group_alloc (di_packages_allocator *allocator);
+di_package_description *di_package_description_alloc (di_packages_allocator *allocator);
 
-di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *list);
+di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *list, di_packages_allocator *allocator);
 
 /** @} */
 

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.c,v 1.1 2003/09/06 21:11:46 waldi Exp $
+ * $Id: dpkg.c,v 1.2 2003/09/15 20:02:47 waldi Exp $
  */
 
 #include <debian-installer/system/dpkg.h>
@@ -69,6 +69,54 @@ int di_system_dpkg_package_configure (di_packages *status, const char *_package,
   package->status = di_package_status_installed;
 
   return 0;
+}
+
+di_package *di_system_dpkg_package_control_read (di_packages_allocator *allocator, const char *filename)
+{
+  const char *argv_rm[] = { "/bin/rm", "-rf", NULL, NULL };
+  char buf[PATH_MAX];
+  char buf_tmpdir[PATH_MAX] = { '\0' };
+  char *tmpdir_rest;
+  di_ksize_t tmpdir_len, tmpdir_rest_len;
+  di_package *ret;
+  struct stat statbuf;
+
+  snprintf (buf_tmpdir, sizeof (buf_tmpdir) - 10, "%s/tmp.ci/", ADMINDIR);
+  tmpdir_len = strnlen (buf_tmpdir, sizeof (buf_tmpdir));
+
+  tmpdir_rest = buf_tmpdir + tmpdir_len;
+  tmpdir_rest_len = sizeof (buf_tmpdir) - tmpdir_len;
+
+  if (!stat (buf_tmpdir, &statbuf))
+  {
+    argv_rm[2] = buf_tmpdir;
+    if (di_exec (argv_rm[0], argv_rm))
+      return NULL;
+  }
+
+  if (mkdir (buf_tmpdir, 0700))
+    return NULL;
+  if (chdir (buf_tmpdir))
+    return NULL;
+
+  snprintf (buf, sizeof (buf), "ar -p %s control.tar.gz|tar -xzf -", filename);
+
+  if (di_exec_shell (buf))
+    return NULL;
+
+  strcpy (tmpdir_rest, "control");
+
+  if (stat (buf_tmpdir, &statbuf))
+    return NULL;
+
+  ret = di_packages_control_read_file (buf_tmpdir, allocator);
+
+  tmpdir_rest[0] = '\0';
+  argv_rm[2] = buf_tmpdir;
+  if (di_exec (argv_rm[0], argv_rm))
+    return NULL;
+
+  return ret;
 }
 
 int internal_di_system_dpkg_package_control_file_exec (di_package *package, const char *name, int argc, const char *const argv[])
@@ -140,8 +188,6 @@ int internal_di_system_dpkg_package_unpack_control (di_package *package, const c
     return -1;
 
   snprintf (buf, sizeof (buf), "ar -p %s control.tar.gz|tar -xzf -", filename);
-
-  package->status = di_package_status_half_installed;
 
   if (di_exec_shell (buf))
     return -2;

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser_rfc822.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: parser_rfc822.c,v 1.2 2003/09/15 20:02:47 waldi Exp $
  */
 
 #include <config.h>
@@ -207,6 +207,7 @@ int di_parser_rfc822_read_file (const char *file, di_parser_info *info, di_parse
     return -1;
   if (!(begin = mmap (NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0)))
     return -1;
+  madvise (begin, statbuf.st_size, MADV_SEQUENTIAL);
 
   if ((ret = di_parser_rfc822_read (begin, statbuf.st_size, info, entry_new, entry_finish, user_data)) < 0)
     return -1;

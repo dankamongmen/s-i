@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.h,v 1.1 2003/09/06 21:11:46 waldi Exp $
+ * $Id: dpkg.h,v 1.2 2003/09/15 20:02:46 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__DPKG_H
@@ -28,6 +28,7 @@
 #include <stdbool.h>
 
 int di_system_dpkg_package_configure (di_packages *status, const char *_package, bool force);
+di_package *di_system_dpkg_package_control_read (di_packages_allocator *allocator, const char *filename);
 int di_system_dpkg_package_control_file_exec (di_packages *status, const char *_package, const char *name, int argc, const char *const argv[]);
 int di_system_dpkg_package_unpack (di_packages *status, const char *package, const char *filename);
 
