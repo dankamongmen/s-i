@@ -62,15 +62,6 @@ for pofile in debian/po/*.po ; do
     # the translation with the templates translations
     if [ -f $ISO3166TRANSLATIONS/$pofilename ]
     then
-	cat debian/pobuild/templates.pot | 
-	    # the temporary po files will be UTF-8 encoded
-	    sed '/^\"Content-Type/s/CHARSET/UTF-8/' | 
-	    # We put back commas in msgid's
-	    sed '/^msgid/s/ -/,/' \
-	    > debian/pobuild/$pofilename.temp
-	
-	cp debian/pobuild/$pofilename.temp debian/pobuild/templates.pot.temp
-
 	# Munge the po file to have the indentmarker in its strings.
 	perl -pe 'BEGIN { $marker=shift } s/^msg(id|str) "(.+)"/msg$1 "$marker$2"/' "$INDENTMARKER" \
 		< $ISO3166TRANSLATIONS/$pofilename \
@@ -78,8 +69,8 @@ for pofile in debian/po/*.po ; do
 	
 	msgmerge -C debian/po/$pofilename \
                  -C $ISO3166TRANSLATIONS/$pofilename.munged \
-                 debian/pobuild/$pofilename.temp \
-                 debian/pobuild/templates.pot.temp | \
+                 /dev/null \
+                 debian/pobuild/templates.pot | \
                  sed '/^msgid/s/,/ -/' | \
                  sed '/^msgstr/s/,/ -/' \
 		 > debian/pobuild/$pofilename
