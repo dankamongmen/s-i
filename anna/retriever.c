@@ -45,19 +45,19 @@ struct package_t *get_packages (void) {
 			newp=(struct package_t *) malloc(sizeof(struct package_t));
 			newp->next = p;
 			p = newp;
-			p->package = buf + 9;
+			p->package = strdup(buf + 9);
 		}
 		else if (strstr(buf, "Installer-Menu-Item: ") == buf) {
 			p->installer_menu_item = atoi(buf + 21);
 		}
 		else if (strstr(buf, "Filename: ") == buf) {
-			p->filename = buf + 10;
+			p->filename = strdup(buf + 10);
 		}
 		else if (strstr(buf, "MD5sum: ") == buf) {
-			p->md5sum = buf + 8;
+			p->md5sum = strdup(buf + 8);
 		}
 	}
-
+	
 	return p;
 }
 
