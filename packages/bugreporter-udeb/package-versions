@@ -1,4 +1,6 @@
 #!/bin/sh
+
+grep "^\(Package\|Version\):" /var/lib/dpkg/status | \
 (
     while read tag content ; do
 	if [ "$tag" = "Package:" ] ; then
@@ -8,4 +10,4 @@
 	    echo "$package $content"
 	fi
     done
-) < /var/lib/dpkg/status
+)
