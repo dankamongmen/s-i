@@ -71,7 +71,9 @@ elsif ($action eq 'connect_cd') {
 	send_command('rib_info', qq{<EJECT_VIRTUAL_MEDIA DEVICE="CDROM"/>});
 	process_result();
 	send_command('rib_info', qq{<INSERT_VIRTUAL_MEDIA DEVICE="CDROM" IMAGE_URL="$ENV{HP_ILO_ISO_URL}"/>});
-	process_result();
+	exit process_result();
+}
+elsif ($action eq 'boot_cd') {
 	send_command('rib_info', qq{<SET_VM_STATUS DEVICE="CDROM">
 		<VM_BOOT_OPTION VALUE="BOOT_ONCE"/>
 	</SET_VM_STATUS>});
