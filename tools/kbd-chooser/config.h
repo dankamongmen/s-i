@@ -19,6 +19,8 @@
 
 #define PROGNAME "kbd-chooser"
 
+// #undef ENABLE_NLS
+
 // Define this if you want 2.5 kernel support
 
 // #define KERNEL_2_5 1

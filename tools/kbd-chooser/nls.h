@@ -1,10 +1,10 @@
 
 
-
 #ifndef LOCALEDIR
 #define LOCALEDIR "/usr/share/locale"
 #endif
 
+#include "config.h"
 # include <locale.h>
 
 #ifdef ENABLE_NLS

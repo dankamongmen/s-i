@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.7 2003/03/19 20:49:31 mckinstry Exp $
+ * $Id: kbd-chooser.h,v 1.8 2003/03/25 07:18:35 mckinstry Exp $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -33,7 +33,7 @@ typedef struct maplist_s {
 typedef struct kbd_s { 
 	char *name;		/* short name of kbd arch */
 	char *description;	/* description in english */
-	keymap_t *deflt;	/* default keymap for this keyboard */
+	char *deflt;	/* default keymap for this keyboard */
 	exists present;
 	int fd;			
 	struct kbd_s *next;
@@ -51,5 +51,14 @@ extern kbd_t *serial_kbd_get (kbd_t *keyboards);
 extern kbd_t *atari_kbd_get (kbd_t *keyboards);
 
 extern int grep (const char *file, const char *string);
+
+
+#ifdef SPARC
+#define PREFERRED_KBD "sparc"
+#endif
+
+#ifdef AT_KBD
+#define PREFERRED_KBD "ps2"
+#endif
 
 #endif

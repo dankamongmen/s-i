@@ -1,3 +1,4 @@
+#include "config.h"
 #include <linux/keyboard.h>
 #include <stdio.h>
 #include <string.h>
@@ -976,7 +977,7 @@ static sym iso_8859_7_syms[] = { /* 160-255 */
 };
 #endif // CHARSET_ISO_8859_7
 
-#ifdef CHARSET_ISO_8869_8
+#ifdef CHARSET_ISO_8859_8
 static sym iso_8859_8_syms[] = {
 	{ 0x00a0, "" },
 	{ 0xfffd, "" },
