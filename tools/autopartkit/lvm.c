@@ -47,13 +47,6 @@ lvm_isinstalled(void)
     struct stat statbuf;
     static int isinstalled = -1;
 
-#if 0
-    /* Disabled until I find a way to create both LVM partitions and
-       real partitions without the kernel caching an incorrect
-       partition table. */
-    isinstalled = FALSE;
-#endif
-
     if (isinstalled != -1)
       return isinstalled;
 
@@ -69,6 +62,13 @@ lvm_isinstalled(void)
     if (0 != stat(VGSCAN, &statbuf) || ! S_ISREG(statbuf.st_mode))
     {
         autopartkit_error(0, "Missing %s, no LVM support available.", VGSCAN);
+        isinstalled = FALSE;
+        return FALSE;
+    }
+
+    if (0 != stat("/etc/uselvm", &statbuf) || ! S_ISREG(statbuf.st_mode))
+    {
+        autopartkit_error(0, "Missing /etc/uselvm, no LVM support enabled.");
         isinstalled = FALSE;
         return FALSE;
     }
