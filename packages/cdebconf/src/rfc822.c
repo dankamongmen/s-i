@@ -15,7 +15,7 @@ static char *unescapestr(const char *in)
 }
 
 /*
- * Function: rc822db_parse_stanza
+ * Function: rfc822db_parse_stanza
  * Input: a FILE pointer to an open readable file containing a stanza in rfc822 
  *    format.
  * Output: a pointer to a dynamically allocated rfc822_header structure
