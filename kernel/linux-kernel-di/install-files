@@ -41,12 +41,17 @@ while (<KVERS>) {
 	chomp;
 	next if /^#/ || ! length;
 
-	my ($arch, $kernelversion, $flavour, $installedname, $multkern, $builddep)=split(' ', $_, 5);
+	my ($arch, $kernelversion, $flavour, $installedname, $multkern, $builddep)=split(' ', $_, 6);
 	if (! length $arch || ! length $kernelversion ||
-	    ! length $installedname || ! length $flavour) {
-		die "parse error";
+	    ! length $installedname || ! length $flavour || 
+	    ! length $builddep ) {
+		die "parse error: $_";
 	}
 	next unless $arch eq $hostarch;
+
+	if ($arch eq "m68k") {
+		$sourcedir="$ENV{PWD}/../m68k/$builddep";
+	}
 
 	my $extraname="";
 	if ($multkern =~ /^[yY]/) {
@@ -60,6 +65,9 @@ while (<KVERS>) {
 		"$sourcedir/boot/System.map-$installedname",
 		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname")
 	      if -e "$sourcedir/boot/System.map-$installedname";
+	if ($arch eq "m68k") {
+		$ENV{SOURCEDIR}=$sourcedir
+	}
 	doit("./copy-modules", $kernelversion, $flavour, $installedname);
 	doit("./find-dups", "$kernelversion-$flavour");
 }

@@ -50,11 +50,10 @@ processmodules() {
 			else
 				optional=0
 			fi
-			
-			if [ -e $moddir/$file ]; then
+			if [ -e $moddir/$file ] || [ -e $file ]; then
 				echo $file
 			else
-				if [ "$optional" = 0 ]; then
+				if [ "$optional" == "0" ]; then
 					echo "missing module $file" >&2
 					exit 1
 				fi
@@ -147,18 +146,30 @@ for i in $(
 	deplist $tmpdir/tmpdeps $tmpdir/module-list/$i
 
 	# deal with modules marked as optional
-	processmodules $tmpdir/module-list/$i $moddir/kernel
+	if [ "" != "`echo $version | grep ^2.2.`" ]; then
+		processmodules $tmpdir/module-list/$i $moddir
+	else
+		processmodules $tmpdir/module-list/$i $moddir/kernel
+	fi
 
 	if [ -s $tmpdir/module-list/$i ]; then
 		# copy kernel modules to package build dir
-		cd $moddir/kernel
+		if [ "" != "`echo $version | grep ^2.2.`" ]; then
+			cd $moddir
+		else
+			cd $moddir/kernel
+		fi
 		ret=$( ( (
 			set +e
 			tar cfT - $tmpdir/module-list/$i
 			printf $? >&3
 		) | (
 			set +e
-			dir=$home/debian/$i-$version-di/lib/modules/$installedname/kernel
+			if [ "" != "`echo $version | grep ^2.2.`" ]; then
+				dir=$home/debian/$i-$version-di/lib/modules/$installedname
+			else
+				dir=$home/debian/$i-$version-di/lib/modules/$installedname/kernel
+			fi
 			mkdir -p $dir
 			cd $dir
 			tar xf -
