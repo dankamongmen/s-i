@@ -42,7 +42,7 @@ gtk_udebpriority=$(shell grep '^Package: cdebconf-gtk-udeb' debian/control -A 10
 LIBDEBCONFDEV=libdebconfclient0-dev
 LIBDEBCONF=libdebconfclient0
 
-FRONTENDS=text slang newt  gtk
+FRONTENDS=text slang newt gtk
 ifeq (,$(findstring hurd-,$(DEB_HOST_ARCH)))
 FRONTENDS += bogl
 endif
@@ -137,7 +137,7 @@ install-newt-udeb: build-udeb install-dirs
 install-text-udeb: build-udeb install-dirs
 	dh_testdir
 	dh_testroot
-	dh_installdebconf -n -pcdebconf-newt-udeb
+	dh_installdebconf -n -pcdebconf-text-udeb
 	(cd $(udebbuild)/src/modules/frontend/text; \
 		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf-text-udeb/usr )
 

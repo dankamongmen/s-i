@@ -8,6 +8,8 @@
 #include <bogl/bogl.h>
 #include <bogl/bowl.h>
 
+#define q_get_description(q)            question_get_field((q), "", "description")
+
 /* Any private variables we may need. */
 struct uidata {
 };
@@ -31,8 +33,15 @@ struct question_handlers question_handlers[] = {
 	{ "select", bogl_handler_select },
 	{ "note", bogl_handler_note },
 	{ "string", bogl_handler_string },
-        { "eror", bogl_handler_note },
+        { "error", bogl_handler_note },
 };
+
+static const char *
+get_text(struct frontend *obj, const char *template, const char *fallback )
+{
+	        struct question *q = obj->qdb->methods.get(obj->qdb, template);
+		return q ? q_get_description(q) : fallback;
+}
 
 static handler_t handler(const char *type)
 {
@@ -47,9 +56,9 @@ static handler_t handler(const char *type)
 static void drawnavbuttons(struct frontend *ui, struct question *q)
 {
 	if(ui->methods.can_go_back(ui, q))
-		bowl_new_button(_("Previous"), DC_GOBACK);
+		bowl_new_button(get_text(ui, "debconf/button-goback", "Go Back"), DC_GOBACK);
 	if(ui->methods.can_go_forward(ui, q))
-		bowl_new_button(_("Next"), DC_OK);
+		bowl_new_button(get_text(ui, "debconf/button-continue", "Next"), DC_OK);
 }
 
 static void drawdesctop(struct frontend *ui, struct question *q)
@@ -62,6 +71,7 @@ static void drawdescbot(struct frontend *ui, struct question *q)
 {
 	bowl_new_text(question_get_field(q, "", "extended_description"));
 }
+
 
 /* boolean requires a new widget, the radio button :( */
 /* Pretend with buttons - loses default info. */
@@ -83,9 +93,9 @@ int bogl_handler_boolean(struct frontend *ui, struct question *q)
 
 	/* Should be:  bowl_new_radio(); drawnavbuttons(ui, q); */
 	if(ui->methods.can_go_back(ui, q))
-		bowl_new_button(_("Previous"), 0);
-	bowl_new_button(_("Yes"), 1);
-	bowl_new_button(_("No"), 2);
+		bowl_new_button(get_text(ui, "debconf/button-goback", "Go Back"), 0);
+	bowl_new_button(get_text(ui, "debconf/button-yes", "Yes"), 1);
+	bowl_new_button(get_text(ui, "debconf/button-no", "No"), 2);
 
 	drawdescbot(ui, q);
 	bowl_layout();

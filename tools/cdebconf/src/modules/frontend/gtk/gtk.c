@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.25 2003/08/18 23:34:36 sley Exp $
+ * $Id: gtk.c,v 1.26 2003/10/06 19:03:18 mckinstry Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -64,6 +64,8 @@
 #include <dlfcn.h>
 
 #include <gtk/gtk.h>
+
+#define q_get_description(q)            question_get_field((q), "", "description")
 
 /* A struct to let a question handler store appropriate set functions that will be called after
    gtk_main has quit */
@@ -280,6 +282,13 @@ void exit_button_callback(GtkWidget *button, struct frontend* obj)
     gtk_main_quit();
 }
 
+static const char *
+get_text(struct frontend *obj, const char *template, const char *fallback )
+{
+	        struct question *q = obj->qdb->methods.get(obj->qdb, template);
+		        return q ? q_get_description(q) : fallback;
+}
+
 gboolean need_continue_button(struct frontend *obj)
 {
     if (obj->questions->next == NULL)
@@ -311,7 +320,7 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 
     if (need_continue_button(obj))
     {
-	continue_button = gtk_button_new_with_label("Continue");
+	continue_button = gtk_button_new_with_label(get_text(obj, "debconf/button-continue", "Continue"));
 	ret_val = NEW(int);
 	*ret_val = DC_OK;
 	gtk_object_set_user_data(GTK_OBJECT(continue_button), ret_val);
@@ -322,7 +331,7 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 
     if (need_back_button(obj))
     {
-	back_button = gtk_button_new_with_label("Go Back");
+	back_button = gtk_button_new_with_label(get_text(obj, "debconf/button-goback","Go Back"));
 	ret_val = NEW(int);
 	*ret_val = DC_GOBACK;
 	gtk_object_set_user_data(GTK_OBJECT(back_button), ret_val);
@@ -369,9 +378,9 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
     data->obj = obj;
     data->q = q;
 	
-    yes_button = gtk_button_new_with_label("Yes");
-    no_button = gtk_button_new_with_label("No");
-    back_button = gtk_button_new_with_label("Go Back");
+    yes_button = gtk_button_new_with_label(get_text(obj, "debconf/button-yes", "Yes"));
+    no_button = gtk_button_new_with_label(get_text(obj, "debconf/button-no", "No"));
+    back_button = gtk_button_new_with_label(get_text(obj, "debconf/button-goback", "Go Back"));
 
     ret_val = NEW(int);
     *ret_val = DC_GOBACK;

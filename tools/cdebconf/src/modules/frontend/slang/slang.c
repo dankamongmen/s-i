@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.27 2003/09/23 01:50:36 sesse Exp $
+ * $Id: slang.c,v 1.28 2003/10/06 19:03:18 mckinstry Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -57,6 +57,8 @@
 #define LINES		(SLtt_Screen_Rows ? SLtt_Screen_Rows : 24)
 #define COLS		(SLtt_Screen_Cols ? SLtt_Screen_Cols : 80)
 #define UIDATA(obj) 	((struct uidata *)(obj)->data)
+
+#define q_get_description(q)            question_get_field((q), "", "description")
 
 /* Private variables */
 struct uidata {
@@ -279,6 +281,22 @@ static int slang_keyhandler(struct frontend *ui, struct question *q, int *pos,
 	return -1;
 }
 
+static char *get_text(struct frontend *obj, const char *template, char *fallback)
+{
+        struct question *q = obj->qdb->methods.get(obj->qdb, template);
+        return q ? q_get_description(q) : fallback;
+}
+
+static char *button_text(struct frontend *obj, const char *template, char *fallback)
+{
+	char text[50];
+        struct question *q = obj->qdb->methods.get(obj->qdb, template);
+	sprintf(text, "< %s >", q ? q_get_description(q) : fallback);
+	return strdup(text);
+}
+
+
+
 /*
  * slang_navbuttons
  *
@@ -293,6 +311,7 @@ static void slang_navbuttons(struct frontend *ui, struct question *q,
 	struct uidata *uid = UIDATA(ui);
 	struct slwindow *win = &uid->qrywin;
 	int ybut = win->y + win->h - win->border;
+	static char *continue_text = NULL, *goback_text;
 
 	SLsmg_set_color(win->drawcolor);
 	SLsmg_gotorc(ybut-2, 1);
@@ -304,20 +323,27 @@ static void slang_navbuttons(struct frontend *ui, struct question *q,
 	SLsmg_write_char(SLSMG_RTEE_CHAR);
 	SLsmg_set_char_set(0);
 
+	/* Get the translated button labels */
+	if (!continue_text)
+		continue_text = button_text(ui, "debconf/button-continue", "Continue");
+	if (!goback_text)
+		goback_text = button_text(ui, "debconf/button-goback", "Go Back");
+	
 	/* draw the actual buttons, note that these are drawn in the
 	 * query window instead of in the parent (like the frame) */
 
 	if (ui->methods.can_go_forward(ui, q))
 	{
 		slang_printf(ybut - 1, 2, (selected == 0 ? 
-			win->selectedcolor : win->drawcolor), _(" <Next> "));
+			win->selectedcolor : win->drawcolor), continue_text);
 	}
 
 	if (ui->methods.can_go_back(ui, q))
 	{
-		slang_printf(ybut - 1, COLS-2-strlen(_(" <Cancel> ")),
+		
+		slang_printf(ybut - 1, COLS-2-strlen(goback_text),
 			(selected == 1 ? win->selectedcolor : win->drawcolor),
-			_(" <Cancel> "));
+			goback_text);
 	}
 
 	/* caller should call slang_flush() ! */
@@ -331,6 +357,10 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	int ybut = win->y + win->h - win->border - 4;
 	const char *value = "true";
 	int ret = 0, ans, pos;
+	static char *yes_text = NULL, *no_text = NULL;
+
+	if (!yes_text)	yes_text = get_text(ui, "debconf/button-yes", "Yes");
+	if (!no_text)  	no_text = get_text(ui, "debconf/button-no", "No");
 
 	value = question_get_field(q, NULL, "value");
 
@@ -340,14 +370,12 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	while (ret == 0) 
 	{
 		/* Draw the radio boxes */
-		slang_printf(ybut, (COLS/2)-strlen(_("Yes"))-8,
+		slang_printf(ybut, (COLS/2)-strlen(yes_text)-8,
 			(pos == 2 ? win->selectedcolor : win->drawcolor),
-			" (%c) %s ", (ans ? '*' : ' '), 
-			_("Yes"));
+			" (%c) %s ", (ans ? '*' : ' '), yes_text);
 		slang_printf(ybut, (COLS/2)+4,
 			(pos == 3 ? win->selectedcolor : win->drawcolor),
-			" (%c) %s ", (ans ? ' ' : '*'),
-			_("No"));
+			" (%c) %s ", (ans ? ' ' : '*'), no_text);
 
 		slang_navbuttons(ui, q, pos);
 
