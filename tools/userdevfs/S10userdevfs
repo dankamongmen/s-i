@@ -1,8 +1,19 @@
 #!/bin/sh
-echo 'Setting up Userspace DevFS: '
-echo -n 'mounting /proc... '
-mount /proc
-# run update-dev once, just to make sure /dev/discs is set up correctly.
-echo -n ' Hard disk and partitions... '
-/usr/bin/update-dev
-echo 'done'
+
+# run for 2.2.x kernels only
+if [ "`uname -r | grep '^2.2.'`" != "" ]; then
+    echo 'Setting up Userspace DevFS: '
+
+    if [ ! -d /proc/self ]; then
+	echo '  Mounting /proc... '
+	mount /proc
+    fi
+
+    echo '  Detecting cdrom devices ...'
+    /usr/bin/init-dev 
+
+    echo '  Hard disk and partitions... '
+    /usr/bin/update-dev
+    
+    echo 'Userdevfs done.'
+fi
