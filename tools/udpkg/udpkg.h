@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.6 2000/11/02 20:36:01 joeyh Exp $ */
+/* $Id: udpkg.h,v 1.7 2000/11/20 23:43:34 bug1 Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -53,8 +53,13 @@
 #define COLOR_GRAY			1
 #define COLOR_BLACK			2
 
+#define UDPKG_CONFIGURE 1
+#define UDPKG_INSTALL   2   
+#define UDPKG_REMOVE    4
+#define UDPKG_UNPACK    8
+
 /* data structures */
-struct package_t {
+typedef struct package_s {
 	char *file;
 	char *package;
 	char *version;
@@ -64,16 +69,21 @@ struct package_t {
 	int installer_menu_item;
 	unsigned long status;
 	char color; /* for topo-sort */
-	struct package_t *requiredfor[DEPENDSMAX]; 
+	struct package_s *requiredfor[DEPENDSMAX]; 
 	unsigned short requiredcount;
-	struct package_t *next;
-};
+	struct package_s *next;
+} package_t;
 
 /* function prototypes */
 void *status_read(void);
-void control_read(FILE *f, struct package_t *p);
-int status_merge(void *status, struct package_t *pkgs);
+void control_read(FILE *f, package_t *p);
+int status_merge(void *status, package_t *pkgs);
 int package_compare(const void *p1, const void *p2);
-struct package_t *depends_resolve(struct package_t *pkgs, void *status);
+package_t *depends_resolve(package_t *pkgs, void *status);
+extern package_t *build_package_struct(const char **name_list, int funct);
+extern int dpkg_unpack(package_t *pkgs);
+extern int dpkg_configure(package_t *pkgs);
+extern int dpkg_install(package_t *pkgs);
+extern int dpkg_remove(package_t *pkgs);
 
 #endif
