@@ -180,9 +180,12 @@ any_free_vgs() {
 # get all activated volume groups
 #
 get_vgs() {
+	arg="$1"
 	GROUPS=""
 	for i in $(list_vgs); do
-		
+		if [ "$arg" = "free" -a "$(getfree_vg "$i")" = "0" ]; then
+			continue
+		fi
 		addinfos_vg "$i"
 		i=`printf "%-15s (%s)" "$i" "$RET"`
 		
@@ -559,6 +562,13 @@ lv_create() {
 	if [ -z "$GROUPS" ]; then
 		db_set lvmcfg/lvcreate_novg "false"
 		db_input high lvmcfg/lvcreate_novg
+		db_go
+		return
+	fi
+	get_vgs "free"
+	if [ -z "$GROUPS" ]; then
+		db_set lvmcfg/lvcreate_nofreevg "false"
+		db_input high lvmcfg/lvcreate_nofreevg
 		db_go
 		return
 	fi
