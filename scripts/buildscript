@@ -36,19 +36,19 @@ install_deb ()
 	return 0
 }
 
-# copy sucessfully built udebs into build/localudebs
+# copy sucessfully built udebs into installer/build/localudebs
 supply_udeb ()
 {
 	local _dir=$1
 	local _pkg=$(grep -sh "^Package: " ${_dir}/debian/control |sed -e 's/^Package: //' |xargs echo -n)
 	for i in ${_pkg}; do
 		[ -f ${_dir}/../${i}_*_${ARCH}.udeb ] && {
-			rm -f build/localudebs/${i}_*_${ARCH}.udeb
-			cp -f ${_dir}/../${i}_*_${ARCH}.udeb build/localudebs/
+			rm -f installer/build/localudebs/${i}_*_${ARCH}.udeb
+			cp -f ${_dir}/../${i}_*_${ARCH}.udeb installer/build/localudebs/
 		}
 		[ -f ${_dir}/../${i}_*_all.udeb ] && {
-			rm -f build/localudebs/${i}_*_all.udeb
-			cp -f ${_dir}/../${i}_*_all.udeb build/localudebs/
+			rm -f installer/build/localudebs/${i}_*_all.udeb
+			cp -f ${_dir}/../${i}_*_all.udeb installer/build/localudebs/
 		}
 	done
 	return 0
@@ -95,7 +95,7 @@ while [ ${#} -ge 1 ]; do
 done
 
 # directory sanity check
-[ -d build/pkg-lists ] || { echo "Not in source dir"; exit 1; }
+[ -d installer/build/pkg-lists ] || { echo "Not in source dir"; exit 1; }
 
 [ -z "$REALROOTCMD" ] && REALROOTCMD=$ROOTCMD
 
@@ -109,7 +109,7 @@ install_deb . di-packages-build
 # build d-i library
 build libdebian-installer
 install_deb . libdebian-installer4 libdebian-installer-extra4 libdebian-installer4-dev
-supply_udeb . libdebian-installer4 libdebian-installer-extra4
+supply_udeb libdebian-installer4 libdebian-installer-extra4
 
 # build cdebconf
 build tools/cdebconf
@@ -162,6 +162,6 @@ do_subdir utils
 [ "$ARCH" = "sparc" ] && do_subdir tools/sparc/silo-installer
 
 # Build the installer boot image.
-build build
+build installer
 
 exit 0
