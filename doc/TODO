@@ -1,14 +1,17 @@
 Done this week:
-- choose-mirror is usable
-- wget retriever works, needs some things like proxy support
-- cdebconf udebs build now, and it is usable
-- demo2a.tar.gz, demo system that can download udebs from the web
-  and uses cdebconf (20001208215147.A1035@tausq.org)
-- netcfg has been started, to perform manual network configuration
-- package pools are here, and udebs can be uploaded
+- udebs are flooding into sid
+- demo3 is a chrooted demo system
+  http://people.debian.org/~joeyh/debian-installer/
 
-Still Todo (for individual TODO lists, see inside the trees of the
-individual modules):
+Where we are:
+
+Now that we have a chrooted system, it's time to start seriously looking at
+the size of the d-i base system. library reduction and trimming down
+busybox need to be done soon. It's also time to start writing the modules
+that are actual components of the installer, like the disk partitioner, the
+disk formatter, etc, etc.
+
+Still Todo:
 
 	- design [Joey Hess, debian-boot]
                 80% done. Enough to know what the big peices are 
@@ -22,8 +25,10 @@ individual modules):
         - main-menu (main menu generator) [Joey Hess]
                 90% done (one non-trivial todo item)
         - busybox integration [Erik Andersen]
-		First pass busybox udeb is ready.
-		http://people.debian.org/~andersee/
+		First pass busybox udeb available.
+	- netkit-tiny [UNCLAIMED]
+		http://oss.lineo.com/cgi-bin/cvsweb/netkit-tiny/
+		ifconfig is needed at least by netcfg
         - network card detector [Glenn McGrath, David Whedon]
 		Pcidetect is written, detects PCI cards only. Needs
 		testing. David has another detector that uses libdetect
@@ -37,10 +42,8 @@ individual modules):
 		About 10% done realistically, but it does work.
         - choose-mirror [Joey Hess]
 		75% done
- 	- http retreiver [Joey Hess]
-		Nearly 50% done, but entirely untested.
- 	- http retriever [Joey Hess, Erik Anderson]
-		Started, uses busybox wget.
+ 	- http retriever [Joey Hess]
+		Works, needs testing and proxy support.
         - target media detector [UNCLAIMED]
                 Not started. Just has to figure out what media to install to.
                 Probably trivial; most support already in the kernel.
@@ -70,8 +73,8 @@ individual modules):
 	- after-reboot configuration [Joey?]
 		Many packages that are currently set up by the
 		boot-floppies need to start handling their own setup, after
-		reboot, via debconf. These include timezone config, many of
-		the things in base-config now, what else?
+		reboot, via debconf. These include timezone and clock config, 
+		many of the things in base-config now, what else?
 
 Other stuff:
      - The main menu design has some issues. If a step is failing
