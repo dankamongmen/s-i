@@ -236,6 +236,7 @@ struct linkedlist_t *get_packages (void) {
 				list = tmplist;
 			else if (list->tail != NULL) {
 				list->tail->next = tmplist->head;
+				list->tail = tmplist->tail;
 				free(tmplist);
 			}
                 }
