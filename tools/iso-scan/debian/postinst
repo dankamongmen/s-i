@@ -187,16 +187,12 @@ fi
 # Let them know the second pass failed too.
 if [ "$ISO_COUNT" = 0 ]; then
 	db_fset iso-scan/no-isos seen false
-	db_subst iso-scan/no-isos NUM_FILESYSTEMS $MOUNTABLE_DEVS_COUNT
 	db_input critical iso-scan/no-isos || true
 elif [ "$ISO_MOUNT_COUNT" != "$ISO_COUNT" ]; then
 	db_fset iso-scan/bad-isos seen false
-	db_subst iso-scan/bad-isos ISO_COUNT $ISO_COUNT
-	db_subst iso-scan/bad-isos ISO_MOUNT_FAILURES $(expr $ISO_COUNT - $ISO_MOUNT_COUNT)
 	db_input critical iso-scan/bad-isos || true
 else
 	db_fset iso-scan/other-isos seen false
-	db_subst iso-scan/other-isos ISO_COUNT $ISO_COUNT
 	db_input critical iso-scan/other-isos || true
 fi
 db_go || true
