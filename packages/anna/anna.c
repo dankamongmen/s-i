@@ -122,8 +122,6 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 
         package->status_want = di_package_status_want_deinstall;
 
-        if (package->status_want == di_package_status_want_install)
-          continue;
         if (package->type != di_package_type_real_package)
           continue;
         if (is_installed(package, status))
