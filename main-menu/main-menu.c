@@ -157,8 +157,11 @@ static char *menu_entry(struct debconfclient *debconf, char *language,
 
 	/* The following fallback case can go away once all packages
 	   have transitioned to the new form.  */
-	if (entry == NULL)
+	if (entry == NULL) {
+		di_logf("Falling back to the package description for %s",
+			package->package);
 		entry = strdup(package->description);
+	}
 	return entry;
 }
 
