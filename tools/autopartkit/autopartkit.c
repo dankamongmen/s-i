@@ -205,12 +205,6 @@ static const char * mydebconf_input (char *priority, char *template)
     return client->value;
 }
 
-static const char * mydebconf_get(const char *template)
-{
-    debconf_get(client, template);
-    return client->value;
-}
-
 void autopartkit_log(const int level, const char * format, ...)
 {
     int LOGLIMIT = 1;
