@@ -1,0 +1,158 @@
+#! /bin/sh
+
+#set -e
+. /usr/share/debconf/confmodule
+#set -x
+
+# This is a gross and stupid hack, but needed because of Xu's
+# unwillingness to run depmod in kernel-image's postinst.  See Debian
+# bug #136743
+
+depmod || true
+
+log () {
+    echo "$0: $@" >>/var/log/messages
+}
+log "Detecting disks..."
+
+# Manually load modules to enable things we can't detect.
+manual_load="ide-mod ide-probe-mod ide-disk"
+#manual_load=i82365 usb-storage
+#manual_load=i82365 sr_mod usb-storage
+old=`cat /proc/sys/kernel/printk`
+echo 0 >/proc/sys/kernel/printk
+for module in $manual_load
+do
+    modprobe $module >>/var/log/messages 2>&1
+done
+echo $old >/proc/sys/kernel/printk
+
+IFS_SAVE="$IFS"
+IFS="
+"
+for device in `/sbin/discover --disable-all --enable=pci,ide,scsi,pcmcia \
+                --format="%m\t%V\t%M\n" scsi`
+do
+    vendor="`echo $device | cut -f2`"
+    model="`echo $device | cut -f3`"
+    module="`echo $device | cut -f1`"
+    IFS="$IFS_SAVE"
+
+    if [ "$vendor" != "Unknown" ]
+    then
+        name="$vendor $model"
+    else
+        name="$model"
+    fi
+
+    echo
+    echo $name
+
+    if [ -n "$module" -a "$module" != "ignore" ]
+    then
+        if [ ! -f /lib/modules/*/*/"$module".o ]
+        then
+            while true
+            do
+		db_fset disk-detect/not_included seen false || true
+		db_subst disk-detect/not_included vendor "$name" || true
+		db_subst disk-detect/not_included module $module || true
+		db_input critical disk-detect/not_included || true
+		db_go || true
+		db_get disk-detect/not_included || true
+                mounted=0
+                if [ "$RET" != "true" ]
+                then
+                    break
+                fi
+                mount -t ext2 /dev/fd0 /mnt
+                if [ "$?" = "0" ]
+                then
+                    if [ -f /mnt/modules.tgz ]
+                    then
+                        mounted=1
+                        break
+                    fi
+                    umount /mnt
+                fi
+            done
+
+            if [ "$mounted" = "1" ]
+            then
+                log "Copying drivers from modules disk... "
+                gunzip -c /mnt/modules.tgz | tar xf - $module.o
+                umount /mnt
+            fi
+        fi
+
+        if [ -f /lib/modules/*/*/"$module".o ]
+        then
+	    old=`cat /proc/sys/kernel/printk`
+	    echo 0 >/proc/sys/kernel/printk
+            modprobe $module >>/var/log/messages 2>&1
+	    echo $old >/proc/sys/kernel/printk
+            if [ "$?" != "0" ]
+            then
+                log "Error loading driver for $vendor $model!"
+            else
+	    fi
+        else
+            log "Could not locate driver for $vendor $model."
+        fi
+    fi
+    IFS="
+"
+done
+IFS="$IFS_SAVE"
+
+# If PCMCIA was detected, load the PCMCIA drivers and load cardmgr
+if [ -e /proc/bus/pccard ]
+then
+    pcmcia=0
+    if [ -e /lib/modules/*/pcmcia ]
+    then
+	echo "PCMCIA was detected on this system."
+	while true
+        do
+	    echo "Please insert the modules disk and press Enter to continue, or type"
+            echo -n "\`q' to skip loading PCMCIA drivers: "
+            read input
+            mounted=0
+            if [ "$input" = "q" ]
+            then
+                break
+            fi
+            mount -t ext2 /dev/fd0 /mnt
+            if [ "$?" = "0" ]
+            then
+                if [ -f /mnt/pcmcia.tgz ]
+                then
+                    mounted=1
+                    break
+                fi
+                umount /mnt
+            fi
+        done
+        if [ "$mounted" = "1" ]
+        then
+            echo -n "Copying drivers from modules disk... "
+            gunzip -c /mnt/pcmcia.tgz | tar xf -
+            echo "done."
+            umount /mnt
+	    pcmcia=1
+        fi
+    else
+	pcmcia=1
+    fi
+
+    if [ "$pcmcia" = "1" ]
+    then
+	gunzip /etc/pcmcia/config.gz
+	/sbin/cardmgr
+    fi
+fi
+
+# Hey, we're done
+
+exit 0
+
