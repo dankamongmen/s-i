@@ -23,5 +23,6 @@ realinclude_HEADERS = \
 
 noinst_HEADERS = \
 	package_internal.h \
-	packages_internal.h
+	packages_internal.h \
+	slist_internal.h
 

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.15 2004/02/29 20:56:13 waldi Exp $
+ * $Id: packages.c,v 1.16 2004/03/04 09:49:56 waldi Exp $
  */
 
 #include <config.h>
@@ -26,6 +26,7 @@
 
 #include <debian-installer/log.h>
 #include <debian-installer/package_internal.h>
+#include <debian-installer/slist_internal.h>
 #include <debian-installer/string.h>
 
 #include <ctype.h>
@@ -304,7 +305,7 @@ static void resolve_dependencies_marker (di_packages *packages)
 
 di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *list, di_packages_allocator *allocator)
 {
-  di_slist *install = di_slist_alloc ();
+  di_slist *install = di_slist_alloc (), temp = { NULL, NULL };
   di_slist_node *node;
 
   resolve_dependencies_marker (packages);
@@ -312,11 +313,8 @@ di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *lis
   for (node = list->head; node; node = node->next)
   {
     di_package *p = node->data;
-    if (!resolve_dependencies_recurse (install, p, NULL, allocator, packages->resolver, false))
-    {
-      di_slist_free (install);
-      return NULL;
-    }
+    if (resolve_dependencies_recurse (&temp, p, NULL, allocator, packages->resolver, false))
+      internal_di_slist_append_list (install, &temp);
   }
 
   return install;
@@ -324,16 +322,13 @@ di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *lis
 
 di_slist *di_packages_resolve_dependencies_array (di_packages *packages, di_package **array, di_packages_allocator *allocator)
 {
-  di_slist *install = di_slist_alloc ();
+  di_slist *install = di_slist_alloc (), temp = { NULL, NULL };
 
   resolve_dependencies_marker (packages);
 
   while (*array)
-    if (!resolve_dependencies_recurse (install, *array++, NULL, allocator, packages->resolver, false))
-    {
-      di_slist_free (install);
-      return NULL;
-    }
+    if (resolve_dependencies_recurse (&temp, *array++, NULL, allocator, packages->resolver, false))
+      internal_di_slist_append_list (install, &temp);
 
   return install;
 }

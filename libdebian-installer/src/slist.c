@@ -17,12 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: slist.c,v 1.6 2003/12/11 19:29:50 waldi Exp $
+ * $Id: slist.c,v 1.7 2004/03/04 09:49:56 waldi Exp $
  */
 
 #include <config.h>
 
-#include <debian-installer/slist.h>
+#include <debian-installer/slist_internal.h>
 
 #include <debian-installer/mem.h>
 
@@ -97,5 +97,17 @@ void di_slist_prepend (di_slist *slist, void *data)
 void di_slist_prepend_chunk (di_slist *slist, void *data, di_mem_chunk *mem_chunk)
 {
   return internal_di_slist_prepend (slist, data, di_mem_chunk_alloc (mem_chunk));
+}
+
+void internal_di_slist_append_list (di_slist *slist, di_slist *new)
+{
+  if (!new->head || !new->bottom)
+    return;
+  if (slist->bottom)
+    slist->bottom->next = new->head;
+  else
+    slist->head = new->head;
+  slist->bottom = new->bottom;
+  new->head = new->bottom = NULL;
 }
 
