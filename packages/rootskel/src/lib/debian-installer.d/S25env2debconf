@@ -11,6 +11,10 @@ for line in $(set); do
 		# remove single quotes from around value
 		val="${val#\'}"
 		val="${val%\'}"
+		# remove double quotes (user can type those for values with
+		# spaces)
+		val="${val#\"}"
+		val="${val%\"}"
 		debconf-set "$var" "$val" >/dev/null
 	fi
 done
