@@ -257,10 +257,11 @@ static int textdb_question_add(struct database *db, struct question *q)
 		return DC_NOTOK;
 
 	fprintf(outf, "question {\n");
-	fprintf(outf, "\tname \"%s\";\n", q->tag);
+	fprintf(outf, "\ttag \"%s\";\n", q->tag);
 	fprintf(outf, "\tvalue \"%s\";\n", q->value);
-	fprintf(outf, "\tdefault \"%s\";\n", q->defaultval);
-	fprintf(outf, "\tflags %08X;\n", q->flags);
+	if (q->defaultval)
+		fprintf(outf, "\tdefault \"%s\";\n", q->defaultval);
+	fprintf(outf, "\tflags 0x%08X;\n", q->flags);
 	fprintf(outf, "\ttemplate \"%s\";\n", q->template->tag);
 	if ((var = q->variables))
 	{

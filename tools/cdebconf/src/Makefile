@@ -3,7 +3,7 @@ include ../globalmakeflags
 MAJOR=0
 MINOR=1
 MICRO=0
-LDFLAGS=-L. -ldebconf
+LDFLAGS=-L. -ldebconf -Wl,-rpath,$(shell pwd)
 LIB=libdebconf.so
 LIBNAME=libdebconf.so.$(MAJOR).$(MINOR).$(MICRO)
 SONAME=libdebconf.so.$(MAJOR).$(MINOR)

@@ -36,6 +36,8 @@ void question_delete(struct question *question);
 void question_ref(struct question *);
 void question_deref(struct question *);
 
+void question_setvalue(struct question *q, const char *value);
+
 void question_variable_add(struct question *q, const char *var, 	
 	const char *value);
 void question_variable_delete(struct question *q, const char *var, 	

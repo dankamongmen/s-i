@@ -19,6 +19,12 @@ void question_delete(struct question *question)
 	DELETE(question);
 }
 
+void question_setvalue(struct question *q, const char *value)
+{
+	free(q->value);
+	q->value = STRDUP(value);
+}
+
 void question_variable_add(struct question *q, const char *var, 	
 	const char *value)
 {

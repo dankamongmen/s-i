@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 
 	/* parse the configuration info */
 	config = config_new();
-	if (config->read(config, "dbtest.conf") == 0)
+	if (config->read(config, "debconf.conf") == 0)
 		DIE("Error reading configuration information");
 
 	/* initialize database and frontend modules */

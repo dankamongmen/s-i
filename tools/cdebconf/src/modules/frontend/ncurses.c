@@ -4,6 +4,8 @@
 #include "frontend.h"
 #include "ncurses.h"
 
+#include <string.h>
+
 struct question_handlers {
 	const char *type;
 	int (*handler)(struct uidata *, struct question *q);
@@ -56,6 +58,7 @@ static int nchandler_text(struct uidata *ui, struct question *q)
 
 static int ncurses_initialize(struct frontend *obj, struct configuration *cfg)
 {
+	obj->interactive = 1;
 	initscr();
 	cbreak();
 	noecho();
@@ -80,7 +83,7 @@ static int ncurses_go(struct frontend *obj)
 	for (; q != 0; q = q->next)
 	{
 		for (i = 0; i < sizeof(question_handlers) / sizeof(question_handlers[0]); i++)
-			if (strcmp(q->template->type, question_handlers[i].type) == 0)
+			if (strcasecmp(q->template->type, question_handlers[i].type) == 0)
 			{
 				ret = question_handlers[i].handler((struct uidata *)obj->data, q);
 			}
