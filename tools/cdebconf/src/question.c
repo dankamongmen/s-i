@@ -225,11 +225,20 @@ static char *question_expand_vars(struct question *q, const char *field)
 char *question_get_field(struct question *q, const char *lang,
 	const char *field)
 {
+    char *ret; 
+	
     assert(q);
     assert(field);
+
     if (strcmp(field, "value") == 0)
-        return question_expand_vars(q, question_getvalue(q, lang));
+        ret = question_expand_vars(q, question_getvalue(q, lang));
     else
-        return question_expand_vars(q, q->template->lget(q->template, lang, field));
+        ret = question_expand_vars(q, q->template->lget(q->template, lang, field));
+
+    /* question_get_field must always return a valid string. */
+    if (ret == NULL)
+        return strdup("");
+    else
+        return ret;
 }
 
