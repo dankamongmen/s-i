@@ -701,7 +701,6 @@ char *
 command_x_setbacktitle(struct confmodule *mod, char *arg)
 {
     struct question *q = NULL;
-    char *value;
     char *out;
 
     q = mod->questions->methods.get(mod->questions, arg);
@@ -710,16 +709,7 @@ command_x_setbacktitle(struct confmodule *mod, char *arg)
         asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, arg);
         return out;
     }
-    value = question_get_field(q, "", "description");
-    if (value == NULL)
-    {
-        asprintf(&out, "%u %s description field does not exist",
-                 CMDSTATUS_BADQUESTION, arg);
-        return out;
-    }
-
-    mod->frontend->methods.set_backtitle(mod->frontend, value);
-    free(value);
+    mod->frontend->methods.set_backtitle(mod->frontend, q);
 
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;

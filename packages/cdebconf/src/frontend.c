@@ -78,10 +78,10 @@ static void frontend_set_title(struct frontend *f, const char *title)
 	f->title = STRDUP(title);
 }
 
-static void frontend_set_backtitle(struct frontend *f, const char *backtitle)
+static void frontend_set_backtitle(struct frontend *f, struct question *backtitle)
 {
-	DELETE(f->backtitle);
-	f->backtitle = STRDUP(backtitle);
+	question_deref(f->backtitle);
+	f->backtitle = backtitle;
 }
 
 static bool frontend_can_go_back(struct frontend *ui, struct question *q)

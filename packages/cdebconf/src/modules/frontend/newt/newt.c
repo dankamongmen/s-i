@@ -1024,8 +1024,12 @@ newt_go(struct frontend *obj)
                     newtInit();
                     newtCls();
                 }
-                if (obj->backtitle != NULL)
-                    newtDrawRootText(0, 0, obj->backtitle);
+                if (obj->backtitle != NULL) {
+                    char *text = question_get_field(obj->backtitle, "", "description");
+                    if (text)
+                        newtDrawRootText(0, 0, text);
+                    free(text);
+                }
                 ret = question_handlers[i].handler(obj, q);
                 if (ret == DC_OK)
                     obj->qdb->methods.set(obj->qdb, q);
@@ -1071,8 +1075,12 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     obj->progress_cur = min;
     newtInit();
     newtCls();
-    if (obj->backtitle != NULL)
-        newtDrawRootText(0, 0, obj->backtitle);
+    if (obj->backtitle != NULL) {
+        char *text = question_get_field(obj->backtitle, "", "description");
+        if (text)
+            newtDrawRootText(0, 0, text);
+        free(text);
+    }
     newtGetScreenSize(&width, NULL);
     win_width = width-7;
     strtruncate(obj->progress_title, win_width-4);
