@@ -31,6 +31,8 @@ sub get_language_names {
 	my ($name, $locale) = split(/;/);
 	push(@names, $name);
 	$locale =~ s/@.+//;
+	# Drop modifier and charset part of locale
+	$locale =~ s/[@.].+$//;
 	$locales{$name} = $locale;
     }
     close(L);
