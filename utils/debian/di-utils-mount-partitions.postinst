@@ -5,7 +5,7 @@
 ARCH=`udpkg --print-architecture`
 MOUNTPOINT="/target"
 
-if [ "$ARCH" = "i386" ]; then
+if [ "$ARCH" = "i386" -o "$ARCH" = "hppa" ]; then
     TMP=`sfdisk -d /dev/discs/*/disc | grep Id=83 | cut -d\  -f 1`
 elif [ "$ARCH" = "s390" -o "$ARCH" = "s390x" ]; then
     TMP=`for i in /dev/dasd/*/disc; do fdasd -p $i | grep "Linux native" | cut -d\  -f 2; done`
