@@ -37,7 +37,7 @@ ethdetect_insmod (char *modulename)
   char buffer[128];
   char *params = NULL;
   params = debconf_input ("high", "ethdetect/module_params");
-  snprintf (buffer, sizeof (buffer), "insmod %s %s", modulename,
+  snprintf (buffer, sizeof (buffer), "modprobe -v %s %s", modulename,
 	    (params ? params : " "));
 
   if (execlog (buffer) != 0)
