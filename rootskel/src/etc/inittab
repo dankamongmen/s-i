@@ -5,13 +5,13 @@
 null::sysinit:/etc/init.d/rcS
 
 # main setup program
-vc/1::respawn:/sbin/debian-installer
+::respawn:/sbin/debian-installer
 
 # convenience shell
 vc/2::askfirst:/bin/sh
 
 # logging
-::sysinit:/bin/dmesg > /dev/vc/4
+::sysinit:/bin/sh -c "[ -e /dev/vc/4 ] && /bin/dmesg > /dev/vc/4"
 vc/3::respawn:/usr/bin/tail -f /var/log/messages
 vc/4::respawn:/usr/bin/tail -f /proc/kmsg
 
