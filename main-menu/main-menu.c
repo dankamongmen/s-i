@@ -436,6 +436,8 @@ static void set_package_title(di_system_package *p) {
 
 int do_menu_item(di_system_package *p) {
 	char *configcommand;
+	const char *showold_template = "debconf/showold";
+	char *showold = NULL;
 	int ret = 0;
 
 	di_log(DI_LOG_LEVEL_DEBUG, "Menu item '%s' selected", p->p.package);
@@ -444,12 +446,22 @@ int do_menu_item(di_system_package *p) {
 		set_package_title(p);
 
 		/* The menu item is already configured, so reconfigure it. */
+		debconf_get(debconf, showold_template);
+		if (debconf->value)
+			showold = strdup(debconf->value);
+		debconf_set(debconf, showold_template, "true");
 		if (asprintf(&configcommand, "exec udpkg --configure --force-configure %s", p->p.package) == -1) {
 			return 0;
 		}
 		ret = di_exec_shell_log(configcommand);
 		ret = di_exec_mangle_status(ret);
 		free(configcommand);
+		if (showold) {
+			debconf_set(debconf, showold_template, showold);
+			free(showold);
+		} else {
+			debconf_reset(debconf, showold_template);
+		}
 		check_special(p);
 		if (ret)
 			di_log(DI_LOG_LEVEL_WARNING, "Reconfiguring '%s' failed with error code %d", p->p.package, ret);
