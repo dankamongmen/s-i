@@ -1,7 +1,8 @@
-#!/bin/sh -e
+#!/bin/bash -e
 # Find duplicate modules. Pass the kernel name.
 kernel=$1
 (
+	shopt -s nullglob
 	for dir in debian/*-modules-$kernel-di; do
 		cd $dir
 		find lib -type f -printf "$dir %p\n"
