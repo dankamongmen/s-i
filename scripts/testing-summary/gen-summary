@@ -94,7 +94,8 @@ foreach my $dist (@dists) {
 				if ($dist eq 'testing' && 
 				    exists $packageversions{$source}{$dist}{$arch} &&
 				    $packageversions{$source}{$dist}{$arch} ne $version) {
-					push @annotations, {package => $source, annotation => "binary package $package at version $version on arch $arch, while $lastbinfromsource{$source} is version $packageversions{$source}{$dist}{$arch}" };
+					push @annotations, {package => $source, annotation => "inconsistent binary versions in testing" };
+					push @annotations, {detail => 1, package => $source, annotation => "binary package $package at version $version on arch $arch, while $lastbinfromsource{$source} is version $packageversions{$source}{$dist}{$arch}" };
 				}
 				$packageversions{$source}{$dist}{$arch} = $version;
 				$lastbinfromsource{$source}=$package;
@@ -146,8 +147,8 @@ close ANN;
 
 print "<html><head><title>udeb testing summary</title></head><body>\n";
 
-foreach my $withchangelog (0,1) {
-	if (! $withchangelog) {
+foreach my $withdetail (0,1) {
+	if (! $withdetail) {
 		print "<h1>udeb testing summary</h1>\n";
 	}
 	else {
@@ -177,7 +178,7 @@ foreach my $withchangelog (0,1) {
 					push @vers, $version;
 				}
 				if ($dist eq $dists[-1]) {
-					if ($withchangelog) {
+					if ($withdetail) {
 						print "<td><a name=\"$transition\"><a href=\"#nochangelog $transition\">$version</a>";
 					}
 					else {
@@ -200,8 +201,9 @@ foreach my $withchangelog (0,1) {
 			print "<td>".int($minage)."</td></tr>\n";
 			
 			foreach my $ann (@annotations) {
-				if ($package eq $ann->{package} && (! exists $ann->{version} || 
-				    between_versions($ann->{version}, $vers[0], $vers[1]))) {
+				if ($package eq $ann->{package} && 
+				    (! exists $ann->{version} || between_versions($ann->{version}, $vers[0], $vers[1])) &&
+				    ($withdetail || ! exists $ann->{detail})) {
 					print "<tr><td></td><td colspan=".($numcols-1)."><b>$ann->{annotation}</b>";
 					if (exists $ann->{user}) {
 						print " <i>-- $ann->{user}</i>";
@@ -213,7 +215,7 @@ foreach my $withchangelog (0,1) {
 				}
 			}
 			
-			if ($withchangelog && length $vers[0] && length $vers[1]) {
+			if ($withdetail && length $vers[0] && length $vers[1]) {
 				my $ch_a=changelogfile($package, $vers[0]);
 				my $ch_b=changelogfile($package, $vers[1]);
 				my $changelog=`diff -U 0 $ch_a $ch_b `;
