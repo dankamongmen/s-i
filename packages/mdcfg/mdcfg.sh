@@ -48,6 +48,12 @@ md_delete_verify() {
 
 md_delete() {
 	md_get_devices
+	if [ -z "$DEVICES" ]; then
+		db_set mdcfg/delete_no_md "false"
+		db_input high mdcfg/delete_no_md
+		db_go
+		return
+	fi
 	db_set mdcfg/deletemenu "false"
 	db_fset mdcfg/deletemenu "seen" "false"
 	db_subst mdcfg/deletemenu DEVICES "${DEVICES}"
