@@ -59,10 +59,10 @@ echo $old >/proc/sys/kernel/printk
 # mknod /dev/hdd b 22 64
 
 load_floppy_driver() {
-  if [ ! -d /dev/floppy ] ; then
-  	modprobe floppy || true
-  fi
-  floppydev=/dev/floppy/0
+    if [ ! -d /dev/floppy ] ; then
+        modprobe floppy || true
+    fi
+    floppydev=/dev/floppy/0
 }
 
 IFS_SAVE="$IFS"
@@ -121,6 +121,9 @@ do
                 log "Copying drivers from modules disk... "
                 gunzip -c /mnt/modules.tgz | tar xf - $module.o
                 umount /mnt
+                # Make sure 'depmod -a' accepts the new module
+                chown -R root /lib/modules
+                depmod -a
             fi
         fi
 
