@@ -13,6 +13,7 @@ COMMIT_MARKER="[l10n] [l10n-sync]"
 
 # Defaults
 ONLINE=N
+ATOMIC_UPDATES=N
 ATOMIC_COMMITS=N
 BIG_COMMITS=N
 DEBUG=N
@@ -22,7 +23,27 @@ debconfupdatepo=debconf-updatepo
 
 usage() {
 echo  "Usage:"
-echo  "$0 [--keep-revision=lang] [--online] [--atomic] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
+echo  "$0 [--online] [--debug] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
+echo  "    --debug           : Verbose output"
+echo  "    --online          : Work online (will update the local copy on"
+echo  "                        the fly)"
+echo  "    --commit          : Commit changed files (implies --online)"
+echo  "                        Files are by default commited in big chunks"
+echo  "    --atomic          : Files will be commited at each change"
+echo  "                        (will often trigger commit storms!"
+echo  "                        Handle with care!)"
+echo  "                        implies --online"
+echo  "    --atomic-updates  : Do a \"svn up\" before each step"
+echo  "                        (VERY time consuming)"
+echo  "                        implies --online"
+echo  "    --keep-revision   : Force keeping the old PO-Revision-Date"
+echo  "                        for a given language"
+echo  "                        meant for use when switching a language"
+echo  "                        NOT RECOMMENDED in other situations"
+echo  "    --svn             : path to the svn binary"
+echo  "    --debconf-updatepo: debconf-updatepo command line"
+echo  "                        (for using hacked debconf-updatepo)"
+echo  " <D-I repository path>: path to the local copy of the D-I repository"
 }
 
 ##  Command line parsing
@@ -47,6 +68,10 @@ while $MORETODO ; do
         ;;
     "--atomic")
         ATOMIC_COMMITS=Y
+        shift
+        ;;      
+    "--atomic-updates")
+        ATOMIC_UPDATES=Y
         shift
         ;;      
     "--commit")
@@ -80,7 +105,7 @@ then
 fi
 
 # If we asked for commits we are online...:-)
-if [ "$ATOMIC_COMMITS" = "Y" -o "$BIG_COMMITS" = "Y" ] ; then
+if [ "$ATOMIC_COMMITS" = "Y" -o "$ATOMIC_UPDATES" = "Y" -o "$BIG_COMMITS" = "Y" ] ; then
    ONLINE=Y
 fi
 
@@ -147,7 +172,7 @@ for i in  $packages ; do
   echo "  $i:"
  fi
  cd $DI_COPY/packages/$i/debian
- if [ "$ONLINE" = "Y" ] ; then
+ if [ "$ATOMIC_UPDATES" = "Y" ] ; then
    if [ "$DEBUG" = "Y" ] ; then
      echo -n "    - Update..."
      $svn update
@@ -170,7 +195,7 @@ for i in  $packages ; do
  if [ "$DEBUG" = "Y" ] ; then
    echo Done.
  fi
- if [ "$ATOMIC_COMMITS" = "Y"  -o "$BIG_COMMITS" = "Y" ] ; then
+ if [ "$ATOMIC_COMMITS" = "Y" ] ; then
    if [ "$DEBUG" = "Y" ] ; then
      echo -n "    - Commit..."
    fi
@@ -181,6 +206,11 @@ for i in  $packages ; do
    fi
  fi
 done
+
+if [ "$BIG_COMMITS" = "Y" ] ; then
+  cd $DI_COPY/packages
+  $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on all packages"
+fi
 
 # 2) Merge all templates.pot file together
 cd $DI_COPY/packages
@@ -364,6 +394,7 @@ EOF
 	fi
       fi
  done
+ echo ""
  if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
    if [ "$DEBUG" = "Y" ] ; then
      echo -n "      - commiting back updated files..."
@@ -379,13 +410,7 @@ EOF
  fi
 done
 
-# Do the big commits for each language
 if [ "$BIG_COMMITS" = "Y" ] ; then
   cd $DI_COPY/packages
-#  for lang in $languages ; do
-     find . -mindepth 3 -name \*.po |\
-              grep /debian/po/      |\
-            xargs $svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" 
-#  done
+  svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" 
 fi
-
