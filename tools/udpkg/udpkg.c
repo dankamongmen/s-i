@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.47 2004/01/24 17:58:15 waldi Exp $ */
+/* $Id: udpkg.c,v 1.48 2004/03/08 20:52:45 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -161,7 +161,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 			else if (ret > 0)
 			{
 #ifdef DOLOADTEMPLATE
-				/* Is this the templates files?  If
+				/* Is this the templates file?  If
 				 * so, call debconf-loadtemplate on it
 				 */
 				if (strcmp(adminscripts[i],"templates") == 0) {
@@ -170,6 +170,8 @@ static int dpkg_dounpack(struct package_t *pkg)
 						 pkg->package, buf2);
 					if (di_exec_shell_log(buf) != 0)
 						r = 1;
+					/* Delete templates after loading. */
+					unlink(buf2);
 				}
 #endif
 
