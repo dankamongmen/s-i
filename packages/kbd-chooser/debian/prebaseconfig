@@ -10,6 +10,14 @@ then
 	exit 0
 fi
 
+# FIXME Workaround to install some keymaps properly
+case "$KEYMAP" in
+	trqu|trfu|hebrew|lt|lv-latin4)
+		kbd_mode_temp="ascii" ;;
+	*)
+		kbd_mode_temp=""      ;;
+esac
+
 # Install non-Unicode variants of Turkish keymaps
 if [ "$KEYMAP" = "trqu" ]; then
 	KEYMAP="trq"
@@ -23,7 +31,9 @@ fi
 db_get debian-installer/serial-console
 if [ "$RET" = "false" ] ; then
 	apt-install console-tools console-data console-common 
+	[ -n "$kbd_mode_temp" ] && kbd-mode --$kbd_mode_temp
 	chroot /target install-keymap $KEYMAP
+	[ -n "$kbd_mode_temp" ] && kbd-mode --unicode
 fi
 
 

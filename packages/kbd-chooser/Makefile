@@ -66,7 +66,7 @@ CFLAGS += -DAT_KBD -DUSB_KBD
 KEYBOARDS := at usb
 endif
 
-TEMPLATES := debian/templates-in $(patsubst %, debian/keyboard-%.templates, $(KEYBOARDS))
+TEMPLATES := debian/kbd-chooser.templates-in $(patsubst %, debian/keyboard-%.templates, $(KEYBOARDS))
 OBJS += $(patsubst %, %-kbd.o, $(KEYBOARDS))
 
 all: kbd-chooser kbd-mode debian/kbd-chooser.templates
