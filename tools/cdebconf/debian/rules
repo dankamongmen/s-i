@@ -71,6 +71,15 @@ install: build
 	(cd $(debbuild); \
 		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf/usr \
 		etcdir=$(shell pwd)/debian/cdebconf/etc )
+
+	# TODO: REmove this temporary hack when we make debconf/cdebconf
+	# coexist happily
+	for i in usr/sbin/dpkg-reconfigure usr/bin/debconf-loadtemplate \
+		usr/share/debconf/confmodule usr/share/debconf/frontend; do \
+		mv $(shell pwd)/debian/cdebconf/$$i \
+			$(shell pwd)/debian/cdebconf/$$i.cdebconf; \
+	done
+
 	dh_movefiles -pcdebconf-dev --sourcedir=debian/cdebconf \
 		usr/lib/*.so usr/include/cdebconf
 	rm -rf debian/cdebconf/usr/include

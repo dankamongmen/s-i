@@ -24,7 +24,7 @@
 
 #define DIE(fmt, args...) 					\
  	do {							\
-		fprintf(stderr, "%s:%d: ", __FILE__, __LINE__); \
+		fprintf(stderr, "%s:%d (%s): ", __FILE__, __LINE__, __FUNCTION__); \
 		fprintf(stderr, fmt, ##args);			\
 		fprintf(stderr, "\n");				\
 		exit(1);					\
@@ -33,7 +33,7 @@
 #ifndef NODEBUG
 #define INFO(level, fmt, args...)					\
 	debug_printf(level, fmt, ##args)
-#define ASSERT(cond) if (!(cond)) DIE("%s:%d: Assertion failed: %s", __FILE__, __LINE__, #cond)
+#define ASSERT(cond) if (!(cond)) DIE("%s:%d (%s): Assertion failed: %s", __FILE__, __LINE__, __FUNCTION__, #cond)
 #else
 #define INFO(level, fmt, args...)	/* nothing */
 #define ASSERT(cond)
@@ -46,7 +46,7 @@
 /* Be careful with these macros; they evaluate the string arguments multiple
    times!
  */
-#define STRDUP(s) ((s) == NULL ? NULL : strdup(s))
+#define STRDUP(s) ((s) == NULL ? strdup("") : strdup(s))
 #define STRLEN(s) ((s) == NULL ? 0 : strlen(s))
 #define STRCPY(d,s) strcpy(d,((s) == NULL ? "" : (s)))
 #define DIM(ar) (sizeof(ar)/sizeof(ar[0]))
