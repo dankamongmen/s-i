@@ -48,7 +48,7 @@ is_queued(di_package *package)
     FILE *fp;
     char buf[1024];
 
-    if ((fp = fopen("/var/lib/anna-install/queue")) != NULL) {
+    if ((fp = fopen("/var/lib/anna-install/queue", "r")) != NULL) {
 	while (fgets(buf, sizeof(buf), fp)) {
 	    buf[strlen(buf) - 1] = '\0';
 
