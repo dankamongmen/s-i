@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.3 2003/02/24 13:17:59 sjogren Exp $
+ * $Id: newt.c,v 1.4 2003/03/01 19:41:31 mckinstry Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -598,7 +598,7 @@ static int
 newt_go(struct frontend *obj)
 {
     struct question *q = obj->questions;
-    int i, ret;
+    int i, ret = DC_OK;
 
     init_and_cls(0);
     while (q != NULL) {
