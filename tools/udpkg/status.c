@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.16 2000/11/29 06:27:21 tausq Exp $ */
+/* $Id: status.c,v 1.17 2000/11/29 21:25:54 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -167,7 +167,6 @@ void *status_read(void)
 				t = *(struct package_t **)tsearch(p, &status, package_compare);
 				if (!(t == p))
 				{
-					fprintf(stderr, "already provided, freeing\n");
 					free(p->package);
 					free(p);
 				}

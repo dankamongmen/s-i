@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.18 2000/11/29 04:13:31 tausq Exp $ */
+/* $Id: udpkg.c,v 1.19 2000/11/29 21:25:54 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -362,12 +362,18 @@ int main(int argc, char **argv)
 #endif
 {
 	char opt = 0;
+	char *s;
 	struct package_t *p, *packages = NULL;
 	char *cwd = getcwd(0, 0);
 	while (*++argv)
 	{
-		if (**argv == '-')
-			opt = *(*argv+1);
+		if (**argv == '-') {
+			/* Nasty little hack to "parse" long options. */
+			s = *argv;
+			while (*s == '-')
+				s++;
+			opt=s[0];
+		}
 		else
 		{
 			p = (struct package_t *)malloc(sizeof(struct package_t));
@@ -397,6 +403,6 @@ int main(int argc, char **argv)
 
 	/* if it falls through to here, some of the command line options were
 	   wrong */
-	fprintf(stderr, "udpkg <-i|-r|-u|-c> my.deb\n");
+	fprintf(stderr, "udpkg <-i|-r|--unpack|--configure> my.deb\n");
 	return 0;
 }
