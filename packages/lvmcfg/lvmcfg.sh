@@ -272,7 +272,7 @@ vg_mainmenu() {
 				get_pvs
 				if [ -z "$PARTITIONS" ]; then
 					OVERRIDE=no
-					db_set lvmcfg/mainmenu "Logical Volumes (LV)"
+					db_set lvmcfg/mainmenu "Modify logical volumes (LV)"
 					break
 				fi
 			else
