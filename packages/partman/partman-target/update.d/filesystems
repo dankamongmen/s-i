@@ -15,11 +15,11 @@ cd $dev
 
 [ -d $id ] || mkdir $id
 
-if [ $fs = free -a -f $id/method ]; then
+if [ $fs = free ] && [ -f $id/method ]; then
     rm $id/method
 fi
 
-if [ ! -f $id/method -o ! -f $id/use_filesystem ]; then
+if [ ! -f $id/method ] || [ ! -f $id/use_filesystem ]; then
     [ ! -f $id/acting_filesystem ] || rm $id/acting_filesystem
     exit 0
 fi

@@ -12,7 +12,7 @@ else
     method=dont_use
 fi
 
-if [ -f $id/filesystem -a '(' "$method" = keep -o "$method" = format ')' ]; then
+if [ -f $id/filesystem ] && ([ "$method" = keep ] || [ "$method" = format ]); then
     fs=$(cat $id/filesystem)
     db_metaget partman/filesystem_long/$fs description || RET=''
     if [ "$RET" ]; then
