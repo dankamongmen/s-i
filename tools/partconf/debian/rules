@@ -53,7 +53,7 @@ binary-arch: build install
 	for p in $(PACKAGES); do \
 	    FILENAME=$${p}_$(VERSION)_$(ARCH).udeb; \
 	    dpkg-distaddfile $$FILENAME debian-installer $(PRIORITY); \
-	    dh_builddeb --filename=$$FILENAME; \
+	    dh_builddeb -p$${p} --filename=$$FILENAME; \
 	done
 
 binary: binary-arch
