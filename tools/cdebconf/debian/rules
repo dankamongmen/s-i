@@ -22,11 +22,14 @@ udebpriority=$(shell grep '^Package: cdebconf-udeb' debian/control -A 10 | grep 
 slang_udebname=cdebconf-slang-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
 slang_udebpriority=$(shell grep '^Package: cdebconf-slang-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
 
+newt_udebname=cdebconf-newt-udeb_$(VERSION)_$(DEB_HOST_ARCH).udeb
+newt_udebpriority=$(shell grep '^Package: cdebconf-newt-udeb' debian/control -A 10 | grep ^Priority: | cut -d ' ' -f 2)
+
 #package names
 LIBDEBCONFDEV=libdebconf1-dev
 LIBDEBCONF=libdebconf1
 
-FRONTENDS=text slang
+FRONTENDS=text slang newt
 ifeq (,$(findstring hurd-,$(DEB_HOST_ARCH)))
 FRONTENDS += bogl
 endif
@@ -57,7 +60,7 @@ build-udeb-stamp:
 	(cd $(udebbuild); CFLAGS="$(CFLAGS) $(SIZEOPTFLAG) -fomit-frame-pointer" \
 		$(topdir)/configure --prefix=/usr --sysconfdir=/etc \
 		--without-rpath --with-db="rfc822db" \
-		--with-frontend="text slang" $(DEBUG_CONFIGURE_OPT) \
+		--with-frontend="text slang newt" $(DEBUG_CONFIGURE_OPT) \
 		--with-conffile=$(CONFFILE))
 	(cd $(udebbuild); $(MAKE) clean; $(MAKE))
 	touch $@
@@ -87,6 +90,7 @@ install-udeb: build-udeb
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/include
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/share/man
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/cdebconf/frontend/slang.so
+	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/cdebconf/frontend/newt.so
 	rm -rf $(shell pwd)/debian/cdebconf-udeb/usr/lib/lib*.a
 
 install-slang-udeb: build-udeb
@@ -97,6 +101,15 @@ install-slang-udeb: build-udeb
 	dh_installdebconf -n -pcdebconf-slang-udeb
 	(cd $(udebbuild)/src/modules/frontend/slang; \
 		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf-slang-udeb/usr )
+
+install-newt-udeb: build-udeb
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	dh_installdebconf -n -pcdebconf-newt-udeb
+	(cd $(udebbuild)/src/modules/frontend/newt; \
+		$(MAKE) install prefix=$(shell pwd)/debian/cdebconf-newt-udeb/usr )
 
 install: build
 	dh_testdir
@@ -121,7 +134,7 @@ binary-indep: build install
 # Build architecture-dependent files here.
 #
 # Note that this builds a .udeb, which is not policy compliant or anything.
-binary-arch: cdebconf cdebconf-udeb cdebconf-slang-udeb
+binary-arch: cdebconf cdebconf-udeb cdebconf-slang-udeb cdebconf-newt-udeb
 
 $(LIBDEBCONF): install
 	dh_testdir
@@ -211,6 +224,24 @@ cdebconf-slang-udeb: install-slang-udeb
 # udebs shouldn't have md5sums.
 #	dh_md5sums		-p$@
 	dh_builddeb		-p$@ --filename=$(slang_udebname)
+
+cdebconf-newt-udeb: install-newt-udeb
+	@echo "Building $@"
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	dh_strip		-p$@
+	dh_compress		-p$@
+	dh_fixperms		-p$@
+	dh_installdeb		-p$@
+	dh_shlibdeps -p$@ -ldebian/$@/usr/lib
+	# Don't write your stupid guesses to debian/files.
+	dh_gencontrol 		-p$@ -- -fdebian/files~
+	# Register file manually.
+	dpkg-distaddfile	$(newt_udebname) debian-installer $(newt_udebpriority)
+# udebs shouldn't have md5sums.
+#	dh_md5sums		-p$@
+	dh_builddeb		-p$@ --filename=$(newt_udebname)
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
