@@ -39,7 +39,7 @@ load_module() {
 	#echo "echo \"$module $RET\" >> /target/etc/modules" >> $prebaseconfig
 	:
     else
-	db_subst hw-detect/modprobe_error CMD_LINE "modprobe -v $module $RET"
+	db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $RET"
 	db_input critical hw-detect/modprobe_error || [ $? -eq 30 ]
 	db_go
     fi
@@ -144,7 +144,7 @@ do
     then
         log "Trying to load module '$module'"
 
-        if modprobe -l ${module}.o | grep ${module}.o > /dev/null
+        if find /lib/modules/`uname -r`/ | grep ${module}\\.o > /dev/null
         then
                 :
         else
@@ -190,7 +190,7 @@ do
             fi
         fi
 
-        if modprobe -l ${module}.o | grep ${module}.o > /dev/null
+        if find /lib/modules/`uname -r`/ | grep ${module}\\.o > /dev/null
         then
             if load_modules "$module"
             then
