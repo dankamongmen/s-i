@@ -32,21 +32,26 @@ update_mtab() {
         done ) > $mtab
 }
 
-db_progress START 0 5 aboot-installer/progress/title
-db_progress INFO aboot-installer/progress/step_install
+db_progress START 0 4 aboot-installer/progress/title
 
-if apt-install aboot; then
-	:
-else
-	info "Calling 'apt-install aboot' failed"
-	db_input critical aboot-installer/apt-install-failed || [ $? -eq 30 ]
-	db_go
-	db_get
-	if [ true != "$RET" ]; then
-		db_progress STOP
-		exit 1
-	fi
-fi
+
+# Probably unnecessary, because aboot is Prio: standard and part of
+# base.  Let's try without it and see!
+#
+#db_progress INFO aboot-installer/progress/step_install
+#
+#if apt-install aboot; then
+#	:
+#else
+#	info "Calling 'apt-install aboot' failed"
+#	db_input critical aboot-installer/apt-install-failed || [ $? -eq 30 ]
+#	db_go
+#	db_get
+#	if [ true != "$RET" ]; then
+#		db_progress STOP
+#		exit 1
+#	fi
+#fi
 
 db_progress STEP 1
 db_progress INFO aboot-installer/progress/step_bootdev
@@ -66,11 +71,13 @@ do
 done
 
 if [ -z "$PARTITIONS" ]; then
-	# FIXME:
 	# error: no viable ext2 partitions found, throw a debconf message
 	# and exit with an error
-	# db_input critical ...
+	error 'No ext2 partitions found'
+	db_input critical aboot-installer/no-partitions || [ $? -eq 30 ]
+	db_go
 	db_progress STOP
+	exit 1
 fi
 
 # We'll need this to figure out which device /boot is on, just like
@@ -131,8 +138,58 @@ mv ${ABOOTCONF}.new $ABOOTCONF
 
 db_progress STEP 1
 
-# FIXME: If bootdev is not the rootfs, move /boot and /etc/aboot.conf
-# db_subst aboot-installer/progress/step_copy_kernel BOOTDEV $bootdev
+# Possibilities:
+#
+# If /boot is the chosen ext2 partition, and it's not part of /, there
+# must be a reason -- copy /etc/aboot.conf under /boot.
+#
+# If / is the chosen ext2 partition, and /boot is not part of it, we're
+# in trouble; we assumed above they were part of the same partition.  Now,
+# as long as /boot is also ext2 and on the same physical device, this
+# can be made to work, but we already wrote out a different aboot.conf
+# above.  TODO: work on this case later.
+#
+# If / is the chosen ext2 partition, and /boot *is* part of it, piece of
+# cake -- no copy needed.
+#
+# If we've been given a partition that matches neither /boot nor /,
+# do a full copy of the bits we need.
+#
+rootdev=`chroot /target df / | sed -n -e'/^\/dev/ { s/[[:space:]].*//; p }'`
+if [ "$bootdev" = "$realbootdev" ] ; then
+    if [ "$rootdev" != "$bootdev" ] ; then
+        db_subst aboot-installer/progress/step_copy_kernel BOOTDEV $bootdev
+        db_progress INFO aboot-installer/progress/step_copy_kernel
+        mkdir /target/boot/etc/
+        cp -a /target/etc/aboot.conf /target/boot/etc/
+    fi
+elif [ "$bootdev" != $rootdev" ] ; then
+    # The chosen device is neither / nor /boot; special case.
+    db_subst aboot-installer/progress/step_copy_kernel BOOTDEV $bootdev
+    db_progress INFO aboot-installer/progress/step_copy_kernel
+
+    # Do we have to figure out whether this device is mounted somewhere?
+    mkdir -p /target/realboot
+    chroot /target mount -text2 $bootdev /realboot
+
+    # Figure out where the symlinks are pointed (normally boot, but
+    # let's be robust)
+    realkernel=`readlink /target/vmlinuz`
+    realinitrd=`readlink /target/initrd.img`
+
+    # Make the directories we need
+    mkdir -p /target/realboot/etc /target/realboot/`dirname realkernel` \
+             /target/realboot/`dirname realinitrd`
+
+    # Copy everything we need -- config file, symlinks, symlink targets.
+    cp -a /target/etc/aboot.conf /target/realboot/etc/
+    cp -a /target/vmlinuz /target/initrd.img /target/realboot/
+    cp -a "/target/$realkernel" "/target/realboot/$realkernel"
+    cp -a "/target/$realinitrd" "/target/realboot/$realinitrd"
+
+    chroot /target umount /target/realboot
+    rmdir --ignore-fail-on-non-empty /target/realboot
+fi
 
 # TODO: hooks in /etc/kernel-img.conf, in case we move the device?
 
