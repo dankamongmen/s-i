@@ -30,15 +30,14 @@ debconf_select () {
 	choices="$3"
 	default_choice="$4"
 	default=''
-	# Debconf ignores spaces so we have to remove them from
-	# $choices
+	# Debconf ignores spaces so we have to remove them from $choices
 	newchoices=''
 	IFS="$NL"
 	for x in $choices; do
 		local key option
 		restore_ifs
 		key=$(echo ${x%$TAB*})
-		option=$(echo "${x#*$TAB}" | sed 's/ *$//g')
+		option=$(echo "${x#*$TAB}" | sed 's/ *$//g' | sed 's/^ / /g')
 #		option=$(echo "${x#*$TAB}" | sed 's/ / /g')
 		newchoices="${newchoices}${NL}${key}${TAB}${option}"
 		if [ "$key" = "$default_choice" ]; then
@@ -73,19 +72,7 @@ debconf_select () {
 }
 
 menudir_default_choice () {
-    local dir plugin
-    dir="$1"
-    plugin="$dir/[0-9]*$2"
-    shift 2
-    if [ ! -x $plugin/choices ]; then
-        return 1
-    fi
-    name=$(basename $plugin)
-    IFS="$NL"
-    for option in $($plugin/choices "$@"); do
-        printf "%s__________%s\n" $name $(echo "$option" | cut -f 1) > $dir/default_choice
-    done
-    restore_ifs
+    printf "%s__________%s\n" "$(basename $1/??$2)" "$3" > $1/default_choice
 }
 
 ask_user () {
@@ -134,7 +121,7 @@ partition_tree_choices () {
 	while { read num id size type fs path name; [ "$id" ]; }; do
 	    part=${dev}/$id
 	    [ -f $part/view ] || continue
-	    printf "%s//%s\t        %s\n" "$dev" "$id" $(cat $part/view)
+	    printf "%s//%s\t     %s\n" "$dev" "$id" $(cat $part/view)
 	done
 	restore_ifs
     done
@@ -146,13 +133,15 @@ longint_le () {
 	x=$(expr "$1" : '0*\(.*\)')
 	y=$(expr "$2" : '0*\(.*\)')
 	if [ ${#x} -lt ${#y} ]; then
-		return 0
+	    return 0
 	elif [ ${#x} -gt ${#y} ]; then
-		return 1
+	    return 1
+	elif [ "$x" = "$y" ]; then
+	    return 0
 	elif [ "$x" '<' "$y" ]; then
-		return 0
+	    return 0
 	else
-		return 1
+	    return 1
 	fi
 }
 
@@ -220,23 +209,27 @@ human2longint () {
 	t|T)
 		longint=${longint}00000000
 		;;
-	*) # bytes (no suffix)
-		longint=${longint%????}
-		[ "$longint" ] || longint=0
+	*) # no suffix:
+		# bytes
+		#longint=${longint%????}
+		#[ "$longint" ] || longint=0
+		# megabytes
+		longint=${longint}00
+		;;
 	esac
 	echo $longint
 }
 
 valid_human () {
 	local IFS patterns
-	patterns='[0-9][0-9]*$
-[0-9][0-9]* *[bB]$
-[0-9][0-9]* *[kKmMgGtT]$
-[0-9][0-9]* *[kKmMgGtT][bB]$
-[0-9]*[.,][0-9]*$
-[0-9]*[.,][0-9]* *[bB]$
-[0-9]*[.,][0-9]* *[kKmMgGtT]$
-[0-9]*[.,][0-9]* *[kKmMgGtT][bB]$'
+	patterns='[0-9][0-9]* *$
+[0-9][0-9]* *[bB] *$
+[0-9][0-9]* *[kKmMgGtT] *$
+[0-9][0-9]* *[kKmMgGtT][bB] *$
+[0-9]*[.,][0-9]* *$
+[0-9]*[.,][0-9]* *[bB] *$
+[0-9]*[.,][0-9]* *[kKmMgGtT] *$
+[0-9]*[.,][0-9]* *[kKmMgGtT][bB] *$'
 	IFS="$NL"
 	for regex in $patterns; do
 		if expr "$1" : "$regex" >/dev/null; then return 0; fi
@@ -250,6 +243,7 @@ update_partition () {
     open_dialog PARTITION_INFO $2
     read_line part
     close_dialog
+    [ "$part" ] || return 0
     for u in /lib/partman/update.d/*; do
 	[ -x "$u" ] || continue
 	$u $1 $part
@@ -390,12 +384,12 @@ error_handler () {
 		write_line "unhandled"
 	    fi
 	else
-	    write_line "unhandled"
 	    db_subst partman/exception_handler_note TYPE "$type"
 	    db_subst partman/exception_handler_note DESCRIPTION "$message"
 	    db_fset partman/exception_handler_note seen false
 	    db_input $priority partman/exception_handler_note || true
 	    db_go || true
+	    write_line "unhandled"
 	fi
     done
     if [ -f /var/lib/partman/progress_info ]; then
@@ -632,6 +626,8 @@ default_disk_label () {
 	    echo UNKNOWN;;
     esac
 }
+
+log '*******************************************************'
 
 # Local Variables:
 # coding: utf-8

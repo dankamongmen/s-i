@@ -12,6 +12,7 @@ cd $dev
 
 [ -f $part/method -a -f $part/acting_filesystem ] || exit 0
 
+method=$(cat $part/method)
 filesystem=$(cat $part/acting_filesystem)
 
 choice_mountpoint () {
@@ -55,7 +56,25 @@ choice_options () {
     esac
 }
 
+choice_format_swap () {
+    if 
+        [ "$method" = swap -a -f $part/detected_filesystem ] \
+        && [ "$(cat $part/detected_filesystem)" = linux-swap ]
+    then
+	db_metaget partman-basicfilesystems/text/format_swap description
+	description=$(stralign -25 "$RET")
+	if [ -f $part/format ]; then
+	    db_metaget partman-basicfilesystems/text/yes description
+	    printf "dont_format_swap\t%s%s\n" "$description" "${RET}"
+	else
+	    db_metaget partman-basicfilesystems/text/no description
+	    printf "format_swap\t%s%s\n" "$description" "${RET}"
+	fi
+    fi
+}
+
 choice_mountpoint
 
 choice_options
 
+choice_format_swap

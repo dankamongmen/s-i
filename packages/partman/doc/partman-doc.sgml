@@ -499,7 +499,17 @@ _Description: Palo
 
 <p> Another job for the scripts <prgn>do_option</prgn> of the menu
 directory <prgn>choose_method</prgn> is to create or remove a file
-named `format' in the directory of the partitions.  If the partition
+named <prgn>use_filesystem</prgn> in the directory of the partitions.
+This file is created when the usage method requires the partition to
+be is used together with some file system.  Otherwise it is removed.
+Example methods that are used together with a file system are `format
+the partition' and `keep and use the existing data'.  Example methods
+that are not used together with a file system are `LVM physical
+volume' and `PALO boot partition'.
+
+<p> Finaly, the scripts <prgn>do_option</prgn> of the menu directory
+<prgn>choose_method</prgn> have to create or remove a file named
+`format' in the directory of the partitions.  If the partition
 directory contains a file named <prgn>format</prgn> then it will be
 formated.  Otherwise it will not be formated.  For example if the user
 chooses to `format the partition' the script <prgn>do_option</prgn>
@@ -700,11 +710,18 @@ other arguments are again
   <prgn>menudir_default_choice</prgn>. Synopsis:
 
 <example>
-menudir_default_choice <var>a_menu_directory</var> <var>default</var> <var>aditional_optional_arguments</var>...
+menudir_default_choice <var>a_menu_directory</var> <var>subdirectory</var> <var>menu_item_id</var>
 </example>
 
-<p> Where the default is the name of an item in the menu-directory,
-with the leading sequence number stripped off.
+<p> Where the <var><tt>subdirectory</tt></var> is the name of a
+subdirectory in the menu-directory with the leading sequence number
+stripped off and <var><tt>menu_item_id</tt></var> is the id of a
+menu-item printed by
+<file><var>a_menu_directory</var>/??<var>subdirectory</var>/choices</file>.
+The specified item is set as default not forever but only for the next
+invocation of <prgn>ask_user</prgn>.  It is not an error to set as
+default non-existing item; in this case the first item in the menu
+will be default.
 
 <p> The function <prgn>partition_tree_choices</prgn> prints a sequence
 of lines in the form
@@ -1343,11 +1360,19 @@ open_dialog RESIZE_PARTITION <var>partition_id</var> <var>new_size</var>
 read_line new_id
 close_dialog
 </example>
-This command resizes the partition, preserving the data in it.  As
-usualy <var><tt>new_size</tt></var> is measured in bytes.  $new_id is
-the new id that the partition receives.  Resizing is not always supported.
-If it fails, then $new_id will be the same as
+This command resizes a partition.  As usualy
+<var><tt>new_size</tt></var> is measured in bytes.  $new_id is the new
+id that the partition receives.  The resizing is not supported always.
+If it fails $new_id will be the same as
 <var><tt>partition_id</tt></var>.
+
+<p> If the partition exists on the storage device and contains some
+file system, then the data in the partition will be preserved and the
+new partition table <em>will be written on the storage device</em>.
+When it is imposible to resize the file system, the partition will be
+left unresized.  When the partition doesn't exist on the storage
+device, the new version of the partition table will not be written to
+it.
 
 <p> This command doesn't move the start of the partition but only its
 end.

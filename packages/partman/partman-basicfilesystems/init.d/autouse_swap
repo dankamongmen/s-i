@@ -2,7 +2,7 @@
 
 # Only run the first time.
 if [ -f /var/lib/partman/autouse_swap ]; then
-	exit 0
+    exit 0
 fi
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 touch /var/lib/partman/autouse_swap
@@ -28,7 +28,7 @@ for part in $partitions; do
     dev=${part%,*}
     id=${part#*,}
     [ -d $dev/$id ] || continue
-    echo keep >$dev/$id/method
+    echo swap >$dev/$id/method
     update_partition $dev $id
 done
 

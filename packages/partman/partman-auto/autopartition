@@ -11,11 +11,11 @@ open_dialog PARTITION_INFO $free_space
 read_line x1 x2 free_size x3 x4 x5 x6
 close_dialog
 
-free_size=$(expr 000000"$free_size" : '0*\(.*\)......$') # convert to megabytes
+free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
 
 choose_recipe "$free_size" || exit $?
 
 perform_recipe $dev $free_space $recipe || exit $?
 
 # default to accepting the autopartitioning
-menudir_default_choice /lib/partman/choose_partition finish || true
+menudir_default_choice /lib/partman/choose_partition finish finish || true

@@ -20,14 +20,13 @@ for dev in $DEVICES/*; do
 	    -a -f $id/acting_filesystem ] || continue
 	filesystem=$(cat $id/acting_filesystem)
 	case $filesystem in
-	    linux-swap|ext2|fat16|fat32)
+	    ext2|fat16|fat32)
 		log "Check the file system in $dev/$id"
-		if [ "$filesystem" = linux-swap ]; then
-		    template=partman-basicfilesystems/progress_swap_checking
-		else
-		    template=partman-basicfilesystems/progress_checking
-		fi
-		db_subst $template TYPE "$filesystem"
+		template=partman-basicfilesystems/progress_checking
+                RET=''
+                db_metaget  partman/filesystem_short/"$filesystem" description || RET=''
+                [ "$RET" ] || RET="$filesystem"
+		db_subst $template TYPE "$RET"
 		db_subst $template PARTITION "$num"
 		db_subst $template DEVICE $(humandev $(cat device))
 		name_progress_bar $template

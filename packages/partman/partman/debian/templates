@@ -50,10 +50,7 @@ _Description: Continue with partitioning?
 Template: partman/choose_partition
 Type: select
 Choices: ${CHOICES}
-_Description: Partition table overview:
- This is an overview of your currently configured partitions and mount
- points. Select a partition or device to modify its settings, or select
- free space to add a new partition.
+_Description: This is an overview of your currently configured partitions and mount points. Select a partition to modify its settings, a free space to create partitions, or a device to initialise its partition table.
 
 Template: partman/confirm_new_label
 Type: boolean
@@ -68,7 +65,7 @@ _Description: Create new empty partition table on this device?
 Template: partman/confirm_write_new_label
 Type: boolean
 Default: false
-Description: Write a new empty partition table?
+_Description: Write a new empty partition table?
  Because of limitations in the current implementation of the Sun
  partition tables in libparted, the newly created partition table has
  to be written to the disk immediately.
@@ -82,13 +79,24 @@ Description: Write a new empty partition table?
 Template: partman/confirm
 Type: boolean
 Default: false
-# Translators, note that this is identical to partconf/confirm from the
-# partconf package.
-_Description: Ready to create file systems and mount partitions?
- File systems will be created and partitions mounted.
+_Description: Ready to write the changes to disk?
+ The changes to the partition table will be written to disk, file
+ systems created and partitions mounted.
  .
- WARNING: This will destroy all data on the partitions you have assigned
- file systems to.
+ WARNING: This will destroy all data on the partitions you have
+ removed as well as on the partitions you have assigned creation of
+ new file systems.
+ .
+ ${ITEMS}
+
+Template: partman/text/confirm_item_header
+Type: text
+_Description: The following partitions are going to be formated:
+
+Template: partman/text/confirm_item
+Type: text
+# for example: "partition #6 of IDE0 master as ext3 journalling file system"
+_Description: partition #${PARTITION} of ${DEVICE} as ${TYPE}
 
 Template: partman/storage_device
 Type: select
@@ -104,6 +112,15 @@ Template: partman/active_partition
 Type: select
 Choices: ${CHOICES}
 _Description: Partition settings:
+ You are editing partition #${PARTITION} of ${DEVICE}. ${OTHERINFO}
+
+Template: partman/text/there_is_detected
+Type: text
+_Description: This partition contains ${FILESYSTEM}.
+
+Template: partman/text/none_detected
+Type: text
+_Description: No existing file system is detected in this partition.
 
 Template: partman/show_partition_chs
 Type: note

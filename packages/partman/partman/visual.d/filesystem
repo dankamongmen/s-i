@@ -12,24 +12,10 @@ fs=$6
 path=$7
 name=$8
 
-if [ "$fs" != free ]; then
-    if [ -f $id/acting_filesystem ]; then
-	filesystem=$(cat $id/acting_filesystem)
-    elif [ -f $id/detected_filesystem -a ! -f $id/method ]; then
-	filesystem=$(cat $id/detected_filesystem)
-    else
-	filesystem=''
-    fi
-    RET=''
-    if [ "$filesystem" ]; then
-	db_metaget partman/filesystem_short/$filesystem description || RET=''
-    fi
-    RET="${RET:-$filesystem}"
-elif [ "$type" = unusable ]; then
-    db_metaget partman/text/unusable description
+if [ -f $id/visual_filesystem ]; then
+    fs=$(cat $id/visual_filesystem)
 else
-    db_metaget partman/text/free_space description
+    fs=''
 fi
 
-stralign -11 " $RET" #TODO: language dependent length
-
+stralign -11 " $fs" #TODO: language dependent length

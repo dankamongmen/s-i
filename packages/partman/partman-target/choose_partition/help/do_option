@@ -1,0 +1,41 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+if [ -x /bin/archdetect ]; then
+    archdetect=$(archdetect)
+else
+    archdetect=unknown/generic
+fi
+arch=${archdetect%/*}
+
+db_reset partman-target/arch_help/$arch
+
+if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
+    db_subst partman-target/arch_help/$arch BOOTABLE '↯'
+else
+    db_subst partman-target/arch_help/$arch BOOTABLE 'B'
+fi
+
+db_reset partman-target/help 
+db_metaget partman-target/arch_help/$arch description || RET=''
+db_subst partman-target/help ARCHITECTURE_HELP  "$RET"
+
+if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
+    db_subst partman-target/help KEEP  '☻'
+    db_subst partman-target/help DESTROY '☠'
+    db_subst partman-target/help FORMAT '☺'
+else
+    db_subst partman-target/help KEEP 'K'
+    db_subst partman-target/help DESTROY 'F'
+    db_subst partman-target/help FORMAT 'f'
+fi
+
+db_input critical partman-target/help
+db_go
+
+exit 0
+
+# Local Variables:
+# coding: utf-8
+# End:

@@ -15,5 +15,9 @@ touch /var/lib/partman/initial_auto
 
 echo "partman-auto/init_automatically_partition" > /lib/partman/automatically_partition/question
 . /lib/partman/definitions.sh
-ask_user /lib/partman/automatically_partition || true
+ask_user /lib/partman/automatically_partition 
+code=$?
 echo "partman-auto/automatically_partition" > /lib/partman/automatically_partition/question
+if [ "$code" = 255 ]; then
+    exit 1
+fi

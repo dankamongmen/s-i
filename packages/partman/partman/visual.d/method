@@ -13,34 +13,27 @@ name=$8
 if [ ! -f $id/method ]; then
     printf "  "
 else
-    method=$(cat $id/method)
-    case "$method" in
-	keep)
+    if [ -f $id/format ]; then
+	if [ -f $id/detected_filesystem ]; then
 	    if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
-		printf " ☻"
+		printf " ☠"
 	    else
-		printf " K"
+		printf " F"
 	    fi
-	    ;;
-	format)
-	    if [ -f $id/detected_filesystem ]; then
-		if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
-		    printf " ☠"
-		else
-		    printf " F"
-		fi
+	else
+	    if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
+		printf " ☺"
 	    else
-		if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
-		    printf " ☺"
-		else
-		    printf " f"
-		fi
+		printf " f"
 	    fi
-	    ;;
-	*)
-	    printf "  "
-	    ;;
-    esac
+	fi
+    else
+	if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
+	    printf " ☻"
+	else
+	    printf " K"
+	fi
+    fi
 fi
 
 # Local Variables:

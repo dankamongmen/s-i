@@ -10,6 +10,10 @@ Template: partman-basicfilesystems/progress_formatting
 Type: text
 _Description: Creating ${TYPE} file system in partition #${PARTITION} of ${DEVICE}...
 
+Template: partman-basicfilesystems/progress_formatting_mountable
+Type: text
+_Description: Creating ${TYPE} file system for ${MOUNT_POINT} in partition #${PARTITION} of ${DEVICE}...
+
 Template: partman-basicfilesystems/progress_swap_formatting
 Type: text
 _Description: Formatting swap space in partition #${PARTITION} of ${DEVICE}...
@@ -21,13 +25,27 @@ _Description: Go back to the menu and correct errors?
  of ${DEVICE} found uncorrected errors.
  .
  If you do not go back to the partitioning menu and correct these errors,
- the partition will not be used at all.
+ the partition will be used as is.
+
+Template: partman-basicfilesystems/swap_check_failed
+Type: boolean
+_Description: Go back to the menu and correct errors?
+ The test of the swap space in partition #${PARTITION} of ${DEVICE} found
+ uncorrected errors.
+ .
+ If you do not go back to the partitioning menu and correct these errors,
+ the partition will be used as is.
 
 Template: partman-basicfilesystems/create_failed
 Type: error
 _Description: Failed to create a file system
  The ${TYPE} file system creation in partition
  #${PARTITION} of ${DEVICE} failed.
+
+Template: partman-basicfilesystems/create_swap_failed
+Type: error
+_Description: Failed to create a swap space
+ The creation of swap space in partition #${PARTITION} of ${DEVICE} failed.
 
 Template: partman-basicfilesystems/no_mount_point
 Type: boolean
@@ -59,6 +77,24 @@ _Description: Invalid mount point
  .
  Mount points must start with /.  They cannot contain spaces.
 
+Template: partman-basicfilesystems/text/swap_method
+Type: text
+_Description: Use the partition as a swap area
+
+Template: partman-basicfilesystems/text/format_swap
+Type: text
+_Description: Format the swap area:
+
+Template: partman-basicfilesystems/text/yes
+Type: text
+# In the following context: "Format the partition: yes"
+_Description: yes
+
+Template: partman-basicfilesystems/text/no
+Type: text
+# In the following context: "Format the partition: no"
+_Description: no
+
 Template: partman-basicfilesystems/text/specify_mountpoint
 Type: text
 # This is an item in the menu "Action on the partition"
@@ -66,11 +102,11 @@ _Description: Mount point:
 
 Template: partman-basicfilesystems/text/no_mountpoint
 Type: text
-_Description: None
+# In the following context: "Mount point: none"
+_Description: none
 
 Template: partman/filesystem_long/ext2
 Type: text
-# File system name
 _Description: ext2 file system
 
 Template: partman/filesystem_short/ext2
@@ -80,8 +116,7 @@ _Description: ext2
 
 Template: partman/filesystem_long/fat16
 Type: text
-# File system name (untranslatable in many languages)
-_Description: FAT16
+_Description: FAT16 file system
 
 Template: partman/filesystem_short/fat16
 Type: text
@@ -90,17 +125,25 @@ _Description: fat16
 
 Template: partman/filesystem_long/fat32
 Type: text
-# File system name
-_Description: FAT32
+_Description: FAT32 file system
 
 Template: partman/filesystem_short/fat32
 Type: text
 # Short file system name (untranslatable in many languages)
 _Description: fat32
 
+Template: partman/method_long/swap
+Type: text
+_Description: swap area
+
+Template: partman/method_short/swap
+Type: text
+# Short variant of `swap space'
+_Description: swap
+
 Template: partman/filesystem_long/linux-swap
 Type: text
-_Description: swap space
+_Description: swap area
 
 Template: partman/filesystem_short/linux-swap
 Type: text

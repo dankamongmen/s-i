@@ -1,3 +1,36 @@
+partman-partitioning (17) UNRELEASED; urgency=low
+
+  * Translators: do not modify this changelog to record changes you make to
+    po files. A record of your contributions will be added to the changelog
+    at package release time by the output-l10n-changes program.
+
+  * Anton Zinoviev
+    - rules: remove .svn directories from the package
+    - resizing:
+        1. do not allow sizes bigger or smaller than possible.
+           Thanks to Laurens Blankers, closes: #239208
+        2. accept "max" and "nn%" as shortcuts for the value of the new size
+        3. write changes to the storage device and resize the file system
+           in the partition only when the partition already exists in the
+           storage device.  Thanks to Laurens Blankers and
+           dan_at_watson.ibm.com, closes: #239435, #239562
+    - new partition:
+        1. the default type is logical when the new partition is near
+           extended partition.  Thanks to Joey Hess, closes: #235505.
+        2. better defaults for the new partition: usage method (format),
+           file system (ext3) and mount point (first unused from /, /home,
+           /usr, /tmp, /usr/local).  The bootable flag is untouched
+           though.  Thanks to Joey Hess and dan_at_watson.ibm.com,
+	   closes: #235367, #239557.
+        3. in the main menu of partman the item for the new partition is
+           default 
+        4. add progress bar while computing the new state (this happened
+           to be quiet slow...)
+    - active_partition/{delete,toggle_bootable}/do_option: add progress
+      bar while computing the new state 
+    
+ -- Anton Zinoviev <zinoviev@debian.org>  Tue,  6 Apr 2004 00:34:21 +0300
+
 partman-partitioning (16) unstable; urgency=low
 
   * Updated translations: 

@@ -2,16 +2,81 @@
 
 [ -f /target/etc/fstab ] || exit 0
 
+MEDIA=/media # or MEDIA='' to make directories in /
+
 # dev, mountpoint, type, options, dump, pass
 addfstab () {
 	printf "%-15s %-15s %-7s %-15s %-7s %s\n" "$1" "$2" "$3" "$4" "$5" "$6" >> /target/etc/fstab
 }
 
-addfstab "#/dev/floppy" "/floppy" "auto" "ro,user,noauto" "0" "0"
+rm_dir_or_link () {
+    if [ -L "$1" ]; then
+	rm "$1"
+    elif [ -d "$1" ]; then
+	rmdir "$1"
+    fi
+}
+
+# category, file system, options, main device, other devices ...
+populate_media () {
+    local category fs options number mount_point
+    category=$1
+    fs=$2
+    options=$3
+    shift; shift; shift
+    mkdir -p /target$MEDIA
+    if [ "$2" ]; then
+	number=0
+	rm_dir_or_link /target${MEDIA}/${category}
+	ln -s ${category}0 /target${MEDIA}/${category}
+	addfstab $1 ${MEDIA}/${category} $fs $options 0 0
+    else
+	number=''
+    fi
+    while [ "$1" ]; do
+	mount_point="${MEDIA}/${category}$number"
+	addfstab $1 $mount_point $fs $options 0 0
+	rm_dir_or_link /target$mount_point
+	mkdir -p /target$mount_point
+	[ -z "$number" ] || number=$(($number + 1))
+	shift
+    done
+}
 
 CDDEV=$(grep /cdrom /proc/mounts | cut -d ' ' -f 1 | grep -v ^/dev/loop)
 if [ -n "$CDDEV" ]; then
-	addfstab "$(mapdevfs $CDDEV)" "/cdrom" "iso9660" "ro,user,noauto" "0" "0"
+    MAPCDDEV=$(mapdevfs $CDDEV)
 else
-	addfstab "#/dev/cdrom" "/cdrom" "iso9660" "ro,user,noauto" "0" "0"
+    MAPCDDEV=''
 fi
+
+CDDEVICES=''
+for dev in /dev/cdroms/*; do
+    [ -b "$dev" ] || continue
+    mapdev=$(mapdevfs $dev)
+    if [ -n "$mapdev" -a "$mapdev" != "$MAPCDDEV" ]; then
+	CDDEVICES="$CDDEVICES $mapdev"
+    fi
+done
+CDDEVICES="$MAPCDDEV $CDDEVICES" # first the mounted cdrom
+
+populate_media cdrom iso9660 ro,user,noauto $CDDEVICES
+
+modprobe floppy >>/var/log/messages 2>&1 || true
+
+FDDEVICES=''
+for dev in /dev/floppy/?; do
+    [ -b "$dev" ] || continue
+    mapdev=$(mapdevfs $dev)
+    if [ "$mapdev" ]; then
+	FDDEVICES="$FDDEVICES $mapdev"
+    fi
+done
+
+populate_media floppy auto rw,user,noauto $FDDEVICES
+
+# Setup /cdrom for compatability
+if [ "$MAPCDDEV" ]; then
+    addfstab "$MAPCDDEV" "/cdrom" "iso9660" "ro,user,noauto" "0" "0"
+fi
+

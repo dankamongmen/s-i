@@ -32,9 +32,9 @@ export number_width
 # discover where the comma has to be escaped..
 deci='.'
 
-if [ -e /var/lib/partman ]; then 
-    rm -rf /var/lib/partman 
-fi
+#if [ -e /var/lib/partman ]; then 
+#    rm -rf /var/lib/partman 
+#fi
 
 mkdir /var/lib/partman
 
@@ -69,7 +69,43 @@ while true; do
 	abort 1
     fi
     
+    # Compute the changes we are going to do
+    items=''
+    for dev in $DEVICES/*; do
+	[ -d "$dev" ] || continue
+	cd $dev
+	partitions=
+	open_dialog PARTITIONS
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+	    [ "$fs" != free ] || continue
+	    partitions="$partitions $id,$num"
+	done
+	close_dialog
+	
+	for part in $partitions; do
+	    id=${part%,*}
+	    num=${part#*,}
+	    [ -f $id/method -a -f $id/format \
+		-a -f $id/visual_filesystem ] || continue
+	    filesystem=$(cat $id/visual_filesystem)
+	    db_subst partman/text/confirm_item TYPE "$filesystem"
+	    db_subst partman/text/confirm_item PARTITION "$num"
+	    db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
+	    db_metaget partman/text/confirm_item description
+	    
+	    items="${items}   ${RET}
+"
+	done
+    done
+
+    if [ "$items" ]; then
+	db_metaget partman/text/confirm_item_header description
+	items="$RET
+$items"
+    fi
+    
     db_reset partman/confirm
+    db_subst partman/confirm ITEMS "$items"
     db_input critical partman/confirm
     db_go || true
     db_get partman/confirm

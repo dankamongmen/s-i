@@ -11,14 +11,22 @@ ARCH=$(shell dpkg --print-architecture)
 FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
 PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
+PROVIDES=made-filesystems, mounted-partitions, partitioned-harddrives
+# parted can not edit properly dvh disk labels, do not provide
+# partitioned-harddrives
+ifeq ($(ARCH),mips)
+PROVIDES=made-filesystems, mounted-partitions
+endif
+
 MENUITEMNUM=42
-# quiet slow and doesn't support the atari subarch
+# slow and doesn't support the atari subarch
 ifeq ($(ARCH),m68k)
 MENUITEMNUM=49
 endif
-# has buggy support for dvh partitioning labels, slow
+# Use `partitioner' for partitioned-harddrives and `partman'
+# instead of `partconf' for made-filesystems and mounted-partitions.
 ifeq ($(ARCH),mips)
-MENUITEMNUM=49
+MENUITEMNUM=44
 endif
 # ibm disk labels are completely unsupported
 ifeq ($(ARCH),s390)
@@ -63,6 +71,7 @@ install: build
 	strip --remove-section=.note --remove-section=.comment `pwd`/debian/${PACKAGE}/bin/parted_server
 	strip --remove-section=.note --remove-section=.comment `pwd`/debian/${PACKAGE}/bin/parted_devices
 	rm -rf `find debian/$(PACKAGE) -name CVS`
+	rm -rf `find debian/$(PACKAGE) -name .svn`
 
 binary-arch: build install
 	dh_testdir
@@ -70,7 +79,7 @@ binary-arch: build install
 	dh_installdebconf -n
 	dh_fixperms
 	dh_installdeb
-	dh_gencontrol -- -Vmenuitemnum=$(MENUITEMNUM) -fdebian/files~
+	dh_gencontrol -- -Vmenuitemnum=$(MENUITEMNUM) -Vprovides='$(PROVIDES)' -fdebian/files~
 	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
 	dh_builddeb --filename=$(FILENAME)
 

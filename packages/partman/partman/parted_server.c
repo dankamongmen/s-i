@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 /**********************************************************************
    Logging
@@ -37,7 +38,7 @@ char const program_name[] = "parted_server";
 #define critical_error(...) \
         ({ \
                 log(__VA_ARGS__); \
-                log("CRITICAL ERROR!!!  EXITING."); \
+                log("Line %i. CRITICAL ERROR!!!  EXITING.", __LINE__); \
                 exit(1); \
         })
 
@@ -364,6 +365,8 @@ struct devdisk {
         PedDevice *dev;
         PedDisk *disk;
         bool changed;
+        PedGeometry *geometries;
+        int number_geometries;
 };
 
 /* We store the accessed devices from `devices[0]' to
@@ -401,6 +404,8 @@ index_of_name(char *name)
         devices[i].dev = NULL;
         devices[i].disk = NULL;
         devices[i].changed = false;
+        devices[i].geometries = NULL;
+        devices[i].number_geometries = 0;
         return i;
 }
 
@@ -439,6 +444,48 @@ set_device_named(char *name, PedDevice *dev)
         devices[index_of_name(name)].dev = dev;
 }
 
+void
+remember_geometries_named(char *name)
+{
+        static unsigned const max_partition = 50;
+        PedGeometry *geometries;
+        PedDisk *disk;
+        int last;
+        PedPartition *part;
+        geometries = devices[index_of_name(name)].geometries;
+        if (NULL != geometries)
+                free(geometries);
+        disk = disk_named(name);
+        if (disk == NULL) {
+                devices[index_of_name(name)].geometries = NULL;
+                devices[index_of_name(name)].number_geometries = 0;
+        } else {
+                geometries = malloc(sizeof(PedGeometry[max_partition]));
+                last = 0;
+                for (part = NULL;
+                     NULL != (part = ped_disk_next_partition(disk, part));) {
+                        if (PED_PARTITION_EXTENDED & part->type)
+                                continue;
+                        if (PED_PARTITION_METADATA & part->type)
+                                continue;
+                        if (PED_PARTITION_FREESPACE & part->type)
+                                continue;
+                        ped_geometry_init(geometries+last,
+                                          disk->dev,
+                                          part->geom.start,
+                                          part->geom.length);
+                        last = last + 1;
+                        if (last >= max_partition)
+                                critical_error("Too many partitions");
+                }
+                geometries = realloc(geometries, sizeof(PedGeometry[last]));
+                if (last != 0 && geometries == NULL)
+                        critical_error("Can not allocate memory");
+                devices[index_of_name(name)].geometries = geometries;
+                devices[index_of_name(name)].number_geometries = last;
+        }
+}
+
 /* Set the PedDisk of `name' to be `disk'.  The old PedDisk of `name'
    (if any) will be ped_disk_destroy-ed. */
 void
@@ -450,6 +497,28 @@ set_disk_named(char *name, PedDisk *disk)
         if (NULL != old_disk)
                 ped_disk_destroy(old_disk);
         devices[index_of_name(name)].disk = disk;
+        remember_geometries_named(name);
+}
+
+/* True iff the partition doesn't exist on the storage device */
+bool
+named_partition_is_virtual(char *name, PedSector start, PedSector end)
+{
+        PedGeometry *geometries;
+        int i;
+        int last;
+        log("named_partition_is_virtual(%s,%lli,%lli)", name, start, end);
+        geometries = devices[index_of_name(name)].geometries;
+        last = devices[index_of_name(name)].number_geometries;
+        if (NULL == geometries)
+                return true;
+        for (i=0; i<last; i++) {
+                log("comparing against %lli-%lli",
+                    geometries[i].start, geometries[i].end);
+                if (start == geometries[i].start && end == geometries[i].end)
+                        return false;
+        }
+        return true;
 }
 
 /* True iff the partition table of `name' has been changed. */
@@ -583,28 +652,44 @@ add_logical_partition(PedDisk *disk, PedFileSystemType *fs_type,
 }
 
 /* Resizes `part' from `disk' to start from `start' and end at `end'.
-   If `disk' contains some file system it is also resized.  Returns
-   true on success. */
+   If `open_filesystem' is true and `disk' contains some file system
+   then it is also resized.  Returns true on success. */
 bool
 resize_partition(PedDisk *disk, PedPartition *part,
-                 PedSector start, PedSector end)
+                 PedSector start, PedSector end, bool open_filesystem)
 {
         PedFileSystem *fs;
         PedConstraint *constraint;
         PedSector old_start, old_end;
         bool result;
+        log("resize_partition(openfs=%s)", open_filesystem ? "true":"false");
         old_start = (part->geom).start;
         old_end = (part->geom).end;
         if (old_start == start && old_end == end)
                 return true;
-        fs = ped_file_system_open(&(part->geom));
-        if (NULL == fs && NULL != ped_file_system_probe(&(part->geom)))
-                return false;
+        if (open_filesystem) {
+                deactivate_exception_handler();
+                fs = ped_file_system_open(&(part->geom));
+                activate_exception_handler();
+                log("opened file system: %s", NULL != fs ? "yes" : "no");
+                if (NULL != fs && (fs->geom->start != (part->geom).start
+                                   || fs->geom->end != (part->geom).end)) {
+                        ped_file_system_close(fs);
+                        fs = NULL;
+                }
+                if (NULL == fs && NULL != ped_file_system_probe(&(part->geom)))
+                        return false;
+        } else {
+                fs = NULL;
+        }
+        log("try to check the file system for errors");
         if (NULL != fs && !timered_file_system_check(fs)) {
                 /* TODO: inform the user. */
+                log("uncorrected errors");
                 ped_file_system_close(fs);
                 return false;
         }
+        log("successfuly checked");
         if (part->type & PED_PARTITION_LOGICAL)
                 maximize_extended_partition(disk);
         if (NULL != fs)
@@ -772,10 +857,30 @@ partition_info(PedDisk *disk, PedPartition *part)
                 fs = "unknown";
         else
                 fs = part->fs_type->name;
-        if (0 != strcmp(disk->type->name, "loop")) {
-                path = ped_partition_get_path(part);
-        } else {
+        if (0 == strcmp(disk->type->name, "loop")) {
                 path = strdup(disk->dev->path);
+        } else if (0 == strcmp(disk->type->name, "dvh")) {
+                PedPartition *p;
+                int count = 1;
+                int number_offset;
+                for (p = NULL;
+                     NULL != (p = ped_disk_next_partition(disk, p));) {
+                        if (PED_PARTITION_METADATA & p->type)
+                                continue;
+                        if (PED_PARTITION_FREESPACE & p->type)
+                                continue;
+                        if (PED_PARTITION_LOGICAL & p->type)
+                                continue;
+                        if (part->num > p->num)
+                                count++;
+                }
+                path = ped_partition_get_path(part);
+                number_offset = strlen(path);
+                while (number_offset > 0 && isdigit(path[number_offset-1]))
+                        number_offset--;
+                sprintf(path + number_offset, "%i", count);
+        } else {
+                path = ped_partition_get_path(part);
         }
         if (ped_disk_type_check_feature(part->disk->type,
                                         PED_DISK_TYPE_PARTITION_NAME)
@@ -902,6 +1007,7 @@ command_open()
                 deactivate_exception_handler();
                 set_disk_named(device_name,
                                ped_disk_new(device_named(device_name)));
+                unchange_named(device_name);
                 activate_exception_handler();
         } else
                 oprintf("failed\n");
@@ -1119,6 +1225,30 @@ command_get_chs()
         }
         free(id);
         activate_exception_handler();
+}
+
+void
+command_virtual()
+{
+        char *id;
+        PedPartition *part;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        log("command_virtual()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("is virtual partition with id %s", id);
+        part = partition_with_id(disk, id);
+        oprintf("OK\n");
+        if (named_partition_is_virtual(device_name, 
+                                       part->geom.start, part->geom.end)) {
+                oprintf("yes\n");
+        } else {
+                oprintf("no\n");
+        }
+        free(id);
 }
 
 void
@@ -1348,15 +1478,20 @@ command_get_file_system()
         log("command_get_file_system: File system for partition %s", id);
         part = partition_with_id(disk, id);
         oprintf("OK\n");
-        deactivate_exception_handler();
-        fstype = ped_file_system_probe(&(part->geom));
-        if (fstype == NULL) {
+        if (named_partition_is_virtual(device_name, 
+                                       part->geom.start, part->geom.end)) {
                 oprintf("none\n");
         } else {
-                oprintf("%s\n", fstype->name);
+                deactivate_exception_handler();
+                fstype = ped_file_system_probe(&(part->geom));
+                if (fstype == NULL) {
+                        oprintf("none\n");
+                } else {
+                        oprintf("%s\n", fstype->name);
+                }
+                free(id);
+                activate_exception_handler();
         }
-        free(id);
-        activate_exception_handler();
 }
 
 void
@@ -1438,7 +1573,9 @@ command_create_file_system()
         if (fstype == NULL)
                 critical_error("Bad file system type: %s", s_fstype);
         ped_partition_set_system(part, fstype);
+        deactivate_exception_handler();
         fs = timered_file_system_create(&(part->geom), fstype);
+        activate_exception_handler();
         oprintf("OK\n");
         if (fs != NULL)
                 oprintf("OK\n");
@@ -1614,12 +1751,19 @@ command_resize_partition()
                 critical_error("Expected new size");
         start = (part->geom).start;
         end = start + new_size / PED_SECTOR_SIZE - 1;
-        if (resize_partition(disk, part, start, end)) {
-                ped_disk_commit(disk);
+        if (named_partition_is_virtual(device_name, 
+                                       part->geom.start, part->geom.end)) {
+                resize_partition(disk, part, start, end, false);
+        } else {
+                if (resize_partition(disk, part, start, end, true)) {
+                        ped_disk_commit(disk);
+                        unchange_named(device_name);
+                        remember_geometries_named(device_name);
+                }
         }
         oprintf("OK\n");
         oprintf("%lli-%lli\n", (part->geom).start * PED_SECTOR_SIZE,
-                (part->geom).end * PED_SECTOR_SIZE);
+                (part->geom).end * PED_SECTOR_SIZE + PED_SECTOR_SIZE - 1);
         free(id);
 }
 
@@ -1629,7 +1773,7 @@ command_get_resize_range()
         char *id;
         PedPartition *part;
         PedFileSystem *fs;
-        PedConstraint *constraint, *fixed_start;
+        PedConstraint *constraint;
         PedGeometry *max_geom;
         long long max_size, min_size, current_size;
         scan_device_name();
@@ -1644,16 +1788,20 @@ command_get_resize_range()
         part = partition_with_id(disk, id);
         if (part == NULL)
                 critical_error("No such partition");
-        /* TODO: Should we ped_constraint_duplicate? */
-        fixed_start = ped_constraint_duplicate(ped_constraint_any(disk->dev));
-        ped_geometry_set_start(fixed_start->start_range, (part->geom).start);
-        ped_geometry_set_end(fixed_start->start_range, (part->geom).start);
-        fs = ped_file_system_open(&(part->geom));
-        if (NULL != fs)
+        if (!named_partition_is_virtual(device_name, 
+                                        part->geom.start, part->geom.end)) {
+                fs = ped_file_system_open(&(part->geom));
+        } else {
+                fs = NULL;
+        }
+        if (NULL != fs) {
                 constraint = ped_file_system_get_resize_constraint(fs);
-        else
+                ped_file_system_close(fs);
+        } else {
                 constraint = ped_constraint_any(disk->dev);
-        constraint = ped_constraint_intersect(constraint, fixed_start);
+        }
+        ped_geometry_set_start(constraint->start_range, (part->geom).start);
+        ped_geometry_set_end(constraint->start_range, (part->geom).start);
         if (part->type & PED_PARTITION_LOGICAL)
                 maximize_extended_partition(disk);
         max_geom = ped_disk_get_max_partition_geometry(disk, part, constraint);
@@ -1749,6 +1897,8 @@ main_loop()
                         command_partition_info();
                 else if (!strcasecmp(str, "GET_CHS"))
                         command_get_chs();
+                else if (!strcasecmp(str, "VIRTUAL"))
+                        command_virtual();
                 else if (!strcasecmp(str, "LABEL_TYPES"))
                         command_label_types();
                 else if (!strcasecmp(str, "VALID_FLAGS"))

@@ -23,12 +23,29 @@ for dev in $DEVICES/*; do
 	filesystem=$(cat $id/acting_filesystem)
 	case $filesystem in
 	    ext2|fat16|fat32)
+		if 
+		    [ -f $id/formatted_as_$filesystem \
+		      -a $id/formatted_as_$filesystem -nt $id/method \
+		    && [ ! -f $id/filesystem \
+		         -o $id/formatted_as_$filesystem -nt $id/filesystem ]
+		then
+		    continue
+		fi
 		log "Try to create file system for $dev/$id"
-		template=partman-basicfilesystems/progress_formatting
+		if [ -f $id/mountpoint ]; then
+		    template=partman-basicfilesystems/progress_formatting_mountable
+		    db_subst $template MOUNT_POINT "$(cat $id/mountpoint)"
+		else
+		    template=partman-basicfilesystems/progress_formatting
+		fi
 		open_dialog PARTITION_INFO $id
 		read_line x1 x2 x3 x4 x5 device x6
 		close_dialog
-		db_subst $template TYPE "$filesystem"
+
+		RET=''
+		db_metaget  partman/filesystem_short/"$filesystem" description || RET=''
+		[ "$RET" ] || RET="$filesystem"
+		db_subst $template TYPE "$RET"
 		db_subst $template PARTITION "$num"
 		db_subst $template DEVICE $(humandev $(cat device))
 		case $filesystem in
@@ -72,6 +89,7 @@ for dev in $DEVICES/*; do
 		    disable_swap
 		    exit 1
 		fi
+		>$id/formatted_as_$filesystem
 		;;
 	esac
     done

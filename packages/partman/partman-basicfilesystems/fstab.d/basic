@@ -12,6 +12,9 @@ for dev in $DEVICES/*; do
 	    [ -f "$id/acting_filesystem" ] || continue
 	    method=$(cat $id/method)
 	    filesystem=$(cat $id/acting_filesystem)
+	    if [ "$method" = swap ]; then
+		echo "$path" none swap sw 0 0
+	    fi
 	    case "$filesystem" in
 		ext2)
 		    [ -f "$id/mountpoint" ] || continue
@@ -43,9 +46,6 @@ for dev in $DEVICES/*; do
 			options=defaults
 		    fi
 		    echo "$path" "$mountpoint" vfat $options 0 2
-		    ;;
-		linux-swap)
-		    echo "$path" none swap sw 0 0
 		    ;;
 	    esac
 	done

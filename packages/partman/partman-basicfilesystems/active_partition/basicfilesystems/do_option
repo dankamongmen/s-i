@@ -114,5 +114,15 @@ case $1 in
     fatoptions)
 	do_options fat
 	;;
+    format_swap)
+	>$part/format
+	update_partition $dev $id
+	;;
+    dont_format_swap)
+	if [ -f $part/format ]; then
+	    rm $part/format
+	    update_partition $dev $id
+	fi
+	;;
 esac
 
