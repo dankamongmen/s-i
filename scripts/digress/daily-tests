@@ -20,9 +20,11 @@ use () {
 }
 
 overview () {
-	grep -v "$MACHINE-$SCHEME " $DI_TESTDIR/logs/overview.log > $DI_TESTDIR/logs/overview.log.new
-	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $DI_TESTDIR/logs/overview.log.new
-	mv $DI_TESTDIR/logs/overview.log.new $DI_TESTDIR/logs/overview.log
+	logdir=$1
+	shift 1
+	grep -v "$MACHINE-$SCHEME " $LOGDIR/overview.log > $LOGDIR/overview.log.new
+	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $LOGDIR/overview.log.new
+	mv $LOGDIR/overview.log.new $LOGDIR/overview.log
 }
 
 DIGRESSDIR=$(dirname $0)
@@ -45,21 +47,22 @@ touch $DI_TESTDIR/logs/overview.log
 
 for SCHEME in $@; do
 	RETRY=""
+	LOGDIR=$DI_TESTDIR/logs
 	use common
 	use $SCHEME
 	
-	if $DIGRESSDIR/test-harness $MACHINE $SCHEME > $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
-		overview success
+	if $DIGRESSDIR/test-harness $MACHINE $SCHEME > $LOGDIR/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
+		overview $LOGDIR success
 	else
 		if [ -n "$RETRY" ]; then
-			if $DIGRESSDIR/test-harness $MACHINE $SCHEME >> $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
-				overview "success second try"
+			if $DIGRESSDIR/test-harness $MACHINE $SCHEME >> $LOGDIR/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
+				overview $LOGDIR "success second try"
 			else
-				overview failed
+				overview $LOGDIR failed
 			fi
 		else
-			overview failed
+			overview $LOGDIR failed
 		fi
 	fi
-	ln -f $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log $DI_TESTDIR/logs/$MACHINE-$SCHEME.log
+	ln -f $LOGDIR/$datestamp/$MACHINE-$SCHEME.log $LOGDIR/$MACHINE-$SCHEME.log
 done
