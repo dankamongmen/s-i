@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.60 2004/03/09 09:26:51 barbier Exp $
+ * $Id: text.c,v 1.61 2004/03/09 12:56:50 waldi Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -513,11 +513,11 @@ static int text_handler_note(struct frontend *obj, struct question *q)
 		MAKE_UPPER(c); 
 		if (obj->methods.can_go_back (obj, q) && c == CHAR_GOBACK)
 			return DC_GOBACK;
+		if (c == '\r' || c == '\n'
 #if defined(__s390__) || defined (__s390x__)
-		if (c == '.')
-#else
-		if (c == '\r' || c == '\n');
+		    || c == '.'
 #endif
+		   )
 			break;
 	}
 	return DC_OK;
