@@ -197,14 +197,26 @@ md_create_raid1() {
 
 	# Remove partitions selected in raid1devs from the PARTITION list
 	db_get mdcfg/raid1devs
-
-	PARTITIONS=`echo ${PARTITIONS}|sed -e "s/,/\\n/g"`
-
-	for i in $RET; do
-		DEVICE=`echo ${i}|sed -e "s/,//"`
-		PARTITIONS=`echo -e ${PARTITIONS}|sed -e "s/ /\\n/g"|grep -v "${DEVICE}"`
+	OLDIFS="$IFS"
+	IFS=,
+	NEW_PARTITIONS=""
+	for i in $PARTITIONS; do
+		found=0
+		for j in $RET; do
+			if [ "$i" = "$j" ]; then
+				found=1
+			fi
+		done
+		if [ $found -eq 0 ]; then
+			if [ -z "$NEW_PARTITIONS" ]; then
+				NEW_PARTITIONS="$i"
+			else
+				NEW_PARTITIONS="${NEW_PARTITIONS},$i"
+			fi
+		fi
 	done
-
+	IFS=$OLDIFS
+	PARTITIONS=$NEW_PARTITIONS
 
 	db_set mdcfg/raid1sparedevs ""
 	SELECTED=99
