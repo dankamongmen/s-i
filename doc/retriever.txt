@@ -55,20 +55,21 @@ All retrievers should support the following interface.
 ramdisk allocation scheme used by the installer, and so the locations may
 change. ]
 
-/usr/lib/debian-installer/retriever/<retriever name> is a executable. It
-is run with the following parameters:
+/usr/lib/debian-installer/retriever/<retriever name> is a executable (the
+name of the exectable must be the same as the name of the module that
+contains it). It is run with the following parameters:
 
-filename [dest-filename]
+retriever [dest-filename]
 	Download the specified file to the specified destination.
 	If the destination is unspecified, use stdout. The filename 
 	is the Filename field of a Packages file.
 
 	Thus, retrieving the Packages file itself to stdout is 
 	something like this:
-		program Packages
+		retreiver Packages
 	
 	While retrieving a deb is something like this:
-		program retrievers/http-retriever.deb /tmp/http-retriever.deb
+		retreiver retrievers/http-retriever.deb /tmp/http-retriever.deb
 
 If the destination file already exists, the retriever may want to attempt
 to continue a download[2].
