@@ -56,8 +56,6 @@ count="$1"
 log "Progress bar from 0 to $count"
 db_progress START 0 $count disk-detect/progress_title
 
-found_scsi=
-
 # Setting IFS to adjust how the for loop splits the values
 IFS_SAVE="$IFS"
 IFS="
@@ -142,10 +140,7 @@ do
         then
             if load_modules $module
             then
-                case "$module" in
-                    ide-*);;
-                    *) found_scsi=true;;
-                esac
+                :
             else
                 log "Error loading driver '$module' for $vendor $model!"
 	    fi
@@ -161,8 +156,10 @@ IFS="$IFS_SAVE"
 log "Progress bar stop"
 db_progress STOP
 
-# always load sd_mod if a scsi controller module was loaded
-if [ "$found_scsi" ] ; then
+# always load sd_mod if a scsi controller module was loaded.  The
+# /dev/scsi directory should appear automatically on devfs in such
+# cases.
+if [ -d /dev/scsi ] ; then
     load_modules sd_mod
 fi
 
