@@ -42,38 +42,34 @@ A rough roadmap:
 
 -> for debs (base system):
 
- Old, deprecated way:
+ The old way:
  
-   * translators make the templates.ll files in whatever encoding they prefer
+   * translators make the templates.ll files in whatever encoding 
+     their language default is set to.
    
-   * package build procedure merges them into one big mess (multiple encodings
-     in single file), which musn't have the "Encoding: UTF-8" header.
+   * package build procedure merges them into one (multiple encodings
+     in single file).
 
    * when debconf sees a template without the mentioned header, it simply
      outputs the message hoping that the user's locale charset matches the
-     encoding the translator used (current behavior). (We can't use
-     libtext-iconv-perl because we don't know the template's encoding - there
-     is no authorative mapping of lang->encoding for them).
+     encoding the translator used (current behavior). (We don't use
+     libtext-iconv-perl because it is not implemented - there
+     is a authorative mapping of lang->encoding for them).
 
- New, preferred way:
+ New way (are we there yet?):
 
    * translators provide messages in po files (using po-debconf) in whatever
      encoding they prefer
    
    * package build procedure recodes the messages when producing the "combined"
-     template file. The resulting templates file should have a "Encoding:
-     UTF-8" header (actually all this should be taken care of by po-debconf).
+     template file. The resulting templates file should have fields 
+     such as "Description-ll_LL.UTF-8:"
 
    * At debconf run time:
      - if the locale is "C" or uses UTF8 charset, debconf simply copies the
        strings to output, without using libtext-iconv-perl
      - if the locale is something else, debconf recodes the messages using
        libtext-iconv-perl before printing them. [2]
-
-  Since we have a transition period coming up anyway as packages begin to
-  move to po-debconf, and since po-debconf's template po files will include
-  encoding info, add onto this transition that po-debnconf generated
-  template files will be in utf-8.  
 
 
 ISSUES/TODOs:
