@@ -15,6 +15,13 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+/*
+ * Function: getwidth
+ * Input: none
+ * Output: int - width of screen
+ * Description: get the width of the current terminal
+ * Assumptions: doesn't handle resizing; caches value on first call
+ */
 static const int getwidth(void)
 {
 	static int res = 80;
@@ -35,6 +42,13 @@ static const int getwidth(void)
 	return res;
 }
 
+/*
+ * Function: wrap_print
+ * Input: const char *str - string to display
+ * Output: none
+ * Description: prints a string to the screen with word wrapping 
+ * Assumptions: string fits in <500 lines
+ */
 static void wrap_print(const char *str)
 {
 	/* Simple greedy line-wrapper */
@@ -50,12 +64,28 @@ static void wrap_print(const char *str)
 	}
 }
 
+/*
+ * Function: texthandler_displaydesc
+ * Input: struct frontend *obj - UI object
+ *        struct question *q - question for which to display the description
+ * Output: none
+ * Description: displays the description for a given question 
+ * Assumptions: none
+ */
 static void texthandler_displaydesc(struct frontend *obj, struct question *q) 
 {
 	wrap_print(question_description(q));
 	wrap_print(question_extended_description(q));
 }
 
+/*
+ * Function: texthandler_boolean
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handler for the boolean question type
+ * Assumptions: none
+ */
 static int texthandler_boolean(struct frontend *obj, struct question *q)
 {
 	char buf[30];
@@ -92,6 +122,16 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	return DC_OK;
 }
 
+/*
+ * Function: texthandler_multiselect
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handler for the multiselect question type
+ * Assumptions: none
+ *
+ * TODO: factor common code with select
+ */
 static int texthandler_multiselect(struct frontend *obj, struct question *q)
 {
 	char *choices[100] = {0};
@@ -148,6 +188,14 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	return DC_OK;
 }
 
+/*
+ * Function: texthandler_note
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handler for the note question type
+ * Assumptions: none
+ */
 static int texthandler_note(struct frontend *obj, struct question *q)
 {
 	int c;
@@ -156,6 +204,16 @@ static int texthandler_note(struct frontend *obj, struct question *q)
 	return DC_OK;
 }
 
+/*
+ * Function: texthandler_password
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handler for the password question type
+ * Assumptions: none
+ *
+ * TODO: this can be *MUCH* improved. no editing is possible right now
+ */
 static int texthandler_password(struct frontend *obj, struct question *q)
 {
 	struct termios oldt, newt;
@@ -173,12 +231,23 @@ static int texthandler_password(struct frontend *obj, struct question *q)
 		if (c == '\r' || c == '\n') break;
 
 	}
+	printf("\n");
 	passwd[i] = 0;
 	tcsetattr(0, TCSANOW, &oldt);
 	question_setvalue(q, passwd);
 	return DC_OK;
 }
 
+/*
+ * Function: texthandler_select
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handler for the select question type
+ * Assumptions: none
+ *
+ * TODO: factor common code with multiselect
+ */
 static int texthandler_select(struct frontend *obj, struct question *q)
 {
 	char *choices[100] = {0};
@@ -220,6 +289,14 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	return DC_OK;
 }
 
+/*
+ * Function: texthandler_string
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handler for the string question type
+ * Assumptions: none
+ */
 static int texthandler_string(struct frontend *obj, struct question *q)
 {
 	char buf[1024] = {0};
@@ -236,6 +313,14 @@ static int texthandler_string(struct frontend *obj, struct question *q)
 	return DC_OK;
 }
 
+/*
+ * Function: texthandler_text
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question to ask
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: handler for the text question type
+ * Assumptions: none
+ */
 static int texthandler_text(struct frontend *obj, struct question *q)
 {
 	char *out = 0;
@@ -267,6 +352,17 @@ struct question_handlers {
 	{ "text",	texthandler_text }
 };
 
+/*
+ * Function: text_intitialize
+ * Input: struct frontend *obj - frontend UI object
+ *        struct configuration *cfg - configuration parameters
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: initializes the text UI
+ * Assumptions: none
+ *
+ * TODO: SIGINT is ignored by the text UI, otherwise it interfers with
+ * the way question/answers are handled. this is probably not optimal
+ */
 static int text_initialize(struct frontend *obj, struct configuration *conf)
 {
 	obj->interactive = 1;
@@ -274,6 +370,13 @@ static int text_initialize(struct frontend *obj, struct configuration *conf)
 	return DC_OK;
 }
 
+/*
+ * Function: text_go
+ * Input: struct frontend *obj - frontend object
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: asks all pending questions
+ * Assumptions: none
+ */
 static int text_go(struct frontend *obj)
 {
 	struct question *q = obj->questions;
