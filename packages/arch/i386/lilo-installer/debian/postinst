@@ -63,7 +63,7 @@ db_capb backup
 db_subst lilo-installer/bootdev disc "$disc_offered"
 db_subst lilo-installer/bootdev part "$bootfs"
 
-db_input high lilo-installer/bootdev
+db_input high lilo-installer/bootdev || [ $? -eq 30 ]
 db_go || exit 10 # back up
 
 db_get lilo-installer/bootdev
