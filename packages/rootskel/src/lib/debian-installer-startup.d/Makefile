@@ -22,6 +22,11 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
     files += \
 	S45keyboard-linux-powerpc
   endif
+  
+  ifeq ($(DEB_HOST_GNU_CPU),ia64)
+    files += \
+	S45keyboard-linux-ia64
+  endif
 
   ifneq (,$(filter mips mipsel,$(DEB_HOST_GNU_CPU)))
     files += \
