@@ -5,7 +5,7 @@
  * Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: amiga-kbd.c,v 1.7 2003/10/14 20:42:02 mckinstry Exp $
+ * $Id: amiga-kbd.c,v 1.8 2003/11/06 22:30:41 mckinstry Rel $
  */
 
 #include "config.h"
@@ -33,7 +33,7 @@ kbd_t *amiga_kbd_get (kbd_t *keyboards, const char *subarch)
 #endif
 
 	k->name = "amiga"; // This must match the name "amiga" in console-keymaps-amiga
-	k->deflt = "amiga-us";
+	k->deflt = NULL;
 	k->fd = -1;
 	k->present = UNKNOWN;
 	k->next = keyboards;

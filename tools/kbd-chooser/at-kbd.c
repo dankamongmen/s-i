@@ -4,7 +4,7 @@
  * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: at-kbd.c,v 1.10 2003/10/14 20:30:40 mckinstry Exp $
+ * $Id: at-kbd.c,v 1.11 2003/11/06 22:30:41 mckinstry Rel $
  */
 
 #include "config.h"
@@ -34,7 +34,7 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 #endif
 	
 	k->name = "at"; // This must match the name "at" in console-keymaps-at
-	k->deflt = "us";
+	k->deflt = NULL;
 	k->fd = -1;
 	k->present = UNKNOWN;
 	k->next = keyboards;
