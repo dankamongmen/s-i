@@ -319,6 +319,14 @@ vg_create() {
 	[ "$RET" = "false" ] && return
 	NAME="$RET"
 
+	# check whether a name for the vg has been given
+	if [ "$NAME" = "" ]; then
+		db_set lvmcfg/vgcreate_nonamegiven "false"
+		db_input high lvmcfg/vgcreate_nonamegiven
+		db_go
+		return
+	fi
+
 	# check, if the vg name is already in use
 	vgdisplay -v | grep '^[ ]*VG Name' | sed -e 's/ *VG Name *//' | grep -q "^$NAME$"
 	if [ $? -eq 0 ]; then
@@ -561,6 +569,14 @@ lv_create() {
 	[ $? -eq 30 ] && return
 	db_get lvmcfg/lvcreate_name
 	NAME="$RET"
+
+	# check whether a name for the lv has been given
+	if [ "$NAME" = "" ]; then
+		db_set lvmcfg/lvcreate_nonamegiven "false"
+		db_input high lvmcfg/lvcreate_nonamegiven
+		db_go
+		return
+	fi
 
 	db_subst lvmcfg/lvcreate_vgnames GROUPS "${GROUPS}, Leave"
 	db_set lvmcfg/lvcreate_vgnames "false"
