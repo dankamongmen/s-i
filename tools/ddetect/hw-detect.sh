@@ -19,7 +19,7 @@ log () {
 }
 
 is_not_loaded() {
-	return $(cut -d" " -f1 /proc/modules | grep -q "^$1\$")
+	! (cut -d" " -f1 /proc/modules | grep -q "^$1\$")
 }
 
 snapshot_devs() {

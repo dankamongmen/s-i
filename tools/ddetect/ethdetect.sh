@@ -5,7 +5,7 @@ set -e
 #set -x
 
 is_not_loaded() {
-	cut -d" " -f1 /proc/modules | grep -q "^$1\$"
+	! (cut -d" " -f1 /proc/modules | grep -q "^$1\$")
 }
 
 load_module() {
