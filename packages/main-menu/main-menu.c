@@ -31,10 +31,6 @@ const int LOWER = 0;
 
 int last_successful_item = -1;
 
-/* Did the last item signal a backup? This is evil and should be removed.
- * See the TODO. */
-int last_item_backup = 0;
-
 /* Save default priority, to be able to return to it when we have to lower it */
 int default_priority = 1;
 
@@ -336,8 +332,8 @@ static int satisfy_virtual(di_system_package *p) {
 			/* Non-providing dependency */
 			di_log(DI_LOG_LEVEL_DEBUG, "non-providing dependency from %s to %s", p->p.package, dep->p.package);
 			if (dep->p.status != di_package_status_installed &&
-			    !di_config_package(dep, satisfy_virtual, check_special))
-				return 0;
+			    di_config_package(dep, satisfy_virtual, check_special) == -1)
+				return -1;
 			continue;
 		}
 		if (d->type != di_package_dependency_type_reverse_provides)
@@ -410,8 +406,8 @@ static int satisfy_virtual(di_system_package *p) {
 				/* Ick. If we have a menu item it has to match the
 				 * debconf choice, otherwise we configure all of
 				 * the providing packages */
-				if (!di_config_package(dep, satisfy_virtual, check_special))
-					return 0;
+				if (di_config_package(dep, satisfy_virtual, check_special) == -1)
+					return -1;
 				if (is_menu_item)
 					break;
 			}
@@ -463,37 +459,10 @@ static void set_package_title(di_system_package *p) {
 	free(title);
 }
 
-int do_menu_item(di_system_package *p) {
-	char *configcommand;
-	int ret = 0;
-
+static int do_menu_item(di_system_package *p) {
 	di_log(DI_LOG_LEVEL_DEBUG, "Menu item '%s' selected", p->p.package);
 
-	if (p->p.status == di_package_status_installed) {
-		set_package_title(p);
-
-		/* The menu item is already configured, so reconfigure it. */
-		if (asprintf(&configcommand, "exec udpkg --configure --force-configure %s", p->p.package) == -1) {
-			return 0;
-		}
-		ret = di_exec_shell_log(configcommand);
-		ret = di_exec_mangle_status(ret);
-		free(configcommand);
-		check_special(p);
-		last_item_backup = 0;
-		if (ret) {
-			if (ret == BACKUP)
-				last_item_backup = 1;
-			else
-				di_log(DI_LOG_LEVEL_WARNING, "Reconfiguring '%s' failed with error code %d", p->p.package, ret);
-		}
-		ret = !ret;
-	}
-	else if (p->p.status == di_package_status_unpacked || p->p.status == di_package_status_half_configured) {
-		ret = di_config_package(p, satisfy_virtual, check_special);
-	}
-
-	return ret;
+	return di_config_package(p, satisfy_virtual, check_special);
 }
 
 static char *debconf_priorities[] =
@@ -594,27 +563,29 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	while ((p=show_main_menu(packages, allocator))) {
 		ret = do_menu_item(p);
 		adjust_default_priority();
-		if (!ret) {
-			if (last_item_backup) {
+		switch (ret) {
+			case EXIT_OK:
+				/* Success */
+				if (p->installer_menu_item < NEVERDEFAULT) {
+					last_successful_item = p->installer_menu_item;
+					modify_debconf_priority(RAISE);
+					//di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
+				}
+				else {
+					// di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
+				}
+				break;
+			case EXIT_BACKUP:
 				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' succeeded but requested to be left unconfigured.", p->p.package); 
-				last_item_backup = 0;
-			}
-			else {
+				break;
+			case EXIT_QUIT:
+			case EXIT_RESTART:
+				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' requested exit with %d.", p->p.package, ret); 
+				return ret;
+			default:
 				di_log(DI_LOG_LEVEL_WARNING, "Menu item '%s' failed.", p->p.package);
 				notify_user_of_failure(p);
-			}
-			modify_debconf_priority(LOWER);
-		}
-		else {
-			/* Success */
-			if (p->installer_menu_item < NEVERDEFAULT) {
-				last_successful_item = p->installer_menu_item;
-				modify_debconf_priority(RAISE);
-				//di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
-			}
-			else {
-				// di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
-			}
+				modify_debconf_priority(LOWER);
 		}
 		
 		di_packages_free (packages);
@@ -626,7 +597,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 		kill(getppid(), SIGUSR1);
 	}
 	
-	return(0);
+	return EXIT_FAILURE;
 }
 
 /*
@@ -648,10 +619,10 @@ static int di_config_package(di_system_package *p,
 		if (virtfunc)
 			return virtfunc(p);
 		else
-			return 0;
+			return -1;
 	}
 	else if (p->p.type == di_package_type_non_existent)
-		return 1;
+		return 0;
 
 	for (node = p->p.depends.head; node; node = node->next) {
 		di_package_dependency *d = node->data;
@@ -661,29 +632,34 @@ static int di_config_package(di_system_package *p,
 		if (d->type != di_package_dependency_type_depends)
 			continue;
 		/* Recursively configure this package */
-		if (!di_config_package(dep, virtfunc, walkfunc))
-			return 0;
+		if (di_config_package(dep, virtfunc, walkfunc) == -1)
+			return -1;
 	}
 
 	set_package_title(p);
-	if (asprintf(&configcommand, "exec udpkg --configure %s", p->p.package) == -1) {
-		return 0;
-	}
+	if (asprintf(&configcommand, "exec udpkg --configure --force-configure %s", p->p.package) == -1)
+		return -1;
+
 	ret = di_exec_shell_log(configcommand);
 	ret = di_exec_mangle_status(ret);
 	free(configcommand);
-	last_item_backup = 0;
-	if (ret == 0) {
-		p->p.status = di_package_status_installed;
-		if (walkfunc != NULL)
-			walkfunc(p);
-	} else {
-		if (ret == 10)
-			last_item_backup = 1;
-		else
+	switch (ret) {
+		case EXIT_OK:
+		case EXIT_QUIT:
+		case EXIT_RESTART:
+			p->p.status = di_package_status_installed;
+			if (walkfunc != NULL)
+				walkfunc(p);
+			break;
+		default:
 			di_log(DI_LOG_LEVEL_WARNING, "Configuring '%s' failed with error code %d", p->p.package, ret);
-		p->p.status = di_package_status_half_configured;
-		return 0;
+			ret = -1;
+		case EXIT_BACKUP:
+			p->p.status = di_package_status_half_configured;
+			break;
 	}
-	return !ret;
+	return ret;
 }
+
+/* vim: noexpandtab sw=8
+ */

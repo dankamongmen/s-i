@@ -17,4 +17,7 @@
 
 #define NEVERDEFAULT 900
 
-#define BACKUP	10
+#define EXIT_OK 	        0
+#define EXIT_BACKUP	        10
+#define EXIT_QUIT	        11
+#define EXIT_RESTART	        12
