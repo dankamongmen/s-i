@@ -1,9 +1,12 @@
 #!/bin/sh
 . /usr/share/debconf/confmodule
+template="$1"
+min="$2"
 db_title "Low memory"
-db_input critical debian-installer/lowmem || true
+db_subst "$template" MIN "$min"
+db_input critical "$template" || true
 db_go || true
-	
+
 for var in countrychooser/country countrychooser/country-name \
 	countrychooser/country-name-shortlist; do
 	if ! db_get $var; then

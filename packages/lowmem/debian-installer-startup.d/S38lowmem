@@ -14,27 +14,33 @@ else
 	# install in lowmem mode. (This is the max memory footprint of the
 	# installer in lowmem mode up to running the partitioner
 	# and swapon.)
+	# Set min to absolute minimum of memory needed for an install.
 	ARCH=`udpkg --print-architecture`
 	case $ARCH in
 		i386)
 			level1=45
 			level2=32
+			min=24
 		;;
 		mips)
 			level1=33
 			level2=0 #FIXME
+			min=0 #FIXME
 		;;
 		mipsel)
 			level1=33
 			level2=0 #FIXME
+			min=0 #FIXME
 		;;
 		m68k)
 			level1=25
 			level2=0 #FIXME
+			min=0 #FIXME
 		;;
 		*)
 			level1=45
 			level2=32
+			min=0 #FIXME
 		;;
 	esac
 
@@ -48,8 +54,13 @@ else
 		fi
 			
 	       	trimtemplates /var/lib/dpkg/info || true
-		
-		lowmem_debconf
+	
+		# 4 mb fuzz for kernel
+		if  [ "$ram" -lt "$(($min - 4))" ]; then
+			lowmem_debconf lowmem/insufficient "$min"
+		else
+			lowmem_debconf lowmem/low "$level1"
+		fi
 		anna-install lowmem
 	fi
 fi
