@@ -1,46 +1,51 @@
 Template: di-utils-mkswap/partitions
 Type: select
 Choices: ${PARTITIONS}
-_Description: Please select which make a swapspace on
+_Description: Please select what partition to create swap space on
  Listed are the partitions available in your system.  Please choose which
- partitions you want to mkswap.  Note that this will COMPLETELY ERASE
- that partition and any data on it.
+ partition you want to create swap space on.  Note that this will COMPLETELY
+ ERASE that partition and any data on it.
+ .
+ Only partitions with type Linux Swap (82) will be displayed.
 
 Template: di-utils-mkswap/badblock
 Type: boolean
 Default: false
-_Description: Check for bad blocks
- Should the partition badblock test during the mkswap?
+_Description: Check for bad blocks?
+ Should the partition be checked for bad blocks?
+ .
+ This is almost always safe to skip.
 
 Template: di-utils-mkswap/confirm
 Type: boolean
 Default: false
-_Description: Ready to format discs?
- WARNING all data on the partition(s) ${PARTITION} will now be deleted.
+_Description: Ready to create swap space?
+ WARNING: all data on the partition ${PARTITION} will now be deleted.
 
 Template: di-utils-mkswap/noparts
 Type: note
 _Description: No valid partitions found
- Unabel to find any partition which is usable for swapspace. Maybe some discs
- need to repartitioning, or other kernel modules need to be loaded.
+ Unable to find any partitions usable for swap space. Maybe other kernel
+ modules need to be loaded or the partition type must be set to Linux Swap
+ (82).
 
 Template: di-utils-mkswap/nomoreparts
 Type: note
-_Description: There are no more spaw partitions
+_Description: There are no more swap partitions
  All swap partitions are already activated.
 
 Template: di-utils-mkswap/nosel
 Type: note
-_Description: No partitions selected
+_Description: No partition was selected
  No partition was selected. Aborting.
 
 Template: di-utils-mkswap/mkswaperror
 Type: note
-_Description: Error while creating filesystem
- Unable to create swapspace on ${PARTITION}.
+_Description: Error while creating swap space
+ Unable to create swap space on ${PARTITION}.
 
 Template: di-utils-mkswap/swaponerror
 Type: note
-_Description: Error while activate swapspace
- Unable to activate the selected partition for ${PARTITION} swapspace.
+_Description: Error while activating swap space
+ Unable to activate the partition ${PARTITION} swap space.
 
