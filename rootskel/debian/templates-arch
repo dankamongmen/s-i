@@ -1,3 +1,8 @@
+Template: debian-installer/framebuffer
+Type: boolean
+Default: true
+Description: enable frame buffer console on boot
+
 Template: debian-installer/kernel/commandline
 Type: string
 Default: ro
@@ -16,19 +21,7 @@ Description: kernel image
 Template: debian-installer/kernel/linux/devfs
 Type: boolean
 Default: false
-Default[s390]: true
 Description: enable devfs (linux only)
-
-Template: debian-installer/framebuffer
-Type: boolean
-Default: true
-Description: enable frame buffer console on boot
-
-Template: debian-installer/kernel/linux/devfs/builtin
-Type: boolean
-Default: true
-Default[m68k]: false
-Description: kernel includes devfs (workaround for broken maintainers) (linux only)
 
 Template: debian-installer/kernel/linux/initrd
 Type: boolean
@@ -39,7 +32,7 @@ Default[mips]: false
 Default[mipsel]: false
 Default[powerpc]: false
 Description: kernel needs an initrd (linux only)
-  Setting this to true makes kernel-installer set 'do_initrd=yes'
+  Setting this to true makes base-installer set 'do_initrd=yes'
   in /etc/kernel-img.conf.
 
 Template: debian-installer/kernel/linux/link_in_boot
@@ -48,11 +41,10 @@ Default: false
 Default[sparc]: true
 Default[hppa]: true
 Description: kernel needs a link in /boot/ (linux only)
-  Setting this to true makes kernel-installer include 'link_in_boot=yes'
+  Setting this to true makes base-installer include 'link_in_boot=yes'
   in /etc/kernel-img.conf.
 
 Template: debian-installer/kernel/subarchitecture
 Type: string
 Description: sub architecture
-
 
