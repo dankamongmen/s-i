@@ -43,8 +43,17 @@ int main(int argc, char **argv) {
 		/* TODO: obviously this path is sid specific. FIXME */
 		/* One way to fix this is choose-mirror could prompt for
 		 * what version to install */
-		src="dists/sid/main/debian-installer/binary-" ARCH "/Packages";
-	}
+                if (argc == 4) {
+                        /* third argument is which suite we want */
+                        src = malloc(strlen("dists/sid/") + strlen(argv[3]) + 
+                                     strlen("/debian-installer/binary-" 
+                                            ARCH "/Packages") + 1);
+                        sprintf(src,"dists/sid/%s/debian-installer/binary-" 
+                                ARCH "/Packages", argv[3]);
+                } else {
+                        src="dists/sid/main/debian-installer/binary-" ARCH "/Packages";
+                }
+        }
 	
 	command=malloc( 18 /* wget -c -q http:// */ + strlen(hostname) +
 			strlen(directory) + 1 /* / */ + strlen(src) +
