@@ -16,7 +16,12 @@ is_not_loaded() {
 module_probe() {
     module="$1"
     db_subst ethdetect/module_params MODULE "$module"
-    db_input low ethdetect/module_params || [ $? -eq 30 ]
+    if [ "$module" != ne ]; then
+	priority=low
+    else
+	priority=high
+    fi
+    db_input $priority ethdetect/module_params || [ $? -eq 30 ]
     db_go
     db_get ethdetect/module_params
     if modprobe -v "$module" $RET ; then
