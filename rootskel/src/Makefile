@@ -13,6 +13,6 @@ subdirs = \
 	var \
 	initrd
 
-files_exec = linuxrc
+files_exec = 
 
 include Makefile.inc

@@ -3,6 +3,7 @@ dir = sbin
 files_exec = \
 	debian-installer \
 	di-main-menu \
-	shutdown
+	shutdown \
+	init
 
 include ../Makefile.inc

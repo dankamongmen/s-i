@@ -1,0 +1,138 @@
+#!/bin/sh
+# This is a special linuxrc for the boot floppy image.
+# It loads the main d-i initrd from either a second floppy, or a USB
+# storage device.
+#
+# Throughout we use BOOT_DEBUG to turn on debugging. 1 = minimal,
+# 2 = set -x, with 3 you'll get shells in strategic places.
+
+debugshell () {
+	if [ "$BOOT_DEBUG" -gt 2 ]; then
+		echo "This is a debug shell ($1)."
+		sh
+	fi
+}
+
+if [ "$BOOT_DEBUG" -gt 1 ]; then
+	set -x
+fi
+
+mount -t proc proc proc
+mount -t devfs devfs dev
+
+modprobe vfat
+modprobe loop
+
+# Hardware detection.
+modprobe floppy
+if [ -x /usr/sbin/usb-discover ]; then
+	/usr/sbin/usb-discover
+fi
+# This is currently needed or usb-storage won't load (for ide_fix_driveid).
+modprobe ide-core
+modprobe usb-storage
+modprobe sd_mod
+
+debugshell "after hardware detection"
+
+FIRST_PASS=1
+LOADED=0
+while [ "$LOADED" = 0 ]; do
+	echo
+	echo
+	echo
+	echo
+	echo
+	echo
+	echo -n "Please insert the second floppy or plug in a USB storage device..."
+
+	if [ 1 -gt "$BOOT_DEBUG" ]; then
+		# Shut up kernel errors if the disk is inserted at wrong time, etc.
+		OLD_PRINTK=`cat /proc/sys/kernel/printk`
+		echo 0 > /proc/sys/kernel/printk
+	fi
+	
+	MOUNTED=0
+	while [ "$MOUNTED" = 0 ]; do
+		if [ "$FIRST_PASS" = 0 ]; then
+			# avoid thrashing the floppy drive too much
+			sleep 5
+			echo -n "."
+		fi
+		FIRST_PASS=0
+		
+		# Look for any storage devices we can find.
+		# Only ones that we have modules loaded for should exist,
+		# so this is not at brute-force as it may seem.
+		# It's done each time through the loop as USB devices may
+		# be inserted at any time.
+		DEVS=""
+		if [ -d dev/floppy ]; then
+			DEVS=dev/floppy/?
+		fi
+		if [ -d /dev/scsi ]; then
+			DEVS="$DEVS `find /dev/scsi`"
+		fi
+		
+		for dev in $DEVS; do
+			if [ "$MOUNTED" = 0 ] && [ -b $dev ]; then
+				# XXX as a mount point, /floppy is not
+				# quite right, as this may be USB storage,
+				# whatever.
+				if mount $dev -o ro -tvfat floppy 2>/dev/null; then
+					if [ -e floppy/initrd.gz -a ! -e floppy/linux ]; then
+						MOUNTED=1
+						echo " mounted."
+					else
+						umount floppy || echo "umount failed!"
+					fi
+				else
+					echo -n ""
+				fi
+			fi
+		done
+	done
+
+	if [ 1 -gt "$BOOT_DEBUG" ]; then
+		# Restore kernel errors.
+		echo $OLD_PRINTK > /proc/sys/kernel/printk
+	fi
+	
+	# TODO progress display, this can take quite some time!
+	echo "Loading the Debian installer, please wait...."
+	mount -t shm shm mnt
+	if zcat floppy/initrd.gz > mnt/tmp-initrd; then
+		LOADED=1
+	else
+		echo "This install media seems to be bad."
+		debugshell "bad media mounted"
+		umount mnt
+	fi
+	umount floppy
+done
+
+echo "Setting up filesystem, please wait..."
+mount -o loop mnt/tmp-initrd initrd
+cp -a initrd/* mnt
+umount initrd
+
+# dev will be unmounted by rcS
+umount proc
+
+echo "Starting the installer..."
+cd mnt
+pivot_root . initrd
+mount -t proc proc proc
+mount -t devfs devfs dev
+
+# If this is messing, things can get *really* weird.
+if [ ! -x /usr/sbin/chroot ]; then
+	echo "Bad initrd! Cannot chroot."
+	sleep 5000
+fi
+
+# Close all open files on the initrd, and run busybox init.
+rm -f sbin/init # probably not busybox init
+ln -s ../bin/busybox sbin/init
+debugshell "before chroot"
+exec /usr/sbin/chroot . /sbin/init <dev/console >dev/console 2>&1

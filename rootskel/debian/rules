@@ -37,7 +37,8 @@ install: build
 	dh_testroot
 	dh_installdirs
 	$(MAKE) -C src DESTDIR=$(CURDIR)/debian/rootskel/
-	install src/linuxrc.bootfloppy debian/rootskel-bootfloppy/linuxrc
+	mkdir -p debian/rootskel-bootfloppy/sbin/
+	install -m755 src/sbin/init.bootfloppy debian/rootskel-bootfloppy/sbin/init
 
 # Build architecture-independent files here.
 binary-indep: build install

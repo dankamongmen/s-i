@@ -1,0 +1,14 @@
+#!/bin/sh
+# Set up filesystem as root and pivot into it.
+echo "Setting up filesystem, please wait ..."
+mount -t shm shm mnt
+cp -a `ls -1 | grep -v mnt | grep -v proc | grep -v dev | grep -v lost+found` mnt
+cd mnt
+mkdir proc dev
+pivot_root . initrd
+mount -t proc proc proc
+mount -t devfs devfs dev
+# Close all open files on the initrd, and run busybox init.
+rm -f sbin/init # this program
+ln -s ../bin/busybox sbin/init
+exec /usr/sbin/chroot . /sbin/init <dev/console >dev/console 2>&1
