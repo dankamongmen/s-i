@@ -56,7 +56,7 @@ A rough roadmap:
      libtext-iconv-perl because it is not implemented - there
      is a authorative mapping of lang->encoding for them).
 
- New way (are we there yet?):
+ New way:
 
    * translators provide messages in po files (using po-debconf) in whatever
      encoding they prefer
@@ -75,7 +75,6 @@ A rough roadmap:
 ISSUES/TODOs:
 
 
-1.
  Problem : bterm does not currently run on all architectures (m68k, some sparcs?).
          : What about dumb terminals/headless systems?
  Answer1 : Philip Blundell says that bogl just needs to have support for the
@@ -91,15 +90,6 @@ ISSUES/TODOs:
  Answer1 : Maybe make a virtual package?
  Answer2 : Maybe run main-menu via some wrapper?
 
-
-2. A sample script is available at
-   http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=148490&repeatmerged=yes
-   This needs to be polished (e.g. the lang->encoding mapping removed), turned
-   into a real patch, tested and applied to debconf.
-   This should be done without introducing a "Depends:" dependency on
-   libtext-iconv-perl, i.e. debconf should simply output a message (not using
-   the module) if locale is C or an UTF-8 one.
- 
 * Some developers keep all translations in a single templates file,
   see 'adduser' for instance.
 
@@ -131,7 +121,6 @@ ISSUES/TODOs:
   have the variable set in cdebconf/main-menu, since those are the ones
   starting other processes.
 
-
 * add support for the LANGUAGE style variable listing several languages in
   priority order to be able to use other translations if the primary
   translation is missing
@@ -145,10 +134,7 @@ ISSUES/TODOs:
 
 * debconf TITLE commands aren't translated at all.
   
-  joeyh says: You translate these in the usual way, by making the program that
-  tells [c]debconf to set a title use gettext. Dunno how well that works on
-  d-i.
-
+  The new SETTITLE command deals with this, transition is in progress.
 
 * Should we even use debconf i18n (which is pretty limited) or po files
   as per gettext?
@@ -166,5 +152,3 @@ ISSUES/TODOs:
   to i18n.
   boot-floppies worked around the size constraints by loading locale
   information from file on CD-Rom, if it was available.  (xlp.tgz).
-
-
