@@ -214,6 +214,13 @@ static int config_read(struct configuration *cfg, const char *filename)
 		inquote = 0;
 		for (s = buf; *s != 0; s++)
 		{
+			if (*s == '\\')
+			{
+				s++;
+				if (*s == 0)
+					break;
+				continue;
+			}
 			if (*s == '"')
 				inquote = !inquote;
 			if (inquote != 0)
@@ -230,6 +237,13 @@ static int config_read(struct configuration *cfg, const char *filename)
 		inquote = 0;
 		for (s = buf; *s != 0; s++)
 		{
+			if (*s == '\\')
+			{
+				s++;
+				if (*s == 0)
+					break;
+				continue;
+			}
 			if (*s == '"')
 				inquote = !inquote;
 			if (inquote != 0)
@@ -264,6 +278,13 @@ static int config_read(struct configuration *cfg, const char *filename)
 		inquote = 0;
 		for (s = buf; *s != 0;)
 		{
+			if (*s == '\\')
+			{
+				if (*(s+1) == 0)
+					break;
+				s += 2;
+				continue;
+			}
 			if (*s == '"')
 				inquote = !inquote;
 

@@ -41,8 +41,8 @@ int strparsecword(char **inbuf, char *outbuf, size_t maxlen);
 int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen);
 int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg);
 int strcmdsplit(char *inbuf, char **argv, size_t maxnarg);
-void strunescape(const char *inbuf, char *outbuf, const size_t maxlen);
-void strescape(const char *inbuf, char *outbuf, const size_t maxlen);
+void strunescape(const char *inbuf, char *outbuf, const size_t maxlen, const int quote);
+void strescape(const char *inbuf, char *outbuf, const size_t maxlen, const int quote);
 int strwrap(const char *str, const int width, char *lines[], int maxlines);
 int strlongest(char **strs, int count);
 

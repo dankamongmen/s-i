@@ -76,6 +76,7 @@ int strparsecword(char **inbuf, char *outbuf, size_t maxlen)
 	char buffer[maxlen];
 	char *buf = buffer;
 	char *c = *inbuf;
+	char *start;
 
 	for (; *c != 0 && isspace(*c); c++);
 
@@ -87,10 +88,21 @@ int strparsecword(char **inbuf, char *outbuf, size_t maxlen)
 	{
 		if (*c == '"')
 		{
-			for (; *c != 0 && *c != '"'; c++)
-				*buf++ = *c;
+			start = c+1;
+			for (c++; *c != 0 && *c != '"'; c++)
+			{
+				if (*c == '\\')
+				{
+					c++;
+					if (*c == 0)
+						return 0;
+				}
+			}
 			if (*c == 0)
 				return 0;
+			/* dequote the string */
+			strunescape(start, buf, (int) (c - start + 1), 1);
+			buf += strlen(buf);
 			continue;
 		}
 		
@@ -109,23 +121,29 @@ int strparsecword(char **inbuf, char *outbuf, size_t maxlen)
 
 int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 {
-	char buffer[maxlen];
-	char tmp[3];
-	char *start, *i;
-	char *c = *inbuf;
+	char *start = *inbuf;
+	char *c;
 
-    /* skip ws, return if empty */
-	for (; *c != 0 && isspace(*c); c++); 
-	if (*c == 0)
+	/* skip ws, return if empty */
+	for (; *start != 0 && isspace(*start); start++); 
+	if (*start == 0)
 		return 0;
 
-    start = c;
+	c = start;
 	
 	for (; *c != 0 && isspace(*c) == 0; c++)
 	{
 		if (*c == '"')
 		{
-			for (c++; *c != 0 && *c != '"'; c++);
+			for (c++; *c != 0 && *c != '"'; c++)
+			{
+				if (*c == '\\')
+				{
+					c++;
+					if (*c == 0)
+						return 0;
+				}
+			}
 			if (*c == 0)
 				return 0;
 		}
@@ -138,28 +156,9 @@ int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 	}
 
 	/* dequote the string */
-	for (i = buffer; i < buffer + maxlen && start < c; i++)
-	{
-		if (*start == '%' && start + 2 < c)
-		{
-			tmp[0] = start[1];
-			tmp[1] = start[2];
-			tmp[2] = 0;
-			*i = (char)strtol(tmp, 0, 16);
-			start += 3;
-			continue;
-		}
-		if (*start != '"')
-			*i = *start;
-		else
-			i--;
-		start++;
-	}
-	*i = 0;
-	
-	strncpy(outbuf, buffer, maxlen);
+	strunescape(start, outbuf, (int) (c - start + 1), 1);
 
-    /* skip trailing spaces */
+	/* skip trailing spaces */
 	for (; *c != 0 && isspace(*c); c++);
 	*inbuf = c;
 
@@ -224,43 +223,53 @@ int strcmdsplit(char *inbuf, char **argv, size_t maxnarg)
 	return argc;
 }
 
-void strunescape(const char *inbuf, char *outbuf, const size_t maxlen)
+void strunescape(const char *inbuf, char *outbuf, const size_t maxlen, const int quote)
 {
 	const char *p = inbuf;
 	int i = 0;
-	char tmp[3];
 	while (*p != 0 && i < maxlen-1)
 	{
-		if (*p == '%')
+		/*  Debconf only escapes \n  */
+		if (*p == '\\')
 		{
-			if (i + 4 >= maxlen) break;
-			tmp[0] = *(p+1);
-			tmp[1] = *(p+2);
-			tmp[2] = 0;
-			outbuf[i++] = strtol(tmp, (char **)NULL, 16);
-			p += 3;
+			if (*(p+1) == 'n')
+			{
+				outbuf[i++] = '\n';
+				p += 2;
+			}
+			else if (quote != 0 && (*(p+1) == '"' || *(p+1) == '\\'))
+			{
+				outbuf[i++] = *(p+1);
+				p += 2;
+			}
+			else
+				outbuf[i++] = *p++;
 		}
 		else
-		{
 			outbuf[i++] = *p++;
-		}
 	}
 	outbuf[i] = 0;
 }
 
-void strescape(const char *inbuf, char *outbuf, const size_t maxlen)
+void strescape(const char *inbuf, char *outbuf, const size_t maxlen, const int quote)
 {
 	const char *p = inbuf;
 	int i = 0;
 	while (*p != 0 && i < maxlen-1)
 	{
-		if (*p == '%' || *p == '"' || *p == '\r' || *p == '\n')
+		/*  Debconf only escapes \n  */
+		if (*p == '\n')
 		{
-			if (i + 4 >= maxlen) break;
-			outbuf[i] = '%';
-			sprintf(&outbuf[i+1], "%02X", (unsigned int)*p);
+			if (i + 2 >= maxlen) break;
+			outbuf[i++] = '\\';
+			outbuf[i++] = 'n';
 			p++;
-			i += 3;
+		}
+		else if (quote != 0 && (*p == '"' || *p == '\\'))
+		{
+			if (i + 2 >= maxlen) break;
+			outbuf[i++] = '\\';
+			outbuf[i++] = *p++;
 		}
 		else
 			outbuf[i++] = *p++;

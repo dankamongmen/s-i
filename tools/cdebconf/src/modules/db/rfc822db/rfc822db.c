@@ -35,7 +35,7 @@ static char *unescapestr(const char *in)
 {
     static char buf[8192];
     if (in == 0) return 0;
-    strunescape(in, buf, sizeof(buf));
+    strunescape(in, buf, sizeof(buf), 0);
     return buf;
 }
 
@@ -43,7 +43,7 @@ static char *escapestr(const char *in)
 {
     static char buf[8192];
     if (in == 0) return 0;
-    strescape(in, buf, sizeof(buf));
+    strescape(in, buf, sizeof(buf), 0);
     return buf;
 }
 
