@@ -5,5 +5,8 @@ fi
 
 for log in syslog messages; do
 	echo "Log file truncated to save memory." > /var/log/$log
-	kill $(ps | grep [t]ail | grep /var/log/$log | sed 's/ root.*//')
+	pid=$(ps | grep [t]ail | grep /var/log/$log | sed 's/ root.*//')
+	if [ -n "$pid" ]; then
+		kill $pid
+	fi
 done
