@@ -1,20 +1,3 @@
 #!/usr/bin/make -f
 
-DEB_BUILD_ARCH=$(shell dpkg-architecture -qDEB_BUILD_ARCH)
-
 include /usr/share/kernel-wedge/generic-rules
-
-clean: cleanup
-
-cleanup:
-	rm -f kernel-versions modules/i386
-
-debian/control: kernel-versions modules/i386
-
-kernel-versions:
-	sed "s/@arch@/$(DEB_BUILD_ARCH)/g" kernel-versions.in >kernel-versions
-
-modules/i386:
-	ln -s amd64 modules/i386
-
-.PHONY: cleanup configure
