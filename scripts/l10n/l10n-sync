@@ -364,7 +364,6 @@ EOF
 	fi
       fi
  done
- echo ""
  if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
    if [ "$DEBUG" = "Y" ] ; then
      echo -n "      - commiting back updated files..."
@@ -384,8 +383,9 @@ done
 if [ "$BIG_COMMITS" = "Y" ] ; then
   cd $DI_COPY/packages
 #  for lang in $languages ; do
-     $svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" $(find . -mindepth 3 -name \*.po |\
-              grep /debian/po/)
+     find . -mindepth 3 -name \*.po |\
+              grep /debian/po/      |\
+            xargs $svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" 
 #  done
 fi
 
