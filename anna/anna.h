@@ -11,6 +11,7 @@
 #define INCLUDE_FILE            DOWNLOAD_DIR "/include"
 #define EXCLUDE_FILE            DOWNLOAD_DIR "/exclude"
 #define DPKG_UNPACK_COMMAND	"udpkg --unpack"
+#define DPKG_CONFIGURE_COMMAND	"udpkg --configure"
 #define ANNA_RETRIEVER          "anna/retriever"
 #define ANNA_CHOOSE_MODULES     "anna/choose_modules"
 #define ANNA_NO_MODULES         "anna/no_modules"
@@ -40,5 +41,6 @@ int new_retrievers(di_package **retrievers_before, di_package **retrievers_after
 #ifndef LIBDI_SYSTEM_DPKG
 int unpack_package (const char *pkgfile);
 #endif
+int configure_package (const char *package);
 
 #endif /* ANNA_H_ */

@@ -261,6 +261,18 @@ install_modules(di_packages *status, di_packages *packages, di_packages_allocato
                 ret = 8;
                 break;
             }
+	    if (!((di_system_package *)package)->installer_menu_item)
+		if (!configure_package(dest_file)) {
+		    debconf_progress_stop(debconf);
+		    debconf_subst(debconf, "anna/install_failed", "PACKAGE",
+				  package->package);
+		    debconf_input(debconf, "critical", "anna/install_failed");
+		    debconf_go(debconf);
+		    unlink(dest_file);
+		    free(dest_file);
+		    ret = 8;
+		    break;
+		}
             unlink(dest_file);
             free(dest_file);
             debconf_progress_step(debconf, 1);

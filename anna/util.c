@@ -228,6 +228,19 @@ unpack_package (const char *pkgfile)
 }
 #endif
 
+int
+configure_package (const char *pkgfile)
+{
+    char *command;
+    int ret;
+
+    if (asprintf(&command, "%s %s", DPKG_CONFIGURE_COMMAND, pkgfile) == -1)
+	return 0;
+    ret = !di_exec_shell_log(command);
+    free(command);
+    return ret;
+}
+
 /* check whether the md5sum of file matches sum.  if they don't,
  * return 0. */
 int
