@@ -142,7 +142,12 @@ while [ "$LOADED" = 0 ]; do
 		fi
 	done
 
-	mount -t shm shm mnt
+	if grep -q tmpfs /proc/filesystems; then
+		mount -t tmpfs -o size=100M tmpfs mnt
+	else
+		mount -t shm shm mnt
+	fi
+	
 	echo -n "Loading.."
 	# pipe_progress adds dots to the above line while there is
 	# activity. But we must be sure to catch errors from the zcat.

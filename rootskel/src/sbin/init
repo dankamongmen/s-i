@@ -2,7 +2,13 @@
 # Set up filesystem as root and pivot into it.
 echo "Setting up filesystem, please wait ..."
 umount initrd
-mount -t shm shm mnt
+mount -t proc proc proc
+if grep -q tmpfs /proc/filesystems; then
+	mount -t tmpfs -o size=100M tmpfs mnt
+else
+	mount -t shm shm mnt
+fi
+umount proc
 cp -a $(ls -1 / |grep -v '\(dev\|lost+found\|mnt\|proc\)') /mnt
 cd mnt
 mkdir proc dev
