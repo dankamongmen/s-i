@@ -13,20 +13,22 @@ then
 	exit 0
 fi
 
-(for i in /lib/partman/fstab.d/*; do
-	[ -x "$i" ] || continue
-	$i
-done) | 
-while read fs mp type options dump pass
-do
-	if [ "$mp" = / ]; then
-		root_type=$type
-		root_fs=$fs
-	elif [ "$mp" = /boot ]; then
-		boot_type=$type
-		boot_fs=$fs
-	fi
-done
+get_aboot_root_boot() {
+	(for i in /lib/partman/fstab.d/*; do
+		[ -x "$i" ] || continue
+		$i
+	done) | 
+	while read fs mp type options dump pass
+	do
+		if [ "$mp" = / ]; then
+			echo root_type=$type; root_fs=$fs;
+		elif [ "$mp" = /boot ]; then
+			echo boot_type=$type; boot_fs=$fs;
+		fi
+	done
+}
+
+eval "$(get_aboot_root_boot)"
 
 if [ -z "$boot_fs" ]
 then
