@@ -1,0 +1,91 @@
+#!/bin/sh -e
+
+. /lib/partman/definitions.sh
+
+# Verify that /boot is on an ext2/3 partition on a disk using Sun
+# disklabels, so that the system will actually be bootable.
+
+get_silo_root_boot() {
+	(for i in /lib/partman/fstab.d/*; do
+		[ -x "$i" ] || continue
+		$i
+	done) | 
+	while read fs mp type options dump pass
+	do
+		if [ "$mp" = / ]; then
+			echo "root_type=$type; root_fs=$fs;"
+		elif [ "$mp" = /boot ]; then
+			echo "boot_type=$type; boot_fs=$fs; bpart=$mp"
+		fi
+	done
+}
+
+eval "$(get_silo_root_boot)"
+
+if [ -z "$boot_fs" ]
+then
+	boot_fs=$root_fs
+	boot_type=$root_type
+	bpart='/'
+fi
+
+disk=
+for dev in $DEVICES/*
+do
+	[ -d "$dev" ] || continue
+	cd $dev
+	allsize=0
+	partitions=
+	open_dialog PARTITIONS
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+		let allsize+=$size
+		if [ -d "$id" ] && [ "$path" = "$boot_fs" ]; then
+			ourdev=$dev
+			disk="$(cat ${dev}/device)"
+			break
+		fi
+	done
+	close_dialog
+
+	# We got /boot or /. Hooray!
+	if [ -n "$disk" ]; then
+		# /boot or / goes past the 1024MB barrier
+		if [ "$allsize" -gt 1024 ]; then
+			db_subst silo-installer/boot-after-1g BPART "$bpart"
+			db_input critical silo-installer/boot-after-1g
+			db_go
+			db_get silo-installer/boot-after-1g
+			# Bail out
+			if [ "$RET" = false ]; then
+				db_stop
+				exit 1
+			fi
+		fi
+		break
+	fi
+done
+
+# Make sure the disk is using a Sun disklabel or nothing will boot!
+
+label=$(parted "$disk" print | sed -n 's/Disk label type: //p')
+if [ "$label" != sun ]; then
+	db_input critical silo-installer/non-sun-partitions
+	db_go
+	db_get silo-installer/non-sun-partitions
+	if [ "$RET" = false ]; then
+		exit 1
+	fi
+fi
+
+# SILO only groks ext2/3.
+
+if [ "$boot_type" != ext2 ] && [ "$boot_type" != ext3 ]
+then
+	db_subst silo-installer/non-ext2-boot PARTTYPE $boot_type 
+	db_input critical silo-installer/non-ext2-boot
+	db_go
+	db_get silo-installer/non-ext2-boot
+	if [ "$RET" = false ]; then
+		exit 1
+	fi
+fi

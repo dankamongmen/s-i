@@ -1,6 +1,6 @@
 Template: silo-installer/apt-install-failed
 Type: boolean
-Default: yes
+Default: false
 _Description: SILO installation failed.  Continue anyway?
  The 'silo' package failed to install into /target/.  Installing SILO
  as a boot loader is a required step.  The install problem might however be
@@ -21,3 +21,36 @@ Template: debian-installer/silo-installer/title
 Type: text
 # Main menu text
 _Description: Install the SILO boot loader on a hard disk
+
+Template: silo-installer/non-sun-partitions
+Type: boolean
+Default: false
+_Description: Install /boot on a disk with an unsupported partition table?
+ To be bootable from the PROM, silo and the kernel it loads must be
+ installed on a disk which uses Sun disklabels for its partition
+ table.  Your /boot directory is not located on such a disk.  If you
+ proceed, you will not be able to boot your system using SILO, and will
+ need to boot it some other way.
+
+Template: silo-installer/non-ext2-boot
+Type: boolean
+Default: false
+_Description: Use unsupported filesystem type for /boot?
+ SILO requires /boot to be located on an ext2 or ext3 partition on
+ a bootable device.  This means that either the root partition must be
+ an ext2 filesystem, or you must have a separate ext2 partition mounted at
+ /boot.
+ .
+ Currently, /boot is located on a partition of type ${PARTTYPE}.  If you
+ keep this setting, you will not be able to boot your Debian system
+ using SILO.
+
+Template: silo-installer/boot-after-1g
+Type: boolean
+Default: false
+_Description: Install /boot on a disk with an unsupported partition table?
+ For many SPARC machines, booting with the kernel and boot block on a
+ partition past the first gigabyte of the hard disk. In this case, you
+ would be booting from ${BPART}, and it extends to or resides beyond the
+ first gigabyte of the hard disk. You will not be able to boot your Debian
+ system with SILO using this configuration.
