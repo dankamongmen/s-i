@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: kernel-baking.xml,v 1.2 2003/06/15 17:39:02 toff Exp $ -->
+<!-- $Id: kernel-baking.xml,v 1.3 2003/09/19 02:07:12 toff Exp $ -->
 
  <sect1 id="kernel-baking"><title>Compiling a New Kernel</title>
 <para>
@@ -67,7 +67,7 @@ Don't be afraid to try compiling the kernel.  It's fun and profitable.
 
 To compile a kernel the Debian way, you need some packages:
 <classname>kernel-package</classname>,
-<classname>kernel-source-2.4.19</classname> (the most recent version
+<classname>kernel-source-&kernelversion;</classname> (the most recent version
 at the time of this writing), <classname>fakeroot</classname> and a
 few others which are probably already installed (see
 <filename>/usr/share/doc/kernel-package/README.gz</filename> for the
@@ -87,9 +87,9 @@ Note that you don't <emphasis>have</emphasis> to compile your kernel
 the ``Debian way''; but we find that using the packaging system to
 manage your kernel is actually safer and easier.  In fact, you can get
 your kernel sources right from Linus instead of
-<classname>kernel-source-2.4.19</classname>, yet still use the
+<classname>kernel-source-&kernelversion;</classname>, yet still use the
 <classname>kernel-package</classname> compilation method. Although the
-2.4.19 kernel is still used in Woody for installs, more-recent 2.4
+&kernelversion; kernel is still used in Woody for installs, more-recent 2.4
 kernels are available as kernel-images.
 
 </para><para>
@@ -123,15 +123,15 @@ sparc64-linux-gcc</userinput> as root, and be sure that
 
 Hereafter, we'll assume your kernel source will be located in
 <filename>/usr/local/src</filename> and that your kernel version is
-2.4.19.  As root, create a directory under
+&kernelversion;.  As root, create a directory under
 <filename>/usr/local/src</filename> and change the owner of that
 directory to your normal non-root account.  As your normal non-root
 account, change your directory to where you want to unpack the kernel
 sources (<userinput>cd /usr/local/src</userinput>), extract the kernel
 sources (<userinput>tar xIf
-/usr/src/kernel-source-2.4.19.tar.bz2</userinput>), change your
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>), change your
 directory to it (<userinput>cd
-kernel-source-2.4.19/</userinput>). 
+kernel-source-&kernelversion;/</userinput>). 
 
 </para><para>
 
@@ -188,7 +188,7 @@ modules_image</userinput>.
 
 Once the compilation is complete, you can install your custom kernel
 like any package.  As root, do <userinput>dpkg -i
-../kernel-image-2.4.19-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+../kernel-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
 The <replaceable>subarchitecture</replaceable> part is an optional
 sub-architecture,
 <![ %i386; [ such as ``i586'', ]]> depending on what kernel options you set.
@@ -196,9 +196,9 @@ sub-architecture,
 kernel, along with some other nice supporting files.  For instance,
 the <filename>System.map</filename> will be properly installed
 (helpful for debugging kernel problems), and
-<filename>/boot/config-2.4.19</filename> will be installed, containing
-your current configuration set.  Your new
-<classname>kernel-image-2.4.19</classname> package is also clever
+<filename>/boot/config-&kernelversion;</filename> will be installed,
+containing your current configuration set.  Your new
+<classname>kernel-image-&kernelversion;</classname> package is also clever
 enough to automatically use your platform's boot-loader to run an
 update on the booting, allowing you to boot without re-running the
 boot loader.  If you have created a modules package, e.g., if you have
