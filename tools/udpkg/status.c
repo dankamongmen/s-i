@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.25 2002/04/21 09:53:17 tfheen Exp $ */
+/* $Id: status.c,v 1.26 2002/05/02 06:29:41 tausq Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -52,7 +52,7 @@ static unsigned long status_parse(const char *line)
 		{
 			if (strcmp(line, statuswords[i][j]) == 0) 
 			{
-				l |= (1 << ((int)statuswords[i][0] + j - 1));
+				l |= (1 << ((long)statuswords[i][0] + j - 1));
 				break;
 			}
 			j++;
@@ -75,7 +75,7 @@ static const char *status_print(unsigned long flags)
 		j = 1;
 		while (statuswords[i][j] != 0)
 		{
-			if ((flags & (1 << ((int)statuswords[i][0] + j - 1))) != 0)
+			if ((flags & (1 << ((long)statuswords[i][0] + j - 1))) != 0)
 			{
 				strcat(buf, statuswords[i][j]);
 				if (i < 2) strcat(buf, " ");
