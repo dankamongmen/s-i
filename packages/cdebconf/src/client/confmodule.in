@@ -26,7 +26,10 @@ if [ -z "$DEBCONF_REDIR" ]; then
 fi
 
 # The original stdin/stdout/stderr fds are duplicated onto fds
-# DEBCONF_OLD_FD_BASE to DEBCONF_OLD_FD_BASE + 2.
+# DEBCONF_OLD_FD_BASE to DEBCONF_OLD_FD_BASE + 2. These values are exported
+# so that you can get the original fds back. This is kind of a hack:
+# ideally, we might use something like a socket for the debconf protocol
+# instead of stdio.
 DEBCONF_OLD_FD_BASE='@DEBCONF_OLD_FD_BASE@'
 export DEBCONF_OLD_FD_BASE
 
