@@ -199,7 +199,10 @@ cat /tmp/os-probed | while read partition title label loadertype; do
 		if [ -z "$label" ]; then
 		    label="$title"
 		fi
-		# TODO: uniquify label?
+		# Prepend the last part of the partition name to the label,
+		# for uniqueness and (I hope) clarity, given that we don't
+		# have a way to display a useful description in yaboot.
+		label="${mappedbootpart##*/}-$label"
 		if echo "$kernel" | grep -q '^/boot/' && \
 		   [ "$mappedbootpart" != "$mappedpartition" ]; then
 		    # separate /boot partition
