@@ -1238,7 +1238,7 @@ int main (int argc, char *argv[])
     {
         autopartkit_err( 0,
 			 "Unable to load partition table for profile '%s'.\n",
-			 profiles);
+			 profiles ? profiles : "[null]");
 	goto end;
     }
     else

@@ -1,6 +1,6 @@
 bin_PROGRAMS = autopartkit
 
-noinst_PROGRAMS = dumptable distribute-test
+noinst_PROGRAMS = dumptable distribute-test choosetable-test
 
 autopartkit_SOURCES = \
 	autopartkit.h \
@@ -18,6 +18,10 @@ distribute_test_SOURCES = \
 	distribute.c \
 	loadpartitions.c \
 	distribute-test.c
+
+choosetable_test_SOURCES = \
+	choosetable.c \
+	choosetable-test.c
 
 tabledir = $(sysconfdir)/autopartkit
 table_DATA = \

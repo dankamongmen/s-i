@@ -88,6 +88,10 @@ choose_profile_table(const char *profiles)
     int profilemask = 0;
     char *tablefile;
 
+    /* Avoid segfault, and make sure default.table is choosen. */
+    if (NULL == profiles)
+      profiles = "";
+
     valuestr = strdup(profiles);
     /* assert(valuestr); */
 
