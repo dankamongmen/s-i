@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.14 2004/02/27 23:22:00 waldi Exp $
+ * $Id: packages.c,v 1.15 2004/02/29 20:56:13 waldi Exp $
  */
 
 #include <config.h>
@@ -169,115 +169,117 @@ static bool resolve_dependencies_recurse (di_slist *install, di_package *package
   di_package *best_provide;
 
   /* did we already check this package? */
-  if (!(package->resolver & resolver))
+  if (package->resolver & resolver)
+    return package->resolver & (resolver << 1);
+
+  package->resolver |= resolver;
+  package->resolver |= (resolver << 1);
+
+  switch (package->type)
   {
-    package->resolver |= resolver;
+    case di_package_type_real_package:
+      for (node = package->depends.head; node; node = node->next)
+      {
+        di_package_dependency *d = node->data;
 
-    switch (package->type)
-    {
-      case di_package_type_real_package:
-        for (node = package->depends.head; node; node = node->next)
+        /* it's a dependency */
+        if (d->type == di_package_dependency_type_depends || d->type == di_package_dependency_type_pre_depends)
         {
-          di_package_dependency *d = node->data;
-
-          /* it's a dependency */
-          if (d->type == di_package_dependency_type_depends || d->type == di_package_dependency_type_pre_depends)
-          {
-            /* ugh, someone don't respect our policy */
-            if (!shutup && package->priority > d->ptr->priority)
-              di_log (DI_LOG_LEVEL_INFO, "broken dependency: %s to %s (wrong priority)", package->package, d->ptr->package);
-            /* check recursive */
-            if (!resolve_dependencies_recurse (install, d->ptr, package, allocator, resolver, shutup))
-              return false;
-          }
-          else if (d->type == di_package_dependency_type_conflicts)
-            switch (d->ptr->type)
-            {
-              case di_package_type_real_package:
-                if (d->ptr->status == di_package_status_unpacked ||
-                    d->ptr->status == di_package_status_installed)
-                  return false;
-                break;
-              case di_package_type_virtual_package:
-                for (node2 = d->ptr->depends.head; node2; node2 = node2->next)
-                {
-                  di_package_dependency *d = node2->data;
-
-                  if (d->type == di_package_dependency_type_reverse_provides)
-                    if ((d->ptr->status == di_package_status_unpacked ||
-                         d->ptr->status == di_package_status_installed) &&
-                        d->ptr != package)
-                      return false;
-                }
-                break;
-              default:
-                break;
-            }
+          /* ugh, someone don't respect our policy */
+          if (!shutup && package->priority > d->ptr->priority)
+            di_log (DI_LOG_LEVEL_INFO, "broken dependency: %s to %s (wrong priority)", package->package, d->ptr->package);
+          /* check recursive */
+          if (!resolve_dependencies_recurse (install, d->ptr, package, allocator, resolver, shutup))
+            goto error;
         }
+        else if (d->type == di_package_dependency_type_conflicts)
+          switch (d->ptr->type)
+          {
+            case di_package_type_real_package:
+              if (d->ptr->status == di_package_status_unpacked ||
+                  d->ptr->status == di_package_status_installed)
+                goto error;
+              break;
+            case di_package_type_virtual_package:
+              for (node2 = d->ptr->depends.head; node2; node2 = node2->next)
+              {
+                di_package_dependency *d = node2->data;
 
-        if (dependend_package)
-          di_log (DI_LOG_LEVEL_DEBUG, "install %s, dependency from %s", package->package, dependend_package->package);
+                if (d->type == di_package_dependency_type_reverse_provides)
+                  if ((d->ptr->status == di_package_status_unpacked ||
+                       d->ptr->status == di_package_status_installed) &&
+                      d->ptr != package)
+                    goto error;
+              }
+              break;
+            default:
+              break;
+          }
+      }
 
-        if (install)
-          di_slist_append_chunk (install, package, allocator->slist_node_mem_chunk);
-        else
-          package->status_want = di_package_status_want_install;
-        break;
+      if (dependend_package)
+        di_log (DI_LOG_LEVEL_DEBUG, "install %s, dependency from %s", package->package, dependend_package->package);
 
-      case di_package_type_virtual_package:
+      if (install)
+        di_slist_append_chunk (install, package, allocator->slist_node_mem_chunk);
+      else
+        package->status_want = di_package_status_want_install;
+      break;
 
-        if (dependend_package)
-          di_log (DI_LOG_LEVEL_DEBUG, "search for package resolving %s, dependency from %s", package->package, dependend_package->package);
+    case di_package_type_virtual_package:
+
+      if (dependend_package)
+        di_log (DI_LOG_LEVEL_DEBUG, "search for package resolving %s, dependency from %s", package->package, dependend_package->package);
+
+      for (node = package->depends.head; node; node = node->next)
+      {
+        di_package_dependency *d = node->data;
+
+        if (d->type == di_package_dependency_type_reverse_provides)
+          package->resolver &= ~(resolver << 2);
+      }
+
+      while (1)
+      {
+        best_provide = NULL;
 
         for (node = package->depends.head; node; node = node->next)
         {
           di_package_dependency *d = node->data;
 
           if (d->type == di_package_dependency_type_reverse_provides)
-            package->resolver &= ~(resolver << 2);
+          {
+            if (!(package->resolver & (resolver << 2)) &&
+                (!best_provide || best_provide->priority < d->ptr->priority ||
+                 (d->ptr->status == di_package_status_installed && best_provide->status != di_package_status_installed)))
+              best_provide = d->ptr;
+          }
         }
 
-        while (1)
+        if (best_provide)
         {
-          best_provide = NULL;
-
-          for (node = package->depends.head; node; node = node->next)
-          {
-            di_package_dependency *d = node->data;
-
-            if (d->type == di_package_dependency_type_reverse_provides)
-            {
-              if (!(package->resolver & (resolver << 2)) &&
-                  (!best_provide || best_provide->priority < d->ptr->priority ||
-                   (d->ptr->status == di_package_status_installed && best_provide->status != di_package_status_installed)))
-                best_provide = d->ptr;
-            }
-          }
-
-          if (best_provide)
-          {
-            if (resolve_dependencies_recurse (install, best_provide, package, allocator, resolver, shutup))
-              break;
-            else
-              package->resolver |= (resolver << 2);
-          }
+          if (resolve_dependencies_recurse (install, best_provide, package, allocator, resolver, shutup))
+            break;
           else
-            return false;
+            package->resolver |= (resolver << 2);
         }
+        else
+          goto error;
+      }
 
-        break;
+      break;
 
-      case di_package_type_non_existent:
-        if (!shutup)
-          di_log (DI_LOG_LEVEL_WARNING, "package %s doesn't exist", package->package);
-        return false;
-    }
-
-    package->resolver |= (resolver << 1);
-    return true;
+    case di_package_type_non_existent:
+      if (!shutup)
+        di_log (DI_LOG_LEVEL_WARNING, "package %s doesn't exist", package->package);
+      goto error;
   }
 
-  return package->resolver & (resolver << 1);
+  return true;
+
+error:
+  package->resolver &= ~(resolver << 1);
+  return false;
 }
 
 static void resolve_dependencies_marker_reset (void *key __attribute__ ((unused)), void *value, void *user_data __attribute__ ((unused)))
