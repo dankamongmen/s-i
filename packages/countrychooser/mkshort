@@ -5,12 +5,10 @@ set -e
 ISO3166TAB=/usr/share/iso-codes/iso_3166.tab
 SUPPORTED=/usr/share/i18n/SUPPORTED
 
-if [ ! -d debian/short-tmp ]; then
-   mkdir debian/short-tmp
-fi
-
-rm -f debian/short-tmp/*.tab
-rm -f debian/short-tmp/*.short
+rm -rf debian/short-tmp
+rm -rf debian/locales
+mkdir debian/short-tmp
+mkdir debian/locales
 
 for file in debian/po/*.po en.po; do
   lang_variant=`basename $file .po`
@@ -20,9 +18,12 @@ for file in debian/po/*.po en.po; do
   msgconv debian/iso-codes/$lang_variant.po -t UTF-8 --stringtable-output | tail -n +3 | \
      sed -e 's/" = "/	/' -e 's/^"//' -e 's/";$//' | awk '/^.+$/{print}'> $tabfile
   outfile=debian/short-tmp/$lang_variant.short
-  :>$outfile
-  (for code in $(grep -e "^$lang" $SUPPORTED | cut -b 4-5 | sort | uniq); do
-      line=`grep -e "^$code" $ISO3166TAB`
+  lastlocale=C
+  :> $outfile
+  for locale in $(grep -e "^$lang" $SUPPORTED | sed -e 's/[@. ].*//' | sort | uniq); do
+      code=`echo "$locale" | sed -e 's/.*_//'`
+      line=`grep -e "^$code" $ISO3166TAB` || true
+      lastlocale=$locale
       if [ "$line" ]; then
          OLD_IFS="$IFS"
 	 IFS='	'
@@ -37,9 +38,12 @@ for file in debian/po/*.po en.po; do
 	   fi
 	 fi
       fi
-   done)
+   done
    if [ $(wc -l < $outfile) -le 1 ]; then
       rm -f $outfile
+   else
+      localedef -c -f UTF-8 -i $lastlocale debian/locales/$lastlocale.UTF-8
+      LOCPATH=`pwd` LC_ALL=debian/locales/$lastlocale.UTF-8 sort -k 2.1 $outfile > $outfile.tmp && mv $outfile.tmp $outfile
    fi
 done
 
