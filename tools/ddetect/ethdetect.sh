@@ -36,8 +36,8 @@ db_go
 
 db_get ethdetect/detection_type
 if [ true = "$RET" ] ; then
-    # Autodetect using hwdetect from disk-detect or cdrom-detect
-    hwdetect || true
+    # Autodetect using hw-detect from hw-detect
+    hw-detect || true
 fi
 
 if [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`"  ]

@@ -1,34 +1,26 @@
-PROGS=ethdetect
+bindir=$(DESTDIR)/bin/
 
-INSTALL_DIR=$(DESTDIR)/usr/bin/
-CFLAGS=-Wall -Wstrict-prototypes -Os -fomit-frame-pointer 
 INSTALL=install
-STRIPTOOL=strip
-STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment 
-LDFLAGS= -ldiscover -ldebconf -ldebian-installer
+INSTALL_SCRIPT = ${INSTALL}
+INSTALL_DATA = ${INSTALL} -m 644
 
-
-all: $(OBJS) $(PROGS)
-
-ethdetect: ethdetect.c ethpci.lst
-	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(LDFLAGS)
-	$(STRIP) $@
+all:
 
 clean:
-	$(RM) *.o $(PROGS) *.lst
+	$(RM) *~
 
-install:
-	$(foreach PROG, $(PROGS), \
-	cp $(PROG) debian/$(PROG).postinst)
-	
-	mkdir -p $(DESTDIR)/usr/share/ddetect/
-	cp *.lst $(DESTDIR)/usr/share/ddetect/
+install: install-hw-detect install-ethdetect 
 
-	mkdir -p $(DESTDIR)/usr/lib/prebaseconfig.d
-	cp prebaseconfig $(DESTDIR)/usr/lib/prebaseconfig.d/40ethdetect
-	chmod a+x $(DESTDIR)/usr/lib/prebaseconfig.d/40ethdetect
-	  
+install-hw-detect: hw-detect.sh
+	$(INSTALL) -d $(DESTDIR)/bin
+	$(INSTALL_SCRIPT) hw-detect.sh $(bindir)/hw-detect
 
-ethpci.lst:
-	./lstgen -p > ethpci.lst
+install-hw-detect-full:
 
+install-ethdetect: ethdetect.sh
+	$(INSTALL) -d $(DESTDIR)/bin
+	$(INSTALL_SCRIPT) ethdetect.sh $(bindir)/ethdetect
+
+	$(INSTALL) -d $(DESTDIR)/usr/lib/prebaseconfig.d
+	$(INSTALL_SCRIPT) prebaseconfig \
+		$(DESTDIR)/usr/lib/prebaseconfig.d/40ethdetect

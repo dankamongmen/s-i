@@ -3,15 +3,30 @@ Section: debian-installer
 Priority: standard
 Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
 Uploaders: David Kimdon <dwhedon@debian.org>, Tollef Fog Heen <tfheen@debian.org>, Matt Kraai <kraai@debian.org>, Petter Reinholdtsen <pere@debian.org>
-Build-Depends: debhelper (>= 4.1.13), libdiscover-dev, dpkg-dev (>= 1.9.0), libcdebconf-dev, libdebian-installer-dev, discover-data, python, po-debconf (>= 0.5.0)
+Build-Depends-Indep: debhelper (>= 4.1.13), dpkg-dev (>= 1.9.0), po-debconf (>= 0.5.0)
 Standards-Version: 3.1.1
 
+Package: hw-detect
+Architecture: all
+Depends: cdebconf-udeb (>= 0.31), modutils-basic | modutils-full, discover-udeb, discover-data-udeb
+Description: Detect HW and load kernel drivers for it
+ Using discover to find the HW.
+
 Package: ethdetect
-Architecture: alpha arm i386 m68k mips mipsel powerpc sparc ia64 hppa sh3 sh4 sh3eb sh4eb
-Depends: ${shlibs:Depends}
+Architecture: all
+Depends: cdebconf-udeb (>= 0.31), hw-detect
 Provides: ethernet-card-detection
 XB-Installer-Menu-Item: 11
 Description: Configure network hardware
  If you have an ethernet card in the computer I may be able to autodetect it
  and load the proper module for it, thus bringing you closer to a working
  network.
+
+Package: hw-detect-full
+Architecture: all
+Depends: cdebconf-udeb (>= 0.31), hw-detect
+Replaces: disk-detect
+Provides: disk-detect
+XB-Installer-Menu-Item: 35
+Description: Detect HW and load kernel drivers for it (full version)
+ Using discover to find the HW.

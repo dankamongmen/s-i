@@ -7,6 +7,7 @@
 
 
 PACKAGES=$(shell dh_listpackages)
+MENUPACKAGES=ethdetect hw-detect-full
 VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 ARCH=$(shell dpkg --print-architecture)
 
@@ -27,7 +28,6 @@ clean:
 	rm -f build-stamp 
 
 	-$(MAKE) clean
-	rm -f debian/ethdetect.postinst
 	dh_clean
 
 install: build
@@ -36,33 +36,33 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	$(foreach PACKAGE,  $(PACKAGES), \
-	( $(MAKE) install PROGS=$(PACKAGE) DESTDIR=`pwd`/debian/$(PACKAGE)) ; )
+	  $(MAKE) install-$(PACKAGE) DESTDIR=`pwd`/debian/$(PACKAGE);)
 
 
 # Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
-
-# Build architecture-dependent files here.
-binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
-	$(foreach PACKAGE, $(PACKAGES), \
-	(cp debian/$(PACKAGE).menutest debian/$(PACKAGE)/DEBIAN/menutest ) ; )
+	$(foreach PACKAGE, $(MENUPACKAGES), \
+	  cp debian/$(PACKAGE).menutest debian/$(PACKAGE)/DEBIAN/menutest; )
 	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_installdeb
 	dh_shlibdeps
 	$(foreach PACKAGE, $(PACKAGES), \
-	( dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
-	-Tdebian/$(PACKAGE).substvars \
-	-n$(PACKAGE)_$(VERSION)_$(ARCH).udeb ) ; )
+	  ( dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
+	  -Tdebian/$(PACKAGE).substvars \
+	  -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb ) ; )
 	$(foreach PACKAGE, $(PACKAGES), \
-	(cd debian ; \
+	  (cd debian ; \
 		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb \
 		); )
+
+# Build architecture-dependent files here.
+binary-arch: build install
+# We have nothing to do by default.
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install 
