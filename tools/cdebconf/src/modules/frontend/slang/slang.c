@@ -7,7 +7,7 @@
  *
  * Description: SLang-based cdebconf UI module
  *
- * $Id: slang.c,v 1.26 2003/07/14 12:52:48 sjogren Exp $
+ * $Id: slang.c,v 1.27 2003/09/23 01:50:36 sesse Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -53,13 +53,14 @@
 
 #define WIN_QUERY	1
 #define WIN_DESC	2
+#define WIN_PROGRESS    3
 #define LINES		(SLtt_Screen_Rows ? SLtt_Screen_Rows : 24)
 #define COLS		(SLtt_Screen_Cols ? SLtt_Screen_Cols : 80)
 #define UIDATA(obj) 	((struct uidata *)(obj)->data)
 
 /* Private variables */
 struct uidata {
-	struct slwindow qrywin, descwin;
+	struct slwindow qrywin, descwin, progwin;
 	int descstart;
 };
 
@@ -121,12 +122,25 @@ static void slang_initwin(struct frontend *ui, int type, struct slwindow *win)
 		win->y = LINES*2/3;
 		win->w = COLS;
 		win->h = LINES - win->y;
-		slang_setcolor(ui, &win->drawcolor, "desc:::draw", "yellow",
+		slang_setcolor(ui, &win->drawcolor, "desc::draw", "yellow",
 			"blue");
 		slang_setcolor(ui, &win->fillcolor, "desc::fill", "blue",
 			"blue");
 		slang_setcolor(ui, &win->selectedcolor, "desc::selected",
 			"black", "yellow");
+		break;
+	case WIN_PROGRESS:
+		win->border = 1;
+		win->x = 2;
+		win->y = (LINES*2/3) / 2 - 1;
+		win->w = COLS - 4;
+		win->h = 3;
+		slang_setcolor(ui, &win->drawcolor, "progress::draw", "yellow",
+			"blue");
+		slang_setcolor(ui, &win->fillcolor, "progress::fill", "blue",
+			"blue");
+		slang_setcolor(ui, &win->donecolor, "progress::done", "white",
+			"red");
 		break;
 	default:
 		INFO(INFO_DEBUG, "Unrecognized window type");
@@ -675,6 +689,7 @@ static int slang_initialize(struct frontend *obj, struct configuration *cfg)
 
 	slang_initwin(obj, WIN_QUERY, &uid->qrywin);
 	slang_initwin(obj, WIN_DESC, &uid->descwin);
+	slang_initwin(obj, WIN_PROGRESS, &uid->progwin);
 
 	slang_drawwin(&uid->qrywin);
 	slang_drawwin(&uid->descwin);
@@ -749,10 +764,106 @@ static int slang_go(struct frontend *obj)
 	return DC_OK;
 }
 
+static void
+slang_progress_set(struct frontend *obj, int val);
+
+static void
+slang_progress_start(struct frontend *obj, int min, int max, const char *title)
+{
+	struct uidata *uid = UIDATA(obj);
+	
+	DELETE(obj->progress_title);
+	obj->progress_title = strdup(title);
+	obj->progress_min = min;
+	obj->progress_max = max;
+	
+	slang_drawwin(&uid->descwin);
+	slang_wrapprint(&uid->descwin, title, 0);
+
+	slang_progress_set(obj, min);
+}
+
+static void
+slang_progress_set(struct frontend *obj, int val)
+{
+	struct uidata *uid = UIDATA(obj);
+	char buf[64], *percstr;
+	float perc;
+	int w, fillw, pos, i;
+
+	w = uid->progwin.w - 2;
+
+	obj->progress_cur = val;
+	if (obj->progress_max - obj->progress_min < 0 || w < 4)
+		return;
+	
+       	perc = 100.0 * (float)(obj->progress_cur - obj->progress_min) /
+		(float)(obj->progress_max - obj->progress_min);
+	sprintf(buf, "%3d%%", (int)perc);
+
+	percstr = (char *)malloc(w);
+	memset(percstr, ' ', w);
+
+	/* center the text in the percent string */
+	pos = (w - strlen(buf)) / 2;
+	memcpy(percstr + pos, buf, strlen(buf));
+
+	/* now draw the progress bar with the right amount filled */
+	slang_drawwin(&uid->qrywin);
+	slang_drawwin(&uid->progwin);
+	slang_flush();
+
+	fillw = (int)(w * perc * 0.01);
+
+	for (i = 0; i < w; i++) {
+		if (i < fillw)
+			SLsmg_set_color(uid->progwin.donecolor);
+		else
+			SLsmg_set_color(uid->progwin.drawcolor);
+			
+		SLsmg_gotorc(uid->progwin.y + 1, uid->progwin.x + i + 1);
+		SLsmg_write_char(percstr[i]);
+	}
+	
+	free(percstr);
+}
+
+static void
+slang_progress_info(struct frontend *obj, const char *info)
+{
+	struct uidata *uid = UIDATA(obj);
+	char *buf = (char *)
+		malloc(strlen(obj->progress_title) + strlen(info) + 3);
+	
+	strcpy(buf, obj->progress_title);
+	strcat(buf, ":\n");
+	strcat(buf, info);
+	
+	slang_drawwin(&uid->descwin);
+	slang_wrapprint(&uid->descwin, buf, 0);
+	slang_flush();
+
+	free(buf);
+}
+
+static void
+slang_progress_stop(struct frontend *obj)
+{
+	struct uidata *uid = UIDATA(obj);
+
+	slang_drawwin(&uid->descwin);
+	slang_drawwin(&uid->qrywin);
+	slang_flush();
+}
+
 struct frontend_module debconf_frontend_module =
 {
 	initialize: slang_initialize,
 	shutdown: slang_shutdown,
 	can_go_back: slang_can_go_back,
 	go: slang_go,
+	progress_start: slang_progress_start,
+	progress_set: slang_progress_set,
+	progress_info: slang_progress_info,
+	progress_stop: slang_progress_stop,
 };

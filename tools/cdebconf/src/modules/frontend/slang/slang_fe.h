@@ -9,6 +9,7 @@ struct slwindow {
 	int drawcolor;
 	int fillcolor;
 	int selectedcolor;
+	int donecolor;
 	char *title;
 };
 
