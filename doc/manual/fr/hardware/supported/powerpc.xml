@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- original version: 1.5 -->
+
+  <sect2 arch="powerpc">
+<title>Support pour les microprocesseurs, cartes mères et cartes vidéos</title>
+
+<para>
+Il y a quatre variantes principales de
+<emphasis>&architecture;</emphasis> supportées&nbsp;: CHRP, PMac
+(Power-Macintosh), PReP et Apus. Des portages vers d'autres
+architectures <emphasis>&architecture;</emphasis>, telles que Be-Box et
+MBX sont en cours, mais pas encore supportées. Nous aurons
+peut-être aussi un portage 64-bits (Power3) dans l'avenir.
+</para>
+
+<para>
+Apple (et quelques autres constructeurs &mdash;&nbsp;Power
+Computing, par exemple), produit une série d'ordinateurs
+Macintosh basés sur le processeur PowerPC. Afin de
+simplifier le support, on dénote trois catégories&nbsp;:
+Nubus, OldWorld PCI et NewWorld.
+</para>
+
+<para>
+Les ordinateurs Macintosh utilisant la série des
+microprocesseur 680x0 ne font pas partie de la famille des
+PowerPC mais sont dans celle des machines m68k. Ces modèles
+ont débutés avec les «&nbsp;Mac II&nbsp;» ou bien ont un
+numéro de modèle à trois chiffres comme «&nbsp;Centris
+650&nbsp;» ou «&nbsp;Quadra 950&nbsp;». Les numéros de
+modèles PowerPC pré-iMac de chez Apple ont quatre chiffres.
+</para>
+
+<para>
+Les systèmes Nubus ne sont pas supportés par debian/powerpc
+pour le moment. L'architecture monolithique de noyau
+Linux/PPC ne supporte pas ces machines&nbsp;; à la place, il faut
+utiliser le micro-noyau MkLinux Mach, que Debian ne supporte
+pas encore. Ceci inclut les modèles suivants&nbsp;:
+<itemizedlist>
+<listitem><para>Power Macintosh 6100, 7100, 8100</para></listitem>
+<listitem><para>Performa 5200, 6200, 6300</para></listitem>
+<listitem><para>Powerbook 1400, 2300 et 5300</para></listitem>
+<listitem><para>Workgroup Server 6150, 8150, 9150</para></listitem>
+</itemizedlist>
+Il existe un noyau Linux pour ces machines et on trouve un
+support limité à <ulink url="http://nubus-pmac.sourceforge.net/">http://nubus-pmac.sourceforge.net/</ulink>.
+</para>
+
+<para>
+Les systèmes OldWorld représentent la plupart des Power
+Macintoshs qui possèdent un lecteur de disquettes et un bus
+PCI. La plupart des Power Macintoshs 603,603e,604 et 604e,
+en incluant les 7200, 7300, 7500, 7600, 8500, 8600, 9500 et
+9600 sont des machines OldWorld. Les systèmes G3 de couleur
+beige sont aussi des OldWorld.
+</para>
+
+<para>
+Les machines appelées PowerMacs NewWorld sont les PowerMacs
+avec un boîtier en plastique de couleur translucide&nbsp;: 
+tous les iMacs, iBooks, G4, G3 de couleur bleue et
+la plupart des PowerBooks fabriqués à partir de 1999. Les
+PowerMacs NewWorld sont aussi connus pour utiliser le
+système «&nbsp;Rom en Ram&nbsp;» de MacOS et ont commencé
+à être fabriqués à partir de mi-1998.
+</para>
+
+<para>
+Les systèmes Macintosh récemment introduits ont un matériel
+bien mieux supporté par la version 2.4 du noyau
+Linux. Certains ne fonctionnent simplement pas avec un noyau
+2.2. La nouvelle saveur new-powermac, qui utilise le noyau
+2.4 a été ajoutée, afin de correspondre au matériel. La
+saveur new-powermac peut aussi être installée sur les
+machines OldWorld et NewWorld. Les machines pour lesquelles
+new-powermac est fortement recommandée sont marqués d'un
+astérisque ci-dessous.
+</para>
+
+<para>
+Les spécifications pour le matériel Apple sont disponibles sur
+<ulink url="http://www.info.apple.com/support/applespec.html">AppleSpec</ulink>,
+et pour le matériel plus ancien, 
+<ulink url="http://www.info.apple.com/support/applespec.legacy/index.html">AppleSpec Legacy</ulink>.
+</para>
+
+<para>
+<informalexample><screen>
+
+Modèle/Numéro                                     Architecture
+----------------------------------------------    ---------------
+
+Apple
+iMac Bondi Blue, 5 Flavors, Slot Loading        powermac-NewWorld
+iMac Summer 2000, Early 2001                    powermac-NewWorld 
+* iBook, iBook SE, iBook Dual USB               powermac-NewWorld 
+* iBook2                                        powermac-NewWorld 
+Power Macintosh Blue and White (B&amp;W) G3         powermac-NewWorld
+* Power Macintosh G4 PCI, AGP, Cube             powermac-NewWorld 
+* Power Macintosh G4 Gigabit Ethernet           powermac-NewWorld 
+* Power Macintosh G4 Digital Audio, Quicksilver powermac-NewWorld 
+PowerBook G3 FireWire Pismo (2000)              powermac-NewWorld 
+PowerBook G3 Lombard (1999)                     powermac-NewWorld 
+* PowerBook G4 Titanium                         powermac-NewWorld 
+
+Performa 4400, 54xx, 5500                       powermac-OldWorld  
+Performa 6300, 6360, 6400, 6500                 powermac-OldWorld 
+Power Macintosh 4400, 5400                      powermac-OldWorld 
+Power Macintosh 7200, 7300, 7500, 7600          powermac-OldWorld 
+Power Macintosh 8200, 8500, 8600                powermac-OldWorld 
+Power Macintosh 9500, 9600                      powermac-OldWorld 
+Power Macintosh (Beige) G3 Minitower            powermac-OldWorld 
+Power Macintosh (Beige) Desktop, All-in-One     powermac-OldWorld 
+PowerBook 2400, 3400, 3500                      powermac-OldWorld 
+PowerBook G3 Wallstreet (1998)                  powermac-OldWorld 
+Twentieth Anniversary Macintosh                 powermac-OldWorld 
+Workgroup Server 7250, 8550, 9650, G3           powermac-OldWorld 
+
+Power Computing
+PowerBase, PowerTower / Pro, PowerWave          powermac-OldWorld 
+PowerCenter / Pro, PowerCurve                   powermac-OldWorld 
+
+UMAX
+C500, C600, J700, S900                          powermac-OldWorld 
+
+APS
+APS Tech M*Power 604e/2000                      powermac-OldWorld 
+
+Motorola 
+Starmax 3000, 4000, 5000, 5500                  powermac-OldWorld 
+Firepower, PowerStack Series E, PowerStack II   prep                
+MPC 7xx, 8xx                                    prep     
+MTX, MTX+                                       prep
+MVME2300(SC)/24xx/26xx/27xx/36xx/46xx           prep
+MCP(N)750                                       prep
+
+IBM RS/6000
+40P, 43P                                        prep
+Power 830/850/860 (6070, 6050)                  prep         
+6030, 7025, 7043                                prep             
+p640                                            prep             
+B50, 43P-150, 44P                               chrp 
+
+Amiga Power-UP Systems (APUS)
+A1200, A3000, A4000                             apus 
+
+</screen></informalexample>
+</para>
+  </sect2>
