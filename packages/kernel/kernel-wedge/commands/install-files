@@ -18,6 +18,7 @@ if (! defined $sourcedir) {
 }
 
 open(KVERS, "kernel-versions") || die "kernel-versions: $!";
+my $version = 0;
 while (<KVERS>) {
 	chomp;
 	next if /^#/ || ! length;
@@ -33,6 +34,9 @@ while (<KVERS>) {
 	my $extraname="";
 	if ($multkern =~ /^[yY]/) {
 		$extraname="-$kernelversion-$flavour";
+	}
+	elsif ($multkern =~ /^-/) {
+	        $extraname="$multkern" if $multkern ne "-";
 	}
 	
 	if (-e "$sourcedir/boot/vmlinuz-$installedname") {
