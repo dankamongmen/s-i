@@ -65,6 +65,24 @@ case "x$cmd" in
         exit $ret
         ;;
 
+    xerror)
+	T="retriever/net/error"
+	db_set "$T" retry
+	db_input high "$T" || true
+	
+	db_capb # no backup
+	db_go || true
+	db_get "$T"
+	if [ "$RET" = retry ]; then
+		exit 0
+	elif [ "$RET" = "change mirror" ]; then
+		choose-mirror || true
+		exit 0
+	elif [ "$RET" = cancel ]; then
+		exit 2
+	fi
+	;;
+
     *)
         # unknown command
         exit 1
