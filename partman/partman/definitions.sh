@@ -498,6 +498,42 @@ device_name () {
     printf "%s - %s %s" "$(humandev $(cat device))" "$(longint2human $(cat size))" "$(cat model)"
 }
 
+enable_swap () {
+    local swaps dev num id size type fs path name method filesystem
+    # do swapon only when we will be able to swapoff afterwards
+    [ -f /proc/swaps ] || return 0
+    swaps=''
+    for dev in $DEVICES/*; do
+	[ -d $dev ] || continue
+	cd $dev
+	open_dialog PARTITIONS
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+	    [ $fs != free ] || continue
+	    [ -f "$id/method" ] || continue
+	    [ -f "$id/acting_filesystem" ] || continue
+	    method=$(cat $id/method)
+	    filesystem=$(cat $id/acting_filesystem)
+	    case "$filesystem" in
+		linux-swap)
+		    swaps="$swaps $path"
+		    ;;
+	    esac
+	done
+	close_dialog
+    done
+    for path in $swaps; do
+	swapon $path
+    done
+}
+
+disable_swap () {
+    [ -f /proc/swaps ] || return 0
+    cat /proc/swaps | grep '^/dev' \
+	| while read path x; do
+	      swapoff $path
+          done
+}
+
 default_disk_label () {
     if [ -x /bin/archdetect ]; then
 	archdetect=$(archdetect)
