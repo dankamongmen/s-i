@@ -387,15 +387,13 @@ case "$DISCOVER_VERSION" in
 		apt-install discover || true
 		;;
 	1)
-		# Install discover1 when it enter testing/sarge.
-
 		# This will break woody install, as discover1 is
 		# missing in woody.  We should try to find out which
 		# packages are available when selecting it for
 		# installation. [pere 2004-04-23]
 
-		log "Detected discover version 1, installing discover."
-		apt-install discover || true
+		log "Detected discover version 1, installing discover1."
+		apt-install discover1 || true
 		;;
 esac
 
