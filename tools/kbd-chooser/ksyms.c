@@ -571,6 +571,7 @@ static sym mazovia_syms[] = {
 	{ 0x201e, "quotedblbase" }
 };
 
+#ifdef CHARSET_ISO_8859_3
 static sym latin3_syms[] = {
 	{ 0x00a0, "" },
 	{ 0x0126, "Hstroke" },
@@ -669,7 +670,9 @@ static sym latin3_syms[] = {
 	{ 0x015d, "scircumflex" },
 	{ 0x02d9, "" }
 };
+#endif // CHARSET_ISO_8859_3
 
+#ifdef CHARSET_ISO_8859_4
 static sym latin4_syms[] = {
 	{ 0x00a0, "" },
 	{ 0x0104, "" },
@@ -768,7 +771,9 @@ static sym latin4_syms[] = {
 	{ 0x016b, "umacron" },
 	{ 0x02d9, "" }
 };
+#endif // CHARSET_ISO_8859_4
 
+#ifdef CHARSET_ISO_8859_5
 static sym iso_8859_5_syms[] = { /* 160-255 */
 	{ 0x00a0, "no-break_space" },					/* 0240 */
 	{ 0x0401, "cyrillic_capital_letter_io" },
@@ -868,6 +873,9 @@ static sym iso_8859_5_syms[] = { /* 160-255 */
 	{ 0x045f, "cyrillic_small_letter_dze" }
 };
 
+#endif // CHARSET_ISO_8859_5
+
+#ifdef CHARSET_ISO_8859_7
 static sym iso_8859_7_syms[] = { /* 160-255 */
 	{ 0x00a0, "" },
 	{ 0x02bd, "leftquote" },
@@ -966,7 +974,9 @@ static sym iso_8859_7_syms[] = { /* 160-255 */
 	{ 0x03ce, "omegaaccent" },
 	{ 0xfffd, "" }
 };
+#endif // CHARSET_ISO_8859_7
 
+#ifdef CHARSET_ISO_8869_8
 static sym iso_8859_8_syms[] = {
 	{ 0x00a0, "" },
 	{ 0xfffd, "" },
@@ -1065,7 +1075,9 @@ static sym iso_8859_8_syms[] = {
 	{ 0xfffd, "" },
 	{ 0xfffd, "" }
 };
+#endif // CHARSET_ISO_8859_8
 
+#ifdef CHARSET_ISO_8859_9
 static sym iso_8859_9_syms[] = { /* latin-5 */
 	/* Identical to latin-1, but with the 6 symbols
 	   ETH, eth, THORN, thorn, Yacute, yacute replaced by
@@ -1119,11 +1131,18 @@ static sym iso_8859_9_syms[] = { /* latin-5 */
 	{ 0x015f, "scedilla" },
 	{ 0x00ff, "" }
 };
+#endif
 
 #include "koi8.syms.h"
 #include "cp1250.syms.h"
+
+#if defined(CHARSET_ETHIOPIC)
 #include "ethiopic.syms.h"
+#endif
+
+#if defined(CHARSET_SAMI)
 #include "sami.syms.h"
+#endif
 
 static sym iso_8859_15_syms[] = {
 	/* latin-1 with 8 changes */
@@ -1596,21 +1615,39 @@ struct cs {
 } charsets[] = {
     { "iso-8859-1",	latin1_syms, 160 },
     { "iso-8859-2",	latin2_syms, 160 },
+#ifdef CHARSET_ISO_8859_3
     { "iso-8859-3",	latin3_syms, 160 },
+#endif
+#ifdef CHARSET_ISO_8859_4
     { "iso-8859-4",	latin4_syms, 160 },
+#endif
+#ifdef CHARSET_ISO_8859_5
     { "iso-8859-5",	iso_8859_5_syms, 160 },
+#endif
+#ifdef CHARSET_ISO_8859_7
     { "iso-8859-7",	iso_8859_7_syms, 160 },
+#endif
+#ifdef CHARSET_ISO_8859_8
     { "iso-8859-8",	iso_8859_8_syms, 160 },
+#endif
+#ifdef CHARSET_ISO_8859_9
     { "iso-8859-9",	iso_8859_9_syms, 208 },
+#endif
+#ifdef CHARSET_SAMI
     { "iso-8859-10",	latin6_syms, 160 },
+#endif
     { "iso-8859-15",	iso_8859_15_syms, 160 },
     { "mazovia",	mazovia_syms, 128 },
     { "cp-1250",	cp1250_syms, 128 },
     { "koi8-r",		koi8_syms, 128 },
     { "koi8-u",		koi8_syms, 128 },
+#ifdef CHARSET_ETHIOPIC
     { "iso-10646-18",	iso_10646_18_syms, 159 },	/* ethiopic */
+#endif
+#ifdef CHARSET_SAMI
     { "iso-ir-197",	iso_ir_197_syms, 160 },		/* sami */
     { "iso-ir-209",	iso_ir_209_syms, 160 },		/* sami */
+#endif
 };
 
 /* Functions for both dumpkeys and loadkeys. */
@@ -1618,40 +1655,7 @@ struct cs {
 static int prefer_unicode = 0;
 static const char *chosen_charset = NULL;
 
-void
-list_charsets(FILE *f) {
-	int i,j,lth,ct;
-	char *mm[] = { "iso-8859-", "koi8-" };
-
-	for (j=0; j<sizeof(mm)/sizeof(mm[0]); j++) {
-		if(j)
-			fprintf(f, ",");
-		fprintf(f, "%s{", mm[j]);
-		ct = 0;
-		lth = strlen(mm[j]);
-		for(i=0; i < sizeof(charsets)/sizeof(charsets[0]); i++) {
-			if(!strncmp(charsets[i].charset, mm[j], lth)) {
-				if(ct++)
-					fprintf(f, ",");
-				fprintf(f, charsets[i].charset+lth);
-			}
-		}
-		fprintf(f, "}");
-	}
-	for(i=0; i < sizeof(charsets)/sizeof(charsets[0]); i++) {
-		for (j=0; j<sizeof(mm)/sizeof(mm[0]); j++) {
-			lth = strlen(mm[j]);
-			if(!strncmp(charsets[i].charset, mm[j], lth))
-				goto nxti;
-		}
-		fprintf(f, ",%s", charsets[i].charset);
-	nxti:;
-	}
-	fprintf(f, "\n");
-}
-
-int
-set_charset(const char *charset) {
+int set_charset(const char *charset) {
 	sym *p;
 	int i;
 
@@ -1761,19 +1765,23 @@ ksymtocode(const char *s) {
 				return K(KT_LATIN, 160 + i);
 			}
 
+#ifdef CHARSET_ISO_8859_3
 		for (i = 0; i < 256 - 160; i++)
 			if (!strcmp(s, latin3_syms[i].name)) {
 				fprintf(stderr,
 					_("assuming iso-8859-3 %s\n"), s);
 				return K(KT_LATIN, 160 + i);
 			}
+#endif
 
+#ifdef CHARSET_ISO_8859_4
 		for (i = 0; i < 256 - 160; i++)
 			if (!strcmp(s, latin4_syms[i].name)) {
 				fprintf(stderr,
 					_("assuming iso-8859-4 %s\n"), s);
 				return K(KT_LATIN, 160 + i);
 			}
+#endif
 	}
 
 	fprintf(stderr, _("unknown keysym '%s'\n"), s);

@@ -4,15 +4,17 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
- * $Id: usb-kbd.c,v 1.3 2003/01/22 19:09:14 mckinstry Exp $
+ * $Id: usb-kbd.c,v 1.4 2003/01/26 17:06:45 mckinstry Exp $
  */
 
 #include "config.h"
 #include <sys/types.h>
+#include <errno.h>
 #include <sys/stat.h>
+#include <stdlib.h>
 #include <string.h>
 #include <debian-installer.h>
-#include <cdebconf/common.h>  // for NEW()
+#include "xmalloc.h"
 #include "nls.h"
 #include "kbd-chooser.h"
 
@@ -20,14 +22,14 @@ extern kbd_t *keyboards;	/* in kbd-chooser.c */
 
 /**
  * @brief  Do a grep for a string
- * @return 0 if present, 1 if not
+ * @return 0 if present, 1 if not, errno if error
  */
 int grep (const char *file, const char *string)
 {
 	FILE *fp = fopen (file, "r");	
 	char buf[LINESIZE];
-	if (DEBUG && fp == NULL)
-		DIE ("Failed to open %s to search for %s\n", file, string);
+	if (!fp)
+		return errno;
 	while (!feof (fp)) {
 		fgets (buf, LINESIZE, fp);
 		if (strstr (buf, string) != NULL) {
@@ -42,16 +44,19 @@ int grep (const char *file, const char *string)
 /**
  * @brief list of keyboards present
  */
-kbd_t *usb_kbd_get (void)
+void usb_kbd_get (void)
 {
-	kbd_t *k = NEW (kbd_t);
-	int err, mounted_fs = 0 ;
-	struct stat sbuf;
+	kbd_t *k = xmalloc(sizeof(kbd_t));
+	int res, mounted_fs = 0 ;
 
+	// Set up default entries.
 	k->name = "usb";
 	k->description = N_("USB");
 	k->fd = -1;
 	k->deflt = NULL;
+	k->present = UNKNOWN;
+	k->next = keyboards;
+	keyboards = k;
 	
 #if defined (KERNEL_2_5)
 	/* In 2.5 series, we can detect keyboard via /proc/bus/input
@@ -59,7 +64,6 @@ kbd_t *usb_kbd_get (void)
 	 * FIXME: Write this code	 
 	 */	
 #warning "Kernel 2.5 code not written yet"
-	k->present = UNKNOWN ;
 
 #else /* 2.4 code */
 
@@ -74,38 +78,33 @@ kbd_t *usb_kbd_get (void)
 	 *   (1) kernel module means there _probably_was_ a USB keyboard,
 	 *     not that there is one at the moment.
 	 */
-	if ((err = stat ("/proc/bus/usb/drivers", &sbuf)) < 0) { /* assume ENOENT */
-		if (DEBUG) {
-			perror ("Looking for /proc/bus/usb/drivers: ");
-			di_log ("No keyboard drivers file");
-			if (DEBUG) { 
-				if (stat ("/proc/bus/usb", &sbuf) < 0) 
-					DIE ("reading /proc/bus/usb failed. ");
-			}
-		}
-		err = system ("mount -t  usbdevfs usbdevfs /proc/bus/usb");
-		if (err != 0) {
+	
+	res = grep ("/proc/bus/usb/drivers", "keyboard");
+	if (res < 0) {
+		if (DEBUG) 
+			di_log ("Failed to grep /proc/bus/usb/drivers; assuming usbdevfs not present");		
+		res = system ("mount -t  usbdevfs usbdevfs /proc/bus/usb");
+		if (res != 0) {
 			di_log ("Failed to mount USB filesystem");
-			k->present = UNKNOWN;
-			k->next = keyboards;
-			keyboards = k;
-			return k;
+			return;
 		}
 		mounted_fs = 1;
-	}
-	if (grep ("/proc/bus/usb/drivers", "keyboard") == 0) {
-		di_log ("Found USB Keyboard\n");
-		k->present = TRUE;		
-		k->next = keyboards;
-		keyboards = k;
-	} else {
-		k->present = FALSE;
+		res = grep ("/proc/bus/usb/drivers", "keyboard");
+		if (DEBUG && res < 0) 
+			perror ("Failed to grep /proc/bus/usb/drivers");
 	}	
+	if (res >  0) {
+		if (DEBUG) di_log ("Found USB Keyboard\n");
+		k->present = TRUE;		
+	}
+	if (res == 0) {
+		if (DEBUG) di_log ("No USB keyboard present\n");
+		k->present = FALSE;
+	}
 	if (mounted_fs)
 		system ("umount /proc/bus/usb");
-
-#endif
-	return k;
+	
+#endif	
 }
 
 /*

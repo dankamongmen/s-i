@@ -3,7 +3,7 @@
  * Copyright (C) 2002 Alastair McKinstry   <mckinstry@computer.org>  
  * Released under the GNU License; see file COPYING for details 
  * 
- * $Id: kbd-chooser.h,v 1.4 2003/01/21 18:38:58 mckinstry Exp $
+ * $Id: kbd-chooser.h,v 1.5 2003/01/26 17:06:45 mckinstry Exp $
  */
 
 #ifndef KBD_CHOOSER_H
@@ -31,23 +31,23 @@ typedef struct maplist_s {
 } maplist_t;
 
 typedef struct kbd_s { 
-	char *name;
-	char *description;
-	keymap_t *deflt;
+	char *name;		/* short name of kbd arch */
+	char *description;	/* description in english */
+	keymap_t *deflt;	/* default keymap for this keyboard (may be null) */
 	exists present;
-	int fd;
+	int fd;			
 	struct kbd_s *next;
 } kbd_t;
 
 /* Some of the following will be linked in
  * via *-kbd.c
  */
-extern kbd_t *at_kbd_get (void);
-extern kbd_t *usb_kbd_get (void);
-extern kbd_t *mac_kbd_get (void);
-extern kbd_t *sparc_kbd_get (void);
-extern kbd_t *amiga_kbd_get (void);
-extern kbd_t *serial_kbd_get (void);
-extern kbd_t *atari_kbd_get (void);
+extern void at_kbd_get (void);
+extern void usb_kbd_get (void);
+extern void mac_kbd_get (void);
+extern void sparc_kbd_get (void);
+extern void amiga_kbd_get (void);
+extern void serial_kbd_get (void);
+extern void atari_kbd_get (void);
 
 #endif

@@ -1,6 +1,7 @@
 /* Error-free versions of some libc routines */
 
 
+#include <stdlib.h>
 
 #if defined(NDEBUG)
 

@@ -1,10 +1,10 @@
 /* @file  kbd-chooser.c
- * @brief Cxhoose a keyboard.
- *
+ * @brief Choose a keyboard.
+ * 
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.3 2003/01/21 18:38:58 mckinstry Exp $
+ * $Id: kbd-chooser.c,v 1.4 2003/01/26 17:06:45 mckinstry Exp $
  */
 
 #include "config.h"
@@ -21,6 +21,7 @@
 #include <cdebconf/commands.h>
 #include <cdebconf/debconfclient.h>
 #include "nls.h"
+#include "xmalloc.h"
 #include "kbd-chooser.h"
 
 kbd_t *keyboards = NULL;
@@ -28,15 +29,6 @@ static maplist_t *maplists = NULL;
 static struct debconfclient *client;
 
 extern int loadkeys_wrapper (char *map); // in loadkeys.y
-
-
-/**
- * @brief Tell the installer to remove console packages from base install
- */
-void unselect_console_packages (void)
-{
-	// FIXME Write this.
-}
 
 
 int my_debconf_input (char *priority, char *template, char **result)
@@ -62,7 +54,7 @@ int my_debconf_input (char *priority, char *template, char **result)
  */
 char *get_locale (void)
 {
-	char *lang, locale[8];
+	char *lang, locale[LINESIZE];
 	lang = getenv ("LANGUAGE");
 	
 	/* LANGUAGE may be set as a colon seperated list by languagechooser;
@@ -155,16 +147,16 @@ int compare_locale_list (char *langs)
  * @brief  Insert keymap into buffer in the form "[name] translated_description"
  * @return ptr to char after description.
  */
-inline char *insert_description (char *buf, keymap_t *mp)
+inline char *insert_description (char *buf, char *name, char *description)
 {
 	char *s, * t;
 
 	s = buf;
-	t = mp->name;
+	t = name;
 	*s++ = '[';
 	while (*t)  *s++ = *t++;
 	*s++ = ']'; *s++ = ' ';
-	t = gettext (mp->description);
+	t = gettext (description);
 	while (*t)  *s++ = *t++;
 	return s;
 }
@@ -186,7 +178,7 @@ void select_keymap (maplist_t *maplist)
 			s += 2;
 		} else
 			s = buf;
-		s = insert_description (s, mp);
+		s = insert_description (s, mp->name, mp->description);
 		score = compare_locale_list (mp->langs);
 		if (score > best) {
 			best = score;
@@ -201,7 +193,7 @@ void select_keymap (maplist_t *maplist)
 	// set the default
 	client->command (client, "fget", template, "seen", NULL);
 	if (strcmp(client->value, "false") == 0) {
-		s = insert_description (deflt, preferred);
+		s = insert_description (deflt, preferred->name, preferred->description);
 		*s = '\0';
 		client->command (client, "set", template, deflt, NULL);
 	}
@@ -223,8 +215,6 @@ maplist_t *parse_keymap_file (const char *name)
 	if (DEBUG && fp == NULL)
 		DIE ("Failed to open %s: %s \n", name, strerror (errno));
 	mapfile = NEW (maplist_t);
-	if (DEBUG && mapfile == NULL)
-		DIE ("malloc failed\n");
 	mapfile->next = maplists;
 	mapfile->name = STRDUP (name + STRLEN (KEYMAPLISTDIR) + STRLEN ("console-keymaps-") + 1);
 	maplists = mapfile;
@@ -232,7 +222,6 @@ maplist_t *parse_keymap_file (const char *name)
 
 	while (!feof (fp)) {
 		map = NEW (keymap_t);
-		if (DEBUG && map == NULL) DIE ("Malloc failed\n");
 		
 		fgets (buf, LINESIZE, fp);
 		tab1 = strchr (buf, '\t');
@@ -281,24 +270,14 @@ void read_keymap_files (void)
 	}	
 }
 
-
-/**
- * @brief  Pick a keyboard.
- * @return const char *  - priority of question
- */
-char *ponder_keyboard_choices (void)
+void collect_keyboards (void)
 {
-	kbd_t *k = NULL, *kp = NULL, *preferred = NULL;
-	char buf [LINESIZE], *s = NULL;
-	int kboards = 0;
-
-	assert (maplists != NULL); // needed to choose default kbd in some cases
 
 #if defined (USB_KBD)
-	k = usb_kbd_get ();
+	usb_kbd_get ();
 #endif
 #if defined (AT_KBD)
-	k = at_kbd_get ();
+	at_kbd_get ();
 #endif
 #if defined (MAC_KBD)
 	mac_kbd_get ();
@@ -315,7 +294,45 @@ char *ponder_keyboard_choices (void)
 #if defined (SERIAL_KBD)
 	serial_kbd_get ();
 #endif
+}
 
+
+char  *add_no_keyboard_case (char *s, char **preferred_name)
+{
+	char template[256], *t;
+	t = insert_description (template, "none", N_("No keyboard to configure"));
+	*(++t) = '\0';
+	strcpy (s, t);
+	*preferred_name = STRDUP (t);
+
+	return s + strlen (t);
+}
+
+char *extract_name (char *name, char *ptr)
+{
+	int len;
+	// Choice will be of the form "[name] description". Extract name
+	len = (int) (strchr (ptr, ']') - ptr) -1 ;	
+	strncpy (name, ptr+1, len);
+	name[len] = '\0';
+	return name;
+}
+
+/**
+ * @brief  Pick a keyboard.
+ * @return const char *  - priority of question
+ */
+char *ponder_keyboard_choices (void)
+{
+	kbd_t *kp = NULL, *preferred = NULL;
+	char buf [LINESIZE], *s = NULL, *preferred_arch;
+	int kboards = 0;
+
+	assert (maplists != NULL); // needed to choose default kbd in some cases
+
+	collect_keyboards ();
+
+	// Did we forget to compile in a keyboard ???
 	if (DEBUG &&  keyboards == NULL)
 		DIE ("No keyboards found");
 
@@ -324,44 +341,37 @@ char *ponder_keyboard_choices (void)
 	 * In 2.6+ we may have per-keyboard keymaps, and better autodetection
 	 * of keyboards present.
 	 */
-	if (k->present == TRUE)
-		preferred = k;
 
 	// Add the keyboards to debconf
 	for (kp = keyboards; kp != NULL ; kp = kp->next) {
-		if (kp->present != FALSE) kboards++;
-		if (s) {
-			STRCPY (s, ", ");
-			s += 2;
-		} else
-			s = buf;		
-		STRCPY (s, gettext (kp->name));
-		s += STRLEN (gettext (kp->name));
-		// If we _know_ a kbd is present, and are uncertain about the preferred kbd,
-		// select the known.
-		if (preferred == NULL && kp->present == TRUE)
-			preferred = kp;
-	}	
-	*(++s) = '\0';
-	if (preferred == NULL)
-		preferred = k;
-
-	client->command (client, "subst", "console-tools/archs", 
-			 "choices", buf, NULL);		      
+		if (kp->present != FALSE) {
+			kboards++;
+			if (s) {
+				STRCPY (s, ", ");
+				s += 2;
+			} else
+				s = buf;		
+			s = insert_description (s, kp->name, kp->description);
+			if (preferred == NULL || (preferred->present != TRUE))
+				preferred = kp;					
+		}	
+	}
+	if ((preferred == NULL) || (preferred->present == UNKNOWN)) 
+		s = add_no_keyboard_case (s, &preferred_arch);
+	else 
+		preferred_arch = preferred->name;
 	
 	// Set the default option
 	client->command (client, "fget", "console-tools/archs", "seen", NULL);
 	if (strcmp(client->value, "false") == 0)
-		client->command (client, "set", "console-tools/archs", preferred->name, NULL);
-
-	if (kboards == 0) {
-		di_log ("No keyboards found; unselecting console-tools, console-data pkgs\n");
-		unselect_console_packages ();
-		exit (0);
-	}				
+		client->command (client, "set", "console-tools/archs", preferred_arch, NULL);
 		
+	*s = '\0';
+	client->command (client, "subst", "console-tools/archs", 
+			 "choices", buf, NULL);		      
+	       
 	// Should we prompt the user?
-	if (kboards == 1)		
+	if (kboards <= 1)		
 		return "low";
 	return (preferred->present == TRUE) ? "medium" : "high";	
 }
@@ -374,9 +384,9 @@ char *ponder_keyboard_choices (void)
  */
 int choose_keymap (char *arch, char *keymap)
 {
-	char template[50], *ptr, preferred[1024], *s;
+	char template[50], *ptr, preferred[LINESIZE], *s;
 	kbd_t *kb;
-	int len, res;
+	int res;
 	STRCPY (template, "console-data/keymap/");
 	STRCPY (template + 20, arch);
 
@@ -387,7 +397,7 @@ int choose_keymap (char *arch, char *keymap)
 	if (DEBUG && !kb)
 		DIE ("Keyboard not found\n");
 	if (kb->deflt) {
-		s = insert_description (preferred, kb->deflt);
+		s = insert_description (preferred, kb->deflt->name, kb->deflt->description);
 		*s = '\0';
 		client->command (client, "set", template, preferred, NULL);
 	}
@@ -396,17 +406,16 @@ int choose_keymap (char *arch, char *keymap)
 				template, &ptr);
 	if (res != CMDSTATUS_SUCCESS)
 		return res;
-	// Choice will be of the form "[name] description". Extract name
-	len = (int) (strchr (ptr, ']') - ptr) -1 ;	
-	strncpy (keymap, ptr+1, len);
-	keymap [ len ] = '\0';
+
+	keymap = extract_name (keymap, ptr);
+	
 	return CMDSTATUS_SUCCESS;
 }	
 
 
 int main (int argc, char **argv)
 {
-	char *kbd_priority, *arch, keymap[20];
+	char *kbd_priority, *arch = NULL, keymap[LINESIZE], buf[LINESIZE], *s;
 	enum { CHOOSE_ARCH, CHOOSE_KEYMAP } state = CHOOSE_ARCH;
 
 	client = debconfclient_new (); 
@@ -417,14 +426,19 @@ int main (int argc, char **argv)
 
 	kbd_priority = ponder_keyboard_choices ();
 
+	s = buf;
+
 	while (1) {
 
 		switch (state) {
 
 			// First select a keyboard arch. 
 		case CHOOSE_ARCH:		
-			if (my_debconf_input (kbd_priority, "console-tools/archs", &arch) != CMDSTATUS_SUCCESS)
+			if (my_debconf_input (kbd_priority, "console-tools/archs", &s) != CMDSTATUS_SUCCESS)
 				exit (0);
+			arch = extract_name (xmalloc (LINESIZE), s);
+			if (strcmp (arch, "none") == 0)
+			  exit (0);
 			state = CHOOSE_KEYMAP;
 			break;
 
