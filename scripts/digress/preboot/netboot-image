@@ -1,5 +1,5 @@
 #!/bin/sh
-# Unpack a netboot image.
+# Unpack (or copy) a netboot image.
 set -e
 
 error () {
@@ -23,8 +23,12 @@ if [ ! -e "$NETBOOT_IMAGE" ]; then
 fi
 
 (
-	cd $TFTP_DIR
-	if ! tar zxf $NETBOOT_IMAGE; then
-		error "failed to untar NETBOOT_IMAGE in $TFTP_DIR"
+	if [ "$ARCH" = sparc ]; then
+		cp "$NEWBOOT_IMAGE" $TFTP_DIR
+	else
+		cd $TFTP_DIR
+		if ! tar zxf $NETBOOT_IMAGE; then
+			error "failed to untar NETBOOT_IMAGE in $TFTP_DIR"
+		fi
 	fi
 )
