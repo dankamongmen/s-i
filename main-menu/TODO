@@ -1,28 +1,2 @@
-     - The main menu design has some issues. If a step is failing
-       because some step above it did something wrong, but thought
-       it succeeded (a disk was partitioned, but very badly, and
-       installing the base system to it fails), there is no way to
-       force the user to back up. This seems to preclude linear
-       install mode. I posted a longer example to -boot. Three
-       possible fixes:
-                        - Detect loops, and have code to figure out what went
-                          wrong and back up to the appropriate step that can
-                          fix it
-                        - Detect loops, and back up to the beginning of
-                          the menu
-                        - Detect whenever any menu item fails, and leave
-                          linear mode. (BEST)
-
-* If package A depends on a virtual package B which is provided by C and D,
-  and at least one of C and D is a menu item, the user is asked for which of
-  C and D to use, but what if none of them is a menu item?
-  For example:
-  anna depends on retriever. Say you have the cdrom retriever and a floppy
-  retriever installed, and you want to use the floppy retriever to load some
-  modules for your arcane whizbang CD reader. How on earth would main-menu
-  know that only the floppy retriever needs to be configured? If it asks, it
-  overrides anna's retriever choice question (bad), if it doesn't ask, it has
-  to either configure all providers, or select one arbitrarily. Ick.
-
 * Implement Recommends support for ordering the menu and determining default,
   but don't enforce them like depends.
