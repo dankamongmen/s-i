@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.54 2003/11/11 23:22:40 barbier Exp $
+ * $Id: text.c,v 1.55 2003/11/13 21:29:50 barbier Rel $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -296,13 +296,13 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 			        "Prompt: 1 - %d, q to quit select> "), count);
 	    } else if (i == count) {
 	        printf(get_text(obj, "debconf/prompt-last-page",
-			        "Prompt: 1 - %d, q to quit select, b for back> "), count);
+			        "Prompt: 1 - %d, q to quit select, b to back up> "), count);
 	    } else if (i == getheight()-1) {
 	        printf(get_text(obj, "debconf/prompt-first-page", 
 			        "Prompt: 1 - %d/%d, q to quit select, n for next page> "), i, count);
 	    } else {
 	        printf(get_text(obj, "debconf/prompt-multi-page", 
-			        "Prompt: 1 - %d/%d, q to quit select, b for back, n for next page> "), i, count);
+			        "Prompt: 1 - %d/%d, q to quit select, b to back up, n for next page> "), i, count);
 	    }
 
 	    fgets(answer, sizeof(answer), stdin);
@@ -314,7 +314,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	                       /* n for next page */
 	    if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
                     continue;
-	                       /* b for back */
+	                       /* b to back up */
 	    if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
 	            { i -= 2*(getheight()-1); continue; }
 
@@ -480,7 +480,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	        printf(get_text(obj, "debconf/prompt-firstpage", "Prompt: 1 - %d/%d, n for next page> "),
 				i, count);
 	    } else {
-	        printf(get_text(obj, "debconf/prompt-multipage", "Prompt: 1 - %d/%d, b for back, n for next page> "),
+	        printf(get_text(obj, "debconf/prompt-multipage", "Prompt: 1 - %d/%d, b to back up, n for next page> "),
 				i, count);
 	    }
 	    fgets(answer, sizeof(answer), stdin);
@@ -489,7 +489,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	                       /* n for next page */
 	    if (answer[0] == *(get_text(obj,"debconf/next-key", "N")))
                     continue;
-	                       /* b for back */
+	                       /* b to back up */
 	    if (answer[0] == *(get_text(obj,"debconf/back-key", "B"))) 
 	            { i -= 2*(getheight()-1); continue; }
 
