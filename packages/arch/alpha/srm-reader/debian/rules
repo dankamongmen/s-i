@@ -1,19 +1,4 @@
 #!/usr/bin/make -f
-#
-# debian/rules file for srm-reader
-# Copyright (C) 2003 Alastair McKinstry, <mckinstry@debian.org>
-# $Id$
-
-export DH_VERBOSE=1
-PACKAGE=srm-reader
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=alpha
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-
-export DH_COMPAT=3
-
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
 
 clean:
 	dh_testdir
@@ -22,12 +7,7 @@ clean:
 	-$(MAKE) clean
 	dh_clean
 
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-	touch configure-stamp
-
-build: configure-stamp build-stamp
+build: build-stamp
 build-stamp:
 	dh_testdir
 	$(MAKE)
@@ -41,18 +21,15 @@ install: build
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/srm-reader
 	dh_link /usr/bin/srm-reader /etc/rcS.d/S40srm-reader
 
-# Build architecture-independent files here.
 binary-indep:
 
-# Build arch-dependent files here
 binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
 	dh_fixperms
-	dh_gencontrol -- -n$(FILENAME)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure
-
