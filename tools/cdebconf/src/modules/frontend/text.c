@@ -3,13 +3,11 @@
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
+#include "strutl.h"
 
 #include <string.h>
-
-struct uidata {
-	int foo;
-};
-#define UIDATA(obj) ((struct uidata *)(obj)->data)
+#include <termios.h>
+#include <unistd.h>
 
 static void texthandler_displaydesc(struct frontend *obj, struct question *q) {
 	int i;
@@ -56,38 +54,142 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 
 static int texthandler_multiselect(struct frontend *obj, struct question *q)
 {
+	char *choices[100] = {0};
+	char selected[100] = {0};
+	char answer[1024];
+	int i, count, choice;
+
 	texthandler_displaydesc(obj, q);
-	return 0;
+
+	count = strchoicesplit(q->template->choices, choices, sizeof(choices)/sizeof(choices[0]));
+
+	while(1)
+	{
+		for (i = 0; i < count; i++)
+		{
+			printf("%s %3d) %s\n", (selected[i] ? "*" : " "), i+1,
+			       choices[i]);
+			
+		}
+
+		printf("1 - %d, q to end> ", count);
+		fgets(answer, sizeof(answer), stdin);
+		if (answer[0] == 'q') break;
+
+		choice = atoi(answer);
+		if (choice > 0 && choice <= count)
+		{
+			if (selected[choice-1] == 0) 
+				selected[choice-1] = 1;
+			else
+				selected[choice-1] = 0;
+		}
+	}
+
+	answer[0] = 0;
+	for (i = 0; i < count; i++)
+	{
+		if (selected[i])
+		{
+			if (answer[0] != 0)
+				strvacat(answer, sizeof(answer), ", ");
+			strvacat(answer, sizeof(answer), choices[i], NULL);
+		}
+		free(choices[i]);
+	}
+	question_setvalue(q, answer);
+	
+	return DC_OK;
 }
 
 static int texthandler_note(struct frontend *obj, struct question *q)
 {
+	int c;
 	texthandler_displaydesc(obj, q);
-	return 0;
+	printf("[Press enter to continue]\n");
+	do { c = fgetc(stdin); } while (c != '\r' && c != '\n');
+	return DC_OK;
 }
 
 static int texthandler_password(struct frontend *obj, struct question *q)
 {
+	struct termios oldt, newt;
+	char passwd[256] = {0};
+	int i = 0, c;
+
 	texthandler_displaydesc(obj, q);
-	return 0;
+
+	tcgetattr(0, &oldt);
+	memcpy(&newt, &oldt, sizeof(struct termios));
+	cfmakeraw(&newt);
+	tcsetattr(0, TCSANOW, &newt);
+	while ((c = fgetc(stdin)) != EOF)
+	{
+		fputc('*', stdout);
+		passwd[i++] = (char)c;
+		if (c == '\r' || c == '\n') break;
+
+	}
+	passwd[i] = 0;
+	tcsetattr(0, TCSANOW, &oldt);
+	question_setvalue(q, passwd);
+	return DC_OK;
 }
 
 static int texthandler_select(struct frontend *obj, struct question *q)
 {
+	char *choices[100] = {0};
+	char answer[10];
+	int i, count, choice;
+
 	texthandler_displaydesc(obj, q);
-	return 0;
+
+	count = strchoicesplit(q->template->choices, choices, sizeof(choices)/sizeof(choices[0]));
+
+	do
+	{
+		for (i = 0; i < count; i++)
+			printf("%3d) %s\n", i+1, choices[i]);
+
+		printf("1 - %d> ", count);
+		fgets(answer, sizeof(answer), stdin);
+
+		choice = atoi(answer);
+	} while (choice <= 0 || choice > count);
+
+	question_setvalue(q, choices[choice - 1]);
+	for (i = 0; i < count; i++) 
+		free(choices[i]);
+	
+	return DC_OK;
 }
 
 static int texthandler_string(struct frontend *obj, struct question *q)
 {
+	char buf[1024] = {0};
 	texthandler_displaydesc(obj, q);
-	return 0;
+	fgets(buf, sizeof(buf), stdin);
+	CHOMP(buf);
+	question_setvalue(q, buf);
+	return DC_OK;
 }
 
 static int texthandler_text(struct frontend *obj, struct question *q)
 {
+	char *out = 0;
+	char buf[1024];
+	int sz = 1;
 	texthandler_displaydesc(obj, q);
-	return 0;
+	while (fgets(buf, sizeof(buf), stdin))
+	{
+		sz += strlen(buf);
+		out = realloc(out, sz);
+		memcpy(out + sz - strlen(buf) - 1, buf, strlen(buf));
+	}
+	out[sz-1] = 0;
+	question_setvalue(q, out);
+	free(out);
+	return DC_OK;
 }
 
 /* ----------------------------------------------------------------------- */

@@ -160,10 +160,39 @@ int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen)
 	return 1;
 }
 
+int strchoicesplit(char *inbuf, char **argv, size_t maxnarg)
+{
+	int argc = 0;
+	char *s = inbuf, *e;
+
+	if (inbuf == 0) return 0;
+
+	while (*s != 0 && argc < maxnarg)
+	{
+		/* skip initial spaces */
+		while (isspace(*s)) s++;
+
+		/* find end */
+		e = s;
+		while (*e != 0 && *e != ',') e++;
+
+		argv[argc] = malloc(e-s+1);
+		memcpy(argv[argc], s, e-s);
+		argv[argc][e-s] = 0;
+		argc++;
+
+		s = e;
+		if (*s == ',') s++;
+	}
+	return argc;
+}
+
 int strcmdsplit(char *inbuf, char **argv, size_t maxnarg)
 {
 	int argc = 0;
 	int inspace = 1;
+
+	if (maxnarg == 0) return 0;
 	
 	for (; *inbuf != 0; inbuf++)
 	{
@@ -214,7 +243,7 @@ void strescape(const char *inbuf, char *outbuf, const size_t maxlen)
 	int i = 0;
 	while (*p != 0 && i < maxlen-1)
 	{
-		if (*p == '%' || *p == '"')
+		if (*p == '%' || *p == '"' || *p == '\r' || *p == '\n')
 		{
 			if (i + 4 >= maxlen) break;
 			outbuf[i] = '%';

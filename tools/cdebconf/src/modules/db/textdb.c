@@ -145,7 +145,7 @@ static int textdb_template_set(struct database *db, struct template *t)
 
 	fprintf(outf, "template {\n");
 
-	fprintf(outf, "\tname \"%s\";\n", escapestr(t->tag));
+	fprintf(outf, "\ttag \"%s\";\n", escapestr(t->tag));
 	fprintf(outf, "\ttype \"%s\";\n", escapestr(t->type));
 	if (t->defaultval != NULL)
 		fprintf(outf, "\tdefault \"%s\";\n", escapestr(t->defaultval));

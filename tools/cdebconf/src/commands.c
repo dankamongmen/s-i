@@ -131,6 +131,8 @@ int command_go(struct confmodule *mod, int argc, char **argv,
 	else
 		snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
 
+	mod->frontend->clear(mod->frontend);
+
 	return DC_OK;
 }
 
