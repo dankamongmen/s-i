@@ -127,8 +127,25 @@ struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
 		}
 	}
 
-	/* Finally, pull in needed dependencies */
-	return di_pkg_toposort_list(packages);
+	/* pull in needed dependencies */
+	packages = di_pkg_toposort_list(packages);
+
+	/* And finally (bleh), remove virtual and installed packages again */
+	for (node = packages->head; node != NULL; node = next)
+	{
+		next = node->next;
+		p = (struct package_t *)node->data;
+		if (p->filename == NULL || is_installed(p, status_p)) {
+			if (prev)
+				prev->next = next;
+			else
+				packages->head = next;
+			continue;
+		}
+		prev = node;
+	}
+
+	return packages;
 }
 
 /* Calls udpkg to unpack a package. */
