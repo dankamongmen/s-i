@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.12 2000/12/31 01:24:51 joeyh Rel $ */
+/* $Id: udpkg.h,v 1.13 2001/02/14 18:13:26 bug1 Exp $ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -18,7 +18,7 @@
 #endif
 
 #define BUFSIZE		4096
-#define STATUSFILE	ADMINDIR ## "/status"
+#define STATUSFILE	ADMINDIR ## "/status.udeb"
 #define DPKGCIDIR	ADMINDIR ## "/tmp.ci/"
 #define INFODIR		ADMINDIR ## "/info/"
 #define UDPKG_QUIET	"UDPKG_QUIET"
@@ -58,12 +58,24 @@
 struct package_t {
 	char *file;
 	char *package;
-	char *version;
-	char *depends;
-	char *provides;
-	char *description;
-	int installer_menu_item;
 	unsigned long status;
+	char *priority;
+	char *section;
+	char *installed_size;
+	char *maintainer;
+	char *source;
+	char *version;
+	char *pre_depends;
+	char *depends;
+	char *replaces;
+	char *recommends;
+	char *suggests;
+	char *provides;
+	char *conflicts;
+	char *conffiles;
+	char *description;
+	char *long_description;
+	int installer_menu_item;
 	char color; /* for topo-sort */
 	struct package_t *requiredfor[DEPENDSMAX]; 
 	unsigned short requiredcount;

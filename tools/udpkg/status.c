@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.22 2001/02/14 15:04:55 bug1 Exp $ */
+/* $Id: status.c,v 1.23 2001/02/14 18:13:26 bug1 Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -92,6 +92,21 @@ static const char *status_print(unsigned long flags)
 	return buf;
 }
 
+int read_block(FILE *f, char *multiple_lines)
+{
+	char ch;
+	char buf[BUFSIZE];
+
+	while (((ch = fgetc(f)) == ' ') && !feof(f)) {
+		fgets(buf, BUFSIZE, f);
+		multiple_lines = (char *) realloc(multiple_lines, strlen(multiple_lines) + strlen(buf) + 2);
+		strcat(multiple_lines, " ");
+		strcat(multiple_lines, buf);
+	}
+	ungetc(ch, f);
+	return EXIT_SUCCESS;
+}
+
 /*
  * Read a control file (or a stanza of a status file) and parse it,
  * filling parsed fields into the package structure
@@ -104,6 +119,7 @@ void control_read(FILE *f, struct package_t *p)
 		buf[strlen(buf)-1] = 0;
 		if (*buf == 0)
 			return;
+		/* these are common to both installed and uninstalled packages */
 		else if (strstr(buf, "Package: ") == buf)
 		{
 			p->package = strdup(buf+9);
@@ -120,15 +136,51 @@ void control_read(FILE *f, struct package_t *p)
 		{
 			p->provides = strdup(buf+10);
 		}
+		else if (strstr(buf, "Description: ") == buf)
+		{
+			p->description = strdup(buf+13);
+			p->long_description = malloc(1);
+			read_block(f, p->long_description);
+		}
 		/* This is specific to the Debian Installer. Ifdef? */
 		else if (strstr(buf, "installer-menu-item: ") == buf) 
 		{
 			p->installer_menu_item = atoi(buf+21);
 		}
-		else if (strstr(buf, "Description: ") == buf)
+		else if (strstr(buf, "Priority: ") == buf)
 		{
-			p->description = strdup(buf+13);
+			p->priority = strdup(buf + 10);
 		}
+		else if (strstr(buf, "Section: ") == buf)
+		{
+			p->section = strdup(buf + 9);
+		}
+		else if (strstr(buf, "Installed-Size: ") == buf)
+		{
+			p->installed_size = strdup(buf + 16);
+		}
+		else if (strstr(buf, "Maintainer: ") == buf)
+		{
+			p->maintainer = strdup(buf + 12);
+		}
+		else if (strstr(buf, "Version: ") == buf)
+		{
+			p->version = strdup(buf + 9);
+		}
+		else if (strstr(buf, "Suggests: ") == buf)
+		{
+			p->suggests = strdup(buf + 10);
+		}
+		else if (strstr(buf, "Recommends: ") == buf)
+		{
+			p->recommends = strdup(buf + 12);
+		}
+		else if (strstr(buf, "Conffiles: ") == buf)
+		{
+			p->conffiles = malloc(1);
+			read_block(f, p->conffiles);
+		}
+
 		/* TODO: localized descriptions */
 	}
 }
@@ -258,14 +310,38 @@ int status_merge(void *status, struct package_t *pkgs)
 	for (pkg = pkgs; pkg != 0; pkg = pkg->next) {
 		fprintf(fout, "Package: %s\nStatus: %s\n", 
 			pkg->package, status_print(pkg->status));
+		if (pkg->priority)
+			fprintf(fout, "Priority: %s\n", pkg->priority);
+		if (pkg->section)
+			fprintf(fout, "Section: %s\n", pkg->section);
+		if (pkg->priority)
+			fprintf(fout, "Installed-Size: %s\n", pkg->installed_size);
+		if (pkg->maintainer)
+			fprintf(fout, "Maintainer: %s\n", pkg->maintainer);
+		if (pkg->source)
+			fprintf(fout, "Source: %s\n", pkg->source);
+		if (pkg->version)
+			fprintf(fout, "Version: %s\n", pkg->version);
+		if (pkg->pre_depends)
+			fprintf(fout, "Pre-Depends: %s\n", pkg->pre_depends);
 		if (pkg->depends)
 			fprintf(fout, "Depends: %s\n", pkg->depends);
+		if (pkg->replaces)
+			fprintf(fout, "Replaces: %s\n", pkg->replaces);
+		if (pkg->recommends)
+			fprintf(fout, "Recommends: %s\n", pkg->recommends);
+		if (pkg->suggests)
+			fprintf(fout, "Suggests: %s\n", pkg->suggests);
 		if (pkg->provides)
 			fprintf(fout, "Provides: %s\n", pkg->provides);
+		if (pkg->conflicts)
+			fprintf(fout, "Conflicts: %s\n", pkg->conflicts);
+		if (pkg->conffiles)
+			fprintf(fout, "Conffiles:\n %s\n", pkg->conffiles);
+		if (pkg->description)
+			fprintf(fout, "Description: %s\n%s\n", pkg->description, pkg->long_description);
 		if (pkg->installer_menu_item)
 			fprintf(fout, "installer-menu-item: %i\n", pkg->installer_menu_item);
-		if (pkg->description)
-			fprintf(fout, "Description: %s\n", pkg->description);
 		fputc('\n', fout);
 	}
 	
