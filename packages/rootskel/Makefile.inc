@@ -46,7 +46,7 @@ build-recursive clean-recursive install-recursive:
 	@target=`echo $@ | sed s/-recursive//`; \
 	list='$(subdirs)'; \
 	for subdir in $$list; do \
-	  echo "Making install in $$subdir"; \
+	  echo "Making $$target in $$subdir"; \
 	  (cd $$subdir && $(MAKE) $$target) || exit 1; \
 	done
 

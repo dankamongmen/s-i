@@ -1,5 +1,5 @@
 dir = lib
 
-subdirs = debian-installer.d
+subdirs = debian-installer debian-installer.d
 
 include ../../Makefile.inc
