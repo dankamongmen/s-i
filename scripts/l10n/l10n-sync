@@ -163,6 +163,12 @@ if ! grep "svn/d-i/trunk" $DI_COPY/.svn/entries >/dev/null 2>&1 ; then
   exit 1
 fi
 
+if [ $(find $DI_COPY/packages -name \*.mine | wc -l) != 0 ] ; then
+  echo $DI_COPY seems to contain some SVN conflict files
+  echo Please fix this before lauching the script again...
+  exit 1
+fi
+
 # First, update the copy of D-I repository
 cd $DI_COPY/packages
 if [ "$ONLINE" = "Y" ] ; then
