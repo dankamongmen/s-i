@@ -327,7 +327,8 @@ static int config_read(struct configuration *cfg, const char *filename)
 				/* parse off the tag */
 				q = (char *)linebuf;
 				tag[0] = 0;
-				if (strparsequoteword(&q, tag, sizeof(tag)) == 0)
+				if (strparsecword(&q, tag, sizeof(tag)) == 0
+				    && strparsequoteword(&q, tag, sizeof(tag)) == 0)
 				{
 					INFO(INFO_ERROR, "Syntax error %s:%u: Malformed tag\n", filename, curline);
 					return DC_NOTOK;
