@@ -11,6 +11,11 @@ findfs () {
 rootfs_devfs=$(findfs /)
 bootfs_devfs=$(findfs /boot)
 
+# partconf workaround (mounts /target as /target/)
+if [ "$rootfs_devfs" = "" ]; then
+	rootfs_devfs=$(findfs //)
+fi
+
 if [ "$bootfs_devfs" = "" ]; then
 	bootfs_devfs=$rootfs_devfs
 	boot="boot/"
