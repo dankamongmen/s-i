@@ -270,6 +270,8 @@ int main(int argc, char *argv[]) {
 	get_swapspaces();
 	get_fstab_d_dir();
 
+	mkdir(FSTAB_DIR, 0755); /* may not yet exist */
+	
 	outfile = fopen(FSTAB_FILE, "w");
 	if(outfile == NULL)
 		return(0);
