@@ -1,5 +1,5 @@
-AC_INIT([libdebian-installer],[0.18])
-AM_INIT_AUTOMAKE(libdebian-installer,0.18)
+AC_INIT([libdebian-installer],[0.20])
+AM_INIT_AUTOMAKE([])
 AM_MAINTAINER_MODE
 
 AC_PROG_CC
@@ -31,6 +31,16 @@ if test $di_cv_support_cc_attribute_alias = yes; then
 	HAVE_ATTRIBUTE_ALIAS=1
 	AC_DEFINE_UNQUOTED(HAVE_ATTRIBUTE_ALIAS,1,[Define to 1 if compiler supports __attribute__((alias))])
 fi
+
+AH_VERBATIM([PATH_MAX],
+[/* Define PATH_MAX if missing. */
+#ifndef PATH_MAX
+# undef PATH_MAX
+#endif])
+
+AC_CHECK_DECLS(PATH_MAX,[],[AC_DEFINE(PATH_MAX,4096)],[
+#include <limits.h>
+])
 
 AC_CONFIG_HEADERS([config.h include/debian-installer/config.h])
 
