@@ -27,7 +27,7 @@ fixme="FIXME"
 case $arch in
     alpha)
         archspec="alpha;not-i386;not-s390;not-m68k;not-powerpc"
-	kernelversion="2.2.22"
+	kernelversion="2.4.24"
 	
         fdisk="fdisk.txt;cfdisk.txt"
         network="supports-tftp;supports-nfsroot"
@@ -60,7 +60,7 @@ case $arch in
 	;;
     i386)
         archspec="i386;not-s390;not-m68k;not-powerpc;not-alpha"
-	kernelversion="2.2.22"
+	kernelversion="2.4.25"
 	
         fdisk="fdisk.txt;cfdisk.txt"
         network="supports-tftp;supports-rarp;supports-dhcp;supports-bootp;supports-nfsroot"
@@ -71,7 +71,7 @@ case $arch in
 	;;
     ia64)
         archspec="ia64;not-i386;not-s390;not-m68k;not-powerpc;not-alpha"
-	kernelversion="2.4.19"
+	kernelversion="2.4.22"
 	
         fdisk="parted.txt;cfdisk.txt"
         network="supports-tftp;supports-rarp;supports-dhcp;supports-bootp;supports-nfsroot"
@@ -82,7 +82,7 @@ case $arch in
 	;;
     m68k)
         archspec="m68k;not-i386;not-s390;not-powerpc;not-alpha"
-	kernelversion="2.2.20"
+	kernelversion="2.2.25"
 	
         fdisk="atari-fdisk.txt;mac-fdisk.txt;amiga-fdisk.txt;pmac-fdisk.txt"
         network="supports-tftp;supports-rarp;supports-dhcp;supports-bootp;supports-nfsroot"
@@ -93,7 +93,7 @@ case $arch in
 	;;
     mips)
         archspec="mips;not-i386;not-s390;not-m68k;not-powerpc;not-alpha"
-	kernelversion="2.4.19"
+	kernelversion="2.4.22"
 	
         fdisk="fdisk.txt;cfdisk.txt"
         network="supports-tftp;supports-nfsroot"
@@ -115,7 +115,7 @@ case $arch in
 	;;
     powerpc)
         archspec="powerpc;not-s390;not-m68k;not-i386;not-alpha"
-	kernelversion="2.2.20"
+	kernelversion="2.4.22"
 	
         fdisk="mac-fdisk.txt;cfdisk.txt"
         network="supports-tftp;supports-dhcp;supports-bootp;supports-nfsroot"
@@ -126,7 +126,7 @@ case $arch in
 	;;
     s390)
         archspec="s390;not-powerpc;not-m68k;not-i386;not-alpha"
-	kernelversion="2.4.19"
+	kernelversion="2.4.21"
 	
         fdisk="fdasd.txt;dasdfmt.txt"
         network="supports-nfsroot"
@@ -137,7 +137,7 @@ case $arch in
 	;;
     sparc)
         archspec="sparc;not-i386;not-s390;not-m68k;not-powerpc;not-alpha"
-	kernelversion="2.2.20"
+	kernelversion="2.4.24"
 	
         fdisk="fdisk.txt"
         network="supports-tftp;supports-rarp;supports-dhcp;supports-bootp;supports-nfsroot"
