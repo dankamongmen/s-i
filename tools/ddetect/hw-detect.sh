@@ -64,10 +64,12 @@ load_module() {
 		fi
 	else   
 		log "Error loading '$module'"
-		db_fset hw-detect/modprobe_error seen false
-		db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
-		db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
-		db_go
+		if [ "$module" != floppy ] && [ "$module" != ide-floppy ]; then
+			db_fset hw-detect/modprobe_error seen false
+			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
+			db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
+			db_go
+		fi
 	fi
     
 	echo $old > /proc/sys/kernel/printk

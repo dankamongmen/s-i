@@ -4,6 +4,12 @@ set -e
 . /usr/share/debconf/confmodule
 #set -x
 
+# This is a hack, but we don't have a better idea right now.
+# See Debian bug #136743
+if [ -x /sbin/depmod ]; then
+	depmod -a > /dev/null 2>&1 || true
+fi
+
 is_not_loaded() {
 	! (cut -d" " -f1 /proc/modules | grep -q "^$1\$")
 }
