@@ -355,8 +355,13 @@ finish(void)
                     break;
                 }
             } else {
+		char *mkfs_opts="";
+		/* mkfs.reiserfs is interactive unless passed a -q */
+		if (strcmp(fs, "reiserfs") == 0) {
+			mkfs_opts="-q";
+		}
                 append_message("partconf: Creating %s file system on %s\n", fs, parts[i]->path);
-                asprintf(&cmd, "mkfs.%s %s >/dev/null 2>>/var/log/messages", fs, parts[i]->path);
+                asprintf(&cmd, "mkfs.%s %s %s >/dev/null 2>>/var/log/messages", fs, mkfs_opts, parts[i]->path);
                 ret = system(cmd);
                 free(cmd);
                 if (ret != 0) {
