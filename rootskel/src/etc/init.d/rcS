@@ -6,9 +6,14 @@ umount /initrd
 freeramdisk /dev/rd/0
 
 echo -n "Starting system log daemon: "
+/sbin/syslogd -m 0 -O /var/log/syslog
+echo -n "syslogd, "
+/sbin/klogd
+echo "klogd."
 
-/sbin/syslogd -m 0
-echo "syslogd."
+echo -n "Calculating module depencies"
+depmod -a
+echo "."
 
 if [ -d /etc/rcS.d ]; then
     for script in /etc/rcS.d/S[0-9][0-9]*; do
