@@ -22,6 +22,7 @@ open (R, $regionmap) || die "$regionmap: $!";
 while (<R>) {
 	chomp;
 	my ($code, $region) = split(' ', $_, 2);
+	$region =~ s/gettext\("(.*)"\)/$1/;
 	if (exists $code2country{$code}) {
 		push @{$regions{$region}}, $code2country{$code};
 		$codes_listed{$code}++;
@@ -35,7 +36,7 @@ close R;
 # Add any unlisted countries to "other".
 foreach my $code (keys %codes_listed) {
 	if ($codes_listed{$code} == 0) {
-		push @{$regions{unknown}}, $code2country{$code};
+		push @{$regions{other}}, $code2country{$code};
 		print STDERR "unknown region for country $code, not in $regionmap\n";
 	}
 }
