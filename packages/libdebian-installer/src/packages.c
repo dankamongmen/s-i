@@ -194,7 +194,9 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
       {
         di_package_dependency *d = node->data;
 
-        if (d->type == di_package_dependency_type_depends && !r->check_real (r, package, d))
+        if ((d->type == di_package_dependency_type_depends ||
+             d->type == di_package_dependency_type_pre_depends) &&
+            !r->check_real (r, package, d))
           goto error;
       }
 
