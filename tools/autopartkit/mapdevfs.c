@@ -3,12 +3,16 @@
  *
  */
 
+#define _GNU_SOURCE /* Make asprintf available */
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <malloc.h>
 #include <string.h>
 #include <stdio.h>
+
+#include "autopartkit.h"
 
 struct diskentry {
     int major;

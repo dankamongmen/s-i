@@ -14,7 +14,7 @@ autopartkit_log(const int level, const char * format, ...)
     va_end(ap);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
   int i;
   char *profiles[] = {

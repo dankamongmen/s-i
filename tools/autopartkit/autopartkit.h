@@ -60,6 +60,6 @@ void autopartkit_error (int isfatal, const char * format, ...);
 #define BLOCKS_TO_MiB(b)  ((b)  / 2048l)
 
 /* from mapdevfs.c */
-char *normalize_devfs(const char* path)
+char *normalize_devfs(const char* path);
 
 #endif /* AUTOPARTKIT_H */
