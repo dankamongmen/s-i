@@ -82,6 +82,14 @@ getfree_vg() {
 }
 
 #
+# return the free space of a volume group (in physical extents [PE])
+#
+getfreepe_vg() {
+	cmdout=`vgdisplay "$1" 2>&1`
+	echo "$cmdout" | grep '^[ ]*Free  PE' | sed -e 's/^.*Size \+//' | sed -e 's/ \+.*//'
+}
+
+#
 # return the size of a volume group
 #
 getsize_vg() {
@@ -616,7 +624,16 @@ lv_create() {
 	SIZE=$(human2lvm "$RET")
 	[ -z "$RET" ] && return
 
-	lvcreate -L${SIZE} -n "$NAME" $VG >>/var/log/messages 2>&1
+	# If the maximum free space should be used for the new LV, use the
+	# number of physical extents (PEs) because the size given by LVM
+	# might not be accurate, resulting in an error because the VG is
+	# not big enough (see #250594).
+	if [ "$MAX_SIZE" = "$SIZE" ]; then
+		lvcreate -l$(getfreepe_vg "$VG") -n "$NAME" $VG >>/var/log/messages 2>&1
+	else
+		lvcreate -L${SIZE} -n "$NAME" $VG >>/var/log/messages 2>&1
+	fi
+
 	if [ $? -ne 0 ]; then
 		db_subst lvmcfg/lvcreate_error VG $VG
 		db_subst lvmcfg/lvcreate_error LV $NAME
