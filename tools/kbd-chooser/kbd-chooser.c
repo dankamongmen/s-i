@@ -4,7 +4,7 @@
  * Copyright (C) 2002 Alastair McKinstry, <mckinstry@computer.org>
  * Released under the GPL
  *
- * $Id: kbd-chooser.c,v 1.9 2003/02/04 04:48:38 kraai Exp $
+ * $Id: kbd-chooser.c,v 1.10 2003/02/26 21:54:17 mckinstry Exp $
  */
 
 #include "config.h"
@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <ctype.h> // Needed ATM for toupper()
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
 #include <errno.h> 
@@ -20,6 +22,8 @@
 #include <cdebconf/common.h>
 #include <cdebconf/commands.h>
 #include <cdebconf/debconfclient.h>
+#include <linux/serial.h>
+#include <sys/ioctl.h>
 #include "nls.h"
 #include "xmalloc.h"
 #include "kbd-chooser.h"
@@ -102,7 +106,6 @@ char *get_locale (void)
 	}
 	else
 		strncpy (locale + 3, "US", 2);
-	if (DEBUG) printf ("Using language settings %s \n", locale);
 	return STRDUP (locale);
 }
 
@@ -227,6 +230,56 @@ void select_keymap (maplist_t *maplist)
 	}
 }
 
+/**
+ * @brief	Get a maplist "name", creating if necessary
+ */
+maplist_t *maplist_get (char *name)
+{
+	maplist_t *p = maplists;
+	
+	while (p) {
+		if (strcmp(p->name, name) == 0)
+			break;
+		p = p->next;
+	}	
+	if (p) return p;
+	p = NEW (maplist_t);
+	if (DEBUG && p==NULL)
+	  DIE ("Failed to create maplist\n");
+	p->next = maplists;
+	p->maps = NULL;
+	p->name = STRDUP (name);
+	maplists = p;
+	return p;
+}
+
+/**
+ * @brief	Get a keymap in a maplist; create if necessary
+ * @list	maplist to search
+ * @name	name of list
+ */
+keymap_t *keymap_get (maplist_t *list, char *name)
+{
+	keymap_t *mp = list->maps;
+
+	while (mp) { 
+	  if (strcmp (mp->name, name) == 0)
+			break;
+		mp = mp->next;
+	}
+	if (mp)  
+	  return mp;
+	mp = NEW (keymap_t);
+	if (DEBUG && mp == NULL)
+	  DIE ("Failed to malloc keymap_t");
+	mp->langs = NULL;
+	mp->name = STRDUP (name);
+	mp->description = NULL;
+	mp->next = list->maps;
+	list->maps = mp;
+	return mp;
+}
+
 
 /**
  * @brief    Load the keymap files into memory
@@ -236,20 +289,19 @@ void select_keymap (maplist_t *maplist)
 maplist_t *parse_keymap_file (const char *name)
 {
 	FILE *fp;
-	maplist_t *mapfile;
-	keymap_t *map , **mp;
+	maplist_t *maplist;
+	keymap_t *map;
 	char buf[LINESIZE], *tab1, *tab2, *nl;
 	fp = fopen (name, "r");
+
 	if (DEBUG && fp == NULL)
 		DIE ("Failed to open %s: %s \n", name, strerror (errno));
-	mapfile = NEW (maplist_t);
-	mapfile->next = maplists;
-	mapfile->name = STRDUP (name + STRLEN (KEYMAPLISTDIR) + STRLEN ("console-keymaps-") + 1);
-	maplists = mapfile;
-	mp = &(mapfile->maps);
+	maplist = maplist_get ((char *) (name + STRLEN (KEYMAPLISTDIR) + STRLEN ("console-keymaps-") + 1));
 
 	while (!feof (fp)) {
 		fgets (buf, LINESIZE, fp);
+		if (*buf == '#' ) //comment ; skip line
+			continue; 
 		tab1 = strchr (buf, '\t');
 		if (!tab1)
 			continue; // malformed line
@@ -263,43 +315,68 @@ maplist_t *parse_keymap_file (const char *name)
 		*tab2 = '\0';
 		*nl = '\0';
 		
-		map = NEW (keymap_t);
-		map->langs = STRDUP (buf);
-		map->name =  STRDUP (tab1+1);
-		map->description = STRDUP (tab2+1);
-		map->next = NULL;
-		*mp = map;
-		mp = &(map->next);
+		printf ("DEBUG: tab1 %s tab2 %s buf %s\n", tab1+1, tab2+1, buf);
+		map = keymap_get (maplist, tab1+1);
+		if (! map->langs) { // new keymap
+			map->langs = STRDUP (buf);
+			map->description = STRDUP (tab2+1);
+		}
 	}
 	fclose (fp);
-	return mapfile;
+	return maplist;
 }
 		
 
 /**
  * @brief   Read keymap files from /usr/share/console/lists and parse them
+ * @listdir Directory to look in
  * @warning Assumes files present, readable: this should be guaranteed by the installer dependencies
  */
-void read_keymap_files (void)
+void read_keymap_files (char *listdir)
 {
 	DIR *d;
-	char *p, buf[LINESIZE] = KEYMAPLISTDIR "/";
+	char *p, fullname[LINESIZE];
 	struct dirent *ent;
+	struct stat sbuf;
 
-	d = opendir (KEYMAPLISTDIR);
-	p = buf + STRLEN (KEYMAPLISTDIR)+1; 
+	strncpy (fullname, listdir, LINESIZE); 
+	p = fullname + STRLEN (listdir);
+	*p++ = '/';
+	printf ("DEBUG: Examining %s\n", fullname);
+
+	d = opendir (listdir);
 
 	if (DEBUG && d == NULL)
-		DIE ("Failed to open %s: %s\n", KEYMAPLISTDIR, strerror (errno));
+		DIE ("Failed to open %s: %s\n", listdir, strerror (errno));
 	
 	ent = readdir (d);
-	while (ent) {
-		if (strncmp (ent->d_name, "console-keymaps-", 16) == 0) {
-			STRCPY (p, ent->d_name);
-			select_keymap (parse_keymap_file (buf));
-		}		
-		ent = readdir (d);
-	}	
+	for (; ent ; ent = readdir (d)) {
+		printf ("FIXME: Examining %s\n", ent->d_name);
+		if ((strcmp (ent->d_name, ".") == 0) ||
+		    (strcmp (ent->d_name, "..") == 0))
+			continue;
+		strcpy (p, ent->d_name);
+		if (stat (fullname, &sbuf) == -1) {
+			if (DEBUG) 			       
+				DIE ("Failed to stat %s: %s\n", fullname,
+				     strerror (errno));
+			// otherwise continue
+			continue;
+		}
+		if (S_ISDIR (sbuf.st_mode)) {
+			read_keymap_files (p); 
+		} else { // Assume a file
+			
+			/* two types of name allowed (for the moment; )
+			 * legacy 'console-keymaps-* names and *.keymaps names
+			 */
+			if (strncmp (ent->d_name, "console-keymaps-", 16) == 0) 
+				STRCPY (p, ent->d_name);
+			 else 
+				 strncpy (p, ent->d_name, strchr (ent->d_name, '.') - p);			
+			select_keymap (parse_keymap_file (fullname));
+		}
+	}
 	closedir (d);
 }
 
@@ -329,7 +406,29 @@ void collect_keyboards (void)
 #endif
 }
 
+/**
+ * @brief set debian-installer/serial console as to whether we are using a serial console
+ * This is then passed via prebaseconfig to base-config
+ */
+void check_if_serial_console (void)
+{
+	int fd;
+	struct serial_struct sr;
+	char *present;
 
+	fd = open("/dev/console", O_NONBLOCK);
+	if (fd == -1) 
+		return;
+	present = ( ioctl(fd, TIOCGSERIAL, &sr) == 0) ? "yes" : "no" ;
+	client->command (client, "set", "debian-installer/serial-console",
+			 present, NULL);
+	close (fd);
+}
+		
+/**
+ * @brief If we aren't sure a kbd is present, add an option not to configure
+ * (In the critical-questions only case, this will be the default)
+ */
 void add_no_keyboard_case (char *s, char **preference)
 {
 	char template[LINESIZE], *t;
@@ -392,11 +491,11 @@ char *ponder_keyboard_choices (void)
 	}	
 	if ((preferred == NULL) || (preferred->present == UNKNOWN)) {
 		s = s ? ( strcpy (s, ", ") + 2) : buf ;
-		printf ("Setting no keybd case\n");
+		di_log ("Setting no keybd case\n");
 		add_no_keyboard_case (s, &preference );
 		choices++;
 	}		
-	client->command (client, "su bst", "console-tools/archs", 
+	client->command (client, "subst", "console-tools/archs", 
 			 "choices", buf, NULL);		      
 	
 	// Set the default option
@@ -414,7 +513,7 @@ char *ponder_keyboard_choices (void)
 /**
  * @brief   choose a given keyboard
  * @arch    keyboard architecture
- * @keymap  ptr to buffer in which to store chosen keymap
+ * @keymap  ptr to buffer in which to store chosen keymap name
  * @returns CMDSTATUS_SUCCESS or CMDSTATUS_GOBACK, keymap set if SUCCESS
  */
 int choose_keymap (char *arch, char *keymap)
@@ -452,13 +551,22 @@ int main (int argc, char **argv)
 {
 	char *kbd_priority, *arch = NULL, keymap[LINESIZE], buf[LINESIZE], *s;
 	enum { CHOOSE_ARCH, CHOOSE_KEYMAP } state = CHOOSE_ARCH;
+	int res;
+	
+	// As a form of debugging, allow a keyboard map to 
+	// be named on command-line
+	if (argc == 2) {
+		loadkeys_wrapper (argv[1]);
+		exit (0);
+	}
 
 	client = debconfclient_new (); 
 	client->command (client, "capb", "backup", NULL);
 	client->command (client, "title", "Select a Keyboard Layout", NULL);
 
-	read_keymap_files ();
+	read_keymap_files (KEYMAPLISTDIR);
 
+	check_if_serial_console ();
 	kbd_priority = ponder_keyboard_choices ();
 
 	s = buf;
@@ -468,9 +576,11 @@ int main (int argc, char **argv)
 		switch (state) {
 
 			// First select a keyboard arch. 
-		case CHOOSE_ARCH:				  
-			if (my_debconf_input (kbd_priority, "console-tools/archs", &s) != CMDSTATUS_SUCCESS)
-				exit (0);
+		case CHOOSE_ARCH:				 
+			res = my_debconf_input (kbd_priority, "console-tools/archs", &s);
+			if (res != CMDSTATUS_SUCCESS) {
+				exit (res == CMDSTATUS_GOBACK ? 0 : 1);
+			}
 			arch = extract_name (xmalloc (LINESIZE), s);
 			if (strcmp (arch, "none") == 0) {
 				di_log ("not setting keymap");
@@ -485,6 +595,8 @@ int main (int argc, char **argv)
 				state = CHOOSE_ARCH;
 				break;
 			}
+			client->command (client, "set", "debian-installer/keymap", 
+					 keymap, NULL);
 			loadkeys_wrapper (keymap);  
 			exit (0);
 			break;			
