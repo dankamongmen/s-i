@@ -64,12 +64,8 @@ db_progress INFO sibyl-installer/conf
 
 # The kernel path should not start with a / because SiByl cannot handle
 # that.
-if [ -e /target/boot/vmlinux ]; then
-	kernel=vmlinux
-else
-	kernel=`find /target/boot -name 'vmlinu*sb1-swarm-bn' | tail -1`
-	kernel=${kernel#/target/boot/}
-fi
+kernel=`find /target/boot -name 'vmlinu*sb1-swarm-bn' | tail -1`
+kernel=${kernel#/target/boot/}
 info "Using kernel '$kernel'"
 
 # /boot has to be on a separate partition because SiByl can only
