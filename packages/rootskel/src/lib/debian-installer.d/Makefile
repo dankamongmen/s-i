@@ -17,7 +17,7 @@ ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
 	S35framebuffer-linux
   endif
   ifeq ($(DEB_HOST_GNU_CPU),i386)
-    files_term += \
+    files += \
 	S33framebuffer-module-linux-i386
   endif
 
