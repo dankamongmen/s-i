@@ -418,6 +418,8 @@ if [ -x /etc/init.d/pcmcia ]; then
 		fi
     
 		db_progress STEP $OTHER_STEPSIZE
+	else
+		db_fset hw-detect/start_pcmcia seen true || true
 	fi
 fi
 
