@@ -6,7 +6,6 @@
 
 bterm=/usr/bin/bterm
 font=/unifont.bgf
-kbdchooser=/usr/bin/kbd-chooser
 
 /usr/bin/debconf-loadtemplate debian /var/lib/dpkg/info/*.templates 
 
@@ -24,12 +23,6 @@ fi
 # Load framebuffer and enable it for bterm
 if [ -x "$bterm" -a -e "$font" -a C.UTF-8 = "$LANG" ] && enable-fb ; then
     use_bterm=true
-fi
-
-# Set the kbd early, if necessary
-bootkbd=$( echo " " $( cat /proc/cmdline ) " " | sed -n 's/^.* bootkbd=\([^ ]*\) .*$/\1/p' )
-if [ -x "$kbdchooser" -a $bootkbd != "" ] ; then
-     kbd-chooser $bootkbd
 fi
 
 # Use boot variable, but make it possible to change it in main-menu
