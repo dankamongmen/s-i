@@ -30,6 +30,7 @@ my @buildlist = (
 		email => 'jbailey@debian.org',
 		description => 'daily alpha images build',
 		logext => ".log",
+		frequency => 1,
 	},
 
 	{
@@ -38,6 +39,7 @@ my @buildlist = (
 		email => 'Q@ping.be',
 		description => 'daily amd64 images build',
 		logext => ".log",
+		frequency => 1,
 	},
 	
 	{
@@ -46,6 +48,7 @@ my @buildlist = (
 		email => 'vince@debian.org',
 		description => 'daily arm images build',
 		logext => ".log",
+		frequency => 1,
 	},
 	
 	{
@@ -54,6 +57,7 @@ my @buildlist = (
 		email => 'jbailey@debian.org',
 		description => 'daily hppa images build',
 		logext => ".log",
+		frequency => 1,
 	},
 	
 	{
@@ -62,6 +66,7 @@ my @buildlist = (
 		email => 'joeyh@debian.org',
 		description => 'daily i386 images build',
 		logext => ".log",
+		frequency => 1,
 	},
 	
 	{
@@ -70,6 +75,7 @@ my @buildlist = (
 		email => 'jbailey@debian.org',
 		description => 'daily ia64 images build',
 		logext => ".log",
+		frequency => 1,
 	},
 
 	{
@@ -78,6 +84,7 @@ my @buildlist = (
 		email => 'smarenka@debian.org',
 		description => 'daily m68k images build',
 		logext => ".log",
+		frequency => 1,
 	},
 
 	{
@@ -86,6 +93,7 @@ my @buildlist = (
 		email => 'tbm@debian.org',
 		description => 'daily mips images build',
 		logext => ".log",
+		frequency => 1,
 	},
 
 	{
@@ -94,6 +102,7 @@ my @buildlist = (
 		email => 'tbm@debian.org',
 		description => 'daily mipsel images build',
 		logext => ".log",
+		frequency => 1,
 	},
 
 	{
@@ -102,6 +111,7 @@ my @buildlist = (
 		email => 'luther@debian.org',
 		description => 'daily powerpc images build',
 		logext => ".log",
+		frequency => 1,
 	},
 
 	{
@@ -110,6 +120,7 @@ my @buildlist = (
 		email => 'waldi@debian.org',
 		description => 'daily s390 images build',
 		logext => ".log",
+		frequency => 1,
 	},
 
 	{
@@ -118,6 +129,7 @@ my @buildlist = (
 		email => 'jbailey@debian.org',
 		description => 'daily sparc images build',
 		logext => ".log",
+		frequency => 1,
 	},
 	
 	{
@@ -126,6 +138,7 @@ my @buildlist = (
 		email => 'joshk@debian.org',
 		description => 'daily sparc floppy build',
 		logext => ".log",
+		frequency => 1,
 	},
 
 	{
@@ -134,12 +147,16 @@ my @buildlist = (
 		email => 'manty@debian.org',
 		description => 'CD image builds',
 		logext => "",
+		frequency => 7, # some build only weekly
 	},
 
 #	{
 #		url => 'http://somehost/',
+#		logurl => 'http://somehost/',
 #		email => 'you@debian.org',
 #		description => 'put something informative here',
+#		logext => ".log",
+#		frequency => 1,
 #	},
 );
 
@@ -190,6 +207,11 @@ foreach my $build (@buildlist) {
 			chomp $shortdate;
 			if (! length $shortdate) {
 				$shortdate=$date;
+			}
+			my $unixdate=`TZ=GMT LANG=C date -d '$date' '+%s'`;
+			if (length $unixdate && 
+			    (time - $unixdate) > ($build->{frequency}+1) * 60*60*24)  {
+				$shortdate="<b>$shortdate</b>";
 			}
 			if ($status eq 'failed') {
 				$status='<b>failed</b>';
