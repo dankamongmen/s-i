@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.9 2003/05/11 10:13:40 sjogren Exp $
+ * $Id: newt.c,v 1.10 2003/05/11 10:23:41 sjogren Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -69,6 +69,34 @@ struct newt_data {
 #define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
 
 #define create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
+
+/* To be i18ned */
+static char *
+continue_text(void)
+{
+    return "Continue";
+}
+
+/* To be i18ned */
+static char *
+goback_text(void)
+{
+    return "Go Back";
+}
+
+/* To be i18ned */
+static char *
+yes_text(void)
+{
+    return "Yes";
+}
+
+/* To be i18ned */
+static char *
+no_text(void)
+{
+    return "No";
+}
 
 static int
 get_text_height(const char *text, int win_width)
@@ -136,8 +164,8 @@ show_separate_window(struct frontend *obj, struct question *q)
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
     newtTextboxSetText(textbox, q_get_extended_description(q));
-    bOk     = newtCompactButton(5, win_height-2, _("OK"));
-    bCancel = newtCompactButton(win_width - 9 - strwidth(_("Cancel")), win_height-2, _("Cancel"));
+    bOk     = newtCompactButton(5, win_height-2, continue_text());
+    bCancel = newtCompactButton(win_width - 9 - strwidth(goback_text()), win_height-2, goback_text());
     newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
     newtFormAddComponents(form, textbox, bOk, bCancel, NULL);
     cRet = newtRunForm(form);
@@ -181,8 +209,8 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     else
         defval = (char *)question_getvalue(q, "");
     entry   = newtEntry(1, 1+t_height+1, defval, win_width-4, &result, eflags);
-    bOk     = newtCompactButton(5, win_height-2, _("OK"));
-    bCancel = newtCompactButton(win_width - 9 - strwidth(_("Cancel")), win_height-2, _("Cancel"));
+    bOk     = newtCompactButton(5, win_height-2, continue_text());
+    bCancel = newtCompactButton(win_width - 9 - strwidth(goback_text()), win_height-2, goback_text());
     newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
     newtFormAddComponents(form, textbox, bOk, bCancel, entry, NULL);
     newtFormSetCurrent(form, entry);
@@ -241,8 +269,8 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     }
     newtCenteredWindow(win_width, win_height, obj->title);
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
-    bOk     = newtCompactButton(5, win_height-2, _("OK"));
-    bCancel = newtCompactButton(win_width - 9 - strwidth(_("Cancel")), win_height-2, _("Cancel"));
+    bOk     = newtCompactButton(5, win_height-2, continue_text());
+    bCancel = newtCompactButton(win_width - 9 - strwidth(goback_text()), win_height-2, goback_text());
     newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q) || !show_ext_desc);
     newtFormAddComponents(form, label, bOk, bCancel, NULL);
     if (count > sel_height) {
@@ -339,8 +367,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     newtCenteredWindow(win_width, win_height, obj->title);
     label   = newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q));
     listbox = newtListbox((win_width - sel_width)/2, 1+t_height+1, sel_height, listflags);
-    bOk     = newtCompactButton(5, win_height-2, _("OK"));
-    bCancel = newtCompactButton(win_width - 9 - strwidth(_("Cancel")), win_height-2, _("Cancel"));
+    bOk     = newtCompactButton(5, win_height-2, continue_text());
+    bCancel = newtCompactButton(win_width - 9 - strwidth(goback_text()), win_height-2, goback_text());
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
         newtListboxAppendEntry(listbox, choices_trans[i], choices[i]);
@@ -397,9 +425,9 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     newtFormAddComponent(form, newtLabel((win_width - strwidth(q_get_description(q)))/2, 0, q_get_description(q)));
     textbox = newtTextbox(1, 1, win_width-4, t_height, flags);
     newtTextboxSetText(textbox, q_get_extended_description(q));
-    bYes    = newtCompactButton(5, win_height-2, _("Yes"));
-    bNo     = newtCompactButton((win_width - strwidth(_("No")) - 2)/2, win_height-2, _("No"));
-    bCancel = newtCompactButton(win_width - 9 - strwidth(_("Cancel")), win_height-2, _("Cancel"));
+    bYes    = newtCompactButton(5, win_height-2, yes_text());
+    bNo     = newtCompactButton((win_width - strwidth(no_text()) - 2)/2, win_height-2, no_text());
+    bCancel = newtCompactButton(win_width - 9 - strwidth(goback_text()), win_height-2, goback_text());
     newtComponentTakesFocus(bCancel, obj->methods.can_go_back(obj, q));
     newtFormAddComponents(form, textbox, bYes, bNo, bCancel, NULL);
     if (strcmp(question_getvalue(q, ""), "true") == 0)
