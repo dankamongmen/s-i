@@ -34,6 +34,33 @@ int unpack_package (char *pkgfile) {
 	return ! system(command);
 }
 
+/* check whether the md5sum of file matches sum.  if they don't,
+ * return 0.
+ */
+
+int md5sum(char* sum, char *file) {
+        int io[2];
+        int pid;
+        char line[1024];
+        pipe(io);
+        pid = fork();
+        if (pid == 0) {
+                /* child */
+                dup2(io[1],1);
+                execl("/usr/bin/md5sum","/usr/bin/md5sum",file,0);
+        }
+        wait(NULL);
+        read(io[0],&line,1023);
+        line[1023] = '\0';
+        if (strlen(line) < 32) {
+                /* not a success, return */
+                return -1;
+        }
+        line[32] = '\0';
+        /* line now contains just the md5sum */
+        return ! strcmp(line,sum);
+}
+
 /*
  * Retrives and unpacks each package in the linked list in turn.
  * 
@@ -42,7 +69,7 @@ int unpack_package (char *pkgfile) {
 int install_packages (struct package_t *packages) {
 	struct package_t *p;
 	char *f, *fp, *dest_file;
-	
+
 	for (p=packages; p; p=p->next) {
 		if (p->filename) {
 			/*
@@ -61,8 +88,12 @@ int install_packages (struct package_t *packages) {
 				fprintf(stderr, "anna: error getting %s!\n",
 					p->filename);
 				exit(1);
-			}
-			else if (! unpack_package(dest_file)) {
+			} else if (! md5sum(p->md5sum, dest_file)) {
+                          fprintf(stderr, "anna: md5sum mismatch on %s!\n",
+                                  p->filename);
+                          unlink(dest_file);
+                          exit(1);
+                        } else if (! unpack_package(dest_file)) {
 				unlink(dest_file);
 				return(0);
 			}
