@@ -36,6 +36,8 @@ elsif ($action eq 'force_restart') {
 	# interface. it requires iLO 1.60.
 	my $exp = new Expect;
 	$exp->raw_pty(1);
+	#$exp->debug(2);
+	#$exp->exp_internal(1);
 
 	$exp->spawn("nc", $ENV{HP_ILO_HOST}, "telnet") or die "cannot spawn nc: $!\n";
 
@@ -53,6 +55,7 @@ elsif ($action eq 'force_restart') {
 		[ "Off" => sub { $power=0 } ],
 		[ "On" => sub { $power=1 } ],
 	);
+	$exp->expect(10, "iLO>");
 	if ($power) {
 		$exp->send("power warm\r");
 	}

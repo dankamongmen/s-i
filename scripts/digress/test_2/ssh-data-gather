@@ -11,9 +11,12 @@ $exp->expect($timeout, "Password:");
 $exp->send("$ENV{USER_PASSWORD}\r");
 $exp->expect($timeout, "Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY");
 sleep 2;
-$exp->send("uname -a; mount; df -h; free; locale; dmesg; dpkg -l\r");
 foreach my $log (qw{status hardware-summary syslog partman}) {
 	$exp->send("cat /var/log/debian-installer/$log\r");
 }
+$exp->send("dmesg; dpkg -l; uname -a; mount; df -h; free; tasksel --list-tasks; locale\r");
+# Strings output by locale indicate end of output.
+$exp->expect($timeout, "LC_MEASUREMENT=");
+$exp->expect($timeout, "LC_IDENTIFICATION=");
 $exp->send("exit\r");
 $exp->interact;
