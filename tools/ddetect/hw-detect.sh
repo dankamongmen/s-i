@@ -67,7 +67,7 @@ discover_hw () {
         log "Using discover2 do not work yet."
 
         dpath=linux/module/name
-        dver=2.4 # Kernel version
+        dver=`uname -r|cut -d. -f1,2` # Kernel version (ie 2.4)
         dflags="-t -d all -e ata -e pci -e pcmcia -e scsi display"
 
         VENDOR_MODEL_FILE=$(tempfile)
