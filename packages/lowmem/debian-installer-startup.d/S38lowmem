@@ -5,21 +5,48 @@ if [ "$ram" = "" ]; then
 	echo "Cannot determine system memory, skipping lowmem probe" >&2
 else
 	ram=$(expr "$ram" / 1024) # convert to megabytes
-	# This is the max memory footprint of the installer in non lowmem mode
-	# up to running the partitioner.
+
+	# Set level1 to the minimum amount of memory that will support an
+	# install not in lowmem mode. (This is the max memory footprint of
+	# the installer in non lowmem mode up to running the partitioner
+	# and swapon.)
+	# Set level2 to the minimum amount of memory that will support an
+	# install in lowmem mode. (This is the max memory footprint of the
+	# installer in lowmem mode up to running the partitioner
+	# and swapon.)
 	ARCH=`udpkg --print-architecture`
 	case $ARCH in
-		i386) needed=45 ;;
-		mips) needed=33 ;;
-		mipsel) needed=33 ;;
-		m68k) needed=25 ;;
-		*) needed=45 ;;
+		i386)
+			level1=45
+			level2=32
+		;;
+		mips)
+			level1=33
+			#level2=FIXME
+		;;
+		mipsel)
+			level1=33
+			#level2=FIXME
+		;;
+		m68k)
+			level1=25
+			#level2=FIXME
+		;;
+		*)
+			level1=45
+			level2=32
+		;;
 	esac
 
-	if [ "$ram" -lt "$needed" ]; then
+	if [ "$ram" -lt "$level1" ]; then
 		echo "Entering low memory mode, please wait ..."
-		touch /var/lib/lowmem
-	
+
+		if [ "$ram" -lt "$level2" ]; then
+			echo 2 > /var/lib/lowmem
+		else
+			echo 1 > /var/lib/lowmem
+		fi
+			
 	       	trimtemplates /var/lib/dpkg/info || true
 		
 		lowmem_debconf

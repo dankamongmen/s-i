@@ -3,10 +3,13 @@ framework to which you can add more hacks to save memory. The memory saving
 hacks are divided into two groups, which run at different times:
 initialisation, and post anna run.
 
-Initialisation hacks are in the debian-installer.d/S10lowmem scripts, in
-the lowmemcheck package. The is what decides if the system is low on
+Initialisation hacks are in the debian-installer-startup.d/*lowmem script,
+in the lowmemcheck package. The is what decides if the system is low on
 memory, and it creates /var/lib/lowmem as a flag indicating the system
-should be in lowmem mode. Other hacks test for this file.
+should be in lowmem mode. Other hacks test for this file. There are
+actually different low memory levels, as determined by the number in the
+file. 1 is standard low memory mode, 2 turns on additional lowmem hacks
+that can make the installation more difficult for the user.
 
 Post anna run hacks are in the lowmem package, which is queued for install
 by anna on lowmem systems, and provides a menu item.
@@ -37,6 +40,13 @@ Current hacks:
 		even systems with lots of memory.
 
 		Saves a few hundred K of memory.
+	
+	allow user more control over what udebs are loaded
+		This hack is enabled in level 2 lowmem mode. It makes anna
+		not install standard priority udebs by default, and the
+		user can choose which to install. Careful selection by the
+		user can allow for installs with as little as 24 mb or
+		memory.
 
 Possible future hacks:
 
@@ -65,12 +75,3 @@ Possible future hacks:
 	let user choose a partition to use as swap
 		Scan disks for existing small-ish partitions, list them,
 		and offer to turn them into swap space.
-	
-	prioritise udebs, and only load important ones
-		Currently all standard priority udebs are loaded. If the
-		udebs are re-preioritised so those that are absolutely
-		needed for an install are important, then anna could
-		install only that smaller set. anna could also in this mode
-		prompt at a higher priority for what udebs to load.
-	
-		This could get us down to 28 or 24 mb, probably.
