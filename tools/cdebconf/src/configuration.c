@@ -8,7 +8,7 @@
  * Description: configuration file parsing and access routines
  *              (adapted from APT's Configuration class)
  *
- * $Id: configuration.c,v 1.7 2002/07/01 06:58:37 tausq Exp $
+ * $Id: configuration.c,v 1.8 2002/08/07 16:38:44 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -433,7 +433,9 @@ static int config_read(struct configuration *cfg, const char *filename)
 
 				if (termchar == '{')
 				{
-					if (stackpos <= 100)
+                                        /* 99, not 100.  100 gives possible
+                                           off-by-one error */
+					if (stackpos <= 99)
 						stack[stackpos++] = strdup(parenttag);
 					if (value[0] != 0)
 					{
