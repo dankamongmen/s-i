@@ -58,7 +58,7 @@ int isdefault(struct package_t *p) {
 		return 0;
 	}
 	if (stat(menutest, &statbuf) == 0) {
-		if (asprintf(&cmd, "%s >/dev/null 2>&1", menutest) == -1) {
+		if (asprintf(&cmd, "exec %s >/dev/null 2>&1", menutest) == -1) {
 			return 0;
 		}
 		ret = !SYSTEM(cmd);
@@ -376,7 +376,7 @@ config_package(struct package_t *p) {
 			return 0;
 	}
 
-	if (asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package) == -1) {
+	if (asprintf(&configcommand, "exec " DPKG_CONFIGURE_COMMAND " %s", p->package) == -1) {
 		return 0;
 	}
 	ret = SYSTEM(configcommand);
@@ -407,7 +407,7 @@ int do_menu_item(struct package_t *p) {
 
 	if (p->status == installed) {
 		/* The menu item is already configured, so reconfigure it. */
-		if (asprintf(&configcommand, DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package) == -1) {
+		if (asprintf(&configcommand, "exec " DPKG_CONFIGURE_COMMAND " --force-configure %s", p->package) == -1) {
 			return 0;
 		}
                 ret = SYSTEM(configcommand);
