@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.50 2004/03/04 10:47:10 barbier Exp $
+ * $Id: newt.c,v 1.51 2004/03/04 11:06:54 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -284,7 +284,7 @@ show_separate_window(struct frontend *obj, struct question *q)
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
-    /*  There 5 characters for sigils, plus 4 for borders */
+    /*  There are 5 characters for sigils, plus 4 for borders */
     strtruncate(obj->title, win_width-9);
     t_height = get_text_height(full_description, win_width);
     if (t_height+extra <= height-5)
