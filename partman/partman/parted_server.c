@@ -347,6 +347,7 @@ struct devdisk {
         char *name;
         PedDevice *dev;
         PedDisk *disk;
+        bool changed;
 };
 
 /* We store the accessed devices from `devices[0]' to
@@ -383,6 +384,7 @@ index_of_name(char *name)
                 critical_error("Can not allocate memory.");
         devices[i].dev = NULL;
         devices[i].disk = NULL;
+        devices[i].changed = false;
         return i;
 }
 
@@ -432,6 +434,29 @@ set_disk_named(char *name, PedDisk *disk)
         if (NULL != old_disk)
                 ped_disk_destroy(old_disk);
         devices[index_of_name(name)].disk = disk;
+}
+
+/* True iff the partition table of `name' has been changed. */
+bool
+named_is_changed(char *name)
+{
+        return devices[index_of_name(name)].changed;
+}
+
+/* Note the partition table of `name' as having been changed. */
+void
+change_named(char *name)
+{
+        log("Note %s as changed", name);
+        devices[index_of_name(name)].changed = true;
+}
+
+/* Note the partition table of `name' as unchanged. */
+void
+unchange_named(char *name)
+{
+        log("Note %s as unchanged", name);
+        devices[index_of_name(name)].changed = false;
 }
 
 
@@ -809,20 +834,20 @@ dump_info(FILE *dumpfile, PedDevice *dev, PedDisk *disk)
    Commands
 *********************************************************************/
 
+PedDevice *dev;
+PedDisk *disk;
+char *device_name;
 
-#define SETUP_DEV_DISK \
-        PedDevice *dev; PedDisk *disk; \
-        { \
-                char *name; \
-                if (1 != iscanf("%as", &name)) \
-                        critical_error("Expected device identifier."); \
-                if (!device_opened(name)) \
-                        critical_error("The device %s is not opened.", name); \
-                dev = device_named(name); \
-                disk = disk_named(name); \
-                free(name); \
-        }
-
+void
+scan_device_name()
+{
+        if (device_name != NULL)
+                free(device_name);
+        if (1 != iscanf("%as", &device_name))
+                critical_error("Expected device identifier.");
+        dev = device_named(device_name);
+        disk = disk_named(device_name);
+}
 
 void
 command_quit()
@@ -836,30 +861,29 @@ void
 command_open()
 {
         log("command_open()");
-        char *name, *device;
-        if (1 != iscanf("%as", &name))
-                critical_error("Expected device identifier.");
+        char *device;
+        scan_device_name();
         if (1 != iscanf("%as", &device))
                 critical_error("Expected device name.");
-        log("Request to open %s", name);
+        log("Request to open %s", device_name);
         open_out();
-        if (device_opened(name)) {
+        if (device_opened(device_name)) {
                 static char *only_ok[] = { "OK", NULL };
                 log("Warning: the device is opened");
                 pseudo_exception("Warning",
                                  "The device is already opened.", only_ok);
         } else {
-                set_device_named(name, ped_device_get(device));
+                set_device_named(device_name, ped_device_get(device));
         }
         oprintf("OK\n");
-        if (NULL != device_named(name)) {
+        if (NULL != device_named(device_name)) {
                 oprintf("OK\n");
                 deactivate_exception_handler();
-                set_disk_named(name, ped_disk_new(device_named(name)));
+                set_disk_named(device_name,
+                               ped_disk_new(device_named(device_name)));
                 activate_exception_handler();
         } else
                 oprintf("failed\n");
-        free(name);
         free(device);
 }
 
@@ -867,17 +891,15 @@ void
 command_close()
 {
         log("command_close()");
-        char *name;
-        if (1 != iscanf("%as", &name))
-                critical_error("Expected device name.");
+        scan_device_name();
         open_out();
-        if (!device_opened(name)) {
+        if (!device_opened(device_name)) {
                 static char *only_cancel[] = { "Cancel", NULL };
                 pseudo_exception("Error",
                                  "The device is not opened!", only_cancel);
         }
-        set_disk_named(name, NULL);
-        set_device_named(name, NULL);
+        set_disk_named(device_name, NULL);
+        set_device_named(device_name, NULL);
         oprintf("OK\n");
 }
 
@@ -885,12 +907,10 @@ void
 command_opened()
 {
         log("command_opened()");
-        char *name;
-        if (1 != iscanf("%as", &name))
-                critical_error("Expected partition device name.");
+        scan_device_name();
         open_out();
         oprintf("OK\n");
-        if (NULL != device_named(name)) {
+        if (NULL != device_named(device_name)) {
                 oprintf("yes\n");
         } else {
                 oprintf("no\n");
@@ -900,31 +920,31 @@ command_opened()
 void
 command_commit()
 {
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_commit()");
         open_out();
-        if (disk != NULL)
+        if (disk != NULL && named_is_changed(device_name))
                 ped_disk_commit(disk);
+        unchange_named(device_name);
         oprintf("OK\n");
 }
 
 void
 command_undo()
 {
-        PedDevice *dev;
-        char *name;
-        if (1 != iscanf("%as", &name))
-                critical_error("Expected partition device name.");
-        if (NULL == device_named(name))
-                critical_error("The device %s is not opened.", name);
-        dev = device_named(name);
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_undo()");
         open_out();
         log("Rereading disk label");
         deactivate_exception_handler();
         if (dev != NULL)
-                set_disk_named(name, ped_disk_new(dev));
+                set_disk_named(device_name, ped_disk_new(dev));
         activate_exception_handler();
+        unchange_named(device_name);
         oprintf("OK\n");
 }
 
@@ -935,7 +955,9 @@ command_dump()
 {
         FILE *dumpfile;
         static char *only_cancel[] = { "Cancel", NULL };
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_dump()");
         open_out();
         dumpfile = fopen("/var/log/partition_dump", "a+");
@@ -954,7 +976,9 @@ void
 command_partitions()
 {
         PedPartition *part;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_partitions()");
         open_out();
         oprintf("OK\n");
@@ -1004,7 +1028,9 @@ command_partition_info()
 {
         char *id;
         PedPartition *part;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_partition_info()");
         open_out();
         if (1 != iscanf("%as", &id))
@@ -1032,7 +1058,9 @@ command_get_chs()
 {
         char *id;
         PedPartition *part;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_get_chs()");
         open_out();
         if (1 != iscanf("%as", &id))
@@ -1076,7 +1104,9 @@ void
 command_label_types()
 {
         PedDiskType *type = NULL;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_label_types()");
         open_out();
         oprintf("OK\n");
@@ -1094,7 +1124,9 @@ command_valid_flags()
         char *id;
         PedPartition *part;
         PedPartitionFlag flag;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_valid_flags()");
         open_out();
         if (1 != iscanf("%as", &id))
@@ -1122,7 +1154,9 @@ command_get_flags()
         char *id;
         PedPartition *part;
         PedPartitionFlag flag;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_get_flags()");
         open_out();
         if (1 != iscanf("%as", &id))
@@ -1149,8 +1183,11 @@ command_set_flags()
         PedPartition *part;
         PedPartitionFlag first, last, flag;
         bool *states;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_set_flags()");
+        change_named(device_name);
         open_out();
         if (1 != iscanf("%as", &id))
                 critical_error("Expected partition id");
@@ -1192,7 +1229,9 @@ command_set_flags()
 void
 command_uses_names()
 {
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_uses_names()");
         open_out();
         oprintf("OK\n");
@@ -1210,8 +1249,11 @@ command_set_name()
 {
         char *id, *name;
         PedPartition *part;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_set_name()");
+        change_named(device_name);
         if (!ped_disk_type_check_feature(disk->type,
                                          PED_DISK_TYPE_PARTITION_NAME))
                 critical_error("This label doesn't support partition names.");
@@ -1236,7 +1278,9 @@ command_set_name()
 void
 command_uses_extended()
 {
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_uses_extended()");
         open_out();
         oprintf("OK\n");
@@ -1252,7 +1296,9 @@ void
 command_file_system_types()
 {
         PedFileSystemType *type;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_file_system_types()");
         open_out();
         oprintf("OK\n");
@@ -1270,7 +1316,9 @@ command_get_file_system()
         char *id;
         PedPartition *part;
         PedFileSystemType *fstype;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_get_file_system()");
         open_out();
         if (1 != iscanf("%as", &id))
@@ -1296,7 +1344,10 @@ command_change_file_system()
         PedPartition *part;
         char *s_fstype;
         PedFileSystemType *fstype;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        change_named(device_name);
         open_out();
         if (2 != iscanf("%as %as", &id, &s_fstype))
                 critical_error("Expected partition id and file system");
@@ -1318,7 +1369,9 @@ command_check_file_system()
         PedPartition *part;
         PedFileSystem *fs;
         char *status;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         open_out();
         if (1 != iscanf("%as", &id))
                 critical_error("Expected partition id");
@@ -1347,7 +1400,10 @@ command_create_file_system()
         char *s_fstype;
         PedFileSystemType *fstype;
         PedFileSystem *fs;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        change_named(device_name);
         open_out();
         if (2 != iscanf("%as %as", &id, &s_fstype))
                 critical_error("Expected partition id and file system");
@@ -1374,16 +1430,11 @@ command_new_label()
 {
         PedDiskType *type;
         char *str, *device;
-        PedDevice *dev;
-        PedDisk *disk;
-        char *name;
-        if (1 != iscanf("%as", &name))
-                critical_error("Expected partition device name.");
-        if (!device_opened(name))
-                critical_error("The device %s is not opened.", name);
-        dev = device_named(name);
-        disk = disk_named(name);
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_new_label()");
+        change_named(device_name);
         open_out();
         if (1 != iscanf("%as", &str))
                 critical_error("Expected label type");
@@ -1391,16 +1442,17 @@ command_new_label()
         if (type == NULL)
                 critical_error("Bad label type: %s", str);
         log("command_new_label: requested label with type %s", str);
-        device = strdup(device_named(name)->path);
+        device = strdup(device_named(device_name)->path);
         /* The old partition table may have contained wrong
            Cylinder/Head/Sector geometry.  So it is not probably
            enough to change the partition table (i.e. `disk'). */
-        set_disk_named(name, NULL);
-        set_device_named(name, NULL);
+        set_disk_named(device_name, NULL);
+        set_device_named(device_name, NULL);
         dev = ped_device_get(device);
+        free(device);
         if (NULL == dev)
-                critical_error("Can not reopen %s", name);
-        set_device_named(name, dev);
+                critical_error("Can not reopen %s", device_name);
+        set_device_named(device_name, dev);
         log("command_new_label: creating");
         disk = ped_disk_new_fresh(dev, type);
         if (disk == NULL) {
@@ -1408,7 +1460,7 @@ command_new_label()
                 pseudo_exception("Error",
                                  "Can't create new disk label.", only_cancel);
         } else
-                set_disk_named(name, disk);
+                set_disk_named(device_name, disk);
         oprintf("OK\n");
         free(str);
 }
@@ -1425,9 +1477,12 @@ command_new_partition()
         PedSector part_start, part_end;
         PedPartition *part;
         int n;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         assert(disk != NULL);
         log("command_new_partition()");
+        change_named(device_name);
         open_out();
         n = iscanf("%as %as %lli-%lli %as %lli", &s_type, &s_fs_type,
                    &range_start, &range_end, &position, &length);
@@ -1490,8 +1545,11 @@ command_delete_partition()
 {
         PedPartition *part;
         char *id;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         log("command_delete_partition()");
+        change_named(device_name);
         open_out();
         if (1 != iscanf("%as", &id))
                 critical_error("Expected partition id");
@@ -1518,9 +1576,12 @@ command_resize_partition()
         char *id;
         long long new_size;
         PedSector start, end;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         assert(disk != NULL);
         log("command_resize_partition()");
+        change_named(device_name);
         open_out();
         if (1 != iscanf("%as", &id))
                 critical_error("Expected partition id");
@@ -1550,7 +1611,9 @@ command_get_resize_range()
         PedConstraint *constraint, *fixed_start;
         PedGeometry *max_geom;
         long long max_size, min_size, current_size;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         assert(disk != NULL);
         log("command_get_resize_range()");
         open_out();
@@ -1594,9 +1657,12 @@ command_copy_partition()
         PedPartition *source, *destination;
         PedDisk *srcdisk;
         PedFileSystem *fs;
-        SETUP_DEV_DISK;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
         assert(disk != NULL);
         log("command_copy_partition()");
+        change_named(device_name);
         open_out();
         if (3 != iscanf("%as %as %as", &destid, &srcdiskid, &srcid))
                 critical_error("Expected id device_identifier id");
