@@ -44,7 +44,7 @@ installer of GNU/Linux and that are related to partitioning:
 
 <item> It should be able to partition disks automatically and allow
   the user to inspect and customise the automatic partitioning
-  latter.
+  later.
 
 <item> It should be able to resize partitions and move their contents
 from one place to another.
@@ -123,7 +123,7 @@ several other menus.  They can add new items in the list of devices
 such as software RAID and LVM devices, networked file systems,
 encrypted partitions, etc.  The package
 <package>partman-partitioning</package> is responsible for pure
-partitioning operationgs such as creation of new partitions and
+partitioning operations such as creation of new partitions and
 deletion.  The packages <package>partman-target</package> and
 <package>partman-basicmethods</package> are responsible for the items
 `Choose how this partition should be used' and `Choose a file system'.
@@ -172,25 +172,25 @@ This process is <file>/bin/parted_server</file> from the package
 
 <p> Any udeb may install a script in this directory.  For example the
 script <file>/lib/partman/init.d/30parted</file> from the package
-<package>partman</package> is responsible to run
+<package>partman</package> is responsible for running
 <prgn>parted_server</prgn>.  Notice that the scripts are prefixed by a
 two-digit number.  This number determines the order the scripts are
-executed.  If some of the scripts exits with non-zero exit code the
+executed.  If any of the scripts exit with non-zero exit code the
 partitioning will be aborted.  This means that in almost all cases
 these scripts must end with exit-code 0.
 
 <p> While the user is modifying the partitions this happens only in
   the memory of the computer and not in the edited devices.  This is
   because almost all changes happen either in the data-structures of
-  <prgn>parted_server</prgn> or in files in the installers ram-disk.
+  <prgn>parted_server</prgn> or in files in the installer's ram-disk.
   That's why we can provide the user with the option to undo
   everything.  When the user chooses to undo the scripts in the
   directory <file>/lib/partman/undo.d/</file> are executed.  Any udeb
   may install a script in this directory.  For example the script
-  <file>/lib/partman/undo.d/30parted</file> is responsible to restore
+  <file>/lib/partman/undo.d/30parted</file> is responsible for restoring
   the contents of the data structures of <prgn>parted_server</prgn>.
   In most cases the scripts from <prgn>undo.d</prgn> must exit with
-  exit-code 0.  If some of the scripts exits with non-zero exit code
+  exit-code 0.  If any of the scripts exit with non-zero exit code
   the partitioning will be aborted.
 
 <p> In order to perform the editing operations on the storage devices
@@ -200,10 +200,10 @@ scripts from the directory <file>/lib/partman/commit.d/</file> are
 executed.  The order in which these scripts are executed is determined
 again by two-digit prefixes in the script names.  Every script from
 <prgn>commit.d</prgn> is guaranteed that the scripts ordered before it
-have been already executed.  However if some of the scripts exits with
+have been already executed.  However if any of the scripts exit with
 non-zero exit-code the execution of the scripts in
 <prgn>commit.d</prgn> will be stopped.  In this case the partitioning
-will continue and the user is expected to fix the problem.  If some
+will continue and the user is expected to fix the problem.  If any
 script exits with non-zero exit code it is supposed to inform the user
 what went wrong using debconf.
 
@@ -214,20 +214,20 @@ when the partitioning ends.  In the first case if none of the scripts
 fails the scripts from <prgn>init.d</prgn> will be also executed and
 the user will be returned to the partitioning dialog.  In the second
 case the scripts from <prgn>finish.d</prgn> will be executed.  In both
-cases if some of the scripts in <prgn>commit.d</prgn> fails the user
+cases if any of the scripts in <prgn>commit.d</prgn> fail the user
 will be returned immediately back to the partitioning dialog.
 
 <p> The scripts from <file>/lib/partman/finish.d/</file> are
 responsible for final tasks such as to mount partitions on
 <file>/target</file>, generate of <prgn>fstab</prgn>, stop
 <prgn>parted_server</prgn> etc.<footnote>What tasks will be performed
-depends on what udebs are unpacked.  If the packages responsible to
-mount partitions and create fstab are not unpacked we have only a
+depends on what udebs are unpacked.  If the packages responsible for
+mounting partitions and creating fstab are not unpacked we have only a
 simple partitioner providing
 <package>partitioned-harddrives</package>.  If they are unpacked they
 provide also <package>made-filesystems</package> and
-<package>mounted-partitions</package>.</footnote> If some of these
-scripts exits with non-zero exit-code the execution of the scripts
+<package>mounted-partitions</package>.</footnote> If any of these
+scripts exit with non-zero exit-code the execution of the scripts
 will be stopped.  If the exit-code was 1 then the user will be
 returned back to the partitioning dialog and is expected to correct
 the problem.  If the exit-code was neither 0 nor 1 then the
@@ -255,7 +255,7 @@ are not obligated to contain additional information.  We call these
 subdirectories <em>device directories</em>.
 
 <p> Every partition in a device managed by <prgn>parted_server</prgn>
-is given an unique name having the form
+is given a unique name having the form
 <var>first_byte</var>-<var>last_byte</var>.  This name can be used to
 determine where the partition starts and where it
 ends.<footnote>Unlike one can suppose <prgn>parted_server</prgn>
@@ -277,12 +277,12 @@ keep the Debian installer modular and extensible we want to allow
 every udeb to install items in these menus.  Let us be more specific.
 When the users decide to format some existing partition we need a menu
 with an item for every supported file system.  Obviously we don't want
-to hardwire the list of the supported file systems in any place of our
+to hardwire the list of the supported file systems anywhere in our
 installer.  If we want to add support to the installer say for XFS or
-UMSDOS file systems, only few new udebs must be all that is needed.
+UMSDOS file systems, only a few new udebs must be all that is needed.
 
 <p> In order to achieve this flexibility the package
- <package>partman</package> provides support for the so caled
+ <package>partman</package> provides support for the so-called
  menu-directories.  Every such a directory contains files named
  <prgn>question</prgn> and <prgn>priority</prgn>.  They contain the
  name of a Debconf template and the priority of the question
@@ -567,12 +567,12 @@ _Description: Ext3
 
 <p> Most of the packages that provide support for a file system will
 have to add an item `Mount point:' to the menu
-<prgn>active_partition</prgn>.  Ofcourse this item should be showed
+<prgn>active_partition</prgn>.  Of course this item should be shown
 only when the contents of the file <prgn>acting_filesystem</prgn> is
-appropriate.  The chosen by the user mount point should be written in
+appropriate.  The mount point chosen by the user should be written in
 a file named <prgn>mountpoint</prgn> situated in the directory of the
 partition.  If the user chooses not to mount this file system then the
-file <prgn>mountpoint</prgn> shoult be removed (if exists).
+file <prgn>mountpoint</prgn> should be removed (if it exists).
 
 <p> In order to be able to mount file systems and generate fstab the
   directories <file>/lib/partman/fstab.d/</file> and
@@ -590,14 +590,14 @@ file <prgn>mountpoint</prgn> shoult be removed (if exists).
   <file>/dev/hda5</file>.  On the other hand the other five fields
   should look exactly the same way as in the <prgn>fstab</prgn> to be
   generated.  For example <var><tt>options</tt></var> can contain
-  options such as <tt>quota</tt> that are sensless for the installer.
+  options such as <tt>quota</tt> that are senseless for the installer.
 
 <p> The scripts from <prgn>mount.d</prgn> are used to mount file
-  systems.  A string having the same form as the lines outputed by the
+  systems.  A string having the same form as the lines output by the
   scripts from <prgn>fstab.d</prgn> should be given as first argument
   to any script from <prgn>mount.d</prgn>.  Any script from
   <prgn>mount.d</prgn> checks if it can mount the requested file
-  system.  If it can not then the script exits with some non-zero exit
+  system.  If it cannot then the script exits with some non-zero exit
   code.  Otherwise the script must mount the file system in the proper
   place in the hierarchy over <file>/target</file>, print on its
   standard output a command that should be used in order to unmount
@@ -626,10 +626,10 @@ partition should be used.
 <chapt> <file>/lib/partman/definitions.sh</file>
 
 <p> The package <package>partman</package> contains the script
-<file>/lib/partman/definitions.sh</file>.  It defines some usefull
+<file>/lib/partman/definitions.sh</file>.  It defines some useful
 variables and functions.  They are documented in this chapter.
-<footnote>The script <file>/lib/partman/definitions.sh</file> becomed
-too long and this probably makes its sourcing slow.  May be it will be
+<footnote>The script <file>/lib/partman/definitions.sh</file> became
+too long and this probably makes its sourcing slow.  Maybe it will be
 a good idea to split it into smaller pieces or even convert some of
 the functions to scripts in <file>/bin</file>.</footnote>
 
@@ -739,9 +739,9 @@ partitions has the form
 
 <sect> Long numbers
 
-<p> Notice that the sizes of the most of the present storage devices
+<p> Notice that the sizes of most of the present storage devices
 are so large that we can not measure them using 32-bit integers.
-Consequently we can not use the usuall shell arithmetic. The functions
+Consequently we can not use the usual shell arithmetic. The functions
 <prgn>longint_le</prgn>, <prgn>longint2human</prgn>,
 <prgn>human2longint</prgn> and <prgn>valid_human</prgn> exist in order
 to deal with such big numbers.
@@ -796,7 +796,7 @@ responsible for formatting and mounting create the directories
 What will happen if the users change their mind and decide to use the
 same partition as swap space?  Swap spaces have no mount points and
 the file <prgn>mountpoint</prgn> should be removed.  Who is
-responsible to remove it?  The udeb that allows the user to choose a
+responsible for removing it?  The udeb that allows the user to choose a
 file system for the partition doesn't have to know that swap-spaces
 have no mount points, only the udeb that provides support for
 swap-spaces can know that the file <prgn>mountpoint</prgn> should be
@@ -1306,7 +1306,7 @@ case $result in
 esac
 </example>
 
-The command <prgn>name_progress_bar</prgn> may be omited.  The debconf
+The command <prgn>name_progress_bar</prgn> may be omitted.  The debconf
 template must have type text.  It is used to give the user some
 information of what is being done.
 
@@ -1369,7 +1369,7 @@ If it fails $new_id will be the same as
 <p> If the partition exists on the storage device and contains some
 file system, then the data in the partition will be preserved and the
 new partition table <em>will be written on the storage device</em>.
-When it is imposible to resize the file system, the partition will be
+When it is impossible to resize the file system, the partition will be
 left unresized.  When the partition doesn't exist on the storage
 device, the new version of the partition table will not be written to
 it.
@@ -1377,8 +1377,8 @@ it.
 <p> This command doesn't move the start of the partition but only its
 end.
 
-<p> The command <prgn>name_progress_bar</prgn> may be omited.  The
-debconf template must has type text.  It will be used to give the user
+<p> The command <prgn>name_progress_bar</prgn> may be omitted.  The
+debconf template must have type text.  It will be used to give the user
 information of what is being done.
 
 <sect> Get resize range
@@ -1408,8 +1408,8 @@ This command copies into the partition with id
 id <var><tt>source_id</tt></var>.  <var><tt>source_device</tt></var>
 is <tt>$(basename <var>source_device_directory</var>)</tt>.
 
-<p> The command <prgn>name_progress_bar</prgn> may be omited.  The
-debconf template must has type text.  It will be used to give the user
+<p> The command <prgn>name_progress_bar</prgn> may be omitted.  The
+debconf template must have type text.  It will be used to give the user
 information of what is being done.
 
 
