@@ -247,3 +247,13 @@ void di_system_packages_resolve_dependencies_mark_anna (di_packages *packages, c
   return di_packages_resolve_dependencies_mark_special (packages, &s);
 }
 
+void di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable (di_packages *packages) __attribute__ ((unused));
+void di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable (di_packages *packages)
+{
+  struct utsname uts;
+  uname (&uts);
+  di_system_packages_resolve_dependencies_mark_anna (packages, "unknown", uts.release);
+}
+
+__asm__ (".symver di_system_packages_resolve_dependencies_mark_kernel_real_4_2_unstable,di_system_packages_resolve_dependencies_mark_kernel@LIBDI_4.2_UNSTABLE");
+
