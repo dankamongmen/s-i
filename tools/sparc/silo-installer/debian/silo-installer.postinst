@@ -1,33 +1,61 @@
 #!/bin/sh
 set -e
 
-if [ -f /etc/mtab ]; then
+. /usr/share/debconf/confmodule
+db_capb backup
+
+if [ -f "/etc/mtab" ]; then
     MTAB=/etc/mtab
 else
     MTAB=/proc/mounts
 fi
 
 # detect which is the root partition: /target
-rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
+rootfs=$(mapdevfs `/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`)
 
-. /usr/share/debconf/confmodule
+# detect which hard drive has /target/boot mounted on it. this does *not*
+# have to be the same as the drive /target is mounted on.
+bootpart=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
 
-rootfs=`mapdevfs $rootfs`
+if [ -z "$bootpart" ]; then
+	bootpart=$rootfs
+fi
+
+bootpart=`/target/bin/echo $bootpart | /target/bin/sed 's/.*\/part\([0-9]\+\)$/\1/'`
+
+if [ -z "$bootpart" ]; then
+	bootpart=1
+fi
+
+if [ -e "/target/boot/initrd.img" ]; then
+	initrd='initrd=/boot/initrd.img'
+fi
 
 # Write out silo.conf
 cat > /target/boot/silo.conf << EOF
-root=$rootfs
+root=${rootfs}
+default=Linux
+read-only
 timeout=100
+${initrd}
 image=/boot/vmlinuz
 	label=Linux
-	read-only
+	
+image=/boot/vmlinuz.old
+	label=LinuxOLD
 EOF
 
 chmod 644 /target/boot/silo.conf
 
 # Compat links
-ln -s ../boot/silo.conf /target/etc/silo.conf
-ln -s . /target/boot/boot
-ln -s . /target/boot/etc
+ln -sf ../boot/silo.conf /target/etc/silo.conf
+ln -sf . /target/boot/boot
+ln -sf . /target/boot/etc
 
-chroot /target /sbin/silo -f
+if ! chroot /target /sbin/silo -f; then
+	ERRCODE=$?
+	db_subst silo-installer/failed ERRCODE "$ERRCODE"
+	db_input critical silo-installer/failed || [ $? -eq 30 ]
+	db_go || exit 10 # back up
+	exit 1
+fi
