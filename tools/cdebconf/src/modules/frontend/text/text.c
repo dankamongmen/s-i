@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.28 2002/12/20 17:00:17 barbier Exp $
+ * $Id: text.c,v 1.29 2002/12/23 09:48:46 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -75,7 +75,7 @@ static const int getwidth(void)
 		inited = 1;
 		if ((fd = open("/dev/tty", O_RDONLY)) > 0)
 		{
-			if (ioctl(fd, TIOCGWINSZ, &ws) == 0 && res > 0)
+			if (ioctl(fd, TIOCGWINSZ, &ws) == 0 && ws.ws_col > 0)
 				res = ws.ws_col;
 			close(fd);
 		}
