@@ -252,32 +252,20 @@ setup_partition () {
 choose_recipe () {
     local recipes archdetect arch sub free_size choices min_size
     
-#     recipes=$(
-# 	if [ -x /bin/archdetect ]; then
-# 	    archdetect=$(archdetect)
-# 	else
-# 	    archdetect=unknown/generic
-# 	fi
-# 	arch=${archdetect%/*}
-# 	sub=${archdetect#*/}
-# 	for recipe in \
-# 	    /lib/partman/recipes/* \
-# 	    /lib/partman/recipes-$arch/* \
-# 	    /lib/partman/recipes-$arch-$sub/*
-# 	do
-# 	    [ -f $recipe ] || continue
-# 	    echo ${recipe##*/} ${recipe#/lib/partman/recipes} $recipe
-# 	done |
-# 	sort | {
-# 	    oldname=''
-# 	    while read name recipe; do
-# 		if [ "$name" != "$oldname" ]; then
-# 		    echo $recipe
-# 		    oldname="$name"
-# 		fi
-# 	    done
-# 	}
-#     )
+    # Preseeding of recipes.
+    db_get partman-auto/expert_recipe
+    if [ -n "$RET" ]; then
+	echo "$RET" > /tmp/expert_recipe
+	db_set partman-auto/expert_recipe_file /tmp/expert_recipe
+    fi
+    db_get partman-auto/expert_recipe_file
+    if [ ! -z "$RET" ] && [ -e "$RET" ]; then
+        recipe="$RET"
+	decode_recipe $recipe
+	if [ $(min_size) -le $free_size ]; then
+	    return 0
+	fi
+    fi
 
     if [ -x /bin/archdetect ]; then
 	archdetect=$(archdetect)
@@ -316,20 +304,10 @@ choose_recipe () {
        db_go || true # TODO handle backup right
        return 1
     fi
-    
-#    db_metaget partman-auto/text/expert_recipe description
-#    choices="${choices}expert${TAB}${RET}"
-    
+ 
     debconf_select high partman-auto/choose_recipe "$choices" "$first_recipe"
     if [ "$?" = 255 ]; then
 	exit 0
-    fi
-    
-    if [ "$RET" = expert ]; then
-	db_input critical partman-auto/expert_recipe || true
-	if ! db_go; then
-	    exit 1
-	fi
     fi
     recipe="$RET"
 }

@@ -5,46 +5,4 @@
 
 dev=$1
 
-[ -f $dev/size ] || exit 1
-free_size=$(cat $dev/size)
-free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
-
-choose_recipe "$free_size" || exit $?
-
-cd $dev
-
-open_dialog LABEL_TYPES
-types=$(read_list)
-close_dialog
-
-label_type=$(default_disk_label)
-
-if ! expr "$types" : ".*${label_type}.*" >/dev/null; then
-    label_type=msdos # most widely used
-fi
-
-open_dialog NEW_LABEL "$label_type"
-close_dialog
-
-# Different types partition tables support different visuals.  Some
-# have partition names other don't have, some have extended and
-# logical partitions, others don't.  Hence we have to regenerate the
-# list of the visuals
-if [ -f visuals ]; then
-    rm visuals
-fi
-
-free_space=''
-open_dialog PARTITIONS
-while { read_line num id size type fs path name; [ "$id" ]; }; do
-    if [ "$fs" = free ]; then
-	free_space=$id
-	free_size=$size
-    fi
-done
-close_dialog
-
-perform_recipe $dev $free_space $recipe || exit $?
-
-# default to accepting the autopartitioning
-menudir_default_choice /lib/partman/choose_partition finish finish || true
+autopartition $dev

@@ -1,6 +1,20 @@
 #!/bin/sh
 
 . /usr/share/debconf/confmodule
+. /lib/partman/definitions.sh
+
+dev_to_partman () {
+	local dev_name="$1"
+
+	for dev in $DEVICES/*; do
+		# mapdevfs both to allow for different ways to refer to the
+		# same device using devfs, and to allow user input in
+		# non-devfs form
+		if [ "$(mapdevfs $(cat $dev/device))" = "$(mapdevfs $dev_name)" ]; then
+			echo $dev
+		fi
+	done
+}
 
 # Only run the first time.
 if [ -f /var/lib/partman/initial_auto ]; then
@@ -8,6 +22,18 @@ if [ -f /var/lib/partman/initial_auto ]; then
 fi
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 touch /var/lib/partman/initial_auto
+
+# See if a disk to autopartition has been set.
+db_get partman-auto/disk
+if [ -n "$RET" ]; then
+	disk="$RET"
+
+	id=$(dev_to_partman "$disk")
+	if [ -n "$id" ]; then
+		autopartition "$id"
+		exit 0
+	fi
+fi
 
 echo "partman-auto/init_automatically_partition" > /lib/partman/automatically_partition/question
 . /lib/partman/definitions.sh
