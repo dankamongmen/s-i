@@ -316,12 +316,19 @@ for package in $packages ; do
       if [ "$DEBUG" = "Y" ] ; then
         echo -n "$lang "
       fi
+      cat >$lang.po.new <<EOF
+# THIS FILE IS GENERATED AUTOMATICALLY FROM THE MASTER FILE
+# packages/po/$lang.po
+#
+# DO NOT MODIFY IT DIRECTLY : SUCH CHANGES WILL BE LOST
+# 
+EOF
       if [ "$DEBUG" = "Y" ] ; then
         msgmerge $DI_COPY/packages/po/$lang.po templates.pot |\
-           msgattrib --no-obsolete - >$lang.po.new
+           msgattrib --no-obsolete - >>$lang.po.new
       else
         msgmerge $DI_COPY/packages/po/$lang.po templates.pot 2>/dev/null |\
-           msgattrib --no-obsolete - >$lang.po.new 2>/dev/null
+           msgattrib --no-obsolete - >>$lang.po.new 2>/dev/null
       fi
       # We use the new file only if the changes are more than just 
       # changing the PO-Revision-Date line
