@@ -249,7 +249,6 @@ int strchoicesplitsort(const char *origbuf, const char *transbuf, const char *in
     int i;
     char **cindex;
     char **sorted_targv;
-    int index;
 
     assert(oindex);
     assert(oargv);
@@ -270,11 +269,10 @@ int strchoicesplitsort(const char *origbuf, const char *transbuf, const char *in
             return DC_NOTOK;
         sorted_targv = malloc(sizeof(char *) * maxnarg);
         for (i = 0; i < maxnarg; i++) {
-            index = strtol(cindex[i], NULL, 10) - 1;
-            if (index < 0 || index >= maxnarg)
+            oindex[i] = strtol(cindex[i], NULL, 10) - 1;
+            if (oindex[i] < 0 || oindex[i] >= maxnarg)
                 return DC_NOTOK;
-            oindex[index] = i;
-            sorted_targv[index] = STRDUP(targv[i]);
+            sorted_targv[i] = STRDUP(targv[oindex[i]]);
         }
         for (i = 0; i < maxnarg; i++) {
             free(targv[i]);
