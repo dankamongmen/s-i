@@ -166,6 +166,7 @@ distribute_partitions(struct disk_info_t diskinfo[],
 		   too big. */
 		newsize = reqs[j].max_blk - reqs[j].min_blk;
 		newsize *= diskinfo[i].freespace;
+		assert(total_wanted);
 		newsize /= total_wanted;
 		newsize += reqs[j].blocks;
 		if (newsize > reqs[j].max_blk)
