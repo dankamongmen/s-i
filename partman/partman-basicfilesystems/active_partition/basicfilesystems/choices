@@ -24,7 +24,8 @@ choice_mountpoint () {
 		mp="$RET"
 	    fi
 	    db_metaget partman-basicfilesystems/text/specify_mountpoint description
-	    printf "mountpoint\t%-25s%s\n" "$RET" "$mp"
+	    RET=$(stralign -25 "$RET")
+	    printf "mountpoint\t%s%s\n" "$RET" "$mp"
 	    ;;
     esac
 }
@@ -38,7 +39,8 @@ choice_options () {
 		options=defaults
 	    fi
 	    db_metaget partman-basicfilesystems/text/options description
-	    printf "options\t%-25s%.45s\n" "$RET" "$options"
+	    RET=$(stralign -25 "$RET")
+	    printf "options\t%s%.45s\n" "$RET" "$options"
 	    ;;
 	fat16|fat32)
 	    if [ -f $part/fatmountoptions ]; then
@@ -47,7 +49,8 @@ choice_options () {
 		options=defaults
 	    fi
 	    db_metaget partman-basicfilesystems/text/options description
-	    printf "fatoptions\t%-25s%.45s\n" "$RET" "$options"
+	    RET=$(stralign -25 "$RET")
+	    printf "fatoptions\t%s%.45s\n" "$RET" "$options"
 	    ;;
     esac
 }

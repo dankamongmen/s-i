@@ -24,7 +24,8 @@ choice_mountpoint () {
 		mp="$RET"
 	    fi
 	    db_metaget partman-reiserfs/text/specify_mountpoint description
-	    printf "mountpoint\t%-25s%s\n" "$RET" "$mp"
+	    RET=$(stralign -25 "$RET")
+	    printf "mountpoint\t%s%s\n" "$RET" "$mp"
 	    ;;
     esac
 }
@@ -38,7 +39,8 @@ choice_options () {
     case "$filesystem" in
 	reiserfs)
 	    db_metaget partman-reiserfs/text/options description
-	    printf "options\t%-25s%.45s\n" "$RET" "$options"
+	    RET=$(stralign -25 "$RET")
+	    printf "options\t%s%.45s\n" "$RET" "$options"
 	    ;;
     esac
 }
