@@ -3,4 +3,5 @@
 while read in; do
   COMMANDS="$COMMANDS \"$in $(echo $in | tr "a-z" "A-Z")\""
 done < $1
-sed -e "s,@COMMANDS@,$COMMANDS," < $2
+DEBCONF_OLD_FD_BASE="$(cpp -dM "$2" | grep '#define DEBCONF_OLD_FD_BASE' | cut -d' ' -f3)"
+sed -e "s,@COMMANDS@,$COMMANDS," -e "s,@DEBCONF_OLD_FD_BASE@,$DEBCONF_OLD_FD_BASE," < $3
