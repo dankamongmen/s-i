@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-# Expect script to install on s390 in hercules. Currently s390 cannot be
-# preseeded, so this walks all the way through.
+# Expect script to set up for install on s390 in hercules. Once this stops,
+# network-console is ready for ssh connections.
 use Expect;
 
 my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
@@ -28,16 +28,9 @@ question("IP address:", $ENV{S390_IP});
 question("Point-to-point address:", $ENV{S390_PTP_IP});
 question("Name server addresses:", $env{S390_NAMESERVER_IP});
 question("Hostname:", "debian");
-question("Domain name:", "test");
+question("Domain name:", $ENV{S390_HOSTNAME});
 question("Remote installation password:", $ENV{ROOT_PASSWORD}); # root will do
 question("Password confirmation:", $ENV{ROOT_PASSWORD});
-
-# Could stop here and ssh in to complete the install, but since that uses
-# the harder to drive newt interface, and none of the other autoinstall
-# scripts for that would work since the partitioner is different and
-# there's no presseding, I'll just continue using the console instead.
-
-#TODO
-#question("");
+question("To continue the installation, please use an SSH client to log in");
 
 exit
