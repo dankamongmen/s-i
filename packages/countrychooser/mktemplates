@@ -28,7 +28,7 @@ CHOICES=$(./countrylist $ISO3166TAB ./regionmap "$INDENTMARKER" | \
 
 # Now put this list as the choices in the templates
 # and defined this field as translatable (__Choices hack)
-cat debian/templates-in | \
+cat debian/countrychooser.templates-in | \
     perl -pe 's/\@countrylist\@/'"$CHOICES"'/g' | \
     sed "/^Choices:/s/Choices:/__Choices:/g" \
     >debian/templates.tmp
