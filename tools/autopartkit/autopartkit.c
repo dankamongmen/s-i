@@ -1298,7 +1298,11 @@ int main (int argc, char *argv[])
     disable_kmsg(0);
 
     if (argc > 1)
+#if defined(TEST)
+        tablefile = "default.table";
+#else
         tablefile = mydebconf_get(argv[1]);
+#endif /* TEST */
 
     if ( ! tablefile )
         autopartkit_err(1, "usage: %s <debconf-template>\n", argv[0]);
