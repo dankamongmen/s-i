@@ -124,13 +124,7 @@ sub getpassword {
 	if (exists $ENV{HP_ILO_PASSWORD}) {
 		return $ENV{HP_ILO_PASSWORD};
 	}
-	else {
-		open (PW, $ENV{HP_ILO_PASSWORD_FILE}) || die "Please set HP_ILO_PASSWORD or HP_ILO_PASSWORD_FILE\n";
-		my $password=<PW>;
-		chomp $password;
-		close PW;
-		return $password;
-	}
+	die "Please set HP_ILO_PASSWORD\n";
 }
 
 sub getuser {
