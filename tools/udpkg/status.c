@@ -1,4 +1,4 @@
-/* $Id: status.c,v 1.14 2000/11/29 04:13:31 tausq Exp $ */
+/* $Id: status.c,v 1.15 2000/11/29 04:16:50 tausq Exp $ */
 #include "udpkg.h"
 
 #include <stdio.h>
@@ -144,7 +144,7 @@ void *status_read(void)
 		perror(STATUSFILE);
 		return 0;
 	}
-	fprintf(stderr, "(Reading database...)\n");
+	printf("(Reading database...)\n");
 	while (!feof(f))
 	{
 		m = (struct package_t *)malloc(sizeof(struct package_t));
@@ -210,7 +210,7 @@ int status_merge(void *status, struct package_t *pkgs)
 		perror(STATUSFILE ".new");
 		return 0;
 	}
-	fprintf(stderr, "(Updating database...)\n");
+	printf("(Updating database...)\n");
 	while (fgets(buf, BUFSIZE, fin) && !feof(fin))
 	{
 		buf[strlen(buf)-1] = 0; /* trim newline */
