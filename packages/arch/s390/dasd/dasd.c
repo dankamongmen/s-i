@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -33,7 +34,6 @@ enum state_wanted { WANT_BACKUP, WANT_NEXT, WANT_QUIT, WANT_ERROR };
 int my_debconf_input(char *priority, char *template, char **ptr)
 {
 	int ret;
-	debconf_fset (client, template, "seen", "false");
 	debconf_input (client, priority, template);
 	ret = debconf_go (client);
 	debconf_get (client, template);
@@ -194,6 +194,26 @@ static enum state_wanted get_channel (void)
 	return WANT_NEXT;
 }
 
+struct hd_geometry {
+	unsigned char heads;
+	unsigned char sectors;
+	unsigned short cylinders;
+	unsigned long start;
+};
+
+#define HDIO_GETGEO 0x0301  
+
+static di_io_handler format_handler;
+
+static int format_handler (const char *buf, size_t len, void *user_data __attribute__ ((unused)))
+{
+	if (len == 1 && buf[0] == '#')
+		debconf_progress_step (client, 1);
+	else
+		di_log (DI_LOG_LEVEL_OUTPUT, "%s", buf);
+	return 0;
+}
+
 static enum state_wanted confirm (void)
 {
 	char buf[256], *ptr;
@@ -234,8 +254,26 @@ static enum state_wanted confirm (void)
 
 	if (strcmp (ptr, "true") == 0)
 	{
-		snprintf (buf, sizeof (buf), "dasdfmt -l LX%04x -b 4096 -n %04x -y", dasd_current->device, dasd_current->device);
-		ret = di_exec_shell_log (buf);
+		char dev[128];
+		int fd;
+		struct hd_geometry drive_geo;
+
+		snprintf (dev, sizeof (dev), "/dev/dasd/%04x/device", dasd_current->device);
+
+		fd = open (dev, O_RDONLY);
+		if (fd < 0)
+			return WANT_ERROR;
+		if (ioctl (fd, HDIO_GETGEO, &drive_geo) < 0)
+			return WANT_ERROR;
+		close (fd);
+
+		debconf_subst (client, "debian-install/s390/dasd/formating", "device", buf);
+		debconf_progress_start (client, 0, drive_geo.cylinders, "debian-install/s390/dasd/formating");
+
+		snprintf (buf, sizeof (buf), "dasdfmt -l LX%04x -b 4096 -m 1 -f %s -y", dasd_current->device, dev);
+		ret = di_exec_shell_full (buf, format_handler, NULL, NULL, NULL, NULL, NULL, NULL);
+
+		debconf_progress_stop (client);
 
 		if (ret)
 			return WANT_ERROR;
@@ -277,7 +315,7 @@ static void error (void)
 	my_debconf_input ("high", "debian-install/s390/dasd/error", &ptr);
 }
 
-int main(int argc, char *argv[])
+int main ()
 {
 	di_system_init ("s390-dasd");
 
