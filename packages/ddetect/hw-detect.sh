@@ -190,8 +190,7 @@ for device in $ALL_HW_INFO; do
 		fi
 	done
 	if [ "$loaded" = 0 ] &&
-	   echo "$LIST" | grep -v "^$module " &&
-	   echo "$LIST" | grep -v ", $module " ; then
+	   echo "$LIST" | grep -v -q '\(^\|, \)'"$module " ; then
 		if [ -n "$LIST" ]; then
 			LIST="$LIST, "
 		fi
@@ -258,8 +257,7 @@ for device in $(list_to_lines); do
 			# Only add the module to the missing list if it was not
 			# manually added to the list of modules to load.
 			if ! echo "$MANUAL_HW_INFO" | grep -q "$module:" &&
-			   ! echo "$MISSING_MODULES_LIST" | grep -q "^$module " &&
-			   ! echo "$MISSING_MODULES_LIST" | grep -q ", $module " ; then
+			   ! echo "$MISSING_MODULES_LIST" | grep -q '\(^\|, \)'"$module " ; then
 				if [ -n "$MISSING_MODULES_LIST" ]; then
 					MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
 				fi
