@@ -15,11 +15,11 @@ defaultbootdev=`echo $rootfs |sed 's/part[0-9]\+$/disc/'`
 rootfs=`mapdevfs $rootfs`
 defaultbootdev=`mapdevfs $defaultbootdev`
 
-db_fget arcboot/boot_device seen
-[ "$RET" = true ] || db_set arcboot/boot_device "$defaultbootdev"
-db_input high arcboot/boot_device || [ $? -eq 30 ]
+db_fget arcboot-installer/boot_device seen
+[ "$RET" = true ] || db_set arcboot-installer/boot_device "$defaultbootdev"
+db_input high arcboot-installer/boot_device || [ $? -eq 30 ]
 db_go || true
-db_get arcboot/boot_device
+db_get arcboot-installer/boot_device
 
 bootdev=$RET
 [ "$bootdev" != '' ] || bootdev=$defaultbootdev
