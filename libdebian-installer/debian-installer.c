@@ -74,7 +74,7 @@ di_prebaseconfig_append(const char *udeb, const char *fmt, ...)
   fprintf(fp, "\n# start entry %s\n", ctime(&t));
   
   va_start(ap, fmt);
-  fprintf(fp, fmt, ap);
+  vfprintf(fp, fmt, ap);
   va_end(ap);
   
   fprintf(fp, "\n# end entry\n");
