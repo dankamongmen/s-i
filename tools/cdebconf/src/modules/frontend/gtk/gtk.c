@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.14 2003/03/25 13:57:35 sley Exp $
+ * $Id: gtk.c,v 1.15 2003/03/26 13:29:51 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -75,7 +75,7 @@ struct frontend_data
 };
 
 /* Embed frontend ans question in this object to pass it through an event handler */
-struct show_description_data
+struct frontend_question_data
 {
     struct frontend *obj;
     struct question *q;
@@ -199,14 +199,21 @@ void call_setters(struct frontend *obj)
     }
 }
 
-void free_description_data( GtkObject *obj, struct show_description_data* data )
+void free_description_data( GtkObject *obj, struct frontend_question_data* data )
 {
     free(data);
 }
 
-void button_single_callback(GtkWidget *button, struct question* q)
+void button_single_callback(GtkWidget *button, struct frontend_question_data* data)
 {
+    struct frontend *obj = data->obj;
+    struct question *q = data->q;
+
     question_setvalue(q, (gchar*) gtk_object_get_user_data(GTK_OBJECT(button)) );
+    ((struct frontend_data*)obj->data)->button_val = DC_OK;
+
+    free(data);
+   
     gtk_main_quit();
 }
 
@@ -218,7 +225,7 @@ void exit_button_callback(GtkWidget *button, struct frontend* obj)
     gtk_main_quit();
 }
 
-static gboolean show_description( GtkWidget *widget, struct show_description_data* data )
+static gboolean show_description( GtkWidget *widget, struct frontend_question_data* data )
 {
     struct question *q;
     struct frontend *obj;
@@ -291,6 +298,11 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *yes_button, *no_button, *button_box, *vbox, *description_label;
+    struct frontend_question_data *data;
+
+    data = NEW(struct frontend_question_data);
+    data->obj = obj;
+    data->q = q;
 	
     yes_button = gtk_button_new_with_label("Yes");
     no_button = gtk_button_new_with_label("No");
@@ -298,8 +310,8 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
     gtk_object_set_user_data(GTK_OBJECT(yes_button), g_strdup("true"));
     gtk_object_set_user_data(GTK_OBJECT(no_button), g_strdup("false"));
 
-    g_signal_connect (G_OBJECT (yes_button), "clicked", G_CALLBACK (button_single_callback), q);
-    g_signal_connect (G_OBJECT (no_button), "clicked", G_CALLBACK (button_single_callback), q);
+    g_signal_connect (G_OBJECT (yes_button), "clicked", G_CALLBACK (button_single_callback), data);
+    g_signal_connect (G_OBJECT (no_button), "clicked", G_CALLBACK (button_single_callback), data);
 
     button_box = gtk_hbutton_box_new();
     gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
@@ -327,10 +339,10 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
 static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *check;
-    struct show_description_data *data;
+    struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 
-    data = NEW(struct show_description_data);
+    data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
 	
@@ -368,9 +380,9 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     char *choices_translated[100] = {0};
     char *defvals[100] = {0};
     int i, j, count, dcount;
-    struct show_description_data *data;
+    struct frontend_question_data *data;
 
-    data = NEW(struct show_description_data);
+    data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
 
@@ -431,7 +443,7 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *entry;
-    struct show_description_data *data;
+    struct frontend_question_data *data;
 	
     entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
@@ -441,7 +453,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
-    data = NEW(struct show_description_data);
+    data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
 
@@ -459,6 +471,11 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     gchar *choices_translated[100] = {0};
     gchar *choices[100] = {0};
     int i, count;
+    struct frontend_question_data *data;
+
+    data = NEW(struct frontend_question_data);
+    data->obj = obj;
+    data->q = q;
 
     count = strchoicesplit(question_get_field(q, NULL, "choices"),
                            choices, DIM(choices));
@@ -475,7 +492,7 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     {
         button = gtk_button_new_with_label(choices_translated[i]);
 	gtk_object_set_user_data(GTK_OBJECT(button), choices[i]);
-	g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (button_single_callback), q);	
+	g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (button_single_callback), data);	
 	gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
 
 	free(choices_translated);
@@ -494,7 +511,7 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     GtkWidget *combo, *frame;
     GList *items = NULL;
     gchar *choices_translated[100] = {0};
-    struct show_description_data *data;
+    struct frontend_question_data *data;
     int i, count;
     const char *defval = question_getvalue(q, "");
 
@@ -518,7 +535,7 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
-    data = NEW(struct show_description_data);
+    data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
 
@@ -544,7 +561,7 @@ static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget
 static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *entry;
-    struct show_description_data *data;
+    struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 	
     entry = gtk_entry_new ();
@@ -555,7 +572,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
-    data = NEW(struct show_description_data);
+    data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
 
