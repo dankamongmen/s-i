@@ -41,7 +41,7 @@ clean:
 
 	# Add here commands to clean up after the build process.
 	-$(MAKE) clean
-
+	rm -f debian/ethdetect.postinst
 	dh_clean
 
 install: build
@@ -62,7 +62,9 @@ binary-arch: build install
 #	dh_testversion
 	dh_testdir
 	dh_testroot
-	dh_installdebconf	
+	dh_installdebconf
+	$(foreach PACKAGE, $(PACKAGES), \
+	(cp  debian/$(PACKAGE).menutest debian/$(PACKAGE)/DEBIAN/ ) ; )
 #	dh_installdocs
 #	dh_undocumented ddetect.1
 #	dh_installchangelogs 

@@ -1,7 +1,7 @@
 
 
 
-OBJS=ddetect.o
+OBJS=utils.o
 
 ifndef PROGS
 PROGS=ethdetect
@@ -29,7 +29,7 @@ cddetect : cddetect.c ddetect.o
 
 
 ethdetect :ethdetect.c ddetect.o
-	$(CC) $< -o $@ $(CFLAGS) $(INCS) $(LDFLAGS)
+	$(CC) $< -o $@ $(OBJS) $(CFLAGS) $(INCS) $(LDFLAGS)
 
 lst2header: lst2header.c
 	$(CC) lst2header.c -o lst2header -ldetect -lisapnp 
