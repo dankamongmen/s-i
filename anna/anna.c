@@ -38,7 +38,7 @@ is_installed(struct package_t *p, struct linkedlist_t *installed)
  * - Ask for which packages with priority below standard to install
  */
 struct linkedlist_t *select_packages (struct linkedlist_t *packages) {
-	struct list_node *node, *next, *prev;
+	struct list_node *node, *next, *prev = NULL;
 	struct package_t *p;
 	struct linkedlist_t *status_p, *lowpri_p;
 	FILE *fp;
