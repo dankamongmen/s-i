@@ -1,40 +1,18 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
-
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-
-PACKAGES_INDEP=$(shell dh_listpackages -i)
-PACKAGES_ARCH=$(shell dh_listpackages -a)
-MENUPACKAGES=ethdetect hw-detect-full
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
 
 CFLAGS = -W -Wall -Os
-
 export CFLAGS
-
-# This is the debhelper compatability version to use.
-export DH_COMPAT=2
-
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
 
 build: build-stamp
 build-stamp:
 	dh_testdir
-
 	$(MAKE)
-
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
-
 	-$(MAKE) clean
 	dh_clean
 
@@ -43,10 +21,9 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-	$(foreach PACKAGE,  $(PACKAGES_INDEP) $(PACKAGES_ARCH), \
+	$(foreach PACKAGE, $(shell dh_listpackages), \
 	  $(MAKE) install-$(PACKAGE) DESTDIR=`pwd`/debian/$(PACKAGE);)
 
-# Build architecture-independent files here.
 binary-indep: build install
 	dh_testdir
 	dh_testroot
@@ -55,16 +32,9 @@ binary-indep: build install
 	dh_fixperms -i
 	dh_installdeb -i
 	dh_shlibdeps -i
-	$(foreach PACKAGE, $(PACKAGES_INDEP), \
-	  ( dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
-	  -Tdebian/$(PACKAGE).substvars \
-	  -n$(PACKAGE)_$(VERSION)_all.udeb ) ; )
-	$(foreach PACKAGE, $(PACKAGES_INDEP), \
-	  (cd debian ; \
-		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_all.udeb \
-		); )
+	dh_gencontrol -i
+	dh_builddeb -i
 
-# Build architecture-dependent files here.
 binary-arch: build install
 	dh_testdir
 	dh_testroot
@@ -74,15 +44,8 @@ binary-arch: build install
 	dh_fixperms -a
 	dh_installdeb -a
 	dh_shlibdeps -a
-	$(foreach PACKAGE, $(PACKAGES_ARCH), \
-	  ( dpkg-gencontrol -Pdebian/$(PACKAGE) -isp -p$(PACKAGE) \
-	  -Tdebian/$(PACKAGE).substvars \
-	  -n$(PACKAGE)_$(VERSION)_$(ARCH).udeb ) ; )
-	$(foreach PACKAGE, $(PACKAGES_ARCH), \
-	  (cd debian ; \
-		dpkg-deb -b $(PACKAGE) ../../$(PACKAGE)_$(VERSION)_$(ARCH).udeb \
-		); )
-
+	dh_gencontrol -a
+	dh_builddeb -a
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install 
