@@ -328,60 +328,66 @@ finish(void)
     // Sort the partitions according to the order they have to be mounted
     qsort(parts, part_count, sizeof(struct partition *), mountpoint_sort_func);
     for (i = 0; i < part_count; i++) {
-        if (MK_SWAP(parts[i])) {
-            append_message("partconf: Creating swap on %s\n", parts[i]->path);
-            asprintf(&cmd, "mkswap %s >/dev/null 2>>/var/log/messages", parts[i]->path);
-            ret = system(cmd);
-            free(cmd);
-            if (ret != 0) {
-                errq = "partconf/failed-mkswap";
-                break;
+        fs = parts[i]->op.filesystem;
+        if (fs == NULL)
+            fs = parts[i]->fstype;
+        else {
+            // Create the file system/swap
+            if (strcmp(fs, "swap") == 0) {
+                append_message("partconf: Creating swap on %s\n", parts[i]->path);
+                asprintf(&cmd, "mkswap %s >/dev/null 2>>/var/log/messages", parts[i]->path);
+                ret = system(cmd);
+                free(cmd);
+                if (ret != 0) {
+                    errq = "partconf/failed-mkswap";
+                    break;
+                }
+            } else {
+                append_message("partconf: Creating %s file system on %s\n", fs, parts[i]->path);
+                asprintf(&cmd, "mkfs.%s %s >/dev/null 2>>/var/log/messages", fs, parts[i]->path);
+                ret = system(cmd);
+                free(cmd);
+                if (ret != 0) {
+                    errq = "partconf/failed-mkfs";
+                    debconf->command(debconf, "SUBST", errq, "FS", parts[i]->op.filesystem, NULL);
+                    break;
+                }
             }
         }
-        if (IS_SWAP(parts[i])) {
-            append_message("partconf: Activating swap on %s\n", parts[i]->path);
-            asprintf(&cmd, "swapon %s >/dev/null 2>>/var/log/messages", parts[i]->path);
-            ret = system(cmd);
-            free(cmd);
-            if (ret != 0) {
-                errq = "partconf/failed-swapon";
-                break;
-            }
-            continue;
-        }
-        // If we have absolutely no file system, continue with next partition
-        if (parts[i]->op.filesystem == NULL && parts[i]->fstype == NULL)
-            continue;
-        if (parts[i]->op.filesystem != NULL)
-        {
-            append_message("partconf: Creating %s file system on %s\n",
-                    parts[i]->op.filesystem, parts[i]->path);
-            asprintf(&cmd, "mkfs.%s %s >/dev/null 2>>/var/log/messages",
-                    parts[i]->op.filesystem, parts[i]->path);
-            ret = system(cmd);
-            free(cmd);
-            if (ret != 0) {
-                errq = "partconf/failed-mkfs";
-                debconf->command(debconf, "SUBST", errq, "FS", parts[i]->op.filesystem, NULL);
-                break;
-            }
-        }
-        if (parts[i]->op.mountpoint != NULL) {
-            append_message("partconf: Mounting %s on %s\n",
-                    parts[i]->path, parts[i]->op.mountpoint);
-            asprintf(&mntpt, "/target%s", parts[i]->op.mountpoint);
-            makedirs(mntpt);
-            fs = parts[i]->op.filesystem ? parts[i]->op.filesystem : parts[i]->fstype;
-            ret = mount(parts[i]->path, mntpt, fs, 0xC0ED0000, NULL);
-            // Ignore failure due to unknown filesystem
-            if (ret < 0 && errno != ENODEV) {
-                append_message("mount: %s\n", strerror(errno));
-                errq = "partconf/failed-mount";
-                debconf->command(debconf, "SUBST", errq, "MOUNT", mntpt, NULL);
+        if (fs != NULL) {
+            if (strcmp(fs, "swap") == 0) {
+                // Activate swap
+                append_message("partconf: Activating swap on %s\n", parts[i]->path);
+                asprintf(&cmd, "swapon %s >/dev/null 2>>/var/log/messages", parts[i]->path);
+                ret = system(cmd);
+                free(cmd);
+                /* 
+                 * Should this actually be fatal?
+                 * FIXME: If this is fatal, things will break horribly on a second
+                 * invocation of partconf... :(
+                 */
+                if (ret != 0) {
+                    errq = "partconf/failed-swapon";
+                    break;
+                }
+            } else if (parts[i]->op.mountpoint != NULL) {
+                // And mount
+                append_message("partconf: Mounting %s on %s\n",
+                        parts[i]->path, parts[i]->op.mountpoint);
+                asprintf(&mntpt, "/target%s", parts[i]->op.mountpoint);
+                makedirs(mntpt);
+                fs = parts[i]->op.filesystem ? parts[i]->op.filesystem : parts[i]->fstype;
+                ret = mount(parts[i]->path, mntpt, fs, 0xC0ED0000, NULL);
+                // Ignore failure due to unknown filesystem
+                if (ret < 0 && errno != ENODEV) {
+                    append_message("mount: %s\n", strerror(errno));
+                    errq = "partconf/failed-mount";
+                    debconf->command(debconf, "SUBST", errq, "MOUNT", mntpt, NULL);
+                    free(mntpt);
+                    break;
+                }
                 free(mntpt);
-                break;
             }
-            free(mntpt);
         }
     }
     if (errq != NULL) {
