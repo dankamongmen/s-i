@@ -2,10 +2,6 @@
 
 . /usr/share/debconf/confmodule
 
-# Use tar in /target/ if present
-PATH=/target/bin:$PATH
-export PATH
-
 if [ "" = "$DILOGDIR" ]; then
 	DILOGDIR=/var/log/
 fi
@@ -33,13 +29,7 @@ db_go
 
 # generate files with HW info, debconf database info etc, and store
 # them in $DILOGDIR
-db_progress START 0 5 prebaseconfig/progress/bugreporter-udeb
-
-#cp -a /var/log/* $DILOGDIR || true
-db_progress STEP 1
-
-#copy_cdebconf_db $DILOGDIR/cdebconf-copy
-db_progress STEP 1
+db_progress START 0 3 debian-installer/bugreporter-udeb/title
 
 /bin/package-versions > $DILOGDIR/package-versions
 db_progress STEP 1
@@ -77,23 +67,15 @@ mountfloppy() {
 }
 
 test -d /floppy || mkdir /floppy
+umount /floppy 2>/dev/null || true
 if mountfloppy ; then
-	# make tarball with logs and stuff
-	# This fail because busybox tar is not compiled with creation support
-	tar zcf /tmp/debuginfo.tgz /var/log /target/var/log 
-	if [ -f /tmp/debuginfo.tgz ]; then
-    		# copy tarball into floppy
-		cp /tmp/debuginfo.tgz /floppy
-	else
-		# At least copy something to the floppy.
-		for file in \
-		    /var/log/messages \
-		    /var/log/syslog \
-		    $DILOGDIR/hardware-summary \
-		    $DILOGDIR/package-versions; do 
-			cp $file /floppy/
-    		done
-	fi
+	for file in \
+	    /var/log/messages \
+	    /var/log/syslog \
+	    $DILOGDIR/hardware-summary \
+	    $DILOGDIR/package-versions; do 
+		cp $file /floppy/
+    	done
 
 	umount /floppy
 	db_progress STEP 1
