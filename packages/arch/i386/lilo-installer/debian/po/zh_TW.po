@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tools/lilo-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-03-07 17:02-0900\n"
+"POT-Creation-Date: 2004-04-10 15:11-0700\n"
 "PO-Revision-Date: 2004-03-28 09:23+0800\n"
 "Last-Translator: Tetralet <tetralet@pchome.com.tw>\n"
 "Language-Team: Chinese/Traditional <tetralet@pchome.com.tw>\n"
@@ -24,49 +24,97 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. Type: string
+#. Type: select
 #. Description
-#: ../lilo-installer.templates:3
-msgid "Device for boot loader installation:"
-msgstr "用來安裝開機程式的裝置："
+#: ../lilo-installer.templates:4
+msgid "Where would you like to install LILO?"
+msgstr ""
+
+#. Type: select
+#. Description
+#: ../lilo-installer.templates:4
+msgid ""
+"The LILO program needs to be installed to make your new Debian system "
+"bootable. By installing it onto your disk's Master Boot Record, LILO will "
+"take complete control of the boot process, but if you want to use a "
+"different boot manager, just install LILO on the new Debian partition "
+"instead."
+msgstr ""
+
+#. Type: select
+#. Description
+#: ../lilo-installer.templates:4
+msgid "If unsure, install LILO into the Master Boot Record."
+msgstr ""
 
 #. Type: string
 #. Description
-#: ../lilo-installer.templates:3
-msgid ""
-"Now it is time to make the newly installed Debian system bootable, by "
-"installing the LILO bootloader on a bootable device. The usual way to do "
-"this is to install LILO on the master boot record of your first hard drive, "
-"but it is also possible to install LILO to a partition if you want to use "
-"another boot manager as the primary boot manager. Leave this at default if "
-"unsure."
+#: ../lilo-installer.templates:15
+msgid "Select a partition to install LILO onto"
 msgstr ""
-"現在要把 LILO 開機程式安裝至可開機裝置上，並讓這個新安裝的 Debian 系統能夠"
-"開機。一般的作法是將 LILO 安裝至您第一顆硬碟的主要開機磁區 (MBR) 上。但"
-"如果您想使用其它的程式作為主要的開機管理程式時，您也可以將 LILO 安裝至某個分"
-"割區上。如果不確定該如何指定時則使用預設選項。"
 
 #. Type: string
 #. Description
-#: ../lilo-installer.templates:3
+#: ../lilo-installer.templates:15
 msgid ""
-"Warning: by default, this will change how your computer boots, overwriting "
-"your existing master boot record with LILO. Continuing may make other "
-"operating systems installed on this computer unbootable."
+"Please enter the partition or disk where LILO should be installed onto. Only "
+"devfs style names, such as those that start with /dev/ide, /dev/scsi, and /"
+"dev/discs are accepted."
 msgstr ""
-"警告：在預設情況下，這將會以 LILO 覆蓋原有的主要開機磁區 (MBR)，並改變您的電"
-"腦的開機方式。如果繼續的話，有可能會使得這台電腦上的其它已安裝的作業系統無法"
-"開機。"
+
+#. Type: error
+#. Description
+#: ../lilo-installer.templates:22
+msgid "Invalid partition name"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../lilo-installer.templates:22
+msgid ""
+"The path ${path} does not represent a partition or hard disk device. Please "
+"try again."
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../lilo-installer.templates:28
+msgid "Installing LILO ..."
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../lilo-installer.templates:32
+msgid "Activating partition ${bootdev}"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../lilo-installer.templates:36
+msgid "Creating lilo.conf"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../lilo-installer.templates:40
+msgid "Installing the LILO package"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../lilo-installer.templates:44
+msgid "Running LILO for ${bootdev}"
+msgstr ""
 
 #. Type: note
 #. Description
-#: ../lilo-installer.templates:17
+#: ../lilo-installer.templates:48
 msgid "LILO configured to use a serial console"
 msgstr "LILO 被設定為使用串列主控台"
 
 #. Type: note
 #. Description
-#: ../lilo-installer.templates:17
+#: ../lilo-installer.templates:48
 msgid ""
 "LILO is configured to use serial port ${PORT} as the console. The serial "
 "port speed is set to ${SPEED}."
@@ -75,13 +123,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../lilo-installer.templates:24
+#: ../lilo-installer.templates:55
 msgid "Would you like to make this partition active?"
 msgstr "要將這個分割區設定為「啟動」嗎？"
 
 #. Type: boolean
 #. Description
-#: ../lilo-installer.templates:24
+#: ../lilo-installer.templates:55
 msgid ""
 "You have chosen to install LILO on a partition that is not the active one. "
 "If this partition is not marked active, then LILO will not be loaded by the "
@@ -94,7 +142,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../lilo-installer.templates:24
+#: ../lilo-installer.templates:55
 msgid ""
 "You should make this partition active unless you have another bootloader "
 "that will allow you to access your new Linux installation."
@@ -104,13 +152,13 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../lilo-installer.templates:36
+#: ../lilo-installer.templates:67
 msgid "LILO installation failed.  Continue anyway?"
 msgstr "LILO 的安裝作業失敗了。無論如何仍然繼續嗎？"
 
 #. Type: boolean
 #. Description
-#: ../lilo-installer.templates:36
+#: ../lilo-installer.templates:67
 msgid ""
 "The lilo package failed to install into /target/.  Installing LILO as a boot "
 "loader is a required step.  The install problem might however be unrelated "
@@ -121,20 +169,44 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../lilo-installer.templates:43
+#: ../lilo-installer.templates:74
 msgid "LILO installation failed"
 msgstr "LILO 的安裝作業失敗了"
 
 #. Type: boolean
 #. Description
-#: ../lilo-installer.templates:43
+#: ../lilo-installer.templates:74
 msgid "Running \"/sbin/lilo\" failed with error code \"${ERRCODE}\"."
 msgstr "在執行 \"/sbin/lilo\" 時失敗了，錯誤代碼為 \"${ERRCODE}\"。"
 
 #. Type: text
 #. Description
 #. Main menu item
-#: ../lilo-installer.templates:49
+#: ../lilo-installer.templates:80
 msgid "Install the LILO boot loader on a hard disk"
 msgstr "將 LILO 開機程式安裝至硬碟上"
 
+#~ msgid "Device for boot loader installation:"
+#~ msgstr "用來安裝開機程式的裝置："
+
+#~ msgid ""
+#~ "Now it is time to make the newly installed Debian system bootable, by "
+#~ "installing the LILO bootloader on a bootable device. The usual way to do "
+#~ "this is to install LILO on the master boot record of your first hard "
+#~ "drive, but it is also possible to install LILO to a partition if you want "
+#~ "to use another boot manager as the primary boot manager. Leave this at "
+#~ "default if unsure."
+#~ msgstr ""
+#~ "現在要把 LILO 開機程式安裝至可開機裝置上，並讓這個新安裝的 Debian 系統能夠"
+#~ "開機。一般的作法是將 LILO 安裝至您第一顆硬碟的主要開機磁區 (MBR) 上。但如"
+#~ "果您想使用其它的程式作為主要的開機管理程式時，您也可以將 LILO 安裝至某個分"
+#~ "割區上。如果不確定該如何指定時則使用預設選項。"
+
+#~ msgid ""
+#~ "Warning: by default, this will change how your computer boots, "
+#~ "overwriting your existing master boot record with LILO. Continuing may "
+#~ "make other operating systems installed on this computer unbootable."
+#~ msgstr ""
+#~ "警告：在預設情況下，這將會以 LILO 覆蓋原有的主要開機磁區 (MBR)，並改變您的"
+#~ "電腦的開機方式。如果繼續的話，有可能會使得這台電腦上的其它已安裝的作業系統"
+#~ "無法開機。"

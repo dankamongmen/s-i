@@ -16,79 +16,90 @@ info() {
 	log "info: $@"
 }
 
+findfs () {
+        df /target$1 | sed '1d;s/ .*//'
+}
+
+# detect the partitions /target and /target/boot
+rootfs_devfs=$(findfs /)
+bootfs_devfs=$(findfs /boot)
+
+rootfs=$(mapdevfs $rootfs_devfs)
+bootfs=$(mapdevfs $bootfs_devfs)
+
+disc_offered_devfs=$(echo $bootfs_devfs | sed 's/part[0-9]\+$/disc/')
+disc_offered=$(mapdevfs "$disc_offered_devfs")
+
 . /usr/share/debconf/confmodule
 db_capb backup
 
-if [ -f /etc/mtab ]; then
-    MTAB=/etc/mtab
-else
-    MTAB=/proc/mounts
-fi
+db_subst lilo-installer/bootdev disc "$disc_offered"
+db_subst lilo-installer/bootdev part "$bootfs"
 
-if ! apt-install lilo ; then
-	info "Calling 'apt-install lilo' failed"
-	# Hm, unable to install lilo into /target/, what should we do?
-	db_input critical lilo-installer/apt-install-failed || [ $? -eq 30 ]
-	if ! db_go; then
-		exit 10 # back up to menu
-	fi
-	db_get lilo-installer/apt-install-failed
-	if [ true != "$RET" ] ; then
-		exit 1
-	fi
-fi
-
-# detect which is the root partition: /target
-# ugh, I wanted to use awk, but sed has better chance of being in busybox
-rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
-
-# detect which hard drive has /target/boot mounted on it. this does *not*
-# have to be the same as the drive /target is mounted on.
-defaultbootdev=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
-
-if [ "$defaultbootdev" = '' ]; then
-	defaultbootdev=$rootfs
-fi
-
-defaultbootdev=`/target/bin/echo $defaultbootdev | /target/bin/sed 's/part[0-9]\+$/disc/'` 
-
-defaultbootdev=$(mapdevfs $defaultbootdev)
-
-if [ "$defaultbootdev" = '' ]; then
-	defaultbootdev='/dev/hda'
-fi
-
-db_fget lilo-installer/bootdev seen
-[ "$RET" = true ] || db_set lilo-installer/bootdev "$defaultbootdev"
-db_input high lilo-installer/bootdev || [ $? -eq 30 ]
+db_input high lilo-installer/bootdev
 db_go || exit 10 # back up
 
 db_get lilo-installer/bootdev
-bootdev=$RET
 
-if [ "$bootdev" = '' ]; then
-	bootdev=$defaultbootdev
-fi
+case "$RET" in
+  *Master*) bootdev=$disc_offered_devfs ;;
+  *Debian*) bootdev=$bootfs_devfs ;;
+  *Advanced*)
+    not_done=1
+    db_set lilo-installer/manual_bootdev "$disc_offered_devfs" || true
 
-rootfs=`mapdevfs $rootfs`
+    while [ $not_done -eq 1 ]; do
+      db_input critical lilo-installer/manual_bootdev || true
+      db_go || exit 10
+      db_get lilo-installer/manual_bootdev
+
+      if [ -b "$RET" ]; then
+        case "$RET" in
+          /dev/ide*|/dev/discs/*|/dev/scsi/*) bootdev="$RET"; not_done=0 ;;
+	esac
+      fi
+
+      if [ $not_done -eq 1 ]; then
+        db_subst lilo-installer/manual_bootdev_error path "$RET"
+	db_input critical lilo-installer/manual_bootdev_error || true
+	db_go || exit 10
+      fi
+    done
+	  
+  ;;
+esac
+
+db_subst lilo-installer/progress_active bootdev "$bootdev"
+db_subst lilo-installer/progress_running bootdev "$bootdev"
+
+db_progress start 0 4 lilo-installer/progress_title
+
+db_progress info lilo-installer/progress_active
 
 # If installing to a partition (not MBR), offer to make it active
 if echo "${bootdev}" | grep -q '[0-9]$'; then
     # Installing to a partition, check if it is already marked active
-    disc=$(echo ${bootdev} | sed 's/part[0-9]\+$/disc/')
-    if ! fdisk -l ${disc} | grep "^${bootdev}" | grep -q '\*'; then
+    if ! fdisk -l ${disc_offered_devfs} | grep "^${bootdev}" | grep -q '\*'; then
         # partition is not marked active, offer to make it so
         db_input high lilo-installer/activate-part || [ $? -eq 30 ]
-        db_go || exit 10 # back up
+        if ! db_go; then
+	  db_progress stop
+	  exit 10 # back up
+	fi
         db_get lilo-installer/activate-part
         if [ "${RET}" = "true"]; then
             pnum=$(echo ${bootdev} | sed 's/^.*\([0-9]\+\)$/\1/')
             echo -n "I: Setting partition to active..." >&2
-            sfdisk -A${pnum} ${disc}
+            sfdisk -A${pnum} ${disc_offered_devfs}
             echo "done." >&2
         fi
     fi
 fi
+
+# LILO would like this
+bootdev=$(mapdevfs "$bootdev")
+
+db_progress step 1
 
 # Use a serial console if current default console is a serial port.
 # default console is last listed
@@ -101,8 +112,13 @@ if echo "${defconsole}" | grep -q console=ttyS; then
     db_subst lilo-installer/serial-console PORT "ttyS${PORT}"
     db_subst lilo-installer/serial-console SPEED "${SPEED}"
     db_input medium lilo-installer/serial-console || [ $? -eq 30 ]
-    db_go || exit 10 # back up
+    if ! db_go; then
+      db_progress stop
+      exit 10 # back up
+    fi
 fi
+
+db_progress info lilo-installer/progress_lilo_conf
 
 #write out lilo.conf
 
@@ -118,6 +134,7 @@ fi
 
 if [ -e "/target/initrd.img" ]; then
   INITRD="	initrd=/initrd.img"
+  OLD_INITRD="${INITRD}.old"
 fi
 
 cat > /target/etc/lilo.conf <<EOF
@@ -225,20 +242,21 @@ default=Linux
 
 image=/vmlinuz
 	label=Linux
-${SERIAL_CONSOLE_APPEND}
-${INITRD}
 	read-only
 #	restricted
 #	alias=1
+${SERIAL_CONSOLE_APPEND}
+${INITRD}
 
 image=/vmlinuz.old
 	label=LinuxOLD
-${SERIAL_CONSOLE_APPEND}
-${INITRD}.old
 	read-only
 	optional
 #	restricted
 #	alias=2
+${SERIAL_CONSOLE_APPEND}
+${OLD_INITRD}
+	
 
 # If you have another OS on this machine to boot, you can uncomment the
 # following lines, changing the device name on the \`other' line to
@@ -282,13 +300,41 @@ EOF
   IFS="$OLDIFS"
 fi
 
+db_progress step 1
+
+db_progress info lilo-installer/progress_installing
+
+if ! apt-install lilo ; then
+	info "Calling 'apt-install lilo' failed"
+	# Hm, unable to install lilo into /target/, what should we do?
+	db_input critical lilo-installer/apt-install-failed || [ $? -eq 30 ]
+	if ! db_go; then
+		db_progress stop
+		exit 10 # back up to menu
+	fi
+	db_get lilo-installer/apt-install-failed
+	if [ true != "$RET" ] ; then
+		db_progress stop
+		exit 1
+	fi
+fi
+
+db_progress step 1
+
+db_progress info lilo-installer/progress_running
+
 if ! chroot /target /sbin/lilo ; then
     ERRCODE=$?
     db_subst lilo-installer/failed ERRCODE "$ERRCODE"
-    db_input critical lilo-installer/failed || [ $? -eq  30 ]
+    db_input critical lilo-installer/failed || [ $? -eq 30 ]
+    db_progress stop
     db_go || exit 10 # back up
     exit 1
 fi
+
+db_progress step 1
+
+db_progress stop
 
 sed -e 's/do_bootloader = no/do_bootloader = yes/' -e 's/postinst_hook = \/sbin\/update-grub//' -e 's/postrm_hook   = \/sbin\/update-grub//' < /target/etc/kernel-img.conf > /target/etc/kernel-img.conf.$$
 mv /target/etc/kernel-img.conf.$$ /target/etc/kernel-img.conf
