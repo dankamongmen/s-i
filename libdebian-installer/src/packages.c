@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.4 2003/09/24 11:49:52 waldi Exp $
+ * $Id: packages.c,v 1.5 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/packages_internal.h>
@@ -64,7 +64,6 @@ di_packages_allocator *internal_di_packages_allocator_alloc (void)
 
   ret = di_new0 (di_packages_allocator, 1);
   ret->package_dependency_mem_chunk = di_mem_chunk_new (sizeof (di_package_dependency), 4096);
-  ret->package_description_mem_chunk = di_mem_chunk_new (sizeof (di_package_description), 4096);
   ret->slist_node_mem_chunk = di_mem_chunk_new (sizeof (di_slist_node), 4096);
 
   return ret;
@@ -86,9 +85,29 @@ void di_packages_allocator_free (di_packages_allocator *allocator)
 {
   di_mem_chunk_destroy (allocator->package_mem_chunk);
   di_mem_chunk_destroy (allocator->package_dependency_mem_chunk);
-  di_mem_chunk_destroy (allocator->package_description_mem_chunk);
   di_mem_chunk_destroy (allocator->slist_node_mem_chunk);
   di_free (allocator);
+}
+
+/**
+ * append a package.
+ *
+ * @param packages a di_packages
+ */
+void di_packages_append_package (di_packages *packages, di_package *package, di_packages_allocator *allocator)
+{
+  di_package *tmp;
+
+  tmp = di_packages_get_package (packages, package->package, 0);
+
+  if (tmp)
+    /* FIXME */
+    ;
+  else
+  {
+    di_hash_table_insert (packages->table, &package->key, package);
+    di_slist_append_chunk (&packages->list, package, allocator->slist_node_mem_chunk);
+  }
 }
 
 /**
@@ -134,9 +153,10 @@ di_package *di_packages_get_package_new (di_packages *packages, di_packages_allo
   {
     char *temp;
     temp = di_stradup (name, n);
-    ret = di_mem_chunk_alloc0 (allocator->package_mem_chunk);
+    ret = di_package_alloc (allocator);
     ret->key.string = temp;
     ret->key.size = n;
+    di_log (DI_LOG_LEVEL_WARNING, "new package: %s\n", temp);
 
     di_hash_table_insert (packages->table, &ret->key, ret);
   }
@@ -144,10 +164,10 @@ di_package *di_packages_get_package_new (di_packages *packages, di_packages_allo
   return ret;
 }
 
-static void resolve_dependencies_recurse (di_slist *install, di_package *package, di_packages_allocator *allocator, unsigned int resolver)
+static void resolve_dependencies_recurse (di_slist *install, di_package *package, di_package *dependend_package, di_packages_allocator *allocator, unsigned int resolver, int shutup)
 {
   di_slist_node *node;
-  di_package *last_provide;
+  di_package *best_provide;
 
   if (!(package->resolver & resolver))
   {
@@ -156,6 +176,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
     switch (package->type)
     {
       case di_package_type_real_package:
+        di_log (DI_LOG_LEVEL_DEBUG, "consider package %s on %p\n", package->package, package);
         for (node = package->depends.first; node; node = node->next)
         {
           di_package_dependency *d = node->data;
@@ -163,12 +184,15 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
           if (d->type == di_package_dependency_type_depends || d->type == di_package_dependency_type_pre_depends)
           {
 #if 1
-            if (package->priority > d->ptr->priority)
-              di_log (DI_LOG_LEVEL_INFO, "broken dependency: %s to %s\n", package->key.string, d->ptr->key.string);
+            if (!shutup && package->priority > d->ptr->priority)
+              di_log (DI_LOG_LEVEL_INFO, "broken dependency: %s to %s", package->key.string, d->ptr->key.string);
 #endif
-            resolve_dependencies_recurse (install, d->ptr, allocator, resolver);
+            resolve_dependencies_recurse (install, d->ptr, package, allocator, resolver, shutup);
           }
         }
+
+        if (dependend_package)
+          di_log (DI_LOG_LEVEL_DEBUG, "install %s, dependency from %s", package->package, dependend_package->package);
 
         if (install)
           di_slist_append_chunk (install, package, allocator->slist_node_mem_chunk);
@@ -177,7 +201,7 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
         break;
 
       case di_package_type_virtual_package:
-        last_provide = NULL;
+        best_provide = NULL;
 
         for (node = package->depends.first; node; node = node->next)
         {
@@ -185,17 +209,21 @@ static void resolve_dependencies_recurse (di_slist *install, di_package *package
 
           if (d->type == di_package_dependency_type_reverse_provides)
           {
-            if (!last_provide || last_provide->priority < d->ptr->priority)
-              last_provide = d->ptr;
+            if (!best_provide || best_provide->priority < d->ptr->priority)
+              best_provide = d->ptr;
           }
         }
 
-        if (last_provide)
-          resolve_dependencies_recurse (install, last_provide, allocator, resolver);
+        if (best_provide)
+          resolve_dependencies_recurse (install, best_provide, package, allocator, resolver, shutup);
+
+        if (dependend_package && best_provide)
+          di_log (DI_LOG_LEVEL_DEBUG, "search for package resolving %s, dependency from %s", package->package, dependend_package->package);
         break;
 
       case di_package_type_non_existent:
-        di_log (DI_LOG_LEVEL_WARNING, "package %s don't exists\n", package->key.string);
+        if (!shutup)
+          di_log (DI_LOG_LEVEL_WARNING, "package %s don't exists", package->key.string);
         break;
     }
   }
@@ -230,7 +258,7 @@ di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *lis
   for (node = list->first; node; node = node->next)
   {
     di_package *p = node->data;
-    resolve_dependencies_recurse (install, p, allocator, packages->resolver);
+    resolve_dependencies_recurse (install, p, NULL, allocator, packages->resolver, 0);
   }
 
   return install;
@@ -246,7 +274,7 @@ void di_packages_resolve_dependencies_mark (di_packages *packages)
   {
     di_package *package = node->data;
     if (!(package->resolver & packages->resolver) && package->status_want == di_package_status_want_install)
-      resolve_dependencies_recurse (NULL, package, NULL, packages->resolver);
+      resolve_dependencies_recurse (NULL, package, NULL, NULL, packages->resolver, 1);
   }
 }
 

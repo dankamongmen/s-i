@@ -1,5 +1,5 @@
 /*
- * prebaseconfig.h
+ * utils.h
  *
  * Copyright (C) 2003 Bastian Blank <waldi@debian.org>
  *
@@ -17,14 +17,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: prebaseconfig.h,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: utils.h,v 1.1 2003/09/29 12:10:00 waldi Exp $
  */
 
-#ifndef DEBIAN_INSTALLER__SYSTEM__PREBASECONFIG_H
-#define DEBIAN_INSTALLER__SYSTEM__PREBASECONFIG_H
+#ifndef DEBIAN_INSTALLER__SYSTEM__UTILS_H
+#define DEBIAN_INSTALLER__SYSTEM__UTILS_H
 
-#define DI_SYSTEM_PREBASECONFIG_DIR "/usr/lib/prebaseconfig.d"
+/**
+ * @defgroup di_system_utils Utils
+ * @{
+ */
 
-int di_system_prebaseconfig_append (const char *udeb, const char *format, ...);
+void di_system_init (const char *progname);
 
+/** @} */
 #endif

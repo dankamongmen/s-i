@@ -1,8 +1,7 @@
 /*
- * prebaseconfig.c
+ * utils.c
  *
- * Copyright (C) 2000-2002 David Kimdon <dwhedon@debian.org>
- *               2003 Bastian Blank <waldi@debian.org>
+ * Copyright (C) 2003 Bastian Blank <waldi@debian.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,37 +17,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: prebaseconfig.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
+ * $Id: utils.c,v 1.1 2003/09/29 12:10:00 waldi Exp $
  */
 
-#include <debian-installer/system/prebaseconfig.h>
+#include <debian-installer/system/utils.h>
 
-#include <stdarg.h>
-#include <stdio.h>
+#include <debian-installer/log.h>
+#include <debian-installer/utils.h>
+
 #include <unistd.h>
 
-int di_system_prebaseconfig_append (const char *udeb, const char *fmt, ...)
+void di_system_init (const char *_progname)
 {
-  char path[128];
-  FILE *fp;
-  va_list ap;
-
-  if (snprintf (path, sizeof (path), DI_SYSTEM_PREBASECONFIG_DIR "/%s", udeb) == -1) 
-    return -1;
-
-  if ((fp = fopen (path, "a")) == NULL) 
-    return -1;
-
-  fputs ("\n# start entry\n", fp);
-
-  va_start(ap, fmt);
-  vfprintf(fp, fmt, ap);
-  va_end(ap);
-
-  fputs ("\n# end entry\n", fp);
-
-  fclose (fp);
-
-  return 0;
+  di_init (_progname);
+  di_log_set_handler (DI_LOG_LEVEL_MASK, di_log_handler_syslog, NULL);
 }
 

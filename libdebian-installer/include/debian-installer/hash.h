@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.h,v 1.2 2003/09/24 11:49:52 waldi Exp $
+ * $Id: hash.h,v 1.3 2003/09/29 12:10:00 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__HASH_H
@@ -26,8 +26,6 @@
 
 #include <debian-installer/mem.h>
 #include <debian-installer/types.h>
-
-typedef struct di_hash_key di_hash_key;
 
 /** 
  * @defgroup di_hash Hash functions
@@ -37,8 +35,10 @@ typedef struct di_hash_key di_hash_key;
 di_equal_func di_rstring_equal;
 di_hash_func di_rstring_hash;
 
+#if 0
 di_equal_func di_string_equal;
 di_hash_func di_string_hash;
+#endif
 
 /**
  * @defgroup di_hash_table Simple hash table

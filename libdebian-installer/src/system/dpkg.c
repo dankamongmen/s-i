@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.c,v 1.4 2003/09/26 00:18:10 waldi Exp $
+ * $Id: dpkg.c,v 1.5 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <config.h>
@@ -104,7 +104,7 @@ int di_system_dpkg_package_control_file_exec (di_packages *status, const char *_
   return internal_di_system_dpkg_package_control_file_exec (package, name, argc, argv);
 }
 
-int internal_di_system_dpkg_package_unpack_control (di_package **package, const char *filename, di_packages_allocator *allocator)
+int internal_di_system_dpkg_package_unpack_control (di_packages *status, di_package **package, const char *_package, const char *filename, di_packages_allocator *allocator)
 {
   const char *argv_rm[] = { "/bin/rm", "-rf", NULL, NULL };
   char buf[PATH_MAX];
@@ -116,7 +116,7 @@ int internal_di_system_dpkg_package_unpack_control (di_package **package, const 
   struct dirent *tmpdirent;
   struct stat statbuf;
 
-  snprintf (buf_infodir, sizeof (buf_infodir) - 10, "%s%s.", DI_SYSTEM_DPKG_INFODIR, (*package)->key.string);
+  snprintf (buf_infodir, sizeof (buf_infodir) - 10, "%s%s.", DI_SYSTEM_DPKG_INFODIR, _package);
   infodir_len = strnlen (buf_infodir, sizeof (buf_infodir));
 
   infodir_rest = buf_infodir + infodir_len;
@@ -154,23 +154,29 @@ int internal_di_system_dpkg_package_unpack_control (di_package **package, const 
       continue;
     if (strlen (tmpdirent->d_name) > (tmpdir_rest_len < infodir_rest_len ? tmpdir_rest_len : infodir_rest_len))
       continue;
+
+    strcpy (infodir_rest, tmpdirent->d_name);
+    strcpy (tmpdir_rest, tmpdirent->d_name);
+
     if (!strcmp (tmpdirent->d_name, "control"))
+    {
       if (allocator)
       {
         if (*package)
           di_package_destroy (*package);
-        *package = di_system_package_read_file (buf_tmpdir, allocator);
+        *package = di_system_package_read_file (buf_tmpdir, status, allocator);
       }
       continue;
-
-    strcpy (infodir_rest, tmpdirent->d_name);
-    strcpy (tmpdir_rest, tmpdirent->d_name);
+    }
 
     if (rename (buf_tmpdir, buf_infodir))
       return -2;
   }
 
   closedir (tmpdir);
+
+  if (chdir ("/"))
+    return -1;
 
   tmpdir_rest[0] = '\0';
   argv_rm[2] = buf_tmpdir;
@@ -182,6 +188,16 @@ int internal_di_system_dpkg_package_unpack_control (di_package **package, const 
 
 int internal_di_system_dpkg_package_unpack_data (di_package *package, const char *filename)
 {
+  char buf[PATH_MAX];
+
+  if (chdir ("/"))
+    return -1;
+
+  snprintf (buf, sizeof (buf), "ar -p %s data.tar.gz|tar -xzf -", filename);
+
+  if (di_exec_shell (buf))
+    return -2;
+
   return 0;
 }
 
@@ -190,18 +206,16 @@ int di_system_dpkg_package_unpack (di_packages *status, const char *_package, co
   di_package *package;
   int ret;
 
-  if (_package)
-  {
-    package = di_packages_get_package (status, _package, 0);
+  package = di_packages_get_package (status, _package, 0);
 
-    if (package && package->status != di_package_status_not_installed)
-      return 1;
-  }
-  else
-    package = NULL;
+  ret = internal_di_system_dpkg_package_unpack_control (status, &package, _package, filename, allocator);
+  if (ret)
+    return ret;
 
-  ret = internal_di_system_dpkg_package_unpack_control (&package, filename, allocator);
   ret = internal_di_system_dpkg_package_unpack_data (package, filename);
+
+  di_log(DI_LOG_LEVEL_INFO, "parse file: %s, get package: %s", filename, package->package);
+  di_packages_append_package (status, package, allocator);
 
   package->status = di_package_status_unpacked;
 

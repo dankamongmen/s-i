@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages_parser.c,v 1.1 2003/09/24 11:49:52 waldi Exp $
+ * $Id: packages_parser.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/packages_internal.h>
@@ -124,7 +124,21 @@ di_parser_info *di_packages_parser_info (void)
   di_parser_info *info;
 
   info = di_parser_info_alloc ();
-  di_parser_info_add_pointer (info, di_packages_parser_fieldinfo);
+  di_parser_info_add (info, di_packages_parser_fieldinfo);
+
+  return info;
+}
+
+/**
+ * @internal
+ * Get parser info for minimal Packages file
+ */
+di_parser_info *di_packages_minimal_parser_info (void)
+{
+  di_parser_info *info;
+
+  info = di_parser_info_alloc ();
+  di_parser_info_add (info, di_packages_minimal_parser_fieldinfo);
 
   return info;
 }
@@ -138,7 +152,7 @@ di_parser_info *di_packages_status_parser_info (void)
   di_parser_info *info;
 
   info = di_parser_info_alloc ();
-  di_parser_info_add_pointer (info, di_packages_status_parser_fieldinfo);
+  di_parser_info_add (info, di_packages_status_parser_fieldinfo);
 
   return info;
 }
@@ -191,8 +205,13 @@ void *internal_di_packages_parser_write_entry_next (void **state_data, void *use
   if (!*state_data)
   {
     di_packages *p = user_data;
-    *state_data = p->list.first;
-    return p->list.first->data;
+    if (p->list.first)
+    {
+      *state_data = p->list.first;
+      return p->list.first->data;
+    }
+    else
+      return NULL;
   }
   else
   {

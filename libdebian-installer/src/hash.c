@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.c,v 1.2 2003/09/24 11:49:52 waldi Exp $
+ * $Id: hash.c,v 1.3 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/hash.h>
@@ -141,7 +141,7 @@ di_hash_table *di_hash_table_new (di_hash_func hash_func, di_equal_func key_equa
 di_hash_table *di_hash_table_new_full (di_hash_func hash_func, di_equal_func key_equal_func, di_destroy_notify key_destroy_func, di_destroy_notify value_destroy_func)
 {
   di_hash_table *hash_table;
-  unsigned int i;
+  di_ksize_t i;
 
   hash_table = di_new (di_hash_table, 1);
   hash_table->size               = HASH_TABLE_MIN_SIZE;
@@ -170,7 +170,7 @@ di_hash_table *di_hash_table_new_full (di_hash_func hash_func, di_equal_func key
  */
 void di_hash_table_destroy (di_hash_table *hash_table)
 {
-  unsigned int i;
+  di_ksize_t i;
 
   for (i = 0; i < hash_table->size; i++)
     di_hash_nodes_destroy (hash_table->nodes[i], hash_table->key_destroy_func, hash_table->value_destroy_func);

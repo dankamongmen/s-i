@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: slist.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: slist.h,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SLIST_H
@@ -58,7 +58,6 @@ void di_slist_append (di_slist *slist, void *data) __attribute__ ((nonnull(1)));
 void di_slist_append_chunk (di_slist *slist, void *data, di_mem_chunk *mem_chunk) __attribute__ ((nonnull(1,3)));
 void di_slist_prepend (di_slist *slist, void *data) __attribute__ ((nonnull(1)));
 void di_slist_prepend_chunk (di_slist *slist, void *data, di_mem_chunk *mem_chunk) __attribute__ ((nonnull(1,3)));
-void di_slist_foreach (di_slist *slist, di_func *func, void *user_data);
 
 /** @} */
 #endif

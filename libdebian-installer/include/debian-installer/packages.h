@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.5 2003/09/28 00:16:49 waldi Exp $
+ * $Id: packages.h,v 1.6 2003/09/29 12:10:00 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGES_H
@@ -59,7 +59,6 @@ struct di_packages_allocator
 {
   di_mem_chunk *package_mem_chunk;                      /**< @internal */
   di_mem_chunk *package_dependency_mem_chunk;           /**< @internal */
-  di_mem_chunk *package_description_mem_chunk;          /**< @internal */
   di_mem_chunk *slist_node_mem_chunk;                   /**< @internal */
 };
 

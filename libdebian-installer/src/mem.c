@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: mem.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: mem.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/mem.h>
@@ -167,8 +167,7 @@ di_mem_chunk* di_mem_chunk_new (di_ksize_t atom_size, di_ksize_t area_size)
   if (mem_chunk->atom_size % MEM_ALIGN)
     mem_chunk->atom_size += MEM_ALIGN - (mem_chunk->atom_size % MEM_ALIGN);
 
-  mem_chunk->rarea_size = area_size + sizeof (di_mem_area) - MEM_AREA_SIZE;
-  mem_chunk->rarea_size = di_mem_chunk_compute_size (mem_chunk->rarea_size, atom_size + sizeof (di_mem_area) - MEM_AREA_SIZE);
+  mem_chunk->rarea_size = di_mem_chunk_compute_size (area_size + sizeof (di_mem_area) - MEM_AREA_SIZE, atom_size + sizeof (di_mem_area) - MEM_AREA_SIZE);
   mem_chunk->area_size = mem_chunk->rarea_size - (sizeof (di_mem_area) - MEM_AREA_SIZE);
 
   return mem_chunk;

@@ -2,7 +2,6 @@
 #include <debian-installer/hash.h>
 #include <debian-installer/list.h>
 #include <debian-installer/log.h>
-#include <debian-installer/macros.h>
 #include <debian-installer/mem.h>
 #include <debian-installer/parser.h>
 #include <debian-installer/parser_rfc822.h>
@@ -17,4 +16,5 @@
 #include <debian-installer/system/dpkg.h>
 #include <debian-installer/system/packages.h>
 #include <debian-installer/system/prebaseconfig.h>
+#include <debian-installer/system/utils.h>
 

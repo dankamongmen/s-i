@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.c,v 1.1 2003/09/24 11:49:52 waldi Exp $
+ * $Id: package.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -33,8 +33,6 @@ void internal_di_package_destroy_func (void *data)
 
 void di_package_destroy (di_package *package)
 {
-  di_slist_node *node;
-
   di_free (package->key.string);
   di_free (package->section);
   di_free (package->maintainer);
@@ -42,15 +40,8 @@ void di_package_destroy (di_package *package)
   di_free (package->version);
   di_free (package->filename);
   di_free (package->md5sum);
-
-  for (node = package->descriptions.first; node; node = node->next)
-  {
-    di_package_description *d = node->data;
-    di_free (d->language);
-    di_free (d->short_description);
-    di_free (d->description);
-    memset (d, 0, sizeof (di_package_description));
-  }
+  di_free (package->short_description);
+  di_free (package->description);
 
   memset (package, 0, sizeof (di_package));
 }
@@ -58,26 +49,6 @@ void di_package_destroy (di_package *package)
 void di_package_version_free (di_package_version *version)
 {
   di_free (version);
-}
-
-di_package_description *di_package_get_description (di_package *package, const char *language)
-{
-  di_slist_node *node;
-  di_package_description *d, *common = NULL;
-
-  for (node = package->descriptions.first; node; node = node->next)
-  {
-    d = node->data;
-    if (d->language)
-    {
-      if (language && !strcmp (d->language, language))
-        return d;
-    }
-    else
-      common = d;
-  }
-
-  return common;
 }
 
 #define order(x) ((x) == '~' ? -1 \

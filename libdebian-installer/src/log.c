@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: log.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: log.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/log.h>
@@ -57,75 +57,63 @@ static di_slist handlers;
 
 void mklevel_prefix (char *level_prefix, di_log_level_flags log_level)
 {
+  char *prefix = NULL;
+  char buf[16];
+
   switch (log_level & DI_LOG_LEVEL_MASK)
   {
     case DI_LOG_LEVEL_ERROR:
-      strcat (level_prefix, "ERROR");
+      prefix = "ERROR";
       break;
     case DI_LOG_LEVEL_CRITICAL:
-      strcat (level_prefix, "CRITICAL");
+      prefix = "CRITICAL";
       break;
     case DI_LOG_LEVEL_WARNING:
-      strcat (level_prefix, "WARNING");
+      prefix = "WARNING";
       break;
     case DI_LOG_LEVEL_MESSAGE:
-      strcat (level_prefix, "Message");
+      prefix = "Message";
       break;
     case DI_LOG_LEVEL_INFO:
-      strcat (level_prefix, "INFO");
+      prefix = "INFO";
       break;
     case DI_LOG_LEVEL_DEBUG:
-      strcat (level_prefix, "DEBUG");
+      prefix = "DEBUG";
       break;
     case DI_LOG_LEVEL_OUTPUT:
       return;
     default:
       if (log_level)
       {
-        char buf[16];
-        strcat (level_prefix, "LOG-");
-        sprintf (buf, "%u", log_level & DI_LOG_LEVEL_MASK);
-        strcat (level_prefix, buf);
+        snprintf (buf, sizeof (buf), "LOG-%u", log_level & DI_LOG_LEVEL_MASK);
+        prefix = buf;
       }
       else
-        strcat (level_prefix, "LOG");
+        prefix = "LOG";
       break;
   }
 
-  if (log_level & ALERT_LEVELS)
-    strcat (level_prefix, " **");
-  strcat (level_prefix, ": ");
+  strcpy (level_prefix, prefix);
+  strcat (level_prefix, log_level & ALERT_LEVELS ? " **: " : ": ");
 }
 
 static void di_log_handler_default (di_log_level_flags log_level, const char *message, void *user_data __attribute__ ((unused)))
 {
-  char buf[1280] = { '\0' };
+  char buf[1280];
   const char *progname = di_progname_get ();
 
-  if (!progname)
-    sprintf (buf, "(process:%lu): ", (unsigned long) getpid ());
-  else
-    sprintf (buf, "(%s:%lu): ", progname, (unsigned long) getpid ());
-
+  snprintf (buf, sizeof (buf), "(%s:%lu): ", progname ? progname : "process", (unsigned long) getpid ());
   mklevel_prefix (buf, log_level);
-
-  if (message)
-    strcat (buf, message);
-  else
-    strcat (buf, "(NULL)");
-
+  strcat (buf, message ? message : "(NULL)");
   strcat (buf, "\n");
 
-  if (log_level & ALERT_LEVELS)
-    fputs (buf, stderr);
-  else
-    fputs (buf, stdout);
+  fputs (buf, log_level & ALERT_LEVELS ? stderr : stdout);
 }
 
 void di_log_handler_syslog (di_log_level_flags log_level, const char *message, void *user_data __attribute__ ((unused)))
 {
-  char buf[1280] = { '\0' };
-  static char ident_buf[129];
+  char buf[1280];
+  static char ident_buf[128];
   static int log_open;
   int syslog_level;
 
@@ -136,10 +124,7 @@ void di_log_handler_syslog (di_log_level_flags log_level, const char *message, v
     else
     {
       const char *progname = di_progname_get ();
-      if (!progname)
-        snprintf (ident_buf, 128, "process[%lu]", (unsigned long) getpid ());
-      else
-        snprintf (ident_buf, 128, "%s[%lu]", progname, (unsigned long) getpid ());
+      snprintf (ident_buf, sizeof (ident_buf), "%s[%lu]", progname ? progname : "process", (unsigned long) getpid ());
     }
 
     openlog (ident_buf, 0, LOG_USER);
@@ -147,13 +132,7 @@ void di_log_handler_syslog (di_log_level_flags log_level, const char *message, v
   }
 
   mklevel_prefix (buf, log_level);
-  strcat (buf, ": ");
-
-  if (message)
-    strcat (buf, message);
-  else
-    strcat (buf, "(NULL)");
-
+  strcat (buf, message ? message : "(NULL)");
   strcat (buf, "\n");
 
   switch (log_level)
@@ -228,12 +207,12 @@ void di_log (di_log_level_flags log_level, const char *format, ...)
 
 void di_logv (di_log_level_flags log_level, const char *format, va_list args)
 {
-  char buf[1025];
+  char buf[1024];
   int fatal = log_level & DI_LOG_FATAL_MASK;
   di_log_handler *log_func;
   void *user_data;
 
-  vsnprintf (buf, 1024, format, args);
+  vsnprintf (buf, sizeof (buf), format, args);
 
   log_func = di_log_get_handler (log_level, &user_data);
 

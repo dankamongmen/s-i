@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: utils.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: utils.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/utils.h>
@@ -34,6 +34,3 @@ const char *di_progname_get (void)
   return progname;
 }
 
-void internal_di_test (void)
-{
-}

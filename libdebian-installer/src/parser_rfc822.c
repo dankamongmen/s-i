@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser_rfc822.c,v 1.3 2003/09/24 11:49:52 waldi Exp $
+ * $Id: parser_rfc822.c,v 1.4 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <config.h>
@@ -51,14 +51,25 @@
 int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_parser_read_entry_new entry_new, di_parser_read_entry_finish entry_finish, void *user_data)
 {
   char *cur, *end;
-  char *field_begin, *field_end, *field_modifier_begin, *field_modifier_end, *value_begin, *value_end;
+  char *field_begin, *field_end;
+#if MODIFIER
+  char *field_modifier_begin, *field_modifier_end;
+#endif
+  char *value_begin, *value_end;
 #ifndef HAVE_MEMRCHR
   char *temp;
 #endif
   int nr = 0;
-  size_t readsize, field_size, field_modifier_size, value_size;
+  size_t readsize;
+  size_t field_size;
+#if MODIFIER
+  size_t field_modifier_size;
+#endif
+  size_t value_size;
   const di_parser_fieldinfo *fip = NULL;
-  di_rstring field_string, field_modifier_string, value_string;
+  di_rstring field_string;
+  di_rstring field_modifier_string;
+  di_rstring value_string;
   void *act = NULL;
 
   cur = begin;
@@ -79,7 +90,10 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
       readsize = end - field_begin < READSIZE ? end - field_begin : READSIZE;
       if (!readsize)
         break;
-      field_modifier_end = field_end = memchr (cur, ':', readsize);
+      field_end = memchr (cur, ':', readsize);
+#if MODIFIER
+      field_modifier_end = field_end;
+#endif
       if (!field_end)
       {
         di_warning ("parser_rfc822: Iek! Don't find end of field!");
@@ -87,6 +101,7 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
       }
       field_size = field_end - field_begin;
 
+#if MODIFIER
 #ifdef HAVE_MEMRCHR
       if ((field_modifier_begin = memrchr (field_begin, '-', field_end - field_begin)))
         field_modifier_begin++;
@@ -105,6 +120,7 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
         field_modifier_begin = 0;
         field_modifier_size = 0;
       }
+#endif
 
       value_begin = field_end + 1;
       while (value_begin < end && isspace (*++value_begin));
@@ -137,6 +153,7 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
       if (fip)
         fip->read (&act, fip, NULL, &value_string, user_data);
 
+#if MODIFIER
       if (info->wildcard)
         goto wildcard;
       else if (!info->modifier)
@@ -153,11 +170,14 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
 
         fip->read (&act, fip, &field_modifier_string, &value_string, user_data);
       }
+#endif
 
       if (!info->wildcard)
         goto next;
 
+#if MODIFIER
 wildcard:
+#endif
       field_string.size = 0;
 
       fip = di_hash_table_lookup (info->table, &field_string);
@@ -207,6 +227,8 @@ int di_parser_rfc822_read_file (const char *file, di_parser_info *info, di_parse
     return -1;
   if (fstat (fd, &statbuf))
     return -1;
+  if (!statbuf.st_size)
+    return 0;
   if (!(begin = mmap (NULL, statbuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0)))
     return -1;
   madvise (begin, statbuf.st_size, MADV_SEQUENTIAL);
@@ -245,12 +267,16 @@ int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_pars
   void *act = NULL, *state_data = NULL;
   di_slist_node *node;
   FILE *f;
+  char tmpfile[1024] = { '\0' };
 
 
   if (!strncmp (file, "-", 1))
     f = stdout;
   else
-    f = fopen (file, "w");
+  {
+    snprintf (tmpfile, 1024, "%s.tmp", file);
+    f = fopen (tmpfile, "w");
+  }
 
   if (!f)
     return -1;
@@ -266,17 +292,18 @@ int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_pars
     for (node = info->list.first; node; node = node->next)
     {
       fip = node->data;
-
       if (fip->write)
-      {
         fip->write (&act, fip, callback, f, user_data);
-      }
     }
     fputs ("\n", f);
   }
 
-  if (strncmp (file, "-", 1))
+  if (*tmpfile)
+  {
     fclose (f);
+    if (rename (tmpfile, file))
+      return -1;
+  }
 
   return nr;
 }

@@ -7,5 +7,6 @@ libsystem_la_SOURCES = \
 	devfs.c \
 	dpkg.c \
 	packages.c \
-	prebaseconfig.c
+	prebaseconfig.c \
+	utils.c
 

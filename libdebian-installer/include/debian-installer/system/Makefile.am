@@ -4,5 +4,6 @@ realinclude_HEADERS = \
 	devfs.h \
 	dpkg.h \
 	packages.h \
-	prebaseconfig.h
+	prebaseconfig.h \
+	utils.h
 

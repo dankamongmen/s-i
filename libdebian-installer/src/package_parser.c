@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package_parser.c,v 1.1 2003/09/24 11:49:52 waldi Exp $
+ * $Id: package_parser.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/package_internal.h>
@@ -41,7 +41,7 @@ const di_parser_fieldinfo
     DI_PARSER_FIELDINFO
     (
       "Package",
-      di_parser_read_string,
+      di_package_parser_read_name,
       di_parser_write_string,
       offsetof (di_package, package)
     ),
@@ -202,8 +202,8 @@ const di_parser_fieldinfo
     (
       "Description",
       di_package_parser_read_description,
-      NULL,
-      0
+      di_package_parser_write_description,
+      
     );
 
 /**
@@ -239,6 +239,7 @@ const di_parser_fieldinfo *di_package_parser_fieldinfo[] =
 void *internal_di_package_parser_new (void *user_data)
 {
   internal_di_package_parser_data *parser_data = user_data;
+  parser_data->package = di_package_alloc (parser_data->allocator);
   return parser_data->package;
 }
 
@@ -248,20 +249,15 @@ void *internal_di_package_parser_new (void *user_data)
  * @param file file to read
  * @param info parser info
  */
-di_package *di_package_special_read_file (const char *file, di_packages_allocator *allocator, di_parser_info *(get_info) (void))
+di_package *di_package_special_read_file (const char *file, di_packages *packages, di_packages_allocator *allocator, di_parser_info *(get_info) (void))
 {
   di_parser_info *info = get_info ();
   internal_di_package_parser_data data;
 
   data.allocator = allocator;
-  data.packages = NULL;
-  data.package = di_mem_chunk_alloc (allocator->package_mem_chunk);
+  data.packages = packages;
 
-  if (di_parser_rfc822_read_file (file, info, internal_di_package_parser_new, NULL, &data) < 0)
-  {
-    di_packages_free (data.packages);
-    data.package = NULL;
-  }
+  di_parser_rfc822_read_file (file, info, internal_di_package_parser_new, NULL, &data);
 
   di_parser_info_free (info);
 
@@ -291,7 +287,7 @@ void di_package_parser_read_dependency (data, fip, field_modifier, value, user_d
     namebegin = cur;
     namelen = strcspn (cur, " \t\n(,|");
 
-    d = di_mem_chunk_alloc0 (parser_data->allocator->package_dependency_mem_chunk);
+    d = di_package_dependency_alloc (parser_data->allocator);
 
     if (parser_data->packages)
     {
@@ -311,7 +307,7 @@ void di_package_parser_read_dependency (data, fip, field_modifier, value, user_d
       if (q->type == di_package_type_virtual_package && q->priority < p->priority)
         q->priority = p->priority;
 
-      d1 = di_mem_chunk_alloc0 (parser_data->allocator->package_dependency_mem_chunk);
+      d1 = di_package_dependency_alloc (parser_data->allocator);
       d1->ptr = p;
       if (d->type == di_package_dependency_type_provides)
         d1->type = di_package_dependency_type_reverse_provides;
@@ -333,6 +329,40 @@ void di_package_parser_write_dependency (data, fip, callback, callback_data, use
   void *callback_data;
   void *user_data __attribute__ ((unused));
 {
+  di_package *p = *data;
+  di_slist_node *node;
+  di_rstring value = { NULL, 0 };
+  di_ksize_t value_size = 0, value_size_needed;
+
+  for (node = p->depends.first; node; node = node->next)
+  {
+    di_package_dependency *d = node->data;
+
+    if (d->type == fip->integer && d->ptr)
+    {
+      di_ksize_t size = strlen (d->ptr->package);
+      if (value.size)
+        value_size_needed = size + 2;
+      else
+        value_size_needed = size;
+      if (value.size + value_size_needed > value_size)
+      {
+        int new_value_size = value_size + 1024;
+        value.string = di_renew (char, value.string, new_value_size);
+        value.string[value_size] = 0;
+        value_size = new_value_size;
+      }
+      if (value.size)
+        strcat (value.string, ", ");
+      strcat (value.string, d->ptr->package);
+      value.size += value_size_needed;
+    }
+  }
+
+  if (value.size)
+    callback (&fip->key, &value, callback_data);
+
+  di_free (value.string);
 }
 
 void di_package_parser_read_description (data, fip, field_modifier, value, user_data)
@@ -342,24 +372,17 @@ void di_package_parser_read_description (data, fip, field_modifier, value, user_
   di_rstring *value;
   void *user_data __attribute__ ((unused));
 {
-  internal_di_package_parser_data *parser_data = user_data;
   di_package *p = *data;
-  di_package_description *d = di_package_description_alloc (parser_data->allocator);
   char *temp;
-
-  if (field_modifier)
-    d->language = di_stradup (field_modifier->string, field_modifier->size);
 
   temp = memchr (value->string, '\n', value->size);
   if (temp)
   {
-    d->short_description = di_stradup (value->string, temp - value->string - 1);
-    d->description = di_stradup (temp, (value->string + value->size) - temp - 1);
+    p->short_description = di_stradup (value->string, temp - value->string - 1);
+    p->description = di_stradup (temp, (value->string + value->size) - temp - 1);
   }
   else
-    d->short_description = di_stradup (value->string, value->size);
-
-  di_slist_append_chunk (&p->descriptions, d, parser_data->allocator->slist_node_mem_chunk);
+    p->short_description = di_stradup (value->string, value->size);
 }
 
 void di_package_parser_write_description (data, fip, callback, callback_data, user_data)
@@ -369,14 +392,27 @@ void di_package_parser_write_description (data, fip, callback, callback_data, us
   void *callback_data;
   void *user_data __attribute__ ((unused));
 {
-  internal_di_package_parser_data *parser_data = user_data;
   di_package *p = *data;
-  di_slist_node *node;
+  di_rstring value;
 
-  for (node = p->descriptions.first; node; node = node->next)
-  {
-    di_package_description *d = node->data;
-  }
+  value.size = strlen (p->short_description) + strlen (p->description) + 2;
+  value.string = di_malloc (value.size);
+  snprintf (value.string, value.size, "%s\n%s", p->short_description, p->description);
+  callback (&fip->key, &value, callback_data);
+  di_free (value.string);
+}
+
+void di_package_parser_read_name (data, fip, field_modifier, value, user_data)
+  void **data;
+  const di_parser_fieldinfo *fip __attribute__ ((unused));
+  di_rstring *field_modifier __attribute__ ((unused));
+  di_rstring *value;
+  void *user_data __attribute__ ((unused));
+{
+  di_package *p = *data;
+  p->key.string = di_stradup (value->string, value->size);
+  p->key.size = value->size;
+  p->type = di_package_type_real_package;
 }
 
 struct nr_to_string

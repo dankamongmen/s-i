@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.h,v 1.4 2003/09/28 00:16:49 waldi Exp $
+ * $Id: packages.h,v 1.5 2003/09/29 12:10:00 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__SYSTEM__PACKAGES_H
@@ -40,7 +40,10 @@ struct di_system_package
 {
   di_package p;
   int installer_menu_item;
+  char *subarchitecture;
 };
+
+void di_system_package_destroy (di_system_package *package);
 
 di_packages *di_system_packages_alloc (void);
 di_packages_allocator *di_system_packages_allocator_alloc (void);

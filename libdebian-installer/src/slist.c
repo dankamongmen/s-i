@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: slist.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: slist.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/slist.h>
@@ -129,6 +129,7 @@ void di_slist_prepend_chunk (di_slist *slist, void *data, di_mem_chunk *mem_chun
  * @param func this is called with every list item
  * @param user_data user_data
  */
+#if 0
 void di_slist_foreach (di_slist *slist, di_func *func, void *user_data)
 {
   di_slist_node *node;
@@ -136,3 +137,4 @@ void di_slist_foreach (di_slist *slist, di_func *func, void *user_data)
   for (node = slist->first; node; node = node->next)
     func (node->data, user_data);
 }
+#endif

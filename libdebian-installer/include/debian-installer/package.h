@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: package.h,v 1.2 2003/09/28 00:16:49 waldi Exp $
+ * $Id: package.h,v 1.3 2003/09/29 12:10:00 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGE_H
@@ -30,7 +30,6 @@
 
 typedef struct di_package di_package;
 typedef struct di_package_dependency di_package_dependency;
-typedef struct di_package_description di_package_description;
 typedef struct di_package_version di_package_version;
 
 typedef enum di_package_dependency_type di_package_dependency_type;
@@ -116,7 +115,8 @@ struct di_package
   char *filename;                                       /**< Filename field */
   size_t size;                                          /**< Size field */
   char *md5sum;                                         /**< MD5Sum field */
-  di_slist descriptions;                                /**< Description fields */
+  char *short_description;                              /**< Description field, first part*/
+  char *description;                                    /**< Description field, second part */
   unsigned int resolver;                                /**< @internal */
 };
 
@@ -147,16 +147,6 @@ struct di_package_dependency
 };
 
 /**
- * @brief Package description
- */
-struct di_package_description
-{
-  char *language;                                       /**< language for description, "" for default */
-  char *short_description;                              /**< description */
-  char *description;                                    /**< description */
-};
-
-/**
  * @brief Package version
  */
 struct di_package_version
@@ -178,14 +168,7 @@ static inline di_package_dependency *di_package_dependency_alloc (di_packages_al
   return di_mem_chunk_alloc0 (allocator->package_dependency_mem_chunk);
 }
 
-static inline di_package_description *di_package_description_alloc (di_packages_allocator *allocator)
-{
-  return di_mem_chunk_alloc0 (allocator->package_description_mem_chunk);
-}
-
 void di_package_version_free (di_package_version *version);
-
-di_package_description *di_package_get_description (di_package *package, const char *language);
 
 int di_package_version_compare (const di_package_version *a, const di_package_version *b);
 di_package_version *di_package_version_parse (di_package *package);

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.4 2003/09/26 00:18:10 waldi Exp $
+ * $Id: packages.c,v 1.5 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/system/packages.h>
@@ -41,6 +41,18 @@ const di_parser_fieldinfo *di_system_package_parser_fieldinfo[] =
   NULL
 };
 
+void internal_di_system_package_destroy_func (void *data)
+{
+  di_system_package_destroy (data);
+}
+
+void di_system_package_destroy (di_system_package *package)
+{
+  di_free (package->subarchitecture);
+
+  di_package_destroy (&package->p);
+}
+
 di_packages_allocator *di_system_packages_allocator_alloc (void)
 {
   di_packages_allocator *ret;
@@ -51,13 +63,23 @@ di_packages_allocator *di_system_packages_allocator_alloc (void)
   return ret;
 }
 
+di_packages *di_system_packages_alloc (void)
+{
+  di_packages *ret;
+
+  ret = di_new0 (di_packages, 1);
+  ret->table = di_hash_table_new_full (di_rstring_hash, di_rstring_equal, NULL, internal_di_system_package_destroy_func);
+
+  return ret;
+}
+
 di_parser_info *di_system_package_parser_info (void)
 {
   di_parser_info *info;
 
   info = di_parser_info_alloc ();
-  di_parser_info_add_pointer (info, di_package_parser_fieldinfo);
-  di_parser_info_add_pointer (info, di_system_package_parser_fieldinfo);
+  di_parser_info_add (info, di_package_parser_fieldinfo);
+  di_parser_info_add (info, di_system_package_parser_fieldinfo);
 
   return info;
 }
@@ -67,8 +89,8 @@ di_parser_info *di_system_packages_parser_info (void)
   di_parser_info *info;
 
   info = di_parser_info_alloc ();
-  di_parser_info_add_pointer (info, di_packages_parser_fieldinfo);
-  di_parser_info_add_pointer (info, di_system_package_parser_fieldinfo);
+  di_parser_info_add (info, di_packages_parser_fieldinfo);
+  di_parser_info_add (info, di_system_package_parser_fieldinfo);
 
   return info;
 }
@@ -78,8 +100,8 @@ di_parser_info *di_system_packages_status_parser_info (void)
   di_parser_info *info;
 
   info = di_parser_info_alloc ();
-  di_parser_info_add_pointer (info, di_packages_status_parser_fieldinfo);
-  di_parser_info_add_pointer (info, di_system_package_parser_fieldinfo);
+  di_parser_info_add (info, di_packages_status_parser_fieldinfo);
+  di_parser_info_add (info, di_system_package_parser_fieldinfo);
 
   return info;
 }

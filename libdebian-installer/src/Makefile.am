@@ -8,7 +8,6 @@ lib_LTLIBRARIES = libdebian-installer.la
 libdebian_installer_la_SOURCES = \
 	exec.c \
 	hash.c \
-	list.c \
 	log.c \
 	mem.c \
 	package.c \
@@ -21,6 +20,7 @@ libdebian_installer_la_SOURCES = \
 	slist.c \
 	string.c \
 	utils.c
+#	list.c
 
 libdebian_installer_la_LIBADD = \
 	system/libsystem.la

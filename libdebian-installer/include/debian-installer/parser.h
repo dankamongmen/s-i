@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: parser.h,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PARSER_H
@@ -140,8 +140,7 @@ di_parser_fields_function_write
 di_parser_info *di_parser_info_alloc (void);
 void di_parser_info_free (di_parser_info *info);
 
-void di_parser_info_add (di_parser_info *info, di_parser_fieldinfo fieldinfo[]);
-void di_parser_info_add_pointer (di_parser_info *info, const di_parser_fieldinfo *fieldinfo[]);
+void di_parser_info_add (di_parser_info *info, const di_parser_fieldinfo *fieldinfo[]);
 
 /** @} */
 #endif

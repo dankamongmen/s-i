@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: parser.c,v 1.2 2003/09/29 12:10:00 waldi Exp $
  */
 
 #include <debian-installer/parser.h>
@@ -44,18 +44,7 @@ void di_parser_info_free (di_parser_info *info)
   di_free (info);
 }
 
-void di_parser_info_add (di_parser_info *info, di_parser_fieldinfo fieldinfo[])
-{
-  di_parser_fieldinfo *fip;
-
-  for (fip = fieldinfo; fip->key.string; fip++)
-  {
-    di_hash_table_insert (info->table, &fip->key, fip);
-    di_slist_append (&info->list, fip);
-  }
-}
-
-void di_parser_info_add_pointer (di_parser_info *info, const di_parser_fieldinfo *fieldinfo[])
+void di_parser_info_add (di_parser_info *info, const di_parser_fieldinfo *fieldinfo[])
 {
   di_parser_fieldinfo **fip;
 
