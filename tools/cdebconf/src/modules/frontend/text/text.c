@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.12 2002/07/09 05:25:05 tausq Exp $
+ * $Id: text.c,v 1.13 2002/08/07 16:19:51 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -305,6 +305,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 
 	count = strchoicesplit(question_choices(q), choices, DIM(choices));
 	strchoicesplit(question_choices_translated(q), choices_translated, DIM(choices_translated));
+        /* fprintf(stderr,"In texthandler_select, count is: %d\n", count);*/
 	if (count > 1)
 	{
 		if (defval != NULL)
@@ -441,9 +442,14 @@ static int text_go(struct frontend *obj)
 
 	for (; q != 0; q = q->next)
 	{
+                struct template *t = obj->tdb->methods.get(obj->tdb, q->tag);
+                template_deref(q->template);
+                q->template = t;
+
 		for (i = 0; i < DIM(question_handlers); i++)
 			if (strcmp(q->template->type, question_handlers[i].type) == 0)
 			{
+
 				texthandler_displaydesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
 				if (ret == DC_OK)
