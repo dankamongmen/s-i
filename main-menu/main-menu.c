@@ -488,17 +488,21 @@ static void modify_debconf_priority (int raise_or_lower) {
 }
 	
 static void adjust_default_priority (void) {
-	int pri;
+	int pri, i;
 	const char *template = "debconf/priority";
-	debconf_get(debconf,  template);	
-	if ( ! debconf->value )
-		pri = 1;
-	else
-	    for (pri = 0; (size_t)pri < ARRAY_SIZE(debconf_priorities); ++pri) {
-		if (0 == strcmp(debconf->value,
-				debconf_priorities[pri]) )
-		    break;
+	debconf_get(debconf,  template);
+
+	pri = 1;
+	if ( debconf->value ) {
+	    for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
+			if (0 == strcmp(debconf->value,
+					debconf_priorities[i]) ) {
+				pri = i;
+		    	break;
+			}
 	    }
+	}
+	
 	if ( pri != local_priority ) {
 		di_log(DI_LOG_LEVEL_INFO, "Priority changed externally, setting main-menu default to '%s'",
 			debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
