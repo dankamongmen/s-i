@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_di_gencontrol - generate and install control file
+
+=cut
+
+use strict;
+use warnings;
+
+use Debian::Debhelper::Dh_Lib;
+use Debian::Installer;
+
+=head1 SYNOPSIS
+
+B<dh_di_gencontrol> [S<I<debhelper options>>] [S<I<dh_gencontrol options>>]
+
+=head1 DESCRIPTION
+
+Wrappers arround the dh_gencontrol command. It sets the right filename for the
+packages depending on the type and strips away a possible .udeb suffix from the
+packagename.
+
+=cut
+
+my @args = Debian::Installer::fixup_arguments(@ARGV);
+
+init();
+
+my %packages = Debian::Installer::control();
+my @args2 = Debian::Installer::packages_args ("deb", \%packages, @{$dh{DOPACKAGES}});
+doit ("dh_gencontrol", @args, @args2) if @args2;
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+  next if $packages{$package}->{type} ne "udeb";
+  @args2 = ();
+  push @args2, "-n" . $packages{$package}->{filename};
+  push @args2, "-DPackage=" . $packages{$package}->{real_package} if $package ne $packages{$package}->{real_package};
+  doit ("dh_gencontrol", @args, "-p", $package, "--", @args2);
+}
+
+=head1 SEE ALSO
+
+L<dh_gencontrol(1)>
+L<debhelper(7)>
+
+=head1 AUTHOR
+
+Bastian Blank <waldi@debian.org>
+
+=cut
+

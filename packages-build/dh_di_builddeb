@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_di_builddeb - build debian packages
+
+=cut
+
+use strict;
+use warnings;
+
+use Debian::Debhelper::Dh_Lib;
+use Debian::Installer;
+
+=head1 SYNOPSIS
+
+B<dh_di_builddeb> [S<I<debhelper options>>] [S<I<dh_builddeb options>>]
+
+=head1 DESCRIPTION
+
+Wrappers arround the dh_builddeb command. It sets the right filename for the
+files depending on the type and strips away a possible .udeb suffix from the
+filename.
+
+=cut
+
+my @args = Debian::Installer::fixup_arguments(@ARGV);
+
+init();
+
+my %packages = Debian::Installer::control();
+my @args2 = Debian::Installer::packages_args ("deb", \%packages, @{$dh{DOPACKAGES}});
+doit ("dh_builddeb", @args, @args2) if @args2;
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+  next if $packages{$package}->{type} ne "udeb";
+  @args2 = ();
+  push @args2, "--filename=" . $packages{$package}->{filename};
+  doit ("dh_builddeb", @args, "-p", $package, @args2);
+}
+
+=head1 SEE ALSO
+
+L<dh_builddeb(1)>
+L<debhelper(7)>
+
+=head1 AUTHOR
+
+Bastian Blank <waldi@debian.org>
+
+=cut
+
