@@ -1,18 +1,6 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
-
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
 
 PACKAGES=$(shell dh_listpackages)
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-#FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 
 build: build-stamp
 build-stamp:
@@ -52,19 +40,15 @@ install: build
 
 # Build architecture-dependent files here.
 binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol -- -fdebian/files~
-	for p in $(PACKAGES); do \
-	    FILENAME=$${p}_$(VERSION)_$(ARCH).udeb; \
-	    dpkg-distaddfile $$FILENAME debian-installer $(PRIORITY); \
-	    dh_builddeb -p$${p} --filename=$$FILENAME; \
-	done
+	dh_testdir -s
+	dh_testroot -s
+	dh_installdebconf -s
+	dh_compress -s 
+	dh_fixperms -s
+	dh_installdeb -s
+	dh_shlibdeps -s
+	dh_gencontrol -s
+	dh_builddeb -s
 
 binary: binary-arch
 .PHONY: build clean binary-arch binary install
