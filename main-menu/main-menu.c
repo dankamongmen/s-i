@@ -110,9 +110,10 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	static struct debconfclient *debconf = NULL;
 	char *language = NULL;
 	struct package_t **package_list, *p, *head = NULL, *tail = NULL;
+        struct package_t *menudefault = NULL;
 	struct language_description *langdesc;
 	int i = 0, num = 0;
-	char *s, *menudefault = NULL;
+	char *s;
 	char menutext[1024];
 
 	if (! debconf)
@@ -174,8 +175,15 @@ struct package_t *show_main_menu(struct package_t *packages) {
 			*s++ = ',';
 			*s++ = ' ';
 
-			if (! menudefault && isdefault(p))
-				menudefault = p->description;
+			if (isdefault(p)) {
+                          if (menudefault) {
+                            if (menudefault->installer_menu_item > p->installer_menu_item) {
+                              menudefault = p;
+                            }
+                          } else {
+                            menudefault = p;
+                          }
+                        }
 		}
 	}
 	/* Trim trailing ", " */
@@ -187,11 +195,11 @@ struct package_t *show_main_menu(struct package_t *packages) {
 	/* Make debconf show the menu and get the user's choice. */
         debconf->command(debconf, "TITLE", "Debian Installer Main Menu", NULL);
 	if (menudefault)
-		debconf->command(debconf, "SET", MAIN_MENU, menudefault, NULL);
+		debconf->command(debconf, "SET", MAIN_MENU, menudefault->description, NULL);
 	debconf->command(debconf, "FSET", MAIN_MENU, "seen", "false", NULL);
 	debconf->command(debconf, "SUBST", MAIN_MENU, "MENU", menutext, NULL);
 	if (menudefault)
-		debconf->command(debconf, "SUBST", MAIN_MENU, "DEFAULT", menudefault, NULL);
+		debconf->command(debconf, "SUBST", MAIN_MENU, "DEFAULT", menudefault->description, NULL);
 	debconf->command(debconf, "INPUT medium", MAIN_MENU, NULL);
 	debconf->command(debconf, "GO", NULL);
 	debconf->command(debconf, "GET", MAIN_MENU, NULL);
