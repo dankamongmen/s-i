@@ -152,7 +152,6 @@ ethdetect_detect_and_install(int passive_detection) {
    
     for (; ethernet; ethernet = ethernet->next)
     {
-	fprintf(stderr, "here\n");
 	client->command (client, "subst", "ethdetect/load_module", "bus", 
 		bus2str (ethernet->bus), NULL);
 	client->command (client, "subst", "ethdetect/load_module", "module",
