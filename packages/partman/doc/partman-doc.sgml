@@ -739,7 +739,7 @@ the second and returns 1 otherwise.
 
 <p> The function <prgn>longint2human</prgn> accepts in its first
 argument some number of bytes, converts it to something that is more
-meaningfull for humans and outputs the result.  For example
+meaningful for humans and outputs the result.  For example
 <example>
 longint2human 1234567890
 </example>
@@ -874,21 +874,20 @@ The rest arguments are arguments for the command.
 <p> You use the function <prgn>close_dialog</prgn> in order to
 terminate the communication dialog.
 
-<p> When you sent to <prgn>parted_server</prgn> an order to do some
+<p> When you send <prgn>parted_server</prgn> an order to do some
 long operation (check, create, resize or copy file system) the user
 will be shown a progress bar.  You may give name to it by the function
 <prgn>name_progress_bar</prgn>.  It may be used right before the
 command <prgn>open_dialog</prgn> and accepts only one argument &ndash;
-a template with type text that describes what is being doing.
+a template with type text that describes what is being done.
 
 <p> The function <prgn>log</prgn> appends its arguments to the file
 <file>/var/log/partman</file>.  This file is used as log-file also by
 <prgn>parted_server</prgn>.
 
-
 <chapt> The commands of <prgn>parted_server</prgn>
 
-<p> You should be very carefull when you communicate with the
+<p> You should be very careful when you communicate with the
 <prgn>parted_server</prgn>.  If <prgn>parted_server</prgn> detects any
 error it will exit immediately.  This is safer approach then to try to
 resolve somehow the error.  However this also means that the user will
@@ -925,7 +924,7 @@ open_dialog CLOSE
 close_dialog
 </example>
 
-After this command you may not issue commands about the device of
+After this command you may not issue commands regarding the device of
 <var><tt>device_directory</tt></var>.  This command does
 <strong>not</strong> invoke the command COMMIT.
 
@@ -965,7 +964,7 @@ close_dialog
 </example>
 
 <p> This command prints in <file>/var/log/partition_dump</file>
-all data about the device.  It is used for debuging.
+all the data regarding the device.  It is used for debugging.
 
 <sect> Get the partitions
 
@@ -993,7 +992,7 @@ for example <file>/dev/ide/host0/bus0/target0/lun0/part6</file>.
 $name is the name of the partition or the empty string if the
 partition table doesn't support partition names.
 
-<p> Notice that in the loop-body you may not initiate another dialogs
+<p> Notice that in the loop-body you may not initiate another dialog
 with <prgn>parted_server</prgn>.  If you need this you can use the
 following construction instead:
 <example>
@@ -1018,7 +1017,7 @@ read_line num id size type fs path name
 close_dialog
 </example>
 Here <var><tt>partition_id</tt></var> is the id of the partition to
-get info.  The meaning of the variables is the same as in the command
+get info.  The meaning of the variables are the same as in the command
 PARTITIONS.
 
 <sect> Getting cylinder/head/sector geometry of a partition/free space
@@ -1059,31 +1058,31 @@ open_dialog NEW_LABEL <var>partition_table_type</var>
 end_dialog
 </example>
 This command creates in the device a new empty partition table with
-type <var><tt>partition_table_type</tt></var>.  (Ofcourse it won't be
+type <var><tt>partition_table_type</tt></var>.  (Of course it won't be
 written to the disk if you don't use the command COMMIT.)
 
-<sect> Getting the meaningfull flags for a partition
+<sect> Getting the meaningful flags for a partition
 
 <p> Synopsis:
 <example>
 cd <var>device_directory</var>
 open_dialog VALID_FLAGS <var>partition_id</var>
-meaningfull_flags=$(read_list)
+meaningful_flags=$(read_list)
 end_dialog
 </example>
-$meaningfull_flags is a comma-separated list of the flags that are
-meaningfull for the partition with id
+$meaningful_flags is a comma-separated list of the flags that are
+meaningful for the partition with id
 <var><tt>partition_id</tt></var>.
 
-<p> In order to check wether some particular flag xyz is meaningfull
+<p> In order to check wether some particular flag xyz is meaningful
 you can use this code:
 <example>
 cd <var>device_directory</var>
-xyz_is_meaningfull=no
+xyz_is_meaningful=no
 open_dialog VALID_FLAGS <var>partition_id</var>
 while { read_line flag; [ "$flag" ]; }; do
     if [ "$flag" = xyz ]; then
-        xyz_is_meaningfull=yes
+        xyz_is_meaningful=yes
         # you may not use break here
     fi
 done
@@ -1179,7 +1178,7 @@ open_dialog SET_NAME <var>partition_id</var> <var>new_name</var>
 end_dialog
 </example>
 After this command the name of <var><tt>partition_id</tt></var> will
-be <var><tt>new_name</tt></var>.  It is error to use this command with
+be <var><tt>new_name</tt></var>.  It is an error to use this command with
 a partition table that doesn't support partition names.
 
 <sect> Check if extended and logical partitions are supported
@@ -1237,7 +1236,7 @@ open_dialog CHANGE_FILE_SYSTEM <var>partition_id</var> <var>new_filesystem</var>
 end_dialog
 </example>
 
-<p> Every partition libparted assigns some file system.  This command
+<p> libparted assigns every partition some file system.  This command
 can be used to change this file system.  The file system assigned to
 the partition is not necessarily the same as the actual file system.
 Libparted uses it to determine automaticaly the type of the partition
@@ -1267,9 +1266,9 @@ case $result in
 esac
 </example>
 
-The command <prgn>name_progress_bar</prgn> may be omited.  The debconf
-template must has type text.  It will be used to give the user
-information of what is being doing.
+The command <prgn>name_progress_bar</prgn> may be omitted.  The debconf
+template must have type text.  It will be used to give the user
+information of what is being done.
 
 <sect> Create a file system in a partition
 
@@ -1291,8 +1290,8 @@ esac
 </example>
 
 The command <prgn>name_progress_bar</prgn> may be omited.  The debconf
-template must has type text.  It will be used to give the user
-information of what is being doing.
+template must have type text.  It is used to give the user some
+information of what is being done.
 
 <sect> Create a new partition
 
@@ -1319,10 +1318,10 @@ partition should have (in bytes).
 of the created partition (for example <file>/dev/hda6</file> has
 number 6).  $id is the id of the new partition.  $size is the size of
 the new partition.  $size is approximately $length but not necessarily
-the same.  $type and $fs don't change theirs values.  $path is a
+the same.  $type and $fs don't change their values.  $path is a
 device name, for example
 <file>/dev/ide/host0/bus0/target0/lun0/part6</file>.  $name is the
-name of the new partition or the empty string if the partition table
+name of the new partition or an empty string if the partition table
 doesn't support partition names.
 
 <sect> Delete a partition
@@ -1344,10 +1343,10 @@ open_dialog RESIZE_PARTITION <var>partition_id</var> <var>new_size</var>
 read_line new_id
 close_dialog
 </example>
-This command resizes the partition preserving the data in it.  As
+This command resizes the partition, preserving the data in it.  As
 usualy <var><tt>new_size</tt></var> is measured in bytes.  $new_id is
-the new id that the partition receives.  The resizing is not supported
-always.  If it fails $new_id will be the same as
+the new id that the partition receives.  Resizing is not always supported.
+If it fails, then $new_id will be the same as
 <var><tt>partition_id</tt></var>.
 
 <p> This command doesn't move the start of the partition but only its
@@ -1355,7 +1354,7 @@ end.
 
 <p> The command <prgn>name_progress_bar</prgn> may be omited.  The
 debconf template must has type text.  It will be used to give the user
-information of what is being doing.
+information of what is being done.
 
 <sect> Get resize range
 
@@ -1386,12 +1385,12 @@ is <tt>$(basename <var>source_device_directory</var>)</tt>.
 
 <p> The command <prgn>name_progress_bar</prgn> may be omited.  The
 debconf template must has type text.  It will be used to give the user
-information of what is being doing.
+information of what is being done.
 
 
 <chapt> Bugs and limitations
 
-<p> All files and directories are supposed not to contain space in
+<p> All files and directories are assumed to not contain spaces in
 their names.
 
 <p> If the partition table supports extended and logical partitions
