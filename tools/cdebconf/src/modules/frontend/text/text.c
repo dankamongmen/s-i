@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.32 2003/02/21 21:33:24 sjogren Exp $
+ * $Id: text.c,v 1.33 2003/02/23 12:36:06 mlang Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -81,6 +81,35 @@ static const int getwidth(void)
 		}
 	}
 	return res;
+}
+
+/*
+ * Function: getheight
+ * Input: none
+ * Output: int - height of screen
+ * Description: get the height of the current terminal
+ * Assumptions: doesn't handle resizing; caches value on first call
+ */
+static const int getheight(void)
+{
+  static int res = 25;
+  static int inited = 0;
+
+  if (inited == 0) {
+    int fd;
+
+    inited = 1;
+    if ((fd = open("/dev/tty", O_RDONLY)) > 0) {
+      struct winsize ws;
+
+      if (ioctl(fd, TIOCGWINSZ, &ws) == 0 && ws.ws_row > 0)
+	res = ws.ws_row;
+
+      close(fd);
+    }
+  }
+
+  return res;
 }
 
 /*
@@ -184,7 +213,7 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 	char *defaults[100] = {0};
 	char selected[100] = {0};
 	char answer[1024] = {0};
-	int i, j, count, dcount, choice;
+	int i, j, line, count, dcount, choice;
 
 	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
@@ -197,27 +226,35 @@ static int texthandler_multiselect(struct frontend *obj, struct question *q)
 			if (strcmp(choices[i], defaults[j]) == 0)
 				selected[i] = 1;
 
-	while(1)
-	{
-		for (i = 0; i < count; i++)
-		{
-			printf("%3d. %s%s\n", i+1, choices_translated[i], 
-				(selected[i] ? _(" (selected)") : ""));
-			
-		}
+	i = 0;
 
-		printf(_("Prompt: 1 - %d, q to end> "), count);
-		fgets(answer, sizeof(answer), stdin);
-		if (answer[0] == 'q') break;
+	while (1) {
+ 	    for (line = 0; i < count && line < getheight()-1; i++, line++)
+	        printf("%3d. %s%s\n", i+1, choices_translated[i], 
+		       (selected[i] ? _(" (selected)") : ""));
 
-		choice = atoi(answer);
-		if (choice > 0 && choice <= count)
-		{
-			if (selected[choice-1] == 0) 
-				selected[choice-1] = 1;
-			else
-				selected[choice-1] = 0;
-		}
+	    if (i == count && count < getheight()-1) {
+	        printf(_("Prompt: 1 - %d, q to end> "), count);
+	    } else if (i == count) {
+	        printf(_("Prompt: 1 - %d, q to end, b for begin> "), count);
+	    } else {
+	        printf(_("Prompt: 1 - %d/%d, q to end, n for next page> "), i, count);
+	    }
+
+	    fgets(answer, sizeof(answer), stdin);
+	    if (answer[0] == 'q') break;
+	    if (answer[0] == 'n') continue;
+	    if (answer[0] == 'b') { i = 0; continue; }
+
+	    choice = atoi(answer);
+
+	    if (choice > 0 && choice <= count) {
+	        if (selected[choice-1] == 0) 
+	            selected[choice-1] = 1;
+	        else
+	            selected[choice-1] = 0;
+	        i = choice-getheight()+1 > 0 ? choice-getheight()+1 : 0;
+	    }
 	}
 
 	answer[0] = 0;
@@ -304,7 +341,7 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 	char *choices[100] = {0};
 	char *choices_translated[100] = {0};
 	char answer[10];
-	int i, count, choice = 1, def = -1;
+	int i, line, count, choice = 1, def = -1;
 	const char *defval = question_getvalue(q, "");
 
 	count = strchoicesplit(question_get_field(q, NULL, "choices"), choices, DIM(choices));
@@ -321,22 +358,31 @@ static int texthandler_select(struct frontend *obj, struct question *q)
 				def = i + 1;
 	}
 
-	do
-	{
-		for (i = 0; i < count; i++)
-			printf("%3d. %s%s\n", i+1, choices_translated[i],
-				(def == i + 1 ? _(" (default)") : ""));
+	i = 0;
 
-		printf(_("Prompt: 1 - %d> "), count);
-		fgets(answer, sizeof(answer), stdin);
+	do {
+	    for (line = 0; i < count && line < getheight()-1; i++, line++)
+	        printf("%3d. %s%s\n", i+1, choices_translated[i],
+		       (def == i + 1 ? _(" (default)") : ""));
+ 
+	    if (i == count) {
+	        if (choices_translated[def-1]) {
+	            printf(_("Prompt: 1 - %d, default=%s> "), count, choices_translated[def-1]);
+	        } else {
+	            printf(_("Prompt: 1 - %d> "), count);
+                }
+	    } else {
+	        printf(_("Prompt: 1 - %d/%d, n for next page> "), i, count);
+	    }
+	    fgets(answer, sizeof(answer), stdin);
 #if defined(__s390__) || defined (__s390x__)
-		if (answer[0] == '\n' || (answer[0] == '.' && answer[1] == '\n'))
+	    if (answer[0] == '\n' || (answer[0] == '.' && answer[1] == '\n'))
 #else
-		if (answer[0] == '\n')
+	    if (answer[0] == '\n')
 #endif
-			choice = def;
-		else
-			choice = atoi(answer);
+	        choice = def;
+	    else
+	        choice = atoi(answer);
 	} while (choice <= 0 || choice > count);
 	/*	fprintf(stderr,"In %s, line: %d\n\tanswer: %s, choice[choice]: %s\n",
 		__FILE__,__LINE__,answer, choices[choice - 1]);*/
