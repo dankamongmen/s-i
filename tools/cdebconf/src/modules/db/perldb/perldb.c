@@ -19,6 +19,7 @@
 
 static PerlInterpreter *perlinterp = 0;
 
+/* These functions arent used (yet?)
 static char *unescapestr(const char *in)
 {
 	return 0;
@@ -28,6 +29,7 @@ static char *escapestr(const char *in)
 {
 	return 0;
 }
+*/
 
 static int perldb_initialize(struct database *db, struct configuration *cfg)
 {
@@ -99,7 +101,6 @@ static int perldb_load(struct database *db)
 static int perldb_save(struct database *db)
 {
 	const char *questiondb, *templatedb;
-	char perlstr[1024];
 	int count;
 	SV *dumper;
 	dSP;
