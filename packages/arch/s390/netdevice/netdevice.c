@@ -43,7 +43,7 @@ static int items, items_ctc, items_escon, items_lcs, items_qeth;
 static int chantype_qeth;
 static int device_selected, device_ctc_protocol, device_qeth_lcs_port;
 static char *device_qeth_portname_iucv_peer;
-static char *type_text = "", chandev_parm[256], chandev_module_parm[256];
+static char *type_text = "", *module = "", chandev_parm[256], chandev_module_parm[256];
 
 #define TEMPLATE_PREFIX	"debian-installer/s390/netdevice/"
 
@@ -82,21 +82,25 @@ static int get_networktype (void)
 	{
 		type = TYPE_QETH;
 		type_text = "qeth";
+		module = type_text;
 	}
 	else if (!strncmp (ptr, "ctc", 3))
 	{
 		type = TYPE_CTC;
 		type_text = "ctc";
+		module = type_text;
 	}
 	else if (!strncmp (ptr, "lcs", 3))
 	{
 		type = TYPE_LCS;
 		type_text = "lcs";
+		module = type_text;
 	}
 	else if (!strncmp (ptr, "iucv", 4))
 	{
 		type = TYPE_IUCV;
 		type_text = "iucv";
+		module = "netiucv";
 	}
 	else
 		return -1;
@@ -476,7 +480,7 @@ static int confirm (void)
 static int setup (void)
 {
 	FILE *f;
-	char buf[256], buf1[256] = "", buf2[256], *ptr = NULL;
+	char buf[256], buf1[256] = "", *ptr = NULL;
 
 	if (mkdir ("/etc/modutils", 777) && errno != EEXIST)
 		return 1;
@@ -486,7 +490,6 @@ static int setup (void)
 		case TYPE_QETH:
 		case TYPE_CTC:
 		case TYPE_LCS:
-                        strncpy(buf2,type_text,sizeof(type_text));
 			if (strlen (chandev_parm))
 				ptr = chandev_parm;
 
@@ -522,10 +525,6 @@ static int setup (void)
 			break;
 
 		case TYPE_IUCV:
-                        strncpy(buf2,"netiucv",sizeof("netiucv"));
-			/* This is necessary because the "iucv" module */
-                        /*  provides the basic IUCV functions, but the */
-			/* "netiucv" module provides TCP/IP support.   */
 			f = fopen("/etc/modutils/netiucv", "a");
 			if (!f)
 				 return 1;
@@ -537,7 +536,7 @@ static int setup (void)
 			break;
 	}
 
-	snprintf (buf, sizeof (buf), "modprobe %s %s", buf2, buf1);
+	snprintf (buf, sizeof (buf), "modprobe %s %s", module, buf1);
 
 	di_exec_shell_log (buf);
 
@@ -707,3 +706,5 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 	return 0;
 }
 
+/* vim: noexpandtab sw=8
+ */
