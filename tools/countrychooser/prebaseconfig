@@ -1,0 +1,26 @@
+#! /bin/sh -e
+#
+# Pass the language/locale information needed by base-config into
+# /target/root/dbootstrap_settings.
+
+. /usr/share/debconf/confmodule
+
+db_get debian-installer/locale
+LOCALE="$RET"
+
+db_get debian-installer/language
+LANGLIST="$RET"
+
+if [ ! -d /target/root ] ; then
+    if mkdir /target/root ; then
+        :
+    else
+        echo "error: unable to create /target/root"
+    fi
+fi
+
+(
+    echo "# Inserted by languagechooser."
+    echo "LANG_INST=\"$LOCALE\""
+    echo "LANGUAGE_INST=\"$LANGLIST\""
+) >> /target/root/dbootstrap_settings

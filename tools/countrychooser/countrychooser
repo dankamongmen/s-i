@@ -1,0 +1,47 @@
+#!/bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+localecode="debian-installer/locale"
+languagecode="debian-installer/language"
+countrycode="debian-installer/country"
+
+log() {
+    logger -t countrychooser "info: $@"
+}
+
+db_fset "countrychooser/country-name" seen false
+db_fset "$countrycode" seen false
+db_input critical "countrychooser/country-name" || [ $? -eq 30 ]
+if db_go; then
+    db_get "countrychooser/country-name"
+    if test "$RET" ; then
+	COUNTRYNAME="$RET"
+	. countrymap
+	db_set "$countrycode"  "$COUNTRYCODE"
+	db_get "$languagecode"
+	if test "$RET" ; then
+	    LANGUAGECODE=$RET
+	    if [ "$LANGUAGECODE" != "C" ]
+	    then
+		LOCALE=$LANGUAGECODE_$COUNTRYCODE
+	    else
+		LOCALE=C
+	    fi
+	else
+	    LOCALE=C
+	fi
+	db_set "$localecode"   "$LOCALE"
+    else
+	# Error, not sure how to handle it
+	:
+    fi
+else
+    # Error, not sure how to handle it
+    :
+fi
+
+log "$countrycode   = '$COUNTRYCODE'"
+log "$localecode  = '$LOCALE'"
+
+exit 0
