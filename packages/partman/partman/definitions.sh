@@ -621,10 +621,16 @@ default_disk_label () {
 	    esac;;
 	mips)
 	    case "$sub" in
-		r4k-ip22)
+		# Indy
+		r4k-ip22 | r5k-ip22 | r8k-ip26 | r10k-ip28)
 		    echo dvh;;
-		r5k-ip22)
+		# Origin
+		r10k-ip27 | r12k-ip27)
 		    echo dvh;;
+		# O2
+		r5k-ip32 | r10k-ip32 | r12k-ip32)
+		    echo dvh;;
+		# SiByte SWARM
 		sb1-swarm-bn)
 		    echo msdos;;
 		*)
