@@ -299,3 +299,20 @@ get_free_space_list(void)
         return NULL;
     }
 }
+
+/* andread@linpro.no */
+void *
+reduce_disk_usage_size(struct disk_info_t *vg, 
+                     struct diskspace_req_s reqs[],
+                     double percent){
+    /* Reduce vg size to sum(min values) + 2/3 of free space */
+    int i;
+    int minimum = 0;
+    int newsize = 0;
+    for(i=0; i<10 && reqs[i].mountpoint; i++){
+      minimum = minimum + MiB_TO_BLOCKS(reqs[i].minsize);
+    }
+    newsize = ((vg->capacity) - minimum) * percent;
+    vg->capacity = newsize + minimum;
+    vg->freespace = newsize + minimum;
+}
