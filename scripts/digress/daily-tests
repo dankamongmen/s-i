@@ -36,21 +36,12 @@ overview () {
 log () {
 	local machine=$1
 	local scheme=$2
-	local append=$3
 	local logfile=$LOGDIR/$DATESTAMP/$machine-$scheme.log
 
 	if [ "$VERBOSE" = 1 ]; then
-		if [ "$append" = 1 ]; then
-			tee -a $logfile
-		else
-			tee $logfile
-		fi
+		tee $logfile
 	else
-		if [ "$append" = 1 ]; then
-			cat >> $logfile
-		else
-			cat > $logfile
-		fi
+		cat > $logfile
 	fi
 }
 
@@ -78,11 +69,11 @@ for SCHEME in $@; do
 
 	overview $LOGDIR "incomplete"
 	
-	if $DIGRESSDIR/test-harness $MACHINE $SCHEME 2>&1 | log $MACHINE $SCHEME; then
+	(if $DIGRESSDIR/test-harness $MACHINE $SCHEME; then
 		overview $LOGDIR success
 	else
 		if [ -n "$RETRY" ]; then
-			if $DIGRESSDIR/test-harness $MACHINE $SCHEME 2>&1 | log $MACHINE $SCHEME 1; then
+			if $DIGRESSDIR/test-harness $MACHINE $SCHEME 2>&1; then
 				overview $LOGDIR "success second try"
 			else
 				overview $LOGDIR failed
@@ -90,6 +81,6 @@ for SCHEME in $@; do
 		else
 			overview $LOGDIR failed
 		fi
-	fi
+	fi) 2>&1 | log $MACHINE $SCHEME
 	ln -f $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log $LOGDIR/$MACHINE-$SCHEME.log
 done

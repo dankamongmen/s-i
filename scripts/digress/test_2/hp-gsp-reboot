@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+# Allows booting from non-primary device on reboot.
+use strict;
+use Expect;
+
+exit unless defined $ENV{HP_GSP_REBOOTCOMMAND};
+	
+my $exp = new Expect;
+#$exp->exp_internal(1);
+$exp->raw_pty(1);
+
+$exp->spawn("hp-gsp-prompt") or die "cannot connect: $!\n";
+
+$exp->expect(600, "End of early boot detected");
+$exp->expect(120, "Processor is booting from first available device");
+$exp->send("\r");
+$exp->expect(120, "Main Menu:");
+$exp->send($ENV{HP_GSP_REBOOTCOMMAND}."\r");
+$exp->expect(120, "Interact with IPL");
+$exp->send("n\r");
+$exp->expect(120, "Booting...");
+
+exit;
