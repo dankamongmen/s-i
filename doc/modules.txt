@@ -1,0 +1,39 @@
+The new debian installer is highly modular. Modules are loaded at several
+points in the install process to add capabilities to the installer. Modules
+are essentially sets of files that get unpacked onto the installation
+system, plus some metadata.
+
+Because there is already so much infrastructure to build and manage debian
+packages, and because it allows metadata to accompny the files in a module,
+we have decided to use debian packages as the modules for the installer.
+
+Unlike regular debian packages, modules for the installer will not be
+policy compliant. They will not contain documentation in /usr/share/doc.
+They need not comply with the FHS. They may be statically linked. They may
+conflict with essential "real" debian packages, and thus be non-installable
+on a real debian system.
+
+<Detail where the modules will go in the debian archive, and any way they
+can be distinguised from "real" debs.>
+
+Modules will not be installed by a full-fledged dpkg implementation, so the
+following features of regular debs will not be supported:
+<This is not set in stone, but let's not implement this stuff unless we
+need it.>
+	* pre-dependancies
+	* preinst, postrm and prerm
+	* conflicts
+	* versioned dependancies
+	* provides
+	* essential or required packages
+	* suggests
+	* recommends
+	* dependancies will not be guaranteed to be met when the postinst
+	  runs.
+	* `|' in dependancies.
+
+The following will be supported:
+	* simple dependancies
+	* postinst
+	* debconf
+
