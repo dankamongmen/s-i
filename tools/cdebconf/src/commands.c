@@ -111,6 +111,7 @@ int command_capb(struct confmodule *mod, int argc, char **argv,
 
 	/* FIXME: frontend.h should provide a method to prevent direct
 	 *        access to capability membre */
+	mod->frontend->capability = 0;
 	for (i = 1; i <= argc; i++)
 		if (strcmp(argv[i], "backup") == 0)
 			mod->frontend->capability |= DCF_CAPB_BACKUP;
