@@ -15,148 +15,136 @@ if [ -x /sbin/depmod ]; then
 fi
 
 log () {
-    logger -t hw-detect "$@"
+	logger -t hw-detect "$@"
 }
 
 is_not_loaded() {
-    local module="$1"
-    if cut -d" " -f1 /proc/modules | grep -q "^${module}\$" ; then
-	false
-    else
-	true
-    fi
+	return $(cut -d" " -f1 /proc/modules | grep -q "^$1\$")
 }
 
 snapshot_devs() {
-  echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`
+	echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`
 }
 
 compare_devs() {
-  local olddevs="$1"
-  local devs="$2"
-  echo "${devs#$olddevs}" | sed -e 's/^ //'
+	local olddevs="$1"
+	local devs="$2"
+	echo "${devs#$olddevs}" | sed -e 's/^ //'
 }
 
 load_module() {
-    local module="$1"
-    local cardname="$2"
-    local devs=""
-    local olddevs=""
-    local newdev=""
+	local module="$1"
+	local cardname="$2"
+	local devs=""
+	local olddevs=""
+	local newdev=""
     
-    old=`cat /proc/sys/kernel/printk`
-    echo 0 > /proc/sys/kernel/printk
+	old=`cat /proc/sys/kernel/printk`
+	echo 0 > /proc/sys/kernel/printk
     
-    db_fset hw-detect/module_params seen false
-    db_subst hw-detect/module_params MODULE "$module"
-    db_input low hw-detect/module_params || [ $? -eq 30 ]
-    db_go
-    db_get hw-detect/module_params
-    devs="$(snapshot_devs)"
-    if modprobe -v "$module" "$RET" >> /var/log/messages 2>&1 ; then
-    	if [ "$RET" != "" ]; then
-		register-module "$module" "$RET"
-	fi
-	
-	olddevs="$devs"
-	devs="$(snapshot_devs)"
-	newdev="$(compare_devs "$olddevs" "$devs")"
-
-        if [ -n "$newdev" ]; then
-          if [ -n "$cardname" ]; then
-            echo "${newdev}:${cardname}" >> /etc/network/devnames
-          fi
-        fi
-    else   
-	db_fset hw-detect/modprobe_error seen false
-	db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
-	db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
+	db_fset hw-detect/module_params seen false
+	db_subst hw-detect/module_params MODULE "$module"
+	db_input low hw-detect/module_params || [ $? -eq 30 ]
 	db_go
-    fi
+	db_get hw-detect/module_params
+	devs="$(snapshot_devs)"
+	if modprobe -v "$module" "$RET" >> /var/log/messages 2>&1 ; then
+		if [ "$RET" != "" ]; then
+			register-module "$module" "$RET"
+		fi
+	
+		olddevs="$devs"
+		devs="$(snapshot_devs)"
+		newdev="$(compare_devs "$olddevs" "$devs")"
+
+		if [ -n "$newdev" ]; then
+			if [ -n "$cardname" ]; then
+				echo "${newdev}:${cardname}" >> /etc/network/devnames
+			fi
+		fi
+	else   
+		log "Error loading '$module'"
+		db_fset hw-detect/modprobe_error seen false
+		db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
+		db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
+		db_go
+	fi
     
-    echo $old > /proc/sys/kernel/printk
+	echo $old > /proc/sys/kernel/printk
 }
 
-# HACK ALERT! (pere: do not use as an example ;-) )
-# join hack for discover 2 (ask Eric Gillespie why this
-# is needed ;-) )
+# join hack for discover 2
 dumb_join_discover (){
-    IFS_SAVE="$IFS"
-    IFS="$NEWLINE"
-    for i in $MODEL_INFOS; do
-        echo $1:$i;
-        shift
-    done
-    IFS="$IFS_SAVE"
+	IFS_SAVE="$IFS"
+	IFS="$NEWLINE"
+	for i in $MODEL_INFOS; do
+		echo $1:$i;
+		shift
+	done
+	IFS="$IFS_SAVE"
 }
 
 # wrapper for discover command that can distinguish Discover 1.x and 2.x
 discover_hw () {
-    DISCOVER=/sbin/discover
-    if [ -f /usr/bin/discover ] ; then
-        log "Testing experimental discover2 package."
+	DISCOVER=/sbin/discover
+	if [ -f /usr/bin/discover ] ; then
+		DISCOVER=/usr/bin/discover
+	fi
+	# Ugh, Discover 1.x didn't exit with nonzero status if given an
+	# unrecongized option!
+	DISCOVER_TEST=$($DISCOVER --version 2> /dev/null)
+	if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
+		log "Testing experimental discover2 package."
+		dpath=linux/module/name
+		dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
+		dflags="-d all -e ata -e pci -e pcmcia -e \
+			scsi bridge broadband fixeddisk humaninput modem \
+			network optical removabledisk"
 
-        DISCOVER=/usr/bin/discover
-    fi
-    # Ugh, Discover 1.x didn't exit with nonzero status if given an
-    # unrecongized option!
-    DISCOVER_TEST=$($DISCOVER --version 2> /dev/null)
-    if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
-        # Discover 2.x, see <URL:http://hackers.progeny.com/discover/> for doc
-        # This worked with jeff's didiscover utility, which progeny removed from
-        # the discover subversion repository :-(
-
-        dpath=linux/module/name
-        dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
-        dflags="-d all -e ata -e pci -e pcmcia -e \
-                scsi bridge broadband fixeddisk humaninput modem \
-                network optical removabledisk"
-
-        MODEL_INFOS=$($DISCOVER -t $dflags)
-        MODULES=$($DISCOVER --data-path=$dpath --data-version=$dver $dflags)
-        dumb_join_discover $MODULES
-
-    else
-        # must be Discover 1.x
-        $DISCOVER --format="%m:%V %M\n" \
-            --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
-	  sed 's/ $//'
-    fi
+		MODEL_INFOS=$($DISCOVER -t $dflags)
+		MODULES=$($DISCOVER --data-path=$dpath --data-version=$dver $dflags)
+		dumb_join_discover $MODULES
+	else
+		# must be Discover 1.x
+		$DISCOVER --format="%m:%V %M\n" --disable-all \
+		          --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
+			sed 's/ $//'
+	fi
 }
 
 # Some pci chipsets are needed or there can be DMA or other problems.
 get_ide_chipset_info() {
 	for ide_module in $(find /lib/modules/*/kernel/drivers/ide/pci/ -type f 2>/dev/null); do
-    	if [ -e $ide_module ]; then
-		baseidemod=$(echo $ide_module | sed 's/\.o$//' | sed 's/\.ko$//' | sed 's/.*\///')
-		echo "$baseidemod:IDE chipset support"
-    	fi
-    done
+		if [ -e $ide_module ]; then
+			baseidemod=$(echo $ide_module | sed 's/\.o$//' | sed 's/\.ko$//' | sed 's/.*\///')
+			echo "$baseidemod:IDE chipset support"
+		fi
+	done
 }
 
 # Return list of lines formatted "module:Description"
 get_all_hw_info() {
-    discover_hw
-    if [ -d /proc/bus/usb ]; then
-    	echo "usb-storage:USB storage"
-    fi
-    get_manual_hw_info
+	discover_hw
+	if [ -d /proc/bus/usb ]; then
+		echo "usb-storage:USB storage"
+	fi
+	get_manual_hw_info
 }
    
 # Manually load modules to enable things we can't detect.
 # XXX: This isn't the best way to do this; we should autodetect.
 # The order of these modules are important.
 get_manual_hw_info() {
-    echo "floppy:Linux Floppy"
-    # ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
-    echo "ide-mod:Linux IDE driver"
-    echo "ide-probe-mod:Linux IDE probe driver"
-    get_ide_chipset_info
-    echo "ide-detect:Linux IDE detection"
-    echo "ide-floppy:Linux IDE floppy"
-    echo "ide-disk:Linux ATA DISK"
-    echo "ide-cd:Linux ATAPI CD-ROM"
-    echo "isofs:Linux ISO 9660 filesystem"
+	echo "floppy:Linux Floppy"
+	# ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
+	echo "ide-mod:Linux IDE driver"
+	echo "ide-probe-mod:Linux IDE probe driver"
+	get_ide_chipset_info
+	echo "ide-detect:Linux IDE detection"
+	echo "ide-floppy:Linux IDE floppy"
+	echo "ide-disk:Linux ATA DISK"
+	echo "ide-cd:Linux ATAPI CD-ROM"
+	echo "isofs:Linux ISO 9660 filesystem"
 }
 
 db_settitle hw-detect/title
@@ -224,85 +212,69 @@ MODULE_STEPSIZE=$(expr \( $MAX_STEPS - \( $OTHER_STEPS \* $OTHER_STEPSIZE \) \) 
 log "Loading modules..."
 IFS="$NEWLINE"
 for device in $(list_to_lines); do
-    module="`echo $device | cut -d' ' -f1`"
-    cardname="`echo $device | cut -d'(' -f2 | sed 's/)$//'`"
-    # Restore IFS after extracting the fields.
-    IFS="$IFS_SAVE"
+	module="`echo $device | cut -d' ' -f1`"
+	cardname="`echo $device | cut -d'(' -f2 | sed 's/)$//'`"
+	# Restore IFS after extracting the fields.
+	IFS="$IFS_SAVE"
 
-    if [ -z "$module" ] ; then module="[Unknown]" ; fi
-    if [ -z "$cardname" ] ; then cardname="[Unknown]" ; fi
+	if [ -z "$module" ] ; then module="[Unknown]" ; fi
+	if [ -z "$cardname" ] ; then cardname="[Unknown]" ; fi
 
-    log "Detected module '$module' for '$cardname'"
+	log "Detected module '$module' for '$cardname'"
 
-    if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] && \
-       is_not_loaded "$module"; then
-    	db_subst hw-detect/load_progress_step CARDNAME "$cardname"
-        db_subst hw-detect/load_progress_step MODULE "$module"
-        db_progress INFO hw-detect/load_progress_step
-        log "Trying to load module '$module'"
+	if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] && \
+	   is_not_loaded "$module"; then
+		db_subst hw-detect/load_progress_step CARDNAME "$cardname"
+		db_subst hw-detect/load_progress_step MODULE "$module"
+		db_progress INFO hw-detect/load_progress_step
+		log "Trying to load module '$module'"
 
-        if find /lib/modules/`uname -r`/ | grep -q /${module}\\. ; then
-            if load_module "$module" "$cardname"; then
-                :
-            else
-                log "Error loading driver '$module' for '$cardname'!"
-	    fi
-        else
-       	    db_subst hw-detect/load_progress_skip_step CARDNAME "$cardname"
-            db_subst hw-detect/load_progress_skip_step MODULE "$module"
-            db_progress INFO hw-detect/load_progress_skip_step
-            log "Could not load driver '$module' for '$cardname'."
-	    # Only add the module to the missing list if it was not
-	    # manually added to the list of modules to load.
-	    if ! echo "$MANUAL_HW_INFO" | grep -q "$module:"; then
-		    if [ -n "$MISSING_MODULES_LIST" ]; then
-			    MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
-		    fi
-		    MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
-	    fi
-        fi
-    fi
+		if find /lib/modules/`uname -r`/ | grep -q /${module}\\. ; then
+			load_module "$module" "$cardname"
+		else
+			db_subst hw-detect/load_progress_skip_step CARDNAME "$cardname"
+			db_subst hw-detect/load_progress_skip_step MODULE "$module"
+			db_progress INFO hw-detect/load_progress_skip_step
+			log "Missing module '$module'."
+			# Only add the module to the missing list if it was not
+			# manually added to the list of modules to load.
+			if ! echo "$MANUAL_HW_INFO" | grep -q "$module:"; then
+				if [ -n "$MISSING_MODULES_LIST" ]; then
+					MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
+				fi
+				MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
+			fi
+		fi
+	fi
 
-    db_progress STEP $MODULE_STEPSIZE
-    IFS="$NEWLINE"
+	db_progress STEP $MODULE_STEPSIZE
+	IFS="$NEWLINE"
 done
 IFS="$IFS_SAVE"
 
 # always load sd_mod and sr_mod if a scsi controller module was loaded.
 # sd_mod to find the disks, and sr_mod to find the CD-ROMs
-if [ -e /proc/scsi/scsi ] ; then
-    if grep -q "Attached devices: none" /proc/scsi/scsi ; then
-        :
-    else
-	if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi ; then
-	    if is_not_loaded "sd_mod" ; then
-		if grep -q '^[^[:alpha:]]\+sd$' /proc/devices ; then
-		    :
-		else
-                    db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
-                    db_subst hw-detect/load_progress_step MODULE "sd_mod"
-                    db_progress INFO hw-detect/load_progress_step
-		    load_module sd_mod
-		    register-module sd_mod
-		fi
-	    fi
+if [ -e /proc/scsi/scsi ] && ! grep -q "Attached devices: none" /proc/scsi/scsi; then
+	if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi && \
+	   is_not_loaded "sd_mod" && \
+	   ! grep -q '^[^[:alpha:]]\+sd$' /proc/devices; then
+		db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
+		db_subst hw-detect/load_progress_step MODULE "sd_mod"
+		db_progress INFO hw-detect/load_progress_step
+		load_module sd_mod
+		register-module sd_mod
 	fi
 	db_progress STEP $OTHER_STEPSIZE
-    	if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi ; then
-	    if is_not_loaded "sr_mod" ; then
-		if grep -q '^[^[:alpha:]]\+sr$' /proc/devices ; then
-		    :
-		else
-                    db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
-                    db_subst hw-detect/load_progress_step MODULE "sr_mod"
-                    db_progress INFO hw-detect/load_progress_step
-		    load_module sr_mod
-		    register-module sr_mod
-		fi
-	    fi
+	if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi && \
+	   is_not_loaded "sr_mod" &&
+	   ! grep -q '^[^[:alpha:]]\+sr$' /proc/devices; then
+		db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
+		db_subst hw-detect/load_progress_step MODULE "sr_mod"
+		db_progress INFO hw-detect/load_progress_step
+		load_module sr_mod
+		register-module sr_mod
 	fi
 	db_progress STEP $OTHER_STEPSIZE
-    fi
 fi
 
 # if there is an ide bus, then register the ide CD modules so they'll be
