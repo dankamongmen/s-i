@@ -188,8 +188,9 @@ install_modules(void)
     /* Pull in dependencies again since we might have added packages */
     di_pkg_resolve_deps(instlist);
     tmplist = di_pkg_toposort_list(instlist);
-    /* Free some memory */
-    di_list_free(asklist, free);
+    /* Free some memory. Note, we don't know which of the nodes inside
+       the asklist we can free. sigh. */
+    free(asklist);
     instlist = tmplist;
 
     for (node = instlist->head; node != NULL; node = node->next) {
