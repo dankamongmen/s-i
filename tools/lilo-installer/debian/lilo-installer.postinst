@@ -1,0 +1,35 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+# detect which is the root partition: /target
+# ugh, I wanted to use awk, but sed has better chance of being in busybox
+rootfs=`sed -ne '/^[^ ]* \/target /s/ .*//p' /etc/mtab`
+
+
+# detect which hard drive has /target/boot mounted on it. this does *not*
+# have to be the same as the drive /target is mounted on.
+bootdev=`sed -ne '/^[^ ]* \/target/boot /s/ .*//p' /etc/mtab`
+
+if [ $bootfs = '' ]; then
+	bootdev=$rootfs
+fi
+
+bootdev=`echo $bootdev | sed 's/[0-9]+$//'`
+
+db_subst lilo/bootdev default $bootdev
+db_input high lilo/bootdev
+db_go
+
+db_get lilo/bootdev
+bootdev=$RET
+
+#write out lilo.conf
+echo 'boot=$bootdev' > /target/etc/lilo.conf
+echo 'root=$rootfs' >> /target/etc/lilo.conf
+echo 'install=/boot/boot.b' >> /target/etc/lilo.conf
+echo 'map=/boot/map' >> /target/etc/lilo.conf
+echo 'image=/vmlinuz' >> /target/etc/lilo.conf
+echo '	label=Linux' >> /target/etc/lilo.conf
+chroot /target /sbin/lilo
