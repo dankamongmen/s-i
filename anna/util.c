@@ -425,6 +425,7 @@ get_initial_package_list(struct linkedlist_t *pkglist)
             continue;
         if ((ptr = strchr(buf, '\n')) != NULL)
             *ptr = '\0';
+        prev = NULL;
         for (node = pkglist->head; node != NULL; node = next) {
             next = node->next;
             p = (struct package_t *)node->data;
@@ -464,6 +465,7 @@ drop_excludes(struct linkedlist_t *pkglist)
             continue;
         if ((ptr = strchr(buf, '\n')) != NULL)
             *ptr = '\0';
+        prev = NULL;
         for (node = pkglist->head; node != NULL; node = next) {
             next = node->next;
             p = (struct package_t *)node->data;
