@@ -14,6 +14,15 @@ abort () {
 
 db_capb backup
 
+# Measure the width of partman/text/number here to make things faster.
+# number_width is used only in visual.d/number
+db_metaget partman/text/number description
+RET=$(printf "$RET" '')
+RET=$(stralign 50 "$RET" | sed 's/[^ ]//g')
+number_width=$((2 + 50 - ${#RET}))
+export number_width
+
+
 # Here is maybe not a good place to set deci (TODO)
 #db_metaget partman/text/deci description
 #deci="$RET"

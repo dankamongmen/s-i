@@ -12,15 +12,10 @@ fs=$6
 path=$7
 name=$8
 
-db_metaget partman/text/number description
-x=$(printf "$RET" '')
-length=$((${#x} + 2))
-#RET='#%s'
-#length=4
-
 if [ "$fs" = free ]; then
-    printf "%${length}s" ''
+    printf "%${number_width}s" ''
 else
+    db_metaget partman/text/number description
     x=$(printf "$RET" $num)
-    stralign "${length}" "$x"
+    stralign "$number_width" "$x"
 fi
