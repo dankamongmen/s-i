@@ -19,7 +19,15 @@
  */
 kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
 {
-	kbd_t *k = xmalloc (sizeof(kbd_t));
+    	kbd_t *k = NULL;
+
+#if defined(__m68k__)
+	// on m68k only sun3(x) have PC-style keyboards
+	if (strstr(subarch, "sun3") == NULL) 
+		return keyboards;
+#endif
+    
+	k = xmalloc (sizeof(kbd_t));
 
 	k->name = "sun"; // This must match the name "sun" in console-keymaps-sun
 	k->deflt = NULL;
