@@ -112,6 +112,10 @@ if [ -n "$RET" ]; then
 	# language alone in LANGUAGE
 	if ! . languagemap ; then
 		LANGUAGE=C
+        else
+		# We need to remember these for further use
+	        LOCALE_LANGUAGECHOOSER=$LOCALE
+		LANGUAGECODE_LANGUAGECHOOSER=$LANGUAGE
 	fi
 fi
 
@@ -219,10 +223,36 @@ log "$countrycode = '$COUNTRYCODE'"
 
 # Search for a supported locale which most closely resembles.
 LOCALE=""
+log "LANGUAGE = '$LANGUAGE'"
+log "LANGUAGECODE_LANGUAGECHOOSER = '$LANGUAGECODE_LANGUAGECHOOSER'"
+log "COUNTRYCODE = '$COUNTRYCODE'"
+log "COUNTRYCODE_LANGUAGECHOOSER = '$COUNTRYCODE_LANGUAGECHOOSER'"
+log "LOCALE_LANGUAGECHOOSER = '$LOCALE_LANGUAGECHOOSER'"
+
 for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
 	     ${LANGUAGE}_${COUNTRYCODE}; do
 	if grep -q "^${entry}$" $SUPPORTEDLOCALES; then
-		LOCALE="${entry}"
+		# Special handling of cases where the locale
+		# in languagechooser is NOT the combination of
+		# language_COUNTRY. Used for Norwegian Bokmal transition
+		# in order to keep no_NO as locale. May be used in the
+		# future for other special cases, so we'd better keep this
+	        if \
+		    [ "${LANGUAGE}" = "${LANGUAGECODE_LANGUAGECHOOSER}" \
+		      -a \
+		      "${COUNTRYCODE}" = "${COUNTRYCODE_LANGUAGECHOOSER}" \
+		      -a \
+		      "${LANGUAGE}_${COUNTRYCODE}" != "${LOCALE_LANGUAGECHOOSER}" \
+		    ] ;  then
+		    # In details : we revert back to the locale
+		    # defined in languagechooser if countrychooser
+		    # did NOT induce change in language and country
+		    # but the resulting locale is different from the
+		    # one we had in languagechooser
+		    LOCALE=${LOCALE_LANGUAGECHOOSER}
+		else
+		    LOCALE="${entry}"
+		fi
 		break
 	fi
 done
