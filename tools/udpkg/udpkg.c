@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.26 2002/08/01 09:12:50 cjwatson Exp $ */
+/* $Id: udpkg.c,v 1.27 2002/08/30 15:20:50 tfheen Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -70,9 +70,23 @@ static int dpkg_doconfigure(struct package_t *pkg)
 {
 	int r;
 	char postinst[1024];
+	char config[1024];
 	char buf[1024];
 	DPRINTF("Configuring %s\n", pkg->package);
 	pkg->status &= STATUS_STATUSMASK;
+
+	snprintf(config, sizeof(config), "%s%s.config", INFODIR, pkg->package);
+	if (is_file(config))
+	{
+		snprintf(buf, sizeof(buf), "%s configure", config);
+		if ((r = do_system(buf)) != 0)
+		{
+			fprintf(stderr, "config exited with status %d\n", r);
+			pkg->status |= STATUS_STATUSHALFCONFIGURED;
+			return 1;
+		}
+	}
+
 	snprintf(postinst, sizeof(postinst), "%s%s.postinst", INFODIR, pkg->package);
 	if (is_file(postinst))
 	{
@@ -99,7 +113,8 @@ static int dpkg_dounpack(struct package_t *pkg)
 	int i;
 	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
 	                         "conffiles", "md5sums", "shlibs", 
-				 "templates", "menutest", "isinstallable" };
+				 "templates", "menutest", "isinstallable",
+                                 "config" };
 
 	DPRINTF("Unpacking %s\n", pkg->package);
 
@@ -371,8 +386,7 @@ int main(int argc, char **argv)
 				p->file = *argv;
 			else if (opt != 'c')
 			{
-				p->file = malloc(strlen(cwd) + strlen(*argv) + 2);
-				sprintf(p->file, "%s/%s", cwd, *argv);
+				asprintf(&p->file, "%s/%s", cwd, *argv);
 			}
 			else {
 				p->package = strdup(*argv);
