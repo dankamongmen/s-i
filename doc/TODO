@@ -37,6 +37,25 @@ release.
  * Error handling.  We need to make sure the user is told so when
    something goes wrong.
 
+This is a list of common mistakes that need to be corrected throughout the
+code base:
+
+  * All debconf commands that INPUT, GO, GET or SET questions should check
+    their return value. This is pure evil:
+
+    debconf->command(debconf, "GET", "mirror/distribution", NULL); /* unchecked return code ! */
+    asprintf(&command, "foo %s", debconf->value);
+    system(command);
+
+  * Nothing should send error messages to stderr. If there is an error,
+    use debconf to display a message. stderr messages will overwrite the
+    newt frontend.
+
+  * cdebconf's debconfclient.h has a set of macros for calling debconf
+    (debconf_get() and so on)
+    These should perhaps be used consistently throughout the code for
+    clarity.
+
 Finished items:
 
  * Unbreak netinst CDs
@@ -182,7 +201,7 @@ time.
 	- kernel-package integration [Herbert Xu]
 		Udebs are built automatically; this is well in hand.
  	- net retriever [Joey Hess]
-		Seems to work.  FTP support missing.
+		Seems to work.
 	- cdrom retriever [Raphael Hertzog]
    		Working
         - ethdetect [David Whedon]
