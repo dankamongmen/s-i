@@ -17,25 +17,6 @@ if (! defined $sourcedir) {
 	$sourcedir="";
 }
 
-my $kname;
-
-open(NAMES, "/usr/share/kernel-wedge/kernel-names") || die "kernel-names: $!";
-while (<NAMES>) {
-	chomp;
-	next if /^#/ || ! length;
-
-	my ($arch, $name)=split(' ', $_, 2);
-	if ($arch eq $hostarch) {
-		$kname=$name;
-		last;
-	}
-}
-close NAMES;
-
-if (! defined $kname) {
-	die "could not find $hostarch in kernel-names";
-}
-
 open(KVERS, "kernel-versions") || die "kernel-versions: $!";
 while (<KVERS>) {
 	chomp;
@@ -54,16 +35,15 @@ while (<KVERS>) {
 		$extraname="-$kernelversion-$flavour";
 	}
 	
-	# Temporary gross hack for netwinder, has only a vmlinux.
-	if ($installedname =~ /netwinder/) {
+	if (-e "$sourcedir/boot/vmlinuz-$installedname") {
 		doit("install", "-D", "-m", 644,
-			"$sourcedir/boot/vmlinux-$installedname",
-			"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname$extraname");
+			"$sourcedir/boot/vmlinuz-$installedname",
+			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinuz$extraname");
 	}
 	else {
 		doit("install", "-D", "-m", 644,
-			"$sourcedir/boot/$kname-$installedname",
-			"debian/kernel-image-$kernelversion-$flavour-di/boot/$kname$extraname");
+			"$sourcedir/boot/vmlinux-$installedname",
+			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinux$extraname");
 	}
 	doit("install", "-D", "-m", 644,
 		"$sourcedir/boot/System.map-$installedname",
