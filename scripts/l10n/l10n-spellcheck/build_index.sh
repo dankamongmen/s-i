@@ -24,7 +24,7 @@ STATS=$1
 TEMPLATE=$2
 INDEX_HTML=$3
 TABLE_HTML=stats.html
-
+DICTIONARIES=build-tools/dictionaries.txt
 # Compute some statistics
 i=0
 TOTAL=0
@@ -47,6 +47,7 @@ echo "   <th class=\"t1\">Unknown words</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Messages</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Unknown WL</th>" >> $TABLE_HTML
 echo "   <th class=\"t1\">Messages + Unknown WL</th>" >> $TABLE_HTML
+echo "   <th class=\"t1\">Aspell Dictionary</th>" >> $TABLE_HTML
 echo " </tr>" >> $TABLE_HTML
 
 # fill the table:
@@ -55,12 +56,20 @@ for ROW in `cat $STATS | sed  "s: :,:"`; do
     LANG=`echo $ROW | awk -F, '{print $2}'`
     UNKN=`echo $ROW | awk -F, '{print $1}'`
 
+if [ $LANG = "pt_BR" ] ; then
+    LANG="pt"
+fi
+
+    DICT_URL=`grep -w "${LANG}" $DICTIONARIES`
+    DICT_NAME=`echo $DICT_URL | sed "s|ftp://ftp.gnu.org/gnu/aspell/dict/.*/||" | sed "s:.tar.bz2$::"`
+
 echo "  <tr>" >> $TABLE_HTML
 echo "   <td class=\"col1\">$LANG</td>" >> $TABLE_HTML
 echo "   <td>$UNKN</td>" >> $TABLE_HTML
 echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a></td>" >> $TABLE_HTML
 echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a></td>" >> $TABLE_HTML
 echo "   <td><a href=\"latest/zip/$LANG.tar.gz\">$LANG.tar.gz</a></td>" >> $TABLE_HTML
+echo "   <td><a href=\"$DICT_URL\">$DICT_NAME</a></td>" >> $TABLE_HTML
 echo "  </tr>" >> $TABLE_HTML
     
 done
