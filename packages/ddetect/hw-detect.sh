@@ -137,8 +137,11 @@ discover_hw () {
 		dumb_join_discover $MODULES
 		;;
 	1)
+		case "$SUBARCH" in
+		  sparc/*) sbus=",sbus"
+		esac
 		discover --format="%m:%V %M\n" --disable-all \
-		          --enable=pci,ide,scsi,sbus,pcmcia scsi cdrom ethernet bridge |
+		          --enable=pci,ide,scsi${sbus},pcmcia scsi cdrom ethernet bridge |
 			sed 's/ $//'
 		;;
 	esac
