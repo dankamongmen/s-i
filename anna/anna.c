@@ -184,30 +184,27 @@ int unpack_package (char *pkgfile) {
  * return 0.
  */
 
-int md5sum(char* sum, char *file) {
-        int io[2];
-        int pid;
-        char line[1024];
+int md5sum(char *sum, char *file)
+{
+	FILE *fp;
+	char line[1024];
+
 	/* Trivially true if the Packages file doesn't have md5sum lines */
 	if (sum == NULL)
 		return 1;
-        pipe(io);
-        pid = fork();
-        if (pid == 0) {
-                /* child */
-                dup2(io[1],1);
-                execl("/usr/bin/md5sum","/usr/bin/md5sum",file,0);
-        }
-        wait(NULL);
-        read(io[0],&line,1023);
-        line[1023] = '\0';
-        if (strlen(line) < 32) {
-                /* not a success, return */
-                return 0;
-        }
-        line[32] = '\0';
-        /* line now contains just the md5sum */
-        return ! strcmp(line,sum);
+	snprintf(line, sizeof(line), "/usr/bin/md5sum %s", file);
+	fp = popen(line, "r");
+	if (fp == NULL)
+		return 0;
+	if (fgets(line, sizeof(line), fp) != NULL) {
+		fclose(fp);
+		if (strlen(line) < 32)
+			return 0;
+		line[32] = '\0';
+		return !strcmp(line, sum);
+	}
+	fclose(fp);
+	return 0;
 }
 
 /*
