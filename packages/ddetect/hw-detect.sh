@@ -72,12 +72,16 @@ load_module() {
 		devs="$(snapshot_devs)"
 		newdevs="$(compare_devs "$olddevs" "$devs")"
 
+                # Make sure space is used as a delimiter.
+                IFS_SAVE="$IFS"
+                IFS=" "
 		if [ -n "$newdevs" -a -n "$cardname" ]; then
 			mkdir -p /etc/network
 			for dev in $newdevs; do
 				echo "${dev}:${cardname}" >> /etc/network/devnames
 			done
 		fi
+                IFS="$IFS_SAVE"
 	else   
 		log "Error loading '$module'"
 		if [ "$module" != floppy ] && [ "$module" != ide-floppy ]; then
@@ -402,6 +406,7 @@ if [ -e /proc/bus/pccard/drivers ]; then
 
 	# Determine devnames.
         if [ -f /var/run/stab ]; then
+                mkdir -p /etc/network
 	        gen_pcmcia_devnames < /var/run/stab
         fi
 fi
