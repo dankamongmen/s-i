@@ -377,8 +377,9 @@ db_progress step 1
 
 db_progress info lilo-installer/progress_running
 
-if ! chroot /target /sbin/lilo ; then
-    ERRCODE=$?
+ERRCODE=0
+chroot /target /sbin/lilo || ERRCODE=$?
+if [ "$ERRCODE" != 0 ]; then
     db_subst lilo-installer/failed ERRCODE "$ERRCODE"
     db_input critical lilo-installer/failed || [ $? -eq 30 ]
     db_progress stop
