@@ -145,7 +145,8 @@ fi
 if [ "$LANGUAGE" != "C" ]; then
 	STATE=1
 	LASTSTATE=3
-	fullprio=critical
+	fullprio=high
+	shortprio=high
 	while [ "$STATE" != 0 -a "$STATE" -le "$LASTSTATE" ]; do
 		case "$STATE" in
 		1)
@@ -174,7 +175,7 @@ if [ "$LANGUAGE" != "C" ]; then
 					IFS="$OLD_IFS"	
 					db_subst $shortlist SHORTLIST "${SHORTLIST}"
 					db_subst $shortlist DEFAULTLOCALE "${DEFAULTLOCALE}"
-					db_input critical $shortlist || [ $? -eq 30 ]
+					db_input $shortprio $shortlist || [ $? -eq 30 ]
 					askedshort=1
 				else
 					askedshort=0
