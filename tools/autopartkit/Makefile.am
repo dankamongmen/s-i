@@ -19,7 +19,8 @@ autopartkit_SOURCES = \
 	mapdevfs.c \
 	makepath.c \
 	parted-compat.h \
-	autopartkit.c
+	autopartkit.c \
+	evaluator.c
 
 autopartkit_test_SOURCES = \
 	$(autopartkit_SOURCES)
@@ -32,13 +33,15 @@ lvm_test_SOURCES = \
 dumptable_SOURCES = \
 	dummylog.c \
 	loadpartitions.c \
-	dumptable.c
+	dumptable.c \
+	evaluator.c
 
 distribute_test_SOURCES = \
 	dummylog.c \
 	distribute.c \
 	loadpartitions.c \
-	distribute-test.c
+	distribute-test.c \
+	evaluator.c
 
 tabledir = $(sysconfdir)/autopartkit
 table_DATA = \

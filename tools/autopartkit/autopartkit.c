@@ -205,19 +205,6 @@ static void mydebconf_set_title(const char *new_title)
     client->command(client, "TITLE", new_title, NULL);
 }
 
-static int mydebconf_bool(char *priority, char *template)
-{
-    const char *value;
-
-    value = mydebconf_input(priority, template);
-    if (strstr(value, "true"))
-	return 1;
-    if (strstr(value, "false"))
-	return 0;
-    mydebconf_debug("unknown bool value", value);
-    return 0;
-}
-
 void autopartkit_log(const int level, const char * format, ...)
 {
     int LOGLIMIT = 1;
@@ -228,18 +215,26 @@ void autopartkit_log(const int level, const char * format, ...)
     vsyslog(LOG_DEBUG, format, ap);
     va_end(ap);
 }
+
+/* note: only fsets seen=true if the user answered yes */
 static void autopartkit_confirm(void)
 {
-    static int confirm = 0;
-    if (confirm)
-	return;
-    if (mydebconf_bool("critical", "autopartkit/confirm"))
-    {
-	confirm = 1;
-	return;
-    } else {
-	exit(EXIT_FAILURE);
+    client->command (client, "FGET", "autopartkit/confirm", "seen", NULL);
+    if (!strstr(client->value, "true")) {
+        client->command (client, "INPUT", "critical", "autopartkit/confirm", NULL);
+        client->command (client, "GO", NULL);
     }
+    
+    client->command (client, "GET", "autopartkit/confirm", NULL);
+    if (strstr(client->value, "true"))
+        return;
+
+    client->command (client, "FSET", "autopartkit/confirm", "seen", "false", NULL);
+    
+    if (strstr(client->value, "false"))
+        exit(EXIT_FAILURE);
+    mydebconf_debug("unknown bool value", client->value);
+    exit(EXIT_FAILURE);
 }
 
 static void disable_kmsg(int disable)
@@ -1354,7 +1349,7 @@ int main (int argc, char *argv[])
         autopartkit_error(1, "usage: %s <debconf-template>\n", argv[0]);
 
     disk_reqs = load_partitions(tablefile);
-
+    
     /* Step 1 & 2 : discover & choose device */
     dev = choose_device();
     if (! dev)

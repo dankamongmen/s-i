@@ -5,10 +5,14 @@
  * Date:   2002-04-14
  */
 
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "autopartkit.h"
 
@@ -94,9 +98,10 @@ add_partition(struct partition_list *list, char *line)
 {
   char mountpoint[1024];
   char fstype[1024];
-  int minsize;
-  int maxsize;
+  char minsize[1024];
+  char maxsize[1024];
   int ondisk;
+  int minsize_mb, maxsize_mb;
 
   if (!line || ! *line) /* Ignore empty lines */
     return -1;
@@ -105,21 +110,24 @@ add_partition(struct partition_list *list, char *line)
 
   autopartkit_log(3, "Adding '%s'\n", line);
 
-  if (4 != sscanf(line, "%s %s %d %d ", mountpoint, fstype, &minsize,
-		  &maxsize))
+  if (4 != sscanf(line, "%s %s %s %s ", mountpoint, fstype, minsize, maxsize))
   {
       autopartkit_log(3, "Failed to parse line.\n");
       return -1; /* error */
   }
 
-  autopartkit_log(2, "Fetched partition info %s %s %d %d\n",
+  autopartkit_log(2, "Fetched partition info %s %s %s %s\n",
                   mountpoint, fstype, minsize, maxsize);
   if (maxsize != 0)
       ondisk = 1;
   else
       ondisk = 0;
 
-  return list_add_entry(list, mountpoint, fstype, minsize, maxsize, ondisk);
+  /* round minsize and maxsize to closest megabyte */
+  minsize_mb = (int)floor(evaluate(minsize) + 0.5);
+  maxsize_mb = (int)floor(evaluate(maxsize) + 0.5);
+ 
+  return list_add_entry(list, mountpoint, fstype, minsize_mb, maxsize_mb, ondisk);
 }
 
 diskspace_req_t *
@@ -169,4 +177,21 @@ free_partition_list(diskspace_req_t *list)
       free(list[i].fstype);
   }
   free(list);
+}
+
+/*
+ * There are multiple ways to get available RAM in the machine. /proc/meminfo
+ * (and thus also /usr/bin/free) gives a number that is too small, and grokking
+ * things out of dmesg is quite ugly. Stat'ing /proc/kcore is easy and reports
+ * a number that is much better then /proc/meminfo, although still a tad too
+ * low.
+ */
+double
+get_ram_size(void)
+{
+  struct stat buf;
+  if (stat("/proc/kcore", &buf) == -1)
+    autopartkit_error(0, "Failed to stat /proc/kcore\n");
+
+  return ((double)(buf.st_size) / (double)(MEGABYTE));
 }

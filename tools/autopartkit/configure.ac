@@ -32,6 +32,7 @@ fi
 AC_CHECK_LIB([debconfclient], [debconfclient_new])
 AC_CHECK_LIB([dl], [dlopen])
 AC_CHECK_LIB([parted], [ped_constraint_any])
+AC_CHECK_LIB([m], [floor])
 
 if test "$ac_cv_lib_parted_ped_constraint_any" != yes; then
     AC_MSG_ERROR(Unable to find required library libparted.)

@@ -49,6 +49,7 @@ void print_list(struct disk_info_t diskinfo[], struct diskspace_req_s reqs[]);
 diskspace_req_t * load_partitions(const char *filename);
 void free_partition_list(diskspace_req_t *list);
 void list_dump(diskspace_req_t *list);
+double get_ram_size(void);
 
 /* From choosetable.c */
 const char *choose_profile_table(const char *profiles);
@@ -92,5 +93,9 @@ int lvm_lv_stack_delete(void *);
 #include <sys/stat.h>
 #include <sys/types.h>
 int make_path(const char *pathname, mode_t mode);
+
+/* from evaulator.c */
+void eval_error(void);
+double evaluate(char *expression);
 
 #endif /* AUTOPARTKIT_H */
