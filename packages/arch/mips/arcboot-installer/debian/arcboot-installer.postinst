@@ -98,6 +98,7 @@ fi
 rootmin=`echo $rootfs |sed 's+/dev/sd.++'`
 rootdev=`grep "^\ \+8\ \+$rootmin\ \+" /proc/partitions | sed -e "s/ \+/ /g" | cut -d " " -f5`
 if [ "$version" = "2.6" ]; then
+    rootdev=$(echo $rootdev | sed 's/[0-9]\+$//')
     scsi_info=$(readlink /sys/block/$rootdev/device | sed 's/.*\///')
     ROOTBUS=`echo $scsi_info | cut -d: -f2`
     ROOTID=`echo $scsi_info | cut -d: -f3`
