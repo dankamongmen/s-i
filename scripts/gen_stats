@@ -23,10 +23,10 @@ remove_pot ()
     find $DI_HOME \( -name \*.po -o -name templates.pot \) | xargs -n 20 rm -f
     cd $DI_HOME/base-config
     cvs -z3 update -P -d -A >/dev/null 2>&1
-    [ -f po/base-config.pot ] && rm -f po/base-config.pot
-    make -C po base-config.pot >/dev/null 2>&1
     cd $DI_HOME/debian-installer
     cvs -z3 update -P -d -A >/dev/null 2>&1
+    cd $DI_HOME/tasksel
+    svn update >/dev/null 2>&1
     cd $oldcwd
 }
 
@@ -35,21 +35,23 @@ finaldestdir=$HOME/public_html/debian-installer/l10n
 destdir=$finaldestdir.new
 rm -rf $destdir 2>/dev/null
 mkdir -p $destdir
+mkdir $destdir/POT
 for f in `find * -name templates.pot | sort`
 do
     dir=`echo $f | sed -e 's,/debian/po/templates.pot,,'`
     test "$dir" = "$f" && continue
-    nstr=`msgfmt -o /dev/null --statistics $f 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g' | sed -e 's/^0t//' -e 's/u$//'`
-    totstr=`expr ${totstr:-0} + $nstr`
     for p in $dir/debian/po/*.po
     do
         [ -r $p ] || continue
-        msgfmt -o /dev/null $p >/dev/null 2>&1 || continue
         l=`echo $p | sed -e 's,.*/,,' -e 's/\.po$//'`
         test -d $destdir/$l || mkdir $destdir/$l
+        msgfmt -o /dev/null $p >/dev/null 2>&1 || continue
         eval "x1$l=`msgfmt -o /dev/null --statistics $p 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g'`"
     done
     ( cd $dir; debconf-updatepo 2>/dev/null )
+    cp $f $destdir/POT/`echo $dir | sed -e 's,.*/,,'`.pot
+    nstr=`msgfmt -o /dev/null --statistics $f 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g' | sed -e 's/^0t//' -e 's/u$//'`
+    totstr=`expr ${totstr:-0} + $nstr`
     for p in $dir/debian/po/*.po
     do
         [ -r $p ] || continue
@@ -76,19 +78,35 @@ do
     done
 done
 
-    f=base-config/po/base-config.pot
-    dir=base-config
-    nstr=`msgfmt -o /dev/null --statistics $f 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g' | sed -e 's/^0t//' -e 's/u$//'`
-    totstr=`expr ${totstr:-0} + $nstr`
+#  Special cases
+for dir in base-config tasksel tasksel/tasks
+do
+    case $dir in
+      tasksel/tasks ) f=$dir/po/debian-tasks.pot ;;
+      * ) f=$dir/po/$dir.pot ;;
+    esac
     for p in $dir/po/*.po
     do
         [ -r $p ] || continue
-        msgfmt -o /dev/null $p >/dev/null 2>&1 || continue
         l=`echo $p | sed -e 's,.*/,,' -e 's/\.po$//'`
         test -d $destdir/$l || mkdir $destdir/$l
+        msgfmt -o /dev/null $p >/dev/null 2>&1 || continue
         eval "x1$l=`msgfmt -o /dev/null --statistics $p 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g'`"
     done
-    ( cd $dir/po; make *.po >/dev/null 2>&1 )
+    case "$dir" in
+      base-config )
+        ( cd $dir/po; rm -f base-config.pot >/dev/null 2>&1; make *.po >/dev/null 2>&1 )
+        ;;
+      tasksel )
+        ( cd $dir; make updatepo >/dev/null 2>&1 )
+        ;;
+      tasksel/tasks )
+        ( cd $dir; make updatetaskspo >/dev/null 2>&1 )
+        ;;
+    esac
+    cp $f $destdir/POT/`echo $dir | sed -e 's,/,_,g'`.pot
+    nstr=`msgfmt -o /dev/null --statistics $f 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g' | sed -e 's/^0t//' -e 's/u$//'`
+    totstr=`expr ${totstr:-0} + $nstr`
     for p in $dir/po/*.po
     do
         [ -r $p ] || continue
@@ -111,8 +129,9 @@ done
         echo $x2 | grep '[fu]' >/dev/null 2>&1 || continue
         eval "test \"\$x1$l\" = \"\$x2\" || u='*'"
         echo "$u $dir/po: $x2  [$t]" >> $destdir/$l/STATUS.utf8.txt
-        cp $p $destdir/$l/base-config_po_$l.po
+        cp $p $destdir/$l/`echo ${dir} | sed -e 's,/,_,g'`_po_$l.po
     done
+done
 
 langs=`( cd $destdir && echo [a-z][a-z]* )`
 for l in $langs
@@ -211,7 +230,9 @@ do
     done
 done
 
-    dir=base-config
+#  Special cases
+for dir in base-config tasksel tasksel/tasks
+do
     for l in $langs
     do
         if test -f "$dir/po/$l.po"; then
@@ -221,6 +242,7 @@ done
 	    echo "Missing file: $dir/po/$l.po" >> $destdir/$l/STATUS.utf8.txt
 	fi
     done
+done
 
 #  Now merge all files into a single PO file
 cd $DI_HOME/debian-installer
@@ -229,21 +251,26 @@ for l in $langs
 do
     perl -I $webwmldir/Perl scripts/gettext-helper export $l >/dev/null 2>&1
     echo >> $destdir/$l/STATUS.utf8.txt
+    eval "stats=\`expr \${tot_t_$l}00 / $totstr\`"
+    po_merged=
     if grep '^"Content-Type: \\n"$' po/$l.po >/dev/null 2>&1; then
         echo "Some PO files are invalid, $l.po cannot be generated" >> $destdir/$l/STATUS.utf8.txt
+        po_merged='(Some PO files are invalid)'
     else
         x2=`msgfmt -o /dev/null --statistics po/$l.po 2>&1 | sed -e 's/ fuzzy translations*/f/' -e 's/ untranslated messages*/u/' -e 's/ translated messages*/t/' | sed -e 's/[^0-9tfu]//g'`
         echo "All debian-installer PO files merged together: $l.po  $x2" >> $destdir/$l/STATUS.utf8.txt
         cp po/$l.po $destdir/$l/$l.po
+        if echo $x2 | grep '[fu]' >/dev/null 2>&1; then
+            [ "$stats" = 100 ] && po_merged="(Merged PO file: $x2)"
+        fi
     fi
     echo >> $destdir/$l/STATUS.utf8.txt
-    eval "stats=\`expr \${tot_t_$l}00 / $totstr\`"
     eval "echo Global statistics: \${tot_t_$l}t\${tot_f_$l}f\${tot_u_$l}u'   '\(${stats}%\) >> $destdir/$l/STATUS.utf8.txt"
     echo >> $destdir/$l/STATUS.utf8.txt
     echo "PO files are available at http://people.debian.org/~barbier/d-i/l10n/$l/" >> $destdir/$l/STATUS.utf8.txt
     echo >> $destdir/$l/STATUS.utf8.txt
     echo "Files fetched and report generated on: "`date -u` >> $destdir/$l/STATUS.utf8.txt
-    echo "${stats}% $l" >> $destdir/rank
+    echo "${stats}% $l  $po_merged" >> $destdir/rank
     ln -s ../README.txt $destdir/$l/README.txt
     cat >> $destdir/$l/STATUS.utf8.txt <<'EOT'
 
