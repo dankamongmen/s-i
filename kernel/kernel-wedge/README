@@ -1,0 +1,139 @@
+This is kernel-wedge, an industrial strength kernel splitting tool.
+It is used to generate kernel module udebs for the debian installer.
+
+To use kernel-wedge, you need a source package, which will become the
+"source" for the generated udebs. Your source package will be very simple,
+looking something like this:
+
+  debian/copyright
+  debian/changelog
+  debian/rules
+  debian/control.stub
+  kernel-versions
+  modules/<arch>/*
+  exclude-packages
+
+Let's get the easy files out of the way. The changelog is a changelog, like
+any other, as is the copyright. The debian/rules can be something as simple
+as this:
+
+  #!/usr/bin/make -f
+  include /usr/lib/kernel-wedge/generic-rules
+
+Or you can use the kernel-wedge command directly in your own rules file.
+Run it for some semblance of usage help.
+
+debian/control.stub is the top of a control file. Something like this:
+
+  Source: linux-kernel-di-i386
+  Section: debian-installer
+  Priority: optional
+  Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
+  Build-Depends: kernel-wedge
+
+The rest of the control file will be generated for you.
+
+The kernel-versions file lists the kernel versions to produce packages for.
+There are 6 whitespace separated fields per line, and it looks something
+like this:
+
+# arch   version  flavour       installedname        multkern  build-depends
+i386     2.4.25-1 386           2.4.25-1-386         n         kernel-image-2.4.25-1-386, kernel-pcmcia-modules-2.4.25-1-386
+i386     2.4.24   speakup       2.4.24-speakup       n         kernel-image-2.4.24-speakup
+
+In this case we are building two different flavours of i386 kernels.
+We could just as easily be building kernels for differnet architectures.
+
+The installedname column gives the directory/filename that the kernel and
+modules are installed using in the kernel .deb. The multkern column is
+either y on n; if it is y then the kernel image inside the udeb will include
+the version and flavour in its name. (So will the System.map). The
+build-depends show what kernel deb to use for this kernel.
+
+Finally, you need a modules/<arch> directory, or directories. These are
+used to list the modules that go in a kernel. For example, for i386, we
+want to have some nic drivers, so we create a modules/i386/nic-modules:
+
+  drivers/net/8139too.o
+  drivers/net/e100/e100.o
+  drivers/net/natsemi.o
+  drivers/net/ne2k-pci.o
+  drivers/net/tg3.o
+  drivers/net/tulip/tulip.o
+  drivers/net/winbond-840.o
+  drivers/net/3c59x.o
+
+Suppose we want a different set of modules in the speakup flavored kernel.
+Then create a modules/<arch>-<flavor>/nic-modules instead, it will be used
+by preference. One udeb will be created for each modules list file,
+containing the listed modules. The names of the files should match the
+names of the various modules listed in /usr/lib/kernel-wedge/package-list.
+
+You will also want a special modules list file for the kernel-image udeb.
+If you need to include no modles with your kernel, it can be an empty file.
+but you should have a modules/<arch>/kernel.
+
+The udebs are named with the version of the kernel in their package name,
+since that can be useful during kernel transitions. The string -di is
+appended to prevent any posible collisions in names with real debs.
+
+kernel-wedge includes its own modules lists for some common sets of modules
+that are unlikely to differ between kernels. These are stored in
+/usr/lib/kernel-wedge/modules. If you would like to build one, you need
+only make a symlink to it in your modules/<arch> directory.
+
+Since many version control programs have issues with symlinks, kernel-wedge
+include support for creating symlinks for you, based on .lnk files, via the
+"kernel-wedge make-links" command. For example, a file
+modules/i386/scsi-core-modules.lnk will result in a
+modules/i386/scsi-core-modules. The content of the file becomes the
+destination of the symlink. To link to common module lists, just use
+"common/module-list", instead of hardcoding "/usr/lib/kernel-wedge/modules".
+
+More on the content of the modules lists. The files contain paths relative
+to the top-level kernel modules directory (/lib/modules/<kernel-version>/).
+In fact these files are used as the input to a tar command, and can list
+either files, or whole directories, though the latter is rarely used.
+Modules can have a "-" put in front of their filename, if so that means the
+module is optional, and the build will not fail if the module is not
+available.
+
+One last file, the exclude-packages file is an optional file that lists
+any udebs (by full package name) that would normally be built, but that you
+want to skip.
+
+Building:
+
+Once you have your source package set up, run:
+	kernel-wedge gen-control > debian/control
+You only need to do this once. Then build it like any other package. Be
+amazed at the sheer quantities of udebs that are spit out with no effort.
+Note that you will have to have the kernels listed as build dependencies
+installed normally; but see "kernel-wedge help build-all" for an
+alternative.
+
+Misc other info:
+
+The "kernel-wedge copy-modules" command does the actual copying of modules
+to the temp dirs that are used to build the package. It is complicated by
+the need to make sure that all of a module's dependencies are included in
+its package, or in a package on which it depends. If necessary, extra
+modules will be added to a package to make sure the dependencies are
+satisfied.
+
+The dependency information from modules.dep is compared with the output of
+the "kernel-wedge module-deps" command, which extracts dependency
+information from package-lists, and formats it in a form used by tsort. If
+any additional modules are needed to meet dependencies of modules in the
+udebs, they will automatically be added. Since that might result in modules
+being copied to multiple udebs, the "kernel-wedge find-dups" command is
+used to scan for duplicates of modules. When you have duplicates, you need
+to find (or make) a package that both packages depend on, and move the
+duplicate modules to it.
+
+SOURCEDIR can be set to a directory containing a tree of kernel modules and
+kernel image, and it will be used instead of the usual tree. That directory
+will need to have a modules.dep file already generated for this to work
+though -- but the modules.dep can even be copied from another system and
+it'll work. This can be useful if you cannot install the required
+kernel-image package, or are cross-compiling.
