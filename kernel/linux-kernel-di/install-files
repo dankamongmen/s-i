@@ -50,7 +50,8 @@ while (<KVERS>) {
 	next unless $arch eq $hostarch;
 
 	if ($arch eq "m68k") {
-		$sourcedir="$ENV{PWD}/../m68k/$builddep";
+		$sourcedir="$ENV{PWD}/../m68k/$flavour";
+		$ENV{SOURCEDIR}=$sourcedir
 	}
 
 	my $extraname="";
@@ -65,9 +66,6 @@ while (<KVERS>) {
 		"$sourcedir/boot/System.map-$installedname",
 		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname")
 	      if -e "$sourcedir/boot/System.map-$installedname";
-	if ($arch eq "m68k") {
-		$ENV{SOURCEDIR}=$sourcedir
-	}
 	doit("./copy-modules", $kernelversion, $flavour, $installedname);
 	doit("./find-dups", "$kernelversion-$flavour");
 }
