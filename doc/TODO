@@ -6,11 +6,13 @@ Possibilities for the next beta
 
  - fix all beta2 errata (a must)
  - security fixed, 2.4.24 kernel (with SATA support)
- 	waiting on 2.4.24 to go to testing, otherwise almost ready
+ 	(done for stock i386)
  - discover 2
  - partman (fixes many issues with current system)
- 	first uploads in progress
+ 	initial version available, not default yet
+	needs some UI polishing
  - grub as default boot loader
+ 	(done except testing)
  - XFS support in official release
  - 2.6 kernel
  - improved languagechooser (split out country chooser)
@@ -21,7 +23,8 @@ Possibilities for the next beta
  	in progress
  - udebs and debs with same names
  - better wireless support
- 	wireless-tools-udeb in the archive, not yet in the images
+ 	wireless-tools-udeb is available, but is not loaded by default
+	on netinst CD
 	no easy configurator yet
  - better pcmcia support
  - a manual (partly done)
@@ -29,6 +32,8 @@ Possibilities for the next beta
  - BIDI support (for Arabic)
  - subarchitecture support for powerpc and m68k
 	in progress
+ - get manual building and include on ftp site or web site
+ 	provisional html build system now available
 
 Current status
 ==============
@@ -39,7 +44,9 @@ Current status
 	Also fair success with other install methods: floppy, USB, netboot, etc.
 
 	debian-installer images are built daily for i386, ia64, powerpc.
-	This includes CD images.
+	This includes CD images. Images are available for some other
+	architectures too.
+		http://www.debian.org/devel/debian-installer/ports-status
 
 	debian-installer boot images are available in the Debian archive.
 	
@@ -58,9 +65,6 @@ time.
 	- lintian support for udebs, to catch all the common gotchas
 	- ppp support
 	  Not as important for analog dialup, as for ISDN, pppoe.
-	- wireless support
-	  If you're lucky, you may just get a nearby AP by default, but
-	  there is no wireless-tools, no way to configure it
 	- some architectures
 		arm
 		hurd-i386
@@ -73,14 +77,11 @@ time.
 ---------------------------------------------------------------------
         - user documentation
 		Short term we have the INSTALLATION-HOWTO, but the real
-		install manual is still being put together, and lacks a
-		Makefile.
+		install manual is still being put together.
         - GUI frontend to cdebconf.
 		There are some basic implementations. The trick is to make
 		it a GUI that does not suck, while still using debconf
 		underneath.
-	- cdrom-checker
-		apparently broken (#213054)
 	- pcmcia support
 		- may work, may not.. (many failure reports)
 		- pcmcia-modules are not installed onto the target system
@@ -88,8 +89,10 @@ time.
 		  because pcmcia-cs-udeb has the wrong priority.
 		- Probably need to re-run hw-detect after loading pcmcia from
 		  the net_driver floppy.
+	- wireless support
+		Lacks a configurator for wireless. Command-line iwconfg is
+		available.
 	- some architectures
-		alpha
 		hppa
 		m69k (some subarches)
 			- boots to main menu, no more
@@ -122,12 +125,13 @@ time.
 		Needs to have load-installer properly split out of the anna
 		binary to save space on root floppy.
 	- kernel-package integration
-		Moving to the new linux-kernel-di system, so far only i386
-		is fully converted.
+		Moving to the new linux-kernel-di system. Not all arches
+		use it yet.
         - disk selector, partitioner
-		There are two of them, autopartkit and partkit.
-		partkit needs polish, both work, except for when they
-		don't. (See BTS.)
+		There are three of them, autopartkit, partkit, and partman.
+		partkit needs polish
+		partman needs more
+		All of them work, except for when they don't. (See BTS.)
 	- iso-scan
 		Works, but does not flag the disk the iso is mounted from
 		as unusable by the rest of the installer.
@@ -140,12 +144,14 @@ time.
 		Could be better laid out, lacking some sections, other
 		parts are quite good.
 	- archive integration
-                We probably want to separate testing and unstable at some
-		point.
-		Only a few arches (i386, powerpc) have boot media in the
-		archive.
-		There is currently no mechanism to promote boot media
-		or udebs from unstable to testing.
+		Only a few arches (i386, powerpc, ia64) have boot media in
+		the archive.
+		Last kinks in unstable/testing separation for d-i still being
+		worked out.
+	- low memory support
+		Where "low" is 32 mb!
+		Works, but user must be careful to set up swap ASAP.
+		There is no sanity checking, and some bad failure modes.
 	- some architectures
 		i386
 		ia64
@@ -154,15 +160,11 @@ time.
 			- problems with partitioning, CD images, arcboot
 			- netboot and basic install works, if you know what
 			  you're doing
-	- low memory support
-		Where "low" is 32 mb!
-		Works, but user must be careful to set up swap ASAP.
-		There is no sanity checking, and some bad failure modes.
+		alpha
 
 [90%] Single missing important feature or bug.
 ---------------------------------------------------------------------
         - install media build system
-		The mrvn branch needs to be tested and merged.
 		The dest/ image names need to be reorganised.
 	- partconf
 		Needs progress bars.
@@ -179,7 +181,6 @@ time.
         - udpkg
 		May be eventually replaced with busybox dpkg.
 	- cd installs
-                Works mostly.
  	- net retriever
 	- cdrom retriever
         - ethdetect
@@ -189,7 +190,6 @@ time.
         - main-menu
         - choose-mirror
         - busybox integration
-        - disk formatter
 
 Common problems and transitions
 ===============================
