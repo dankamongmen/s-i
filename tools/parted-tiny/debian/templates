@@ -1,0 +1,60 @@
+Template: parted-tiny/no_hard_drives
+Type: note
+Description: No hard disks drives could be found.
+ Make sure they are cabled correctly and are turned on before the system is
+ started. You may have to change driver settings when you start the system with
+ a command at the "boot:" prompt, or you may have to load a driver that is in a
+ loadable module to solve this problem.
+
+Template: parted-tiny/table_report
+Type: note
+Description: The following partitions have been detected:
+ Device         Mounted on                 Type
+ -------------  -------------------------  -------------------------
+ ${partition_table}
+
+Template: parted-tiny/make_swap
+Type: boolean
+Default: false
+Description: Would you like to do without a swap partition? 
+ A swap partition is a good idea for all systems, even ones with lots of
+ memory.  It's strongly encouraged that you create one. If you have less than 8
+ megabytes of RAM in your system, you will need to create a swap partition
+ simply so that there is enough virtual memory to finish the installation. If
+ you answer "Yes" to the following question, the system will not require you to
+ create a swap partition. It's strongly advised that you answer "No".
+
+Template: parted-tiny/pre_2_2_compat
+Type: boolean
+Default: yes
+Description:  Do you want to retain Linux kernel 2.0 compatibility?
+ This 2.2 version of the Linux kernel has new "ext2" filesystem features not
+ present in earlier kernel versions. Using these features, however, means that
+ you will not be able to use this filesystem with earlier kernels, such as
+ Linux 2.0. 
+
+Template: parted-tiny/skip_bad_block_scan
+Type: boolean
+Default: yes
+Description: Should the bad-block scan be skipped on '${partition}'
+ The system can scan the entire partition for un-readable disk blocks and will
+ mark any such bad blocks it finds so that they will not be used. This requires
+ that every block be read, and thus could take a long time, but may save you
+ trouble later.  Modern disk controllers generally do not need this, since they
+ can identify and deal with bad blocks automatically, so the default is not to
+ perform this check.
+
+Template: parted-tiny/choose_drive
+Type: select
+Choices: ${drives}
+Description: Which drive would you like to partition?
+ Select the drive to partition. SCSI drives are listed in disk ID number order.
+ Only drives that were connected and operating when the system was started will
+ show up in this display. CD-ROM drives may be mis-identified as writable disk
+ drives by this menu.
+
+Template: parted-tiny/choose_mount
+Type: string
+Description: Where would you like to mount ${partition}?
+ You must choose the mount point for this partition.
+
