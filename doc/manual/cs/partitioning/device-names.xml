@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<!-- $Id: device-names.xml,v 1.1 2003/11/13 17:22:47 mck Exp $ -->
+<!-- original version: 1.3 -->
+
+ <sect1 id="device-names">
+ <title>Jak Linux pojmenovává pevné disky</title>
+<para>
+
+Disky a oddíly na nich mají v Linuxu odlišné názvy než v jiných
+operačních systémech. Tyto názvy budete potřebovat při rozdělování
+disku a připojování oblastí. Základní zařízení:
+
+</para>
+<itemizedlist arch="not-s390">
+<listitem><para>
+
+První disketová jednotka je nazvána ,,/dev/fd0''.
+
+</para></listitem>
+<listitem><para>
+
+Druhá disketová jednotka je ,,/dev/fd1''.
+
+</para></listitem>
+<listitem><para>
+
+První disk na SCSI (podle čísel zařízení na sběrnici) je ,,/dev/sda''.
+
+</para></listitem>
+<listitem><para>
+
+Druhý disk na SCSI (vyšší číslo na sběrnici) je ,,/dev/sdb'' atd.
+
+</para></listitem>
+<listitem><para>
+
+První SCSI CD mechanice odpovídá ,,/dev/scd0'' nebo také ,,/dev/sr0''.
+
+</para></listitem>
+<listitem><para>
+
+Hlavní (master) disk na prvním IDE řadiči se jmenuje ,,/dev/hda''.
+
+</para></listitem>
+<listitem><para>
+
+Podřízený (slave) disk na prvním IDE řadiči je ,,/dev/hdb''.
+
+</para></listitem>
+<listitem><para>
+
+Master a slave diskům na druhém řadiči jsou postupně přiřazeny
+,,/dev/hdc'' a ,,/dev/hdd''. Novější IDE řadiče mají dva kanály,
+které se chovají jako dva řadiče.
+
+<phrase arch="m68k">
+Písmena se mohou lišit od toho, co na Macintoshi zobrazuje program
+pdisk (např. to co se v pdisku zobrazuje jako /dev/hdc, se může v
+Debianu objevit jako /dev/hda).
+</phrase>
+
+</para></listitem>
+
+<listitem arch="i386"><para>
+
+Prvnímu XT disku odpovídá ,,/dev/xda''.
+
+</para></listitem>
+<listitem arch="i386"><para>
+
+Druhému XT disku odpovídá ,,/dev/xdb''.
+
+</para></listitem>
+<listitem arch="m68k"><para>
+
+První ACSI zařízení se jmenuje ,,/dev/ada'', druhému odpovídá
+,,/dev/adb''. 
+
+</para></listitem>
+</itemizedlist>
+
+<itemizedlist arch="s390">
+<listitem><para>
+
+Zařízení DASD se jmenují ,,/dev/dasd/xxxx/device'', kde xxxx je číslo
+zařízení v hexadecimálním tvaru. Jádro dodávané se systémem &debian;
+využívá devfs, takže uzly zařízení se vytváří a ruší dynamicky při
+připojení nebo odpojení příslušného zařízení. Další informace můžete
+najít v dokumentu
+<ulink url="http://oss.software.ibm.com/developerworks/opensource/linux390/docu/l390dd08.pdf">
+Device Drivers and Installation Commands</ulink> v kapitole 3.
+
+</para></listitem>
+</itemizedlist>
+
+<para arch="not-s390">
+
+Oddíly na discích jsou rozlišeny připojením čísla k názvu zařízení:
+,,sda1'' a ,,sda2'' představují první a druhý oddíl prvního SCSI
+disku.
+
+</para><para arch="not-s390">
+
+Například uvažujme počítač se dvěma disky na SCSI sběrnici na
+SCSI adresách 2 a 4. Prvnímu disku (na adrese 2) odpovídá zařízení
+,,sda'', druhému ,,sdb''. Tři oddíly na disku ,,sda'' by byly
+pojmenovány ,,sda1'', ,,sda2'', ,,sda3''. Stejné schéma značení platí
+i pro disk ,,sdb'' a jeho oblasti.
+
+</para><para arch="not-s390">
+
+Máte-li v počítači dva SCSI řadiče, pořadí disků zjistíte ze
+zpráv, které Linux vypisuje při startu.
+
+</para><para arch="i386">
+
+Primární oddíly jsou v Linuxu reprezentovány názvem disku a číslem
+oddílu 1 až 4. Například <filename>/dev/hda1</filename> odpovídá
+prvnímu primárnímu oddílu na prvním IDE disku. Logické oddíly jsou
+číslovány od 5, takže na stejném disku má první logický oddíl označení
+<filename>/dev/hda5</filename>. Rozšířený oddíl, tj. primární oddíl
+obsahující logické oddíly, sám o sobě použitelný není.
+To platí jak pro IDE, tak SCSI disky.
+
+</para><para arch="m68k">
+
+Systémy VMEbus používající disketovou SCSI mechaniku TEAC FC-1 ji
+uvidí jako normální SCSI disk. Aby byla identifikace mechaniky
+jednodušší, instalační program vytvoří symbolický odkaz na příslušné
+zařízení a pojmenuje ho ,,/dev/sfd0''.
+
+</para><para arch="sparc">
+
+Sunovské oblasti povolují mít 8 samostatných oblastí (nebo
+také plátků (slices)). Třetí oblast bývá obvykle (a je to tak
+doporučováno) oblast ,,celého disku'' (Whole disk).
+Tato oblast obsahuje všechny sektory na disku a obvykle je používána
+zavaděčem systému (buď SILO nebo vlastním zavaděčem od Sunu).
+
+</para><para arch="s390">
+
+Diskové oblasti &arch-title; povolují 3 samostatné oblasti. Označují
+se /dev/dasd/xxxx/part1, /dev/dasd/xxxx/part2 a /dev/dasd/xxxx/part3.
+
+</para>
+ </sect1>
