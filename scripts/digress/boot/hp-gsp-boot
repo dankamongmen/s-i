@@ -1,41 +1,55 @@
-#!/usr/bin/expect
+#!/usr/bin/perl
 # Uses the GSP to reset the system. The system may be powered off, it will
 # be turned on if so. After reset, gets to the boot menu and sends the
 # defined boot command.
-spawn -noecho "hp-gsp-prompt"
+use strict;
+use Expect;
 
-send "\r"
-expect "GSP>"
+my $exp = new Expect;
+#$exp->exp_internal(1);
+$exp->raw_pty(1);
 
-send "rs\r"
-expect {
-	"SPU power is down" {
-		send "pc\r"
-		expect "Do you wish to turn power On"
-		send "y\nr"
-		expect "Enter delay"
-		send "0\r"
-		expect "Confirm?"
-		send "y\r"
-		expect "System has been powered On"
-	} "Type Y to confirm your intention to restart the system" {
-		send "y\r"
-	}
+$exp->spawn("hp-gsp-prompt") or die "cannot connect: $!\n";
+
+$exp->send("\r");
+$exp->expect(10, "GSP>");
+
+$exp->send("rs\r");
+$exp->expect(60,
+	["SPU power is down" => sub {
+		$exp->send("pc\r");
+		$exp->expect(60, "Do you wish to turn power On");
+		$exp->send("y\r");
+		$exp->expect(60, "Enter delay");
+		$exp->send("0\r");
+		$exp->expect(60, "Confirm?");
+		$exp->send("y\r");
+		$exp->expect(60, "System has been powered On");
+	}],
+	["Type Y to confirm your intention to restart the system" => sub {
+		$exp->send("y\r");
+	}],
+);
+
+$exp->expect(120, "System Boot detected");
+$exp->expect(600, "End of early boot detected");
+$exp->expect(120, "Processor is booting from first available device");
+$exp->send("\r");
+$exp->expect(120, "Main Menu:");
+$exp->send($ENV{HP_GSP_BOOTCOMMAND}."\r");
+$exp->expect(120, "Interact with IPL");
+$exp->send("y\r");
+$exp->expect(120, "Booting...");
+
+$exp->expect(120, "? 0");
+if (length $ENV{BOOT_OPTIONS}) {
+	# Add BOOT_OPTIONS to boot line
+	$exp->send("\r");
+	$exp->send(" ".$ENV{BOOT_OPTIONS}."\r");
+	$exp->expect(120, "? 0");
 }
+$exp->send("");
+$exp->send("b\r");
+$exp->expect(120, "Loading ramdisk");
 
-set timeout 120
-expect "System Boot detected"
-set timeout 600
-expect "End of early boot detected"
-set timeout 120
-expect "Processor is booting from first available device"
-send "\r"
-expect "Main Menu:"
-send $env(HP_GSP_BOOTCOMMAND)
-send "\r"
-expect "Interact with IPL"
-expect ">"
-send "n\r"
-expect "Booting..."
-
-exit
+exit;
