@@ -20,8 +20,6 @@ config.status:
 		--enable-small \
 		--enable-lvm
 
-	touch configure-stamp
-
 build: build-stamp
 build-stamp: config.status
 	dh_testdir
@@ -34,7 +32,7 @@ clean:
 	dh_testdir
 	dh_testroot
 
-	rm -f build-stamp
+	rm -f build-stamp config.status
 	rm -f debian/autopartkit.postinst
 
 	-$(MAKE) distclean
@@ -65,4 +63,4 @@ binary-arch: build install
 	dh_builddeb
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure autopartkit
+.PHONY: build clean binary-indep binary-arch binary install
