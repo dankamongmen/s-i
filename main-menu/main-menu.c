@@ -134,10 +134,10 @@ static size_t menu_entry(struct debconfclient *debconf, char *language, di_syste
 		}
 		// Was the language of the form xx_YY ? 
 		if (strchr(language, '_')) {
-			char buf[10];
-			strncpy (buf, language, 10);
-			*(strchr(buf,'_')) = '\0';
-			snprintf(field, sizeof (field), "Description-%s.UTF-8", buf);
+			char tempbuf[10];
+			strncpy (tempbuf, language, 10);
+			*(strchr(tempbuf,'_')) = '\0';
+			snprintf(field, sizeof (field), "Description-%s.UTF-8", tempbuf);
 			if (!debconf_metaget(debconf, question, field))
 	                {
 	                        strncpy(buf, debconf->value, size);
