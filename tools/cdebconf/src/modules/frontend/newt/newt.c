@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.39 2003/11/06 22:27:08 barbier Rel $
+ * $Id: newt.c,v 1.40 2003/11/08 22:39:41 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -309,11 +309,14 @@ show_separate_window(struct frontend *obj, struct question *q)
     newtTextboxSetText(textbox, full_description);
     free(full_description);
     bOk     = newtCompactButton( win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
-    if (obj->methods.can_go_back(obj, q))
+    if (obj->methods.can_go_back(obj, q)) {
         bCancel = newtCompactButton(5,  win_height-2, goback_text(obj));
-    else
+        newtFormAddComponents(form, bCancel, textbox, bOk, NULL);
+    } else {
         bCancel = NULL;
-    newtFormAddComponents(form, textbox, bOk, bCancel, NULL);
+        newtFormAddComponents(form, textbox, bOk, NULL);
+    }
+    newtFormSetCurrent(form, bOk);
     cRet = newtRunForm(form);
     if (cRet == bOk)
         ret = DC_OK;
@@ -383,11 +386,13 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         defval = (char *)question_getvalue(q, "");
     entry   = newtEntry(1, 1+t_height+1, defval, t_width, &result, eflags);
     bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)),  win_height-2, continue_text(obj));
-    if (obj->methods.can_go_back(obj, q))
+    if (obj->methods.can_go_back(obj, q)) {
         bCancel = newtCompactButton(5 , win_height-2, goback_text(obj));
-    else
+        newtFormAddComponents(form, bCancel, textbox, entry, bOk, NULL);
+    } else {
         bCancel = NULL;
-    newtFormAddComponents(form, textbox, bOk, entry, bCancel, NULL);
+        newtFormAddComponents(form, textbox, entry, bOk, NULL);
+    }
     newtFormSetCurrent(form, entry);
     cRet = newtRunForm(form);
     if ((cRet == NULL) || (bCancel != NULL && cRet == bCancel))
@@ -478,12 +483,6 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         sel_height = win_height - t_height - 5;
     }
     create_window(win_width, win_height, obj->title, q->priority);
-    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
-    if (obj->methods.can_go_back(obj, q) || !show_ext_desc)
-        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
-    else
-        bCancel = NULL;
-    newtFormAddComponents(form, bOk, bCancel, NULL);
     if (count > sel_height) {
         scrollbar = newtVerticalScrollbar((win_width+sel_width+5)/2, 1+t_height+1, sel_height,
                 NEWT_COLORSET_WINDOW, NEWT_COLORSET_ACTCHECKBOX);
@@ -502,7 +501,14 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
                 def = 1;
         newtFormAddComponent(sform, newtCheckbox((win_width-sel_width-3)/2, 1+t_height+1+i, choices_trans[i], def ? '*' : ' ', " *", &answer[tindex[i]]));
     }
-    newtFormAddComponent(form, sform);
+    bOk     = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
+    if (obj->methods.can_go_back(obj, q) || !show_ext_desc) {
+        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
+        newtFormAddComponents(form, bCancel, sform, bOk, NULL);
+    } else {
+        bCancel = NULL;
+        newtFormAddComponents(form, sform, bOk, NULL);
+    }
     newtFormSetCurrent(form, sform);
     cRet = newtRunForm(form);
     if ((cRet == NULL) || (bCancel != NULL && cRet == bCancel))
@@ -615,11 +621,6 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         listflags |= NEWT_FLAG_SCROLL;
     create_window(win_width, win_height, obj->title, q->priority);
     listbox = newtListbox((win_width-sel_width-3)/2, 1+t_height+1, sel_height, listflags);
-    if (obj->methods.can_go_back(obj, q) || !show_ext_desc)
-        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
-    else
-        bCancel = NULL;
-    bOk = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
         newtListboxAppendEntry(listbox, choices_trans[i], choices[tindex[i]]);
@@ -633,7 +634,15 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         defchoice = 0;
     if (defchoice >= 0)
         newtListboxSetCurrent(listbox, defchoice);
-    newtFormAddComponents(form, listbox, bOk, bCancel, NULL);
+    bOk = newtCompactButton(win_width - 9 - strwidth(continue_text(obj)), win_height-2, continue_text(obj));
+    if (obj->methods.can_go_back(obj, q) || !show_ext_desc) {
+        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
+        newtFormAddComponents(form, bCancel, listbox, bOk, NULL);
+    } else {
+        bCancel = NULL;
+        newtFormAddComponents(form, listbox, bOk, NULL);
+    }
+    newtFormSetCurrent(form, listbox);
     cRet = newtRunForm(form);
     if ((cRet == NULL) || (bCancel != NULL && cRet == bCancel))
         ret = DC_GOBACK;
@@ -701,13 +710,15 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     if (full_description != NULL)
         newtTextboxSetText(textbox, full_description);
     free(full_description);
-    if (obj->methods.can_go_back(obj, q))
-        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
-    else
-        bCancel = NULL;
     bYes     = newtCompactButton((win_width - strwidth(yes_text(obj)) - 2)/2, win_height-2, yes_text(obj));
     bNo      = newtCompactButton(win_width - 9 - strwidth(no_text(obj)), win_height-2, no_text(obj));
-    newtFormAddComponents(form, textbox, bYes, bNo, bCancel, NULL);
+    if (obj->methods.can_go_back(obj, q)) {
+        bCancel = newtCompactButton(5, win_height-2, goback_text(obj));
+        newtFormAddComponents(form, bCancel, textbox, bYes, bNo, NULL);
+    } else {
+        bCancel = NULL;
+        newtFormAddComponents(form, textbox, bYes, bNo, NULL);
+    }
     if (question_getvalue(q, "") != NULL && strcmp(question_getvalue(q, ""), "true") == 0)
         newtFormSetCurrent(form, bYes);
     else
