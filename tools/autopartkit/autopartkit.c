@@ -912,6 +912,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 
 /*
  * Remove all partitions on all detected disks.
+ * FIXME: Do not work with libparted 1.6
  */
 static void
 nuke_all_partitions(void)
@@ -924,6 +925,7 @@ nuke_all_partitions(void)
         PedDisk *p;
 	p = ped_disk_new_fresh(dev, ped_disk_type_get(DISK_LABEL));
 	ped_disk_destroy(p);
+	ped_disk_commit(p);
 	dev = ped_device_get_next(dev);
     } while (dev != NULL);
 }

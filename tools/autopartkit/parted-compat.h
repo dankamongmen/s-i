@@ -26,7 +26,7 @@
 #define PED_INIT()
 #define PED_DONE()
 /* Missing in v1.6.1 */
-#  define PED_PARTITION_PRIMARY PED_PARTITION_LOGICAL
+#  define PED_PARTITION_PRIMARY 0
 #endif
 
 #endif /* _PARTED_COMPAT_H */
