@@ -11,15 +11,15 @@
 #include <libgen.h>
 #include <errno.h>
 
-#include <cdebconf/debconfclient.h>
-
 #include "partconf.h"
+#include "hinting.h"
 
-static struct debconfclient *debconf = NULL;
 struct partition *parts[MAX_PARTS];
 static char *filesystems[MAX_FSES];
 static int part_count = 0, fs_count = 0;
 static char *fschoices;
+
+struct debconfclient *debconf = NULL;
 
 static PedExceptionOption
 my_exception_handler(PedException* ex)
@@ -201,7 +201,7 @@ sanity_checks(void)
             }
         }
         if (!ok) {
-            debconf->command(debconf, "INPUT critical", "partconf/sanity-no-root", NULL);
+            debconf->command(debconf, "INPUT", "critical", "partconf/sanity-no-root", NULL);
             debconf->command(debconf, "GO", NULL);
             return 0;
         }
@@ -292,7 +292,7 @@ mountpoint_sort_func(const void *v1, const void *v2)
 /*
  * Like mkdir -p
  */
-static void
+void
 makedirs(const char *dir)
 {
     DIR *d;
@@ -368,9 +368,10 @@ finish(void)
         debconf->command(debconf, "INPUT critical", errq, NULL);
         debconf->command(debconf, "GO", NULL);
         exit(30);
-    }
-    else
+    } else {
+		write_hintings_file(parts, part_count);
         exit(0);
+	}
 }
 
 static struct partition *curr_part = NULL;
@@ -405,6 +406,11 @@ filesystem(void)
     }
     if (strcmp(debconf->value, "Abort") == 0)
         return -1;
+	if (strcmp(debconf->value, "Add other mountpoint") == 0) {
+		part_count = add_hinting_partition(parts, part_count);
+		return(1);
+	}
+
     partname = strdup(debconf->value);
     if ((ptr = strchr(partname, ' ')) == NULL)
         return -1;
@@ -417,6 +423,13 @@ filesystem(void)
         }
     if (curr_part == NULL)
         return -1;
+
+	/* is this a real device, or one of the hinting partitions? */
+	if(curr_part->hinting == 1) {
+		edit_hinting_partition(parts, part_count, i);
+		return(1);
+	}
+
     if (curr_part->fstype != NULL) {
         curr_q = "partconf/existing-filesystem";
         debconf->command(debconf, "SUBST", curr_q, "FSTYPE", curr_part->fstype, NULL);
@@ -520,6 +533,7 @@ main(int argc, char *argv[])
         debconf->command(debconf, "GO", NULL);
         return 1;
     }
+    part_count = get_all_hintings(parts, part_count, MAX_PARTS);
     if (get_all_filesystems() <= 0) {
         debconf->command(debconf, "INPUT critical", "partconf/no-filesystems", NULL);
         debconf->command(debconf, "GO", NULL);
