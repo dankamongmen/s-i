@@ -64,9 +64,10 @@ load_modules()
 
 # wrapper for discover command that can distinguish Discover 1.x and 2.x
 discover_hw () {
+    DISCOVER=/sbin/discover
     # Ugh, Discover 1.x didn't exit with nonzero status if given an
     # unrecongized option!
-    DISCOVER_TEST=$(discover --version 2> /dev/null)
+    DISCOVER_TEST=$($DISCOVER --version 2> /dev/null)
     if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
         # Discover 2.x, see <URL:http://hackers.progeny.com/discover/> for doc
         # XXX: This is copied from xfree86, and do not work yet
@@ -81,14 +82,14 @@ discover_hw () {
         VENDOR_MODEL_FILE=/tmp/discover-vendor.txt
         DRIVER_FILE=/tmp/discover-driver.txt
 
-        discover --type-summary $dflags > $VENDOR_MODEL_FILE
-        discover --data-path=$dpath --data-version=$dver $dflags > $DRIVER_FILE
+        $DISCOVER --type-summary $dflags > $VENDOR_MODEL_FILE
+        $DISCOVER --data-path=$dpath --data-version=$dver $dflags > $DRIVER_FILE
         # 'paste' is missing from busybox-cvs-udeb [pere 2003-06-01]
-        paste $VENDOR_MODEL_FILE $DRIVER_FILE
+        paste -d: $VENDOR_MODEL_FILE $DRIVER_FILE
         rm -f $VENDOR_MODEL_FILE $DRIVER_FILE
     else
         # must be Discover 1.x
-        /sbin/discover --format="%m\t%V %M\n" \
+        $DISCOVER --format="%m:%V %M\n" \
             --disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom ethernet |
 	  sed 's/ $//'
     fi
@@ -97,21 +98,21 @@ discover_hw () {
 # Return list of lines with "Kernel module<tab>Vendor<tab>Model"
 get_hw_info() {
     # Try to make sure the floppy driver is available
-    echo "floppy	Linux Floppy Driver"
+    echo "floppy:Linux Floppy Driver"
 
     discover_hw
 
     # Manually load modules to enable things we can't detect.
     # XXX: This isn't the best way to do this; we should autodetect.
     # The order of these packages are important. [pere 2003-03-16]
-    echo "ide-mod	Linux IDE Driver"
-    echo "ide-probe-mod	Linux IDE probe Driver"
-    echo "ide-disk	Linux ATA DISK Driver"
-    echo "ide-cd	Linux ATAPI CD-ROM Driver"
-    echo "isofs	Linux ISO 9660 Filesystem Driver"
-    #echo "i82365	Linux Unknown"
-    #echo "sr_mod	Linux Unknown"
-    #echo "usb-storage	Linux Unknown"
+    echo "ide-mod:Linux IDE Driver"
+    echo "ide-probe-mod:Linux IDE probe Driver"
+    echo "ide-disk:Linux ATA DISK Driver"
+    echo "ide-cd:Linux ATAPI CD-ROM Driver"
+    echo "isofs:Linux ISO 9660 Filesystem Driver"
+    #echo "i82365:Linux Unknown"
+    #echo "sr_mod:Linux Unknown"
+    #echo "usb-storage:Linux Unknown"
 }
 
 log "Detecting hardware..."
@@ -129,8 +130,8 @@ IFS="
 "
 for device in `get_hw_info`
 do
-    module="`echo $device | cut -f1`"
-    cardname="`echo $device | cut -f2`"
+    module="`echo $device | cut -d: -f1`"
+    cardname="`echo $device | cut -d: -f2`"
     # Restore IFS after extracting the fields.
     IFS="$IFS_SAVE"
 
