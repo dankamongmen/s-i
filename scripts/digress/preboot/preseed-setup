@@ -1,0 +1,17 @@
+#!/bin/sh
+# Sets up a preseed/t/$MACHINE file based on some environment variables.
+# This is mostly useful if you're netbooting and out of kernel command line
+# space, and need to vary some options on a per scheme basis.
+f=$DI_TESTDIR/preseed/t/$MACHINE
+rm -f $f
+echo "# Automatically generated for $SCHEME digress test" >> $f
+
+if [ -n "$TASK" ]; then
+	echo "d-i preseed/include string ../main.cfg ../task/$TASK.cfg" >> $f
+else
+	echo "d-i preseed/include string ../main.cfg" >> $f
+fi
+
+if [ -n "$SUITE" ]; then
+	echo "d-i mirror/suite string $SUITE" >> $f
+fi
