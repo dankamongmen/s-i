@@ -1,103 +1,24 @@
-Redesigning Debian's boot floppies
-
-Our install and our boot floppies have long been a problem for Debian.
-I'm going to try to identify the roots of the problems with the boot
-floppies and suggest some soutions, but first let's look at how the boot
-floppies work now and what they have to do.
-
-Boot floppies now
------------------
-
-A few stages can be identified in a debian install now:
+Here is an overview of the new design.
 
 1. initial boot off of install media (floppy, cd)
-  - Syslinux (or other loader for other arch) is run, and it boots the kernel
+  - Syslinux (or other loader) is run, and it boots the kernel
 2. kernel boot
-  - The kernel sets up a ram disk and loads the main install system
-3. main install system
-  - Many subsections here. Key are:
-    - identify local settings (is there color? What lanugage and time zone?)
-    - load device drivers from install media
-    - identify hardware, configure device drivers
-    - set up install disk (partitioning, formatting)
-    - install base system (kernel, base tarball, lilo (other loaders for
-      other arch's))
-  - This also includes a full shell system for rescue and other activities.
-4. reboot
-  - Several questions asked before the user is dumped into a normal login:
-    - root password
-    - add another user
-    - shadow passwords, pcmcia, etc
-    - package selection
-    - package install
-
-The root of the problem
------------------------
-
-I think the core of our problems is in step 3. Everything that happens in
-step 3 is done with special-purpose code, that has to deal with all the
-possbilites (multiple arches, different install methods and hardware, etc)
-and must be crammed into as small a space as possible. Note that these two
-needs tend to conflict a lot!
-
-The code isn't reused in other parts of debian, and developers tend to
-forget about the installation once they've done it, so only a small team of
-people works on it. Contrast with step 4, where little of the code is
-special purpose, and space constrianst are no longer a real problem. 
-
-I think that much of what is done in step 3 can be postponed to step 4.
-(Things like time zone setup, configuration of hardware not necessary to
-boot, etc). Anything that is pushed back to step 4 becomes part of a "real"
-debian system, and so I think it will get a lot more attention.
-
-Goals
------
-
-I would like to reorganize the boot floppies to accomplish the following
-goals:
-
-- Bring them back into the core of debian as much as possible, so more
-  people work on them as part of normal debian work. This means getting
-  a normal debian system up as soon as possible, and continuing the rest of
-  the install inside it.
-- Make them modular, for increased flexability, and smaller size.
-- Make the set of floppies you need to burn to install debian smaller.
-  Ideally: 1.
-- Simplify the install as much as possible.
-
-New design
-----------
-
-Here is an overview of the new design I am proposing. The install process is
-modularized, and works like this:
-
-1. initial boot off of install media (floppy, cd)                    
-  - Syslinux (or other loader for other arch) is run, and it boots the kernel
-2. kernel boot
-  - the kernel sets up an initrd, which contains the installer,
-    UI, and bootstrap loader, and runs the installer
+  - The kernel sets up an initrd, runs the installer.
 3. installer
-  The installer consists a bit of logic code, and some random tools like tar.
-  - figures out what UI to use and starts it in the most portable mode that
-    UI has (ie, uncolored text in English).
-  - runs the UI's setup program.
-  - probes to see if any extra modules are available on the initrd. If so,
-    sets them up. (optional)
-  - if more than one bootstrap loader is available, asks which to use.
-  - runs the bootstrap loader's setup program.
-  - asks the bootstrap loader to see if there are any extra modules it can
-    download. If so, gets them and sets them up. (optional)
-  - tells the bootstrap loader to download the bootstrap partitioner.
-  - mounts the bootstrap partitioner on a ram disk, and runs the
-    bootstrap partitioner's setup program.
-  - tells the bootstrap loader to download the base system.
-  - unpacks the base system onto the filesystem the partitioner set up.
-    (In an ideal world, the base system would be smaller, just containing dpkg
-     and it's dependancies, and the rest would be downloaded and installed
-     as .deb's in a chroot.)
-  - chroots into the base system and runs the base setup program.
+  - Check to see what UI's are available (already unpacked onto the
+    initrd), and choses one of them.
+  - Configures the UI.
+  - Checks to see what other modules are already unpacked and not yet
+    configured on the initrd, and configures each in turn. This is expected
+    to include at least one module retreiver, and possibly more.
+  - Asks the module retreivers to retreive any additional modules that are
+    available, and installs and configures those modules, one at a time.
+    This is expected to include at least a disk partitioning and formatting
+    module.
+  - Asks a module retreiver to retreive the base system module (yes, it's a
+    .deb too..), and install it (its postinst probably chroots into the
+    new base system and a base setup program).
 4. base setup program
-  - This program runs inside a complete debian base system.
   - Sets up some of:
     - lilo (or other loader)
     - the initrd debian will boot from

@@ -1,47 +1,46 @@
 Retrievers
 ----------
 
-Retrievers are modules that can download or otherwise retreive
-other modules[1]. It is expected that at least the following types will
-eventually be implemented:
+Retrievers are modules that can download or otherwise retrieve
+other modules[1] and Packages files. It is expected that at least the
+following types will eventually be implemented:
 
 - cd retriever
 	Ensures an install cd is mounted, and finds modules on it. No real
-	retreiving done.
+	retrieving done.
 - floppy retriever
 	May or may not need to deal with modules split accross multiple
-	floppies. In any case, pulls the module off the floppy.
+	floppies. In any case, pulls modules off floppies.
 - hard disk retriever
-	Downloads a module from a local hard disk (dos or linux, etc -- may
-	be different retrievers for different disk types).
+	Gets a module from a local hard disk (dos, linux, etc).
 - http retriever
 	Downloads a module from a remote http mirror.
 - ftp retriever (needed?)
 	Downloads a module from a remote ftp mirror.
 - nfs retriever
-	Makes a module available from nfs.
+	Gets module via nfs.
 
 A module retriever must be able to do the following:
 
 - Set itself up so it can access the cdrom, mirror, or whatever.
 - Get a list of the modules that are available. This will be done by
   retreiving a standard Packages file.
-- Download a module.
+- Retrieve a module.
 
-A common support module for all retriever modules will take care of parsing
-the Packages files, and checking md5sums of downloaded modules.
+A separate module will take care of parsing the Packages files, and 
+checking md5sums of downloaded modules.
 
 Since retrievers are debian packages, they have a postinst that is
 run to set them up. During setup, they may need to prompt the user for
 information (using debconf).
 
 Retrievers may also need to depend on additional modules. For example the
-http/ftp/nfs retrievers will need to depend on a module to set up networking,
+http/ftp/nfs retrievers will need to depend on a module to sets up networking,
 while the cdrom retriever will need to depend on module(s) that include kernel
 modules for the iso9660 filesystem and cd drivers.
 
 Retrievers may also need to interact with the user when they are retrieving
-a module. For example, the floppy retriever will need to prompt for disks.
+a file. For example, the floppy retriever will need to prompt for disks.
 This interaction will also be accomplished via debconf.
 
 Retriever interface
@@ -50,7 +49,8 @@ Retriever interface
 All retrievers should support the following interface.
 
 [ This interface is preliminary and depends on the filesystem layout and
-ramdisk allocation scheme used by the installer, and may change. ]
+ramdisk allocation scheme used by the installer, and the location may 
+change. ]
 
 /usr/lib/debian-installer/retriever/<retriever name> is a executable. It
 is run with the following parameters:
@@ -70,8 +70,8 @@ is run with the following parameters:
 If the destination file already exists, the retriever may want to attempt
 to continue a download.
 
-Retrievers are free to prompt the user, or do whatever else is necessary to
-retrieve the file.
+Once ran, retrievers are free to prompt the user, or do whatever else is 
+necessary to retrieve the file.
 
 Note that this simple interface requires that retrievers know the location
 of the base directory of the archive. This will not be a problem for many 
@@ -79,8 +79,9 @@ of the base directory of the archive. This will not be a problem for many
 location. Other retrievers may require more configuration. For example, the
 http retriever will need to know what version of Debian is being installed,
 what site to install from, and probably what version of the debian-installer
-is being installed as well. The user will likely have to be prompted for
-some of this data during retriever setup.
+is being used as well. The user will likely have to be prompted for some,
+but not all, of this data during retriever setup.
+
 
 Footnotes:
 
@@ -88,6 +89,7 @@ Footnotes:
     is a lot more simplistic and we don't need to suppoprt things like
     pipelining multiple downloads.
 [2] Some retrievers may want to show progress displays while downloading.
-    Support for this will need to be added to debconf, via a new data type.
-    Details to be determined.
+    Support for this may need to be added to debconf, via a new data type.
+    It's rather hard to do in the context of debconf -- details to be
+    determined.
 
