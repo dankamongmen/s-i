@@ -7,7 +7,7 @@
  *
  * Description: Newt UI for cdebconf
  *
- * $Id: newt.c,v 1.21 2003/09/04 00:03:00 kubota Exp $
+ * $Id: newt.c,v 1.22 2003/09/23 15:11:00 sesse Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -362,7 +362,11 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     q_ext_text = q_get_extended_description(q);
 #endif
     if (show_ext_desc && q_ext_text) {
+#ifdef HAVE_LIBTEXTWRAP
+        textbox = newtTextbox(1, 1, win_width-4, 10, 0); 
+#else
         textbox = newtTextbox(1, 1, win_width-4, 10, NEWT_FLAG_WRAP);
+#endif
         assert(textbox);
         newtTextboxSetText(textbox, q_ext_text);
         t_height = newtTextboxGetNumLines(textbox);
@@ -486,7 +490,11 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     q_ext_text = q_get_extended_description(q);
 #endif
     if (show_ext_desc && q_ext_text) {
+#ifdef HAVE_LIBTEXTWRAP
+        textbox = newtTextbox(1, 1, win_width-4, 10, 0);
+#else
         textbox = newtTextbox(1, 1, win_width-4, 10, NEWT_FLAG_WRAP);
+#endif
         assert(textbox);
         newtTextboxSetText(textbox, q_ext_text);
         t_height = newtTextboxGetNumLines(textbox);
