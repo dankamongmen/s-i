@@ -112,7 +112,7 @@ do
 		db_fset "$template" seen false || true
 		db_subst "$template" vendor "$name" || true
 		db_subst "$template" module $module || true
-		db_input low "$template" || true
+		db_input low "$template" || [ $? -eq 30 ]
 		db_go || true
 		db_get "$template" || true
                 mounted=0
@@ -203,7 +203,7 @@ do
     if [ -n "$devices" ]
     then
 	db_fset cdrom-detect/is_cd_inserted seen false
-	db_input critical cdrom-detect/is_cd_inserted
+	db_input critical cdrom-detect/is_cd_inserted || [ $? -eq 30 ]
 	db_go
 	db_get cdrom-detect/is_cd_inserted
 	if [ "$RET" = "false" ]
@@ -214,7 +214,7 @@ do
     
     # Otherwise manual configuration may be needed
     db_fset cdrom-detect/manual_config seen false
-    db_input critical cdrom-detect/manual_config
+    db_input critical cdrom-detect/manual_config || [ $? -eq 30 ]
     db_go
     db_get cdrom-detect/manual_config
 
@@ -231,14 +231,14 @@ do
     then
 	db_fset cdrom-detect/cdrom_module seen false
 	db_subst cdrom-detect/cdrom_module choices "$modules"
-	db_input critical cdrom-detect/cdrom_module
+	db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
 	db_go
 
 	db_get cdrom-detect/cdrom_module
 	module="$RET"
 
 	db_fset cdrom-detect/cdrom_device seen false
-	db_input critical cdrom-detect/cdrom_device
+	db_input critical cdrom-detect/cdrom_device || [ $? -eq 30 ]
 	db_go
 
 	db_get cdrom-detect/cdrom_device
@@ -255,9 +255,22 @@ do
 	fi
     else
 	log "CDROM-detect failed."
+	db_input critical cdrom-detect/no-cd || [ $? -eq 30 ]
+	db_go
 	exit 1
     fi
 done
+
+if [ -e /cdrom/.disk/info ] ; then
+   CDNAME=`cat /cdrom/.disk/info`
+   log "Detected CD '$CDNAME'"
+else
+   log "The available CD is not a Debian CD!"
+   umount /cdrom
+   db_input critical cdrom-detect/wrong-cd || [ $? -eq 30 ]
+   db_go
+   exit 1 
+fi
 
 # Set the distribution used by base-installer, test in priority order
 for dist in stable testing unstable ; do
@@ -275,9 +288,8 @@ apt-install eject || true
 
 # Hey, we're done
 db_fset cdrom-detect/success seen false
-db_subst cdrom-detect/success cdname "`cat /cdrom/.disk/info`"
-db_input low cdrom-detect/success || true
+db_subst cdrom-detect/success cdname "CDNAME"
+db_input low cdrom-detect/success || [ $? -eq 30 ]
 db_go
 
 exit 0
-
