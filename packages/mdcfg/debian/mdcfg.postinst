@@ -232,7 +232,7 @@ md_create_raid1() {
 	done
 
 	# Find the next available md-number
-	MD_NUM=`cat /proc/mdstat|grep md|head -1|sed -e 's/^md\(.*\) : active .*/\1/'`
+	MD_NUM=`cat /proc/mdstat|grep md|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -1`
 	if [ -z "${MD_NUM}" ]; then
 		MD_NUM=0
 	else
