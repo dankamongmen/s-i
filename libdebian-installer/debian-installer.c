@@ -303,8 +303,7 @@ parse_dependency(char *buf, struct package_dependency **dep)
 }
 
 #define BUFSIZE         4096
-  struct linkedlist_t *
-di_pkg_parse(FILE *f)
+struct linkedlist_t *di_pkg_parse(FILE *f)
 {
   char buf[BUFSIZE];
   struct linkedlist_t *list;
@@ -484,6 +483,24 @@ di_pkg_parse(FILE *f)
   }
 
   return list;
+}
+
+/*
+ * Read status file and generate and return a linked list of packages.
+ */
+struct linkedlist_t *di_status_read(void) {
+	FILE *f;
+	struct linkedlist_t *plist;
+
+	if ((f = fopen(STATUSFILE, "r")) == NULL) {
+		perror(STATUSFILE);
+		return 0;
+	}
+	plist = di_pkg_parse(f);
+	fclose(f);
+	di_pkg_resolve_deps(plist);
+
+	return plist;
 }
 
   struct package_t *
@@ -915,4 +932,3 @@ di_mapdevfs(const char *path, char *buf, size_t n)
 
   return ret;
 }
-

@@ -8,6 +8,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#define DPKG_CONFIGURE_COMMAND "/usr/bin/udpkg --configure"
+#define DPKGDIR         "/var/lib/dpkg/"
+#define STATUSFILE      DPKGDIR "status"
+
 #define MAXLINE 512
 
 #define DEPENDSMAX	64	/* maximum number of depends we can handle */
@@ -76,6 +80,7 @@ char *di_stristr(const char *haystack, const char *needle);
 struct package_t *di_pkg_alloc(const char *name);
 void di_pkg_free(struct package_t *p);
 struct linkedlist_t *di_pkg_parse(FILE *fp);
+struct linkedlist_t *di_status_read(void);
 struct package_t *di_pkg_find(struct linkedlist_t *ptr, const char *package);
 int di_pkg_provides(struct package_t *p, struct package_t *target);
 int di_pkg_is_virtual(struct package_t *p);

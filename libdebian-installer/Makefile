@@ -11,12 +11,10 @@ LIBS=$(LIB) $(SONAME) $(LIBNAME) $(LIBNAME_A)
 PREFIX=$(DESTDIR)/usr/
 libdir=$(DESTDIR)/usr/lib/
 incdir=$(DESTDIR)/usr/include/
-CFLAGS=-fPIC -Wall  -Os 
+CFLAGS=-fPIC -Wall -g
 
-ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
-CFLAGS += -g
-else
-CFLAGS += -fomit-frame-pointer
+ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+CFLAGS += -fomit-frame-pointer -Os
 endif
 
 
