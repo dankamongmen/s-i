@@ -1,7 +1,11 @@
 #!/bin/sh
-set -x
+set -e
 
 [ "$TERM_TYPE" != network ] && exit 0
+
+. /usr/share/debconf/confmodule
+
+TEMPLATE_ROOT=debian-installer/network-console
 
 DIR=/etc/ssh/
 
@@ -13,4 +17,7 @@ echo 'installer:x:0:0:installer:/:/usr/sbin/base-config-network-console' >> /tar
 grep "^installer:" /etc/shadow >> /target/etc/shadow
 
 apt-install network-console-config
+
+db_input critical $TEMPLATE_ROOT/prebaseconfig-reminder
+db_go
 
