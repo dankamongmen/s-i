@@ -400,7 +400,7 @@ char *
 command_metaget(struct confmodule *mod, char *arg)
 {
     struct question *q;
-    const char *value;
+    char *value;
     char *argv[4];
     int argc;
     char *out;
@@ -419,6 +419,7 @@ command_metaget(struct confmodule *mod, char *arg)
         asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, argv[1]);
     else
         asprintf(&out, "%u %s", CMDSTATUS_SUCCESS, value);
+    free(value);
 
     return out;
 }
@@ -561,7 +562,7 @@ command_progress(struct confmodule *mod, char *arg)
 {
     int min, max;
     struct question *q = NULL;
-    const char *value;
+    char *value;
     char *argv[6];
     int argc;
     char *out;
@@ -599,6 +600,7 @@ command_progress(struct confmodule *mod, char *arg)
         }
         mod->frontend->methods.progress_start(mod->frontend,
                 min, max, value);
+        free(value);
     }
     else if (strcasecmp(argv[0], "set") == 0)
     {
@@ -628,6 +630,7 @@ command_progress(struct confmodule *mod, char *arg)
             return out;
         }
         mod->frontend->methods.progress_info(mod->frontend, value);
+        free(value);
     }
     else if (strcasecmp(argv[0], "stop") == 0)
     {
@@ -646,7 +649,7 @@ char *
 command_settitle(struct confmodule *mod, char *arg)
 {
     struct question *q = NULL;
-    const char *value;
+    char *value;
     char *out;
 
     q = mod->questions->methods.get(mod->questions, arg);
@@ -664,6 +667,7 @@ command_settitle(struct confmodule *mod, char *arg)
     }
 
     mod->frontend->methods.set_title(mod->frontend, value);
+    free(value);
 
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;
@@ -697,7 +701,7 @@ char *
 command_x_setbacktitle(struct confmodule *mod, char *arg)
 {
     struct question *q = NULL;
-    const char *value;
+    char *value;
     char *out;
 
     q = mod->questions->methods.get(mod->questions, arg);
@@ -715,6 +719,7 @@ command_x_setbacktitle(struct confmodule *mod, char *arg)
     }
 
     mod->frontend->methods.set_backtitle(mod->frontend, value);
+    free(value);
 
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;
