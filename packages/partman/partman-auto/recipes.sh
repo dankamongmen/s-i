@@ -288,17 +288,23 @@ choose_recipe () {
 	fi
     done
 
+    
     free_size=$1
     choices=''
-    first_recipe=no
+    default_recipe=no
+    db_get partman-auto/choose_recipe
+    old_default_recipe="$RET"
     for recipe in $recipedir/*; do
 	[ -f "$recipe" ] || continue
 	decode_recipe $recipe
 	if [ $(min_size) -le $free_size ]; then
 	    choices="${choices}${recipe}${TAB}${name}${NL}"
-	    if [ no = "$first_recipe" ]; then
-		first_recipe="$recipe"
+	    if [ no = "$default_recipe" ]; then
+		default_recipe="$recipe"
 	    fi
+	    if [ "$old_default_recipe" = "$name" ]; then
+		default_recipe="$recipe"
+            fi
 	fi
     done
     
@@ -308,7 +314,7 @@ choose_recipe () {
        return 1
     fi
  
-    debconf_select high partman-auto/choose_recipe "$choices" "$first_recipe"
+    debconf_select high partman-auto/choose_recipe "$choices" "$default_recipe"
     if [ "$?" = 255 ]; then
 	exit 0
     fi
