@@ -183,3 +183,23 @@ int strcmdsplit(char *inbuf, char **argv, size_t maxnarg)
 
 	return argc;
 }
+
+void strescape(const char *inbuf, char *outbuf, const size_t maxlen)
+{
+	char *p = inbuf;
+	int i = 0;
+	while (*p != 0 && i < maxlen-1)
+	{
+		if (*p == '\\' || *p == '"')
+		{
+			if (i + 4 >= maxlen) break;
+			outbuf[i] = '%';
+			sprintf(&outbuf[i+1], "%02X", (unsigned int)*p);
+			p++;
+			i += 3;
+		}
+		else
+			outbuf[i++] = *p++;
+	}
+	outbuf[i] = 0;
+}

@@ -19,6 +19,17 @@ void question_delete(struct question *question)
 	DELETE(question);
 }
 
+void question_ref(struct question *q)
+{
+	++q->ref;
+}
+
+void question_deref(struct question *q)
+{
+	if (--q->ref == 0)
+		question_delete(q);
+}
+
 void question_setvalue(struct question *q, const char *value)
 {
 	free(q->value);
@@ -48,6 +59,18 @@ void question_variable_add(struct question *q, const char *var,
 
 void question_owner_add(struct question *q, const char *owner)
 {
+	struct questionowner **ownerp = &q->owners;
+	
+	while (*ownerp != 0)
+	{
+		if (strcmp((*ownerp)->owner, owner) == 0)
+			return;
+		ownerp = &(*ownerp)->next;
+	}
+
+	*ownerp = NEW(struct questionowner);
+	(*ownerp)->owner = STRDUP(owner);
+	(*ownerp)->next = 0;
 }
 
 void question_owner_delete(struct question *q, const char *owner)

@@ -4,6 +4,7 @@
 #include "textdb.h"
 #include "template.h"
 #include "question.h"
+#include "strutl.h"
 
 #include <dirent.h>
 #include <stdio.h>
@@ -48,6 +49,23 @@ static char *question_filename(struct configuration *cfg, const char *tag)
 		TEXTDB_QUESTION_PATH), tagname);
 
 	return filename;
+}
+
+static char *unescapestr(const char *in)
+{
+	static char buf[8192];
+	char *p = (char *)in;
+	if (in == 0) return 0;
+	strparsequoteword(&p, buf, sizeof(buf));
+	return buf;
+}
+
+static char *escapestr(const char *in)
+{
+	static char buf[8192];
+	if (in == 0) return 0;
+	strescape(in, buf, sizeof(buf));
+	return buf;
 }
 
 static struct template *textdb_lookup_cached_template(
@@ -127,17 +145,16 @@ static int textdb_template_set(struct database *db, struct template *t)
 
 	fprintf(outf, "template {\n");
 
-	fprintf(outf, "\tname \"%s\";\n", t->tag);
-	fprintf(outf, "\ttype \"%s\";\n", t->type);
+	fprintf(outf, "\tname \"%s\";\n", escapestr(t->tag));
+	fprintf(outf, "\ttype \"%s\";\n", escapestr(t->type));
 	if (t->defaultval != NULL)
-		fprintf(outf, "\tdefault \"%s\";\n", t->defaultval);
+		fprintf(outf, "\tdefault \"%s\";\n", escapestr(t->defaultval));
 	if (t->choices != NULL)
-		fprintf(outf, "\tchoices \"%s\";\n", t->choices);
+		fprintf(outf, "\tchoices \"%s\";\n", escapestr(t->choices));
 	if (t->description != NULL)
-		fprintf(outf, "\tdescription \"%s\";\n", t->description);
+		fprintf(outf, "\tdescription \"%s\";\n", escapestr(t->description));
 	if (t->extended_description != NULL)
-		fprintf(outf, "\textended_description \"%s\";\n", 
-			t->extended_description);
+		fprintf(outf, "\textended_description \"%s\";\n", escapestr(t->extended_description));
 
 	fprintf(outf, "};\n");
 	fclose(outf);
@@ -164,19 +181,19 @@ static struct template *textdb_template_get_real(struct database *db,
 
 	t = NEW(struct template);
 
-	t->tag = STRDUP(rec->get(rec, "template::tag", 0));
+	t->tag = STRDUP(unescapestr(rec->get(rec, "template::tag", 0)));
 	if (t->tag == 0)
 	{
-		template_delete(t);
+		template_deref(t);
 		t = 0;
 	}
 	else
 	{
-		t->type = STRDUP(rec->get(rec, "template::type", "string"));
-		t->defaultval = STRDUP(rec->get(rec, "template::default", 0));
-		t->choices = STRDUP(rec->get(rec, "template::choices", 0));
-		t->description = STRDUP(rec->get(rec, "template::description", 0));
-		t->extended_description = STRDUP(rec->get(rec, "template::extended_description", 0));
+		t->type = STRDUP(unescapestr(rec->get(rec, "template::type", "string")));
+		t->defaultval = STRDUP(unescapestr(rec->get(rec, "template::default", 0)));
+		t->choices = STRDUP(unescapestr(rec->get(rec, "template::choices", 0)));
+		t->description = STRDUP(unescapestr(rec->get(rec, "template::description", 0)));
+		t->extended_description = STRDUP(unescapestr(rec->get(rec, "template::extended_description", 0)));
 	}
 
 	config_delete(rec);
@@ -257,18 +274,17 @@ static int textdb_question_set(struct database *db, struct question *q)
 		return DC_NOTOK;
 
 	fprintf(outf, "question {\n");
-	fprintf(outf, "\ttag \"%s\";\n", q->tag);
-	fprintf(outf, "\tvalue \"%s\";\n", (q->value ? q->value : ""));
+	fprintf(outf, "\ttag \"%s\";\n", escapestr(q->tag));
+	fprintf(outf, "\tvalue \"%s\";\n", (q->value ? escapestr(q->value) : ""));
 	if (q->defaultval)
-		fprintf(outf, "\tdefault \"%s\";\n", q->defaultval);
+		fprintf(outf, "\tdefault \"%s\";\n", escapestr(q->defaultval));
 	fprintf(outf, "\tflags 0x%08X;\n", q->flags);
-	fprintf(outf, "\ttemplate \"%s\";\n", q->template->tag);
+	fprintf(outf, "\ttemplate \"%s\";\n", escapestr(q->template->tag));
 	if ((var = q->variables))
 	{
 		fprintf(outf, "\tvariables {\n");
 		do {
-			fprintf(outf, "\t\t%s \"%s\"\n", var->variable,
-				var->value);
+			fprintf(outf, "\t\t%s \"%s\"\n", escapestr(var->variable), escapestr(var->value));
 		} while ((var = var->next));
 		fprintf(outf, "};\n");
 	}
@@ -276,9 +292,9 @@ static int textdb_question_set(struct database *db, struct question *q)
 	{
 		fprintf(outf, "\towners:: {\n");
 		do {
-			fprintf(outf, "\t\t\"%s\"\n", owner->owner);
+			fprintf(outf, "\t\t\"%s\";\n", escapestr(owner->owner));
 		} while ((owner = owner->next));
-		fprintf(outf, "};\n");
+		fprintf(outf, "\t};\n");
 	}
 
 	fprintf(outf, "};\n");
@@ -306,16 +322,16 @@ static struct question *textdb_question_get(struct database *db,
 
 	q = NEW(struct question);
 
-	q->tag = STRDUP(rec->get(rec, "question::tag", 0));
-	q->value = STRDUP(rec->get(rec, "question::value", 0));
-	q->defaultval = STRDUP(rec->get(rec, "question::default", 0));
+	q->tag = STRDUP(unescapestr(rec->get(rec, "question::tag", 0)));
+	q->value = STRDUP(unescapestr(rec->get(rec, "question::value", 0)));
+	q->defaultval = STRDUP(unescapestr(rec->get(rec, "question::default", 0)));
 	q->flags = rec->geti(rec, "question::flags", 0);
 	q->template = textdb_template_get(db,
-		rec->get(rec, "question::template", 0));
+		unescapestr(rec->get(rec, "question::template", 0)));
 	/* TODO: variables and owners */
 	if (q->tag == 0 || q->value == 0 || q->template == 0)
 	{
-		question_delete(q);
+		question_deref(q);
 		q = 0;
 	}
 
@@ -331,7 +347,7 @@ static int textdb_question_disown(struct database *db, const char *tag,
 	if (q == NULL) return DC_NOTOK;
 	question_owner_delete(q, owner);
 	textdb_question_set(db, q);
-	question_delete(q);
+	question_deref(q);
 	return DC_OK;
 }
 

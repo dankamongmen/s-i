@@ -10,5 +10,6 @@ void strvacat(char *buf, size_t len, ...);
 int strparsecword(char **inbuf, char *outbuf, size_t maxlen);
 int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen);
 int strcmdsplit(char *inbuf, char **argv, size_t maxnarg);
+void strescape(const char *inbuf, char *outbuf, const size_t maxlen);
 
 #endif

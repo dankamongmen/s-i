@@ -52,15 +52,8 @@ struct template *template_load(const char *filename)
 		{
 			if (t != 0)
 			{
-				if (tlist == 0)
-				{
-					tlist = t;
-				}
-				else
-				{
-					t->next = tlist;
-					tlist = t;
-				}
+				t->next = tlist;
+				tlist = t;
 				t = 0;
 			}
 		}
@@ -84,6 +77,13 @@ struct template *template_load(const char *filename)
 			}
 			if (*extdesc != 0)
 				t->extended_description = strdup(extdesc);
+
+			if (t != 0)
+			{
+				t->next = tlist;
+				tlist = t;
+				t = 0;
+			}
 		}
 	}
 	fclose(fp);
