@@ -824,7 +824,9 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     {
         char *tmpmnt;
 	char *devpath;
+#if defined(CREATE_FSTAB)
 	int fsckpass;
+#endif /* CREATE_FSTAB */
 	if ( is_root(mountmap[i].mountpoint->mountpoint)
 #if defined(LVM_HACK)
 	     || (strcmp(mountmap[i].mountpoint->fstype,"lvm") == 0)
