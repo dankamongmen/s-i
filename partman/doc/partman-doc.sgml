@@ -73,22 +73,20 @@ look like this one:
 +------------------+ [!!] Partition the storage devices +-----------------+
 |             Partition, free space or device to be modified              |
 |                                                                         |
-|        ------- IDE1 master - Seagate U Series 40810 (40.0 GB)           |
-|         #3 primary    2.1 GB B F ext3       /                           |
-|            pri/log    4.4 GB     FREE SPACE                             |
-|         #5 logical    3.6 GB                                            |
-|         #7 logical   10.0 GB   F ext3       /usr                        |
-|         #8 logical   19.9 GB   K ext2       /home                       |
-|        ------- IDE2 master - Maxtor 6Y120L0 (122.9 GB)                  |
-|         #7 logical    1.0 GB     linux-swap                             |
-|            logical  114.5 GB     FREE SPACE                             |
-|         #5 logical    5.5 GB     reiserfs                               |
-|         #6 logical    1.9 GB                                            |
-|        ---------------------------------------------                    |
-|        Undo everything                                                  |
-|        End the partitioning                                             |
-|        Commit the partitioning to the storage devices                   |
-|        Abort the partitioning                                           |
+|        IDE1 master - Seagate U Series 40810 (40.0 GB)                   |
+|                 #3 primary    2.1 GB B F ext3       /                   |
+|                    pri/log    4.4 GB     FREE SPACE                     |
+|                 #5 logical    3.6 GB                                    |
+|                 #7 logical   10.0 GB   F ext3       /usr                |
+|                 #8 logical   19.9 GB   K ext2       /home               |
+|        IDE2 master - Maxtor 6Y120L0 (122.9 GB)                          |
+|                 #7 logical    1.0 GB     linux-swap                     |
+|                    logical  114.5 GB     FREE SPACE                     |
+|                 #5 logical    5.5 GB     reiserfs                       |
+|                 #6 logical    1.9 GB                                    |
+|                                                                         |
+|        Undo changes to partitions                                       |
+|        Finish partitioning and write changes to disk                    |
 |                                                                         |
 |      &lt;Go Back&gt;                                          &lt;Continue&gt;      |
 |                                                                         |
@@ -110,8 +108,8 @@ operations:
 |           Mount options:         noatime,nodev,nosuid,noexec,usrquota   |
 |           Bootable flag:         off                                    |
 |           Size:                  995.2 MB                               |
-|           Choose this if you are satisfied with the above settings      |
-|           -----------------------------------------------------         |
+|                                                                         |
+|           Finished setting up partition                                 |
 |           Copy here data from another partition                         |
 |           Delete the partition                                          |
 |                                                                         |
@@ -120,7 +118,7 @@ operations:
 +-------------------------------------------------------------------------+
 </example>
 
-<p> All udebs are allowed ot add items to this meny as well as to
+<p> All udebs are allowed to add items to this meny as well as to
 several other menus.  They can add new items in the list of devices
 such as software RAID and LVM devices, networked file systems,
 encrypted partitions, etc.  The package
@@ -276,7 +274,7 @@ partition.
 
 <p> There are several menus involved in partitioning.  In order to
 keep the Debian installer modular and extensible we want to allow
-every udeb to install items in these menus.  Let we be more specific.
+every udeb to install items in these menus.  Let us be more specific.
 When the users decide to format some existing partition we need a menu
 with an item for every supported file system.  Obviously we don't want
 to hardwire the list of the supported file systems in any place of our
