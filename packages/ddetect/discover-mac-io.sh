@@ -51,5 +51,8 @@ for dir in $(find "$macio" -type d); do
 				fi
 			fi
 		done
+	elif [ "$name" = mesh ] || ([ "$device_type" = scsi ] && [ "$compatible" = chrp,mesh0 ]); then
+		echo "mesh:Macintosh Enhanced SCSI Hardware"
+		register-module mesh
 	fi
 done
