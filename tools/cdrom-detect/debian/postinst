@@ -7,9 +7,36 @@
 # Is a cdrom already mounted?  If so, assume it's the right one..
 mount | grep -q ^/dev/cdroms/ && exit 0
 
+# This is a gross and stupid hack, but needed because of Xu's
+# unwillingness to run depmod in kernel-image's postinst.  See Debian
+# bug #136743
+
+depmod -a || true
+
 log () {
     echo "$0: $@" >>/var/log/messages
 }
+
+load_modules()
+{
+    old=`cat /proc/sys/kernel/printk`
+    echo 0 > /proc/sys/kernel/printk
+    for module in $* ; do
+	modprobe $module >> /var/log/messages 2>&1
+    done
+    echo $old > /proc/sys/kernel/printk
+}
+
+load_floppy_driver() {
+    if [ ! -d /dev/floppy ] ; then
+        load_modules floppy
+    fi
+    if [ ! -d /dev/floppy ] ; then
+        log "error: Unable to load floppy device driver"
+    fi
+    floppydev=/dev/floppy/0
+}
+
 log "Detecting hardware..."
 
 # Manually load modules to enable things we can't detect.
@@ -17,52 +44,6 @@ log "Detecting hardware..."
 manual_load="ide-mod ide-probe-mod ide-cd ide-disk isofs"
 #manual_load=i82365 usb-storage
 #manual_load=i82365 sr_mod usb-storage
-old=`cat /proc/sys/kernel/printk`
-echo 0 >/proc/sys/kernel/printk
-for module in $manual_load
-do
-    modprobe $module >>/var/log/messages 2>&1
-done
-echo $old >/proc/sys/kernel/printk
-
-# Creating devices for CDROM (devfs is used)
-#mknod() {
-#    test -e "$1" || /bin/mknod $1 $2 $3 $4
-#    true
-# }
-# for i in 0 1 2 3 4
-# do
-#     mknod /dev/scd$i b 11 $i  # Scsi
-#     mknod /dev/mcdx$i b 20 $i # Mitsumi
-#     mknod /dev/pcd$i b 46 $i
-# done
-# # Special devices
-# mknod /dev/mcd b 23 0
-# mknod /dev/sonycd b 15 0
-# mknod /dev/cdu535 b 24 0
-# mknod /dev/lmscd b 24 0
-# mknod /dev/sbpcd b 25 0
-# mknod /dev/aztcd b 29 0
-# mknod /dev/cm206cd b 30 0
-# mknod /dev/gscd b 16 0
-# mknod /dev/bpcd b 41 0
-# mknod /dev/optcd b 17 0
-# mknod /dev/sjcd b 18 0
-# # Standard IDE
-# mknod /dev/hda b 3 0
-# mknod /dev/hdb b 3 64
-# mknod /dev/hdc b 22 0
-# mknod /dev/hdd b 22 64
-
-load_floppy_driver() {
-    if [ ! -d /dev/floppy ] ; then
-        modprobe floppy >> /var/log/messages 2>&1 || true
-    fi
-    if [ ! -d /dev/floppy ] ; then
-        log "Unable to load floppy device driver"
-    fi
-    floppydev=/dev/floppy/0
-}
 
 IFS_SAVE="$IFS"
 IFS="
@@ -119,7 +100,7 @@ do
 
             if [ "$mounted" = "1" ]
             then
-                log "Copying drivers from modules disk... "
+                log "Copying modules.tgz from ext2 modules disk... "
                 gunzip -c /mnt/modules.tgz | tar xf - $module.o
                 umount /mnt
                 # Make sure 'depmod -a' accepts the new module
@@ -130,16 +111,13 @@ do
 
         if modprobe -l ${module}.o | grep ${module}.o > /dev/null
         then
-	    old=`cat /proc/sys/kernel/printk`
-	    echo 0 >/proc/sys/kernel/printk
-            modprobe $module >>/var/log/messages 2>&1
-	    echo $old >/proc/sys/kernel/printk
+            load_modules $module
             if [ "$?" != "0" ]
             then
-                log "Error loading driver for $vendor $model!"
+                log "Error loading driver '$module' for $vendor $model!"
 	    fi
         else
-            log "Could not locate driver for $vendor $model."
+            log "Could not locate driver '$module' for $vendor $model."
         fi
     fi
     IFS="
@@ -147,52 +125,7 @@ do
 done
 IFS="$IFS_SAVE"
 
-# If PCMCIA was detected, load the PCMCIA drivers and load cardmgr
-#if [ -e /proc/bus/pccard ]
-#then
-#    pcmcia=0
-#    if [ -e /lib/modules/*/pcmcia ]
-#    then
-#	echo "PCMCIA was detected on this system."
-#	while true
-#        do
-#	    echo "Please insert the modules disk and press Enter to continue, or type"
-#            echo -n "\`q' to skip loading PCMCIA drivers: "
-#            read input
-#            mounted=0
-#            if [ "$input" = "q" ]
-#            then
-#                break
-#            fi
-#            mount -t ext2 /dev/floppy/0 /mnt
-#            if [ "$?" = "0" ]
-#            then
-#                if [ -f /mnt/pcmcia.tgz ]
-#                then
-#                    mounted=1
-#                    break
-#                fi
-#                umount /mnt
-#            fi
-#        done
-#        if [ "$mounted" = "1" ]
-#        then
-#            echo -n "Copying drivers from modules disk... "
-#            gunzip -c /mnt/pcmcia.tgz | tar xf -
-#            echo "done."
-#            umount /mnt
-#	    pcmcia=1
-#        fi
-#    else
-#	pcmcia=1
-#    fi
-#
-#    if [ "$pcmcia" = "1" ]
-#    then
-#	gunzip /etc/pcmcia/config.gz
-#	/sbin/cardmgr
-#    fi
-#fi
+load_modules $manual_load
 
 log "Searching for Debian installation media..."
 
