@@ -687,7 +687,7 @@ keymap_select (char *arch, char *keymap)
 	// and shouldn't have to ask the question.
 	if (kb->deflt) {
 		def = keymap_get (maplist_get (arch), kb->deflt);
-		mydebconf_default_set (template, def->description);
+		mydebconf_default_set (template, kb->deflt);
 	}
 	res = mydebconf_ask ( kb->deflt ? "low" : "high", template, &ptr);
 	if (res != CMD_SUCCESS)
