@@ -28,8 +28,9 @@ bootdev=$RET
 # default console is last listed
 defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
 if echo "${defconsole}" | grep -q console=ttyS; then
+    defconsole=$(echo "${defconsole}" | sed -e 's/[[:space:]].*//')
     PORT=$(echo "${defconsole}" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
-    SPEED=$(echo "${defconsole}" | sed -e 's%^console=ttyS[0-9]\+,%%' -e 's% .*%%')
+    SPEED=$(echo "${defconsole}" | sed -e 's%^console=ttyS[0-9]\+,*%%' -e 's%[[:space:]].*%%')
     SERIAL="${PORT}"
     if [ "${SPEED}" != '' ]; then
 	SERIAL="${SERIAL},${SPEED}"
@@ -42,7 +43,7 @@ if echo "${defconsole}" | grep -q console=ttyS; then
 fi
 
 # write out arcboot.conf
-(   echo 'label=Linux'
+{   echo 'label=Linux'
     echo '  image=/vmlinux'
 
     if [ "${SERIAL}" ]; then
@@ -50,7 +51,7 @@ fi
     else
 	echo "  append=\"root=${rootfs}\""
     fi
-) > /target/etc/arcboot.conf
+} > /target/etc/arcboot.conf
 
 # Install arcboot only after arcboot.conf is created since the arcboot
 # postinst fails in a chroot.
