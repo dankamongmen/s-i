@@ -35,7 +35,8 @@ binary-indep: build
           cp -a $$file debian/di-utils-terminfo/$$file; \
         done
 	#$(MAKE) devicefiles  DEVDIR=debian/di-utils-devicefiles
-	dh_installdeb -i
+	# v4 mode marks conffiles, so use v3
+	DH_COMPAT=3 dh_installdeb -i
 	$(foreach PACKAGE, $(INDEP_PACKAGES), \
 	  dh_gencontrol -p $(PACKAGE) -- -n$(PACKAGE)_$(VERSION)_all.udeb; \
 	  dh_builddeb -p $(PACKAGE) --filename=$(PACKAGE)_$(VERSION)_all.udeb; \
