@@ -225,7 +225,7 @@ int install_packages (struct linkedlist_t *packages) {
 		if (((struct package_t *)node->data)->filename)
 			pkg_count++;
 	}
-	debconf->commandf(debconf, "PROGRESS START 0 %d Installing modules", 2*pkg_count);
+	//debconf->commandf(debconf, "PROGRESS START 0 %d Installing modules", 2*pkg_count);
 	for (node = packages->head; node != NULL; node = node->next) {
 		p = (struct package_t *)node->data;
 		if (p->filename) {
@@ -239,7 +239,7 @@ int install_packages (struct linkedlist_t *packages) {
 					f = ++fp;
 			asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f);
 
-			debconf->commandf(debconf, "PROGRESS STEP 1 Retrieving %s", p->package);
+			//debconf->commandf(debconf, "PROGRESS STEP 1 Retrieving %s", p->package);
 			if (! get_package(p, dest_file)) {
 				asprintf(&emsg, "anna: error getting %s!\n",
 					p->filename);
@@ -257,7 +257,7 @@ int install_packages (struct linkedlist_t *packages) {
 				ret = 0;
 				break;
 			}
-			debconf->commandf(debconf, "PROGRESS STEP 1 Installing %s", p->package);
+			//debconf->commandf(debconf, "PROGRESS STEP 1 Installing %s", p->package);
 			if (! unpack_package(dest_file)) {
 				unlink(dest_file);
 				ret = 0;
@@ -268,8 +268,8 @@ int install_packages (struct linkedlist_t *packages) {
 		}
 	}
 
-	debconf->command(debconf, "PROGRESS STEP 0 Done", NULL);
-	debconf->command(debconf, "PROGRESS STOP", NULL);
+	//debconf->command(debconf, "PROGRESS STEP 0 Done", NULL);
+	//debconf->command(debconf, "PROGRESS STOP", NULL);
 
 	cleanup();
 
