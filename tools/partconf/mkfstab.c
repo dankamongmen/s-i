@@ -272,12 +272,21 @@ int main(int argc, char *argv[]) {
 #endif
 	fprintf(outfile, HEADER, FSTAB_FILE);
 	for(i=0; i<count_entries; i++) {
-		int pass = 2;
+		int pass;
 
-		mapdevfs(entries[i]);
-		if((strlen(entries[i]->mountpoint) == 1) && 
-		(entries[i]->mountpoint[0] == '/')) {
-			pass = 1;
+		if(strcmp(entries[i]->typ, "proc") == 0)
+			pass = 0;
+		else {
+			if(strcmp(entries[i]->mountpoint, "/cdrom") == 0
+			   || strcmp(entries[i]->mountpoint, "/floppy") == 0
+			   || strcmp(entries[i]->typ, "swap") == 0)
+				pass = 0;
+			else if(strcmp(entries[i]->mountpoint, "/") == 0)
+				pass = 1;
+			else
+				pass = 2;
+
+			mapdevfs(entries[i]);
 		}
 #ifdef DEBUG
 		fprintf(stdout, "%s\t%s\t%s\t%s\t%d %d\n",
