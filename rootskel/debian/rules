@@ -15,12 +15,7 @@ PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 # This is the debhelper compatability version to use.
 export DH_COMPAT=2
 
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-	touch configure-stamp
-
-build: configure-stamp build-stamp
+build: build-stamp
 build-stamp:
 	dh_testdir
 	touch build-stamp
@@ -28,7 +23,7 @@ build-stamp:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
+	rm -f build-stamp
 	dh_clean
 
 # cvs update -P will remove these dirs if they are empty
@@ -42,8 +37,6 @@ install: build
 	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
 	$(foreach DIR, $(DIRS), \
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
-	mknod debian/rootskel/dev/console c 5 1
-	mknod debian/rootskel/dev/tty1 c 4 1
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -62,4 +55,4 @@ binary-arch: build install
 	dh_builddeb --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
+.PHONY: build clean binary-indep binary-arch binary install
