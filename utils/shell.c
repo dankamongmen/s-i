@@ -20,15 +20,14 @@ main ()
 		   NULL);
   client->command (client, "go", NULL);
 
-  if ((freopen ("/dev/console", "r", stdin) == NULL)
-      || (freopen ("/dev/console", "w", stdout) == NULL))
+  if ((dup2 (4, 0) == -1)
+      || (dup2 (5, 1) == -1))
     {
       return -1;
     }
 
   chdir ("/");
-  printf (CLEAR);
-  system ("/bin/sh");
+  execl ("/bin/sh", "/bin/sh", NULL);
 
   return 0;
 }

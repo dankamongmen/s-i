@@ -9,8 +9,11 @@ STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 
 all: $(TARGETS)
 
+mapdevfs: mapdevfs.c
+	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
+
 shell: shell.c
-	$(CC) $(CFLAGS) $@.c  -o $@  -ldebconfclient
+	$(CC) $(CFLAGS) $^ -o $@ -ldebconfclient
 
 strip: $(TARGETS)
 	$(STRIP) $^
