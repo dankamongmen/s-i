@@ -1,4 +1,4 @@
-#! /usr/bin/make -f
+#!/usr/bin/make -f
 # Sample debian/rules that uses debhelper.
 # GNU copyright 1997 to 1999 by Joey Hess.
 
@@ -43,8 +43,8 @@ binary-indep: build install
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install partkit
-partkit: build install
+binary-arch: build install disk-detect
+disk-detect: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
@@ -62,4 +62,4 @@ partkit: build install
 	dh_builddeb --filename=$(FILENAME)
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: build clean binary-indep binary-arch binary install disk-detect

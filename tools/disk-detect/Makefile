@@ -1,5 +1,5 @@
 all:
 
 install:
-	
+
 clean:

@@ -34,7 +34,7 @@ load_floppy_driver() {
     floppydev=/dev/floppy/0
 }
 
-log "Detecting disks..."
+log "Detecting hardware..."
 
 # Manually load modules to enable things we can't detect.
 manual_load="ide-mod ide-probe-mod ide-disk"
@@ -42,7 +42,8 @@ manual_load="ide-mod ide-probe-mod ide-disk"
 #manual_load=i82365 sr_mod usb-storage
 
 get_hw_info() {
-    /sbin/discover --format="%m\t%V\t%M\n" --disable-all --enable=pci,ide,scsi,pcmcia scsi
+    /sbin/discover --format="%m\t%V\t%M\n" \
+	--disable-all --enable=pci,ide,scsi,pcmcia scsi
 }
 set -- `get_hw_info | wc -l`
 count="$1"
