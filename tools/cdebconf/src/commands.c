@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.29 2002/11/21 22:40:01 barbier Exp $
+ * $Id: commands.c,v 1.30 2002/11/21 23:21:46 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -590,7 +590,7 @@ int command_metaget(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	struct question *q;
-	char *value;
+	const char *value;
 
 	CHECKARGC(== 2);
 	q = mod->questions->methods.get(mod->questions, argv[1]);
