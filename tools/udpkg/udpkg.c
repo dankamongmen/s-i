@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.32 2002/11/24 22:52:34 tausq Exp $ */
+/* $Id: udpkg.c,v 1.33 2002/11/24 22:55:07 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -474,7 +474,7 @@ int main(int argc, char **argv)
             case 'c': return dpkg_configure(packages); break;
             case 'p': return dpkg_print_architecture(); break;
             case 'f': return dpkg_fields(packages); break;
-            case '0': /* option, not action */; break;
+            case 0: /* option, not action */; break;
         }
 	}
 
