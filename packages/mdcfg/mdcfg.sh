@@ -86,6 +86,7 @@ md_create_raid1() {
 
 	# Convert it into a proper list form for a select question 
 	# (comma seperated)
+	NUM_PART=0
 	for i in ${RAW_PARTITIONS}; do
 		DEV=`echo ${i}|sed -e "s/\/dev\///"`
 		cat /proc/mdstat | grep -q "${DEV}"
@@ -99,6 +100,7 @@ md_create_raid1() {
 		else
 			PARTITIONS="${PARTITIONS}, ${i}"
 		fi
+		NUM_PART=$(($NUM_PART + 1))
 	done
 
 	if [ -z "${PARTITIONS}" ] ; then
@@ -151,9 +153,19 @@ md_create_raid1() {
 
 	db_get mdcfg/raid1devcount
 	DEV_COUNT="${RET}"
-
 	db_get mdcfg/raid1sparecount
 	SPARE_COUNT="${RET}"
+	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
+	if [ "$REQUIRED" -gt "$NUM_PART" ] ; then
+		db_fset mdcfg/notenoughparts "seen" "false"
+		db_subst mdcfg/raid1devs NUM_PART "${NUM_PART}"
+		db_subst mdcfg/raid1devs REQUIRED "${REQUIRED}"
+		db_subst mdcfg/raid1devs DEV "${DEV_COUNT}"
+		db_subst mdcfg/raid1devs SPARE "${SPARE_COUNT}"
+		db_input critical mdcfg/notenoughparts
+		db_go mdcfg/notenoughparts
+		return
+	fi
 
 	db_set mdcfg/raid1devs ""
 	SELECTED=0
