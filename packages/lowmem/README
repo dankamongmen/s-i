@@ -1,7 +1,7 @@
 This package is, frankly, a collection of hacks, hung on a reasonable
 framework to which you can add more hacks to save memory. The memory saving
-hacks are divided into two groups, which run at different times:
-initialisation, and post anna run.
+hacks are divided into four groups, which run at different times:
+initialisation, post anna run, and pre partitioning.
 
 Initialisation hacks are in the debian-installer-startup.d/*lowmem script,
 in the lowmemcheck package. The is what decides if the system is low on
@@ -13,6 +13,9 @@ that can make the installation more difficult for the user.
 
 Post anna run hacks are in the lowmem package, which is queued for install
 by anna on lowmem systems, and provides a menu item.
+
+Pre partitioning hacks are also in the lowmem package, and are run as
+the partitioner is starting up.
 
 Current hacks:
 
@@ -48,25 +51,26 @@ Current hacks:
 		user can allow for installs with as little as 24 mb or
 		memory.
 
+	remove all keymaps
+		After keyboard is selected, not needed. Done post-anna.
+	
+	remove selected modules
+		Pre partitioning, only kernel modules for filesystems,
+		raid, lvm, and the like are needed anymore. This hack
+		deletes some other modules to save memory. This frees
+		up several megabytes for the partitioner to run in, but
+		unfortuantly runs too late (after all these udebs are
+		unpacked to the initrd) to reduce the overall amount of
+		memory needed to install by more than the memory footprint
+		of the partitioner. Therefore, removing even more modules
+		at this point is not likely to help save any more memory.
+	
 Possible future hacks:
 
-	remove loaded kernel modules
-		If a kernel module is loaded, there is no reason to keep it
-		on the ramdisk.
-	
-		May free hundreds of KB of memory.
+	progressive udeb installation
+		Modify anna so it can install udebs on demand. Allows some
+		udebs to be loaded after partitioning has enabled swap.
 
-	remove all kernel modules
-		If lowmem runs after hw-detect-full, we probably don't need
-		any of the kernel modules in the initrd (except filesystem
-		modules, hmm..)
-	
-		Removing them would free up tons of space. Fairly 
-		unsafe/inflexible though.
-	
-	remove all keymaps
-		After keyboard is selected, not needed.
-	
 	find swap partitions and auto-swapon
 		Try to scan disks for existing swap partitions and swapon.
 		This will make later partitioning a bit more difficult, and
