@@ -12,6 +12,12 @@
 #endif
 #include <assert.h>
 
+/*  Structure used to sort translated lists  */
+typedef struct {
+    char *string;
+    int index;
+} sort_str_t;
+
 int strcountcmp(const char *s1, const char *e1, const char *s2, const char *e2)
 {
 	for (; s1 != e1 && s2 != e2 && *s1 == *s2; s1++, s2++) ;
@@ -223,19 +229,21 @@ int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
 
 static int mystrcmp_lexicographic(const void *p1, const void *p2)
 {
-	return strcmp(*((char **) p1), *((char **) p2));
+	return strcmp(((sort_str_t *) p1)->string, ((sort_str_t *) p2)->string);
 }
 
 int strchoicesplitsort(const char *inbuf, const char *listorder, char **argv, int *tindex, size_t maxnarg)
 {
     int argc = 0, i;
     const char *s = inbuf, *e, *c;
+    sort_str_t *sorted_string = NULL;
     char *p;
 
     assert(tindex);
     assert(argv);
     if (inbuf == 0) return 0;
 
+    sorted_string = malloc(sizeof(sort_str_t) * maxnarg);
     INFO(INFO_VERBOSE, "Splitting [%s]\n", inbuf);
     while (*s != 0 && argc < maxnarg)
     {
@@ -254,49 +262,32 @@ int strchoicesplitsort(const char *inbuf, const char *listorder, char **argv, in
                 e++;
         }
 
-        argv[argc] = malloc(e-s+1+10);
-        for (c = s, i = 0; c < e; c++, i++)
+        sorted_string[argc].string = malloc(e-s+1);
+        sorted_string[argc].index = argc;
+        p = sorted_string[argc].string;
+        for (c = s; c < e; c++, p++)
         {
             if (*c == '\\' && c < (e-1) && *(c+1) == ',')
-            {
-                argv[argc][i] = ',';
                 c++;
-            }
-            else
-                argv[argc][i] = *c;
+            *p = *c;
         }
-        argv[argc][i] = 0;
-        p = &argv[argc][i-1];
+        *p-- = 0;
         /* strip off trailing spaces */
-        while (p > argv[argc] && *p == ' ') *p-- = 0;
-
-        /* append string index */
-        p++;
-        snprintf(p, 10, ":%d", argc);
+        while (p > sorted_string[argc].string && *p == ' ') *p-- = 0;
 
         argc++;
         s = e;
         if (*s == ',') s++;
     }
     if (strcmp(listorder, "lexicographic") == 0)
-        qsort(argv, argc, sizeof(char *), mystrcmp_lexicographic);
+        qsort(sorted_string, argc, sizeof(sort_str_t), mystrcmp_lexicographic);
 
-    /*
-     *  In each string stored in argv, ":IND" has been appended,
-     *  where IND was the position before sorting.
-     *  This loop removes this extra markup to restore original
-     *  strings, and put this information into an array of integers:
-     *    original index -> ret[index in translated strings]
-     */
-    i = 0;
-    while (i < argc)
+    for (i = 0; i < argc; i++)
     {
-        p = strrchr(argv[i], ':');
-        assert(p);
-        *p = 0;
-        tindex[i] = strtol(p+1, NULL, 10);
-        i++;
+        argv[i] = sorted_string[i].string;
+        tindex[i] = sorted_string[i].index;
     }
+    free(sorted_string);
     return argc;
 }
 
