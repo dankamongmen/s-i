@@ -82,13 +82,13 @@ void debconfclient_delete(struct debconfclient *client);
     _client->commandf(_client, "TITLE %s", _title)
 
 #define debconf_beginblock(_client) \
-    _client->command(_client, "BEGINBLOCK")
+    _client->command(_client, "BEGINBLOCK", NULL)
 
 #define debconf_endblock(_client) \
-    _client->command(_client, "ENDBLOCK")
+    _client->command(_client, "ENDBLOCK", NULL)
 
 #define debconf_go(_client) \
-    _client->command(_client, "GO")
+    _client->command(_client, "GO", NULL)
 
 #define debconf_get(_client, _question) \
     _client->commandf(_client, "GET %s", _question)
@@ -109,7 +109,7 @@ void debconfclient_delete(struct debconfclient *client);
     _client->commandf(_client, "UNREGISTER %s", _question)
 
 #define debconf_purge(_client) \
-    _client->command(_client, "PURGE")
+    _client->command(_client, "PURGE", NULL)
 
 #define debconf_metaget(_client, _question, _field) \
     _client->commandf(_client, "METAGET %s %s", _question, _field)
@@ -124,16 +124,22 @@ void debconfclient_delete(struct debconfclient *client);
     _client->commandf(_client, "EXIST %s", _question)
 
 #define debconf_stop(_client) \
-    _client->command(_client, "STOP")
+    _client->command(_client, "STOP", NULL)
+
+#define debconf_progress_info(_client, _info) \
+    _client->commandf(_client, "PROGRESS INFO %s", _info)
+
+#define debconf_progress_set(_client, _val) \
+    _client->commandf(_client, "PROGRESS SET %d", _val)
 
 #define debconf_progress_start(_client, _min, _max, _title) \
     _client->commandf(_client, "PROGRESS START %d %d %s", _min, _max, _title)
 
-#define debconf_progress_step(_client, _step, _info) \
-    _client->commandf(_client, "PROGRESS STEP %d %s", _step, _info)
+#define debconf_progress_step(_client, _step) \
+    _client->commandf(_client, "PROGRESS STEP %d", _step)
 
 #define debconf_progress_stop(_client) \
-    _client->command(_client, "PROGRESS STOP")
+    _client->command(_client, "PROGRESS STOP", NULL)
 
 #define debconf_x_loadtemplate(_client, _template) \
     _client->commandf(_client, "X_LOADTEMPLATEFILE %s", _template)
