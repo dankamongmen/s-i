@@ -15,31 +15,35 @@ PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
 export DH_COMPAT=2
 
 build: build-stamp
-build-stamp:
+build-stamp: build-locale
 	dh_testdir
+	mkdir -p build-tree
+	cp -a src/* build-tree/.
+	find build-tree -depth -type d -path "*CVS*" -exec rm -rf {} \;
+
 	touch build-stamp
 
 build-locale:
-	mkdir -p debian/rootskel/usr/lib/locale
+	mkdir -p build-tree/usr/lib/locale
 	localedef -i "debian/C.UTF-8" -f "UTF-8" \
-	  "debian/rootskel/usr/lib/locale/C.UTF-8" 
+	  "build-tree/usr/lib/locale/C.UTF-8" 
 
 clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
+	rm -f build-tree
 	rm -f debian/files~
 	dh_clean
 
 # cvs update -P will remove these dirs if they are empty
 DIRS=dev proc var/log var/lib/apt-install mnt floppy usr/lib/prebaseconfig.d
 
-install: build build-locale
+install: build
 	dh_testdir
 	dh_testroot
 	mkdir -p debian/rootskel/
-	cp -a src/* debian/rootskel/
-	find debian/rootskel -depth -type d -path "*CVS*" -exec rm -rf {} \;
+	cp -a build-tree/* debian/rootskel/
 	$(foreach DIR, $(DIRS), \
 	(mkdir -p debian/rootskel/$(DIR) ) ; )
 	touch debian/rootskel/var/lib/apt-install/queue
