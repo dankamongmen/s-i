@@ -9,7 +9,9 @@ for i in `cat /proc/mdstat|grep md|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\)
 	mkdir ${DEVICE}
 	cd ${DEVICE}
 	echo "/dev/md/${NUMBER}" > ${DEVICE}/device
-	echo "Software RAID device" > ${DEVICE}/model
+
+	db_metaget partman-md/text/device description
+	echo "${RET}" > ${DEVICE}/model
 
 	# Fixme: Find the size from /dev/mdstat
 	echo "0" > ${DEVICE}/size
