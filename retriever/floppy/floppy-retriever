@@ -7,16 +7,13 @@ mountfloppy()
 {
     if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
         if [ ! -d /dev/floppy ]; then
-            modprobe floppy >> /var/log/messages 2>&1 || true
+            modprobe floppy >> /var/log/messages 2>&1
         fi
         if [ ! -d /dev/floppy ]; then
             exit 1
         fi
-        if ! lsmod | grep -q ^fat; then
-            insmod fat >> /var/log/messages 2>&1 || true
-        fi
         if ! lsmod | grep -q ^vfat; then
-            insmod vfat >> /var/log/messages 2>&1 || true
+            modprobe vfat >> /var/log/messages 2>&1
         fi
 
         choices="`echo /dev/floppy/[0-9] | sed 's/ /, /g'`"
