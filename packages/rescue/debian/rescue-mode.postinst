@@ -2,6 +2,10 @@
 
 . /usr/share/debconf/confmodule
 
+# Be nice to monolithic users.
+db_get rescue/enable
+[ "$RET" = true ] || exit 0
+
 MESSAGES=/var/log/messages
 
 log () {
