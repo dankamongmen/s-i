@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.15 2003/03/26 13:29:51 sley Exp $
+ * $Id: gtk.c,v 1.16 2003/03/27 12:44:46 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -252,6 +252,14 @@ gboolean need_continue_button(struct frontend *obj)
     return TRUE;
 }
 
+gboolean is_first_question(struct question *q)
+{
+    if (q->prev == NULL)
+	return TRUE;
+    else
+	return FALSE;
+}
+
 void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *separator, *button_box;
@@ -283,15 +291,15 @@ void add_buttons(struct frontend *obj, struct question *q, GtkWidget *qbox)
 	gtk_box_pack_start (GTK_BOX (qbox), separator, FALSE, 0, 0);
 
 	button_box = gtk_hbutton_box_new();
-	gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
+	gtk_box_pack_start(GTK_BOX(qbox), button_box, FALSE, FALSE, 5);
 
-	if (continue_button)
-	    gtk_box_pack_start (GTK_BOX(button_box), continue_button, FALSE, FALSE, 5);
+	gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
 
 	if (back_button)
 	    gtk_box_pack_start (GTK_BOX(button_box), back_button, FALSE, FALSE, 5);
 
-	gtk_box_pack_start(GTK_BOX(qbox), button_box, FALSE, FALSE, 5);
+	if (continue_button) 
+	    gtk_box_pack_start (GTK_BOX(button_box), continue_button, FALSE, FALSE, 5);
     }
 }
 
@@ -299,6 +307,7 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
 {
     GtkWidget *frame, *yes_button, *no_button, *button_box, *vbox, *description_label;
     struct frontend_question_data *data;
+    const char *defval = question_getvalue(q, "");
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -331,6 +340,19 @@ static int gtkhandler_boolean_single(struct frontend *obj, struct question *q, G
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
+    if (strcmp (defval, "true") == 0)
+    {
+	GTK_WIDGET_SET_FLAGS (yes_button, GTK_CAN_DEFAULT);
+	gtk_widget_grab_default(yes_button);
+	gtk_widget_grab_focus(yes_button);
+    }
+    else
+    {
+	GTK_WIDGET_SET_FLAGS (no_button, GTK_CAN_DEFAULT);
+	gtk_widget_grab_default(no_button);
+	gtk_widget_grab_focus(no_button);
+    }
+
     gtk_label_set_text(GTK_LABEL(((struct frontend_data*) obj->data)->description_label), "");
 	
     return DC_OK;
@@ -359,6 +381,9 @@ static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q,
     gtk_container_add(GTK_CONTAINER (frame), check);	
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+
+    if (is_first_question(q))
+	gtk_widget_grab_focus(check);
 	
     register_setter(bool_setter, check, q, obj);
 
@@ -412,6 +437,8 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
         }
         g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
         gtk_box_pack_start(GTK_BOX(check_container), check, FALSE, FALSE, 0);
+	if (is_first_question(q) && (i == 0) )
+	    gtk_widget_grab_focus(check);
     }
 
     frame = gtk_frame_new(question_get_field(q, "", "description"));
@@ -453,6 +480,9 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
+    if (is_first_question(q))
+	gtk_widget_grab_focus(entry);
+
     data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
@@ -472,6 +502,7 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     gchar *choices[100] = {0};
     int i, count;
     struct frontend_question_data *data;
+    const char *defval = question_getvalue(q, "");
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -486,7 +517,11 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     if (count <= 0) return DC_NOTOK;
 
     button_box = gtk_vbutton_box_new();
-//    gtk_button_box_set_layout(GTK_BUTTON_BOX(button_box), GTK_BUTTONBOX_SPREAD);
+
+    frame = gtk_frame_new(question_get_field(q, "", "description"));
+    gtk_container_add(GTK_CONTAINER (frame), button_box);
+
+    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
     for (i = 0; i < count; i++)
     {
@@ -494,15 +529,16 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
 	gtk_object_set_user_data(GTK_OBJECT(button), choices[i]);
 	g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (button_single_callback), data);	
 	gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
+	if (strcmp(choices[i], defval) == 0)
+	{
+	    GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
+	    gtk_widget_grab_focus(button);
+	    gtk_widget_grab_default(button);
+	}
 
 	free(choices_translated);
     }
 
-    frame = gtk_frame_new(question_get_field(q, "", "description"));
-    gtk_container_add(GTK_CONTAINER (frame), button_box);
-
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
-	
     return DC_OK;
 }
 
@@ -534,6 +570,9 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     gtk_container_add(GTK_CONTAINER (frame), combo);	
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+
+    if (is_first_question(q))
+	gtk_widget_grab_focus(combo);
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -572,6 +611,9 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
+    if (is_first_question(q))
+	gtk_widget_grab_focus(entry);
+
     data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
@@ -597,10 +639,6 @@ struct question_handlers {
     { "string",	        gtkhandler_string },
     //	{ "text",	gtkhandler_text }
 };
-
-void test_window_full()
-{
-}
 
 void set_window_properties(GtkWidget *window)
 {
@@ -665,6 +703,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     set_window_properties (window);
     set_design_elements (obj, window);
     ((struct frontend_data*) obj->data)->window = window;
+    gtk_widget_show_all(window);
 
     return DC_OK;
 }
@@ -691,7 +730,6 @@ static int gtk_go(struct frontend *obj)
         for (i = 0; i < DIM(question_handlers); i++)
             if (strcmp(q->template->type, question_handlers[i].type) == 0)
             {
-                test_window_full();
                 ret = question_handlers[i].handler(obj, q, questionbox);
                 if (ret != DC_OK)
                 {
