@@ -12,120 +12,34 @@ log() {
     echo "languagechooser: info: $*" >> $logfile
 }
 
-db_capb backup
-
-db_metaget "languagechooser/language-first" choices
-db_subst "languagechooser/language-addtolist" list "$RET"
-
-STATE=1
-
-while [ "$STATE" -gt 0 ]; do
-    #   States 1 and 2 depend on $languagecode current value
-    db_get "$languagecode"
-    language="$RET"
-    case "${language}=$STATE" in
-      =[12])
-        STATE=1 ;;
-      *=[12])
-        STATE=2 ;;
-    esac
-
-    case "$STATE" in
-      1)
-        db_fset "languagechooser/language-first" seen false
-        db_fset "$languagecode" seen false
-        db_input critical "languagechooser/language-first" || [ $? -eq 30 ]
-        if db_go; then
-            db_get "languagechooser/language-first"
-            language=`echo $RET | sed -e 's/ .*//' -e 's/[][]//g'`
-            db_set "$languagecode" "$language"
-            db_fset "$languagecode" seen true
-        else
-            STATE=$(($STATE - 1))
-        fi
-        ;;
-
-      2)
-        db_reset "languagechooser/language-addtolist"
-        db_subst "languagechooser/language-addtolist" LANGUAGE "$language"
-        db_input critical "languagechooser/language-addtolist" || [ $? -eq 30 ]
-        if db_go; then
-            db_get "languagechooser/language-addtolist"
-            case $RET in
-              Finish)
-                STATE=$(($STATE + 1))
-                ;;
-              Reset)
-                db_reset "$languagecode"
-                ;;
-              "Remove last entry")
-                language=`echo ":$language" | sed -e 's/:[^:]*$//' -e 's/^://'`
-                if [ -n "$language" ]; then
-                    db_set "$languagecode" "$language"
-                else
-                    db_reset "$languagecode"
-                fi
-                ;;
-              *)
-                language="${language}:"`echo $RET | sed -e 's/ .*//' -e 's/[][]//g'`
-                db_set "$languagecode" "$language"
-                ;;
-            esac
-        else
-            STATE=99
-        fi
-        ;;
-
-      3)
-        db_fset "languagechooser/country-name" seen false
-        db_fset "$countrycode" seen false
-        db_input critical "languagechooser/country-name" || [ $? -eq 30 ]
-        if db_go; then
-            db_get "languagechooser/country-name"
-            if [ "$RET" != "Other" ]; then
-                country=`echo $RET | sed -e 's/ .*//' -e 's/[][]//g'`
-                db_set "$countrycode" "$country"
-            else
-                country=unknown
-            fi
-            STATE=$(($STATE + 1))
-        else
-            STATE=$(($STATE - 1))
-        fi
-        ;;
-
-      4)
-        db_fset "$localecode" seen false
-        db_input critical "$localecode" || [ $? -eq 30 ]
-        if db_go; then
-            db_get "$localecode"
-            locale="$RET"
-            STATE=$(($STATE + 1))
-        else
-            STATE=$(($STATE - 1))
-        fi
-        ;;
-
-      99)
-        db_fset "languagechooser/no-backup" seen false
-        db_input critical "languagechooser/no-backup"
-        db_go
-        STATE=1
-        ;;
-
-      *)
-        STATE=-1
-        ;;
-    esac
-done
+db_title "Choose language"
 
 #   debconf/language is an alias for debian-installer/language
 db_register "$languagecode" "debconf/language"
+
+db_fset "languagechooser/language" seen false
+db_fset "$languagecode" seen false
+db_input critical "languagechooser/language" || [ $? -eq 30 ]
+if db_go; then
+    db_get "languagechooser/language"
+    if test "$RET" ; then
+	LANGNAME="$RET"
+	. languagemap
+	db_set "$languagecode" "$LANGUAGELIST"
+	db_set "$localecode"   "$LOCALE"
+	db_set "$countrycode"  "$COUNTRY"
+    else
+	# Error, not sure how to handle it
+    fi
+else
+    # Error, not sure how to handle it
+fi
+
 db_get "$languagecode"
-db_set "debconf/language" "$RET"
+db_set "debconf/language" "$LANGUAGELIST"
 
-[ $STATE = -1 ] || exit 0
+log "debian-installer/locale   = '$LOCALE'"
+log "debian-installer/language = '$LANGUAGELIST'"
+log "debian-installer/country  = '$COUNTRY'"
 
-log "debian-installer/locale   = '$locale'"
-log "debian-installer/language = '$language'"
-log "debian-installer/country  = '$country'"
+exit 0
