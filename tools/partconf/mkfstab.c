@@ -256,7 +256,7 @@ int main(int argc, char *argv[]) {
 	for(i=0; i<count_entries; i++) {
 		int pass = 2;
 
-		//mapdevfs(entries[i]);
+		mapdevfs(entries[i]);
 		if((strlen(entries[i]->mountpoint) == 1) && 
 		(entries[i]->mountpoint[0] == '/')) {
 			pass = 1;
