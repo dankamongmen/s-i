@@ -32,26 +32,22 @@ update_mtab() {
         done ) > $mtab
 }
 
-db_progress START 0 4 aboot-installer/progress/title
+db_progress START 0 5 aboot-installer/progress/title
 
 
-# Probably unnecessary, because aboot is Prio: standard and part of
-# base.  Let's try without it and see!
-#
-#db_progress INFO aboot-installer/progress/step_install
-#
-#if apt-install aboot; then
-#	:
-#else
-#	info "Calling 'apt-install aboot' failed"
-#	db_input critical aboot-installer/apt-install-failed || [ $? -eq 30 ]
-#	db_go
-#	db_get
-#	if [ true != "$RET" ]; then
-#		db_progress STOP
-#		exit 1
-#	fi
-#fi
+db_progress STEP 1
+db_progress INFO aboot-installer/progress/step_install
+
+if ! apt-install aboot; then
+	info "Calling 'apt-install aboot' failed"
+	db_input critical aboot-installer/apt-install-failed || [ $? -eq 30 ]
+	db_go
+	db_get
+	if [ true != "$RET" ]; then
+		db_progress STOP
+		exit 1
+	fi
+fi
 
 db_progress STEP 1
 db_progress INFO aboot-installer/progress/step_bootdev
