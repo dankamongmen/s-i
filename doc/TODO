@@ -1,37 +1,41 @@
-	 - design [Joey Hess, debian-boot]
+Done this week:
+- dpkg 1.7.0 was released, so udebs can be built now
+- Continuing development of udpkg has gotten all the important features
+  working.
+
+Still Todo:
+	- design [Joey Hess, debian-boot]
                 75% done. Enough to know what the big peices are 
                 and how they fit together.
 		- The main menu design has some issues. If a step is failing
-		  because some step above it did something wrong, but thought it
-		  succeeded (a disk was partitioned, but very badly, and installing
-		  the base system to it fails), there is no way to force the user
-		  to back up. This seems to preclude linear install mode. I posted
-		  a longer example to -boot. Three possible fixes:
-		  	- Detect loops, and have code to figure out what went wrong
-			  and back up to the appropriate step that can fix it
-			- Detect loops, and back up to the beginning of the menu
-			- Detect whenever any menu item fails, and leave linear
-			  mode. (BEST)
-		- Need to define module subsystems for network/hardware support,
-		  network configuration, target media support, etc.
+		  because some step above it did something wrong, but thought 
+		  it succeeded (a disk was partitioned, but very badly, and 
+		  installing the base system to it fails), there is no way to 
+		  force the user to back up. This seems to preclude linear 
+		  install mode. I posted a longer example to -boot. Three
+		  possible fixes:
+		  	- Detect loops, and have code to figure out what went
+			  wrong and back up to the appropriate step that can 
+			  fix it
+			- Detect loops, and back up to the beginning of 
+			  the menu
+			- Detect whenever any menu item fails, and leave 
+			  linear mode. (BEST)
+		- Need to define module subsystems for network/hardware
+		  support, network configuration, target media support, etc.
         - udeb archive setup [James Troup, Anthony Towns, Jason Gunthorpe]
                 95% support in new package pools code. That code will
 		go live soon after Debian 2.2r1 is released.
-        - udeb building [Joey Hess, Wichert Akkerman]
-                99% done. udebs can be built, but a 2 line patch to
-                dpkg-genchanges is required. A new version of dpkg-dev
-                was promised for last weekend.
+        - udeb building [Joey Hess]
+		Udebs can be built now.
         - cdebconf (miniature debconf in C) [Randolph Chung, Anthony Towns]
                 In progress. Infrastructure is 70% done. have one working
                 (sick) database backend, have a conceptual text-based
                 frontend that is ~1/4 done.
         - udpkg (tiny dpkg clone) [Randolph Chung, Joey Hess]
-                Usable. Can install packages and update the status file,
-                though there is one known bug related to that. Needs to
-                support Pre-Depends and localized descriptions. --unpack
-                and --configure code needs testing.
+		Usable. One todo item (localized descriptions)
         - main-menu (main menu generator) [Joey Hess]
-                90% done (one non-trivial todo item).
+                90% done (one non-trivial todo item)
         - busybox integration [Erik Andersen]
                 Not started. Busybox needs to build one or more .udebs.
                 Probably more than one.
