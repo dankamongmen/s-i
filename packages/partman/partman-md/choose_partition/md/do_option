@@ -60,8 +60,7 @@ $items"
 $partitems"
     fi
  
-# Uncomment once partman-md/confirm_nochanges template is available.
-#    if [ "$partitems$items" ]; then
+    if [ "$partitems$items" ]; then
 	if [ -z "$items" ]; then
 	    x="$partitems"
 	elif [ -z "$partitems" ]; then
@@ -81,19 +80,18 @@ $items"
 	    db_reset partman-md/confirm
 	    return 0
 	fi
-#    else
-# Uncomment once partman-md/confirm_nochanges template is available.
-#	db_input high partman-md/confirm_nochanges
-#	db_go || true
-#	db_get partman-md/confirm_nochanges
-#	if [ "$RET" = false ]; then
-#	    db_reset partman-md/confirm_nochanges
-#	    return 1
-#	else
-#	    db_reset partman-md/confirm_nochanges
-#	    return 0
-#	fi
-#    fi
+    else
+	db_input high partman-md/confirm_nochanges
+	db_go || true
+	db_get partman-md/confirm_nochanges
+	if [ "$RET" = false ]; then
+	    db_reset partman-md/confirm_nochanges
+	    return 1
+	else
+	    db_reset partman-md/confirm_nochanges
+	    return 0
+	fi
+    fi
 }
 
 confirm_changes || exit 0
