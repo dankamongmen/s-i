@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.27 2003/10/13 22:56:32 barbier Exp $
+ * $Id: gtk.c,v 1.28 2003/10/15 23:11:31 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -147,21 +147,25 @@ static void combo_setter(void *entry, struct question *q)
     gchar *choices_translated[100] = {0};
     char *tmp;
     int i, count;
+    int *tindex = NULL;
+    const gchar *listorder = q_get_listorder(q);
     
     tmp = q_get_choices_vals(q);
     count = strchoicesplit(tmp, choices, DIM(choices));
     free(tmp);
     tmp = q_get_choices(q);
-    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    tindex = malloc(sizeof(int) * count);
+    strchoicesplitsort(tmp, listorder, choices_translated, tindex, DIM(choices_translated));
     free(tmp);
     for (i = 0; i < count; i++)
     {
         if (strcmp(gtk_entry_get_text(GTK_ENTRY(entry)), choices_translated[i]) == 0)
-	    question_setvalue(q, choices[i]);
+	    question_setvalue(q, choices[tindex[i]]);
 
-	free(choices[i]);
+	free(choices[tindex[i]]);
 	free(choices_translated[i]);
     }
+    free(tindex);
 }	
 
 static void multi_setter(void *check_container, struct question *q)
@@ -173,6 +177,8 @@ static void multi_setter(void *check_container, struct question *q)
     gchar *choices[100] = {0};
     gchar *choices_translated[100] = {0};
     char *tmp;
+    int *tindex = NULL;
+    const gchar *listorder = q_get_listorder(q);
 
     check_list = gtk_container_get_children(GTK_CONTAINER(check_container));
     while(check_list)
@@ -183,7 +189,8 @@ static void multi_setter(void *check_container, struct question *q)
 	    count = strchoicesplit(tmp, choices, DIM(choices));
 	    free(tmp);
 	    tmp = q_get_choices(q);
-	    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+	    tindex = malloc(sizeof(int *) * count);
+	    strchoicesplitsort(tmp, listorder, choices_translated, tindex, DIM(choices_translated));
 	    free(tmp);
 	    for (i = 0; i < count; i++)
             {
@@ -193,15 +200,16 @@ static void multi_setter(void *check_container, struct question *q)
 		    {
 			copy = g_strdup(result);
 			free(result);
-			result = g_strconcat(copy, ", ", choices[i], NULL);
+			result = g_strconcat(copy, ", ", choices[tindex[i]], NULL);
 			free(copy);
 		    }
 		    else
-			result = g_strdup(choices[i]);
+			result = g_strdup(choices[tindex[i]]);
 		}    
-		free(choices[i]);
+		free(choices[tindex[i]]);
 		free(choices_translated[i]);
             }
+	    free(tindex);
 
 	}
 	check_list = g_list_next(check_list);
@@ -235,22 +243,26 @@ void button_single_callback(GtkWidget *button, struct frontend_question_data* da
     gchar *choices[100] = {0};
     gchar *choices_translated[100] = {0};
     int i, count;
+    int *tindex = NULL;
+    const gchar *listorder = q_get_listorder(q);
 
     tmp = q_get_choices_vals(q);
     count = strchoicesplit(tmp, choices, DIM(choices));
     free(tmp);
     tmp = q_get_choices(q);
-    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    tindex = malloc(sizeof(int *) * count);
+    strchoicesplitsort(tmp, listorder, choices_translated, tindex, DIM(choices_translated));
     free(tmp);
     for (i = 0; i < count; i++)
     {
 	if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0)
-	    question_setvalue(q, choices[i]);
+	    question_setvalue(q, choices[tindex[i]]);
 
-	free(choices[i]);
+	free(choices[tindex[i]]);
 	free(choices_translated[i]);
 
     }
+    free(tindex);
     ((struct frontend_data*)obj->data)->button_val = DC_OK;
     free(data);
    
@@ -488,6 +500,8 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     char *tmp;
     int i, j, count, dcount;
     struct frontend_question_data *data;
+    int *tindex = NULL;
+    const gchar *listorder = q_get_listorder(q);
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -497,7 +511,8 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     count = strchoicesplit(tmp, choices, DIM(choices));
     free(tmp);
     tmp = q_get_choices(q);
-    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    tindex = malloc(sizeof(int) * count);
+    strchoicesplitsort(tmp, listorder, choices_translated, tindex, DIM(choices_translated));
     free(tmp);
     tmp = question_get_field(q, NULL, "value");
     dcount = strchoicesplit(tmp, defvals, DIM(defvals));
@@ -514,7 +529,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), FALSE);
 	for (j = 0; j < dcount; j++)
         {
-	    if (strcmp(choices[i], defvals[j]) == 0)
+	    if (strcmp(choices[tindex[i]], defvals[j]) == 0)
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
 	    if (i == count-1)
 		free(defvals[j]);
@@ -524,8 +539,9 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
 	if (is_first_question(q) && (i == 0) )
 	    gtk_widget_grab_focus(check);
 
-	free(choices[i]);
+	free(choices[tindex[i]]);
     }
+    free(tindex);
 
     frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), check_container);	
@@ -590,6 +606,8 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
     char *tmp;
+    int *tindex = NULL;
+    const gchar *listorder = q_get_listorder(q);
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -599,7 +617,8 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     count = strchoicesplit(tmp, choices, DIM(choices));
     free(tmp);
     tmp = q_get_choices(q);
-    strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    tindex = malloc(sizeof(int) * count);
+    strchoicesplitsort(tmp, listorder, choices_translated, tindex, DIM(choices_translated));
     free(tmp);
     if (count <= 0) return DC_NOTOK;
 
@@ -613,17 +632,18 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     for (i = 0; i < count; i++)
     {
         button = gtk_button_new_with_label(choices_translated[i]);
-	gtk_object_set_user_data(GTK_OBJECT(button), choices[i]);
+	gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
 	g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (button_single_callback), data);	
 	gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
-	if (strcmp(choices[i], defval) == 0)
+	if (strcmp(choices[tindex[i]], defval) == 0)
 	{
 	    GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
 	    gtk_widget_grab_focus(button);
 	    gtk_widget_grab_default(button);
 	}
-	free(choices[i]);
+	free(choices[tindex[i]]);
     }
+    free(tindex);
 
     return DC_OK;
 }
@@ -637,10 +657,14 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     int i, count;
     const char *defval = question_getvalue(q, "");
     char * tmp;
+    int *tindex = NULL;
+    const gchar *listorder = q_get_listorder(q);
     
     tmp = q_get_choices(q);
-    count = strchoicesplit(tmp, choices_translated, DIM(choices_translated));
+    tindex = malloc(sizeof(int) * count);
+    count = strchoicesplitsort(tmp, listorder, choices_translated, tindex, DIM(choices_translated));
     free(tmp);
+    free(tindex);
     if (count <= 0) return DC_NOTOK;
 
     for (i = 0; i < count; i++)
