@@ -13,6 +13,7 @@
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 static commands_t commands[] = {
     { "input",	    command_input },
@@ -153,15 +154,25 @@ static int confmodule_shutdown(struct confmodule *mod)
     return mod->exitcode;
 }
 
+static inline void check_fd(int fd, int newfd, int *oldstdin, int *oldstdout)
+{
+	if (fd == 0)
+		*oldstdin = -1;
+	else if (fd == 1)
+		*oldstdout = -1;
+	dup2(fd, newfd);
+	close(fd);
+}
+
 static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 {
 	int pid;
 	int i;
 	char **args;
-	int oldstdin = -1, oldstdout = -1;
-	int toconfig[2], fromconfig[2]; /* 0=read, 1=write */
-	pipe(toconfig);
-	pipe(fromconfig);
+	int oldstdin = 0, oldstdout = 1, temp = -1;
+	int config[4]; /* 0=read/to, 1=write/to, 2=read/from, 3=write/from */
+	pipe(&config[0]);
+	pipe(&config[2]);
 	switch ((pid = fork()))
 	{
 	case -1:
@@ -169,21 +180,16 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 		DIE("Cannot execute client config script");
 		break;
 	case 0:
-		oldstdout = dup(1);
-		if (toconfig[0] != 0) { /* if stdin is closed initially */
-			oldstdin = dup(0);
-			dup2(toconfig[0], 0); close(toconfig[0]);
-		}
-		close(fromconfig[0]); close(toconfig[1]);
-		dup2(fromconfig[1], 1); close(fromconfig[1]);
-		if (oldstdin != -1 && oldstdin != DEBCONF_OLD_STDIN_FD) {
-			dup2(oldstdin, DEBCONF_OLD_STDIN_FD);
-			close(oldstdin);
-		}
-		if (oldstdout != -1 && oldstdout != DEBCONF_OLD_STDOUT_FD) {
-			dup2(oldstdout, DEBCONF_OLD_STDOUT_FD);
-			close(oldstdout);
-		}
+		/* 10=read/to, 11=write/to, 12=read/from, 13=write/from */
+		for (i = 0; i < 4; i++)
+			check_fd(config[i], 10 + i, &oldstdin, &oldstdout);
+		temp = open("/dev/null", O_RDWR);
+		dup2(oldstdin != -1 ? oldstdin : temp, DEBCONF_OLD_STDIN_FD);
+		dup2(oldstdout != -1 ? oldstdout : temp, DEBCONF_OLD_STDOUT_FD);
+		dup2(10, 0); dup2(13, 1);
+		for (i = 0; i < 4; i++)
+			close(10 + i);
+		close(temp);
 
 		args = (char **)malloc(sizeof(char *) * argc);
 		for (i = 1; i < argc; i++)
@@ -194,9 +200,9 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 		/* should never reach here, otherwise execv failed :( */
 		DIE("Cannot execute client config script");
 	default:
-		close(fromconfig[1]); close(toconfig[0]);
-		mod->infd = fromconfig[0];
-		mod->outfd = toconfig[1];
+		close(config[0]); close(config[3]);
+		mod->infd = config[2];
+		mod->outfd = config[1];
 	}
 
 	return pid;
