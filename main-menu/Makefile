@@ -12,7 +12,7 @@ $(BIN): $(OBJS)
 	$(CC) -o $(BIN) $(OBJS) $(LIBS)
 
 demo: $(BIN)
-	ln -sf debian/templates main-menu.template
+	ln -sf debian/templates main-menu.templates
 	/usr/share/debconf/frontend ./$(BIN)
 	rm -f main-menu.template
 
