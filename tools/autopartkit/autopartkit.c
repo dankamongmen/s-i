@@ -1209,10 +1209,6 @@ int main (int argc, char *argv[])
     diskspace_req_t *disk_reqs = NULL;
     const char *profiles;
     const char *tablefile;
-    int testing_new_code = 1;
-    
-    if (argc > 1)
-        testing_new_code = 1; /* Any argument turn on test mode */
     
     client = debconfclient_new ();
     debconf_set_title("Automatic Partitionner");
