@@ -17,7 +17,7 @@ C_FILES=0
 test -z $1 && LANGUAGECODE="*" || LANGUAGECODE=$1
 for I in `find ./ -name "$LANGUAGECODE.po"`; do
 	# Get translator and language
-	LAST=`grep "Last-Translator" $I | sed "s/^\"Last-Translator: //g" | sed 's/>.*$/>/g'`
+	LAST=`grep "Last-Translator" $I | sed "s/^\"Last-Translator: //g" | sed 's/>.*$/>/g' | iconv -t utf8`
 	CURR_LANG=`basename $I .po`
 
 	# Add them to the list, remove people listed twice and count the files
