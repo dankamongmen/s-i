@@ -174,7 +174,7 @@ static int rfc822db_template_load(struct template_db *db)
     if (path == NULL ||
         (inf = fopen(path, "r")) == NULL)
     {
-        INFO(INFO_ERROR, "Cannot open template file %s\n",
+        INFO(INFO_VERBOSE, "Cannot open template file %s\n",
             path ? path : "<empty>");
         return DC_NOTOK;
     }
@@ -377,7 +377,7 @@ static int rfc822db_question_load(struct question_db *db)
         if (errno == ENOENT)
             return DC_NOTOK;
 
-        INFO(INFO_ERROR, "Cannot open config database %s: %s\n",
+        INFO(INFO_VERBOSE, "Cannot open config database %s: %s\n",
             path ? path : "<empty>", strerror(errno));
         return DC_NOTOK;
     }
