@@ -183,7 +183,7 @@ int choose_protocol(void) {
 #if defined (WITH_HTTP) && defined (WITH_FTP)
 	/* Both are supported, so ask. */
 	debconf_subst(debconf, DEBCONF_BASE "protocol", "protocols", "http, ftp");
-	debconf_input(debconf, "high", DEBCONF_BASE "protocol");
+	debconf_input(debconf, "medium", DEBCONF_BASE "protocol");
 	ret = debconf_go(debconf);
 	debconf_get(debconf, DEBCONF_BASE "protocol");
 	protocol = strdup(debconf->value);
