@@ -75,8 +75,10 @@ case "$ARCH","$SUBARCH" in
 
 		bootcmd="boot ${path}:${part} ${boot}${kernel} root=${rootfs}"
 
-		db_subst nobootloader/confirmation KERNEL_BOOT "${bootcmd}"
-		db_input high nobootloader/confirmation || true
+		db_subst nobootloader/confirmation_powerpc_chrp_pegasos KERNEL_BOOT "${bootcmd}"
+		db_subst nobootloader/confirmation_powerpc_chrp_pegasos OF_BOOT_DEVICE "${path}:${part}" 
+		db_subst nobootloader/confirmation_powerpc_chrp_pegasos OF_BOOT_FILE "${boot}${kernel} root=${rootfs}"
+		db_input high nobootloader/confirmation_powerpc_chrp_pegasos || true
 	;;
 	*)
 		bootfs=`mapdevfs $bootfs`
@@ -97,7 +99,7 @@ case "$ARCH","$SUBARCH" in
 
 		db_subst nobootloader/confirmation_common ROOT "${rootfs}"
 		db_subst nobootloader/confirmation_common BOOT "${bootfs}"
-		db_subst nobootloader/confirmation_common KERNEL_LOC "${kernel}"
+		db_subst nobootloader/confirmation_common KERNEL "${kernel}"
 		db_input high nobootloader/confirmation_common || true
 	;;
 esac
