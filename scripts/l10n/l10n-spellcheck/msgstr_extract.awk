@@ -32,6 +32,9 @@ BEGIN {
                 index(line, "MIME-Version:") == 0 &&
                 index(line, "Content-Type:") == 0 &&
                 index(line, "X-Generator:") == 0 &&
+                index(line, "X-Poedit-Language:") == 0 &&
+                index(line, "X-Poedit-Country:") == 0 &&
+                index(line, "Plural-Forms:") == 0 &&
                 index(line, "Content-Transfer-Encoding:") == 0 ) {
 	        print "- " line
 	    }
