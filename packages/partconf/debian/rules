@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 PACKAGES=$(shell dh_listpackages)
+ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 build: build-stamp
 build-stamp:
@@ -43,7 +44,9 @@ binary-arch: build install
 	dh_testdir -s
 	dh_testroot -s
 	dh_installdebconf -s
+ifeq ($(ARCH),mips)
 	install -m755 debian/partconf.isinstallable debian/partconf/DEBIAN/isinstallable
+endif
 	dh_compress -s
 	dh_fixperms -s
 	dh_installdeb -s
