@@ -2,14 +2,23 @@
 DISK="$1"
 [ -z "$DISK" ] && exit 1
 
-case "`/usr/bin/ppcdetect`" in
-"NewWorld PowerMac"|"OldWorld PowerMac")
+case "`/usr/bin/archdetect`" in
+"powerpc/powermac_newworld")
 	mac-fdisk $DISK
 	;;
-"CHRP Pegasos")
+"powerpc/powermac_oldworld")
+	mac-fdisk $DISK
+	;;
+"powerpc/chrp_pegasos")
 	parted $DISK
 	;;
-"Amiga")
+"powerpc/chrp")
+	fdisk $DISK
+	;;
+"powerpc/prep")
+	fdisk $DISK
+	;;
+"powerpc/amiga")
 	parted $DISK
 	;;
 *)
