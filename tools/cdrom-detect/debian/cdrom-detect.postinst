@@ -51,7 +51,6 @@ do
     # If a device was detected but the mount failed, ask for the CD.
     if [ -n "$devices" ]
     then
-	db_fset cdrom-detect/retry seen false
 	db_input critical cdrom-detect/retry || [ $? -eq 30 ]
 	db_go
 	db_get cdrom-detect/retry
@@ -62,9 +61,20 @@ do
             fail
 	fi
     fi
+ 
+    # If no device was detected, perhaps a driver floppy is needed.
+    if [ -e /usr/lib/debian-installer/retriever/floppy-retriever ]; then
+        db_input critical cdrom-detect/load_floppy
+	db_go
+	db_get cdrom-detect/load_floppy
+	if [ "$RET" = true ]; then
+		anna floppy-retriever
+		hw-detect || true
+		continue
+	fi
+    fi
     
     # Otherwise manual configuration may be needed
-    db_fset cdrom-detect/manual_config seen false
     db_input critical cdrom-detect/manual_config || [ $? -eq 30 ]
     db_go
     db_get cdrom-detect/manual_config
@@ -77,7 +87,6 @@ do
     
     if [ "$RET" = "true" ]
     then
-	db_fset cdrom-detect/cdrom_module seen false
 	db_subst cdrom-detect/cdrom_module choices "$modules"
 	db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
 	db_go
@@ -85,7 +94,6 @@ do
 	db_get cdrom-detect/cdrom_module
 	module="$RET"
 
-	db_fset cdrom-detect/cdrom_device seen false
 	db_input critical cdrom-detect/cdrom_device || [ $? -eq 30 ]
 	db_go
 
@@ -139,7 +147,6 @@ done
 apt-install eject || true
 
 # Hey, we're done
-db_fset cdrom-detect/success seen false
 db_subst cdrom-detect/success cdname "$CDNAME"
 db_input low cdrom-detect/success || [ $? -eq 30 ]
 db_go
