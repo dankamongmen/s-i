@@ -1,6 +1,8 @@
 #!/bin/sh -e
 
-. /usr/share/debconf/confmodule
+#. /usr/share/debconf/confmodule
+
+log=/var/log/messages
 
 # The C@utf-8 locale is not usable inside /target/.  Unset it here to avoid
 # warnings like 'perl: warning: Setting locale failed.'.
@@ -25,6 +27,16 @@ fi
 #    fi
 #fi
 
+# Unset to avoid problems with packages using debconf.  This should
+# avoid the following error when installing dash:
+# "/var/lib/dpkg/info/ash/config: 1: Bad file descriptor"
+# The problem only appear if /usr/share/debconf/confmodule is sourced
+# into this script.
+unset DEBIAN_HAS_FRONTEND
+unset DEBIAN_FRONTEND
+unset DEBCONF_FRONTEND
+unset DEBCONF_REDIR
+
 PATH=$PATH:/target/usr/bin:/target/bin:/target/usr/sbin:/target/sbin \
 LD_LIBRARY_PATH=/usr/lib:/lib:/target/usr/lib:/target/lib \
 /target/usr/bin/apt-get \
@@ -36,4 +48,4 @@ LD_LIBRARY_PATH=/usr/lib:/lib:/target/usr/lib:/target/lib \
     -o Dir::Bin::gzip=/target/bin/gzip \
     -o Dir::Bin::dpkg=/target/usr/bin/dpkg \
     -o Dpkg::Options::=--root=/target \
-    update
+    update >> $log 2>&1

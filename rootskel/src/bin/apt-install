@@ -1,6 +1,8 @@
 #!/bin/sh -e
 
-. /usr/share/debconf/confmodule
+#. /usr/share/debconf/confmodule
+
+log=/var/log/messages
 
 # The C@utf-8 locale is not usable inside /target/.  Unset it here to avoid
 # warnings like 'perl: warning: Setting locale failed.'.
@@ -32,6 +34,16 @@ fi
 #    fi
 #fi
 
+# Unset to avoid problems with packages using debconf.  This should
+# avoid the following error when installing dash:
+# "/var/lib/dpkg/info/ash/config: 1: Bad file descriptor"
+# The problem only appear if /usr/share/debconf/confmodule is sourced
+# into this script.
+unset DEBIAN_HAS_FRONTEND
+unset DEBIAN_FRONTEND
+unset DEBCONF_FRONTEND
+unset DEBCONF_REDIR
+
 # first copy the files into /target/, then install in chroot
 # environment.  This work around a bug in glibc, and make sure the
 # packages run their postinst script in their target environment.
@@ -47,7 +59,7 @@ LD_LIBRARY_PATH=/usr/lib:/lib:/target/usr/lib:/target/lib \
     -o Dir::Bin::gzip=/target/bin/gzip \
     -o Dir::Bin::dpkg=/target/usr/bin/dpkg \
     -o Dpkg::Options::=--root=/target \
-    -y --download-only install $@
+    -y --download-only install $@ >> $log 2>&1
 
 # Some packages (eg. the kernel-image package) require a mounted /proc/
 # Only mount it if it isn't mounted already
@@ -56,7 +68,7 @@ if [ ! -f /target/proc/cmdline ] ; then
 fi
 
 DEBIAN_FRONTEND=noninteractive \
-chroot /target apt-get --no-download -y install $@ < /dev/null
+chroot /target apt-get --no-download -y install $@ < /dev/null >> $log 2>&1
 
 umount /target/proc
 
