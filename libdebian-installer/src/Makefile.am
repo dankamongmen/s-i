@@ -11,7 +11,10 @@ libdebian_installer_la_SOURCES = \
 	list.c \
 	log.c \
 	mem.c \
+	package.c \
+	package_parser.c \
 	packages.c \
+	packages_parser.c \
 	parser.c \
 	parser_rfc822.c \
 	release.c \

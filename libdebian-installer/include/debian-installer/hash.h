@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.h,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: hash.h,v 1.2 2003/09/24 11:49:52 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__HASH_H
@@ -58,7 +58,7 @@ void di_hash_table_destroy (di_hash_table *hash_table);
 void di_hash_table_insert (di_hash_table *hash_table, void *key, void *value);
 void *di_hash_table_lookup (di_hash_table *hash_table, const void *key);
 void di_hash_table_foreach (di_hash_table *hash_table, di_hfunc *func, void *user_data);
-size_t di_mem_chunk_size (di_mem_chunk *mem_chunk);
+di_ksize_t di_hash_table_size (di_hash_table *hash_table);
 
 /** @} */
 #endif

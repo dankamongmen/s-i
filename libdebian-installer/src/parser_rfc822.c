@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser_rfc822.c,v 1.2 2003/09/15 20:02:47 waldi Exp $
+ * $Id: parser_rfc822.c,v 1.3 2003/09/24 11:49:52 waldi Exp $
  */
 
 #include <config.h>
@@ -172,9 +172,11 @@ wildcard:
 
 next:
       cur = value_end + 1;
+      if (cur >= end)
+        break;
       if (*cur == '\n')
       {
-        while (*++cur == '\n' && cur < end);
+        while (cur < end && *++cur == '\n');
         break;
       }
     }
@@ -240,8 +242,6 @@ int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_pars
 {
   int nr = 0;
   const di_parser_fieldinfo *fip;
-  char output_buf[16384];
-  di_rstring output_string = { output_buf, sizeof (output_buf) };
   void *act = NULL, *state_data = NULL;
   di_slist_node *node;
   FILE *f;
@@ -251,6 +251,9 @@ int di_parser_rfc822_write_file (const char *file, di_parser_info *info, di_pars
     f = stdout;
   else
     f = fopen (file, "w");
+
+  if (!f)
+    return -1;
 
   while (1)
   {

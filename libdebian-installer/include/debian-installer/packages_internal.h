@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages_internal.h,v 1.2 2003/09/15 20:02:46 waldi Exp $
+ * $Id: packages_internal.h,v 1.3 2003/09/24 11:49:52 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__PACKAGES_INTERNAL_H
@@ -31,12 +31,19 @@
  */
 
 di_packages_allocator *internal_di_packages_allocator_alloc (void);
-di_parser_info *internal_di_packages_parser_info (void);
-di_parser_info *internal_di_packages_status_parser_info (void);
 
 /** @} */
 
 di_parser_write_entry_next
   internal_di_packages_parser_write_entry_next;
 
+/**
+ * @addtogroup di_packages_parser
+ * @{
+ */
+
+const di_parser_fieldinfo
+  internal_di_packages_parser_field_package;
+
+/** @} */
 #endif

@@ -17,28 +17,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: dpkg.c,v 1.2 2003/09/15 20:02:47 waldi Exp $
+ * $Id: dpkg.c,v 1.3 2003/09/24 11:49:52 waldi Exp $
  */
 
+#include <config.h>
+
 #include <debian-installer/system/dpkg.h>
+#include <debian-installer/system/dpkg_internal.h>
 
 #include <debian-installer/exec.h>
-#include <debian-installer/packages.h>
+#include <debian-installer/system/packages.h>
 
 #include <dirent.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-#define ADMINDIR "/tmp/test/var/lib/dpkg"
-#define INFODIR ADMINDIR "/info"
 
 int di_system_dpkg_package_configure (di_packages *status, const char *_package, bool force)
 {
   di_package *package;
   /* i don't think that is correct, but who cares? */
-  char *argv_config[] = { "configure", NULL };
-  char *argv_postinst[] = { "configure", NULL };
+  const char *argv_config[] = { "configure", NULL };
+  const char *argv_postinst[] = { "configure", NULL };
   int ret;
 
   package = di_packages_get_package (status, _package, 0);
@@ -59,64 +60,16 @@ int di_system_dpkg_package_configure (di_packages *status, const char *_package,
 
   package->status = di_package_status_half_configured;
 
-  ret = internal_di_system_dpkg_package_control_file_exec (package, "config", argv_config, sizeof (argv_config));
+  ret = internal_di_system_dpkg_package_control_file_exec (package, "config", sizeof (argv_config), argv_config);
   if (ret)
     return -2;
-  ret = internal_di_system_dpkg_package_control_file_exec (package, "postinst", argv_postinst, sizeof (argv_postinst));
+  ret = internal_di_system_dpkg_package_control_file_exec (package, "postinst", sizeof (argv_postinst), argv_postinst);
   if (ret)
     return -3;
 
   package->status = di_package_status_installed;
 
   return 0;
-}
-
-di_package *di_system_dpkg_package_control_read (di_packages_allocator *allocator, const char *filename)
-{
-  const char *argv_rm[] = { "/bin/rm", "-rf", NULL, NULL };
-  char buf[PATH_MAX];
-  char buf_tmpdir[PATH_MAX] = { '\0' };
-  char *tmpdir_rest;
-  di_ksize_t tmpdir_len, tmpdir_rest_len;
-  di_package *ret;
-  struct stat statbuf;
-
-  snprintf (buf_tmpdir, sizeof (buf_tmpdir) - 10, "%s/tmp.ci/", ADMINDIR);
-  tmpdir_len = strnlen (buf_tmpdir, sizeof (buf_tmpdir));
-
-  tmpdir_rest = buf_tmpdir + tmpdir_len;
-  tmpdir_rest_len = sizeof (buf_tmpdir) - tmpdir_len;
-
-  if (!stat (buf_tmpdir, &statbuf))
-  {
-    argv_rm[2] = buf_tmpdir;
-    if (di_exec (argv_rm[0], argv_rm))
-      return NULL;
-  }
-
-  if (mkdir (buf_tmpdir, 0700))
-    return NULL;
-  if (chdir (buf_tmpdir))
-    return NULL;
-
-  snprintf (buf, sizeof (buf), "ar -p %s control.tar.gz|tar -xzf -", filename);
-
-  if (di_exec_shell (buf))
-    return NULL;
-
-  strcpy (tmpdir_rest, "control");
-
-  if (stat (buf_tmpdir, &statbuf))
-    return NULL;
-
-  ret = di_packages_control_read_file (buf_tmpdir, allocator);
-
-  tmpdir_rest[0] = '\0';
-  argv_rm[2] = buf_tmpdir;
-  if (di_exec (argv_rm[0], argv_rm))
-    return NULL;
-
-  return ret;
 }
 
 int internal_di_system_dpkg_package_control_file_exec (di_package *package, const char *name, int argc, const char *const argv[])
@@ -126,7 +79,7 @@ int internal_di_system_dpkg_package_control_file_exec (di_package *package, cons
   int i;
   struct stat statbuf;
 
-  snprintf (buf, sizeof (buf), "%s/%s.%s", INFODIR, package->key.string, name);
+  snprintf (buf, sizeof (buf), "%s%s.%s", DI_SYSTEM_DPKG_INFODIR, package->key.string, name);
 
   if (stat (buf, &statbuf))
     return 0;
@@ -151,25 +104,24 @@ int di_system_dpkg_package_control_file_exec (di_packages *status, const char *_
   return internal_di_system_dpkg_package_control_file_exec (package, name, argc, argv);
 }
 
-int internal_di_system_dpkg_package_unpack_control (di_package *package, const char *filename)
+int internal_di_system_dpkg_package_unpack_control (di_package **package, const char *filename, di_packages_allocator *allocator)
 {
   const char *argv_rm[] = { "/bin/rm", "-rf", NULL, NULL };
   char buf[PATH_MAX];
   char buf_infodir[PATH_MAX] = { '\0' };
-  char buf_tmpdir[PATH_MAX] = { '\0' };
+  char buf_tmpdir[PATH_MAX] = DI_SYSTEM_DPKG_TMPCONTROLDIR;
   char *infodir_rest, *tmpdir_rest;
   di_ksize_t infodir_len, infodir_rest_len, tmpdir_len, tmpdir_rest_len;
   DIR *tmpdir;
   struct dirent *tmpdirent;
   struct stat statbuf;
 
-  snprintf (buf_infodir, sizeof (buf_infodir) - 10, "%s/%s.", INFODIR, package->key.string);
+  snprintf (buf_infodir, sizeof (buf_infodir) - 10, "%s%s.", DI_SYSTEM_DPKG_INFODIR, (*package)->key.string);
   infodir_len = strnlen (buf_infodir, sizeof (buf_infodir));
 
   infodir_rest = buf_infodir + infodir_len;
   infodir_rest_len = sizeof (buf_infodir) - infodir_len;
 
-  snprintf (buf_tmpdir, sizeof (buf_tmpdir) - 10, "%s/tmp.ci/", ADMINDIR);
   tmpdir_len = strnlen (buf_tmpdir, sizeof (buf_tmpdir));
 
   tmpdir_rest = buf_tmpdir + tmpdir_len;
@@ -203,6 +155,9 @@ int internal_di_system_dpkg_package_unpack_control (di_package *package, const c
     if (strlen (tmpdirent->d_name) > (tmpdir_rest_len < infodir_rest_len ? tmpdir_rest_len : infodir_rest_len))
       continue;
     if (!strcmp (tmpdirent->d_name, "control"))
+      if (*package)
+        di_package_destroy (*package);
+      *package = di_system_package_read_file (buf_tmpdir, allocator);
       continue;
 
     strcpy (infodir_rest, tmpdirent->d_name);
@@ -224,28 +179,24 @@ int internal_di_system_dpkg_package_unpack_control (di_package *package, const c
 
 int internal_di_system_dpkg_package_unpack_data (di_package *package, const char *filename)
 {
+  return 0;
 }
 
-int di_system_dpkg_package_unpack (di_packages *status, const char *_package, const char *filename)
+int di_system_dpkg_package_unpack (di_packages *status, const char *_package, const char *filename, di_packages_allocator *allocator)
 {
   di_package *package;
   int ret;
 
   package = di_packages_get_package (status, _package, 0);
-  if (!package)
-    return -1;
 
-  switch (package->status)
-  {
-    case di_package_status_not_installed:
-      break;
-    default:
-      return 1;
-  }
+  if (package && package->status != di_package_status_not_installed)
+    return 1;
 
-  ret = internal_di_system_dpkg_package_unpack_config (package, filename);
+  ret = internal_di_system_dpkg_package_unpack_control (&package, filename, allocator);
   ret = internal_di_system_dpkg_package_unpack_data (package, filename);
 
   package->status = di_package_status_unpacked;
+
+  return ret;
 }
 

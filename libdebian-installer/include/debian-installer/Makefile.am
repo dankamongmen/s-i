@@ -9,6 +9,7 @@ realinclude_HEADERS = \
 	log.h \
 	macros.h \
 	mem.h \
+	package.h \
 	packages.h \
 	parser.h \
 	parser_rfc822.h \
@@ -19,5 +20,6 @@ realinclude_HEADERS = \
 	utils.h
 
 noinst_HEADERS = \
+	package_internal.h \
 	packages_internal.h
 

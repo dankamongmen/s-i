@@ -2,6 +2,7 @@ realincludedir = $(includedir)/debian-installer/system
 
 realinclude_HEADERS = \
 	devfs.h \
+	dpkg.h \
 	packages.h \
 	prebaseconfig.h
 

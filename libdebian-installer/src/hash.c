@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.c,v 1.1 2003/08/29 12:37:33 waldi Exp $
+ * $Id: hash.c,v 1.2 2003/09/24 11:49:52 waldi Exp $
  */
 
 #include <debian-installer/hash.h>
@@ -327,6 +327,11 @@ void di_hash_table_foreach (di_hash_table *hash_table, di_hfunc *func, void *use
   for (i = 0; i < hash_table->size; i++)
     for (node = hash_table->nodes[i]; node; node = node->next)
       func (node->key, node->value, user_data);
+}
+
+di_ksize_t di_hash_table_size (di_hash_table *hash_table)
+{
+  return hash_table->size;
 }
 
 static void di_hash_table_resize (di_hash_table *hash_table)
