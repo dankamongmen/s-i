@@ -725,5 +725,49 @@ command_x_setbacktitle(struct confmodule *mod, char *arg)
     return out;
 }
 
+/*
+ * Accept template data from the client
+ * (for use with the passthrough frontend)
+ */
+char *
+command_data(struct confmodule *mod, char *arg)
+{
+    char *argv[3];
+    const char *tag = NULL, *item = NULL, *value = NULL;
+    int argc;
+    struct template *t = NULL;
+    struct question *q = NULL;
+    char *out;
+    char buf[1024];
+
+    argc = strcmdsplit(arg, argv, DIM(argv));
+    CHECKARGC(== 3);
+
+    tag = argv[0];
+    item = argv[1];
+
+    strunescape(argv[2], buf, sizeof(buf), 0);
+    value = buf;
+
+    t = mod->templates->methods.get(mod->templates, tag);
+    if (t == NULL)
+    {
+        t = template_new(tag);
+        mod->templates->methods.set(mod->templates, t);
+        q = mod->questions->methods.get(mod->questions, t->tag);
+        if (q == NULL) {
+            q = question_new(t->tag);
+            q->template = t;
+            template_ref(t);
+        }
+        mod->questions->methods.set(mod->questions, q);
+    }
+
+    t->lset(t, NULL, item, value);
+
+    asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
+    return out;
+}
+
 /* vim: expandtab sw=4
 */

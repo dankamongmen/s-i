@@ -224,4 +224,13 @@ char *command_settitle(struct confmodule *mod, char *arg);
  */
 char *command_x_setbacktitle(struct confmodule *mod, char *);
 
+/**
+ * @brief handler for the DATA debconf command
+ *
+ * Read template data sent by the client
+ *
+ * @warning This is not in the debconf spec
+ */
+char *command_data(struct confmodule *mod, char *);
+
 #endif
