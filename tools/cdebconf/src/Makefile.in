@@ -28,11 +28,11 @@ CLILIBOBJS_A=$(CLILIBOBJS:.opic=.o)
 all: $(BIN) $(LIBNAME) $(CLILIBNAME) $(CLILIBNAME_A) modules/Makefile
 	@$(MAKE) -C modules $@
 
+bin: $(BIN)
+
 $(BIN): $(LIBNAME) $(addsuffix .o,$(BIN))
-	@for bin in $(BIN); do \
-		echo Compiling tool $$bin; \
-		$(CC) $(CFLAGS) -o $$bin $$bin.o -Wl,-rpath,${moddir} $(LDFLAGS); \
-	done
+	@echo Compiling tool $@
+	$(CC) $(CFLAGS) -o $@ $@.o -Wl,-rpath,${moddir} $(LDFLAGS)
 
 $(LIBNAME): $(LIBOBJS)
 	@echo Creating library $@
@@ -77,4 +77,4 @@ clean:
 	-@rm -f $(BIN) $(LIBNAME) $(CLILIB) $(CLILIBNAME) $(CLILIBNAME_A) $(CLISONAME) *~ *.o *.opic
 	@$(MAKE) -C modules clean
 
-.PHONY: clean lib
+.PHONY: all bin install clean

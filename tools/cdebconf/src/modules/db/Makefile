@@ -1,23 +1,25 @@
 include ../../../globalmakeflags
 
-MODULES:=$(DB_MODULES)
+MODULES=$(DB_MODULES)
+INSTALLMODULES=$(addprefix install-,$(MODULES))
+CLEANMODULES=$(addprefix clean-,$(MODULES))
 SOBJS=$(addsuffix .so,$(MODULES))
 
-all:
-	@for module in $(MODULES); do \
-		$(MAKE) -C $$module; \
-		cp $$module/$$module.so .; \
-	done
+all: $(MODULES)
 
-install:
-	@for module in $(MODULES); do \
-		$(MAKE) -C $$module $@; \
-	done
+$(MODULES):
+	$(MAKE) -C $@
+	cp $@/$@.so .
 
-clean:
-	@for module in $(MODULES); do \
-		$(MAKE) -C $$module clean; \
-	done
+install: $(INSTALLMODULES)
+
+$(INSTALLMODULES):
+	$(MAKE) -C $(patsubst install-%,%,$@) install
+
+clean: $(CLEANMODULES)
+
+$(CLEANMODULES):
+	$(MAKE) -C $(patsubst clean-%,%,$@) clean
 	-@rm -f $(SOBJS)
 
-.PHONY: all
+.PHONY: all install clean $(MODULES) $(INSTALLMODULES) $(CLEANMODULES)
