@@ -92,8 +92,7 @@ void display_stderr_log(const char *package) {
 			size = strlen(ret);
 		} while (size > 0 && ! feof(f));
 
-		di_logf("Package '%s' printed to stderr, size=%d.",
-			package, size);
+		di_log(DI_LOG_LEVEL_WARNING, "Package '%s' printed to stderr, size=%d.", package, size);
 		
 		/* remove newlines, as they screw up the debconf
 		 * protocol. Which might one day be fixed.. */
