@@ -1,17 +1,3 @@
 #!/bin/sh
-set -e
-if [ -z "$X10_HOUSE" ] || [ -z "$X10_DEVICE" ]; then
-	echo "X10_HOUSE and X10_DEVICE required for x10 control" >&2
-	exit 1
-fi
-
-if ! br -r 4 -c "$X10_HOUSE" -f "$X10_DEVICE"; then
-	echo "br failed!" >&2
-	exit 1
-fi
-sleep 2
-if ! br -r 4 -c "$X10_HOUSE" -n "$X10_DEVICE"; then
-	echo "br failed!" >&2
-	exit 1
-fi
-sleep 2
+x10-off
+x10-on
