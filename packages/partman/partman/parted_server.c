@@ -1815,6 +1815,44 @@ command_resize_partition()
 }
 
 void
+command_virtual_resize_partition()
+{
+        PedPartition *part;
+        char *id;
+        long long new_size;
+        PedSector start, end;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        assert(disk != NULL);
+        log("command_virtual_resize_partition()");
+        change_named(device_name);
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("Resizing partition with id %s", id);
+        part = partition_with_id(disk, id);
+        if (part == NULL)
+                critical_error("No such partition");
+        if (1 != iscanf(" %lli", &new_size))
+                critical_error("Expected new size");
+        log("New size: %lli", new_size);
+        start = (part->geom).start;
+        end = start + new_size / PED_SECTOR_SIZE - 1;
+        /* ensure that the size is not less than the requested */
+        do {
+                resize_partition(disk, part, start, end, false);
+                end = end + 1;
+        } while ((part->geom).length * PED_SECTOR_SIZE < new_size);
+        ped_disk_commit(disk);
+        unchange_named(device_name);
+        oprintf("OK\n");
+        oprintf("%lli-%lli\n", (part->geom).start * PED_SECTOR_SIZE,
+                (part->geom).end * PED_SECTOR_SIZE + PED_SECTOR_SIZE - 1);
+        free(id);
+}
+
+void
 command_get_resize_range()
 {
         char *id;
@@ -1838,6 +1876,18 @@ command_get_resize_range()
         if (!named_partition_is_virtual(device_name, 
                                         part->geom.start, part->geom.end)) {
                 fs = ped_file_system_open(&(part->geom));
+                if (NULL != fs && (fs->geom->start < (part->geom).start
+                                   || fs->geom->end > (part->geom).end)) {
+                        ped_file_system_close(fs);
+                        fs = NULL;
+                } else if (NULL == fs
+                           && NULL != ped_file_system_probe(&(part->geom))) {
+                        oprintf("OK\n");
+                        oprintf("\n");
+                        free(id);
+                        activate_exception_handler();
+                        return;
+                }
         } else {
                 fs = NULL;
         }
@@ -1847,6 +1897,46 @@ command_get_resize_range()
         } else {
                 constraint = ped_constraint_any(disk->dev);
         }
+        ped_geometry_set_start(constraint->start_range, (part->geom).start);
+        ped_geometry_set_end(constraint->start_range, (part->geom).start);
+        if (part->type & PED_PARTITION_LOGICAL)
+                maximize_extended_partition(disk);
+        max_geom = ped_disk_get_max_partition_geometry(disk, part, constraint);
+        if (part->type & PED_PARTITION_LOGICAL)
+                minimize_extended_partition(disk);
+        max_size = max_geom->length * PED_SECTOR_SIZE;
+        min_size = constraint->min_size * PED_SECTOR_SIZE;
+        current_size = (part->geom).length * PED_SECTOR_SIZE;
+        oprintf("OK\n");
+        oprintf("%lli %lli %lli\n", min_size, current_size, max_size);
+        ped_geometry_destroy(max_geom);
+        ped_constraint_destroy(constraint);
+        /* TODO: Probably there are memory leaks because of constraints. */
+        activate_exception_handler();
+        free(id);
+}
+
+void
+command_get_virtual_resize_range()
+{
+        char *id;
+        PedPartition *part;
+        PedConstraint *constraint;
+        PedGeometry *max_geom;
+        long long max_size, min_size, current_size;
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        assert(disk != NULL);
+        log("command_get_virtual_resize_range()");
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        deactivate_exception_handler();
+        part = partition_with_id(disk, id);
+        if (part == NULL)
+                critical_error("No such partition");
+        constraint = ped_constraint_any(disk->dev);
         ped_geometry_set_start(constraint->start_range, (part->geom).start);
         ped_geometry_set_end(constraint->start_range, (part->geom).start);
         if (part->type & PED_PARTITION_LOGICAL)
@@ -1984,6 +2074,11 @@ main_loop()
                         command_resize_partition();
                 else if (!strcasecmp(str, "GET_RESIZE_RANGE"))
                         command_get_resize_range();
+                /* these two functions are undocumented and should disappear */
+                else if (!strcasecmp(str, "VIRTUAL_RESIZE_PARTITION"))
+                        command_virtual_resize_partition();
+                else if (!strcasecmp(str, "GET_VIRTUAL_RESIZE_RANGE"))
+                        command_get_virtual_resize_range();
                 else if (!strcasecmp(str, "COPY_PARTITION"))
                         command_copy_partition();
                 else
