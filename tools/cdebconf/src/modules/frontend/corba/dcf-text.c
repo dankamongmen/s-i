@@ -1,10 +1,11 @@
 /*
  * cdebconf frontend, corba servant, text frontend
  *
- * $Id: dcf-text.c,v 1.1 2001/02/22 02:27:57 zw Exp $
+ * $Id: dcf-text.c,v 1.2 2001/02/22 05:59:06 zw Exp $
  */
 
 #include "dcf-textimpl.c"
+#include <ORBitservices/CosNaming.h>
 
 int main(int argc, char* argv[]) {
   CORBA_ORB                 orb;
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]) {
     exit(1);
   }
 
-  dcf_text = impl_Dcf__create(root_poa, ev);
+  dcf_text = impl_Debconf_Frontend__create(root_poa, ev);
 
   pm = PortableServer_POA__get_the_POAManager(root_poa, ev);
   PortableServer_POAManager_activate(pm, ev);

@@ -1,7 +1,7 @@
 /*
  * cdebconf frontend, corba servant, text frontend implementation
  *
- * $Id: dcf-textimpl.c,v 1.1 2001/02/22 02:27:57 zw Exp $
+ * $Id: dcf-textimpl.c,v 1.2 2001/02/22 05:59:06 zw Exp $
  */
 
 #include "dcf.h"
@@ -199,8 +199,8 @@ static CORBA_char *
 impl_Debconf_Frontend_Text(impl_POA_Debconf_Frontend * servant,
 			   CORBA_char * prompt, CORBA_Environment * ev)
 {
-  CORBA_char *retval = '\0';
-
+  CORBA_char *retval;
+  char *out = '\0';
   char buf[1024];
   int sz = 1;
 
@@ -208,10 +208,12 @@ impl_Debconf_Frontend_Text(impl_POA_Debconf_Frontend * servant,
   while (fgets(buf, sizeof(buf), stdin)) {
     if (strcmp(buf, ".\n") == 0) break;
     sz += strlen(buf);
-    retval = CORBA_string_alloc(retval, sz); /* Totally broken! ;) */
-    memcpy(retval + sz - strlen(buf) - 1, buf, strlen(buf));
+    out = (char *) realloc(out, sz);
+    memcpy(out + sz - strlen(buf) - 1, buf, strlen(buf));
   }
-  retval[sz-1] = 0;
+  out[sz-1] = 0;
+  retval = CORBA_string_dup((CORBA_char *) out);
+  free(out);
   
   return retval;
 }

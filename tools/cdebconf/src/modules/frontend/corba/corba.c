@@ -1,7 +1,7 @@
 /*
  * cdebconf frontend, corba client
  *
- * $Id: corba.c,v 1.2 2001/02/22 02:31:03 zw Exp $
+ * $Id: corba.c,v 1.3 2001/02/22 05:59:06 zw Rel $
  */
 
 #include "common.h"
@@ -22,7 +22,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "dcf.h"
+#include "dcf-common.c"		/* Yeah, stupid and wrong. :P */
+#include "dcf-stubs.c"
 
 #define EXCEPTION(ev) 								\
   if ((ev)->_major != CORBA_NO_EXCEPTION) { 					\
