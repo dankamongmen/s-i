@@ -44,12 +44,16 @@ lvm_isinstalled(void)
     struct stat statbuf;
     static int isinstalled = -1;
 
+    /* Disabled until I find a way to create both LVM partitions and
+       real partitions without the kernel caching an incorrect
+       partition table. */
+    isinstalled = FALSE;
+
     if (isinstalled != -1)
       return isinstalled;
 
     /* Is /proc/lvm a directory? */
-    if ( 0 != stat("/proc/lvm", &statbuf)
-         || ! S_ISDIR(statbuf.st_mode) )
+    if ( 0 != stat("/proc/lvm", &statbuf) || ! S_ISDIR(statbuf.st_mode) )
     {
         autopartkit_error(0, "Missing /proc/lvm/, no LVM support available.");
         isinstalled = FALSE;
@@ -96,10 +100,16 @@ vg_exists(const char *vgname)
 int
 lvm_init(void)
 {
-    int retval;
+    int retval = -1;
     if ( ! lvm_isinstalled())
-        return -1;
-    return 0;
+        return retval;
+
+    if (0 == (retval = system("vgscan >> /var/log/messages 2>&1")))
+	retval = 0;
+    else
+        autopartkit_log(2, "Executing vgscan returned error code %d\n",retval);
+
+    return retval;
 }
 
 int
