@@ -11,3 +11,4 @@
 
 int get_package (struct package_t *package, char *dest);
 struct package_t *get_packages (void);
+void cleanup (void);

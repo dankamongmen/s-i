@@ -75,7 +75,7 @@ retriever retrieve [source-filename] [dest-filename] [suite]
 	While retrieving a deb is something like this:
 		retreiver retrievers/http-retriever.deb /tmp/http-retriever.deb
 
-retriever packages [dest-filename] [optional extension]
+retriever packages [dest-filename] [extension] [optional suite]
 	Download a Packages file, or a Packages-like file. The fields used by
 	anna are:
 	- Package
@@ -84,6 +84,17 @@ retriever packages [dest-filename] [optional extension]
 	Whether other fields are needed is currently undecided. A retriever
 	doesn't have to support the 'packages' command, if it fails, anna will
 	try to guess the location of a Packages file and try to retrieve it.
+	If no extension is used, it must be '.'
+	The suite should default to 'main'
+
+retriever release [dest-filename]
+	Download a Release file. It's used by anna to figure out where the
+	Packages files are. A retriever doesn't have to support this command,
+	if it fails, anna will try the packages command with suite main.
+
+retriever cleanup
+	Clean up after a retriever round. This is used by e.g. the floppy
+	retriever to unmount the floppy.
 
 If the destination file already exists, the retriever may optionally attempt
 to continue a download.

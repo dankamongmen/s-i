@@ -174,6 +174,7 @@ int install_packages (struct package_t *packages) {
 	struct package_t *p;
 	char *f, *fp, *dest_file;
 	char *emsg;
+	int ret = 1;
 
 	for (p=packages; p; p=p->next) {
 		if (p->filename) {
@@ -192,24 +193,29 @@ int install_packages (struct package_t *packages) {
 					p->filename);
 				di_log(emsg);
 				free(emsg);
-				return 0;
+				ret = 0;
+				break;
 			} else if (! md5sum(p->md5sum, dest_file)) {
 				asprintf(&emsg, "anna: md5sum mismatch on %s!\n",
 					p->filename);
 				di_log(emsg);
 				free(emsg);
 				unlink(dest_file);
-				return 0;
+				ret = 0;
+				break;
 			} else if (! unpack_package(dest_file)) {
 				unlink(dest_file);
-				return 0;
+				ret = 0;
+				break;
 			}
 			unlink(dest_file);
 			free(dest_file);
 		}
 	}
 
-	return 1;
+	cleanup();
+
+	return ret;
 }
 
 int main (int argc, char **argv) {
