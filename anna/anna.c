@@ -57,9 +57,9 @@ choose_modules(void)
     char *choices;
 
     pkglist = get_packages();
-    if (pkglist == NULL)
-        return 3;
-    if (pkglist->head == NULL) {
+    if (pkglist == NULL || pkglist->head == NULL) {
+        debconf->command(debconf, "INPUT critical", ANNA_NO_MODULES, NULL);
+        debconf->command(debconf, "GO", NULL);
         free(pkglist);
         return 4;
     }

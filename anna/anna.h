@@ -9,6 +9,7 @@
 #define DPKG_UNPACK_COMMAND     "udpkg --unpack"
 #define ANNA_RETRIEVER          "anna/retriever"
 #define ANNA_CHOOSE_MODULES     "anna/choose_modules"
+#define ANNA_NO_MODULES         "anna/no_modules"
 
 struct linkedlist_t *get_retriever_packages(void);
 char *get_retriever_choices(struct linkedlist_t *list);
