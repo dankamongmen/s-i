@@ -35,8 +35,6 @@ static int do_system(const char *cmd) {
 }
 #endif
 
-static void update_language (void);
-
 /*
  * qsort comparison function (sort by menu item values, fall back to
  * lexical sort to resolve ties deterministically).
@@ -316,6 +314,16 @@ static int satisfy_virtual(struct package_t *p) {
 	return 1;
 }
 
+static void update_language (void) {
+	struct debconfclient *debconf;
+
+	debconf = debconfclient_new();
+	debconf->command(debconf, "GET", "debian-installer/language", NULL);
+	if (*debconf->value != 0)
+		setenv("LANGUAGE", debconf->value, 1);
+	debconfclient_delete(debconf);
+}
+
 static void
 check_special(struct package_t *p)
 {
@@ -404,16 +412,6 @@ int do_menu_item(struct package_t *p) {
 	}
 
 	return ret;
-}
-
-static void update_language (void) {
-	struct debconfclient *debconf;
-
-	debconf = debconfclient_new();
-	debconf->command(debconf, "GET", "debian-installer/language", NULL);
-	if (*debconf->value != 0)
-		setenv("LANGUAGE", debconf->value, 1);
-	debconfclient_delete(debconf);
 }
 
 static char *debconf_priorities[] =
