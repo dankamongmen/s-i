@@ -821,6 +821,13 @@ static int text_go(struct frontend *obj)
 
 				if (display_title)
 				{
+					/* TODO: can't tell if we called go()
+					 * twice during one progress bar, but
+					 * I'm guessing that's relatively
+					 * unimportant (c.f. #271707).
+					 */
+					if (obj->progress_title != NULL)
+						putchar('\n');
 					printf("%s\n\n", obj->title);
 					display_title = 0;
 				}
@@ -876,6 +883,7 @@ static void text_progress_stop(struct frontend *obj)
 	INFO(INFO_DEBUG, "%s\n", __FUNCTION__);
 	printf("\n");
 	fflush(stdout);
+	DELETE(obj->progress_title);
 }
 
 struct frontend_module debconf_frontend_module =
