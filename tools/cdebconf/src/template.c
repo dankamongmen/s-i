@@ -7,7 +7,7 @@
  *
  * Description: interface to debconf templates
  *
- * $Id: template.c,v 1.9 2002/11/18 00:37:10 barbier Exp $
+ * $Id: template.c,v 1.10 2002/11/18 23:05:59 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -229,7 +229,12 @@ static const char *template_lget(struct template *t, const char *lang,
     {
         /*  Exact match  */
         if (strcmp(p->language, lang) == 0)
-            return template_field_get(p, field);
+        {
+            ret = template_field_get(p, field);
+            if (ret == NULL)
+                ret = template_field_get(t->fields, field);
+            return ret;
+        }
 
         /*  Language is xx_XX and a xx field is found  */
         if (strlen(p->language) == 2 && strncmp(lang, p->language, 2) == 0)
@@ -239,8 +244,6 @@ static const char *template_lget(struct template *t, const char *lang,
     }
     if (altret != NULL)
         return altret;
-    if (ret)
-        return ret;
     /*  Default value  */
     return template_field_get(t->fields, field);
 }
