@@ -1,5 +1,5 @@
 CFLAGS=-Wall -Os -D_GNU_SOURCE
-LIBS=-lparted -ldl -ldebian-installer
+LIBS=-lparted -ldl
 
 all: parted_server parted_devices stralign
 
