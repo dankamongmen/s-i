@@ -63,10 +63,16 @@ void insert_line(const char *line) {
 		dummy->mountpoint = strdup(mountpoint);
 	if(strlen(typ) > 0)
 		dummy->typ = strdup(typ);
-	if(strlen(options) > 0) {
-		dummy->options = strdup(options);
+
+	/* handle reiserfs */
+	if(strstr(dummy->typ, "reiserfs") && strstr(dummy->mountpoint, "/boot")) {
+		dummy->options = strdup("notail");
 	} else {
-		dummy->options = strdup("defaults");
+		if(strlen(options) > 0) {
+			dummy->options = strdup(options);
+		} else {
+			dummy->options = strdup("defaults");
+		}
 	}
 
 #ifdef DEBUG
