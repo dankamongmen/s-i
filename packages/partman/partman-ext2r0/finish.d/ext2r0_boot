@@ -62,7 +62,7 @@ fi
 
 # The root partition has to be primary
 # FIXME: This should probably move to colo-installer
-if [ "$root_type" != "primary" ]; then
+if [ "$root_path" != "$boot_path" -a "$root_type" != "primary" ]; then
 	db_fset partman-ext2r0/root_not_primary seen false
 	db_set partman-ext2r0/root_not_primary 'true'
 	db_input critical partman-ext2r0/root_not_primary || true
