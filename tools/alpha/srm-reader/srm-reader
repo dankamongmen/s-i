@@ -1,0 +1,18 @@
+#!/bin/sh -e
+
+# Ensure srm_env.o module is loaded
+(modprobe srm_env || true) 2> /dev/null
+
+. /usr/share/debconf/confmodule
+
+# If not present, leave
+[ -e /proc/srm_environmenti/named_variables/language ] || exit 0
+
+LANGCODE=`cat /proc/srm_environment/named_variables/language`
+
+LANG=`grep $LANGCODE /usr/share/srm-reader/lang-codes | cut -d: -f2`
+if [ "x$LANG" != "x" ] ; 
+	db_set debian-installer/language $LANG
+fi
+
+exit 0
