@@ -336,8 +336,6 @@ static int textdb_question_set(struct question_db *db, struct question *q)
 	fprintf(outf, "question {\n");
 	fprintf(outf, "\ttag \"%s\";\n", escapestr(q->tag));
 	fprintf(outf, "\tvalue \"%s\";\n", (q->value ? escapestr(q->value) : ""));
-	if (q->defaultval)
-		fprintf(outf, "\tdefault \"%s\";\n", escapestr(q->defaultval));
 	fprintf(outf, "\tflags 0x%08X;\n", q->flags);
 	fprintf(outf, "\ttemplate \"%s\";\n", escapestr(q->template->tag));
 	if ((var = q->variables))
@@ -390,7 +388,6 @@ static struct question *textdb_question_get(struct question_db *db,
 
 	q->tag = STRDUP(unescapestr(rec->get(rec, "question::tag", 0)));
 	q->value = STRDUP(unescapestr(rec->get(rec, "question::value", 0)));
-	q->defaultval = STRDUP(unescapestr(rec->get(rec, "question::default", 0)));
 	q->flags = rec->geti(rec, "question::flags", 0);
 	q->template = db->tdb->methods.get(db->tdb,
 		unescapestr(rec->get(rec, "question::template", "")));

@@ -79,8 +79,6 @@ int bogl_handler_boolean(struct frontend *ui, struct question *q)
 
 	if(q->value && *(q->value))
 		ans = (strcmp(q->value, "true") == 0) ? '*' : ' ';
-	else if(q->template->defaultval && *(q->template->defaultval))
-		ans = (strcmp(q->template->defaultval, "true") == 0) ? '*' : ' ';
 #endif
 	
 	bowl_flush();

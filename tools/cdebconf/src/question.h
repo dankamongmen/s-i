@@ -21,7 +21,6 @@ struct question {
 	char *tag;
 	unsigned int ref;
 	char *value;
-	char *defaultval;
 	unsigned int flags;
 
 	struct template *template;

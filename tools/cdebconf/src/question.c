@@ -7,7 +7,7 @@
  *
  * Description: interfaces for handling debconf questions
  *
- * $Id: question.c,v 1.15 2002/11/18 00:37:10 barbier Exp $
+ * $Id: question.c,v 1.16 2002/11/18 00:44:14 barbier Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -92,7 +92,6 @@ struct question *question_dup(struct question *q)
         struct questionvariable *qv = q->variables;
         struct questionowner *qo = q->owners;
         ret->value = STRDUP(q->value);
-        ret->defaultval = STRDUP(q->defaultval);
         ret->flags = q->flags;
         ret->template = q->template;
         template_ref(ret->template);
