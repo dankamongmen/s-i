@@ -1,0 +1,19 @@
+#! /bin/sh -e
+
+if autopartkit ; then
+
+    # This should be done in prebaseconfig, but will put it here until
+    # someone fixes it in the proper place.
+    if [ -f /target/etc/fstab ] ; then
+	mkdir -p /target/root
+	touch /target/root/dbootstrap_settings
+    fi
+else
+    # This should use debconf to report the error.
+    echo "error: autopartkit failed."
+    # No sleep in d-i environment [2002-08-21]
+    #sleep 10
+    exit 1
+fi
+
+##DEBHELPER##
