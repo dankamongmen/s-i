@@ -12,6 +12,7 @@ static void template_lset(struct template *t, const char *lang,
                 const char *field, const char *value);
 static const char *template_next_lang(struct template *t, const char *l);
 static const char *getlanguage(void);
+static void remove_newlines(char *);
 
 const char *template_fields_list[] = {
         "tag",
@@ -418,11 +419,44 @@ static const char *template_next_lang(struct template *t, const char *lang)
     return NULL;
 }
 
+/* remove extraneous linebreaks */
+/* remove internal linebreaks unless the next
+ * line starts with a space; also change
+ * lines that contain a . only to an empty line
+ */
+static void remove_newlines(char *text)
+{
+	char *in, *out;
+
+	in = out = text;
+	for (; *in != 0; in++)
+	{
+		*out = *in;
+		if (*in == '\n')
+		{
+			if (*(in+1) == '.' && *(in+2) == '\n')
+			{
+				out++;
+				*out = *in;
+				in+=2;
+			}
+			else if (*(in+1) != ' ')
+			{
+				if (*(in+1) != 0)
+					*out = ' ';
+				else
+					*out = 0;
+			}
+		}
+		out++;
+	}
+}
+
 struct template *template_load(const char *filename)
 {
 	char buf[2048], extdesc[8192];
 	char *lang;
-	char *p, *bufp;
+	char *p;
 	char *cp;
 	FILE *fp;
 	struct template *tlist = NULL, *t = 0;
@@ -505,31 +539,7 @@ struct template *template_load(const char *filename)
                         ungetc(i, fp); /* toss the last one back */
 			if (*extdesc != 0)
 			{
-
-				/* remove extraneous linebreaks */
-				/* remove internal linebreaks unless the next
-				 * line starts with a space; also change
-				 * lines that contain a . only to an empty
-				 * line
-				 */
-				for (bufp = extdesc; *bufp != 0; bufp++)
-					if (*bufp == '\n')
-					{
-						if (*(bufp+1) == '.' &&
-							*(bufp+2) == '\n')
-						{
-							*(bufp+1) = ' ';
-							bufp+=2;
-						}
-						else if (*(bufp+1) != ' ')
-						{
-							if (*(bufp+1) != 0)
-								*bufp = ' ';
-                                                        else
-								*bufp = 0;
-						}
-					}
-					
+				remove_newlines(extdesc);
 				template_lset(t, NULL, "extended_description", extdesc);
 			}
 		}
@@ -566,34 +576,10 @@ struct template *template_load(const char *filename)
                                 i = fgetc(fp);
 			}
                         ungetc(i, fp); /* toss the last one back */
-			if (*extdesc != 0)
+			if (*extdesc != 0 && lang)
 			{
-				/* remove extraneous linebreaks */
-				/* remove internal linebreaks unless the next
-				 * line starts with a space; also change
-				 * lines that contain a . only to an empty
-				 * line
-				 */
-				for (bufp = extdesc; *bufp != 0; bufp++)
-					if (*bufp == '\n')
-					{
-						if (*(bufp+1) == '.' &&
-						    *(bufp+2) == '\n')
-						{
-							*(bufp+1) = ' ';
-							bufp+=2;
-						}
-						else if (*(bufp+1) != ' ')
-						{
-							if (*(bufp+1) != 0)
-								*bufp = ' ';
-                                                        else
-								*bufp = 0;
-						}
-					}
-				
-				if (lang)
-					template_lset(t, lang, "extended_description", extdesc);
+				remove_newlines(extdesc);
+				template_lset(t, lang, "extended_description", extdesc);
 			}
 		}
 		if (lang)
