@@ -98,6 +98,7 @@ di_packages *di_system_packages_alloc (void)
 bool di_system_package_check_subarchitecture (di_package *package, const char *subarchitecture)
 {
   char *begin, *end, *temp;
+  size_t len_subarchitecture = strlen (subarchitecture);
 
   begin = ((di_system_package *) package)->subarchitecture;
   if (!begin)
@@ -110,7 +111,7 @@ bool di_system_package_check_subarchitecture (di_package *package, const char *s
     temp = begin;
     temp += strcspn (temp, " \t\n");
 
-    if (!strncmp (begin, subarchitecture, temp - begin))
+    if ((size_t) (temp - begin) == len_subarchitecture && strncmp (begin, subarchitecture, len_subarchitecture) == 0)
       return true;
 
     begin = temp;
