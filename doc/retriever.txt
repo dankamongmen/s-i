@@ -34,7 +34,8 @@ checking md5sums of downloaded modules, and a separate program
 Since retrievers are debian packages, they can have a postinst that is
 run to set them up. During setup, they may need to prompt the user for
 information (using debconf). For example, a nfs retriever will probably
-need to prompt the user for a nfs server name.
+need to prompt the user for a nfs server name. [ I'm not sure that doing
+such setup in the postinst is a good idea. ]
 
 Retrievers may also need to depend on additional modules. For example the
 http/ftp/nfs retrievers will need to depend on a module to set up networking,
@@ -57,17 +58,16 @@ change. ]
 /usr/lib/debian-installer/retriever/<retriever name> is a executable. It
 is run with the following parameters:
 
--d source-directory filename dest-directory
+filename dest-directory
 	Download the specified file to the specified destination
-	directory[2]. The source directory specifies what directory the file
-	is in, and is relative to the top of the archive the retriever is
-	using (it's the path component of the Packages file).
+	directory[2]. The filename is the Filename field of a Packages
+	file.
 
 	Thus, retrieving the Packages file itself is something like this:
-		program -d ./ Packages /tmp/Packages
+		program Packages /tmp/
 	
 	While retrieving a deb is something like this:
-		program -d ./retrievers/ http-retriever.deb
+		program retrievers/http-retriever.deb /tmp/
 
 If the destination file already exists, the retriever may want to attempt
 to continue a download. Note that the destination file may also be a fifo
