@@ -197,6 +197,9 @@ install_modules(void)
         if (p->filename != NULL && !is_installed(p, status_p))
             pkg_count++;
     }
+    // Short-circuit if there's no packages to install
+    if (pkg_count <= 0)
+        return 0;
     debconf->commandf(debconf, "PROGRESS START 0 %d anna/progress_title", 2*pkg_count);
     for (node = instlist->head; node != NULL; node = node->next) {
         p = (struct package_t *)node->data;
