@@ -22,15 +22,15 @@ LDOPTS=  -ldebconf -ldebian-installer
 
 
 ifeq ($(ARCH),i386)
-CFLAGS += -DAT_KBD -DPREFERRED_KEYBOARD="PS/2" -DUSB_KBD
+CFLAGS += -DAT_KBD  -DUSB_KBD
 OBJS   += at-kbd.o usb-kbd.o
 endif
 ifeq ($(ARCH),sparc)
-CFLAGS += -DSPARC -DPREFERRED_KEYBOARD="sparc"
+CFLAGS += -DSPARC -DUSB_KBD
 OBJS   += sparc-kbd.o
 endif
 ifeq ($(ARCH),powerpc)
-CFLAGS += -DPOWERPC -DPREFERRED_KEYBOARD="mac"
+CFLAGS += -DPOWERPC -DUSB_KBD
 OBJS += mac-kbd.o amiga-kbd.o
 endif
 
