@@ -10,7 +10,7 @@ for i in `find /usr/share/locale/ -name iso_3166.mo` ; do
   # If a file exists in iso-codes.updated, then use it
   # else extract translations from the iso-codes package
   if [ ! -f iso-codes.updates/$language.po ] ; then
-    msgunfmt $i >debian/iso-codes/${language}.po
+    msgunfmt $i >debian/iso-codes/${language}.po 2>/dev/null
   else
     cp iso-codes.updates/$language.po debian/iso-codes
   fi
