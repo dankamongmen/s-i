@@ -2,6 +2,17 @@ ddetect (1.11) UNRELEASED; urgency=low
 
   * Colin Watson
     - Portable shell fix in hotplug-pcmcia.
+  * Joey Hess
+    - Work around de4x5 / tulip problem by using tulip if de4x5 is not
+      available, and blacklisting de4x5. So we can control which is used
+      on a per-arch or kernel basis by including the right one on the
+      initrd.
+    - If above hack causes tulip to be used for the first stage, call
+      register-modules to make it be used on the installed system.
+      Closes: #282814
+    - On hppa 2.4 this doesn't happen, since tulip is built in.
+      In that case, de4x5 will still be blacklisted so the hang will be
+      avoided. Closes: #283754
 
  -- Colin Watson <cjwatson@debian.org>  Thu, 28 Oct 2004 15:59:39 +0100
 

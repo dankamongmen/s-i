@@ -131,6 +131,15 @@ load_sr_mod () {
 	fi
 }
 
+blacklist_de4x5 () {
+	cat << EOF >> $prebaseconfig
+if [ -e /target/etc/discover.conf ]; then
+	touch /target/etc/discover-autoskip.conf
+	(echo "# blacklisted since tulip is used instead"; echo skip de4x5 ) >> /target/etc/discover-autoskip.conf
+fi
+EOF
+}
+
 discover_version () {
 	# Ugh, Discover 1.x didn't exit with nonzero status if given an
 	# unrecognized option!
@@ -318,6 +327,14 @@ for device in $ALL_HW_INFO; do
 		if [ -z "$cardname" ]; then
 			cardname="[Unknown]"
 		fi
+		
+		if [ "$module" = de4x5 ] && ! in_list "$module" "$AVAIL_MODULES"; then
+			log "Using tulip rather than unavailable de4x5"
+			blacklist_de4x5
+			module=tulip
+			tulip_de4x5_hack=1
+		fi
+		
 		if in_list "$module" "$AVAIL_MODULES"; then
 			if [ -n "$LIST" ]; then
 				LIST="$LIST, "
@@ -380,6 +397,11 @@ for device in $(list_to_lines); do
 			load_module "$module"
 		else
 			load_module "$module" "$cardname"
+		fi
+
+		if [ "$module" = tulip ] && [ "$tulip_de4x5_hack" = 1 ]; then
+			log "Forcing use of tulip in installed system (de4x hack)"
+			register-module tulip
 		fi
 	fi
 
