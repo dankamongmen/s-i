@@ -23,7 +23,7 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	$(foreach PACKAGE, $(shell dh_listpackages), \
-	  $(MAKE) install-$(PACKAGE) DESTDIR=`pwd`/debian/$(PACKAGE);)
+	  $(MAKE) install-$(PACKAGE) DESTDIR=$(CURDIR)/debian/$(PACKAGE);)
 	cp devnames.gz debian/ethdetect/etc/network/ 
 
 binary-indep: build install

@@ -17,7 +17,7 @@ INSTALL_DATA = ${INSTALL} -m 644
 all: archdetect
 
 clean:
-	$(RM) -f *~
+	rm -f *~
 	rm -f *.o
 	rm -f archdetect
 
