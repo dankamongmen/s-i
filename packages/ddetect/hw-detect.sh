@@ -255,8 +255,8 @@ for device in $(list_to_lines); do
 			log "Missing module '$module'."
 			# Only add the module to the missing list if it was not
 			# manually added to the list of modules to load.
-			if ! echo "$MANUAL_HW_INFO" | grep -q "$module:" -a
-			   ! echo "$MISSING_MODULES_LIST" | grep -q "^$module " -a
+			if ! echo "$MANUAL_HW_INFO" | grep -q "$module:" &&
+			   ! echo "$MISSING_MODULES_LIST" | grep -q "^$module " &&
 			   ! echo "$MISSING_MODULES_LIST" | grep -q ", $module " ; then
 				if [ -n "$MISSING_MODULES_LIST" ]; then
 					MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
