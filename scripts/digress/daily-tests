@@ -1,0 +1,55 @@
+#!/bin/sh
+set -e
+
+MACHINE="$1"
+shift 1
+
+if [ -z "$MACHINE" ]; then
+	echo "Usage: $0 machine scheme [scheme ...]" >&2
+	exit 1
+fi
+
+config () {
+	var="$1"
+	shift 1
+	eval "$var='$@'"
+}
+
+use () {
+	. $DI_TESTDIR/schemes/$MACHINE/$1
+}
+
+overview () {
+	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1"
+}
+
+DIGRESSDIR=$(dirname $0)
+cd $DIGRESSDIR
+if [ -z "$DI_TESTDIR" ]; then
+	DI_TESTDIR=$DIGRESSDIR
+fi
+
+if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
+	echo "Cannot determine DI_TESTDIR" >&2
+	exit 1
+fi
+
+datestamp=$(date +%Y%m%d%H%M)
+mkdir $DI_TESTDIR/logs/$datestamp
+
+rm -f $DI_TESTDIR/logs/summary.log
+touch $DI_TESTDIR/logs/summary.log
+
+. $DI_TESTDIR/config
+
+for SCHEME in $@; do
+	use common
+	use $SCHEME
+	
+	if ./test-harness $MACHINE $SCHEME > $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log 2>&1; then
+		overview success >> $DI_TESTDIR/logs/overview.log
+	else
+		overview failed >> $DI_TESTDIR/logs/overview.log
+	fi
+	ln -sf $DI_TESTDIR/logs/$datestamp/$MACHINE-$SCHEME.log $DI_TESTDIR/logs/$MACHINE-$SCHEME.log
+done
