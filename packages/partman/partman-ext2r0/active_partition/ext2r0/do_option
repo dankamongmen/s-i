@@ -72,12 +72,34 @@ do_mountpoint_manual () {
     done
 }
 
+do_options () {
+    local seen_marker full_options
+    if [ -f $part/mountoptions ]; then
+	full_options=$(cat $part/full_mountoptions)
+    else
+	full_options=''
+    fi
+    db_fset partman-ext2r0/options seen false
+    db_set partman-ext2r0/options "$full_options"
+    db_input critical partman-ext2r0/options || true
+    db_go || exit
+    db_get partman-ext2r0/options
+    if [ "$RET" ]; then
+	echo "$RET" | sed 's/ *-[^,]*//g' >$part/mountoptions
+	echo "$RET" >$part/full_mountoptions
+    else
+	[ ! -f $part/mountoptions ] || rm $part/mountoptions
+	[ ! -f $part/full_mountoptions ] || rm $part/full_mountoptions
+    fi
+}
+
 case $1 in
     mountpoint)
 	do_mountpoint
 	update_partition $dev $id
 	;;
     options)
+	do_options
 	;;
 esac
 
