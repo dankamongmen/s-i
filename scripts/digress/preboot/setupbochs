@@ -12,6 +12,12 @@ fi
 
 # Add CD to the rc file.
 if [ -n "$ISO" ]; then
+	if [ -e "$ISO_ALT" ] && [ "$ISO_ALT" -nt "$ISO" ]; then
+	        echo "Using cd image: alternate"
+		ISO="$ISO_ALT"
+	else
+		echo "Using cd image: primary"
+	fi
 	echo "ata0-slave: type=cdrom, path=$ISO, status=inserted" >> $rc
 fi
 

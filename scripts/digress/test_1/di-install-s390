@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+# Takes care of a s390 first stage install after network-console is set up.
+use Expect;
+
+my $timeout=$ENV{STAGE_1_MAX_TIME};
+
+my $exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ENV{S390_IP}") or die "failed to start: $!";
+#$exp->debug(2);
+##$exp->exp_internal(1);
+
+$exp->expect($timeout, "Password:");
+$exp->send("$ENV{ROOT_PASSWORD}\r");
+
+$exp->expect($timeout, "Start menu");
+sleep 1;
+$exp->send("\r");
+
+# Now it should be noninteractive
+
+exit
