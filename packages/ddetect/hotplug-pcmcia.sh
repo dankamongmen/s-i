@@ -11,7 +11,7 @@ TYPE="$1"
 
 case $TYPE in
 	net)
-		if [ "$INTERFACE" == "" ]; then
+		if [ "$INTERFACE" = "" ]; then
 			log "Got net event without interface"
 			exit 1
 		fi
