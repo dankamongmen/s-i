@@ -2,11 +2,13 @@
  * Mirror selection via debconf.
  */
 
+#include <debconfclient.h>
 #include <string.h>
 #include <stdlib.h>
 #include "mirrors.h"
 #include "mirrors_http.h"
-#include "debconf.h"
+
+struct debconfclient *debconf;
 
 /*
  * Generates a list, suitable to be passed into debconf, from a
@@ -54,9 +56,9 @@ char *mirror_root(char *mirror) {
 
 void choose_country(void) {
 	char *list=debconf_list(countries_http);
-	debconf_command("SUBST", DEBCONF_BASE "country", "countries", list, NULL);
+	debconf->command(debconf, "SUBST", DEBCONF_BASE "country", "countries", list, NULL);
 	free(list);
-	debconf_command("INPUT", "high", DEBCONF_BASE "country", NULL);
+	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "country", NULL);
 }
 
 int manual_entry;
@@ -64,22 +66,22 @@ int manual_entry;
 void choose_mirror(void) {
 	char *list;
 
-	debconf_command("GET", DEBCONF_BASE "country", NULL);
-	manual_entry = ! strcmp(debconf_ret(), "enter information manually");
+	debconf->command(debconf, "GET", DEBCONF_BASE "country", NULL);
+	manual_entry = ! strcmp(debconf->value, "enter information manually");
 	if (! manual_entry) {
 		/* Prompt for mirror in selected country. */
-		list=debconf_list(mirrors_in(debconf_ret()));
-		debconf_command("SUBST", DEBCONF_BASE "http/mirror", "mirrors", list, NULL);
+		list=debconf_list(mirrors_in(debconf->value));
+		debconf->command(debconf, "SUBST", DEBCONF_BASE "http/mirror", "mirrors", list, NULL);
 		free(list);
-		debconf_command("INPUT", "medium", DEBCONF_BASE "http/mirror", NULL);
+		debconf->command(debconf, "INPUT", "medium", DEBCONF_BASE "http/mirror", NULL);
 	}
 	else {
 		/* Manual entry. */
-		debconf_command("INPUT", "critical", DEBCONF_BASE "http/hostname", NULL);
-		debconf_command("INPUT", "critical", DEBCONF_BASE "http/directory", NULL);
+		debconf->command(debconf, "INPUT", "critical", DEBCONF_BASE "http/hostname", NULL);
+		debconf->command(debconf, "INPUT", "critical", DEBCONF_BASE "http/directory", NULL);
 	}
 	/* Always ask about a proxy. */
-	debconf_command("INPUT", "high", DEBCONF_BASE "http/proxy", NULL);
+	debconf->command(debconf, "INPUT", "high", DEBCONF_BASE "http/proxy", NULL);
 }
 
 void validate_mirror(void) {
@@ -92,11 +94,12 @@ void validate_mirror(void) {
 		 * which is the standard location other
 		 *tools can look at.
 		 */
-		debconf_command("GET", DEBCONF_BASE "http/mirror", NULL);
-		mirror=debconf_ret();
-		debconf_command("SET", DEBCONF_BASE "http/hostname", mirror, NULL);
-		debconf_command("SET", DEBCONF_BASE "http/directory",
+		debconf->command(debconf, "GET", DEBCONF_BASE "http/mirror", NULL);
+		mirror=strdup(debconf->value);
+		debconf->command(debconf, "SET", DEBCONF_BASE "http/hostname", mirror, NULL);
+		debconf->command(debconf, "SET", DEBCONF_BASE "http/directory",
 			mirror_root(mirror), NULL);
+		free(mirror);
 	}
 }
 
@@ -109,9 +112,10 @@ int main (int argc, char **argv) {
 		validate_mirror,
 		NULL,
 	};
-	
-	debconf_command("CAPB", "backup", NULL);
-	debconf_command("TITLE", "Choose mirror", NULL); //TODO: i18n
+
+	debconf = debconfclient_new();
+	debconf->command(debconf, "CAPB", "backup", NULL);
+	debconf->command(debconf, "TITLE", "Choose mirror", NULL); //TODO: i18n
 
 	/*
 	 * It's a pretty brain-dead state machine though. It advances
@@ -119,7 +123,7 @@ int main (int argc, char **argv) {
 	 */
 	while (state >= 0 && states[state]) {
 		states[state]();
-		if (debconf_command("GO", NULL) == 0)
+		if (debconf->command(debconf, "GO", NULL) == 0)
 			state++;
 		else
 			state--; /* back up */
