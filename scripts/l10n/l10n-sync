@@ -20,10 +20,29 @@ DEBUG=N
 KEEP_REVISION=N
 svn=svn
 debconfupdatepo=debconf-updatepo
+SORT_ORDER="main-menu \
+            cdebconf \
+            languagechooser \
+	    countrychooser \
+	    kbd-chooser \
+	    ddetect \
+	    netcfg \
+	    choose-mirror \
+	    retriever/net \
+	    retriever/cdrom \
+	    partman/partman \
+	    partman/partman-auto \
+	    partman/partman-basicfilesystems \
+	    partman/partman-ext3 \
+	    anna \
+	    base-installer \
+	    baseconfig-udeb \
+	    arch/i386/grub-installer \
+	    prebaseconfig"
 
 usage() {
 echo  "Usage:"
-echo  "$0 [--online] [--debug] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
+echo  "$0 [--online] [--debug] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] [--sort-order="sorting_order"] <D-I repository path>"
 echo  "    --debug           : Verbose output"
 echo  "    --online          : Work online (will update the local copy on"
 echo  "                        the fly)"
@@ -43,6 +62,8 @@ echo  "                        NOT RECOMMENDED in other situations"
 echo  "    --svn             : path to the svn binary"
 echo  "    --debconf-updatepo: debconf-updatepo command line"
 echo  "                        (for using hacked debconf-updatepo)"
+echo  "    --sort-order      : packages sorting order"
+echo  "                        (packages names relatively to packages)"
 echo  " <D-I repository path>: path to the local copy of the D-I repository"
 }
 
@@ -84,6 +105,10 @@ while $MORETODO ; do
         ;;
     "--debconf-updatepo="*)
         debconfupdatepo=`echo $1|cut -f2 -d=`
+        shift
+        ;;
+    "--sort-order="*)
+        SORT_ORDER=`echo $1|cut -f2 -d=`
         shift
         ;;
     "--"*)
@@ -158,6 +183,27 @@ packages=$(echo $pots |\
 if [ "$DEBUG" = "Y" ] ; then
   echo Done.
 fi
+
+# Sort packages
+packages_new=""
+pots_new=""
+# Put packages from the SORT_ORDER list first
+# of course we check if they are really in the list
+for package in ${SORT_ORDER} ; do
+  if (echo ${packages} | grep $package >/dev/null 2>&1) ; then
+    packages_new="${packages_new} ${package}"
+    pots_new="${pots_new} ${package}/debian/po/templates.pot"
+  fi
+done
+for package in $packages ; do
+  if ! (echo ${SORT_ORDER} | grep $package >/dev/null 2>&1) ; then
+    packages_new="${packages_new} ${package}"
+    pots_new="${pots_new} ${package}/debian/po/templates.pot"
+  fi
+done
+
+packages=${packages_new}
+pots=${pots_new}
 
 # Loop over packages
 #  1a) sync the debian/ directory
@@ -311,7 +357,6 @@ if [ "$BIG_COMMITS" = "Y" ] ; then
      echo Done.
    fi
 fi
-
 
 # Loop over D-I packages:
 # 4a) synchronize the local copy with the D-I SVN 
