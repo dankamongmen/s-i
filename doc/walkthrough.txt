@@ -38,14 +38,14 @@ what retriever modules are available in
 retriever and a floppy retriever. It generates a menu listing them and
 prompts the user to pick their install media. They pick cdrom.
 
-All the modules the cdrom retreiver depends on are configured. It depends on 
+All the modules the cdrom retriever depends on are configured. It depends on 
 only one, a cd driver module.
 
 That module, when configured, goes out and probes for cd roms. It is 
 prepared to ask the user what kind of cd they have if the probe fails, 
 but luckily they have a modern cd drive, and it is easily autodetected.
 
-The cdrom retreiver itself is now configured. It mounts the cd, and tries
+The cdrom retriever itself is now configured. It mounts the cd, and tries
 to find a debian archive on it. Since this is an official cd, it finds one
 in the first place it looks.
 
@@ -53,10 +53,10 @@ With configuration of the retriever complete, control passes back to the
 "configure installation media" program. 
 
 The program sees that it now has installation media configured, but before
-exiting, it asks the cdrom retreiver to retreive a Packages file.
+exiting, it asks the cdrom retriever to retrieve a Packages file.
 
 It calls another program to parse the file, and get a list of available
-modules on the CD. It then asks the retreiver to download them each in
+modules on the CD. It then asks the retriever to download them each in
 turn, and unpacks (but doesn't configure) each of them. A bunch of modules
 are unpacked (including a hard drive driver module, a partitioning module, a
 disk formatter and mount module, a swap setup module, a base system installer
@@ -78,7 +78,7 @@ installed menu control files, so it has now grown to look like this:
 
 Once more, each testprog is run in turn. The first one sees that the
 installation media are configured, and returns 1. The next one sees that
-didks have not been partitioned, and returns 0, making that menu item be the
+disks have not been partitioned, and returns 0, making that menu item be the
 new default.
 
 The user decides to run a shell this time, so the associated program is
@@ -100,7 +100,7 @@ The main menu is displayed gain. The third menu item becomes the default,
 and the user picks it, so it's time to set up swap. 
 
 This is a pretty trivial process, and once it's completed, it's back to the
-menu, where format and mount paritions becomes default and is selected by
+menu, where format and mount partitions becomes default and is selected by
 the user.
 
 The user made 2 partitions, plus the already set up swap partition.
@@ -111,8 +111,8 @@ Back to the menu, where "install the base system" becomes the default, and
 is picked by the user. This makes the base system installer module run.
 
 This module sets up a FIFO and for the base system to be retrieved to the fifo.
-As the CD retiever does that, another process runs, reading from the fifo
-and unpacking the base system to the desitnation filesystem.
+As the CD retriever does that, another process runs, reading from the fifo
+and unpacking the base system to the destination filesystem.
 
 With the base system installed, a few more things are set up, like the
 fstab file.
