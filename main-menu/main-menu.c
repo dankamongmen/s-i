@@ -458,17 +458,20 @@ static char *debconf_priorities[] =
 
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 static void modify_debconf_priority (int raise_or_lower) {
-	int pri;
+	int pri, i;
 	const char *template = "debconf/priority";
 	debconf_get(debconf, template);
-	if ( ! debconf->value )
-		pri = 1;
-	else
-		for (pri = 0; (size_t)pri < ARRAY_SIZE(debconf_priorities); ++pri) {
+	
+	pri = 1;
+	if ( debconf->value ) {
+		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
 			if (0 == strcmp(debconf->value,
-					debconf_priorities[pri]) )
+					debconf_priorities[i]) ) {
+				pri = i;
 				break;
+			}
 		}
+	}
 	if (raise_or_lower == LOWER)
 		--pri;
 	else if (raise_or_lower == RAISE)
@@ -504,8 +507,8 @@ static void adjust_default_priority (void) {
 	}
 	
 	if ( pri != local_priority ) {
-		di_log(DI_LOG_LEVEL_INFO, "Priority changed externally, setting main-menu default to '%s'",
-			debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
+		di_log(DI_LOG_LEVEL_INFO, "Priority changed externally, setting main-menu default to '%s' (%s)",
+			debconf_priorities[pri] ? debconf_priorities[pri] : "(null)", debconf->value);
 		local_priority = pri;
 		default_priority = pri;
 	}
