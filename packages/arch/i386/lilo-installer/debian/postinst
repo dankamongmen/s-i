@@ -83,20 +83,20 @@ case "$RET" in
       db_go || exit 10
       db_get lilo-installer/manual_bootdev
 
-      if [ -b "$RET" ]; then
         case "$RET" in
           /dev/ide*|/dev/discs/*|/dev/scsi/*)
+	   if [ -b "$RET" ]; then
 	    bootdev="$(mapdevfs $RET)"
 	    not_done=0
 	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
+	   fi
 	  ;;
-	  /dev/[hs]d[a-z][0-9])
+	  /dev/[hs]d[a-z]*)
 	    bootdev=$RET;
 	    not_done=0
 	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
 	  ;;
 	esac
-      fi
 
       if [ $not_done -eq 1 ]; then
         db_subst lilo-installer/manual_bootdev_error path "$RET"
