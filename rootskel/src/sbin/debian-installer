@@ -31,8 +31,8 @@ fi
 if [ -z "$DEBIAN_FRONTEND" ] ; then
     for frontend in gtk newt slang text ; do
         if [ -e "/usr/lib/cdebconf/frontend/$frontend.so" ] ; then
-            debconf-set debconf/frontend "$DEBCONF_FRONTEND"
-            unset DEBIAN_FRONTEND
+            DEBIAN_FRONTEND=$frontend
+            export DEBIAN_FRONTEND
             break
         fi
     done
