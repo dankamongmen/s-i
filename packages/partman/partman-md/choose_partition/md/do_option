@@ -1,0 +1,54 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+db_reset partman-md/confirm
+db_input critical partman-md/confirm
+db_go || true
+db_get partman-md/confirm
+if [ "$RET" = false ]; then
+    exit 0
+fi
+
+for s in /lib/partman/commit.d/*; do
+    if [ -x $s ]; then
+	$s || {
+	    db_fset partman-md/commit_failed seen false
+	    db_input high partman-md/commit_failed || true
+	    db_go || true
+	    for s in /lib/partman/init.d/*; do
+		if [ -x $s ]; then
+		    $s || exit 255
+		fi
+	    done
+	    exit 0
+	}
+    fi
+done
+
+# Restart partman.
+
+open_infifo
+write_line "QUIT"
+close_infifo
+
+rm /var/run/parted_server.pid
+
+mdcfg
+
+initcount=`ls /lib/partman/init.d/* | wc -l`
+db_progress START 0 $initcount partman/progress/init/title
+for s in /lib/partman/init.d/*; do
+    if [ -x $s ]; then
+	base=$(basename $s | sed 's/[0-9]*//')
+	if ! db_progress INFO partman/progress/init/$base; then
+	    db_progress INFO partman/progress/init/fallback
+	fi
+	if ! $s; then
+	    db_progress STOP
+	    exit 255
+	fi
+    fi
+    db_progress STEP 1
+done
+db_progress STOP
