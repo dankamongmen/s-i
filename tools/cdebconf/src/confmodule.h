@@ -9,10 +9,17 @@
 
 #include "common.h"
 
-enum debconf_seen_action {
-        DEBCONF_SEEN_REMOVE = -1,
-        DEBCONF_SEEN_SAVE   = 0,
-        DEBCONF_SEEN_ADD    = 1
+/*
+ *  For full backup sort, questions are not flagged as being seen
+ *  as soon as they are displayed, but only when session is over.
+ *  The list of displayed questions is managed by a stack, which
+ *  is the seen_questions member of the confmodule structure.
+ */
+enum seen_action {
+        STACK_SEEN_ADD,       /*  Add a question to the stack       */
+        STACK_SEEN_REMOVE,    /*  Remove a question from the stack  */
+        STACK_SEEN_SAVE       /*  Questions are flagged as seen and
+                                  removed from the etack */
 };
 
 struct configuration;
@@ -72,7 +79,7 @@ struct confmodule {
      * @param int action - push, pop or sync values
      * @return int - DC_OK, DC_NOTOK
      */
-	int (*update_seen_questions)(struct confmodule *mod, enum debconf_seen_action action);
+	int (*update_seen_questions)(struct confmodule *mod, enum seen_action action);
 };
 
 /**

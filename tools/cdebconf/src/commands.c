@@ -167,12 +167,12 @@ int command_go(struct confmodule *mod, int argc, char **argv,
 	if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
 	{
 		snprintf(out, outsize, "%u backup", CMDSTATUS_GOBACK);
-		mod->update_seen_questions(mod, DEBCONF_SEEN_REMOVE);
+		mod->update_seen_questions(mod, STACK_SEEN_REMOVE);
 	}
 	else
 	{
 		snprintf(out, outsize, "%u ok", CMDSTATUS_SUCCESS);
-		mod->update_seen_questions(mod, DEBCONF_SEEN_ADD);
+		mod->update_seen_questions(mod, STACK_SEEN_ADD);
 	}
 	mod->frontend->methods.clear(mod->frontend);
 

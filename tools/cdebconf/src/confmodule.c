@@ -192,7 +192,7 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 	return pid;
 }
 
-static int confmodule_update_seen_questions(struct confmodule *mod, enum debconf_seen_action action)
+static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_action action)
 {
 	struct question *q;
 	struct question *qlast = NULL;
@@ -200,7 +200,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum debconf
 
 	switch (action)
 	{
-	case DEBCONF_SEEN_ADD:
+	case STACK_SEEN_ADD:
 		if (mod->seen_questions == NULL)
 			narg = 0;
 		else
@@ -219,7 +219,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum debconf
 			i++;
 		}
 		break;
-	case DEBCONF_SEEN_REMOVE:
+	case STACK_SEEN_REMOVE:
 		if (mod->seen_questions == NULL)
 			return DC_OK;
 
@@ -235,7 +235,7 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum debconf
 			narg --;
 		}
 		break;
-	case DEBCONF_SEEN_SAVE:
+	case STACK_SEEN_SAVE:
 		if (mod->seen_questions == NULL)
 			return DC_OK;
 
