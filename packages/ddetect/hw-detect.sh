@@ -414,8 +414,9 @@ for device in $(list_to_lines); do
 done
 IFS="$IFS_SAVE"
 
-# if there is an ide bus, then register the ide CD modules so they'll be
-# available on the target system for base-config
+# If there is an ide bus, then register the ide CD modules so they'll be
+# available on the target system for base-config. Disk too, in case root is
+# not ide but ide is still used.
 if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 	register-module ide-cd
 	case "$(uname -r)" in
@@ -426,6 +427,7 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 		register-module ide-generic
 	;;
 	esac
+	register-module ide-disk
 fi
 
 # always load sd_mod and sr_mod if a scsi controller module was loaded.
