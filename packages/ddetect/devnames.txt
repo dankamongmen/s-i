@@ -1,84 +1,117 @@
-8139cp.o:RealTek RTL-8139C+ series 10/100 PCI Ethernet
-3c501.o:3Com 3c501 Ethernet
-3c503.o:3Com ISA EtherLink II-II/16
-3c505.o:3Com 3c505 Ethernet
-3c507.o:3Com 3c507 Ethernet
-3c509.o:3Com Etherlink III
-3c515.o:3Com 3c515 "Corkscrew" Ethernet
-3c523.o:3Com 3c523 Ethernet
-3c527.o:3Com 3c527 Ethernet
-ac3200.o:Ansel AC3200 EISA ethernet
-82596.o:Generic i82596 Ethernet
-ni5010.o:MiCom-Interlan NI5010 Ethernet
-ne.o:NE1000/NE2000 ISA/PnP Ethernet
-aironet4500_card.o:Cisco Aironet 4500 802.11 wireless card
-amd8111e.o:AMD8111 based 10/100 Ethernet
-at1700.o:Allied Telesis 10/100 Ethernet
-cs89x0.o:Crystal Semiconductor CS8900/8920 Ethernet
-de4x5.o:DIGITAL DC21x4x/DE425-500 DECchip Ethernet
-depca.o:DIGITAL DEPCA & EtherWORKS Ethernet
-dl2k.o:D-Link DL2000-based Gigabit Ethernet Adapter
-dmfe.o:Davicom DM910X fast ethernet
-e1000.o:Intel(R) PRO/1000 Gigabit Ethernet
-e2100.o:Cabletron E2100 ISA ethernet
-eepro.o:Intel i82595 ISA EtherExpressPro10/10+
-eepro100.o:Intel i82557/i82558/i82559 PCI EtherExpressPro
-eexpress.o:Intel EtherExpress 16
-epic100.o:SMC 83c170 EPIC series Ethernet
-es3210.o:Racal-Interlan ES3210 EISA ethernet
-eth16i.o:ICL EtherTeam 16i/32
-ewrk3.o:DIGITAL EtherWORKS 3 ethernet
-fealnx.o:Myson MTD-8xx 100/10M Ethernet PCI Adapter
-forcedeth.o:nVidia nForce(2) 10/100 Ethernet
-hamachi.o:Packet Engines 'Hamachi' GNIC-II Gigabit Ethernet
-hp100.o:HP 100VG-AnyLan Network Adapter
-lance.o:AMD LANCE/PCnet ethernet
-lne390.o:Mylex LNE390A/B EISA Ethernet
-lp486e.o:Intel Panther onboard i82596
-ne2.o:Generic NE/2 ethernet
-ns83820.o:National Semiconductor DP83820 10/100/1000
-ni52.o:NI5210 (i82586) ethernet
-ni65.o:AM7990 "Lance" ethernet
-smc-ultra32.o:SMC Ultra32 EISA ethernet
-pcnet32.o:AMD PCnet32/PCnetPCI based ethernet
-r8169.o:RealTek RTL-8169 Gigabit Ethernet
-rrunner.o:Essential RoadRunner HIPPI
-sk98lin.o:SysKonnect SK-NET Gigabit Ethernet SK-98xx
-smc-ultra.o:SMC Ultra/EtherEZ ISA/PnP Ethernet
-winbond-840.o:Winbond W89c840 Ethernet
-smc9194.o:SMC 9000 Series Ethernet
-starfire.o:Adaptec Starfire Ethernet
-sundance.o:Sundance Alta Ethernet
-tlan.o:TI ThunderLAN Ethernet PCI Adapter
-olympic.o:Olympic PCI/Cardbus Chipset Driver
-typhoon.o:3Com Typhoon Family (3C990, 3CR990, and variants)
-orinoco_pci.o:Lucent ORiNOCO wireless 802.11 PCI device
-airo_cs.o:Cisco/Aironet 802.11 wireless ethernet
-orinoco_cs.o:Lucent ORiNOCO/Prism2 802.11b PCMCIA Card
-yellowfin.o:Packet Engines Yellowfin G-NIC Gigabit Ethernet
-3c59x.o:3Com 3c59x/3c9xx Ethernet
-8139too.o:RealTek RTL-8139 Fast Ethernet
-b44.o:Broadcom 4400 10/100 PCI ethernet
-e100.o:Intel(R) PRO/100 Ethernet 
-natsemi.o:National Semiconductor DP8381x series PCI Ethernet
-ne2k-pci.o:PCI NE2000 Ethernet
-sis900.o:SiS 900 PCI Fast Ethernet
-tg3.o:Broadcom Tigon3 Ethernet
-tulip.o:Digital 21*4* Tulip ethernet
-via-rhine.o:VIA Rhine PCI Fast Ethernet
-wd.o:ISA WD 8003/8013 or SMC Elite/16 Ethernet
-aironet4500_cs.o:Cisco AiroNet 4500 Wireless 802.11
-3c574_cs.o:3Com 3c574 series PCMCIA ethernet
-3c589_cs.o:3Com 3c589 series PCMCIA ethernet
-axnet_cs.o:Asix AX88190 PCMCIA ethernet
-xircom_tulip_cb.o:Xircom CBE-100 ethernet
-fmvj18x_cs.o:fmvj18x and compatible PCMCIA ethernet
-netwave_cs.o:Xircom Netwave AirSurfer 802.11
-nmclan_cs.o:New Media PCMCIA ethernet
-pcnet_cs.o:NE2000 compatible PCMCIA ethernet
-ray_cs.o:Raylink/WebGear wireless 802.11
-smc91c92_cs.o:SMC 91c92 series PCMCIA ethernet
-wavelan_cs.o:Lucent WaveLAN/IEEE + compatibles 802.11
-xirc2ps_cs.o:Xircom PCMCIA ethernet
-xircom_cb.o:Xircom Cardbus ethernet
-8390.o:National Semiconductor 8390 ethernet
+# Note to editors:
+#   For new modules, module (without suffix):module information
+#   The only comments allowed start with a #
+#   Don't use commas, or hack ethdetect and netcfg support in.
+#   Try not to make descriptions any wider than 70-75 chars.
+
+# First, we remove the ones we never want to see in an ethdetect menu..
+atmel:BLACKLIST
+hermes:BLACKLIST
+mii:BLACKLIST
+orinoco:BLACKLIST
+tms380tr:BLACKLIST
+wavelan:BLACKLIST
+aironet4500_core:BLACKLIST
+
+# Here's the meat.
+3c501:3Com 3c501 Ethernet
+3c503:3Com ISA EtherLink II-II/16
+3c505:3Com 3c505 Ethernet
+3c507:3Com 3c507 Ethernet
+3c509:3Com Etherlink III
+3c515:3Com 3c515 "Corkscrew" Ethernet
+3c523:3Com 3c523 Ethernet
+3c527:3Com 3c527 Ethernet
+3c574_cs:3Com 3c574 series PCMCIA Ethernet
+3c589_cs:3Com 3c589 series PCMCIA Ethernet
+3c59x:3Com 3c59x/3c9xx PCI Ethernet
+8139cp:RealTek RTL-8139C+ series 10/100 PCI Ethernet
+8139too:RealTek RTL-8139 Fast Ethernet
+82596:Generic i82596 Ethernet
+8390:National Semiconductor 8390 Ethernet
+abyss:Madge Smart 16/4 PCI Mk2 Token Ring
+ac3200:Ansel AC3200 EISA Ethernet
+airo_cs:Cisco/Aironet 802.11 Wireless
+aironet4500_card:Cisco Aironet 4500 802.11 Wireless Ethernet
+aironet4500_cs:Cisco Aironet 4500 Wireless Ethernet
+amd8111e:AMD8111 based 10/100 Ethernet
+arlan:Aironet Arlan 655 Wireless
+at1700:Allied Telesis 10/100 Ethernet
+atmel_pci:Atmel AT76c50x Wireless Ethernet
+axnet_cs:Asix AX88190 PCMCIA Ethernet
+b44:Broadcom 4400 10/100 PCI Ethernet
+cs89x0:Crystal Semiconductor CS8900/8920 Ethernet
+de2104x:Intel/Digital 21040/1 PCI Ethernet
+de4x5:DIGITAL DC21x4x/DE425-500 DECchip Ethernet
+depca:DIGITAL DEPCA & EtherWORKS Ethernet
+dl2k:D-Link DL2000-based Gigabit Ethernet Adapter
+dmfe:Davicom DM910X fast Ethernet
+e1000:Intel(R) PRO/1000 Gigabit Ethernet
+e100:Intel(R) PRO/100 Ethernet 
+e2100:Cabletron E2100 ISA Ethernet
+eepro100:Intel i82557/i82558/i82559 PCI EtherExpressPro
+eepro:Intel i82595 ISA EtherExpressPro10/10+
+eexpress:Intel EtherExpress 16
+epic100:SMC 83c170 EPIC series Ethernet
+es3210:Racal-Interlan ES3210 EISA Ethernet
+eth16i:ICL EtherTeam 16i/32
+ewrk3:DIGITAL EtherWORKS 3 Ethernet
+fealnx:Myson MTD-8xx 100/10M Ethernet PCI Adapter
+fmvj18x_cs:fmvj18x and compatible PCMCIA Ethernet
+forcedeth:nVidia nForce(2) 10/100 Ethernet
+hamachi:Packet Engines 'Hamachi' GNIC-II Gigabit Ethernet
+hp:HP PC-LAN ISA Ethernet
+hp-plus:HP PCLAN/Plus Ethernet
+hp100:HP 100VG-AnyLan Network Adapter
+ibmtr:IBM Token Ring 16/4
+ixgb:Intel(R) PRO/10Gbit Ethernet
+lance:AMD LANCE/PCnet Ethernet
+lanstreamer:IBM LANStreamer Token Ring Adapter
+lne390:Mylex LNE390A/B EISA Ethernet
+lp486e:Intel Panther onboard i82596
+natsemi:National Semiconductor DP8381x Series PCI Ethernet
+ne2:Generic NE/2 Ethernet
+ne2k-pci:PCI NE2000 Ethernet
+ne3210:Novell NE3210 EISA Network Adapter
+ne:NE1000/NE2000 ISA/PnP Ethernet
+netwave_cs:Xircom Netwave AirSurfer 802.11
+ni5010:MiCom-Interlan NI5010 Ethernet
+ni52:NI5210 (i82586) Ethernet
+ni65:AM7990 "Lance" Ethernet
+nmclan_cs:New Media PCMCIA Ethernet
+ns83820:National Semiconductor DP83820 10/100/1000
+olympic:Olympic PCI/Cardbus Chipset Driver
+orinoco_cs:Lucent ORiNOCO/Prism2 Wireless (PCMCIA)
+orinoco_pci:Lucent ORiNOCO Wireless (PCI)
+orinoco_plx:Lucent ORiNOCO Wireless (PCMCIA in PLX)
+orinoco_tmd:Lucent/Agere ORiNOCO Wireless (TMD7160 PCI)
+pcnet32:AMD PCnet32/PCnetPCI based Ethernet
+pcnet_cs:NE2000 compatible PCMCIA Ethernet
+prism54:Prism GT/Duette/Indigo Wireless
+r8169:RealTek RTL-8169 Gigabit Ethernet
+ray_cs:Raylink/WebGear Wireless LAN
+rrunner:Essential RoadRunner HIPPI
+sis190:SiS 190 PCI Gigabit Ethernet
+sis900:SiS 900 PCI Fast Ethernet
+sk98lin:SysKonnect SK-NET Gigabit Ethernet SK-98xx
+skfp:SysKonnect 5xxx / Compaq Netelligent Token Ring
+smc9194:SMC 9000 Series Ethernet
+smc91c92_cs:SMC 91c92 series PCMCIA Ethernet
+smc-ultra32:SMC Ultra32 EISA Ethernet
+smc-ultra:SMC Ultra/EtherEZ ISA/PnP Ethernet
+starfire:Adaptec Starfire Ethernet
+sundance:Sundance Alta Ethernet
+tg3:Broadcom Tigon3 Gigabit Ethernet
+tlan:TI ThunderLAN Ethernet PCI Adapter
+tmspci:SysKonnect 4/16 / 3Com 3c339 / Compaq 4/16 Token Ring 
+tulip:Digital 21x4x Tulip Ethernet
+typhoon:3Com Typhoon Family (3C990/3CR990/variants)
+via-rhine:VIA Rhine PCI Fast Ethernet
+wavelan_cs:Lucent WaveLAN/IEEE + compatibles 802.11
+wd:ISA WD 8003/8013 or SMC Elite/16 Ethernet
+winbond-840:Winbond W89c840 Ethernet
+xirc2ps_cs:Xircom PCMCIA Ethernet
+xircom_cb:Xircom Cardbus Ethernet
+xircom_tulip_cb:Xircom CBE-100 Ethernet
+yellowfin:Packet Engines Yellowfin G-NIC Gigabit Ethernet
+znet:Zenith Z-Note Ethernet

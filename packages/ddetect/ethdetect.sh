@@ -40,10 +40,16 @@ compare_devs() {
 }
 
 DEVNAMES=/etc/network/devnames.gz
+TEMP_EXTRACT=/tmp/devnames-static.txt
 get_static_modinfo() {
-	local module="$1"
+	local module="$(echo $1 | sed 's/\.k\?o//')"
 	local modinfo=""
-	if zcat $DEVNAMES | grep -q $module; then 
+
+	if [ ! -f "$TEMP_EXTRACT" ]; then
+		zcat $DEVNAMES > $TEMP_EXTRACT
+	fi
+	
+	if grep -q "$module:" $TEMP_EXTRACT; then 
 		modinfo=$(zcat $DEVNAMES | grep ^${module} | head -n 1 | cut -d':' -f2-)
 	fi
 	echo "$modinfo"
@@ -123,7 +129,14 @@ hw-detect ethdetect/detect_progress_title || true
 while [ -z "`sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*"`" ]
 do
 	CHOICES=""
-	for mod in $(find /lib/modules/*/kernel/drivers/net -type f | sed 's/\.o$//' | sed 's/\.ko$//' | sed 's/.*\///' | sort); do
+	for mod in $(find /lib/modules/*/kernel/drivers/net -type f | sed -e 's/\.k\?o$//' -e 's/.*\///' | sort); do
+		modinfo=$(get_static_modinfo $mod)
+		if [ -n "$modinfo" ]; then
+			if [ "$modinfo" = BLACKLIST ]; then
+				continue
+			fi
+			mod="$mod: $modinfo"
+		fi
 		if [ -z "$CHOICES" ]; then
 			CHOICES="$mod"
 		else
@@ -140,7 +153,7 @@ do
 		if [ "$RET" = "no ethernet card" ]; then
 			break
 		elif [ "$RET" != "none of the above" ]; then
-			module="$RET"
+			module="$(echo $RET | cut -d: -f1)"
 			if [ -n "$module" ] && is_not_loaded "$module" ; then
 				register-module "$module"
 				load_module "$module"
@@ -165,6 +178,9 @@ do
 	db_go || break
 
 	if [ -z "$CHOICES" ]; then
+		rm -f $TEMP_EXTRACT
 		exit 1
 	fi
 done
+
+rm -f $TEMP_EXTRACT
