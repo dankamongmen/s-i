@@ -4,7 +4,7 @@ set -e
 . /usr/share/debconf/confmodule
 #set -x
 
-MISSING_MODULES=""
+MISSING_MODULES_LIST=""
 
 # This is a gross and stupid hack, but needed because of Xu's
 # unwillingness to run depmod in kernel-image's postinst.  See Debian
@@ -184,10 +184,10 @@ for device in $HW_INFO; do
 	    fi
         else
             log "Could not load driver '$module' for '$cardname'."
-	    if [ -n "$MISSING_MODULES" ]; then
-		    MISSING_MODULES="$MISSING_MODULES, "
+	    if [ -n "$MISSING_MODULES_LIST" ]; then
+		    MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
 	    fi
-	    MISSING_MODULES="$MISSING_MODULES$module ($cardname)"
+	    MISSING_MODULES_LIST="$MISSING_MODULES_LIST$module ($cardname)"
         fi
     fi
 
@@ -228,12 +228,13 @@ then
     fi
 fi
 
-if [ -n "$MISSING_MODULES" ]; then
+if [ -n "$MISSING_MODULES_LIST" ]; then
+	log "Missing modules '$MISSING_MODULES_LIST"
 	# Tell the user to try to load more modules from floppy
 	template=hw-detect/missing_modules
 	db_fset "$template" seen false
-	db_subst "$template" MISSING_MODULES "$MISSING_MODULES" || true
-	db_input low "$template"
+	db_subst "$template" MISSING_MODULES_LIST "$MISSING_MODULES_LIST" || true
+	db_input low "$template" || [ $? -eq 30 ]
 	db_go || true
 fi
 	    
