@@ -1,13 +1,18 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: m68k.xml,v 1.2 2003/10/24 01:03:02 toff Exp $ -->
+<!-- $Id: m68k.xml,v 1.3 2003/10/27 00:07:42 toff Exp $ -->
 
+
+  <sect2 arch="m68k"><title>Booting from Hard Disk</title>
+
+&boot-installer-intro-hd.xml;
+
+  </sect2>
 
   <sect2 arch="m68k"><title>Booting from AmigaOS</title>
-
 <para>
 
-In the <command>Workbench</command>, start the Linux installation process by
-double-clicking on the ``StartInstall'' icon in the
+In the <command>Workbench</command>, start the Linux installation
+process by double-clicking on the ``StartInstall'' icon in the
 <filename>debian</filename> directory.
 
 </para><para>
@@ -30,8 +35,8 @@ can continue down at <xref linkend="init-config"/>.
 
 At the GEM desktop, start the Linux installation process by
 double-clicking on the ``bootstra.prg'' icon in the
-<filename>debian</filename> directory and clicking ``Ok'' at the program
-options dialog box.
+<filename>debian</filename> directory and clicking ``Ok'' at the
+program options dialog box.
 
 </para><para>
 
@@ -52,32 +57,40 @@ you can continue below at <xref linkend="init-config"/>.
 <para>
 
 At the MacOS desktop, start the Linux installation process by
-double-clicking on the <userinput>Penguin Prefs</userinput> icon in the
-<filename>debian</filename> directory. The <command>Penguin</command> booter will
-start up. Go to the <userinput>Settings</userinput> item in the <userinput>File</userinput> menu,
-click the <userinput>Kernel</userinput> tab.  Select the kernel
-(<filename>linux.bin</filename>) and ramdisk (<filename>root.bin</filename>) images in
-the <filename>debian</filename> directory by clicking on the corresponding
+double-clicking on the <userinput>Penguin Prefs</userinput> icon in
+the <filename>debian</filename> directory. The
+<command>Penguin</command> booter will start up. Go to the
+<userinput>Settings</userinput> item in the
+<userinput>File</userinput> menu, click the
+<userinput>Kernel</userinput> tab.  Select the kernel
+(<filename>linux.bin</filename>) and ramdisk
+(<filename>root.bin</filename>) images in the
+<filename>debian</filename> directory by clicking on the corresponding
 buttons in the upper right corner, and navigating the file select
-dialogs to locate the files. Close the <userinput>Settings</userinput> dialog, save
-the settings and start the bootstrap using the <userinput>Boot Now</userinput> item
-in the <userinput>File</userinput> menu.
+dialogs to locate the files. Close the <userinput>Settings</userinput>
+dialog, save the settings and start the bootstrap using the
+<userinput>Boot Now</userinput> item in the
+<userinput>File</userinput> menu.
 
 </para><para>
 
-The <command>Penguin</command> booter will output some debugging information
-into a window. After this, the screen will go grey, there will be a
-few seconds' delay. Next, a black screen with white text should come
-up, displaying all kinds of kernel debugging information. These
-messages may scroll by too fast for you to read, but that's OK. After
-a couple of seconds, the installation program should start
-automatically, so you can continue below at <xref linkend="init-config"/>.
+The <command>Penguin</command> booter will output some debugging
+information into a window. After this, the screen will go grey, there
+will be a few seconds' delay. Next, a black screen with white text
+should come up, displaying all kinds of kernel debugging
+information. These messages may scroll by too fast for you to read,
+but that's OK. After a couple of seconds, the installation program
+should start automatically, so you can continue below at 
+<xref linkend="init-config"/>.
 
 </para>
   </sect2>
 
 
-  <sect2 arch="m68k" id="install-cd"><title>Booting from a CD-ROM</title>
+  <sect2 arch="m68k"><title>Booting from a CD-ROM</title>
+
+&boot-installer-intro-cd.xml;
+
 <para>
 
 Currently, the only &arch-title; subarchitecture that
@@ -90,28 +103,34 @@ Simply insert your CD, reboot, and proceed to the next chapter.
   </sect2>
 
 
-  <sect2 arch="m68"><title>Booting with TFTP</title>
+  <sect2 arch="m68k"><title>Booting with TFTP</title>
+
+&boot-installer-intro-net.xml;
+
 <para>
 
-After booting the VMEbus systems you will be presented
-with the LILO <command>Boot:</command> prompt.  At that prompt enter one of the
+After booting the VMEbus systems you will be presented with the LILO
+<command>Boot:</command> prompt.  At that prompt enter one of the
 following to boot Linux and begin installation proper of the Debian
 software using vt102 terminal emulation:
+
+<!-- Because the &enterkey; definition uses <emphasis>,  -->
+<!-- we use <screen> instead of <userinput> in this list -->
 
 <itemizedlist>
 <listitem><para>
 
-type <userinput>i6000 &enterkey;</userinput> to install a BVME4000/6000
+type <screen>i6000 &enterkey;</screen> to install a BVME4000/6000
 
 </para></listitem>
 <listitem><para>
 
-type <userinput>i162 &enterkey;</userinput> to install an MVME162
+type <screen>i162 &enterkey;</screen> to install an MVME162
 
 </para></listitem>
 <listitem><para>
 
-type <userinput>i167 &enterkey;</userinput> to install an MVME166/167
+type <screen>i167 &enterkey;</screen> to install an MVME166/167
 
 </para></listitem>
     </itemizedlist>
@@ -119,8 +138,8 @@ type <userinput>i167 &enterkey;</userinput> to install an MVME166/167
 </para><para>
 
 You may additionally append the string
-<userinput>TERM=vt100</userinput> to use vt100 terminal emulation,
-e.g., <userinput>i6000 TERM=vt100 &enterkey;<userinput>.
+<screen>TERM=vt100</screen> to use vt100 terminal emulation,
+e.g., <screen>i6000 TERM=vt100 &enterkey;</screen>.
 
 </para>
   </sect2>
@@ -145,8 +164,8 @@ Booting from the rescue floppy is supported only for Atari and VME
   <sect2 arch="m68k"><title>Macintosh Limitations</title>
 <para>
 
-In the case of Macintosh, you must retain the original Mac
-system and boot from it. It is <emphasis>essential</emphasis> that, when booting
+In the case of Macintosh, you must retain the original Mac system and
+boot from it. It is <emphasis>essential</emphasis> that, when booting
 MacOS in preparation for booting the Penguin linux loader, you must
 hold the shift key down to prevent extensions from loading. If you
 don't use MacOS except for loading linux, you can accomplish the same
@@ -161,9 +180,9 @@ random problems with the running linux kernel.
   <sect2 arch="m68k"><title>Penguin Boot Parameters</title>
 <para>
 
-In the Penguin boot program, choose File -&gt; Settings..., then switch
-to the Options tab.  Boot parameters may be typed in to the text entry
-area.  If you will always want to use these settings,
+In the Penguin boot program, choose File -&gt; Settings..., then
+switch to the Options tab.  Boot parameters may be typed in to the
+text entry area.  If you will always want to use these settings,
 select File -&gt; Save Settings as Default.
 
 </para>

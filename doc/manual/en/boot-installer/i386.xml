@@ -1,9 +1,9 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: i386.xml,v 1.2 2003/10/24 01:03:02 toff Exp $ -->
+<!-- $Id: i386.xml,v 1.3 2003/10/27 00:07:42 toff Exp $ -->
 
   <sect2 arch="i386"><title>Booting from a CD-ROM</title>
 
-&intro-cd.xml;
+&boot-installer-intro-cd.xml;
 
 <para>
 
@@ -86,7 +86,7 @@ to <xref linkend="init-config"/>.
 
 Also, if you're going to be installing from a FAT (DOS) partition, you
 have the option of booting the installer from the hard disk. See 
-<xref id="install-from-dos"/> for more information on 
+<xref linkend="install-from-dos"/> for more information on 
 installing via this method.
 
 </para><para>
@@ -102,6 +102,9 @@ are supported by the ohci1394 and sbp2 drivers may also be useable with the
 
   <sect2 arch="i386" id="install-from-dos">
   <title>Booting from a DOS partition</title>
+
+&boot-installer-intro-hd.xml;
+
 <para>
 
 Boot into DOS (not Windows) without any drivers being loaded.  To do
@@ -129,8 +132,8 @@ format' error.
   </sect2>
 
 
-  <sect2 id="boot-initrd">Booting from linux using <command>LILO</command>
-
+  <sect2 arch="i386" id="boot-initrd">
+  <title>Booting from linux using <command>LILO</command></title>
 <para>
 
 One <emphasis>initrd=</emphasis> line in <filename>/etc/lilo.conf</filename> is enough to
@@ -201,26 +204,30 @@ your kernel miss the <filename>initrd</filename> feature.
 </para></listitem>
 </itemizedlist>
 
-</para><para>
+</para><para condition="FIXME">
 
-You should now see the debian installer <qref id="dbootstrap-intro">
-<command>dbootstrap</command></qref> running. If you do not use any
+You should now see the debian installer running. If you do not use any
 removable medium, you want to check very early that your network
-connection is working and <emphasis>before</emphasis> irreversibly partitioning
-your hard disk. So you maybe need to <userinput>insmod</userinput> some additional
-kernel modules for this, for instance for your network interface. It's
-time <emphasis>not</emphasis> to follow the order of steps suggested by
+connection is working and <emphasis>before</emphasis> irreversibly
+partitioning your hard disk. So you maybe need to
+<userinput>insmod</userinput> some additional kernel modules for this,
+for instance for your network interface. It's time
+<emphasis>not</emphasis> to follow the order of steps suggested by
 <command>dbootstrap</command>. Leap directly to <userinput>Mount a
-Previously-Initialized Partition</userinput>, and mount the partition where
-you stored the modules that <qref id="files-lilo">you extracted from
-<filename>drivers.tgz</filename></qref>.
+Previously-Initialized Partition</userinput>, and mount the partition
+where you stored the modules that you extracted from
+<filename>drivers.tgz</filename> (<xref linkend="files-lilo"></xref>).
+
+</para>
 
 <!-- Ideally, configure Device Driver Modules should support the
 following (insmod-ing from the hard-disk) and not only from a floppy.
 That would avoid the need to open a shell -->
 
-Then switch to an other virtual terminal and use a shell (see <xref
-id="dbootstrap-shell-log"/>) to find drivers
+<para>
+
+Then switch to an other virtual terminal and use a shell (see 
+<xref linkend="dbootstrap-shell-log"/>) to find drivers
 in the just mounted <filename>/target</filename>
 directory. <userinput>insmod</userinput> the ones you need.
 
@@ -245,19 +252,19 @@ your hard drive will be un-bootable for a short period of time.
   </sect2>
 
 
-  <sect2 id="boot-from-floppies"><title>Booting from Floppies</title>
+  <sect2 arch="i386"><title>Booting from Floppies</title>
 <para>
 
 You will have already downloaded the floppy images you needed and
-created floppies from the images in <xref linkend="create-floppy"/>.  If you
-need to, you can also modify the rescue floppy; see <xref
-id="rescue-replace-kernel"/>.
+created floppies from the images in <xref linkend="create-floppy"/>.
+If you need to, you can also modify the rescue floppy; see 
+<xref linkend="rescue-replace-kernel"/>.
 
 </para><para>
 
-Booting from the rescue floppy is easy: place the rescue floppy in
-the primary floppy drive, and shut down the system as you normally
-would, then turn it back on. 
+To boot from the installer boot floppy, place it in the primary floppy
+drive, shut down the system as you normally would, then turn it back
+on.
 
 </para><para>
 
@@ -360,7 +367,7 @@ contents are loaded into memory. The installer program
 If you are booting from the rescue floppy or from CD-ROM you will be
 presented with the boot prompt, <prompt>boot:</prompt>.  Details
 about how to use boot parameters with the rescue floppy can be found
-in <xref id="boot-from-floppies"/>.  If you are booting from an
+in <xref linkend="boot-from-floppies"/>.  If you are booting from an
 existing operating system, you'll have to use other means to set boot
 parameters.  For instance, if you are installing from DOS, you can
 edit the <filename>install.bat</filename> file with any text editor.
@@ -380,5 +387,81 @@ recognized properly.  If not, determine your drive geometry
 (cylinders, heads, and sectors), and use the parameter
 <userinput>hd=<replaceable>cylinders</replaceable>,<replaceable>heads</replaceable>,<replaceable>sectors</replaceable></userinput>.
 
+</para><para>
+
+If you have a very old machine, and the kernel hangs after saying
+<computeroutput>Checking 'hlt' instruction...</computeroutput>, then
+you should try the <userinput>no-hlt</userinput> boot argument, which
+disables this test.
+
+</para><para>
+
+If your screen begins to show a weird picture while the kernel boots,
+eg. pure white, pure black or colored pixel garbage, your system may
+contain a problematic video card which does not switch to the
+framebuffer mode properly.  Then you can use the boot parameter
+<userinput>video=vga16:off</userinput> to disable the framebuffer
+console. The language chooser will not appear; only the english
+language will be available during the installation due to limited
+console features. See <xref linkend="boot-parms"/> for details.
+
 </para>
   </sect2>
+
+
+  <sect2 arch="i386">
+  <title>System freeze during the PCMCIA configuration phase</title>
+
+<para>
+
+Some laptop models produced by DELL are known to crash when PCMCIA device
+detection tries to access some hardware addresses. If you experience a such problem, try the following workaround:
+<itemizedlist>
+<listitem><para>
+
+prepare the root filesystem and install kernel and modules, but do not
+start PCMCIA configuration immediately
+
+</para></listitem>
+<listitem><para>
+
+enter the system shell (see <xref linkend="dbootstrap-shell-log"/> for
+details)
+
+</para></listitem>
+<listitem><para>
+
+execute this command: 
+<userinput>echo exclude port 0x810-0x81f >>
+/target/etc/pcmcia/config.opts</userinput>
+
+</para></listitem>
+<listitem><para>
+
+now return to the main menu and run the PCMCIA configuration part
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+  </sect2>
+
+  <sect2 arch="i386">
+  <title>System freeze while loading the USB modules</title>
+<para>
+
+The bf2.4 flavor normaly tries to install the USB and USB keyboard driver in
+order to allow the installation for users of some non-standard USB keyboards.
+However, there are few broken USB systems where the driver hangs on loading. A
+possible workaround may be disabling of the USB controller in your mainboard
+BIOS setup. Another way is passing the <userinput>nousb</userinput>
+argument on the boot prompt, which will prevent the modules from
+beeing loaded even if USB hardware has been detected.
+
+</para>
+  </sect2>
+
+
+
+
+

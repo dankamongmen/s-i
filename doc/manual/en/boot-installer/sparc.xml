@@ -1,7 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: sparc.xml,v 1.2 2003/10/24 01:03:02 toff Exp $ -->
+<!-- $Id: sparc.xml,v 1.3 2003/10/27 00:07:42 toff Exp $ -->
 
-  <sect2 arch="sparc" id="install-nfs"><title>Booting from NFS</title>
+  <sect2 arch="sparc"><title>Booting from NFS</title>
 <para>
 
 To install the system via NFS, simply select
@@ -13,12 +13,15 @@ and follow the instructions provided.  You will be prompted for the
   </sect2>
 
 
-  <sect2 arch="sparc" id="install-tftp"><title>Booting with TFTP</title>
+  <sect2 arch="sparc"><title>Booting with TFTP</title>
+
+&boot-installer-intro-net.xml;
+
 <para>
 
 On machines with OpenBoot, simply enter the boot monitor on the
 machine which is being installed (see 
-<xref id="invoking-openboot"/>).
+<xref linkend="invoking-openboot"/>).
 Use the command <userinput>boot net</userinput> to boot from a TFTP
 and RARP server, or <userinput>boot net:dhcp</userinput> to boot from
 a TFTP and DHCP server. Some older OpenBoot revisions require using
@@ -29,9 +32,9 @@ probably don't support DHCP.
   </sect2>
 
 
-  <sect2 arch="sparc" id="install-cd"><title>Booting from a CD-ROM</title>
+  <sect2 arch="sparc"><title>Booting from a CD-ROM</title>
 
-&intro-cd.xml;
+&boot-installer-intro-cd.xml;
 
 <para>
 
@@ -46,26 +49,9 @@ this special command. Note that some problems have been reported on Sun4m
   </sect2>
 
 
-  <sect2 arch="sparc" id="boot-from-floppies">
+  <sect2 arch="sparc">
   <title>Booting from Floppies</title>
 <para>
-
-Be warned that the newer Sun4u (ultra) architecture does not support
-floppy booting. A typical error message is <computeroutput>Bad magic
-number in disk label - Can't open disk label package</computeroutput>.
-Furthermore, a number of
-Sun4c models (such as the IPX) do not support the compressed images
-found on the disks, so also are not supported.
-
-</para><para>
-
-Several Sparcs (e.g. Ultra 10) have an OBP bug that prevents them from
-booting (instead of not supporting booting at all). The appropriate
-OBP update can be downloaded as product ID 106121 from
-
-<ulink url="http://sunsolve.sun.com"></ulink>.
-
-</para><para>
 
 To boot from floppy on a Sparc, use 
 <informalexample><screen>
@@ -73,5 +59,44 @@ To boot from floppy on a Sparc, use
 Stop-A -> OpenBoot: "boot floppy"
 
 </screen></informalexample>
+</para><para>
+
+Be warned that the newer Sun4u (ultra) architecture does not support
+floppy booting. A typical error message is <computeroutput>Bad magic
+number in disk label - Can't open disk label package</computeroutput>.
+Furthermore, a number of Sun4c models (such as the IPX) do not support
+the compressed images found on the disks, so also are not supported.
+
+</para><para>
+
+Several Sparcs (e.g. Ultra 10) have an OBP bug that prevents them from
+booting (instead of not supporting booting at all). The appropriate
+OBP update can be downloaded as product ID 106121 from
+<ulink url="http://sunsolve.sun.com"></ulink>.
+
+</para><para>
+
+If you are booting from the floppy, and you seem messages such as 
+<informalexample><screen>
+
+Fatal error: Cannot read partition
+Illegal or malformed device name
+
+</screen></informalexample>
+then it is possible that floppy booting is simply not supported on
+your machine.
+
+</para>
+  </sect2>
+
+  <sect2 arch="sparc"><title>IDPROM Messages</title>
+<para>
+
+If you cannot boot because you get messages about a problem with
+``IDPROM'', then it's possible that your NVRAM battery, which holds
+configuration information for you firmware, has run out.  See the
+<ulink url="&url-sun-nvram-faq;">Sun NVRAM FAQ</ulink> for more
+information.
+
 </para>
   </sect2>
