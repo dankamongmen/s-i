@@ -1,0 +1,57 @@
+#! /usr/bin/python
+# This parses discover data files and produces a subset for
+# debian-installer.
+
+import commands
+import string
+import re
+import getopt
+import sys
+
+device_list = ""
+vendor = ""
+bus = None
+idfile = None
+
+def usage():
+    print "Usage:", sys.argv[0], "-p|-u"
+    sys.exit(2)
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "pu")
+except getopt.GetoptError:
+    usage()
+
+for opt, arg in opts:
+    if opt == "-p":
+        if bus != None:
+            usage()
+        idfile = "/usr/share/discover/pci.lst"
+    if opt == "-u":
+        if bus != None:
+            usage()
+        idfile = "/usr/share/discover/usb.lst"
+
+if idfile == None:
+    usage()
+
+file = open(idfile, 'r')
+
+vendor_regex = re.compile("^[^\t]")
+ethernet = re.compile("^\t[0-9a-f]{8}[\s]+ethernet.*")
+
+
+while 1:
+    line = file.readline()
+    if line == '':
+        break;
+    if vendor_regex.match(line):
+        if not vendor == "" and device_list != "":
+            print string.join([vendor, device_list], ''), ;
+            device_list = ""
+        vendor = line
+    elif ethernet.match(line):
+        device_list = string.join([device_list, line], '')
+
+file.close()
+

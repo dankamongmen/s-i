@@ -1,8 +1,24 @@
 /*
- * file : ddetect 
- * purpose : detect ethernet cards for the Debian/GNU Linux installer
- * author : David Whedon <dwhedon@gordian.com>
- */
+  file : ethdetect 
+  purpose : detect ethernet cards for the Debian/GNU Linux installer
+
+  Copyright 2000-2002 David Kimdon <dwhedon@debian.org>
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+*/
 
 
 #include <stdio.h>
@@ -12,11 +28,7 @@
 #include <cdebconf/debconfclient.h>
 #include <string.h>
 #include <debian-installer.h>
-#include "ddetect.h"
-#include "ethdetect.h"
 
-#define ERROR 1
-#define SUCCESS 0
 
 static struct debconfclient *client;
 
@@ -51,7 +63,6 @@ ethdetect_insmod (char *modulename)
 }
 
 
-
 char *
 ethdetect_prompt (void)
 {
@@ -71,29 +82,16 @@ ethdetect_prompt (void)
 }
 
 
-
 static struct ethernet_info *
-ethdetect_detect (int passive_detection)
+ethdetect_detect (struct cards_lst *lst)
 {
 
   struct bus_lst bus = { 0 };
   struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
-  int i = 0;
-
-  while (lst[i].vendor)
-    {
-      lst[i].next = &lst[++i];
-    }
-  lst[i - 1].next = NULL;
-
 
   sync ();
   bus.pci = pci_detect (lst);
-  if (!passive_detection)
-    bus.isa = isa_detect (lst);
-
   bus.pcmcia = pcmcia_detect (lst);
-
 
   if (((ethernet = ethernet_detect (&bus)) == NULL))
     {
@@ -107,21 +105,26 @@ ethdetect_detect (int passive_detection)
 
 
 #ifndef TEST
+
+#define ETHDETECT_PCI_LIST "/usr/share/ddetect/ethpci.lst"
+
 int
 main (int argc, char *argv[])
 {
   char *ptr = NULL;
-  int passive_detection = 1, rv = 1;
+  int rv = 1;
   struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
   char *module;
+  struct cards_lst *lst = NULL;
 
+  lst = init_lst(ETHDETECT_PCI_LIST, NULL, NULL);
 
   client = debconfclient_new ();
   client->command (client, "title", "Network Hardware Configuration", NULL);
 
   ptr = debconf_input ("high", "ethdetect/detection_type");
 
-  if (strstr (ptr, "none"))
+  if (strstr (ptr, "no"))
     {
       if ((module = ethdetect_prompt ()) == NULL)
 	return 1;
@@ -130,12 +133,7 @@ main (int argc, char *argv[])
     }
   else
     {
-      if (strstr (ptr, "full"))
-	passive_detection = 0;
-      else
-	passive_detection = 1;
-
-      ethernet = ethdetect_detect (passive_detection);
+      ethernet = ethdetect_detect (lst);
       for (; ethernet; ethernet = ethernet->next)
 	{
 	  client->command (client, "subst", "ethdetect/load_module", "bus",
@@ -156,12 +154,17 @@ main (int argc, char *argv[])
 
 #else
 
+#define ETHDETECT_PCI_LIST "ethpci.lst"
+
 int
 main (int argc, char *argv[])
 {
   struct ethernet_info *ethernet = (struct ethernet_info *) NULL;
+  struct cards_lst *lst = NULL;
   
-  ethernet = ethdetect_detect(0);
+  lst = init_lst(ETHDETECT_PCI_LIST, NULL, NULL);
+  
+  ethernet = ethdetect_detect(lst);
   for (; ethernet; ethernet = ethernet->next) {
     fprintf(stderr, "%s\n", ethernet->module);
   };
