@@ -567,6 +567,27 @@ char *keyboard_parse (char *reply)
 }
 
 /**
+ * @brief set debian-installer/uml-console as to whether we are using a user mode linux console
+ * This is then passed via prebaseconfig to base-config
+ * @return 1 if present, 0 if absent, 2 if unknown.
+ */
+sercon_state
+check_if_uml_console (void)
+{
+	sercon_state present = SERIAL_UNKNOWN;
+	struct debconfclient *client = mydebconf_get ();
+
+	if (grep("/proc/cpuinfo", "User Mode Linux") == 0)
+		present = SERIAL_PRESENT;
+	else
+		present = SERIAL_ABSENT;
+
+	debconf_set (client, "debian-installer/uml-console", present ? "true" : "false");
+	di_info ("Setting debian-installer/uml-console to %s", present ? "true" : "false");
+	return present;
+}
+
+/**
  * @brief set debian-installer/serial console as to whether we are using a serial console
  * This is then passed via prebaseconfig to base-config
  * @return 1 if present, 0 if absent, 2 if unknown.
@@ -608,6 +629,7 @@ keyboard_select (void)
 	char buf[LINESIZE], *s = NULL, *none = NULL;
 	int choices = 0, first_entry = 1;
 	sercon_state sercon;
+	sercon_state umlcon;
 	struct debconfclient *client = mydebconf_get ();
 
 	/* k is returned by a method if it is preferred keyboard.
@@ -637,8 +659,9 @@ keyboard_select (void)
 		}
 	}
 	sercon = check_if_serial_console();
+	umlcon = check_if_uml_console();
 	none = translated_template_get ("kbd-chooser/no-keyboard");
-	if (sercon == SERIAL_PRESENT) {
+	if (sercon == SERIAL_PRESENT || umlcon == SERIAL_PRESENT) {
 		choices++;
 		s = insert_description (s, none, &first_entry);
 		mydebconf_default_set ("console-tools/archs", none);
