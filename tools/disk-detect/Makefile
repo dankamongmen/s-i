@@ -14,3 +14,4 @@ install:
 	#rm $(DESTDIR)/usr/share/discover/isa.lst
 	#touch $(DESTDIR)/usr/share/discover/isa.lst
 	
+clean:
