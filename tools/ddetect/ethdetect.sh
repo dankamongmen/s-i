@@ -26,6 +26,7 @@ module_insmod() {
 	db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 	db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
 	db_go
+	false
     fi
 }
 
