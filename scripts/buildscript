@@ -2,6 +2,9 @@
 #
 # Build debian-installer packages.
 
+set -e
+#set -x
+
 # First, some shell functions.
 
 # build debs and udebs
@@ -25,8 +28,20 @@ install_deb ()
 	shift
 	pushd $_dir >/dev/null
 	while [ ${#} -ne 0 ]; do
-		[ -f ${1}_*_${ARCH}.deb ] && $REALROOTCMD dpkg -i ${1}_*_${ARCH}.deb
-		[ -f ${1}_*_all.deb ] && $REALROOTCMD dpkg -i ${1}_*_all.deb
+		local _files=$(find . -maxdepth 1 -regex "\./${1}_.*_\(${ARCH}\|all\)\.deb")
+		local _file=""
+		local _ver=0
+
+		for i in ${_files}; do
+			local v=$(dpkg-deb -f $i Version)
+
+			[ $(dpkg --compare-versions $v le ${_ver}) ] || {
+				_ver=$v
+				_file=$i
+			}
+		done
+
+		[ -z "${_file}" ] || $REALROOTCMD dpkg -i ${_file}
 		shift
 	done
 	popd >/dev/null
@@ -39,13 +54,23 @@ supply_udeb ()
 	local _dir=$1
 	local _pkg=$(grep -sh "^Package: " ${_dir}/debian/control |sed -e 's/^Package: //' |xargs echo -n)
 	for i in ${_pkg}; do
-		[ -f ${_dir}/../${i}_*_${ARCH}.udeb ] && {
+		local _files=$(find ${_dir}/.. -maxdepth 1 -regex "${_dir}/\.\./${1}_.*_\(${ARCH}\|all\)\.udeb")
+		local _file=""
+		local _ver=0
+
+		for i in ${_files}; do
+			local v=$(dpkg-deb -f $i Version)
+
+			[ $(dpkg --compare-versions $v le ${_ver}) ] || {
+				_ver=$v
+				_file=$i
+			}
+		done
+
+		[ -z "${_file}" ] || {
 			rm -f installer/build/localudebs/${i}_*_${ARCH}.udeb
-			cp -f ${_dir}/../${i}_*_${ARCH}.udeb installer/build/localudebs/
-		}
-		[ -f ${_dir}/../${i}_*_all.udeb ] && {
 			rm -f installer/build/localudebs/${i}_*_all.udeb
-			cp -f ${_dir}/../${i}_*_all.udeb installer/build/localudebs/
+			cp -f ${_file} installer/build/localudebs/
 		}
 	done
 	return 0
@@ -85,9 +110,6 @@ usage ()
 }
 
 # Here we go.
-#set -x
-set -e
-
 MAKETARGET=all_images
 
 while [ ${#} -ge 1 ]; do
