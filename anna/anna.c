@@ -84,9 +84,7 @@ choose_modules(void)
     for (node = pkglist->head; node != NULL; node = next) {
         next = node->next;
         p = (struct package_t *)node->data;
-        if (p->filename == NULL || p->package == NULL || is_installed(p, status_p)) {
-            /* Packages without filenames or names (!) or packages already
-             * installed will be brutally skipped. */
+        if (p->package == NULL || is_installed(p, status_p) || skip_package(p)) {
             if (prev)
                 prev->next = next;
             else
@@ -96,20 +94,6 @@ choose_modules(void)
             continue;
         }
         pkg_kernel = udeb_kernel_version(p);
-        // Ignore
-        // - kernel image packages
-        // - kernel module packages with inappropriate versions
-        if (strstr(p->package, "kernel-image-") == p->package ||
-                (running_kernel && pkg_kernel && strcmp(running_kernel, pkg_kernel) != 0)) {
-            /* Bad kernel version, skip */
-            if (prev)
-                prev->next = next;
-            else
-                pkglist->head = next;
-            /* FIXME: When is it safe to free p? */
-            free(node);
-            continue;
-        }
         if (p->priority >= standard || (running_kernel && pkg_kernel &&
                     strcmp(running_kernel, pkg_kernel) == 0)) {
             /* These packages will automatically be installed */

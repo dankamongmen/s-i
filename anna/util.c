@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/utsname.h>
 #include <cdebconf/debconfclient.h>
 #include <debian-installer.h>
 #include "anna.h"
@@ -334,6 +335,7 @@ udeb_kernel_version(struct package_t *p)
     char *name = strdup(p->package);
     char *t1, *t2;
 
+    fprintf(stderr, "Package %s\n", p->package);
     if ((t1 = strstr(name, "-modules-")) == NULL)
         return NULL;
     t1 += strlen("-modules-");
@@ -344,6 +346,30 @@ udeb_kernel_version(struct package_t *p)
     *t2 = '\0';
     t2 = strdup(t1);
     free(name);
+    fprintf(stderr, "  kernel-version: %s\n", t2);
     return t2;
 }
 
+/*
+ * Should this udeb be skipped?
+ */
+int
+skip_package(struct package_t *p)
+{
+    char *pkg_kernel, *running_kernel = NULL;
+    struct utsname uts;
+
+    if (uname(&uts) == 0)
+        running_kernel = uts.release;
+    /* Packages without filenames or names (!) or packages already
+     * installed will be brutally skipped. */
+    if (p->filename == NULL)
+        return 1;
+    if (strstr(p->package, "kernel-image-") == p->package)
+        return 1;
+    if (running_kernel != NULL && (pkg_kernel = udeb_kernel_version(p)) != NULL) {
+        if (strcmp(running_kernel, pkg_kernel) != 0)
+            return 1;
+    }
+    return 0;
+}
