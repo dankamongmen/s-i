@@ -9,18 +9,21 @@ log() {
 }
 
 # Use this instead of /target/bin/run-parts because one of the
-# parts will unmount /target/
+# parts will unmount /target/. Also, progress bar.
 run_parts() {
     partsdir="$1"
     scriptcount=`ls "$partsdir"/* | wc -l`
 
-    db_progress START 0 $scriptcount prebaseconfig/runparts-progress/title
+    db_progress START 0 $scriptcount prebaseconfig/progress/title
 
     tmpfile=/tmp/prebaseconfig.stderr.log
     for script in "$partsdir"/*; do
 
-	db_subst prebaseconfig/runparts-progress/step SCRIPT "$script"
-	db_progress INFO prebaseconfig/runparts-progress/step
+	base=$(basename $script | sed 's/[0-9]*//')
+	if ! db_progress INFO prebaseconfig/progress/$base; then
+		db_subst prebaseconfig/progress/fallback SCRIPT "$base"
+		db_progress INFO prebaseconfig/progress/fallback
+	fi
 
         if [ -x "$script" ] ; then
             log "info: Running $script"

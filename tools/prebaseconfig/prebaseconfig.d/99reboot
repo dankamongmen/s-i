@@ -1,28 +1,18 @@
 #! /bin/sh
-#
-# Reboot the system, and ask the user to wait while this happens
-
 set -e
-
 . /usr/share/debconf/confmodule
-
-# In case some file systems are still mounted
-sync; sync; sync
 
 db_capb backup
 db_input critical prebaseconfig/reboot_in_progress || [ $? -eq 30 ]
 if ! db_go ; then
-    # <Go back> selected
-    db_fset prebaseconfig/reboot_in_progress seen false
+    # abort
+    db_progress STOP
     exit 10
 fi
-db_capb
 
-# The progress bar is a hack to make sure the previous dialog screen
-# is removed while the system reboots.
-db_progress START 0 1 prebaseconfig/progress/title
+# Attempt to display the progress bar again before the reboot.
+db_progress STEP 1
+
+sync; sync; sync
 
 /sbin/reboot
-
-db_progress STEP 1
-db_progress STOP
