@@ -61,13 +61,13 @@ void order(struct package_t *p, struct package_t **head, struct package_t **tail
 			order(found, head, tail);
 	}
 	
-	if (*head) {
+	if (*head)
 		(*tail)->next = *tail = p;
-		(*tail)->next = NULL;
-	}
 	else
 		*head = *tail = p;
-
+	
+	(*tail)->next = NULL;
+		
 	p->processed = 1;
 }
 
