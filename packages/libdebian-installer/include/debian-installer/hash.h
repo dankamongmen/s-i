@@ -131,6 +131,14 @@ void *di_hash_table_lookup (di_hash_table *hash_table, const void *key);
  * @param user_data user data to pass to the function.
  */
 void di_hash_table_foreach (di_hash_table *hash_table, di_hfunc *func, void *user_data);
+
+/**
+ * Returns the number of elements contained in the di_hash_table.
+ *
+ * @param hash_table a di_hash_table.
+ *
+ * @return the number of key/value pairs.
+ */
 di_ksize_t di_hash_table_size (di_hash_table *hash_table);
 
 /** @} */

@@ -258,7 +258,7 @@ void di_hash_table_foreach (di_hash_table *hash_table, di_hfunc *func, void *use
 
 di_ksize_t di_hash_table_size (di_hash_table *hash_table)
 {
-  return hash_table->size;
+  return hash_table->nnodes;
 }
 
 static void internal_di_hash_table_resize (di_hash_table *hash_table)
