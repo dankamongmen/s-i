@@ -16,7 +16,7 @@ if [ "`uname -r | grep '^2.2.'`" != "" ] || [ -f /var/state/userdevfs ]; then
 	if [ ! -d $ROOT/dev/vc ]; then
 		echo 'Creating Virtual Console devices ...'
 		mkdir -p $ROOT/dev/vc
-		for i in $(seq 0 5); do
+		for i in 0 1 2 3 4 5; do
 			mknod $ROOT/dev/vc/$i c 4 $i
 		done
 	fi
@@ -24,7 +24,7 @@ if [ "`uname -r | grep '^2.2.'`" != "" ] || [ -f /var/state/userdevfs ]; then
 	if [ ! -d $ROOT/dev/loop ]; then
 		echo 'Creating loopback devices ...'
 		mkdir -p $ROOT/dev/loop
-		for i in $(seq 0 3); do
+		for i in 0 1 2 3; do
 			mknod $ROOT/dev/loop/$i b 7 $i 
 		done
 	fi
