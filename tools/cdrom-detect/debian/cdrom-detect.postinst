@@ -17,6 +17,11 @@ fail () {
 
 # Is a cdrom already mounted?  If so, assume it's the right one..
 mount | grep -q ^/dev/cdroms/ && exit 0
+if [ -e /cdrom/.disk/info ] ; then
+   CDNAME=`cat /cdrom/.disk/info`
+   log "Detected CD '$CDNAME'"
+   exit 0
+fi
 
 # Load kernel modules
 hw-detect || true
