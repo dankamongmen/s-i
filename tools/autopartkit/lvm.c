@@ -50,6 +50,13 @@ lvm_isinstalled(void)
     if (isinstalled != -1)
       return isinstalled;
 
+    if (0 != stat("/etc/uselvm", &statbuf) || ! S_ISREG(statbuf.st_mode))
+    {
+        autopartkit_log(1, "Missing /etc/uselvm, no LVM support enabled.");
+        isinstalled = FALSE;
+        return FALSE;
+    }
+
     /* Is /proc/lvm a directory? */
     if ( 0 != stat("/proc/lvm", &statbuf) || ! S_ISDIR(statbuf.st_mode) )
     {
@@ -62,13 +69,6 @@ lvm_isinstalled(void)
     if (0 != stat(VGSCAN, &statbuf) || ! S_ISREG(statbuf.st_mode))
     {
         autopartkit_error(0, "Missing %s, no LVM support available.", VGSCAN);
-        isinstalled = FALSE;
-        return FALSE;
-    }
-
-    if (0 != stat("/etc/uselvm", &statbuf) || ! S_ISREG(statbuf.st_mode))
-    {
-        autopartkit_error(0, "Missing /etc/uselvm, no LVM support enabled.");
         isinstalled = FALSE;
         return FALSE;
     }
