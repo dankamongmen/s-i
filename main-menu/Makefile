@@ -1,9 +1,7 @@
-# TODO: the ../../tools/cdebconf bits are temporary, until there is a -dev
-# package.
-CFLAGS=-Wall -g -D_GNU_SOURCE -I../tools/cdebconf/src
+CFLAGS=-Wall -g -D_GNU_SOURCE
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=main-menu
-LIBS=-L../tools/cdebconf/src -ldebconf
+LIBS=-ldebconf
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG

@@ -15,7 +15,7 @@
  */
 
 #include "main-menu.h"
-#include <debconfclient.h>
+#include <cdebconf/debconfclient.h>
 #include <stdlib.h>
 #include <search.h>
 #include <stdio.h>
