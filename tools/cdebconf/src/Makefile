@@ -33,7 +33,7 @@ $(SONAME) $(LIB): $(LIBNAME)
 	-ln -sf $^ $@
 
 clean:
-	-rm -f $(LIBOBJS) $(BINOBJS) $(BIN) $(LIB) $(LIBNAME) $(SONAME) *~
+	-rm -f $(BIN) $(LIB) $(LIBNAME) $(SONAME) *~ *.o *.opic
 	(cd modules && make clean)
 
 .PHONY: clean lib

@@ -34,5 +34,6 @@
 #define DELETE(x) do { free(x); x = 0; } while (0)
 #define CHOMP(s) if (s[strlen(s)-1] == '\n') s[strlen(s)-1] = 0 
 #define STRDUP(s) ((s) == NULL ? NULL : strdup(s))
+#define STRLEN(s) ((s) == NULL ? 0 : strlen(s))
 
 #endif

@@ -5,15 +5,82 @@
 #include "database.h"
 #include "strutl.h"
 
+#include <fcntl.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-static void texthandler_displaydesc(struct frontend *obj, struct question *q) {
-	int i;
-	printf("%s", question_description(q));
-	printf("\n");
-	printf("%s\n", question_extended_description(q));
+static const int getwidth(void)
+{
+	static int res = 80;
+	static int inited = 0;
+	int fd;
+	struct winsize ws;
+
+	if (inited == 0)
+	{
+		inited = 1;
+		if ((fd = open("/dev/tty", O_RDONLY)) > 0)
+		{
+			if (ioctl(fd, TIOCGWINSZ, &ws) == 0)
+				res = ws.ws_col;
+			close(fd);
+		}
+	}
+	return res;
+}
+
+static void wrap_print(const char *str)
+{
+	/* Simple greedy line-wrapper */
+	const int width = getwidth() - 1;
+	int len = STRLEN(str);
+	char line[width+1];
+	const char *s, *e, *end, *lb;
+
+	if (str == 0) return;
+
+	s = e = str;
+	end = str + len;
+	
+	while (len > 0)
+	{
+		/* try to fit the most characters */
+		e = s + width;
+		
+		if (e >= end) 
+		{
+			e = end;
+		}
+		else
+		{
+			while (e > s && isalnum(*e)) e--;
+			e++;
+		}
+		/* no word-break point found, so just break the line */
+		if (e == s) e = s + width;
+
+		/* if there's an explicit linebreak, honor it */
+		lb = strchr(s, '\n');
+		if (lb != NULL && lb < e) e = lb + 1;
+
+		strncpy(line, s, e-s);
+		line[e-s] = 0;
+		printf("%s%s", line, (lb == NULL || lb >= e ? "\n" : ""));
+
+		len -= (e-s);
+		s = e;
+		while (*s == ' ') s++;
+	}
+}
+
+static void texthandler_displaydesc(struct frontend *obj, struct question *q) 
+{
+	wrap_print(question_description(q));
+	wrap_print(question_extended_description(q));
 }
 
 static int texthandler_boolean(struct frontend *obj, struct question *q)
@@ -22,11 +89,11 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 	int ans = -1;
 	int def = -1;
 	texthandler_displaydesc(obj, q);
-	if (q->defaultval)
+	if (q->template->defaultval)
 	{
-		if (strcmp(q->defaultval, "true") == 0)
+		if (strcmp(q->template->defaultval, "true") == 0)
 			def = 1;
-		else if (strcmp(q->defaultval, "false") == 0)
+		else if (strcmp(q->template->defaultval, "false") == 0)
 			def = 0;
 	}
 
@@ -39,7 +106,7 @@ static int texthandler_boolean(struct frontend *obj, struct question *q)
 			ans = 1;
 		else if (strcmp(buf, "no\n") == 0)
 			ans = 0;
-		else if (q->defaultval && strcmp(buf, "\n") == 0)
+		else if (q->template->defaultval && strcmp(buf, "\n") == 0)
 			ans = def;
 	} while (ans < 0);
 
