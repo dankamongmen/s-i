@@ -144,69 +144,92 @@ void question_owner_delete(struct question *q, const char *owner)
 	}
 }
 
-static int question_expand_vars(struct question *q, const char *field, 
-	char *buf, size_t maxlen)
+static char *question_expand_vars(struct question *q, const char *field)
 {
-	int i = 0;
-	const char *p = field, *varend;
-	char var[100];
-	struct questionvariable *qvi;
+    int i = 0;
+    const char *p = field, *varend;
+    char var[100];
+    struct questionvariable *qvi;
+    size_t size;
+    char *buf;
 
-	memset(buf, 0, maxlen);
-	if (p == 0) return 0;
+    if (p == 0) return 0;
+    if (*p == 0) return strdup("");
+    size = strlen(field);
 
-	while (*p != 0 && i < maxlen - 1)
-	{
-		/* is this a variable string? */
-		if (*p != '$' || *(p+1) != '{') 
-		{
-			buf[i++] = *p++;
-			continue;
-		}
+    while (*p != 0)
+    {
+        if (*p != '$' || *(p+1) != '{')
+        {
+            p++;
+            continue;
+        }
+        varend = p+2;
+        while (*varend != 0 && *varend != '}')
+            varend++;
+        if (*varend == 0)
+        {
+            p++;
+            continue;
+        }
+        strncpy(var, p+2, varend-(p+2));
+        var[varend-(p+2)] = 0;
+        for (qvi = q->variables; qvi != 0; qvi = qvi->next)
+            if (strcmp(qvi->variable, var) == 0)
+                break;
+        if (qvi != 0)
+            size += strlen(qvi->value) - (strlen(var)+3);
+        p = varend + 1;
+    }
 
-		/* look for the end of the variable */
-		varend = p + 2;
-		while (*varend != 0 && *varend != '}') varend++;
-		/* didn't find it? then don't consider this a variable */
-		if (*varend == 0)
-		{
-			buf[i++] = *p++;
-			continue;
-		}
+    buf = calloc(1, size+1);
 
-		strncpy(var, p+2, varend-(p+2));
-		var[varend-(p+2)] = 0;
+    p = field;
+    while (*p != 0 && i < size)
+    {
+        /* is this a variable string? */
+        if (*p != '$' || *(p+1) != '{') 
+        {
+            buf[i++] = *p++;
+            continue;
+        }
 
-		for (qvi = q->variables; qvi != 0; qvi = qvi->next)
-			if (strcmp(qvi->variable, var) == 0)
-				break;
+        /* look for the end of the variable */
+        varend = p + 2;
+        while (*varend != 0 && *varend != '}') varend++;
+        /* didn't find it? then don't consider this a variable */
+        if (*varend == 0)
+        {
+            buf[i++] = *p++;
+            continue;
+        }
 
-		if (qvi != 0)
-		{
-			strvacat(buf, maxlen, qvi->value, NULL);
-			i = strlen(buf);
-		}
+        strncpy(var, p+2, varend-(p+2));
+        var[varend-(p+2)] = 0;
 
-		p = varend + 1;
-	}
-	return DC_OK;
+        for (qvi = q->variables; qvi != 0; qvi = qvi->next)
+            if (strcmp(qvi->variable, var) == 0)
+                break;
+
+        if (qvi != 0)
+        {
+            strvacat(buf, size+1, qvi->value, NULL);
+            i = strlen(buf);
+        }
+
+        p = varend + 1;
+    }
+    return buf;
 }
 
 const char *question_get_field(struct question *q, const char *lang,
 	const char *field)
 {
-	static char buf[4096] = {0};
-	assert(q);
-	/* assert(lang); - lang is NULL when cdebconf starts */
-	assert(field);
-	if (strcmp(field, "value") == 0)
-		question_expand_vars(q,
-			question_getvalue(q, lang),
-			buf, sizeof(buf));
-        else
-		question_expand_vars(q,
-			q->template->lget(q->template, lang, field),
-			buf, sizeof(buf));
-	return buf;
+    assert(q);
+    assert(field);
+    if (strcmp(field, "value") == 0)
+        return question_expand_vars(q, question_getvalue(q, lang));
+    else
+        return question_expand_vars(q, q->template->lget(q->template, lang, field));
 }
 
