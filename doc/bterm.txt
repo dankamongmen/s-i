@@ -1,25 +1,10 @@
 Using bogl-bterm with debian-installer
 ======================================
 
-The status as of 2003-03-16 is the following:
+The status as of 2003-12-19 is the following:
 
-* bogl-bterm doesn't support devfs. I have a simple, stupid patch[0] that
-  doesn't work with non-devfs. (Bug #182176).
+bogl-bterm is used in d-i
 
-* We need udebs of bogl-bterm (bug #185046) and fbset (bug #185045).
-  In the meantime, I just use the full-size debs and trim out stuff
-  manually (eew).
-
-* build/Makefile must generate a reduced font. I have a patch[1] for that
-  too. You also need graphic.utf[2] from b-f. You need bf-utf-source
-  (for the full font) and libbogl-dev (for reduce-font and bdftobogl)
-
-* rootskel has to modprobe for the framebuffer modules, run fbset and
-  start things through bogl-bterm. I of course have a patch[3] for that too.
-  :-)
-
-All files are on http://people.debian.org/~sjogren/d-i/bterm/
-[0] bogl-patch.diff
-[1] Makefile-patch.diff
-[2] graphic.utf
-[3] rootskel-patch.diff
+  * There are some problems with the reduced font not including
+    symbols that are in udebs loaded later. This mostly effects CJK
+    environments. (#224227)
