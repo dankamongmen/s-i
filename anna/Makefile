@@ -2,7 +2,7 @@ ARCH=$(shell dpkg --print-architecture)
 CFLAGS=-Wall -g -D_GNU_SOURCE -DARCH=\"$(ARCH)\"
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=anna
-LIBS=-ldebconf -ldebian-installer
+LIBS=-ldebconfclient -ldebian-installer
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -g3 -DDODEBUG

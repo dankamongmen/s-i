@@ -132,7 +132,7 @@ do
     db_subst hw-detect/progress_step CARDNAME "$cardname"
     db_subst hw-detect/progress_step MODULE "$module"
 
-    db_progress STEP 1 hw-detect/progress_step
+    db_progress INFO hw-detect/progress_step
 
     if [ "$module" != "ignore" -a "$module" != "[Unknown]" ] &&
 	is_not_loaded $module
@@ -197,6 +197,9 @@ do
             log "Could not locate driver '$module' for $vendor $model."
         fi
     fi
+
+    db_progress STEP 1
+
     IFS="
 "
 done

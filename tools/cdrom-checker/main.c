@@ -145,14 +145,15 @@ int check_cdrom() {
 		status = 0;
 		sscanf(line, "%*s %s", filename);
 		debconf->command(debconf, "SUBST", "cdrom-checker/progress_step",
-			"FILE", filename, NULL);
-		debconf->commandf(debconf,
-			"PROGRESS STEP 1 cdrom-checker/progress_step");
+				"FILE", filename, NULL);
+		debconf->command(debconf, "PROGRESS", "INFO",
+				"cdrom-checker/progress_step", NULL);
 		asprintf(&cmd, "echo '%s' | md5sum -c 1>/dev/null 2>&1", line);
 		if(system(cmd) != 0) {
 			status = 1;
 			break;
 		}
+		debconf->command(debconf, "PROGRESS", "STEP", "1", NULL);
 	}
 
 	fclose(md5file);

@@ -231,7 +231,7 @@ install_modules(void)
 
             debconf->command(debconf, "SUBST", "anna/progress_step_retr", "PACKAGE", p->package, NULL);
             debconf->command(debconf, "SUBST", "anna/progress_step_inst", "PACKAGE", p->package, NULL);
-            debconf->commandf(debconf, "PROGRESS STEP 1 anna/progress_step_retr");
+            debconf->command(debconf, "PROGRESS", "INFO", "anna/progress_step_retr", NULL);
             if (!get_package(p, dest_file)) {
                 debconf->command(debconf, "PROGRESS STOP", NULL);
                 debconf->command(debconf, "SUBST", "anna/retrieve_failed", "PACKAGE", p->package, NULL);
@@ -251,7 +251,8 @@ install_modules(void)
                 ret = 7;
                 break;
             }
-            debconf->commandf(debconf, "PROGRESS STEP 1 anna/progress_step_inst");
+            debconf->command(debconf, "PROGRESS", "STEP", "1", NULL);
+            debconf->command(debconf, "PROGRESS", "INFO", "anna/progress_step_inst", NULL);
             if (!unpack_package(dest_file)) {
                 debconf->command(debconf, "PROGRESS STOP", NULL);
                 debconf->command(debconf, "SUBST", "anna/install_failed", "PACKAGE", p->package, NULL);
@@ -264,6 +265,7 @@ install_modules(void)
             }
             unlink(dest_file);
             free(dest_file);
+            debconf->command(debconf, "PROGRESS", "STEP", "1", NULL);
         }
     }
 

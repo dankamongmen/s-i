@@ -21,7 +21,7 @@ CC = gcc
 CFLAGS = -Wall -O3
 LD = gcc
 LDLFAGS =
-LDLIBS = -ldebconf -ldebian-installer
+LDLIBS = -ldebconfclient -ldebian-installer
 APP = cdrom-checker
 
 all: ${APP}
