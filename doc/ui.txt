@@ -1,0 +1,83 @@
+Debconf (or rather, a smaller C implementation of the same specification)
+is the main UI framework for the installer. Using debconf, it should be
+possible to plug in new UI's with a minimum of difficulty.
+
+So this document won't go into detail about how the UI will look. Instead,
+it will talk about the structure and flow of the installation experience,
+from a user's standpoint, and then from an implementation standpoint.
+
+The user's view
+---------------
+
+Note that since debconf allows questions to be prioritized, it is possible
+that the install process will skip over any or all of the questions.
+
+The install begins with a bootloader. It is unlikely that this will change
+significantly from how it is now.
+
+After the kernel boots up, the first thing the user will see is whatever UI
+is being used, configuring itself. This is equivalent to the current
+installer asking if the screen supports color, and keyboard configuration.
+It might also include language selection, mouse setup, etc. All up the
+individual UI.
+
+Once the UI is configured, the user will see a list of every step in the
+install process, with a proposed next step, and an alternate next step, at
+the top. This is very similar to how the installer works now. We have
+observed that this layout gives the user a great deal of flexibility, which
+is very useful if something goes wrong and they have to run steps out of
+order for some reason, or repeat a step. However, we also anticipate that 
+people might not want to see this menu, and would rather go through a 
+rigidly linear install process. Therefore, this menu will be a debconf
+question asked at priority "medium", and so it might not actually be
+displayed.
+
+Anyway, each time an item is picked, the user will see one or more debconf
+questions about it. They'll be able to go back and forward between these
+questions -- and can even go all the way back to the menu to abort the
+item. Assuming they go through the questions, though, eventually, the
+question and answer sequence will end, and they will be returned to the menu,
+typically with the next item selected.
+
+At a minimum, the menu will probably contain the following items (and
+probably several others):
+
+  - Configure installation media (from floppy, cd, network, etc)
+  - Partition disk
+  - Format and mount partitions
+  - Install base system
+  - Install lilo (or silo, etc)
+  - Make a rescue floppy
+  - Reboot the system
+
+Once the last item is picked, the system will boot up into a full debian
+install, and the user will be prompted for additional information, much
+as base-config does now.
+
+Implementation
+--------------
+
+Each item in the list is provided by an installer module. To create the
+list item, a module must only drop a control file with a unique name into
+/usr/lib/debian-installer/menu/. The control file is rfc-822 format, and 
+should have the following fields:
+  Priority: a number, which determines where the item appears on the menu
+  Prog: the program to run if this item is selected
+  TestProg: a program to run to determine if this menu item should be the
+            default item
+  Description: the text to appear on the menu
+
+So the menu is constructed by ordering the descriptions according to their
+priorities. Then, each time the menu is displayed, all of the testprogs are
+run in turn. The first to return a 0 exit code becomes the default selected
+menu item.
+
+Note that items may be added to the menu during the install itself. The
+menu might start off as just:
+
+  - Configure installation media
+  - Reboot the system
+
+When the installation media is configured, other modules are automatically
+loaded from it, and more menu items become available.
+
