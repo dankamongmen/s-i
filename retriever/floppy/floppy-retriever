@@ -20,30 +20,10 @@ mountfloppy()
             modprobe vfat >> /var/log/messages 2>&1
         fi
 
-        STATE=1
-        while [ "$STATE" != 0 -a "$STATE" != 3 ]; do
-            case "$STATE" in
-            1)
-                db_fset retriever/floppy/insert seen false || true
-                db_fset retriever/floppy/fstype seen false || true
-                db_input critical retriever/floppy/insert || true
-                db_input low retriever/floppy/fstype || true
-                ;;
-            2)
-                db_get retriever/floppy/fstype
-                if [ "$RET" = "Enter manually" ]; then
-                    db_input critical retriever/floppy/fstype-manual || true
-                fi
-                ;;
-            esac
-            if db_go; then
-                STATE=$(($STATE + 1))
-            else
-                STATE=$(($STATE - 1))
-            fi
-        done
-        if [ "$STATE" = 0 ]; then
-            exit 30 # backed out
+        db_fset retriever/floppy/insert seen false || true
+        db_input critical retriever/floppy/insert || true
+        if ! db_go; then
+            exit 30 # backup
         fi
         db_capb
 
@@ -76,20 +56,12 @@ case "x$cmd" in
 
     xpackages)
         # generate a Packages file based on what udebs are on the floppy
-        if [ "$2" != "." ]; then
-            # sorry, no compressed files
-            exit 1
-        fi
-        if [ -n "$3" -a "$3" != "main" ]; then
-            # only do 'main'
-            exit 1
-        fi
         mountfloppy
         rm -f "$1"
         touch "$1"
         # Check for regular debs, udebs, and to be on the safe side,
         # check for *.ude files (msdos file names...)
-        for filename in $FLOPPYMNT/*.{deb,udeb,ude}; do
+        for filename in $FLOPPYMNT/*.deb $FLOPPYMNT/*.udeb $FLOPPYMNT/*.ude; do
             if [ -f "$filename" ]; then
                 udpkg -f "$filename" >> "$1"
                 path="`echo "$filename" | sed 's,^/floppy/,,'`"
