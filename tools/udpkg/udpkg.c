@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.3 2000/10/08 03:23:44 tausq Exp $ */
+/* $Id: udpkg.c,v 1.4 2000/10/30 01:03:44 tausq Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -53,7 +53,7 @@ static int dpkg_doinstall(struct package_t *pkg)
 
 cleanup:
 	chdir(cwd);
-	if (cwd != 0) free(cwd);
+	free(cwd);
 	return r;
 }
 #endif
@@ -238,7 +238,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	}
 
 	chdir(cwd);
-	if (cwd != 0) free(cwd);
+	free(cwd);
 	return r;
 }
 

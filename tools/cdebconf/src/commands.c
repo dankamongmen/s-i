@@ -170,8 +170,7 @@ int command_set(struct confmodule *mod, int argc, char **argv,
 		for (i = 2; i <= argc; i++)
 			strvacat(buf, sizeof(buf), argv[i], 0);	
 
-		DELETE(q->value);
-		q->value = strdup(buf);
+		question_setvalue(q, buf);
 
 		if (mod->db->question_set(mod->db, q) != 0)
 			snprintf(out, outsize, "%u value set",

@@ -8,6 +8,7 @@
 #define DC_NOTOK	0
 #define DC_OK		1
 #define DC_NOTIMPL	2
+#define DC_AUTHNEEDED	3
 
 #define DC_NO		0
 #define DC_YES		1
