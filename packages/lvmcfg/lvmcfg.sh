@@ -194,7 +194,7 @@ get_vgs() {
 		if [ "$arg" = "free" -a "$(getfree_vg "$i")" = "0" ]; then
 			continue
 		fi
-		if [ "$arg" = "with-lv"]; then
+		if [ "$arg" = "with-lv" ]; then
 			get_vglvs "$i"
 			[ "$LVS" = "" ] && continue
 		fi
