@@ -532,11 +532,13 @@ int strwrap(const char *str, const int width, char *lines[], int maxlines)
 int strlongest(char **strs, int count)
 {
 	int i, max = 0;
+	size_t width;
 
 	for (i = 0; i < count; i++)
 	{
-		if (strlen(strs[i]) > max)
-			max = strlen(strs[i]);
+		width = strwidth(strs[i]);
+		if (width > max)
+			max = width;
 	}
 	return max;
 }
