@@ -263,7 +263,7 @@ if [ -d /sys/bus/pci/devices ] && grep -q 0x060700 \
 	log "Detected Cardbus bridge, loading yenta_socket"
 	modprobe -v yenta_socket | logger -t hw-detect
 	# Ugly hack, but what's the alternative?
-	sleep 3
+	sleep 3 || true
 fi
 
 log "Detecting hardware..."
