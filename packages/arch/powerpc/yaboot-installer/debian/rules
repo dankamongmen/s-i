@@ -2,15 +2,6 @@
 
 #export DH_VERBOSE=1
 
-# Udebs have no postrm file, don't make one
-export DH_OPTIONS=-n
-
-PACKAGE=yaboot-installer
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=$(shell dpkg --print-architecture)
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
-
 CFLAGS='-Wall -Os'
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
@@ -32,7 +23,6 @@ clean:
 	dh_testroot
 	$(MAKE) clean
 	rm -f build-stamp
-	rm -f debian/files~
 	rm -f debian/postinst
 	dh_clean
 
@@ -48,9 +38,8 @@ binary-arch: build install
 	dh_testroot
 	dh_installdebconf
 	dh_installdeb 
-	dh_gencontrol -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 binary-indep: build install
 
