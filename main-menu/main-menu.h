@@ -33,10 +33,6 @@ struct package_t {
 /* status.c */
 struct package_t *status_read(void);
 
-/* debconf.c */
-int debconf_command (const char *, ...);
-char *debconf_ret (void);
-
 /* tree.c */
 struct package_t *tree_find(char *);
 struct package_t *tree_add(const char *);

@@ -15,6 +15,7 @@
  */
 
 #include "main-menu.h"
+#include "debconf.h"
 
 #include <stdlib.h>
 #include <search.h>
@@ -163,7 +164,7 @@ struct package_t *show_main_menu(struct package_t *packages) {
 		if (p->installer_menu_item && strcmp(p->description, s) == 0)
 			return p;
 	}
-	return 0;
+	return NULL;
 }
 
 void do_menu_item(struct package_t *p) {
@@ -184,10 +185,9 @@ void do_menu_item(struct package_t *p) {
 		order_done(head);
 		for (p = head; p; p = p->next) {
 			if (p->status == unpacked) {
-				sprintf(configcommand, DPKG_CONFIGURE_COMMAND " %s",
-						p->package);
+				sprintf(configcommand, DPKG_CONFIGURE_COMMAND " %s", p->package);
 				if (SYSTEM(configcommand) != 0)
-					return; /* give up on failure */				
+					return; /* give up on failure */
 			}
 		}
 	}
