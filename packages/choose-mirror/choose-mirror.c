@@ -308,11 +308,11 @@ static int validate_mirror(void) {
 		directory = strdup(debconf->value);
 	
 		if ( NULL == proxy || (proxy && *proxy == '\0'))
-			asprintf(&command, "wget -q %s://%s%s%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+			asprintf(&command, "wget -q %s://%s%s/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
 		                   protocol, hostname, directory,
 				   "dists/" PREFERRED_DISTRIBUTION);
 		else
-			asprintf(&command, "%s_proxy=%s wget -q %s://%s%s%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+			asprintf(&command, "%s_proxy=%s wget -q %s://%s%s/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
 		                   protocol, proxy, 
 				   protocol, hostname, directory,
 				   "dists/" PREFERRED_DISTRIBUTION);
