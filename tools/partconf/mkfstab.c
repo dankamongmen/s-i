@@ -248,6 +248,8 @@ int main(int argc, char *argv[]) {
 	printf("W: using local mode!\n\n");
 #endif
 
+	system("modprobe floppy 1>/dev/null 2>&1");
+
 	get_filesystems();
 	get_swapspaces();
 	get_fstab_d_dir();
