@@ -8,7 +8,7 @@
  * Description: dpkg-reconfigure utility that allows users to 
  *              reconfigure a package after it's been installed
  *
- * $Id: dpkg-reconfigure.c,v 1.9 2002/07/01 06:58:37 tausq Exp $
+ * $Id: dpkg-reconfigure.c,v 1.10 2002/08/07 16:36:40 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -170,6 +170,7 @@ void loadtemplate(const char *filename, const char *owner)
 		{
 			q = question_new(t->tag);
 			q->template = t;
+                        template_ref(t);
 		}
 		question_owner_add(q, owner);
 		if (g_questions->methods.set(g_questions, q) != DC_OK)
@@ -384,6 +385,7 @@ int main(int argc, char **argv)
         case 'F': opt_force = 1; break;
 		}
 	}
+	g_config = config_new();
 
 	/* parse the configuration info */
 	if (g_config->read(g_config, DEBCONFCONFIG) == 0)
