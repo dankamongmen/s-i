@@ -147,6 +147,12 @@ while [ "$LOADED" = 0 ]; do
 		# TODO remove after pipe_progress is available in the archive
 		(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) > mnt/tmp-initrd
 	fi
+	if [ "$?" ]; then
+		# Writing to the ram disk apparently failed.
+		echo "failed to extract initrd (may be out of space on ram disk)" >&2
+		sleep 5000
+		exit
+	fi
 	if [ ! -e /tmp/zcat_failure ]; then
 		LOADED=1
 	else
@@ -176,10 +182,11 @@ pivot_root . initrd
 mount -t proc proc proc
 mount -t devfs devfs dev
 
-# If this is messing, things can get *really* weird.
+# If this is missing, things can get *really* weird.
 if [ ! -x /usr/sbin/chroot ]; then
 	echo "Bad initrd! Cannot chroot."
 	sleep 5000
+	exit
 fi
 
 # Close all open files on the initrd, and run busybox init.
