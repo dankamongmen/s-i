@@ -32,19 +32,9 @@ binary-arch:
 	install -D -m 644 /lib/modules/$(version)-386/modules.dep \
 		$(kdst)/lib/modules/$(version)-386/modules.dep
 	dh_fixperms
-	# Don't write your stupid guesses to debian/files.
-	dh_gencontrol -- -fdebian/files~
 	for i in $$(dh_listpackages); do \
-		dpkg-distaddfile $${i}_$(fullversion)_i386.udeb \
-			debian-installer $$( \
-				sed -n " \
-					/^Package: $${i}\$$/!d; \
-					:b; s/^Priority: //p; t e; \
-					n; b b; :e; q \
-				" debian/control \
-			); \
-		dh_builddeb --package=$$i \
-			--filename=$${i}_$(fullversion)_i386.udeb; \
+		dh_gencontrol -p $$i -- -n$${i}_$(fullversion)_i386.udeb; \
+		dh_builddeb -p $$i --filename=$${i}_$(fullversion)_i386.udeb; \
 	done
 
 binary: binary-indep binary-arch
