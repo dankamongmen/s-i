@@ -594,6 +594,8 @@ default_disk_label () {
 		    echo msdos;;
 		sb1-swarm-bn)
 		    echo msdos;;
+		cobalt)
+		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
