@@ -8,54 +8,47 @@ else
 fi
 
 # detect which is the root partition: /target
-# ugh, I wanted to use awk, but sed has better chance of being in busybox
 rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
 
-# detect which hard drive has /target/boot mounted on it. this does *not*
-# have to be the same as the drive /target is mounted on.
-defaultbootdev=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
+# Find all partitons with fat filesystems and the boot flag set.  May be
+# enough just to look for one of those.  OTOH, elilo will convert any
+# partition you give it to FAT...  Also translates /dev/discs paths in to
+# real /dev/scsi (or ide) paths.
 
-if [ "$defaultbootdev" = '' ]; then
-	defaultbootdev=$rootfs
+p=$(for i in /dev/discs/*/disc; do
+	dev=$(parted $i print | sed -n "s|^Disk geometry for \([^:]*\)/disc:.*$|\1|p")
+	parted $i print | sed -n "s|^\([0-9]\+\) \+[0-9\.]\+ \+[0-9\.]\+ \+fat[0-9]* \+boot$|$dev/part\1|p"
+     done)
+
+if [ "$p" = '' ]; then
+	db_input critical elilo-installer/no-bootpart
+	db_go
+	exit 1
 fi
 
-defaultbootdev=`/target/bin/echo $defaultbootdev | /target/bin/sed 's/[0-9]+$//'` 
-
-FIXME: this approach to findin the boot device is wrong for ia64, we need
-FIXME: something more like yaboot's disk chooser!    bdale
-
-if [ "$defaultbootdev" = '' ]; then
-	defaultbootdev='/dev/hda'
-fi
+for i in $p; do
+	if [ $BOOTPARTS ]; then
+		BOOTPARTS="$BOOTPARTS, $i"
+	else
+		BOOTPARTS=$i
+	fi
+done
 
 . /usr/share/debconf/confmodule
-db_fget elilo-installer/bootdev seen
-[ "$RET" = true ] || db_set elilo-installer/bootdev "$defaultbootdev"
-db_input high elilo-installer/bootdev || true
-db_go || true
 
-db_get elilo-installer/bootdev
-bootdev=$RET
+db_subst elilo-installer/bootpart BOOTPARTS $BOOTPARTS
 
-if [ "$bootdev" = '' ]; then
-	bootdev=$defaultbootdev
-fi
+db_fset elilo-installer/bootpart seen false
+db_input critical elilo-installer/bootpart
+db_go
 
-bootdev=`mapdevfs $bootdev`
+db_get elilo-installer/bootpart
+bootpart=$RET
+
+bootpart=`mapdevfs $bootpart`
 rootfs=`mapdevfs $rootfs`
 
-#write out elilo.conf
+# Write out elilo.conf
 
-	# this can be done with elilo --autoconf, right?
+chroot /target /usr/sbin/elilo --autoconf --boot $bootpart --root $rootfs --efiboot
 
-#/target/bin/echo "boot=$bootdev" > /target/etc/lilo.conf
-#/target/bin/echo "root=$rootfs" >> /target/etc/lilo.conf
-#/target/bin/echo 'install=/boot/boot.b' >> /target/etc/lilo.conf
-#/target/bin/echo 'map=/boot/map' >> /target/etc/lilo.conf
-#/target/bin/echo 'image=/vmlinuz' >> /target/etc/lilo.conf
-#/target/bin/echo '	label=Linux' >> /target/etc/lilo.conf
-#if [ -L /target/initrd.img -o -f /target/initrd.img ]; then
-#/target/bin/echo '	initrd=/initrd.img' >> /target/etc/lilo.conf
-#fi
-
-chroot /target /usr/sbin/elilo
