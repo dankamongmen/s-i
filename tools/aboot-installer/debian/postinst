@@ -2,18 +2,135 @@
 export LD_LIBRARY_PATH="/target/lib:/target/usr/lib"
 
 . /usr/share/debconf/confmodule
-db_subst aboot-installer/bootdev bootdev "$defaultbootdev"
-db_input medium aboot-installer/bootdev || true
-db_go || true
+
+log=/var/log/messages
+
+log() {
+    logger -t aboot-installer "$@"
+}
+
+error() {
+    log "error: $@"
+}
+
+info() {
+    log "info: $@"
+}
+
+# Make sure mtab in the chroot reflects the currently mounted partitions
+update_mtab() {
+    mtab=/target/etc/mtab
+    grep /target /proc/mounts | (
+        while read devpath mountpoint fstype options n1 n2 ; do
+            devpath=`mapdevfs $devpath`
+            mountpoint=`echo $mountpoint | sed s%^/target%%`
+            # The sed line removes the mount point for root.
+            if [ -z "$mountpoint" ]; then
+                mountpoint="/"
+            fi
+            echo $devpath $mountpoint $fstype $options $n1 $n2
+        done ) > $mtab
+}
+
+db_progress START 0 5 aboot-installer/progress/title
+db_progress INFO aboot-installer/progress/step_install
+
+if apt-install aboot; then
+	:
+else
+	info "Calling 'apt-install aboot' failed"
+	db_input critical aboot-installer/apt-install-failed || [ $? -eq 30 ]
+	db_go
+	db_get
+	if [ true != "$RET" ]; then
+		db_progress STOP
+		exit 1
+	fi
+fi
+
+db_progress STEP 1
+db_progress INFO aboot-installer/progress/step_bootdev
+
+for i in `/usr/lib/partconf/find-partitions 2>/dev/null \
+	| grep '[[:space:]]ext2[[:space:]]' | cut -f1`
+do
+	# add it to the list.
+	if [ -z "$PARTITIONS" ]; then
+		PARTITIONS="$i"
+	else
+		PARTITIONS="${PARTITIONS},$i"
+	fi
+done
+
+if [ -z "$PARTITIONS" ]; then
+	# FIXME:
+	# error: no viable ext2 partitions found, throw a debconf message
+	# and exit with an error
+	# db_input critical ...
+	db_progress STOP
+fi
+
+# TODO: detect whether a given disk is using BSD disklabels
+
+# FIXME: what if "defaultbootdev" isn't the device that the kernels are
+# on?
+# Figure out the /boot partition, and set it as the default.
+# If the /boot partition isn't ext2, use the value of defaultbootdev if
+# any.
+# Else, just default to the first device found.
+
+# We'll need this to figure out which device /boot is on, just like
+# grub does
+update_mtab
+
+if [ "$defaultbootdev" ]; then
+    db_set aboot-installer/bootdev "$defaultbootdev"
+fi
+
+db_subst aboot-installer/bootdev PARTITIONS $PARTITIONS
+# FIXME: this should be 'medium', but need to test it first
+db_input high aboot-installer/bootdev || [ $? -eq 30 ]
+db_go
 
 db_get aboot-installer/bootdev
 bootdev=$RET
 
-chroot /target /sbin/e2writeboot $bootdev /boot/bootlx
-#chroot /target /usr/bin/touch /boot/grub/menu.lst
-#chroot /target /sbin/update-grub
+# Convert to something we can use in the chroot
+bootdev=`mapdevfs $bootdev`
 
-#IMG_CONF=/target/etc/kernel-img.conf
-#/target/bin/echo "postinst_hook = /sbin/update-grub" >> $IMG_CONF
-#/target/bin/echo "postrm_hook   = /sbin/update-grub" >> $IMG_CONF
-#/target/bin/echo "do_bootloader = no" >> $IMG_CONF
+# Determine the name of the disk, and the partition number where
+# aboot.conf is located, from the name of the selected partition.
+bootdisk=`echo $bootdev | sed -e's/[0-9]*$//'`
+partnum=`echo $bootdev | sed -e's/^[^0-9]*//'`
+
+db_progress STEP 1
+db_subst aboot-installer/progress/step_install_loader BOOTDISK $bootdisk
+db_progress INFO aboot-installer/progress/step_install_loader
+
+info "Installing aboot on '$bootdisk'"
+chroot /target /sbin/swriteboot $bootdisk /boot/bootlx
+# TODO: should this say something if it fails, like grub-installer does?
+
+db_progress STEP 1
+db_subst aboot-installer/progress/step_config_loader PARTNUM $partnum
+db_progress INFO aboot-installer/progress/step_config_loader
+
+info "Configuring aboot to look in partition $partnum"
+chroot /target /sbin/abootconf $bootdisk $partnum
+
+# Edit /etc/aboot.conf to point to partnum.
+ABOOTCONF=/target/etc/aboot.conf
+
+sed -e"/^0:/ c\
+0:$partnum/vmlinuz ro root=/initrd" < $ABOOTCONF > ${ABOOTCONF}.new
+mv ${ABOOTCONF}.new $ABOOTCONF
+
+db_progress STEP 1
+
+# FIXME: If bootdev is not the rootfs, move /boot and /etc/aboot.conf
+# db_subst aboot-installer/progress/step_copy_kernel BOOTDEV $bootdev
+
+# TODO: hooks in /etc/kernel-img.conf, in case we move the device?
+
+db_progress STEP 1
+db_progress STOP

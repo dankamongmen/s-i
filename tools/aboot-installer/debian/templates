@@ -1,11 +1,38 @@
 Template: aboot-installer/bootdev
-Type: string
-Default: (hda)
+Type: select
+Choices: ${PARTITIONS}
 _Description: Device for boot loader installation:
- Aboot needs to install the boot loader on a bootable device. This is
- usually the first hard drive, /dev/hda.
+ Aboot needs to install the boot loader on a bootable device containing
+ an ext2 partition.  Please select the ext2 partition that you wish
+ aboot to use.  If this is not the root filesystem, your kernel image
+ and the configuration file /etc/aboot.conf will be copied to that
+ partition.
 
 Template: debian-installer/aboot-installer/title
 Type: text
 #  Main menu item
 _Description: Install aboot on a hard disk
+
+Template: aboot-installer/progress/title
+Type: text
+_Description: Installing the aboot boot loader
+
+Template: aboot-installer/progress/step_install
+Type: text
+_Description: Installing the 'aboot' package.
+
+Template: aboot-installer/progress/step_bootdev
+Type: text
+_Description: Determining aboot boot device.
+
+Template: aboot-installer/progress/step_install_loader
+Type: text
+_Description: Installing aboot on ${BOOTDISK}.
+
+Template: aboot-installer/progress/step_config_loader
+Type: text
+_Description: Configuring aboot to use partition ${PARTNUM}.
+
+Template: aboot-installer/progress/step_copy_kernel
+Type: text
+_Description: Copying kernel images to ${BOOTDEV}.
