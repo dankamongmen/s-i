@@ -11,8 +11,8 @@ DEBCONF=debconf
 TOOLS=loadtemplate
 BIN=$(DEBCONF) $(TOOLS)
 
-LIBOBJS=commands.o confmodule.o frontend.o priority.o strutl.o configuration.o\
-	database.o question.o template.o
+LIBOBJS=commands.opic confmodule.opic frontend.opic priority.opic strutl.opic \
+	configuration.opic database.opic question.opic template.opic
 
 all: $(BIN) $(LIB) $(SONAME)
 	(cd modules && make all)
