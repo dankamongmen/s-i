@@ -5,7 +5,7 @@ dnl linux architectures and configurations, it is not used to make the
 dnl code more portable
 
 AC_INIT(configure.in)
-CFLAGS="-Wall -g $CFLAGS"
+CFLAGS="-Wall $CFLAGS"
 AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_HEADER(config.h:config.h.in)
 
@@ -22,6 +22,7 @@ dnl Enable debugging?
 AC_ARG_WITH(debug,[  --without-debug         turn off debugging?])
 if test "$with_debug" != "no"; then
   AC_DEFINE(DODEBUG)
+  CFLAGS="$CFLAGS -g"
 fi
 
 dnl Do dependency checking?

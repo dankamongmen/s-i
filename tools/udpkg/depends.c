@@ -1,4 +1,4 @@
-/* $Id: depends.c,v 1.1 2000/08/24 06:23:56 tausq Exp $ */
+/* $Id: depends.c,v 1.2 2000/08/26 21:46:43 tausq Exp $ */
 #include "udpkg.h"
 
 #ifdef DODEPENDS
@@ -10,7 +10,7 @@
 static char **depends_split(const char *dependsstr)
 {
 	static char *dependsvec[DEPENDSMAX];
-	char *p, *q;
+	char *p;
 	int i = 0;
 
 	dependsvec[0] = 0;
@@ -40,12 +40,57 @@ static char **depends_split(const char *dependsstr)
 	return dependsvec;
 }
 
+static void depends_sort_visit(struct package_t **ordered, 
+	struct package_t *pkgs, struct package_t *pkg)
+{
+	/* Topological sort algorithm:
+	 * ordered is the output list, pkgs is the dependency graph, pkg is 
+	 * the current node
+	 *
+	 * recursively add all the adjacent nodes to the ordered list, marking
+	 * each one as visited along the way
+	 *
+	 * yes, this algorithm looks a bit odd when all the params have the
+	 * same type :-)
+	 */
+	unsigned short i;
+	struct package_t *newnode;
+
+	/* mark node as processing */
+	pkg->color = COLOR_GRAY;
+
+	/* visit each not-yet-visited node */
+	for (i = 0; i < pkg->requiredcount; i++)
+		if (pkg->requiredfor[i]->color == COLOR_WHITE)
+			depends_sort_visit(ordered, pkgs, pkg->requiredfor[i]);
+
+	/* add it to the list */
+	newnode = (struct package_t *)malloc(sizeof(struct package_t));
+	/* make a shallow copy */
+	*newnode = *pkg;
+	newnode->next = *ordered;
+	*ordered = newnode;
+
+	/* mark node as done */
+	pkg->color = COLOR_BLACK;
+}
+
 static struct package_t *depends_sort(struct package_t *pkgs)
 {
-	/* TODO: try doing a topological sort to order dependencies */
-	/* First it needs to break cycles in the to-be-installed package 
+	/* TODO: it needs to break cycles in the to-be-installed package 
 	 * graph... */
-	return pkgs;
+	struct package_t *ordered = NULL;
+	struct package_t *pkg;
+
+	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
+		pkg->color = COLOR_WHITE;
+
+	for (pkg = pkgs; pkg != 0; pkg = pkg->next)
+		if (pkg->color == COLOR_WHITE)
+			depends_sort_visit(&ordered, pkgs, pkg);
+
+	/* Leaks the old list... return the new one... */
+	return ordered;
 }
 
 
