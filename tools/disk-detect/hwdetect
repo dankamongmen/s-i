@@ -26,12 +26,31 @@ is_not_loaded() {
     fi
 }
 
+load_module() {
+    module="$1"
+    db_subst hwdetect/module_params MODULE "$module"
+    db_input low hwdetect/module_params || [ $? -eq 30 ]
+    db_go
+    db_get hwdetect/module_params
+    if modprobe -v "$module" $RET >> /var/log/messages 2>&1 ; then
+	# Not sure if this is usefull.  After all, 'discover' is installed
+	# in /target/. [pere 2003-04-18]
+	#prebaseconfig=/usr/lib/prebaseconfig.d/40ethdetect
+	#echo "echo \"$module $RET\" >> /target/etc/modules" >> $prebaseconfig
+	:
+    else
+	db_subst hwdetect/modprobe_error CMD_LINE "modprobe -v $module $RET"
+	db_input critical hwdetect/modprobe_error || [ $? -eq 30 ]
+	db_go
+    fi
+}
+
 load_modules()
 {
     old=`cat /proc/sys/kernel/printk`
     echo 0 > /proc/sys/kernel/printk
     for module in $* ; do
-	modprobe $module >> /var/log/messages 2>&1
+	load_module $module
     done
     echo $old > /proc/sys/kernel/printk
 }
@@ -87,7 +106,7 @@ do
     if [ -z "$module" ] ; then module="[Unknown]" ; fi
     if [ -z "$name" ] ;   then name="[Unknown]" ; fi
 
-    log "Detected load module '$module' for '$name', progress step 1"
+    log "Detected load module '$module' for '$name'"
 
     db_subst hwdetect/progress_step CARDNAME "$name"
     db_subst hwdetect/progress_step MODULE "$module"
@@ -113,7 +132,7 @@ do
 		    db_fset "$template" seen false || true
 		    db_subst "$template" vendor "$name" || true
 		    db_subst "$template" module "$module" || true
-		    db_input medium "$template" || true
+		    db_input medium "$template" || [ $? -eq 30 ]
 		    db_go || true
 		    db_get "$template" || true
 		    mounted=0
