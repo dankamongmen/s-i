@@ -299,7 +299,28 @@ if [ "$DEBUG" = "Y" ] ; then
   echo Updating general PO files:
 fi
 cd $DI_COPY/packages/po
-languages=$(ls -1 *.po | sed 's/\.po//g')
+# The languages variable will contain the list of *supported* languages
+# Supported languages will have PO files content spread over
+# D-I packages
+# Other languages will only have a PO file in packages/po
+#
+# This is meant for having prospective translations
+# which do not clutter up all packages
+#
+# All languages with no supported locale in Debian
+# should stay in the list of PROSPECTIVE languages
+alllanguages=$(ls -1 *.po | sed 's/\.po//g')
+languages=""
+if [ -f $DI_COPY/packages/po/PROSPECTIVE ] ; then
+  for language in $alllanguages ; do
+    if ! grep -q -e "^${language}$" $DI_COPY/packages/po/PROSPECTIVE ; then
+      languages="$languages $language"
+    fi
+  done
+else
+  languages=$alllanguages
+fi
+
 for po in *.po ; do
  lang=$(basename $po .po)
  if [ "$DEBUG" = "Y" ] ; then
