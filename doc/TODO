@@ -9,19 +9,20 @@ To do before next release  - march 15th
 	2. images must be in debian archive
 	3. at least one successful installation report per boot method
 
- - partman 
-	- testing!
-	- clean up lvmcfg UI issue
-	- probably go for i386, powerpc; other arches unknown
  - i18n:
 	- bterm-unifont reloading. Bug#232397
- - lowmem package must enter archive
  - Check archive for udebs that need to be built on various arches;
    make sure everything is up-to-date. Also, make sure that eg,
    appropriate kernel debs have entered the archive on each
    architecture.
  - Write a release announcement.
- 
+
+Archive work
+------------
+
+byhand the newest image builds (lost of arches)
+NEW lvmcfg-utils
+
 Current status
 ==============
 
@@ -65,18 +66,11 @@ time.
 		There are some basic implementations. The trick is to make
 		it a GUI that does not suck, while still using debconf
 		underneath.
-	- pcmcia support
-		- may work, may not.. (many failure reports)
-		- pcmcia is not enabled during CD or netboot installs,
-		  because pcmcia-cs-udeb has the wrong priority.
-		  (Still true?)
-		- Probably need to re-run hw-detect after loading pcmcia from
-		  the net_driver floppy.
 	- some architectures
 		hppa
 		mipsel
 		sparc
-			- boots, kinda
+			- almost there!
 		
 [60%] Needs some work, but does its grunt work
 ---------------------------------------------------------------------
@@ -94,25 +88,16 @@ time.
 		debootstrap is stable, and has quite good support in
                 base-installer
 		Except for when it fails. See BTS.
-		In particular, it always fails when used on a non-empty
-		partition. Many users run into this.
-        - netcfg
-		Working, pending rewrite for IPv6.
 	- anna
 		Works, mostly.  Needs support for Releases files.
 		Support for signed Release files would be cool, but
 		needs gpgv-udeb.
 		Needs to have load-installer properly split out of the anna
-		binary to save space on root floppy.
-	- kernel-package integration
-		Moving to the new linux-kernel-di system. Not all arches
-		use it yet.
+		binary to save space on root floppy. Or removed, not used
+		anymore.
         - disk selector, partitioner
 		There are three of them, autopartkit, partkit, and partman.
 		All of them work, except for when they don't. (See BTS.)
-	- iso-scan
-		Works, but does not flag the disk the iso is mounted from
-		as unusable by the rest of the installer.
 	- wireless support
 		- configurator newly available, needs testing
  		- wireless-tools-udeb is available, but is not loaded by default
@@ -132,6 +117,10 @@ time.
 		the archive.
 		Last kinks in unstable/testing separation for d-i still being
 		worked out.
+	- pcmcia support
+		- may work, may not.. (many failure reports)
+		- Probably need to re-run hw-detect after loading pcmcia from
+		  the net_driver floppy.
 	- low memory support
 		Where "low" is 32-46 mb!
 		Works, but user must be careful to set up swap ASAP.
@@ -148,15 +137,20 @@ time.
 			- mac fully working
 			- amiga building, untested
 		alpha
+			- needs TLC
 
 [90%] Single missing important feature or bug.
 ---------------------------------------------------------------------
-        - install media build system
-		The dest/ image names need to be reorganised.
-	- partconf
-		Needs progress bars.
 	- hw-detect
 		Working but needs to be switched over to discover2
+	- iso-scan
+		Works, but does not flag the disk the iso is mounted from
+		as unusable by the rest of the installer.
+	- kernel-package integration
+		Moving to the new linux-kernel-di system. Not all arches
+		use it yet.
+        - netcfg
+		Working, pending rewrite for IPv6.
 	- bts
 		Still need a non-manual way to tag our bugs.
         - library reduction
@@ -166,7 +160,6 @@ time.
        (famous last words)
 ---------------------------------------------------------------------
         - udpkg
-		May be eventually replaced with busybox dpkg.
 	- cd installs
  	- net retriever
 	- cdrom retriever
@@ -177,6 +170,7 @@ time.
         - main-menu
         - choose-mirror
         - busybox integration
+        - install media build system
 
 Common problems and transitions
 ===============================
