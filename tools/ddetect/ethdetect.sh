@@ -76,13 +76,25 @@ module_probe() {
 		
 		olddevs="$devs"
 		devs="$(snapshot_devs)"
-		newdev="$(compare_devs "$olddevs" "$devs")"
+		newdevs="$(compare_devs "$olddevs" "$devs")"
 
-		if [ -n "$newdev" ]; then
+		# Pick up multiple cards that were loaded by a single module
+		# hence they'll have same description
+		
+		if [ -n "$newdevs" ]; then
+			local devcount=1
 			modinfo=$(get_static_modinfo $module)
-			if [ -n "$modinfo" ]; then
-				echo "${newdev}:${modinfo}" >> /etc/network/devnames
-			fi
+
+			if [ -n "$modinfo" ]; then break; fi
+			
+			for ndev in $newdevs; do
+				devcount=$(($devcount + 1))
+				if [ $devcount -ge 2 ]; then
+					echo "${ndev}:${modinfo} (${devcount})" >> /etc/network/devnames
+				else
+					echo "${ndev}:${modinfo}" >> /etc/network/devnames
+				fi
+			done
 		fi
 	else
 		db_unregister "$question"
