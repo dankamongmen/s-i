@@ -24,9 +24,14 @@ do
         else
             [ -d ../locales/$unilang.UTF-8 ] || localedef -c -f UTF-8 -i $unilang ../locales/$unilang.UTF-8
             LOCPATH=`pwd` LC_ALL=../locales/$unilang.UTF-8 sort -k 2.1 $file | sed -e 's/ .*/, /' | tr -d '\n' | sed -e "s/^/Indices-$lang.UTF-8: 1, /" -e 's/, $//' > sorted$file
+	echo "" >>sorted$file
         fi
     done
     #  Now ../choose-mirror/DEBIAN/templates must be patched: all sortedlist.*
     #  files have to be added to the mirror/$protocol/countries template.
+    sed -e "/$protocol.*countries/{n;q;}" ../choose-mirror/DEBIAN/templates >templates.tmp
+    cat sorted* >>templates.tmp
+    sed -e "/$protocol.*countries/!d;/$protocol.*countries/{:end;n;b end}" ../choose-mirror/DEBIAN/templates | sed '1,2d'>>templates.tmp
+    mv templates.tmp  ../choose-mirror/DEBIAN/templates
 done
 
