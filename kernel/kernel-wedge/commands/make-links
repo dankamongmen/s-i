@@ -12,6 +12,6 @@ foreach my $link (`find modules -type f -name \\*.lnk`) {
 	$target=~s#^common/#/usr/lib/kernel-wedge/modules/#;
 	symlink($target, $file) || die "symlink $target $file: $!";
 	if (! -e $file) {
-		print "warning: $file is a broken link\n";
+		die "$file is a broken link\n";
 	}
 }
