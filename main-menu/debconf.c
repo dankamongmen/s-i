@@ -36,7 +36,10 @@ int debconf_command (const char *fmt, ...) {
 		return atoi(buf);
 	}
 	else {
-		/* Nothing was entered; never really happens. */
+		/* 
+		 * Nothing was entered; never really happens except during
+		 * debugging.
+		 */
 		text=buf;
 		return 0;
 	}
