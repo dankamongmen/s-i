@@ -12,7 +12,7 @@ inheader=""
 divider () {
 	echo "============================================================================"
 }
-	
+
 header () {
 	if [ -z "$inheader" ]; then
 		inheader=1
@@ -29,6 +29,14 @@ endheader () {
 	fi
 }
 
+do_shutdown () {
+	if [ -n "$SHUTDOWN" ]; then
+		if ! $SHUTDOWN; then
+			echo "SHUTDOWN $SHUTDOWN failed"
+		fi
+	fi
+}
+
 error () {
 	if [ "$started" ]; then
 		echo
@@ -39,7 +47,14 @@ error () {
 		echo "$@" >&2
 	fi
 	
+	do_shutdown
+	
 	exit 1
+}
+
+sigout () {
+	error "Exiting on signal."
+	exit 0
 }
 
 config () {
@@ -62,7 +77,7 @@ if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
 	fi
 fi
 
-PATH=$PATH:$DIGRESSDIR/boot:$DIGRESSDIR/preboot:$DIGRESSDIR/console:$DIGRESSDIR/test_1:$DIGRESSDIR/test_2
+PATH=$PATH:$DIGRESSDIR/boot:$DIGRESSDIR/preboot:$DIGRESSDIR/console:$DIGRESSDIR/test_1:$DIGRESSDIR/test_2:$DIGRESSDIR/shutdown
 export PATH
 
 if [ -z "$SCHEME" ]; then
@@ -81,6 +96,8 @@ fi
 use common
 use $SCHEME
 
+trap sigout INT QUIT
+
 if [ -n "$ROOT_PASSWORD_FILE" ]; then
 	ROOT_PASSWORD=$(cat $ROOT_PASSWORD_FILE) || true
 	if [ -z "$ROOT_PASSWORD" ]; then
@@ -93,7 +110,7 @@ started=1
 header "Booting: $MACHINE"
 echo "Scheme: $SCHEME -- $DESCRIPTION"
 
-if [ "$PREBOOT" ]; then
+if [ -n "$PREBOOT" ]; then
 	echo "Setting up..."
 	for p in $PREBOOT; do
 		if ! $p; then
@@ -103,8 +120,13 @@ if [ "$PREBOOT" ]; then
 fi
 	
 endheader
-if ! $BOOT; then
-	error "BOOT $BOOT failed"
+
+if [ -n "$BOOT" ]; then
+	echo
+	header "Booting..."
+	if ! $BOOT; then
+		error "BOOT $BOOT failed"
+	fi
 fi
 
 if [ -n "$TEST_1" ]; then
@@ -132,4 +154,5 @@ fi
 echo
 header "Successful finish: $SCHEME"
 endheader
+do_shutdown
 exit 0

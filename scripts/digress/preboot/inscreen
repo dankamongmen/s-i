@@ -26,10 +26,14 @@ if [ -n "$existing" ]; then
 fi
 
 rc=$(tempfile)
-cat > $rc <<"EOF"
+cat > $rc <<EOF
 startup_message off
 shell $SCREEN_COMMAND
 sessionname $session
+detach
 EOF
 
+screen -m -c $rc
 
+# Give the program a while to settle down.
+sleep 5

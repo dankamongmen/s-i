@@ -1,0 +1,25 @@
+#!/usr/bin/expect
+# Expect script to run for interactive first stage installs.
+
+spawn -noecho $env(CONSOLECOMMAND)
+
+set timeout $env(STAGE_1_MAX_TIME)
+
+expect {
+	"English" {
+		sleep 1
+		send "\r"
+		exp_continue -continue_timer
+	} "<Go Back>" {
+		sleep 1
+		send "\r"
+		exp_continue -continue_timer
+	} "Please stand by while rebooting the system." {
+		exit
+	} timeout {
+		puts "timeout!"
+		exit 1
+	}
+}
+
+exit
