@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.42 2003/11/01 13:35:52 merker Exp $ */
+/* $Id: udpkg.c,v 1.43 2003/11/01 21:57:22 merker Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -23,7 +23,7 @@ static int force_configure = 0;
 
 int is_little_endian()
 {
-  unsigned char numarray[]={0x12,0x34,0x56,0x78};
+  unsigned char numarray[] __attribute__ ((aligned (8))) ={0x12,0x34,0x56,0x78};
   unsigned long value = *(unsigned long*) numarray;
   if (value == 0x78563412)
   {
