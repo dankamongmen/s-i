@@ -249,7 +249,7 @@ static int question_db_is_visible(struct question_db *db, const char *name,
 			strcmp(q2->value, "false") == 0)
 			ret = DC_NO;
 		showold = getenv("DEBCONF_SHOWOLD");
-		if (showold != NULL && strcmp(showold, "false") == 0)
+		if (showold == NULL || strcmp(showold, "true") != 0)
 			ret = DC_NO;
 	}
 

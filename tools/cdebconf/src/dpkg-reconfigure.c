@@ -327,6 +327,7 @@ int reconfigure(char **pkgs, int i, int max)
                     g_questions->methods.save(g_questions);
 
                     unsetenv("DEBIAN_HAS_FRONTEND");
+                    setenv("DEBCONF_SHOWOLD", "1", 1);
 
                     strvacat(filename, sizeof(filename), " configure ", getfield(pkg, VERSIONFIELD), NULL);
 
@@ -334,6 +335,7 @@ int reconfigure(char **pkgs, int i, int max)
                     if (ret != 0) return DC_NOTOK;
 
                     setenv("DEBIAN_HAS_FRONTEND", "1", 1);
+                    unsetenv("DEBCONF_SHOWOLD");
 
                     g_templates->methods.load(g_templates);
                     g_questions->methods.load(g_questions);
