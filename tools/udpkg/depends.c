@@ -1,4 +1,4 @@
-/* $Id: depends.c,v 1.6 2000/11/29 02:44:30 joeyh Rel $ */
+/* $Id: depends.c,v 1.7 2000/12/21 23:58:12 bug1 Rel $ */
 #include "udpkg.h"
 
 #ifdef DODEPENDS
@@ -55,7 +55,6 @@ static void depends_sort_visit(struct package_t **ordered,
 	 * same type :-)
 	 */
 	unsigned short i;
-	struct package_t *newnode;
 
 	/* mark node as processing */
 	pkg->color = COLOR_GRAY;
