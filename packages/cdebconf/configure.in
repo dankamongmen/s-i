@@ -91,9 +91,14 @@ AC_ARG_WITH(textwrap, [  --with-textwrap         use libtextwrap for line-foldin
 
 dnl logging to syslog (should be configurable in config file
 SYSLOG_LOGGING=
-AC_ARG_WITH(syslog-logging, [  --with-syslog-logging         enable logging to syslog],
+AC_ARG_WITH(syslog-logging, [  --with-syslog-logging   enable logging to syslog],
 [SYSLOG_LOGGING=1])
 AC_DEFINE_UNQUOTED(SYSLOG_LOGGING, "$SYSLOG_LOGGING")
+
+dnl compile cdebconf udeb?
+AC_ARG_ENABLE(d_i,
+[  --enable-d-i            build cdebconf for the debian-installer],
+[test "$enableval" = "yes" && CFLAGS="$CFLAGS -DDI_UDEB"])
 
 dnl Check for libraries
 AC_CHECK_LIB(dl, dlopen)
