@@ -1,4 +1,4 @@
-/* $Id: udpkg.h,v 1.17 2003/10/16 00:39:42 kraai Rel $ */
+/* $Id$ */
 #ifndef _UDPKG_H_
 #define _UDPKG_H_
 
@@ -19,7 +19,7 @@
 #define FPRINTF(str,fmt,args...) if (getenv(UDPKG_QUIET) == NULL) fprintf(str, fmt, ##args)
 
 #define BUFSIZE		4096
-#define STATUSFILE	ADMINDIR "/status.udeb"
+#define STATUSFILE	ADMINDIR "/status"
 #define DPKGCIDIR	ADMINDIR "/tmp.ci/"
 #define INFODIR		ADMINDIR "/info/"
 #define UDPKG_QUIET	"UDPKG_QUIET"
