@@ -49,5 +49,22 @@ fi
 echo $LANG
 echo $DI_COPY
 
-echo This script is not finished yet.
+
+cd $DI_COPY
+if [ ! -x scripts/l10n/gettext-helper ] ; then
+  echo $DI_COPY/scripts/l10n/gettext-helper not found
+  echo Please check your repository or report this as a bug
+  exit 1
+fi
+
+scripts/l10n/gettext-helper export $LANG
+
+if [ ! -f packages/po/$LANG.po ] ; then
+  echo No packages/po/$LANG.po generated
+  echo Please read the above messages and check the $LANG translations
+  echo If everything is OK, please report as a bug
+  exit 1
+fi
+
+scripts/l10n/l10n-sync --keep-revision=$LANG --commit $DI_COPY
 

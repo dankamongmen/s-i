@@ -168,15 +168,15 @@ done
 cd $DI_COPY/packages
 echo -n "Creating the general template.pot file..."
 if [ "$DEBUG" = "Y" ] ; then
-  msgcat $pots >$DI_COPY/packages/po/template.pot.new
+  msgcat $pots | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new
 else
-  msgcat $pots >$DI_COPY/packages/po/template.pot.new 2>/dev/null
+  msgcat $pots  | sed 's/charset=CHARSET/charset=UTF-8/g'>$DI_COPY/packages/po/template.pot.new 2>/dev/null
 fi
 # We don't want all templates.pot files headers as we don't care about them
 # So we merge the generated file with a simple header.pot file
 if [ -f po/header.pot ] ; then
-  msgcat --use-first po/header.pot po/template.pot.new
-  mv template.pot.new template.pot
+  msgcat --use-first po/header.pot po/template.pot.new | sed 's/charset=UTF-8/charset=CHARSET/g' > po/template.pot
+  rm po/template.pot.new
 else
   echo ERROR : no $DI_COPY/packages/po/header.pot file. Cannot continue.
   exit 1
