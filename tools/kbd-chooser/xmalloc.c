@@ -1,5 +1,6 @@
 /* Error-free versions of some libc routines */
 
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,11 +8,10 @@
 #include "nls.h"
 #include "xmalloc.h"
 
-extern char *progname;
 
 static void
 nomem(void) {
-	fprintf(stderr, _("%s: out of memory\n"), progname);
+	fprintf(stderr, _("%s: out of memory\n"),  PROGNAME);
 	exit(EX_OSERR);
 }
 
