@@ -96,10 +96,10 @@ main (int argc, char *argv[])
 	  || (ptr->type == MODEM && modem_flag))
 	{
 	  printf
-	    ("{ unknown_str, \tunknown_str, \t\"%s\", \t%d,\t\"%s\", \t%d, \t%d, \t%d, \tNULL},\n",
+	    ("{ unknown_str, \tunknown_str, \t\"%s\", \t%d,\t\"%s\", \t%d, \t%d, \t%d, \tNULL},\n /* %s %s */\n\n",
 	     (ptr->modulename ? ptr->modulename : "unknown"), ptr->bus,
 	     (ptr->dev_id ? ptr->dev_id : "unknown"), ptr->long_id, ptr->type,
-	     ptr->options);
+	     ptr->options, ptr->model, ptr->vendor);
 	}
       ptr = ptr->next;
     }
