@@ -40,15 +40,15 @@
 #ifndef NODEBUG
 #define INFO(level, fmt, args...)					\
 	debug_printf(level, fmt, ##args)
-#define ASSERT(cond) if (!(cond)) DIE("%s:%d (%s): Assertion failed: %s", __FILE__, __LINE__, __FUNCTION__, #cond)
+#define ASSERT(cond) do { if (!(cond)) DIE("%s:%d (%s): Assertion failed: %s", __FILE__, __LINE__, __FUNCTION__, #cond); } while (0)
 #else
 #define INFO(level, fmt, args...)	/* nothing */
 #define ASSERT(cond)
 #endif
 
 #define NEW(type) (type *)malloc(sizeof(type))
-#define DELETE(x) if (x) { free(x); x = 0; }
-#define CHOMP(s) if (s[strlen(s)-1] == '\n') s[strlen(s)-1] = '\0'
+#define DELETE(x) do { if (x) free(x); x = 0; } while (0)
+#define CHOMP(s) do { if (s[strlen(s)-1] == '\n') s[strlen(s)-1] = '\0'; } while (0)
 
 /* Be careful with these macros; they evaluate the string arguments multiple
    times!
