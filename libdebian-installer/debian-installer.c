@@ -791,6 +791,7 @@ di_mapdevfs(const char *path, char *buf, size_t n)
 	{ 4,	64,	"ttyS",		ENTRY_TYPE_NUMBER,	0,	6 },
 	{ 4,	0,	"tty",		ENTRY_TYPE_NUMBER,	0,	6 },
 	{ 8,	0,	"sd",		ENTRY_TYPE_DISC,	0,	4 },
+	{ 9,    0,      "md",           ENTRY_TYPE_NUMBER,      0,      0 },
 	{ 22,	0,	"hd",		ENTRY_TYPE_DISC,	2,	6 },
 	{ 33,	0,	"hd",		ENTRY_TYPE_DISC,	4,	6 },
 	{ 34,	0,	"hd",		ENTRY_TYPE_DISC,	6,	6 },
