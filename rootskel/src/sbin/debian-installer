@@ -5,6 +5,14 @@
 #export DEBIAN_FRONTEND=text
 #export DEBCONF_DEBUG=5 
 
+bterm=/usr/bin/bterm
+font=/unifont-reduced.bgf
+
+# Load framebuffer and enable it for bterm
+if [ -x "$bterm" -a -e "$font" ] && enable-fb ; then
+    use_bterm=true
+fi
+
 # Turn off console blanking.
 echo "\033[9;0]"
 
@@ -28,4 +36,8 @@ if [ -z "$DEBIAN_FRONTEND" ] ; then
     done
 fi
 
-/sbin/di-main-menu
+if [ true = "$use_bterm" ] ; then
+    $bterm -f "$font" -l "$LANG" /sbin/di-main-menu
+else
+    /sbin/di-main-menu
+fi

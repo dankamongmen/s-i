@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# Load one of vesafb and vga16fb to enable framebuffer, create
+# compatibility symlinks.
+
+if (modprobe vesafb || modprobe vga16fb) && fbset ; then
+    # Add compatibility symlinks
+    test -e /dev/fb0 || ln -s /dev/fb/0 /dev/fb0
+    test -e /dev/tty0 || ln -s /dev/vc/0 /dev/tty0
+
+    test -e /dev/ptyp0 || ln -s /dev/pty/m0 /dev/ptyp0
+    test -e /dev/ptyp1 || ln -s /dev/pty/m1 /dev/ptyp1
+    test -e /dev/ptyp2 || ln -s /dev/pty/m2 /dev/ptyp2
+    test -e /dev/ptyp3 || ln -s /dev/pty/m3 /dev/ptyp3
+    test -e /dev/ptyp4 || ln -s /dev/pty/m4 /dev/ptyp4
+    test -e /dev/ptyp5 || ln -s /dev/pty/m5 /dev/ptyp5
+    test -e /dev/ptyp6 || ln -s /dev/pty/m6 /dev/ptyp6
+    test -e /dev/ptyp7 || ln -s /dev/pty/m7 /dev/ptyp7
+    test -e /dev/ptyp8 || ln -s /dev/pty/m8 /dev/ptyp8
+    test -e /dev/ptyp9 || ln -s /dev/pty/m9 /dev/ptyp9
+    test -e /dev/ptyp10 || ln -s /dev/pty/m10 /dev/ptyp10
+    test -e /dev/ptyp11 || ln -s /dev/pty/m11 /dev/ptyp11
+    test -e /dev/ptyp12 || ln -s /dev/pty/m12 /dev/ptyp12
+    test -e /dev/ptyp13 || ln -s /dev/pty/m13 /dev/ptyp13
+    test -e /dev/ptyp14 || ln -s /dev/pty/m14 /dev/ptyp14
+    test -e /dev/ptyp15 || ln -s /dev/pty/m15 /dev/ptyp15
+else
+    exit 1
+fi
+
+exit 0
