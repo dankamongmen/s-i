@@ -28,13 +28,30 @@ for dev in $DEVICES/*; do
 		db_subst partman-ext3/progress_formatting TYPE "$filesystem"
 		db_subst partman-ext3/progress_formatting PARTITION "$num"
 		db_subst partman-ext3/progress_formatting DEVICE $(humandev $(cat device))
-                db_progress START 0 3 partman/text/please_wait
-                db_progress INFO partman-ext3/progress_formatting
-                db_progress SET 1
-                mkfs.ext3 $device >/dev/null 2>>/var/log/messages
-                code=$?
-                db_progress STOP
-                if [ "$code" != 0 ]; then
+		status=failed
+		if [ -x /sbin/tune2fs ]; then
+		    name_progress_bar partman-ext3/progress_formatting
+		    open_dialog CREATE_FILE_SYSTEM $id ext2
+		    read_line status
+		    close_dialog
+		    if [ "$status" = OK ]; then
+			/sbin/tune2fs -j $device >/dev/null 2>>/var/log/messages || status=failed
+		    fi
+		fi
+		if [ "$status" != OK ]; then
+		    db_progress START 0 3 partman/text/please_wait
+		    db_progress INFO partman-ext3/progress_formatting
+		    db_progress SET 1
+		    if
+			mkfs.ext3 $device >/dev/null 2>>/var/log/messages
+		    then
+			status=OK
+		    else
+			status=failed
+		    fi
+		    db_progress STOP
+		fi
+                if [ "$status" != OK ]; then
 		    db_fset partman-ext3/create_failed seen false
 		    db_subst partman-ext3/create_failed PARTITION "$num"
 		    db_subst partman-ext3/create_failed DEVICE $(humandev $(cat device))

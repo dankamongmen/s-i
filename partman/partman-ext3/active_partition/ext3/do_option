@@ -55,7 +55,7 @@ do_mountpoint_manual () {
 	    fi
 	    db_fset partman-ext3/mountpoint_manual seen false
 	    db_set partman-ext3/mountpoint_manual "$old_mountpoint"
-	    db_input critical partman-basicfilesystems/ext3 || $noninteractive
+	    db_input critical partman-ext3/mountpoint_manual || $noninteractive
 	    db_go || return 1
 	    db_get partman-ext3/mountpoint_manual
 	    
@@ -73,46 +73,24 @@ do_mountpoint_manual () {
 }
 
 do_options () {
-    local tpl seen_marker old_options
-    tpl=$1
-    seen_marker=$DEVICES/`basename $tpl`_seen
-    if [ ! -f "$seen_marker" ]; then
-	db_input high ${tpl}_help || true
-	db_go || exit
-	>"$seen_marker"
-    fi
-    db_fset $tpl seen false
+    local seen_marker full_options
     if [ -f $part/mountoptions ]; then
-	old_options=$(cat $part/mountoptions)
+	full_options=$(cat $part/full_mountoptions)
     else
-	old_options=''
-    fi
-    db_set $tpl "$old_options"
-    db_input critical $tpl || true
-    db_go || exit
-    db_get $tpl
-    echo "$RET" >$part/mountoptions
-}
-
-do_options () {
-    local seen_marker old_options
-    seen_marker=$DEVICES/options_seen
-    if [ ! -f "$seen_marker" ]; then
-	db_input high partman-basicfilesystems/options_help || true
-	db_go || exit
-	>"$seen_marker"
+	full_options=''
     fi
     db_fset partman-ext3/options seen false
-    if [ -f $part/mountoptions ]; then
-	old_options=$(cat $part/mountoptions)
-    else
-	old_options=''
-    fi
-    db_set partman-ext3/options "$old_options"
+    db_set partman-ext3/options "$full_options"
     db_input critical partman-ext3/options || true
     db_go || exit
     db_get partman-ext3/options
-    echo "$RET" >$part/mountoptions
+    if [ "$RET" ]; then
+	echo "$RET" | sed 's/ *-[^,]*//g' >$part/mountoptions
+	echo "$RET" >$part/full_mountoptions
+    else
+	[ ! -f $part/mountoptions ] || rm $part/mountoptions
+	[ ! -f $part/full_mountoptions ] || rm $part/full_mountoptions
+    fi
 }
 
 case $1 in

@@ -82,25 +82,25 @@ do_mountpoint_manual () {
 }
 
 do_options () {
-    local tpl seen_marker old_options
-    tpl=$1
-    seen_marker=$DEVICES/`basename $tpl`_seen
-    if [ ! -f "$seen_marker" ]; then
-	db_input high ${tpl}_help || true
-	db_go || exit
-	>"$seen_marker"
+    local tpl seen_marker full_options
+    tpl=partman-basicfilesystems/${1}options
+    if [ -f $part/${1}mountoptions ]; then
+	full_options=$(cat $part/${1}full_mountoptions)
+    else
+	full_options=''
     fi
     db_fset $tpl seen false
-    if [ -f $part/mountoptions ]; then
-	old_options=$(cat $part/mountoptions)
-    else
-	old_options=''
-    fi
-    db_set $tpl "$old_options"
+    db_set $tpl "$full_options"
     db_input critical $tpl || true
     db_go || exit
     db_get $tpl
-    echo "$RET" >$part/mountoptions
+    if [ "$RET" ]; then
+	echo "$RET" | sed 's/ *-[^,]*//g' >$part/${1}mountoptions
+	echo "$RET" >$part/${1}full_mountoptions
+    else
+	[ ! -f $part/${1}mountoptions ] || rm $part/${1}mountoptions
+	[ ! -f $part/${1}full_mountoptions ] || rm $part/${1}full_mountoptions
+    fi
 }
 
 case $1 in
@@ -109,10 +109,10 @@ case $1 in
 	update_partition $dev $id
 	;;
     options)
-	do_options partman-basicfilesystems/options
+	do_options ''
 	;;
     fatoptions)
-	do_options partman-basicfilesystems/fatoptions
+	do_options fat
 	;;
 esac
 
