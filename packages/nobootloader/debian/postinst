@@ -23,7 +23,6 @@ rootfs=`/target/bin/sed -ne '/^[^ ]* \/target /s/ .*//p' $MTAB`
 if [ "" = "$rootfs" ]; then
 	rootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/ /s/ .*//p' $MTAB`
 fi
-rootfs=`mapdevfs $rootfs`
 
 # detect if /boot is a separate partition and if so which partition it is.
 bootfs=`/target/bin/sed -ne '/^[^ ]* \/target\/boot /s/ .*//p' $MTAB`
@@ -34,38 +33,70 @@ if [ "" = "$bootfs" ]; then
 fi
 
 if [ "" = "$bootfs" ]; then
-	separateboot="false"
 	bootfs=$rootfs
 	boot="boot/"
 else
-	separateboot="true"
-	bootfs=`mapdevfs $bootfs`
 	boot=""
 fi
 
-if [ "$ARCH" = "powerpc" -a "$SUBARCH" = "chrp_pegasos" ]; then
-	kernel=`ls /target/boot/vmlinuz-2.* | /target/bin/sed -e 's%/target/boot/%%'`
-	bootcmd="boot ${bootfs} ${boot}${kernel} root=${rootfs}"
+rootfs=`mapdevfs $rootfs`
 
-	db_subst nobootloader/confirmation KERNEL_BOOT "${bootcmd}"
-	db_input high nobootloader/confirmation || true
-else 
-	db_get debian-installer/kernel/linux/link_in_boot
-	link_in_boot="$RET"
-	if [ "$link_in_boot" = "true" ]; then
-		boot="boot/"
-	else
-		boot=""
-	fi
-	if [ -e /target$boot/vmlinuz ]; then
-		kernel="/${boot}vmlinuz"
-	else if [ -e /target$boot/vmlinux ]; then
-		kernel="/${boot}vmlinux"
-	fi
-	fi
-	db_subst nobootloader/confirmation_common ROOT "${rootfs}"
-	db_subst nobootloader/confirmation_common KERNEL_LOC "${kernel}"
-	db_input high nobootloader/confirmation_common || true
-fi
+case "$ARCH","$SUBARCH" in
+	powerpc,chrp_pegasos)
+		kernel=`ls /target/boot/vmlinuz-2.* | /target/bin/sed -e 's%/target/boot/%%'`
+
+		kind=`echo $bootfs | sed -e 's%/dev/%%' -e 's%/host.*$%%'`
+		host=`echo $bootfs | sed -e 's%^.*host%%' -e 's%/bus.*$%%'`
+		bus=`echo $bootfs | sed -e 's%^.*bus%%' -e 's%/target.*$%%'`
+		target=`echo $bootfs | sed -e 's%^.*target%%' -e 's%/lun.*$%%'`
+		lun=`echo $bootfs | sed -e 's%^.*lun%%' -e 's%/part.*$%%'`
+		part=$((`echo $bootfs | sed -e 's%^.*part%%'`-1))
+
+		# We don't know how to map non ide or scsi disks
+		# and we have trouble when there is more than one such controller.
+		case "$kind","$host" in
+			ide,0) path="/pci/ide/disk@$bus,$target"
+				;;
+			scsi,0) path="/pci/scsi/disk@$bus,$target,$lun"
+				;;
+			*) path="<unknown path>"
+				;;
+		esac
+
+		# map theidevice to the OF aliases from /proc/device-tree/aliases.
+		if [ -d /proc/device-tree/aliases ]; then
+			for alias in `ls /proc/device-tree/aliases/*`; do
+				device=`grep disk $alias | sed -e 's%@[^/]*/%/%g'`
+				if [ "$path" = "$device" ]; then
+					path=`echo $alias | sed -e 's%/proc/device-tree/aliases/%%'`
+				fi
+			done
+		fi
+
+		bootcmd="boot ${path}:${part} ${boot}${kernel} root=${rootfs}"
+
+		db_subst nobootloader/confirmation KERNEL_BOOT "${bootcmd}"
+		db_input high nobootloader/confirmation || true
+	;;
+	*)
+		db_get debian-installer/kernel/linux/link_in_boot
+		link_in_boot="$RET"
+		if [ "$link_in_boot" = "true" ]; then
+			boot="boot/"
+		else
+			boot=""
+		fi
+		if [ -e /target$boot/vmlinuz ]; then
+			kernel="/${boot}vmlinuz"
+		else if [ -e /target$boot/vmlinux ]; then
+			kernel="/${boot}vmlinux"
+		fi
+		fi
+
+		db_subst nobootloader/confirmation_common ROOT "${rootfs}"
+		db_subst nobootloader/confirmation_common KERNEL_LOC "${kernel}"
+		db_input high nobootloader/confirmation_common || true
+	;;
+esac
 
 db_go || true
