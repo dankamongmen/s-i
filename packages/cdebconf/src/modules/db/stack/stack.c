@@ -56,7 +56,6 @@
 
 static int stack_template_db_initialize(struct template_db *db, struct configuration *cfg)
 {
-     char buf[256];
      struct template_stack *tstack = NULL;
      struct configitem *tmp, *child;
      
@@ -192,7 +191,6 @@ static int stack_question_db_initialize(struct question_db *db, struct configura
 {
      struct question_stack *qstack = NULL;
      struct configitem *tmp, *child;
-     char buf[256];
 
      tmp = cfg->tree(cfg, "config::instance::configdb::stack");
      for (child = tmp->child; child != NULL; child = child->next) {
