@@ -67,54 +67,6 @@ int isdefault(struct package_t *p) {
 	return ret;
 }
 
-/* The visit function for the depth-first traversal */
-static void
-dfs_visit(struct package_t *p, struct linkedlist_t *queue)
-{
-	struct package_t *q;
-	struct list_node *node;
-	int i;
-
-	p->processed = 1;
-	for (i = 0; p->depends[i] != NULL; i++) {
-		q = p->depends[i]->ptr;
-		if (q == NULL)
-			continue;
-		if (!q->processed)
-			dfs_visit(q, queue);
-	}
-	/* Note that since we consider the list a queue and append in the end
-	 * we will actually get a "reversed" toposort, but that's what we want.
-	 */
-	node = (struct list_node *)malloc(sizeof(struct list_node));
-	node->data = p;
-	node->next = NULL;
-	if (queue->tail == NULL)
-		queue->head = queue->tail = node;
-	else {
-		queue->tail->next = node;
-		queue->tail = node;
-	}
-}
-
-/* Create a topological order of the packages, packages with few or no
- * dependencies will come first */
-static struct linkedlist_t *
-topological_order(struct package_t **packages, const int pkg_count)
-{
-	struct linkedlist_t *list;
-	int i;
-
-	list = (struct linkedlist_t *)malloc(sizeof(struct linkedlist_t));
-	list->head = list->tail = NULL;
-	for (i = 0; i < pkg_count; i++)
-		packages[i]->processed = 0;
-	for (i = 0; i < pkg_count; i++)
-		if (!packages[i]->processed)
-			dfs_visit(packages[i], list);
-	return list;
-}
-
 /* Expects a topologically ordered linked list of packages. */
 static struct package_t *
 get_default_menu_item(struct linkedlist_t *list)
@@ -185,7 +137,7 @@ struct package_t *show_main_menu(struct linkedlist_t *list) {
 	
 	/* Order menu so depended-upon packages come first. */
 	/* The menu number is really only used to break ties. */
-	olist = topological_order(package_list, num);
+	olist = di_pkg_toposort_arr(package_list, num);
 
 	/*
 	 * Generate list of menu choices for debconf.
