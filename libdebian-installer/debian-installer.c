@@ -388,11 +388,13 @@ di_pkg_is_virtual(struct package_t *p)
 int
 di_pkg_is_installed(struct package_t *p)
 {
+    struct package_t *q;
     int i;
 
     for (i = 0; p->depends[i] != NULL; i++)
     {
-        if (p->depends[i]->ptr != NULL && di_pkg_provides(p->depends[i]->ptr, p) && p->status == installed)
+        q = p->depends[i]->ptr;
+        if (q != NULL && di_pkg_provides(q, p) && q->status == installed)
             return 1;
     }
     return (p->status == installed);
