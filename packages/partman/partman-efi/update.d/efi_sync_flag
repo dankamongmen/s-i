@@ -23,6 +23,21 @@ method=
 if [ -f $id/method ]; then
     method=$(cat $id/method)
 fi
+filesys=
+if [ -f $id/filesystem ]; then
+    filesys=$(cat $id/filesystem)
+fi
+
+if [ "$method" = keep -a "$filesys" = efi -a "$filesys" != "$fs" ]; then
+    method=format
+fi
+
+if [ "$method" = format -a "$filesys" = efi ]; then
+    echo efi >$id/method
+    method=efi
+    rm $id/mountpoint
+    rm $id/visual_mountpoint
+fi
 
 flags=''
 open_dialog GET_FLAGS $id
@@ -47,9 +62,6 @@ if [ "$method" = efi -a ! -f $id/bootable ]; then
     >$id/bootable
     >$id/efi_bootable
     RET=''
-    db_metaget partman/filesystem_short/efi description || RET='EFI'
-    printf "${RET:-efi}" >$id/visual_filesystem
-    printf "${RET:-efi}" >$id/visual_mountpoint
 elif [ "$method" != efi -a -f $id/bootable -a -f $id/efi_bootable ]; then
     open_dialog SET_FLAGS $id
     write_line "$flags"
@@ -57,6 +69,4 @@ elif [ "$method" != efi -a -f $id/bootable -a -f $id/efi_bootable ]; then
     close_dialog
     rm $id/bootable
     rm $id/efi_bootable
-    rm $id/visual_filesystem
-    rm $id/visual_mountpoint
 fi
