@@ -436,7 +436,7 @@ command_metaget(struct confmodule *mod, char *arg)
         return out;
     }
 
-    value = question_get_field(q, NULL, argv[1]);
+    value = question_get_field(q, "", argv[1]);
     if (value == NULL)
         asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, argv[1]);
     else
