@@ -26,13 +26,16 @@ void loadtemplate(const char *filename, const char *owner,
 		{
 			q = question_new(t->tag);
 			q->template = t;
+                        question_ref(q);
 		}
 		question_owner_add(q, owner);
 		if (g_questions->methods.set(g_questions, q) != DC_OK)
 			INFO(INFO_ERROR, "Cannot add question %s", t->tag);
+                fprintf(stderr, "\t\t%p\n\t\t%s\n",q,q->tag);
 		question_deref(q);
 		t = t->next;
 	}
+        
 }
 
 int main(int argc, char **argv)
@@ -40,6 +43,7 @@ int main(int argc, char **argv)
 	struct configuration *config;
 	struct question_db *qdb;
 	struct template_db *tdb;
+        struct question *q;
 
 	/* parse the configuration info */
 	config = config_new();
@@ -54,15 +58,17 @@ int main(int argc, char **argv)
 		DIE("Cannot initialize DebConf question database");
 
 	/* load templates */
-	qdb->methods.load(qdb);
 	tdb->methods.load(tdb);
-
+        qdb->methods.load(qdb);
         loadtemplate("test.templates","foo", tdb, qdb);
+        q = qdb->methods.get(qdb,"test/boolean");
+
+        fprintf(stderr, "\t\t%p\n", q);
+        fprintf(stderr, "\t\t%s\n", q->tag);
 
 	/* shutting down .... sync the database and shutdown the modules */
-	qdb->methods.save(qdb);
+        qdb->methods.save(qdb);
 	tdb->methods.save(tdb);
-
 	template_db_delete(tdb);
 	question_db_delete(qdb);
 
