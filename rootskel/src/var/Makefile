@@ -1,5 +1,5 @@
 dir = var
 
-subdirs = lib log
+subdirs = lib log run
 
 include ../Makefile.inc
