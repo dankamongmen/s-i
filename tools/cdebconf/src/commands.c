@@ -523,15 +523,15 @@ int command_x_loadtemplatefile(struct confmodule *mod, int argc, char **argv,
 int command_progress(struct confmodule *mod, int argc, char **argv, 
                      char *out, size_t outsize)
 {
-    char buf[1024];
-    int i, min, max;
+    int min, max;
+    struct question *q = NULL;
+    const char *value;
 
     CHECKARGC(>= 1);
-    buf[0] = 0;
 
     if (strcasecmp(argv[1], "start") == 0)
     {
-        CHECKARGC(>= 4);
+        CHECKARGC(== 4);
 
         min = atoi(argv[2]);
         max = atoi(argv[3]);
@@ -543,18 +543,42 @@ int command_progress(struct confmodule *mod, int argc, char **argv,
             return DC_NOTOK;
         }
 
-        for (i = 4; i <= argc; i++)
-            strvacat(buf, sizeof(buf), argv[i], " ", NULL);
+        q = mod->questions->methods.get(mod->questions, argv[4]);
+        if (q == NULL)
+        {
+            snprintf(out, outsize, "%u %s does not exist",
+                    CMDSTATUS_BADQUESTION, argv[4]);
+            return DC_NOTOK;
+        }
+        value = question_get_field(q, "", "description");
+        if (value == NULL)
+        {
+            snprintf(out, outsize, "%u %s description field does not exist",
+                    CMDSTATUS_BADQUESTION, argv[4]);
+            return DC_NOTOK;
+        }
         mod->frontend->methods.progress_start(mod->frontend,
-            min, max, buf);
+            min, max, value);
     }
     else if (strcasecmp(argv[1], "step") == 0)
     {
-        CHECKARGC(>= 3);
-        for (i = 3; i <= argc; i++)
-            strvacat(buf, sizeof(buf), argv[i], " ", NULL);
+        CHECKARGC(== 3);
+        q = mod->questions->methods.get(mod->questions, argv[3]);
+        if (q == NULL)
+        {
+            snprintf(out, outsize, "%u %s does not exist",
+                    CMDSTATUS_BADQUESTION, argv[3]);
+            return DC_NOTOK;
+        }
+        value = question_get_field(q, "", "description");
+        if (value == NULL)
+        {
+            snprintf(out, outsize, "%u %s description field does not exist",
+                    CMDSTATUS_BADQUESTION, argv[3]);
+            return DC_NOTOK;
+        }
         mod->frontend->methods.progress_step(mod->frontend,
-            atoi(argv[2]), buf);
+            atoi(argv[2]), value);
     }
     else if (strcasecmp(argv[1], "stop") == 0)
     {
