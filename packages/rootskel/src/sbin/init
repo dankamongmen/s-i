@@ -24,11 +24,13 @@ if [ "`uname -r | grep '^2.2.'`" = "" ]; then
 else
 	rm /sbin/init
 	mount /proc
-	. /lib/debian-installer/detect-console
+	if grep VME /proc/hardware; then
+		. /lib/debian-installer/detect-console
         if [ $TERM_TYPE = "serial" ]; then
                 for i in 2 3 4 5; do
                         rm -f /dev/vc/$i
                 done
         fi
+	fi
 	exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
 fi
