@@ -20,6 +20,7 @@
 #include <linux/serial.h>
 #include <locale.h>
 #include <sys/ioctl.h>
+#include <sys/sysmacros.h>
 #include "nls.h"
 #include "xmalloc.h"
 #include "kbd-chooser.h"
@@ -567,24 +568,26 @@ char *keyboard_parse (char *reply)
 sercon_state
 check_if_serial_console (void)
 {
-	int fd;
-	struct serial_struct sr;
+	int maj;
 	sercon_state present = SERIAL_UNKNOWN;
 	struct debconfclient *client = mydebconf_get ();
+	struct stat sb;
+	unsigned char twelve = 12;
 
-	// Some UARTs don't support the TIOCGSERIAL ioctl(), so also
-	// try to detect serial console via cmdline
-	if ((grep("/proc/cmdline","console=ttyS") == 0) ||
-	    (grep("/proc/cmdline","console=ttys") == 0)) {
-		present = SERIAL_PRESENT;
-	} else {
-		fd = open ("/dev/console", O_NONBLOCK);
-		if (fd == -1)
-			return SERIAL_UNKNOWN;
-		present = (ioctl (fd, TIOCGSERIAL, &sr) == 0) ? SERIAL_PRESENT : SERIAL_ABSENT;
-		debconf_set (client,  "debian-installer/serial-console", present ? "true" : "false");
-		close (fd);
+	fstat(0, &sb);
+	maj = major(sb.st_rdev);
+
+	if (maj != 3 && (maj < 136 || maj > 143)) {
+	  if (ioctl(0, TIOCLINUX, &twelve) < 0) {
+	    present = SERIAL_PRESENT;
+	  } else {
+	    present = SERIAL_ABSENT;
+	  }
 	}
+	else
+	  present = SERIAL_ABSENT;
+	
+	debconf_set (client, "debian-installer/serial-console", present ? "true" : "false");
 	di_info ("Setting debian-installer/serial-console to %s", present ? "true" : "false");
 	return present;
 }
