@@ -4,8 +4,13 @@ ram=$(expr 000000"$ram" : '0*\(.*\)......$') # convert to megabytes
 
 # This is the max memory footprint of the installer in non lowmem mode
 # up to running the partitioner.
-# TODO varies by arch
-needed=45
+ARCH=`udpkg --print-architecture`
+case $ARCH in
+	i386) needed=45 ;;
+	mips) needed=25 ;;
+	mipsel) needed=25 ;;
+	*) needed=45 ;;
+esac
 
 if [ "$ram" -lt "$needed" ]; then
 	touch /var/lib/lowmem
