@@ -35,8 +35,12 @@ char *debconf_list(char *list[]) {
 
 /* Returns an array of hostnames of mirrors in the specified country. */
 char **mirrors_in(char *country) {
-	char **ret;
-	//TODO
+	char **ret=malloc(100 * sizeof(char *)); // TODO: don't hardcode size
+	int i, j;
+	for (i = j = 0; mirrors_http[i].country != NULL; i++)
+		if (strcmp(mirrors_http[i].country, country) == 0)
+			ret[j++]=mirrors_http[i].site;
+	ret[j]=NULL;
 	return ret;
 }
 
@@ -55,11 +59,13 @@ int main (int argc, char **argv) {
 	int manual_entry;
 	char *list;
 	char *mirror;
-
-	/* Use a state machine to allow jumping back to previous questions. */
 	int state = 1;
-	#define ENDSTATE 3
-	while (state != 0 && state != ENDSTATE) {
+	
+	debconf_command("CAPB", "backup", NULL);
+	debconf_command("TITLE", "Choose mirror", NULL); //TODO: i18n
+	
+	/* Use a state machine to allow jumping back to previous questions. */
+	while (state != 0 && state != 3) {
 		switch (state) {
 		case 1:
 			/* Prompt for the country. */
@@ -71,10 +77,10 @@ int main (int argc, char **argv) {
 			break;
 		case 2:
 			debconf_command("GET", DEBCONF_BASE "country", NULL);
-			manual_entry = strcmp(debconf_ret, "enter information manually");
+			manual_entry = ! strcmp(debconf_ret(), "enter information manually");
 			if (! manual_entry) {
 				/* Prompt for mirror in selected country. */
-				list=debconf_list(mirrors_in(debconf_ret));
+				list=debconf_list(mirrors_in(debconf_ret()));
 				debconf_command("SUBST",
 					DEBCONF_BASE "http/mirror",
 					"mirrors", list, NULL);
