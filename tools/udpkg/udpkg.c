@@ -1,4 +1,4 @@
-/* $Id: udpkg.c,v 1.20 2000/12/07 23:03:33 joeyh Exp $ */
+/* $Id: udpkg.c,v 1.21 2000/12/07 23:09:07 joeyh Exp $ */
 #include "udpkg.h"
 
 #include <errno.h>
@@ -57,6 +57,8 @@ static int dpkg_copyfile(const char *src, const char *dest)
 		if (write(outfd, buf, r) < 0)
 			return -1;
 	}
+	close(outfd);
+	close(infd);
 	if (r < 0) return -1;
 	times.actime = srcStat.st_atime;
 	times.modtime = srcStat.st_mtime;
@@ -74,7 +76,6 @@ static int dpkg_doconfigure(struct package_t *pkg)
 	snprintf(postinst, sizeof(postinst), "%s%s.postinst", INFODIR, pkg->package);
 	if (is_file(postinst))
 	{
-
 		snprintf(buf, sizeof(buf), "%s configure", postinst);
 		if ((r = do_system(buf)) != 0)
 		{
