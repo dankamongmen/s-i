@@ -36,6 +36,24 @@ Each of these methods have a signature defined in database.h. All methods
 have a sensible default implementation (usually doing nothing) so that 
 you only need to override the ones you need.
 
+Method descriptions:
+
+initialize: initialize data structures, like cache
+shutdown: free data structures, like cache
+load: read in the database structure from a file
+save: save the database structure back to a file
+
+template_set, question_set: 
+ Don't think that you can view the template pointer as a linked list
+ -- the only one you are supposed to touch is the template you have
+ been given a pointer to.  Ditto for question_set.  Be sure not return
+ a pointer into any private data structures (use
+ template_dup/question_dup).
+
+template_iterate, question_iterate:
+ Iterate over all the questions/templates using the void** as a mean
+ to knowing where in the list of templates you are.
+
 /* TODO: describe each method */
 
 See modules/db/* for some examples.
@@ -64,4 +82,4 @@ you only need to override the ones you need.
 
 See modules/frontend/* for examples.
 
-$Id: modules.txt,v 1.1 2000/12/09 07:52:16 tausq Exp $
+$Id: modules.txt,v 1.2 2002/05/18 22:36:01 tfheen Exp $
