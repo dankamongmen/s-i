@@ -13,6 +13,9 @@ case "`/bin/archdetect`" in
         # The Broadcom is a normal ATX board with standard IDE/SCSI devices
         cfdisk $DISK
         ;;
+"mipsel/cobalt")
+        cfdisk $DISK
+        ;;
 *)
         fdisk $DISK
         ;;
