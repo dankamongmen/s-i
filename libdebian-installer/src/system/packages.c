@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.13 2004/03/09 17:10:29 waldi Exp $
+ * $Id: packages.c,v 1.14 2004/03/15 10:12:37 waldi Exp $
  */
 
 #include <config.h>
@@ -125,7 +125,7 @@ bool di_system_package_check_subarchitecture (di_package *package, const char *s
 cleanup:
   free (string);
 
-  return false;
+  return ret;
 }
 
 di_parser_info *di_system_package_parser_info (void)
