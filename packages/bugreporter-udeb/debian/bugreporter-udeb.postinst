@@ -7,7 +7,7 @@ PATH=/target/bin:$PATH
 export PATH
 
 if [ "" = "$DILOGDIR" ]; then
-	DILOGDIR=/target/var/log/debian-installer
+	DILOGDIR=/var/log/
 fi
 
 if [ "" = "$FLOPPYMNT" ]; then
@@ -35,10 +35,10 @@ db_go
 # them in $DILOGDIR
 db_progress START 0 5 prebaseconfig/progress/bugreporter-udeb
 
-cp -a /var/log/* $DILOGDIR || true
+#cp -a /var/log/* $DILOGDIR || true
 db_progress STEP 1
 
-copy_cdebconf_db $DILOGDIR/cdebconf-copy
+#copy_cdebconf_db $DILOGDIR/cdebconf-copy
 db_progress STEP 1
 
 /bin/package-versions > $DILOGDIR/package-versions
@@ -82,15 +82,15 @@ if mountfloppy ; then
 	# This fail because busybox tar is not compiled with creation support
 	tar zcf /tmp/debuginfo.tgz /var/log /target/var/log 
 	if [ -f /tmp/debuginfo.tgz ]; then
-    	# copy tarball into floppy
+    		# copy tarball into floppy
 		cp /tmp/debuginfo.tgz /floppy
 	else
-    # At least copy something to the floppy.
-	for file in \
-		/var/log/messages \
-		/var/log/syslog \
-		$DILOGDIR/hardware-summary \
-		$DILOGDIR/package-versions; do 
+		# At least copy something to the floppy.
+		for file in \
+		    /var/log/messages \
+		    /var/log/syslog \
+		    $DILOGDIR/hardware-summary \
+		    $DILOGDIR/package-versions; do 
 			cp $file /floppy/
     		done
 	fi
@@ -104,5 +104,3 @@ else
 	db_input critical bugreporter-udeb/no_floppy || [ $? -eq 30 ]
 	db_go
 fi
-
-#DEBHELPER#
