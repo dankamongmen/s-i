@@ -232,7 +232,7 @@ static int provides(struct package_t *p, const char *what)
  */
 static int satisfy_virtual(struct package_t *p) {
 	struct debconfclient *debconf;
-	struct package_t *dep;
+	struct package_t *dep, *defpkg = NULL;
 	char *configcommand;
 	int i, ret;
 	char *choices, *defval;
@@ -241,6 +241,9 @@ static int satisfy_virtual(struct package_t *p) {
 
 	choices = malloc(1);
 	choices[0] = '\0';
+	/* Compile a list of providing package. The default choice will be the
+	 * package with highest priority. If we have ties, menu items are
+	 * preferred. If we still have ties, the default choice is arbitrary */
 	for (i = 0; p->depends[i] != 0; i++) {
 		if ((dep = tree_find(p->depends[i])) == NULL)
 			continue;
@@ -256,6 +259,10 @@ static int satisfy_virtual(struct package_t *p) {
 			choices[0] = '\0';
 			break;
 		}
+		if (defpkg == NULL || dep->priority > defpkg->priority ||
+				(dep->priority == defpkg->priority &&
+				 dep->installer_menu_item))
+			defpkg = dep;
 		/* This only makes sense if one of the dependencies
 		 * is a menu item */
 		if (dep->installer_menu_item)
@@ -270,10 +277,8 @@ static int satisfy_virtual(struct package_t *p) {
 	if (choices[0] != '\0') {
 		if (is_menu_item) {
 			/* Only let the user choose if one of them is a menu item */
-			/* TODO: package with highest priority should be default */
-			defval = strrchr(choices, ',');
-			if (defval != NULL && defval[1] != '\0')
-				defval += 2;
+			if (defpkg != NULL)
+				defval = defpkg->description;
 			else
 				defval = "";
 			debconf = debconfclient_new();
