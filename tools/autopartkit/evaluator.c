@@ -11,72 +11,29 @@
 
 #include "autopartkit.h"
 
-int token; /* global token variable */
-double value;
+static const char *origstr;
+static const char *str;
+static int token;
 
-char *str, *origstr;
+/* forward declarations, as it is called recursively */
+static double expr(void);
 
-/* forward declarations, as they are called recursively */
-double expr(void);
-double term(void);
-double factor(void);
-
-void eval_error(void)
+static void eval_error(void)
 {
-    autopartkit_error(1, "Could not parse expression '%s', error at position %d\n",
-        origstr, str - origstr);
-    exit(1);
+    autopartkit_error(1, "Could not parse expression '%s', "
+		      "error at position %d\n",
+		      origstr, str - origstr);
 }
 
-void match(int expected_token)
+static void match(int expected_token)
 {
-    if(token == expected_token) token = *str++; 
-    else eval_error();
+    if(token == expected_token)
+        token = *str++; 
+    else
+        eval_error();
 }
 
-double evaluate(char *expression)
-{
-    str = origstr = expression;
-    token = *str++;
-    return expr();
-}
-
-double expr()
-{
-    double temp = term();
-    while ((token == '+') || (token == '-')) {
-        switch(token) {
-        case '+': 
-            match('+');
-            temp += term();
-            break;
-        case '-':
-            match('-');
-            temp -= term();
-            break;
-        }
-    }
-    return temp;
-}
-
-double term()
-{
-    double temp = factor();
-    while ((token == '*') || (token == '/'))
-        switch(token) {
-        case '*': 
-            match('*');
-            temp *= factor();
-            break;
-        case '/':
-            match('/');
-            temp /= factor();
-            break;
-    }
-    return temp;
-}
-
-double factor(void)
+static double factor(void)
 {
     char buf[256];
     int buflen = 0;
@@ -113,4 +70,46 @@ double factor(void)
     }
     
     return temp;
+}
+
+static double term(void)
+{
+    double temp = factor();
+    while ((token == '*') || (token == '/'))
+        switch(token) {
+        case '*': 
+            match('*');
+            temp *= factor();
+            break;
+        case '/':
+            match('/');
+            temp /= factor();
+            break;
+    }
+    return temp;
+}
+
+static double expr(void)
+{
+    double temp = term();
+    while ((token == '+') || (token == '-')) {
+        switch(token) {
+        case '+': 
+            match('+');
+            temp += term();
+            break;
+        case '-':
+            match('-');
+            temp -= term();
+            break;
+        }
+    }
+    return temp;
+}
+
+double evaluate(const char *expression)
+{
+    str = origstr = expression;
+    token = *str++;
+    return expr();
 }

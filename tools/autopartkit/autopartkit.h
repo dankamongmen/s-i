@@ -98,7 +98,6 @@ int make_path(const char *pathname, mode_t mode);
 #define DEFAULT_FS "ext2"
 
 /* from evaulator.c */
-void eval_error(void);
-double evaluate(char *expression);
+double evaluate(const char *expression);
 
 #endif /* AUTOPARTKIT_H */
