@@ -71,10 +71,34 @@ check_proc_mounts(const char *mntpoint)
         sscanf(buf, "%*s %s", mnt);
         if (strcmp(tmp, mnt) == 0) {
             free(tmp);
+            fclose(fp);
             return 1;
         }
     }
     free(tmp);
+    fclose(fp);
+    return 0;
+}
+
+/*
+ * Check if the given device is already activated as a swap
+ */
+int
+check_proc_swaps(const char *dev)
+{
+    FILE *fp;
+    char buf[1024];
+
+    if ((fp = fopen("/proc/swaps", "r")) == NULL)
+        return 0;
+    fgets(buf, sizeof(buf), fp);
+    while (fgets(buf, sizeof(buf), fp) != NULL) {
+        if (strstr(buf, dev) == buf) {
+            fclose(fp);
+            return 1;
+        }
+    }
+    fclose(fp);
     return 0;
 }
 
@@ -92,3 +116,19 @@ append_message(const char *fmt, ...)
     va_end(ap);
 }
 
+/*
+ * Counts the number of occurrences of c in s
+ */
+int
+strcount(const char *s, int c)
+{
+    const char *p;
+    int ret = 0;
+
+    p = s;
+    while ((p = index(p, c)) != NULL) {
+        ret++;
+        p++;
+    }
+    return ret;
+}

@@ -37,7 +37,9 @@ struct partition {
 char    *size_desc(long long bytes);
 void     modprobe(const char *mod);
 int      check_proc_mounts(const char *mntpoint);
+int      check_proc_swaps(const char *dev);
 void     append_message(const char *fmt, ...);
+int      strcount(const char *s, int c);
 
 /* find-parts.c */
 int      get_all_partitions(struct partition *parts[], const int max_parts);

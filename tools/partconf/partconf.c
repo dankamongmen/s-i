@@ -30,20 +30,34 @@ my_exception_handler(PedException* ex)
     return PED_EXCEPTION_CANCEL;
 }
 
+// True if any partition will get a new file system
+int
+will_mkfs(void)
+{
+    int i;
+
+    for (i = 0; i < part_count; i++) {
+        if (parts[i]->op.filesystem != NULL)
+            return 1;
+    }
+    return 0;
+}
+
 char *
 build_part_choices(struct partition *parts[], const int part_count)
 {
     char *list[part_count];
     char *tmp, *tmp2;
-    int i, max_len;
+    int i, max_len, len;
 
     //printf("part_count=%d\n", part_count);
     if (part_count <= 0)
         return NULL;
     max_len = 0;
     for (i = 0; i < part_count; i++) {
-        if (strlen(parts[i]->description) > max_len)
-            max_len = strlen(parts[i]->description);
+        len = strlen(parts[i]->description) - strcount(parts[i]->description, ',');
+        if (len > max_len)
+            max_len = len;
     }
     // pad with spaces
     for (i = 0; i < part_count; i++) {
@@ -253,14 +267,20 @@ sanity_checks(void)
     }
     if (!ok)
         return 0;
-    // Confirm
-    debconf->command(debconf, "SET", "partconf/confirm", "false", NULL);
-    debconf->command(debconf, "INPUT critical", "partconf/confirm", NULL);
-    if (debconf->command(debconf, "GO", NULL) == 30)
-        return 0;
-    debconf->command(debconf, "GET", "partconf/confirm", NULL);
-    if (strcmp(debconf->value, "false") == 0)
-        return 0;
+    if (will_mkfs()) {
+        // Confirm
+        // XXX Can we build a sane substitution string? Would be nice to say
+        // XXX something like "Partitions 1, 3 and 7 on IDE3 master", but this
+        // XXX is probably hard, especially for i18n. :-( If multi-line
+        // XXX substitutions worked, we could just list the partitions.
+        debconf->command(debconf, "SET", "partconf/confirm", "false", NULL);
+        debconf->command(debconf, "INPUT critical", "partconf/confirm", NULL);
+        if (debconf->command(debconf, "GO", NULL) == 30)
+            return 0;
+        debconf->command(debconf, "GET", "partconf/confirm", NULL);
+        if (strcmp(debconf->value, "false") == 0)
+            return 0;
+    }
     return 1;
 }
 
@@ -311,7 +331,6 @@ makedirs(const char *dir)
     }
 }
 
-#define MK_SWAP(p)  ((p)->op.filesystem != NULL && strcmp((p)->op.filesystem, "swap"))
 // This is a swap partition IFF
 //   The new fs is swap
 // or
@@ -355,16 +374,15 @@ finish(void)
             }
         }
         if (fs != NULL) {
-            if (strcmp(fs, "swap") == 0) {
+            if (strcmp(fs, "swap") == 0 && !check_proc_swaps(parts[i]->path)) {
                 // Activate swap
                 append_message("partconf: Activating swap on %s\n", parts[i]->path);
                 asprintf(&cmd, "swapon %s >/dev/null 2>>/var/log/messages", parts[i]->path);
                 ret = system(cmd);
                 free(cmd);
                 /* 
-                 * Should this actually be fatal?
-                 * FIXME: If this is fatal, things will break horribly on a second
-                 * invocation of partconf... :(
+                 * Since we check if the swap is already activated, it may
+                 * make sense to make this fatal. For now, it is, anyway.
                  */
                 if (ret != 0) {
                     errq = "partconf/failed-swapon";
