@@ -26,20 +26,13 @@ load_modules()
     echo $old > /proc/sys/kernel/printk
 }
 
-load_floppy_driver() {
-    if [ ! -d /dev/floppy ] ; then
-        load_modules floppy
-    fi
-    if [ ! -d /dev/floppy ] ; then
-        log "error: Unable to load floppy device driver"
-    fi
-    floppydev=/dev/floppy/0
-}
-
 log "Detecting hardware..."
 
 # Return list of lines with "Kernel module<tab>Vendor<tab>Model"
 get_hw_info() {
+    # Try to make sure the floppy driver is available
+    echo "floppy	Linux	Floppy driver"
+
     /sbin/discover --format="%m\t%V\t%M\n" \
 	--disable-all --enable=pci,ide,scsi,pcmcia scsi cdrom
     # Manually load modules to enable things we can't detect.
@@ -103,31 +96,36 @@ do
         then
                 :
         else
-            while true
-            do
-	        template=hwdetect/not_included
-		db_fset "$template" seen false || true
-		db_subst "$template" vendor "$name" || true
-		db_subst "$template" module $module || true
-		db_input medium "$template" || true
-		db_go || true
-		db_get "$template" || true
-                mounted=0
-                if [ "$RET" != "true" ]
-                then
-                    break
-                fi
-                load_floppy_driver
-                if mount -t ext2 $floppydev /mnt
-                then
-                    if [ -f /mnt/modules.tgz ]
-                    then
-                        mounted=1
-                        break
-                    fi
-                    umount /mnt
-                fi
-            done
+	    if [ ! -d /dev/floppy ] ; then
+		log "error: Unable to load floppy device driver"
+		log "error: no way to load extra modules from floppy"
+	    else
+		while true
+		do
+		    template=hwdetect/not_included
+		    db_fset "$template" seen false || true
+		    db_subst "$template" vendor "$name" || true
+		    db_subst "$template" module $module || true
+		    db_input medium "$template" || true
+		    db_go || true
+		    db_get "$template" || true
+		    mounted=0
+		    if [ "$RET" != "true" ]
+			then
+			break
+		    fi
+
+		    if mount -t ext2 /dev/floppy/0 /mnt
+		    then
+			if [ -f /mnt/modules.tgz ]
+			then
+			    mounted=1
+			    break
+			fi
+			umount /mnt
+		    fi
+		done
+	    fi
 
             if [ "$mounted" = "1" ]
             then
