@@ -74,7 +74,7 @@ while [ 1 ]; do
 		db_subst cdrom-checker/progress_step FILE "$file"
 		db_progress STEP 1 cdrom-checker/progress_step
 		echo "$sum  $file" >$TMPFILE
-		md5sum -c $TMPFILE
+		md5sum -c $TMPFILE 1>/dev/null 2>&1
 		if [ $? -ne 0 ]; then
 			echo -n "$2" >$TMPFILE
 			break
