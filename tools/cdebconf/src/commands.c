@@ -163,18 +163,17 @@ int command_endblock(struct confmodule *mod, int argc, char **argv,
 int command_go(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	struct question *q;
-
 	CHECKARGC(== 0);
 	if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
+	{
 		snprintf(out, outsize, "%u backup", CMDSTATUS_GOBACK);
-    else 
-    {
-        snprintf(out, outsize, "%u ok", CMDSTATUS_SUCCESS);
-        /* FIXME  questions should be tagged when closing session */
-        for (q = mod->frontend->questions; q != NULL; q = q->next)
-            q->flags |= DC_QFLAG_SEEN;
-    }
+		mod->update_seen_questions(mod, -1);
+	}
+	else
+	{
+		snprintf(out, outsize, "%u ok", CMDSTATUS_SUCCESS);
+		mod->update_seen_questions(mod, 1);
+	}
 	mod->frontend->methods.clear(mod->frontend);
 
 	return DC_OK;

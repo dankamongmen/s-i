@@ -17,12 +17,13 @@ struct frontend;
 struct confmodule {
 	struct configuration *config;
 	struct template_db *templates;
-    struct question_db *questions;
+	struct question_db *questions;
 	struct frontend *frontend;
 	pid_t pid;
 	int infd, outfd;
 	int exitcode;
 	char *owner;
+	char **seen_questions;
 
 	/* methods */
     /*
@@ -48,6 +49,14 @@ struct confmodule {
      * @return int - exit code of the config script
      */
 	int (*shutdown)(struct confmodule *mod);
+
+    /**
+     * @brief Stack for already seen questions, to help backing up
+     * @param struct confmodule *mod - confmodule object
+     * @param int action - push, pop or sync values
+     * @return int - DC_OK, DC_NOTOK
+     */
+	int (*update_seen_questions)(struct confmodule *mod, int action);
 };
 
 /**

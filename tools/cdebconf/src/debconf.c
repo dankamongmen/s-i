@@ -28,6 +28,8 @@ static struct option options[] = {
 
 static void save()
 {
+	if (confmodule != NULL)
+		confmodule->update_seen_questions(confmodule, 0);
 	if (questions != NULL)
 		questions->methods.save(questions);
 	if (templates != NULL)

@@ -1,6 +1,8 @@
 #include "confmodule.h"
 #include "commands.h"
 #include "frontend.h"
+#include "database.h"
+#include "question.h"
 #include "strutl.h"
 
 #include <stdio.h>
@@ -170,6 +172,72 @@ static int confmodule_run(struct confmodule *mod, int argc, char **argv)
 	return pid;
 }
 
+static int confmodule_update_seen_questions(struct confmodule *mod, int action)
+{
+	struct question *q;
+	struct question *qlast = NULL;
+	int i, narg;
+
+	switch (action)
+	{
+	case 1:
+		if (mod->seen_questions == NULL)
+			narg = 0;
+		else
+			narg = sizeof(mod->seen_questions) / sizeof(char *);
+
+		i = narg;
+		for (q = mod->frontend->questions; q != NULL; q = q->next)
+			narg++;
+		if (narg == 0)
+			return DC_OK;
+
+		mod->seen_questions = (char **) realloc(mod->seen_questions, narg);
+		for (q = mod->frontend->questions; q != NULL; q = q->next)
+		{
+			*(mod->seen_questions+i) = strdup(q->tag);
+			i++;
+		}
+		break;
+	case -1:
+		if (mod->seen_questions == NULL)
+			return DC_OK;
+
+		narg = sizeof(mod->seen_questions) / sizeof(char *);
+		for (q = mod->frontend->questions; q != NULL; q = q->next)
+			qlast = q;
+
+		for (q = qlast; q != NULL; q = q->prev)
+		{
+			if (strcmp(*(mod->seen_questions + narg - 1), q->tag) != 0)
+				return DC_OK;
+			DELETE(*(mod->seen_questions + narg - 1));
+			narg --;
+		}
+		break;
+	case 0:
+		if (mod->seen_questions == NULL)
+			return DC_OK;
+
+		narg = sizeof(mod->seen_questions) / sizeof(char *);
+		for (i = 0; i < narg; i++)
+		{
+			q = mod->questions->methods.get(mod->questions, *(mod->seen_questions+i));
+			if (q == NULL)
+				return DC_NOTOK;
+			q->flags |= DC_QFLAG_SEEN;
+			DELETE(*(mod->seen_questions+i));
+		}
+		DELETE(mod->seen_questions);
+		break;
+	default:
+		/* should never happen */
+		DIE("Mismatch argument in confmodule_update_seen_questions");
+	}
+
+	return DC_OK;
+}
+
 struct confmodule *confmodule_new(struct configuration *config,
 	struct template_db *templates, struct question_db *questions, 
     struct frontend *frontend)
@@ -183,6 +251,7 @@ struct confmodule *confmodule_new(struct configuration *config,
 	mod->run = confmodule_run;
 	mod->communicate = confmodule_communicate;
 	mod->shutdown = confmodule_shutdown;
+	mod->update_seen_questions = confmodule_update_seen_questions;
 
 	/* TODO: I wish we don't need gross hacks like this.... */
 	setenv("DEBIAN_HAS_FRONTEND", "1", 1);
@@ -194,3 +263,4 @@ void confmodule_delete(struct confmodule *mod)
 {
 	DELETE(mod);
 }
+
