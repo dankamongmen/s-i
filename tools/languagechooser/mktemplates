@@ -15,6 +15,10 @@ my $templatein = shift;
 
 my $debug = 0;
 
+my $show_locales = 0;
+
+my %locales;
+
 sub get_language_names {
     my $list = shift;
     my @names;
@@ -24,8 +28,10 @@ sub get_language_names {
 	print if ($debug);
 	chomp;
 	next if m/^\#/;
-	my ($name) = split(/;/);
+	my ($name, $locale) = split(/;/);
 	push(@names, $name);
+	$locale =~ s/@.+//;
+	$locales{$name} = $locale;
     }
     close(L);
     return @names;
@@ -42,6 +48,7 @@ sub get_translations {
 	next if m/^\#/;
 	my ($name, $translation) = split(/: /);
 	$translation =~ s/,/\\,/g;
+	$translation = "$locales{$name} - $translation" if ($show_locales);
 	$translations{$name} = $translation;
     }
     close(L);
