@@ -15,7 +15,7 @@
  *        There is some rudimentary attempt at implementing the next
  *        and back functionality. 
  *
- * $Id: gtk.c,v 1.20 2003/05/11 11:59:15 sjogren Exp $
+ * $Id: gtk.c,v 1.21 2003/06/10 22:37:08 sley Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -60,7 +60,6 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <pthread.h>
 
 #include <gtk/gtk.h>
 
@@ -70,12 +69,9 @@ struct frontend_data
     GtkWidget *window; //Main window of the frontend
     GtkWidget *description_label; //Pointer to the Description Field
     GtkWidget *target_box; //Pointer to the box, where question widgets shall be stored in
-    GtkWidget *progress_bar; //Pointer to the Progress Bar when initialized
+    GtkWidget *progress_bar; //Pointer to the Progress Bar, when initialized
     struct setter_struct *setters; //Struct to register the Set Functions of the Widgets
     int button_val; //Value of the button pressed to leave a form
-    pthread_t *gtkthread; //Thread that runs gtk_main and handlers
-    pthread_mutex_t *gtkmain_lock; //Lock when gtk_main must not be runned
-    pthread_cond_t *data_ready;// Main thread will wait until gtkthread has evaluated the widgets
 };
 
 /* Embed frontend ans question in this object to pass it through an event handler */
@@ -218,7 +214,7 @@ void button_single_callback(GtkWidget *button, struct frontend_question_data* da
 
     free(data);
    
-    pthread_cond_signal(((struct frontend_data*)obj->data)->data_ready);
+    gtk_main_quit();
 }
 
 void exit_button_callback(GtkWidget *button, struct frontend* obj)
@@ -226,7 +222,7 @@ void exit_button_callback(GtkWidget *button, struct frontend* obj)
     ((struct frontend_data*)obj->data)->button_val =
 	*((int*)gtk_object_get_user_data(GTK_OBJECT(button))) ;
 
-    pthread_cond_signal(((struct frontend_data*)obj->data)->data_ready);
+    gtk_main_quit();
 }
 
 static gboolean show_description( GtkWidget *widget, struct frontend_question_data* data )
@@ -691,21 +687,10 @@ void set_window_properties(GtkWidget *window)
     gtk_window_set_decorated (GTK_WINDOW (window), TRUE);
 }
 
-GtkWidget* setup_log()
-{
-    GtkWidget *logarea;
-
-    logarea = gtk_text_view_new();
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(logarea), FALSE);
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(logarea), GTK_WRAP_CHAR);
-    return logarea;
-}
-
-
 void set_design_elements(struct frontend *obj, GtkWidget *window)
 {
     GtkWidget *mainbox, *targetbox, *description_area, *description_frame,
-        *description_scroll, *targetbox_scroll, *notebook, *label_main, *label_log;
+        *description_scroll, *targetbox_scroll;
 
     description_area = gtk_label_new("");
     gtk_misc_set_alignment(GTK_MISC (description_area), 0.0, 0.0);
@@ -733,31 +718,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
     gtk_box_pack_start(GTK_BOX (mainbox), targetbox_scroll, TRUE, TRUE, 5);
-
-    label_main = gtk_label_new("Debian Installer");
-    label_log = gtk_label_new("Log Output");
-
-    notebook = gtk_notebook_new();
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), mainbox, label_main);
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), setup_log(), label_log); 
-
-    gtk_container_add(GTK_CONTAINER(window), notebook);
-}
-
-static void init_gtkmain(struct frontend* obj)
-{
-    while (TRUE) 
-    {
-	if(gtk_events_pending ())
-	{
-	    pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
-	    while (gtk_events_pending ())
-	    {
-		gtk_main_iteration ();
-	    }
-	    pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
-	}
-    }
+    gtk_container_add(GTK_CONTAINER(window), mainbox);
 }
 
 static int gtk_initialize(struct frontend *obj, struct configuration *conf)
@@ -783,16 +744,6 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     ((struct frontend_data*) obj->data)->window = window;
     gtk_widget_show_all(window);
 
-    ((struct frontend_data*) obj->data)->gtkmain_lock = NEW(pthread_mutex_t);
-    pthread_mutex_init(((struct frontend_data*) obj->data)->gtkmain_lock, NULL);
-
-    ((struct frontend_data*) obj->data)->data_ready = NEW(pthread_cond_t);
-    pthread_cond_init(((struct frontend_data*) obj->data)->data_ready, NULL);
-
-    ((struct frontend_data*) obj->data)->gtkthread = NEW(pthread_t);
-    pthread_create(((struct frontend_data*) obj->data)->gtkthread, NULL,
-		   (void*) &init_gtkmain, (void*) obj);
-
     return DC_OK;
 }
 
@@ -806,11 +757,10 @@ static int gtk_go(struct frontend *obj)
     if (q == NULL) return DC_OK;
 
     ((struct frontend_data*) obj->data)->setters = NULL;
-    
     questionbox = gtk_vbox_new(FALSE, 5);
     gtk_box_pack_start(GTK_BOX (((struct frontend_data*)obj->data)->target_box),
                        questionbox, FALSE, FALSE, 5);
-    pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
+
     if (strcmp(q->template->type, "note") != 0 )
         gtk_label_set_text(GTK_LABEL( ((struct frontend_data*)obj->data)->description_label), 
                            question_get_field(q, "", "extended_description")); 
@@ -830,8 +780,7 @@ static int gtk_go(struct frontend *obj)
 
     add_buttons(obj, q, questionbox);
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
-    pthread_cond_wait(((struct frontend_data*) obj->data)->data_ready,
-		      ((struct frontend_data*) obj->data)->gtkmain_lock);
+    gtk_main();
     if ( ((struct frontend_data*)obj->data)->button_val == DC_OK ) 
     {
 	call_setters(obj);
@@ -844,10 +793,8 @@ static int gtk_go(struct frontend *obj)
     }
     gtk_widget_destroy(questionbox);
     gtk_label_set_text(GTK_LABEL( ((struct frontend_data*)obj->data)->description_label),""); 
-    ret = ((struct frontend_data*)obj->data)->button_val;
-    pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
 
-    return ret;
+    return ((struct frontend_data*)obj->data)->button_val;
 }
 
 static int gtk_can_go_back(struct frontend *obj, struct question *q)
@@ -858,8 +805,6 @@ static int gtk_can_go_back(struct frontend *obj, struct question *q)
 static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
     GtkWidget *progress_bar, *target_box, *frame;
-
-    pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
 
     obj->progress_title = NULL;
     obj->progress_min = min;
@@ -876,41 +821,41 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
 
     gtk_box_pack_start(GTK_BOX(target_box), frame, FALSE, FALSE, 5);
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
-    pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
+    while (gtk_events_pending ())
+	gtk_main_iteration ();
 }
 
 static void gtk_progress_set(struct frontend *obj, int val)
 {
     gdouble progress;
 
-    pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
     obj->progress_cur = val;
     if (obj->progress_max - obj->progress_min > 0)
     {
-
         progress = (gdouble)(obj->progress_cur - obj->progress_min) /
                    (gdouble)(obj->progress_max - obj->progress_min);
 	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(((struct frontend_data*)obj->data)->progress_bar),
 				      progress);
     }
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
-    pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
+    while (gtk_events_pending ())
+	gtk_main_iteration ();
 }
 
 static void gtk_progress_info(struct frontend *obj, const char *info)
 {
-    pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(((struct frontend_data*)obj->data)->progress_bar), info);
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
-    pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
+    while (gtk_events_pending ())
+	gtk_main_iteration ();
 }
 
 static void gtk_progress_stop(struct frontend *obj)
 {
-    pthread_mutex_lock(((struct frontend_data*) obj->data)->gtkmain_lock);
     gtk_widget_destroy(gtk_widget_get_parent(((struct frontend_data*)obj->data)->progress_bar));
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
-    pthread_mutex_unlock(((struct frontend_data*) obj->data)->gtkmain_lock);
+    while (gtk_events_pending ())
+	gtk_main_iteration ();
 }
 
 
