@@ -17,7 +17,7 @@ md_get_devices() {
 
 md_delete_verify() {
 	DEVICE=`echo "$1" | sed -e "s/^\(md.*\)_.*/\1/"`
-	INFO=`cat /proc/mdstat|grep ^${DEVICE}| sed -e "s/^md.* : active \([[:alnum:]]*\) \(.*\)/\1:\2/"`
+	INFO=`cat /proc/mdstat|grep "^${DEVICE}[ :]" | sed -e "s/^md.* : active \([[:alnum:]]*\) \(.*\)/\1:\2/"`
 	TYPE=`echo ${INFO}|sed -e "s/\(.*\):.*/\1/"`
 	DEVICES=`echo ${INFO}|sed -e "s/.*:\(.*\)/\1/"`
 	NUMBER=`echo ${DEVICE}|sed -e "s/^md//"`
