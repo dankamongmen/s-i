@@ -1,0 +1,35 @@
+#!/bin/sh
+# Starts a command running in screen, with a given session name, and detaches
+# it immediatly. The screen session can then be connected to by the various
+# test scripts as a console.
+set -e
+
+session=digress-$MACHINE-$SCHEME
+
+# Check to see if this session is already running
+existing=$(screen -ls $session | grep "$session	(") || true
+if [ -n "$existing" ]; then
+	if echo $existing | grep -q "Attached"; then
+		echo "Existing attached screen session: $existing"
+		exit 1
+	else
+		echo "Killing existing screen session: $existing"
+		pid=$(echo $existing | cut -d . -f 1)
+		kill $pid
+		sleep 1
+		existing=$(screen -ls $session | grep "$session (") || true
+		if [ -n "$existing" ]; then
+			echo "Failed to kill existing session. Aborting."
+			exit 1
+		fi
+	fi
+fi
+
+rc=$(tempfile)
+cat > $rc <<"EOF"
+startup_message off
+shell $SCREEN_COMMAND
+sessionname $session
+EOF
+
+

@@ -1,0 +1,20 @@
+#!/bin/sh
+# Unpack a netboot image.
+set -e
+if [ -e "$NETBOOT_IMAGE_ALT" ] && [ "$NETBOOT_IMAGE_ALT" -nt "$NETBOOT_IMAGE" ]; then
+	echo "Using netboot image: alternate"
+	NETBOOT_IMAGE="$NETBOOT_IMAGE_ALT"
+else
+	echo "Using netboot image: primary"
+fi
+
+if [ ! -e "$NETBOOT_IMAGE" ]; then
+	error "NETBOOT_IMAGE $NETBOOT_IMAGE does not exist"
+fi
+
+(
+	cd $TFTP_DIR
+	if ! tar zxf $NETBOOT_IMAGE; then
+		error "failed to untar NETBOOT_IMAGE in $TFTP_DIR"
+	fi
+)

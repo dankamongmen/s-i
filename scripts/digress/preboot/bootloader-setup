@@ -1,0 +1,16 @@
+#!/bin/sh
+# This PREBOOT command is used to modify a boot loader config file for an
+# automatic install.
+case "$ARCH" in
+ia64)
+	sed -i \
+	    -e "s!--.*!-- $BOOT_OPTS\"!" \
+	    -e "s/default=.*/default=$BOOT_SELECTION/" \
+	    -e "s/chooser=textmenu/timeout=10/" \
+	    $TFTP_DIR/debian-installer/ia64/elilo.conf
+;;
+*)
+	echo "$0 does not support $ARCH"
+	exit 1
+;;
+esac
