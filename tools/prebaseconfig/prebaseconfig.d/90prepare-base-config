@@ -6,10 +6,6 @@ ARCH=`udpkg --print-architecture`
 
 . /usr/share/debconf/confmodule
 
-if db_get debian-installer/locale && [ "$RET" ] ; then
-    LANG_INST="$RET"
-fi
-
 if db_get mirror/distribution && [ "$RET" ] ; then
     SUITE="$RET"
 
@@ -80,7 +76,6 @@ cp /usr/share/prebaseconfig/inittab /target/etc/inittab
 
 (
     echo "# inserted by prebaseconfig"
-    echo "LANG_INST=\"$LANG_INST\""
     echo "SUITE=\"$SUITE\""
 ) >> /target/root/dbootstrap_settings
 
