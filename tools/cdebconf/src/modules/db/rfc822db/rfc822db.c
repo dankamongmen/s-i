@@ -248,7 +248,6 @@ static int rfc822db_template_load(struct template_db *db)
     const char *path;
     FILE *inf;
     struct rfc822_header *header = NULL;
-
     snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
     path = db->config->get(db->config, tmp, 0);
     if (path == NULL ||
@@ -267,7 +266,6 @@ static int rfc822db_template_load(struct template_db *db)
         memset(&tbuf,0,1024);
 
         name = rfc822db_header_lookup(header, "name");
-
         if (name == NULL)
         {
             INFO(INFO_ERROR, "Read a stanza without a name\n");

@@ -9,7 +9,7 @@
  *              of client configuration modules and communications
  *              between the debconf frontend and the confmodule
  *
- * $Id: confmodule.c,v 1.13 2002/07/01 06:58:37 tausq Exp $
+ * $Id: confmodule.c,v 1.14 2002/11/03 14:58:19 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -119,22 +119,56 @@ static int _confmodule_process(struct confmodule *mod, char *in, char *out, size
  */
 static int confmodule_communicate(struct confmodule *mod)
 {
-	char in[1024];
-	char out[1024];
+        char buf[1023];
+        char *in;
+        size_t insize = 1024;
+  	char *out;
+        size_t outsize = 1024;
 	char *inp;
 	int ret = 0;
 
-	while ((ret = read(mod->infd, in, sizeof(in))) > 0)
+        in = malloc(insize);
+        if (!in)
+                return DC_NOTOK;
+        memset(in, 0, insize);
+
+        out = malloc(outsize);
+        if (!out)
+                return DC_NOTOK;
+        memset(out, 0, outsize);
+
+	while (1)
 	{
-		in[ret] = 0;
+                ret = read(mod->infd, buf, sizeof(buf));
+                buf[ret] = 0;
+                if (ret <= 0)
+                        break;
+                strncpy(in,buf,insize-1);
+
+                while ((strlen(in) + strlen(buf) + 1) > insize) {
+                        ret = read(mod->infd, buf, sizeof(buf));
+                        buf[ret] = 0;
+                        insize += sizeof(buf);
+                        in = realloc(in, insize);
+                        if (!buf) {
+                                free(in);
+                                free(out);
+                                return DC_NOTOK;
+                        }
+                        strncat(in, buf, (insize - strlen(in)));
+                        if (ret < sizeof(buf))
+                                break;
+                }
+                if (ret <= 0)
+                  break;
 		inp = strstrip(in);
 		INFO(INFO_DEBUG, "--> %s\n", inp);
-		ret = _confmodule_process(mod, inp, out, sizeof(out) - 1);
+		ret = _confmodule_process(mod, inp, out, outsize);
 		if (ret == DC_NOTIMPL) {
 			fprintf(stderr, "E: Unimplemented function\n");
 			continue;
 		}
-		if (out[0] == 0) break; // STOP called
+                /*		if (out[0] == 0) break; // STOP called*/
 		INFO(INFO_DEBUG, "<-- %s\n", out);
 		strcat(out, "\n");
 		write(mod->outfd, out, strlen(out));

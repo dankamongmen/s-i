@@ -7,7 +7,7 @@
  *
  * Description: implementation of each command specified in the spec
  *
- * $Id: commands.c,v 1.22 2002/08/13 16:17:51 tfheen Exp $
+ * $Id: commands.c,v 1.23 2002/11/03 14:58:19 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -219,10 +219,23 @@ int command_capb(struct confmodule *mod, int argc, char **argv,
 int command_title(struct confmodule *mod, int argc, char **argv, 
 	char *out, size_t outsize)
 {
-	char buf[1024] = {0};
+        char *buf;
+        size_t bufsize = 1024;
 	int i;
-	for (i = 1; i <= argc; i++)
-		strvacat(buf, sizeof(buf), argv[i], " ", 0);	
+
+        buf = malloc(bufsize);
+        if (!buf)
+                return DC_NOTOK;
+        memset(buf, 0, bufsize);
+	for (i = 1; i <= argc; i++) {
+                while ((strlen(buf) + strlen(argv[i]) + 1) > bufsize) {
+                        bufsize += 1024;
+                        buf = realloc(buf, bufsize);
+                        if (!buf)
+                                return DC_NOTOK;
+                }
+		strvacat(buf, bufsize, argv[i], " ", 0);
+        }
 
 	mod->frontend->methods.set_title(mod->frontend, buf);
 	snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
@@ -284,12 +297,11 @@ int command_go(struct confmodule *mod, int argc, char **argv,
 	char *out, size_t outsize)
 {
 	CHECKARGC(== 0);
-
 	if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK)
 		snprintf(out, outsize, "%u backup", CMDSTATUS_GOBACK);
-	else
+	else {
 		snprintf(out, outsize, "%u OK", CMDSTATUS_SUCCESS);
-
+        }
 	mod->frontend->methods.clear(mod->frontend);
 
 	return DC_OK;
@@ -342,9 +354,15 @@ int command_set(struct confmodule *mod, int argc, char **argv,
 {
 	struct question *q;
 	int i;
-	char buf[1024];
+        char *buf;
+        size_t bufsize = 1024;
 
 	CHECKARGC(>= 2);
+
+        buf = malloc(bufsize);
+        if (!buf)
+                return DC_NOTOK;
+        memset(buf, 0, bufsize);
 
 	q = mod->questions->methods.get(mod->questions, argv[1]);
 	if (q == NULL)
@@ -352,9 +370,15 @@ int command_set(struct confmodule *mod, int argc, char **argv,
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 	{
-		buf[0] = 0;
-		for (i = 2; i <= argc; i++)
-			strvacat(buf, sizeof(buf), argv[i], " ", 0);	
+		for (i = 2; i <= argc; i++) {
+                        while ((strlen(buf) + strlen(argv[i]) + 1) > bufsize) {
+                                bufsize += 1024;
+                                buf = realloc(buf, bufsize);
+                                if (!buf)
+                                        return DC_NOTOK;
+                        }
+			strvacat(buf, bufsize, argv[i], " ", 0);
+                }
 
         /* remove the last space added */
         if (buf[0] != 0)
@@ -434,9 +458,15 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 	struct questionvariable;
 	char *variable;
 	int i;
-	char buf[1024];
+        char *buf;
+        size_t bufsize = 1024;
 
 	CHECKARGC(>= 3);
+
+        buf = malloc(bufsize);
+        if (!buf)
+                return DC_NOTOK;
+        memset(buf, 0, bufsize);
 
 	variable = argv[2];
 	q = mod->questions->methods.get(mod->questions, argv[1]);
@@ -446,11 +476,18 @@ int command_subst(struct confmodule *mod, int argc, char **argv,
 			CMDSTATUS_BADQUESTION, argv[1]);
 	else
 	{
-		buf[0] = 0;
-		strvacat(buf, sizeof(buf), argv[3], 0);	
-		for (i = 4; i <= argc; i++)
-			strvacat(buf, sizeof(buf), " ", argv[i], 0);	
+		strvacat(buf, bufsize, argv[3], 0);	
+		for (i = 4; i <= argc; i++) {
+                        while ((strlen(buf) + strlen(argv[i])) + 1 > bufsize)
+                        {
+                                bufsize += 1024;
+                                buf = realloc(buf, bufsize);
+                                if (!buf)
+                                        return DC_NOTOK;
+                        }
 
+			strvacat(buf, bufsize, " ", argv[i], 0);	
+                }
 		question_variable_add(q, variable, buf);
 
 		if (mod->questions->methods.set(mod->questions, q) != 0)

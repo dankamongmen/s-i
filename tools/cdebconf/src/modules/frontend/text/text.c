@@ -10,7 +10,7 @@
  * friendly implementation. I've taken care to make the prompts work well
  * with screen readers and the like.
  *
- * $Id: text.c,v 1.13 2002/08/07 16:19:51 tfheen Exp $
+ * $Id: text.c,v 1.14 2002/11/03 14:58:19 tfheen Exp $
  *
  * cdebconf is (c) 2000-2001 Randolph Chung and others under the following
  * license.
@@ -379,6 +379,7 @@ static int texthandler_text(struct frontend *obj, struct question *q)
 	char buf[1024];
 	int sz = 1;
 
+        out = malloc(sz);
 	printf(_("Enter . on a line by itself when you are done\n"));
 	while (fgets(buf, sizeof(buf), stdin))
 	{
