@@ -10,6 +10,7 @@ libdebian_installer_la_SOURCES = \
 	hash.c \
 	log.c \
 	mem.c \
+	mem_chunk.c \
 	package.c \
 	package_parser.c \
 	packages.c \

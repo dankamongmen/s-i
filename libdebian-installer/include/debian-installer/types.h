@@ -18,13 +18,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: types.h,v 1.5 2003/11/03 13:46:12 waldi Exp $
+ * $Id: types.h,v 1.6 2003/11/13 21:28:57 waldi Exp $
  */
 
 #ifndef DEBIAN_INSTALLER__TYPES_H
 #define DEBIAN_INSTALLER__TYPES_H
-
-#include <debian-installer/log.h>
 
 #include <stdbool.h>
 #include <stdint.h>

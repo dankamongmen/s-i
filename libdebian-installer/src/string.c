@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: string.c,v 1.3 2003/10/03 18:25:02 waldi Exp $
+ * $Id: string.c,v 1.4 2003/11/13 21:28:57 waldi Exp $
  */
 
 #include <debian-installer/string.h>
@@ -27,6 +27,7 @@
 #include <debian-installer/mem.h>
 
 #include <ctype.h>
+#include <stdarg.h>
 #include <string.h>
 
 int di_snprintfcat (char *str, size_t size, const char *format, ...)

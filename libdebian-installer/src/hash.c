@@ -18,10 +18,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: hash.c,v 1.6 2003/11/06 07:52:16 waldi Exp $
+ * $Id: hash.c,v 1.7 2003/11/13 21:28:57 waldi Exp $
  */
 
 #include <debian-installer/hash.h>
+
+#include <debian-installer/mem.h>
 
 #include <string.h>
 

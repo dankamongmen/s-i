@@ -17,10 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: exec.c,v 1.7 2003/10/03 13:57:12 waldi Exp $
+ * $Id: exec.c,v 1.8 2003/11/13 21:28:57 waldi Exp $
  */
 
 #include <debian-installer/exec.h>
+
+#include <debian-installer/log.h>
 
 #include <fcntl.h>
 #include <stdio.h>

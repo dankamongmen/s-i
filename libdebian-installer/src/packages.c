@@ -17,11 +17,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: packages.c,v 1.9 2003/10/10 19:34:02 joeyh Exp $
+ * $Id: packages.c,v 1.10 2003/11/13 21:28:57 waldi Exp $
  */
 
 #include <debian-installer/packages_internal.h>
 
+#include <debian-installer/log.h>
 #include <debian-installer/package_internal.h>
 #include <debian-installer/string.h>
 

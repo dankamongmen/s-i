@@ -17,13 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Id: parser_rfc822.c,v 1.6 2003/11/06 07:52:16 waldi Exp $
+ * $Id: parser_rfc822.c,v 1.7 2003/11/13 21:28:57 waldi Exp $
  */
 
 #include <config.h>
 
 #include <debian-installer/parser_rfc822.h>
 
+#include <debian-installer/log.h>
 #include <debian-installer/macros.h>
 #include <debian-installer/string.h>
 
