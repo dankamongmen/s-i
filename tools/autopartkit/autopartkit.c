@@ -1295,7 +1295,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                 retval = system(cmd);
                 free(cmd);
                 if (0 != retval)
-                    autopartkit_error(1, "Failed to create '%s' fs on '%s'",
+                    autopartkit_error(1, "  Failed to create '%s' fs on '%s'",
                                       fstype, devpath);
                 else
                 { /* Replace devpath placeholder with real path */
@@ -1308,8 +1308,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                         if (0 == strcmp(buf, mountmap[i].devpath))
                         {
                             free(mountmap[i].devpath);
-                            /* XXX Should not hardcode fstype */
-                            mountmap[i].mountpoint->fstype = "ext3";
+                            mountmap[i].mountpoint->fstype = strdup(fstype);
                             mountmap[i].devpath = devpath;
                         }
                 }
