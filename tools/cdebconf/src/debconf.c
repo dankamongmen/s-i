@@ -42,6 +42,9 @@ int main(int argc, char **argv)
 	signal(SIGINT, sighandler);
 
 	config = config_new();
+	if (!config) {
+	  DIE("Cannot read new config");
+	}
 	parsecmdline(config, argc, argv);
 
 	/* parse the configuration info */
@@ -53,7 +56,6 @@ int main(int argc, char **argv)
 		DIE("Cannot initialize DebConf database");
 	if ((frontend = frontend_new(config, db)) == 0)
 		DIE("Cannot initialize DebConf frontend");
-
 	/* set title */
 	{
 		char buf[100], pkg[100];
