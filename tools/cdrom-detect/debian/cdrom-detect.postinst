@@ -117,13 +117,21 @@ else
    exit 1 
 fi
 
-# Set the distribution used by base-installer, test in priority order
-for dist in testing stable unstable ; do
-    if [ -e /cdrom/dists/$dist ] ; then
-	db_set mirror/distribution $dist
-	log "Detected CD with '$dist' distribution"
-	break
-    fi
+# Set the suite used by base-installer and base-config to
+# the suite that is on the CD. This assumes that there will
+# be no more than one distribution on the CD, and that one of the
+# testing, stable, or unstable links will point to it. Since the
+# CDs currently have many links, parse the Release file to get the
+# actual suite name to use.
+for distlink in stable testing unstable ; do
+	relfile=/cdrom/dists/$distlink/Release
+	if [ -e $relfile ] ; then
+		suite=$(sed -n 's/^Suite: *//p' $relfile)
+		log "Detected CD with '$suite' distribution"
+		db_set mirror/suite $suite
+
+		break
+	fi
 done
 
 # Ask for eject to be installed into /target/, to be able to use it in
