@@ -199,7 +199,6 @@ choose_modules(di_packages *status, di_packages **packages, di_packages_allocato
 
     qsort(package_array, package_count, sizeof(di_package *), package_array_compare);
     choices = list_to_choices(package_array);
-    debconf_fset(debconf, choose_modules_question, "seen", "false");
     debconf_subst(debconf, choose_modules_question, "CHOICES", choices);
     if (lowmem < 2) {
 	 debconf_input(debconf, "medium", choose_modules_question);
