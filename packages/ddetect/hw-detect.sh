@@ -329,17 +329,17 @@ for device in $ALL_HW_INFO; do
 	   ! in_list "$module" "$LOADED_MODULES" &&
 	   ! in_list "$module" "$PROCESSED"
 	then
+		if [ -z "$cardname" ]; then
+			cardname="[Unknown]"
+		fi
 		if in_list "$module" "$AVAIL_MODULES"; then
 			if [ -n "$LIST" ]; then
 				LIST="$LIST, "
 			fi
-			if [ -z "$cardname" ]; then
-				cardname="[Unknown]"
-			fi
 			LIST="$LIST$module ($(echo "$cardname" | sed 's/,/ /g'))"
 			PROCESSED="$PROCESSED $module"
 		else
-			missing_module "$module"
+			missing_module "$module" "$cardname"
 		fi
 	fi
 done
