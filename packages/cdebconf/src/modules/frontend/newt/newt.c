@@ -1024,8 +1024,8 @@ newt_go(struct frontend *obj)
                     newtInit();
                     newtCls();
                 }
-                if (obj->backtitle != NULL) {
-                    char *text = question_get_field(obj->backtitle, "", "description");
+                if (obj->info != NULL) {
+                    char *text = question_get_field(obj->info, "", "description");
                     if (text)
                         newtDrawRootText(0, 0, text);
                     free(text);
@@ -1075,8 +1075,8 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     obj->progress_cur = min;
     newtInit();
     newtCls();
-    if (obj->backtitle != NULL) {
-        char *text = question_get_field(obj->backtitle, "", "description");
+    if (obj->info != NULL) {
+        char *text = question_get_field(obj->info, "", "description");
         if (text)
             newtDrawRootText(0, 0, text);
         free(text);

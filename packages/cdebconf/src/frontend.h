@@ -23,7 +23,7 @@ struct frontend_module {
     int (*shutdown)(struct frontend *);
     unsigned long (*query_capability)(struct frontend *);
     void (*set_title)(struct frontend *, const char *title);
-    void (*set_backtitle)(struct frontend *, struct question *);
+    void (*info)(struct frontend *, struct question *);
     int (*add)(struct frontend *, struct question *q);
     int (*go)(struct frontend *);
     void (*clear)(struct frontend *);
@@ -58,7 +58,7 @@ struct frontend {
 	int interactive;
 	char *capb;
 	char *title;
-    struct question *backtitle;
+    struct question *info;
 	char *progress_title;
     int progress_min, progress_max, progress_cur;
 	

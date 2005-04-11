@@ -1,14 +1,15 @@
 cdebconf (0.75) UNRELEASED; urgency=low
 
   * Colin Watson
-    - Add an X_SETBACKTITLE command, which sets the backdrop title. In the
-      newt frontend, this appears as text at the top left-hand corner of the
-      screen. This is to be used for top-level operational modes of the
-      installer, such as rescue mode.
+    - Add an INFO command, which may (depending on the frontend) display an
+      out-of-band informative message. Unlike inputting a note, this doesn't
+      require an acknowledgement from the user. Like PROGRESS INFO,
+      frontends should display the info persistently until some other info
+      comes along. In the newt frontend, this appears as text at the top
+      left-hand corner of the screen; no other frontends implement it yet.
     - Fix text frontend segfault when encountering empty elements in Choices
       field (closes: #256557).
-    - Fix memory leaks in METAGET, PROGRESS, SETTITLE, and X_SETBACKTITLE
-      commands.
+    - Fix memory leaks in METAGET, PROGRESS, and SETTITLE commands.
     - Make the text frontend output a blank line before the first title in
       go() if it was already displaying a progress bar (closes: #271707).
     - If possible, clean source directory in 'debian/rules clean' so that

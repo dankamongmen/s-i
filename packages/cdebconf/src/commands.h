@@ -215,14 +215,15 @@ char *command_x_save(struct confmodule *, char *);
 char *command_settitle(struct confmodule *mod, char *arg);
 
 /**
- * @brief handler for the X_SETBACKTITLE debconf command
+ * @brief handler for the INFO debconf command
  *
- * Set the debconf backdrop title to the description of the template
- * specified
+ * Displays the given template as an out-of-band informative message. Unlike
+ * inputting a note, this doesn't require an acknowledgement from the user,
+ * and depending on the frontend it may not even be displayed at all.
  *
  * @warning This is not in the debconf spec
  */
-char *command_x_setbacktitle(struct confmodule *mod, char *);
+char *command_info(struct confmodule *mod, char *);
 
 /**
  * @brief handler for the DATA debconf command

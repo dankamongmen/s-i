@@ -691,14 +691,14 @@ char *command_x_save(struct confmodule *mod, char *arg)
 }
 
 /*
- * Set a backdrop title. Use this to describe top-level modes of the
- * system as a whole.
- *
- * Takes a template name and sets the backdrop title to the description
- * of the template.
+ * Displays the given template as an out-of-band informative message. Unlike
+ * inputting a note, this doesn't require an acknowledgement from the user,
+ * and depending on the frontend it may not even be displayed at all. Like
+ * PROGRESS INFO, frontends should display the info persistently until some
+ * other info comes along.
  */
 char *
-command_x_setbacktitle(struct confmodule *mod, char *arg)
+command_info(struct confmodule *mod, char *arg)
 {
     struct question *q = NULL;
     char *out;
@@ -709,7 +709,7 @@ command_x_setbacktitle(struct confmodule *mod, char *arg)
         asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, arg);
         return out;
     }
-    mod->frontend->methods.set_backtitle(mod->frontend, q);
+    mod->frontend->methods.info(mod->frontend, q);
 
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;
