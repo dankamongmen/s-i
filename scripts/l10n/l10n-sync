@@ -44,27 +44,29 @@ SORT_ORDER="main-menu \
 usage() {
 echo  "Usage:"
 echo  "$0 [--online] [--debug] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] [--sort-order="sorting_order"] <D-I repository path>"
-echo  "    --debug           : Verbose output"
-echo  "    --online          : Work online (will update the local copy on"
-echo  "                        the fly)"
-echo  "    --commit          : Commit changed files (implies --online)"
-echo  "                        Files are by default commited in big chunks"
-echo  "    --atomic          : Files will be commited at each change"
-echo  "                        (will often trigger commit storms!"
-echo  "                        Handle with care!)"
-echo  "                        implies --online"
-echo  "    --atomic-updates  : Do a \"svn up\" before each step"
-echo  "                        (VERY time consuming)"
-echo  "                        implies --online"
-echo  "    --keep-revision   : Force keeping the old PO-Revision-Date"
-echo  "                        for a given language"
-echo  "                        meant for use when switching a language"
-echo  "                        NOT RECOMMENDED in other situations"
-echo  "    --svn             : path to the svn binary"
-echo  "    --debconf-updatepo: debconf-updatepo command line"
-echo  "                        (for using hacked debconf-updatepo)"
-echo  "    --sort-order      : packages sorting order"
-echo  "                        (packages names relatively to packages)"
+echo  "    --debug             : Verbose output"
+echo  "    --online            : Work online (will update the local copy on"
+echo  "                          the fly)"
+echo  "    --commit            : Commit changed files (implies --online)"
+echo  "                          Files are by default commited in big chunks"
+echo  "    --atomic            : Files will be commited at each change"
+echo  "                          (will often trigger commit storms!"
+echo  "                          Handle with care!)"
+echo  "                          implies --online"
+echo  "    --atomic-updates    : Do a \"svn up\" before each step"
+echo  "                          (VERY time consuming)"
+echo  "                          implies --online"
+echo  "    --keep-revision     : Force keeping the old PO-Revision-Date"
+echo  "                          for a given language"
+echo  "                          meant for use when switching a language"
+echo  "                          NOT RECOMMENDED in other situations"
+echo  "    --svn               : path to the svn binary"
+echo  "    --debconf-updatepo  : debconf-updatepo command line"
+echo  "                          (for using hacked debconf-updatepo)"
+echo  "    --sort-order        : packages sorting order"
+echo  "                          (packages names relatively to packages)"
+echo  "    --merge="other_dir" : merge master files from master files"
+echo  "                          in another directory"
 echo  " <D-I repository path>: path to the local copy of the D-I repository"
 }
 
@@ -108,6 +110,10 @@ while $MORETODO ; do
         ;;      
     "--commit")
         BIG_COMMITS=Y
+        shift
+        ;;
+    "--merge="*)
+        MERGEDIR=`echo $1|cut -f2 -d=`
         shift
         ;;
     "--svn="*)
@@ -169,6 +175,19 @@ if ! grep "/d-i/" $DI_COPY/.svn/entries >/dev/null 2>&1 ; then
   exit 1
 fi
 
+if [ -n "$MERGEDIR" ] ; then
+  if [ -d "$MERGEDIR" ] ; then
+    if [ ! -d "$MERGEDIR/packages/po" ] ; then
+      echo $MERGEDIR/packages/po does not exist. Please check
+      echo whether $MERGEDIR is a complete Debian Installer checkout copy
+      exit 1
+    fi
+  else
+    echo $MERGEDIR is not a directory
+    exit 1
+  fi   
+fi
+
 # Do not accept working on an unclean copy
 if $(svn st $DI_COPY/packages | grep -q "^C") ; then
   echo $DI_COPY seems to contain some SVN conflict files
@@ -176,8 +195,9 @@ if $(svn st $DI_COPY/packages | grep -q "^C") ; then
   exit 1
 fi
 
-# First, update the copy of D-I repository
-cd $DI_COPY/packages
+# First, update the packages/po directory
+# to get the run-l10n-sync file
+cd $DI_COPY/packages/po
 if [ "$ONLINE" = "Y" ] ; then
   if [ "$DEBUG" = "Y" ] ; then
     echo Synchronising $DI_COPY/packages:
@@ -203,6 +223,33 @@ else
   exit 1
 fi
 
+# First, update the copy of D-I repository
+cd $DI_COPY/packages
+if [ "$ONLINE" = "Y" ] ; then
+  if [ "$DEBUG" = "Y" ] ; then
+    echo Synchronising $DI_COPY/packages:
+    $svn update || svnerr
+    echo Done.
+  else
+    $svn update >/dev/null 2>&1 || svnerr
+  fi
+fi
+
+# In case a merge has to be done with another directory
+# we update this directory as well
+if [ -n "$MERGEDIR" ] ; then
+  cd $MERGEDIR/packages/po
+  if [ "$ONLINE" = "Y" ] ; then
+    if [ "$DEBUG" = "Y" ] ; then
+      echo Synchronising the merge directory $MERGEDIR/packages/po:
+      $svn update || svnerr
+      echo Done.
+    else
+      $svn update >/dev/null 2>&1 || svnerr
+    fi
+  fi
+fi
+
 # Let's check the thing again....ceinture et bretelles as we say in French
 if $(svn st $DI_COPY/packages | grep -q "^C") ; then
   echo $DI_COPY seems to contain some SVN conflict files
@@ -211,6 +258,7 @@ if $(svn st $DI_COPY/packages | grep -q "^C") ; then
 fi
 
 # Build a list of all D-I packages with i18n material
+cd $DI_COPY/packages
 if [ "$DEBUG" = "Y" ] ; then
   echo -n Building a list of all packages with i18n material...
 fi
@@ -296,6 +344,9 @@ if [ "$BIG_COMMITS" = "Y" ] ; then
   cd $DI_COPY/packages
   $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on all packages" || svnerr
 fi
+if [ "$DEBUG" = "Y" ] ; then
+  echo Done.
+fi
 
 # 2) Merge all templates.pot file together
 cd $DI_COPY/packages
@@ -330,6 +381,7 @@ if [ "$ATOMIC_COMMITS" = "Y" ] ; then
   fi
 fi
 
+
 # For each PO file in packages/po:
 # 3a) Synchronize with D-I SVN
 # 3b) Update with template.pot
@@ -338,6 +390,7 @@ if [ "$DEBUG" = "Y" ] ; then
   echo Updating general PO files:
 fi
 cd $DI_COPY/packages/po
+
 # The languages variable will contain the list of *supported* languages
 # Supported languages will have PO files content spread over
 # D-I packages
@@ -378,23 +431,30 @@ for po in *.po ; do
      echo Done.
    fi
  fi
+ if [ -n "$MERGEDIR" ] ; then
+   if [ "$DEBUG" = "Y" ] ; then
+     echo "     - Merge with $MERGEDIR/packages/po/$lang.po"
+   fi
+   if [ -f "$MERGEDIR/packages/po/$lang.po" ] ; then
+     msgcat --use-first "$MERGEDIR/packages/po/$lang.po" $po >$po.new
+     mv $po.new $po
+   fi
+ fi
  if [ "$DEBUG" = "Y" ] ; then
    echo "     - Merge with template.pot:"
  fi
  if [ "$DEBUG" = "Y" ] ; then
-   # This will not make comments go into the PO files
-   # but this have been proven to work
-   # msgmerge -U $po template.pot
+   msgmerge -U $po template.pot
    #
-   # Less tested
-   msgmerge $po template.pot >$po.new
-   mv $po.new $po
+   # Will not mark strings in the PO but not in the POT as obsolete
+   # so not appropriate for cases when a merge occurs
+   # msgmerge $po template.pot >$po.new
+   # mv $po.new2 $po
  else
-   # This will not make comments go into the PO files
-   # but this have been proven to work
-   # msgmerge -U $po template.pot >/dev/null 2>&1
+   msgmerge -U $po template.pot >/dev/null 2>&1
    #
-   # Less tested
+   # Will not mark strings in the PO but not in the POT as obsolete
+   # so not appropriate for cases when a merge occurs
    msgmerge $po template.pot >$po.new 2>/dev/null
    mv $po.new $po
  fi
