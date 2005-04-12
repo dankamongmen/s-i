@@ -29,9 +29,21 @@ template {
 };
 
 config {
-  instance "configdb" {
+  instance "config_gen_db" {
     driver "rfc822db";
     path "/var/lib/cdebconf/questions.dat";
+    reject_types { "password"; };
+  };
+
+  instance "config_passwd_db" {
+    driver "rfc822db";
+    path "/var/lib/cdebconf/passwords.dat";
+    accept_types { "password"; };
+  };
+
+  instance "configdb" {
+    driver "stack";
+    stack { "config_gen_db"; "config_passwd_db"; };
   };
 };
 
