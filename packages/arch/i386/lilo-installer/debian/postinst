@@ -86,14 +86,14 @@ case "$RET" in
       db_get lilo-installer/manual_bootdev
 
         case "$RET" in
-          /dev/ide*|/dev/discs/*|/dev/scsi/*)
+          /dev/ide*|/dev/discs/*|/dev/scsi/*|/dev/md/*)
 	   if [ -b "$RET" ]; then
 	    bootdev="$(mapdevfs $RET)"
 	    not_done=0
 	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
 	   fi
 	  ;;
-	  /dev/[hs]d[a-z]*)
+	  /dev/[hs]d[a-z]*|/dev/md*)
 	    bootdev=$RET;
 	    not_done=0
 	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
@@ -118,7 +118,8 @@ db_progress start 0 4 lilo-installer/progress_title
 db_progress info lilo-installer/progress_active
 
 # If installing to a partition (not MBR), offer to make it active
-if echo "${bootdev}" | grep -q '[0-9]$'; then
+# Do not try to make MD device active
+if (echo "${bootdev}" | grep -q '[0-9]$') && !(echo "${bootdev}" | grep -q '^/dev/md'); then
     # Installing to a partition, check if it is already marked active
     if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+${part} " | grep -q '\*'; then
         # partition is not marked active, offer to make it so
