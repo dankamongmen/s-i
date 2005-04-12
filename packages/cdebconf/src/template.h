@@ -23,11 +23,11 @@ struct template
 	char *type;
 	struct template_l10n_fields *fields;
 	struct template *next;
-	char *(*lget)(struct template *, const char *l, const char *f);
-	char *(*get)(struct template *, const char *f);  /*unused*/
+	const char *(*lget)(const struct template *, const char *l, const char *f);
+	const char *(*get)(const struct template *, const char *f);  /*unused*/
 	void (*lset)(struct template *, const char *l, const char *f, const char *v);
 	void (*set)(struct template *, const char *f, const char *v); /*unused*/
-	char *(*next_lang)(struct template *, const char *l);
+	const char *(*next_lang)(const struct template *, const char *l);
 };
 
 extern const char *template_fields_list[];
@@ -36,8 +36,8 @@ struct template *template_new(const char *tag);
 void template_delete(struct template *t);
 void template_ref(struct template *t);
 void template_deref(struct template *t);
-struct template *template_dup(struct template *t);
-struct template *template_l10nmerge(struct template *ret, struct template *t);
+struct template *template_dup(const struct template *t);
+struct template *template_l10nmerge(struct template *ret, const struct template *t);
 struct template *template_load(const char *filename);
 
 #endif

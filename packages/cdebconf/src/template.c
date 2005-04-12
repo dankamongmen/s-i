@@ -5,14 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static char *template_lget(struct template *t, const char *lang,
-                const char *field);
-static char *template_get_internal(struct template *t, const char *lang,
-                const char *field);
+static const char *template_lget(const struct template *t,
+                const char *lang, const char *field);
+static const char *template_get_internal(const struct template *t,
+                const char *lang, const char *field);
 static void template_lset(struct template *t, const char *lang,
                 const char *field, const char *value);
-static char *template_next_lang(struct template *t, const char *l);
-static struct template_l10n_fields *template_cur_l10n_fields(struct template *t,
+static const char *template_next_lang(const struct template *t, const char *l);
+static struct template_l10n_fields *template_cur_l10n_fields(const struct template *t,
                 const char *lang);
 static char *getlanguage(void);
 static void remove_newlines(char *);
@@ -153,7 +153,7 @@ void template_deref(struct template *t)
  * Assumptions: template_new succeeds, STRDUP succeeds.
  */
 
-struct template *template_dup(struct template *t)
+struct template *template_dup(const struct template *t)
 {
         struct template *ret = template_new(t->tag);
         struct template_l10n_fields *from, *to;
@@ -190,7 +190,7 @@ struct template *template_dup(struct template *t)
         return ret;
 }
 
-struct template *template_l10nmerge(struct template *ret, struct template *t)
+struct template *template_l10nmerge(struct template *ret, const struct template *t)
 {
         struct template_l10n_fields *from, *to;
         int same_choices, same_description;
@@ -258,7 +258,7 @@ struct template *template_l10nmerge(struct template *ret, struct template *t)
         return ret;
 }
 
-static char *template_field_get(struct template_l10n_fields *p,
+static const char *template_field_get(const struct template_l10n_fields *p,
                 const char *field)
 {
     if (strcasecmp(field, "default") == 0)
@@ -316,10 +316,10 @@ static void template_field_set(struct template_l10n_fields *p,
  * Assumptions: 
  */
 
-static char *template_lget(struct template *t, const char *lang,
-                const char *field)
+static const char *template_lget(const struct template *t,
+                const char *lang, const char *field)
 {
-    char *ret = NULL;
+    const char *ret = NULL;
     char *orig_field;
     char *altlang;
     char *cp;
@@ -388,11 +388,11 @@ static char *template_lget(struct template *t, const char *lang,
  *              are not MULL
  */
 
-static char *template_get_internal(struct template *t, const char *lang,
-                const char *field)
+static const char *template_get_internal(const struct template *t,
+                const char *lang, const char *field)
 {
-    struct template_l10n_fields *p;
-    char *altret = NULL;
+    const struct template_l10n_fields *p;
+    const char *altret = NULL;
 
     p = t->fields->next;
     while (p != NULL)
@@ -481,7 +481,7 @@ static void template_lset(struct template *t, const char *lang,
     template_field_set(p, field, value);
 }
 
-static struct template_l10n_fields *template_cur_l10n_fields(struct template *t,
+static struct template_l10n_fields *template_cur_l10n_fields(const struct template *t,
                 const char *lang)
 {
     struct template_l10n_fields *p;
@@ -496,9 +496,9 @@ static struct template_l10n_fields *template_cur_l10n_fields(struct template *t,
     return NULL;
 }
 
-static char *template_next_lang(struct template *t, const char *lang)
+static const char *template_next_lang(const struct template *t, const char *lang)
 {
-    struct template_l10n_fields *p = template_cur_l10n_fields(t, lang);
+    const struct template_l10n_fields *p = template_cur_l10n_fields(t, lang);
     if (p != NULL && p->next != NULL)
         return p->next->language;
     return NULL;

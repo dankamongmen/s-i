@@ -162,8 +162,8 @@ command_go(struct confmodule *mod, char *arg)
     char *argv[3];
     int argc;
     char *out;
-    char *running_frontend = NULL;
-    char *requested_frontend = NULL;
+    const char *running_frontend = NULL;
+    const char *requested_frontend = NULL;
     struct question *q;
 
     argc = strcmdsplit(arg, argv, DIM(argv) - 1);

@@ -41,7 +41,7 @@ void question_deref(struct question *q)
 }
 
 
-struct question *question_dup(struct question *q)
+struct question *question_dup(const struct question *q)
 {
         struct question *ret = question_new(q->tag);
         struct questionvariable *qv = q->variables;
@@ -74,7 +74,7 @@ void question_setvalue(struct question *q, const char *value)
 	}
 }
 
-char *question_getvalue(struct question *q, const char *lang)
+const char *question_getvalue(const struct question *q, const char *lang)
 {
 	if (q->value)
 		return q->value;
@@ -141,7 +141,7 @@ void question_owner_delete(struct question *q, const char *owner)
 	}
 }
 
-static char *question_expand_vars(struct question *q, const char *field)
+static char *question_expand_vars(const struct question *q, const char *field)
 {
     int i = 0;
     const char *p = field, *varend;
@@ -219,7 +219,7 @@ static char *question_expand_vars(struct question *q, const char *field)
     return buf;
 }
 
-char *question_get_field(struct question *q, const char *lang,
+char *question_get_field(const struct question *q, const char *lang,
 	const char *field)
 {
     char *ret; 
