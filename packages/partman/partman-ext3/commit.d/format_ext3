@@ -49,7 +49,7 @@ for dev in $DEVICES/*; do
 		db_subst $template DEVICE $(humandev $(cat device))
 
 		status=failed
-		if [ -x /sbin/tune2fs -a ! -f $id/usage ]; then
+		if [ -x /sbin/tune2fs ] && ! [ -f $id/usage ]; then
 		    name_progress_bar $template
 		    open_dialog CREATE_FILE_SYSTEM $id ext2
 		    read_line status
