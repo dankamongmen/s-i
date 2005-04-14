@@ -31,6 +31,26 @@ int nodequestioncomp(const void *pa, const void *pb) {
                 ((struct question *)pb)->tag);
 }
 
+/* TODO: This is an ugly hack because there's no better way to do this
+ * within the constraints of twalk() (since there's no user-data argument).
+ * If we ever switch to some other tree API, this should go away
+ * immediately. If we ever need iterate() to be thread-safe, this *needs* to
+ * go away.
+ */
+di_slist *iterator;
+void rfc822db_makeiterator(const void *node, const VISIT which, const int depth)
+{
+    if (which == postorder || which == leaf)
+        /* cast is OK; node is never actually written to */
+        di_slist_append(iterator, (void *) node);
+}
+
+void rfc822db_destroyiterator(void *data)
+{
+    /* We only store pointers; nothing to destroy. */
+    (void) data;
+}
+
 
 static char *unescapestr(const char *in)
 {
@@ -150,6 +170,7 @@ static int rfc822db_template_initialize(struct template_db *db, struct configura
         return DC_NOTOK;
 
     dbdata->root = NULL;
+    dbdata->iterator = NULL;
     db->data = dbdata;
 
     return DC_OK;
@@ -336,10 +357,36 @@ static int rfc822db_template_remove(struct template_db *db, const char *tag)
     return DC_NOTOK;
 }
 
-static struct template *rfc822db_template_iterate(struct template_db *db, void **iter)
+static struct template *rfc822db_template_iterate(struct template_db *db,
+    void **iter)
 {
-    INFO(INFO_VERBOSE, "rfc822db_template_iterate stub\n");
-    return NULL;
+    struct template_db_cache *dbdata = db->data;
+    di_slist_node *node;
+    struct template *t;
+
+    INFO(INFO_VERBOSE, "rfc822db_template_iterate(db,*iter=%p)\n", *iter);
+
+    node = *(di_slist_node **) iter;
+    if (node == NULL) {
+        if (dbdata->iterator)
+            di_slist_destroy(dbdata->iterator, rfc822db_destroyiterator);
+        dbdata->iterator = di_slist_alloc();
+        iterator = dbdata->iterator; /* non-thread-safe */
+        twalk(dbdata->root, rfc822db_makeiterator);
+        iterator = NULL;
+        *iter = node = dbdata->iterator->head;
+    } else
+        *iter = node = node->next;
+
+    if (node == NULL) {
+        di_slist_destroy(dbdata->iterator, rfc822db_destroyiterator);
+        dbdata->iterator = NULL;
+        return NULL;
+    }
+
+    t = *(struct template **) node->data;
+    template_ref(t);
+    return t;
 }
 
 /* config database */
@@ -353,6 +400,7 @@ static int rfc822db_question_initialize(struct question_db *db, struct configura
         return DC_NOTOK;
 
     dbdata->root = NULL;
+    dbdata->iterator = NULL;
     db->data = dbdata;
 
     return DC_OK;
@@ -562,8 +610,33 @@ static int rfc822db_question_disown(struct question_db *db, const char *tag,
 static struct question *rfc822db_question_iterate(struct question_db *db,
     void **iter)
 {
-        INFO(INFO_VERBOSE, "rfc822db_question_iterate stub\n");
+    struct question_db_cache *dbdata = db->data;
+    di_slist_node *node;
+    struct question *q;
+
+    INFO(INFO_VERBOSE, "rfc822db_question_iterate(db,*iter=%p)\n", *iter);
+
+    node = *(di_slist_node **) iter;
+    if (node == NULL) {
+        if (dbdata->iterator)
+            di_slist_destroy(dbdata->iterator, rfc822db_destroyiterator);
+        dbdata->iterator = di_slist_alloc();
+        iterator = dbdata->iterator; /* non-thread-safe */
+        twalk(dbdata->root, rfc822db_makeiterator);
+        iterator = NULL;
+        *iter = node = dbdata->iterator->head;
+    } else
+        *iter = node = node->next;
+
+    if (node == NULL) {
+        di_slist_destroy(dbdata->iterator, rfc822db_destroyiterator);
+        dbdata->iterator = NULL;
         return NULL;
+    }
+
+    q = *(struct question **) node->data;
+    question_ref(q);
+    return q;
 }
 
 struct template_db_module debconf_template_db_module = {

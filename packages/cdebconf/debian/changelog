@@ -20,6 +20,13 @@ cdebconf (0.75) UNRELEASED; urgency=low
     - Move answers to password questions out of
       /var/lib/cdebconf/questions.dat to /var/lib/cdebconf/passwords.dat.
     - Some const-correctness improvements.
+    - Add iterate methods to rfc822db, making debconf-copydb and
+      debconf-dumpdb work (closes: #213266). This uses a horrible
+      non-thread-safe technique involving building a temporary list with a
+      pointer to each node in order, which will of course use a fair amount
+      of memory, because the twalk() interface doesn't allow for anything
+      better. If we ever switch to a completely different cache mechanism,
+      this can go away.
   * Joey Hess
     - Apply patch from Denis to fix rfc822db to not output empty Value fields
       if the value is not set. Closes: #257180
