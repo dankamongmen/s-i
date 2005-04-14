@@ -9,20 +9,26 @@
 #include "database.h"
 #include "question.h"
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <getopt.h>
 #include <unistd.h>
 #include <locale.h>
+#include <sys/types.h>
+#include <regex.h>
 
 static struct option g_dpc_args[] = {
     { "help", 0, NULL, 'h' },
+    { "pattern", 1, NULL, 'p' },
     { 0, 0, 0, 0 }
 };
 
 void usage(const char *exename)
 {
-    printf("%s [-h|--help] source-db dest-db\n", exename);
+    printf("%s [-h|--help] [-p|--pattern pattern] source-db dest-db\n", exename);
     printf("\tsource-db, dest-db - config databases to copy from/to\n");
     printf("\t-h, --help - this help message\n");
+    printf("\t-p, --pattern pattern - copy only names matching this pattern\n");
     exit(0);
 }
 
@@ -36,16 +42,19 @@ int main(int argc, char **argv)
     struct template *t;
 #endif
     char *db1name = 0, *db2name = 0;
+    char *pattern = 0;
+    regex_t pattern_regex;
     void *iter;
     int c;
 
     setlocale(LC_ALL, "");
     
-    while ((c = getopt_long(argc, argv, "h", g_dpc_args, NULL)) > 0)
+    while ((c = getopt_long(argc, argv, "hp:", g_dpc_args, NULL)) > 0)
     {
         switch (c)
         {
         case 'h': usage(argv[0]); break;
+        case 'p': pattern = optarg; break;
         }
     }
 
@@ -78,6 +87,19 @@ int main(int argc, char **argv)
     db1->methods.load(db1);
     db2->methods.load(db2);
     
+    /* maybe compile pattern regex */
+    if (pattern) {
+        int err = regcomp(&pattern_regex, pattern, REG_EXTENDED | REG_NOSUB);
+        if (err != 0) {
+            int errmsgsize = regerror(err, &pattern_regex, NULL, 0);
+            char *errmsg = malloc(errmsgsize);
+            if (errmsg == NULL)
+                DIE("Out of memory");
+            regerror(err, &pattern_regex, errmsg, errmsgsize);
+            DIE("regcomp: %s", errmsg);
+        }
+    }
+
     /* 
      * Iterate through all the questions and put them into db2
      */
@@ -86,9 +108,18 @@ int main(int argc, char **argv)
     iter = 0;
     while ((q = db1->methods.iterate(db1, &iter)) != NULL)
     {
+        if (pattern) {
+            if (regexec(&pattern_regex, q->tag, 0, 0, 0) != 0)
+                goto nextq;
+        }
+
         db2->methods.set(db2, q);
+nextq:
         question_deref(q);
     }
+
+    if (pattern)
+        regfree(&pattern_regex);
 
     db2->methods.save(db2);
     question_db_delete(db1);

@@ -13,20 +13,26 @@
 #include "template.h"
 #include "question.h"
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <getopt.h>
 #include <unistd.h>
 #include <locale.h>
+#include <sys/types.h>
+#include <regex.h>
 
 static struct option g_dpc_args[] = {
     { "help", 0, NULL, 'h' },
+    { "pattern", 1, NULL, 'p' },
     { 0, 0, 0, 0 }
 };
 
 void usage(const char *exename)
 {
-    printf("%s [-h|--help] [source-db]\n", exename);
+    printf("%s [-h|--help] [-p|--pattern pattern] [source-db]\n", exename);
     printf("\tsource-db -  config database to dump\n");
     printf("\t-h, --help - this help message\n");
+    printf("\t-p, --pattern pattern - dump only names matching this pattern\n");
     exit(0);
 }
 
@@ -37,16 +43,19 @@ int main(int argc, char **argv)
     struct question_db *qdb;
     struct question *q;
     char *dbname = 0;
+    char *pattern = 0;
+    regex_t pattern_regex;
     void *iter;
     int c;
 
     setlocale(LC_ALL, "");
     
-    while ((c = getopt_long(argc, argv, "h", g_dpc_args, NULL)) > 0)
+    while ((c = getopt_long(argc, argv, "hp:", g_dpc_args, NULL)) > 0)
     {
         switch (c)
         {
         case 'h': usage(argv[0]); break;
+        case 'p': pattern = optarg; break;
         }
     }
 
@@ -78,13 +87,35 @@ int main(int argc, char **argv)
      * Iterate through all the questions and print them out
      */
 
+    /* maybe compile pattern regex */
+    if (pattern) {
+        int err = regcomp(&pattern_regex, pattern, REG_EXTENDED | REG_NOSUB);
+        if (err != 0) {
+            int errmsgsize = regerror(err, &pattern_regex, NULL, 0);
+            char *errmsg = malloc(errmsgsize);
+            if (errmsg == NULL)
+                DIE("Out of memory");
+            regerror(err, &pattern_regex, errmsg, errmsgsize);
+            DIE("regcomp: %s", errmsg);
+        }
+    }
+
     /* TODO: error checking */
     iter = 0;
     while ((q = qdb->methods.iterate(qdb, &iter)) != NULL)
     {
+        if (pattern) {
+            if (regexec(&pattern_regex, q->tag, 0, 0, 0) != 0)
+                goto nextq;
+        }
+
         printf("%s %s %s\n", q->tag, q->template->type, q->value);
+nextq:
         question_deref(q);
     }
+
+    if (pattern)
+        regfree(&pattern_regex);
 
     question_db_delete(qdb);
     template_db_delete(tdb);
