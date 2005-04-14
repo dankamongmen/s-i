@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
     setlocale(LC_ALL, "");
     
-    while ((c = getopt_long(argc, argv, "h", g_dpc_args, NULL) > 0))
+    while ((c = getopt_long(argc, argv, "h", g_dpc_args, NULL)) > 0)
     {
         switch (c)
         {

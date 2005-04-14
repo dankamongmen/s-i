@@ -368,7 +368,7 @@ int main(int argc, char **argv)
 
 	g_config = config_new();
 
-	while ((opt = getopt_long(argc, argv, "dhf:p:aF", g_dpc_args, NULL) > 0))
+	while ((opt = getopt_long(argc, argv, "dhf:p:aF", g_dpc_args, NULL)) > 0)
 	{
 		switch (opt)
 		{
