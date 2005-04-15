@@ -85,7 +85,6 @@ lock () {
 }
 
 unlock () {
-	echo "exit .. $lockpid ; $lockfile"
 	if [ -n "$lockpid" ]; then
 		kill "$lockpid"
 	fi
@@ -129,7 +128,7 @@ if [ -z "$STATE_DIR" ]; then
 fi
 mkdir -p "$STATE_DIR"
 
-lockfile="$STATE_DIR/$MACHINE-$SCHEME-test"
+lockfile="$STATE_DIR/$MACHINE-test"
 lock
 
 if [ -n "$ROOT_PASSWORD_FILE" ]; then
