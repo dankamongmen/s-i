@@ -12,6 +12,7 @@ looking something like this:
   kernel-versions
   modules/<arch>/*
   exclude-packages
+  package-list
 
 Let's get the easy files out of the way. The changelog is a changelog, like
 any other, as is the copyright. The debian/rules can be something as simple
@@ -99,9 +100,32 @@ Modules can have a "-" put in front of their filename, if so that means the
 module is optional, and the build will not fail if the module is not
 available.
 
-One last file, the exclude-packages file is an optional file that lists
-any udebs (by full package name) that would normally be built, but that you
-want to skip.
+A few other, optional files:
+
+The package-list file can be used to override and/or suppliment values from
+kernel-wedge's own /usr/share/kernel-wedge/package-list file. New packages
+can be defined in this file using the same format, or partial entries can
+be used to override a field or fields of a previously defined package. For
+example:
+
+# This file is used to build up the control file. The kernel version and
+# "-di" are appended to the package names. Section can be left out. So can
+# architecture, which is derived from the files in the modules directory.
+# It overwrites specifications from /usr/share/kernel-wedge/package-list.
+Package: fat-modules
+Priority: standard
+
+Package: nic-modules
+Depends: kernel-image, nic-shared-modules, firmware-modules, firewire-core-modules
+
+Package: other-modules
+Depends: kernel-image
+Description: some other modules I like to have in the installer
+
+The exclude-packages file is an optional file that lists any udebs (by
+full package name) that would normally be built, but that you want to
+skip.
+
 
 Building:
 
