@@ -6,8 +6,9 @@ set -e
 
 # The cobalt nfsroot.tar.gz contains a nfsroot/ subdirectory, make things work
 # with it.
-if [ "$ARCH" = mipsel ]; then
+if [ "$ARCH" = mipsel ] && [ -e "$NFSROOT_DIR/nfsroot" ] ; then
 	NFSROOT_DIR=$NFSROOT_DIR/nfsroot
 fi
 
+rm -f $NFSROOT_LINK
 ln -sf $NFSROOT_DIR $NFSROOT_LINK
