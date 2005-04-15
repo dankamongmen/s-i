@@ -52,7 +52,7 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 	 * all use standard "AT" keymaps. But its too close to sarge release to change design,
 	 * so we go with the following hack:
 	 * If the USB keyboard vendor is Apple, set PRESENT = TRUE.
-	 * For other keyboard vendors and if architecture is i386 or powerpc (prep and chrp),
+	 * For other keyboard vendors and if architecture is x86 or powerpc (prep and chrp),
 	 * force the installer to display the list of AT keymaps. This is needed because, for
 	 * 2.6 kernels, we can not assume that a AT connector will be detected in at-kbd.c.
 	 */
@@ -69,8 +69,8 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 			} else {
 				di_debug ("non-Apple USB keyboard detected\n");
 				p->present = UNKNOWN;     // Is this really an USB/Mac keyboard?
-#if defined(__i386__) && defined (AT_KBD)
-				di_debug ("Forcing keymap list to AT (i386)\n");
+#if (defined(__i386__) || defined(__amd64__)) && defined (AT_KBD)
+				di_debug ("Forcing keymap list to AT (x86)\n");
 				p->name = "at";           // Force installer to show AT keymaps
 				p->present = TRUE;
 #endif
