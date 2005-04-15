@@ -5,7 +5,14 @@
 (
 	for dir in $1/*; do
 		for file in $(find $dir/modules -type f | grep -v .svn | grep -v .lnk); do
-			cat $file | sed 's/^-//' | grep -v \# | grep -v '^$' | sed 's!.*/!!' | sed 's/\..*//'
+			cat $file | \
+			grep -v \# | \
+			sed 's/^-//' | \
+			sed 's/ ?$//' | \
+			sed 's/ -$//' | \
+			grep -v '^$' | \
+			sed 's!.*/!!' | \
+			sed 's/\..*//'
 		done
 	done
 ) | sort | uniq
