@@ -59,8 +59,8 @@ error () {
 }
 
 sigout () {
+	unlock
 	error "Exiting on signal."
-	exit 0
 }
 
 config () {
@@ -72,6 +72,24 @@ config () {
 
 use () {
 	. $DI_TESTDIR/schemes/$MACHINE/$1
+}
+
+lock () {
+	while ! lockfile-create --retry 1 "$lockfile"; do
+		echo "$MACHINE is in use:"
+		ls -l $lockfile.lock
+		echo "Retrying.."
+	done
+	lockfile-touch "$lockfile" &
+	lockpid="$!"
+}
+
+unlock () {
+	echo "exit .. $lockpid ; $lockfile"
+	if [ -n "$lockpid" ]; then
+		kill "$lockpid"
+	fi
+	lockfile-remove "$lockfile"
 }
 
 export DIGRESSDIR=$(dirname $0)
@@ -87,13 +105,13 @@ PATH=$PATH:$DIGRESSDIR/boot:$DIGRESSDIR/preboot:$DIGRESSDIR/console:$DIGRESSDIR/
 export PATH
 
 if [ -z "$SCHEME" ]; then
-	echo "Available schemes for $MACHINE:"
+	if [ -z "$MACHINE" ]; then
+		echo "Available machines:"
+	else
+		echo "Available schemes for $MACHINE:"
+	fi
 	ls $DI_TESTDIR/schemes/$MACHINE
 	exit
-fi
-
-if [ -z "$MACHINE" ]; then
-	error "Usage: test-harness machine [scheme]"
 fi
 
 if [ ! -e "$DI_TESTDIR/schemes/$MACHINE" ]; then
@@ -110,6 +128,9 @@ if [ -z "$STATE_DIR" ]; then
 	error "STATE_DIR not set"
 fi
 mkdir -p "$STATE_DIR"
+
+lockfile="$STATE_DIR/$MACHINE-$SCHEME-test"
+lock
 
 if [ -n "$ROOT_PASSWORD_FILE" ]; then
 	ROOT_PASSWORD=$(cat $ROOT_PASSWORD_FILE) || true
@@ -195,4 +216,5 @@ echo
 header "Successful finish: $SCHEME"
 endheader
 do_shutdown
+unlock
 exit 0
