@@ -57,6 +57,7 @@ used to list the modules that go in a kernel. For example, for i386, we
 want to have some nic drivers, so we create a modules/i386/nic-modules
 listing them:
 
+# My short list of nic modules.
 8139too
 e100
 natsemi
@@ -75,30 +76,32 @@ You will also want a special modules list file for the kernel-image udeb.
 If you need to include no modules with your kernel, it can be an empty file.
 but you should have a modules/<arch>/kernel.
 
+kernel-wedge will copy the listed modules into each package. If a listed 
+module does not exist, it will fail by default. Sometimes you might want to
+make a module be included but it's not fatal for it not to be available.
+To indicate this, follow the module with a space and a "?".
+
+Module list files can also include other module lists by reference. This
+works similar to cpp includes, and can be used to include module lists
+distributed as part of kernel-wedge, or others. For example:
+
+# kernel-wedge's standard set of cdrom modules
+#include <cdrom-core-modules>
+# my own list
+#include "../../includes/cdrom-modules"
+
+A final capability of the module list files is the ability to include a
+module list and then override parts of it. Follow a module name with " -" to
+remove it from the list if it was previously listed, as by an include:
+
+# kernel-wedge's standard set of cdrom modules
+#include <cdrom-core-modules>
+# but not this one
+sr_mod -
+
 The udebs are named with the version of the kernel in their package name,
 since that can be useful during kernel transitions. The string -di is
 appended to prevent any posible collisions in names with real debs.
-
-kernel-wedge includes its own modules lists for some common sets of modules
-that are unlikely to differ between kernels. These are stored in
-/usr/share/kernel-wedge/modules. If you would like to build one, you need
-only make a symlink to it in your modules/<arch> directory.
-
-Since many version control programs have issues with symlinks, kernel-wedge
-include support for creating symlinks for you, based on .lnk files, via the
-"kernel-wedge make-links" command. For example, a file
-modules/i386/scsi-core-modules.lnk will result in a
-modules/i386/scsi-core-modules. The content of the file becomes the
-destination of the symlink. To link to common module lists, just use
-"common/module-list", instead of hardcoding "/usr/share/kernel-wedge/modules".
-
-More on the content of the modules lists. The files contain paths relative
-to the top-level kernel modules directory (/lib/modules/<kernel-version>/).
-In fact these files are used as the input to a tar command, and can list
-either files, or whole directories, though the latter is rarely used.
-Modules can have a "-" put in front of their filename, if so that means the
-module is optional, and the build will not fail if the module is not
-available.
 
 A few other, optional files:
 

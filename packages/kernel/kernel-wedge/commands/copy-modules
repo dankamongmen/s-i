@@ -39,12 +39,12 @@ processmodules() {
 	cp $list $tmpdir/work
 	(
 		while read module; do
-			if echo "$module" | grep -q -- '^#' || [ -z "$module" ]; then
-				continue
-			fi
-
-			if echo "$module" | grep -q -- '^-'; then
+			# Question mark suffied modules are optional.
+			# Support dash prefixing for backwards compatability.
+			if [ "${module#-}" != "$module" ] || \
+			   [ "${module% \?}" != "$module" ]; then
 				optional=1
+				module=${module% \?}
 				module=${module#-}
 			else
 				optional=0
@@ -152,9 +152,10 @@ for i in $(
 		cd $tmpdir/module-list
 		xargs -r cat
 	} | sort -u > $tmpdir/exclude			# modules to exclude
-	# Sort so that the joins work, no matter what the order of the
-	# input file.
-	sort $home/$modlistdir/$i > $tmpdir/module-list/$i
+	
+	# preprocess file, handle includes and excludes and sort so that
+	# the joins work, no matter what the order of the input.
+	kernel-wedge preprocess $home/$modlistdir/$i | sort > $tmpdir/module-list/$i
 
 	# exclude modules in exclude from dependency list
 	join -2 2 -v 2 $tmpdir/exclude $tmpdir/deps |
