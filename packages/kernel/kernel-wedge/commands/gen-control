@@ -154,9 +154,11 @@ foreach my $ver (@versions) {
 		if (defined $package->("Depends")) {
 			$pkg{Depends}=join(", ",
 				map { $_."-".$kernelversion."-".$flavour."-di" }
+				# Remove force marker.
+				map { s/!$//; $_ }
 				# If the dep is not built for this arch,
-				# skip it.
-				grep { -e "$modlistdir/$_" } 
+				# skip it, unless it's forced.
+				grep { -e "$modlistdir/$_" || /!$/ }
 				split(", ", $package->("Depends")));
 		}
 		

@@ -1,4 +1,4 @@
-kernel-wedge (1.26) UNRELEASED; urgency=low
+kernel-wedge (2.00) UNRELEASED; urgency=low
 
   NOTE: This package has been branched for sarge, since some of the changes
   NOTE: below have the potential to prevent packages in sarge from building,
@@ -27,6 +27,21 @@ kernel-wedge (1.26) UNRELEASED; urgency=low
     - Add ahci to sata-modules, available in 2.6.11.
     - Add sata_qstor, ditto.
     - And sata_uli.
+    - Allow unknown dependencies in package-list files to be forced
+      not to be removed by gen-control, by following them with a bang.
+      I expect this will be used by third-party modules packages that need to
+      depend on a udeb from the main kernel package set. Ie, non-free modules.
+    - copy-modules now uses find to find a module anywhere in the kernel
+      modules tree. 
+    - Module list files no longer need path info (or extension info!), though
+      old ones with that info will still work (mostly; not if whole module
+      subdirs such as sym53c8xx_2 or aic7xxx were listed).
+    - Modules not in the kernel/ subdir can also be listed now.
+    - Remove all module path and extension info from kernel-wedge's own
+      module lists.
+    - Try to clean up the sym53c8xx_2 / sym53c8xx mess somewhat. It was too
+      complicated to describe.. Currently both modules are included in
+      scsi-common-modules if a kernel has both.
 
  -- Colin Watson <cjwatson@debian.org>  Wed, 24 Nov 2004 14:12:54 +0000
 

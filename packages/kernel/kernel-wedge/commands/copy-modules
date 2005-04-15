@@ -38,24 +38,33 @@ processmodules() {
 	
 	cp $list $tmpdir/work
 	(
-		while read file; do
-			if echo "$file" | grep -q -- '^#' || [ -z "$file" ]; then
+		while read module; do
+			if echo "$module" | grep -q -- '^#' || [ -z "$module" ]; then
 				continue
 			fi
 
-			if echo "$file" | grep -q -- '^-'; then
+			if echo "$module" | grep -q -- '^-'; then
 				optional=1
-				file=$(echo $file | sed 's/^-//');
+				module=${module#-}
 			else
 				optional=0
 			fi
-			if [ -e $moddir/$file ]; then
-				echo $file
-			elif [ -e $moddir/${file%.o}.ko ]; then
-				echo ${file%.o}.ko
+
+			module=${module##*/} # remove path info
+			module=${module%.*}  # remove extension
+			
+			# Prefer modules in the kernel subdir, but failing
+			# that search the whole thing, to find third-party,
+			# etc modules.
+			match="$(find $moddir/kernel $moddir \
+			            -name $module.o -or -name $module.ko \
+				| head -n 1 | sed "s!$moddir/!!")"
+			
+			if [ -n "$match" ]; then
+				echo $match
 			else
 				if [ "$optional" = 0 ]; then
-					echo "missing module $file" >&2
+					echo "missing module $module" >&2
 					exit 1
 				fi
 			fi
@@ -87,12 +96,6 @@ if [ ! -d $moddir ]; then
 	exit 0
 fi
 	
-if [ "" != "`echo $version | grep ^2.2.`" ]; then
-	kernel_modules=""
-else
-	kernel_modules="/kernel"
-fi
-
 # The directory of modules lists to use.
 if [ -d modules/$arch-$flavour ]; then
 	modlistdir=modules/$arch-$flavour
@@ -158,7 +161,7 @@ for i in $(
 		sort -k 1,1 > $tmpdir/tmpdeps
 
 	# deal with modules marked as optional and other transformations
-	processmodules $tmpdir/module-list/$i $moddir$kernel_modules
+	processmodules $tmpdir/module-list/$i $moddir
 
 	# include dependent modules which are not in a
 	# dependent udeb into module-list/$i
@@ -166,14 +169,14 @@ for i in $(
 
 	if [ -s $tmpdir/module-list/$i ] && dh_listpackages | grep -qx "$i-$version-di"; then
 		# copy kernel modules to package build dir
-		cd $moddir$kernel_modules
+		cd $moddir
 		ret=$( ( (
 			set +e
 			tar cfT - $tmpdir/module-list/$i
 			printf $? >&3
 		) | (
 			set +e
-			dir=$home/debian/$i-$version-di/lib/modules/$installedname$kernel_modules
+			dir=$home/debian/$i-$version-di/lib/modules/$installedname
 			mkdir -p $dir
 			cd $dir
 			tar xf -
