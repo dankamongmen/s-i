@@ -8,12 +8,18 @@ else
 	switch=-f
 fi
 
-LOCK=$STATE_DIR/x10.lock
+LOCK=$STATE_DIR/x10
 
 if [ -z "$X10_HOUSE" ] || [ -z "$X10_DEVICE" ]; then
 	echo "X10_HOUSE and X10_DEVICE required for x10 control" >&2
 	exit 1
 fi
+
+sigout () {
+	lockfile-remove $LOCK
+}
+
+trap sigout INT QUIT
 
 lockfile-create $LOCK
 lockfile-touch --oneshot $LOCK
