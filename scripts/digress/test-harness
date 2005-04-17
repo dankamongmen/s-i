@@ -44,6 +44,7 @@ do_shutdown () {
 }
 
 error () {
+	unlock
 	if [ "$started" ]; then
 		echo
 		header "Unsuccessful finish: $SCHEME"
@@ -59,7 +60,6 @@ error () {
 }
 
 sigout () {
-	unlock
 	error "Exiting on signal."
 }
 
