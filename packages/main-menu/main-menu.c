@@ -25,6 +25,8 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <errno.h>
 
 const int RAISE = 1;
 const int LOWER = 0;
@@ -559,6 +561,59 @@ void notify_user_of_failure (di_system_package *p) {
 	debconf_capb(debconf, "backup");
 }
 
+/* Cheap-and-cheerful run-parts-a-like for /lib/main-menu.d. Allows packages
+ * to register scripts to be run at main-menu startup that need to share
+ * main-menu's debconf frontend but that don't merit a menu item, such as
+ * setting an info message.
+ */
+static void menu_startup (void) {
+	struct dirent **namelist;
+	int entries, i;
+
+	/* scandir() isn't POSIX, but it makes things easy. */
+	entries = scandir(MAIN_MENU_DIR, &namelist, NULL, alphasort);
+	if (entries < 0)
+		return;
+
+	for (i = 0; i < entries; ++i) {
+		size_t len;
+		char *filename;
+		struct stat st;
+		int ret;
+
+		if (strcmp(namelist[i]->d_name, ".") == 0 || strcmp(namelist[i]->d_name, "..") == 0)
+			continue;
+
+		/* sizeof(MAIN_MENU_DIR) includes trailing \0 */
+		len = sizeof(MAIN_MENU_DIR) + 1 + strlen(namelist[i]->d_name);
+		filename = di_new(char, len);
+		snprintf(filename, len, "%s/%s", MAIN_MENU_DIR, namelist[i]->d_name);
+
+		if (stat(filename, &st) != 0) {
+			di_log(DI_LOG_LEVEL_WARNING, "Can't stat %s (%s)", filename, strerror(errno));
+			di_free(filename);
+			continue;
+		}
+		if (!S_ISREG(st.st_mode)) {
+			di_log(DI_LOG_LEVEL_WARNING, "%s is not a regular file", filename);
+			di_free(filename);
+			continue;
+		}
+		if (access(filename, X_OK) != 0) {
+			di_log(DI_LOG_LEVEL_WARNING, "%s is not executable", filename);
+			di_free(filename);
+			continue;
+		}
+
+		di_log(DI_LOG_LEVEL_DEBUG, "Executing %s", filename);
+		ret = system(filename);
+		if (ret != 0)
+			di_log(DI_LOG_LEVEL_WARNING, "%s exited with status %d", filename, ret);
+
+		di_free(filename);
+	}
+}
+
 int main (int argc __attribute__ ((unused)), char **argv) {
 	di_system_package *p;
 	di_packages *packages;
@@ -570,6 +625,8 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
+
+	menu_startup();
 
 	allocator = di_system_packages_allocator_alloc ();
 	packages = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, allocator);
