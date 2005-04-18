@@ -676,7 +676,7 @@ command_settitle(struct confmodule *mod, char *arg)
 char *command_x_save(struct confmodule *mod, char *arg)
 {
     char *argv[2];
-    int argc, ret;
+    int argc, ret = DC_OK;
     char *out;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
