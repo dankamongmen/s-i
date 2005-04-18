@@ -72,5 +72,9 @@ for dir in $(find "/proc/device-tree/" -type d); do
 				fi
 			fi
 		done
+	elif [ "$name" = via-pmu ]; then
+		# APM emulation is useful for some applications, such as the
+		# GNOME battery applet.
+		register-module apm_emu
 	fi
 done
