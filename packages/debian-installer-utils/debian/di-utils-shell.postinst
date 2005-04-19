@@ -1,0 +1,15 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+db_capb backup
+db_input high di-utils-shell/do-shell
+db_go || exit 10
+
+OLD_STDIN="$DEBCONF_OLD_FD_BASE"
+OLD_STDOUT="$(($DEBCONF_OLD_FD_BASE + 1))"
+OLD_STDERR="$(($DEBCONF_OLD_FD_BASE + 2))"
+
+cd /
+
+env -i PATH="$PATH" TERM="$TERM" /bin/sh <&$OLD_STDIN >&$OLD_STDOUT 2>&$OLD_STDERR

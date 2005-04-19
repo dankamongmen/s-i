@@ -1,5 +1,5 @@
 ifndef TARGETS
-TARGETS=mapdevfs debian/di-utils-shell.postinst pipe_progress
+TARGETS=mapdevfs pipe_progress
 endif
 
 # Where to create device entries for di-utils-devicefiles
@@ -16,9 +16,6 @@ all: $(TARGETS)
 
 mapdevfs: mapdevfs.c
 	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
-
-debian/di-utils-shell.postinst: debian/di-utils-shell.postinst.c
-	$(CC) $(CFLAGS) $^ -o $@ -ldebconfclient -ldebian-installer
 
 devicefiles:
 	mkdir -p $(DEVDIR)/dev
