@@ -52,7 +52,11 @@ echo "   <th class=\"col1\">Language</th>"
 echo "   <th class=\"t1\">Unknown words</th>"
 echo "   <th class=\"t1\">Messages</th>"
 echo "   <th class=\"t1\">List of unknown words</th>"
-echo "   <th class=\"t1\">Suspect variables</th>"
+
+if [ $HANDLE_SUSPECT_VARS = "yes" ] ; then
+    echo "   <th class=\"t1\">Suspect variables</th>"
+fi
+
 echo "   <th class=\"t1\">All files</th>"
 echo "   <th class=\"t1\">Aspell Dictionary</th>"
 echo " </tr>"
@@ -62,14 +66,17 @@ echo " </tr>"
 for ROW in `cat $STATS | sed  "s: :,:g"`; do
     LANG=`echo $ROW | awk -F, '{print $2}'`
     UNKN=`echo $ROW | awk -F, '{print $1}'`
+
+if [ $HANDLE_SUSPECT_VARS = "yes" ] ; then
     SUSP=`echo $ROW | awk -F, '{print $3}'`
 
-if [ $SUSP = "1" ] ; then
-    SUSPECT_VARS_URL="latest/nozip/${LANG}_var.txt"
-    SUSPECT_VARS_NAME="${LANG}_var.txt"
-else
-    SUSPECT_VARS_URL=""
-    SUSPECT_VARS_NAME="-"
+    if [ $SUSP = "1" ] ; then
+	SUSPECT_VARS_URL="latest/nozip/${LANG}_var.txt"
+	SUSPECT_VARS_NAME="${LANG}_var.txt"
+    else
+	SUSPECT_VARS_URL=""
+	SUSPECT_VARS_NAME="-"
+    fi
 fi
 
 if [ $LANG = "pt_BR" ] ; then
@@ -85,7 +92,11 @@ echo "   <td class=\"col1\">$LANG</td>"
 echo "   <td>$UNKN</td>"
 echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a></td>"
 echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a></td>"
-echo "   <td><a href=\"$SUSPECT_VARS_URL\">$SUSPECT_VARS_NAME</a></td>"
+
+if [ $HANDLE_SUSPECT_VARS = "yes" ] ; then
+    echo "   <td><a href=\"$SUSPECT_VARS_URL\">$SUSPECT_VARS_NAME</a></td>"
+fi
+
 echo "   <td><a href=\"latest/zip/$LANG.tar.gz\">$LANG.tar.gz</a></td>"
 echo "   <td><a href=\"$DICT_URL\">$DICT_NAME</a></td>"
 echo "  </tr>"

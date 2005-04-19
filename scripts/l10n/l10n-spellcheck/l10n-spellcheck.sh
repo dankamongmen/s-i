@@ -7,18 +7,27 @@
 # Author: Davide Viti <zinosat@tiscali.it> 2005, for the Debian Project
 #
 
-export PATH=~/aspell:~/gnuplot/bin:$PATH
+export PATH=${HOME}/aspell:${HOME}/gnuplot/bin:$PATH
+SCRIPT_WITHOUT_PATH=`basename $0`
+SCRIPTS_PATH=`echo $0 | sed "s:\(.*\)${SCRIPT_WITHOUT_PATH}\(.*\):\1\2:"`
 
-LOCAL_REPOSITORY=~/debian-installer
-OUT_DIR=~/public_html/spellcheck/
+. ${HOME}/$SCRIPTS_PATH/cfg/$1/setup.sh
+export LANGUAGE_LIST="cfg/$1/lang2dict.txt"
+export PO_FINDER="cfg/$1/po_finder.sh"
+
+if  [ $? != 0 ] ; then
+    echo "error: configuration file not found"
+    exit 1
+fi
+
 NEW="check_$(date '+%Y%m%d')"
 
 # update local copy of svn repository
-svn up $LOCAL_REPOSITORY
+svn up ${LOCAL_REPOSITORY}
 
 # spellcheck and move data to public_html
-cd  ~/l10n-spellcheck
-sh check_all.sh $LOCAL_REPOSITORY
+cd  ${HOME}/$SCRIPTS_PATH
+sh check_all.sh ${LOCAL_REPOSITORY}
 mv $NEW $OUT_DIR
 
 # save symlink destinations

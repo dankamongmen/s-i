@@ -15,7 +15,8 @@ BEGIN {
         IN_MSGSTR=0;
         file=FILENAME;
         print "";
-        print "*** " file;
+	home_len=length(ENVIRON["HOME"])+2;
+        print "*** " substr(file, home_len);
     }
     
     line=$0;

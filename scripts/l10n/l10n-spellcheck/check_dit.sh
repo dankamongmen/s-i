@@ -23,7 +23,6 @@ ALL_STRINGS=$DEST_DIR/${LANG}_all.txt
 FILES_TO_KEEP="$ALL_STRINGS $FILES_TO_KEEP"
 
 NO_VARS=$DEST_DIR/1_no_vars_${LANG}
-NEEDS_RM="$NO_VARS $NEEDS_RM"
 
 ALL_UNKNOWN=$DEST_DIR/2_all_unkn_${LANG}
 NEEDS_RM="$ALL_UNKNOWN $NEEDS_RM"
@@ -36,8 +35,8 @@ SUSPECT_VARS=$DEST_DIR/${LANG}_var.txt
 
 checks(){
 
-if [ ! -d $DI_COPY ] ; then
-    echo $DI_COPY does not exist
+if [ ! -d $BASE_SEARCH_DIR ] ; then
+    echo $BASE_SEARCH_DIR does not exist
     exit 1
 fi
 
@@ -56,23 +55,6 @@ if [ ! -f $CHECK_VAR ] ; then
     exit 1
 fi
 
-# This has to be commented in order to run this script on a system (like Alioth) 
-# where we have a custom installation for aspell, or on a non-debian system
-
-# dpkg -l aspell | grep -q "^ii"
-# if [ $? != 0 ] ; then
-#     echo "aspell is not installed"
-#     echo "you need some packages (aspell, aspell-bin, aspell-${LANG})"
-#     exit 1
-# fi
-
-# dpkg -l aspell-${DICT} | grep -q "^ii" 
-# if  [ $? != 0 ] ; then
-#     echo "There was an error during the detection of aspell-${DICT}"
-#     exit 1
-# fi
-
-
 if [ ! -d $DEST_DIR ] ; then
     mkdir $DEST_DIR
 fi
@@ -87,7 +69,7 @@ fi
 
 LANG=$1
 DICT=$2
-DI_COPY=$3
+BASE_SEARCH_DIR=$3
 DEST_DIR=$4
 
 initialise	# initalise some variables
@@ -122,7 +104,6 @@ fi
 if [ $WL_WARN -ne 2 ] ; then
     cat $COMMON_WL $SPECIFIC_WL | sort -f | sed "s:\(^#.*\)::" > $WLIST.txt
 
-# FIXME: does not work for accented letters despite --encoding=utf-8
 # NB: --lang uses $LANG and not $DICT
     aspell --lang=$LANG create master ./$WLIST < $WLIST.txt
 
@@ -132,65 +113,67 @@ fi
 PO_FILE_LIST="${LANG}_file_list.txt"
 NEEDS_RM="$PO_FILE_LIST $NEEDS_RM"
 
-# Create a list of all the po files and count them
-find $DI_COPY -name "$LANG.po" > $PO_FILE_LIST
-NUM_PO_FILES=`wc -l $PO_FILE_LIST | awk '{print $1}'`
-
-# Deal with "master files" so that we don't count twice unknown words:
-#
-# 1) there are both po files and master file (i.e. "fr")
-#      ignore the master file
-# 2) there's only the master file file (i.e. "ga") 
-#      leave it unchanged
-# 3) there's just a bunch of sparse po files and no master file (i.e. "it")
-#      leave them unchanged   
-# 4) English language if made of "en.po" + "templates.pot"
-
-if [ $NUM_PO_FILES -gt 1 ]; then
-    PO_FILE_LIST_NO_MASTER="${LANG}_no_master.txt"
-    NEEDS_RM="$PO_FILE_LIST_NO_MASTER $NEEDS_RM"
-    cat $PO_FILE_LIST | sed "s:$DI_COPY/po/$LANG.po::" > $PO_FILE_LIST_NO_MASTER
-    PO_FILE_LIST=$PO_FILE_LIST_NO_MASTER
-fi
+sh $PO_FINDER $BASE_SEARCH_DIR $LANG > $PO_FILE_LIST
 
 rm -f $ALL_STRINGS
 for LANG_FILE in `cat $PO_FILE_LIST`; do
     ENC=`cat $LANG_FILE | grep -e "^\"Content-Type:" | sed 's:^.*charset=::' | sed 's:\\\n\"::'`
-    $CHECK_VAR -s $LANG_FILE | iconv --from $ENC --to utf-8 >> $SUSPECT_VARS
-    awk -f $GATHER_MSGSTR_SCRIPT $LANG_FILE | iconv --from $ENC --to utf-8 >> $ALL_STRINGS
+
+    echo "$LANG_FILE" | grep -e ".po$" > /dev/null
+    if  [ $? = 0 ] ; then
+
+	echo $ENC | grep -iw "utf-8" > /dev/null
+	if [ $? = 0 ]  ; then
+	    if [ $HANDLE_SUSPECT_VARS = "yes" ] ; then
+		$CHECK_VAR -s $LANG_FILE >> $SUSPECT_VARS
+	    fi
+	    awk -f $GATHER_MSGSTR_SCRIPT $LANG_FILE >> $ALL_STRINGS
+	else
+	    if [ $HANDLE_SUSPECT_VARS = "yes" ] ; then
+		$CHECK_VAR -s $LANG_FILE | iconv --from $ENC --to utf-8 >> $SUSPECT_VARS
+	    fi
+	    awk -f $GATHER_MSGSTR_SCRIPT $LANG_FILE | iconv --from $ENC --to utf-8 >> $ALL_STRINGS
+	fi
+
+    else			# now deal with ".pot" files
+	if [ $HANDLE_SUSPECT_VARS = "yes" ] ; then
+	    $CHECK_VAR -s $LANG_FILE >> $SUSPECT_VARS
+	fi
+	awk -f $GATHER_MSGID_SCRIPT $LANG_FILE >> $ALL_STRINGS
+    fi
 done
 
-if [ $LANG = en ] ; then
-    find $DI_COPY -name "templates.pot" >> $PO_FILE_LIST
-
-    for LANG_FILE in `cat $PO_FILE_LIST | grep "templates.pot$"`; do
-	$CHECK_VAR -s $LANG_FILE >> $SUSPECT_VARS
-	awk -f $GATHER_MSGID_SCRIPT $LANG_FILE >> $ALL_STRINGS
-    done
+if [ $HANDLE_SUSPECT_VARS = "yes" ] ; then
+    if [ `ls -l $SUSPECT_VARS | awk '{print $5}'` -gt 0 ]; then
+	FILES_TO_KEEP="$SUSPECT_VARS $FILES_TO_KEEP" 
+	SUSPECT_EXIST=1
+    else
+	rm $SUSPECT_VARS
+	SUSPECT_EXIST=0
+    fi
 fi
 
-if [ `ls -l $SUSPECT_VARS | awk '{print $5}'` -gt 0 ]; then
-    FILES_TO_KEEP="$SUSPECT_VARS $FILES_TO_KEEP" 
-    SUSPECT_EXIST=1
+# remove ${ALL_THESE_VARIABLES} if they do not need to be spell checked
+if [ $REMOVE_VARS = "yes" ] ; then
+    NEEDS_RM="$NO_VARS $NEEDS_RM"
+    grep -e "^-" $ALL_STRINGS | sed s/\$\{[a-zA-Z0-9_]*\}//g > $NO_VARS
+    FILE_TO_CHECK=$NO_VARS
 else
-    rm $SUSPECT_VARS
-    SUSPECT_EXIST=0
+    FILE_TO_CHECK=$ALL_STRINGS
 fi
 
-# Remove ${HOME} from the "*** path_of_po_file" string
-cat $ALL_STRINGS | sed "s:\(.*\)${HOME}\(.*\):\1\2:" > $DEST_DIR/no_home.txt
-mv $DEST_DIR/no_home.txt $ALL_STRINGS
-
-# remove ${ALL_THESE_VARIABLES} which do not need to be spell checked
-grep -e "^-" $ALL_STRINGS | sed s/\$\{[a-zA-Z0-9_]*\}//g > $NO_VARS
-
-# spell check the selected strings eventually using a custom wl and utf-8 encoding (works?)
-cat $NO_VARS | aspell list --lang=$LANG --encoding=utf-8 $WL_PARAM > $ALL_UNKNOWN
+# spell check the selected strings eventually using a custom wl 
+cat $FILE_TO_CHECK | aspell list --lang=$LANG --encoding=utf-8 $WL_PARAM $ASPELL_EXTRA_PARAM > $ALL_UNKNOWN
 
 # sort all the unrecognized words (don't care about upper/lower case)
 # count duplicates
 # take note of unknown words
 cat $ALL_UNKNOWN | sort -f | uniq -c > $UNKN
+
+# if we're *not* handling suspecet vars (i.e. d-i manual), make this an empty string
+if [ $HANDLE_SUSPECT_VARS = "no" ] ; then
+    SUSPECT_EXIST=
+fi
 
 # build the entry of stats.txt for the current language (i.e "395 it 1")
 echo `wc -l $UNKN | awk '{print $1}'` $LANG $SUSPECT_EXIST >> ${DEST_DIR}/stats.txt

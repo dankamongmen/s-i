@@ -27,12 +27,6 @@ checks()
 	echo $DI_COPY does not exist
 	exit 1
     fi
-
-#     dpkg -l gnuplot | grep -q "^ii" 
-#     if  [ $? != 0 ] ; then
-# 	echo "gnuplot is not installed on your system"
-# 	exit 1
-#     fi
 }
 
 if [ -z "$1" ]
@@ -47,7 +41,7 @@ initialise	# initalise some variables
 checks          # do an environment check
 
 i=0
-for LANGUAGE in `cat lang2dict.txt | sed "s:\(^#.*\)::"`; do
+for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
     LANG=`echo  ${LANGUAGE} | awk -F, '{print $1}'`
     DICT=`echo  ${LANGUAGE} | awk -F, '{print $2}'`
 
@@ -64,7 +58,7 @@ if [ ! -d $DEST_DIR ] ; then
 fi
 
 # build "index.html" with the new results
-sh build_index.sh $STATS.txt index_template.html $DEST_DIR/index.html
+sh build_index.sh $STATS.txt $HTML_PAGE $DEST_DIR/index.html
 
 # Compute some statistics
 i=0
@@ -98,10 +92,10 @@ exec 6>&1           # Link file descriptor #6 with stdout.
 
 exec > $LOGFILE     # stdout replaced with file "logfile.txt".
 
-#echo "set terminal png size 640,480" >> $GNUPLOT_SCRIPT
+#echo "set terminal png size 640,480"
 echo "set terminal png"
 echo "set output \"$DEST_DIR/graph.png\""
-echo "set title \"Statistics for the $i languages with an Aspell dictionary\""
+echo "set title \"$PLOT_TITLE ($i languages)\""
 echo "set key left"
 echo "set xlabel \"Languages\" 0,-1"
 echo "set ylabel \"Unknown words\""
