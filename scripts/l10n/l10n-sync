@@ -80,6 +80,11 @@ fi
 exit 1
 }
 
+gettexterr() {
+echo "Error in a gettext operation, please investigate"
+exit 2
+}
+
 ##  Command line parsing
 MORETODO=true
 while $MORETODO ; do
@@ -444,18 +449,31 @@ for po in *.po ; do
    echo "     - Merge with template.pot:"
  fi
  if [ "$DEBUG" = "Y" ] ; then
+   # In case some msgids are duplicate
+   if ! msguniq $po > $po.uniq ; then
+     gettexterr
+   fi
+   # Now do the real merge
+   # The following does not work on woody (gluck for instance)
    # msgmerge -U $po template.pot
-   #
-   # Will not mark strings in the PO but not in the POT as obsolete
-   # so not appropriate for cases when a merge occurs
-   msgmerge $po template.pot >$po.new
+   if ! msgmerge $po.uniq template.pot >$po.new ; then
+     gettexterr
+   fi
    mv $po.new $po
  else
+   # In case some msgids are duplicate
+   if ! msguniq $po > $po.uniq ; then
+     gettexterr
+   fi
+   # Now do the real merge
+   # The following does not work on woody (gluck for instance)
    # msgmerge -U $po template.pot >/dev/null 2>&1
    #
    # Will not mark strings in the PO but not in the POT as obsolete
    # so not appropriate for cases when a merge occurs
-   msgmerge $po template.pot >$po.new 2>/dev/null
+   if ! msgmerge $po.uniq template.pot >$po.new 2>/dev/null ; then
+     gettexterr
+   fi
    mv $po.new $po
  fi
  if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
