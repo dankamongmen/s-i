@@ -970,7 +970,7 @@ struct question_handlers {
 	{ "password",	newt_handler_password },        // OK
 	{ "note",	newt_handler_note },            // OK
 	{ "text",	newt_handler_text },
-        { "error",      newt_handler_error },
+	{ "error",      newt_handler_error },
 };
 
 /*
