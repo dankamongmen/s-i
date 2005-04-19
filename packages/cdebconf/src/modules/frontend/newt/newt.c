@@ -938,7 +938,7 @@ static int newt_handler_note(struct frontend *obj, struct question *q)
 static int
 newt_handler_text(struct frontend *obj, struct question *q)
 {
-    /* FIXME: Is really text an interactive question type? */
+    /* FIXME: Is text really an interactive question type? */
     return newt_handler_note(obj, q);
 }
 
@@ -981,7 +981,7 @@ struct question_handlers {
  * Description: initializes the text UI
  * Assumptions: none
  *
- * TODO: SIGINT is ignored by the newt UI, otherwise it interfers with
+ * TODO: SIGINT is ignored by the newt UI, otherwise it interferes with
  * the way question/answers are handled. this is probably not optimal
  */
 static int
