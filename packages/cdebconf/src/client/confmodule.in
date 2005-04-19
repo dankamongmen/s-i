@@ -36,31 +36,20 @@ export DEBCONF_OLD_FD_BASE
 ###############################################################################
 # Commands.
 
-# Generate subroutines for all commands that don't have special handlers.
-# Each command must be listed twice, once in lower case, once in upper.
-# Doing that saves us a lot of calls to tr at load time. I just wish shell had
-# an upper-case function.
-_old_opts="$@"
-for i in @COMMANDS@; do
-	# Break string up into words.
-	set -- $i
-	# Generate functions on the fly.
-	eval "db_$1 () {
-		echo \"$2 \$@\" >&3
-		# Set to newline to get whole line.
-		local IFS='
+_db_cmd () {
+	echo "$@" >&3
+	# Set to newline to get whole line.
+	local IFS='
 '
-		local _LINE
-		read -r _LINE
-		# Disgusting, but it's the only good way to split the line,
-		# preserving all other whitespace.
-		RET=\"\${_LINE#[! 	][ 	]}\"
-		return \${_LINE%%[ 	]*}
-	      }"
-done
-# $@ was clobbered above, unclobber.
-set -- $_old_opts
-unset _old_opts
+	local _LINE
+	read -r _LINE
+	# Disgusting, but it's the only good way to split the line,
+	# preserving all other whitespace.
+	RET="${_LINE#[! 	][ 	]}"
+	return ${_LINE%%[ 	]*}
+}
+
+REPEAT: db_@command@ ()	{ _db_cmd "@COMMAND@ $@"; }
 
 # Just an old alias for input.
 db_text () {
