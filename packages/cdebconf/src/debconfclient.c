@@ -63,7 +63,8 @@ static int debconfclient_command(struct debconfclient *client,
 	return debconfclient_handle_rsp(client);
 }
 
-int debconf_commandf(struct debconfclient *client, const char *cmd, ...)
+static int debconfclient_commandf(struct debconfclient *client,
+	const char *cmd, ...)
 {
 	va_list ap;
 
@@ -99,7 +100,7 @@ struct debconfclient *debconfclient_new(void)
 	}
 
 	client->command = debconfclient_command;
-	client->commandf = debconf_commandf;
+	client->commandf = debconfclient_commandf;
 	client->ret = debconfclient_ret;
 	client->out = fdopen(3, "a");
 
