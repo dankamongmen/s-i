@@ -88,14 +88,14 @@ static int confmodule_communicate(struct confmodule *mod)
         }
 
         inp = strstrip(in);
-        INFO(INFO_DEBUG, "--> %s\n", inp);
+        INFO(INFO_DEBUG, "--> %s", inp);
         out = _confmodule_process(mod, inp);
         if (out == NULL) {
             fprintf(stderr, "E: Unimplemented function\n");
             continue;
         }
         /*		if (out[0] == 0) break; // STOP called*/
-        INFO(INFO_DEBUG, "<-- %s\n", out);
+        INFO(INFO_DEBUG, "<-- %s", out);
         write(mod->outfd, out, strlen(out));
         write(mod->outfd, "\n", 1);
         free(out);
@@ -110,14 +110,14 @@ static char *confmodule_process_command(struct confmodule *mod, char *cmd)
 
     inp = strstrip(cmd);
 
-    INFO(INFO_DEBUG, "--> %s\n", inp);
+    INFO(INFO_DEBUG, "--> %s", inp);
     out = _confmodule_process(mod, inp);
     if (out == NULL) {
         fprintf(stderr, "E: Unimplemented function\n");
         asprintf(&out, "%u Not implemented", DC_NOTOK);
     }
     /*		if (out[0] == 0) break; // STOP called*/
-    INFO(INFO_DEBUG, "<-- %s\n", out);
+    INFO(INFO_DEBUG, "<-- %s", out);
 
     return out;
 }

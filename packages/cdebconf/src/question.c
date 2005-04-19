@@ -87,7 +87,7 @@ void question_variable_add(struct question *q, const char *var,
 	struct questionvariable *qvi = q->variables;
 	struct questionvariable **qlast = &q->variables;
 
-	INFO(INFO_DEBUG, "Adding [%s] -> [%s]\n", var, value);
+	INFO(INFO_DEBUG, "Adding [%s] -> [%s]", var, value);
 	for (; qvi != 0; qlast = &qvi->next, qvi = qvi->next)
 		if (strcmp(qvi->variable, var) == 0 && qvi->value != value)
 		{

@@ -880,7 +880,7 @@ static void text_progress_set(struct frontend *obj, int val)
 
 static void text_progress_stop(struct frontend *obj)
 {
-	INFO(INFO_DEBUG, "%s\n", __FUNCTION__);
+	INFO(INFO_DEBUG, "%s", __FUNCTION__);
 	printf("\n");
 	fflush(stdout);
 	DELETE(obj->progress_title);

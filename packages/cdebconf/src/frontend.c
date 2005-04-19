@@ -205,7 +205,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	}
 
 	obj->capability = obj->methods.query_capability(obj);
-	INFO(INFO_VERBOSE, "Capability: 0x%08X\n", obj->capability);
+	INFO(INFO_VERBOSE, "Capability: 0x%08X", obj->capability);
 
 	return obj;
 }

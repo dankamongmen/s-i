@@ -203,7 +203,7 @@ int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
 
     if (inbuf == 0) return 0;
 
-    INFO(INFO_VERBOSE, "Splitting [%s]\n", inbuf);
+    INFO(INFO_VERBOSE, "Splitting [%s]", inbuf);
     while (*s != 0 && argc < maxnarg)
     {
         /* skip initial spaces */

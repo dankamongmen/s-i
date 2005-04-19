@@ -341,7 +341,7 @@ static struct question *textdb_question_get(struct question_db *db,
 	if (ltag == NULL) return DC_NOTOK;
 	filename = question_filename(db, ltag);
 
-    INFO(INFO_DEBUG, "%s: filename = [%s]\n", __FILE__, filename);
+    INFO(INFO_DEBUG, "%s: filename = [%s]", __FILE__, filename);
 
 	rec = config_new();
 	if (rec->read(rec, filename) != DC_OK)
@@ -374,7 +374,7 @@ static struct question *textdb_question_get(struct question_db *db,
 				question_owner_add(q, node->tag);
 	}
 
-    INFO(INFO_DEBUG, "Read q = %s\n", q->tag);
+    INFO(INFO_DEBUG, "Read q = %s", q->tag);
 
 	if (q->tag == 0 || q->value == 0 || q->template == 0)
 	{
@@ -412,7 +412,7 @@ static struct question *textdb_question_iterate(struct question_db *db,
 	{
         snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
         path = db->config->get(db->config, tmp, ".");
-        INFO(INFO_VERBOSE, "Checking %s -> %s\n", tmp, path);
+        INFO(INFO_VERBOSE, "Checking %s -> %s", tmp, path);
 
 		dir = opendir(path);
 		if (dir == NULL)
@@ -427,7 +427,7 @@ static struct question *textdb_question_iterate(struct question_db *db,
     do {
         if ((ent = readdir(dir)) == NULL)
         {
-            INFO(INFO_DEBUG, "readdir returned NULL\n");
+            INFO(INFO_DEBUG, "readdir returned NULL");
             closedir(dir);
             return NULL;
         }
@@ -436,7 +436,7 @@ static struct question *textdb_question_iterate(struct question_db *db,
         ret = stat(tmp, &st);
     } while (ret < 0 || S_ISDIR(st.st_mode));
 
-    INFO(INFO_DEBUG, "Getting %s\n", ent->d_name);
+    INFO(INFO_DEBUG, "Getting %s", ent->d_name);
 	return textdb_question_get(db, ent->d_name);
 }
 

@@ -28,7 +28,7 @@ int priority_compare(const char *p1, const char *p2)
 	i1 = priority_code(p1);
 	i2 = priority_code(p2);
 
-	INFO(INFO_VERBOSE, "Comparing priorities %s (%d) with %s (%d)\n",
+	INFO(INFO_VERBOSE, "Comparing priorities %s (%d) with %s (%d)",
 		p1, i1, p2, i2);
 
 	if (i1 > i2)

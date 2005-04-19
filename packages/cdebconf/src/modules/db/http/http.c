@@ -303,7 +303,7 @@ static struct question *http_question_get(struct question_db *db,
 		 url, translated_tag);
 	
 	system(buf);
-	INFO(INFO_DEBUG, "%s: url = [%s]\n", __FILE__, url);
+	INFO(INFO_DEBUG, "%s: url = [%s]", __FILE__, url);
 	asprintf(&path, "/tmp/cdebconf_q_%s", translated_tag);
 
 	if (path == NULL ||
@@ -312,7 +312,7 @@ static struct question *http_question_get(struct question_db *db,
 			if (errno == ENOENT)
 				return DC_NOTOK;
 
-			INFO(INFO_ERROR, "Cannot get question %s: %s\n",
+			INFO(INFO_ERROR, "Cannot get question %s: %s",
 			     ltag, strerror(errno));
 			return DC_NOTOK;
 		}
@@ -326,7 +326,7 @@ static struct question *http_question_get(struct question_db *db,
 
         if (name == NULL || *name == 0)
         {
-            INFO(INFO_ERROR, "Read a stanza without a name\n");
+            INFO(INFO_ERROR, "Read a stanza without a name");
             DELETE(header);
             continue;
         }

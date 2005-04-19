@@ -195,7 +195,7 @@ static int rfc822db_template_load(struct template_db *db)
     if (path == NULL ||
         (inf = fopen(path, "r")) == NULL)
     {
-        INFO(INFO_VERBOSE, "Cannot open template file %s\n",
+        INFO(INFO_VERBOSE, "Cannot open template file %s",
             path ? path : "<empty>");
         return DC_NOTOK;
     }
@@ -209,7 +209,7 @@ static int rfc822db_template_load(struct template_db *db)
         name = rfc822_header_lookup(header, "name");
         if (name == NULL)
         {
-            INFO(INFO_ERROR, "Read a stanza without a name\n");
+            INFO(INFO_ERROR, "Read a stanza without a name");
             DELETE(header);
             continue;
         }
@@ -242,7 +242,7 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
     case postorder: 
     case leaf:
         p = t->lget((struct template *) t, NULL, "tag");
-        INFO(INFO_VERBOSE, "dumping template %s\n", p);
+        INFO(INFO_VERBOSE, "dumping template %s", p);
 
         for (field = template_fields_list; *field != NULL; field++)
         {
@@ -289,12 +289,12 @@ static int rfc822db_template_save(struct template_db *db)
     path = db->config->get(db->config, tmp, 0);
     if (path == NULL)
     {
-        INFO(INFO_ERROR, "Cannot open template file <empty>\n");
+        INFO(INFO_ERROR, "Cannot open template file <empty>");
         return DC_NOTOK;
     }
     else if ((outf = fopen(path, "w")) == NULL)
     {
-        INFO(INFO_ERROR, "Cannot open template file %s: %s\n",
+        INFO(INFO_ERROR, "Cannot open template file %s: %s",
             path, strerror(errno));
         return DC_NOTOK;
     }
@@ -327,7 +327,7 @@ static struct template *rfc822db_template_get(struct template_db *db,
 static int rfc822db_template_set(struct template_db *db, struct template *template)
 {
         struct template_db_cache *dbdata = db->data;
-    INFO(INFO_VERBOSE, "rfc822db_template_set(db,t=%s)\n", template->tag);
+    INFO(INFO_VERBOSE, "rfc822db_template_set(db,t=%s)", template->tag);
 
     tdelete(template, &dbdata->root, nodetemplatecomp);
     tsearch(template, &dbdata->root, nodetemplatecomp);
@@ -343,7 +343,7 @@ static int rfc822db_template_remove(struct template_db *db, const char *tag)
     struct template_db_cache *dbdata = db->data;
     struct template *t, t2;
 
-    INFO(INFO_VERBOSE, "rfc822db_template_remove(db,tag=%s)\n",tag);
+    INFO(INFO_VERBOSE, "rfc822db_template_remove(db,tag=%s)",tag);
 
     t2.tag = (char*) tag;
     t = tdelete(&t, &dbdata->root, nodetemplatecomp);
@@ -364,7 +364,7 @@ static struct template *rfc822db_template_iterate(struct template_db *db,
     di_slist_node *node;
     struct template *t;
 
-    INFO(INFO_VERBOSE, "rfc822db_template_iterate(db,*iter=%p)\n", *iter);
+    INFO(INFO_VERBOSE, "rfc822db_template_iterate(db,*iter=%p)", *iter);
 
     node = *(di_slist_node **) iter;
     if (node == NULL) {
@@ -429,7 +429,7 @@ static int rfc822db_question_load(struct question_db *db)
         if (errno == ENOENT)
             return DC_NOTOK;
 
-        INFO(INFO_VERBOSE, "Cannot open config database %s: %s\n",
+        INFO(INFO_VERBOSE, "Cannot open config database %s: %s",
             path ? path : "<empty>", strerror(errno));
         return DC_NOTOK;
     }
@@ -443,7 +443,7 @@ static int rfc822db_question_load(struct question_db *db)
 
         if (name == NULL || *name == 0)
         {
-            INFO(INFO_ERROR, "Read a stanza without a name\n");
+            INFO(INFO_ERROR, "Read a stanza without a name");
             DELETE(header);
             continue;
         }
@@ -483,7 +483,7 @@ void rfc822db_question_dump(const void *node, const VISIT which, const int depth
   case postorder: 
   case leaf:
 
-        INFO(INFO_VERBOSE, "dumping question %s\n", (q)->tag); 
+        INFO(INFO_VERBOSE, "dumping question %s", (q)->tag); 
         fprintf(outf, "Name: %s\n", escapestr((q)->tag));
         fprintf(outf, "Template: %s\n", escapestr((q)->template->tag));
         if ((q)->value)
@@ -540,12 +540,12 @@ static int rfc822db_question_save(struct question_db *db)
     path = db->config->get(db->config, tmp, 0);
     if (path == NULL)
     {
-        INFO(INFO_ERROR, "Cannot open question file <empty>\n");
+        INFO(INFO_ERROR, "Cannot open question file <empty>");
         return DC_NOTOK;
     }
     else if ((outf = fopen(path, "w")) == NULL)
     {
-        INFO(INFO_ERROR, "Cannot open question file %s: %s\n",
+        INFO(INFO_ERROR, "Cannot open question file %s: %s",
             path, strerror(errno));
         return DC_NOTOK;
     }
@@ -583,7 +583,7 @@ static int rfc822db_question_set(struct question_db *db, struct question *questi
     struct question_db_cache *dbdata = db->data;
     struct question *q;
 
-    INFO(INFO_VERBOSE, "rfc822db_question_set(db,q=%s,q=%p)\n", question->tag, question);
+    INFO(INFO_VERBOSE, "rfc822db_question_set(db,q=%s,q=%p)", question->tag, question);
 
     tdelete(question, &dbdata->root, nodequestioncomp);
     q = tsearch(question, &dbdata->root, nodequestioncomp);
@@ -614,7 +614,7 @@ static struct question *rfc822db_question_iterate(struct question_db *db,
     di_slist_node *node;
     struct question *q;
 
-    INFO(INFO_VERBOSE, "rfc822db_question_iterate(db,*iter=%p)\n", *iter);
+    INFO(INFO_VERBOSE, "rfc822db_question_iterate(db,*iter=%p)", *iter);
 
     node = *(di_slist_node **) iter;
     if (node == NULL) {

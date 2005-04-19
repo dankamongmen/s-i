@@ -27,6 +27,7 @@ void debug_printf(int level, char *fmt, ...)
 #ifndef SYSLOG_LOGGING
 		va_start(ap, fmt);
 		vfprintf(fp, fmt, ap);
+		fputc('\n', fp);
 		va_end(ap);
 
 		fflush(fp);

@@ -442,7 +442,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	tindex = malloc(sizeof(int) * count);
 	strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
 	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
-	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults\n", count, dcount);
+	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults", count, dcount);
 	if (count <= 0) return DC_NOTOK;
 	if (count == 1 && !multi)
 	{
@@ -473,7 +473,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 		ypos = 3;
 		bottom = top + MIN(count, win->h - 7);
 
-		INFO(INFO_VERBOSE, "[val; %d, top: %d, bottom: %d]\n", val,
+		INFO(INFO_VERBOSE, "[val; %d, top: %d, bottom: %d]", val,
 			top, bottom);
 		for (i = top; i < bottom; i++)
 		{
@@ -482,7 +482,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 				"(%c) %-*s ", (selected[tindex[i]] ? '*' : ' '), 
 				longest, choices_translated[i]);
 
-			INFO(INFO_VERBOSE, "(%c) %-*s\n", (selected[tindex[i]] ? '*' : 
+			INFO(INFO_VERBOSE, "(%c) %-*s", (selected[tindex[i]] ? '*' : 
 				' '), longest, choices_translated[i]);
 		}
 
@@ -562,7 +562,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 
 static int slang_select(struct frontend *ui, struct question *q)
 {
-	INFO(INFO_VERBOSE, "calling getselect\n");
+	INFO(INFO_VERBOSE, "calling getselect");
 	return slang_getselect(ui, q, 0);
 }
 
@@ -723,11 +723,11 @@ static int slang_initialize(struct frontend *obj, struct configuration *cfg)
 
 	SLtt_get_terminfo();
 	ret = SLsmg_init_smg();
-	INFO(INFO_DEBUG, "SLsmg_init_smg returned %d\n", ret);
+	INFO(INFO_DEBUG, "SLsmg_init_smg returned %d", ret);
 	ret = SLang_init_tty(-1, 0, 0);
-	INFO(INFO_DEBUG, "SLang_init_tty returned %d\n", ret);
+	INFO(INFO_DEBUG, "SLang_init_tty returned %d", ret);
 	ret = SLkp_init();
-	INFO(INFO_DEBUG, "SLkp_init returned %d\n", ret);
+	INFO(INFO_DEBUG, "SLkp_init returned %d", ret);
 
 	slang_initwin(obj, WIN_QUERY, &uid->qrywin);
 	slang_initwin(obj, WIN_DESC, &uid->descwin);
@@ -769,14 +769,14 @@ static int slang_go(struct frontend *obj)
 		ret = DC_OK;
 		for (i = 0; i < DIM(question_handlers); i++)
 		{
-			INFO(INFO_VERBOSE, "For question [%s], comparing question type [%s] against handler %d (%s)\n", q->tag, q->template->type, i, question_handlers[i].type);
+			INFO(INFO_VERBOSE, "For question [%s], comparing question type [%s] against handler %d (%s)", q->tag, q->template->type, i, question_handlers[i].type);
 			if (strcasecmp(q->template->type, question_handlers[i].type) == 0)
 			{
-				INFO(INFO_VERBOSE, "Found one!\n");
+				INFO(INFO_VERBOSE, "Found one!");
 				UIDATA(obj)->descstart = 0;
 				slang_drawdesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
-				INFO(INFO_VERBOSE, "Return code = %d\n", ret);
+				INFO(INFO_VERBOSE, "Return code = %d", ret);
 				switch (ret)
 				{
 				case DC_OK:

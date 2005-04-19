@@ -308,7 +308,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 				/* syntax error */
 				if (termchar == '{' && linebuf[0] == 0)
 				{
-					INFO(INFO_ERROR, "Syntax error %s:%u: block starts with no name\n", filename, curline);
+					INFO(INFO_ERROR, "Syntax error %s:%u: block starts with no name", filename, curline);
 					return DC_NOTOK;
 				}
 
@@ -330,7 +330,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 				if (strparsecword(&q, tag, sizeof(tag)) == 0
 				    && strparsequoteword(&q, tag, sizeof(tag)) == 0)
 				{
-					INFO(INFO_ERROR, "Syntax error %s:%u: Malformed tag\n", filename, curline);
+					INFO(INFO_ERROR, "Syntax error %s:%u: Malformed tag", filename, curline);
 					return DC_NOTOK;
 				}
 

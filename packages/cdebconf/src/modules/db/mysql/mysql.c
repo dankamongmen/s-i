@@ -63,7 +63,7 @@ static MYSQL_RES *mysql_runquery(struct database *db, const char *fmt, ...)
 	vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
 
-	INFO(INFO_DEBUG, "SQL: [%s]\n", buf);
+	INFO(INFO_DEBUG, "SQL: [%s]", buf);
 	if (mysql_query(DBH(db), buf) != 0)
 		return NULL;
 
