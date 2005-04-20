@@ -462,12 +462,15 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	 */
 	selected = malloc(sizeof(char) * count);
 	for (i = count-1; i >=0; i--)
+	{
+		selected[tindex[i]] = 0;
 		for (j = 0; j < dcount; j++)
 			if (strcmp(choices[tindex[i]], defaults[j]) == 0)
 			{
 				selected[tindex[i]] = 1;
 				val = i;
 			}
+	}
 
 	longest = strlongest(choices, count);
 	top = 0;
