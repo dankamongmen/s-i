@@ -751,7 +751,7 @@ static int slang_shutdown(struct frontend *obj)
 	return DC_OK;
 }
 
-static int slang_can_go_back(struct frontend *obj, struct question *q)
+static bool slang_can_go_back(struct frontend *obj, struct question *q)
 {
 	return (obj->capability & DCF_CAPB_BACKUP);
 }
