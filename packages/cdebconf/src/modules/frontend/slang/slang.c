@@ -473,7 +473,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	}
 
 	longest = strlongest(choices, count);
-	top = 0;
+	top = val - win->h + 8;
 	if (top < 0) top = 0;
 	xpos = (COLS-longest)/2-1;
 
@@ -482,7 +482,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 		ypos = 3;
 		bottom = top + MIN(count, win->h - 7);
 
-		INFO(INFO_VERBOSE, "[val; %d, top: %d, bottom: %d]", val,
+		INFO(INFO_VERBOSE, "[val: %d, top: %d, bottom: %d]", val,
 			top, bottom);
 		for (i = top; i < bottom; i++)
 		{
