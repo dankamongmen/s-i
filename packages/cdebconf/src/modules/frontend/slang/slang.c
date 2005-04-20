@@ -423,10 +423,10 @@ static int slang_note(struct frontend *ui, struct question *q)
 
 static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 {
-	char *choices[100] = {0};
-	char *choices_translated[100] = {0};
-	char *defaults[100] = {0};
-	char selected[100] = {0};
+	char **choices;
+	char **choices_translated;
+	char **defaults;
+	char *selected;
 	char answer[1024] = {0};
 	int *tindex = NULL;
 	const char *indices = q_get_indices(q);
@@ -439,11 +439,16 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	count = strgetargc(q_get_choices_vals(q));
 	if (count <= 0)
 		return DC_NOTOK;
+	choices = malloc(sizeof(char *) * count);
+	choices_translated = malloc(sizeof(char *) * count);
 	tindex = malloc(sizeof(int) * count);
-	strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
+	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+		return DC_NOTOK;
+
+	defaults = malloc(sizeof(char *) * count);
+	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, count);
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults", count, dcount);
-	if (count <= 0) return DC_NOTOK;
+	if (dcount <= 0) return DC_NOTOK;
 	if (count == 1 && !multi)
 	{
 		dcount = 1;
@@ -455,6 +460,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	 * Loop in descending order so that cursor is at the first
 	 * selected value
 	 */
+	selected = malloc(sizeof(char) * count);
 	for (i = count-1; i >=0; i--)
 		for (j = 0; j < dcount; j++)
 			if (strcmp(choices[tindex[i]], defaults[j]) == 0)
@@ -551,8 +557,12 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 		free(choices[i]);
 		free(choices_translated[i]);
 	}
+	free(choices);
+	free(choices_translated);
 	for (i = 0; i < dcount; i++)
 		free(defaults[i]);
+	free(defaults);
+	free(selected);
 	question_setvalue(q, answer);
 
 	free(tindex);
