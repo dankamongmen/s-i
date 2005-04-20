@@ -89,7 +89,7 @@ void parsecmdline(struct configuration *config, int argc, char **argv)
             case 'p':
                 break;
             case 'f':
-		        config->set(config, "frontend::default::driver", optarg);
+                config->set(config, "_cmdline::frontend", optarg);
                 break;
             default:
                 break;
