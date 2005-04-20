@@ -537,7 +537,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 			default: 
 				if (multi == 0)
 				{
-					memset(selected, 0, sizeof(selected));
+					memset(selected, 0, sizeof(*selected) * count);
 					selected[tindex[val]] = 1;
 				}
 				else
