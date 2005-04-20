@@ -19,6 +19,8 @@ LDFLAGS = $(MODLDFLAGS) $(GNOME_LIBS)
 
 $(PROJ)-all: $(ORBIT_IDLTARGETS) $(PROJ_SERV)
 
+$(OBJS): $(ORBIT_IDLTARGETS)
+
 $(PROJ)-text: $(PROJ)-text.o $(PROJ)-skels.o $(PROJ)-common.o
 	$(CC) -o $(PROJ)-text $^ $(LDFLAGS)
 

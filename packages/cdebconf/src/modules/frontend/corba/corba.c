@@ -22,6 +22,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include <ORBitservices/CosNaming.h>
+
 #include "dcf-common.c"		/* Yeah, stupid and wrong. :P */
 #include "dcf-stubs.c"
 
@@ -32,7 +34,7 @@
       buffer = CORBA_exception_id(ev);	 					\
       if (strcmp (buffer, "Debconf_Frontend_Failure")) { 			\
 	fprintf(stderr, "dcf_corba: user exception: %s\n", 			\
-		(CORBA_exception_value(ev))->reason); 				\
+		((Debconf_Failure *) CORBA_exception_value(ev))->reason); 	\
 	return DC_NOTOK; 							\
       } else { 									\
 	fprintf(stderr, "dcf_corba: unknown exception raised!!\n");	 	\
@@ -77,7 +79,7 @@ static int corba_note(struct frontend *f, struct question *q) {
   struct uidata *uid = UIDATA(f);
   CORBA_Environment *ev = uid->ev;
 
-  CORBA_boolean ans = Debconf_Frontend_Note(*uid->serv, "yes/no", ev);
+  Debconf_Frontend_Note(*uid->serv, "yes/no", ev);
   EXCEPTION(ev);
 
   return DC_OK;
@@ -229,7 +231,7 @@ static int corba_go(struct frontend *f) {
 	corba_displaydesc(f, q);
 	ret = question_handlers[i].handler(f, q);
 	if (ret == DC_OK)
-	  f->db->question_set(f->db, q);
+	  f->qdb->methods.set(f->qdb, q);
 	else
 	  return ret;
 	break;
