@@ -45,5 +45,22 @@ config {
     driver "stack";
     stack { "config_gen_db"; "config_passwd_db"; };
   };
+
+  instance "target_config_gen_db" {
+    driver "rfc822db";
+    path "/target/var/cache/debconf/config.dat";
+    reject_types { "password"; };
+  };
+
+  instance "target_config_passwd_db" {
+    driver "rfc822db";
+    path "/target/var/cache/debconf/passwords.dat";
+    accept_types { "password"; };
+  };
+
+  instance "target_configdb" {
+    driver "stack";
+    stack { "target_config_gen_db"; "target_config_passwd_db"; };
+  };
 };
 
