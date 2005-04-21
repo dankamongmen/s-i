@@ -59,6 +59,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+struct frontend_data {
+	char *previous_title;
+};
+
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
 #define q_get_description(q)		question_get_field((q), "", "description")
 #define q_get_choices(q)		question_get_field((q), "", "choices")
@@ -620,8 +624,9 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 static int text_handler_note(struct frontend *obj, struct question *q)
 {
 	char buf[100] = {0};
-	printf("%s\n", get_text(obj, "debconf/cont-prompt",
-				"[Press enter to continue]"));
+	printf("%s ", get_text(obj, "debconf/cont-prompt",
+			       "[Press enter to continue]"));
+	fflush(stdout);
 	while (1)
 	{
 		get_answer(buf, sizeof(buf));
@@ -781,6 +786,9 @@ struct question_handlers {
  */
 static int text_initialize(struct frontend *obj, struct configuration *conf)
 {
+	struct frontend_data *data = NEW(struct frontend_data);
+	data->previous_title = NULL;
+	obj->data = data;
 	obj->interactive = 1;
 	signal(SIGINT, SIG_IGN);
 	return DC_OK;
@@ -809,18 +817,21 @@ text_can_go_back(struct frontend *obj, struct question *q)
  */
 static int text_go(struct frontend *obj)
 {
+	struct frontend_data *data = (struct frontend_data *) obj->data;
 	struct question *q = obj->questions;
 	int i;
 	int ret = DC_OK;
-	int display_title = 1;
 
 	while (q != NULL) {
 		for (i = 0; i < DIM(question_handlers); i++) {
-			if (strcmp(q->template->type, question_handlers[i].type) == 0) 
+			if (strcmp(q->template->type, question_handlers[i].type) == 0)
 			{
-
-				if (display_title)
+				if (!data->previous_title ||
+				    strcmp(obj->title, data->previous_title) != 0)
 				{
+					size_t underline_len;
+					char *underline;
+
 					/* TODO: can't tell if we called go()
 					 * twice during one progress bar, but
 					 * I'm guessing that's relatively
@@ -828,11 +839,19 @@ static int text_go(struct frontend *obj)
 					 */
 					if (obj->progress_title != NULL)
 						putchar('\n');
-					printf("%s\n\n", obj->title);
-					display_title = 0;
+					underline_len = strlen(obj->title);
+					underline = malloc(underline_len + 1);
+					memset(underline, '-', underline_len);
+					underline[underline_len] = '\0';
+					printf("%s\n%s\n\n", obj->title, underline);
+					free(underline);
+					if (data->previous_title)
+						free(data->previous_title);
+					data->previous_title = strdup(obj->title);
 				}
 				text_handler_displaydesc(obj, q);
 				ret = question_handlers[i].handler(obj, q);
+				putchar('\n');
 				if (ret == DC_OK)
 					obj->qdb->methods.set(obj->qdb, q);
 				else if (ret == DC_GOBACK && q->prev != NULL)
