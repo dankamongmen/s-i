@@ -33,6 +33,7 @@ $(PROJ)-clean:
 	-rm *.[oa] $(PROJ)-text
 
 $(PROJ)-distclean: $(PROJ)-clean
-	-rm -f $(PROJ)-stubs.[oc] $(PROJ)-skels.[oc] $(PROJ)-common.[oc] $(PROJ).h
+	-rm -f $(PROJ)-stubs.[oc] $(PROJ)-skels.[oc] $(PROJ)-skelimpl.[oc] \
+		$(PROJ)-common.[oc] $(PROJ).h
 
 .PHONY: $(PROJ)-all $(PROJ)-clean $(PROJ)-distclean
