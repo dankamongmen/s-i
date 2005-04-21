@@ -28,7 +28,7 @@ fi
 
 CHANGELOG="$PACKAGE/debian/changelog"
 POS="$PACKAGE/debian/po"
-RELEASE="unstable"
+RELEASE="unstable|experimental"
 
 if [ ! -e $CHANGELOG ]
 then
@@ -37,7 +37,7 @@ then
 fi
 
 # Line number of the changelog's old date
-LINE=`grep -a "; urgency=" "$CHANGELOG" | grep -n "$RELEASE" | head -n 1 | sed 's/:.*//g'`
+LINE=`grep -a "; urgency=" "$CHANGELOG" | egrep -n "$RELEASE" | head -n 1 | sed 's/:.*//g'`
 
 if [ ! -z "$LINE" ]; then
 	# Date of the last release
