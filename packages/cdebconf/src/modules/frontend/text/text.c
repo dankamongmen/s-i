@@ -44,6 +44,7 @@
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
+#include "plugin.h"
 #include "strutl.h"
 
 #include <ctype.h>
@@ -62,6 +63,8 @@
 struct frontend_data {
 	char *previous_title;
 };
+
+typedef int (text_handler)(struct frontend *obj, struct question *q);
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
 #define q_get_description(q)		question_get_field((q), "", "description")
@@ -761,7 +764,7 @@ static int text_handler_error(struct frontend *obj, struct question *q)
 /* ----------------------------------------------------------------------- */
 struct question_handlers {
 	const char *type;
-	int (*handler)(struct frontend *obj, struct question *q);
+	text_handler *handler;
 } question_handlers[] = {
 	{ "boolean",	text_handler_boolean },
 	{ "multiselect", text_handler_multiselect },
@@ -771,6 +774,7 @@ struct question_handlers {
 	{ "string",	text_handler_string },
 	{ "text",	text_handler_text },
 	{ "error",	text_handler_error },
+	{ "",		NULL },
 };
 
 /*
@@ -824,7 +828,23 @@ static int text_go(struct frontend *obj)
 
 	while (q != NULL) {
 		for (i = 0; i < DIM(question_handlers); i++) {
-			if (strcmp(q->template->type, question_handlers[i].type) == 0)
+			text_handler *handler;
+			struct plugin *plugin = NULL;
+
+			if (*question_handlers[i].type)
+				handler = question_handlers[i].handler;
+			else {
+				plugin = plugin_find(obj, q->template->type);
+				if (plugin) {
+					INFO(INFO_DEBUG, "Found plugin for %s", q->template->type);
+					handler = (text_handler *) plugin->handler;
+				} else {
+					INFO(INFO_DEBUG, "No plugin for %s", q->template->type);
+					continue;
+				}
+			}
+
+			if (plugin || strcmp(q->template->type, question_handlers[i].type) == 0)
 			{
 				if (!data->previous_title ||
 				    strcmp(obj->title, data->previous_title) != 0)
@@ -850,14 +870,19 @@ static int text_go(struct frontend *obj)
 					data->previous_title = strdup(obj->title);
 				}
 				text_handler_displaydesc(obj, q);
-				ret = question_handlers[i].handler(obj, q);
+				ret = handler(obj, q);
 				putchar('\n');
 				if (ret == DC_OK)
 					obj->qdb->methods.set(obj->qdb, q);
 				else if (ret == DC_GOBACK && q->prev != NULL)
 					q = q->prev;
-				else
+				else {
+					if (plugin)
+						plugin_delete(plugin);
 					return ret;
+				}
+				if (plugin)
+					plugin_delete(plugin);
 				break;
 			}
 		}

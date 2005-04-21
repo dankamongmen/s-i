@@ -4,6 +4,7 @@
 #include "database.h"
 #include "question.h"
 #include "template.h"
+#include "plugin.h"
 #include "strutl.h"
 
 #include <dlfcn.h>
@@ -112,7 +113,10 @@ command_capb(struct confmodule *mod, char *arg)
     int i;
     char *argv[32];
     int argc;
-    char *out;
+    char *out, *outend;
+    size_t outalloc;
+    struct plugin *plugin;
+    void *plugin_state;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     /* FIXME: frontend.h should provide a method to prevent direct
@@ -122,7 +126,28 @@ command_capb(struct confmodule *mod, char *arg)
         if (strcmp(argv[i], "backup") == 0)
             mod->frontend->capability |= DCF_CAPB_BACKUP;
 
-    asprintf(&out, "%u multiselect backup", CMDSTATUS_SUCCESS);
+    if (asprintf(&out, "%u multiselect backup", CMDSTATUS_SUCCESS) == -1)
+        DIE("Out of memory");
+
+    plugin_state = NULL;
+    outend = strchr(out, '\0');
+    outalloc = outend - out + 1;
+    while ((plugin = plugin_iterate(mod->frontend, &plugin_state)) != NULL) {
+        size_t namelen;
+        char *newout;
+
+        namelen = strlen(plugin->name);
+        outalloc += 8 + namelen;
+        newout = realloc(out, outalloc);
+        if (!newout)
+            DIE("Out of memory");
+        outend = newout + (outend - out);
+        out = newout;
+        outend = mempcpy(outend, " plugin-", 8);
+        outend = mempcpy(outend, plugin->name, namelen);
+        *outend++ = '\0';
+    }
+
     return out;
 }
 

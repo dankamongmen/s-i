@@ -39,6 +39,8 @@ struct frontend_module {
 };
 
 struct frontend {
+    /* module name */
+    char *name;
 	/* module handle */
 	void *handle;
 	/* configuration data */
@@ -64,6 +66,8 @@ struct frontend {
 	
 	/* methods */
     struct frontend_module methods;
+    /* path to plugins */
+    char *plugin_path;
 };
 
 struct frontend *frontend_new(struct configuration *, struct template_db *, struct question_db *);

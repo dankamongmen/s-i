@@ -41,6 +41,7 @@
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
+#include "plugin.h"
 #include "strutl.h"
 
 #include <ctype.h>
@@ -69,6 +70,8 @@ struct newt_data {
                   perc_label;
     int           scale_textbox_height;
 };
+
+typedef int (newt_handler)(struct frontend *obj, struct question *q);
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
 #define q_get_description(q)  		question_get_field((q), "", "description")
@@ -961,7 +964,7 @@ newt_handler_error(struct frontend *obj, struct question *q)
 /* ----------------------------------------------------------------------- */
 struct question_handlers {
 	const char *type;
-	int (*handler)(struct frontend *obj, struct question *q);
+	newt_handler *handler;
 } question_handlers[] = {
 	{ "boolean",	newt_handler_boolean },         // OK
 	{ "multiselect", newt_handler_multiselect },
@@ -970,7 +973,8 @@ struct question_handlers {
 	{ "password",	newt_handler_password },        // OK
 	{ "note",	newt_handler_note },            // OK
 	{ "text",	newt_handler_text },
-	{ "error",      newt_handler_error },
+	{ "error",	newt_handler_error },
+	{ "",		NULL },
 };
 
 /*
@@ -1018,7 +1022,23 @@ newt_go(struct frontend *obj)
     cleared = 0;
     while (q != NULL) {
         for (i = 0; i < DIM(question_handlers); i++) {
-            if (strcmp(q->template->type, question_handlers[i].type) == 0) {
+            newt_handler *handler;
+            struct plugin *plugin = NULL;
+
+            if (*question_handlers[i].type)
+                handler = question_handlers[i].handler;
+            else {
+                plugin = plugin_find(obj, q->template->type);
+                if (plugin) {
+                    INFO(INFO_DEBUG, "Found plugin for %s", q->template->type);
+                    handler = (newt_handler *) plugin->handler;
+                } else {
+                    INFO(INFO_DEBUG, "No plugin for %s", q->template->type);
+                    continue;
+                }
+            }
+
+            if (plugin || strcmp(q->template->type, question_handlers[i].type) == 0) {
                 if (!cleared && !data->scale_form) {
                     cleared = 1;
                     newtInit();
@@ -1030,7 +1050,7 @@ newt_go(struct frontend *obj)
                         newtDrawRootText(0, 0, text);
                     free(text);
                 }
-                ret = question_handlers[i].handler(obj, q);
+                ret = handler(obj, q);
                 if (ret == DC_OK)
                     obj->qdb->methods.set(obj->qdb, q);
                 else if (ret == DC_GOBACK && q->prev != NULL)
@@ -1038,8 +1058,12 @@ newt_go(struct frontend *obj)
                 else {
                     if (cleared && !data->scale_form)
                         newtFinished();
+                    if (plugin)
+                        plugin_delete(plugin);
                     return ret;
                 }
+                if (plugin)
+                    plugin_delete(plugin);
                 break;
             }
         }

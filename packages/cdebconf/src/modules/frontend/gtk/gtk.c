@@ -49,6 +49,7 @@
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
+#include "plugin.h"
 #include "strutl.h"
 #include "cdebconf_gtk.h"
 
@@ -63,7 +64,11 @@
 #include <sys/types.h>
 #include <dlfcn.h>
 
+#include <debian-installer/slist.h>
+
 #include <gtk/gtk.h>
+
+typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
 #define q_get_description(q)  		question_get_field((q), "", "description")
@@ -746,7 +751,7 @@ static int gtkhandler_custom(struct frontend *obj, struct question *q, GtkWidget
 /* ----------------------------------------------------------------------- */
 struct question_handlers {
     const char *type;
-    int (*handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
+    gtk_handler *handler;
 } question_handlers[] = {
     { "boolean",        gtkhandler_boolean },
     { "multiselect",    gtkhandler_multiselect },
@@ -756,7 +761,8 @@ struct question_handlers {
     { "string",	        gtkhandler_string },
     { "error",	        gtkhandler_note },
 //  { "custom",         gtkhandler_custom },
-    { "text",           gtkhandler_text }
+    { "text",           gtkhandler_text },
+    { "",               NULL },
 };
 
 void set_window_properties(GtkWidget *window)
@@ -840,6 +846,11 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     return DC_OK;
 }
 
+static void gtk_plugin_destroy_notify(void *data)
+{
+    plugin_delete((struct plugin *) data);
+}
+
 static int gtk_go(struct frontend *obj)
 {
     struct frontend_data *data = (struct frontend_data *) obj->data;
@@ -847,6 +858,7 @@ static int gtk_go(struct frontend *obj)
     int i;
     int ret;
     GtkWidget *questionbox;
+    di_slist *plugins;
 
     if (q == NULL) return DC_OK;
 
@@ -860,17 +872,38 @@ static int gtk_go(struct frontend *obj)
        gtk_label_set_text(GTK_LABEL(data->description_label), 
        q_get_extended_description(q)); 
     */
+    plugins = di_slist_alloc();
     while (q != 0)
     {
-        for (i = 0; i < DIM(question_handlers); i++)
-            if (strcmp(q->template->type, question_handlers[i].type) == 0)
-            {
-                ret = question_handlers[i].handler(obj, q, questionbox);
-                if (ret != DC_OK)
-                {
-                    return ret;
+        for (i = 0; i < DIM(question_handlers); i++) {
+            gtk_handler *handler;
+            struct plugin *plugin = NULL;
+
+            if (*question_handlers[i].type)
+                handler = question_handlers[i].handler;
+            else {
+                plugin = plugin_find(obj, q->template->type);
+                if (plugin) {
+                    INFO(INFO_DEBUG, "Found plugin for %s", q->template->type);
+                    handler = (gtk_handler *) plugin->handler;
+                    di_slist_append(plugins, plugin);
+                } else {
+                    INFO(INFO_DEBUG, "No plugin for %s", q->template->type);
+                    continue;
                 }
             }
+
+            if (plugin || strcmp(q->template->type, question_handlers[i].type) == 0)
+            {
+                ret = handler(obj, q, questionbox);
+                if (ret != DC_OK)
+                {
+                    di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
+                    return ret;
+                }
+                break;
+            }
+        }
         q = q->next;
     }
     q = obj->questions;
@@ -889,6 +922,7 @@ static int gtk_go(struct frontend *obj)
 	    q = q->next;
 	}
     }
+    di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
     gtk_widget_destroy(questionbox);
 
     /* FIXME

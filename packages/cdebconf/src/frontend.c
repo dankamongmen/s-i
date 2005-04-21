@@ -1,5 +1,6 @@
 #include "common.h"
 #include "configuration.h"
+#include "plugin.h"
 #include "database.h"
 #include "frontend.h"
 #include "question.h"
@@ -149,12 +150,13 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
     setenv("DEBIAN_FRONTEND", modname, 1);
     obj = NEW(struct frontend);
     memset(obj, 0, sizeof(struct frontend));
+
+    modpath = cfg->get(cfg, "global::module_path::frontend", 0);
+    if (modpath == NULL)
+	DIE("Frontend module path not defined (global::module_path::frontend)");
+
     if (strcmp(modname, "none") != 0)
     {
-        modpath = cfg->get(cfg, "global::module_path::frontend", 0);
-        if (modpath == NULL)
-            DIE("Frontend module path not defined (global::module_path::frontend)");
-
         q = qdb->methods.get(qdb, "debconf/frontend");
         if (q)
 	    question_setvalue(q, modname);
@@ -170,12 +172,18 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	
 	memcpy(&obj->methods, mod, sizeof(struct frontend_module));
     }
+    obj->name = strdup(modname);
 	obj->handle = dlh;
 	obj->config = cfg;
 	obj->tdb = tdb;
 	obj->qdb = qdb;
     snprintf(obj->configpath, sizeof(obj->configpath),
         "frontend::instance::%s", modname);
+
+    if (asprintf(&obj->plugin_path, "%s/%s", modpath, modname) == -1) {
+        frontend_delete(obj);
+        return NULL;
+    }
 
 
 #define SETMETHOD(method) if (obj->methods.method == NULL) obj->methods.method = frontend_##method
@@ -220,6 +228,7 @@ void frontend_delete(struct frontend *obj)
 	DELETE(obj->title);
 	DELETE(obj->info);
     DELETE(obj->progress_title);
+    DELETE(obj->plugin_path);
 	DELETE(obj);
 }
 
