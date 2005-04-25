@@ -26,8 +26,7 @@ fi
 	if [ "$ARCH" = sparc ] || [ "$ARCH" = hppa ] || [ "$ARCH" = alpha ]; then
 		cp "$NETBOOT_IMAGE" $TFTP_DIR/$TFTP_IMAGE
 	else
-		temp=$(tempfile)
-		mkdir -p $temp
+		temp=$(mktemp -d)
 		cd $temp
 		if ! tar zxf $NETBOOT_IMAGE; then
 			error "failed to untar NETBOOT_IMAGE in $temp"
