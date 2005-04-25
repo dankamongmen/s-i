@@ -27,8 +27,23 @@ fi
 		cp "$NETBOOT_IMAGE" $TFTP_DIR/$TFTP_IMAGE
 	else
 		cd $TFTP_DIR
+		# Remove old files to try to support multi-user.
+		for file in $(tar tzf $NETBOOT_IMAGE); do
+			if [ "$file" != "./" ] && [ "$file" != "." ]; then
+				rm -rf "$file"
+			fi
+		done
 		if ! tar zxf $NETBOOT_IMAGE; then
 			error "failed to untar NETBOOT_IMAGE in $TFTP_DIR"
 		fi
+		# And permissions fixup.
+		for file in $(tar tzf $NETBOOT_IMAGE); do
+			if [ "$file" != "./" ] && [ "$file" != "." ]; then
+				chmod g+w "$file"
+				if [ -d "$file" ]; then
+					chmod g+s "$file"
+				fi
+			fi
+		done
 	fi
 )
