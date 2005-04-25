@@ -24,7 +24,7 @@ fi
 
 (
 	if [ "$ARCH" = sparc ] || [ "$ARCH" = hppa ] || [ "$ARCH" = alpha ]; then
-		cp "$NETBOOT_IMAGE" $TFTP_DIR/$TFTP_IMAGE
+		cp -f "$NETBOOT_IMAGE" $TFTP_DIR/$TFTP_IMAGE
 	else
 		temp=$(mktemp -d)
 		cd $temp
@@ -35,7 +35,7 @@ fi
 		find $temp -type d | xargs chmod g+s
 		
 		cd $TFTP_DIR
-		if ! cp -r $temp/* .; then
+		if ! cp -fr $temp/* .; then
 			error "copy to TFTP_DIR failed"
 		fi
 		rm -rf $temp
