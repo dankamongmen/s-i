@@ -26,24 +26,19 @@ fi
 	if [ "$ARCH" = sparc ] || [ "$ARCH" = hppa ] || [ "$ARCH" = alpha ]; then
 		cp "$NETBOOT_IMAGE" $TFTP_DIR/$TFTP_IMAGE
 	else
-		cd $TFTP_DIR
-		# Remove old files to try to support multi-user.
-		for file in $(tar tzf $NETBOOT_IMAGE); do
-			if [ "$file" != "./" ] && [ "$file" != "." ]; then
-				rm -rf "$file"
-			fi
-		done
+		temp=$(tempfile)
+		mkdir -p $temp
+		cd $temp
 		if ! tar zxf $NETBOOT_IMAGE; then
-			error "failed to untar NETBOOT_IMAGE in $TFTP_DIR"
+			error "failed to untar NETBOOT_IMAGE in $temp"
 		fi
-		# And permissions fixup.
-		for file in $(tar tzf $NETBOOT_IMAGE); do
-			if [ "$file" != "./" ] && [ "$file" != "." ]; then
-				chmod g+w "$file"
-				if [ -d "$file" ]; then
-					chmod g+s "$file"
-				fi
-			fi
-		done
+		find $temp | xargs chmod g+w
+		find $temp -type d | xargs chmod g+s
+		
+		cd $TFTP_DIR
+		if ! cp -r $temp/* .; then
+			error "copy to TFTP_DIR failed"
+		fi
+		rm -rf $temp
 	fi
 )
