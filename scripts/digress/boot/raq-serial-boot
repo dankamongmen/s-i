@@ -11,17 +11,24 @@ $exp->spawn($ENV{CONSOLECOMMAND}) or die "cannot start console: $!\n";
 
 $exp->send(" "); # break;
 
-if (! $exp->expect(120, "CoLo")) {
-	die "did not see CoLo boot";
+# Look for either a CoLO boot or the firmware booting.
+if (! $exp->expect(120, "CoLo", 'Microserver Diagnostics')) {
+	die "did not see boot";
 }
 
 $exp->send(" "); # break
-if (! $exp->expect(60, "> ")) {
-	die "failed to break to command shell";
-}
-
-$exp->send("boot $ENV{RAQ_BOOTNUM}\r");
-
-$exp->expect(10, "1>");
+$exp->expect(60, 
+	[ '> ' => sub {
+		# CoLO boot
+		$exp->send("boot $ENV{RAQ_BOOTNUM}\r");
+		$exp->expect(10, "1>");
+	}],
+	[ 'Cobalt: ' => sub {
+		# firmware boot
+		$exp->send_slow(0.1, "bfd /vmlinux.gz nfsroot=/nfsroot");
+		$exp->expect(60, "XXX WHAT? Doesn't boot yet..."); # FIXME
+	}],
+	[ 'timeout' => sub { die "failed to break to command prompt" } ],
+);
 
 exit;
