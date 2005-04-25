@@ -11,13 +11,9 @@ $exp->spawn($ENV{CONSOLECOMMAND}) or die "cannot start console: $!\n";
 
 $exp->send(" "); # break;
 
-# Look for either a CoLO boot or the firmware booting.
-if (! $exp->expect(120, "CoLo", 'Microserver Diagnostics')) {
-	die "did not see boot";
-}
-
-$exp->send(" "); # break
 $exp->expect(60, 
+	[ 'CoLo' => sub { $exp->send(" "); exp_continue } ],
+	[ 'Microserver Diagnostics' => sub { $exp->send(" "); exp_continue } ],
 	[ '> ' => sub {
 		# CoLO boot
 		$exp->send("boot $ENV{RAQ_BOOTNUM}\r");
