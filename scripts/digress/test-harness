@@ -107,6 +107,8 @@ fi
 PATH=$PATH:$DIGRESSDIR/boot:$DIGRESSDIR/preboot:$DIGRESSDIR/console:$DIGRESSDIR/test_1:$DIGRESSDIR/test_2:$DIGRESSDIR/shutdown:$DIGRESSDIR/utils
 export PATH
 
+. $DI_TESTDIR/config
+
 if [ -z "$SCHEME" ]; then
 	if [ -z "$MACHINE" ]; then
 		echo "Machines:"
@@ -115,8 +117,9 @@ if [ -z "$SCHEME" ]; then
 	fi
 	ls $DI_TESTDIR/schemes/$MACHINE
 	if [ -z "$MACHINE" ] && [ -n "$(find $STATE_DIR -maxdepth 1 -name '*-test.lock')" ]; then
+		echo
 		echo "Machines in use:"
-		echo "user\tdate                     \tmachine"
+		printf "user\tdate                     \tmachine\n"
 		find $STATE_DIR -maxdepth 1 -name '*-test.lock' -printf "%u\t%t\t%f\n" | sed 's/-test.lock//'
 	fi
 	exit
@@ -126,7 +129,6 @@ if [ ! -e "$DI_TESTDIR/schemes/$MACHINE" ]; then
 	error "Unknown machine $MACHINE"
 fi
 
-. $DI_TESTDIR/config
 use common
 use $SCHEME
 
