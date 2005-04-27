@@ -1,5 +1,7 @@
 #! /bin/sh -e
 
+. /usr/share/debconf/confmodule
+
 log() {
 	logger -t cdrom-detect "$@"
 }
@@ -12,7 +14,13 @@ if test -x /target/usr/bin/eject ; then
 	if [ -n "$CDDEV" ]; then
 		log "Unmounting and ejecting '$CDDEV'"
 		umount /cdrom || true
-		/target/usr/bin/eject $CDDEV || true
+
+		db_get cdrom-detect/eject
+		if [ "$RET" = false ]; then
+			log "Not ejecting CD, per debconf setting."
+		else
+			/target/usr/bin/eject $CDDEV || true
+		fi
 	else
 		log "Not ejecting CD, as nothing is mounted."
 	fi
