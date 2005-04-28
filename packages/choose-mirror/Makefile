@@ -22,9 +22,9 @@ Mirrors.masterlist: force-try-update
 	fi
 force-try-update: ;
 
-debian/choose-mirror.templates:  Mirrors.masterlist debian/templates-in
+debian/choose-mirror.templates:  Mirrors.masterlist debian/choose-mirror.templates-in
 	./makeheader.pl template
-	cat debian/templates-in debian/templates-countries > debian/choose-mirror.templates
+	cat debian/choose-mirror.templates-in debian/templates-countries > debian/choose-mirror.templates
 
 mirrors_http.h: Mirrors.masterlist
 	./makeheader.pl http
