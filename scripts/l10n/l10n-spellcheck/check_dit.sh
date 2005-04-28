@@ -75,41 +75,6 @@ DEST_DIR=$4
 initialise	# initalise some variables
 checks		# do an environment check
 
-
-# Build word list: it's composed by words common to all d-i translations
-# AND words specific for each language:
-#
-# di_${LANG}_wl = di_common_wl + ${LANG}_wl
-#
-# FIXME: I assume that wlS have to be searched ./wls 
-COMMON_WL=./wls/di_common_wl.txt
-SPECIFIC_WL=./wls/${LANG}_wl.txt
-WLIST=./wls/${LANG}_di_wl
-
-WL_WARN=0
-if [ ! -f $COMMON_WL ] ; then
-    echo "can't find di_common_wl.txt. You'll get a lot of unknown technical words!"
-    COMMON_WL=
-    WL_WARN=`expr $WL_WARN + 1`
-fi
-
-if [ ! -f $SPECIFIC_WL ] ; then
-    echo "can't find ${LANG}_wl.txt. You'll get a lot of unknown words in \"${LANG}\" language!"
-    SPECIFIC_WL=
-    WL_WARN=`expr $WL_WARN + 1`    
-fi
-
-# build wl only if there's at least one of the "private" wls
-# "| perl -00lne'/\n/&&print'" would remove blank lines from wl: is it needed?
-if [ $WL_WARN -ne 2 ] ; then
-    cat $COMMON_WL $SPECIFIC_WL | sort -f | sed "s:\(^#.*\)::" > $WLIST.txt
-
-# NB: --lang uses $LANG and not $DICT
-    aspell --lang=$LANG create master ./$WLIST < $WLIST.txt
-
-    WL_PARAM="--add-extra-dicts ./$WLIST"
-fi
-
 PO_FILE_LIST="${LANG}_file_list.txt"
 NEEDS_RM="$PO_FILE_LIST $NEEDS_RM"
 
@@ -160,6 +125,10 @@ if [ $REMOVE_VARS = "yes" ] ; then
     FILE_TO_CHECK=$NO_VARS
 else
     FILE_TO_CHECK=$ALL_STRINGS
+fi
+
+if [ -f ./wls/${LANG}_di_wl ] ; then
+    WL_PARAM="--add-extra-dicts ./wls/${LANG}_di_wl"
 fi
 
 # spell check the selected strings eventually using a custom wl 
