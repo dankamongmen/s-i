@@ -14,7 +14,7 @@ sleep 2;
 $exp->send("\r\r\r\r\r");
 $exp->expect(20, "ok ") or die "didn't get to OF";
 print "(Sending: $ENV{OF_BOOT_COMMAND})\n";
-$exp->send($ENV{OF_BOOT_COMMAND});
+$exp->send_slow(0.1, $ENV{OF_BOOT_COMMAND});
 sleep 1;
 $exp->send("\r");
 $exp->expect(600, "Remapping the kernel...") or die "didn't boot";
