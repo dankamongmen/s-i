@@ -737,6 +737,13 @@ if [ -f /proc/sys/kernel/hotplug ]; then
 	apt-install usbutils || true
 fi
 
+# Install acpi (works only for 2.6 kernels)
+if [ -d /proc/acpi ]; then
+	log "Detected acpi support, installing acpi/acpid."
+	apt-install acpi || true
+	apt-install acpid || true
+fi
+
 db_progress SET $MAX_STEPS
 db_progress STOP
 
