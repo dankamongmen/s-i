@@ -25,6 +25,10 @@ for file in debian/po/*.po en.po; do
   lastlocale=C
   :> $outfile
   for locale in $( (grep -e "^$lang" $SUPPORTED || true) | sed -e 's/[@. ].*//' | sort | uniq); do
+      if [ "$locale" = "en_DK" ] ; then
+          # Don't add Denmark to shortlist for English (per #276067)
+          continue
+      fi
       code=`echo "$locale" | sed -e 's/.*_//'`
       line=$(grep -e "^$code" $ISO3166TAB || true)
       lastlocale=$locale
