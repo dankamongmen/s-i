@@ -47,12 +47,12 @@ for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
 
     echo ""
     echo "*** checking \"$LANG\" using aspell-${DICT} ***"
-    ./check_dit.sh $LANG $DICT $DI_COPY $DEST_DIR
+    ./check_dit.sh ${LANG} ${DICT} ${DI_COPY} ${DEST_DIR}
 
     i=`expr $i + 1`
 done
 
-if [ ! -d $DEST_DIR ] ; then
+if [ ! -d ${DEST_DIR} ] ; then
     echo does not exist: for some reasons nothing could be checked
     exit 1
 fi

@@ -127,6 +127,7 @@ else
     FILE_TO_CHECK=$ALL_STRINGS
 fi
 
+# if a binary wl exists, use it
 if [ -f ./wls/${LANG}_di_wl ] ; then
     WL_PARAM="--add-extra-dicts ./wls/${LANG}_di_wl"
 fi
@@ -157,9 +158,20 @@ if [ ! -d  $DEST_DIR/nozip ] ; then
     mkdir $DEST_DIR/nozip
 fi
 
-tar czf $DEST_DIR/${LANG}.tar.gz $FILES_TO_KEEP
+# in the tgz file WL is iso-8859-1 (the way it has to be)
+# in "nozip" it's utf-8 like the other files 
+if [ -f ./wls/${LANG}_wl.txt ] ; then
+    WORDLIST=./wls/${LANG}_wl.txt
+    cat ${WORDLIST} | iconv --from iso-8859-1 --to utf-8 > $DEST_DIR/nozip/${LANG}_wl.txt
+    cp ${WORDLIST} ${DEST_DIR}
+    WL_ISO8859=${DEST_DIR}/${LANG}_wl.txt
+fi
 
-mv $DEST_DIR/${LANG}.tar.gz $DEST_DIR/zip
-mv $FILES_TO_KEEP $DEST_DIR/nozip
+tar czf ${DEST_DIR}/${LANG}.tar.gz $FILES_TO_KEEP ${WL_ISO8859}
 
-echo "AddCharset UTF-8 .txt" > $DEST_DIR/nozip/.htaccess
+mv ${DEST_DIR}/${LANG}.tar.gz ${DEST_DIR}/zip
+
+mv $FILES_TO_KEEP ${DEST_DIR}/nozip
+rm -f ${WL_ISO8859}
+
+echo "AddCharset UTF-8 .txt" > ${DEST_DIR}/nozip/.htaccess
