@@ -23,18 +23,16 @@ Mirrors.masterlist: force-try-update
 force-try-update: ;
 
 debian/choose-mirror.templates:  Mirrors.masterlist debian/choose-mirror.templates-in
-	./makeheader.pl template
+	./mirrorlist template
 	cat debian/choose-mirror.templates-in debian/templates-countries > debian/choose-mirror.templates
 
 mirrors_http.h: Mirrors.masterlist
-	./makeheader.pl http
-	# Unused yet
-	./makeheader.pl httplist
+	./mirrorlist http
+	./mirrorlist httplist
 	
 mirrors_ftp.h: Mirrors.masterlist
-	./makeheader.pl ftp
-	# Unused yet
-	./makeheader.pl ftplist
+	./mirrorlist ftp
+	./mirrorlist ftplist
 
 choose-mirror.o: mirrors_http.h mirrors_ftp.h
 
@@ -61,6 +59,7 @@ clean:
 	rm -f $(BIN) $(OBJS) *~ mirrors_*.h
 	rm -f debian/templates-countries debian/httplist-countries debian/ftplist-countries
 	rm -f demo demo.templates
+	rm -rf debian/iso-codes debian/pobuild
 
 reallyclean:
 	rm -f debian/choose-mirror.templates Mirrors.masterlist

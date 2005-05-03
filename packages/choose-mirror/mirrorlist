@@ -3,8 +3,9 @@
 # Note that there will be duplicate strings in the generated file.
 # I am relying on the c compiler to fix this, which gcc does.
 #
-# Pass in the type of mirror we are interested in (http or ftp), or
-# 'template' to generate templates-countries file
+# Pass in the type of mirror we are interested in (http or ftp), 
+# or use httplist or ftplist to generate a list of country codes for the
+# mirror type. Or pass 'template' to generate templates-countries file
 use strict;
 
 my $type = shift || die "please specify mirror type\n";
@@ -45,6 +46,7 @@ foreach my $site (keys %data) {
         }
        $data{$site}->{rating}=$rating;
 }
+
 if ($type eq 'template') { 
  	open (TEMPLATE, ">debian/templates-countries") or die "debian/templates-countries: $!";
 	foreach my $site (sort keys %data) {
@@ -91,13 +93,12 @@ if ($type eq 'template') {
 	print TEMPLATE " The goal is to find a mirror of the Debian archive that is close to you on the network -- be\n";
         print TEMPLATE " aware that nearby countries, or even your own, may not be the best choice.\n\n";
 	close TEMPLATE;
-	exit 0;
 }
-
-if ($type eq 'httplist') { 
- 	open (LIST, ">debian/httplist-countries") or die "debian/httplist-countries: $!";
+elsif ($type =~ /(.*)list/) {
+	my $type=$1;
+ 	open (LIST, ">debian/${type}list-countries") or die "debian/${type}list-countries: $!";
 	foreach my $site (sort keys %data) {
-		next unless exists $data{$site}->{"archive-http"} and
+		next unless exists $data{$site}->{"archive-$type"} and
 		                    exists $data{$site}->{country};
 		$countries{$data{$site}->{country}} = 1;
 	}
@@ -105,40 +106,25 @@ if ($type eq 'httplist') {
 		print LIST "${country}\n";
 	}
 	close LIST;
-	exit 0;
 }
+else {
+	open (OUT, ">mirrors_$type.h") or die "mirrors_$type.h: $!";
+	print OUT "/* Automatically generated; do not edit. */\n";
 
-if ($type eq 'ftplist') { 
- 	open (LIST, ">debian/ftplist-countries") or die "debian/ftplist-countries: $!";
-	foreach my $site (sort keys %data) {
-		next unless exists $data{$site}->{"archive-ftp"} and
-		                    exists $data{$site}->{country};
-		$countries{$data{$site}->{country}} = 1;
+	# Now output the mirror list. It is ordered with better mirrors
+	# near the top.
+	print OUT "static struct mirror_t mirrors_$type\[] = {\n";
+	my $q='"';
+	foreach my $site (sort { $data{$b}->{rating} <=> $data{$a}->{rating} } keys %data) {
+		next unless exists $data{$site}->{"archive-$type"} and
+			    exists $data{$site}->{country};
+		print OUT "\t{",
+			  join(", ", $q.$site.$q, $q.$data{$site}->{country}.$q,
+				$q.$data{$site}->{"archive-$type"}.$q),
+			  "},\n";
 	}
-	foreach  my $country (sort (keys %countries)) {
-		print LIST "${country}\n";
-	}
-	close LIST;
-	exit 0;
+	print OUT "\t{NULL, NULL, NULL}\n";
+	print OUT "};\n";
+
+	close OUT;
 }
-
-open (OUT, ">mirrors_$type.h") or die "mirrors_$type.h: $!";
-print OUT "/* Automatically generated; do not edit. */\n";
-
-# Now output the mirror list. It is ordered with better mirrors near the top.
-my %used_country;
-print OUT "static struct mirror_t mirrors_$type\[] = {\n";
-my $q='"';
-foreach my $site (sort { $data{$b}->{rating} <=> $data{$a}->{rating} } keys %data) {
-	next unless exists $data{$site}->{"archive-$type"} and
-		    exists $data{$site}->{country};
-	print OUT "\t{",
-		  join(", ", $q.$site.$q, $q.$data{$site}->{country}.$q,
-			$q.$data{$site}->{"archive-$type"}.$q),
-		  "},\n";
-# 	$used_country{$data{$site}->{country}}=1;
-}
-print OUT "\t{NULL, NULL, NULL}\n";
-print OUT "};\n";
-
-close OUT;

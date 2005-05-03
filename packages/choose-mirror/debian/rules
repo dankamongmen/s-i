@@ -5,31 +5,20 @@ build-stamp:
 	dh_testdir
 	$(MAKE) small
 
-	# C. Perrier 2/7/2004
-	# DO NOT actually uncomment these
-	# the scripts have not been tested enough
-	# we'd better include this for post-rc1
 	# Grab ISO codes from iso-codes package
-	chmod u+x ./get-iso-codes
 	./get-iso-codes
-	# Yes, we use this one, embarked, because it has been
-	# hacked for using partial translations in lists
-	chmod u+x ./intltool-merge
 	# Build the templates
-	chmod u+x ./mktemplates
 	./mktemplates
-	# END of do not uncomment
 
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp debian/choose-mirror.postinst
-	rm -f debian/templates.tmp debian/choose-mirror.templates
+	rm -f build-stamp
 	rm -rf debian/iso-codes debian/pobuild
 	$(MAKE) clean
-	dh_clean
+	dh_clean debian/choose-mirror.templates
 
 install: build
 	dh_testdir
@@ -45,7 +34,6 @@ binary-arch: build install
 	dh_installdebconf
 	# Sort countries (including in translations)
 	# MUST be after dh_installdebconf
-	chmod u+x ./sort-countries
 	./sort-countries
 	dh_strip
 	dh_compress
