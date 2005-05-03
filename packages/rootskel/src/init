@@ -1,7 +1,11 @@
 #!/bin/sh -e
 # used for initramfs
 mkdir proc dev
-mount /dev
-mount /dev/pts
+if [ -x /sbin/udevstart ]; then
+	/lib/debian-installer/init-udev-devices
+else
+	mount /dev
+	mount /dev/pts
+fi
 mount /proc
 exec busybox init
