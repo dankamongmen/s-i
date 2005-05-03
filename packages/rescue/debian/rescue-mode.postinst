@@ -38,6 +38,13 @@ try_load_module xfs
 # Linux root filesystems won't be on vfat, but this may be useful anyway ...
 try_load_module vfat
 
+# RAID support
+try_load_module md
+try_load_module raid0
+try_load_module raid1
+try_load_module raid5
+mdrun >>"$MESSAGES" 2>&1 || true
+
 # LVM support
 try_load_module dm-mod
 try_load_module lvm-mod
