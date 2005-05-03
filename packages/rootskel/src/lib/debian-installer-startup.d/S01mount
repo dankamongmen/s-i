@@ -1,7 +1,7 @@
-# Cleanup after the first init, which left the initrd mounted
-# on /initrd.
+# Cleanup after the first init, which leaves the initrd mounted
+# on /initrd (if we're not using initramfs)
 umount /initrd/dev 2>/dev/null
-umount /initrd
+umount /initrd 2>/dev/null
 if [ "`uname -r | grep '^2.2.'`" = "" ]; then
 	freeramdisk /dev/rd/0
 fi

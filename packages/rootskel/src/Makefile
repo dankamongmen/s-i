@@ -15,4 +15,7 @@ subdirs_empty = \
 	sys \
 	usr/lib/prebaseconfig.d
 
+files_exec = \
+	init
+     
 include ../Makefile.inc
