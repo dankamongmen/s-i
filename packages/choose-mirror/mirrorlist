@@ -5,7 +5,7 @@
 #
 # Pass in the type of mirror we are interested in (http or ftp), 
 # or use httplist or ftplist to generate a list of country codes for the
-# mirror type. Or pass 'template' to generate templates-countries file
+# mirror type.
 use strict;
 
 my $type = shift || die "please specify mirror type\n";
@@ -47,54 +47,7 @@ foreach my $site (keys %data) {
        $data{$site}->{rating}=$rating;
 }
 
-if ($type eq 'template') { 
- 	open (TEMPLATE, ">debian/templates-countries") or die "debian/templates-countries: $!";
-	foreach my $site (sort keys %data) {
-		next unless exists $data{$site}->{"archive-http"} and
-		                    exists $data{$site}->{country};
-		$http_countries{$data{$site}->{country}} = 1;
-	}
-	foreach my $site (sort keys %data) {
-		 next unless exists $data{$site}->{"archive-ftp"} and
-                      exists $data{$site}->{country};
-                $ftp_countries{$data{$site}->{country}} = 1;
-	}
-	print TEMPLATE "Template: mirror/http/countries\n";
-        print TEMPLATE "Type: select\n";
-	print TEMPLATE "#  [NOTE] Translate the ISO country codes below into localised country names.\n";
-        print TEMPLATE "__Choices: enter information manually";
-	foreach  my $country (sort (keys %http_countries)) {
-		print TEMPLATE ", ${country}";
-	}
-	print TEMPLATE "\n";
-	print TEMPLATE "#  Translators, you must not translate this value, but you can change it\n".
-"#  to one of those listed above, e.g. msgstr \"GB\".  Square brackets are\n".
-"#  ignored and appear here only to distinguish this msgid from the same\n".
-"#  one in the Choices field.\n";
-	print TEMPLATE "_Default: US[ Default value for http]\n";
-	print TEMPLATE "_Description: Debian archive mirror country:\n";
-	print TEMPLATE " The goal is to find a mirror of the Debian archive that is close to you on the network -- be\n";
-	print TEMPLATE " aware that nearby countries, or even your own, may not be the best choice.\n\n";
-
-	print TEMPLATE "Template: mirror/ftp/countries\n";
-	print TEMPLATE "Type: select\n";
-	print TEMPLATE "#  [NOTE] Translate the ISO country codes below into localised country names.\n";
-        print TEMPLATE "__Choices: enter information manually";
-	foreach  my $country (sort (keys %ftp_countries)) {
-                print TEMPLATE ", ${country}";
-        }
-	print TEMPLATE "\n";
-	print TEMPLATE "#  Translators, you must not translate this value, but you can change it\n".
-"#  to one of those listed above, e.g. msgstr \"GB\".  Square brackets are\n".
-"#  ignored and appear here only to distinguish this msgid from the same\n".
-"#  one in the Choices field.\n";
-	print TEMPLATE "_Default: US[ Default value for ftp]\n";
-	print TEMPLATE "_Description: Debian archive mirror country:\n";
-	print TEMPLATE " The goal is to find a mirror of the Debian archive that is close to you on the network -- be\n";
-        print TEMPLATE " aware that nearby countries, or even your own, may not be the best choice.\n\n";
-	close TEMPLATE;
-}
-elsif ($type =~ /(.*)list/) {
+if ($type =~ /(.*)list/) {
 	my $type=$1;
  	open (LIST, ">debian/${type}list-countries") or die "debian/${type}list-countries: $!";
 	foreach my $site (sort keys %data) {

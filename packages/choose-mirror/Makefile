@@ -22,17 +22,23 @@ Mirrors.masterlist: force-try-update
 	fi
 force-try-update: ;
 
-debian/choose-mirror.templates:  Mirrors.masterlist debian/choose-mirror.templates-in
-	./mirrorlist template
-	cat debian/choose-mirror.templates-in debian/templates-countries > debian/choose-mirror.templates
+debian/httplist-countries:
+	./mirrorlist httplist
+
+debian/ftplist-countries:
+	./mirrorlist ftplist
+
+debian/choose-mirror.templates: Mirrors.masterlist debian/choose-mirror.templates-in debian/httplist-countries debian/ftplist-countries
+	# Grab ISO codes from iso-codes package
+	./get-iso-codes
+	# Build the templates
+	./mktemplates
 
 mirrors_http.h: Mirrors.masterlist
 	./mirrorlist http
-	./mirrorlist httplist
 	
 mirrors_ftp.h: Mirrors.masterlist
 	./mirrorlist ftp
-	./mirrorlist ftplist
 
 choose-mirror.o: mirrors_http.h mirrors_ftp.h
 
