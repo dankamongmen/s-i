@@ -117,6 +117,16 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 			else {
 				continue;
 			}
+
+			for (node1 = package->depends.head; node1; node1 = node1->next) {
+				di_package_dependency *d = node1->data;
+				if (d->type == di_package_dependency_type_provides
+				    && d->ptr && is_queued(d->ptr)) {
+					package->status_want = di_package_status_want_install;
+					di_log (DI_LOG_LEVEL_DEBUG, "install %s, queued by anna-install", package->package);
+					continue;
+				}
+			}
 		}
  
 		if (lowmem > 1) {
