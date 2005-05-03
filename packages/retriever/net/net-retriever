@@ -46,6 +46,32 @@ fetch() {
     done
 }
 
+checkmatch() {
+    release="$1"
+    packages="$2"
+    pkgmd5="$3"
+    pkgsize="$4"
+    set -e
+    sed -n '/^MD5Sum:$/ b LOOP; b; : PRINT; /:$/q; p; : LOOP; n; b PRINT' \
+        "$release" | \
+    (while read md5 size file; do
+        if [ "$file" = "$packages" ]; then
+            if [ "$md5" != "$pkgmd5" ]; then
+                error "MD5 mismatch for $packages ($md5 != $pkgmd5)."
+                exit 1
+            fi
+            if [ "$size" != "$pkgsize" ]; then
+                error "Size mismatch for $packages ($size != $pkgsize)."
+                exit 1
+            fi
+            return 0
+        fi
+    done
+    error "$packages not found in $release."
+    exit 1)
+    set +e
+}
+
 cmd="$1"
 shift
 
@@ -83,7 +109,9 @@ case "x$cmd" in
                 Packages="/tmp/net-retriever-$$-Packages"
                 rm -f "$Packages"
                 fetch "dists/$suite/$pkgfile" "$Packages" || continue
-                # TODO: Verify the integrity
+                checkmatch "$Release" "$pkgfile" \
+                    "$(md5sum "$Packages" | cut -d' ' -f1)" \
+                    "$(wc -c < "$Packages" | tr -d ' ')"
                 if [ "$ext" = '' ]; then
                     cat "$Packages" >> "$1"
                 elif [ "$ext" = .gz ]; then
