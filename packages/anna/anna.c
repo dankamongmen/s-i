@@ -141,9 +141,13 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 			}
 		}
 
-		if (package->priority >= di_package_priority_standard || is_queued(package)) {
+		if (package->priority >= di_package_priority_standard) {
 			package->status_want = di_package_status_want_install;
 			di_log (DI_LOG_LEVEL_DEBUG, "install %s, priority >= standard", package->package);
+		}
+		else if (is_queued(package)) {
+			package->status_want = di_package_status_want_install;
+			di_log (DI_LOG_LEVEL_DEBUG, "install %s, queued by anna-install", package->package);
 		}
 		else if (((di_system_package *)package)->installer_menu_item 
 			/* we don't want to see installed packages in choices list*/
