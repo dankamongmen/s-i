@@ -15,8 +15,12 @@ if [ "`uname -r | grep '^2.2.'`" = "" ]; then
 	cd /mnt
 	pivot_root . initrd
 	mkdir proc dev
-	mount /dev
-	mount /dev/pts
+	if [ -x /sbin/udevstart ]; then
+		/lib/debian-installer/init-udev-devices
+	else
+		mount /dev
+		mount /dev/pts
+	fi
 	mount /proc
 
 	# Close all open files on the initrd, and run busybox init.

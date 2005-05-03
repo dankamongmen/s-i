@@ -1,0 +1,41 @@
+UDEVSTART=/sbin/udevstart
+
+tmpfs_size=5M
+
+# I hate this hack.  -- Md
+make_extra_nodes () {
+	grep '^[^#]' /etc/udev/links.conf | \
+	while read type name arg1; do
+		([ "$type" ] && [ "$name" ] && \
+		 [ ! -e "/dev/$name" ] && [ ! -L "/dev/$name" ]) || continue
+		case $type in
+			L) ln -s "$arg1" "/dev/$name" ;;
+			D) mkdir -p "/dev/$name" ;;
+			M) mknod -m 600 "/dev/$name" $arg1 ;;
+			*) echo "unparseable line ($type $name $arg1)" ;;
+		esac
+	done
+}
+
+if [ -x "$UDEVSTART" ] && [ -f /proc/sys/kernel/hotplug ]; then
+	case $(uname -r) in
+		2.[012345].*)
+			echo "d-i built with udev, but running pre-2.6 kernel!"
+			exit 1
+			;;
+	esac
+
+	echo 'Mounting a tmpfs over /dev...'
+	mount -n -o size=$tmpfs_size,mode=0755 -t tmpfs none /dev
+
+	# needed to make some programs (e.g. mdrun) behave correctly
+	mkdir -p /.dev
+	mount -o bind /dev /.dev
+
+	echo "Creating initial device nodes..."
+	echo /sbin/udevsend > /proc/sys/kernel/hotplug
+	$UDEVSTART
+	make_extra_nodes
+
+	mount /dev/pts
+fi

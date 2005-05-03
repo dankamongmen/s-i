@@ -7,6 +7,7 @@ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 files_exec = \
 	exit \
 	exit-command \
+	init-udev-devices \
 	menu
 
 ifeq ($(DEB_HOST_GNU_SYSTEM),linux)

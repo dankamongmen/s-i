@@ -6,6 +6,7 @@ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 files = \
 	S01mount \
+	S02udev \
 	S10syslog \
 	S20templates \
 	S30read-environment \

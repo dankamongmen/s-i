@@ -2,7 +2,12 @@ if [ -n "$TERM_FRAMEBUFFER_TRY" -a "`debconf-get debian-installer/framebuffer`" 
 	echo "Trying to enable the frame buffer..."
 	case $(uname -r) in
 	2.6.*)
-		(modprobe -q vesafb >/dev/null 2>&1 && grep -q . /proc/fb && modprobe -q fbcon >/dev/null 2>&1) || (modprobe -q vga16fb >/dev/null 2>&1 && grep -q . /proc/fb && modprobe -q fbcon >/dev/null 2>&1) || true
+		if (modprobe -q vesafb >/dev/null 2>&1 && grep -q . /proc/fb && modprobe -q fbcon >/dev/null 2>&1) || (modprobe -q vga16fb >/dev/null 2>&1 && grep -q . /proc/fb && modprobe -q fbcon >/dev/null 2>&1); then
+			if [ -x /sbin/udevstart ]; then
+				# sledgehammer workaround for race condition
+				udevstart
+			fi
+		fi
 		;;
 	*)
 		modprobe -q vesafb >/dev/null 2>&1 || modprobe -q vga16fb >/dev/null 2>&1 || true

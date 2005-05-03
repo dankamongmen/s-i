@@ -10,7 +10,7 @@ fi
 if [ ! -d /proc/self ] ; then
     mount -t proc proc /proc
 fi
-if [ ! -e /dev/.devfsd ] ; then
+if [ ! -e /dev/.devfsd ] && [ ! -x /sbin/udevstart ]; then
     mount -t devfs devfs /dev
 fi
 if grep -q '[[:space:]]sysfs' /proc/filesystems; then
