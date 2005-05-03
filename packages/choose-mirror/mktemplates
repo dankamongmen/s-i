@@ -70,15 +70,17 @@ for pofile in debian/po/*.po ; do
     if [ -f $ISO3166TRANSLATIONS/$pofilename ]
     then
 	# Output is verbose, don't worry
-	# Copy other templates translations
-	cp debian/po/$pofilename debian/pobuild/$pofilename.copied
-	# Update it with templates.pot
-	msgmerge -U debian/pobuild/$pofilename.copied \
+	# Convert translations to UTF-8
+	msgconv -t UTF-8 debian/po/$pofilename \
+		> debian/pobuild/$pofilename.other
+	msgconv -t UTF-8 debian/iso-codes/$pofilename \
+		> debian/pobuild/$pofilename.iso-codes
+	# Update other template translations with templates.pot
+	msgmerge -U debian/pobuild/$pofilename.other \
 		    debian/pobuild/templates.pot 2>/dev/null
         # merge with iso-codes translations
-        # if charsets differ, this may output some "error" messages we ignore
-	msgmerge    debian/iso-codes/$pofilename \
-		    debian/pobuild/$pofilename.copied \
+	msgmerge    debian/pobuild/$pofilename.iso-codes \
+		    debian/pobuild/$pofilename.other \
 		       > debian/pobuild/$pofilename 2>/dev/null
         # clean out the generated file
 	msgmerge -U debian/pobuild/$pofilename \
