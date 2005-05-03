@@ -139,4 +139,8 @@ sed "/<!-- HTML TABLE STARTS HERE -->/r ${TABLE_HTML}" $TEMPLATE > $INDEX_HTML
 NOW="$(date --utc)"
 sed "s|<\!-- TODAY DATE -->|$NOW|" $INDEX_HTML > temp.xxx
 mv temp.xxx $INDEX_HTML 
+
+sed "s|<!-- COMMON WL -->|latest/nozip/di_common_wl.txt|" $INDEX_HTML > temp.xxx
+mv temp.xxx $INDEX_HTML 
+
 rm $TABLE_HTML

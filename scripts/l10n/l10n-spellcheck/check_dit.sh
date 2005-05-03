@@ -167,6 +167,11 @@ if [ -f ./wls/${LANG}_wl.txt ] ; then
     WL_ISO8859=${DEST_DIR}/${LANG}_wl.txt
 fi
 
+# now let's copy the common wl *only* to nozip
+if [ -f ./wls/di_common_wl.txt ] ; then
+    cp ./wls/di_common_wl.txt ${DEST_DIR}/nozip
+fi
+
 tar czf ${DEST_DIR}/${LANG}.tar.gz $FILES_TO_KEEP ${WL_ISO8859}
 
 mv ${DEST_DIR}/${LANG}.tar.gz ${DEST_DIR}/zip
