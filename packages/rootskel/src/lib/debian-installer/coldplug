@@ -1,0 +1,30 @@
+run_hotplug_rc () {
+	logger -t S03hotplug "Running $1"
+	if $1 start; then
+		printf "   %-8s [success]\n" "$2"
+	else
+		printf "   %-8s [failed]\n" "$2"
+	fi
+}
+
+if [ -d /etc/hotplug ]; then
+	for RC in /etc/hotplug/*.rc; do
+		basename="${1#/etc/hotplug/}"
+		name="${basename%.rc}"
+		case $name in
+			pci|usb|ide|scsi)
+				# Defer these until last so that we can
+				# guarantee ordering.
+				continue
+				;;
+			*)
+				run_hotplug_rc "$RC" "$name"
+				;;
+		esac
+	done
+	for name in pci usb ide scsi; do
+		if [ -x "/etc/hotplug/$name.rc" ]; then
+			run_hotplug_rc "/etc/hotplug/$name.rc" "$name"
+		fi
+	done
+fi
