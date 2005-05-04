@@ -5,6 +5,7 @@ DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 files_exec = \
+	coldplug \
 	exit \
 	exit-command \
 	init-udev-devices \

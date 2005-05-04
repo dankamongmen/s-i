@@ -1,9 +1,19 @@
-run_hotplug_rc () {
-	logger -t S03hotplug "Running $1"
-	if $1 start; then
-		printf "   %-8s [success]\n" "$2"
+#! /bin/sh
+
+log () {
+	if [ -S /dev/log ]; then
+		logger -t coldplug "$@"
 	else
-		printf "   %-8s [failed]\n" "$2"
+		echo "$@"
+	fi
+}
+
+run_hotplug_rc () {
+	log "Running $1"
+	if $1 start; then
+		log "$(printf "   %-8s [success]\n" "$2")"
+	else
+		log "$(printf "   %-8s [failed]\n" "$2")"
 	fi
 }
 
