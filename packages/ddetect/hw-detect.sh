@@ -26,6 +26,9 @@ fi
 # Which discover version to use.  Updated by discover_version()
 DISCOVER_VERSION=1
 
+# Is hotplug available?  Updated by hotplug_type()
+HOTPLUG_TYPE=fake
+
 log () {
 	logger -t hw-detect "$@"
 }
@@ -141,15 +144,20 @@ EOF
 }
 
 discover_version () {
-	# Ugh, Discover 1.x didn't exit with nonzero status if given an
-	# unrecognized option!
-	DISCOVER_TEST=$(discover --version 2> /dev/null) || true
-	if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
-		log "Testing experimental discover version 2."
-		DISCOVER_VERSION=2
+	if type discover >/dev/null 2>&1; then
+		# Ugh, Discover 1.x didn't exit with nonzero status if given an
+		# unrecognized option!
+		DISCOVER_TEST=$(discover --version 2> /dev/null) || true
+		if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
+			log "Testing experimental discover version 2."
+			DISCOVER_VERSION=2
+		else
+			log "Using discover version 1."
+			DISCOVER_VERSION=1
+		fi
 	else
-		log "Using discover version 1."
-		DISCOVER_VERSION=1
+		log "No discover available. Maybe using hotplug instead?"
+		DISCOVER_VERSION=
 	fi
 }
 
@@ -187,6 +195,18 @@ discover_hw () {
 			sed 's/ $//'
 		;;
 	esac
+}
+
+hotplug_type () {
+	if [ -f /proc/sys/kernel/hotplug ]; then
+		if [ -d /etc/hotplug ]; then
+			HOTPLUG_TYPE=real
+		else
+			HOTPLUG_TYPE=fake
+		fi
+	else
+		HOTPLUG_TYPE=
+	fi
 }
 
 # Some pci chipsets are needed or there can be DMA or other problems.
@@ -298,6 +318,9 @@ get_manual_hw_info() {
 # Detect discover version
 discover_version
 
+# Detect hotplug type
+hotplug_type
+
 # Should be greater than the number of kernel modules we can reasonably
 # expect it will ever need to load.
 MAX_STEPS=1000
@@ -310,7 +333,7 @@ db_progress START 0 $MAX_STEPS $PROGRESSBAR
 # We need to do this before the regular PCI detection so that we can
 # determine which network cards are Cardbus.
 if [ -f /etc/pcmcia/cb_mod_queue ]; then
-	if [ -f /proc/sys/kernel/hotplug ]; then
+	if [ "$HOTPLUG_TYPE" = fake ]; then
 		saved_hotplug=`cat /proc/sys/kernel/hotplug`
 		echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
 	fi
@@ -318,7 +341,7 @@ if [ -f /etc/pcmcia/cb_mod_queue ]; then
 		log "Loading queued Cardbus module $module"
 		modprobe -v $module | logger -t hw-detect
 	done
-	if [ -f /proc/sys/kernel/hotplug ]; then
+	if [ "$HOTPLUG_TYPE" = fake ]; then
 		echo $saved_hotplug >/proc/sys/kernel/hotplug
 	fi
 fi
@@ -339,6 +362,12 @@ if [ -d /sys/bus/pci/devices ] && grep -q 0x060700 \
 	modprobe -v yenta_socket | logger -t hw-detect
 	# Ugly hack, but what's the alternative?
 	sleep 3 || true
+fi
+
+# If using real hotplug, re-run the rc scripts to pick up new modules.
+# TODO: this just loads modules itself, rather than handing back a list
+if [ "$HOTPLUG_TYPE" = real ]; then
+	/lib/debian-installer/coldplug
 fi
 
 ALL_HW_INFO=$(get_detected_hw_info; get_manual_hw_info)
@@ -605,7 +634,7 @@ if [ -x /etc/init.d/pcmcia ]; then
 		# load modules for Cardbus cards and tell which network
 		# interfaces belong to PCMCIA devices. The former is only
 		# necessary on 2.4 kernels, though.
-		if [ -f /proc/sys/kernel/hotplug ]; then
+		if [ "$HOTPLUG_TYPE" = fake ]; then
 			# Snapshot discover information so we can detect
 			# modules for Cardbus cards by later comparison in
 			# the hotplug handler. (Only on 2.4 kernels.)
@@ -636,7 +665,7 @@ if [ -x /etc/init.d/pcmcia ]; then
 		CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 3<&0 2>&1 \
 			| logger -t hw-detect
 	    
-		if [ -f /proc/sys/kernel/hotplug ]; then
+		if [ "$HOTPLUG_TYPE" = fake ]; then
 			echo $saved_hotplug >/proc/sys/kernel/hotplug
 			rm -f /tmp/pcmcia-discover-snapshot
 		fi
@@ -764,6 +793,8 @@ if [ -n "$MISSING_MODULES_LIST" ]; then
 	db_input low "$template" || [ $? -eq 30 ]
 	db_go || true
 fi
+
+sysfs-update-devnames
 
 # Make sure udev creates device nodes in time.
 if type udevstart >/dev/null 2>&1; then

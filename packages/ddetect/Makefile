@@ -8,6 +8,7 @@ CFLAGS = -Wall -O2 -g
 CFLAGS_ARCH = -DARCH=$(DEB_HOST_ARCH) -DCPU=$(DEB_HOST_GNU_CPU) -DCPU_TEXT='"$(DEB_HOST_ARCH)"' -DSYSTEM=$(DEB_HOST_GNU_SYSTEM)
 
 bindir=$(DESTDIR)/bin/
+hpdir=$(DESTDIR)/etc/hotplug.d
 didir=$(DESTDIR)/lib/debian-installer.d
 pbcdir=$(DESTDIR)/usr/lib/prebaseconfig.d
 
@@ -28,6 +29,9 @@ install-hw-detect: hw-detect.sh
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) hw-detect.sh $(bindir)/hw-detect
 	$(INSTALL) hotplug-pcmcia.sh $(bindir)/hotplug-pcmcia
+	$(INSTALL) sysfs-update-devnames.sh $(bindir)/sysfs-update-devnames
+	$(INSTALL) -d $(hpdir)/net
+	$(INSTALL) net-hotplug.sh $(hpdir)/net/ddetect.hotplug
 	$(INSTALL) -d $(pbcdir)
 	$(INSTALL) hw-detect.prebaseconfig $(pbcdir)/30hw-detect
 ifeq ($(DEB_HOST_ARCH),powerpc)
