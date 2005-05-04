@@ -384,13 +384,15 @@ done
 IFS="$IFS_SAVE"
 db_progress STEP $OTHER_STEPSIZE
 
-# Ask which modules to install.
-db_subst hw-detect/select_modules list "$LIST"
-db_set hw-detect/select_modules "$LIST"
-db_input medium hw-detect/select_modules || true
-db_go || exit 10 # back up
-db_get hw-detect/select_modules
-LIST="$RET"
+if [ "$LIST" ]; then
+	# Ask which modules to install.
+	db_subst hw-detect/select_modules list "$LIST"
+	db_set hw-detect/select_modules "$LIST"
+	db_input medium hw-detect/select_modules || true
+	db_go || exit 10 # back up
+	db_get hw-detect/select_modules
+	LIST="$RET"
+fi
 
 db_input low hw-detect/prompt_module_params || true
 db_go || exit 10 # back up
@@ -407,7 +409,10 @@ list_to_lines() {
 
 # Work out amount to step per module load. expr rounds down, so 
 # it may not get quite to 100%, but will at least never exceed it.
-MODULE_STEPSIZE=$(expr \( $MAX_STEPS - \( $OTHER_STEPS \* $OTHER_STEPSIZE \) \) / $(list_to_lines | wc -l))
+MODULE_STEPS=$(expr \( $MAX_STEPS - \( $OTHER_STEPS \* $OTHER_STEPSIZE \) \))
+if [ "$LIST" ]; then
+	MODULE_STEPSIZE=$(expr $MODULE_STEPS / $(list_to_lines | wc -l))
+fi
 
 log "Loading modules..."
 IFS="$NEWLINE"
@@ -444,6 +449,10 @@ for device in $(list_to_lines); do
 	IFS="$NEWLINE"
 done
 IFS="$IFS_SAVE"
+
+if [ -z "$LIST" ]; then
+	db_progress STEP $MODULE_STEPS
+fi
 
 # If there is an ide bus, then register the ide CD modules so they'll be
 # available on the target system for base-config. Disk too, in case root is
