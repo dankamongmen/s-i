@@ -70,6 +70,7 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 	di_slist_node *node, *node1, *node2;
 	int reverse_depend=0;
 	int lowmem=get_lowmem_level();
+	bool standard_modules = true;
 	
 	if (lowmem < 2) {
 		choose_modules_question="anna/choose_modules";
@@ -94,6 +95,10 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 			}
 		}
 	}
+
+	debconf_get(debconf, "anna/standard_modules");
+	if (strcmp(debconf->value, "false") == 0)
+		standard_modules = false;
 
 	for (node = (*packages)->list.head; node; node = node->next) {
 		package = node->data;
@@ -152,8 +157,14 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 		}
 
 		if (package->priority >= di_package_priority_standard) {
-			package->status_want = di_package_status_want_install;
-			di_log (DI_LOG_LEVEL_DEBUG, "install %s, priority >= standard", package->package);
+			if (standard_modules || ((di_system_package *)package)->kernel_version) {
+				package->status_want = di_package_status_want_install;
+				di_log (DI_LOG_LEVEL_DEBUG, "install %s, priority >= standard", package->package);
+			}
+			else {
+				package->status_want = di_package_status_want_unknown;
+				di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, priority >= standard", package->package);
+			}
 		}
 		else if (is_queued(package)) {
 			package->status_want = di_package_status_want_install;
