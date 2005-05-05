@@ -329,9 +329,14 @@ static int satisfy_virtual(di_system_package *p) {
 		if (d->type == di_package_dependency_type_depends) {
 			/* Non-providing dependency */
 			di_log(DI_LOG_LEVEL_DEBUG, "non-providing dependency from %s to %s", p->p.package, dep->p.package);
-			if (dep->p.status != di_package_status_installed &&
-			    di_config_package(dep, satisfy_virtual, check_special) == -1)
-				return -1;
+			if (dep->p.status != di_package_status_installed) {
+				switch (di_config_package(dep, satisfy_virtual, check_special)) {
+					case -1:
+						return -1;
+					case EXIT_BACKUP:
+						return EXIT_BACKUP;
+				}
+			}
 			continue;
 		}
 		if (d->type != di_package_dependency_type_reverse_provides)
@@ -404,8 +409,12 @@ static int satisfy_virtual(di_system_package *p) {
 				/* Ick. If we have a menu item it has to match the
 				 * debconf choice, otherwise we configure all of
 				 * the providing packages */
-				if (di_config_package(dep, satisfy_virtual, check_special) == -1)
-					return -1;
+				switch (di_config_package(dep, satisfy_virtual, check_special)) {
+					case -1:
+						return -1;
+					case EXIT_BACKUP:
+						return EXIT_BACKUP;
+				}
 				if (is_menu_item)
 					break;
 			}
@@ -699,8 +708,12 @@ static int di_config_package(di_system_package *p,
 		if (d->type != di_package_dependency_type_depends)
 			continue;
 		/* Recursively configure this package */
-		if (di_config_package(dep, virtfunc, walkfunc) == -1)
-			return -1;
+		switch (di_config_package(dep, virtfunc, walkfunc)) {
+			case -1:
+				return -1;
+			case EXIT_BACKUP:
+				return EXIT_BACKUP;
+		}
 	}
 
 	set_package_title(p);
