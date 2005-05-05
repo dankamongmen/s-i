@@ -3,4 +3,8 @@
 . /usr/share/debconf/confmodule
 
 db_get rescue/enable
-[ "$RET" = true ] && anna-install rescue-mode
+if [ "$RET" = true ]; then
+	anna-install rescue-mode
+	# Disable installation of many Priority >= standard udebs.
+	db_set anna/standard_modules false || true
+fi
