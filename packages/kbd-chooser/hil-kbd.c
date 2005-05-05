@@ -75,9 +75,9 @@ kbd_t *hil_kbd_get (kbd_t *keyboards, const char *subarch)
 	if (check_dir("/proc/bus/input")) {
 		int res;
 		res = grep ("/proc/bus/input/devices", "HIL keyboard");
-		if (res == 1)
+		if (res > 0)
 			k->present = TRUE;
-		else if (res == 0)
+		else
 			k->present = FALSE;
 	}
 	return keyboards;

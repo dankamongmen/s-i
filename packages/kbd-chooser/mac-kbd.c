@@ -31,13 +31,13 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 	keyboards = k;
 
 	// Handle 2.2 kernel.
-	if (! grep("/proc/version","2.2."))
+	if (grep("/proc/version", "2.2.") > 0)
 		k->present = TRUE;
-	// if we send linux keycodes, don't use ADB keymaps
+	// if we send linux keycodes (grep > 0), don't use ADB keymaps
 	// pretend we don't have an ADB keyboard
-	// If keyboard_sends_linux_keycodes isn't present, then ADB keymap
-	// support is not even compiled into the kernel.
-	else if (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes","1"))
+	// If keyboard_sends_linux_keycodes isn't present (grep < 0), then
+	// ADB keymap support is not even compiled into the kernel.
+	else if (grep("/proc/sys/dev/mac_hid/keyboard_sends_linux_keycodes", "1") != 0)
 		k->present = FALSE;
 	else
 		k->present = TRUE;
@@ -48,16 +48,13 @@ kbd_t *mac_kbd_get (kbd_t *keyboards, const char *subarch)
 	
 	// In 2.6 series, we can detect keyboard via /proc/bus/input
 	// This bit of code should be superflous; 
-	switch (grep ("/proc/bus/input/devices","ADB keyboard")) {
-	case 0:
+	res = grep ("/proc/bus/input/devices", "ADB keyboard");
+	if (res > 0)
 		k->present = TRUE;
-		break;
-	case 1:
+	else if (res == 0)
 		k->present = FALSE;
-		break;
-	default:
+	else
 		k->present = UNKNOWN;
-	}
 #endif
 	// TODO:
 	// We should be able to read the keyboard type from /proc/bus/input/devices too.

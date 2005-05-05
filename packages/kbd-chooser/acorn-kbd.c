@@ -38,7 +38,7 @@ kbd_t *acorn_kbd_get (kbd_t *keyboards, const char *subarch)
 		di_warning ("acorn-kbd: failed to open /proc/cpuinfo.");
 		return keyboards;
 	}
-	if (res != 0) { // Not an acorn
+	if (res == 0) { // Not an acorn
 		k->present = FALSE;
 		return keyboards;
 	}

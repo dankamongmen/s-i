@@ -48,7 +48,7 @@ kbd_t *amiga_kbd_get (kbd_t *keyboards, const char *subarch)
 			di_info ("amiga-kbd: Could not open /proc/bus/input/devicves");
 			return keyboards;
 		}
-		k->present = ( res == 0) ? TRUE : FALSE;
+		k->present = (res > 0) ? TRUE : FALSE;
 	}
 
 	return keyboards;

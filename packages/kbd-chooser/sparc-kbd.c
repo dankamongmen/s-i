@@ -56,12 +56,12 @@ kbd_t *sparc_kbd_get (kbd_t *keyboards, const char *subarch)
 	  if (check_dir ("/proc/bus/input")) {
 		int res;
 		// this dir only present in 2.6
-		res = grep ("/proc/bus/input/devices","Sun Type");
+		res = grep ("/proc/bus/input/devices", "Sun Type");
 		if (res < 0) {
 			di_info ("sparc-kbd: Could not open /proc/bus/input/devices");
 			return keyboards;
 		}
-		k->present = (res == 0) ? TRUE : FALSE;
+		k->present = (res > 0) ? TRUE : FALSE;
 	}	
 
 	return keyboards;
