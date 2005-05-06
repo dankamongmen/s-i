@@ -1,4 +1,4 @@
-PROGS = report-hw package-versions
+PROGS = report-hw
 
 INSTALL     = install
 INSTALL_DATA= install -m 644
