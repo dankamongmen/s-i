@@ -2,59 +2,20 @@
 
 . /usr/share/debconf/confmodule
 
-if [ "" = "$DILOGDIR" ]; then
-	DILOGDIR=/var/log/
-fi
+DILOGDIR=/var/log/
 
-if [ "" = "$FLOPPYMNT" ]; then
-	FLOPPYMNT=/floppy
-fi
-
-# make sure we have a directory
-if [ ! -d $DILOGDIR ]; then
-	mkdir -p $DILOGDIR
-fi
+test -d /floppy || mkdir /floppy
+umount /floppy 2>/dev/null || true
 
 db_input critical bugreporter-udeb/insert_floppy || [ $? -eq 30 ]
 db_go
 
-# generate files info and store them in $DILOGDIR
 db_progress START 0 2 debian-installer/bugreporter-udeb/title
 
+# generate files info and store them in $DILOGDIR
 report-hw > $DILOGDIR/hardware-summary
 db_progress STEP 1
 
-# Mostly copied from floppy-retriever. [pere 2004-03-13]
-mountfloppy() {
-	if ! mount | cut -d' ' -f3 | grep -q '^/floppy$'; then
-		logger -t bugreporter-udeb -p user.debug "failed to mount floppy, trying harder"
-		# This is a good reasonable default, but will fail for
-		# USB floppys.
-		FLOPPYDEV=/dev/floppy/0
-		
-		if [ ! -e $FLOPPYDEV ]; then
-			modprobe floppy >> /var/log/messages 2>&1 || true
-		fi
-	
-		if ! grep -q ^vfat /proc/modules ; then
-			modprobe vfat >> /var/log/messages 2>&1 || true
-		fi
-
-		if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
-			logger -t bugreporter-udeb -p user.debug "cannot mount floppy"
-			# Cannot find a device, or found the wrong device.
-			# Ask for help from the user and try it again.
-			#FLOPPYDEV=$(ask_dev)
-			#mount $FLOPPYDEV -tauto $FLOPPYMNT
-		        return 1
-		fi
-	fi
-	logger -t bugreporter-udeb -p user.debug "mounted floppy"
-	return 0
-}
-
-test -d /floppy || mkdir /floppy
-umount /floppy 2>/dev/null || true
 if mountfloppy ; then
 	for file in \
 	    /var/log/messages \
@@ -63,7 +24,7 @@ if mountfloppy ; then
 	    /var/lib/dpkg/status \
 	    $DILOGDIR/hardware-summary \
 	    $DILOGDIR/package-versions; do 
-	        if [ -e $file ]; then
+	    	if [ -e $file ]; then
 			cp $file /floppy/
 		fi
     	done
@@ -74,6 +35,6 @@ if mountfloppy ; then
 else
 	db_progress STEP 1
 	db_progress STOP
-	db_input critical bugreporter-udeb/no_floppy || [ $? -eq 30 ]
+	db_input critical bugreporter-udeb/floppy_mount_failed || [ $? -eq 30 ]
 	db_go
 fi
