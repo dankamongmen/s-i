@@ -18,14 +18,10 @@ fi
 db_input critical bugreporter-udeb/insert_floppy || [ $? -eq 30 ]
 db_go
 
-# generate files with HW info, debconf database info etc, and store
-# them in $DILOGDIR
-db_progress START 0 3 debian-installer/bugreporter-udeb/title
+# generate files info and store them in $DILOGDIR
+db_progress START 0 2 debian-installer/bugreporter-udeb/title
 
-/bin/package-versions > $DILOGDIR/package-versions
-db_progress STEP 1
-
-/bin/report-hw > $DILOGDIR/hardware-summary
+report-hw > $DILOGDIR/hardware-summary
 db_progress STEP 1
 
 # Mostly copied from floppy-retriever. [pere 2004-03-13]
@@ -64,6 +60,7 @@ if mountfloppy ; then
 	    /var/log/messages \
 	    /var/log/syslog \
 	    /var/log/partman \
+	    /var/lib/dpkg/status \
 	    $DILOGDIR/hardware-summary \
 	    $DILOGDIR/package-versions; do 
 	        if [ -e $file ]; then
