@@ -1,0 +1,50 @@
+#!/bin/sh
+. /usr/share/debconf/confmodule
+
+FLOPPYMNT=/floppy
+
+ask_dev() {
+	DEVS=""
+	for dev in `find /dev/floppy /dev/scsi /dev/ide /dev/disc`; do
+		# TODO if sfdisk or something similar were available, we could
+		# do this:
+		#        SIZE=sfdisk -s $DEV
+		#        if [ "$SIZE" -eq '1440' -o "$SIZE" -eq '2880' ]; then
+		if [ -b "$dev" ]; then
+			if [ -z "$DEVS" ]; then
+				DEVS="$dev"
+			else
+				DEVS="$DEVS, $dev"
+			fi
+		fi
+	done
+	db_subst retriever/floppy/device DEVS $DEVS
+	db_input high retriever/floppy/device
+	db_go 
+	db_get retriever/floppy/device
+	if [ "$RET" = Cancel ]; then
+		exit 1
+	fi
+	echo $RET
+}
+
+if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
+	# This is a good reasonable default, but will fail for
+	# USB floppys.
+	FLOPPYDEV=/dev/floppy/0
+	
+	if [ ! -e $FLOPPYDEV ]; then
+		modprobe floppy >> /var/log/messages 2>&1 || true
+	fi
+
+	if ! grep -q ^vfat /proc/modules ; then
+		modprobe vfat >> /var/log/messages 2>&1 || true
+	fi
+	
+	if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
+		# Cannot find a device, or found the wrong device.
+		# Ask for help from the user and try it again.
+		FLOPPYDEV=$(ask_dev)
+		mount $FLOPPYDEV -tauto $FLOPPYMNT
+	fi
+fi
