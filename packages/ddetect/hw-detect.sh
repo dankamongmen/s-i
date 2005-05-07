@@ -303,17 +303,6 @@ get_manual_hw_info() {
 		echo "zalon7xx:Zalon SCSI"
 		register-module zalon7xx
 	fi
-
-	# similarly, on sparc, sbus hardware should just be loaded, we
-	# don't detect it.
-	if [ "`udpkg --print-architecture`" = sparc ]; then
-		echo 'sunhme:Sun "Happy Meal" 10/100 Ethernet'
-		register-module sunhme
-		echo 'sunbmac:Sun "Big Mac" 10/100 Ethernet'
-		register-module sunbmac
-		echo 'esp:ESP SCSI driver'
-		register-module esp
-	fi
 }
 
 # Detect discover version
