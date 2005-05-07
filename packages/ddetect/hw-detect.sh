@@ -78,10 +78,11 @@ load_module() {
 	local params=""
     
 	if [ "$PROMPT_MODULE_PARAMS" = 1 ]; then
-		db_subst hw-detect/module_params MODULE "$module"
-		db_input low hw-detect/module_params || [ $? -eq 30 ]
+		db_register hw-detect/module_params hw-detect/module_params/$module
+		db_subst hw-detect/module_params/$module MODULE "$module"
+		db_input low hw-detect/module_params/$module || [ $? -eq 30 ]
 		db_go
-		db_get hw-detect/module_params
+		db_get hw-detect/module_params/$module
 		params="$RET"
 	fi
 	
