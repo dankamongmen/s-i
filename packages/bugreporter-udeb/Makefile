@@ -1,4 +1,4 @@
-PROGS = report-hw
+PROGS = report-hw httpd
 
 INSTALL     = install
 INSTALL_DATA= install -m 644

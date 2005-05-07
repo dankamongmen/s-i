@@ -1,54 +1,40 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 2003 by Petter Reinholdtsen
-
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-INSTALL      = install -m0755
 
 PACKAGE=bugreporter-udeb
 
 build:
-# Nothing to do.
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
 	$(MAKE) clean
 	dh_clean
 
-install-common: build
+install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
 
-install-bugreporter-udeb: install-common
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/$(PACKAGE)
 
 	# Install it after 93save-install-log to make sure
-	# /var/log/debian-installer/ exist, and before 95umount
+	# /var/log/debian-installer/ exists, and before 95umount
 	# to make sure it is still mounted.
-	$(INSTALL) debian/$(PACKAGE).prebaseconfig debian/$(PACKAGE)/usr/lib/prebaseconfig.d/94$(PACKAGE)
+	dh_install debian/$(PACKAGE).prebaseconfig usr/lib/prebaseconfig.d/94$(PACKAGE)
 
-# Build architecture-independent files here.
-binary-indep: install bugreporter-udeb
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_builddeb
 
-bugreporter-udeb: install-bugreporter-udeb
-	dh_testdir 
-	dh_testroot 
-	dh_installdebconf 
-	dh_strip 
-	dh_compress 
-	dh_fixperms 
-	dh_installdeb 
-	dh_gencontrol 
-	dh_builddeb 
-
-# Build architecture-dependent files here.
 binary-arch: build install
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
+.PHONY: build clean binary-indep binary-arch binary install
