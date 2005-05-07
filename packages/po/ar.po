@@ -3748,7 +3748,8 @@ msgstr "جاري التحضير للتّهيئة الأساسيّة..."
 #. Type: text
 #. Description
 #: ../templates:28
-msgid "Saving installation logs to /var/log/debian-installer/..."
+#, fuzzy
+msgid "Saving installation logs to /var/log/installer/..."
 msgstr "جاري حفظ سجلّات التثبيت في /var/log/debian-installer/..."
 
 #. Type: text
@@ -6713,9 +6714,10 @@ msgstr "سيتمّ نسخ ملفّات السجلّات ومعلومات الإ�
 #. Type: note
 #. Description
 #: ../bugreporter-udeb.templates:8
+#, fuzzy
 msgid ""
 "The information will also be stored in /var/log/debian-installer/ on the "
-"installed system, and on a floppy if the floppy device was found."
+"installed system."
 msgstr ""
 "ستكون المعلومات مفرزةً أيضاً في /var/log/debian-installer/ على النّظام المثبّت، "
 "وعلى قرصٍ مرن إن عُثر على قارئ أقراصٍ مرنة."
@@ -6723,29 +6725,22 @@ msgstr ""
 #. Type: note
 #. Description
 #: ../bugreporter-udeb.templates:16
-msgid "Unable to find any floppy device"
-msgstr "تعذّر العثور على أيّ قارئ أقراصٍ مرنة"
+#, fuzzy
+msgid "Failed to mount the floppy"
+msgstr "فشل تركيب /target/proc"
 
 #. Type: note
 #. Description
 #: ../bugreporter-udeb.templates:16
 msgid ""
-"No floppy device was found. If this computer has a floppy drive, it is "
-"probably a bug in the bugreporter-udeb package that got you here."
+"Either the floppy device cannot be found, or a formatted floppy is not in "
+"the drive."
 msgstr ""
-"لم يُعثر على أيّ قارئ أقراصٍ مرنة. إن كان لهذا الحاسوب قارئ أقراصٍ مرنة، فقد "
-"تكون هذه علّة برمجيّة في حزمة bugreporter-udeb التي لديك هنا."
-
-#. Type: note
-#. Description
-#: ../bugreporter-udeb.templates:16
-msgid "Note: USB floppies are not supported at the moment."
-msgstr "ملاحظة: قارئات USB للأقراص المرنة غير مدعومةٍ حالياً."
 
 #. Type: text
 #. Description
 #. Prebaseconfig progress bar item
-#: ../bugreporter-udeb.templates:25
+#: ../bugreporter-udeb.templates:23
 msgid "Gathering information for installation report..."
 msgstr "جاري جمع المعلومات لتقرير التّثبيت..."
 
@@ -8947,40 +8942,15 @@ msgstr "الزّمن المتبقّي المقدّر: أقل من دقيقة"
 msgid "Scanning the floppy"
 msgstr "جاري مسح القرص المرن"
 
-#. Type: select
-#. Choices
-#: ../floppy-retriever.templates:7
-msgid "Cancel, ${DEVS}"
-msgstr "إلغاء، ${DEVS}"
-
-#. Type: select
-#. Description
-#: ../floppy-retriever.templates:8
-msgid "Select your floppy device:"
-msgstr "انتقِ جهاز القرص المرن:"
-
-#. Type: select
-#. Description
-#: ../floppy-retriever.templates:8
-msgid ""
-"No standard floppy drive was found. If you have a USB floppy drive or some "
-"other unusual type of floppy drive, select it from the list. Note that the "
-"list may also include drives that are not floppy drives. The installer will "
-"only try to read from the selected device."
-msgstr ""
-"لم يعثر على سواقة أقراص مرنة قياسية. اذا كنت تمتلك سواقة أقراص مرنة من نوع "
-"USBأو نوع مغاير، فانتقها من القائمة. انتبه لاحتواء القائمة على سواقات أقراص "
-"غير مرنة. كما أن المثبت سيحاول القراءة فقط من الجهاز المحدد."
-
 #. Type: boolean
 #. Description
-#: ../floppy-retriever.templates:17
+#: ../floppy-retriever.templates:8
 msgid "Cannot read floppy, or not a driver floppy. Retry?"
 msgstr "لا يمكن قراءة القرص المرن، أو أنّه ليس قرصاً دافعاً. هل أعيد المحاولة؟"
 
 #. Type: boolean
 #. Description
-#: ../floppy-retriever.templates:17
+#: ../floppy-retriever.templates:8
 msgid ""
 "There was a problem reading data from the floppy disk. Please make sure that "
 "the right floppy is in the drive. If you continue to have trouble, you may "
@@ -9392,6 +9362,44 @@ msgstr "حدث خطأ عندما جهّز ${PARTITION} على ${MOUNT}."
 #: ../partconf.templates:143
 msgid "Configure and mount partitions"
 msgstr "أعدّ وجهّز التجزيئات"
+
+#. Type: select
+#. Choices
+#: ../mountfloppy.templates:3
+msgid "Cancel, ${DEVS}"
+msgstr "إلغاء، ${DEVS}"
+
+#. Type: select
+#. Description
+#: ../mountfloppy.templates:4
+msgid "Select your floppy device:"
+msgstr "انتقِ جهاز القرص المرن:"
+
+#. Type: select
+#. Description
+#: ../mountfloppy.templates:4
+#, fuzzy
+msgid ""
+"No standard floppy drive was found. If you have a USB floppy drive or some "
+"other unusual type of floppy drive, select it from the list. Note that the "
+"list may also include drives that are not floppy drives."
+msgstr ""
+"لم يعثر على سواقة أقراص مرنة قياسية. اذا كنت تمتلك سواقة أقراص مرنة من نوع "
+"USBأو نوع مغاير، فانتقها من القائمة. انتبه لاحتواء القائمة على سواقات أقراص "
+"غير مرنة. كما أن المثبت سيحاول القراءة فقط من الجهاز المحدد."
+
+#~ msgid "Unable to find any floppy device"
+#~ msgstr "تعذّر العثور على أيّ قارئ أقراصٍ مرنة"
+
+#~ msgid ""
+#~ "No floppy device was found. If this computer has a floppy drive, it is "
+#~ "probably a bug in the bugreporter-udeb package that got you here."
+#~ msgstr ""
+#~ "لم يُعثر على أيّ قارئ أقراصٍ مرنة. إن كان لهذا الحاسوب قارئ أقراصٍ مرنة، فقد "
+#~ "تكون هذه علّة برمجيّة في حزمة bugreporter-udeb التي لديك هنا."
+
+#~ msgid "Note: USB floppies are not supported at the moment."
+#~ msgstr "ملاحظة: قارئات USB للأقراص المرنة غير مدعومةٍ حالياً."
 
 #~ msgid "AR"
 #~ msgstr "الأرجنتين"
