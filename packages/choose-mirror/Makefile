@@ -36,7 +36,7 @@ debian/choose-mirror.templates: Mirrors.masterlist debian/choose-mirror.template
 
 mirrors_http.h: Mirrors.masterlist
 	./mirrorlist http
-	
+
 mirrors_ftp.h: Mirrors.masterlist
 	./mirrorlist ftp
 
