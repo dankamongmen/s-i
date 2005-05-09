@@ -168,7 +168,7 @@ get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev, bool
 }
 
 int
-get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_fs_type)
+get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_fs_type, PedPartitionFlag require_flag)
 {
     char buf[1024], *ptr, partname[1024], *canon_partname = NULL, tmp[1024];
     FILE *fp, *fptmp;
@@ -277,6 +277,9 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
                 continue;
 #endif
 
+            if (require_flag && !ped_partition_get_flag(part, require_flag))
+                continue;
+
             p = malloc(sizeof(*p));
             p->path = ped_partition_get_path(part);
             if (strstr(p->path, "/dev/ide/") == p->path) {
@@ -324,15 +327,17 @@ main(int argc, char *argv[])
     int part_count, i;
     bool ignore_fs_type = false;
     bool colons = false;
+    PedPartitionFlag require_flag = 0;
 
     int opt;
     struct option longopts[] = {
         { "ignore-fstype",  no_argument,        NULL, 'i' },
         { "colons",         no_argument,        NULL, 'c' },
+        { "flag",           required_argument,  NULL, 'f' },
         { NULL, 0, NULL, 0 }
     };
 
-    while ((opt = getopt_long(argc, argv, "ic", longopts, NULL)) != EOF) {
+    while ((opt = getopt_long(argc, argv, "icf:", longopts, NULL)) != EOF) {
         switch (opt) {
             case 'i':
                 ignore_fs_type = true;
@@ -340,10 +345,17 @@ main(int argc, char *argv[])
             case 'c':
                 colons = true;
                 break;
+            case 'f':
+                require_flag = ped_partition_flag_get_by_name(optarg);
+                if (!require_flag) {
+                    fprintf(stderr, "Unknown parted flag '%s'\n", optarg);
+                    exit(1);
+                }
+                break;
         }
     }
 
-    if ((part_count = get_all_partitions(parts, MAX_PARTS, ignore_fs_type)) <= 0)
+    if ((part_count = get_all_partitions(parts, MAX_PARTS, ignore_fs_type, require_flag)) <= 0)
         return 1;
     for (i = 0; i < part_count; i++) {
         if (colons)

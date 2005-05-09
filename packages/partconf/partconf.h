@@ -44,6 +44,6 @@ int      strcount(const char *s, int c);
 int      umount_target(void);
 
 /* find-parts.c */
-int      get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_fs_type);
+int      get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_fs_type, PedPartitionFlag require_flag);
 
 #endif /* PARTCONF_H_ */
