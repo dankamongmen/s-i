@@ -71,6 +71,9 @@ LOCALE="$RET"
 db_get debian-installer/language
 LANGLIST="$RET"
 
+db_get localechooser/supported-locales
+EXTRAS="$(echo "$RET" | sed 's/,//g')"
+
 if [ ! -d /target/root ] ; then
     if mkdir /target/root ; then
         :
@@ -93,11 +96,26 @@ fi
     echo "LANGUAGE=\"$LANGLIST\""
 ) >> /target/etc/environment
 # If the locale isn't already valid, append it to locale.gen
+gen=
 if chroot /target/ /usr/sbin/validlocale $LOCALE \
     >> /target/etc/locale.gen 2>> $LOG ; then
     : # Nothing to do
 else
     # New locale added to locale.gen, generate it
-    chroot /target /usr/sbin/locale-gen >> $LOG 2>&1
+    gen=1
 fi
-
+for loc in $EXTRAS; do
+    if [ "$loc" = "$LOCALE" ]; then
+        continue
+    fi
+    if chroot /target/ /usr/sbin/validlocale $loc \
+        >> /target/etc/locale.gen 2>> $LOG ; then
+        : # Nothing to do
+    else
+        # New locale added to locale.gen, generate it
+        gen=1
+    fi
+done
+if [ "$gen" ]; then
+    chroot /target /usr/sbin/locale-gen --keep-existing >> $LOG 2>&1
+fi

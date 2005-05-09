@@ -13,6 +13,7 @@ countrycode="debian-installer/country"
 consoledisplay="debian-installer/consoledisplay"
 shortlist="countrychooser/shortlist"
 fulllist="countrychooser/country-name"
+supportedlocales="localechooser/supported-locales"
 ARCH=`udpkg --print-architecture`
 
 # This is the iso_3166.tab file location
@@ -492,10 +493,34 @@ if [ "$LOCALE" != "C" ] ; then
     else
       exit 10
     fi
+    db_get $localecode
+    LOCALE="$RET"
   fi
 fi
 
-# Any further run should trigger the locale question
+CHOICES=
+# *.UTF-8@euro locales are deprecated; don't use them.
+for i in $(grep -v '\.UTF-8@euro$' $SUPPORTEDLOCALES); do
+  if [ -z "$CHOICES" ]; then
+    CHOICES="$i"
+  else
+    CHOICES="$CHOICES,$i"
+  fi
+done
+db_subst $supportedlocales LOCALELIST "$CHOICES"
+db_fget $supportedlocales seen
+if [ "$RET" = false ]; then
+  db_set $supportedlocales "$LOCALE"
+fi
+db_input medium $supportedlocales || [ $? -eq 30 ]
+if db_go; then
+  log "Supported locales successfully set"
+else
+  exit 10
+fi
+
+# Any further run should trigger the locale questions
 db_fset $localecode seen false || true
+db_fset $supportedlocales seen false || true
 
 exit 0
