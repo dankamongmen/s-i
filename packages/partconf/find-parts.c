@@ -323,17 +323,22 @@ main(int argc, char *argv[])
     struct partition *parts[MAX_PARTS];
     int part_count, i;
     bool ignore_fs_type = false;
+    bool colons = false;
 
     int opt;
     struct option longopts[] = {
 	{ "ignore-fstype", no_argument, NULL, 'i' },
+        { "colons", no_argument, NULL, 'c' },
 	{ NULL, 0, NULL, 0 }
     };
 
-    while ((opt = getopt_long(argc, argv, "i", longopts, NULL)) != EOF) {
+    while ((opt = getopt_long(argc, argv, "ic", longopts, NULL)) != EOF) {
         switch (opt) {
             case 'i':
                 ignore_fs_type = true;
+                break;
+            case 'c':
+                colons = true;
                 break;
         }
     }
@@ -341,10 +346,16 @@ main(int argc, char *argv[])
     if ((part_count = get_all_partitions(parts, MAX_PARTS, ignore_fs_type)) <= 0)
         return 1;
     for (i = 0; i < part_count; i++) {
-        printf("%s\t%s\t%s\n",
-                parts[i]->path,
-                parts[i]->fstype != NULL ? parts[i]->fstype : "",
-                parts[i]->size > 0 ? size_desc(parts[i]->size) : "");
+        if (colons)
+            printf("%s:%s:%lld\n",
+                    parts[i]->path,
+                    parts[i]->fstype != NULL ? parts[i]->fstype : "",
+                    parts[i]->size);
+        else
+            printf("%s\t%s\t%s\n",
+                    parts[i]->path,
+                    parts[i]->fstype != NULL ? parts[i]->fstype : "",
+                    parts[i]->size > 0 ? size_desc(parts[i]->size) : "");
     }
     return 0;
 }
