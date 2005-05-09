@@ -19,7 +19,7 @@ do
     for file in list.*
     do
         lang=${file#list.}
-        unilang=$(grep "^$lang.*\\.UTF-8" /usr/share/i18n/SUPPORTED | sed -e 1q | sed -e 's/[@. ].*//' )
+	unilang=$(grep "^$lang.* UTF-8" /usr/share/i18n/SUPPORTED | sed -e 's/[@. ].*//;q' )
         if [ -z "$unilang" ]; then
             echo "Warning: lang $lang skipped because no UTF-8 variant found" 1>&2
         else
