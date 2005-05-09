@@ -200,6 +200,17 @@ if $(svn st $DI_COPY/packages | grep -q "^C") ; then
   exit 1
 fi
 
+# Do not accept working on a locked copy
+LOCKFILE=$DI_COPY/.l10n-sync.lock
+if [ -f $LOCKFILE ] ; then
+  echo $LOCKFILE file detected.
+  echo $DI_COPY seems to be locked by another l10n-sync process
+  echo Please fix this before lauching the script again...
+  exit 1
+else
+  touch $LOCKFILE
+fi
+
 # First, update the packages/po directory
 # to get the run-l10n-sync file
 cd $DI_COPY/packages/po
@@ -616,3 +627,6 @@ if [ "$BIG_COMMITS" = "Y" ] ; then
   cd $DI_COPY/packages
   svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" || svnerr
 fi
+
+# Remove the lock file
+rm -f $LOCKFILE || true
