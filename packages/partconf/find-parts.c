@@ -327,9 +327,9 @@ main(int argc, char *argv[])
 
     int opt;
     struct option longopts[] = {
-	{ "ignore-fstype", no_argument, NULL, 'i' },
-        { "colons", no_argument, NULL, 'c' },
-	{ NULL, 0, NULL, 0 }
+        { "ignore-fstype",  no_argument,        NULL, 'i' },
+        { "colons",         no_argument,        NULL, 'c' },
+        { NULL, 0, NULL, 0 }
     };
 
     while ((opt = getopt_long(argc, argv, "ic", longopts, NULL)) != EOF) {
