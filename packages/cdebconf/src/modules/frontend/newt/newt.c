@@ -426,7 +426,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         newtTextboxSetText(textbox, full_description);
         free(full_description);
     }
-    if (eflags & NEWT_FLAG_HIDDEN || question_getvalue(q, "") == NULL)
+    if (eflags & NEWT_FLAG_PASSWORD || question_getvalue(q, "") == NULL)
         defval = "";
     else
         defval = (char *)question_getvalue(q, "");
@@ -913,7 +913,7 @@ newt_handler_string(struct frontend *obj, struct question *q)
  */
 static int newt_handler_password(struct frontend *obj, struct question *q)
 {
-    return generic_handler_string(obj, q, NEWT_FLAG_HIDDEN);
+    return generic_handler_string(obj, q, NEWT_FLAG_PASSWORD);
 }
 
 /*
