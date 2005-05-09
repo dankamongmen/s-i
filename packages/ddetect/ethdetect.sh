@@ -240,11 +240,11 @@ while ! ethernet_found; do
 	db_capb
 
 	if [ -z "$CHOICES" ]; then
-		sysfs-update-devnames
+		sysfs-update-devnames || true
 		rm -f $TEMP_EXTRACT
 		exit 1
 	fi
 done
 
-sysfs-update-devnames
+sysfs-update-devnames || true
 rm -f $TEMP_EXTRACT
