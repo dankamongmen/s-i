@@ -167,7 +167,7 @@ get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev, bool
 int
 get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_fs_type)
 {
-    char buf[1024], *ptr, partname[1024], tmp[1024];
+    char buf[1024], *ptr, partname[1024], *canon_partname = NULL, tmp[1024];
     FILE *fp, *fptmp;
     DIR *d;
     struct dirent *dent;
@@ -182,28 +182,17 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
     if ((d = opendir("/dev/discs")) == NULL)
         return 0;
     while ((dent = readdir(d)) != NULL) {
+        char *canon_disc;
         if (dent->d_name[0] == '.')
             continue;
         if (disc_count >= MAX_DISCS)
             break;
-        snprintf(buf, sizeof(buf)-1, "/dev/discs/%s", dent->d_name);
-        size = readlink(buf, tmp, sizeof(tmp)-1);
-        if (size < 0) {
-            snprintf(buf, sizeof(buf)-1, "/dev/discs/%s/disc", dent->d_name);
-            size = readlink(buf, tmp, sizeof(tmp)-1);
-            if (size < 0) {
-                discs[disc_count] = strdup(buf);
-            } else {
-                tmp[size] = 0;
-            // 2.2.x simulated devfs support 
-                asprintf(&discs[disc_count], "/dev/%s", tmp);
-            }
-        } else {
-            tmp[size] = 0;
-            // Assumes the symlink starts with '../'
-            asprintf(&discs[disc_count], "/dev/%s", tmp+3);
+        snprintf(buf, sizeof(buf)-1, "/dev/discs/%s/disc", dent->d_name);
+        canon_disc = canonicalize_file_name(buf);
+        if (canon_disc) {
+            discs[disc_count++] = strdup(dirname(canon_disc));
+            free(canon_disc);
         }
-        disc_count++;
     }
     if ((fp = fopen("/proc/partitions", "r")) == NULL) {
         perror("fopen(/proc/partitions)");
@@ -214,13 +203,17 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
     if (fgets(buf, sizeof(buf), fp) == NULL)
         return 0;
     while ((ptr = fgets(buf, sizeof(buf), fp)) != NULL) {
+        free(canon_partname);
         sscanf(buf, "%*d %*d %*d %s", tmp);
         strcpy(partname, "/dev/");
         strcat(partname, tmp);
+        canon_partname = canonicalize_file_name(partname);
+        if (!canon_partname)
+            continue;
         // Check if this is a disk or a partition on a known disk
         cont = 0;
         for (i = 0; i < disc_count; i++)
-            if (strstr(partname, discs[i]) == partname) {
+            if (strstr(canon_partname, discs[i]) == canon_partname) {
                 cont = 1;
                 break;
             }
@@ -233,7 +226,7 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
         if (part_count >= max_parts)
             break;
         p = malloc(sizeof(*p));
-        p->path = strdup(partname);
+        p->path = strdup(canon_partname);
         p->description = strdup(p->path);
         p->fstype = NULL;
         p->fsid = NULL;
@@ -248,7 +241,7 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
         parts[part_count++] = p;
         // Open the partition/volume as if it was a disk, it should
         // just have one partition that we can toy with.
-        if ((dev = ped_device_get(partname)) == NULL)
+        if ((dev = ped_device_get(canon_partname)) == NULL)
             continue;
         if ((disk = ped_disk_new(dev)) == NULL)
             continue;
@@ -256,6 +249,7 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
             continue;
         get_partition_info(p, part, dev, ignore_fs_type);
     }
+    free(canon_partname);
     // Add partitions from all the disks we found
     for (i = 0; i < disc_count; i++) {
         char *foo;
