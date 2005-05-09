@@ -9,6 +9,9 @@
 #include <ctype.h>
 #include <libgen.h>
 #include <errno.h>
+#ifdef FIND_PARTS_MAIN
+#include <getopt.h>
+#endif
 
 #include "partconf.h"
 #include <debian-installer.h>
@@ -321,9 +324,20 @@ main(int argc, char *argv[])
     int part_count, i;
     bool ignore_fs_type = false;
 
-    if (argc == 2 && strcmp(argv[1], "--ignore-fstype") == 0) {
-        ignore_fs_type = true;
+    int opt;
+    struct option longopts[] = {
+	{ "ignore-fstype", no_argument, NULL, 'i' },
+	{ NULL, 0, NULL, 0 }
+    };
+
+    while ((opt = getopt_long(argc, argv, "i", longopts, NULL)) != EOF) {
+        switch (opt) {
+            case 'i':
+                ignore_fs_type = true;
+                break;
+        }
     }
+
     if ((part_count = get_all_partitions(parts, MAX_PARTS, ignore_fs_type)) <= 0)
         return 1;
     for (i = 0; i < part_count; i++) {
