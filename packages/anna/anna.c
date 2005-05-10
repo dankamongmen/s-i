@@ -414,7 +414,7 @@ int main(int argc, char **argv) {
 				}
 			}
 			if (! found) {
-				fprintf(stderr, "unknwon udeb %s\n", argv[i]);
+				fprintf(stderr, "unknown udeb %s\n", argv[i]);
 				exit(1);
 			}
 		}
