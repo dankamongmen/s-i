@@ -138,10 +138,9 @@ if [ "${realkernel#/}" = "$realkernel" ]; then
     realkernel="${kernel%/*}/$realkernel"
 fi
 
-# TODO: throw an error here rather than just forgetting about the initrd;
-# can't fix this now due to the string freeze.
 realinitrd="$(readlink "/target$initrd")" || \
-    realinitrd=
+    die quik-installer/resolve_initrd \
+	"readlink $initrd failed with exit status $?"
 if [ "$realinitrd" ] && [ "${realinitrd#/}" = "$realinitrd" ]; then
     # target symlink is relative
     realinitrd="${initrd%/*}/$realinitrd"
