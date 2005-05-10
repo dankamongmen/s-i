@@ -481,6 +481,7 @@ modprobe md 1>/dev/null 2>&1
 modprobe raid0 >/dev/null 2>&1
 modprobe raid1 1>/dev/null 2>&1
 modprobe raid5 >/dev/null 2>&1
+mkdir -p /dev/md
 
 # Try to detect MD devices, and start them
 /sbin/mdrun
