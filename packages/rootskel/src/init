@@ -8,4 +8,12 @@ else
 	mount /dev/pts
 fi
 mount /proc
-exec busybox init
+init='busybox init'
+for i in $(cat /proc/cmdline); do
+	case $i in
+		init=*)
+			init=${i#init=}
+			;;
+	esac
+done
+exec $init
