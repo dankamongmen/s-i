@@ -31,20 +31,53 @@ sub setup()
 		else { $needhelp = 1; }
 	}
 	unless ($msgmark) { $needhelp = 1; }
+
+	$ARGC = @ARGV;	#getting the number of parameters
+	if ($ARGC gt 1) { $needhelp = 1; }
+	else
+	{
+		if ($ARGC eq 1)
+		{
+			$filename = @ARGV[0];
+			if ( open(STDIN, "$filename") )
+			{
+				print "**** $filename\n\n";
+			}
+			else
+			{
+				print "!!!! Error opening $filename! Will quit!\n" and die;
+			}	
+		}
+		else
+		{
+			# there is no filename in the command line
+			# so we will read the input directly from STDIN
+
+			# we are already set for this situation, so we do nothing
+			1;
+		}
+	}
+	
 	if ( ($help) || ($needhelp eq 1) ) { help(); }
+
 }
 
 sub help()
 {
-	print "\n\nUsage: $0 [-msgid|-msgstr [-noignore]\n";
-	print "\nExtracts msgid or msgstr from a .po file.\n";
-	print "\t-msgid\n\t\textract mesgid-s\n\t-msgstr\n\t\textract msgstr-s\n";
+	print "\n\nUsage: $0 [-msgid|-msgstr] [-noignore] [filename]\n";
+	print "\nExtracts msgid or msgstr fields from a .po file.\n";
+	print "\t-msgid\n\t\textract msgid-s\n\t-msgstr\n\t\textract msgstr-s\n";
 	print "\t-noignore\n\t\tby default, the first msgid/msgstr is ignored because";
 	print "\n\t\tregular .po files have the header in there. If this";
 	print "\n\t\tparameter is specified then the first msgid/msgstr is";
 	print "\n\t\tincluded, too.\n";
-	print "\n\nExample: cat ro.po | perl -s $0 -msgid >ro_all.txt\n";
-	print "\nNOTE: This script needs to be run with Perl's -s option.\n\n";
+	print "\n\tfilename\n\t\tan optional filename that should be a valid po filename.\n";
+	print "\n\nExamples:\n\n\tperl -s $0 -msgid ro.po > ro_all.txt\n";
+	print "\n\tcat ro.po | perl -s $0 -msgid > ro_all.txt\n";
+	print "\nNOTE: This script needs to be run with Perl's -s option.";
+	print "\n\tThis should be taken care by the shebang,\n";
+	print "\tbut life is full of surprises :-)\n";
+	print "\tIf you are surprised, use the perl's parameter -s.\n\n";
 	die "\n";
 }
 
