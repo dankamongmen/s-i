@@ -383,7 +383,7 @@ unsigned allocated_devices = 0;
 
 /* 0 == strcmp(devices[index_of_name(name)].name, name) */
 int
-index_of_name(char *name)
+index_of_name(const char *name)
 {
         int i;
         assert(name != NULL);
@@ -411,7 +411,7 @@ index_of_name(char *name)
 
 /* Return the PedDevice of `name'. */
 PedDevice *
-device_named(char *name)
+device_named(const char *name)
 {
         return devices[index_of_name(name)].dev;
 }
@@ -419,14 +419,14 @@ device_named(char *name)
 
 /* Return the PedDisk of `name'. */
 PedDisk *
-disk_named(char *name)
+disk_named(const char *name)
 {
         return devices[index_of_name(name)].disk;
 }
 
 /* True iff the PedDevice of `name' is not NULL. */
 bool
-device_opened(char *name)
+device_opened(const char *name)
 {
         return NULL != device_named(name);
 }
@@ -434,7 +434,7 @@ device_opened(char *name)
 /* Set the PedDevice of `name' to be `dev'.  The old PedDevice of
    `name' (if any) will be ped_device_destroy-ed. */
 void
-set_device_named(char *name, PedDevice *dev)
+set_device_named(const char *name, PedDevice *dev)
 {
         PedDevice *old_dev;
         assert(disk_named(name) == NULL);
@@ -445,7 +445,7 @@ set_device_named(char *name, PedDevice *dev)
 }
 
 void
-remember_geometries_named(char *name)
+remember_geometries_named(const char *name)
 {
         static unsigned const max_partition = 50;
         PedGeometry *geometries;
@@ -489,7 +489,7 @@ remember_geometries_named(char *name)
 /* Set the PedDisk of `name' to be `disk'.  The old PedDisk of `name'
    (if any) will be ped_disk_destroy-ed. */
 void
-set_disk_named(char *name, PedDisk *disk)
+set_disk_named(const char *name, PedDisk *disk)
 {
         PedDisk *old_disk;
         assert(device_opened(name));
@@ -501,7 +501,7 @@ set_disk_named(char *name, PedDisk *disk)
 
 /* True iff the partition doesn't exist on the storage device */
 bool
-named_partition_is_virtual(char *name, PedSector start, PedSector end)
+named_partition_is_virtual(const char *name, PedSector start, PedSector end)
 {
         PedGeometry *geometries;
         int i;
@@ -525,14 +525,14 @@ named_partition_is_virtual(char *name, PedSector start, PedSector end)
 
 /* True iff the partition table of `name' has been changed. */
 bool
-named_is_changed(char *name)
+named_is_changed(const char *name)
 {
         return devices[index_of_name(name)].changed;
 }
 
 /* Note the partition table of `name' as having been changed. */
 void
-change_named(char *name)
+change_named(const char *name)
 {
         log("Note %s as changed", name);
         devices[index_of_name(name)].changed = true;
@@ -540,7 +540,7 @@ change_named(char *name)
 
 /* Note the partition table of `name' as unchanged. */
 void
-unchange_named(char *name)
+unchange_named(const char *name)
 {
         log("Note %s as unchanged", name);
         devices[index_of_name(name)].changed = false;
