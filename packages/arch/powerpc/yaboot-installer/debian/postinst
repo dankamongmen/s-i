@@ -35,6 +35,10 @@ findfs () {
     mount | grep "on /target${1%/} " | cut -d' ' -f1
 }
 
+partitions_with_flag () {
+    /usr/lib/partconf/find-partitions --colons --flag "$1" 2>/dev/null || true
+}
+
 db_capb backup
 
 db_progress START 0 6 yaboot-installer/progress
@@ -122,23 +126,19 @@ fi
 if [ -z "$PARTITIONS" ]; then
     case $SUBARCH in
 	powermac_newworld)
-	    PARTED_MATCH='boot'
+	    PARTED_FLAGS='boot'
 	    ;;
 	chrp|chrp_rs6k)
-	    PARTED_MATCH='prep.*'
+	    PARTED_FLAGS='prep prep-boot'
 	    ;;
 	*)
 	    error 'unknown subarchitecture; allowing any bootable partition'
-	    PARTED_MATCH='boot'
+	    PARTED_FLAGS='boot'
 	    ;;
     esac
 
-    for i in /dev/discs/*/disc; do
-	info "parted dump of partition table on $i:"
-	parted -s "$i" print | logger -t yaboot-installer
-	dev="`parted -s "$i" print | sed -n 's,^Disk geometry for \([^:]*\)/disc:.*$,\1,p'`"
-	# Look for partitions with the boot flag set.
-	for part in `parted -s "$i" print | sed -n 's,^\([0-9]\+\) .* '"$PARTED_MATCH"'$,'"$dev"'/part\1,p'`; do
+    for flag in $PARTED_FLAGS; do
+	for part in $(partitions_with_flag "$flag" | cut -d: -f1); do
 	    mappart="$(mapdevfs "$part")"
 	    if [ -z "$PARTITIONS" ]; then
 		DEFAULT="$mappart"
@@ -147,9 +147,9 @@ if [ -z "$PARTITIONS" ]; then
 		PARTITIONS="$PARTITIONS,$mappart"
 	    fi
 	done
-	info "guessed bootstrap partitions: $PARTITIONS"
-	info "guessed default bootstrap partition: $DEFAULT"
     done
+    info "guessed bootstrap partitions: $PARTITIONS"
+    info "guessed default bootstrap partition: $DEFAULT"
 fi
 
 if [ -z "$PARTITIONS" ]; then
