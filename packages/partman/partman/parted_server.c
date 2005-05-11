@@ -381,7 +381,12 @@ struct devdisk *devices = NULL;
 /* The size of the array `devices' */
 unsigned allocated_devices = 0;
 
-/* 0 == strcmp(devices[index_of_name(name)].name, name) */
+/* index = index_of_name(name);
+ * 0 == strcmp(devices[index].name, name)
+ *
+ * Be careful not to write code like devices[index_of_name(name)].
+ * This function may change devices, so a sequence point is required.
+ */
 int
 index_of_name(const char *name)
 {
@@ -413,7 +418,8 @@ index_of_name(const char *name)
 PedDevice *
 device_named(const char *name)
 {
-        return devices[index_of_name(name)].dev;
+        int index = index_of_name(name);
+        return devices[index].dev;
 }
 
 
@@ -421,7 +427,8 @@ device_named(const char *name)
 PedDisk *
 disk_named(const char *name)
 {
-        return devices[index_of_name(name)].disk;
+        int index = index_of_name(name);
+        return devices[index].disk;
 }
 
 /* True iff the PedDevice of `name' is not NULL. */
@@ -437,11 +444,12 @@ void
 set_device_named(const char *name, PedDevice *dev)
 {
         PedDevice *old_dev;
+        int index = index_of_name(name);
         assert(disk_named(name) == NULL);
         old_dev = device_named(name);
         if (NULL != old_dev)
                 ped_device_destroy(old_dev);
-        devices[index_of_name(name)].dev = dev;
+        devices[index].dev = dev;
 }
 
 void
@@ -452,13 +460,14 @@ remember_geometries_named(const char *name)
         PedDisk *disk;
         int last;
         PedPartition *part;
-        geometries = devices[index_of_name(name)].geometries;
+        int index = index_of_name(name);
+        geometries = devices[index].geometries;
         if (NULL != geometries)
                 free(geometries);
         disk = disk_named(name);
         if (disk == NULL) {
-                devices[index_of_name(name)].geometries = NULL;
-                devices[index_of_name(name)].number_geometries = 0;
+                devices[index].geometries = NULL;
+                devices[index].number_geometries = 0;
         } else {
                 geometries = malloc(sizeof(PedGeometry[max_partition]));
                 last = 0;
@@ -481,8 +490,8 @@ remember_geometries_named(const char *name)
                 geometries = realloc(geometries, sizeof(PedGeometry[last]));
                 if (last != 0 && geometries == NULL)
                         critical_error("Cannot allocate memory");
-                devices[index_of_name(name)].geometries = geometries;
-                devices[index_of_name(name)].number_geometries = last;
+                devices[index].geometries = geometries;
+                devices[index].number_geometries = last;
         }
 }
 
@@ -492,11 +501,12 @@ void
 set_disk_named(const char *name, PedDisk *disk)
 {
         PedDisk *old_disk;
+        int index = index_of_name(name);
         assert(device_opened(name));
         old_disk = disk_named(name);
         if (NULL != old_disk)
                 ped_disk_destroy(old_disk);
-        devices[index_of_name(name)].disk = disk;
+        devices[index].disk = disk;
 }
 
 /* True iff the partition doesn't exist on the storage device */
@@ -506,9 +516,10 @@ named_partition_is_virtual(const char *name, PedSector start, PedSector end)
         PedGeometry *geometries;
         int i;
         int last;
+        int index = index_of_name(name);
         log("named_partition_is_virtual(%s,%lli,%lli)", name, start, end);
-        geometries = devices[index_of_name(name)].geometries;
-        last = devices[index_of_name(name)].number_geometries;
+        geometries = devices[index].geometries;
+        last = devices[index].number_geometries;
         if (NULL == geometries) {
                 log("yes");
                 return true;
@@ -527,23 +538,26 @@ named_partition_is_virtual(const char *name, PedSector start, PedSector end)
 bool
 named_is_changed(const char *name)
 {
-        return devices[index_of_name(name)].changed;
+        int index = index_of_name(name);
+        return devices[index].changed;
 }
 
 /* Note the partition table of `name' as having been changed. */
 void
 change_named(const char *name)
 {
+        int index = index_of_name(name);
         log("Note %s as changed", name);
-        devices[index_of_name(name)].changed = true;
+        devices[index].changed = true;
 }
 
 /* Note the partition table of `name' as unchanged. */
 void
 unchange_named(const char *name)
 {
+        int index = index_of_name(name);
         log("Note %s as unchanged", name);
-        devices[index_of_name(name)].changed = false;
+        devices[index].changed = false;
         remember_geometries_named(name);
 }
 
