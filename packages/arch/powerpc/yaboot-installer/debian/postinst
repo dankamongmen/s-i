@@ -315,7 +315,7 @@ slashboot="`mapdevfs "$slashbootdev"`"
 partnr="`printf %s "$slashboot" | sed 's/[^0-9]*\([0-9]\)/\1/'`"
 disk="`printf %s "$slashboot" | sed 's/[0-9].*//'`"
 
-ofpath="`chroot /target ofpath "$disk"`"
+ofpath="$(map_of_path "$disk" || true)"
 
 if [ -e /target/boot/vmlinux ]; then
     kernel=/boot/vmlinux
