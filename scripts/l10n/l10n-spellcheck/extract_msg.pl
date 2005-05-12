@@ -41,7 +41,7 @@ sub setup()
 			$filename = @ARGV[0];
 			if ( open(STDIN, "$filename") )
 			{
-				print "**** $filename\n\n";
+				print "\n*** $filename\n";
 			}
 			else
 			{
@@ -89,7 +89,7 @@ setup();
 while (defined($line = <STDIN>)) 
 {
 	# process $line here
-	unless ( $line =~ /\s*#.*/ )
+	unless ( $line =~ /^\s*#.*/ )
 	{
 		if ( $line =~ /^$msgmark .*/)
 		{
