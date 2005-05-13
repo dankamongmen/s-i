@@ -1181,8 +1181,7 @@ static int gtk_go(struct frontend *obj)
     /* this string is used to identify which question is the main menu
      * (usually this is "debian/main-menu")
      */
-    char main_menu_tag[50];
-    strcpy(main_menu_tag, "test/select");
+    const char *main_menu_tag = "test/select";
 
     if (q == NULL) return DC_OK;
 
