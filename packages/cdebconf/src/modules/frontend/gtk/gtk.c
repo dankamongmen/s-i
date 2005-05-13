@@ -49,6 +49,7 @@
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
+#include "plugin.h"
 #include "strutl.h"
 #include "cdebconf_gtk.h"
 
@@ -62,10 +63,13 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dlfcn.h>
+#include <syslog.h>
+
+#include <debian-installer/slist.h>
 
 #include <gtk/gtk.h>
 
-#include <syslog.h>
+typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
 #define q_get_description(q)  		question_get_field((q), "", "description")
@@ -980,7 +984,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
 
 struct question_handlers {
     const char *type;
-    int (*handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
+    gtk_handler *handler;
 } question_handlers[] = {
     { "boolean",        gtkhandler_boolean },
     { "multiselect",    gtkhandler_multiselect },
@@ -989,8 +993,8 @@ struct question_handlers {
     { "select",	        gtkhandler_select },
     { "string",	        gtkhandler_string },
     { "error",	        gtkhandler_note },
-//  { "custom",         gtkhandler_custom },
-    { "text",           gtkhandler_text }
+    { "text",           gtkhandler_text },
+    { "",               NULL },
 };
 
 void set_window_properties(GtkWidget *window)
@@ -1171,11 +1175,17 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     return DC_OK;
 }
 
+static void gtk_plugin_destroy_notify(void *data)
+{
+    plugin_delete((struct plugin *) data);
+}
+
 static int gtk_go(struct frontend *obj)
 {
     struct frontend_data *data = (struct frontend_data *) obj->data;
     struct question *q = obj->questions;
     GtkWidget *questionbox, *menubox;
+    di_slist *plugins;
     int i, j, number_of_questions=0;
     int ret;
 
@@ -1263,19 +1273,43 @@ static int gtk_go(struct frontend *obj)
 
     /* now we can safely handle all other questions, if any */
     j = 0;
+    plugins = di_slist_alloc();
     while (q != NULL)
     {
     	j++;
     	printf("  gtk_fe_debug - question %d: %s (type %s)\n",j,q->tag,q->template->type);
         for (i = 0; i < DIM(question_handlers); i++)
         {
-            if (strcmp(q->template->type, question_handlers[i].type) == 0)
-            {
-                ret = question_handlers[i].handler(obj, q, questionbox);
-                if (ret != DC_OK)
-                    printf("gtk_fe_debug - question %d: \"%s\" failed to display!\n",j,q->tag);
+            gtk_handler *handler;
+            struct plugin *plugin = NULL;
 
-                break; /*we've founf the right handler for the question, so we break the for() loop*/
+            if (*question_handlers[i].type)
+                handler = question_handlers[i].handler;
+            else {
+                plugin = plugin_find(obj, q->template->type);
+                if (plugin) {
+                    INFO(INFO_DEBUG, "Found plugin for %s", q->template->type);
+                    handler = (gtk_handler *) plugin->handler;
+                    di_slist_append(plugins, plugin);
+                } else {
+                    INFO(INFO_DEBUG, "No plugin for %s", q->template->type);
+                    continue;
+                }
+            }
+
+            if (plugin || strcmp(q->template->type, question_handlers[i].type) == 0)
+            {
+                ret = handler(obj, q, questionbox);
+                if (ret != DC_OK)
+                {
+                    di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
+                    printf("gtk_fe_debug - question %d: \"%s\" failed to display!\n",j,q->tag);
+                }
+
+                /* we've found the right handler for the question, so we break
+                 * the for() loop
+                 */
+                break;
             }
         }
 
@@ -1313,6 +1347,7 @@ static int gtk_go(struct frontend *obj)
         }
     }
 
+    di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
     gtk_widget_destroy(questionbox);
     gtk_widget_destroy(menubox);
 
