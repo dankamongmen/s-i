@@ -1158,6 +1158,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     fe_data = obj->data;
     strcpy(fe_data->jump_target, "");
     fe_data->number_of_questions = 0;
+    fe_data->q_main = NULL;
 
     gtk_init (&args, &name);
 
@@ -1190,6 +1191,8 @@ static int gtk_go(struct frontend *obj)
      */
     if (strcmp(q->tag, main_menu_tag) == 0)
     {
+        if (data->q_main)
+            question_delete(data->q_main);
         data->q_main = question_dup(q);
         printf("gtk_fe_debug - gtk_go() main question \"%s\" stored in memory\n", main_menu_tag);
     }
@@ -1249,7 +1252,7 @@ static int gtk_go(struct frontend *obj)
         ret = gtkhandler_select_single(obj, q, menubox);
         q = q->next;
     }
-    else
+    else if (data->q_main)
     {
         /* the first question in the question list is not the main menu, so
          * we need to show it using the copy of the main menu stored
