@@ -49,7 +49,6 @@
 #include "question.h"
 #include "frontend.h"
 #include "database.h"
-#include "plugin.h"
 #include "strutl.h"
 #include "cdebconf_gtk.h"
 
@@ -64,11 +63,9 @@
 #include <sys/types.h>
 #include <dlfcn.h>
 
-#include <debian-installer/slist.h>
-
 #include <gtk/gtk.h>
 
-typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
+#include <syslog.h>
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
 #define q_get_description(q)  		question_get_field((q), "", "description")
@@ -88,6 +85,7 @@ struct setter_struct
 
 typedef int (custom_func_t)(struct frontend*, struct question*, GtkWidget*);
 
+
 void register_setter(void (*func)(void*, struct question*), 
 		     void *data, struct question *q, struct frontend *obj)
 {
@@ -106,38 +104,94 @@ void free_description_data( GtkObject *obj, struct frontend_question_data* data 
     free(data);
 }
 
-gboolean 
-show_description (GtkWidget *widget, struct frontend_question_data* data)
+/*
+If the user decides to "jump" we should always give him a lst chance to get back, jump saving the data he entered or jump discarding changes; acutally the first option is still unimplemented because i don't know how to properly SETUP the signal handling needed to close the dialog window without quitting the gtk_main()
+*/
+gboolean jump_comfirmation (GtkWidget *widget, struct frontend_question_data* data)
 {
   struct question *q;
   struct frontend *obj;
 
   GtkWidget *main_window;
-  GtkWidget *dialog;
+  GtkWidget *dialog, *label;
+  gint result;
   
   obj = data->obj;
   q = data->q;
 
   main_window = ((struct frontend_data*) obj->data)->window;
 
-  dialog = gtk_message_dialog_new (GTK_WINDOW(main_window), GTK_DIALOG_MODAL,
-				   GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-				   q_get_extended_description(q));
+ 	dialog = gtk_dialog_new_with_buttons ("My dialog",
+                                                  GTK_WINDOW(main_window),
+                                                  GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                  GTK_STOCK_OK,
+                                                  GTK_RESPONSE_ACCEPT,
+                                                  GTK_STOCK_NO,
+                                                  GTK_RESPONSE_NO,
+                                                  //GTK_STOCK_CANCEL,
+                                                  //GTK_RESPONSE_REJECT,
+                                                  NULL);
 
-  gtk_dialog_run (GTK_DIALOG(dialog));
-  gtk_widget_destroy (dialog);
+	label = gtk_label_new ("Do tou want to save your changes before quitting?");
+	gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
+	gtk_widget_show_all (dialog);
+	result=gtk_dialog_run ( GTK_DIALOG(dialog) );
+	gtk_widget_destroy (dialog);
 
-    /* FIXME: no longer has a description frame
-       GtkWidget *target;
-       
-       obj = data->obj;
-       q = data->q;
-       target = ((struct frontend_data*)obj->data)->description_label;
-       
-       gtk_label_set_text(GTK_LABEL(target), q_get_extended_description(q));
-    */
-    return FALSE;
+    return result;
 }
+
+
+gboolean show_description (GtkWidget *widget, struct frontend_question_data* data)
+{
+
+
+	struct question *q;
+	struct frontend *frontend_ptr;
+	struct frontend_data *frontend_data_ptr;
+ 	GtkWidget *view;
+  		
+	GtkTextBuffer *buffer;
+  
+	frontend_ptr=data->obj;
+	frontend_data_ptr=frontend_ptr->data;
+	view=(GtkWidget*)frontend_data_ptr->info_box;
+  	q = data->q;
+
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view) );
+
+	gtk_text_buffer_set_text (buffer, q_get_extended_description(q), -1);
+
+	//printf("gtk_fe_debug - show_description(%s) called\n",q_get_extended_description(q));	
+	
+    return DC_OK;
+}
+
+
+/*
+used to cleat the help area
+*/
+gboolean clear_description (GtkWidget *widget, struct frontend_question_data* data)
+{
+
+	struct frontend *frontend_ptr;
+	struct frontend_data *frontend_data_ptr;
+ 	GtkWidget *view;
+  		
+	GtkTextBuffer *buffer;
+  
+	frontend_ptr=data->obj;
+	frontend_data_ptr=frontend_ptr->data;
+	view=(GtkWidget*)frontend_data_ptr->info_box;
+
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view) );
+
+	gtk_text_buffer_set_text (buffer, "", -1);
+	
+    return DC_OK;
+}
+
+
 
 GtkWidget*
 create_help_button (struct frontend_question_data *data)
@@ -264,6 +318,9 @@ void call_setters(struct frontend *obj)
     struct setter_struct *s, *p;
 
     s = ((struct frontend_data*)obj->data)->setters;
+    
+  	//printf("gtk_fe_debug - call_setters() called\n");
+    
     while (s != NULL)
     {
         (*s->func)(s->data, s->q);
@@ -275,12 +332,14 @@ void call_setters(struct frontend *obj)
 
 void button_single_callback(GtkWidget *button, struct frontend_question_data* data)
 {
+  
     struct frontend *obj = data->obj;
     struct question *q = data->q;
     char **choices, **choices_translated;
     int i, count;
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
+	
 
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
@@ -288,17 +347,18 @@ void button_single_callback(GtkWidget *button, struct frontend_question_data* da
     choices = malloc(sizeof(char *) * count);
     choices_translated = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
-        return /* DC_NOTOK */;
+
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)return /* DC_NOTOK */;
     for (i = 0; i < count; i++)
-    {
-	if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0)
-	    question_setvalue(q, choices[tindex[i]]);
-
-	free(choices[tindex[i]]);
-	free(choices_translated[i]);
-
-    }
+    	{
+		if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0) 
+			{
+			question_setvalue(q, choices[tindex[i]]);
+			}
+		free(choices[tindex[i]]);
+		free(choices_translated[i]);
+    	}
+    	
     free(choices);
     free(choices_translated);
     free(tindex);
@@ -310,11 +370,12 @@ void button_single_callback(GtkWidget *button, struct frontend_question_data* da
 
 void check_toggled_callback (GtkWidget *toggle, gpointer data)
 {
-  struct question *q = (struct question*)data;
-  gboolean value;
+	struct question *q = (struct question*)data;
+	gboolean value;
 
-  value = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(toggle));
-  bool_setter (toggle, q);
+	printf("gtk_fe_debug - check_toggled_callback() called - \n");
+	value = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(toggle));
+	bool_setter (toggle, q);
 }
 
 void boolean_single_callback(GtkWidget *button, struct frontend_question_data* data )
@@ -323,6 +384,7 @@ void boolean_single_callback(GtkWidget *button, struct frontend_question_data* d
     struct question *q = data->q;
     char *ret;
     
+   	printf("gtk_fe_debug - boolean_single_callback() called\n");
     ret = (char*) gtk_object_get_user_data(GTK_OBJECT(button));
     question_setvalue(q, ret);
     free(ret);
@@ -336,14 +398,93 @@ void exit_button_callback(GtkWidget *button, struct frontend* obj)
 {
     int value;
     void *ret;
-    
+   
     ret = gtk_object_get_user_data(GTK_OBJECT(button));
     value = *(int*) ret;
+
+   	printf("gtk_fe_debug - exit_button_callback() called, value: %d \n",value);
 
     ((struct frontend_data*)obj->data)->button_val = value;
     
     gtk_main_quit();
 }
+
+
+/*
+this is the calback that manges the jump mechanism
+*/
+void jump_callback(GtkWidget *button, struct frontend_question_data* data)
+{
+  
+     struct frontend *obj = data->obj;
+    struct frontend_data *fe_data = obj->data;
+    struct question *q = data->q;
+    char **choices, **choices_translated;
+    int i, count;
+    int *tindex = NULL;
+    const gchar *indices = q_get_indices(q);
+	gint ret_val;
+
+    count = strgetargc(q_get_choices_vals(q));
+    if (count <= 0)
+        return /* DC_NOTOK */;
+    choices = malloc(sizeof(char *) * count);
+    choices_translated = malloc(sizeof(char *) * count);
+    tindex = malloc(sizeof(int) * count);
+
+  	printf("gtk_fe_debug - button_single_callback(%s) called \n", gtk_button_get_label(GTK_BUTTON(button)) );
+
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count) return /* DC_NOTOK */;
+    for (i = 0; i < count; i++)
+    	{
+		if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0) 
+			{
+			ret_val=jump_comfirmation ( button, data);
+			//printf("gtk_fe_debug - jump confirmation return value: %d\n",ret_val);
+			switch (ret_val)
+				{
+				case GTK_RESPONSE_ACCEPT:
+					/*
+					the user wants to save the changes made up to that point and then do the jump
+					*/ 
+					//strcpy(fe_data->jump_target, gtk_button_get_label(GTK_BUTTON(button)) );
+					printf("gtk_fe_debug - jump programmed, modifications confirmed, target: \"%s\" \n", fe_data->jump_target );
+					((struct frontend_data*)obj->data)->button_val = DC_OK;
+
+					//gtk_main_quit();
+					break;
+				case GTK_RESPONSE_NO:
+					/*
+					the user wants to forget the changes made up to that point and then do the jump
+					*/ 
+					//strcpy(fe_data->jump_target,choices[tindex[i]]);
+					printf("gtk_fe_debug - jump programmed, modifications canceled, target: \"%s\" \n", fe_data->jump_target );
+					((struct frontend_data*)obj->data)->button_val = DC_GOBACK;
+
+					//gtk_main_quit();
+					break;
+				default:
+					/*this is also the case GTK_RESPONSE_REJECT*/
+					printf("gtk_fe_debug - jump to %s canceled \n", fe_data->jump_target );
+					break;
+				}
+			printf("gtk_fe_debug - jump programmed to %s \n", choices[tindex[i]] );
+			strcpy(fe_data->jump_target,choices[tindex[i]]);
+			}
+		free(choices[tindex[i]]);
+		free(choices_translated[i]);
+    	}
+    	
+    free(choices);
+    free(choices_translated);
+    free(tindex);
+    //((struct frontend_data*)obj->data)->button_val = DC_OK;
+    free(data);
+   
+	if( (ret_val==GTK_RESPONSE_ACCEPT) | (ret_val==GTK_RESPONSE_NO) )
+	    gtk_main_quit();
+}
+
 
 static const char *
 get_text(struct frontend *obj, const char *template, const char *fallback )
@@ -378,27 +519,35 @@ static int
 gtkhandler_boolean_single(struct frontend *obj, struct question *q, 
 			  GtkWidget *qbox)
 {
-  GtkWidget *hbox;
-  GtkWidget *check_button;
-  GtkWidget *help_button;
-  struct frontend_question_data *data;
-  const char *defval = question_getvalue(q, "");
-  
-  data = NEW(struct frontend_question_data);
-  data->obj = obj;
-  data->q = q;
-  
-  hbox = gtk_hbox_new (FALSE, 5);
-  gtk_box_pack_start (GTK_BOX(qbox), hbox, TRUE, TRUE, 5);
+	GtkWidget *hbox;
+	GtkWidget *check_button;
+	GtkWidget *help_button;
+	struct frontend_question_data *data;
+	const char *defval = question_getvalue(q, "");
 
-  check_button = gtk_check_button_new_with_label (q_get_description (q));
-  g_signal_connect (G_OBJECT(check_button), "toggled",
-		    G_CALLBACK(check_toggled_callback),
-		    q);
-  gtk_box_pack_start (GTK_BOX(hbox), check_button, TRUE, TRUE, 5);
+	printf("gtk_fe_debug - gtkhandler_boolean_single() called\n");
+
+	data = NEW(struct frontend_question_data);
+	data->obj = obj;
+	data->q = q;
+
+	hbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(qbox), hbox, TRUE, TRUE, 5);
+
+	check_button = gtk_check_button_new_with_label (q_get_description (q));
+	g_signal_connect (G_OBJECT(check_button), "toggled", G_CALLBACK(check_toggled_callback), q );
   
-  help_button = create_help_button (data);
-  gtk_box_pack_start (GTK_BOX(hbox), help_button, FALSE, FALSE, 3);
+  
+	/*
+	since help is now showed inside a text area this should be no longer necessary
+	help_button = create_help_button (data);
+	gtk_box_pack_start (GTK_BOX(hbox), help_button, FALSE, FALSE, 3);
+		gtk_box_pack_start(GTK_BOX(check_container), check, FALSE, FALSE, 0);
+	*/
+	g_signal_connect (G_OBJECT(check_button), "enter", G_CALLBACK (show_description), data);
+
+	gtk_box_pack_start (GTK_BOX(hbox), check_button, TRUE, TRUE, 5);
+
 
   /* FIXME: sensitive to the druid button 
      if (obj->methods.can_go_back(obj, q) == FALSE)
@@ -418,6 +567,8 @@ static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q,
     GtkWidget *frame, *check;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
+
+	 printf("gtk_fe_debug - gtkhandler_boolean_multiple() called\n");
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -445,12 +596,14 @@ static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q,
     return DC_OK;
 }
 
+
 static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
+	printf("gtk_fe_debug - gtkhandler_boolean() called\n");
     if (q->next == NULL && q->prev == NULL)
         return gtkhandler_boolean_single(obj, q, qbox);
     else
-        return gtkhandler_boolean_multiple(obj, q, qbox);
+		return gtkhandler_boolean_multiple(obj, q, qbox);
 }
 
 static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkWidget *qbox)
@@ -465,10 +618,10 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
-
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
+
     choices = malloc(sizeof(char *) * count);
     choices_translated = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
@@ -476,33 +629,32 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
         return DC_NOTOK;
 
     defvals = malloc(sizeof(char *) * count);
+    
     defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
-    if (defcount <= 0) return DC_NOTOK;	
+    if (defcount < 0)
+    	return DC_NOTOK;
 
     check_container = gtk_vbox_new (FALSE, 0);
 
     g_signal_connect (G_OBJECT(check_container), "destroy", G_CALLBACK (free_description_data), data);
 
     for (i = 0; i < count; i++) 
-    {
-	check = gtk_check_button_new_with_label(choices_translated[i]);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), FALSE);
-	for (j = 0; j < defcount; j++)
-        {
-	    if (strcmp(choices[tindex[i]], defvals[j]) == 0)
-                gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
-        }
-        /* TODO: This should go somewhere that doesn't interfere. "Help"
-         * that prevents you from actually doing anything is not helpful.
-         */
-        /* g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data); */
+    	{
+		check = gtk_check_button_new_with_label(choices_translated[i]);
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), FALSE);
+		for (j = 0; j < defcount; j++)
+   	    	{
+		    if (strcmp(choices[tindex[i]], defvals[j]) == 0)	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
+        	}
+        g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
         gtk_box_pack_start(GTK_BOX(check_container), check, FALSE, FALSE, 0);
-	if (is_first_question(q) && (i == 0) )
-	    gtk_widget_grab_focus(check);
+       
+		if (is_first_question(q) && (i == 0) )	gtk_widget_grab_focus(check);
 
-	free(choices[tindex[i]]);
+		free(choices[tindex[i]]);
         free(choices_translated[i]);
-    }
+    	}
+    	
     free(choices);
     free(choices_translated);
     free(tindex);
@@ -524,6 +676,8 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 {
     GtkWidget *frame, *label;
 	
+	printf("gtk_fe_debug - gtkhandler_note() called\n");
+	
     label = gtk_label_new (q_get_extended_description(q));
     gtk_misc_set_alignment(GTK_MISC (label), 0.0, 0.0);
     gtk_label_set_line_wrap(GTK_LABEL (label), TRUE);
@@ -536,9 +690,11 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
     return DC_OK;
 }
 
+
+
+
 static int gtkhandler_text(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    /* FIXME: text probably shouldn't be quite so interactive as note */
     return gtkhandler_note(obj, q, qbox);
 }
 
@@ -546,6 +702,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
 {
     GtkWidget *frame, *entry;
     struct frontend_question_data *data;
+	 printf("gtk_fe_debug - gtkhandler_password() called\n");
 	
     entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
@@ -564,17 +721,14 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     data->q = q;
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
-    /* TODO: showing description on keyboard focus grab makes it impossible
-     * to enter a password.
-     */
-    /* g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data); */
+    g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
 	
     register_setter(entry_setter, entry, q, obj);
 
     return DC_OK;
 }
 
-static int gtkhandler_select_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
+static int gtkhandler_select_single_jump(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *button, *button_box;
     char **choices, **choices_translated;
@@ -583,6 +737,8 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
+
+	printf("gtk_fe_debug - gtkhandler_select_single_jump() called\n");
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -605,19 +761,86 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
     for (i = 0; i < count; i++)
-    {
-        button = gtk_button_new_with_label(choices_translated[i]);
-	gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
-	g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (button_single_callback), data);	
-	gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
-	if (defval && strcmp(choices[tindex[i]], defval) == 0)
-	{
-	    GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-	    gtk_widget_grab_focus(button);
-	    gtk_widget_grab_default(button);
-	}
-	free(choices[tindex[i]]);
-    }
+    	{
+	    button = gtk_button_new_with_label(choices_translated[i]);
+		gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
+		g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (jump_callback), data);
+		
+		/*
+		the following lines of code were previously introduced to give the user help about the main-menu, but since the help is just a "This is the main menu for the debian installer" i don't think this can be useful
+		*/
+		g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data);
+		//g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (clear_description), data );
+		
+		gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
+		if (defval && strcmp(choices[tindex[i]], defval) == 0)
+			{
+		    GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
+		    gtk_widget_grab_focus(button);
+		    gtk_widget_grab_default(button);
+			}
+		free(choices[tindex[i]]);
+   		}
+    free(choices);
+    free(choices_translated);
+    free(tindex);
+
+    return DC_OK;
+}
+
+static int gtkhandler_select_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    GtkWidget *frame, *button, *button_box;
+    char **choices, **choices_translated;
+    int i, count;
+    struct frontend_question_data *data;
+    const char *defval = question_getvalue(q, "");
+    int *tindex = NULL;
+    const gchar *indices = q_get_indices(q);
+
+	printf("gtk_fe_debug - gtkhandler_select_single() called\n");
+
+    data = NEW(struct frontend_question_data);
+    data->obj = obj;
+    data->q = q;
+
+    count = strgetargc(q_get_choices_vals(q));
+    if (count <= 0)
+        return DC_NOTOK;
+    choices = malloc(sizeof(char *) * count);
+    choices_translated = malloc(sizeof(char *) * count);
+    tindex = malloc(sizeof(int) * count);
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+        return DC_NOTOK;
+
+    button_box = gtk_vbutton_box_new();
+
+    frame = gtk_frame_new(q_get_description(q));
+    gtk_container_add(GTK_CONTAINER (frame), button_box);
+
+    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+
+    for (i = 0; i < count; i++)
+    	{
+	    button = gtk_button_new_with_label(choices_translated[i]);
+		gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
+		g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (button_single_callback), data);
+		
+		/*
+		the following lines of code were previously introduced to give the user help about the main-menu, but since the help is just a "This is the main menu for the debian installer" i don't think this can be useful
+		*/
+		g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data);
+		//g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (clear_description), data );
+		
+		gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
+		if (defval && strcmp(choices[tindex[i]], defval) == 0)
+			{
+		    GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
+		    gtk_widget_grab_focus(button);
+		    gtk_widget_grab_default(button);
+			}
+		free(choices[tindex[i]]);
+   		}
     free(choices);
     free(choices_translated);
     free(tindex);
@@ -635,7 +858,15 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
-    
+
+
+	GtkWidget *view;
+	GtkTextBuffer *buffer;
+
+
+	//printf("gtk_fe_debug - gtkhandler_select_multiple() called\n");    
+
+                 
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
         return DC_NOTOK;
@@ -650,23 +881,46 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 
     for (i = 0; i < count; i++)
         /* steal memory */
+        {
         items = g_list_append (items, choices_translated[i]);
+        //printf("gtk_fe_debug - gtkhandler_select_multiple(\"%s\") \n", choices_translated[i] );
+        }
     free(choices_translated);
 
     combo = gtk_combo_new ();
     gtk_combo_set_popdown_strings (GTK_COMBO (combo), items);
     g_list_free(items);
     gtk_editable_set_editable (GTK_EDITABLE(GTK_COMBO(combo)->entry), FALSE);
-    gtk_entry_set_text (GTK_ENTRY(GTK_COMBO(combo)->entry), defval);
+    
+    if( defval!=NULL )
+    	gtk_entry_set_text (GTK_ENTRY(GTK_COMBO(combo)->entry), defval);
+    else
+    	gtk_entry_set_text (GTK_ENTRY(GTK_COMBO(combo)->entry), "");
     gtk_combo_set_value_in_list (GTK_COMBO (combo), TRUE, FALSE);
 
-    frame = gtk_frame_new(q_get_description(q));
+
+	/*
+	this is just a dirty hack to prevent the description of the disk-partitioner, which is very long, from trashing the screen
+	*/
+	view = gtk_text_view_new ();
+	
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+	gtk_text_buffer_set_text (buffer, q_get_description(q), -1);
+	gtk_text_view_set_editable ( GTK_TEXT_VIEW(view) , FALSE);
+	gtk_text_view_set_cursor_visible ( GTK_TEXT_VIEW(view) , FALSE);
+	gtk_text_view_set_wrap_mode ( GTK_TEXT_VIEW(view) , GTK_WRAP_WORD);
+	gtk_text_view_set_left_margin( GTK_TEXT_VIEW(view) , 5);
+	gtk_text_view_set_right_margin( GTK_TEXT_VIEW(view) , 5);
+
+    frame = gtk_frame_new("");
+    gtk_frame_set_label_widget( GTK_FRAME(frame), view );
+    printf("gtk_fe_debug - gtkhandler_select_multiple() frame title: \"%s\" \n", q_get_description(q) );
     gtk_container_add(GTK_CONTAINER (frame), combo);	
 
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
     if (is_first_question(q))
-	gtk_widget_grab_focus(combo);
+		gtk_widget_grab_focus(combo);
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -685,9 +939,14 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 
 static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    if (q->next == NULL && q->prev == NULL)
-        return gtkhandler_select_single(obj, q, qbox);
-    else
+
+	/*
+	actually the gtkhandler_select_single is used to display the main menu only and is called directly, so any select questions will  use gtkhandler_select_multiple
+	*/	
+	
+    //if (q->prev == NULL)
+    //    return gtkhandler_select_single(obj, q, qbox);
+    //else
         return gtkhandler_select_multiple(obj, q, qbox);
 }
 
@@ -697,9 +956,13 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 	
+	printf("gtk_fe_debug - gtkhandler_string() called\n"); 	
+	
     entry = gtk_entry_new ();
-    if (defval)
-	gtk_entry_set_text (GTK_ENTRY(entry), defval);
+    if ( defval != NULL )
+		gtk_entry_set_text (GTK_ENTRY(entry), defval);
+	else
+		gtk_entry_set_text (GTK_ENTRY(entry), "");
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
     gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
     frame = gtk_frame_new(q_get_description(q));
@@ -708,7 +971,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
     if (is_first_question(q))
-	gtk_widget_grab_focus(entry);
+		gtk_widget_grab_focus(entry);
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -722,36 +985,11 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     return DC_OK;
 }
 
-/*
-static int gtkhandler_custom(struct frontend *obj, struct question *q, GtkWidget *qbox)
-{
-    custom_func_t *custom_func;
-    char *symname, *tmp;
-    int ret, i;
-    
-    symname = strdup(q->template->tag);
-    for (i = 0; i < strlen(symname); i++) 
-    {
-	if (symname[i] == '/')
-	    symname[i] = '_';
-    }
 
-    asprintf(&tmp, "%s_gtk", symname);
 
-    custom_func = (custom_func_t*) dlsym(q->custom_module, tmp);
-    free(tmp);
-    free(symname);
-
-    ret = custom_func(obj, q, qbox);
-
-    return ret;
-}
-*/
-
-/* ----------------------------------------------------------------------- */
 struct question_handlers {
     const char *type;
-    gtk_handler *handler;
+    int (*handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
 } question_handlers[] = {
     { "boolean",        gtkhandler_boolean },
     { "multiselect",    gtkhandler_multiselect },
@@ -761,28 +999,69 @@ struct question_handlers {
     { "string",	        gtkhandler_string },
     { "error",	        gtkhandler_note },
 //  { "custom",         gtkhandler_custom },
-    { "text",           gtkhandler_text },
-    { "",               NULL },
+    { "text",           gtkhandler_text }
 };
 
 void set_window_properties(GtkWidget *window)
 {
-    gtk_widget_set_size_request (window, 600, 400);
-    gtk_window_set_resizable (GTK_WINDOW (window), FALSE);
+    gtk_widget_set_size_request (window, 800, 600);
+    gtk_window_set_resizable (GTK_WINDOW (window), TRUE);
     gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
     gtk_window_set_decorated (GTK_WINDOW (window), TRUE);
 }
 
 void set_design_elements(struct frontend *obj, GtkWidget *window)
 {
-    GtkWidget *mainbox;
+	/*
+	a  scheme of the hierarchy of boxes used to store widgets
+	
+	0) Globalbox
+	1) Mainbox
+	2) menubox_scroll
+	3) menubox
+	4) targetbox_scroll
+	5) targetbox
+	6) actionbox
+	7) infobox
+	8) probress_bax
+	
+	0_________________________
+	|  _____  |1 ___________  |
+	| |2___ | | |4_________ | |
+	| ||3  || | ||5        || |
+	| ||   || | ||_________|| |
+	| ||   || | |___________| |	
+	| ||   || |  ___________  |
+	| ||   || | |6          | |	
+	| ||   || | |___________| |
+	| ||   || |  ___________  |
+	| ||   || | |7__________| |	
+	| ||___|| |  ___________  |
+	| |_____| | |8__________| |	
+	|_________|_______________|		
+				
+			*/
+	
+	
+	
+    GtkWidget *mainbox, *globalbox;
     GtkWidget *targetbox, *targetbox_scroll;
-    GtkWidget *actionbox;
+    GtkWidget *menubox, *menubox_scroll;
+    GtkWidget *actionbox, *infobox;
     GtkWidget *button_next, *button_prev;
+	GtkWidget *frame;
+	GtkWidget *view;
+	GtkTextBuffer *buffer;
+	GtkWidget *progress_bar;
+	
     int *ret_val;
 
     mainbox = gtk_vbox_new (FALSE, 10);
     gtk_container_set_border_width (GTK_CONTAINER(mainbox), 5);
+
+    /*
+    This is the set of box and the copntaining viewport where the questions will be displayed
+    */
     targetbox = gtk_vbox_new (FALSE, 10);
     ((struct frontend_data*) obj->data)->target_box = targetbox;
 
@@ -791,6 +1070,10 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (targetbox_scroll),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
+        
+    /*
+    Here are the back and forward buttons
+    */
     actionbox = gtk_hbutton_box_new();
     gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END); 
     gtk_box_pack_end (GTK_BOX(mainbox), actionbox, FALSE, FALSE, 5);
@@ -801,13 +1084,14 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_object_set_user_data (GTK_OBJECT(button_prev), ret_val);
     g_signal_connect (G_OBJECT(button_prev), "clicked",
                       G_CALLBACK(exit_button_callback), obj);
+    
+       
     gtk_box_pack_start (GTK_BOX(actionbox), button_prev, TRUE, TRUE, 2);
 
     button_next = gtk_button_new_from_stock (GTK_STOCK_GO_FORWARD);
     ret_val = NEW(int);
     *ret_val = DC_OK;
     gtk_object_set_user_data (GTK_OBJECT(button_next), ret_val);
-    /* the question is held by a gtk_main thing */
     g_signal_connect (G_OBJECT(button_next), "clicked",
                       G_CALLBACK(exit_button_callback), obj);
     gtk_box_pack_start (GTK_BOX(actionbox), button_next, TRUE, TRUE, 2);
@@ -816,25 +1100,94 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     ((struct frontend_data*) obj->data)->button_prev = button_prev;
     ((struct frontend_data*) obj->data)->button_next = button_next;
 
-    gtk_box_pack_start(GTK_BOX (mainbox), targetbox_scroll, TRUE, TRUE, 5);
-    gtk_container_add(GTK_CONTAINER(window), mainbox);
+
+ 	/*
+ 	Here a frame is created to display extended descriptions about the questions
+ 	*/
+	view = gtk_text_view_new ();
+	buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+	gtk_text_buffer_set_text (buffer, "Hello, this is some text", -1);
+	gtk_text_view_set_editable ( GTK_TEXT_VIEW(view) , FALSE);
+	gtk_text_view_set_cursor_visible ( GTK_TEXT_VIEW(view) , FALSE);
+	gtk_text_view_set_wrap_mode ( GTK_TEXT_VIEW(view) , GTK_WRAP_WORD);
+	gtk_text_view_set_left_margin( GTK_TEXT_VIEW(view) , 5);
+	gtk_text_view_set_right_margin( GTK_TEXT_VIEW(view) , 5);
+    ((struct frontend_data*) obj->data)->info_box = view;
+    frame = gtk_frame_new("Description");
+    gtk_container_add(GTK_CONTAINER (frame), view);
+    infobox = gtk_vbox_new (FALSE, 10);
+    gtk_box_pack_start(GTK_BOX (infobox), frame, TRUE, TRUE, 5);
+    		
+	
+ 	/*
+ 	Here is created a progress bar; probably it will be removed from here in the future and placed somewher else 
+ 	*/
+    obj->progress_title = NULL;
+    obj->progress_min = 0;
+    obj->progress_max = 100;
+    obj->progress_cur = 0;
+    progress_bar = gtk_progress_bar_new ();
+    ((struct frontend_data*)obj->data)->progress_bar = progress_bar;
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), "progressbar");
+
+
+	/*
+	This is where the main-menu will be displayed, in the left-area of the screen
+	*/
+	menubox = gtk_vbox_new (FALSE, 10);
+    ((struct frontend_data*) obj->data)->menu_box = menubox;
+    menubox_scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (menubox_scroll), menubox);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (menubox_scroll),
+                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+	
+
+	/*
+	Final packaging
+	*/
+    gtk_box_pack_start(GTK_BOX (mainbox), targetbox_scroll, TRUE, TRUE, 5);	
+    gtk_box_pack_start(GTK_BOX (mainbox), infobox, FALSE, FALSE, 5);
+	gtk_box_pack_end(GTK_BOX (mainbox), progress_bar, FALSE, FALSE, 5);
+    
+    globalbox = gtk_hbox_new (FALSE, 10);
+    gtk_box_pack_start(GTK_BOX (globalbox), menubox_scroll, TRUE, TRUE, 5);
+    gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
+    
+    gtk_container_add(GTK_CONTAINER(window), globalbox);
+    
+
 }
+
+
 
 static int gtk_initialize(struct frontend *obj, struct configuration *conf)
 {
+
+	struct frontend_data *fe_data;
     GtkWidget *window;
     int args = 1;
     char **name;
 
     //FIXME: This can surely be done in a better way
     (char**) name = malloc(2 * sizeof(char*));
-    (char*) name[0] = malloc(9 * sizeof(char));
-    name[0] = "cdebconf";
+    (char*) name[0] = malloc(8 * sizeof(char));
+    name[0] = "debconf";
     name[1] = NULL;
 
+
+	printf("gtk_fe_debug - gtk_initialize() called\n");
     obj->data = NEW(struct frontend_data);
     obj->interactive = 1;
+
 	
+	/*
+	Here we setup in the frontend structure the fields needed for the mechanism that lets the user jump across questions to work
+	*/
+	
+	fe_data=obj->data;
+	strcpy(fe_data->jump_target,"");
+	fe_data->number_of_questions=0;
+			
     gtk_init (&args, &name);
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -846,90 +1199,158 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     return DC_OK;
 }
 
-static void gtk_plugin_destroy_notify(void *data)
-{
-    plugin_delete((struct plugin *) data);
-}
-
 static int gtk_go(struct frontend *obj)
 {
     struct frontend_data *data = (struct frontend_data *) obj->data;
     struct question *q = obj->questions;
-    int i;
+    GtkWidget *questionbox, *menubox;
+    int i,j, number_of_questions=0;
     int ret;
-    GtkWidget *questionbox;
-    di_slist *plugins;
+	
+	/*
+	this string is used to identify which question is the main menu (usually this is "debian/main-menu" )
+	*/
+    char main_menu_tag[50];
+	strcpy(main_menu_tag, "test/select");
 
     if (q == NULL) return DC_OK;
+    
+ 	/*
+	The main-menu question is stored in a private area of the frontend, so that it can be shown even if it's not passed to the frontend
+	*/
+	if( strcmp(q->tag, main_menu_tag )==0 )
+		{
+		data->q_main=question_dup(q);
+		printf("gtk_fe_debug - gtk_go() main question \"%s\" stored in memory\n", main_menu_tag );
+		}
+
+    /*
+    gtk_fe_debug this piece of code impements the "jump" mechanism
+    */
+	if( strcmp(data->jump_target,"") != 0 )
+		{
+		if( strcmp(q->tag, main_menu_tag)==0 )
+			{
+			/*
+			the d-i has just told us to show the main menu; so w've just automatically backed-up to this step and now we can execute the jump
+			*/
+			printf("gtk_fe_debug - gtk_go() jumping to \"%s\"\n", data->jump_target );
+			q = obj->questions;
+			question_setvalue(q, data->jump_target);
+			obj->qdb->methods.set(obj->qdb, q);
+q->next=NULL;
+			strcpy(data->jump_target,"");
+						
+			data->button_val = DC_OK;
+			
+			return DC_OK;
+			}
+		else
+			{
+			data->button_val = DC_GOBACK;
+			
+			printf("gtk_fe_debug - gtk_go() backin up to jump to \"%s\"\n", data->jump_target );
+	
+			return DC_GOBACK;
+			}
+		}
 
     data->setters = NULL;
-    questionbox = gtk_vbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(data->target_box),
-                       questionbox, FALSE, FALSE, 5);
 
-    /* FIXME: no more description frame
-       if (strcmp(q->template->type, "note") != 0 )
-       gtk_label_set_text(GTK_LABEL(data->description_label), 
-       q_get_extended_description(q)); 
-    */
-    plugins = di_slist_alloc();
-    while (q != 0)
-    {
-        for (i = 0; i < DIM(question_handlers); i++) {
-            gtk_handler *handler;
-            struct plugin *plugin = NULL;
-
-            if (*question_handlers[i].type)
-                handler = question_handlers[i].handler;
-            else {
-                plugin = plugin_find(obj, q->template->type);
-                if (plugin) {
-                    INFO(INFO_DEBUG, "Found plugin for %s", q->template->type);
-                    handler = (gtk_handler *) plugin->handler;
-                    di_slist_append(plugins, plugin);
-                } else {
-                    INFO(INFO_DEBUG, "No plugin for %s", q->template->type);
-                    continue;
-                }
-            }
-
-            if (plugin || strcmp(q->template->type, question_handlers[i].type) == 0)
-            {
-                ret = handler(obj, q, questionbox);
-                if (ret != DC_OK)
-                {
-                    di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
-                    return ret;
-                }
-                break;
-            }
-        }
-        q = q->next;
-    }
-    q = obj->questions;
-    gtk_window_set_title(GTK_WINDOW(data->window), obj->title);
-    gtk_widget_set_sensitive (data->button_prev, obj->methods.can_go_back(obj, q));
-    gtk_widget_grab_default(data->button_next);
-    gtk_widget_show_all(data->window);
-    gtk_main();
-    if (data->button_val == DC_OK) 
-    {
-	call_setters(obj);
+	menubox = gtk_vbox_new(FALSE, 5);
+    questionbox = gtk_vbox_new(FALSE, 5);                    
+	
+	//printf("pack di menubox iniziato\n");
+    gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
+	//printf("pack di menubox terminato\n"); 
+		
+	//printf("pack di questionbox iniziato\n");
+    gtk_box_pack_start(GTK_BOX(data->target_box), questionbox, FALSE, FALSE, 5);
+	//printf("pack di questionbox terminato\n");
+		
+ 
+	/*
+	We should always show the main menu, even if the frontend doest' passes it as a question
+	*/
 	q = obj->questions;
-	while (q != NULL)
-	{
-	    obj->qdb->methods.set(obj->qdb, q);
-	    q = q->next;
-	}
-    }
-    di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
-    gtk_widget_destroy(questionbox);
+	if ( strcmp ( q->tag, main_menu_tag )==0 )
+		{
+		/*
+		the first question in the question list is the main menu, so we simply handle it
+		*/
+    	ret = gtkhandler_select_single(obj, q, menubox);
+    	q=q->next;
+    	}
+	else if ( strcmp ( q->tag, main_menu_tag )!=0 )
+		{
+		/*
+		the first question in the question list is not the main menu, so we need to show it using the copy of the main menu stored previously into memory
+		*/
+		ret = gtkhandler_select_single_jump(obj, data->q_main, menubox);
+		}
 
-    /* FIXME
-      gtk_label_set_text(GTK_LABEL(data->description_label), ""); 
-    */
+	/*
+	now we can safely handle all other questions, if any
+	*/
+	j=0;
+    while (q != NULL)
+    	{
+    	j++;
+    	printf("  gtk_fe_debug - question %d: %s (type %s)\n",j,q->tag,q->template->type);
+        for (i = 0; i < DIM(question_handlers); i++)
+        	{
+            if (strcmp(q->template->type, question_handlers[i].type) == 0)
+            	{
+       	
+           		ret = question_handlers[i].handler(obj, q, questionbox);
+                if (ret != DC_OK)
+                	{
+                	printf("gtk_fe_debug - question %d: \"%s\" failed to display!\n",j,q->tag);
+                	}
 
-    return data->button_val;
+                break; /*we've founf the right handler for the question, so we break the for() loop*/
+            	}
+            }
+            
+        q = q->next;    	
+    	}
+	
+
+
+	/*
+	the "back button" will be shown only if there is more than one question to show (if there is just one question the user must click in the left menu)
+	
+    if( number_of_questions > 1 && obj->methods.can_go_back(obj, q) ) gtk_widget_set_sensitive (data->button_prev, TRUE );
+    else gtk_widget_set_sensitive (data->button_prev, FALSE );
+    
+    if ( number_of_questions > 1 ) gtk_widget_set_sensitive(GTK_WIDGET(data->button_next), TRUE); 
+    else gtk_widget_set_sensitive(GTK_WIDGET(data->button_next), FALSE);
+*/
+    gtk_widget_show_all(data->window);    
+   
+	gtk_main();
+
+    
+    if (data->button_val == DC_OK) 
+	    {
+		call_setters(obj);
+		q = obj->questions;
+		while (q != NULL)	
+			{
+		    obj->qdb->methods.set(obj->qdb, q);
+		    q = q->next;
+			}
+   		}
+   		
+	gtk_widget_destroy(questionbox);
+
+	gtk_widget_destroy(menubox);
+   
+    
+    if (data->button_val == DC_OK) return DC_OK;
+    else if (data->button_val == DC_GOBACK) return DC_GOBACK;
+	else return DC_OK;
+
 }
 
 static bool gtk_can_go_back(struct frontend *obj, struct question *q)
@@ -939,23 +1360,18 @@ static bool gtk_can_go_back(struct frontend *obj, struct question *q)
 
 static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
-    GtkWidget *progress_bar, *target_box, *frame;
+    GtkWidget *progress_bar;
 
-    obj->progress_title = NULL;
+    progress_bar=((struct frontend_data*)obj->data)->progress_bar;
+    
+    DELETE(obj->progress_title);
+    obj->progress_title=strdup(title);
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
 
-    target_box = ((struct frontend_data*)obj->data)->target_box;
-    progress_bar = gtk_progress_bar_new ();
-    ((struct frontend_data*)obj->data)->progress_bar = progress_bar;
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), "");
+    printf("gtk_fe_debug - gtk_progress_start(min=%d, max=%d, title=%s) called\n",min ,max, title );
 
-    frame = gtk_frame_new(title);
-    gtk_container_add(GTK_CONTAINER (frame), progress_bar);
-
-    gtk_box_pack_start(GTK_BOX(target_box), frame, FALSE, FALSE, 5);
-    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
     while (gtk_events_pending ())
 	gtk_main_iteration ();
 }
@@ -963,44 +1379,102 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
 static void gtk_progress_set(struct frontend *obj, int val)
 {
     gdouble progress;
+    GtkWidget *progress_bar;
+
+	printf("gtk_fe_debug - gtk_progress_set(val=%d) called\n", val);
+    
+    progress_bar=((struct frontend_data*)obj->data)->progress_bar;
 
     obj->progress_cur = val;
-    if (obj->progress_max - obj->progress_min > 0)
-    {
+    if ((obj->progress_max - obj->progress_min) > 0)
+    	{
         progress = (gdouble)(obj->progress_cur - obj->progress_min) /
                    (gdouble)(obj->progress_max - obj->progress_min);
-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(((struct frontend_data*)obj->data)->progress_bar),
-				      progress);
-    }
-    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
-    while (gtk_events_pending ())
-	gtk_main_iteration ();
+		gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), progress);
+	
+    	}
+    
+    while (gtk_events_pending ())	gtk_main_iteration ();
+
 }
 
 static void gtk_progress_info(struct frontend *obj, const char *info)
 {
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(((struct frontend_data*)obj->data)->progress_bar), info);
-    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
-    while (gtk_events_pending ())
-	gtk_main_iteration ();
+    GtkWidget *progress_bar;
+
+    printf("gtk_fe_debug - gtk_progress_info(%s) called\n", info );
+
+    progress_bar=((struct frontend_data*)obj->data)->progress_bar;
+      
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), info);
+   
+	while (gtk_events_pending ()) gtk_main_iteration ();
 }
 
 static void gtk_progress_stop(struct frontend *obj)
 {
-    gtk_widget_destroy(gtk_widget_get_parent(((struct frontend_data*)obj->data)->progress_bar));
-    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
+	GtkWidget *progress_bar;
+    progress_bar=((struct frontend_data*)obj->data)->progress_bar;
+
+    printf("gtk_fe_debug - gtk_progress_stop() called\n");
+    //gtk_widget_destroy(gtk_widget_get_parent(((struct frontend_data*)obj->data)->progress_bar));
+	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0);
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " ");
+    gtk_widget_set_sensitive(GTK_WIDGET(progress_bar), FALSE);
+	gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
     while (gtk_events_pending ())
-	gtk_main_iteration ();
+		gtk_main_iteration ();
 }
+
+static unsigned long gtk_query_capability(struct frontend *f)
+{
+	printf("gtk_fe_debug - gtk_query_capability() called\n");
+	return DCF_CAPB_BACKUP;
+}
+
 
 
 struct frontend_module debconf_frontend_module =
 {
     initialize: gtk_initialize,
     go: gtk_go,
+//    shutdown: gtk_shutdown,	//gtk_fe_debug +
+//    clear: gtk_clear,	//gtk_fe_debug +
+//    add: gtk_add,		//gtk_fe_debug +
     can_go_back: gtk_can_go_back,
     progress_start: gtk_progress_start,
     progress_info: gtk_progress_info,
     progress_set: gtk_progress_set,
     progress_stop: gtk_progress_stop,
+    query_capability: gtk_query_capability,
 };
+
+/*
+
+
+static int gtk_add(struct frontend *obj, struct question *q)
+{
+
+	return DC_OK;
+}
+
+static int gtk_shutdown(struct frontend *obj) //gtk_fe_debug +
+{
+	struct question *q = obj->questions;
+	printf("gtk_fe_debug - gtk_shutdown() called\n");
+	return DC_OK;
+}
+
+
+static int gtk_clear(struct frontend *obj) //gtk_fe_debug + 
+{
+	printf("gtk_fe_debug - gtk_clear() called\n");
+	return DC_OK;
+}
+*/
+
+
+
+
+
+

@@ -26,6 +26,10 @@ struct frontend_data
   GtkWidget *window;
   /* Pointer to the box, where question widgets shall be stored in */
   GtkWidget *target_box; 
+  /* Pointer to the box, where help messages shall be stored in */
+  GtkWidget *info_box;
+  /* Pointer to the box, where the main menu shall be stored in */
+  GtkWidget *menu_box;
 
   /* Buttons for the druid-like interface */
   GtkWidget *button_next;
@@ -38,6 +42,17 @@ struct frontend_data
   struct setter_struct *setters; 
   /* Value of the button pressed to leave a form */
   int button_val;
+  
+  
+  /* this counter keeps count of the number of question in the question list during a gtk_go() run */
+  int number_of_questions;
+   
+  /*here a question tag is stored and represents the target for a jump*/     
+  char jump_target[40];
+
+  /*Here we store the main question to allow the jump mechanism*/
+  struct question *q_main;
+      
 };
 
 /* Embed frontend ans question in this object to pass it through an event handler */
