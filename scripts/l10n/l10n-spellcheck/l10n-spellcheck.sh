@@ -13,6 +13,7 @@ SCRIPTS_PATH=`echo $0 | sed "s:\(.*\)${SCRIPT_WITHOUT_PATH}\(.*\):\1\2:"`
 
 . ${HOME}/${SCRIPTS_PATH}/cfg/$1/setup.sh
 export LANGUAGE_LIST="cfg/$1/lang2dict.txt"
+export WLS_PATH="./cfg/$1/wls"
 export PO_FINDER="cfg/$1/po_finder.sh"
 export HTML_PAGE="cfg/$1/report_page.html"
 

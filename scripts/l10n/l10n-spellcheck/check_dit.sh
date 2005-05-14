@@ -128,8 +128,8 @@ else
 fi
 
 # if a binary wl exists, use it
-if [ -f ./wls/${LANG}_di_wl ] ; then
-    WL_PARAM="--add-extra-dicts ./wls/${LANG}_di_wl"
+if [ -f ${WLS_PATH}/${LANG}_di_wl ] ; then
+    WL_PARAM="--add-extra-dicts ${WLS_PATH}/${LANG}_di_wl"
 fi
 
 # spell check the selected strings eventually using a custom wl 
@@ -160,16 +160,16 @@ fi
 
 # in the tgz file WL is iso-8859-1 (the way it has to be)
 # in "nozip" it's utf-8 like the other files 
-if [ -f ./wls/${LANG}_wl.txt ] ; then
-    WORDLIST=./wls/${LANG}_wl.txt
+if [ -f ${WLS_PATH}/${LANG}_wl.txt ] ; then
+    WORDLIST=${WLS_PATH}/${LANG}_wl.txt
     cat ${WORDLIST} | iconv --from iso-8859-1 --to utf-8 > ${DEST_DIR}/nozip/${LANG}_wl.txt
     cp ${WORDLIST} ${DEST_DIR}
     WL_ISO8859=${DEST_DIR}/${LANG}_wl.txt
 fi
 
 # now let's copy the common wl *only* to nozip
-if [ -f ./wls/di_common_wl.txt ] ; then
-    cp ./wls/di_common_wl.txt ${DEST_DIR}/nozip
+if [ -f ${WLS_PATH}/di_common_wl.txt ] ; then
+    cp ${WLS_PATH}/di_common_wl.txt ${DEST_DIR}/nozip
 fi
 
 tar czf ${DEST_DIR}/zip/${LANG}.tar.gz ${FILES_TO_KEEP} ${WL_ISO8859}
