@@ -11,7 +11,7 @@ save_logs () {
 		c=$(expr $c + 1)
 		dir="$save_to/install.$c"
 	fi
-	mkdir "$save_to/$dir"
+	mkdir "$dir"
 	
 	for file in \
 	    /etc/lsb-release \
@@ -22,8 +22,8 @@ save_logs () {
 	    /var/log/hardware-summary \
 	    /var/log/package-versions \
 	    /usr/share/save-logs/install-report.template; do 
-	    	if [ -e $file ]; then
-			if ! cp $file "$save_to/$dir"; then
+	    	if [ -e "$file" ]; then
+			if ! cp "$file" "$dir"; then
 				db_progress STOP
 				exit 1
 			fi
@@ -36,9 +36,8 @@ db_go || true
 db_get save-logs/menu
 METHOD="$RET"
 
-# Put up progress bar, gather info.
 db_progress START 0 2 debian-installer/save-logs/title
-report-hw > $DILOGDIR/hardware-summary
+report-hw > /var/log/hardware-summary
 db_progress STEP 1
 
 case "$METHOD" in
@@ -66,13 +65,14 @@ web)
 ;;
 "mounted filesystem")
 	if [ -e "/hd-media" ]; then
-		db_set save-logs/mount-point "/hd-media"
+		db_set save-logs/directory "/hd-media"
 	fi
-	db_input critical save-logs/mount-point || true
+	db_input critical save-logs/directory || true
 	db_go || true
 	db_get save-logs/mount-point
 	if [ ! -d "$RET" ]; then
-		db_input critical save-logs/bad_mount-point || true
+		db_subst save-logs/bad_directory DIR "$RET"
+		db_input critical save-logs/bad_directory || true
 		db_go || true
 		db_progress STOP
 	else
