@@ -53,7 +53,7 @@ web)
 		
 	db_progress STEP 1
 	db_progress STOP
-	if [ -n "$(grep : /proc/net/dev | grep -v lo:)" ]; then
+	if [ -z "$(grep : /proc/net/dev | grep -v lo:)" ]; then
 		db_input critical save-logs/no_network || true
 	else
 		IPADDR=$(ifconfig | grep 'inet addr:' | head -1 | \
