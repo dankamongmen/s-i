@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+logsavedir=/target/var/log/debian-installer
+
+test -d $logsavedir || mkdir $logsavedir
+
+report-hw > $logsavedir/hardware-summary
+
+cp /var/lib/dpkg/status $logsavedir/status
+
+# Install the installation report template
+cp /usr/share/bugreporter-udeb/install-report.template /target/root
