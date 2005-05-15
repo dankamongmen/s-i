@@ -53,11 +53,11 @@ web)
 		
 	db_progress STEP 1
 	db_progress STOP
-	if [ -z "$(grep : /proc/net/dev | grep -v lo:)" ]; then
+	IPADDR=$(ifconfig | grep 'inet addr:' | head -1 | \
+		 sed 's/.*inet addr:\([0-9.]*\).*/\1/')
+	if [ -z "$(IPADDR)" ]; then
 		db_input critical save-logs/no_network || true
 	else
-		IPADDR=$(ifconfig | grep 'inet addr:' | head -1 | \
-			sed 's/.*inet addr:\([0-9.]*\).*/\1/')
 		db_subst save-logs/httpd_running ADDRESS "$IPADDR"
 		db_input critical save-logs/httpd_running || true
 	fi
