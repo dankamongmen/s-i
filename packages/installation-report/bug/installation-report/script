@@ -75,6 +75,13 @@ if [ ! -e "$logsavedir/hardware-summary" ]; then
 	fi
 fi
 
+if [ -e "$logsavedir/lsb-release" ]; then
+	gettext "Including installer lsb-release file in report.."
+	echo
+	header "Installer lsb-release file:" >&3
+	cat "$logsavedir/lsb-release" 2>&1 >&3
+fi
+
 if [ -e "$logsavedir/debconf-seed" ]; then
 	gettext "
 Preseed information can be included in the report, if you want.

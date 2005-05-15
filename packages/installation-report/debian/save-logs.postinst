@@ -14,6 +14,7 @@ save_logs () {
 	mkdir "$save_to/$dir"
 	
 	for file in \
+	    /etc/lsb-release \
 	    /var/log/messages \
 	    /var/log/syslog \
 	    /var/log/partman \
@@ -45,6 +46,7 @@ web)
 	# The httpd serves files from /var/log, where almost
 	# everything of interest is. Link a few other useful files to
 	# there.
+	ln -sf /etc/lsb-release /var/log
 	ln -sf /var/lib/dpkg/status /var/log
 	ln -sf /usr/share/save-logs/install-report.template /var/log
 	# TODO: avoid running more than one
