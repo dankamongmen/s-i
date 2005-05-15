@@ -1,7 +1,4 @@
 #! /bin/sh
-#
-# Copy install logs to /target/var/log/debian-installer
-
 # Intentionally not set -e.
 
 logsavedir=/target/var/log/installer
@@ -15,11 +12,11 @@ db_set debconf/priority $RET
 db_x_save
 
 test -d $logsavedir || mkdir $logsavedir
-cp /var/log/* $logsavedir
+# Transition support for the old logsavedir /var/log/debian-installer
+# as used by sarge base-config.
+if [ ! -L /target/var/log/debian-installer ]; then 
+	ln -s installer /target/var/log/debian-installer
+fi
 
 # Copy current debconf database
 cp -a /var/lib/cdebconf $logsavedir
-
-# Transition support for the old logsavedir /var/log/debian-installer
-cd /target/var/log
-test -L debian-installer || ln -s ./installer debian-installer
