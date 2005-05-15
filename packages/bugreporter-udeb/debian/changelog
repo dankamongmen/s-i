@@ -1,4 +1,4 @@
-bugreporter-udeb (1.03) UNRELEASED; urgency=low
+installation-report (2.0) UNRELEASED; urgency=low
 
   * Colin Watson
     - Remove dead (since r12587) copy_cdebconf_db code.
@@ -14,9 +14,34 @@ bugreporter-udeb (1.03) UNRELEASED; urgency=low
     - Remove udeb extended description.
     - Minor indentation cleanups.
     - Reword the message if floppy mount fails.
-    - Add "httpd", a very simple http server.
-    - If the network is up, prompt the user whether to save to floppy or
-      run the httpd.
+    - Add "httpd", a very simple http server, and add a menu that can be used
+      to start it.
+    - Add support for saving debug logs to a mounted filesystem. If /hd-media
+      is already mounted, offer it as the default to support USB keys,
+      otherwise the user must mount the filesystem by hand. Closes: #267219
+    - Use an error template for failed floppy mount.
+    - Take down the progress bar if saving a log failed.
+    - Save log files to an "install" subdir of the floppy or filesystem;
+      if "install" exists go on to "install.2", etc.
+    - Cut down on the hardcoded paths to commands.
+    - Remove the hdparm stuff that has never really worked, and that 
+      is dependent on kernels compiled with devfs.
+    - Make report-hw work on regular Debian as well as on d-i, various
+      improvements.
+    - Add cardctl ident and status to report-hw.
+    - Include /proc/bus/usb/devices in report-hw.
+    - Add uname -a and free output to report-hw.
+    - Add installation-report package, rename bugreporter-udeb to save-logs
+      (more accurate), and rename source package to installation-logs.
+    - installation-report package has reportbug integration to semi-automate
+      a user filing an installation report.
+    - Add a man page for report-hw.
+    - Add myself to uploaders.
+    - Most of the log saving code moved to here from prebaseconfig,
+      and the logs moved to /var/log/installer.
+    - Reworded and reorganised the installation report template, to
+      better prompt the user for info we need. Move hardware info to end,
+      and prompt for a log file.
 
  -- Joey Hess <joeyh@debian.org>  Fri,  6 May 2005 23:12:42 -0400
 

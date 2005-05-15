@@ -1,64 +1,41 @@
 #!/bin/sh -e
 #
-# Report the detected HW
+# Report the detected HW. Note that this needs to run both inside d-i
+# and in a regular debian system, as well as behaving robustly if commands
+# are missing or broken.
 
-if [ -x /sbin/discover ] ; then
-	/sbin/discover -f "info: $0: discover: %m;%S;%D;%V;%M;%d\n" all || true
+addinfo () {
+	sed "s%^%$1: %"
+}
+
+uname -a 2>&1 | addinfo "umame -a"
+discover -f "%m;%S;%D;%V;%M;%d\n" all | addinfo "discover" || true
+
+# d-i has no which, and debian has no search-path; feh.
+if lspci >/dev/null; then
+	lspci -v -t 2>&1 | addinfo "lspci -v -t"
+	lspci -n 2>&1 | addinfo "lspci -n"
+	lspci -v 2>&1 | addinfo "lspci -v"
+	lspci -x 2>&1 | addinfo "lspci -x"
+elif /target/usr/bin/lspci >/dev/null; then
+	/target/usr/bin/lspci -v -t 2>&1 | addinfo "lspci -v -t"
+	/target/usr/bin/lspci -n 2>&1 | addinfo "lspci -n"
+	/target/usr/bin/lspci -v 2>&1 | addinfo "lspci -v"
+	/target/usr/bin/lspci -x 2>&1 | addinfo "lspci -x"
 else
-	echo "error: $0: Unable to find /sbin/discover"
+	cat /proc/pci 2>&1 | addinfo /proc/pci
+	cat /proc/bus/pci/devices 2>&1 | addinfo /proc/bus/pci/devices
 fi
 
-LSPCI=/sbin/lspci
-if [ -x /target/bin/lspci ] ; then
-	LSPCI=/target/bin/lspci
-fi
+lsmod 2>&1 | addinfo lsmod
+df 2>&1 | addinfo df
+free 2>&1 | addinfo free
+cardctl status 2>&1 | addinfo "cardctl status"
+cardctl ident 2>&1 | addinfo "cardctl ident"
 
-if [ -x $LSPCI ] ; then
-	(
-		$LSPCI -v -t || true
-		$LSPCI -n || true
-		$LSPCI -v || true
-		echo "For use with 'lspci -F':"
-		$LSPCI -x || true
-	)| sed "s%^%info: $0: lspci: %"
-else
-	echo "error: $0: Unable to find lspci."
-	cat /proc/pci | sed "s%^%info: $0: /proc/pci: %"
-	cat /proc/bus/pci/devices | sed "s%^%info: $0: /proc/bus/pci/devices: %"
-fi
-
-if [ -x /sbin/lsmod ] ; then
-	/sbin/lsmod | sed "s%^%info: $0: lsmod: %"
-else
-	echo "error: $0: Unable to find /sbin/lsmod"
-fi
-
-for file in cpuinfo ioports iomem interrupts meminfo ; do
+for file in cpuinfo ioports iomem interrupts meminfo bus/usb/devices; do
 	if [ -e /proc/$file ] ; then
-		cat /proc/$file | sed "s%^%info: $0: $file: %"
-	else
-		echo "error: $0: Unable to find /proc/$file"
+		cat /proc/$file 2>&1 | addinfo /proc/$file
 	fi
 done
-
-HDPARM=/sbin/hdparm
-if [ -x /target/sbin/hdparm ] ; then
-	HDPARM=/target/sbin/hdparm
-fi
-if [ -x $HDPARM ] ; then
-	for disk in `sed -ne '/\(ide\|scsi\).*\/disc/s%[^/]* \([^ ]*\).*%/dev/\1%p' /proc/partitions` ; do 
-		/sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
-	done
-else
-	echo "error: $0: Unable to find hdparm."
-fi
-
-#grep /disc < /proc/partitions | while read line; do
-#    part=`echo $line | cut -f4 -d' '`
-#    disk="/dev/$part"
-#    /sbin/hdparm -i $disk 2>&1 |  sed "s%^%info: $0: hdparm: %"
-#done
-
-df | sed "s%^%info: $0: df: %"
-
-dmidecode | sed "s%^%info: $0: dmidecode: %"
+dmidecode 2>&1 | addinfo dmidecode
