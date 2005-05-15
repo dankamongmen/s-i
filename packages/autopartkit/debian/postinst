@@ -26,10 +26,10 @@ run_parts() {
 }
 # Try to load LVM support
 depmod -a >> $log 2>&1 || true
-modprobe lvm-mod >> $log 2>&1 || true
+modprobe dm-mod >> $log 2>&1 || true
 
 # Make sure it is installed into /target/ as well
-apt-install lvm10 || true
+apt-install lvm2 || true
 
 # Run all scripts to choose table file
 run_parts /usr/lib/autopartkit.d

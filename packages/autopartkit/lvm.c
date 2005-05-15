@@ -56,10 +56,11 @@ lvm_isinstalled(void)
         return FALSE;
     }
 
-    /* Is /proc/lvm a directory? */
-    if ( 0 != stat("/proc/lvm", &statbuf) || ! S_ISDIR(statbuf.st_mode) )
+    /* Is /proc/lvm a directory, or device-mapper loaded ? */
+    if ((0 != system("grep -q \"[0-9] device-mapper\" /proc/misc" )) &&
+        (0 != stat("/proc/lvm", &statbuf) || ! S_ISDIR(statbuf.st_mode)))
     {
-        autopartkit_error(0, "Missing /proc/lvm/, no LVM support available.");
+        autopartkit_error(0, "Missing /proc/lvm/ and no device-mapper in /proc/nmisc, no LVM support available.");
         isinstalled = FALSE;
         return FALSE;
     }
@@ -294,7 +295,7 @@ lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
     memset(&(spaceinfo->geom), 0, sizeof(spaceinfo->geom));
     autopartkit_log(2, "  Locating free space on volumegroup %s\n", vgname);
 
-    asprintf(&command, "/sbin/vgdisplay -c %s 2>&1", vgname);
+    asprintf(&command, "/sbin/vgdisplay -c %s 2>/dev/null", vgname);
     autopartkit_log(2, "  Running command: %s\n", command);
     vgdisplay = popen(command, "r");
     if (! vgdisplay ){
@@ -353,6 +354,7 @@ lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
 	free(command);
         return 0;
     }
+    pclose (vgdisplay);
     free(command);
     return 1;
 }
