@@ -184,7 +184,27 @@ static int stack_template_db_unlock(struct template_db *db, const char *name)
 static struct template *stack_template_db_iterate(struct template_db *db, 
 	void **iter)
 {
-	return 0;
+    struct template_stack_iterator *tsi;
+    struct template *t;
+    
+    tsi = *(struct template_stack_iterator **) iter;
+    if (tsi == NULL) {
+        *iter = tsi = malloc(sizeof *tsi);
+        tsi->stack = (struct template_stack *) db->data;;
+        tsi->child_iterator = NULL;
+    }
+
+    while (tsi->stack) {
+        t = tsi->stack->db->methods.iterate(tsi->stack->db,
+                                            &tsi->child_iterator);
+        if (t)
+            return t;
+        tsi->stack = tsi->stack->next;
+        tsi->child_iterator = NULL;
+    }
+
+    free(tsi);
+    return NULL;
 }
 
 /****************************************************************************
@@ -332,10 +352,30 @@ static int stack_question_db_unlock(struct question_db *db, const char *name)
 	return DC_NOTIMPL;
 }
 
-static struct question *stack_question_db_iterate(struct question_db *db,
+static struct question *stack_question_db_iterate(struct question_db *db, 
 	void **iter)
 {
-	return 0;
+    struct question_stack_iterator *qsi;
+    struct question *q;
+    
+    qsi = *(struct question_stack_iterator **) iter;
+    if (qsi == NULL) {
+        *iter = qsi = malloc(sizeof *qsi);
+        qsi->stack = (struct question_stack *) db->data;;
+        qsi->child_iterator = NULL;
+    }
+
+    while (qsi->stack) {
+        q = qsi->stack->db->methods.iterate(qsi->stack->db,
+                                            &qsi->child_iterator);
+        if (q)
+            return q;
+        qsi->stack = qsi->stack->next;
+        qsi->child_iterator = NULL;
+    }
+
+    free(qsi);
+    return NULL;
 }
 
 struct template_db_module debconf_template_db_module = {
