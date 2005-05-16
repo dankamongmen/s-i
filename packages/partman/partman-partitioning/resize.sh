@@ -5,37 +5,34 @@ check_virtual () {
     close_dialog
 }
 
-get_resize_range () {
-    if \
-	[ "$virtual" = no -a -f $oldid/detected_filesystem ] \
-	&& [ "$(cat $oldid/detected_filesystem)" = ntfs ]
-    then
-	open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
-	read_line minsize cursize maxsize
-	close_dialog
-	# A weird way to get the real device path.  The partition numbers
-	# in parted_server may be changed and the partition table is still
-	# not commited to the disk
-	backupdev=/var/lib/partman/backup/${dev#/var/lib/partman/devices/}
-	if [ -f $backupdev/$oldid/view -a -f $backupdev/device ]; then
-	    num=$(sed 's/^[^0-9]*\([0-9]*\)[^0-9].*/\1/' $backupdev/$oldid/view)
-	    dev=$(cat $backupdev/device)
-	    dev=${dev%/disc}/part$num
-	    if [ -b $dev ]; then
-		size=$(ntfsresize -f -i $dev \
-		    | grep '^You might resize at' \
-		    | sed 's/^You might resize at \([0-9]*\) bytes.*/\1/' \
-		    | grep '^[0-9]*$')
-		if [ "$size" ]; then
-		    minsize=$size
-		fi
+get_ntfs_resize_range () {
+    open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
+    read_line minsize cursize maxsize
+    close_dialog
+    # A weird way to get the real device path.  The partition numbers
+    # in parted_server may be changed and the partition table is still
+    # not commited to the disk
+    backupdev=/var/lib/partman/backup/${dev#/var/lib/partman/devices/}
+    if [ -f $backupdev/$oldid/view -a -f $backupdev/device ]; then
+	num=$(sed 's/^[^0-9]*\([0-9]*\)[^0-9].*/\1/' $backupdev/$oldid/view)
+	dev=$(cat $backupdev/device)
+	dev=${dev%/disc}/part$num
+	if [ -b $dev ]; then
+	    size=$(ntfsresize -f -i $dev \
+		| grep '^You might resize at' \
+		| sed 's/^You might resize at \([0-9]*\) bytes.*/\1/' \
+		| grep '^[0-9]*$')
+	    if [ "$size" ]; then
+		minsize=$size
 	    fi
 	fi
-    else
-	open_dialog GET_RESIZE_RANGE $oldid
-	read_line minsize cursize maxsize
-	close_dialog
     fi
+}
+
+get_resize_range () {
+    open_dialog GET_RESIZE_RANGE $oldid
+    read_line minsize cursize maxsize
+    close_dialog
 }
 
 human_resize_range () {

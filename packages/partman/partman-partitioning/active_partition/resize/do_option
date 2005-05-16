@@ -10,7 +10,14 @@ cd $dev
 
 check_virtual
 
-get_resize_range
+if \
+    [ "$virtual" = no -a -f $oldid/detected_filesystem ] \
+    && [ "$(cat $oldid/detected_filesystem)" = ntfs ]
+then
+    get_ntfs_resize_range
+else
+    get_resize_range
+fi
 
 if [ -z "$maxsize" ]; then
     db_input critical partman-partitioning/impossible_resize || true
