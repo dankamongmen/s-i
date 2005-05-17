@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # *** l10n-spellcheck.sh ***
-export LOCAL_REPOSITORY="${HOME}/d-i/level1"
+export LOCAL_REPOSITORY="${HOME}/d-i/levels/level1"
 export REFRESH_CMD=""
-export OUT_DIR="$HOME/public_html/spellcheck/level1/"
+export OUT_DIR="${HOME}/public_html/spellcheck/level1/"
 
 # remove ${ALL_THESE_VARIABLES} which do not need to be spell checked
 export REMOVE_VARS="yes"
