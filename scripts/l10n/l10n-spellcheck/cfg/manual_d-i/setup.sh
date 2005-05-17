@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # *** l10n-spellcheck.sh ***
-export LOCAL_REPOSITORY="$HOME/di_manual"
+export LOCAL_REPOSITORY="${HOME}/di_manual"
+export REFRESH_CMD="svn up ${LOCAL_REPOSITORY}"
 export OUT_DIR="$HOME/public_html/spellcheck/manual_d-i/"
 
 # *** check_dit.sh ***

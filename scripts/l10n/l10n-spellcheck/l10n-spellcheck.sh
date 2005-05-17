@@ -24,8 +24,9 @@ fi
 
 NEW="check_$(date '+%Y%m%d')"
 
-# update local copy of svn repository
-svn up ${LOCAL_REPOSITORY}
+# update local copy of the repository (if necessary)
+${REFRESH_CMD}
+
 
 # spellcheck and move data to public_html
 cd  ${HOME}/${SCRIPTS_PATH}
