@@ -190,6 +190,7 @@ command_go(struct confmodule *mod, char *arg)
     const char *running_frontend = NULL;
     const char *requested_frontend = NULL;
     struct question *q;
+    int ret;
 
     argc = strcmdsplit(arg, argv, DIM(argv) - 1);
     CHECKARGC(== 0);
@@ -212,10 +213,17 @@ command_go(struct confmodule *mod, char *arg)
 	mod->frontend->questions = q;
     }
 
-    if (mod->frontend->methods.go(mod->frontend) == CMDSTATUS_GOBACK || mod->backed_up != 0)
+    ret = mod->frontend->methods.go(mod->frontend);
+    if (ret == CMDSTATUS_GOBACK || mod->backed_up != 0)
     {
         mod->backed_up = 1;
         asprintf(&out, "%u backup", CMDSTATUS_GOBACK);
+        mod->update_seen_questions(mod, STACK_SEEN_REMOVE);
+    }
+    else if (ret == DC_NOTOK) /* TODO return value namespace */
+    {
+        mod->backed_up = 0;
+        asprintf(&out, "%u internal error", CMDSTATUS_INTERNALERROR);
         mod->update_seen_questions(mod, STACK_SEEN_REMOVE);
     }
     else
