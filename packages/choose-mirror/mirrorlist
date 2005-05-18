@@ -10,6 +10,9 @@ use strict;
 
 my $type = shift || die "please specify mirror type\n";
 
+my $hostarch=`dpkg-architecture -qDEB_HOST_ARCH`;
+chomp $hostarch;
+
 # Slurp in the mirror file.
 my %data;
 my %countries;
@@ -49,14 +52,15 @@ foreach my $site (keys %data) {
 
 my %newdata;
 foreach my $site (keys %data) {
-	if (exists $data{$site}->{'archive-architecture'} and exists $ENV{DEB_HOST_ARCH}) {
+	if (exists $data{$site}->{'archive-architecture'}) {
 		my @arches = split ' ', $data{$site}->{'archive-architecture'};
+		print ">>@arches\n";
 		if (grep /^!/, @arches) {
 			my %notarches = map { substr($_, 1) => 1 } grep /^!/, @arches;
-			next if exists $notarches{$ENV{DEB_HOST_ARCH}};
+			next if exists $notarches{$hostarch};
 		} else {
 			my %arches = map { $_ => 1 } @arches;
-			next if not exists $arches{$ENV{DEB_HOST_ARCH}};
+			next if not exists $arches{$hostarch};
 		}
 	}
 	$newdata{$site} = $data{$site};
