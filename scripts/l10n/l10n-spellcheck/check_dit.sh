@@ -61,8 +61,7 @@ fi
 
 }
 
-if [ -z "$4" ]
-    then
+if [ -z "$4" ] ; then
     usage
     exit 1
 fi
@@ -132,21 +131,32 @@ if [ -f ${WLS_PATH}/${LANG}_di_wl ] ; then
     WL_PARAM="--add-extra-dicts ${WLS_PATH}/${LANG}_di_wl"
 fi
 
+if [ ${DICT} != "null" ] ; then
 # spell check the selected strings eventually using a custom wl 
-cat ${FILE_TO_CHECK} | aspell list --lang=${LANG} --encoding=utf-8 ${WL_PARAM} ${ASPELL_EXTRA_PARAM} > ${ALL_UNKNOWN}
+    cat ${FILE_TO_CHECK} | aspell list --lang=${LANG} --encoding=utf-8 ${WL_PARAM} ${ASPELL_EXTRA_PARAM} > ${ALL_UNKNOWN}
 
 # sort all the unrecognized words (don't care about upper/lower case)
 # count duplicates
 # take note of unknown words
-cat ${ALL_UNKNOWN} | sort -f | uniq -c > ${UNKN}
+    cat ${ALL_UNKNOWN} | sort -f | uniq -c > ${UNKN}
 
 # if we're *not* handling suspecet vars (i.e. d-i manual), make this an empty string
-if [ ${HANDLE_SUSPECT_VARS} = "no" ] ; then
-    SUSPECT_EXIST=
-fi
+    if [ ${HANDLE_SUSPECT_VARS} = "no" ] ; then
+	SUSPECT_EXIST=
+    fi
 
 # build the entry of stats.txt for the current language (i.e "395 it 1")
-echo `wc -l ${UNKN} | awk '{print $1}'` ${LANG} ${SUSPECT_EXIST} >> ${DEST_DIR}/stats.txt
+    echo `wc -l ${UNKN} | awk '{print $1}'` ${LANG} ${SUSPECT_EXIST} >> ${DEST_DIR}/stats.txt
+else
+    if [ ${HANDLE_SUSPECT_VARS} = "no" ] ; then
+	SUSPECT_EXIST=
+    fi
+
+    echo "-1 ${LANG} ${SUSPECT_EXIST}" >> ${DEST_DIR}/stats.txt
+
+    NEEDS_RM=`echo ${NEEDS_RM} | sed "s:${ALL_UNKNOWN}::"`
+    FILES_TO_KEEP=`echo ${FILES_TO_KEEP} | sed "s:${UNKN}::"`
+fi
 
 rm ${NEEDS_RM}
 

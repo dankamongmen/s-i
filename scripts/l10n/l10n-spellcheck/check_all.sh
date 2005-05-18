@@ -28,8 +28,7 @@ checks()
     fi
 }
 
-if [ -z "$1" ]
-    then
+if [ -z "$1" ] ; then
     usage
     exit 1
 fi
@@ -45,8 +44,14 @@ for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
     LANG=`echo  ${LANGUAGE} | awk -F, '{print $1}'`
     DICT=`echo  ${LANGUAGE} | awk -F, '{print $2}'`
 
-    echo ""
-    echo "*** checking \"$LANG\" using aspell-${DICT} ***"
+    if [ ${#DICT} = 0 ] ; then
+	DICT=null
+	echo "*** checking \"$LANG\" dictionary not available ***"
+    else
+	echo "*** checking \"$LANG\" using aspell-${DICT} ***"
+    fi
+
+    
     ./check_dit.sh ${LANG} ${DICT} ${DI_COPY} ${DEST_DIR}
 
     i=`expr $i + 1`
@@ -60,32 +65,30 @@ fi
 # build "index.html" with the new results
 sh build_index.sh ${STATS}.txt ${HTML_PAGE} ${DEST_DIR}/index.html
 
-# Compute some statistics
+# create plot using gnuplot
 i=0
 TOTAL=0
 AVERAGE=0
-for VAL in `cat ${STATS}.txt | sort -n | awk '{print $1}'`; do
-    TOTAL=`expr ${TOTAL} + ${VAL}`
-    i=`expr $i + 1`
+
+for ROW in `cat ${STATS}.txt | sort -n | sed 's: :,:g'`; do
+    VAL=`echo ${ROW}| awk -F, '{print $1}'`
+    LANG=`echo ${ROW}| awk -F, '{print $2}'`
+
+    if [ ${VAL} -ne -1 ] ; then
+	XTICS=$(echo "${XTICS} \"${LANG}\" $i,")
+	TOTAL=`expr ${TOTAL} + ${VAL}`
+	i=`expr $i + 1`
+	echo ${VAL} >> ${GNUPLOT_DATA}
+    fi
 done
+
+XTICS=`echo ${XTICS} | sed "s:^":\(":" | sed "s:,$:):"`
 
 # avoid division by 0
 if [ $i -ne 0 ] ; then
     AVERAGE=`expr ${TOTAL} / $i`
 fi
 
-# create plot using gnuplot
-i=0
-for ROW in `cat ${STATS}.txt | sort -n | awk '{print $2}'`; do
-    XTICS=$(echo "${XTICS} \"${ROW}\" $i,")
-    i=`expr $i + 1`
-done
-
-XTICS=`echo ${XTICS} | sed "s:^":\(":" | sed "s:,$:):"`
-
-cat ${STATS}.txt | sort -n | awk '{print $1}' > ${GNUPLOT_DATA}
-
-rm -f ${GNUPLOT_SCRIPT}
 LOGFILE=${GNUPLOT_SCRIPT}
 exec 6>&1           # Link file descriptor #6 with stdout.
                     # Saves stdout.

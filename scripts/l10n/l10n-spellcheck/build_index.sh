@@ -8,14 +8,12 @@ usage() {
     echo  "$0 <stats file> <HTML template file> <output file>"
 }
 
-if [ -z "$1" ]
-    then
+if [ -z "$1" ] ; then
     usage
     exit 1
 fi
 
-if [ -z "$2" ]
-    then
+if [ -z "$2" ] ; then
     usage
     exit 1
 fi
@@ -30,8 +28,10 @@ i=0
 TOTAL=0
 AVERAGE=0
 for VAL in `cat ${STATS} | sort -n | awk '{print $1}'`; do
-    TOTAL=`expr ${TOTAL} + ${VAL}`
-    i=`expr $i + 1`
+    if [ ${VAL} -ne -1 ] ; then
+	TOTAL=`expr ${TOTAL} + ${VAL}`
+	i=`expr $i + 1`
+    fi
 done
 
 # avoid division by 0
@@ -98,9 +98,20 @@ DICT_NAME=`echo ${DICT_URL} | sed "s|ftp://ftp.gnu.org/gnu/aspell/dict/.*/||" | 
 
 echo "  <tr>"
 echo "   <td class=\"col1\">${LANG}</td>"
-echo "   <td>${UNKN}</td>"
+
+if [ ${UNKN} -eq -1 ] ; then
+    echo "   <td>-</td>"
+else
+    echo "   <td>${UNKN}</td>"
+fi
+
 echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a></td>"
-echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a></td>"
+
+if [ ${UNKN} -eq -1 ] ; then
+    echo "   <td>-</td>"
+else
+    echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a></td>"
+fi
 
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     echo "   <td><a href=\"${SUSPECT_VARS_URL}\">${SUSPECT_VARS_NAME}</a></td>"
