@@ -270,13 +270,24 @@ int strchoicesplitsort(const char *origbuf, const char *transbuf, const char *in
             oindex[i] = i;
     } else {
         cindex = malloc(sizeof(char *) * maxnarg);
-        if (strchoicesplit(indices, cindex, maxnarg) != maxnarg)
-            return DC_NOTOK;
+        if (strchoicesplit(indices, cindex, maxnarg) != maxnarg) {
+            INFO(INFO_WARN, "length of indices list '%s' != expected length %zd", indices, maxnarg);
+            /* fall back semi-gracefully to unsorted list */
+            for (i = 0; i < maxnarg; i++)
+                oindex[i] = i;
+            return maxnarg;
+        }
         sorted_targv = malloc(sizeof(char *) * maxnarg);
         for (i = 0; i < maxnarg; i++) {
             oindex[i] = strtol(cindex[i], NULL, 10) - 1;
-            if (oindex[i] < 0 || oindex[i] >= maxnarg)
-                return DC_NOTOK;
+            if (oindex[i] < 0 || oindex[i] >= maxnarg) {
+                int j;
+                INFO(INFO_WARN, "index %d in indices list '%s' out of range", oindex[i] + 1, indices);
+                /* fall back semi-gracefully to unsorted list */
+                for (j = 0; j < maxnarg; j++)
+                    oindex[j] = j;
+                return maxnarg;
+            }
             sorted_targv[i] = STRDUP(targv[oindex[i]]);
         }
         for (i = 0; i < maxnarg; i++) {
