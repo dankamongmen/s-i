@@ -10,15 +10,18 @@ use strict;
 
 my $type = shift || die "please specify mirror type\n";
 
-my $hostarch=`dpkg-architecture -qDEB_HOST_ARCH`;
-chomp $hostarch;
+my $hostarch=$ENV{DEB_HOST_ARCH};
+if (! defined $hostarch) {
+	$hostarch=`dpkg-architecture -qDEB_HOST_ARCH`;
+	chomp $hostarch;
+}
 
 # Slurp in the mirror file.
-my %data;
+my @data;
 my %countries;
 my %http_countries;
 my %ftp_countries;
-my $site;
+my $id=0;
 open (IN, "Mirrors.masterlist") or die "Mirrors.masterlist: $!";
 while (<IN>) {
 	chomp;
@@ -26,35 +29,35 @@ while (<IN>) {
 		my $key = lc $1;
 		my $value = $2;
 		if (lc $key eq 'site') {
-			$site = $value;
+			$data[$id]->{site} = $value;
+			$id++;
 		}
 		elsif (lc $key eq 'country') {
 			$value =~ s/ .*//;
 			$value = uc $value;
-			$data{$site}->{$key} = $value;
+			$data[$id]->{$key} = $value;
 		}
 		else {
-			$data{$site}->{$key} = $value;
+			$data[$id]->{$key} = $value;
 		}
 	}
 }
 close IN;
 
 # Poor man's mirror rating system: push-primary, push* (-secondary), others
-foreach my $site (keys %data) {
+foreach my $id (0..$#data) {
 	my $rating=0;
-	if (exists $data{$site}->{type}) {
-	        $rating=1 if $data{$site}->{type} =~ /push/i;
-                $rating=2 if $data{$site}->{type} =~ /push-primary/i;
+	if (exists $data[$id]->{type}) {
+	        $rating=1 if $data[$id]->{type} =~ /push/i;
+                $rating=2 if $data[$id]->{type} =~ /push-primary/i;
         }
-       $data{$site}->{rating}=$rating;
+       $data[$id]->{rating}=$rating;
 }
 
-my %newdata;
-foreach my $site (keys %data) {
-	if (exists $data{$site}->{'archive-architecture'}) {
-		my @arches = split ' ', $data{$site}->{'archive-architecture'};
-		print ">>@arches\n";
+my @newdata;
+foreach my $id (0..$#data) {
+	if (exists $data[$id]->{'archive-architecture'}) {
+		my @arches = split ' ', $data[$id]->{'archive-architecture'};
 		if (grep /^!/, @arches) {
 			my %notarches = map { substr($_, 1) => 1 } grep /^!/, @arches;
 			next if exists $notarches{$hostarch};
@@ -63,17 +66,17 @@ foreach my $site (keys %data) {
 			next if not exists $arches{$hostarch};
 		}
 	}
-	$newdata{$site} = $data{$site};
+	push @newdata, $data[$id];
 }
-%data = %newdata;
+@data = @newdata;
 
 if ($type =~ /(.*)list/) {
 	my $type=$1;
  	open (LIST, ">debian/${type}list-countries") or die "debian/${type}list-countries: $!";
-	foreach my $site (sort keys %data) {
-		next unless exists $data{$site}->{"archive-$type"} and
-		                    exists $data{$site}->{country};
-		$countries{$data{$site}->{country}} = 1;
+	foreach my $id (0..$#data) {
+		next unless exists $data[$id]->{"archive-$type"} and
+		                    exists $data[$id]->{country};
+		$countries{$data[$id]->{country}} = 1;
 	}
 	foreach  my $country (sort (keys %countries)) {
 		print LIST "${country}\n";
@@ -88,12 +91,12 @@ else {
 	# near the top.
 	print OUT "static struct mirror_t mirrors_$type\[] = {\n";
 	my $q='"';
-	foreach my $site (sort { $data{$b}->{rating} <=> $data{$a}->{rating} } keys %data) {
-		next unless exists $data{$site}->{"archive-$type"} and
-			    exists $data{$site}->{country};
+	foreach my $id (sort { $data[$b]->{rating} <=> $data[$a]->{rating} } 0..$#data) {
+		next unless exists $data[$id]->{"archive-$type"} and
+			    exists $data[$id]->{country};
 		print OUT "\t{",
-			  join(", ", $q.$site.$q, $q.$data{$site}->{country}.$q,
-				$q.$data{$site}->{"archive-$type"}.$q),
+			  join(", ", $q.$data[$id]->{site}.$q, $q.$data[$id]->{country}.$q,
+				$q.$data[$id]->{"archive-$type"}.$q),
 			  "},\n";
 	}
 	print OUT "\t{NULL, NULL, NULL}\n";
