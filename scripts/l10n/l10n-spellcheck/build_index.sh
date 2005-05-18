@@ -23,7 +23,7 @@ fi
 STATS=$1
 TEMPLATE=$2
 INDEX_HTML=$3
-TABLE_HTML=stats.html
+TABLE_HTML=stats.html_${RANDOM}
 DICTIONARIES=build-tools/dictionaries.txt
 # Compute some statistics
 i=0
