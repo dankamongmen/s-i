@@ -9,7 +9,8 @@ do
     chomp;
     if (m/Choices-([^.]*)\.UTF-8:/) {
       open (OUT, "> list.$1");
-      @t = split(/, /);
+      # split on commas, except for backslash-escaped ones
+      @t = split(/(?<!\\), /);
       shift(@t);
       my $cnt = 1;
       foreach my $name (@t) {$cnt++; print OUT "$cnt $name\n";}
