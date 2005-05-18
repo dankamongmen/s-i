@@ -47,6 +47,22 @@ foreach my $site (keys %data) {
        $data{$site}->{rating}=$rating;
 }
 
+my %newdata;
+foreach my $site (keys %data) {
+	if (exists $data{$site}->{'archive-architecture'} and exists $ENV{DEB_HOST_ARCH}) {
+		my @arches = split ' ', $data{$site}->{'archive-architecture'};
+		my %arches = map { $_ => 1 } @arches;
+		if (grep /^!/, @arches) {
+			my %notarches = map { substr($_, 1) => 1 } grep /^!/, @arches;
+			next if exists $notarches{$ENV{DEB_HOST_ARCH}};
+		} else {
+			next if not exists $arches{$ENV{DEB_HOST_ARCH}};
+		}
+	}
+	$newdata{$site} = $data{$site};
+}
+%data = %newdata;
+
 if ($type =~ /(.*)list/) {
 	my $type=$1;
  	open (LIST, ">debian/${type}list-countries") or die "debian/${type}list-countries: $!";
