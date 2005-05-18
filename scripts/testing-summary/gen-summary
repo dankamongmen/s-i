@@ -4,8 +4,6 @@ use strict;
 use warnings;
 
 my $mirror=shift || "/org/ftp.debian.org/ftp/";
-# extracted changelogs in a pool structure
-my $changelogs=shift || "/org/packages.debian.org/www/changelogs/";
 # only the arches we care about
 my @arches=qw(alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc);
 my @dists=qw(testing unstable);
@@ -46,13 +44,6 @@ sub older_version {
 	else {
 		return 0;
 	}
-}
-
-sub changelogfile {
-	my $package=shift;
-	my $version=shift;
-	$version=~s/^\d+://; # no epoch
-	return "$changelogs/$pooldirs{$package}/${package}_$version/changelog";
 }
 
 sub archname {
@@ -153,96 +144,64 @@ close ANN;
 
 print "<html><head><title>udeb testing summary</title></head><body>\n";
 
-foreach my $withdetail (0,1) {
-	if (! $withdetail) {
-		print "<h1>udeb testing summary</h1>\n";
-	}
-	else {
-		print "<h1>details</h1>\n";
-	}
+print "<h1>udeb testing summary</h1>\n";
 	
-	print "<table border=1><tr align=left><th>package</th><th>notes</th><th>arches</th>";
-	foreach my $dist (@dists) {
-		print "<th>$dist</th>";
-	}
-	print "<th>age (days)</th></tr>\n";
-	my $numcols=4 + @dists;
-	
-	foreach my $package (sort keys %seenpackages) {
-		foreach my $transition (keys %{$transitions{$package}}) {
-			print "<tr><td><a href=\"http://bjorn.haxx.se/debian/testing.pl?package=$package\">$package</a></td><td></td>";
-			print "<td>".archname(@{$transitions{$package}{$transition}})."</td>";
-			my $some_arch=@{$transitions{$package}{$transition}}[0];
-			my @vers;
-			foreach my $dist (@dists) {
-				my $version=$packageversions{$package}{$dist}{$some_arch};
-				if (! defined $version) {
-					$version="-";
-					push @vers, '';
-				}
-				else {
-					push @vers, $version;
-				}
-				if ($dist eq $dists[-1]) {
-					if ($withdetail) {
-						print "<td><a name=\"$transition\"><a href=\"#nochangelog $transition\">$version</a>";
-					}
-					else {
-						print "<td><a name=\"nochangelog $transition\" href=\"#$transition\">$version</a>";
-					}
-				}
-				else {
-					print "<td>$version</td>";
-				}
+print "<table border=1><tr align=left><th>package</th><th>notes</th><th>arches</th>";
+foreach my $dist (@dists) {
+	print "<th>$dist</th>";
+}
+print "<th>age (days)</th></tr>\n";
+my $numcols=4 + @dists;
+
+foreach my $package (sort keys %seenpackages) {
+	foreach my $transition (keys %{$transitions{$package}}) {
+		print "<tr><td><a href=\"http://bjorn.haxx.se/debian/testing.pl?package=$package\">$package</a></td><td></td>";
+		print "<td>".archname(@{$transitions{$package}{$transition}})."</td>";
+		my $some_arch=@{$transitions{$package}{$transition}}[0];
+		my @vers;
+		foreach my $dist (@dists) {
+			my $version=$packageversions{$package}{$dist}{$some_arch};
+			if (! defined $version) {
+				$version="-";
+				push @vers, '';
 			}
-			# Looking at the file modification date may not be
-			# safe. FIXME
-			my $minage;
-			foreach my $file (@{$poolfiles{$package}{$some_arch}}) {
-				my $age=-M $mirror.$file;
-				if (defined $age && (! defined $minage || $minage > $age)) {
-					$minage=$age;
-				}
+			else {
+				push @vers, $version;
 			}
-			if (! defined $minage) {
-				$minage="unknown";
+			print "<td>$version</td>";
+		}
+		# Looking at the file modification date may not be
+		# safe. FIXME
+		my $minage;
+		foreach my $file (@{$poolfiles{$package}{$some_arch}}) {
+			my $age=-M $mirror.$file;
+			if (defined $age && (! defined $minage || $minage > $age)) {
+				$minage=$age;
 			}
-			print "<td>".int($minage)."</td></tr>\n";
+		}
+		if (! defined $minage) {
+			$minage="unknown";
+		}
+		print "<td>".int($minage)."</td></tr>\n";
 			
-			foreach my $ann (@annotations) {
-				if ($package eq $ann->{package} && 
-				    (! exists $ann->{version} || between_versions($ann->{version}, $vers[0], $vers[1])) &&
-				    ($withdetail || ! exists $ann->{detail}) &&
-				    (! exists $ann->{arch} || grep $ann->{arch}, @{$transitions{$package}{$transition}}[0])) {
-					print "<tr><td></td><td colspan=".($numcols-1)."><b>$ann->{annotation}</b>";
-					if (exists $ann->{user}) {
-						print " <i>-- $ann->{user}</i>";
-					}
-					if (exists $ann->{version} && older_version($ann->{version}, $vers[1])) {
-						print " (re an older version)";
-					}
-					print "</td></tr>\n";
+		foreach my $ann (@annotations) {
+			if ($package eq $ann->{package} && 
+			    (! exists $ann->{version} || between_versions($ann->{version}, $vers[0], $vers[1])) &&
+			    (! exists $ann->{arch} || grep $ann->{arch}, @{$transitions{$package}{$transition}}[0])) {
+				print "<tr><td></td><td colspan=".($numcols-1)."><b>$ann->{annotation}</b>";
+				if (exists $ann->{user}) {
+				print " <i>-- $ann->{user}</i>";
 				}
-			}
-			
-			if ($withdetail && length $vers[0] && length $vers[1]) {
-				my $ch_a=changelogfile($package, $vers[0]);
-				my $ch_b=changelogfile($package, $vers[1]);
-				my $changelog=`diff -U 0 $ch_a $ch_b 2>&1`;
-				$changelog=~s/^\+\+\+.*\n//mg;
-				$changelog=~s/^\-\-\-.*\n//mg;
-				$changelog=~s/^\@\@.*\n//mg;
-				$changelog=~s/^\+//mg;
-				$changelog=~s/^ --.*\n//mg;
-				$changelog=~s/^\n//mg;
-				$changelog=markup($changelog);
-				print "<tr><td></td><td colspan=".($numcols-1)."><pre>$changelog</pre></td></tr>\n";
+				if (exists $ann->{version} && older_version($ann->{version}, $vers[1])) {
+					print " (re an older version)";
+				}
+				print "</td></tr>\n";
 			}
 		}
 	}
-	
-	print "</table><hr>\n";
 }
+	
+print "</table><hr>\n";
 
 my $date=`LANG=C TZ=GMT date`;
 chomp $date;
