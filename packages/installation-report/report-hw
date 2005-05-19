@@ -11,8 +11,7 @@ addinfo () {
 uname -a 2>&1 | addinfo "umame -a"
 discover -f "%m;%S;%D;%V;%M;%d\n" all | addinfo "discover" || true
 
-# d-i has no which, and debian has no search-path; feh.
-if lspci >/dev/null; then
+if type lspci >/dev/null 2>&1; then
 	lspci -v -t 2>&1 | addinfo "lspci -v -t"
 	lspci -n 2>&1 | addinfo "lspci -n"
 	lspci -v 2>&1 | addinfo "lspci -v"
