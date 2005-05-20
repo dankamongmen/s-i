@@ -218,6 +218,13 @@ db_progress INFO yaboot-installer/os-probing
 
 os-prober >/tmp/os-probed || true
 
+if [ -s /tmp/os-probed ]; then
+    # Other operating systems are installed, so use a longer timeout.
+    timeout=100
+else
+    timeout=50
+fi
+
 extraglobals=/tmp/yaboot.conf.extraglobals
 rm -f "$extraglobals"
 extraimages=/tmp/yaboot.conf.extraimages
@@ -397,7 +404,7 @@ writeyabootconf <<EOF
 device=$ofpath
 partition=$partnr
 root=$root
-timeout=100
+timeout=$timeout
 install=$yaboot_location
 magicboot=/usr/lib/yaboot/ofboot
 enablecdboot
