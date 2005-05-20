@@ -131,6 +131,9 @@ if [ -z "$PARTITIONS" ]; then
 	chrp|chrp_rs6k)
 	    PARTED_FLAGS='prep prep-boot'
 	    ;;
+	chrp_pegasos)
+	    PARTED_FLAGS=
+	    ;;
 	*)
 	    error 'unknown subarchitecture; allowing any bootable partition'
 	    PARTED_FLAGS='boot'
@@ -148,29 +151,36 @@ if [ -z "$PARTITIONS" ]; then
 	    fi
 	done
     done
-    info "guessed bootstrap partitions: $PARTITIONS"
-    info "guessed default bootstrap partition: $DEFAULT"
+    if [ "$PARTED_FLAGS" ]; then
+	info "guessed bootstrap partitions: $PARTITIONS"
+	info "guessed default bootstrap partition: $DEFAULT"
+    fi
 fi
 
-if [ -z "$PARTITIONS" ]; then
+if [ "$PARTED_FLAGS" ] && [ -z "$PARTITIONS" ]; then
     # error: no viable boot partitions found; fall over
     die yaboot-installer/nopart 'No bootstrap partitions found'
 fi
 
-db_subst yaboot-installer/bootdev DEVICES "$PARTITIONS"
-db_set yaboot-installer/bootdev "$DEFAULT"
-db_input "$bootdev_priority" yaboot-installer/bootdev || [ $? -eq 30 ]
-if ! db_go; then
-    db_progress STOP
-    exit 10 # back up to menu
-fi
+if [ "$PARTITIONS" ]; then
+    db_subst yaboot-installer/bootdev DEVICES "$PARTITIONS"
+    db_set yaboot-installer/bootdev "$DEFAULT"
+    db_input "$bootdev_priority" yaboot-installer/bootdev || [ $? -eq 30 ]
+    if ! db_go; then
+	db_progress STOP
+	exit 10 # back up to menu
+    fi
 
-db_get yaboot-installer/bootdev
-if [ "$RET" = false ]; then
-    die yaboot-installer/nopart 'No bootstrap partition selected (?)'
+    db_get yaboot-installer/bootdev
+    if [ "$RET" = false ]; then
+	die yaboot-installer/nopart 'No bootstrap partition selected (?)'
+    fi
+    # already devfs-mapped
+    boot="$RET"
+else
+    # no bootstrap partition on Pegasos
+    boot=
 fi
-# already devfs-mapped
-boot="$RET"
 
 # Find the root partition
 
@@ -223,6 +233,7 @@ writeimages() {
 
 # Get the Open Firmware path for a device. Requires non-devfs syntax.
 map_of_path() {
+    # TODO: look for shorter name using OF aliases?
     chroot /target ofpath "$1" || return 1
 }
 
@@ -313,6 +324,10 @@ root="`mapdevfs "$rootdev"`"
 slashboot="`mapdevfs "$slashbootdev"`"
 
 partnr="`printf %s "$slashboot" | sed 's/[^0-9]*\([0-9]\)/\1/'`"
+if [ "$SUBARCH" = chrp_pegasos ]; then
+    # Pegasos OF starts counting at 0.
+    partnr="$(($partnr - 1))"
+fi
 disk="`printf %s "$slashboot" | sed 's/[0-9].*//'`"
 
 ofpath="$(map_of_path "$disk" || true)"
@@ -340,6 +355,16 @@ fi
 # Work out user parameters.
 user_params="$(echo $(user-params))" || true
 
+if [ "$SUBARCH" = chrp_pegasos ]; then
+    # Create a /boot/yaboot symlink, and get yaboot to maintain it for us.
+    # TODO: a symlink is suboptimal because it doesn't work if /boot != /.
+    # mkofboot should probably be changed to take a copy instead.
+    ln -sf /usr/lib/yaboot/yaboot /target/boot/yaboot
+    yaboot_location=/boot/yaboot
+else
+    yaboot_location=/usr/lib/yaboot/yaboot
+fi
+
 # we generate our own yaboot.conf kernel (yabootconfig is horribly broken)
 # cjwatson: a little more justification of that would have been nice ...
 # but it does seem clear that yabootconfig isn't flexible enough for our
@@ -360,12 +385,20 @@ writeyabootconf <<EOF
 ## For a dual-boot menu, add one or more of:
 ## bsd=/dev/hdaX, macos=/dev/hdaY, macosx=/dev/hdaZ
 
+EOF
+
+if [ "$boot" ]; then
+    writeyabootconf <<EOF
 boot=$boot
+EOF
+fi
+
+writeyabootconf <<EOF
 device=$ofpath
 partition=$partnr
 root=$root
 timeout=100
-install=/usr/lib/yaboot/yaboot
+install=$yaboot_location
 magicboot=/usr/lib/yaboot/ofboot
 enablecdboot
 EOF
@@ -418,8 +451,20 @@ fi
 db_progress STEP 1
 db_progress INFO yaboot-installer/ybin
 
-chroot /target mkofboot -v -f || \
-    die yaboot-installer/ybinerr "mkofboot failed with exit status $?"
+if [ "$SUBARCH" = chrp_pegasos ]; then
+    if [ "$slashboot" = "$root" ]; then
+	yabootpath=boot/yaboot
+    else
+	yabootpath=yaboot
+    fi
+    db_subst yaboot-installer/of_pegasos OF_BOOT_DEVICE "$ofpath$partnr"
+    db_subst yaboot-installer/of_pegasos OF_BOOT_FILE "$yabootpath"
+    db_subst yaboot-installer/of_pegasos BOOT "boot $ofpath$partnr $yabootpath"
+    db_input high yaboot-installer/of_pegasos || true
+else
+    chroot /target mkofboot -v -f || \
+	die yaboot-installer/ybinerr "mkofboot failed with exit status $?"
+fi
 
 # Done!
 

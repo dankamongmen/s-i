@@ -13,6 +13,17 @@ yaboot-installer (1.0.4) UNRELEASED; urgency=low
       to the third console or /var/log/messages.
     - Add a yaboot-installer/skip template, to let automated installs force
       use of nobootloader.
+    - Preliminary changes to support Pegasos. Somewhat hackish in places,
+      and some known not-too-serious bugs. Requires Open Firmware version
+      2005.03.10-beta or later, so I haven't yet added chrp_pegasos to
+      XB-Subarchitecture. On Pegasos:
+      + Don't bother looking for a bootable partition or adding a boot= line
+        to yaboot.conf.
+      + Subtract one from partition numbers; Pegasos OF apparently reports
+        them differently from Apple's.
+      + Create a /boot/yaboot -> /usr/lib/yaboot/yaboot symlink. It would
+        probably be better to get mkofboot to take a copy instead.
+      + Avoid calling mkofboot.
 
  -- Matt Kraai <kraai@debian.org>  Mon, 14 Feb 2005 03:51:51 -0800
 

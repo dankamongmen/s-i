@@ -93,6 +93,28 @@ _Description: Failed to mount /target/proc
  .
  Warning: Your system may be unbootable!
 
+Template: yaboot-installer/of_pegasos
+Type: note
+_Description: Setting firmware variables for automatic boot
+ Some variables need to be set in the Pegasos OpenFirmware in order for your
+ system to boot automatically.  At the end of the installation, the system
+ will reboot.  At the Pegasos OpenFirmware prompt, set the following
+ OpenFirmware variables to enable auto-booting:
+ .
+  setenv boot-device ${OF_BOOT_DEVICE}
+  setenv boot-file ${OF_BOOT_FILE}
+  setenv auto-boot-timeout 5000
+  setenv auto-boot? true
+ .
+ You will only need to do this once.  Afterwards, enter the "boot" command
+ or reboot the system to proceed to the next stage of the installation.
+ .
+ Alternatively, you will be able to boot the system manually by entering:
+ .
+  ${BOOT}
+ .
+ at the OpenFirmware prompt.
+
 Template: debian-installer/yaboot-installer/title
 Type: text
 #  Main menu item
