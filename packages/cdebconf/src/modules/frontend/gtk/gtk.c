@@ -1332,22 +1332,14 @@ static int gtk_go(struct frontend *obj)
         q = q->next;    	
     }
 
-    /* the "back button" will be shown only if there is more than one
-     * question to show (if there is just one question the user must click
-     * in the left menu)
-     */
-
-#if 0
-    if (number_of_questions > 1 && obj->methods.can_go_back(obj, q))
+  
+    if ( obj->methods.can_go_back(obj, q) )
         gtk_widget_set_sensitive (data->button_prev, TRUE);
     else
         gtk_widget_set_sensitive (data->button_prev, FALSE);
 
-    if (number_of_questions > 1)
-        gtk_widget_set_sensitive(GTK_WIDGET(data->button_next), TRUE); 
-    else
-        gtk_widget_set_sensitive(GTK_WIDGET(data->button_next), FALSE);
-#endif
+    gtk_widget_set_sensitive(GTK_WIDGET(data->button_next), TRUE);
+     
     gtk_widget_show_all(data->window);    
    
     gtk_main();
