@@ -497,12 +497,27 @@ const char *subarch_get (void)
 	static char *subarch = NULL;
 
 	if (!subarch) {
-		struct debconfclient *client = mydebconf_get();
+        	FILE *a; 
+	        char buf[255], *end;
 
-		if (debconf_get (client, "debian-installer/kernel/subarchitecture"))
-			subarch = strdup("");
-		else
-			subarch = strdup(client->value);
+		if (! (a = popen("./archdetect", "r"))) {
+			return subarch=strdup("");
+		}
+		if (! fgets(buf, sizeof(buf), a)) {
+			pclose(a);
+			return subarch=strdup("");
+		}
+		pclose(a);
+		subarch = strdup(buf);
+
+		if (! (subarch=strchr(subarch, '/'))) {
+			return subarch=strdup("");
+		}
+		subarch++;
+
+		if ((end = strchr(subarch, '\n'))) {
+			end[0] = '\0';
+		}
 	}
 	return subarch;
 }

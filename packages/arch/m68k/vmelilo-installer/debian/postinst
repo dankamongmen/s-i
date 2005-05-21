@@ -58,11 +58,11 @@ EOF
 
 write_bootblock () {
 
-    case $SUBARCH in
-	bvme6000)
+    case $ARCH in
+	m68k/bvme6000)
             vmearch=bvme
             ;;
-	mvme16x|mvme147)
+	m68k/mvme16x|m68k/mvme147)
             vmearch=mvme
             ;;
     esac
@@ -75,9 +75,8 @@ write_bootblock () {
 
 db_progress START 0 4 vmelilo-installer/progress
 
-db_get debian-installer/kernel/subarchitecture
-SUBARCH="$RET"
-info "subarchitecture: $SUBARCH"
+ARCH="$(archdetect)"
+info "architecture: $ARCH"
 
 db_progress INFO vmelilo-installer/apt-install
 

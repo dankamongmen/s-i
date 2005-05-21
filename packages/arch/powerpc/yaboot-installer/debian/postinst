@@ -78,9 +78,8 @@ fi
 db_progress STEP 1
 db_progress INFO yaboot-installer/part
 
-db_get debian-installer/kernel/subarchitecture
-SUBARCH="$RET"
-info "subarchitecture: $SUBARCH"
+ARCH="$(archdetect)"
+info "architecture: $ARCH"
 
 # Telling parted to create an Apple_Bootstrap partition doesn't work as well
 # as we might like: parted's probe function isn't intelligent enough to know
@@ -97,7 +96,7 @@ PARTITIONS=
 DEFAULT=
 bootdev_priority=critical
 
-if [ "$SUBARCH" = powermac_newworld ] && \
+if [ "$ARCH" = powerpc/powermac_newworld ] && \
    db_get partman-newworld/boot_partitions && [ "$RET" ]; then
     OLDIFS="$IFS"
     IFS=,
@@ -124,14 +123,14 @@ if [ "$SUBARCH" = powermac_newworld ] && \
 fi
 
 if [ -z "$PARTITIONS" ]; then
-    case $SUBARCH in
-	powermac_newworld)
+    case $ARCH in
+	powerpc/powermac_newworld)
 	    PARTED_FLAGS='boot'
 	    ;;
-	chrp|chrp_rs6k)
+	powerpc/chrp|powerpc/chrp_rs6k)
 	    PARTED_FLAGS='prep prep-boot'
 	    ;;
-	chrp_pegasos)
+	powerpc/chrp_pegasos)
 	    PARTED_FLAGS=
 	    ;;
 	*)
@@ -331,7 +330,7 @@ root="`mapdevfs "$rootdev"`"
 slashboot="`mapdevfs "$slashbootdev"`"
 
 partnr="`printf %s "$slashboot" | sed 's/[^0-9]*\([0-9]\)/\1/'`"
-if [ "$SUBARCH" = chrp_pegasos ]; then
+if [ "$ARCH" = powerpc/chrp_pegasos ]; then
     # Pegasos OF starts counting at 0.
     partnr="$(($partnr - 1))"
 fi
@@ -362,7 +361,7 @@ fi
 # Work out user parameters.
 user_params="$(echo $(user-params))" || true
 
-if [ "$SUBARCH" = chrp_pegasos ]; then
+if [ "$ARCH" = powerpc/chrp_pegasos ]; then
     # Create a /boot/yaboot symlink, and get yaboot to maintain it for us.
     # TODO: a symlink is suboptimal because it doesn't work if /boot != /.
     # mkofboot should probably be changed to take a copy instead.
@@ -458,7 +457,7 @@ fi
 db_progress STEP 1
 db_progress INFO yaboot-installer/ybin
 
-if [ "$SUBARCH" = chrp_pegasos ]; then
+if [ "$ARCH" = powerpc/chrp_pegasos ]; then
     if [ "$slashboot" = "$root" ]; then
 	yabootpath=boot/yaboot
     else

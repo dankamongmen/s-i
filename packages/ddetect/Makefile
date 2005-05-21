@@ -15,13 +15,12 @@ pbcdir=$(DESTDIR)/usr/lib/prebaseconfig.d
 INSTALL=install
 INSTALL_DATA = ${INSTALL} -m 644
 
-all: archdetect archdetect-deb
+all: archdetect
 
 clean:
 	rm -f *~
 	rm -f *.o
 	rm -f archdetect
-	rm -f archdetect-deb
 
 install: install-hw-detect install-ethdetect install-archdetect install-archdetect-deb
 
@@ -49,9 +48,9 @@ install-archdetect: archdetect
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) archdetect $(bindir)
 
-install-archdetect-deb: archdetect-deb
+install-archdetect-deb: archdetect
 	$(INSTALL) -d $(bindir)
-	$(INSTALL) archdetect-deb $(bindir)
+	$(INSTALL) archdetect $(bindir)
 
 ARCHDETECT_TYPE_FILE = archdetect-$(DEB_HOST_GNU_TYPE)
 
@@ -60,11 +59,8 @@ ARCHDETECT_TYPE_FILE = archdetect-generic
 endif
 
 archdetect: $(ARCHDETECT_TYPE_FILE).o archdetect.o 
-	${CC} ${LDFLAGS} -o $@ $^ -ldebconfclient
-
-archdetect-deb: $(ARCHDETECT_TYPE_FILE).o archdetect-deb.o 
 	${CC} ${LDFLAGS} -o $@ $^
 
-archdetect.o archdetect-deb.o: %.o:%.c
+archdetect.o: %.o:%.c
 	$(CC) $(CFLAGS) $(CFLAGS_ARCH) -c $<
 

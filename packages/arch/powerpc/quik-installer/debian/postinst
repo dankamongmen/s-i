@@ -182,13 +182,12 @@ fi
 db_progress STEP 1
 db_progress INFO quik-installer/progress/install
 
-db_get debian-installer/kernel/subarchitecture
-SUBARCH="$RET"
-info "subarchitecture: $SUBARCH"
+ARCH="$(archdetect)"
+info "architecture: $ARCH"
 
 # Warn that the system may not be bootable after this.
-case $SUBARCH in
-    powermac_oldworld)
+case $ARCH in
+    powerpc/powermac_oldworld)
 	WARNING_TEMPLATE=quik-installer/oldworld_warning
 	;;
     *)
@@ -208,7 +207,7 @@ chroot /target quik -v -f || \
 db_progress STEP 1
 db_progress INFO quik-installer/progress/openfirmware
 
-if [ "$SUBARCH" = powermac_oldworld ]; then
+if [ "$ARCH" = powerpc/powermac_oldworld ]; then
     ofpath="`chroot /target ofpath "$disk"`"
     info "ofpath $disk: $ofpath"
     chroot /target nvsetenv boot-device "${ofpath}0" || \

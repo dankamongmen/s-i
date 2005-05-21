@@ -52,15 +52,14 @@ die() {
 db_progress STEP 1
 db_progress INFO prep-installer/part
 
-db_get debian-installer/kernel/subarchitecture
-SUBARCH="$RET"
-info "subarchitecture: $SUBARCH"
+ARCH="$(archdetect)"
+info "architecture: $ARCH"
 
 PARTITIONS=
 DEFAULT=
 bootdev_priority=critical
 
-if ([ "$SUBARCH" = prep ] || [ "$SUBARCH" = chrp_rs6k ]) && \
+if ([ "$ARCH" = powerpc/prep ] || [ "$ARCH" = powerpc/chrp_rs6k ]) && \
 	db_get partman-prep/boot_partitions && [ "$RET" ]; then
     for part in $RET; do
 	if [ -z "$PARTITIONS" ]; then
