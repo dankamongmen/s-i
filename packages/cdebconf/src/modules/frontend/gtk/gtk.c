@@ -108,7 +108,7 @@ void free_description_data( GtkObject *obj, struct frontend_question_data* data 
 }
 
 /* If the user decides to "jump" we should always give him a first chance to
- * get back, jump saving the data he entered or jump discarding changes;
+ * go back, to jump saving the data he entered or to jump discarding changes;
  * actually the first option is still unimplemented because i don't know how
  * to properly SETUP the signal handling needed to close the dialog window
  * without quitting the gtk_main()
@@ -138,7 +138,8 @@ gboolean jump_confirmation (GtkWidget *widget, struct frontend_question_data* da
                                           /* GTK_RESPONSE_REJECT, */
                                           NULL);
 
-    label = gtk_label_new ("Do tou want to save your changes before quitting?");
+	/* The following string should be more explicative and should be localized too */
+    label = gtk_label_new ("Do tou want to save your changes before jumping?");
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
     gtk_widget_show_all (dialog);
     result = gtk_dialog_run ( GTK_DIALOG(dialog) );
@@ -408,7 +409,10 @@ void exit_button_callback(GtkWidget *button, struct frontend* obj)
 }
 
 
-/* this is the callback that manages the jump mechanism */
+/* this callback function is called by gtkhandler_select_single_jump() only
+ * and schedules the jump by copying in fe_data->jump_target the tag
+ * of the question the user wants to jump to
+ */
 void jump_callback(GtkWidget *button, struct frontend_question_data* data)
 {
     struct frontend *obj = data->obj;
@@ -444,24 +448,24 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
                     /* the user wants to save the changes made up to that
                      * point and then do the jump
                      */ 
-                    /* strcpy(fe_data->jump_target, gtk_button_get_label(GTK_BUTTON(button)) ); */
                     INFO(INFO_DEBUG, "jump programmed, modifications confirmed, target: \"%s\"", fe_data->jump_target);
                     ((struct frontend_data*)obj->data)->button_val = DC_OK;
-
-                    /* gtk_main_quit(); */
                     break;
+
                 case GTK_RESPONSE_NO:
                     /* the user wants to forget the changes made up to that
                      * point and then do the jump
                      */ 
-                    /* strcpy(fe_data->jump_target,choices[tindex[i]]); */
                     INFO(INFO_DEBUG, "jump programmed, modifications canceled, target: \"%s\"", fe_data->jump_target);
                     ((struct frontend_data*)obj->data)->button_val = DC_GOBACK;
-
-                    /* gtk_main_quit(); */
                     break;
+
                 default:
-                    /* this is also the case GTK_RESPONSE_REJECT */
+                    /* The user changed his mind and wants to cancel the jump. 
+                     * This is also the case GTK_RESPONSE_REJECT but until
+                     * the "cancel the jump" option works program control will
+                     * never reach this point
+                     */
                     INFO(INFO_DEBUG, "jump to %s canceled", fe_data->jump_target);
                     break;
             }
@@ -518,7 +522,6 @@ gtkhandler_boolean_single(struct frontend *obj, struct question *q,
 {
     GtkWidget *hbox;
     GtkWidget *check_button;
-    GtkWidget *help_button;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 
@@ -533,14 +536,6 @@ gtkhandler_boolean_single(struct frontend *obj, struct question *q,
 
     check_button = gtk_check_button_new_with_label (q_get_description (q));
     g_signal_connect (G_OBJECT(check_button), "toggled", G_CALLBACK(check_toggled_callback), q);
-
-    /* since help is now shown inside a text area this should no longer be
-     * necessary
-     *
-     * help_button = create_help_button (data);
-     * gtk_box_pack_start (GTK_BOX(hbox), help_button, FALSE, FALSE, 3);
-     *                     gtk_box_pack_start(GTK_BOX(check_container), check, FALSE, FALSE, 0);
-     */
     g_signal_connect (G_OBJECT(check_button), "enter", G_CALLBACK (show_description), data);
 
     gtk_box_pack_start (GTK_BOX(hbox), check_button, TRUE, TRUE, 5);
@@ -723,6 +718,13 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     return DC_OK;
 }
 
+/* This handler function is basically a copy of gtkhandler_select_single()
+ * and the only difference is that the callback function that manages
+ * the user click on a button is jump_callback() instead of
+ * button_single_callback(). Since the two handlers are almost identical
+ * they could be melted into an unique function by passing an additional
+ * input parameter that indicates what callback function should be used.
+ */
 static int gtkhandler_select_single_jump(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *frame, *button, *button_box;
@@ -761,11 +763,6 @@ static int gtkhandler_select_single_jump(struct frontend *obj, struct question *
         gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
         g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (jump_callback), data);
 
-        /* the following lines of code were previously introduced to give
-         * the user help about the main-menu, but since the help is just a
-         * "This is the main menu for the debian installer" I don't think
-         * this can be useful
-         */
         g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data);
         /* g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (clear_description), data); */
 
@@ -826,7 +823,7 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
         /* the following lines of code were previously introduced to give
          * the user help about the main-menu, but since the help is just a
          * "This is the main menu for the debian installer" I don't think
-         * this can be useful
+         * if this can be useful
          */
         g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data);
         /* g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (clear_description), data); */
@@ -894,7 +891,9 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     gtk_combo_set_value_in_list (GTK_COMBO (combo), TRUE, FALSE);
 
     /* this is just a dirty hack to prevent the description of the
-     * disk-partitioner, which is very long, from trashing the screen
+     * disk-partitioner, which is very long, from trashing the screen.
+     * A textarea is used as a label to the question frame to
+     * wrap long lines of text.
      */
     view = gtk_text_view_new ();
 
@@ -935,8 +934,8 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     /* actually the gtkhandler_select_single is used to display the main
-     * menu only and is called directly, so any select questions will use
-     * gtkhandler_select_multiple
+     * menu only and is called directly, so any other SELECT question 
+     * will be handled by gtkhandler_select_multiple
      */	
 
 #if 0
@@ -1108,7 +1107,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_box_pack_start(GTK_BOX (infobox), frame, TRUE, TRUE, 5);
 
     /* A progress bar is created here; it will probably be removed from here
-     * in the future and placed somewhere else
+     * in the future and placed somewhere else (maybe inside a popup window?)
      */
     obj->progress_title = NULL;
     obj->progress_min = 0;
@@ -1163,6 +1162,9 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
      */
     fe_data = obj->data;
     strcpy(fe_data->jump_target, "");
+    /* the number_of_questions variable is no longer used, i think
+     * it could be removed unless it is useful for something
+     */
     fe_data->number_of_questions = 0;
     fe_data->q_main = NULL;
 
@@ -1191,10 +1193,14 @@ static int gtk_go(struct frontend *obj)
     int i, j, number_of_questions=0;
     int ret;
 
-    /* this string is used to identify which question is the main menu
-     * (usually this is "debian/main-menu")
+    /* this string is used to identify the main menu question
+     * (usually this is "debian-installer/main-menu" for the debian installer
+     * and "test/select" can be used with the testscripts that come with 
+     * cdebconf sources)
+     * Here we also assume that the main menu is always a SELECT question
      */
-    const char *main_menu_tag = "test/select";
+    //const char *main_menu_tag = "test/select";
+    const char *main_menu_tag = "debian-installer/main-menu";
 
     if (q == NULL) return DC_OK;
 
@@ -1209,20 +1215,26 @@ static int gtk_go(struct frontend *obj)
         INFO(INFO_DEBUG, "gtk_go() main question \"%s\" stored in memory", main_menu_tag);
     }
 
-    /* this piece of code implements the "jump" mechanism */
+    /* this piece of code implements the "jump" mechanism: if the "jump_target"
+     * string is not empty it means that a jump was previously programmed
+     * to be executed: we must tell cdebconf to go back until we reach the main menu,
+     * only then the "jump" can be performed
+     */
     if (strcmp(data->jump_target, "") != 0)
     {
         if (strcmp(q->tag, main_menu_tag) == 0)
         {
-            /* the d-i has just told us to show the main menu; so we've just
-             * automatically backed-up to this step and now we can execute
-             * the jump
+            /* the d-i has eventually just told us to show the main menu: now
+             * the jump can be executed (basically we simulate the users's click
+             * on the programmed jump target)
              */
             INFO(INFO_DEBUG, "gtk_go() jumping to \"%s\"", data->jump_target);
             q = obj->questions;
             question_setvalue(q, data->jump_target);
             obj->qdb->methods.set(obj->qdb, q);
             q->next=NULL;
+            
+            /* once the jump is set we must reset the "jump_target" string */
             strcpy(data->jump_target,"");
 
             data->button_val = DC_OK;
@@ -1231,6 +1243,11 @@ static int gtk_go(struct frontend *obj)
         }
         else
         {
+        	/* A jump is awaiting to be executed but the frontend was told to
+        	 * display something other than the main-menu: we must tell cdebconf
+        	 * to go back until it tells the frontend to display the main-menu:
+        	 * only then the jump will be executed
+        	 */
             data->button_val = DC_GOBACK;
 
             INFO(INFO_DEBUG, "gtk_go() backing up to jump to \"%s\"", data->jump_target);
@@ -1244,16 +1261,13 @@ static int gtk_go(struct frontend *obj)
     menubox = gtk_vbox_new(FALSE, 5);
     questionbox = gtk_vbox_new(FALSE, 5);
 
-    /* INFO(INFO_DEBUG, "pack di menubox iniziato"); */
     gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
-    /* INFO(INFO_DEBUG, "pack di menubox terminato"); */
 
-    /* INFO(INFO_DEBUG, "pack di questionbox iniziato"); */
     gtk_box_pack_start(GTK_BOX(data->target_box), questionbox, FALSE, FALSE, 5);
-    /* INFO(INFO_DEBUG, "pack di questionbox terminato"); */
 
-    /* We should always show the main menu, even if the frontend doesn't
-     * pass it as a question
+    /* The frontend should always display the main-menu to the user to allow
+     * him to jump from a step of the installation to another (even if debconf
+     * doesn't tell the frontend to display it)
      */
     q = obj->questions;
     if (strcmp (q->tag, main_menu_tag) == 0)
