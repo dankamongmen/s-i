@@ -448,16 +448,18 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
                     /* the user wants to save the changes made up to that
                      * point and then do the jump
                      */ 
-                    syslog(LOG_DEBUG, "GTK_DI - jump programmed, modifications confirmed, target: \"%s\"", fe_data->jump_target);
+                    strcpy(fe_data->jump_target,choices[tindex[i]]);
                     ((struct frontend_data*)obj->data)->button_val = DC_OK;
+                    syslog(LOG_DEBUG, "GTK_DI - jump programmed, modifications confirmed, target: \"%s\"", fe_data->jump_target);
                     break;
 
                 case GTK_RESPONSE_NO:
                     /* the user wants to forget the changes made up to that
                      * point and then do the jump
                      */ 
-                    syslog(LOG_DEBUG, "GTK_DI - jump programmed, modifications canceled, target: \"%s\"", fe_data->jump_target);
+                    strcpy(fe_data->jump_target,choices[tindex[i]]);
                     ((struct frontend_data*)obj->data)->button_val = DC_GOBACK;
+                    syslog(LOG_DEBUG, "GTK_DI - jump programmed, modifications canceled, target: \"%s\"", fe_data->jump_target);
                     break;
 
                 default:
@@ -466,11 +468,9 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
                      * the "cancel the jump" option works program control will
                      * never reach this point
                      */
-                    syslog(LOG_DEBUG, "GTK_DI - jump to %s canceled", fe_data->jump_target);
+                    syslog(LOG_DEBUG, "GTK_DI - jump canceled");
                     break;
             }
-            syslog(LOG_DEBUG, "GTK_DI - jump programmed to %s", choices[tindex[i]]);
-            strcpy(fe_data->jump_target,choices[tindex[i]]);
         }
         free(choices[tindex[i]]);
         free(choices_translated[i]);
@@ -479,7 +479,6 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
     free(choices);
     free(choices_translated);
     free(tindex);
-    /* ((struct frontend_data*)obj->data)->button_val = DC_OK; */
     free(data);
    
     if( (ret_val==GTK_RESPONSE_ACCEPT) | (ret_val==GTK_RESPONSE_NO) )
