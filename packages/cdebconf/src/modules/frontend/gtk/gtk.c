@@ -451,6 +451,14 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
         		ret_val=GTK_RESPONSE_ACCEPT;
 				INFO(INFO_DEBUG, "GTK_DI - jump programmed from text/note single question" );
         	}
+        	else if( strcmp(data->obj->questions->tag,"languagechooser/language-name")==0 )
+        	{
+        		/* This is just a temporary workaround to prevent the debian-installer from
+        		 * crashing when performing inter-language jumps.
+        		 */
+        		ret_val=GTK_RESPONSE_NO;
+				INFO(INFO_DEBUG, "GTK_DI - jump workaround to the inter language jump bug occourred" );
+        	}
         	else
         		{
 	            ret_val=jump_confirmation ( button, data);
