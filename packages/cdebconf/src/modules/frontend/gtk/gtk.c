@@ -439,9 +439,23 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
     for (i = 0; i < count; i++)
     {
         if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0) 
-        {
-            ret_val=jump_confirmation ( button, data);
-            /* INFO(INFO_DEBUG, "GTK_DI - jump confirmation return value: %d", ret_val); */
+        {	
+        	if( data->obj->questions->next==NULL && data->obj->questions->prev==NULL && ( (strcmp(data->obj->questions->template->type,"text")==0) | (strcmp(data->obj->questions->template->type,"note")==0) ) )
+        	{
+	        	/* If the client has passed to the frontend a single note/text question 
+	        	 * (like when the cdrom integrity has been successfully tested by the
+	        	 * cdrom checker) and then the user decides to jump there is no point
+	        	 * in asking him if he wants to save his changes since he could have made
+	        	 * no changes at all. 
+	        	 */
+        		ret_val=GTK_RESPONSE_ACCEPT;
+				INFO(INFO_DEBUG, "GTK_DI - jump programmed from text/note single question" );
+        	}
+        	else
+        		{
+	            ret_val=jump_confirmation ( button, data);
+	            /* INFO(INFO_DEBUG, "GTK_DI - jump confirmation return value: %d", ret_val); */
+	            }
             switch (ret_val)
             {
                 case GTK_RESPONSE_ACCEPT:
