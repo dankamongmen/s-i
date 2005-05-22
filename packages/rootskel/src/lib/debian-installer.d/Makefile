@@ -2,6 +2,10 @@ dir = lib/debian-installer.d
 
 DEB_HOST_GNU_CPU    ?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
 DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+# Take account of old dpkg-architecture output.
+DEB_HOST_GNU_SYSTEM := linux-gnu
+endif
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 files += \
@@ -9,7 +13,7 @@ files += \
 	S60frontend \
 	S72menu-exit
 
-ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
   ifneq ($(DEB_HOST_GNU_CPU),s390)
     files += \
 	S35framebuffer-linux

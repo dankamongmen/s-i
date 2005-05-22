@@ -2,6 +2,10 @@ dir = lib/debian-installer-startup.d
 
 DEB_HOST_GNU_CPU    ?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
 DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+# Take account of old dpkg-architecture output.
+DEB_HOST_GNU_SYSTEM := linux-gnu
+endif
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 
 files = \
@@ -13,7 +17,7 @@ files = \
 	S30read-environment \
 	S35term
 
-ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
   ifneq (,$(filter i386 x86_64,$(DEB_HOST_GNU_CPU)))
     files += \
 	S05acpi-linux-x86 \
