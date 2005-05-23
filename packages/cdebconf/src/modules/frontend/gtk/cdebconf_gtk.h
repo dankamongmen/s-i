@@ -37,6 +37,9 @@ struct frontend_data
 
   /* Pointer to the Progress Bar, when initialized */
   GtkWidget *progress_bar; 
+  
+  /* Pointer to the frame encapsulating the progressbar */
+  GtkWidget *progress_bar_frame;
 
   /* Struct to register the Set Functions of the Widgets */
   struct setter_struct *setters; 
