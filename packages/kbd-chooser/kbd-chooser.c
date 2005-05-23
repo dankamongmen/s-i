@@ -45,7 +45,7 @@ typedef enum {
 
 
 struct debconfclient *
-mydebconf_get (void) {
+mydebconf_client (void) {
 	static struct debconfclient *client = NULL;
 	if (client == NULL)
 		client = debconfclient_new ();
@@ -56,7 +56,7 @@ int
 mydebconf_ask (char *priority, char *template, char **result)
 {
 	int res;
-	struct debconfclient *client = mydebconf_get ();
+	struct debconfclient *client = mydebconf_client ();
 
 	debconf_input (client, priority, template);
 	res = debconf_go (client);
@@ -74,7 +74,7 @@ int
 mydebconf_default_set (char *template, char *value)
 {
 	int res = 0;
-	struct debconfclient *client = mydebconf_get ();
+	struct debconfclient *client = mydebconf_client ();
 	if ((res = debconf_get (client, template)))
 		return res;
 
@@ -132,7 +132,7 @@ grep (const char *file, const char *string)
 char *
 locale_get (void)
 {
-	struct debconfclient *client = mydebconf_get ();
+	struct debconfclient *client = mydebconf_client ();
 	// languagechooser sets locale of the form xx_YY
 	// NO encoding used.
 
@@ -461,7 +461,7 @@ translated_template_get(char *template)
 	int ret = 0;
 	static char *languages = NULL;
 	char *colon, *lang;
-	struct debconfclient *client = mydebconf_get();
+	struct debconfclient *client = mydebconf_client();
 	
 	if (!languages) {
 		 ret = debconf_get(client,"debian-installer/language");
@@ -599,7 +599,7 @@ sercon_state
 check_if_uml_console (void)
 {
 	sercon_state present = SERIAL_UNKNOWN;
-	struct debconfclient *client = mydebconf_get ();
+	struct debconfclient *client = mydebconf_client ();
 
 	if (grep("/proc/cpuinfo", "User Mode Linux") > 0)
 		present = SERIAL_PRESENT;
@@ -620,7 +620,7 @@ sercon_state
 check_if_serial_console (void)
 {
 	sercon_state present = SERIAL_UNKNOWN;
-	struct debconfclient *client = mydebconf_get ();
+	struct debconfclient *client = mydebconf_client ();
 	int fd;
 	struct serial_struct sr;
 	int rets, ret1, ret2, ret;
@@ -694,7 +694,7 @@ keyboard_select (void)
 	int choices = 0, first_entry = 1;
 	sercon_state sercon;
 	sercon_state umlcon;
-	struct debconfclient *client = mydebconf_get ();
+	struct debconfclient *client = mydebconf_client ();
 
 	/* k is returned by a method if it is preferred keyboard.
 	 * For 2.4 kernels, we just select one keyboard. 
@@ -810,7 +810,7 @@ main (int argc, char **argv)
 	struct debconfclient *client;
 
 	setlocale (LC_ALL, "");
-	client = mydebconf_get ();
+	client = mydebconf_client ();
 	di_system_init("kbd-chooser"); // enable syslog
 
 	if (argc == 2) { // keymap may be specified on command-line
