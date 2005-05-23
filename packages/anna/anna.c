@@ -357,7 +357,7 @@ char *subarch_get (void) {
         FILE *a; 
         char buf[255], *s, *end;
 
-        if (! (a = popen("./archdetect", "r"))) {
+        if (! (a = popen("archdetect", "r"))) {
                 return "generic";
         }
         if (! fgets(buf, sizeof(buf), a)) {
