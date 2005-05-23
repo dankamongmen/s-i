@@ -254,7 +254,7 @@ maplist_select (maplist_t * maplist)
 	// Pick the default
 	for (mp = maplist->maps ; mp != NULL ; mp  = mp->next)	{
 		score = locale_list_compare (mp->langs);
-		if (score > best)      	{
+		if (score > best) {
 			best = score;
 			preferred = mp;
 		}
