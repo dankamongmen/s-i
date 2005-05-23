@@ -500,7 +500,7 @@ const char *subarch_get (void)
         	FILE *a; 
 	        char buf[255], *end;
 
-		if (! (a = popen("./archdetect", "r"))) {
+		if (! (a = popen("archdetect", "r"))) {
 			return subarch=strdup("");
 		}
 		if (! fgets(buf, sizeof(buf), a)) {
