@@ -1,12 +1,18 @@
 dir = lib/debian-installer
 
-DEB_HOST_GNU_CPU    ?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
-DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
-ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+DEB_HOST_ARCH_CPU   := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null)
+DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
+
 # Take account of old dpkg-architecture output.
-DEB_HOST_GNU_SYSTEM := linux-gnu
+ifeq ($(DEB_HOST_ARCH_CPU),)
+  DEB_HOST_ARCH_CPU   := $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+  ifeq ($(DEB_HOST_ARCH_CPU),x86_64)
+    DEB_HOST_ARCH_CPU   := amd64
+  endif
 endif
-DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ifeq ($(DEB_HOST_ARCH_OS),)
+  DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+endif
 
 files_exec = \
 	coldplug \
@@ -15,8 +21,8 @@ files_exec = \
 	init-udev-devices \
 	menu
 
-ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
-  ifeq ($(DEB_HOST_GNU_CPU),s390)
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+  ifeq ($(DEB_HOST_ARCH_CPU),s390)
     files += \
 	detect-console:detect-console-linux-s390
   else

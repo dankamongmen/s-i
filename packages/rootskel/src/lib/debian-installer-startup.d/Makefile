@@ -1,12 +1,18 @@
 dir = lib/debian-installer-startup.d
 
-DEB_HOST_GNU_CPU    ?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
-DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
-ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+DEB_HOST_ARCH_CPU   := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null)
+DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
+
 # Take account of old dpkg-architecture output.
-DEB_HOST_GNU_SYSTEM := linux-gnu
+ifeq ($(DEB_HOST_ARCH_CPU),)
+  DEB_HOST_ARCH_CPU   := $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+  ifeq ($(DEB_HOST_ARCH_CPU),x86_64)
+    DEB_HOST_ARCH_CPU   := amd64
+  endif
 endif
-DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ifeq ($(DEB_HOST_ARCH_OS),)
+  DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+endif
 
 files = \
 	S01mount \
@@ -17,24 +23,24 @@ files = \
 	S30read-environment \
 	S35term
 
-ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
-  ifneq (,$(filter i386 x86_64,$(DEB_HOST_GNU_CPU)))
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+  ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S05acpi-linux-x86 \
 	S40framebuffer-module-linux-x86
    endif
 
-  ifeq ($(DEB_HOST_GNU_CPU),powerpc)
+  ifeq ($(DEB_HOST_ARCH_CPU),powerpc)
     files += \
 	S45keyboard-linux-powerpc
   endif
   
-  ifneq (,$(filter mips mipsel,$(DEB_HOST_GNU_CPU)))
+  ifneq (,$(filter mips mipsel,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S40framebuffer-module-linux-mips
    endif
 
-  ifneq (,$(filter alpha,$(DEB_HOST_GNU_CPU)))
+  ifneq (,$(filter alpha,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S40framebuffer-module-linux-alpha
    endif
