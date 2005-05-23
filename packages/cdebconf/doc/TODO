@@ -29,6 +29,26 @@ Short term:
   - Oracle
 * Better API documentation
 
+* GTK Frontend
+	- If the user jumps to the same main-menu item where he already is the frontend should cancel the jump, but how can we detect that the user is triyng to jump where he actually is and maybe prevent him from jumping?
+	The main menu button button corresponding to the installation step that is actually being configured could be disabled, but this would require us to be able to identify the last clicked main menu button / value passed after the users had clicked "Forward".
+	This could be done by storing the tag of the last launched configuration module (ex: "languagechooser/language-name") in a new field inside the frontend_data structure, but after the languagechooser's questions have been displayed by GO can i still find that tag inside any of the data structures passed to gtk_go()? the tag is needed to do comparations with each of the targets of the main menu buttons and disable the matching one.
+	Actually most qustion lists are composed by just one single question but if should ever happen to handle multiple-question lists then doing the comparation basing on the first question in the list tag would be not completly correct.
+	- The following one is a problem that is related to the jump from a question to another while switching between different languages.
+	If the user is working in italian, clicks on "Scegli la lingua/Choose language" and then selects "French - Francais" (just an example, it applies to any pair of different languages) , jumps to "Configura la rete" saving his changes then the string "Configura la rete" is stored inside "jump_target".
+	The frontend returns then DC_GOBACK to the client, the client passes the frontend a new main-menu question, this time in french as it should be, the frontend notices that a jump is waiting to be executed to "Configura la rete" but now the jump can no longer be executed since the corresponding main-menu option has been translated to "Configurer le reaseau".
+	We have so to find a different way to code the jump's target in the main menu: would it be a good idea to save the index of the choosed button in the main menu instead of its translated description?
+	Anyhow, as a temporary workaround to the problem, the saving of changes has been disabled in the case the user jumps from the languagechooser module.
+	-When the partitioning prorgam runs progress bar values are not handled correctly by gtk_progress_set() ( this bug is difficult to be reproduced and so fixed )
+	-A question's extended description (if not an ampty string ) should be displayed inside the help area as soon as the question is displayed in the actionbox and not only when the corresponding widget gets focus over it; if someday multiple questions should be displayed all at once what should we display in the text area? the focused question exended description or maybe a fixed text that concatenates the  extended descriptions of the whole question list?
+	-The main-menu tag thing is awfully hardcoded; we'd like to be able to use cdebconf outside the installer one day too. Could the plugin feature be used for this somehow? or maybe could we get that string from a shell exported varaible?
+	-The "Do you want to save your changes before jumping?" question inside jump_corfirmation() has to be localized 
+	-remove deprecated gtk functions with gtk+ replacements as recomended by gtk+ guidelines
+	-Allow every widget (not only multiselect, like now) to properly handle long question_descriptions that are used as a title for the sourrounding frame in the actionbox (we can both use textareas to wrap ong text in frame titles or simply cut-down long questions, like the installation program one )
+	-verify that gtk_init() input parameters, that are hand-created, are no cause of problems like segfaults
+	-Give the boxes fixed size (width and height) since actually boxes automatically shrink/expand to accomodate widgets of different size (a japanese or russian main-menu is twice large the english one!)
+	-make the "cancel" button in jump confirmation dialog work to allow the user to cancel a jump if he changes his mind
+
 Long term:
 * transactions
 * object locking
@@ -39,3 +59,14 @@ Long term:
   require a standalone server daemon that all clients talk to so that it
   can coordinate writes to the DB. This is also needed if we want to do
   caching so that clients are notified when their cache becomes stale.
+
+* GTK Frontend
+-Switch from XFree to Direct Framebuffer as soon as a stable GDK layer is ready
+	-clearly highlight the next step of the instalation to be configured ( bold text inside the button, bigger button , "->text<-" are possible options)
+	-chechmarks for every configured main menu item: after an installation step has been successifully completed a green check or simply an "ok" should be placed aside the corresponding main menu button to remember the unexperienced user about the steps already successfully completed 
+	-display the main menu with something different than buttons. The column of buttons is a bit crude for the main menu, and we must also consider that some translations make the strings inside buttons very long, so long that the main menu occupies half of the screen.
+	-The action area is left empty when only main menu is displayed: we should use it to give useful infos to the user, like displaying informations about the next step to be configured.
+	-while progress bar runs to take count of the progress of steps like the base system installation  the main-menu is not displayed (actualy gtk_progress_set is called but gtk_go is not): this is not a bug just a matter of graphical coherency with the others steps of the instalation process
+	-modify some debian-instaler components to get the best out of the gtk frontend without losing compatibility with newt-like frontends (ex: the network configuration tool could be modified to display questions as ip address, netmask, dns, gateway  (and localname and domainname too) togheter with a single GO.
+	-It might be a good idea to design for the possibility of having more than one progress bar. The cdebconf PROGRESS protocol doesn't support this yet, but it may do in the future, and it would be interesting to have a global progress bar indicating the progress of the whole installation (roughly, your position in the main menu) -> this seems difficult to be implemented (TEMPORARILY ABANDONED IDEA)
+	-disable main menu options that need previous steps to be completed: if the user has not yet installed the base system he should not be even allowed to click the "install bootloader" button (this could be diffcult to do, more or less the problems are the same as if we would insert a global progressbar) (TEMPORARILY ABANDONED IDEA)
