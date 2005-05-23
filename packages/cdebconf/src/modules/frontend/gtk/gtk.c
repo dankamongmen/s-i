@@ -1063,7 +1063,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     GtkWidget *menubox, *menubox_scroll;
     GtkWidget *actionbox, *infobox;
     GtkWidget *button_next, *button_prev;
-    GtkWidget *frame;
+    GtkWidget *info_frame, *progress_bar_frame;
     GtkWidget *view;
     GtkTextBuffer *buffer;
     GtkWidget *progress_bar;
@@ -1115,17 +1115,17 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
      */
     view = gtk_text_view_new ();
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-    gtk_text_buffer_set_text (buffer, "Hello, this is some text", -1);
+    gtk_text_buffer_set_text (buffer, "Here you can get help upon installing Debian/GNU Linux", -1);
     gtk_text_view_set_editable (GTK_TEXT_VIEW(view), FALSE);
     gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(view), FALSE);
     gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
     gtk_text_view_set_left_margin (GTK_TEXT_VIEW(view), 5);
     gtk_text_view_set_right_margin (GTK_TEXT_VIEW(view), 5);
     ((struct frontend_data*) obj->data)->info_box = view;
-    frame = gtk_frame_new("Description");
-    gtk_container_add(GTK_CONTAINER (frame), view);
+    info_frame = gtk_frame_new("Help box");
+    gtk_container_add(GTK_CONTAINER (info_frame), view);
     infobox = gtk_vbox_new (FALSE, 10);
-    gtk_box_pack_start(GTK_BOX (infobox), frame, TRUE, TRUE, 5);
+    gtk_box_pack_start(GTK_BOX (infobox), info_frame, TRUE, TRUE, 5);
 
     /* A progress bar is created here; it will probably be removed from here
      * in the future and placed somewhere else (maybe inside a popup window?)
@@ -1136,7 +1136,10 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     obj->progress_cur = 0;
     progress_bar = gtk_progress_bar_new ();
     ((struct frontend_data*)obj->data)->progress_bar = progress_bar;
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), "progressbar");
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " ");
+	progress_bar_frame = gtk_frame_new("Debian-Installer progressbar");
+    ((struct frontend_data*)obj->data)->progress_bar_frame = progress_bar_frame;
+    gtk_container_add(GTK_CONTAINER (progress_bar_frame), progress_bar);
 
     /* This is where the main-menu will be displayed, in the left-area of
      * the screen
@@ -1152,7 +1155,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     /* Final packaging */
     gtk_box_pack_start(GTK_BOX (mainbox), targetbox_scroll, TRUE, TRUE, 5);	
     gtk_box_pack_start(GTK_BOX (mainbox), infobox, FALSE, FALSE, 5);
-    gtk_box_pack_end(GTK_BOX (mainbox), progress_bar, FALSE, FALSE, 5);
+    gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_frame, FALSE, FALSE, 5);
 
     globalbox = gtk_hbox_new (FALSE, 10);
     gtk_box_pack_start(GTK_BOX (globalbox), menubox_scroll, TRUE, TRUE, 5);
@@ -1395,12 +1398,13 @@ static bool gtk_can_go_back(struct frontend *obj, struct question *q)
 
 static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
-    GtkWidget *progress_bar;
+    GtkWidget *progress_bar, *progress_bar_frame;
 
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
-    
+    progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
+    gtk_frame_set_label( progress_bar_frame , obj->progress_title );
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
@@ -1448,14 +1452,15 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 
 static void gtk_progress_stop(struct frontend *obj)
 {
-    GtkWidget *progress_bar;
+    GtkWidget *progress_bar, *progress_bar_frame;
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
-
+    progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
+    
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_stop() called");
     /* gtk_widget_destroy(gtk_widget_get_parent(((struct frontend_data*)obj->data)->progress_bar)); */
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0);
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " ");
-    gtk_widget_set_sensitive(GTK_WIDGET(progress_bar), FALSE);
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " " );
+	gtk_frame_set_label( progress_bar_frame , "Debian-Installer progressbar" );
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
     while (gtk_events_pending ())
         gtk_main_iteration ();
