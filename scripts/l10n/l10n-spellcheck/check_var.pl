@@ -19,18 +19,30 @@ sub getVars
         return join ('', @vars);
 }
 
+sub checkVars (@)
+{
+        my $msgid = shift;
+        my $var1 = getVars($msgid);
+        for (@_)
+        {
+                my $var2 = getVars($_);
+                return 0 if $var1 ne $var2;
+        }
+        return 1;
+}
+
 $/ = "\n\n";
 open (PO, "< $ARGV[0]") or die "Unable to open $ARGV[0]: $!\n";
 while (<PO>)
 {
         s/"\n"//g;
         next if m/^#, .*fuzzy/m;
-        next unless m/^msgid/m;
-        (my $msgid) = m/^msgid "(.*)"$/m;
-        (my $msgstr) = m/^msgstr "(.*)"$/m;
-        next if $msgstr eq '';
-        my $var1 = getVars($msgid);
-        my $var2 = getVars($msgstr);
-        print if $var1 ne $var2;
+        next unless m/^msgid ".+"$/m;
+        my @msgs = ();
+        while (m/^msg\S+ "(.+)"$/mg)
+        {
+                push (@msgs, $1);
+        }
+        checkVars(@msgs) || print;
 }
 close (PO);
