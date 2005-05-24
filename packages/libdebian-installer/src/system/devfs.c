@@ -95,6 +95,7 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 90,	0,	"hd",		ENTRY_TYPE_DISC,	16,	6 },
     { 91,	0,	"hd",		ENTRY_TYPE_DISC,	18,	6 },
     { 94,	0,	"dasd",		ENTRY_TYPE_DISC,	0,	2 },
+    { 98,	0,	"ubd",		ENTRY_TYPE_DISC,	0,	4 },
     { 104,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	0,	4 },
     { 105,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	1,	4 },
     { 106,	0,	"cciss",	ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	2,	4 },
