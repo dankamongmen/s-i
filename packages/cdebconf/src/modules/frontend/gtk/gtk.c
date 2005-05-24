@@ -644,7 +644,13 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
 
     defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
     if (defcount < 0)
-    	return DC_NOTOK;
+        return DC_NOTOK;
+    /* This is to prevent multiselect questions with no options from
+     * making the frontend hang; the frontend should also automatically
+     * skip the question and return DC_OK
+     */
+    else if (defcount == 0)
+        return DC_OK; 
 
     check_container = gtk_vbox_new (FALSE, 0);
 
@@ -1404,7 +1410,7 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
-    gtk_frame_set_label( progress_bar_frame , obj->progress_title );
+    gtk_frame_set_label( GTK_FRAME(progress_bar_frame) , obj->progress_title );
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
@@ -1460,7 +1466,7 @@ static void gtk_progress_stop(struct frontend *obj)
     /* gtk_widget_destroy(gtk_widget_get_parent(((struct frontend_data*)obj->data)->progress_bar)); */
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0);
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " " );
-	gtk_frame_set_label( progress_bar_frame , "Debian-Installer progressbar" );
+	gtk_frame_set_label( GTK_FRAME(progress_bar_frame) , "Debian-Installer progressbar" );
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
     while (gtk_events_pending ())
         gtk_main_iteration ();
