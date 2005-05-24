@@ -31,10 +31,6 @@ ${REFRESH_CMD}
 cd  ${HOME}/${SCRIPTS_PATH}
 sh check_all.sh ${LOCAL_REPOSITORY} ${NEW}_$1
 
-SAVED_STATS=`echo ${NEW}.txt | sed "s:check_:stats_:"`
-cp ${NEW}_$1/stats.txt ${OUT_DIR}/history/${SAVED_STATS}
-mv ${NEW}_$1/index.html ${OUT_DIR}
-
 OLD_PATH=${OUT_DIR}/latest/nozip
 NEW_PATH=${NEW}_$1/nozip
 
@@ -60,6 +56,14 @@ done
 
 # remove empty files
 find ${NEW_PATH} -empty -exec rm '{}' ';'
+
+# build "index.html" with the new results
+export DIFF_DIR=${NEW}_$1
+sh build_index.sh ${NEW}_$1/stats.txt ${HTML_PAGE} ${NEW}_$1/index.html
+
+SAVED_STATS=`echo ${NEW}.txt | sed "s:check_:stats_:"`
+cp ${NEW}_$1/stats.txt ${OUT_DIR}/history/${SAVED_STATS}
+mv ${NEW}_$1/index.html ${OUT_DIR}
 
 echo ""
 echo "***  $SAVED_STATS  ***"

@@ -62,9 +62,6 @@ if [ ! -d ${DEST_DIR} ] ; then
     exit 1
 fi
 
-# build "index.html" with the new results
-sh build_index.sh ${STATS}.txt ${HTML_PAGE} ${DEST_DIR}/index.html
-
 # create plot using gnuplot
 i=0
 TOTAL=0

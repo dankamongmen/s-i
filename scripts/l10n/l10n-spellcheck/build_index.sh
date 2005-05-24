@@ -23,6 +23,7 @@ TEMPLATE=$2
 INDEX_HTML=$3
 TABLE_HTML=stats.html_${RANDOM}
 DICTIONARIES=build-tools/dictionaries.txt
+
 # Compute some statistics
 i=0
 TOTAL=0
@@ -105,16 +106,36 @@ else
     echo "   <td>${UNKN}</td>"
 fi
 
-echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a></td>"
+if [ -f ${DIFF_DIR}/nozip/${LANG}_all.diff ] ; then
+    DIFF="<a href=\"latest/nozip/${LANG}_all.diff\">  (*)</a>"
+else
+    DIFF=
+fi
+
+echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a>${DIFF}</td>"
 
 if [ ${UNKN} -eq -1 ] ; then
     echo "   <td>-</td>"
 else
-    echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a></td>"
+
+    if [ -f ${DIFF_DIR}/nozip/${LANG}_unkn_wl.diff ] ; then
+	DIFF="<a href=\"latest/nozip/${LANG}_unkn_wl.diff\">  (*)</a>"
+    else
+	DIFF=
+    fi
+
+    echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a>${DIFF}</td>"
 fi
 
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
-    echo "   <td><a href=\"${SUSPECT_VARS_URL}\">${SUSPECT_VARS_NAME}</a></td>"
+    SUSP_PATH=${SUSPECT_VARS_URL/latest/}
+    if [ -f ${DIFF_DIR}/${SUSP_PATH/.txt/.diff} ] ; then
+	DIFF="<a href=\"${SUSPECT_VARS_URL/.txt/.diff}\">  (*)</a>"
+    else
+	DIFF=
+    fi
+
+    echo "   <td><a href=\"${SUSPECT_VARS_URL}\">${SUSPECT_VARS_NAME}</a>${DIFF}</td>"
 fi
 
 echo "   <td><a href=\"${WORDLIST}\">${WORDLIST_NAME}</a></td>"
