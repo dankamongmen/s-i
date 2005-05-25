@@ -757,12 +757,16 @@ static int gtkhandler_select_single_jump(struct frontend *obj, struct question *
     GtkWidget *frame, *button, *button_box;
     char **choices, **choices_translated;
     int i, count;
+    struct frontend_data *fe_data = (struct frontend_data *) obj->data;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
 
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_single_jump() called");
+	if( fe_data->dummy_main_menu == FALSE )
+	    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_single_jump() called");
+	else
+		INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_single_jump() called, dummy mode");
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -787,6 +791,8 @@ static int gtkhandler_select_single_jump(struct frontend *obj, struct question *
     for (i = 0; i < count; i++)
     {
         button = gtk_button_new_with_label(choices_translated[i]);
+        if( fe_data->dummy_main_menu == TRUE )
+	        gtk_widget_set_sensitive( GTK_WIDGET(button), FALSE );
         gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
         g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (jump_callback), data);
 
@@ -1192,10 +1198,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
      */
     fe_data = obj->data;
     strcpy(fe_data->jump_target, "");
-    /* the number_of_questions variable is no longer used, i think
-     * it could be removed unless it is useful for something
-     */
-    fe_data->number_of_questions = 0;
+	fe_data->dummy_main_menu = FALSE;
     fe_data->q_main = NULL;
 
     gtk_init (&args, &name);
@@ -1220,7 +1223,7 @@ static int gtk_go(struct frontend *obj)
     struct question *q = obj->questions;
     GtkWidget *questionbox, *menubox;
     di_slist *plugins;
-    int i, j, number_of_questions=0;
+    int i, j;
     int ret;
 
     /* this string is used to identify the main menu question
@@ -1288,6 +1291,16 @@ static int gtk_go(struct frontend *obj)
 
     data->setters = NULL;
 
+	/* The dummy menubox should be destroyed by gtk_progressbar_stop() but
+	 * since sometimes this function is not called we make sure the dummy
+	 * menubox has been destroyed before displaying the real one
+	 */	
+	if(data->progress_bar_menubox != NULL)
+		{
+		gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox));
+		data->progress_bar_menubox = NULL;
+		}
+
     menubox = gtk_vbox_new(FALSE, 5);
     questionbox = gtk_vbox_new(FALSE, 5);
 
@@ -1306,7 +1319,7 @@ static int gtk_go(struct frontend *obj)
          * simply handle it
          */
         ret = gtkhandler_select_single(obj, q, menubox);
-        q = q->next;
+        q = q->next; 
     }
     else if (data->q_main)
     {
@@ -1314,6 +1327,7 @@ static int gtk_go(struct frontend *obj)
          * we need to show it using the copy of the main menu stored
          * previously into memory
          */
+      	data->dummy_main_menu = FALSE;
         ret = gtkhandler_select_single_jump(obj, data->q_main, menubox);
     }
 
@@ -1359,10 +1373,9 @@ static int gtk_go(struct frontend *obj)
             }
         }
 
-        q = q->next;    	
+        q = q->next;
     }
 
-  
     if ( obj->methods.can_go_back(obj, q) )
         gtk_widget_set_sensitive (data->button_prev, TRUE);
     else
@@ -1389,6 +1402,9 @@ static int gtk_go(struct frontend *obj)
     gtk_widget_destroy(questionbox);
     gtk_widget_destroy(menubox);
 
+	gtk_widget_set_sensitive (data->button_prev, FALSE);
+	gtk_widget_set_sensitive (data->button_next, FALSE);
+
     if (data->button_val == DC_OK)
         return DC_OK;
     else if (data->button_val == DC_GOBACK)
@@ -1405,7 +1421,17 @@ static bool gtk_can_go_back(struct frontend *obj, struct question *q)
 static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
     GtkWidget *progress_bar, *progress_bar_frame;
+    GtkWidget *menubox;
+    display_dummy_mainmenu(obj);
 
+	/* when the progressbar is started a "dummy" mainmenu is displayed */
+    data->dummy_main_menu = TRUE;
+    menubox = gtk_vbox_new(FALSE, 5);
+    data->progress_bar_menubox=menubox;
+    gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
+    gtkhandler_select_single_jump(obj, data->q_main, menubox);
+    gtk_widget_show_all(data->window);
+    
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
     progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
     DELETE(obj->progress_title);
@@ -1459,6 +1485,11 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 static void gtk_progress_stop(struct frontend *obj)
 {
     GtkWidget *progress_bar, *progress_bar_frame;
+    struct frontend_data *data = (struct frontend_data *) obj->data;
+
+	gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox));
+	data->progress_bar_menubox = NULL;
+    
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
     progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
     
