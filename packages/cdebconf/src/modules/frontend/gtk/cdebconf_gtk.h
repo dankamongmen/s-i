@@ -37,7 +37,10 @@ struct frontend_data
 
   /* Pointer to the Progress Bar, when initialized */
   GtkWidget *progress_bar; 
-  
+  /* Pointer to the box containing the dummy mainmenu, used by gtk_progress_stop()
+   * to destroy the box and the mainmenu packed inside
+   */
+  GtkWidget *progress_bar_menubox; 
   /* Pointer to the frame encapsulating the progressbar */
   GtkWidget *progress_bar_frame;
 
@@ -47,8 +50,8 @@ struct frontend_data
   int button_val;
   
   
-  /* this counter keeps count of the number of question in the question list during a gtk_go() run */
-  int number_of_questions;
+  /*needed to tell gtkhandler_select_single_jump() to display unsensitive buttons */
+  bool dummy_main_menu;
    
   /*here a question tag is stored and represents the target for a jump*/     
   char jump_target[40];
