@@ -385,7 +385,7 @@ static const char *template_lget(const struct template *t,
  *         description and extended_description
  * Description: get field value
  * Assumptions: Arguments have been previously checked, lang and field
- *              are not MULL
+ *              are not NULL
  */
 
 static const char *template_get_internal(const struct template *t,
