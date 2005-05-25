@@ -68,6 +68,8 @@ echo " </tr>"
 for ROW in `cat ${STATS} | sed  "s: :,:g"`; do
     LANG=`echo ${ROW} | awk -F, '{print $2}'`
     UNKN=`echo ${ROW} | awk -F, '{print $1}'`
+    
+    ISO_CODE=`grep -w "${LANG}" iso_codes.txt | awk -F, '{print $2}'`
 
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     SUSP=`echo ${ROW} | awk -F, '{print $3}'`
@@ -98,7 +100,7 @@ fi
 DICT_NAME=`echo ${DICT_URL} | sed "s|ftp://ftp.gnu.org/gnu/aspell/dict/.*/||" | sed "s:.tar.bz2$::"`
 
 echo "  <tr>"
-echo "   <td class=\"col1\">${LANG}</td>"
+echo "   <td class=\"col1\">${ISO_CODE} [${LANG}]</td>"
 
 if [ ${UNKN} -eq -1 ] ; then
     echo "   <td>-</td>"
