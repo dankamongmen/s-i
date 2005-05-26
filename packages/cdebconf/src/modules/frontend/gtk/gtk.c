@@ -657,10 +657,14 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
         return DC_NOTOK;
     /* This is to prevent multiselect questions with no options from
      * making the frontend hang; the frontend should also automatically
-     * skip the question and return DC_OK
+     * skip the question and return DC_OK.
+     * The following two lines of code need to be commented in order to allow
+     * multiselect questions with options but no defaul options activated
+     * from being ignorated by the frontend.
+     *
+     * else if (defcount == 0)
+     * return DC_OK; 
      */
-    else if (defcount == 0)
-        return DC_OK; 
 
     check_container = gtk_vbox_new (FALSE, 0);
 
