@@ -48,7 +48,9 @@ struct frontend_data
   struct setter_struct *setters; 
   /* Value of the button pressed to leave a form */
   int button_val;
-  
+
+  /* tells the jump mechanism if jump confirmation dialog has to be displayed */
+  bool ask_jump_confirmation;
   
   /*needed to tell gtkhandler_select_single_jump() to display unsensitive buttons */
   bool dummy_main_menu;
