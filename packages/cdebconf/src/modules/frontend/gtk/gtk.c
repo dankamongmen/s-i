@@ -440,16 +440,14 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
     {
         if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0) 
         {	
-        	if( data->obj->questions->next==NULL && data->obj->questions->prev==NULL && ( (strcmp(data->obj->questions->template->type,"text")==0) | (strcmp(data->obj->questions->template->type,"note")==0) ) )
+            if( fe_data->ask_jump_confirmation == FALSE )
         	{
-	        	/* If the client has passed to the frontend a single note/text question 
-	        	 * (like when the cdrom integrity has been successfully tested by the
-	        	 * cdrom checker) and then the user decides to jump there is no point
-	        	 * in asking him if he wants to save his changes since he could have made
-	        	 * no changes at all. 
-	        	 */
-        		ret_val=GTK_RESPONSE_ACCEPT;
-				INFO(INFO_DEBUG, "GTK_DI - jump programmed from text/note single question" );
+        		/* If the user jumps without having toched any widget there is no
+        		 * need to ask him if he wants to save the changes he made.
+        		 * This includes the case of a single note or text question, where
+        		 * the user can do no modifications.
+        		 */
+        		ret_val=GTK_RESPONSE_NO;
         	}
         	else if( strcmp(data->obj->questions->tag,"languagechooser/language-name")==0 )
         	{
@@ -507,6 +505,16 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
         gtk_main_quit();
 }
 
+/* signals the need to ask the user if he wants to save changes before jumping */
+void enable_jump_confirmation_callback(GtkWidget *widget, struct frontend_question_data* data)
+{
+	struct frontend *obj;
+	struct frontend_data *fe_data;
+	obj=data->obj;
+	fe_data=obj->data;
+	fe_data->ask_jump_confirmation = TRUE;
+	
+}
 
 static const char *
 get_text(struct frontend *obj, const char *template, const char *fallback )
@@ -556,6 +564,9 @@ gtkhandler_boolean_single(struct frontend *obj, struct question *q,
     gtk_box_pack_start (GTK_BOX(qbox), hbox, TRUE, TRUE, 5);
 
     check_button = gtk_check_button_new_with_label (q_get_description (q));
+	if (strcmp (defval, "true") == 0)
+		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(check_button), TRUE);
+	g_signal_connect (G_OBJECT(check_button), "toggled", G_CALLBACK(enable_jump_confirmation_callback), data);
     g_signal_connect (G_OBJECT(check_button), "toggled", G_CALLBACK(check_toggled_callback), q);
     g_signal_connect (G_OBJECT(check_button), "enter", G_CALLBACK (show_description), data);
 
@@ -567,9 +578,7 @@ gtkhandler_boolean_single(struct frontend *obj, struct question *q,
      gtk_widget_set_sensitive(back_button, FALSE);
      }
   */
-  
-  if (strcmp (defval, "true") == 0)
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(check_button), TRUE);
+ 
   
   return DC_OK;
 }
@@ -593,6 +602,7 @@ static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q,
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), FALSE);
     g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
     g_signal_connect (G_OBJECT(check), "grab-focus", G_CALLBACK (show_description), data);
+    g_signal_connect (G_OBJECT(check), "toggled", G_CALLBACK (enable_jump_confirmation_callback), data);
     g_signal_connect (G_OBJECT(check), "destroy", G_CALLBACK (free_description_data), data);
 
     frame = gtk_frame_new(NULL);
@@ -665,6 +675,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
             if (strcmp(choices[tindex[i]], defvals[j]) == 0)
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
         }
+        g_signal_connect (G_OBJECT(check), "toggled", G_CALLBACK (enable_jump_confirmation_callback), data);
         g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
         gtk_box_pack_start(GTK_BOX(check_container), check, FALSE, FALSE, 0);
         if (is_first_question(q) && (i == 0) )
@@ -738,6 +749,14 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     data->q = q;
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
+    g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
+    /*
+     * TODO: also when inserting or deleting text the need to ask user if he wants to
+     * save changes before jumping should be communicated with an appropraire callback.
+     * at the moment the two following lines do not work properly.
+     * g_signal_connect (G_OBJECT(entry), "delete-from-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
+     * g_signal_connect (G_OBJECT(entry), "insert-at-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
+     */
     g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
 	
     register_setter(entry_setter, entry, q, obj);
@@ -956,6 +975,9 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "destroy",
                       G_CALLBACK (free_description_data), data);
 
+	g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "grab-focus",
+                      G_CALLBACK (enable_jump_confirmation_callback), data);
+
     g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "grab-focus",
                       G_CALLBACK (show_description), data);
 
@@ -1007,6 +1029,14 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     data->q = q;
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
+    g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
+    /*
+     * TODO: also when inserting or deleting text the need to ask user if he wants to
+     * save changes before jumping should be communicated with an appropraire callback.
+     * at the moment the two following lines do not work properly.
+     * g_signal_connect (G_OBJECT(entry), "delete-from-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
+     * g_signal_connect (G_OBJECT(entry), "insert-at-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
+     */
     g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
 
     register_setter(entry_setter, entry, q, obj);
@@ -1199,6 +1229,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     fe_data = obj->data;
     strcpy(fe_data->jump_target, "");
 	fe_data->dummy_main_menu = FALSE;
+	fe_data->ask_jump_confirmation = FALSE;
     fe_data->q_main = NULL;
 
     gtk_init (&args, &name);
@@ -1234,6 +1265,9 @@ static int gtk_go(struct frontend *obj)
      */
     //const char *main_menu_tag = "test/select";
     const char *main_menu_tag = "debian-installer/main-menu";
+
+	/* Users's jumps do not need to be confirmated unless he has activated a widget */
+	data->ask_jump_confirmation = FALSE;
 
     if (q == NULL) return DC_OK;
 
@@ -1422,9 +1456,14 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
 {
     GtkWidget *progress_bar, *progress_bar_frame;
     GtkWidget *menubox;
-    display_dummy_mainmenu(obj);
+	struct frontend_data *data;
 
-	/* when the progressbar is started a "dummy" mainmenu is displayed */
+	/* when the progressbar is started a "dummy" mainmenu is displayed
+	 * TODO: sometimes gtk_progress_start() is called twice in a row: we should check
+	 * that another dummy main menu is not already displayed before drawing a new one
+	 */
+	
+	data=obj->data;
     data->dummy_main_menu = TRUE;
     menubox = gtk_vbox_new(FALSE, 5);
     data->progress_bar_menubox=menubox;
