@@ -154,18 +154,20 @@ gboolean show_description (GtkWidget *widget, struct frontend_question_data* dat
     struct question *q;
     struct frontend *frontend_ptr;
     struct frontend_data *frontend_data_ptr;
-    GtkWidget *view;
-  		
+    GtkWidget *view;  		
     GtkTextBuffer *buffer;
   
     frontend_ptr = data->obj;
     frontend_data_ptr = frontend_ptr->data;
     view = (GtkWidget*)frontend_data_ptr->info_box;
     q = data->q;
-
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view) );
 
-    gtk_text_buffer_set_text (buffer, q_get_extended_description(q), -1);
+	/* Workaround for questions missing extended description */
+    if (strlen(q_get_extended_description(q)) > 0)
+    	gtk_text_buffer_set_text (buffer, q_get_extended_description(q), -1);
+    else if (strlen(q_get_description(q)) > 0)
+    	gtk_text_buffer_set_text (buffer, q_get_description(q), -1);
 
     /* INFO(INFO_DEBUG, "GTK_DI - show_description(%s) called", q_get_extended_description(q)); */
 
