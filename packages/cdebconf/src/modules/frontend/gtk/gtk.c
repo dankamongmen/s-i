@@ -821,7 +821,7 @@ static int gtkhandler_select_single_jump(struct frontend *obj, struct question *
         gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
         g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (jump_callback), data);
 
-        g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data);
+        /* g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data); */
         /* g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (clear_description), data); */
 
         gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
@@ -883,7 +883,7 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
          * "This is the main menu for the debian installer" I don't think
          * if this can be useful
          */
-        g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data);
+        /* g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data); */
         /* g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (clear_description), data); */
 
         gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
@@ -1035,11 +1035,11 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     data->q = q;
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
-    g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
     /*
      * TODO: also when inserting or deleting text the need to ask user if he wants to
      * save changes before jumping should be communicated with an appropraire callback.
      * at the moment the two following lines do not work properly.
+     * g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
      * g_signal_connect (G_OBJECT(entry), "delete-from-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
      * g_signal_connect (G_OBJECT(entry), "insert-at-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
      */
@@ -1198,14 +1198,14 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (menubox_scroll), menubox);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (menubox_scroll),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-
+	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW (menubox_scroll), GTK_SHADOW_NONE);
 
     /* Final packaging */
     gtk_box_pack_start(GTK_BOX (mainbox), targetbox_scroll, TRUE, TRUE, 5);	
     gtk_box_pack_start(GTK_BOX (mainbox), infobox, FALSE, FALSE, 5);
     gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_frame, FALSE, FALSE, 5);
 
-    globalbox = gtk_hbox_new (FALSE, 10);
+    globalbox = gtk_hbox_new (TRUE, 10);
     gtk_box_pack_start(GTK_BOX (globalbox), menubox_scroll, TRUE, TRUE, 5);
     gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
 
@@ -1262,6 +1262,8 @@ static int gtk_go(struct frontend *obj)
     di_slist *plugins;
     int i, j;
     int ret;
+    GtkWidget *helpbox_view;
+    GtkTextBuffer *helpbox_buffer;
 
     /* this string is used to identify the main menu question
      * (usually this is "debian-installer/main-menu" for the debian installer
@@ -1274,6 +1276,9 @@ static int gtk_go(struct frontend *obj)
 
 	/* Users's jumps do not need to be confirmated unless he has activated a widget */
 	data->ask_jump_confirmation = FALSE;
+
+	helpbox_view = (GtkWidget*)data->info_box;
+    helpbox_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (helpbox_view) );
 
     if (q == NULL) return DC_OK;
 
@@ -1359,6 +1364,7 @@ static int gtk_go(struct frontend *obj)
          * simply handle it
          */
         ret = gtkhandler_select_single(obj, q, menubox);
+        gtk_text_buffer_set_text (helpbox_buffer, q_get_extended_description(q), -1);
         q = q->next; 
     }
     else if (data->q_main)
@@ -1411,7 +1417,17 @@ static int gtk_go(struct frontend *obj)
                     di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
                     INFO(INFO_DEBUG, "GTK_DI - question %d: \"%s\" failed to display!", j, q->tag);
                 }
-
+				else
+				{
+					/* The (extended) description of the last handled question is
+					 * automatically displayed inside helpbox to give
+					 * the user better help
+					 */
+				    if (strlen(q_get_extended_description(q)) > 0)
+				    	gtk_text_buffer_set_text (helpbox_buffer, q_get_extended_description(q), -1);
+				    else if (strlen(q_get_description(q)) > 0)
+				    	gtk_text_buffer_set_text (helpbox_buffer, q_get_description(q), -1); 	
+				}
                 /* we've found the right handler for the question, so we break
                  * the for() loop
                  */
