@@ -1363,9 +1363,15 @@ static int gtk_go(struct frontend *obj)
     {
         /* the first question in the question list is not the main menu, so
          * we need to show it using the copy of the main menu stored
-         * previously into memory
+         * previously into memory.
+         * If the first real question passed to the frontend doesn't alow to go
+         * back we must prevent the user from jumping, since juping consists
+         * of a sequence of "back" simulated commands
          */
-      	data->dummy_main_menu = FALSE;
+        if ( obj->methods.can_go_back(obj, q) )
+      		data->dummy_main_menu = FALSE;
+      	else
+      		data->dummy_main_menu = TRUE;
         ret = gtkhandler_select_single_jump(obj, data->q_main, menubox);
     }
 
