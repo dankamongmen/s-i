@@ -120,10 +120,18 @@ do
 
   if [ "$PREV" = "$L" ]
   then
-	echo -n ", $T"
+	if [ "$T" ]
+	then
+		echo -n ", $T"
+	fi
   else
       echo
-      echo -n "    - $R ($CSN.po) by $T"
+      if [ "$T" ]
+      then
+	      echo -n "    - $R ($CSN.po) by $T"
+      else
+	      echo -n "    - $R ($CSN.po)"
+      fi
   fi
   PREV=$L
 done < $PACKAGE/debian/.credits_log

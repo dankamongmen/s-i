@@ -71,7 +71,9 @@ do
 
 	    # Get the translator's name
 
-	    translator=`grep '^"Last-Translator:' $i| sed 's/\"//g' | sed 's/Last-Translator: //g' |sed 's/<.*$//g'`		
+	    # [\\] needed because otherwise sed seems to treat \\n as
+	    # backslash+newline?
+	    translator=`grep '^"Last-Translator:' $i | sed 's/\"//g' | sed 's/Last-Translator: //g' | sed 's/<.*$//g' | sed 's/ *[\\]n$//'`
 	    
 	    # Convert to UTF-8 -- the changelogs should be UTF-8, the
 	    # translations need not.
