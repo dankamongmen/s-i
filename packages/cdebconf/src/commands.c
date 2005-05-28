@@ -156,7 +156,8 @@ command_title(struct confmodule *mod, char *arg)
 {
     char *out;
 
-    debug_printf(0, "Obsolete command TITLE %s called", arg);
+    if (*arg)
+        debug_printf(0, "Obsolete command TITLE %s called", arg);
 
     mod->frontend->methods.set_title(mod->frontend, arg);
     asprintf(&out, "%u", CMDSTATUS_SUCCESS);
