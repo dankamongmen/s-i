@@ -1,11 +1,10 @@
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
-DEB_HOST_GNU_CPU ?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
-DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
-DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_HOST_ARCH_CPU ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null || dpkg-architecture -qDEB_HOST_GNU_CPU)
+DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null || dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
 
 CC = gcc
 CFLAGS = -Wall -O2 -g
-CFLAGS_ARCH = -DARCH=$(DEB_HOST_ARCH) -DCPU=$(DEB_HOST_GNU_CPU) -DCPU_TEXT='"$(DEB_HOST_ARCH)"' -DSYSTEM=$(DEB_HOST_GNU_SYSTEM)
+CFLAGS_ARCH = -DARCH=$(DEB_HOST_ARCH) -DCPU=$(DEB_HOST_ARCH_CPU) -DCPU_TEXT='"$(DEB_HOST_ARCH)"' -DSYSTEM=$(DEB_HOST_ARCH_OS)
 
 bindir=$(DESTDIR)/bin/
 hpdir=$(DESTDIR)/etc/hotplug.d
@@ -52,7 +51,7 @@ install-archdetect-deb: archdetect
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) archdetect $(bindir)
 
-ARCHDETECT_TYPE_FILE = archdetect-$(DEB_HOST_GNU_TYPE)
+ARCHDETECT_TYPE_FILE = archdetect-$(DEB_HOST_ARCH_CPU)-$(DEB_HOST_ARCH_OS)
 
 ifeq ($(wildcard $(ARCHDETECT_TYPE_FILE).c),)
 ARCHDETECT_TYPE_FILE = archdetect-generic
