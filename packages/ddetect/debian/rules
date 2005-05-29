@@ -3,6 +3,13 @@
 CFLAGS = -W -Wall -Os
 export CFLAGS
 
+DEB_HOST_ARCH_OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null || dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+discover := discover | hotplug-udeb
+else
+discover :=
+endif
+
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -46,7 +53,7 @@ binary-arch: build install
 	dh_fixperms -a
 	dh_installdeb -a
 	dh_shlibdeps -a
-	dh_gencontrol -a
+	dh_gencontrol -a -- -V'hw-detect:discover=$(discover)'
 	dh_builddeb -a
 
 binary: binary-indep binary-arch
