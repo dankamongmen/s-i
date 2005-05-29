@@ -4,6 +4,10 @@ set -e
 . /usr/share/debconf/confmodule
 #set -x
 
+if [ "$(uname)" != Linux ]; then
+	exit 0
+fi
+
 # This is a hack, but we don't have a better idea right now.
 # See Debian bug #136743
 if [ -x /sbin/depmod ]; then

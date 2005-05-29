@@ -25,6 +25,7 @@ install: install-hw-detect install-ethdetect install-archdetect install-archdete
 
 install-hw-detect: hw-detect.sh
 	$(INSTALL) -d $(bindir)
+ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL) hw-detect.sh $(bindir)/hw-detect
 	$(INSTALL) hotplug-pcmcia.sh $(bindir)/hotplug-pcmcia
 	$(INSTALL) sysfs-update-devnames.sh $(bindir)/sysfs-update-devnames
@@ -35,6 +36,9 @@ install-hw-detect: hw-detect.sh
 ifeq ($(DEB_HOST_ARCH),powerpc)
 	$(INSTALL) discover-mac-io.sh $(bindir)/discover-mac-io
 	$(INSTALL) discover-rs6k.sh $(bindir)/discover-rs6k
+endif
+else
+	$(INSTALL) detect-stub.sh $(bindir)/hw-detect
 endif
 
 install-hw-detect-full:
