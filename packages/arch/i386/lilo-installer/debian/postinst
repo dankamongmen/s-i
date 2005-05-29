@@ -54,7 +54,7 @@ bootfs=$(mapdevfs $bootfs_devfs)
 prefix=$(echo "$bootfs_devfs" | sed 's/\(\/dev\/[a-z]\+\).*/\1/')
 
 if [ "$prefix" != /dev/md ]; then
-	disc_offered_devfs=$(find $prefix -name disc | head -n 1)
+	disc_offered_devfs=$(find $prefix -follow -name disc | head -n 1)
 else
 	disc_offered_devfs="$bootfs_devfs"
 fi
