@@ -7,7 +7,7 @@ endif
 
 PARTCONF_OBJS = util.o partconf.o find-parts.o
 
-all: partconf find-partitions mkfstab
+all: partconf find-partitions mkfstab mountpoint
 
 partconf: $(PARTCONF_OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LIBS) -ldebconfclient -ldebian-installer
@@ -18,15 +18,19 @@ find-partitions: partconf.h find-parts.c util.o
 mkfstab: mkfstab.c mkfstab.h
 	$(CC) $(CFLAGS) -o $@ mkfstab.c $(LIBS) -ldebian-installer
 
+mountpoint: mountpoint.c
+	$(CC) $(CFLAGS) -o $@ mountpoint.c $(LIBS) -ldebian-installer
+
 util.o: util.c
 partconf.o: partconf.c partconf.h
 find-parts.o: find-parts.c partconf.h
 
 small: CFLAGS += -Os
-small: clean partconf find-partitions mkfstab
+small: clean partconf find-partitions mkfstab mountpoint
 	strip --remove-section=.comment --remove-section=.note partconf
 	strip --remove-section=.comment --remove-section=.note find-partitions
 	strip --remove-section=.comment --remove-section=.note mkfstab
+	strip --remove-section=.comment --remove-section=.note mountpoint
 
 test-mkfstab: mkfstab.c mkfstab.h
 	$(CC) $(CFLAGS) -o test-mkfstab -DTEST mkfstab.c $(LIBS) -ldebian-installer
@@ -39,6 +43,7 @@ check: test-mkfstab test-partconf
 	./test-partconf
 
 clean:
-	-rm -f partconf find-partitions mkfstab test-mkfstab test-partconf *.o
+	-rm -f partconf find-partitions mkfstab mountpoint \
+		test-mkfstab test-partconf *.o
 
 .PHONY: all check clean small
