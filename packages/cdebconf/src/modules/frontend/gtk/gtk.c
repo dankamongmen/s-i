@@ -139,7 +139,7 @@ gboolean jump_confirmation (GtkWidget *widget, struct frontend_question_data* da
                                           NULL);
 
 	/* The following string should be more explicative and should be localized too */
-    label = gtk_label_new ("Do tou want to save your changes before jumping?");
+    label = gtk_label_new ("Do you want to save your changes before jumping?");
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
     gtk_widget_show_all (dialog);
     result = gtk_dialog_run ( GTK_DIALOG(dialog) );
@@ -444,7 +444,7 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
         {	
             if( fe_data->ask_jump_confirmation == FALSE )
         	{
-        		/* If the user jumps without having toched any widget there is no
+        		/* If the user jumps without having touched any widget there is no
         		 * need to ask him if he wants to save the changes he made.
         		 * This includes the case of a single note or text question, where
         		 * the user can do no modifications.
@@ -661,8 +661,8 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
      * making the frontend hang; the frontend should also automatically
      * skip the question and return DC_OK.
      * The following two lines of code need to be commented in order to allow
-     * multiselect questions with options but no defaul options activated
-     * from being ignorated by the frontend.
+     * multiselect questions with options but no default options activated
+     * from being ignored by the frontend.
      *
      * else if (defcount == 0)
      * return DC_OK; 
@@ -758,7 +758,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
     /*
      * TODO: also when inserting or deleting text the need to ask user if he wants to
-     * save changes before jumping should be communicated with an appropraire callback.
+     * save changes before jumping should be communicated with an appropriate callback.
      * at the moment the two following lines do not work properly.
      * g_signal_connect (G_OBJECT(entry), "delete-from-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
      * g_signal_connect (G_OBJECT(entry), "insert-at-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
@@ -1037,7 +1037,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
     /*
      * TODO: also when inserting or deleting text the need to ask user if he wants to
-     * save changes before jumping should be communicated with an appropraire callback.
+     * save changes before jumping should be communicated with an appropriate callback.
      * at the moment the two following lines do not work properly.
      * g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
      * g_signal_connect (G_OBJECT(entry), "delete-from-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
