@@ -19,7 +19,7 @@ mkfstab: mkfstab.c mkfstab.h
 	$(CC) $(CFLAGS) -o $@ mkfstab.c $(LIBS) -ldebian-installer
 
 mountpoint: mountpoint.c
-	$(CC) $(CFLAGS) -o $@ mountpoint.c $(LIBS) -ldebian-installer
+	$(CC) $(CFLAGS) -o $@ mountpoint.c -ldebian-installer
 
 util.o: util.c
 partconf.o: partconf.c partconf.h
