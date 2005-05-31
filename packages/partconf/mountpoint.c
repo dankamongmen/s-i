@@ -9,7 +9,6 @@
 #include <limits.h>
 
 #include <debian-installer.h>
-#include <parted/parted.h>
 
 /* Filesystem names as returned by libparted. */
 const char *fs_list[] = {
