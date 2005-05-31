@@ -170,106 +170,25 @@ get_partition_info(struct partition *p, PedPartition *part, PedDevice *dev, bool
 int
 get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_fs_type, PedPartitionFlag require_flag)
 {
-    char buf[1024], *ptr, partname[1024], *canon_partname = NULL, tmp[1024];
-    FILE *fp, *fptmp;
-    DIR *d;
-    struct dirent *dent;
-    char *discs[MAX_DISCS];
     struct partition *p;
-    int disc_count = 0, part_count = 0;
-    int i, cont, size;
-    PedDevice *dev;
+    int part_count = 0;
+    PedDevice *dev = NULL;
     PedDisk *disk;
     PedPartition *part;
 
-    if ((d = opendir("/dev/discs")) == NULL)
-        return 0;
-    while ((dent = readdir(d)) != NULL) {
-        char *canon_disc;
-        if (dent->d_name[0] == '.')
+    ped_device_probe_all();
+    while ((dev = ped_device_get_next(dev)) != NULL) {
+        if (!ped_disk_probe(dev))
             continue;
-        if (disc_count >= MAX_DISCS)
-            break;
-        snprintf(buf, sizeof(buf)-1, "/dev/discs/%s/disc", dent->d_name);
-        canon_disc = canonicalize_file_name(buf);
-        if (canon_disc) {
-            discs[disc_count++] = strdup(dirname(canon_disc));
-            free(canon_disc);
-        }
-    }
-    if ((fp = fopen("/proc/partitions", "r")) == NULL) {
-        perror("fopen(/proc/partitions)");
-        return 0;
-    }
-    if (fgets(buf, sizeof(buf), fp) == NULL)
-        return 0;
-    if (fgets(buf, sizeof(buf), fp) == NULL)
-        return 0;
-    while ((ptr = fgets(buf, sizeof(buf), fp)) != NULL) {
-        free(canon_partname);
-        sscanf(buf, "%*d %*d %*d %s", tmp);
-        strcpy(partname, "/dev/");
-        strcat(partname, tmp);
-        canon_partname = canonicalize_file_name(partname);
-        if (!canon_partname)
-            continue;
-        // Check if this is a disk or a partition on a known disk
-        cont = 0;
-        for (i = 0; i < disc_count; i++)
-            if (strstr(canon_partname, discs[i]) == canon_partname) {
-                cont = 1;
-                break;
-            }
-        if (cont)
-            continue;
-        // Non-existent devices like 'hdc' (!) begone
-        if ((fptmp = fopen(partname, "r")) == NULL)
-            continue;
-        fclose(fptmp);
-        if (part_count >= max_parts)
-            break;
-        p = malloc(sizeof(*p));
-        p->path = strdup(canon_partname);
-        p->description = strdup(p->path);
-        p->fstype = NULL;
-        p->fsid = NULL;
-        p->size = 0L;
-        p->op.filesystem = NULL;
-        p->op.mountpoint = NULL;
-        p->op.done = 0;
-        test_lvm(p);
-        test_evms(p);
-        test_raid(p);
-        // FIXME: Other tests?
-        parts[part_count++] = p;
-        // Open the partition/volume as if it was a disk, it should
-        // just have one partition that we can toy with.
-        if ((dev = ped_device_get(canon_partname)) == NULL)
-            continue;
-        if ((disk = ped_disk_new(dev)) == NULL)
-            continue;
-        if ((part = ped_disk_next_partition(disk, NULL)) == NULL)
-            continue;
-        get_partition_info(p, part, dev, ignore_fs_type);
-    }
-    free(canon_partname);
-    // Add partitions from all the disks we found
-    for (i = 0; i < disc_count; i++) {
-        char *foo;
+        disk = ped_disk_new(dev);
 
-        asprintf(&foo, "%s/disc", discs[i]);
-        if ((dev = ped_device_get(foo)) == NULL) {
-            free(foo);
-            continue;
-        }
-        free(foo);
-        if ((disk = ped_disk_new(dev)) == NULL) {
-            continue;
-        }
         part = NULL;
         while ((part = ped_disk_next_partition(disk, part)) != NULL) {
             if (part->type & (PED_PARTITION_METADATA | PED_PARTITION_FREESPACE | PED_PARTITION_EXTENDED))
                 continue;
+
+            if (part_count >= max_parts)
+                break;
 
 #ifndef FIND_PARTS_MAIN
             /* allow other udebs to block partitions */
@@ -310,10 +229,19 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
             p->op.filesystem = NULL;
             p->op.mountpoint = NULL;
             p->op.done = 0;
+            test_lvm(p);
+            test_evms(p);
+            test_raid(p);
+            /* FIXME: Other tests? */
+
             get_partition_info(p, part, dev, ignore_fs_type);
             parts[part_count++] = p;
         }
+
+        if (part_count >= max_parts)
+            break;
     }
+
     return part_count;
 }
 
