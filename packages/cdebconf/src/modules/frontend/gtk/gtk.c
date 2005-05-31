@@ -1219,7 +1219,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     int args = 1;
     char **name;
 
-    //FIXME: This can surely be done in a better way
+    /* FIXME: This can surely be done in a better way */
     (char**) name = malloc(2 * sizeof(char*));
     (char*) name[0] = malloc(8 * sizeof(char));
     name[0] = "debconf";
@@ -1271,7 +1271,7 @@ static int gtk_go(struct frontend *obj)
      * cdebconf sources)
      * Here we also assume that the main menu is always a SELECT question
      */
-    //const char *main_menu_tag = "test/select";
+    /* const char *main_menu_tag = "test/select"; */
     const char *main_menu_tag = "debian-installer/main-menu";
 
 	/* Users's jumps do not need to be confirmated unless he has activated a widget */
@@ -1582,9 +1582,11 @@ struct frontend_module debconf_frontend_module =
 {
     initialize: gtk_initialize,
     go: gtk_go,
-//    shutdown: gtk_shutdown,	//gtk_fe_debug +
-//    clear: gtk_clear,	//gtk_fe_debug +
-//    add: gtk_add,		//gtk_fe_debug +
+#if 0 /* gtk_fe_debug */
+    shutdown: gtk_shutdown,
+    clear: gtk_clear,
+    add: gtk_add,
+#endif
     can_go_back: gtk_can_go_back,
     progress_start: gtk_progress_start,
     progress_info: gtk_progress_info,
@@ -1600,14 +1602,14 @@ static int gtk_add(struct frontend *obj, struct question *q)
     return DC_OK;
 }
 
-static int gtk_shutdown(struct frontend *obj) //gtk_fe_debug +
+static int gtk_shutdown(struct frontend *obj) /* gtk_fe_debug + */
 {
     struct question *q = obj->questions;
     INFO(INFO_DEBUG, "GTK_DI - gtk_shutdown() called");
     return DC_OK;
 }
 
-static int gtk_clear(struct frontend *obj) //gtk_fe_debug + 
+static int gtk_clear(struct frontend *obj) /* gtk_fe_debug + */
 {
     INFO(INFO_DEBUG, "GTK_DI - gtk_clear() called");
     return DC_OK;
