@@ -14,3 +14,18 @@ for i in `find /usr/share/locale/ -name iso_3166.mo` ; do
   msgunfmt $i >debian/iso-codes/${language}.po 2>/dev/null
 done
 
+DATE="$(date +'%Y-%m-%d %H:%M%z')"
+cat <<EOF >debian/iso-codes/en.po
+msgid ""
+msgstr ""
+"Project-Id-Version: iso_3166 CVS\\n"
+"Report-Msgid-Bugs-To: Alastair McKinstry <mckinstry@debian.org>\\n"
+"POT-Creation-Date: $DATE\\n"
+"PO-Revision-Date: $DATE\\n"
+"MIME-Version: 1.0\\n"
+"Content-Type: text/plain; charset=UTF-8\\n"
+"Content-Transfer-Encoding: 8bit\\n"
+
+EOF
+perl -pe 's/.*?\t(.*)/msgid "$1"\nmsgstr "$1"\n/' \
+  </usr/share/iso-codes/iso_3166.tab >>debian/iso-codes/en.po

@@ -21,13 +21,11 @@ FTPCODECHOICES=`cat debian/ftplist-countries`
 
 printf "Creating the list of countries for HTTP mirrors..."
 # We need building the choices list with English names rather than codes
-HTTPCHOICES=$(cat debian/httplist-countries | \
-         (read a; echo -n `grep -i "^$a" $ISO3166TAB | cut -b 4-` ; while read b; do echo -n ", "`grep -i "^$b" $ISO3166TAB | cut -b 4- | sed 's/,/\\\\\\\\,/g'`; done; echo))
+HTTPCHOICES="$(xargs < debian/httplist-countries | sed 's/ /, /g')"
 printf " Done.\n"
 
 printf "Creating the list of countries for FTP mirrors..."
-FTPCHOICES=$(cat debian/ftplist-countries | \
-         (read a; echo -n `grep -i "^$a" $ISO3166TAB | cut -b 4-` ; while read b; do echo -n ", "`grep -i "^$b" $ISO3166TAB | cut -b 4- | sed 's/,/\\\\\\\\,/g'`; done; echo))
+FTPCHOICES="$(xargs < debian/ftplist-countries | sed 's/ /, /g')"
 printf " Done.\n"
 
 printf "Insert the lists of choices into the templates file..."
@@ -70,10 +68,12 @@ for pofile in debian/po/*.po ; do
     if [ -f $ISO3166TRANSLATIONS/$pofilename ]
     then
 	# Output is verbose, don't worry
-	# Convert translations to UTF-8
+	# Convert translations to UTF-8, and map country names to country
+	# codes in iso-codes translations
 	msgconv -t UTF-8 debian/po/$pofilename \
 		> debian/pobuild/$pofilename.other
-	msgconv -t UTF-8 debian/iso-codes/$pofilename \
+	msgconv -t UTF-8 "$ISO3166TRANSLATIONS/$pofilename" \
+		| ./map-cc "$ISO3166TAB" \
 		> debian/pobuild/$pofilename.iso-codes
 	# Update other template translations with templates.pot
 	msgmerge -U debian/pobuild/$pofilename.other \
@@ -91,6 +91,13 @@ for pofile in debian/po/*.po ; do
     fi
     printf "Done.\n"
 done
+
+if [ ! -f debian/po/en.po ]; then
+    printf "  en..."
+    ./map-cc "$ISO3166TAB" < "$ISO3166TRANSLATIONS/en.po" > debian/pobuild/en.po
+    msgmerge -U debian/pobuild/en.po debian/pobuild/templates.pot 2>/dev/null
+    printf "Done.\n"
+fi
 
 # and now we generate the templates file from all this
 PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates.tmp >debian/choose-mirror.templates
