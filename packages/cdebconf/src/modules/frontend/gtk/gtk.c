@@ -138,7 +138,7 @@ gboolean jump_confirmation (GtkWidget *widget, struct frontend_question_data* da
                                           /* GTK_RESPONSE_REJECT, */
                                           NULL);
 
-	/* The following string should be more explicative and should be localized too */
+	/* TODO: The following string should be more explicative and should be localized too */
     label = gtk_label_new ("Do you want to save your changes before jumping?");
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
     gtk_widget_show_all (dialog);
@@ -1576,17 +1576,10 @@ static unsigned long gtk_query_capability(struct frontend *f)
     return DCF_CAPB_BACKUP;
 }
 
-
-
 struct frontend_module debconf_frontend_module =
 {
     initialize: gtk_initialize,
     go: gtk_go,
-#if 0 /* gtk_fe_debug */
-    shutdown: gtk_shutdown,
-    clear: gtk_clear,
-    add: gtk_add,
-#endif
     can_go_back: gtk_can_go_back,
     progress_start: gtk_progress_start,
     progress_info: gtk_progress_info,
@@ -1594,24 +1587,3 @@ struct frontend_module debconf_frontend_module =
     progress_stop: gtk_progress_stop,
     query_capability: gtk_query_capability,
 };
-
-
-#if 0
-static int gtk_add(struct frontend *obj, struct question *q)
-{
-    return DC_OK;
-}
-
-static int gtk_shutdown(struct frontend *obj) /* gtk_fe_debug + */
-{
-    struct question *q = obj->questions;
-    INFO(INFO_DEBUG, "GTK_DI - gtk_shutdown() called");
-    return DC_OK;
-}
-
-static int gtk_clear(struct frontend *obj) /* gtk_fe_debug + */
-{
-    INFO(INFO_DEBUG, "GTK_DI - gtk_clear() called");
-    return DC_OK;
-}
-#endif
