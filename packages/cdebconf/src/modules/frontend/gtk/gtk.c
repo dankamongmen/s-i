@@ -1480,24 +1480,32 @@ static bool gtk_can_go_back(struct frontend *obj, struct question *q)
     return (obj->capability & DCF_CAPB_BACKUP);
 }
 
-static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
+/* when the progressbar is started or is being updated a "dummy" 
+ * mainmenu is drawn on the screen by this function
+ */
+static void display_dummy_main_menu(struct frontend *obj)
 {
-    GtkWidget *progress_bar, *progress_bar_frame;
-    GtkWidget *menubox;
 	struct frontend_data *data;
-
-	/* when the progressbar is started a "dummy" mainmenu is displayed
-	 * TODO: sometimes gtk_progress_start() is called twice in a row: we should check
-	 * that another dummy main menu is not already displayed before drawing a new one
-	 */
+	GtkWidget *menubox;
 	
 	data=obj->data;
+	/* before displaying a ghosted main menu we make sure another one
+	 * is not already displayed
+	 */
+	if( data->progress_bar_menubox != NULL ) return;
     data->dummy_main_menu = TRUE;
     menubox = gtk_vbox_new(FALSE, 5);
     data->progress_bar_menubox=menubox;
     gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
     gtkhandler_select_single_jump(obj, data->q_main, menubox);
     gtk_widget_show_all(data->window);
+}
+
+static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
+{
+    GtkWidget *progress_bar, *progress_bar_frame;
+
+	display_dummy_main_menu(obj);
     
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
     progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
@@ -1519,6 +1527,8 @@ static void gtk_progress_set(struct frontend *obj, int val)
     gdouble progress;
     GtkWidget *progress_bar;
 
+	display_dummy_main_menu(obj);
+
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val);
 
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
@@ -1539,6 +1549,8 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 {
     GtkWidget *progress_bar;
 
+	display_dummy_main_menu(obj);
+
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info);
 
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
@@ -1554,8 +1566,12 @@ static void gtk_progress_stop(struct frontend *obj)
     GtkWidget *progress_bar, *progress_bar_frame;
     struct frontend_data *data = (struct frontend_data *) obj->data;
 
-	gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox));
-	data->progress_bar_menubox = NULL;
+    /* Altough logically correct, for cosmetic reasons it's better
+     * not to destroy the ghosted main menu until a question is
+     * asked to the user
+     */
+	/* gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox)); */
+	/* data->progress_bar_menubox = NULL; */
     
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
     progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
