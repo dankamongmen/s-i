@@ -18,6 +18,16 @@ if (! defined $hostarch) {
 	chomp $hostarch;
 }
 
+my $iso3166xml = '/usr/share/xml/iso-codes/iso_3166.xml';
+my %iso3166;
+open ISO3166TAB, '-|:utf8', './iso3166tab.py', "$iso3166xml"
+	or die "open iso3166tab.py $iso3166xml: $!";
+while (<ISO3166TAB>) {
+	/^([A-Z]+)\t(.*)$/ or next;
+	$iso3166{$1} = $2;
+}
+close ISO3166TAB;
+
 # Slurp in the mirror file.
 my @data;
 my %countries;
@@ -45,6 +55,31 @@ while (<IN>) {
 	}
 }
 close IN;
+
+# Look for entries in $input matching ${CC}, and expand them out to one
+# entry for every country code in iso_3166.xml, with the following
+# substitution variables:
+#   ${CC}: lower-case country code
+#   ${UCC}: upper-case country code
+#   ${CNAME}: country name
+# This is useful if you have a mirror hierarchy using wildcard DNS.
+# Use a C-style for loop because we may modify $id in the middle of it.
+for (my $id = 0; $id < @data; $id++) {
+	if ($data[$id]->{site} =~ /\${CC}/) {
+		my @expanded;
+		foreach my $cc (sort keys %iso3166) {
+			my %entry = %{$data[$id]};
+			for my $field (keys %entry) {
+				$entry{$field} =~ s/\${CC}/lc($cc)/eg;
+				$entry{$field} =~ s/\${UCC}/uc($cc)/eg;
+				$entry{$field} =~ s/\${CNAME}/$iso3166{$cc}/g;
+			}
+			push @expanded, \%entry;
+		}
+		splice @data, $id, 1, @expanded;
+		$id += @expanded - 1;
+	}
+}
 
 # Poor man's mirror rating system: push-primary, push* (-secondary), others
 foreach my $id (0..$#data) {
