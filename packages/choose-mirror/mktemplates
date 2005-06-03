@@ -101,4 +101,8 @@ fi
 # and now we generate the templates file from all this
 PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates.tmp >debian/choose-mirror.templates
 
+# give the new templates file the same mtime as the input file, so that
+# po2debconf doesn't decide that it needs to run debconf-updatepo
+touch -mr debian/choose-mirror.templates-in debian/choose-mirror.templates
+
 rm -f debian/templates.tmp
