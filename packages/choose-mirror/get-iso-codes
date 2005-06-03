@@ -5,7 +5,7 @@ set -e
 #
 # Get ISO codes from the iso-codes package and extract translations
 set -e
-[ -r /usr/share/iso-codes/iso_3166.tab ] || exit 1
+[ -r /usr/share/xml/iso-codes/iso_3166.xml ] || exit 1
 rm -rf debian/iso-codes >/dev/null 2>&1
 mkdir debian/iso-codes
 for i in `find /usr/share/locale/ -name iso_3166.mo` ; do
@@ -27,5 +27,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\\n"
 
 EOF
-perl -pe 's/.*?\t(.*)/msgid "$1"\nmsgstr "$1"\n/' \
-  </usr/share/iso-codes/iso_3166.tab >>debian/iso-codes/en.po
+./iso3166tab.py /usr/share/xml/iso-codes/iso_3166.xml \
+  | perl -pe 's/.*?\t(.*)/msgid "$1"\nmsgstr "$1"\n/' \
+  >>debian/iso-codes/en.po

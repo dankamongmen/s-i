@@ -7,12 +7,12 @@ set -e
 # iso-codes package
 #
 # Some variables
-ISO3166TAB=/usr/share/iso-codes/iso_3166.tab
-export ISO3166TAB
+ISO3166XML=/usr/share/xml/iso-codes/iso_3166.xml
+export ISO3166XML
 # Translations location (relative to the build root directory)
 ISO3166TRANSLATIONS=debian/iso-codes
 
-# Get the ordered list of countries from the iso_3166.tab, sorted
+# Get the ordered list of countries from the iso_3166.xml, sorted
 # according to the regionmap.
 #
 # We need to escape commas by preceding them with a backslash.
@@ -72,7 +72,7 @@ for pofile in debian/po/*.po ; do
 	msgconv -t UTF-8 debian/po/$pofilename \
 		> debian/pobuild/$pofilename.other
 	msgconv -t UTF-8 "$ISO3166TRANSLATIONS/$pofilename" \
-		| ./map-cc "$ISO3166TAB" \
+		| ./map-cc "$ISO3166XML" \
 		> debian/pobuild/$pofilename.iso-codes
 	# Update other template translations with templates.pot
 	msgmerge -U debian/pobuild/$pofilename.other \
@@ -93,7 +93,7 @@ done
 
 if [ ! -f debian/po/en.po ]; then
     printf "  en..."
-    ./map-cc "$ISO3166TAB" < "$ISO3166TRANSLATIONS/en.po" > debian/pobuild/en.po
+    ./map-cc "$ISO3166XML" < "$ISO3166TRANSLATIONS/en.po" > debian/pobuild/en.po
     msgmerge -U debian/pobuild/en.po debian/pobuild/templates.pot 2>/dev/null
     printf "Done.\n"
 fi
