@@ -72,7 +72,7 @@ clean:
 	rm -f demo demo.templates
 	rm -rf debian/iso-codes debian/pobuild
 
-reallyclean:
+reallyclean: clean
 	rm -f debian/choose-mirror.templates
 ifdef MIRRORLISTURL
 	rm -f Mirrors.masterlist
