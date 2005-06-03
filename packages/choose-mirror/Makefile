@@ -2,7 +2,10 @@ CFLAGS=-Wall -g -D_GNU_SOURCE -DWITH_HTTP -DWITH_FTP
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=choose-mirror
 LIBS=-ldebconfclient -ldebian-installer
+
+# Derivative distributions may want to change these.
 MIRRORLISTURL=http://cvs.debian.org/*checkout*/webwml/english/mirror/Mirrors.masterlist?rev=HEAD&cvsroot=webwml&content-type=text/plain
+MASTERLIST=Mirrors.masterlist
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG
@@ -10,8 +13,9 @@ endif
 
 all: $(BIN) debian/choose-mirror.templates
 
+ifdef MIRRORLISTURL
 # Freshen Mirrors.masterlist file, but allow failure.
-Mirrors.masterlist: force-try-update
+$(MASTERLIST): force-try-update
 	if [ "$$ONLINE" != n ]; then \
 		if wget -nv '$(MIRRORLISTURL)' -O - > $@.new && \
 		   test -s $@.new; then \
@@ -21,24 +25,25 @@ Mirrors.masterlist: force-try-update
 		fi; \
 	fi
 force-try-update: ;
+endif
 
-debian/httplist-countries:
-	./mirrorlist httplist
+debian/httplist-countries: $(MASTERLIST)
+	./mirrorlist httplist $^
 
-debian/ftplist-countries:
-	./mirrorlist ftplist
+debian/ftplist-countries: $(MASTERLIST)
+	./mirrorlist ftplist $^
 
-debian/choose-mirror.templates: Mirrors.masterlist debian/choose-mirror.templates-in debian/httplist-countries debian/ftplist-countries
+debian/choose-mirror.templates: $(MASTERLIST) debian/choose-mirror.templates-in debian/httplist-countries debian/ftplist-countries
 	# Grab ISO codes from iso-codes package
 	./get-iso-codes
 	# Build the templates
 	./mktemplates
 
-mirrors_http.h: Mirrors.masterlist
-	./mirrorlist http
+mirrors_http.h: $(MASTERLIST)
+	./mirrorlist http $^
 
-mirrors_ftp.h: Mirrors.masterlist
-	./mirrorlist ftp
+mirrors_ftp.h: $(MASTERLIST)
+	./mirrorlist ftp $^
 
 choose-mirror.o: mirrors_http.h mirrors_ftp.h
 
@@ -68,7 +73,10 @@ clean:
 	rm -rf debian/iso-codes debian/pobuild
 
 reallyclean:
-	rm -f debian/choose-mirror.templates Mirrors.masterlist
+	rm -f debian/choose-mirror.templates
+ifdef MIRRORLISTURL
+	rm -f Mirrors.masterlist
+endif
 
 .PHONY: demo
 demo: choose-mirror demo.templates

@@ -9,6 +9,8 @@
 use strict;
 
 my $type = shift || die "please specify mirror type\n";
+my $input = shift;
+$input = 'Mirrors.masterlist' unless defined $input;
 
 my $hostarch=$ENV{DEB_HOST_ARCH};
 if (! defined $hostarch) {
@@ -22,7 +24,7 @@ my %countries;
 my %http_countries;
 my %ftp_countries;
 my $id=0;
-open (IN, "Mirrors.masterlist") or die "Mirrors.masterlist: $!";
+open (IN, $input) or die "$input: $!";
 while (<IN>) {
 	chomp;
 	if (m/([^:]*):\s+(.*)/) {
