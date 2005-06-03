@@ -12,6 +12,10 @@ export ISO3166XML
 # Translations location (relative to the build root directory)
 ISO3166TRANSLATIONS=debian/iso-codes
 
+if [ -z "$DEB_HOST_ARCH" ]; then
+    DEB_HOST_ARCH="$(dpkg-architecture -qDEB_HOST_ARCH)"
+fi
+
 # Get the ordered list of countries from the iso_3166.xml, sorted
 # according to the regionmap.
 #
@@ -30,7 +34,8 @@ printf " Done.\n"
 printf "Insert the lists of choices into the templates file..."
 # Now put this list as the choices in the templates
 # and defined this field as translatable (__Choices hack)
-cat debian/choose-mirror.templates-in | \
+debian/templates-build.pl "$DEB_HOST_ARCH" \
+    < debian/choose-mirror.templates-in | \
     perl -pe 'if (m,http/countries$,) { $http = 1; } elsif ($http and /enter information manually$/) { s/$/, '"$HTTPCHOICES"'/; $http = 0; }' | \
     perl -pe 'if (m,ftp/countries$,)  { $ftp  = 1; } elsif ($ftp  and /enter information manually$/) { s/$/, '"$FTPCHOICES"'/;  $ftp  = 0; }' | \
     sed "/^_Choices: enter/s/_Choices:/__Choices:/g" \
