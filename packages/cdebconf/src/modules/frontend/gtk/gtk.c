@@ -69,6 +69,14 @@
 
 #include <gtk/gtk.h>
 
+
+/* used by the treeview widgets */
+enum
+{
+	COL_NAME = 0,
+	NUM_COLS
+} ;
+
 typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
 
 #define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
@@ -518,6 +526,56 @@ void enable_jump_confirmation_callback(GtkWidget *widget, struct frontend_questi
 	
 }
 
+gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *model, GtkTreePath *path, gboolean path_currently_selected, struct frontend_question_data *data)
+{
+    struct question *q = data->q;
+    char **choices, **choices_translated;
+    int i, count;
+    int *tindex = NULL;
+    const gchar *indices = q_get_indices(q);
+	gchar *name;
+	GtkTreeIter iter;
+	
+	INFO(INFO_DEBUG, "GTK_DI - gboolean select_treeview_callback() called");
+
+	enable_jump_confirmation_callback(NULL, data);
+
+    count = strgetargc(q_get_choices_vals(q));
+    if (count <= 0)
+        return FALSE; /* DC_NOTOK */;
+    choices = malloc(sizeof(char *) * count);
+    choices_translated = malloc(sizeof(char *) * count);
+    tindex = malloc(sizeof(int) * count);
+
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+        return FALSE;/* DC_NOTOK */;
+
+	if (gtk_tree_model_get_iter(model, &iter, path))
+		{
+	    gtk_tree_model_get(model, &iter, COL_NAME, &name, -1);
+	    if (!path_currently_selected)
+		    {
+		    for (i = 0; i < count; i++)
+				{
+	    		if (strcmp(name, choices_translated[i]) == 0)
+	    			{
+	    			/* INFO(INFO_DEBUG, "GTK_DI - gboolean select_treeview_callback(): %s is going to be selected  called", name); */
+	        		question_setvalue(q, choices[tindex[i]]);
+	        		}
+	    		free(choices[tindex[i]]);
+	    		free(choices_translated[i]);
+				}
+		    }
+		}
+	
+    g_free(name);
+    free(choices);
+    free(choices_translated);
+    free(tindex);
+
+return TRUE;
+}
+
 static const char *
 get_text(struct frontend *obj, const char *template, const char *fallback )
 {
@@ -658,7 +716,8 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     if (defcount < 0)
         return DC_NOTOK;
     /* This is to prevent multiselect questions with no options from
-     * making the frontend hang; the frontend should also automatically
+     * making the frontend hang.
+     * TODO: the frontend should also automatically
      * skip the question and return DC_OK.
      * The following two lines of code need to be commented in order to allow
      * multiselect questions with options but no default options activated
@@ -902,6 +961,68 @@ static int gtkhandler_select_single(struct frontend *obj, struct question *q, Gt
     return DC_OK;
 }
 
+static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    char **choices, **choices_translated;
+    int i, count;
+    struct frontend_question_data *data;
+    const char *defval = question_getvalue(q, "");
+    int *tindex = NULL;
+    const gchar *indices = q_get_indices(q);
+
+	GtkTreeModel        *model;
+	GtkListStore  		*store;
+	GtkTreeIter    		iter;
+	GtkWidget           *view;
+	GtkCellRenderer     *renderer;
+	GtkTreeSelection    *selection;
+
+    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview() called");
+
+    data = NEW(struct frontend_question_data);
+    data->obj = obj;
+    data->q = q;
+
+    count = strgetargc(q_get_choices_vals(q));
+    if (count <= 0)
+        return DC_NOTOK;
+    choices = malloc(sizeof(char *) * count);
+    choices_translated = malloc(sizeof(char *) * count);
+    tindex = malloc(sizeof(int) * count);
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+        return DC_NOTOK;
+
+	view = gtk_tree_view_new ();
+    gtk_box_pack_start(GTK_BOX(qbox), view, FALSE, FALSE, 0);
+    
+	renderer = gtk_cell_renderer_text_new ();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", COL_NAME, NULL);
+	store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
+
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
+	gtk_tree_selection_set_select_function(selection, select_treeview_callback, data, NULL);
+	model = GTK_TREE_MODEL( store );
+	gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
+	g_object_unref (model);
+
+    for (i = 0; i < count; i++)
+    {
+		gtk_list_store_append (store, &iter);
+		gtk_list_store_set (store, &iter, COL_NAME, choices_translated[i], -1);
+        if (defval && strcmp(choices[tindex[i]], defval) == 0)
+        {
+        	gtk_tree_selection_select_iter  (selection, &iter );
+        }
+        free(choices[tindex[i]]);
+    }
+    
+    free(choices);
+    free(choices_translated);
+    free(tindex);
+
+    return DC_OK;
+}
+
 static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *combo, *frame;
@@ -994,17 +1115,11 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 
 static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    /* actually the gtkhandler_select_single is used to display the main
-     * menu only and is called directly, so any other SELECT question 
-     * will be handled by gtkhandler_select_multiple
-     */	
 
-#if 0
-    if (q->prev == NULL)
-        return gtkhandler_select_single(obj, q, qbox);
+    if (q->prev == NULL && q->next == NULL)
+        return gtkhandler_select_treeview(obj, q, qbox);
     else
-#endif
-        return gtkhandler_select_multiple(obj, q, qbox);
+		return gtkhandler_select_multiple(obj, q, qbox);
 }
 
 static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget *qbox)
