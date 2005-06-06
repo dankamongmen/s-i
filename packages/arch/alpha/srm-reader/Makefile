@@ -5,6 +5,7 @@ clean:
 install: 
 	install -m 755 srm-reader ${DESTDIR}/usr/bin/srm-reader
 	install -m 644 lang-codes $(DESTDIR)/usr/share/srm-reader/lang-codes
+	install -m 644 country-codes $(DESTDIR)/usr/share/srm-reader/country-codes
 
 .PHONY: demo
 	ln -sf debian/templates demo.templates
