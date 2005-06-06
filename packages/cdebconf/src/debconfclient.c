@@ -103,6 +103,13 @@ struct debconfclient *debconfclient_new(void)
 	client->commandf = debconfclient_commandf;
 	client->ret = debconfclient_ret;
 	client->out = fdopen(3, "a");
+	/* If we aren't connected to cdebconf, try talking to stdout. It
+	 * might be (Perl) debconf, or a developer might just want to talk
+	 * debconf protocol to us by hand. Either way, it's better than
+	 * segfaulting.
+	 */
+	if (!client->out)
+		client->out = stdout;
 
 	return client;
 }
