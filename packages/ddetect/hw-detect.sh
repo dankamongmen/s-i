@@ -722,6 +722,10 @@ if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
 	done
 fi
 
+if db_get hw-detect/start_pcmcia && [ "$RET" = false ]; then
+	have_pcmcia=0
+fi
+
 # Try to do this only once..
 if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>/dev/null; then
 	log "Detected PCMCIA, installing pcmcia-cs."
