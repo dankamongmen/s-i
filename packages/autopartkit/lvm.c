@@ -86,18 +86,23 @@ vg_exists(const char *vgname)
     struct stat statbuf;
     char *devpath = NULL;
     int retval = FALSE;
+    char *command = NULL;
 
     if (NULL == vgname)
         return FALSE;
 
-    if ( -1 == asprintf(&devpath, "/proc/lvm/VGs/%s", vgname) )
-        autopartkit_error(0, "Unable to allocate string for vg '%s'", vgname);
-    else
-    {
-        if (0 == stat(devpath, &statbuf) && S_ISDIR(statbuf.st_mode) )
-	    retval = TRUE;
-        free(devpath);
+    /* If the VG is missing, text is only printed on stderr.  Throw
+       away this, to detect if the VG existed or not. */
+    asprintf(&command, "vgdisplay \"%s\" 2>/dev/null |grep -q \"%s\"",
+	     vgname, vgname);
+
+    if ( NULL == command ) {
+        autopartkit_error(0, "Unable to allocate string for command");
+	return retval;
     }
+    if (0 == system(command))
+	retval = TRUE;
+    free(command);
     return retval;
 }
 
