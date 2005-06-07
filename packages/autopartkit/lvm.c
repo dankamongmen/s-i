@@ -295,6 +295,11 @@ lvm_get_free_space_list(char *vgname, struct disk_info_t *spaceinfo)
     memset(&(spaceinfo->geom), 0, sizeof(spaceinfo->geom));
     autopartkit_log(2, "  Locating free space on volumegroup %s\n", vgname);
 
+    /*
+     * Redirect errors to /dev/null, to avoid lots of messages claiming
+     * "File descriptor [3,4,5,6,7] left open", making it hard to find the
+     * VG size.
+     */
     asprintf(&command, "/sbin/vgdisplay -c %s 2>/dev/null", vgname);
     autopartkit_log(2, "  Running command: %s\n", command);
     vgdisplay = popen(command, "r");
