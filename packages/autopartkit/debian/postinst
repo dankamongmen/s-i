@@ -24,12 +24,15 @@ run_parts() {
 	fi
     done
 }
-# Try to load LVM support
+
+# Try to load LVM support, and make sure the user tools are installed into
+# /target/.  It should be safe to try both alternatives, as only the working
+# one will be activated at boot.
 depmod -a >> $log 2>&1 || true
 modprobe dm-mod >> $log 2>&1 || true
-
-# Make sure it is installed into /target/ as well
+modprobe lvm-mod >> $log 2>&1 || true
 apt-install lvm2 || true
+apt-install lvm10 || true
 
 # Run all scripts to choose table file
 run_parts /usr/lib/autopartkit.d
