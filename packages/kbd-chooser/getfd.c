@@ -70,6 +70,6 @@ int getfd() {
       if (is_a_console(fd))
 	return fd;
 
-    di_error ("Couldnt get a file descriptor referring to the console\n");
+    di_error ("Couldn't get a file descriptor referring to the console\n");
     exit(1);		/* total failure */
 }
