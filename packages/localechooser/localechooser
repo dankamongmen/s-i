@@ -138,11 +138,8 @@ else
   db_set debconf/language C
 fi
 
-# First of all, analyse preseed/locale and
-# populate debconf with it
-# This must happen only once, at first run
-# We empty the variable when done
-db_get preseed/locale
+# Support preseeding of the locale all in one variable for convenience.
+db_get $localecode
 if test "$RET" ; then
   LOCALE="$RET"
   log "Locale has been preseeded to $LOCALE"
@@ -183,10 +180,6 @@ if test "$RET" ; then
       LOCALE=""
     fi
   fi
-  # Reset preseed/locale as it should be only used at first run
-  # If the user comes back to localechooser, this is probably
-  # because (s)he wants to reconfigure locale stuff
-  db_set preseed/locale ""
 fi
 
 db_get debian-installer/framebuffer || true
