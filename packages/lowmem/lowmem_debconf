@@ -8,24 +8,11 @@ db_subst "$template" MIN "$min"
 db_input critical "$template" || true
 db_go || true
 
-for var in countrychooser/country countrychooser/country-name \
-	countrychooser/shortlist; do
+for var in debian-installer/locale; do
 	if ! db_get $var; then
 		db_register debian-installer/dummy $var || true
 	fi
 done
 
 db_set debian-installer/framebuffer false || true
-
-db_set languagechooser/language-name "English" || true
-db_fset languagechooser/language-name seen true || true
-
 db_set debian-installer/locale "en_US" || true
-
-# XXX: do we really need to set this? shortlist is probably the only thing
-# needed.
-db_set countrychooser/country "US" || true
-db_fset countrychooser/country-name seen true || true
-
-db_set countrychooser/shortlist "US" || true
-db_fset countrychooser/shortlist seen true || true
