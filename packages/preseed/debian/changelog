@@ -3,8 +3,20 @@ preseed (1.03) UNRELEASED; urgency=low
   * Colin Watson
     - Add preseed/interactive question, allowing you to preseed default
       answers to questions but still have them asked. Needs di-utils 1.09.
+  * Joey Hess
+    - Move debconf-set-selections to preseed-common, remove dep on di-utils.
+      Only preseed seems to use it, so might as well concentrate preseeding
+      stuff here.
+    - Add a new env-preseed udeb, gather the bits from rootskel and
+      di-utils that were used for (boot-time) environment overriding of
+      debconf values (env2debconf and the init script that runs it), and
+      move them into this new udeb.
+    - Log variables preseeded from the environment in the preseed log file,
+      but leave them commented out, since environment preseeding is typically
+      used for one-off overridding, and we don't want preseeded
+      debconf/priority or the like to affect the installed system. Probably.
 
- -- Colin Watson <cjwatson@debian.org>  Fri,  7 Jan 2005 15:52:56 +0000
+ -- Joey Hess <joeyh@debian.org>  Tue, 31 May 2005 20:37:19 -0400
 
 preseed (1.02) unstable; urgency=low
 

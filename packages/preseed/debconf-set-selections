@@ -1,0 +1,42 @@
+#!/bin/sh
+set -e
+
+export DEBIAN_FRONTEND=none
+. /usr/share/debconf/confmodule
+
+SEEN=1
+if [ "$1" = --unseen ]; then
+	SEEN=
+	shift
+fi
+
+file="$1"
+
+OLDIFS="$IFS"
+NEWLINE="
+"
+IFS="$NEWLINE"
+for line in $(grep -v '^#' "$file"); do
+	IFS="$OLDIFS"
+	set -- $line
+	#package="$1"
+	var="$2"
+	type="$3"
+	shift 3
+	val="$@"
+	if [ "$type" = seen ]; then
+		# Set seen flag.
+		db_fset "$var" "$type" "$val" || true # how to handle this error?
+	else
+		if ! db_set "$var" "$val"; then
+			# Question does not exist yet.
+			db_register debian-installer/dummy "$var"
+			db_set "$var" "$val"
+			db_subst "$var" ID "$var"
+		fi
+		if [ "$SEEN" ]; then
+			db_fset "$var" seen true
+		fi
+	fi
+	IFS="$NEWLINE"
+done

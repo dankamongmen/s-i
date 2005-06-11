@@ -1,0 +1,36 @@
+#!/bin/sh
+# Import foo/bar=baz from environment variables into the debconf db.
+set -e
+export DEBIAN_FRONTEND=none
+. /usr/share/debconf/confmodule
+NEWLINE='
+'
+OLDIFS=$IFS
+IFS=$NEWLINE
+for line in $(set); do
+	var="${line%=*}"
+	val="${line#[!=]*=}"
+	# grep out the normal variables with no slashes
+	varnoslash="${var##*/*}"
+	if [ "$var" != "" ] && [ "$val" != "" ] && [ "$varnoslash" = "" ]; then
+		# remove single quotes from around value
+		val="${val#\'}"
+		val="${val%\'}"
+		# remove double quotes (user can type those for values with
+		# spaces)
+		val="${val#\"}"
+		val="${val%\"}"
+
+		IFS=$OLDIFS
+		if ! db_set "$var" "$val"; then
+			db_register debian-installer/dummy "$var"
+			db_set "$var" "$val"
+			db_subst "$var" ID "$var"
+		fi
+			
+		type=$(db_metaget "$var" type || echo unknown)
+		echo "#d-i $var $type $val" >> /var/log/debconf-seed
+		db_fset "$var" seen true
+		IFS=$NEWLINE
+	fi
+done
