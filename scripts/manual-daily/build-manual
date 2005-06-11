@@ -290,7 +290,8 @@ for lang in $languages; do
         # Upload logfile to home.tiscali.nl
         echo -e "lcd $logdir\ncd d-i/log\nput $lang.log\nquit" >/tmp/ftp_script.$$
         ftp -p -v home.tiscali.nl </tmp/ftp_script.$$ >/tmp/ftp_log.$$
-        if egrep -q "^226 Transfer complete" /tmp/ftp_log.$$ ; then
+	# 226 = transfer complete
+        if egrep -q "^226" /tmp/ftp_log.$$ ; then
             echo "  Upload of $lang.log success" >>$mainlog
         else
             echo "  Upload of $lang.log failed" >>$mainlog
