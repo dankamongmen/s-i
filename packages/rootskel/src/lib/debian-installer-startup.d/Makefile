@@ -20,7 +20,6 @@ files = \
 	S03hotplug \
 	S10syslog \
 	S20templates \
-	S30read-environment \
 	S35term
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
