@@ -380,6 +380,50 @@ void strescape(const char *inbuf, char *outbuf, const size_t maxlen, const int q
 	outbuf[i] = 0;
 }
 
+/* These versions allocate their own memory.
+ * TODO: rename to something more self-explanatory
+ */
+
+char *unescapestr(const char *in)
+{
+	static size_t buflen = 0;
+	static char *buf = NULL;
+	size_t inlen;
+
+	if (in == 0) return 0;
+
+	inlen = strlen(in) + 1;
+	if (buflen < inlen) {
+		buflen = inlen;
+		buf = realloc(buf, buflen * sizeof *buf);
+		if (!buf)
+			DIE("Out of memory");
+	}
+
+	strunescape(in, buf, buflen, 0);
+	return buf;
+}
+
+char *escapestr(const char *in)
+{
+	static size_t buflen = 0;
+	static char *buf = NULL;
+	size_t inlen;
+
+	if (in == 0) return 0;
+
+	inlen = strlen(in) + 1;
+	if (buflen < inlen) {
+		buflen = inlen;
+		buf = realloc(buf, buflen * sizeof *buf);
+		if (!buf)
+			DIE("Out of memory");
+	}
+
+	strescape(in, buf, buflen, 0);
+	return buf;
+}
+
 int strwrap(const char *str, const int width, char *lines[], int maxlines)
 {
 #ifdef HAVE_LIBTEXTWRAP

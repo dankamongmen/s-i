@@ -52,22 +52,6 @@ void rfc822db_destroyiterator(void *data)
 }
 
 
-static char *unescapestr(const char *in)
-{
-    static char buf[8192];
-    if (in == 0) return 0;
-    strunescape(in, buf, sizeof(buf), 0);
-    return buf;
-}
-
-static char *escapestr(const char *in)
-{
-    static char buf[8192];
-    if (in == 0) return 0;
-    strescape(in, buf, sizeof(buf), 0);
-    return buf;
-}
-
 static void parse_variables(struct question *q, char *string)
 {
     char *wc, *owc;

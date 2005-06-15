@@ -45,6 +45,8 @@ int strchoicesplitsort(const char *origbuf, const char *transbuf, const char *li
 int strcmdsplit(char *inbuf, char **argv, size_t maxnarg);
 void strunescape(const char *inbuf, char *outbuf, const size_t maxlen, const int quote);
 void strescape(const char *inbuf, char *outbuf, const size_t maxlen, const int quote);
+char *unescapestr(const char *in);
+char *escapestr(const char *in);
 int strwrap(const char *str, const int width, char *lines[], int maxlines);
 int strlongest(char **strs, int count);
 

@@ -58,23 +58,6 @@ static char *question_filename(struct question_db *db, const char *tag)
 	return filename;
 }
 
-static char *unescapestr(const char *in)
-{
-	static char buf[8192];
-	char *p = (char *)in;
-	if (in == 0) return 0;
-	strunescape(p, buf, sizeof(buf), 1);
-	return buf;
-}
-
-static char *escapestr(const char *in)
-{
-	static char buf[8192];
-	if (in == 0) return 0;
-	strescape(in, buf, sizeof(buf), 1);
-	return buf;
-}
-
 static struct template *textdb_lookup_cached_template(
 	const struct template_db *db, const char *tag)
 {

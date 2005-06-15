@@ -19,18 +19,6 @@
 
 static PerlInterpreter *perlinterp = 0;
 
-/* These functions arent used (yet?)
-static char *unescapestr(const char *in)
-{
-	return 0;
-}
-
-static char *escapestr(const char *in)
-{
-	return 0;
-}
-*/
-
 static int perldb_initialize(struct database *db, struct configuration *cfg)
 {
 	char *embedded[] = { "", "-e", "0" };

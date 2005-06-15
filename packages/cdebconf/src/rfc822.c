@@ -6,41 +6,51 @@
 #include "strutl.h"
 
 
-static char *unescapestr(const char *in)
-{
-    static char buf[8192];
-    if (in == 0) return 0;
-    strunescape(in, buf, sizeof(buf), 0);
-    return buf;
-}
-
 /*
  * Function: rfc822db_parse_stanza
  * Input: a FILE pointer to an open readable file containing a stanza in rfc822 
  *    format.
  * Output: a pointer to a dynamically allocated rfc822_header structure
  * Description: parse a stanza from file into the returned header struct
- * Assumptions: no lines are over 8192 bytes long.
  */
 
 struct rfc822_header* rfc822_parse_stanza(FILE *file)
 {
     struct rfc822_header *head, **tail, *cur;
-    char buf[8192];
+    static size_t buflen = 8192;
+    static char *buf = NULL;
+
+    if (!buf) {
+        buf = malloc(buflen * sizeof *buf);
+        if (!buf)
+            DIE("Out of memory");
+    }
 
     head = NULL;
     tail = &head;
     cur = NULL;
 
     /*    fprintf(stderr,"rfc822db_parse_stanza(file)\n");*/
-    while (fgets(buf, sizeof(buf), file))
+    while (fgets(buf, buflen, file))
     {
-        char *tmp = buf;
+        char *tmp;
+        size_t tmplen = strlen(buf);
 
-        if (*tmp == '\n')
+        if (*buf == '\n')
             break;
 
+        while (buf[tmplen - 1] != '\n') {
+            buflen += 8192;
+            buf = realloc(buf, buflen * sizeof *buf);
+            if (!buf)
+                DIE("Out of memory");
+            if (!fgets(buf + tmplen, buflen - tmplen, file))
+                break;
+            tmplen += strlen(buf + tmplen);
+        }
+
         CHOMP(buf);
+        tmp = buf;
 
         if (isspace(*tmp))
         {
