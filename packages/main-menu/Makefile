@@ -5,6 +5,8 @@ LIBS=-ldebconfclient -ldebian-installer
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG=1
+else
+CFLAGS:=$(CFLAGS) -Os -fomit-frame-pointer
 endif
 
 all: $(BIN)
