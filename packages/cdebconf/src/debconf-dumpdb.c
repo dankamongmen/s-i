@@ -42,6 +42,8 @@ int main(int argc, char **argv)
     struct template_db *tdb;
     struct question_db *qdb;
     struct question *q;
+    char *configpath;
+    const char *tdbname;
     char *dbname = 0;
     char *pattern = 0;
     regex_t pattern_regex;
@@ -75,8 +77,15 @@ int main(int argc, char **argv)
     if (config->read(config, DEBCONFCONFIG) == 0)
         DIE("Error reading configuration information");
 
+    /* find out which template databases to load; fall back to global
+     * default if not configured otherwise
+     */
+    if (asprintf(&configpath, "config::instance::%s::template", dbname) == -1)
+        DIE("Out of memory");
+    tdbname = config->get(config, configpath, NULL);
+
     /* initialize database modules */
-    if ((tdb = template_db_new(config, NULL)) == 0)
+    if ((tdb = template_db_new(config, tdbname)) == 0)
         DIE("Cannot initialize debconf template database");
     if ((qdb = question_db_new(config, tdb, dbname)) == 0)
         DIE("Cannot initialize debconf database");

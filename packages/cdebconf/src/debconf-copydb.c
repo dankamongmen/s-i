@@ -35,12 +35,14 @@ void usage(const char *exename)
 int main(int argc, char **argv)
 {
     struct configuration *config;
-    struct template_db *tdb;
+    struct template_db *tdb1, *tdb2;
     struct question_db *db1, *db2;
     struct question *q;
 #if 0
     struct template *t;
 #endif
+    char *configpath1, *configpath2;
+    const char *tdb1name, *tdb2name;
     char *db1name = 0, *db2name = 0;
     char *pattern = 0;
     regex_t pattern_regex;
@@ -75,16 +77,31 @@ int main(int argc, char **argv)
     if (config->read(config, DEBCONFCONFIG) == 0)
         DIE("Error reading configuration information");
 
+    /* find out which template databases to load; fall back to global
+     * default if not configured otherwise
+     */
+    if (asprintf(&configpath1, "config::instance::%s::template",
+                 db1name) == -1)
+        DIE("Out of memory");
+    tdb1name = config->get(config, configpath1, NULL);
+    if (asprintf(&configpath2, "config::instance::%s::template",
+                 db2name) == -1)
+        DIE("Out of memory");
+    tdb2name = config->get(config, configpath2, NULL);
+
     /* initialize database modules */
-    if ((tdb = template_db_new(config, NULL)) == 0)
-        DIE("Cannot initialize DebConf template database");
-    if ((db1 = question_db_new(config, tdb, db1name)) == 0)
+    if ((tdb1 = template_db_new(config, tdb1name)) == 0)
+        DIE("Cannot initialize first DebConf template database");
+    if ((tdb2 = template_db_new(config, tdb2name)) == 0)
+        DIE("Cannot initialize second DebConf template database");
+    if ((db1 = question_db_new(config, tdb1, db1name)) == 0)
         DIE("Cannot initialize first DebConf database");
-    if ((db2 = question_db_new(config, tdb, db2name)) == 0)
+    if ((db2 = question_db_new(config, tdb2, db2name)) == 0)
         DIE("Cannot initialize second DebConf database");
 
     /* load database */
-    tdb->methods.load(tdb);
+    tdb1->methods.load(tdb1);
+    tdb2->methods.load(tdb2);
     db1->methods.load(db1);
     db2->methods.load(db2);
     
@@ -125,7 +142,8 @@ nextq:
     db2->methods.save(db2);
     question_db_delete(db1);
     question_db_delete(db2);
-    template_db_delete(tdb);
+    template_db_delete(tdb1);
+    template_db_delete(tdb2);
 
     return 0;
 }
