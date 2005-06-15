@@ -57,9 +57,14 @@
 static int stack_template_db_initialize(struct template_db *db, struct configuration *cfg)
 {
      struct template_stack *tstack = NULL;
+     char *configpath;
      struct configitem *tmp, *child;
-     
-     tmp = cfg->tree(cfg, "template::instance::templatedb::stack");
+
+     if (asprintf(&configpath, "%s::stack", db->configpath) == -1)
+         return DC_NOTOK;
+     tmp = cfg->tree(cfg, configpath);
+     free(configpath);
+
      for (child = tmp->child; child != NULL; child = child->next) {
           if (tstack != NULL) {
                tstack->next = malloc(sizeof(struct template_stack));
@@ -216,9 +221,14 @@ static struct template *stack_template_db_iterate(struct template_db *db,
 static int stack_question_db_initialize(struct question_db *db, struct configuration *cfg)
 {
      struct question_stack *qstack = NULL;
+     char *configpath;
      struct configitem *tmp, *child;
 
-     tmp = cfg->tree(cfg, "config::instance::configdb::stack");
+     if (asprintf(&configpath, "%s::stack", db->configpath) == -1)
+         return DC_NOTOK;
+     tmp = cfg->tree(cfg, configpath);
+     free(configpath);
+
      for (child = tmp->child; child != NULL; child = child->next) {
           if (qstack != NULL) {
                qstack->next = malloc(sizeof(struct question_stack));
