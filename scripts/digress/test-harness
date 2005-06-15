@@ -81,7 +81,7 @@ use () {
 lock () {
 	while ! lockfile-create --retry 1 "$lockfile"; do
 		echo "$MACHINE is in use:"
-		ls -l $lockfile.lock
+		ls -l $lockfile.lock || true
 		echo "Retrying.."
 	done
 	lockfile-touch "$lockfile" &
