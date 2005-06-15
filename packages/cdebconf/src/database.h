@@ -97,7 +97,7 @@ struct question_db {
  * @param instance Name of instance (NULL for default)
  * @return Newly created db object
  */
-struct template_db *template_db_new(struct configuration *cfg, char *instance);
+struct template_db *template_db_new(struct configuration *cfg, const char *instance);
 
 /**
  * @brief Destroy a template db oject
@@ -112,7 +112,7 @@ void template_db_delete(struct template_db *db);
  * @param instance Name of instance (NULL for default)
  * @return Newly created db object
  */
-struct question_db *question_db_new(struct configuration *cfg, struct template_db *tdb, char *instance);
+struct question_db *question_db_new(struct configuration *cfg, struct template_db *tdb, const char *instance);
 
 /**
  * @brief Destroy a question db oject

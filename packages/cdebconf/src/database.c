@@ -122,7 +122,8 @@ static int template_db_accept(struct template_db *db,
     return common_accept(type, accept_types, reject_types);
 }
 
-struct template_db *template_db_new(struct configuration *cfg, char *instance)
+struct template_db *template_db_new(struct configuration *cfg,
+    const char *instance)
 {
 	struct template_db *db;
 	void *dlh;
@@ -361,7 +362,7 @@ static int question_db_accept(struct question_db *db,
 
 struct question_db *question_db_new(struct configuration *cfg, 
                                     struct template_db *tdb, 
-                                    char *instance)
+                                    const char *instance)
 {
 	struct question_db *db;
 	void *dlh;
