@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 static const char *template_lget(const struct template *t,
                 const char *lang, const char *field);
@@ -84,6 +85,15 @@ static char *getlanguage(void)
 		return NULL;
 
 	return cache_list_lang_ptr->lang;
+}
+
+static bool allow_i18n(void)
+{
+	const char *i18nenv = getenv("DEBCONF_NO_I18N");
+	if (i18nenv && !strcmp(i18nenv, "1"))
+		return false;
+	else
+		return true;
 }
 
 /*
@@ -333,6 +343,8 @@ static const char *template_lget(const struct template *t,
     /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
     {
+        if (!allow_i18n())
+            return NULL;
         orig_field = strdup(field);
         altlang = strchr(orig_field, '-');
         *altlang = 0;
@@ -436,6 +448,8 @@ static void template_lset(struct template *t, const char *lang,
     /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
     {
+        if (!allow_i18n())
+            return;
         orig_field = strdup(field);
         altlang = strchr(orig_field, '-');
         *altlang = 0;
@@ -555,7 +569,8 @@ struct template *template_load(const char *filename)
 	struct template *tlist = NULL, *t = 0;
 	unsigned int i;
 	int linesize;
-	
+	bool i18n = allow_i18n();
+
 	if ((fp = fopen(filename, "r")) == NULL)
 		return NULL;
 	while (fgets(buf, sizeof(buf), fp))
@@ -588,7 +603,7 @@ struct template *template_load(const char *filename)
 			template_lset(t, NULL, "type", p+6);
 		else if (strstr(p, "Default: ") == p && t != 0)
 			template_lset(t, NULL, "default", p+9);
-		else if (strstr(p, "Default-") == p && t != 0) 
+		else if (i18n && strstr(p, "Default-") == p && t != 0)
 		{
 			cp = strstr(p, ".UTF-8: ");
 			if (cp != NULL && cp != p+8)
@@ -606,7 +621,7 @@ struct template *template_load(const char *filename)
 		}
 		else if (strstr(p, "Choices: ") == p && t != 0)
 			template_lset(t, NULL, "choices", p+9);
-		else if (strstr(p, "Choices-") == p && t != 0) 
+		else if (i18n && strstr(p, "Choices-") == p && t != 0)
 		{
 			cp = strstr(p, ".UTF-8: ");
 			if (cp != NULL && cp != p+8)
@@ -624,7 +639,7 @@ struct template *template_load(const char *filename)
 		}
 		else if (strstr(p, "Indices: ") == p && t != 0)
 			template_lset(t, NULL, "indices", p+9);
-		else if (strstr(p, "Indices-") == p && t != 0) 
+		else if (i18n && strstr(p, "Indices-") == p && t != 0)
 		{
 			cp = strstr(p, ".UTF-8: ");
 			if (cp != NULL && cp != p+8)
@@ -666,7 +681,7 @@ struct template *template_load(const char *filename)
 				template_lset(t, NULL, "extended_description", extdesc);
 			}
 		}
-		else if (strstr(p, "Description-") == p && t != 0)
+		else if (i18n && strstr(p, "Description-") == p && t != 0)
 		{
 			cp = strstr(p, ".UTF-8: ");
 			if (cp != NULL && cp != p+12)
