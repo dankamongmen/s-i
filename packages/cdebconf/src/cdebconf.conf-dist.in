@@ -26,6 +26,11 @@ template {
     driver "rfc822db";
     path "/var/lib/cdebconf/templates.dat";
   };
+
+  instance "target_templatedb" {
+    driver "rfc822db";
+    path "/target/var/cache/debconf/templates.dat";
+  };
 };
 
 config {
@@ -61,6 +66,7 @@ config {
   instance "target_configdb" {
     driver "stack";
     stack { "target_config_gen_db"; "target_config_passwd_db"; };
+    template "target_templatedb";
   };
 };
 
