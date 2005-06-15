@@ -1,9 +1,12 @@
 #!/usr/bin/make -f
 
+export CFLAGS=-W -Wall -g
+
 build: build-stamp
 build-stamp:
 	dh_testdir
-	CFLAGS="-W -Wall -Os -fomit-frame-pointer" ./configure --without-depends --without-debug \
+	autoconf
+	./configure --without-depends --without-debug \
 		--without-remove --with-admindir=/var/lib/dpkg
 	$(MAKE) small
 	touch build-stamp
@@ -13,7 +16,7 @@ clean:
 	dh_testroot
 	rm -f build-stamp
 	-$(MAKE) distclean
-	dh_clean
+	dh_clean configure
 
 install: build
 	dh_testdir

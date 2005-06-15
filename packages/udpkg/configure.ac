@@ -5,11 +5,11 @@ dnl linux architectures and configurations, it is not used to make the
 dnl code more portable
 
 AC_INIT(configure.in)
+AC_CONFIG_SRCDIR([udpkg.c])
 CFLAGS="-Wall $CFLAGS"
 AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_HEADER(config.h:config.h.in)
 
-AC_DEFINE_UNQUOTED(VERSION,"0.1")
 AC_DEFINE_UNQUOTED(PACKAGE,"udpkg")
 
 dnl Checks for programs.

@@ -3,7 +3,7 @@
 all: configure
 	./configure && make
 
-configure: configure.in
+configure: configure.ac
 	autoconf
 
 .PHONY: clean distclean
