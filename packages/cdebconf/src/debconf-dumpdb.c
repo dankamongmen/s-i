@@ -75,8 +75,7 @@ int main(int argc, char **argv)
     /* initialize database modules */
     if ((tdb = template_db_new(config, NULL)) == 0)
         DIE("Cannot initialize debconf template database");
-    setenv("DEBCONF_CONFIG", dbname, 1);
-    if ((qdb = question_db_new(config, tdb, NULL)) == 0)
+    if ((qdb = question_db_new(config, tdb, dbname)) == 0)
         DIE("Cannot initialize debconf database");
 
     /* load database */

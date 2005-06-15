@@ -75,11 +75,9 @@ int main(int argc, char **argv)
     /* initialize database modules */
     if ((tdb = template_db_new(config, NULL)) == 0)
         DIE("Cannot initialize DebConf template database");
-    setenv("DEBCONF_CONFIG", db1name, 1);
-    if ((db1 = question_db_new(config, tdb, NULL)) == 0)
+    if ((db1 = question_db_new(config, tdb, db1name)) == 0)
         DIE("Cannot initialize first DebConf database");
-    setenv("DEBCONF_CONFIG", db2name, 1);
-    if ((db2 = question_db_new(config, tdb, NULL)) == 0)
+    if ((db2 = question_db_new(config, tdb, db2name)) == 0)
         DIE("Cannot initialize second DebConf database");
 
     /* load database */
