@@ -569,6 +569,17 @@ static int rfc822db_question_set(struct question_db *db, struct question *questi
 
     INFO(INFO_VERBOSE, "rfc822db_question_set(db,q=%s,q=%p)", question->tag, question);
 
+    /* merge old and new owner lists */
+    q = tfind(question, &dbdata->root, nodequestioncomp);
+    if (q != NULL) {
+        q = *(struct question **)q;
+        const struct questionowner *owner = q->owners;
+        while (owner) {
+            question_owner_add(question, owner->owner);
+            owner = owner->next;
+        }
+    }
+
     tdelete(question, &dbdata->root, nodequestioncomp);
     q = tsearch(question, &dbdata->root, nodequestioncomp);
     question_ref(question);
