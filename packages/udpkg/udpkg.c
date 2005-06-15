@@ -121,7 +121,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 	int r = 0;
 	char *cwd;
 	char buf[1024], buf2[1024];
-	int i;
+	unsigned int i;
 	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
 	                         "conffiles", "md5sums", "shlibs", 
 				 "templates", "menutest", "isinstallable",
@@ -414,6 +414,7 @@ static int dpkg_remove(struct package_t *pkgs)
 #else
 	FPRINTF(stderr, "udpkg: No support for -r.\n");
 	return 1;
+	pkgs = 0; /* avoid -W warning */
 #endif
 }
 
