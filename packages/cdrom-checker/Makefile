@@ -18,7 +18,7 @@
 
 
 CC = gcc
-CFLAGS = -W -Wall -Os
+CFLAGS = -W -Wall -Os -fomit-frame-pointer
 LD = gcc
 LDLFAGS =
 LDLIBS = -ldebconfclient -ldebian-installer
