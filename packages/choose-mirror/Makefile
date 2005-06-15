@@ -9,6 +9,8 @@ MASTERLIST=Mirrors.masterlist
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -DDODEBUG
+else
+CFLAGS:=$(CFLAGS) -Os -fomit-frame-pointer
 endif
 
 all: $(BIN) debian/choose-mirror.templates
