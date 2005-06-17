@@ -18,6 +18,7 @@ header () {
 }
 
 if [ -z "$HTTPD_STARTED" ]; then
+	[ -f /var/lib/httpd_stop ] && exit
 	HTTPD_STARTED=1
 	export HTTPD_STARTED
 	# daemonize
@@ -25,7 +26,7 @@ if [ -z "$HTTPD_STARTED" ]; then
 	exit
 else
 	# start up the next listener process
-	run_nc $0
+	[ -f /var/lib/httpd_stop ] || run_nc $0
 fi
 
 read GET page x y z

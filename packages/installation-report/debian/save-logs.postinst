@@ -48,9 +48,19 @@ web)
 	ln -sf /etc/lsb-release /var/log
 	ln -sf /var/lib/dpkg/status /var/log
 	ln -sf /usr/share/save-logs/install-report.template /var/log
-	# TODO: avoid running more than one
+
+	# Kill existing server if one is already running
+	: >/var/lib/httpd_stop # Blocks new listener processes from starting
+	sleep 1
+	for PID in $(pidof nc); do
+		if grep -q "httpd" /proc/$PID/cmdline ; then
+			# The server may already have gone if hit
+			kill $PID 2>/dev/null || true
+		fi
+	done
+	rm /var/lib/httpd_stop
 	httpd
-		
+
 	db_progress STEP 1
 	db_progress STOP
 	IPADDR=$(ifconfig | grep 'inet addr:' | head -1 | \
