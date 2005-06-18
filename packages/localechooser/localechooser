@@ -22,12 +22,6 @@ SUPPORTEDLOCALES=/etc/SUPPORTED-short
 SHORTLISTS=/etc/shortlists
 LANGUAGELISTFILE=/usr/share/languagelist
 
-for list in $ISO3166TAB ; do 
-	if [ -f "$list" ]; then
-		countries="$list"
-	fi
-done
-
 # This function installs a package (or marks it for install)
 # without failing if the install fails
 # It outputs a message to the log file
@@ -54,7 +48,7 @@ code2country() {
 	  echo ""
         else
           if [ -n "$1" ] ; then
-	    line=`grep "$1" $countries`
+	    line=`grep "$1" $ISO3166TAB`
 
 	    if [ -n "$line" ]; then
 	      # Remember that country names may have spaces so the code
@@ -71,7 +65,7 @@ code2country() {
 
 country2code() {
 	COUNTRYNAME=$(echo "$1" | sed 's/\\,/,/g')
-	line=`grep "$COUNTRYNAME$" $countries`
+	line=`grep "$COUNTRYNAME$" $ISO3166TAB`
 
 	if [ -n "$line" ]; then
 		set $line
