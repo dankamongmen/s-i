@@ -1,6 +1,6 @@
 /* This is the codename of the preferred distribution; the one that the
  * current version of d-i is targeted at installing. */
-#define PREFERRED_DISTRIBUTION "sarge"
+#define PREFERRED_DISTRIBUTION "etch"
 
 #include <debian-installer.h>
 #include <cdebconf/debconfclient.h>
