@@ -78,6 +78,10 @@ get_static_modinfo() {
 	echo "$modinfo"
 }
 
+cleanup () {
+	rm -f $TEMP_EXTRACT
+}
+
 ethernet_found() {
 	local ifaces=0
 	local firewire=0
@@ -127,10 +131,10 @@ module_probe() {
 	db_get "$question"
 	local params="$RET"
 	
-	if ! modprobe -v "$module" "$params"; then
+	if ! modprobe -v "$module" "$params" >> /var/log/messages 2>&1 ; then
 		if [ -z "$params" ] && [ ! "$prompted_params" ]; then
 			# Prompt the user for parameters for the module.
-			template="ethdetect/retry_params"
+			template="hw-detect/retry_params"
 			db_unregister "$question"
 			db_register "$template" "$question"
 			db_subst "$question" MODULE "$module"
@@ -140,17 +144,17 @@ module_probe() {
 			params="$RET"
 
 			if [ -n "$params" ] && \
-			   ! modprobe -v "$module" $params ; then
+			   ! modprobe -v "$module" $params >> /var/log/messages 2>&1 ; then
 				db_unregister "$question"
-				db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
-				db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
+				db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
+				db_input critical hw-detect/modprobe_error || [ $? -eq 30 ]
 				db_go
 				false
 			fi
 		else
 			db_unregister "$question"
-			db_subst ethdetect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
-			db_input critical ethdetect/modprobe_error || [ $? -eq 30 ]
+			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
+			db_input critical hw-detect/modprobe_error || [ $? -eq 30 ]
 			db_go
 			false
 		fi
@@ -201,7 +205,7 @@ while ! ethernet_found; do
 		db_subst ethdetect/module_select CHOICES "$CHOICES"
 		db_input high ethdetect/module_select || [ $? -eq 30 ]
 		if ! db_go; then
-			rm -f $TEMP_EXTRACT
+			cleanup
 			exit 10
 		fi
 		db_capb
@@ -221,13 +225,13 @@ while ! ethernet_found; do
 
 	if [ -e /usr/lib/debian-installer/retriever/floppy-retriever ]; then
 		db_capb backup
-		db_input critical ethdetect/load_floppy
+		db_input critical hw-detect/load_floppy
 		if ! db_go; then
-			rm -f $TEMP_EXTRACT
+			cleanup
 			exit 10
 		fi
 		db_capb
-		db_get ethdetect/load_floppy
+		db_get hw-detect/load_floppy
 		if [ "$RET" = true ] && \
 		   anna floppy-retriever && \
 		   hw-detect ethdetect/detect_progress_title; then
@@ -238,17 +242,17 @@ while ! ethernet_found; do
 	db_capb backup
 	db_input high ethdetect/cannot_find
 	if ! db_go; then
-		rm -f $TEMP_EXTRACT
+		cleanup
 		exit 10
 	fi
 	db_capb
 
 	if [ -z "$CHOICES" ]; then
 		sysfs-update-devnames || true
-		rm -f $TEMP_EXTRACT
+		cleanup
 		exit 1
 	fi
 done
 
 sysfs-update-devnames || true
-rm -f $TEMP_EXTRACT
+cleanup

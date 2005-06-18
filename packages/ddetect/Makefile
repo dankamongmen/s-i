@@ -35,7 +35,7 @@ clean:
 	rm -f *.o
 	rm -f archdetect
 
-install: install-hw-detect install-ethdetect install-archdetect install-archdetect-deb
+install: install-hw-detect install-ethdetect install-disk-detect install-archdetect install-archdetect-deb
 
 install-hw-detect: hw-detect.sh
 	$(INSTALL) -d $(bindir)
@@ -55,11 +55,15 @@ else
 	$(INSTALL) detect-stub.sh $(bindir)/hw-detect
 endif
 
-install-hw-detect-full:
+install-disk-detect:
 
 install-ethdetect: ethdetect.sh
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) ethdetect.sh $(bindir)/ethdetect
+
+install-disk-detect: disk-detect.sh
+	$(INSTALL) -d $(bindir)
+	$(INSTALL) disk-detect.sh $(bindir)/disk-detect
 
 install-archdetect: archdetect
 	$(INSTALL) -d $(bindir)

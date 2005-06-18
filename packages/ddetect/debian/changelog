@@ -6,6 +6,25 @@ ddetect (1.19) UNRELEASED; urgency=low
       hasn't been started (Ubuntu bug #8678).
     - Fix DEB_HOST_ARCH_* compatibility code to handle the various special
       cases.
+  * Joey Hess
+    - Rename hw-detect-full to disk-detect.
+    - Add a disk-detect command, which uses hw-detect to load any additional
+      drivers, as hw-detect-full did, but which also checks to see if any
+      disks were found, and if none are, allows the user to select driver
+      modules from a list, or load more from a floppy. Closes: #283193
+    - disk-detect will use partman's parted_devices command if available to
+      see if any disks are found. Otherwise it falls back to a devfs find
+      similar to that used by partitioner and autopartkit. This is probably
+      good enough, but partman could be extended for network filesystems or
+      something else and disk-detect's check would not know about it.
+    - Move retry_params template to hw-detect so disk-detect can use it too.
+      hw-detect might also use it in the future. Same with load_floppy
+      template.
+    - Remove ethdetect/modprobe_error template, as it's identical to
+      hw-detect/modprobe_error. Use the latter in ethdetect.
+    - Direct some modprobe output to /var/log/messages in ethdetect as is done
+      in hw-detect.
+    - Add a cleanup function to ethdetect.
 
  -- Colin Watson <cjwatson@debian.org>  Tue,  7 Jun 2005 20:54:03 +0100
 
