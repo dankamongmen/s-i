@@ -62,9 +62,9 @@ cat $ROOT/bin/index.head >$pagefile
 
 # First, we build the table for the languages that have all architectures built
 
-# Order of languages is alphabetic on name.
-languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 8,8 | cut -f 1,2 | \
-           egrep "Y$" | cut -f 1`
+# Order of languages is alphabetic on name, but keep English first.
+languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sed "s/English/0English/" | \
+           sort -k 8,8 | cut -f 1,2 | egrep "Y$" | cut -f 1`
 
 # Order of architectures is alphabetic on name.
 architectures=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/archlist | sort -k 2,2 | cut -f 1`
