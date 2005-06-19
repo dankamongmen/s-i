@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 set -e
 . /usr/share/debconf/confmodule
@@ -112,7 +112,7 @@ load_module() {
 	else   
 		log "Error loading '$module'"
 		if [ "$module" != floppy ] && [ "$module" != ide-floppy ] && [ "$module" != ide-cd ]; then
-			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
+			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
 			db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
 			db_go
 		fi
@@ -780,11 +780,6 @@ db_progress STOP
 
 if [ -n "$MISSING_MODULES_LIST" ]; then
 	log "Missing modules '$MISSING_MODULES_LIST"
-	# Tell the user to try to load more modules from floppy
-	template=hw-detect/missing_modules
-	db_subst "$template" MISSING_MODULES_LIST "$MISSING_MODULES_LIST" || true
-	db_input low "$template" || [ $? -eq 30 ]
-	db_go || true
 fi
 
 sysfs-update-devnames
