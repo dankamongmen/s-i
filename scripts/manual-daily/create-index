@@ -85,14 +85,7 @@ architectures="i386"
 build_link_table
 
 if [ -f $logdir/tr-stats ] ; then
-    echo "" >>$pagefile
-    echo "<br>" >>$pagefile
-    echo "<h3>Translation status</h3>" >>$pagefile
-    echo "" >>$pagefile
-    echo "<p>" >>$pagefile
-    echo "This table shows how much of the manual has been translated for each language.<br>" >>$pagefile
-    echo "The column 'Files needing update' gives a rough indication of whether the translation is up to date." >>$pagefile
-    echo "</p>" >>$pagefile
+    cat $ROOT/bin/index.stats >>$pagefile
     echo "" >>$pagefile
 
     echo "<table>" >>$pagefile
@@ -152,5 +145,7 @@ fi
 
 #cat $ROOT/bin/index.tail >>$pagefile
 sed "s/%date%/`date -u`/" $ROOT/bin/index.tail >>$pagefile
+
+cp $ROOT/bin/translators.html $destination
 
 exit 0
