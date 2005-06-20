@@ -3,7 +3,7 @@
 # *** l10n-spellcheck.sh ***
 export LOCAL_REPOSITORY="${HOME}/di_manual"
 export REFRESH_CMD="svn up ${LOCAL_REPOSITORY}"
-export OUT_DIR="$HOME/public_html/spellcheck/manual_d-i/"
+export OUT_DIR="/var/lib/gforge/chroot/home/groups/d-i/htdocs/spellcheck/manual_d-i/"
 
 # *** check_dit.sh ***
 export PO_FINDER="./pof_di-manual.sh"

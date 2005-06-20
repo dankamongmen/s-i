@@ -2,7 +2,7 @@
 
 # *** l10n-spellcheck.sh ***
 export LOCAL_REPOSITORY="${HOME}/d-i/levels/level4"
-export OUT_DIR="${HOME}/public_html/spellcheck/level4/"
+export OUT_DIR="/var/lib/gforge/chroot/home/groups/d-i/htdocs/spellcheck/level4/"
 
 # remove ${ALL_THESE_VARIABLES} which do not need to be spell checked
 export REMOVE_VARS="yes"
