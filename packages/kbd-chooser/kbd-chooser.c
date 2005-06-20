@@ -132,12 +132,14 @@ grep (const char *file, const char *string)
 char *
 locale_get (void)
 {
+	int ret = 0;
+
 	struct debconfclient *client = mydebconf_client ();
 	// languagechooser sets locale of the form xx_YY
 	// NO encoding used.
 
-	debconf_get (client, "debian-installer/locale");
-	if (client->value && (strlen (client->value) > 0))
+	ret = debconf_get (client, "debian-installer/locale");
+	if ((ret != 10) && client->value && (strlen (client->value) > 0))
 		return strdup(client->value);
 	else
 		return strdup("en_US");
@@ -467,6 +469,8 @@ translated_template_get(char *template)
 		 ret = debconf_get(client,"debian-installer/language");
 		 if (client->value && (ret != 10))
 			 languages = strdup(client->value);
+		 else
+			 languages = strdup("en_US:en_EN:en");
 	}
 	lang = strdup (languages);
 	while  (lang) {
