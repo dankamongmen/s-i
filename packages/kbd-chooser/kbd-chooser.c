@@ -139,7 +139,7 @@ locale_get (void)
 	// NO encoding used.
 
 	ret = debconf_get (client, "debian-installer/locale");
-	if ((ret != 10) && client->value && (strlen (client->value) > 0))
+	if ((ret == 0) && client->value && (strlen (client->value) > 0))
 		return strdup(client->value);
 	else
 		return strdup("en_US");
@@ -467,7 +467,7 @@ translated_template_get(char *template)
 	
 	if (!languages) {
 		 ret = debconf_get(client,"debian-installer/language");
-		 if (client->value && (ret != 10))
+		 if ((ret == 0) && client->value)
 			 languages = strdup(client->value);
 		 else
 			 languages = strdup("en_US:en_EN:en");
