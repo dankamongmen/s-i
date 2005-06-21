@@ -470,7 +470,7 @@ translated_template_get(char *template)
 		 if ((ret == 0) && client->value)
 			 languages = strdup(client->value);
 		 else
-			 languages = strdup("en_US:en_EN:en");
+			 languages = strdup("en_US:en_GB:en");
 	}
 	lang = strdup (languages);
 	while  (lang) {
