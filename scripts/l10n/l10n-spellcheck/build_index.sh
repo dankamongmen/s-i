@@ -1,7 +1,24 @@
-# This script builds "index.html" starting from 
+#!/bin/bash
 #
-# "stats.txt"  (i.e.: 391 bg)
-# "index_template.html" 
+# -*-sh-*-
+#
+#     Copyright (C) 2004-2005 Davide Viti <zinosat@tiscali.it>
+# 
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 2 of the License, or
+#     (at your option) any later version.
+# 
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+# 
+#     You should have received a copy of the GNU General Public
+#     License along with this program; if not, write to the Free
+#     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+#     MA 02111-1307 USA
+#
 
 usage() {
     echo  "Usage:"
@@ -69,7 +86,7 @@ for ROW in `cat ${STATS} | sed  "s: :,:g"`; do
     LANG=`echo ${ROW} | awk -F, '{print $2}'`
     UNKN=`echo ${ROW} | awk -F, '{print $1}'`
     
-    ISO_CODE=`grep -w "${LANG}" iso_codes.txt | awk -F, '{print $2}'`
+    ISO_CODE=`grep -w "^${LANG}" iso_codes.txt | awk -F, '{print $2}'`
 
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     SUSP=`echo ${ROW} | awk -F, '{print $3}'`
