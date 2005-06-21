@@ -122,6 +122,11 @@ _mirror=$MIRROR
 _suite=${SUITE:-"unstable"}
 if [ -n "$DIST" ]; then
 	_dist=$DIST;
+	case $_dist in
+		sarge) _suite="stable" ;;
+		etch) _suite="testing" ;;
+		sid | *) _suite="unstable" ;;
+	esac
 else
 	case $_suite in
 		stable) _dist="sarge" ;;
