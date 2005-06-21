@@ -137,6 +137,11 @@ db_get $localecode
 if test "$RET" ; then
 	LOCALE="$RET"
 	log "Locale has been preseeded to $LOCALE"
+
+	# Only mark varibles seen if this one was preseeded seen.
+	db_fget $localecode seen
+	seenflag=$RET
+	
 	# Only populate debconf if this is a supported locale
 	# and if the language is supported in D-I
 	LANGNAME=$(locale2langname "$LOCALE" "$LANGUAGELISTFILE")
@@ -146,24 +151,20 @@ if test "$RET" ; then
 		log "Set $langname = '$LANGNAME'"
 		db_set $langname_nofb $LANGNAME
 		log "Set $langname_nofb = '$LANGNAME'"
-		# We want to jump over the language question
-		db_fset $langname seen true || true
-		db_fset $langname_nofb seen true || true
+		db_fset $langname seen $seenflag || true
+		db_fset $langname_nofb seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if test $COUNTRY ; then
 			if grep -q "$LANGUAGE" $SHORTLISTS ; then
 				db_set $shortlist-$LANGUAGE "$COUNTRY"
 				log "Set $shortlist-$LANGUAGE = '$COUNTRY'"
-				# don't want the questions to be asked
 				db_register $shortlist-$LANGUAGE $shortlist
-				# We want to jump over the country question
-				db_fset $shortlist seen true || true
+				db_fset $shortlist seen $seenflag || true
 			fi
-			db_fset $fulllist seen true || true
+			db_fset $fulllist seen $seenflag || true
 			if grep -q "$LOCALE" $SUPPORTEDLOCALES ; then
 				db_set $localecode $LOCALE
-				# We want to jump over the locale question
-				db_fset $localecode seen true || true
+				db_fset $localecode seen $seenflag || true
 				log "Set $localecode = '$LOCALE'"
 			else
 				# The locale was invalid, empty it
@@ -210,10 +211,6 @@ if db_go; then
 		log "Set $fallbacklocalecode = '$FALLBACKLOCALE''"
 		log "Set $countrycode = '$COUNTRY'"
 		log "Set $consoledisplay = '$CONSOLE''"
-		# Any further run of localechooser must
-		# trigger the language question
-		db_fset $langname seen false
-		db_fset $langname_nofb seen false
 	else
 		# Error, not sure how to handle it
 		:
@@ -373,11 +370,6 @@ if [ "$LANGUAGE" != "C" ]; then
 	log "Set $countrycode = '$COUNTRYCODE'"
 fi
 
-# Any further run must trigger the country  questions
-if [ "$use_lang" ] ; then
-	db_fset $shortlist seen false
-fi
-db_fset $fulllist seen false
 # Search for a supported locale which most closely resembles.
 OLDLOCALE=$LOCALE
 LOCALE=""
@@ -503,9 +495,5 @@ if db_go; then
 else
 	exit 10
 fi
-
-# Any further run should trigger the locale questions
-db_fset $localecode seen false || true
-db_fset $supportedlocales seen false || true
 
 exit 0
