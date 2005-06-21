@@ -84,6 +84,7 @@ rescan ()
 	dpkg-scanpackages $_target /dev/null >$_debpkg
 	gzip -c $_debpkg >${_debpkg}.gz
 	dpkg-scanpackages -u $_target /dev/null >$_udebpkg
+	gzip -c $_udebpkg >${_udebpkg}.gz
 
 	_debmd5sum=$(md5sum $_debpkg |cut -d' ' -f 1)
 	_debsize=$(find $_debpkg -printf %s )
