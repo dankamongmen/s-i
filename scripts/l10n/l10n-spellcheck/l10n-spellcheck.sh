@@ -24,11 +24,16 @@ export PATH=${HOME}/aspell:${HOME}/gnuplot/bin:${PATH}
 SCRIPT_WITHOUT_PATH=`basename $0`
 SCRIPTS_PATH=`echo $0 | sed "s:\(.*\)${SCRIPT_WITHOUT_PATH}\(.*\):\1\2:"`
 
-. ${HOME}/${SCRIPTS_PATH}/cfg/$1/setup.sh
-export LANGUAGE_LIST="cfg/$1/lang2dict.txt"
-export WLS_PATH="./cfg/$1/wls"
-export PO_FINDER="cfg/$1/po_finder.sh"
-export HTML_PAGE="cfg/$1/report_page.html"
+. $1/setup.sh
+export LANGUAGE_LIST="$1/lang2dict.txt"
+export WLS_PATH="$1/wls"
+export PO_FINDER="$1/po_finder.sh"
+export HTML_PAGE="$1/report_page.html"
+
+if [ -z ${LC_ALL} ] ; then
+    export LC_ALL="C"
+fi
+
 
 if  [ $? != 0 ] ; then
     echo "error: configuration file not found"
@@ -36,18 +41,19 @@ if  [ $? != 0 ] ; then
 fi
 
 NEW="check_$(date '+%Y%m%d')"
+WORK_DIR=${NEW}_${RANDOM}
 
 # update local copy of the repository (if necessary)
 ${REFRESH_CMD}
 
 # spellcheck and move data to public_html
 cd  ${HOME}/${SCRIPTS_PATH}
-sh check_all.sh ${LOCAL_REPOSITORY} ${NEW}_$1
+sh check_all.sh ${LOCAL_REPOSITORY} ${WORK_DIR}
 
 OLD_PATH=${OUT_DIR}/latest/nozip
-NEW_PATH=${NEW}_$1/nozip
+NEW_PATH=${WORK_DIR}/nozip
 
-for ROW in `cat ${NEW}_$1/stats.txt | sed 's: :,:g'`; do
+for ROW in `cat ${WORK_DIR}/stats.txt | sed 's: :,:g'`; do
     VAL=`echo ${ROW}| awk -F, '{print $1}'`
     LANG=`echo ${ROW}| awk -F, '{print $2}'`
 
@@ -71,21 +77,21 @@ done
 find ${NEW_PATH} -empty -exec rm '{}' ';'
 
 # build "index.html" with the new results
-export DIFF_DIR=${NEW}_$1
-sh build_index.sh ${NEW}_$1/stats.txt ${HTML_PAGE} ${NEW}_$1/index.html
+export DIFF_DIR=${WORK_DIR}
+sh build_index.sh ${WORK_DIR}/stats.txt ${HTML_PAGE} ${WORK_DIR}/index.html
 
 SAVED_STATS=`echo ${NEW}.txt | sed "s:check_:stats_:"`
-cp ${NEW}_$1/stats.txt ${OUT_DIR}/history/${SAVED_STATS}
-mv ${NEW}_$1/index.html ${OUT_DIR}
+cp ${WORK_DIR}/stats.txt ${OUT_DIR}/history/${SAVED_STATS}
+mv ${WORK_DIR}/index.html ${OUT_DIR}
 
 echo ""
 echo "***  $SAVED_STATS  ***"
 
-sh diff_stats.sh ${OUT_DIR}/latest/stats.txt ${NEW}_$1/stats.txt
+sh diff_stats.sh ${OUT_DIR}/latest/stats.txt ${WORK_DIR}/stats.txt
 
 LATEST=`ls -l ${OUT_DIR}/latest | sed "s:.*-> ::"`
 rm ${OUT_DIR}/latest 
 rm -fr $LATEST
 
-mv ${NEW}_$1 ${OUT_DIR}/${NEW}
+mv ${WORK_DIR} ${OUT_DIR}/${NEW}
 ln -s ${OUT_DIR}/${NEW}  ${OUT_DIR}/latest
