@@ -24,11 +24,12 @@ export PATH=${HOME}/aspell:${HOME}/gnuplot/bin:${PATH}
 SCRIPT_WITHOUT_PATH=`basename $0`
 SCRIPTS_PATH=`echo $0 | sed "s:\(.*\)${SCRIPT_WITHOUT_PATH}\(.*\):\1\2:"`
 
-. $1/setup.sh
-export LANGUAGE_LIST="$1/lang2dict.txt"
-export WLS_PATH="$1/wls"
-export PO_FINDER="$1/po_finder.sh"
-export HTML_PAGE="$1/report_page.html"
+export CFG_DIR=$1
+. ${CFG_DIR}/setup.sh
+export LANGUAGE_LIST="${CFG_DIR}/lang2dict.txt"
+export WLS_PATH="${CFG_DIR}/wls"
+export PO_FINDER="${CFG_DIR}/po_finder.sh"
+export HTML_PAGE="${CFG_DIR}/report_page.html"
 
 if [ -z ${LC_ALL} ] ; then
     export LC_ALL="C"
@@ -47,8 +48,7 @@ WORK_DIR=${NEW}_${RANDOM}
 ${REFRESH_CMD}
 
 # spellcheck and move data to public_html
-cd  ${HOME}/${SCRIPTS_PATH}
-sh check_all.sh ${LOCAL_REPOSITORY} ${WORK_DIR}
+check_all.sh ${LOCAL_REPOSITORY} ${WORK_DIR}
 
 OLD_PATH=${OUT_DIR}/latest/nozip
 NEW_PATH=${WORK_DIR}/nozip
@@ -60,7 +60,7 @@ for ROW in `cat ${WORK_DIR}/stats.txt | sed 's: :,:g'`; do
     LALL=${LANG}_all.txt
     LUWL=${LANG}_unkn_wl.txt
     LVAR=${LANG}_var.txt
-  
+
     for TO_DIFF in ${LALL} ${LUWL} ${LVAR} ; do
 	if [ -f ${OLD_PATH}/${TO_DIFF} -o -f ${NEW_PATH}/${TO_DIFF} ] ; then
 

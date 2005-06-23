@@ -1,3 +1,4 @@
+#!/usr/bin/awk -f
 # Original Author: Frans Pop <aragorn@tiscali.nl>
 # Modified by Davide Viti <zinosat@tiscali.it> in order to check italian translations
 # 

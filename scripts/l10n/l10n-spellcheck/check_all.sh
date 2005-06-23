@@ -63,7 +63,7 @@ for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
     fi
 
     
-    ./check_dit.sh ${LANG} ${DICT} ${DI_COPY} ${DEST_DIR}
+    check_dit.sh ${LANG} ${DICT} ${DI_COPY} ${DEST_DIR}
 
     i=`expr $i + 1`
 done

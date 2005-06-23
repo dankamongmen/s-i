@@ -26,9 +26,9 @@ usage() {
 }
 
 initialise() {
-GATHER_MSGSTR_SCRIPT=./msgstr_extract.awk
-GATHER_MSGID_SCRIPT=./msgid_extract.awk
-CHECK_VAR=./check_var.pl
+GATHER_MSGSTR_SCRIPT=msgstr_extract.awk
+GATHER_MSGID_SCRIPT=msgid_extract.awk
+CHECK_VAR=check_var.pl
 
 ALL_STRINGS=${DEST_DIR}/${LANG}_all.txt
 FILES_TO_KEEP="${ALL_STRINGS} ${FILES_TO_KEEP}"
@@ -48,21 +48,6 @@ checks(){
 
 if [ ! -d ${BASE_SEARCH_DIR} ] ; then
     echo ${BASE_SEARCH_DIR} does not exist
-    exit 1
-fi
-
-if [ ! -f ${GATHER_MSGSTR_SCRIPT} ] ; then
-    echo "${GATHER_MSGSTR_SCRIPT} does not exist. You need it!"
-    exit 1
-fi
-
-if [ ! -f ${GATHER_MSGID_SCRIPT} ] ; then
-    echo "${GATHER_MSGID_SCRIPT} does not exist. You need it!"
-    exit 1
-fi
-
-if [ ! -f ${CHECK_VAR} ] ; then
-    echo "${CHECK_VAR} does not exist. You need it!"
     exit 1
 fi
 
@@ -91,6 +76,7 @@ NEEDS_RM="${PO_FILE_LIST} ${NEEDS_RM}"
 sh ${PO_FINDER} ${BASE_SEARCH_DIR} ${LANG} > ${PO_FILE_LIST}
 
 rm -f ${ALL_STRINGS}
+
 for LANG_FILE in `cat ${PO_FILE_LIST}`; do
     ENC=`cat ${LANG_FILE} | grep -e "^\"Content-Type:" | sed 's:^.*charset=::' | sed 's:\\\n\"::'`
 
@@ -102,19 +88,19 @@ for LANG_FILE in `cat ${PO_FILE_LIST}`; do
 	    if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 		${CHECK_VAR} -s ${LANG_FILE} >> ${SUSPECT_VARS}
 	    fi
-	    awk -f ${GATHER_MSGSTR_SCRIPT} ${LANG_FILE} >> ${ALL_STRINGS}
+	    ${GATHER_MSGSTR_SCRIPT} ${LANG_FILE} >> ${ALL_STRINGS}
 	else
 	    if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 		${CHECK_VAR} -s ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${SUSPECT_VARS}
 	    fi
-	    awk -f ${GATHER_MSGSTR_SCRIPT} ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${ALL_STRINGS}
+	    ${GATHER_MSGSTR_SCRIPT} ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${ALL_STRINGS}
 	fi
 
     else			# now deal with ".pot" files
 	if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 	    ${CHECK_VAR} -s ${LANG_FILE} >> ${SUSPECT_VARS}
 	fi
-	awk -f ${GATHER_MSGID_SCRIPT} ${LANG_FILE} >> ${ALL_STRINGS}
+	${GATHER_MSGID_SCRIPT} ${LANG_FILE} >> ${ALL_STRINGS}
     fi
 done
 

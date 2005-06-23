@@ -39,7 +39,6 @@ STATS=$1
 TEMPLATE=$2
 INDEX_HTML=$3
 TABLE_HTML=stats.html_${RANDOM}
-DICTIONARIES=build-tools/dictionaries.txt
 
 # Compute some statistics
 i=0
@@ -77,7 +76,6 @@ fi
 
 echo "   <th class=\"t1\">Custom wordlist</th>"
 echo "   <th class=\"t1\">All files</th>"
-echo "   <th class=\"t1\">Aspell Dictionary</th>"
 echo " </tr>"
 
 # fill the table:
@@ -85,8 +83,8 @@ echo " </tr>"
 for ROW in `cat ${STATS} | sed  "s: :,:g"`; do
     LANG=`echo ${ROW} | awk -F, '{print $2}'`
     UNKN=`echo ${ROW} | awk -F, '{print $1}'`
-    
-    ISO_CODE=`grep -w "^${LANG}" iso_codes.txt | awk -F, '{print $2}'`
+
+    ISO_CODE=`grep -w "^${LANG}" ${CFG_DIR}/iso_codes.txt | awk -F, '{print $2}'`
 
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     SUSP=`echo ${ROW} | awk -F, '{print $3}'`
@@ -107,14 +105,6 @@ else
     WORDLIST=""
     WORDLIST_NAME="-"
 fi
-
-if [ ${LANG} = "pt_BR" ] ; then
-    DICT_URL=`grep -w "pt" ${DICTIONARIES}`
-else
-    DICT_URL=`grep -w "${LANG}" ${DICTIONARIES}`
-fi
-
-DICT_NAME=`echo ${DICT_URL} | sed "s|ftp://ftp.gnu.org/gnu/aspell/dict/.*/||" | sed "s:.tar.bz2$::"`
 
 echo "  <tr>"
 echo "   <td class=\"col1\">${ISO_CODE} [${LANG}]</td>"
@@ -159,7 +149,6 @@ fi
 
 echo "   <td><a href=\"${WORDLIST}\">${WORDLIST_NAME}</a></td>"
 echo "   <td><a href=\"latest/zip/${LANG}.tar.gz\">${LANG}.tar.gz</a></td>"
-echo "   <td><a href=\"${DICT_URL}\">${DICT_NAME}</a></td>"
 echo "  </tr>"
     
 done
