@@ -64,8 +64,9 @@ int packages_ok (di_packages *packages) {
 
 static int choose_modules(di_packages *status, di_packages **packages) {
 	char *choose_modules_question;
-	char *choices;
+	char *choices, *choices_dfl;
 	int package_count = 0;
+	int package_count_dfl, i;
 	di_package *package, *status_package, **package_array, *test_package;
 	di_slist_node *node, *node1, *node2;
 	int reverse_depend=0;
@@ -186,26 +187,46 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 
 	di_system_packages_resolve_dependencies_mark_anna(*packages, subarchitecture, running_kernel);
 
-	/* Slight over-allocation, but who cares */
 	package_array = di_new0(di_package *, di_hash_table_size((*packages)->table));
-	/* Now build the asklist, figuring out which packages have been
-	 * pulled into instlist */
+	/* Packages selected by default, listed first. */
+	for (node = (*packages)->list.head; node; node = node->next) {
+		package = node->data;
+		if (package->status_want == di_package_status_want_install)
+			package_array[package_count++] = package;
+	}
+	qsort(package_array, package_count, sizeof(di_package *), package_name_compare);
+	package_count_dfl = package_count;
+	choices_dfl = list_to_choices(package_array);
+	
+	/* Now, extra packages. */
 	for (node = (*packages)->list.head; node; node = node->next) {
 		package = node->data;
 		if (package->status_want == di_package_status_want_unknown)
 			package_array[package_count++] = package;
 	}
+	qsort(package_array + package_count_dfl, 
+		package_count - package_count_dfl,
+		 sizeof(di_package *), package_name_compare);
 
-	qsort(package_array, package_count, sizeof(di_package *), package_name_compare);
+	/* Set everything to unknown so user can de-select selected things. */
+	for(i = 0 ; i < package_count_dfl ; i++)
+		package_array[i]->status_want = di_package_status_want_unknown;
+
 	choices = list_to_choices(package_array);
 	debconf_subst(debconf, choose_modules_question, "CHOICES", choices);
+	debconf_fget(debconf, choose_modules_question, "seen");
+	if (strcmp(debconf->value, "true") != 0)
+		debconf_set(debconf, choose_modules_question, choices_dfl);
+
 	if (lowmem < 2) {
 		debconf_input(debconf, "medium", choose_modules_question);
 	}
 	else {
 		debconf_input(debconf, "high", choose_modules_question);
 	}
+
 	di_free(choices);
+	di_free(choices_dfl);
 	di_free(package_array);
 	
 	if (debconf_go(debconf) == 30)
