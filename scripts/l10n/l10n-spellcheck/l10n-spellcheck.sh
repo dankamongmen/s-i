@@ -20,11 +20,15 @@
 #     MA 02111-1307 USA
 #
 
-export PATH=${HOME}/aspell:${HOME}/gnuplot/bin:${PATH}
 SCRIPT_WITHOUT_PATH=`basename $0`
 SCRIPTS_PATH=`echo $0 | sed "s:\(.*\)${SCRIPT_WITHOUT_PATH}\(.*\):\1\2:"`
 
 export CFG_DIR=$1
+if [ ! -d ${CFG_DIR} ] ; then
+    echo "${CFG_DIR} does not exist"
+    exit 1
+fi
+
 . ${CFG_DIR}/setup.sh
 export LANGUAGE_LIST="${CFG_DIR}/lang2dict.txt"
 export WLS_PATH="${CFG_DIR}/wls"
@@ -35,11 +39,7 @@ if [ -z ${LC_ALL} ] ; then
     export LC_ALL="C"
 fi
 
-
-if  [ $? != 0 ] ; then
-    echo "error: configuration file not found"
-    exit 1
-fi
+set -x
 
 NEW="check_$(date '+%Y%m%d')"
 WORK_DIR=${NEW}_${RANDOM}
@@ -87,7 +87,7 @@ mv ${WORK_DIR}/index.html ${OUT_DIR}
 echo ""
 echo "***  $SAVED_STATS  ***"
 
-sh diff_stats.sh ${OUT_DIR}/latest/stats.txt ${WORK_DIR}/stats.txt
+diff_stats.sh ${OUT_DIR}/latest/stats.txt ${WORK_DIR}/stats.txt
 
 LATEST=`ls -l ${OUT_DIR}/latest | sed "s:.*-> ::"`
 rm ${OUT_DIR}/latest 
