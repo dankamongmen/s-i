@@ -2,6 +2,8 @@
 
 . /lib/partman/definitions.sh
 
+swap=false
+
 for dev in $DEVICES/*; do
     [ -d "$dev" ] || continue
     cd $dev
@@ -19,6 +21,7 @@ for dev in $DEVICES/*; do
 	[ -f $id/method -a ! -f $id/format ] || continue
 	method=$(cat $id/method)
 	if [ "$method" = swap ]; then
+	    swap=:
 	    log "Check the swap space in $dev/$id"
 	    template=partman-basicfilesystems/progress_swap_checking
 	    db_subst $template PARTITION "$num"
@@ -41,3 +44,13 @@ for dev in $DEVICES/*; do
 	fi
     done
 done
+
+if ! $swap; then
+    db_set partman-basicfilesystems/no_swap true
+    db_input critical partman-basicfilesystems/no_swap || true
+    db_go || true
+    db_get partman-basicfilesystems/no_swap
+    if [ "$RET" = true ]; then
+	exit 1
+    fi
+fi
