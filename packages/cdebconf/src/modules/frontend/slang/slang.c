@@ -735,6 +735,9 @@ static int slang_initialize(struct frontend *obj, struct configuration *cfg)
 	obj->data = uid;
 
 	SLtt_get_terminfo();
+#if SLANG_VERSION > 20000
+	SLutf8_enable(-1);
+#endif
 	ret = SLsmg_init_smg();
 	INFO(INFO_DEBUG, "SLsmg_init_smg returned %d", ret);
 	ret = SLang_init_tty(-1, 0, 0);
