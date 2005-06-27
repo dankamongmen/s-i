@@ -127,6 +127,12 @@ no_text(struct frontend *obj)
     return get_text(obj, "debconf/button-no", "No");
 }
 
+static const char *
+help_text(struct frontend *obj)
+{
+    return get_text(obj, "debconf/help-line", "<Tab> moves between items; <Space> selects; <Enter> activates buttons");
+}
+
 static void
 create_window(const int width, const int height, const char *title, const char *priority)
 {
@@ -1052,7 +1058,9 @@ newt_go(struct frontend *obj)
                         newtDrawRootText(0, 0, text);
                     free(text);
                 }
+                newtPushHelpLine(help_text(obj));
                 ret = handler(obj, q);
+                newtPopHelpLine();
                 if (ret == DC_OK)
                     obj->qdb->methods.set(obj->qdb, q);
                 else if (ret == DC_GOBACK && q->prev != NULL)
