@@ -5,20 +5,20 @@ set -e
 #set -x
 
 log() {
-    logger -t cdrom-detect "$@"
+	logger -t cdrom-detect "$@"
 }
 
 fail () {
-    log "CDROM-detect failed."
-    exit 1
+	log "CDROM-detect failed."
+	exit 1
 }
 
 # Is a cdrom already mounted?  If so, assume it's the right one..
 mount | grep -q ^/dev/cdroms/ && exit 0
 if [ -e /cdrom/.disk/info ] ; then
-   CDNAME=`cat /cdrom/.disk/info`
-   log "Detected CD '$CDNAME'"
-   exit 0
+	CDNAME=`cat /cdrom/.disk/info`
+	log "Detected CD '$CDNAME'"
+	exit 0
 fi
 
 hw-detect cdrom-detect/detect_progress_title || true
@@ -29,118 +29,115 @@ mkdir /cdrom 2>/dev/null || true
 
 while true
 do
-    mounted=0
+	mounted=0
 
-    if [ -d /dev/cdroms ]; then
-        devices="`echo /dev/cdroms/*`"
-    else
-        devices=""
-    fi
-    for device in $devices
-    do
-        if mount -t iso9660 -o ro,exec $device /cdrom; then
-            log "CDROM-mount succeeded: device=$device"
-            mounted=1
-	    db_set cdrom-detect/cdrom_device $device
-            break
-        else
-            log "CDROM-mount failed (error=$?): device=$device"
-            log "Unmounting CD just to be sure."
-            umount /cdrom 2>/dev/null || true
-            log "Trying it again."
-            if mount -t iso9660 -o ro,exec $device /cdrom
-            then
-                log "CDROM-mount succeeded: device=$device"
-                mounted=1
-                db_set cdrom-detect/cdrom_device $device
-                break
-            else
-                log "CDROM-mount failed again (error=$?): device=$device"
-                log "Unmounting CD just to be sure and giving it up."
-                umount /cdrom 2>/dev/null || true
-            fi
-        fi
-    done
-
-    if [ "$mounted" = "1" ]; then
-        break
-    fi
-
-    # If a device was detected but the mount failed, ask for the CD.
-    if [ -n "$devices" ]; then
-	db_input critical cdrom-detect/retry || [ $? -eq 30 ]
-	db_go
-	db_get cdrom-detect/retry
-	if [ "$RET" = "true" ]; then
-	    continue
+	if [ -d /dev/cdroms ]; then
+		devices="`echo /dev/cdroms/*`"
 	else
-            fail
+		devices=""
 	fi
-    fi
+	for device in $devices; do
+		if mount -t iso9660 -o ro,exec $device /cdrom; then
+			log "CDROM-mount succeeded: device=$device"
+			mounted=1
+			db_set cdrom-detect/cdrom_device $device
+			break
+		else
+			log "CDROM-mount failed (error=$?): device=$device"
+			log "Unmounting CD just to be sure."
+			umount /cdrom 2>/dev/null || true
+			log "Trying it again."
+			if mount -t iso9660 -o ro,exec $device /cdrom; then
+				log "CDROM-mount succeeded: device=$device"
+				mounted=1
+				db_set cdrom-detect/cdrom_device $device
+				break
+			else
+				log "CDROM-mount failed again (error=$?): device=$device"
+				log "Unmounting CD just to be sure and giving it up."
+				umount /cdrom 2>/dev/null || true
+			fi
+		fi
+	done
+
+	if [ "$mounted" = "1" ]; then
+		break
+	fi
+
+	# If a device was detected but the mount failed, ask for the CD.
+	if [ -n "$devices" ]; then
+		db_input critical cdrom-detect/retry || [ $? -eq 30 ]
+		db_go
+		db_get cdrom-detect/retry
+		if [ "$RET" = "true" ]; then
+			continue
+		else
+			fail
+		fi
+	fi
  
-    # If no device was detected, perhaps a driver floppy is needed.
-    if [ -e /usr/lib/debian-installer/retriever/floppy-retriever ]; then
-        db_input critical cdrom-detect/load_floppy
-	db_go
-	db_get cdrom-detect/load_floppy
-	if [ "$RET" = true ]; then
-		anna floppy-retriever
-		hw-detect cdrom-detect/detect_progress_title || true
-		continue
+	# If no device was detected, perhaps a driver floppy is needed.
+	if [ -e /usr/lib/debian-installer/retriever/floppy-retriever ]; then
+		db_input critical cdrom-detect/load_floppy
+		db_go
+		db_get cdrom-detect/load_floppy
+		if [ "$RET" = true ]; then
+			anna floppy-retriever
+			hw-detect cdrom-detect/detect_progress_title || true
+			continue
+		fi
 	fi
-    fi
     
-    # Otherwise manual configuration may be needed
-    db_input critical cdrom-detect/manual_config || [ $? -eq 30 ]
-    db_go
-    db_get cdrom-detect/manual_config
+	# Otherwise manual configuration may be needed
+	db_input critical cdrom-detect/manual_config || [ $? -eq 30 ]
+	db_go
+	db_get cdrom-detect/manual_config
 
-    modules=none
-    for i in `ls -1 /lib/modules/*/kernel/drivers/cdrom/ | sed 's/\.ko$//' | sed 's/\.o$//'`
-    do
-	modules="$modules, $i"
-    done
+	modules=none
+	for i in `ls -1 /lib/modules/*/kernel/drivers/cdrom/ | sed 's/\.ko$//' | sed 's/\.o$//'`; do
+		modules="$modules, $i"
+	done
     
-    if [ "$RET" = "true" ]; then
-	db_subst cdrom-detect/cdrom_module choices "$modules"
-	db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
-	db_go
+	if [ "$RET" = "true" ]; then
+		db_subst cdrom-detect/cdrom_module choices "$modules"
+		db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
+		db_go
 
-	db_get cdrom-detect/cdrom_module
-	module="$RET"
+		db_get cdrom-detect/cdrom_module
+		module="$RET"
 
-	db_input critical cdrom-detect/cdrom_device || [ $? -eq 30 ]
-	db_go
+		db_input critical cdrom-detect/cdrom_device || [ $? -eq 30 ]
+		db_go
 
-	db_get cdrom-detect/cdrom_device
-	device="$RET"
+		db_get cdrom-detect/cdrom_device
+		device="$RET"
 
-	if [ "$module" != "none" ]; then
-	    modprobe $module
+		if [ "$module" != "none" ]; then
+			modprobe $module
+		fi
+		if mount -t iso9660 -o ro,exec $device /cdrom; then
+			log "CDROM-mount succeeded: device=$device"
+			mounted=1
+			break
+		else
+			log "CDROM-mount failed (error=$?): device=$device"
+			log "Unmounting CD just to be sure and giving it up."
+			umount /cdrom 2>/dev/null || true
+		fi
+	else
+		fail
 	fi
-	if mount -t iso9660 -o ro,exec $device /cdrom; then
-            log "CDROM-mount succeeded: device=$device"
-	    mounted=1
-	    break
-        else
-            log "CDROM-mount failed (error=$?): device=$device"
-            log "Unmounting CD just to be sure and giving it up."
-            umount /cdrom 2>/dev/null || true
-	fi
-    else
-	fail
-    fi
 done
 
 if [ -e /cdrom/.disk/info ] ; then
-   CDNAME=`cat /cdrom/.disk/info`
-   log "Detected CD '$CDNAME'"
+	CDNAME=`cat /cdrom/.disk/info`
+	log "Detected CD '$CDNAME'"
 else
-   log "The available CD is not a Debian CD!"
-   umount /cdrom
-   db_input critical cdrom-detect/wrong-cd || [ $? -eq 30 ]
-   db_go
-   exit 1 
+	log "The available CD is not a Debian CD!"
+	umount /cdrom
+	db_input critical cdrom-detect/wrong-cd || [ $? -eq 30 ]
+	db_go
+	exit 1 
 fi
 
 # Get all the pool directories into the dentry cache, to cut down on seek
