@@ -289,16 +289,13 @@ for lang in $languages; do
         rm $langlog.arch
         [ "$BUILDRESULT" = "0" ] && echo "" >>$mainlog
 
-        # Upload logfile to home.tiscali.nl
-        echo -e "lcd $logdir\ncd d-i/log\nput $lang.log\nquit" >/tmp/ftp_script.$$
-        ftp -p -v home.tiscali.nl </tmp/ftp_script.$$ >/tmp/ftp_log.$$
-	# 226 = transfer complete
-        if egrep -q "^226" /tmp/ftp_log.$$ ; then
+        # Upload logfile to people.debian.org
+        scp $logdir/$lang.log people.debian.org:public_html/d-i_manual/log/
+        if [ $? = 0 ] ; then
             echo "  Upload of $lang.log success" >>$mainlog
         else
             echo "  Upload of $lang.log failed" >>$mainlog
         fi
-        rm /tmp/ftp_*.$$
 
         # Check if any architectures have actually been built
         grepexp="${lang}\."

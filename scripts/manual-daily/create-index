@@ -17,6 +17,8 @@ build_link_table () {
         num_lang=$(($num_lang + 1))
     done
 
+    echo "<h2><a name=\"links\"></a>Links per architecture/language</h2>" >>$pagefile
+    echo "" >>$pagefile
     echo "<table>" >>$pagefile
     echo "  <tr>" >>$pagefile
     echo "    <th class=\"col1\">Architecture</th>" >>$pagefile
@@ -38,7 +40,7 @@ build_link_table () {
             destsuffix="${lang}.${arch}"
             echo "    <td>" >>$pagefile
             echo "      <a href=\"$destsuffix/index.html\">html</a>" >>$pagefile
-            SEP="<BR>"
+            SEP="<br/>"
             if [ "$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 4)" = "Y" ] ; then
                 echo "      $SEP<a href=\"$destsuffix/install.${lang}.pdf\">pdf</a>" >>$pagefile
                 SEP=""
@@ -59,6 +61,7 @@ build_link_table () {
 # MAINLINE
 
 cat $ROOT/bin/index.head >$pagefile
+cat $ROOT/bin/index.changes >>$pagefile
 
 # First, we build the table for the languages that have all architectures built
 
@@ -143,7 +146,6 @@ if [ -f $logdir/tr-stats ] ; then
     
 fi
 
-#cat $ROOT/bin/index.tail >>$pagefile
 sed "s/%date%/`date -u`/" $ROOT/bin/index.tail >>$pagefile
 
 cp $ROOT/bin/translators.html $destination

@@ -6,6 +6,7 @@ ROOT=/home/rfjp/d-i
 logdir=$ROOT/log
 mainlog=$logdir/main.log
 builddate=`date +"%d %b %Y"`
+logpage="http://people.debian.org/~fjp/d-i_manual/log"
 
 [ -e "$logdir" ] && cd $logdir || exit 1
 
@@ -64,7 +65,7 @@ for lang in `egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -
     # Check whether upload of logfile to home.tiscali.nl was successful
     if egrep -q "Upload of $lang.log success" $mainlog ; then
         echo "A log of the build is available at:" >>/tmp/message.$$
-        echo "- http://home.tiscali.nl/isildur/d-i/log/$lang.log" >>/tmp/message.$$
+        echo "- $logpage/$lang.log" >>/tmp/message.$$
     else
         echo "A log of the build has been attached." >>/tmp/message.$$
         # Create attachment
@@ -79,7 +80,7 @@ for lang in `egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -
     # Mail message
     mutt -H /tmp/header.$$ $ATTACHMENT </tmp/message.$$
 
-    rm $logdir/$lang.log.gz &>/dev/null
+    [ -f $logdir/$lang.log.gz ] && rm $logdir/$lang.log.gz
 done
 
 echo "" >>$mainlog
