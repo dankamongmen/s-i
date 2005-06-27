@@ -179,9 +179,15 @@ if [ -f ${WLS_PATH}/di_common_wl.txt ] ; then
     cp ${WLS_PATH}/di_common_wl.txt ${DEST_DIR}/nozip
 fi
 
-tar czf ${DEST_DIR}/zip/${LANG}.tar.gz ${FILES_TO_KEEP} ${WL_ISO8859}
+pushd ${DEST_DIR} > /dev/null
+
+FILES_TO_KEEP=`echo ${FILES_TO_KEEP} | sed "s|${DEST_DIR}\/||g"`
+WL_ISO8859=`echo ${WL_ISO8859} | sed "s|${DEST_DIR}\/||g"`
+tar czf zip/${LANG}.tar.gz ${FILES_TO_KEEP} ${WL_ISO8859}
 
 mv ${FILES_TO_KEEP} ${DEST_DIR}/nozip
 rm -f ${WL_ISO8859}
+
+popd > /dev/null
 
 echo "AddCharset UTF-8 .txt" > ${DEST_DIR}/nozip/.htaccess

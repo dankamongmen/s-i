@@ -39,10 +39,8 @@ if [ -z ${LC_ALL} ] ; then
     export LC_ALL="C"
 fi
 
-set -x
-
 NEW="check_$(date '+%Y%m%d')"
-WORK_DIR=${NEW}_${RANDOM}
+WORK_DIR=`mktemp -d`
 
 # update local copy of the repository (if necessary)
 ${REFRESH_CMD}
