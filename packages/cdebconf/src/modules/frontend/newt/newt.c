@@ -367,7 +367,7 @@ show_separate_window(struct frontend *obj, struct question *q)
 static int
 generic_handler_string(struct frontend *obj, struct question *q, int eflags)
 {
-    newtComponent form, textbox, bCancel, entry, cRet;
+    newtComponent form, textbox, bOk, bCancel, entry, cRet;
     int width = 80, height = 24, t_height, t_width, win_width, win_height;
     int t_width_scroll = 0, t_width_title, t_width_buttons;
     int ret;
@@ -432,11 +432,13 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         defval = (char *)question_getvalue(q, "");
     entry   = newtEntry(TEXT_PADDING, 1+t_height+1, defval, t_width, &result, eflags);
     if (obj->methods.can_go_back(obj, q)) {
+        bOk     = newtCompactButton(win_width - TEXT_PADDING - BUTTON_PADDING - strwidth(continue_text(obj)) - 3, win_height-2, continue_text(obj));
         bCancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, goback_text(obj));
-        newtFormAddComponents(form, bCancel, textbox, entry, NULL);
+        newtFormAddComponents(form, bCancel, textbox, entry, bOk, NULL);
     } else {
+        bOk     = newtCompactButton((win_width-strwidth(continue_text(obj))-2)/2 - 1, win_height-2, continue_text(obj));
         bCancel = NULL;
-        newtFormAddComponents(form, textbox, entry, NULL);
+        newtFormAddComponents(form, textbox, entry, bOk, NULL);
     }
     newtFormSetCurrent(form, entry);
     cRet = newtRunForm(form);
