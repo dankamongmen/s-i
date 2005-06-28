@@ -23,6 +23,12 @@
 SCRIPT_WITHOUT_PATH=`basename $0`
 SCRIPTS_PATH=`echo $0 | sed "s:\(.*\)${SCRIPT_WITHOUT_PATH}\(.*\):\1\2:"`
 
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <cfg path>"
+    exit 1
+fi
+
+
 export CFG_DIR=$1
 if [ ! -d ${CFG_DIR} ] ; then
     echo "${CFG_DIR} does not exist"
@@ -48,28 +54,36 @@ ${REFRESH_CMD}
 # spellcheck and move data to public_html
 check_all.sh ${LOCAL_REPOSITORY} ${WORK_DIR}
 
+BRAND_NEW=0
+if [ ! -d ${OUT_DIR} ] ; then
+    mkdir -p ${OUT_DIR}/history
+    BRAND_NEW=1
+fi
+
 OLD_PATH=${OUT_DIR}/latest/nozip
 NEW_PATH=${WORK_DIR}/nozip
 
-for ROW in `cat ${WORK_DIR}/stats.txt | sed 's: :,:g'`; do
-    VAL=`echo ${ROW}| awk -F, '{print $1}'`
-    LANG=`echo ${ROW}| awk -F, '{print $2}'`
-
-    LALL=${LANG}_all.txt
-    LUWL=${LANG}_unkn_wl.txt
-    LVAR=${LANG}_var.txt
-
-    for TO_DIFF in ${LALL} ${LUWL} ${LVAR} ; do
-	if [ -f ${OLD_PATH}/${TO_DIFF} -o -f ${NEW_PATH}/${TO_DIFF} ] ; then
-
-	    diff -u0 -N \
-		--label old ${OLD_PATH}/${TO_DIFF} \
-		--label new ${NEW_PATH}/${TO_DIFF} > \
-		${NEW_PATH}/${TO_DIFF/.txt/.diff}
+if [ ${BRAND_NEW} -ne 1 ] ; then
+    for ROW in `cat ${WORK_DIR}/stats.txt | sed 's: :,:g'`; do
+	VAL=`echo ${ROW}| awk -F, '{print $1}'`
+	LANG=`echo ${ROW}| awk -F, '{print $2}'`
+	
+	LALL=${LANG}_all.txt
+	LUWL=${LANG}_unkn_wl.txt
+	LVAR=${LANG}_var.txt
+	
+	for TO_DIFF in ${LALL} ${LUWL} ${LVAR} ; do
+	    if [ -f ${OLD_PATH}/${TO_DIFF} -o -f ${NEW_PATH}/${TO_DIFF} ] ; then
+		
+		diff -u0 -N \
+		    --label old ${OLD_PATH}/${TO_DIFF} \
+		    --label new ${NEW_PATH}/${TO_DIFF} > \
+		    ${NEW_PATH}/${TO_DIFF/.txt/.diff}
 	fi
-    done
+	done
 
-done
+    done
+fi
 
 # remove empty files
 find ${NEW_PATH} -empty -exec rm '{}' ';'
@@ -85,11 +99,17 @@ mv ${WORK_DIR}/index.html ${OUT_DIR}
 echo ""
 echo "***  $SAVED_STATS  ***"
 
-diff_stats.sh ${OUT_DIR}/latest/stats.txt ${WORK_DIR}/stats.txt
+if [ ${BRAND_NEW} -ne 1 ] ; then    
+    diff_stats.sh ${OUT_DIR}/latest/stats.txt ${WORK_DIR}/stats.txt
 
-LATEST=`ls -l ${OUT_DIR}/latest | sed "s:.*-> ::"`
-rm ${OUT_DIR}/latest 
-rm -fr $LATEST
+    LATEST=`ls -l ${OUT_DIR}/latest | sed "s:.*-> ::"`
+    rm ${OUT_DIR}/latest 
+    rm -fr $LATEST
+else
+    echo "${OUT_DIR} created"
+fi
 
 mv ${WORK_DIR} ${OUT_DIR}/${NEW}
 ln -s ${OUT_DIR}/${NEW}  ${OUT_DIR}/latest
+
+

@@ -38,7 +38,7 @@ fi
 STATS=$1
 TEMPLATE=$2
 INDEX_HTML=$3
-TABLE_HTML=stats.html_${RANDOM}
+TABLE_HTML=`mktemp`
 
 # Compute some statistics
 i=0
@@ -176,13 +176,10 @@ exec 1>&6 6>&-      # Restore stdout and close file descriptor #6.
 
 sed "/<!-- HTML TABLE STARTS HERE -->/r ${TABLE_HTML}" ${TEMPLATE} > ${INDEX_HTML}
 
-RAND_EXT=${RANDOM}
-
+# reuse ${TABLE_HTML} as temporary file
 NOW="$(date --utc)"
-sed "s|<\!-- TODAY DATE -->|${NOW}|" ${INDEX_HTML} > temp.${RAND_EXT}
-mv temp.${RAND_EXT} ${INDEX_HTML}
+sed "s|<\!-- TODAY DATE -->|${NOW}|" ${INDEX_HTML} > ${TABLE_HTML}
+mv ${TABLE_HTML} ${INDEX_HTML}
 
-sed "s|<!-- COMMON WL -->|latest/nozip/di_common_wl.txt|" ${INDEX_HTML} > temp.${RAND_EXT}
-mv temp.${RAND_EXT} ${INDEX_HTML} 
-
-rm ${TABLE_HTML}
+sed "s|<!-- COMMON WL -->|latest/nozip/di_common_wl.txt|" ${INDEX_HTML} > ${TABLE_HTML}
+mv ${TABLE_HTML} ${INDEX_HTML}
