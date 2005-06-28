@@ -46,7 +46,7 @@ if [ -z ${LC_ALL} ] ; then
 fi
 
 NEW="check_$(date '+%Y%m%d')"
-WORK_DIR=`mktemp -d`
+WORK_DIR=`mktemp -u -d`
 
 # update local copy of the repository (if necessary)
 ${REFRESH_CMD}
@@ -111,5 +111,4 @@ fi
 
 mv ${WORK_DIR} ${OUT_DIR}/${NEW}
 ln -s ${OUT_DIR}/${NEW}  ${OUT_DIR}/latest
-
 
