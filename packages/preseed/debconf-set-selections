@@ -16,7 +16,8 @@ OLDIFS="$IFS"
 NEWLINE="
 "
 IFS="$NEWLINE"
-for line in $(grep -v '^#' "$file"); do
+# TODO: this squashes \r elsewhere in the line too
+for line in $(grep -v '^#' "$file" | tr -d '\r'); do
 	IFS="$OLDIFS"
 	set -- $line
 	#package="$1"
