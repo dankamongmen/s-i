@@ -138,6 +138,23 @@ if (echo "${bootdev}" | grep -q '[0-9]$') && !(echo "${bootdev}" | grep -q '^/de
     fi
 fi
 
+# Make sure that there's *some* active partition; some BIOSes reportedly
+# don't like it otherwise.
+if ! fdisk -l "$disc_offered_devfs" | grep '^/dev/' | grep -q '\*'; then
+    # Check whether they already chose not to make their boot partition
+    # active. If so, that's their problem ...
+    db_get lilo-installer/activate-part
+    if [ "$RET" = true ]; then
+        # bootdev must be set to a disk rather than a partition, or we'd
+        # already have an active partition due to the previous check. Let's
+        # just pick the partition containing /boot.
+        pnum="$(echo "$bootfs" | sed 's/^.*\([0-9]\+\)$/\1/')"
+        echo -n "I: Setting partition $bootfs to active..." >&2
+        sfdisk -A"$pnum" "$disc_offered_devfs"
+        echo "done." >&2
+    fi
+fi
+
 db_progress step 1
 
 # Use a serial console if current default console is a serial port.
