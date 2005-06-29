@@ -106,14 +106,14 @@ exec > ${LOGFILE}     # stdout replaced with file "logfile.txt".
 #echo "set terminal png size 640,480"
 echo "set terminal png"
 echo "set output \"${DEST_DIR}/graph.png\""
-echo "set title \"${PLOT_TITLE} ($i languages)\""
+echo "set title \"$(date '+%Y%m%d') - ${PLOT_TITLE}\""
 echo "set key left"
-echo "set xlabel \"Languages\" 0,-1"
+echo "set xlabel \"Languages [$i]\" 0,-1"
 echo "set ylabel \"Unknown words\""
 echo "set origin 0,0.01"
 echo "set xtics rotate ${XTICS}"
 echo "set xrange [-1:$i]"
-echo "plot \"${GNUPLOT_DATA}\" with impulses,${AVERAGE} t \"Average: ${AVERAGE} words\""
+echo "plot \"${GNUPLOT_DATA}\" t \"Unknown words count\" with impulses,${AVERAGE} t \"Average: ${AVERAGE} words\""
 
 exec 1>&6 6>&-      # Restore stdout and close file descriptor #6.
 
