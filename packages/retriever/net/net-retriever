@@ -24,6 +24,11 @@ if [ -n "$proxy" ]; then
         export ftp_proxy="$proxy"
     fi
 fi
+if db_get anna/keyring; then
+    keyring="$RET"
+else
+    keyring=
+fi
 
 fetch() {
     url="${protocol}://${hostname}${directory}/$1"
@@ -92,6 +97,19 @@ case "x$cmd" in
 	
         Release="/tmp/net-retriever-$$-Release"
         fetch "dists/$suite/Release" "$Release" || exit $?
+        if type gpgv >/dev/null && [ "$keyring" ] && [ -f "$keyring" ]; then
+            # If gpgv and a keyring are installed, authentication is
+            # mandatory.
+            if ! fetch "dists/$suite/Release.gpg" "$Release.gpg"; then
+                error "dists/$suite/Release is unsigned."
+                exit 1
+            fi
+            if ! gpgv --keyring "$keyring" --ignore-time-conflict \
+                    "$Release.gpg" "$Release"; then
+                error "Bad signature on $Release."
+                exit 1
+            fi | logger -t net-retriever
+        fi
         ARCH=`udpkg --print-architecture`
         components="`grep ^Components: $Release | cut -d' ' -f2-`"
         ret=1
