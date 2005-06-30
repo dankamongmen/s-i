@@ -247,14 +247,6 @@ if [ "$LANGUAGE" != "en" -a "$LANGUAGE" != "C" ]; then
 	pkginstall iso-codes
 fi
 
-# Install localization-config only if LANG != en_US or
-# arch is powerpc.
-if [ "$LANGUAGE" != "C" ] ; then
-	if [ "$LANG" != "en_US" -o "$ARCH" = "powerpc" ]; then
-		pkginstall localization-config
-	fi
-fi
-
 # Other language specific packages
 case "$LANGUAGE" in
 ja|ko|ko_KR|el|zh|zh_CN|zh_TW|bg)
@@ -448,6 +440,13 @@ if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n
 	db_set "$languagecode" "$LANGUAGELIST"
 	log "Set $languagecode = '$LANGUAGELIST'"
 fi
+
+# Install localization-config except when no localization happens
+# Install it anyway for powerpc arches (to handle subarches)
+if [ "$LOCALE" != "C" ] ||  [ "$ARCH" = "powerpc" ]; then
+    pkginstall localization-config
+fi
+
 
 
 # Third step : ask for a locale at medium priority
