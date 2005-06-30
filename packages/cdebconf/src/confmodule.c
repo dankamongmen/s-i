@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #include <debian-installer.h>
 
@@ -21,6 +22,8 @@ static commands_t commands[] = {
 #include "commands-list.h"
     { 0, 0 }
 };
+
+volatile sig_atomic_t signal_received = 0;
 
 /* private functions */
 /*
@@ -74,6 +77,9 @@ static int confmodule_communicate(struct confmodule *mod)
         buf[0] = 0;
         in[0] = 0;
         while (strchr(buf, '\n') == NULL) {
+            if (signal_received)
+                return DC_OK;
+
             ret = read(mod->infd, buf, sizeof(buf));
             if (ret < 0)
                 return DC_NOTOK;
@@ -86,6 +92,9 @@ static int confmodule_communicate(struct confmodule *mod)
             }
             strcat(in, buf);
         }
+
+        if (signal_received)
+            return DC_OK;
 
         inp = strstrip(in);
         INFO(INFO_DEBUG, "--> %s", inp);

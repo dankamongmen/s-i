@@ -8,6 +8,7 @@
 #define _CONFMODULE_H_
 
 #include "common.h"
+#include <signal.h>
 
 /*
  *  For full backup sort, questions are not flagged as being seen
@@ -21,6 +22,11 @@ enum seen_action {
         STACK_SEEN_SAVE       /*  Questions are flagged as seen and
                                   removed from the etack */
 };
+
+/* Set this in a signal handler to cause confmodule_communicate() to return
+ * at the next opportunity.
+ */
+extern volatile sig_atomic_t signal_received;
 
 struct configuration;
 struct template_db;

@@ -54,8 +54,9 @@ void sighandler(int sig)
 	int status = 1;
 	if (sig == SIGCHLD)
 	{
-		wait(&status);
-		status = di_exec_mangle_status(status);
+		/* confmodule->shutdown() will reap the child process */
+		signal_received = sig;
+		return;
 	}
 	save();
 	/*
