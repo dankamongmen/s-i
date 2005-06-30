@@ -24,11 +24,7 @@ if [ -n "$proxy" ]; then
         export ftp_proxy="$proxy"
     fi
 fi
-if db_get anna/keyring; then
-    keyring="$RET"
-else
-    keyring=
-fi
+keyring=/usr/share/keyrings/archive.gpg
 
 fetch() {
     url="${protocol}://${hostname}${directory}/$1"
@@ -97,7 +93,7 @@ case "x$cmd" in
 	
         Release="/tmp/net-retriever-$$-Release"
         fetch "dists/$suite/Release" "$Release" || exit $?
-        if type gpgv >/dev/null && [ "$keyring" ] && [ -f "$keyring" ]; then
+        if type gpgv >/dev/null && [ -f "$keyring" ]; then
             # If gpgv and a keyring are installed, authentication is
             # mandatory.
             if ! fetch "dists/$suite/Release.gpg" "$Release.gpg"; then
