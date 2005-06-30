@@ -115,7 +115,7 @@ strpad (char *what, size_t maxsize)
  * Description: get the width of the current terminal
  * Assumptions: doesn't handle resizing; caches value on first call
  */
-static const int getwidth(void)
+static int getwidth(void)
 {
 	static int res = 80;
 	static int inited = 0;
