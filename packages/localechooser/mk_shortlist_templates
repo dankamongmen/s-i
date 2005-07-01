@@ -40,10 +40,15 @@ EN_DESCR=$(awk -v ITEM="Description:" -f template_get_item.awk \
 # Add new templates for each language that needs a shortlist
 for LANG in $SHORTLIST_LANGS; do
 
-    # Get the default value
-    LANG_DEFAULT_COUNTRY=$(awk -v ITEM="Default-$LANG.UTF-8:" -f template_get_item.awk \
+    # Get the default value.
+    if [ "$LANG" != en ]; then
+    	field="Default-$LANG.UTF-8"
+    else
+	field="Default"
+    fi
+    LANG_DEFAULT_COUNTRY=$(awk -v ITEM="$field:" -f template_get_item.awk \
 	$TEMPLATE_TMP | head -1)
-
+	
     echo "$LANG"
 
     # Write the 'template header' to the file
