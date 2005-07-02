@@ -27,8 +27,12 @@ for line in $(set); do
 			db_set "$var" "$val"
 			db_subst "$var" ID "$var"
 		fi
-			
-		type=$(db_metaget "$var" type || echo unknown)
+		
+		if db_metaget "$var" type; then
+			type="$RET"
+		else
+			type=unknown
+		fi
 		echo "#d-i $var $type $val" >> /var/log/debconf-seed
 		db_fset "$var" seen true
 		IFS=$NEWLINE
