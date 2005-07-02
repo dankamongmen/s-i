@@ -17,11 +17,16 @@ error () {
 # file, as well as preseed_relative
 preseed_location () {
 	local location="$1"
+	local checksum="$2"
 	
 	local tmp=/tmp/debconf-seed
 	local logfile=/var/log/debconf-seed
 	
 	if ! preseed_fetch $location $tmp; then
+		error retrieve_error "$location"
+	fi
+	if [ -n "$checksum" ] && \
+	   [ "$(md5sum $tmp | cut -d' ' -f1)" != "$checksum" ]; then
 		error retrieve_error "$location"
 	fi
 
@@ -52,15 +57,22 @@ preseed_location () {
 	if [ -n "$RET" ]; then
 		include="$include $(eval $RET)" || true # TODO error handling?
 	fi
-	
+	if db_get preseed/include/checksum; then
+		checksum="$RET"
+	else
+		checksum=""
+	fi
 	for location in $include; do
+		sum="${checksum%% *}"
+		checksum="${checksum#$sum }"
+
 		# Support relative paths, just use path of last file.
 		if preseed_relative "$location"; then
 			# This works for urls too.
 			location="$(dirname $last_location)/$location"
 		fi
 		if [ -n "$location" ]; then
-			preseed_location "$location"
+			preseed_location "$location" "$sum"
 		fi
 	done
 }
@@ -70,9 +82,15 @@ preseed () {
 
 	db_get $template
 	location="$RET"
-	if [ -n "$location" ]; then
-		for loc in $location; do
-			preseed_location "$loc"
-		done
+	if db_get $template/checksum; then
+		checksum="$RET"
+	else
+		checksum=""
 	fi
+	for loc in $location; do
+		sum="${checksum%% *}"
+		checksum="${checksum#$sum }"
+		
+		preseed_location "$loc" "$sum"
+	done
 }
