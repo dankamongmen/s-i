@@ -75,7 +75,7 @@ static void do_constant(void);
 static void do_constant_key (int, u_short);
 static void loadkeys(int fd);
 static void strings_as_usual(void);
-static void compose_as_usual(char *charset);
+static void compose_as_usual(const char *charset);
 extern int set_charset(const char *charset);
 extern int getfd(void);
 
@@ -109,7 +109,7 @@ line		: EOL
 		;
 charsetline	: CHARSET STRLITERAL EOL
 			{
-			    set_charset(kbs_buf.kb_string);
+			    set_charset((const char *) kbs_buf.kb_string);
 			}
 		;
 altismetaline	: ALT_IS_META EOL
@@ -124,7 +124,7 @@ usualstringsline: STRINGS AS USUAL EOL
 		;
 usualcomposeline: COMPOSE AS USUAL FOR STRLITERAL EOL
 			{
-			    compose_as_usual(kbs_buf.kb_string);
+			    compose_as_usual((const char *) kbs_buf.kb_string);
 			}
 		  | COMPOSE AS USUAL EOL
 			{
@@ -616,7 +616,7 @@ addfunc(struct kbsentry kbs) {
 			while(*p++);
 		}
 	func_table[kbs.kb_func] = p;
-        sh = strlen(kbs.kb_string) + 1;
+        sh = strlen((const char *) kbs.kb_string) + 1;
 	if (fp + sh > func_buf + sizeof(func_buf)) {
 	       di_error  ("%s: addfunc: func_buf overflow\n", PROGNAME);
 		exit(1);
@@ -626,7 +626,7 @@ addfunc(struct kbsentry kbs) {
 	r = fp;
 	while (q > p)
 	        *--r = *--q;
-	strcpy(p, kbs.kb_string);
+	strcpy(p, (const char *) kbs.kb_string);
 	for (i = kbs.kb_func + 1; i < MAX_NR_FUNC; i++)
 	        if (func_table[i])
 		        func_table[i] += sh;
@@ -712,7 +712,7 @@ defkeys(int fd) {
 }
 
 static char *
-ostr(char *s) {
+ostr(const char *s) {
 	int lth = strlen(s);
 	char *ns0 = xmalloc(4*lth + 1);
 	char *ns = ns0;
@@ -746,10 +746,10 @@ deffuncs(int fd){
         for (i = 0; i < MAX_NR_FUNC; i++) {
 	    kbs_buf.kb_func = i;
 	    if ((p = func_table[i])) {
-		strcpy(kbs_buf.kb_string, p);
+		strcpy((char *) kbs_buf.kb_string, p);
 		if (ioctl(fd, KDSKBSENT, (unsigned long)&kbs_buf))
 		  di_error ("failed to bind string '%s' to function %s\n",
-			  ostr(kbs_buf.kb_string), syms[KT_FN].table[kbs_buf.kb_func]);
+			  ostr((const char *) kbs_buf.kb_string), syms[KT_FN].table[kbs_buf.kb_func]);
 		else
 		  ct++;
 	    } 
@@ -862,14 +862,14 @@ static void strings_as_usual(void) {
 	for (i=0; i<30; i++) if(stringvalues[i]) {
 		struct kbsentry ke;
 		ke.kb_func = i;
-		strncpy(ke.kb_string, stringvalues[i], sizeof(ke.kb_string));
+		strncpy((char *) ke.kb_string, stringvalues[i], sizeof(ke.kb_string));
 		ke.kb_string[sizeof(ke.kb_string)-1] = 0;
 		addfunc(ke);
 	}
 }
 
 static void
-compose_as_usual(char *charset) {
+compose_as_usual(const char *charset) {
 	if (charset && strcmp(charset, "iso-8859-1")) {
 		di_error("kbd-chooser: loadkeys: don't know how to compose for %s\n",
 			charset);
