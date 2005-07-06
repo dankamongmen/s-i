@@ -109,31 +109,37 @@ mkdir /hd-media 2>/dev/null || true
 
 log "First pass: Look for ISOs near top-level of each filesystem."
 for dev in $DEVS; do
-	if mount_device $dev; then
-		db_subst iso-scan/progress_scan DRIVE $dev
-		log "Mounted $dev for first pass"
-		MOUNTABLE_DEVS="$MOUNTABLE_DEVS $dev"
-		MOUNTABLE_DEVS_COUNT=$(expr $MOUNTABLE_DEVS_COUNT + 1)
-		cd /hd-media
-		for dir in . *; do
-			if [ -d "$dir" ]; then
-				if [ "$dir" != "." ]; then 
-					TOPLEVEL_DIRS_COUNT=$(expr $TOPLEVEL_DIRS_COUNT + 1)
-				fi
-				db_subst iso-scan/progress_scan DIRECTORY "$dir/"
-				db_progress INFO iso-scan/progress_scan
-				for iso in $dir/*.iso $dir/*.ISO; do
-					if [ -e $iso ]; then
-						log "Found ISO $iso on $dev"
-						ISO_COUNT=$(expr $ISO_COUNT + 1)
-						try_iso $iso $dev
-					fi
-				done
-			fi
-		done
-		cd /
-		umount /hd-media
+	if ! mount_device $dev; then
+		log "Waiting for $dev to possibly get ready.."
+		sleep 3
+		if ! mount_device $dev; then
+			continue
+		fi
 	fi
+
+	db_subst iso-scan/progress_scan DRIVE $dev
+	log "Mounted $dev for first pass"
+	MOUNTABLE_DEVS="$MOUNTABLE_DEVS $dev"
+	MOUNTABLE_DEVS_COUNT=$(expr $MOUNTABLE_DEVS_COUNT + 1)
+	cd /hd-media
+	for dir in . *; do
+		if [ -d "$dir" ]; then
+			if [ "$dir" != "." ]; then 
+				TOPLEVEL_DIRS_COUNT=$(expr $TOPLEVEL_DIRS_COUNT + 1)
+			fi
+			db_subst iso-scan/progress_scan DIRECTORY "$dir/"
+			db_progress INFO iso-scan/progress_scan
+			for iso in $dir/*.iso $dir/*.ISO; do
+				if [ -e $iso ]; then
+					log "Found ISO $iso on $dev"
+					ISO_COUNT=$(expr $ISO_COUNT + 1)
+					try_iso $iso $dev
+				fi
+			done
+		fi
+	done
+	cd /
+	umount /hd-media
 
 	# It's possible that the ISO was written right to the front of a
 	# device, and not to a filesystem. (Hey, we may even be spinning
@@ -195,3 +201,4 @@ else
 fi
 db_go || true
 log "Failing with ISO_COUNT = $ISO_COUNT, MOUNTABLE_DEVS_COUNT = $MOUNTABLE_DEVS_COUNT, ISO_MOUNT_COUNT = $ISO_MOUNT_COUNT"
+exit 1
