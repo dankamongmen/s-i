@@ -11,8 +11,7 @@ my $exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHost
 #$exp->exp_internal(1);
 $exp->expect($timeout, "assword:");
 $exp->send("$ENV{USER_PASSWORD}\r");
-$exp->expect($timeout, "Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY");
-sleep 2;
+sleep 3;
 foreach my $log (qw{status hardware-summary syslog partman}) {
 	$exp->send("cat /var/log/debian-installer/$log\r");
 }
