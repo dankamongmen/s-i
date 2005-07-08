@@ -10,7 +10,8 @@
 set -e
 
 buildpackage () {
-	dpkg-buildpackage -d -us -uc -rfakeroot -tc -ICVS -I.svn $@
+	dpkg-buildpackage -d -us -uc -rfakeroot -tc \
+		-ICVS -I.svn -I'{arch}' -I.arch-ids $@
 }
 
 # Build source package. Binaries are built below.
