@@ -57,6 +57,7 @@ if [ "$prefix" != /dev/md ]; then
 	disc_offered_devfs=$(find $prefix -follow -name disc | head -n 1)
 else
 	disc_offered_devfs="$bootfs_devfs"
+	db_register lilo-installer/bootdev_raid lilo-installer/bootdev
 fi
 disc_offered=$(mapdevfs "$disc_offered_devfs")
 
@@ -71,7 +72,7 @@ db_go || exit 10 # back up
 db_get lilo-installer/bootdev
 
 case "$RET" in
-  *Master*) bootdev=$(mapdevfs $disc_offered_devfs)  ;;
+  *Master*|*RAID*) bootdev=$(mapdevfs $disc_offered_devfs)  ;;
   *Debian*)
     bootdev=$(mapdevfs $bootfs_devfs)
     part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
@@ -110,6 +111,14 @@ case "$RET" in
   ;;
 esac
 
+if echo "${bootdev}" | grep -q '^/dev/md'; then
+    raid_boot="yes"
+    raid_extra_boot="raid-extra-boot=mbr-only"
+else
+    raid_boot="no"
+    raid_extra_boot="# raid-extra-boot=mbr-only"
+fi
+
 db_subst lilo-installer/progress_active bootdev "$bootdev"
 db_subst lilo-installer/progress_running bootdev "$bootdev"
 
@@ -119,7 +128,7 @@ db_progress info lilo-installer/progress_active
 
 # If installing to a partition (not MBR), offer to make it active
 # Do not try to make MD device active
-if (echo "${bootdev}" | grep -q '[0-9]$') && !(echo "${bootdev}" | grep -q '^/dev/md'); then
+if (echo "${bootdev}" | grep -q '[0-9]$') && [ "${raid_boot}" = "no" ]; then
     # Installing to a partition, check if it is already marked active
     if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+${part} " | grep -q '\*'; then
         # partition is not marked active, offer to make it so
@@ -140,7 +149,7 @@ fi
 
 # Make sure that there's *some* active partition; some BIOSes reportedly
 # don't like it otherwise.
-if ! fdisk -l "$disc_offered_devfs" | grep '^/dev/' | grep -q '\*'; then
+if [ "${raid_boot}" = no ] && (! fdisk -l "$disc_offered_devfs" | grep '^/dev/' | grep -q '\*'); then
     # Check whether they already chose not to make their boot partition
     # active. If so, that's their problem ...
     db_get lilo-installer/activate-part
@@ -243,6 +252,10 @@ boot=${bootdev}
 # Specifies the device that should be mounted as root. (\`/')
 #
 root=${rootfs}
+
+# This option may be needed for some software RAID installs.
+#
+${raid_extra_boot}
 
 # Enable map compaction:
 # Tries to merge read requests for adjacent sectors into a single
