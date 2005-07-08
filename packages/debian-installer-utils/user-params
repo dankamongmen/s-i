@@ -30,6 +30,13 @@ for item in $(cat $CMDLINE); do
 		fi
 	fi
 done
+
+# Include default parameters.
+db_get debian-installer/add-kernel-opts
+if [ "$RET" ]; then
+        collect="$collect $RET"
+fi
+
 for word in $collect; do
 	echo "$word"
 done
