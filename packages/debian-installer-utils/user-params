@@ -32,7 +32,7 @@ for item in $(cat $CMDLINE); do
 done
 
 # Include default parameters.
-db_get debian-installer/add-kernel-opts
+RET=`debconf-get debian-installer/add-kernel-opts || true`
 if [ "$RET" ]; then
         collect="$collect $RET"
 fi
