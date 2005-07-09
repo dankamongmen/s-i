@@ -1,5 +1,5 @@
 ifndef TARGETS
-TARGETS=mapdevfs pipe_progress
+TARGETS=mapdevfs
 endif
 
 # Where to create device entries for di-utils-devicefiles
