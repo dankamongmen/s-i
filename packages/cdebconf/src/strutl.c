@@ -224,15 +224,10 @@ int strchoicesplit(const char *inbuf, char **argv, size_t maxnarg)
         argv[argc] = malloc(e-s+1);
         for (c = s, i = 0; c < e; c++, i++)
         {
-            if (*c == '\\' && c < (e-1) && *(c+1) == ',')
+            if (*c == '\\' && c < (e-1) && (*(c+1) == ',' || *(c+1) == ' '))
             {
-                argv[argc][i] = ',';
+                argv[argc][i] = *(c+1);
                 c++;
-            }
-	    else if (*c == '\\' && c < (e-1) && *(c+1) == ' ')
-            {
-                argv[argc][i] = ' ';
-		c++;
             }
             else
                 argv[argc][i] = *c;
