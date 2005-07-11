@@ -1,10 +1,11 @@
-/* $Id: status.c,v 1.27 2003/02/12 03:12:39 kraai Rel $ */
+/* $Id$ */
 #include "udpkg.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <search.h>
+#include <debian-installer.h>
 
 /* Status file handling routines
  * 
@@ -100,7 +101,7 @@ int read_block(FILE *f, char **ml)
 
 	while (((ch = fgetc(f)) == ' ') && !feof(f)) {
 		fgets(buf, BUFSIZE, f);
-		multiple_lines = (char *) realloc(multiple_lines, strlen(multiple_lines) + strlen(buf) + 2);
+		multiple_lines = (char *) di_realloc(multiple_lines, strlen(multiple_lines) + strlen(buf) + 2);
                 memset(multiple_lines + strlen(multiple_lines), '\0', strlen(buf) + 2);
 		strcat(multiple_lines, " ");
 		strcat(multiple_lines, buf);
@@ -150,7 +151,7 @@ void control_read(FILE *f, struct package_t *p)
 		{
 			/* Localized description */
 			struct language_description_t *l;
-			l = malloc(sizeof(struct language_description_t));
+			l = di_malloc(sizeof(struct language_description_t));
                         memset(l,'\0',sizeof (struct language_description_t));
 			l->next = p->localized_descriptions;
 			p->localized_descriptions = l;
@@ -219,7 +220,7 @@ void *status_read(void)
 		printf("(Reading database...)\n");
 	while (!feof(f))
 	{
-		m = (struct package_t *)malloc(sizeof(struct package_t));
+		m = (struct package_t *)di_malloc(sizeof(struct package_t));
 		memset(m, 0, sizeof(struct package_t));
 		control_read(f, m);
 		if (m->package)
@@ -238,15 +239,15 @@ void *status_read(void)
 				 * of a pseudo package into the status
 				 * binary-tree.
 				 */
-				p = (struct package_t *)malloc(sizeof(struct package_t));
+				p = (struct package_t *)di_malloc(sizeof(struct package_t));
 				memset(p, 0, sizeof(struct package_t));
 				p->package = strdup(m->provides);
 
 				t = *(struct package_t **)tsearch(p, &status, package_compare);
 				if (!(t == p))
 				{
-					free(p->package);
-					free(p);
+					di_free(p->package);
+					di_free(p);
 				}
 				else {
 					/*
@@ -263,7 +264,7 @@ void *status_read(void)
 		}
 		else
 		{
-			free(m);
+			di_free(m);
 		}
 	}
 	fclose(f);

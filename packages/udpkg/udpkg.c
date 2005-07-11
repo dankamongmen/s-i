@@ -441,7 +441,7 @@ int main(int argc, char **argv)
 	{
 		if (**argv != '-') 
 		{
-			p = (struct package_t *)malloc(sizeof(struct package_t));
+			p = (struct package_t *)di_malloc(sizeof(struct package_t));
 			memset(p, 0, sizeof(struct package_t));
 			if (**argv == '/')
 				p->file = *argv;

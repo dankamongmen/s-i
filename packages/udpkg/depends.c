@@ -1,4 +1,4 @@
-/* $Id: depends.c,v 1.7 2000/12/21 23:58:12 bug1 Rel $ */
+/* $Id$ */
 #include "udpkg.h"
 
 #ifdef DODEPENDS
@@ -66,7 +66,7 @@ static void depends_sort_visit(struct package_t **ordered,
 
 #if 0
 	/* add it to the list */
-	newnode = (struct package_t *)malloc(sizeof(struct package_t));
+	newnode = (struct package_t *)di_malloc(sizeof(struct package_t));
 	/* make a shallow copy */
 	*newnode = *pkg;
 	newnode->next = *ordered;
