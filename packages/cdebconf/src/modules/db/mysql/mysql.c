@@ -54,6 +54,11 @@
 #define DBDATA(db)	((struct dbdata *)db)
 #define DBH(db)		&(DBDATA(db)->dbh)
 
+#ifdef __GNUC__
+static MYSQL_RES *mysql_runquery(struct database *db, const char *fmt, ...)
+	__attribute__((format(printf, 2, 3)));
+#endif
+
 static MYSQL_RES *mysql_runquery(struct database *db, const char *fmt, ...)
 {
 	va_list ap;

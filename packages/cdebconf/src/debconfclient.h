@@ -24,7 +24,11 @@ struct debconfclient {
      * @param const char *command, ... - null terminated command string
      * @return return code from confmodule
      */
-	int (*command)(struct debconfclient *client, const char *cmd, ...);
+	int (*command)(struct debconfclient *client, const char *cmd, ...)
+#if defined(__GNUC__) && __GNUC__ >= 4
+		__attribute__((sentinel))
+#endif
+		;
 
     /**
      * @brief sends a command to the confmodule (printf style)
@@ -33,7 +37,11 @@ struct debconfclient {
      * @param ... - command parameters
      * @return return code from confmodule
      */
-	int (*commandf)(struct debconfclient *client, const char *cmd, ...);
+	int (*commandf)(struct debconfclient *client, const char *cmd, ...)
+#ifdef __GNUC__
+		__attribute__((format(printf, 2, 3)))
+#endif
+		;
 
     /**
      * @brief simple accessor method for the return value

@@ -223,6 +223,11 @@ static void slang_drawdesc(struct frontend *ui, struct question *q)
 	/* caller should call slang_flush() ! */
 }
 
+#ifdef __GNUC__
+static void slang_printf(int r, int c, int col, char *fmt, ...)
+	__attribute__((format(printf, 4, 5)));
+#endif
+
 /*
  * slang_printf
  *

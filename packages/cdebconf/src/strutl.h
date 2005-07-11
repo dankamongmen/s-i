@@ -36,7 +36,11 @@ char *strlower(char *buf);
  * @param len Length of buffer
  * @param ... one or or strings to concatenate (end with NULL)
  */
-void strvacat(char *buf, size_t len, ...);
+void strvacat(char *buf, size_t len, ...)
+#if defined(__GNUC__) && __GNUC__ >= 4
+	__attribute__((sentinel))
+#endif
+	;
 int strparsecword(char **inbuf, char *outbuf, size_t maxlen);
 int strparsequoteword(char **inbuf, char *outbuf, size_t maxlen);
 int strgetargc(const char *inbuf);

@@ -101,6 +101,9 @@ static int longestlen(char **strs, int count)
 
 /* not needed (yet?) 
 static void attrprintf(WINDOW *win, int y, int x, chtype attr, char *fmt, ...)
+#ifdef __GNUC__
+	__attribute__((format(printf, 5, 6)))
+#endif
 {
 	char *buf = 0;
 	va_list ap;
