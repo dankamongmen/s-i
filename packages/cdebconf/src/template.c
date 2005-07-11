@@ -671,7 +671,8 @@ struct template *template_load(const char *filename)
 			{
                                 if (i != ungetc(i, fp)) { /* ERROR */ }
                                 fgets(buf, sizeof(buf), fp);
-                                strvacat(extdesc, sizeof(extdesc), buf+1, 0);
+                                strvacat(extdesc, sizeof(extdesc), buf+1,
+					 (char *) 0);
                                 i = fgetc(fp);
 			}
                         ungetc(i, fp); /* toss the last one back */
@@ -710,7 +711,8 @@ struct template *template_load(const char *filename)
 			{
 				if (i != ungetc(i, fp)) { /* ERROR */ }
 				fgets(buf, sizeof(buf), fp);
-				strvacat(extdesc, sizeof(extdesc), buf+1, 0);
+				strvacat(extdesc, sizeof(extdesc), buf+1,
+					 (char *) 0);
                                 i = fgetc(fp);
 			}
                         ungetc(i, fp); /* toss the last one back */

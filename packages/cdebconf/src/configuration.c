@@ -114,7 +114,7 @@ void config_fulltag(const struct configitem *top,
 		return;
 	}
 	config_fulltag(top->parent, stop, buf, sizeof(buf));
-	strvacat(tag, maxlen, buf, DELIMITER, top->tag, 0);
+	strvacat(tag, maxlen, buf, DELIMITER, top->tag, (char *) 0);
 }
 
 /* public functions */
@@ -362,7 +362,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 					if (value[0] != 0)
 					{
 						strvacat(tag, sizeof(tag),
-							DELIMITER, value, 0);
+							DELIMITER, value, (char *) 0);
 						value[0] = 0;
 					}
 
@@ -372,7 +372,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 					else
 						strvacat(parenttag,
 							sizeof(parenttag), 
-							DELIMITER, tag, 0);
+							DELIMITER, tag, (char *) 0);
 					tag[0] = 0;
 				}
 
@@ -386,7 +386,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 						item[0] = 0;
 						strvacat(item, sizeof(item),
 							parenttag, DELIMITER,
-							tag, 0);
+							tag, (char *) 0);
 					}
 					else
 					{
@@ -420,7 +420,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 		/* store the line fragment */
 		strstrip(buf);
 		if (buf[0] != 0 && linebuf[0] != 0)
-			strvacat(linebuf, sizeof(linebuf), " ", 0);
+			strvacat(linebuf, sizeof(linebuf), " ", (char *) 0);
 		strcat(linebuf, buf);
 	}
 	fclose(infp);
