@@ -429,9 +429,27 @@ int main(int argc, char **argv) {
 			int found = 0;
 			for (node = packages->list.head; node; node = node->next) {
 				package = node->data;
+
+				if (!di_system_package_check_subarchitecture(package, subarchitecture))
+					continue;
+
 				if (strcmp(package->package, argv[i]) == 0) {
 					package->status_want = di_package_status_want_install;
 					found = 1;
+					continue;
+				}
+
+				if (((di_system_package *)package)->kernel_version) {
+					di_slist_node *node1;
+					for (node1 = package->depends.head; node1; node1 = node1->next) {
+						di_package_dependency *d = node1->data;
+						if (d->type == di_package_dependency_type_provides
+						    && d->ptr && strcmp(d->ptr->package, argv[i]) == 0) {
+							package->status_want = di_package_status_want_install;
+							found = 1;
+							continue;
+						}
+					}
 				}
 			}
 			if (! found) {
