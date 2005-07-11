@@ -51,7 +51,11 @@ struct di_rstring
  * @param format printf compatible string
  * @return append chars
  */
-int di_snprintfcat (char *str, size_t size, const char *format, ...);
+int di_snprintfcat (char *str, size_t size, const char *format, ...)
+#ifdef __GNUC__
+  __attribute__ ((format (printf, 3, 4)))
+#endif
+    ;
 
 /**
  * Copies n bytes from s, without calculating the length of s itself.
