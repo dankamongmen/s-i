@@ -4,7 +4,7 @@
 # 
 #
 
-ISO_TABLE=/usr/share/iso-codes/iso-639.tab
+ISO_TABLE=/usr/share/iso-codes/iso_639.tab
 
 cat > table.h << EOF
 
