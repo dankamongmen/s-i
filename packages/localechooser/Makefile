@@ -1,4 +1,4 @@
-all: debian/SUPPORTED debian/short-tmp/shortlists debian/templates check-scripts check-data check-utf8
+all: debian/SUPPORTED-short debian/short-tmp/shortlists debian/templates check-scripts check-data check-utf8
 
 LIST     = languagelist
 L10NLIST = languagelist.l10n
@@ -13,7 +13,7 @@ debian/iso-codes:
 debian/templates: debian/templates.base debian/short-tmp/shortlists
 	./mk_shortlist_templates
 
-debian/SUPPORTED:
+debian/SUPPORTED-short:
 	./get-SUPPORTED
 
 debian/short-tmp/shortlists: debian/iso-codes
