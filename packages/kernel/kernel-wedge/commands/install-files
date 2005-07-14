@@ -57,12 +57,19 @@ while (<KVERS>) {
 	# Include extra files to help the d-i build process build kernels
 	# for certain subarchitectures. This is powerpc-specific at the
 	# moment.
+	my $libdir;
 	if (-d "$sourcedir/usr/lib/kernel-image-$kernelversion-$flavour") {
+		$libdir = "kernel-image";
+	} else {
+		$libdir = "linux-image";
+	}
+
+	if (defined $libdir) {
 		doit("install", "-d",
 			"debian/kernel-image-$kernelversion-$flavour-di/usr/lib");
 		doit("cp", "-a",
-			"$sourcedir/usr/lib/kernel-image-$kernelversion-$flavour",
-			"debian/kernel-image-$kernelversion-$flavour-di/usr/lib/kernel-image-$installedname");
+			"$sourcedir/usr/lib/$libdir-$kernelversion-$flavour",
+			"debian/kernel-image-$kernelversion-$flavour-di/usr/lib/$libdir-$installedname");
 	}
 
 	doit("kernel-wedge", "copy-modules", $kernelversion, $flavour, $installedname);
