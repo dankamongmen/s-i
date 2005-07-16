@@ -19,6 +19,7 @@ files_exec = \
 	exit \
 	exit-command \
 	init-udev-devices \
+	init-debug \
 	menu
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)

@@ -2,6 +2,8 @@
 # Set up filesystem as root and pivot into it.
 echo "Setting up filesystem, please wait ..."
 
+. /lib/debian-installer/init-debug
+
 if [ "`uname -r | grep '^2.2.'`" = "" ]; then
 	mount /proc
 	umount initrd 2>/dev/null || true
@@ -24,6 +26,7 @@ if [ "`uname -r | grep '^2.2.'`" = "" ]; then
 	mount /proc
 
 	# Close all open files on the initrd, and run busybox init.
+	debugshell "before init"
 	exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
 else
 	rm /sbin/init
@@ -36,5 +39,6 @@ else
                 done
         fi
 	fi
+	debugshell "before init"
 	exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
 fi

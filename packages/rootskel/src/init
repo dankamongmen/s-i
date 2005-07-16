@@ -1,5 +1,7 @@
 #!/bin/sh -e
 # used for initramfs
+. /lib/debian-installer/init-debug
+
 if [ -x /sbin/udevstart ]; then
 	/lib/debian-installer/init-udev-devices
 else
@@ -15,4 +17,5 @@ for i in $(cat /proc/cmdline); do
 			;;
 	esac
 done
+debugshell "before init"
 exec $init
