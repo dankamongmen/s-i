@@ -18,7 +18,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <linux/kd.h>
-#include <linux/keyboard.h>
 #include <sys/ioctl.h>
 #include <ctype.h>
 #include <debian-installer.h>
@@ -28,6 +27,7 @@
 #include "findfile.h"
 #include "modifiers.h"
 #include "nls.h"
+#include "keyboard.h"
 
 #ifndef KT_LETTER
 #define KT_LETTER KT_LATIN

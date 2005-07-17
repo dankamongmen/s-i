@@ -1,5 +1,4 @@
 #include "config.h"
-#include <linux/keyboard.h>
 #include <linux/kd.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +6,7 @@
 #include "ksyms.h"
 #include "getfd.h"
 #include "nls.h"
+#include "keyboard.h"
 
 
 /* Keysyms whose KTYP is KT_LATIN or KT_LETTER and whose KVAL is 0..127. */
