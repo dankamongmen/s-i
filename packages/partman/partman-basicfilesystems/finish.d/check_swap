@@ -2,7 +2,7 @@
 
 . /lib/partman/definitions.sh
 
-swap=false
+swap=""
 
 for dev in $DEVICES/*; do
     [ -d "$dev" ] || continue
@@ -17,11 +17,14 @@ for dev in $DEVICES/*; do
     
     for part in $partitions; do
         id=${part%,*}
-        num=${part#*,}
-	[ -f $id/method -a ! -f $id/format ] || continue
+	num=${part#*,}
+	[ -f $id/method ] || continue
 	method=$(cat $id/method)
 	if [ "$method" = swap ]; then
-	    swap=:
+	    swap=1
+	fi
+	if [ "$method" = swap ] && [ -f $id/format ]; then
+	    swap=1
 	    log "Check the swap space in $dev/$id"
 	    template=partman-basicfilesystems/progress_swap_checking
 	    db_subst $template PARTITION "$num"
