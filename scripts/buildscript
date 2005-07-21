@@ -144,6 +144,12 @@ ARCH="$(dpkg-architecture -qDEB_BUILD_ARCH)"
 build packages/packages-build
 install_deb packages di-packages-build
 
+# d-i library needs special preparation when building directly from revision
+# control
+pushd packages/libdebian-installer >/dev/null
+debian/rules configure || true
+popd >/dev/null
+
 # build d-i library
 build packages/libdebian-installer
 install_deb packages libdebian-installer4 libdebian-installer-extra4 libdebian-installer4-dev
