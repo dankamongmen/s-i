@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+build:
+	$(MAKE)
+
+clean:
+	dh_testdir
+	dh_testroot
+	$(MAKE) clean
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_install tzsetup usr/sbin/
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_installchangelogs
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-indep: build install
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

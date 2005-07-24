@@ -1,0 +1,31 @@
+#! /bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+db_capb backup
+
+error() {       
+	logger -t tzsetup "error: $@"
+	exit 1  
+} 
+
+# Per-country templates.
+db_get debian-installer/country
+CC="$RET"
+if db_get "tzsetup/country/$CC"; then
+	db_register "tzsetup/country/$CC" time/zone
+else
+	error "no template for country $CC"
+fi
+
+# Only ask the question if there are multiple choices.
+db_metaget time/zone choices
+case "$RET" in
+"*, *")
+	db_input high time/zone || :
+;;
+esac
+
+if ! db_go; then
+	exit 10 # back to menu
+fi

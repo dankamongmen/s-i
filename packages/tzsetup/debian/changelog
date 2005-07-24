@@ -1,0 +1,2943 @@
+tzsetup (3.00) UNRELEASED; urgency=low
+
+  * Split off from base-config.
+  * Only generate udeb (for now).
+  * Remove GMT setting support, goes to a new udeb.
+  * Removed confirmation questions and command line flags.
+  * Renamed templates all around for consistency.
+  * Ripped out all the nasty complexity of the state machine, now asks only
+    one simple uestion.
+  * Ripped out preseed_zone thing as there is only one question that needs
+    preseding in all cases now: time/zone.
+  * Generate templates containing lists of time zones for countries at build
+    time, with overrides for specific countries in the .in file.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 24 Jul 2005 14:05:21 -0400
+
+base-config (2.70) unstable; urgency=low
+
+  [ Debconf translations ]
+  * Lithuanian updated by Kęstutis Biliūnas.
+  * German debian/po updated by Dennis Stampfer
+  * French updated by Christian Perrier
+  * Danish updated by Claus Hindsgaul
+  * Simplified Chinese updated by Carlos Z.F. Liu
+
+  [ Joey Hess ]
+  * Patch from Colin to remove unnecesary Debian "branding", including
+    parameterisation of the security.debian.org host. Closes: #311870
+  * Patch from Bubulle to clarify the error message about invalid hostnames.
+    Closes: #264615
+  * Remove (undocumented) tzsetup -U parameter. Now tzsetup will always
+    pay attention to the UTC setting in rcS, unless it is a new install,
+    when it will instead pay attention to preseeding.
+  * tzsetup will always source rcS (even on a new install), so the code to
+    change rcS does not misfire if no change was made.
+  * tzsetup.1: Remove fairly pointless "Debian GNU/Linux".
+  * Remove tzsetup question for Brazil on upgrade.
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 23 Jul 2005 11:55:02 -0400
+
+base-config (2.69) unstable; urgency=low
+
+  [ Otavio Salvador ]
+  * Remove Brazil templates of tzsetup since many users had problems to
+    choose the timezone in that way.
+
+  [ Programs translations ]
+  * Wolof added by Mouhamadou Mamoune Mbacke. Closes: #317536
+
+  [ Debconf translations ]
+  * Wolof added by Mouhamadou Mamoune Mbacke. Closes: #317538
+  * Bulgarian updated by Ognyan Kulev
+  * Japanese updated by Kenshi Muto
+  * Norwegian Bokmal by Petter Reinholdtsen.
+  * Hebrew by Lior Kaplan
+  * Xhosa by Ubuntu Xhosa translators
+
+  [ Joey Hess ]
+  * Don't mess with the umask for log perms, just set it after creation
+    but before anything gets in it.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 11 Jul 2005 10:58:50 +0300
+
+base-config (2.68) unstable; urgency=low
+
+  [ Debconf translations ]
+  * Bulgarian updated by Ognyan Kulev
+
+  [ Joey Hess ]
+  * Finally applied Eugeniy Meshcheryakov's patch to remove charset setting,
+    locale setting, etc from termwrap. All that stuff is done by other parts
+    of d-i (and if it's not done properly will need to be fixed there).
+    Termwrap remains only to support languages needing jfbterm and the like.
+    Closes: #250789, #258226, #259150 (termwrap no longer breaks charset setup
+    on exit)
+    Closes: #271145, #271147 (cyr run removed so it no longer borks serial
+    consoles)
+  * Remove hardcoded paths in termwrap and base-config.
+  * Other minor cleanups in termwrap.
+  * No longer (re)set LANG at end of install. This is done by localechooser
+    already. Closes: #251206, #259870
+  * Use script -c instead of SHELL hack.
+  * Make log mode 600 in case something sensitive gets into it.
+    Closes: #254068
+  * Deal with the required wraper not being present by falling back to
+    English.
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  9 Jul 2005 10:19:12 +0300
+
+base-config (2.67) unstable; urgency=low
+
+  [ Joey Hess ]
+  * Set priority to important to match overrides (for new debootstrap).
+
+  [ Debconf translations ]
+  * Galician updated by Jacobo Tarrio
+  * Simplified Chinese updated by Carlos Z.F. Liu
+
+  [ Joey Hess ]
+  * Improve clean up of scrollkeeper diversions if apt run fails.
+  * Don't try to install mdetect or read-edid if they're not available,
+    to avoid the ugly messages. Closes: #262387, #266059
+  * Don't install mdetect or read-edid if there is no X server available,
+    as on s390. Closes: #260801
+  * Remove the bit of apt clean stuff I forgot in 2.65.
+
+  [ Kenshi Muto ]
+  * Apply a patch for apt-setup to use iso_3166.tab in iso-codes at first.
+    If apt-setup couldn't find iso_3166.tab, it falls back to iso3166 in
+    libc. (closes: #260887)
+
+  [ Joey Hess ]
+  * Merge patch from Petter to re-enable popularity-contest and remove it
+    if the user does not want it. Closes: #251986
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  7 Jul 2005 20:06:14 +0300
+
+base-config (2.66) unstable; urgency=low
+
+  [ Joey Hess ]
+  * Make apt-setup -N (and tzsetup -N) be explicitly meant for new installs.
+  * Ask mirror/suite at high priority if it's not a new install, so that
+    after an install re-running apt-setup does not force whatever value was
+    used by the install onto the user, which is especially important if they
+    installed testing, which is now stable. Closes: #154482
+  * Use dpkg --print-architecture instead of now-deprecated
+    --print-installation-architecture
+  * Fix tzsetup to not crash with a bad debconf question if the user skips
+    changing the timezeone. Still allow changing GMT settings in this case.
+
+  [ Debconf translations ]
+  * Vietnamese updated. Closes: #313112
+  * German spellchecked. Closes: #313669
+  * Danish spellchecked and updated by Claus Hindsgaul
+  * Romanian improved by Eddy Petriºor
+
+  [ Program translations ]
+  * Vietnamese updated. Closes: #315843
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 30 Jun 2005 13:17:45 -0400
+
+base-config (2.65) unstable; urgency=low
+
+  * Joey Hess
+    - Fix substitution variable in nb debconf translation. (#308183)
+    - Removed the much hated apt-get clean run (and KEEP_DEBS),
+      the benefit for very low disk space users is not worth the pain for the
+      rest of us. Closes: #224403
+    - Stop passing tasksel -ris parameters, since it no longer accepts them
+      and handles standard installs on its own. Conflict with old tasksels.
+  * Colin Watson
+    - Try to load a VGA framebuffer on amd64 as well as i386.
+    - Support Archive-architecture: in Mirrors.masterlist. Architectures are
+      space-separated, e.g. "i386 amd64"; lines of the form "!hurd-i386
+      !netbsd-i386" are supported to say that the archive has all but the
+      listed architectures, although that should be used with caution.
+    - Export BC_TMPDIR so that hook scripts can use it.
+    - Look for xserver-xorg as well as xserver-xfree86 when checking whether
+      X has been installed.
+    - Provide for simpler timezone preseeding by means of a new
+      tzconfig/preseed_zone question.
+    - Save a couple of sed calls in prep-menu.
+    - scrollkeeper-update can take a long time to run, and when it's called
+      many times by lots of postinst scripts it takes even longer due to
+      parsing OMF directories over and over again. Divert it before
+      installing packages, and undivert and run it afterwards.
+    - apt-setup: Ask a friendlier question the first time round (without the
+      prompt for a device file) if there's no CD in the drive.
+    - Get d-i log files from /var/log/installer, if available, instead of
+      /var/log/debian-installer (#304402).
+    - Make apt-get and apt-cdrom use gpgv --ignore-time-conflict to avoid
+      validation errors with apt 0.6 due to clock problems (Ubuntu bug
+      #8496).
+    - Allow derived distributions to set an alternate location for
+      Mirrors.masterlist in debian/rules and to disable the CVS get
+      altogether.
+    - Support wildcard-DNS-style entries in Mirrors.masterlist, that get
+      expanded out to one entry for every country code in iso3166.tab.
+  * Debconf translations
+    - Vietnamese added
+    - Fix variable substitution errors in cy, fi, hu, ru, sl
+      Closes: #308278
+    - Welsh completed
+    - French completed
+    - Greek completed + spell checking errors corrected.
+  * Programs translations
+    - Vietnamese added
+  * Kenshi Muto
+    - Modified termwrap by applying same code of rootskel 1.12
+      to detect framebuffer for Linux kernel 2.6.9 and above.
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  9 Jun 2005 19:34:40 -0400
+
+base-config (2.64) unstable; urgency=low
+
+  * Debconf translations
+    - Albanian translation update
+    - Czech and Slovak fixed duplicate string. Closes: #304686
+  * Christian Perrier
+    - man pages typos corrected in validlocale.8. Closes: #302738
+    - man pages typos corrected in tzsetup.8. Closes: #302737
+  * Colin Watson
+    - Fix substitution variable in Danish debconf translation.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 14 Apr 2005 16:03:30 -0400
+
+base-config (2.63) unstable; urgency=low
+
+  * Joey Hess
+    - Rather than ignoring signals in new install, which propigates out to
+      child processes such as exim and causes problems, just stty intr ""
+      to block ctrl-c from restarting base-config. Left QUIT (^\) at the
+      default for power users/the foolish. Of the other previous blocked
+      signals, it's probably best it notice HUP, and I don't see any reason
+      to block TERM. Closes: #301988
+    - Added an echo to the cleanup function for aestetics.
+  * Colin Watson
+    - apt 0.6.35 changed the capitalisation of 'Normal Packages:'. Cope with
+      this.
+  * Programs translations
+    - Bulgarian translation update by Ognyan Kulev
+    - Catalan translation update by Jordi Mallach
+  * Debconf translations
+    - Hebrew translation update
+    - Bulgarian translation update by Ognyan Kulev
+    - Catalan translation update by Jordi Mallach
+    - Croatian translation update by Krunoslav Gernhard
+    - Slovenian translation update by Jure Cuhalev
+    - Swedish translation update by Per Olofsson
+    - Polish translation update by Bartosz Fenski
+    - Macedonian translation update by Georgi Stanojevski
+    - Norwegian Nynorsk translation update by Håvard Korsvoll
+    - Spanish translation update by Javier Fernandez-Sanguino
+    - Bosnian translation update by Safir Secerovic
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 29 Mar 2005 13:50:37 -0500
+
+base-config (2.62) unstable; urgency=medium
+
+  * Joey Hess
+    - Add menu item text for debconf-seed. Closes: #288059
+    - The TMPDIR exporting broke some packages like clamav that need it world
+      writable. TMPDIR was exported because other base-config menu scripts
+      used it, but this is no longer the case, so stop exporting it, and in
+      fact, rename the variable to something more descriptive. Closes: #295687
+  * Colin Watson
+    - Pass 'new' argument to prep-menu after Changes-Menu: too, otherwise
+      finish never gets run.
+    - apt-setup: Don't fail if we aren't on a tty.
+  * Debconf translations
+    - French translation update
+    - Dutch translation update by Bart Cornelis
+    - Portuguese translation by Miguel Figueiredo
+    - Danish translation updated by Claus Hindsgaul
+    - Japanese translation by Kenshi Muto
+    - Tagalog translation by Eric Pareja
+    - Greek translation update for Greek by Konstantinos Margaritis
+    - Albanian update by Elian Myftiu
+    - Basque translation update by Piarres Beobide Egana
+    - Ukrainian translation update by Eugeniy Meshcheryakov
+    - Lithuanian translation update by Kęstutis biliūnas
+    - Russian translation update
+    - Spanish translation update
+    - Brazilian Portuguese update
+    - Romanian update
+    - German update
+    - Finnish update. Closes: #291978
+    - Norwegian Bokmal update.
+    - Indonesian update.
+    - Arabic updated from Arabeyes CVS
+    - Korean update.
+    - Traditional Chinese update.
+    - Galician update by Jacobo Tarrio
+  * Programs translations
+    - Indonesian update (plural forms corrected)
+    - Arabic updated from Arabeyes CVS
+    - Romanian updated
+    - Tagalog translation by Eric Pareja
+    - Malagasy translation by Jaonary Rabarisoa
+    - New Galician translation by Jacobo Tarrio
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 17 Feb 2005 11:54:36 -0500
+
+base-config (2.61) unstable; urgency=low
+
+  * Joey Hess
+    - Split out inittab update and exit-menu part of finish into a new exit
+      menu item, to allow insertation of menu items between these two points.
+      Closes: #287964
+    - Patch from tbm to not set LC_ALL in termwrap as it overrides LC_COLLATE
+      and breaks serial console detection. Closes: #266744
+  * Colin Watson
+    - Pass 'new' argument to prep-menu and .tst scripts on new installs, as
+      well as to show-menu and menu scripts.
+  * Translations
+    - Bosnian templates translation update by Safir Sacerovic
+    - German de.po update (po/ and debian/po) by Dennis Stampfer
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 31 Dec 2004 14:43:34 -0500
+
+base-config (2.60) unstable; urgency=low
+
+  * Joey Hess
+    - Add first user to plugdev group so pmount in gnome will work.
+      However, this won't actually do anything until the pmount
+      group exists as a static group created by base-passwd.
+      See bug #283233
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  3 Dec 2004 17:42:29 -0500
+
+base-config (2.59) unstable; urgency=low
+
+  * Christian Perrirer:
+    - Fix missing required comma in Welsh translation. Closes: #282632
+    - Correct encoding of the Polish translation
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  3 Dec 2004 17:19:10 -0500
+
+base-config (2.58) unstable; urgency=low
+
+  * Move HOME setting code from menu/shell to base-config proper, to avoid
+    things like /.aptitude being created during initial install, when HOME is
+    not set.
+  * Translations
+    - Albanian updated
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 11 Nov 2004 11:52:52 -0500
+
+base-config (2.57) unstable; urgency=low
+
+  * Only read d-i database on new install. Closes: #274609
+  * Translations:
+    - Updated Czech
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  8 Nov 2004 13:34:14 -0500
+
+base-config (2.56) unstable; urgency=low
+
+  * Fix http proxy slash adding code.
+  * Move redundant http proxy asking code into a function.
+  * Only ask for a http proxy once per base-config run.
+  * If apt sources test fails, re-ask http proxy in case the proxy was
+    entered wrong.
+  * Actually use http proxy when testing security sources and enable it if
+    not yet enabled. Really closes #255651
+  * i-
+
+ -- Christian Perrier <bubulle@kheops.frmug.org>  Mon,  8 Nov 2004 14:27:35 +0100
+
+base-config (2.55) unstable; urgency=low
+
+  * Re-register questions that are debconf-copydb'd from the d-i database,
+    to entries that they have sane templates. Closes: #279590
+  * Translations
+    - Albanian fixed (double space removed).
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  5 Nov 2004 13:29:21 -0500
+
+base-config (2.54) unstable; urgency=low
+
+  * Correct overzealous translation of French man page. Closes: #279215
+  * Make large changes to apt-setup and tzsetup to fset the seen flags
+    to false only after the question is asked, not before. Really, really
+    Closes: #278566
+  * Unset all seen flags for questions from tzsetup and apt-setup on upgrade
+    to this version, since they used to be set after the programs ran and the
+    new programs do not really deal with that. Note that since this was also
+    fixed in 2.53.1 in the sarge branch, the postinst looks for that version
+    number.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  1 Nov 2004 10:16:46 -0500
+
+base-config (2.53) unstable; urgency=low
+
+  * Fix typo in prep-menu.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 31 Oct 2004 16:43:10 -0500
+
+base-config (2.52) unstable; urgency=low
+
+  * Modified prep-menu to strip doubled whitespace to work around #189026.
+    Closes: #278276 (loops during Albanian installs).
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 31 Oct 2004 16:08:53 -0500
+
+base-config (2.51) unstable; urgency=low
+
+  * Updated Spanish man pages from Ruben.
+  * Change ask_q functions to unset seen flags after setting questions,
+    this should make it possible to re-run apt-setup and tzsetup during the
+    initial base-config run, and really Closes: #278566
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 31 Oct 2004 13:18:12 -0500
+
+base-config (2.50) unstable; urgency=low
+
+  * Revert apt-setup d-i seeding change in last version as it broke
+    any use of apt-setup that needed to re-ask those questions.
+    Closes: #278566 and reopens: #252121
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 29 Oct 2004 19:32:19 -0400
+
+base-config (2.49) unstable; urgency=low
+
+  * Translations
+    - Albanian (po/sq.po) updated by Elian Myftiu
+    - Hebrew update by Lior Kaplan (programs and debconf)
+  * Christian Perrier
+    - apt-setup:
+      - Asks for a proxy for security updates if no proxy has already 
+        been defined. Closes: #255651
+      - Add a trailing slash to the proxy value if missing
+        Closes: #260626
+      - Seed mirror with value from D-I 1st stage
+        Closes: #252121
+  * Otavio Salvador
+    - Dereference when copy script to temp directory. It solve problems
+      with symbolic links as menu.
+    - When changes the menu copy again from library directory to allow new
+      menu itens.
+    - Fixes the copy command to allow derreference;
+    - Continue if base-config was remove;
+  * Joey Hess
+    - Fix running of base-config/early_command.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 25 Oct 2004 02:18:10 -0400
+
+base-config (2.48) unstable; urgency=low
+
+  * Otavio Salvador
+    - Modified termwrap to use lat1-16 when the $LANG is pt_BR;
+  * Joey Hess
+    - Set the title in the finish menu item, needed since it's not run under
+      the same debconf instance anymore. Closes: #275436
+  * Translations
+    - Hebrew update by Lior Kaplan (programs and debconf)
+    - Update po/tr.po (Turkish) by Recai Oktas
+    - Updated  debian/po/pt_BR.po by André Luís Lopes.
+    - Welsh (debian/po/cy.po) updated by Dafydd Harries.
+    - Macedonian (po/mk.po and debian/po/mk.po) by Georgi Stanojevski
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 10 Oct 2004 15:20:51 -0400
+
+base-config (2.47) unstable; urgency=low
+
+  * Konstantinos Margaritis
+    - Modified termwrap to not use jfbterm for Greek, since
+      console-tools is perfectly capable of displaying UTF-8
+      Greek text. Closes: #273262
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 26 Sep 2004 01:09:52 +0200
+
+base-config (2.46) unstable; urgency=low
+
+  * Joey Hess
+    - Fix ask_dm question if there is no window manager installed;
+      allow finishing the install in this case. Closes: #273109
+  * Nikolai Prokoschenko
+    - KOI8-R support in termwrap (copied from Ognyan and Anton)
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 24 Sep 2004 11:57:22 +0200
+
+base-config (2.45) unstable; urgency=low
+
+  * Colin Watson
+    - Make the po build system cope if files aren't world-executable.
+    - Cope with the case that the LANG= line in /etc/default/gdm is
+      commented out.
+    - lib/menu/finish: Fix "/etc/environmment" typos.
+  * Joey Hess
+    - apt-setup: Remove a duplicate proxy question that bubulle accidentially
+      added a while ago.
+    - Add base-config/late_command, which is a command to run at the end of
+      base-config, for use as a hook when preseeding. I left out any warning
+      dialog if this command fails, to avoid adding new strings at this point.
+    - Also base-config/early_command, run before the welcome dialog.
+    - Fix seen flag abuse, don't unset seen flags until after asking
+      questions, to allow for preseeding.
+    - In tzsetup and apt-setup, rather than fixing general seen flag abuse,
+      add a hack; a special command line flag that base-config passes on
+      new installs, that makes them avoid unsetting seen flags then. This
+      was done because fixing it right involves too much work..
+    - Avoid most db_setting that would break preseeding, at least if -N
+      is passed.
+    - Fix force setting of DEBIAN_FRONTEND for crap postinst scripts that
+      check it. Broken since 2003!
+  * Ognyan Kulev and Anton Zinoviev
+    - CP1251 support in termwrap.
+  * Translations
+    - Update po/hr.po (Croatian) by Krunoslav Gernhard
+    - Update po/nb.po (Norwegian Bokmal) by Norwegian nb team
+    - Update debian/po/de.po (German) by Dennis Stampfer
+    - Update debian/po/zh_CN.po (Simplifed Chinese) by Carlos Z.F. Liu
+    - Update debian/po/ja.po (Japanese) header
+    - Update debian/po/bg.po (Bulgarian) by Ognyan Kulev
+    - Update debian/po/nb.po (Norwegian Bokmal) by Norwegian nb team
+    - Update debian/po/nn.po (Norwegian Nynorsk) by Norwegian nn team
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 12 Sep 2004 17:28:17 -0400
+
+base-config (2.44) unstable; urgency=low
+
+  * Joey Hess
+    - Improve mta.tst to not succeed if exim4-config is removed but not
+      purged. Closes: #267149
+    - Fix broken debconf-seed.
+  * Translations
+    - Updated Italian debconf translation by Giuseppe Sacco. Closes: #268278.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 27 Aug 2004 14:17:24 -0400
+
+base-config (2.43) unstable; urgency=low
+
+  * Otavio Salvador
+    - Fix a small spelling error in README.Debian.
+    - Fix GDM language problem. (Workaround for bug #265101)
+  * Joey Hess
+    - apt-setup's loop detection code was a bit broken, but accidentially did
+      the right thing for noninteractive installs with a missing CD. Make
+      it explicitly do the right thing.
+    - Load /var/log/debian-installer/debconf-seed if it exists; this file
+      is set up by the new d-i preseeding feature.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 19 Aug 2004 11:16:14 +0100
+
+base-config (2.42) unstable; urgency=high
+
+  * Joey Hess
+    - Fix broken id, el, ar, nl, tr, zh_TW, he, zh_CN translations, all
+      of which left off a comma and a space and the end of "enter information
+      manually", which screws up the constructd debconf list and causes a
+      hang.
+    - Add a warning comment about that.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 10 Aug 2004 15:04:56 -0300
+
+base-config (2.41) unstable; urgency=low
+
+  * Joey Hess
+    - Ask tzsetup/change_timezone at high priority to make the program
+      useful after base-config.
+    - Fix broken hwclock mangling that fails horribly on 1-9 of each month.
+      Closes: #264314
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  9 Aug 2004 14:00:43 -0300
+
+base-config (2.40) unstable; urgency=CRITICAL
+
+  * Joey Hess
+    - Add a hack to try locale without @euro in termwrap to work around d-i
+      bug that adds that to inappropriate locales.
+    - Trying to slip this in in time for the release, heaven help me.
+  * Updated translations:
+    - Updated Catalan debconf translation by Jordi Mallach.
+
+ -- Joey Hess <joeyh@debian.org>  Tue,  3 Aug 2004 15:25:51 -0400
+
+base-config (2.39) unstable; urgency=medium
+
+  * Matt Kraii
+    - Add security updates for testing. closes: #261555
+  * Joey Hess
+    - Fix permissions of debconf-seed. Closes: #263110
+  * Updated translations: 
+    - Croatian by Krunoslav Gernhard
+    - Per Olofsson
+      - Updated Swedish debconf translation.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  2 Aug 2004 22:07:39 -0400
+
+base-config (2.38) unstable; urgency=high
+
+  * Joey Hess
+    - Remove s390 telnet cleanup hacks. Closes: #260802
+    - Only reconfigure console-data if no keyboard can be set up using
+      info from d-i.
+  * Updated translations: 
+    - Korean (ko.po) by Changwoo Ryu
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 23 Jul 2004 21:04:25 -0400
+
+base-config (2.37) unstable; urgency=high
+
+  * Colin Watson
+    - Fix hwclock drift removal to work in more locales. Closes: #260303
+  * Translations
+    - Updated Bulgarian translations (debian/po/bg.po and po/bg.po).
+    - Updated Portuguese debconf translation.
+    - Initial Croatian translations (debian/po/hr.po and po/hr.po).
+    - Updated German debconf and program translation de.po by Dennis Stampfer
+    - Spanish (Castilian) (es.po) by Javier Fernández-Sanguino
+    - Slovak (sk.po) by Peter KLFMANiK Mann
+    - Extra dot removed in French po/fr.po
+    - Completed Arabic from Arabeyes repository
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 21 Jul 2004 21:05:23 -0400
+
+base-config (2.36) unstable; urgency=low
+
+  * Joey Hess
+    - Make termwrap call cyr -f, not -t, for Russian. There still seem
+      to be Russian display problems however.
+    - No longer update the available file.
+  * Colin Watson
+    - Install read-edid and mdetect separately, as read-edid only exists on
+      i386. Closes: #258690
+  * Translations
+    - Updated Polish debconf translation. Closes: #258557
+    - Updated Spanish debconf translation. Closes: #258845
+    - Minor corrections to French translations
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 11 Jul 2004 12:12:34 -0400
+
+base-config (2.35) unstable; urgency=high
+
+  * Translations
+    - Updated Spanish base-config and apt-setup man pages. Closes: #257828
+  * Kenshi Muto
+    - Brush up vesafb / vga16fb loading routine (for #257970).
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  7 Jul 2004 10:46:27 -0400
+
+base-config (2.34) unstable; urgency=high
+
+  * Joey Hess
+    - Skip stuff in menu/ that don't have .mnu files (needed for debian-edu
+      which links a templates file into there).
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  2 Jul 2004 17:04:20 -0400
+
+base-config (2.33) unstable; urgency=medium
+
+  * Joey Hess
+    - Correct inverted logic in debconf-seed. Closes: #256078
+      Thanks, Martin Orr
+    - Patch from David Weinehall to make base-config's shell fully POSIX.
+      Closes: #256530
+  * Recai Oktas
+    - Fix the revisited line drawing problem with the kernel 2.6 which
+      deserves a high urgency. Closes: #256766
+  * Translations:
+    - Eugeniy Meshcheryakov
+      - Updated Ukrainian debconf translation
+    - KÄ?stutis BiliÅ«nas
+      - Updated Lithuanian debconf translation
+    - Verok Istvan
+      - Updated Hungarian (program and debconf). Closes: #256511
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 30 Jun 2004 13:41:29 -0400
+
+base-config (2.32) unstable; urgency=low
+
+  * Joey Hess
+    - Updated for tasksel 2.00. Only run tasksel, it offers the user a way
+      to use aptitude for manual package selection. dselect is no longer an
+      option at all. Closes: #251900, #240715, #240715
+    - Drop the aptitude dependency (now tasksel ensures it is included).
+      Closes: #225344
+    - Conflict with older versions of tasksel.
+  * Translations
+    - Dennis Stampfer
+      - Updated German debconf translation de.po. Closes: #254036
+    - Carlos Z.F. Liu
+      - Updated Simplified Chinese debconf translation zh_CN.po.
+    - Christian Perrier
+      - Updated French debconf translation
+    - Claus Hindsgaul
+      - Updated Danish debconf translation
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 24 Jun 2004 11:10:19 -0400
+
+base-config (2.31) unstable; urgency=low
+
+  * Christian Perrier
+    - Add Plural-Forms to fr.po and pt_BR.po
+  * Petter Reinholdtsen
+    - Fix typo in lib/menu/shell.  (Closes: #255105)
+    - Change termwrap to make it more obvious why it change the console
+      charset to ISO-8859-1 at the end of its run.
+  * Translations:
+    - HÃ¥vard Korsvoll
+      - Updated Norwegian bokmÃ¥l translation (nb.po). (Closes: #250340)
+    - Claus Hindsgaul
+      - Add Plural-Forms to da.po.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 19 Jun 2004 18:48:22 +0200
+
+base-config (2.30) unstable; urgency=low
+
+  * Joey Hess
+    - Do not add security.debian.org to sources.list if testing is being
+      installed. Besides not offering security updates for testing, the
+      packages on that site can have Task fields that pull them into tasks,
+      and break the task installation, because other packages from stable are
+      not available.
+  * Recai Oktas (commited and tested by Christian Perrier)
+    - Uses configured language even when locales have already been
+      generated by a previous, interrupted, run of termwrap
+      Closes: #254452
+  * Petter Reinholdtsen
+    - Change termwrap to send log messages to syslog in addition to stdout.
+  * Translations
+    - Bosnian programs translation update
+    - Update Ukrainian translation by Eugeniy Meshcheryakov.
+    - Update German program translation by Dennis Stampfer.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 19 Jun 2004 11:26:23 +0200
+
+base-config (2.29) unstable; urgency=HIGH
+
+  * Fix the line drawing problem for ISO-8859-2 by using lat2-sun16 rather
+    than iso02.f16. Closes: #253989
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 12 Jun 2004 12:57:44 -0400
+
+base-config (2.28) unstable; urgency=HIGH
+
+  * Remove the iso01.f16 console font stuff entirely, it seems not to be
+    needed for 2.6 either now.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 10 Jun 2004 23:14:19 -0400
+
+base-config (2.27) unstable; urgency=HIGH
+
+  * Joey Hess
+    - Stop triyng to set PATH in the shell menu item, it won't work for a
+      login shell, and the root bug with root's PATH not including the sbin
+      directories lies elsewhere.
+    - Set HOME before running sh -l in the shell menu item, fixes the path bug
+      for real, Closes: #252930
+    - Only use the iso01.f16 console font with the 2.6 kernel. While it's
+      needed for 2.6, it breaks line drawing characters with 2.4.
+      Closes: #253211
+    - High urgency as the base-config in testing is not release quality.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 10 Jun 2004 12:35:51 -0400
+
+base-config (2.26) unstable; urgency=low
+
+  * Joey Hess
+    - Rebuilt properly without .svn directory. Closes: #252615
+  * Translations
+    - Update Catalan translation by Jordi Mallach.
+    - Track a few glitches in Spanish by Margarita Mantalero
+    - Update Lithuanian translation (po/lt.po) by KÄ?stutis BiliÅ«nas
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  4 Jun 2004 15:21:31 -0300
+
+base-config (2.25) unstable; urgency=high
+
+  * Dennis Stampfer
+    - Removed a whitespace before "..." in apt-setup
+  * Joey Hess
+    - termwrap: When setting LC_ALL to a language, set LC_COLLATE to C, to
+      avoid screwing up things like [p-z]. Closes: #251531
+  * Kenshi Muto
+    - Fix broken display with kernel 2.6 in C or ISO-8859-1 encoding.
+      Closes: Bug#250354
+  * Translations
+    - Update German program translation de.po by Dennis Stampfer
+    - Correct stupid mistakes in french translations by anonymous
+      random translator
+    - Enhance a few spanish strings with the help of Margarita Manterola
+    - Fix length problem in a Spanish string in pkgsel and unfuzzy strings,
+      with help from Anibal Monsalve Salazar
+
+ -- Christian Perrier <bubulle@debian.org>  Sun, 30 May 2004 16:28:35 -0300
+
+base-config (2.24) unstable; urgency=low
+
+  * Joey Hess
+    - Shut up a grep on a file that may not exist in termwrap.
+    - Fix templates.pot generation code to support multiple programs with the
+      same name, such as the apt-setup standalone program and menu item.
+      Closes: #250525 (adds back some missing strings)
+    - Regenerate templates.pot whenever an input file changes.
+  * Translations
+    - Minor fixes in German translation de.po by Dennis Stampfer
+    - Finnish translation updated. Closes: #250746
+    - Bosnian translation updated
+  * Christian Perrier
+    - Fix ellipsis. Unfuzzy translations
+  * Petter Reinholdtsen
+    - Remove no->nb transition code.  This is now handled by po-debconf.
+
+ -- Christian Perrier <bubulle@debian.org>  Wed, 26 May 2004 22:52:23 -0300
+
+base-config (2.23) unstable; urgency=high
+
+  * Joey Hess
+    - Fix "CD's" on apt-setup man page.
+    - Add translated apt-setup.de.8 from Helge Kreutzmann. Closes: #249452
+    - Make /etc/environment setting more robust; in particular deal with it
+      not existing, but also deal with versions that contain LANG already.
+  * Kenshi Muto
+    - Load fbcon.ko for Linux 2.6 framebuffer. Closes: #247238
+
+ -- Otavio Salvador <otavio@debian.org>  Wed, 19 May 2004 13:37:00 -0300
+
+base-config (2.22) unstable; urgency=medium
+
+  * Joey Hess
+    - Use "debian" and not "localhost" as the default hostname, following d-i.
+    - Make apt-setup cdrom probing more robust; look for /media/cdrom0 and
+      /cdrom in the fstab as well as for the /dev/cdrom link.
+    - Make sure /sbin and /usr/sbin are in the path when starting the
+      interactive shell.
+    - In termwrap, delete "should never happen" errors that happen.
+    - In termwrap, put back the code that unsets bad variables if the locale
+      charset comes out as ANSI_X3.4-1968.
+    - In termwrap, don't add locales to locale.gen unless they are not
+      present, and are listed in /usr/share/i18n/SUPPORTED. Closes: #248951
+    - Move the /etc/environment LANG code out of termwrap where it does not
+      belong, have base-config only do it on new installs.
+  * Recai Oktas
+    - Change Turkish console font to ter-916f.
+  * Translation updates
+    - Italian by Giuseppe Sacco
+    - German debconf de.po update by Frank Lichtenheld
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  7 May 2004 14:19:34 -0400
+
+base-config (2.21) unstable; urgency=medium
+
+  * Joey Hess
+    - Improved the pon menu item's .tst file.
+    - Ask apt-setup/cd/another at high priority. Closes: #244577
+    - Patch from Frans Pop to work around modules.conf/modules.dep timestamp
+      problem that occurs if the time zone configuration during initial
+      install moves the timestamps of these files into the future. Then on
+      reboot, modules.dep is updated, and ends up having an earlier timestamp
+      than modules.conf, which resulted in an error. To fix, touch both files
+      after changing time zone. Closes: #246993
+    - Add support for jumping around in the menu via a jump-to file that
+      the name of a menu item can be written to.
+    - Support menu files that are symlinks, as used by debian-edu-install.
+  * Denis Barbier
+    - Add support for ISO-8859-9 encoding for Turkish.  Closes: #247324
+  * Translation updates
+    - French by Christian Perrier
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  6 May 2004 21:20:48 -0400
+
+base-config (2.20) unstable; urgency=high
+
+  * Petter Reinholdtsen
+    - Really quote the $COUNTRY variable in apt-setup. (Closes: #244300)
+  * Joey Hess
+    - Stop installing discover, this is now up to the first stage 
+      installer, which may install discover1 or discover 2.
+    - Fix termwrap to not assume fgconsole will work.
+  * Translation updates
+    - Russian by Nikolai Prokoschenko
+    - Romanian update by Eddy Petrisor
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 23 Apr 2004 13:33:21 -0400
+
+base-config (2.19) unstable; urgency=high
+
+  * Eugeniy Meshcheryakov
+    - Use console-cyrillic for KOI8-U if possible.
+  * Joey Hess
+    - Quote a variable in apt-setup. Closes: #244300
+    - Shut up adduser calls.
+    - Clear screen before displaying available file update message.
+    - Inflated urgency to make beta4.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 18 Apr 2004 23:12:30 -0400
+
+base-config (2.18) unstable; urgency=medium
+
+  * Joey Hess
+    - Allow A-Z in hostnames.
+    - If the hostname question is not asked, assume the current hostname or
+      fallback hostname is valid, and do not check for validity, or loop.
+      Fixes some bad behavior at high debconf priority.
+    - Display a message while updating the available file, for slow machines.
+    - Add the user set up by passwd to a number of supplimental groups.
+      This is a hack. It should be done by passwd with help from adduser, and
+      patches have been written, but not yet applied.
+    - Use commas to separate fields in the mapping file, fixing problems
+      with translations like Greek and Finnish that include colons in menu
+      items. Closes: #242375
+    - Remove commas from menu items just in case when building the mapping
+      file.
+  * Kenshi Muto
+    - Applied Russian termwrap patch (Closes: Bug#241117)
+  * Christian Perrier
+    - Added quotes around message for available file update
+    - Added comments for translators not to translate "available"
+    - Keep po/base-config.pot in package for helping out translators
+  * Eugeniy Meshcheryakov
+    - Add support of devfs device names to termwrap so that this script
+      can be run after installation. Closes: #242785
+    - KOI8-U can be handled by console-tools, there is no need for jfbterm.
+      Closes: #242787
+  * Translations
+    - Andre Dahlqvist
+      - Updated po/sv.po
+    - Changwoo Ryu
+      - Updated Korean translation (po/ko.po)
+    - Peter Mann
+      - Updated Slovak translation (po/sk.po)
+    - Miroslav Kure
+      - Updated Czech translation (po/cs.po)
+    - KÄ?stutis BiliÅ«nas
+      - Updated Lithuanian translation (po/lt.po)
+    - Claus Hindsgaul
+      - Update Danish translation (po/da.po).
+    - Miguel Figueiredo
+      - Update Portuguese translation (po/pt.po)
+    - Carlos Z.F. Liu
+      - Updated Simplified Chinese translation (po/zh_CN.po)
+    - Eugeniy Meshcheryakov
+      - Updated Ukrainian translations (uk.po)
+    - Konstantinos Margaritis
+      - Updated Greek translation (el.po)
+    - Dennis Stampfer
+      - Updated German translation (po/de.po).
+    - AndrÃ© LuÃ­s Lopes
+      - Updated Brazilian Portuguese translation (po/pt_BR.po).
+    - Bart Cornelis
+      - Updated Dutch translation (nl.po)
+    - Kenshi Muto
+      - Updated Japanese translation
+    - Christian Perrier
+      - Updated french translation
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 10 Apr 2004 00:37:45 -0400
+
+base-config (2.17) unstable; urgency=low
+
+  * Petter Reinholdtsen
+    - New menu entry debconf-seed, filling in the debconf database
+      from /usr/share/base-config/debconf-seed/* at install time.
+  * Denis Barbier
+    - Store locale in /etc/environment when it is different from en_US.
+      Closes: #237387
+  * Kenshi Muto
+    - Apply default mirror country patch. (Closes: Bug#239560)
+      This patch also solves a problem when another LANG is used (now
+      apt-setup/country value is always stored in English).
+  * Joey Hess
+    - Document debconf-seed
+    - Only show debconf-seed menu item if the directory exists.
+  * Translations:
+    - KÄ?stutis BiliÅ«nas
+      - Updated Lithuanian translation (po/lt.po and debian/po/lt.po).
+    - Dafydd Harries
+      - Updated Welsh translation (po/cy.po, debian/po/cy.po).
+    - Konstantinos Margaritis
+      - fixed typo in Greek translation (po/el.po)
+    - Jure Cuhalev
+      - Slovenian translation updates (po/sl.po and debian/po/sl.po)
+    - Dennis Stampfer
+      - Update German translation (de.po)
+    - Andre Dahlqvist
+      - Update Swedish translation in po/sv.po
+    - Peter Mann
+      - fixed typo in Slovak translation (debian/po/sk.po)
+    - Ruben Porras
+      - tiny patch to base-config.es.8
+    - Konstantinos Margaritis
+      - Updated Greek translation (debian/po/el.po) small typo
+      - Found stupid translation that broke the installation
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 18 Mar 2004 16:51:12 -0500
+
+base-config (2.15) unstable; urgency=HIGH
+
+  * Translations:
+    - HÃ¥vard Korsvoll
+      - Updated Norwegian bokmÃ¥l translation (nb.po) (from Axel Bojer)
+    - Andre Dahlqvist
+      - Update Swedish translation (debian/po/sv.po)
+    - Carlos Z.F. Liu
+      - Add Traditional Chinese translation (po/zh_TW.po debian/po/zh_TW.po),
+        by Tetralet.
+    - Ognyan Kulev
+      - Updated Bulgarian translation (po/bg.po and debian/po/bg.po).
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 10 Mar 2004 14:29:11 -0500
+
+base-config (2.14) unstable; urgency=HIGH
+
+  * Denis Barbier
+    - Fix termwrap to work with iso-8859-2 encoding.
+      Closes: #232071
+    - Add support for iso-8859-7 encoding.
+    - Fix typo in base-config.8.
+  * KÄ?stutis BiliÅ«nas
+    - Changed font for iso-8859-13 in termwram file
+  * Joey Hess
+    - High urgency for the usual reasons; the termwrap fix is the main one.
+
+  * Translations:
+    - HÃ¥vard Korsvoll
+      - Updated Norwegian nynorsk translation (nn.po)
+    - Peter Mann
+      - Updated Slovak translation (sk.po)
+    - Eugeniy Meshcheryakov
+      - Updated Ukrainian translation (uk.po)  Closes: #234940
+    - Changwoo Ryu
+      - Added Korean translation (po/ko.po)
+      - Updated Korean translation (debian/po/ko.po)
+    - Eddy Petrisor
+      - Initial Romanian translation (po/ro.po)
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  4 Mar 2004 21:31:52 -0500
+
+base-config (2.13) unstable; urgency=HIGH
+
+  * Petter Reinholdtsen
+    - Fix small typo in base-config.8.
+  * Kenshi Muto
+    - Fix framebuffer detection routine (only checks 'false' or not).
+      Closes: #233135
+    - Fix handling gettext of 'enter information manually, ' in apt-setup.
+    - Apply iso-codes patch. Closes: #233995
+  * Denis Barbier
+    - Replace LANG=C by LC_ALL=C in apt-setup to make sure that English
+      messages are parsed.  Closes: #233262
+  * Joey Hess
+    - High urgency for the usual reasons; the apt-setup gettext is the main
+      important fix of the above.
+
+  * Translations:
+    - Andre Dahlqvist
+      - Update Swedish translation (debian/po/sv.po)
+    - Konstantinos Margaritis
+      - Some minor corrections in Greek translation (po/el.po,
+      debian/po/el.po)
+    - Miroslav Kure
+      - Fix more typos in Czech translation
+    - Ruben Porras
+      - Updated spanish man pages. Closes: #232547
+    - Dennis Stampfer
+      - Update German translation (debian/po/de.po).
+    - Christian Perrier
+      - Correct French translation (debian/po/fr.po) for variable name error
+    - Elian Myftiu
+      - Updated Albanian translation (debian/po/sq.po)
+    - Kenshi Muto
+      - Updated Japanese translation (po/ja.po)
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 24 Feb 2004 14:35:20 -0500
+
+base-config (2.12) unstable; urgency=HIGH
+
+  * Patch from Matt Kraai to only set the menu item on the first prep-menu
+    call. Closes: #232050
+  * Fix termwrap to not set an unverified LANG and then call debconf.
+    Fixes at least half of #232329.
+    Also remove unnecessary duplication in the code.
+  * Translations:
+    - Bart Cornelis
+      - Incorporated comments made by Bastiaan van Eeckhoudt
+    - Eugeniy Meshcheryakov
+      - New Ukrainian translaton. Closes: #232287
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 12 Feb 2004 00:02:52 -0500
+
+base-config (2.11) unstable; urgency=low
+
+  * Joey Hess
+    - tzsetup: Ask about GMT at high priority.
+    - Fix typo in .tst code.
+    - Skip .tst files when looking for menu items. Closes: #231454
+    - The contrib selection code was exactly backwards. Closes: #229317
+    - Fix whitespace if contrib is selected w/o non-free. Closes: #229316
+  * Updated translations:
+    - Miroslav Kure
+      - Fix typos in Czech translation (cs.po)
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  7 Feb 2004 14:46:16 -0500
+
+base-config (2.10) unstable; urgency=HIGH
+
+  * Kenshi Muto
+    - Fix TMPDIR small (but critical) typo.
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  6 Feb 2004 13:27:15 -0500
+
+base-config (2.09) unstable; urgency=HIGH
+
+  * Kenshi Muto
+    - Run jfbterm when language is non-latin/Russian.
+      And when jfbterm failed, termwrap fallbacks to C. (closes: Bug#226200)
+    - Add WRAPPER_OPTION (closes: Bug#225865)
+    - Apply validlocale patch for support codeset style. (closes: Bug#225870)
+      Thanks Mutsumi.
+  * Joey Hess
+    - Fix apt-setup return code if add another source question is not
+      displayed.
+    - List the number of available packages in apt-setup/another.
+    - Use ngettext to allow for appropriate translation of the "packages"
+      string.
+    - Removed the last remnants of non-us support in apt-setup.
+    - Remove the remainders of support for the old dbootstrap_settings file.
+      Note that all the translated man pages are not badly out of date.
+  * Denis Barbier
+    - Switch to using gettext instead of $"" in shell scripts, and
+      use xgettext -L Shell.
+    - Better use of ngettext.
+  * Joey Hess
+    - Build-depend on gettext version 0.13.
+    - Fix signular form of the ngettexted string.
+    - The removal of $"" should remove the only bashism, so convert scripts
+      over to /bin/sh.
+    - Update copyright file.
+    - Add a -c switch to tzsetup. With this switch, it will use the
+      country code passed in to construct a list of likely time
+      zones, and prompt accordingly.
+    - Call tzsetup this way, using debian-installer/country.
+      Closes: #226344
+    - Use .tst files to control whether items appear on the menu.
+    - Use this for keyboard, ppp, and mta setup, to avoid displaying
+      those items on the menu if they will not actually do anything.
+    - Add Changes-Menu field to .mnu files that forces a menu rebuild.
+      This is necessary to handle mta's menutest properly.
+    - US and Canada have so many screwed up time zones in zone.tab that
+      it's better to have hand-written templates for their more common time
+      zones. Similar templates can be added for other countries at need.
+    - Also added hand-written template for Brazil.
+    - Add debian-installer/language to the db, so things like
+      dictionaries-common can use it.
+    - Export TMPDIR.
+    - Add dep on gettext-base.
+    - mirror/distribution has been renamed to mirror/suite in d-i, follow
+      .. er .. suite.
+    - To prevent breaking beta2 too badly, set the default suite to
+      testing. Unstable d-i will always override this, so it's safe to do.
+    - Urgency set to high; this needs to get into testing to be tested..
+  * Christian Perrier
+    - Rewrite templates to save work to translators by splitting up
+      a paragraph. Deeply sorry to translators who already updated their
+      files.
+  * Petter Reinholdtsen
+    - Correct typo, ISO-8895-15 -> ISO-8859-15.
+
+  * Updated translations:
+    - Bartosz Fenski
+      - Updated Polish (pl) translation.
+    - Giuseppe Sacco
+      - Updated italian translation (it.po)
+      - changed all string when selectin tasksel/dselect/...
+        in order to fit the screen.
+    - Kenshi Muto
+      - Update Japanese translation (ja.po)
+    - Bart Cornelis
+      - Updated Dutch translation (debian/po/nl.po)
+      - fixs translation-bugs found by Bastiaan van Eeckhoudt
+        Closes: #220477
+    - Ognyan Kulev
+      - Updated bulgarian translation (debian/po/bg.po).
+    - Claus Hindsgaul
+      - Update Danish translation (da.po).
+    - Dennis Stampfer
+      - Updated German translation (de.po).
+      - Updated German translation (debian/po/de.po).
+    - AndrÃ© LuÃ­s Lopes
+      - Updated Brazilian Portuguese (pt_BR) translation.
+    - Miroslav Kure
+      - Update Czech translation
+    - Peter Mann
+      - Update Slovak translation
+    - Nikolai Prokoschenko
+      - Updated russian translation
+    - Anmar Oueja
+      - created and translated to Arabic (ar.po)
+    - Tapio Lehtonen, Tommi Vainikainen
+      - Updated Finnish translation (fi.po).
+    - TeÃ³filo Ruiz SuÃ¡rez
+      - Updated Spanish translation (po/es.po)
+    - Jordi Mallach
+      - Updated Catalan translation (debian/po/ca.po).
+      - Added Catalan translation (po/ca.po).
+    - Carlos Z.F. Liu
+      - Updated Chinese translations (po/zh_CN.po and debian/po/zh_CN.po)
+    - Christian Perrier
+      - Updated French translations (debian/po/fr.po and po/fr.po)
+    - Konstantinos Margaritis
+      - Updated Greek translations (timezones update)
+    - Safir Secerovic
+      - Update Bosnian translation (debian/po/bs.po)
+      - Add po/bs.po
+    - Miguel Figueiredo
+      - Updated pt.po
+    - Andre Dahlqvist
+      - Update Swedish translation (po/sv.po)
+    - KÄ?stutis BiliÅ«nas
+      - Updated Lithuanian translations (debian/po/lt.po and po/lt.po)
+    - Petter Reinholdtsen
+      - Updated Norwegian BokmÃ¥l debconf translation (debian/po/no.po).
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  5 Feb 2004 14:38:10 -0500
+
+base-config (2.08) unstable; urgency=high
+
+  * Joey Hess
+    - Allow 0-9 in hostnames.
+    - When running a shell, cd to root's home dir first.
+    - Fix apt-setup menu item in French to not include a comma.
+    - Add a comment about this to templates file.
+    - Remove bogus $choices from po/fr.po.
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  1 Jan 2004 20:36:54 -0500
+
+base-config (2.05) unstable; urgency=low
+
+  * Peter Mann
+    - Initial Slovak translation (sk.po)
+
+ -- Miroslav Kure <kurem@debian.cz>  Tue,  6 Jan 2004 18:12:21 +0100
+
+base-config (2.04) unstable; urgency=high
+
+  * Bartosz FeÅ?ski
+    - Added Polish program translation (po/pl.po).
+  * Jure Ä?uhalev
+    - Added slovenian translation (sl.po).
+  * Miroslav Kure
+    - Added Czech program translation (po/cs.po).
+  * Jure Cuhalev
+    - Added Slovenian translations.
+  * TeÃ³filo Ruiz SuÃ¡rez <teo@debian.org>
+    - (very) updated Spanish translation (po/es.po)
+  * Miguel Figueiredo
+    - Added portuguese translation (pt.po)
+  * Joey Hess
+    - Loadkeys has stopped sending non-warnings to stderr, so stop
+      /dev/nulling that.
+  * AndrÃ© Dahlqvist
+    - Update Swedish translation (sv.po). Closes: #225057
+    - Initial Swedish translation (po/sv.po)
+  * Giuseppe Sacco
+    - Update italian translation (it.po)
+    - Added portuguese translation by Miguel Figueire (pt.po)
+    - Added finnish translation for both po and debian/po directories.
+      The translation is maintained by Tapio Lehtonen.
+  * KÄ?stutis BiliÅ«nas
+    - Update Lithuanian translation (lt.po)
+    - Added Lithuanian program translation (po/lt.po)
+  * Ming Hua
+    - Added Simplified Chinese translation.
+  * Joey Hess
+    - Ask the add-another question at priority high if the default is
+      true, to avoid an unbreakable loop at high priority.
+    - If it is not displayed, assume they do not want to add another source.
+    - Another high urgency for testing upload.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 23 Dec 2003 13:42:53 +0100
+
+base-config (2.03) unstable; urgency=high
+
+  * Really needs to go into testing now if we're to make our release date.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 22 Dec 2003 19:21:53 -0500
+
+base-config (2.02) unstable; urgency=low
+
+  * Bartosz FeÅ?ski
+    - Update Polish translation. Closes: #224174
+  * Petter Reinholdtsen
+    - Updated Norwegian BokmÃ¥l translation (no.po).
+  * Kenshi Muto
+    - Update jfbterm option.
+  * Konstantinos Margaritis
+    - Initial Greek languange translation (el.po)
+  * Claus Hindsgaul
+    - Update Danish translation (da.po).
+  * Miroslav Kure
+    - Update Czech translation (cs.po).
+  * Dennis Stampfer
+    - Update German translation (de.po).
+    - Initial German translation (po/de.po).
+  * Steinar H. Gunderson
+    - Updated Norwegian BokmÃ¥l translation (nb.po), renamed no.po -> nb.po
+      to reflect the new language codes.
+  * Joey Hess
+    - Add depenedncy on aptitude, so it will be available on new installs.
+  * Petter Reinholdtsen
+    - Updated Norwegian BokmÃ¥l translation (nb.po).
+    - Make sure translation files using the no language code is still
+      installed, while we want for users to start using nb_NO instead
+      of no_NO.
+    - Added Norwegian Nynorsk translation (nn.po), thanks to Gaute
+      Hvoslef Kvalnes.
+  * Christian Perrier
+    - Updated french translation (of program)
+  * VERÃ?K IstvÃ¡n
+    - Updated Hungarian translation
+  * AndrÃ© LuÃ­s Lopes
+    - Added po/pt_BR.po file, which was previously not available.
+  * KÄ?stutis BiliÅ«nas
+    - Added Lithuanian debconf templates translation. Closes: #224747
+  * VERÃ?K IstvÃ¡n
+    - Added base-config/po/hu.po
+  * Konstantinos Margaritis
+    - Added base-config/po/el.po
+  * Ognyan Kulev
+    - Added bulgarian translation (debian/po/bg.po and po/bg.po).
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 22 Dec 2003 19:14:46 -0500
+
+base-config (2.01) unstable; urgency=low
+
+  * Make apt-setup default to adding another apt source if less than 300
+    packages are available to install. In that case probably apt only knows
+    about a netinst CD, or something useless like that.
+  * (Leaving out display of number of packages in that question, due to string
+    freeze.)
+  * Denis Barbier
+    - Run debconf-updatepo
+  * Kenshi Muto
+    - Update Japanese translation (ja.po)
+  * AndrÃ© LuÃ­s Lopes
+    - Update pt_BR (Brazilian Portuguese) translation.
+  * Christian Perrier
+    - Update French translation
+  * Bart Cornelis
+   - Updated Dutch translation (nl.po)
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 13 Dec 2003 22:40:33 -0500
+
+base-config (2.00) unstable; urgency=medium
+
+  * Safir Secerovic
+    - Add Bosnian translation (bs.po).
+  * Tommi Vainikainen
+    - Add Finnish translation (fi.po).
+  * Ilgiz Kalmetev
+    - Update Russian templates tranlsation. Closes: #221445
+  * Sent a few things to /dev/null.
+  * Rename apt-setup/distribution to mirror/distribution, and
+    apt-setup/http_proxy to mirror/http/proxy, to match values from
+    debian-installer.
+    Note that I still use symbolic release names in mirror/distribution,
+    in contrast to d-i. I will accept code names though.
+  * Add debian-installer/keymap dummy template to get values copied from d-i.
+  * Inherit debconf/priority from d-i. This means it defaults to high for
+    most installs, which is a large change!
+  * Add support for copying configs in from a d-i cdebconf db, and for
+    setting LANG based on debian-installer/locale. When present, a cdebconf
+    db overrides dbootstrap_settings, but the old file is still supported,
+    for now, for compatability.
+  * Applied patch from Christian Perrier for debconf template polishing.
+    Closes: #220836
+    (However, there were some rejects, and so it was a hand merge, and
+    the French translaton update part of the patch was droppd.)
+  * Remove "persistent" from apt-setup/security-updates, added incorrectly
+    by above patch.
+  * No longer take the mere presense of /root/dbootstrap_settings as an
+    indication of a new install; $1 must equal new.
+  * Move and rename scripts that can be menu items, and add .mnu files to
+    control their order and usage.
+  * Add menu items to debconf templates.
+  * Change hostname script to always prompt for the hostname at at least
+    medium priority, but use high if the hostname is not set at all.
+    This is so it will do something if picked manually from the menu.
+  * Also, if the hostname is "localhost", as set by d-i on a non-networked
+    (or dhcp?) install, always ask about it at high priority.
+  * Fix hostname script to not do the stupid substitute into a default thing;
+    the SET command is there for a reason.
+  * Don't bother asking about or doing a poff.
+  * Add a menu item to run a shell.
+  * Merge the X hack and popcon into the pkgsel and apt-get steps.
+  * Move the note about base-config from the intro to the final message.
+  * Merge screen blanking code into intro and finish.
+  * Merge all the final stuff into one finish menu item, which has better
+    flow than we had before, with the final message really being final.
+  * Enable xdm starter.
+  * Remove redundant LANG setting code from base-config program, it will 
+    only be handled by termwrap now.
+  * Modify base-config to display a menu at medium priority, and operate
+    based on .mnu files. If something goes wrong, drop debconf priority to a
+    level that displays the menu, from which you can retry steps to hopefully
+    correct it. Closes: #55403, #127678, #197073, #159544
+  * Update base-config man page to document new stuff.
+  * Only pass --unseen-only to dpkg-reconfigure calls when it's a new
+    install. If base-config is re-run, old questions should also be
+    shown.
+  * Make pkgsel set a default package selector.
+  * Improve localised strings for package selectors.
+  * Cleaned up title setting.
+  * Depend on debconf 1.3.22 for SETTITLE support and debconf-communicate.
+  * Convert the install-problem template to a note, and always display the
+    main menu if it fails there.
+  * Increase the priority of the package selector question to high.
+    Without displaying that question, I'd need a high priority note to explain
+    what comes next anyway.
+  * Remove text in hostname question about it being a fqdn. d-i puts a non
+    qualified name in there, after all.
+  * Display the welcome banner and final message at high priority so they
+    will still be visible.
+  * Rename the log file to base-config.log.
+  * Remove console tools removal code for serial consoles, d-i just doesn't
+    install it in that case.
+  * The console-tools keymap file has changed from
+    /etc/console-tools/default.kmap.gz to /etc/console/boottime.kmap.gz.
+    Probably Closes: #212440, #212448 (I'd appreciate some more testing.)
+  * Rename KEEP_BASE_DEBS to KEEP_DEBS and make it disable all apt-get clean
+    calls in base-config. Closes: #217814
+  * If the user includes non-free, always pull in contrib. Conversly, if they
+    do not pick non-free, then ask about contrib at a low priority. There
+    are a few things in contrib that do not depend on non-free.
+    Closes: #209403
+  * Move Mirrors.masterlist to libdir so it will be copied to tmp with
+    everything else.
+  * Clarified the PPP question.
+  * Propigate exit code from apt-setup out to menu to allow fallback.
+  * Make tzsetup exit 30 if backed up past its start.
+  * Similar changes to finish, hostname, intro, pkgsel, pon.
+  * Bugs filed on console-data, passwd, exim4-config, to get them to exit
+    30 appropriatly as well. This leaves only apt-get that in general you
+    cannot back up from.
+  * Turn on capb backup for all of base-config.
+  * Make base-config itself exit 30 if you back up from the main menu.
+  * Urgency medium because this will get little testing before it is in
+    testing, and because some of the unfiled bugs fixed above are really
+    release critical.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 10 Nov 2003 01:07:19 -0500
+
+base-config (1.75) unstable; urgency=low
+
+  * Miroslav Kure
+    - Update Czech translation (cs.po).
+  * Claus Hindsgaul
+    - Update Danish translation (da.po).
+  * Bart Cornelis
+    - update dutch translation (nl.po)
+  * RubÃ©n Porras
+    - Update Spanish man pages. Closes: #218738
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  2 Nov 2003 15:35:29 -0500
+
+base-config (1.74) unstable; urgency=low
+
+  * apt-setup: fix grepping for contrib in sources.list for
+    security.debian.org addition
+  * apt-setup: don't bother with security.debian.org lines if only unstable
+    is in sources.list. Closes: #214859
+  * Pass --unseen-only to dpkg-reconfigure calls, to allow for pre-seeding.
+    Closes: #214099
+  * Javier Fernandez-Sanguino PeÃ±a:
+     - Updated spanish translation
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 11 Oct 2003 18:43:58 +0200
+
+base-config (1.73) unstable; urgency=low
+
+  * Added French template update. Closes: #210464
+  * Updated Polish translation once more. Closes: #208961
+  * Andre Luis Lopes
+    - Update pt_BR (Brazilian Portuguese) template translation.
+  * Denis Barbier
+    - Shorten some strings in po/fr.po. Closes: #212783
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 30 Sep 2003 14:48:51 -0400
+
+base-config (1.72) unstable; urgency=low
+
+  * Reconfigure exim4-config, not exim. Closes: #209419
+  * Update Japanese template po file. Patch from Kenshi Muto
+    Closes: #210373
+  * Bart Cornelis
+    - updated nl.po debian template
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 11 Sep 2003 12:39:12 -0400
+
+base-config (1.71) unstable; urgency=low
+
+  * Petter Reinholdtsen
+    - Update polish (pl) debian template.  Patch from
+      Bartosz Zapalowski. (Closes: #208961)
+    - Update no.po debian template.
+    - Do not load /etc/environment in termwrap, as this always
+      contain LANG=C on first time install.
+  * Joey Hess
+    - Move from build-depends-indep to build-depends to match current policy.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Tue,  9 Sep 2003 20:46:48 +0200
+
+base-config (1.70) unstable; urgency=low
+
+  * Javier Fernandez-Sanguino PeÃ±a:
+    - Updated spanish translation and also worded properly the GTM
+      question.  (thanks to Jorge Ferrer for pointing that out :-)
+  * Petter Reinholdtsen
+    - Updated fr.po, patch from Christian Perrier. (Closes: #206438)
+    - Set hostname and update /etc/hostname if it is unset. (Closes: #201869)
+    - Try to add ISO-8859-13 support into termwrap.  Depend on
+      console-data >= 2002.12.04dbs-16 to get the console charmap for
+      ISO-8859-13. (Closes: #206347)
+    - Try to add ISO-8859-2 support into termwrap.
+    - Fix typos in console charset restore (iso1 is wrong, use iso01
+      instead).
+    - Try harder to detect serial console, using fgconsole from
+      console-tools.  Adding dependency on console-tools.
+      Use TERM=vt100 instead of TERM=linux on serial
+      consoles.  (Closes: #181394)
+    - Add draft 97start-xdm to start X if it is configured.  It is currently
+      disabled.
+    - Make sure to use current debconf priority (and not priority low) when
+      reconfiguring exim4.
+    - Updated Japanese debconf translation.  Patch from Kenshi Muto.
+      (Closes: #208690)
+  * Joey Hess
+    - Updated pt_BR debconf po file from Andre Luis Lopes. Closes: #207949
+    - Modified 77exim to dpkg-reconfigure exim4, if it is installed.
+      If not, then no MTA is set up at all. exim 3 is not an option, sorry.
+      This is now out of my hands and in the hands of debootstrap to get exim4
+      installed. (Bug #208047)
+
+ -- Petter Reinholdtsen <pere@debian.org>  Fri,  5 Sep 2003 20:01:26 +0200
+
+base-config (1.69) unstable; urgency=low
+
+  * Joey Hess:
+    - Added DEBIAN_FRONTEND setting hack for broken postinst scripts that
+      still check this variable. Closes: #205265
+  * Petter Reinholdtsen.
+    - Make sure the DEBIAN_FRONTEND hack never set an empty variable.
+    - Clean up message printing in termwrap.
+    - Updated debian/po/fr.po, thanks to Christian Perrier. (Closes: #206438)
+    - Make sure 75apt-install do not loop forever when running in
+      non-interactive mode.
+
+ -- Petter Reinholdtsen <pere@debian.org>  Thu, 21 Aug 2003 12:53:49 +0200
+
+base-config (1.68) unstable; urgency=low
+
+  * Added Petter Reinholdtsen as a co-maintainer.
+  * Make us uploaders, and debian-boot the maintainer, as is done for d-i.
+  * Petter Reinholdtsen
+    - Add Norwegian BokmÃ¥l translation (no.po, should be nb.no when
+      glibc is corrected).
+    - Ran debconf2po-update to synchronize the translation files.
+    - Convert changelog to UTF-8 for Standards-Version: 3.6.0.
+    - Enable screen blanking at the end of the install, picking a
+      random timeout value of 10 minutes, as it seems impossible to
+      extract the old value.
+    - Add support for ISO-8859-15 and UTF-8 in termwrap.
+    - Remove quote character in validlocale to avoid warning from
+      'bash --dump-po-strings'.
+    - Add 'gettext (>= 0.12.1-3)' to build-depend-indep to make sure
+      msgcat and msguniq is available at build time.
+    - Add LC_ALL=C to tzsetup in addition to LANG=C, to make sure the
+      variables set in termwrap are ignored, and the date format used
+      is correct.
+    - Make sure the sorting order of the scripts is independend of the
+      current locale, and always use LC_ALL=C when sorting the names.
+    - Added Japanese translation (ja.po), thanks to Kurasawa
+      Nozomu. (Closes: #184680)
+    - Corrected da.po, it was missing national characters and charset
+      info.
+    - Only remove the HW detection packages used by the X hack if the
+      packages was installed by base-config.
+  * Bart Cornelis
+    - updated duch debconf .po and, created dutch translation non-debconf
+      .po file
+
+ -- Petter Reinholdtsen <pere@debian.org>  Sat, 16 Aug 2003 21:58:45 +0200
+
+base-config (1.67) unstable; urgency=low
+
+  * Put the non-free prompt back in, but only at low priority (not show by
+    default but see the man page). Contrib is also asked at low.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 20 Jul 2003 14:20:17 +0200
+
+base-config (1.66) unstable; urgency=low
+
+  * Remove non-free question at the command of the DPL.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 18 Jul 2003 12:26:14 +0200
+
+base-config (1.65) unstable; urgency=low
+
+  * base-config.fr.8 update. Closes: #198095
+  * Pass --localtime to hwclock when getting the value to display, as this 
+    will prevent it from adjusting based on /etc/adjtime, and make sure it
+    displays the raw hwclock value. Closes: #198731
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 26 Jun 2003 13:06:43 -0400
+
+base-config (1.64) unstable; urgency=low
+
+  * Add Spanish man pages from RubÃ©n Porras. Closes: #195442
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 31 May 2003 12:17:51 -0400
+
+base-config (1.63) unstable; urgency=low
+
+  * Make tzsetup change UTC setting even if the timezone is not changed.
+    Just jump to step 5, which does the change, a bug had it jumping to step 6
+    before. Closes: #195054
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 28 May 2003 11:57:01 -0400
+
+base-config (1.62) unstable; urgency=low
+
+  * Fix typo that made tzsetup ignore -U switch. Closes: #194903
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 27 May 2003 11:35:27 -0400
+
+base-config (1.61) unstable; urgency=medium
+
+  * brown paper bag: Run aptitude from a script with debconf turned
+    off; users will try to install packages in there! Closes: #184021
+  * Remove broken replaylog hack from source; replay will do since timings
+    are gathered.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  5 May 2003 17:04:44 -0400
+
+base-config (1.60) unstable; urgency=low
+
+  * Force install discover, read-edit, and mdetect before running aptitude or
+    selecting packages. This is the only way to make sure they are available
+    before xserver-xfree86 is installed, to make sure hardware autodetection
+    gets done. Afterwards, if X was not installed after all, remove them.
+  * Changed intro message header. Closes: #188812
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 18 Apr 2003 13:28:53 -0400
+
+base-config (1.59) unstable; urgency=low
+
+  * Mark popularity-contest for install, before running aptitude. So a user
+    can always remove it in aptitude, or just choose not to run it when it
+    installs and prompts about that. We need more people using popcon so we
+    can get better data. Closes: #184601
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  5 Apr 2003 12:18:35 -0500
+
+base-config (1.58) unstable; urgency=low
+
+  * Spanish update from Javier Fernandez-Sanguino PeÃ±a. Closes: #183452
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  9 Mar 2003 19:04:25 -0500
+
+base-config (1.57) unstable; urgency=low
+
+  * Another French debconf po file update.
+  * And a pt_BR debconf po update. Closes: #182951
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  1 Mar 2003 10:28:47 -0500
+
+base-config (1.56) unstable; urgency=low
+
+  * Another de.po update.
+  * Updated French debconf po file from Christian Perrier.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 24 Feb 2003 19:35:13 -0500
+
+base-config (1.55) unstable; urgency=low
+
+  * Removed the "Where do you live?" thing from tzsetup, replacing it with
+    more correct but probably also more vague and confusing to new users
+    terminology. Closes: #174988
+  * Fixed double-equals typoes in apt-setup. Closes: #182007
+  * Updated Russian debconf po file from Serge Winitzki. Closes: #180752
+  * Updated German debconf po file from Christoph Loeffler.
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 22 Feb 2003 13:04:32 -0500
+
+base-config (1.54) unstable; urgency=low
+
+  * Remove boot-floppies 3.0.22 workaround. Closes: #179833
+  * Danish translation of non-debconf po file. Closes: #179876
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  5 Feb 2003 12:07:05 -0500
+
+base-config (1.53) unstable; urgency=low
+
+  * Martin Quinson <Martin.Quinson@tuxfamily.org> sent in a working
+    po/Makefile and the first translation of the non-debconf po files, to
+    French.
+  * Turn off console screen blanking on fresh installs, to avoid confusing
+    newbies in the middle of the package install step with the screen
+    blanking. Unfortunatly, I don't know how to restoe the old blank value, so
+    it will stay on. Closes: #179580
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  3 Feb 2003 12:47:53 -0500
+
+base-config (1.52) unstable; urgency=low
+
+  * No longer use apt dselect method, just run apt-get by hand.
+    Closes: #150519 
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  2 Feb 2003 21:47:35 -0500
+
+base-config (1.51) unstable; urgency=low
+
+  * Build up a list of the available package selector programs on the fly,
+    so as to be able to prompt intelligently about whatever happens to be
+    available.
+  * Drop dependencies on tasksel and aptitude. Closes: #177093, #150771
+  * Don't bother looping through the package selectors, just display once.
+  * Gettextized all the shell scripts in base-config. I made them use bash
+    and use the $"" syntax and bash --dump-po-strings to extract.
+    Closes: #132267 (Translations wanted..)
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  2 Feb 2003 00:28:30 -0500
+
+base-config (1.50) unstable; urgency=low
+
+  * Added a note about using apt-get and command line to the package selectors
+    question, Closes: #174992
+  * Updated French translation of debconf.8 from Antoine GÃ©mis.
+  * Updated pt_BR translation of po file from Andre Luis Lopes,
+    Closes: #177222
+    Since superceded by changes by barbier; fight it out, guys. :-)
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  1 Feb 2003 15:28:15 -0500
+
+base-config (1.49) unstable; urgency=low
+
+  * Fixed tzsetup -U parameter. Closes: #173717
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 19 Dec 2002 20:44:14 -0500
+
+base-config (1.48) unstable; urgency=low
+
+  * Pass --default-priority to dpkg-reconfigure calls. Closes: #172440
+  * Depend on current debconf for that switch.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 10 Dec 2002 12:31:35 -0500
+
+base-config (1.47) unstable; urgency=low
+
+  * Make termwrap use dpkg --print-installation-architecture instead of
+    requiring HOSTTYPE be passed from the first-stage installer.
+  * If base-config is passed "new" as $1, enter new installation mode
+    regardless of the existance of /root/debootstrap_settings.
+  * Added installer-integration.txt with some documentation.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  9 Dec 2002 14:01:37 -0500
+
+base-config (1.46) unstable; urgency=low
+
+  * Make the man page point to debconf(7) not 8. Closes: #172040
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  6 Dec 2002 18:58:43 -0500
+
+base-config (1.45) unstable; urgency=low
+
+  * French and Danish po file updates.
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  8 Nov 2002 13:55:01 -0500
+
+base-config (1.44) unstable; urgency=low
+
+  * Removed all the tty switching info from the final screen (TMI).
+  * Don't ask about using ppp if the system already has a default route.
+  * On fresh installs, make tzsetup default to clock not being set to GMT
+    (even though this is not the default in default/rcS), since most
+    systems don't come with clocks set to GMT.
+  * French translation of base-config man page by Julien Louis
+    <arthur51@ifrance.com>, Closes: #166711
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 28 Oct 2002 10:36:34 -0500
+
+base-config (1.43) unstable; urgency=low
+
+  * Merged two po directories into one.
+  * Merged in pt_BR update. Closes: #163475
+  * Drop debconf-utils build-dep.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  7 Oct 2002 11:47:08 -0400
+
+base-config (1.42) unstable; urgency=low
+
+  * Marcin Owsiany: update Polish man pages' and templates' translation.
+  * Converted over to po-debconf.
+  * Merged in Capatlan update.
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  3 Oct 2002 21:15:31 -0400
+
+base-config (1.41) unstable; urgency=low
+
+  * Generate the locale requested by boot-floppies if the
+    'locales' package is installed. Patch from Petter Reinholdtsen
+    <pere@hungry.com> includes a new validlocale program.
+    Closes: #135565
+  * Add epoch to bsdutils dependency. Closes: #158832
+  * Fixed typo in loop control code. Closes: #158898
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 30 Aug 2002 16:10:18 -0400
+
+base-config (1.40) unstable; urgency=low
+
+  * Better handling of punctuation after bold on man page. Closes: #153830
+  * Swedish fixes in debconf and apt-setup templates. Closes: #153843, #153852
+  * Thank you, era.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 22 Jul 2002 13:33:39 -0400
+
+base-config (1.39) unstable; urgency=low
+
+  * Updated apt-setup pt_BR translation from Andre Luis Lopes.
+  * Fixed typos on base-config(8), spilled a lot of ink on the page, 
+    and clarified dboostrap vs debootstrap (curse you, aj).
+    Closes: #153539
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 19 Jul 2002 21:45:29 -0400
+
+base-config (1.38) unstable; urgency=low
+
+  * Removed the question about removing pcmcia. It was a bit confusing, and
+    is fairly unnecessary, really. There is plenty of other cruft in base that
+    could be removed if one wants a minimal base system, and aptitude is
+    available at install time to easily do that if one wants to. Taking a
+    question out of the critical path is a good thing.
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  6 Jul 2002 08:16:45 -0400
+
+base-config (1.37) unstable; urgency=low
+
+  * Limit apt-setup cd prompt to 5 tries, then give up back to the menu.
+    Same for manual mirror entry. Thanks to Petter Reinholdtsen. 
+    Closes: #141057
+  * Typo, Closes: #150927
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 29 Jun 2002 00:06:48 -0400
+
+base-config (1.36) unstable; urgency=low
+
+  * Message clarification (MIT feedback).
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 19 Jun 2002 23:44:37 -0400
+
+base-config (1.35) unstable; urgency=low
+
+  * If the question about tasksel/aptitude/dselect is not shown, don't loop
+    forever, but break without running any of them. For noninteractive
+    installs.
+  * TODO cleanup
+  * Fixed debhelper builddep.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 13 Jun 2002 15:26:57 -0400
+
+base-config (1.34) unstable; urgency=low
+
+  * Upload for unstable *only*.
+  * Added aptitude as an option, and reworked the package selection stage.
+    Note: debian/templates translations need to be updated.
+    Aptitude features online docs which Closes: #101074, well enough.
+  * Added a dep on aptitude.
+  * Changed debconf template merging to merge each of the three sets of
+    templates in turn; this can work with the new debconf-mergetemplate.
+  * Build-dep on debconf-utils 1.1.1.
+  * Tired of all the bug reports about non-us and since non-us is increasingly
+    less important these days and will not be worth bothering a new user about
+    by the time sarge is released, I have disabled the code in apt-setup
+    that deals with it. Closes: #60879 and 7 others
+  * Capitalize Internet. Closes: #136334
+  * Added 100 to all return codes of base-config subprograms, so things like
+    a return code of 10 from debconf slipping in (as it did disastrously with
+    version 1.33.17..) doesn't cause it to loop back to stage 10 or whatever.
+    The 110-200 range is set aside for internal errors in debconf, which
+    should be much rarer, and in fact debconf currently only uses code 100,
+    which base-config explicitly ignores.
+  * debhelper v4
+  * Updated da translation of all templates.
+
+ -- Joey Hess <joeyh@debian.org>  Tue,  7 May 2002 22:37:14 -0400
+
+base-config (1.33.18) unstable; urgency=high
+
+  * Rebuilt with woody's base-config so the merged templates file won't be
+    missing entries; fixes infinite loop in intial base-config,
+    Closes: #145434 (RC).
+  * Verified by hand that the resulting file is not missing anything.
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  1 May 2002 15:01:05 -0400
+
+base-config (1.33.17) unstable; urgency=high
+
+  * Argh, I got the suite breakage fix exactly backwards! Closes: #144479
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 25 Apr 2002 12:58:27 -0400
+
+base-config (1.33.16) unstable; urgency=HIGH
+
+  * Upload to fix breakage in boot-floppies 3.0.22. If boot-floppies tells
+    us "testing" is being installed, change it to woody, so users will not
+    find themselves unexpectedly using testing after they install woody,
+    after debian 3.0 is released.
+  * Updated pt_BR translation. Closes: #141557
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  4 Apr 2002 11:57:39 -0500
+
+base-config (1.33.14) unstable; urgency=low
+
+  * Updated pt_BR, sv, ca translations of tzsetup.templates.
+    Closes: #135580
+  * Added some lintian overrides.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 21 Feb 2002 22:37:30 -0500
+
+base-config (1.33.13) unstable; urgency=medium
+  
+  * Changed last tzsetup question to allow allow backing up. This
+    renders translations invalid, sigh.
+  * Corrected order templates are given to debconf-mergetemplate,
+    thus de-busting that last question. That's why this is medium.
+  * Removed tzsetup.templates.ru, too old to live.
+  * Updated Swedish translation from Andr�© Dahlqvist
+    <andre.dahlqvist@telia.com>. 
+  * Updated Catalan translation from Jordi Mallach <jordi@debian.org>.
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  7 Feb 2002 23:26:59 -0500
+
+base-config (1.33.12) unstable; urgency=low
+
+  * Updated French translation from Denis Barbier <barbier@debian.org>,
+    Closes: #132382
+  * Set LANG=C when calling date in tzsetup: Closes: #131473
+  * Moved "enter information manually" to the top of the country list so it's
+    not hidden at the bottom. In the dialog frontend (commonest case), this
+    will make the default country appear above it, and all others under it. In
+    other frontends it will work differently, and some may even hide it at the
+    _top_ of the list, when they highlight the default near the end. Still,
+    best I can do, Closes: #130343
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 26 Jan 2002 20:16:10 -0500
+
+base-config (1.33.10) unstable; urgency=low
+
+  * A few typo fixes from Matt Kraai, Closes: #129712
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 17 Jan 2002 20:22:10 -0500
+
+base-config (1.33.9) unstable; urgency=low
+
+  * Removed the LANGUAGE stuff; LANGUAGE is not the correct variable for LANG.
+    Instead, export LANG if it's set after sourcing debootstrap_settings.
+    This will make it available to everything run by base-config.
+    Closes: #128040
+  * Completed and updated Spanish translation. (Next time, *please* send me
+    seperate templates files for apt-setup, and tzsetup.) Closes: #127859
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  5 Jan 2002 00:32:21 -0500
+
+base-config (1.33.8) unstable; urgency=low
+
+  * I'm _really_ not sure if this belongs in testing or not. Probably not.
+  * Don't ask about emoving pcmcia if pcmcia-cs is not installed. Thanks to
+    Matt Krai. Closes: #125831 Note that some arch's don't have pcmcia at all,
+    so this is a nice feature.
+  * Also don't bother asking about that if it's not a new install.
+  * Have script log timing data as well. This makes it possible to play
+    back a whole base-config run in real-time. Closes: #121286
+    There's also a replaylog hack in the source package that replays one
+    screen-worth at a time, which is sometimes more useful.
+  * Typo, Closes: #126219
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 18 Dec 2001 13:13:52 -0500
+
+base-config (1.33.7) woody-proposed-updates unstable; urgency=low
+
+  * Uploading to w-p-u since the base-config in testing does not offer the
+    user a chance to set up ppp if they want to do an install with ppp. I
+    figure ppp installs are sorta important. (This also has a fix for pcmcia
+    removal.)
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 10 Dec 2001 23:12:24 -0500
+
+base-config (1.33.6) unstable; urgency=HIGH
+
+  * Remove pcmcia if PCMCIA is set to no, or is unset. Turns out dbootstrap
+    does not bother to set it if it's not used.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 10 Dec 2001 00:04:01 -0500
+
+base-config (1.33.5) unstable; urgency=HIGH
+
+  * Work with the version of ppp in testing as well as the one in unstable
+    (sigh).
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  9 Dec 2001 16:06:56 -0500
+
+base-config (1.33.4) unstable; urgency=HIGH
+
+  * Set up ppp even if /etc/ppp/peers/provider exists, if it is a template.
+    This is probably RC if we want ppp installs to work, thus the severity.
+  * Source dbootstrap_settings and set LANG to the installation language
+    (no effect if language_chooser is not enabled in the boot floppies).
+  * Various pt_BR fixups, Closes: #122004, #122008, #122010
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  1 Dec 2001 22:04:37 -0500
+
+base-config (1.33.3) unstable; urgency=low
+
+  * Danish translation fixes from Claus Hindsgaul <claus_h@image.dk> 
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 25 Nov 2001 22:29:52 -0500
+
+base-config (1.33.2) unstable; urgency=low
+
+  * Fixed a typo in the termwrap man page, Closes: #120609
+  * Added pt_BR man pages from Andre Luis Lopes <andrelop@ig.com.br>
+    Closes: #121136
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 25 Nov 2001 20:47:00 -0500
+
+base-config (1.33) unstable; urgency=low
+
+  * base-config.8: Documented (most) of the environment variables that effect
+    the program.
+  * 00debootstrap_settings: If DEBIAN_PRIORITY is set, ignore the value from
+    debootstrap_settings. This allows overriding of the priority at the boot
+    prompt in the middle of a debian install, which is pretty neat.
+  * base-config: Added a KEEP_BASE_DEBS, which, if set to yes, will inhibit
+    the deletion of the apt cache when base-config runs on a new install. This
+    can be passed to lilo or whatever. Thanks to bod for the idea, which hits
+    exactly the mix of unobtrusiveness and functionality I wanted.
+  * 75apt-get: Don't run apt-get clean, and let the dselect method prompt
+    about this, as disgusting as that is.
+  * Closes: #103302
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 19 Nov 2001 13:44:41 -0500
+
+base-config (1.32) unstable; urgency=low
+
+  * Andre Luis Lopes <andrelop@ig.com.br> sent in a pt_BR translation of
+    tzsetup.templates. Closes: #120036
+  * Another noninteractive fix. Closes: #119634
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 17 Nov 2001 21:57:37 -0500
+
+base-config (1.31) unstable; urgency=medium
+
+  * Corrected a typo in 75apt-get ($NOCLEAN -> $CLEAN), that was making it
+    clean up the downloaded debs even if the apt run failed sometimes. Also,
+    only clean up debootstrap debs before the initial apt run, not before
+    further retries. This fixes blindman's problem with download timeouts, 
+    but does not address the original issue in wishlist bug #103302. This 
+    does need to get into testing soonish; making base-config usable for 
+    dialup users is RC. Also Closes: #117741
+  * This rebuild freshens the Mirrors.masterlist, Closes: #117706
+  * Removed the code that makes it enter dselect if you opt out of tasksel. It
+    is evidently more trouble than it's worth especially when someone is
+    trying to use base-config in noninteractive mode. Closes: #119003
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 17 Nov 2001 11:05:00 -0500
+
+base-config (1.30) unstable; urgency=low
+
+  * tzsetup.templates.da patch from Morten Brix:
+    "the one existing there was horribly broken, it was
+     referring to 'Description-de'  instead of 'Description-da'
+     and it was not possible to choose a city."
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 27 Oct 2001 13:40:34 -0400
+
+base-config (1.29) unstable; urgency=low
+
+  * Disabled ppp script for s390, which it seems has no ppp support.
+  * Catalan translation from jordi.
+  * Marcin Owsiany: some spelling and style fixes of Polish translation.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 23 Oct 2001 11:50:41 -0400
+
+base-config (1.27) unstable; urgency=low
+
+  * More s/390 hackery, in tzsetup -- hwclock is not supported on this 
+    architecture, (though it is still installed currently), so if hwclock
+    does not exist, don't try to use it, and if uname -m = s390, don't use
+    it. No hu-hu, all I have to do is disable the ASKUTC code path.
+    Closes: #115020
+  * Marcin Owsiany:
+    - updated Polish templates' translations
+    - a few tiny typographic and typo fixes in original manpages
+    - translated apt-setup.8, base-config.8, termwrap.8, tzsetup.8
+      to Polish
+    - changed the pattern in debian/rules to catch translated man
+      pages
+  * I told Marcin wrong, man pages should be ll.8, not 8.ll.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  8 Oct 2001 15:52:04 +0200
+
+base-config (1.26) unstable; urgency=low
+
+  * Rebuild, pulling in updated Mirrors.masterlist (ftp.kenel.org mirror
+    has moved to mirrors.kernel.org).
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  5 Oct 2001 20:53:23 -0400
+
+base-config (1.25) unstable; urgency=low
+
+  * Patch from Gerhard Tonn <GerhardTonn@swol.de> to deal with s/390
+    installs of debian, which involve telnetting into the system to do the
+    install, since its console is so primative that, while debconf will
+    hopefully work on it soon, a lot of other stuff has no chance of
+    working, ever. This only affects base-config in that at the very end it
+    needs to disable the telnet hacks for the s/390. Let's put it in a
+    separate 98s390 script. I'm going to ship the script for all arch's, 
+    though later I might want to make this an arch all package and only
+    include it for s390. Dunno. Closes: #113856
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 29 Sep 2001 16:46:06 -0400
+
+base-config (1.24) unstable; urgency=low
+
+  * Russian translation by ilgiz kalmetev <i.kalmetev@bis.bashtelecom.ru>
+    Closes: #112536
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 19 Sep 2001 13:34:46 -0400
+
+base-config (1.23) unstable; urgency=low
+
+  * Korean translation by Yooseong Yang <yooseong@debian.org> and
+    KiHyeon Seo <nefsall@kldp.org>.
+  * Danish translation of tzsetup by Claus Hindsgaul <claus_h@image.dk>.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 23 Aug 2001 15:58:14 -0400
+
+base-config (1.22) unstable; urgency=low
+
+  * Fixed Standards-Version field, Closes: #109002
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 18 Aug 2001 22:26:40 -0400
+
+base-config (1.21) unstable; urgency=low
+
+  * Updated Galician translation.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  8 Jul 2001 22:41:46 -0400
+
+base-config (1.20) unstable; urgency=low
+
+  * Added backtracking support to base-config.
+  * Renumbered the lib/ scripts so they start at 10. (cvs hates me)
+  * Backtrack from apt-get to stage 50 (tasksel) if it fails, to let the
+    user change their package selections in case something is just not
+    working out or they are too low on disk space.
+  * Attempted to clarify the GMT question; tzsetup does not set the
+    hardware clock, it just lets you specify if it is set to GMT or not.
+  * Fixed tzsetup to not run hwclock.sh until after the timezone files have
+    been set up. If it's run before that point, and the hw clock is on
+    localtime, the time gets screwed up because hwclock does not apply the
+    proper reverse timezone offset to counteract the timezone setting. At
+    least, I think that's what's going on. Anyone really understand this
+    stuff? Thanks to Matt Kraai for bringing this to my attention.
+    Closes: #103223
+  * Fixed bashism in 90finalmessages.
+  * Updated korean translation from Eungkyu Song <eungkyu@sparcs.org>
+    Closes: #103386
+  * Added -g flag to tzsetup.
+  * Reset SHELL in base-config after the script SHELL hack.
+
+ -- Joey Hess <joeyh@debian.org>  Tue,  3 Jul 2001 13:59:14 -0400
+
+base-config (1.13) unstable; urgency=low
+
+  * Don't mention keyboard configuration in intro since it is not always
+    done. Closes: #103209
+  * base-config now runs everything inside script, with the typescript
+    appending to /var/log/installer.log (which dbootstrap also logs the
+    install to).
+  * Added logrotate file to rotate the installer log weekly, deleting
+    it monthly.
+  * Remove the installer log when this package is purged.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  2 Jul 2001 18:16:19 -0400
+
+base-config (1.12) unstable; urgency=low
+
+  * Added 77exim, which will run eximconfig if exim is installed and not
+    configured. This is necessary to give the user a chance to configure
+    exim, which is installed w/o configuration by debootstrap. See the
+    notes in the script for details.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  1 Jul 2001 12:27:20 -0400
+
+base-config (1.11) unstable; urgency=low
+
+  * Added another apt clean.
+  * Updated cz translation from Petr Bydzovsky <petr@rozhled.cz>.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 25 Jun 2001 14:59:31 -0400
+
+base-config (1.09) unstable; urgency=low
+
+  * German translation from Ronald Lembcke <es186@fen-net.de> and
+    Stefan Gybas <sgybas@debian.org>
+  * 75apt-get now runs apt-get clean after installing everything
+    unless the install fails.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 22 Jun 2001 13:22:04 -0400
+
+base-config (1.08) unstable; urgency=low
+
+  * If the user chooses not to run tasksel, default the run dselect
+    question to true. This is to make it just a little harder to install a
+    system w/o standard installed. See bug #101812
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 21 Jun 2001 19:20:03 -0400
+
+base-config (1.07) unstable; urgency=low
+
+  * Czech translation by Petr Bydzovsky <petr@rozhled.cz>
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 18 Jun 2001 13:47:53 -0400
+
+base-config (1.06) unstable; urgency=low
+
+  * If base-config is removed in the middle of a base-config run, let the
+    current base-config invocation still finish cleanly.
+  * Moved inittab stuff into a lib file, as there is no need to have it
+    directly in base-config.
+  * Only trap signals in second-stage install, *not* when base-config is
+    being run by hand. Closes: #100454
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 12 Jun 2001 19:28:40 -0400
+
+base-config (1.05) unstable; urgency=low
+
+  * Moved all templates into templates file in control archive. This
+    should not be a problem now, since the postinst does use debconf.
+    It fixes a bug in 00debootstrap_settings, which tried to modify various
+    apt-setup questions before they were in the debconf database.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 12 Jun 2001 17:27:32 -0400
+
+base-config (1.04) unstable; urgency=low
+
+  * Added GMT prompting and setting to tzsetup.
+  * Fixed some other tzsetup bugs.
+  * Added a quick little introductory message before base-config runs.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 11 Jun 2001 13:56:50 -0400
+
+base-config (1.03) unstable; urgency=medium
+
+  * Added tzsetup, a tzconfig clone that uses debconf. Call it early in the
+    base-config process, to set up a time zone. This functionality is no
+    longer in the boot floppies.
+  * Tzsetup tickles an obscure debconf bug, so I'm afraid this package
+    needs a versioned dep on debconf.
+  * Call loadkeys with --quiet.
+  * Reconfigure console-data instead of calling no longer existing
+    kbdconfig.
+  * Fixed ordering of some of the run-parts scripts.
+  * Use new install-keymap command.
+  * Depend on console-data, passwd, and tasksel too, since it invokes all
+    of these.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 10 Jun 2001 18:10:02 -0400
+
+base-config (1.01) unstable; urgency=medium
+
+  * Use debootstrap_settings SUITE variable to determine what suite
+    apt-setup defaults to, Closes: #100153
+  * Made 1console-tools quieter. See #100365.
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  8 Jun 2001 19:36:50 -0400
+
+base-config (1.00) unstable; urgency=low
+
+  * Rewrote and reorganized everything. There is now a
+    /usr/lib/base-config/ directory full of programs. The programs are ran,
+    using run-parts, by /usr/sbin/base-config. This let me cleanly break up
+    the morass of different things this package must do, worked around
+    some debconf issues, and best of all it allows other packages to just
+    drop scripts in there to add to the base configuration process. In
+    fact, quite a lot of the scripts in there belong in other packages, and
+    I intend to file wishlist bugs to that effect one day.
+  * Anyway, /usr/sbin/base-config should be run by the boot-floppies
+    installed inittab, rather than reconfiguring base-config. Reconfiguring
+    base-config no longer does anything interesting!!
+  * Removed all the password and useradd stuff. That has moved to the
+    passwd package (currently a bit broken in there, since it never asks
+    for root's password, but I'm sure it will be fixed, or that package will
+    get some rc bugs :-).
+  * Reworked package selection. First you get the chance to run tasksel,
+    then the opportunity to use dselect to fine-tune the packages tasksel
+    selects. Since task packages are dead, this actually works. Deity might
+    be added as an option later, but I have not figured out how to
+    interface to it.
+  * All the translations are out of date again, sorry.
+  * Removed a number of unused templates from the master template file,
+    and fron the debconf db on upgrade.
+  * Removed the checklock program, so this package is arch all.
+  * Added man pages for everything.
+  * Fixed trap so ctrl-c and so on don't kill base-config. Closes: #62830
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 29 May 2001 13:16:16 -0400
+
+base-config (0.69.3) unstable; urgency=low
+
+  * Patch from Matt Kraai <kraai@debian.org> to add termwrap to
+    base-config. There was no other sane place to put it, so we settled on
+    here. Closes: #98602
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 24 May 2001 14:24:33 -0400
+
+base-config (0.69.2) unstable; urgency=low
+
+  * Reupload with Mirrors.masterlist so it will build on autobuilders
+    (oops).
+  * Added a guard to clean rule against building source packages w/o that
+    file.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 22 May 2001 21:12:09 -0400
+
+base-config (0.69.1) unstable; urgency=HIGH
+
+  * Pass /var/lib/dpkg to /usr/lib/dpkg/methods/apt/install, which is
+    necessary these days for it to work. Closes: #98094
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 22 May 2001 14:28:06 -0400
+
+base-config (0.69) unstable; urgency=low
+
+  * Properly translate /usr/share/debconf/templates/apt-setup-templates
+    (see #95487). Also, don't include the apt-setup templates in
+    the main templates file, since that just wastes space.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 15 May 2001 18:13:36 -0400
+
+base-config (0.68) unstable; urgency=low
+
+  * Patch from Richard Hirst <rhirst@linuxcare.com> to use a regex, rather
+    than a slow for loop, to determine if a user exists. The old code was
+    unnacceptably slow. Closes: #89325
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 14 May 2001 15:59:44 -0400
+
+base-config (0.67) unstable; urgency=low
+
+  * Japanese update by Kenshi Muto <kmuto@topstudio.co.jp>, Closes: #97474
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 14 May 2001 15:26:27 -0400
+
+base-config (0.66) unstable; urgency=low
+
+  * Galacian translations update.
+  * Portuguese translation udate (yes, feel free to just commit next time)
+    Closes: #96814
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  9 May 2001 11:22:52 -0400
+
+base-config (0.65) unstable; urgency=low
+
+  * Reworded the "simple, advanced" question, adding a third option
+    to not install anything more. All translations need to be updated..
+  * Removed PERL_BADLANG hack. If the boot floppies are not setting a
+    proper LL_ll language code, and are setting LANG=LL instead, this will
+    cause nasty perl messages. Let's find out..
+  * Only ask about removing pcmcia if PCMCIA is set, but not "yes".
+    If it is unset, this is probably not a fresh install (and having it
+    always ask about removing pcmcia from my laptop during testing was
+    getting to be a pita).
+
+ -- Joey Hess <joeyh@debian.org>  Tue,  8 May 2001 15:41:13 -0400
+
+base-config (0.64) unstable; urgency=low
+
+  * Added missing dep on adduser.
+  * Also includes some updated translations.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  6 May 2001 16:44:46 -0400
+
+base-config (0.63) unstable; urgency=low
+
+  * Ensure that Mirrors.masterlist is distributed in the source tarball,
+    Closes: #95611
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 29 Apr 2001 23:14:04 -0400
+
+base-config (0.62) unstable; urgency=low
+
+  * If ppp is not installed, don't prompt about using it or try to use it.
+    See bug #95449.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 27 Apr 2001 10:19:22 -0400
+
+base-config (0.61) unstable; urgency=low
+
+  * Completed Galician translation.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 27 Mar 2001 14:21:49 -0800
+
+base-config (0.60) unstable; urgency=low
+
+  * Added Galician translation of debconf templates (but not the apt-setup
+    debconf templates) from jtarrio@iname.com, Closes: #91310
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 25 Mar 2001 13:39:23 -0800
+
+base-config (0.59) unstable; urgency=low
+
+  * Updated pt_BR translation from "Gustavo Noronha Silva (KoV)"
+    <kov@debian.org>, Closes: #90147
+  * Fixed a wording problem.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 18 Mar 2001 14:58:56 -0800
+
+base-config (0.58) unstable; urgency=low
+
+  * Needs to have a versioned depend on debconf, since no version of
+    debconf-tiny supports the seen flag, and older versions of debconf don't,
+    either. I killed the debconf-tiny conflict this time.
+  * Version 0.56 of this package got into testing by mistake, since it was
+    missing the dependancy. It will continue to be broken for some time,
+    until a new enough debconf gets into testing. This sucks, but I can't
+    do anything really to fix it except wait. In the meantime, unstable
+    will be ok. Closes: #88523
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  5 Mar 2001 17:49:30 -0800
+
+base-config (0.56) unstable; urgency=low
+
+  * Added funky "/d" postfixes to config items in apt-config call to
+    make apt-setup work with the old apt.
+  * Dutch translation from "Thomas J. Zeeman" <tjzeeman@cs.vu.nl>, who
+    needs to turn off word-wrap next time. Closes: #87502
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 27 Feb 2001 00:07:21 -0800
+
+base-config (0.55) unstable; urgency=low
+
+  * Corrected template merge problem, Closes: #85537
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 12 Feb 2001 14:59:00 -0800
+
+base-config (0.54) unstable; urgency=low
+
+  * Built with fixed debhelper to get all the pt_BR template merged in.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 29 Jan 2001 13:06:01 -0800
+
+base-config (0.53) unstable; urgency=medium
+
+  * Swedish translation by AndrÃ© Dahlqvist <anedah-9@sm.luth.se>, 
+    Closes: #83414
+  * Corrected section to base to match overrrides.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 24 Jan 2001 14:08:11 -0800
+
+base-config (0.52) unstable; urgency=medium
+
+  * Brazilian Portugese translation by "Gustavo Noronha Silva (KoV)"
+    <dockov@zaz.com.br>, Closes: #83206
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 23 Jan 2001 12:35:30 -0800
+
+base-config (0.51) unstable; urgency=medium
+
+  * Loosened up the NIS check
+  * Fixed another user check.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 10 Jan 2001 11:31:43 -0800
+
+base-config (0.50) unstable; urgency=medium
+
+  * All right, it's time to whip this package into shape..
+  * Use seen flag instead of isdefault flag.
+  * Corrected a typo in the stop-ppp question asking code.
+  * Added a check for use of NIS for root (shudder).
+  * The config script does nothing when the package is initially installed
+    or upgraded now, just when it is reconfigured. That should prevent a
+    lot of potential problems. Closes: #79336, #65097, #72508, #77551, #78653
+  * Also made the is-there-a-user check smarter; it will assume that
+    any user from 1000 to 29999 is good enough. Closes: #78653
+
+ -- Joey Hess <joeyh@debian.org>  Tue,  9 Jan 2001 15:15:41 -0800
+
+base-config (0.44) unstable; urgency=low
+
+  * Added testing as an option to apt-setup. Translations need to be
+    updated. Closes: #81221
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  4 Jan 2001 12:30:40 -0800
+
+base-config (0.43) unstable; urgency=low
+
+  * Call tasksel -s so standard priority packages are selected. An anal
+    reading of policy might suggest this is in violation of policy 
+    ("standard: This is what will install by default if the user doesn't
+    select anything else."),  but if it is, dselect always was, and
+    I keep seeing evidence that omitting -s was the wrong decision.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  3 Dec 2000 00:44:53 -0800
+
+base-config (0.42) unstable; urgency=low
+
+  * Modified the call to pppconfig to pass --noname, Closes: #78467
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  1 Dec 2000 14:48:13 -0800
+
+base-config (0.41) unstable; urgency=low
+
+  * Updated Mirrors.masterlist, Closes: #78131
+  * Updated apt-setup to parse new coutry format. Otherwise, it fails
+    miserably..
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 27 Nov 2000 21:21:16 -0800
+
+base-config (0.40) unstable; urgency=low
+
+  * Integrated in the Italian translations for the recent new templates.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 31 Aug 2000 12:34:52 -0700
+
+base-config (0.39) unstable; urgency=low
+
+  * Updated Spanish, Japanese, and Polish apt-setup templates.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  1 Oct 2000 14:59:59 -0700
+
+base-config (0.38) unstable; urgency=low
+
+  * Added code to the end of apt-setup to see if security.debian.org
+    entries are missing from sources.list, and if so, prompt about adding
+    them. This code may be going into stable soon, and it has a *lot* of
+    different cases it has to handle, so please beat on it hard. See bug
+    #72845
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  1 Oct 2000 01:21:38 -0700
+
+base-config (0.37) unstable; urgency=low
+
+  * Fixed a stupid typo.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 29 Aug 2000 11:34:27 -0700
+
+base-config (0.36) unstable; urgency=low
+
+  * Don't prompt about keyboard setup if /etc/console-tools/default.kmap.gz
+    already exists.
+  * The merging stuff really got broken in the previous upload; corrected
+    that.
+  * Spanish translation from Enrique Zanardi <ezanard@debian.org>.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 28 Aug 2000 16:33:16 -0700
+
+base-config (0.35) unstable; urgency=low
+
+  * Well this package will now only build on woody. :-(
+  * On the plus side, duplicate template data is gone now, and I don't have
+    to keep merging in translations by hand.
+  * Version number oofup fixed. Closes: #69778
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 22 Aug 2000 15:47:53 -0700
+
+base-config (0.34) unstable; urgency=low
+
+  * Added Japanese translation from Akira YOSHIYAMA <yosshy@debian.or.jp>
+    Not uploading yet though.
+  * Changed stage5 check to only prompt about logging in if
+    /root/dbootstrap_settings exists. Closes: #67358
+  * Freshened Mirrors.masterlist to fix swedish mirror data, Closes: #66755
+  .
+  * I held off on this release since it couldn't get into potato anyway.
+    I'm uploading it to woody now. IMHO, this could be slipped into potato
+    in a point release. Perhaps.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 28 Jun 2000 11:52:54 -0700
+
+base-config (0.32) frozen unstable; urgency=low
+
+  * If anXious is run, apt-get's prompt hangs the install, and you cannot
+    type data into it. Very very odd. To fix, run reset before calling apt.
+    Closes: #65722 (wordaround; I think the real bug is in anXious).
+    RC bug; made some installs very difficult to complete.
+  * Wording changes about non-free and contrib.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 15 Jun 2000 14:24:56 -0700
+
+base-config (0.31) frozen unstable; urgency=low
+
+  * Also set up md5 password stuff in /etc/pam.d/passwd. This fixes the
+    following bug: You install Debian and enable md5 passwords. A month later,
+    your password exipres, and you find that you cannot change it, because
+    login doesn't grok md5 passwords. Whether this is RC or not, I leave up
+    to dark; my opinions is it's a pretty bad sleeper bug. Closes: #64575
+  * In apt setup, don't refer to the last item on a list; the dialog frontend
+    may order it to the top if it is default. Closes: #64567
+  * Added French translation by Vincent.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 23 May 2000 19:25:00 -0700
+
+base-config (0.30) frozen unstable; urgency=low
+
+  * Fixed a stupid typo that made it impossible to use apt-setup to set up
+    local mirror. Closes: #64462 (important)
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 21 May 2000 15:18:07 -0700
+
+base-config (0.29) frozen unstable; urgency=low
+
+  * Fixed hang when installing via ppp. Closes: #64167
+    This is a RC bug; it was impossible to finish the installation via ppp
+    without this bug fix.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 19 May 2000 13:31:44 -0700
+
+base-config (0.28) frozen unstable; urgency=low
+
+  * Fixed postinst to call anXious rather than xviddetect (randolph),
+    I think the boot-floppies people consider this RC, since it makes new
+    installs actually have niceties like a window manager and xterm when
+    they start X. cf, bug #63114
+  * Fixed problem with wrong error message being shown if an empty user
+    password was entered, and only prompt for user password repeat at high,
+    not critical priority. Closes: #64163
+  # Added German translation from Othmar Pasteka <pasteka@kabsi.at>.
+  * Added Polish translation from Marcin Owsiany
+    <porridge@pandora.info.bielsko.pl>.
+  * Added Italian translation from Eugenia Franzoni <franzoni@edisons.it>
+    Closes: #64162
+  * All right, I give up. Added text to initial root password prompt saying
+    that it will not echo what you type, to reassure all the weird people
+    out there who expect to see some kind of _infomation leaking echo_ when
+    they enter the _root password for their system_. Gaaaaaaaaaaagh!
+    Closes: #60444 and probably #63778
+  * HTTP_PROXY value now filters down from dbootstrap, and ends up as the
+    default apt-setup's proxy prompt.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  8 May 2000 18:29:30 -0700
+
+base-config (0.27) frozen unstable; urgency=low
+
+  * If the user specifies that md5 passwords should be used, actually use
+    them when setting passwords. This was not being done because chpasswd
+    doesn't know how. Now I pass it an already crypted password. I think this
+    is important enough to go into potato because it tends to be a security
+    problem. base-config claims to be using md5 passwords; to not do so
+    gives the user a false sense of security. Closes: #62452
+  * Tweaked message about VT switching so it will make sense to mac folks.
+    Closes: #62829
+  * Just refer to "Debian", rather than "Debian GNU/Linux" or "Debian
+    Linux" in several places. Closes: #62544
+  * Pcmcia purging has been fixed for quite some time, Closes: #58150
+  * Display notes if entered passwords don't match or are empty, or if the
+    entered username is invalid. Closes: #61372
+  * Fixed bad directory error message, Closes: #61989
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 26 Apr 2000 15:01:57 -0700
+
+base-config (0.26) frozen unstable; urgency=low
+
+  * There are critical path fixes below -- bugs that will affect nearly all
+    new debian (CD) installs, and would require nasty hacking to work around.
+    Since that would make debian basically unistallable by some classes of
+    users, this needs to get into frozen.
+  * Finally got a chance to test all the cd stuff, using 2 potato cd's, a
+    random non-debian cd, and a blank un-burned cd. Fixed the following
+    bugs:
+    - After successfully scanning cds, prompt the user if they want to
+      add another access method or not, instead of looping back to main
+      menu. Closes: #58531, #61953
+    - Don't exit apt-setup if scanning a second or later cd and a bad cd is
+      inserted.
+    - If scanning first cd and a non-debian cd is inserted, don't go into
+      infinite loop, just inform the user, and go back to main screen.
+      Closes: #56414
+    - Autoprobe for cd on apt-setup start (I had forgotten to pass "probe"
+      parameter, oops.).
+    - Unmount each cd after scanning it.
+    - Make the /dev/cdrom link if it doesn't exist and the user specifies a
+      cd device. Closes: #62101
+    - Touch /etc/apt/sources.list before running apt-cdrom. Otherwise, that
+      program would bail if the file is missing (file should never be
+      missing, but..)
+    - Wording fixes here and there to make prompts clearer.
+  * Added a few more clear's.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 24 Mar 2000 20:15:59 -0800
+
+base-config (0.25) frozen unstable; urgency=low
+
+  * Always ask about ppp, since dbootstrap never does. This is release
+    critical since it is necessary to make installs via ppp possible.
+    For boot-floppies 2.2.9.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 24 Mar 2000 20:15:55 -0800
+
+base-config (0.24) frozen unstable; urgency=low
+
+  * Let apt-cdrom read input from the user. It seems that in some edge
+    conditions it can prompt for input. Closes: #59247 (RC) 
+  * Corrected bad default "frozen" in apt-setup.templates (should be
+    "potato". Closes: #61014
+  * Ask about running ppp with critical priority -- users should always see
+    it if they might need to use ppp.
+  * Run ppp before apt-setup, if ppp is needed. Critical, though no bug has
+    been filed.
+  * Do not fail if pon fails, critical, though no bug has been filed.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 23 Mar 2000 17:31:17 -0800
+
+base-config (0.23) frozen unstable; urgency=low
+
+  * Changed pcmcia purging. Boot-floppies 2.2.8 will set PCMCIA=yes in
+    dbootstrap_settings if pcmcia was used. If that's not set, the user is
+    prompted to remove it. Fixed the mess with the .unconfigured file, and
+    is certianly cleaner.
+
+ -- Joey Hess <joeyh@debian.org>  Tue,  7 Mar 2000 18:46:36 -0800
+
+base-config (0.22) frozen unstable; urgency=low
+
+  * Fixed remaining clear screen problems, I hope. 
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  1 Mar 2000 11:58:23 -0800
+
+base-config (0.21) frozen unstable; urgency=low
+
+  * Applied patch from David Huggins-Daines <dhd@eradicator.org> to
+    switch over to using console-tools, which boot-floppies now uses.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 28 Feb 2000 13:11:08 -0800
+
+base-config (0.20) frozen unstable; urgency=low
+
+  * The "left holding the bag" release.
+  * Fixed hostname in file:/ URI problem. Closes: #58594
+  * Default contrib to true if they select non-free.
+  * After tasksel, now installs packages via
+    /usr/lib/dpkg/methods/apt/install. This handles packages that fail to
+    install, etc, and is already well tested since it's used in dselect.
+    If it returns a nonzero exit code, ask the user if they want to try again.
+    Closes: #58597
+  * Clean up dbootstrap droppings in the form of /etc/pcmcia and
+    /lib/modules/`uname -r`/pcmcia, which are not registered with dpkg.
+    Closes: #58598
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 20 Feb 2000 20:41:32 -0800
+
+base-config (0.19) frozen unstable; urgency=low
+
+  * Cosmetic fix, Closes: #57895.
+  * Changed the maintainer to me. I'm tired of not getting bugs mailed to
+    me directly, and I'm the only person maintaining this, really.
+  * Removed local copy of Mirrors.masterlist from CVS. It's still in the
+    source package. When the package is built, it tries to download and
+    freshen that file, but if that fails, it falls back to the existing
+    version.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 18 Feb 2000 23:37:55 -0800
+
+base-config (0.18) frozen unstable; urgency=low
+
+  * Don't clobber apt configuration on reconfigure, except on fresh installs
+    (important bugfix).
+  * Shut up adduser.
+  * Don't call fixtitle until it is defined (critical bugfix)
+  * Don't fail if sourcing dbootstrap_settings fails. Works around the
+    boot-floppies bug that puts junk in that file.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 11 Feb 2000 12:39:46 -0800
+
+base-config (0.17) frozen unstable; urgency=low
+
+  * apt-setup: fixed a bug that made it always use the first Archive-$type in
+    the mirrors file. That is /debian/, so I didn't notice it until now, but
+    it made apt-setup not work on 75 mirrors.. Closes: #57763 (grave)
+  * apt-setup now returns 1 if the user backs up past the first dialog, and
+    config now detects this and goes back a step. Also, after running
+    apt-setup, reset the title. Closes: #57536
+  * Now supports http proxies. Closes: #56861, #56887
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 10 Feb 2000 16:37:14 -0800
+
+base-config (0.16) frozen unstable; urgency=low
+
+  * Release manager: this needs to go into frozen for the same reason
+    boot-floppies releases still go into frozen -- some of the bugfixes below
+    can prevent installation of Debian for people, and are thus critical bug
+    fixes even though the bugs are not so marked. Others are critical
+    usability fixes.
+  * Call tasksel with new -r and -i flags, to mark all required and important
+    packages for install automatically.
+  * Prompt for full username with medium priority, not low. Closes: #56602
+  * apt-setup changes:
+    - First try just adding the "deb" entry. If that succeeds, try
+      adding the "deb-src" entry also, but if that fails, keep the working
+      "deb" entry. Closes: #53440, #56934
+    - Remove tempfiles.
+    - Removed "nfs server" from list since it confused people.
+    - Instead of "manual entry", I now have "edit sources list by hand",
+      which just runs an editor on sources.list and tests the result, since
+      many people complained the earlier interface wasn't powerful enough.
+    - Changed "aptconf" to "apt-setup" in template names.
+    - Added support for non-us. This is pretty rudimentry for now; it always
+      uses non-us.debian.org. Full support for chosing a non-us mirror will
+      be added for woody. Closes: #53439
+  * Clear the screen on exit and in several places inside apt-setup
+    Closes: #56666
+  * TODO list updates.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  6 Feb 2000 14:02:50 -0800
+
+base-config (0.15) frozen unstable; urgency=low
+
+  * Changed dselect template to type note, not boolean. Closes: #56297
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 26 Jan 2000 21:11:46 -0800
+
+base-config (0.14) frozen unstable; urgency=low
+
+  * Actually set root and user passwords to something other than ""!
+    Major big fix.
+  * Fixed typo that was preventing deletion of /root/dbootstrap_settings.
+  * Fixed keymap loading.
+  * Fixed title in postinst debconf stuff.
+  * Fixed "or $user" display to have a space after it.
+  * Removed 2 useless uses of cat.
+  * I thought I uploaded this already as version 0.13, but it looks like I
+    goofed up and did not.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 24 Jan 2000 12:01:00 -0800
+
+base-config (0.12) frozen unstable; urgency=low
+
+  * Don't try to add a user in NIS environements, Closes: #55772
+  * Fixed debconf reentryancy problem when packages were installed under
+    dpkg-reconfigure. This was nasty, I had to reorganize the whole
+    postinst, and split large parts of it out into helper scripts.
+  * Fixed pcmcia purging.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 20 Jan 2000 10:33:51 -0800
+
+base-config (0.11) frozen unstable; urgency=low
+
+  * Another upload on the Boot-Floppies Freeze Exemption Plan (TM). I hope
+    this one is almost the last for this package..
+  * Added keymap setting and loading support, I think this is the last chunk
+    of code to be moved over from boot-floppies' .bash_profile.
+  * Shut up db_clear, Closes: #55718 (Larzarous still has some real bug, but
+    since he is unable to answer any email or provide any other info about it,
+    I will let his existing 4 other bug reports on the topic stand open.)
+  * Er. Make that 5 other bug reports. Sigh.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 19 Jan 2000 23:33:57 -0800
+
+base-config (0.10) frozen unstable; urgency=low
+
+  * Modified to use /root/dboostrap_settings file if present. That file
+    is created by the boot-floppies install process.
+  * Run tasksel in queue mode.
+  * If it looks like they want X based on what is selected in tasksel, use
+    xviddetect to guess the xserver to load after tasksel runs, and select
+    it for installation.
+  * Then, run apt to install everything that has been selected.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 19 Jan 2000 18:23:02 -0800
+
+base-config (0.09) frozen unstable; urgency=low
+
+  * Only works with debconf 2.0.78 or higher, since it uses CLEAR.
+  * Reworded the question about running tasksel.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 17 Jan 2000 19:19:14 -0800
+
+base-config (0.08) frozen unstable; urgency=low
+
+  * Needs to go info frozen for the same reason new boot-floppies do.
+  * Reorder the question flow. Ask about md5 first, then shadow, then root,
+    etc. Actually turn md5 on/off in the config script. This allows for m5d
+    root passwords.
+  * Run adduser noninteractively, meshes much better with the overall feel.
+  * Shortened the root password prompt (moving part of it to the add a user
+    prompt), so it all fits on one screen in a dialog.
+  * Use clear command, so depends on debconf 0.2.77
+  * Fixed test for /etc/shadow.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 17 Jan 2000 14:27:37 -0800
+
+base-config (0.07) frozen unstable; urgency=low
+
+  * Prevented nasty infinite loop if apt-setup was run in noninteractive
+    mode.
+  * Inserted blank line between 2 items in concacentated templates file.
+  * Changed default distribution apt-setup uses to potato. I can't use
+    stable yet; using unstable is out; if I use frozen things break if it's
+    not changed to stable just before release; so potato is the best choice
+    of a bad lot. This should be changed to "stable" just before we release,
+    but if that isn't possible, "potato" will continue to work, and it can
+    be fixed in an update to the new stable at a later date.
+  * Yes, this has to go into frozen. It's effectivly part of boot-floppies,
+    and will be under development for a while yet..
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 15 Jan 2000 20:30:42 -0800
+
+base-config (0.06) frozen unstable; urgenc=low
+
+  * Sigh. The dpkg database is *not* locked when packages are preconfigured in
+    an apt run. Thus my lock-checking program is worthless when run in the
+    config script, and things still go south, completly screwing up apt when
+    this package is installed. This is a critical bug.
+  * To fix the bug, I used a new approach: only do the things that can mess
+    up apt when this package is being reconfigured. It's a 1 line change.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 14 Jan 2000 16:15:16 -0800
+
+base-config (0.05) unstable; urgency=medium
+
+  * Swapped binary-indep and binary-arch targets. Closes: #54972
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 13 Jan 2000 13:03:28 -0800
+
+base-config (0.04) unstable; urgency=medium
+
+  * Now arch any, because I include a tiny utility to tell me if the dpkg
+    database is locked. Using apt to do this didn't work and caused Jason
+    and me no end of pain. Closes: #54708, #54723
+  * Fixed running of apt-setup (typo).
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 10 Jan 2000 20:23:05 -0800
+
+base-config (0.03) unstable; urgency=low
+
+  * Don't run apt-setup if it doesn't exist (duh).
+  * Don't ask about shadow passwords if /etc/shadow exists, unless this
+    package is being reconfigured.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  9 Jan 2000 18:12:19 -0800
+
+base-config (0.02) unstable; urgency=low
+
+  * Typos.
+  * Redirect apt noise to /dev/null.
+  * I think the last message will be displayed correctly now.
+  * Can be reconfigured once it is installed onto a debian system, and it
+    actually does something sane.
+  * Added README.Debian
+  * Moved apt setup call to a more consitent place.
+  * Run pppconfig on a tty.
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  8 Jan 2000 15:47:47 -0800
+
+base-config (0.01) unstable; urgency=low
+
+  * First release. Yeah, this violates the no-new-packages rule, but it is
+    essential this goes into potato; boot-floppies are going to use it.
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  6 Jan 2000 15:14:07 -0800
