@@ -3,9 +3,9 @@
 # existing templates for countries, generates a complete templates file on
 # stdout for all countries listed in the zone.tab.
 #
-# Most countries have only one time zone, and for these a simple dummy
-# template is generated, which is not intended to ever be displayed, but
-# only to deliver the correct default timezone value.
+# Most countries have only one time zone, and for these no template is
+# generated, but a mapping file is created mapping a country to its time
+# zone.
 #
 # Countries that have more than one time zone should ideally be included
 # in the input file, since generating a usable list of time zones for a
@@ -48,17 +48,20 @@ while (<IN>) {
 }
 close IN;
 
+open (TZMAP, ">tzmap") || die "tzmap: $!";
 foreach my $cc (sort keys %cc2zone) {
-	print "\nTemplate: tzsetup/country/$cc\n";
-	print "Type: select\n";
 	if (@{$cc2zone{$cc}} > 1) {
+		my $englist=join(", ", map { $zonedesc{$_} } @{$cc2zone{$cc}});
+		print "\nTemplate: tzsetup/country/$cc\n";
+		print "Type: select\n";
+		print "# Timezones for $cc. Translate to timezone names.\n";
+		print "# Corresponding English timezone names are: $englist\n";
 		print "__Choices: ".join(", ", @{$cc2zone{$cc}})."\n";
-		print "Choices-en.UTF-8: ".join(", ", map { $zonedesc{$_} } @{$cc2zone{$cc}})."\n";
+		print "Choices-en.UTF-8: $englist\n";
 		print "_Description: Select your time zone:\n";
 	}
 	else {
-		# Not for display, so not translatable and no
-		# description needed.
-		print "Choices: ".join(", ", @{$cc2zone{$cc}})."\n";
+		print TZMAP "$cc @{$cc2zone{$cc}}\n";
 	}
 }
+close TZMAP;
