@@ -20,6 +20,11 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
+
+	# Merge in all templates.
+	echo >> debian/tzsetup-udeb/DEBIAN/templates
+	po2debconf debian/common.templates >> debian/tzsetup-udeb/DEBIAN/templates
+
 	dh_installchangelogs
 	dh_compress
 	dh_fixperms
