@@ -50,18 +50,19 @@ close IN;
 
 open (TZMAP, ">tzmap") || die "tzmap: $!";
 foreach my $cc (sort keys %cc2zone) {
+	my $list=join(", ", @{$cc2zone{$cc}});
 	if (@{$cc2zone{$cc}} > 1) {
 		my $englist=join(", ", map { $zonedesc{$_} } @{$cc2zone{$cc}});
 		print "\nTemplate: tzsetup/country/$cc\n";
 		print "Type: select\n";
 		print "# Timezones for $cc. Translate to timezone names.\n";
 		print "# Corresponding English timezone names are: $englist\n";
-		print "__Choices: ".join(", ", @{$cc2zone{$cc}})."\n";
+		print "__Choices: $list\n";
 		print "Choices-en.UTF-8: $englist\n";
 		print "_Description: Select your time zone:\n";
 	}
 	else {
-		print TZMAP "$cc @{$cc2zone{$cc}}\n";
+		print TZMAP "$list\n";
 	}
 }
 close TZMAP;
