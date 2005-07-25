@@ -57,6 +57,7 @@
 #include <wchar.h>
 #include <assert.h>
 
+#include <slang.h>
 #include <newt.h>
 
 #ifdef HAVE_LIBTEXTWRAP
@@ -1003,6 +1004,7 @@ newt_initialize(struct frontend *obj, struct configuration *conf)
 
     obj->interactive = 1;
     obj->data = calloc(1, sizeof(struct newt_data));
+    SLang_init_tty(0, 1, 0); /* disable flow control */
     newtInit();
     newtGetScreenSize(&width, &height);
     // Fill the screen so people can shift-pgup properly
@@ -1049,6 +1051,7 @@ newt_go(struct frontend *obj)
             if (plugin || strcmp(q->template->type, question_handlers[i].type) == 0) {
                 if (!cleared && !data->scale_form) {
                     cleared = 1;
+                    SLang_init_tty(0, 1, 0); /* disable flow control */
                     newtInit();
                     newtCls();
                 }
@@ -1107,6 +1110,7 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
+    SLang_init_tty(0, 1, 0); /* disable flow control */
     newtInit();
     newtCls();
     if (obj->info != NULL) {
