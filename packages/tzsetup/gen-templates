@@ -22,7 +22,12 @@ my %seencc;
 	local $/="\n\n";
 	while (<>) {
 		if (m!Template: tzsetup/country/([A-Z]+)!) {
-			$seencc{$1}=1;
+			my $cc=$1;
+			$seencc{$cc}=1;
+			if (m/Choices-en.UTF-8: (.*)$/m) {
+				my $enchoices=$1;
+				s/(__Choices:)/# Timezones for $cc. Translate to timezone names.\n# Corresponding English timezone names are: $enchoices\n$1/;
+			}
 		}
 		print;
 	}
