@@ -1,0 +1,36 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+pri=high
+
+if db_fget clock-setup/utc seen && [ "$RET" = true ]; then
+	# keep preseeded value
+	:
+else
+	probed=$(os-prober)
+
+	for line in $probed; do
+		shortname=$(cat "$line" | cut -d : -f 3)
+		case $shortname in
+		MS-DOS*|Windows*|FreeDOS*) # keep in sync with os-prober
+			# default to localtime with those OSes
+			db_set clock-setup/utc=false
+			pri=low
+			break
+		;;
+		esac
+	done
+
+	if [ -z "$probed" ]; then
+		# installing the only OS, so use UTC
+		db_set clock-setup/utc=true
+		pri=low
+	fi
+fi
+
+db_input $pri clock-setup/utc || true
+if ! db_go; then
+	exit 10 # back to main menu
+fi

@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+rcsfile=/target/etc/default/rcS
+tmp=/tmp/rcS
+
+db_get clock-setup/gmt
+if [ "$RET" = true ]; then
+	sed -e 's:^UTC="no":UTC="yes":' -e 's:^UTC=no:UTC=yes:' $rcsfile > $tmp
+	
+else
+	sed -e 's:^UTC="yes":UTC="no":' -e 's:^UTC=yes:UTC=no:' $rcsfile > $tmp
+fi
+mv $tmp $rcsfile
