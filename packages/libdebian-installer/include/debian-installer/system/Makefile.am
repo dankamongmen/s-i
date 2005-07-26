@@ -5,6 +5,7 @@ realinclude_HEADERS = \
 	dpkg.h \
 	packages.h \
 	prebaseconfig.h \
+	subarch.h \
 	utils.h
 
 noinst_HEADERS = \

@@ -11,7 +11,7 @@ AC_CHECK_PROGS(DOXYGEN, doxygen, false)
 
 LIBRARY_VERSION_MAJOR=4
 LIBRARY_VERSION_MINOR=0
-LIBRARY_VERSION_REVISION=4
+LIBRARY_VERSION_REVISION=5
 LIBRARY_VERSION="$LIBRARY_VERSION_MAJOR.$LIBRARY_VERSION_MINOR.$LIBRARY_VERSION_REVISION"
 LIBRARY_VERSION_LIBTOOL="$LIBRARY_VERSION_MAJOR:$LIBRARY_VERSION_MINOR:$LIBRARY_VERSION_REVISION"
 
@@ -46,6 +46,35 @@ AC_ARG_ENABLE(extensive-debug,AS_HELP_STRING([--enable-extensive-debug],[Enable 
 if test "$enable_extensive_debug" = yes; then
 	AC_DEFINE_UNQUOTED(ENABLE_EXTENSIVE_DEBUG,1,[Define to 1 to enable extensive debugging output])
 fi
+
+AC_MSG_CHECKING([Debian CPU name])
+DEB_HOST_ARCH_CPU="`dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null`"
+# Take account of old dpkg-architecture output.
+if test -z "$DEB_HOST_ARCH_CPU"; then
+	DEB_HOST_ARCH_CPU="`dpkg-architecture -qDEB_HOST_GNU_CPU`"
+	if test "$DEB_HOST_ARCH_CPU" = x86_64; then
+		DEB_HOST_ARCH_CPU=amd64
+	fi
+fi
+AC_MSG_RESULT([$DEB_HOST_ARCH_CPU])
+
+AC_MSG_CHECKING([Debian system name])
+DEB_HOST_ARCH_OS="`dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null`"
+# Take account of old dpkg-architecture output.
+if test -z "$DEB_HOST_ARCH_OS"; then
+	DEB_HOST_ARCH_OS="`dpkg-architecture -qDEB_HOST_GNU_SYSTEM | sed 's/-gnu//g'`"
+	if test "$DEB_HOST_ARCH_OS" = gnu; then
+		DEB_HOST_ARCH_OS=hurd
+	fi
+fi
+AC_MSG_RESULT([$DEB_HOST_ARCH_OS])
+
+if test -f "$srcdir/src/system/subarch-$DEB_HOST_ARCH_CPU-$DEB_HOST_ARCH_OS.c"; then
+	SUBARCH_SYSTEM="subarch-$DEB_HOST_ARCH_CPU-$DEB_HOST_ARCH_OS.lo"
+else
+	SUBARCH_SYSTEM="subarch-generic.lo"
+fi
+AC_SUBST(SUBARCH_SYSTEM)
 
 AC_CONFIG_HEADERS([config.h include/debian-installer/config.h])
 

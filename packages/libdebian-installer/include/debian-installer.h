@@ -21,5 +21,6 @@
 #include <debian-installer/system/dpkg.h>
 #include <debian-installer/system/packages.h>
 #include <debian-installer/system/prebaseconfig.h>
+#include <debian-installer/system/subarch.h>
 #include <debian-installer/system/utils.h>
 
