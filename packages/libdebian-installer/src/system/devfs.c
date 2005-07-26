@@ -59,6 +59,7 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 3,	0,	"hd",		ENTRY_TYPE_DISC,	0,	6 },
     { 4,	64,	"ttyS",		ENTRY_TYPE_NUMBER,	0,	0 },
     { 4,	0,	"tty",		ENTRY_TYPE_NUMBER,	0,	0 },
+    { 7,	0,	"loop",		ENTRY_TYPE_NUMBER,	0,	0 },
     { 8,	0,	"sd",		ENTRY_TYPE_DISC,	0,	4 },
     { 9,	0,	"md",		ENTRY_TYPE_NUMBER,	0,	0 },
     { 11,	0,	"scd",		ENTRY_TYPE_NUMBER,	0,	0 },
