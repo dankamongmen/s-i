@@ -80,12 +80,12 @@ locale2langname() {
 		echo "$2 does not exist"
 		exit 1
 	fi
-	langpart=$(echo $1 | cut -f1 -d_)
+	langpart="${1%%_*}"
 	# Match the language code with 5th field in languagelist
 	line=$(cat $2 | grep -v "^#" | cut -f1,5 -d\;|grep ";$langpart")
 	log $(cat $2 | grep -v "^#" | cut -f1,5 -d\;)
 	if [ -n "$line" ] ; then
-		echo $line | cut -f1 -d\;
+		echo "${line%%;*}"
 	fi
 }
 
@@ -104,7 +104,7 @@ locale2countrycode(){
 locale2langcode(){
 	if [ -n "$1" ] ; then
 		if (echo $1 | grep -q "_") ; then
-			echo $1 | cut -f1 -d_
+			echo "${1%%_*}"
 		else
 			echo
 		fi
@@ -288,7 +288,7 @@ LANGUAGECODE_LANGUAGECHOOSER=$LANGUAGE
 # If present, keep track of charset or modifier we got previously
 EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
 
-FIRST_LANG=$(echo $LANGUAGELIST | sed -e 's/:.*$//')
+FIRST_LANG="${LANGUAGELIST%%:*}"
 
 # We use /etc/shortlists to check if we should present a shortlist
 if grep -q "^$FIRST_LANG" $SHORTLISTS; then
