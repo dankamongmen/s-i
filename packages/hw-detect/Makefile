@@ -73,14 +73,8 @@ install-archdetect-deb: archdetect
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) archdetect $(bindir)
 
-ARCHDETECT_TYPE_FILE = archdetect-$(DEB_HOST_ARCH_CPU)-$(DEB_HOST_ARCH_OS)
-
-ifeq ($(wildcard $(ARCHDETECT_TYPE_FILE).c),)
-ARCHDETECT_TYPE_FILE = archdetect-generic
-endif
-
-archdetect: $(ARCHDETECT_TYPE_FILE).o archdetect.o 
-	${CC} ${LDFLAGS} -o $@ $^
+archdetect: archdetect.o 
+	${CC} ${LDFLAGS} -o $@ $^ -ldebian-installer
 
 archdetect.o: %.o:%.c
 	$(CC) $(CFLAGS) $(CFLAGS_ARCH) -c $<
