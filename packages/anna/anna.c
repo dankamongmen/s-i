@@ -4,7 +4,8 @@
 #include "retriever.h"
 
 struct debconfclient *debconf = NULL;
-static char *running_kernel = NULL, *subarchitecture;
+static char *running_kernel = NULL;
+static const char *subarchitecture;
 
 di_packages *get_packages (void) {
 	di_packages_allocator *packages_allocator = di_system_packages_allocator_alloc();
@@ -353,32 +354,6 @@ OUT:
 	return ret;
 }
 
-char *subarch_get (void) {
-        FILE *a; 
-        char buf[255], *s, *end;
-
-        if (! (a = popen("archdetect", "r"))) {
-                return "generic";
-        }
-        if (! fgets(buf, sizeof(buf), a)) {
-                pclose(a);
-                return "generic";
-        }
-        pclose(a);
-	s = strdup(buf);
-
-        if (! (s=strchr(s, '/'))) {
-                return "generic";
-        }
-	s++;
-
-        if ((end = strchr(s, '\n'))) {
-                end[0] = '\0';
-        }
-
-        return s;
-}
-
 int main(int argc, char **argv) {
 	int ret;
 	di_packages *packages, *status;
@@ -390,7 +365,7 @@ int main(int argc, char **argv) {
 
 	di_system_init("anna");
 
-	subarchitecture = subarch_get();
+	subarchitecture = di_system_subarch_analyze();
 	
 	if (uname(&uts) == 0) {
 		running_kernel = strdup(uts.release);
