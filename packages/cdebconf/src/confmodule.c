@@ -77,14 +77,20 @@ static int confmodule_communicate(struct confmodule *mod)
         buf[0] = 0;
         in[0] = 0;
         while (strchr(buf, '\n') == NULL) {
-            if (signal_received)
+            if (signal_received) {
+                free(in);
                 return DC_OK;
+            }
 
             ret = read(mod->infd, buf, sizeof(buf));
-            if (ret < 0)
+            if (ret < 0) {
+                free(in);
                 return DC_NOTOK;
-            if (ret == 0)
+            }
+            if (ret == 0) {
+                free(in);
                 return DC_OK;
+            }
             buf[ret] = 0;
             if (strlen(in) + ret + 1 > insize) {
                 insize += sizeof(buf);
@@ -93,8 +99,10 @@ static int confmodule_communicate(struct confmodule *mod)
             strcat(in, buf);
         }
 
-        if (signal_received)
+        if (signal_received) {
+            free(in);
             return DC_OK;
+        }
 
         inp = strstrip(in);
         INFO(INFO_DEBUG, "--> %s", inp);
@@ -109,6 +117,7 @@ static int confmodule_communicate(struct confmodule *mod)
         write(mod->outfd, "\n", 1);
         free(out);
     }
+    free(in);
     return ret;
 }
 
