@@ -493,40 +493,6 @@ translated_template_get(char *template)
 }
 
 /**
- * @brief discover what subarchitecture we have
- * @return subarch string, or "", freed by caller.
- */
-const char *subarch_get (void)
-{
-	static char *subarch = NULL;
-
-	if (!subarch) {
-        	FILE *a; 
-	        char buf[255], *end;
-
-		if (! (a = popen("archdetect", "r"))) {
-			return subarch=strdup("");
-		}
-		if (! fgets(buf, sizeof(buf), a)) {
-			pclose(a);
-			return subarch=strdup("");
-		}
-		pclose(a);
-		subarch = strdup(buf);
-
-		if (! (subarch=strchr(subarch, '/'))) {
-			return subarch=strdup("");
-		}
-		subarch++;
-
-		if ((end = strchr(subarch, '\n'))) {
-			end[0] = '\0';
-		}
-	}
-	return subarch;
-}
-
-/**
  * @brief Build a list of the keyboards present on this computer
  * @returns kbd_t list
  */
@@ -535,7 +501,7 @@ keyboards_get (void)
 {
 	static kbd_t *keyboards = NULL, *p = NULL;
 	char buf[25];
-	const char *subarch = subarch_get();
+	const char *subarch = di_system_subarch_analyze();
 
 	if (keyboards != NULL)
 		return keyboards;
