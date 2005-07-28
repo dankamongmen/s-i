@@ -1334,10 +1334,8 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     int args = 1;
     char **name;
 
-    /* FIXME: This can surely be done in a better way */
-    (char**) name = malloc(2 * sizeof(char*));
-    (char*) name[0] = malloc(8 * sizeof(char));
-    name[0] = "debconf";
+    name = malloc(2 * sizeof(char*));
+    name[0] = strdup("debconf");
     name[1] = NULL;
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_initialize() called");
