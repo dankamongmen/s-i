@@ -573,7 +573,7 @@ apply_pcmcia_resource_opts() {
 	local rmode=""
 	local type=""
 	local value=""
-	while [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ] && [ -n "$4" ]; do
+	while [ -n "$1" ] && [ -n "$2" ] && [ -n "$3" ]; do
 		if [ "$1" = exclude ]; then
 			mode=exclude
 			rmode=include
