@@ -1033,8 +1033,6 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
-    GtkWidget *view;
-    GtkTextBuffer *buffer;
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_multiple() called"); */
 
@@ -1069,27 +1067,9 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     	gtk_entry_set_text (GTK_ENTRY(GTK_COMBO(combo)->entry), "");
     gtk_combo_set_value_in_list (GTK_COMBO (combo), TRUE, FALSE);
 
-    /* this is just a dirty hack to prevent the description of the
-     * disk-partitioner, which is very long, from trashing the screen.
-     * A textarea is used as a label to the question frame to
-     * wrap long lines of text.
-     */
-    view = gtk_text_view_new ();
 
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-    gtk_text_buffer_set_text (buffer, q_get_description(q), -1);
-    gtk_text_view_set_editable (GTK_TEXT_VIEW(view), FALSE);
-    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(view), FALSE);
-    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
-    gtk_text_view_set_left_margin (GTK_TEXT_VIEW(view), 5);
-    gtk_text_view_set_right_margin (GTK_TEXT_VIEW(view), 5);
-
-    frame = gtk_frame_new("");
-    gtk_frame_set_label_widget( GTK_FRAME(frame), view );
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_multiple() frame title: \"%s\"",
-         q_get_description(q));
+    frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), combo);	
-
     gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
     if (is_first_question(q))
