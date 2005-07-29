@@ -554,6 +554,11 @@ humandev () {
 	    db_metaget partman/text/lvm_lv description
 	    printf "$RET" $vg $lv
 	    ;;
+	/dev/loop/*)
+	    n=${1#/dev/loop/}
+	    db_metaget partman/text/loopback description
+	    printf "$RET" $n
+	    ;;
 	*)
 	    # Check if it's an LVM1 device
 	    vg=`echo "$1" | sed -e 's,/dev/\([^/]\+\).*,\1,'`
