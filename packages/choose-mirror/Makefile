@@ -1,4 +1,21 @@
-CFLAGS=-Wall -g -D_GNU_SOURCE -DWITH_HTTP -DWITH_FTP
+USE_HTTP=1
+#USE_FTP=1
+
+CFLAGS=-Wall -g -D_GNU_SOURCE
+templates=debian/choose-mirror.templates-in
+
+ifeq (1,${USE_HTTP})
+CFLAGS:=$(CFLAGS) -DWITH_HTTP
+templates:=$(templates) debian/choose-mirror.templates.http-in
+endif
+ifeq (1,${USE_FTP})
+CFLAGS:=$(CFLAGS) -DWITH_FTP
+templates:=$(templates) debian/choose-mirror.templates.ftp-in
+endif
+ifeq (11,${USE_HTTP}${USE_FTP})
+templates:=$(templates) debian/choose-mirror.templates.both-in
+endif
+
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=choose-mirror
 LIBS=-ldebconfclient -ldebian-installer
@@ -35,11 +52,11 @@ debian/httplist-countries: $(MASTERLIST)
 debian/ftplist-countries: $(MASTERLIST)
 	./mirrorlist ftplist $^
 
-debian/choose-mirror.templates: $(MASTERLIST) debian/choose-mirror.templates-in debian/httplist-countries debian/ftplist-countries
+debian/choose-mirror.templates: $(MASTERLIST) $(templates) debian/httplist-countries debian/ftplist-countries
 	# Grab ISO codes from iso-codes package
 	./get-iso-codes
 	# Build the templates
-	./mktemplates
+	./mktemplates $(templates)
 
 mirrors_http.h: $(MASTERLIST)
 	./mirrorlist http $^
