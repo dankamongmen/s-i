@@ -18,6 +18,7 @@ ATOMIC_COMMITS=N
 BIG_COMMITS=N
 DEBUG=N
 KEEP_REVISION=N
+FORCE_RUN=N
 svn=svn
 debconfupdatepo=debconf-updatepo
 SORT_ORDER="main-menu \
@@ -53,6 +54,9 @@ echo  "    --atomic            : Files will be commited at each change"
 echo  "                          (will often trigger commit storms!"
 echo  "                          Handle with care!)"
 echo  "                          implies --online"
+echo  "    --force             : Forced run even if 'run=0'"
+echo  "                          appears in packages/po/run-l10n-sync"
+echo  "                          Should only be used in manual runs"
 echo  "    --atomic-updates    : Do a \"svn up\" before each step"
 echo  "                          (VERY time consuming)"
 echo  "                          implies --online"
@@ -115,6 +119,10 @@ while $MORETODO ; do
         ;;      
     "--commit")
         BIG_COMMITS=Y
+        shift
+        ;;
+    "--force")
+        FORCE_RUN=Y
         shift
         ;;
     "--merge="*)
@@ -230,8 +238,12 @@ if [ -f ${markerfile} ] ; then
   . ${markerfile}
   if [ -n "${run}" ] ; then
     if [ ${run} = 0 ] ; then
-      echo Explicit request to no run the script in ${markerfile}...
-      exit 0
+      if [ "${FORCE_RUN}" = "Y" ] ; then
+        echo Enforce running despite instruction in ${markerfile}...
+      else
+        echo Explicit request to no run the script in ${markerfile}...
+        exit 0
+      fi
     fi
   fi
 else
