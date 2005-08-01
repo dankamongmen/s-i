@@ -576,12 +576,14 @@ gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *m
 return TRUE;
 }
 
+#if 0 /* currently unused */
 static const char *
 get_text(struct frontend *obj, const char *template, const char *fallback )
 {
     struct question *q = obj->qdb->methods.get(obj->qdb, template);
     return q ? q_get_description(q) : fallback;
 }
+#endif
 
 gboolean need_continue_button(struct frontend *obj)
 {
