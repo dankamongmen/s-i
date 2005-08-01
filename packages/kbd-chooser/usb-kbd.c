@@ -114,7 +114,7 @@ static kbd_t *usb_parse_proc (kbd_t *keyboards)
 		serr = dup(2);
 		close (2);
 		open ("/dev/null", O_RDWR);
-		if (system ("mount -t  usbdevfs usbdevfs /proc/bus/usb") != 0) {
+		if (system ("mount -t  usbfs usbfs /proc/bus/usb") != 0) {
 			return keyboards; // ok, now you can give up.
 		}
 		// restore stderr
