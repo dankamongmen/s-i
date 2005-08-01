@@ -54,6 +54,8 @@ ${REFRESH_CMD}
 # spellcheck and move data to public_html
 check_all.sh ${LOCAL_REPOSITORY} ${WORK_DIR}
 
+umask 0002
+
 BRAND_NEW=0
 if [ ! -d ${OUT_DIR} ] ; then
     mkdir -p ${OUT_DIR}/history
@@ -111,4 +113,3 @@ fi
 
 mv ${WORK_DIR} ${OUT_DIR}/${NEW}
 ln -s ${OUT_DIR}/${NEW}  ${OUT_DIR}/latest
-
