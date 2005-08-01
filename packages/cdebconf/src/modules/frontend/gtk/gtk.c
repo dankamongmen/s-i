@@ -432,7 +432,7 @@ void jump_callback(GtkWidget *button, struct frontend_question_data* data)
     int i, count;
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
-    gint ret_val;
+    gint ret_val = GTK_RESPONSE_NONE;
 
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
