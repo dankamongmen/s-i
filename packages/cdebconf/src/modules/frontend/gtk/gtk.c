@@ -1000,7 +1000,7 @@ static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, 
 	store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
 
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
-	gtk_tree_selection_set_select_function(selection, select_treeview_callback, data, NULL);
+	gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
 	model = GTK_TREE_MODEL( store );
 	gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
 	g_object_unref (model);
@@ -1657,14 +1657,18 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 static void gtk_progress_stop(struct frontend *obj)
 {
     GtkWidget *progress_bar, *progress_bar_frame;
+#if 0
     struct frontend_data *data = (struct frontend_data *) obj->data;
+#endif
 
     /* Altough logically correct, for cosmetic reasons it's better
      * not to destroy the ghosted main menu until a question is
      * asked to the user
      */
-	/* gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox)); */
-	/* data->progress_bar_menubox = NULL; */
+#if 0
+    gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox));
+    data->progress_bar_menubox = NULL;
+#endif
     
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
     progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
