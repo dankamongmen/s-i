@@ -1,0 +1,7 @@
+if dmesg | grep -q "WARNING: NR_CPUS limit of 1 reached."; then
+	echo 2 > /var/numcpus
+elif dmesg | grep -q ^Processors:; then
+	dmesg | grep -q ^Processors: | cut -d ' ' -f 2 > /var/numcpus
+else
+	echo 1 > /var/numcpus
+fi

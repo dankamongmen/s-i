@@ -26,9 +26,10 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
   ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S05acpi-linux-x86 \
-	S40framebuffer-module-linux-x86
+	S40framebuffer-module-linux-x86 \
+	S04countcpus-linux-x86
    endif
-
+  
   ifeq ($(DEB_HOST_ARCH_CPU),powerpc)
     files += \
 	S45keyboard-linux-powerpc
@@ -41,7 +42,8 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 
   ifneq (,$(filter alpha,$(DEB_HOST_ARCH_CPU)))
     files += \
-	S40framebuffer-module-linux-alpha
+	S40framebuffer-module-linux-alpha \
+	S04countcpus-linux-alpha
    endif
 endif
 
