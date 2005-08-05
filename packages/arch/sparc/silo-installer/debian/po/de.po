@@ -20,7 +20,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: de.neu\n"
-"POT-Creation-Date: 2005-07-06 09:27-0700\n"
+"POT-Creation-Date: 2005-08-04 18:29-0600\n"
 "PO-Revision-Date: 2004-10-01 15:09GMT\n"
 "Last-Translator: \n"
 "Language-Team:  <de@li.org>\n"
@@ -84,72 +84,127 @@ msgstr ""
 msgid "Install the SILO boot loader on a hard disk"
 msgstr "SILO Bootloader auf der Festplatte installieren"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:28
-msgid ""
-"To be bootable from the PROM, silo and the kernel it loads must be installed "
-"on a disk which uses Sun disklabels for its partition table.  Your /boot "
-"directory is not located on such a disk.  If you proceed, you will not be "
-"able to boot your system using SILO, and will need to boot it some other way."
-msgstr ""
-"Um von PROM starten zu können, müssen SILO und der Kernel auf einer "
-"Festplatte, die »Sun-Disklabels« in der Partitionstabelle benutzt, "
-"installiert werden. Ihr /boot/ Verzeichnis befindet sich nicht auf einer "
-"solchen Festplatte. Falls Sie fortfahren, können Sie Ihren Computer nicht "
-"mit SILO starten."
-
-#. Type: boolean
-#. Description
-#: ../silo-installer.templates:38
-msgid "Use unsupported file system type for /boot?"
+#: ../silo-installer.templates:27
+#, fuzzy
+msgid "Warning: unsupported boot filesystem type!"
 msgstr "Nicht unterstützten Dateisystemtyp für /boot benutzen?"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
+#: ../silo-installer.templates:27
 msgid ""
-"SILO requires /boot to be located on an ext2 or ext3 partition on a bootable "
-"device.  This means that either the root partition must be an ext2 file "
-"system, or you must have a separate ext2 partition mounted at /boot."
+"In order to be successfully loaded by SILO (Sparc Linux Loader), the kernel "
+"must reside on an ext2, ext3 or ufs formatted partition. In the current "
+"partitioning scheme the kernel is going to be installed on the ${SILO_PART} "
+"partition of type ${SILO_TYPE}."
 msgstr ""
-"SILO benötigt /boot auf einer ext2 oder ext3 Partition auf einem bootfähigen "
-"Gerät. Das bedeutet, dass sich entweder das Root-Dateisystem auf einer "
-"solchen Partition befindet oder Sie eine weitere ext2 oder ext3 Partition "
-"anlegen und nach /boot einbinden müssen."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
+#: ../silo-installer.templates:39
+msgid "Warning: boot partition may cause problems with SILO!"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:39
 msgid ""
-"Currently, /boot is located on a partition of type ${PARTTYPE}.  If you keep "
-"this setting, you will not be able to boot your Debian system using SILO."
+"This machine is likely to suffer from a firmware bug, which makes it "
+"impossible for SILO (Sparc Linux Loader) to boot a kernel placed farther "
+"than 1 GB from the beginning of the disk."
 msgstr ""
-"Momenten befindet sich /boot auf einer Partition vom Typ ${PARTTYPE}. Wenn "
-"Sie diese Einstellung nicht ändern, werden Sie Ihren Computer nicht mir SILO "
-"starten können."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:51
-msgid "Install /boot on a disk with an unsupported partition table?"
-msgstr ""
-"/boot auf eine Festplatte installieren, deren Partitionstabelle nicht "
-"unterstützt wird?"
-
-#. Type: boolean
-#. Description
-#: ../silo-installer.templates:51
+#: ../silo-installer.templates:39
 msgid ""
-"You are using a 32-bit SPARC machine. On many of these, it is unlikely that "
-"Debian will boot if /boot resides in a partition that extends past the first "
-"1024 cylinders of the hard disk. /boot currently resides in a partition that "
-"extends to cylinder ${CYL}. You should change this by reducing the size of "
-"the partition or creating a separate, smaller partition just for /boot."
+"To avoid problems it is strongly recommended to install the kernel into a\n"
+" partition which fits entirely within the first GB of the disk (by creating "
+"a\n"
+" small /boot partition in the beginning of the disk, for example). In the\n"
+" current partitioning scheme it is going to be installed onto the "
+"${SILO_PART}\n"
+" partition which extends up to ${SILO_OFF} mark. Keeping this configuration "
+"may\n"
+" result in an unbootable system."
 msgstr ""
-"Dies ist eine 32-Bit SPARC Maschine. Bei vielen dieser Maschinen ist es "
-"unwahrscheinlich, dass Debian starten wird wenn /boot auf einer Partition "
-"bleibt, die über 1024 Zylinder der Festplatte hinausgeht. /boot befindet "
-"sich gerade auf einer Partition die bis zu Zylinder ${CYL} reicht. Sie "
-"sollten dies beheben, indem Sie die Größe der Partition ändern oder eine "
-"neue, kleinere Partition nur für /boot erstellen."
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid "Warning: unsupported partition table on the boot disk!"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"SILO (Sparc Linux Loader) can only boot the kernel off a disk with the \"sun"
+"\" partition table. In the current partitioning scheme the  kernel is going "
+"to be installed on the ${SILO_PART} partition located on a disk with the "
+"partition table of type \"${SILO_DISK}\"."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"It is strongly recommended that you go back to partitioning and correct this "
+"problem. Keeping the current configuration may result in an unbootable "
+"system."
+msgstr ""
+
+#~ msgid ""
+#~ "To be bootable from the PROM, silo and the kernel it loads must be "
+#~ "installed on a disk which uses Sun disklabels for its partition table.  "
+#~ "Your /boot directory is not located on such a disk.  If you proceed, you "
+#~ "will not be able to boot your system using SILO, and will need to boot it "
+#~ "some other way."
+#~ msgstr ""
+#~ "Um von PROM starten zu können, müssen SILO und der Kernel auf einer "
+#~ "Festplatte, die »Sun-Disklabels« in der Partitionstabelle benutzt, "
+#~ "installiert werden. Ihr /boot/ Verzeichnis befindet sich nicht auf einer "
+#~ "solchen Festplatte. Falls Sie fortfahren, können Sie Ihren Computer nicht "
+#~ "mit SILO starten."
+
+#~ msgid ""
+#~ "SILO requires /boot to be located on an ext2 or ext3 partition on a "
+#~ "bootable device.  This means that either the root partition must be an "
+#~ "ext2 file system, or you must have a separate ext2 partition mounted at /"
+#~ "boot."
+#~ msgstr ""
+#~ "SILO benötigt /boot auf einer ext2 oder ext3 Partition auf einem "
+#~ "bootfähigen Gerät. Das bedeutet, dass sich entweder das Root-Dateisystem "
+#~ "auf einer solchen Partition befindet oder Sie eine weitere ext2 oder ext3 "
+#~ "Partition anlegen und nach /boot einbinden müssen."
+
+#~ msgid ""
+#~ "Currently, /boot is located on a partition of type ${PARTTYPE}.  If you "
+#~ "keep this setting, you will not be able to boot your Debian system using "
+#~ "SILO."
+#~ msgstr ""
+#~ "Momenten befindet sich /boot auf einer Partition vom Typ ${PARTTYPE}. "
+#~ "Wenn Sie diese Einstellung nicht ändern, werden Sie Ihren Computer nicht "
+#~ "mir SILO starten können."
+
+#~ msgid "Install /boot on a disk with an unsupported partition table?"
+#~ msgstr ""
+#~ "/boot auf eine Festplatte installieren, deren Partitionstabelle nicht "
+#~ "unterstützt wird?"
+
+#~ msgid ""
+#~ "You are using a 32-bit SPARC machine. On many of these, it is unlikely "
+#~ "that Debian will boot if /boot resides in a partition that extends past "
+#~ "the first 1024 cylinders of the hard disk. /boot currently resides in a "
+#~ "partition that extends to cylinder ${CYL}. You should change this by "
+#~ "reducing the size of the partition or creating a separate, smaller "
+#~ "partition just for /boot."
+#~ msgstr ""
+#~ "Dies ist eine 32-Bit SPARC Maschine. Bei vielen dieser Maschinen ist es "
+#~ "unwahrscheinlich, dass Debian starten wird wenn /boot auf einer Partition "
+#~ "bleibt, die über 1024 Zylinder der Festplatte hinausgeht. /boot befindet "
+#~ "sich gerade auf einer Partition die bis zu Zylinder ${CYL} reicht. Sie "
+#~ "sollten dies beheben, indem Sie die Größe der Partition ändern oder eine "
+#~ "neue, kleinere Partition nur für /boot erstellen."
