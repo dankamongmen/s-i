@@ -92,6 +92,8 @@ commit_to_svn () {
     fi
 }
 
+# We want the manual files group writable
+umask 0002
 
 [ -f "$ROOT/do_not_build" ] && exit 1
 
@@ -333,6 +335,7 @@ if [ $NR_BUILD -gt 0 ] ; then
     echo "" >>$mainlog
     cd $destination
     echo "Creating archive..." >>$mainlog
+    #tar cjf $ROOT/manual.tar.bz2 --mode=g+rw *
     tar cjf $ROOT/manual.tar.bz2 *
     checkfatal "$?" "creating archive"
 
