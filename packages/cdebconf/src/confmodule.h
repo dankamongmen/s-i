@@ -28,6 +28,9 @@ enum seen_action {
  */
 extern volatile sig_atomic_t signal_received;
 
+/* If SIGCHLD is handled, put the status here. */
+extern volatile sig_atomic_t sigchld_status;
+
 struct configuration;
 struct template_db;
 struct question_db;

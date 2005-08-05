@@ -24,6 +24,7 @@ static commands_t commands[] = {
 };
 
 volatile sig_atomic_t signal_received = 0;
+volatile sig_atomic_t sigchld_status = 0;
 
 /* private functions */
 /*
@@ -144,9 +145,10 @@ static int confmodule_shutdown(struct confmodule *mod)
 {
     int status;
 
-    waitpid(mod->pid, &status, 0);
+    while (waitpid(mod->pid, &status, WNOHANG) > 0)
+        sigchld_status = status;
 
-    mod->exitcode = di_exec_mangle_status(status);
+    mod->exitcode = di_exec_mangle_status(sigchld_status);
 
     return mod->exitcode;
 }

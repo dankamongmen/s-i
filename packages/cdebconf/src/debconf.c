@@ -54,7 +54,8 @@ void sighandler(int sig)
 	int status = 1;
 	if (sig == SIGCHLD)
 	{
-		/* confmodule->shutdown() will reap the child process */
+		while (waitpid(0, &status, WNOHANG) > 0)
+			sigchld_status = status;
 		signal_received = sig;
 		return;
 	}
@@ -105,7 +106,13 @@ void parsecmdline(struct configuration *config, int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-	signal(SIGCHLD, sighandler);
+	struct sigaction sa;
+
+	sa.sa_handler = &sighandler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_NOCLDSTOP | SA_RESTART;
+	sigaction(SIGCHLD, &sa, NULL);
+
 	signal(SIGINT, sighandler);
 	signal(SIGTERM, sighandler);
 	signal(SIGUSR1, sighandler);
