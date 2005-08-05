@@ -273,14 +273,18 @@ get_input_info() {
 	esac
 }
 
+# Modules that should load before autodetection.
+get_early_manual_hw_info() {
+	# Load explicitly rather than implicitly to allow the user to
+	# specify parameters when the module is loaded.
+	echo "ide-core:Linux IDE support"
+}
+	
 # Manually load modules to enable things we can't detect.
 # XXX: This isn't the best way to do this; we should autodetect.
 # The order of these modules are important.
 get_manual_hw_info() {
 	get_floppy_info
-	# Load explicitly rather than implicitly to allow the user to
-	# specify parameters when the module is loaded.
-	echo "ide-core:Linux IDE support"
 	# ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
 	echo "ide-mod:Linux IDE driver"
 	echo "ide-probe-mod:Linux IDE probe driver"
@@ -360,7 +364,7 @@ if [ "$HOTPLUG_TYPE" = real ]; then
 	/lib/debian-installer/coldplug
 fi
 
-ALL_HW_INFO=$(get_detected_hw_info; get_manual_hw_info)
+ALL_HW_INFO=$(get_early_manual_hw_info; get_detected_hw_info; get_manual_hw_info)
 db_progress STEP $OTHER_STEPSIZE
 
 # Remove modules that are already loaded or not available, and construct
