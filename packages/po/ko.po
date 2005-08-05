@@ -3452,11 +3452,8 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
-#. Type: string
-#. Description
 #: ../aboot-installer.templates:12 ../grub-installer.templates:35
-#: ../palo-installer.templates:3 ../yaboot-installer.templates:45
+#: ../yaboot-installer.templates:45
 msgid "Device for boot loader installation:"
 msgstr "부트 로더를 설치할 장치:"
 
@@ -5523,7 +5520,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:22 ../silo-installer.templates:51
+#: ../aboot-installer.templates:22
 msgid "Install /boot on a disk with an unsupported partition table?"
 msgstr ""
 "지원하지 않는 파티션 테이블이 들어 있는 디스크에 /boot를 설치하시겠습니까?"
@@ -5545,7 +5542,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:32 ../silo-installer.templates:38
+#: ../aboot-installer.templates:32
 msgid "Use unsupported file system type for /boot?"
 msgstr "/boot 파티션에 지원하지 않는 파일시스템을 사용하시겠습니까?"
 
@@ -5745,18 +5742,6 @@ msgstr "vmelilo 부트로더를 설치하는 데 실패했습니다."
 #: ../vmelilo-installer.templates:57
 msgid "Install the vmelilo boot loader on a hard disk"
 msgstr "vmelilo 부트로더를 하드 디스크에 설치"
-
-#. Type: string
-#. Description
-#: ../palo-installer.templates:3
-msgid ""
-"PALO should install the boot block on a bootable device. This is usually the "
-"first hard drive, but could be in a partition if you want to use another "
-"boot manager as the primary boot manager."
-msgstr ""
-"PALO는 부트 블럭을 부팅 가능한 장치에 설치해야 합니다. 보통 첫 번째 하드 드라"
-"이브에 설치하지만, 다른 부트 매니저를 주 부트 매니저로 쓴다면 파티션에 설치"
-"할 수도 있습니다."
 
 #. Type: text
 #. Description
@@ -5971,56 +5956,77 @@ msgstr ""
 msgid "Install the SILO boot loader on a hard disk"
 msgstr "SILO 부트로더를 하드디스크에 설치"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:28
-msgid ""
-"To be bootable from the PROM, silo and the kernel it loads must be installed "
-"on a disk which uses Sun disklabels for its partition table.  Your /boot "
-"directory is not located on such a disk.  If you proceed, you will not be "
-"able to boot your system using SILO, and will need to boot it some other way."
-msgstr ""
-"PROM에서 부팅하려면, 파티션 테이블에 썬 디스크레이블을 사용하는 디스크에 silo"
-"와 커널을 설치해야 합니다.  /boot 디렉토리가 그러한 디스크에 들어 있지 않습니"
-"다.  계속하시면, SILO를 사용해 시스템을 부팅할 수 없게 되고, 다른 방법으로 부"
-"팅해야 할 것입니다."
+#: ../silo-installer.templates:27
+#, fuzzy
+msgid "Warning: unsupported boot filesystem type!"
+msgstr "/boot 파티션에 지원하지 않는 파일시스템을 사용하시겠습니까?"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
+#: ../silo-installer.templates:27
 msgid ""
-"SILO requires /boot to be located on an ext2 or ext3 partition on a bootable "
-"device.  This means that either the root partition must be an ext2 file "
-"system, or you must have a separate ext2 partition mounted at /boot."
+"In order to be successfully loaded by SILO (Sparc Linux Loader), the kernel "
+"must reside on an ext2, ext3 or ufs formatted partition. In the current "
+"partitioning scheme the kernel is going to be installed on the ${SILO_PART} "
+"partition of type ${SILO_TYPE}."
 msgstr ""
-"SILO는 부팅 가능한 장치의 ext2 혹은 ext3 파티션에 들어 있어야 합니다.  즉 루"
-"트 파티션이 ext2 파일시스템이거나 별도로 /boot에 마운트한 ext2 파티션이 있어"
-"야 합니다."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
-msgid ""
-"Currently, /boot is located on a partition of type ${PARTTYPE}.  If you keep "
-"this setting, you will not be able to boot your Debian system using SILO."
+#: ../silo-installer.templates:39
+msgid "Warning: boot partition may cause problems with SILO!"
 msgstr ""
-"현재 /boot는 ${PARTTYPE} 타입의 파티션에 들어 있습니다.  이 설정을 유지하시"
-"면, SILO를 사용해 데비안 시스템을 부팅할 수 없을 것입니다."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:51
+#: ../silo-installer.templates:39
 msgid ""
-"You are using a 32-bit SPARC machine. On many of these, it is unlikely that "
-"Debian will boot if /boot resides in a partition that extends past the first "
-"1024 cylinders of the hard disk. /boot currently resides in a partition that "
-"extends to cylinder ${CYL}. You should change this by reducing the size of "
-"the partition or creating a separate, smaller partition just for /boot."
+"This machine is likely to suffer from a firmware bug, which makes it "
+"impossible for SILO (Sparc Linux Loader) to boot a kernel placed farther "
+"than 1 GB from the beginning of the disk."
 msgstr ""
-"많은 32비트 SPARC 기계에서, 커널과 부트 블록이 하드 디스크의 1024 실린더 안"
-"에 들어 있어야 한다는 PROM의 제한이 있습니다. 지금의 경우, ${BPART}에서 부팅"
-"하지만 이 파티션이 1024번째 실린더를 넘어갑니다.  이 설정대로 진행하시면 데비"
-"안 시스템을 부팅할 수 없게 됩니다."
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:39
+msgid ""
+"To avoid problems it is strongly recommended to install the kernel into a\n"
+" partition which fits entirely within the first GB of the disk (by creating "
+"a\n"
+" small /boot partition in the beginning of the disk, for example). In the\n"
+" current partitioning scheme it is going to be installed onto the "
+"${SILO_PART}\n"
+" partition which extends up to ${SILO_OFF} mark. Keeping this configuration "
+"may\n"
+" result in an unbootable system."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid "Warning: unsupported partition table on the boot disk!"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"SILO (Sparc Linux Loader) can only boot the kernel off a disk with the \"sun"
+"\" partition table. In the current partitioning scheme the  kernel is going "
+"to be installed on the ${SILO_PART} partition located on a disk with the "
+"partition table of type \"${SILO_DISK}\"."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"It is strongly recommended that you go back to partitioning and correct this "
+"problem. Keeping the current configuration may result in an unbootable "
+"system."
+msgstr ""
 
 #. Type: select
 #. Choices
@@ -10224,6 +10230,58 @@ msgstr ""
 #: ../save-logs.templates:57
 msgid "Gathering information for installation report..."
 msgstr "설치 보고서를 만들 정보를 모으는 중입니다 ..."
+
+#~ msgid ""
+#~ "PALO should install the boot block on a bootable device. This is usually "
+#~ "the first hard drive, but could be in a partition if you want to use "
+#~ "another boot manager as the primary boot manager."
+#~ msgstr ""
+#~ "PALO는 부트 블럭을 부팅 가능한 장치에 설치해야 합니다. 보통 첫 번째 하드 "
+#~ "드라이브에 설치하지만, 다른 부트 매니저를 주 부트 매니저로 쓴다면 파티션"
+#~ "에 설치할 수도 있습니다."
+
+#~ msgid ""
+#~ "To be bootable from the PROM, silo and the kernel it loads must be "
+#~ "installed on a disk which uses Sun disklabels for its partition table.  "
+#~ "Your /boot directory is not located on such a disk.  If you proceed, you "
+#~ "will not be able to boot your system using SILO, and will need to boot it "
+#~ "some other way."
+#~ msgstr ""
+#~ "PROM에서 부팅하려면, 파티션 테이블에 썬 디스크레이블을 사용하는 디스크에 "
+#~ "silo와 커널을 설치해야 합니다.  /boot 디렉토리가 그러한 디스크에 들어 있"
+#~ "지 않습니다.  계속하시면, SILO를 사용해 시스템을 부팅할 수 없게 되고, 다"
+#~ "른 방법으로 부팅해야 할 것입니다."
+
+#~ msgid ""
+#~ "SILO requires /boot to be located on an ext2 or ext3 partition on a "
+#~ "bootable device.  This means that either the root partition must be an "
+#~ "ext2 file system, or you must have a separate ext2 partition mounted at /"
+#~ "boot."
+#~ msgstr ""
+#~ "SILO는 부팅 가능한 장치의 ext2 혹은 ext3 파티션에 들어 있어야 합니다.  즉 "
+#~ "루트 파티션이 ext2 파일시스템이거나 별도로 /boot에 마운트한 ext2 파티션이 "
+#~ "있어야 합니다."
+
+#~ msgid ""
+#~ "Currently, /boot is located on a partition of type ${PARTTYPE}.  If you "
+#~ "keep this setting, you will not be able to boot your Debian system using "
+#~ "SILO."
+#~ msgstr ""
+#~ "현재 /boot는 ${PARTTYPE} 타입의 파티션에 들어 있습니다.  이 설정을 유지하"
+#~ "시면, SILO를 사용해 데비안 시스템을 부팅할 수 없을 것입니다."
+
+#~ msgid ""
+#~ "You are using a 32-bit SPARC machine. On many of these, it is unlikely "
+#~ "that Debian will boot if /boot resides in a partition that extends past "
+#~ "the first 1024 cylinders of the hard disk. /boot currently resides in a "
+#~ "partition that extends to cylinder ${CYL}. You should change this by "
+#~ "reducing the size of the partition or creating a separate, smaller "
+#~ "partition just for /boot."
+#~ msgstr ""
+#~ "많은 32비트 SPARC 기계에서, 커널과 부트 블록이 하드 디스크의 1024 실린더 "
+#~ "안에 들어 있어야 한다는 PROM의 제한이 있습니다. 지금의 경우, ${BPART}에서 "
+#~ "부팅하지만 이 파티션이 1024번째 실린더를 넘어갑니다.  이 설정대로 진행하시"
+#~ "면 데비안 시스템을 부팅할 수 없게 됩니다."
 
 #~ msgid "Non-Debian CD-ROM detected"
 #~ msgstr "데비안 CD-ROM이 아닙니다"

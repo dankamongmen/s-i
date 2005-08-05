@@ -3485,11 +3485,8 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
-#. Type: string
-#. Description
 #: ../aboot-installer.templates:12 ../grub-installer.templates:35
-#: ../palo-installer.templates:3 ../yaboot-installer.templates:45
+#: ../yaboot-installer.templates:45
 msgid "Device for boot loader installation:"
 msgstr "Пристрій для встановлення системного завантажувача:"
 
@@ -5600,7 +5597,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:22 ../silo-installer.templates:51
+#: ../aboot-installer.templates:22
 msgid "Install /boot on a disk with an unsupported partition table?"
 msgstr "Встановити /boot на диск з таблицею розділів, що не підтримується?"
 
@@ -5622,7 +5619,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:32 ../silo-installer.templates:38
+#: ../aboot-installer.templates:32
 msgid "Use unsupported file system type for /boot?"
 msgstr "Використовувати непідтримувану файлову систему для /boot?"
 
@@ -5826,18 +5823,6 @@ msgstr "Не вдалося встановити системний завант
 #: ../vmelilo-installer.templates:57
 msgid "Install the vmelilo boot loader on a hard disk"
 msgstr "Встановити системний завантажувач vmelilo на жорсткий диск"
-
-#. Type: string
-#. Description
-#: ../palo-installer.templates:3
-msgid ""
-"PALO should install the boot block on a bootable device. This is usually the "
-"first hard drive, but could be in a partition if you want to use another "
-"boot manager as the primary boot manager."
-msgstr ""
-"PALO повинен встановити завантажувальний блок на завантажувальний пристрій. "
-"Звичайно ним є перший жорсткий диск, але може бути й один з розділів диску, "
-"якщо в якості первинного завантажувача використовується інший завантажувач."
 
 #. Type: text
 #. Description
@@ -6056,59 +6041,77 @@ msgstr ""
 msgid "Install the SILO boot loader on a hard disk"
 msgstr "Встановити системний завантажувач SILO на жорсткий диск"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:28
-msgid ""
-"To be bootable from the PROM, silo and the kernel it loads must be installed "
-"on a disk which uses Sun disklabels for its partition table.  Your /boot "
-"directory is not located on such a disk.  If you proceed, you will not be "
-"able to boot your system using SILO, and will need to boot it some other way."
-msgstr ""
-"Щоб мати можливість завантажуватися із PROM, silo і ядро, що він завантажує, "
-"повинні бути встановлені на диск, що використовує мітки Sun для таблиці "
-"розділів. Ваша директорія /boot не знаходиться на такому диску. Якщо ви "
-"продовжите, то не зможете завантажити вашу систему використовуючи SILO і "
-"повинні будете завантажувати її якимось іншим чином."
+#: ../silo-installer.templates:27
+#, fuzzy
+msgid "Warning: unsupported boot filesystem type!"
+msgstr "Використовувати непідтримувану файлову систему для /boot?"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
+#: ../silo-installer.templates:27
 msgid ""
-"SILO requires /boot to be located on an ext2 or ext3 partition on a bootable "
-"device.  This means that either the root partition must be an ext2 file "
-"system, or you must have a separate ext2 partition mounted at /boot."
+"In order to be successfully loaded by SILO (Sparc Linux Loader), the kernel "
+"must reside on an ext2, ext3 or ufs formatted partition. In the current "
+"partitioning scheme the kernel is going to be installed on the ${SILO_PART} "
+"partition of type ${SILO_TYPE}."
 msgstr ""
-"Для SILO потрібно, щоб директорія /boot знаходилася на розділі з файловою "
-"системою ext2 або ext3 на завантажувальному пристрої. Це означає, що або "
-"кореневий розділ повинен мати файлову систему ext2, або ви повинні мати "
-"окремий розділ ext2, змонтований на /boot."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
-msgid ""
-"Currently, /boot is located on a partition of type ${PARTTYPE}.  If you keep "
-"this setting, you will not be able to boot your Debian system using SILO."
+#: ../silo-installer.templates:39
+msgid "Warning: boot partition may cause problems with SILO!"
 msgstr ""
-"Зараз /boot знаходиться на розділі типу ${PARTTYPE}. Якщо ви залишите все як "
-"є, то не зможете завантажити вашу систему Debian за допомогою SILO."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:51
+#: ../silo-installer.templates:39
 msgid ""
-"You are using a 32-bit SPARC machine. On many of these, it is unlikely that "
-"Debian will boot if /boot resides in a partition that extends past the first "
-"1024 cylinders of the hard disk. /boot currently resides in a partition that "
-"extends to cylinder ${CYL}. You should change this by reducing the size of "
-"the partition or creating a separate, smaller partition just for /boot."
+"This machine is likely to suffer from a firmware bug, which makes it "
+"impossible for SILO (Sparc Linux Loader) to boot a kernel placed farther "
+"than 1 GB from the beginning of the disk."
 msgstr ""
-"Ви використовуєте 32-бітну систему SPARC. На багатьох із них Debian навряд "
-"чи зможе завантажитися, якщо /boot простягається далі 1024 циліндра "
-"жорсткого диску. Зараз /boot знаходиться на розділі, що простягається до "
-"циліндру ${CYL}. Ви повинні виправити це, зменшивши розмір розділу або "
-"створивши окремий, менший розділ для /boot."
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:39
+msgid ""
+"To avoid problems it is strongly recommended to install the kernel into a\n"
+" partition which fits entirely within the first GB of the disk (by creating "
+"a\n"
+" small /boot partition in the beginning of the disk, for example). In the\n"
+" current partitioning scheme it is going to be installed onto the "
+"${SILO_PART}\n"
+" partition which extends up to ${SILO_OFF} mark. Keeping this configuration "
+"may\n"
+" result in an unbootable system."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid "Warning: unsupported partition table on the boot disk!"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"SILO (Sparc Linux Loader) can only boot the kernel off a disk with the \"sun"
+"\" partition table. In the current partitioning scheme the  kernel is going "
+"to be installed on the ${SILO_PART} partition located on a disk with the "
+"partition table of type \"${SILO_DISK}\"."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"It is strongly recommended that you go back to partitioning and correct this "
+"problem. Keeping the current configuration may result in an unbootable "
+"system."
+msgstr ""
 
 #. Type: select
 #. Choices
@@ -10368,6 +10371,62 @@ msgstr "Дисковод не знайдений або немає відфор�
 #: ../save-logs.templates:57
 msgid "Gathering information for installation report..."
 msgstr "Збір інформації для звіту про встановлення..."
+
+#~ msgid ""
+#~ "PALO should install the boot block on a bootable device. This is usually "
+#~ "the first hard drive, but could be in a partition if you want to use "
+#~ "another boot manager as the primary boot manager."
+#~ msgstr ""
+#~ "PALO повинен встановити завантажувальний блок на завантажувальний "
+#~ "пристрій. Звичайно ним є перший жорсткий диск, але може бути й один з "
+#~ "розділів диску, якщо в якості первинного завантажувача використовується "
+#~ "інший завантажувач."
+
+#~ msgid ""
+#~ "To be bootable from the PROM, silo and the kernel it loads must be "
+#~ "installed on a disk which uses Sun disklabels for its partition table.  "
+#~ "Your /boot directory is not located on such a disk.  If you proceed, you "
+#~ "will not be able to boot your system using SILO, and will need to boot it "
+#~ "some other way."
+#~ msgstr ""
+#~ "Щоб мати можливість завантажуватися із PROM, silo і ядро, що він "
+#~ "завантажує, повинні бути встановлені на диск, що використовує мітки Sun "
+#~ "для таблиці розділів. Ваша директорія /boot не знаходиться на такому "
+#~ "диску. Якщо ви продовжите, то не зможете завантажити вашу систему "
+#~ "використовуючи SILO і повинні будете завантажувати її якимось іншим чином."
+
+#~ msgid ""
+#~ "SILO requires /boot to be located on an ext2 or ext3 partition on a "
+#~ "bootable device.  This means that either the root partition must be an "
+#~ "ext2 file system, or you must have a separate ext2 partition mounted at /"
+#~ "boot."
+#~ msgstr ""
+#~ "Для SILO потрібно, щоб директорія /boot знаходилася на розділі з файловою "
+#~ "системою ext2 або ext3 на завантажувальному пристрої. Це означає, що або "
+#~ "кореневий розділ повинен мати файлову систему ext2, або ви повинні мати "
+#~ "окремий розділ ext2, змонтований на /boot."
+
+#~ msgid ""
+#~ "Currently, /boot is located on a partition of type ${PARTTYPE}.  If you "
+#~ "keep this setting, you will not be able to boot your Debian system using "
+#~ "SILO."
+#~ msgstr ""
+#~ "Зараз /boot знаходиться на розділі типу ${PARTTYPE}. Якщо ви залишите все "
+#~ "як є, то не зможете завантажити вашу систему Debian за допомогою SILO."
+
+#~ msgid ""
+#~ "You are using a 32-bit SPARC machine. On many of these, it is unlikely "
+#~ "that Debian will boot if /boot resides in a partition that extends past "
+#~ "the first 1024 cylinders of the hard disk. /boot currently resides in a "
+#~ "partition that extends to cylinder ${CYL}. You should change this by "
+#~ "reducing the size of the partition or creating a separate, smaller "
+#~ "partition just for /boot."
+#~ msgstr ""
+#~ "Ви використовуєте 32-бітну систему SPARC. На багатьох із них Debian "
+#~ "навряд чи зможе завантажитися, якщо /boot простягається далі 1024 "
+#~ "циліндра жорсткого диску. Зараз /boot знаходиться на розділі, що "
+#~ "простягається до циліндру ${CYL}. Ви повинні виправити це, зменшивши "
+#~ "розмір розділу або створивши окремий, менший розділ для /boot."
 
 #~ msgid "Non-Debian CD-ROM detected"
 #~ msgstr "Знайдений не-Debian CD-ROM"

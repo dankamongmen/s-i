@@ -3472,11 +3472,8 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
-#. Type: string
-#. Description
 #: ../aboot-installer.templates:12 ../grub-installer.templates:35
-#: ../palo-installer.templates:3 ../yaboot-installer.templates:45
+#: ../yaboot-installer.templates:45
 msgid "Device for boot loader installation:"
 msgstr "Periferik u istalaasioŋ bu sëfkatu boot bi:"
 
@@ -5572,7 +5569,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:22 ../silo-installer.templates:51
+#: ../aboot-installer.templates:22
 msgid "Install /boot on a disk with an unsupported partition table?"
 msgstr ""
 "Nu istale /boot ci ab disk bu am ab taabal u partisoŋ bu nu manula doxal?"
@@ -5594,7 +5591,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:32 ../silo-installer.templates:38
+#: ../aboot-installer.templates:32
 msgid "Use unsupported file system type for /boot?"
 msgstr ""
 "Ndax nu jëfandikoo ci /boot ab fasoŋ u sistem u fiise bu nu manula doxal?"
@@ -5798,18 +5795,6 @@ msgstr "Istalaasioŋ u sëfkatu boot bii di vmelilo antuwul."
 #: ../vmelilo-installer.templates:57
 msgid "Install the vmelilo boot loader on a hard disk"
 msgstr "Istale sëfkatu boot bii di vmelilo ci ab disk budëgër"
-
-#. Type: string
-#. Description
-#: ../palo-installer.templates:3
-msgid ""
-"PALO should install the boot block on a bootable device. This is usually the "
-"first hard drive, but could be in a partition if you want to use another "
-"boot manager as the primary boot manager."
-msgstr ""
-"PALO dafa wara istale bolok bu boot ci ab periferik bu mana boot. Li ci ëppu "
-"sa disk budëgër bu jëkk lay doon, waaye man naa nekk ci ab partisoŋ bu "
-"fekkee da ngaa bëgg a jëfandikoo baneen sëfkatu boot defko mu jiitu."
 
 #. Type: text
 #. Description
@@ -6027,59 +6012,78 @@ msgstr ""
 msgid "Install the SILO boot loader on a hard disk"
 msgstr "Istale sëfkatu boot bii di SILO ci ab disk budëgër"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:28
-msgid ""
-"To be bootable from the PROM, silo and the kernel it loads must be installed "
-"on a disk which uses Sun disklabels for its partition table.  Your /boot "
-"directory is not located on such a disk.  If you proceed, you will not be "
-"able to boot your system using SILO, and will need to boot it some other way."
+#: ../silo-installer.templates:27
+#, fuzzy
+msgid "Warning: unsupported boot filesystem type!"
 msgstr ""
-"Ngir maneeskoo boote ci PROM, silo ak kernel bi muy sëf dees leen a wara "
-"istale ci ab disk buy jëfandikoo ci taabal i partisoŋ am ay tur i disk yu "
-"Sun. Sa kaggu /boot nekkul ci disk mu mel noonii.  Soo jallee, doo mana "
-"boote sa sistem ak SILO, ta da nga ko wara jéem a boote ak waneen yoon."
+"Ndax nu jëfandikoo ci /boot ab fasoŋ u sistem u fiise bu nu manula doxal?"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
+#: ../silo-installer.templates:27
 msgid ""
-"SILO requires /boot to be located on an ext2 or ext3 partition on a bootable "
-"device.  This means that either the root partition must be an ext2 file "
-"system, or you must have a separate ext2 partition mounted at /boot."
+"In order to be successfully loaded by SILO (Sparc Linux Loader), the kernel "
+"must reside on an ext2, ext3 or ufs formatted partition. In the current "
+"partitioning scheme the kernel is going to be installed on the ${SILO_PART} "
+"partition of type ${SILO_TYPE}."
 msgstr ""
-"SILO dafay soxa /boot nekk ci ap partisoŋ u ext2 walla ext3 bu ne ci ab "
-"periferik bu mana boot.  Lii li muy firi mooy benn partisoŋ u root bi dafa "
-"wara doon sistem u ext2, walla book nga baneen partisoŋ u ext2 monte ko ci /"
-"boot."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
-msgid ""
-"Currently, /boot is located on a partition of type ${PARTTYPE}.  If you keep "
-"this setting, you will not be able to boot your Debian system using SILO."
+#: ../silo-installer.templates:39
+msgid "Warning: boot partition may cause problems with SILO!"
 msgstr ""
-"Fimune nii, /boot mi ngi ci fasoŋ u partisoŋ u ${PARTTYPE}.  Soo jappee ci "
-"boobu reglaas, doo mana boote sa sistem bi ak SILO."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:51
+#: ../silo-installer.templates:39
 msgid ""
-"You are using a 32-bit SPARC machine. On many of these, it is unlikely that "
-"Debian will boot if /boot resides in a partition that extends past the first "
-"1024 cylinders of the hard disk. /boot currently resides in a partition that "
-"extends to cylinder ${CYL}. You should change this by reducing the size of "
-"the partition or creating a separate, smaller partition just for /boot."
+"This machine is likely to suffer from a firmware bug, which makes it "
+"impossible for SILO (Sparc Linux Loader) to boot a kernel placed farther "
+"than 1 GB from the beginning of the disk."
 msgstr ""
-"Yaa ngi yore masin u SPARC bu 32 bit. Ci yi bari ci yii masin, jamtaluwu ne "
-"Debian dana boot su /boot nekkee ci ab partisoŋ bu yaatu ba weesu 1024 "
-"sileendar ci jëkk ci disk budëgëf bi. /boot fimu ne nii mi ngi ci ab "
-"partisoŋ bob eggna ba ci sileendar ${CYL}. Da ngaa wara soppi loolii, daldi "
-"waññi rëyaay bu partisoŋ bi walla nga sos baneen partisoŋ, bu gën a tuuti "
-"buy def /boot rekk."
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:39
+msgid ""
+"To avoid problems it is strongly recommended to install the kernel into a\n"
+" partition which fits entirely within the first GB of the disk (by creating "
+"a\n"
+" small /boot partition in the beginning of the disk, for example). In the\n"
+" current partitioning scheme it is going to be installed onto the "
+"${SILO_PART}\n"
+" partition which extends up to ${SILO_OFF} mark. Keeping this configuration "
+"may\n"
+" result in an unbootable system."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid "Warning: unsupported partition table on the boot disk!"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"SILO (Sparc Linux Loader) can only boot the kernel off a disk with the \"sun"
+"\" partition table. In the current partitioning scheme the  kernel is going "
+"to be installed on the ${SILO_PART} partition located on a disk with the "
+"partition table of type \"${SILO_DISK}\"."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"It is strongly recommended that you go back to partitioning and correct this "
+"problem. Keeping the current configuration may result in an unbootable "
+"system."
+msgstr ""
 
 #. Type: select
 #. Choices
@@ -10340,6 +10344,61 @@ msgstr ""
 #: ../save-logs.templates:57
 msgid "Gathering information for installation report..."
 msgstr "Mi ngi dajale imformaasioŋ ngir raappoor bu istalaasioŋ bi..."
+
+#~ msgid ""
+#~ "PALO should install the boot block on a bootable device. This is usually "
+#~ "the first hard drive, but could be in a partition if you want to use "
+#~ "another boot manager as the primary boot manager."
+#~ msgstr ""
+#~ "PALO dafa wara istale bolok bu boot ci ab periferik bu mana boot. Li ci "
+#~ "ëppu sa disk budëgër bu jëkk lay doon, waaye man naa nekk ci ab partisoŋ "
+#~ "bu fekkee da ngaa bëgg a jëfandikoo baneen sëfkatu boot defko mu jiitu."
+
+#~ msgid ""
+#~ "To be bootable from the PROM, silo and the kernel it loads must be "
+#~ "installed on a disk which uses Sun disklabels for its partition table.  "
+#~ "Your /boot directory is not located on such a disk.  If you proceed, you "
+#~ "will not be able to boot your system using SILO, and will need to boot it "
+#~ "some other way."
+#~ msgstr ""
+#~ "Ngir maneeskoo boote ci PROM, silo ak kernel bi muy sëf dees leen a wara "
+#~ "istale ci ab disk buy jëfandikoo ci taabal i partisoŋ am ay tur i disk yu "
+#~ "Sun. Sa kaggu /boot nekkul ci disk mu mel noonii.  Soo jallee, doo mana "
+#~ "boote sa sistem ak SILO, ta da nga ko wara jéem a boote ak waneen yoon."
+
+#~ msgid ""
+#~ "SILO requires /boot to be located on an ext2 or ext3 partition on a "
+#~ "bootable device.  This means that either the root partition must be an "
+#~ "ext2 file system, or you must have a separate ext2 partition mounted at /"
+#~ "boot."
+#~ msgstr ""
+#~ "SILO dafay soxa /boot nekk ci ap partisoŋ u ext2 walla ext3 bu ne ci ab "
+#~ "periferik bu mana boot.  Lii li muy firi mooy benn partisoŋ u root bi "
+#~ "dafa wara doon sistem u ext2, walla book nga baneen partisoŋ u ext2 monte "
+#~ "ko ci /boot."
+
+#~ msgid ""
+#~ "Currently, /boot is located on a partition of type ${PARTTYPE}.  If you "
+#~ "keep this setting, you will not be able to boot your Debian system using "
+#~ "SILO."
+#~ msgstr ""
+#~ "Fimune nii, /boot mi ngi ci fasoŋ u partisoŋ u ${PARTTYPE}.  Soo jappee "
+#~ "ci boobu reglaas, doo mana boote sa sistem bi ak SILO."
+
+#~ msgid ""
+#~ "You are using a 32-bit SPARC machine. On many of these, it is unlikely "
+#~ "that Debian will boot if /boot resides in a partition that extends past "
+#~ "the first 1024 cylinders of the hard disk. /boot currently resides in a "
+#~ "partition that extends to cylinder ${CYL}. You should change this by "
+#~ "reducing the size of the partition or creating a separate, smaller "
+#~ "partition just for /boot."
+#~ msgstr ""
+#~ "Yaa ngi yore masin u SPARC bu 32 bit. Ci yi bari ci yii masin, jamtaluwu "
+#~ "ne Debian dana boot su /boot nekkee ci ab partisoŋ bu yaatu ba weesu 1024 "
+#~ "sileendar ci jëkk ci disk budëgëf bi. /boot fimu ne nii mi ngi ci ab "
+#~ "partisoŋ bob eggna ba ci sileendar ${CYL}. Da ngaa wara soppi loolii, "
+#~ "daldi waññi rëyaay bu partisoŋ bi walla nga sos baneen partisoŋ, bu gën a "
+#~ "tuuti buy def /boot rekk."
 
 #~ msgid "Non-Debian CD-ROM detected"
 #~ msgstr "Dajeefna ab CD-ROM bu dul bu Debian"

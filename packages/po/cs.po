@@ -3441,11 +3441,8 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
-#. Type: string
-#. Description
 #: ../aboot-installer.templates:12 ../grub-installer.templates:35
-#: ../palo-installer.templates:3 ../yaboot-installer.templates:45
+#: ../yaboot-installer.templates:45
 msgid "Device for boot loader installation:"
 msgstr "Zařízení pro instalaci zavaděče:"
 
@@ -5515,7 +5512,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:22 ../silo-installer.templates:51
+#: ../aboot-installer.templates:22
 msgid "Install /boot on a disk with an unsupported partition table?"
 msgstr "Instalovat /boot na disk s nepodporovanou tabulkou oblastí?"
 
@@ -5536,7 +5533,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:32 ../silo-installer.templates:38
+#: ../aboot-installer.templates:32
 msgid "Use unsupported file system type for /boot?"
 msgstr "Použít pro /boot nepodporovaný souborový systém?"
 
@@ -5736,18 +5733,6 @@ msgstr "Instalace zavaděče vmelilo selhala."
 #: ../vmelilo-installer.templates:57
 msgid "Install the vmelilo boot loader on a hard disk"
 msgstr "Instalovat zavaděč vmelilo na pevný disk"
-
-#. Type: string
-#. Description
-#: ../palo-installer.templates:3
-msgid ""
-"PALO should install the boot block on a bootable device. This is usually the "
-"first hard drive, but could be in a partition if you want to use another "
-"boot manager as the primary boot manager."
-msgstr ""
-"PALO by mělo nainstalovat zaváděcí blok na zaveditelné zařízení. Obvykle to "
-"bývá první pevný disk, ale pokud chcete použít jiný zavaděč jako primární, "
-"můžete použít i diskovou oblast."
 
 #. Type: text
 #. Description
@@ -5961,58 +5946,77 @@ msgstr ""
 msgid "Install the SILO boot loader on a hard disk"
 msgstr "Instalovat zavaděč SILO na pevný disk"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:28
-msgid ""
-"To be bootable from the PROM, silo and the kernel it loads must be installed "
-"on a disk which uses Sun disklabels for its partition table.  Your /boot "
-"directory is not located on such a disk.  If you proceed, you will not be "
-"able to boot your system using SILO, and will need to boot it some other way."
-msgstr ""
-"Aby se mohlo SILO zavádět z PROM, musí ležet společně s jádrem na disku, "
-"který používá tabulku oblastí typu Sun disklabels. Váš adresář /boot na "
-"takovém disku neleží. Budete-li pokračovat, nebudete moci zavádět systém "
-"pomocí SILA a budete muset najít jiný způsob, jak se do něj dostat."
+#: ../silo-installer.templates:27
+#, fuzzy
+msgid "Warning: unsupported boot filesystem type!"
+msgstr "Použít pro /boot nepodporovaný souborový systém?"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
+#: ../silo-installer.templates:27
 msgid ""
-"SILO requires /boot to be located on an ext2 or ext3 partition on a bootable "
-"device.  This means that either the root partition must be an ext2 file "
-"system, or you must have a separate ext2 partition mounted at /boot."
+"In order to be successfully loaded by SILO (Sparc Linux Loader), the kernel "
+"must reside on an ext2, ext3 or ufs formatted partition. In the current "
+"partitioning scheme the kernel is going to be installed on the ${SILO_PART} "
+"partition of type ${SILO_TYPE}."
 msgstr ""
-"SILO vyžaduje, aby byl adresář /boot umístěn na zaveditelném zařízení a aby "
-"byl naformátován souborovým systémem ext2 nebo ext3. To znamená, že buď musí "
-"kořenová oblast obsahovat souborový systém ext2, nebo musíte pro /boot "
-"vytvořit samostatnou ext2 oblast."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
-msgid ""
-"Currently, /boot is located on a partition of type ${PARTTYPE}.  If you keep "
-"this setting, you will not be able to boot your Debian system using SILO."
+#: ../silo-installer.templates:39
+msgid "Warning: boot partition may cause problems with SILO!"
 msgstr ""
-"Momentálně je /boot umístěn na oblasti typu ${PARTTYPE}. Ponecháte-li "
-"stávající nastavení, nebudete moci zavádět Debian pomocí SILA."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:51
+#: ../silo-installer.templates:39
 msgid ""
-"You are using a 32-bit SPARC machine. On many of these, it is unlikely that "
-"Debian will boot if /boot resides in a partition that extends past the first "
-"1024 cylinders of the hard disk. /boot currently resides in a partition that "
-"extends to cylinder ${CYL}. You should change this by reducing the size of "
-"the partition or creating a separate, smaller partition just for /boot."
+"This machine is likely to suffer from a firmware bug, which makes it "
+"impossible for SILO (Sparc Linux Loader) to boot a kernel placed farther "
+"than 1 GB from the beginning of the disk."
 msgstr ""
-"Na mnoha 32 bitových počítačích SPARC má PROM omezení, že jádro a zaváděcí "
-"blok musí být umístěny na oblasti, která celá leží v prvních 1024 cylindrech "
-"pevného disku. V tomto případě byste zaváděli z ${CYL}, která přesahuje za "
-"1024. cylindr, a tudíž byste s tímto nastavením nemohli zavést instalovaný "
-"Debian."
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:39
+msgid ""
+"To avoid problems it is strongly recommended to install the kernel into a\n"
+" partition which fits entirely within the first GB of the disk (by creating "
+"a\n"
+" small /boot partition in the beginning of the disk, for example). In the\n"
+" current partitioning scheme it is going to be installed onto the "
+"${SILO_PART}\n"
+" partition which extends up to ${SILO_OFF} mark. Keeping this configuration "
+"may\n"
+" result in an unbootable system."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid "Warning: unsupported partition table on the boot disk!"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"SILO (Sparc Linux Loader) can only boot the kernel off a disk with the \"sun"
+"\" partition table. In the current partitioning scheme the  kernel is going "
+"to be installed on the ${SILO_PART} partition located on a disk with the "
+"partition table of type \"${SILO_DISK}\"."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"It is strongly recommended that you go back to partitioning and correct this "
+"problem. Keeping the current configuration may result in an unbootable "
+"system."
+msgstr ""
 
 #. Type: select
 #. Choices
@@ -10252,6 +10256,60 @@ msgstr ""
 #: ../save-logs.templates:57
 msgid "Gathering information for installation report..."
 msgstr "Sbírají se informace pro záznam o instalaci ..."
+
+#~ msgid ""
+#~ "PALO should install the boot block on a bootable device. This is usually "
+#~ "the first hard drive, but could be in a partition if you want to use "
+#~ "another boot manager as the primary boot manager."
+#~ msgstr ""
+#~ "PALO by mělo nainstalovat zaváděcí blok na zaveditelné zařízení. Obvykle "
+#~ "to bývá první pevný disk, ale pokud chcete použít jiný zavaděč jako "
+#~ "primární, můžete použít i diskovou oblast."
+
+#~ msgid ""
+#~ "To be bootable from the PROM, silo and the kernel it loads must be "
+#~ "installed on a disk which uses Sun disklabels for its partition table.  "
+#~ "Your /boot directory is not located on such a disk.  If you proceed, you "
+#~ "will not be able to boot your system using SILO, and will need to boot it "
+#~ "some other way."
+#~ msgstr ""
+#~ "Aby se mohlo SILO zavádět z PROM, musí ležet společně s jádrem na disku, "
+#~ "který používá tabulku oblastí typu Sun disklabels. Váš adresář /boot na "
+#~ "takovém disku neleží. Budete-li pokračovat, nebudete moci zavádět systém "
+#~ "pomocí SILA a budete muset najít jiný způsob, jak se do něj dostat."
+
+#~ msgid ""
+#~ "SILO requires /boot to be located on an ext2 or ext3 partition on a "
+#~ "bootable device.  This means that either the root partition must be an "
+#~ "ext2 file system, or you must have a separate ext2 partition mounted at /"
+#~ "boot."
+#~ msgstr ""
+#~ "SILO vyžaduje, aby byl adresář /boot umístěn na zaveditelném zařízení a "
+#~ "aby byl naformátován souborovým systémem ext2 nebo ext3. To znamená, že "
+#~ "buď musí kořenová oblast obsahovat souborový systém ext2, nebo musíte "
+#~ "pro /boot vytvořit samostatnou ext2 oblast."
+
+#~ msgid ""
+#~ "Currently, /boot is located on a partition of type ${PARTTYPE}.  If you "
+#~ "keep this setting, you will not be able to boot your Debian system using "
+#~ "SILO."
+#~ msgstr ""
+#~ "Momentálně je /boot umístěn na oblasti typu ${PARTTYPE}. Ponecháte-li "
+#~ "stávající nastavení, nebudete moci zavádět Debian pomocí SILA."
+
+#~ msgid ""
+#~ "You are using a 32-bit SPARC machine. On many of these, it is unlikely "
+#~ "that Debian will boot if /boot resides in a partition that extends past "
+#~ "the first 1024 cylinders of the hard disk. /boot currently resides in a "
+#~ "partition that extends to cylinder ${CYL}. You should change this by "
+#~ "reducing the size of the partition or creating a separate, smaller "
+#~ "partition just for /boot."
+#~ msgstr ""
+#~ "Na mnoha 32 bitových počítačích SPARC má PROM omezení, že jádro a "
+#~ "zaváděcí blok musí být umístěny na oblasti, která celá leží v prvních "
+#~ "1024 cylindrech pevného disku. V tomto případě byste zaváděli z ${CYL}, "
+#~ "která přesahuje za 1024. cylindr, a tudíž byste s tímto nastavením "
+#~ "nemohli zavést instalovaný Debian."
 
 #~ msgid "Non-Debian CD-ROM detected"
 #~ msgstr "Rozpoznáno nesprávné CD"

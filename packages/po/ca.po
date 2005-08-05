@@ -3509,11 +3509,8 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
-#. Type: string
-#. Description
 #: ../aboot-installer.templates:12 ../grub-installer.templates:35
-#: ../palo-installer.templates:3 ../yaboot-installer.templates:45
+#: ../yaboot-installer.templates:45
 msgid "Device for boot loader installation:"
 msgstr "Dispositiu on instal·lar el carregador:"
 
@@ -5628,7 +5625,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:22 ../silo-installer.templates:51
+#: ../aboot-installer.templates:22
 msgid "Install /boot on a disk with an unsupported partition table?"
 msgstr ""
 "Voleu instal·lar /boot en un disc amb una taula de particions no suportada?"
@@ -5651,7 +5648,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:32 ../silo-installer.templates:38
+#: ../aboot-installer.templates:32
 msgid "Use unsupported file system type for /boot?"
 msgstr "Voleu utilitzar un sistema de fitxers no suportat per a /boot?"
 
@@ -5855,19 +5852,6 @@ msgstr "Ha fallat la instal·lació del carregador vmelilo."
 #: ../vmelilo-installer.templates:57
 msgid "Install the vmelilo boot loader on a hard disk"
 msgstr "Instal·la el carregador vmelilo en un disc dur"
-
-#. Type: string
-#. Description
-#: ../palo-installer.templates:3
-msgid ""
-"PALO should install the boot block on a bootable device. This is usually the "
-"first hard drive, but could be in a partition if you want to use another "
-"boot manager as the primary boot manager."
-msgstr ""
-"PALO necessita instal·lar el bloc d'arrencada en un dispositiu arrencable. "
-"Aquest és normalment el primer disc dur, però pot estar en una partició si "
-"voleu utilitzar un altre gestor d'arrencada com el gestor d'arrencada "
-"primari."
 
 #. Type: text
 #. Description
@@ -6087,60 +6071,77 @@ msgstr ""
 msgid "Install the SILO boot loader on a hard disk"
 msgstr "Instal·la el carregador SILO en un disc dur"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:28
-msgid ""
-"To be bootable from the PROM, silo and the kernel it loads must be installed "
-"on a disk which uses Sun disklabels for its partition table.  Your /boot "
-"directory is not located on such a disk.  If you proceed, you will not be "
-"able to boot your system using SILO, and will need to boot it some other way."
-msgstr ""
-"Per a poder arrencar des de la PROM, silo i el nucli que carrega han d'estar "
-"instal·lats en un disc que utilitze etiquetes de disc Sun per a la seua "
-"taula de particions. El vostre directori /boot no està ubicat en un disc "
-"semblant. Si continueu, no podreu arrencar el vostre sistema utilitzant "
-"SILO, i haureu d'arrencar d'alguna altra manera."
+#: ../silo-installer.templates:27
+#, fuzzy
+msgid "Warning: unsupported boot filesystem type!"
+msgstr "Voleu utilitzar un sistema de fitxers no suportat per a /boot?"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
+#: ../silo-installer.templates:27
 msgid ""
-"SILO requires /boot to be located on an ext2 or ext3 partition on a bootable "
-"device.  This means that either the root partition must be an ext2 file "
-"system, or you must have a separate ext2 partition mounted at /boot."
+"In order to be successfully loaded by SILO (Sparc Linux Loader), the kernel "
+"must reside on an ext2, ext3 or ufs formatted partition. In the current "
+"partitioning scheme the kernel is going to be installed on the ${SILO_PART} "
+"partition of type ${SILO_TYPE}."
 msgstr ""
-"SILO requereix que /boot estiga en una partició ext2 o ext3 en un dispositiu "
-"arrencable. Això vol dir que bé la partició arrel ha de ser un sistema de "
-"fitxers ext2, o que heu de tenir una partició ext2 separada muntada en /boot."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
-msgid ""
-"Currently, /boot is located on a partition of type ${PARTTYPE}.  If you keep "
-"this setting, you will not be able to boot your Debian system using SILO."
+#: ../silo-installer.templates:39
+msgid "Warning: boot partition may cause problems with SILO!"
 msgstr ""
-"Ara mateix, /boot està ubicada en una partició de tipus ${PARTTYPE}. Si "
-"manteniu aquesta configuració, no podreu arrencar el vostre sistema Debian "
-"utilitzant SILO."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:51
+#: ../silo-installer.templates:39
 msgid ""
-"You are using a 32-bit SPARC machine. On many of these, it is unlikely that "
-"Debian will boot if /boot resides in a partition that extends past the first "
-"1024 cylinders of the hard disk. /boot currently resides in a partition that "
-"extends to cylinder ${CYL}. You should change this by reducing the size of "
-"the partition or creating a separate, smaller partition just for /boot."
+"This machine is likely to suffer from a firmware bug, which makes it "
+"impossible for SILO (Sparc Linux Loader) to boot a kernel placed farther "
+"than 1 GB from the beginning of the disk."
 msgstr ""
-"Esteu utilitzant un ordinador Sparc de 32 bits. En molts d'aquests, és "
-"improbable que Debian puga arrencar si /boot està en una partició que s'exté "
-"més enllà dels primers 1024 cilindres del disc dur. Ara mateix, /boot està "
-"en una partició que s'exté fins al cilindre ${CYL}. Hauríeu de canviar això "
-"reduint la mida de la partició o creant una partició separada més petita "
-"només per a /boot."
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:39
+msgid ""
+"To avoid problems it is strongly recommended to install the kernel into a\n"
+" partition which fits entirely within the first GB of the disk (by creating "
+"a\n"
+" small /boot partition in the beginning of the disk, for example). In the\n"
+" current partitioning scheme it is going to be installed onto the "
+"${SILO_PART}\n"
+" partition which extends up to ${SILO_OFF} mark. Keeping this configuration "
+"may\n"
+" result in an unbootable system."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid "Warning: unsupported partition table on the boot disk!"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"SILO (Sparc Linux Loader) can only boot the kernel off a disk with the \"sun"
+"\" partition table. In the current partitioning scheme the  kernel is going "
+"to be installed on the ${SILO_PART} partition located on a disk with the "
+"partition table of type \"${SILO_DISK}\"."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"It is strongly recommended that you go back to partitioning and correct this "
+"problem. Keeping the current configuration may result in an unbootable "
+"system."
+msgstr ""
 
 #. Type: select
 #. Choices
@@ -10420,6 +10421,64 @@ msgstr ""
 #: ../save-logs.templates:57
 msgid "Gathering information for installation report..."
 msgstr "S'està recollint la informació per a l'informe de la instal·lació..."
+
+#~ msgid ""
+#~ "PALO should install the boot block on a bootable device. This is usually "
+#~ "the first hard drive, but could be in a partition if you want to use "
+#~ "another boot manager as the primary boot manager."
+#~ msgstr ""
+#~ "PALO necessita instal·lar el bloc d'arrencada en un dispositiu "
+#~ "arrencable. Aquest és normalment el primer disc dur, però pot estar en "
+#~ "una partició si voleu utilitzar un altre gestor d'arrencada com el gestor "
+#~ "d'arrencada primari."
+
+#~ msgid ""
+#~ "To be bootable from the PROM, silo and the kernel it loads must be "
+#~ "installed on a disk which uses Sun disklabels for its partition table.  "
+#~ "Your /boot directory is not located on such a disk.  If you proceed, you "
+#~ "will not be able to boot your system using SILO, and will need to boot it "
+#~ "some other way."
+#~ msgstr ""
+#~ "Per a poder arrencar des de la PROM, silo i el nucli que carrega han "
+#~ "d'estar instal·lats en un disc que utilitze etiquetes de disc Sun per a "
+#~ "la seua taula de particions. El vostre directori /boot no està ubicat en "
+#~ "un disc semblant. Si continueu, no podreu arrencar el vostre sistema "
+#~ "utilitzant SILO, i haureu d'arrencar d'alguna altra manera."
+
+#~ msgid ""
+#~ "SILO requires /boot to be located on an ext2 or ext3 partition on a "
+#~ "bootable device.  This means that either the root partition must be an "
+#~ "ext2 file system, or you must have a separate ext2 partition mounted at /"
+#~ "boot."
+#~ msgstr ""
+#~ "SILO requereix que /boot estiga en una partició ext2 o ext3 en un "
+#~ "dispositiu arrencable. Això vol dir que bé la partició arrel ha de ser un "
+#~ "sistema de fitxers ext2, o que heu de tenir una partició ext2 separada "
+#~ "muntada en /boot."
+
+#~ msgid ""
+#~ "Currently, /boot is located on a partition of type ${PARTTYPE}.  If you "
+#~ "keep this setting, you will not be able to boot your Debian system using "
+#~ "SILO."
+#~ msgstr ""
+#~ "Ara mateix, /boot està ubicada en una partició de tipus ${PARTTYPE}. Si "
+#~ "manteniu aquesta configuració, no podreu arrencar el vostre sistema "
+#~ "Debian utilitzant SILO."
+
+#~ msgid ""
+#~ "You are using a 32-bit SPARC machine. On many of these, it is unlikely "
+#~ "that Debian will boot if /boot resides in a partition that extends past "
+#~ "the first 1024 cylinders of the hard disk. /boot currently resides in a "
+#~ "partition that extends to cylinder ${CYL}. You should change this by "
+#~ "reducing the size of the partition or creating a separate, smaller "
+#~ "partition just for /boot."
+#~ msgstr ""
+#~ "Esteu utilitzant un ordinador Sparc de 32 bits. En molts d'aquests, és "
+#~ "improbable que Debian puga arrencar si /boot està en una partició que "
+#~ "s'exté més enllà dels primers 1024 cilindres del disc dur. Ara mateix, /"
+#~ "boot està en una partició que s'exté fins al cilindre ${CYL}. Hauríeu de "
+#~ "canviar això reduint la mida de la partició o creant una partició "
+#~ "separada més petita només per a /boot."
 
 #~ msgid "Non-Debian CD-ROM detected"
 #~ msgstr "S'ha detectat un CD-ROM que no és de Debian"

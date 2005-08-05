@@ -3514,11 +3514,8 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
-#. Type: string
-#. Description
 #: ../aboot-installer.templates:12 ../grub-installer.templates:35
-#: ../palo-installer.templates:3 ../yaboot-installer.templates:45
+#: ../yaboot-installer.templates:45
 msgid "Device for boot loader installation:"
 msgstr "Apparaat voor opstartlader-installatie:"
 
@@ -5653,7 +5650,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:22 ../silo-installer.templates:51
+#: ../aboot-installer.templates:22
 msgid "Install /boot on a disk with an unsupported partition table?"
 msgstr ""
 "'/boot' installeren op een schijf met een niet-ondersteunde partitietabel?"
@@ -5674,7 +5671,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../aboot-installer.templates:32 ../silo-installer.templates:38
+#: ../aboot-installer.templates:32
 msgid "Use unsupported file system type for /boot?"
 msgstr "Niet-ondersteund type bestandssysteem gebruiken voor '/boot'?"
 
@@ -5880,19 +5877,6 @@ msgstr "De installatie van de vmelilo-opstartlader is mislukt"
 #: ../vmelilo-installer.templates:57
 msgid "Install the vmelilo boot loader on a hard disk"
 msgstr "vmelilo-opstartlader op een harde schijf installeren"
-
-#. Type: string
-#. Description
-#: ../palo-installer.templates:3
-msgid ""
-"PALO should install the boot block on a bootable device. This is usually the "
-"first hard drive, but could be in a partition if you want to use another "
-"boot manager as the primary boot manager."
-msgstr ""
-"PALO dient het opstartblok op een opstartbaar apparaat te installeren. "
-"Gewoonlijk is dit de eerst harde schijf, maar het kan ook een partitie zijn "
-"indien u een andere opstartbeheerder wil gebruiken als de "
-"hoofdopstartbeheerder"
 
 #. Type: text
 #. Description
@@ -6111,62 +6095,77 @@ msgstr ""
 msgid "Install the SILO boot loader on a hard disk"
 msgstr "SILO-opstartlader op een harde schijf installeren"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:28
-msgid ""
-"To be bootable from the PROM, silo and the kernel it loads must be installed "
-"on a disk which uses Sun disklabels for its partition table.  Your /boot "
-"directory is not located on such a disk.  If you proceed, you will not be "
-"able to boot your system using SILO, and will need to boot it some other way."
-msgstr ""
-"Om opstartbaar te zijn vanuit de PROM dienen silo en de door silo te laden "
-"kernel geïnstalleerd te zijn op een schijf die gebruikt maakt van Sun-"
-"schijflabels voor de partitietabel. Uw '/boot'-map bevindt zich niet op zo'n "
-"schijf. Als u toch doorgaat zal het onmogelijk zijn om uw systeem op te "
-"starten via SILO, en zult u dus op een andere manier moeten opstarten."
+#: ../silo-installer.templates:27
+#, fuzzy
+msgid "Warning: unsupported boot filesystem type!"
+msgstr "Niet-ondersteund type bestandssysteem gebruiken voor '/boot'?"
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
+#: ../silo-installer.templates:27
 msgid ""
-"SILO requires /boot to be located on an ext2 or ext3 partition on a bootable "
-"device.  This means that either the root partition must be an ext2 file "
-"system, or you must have a separate ext2 partition mounted at /boot."
+"In order to be successfully loaded by SILO (Sparc Linux Loader), the kernel "
+"must reside on an ext2, ext3 or ufs formatted partition. In the current "
+"partitioning scheme the kernel is going to be installed on the ${SILO_PART} "
+"partition of type ${SILO_TYPE}."
 msgstr ""
-"SILO vereist dat '/boot' zich op een ext2- of ext3-partitie van een "
-"opstartbaar apparaat bevindt. Dit betekend dat de basispartitie van dit type "
-"dient te zijn, of dat u een partitie van zo'n type aangekoppeld heeft op '/"
-"boot'."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:38
-msgid ""
-"Currently, /boot is located on a partition of type ${PARTTYPE}.  If you keep "
-"this setting, you will not be able to boot your Debian system using SILO."
+#: ../silo-installer.templates:39
+msgid "Warning: boot partition may cause problems with SILO!"
 msgstr ""
-"'/boot' bevindt zich momenteel op een partitie met type ${PARTTYPE}. Als u "
-"deze instelling bewaard zal het onmogelijk zijn om uw nieuwe Debian-systeem "
-"op te starten via SILO."
 
-#. Type: boolean
+#. Type: note
 #. Description
-#: ../silo-installer.templates:51
+#: ../silo-installer.templates:39
 msgid ""
-"You are using a 32-bit SPARC machine. On many of these, it is unlikely that "
-"Debian will boot if /boot resides in a partition that extends past the first "
-"1024 cylinders of the hard disk. /boot currently resides in a partition that "
-"extends to cylinder ${CYL}. You should change this by reducing the size of "
-"the partition or creating a separate, smaller partition just for /boot."
+"This machine is likely to suffer from a firmware bug, which makes it "
+"impossible for SILO (Sparc Linux Loader) to boot a kernel placed farther "
+"than 1 GB from the beginning of the disk."
 msgstr ""
-"U maakt gebruik van een 32-bit SPARC-machine. Op veel van deze machines is "
-"het onwaarschijnlijk dat Debian zal kunnen opstarten wanneer de partitie met "
-"'/boot' zich niet binnen de eerste 1024 cilinders van de harde schijf "
-"bevindt. '/boot' bevindt zich momenteel in een partitie die tot de cilinder "
-"${CYL} loopt. U kunt veranderen door de grootte van deze partitie aan te "
-"passen, of door een aparte, kleine partitie aan te maken speciaal voor '/"
-"boot'."
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:39
+msgid ""
+"To avoid problems it is strongly recommended to install the kernel into a\n"
+" partition which fits entirely within the first GB of the disk (by creating "
+"a\n"
+" small /boot partition in the beginning of the disk, for example). In the\n"
+" current partitioning scheme it is going to be installed onto the "
+"${SILO_PART}\n"
+" partition which extends up to ${SILO_OFF} mark. Keeping this configuration "
+"may\n"
+" result in an unbootable system."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid "Warning: unsupported partition table on the boot disk!"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"SILO (Sparc Linux Loader) can only boot the kernel off a disk with the \"sun"
+"\" partition table. In the current partitioning scheme the  kernel is going "
+"to be installed on the ${SILO_PART} partition located on a disk with the "
+"partition table of type \"${SILO_DISK}\"."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../silo-installer.templates:53
+msgid ""
+"It is strongly recommended that you go back to partitioning and correct this "
+"problem. Keeping the current configuration may result in an unbootable "
+"system."
+msgstr ""
 
 #. Type: select
 #. Choices
@@ -10506,6 +10505,66 @@ msgstr ""
 #: ../save-logs.templates:57
 msgid "Gathering information for installation report..."
 msgstr "Informatie voor installatierapport wordt verzameld ..."
+
+#~ msgid ""
+#~ "PALO should install the boot block on a bootable device. This is usually "
+#~ "the first hard drive, but could be in a partition if you want to use "
+#~ "another boot manager as the primary boot manager."
+#~ msgstr ""
+#~ "PALO dient het opstartblok op een opstartbaar apparaat te installeren. "
+#~ "Gewoonlijk is dit de eerst harde schijf, maar het kan ook een partitie "
+#~ "zijn indien u een andere opstartbeheerder wil gebruiken als de "
+#~ "hoofdopstartbeheerder"
+
+#~ msgid ""
+#~ "To be bootable from the PROM, silo and the kernel it loads must be "
+#~ "installed on a disk which uses Sun disklabels for its partition table.  "
+#~ "Your /boot directory is not located on such a disk.  If you proceed, you "
+#~ "will not be able to boot your system using SILO, and will need to boot it "
+#~ "some other way."
+#~ msgstr ""
+#~ "Om opstartbaar te zijn vanuit de PROM dienen silo en de door silo te "
+#~ "laden kernel geïnstalleerd te zijn op een schijf die gebruikt maakt van "
+#~ "Sun-schijflabels voor de partitietabel. Uw '/boot'-map bevindt zich niet "
+#~ "op zo'n schijf. Als u toch doorgaat zal het onmogelijk zijn om uw systeem "
+#~ "op te starten via SILO, en zult u dus op een andere manier moeten "
+#~ "opstarten."
+
+#~ msgid ""
+#~ "SILO requires /boot to be located on an ext2 or ext3 partition on a "
+#~ "bootable device.  This means that either the root partition must be an "
+#~ "ext2 file system, or you must have a separate ext2 partition mounted at /"
+#~ "boot."
+#~ msgstr ""
+#~ "SILO vereist dat '/boot' zich op een ext2- of ext3-partitie van een "
+#~ "opstartbaar apparaat bevindt. Dit betekend dat de basispartitie van dit "
+#~ "type dient te zijn, of dat u een partitie van zo'n type aangekoppeld "
+#~ "heeft op '/boot'."
+
+#~ msgid ""
+#~ "Currently, /boot is located on a partition of type ${PARTTYPE}.  If you "
+#~ "keep this setting, you will not be able to boot your Debian system using "
+#~ "SILO."
+#~ msgstr ""
+#~ "'/boot' bevindt zich momenteel op een partitie met type ${PARTTYPE}. Als "
+#~ "u deze instelling bewaard zal het onmogelijk zijn om uw nieuwe Debian-"
+#~ "systeem op te starten via SILO."
+
+#~ msgid ""
+#~ "You are using a 32-bit SPARC machine. On many of these, it is unlikely "
+#~ "that Debian will boot if /boot resides in a partition that extends past "
+#~ "the first 1024 cylinders of the hard disk. /boot currently resides in a "
+#~ "partition that extends to cylinder ${CYL}. You should change this by "
+#~ "reducing the size of the partition or creating a separate, smaller "
+#~ "partition just for /boot."
+#~ msgstr ""
+#~ "U maakt gebruik van een 32-bit SPARC-machine. Op veel van deze machines "
+#~ "is het onwaarschijnlijk dat Debian zal kunnen opstarten wanneer de "
+#~ "partitie met '/boot' zich niet binnen de eerste 1024 cilinders van de "
+#~ "harde schijf bevindt. '/boot' bevindt zich momenteel in een partitie die "
+#~ "tot de cilinder ${CYL} loopt. U kunt veranderen door de grootte van deze "
+#~ "partitie aan te passen, of door een aparte, kleine partitie aan te maken "
+#~ "speciaal voor '/boot'."
 
 #~ msgid "Non-Debian CD-ROM detected"
 #~ msgstr "Er is een niet-Debian-CD aangetroffen"
