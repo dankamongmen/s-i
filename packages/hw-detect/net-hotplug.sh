@@ -4,7 +4,7 @@
 # netcfg.
 
 log () {
-	logger -t net/ddetect.hotplug "$@"
+	logger -t net/hw-detect.hotplug "$@"
 }
 
 if [ -z "$INTERFACE" ]; then

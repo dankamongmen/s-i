@@ -44,7 +44,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL) hotplug-pcmcia.sh $(bindir)/hotplug-pcmcia
 	$(INSTALL) sysfs-update-devnames.sh $(bindir)/sysfs-update-devnames
 	$(INSTALL) -d $(hpdir)/net
-	$(INSTALL) net-hotplug.sh $(hpdir)/net/ddetect.hotplug
+	$(INSTALL) net-hotplug.sh $(hpdir)/net/hw-detect.hotplug
 	$(INSTALL) -d $(pbcdir)
 	$(INSTALL) hw-detect.prebaseconfig $(pbcdir)/30hw-detect
 ifeq ($(DEB_HOST_ARCH),powerpc)
