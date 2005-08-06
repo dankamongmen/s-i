@@ -23,8 +23,8 @@
 sub setup()
 {
 	$needhelp = 1;
-	if ($msgid) {$msgmark="msgid"; $needhelp = 0;}
-	if ($msgstr) {$msgmark="msgstr"; $needhelp = 0;}
+	if ($msgid) {$msgmark="msgid"; $marksup='_plural'; $needhelp = 0;}
+	if ($msgstr) {$msgmark="msgstr"; $marksup='\[\d+\]'; $needhelp = 0;}
 	if ($noignore)
 	{
 		if ($msgmark) {$firsttime = 0;}
@@ -91,9 +91,9 @@ while (defined($line = <STDIN>))
 	# process $line here
 	unless ( $line =~ /^\s*#.*/ )
 	{
-		if ( $line =~ /^$msgmark .*/)
+		if ( $line =~ /^$msgmark($marksup)? .*/)
 		{
-			$line =~ s/^$msgmark (.*)/\1/;
+			$line =~ s/^$msgmark($marksup)? (.*)/\2/;
 			unless ($line =~ /^\"\"/) { print "- $line";}
 			#do not parse the header, if requested not to.
 			if ($firsttime == 0) {$ismsg = 1;}
