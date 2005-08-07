@@ -311,6 +311,14 @@ static int validate_mirror(void) {
 		char *command;
 		FILE *f = NULL;
 		char *hostname, *directory;
+		const char *preferred_dist;
+
+		/* Allow the hardcoded default to be overridden by the
+		 * environment.
+		 */
+		preferred_dist = getenv("PREFERRED_DISTRIBUTION");
+		if (preferred_dist == NULL || *preferred_dist == '\0')
+			preferred_dist = PREFERRED_DISTRIBUTION;
 
 		debconf_progress_start(debconf, 0, 1, DEBCONF_BASE "checking_title");
 		debconf_progress_info(debconf, DEBCONF_BASE "checking_download");
@@ -323,9 +331,8 @@ static int validate_mirror(void) {
 		if (proxy)
 			setenv(proxy_var, proxy, 1);
 		
-		asprintf(&command, "wget -q %s://%s%s/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-		         protocol, hostname, directory,
-		         "dists/" PREFERRED_DISTRIBUTION);
+		asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+		         protocol, hostname, directory, preferred_dist);
 		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
 		
 		free(hostname);
