@@ -26,8 +26,6 @@ usage() {
 }
 
 initialise() {
-GATHER_MSGSTR_SCRIPT=msgstr_extract.awk
-GATHER_MSGID_SCRIPT=msgid_extract.awk
 CHECK_VAR=check_var.pl
 
 ALL_STRINGS=${DEST_DIR}/${LANG}_all.txt
@@ -88,19 +86,19 @@ for LANG_FILE in `cat ${PO_FILE_LIST}`; do
 	    if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 		${CHECK_VAR} -s ${LANG_FILE} >> ${SUSPECT_VARS}
 	    fi
-	    ${GATHER_MSGSTR_SCRIPT} ${LANG_FILE} >> ${ALL_STRINGS}
+	    extract_msg.pl -msgstr ${LANG_FILE} >> ${ALL_STRINGS}
 	else
 	    if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 		${CHECK_VAR} -s ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${SUSPECT_VARS}
 	    fi
-	    ${GATHER_MSGSTR_SCRIPT} ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${ALL_STRINGS}
+	    extract_msg.pl -msgstr ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${ALL_STRINGS}
 	fi
 
     else			# now deal with ".pot" files
 	if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 	    ${CHECK_VAR} -s ${LANG_FILE} >> ${SUSPECT_VARS}
 	fi
-	${GATHER_MSGID_SCRIPT} ${LANG_FILE} >> ${ALL_STRINGS}
+	extract_msg.pl -msgid ${LANG_FILE} >> ${ALL_STRINGS}
     fi
 done
 
