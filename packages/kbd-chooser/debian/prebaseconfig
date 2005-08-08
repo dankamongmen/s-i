@@ -34,20 +34,3 @@ if [ "$RET" = "false" ] ; then
 	chroot /target install-keymap $KEYMAP
 	[ -n "$kbd_mode_temp" ] && kbd-mode --unicode
 fi
-
-
-# Pass kbd information needed by old versions of base-config into
-# /target/root/dboostrap-settings. Here only for skolelinux.
-if [ ! -d /target/root ] ; then
-	if mkdir /target/root ; then
-		:
-	else
-		echo "error: unable to create /target/root"
-	fi
-fi
-# Map no-latin1 to i386/qwerty/no-latin1
-KEYBD=`find /usr/share/keymaps/ -name "$KEYMAP.kmap*" | sed -e 's%/usr/share/keymaps/%%' -e 's/.kmap.gz$//' -e 's/.kmap$//' `
-(
-	echo "# Inserted by kbd-chooser."
-	echo "KEYBD=\"$KEYBD\""
-) >> /target/root/dbootstrap_settings
