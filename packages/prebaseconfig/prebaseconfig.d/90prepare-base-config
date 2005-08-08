@@ -7,18 +7,6 @@ log() {
     logger -t prebaseconfig "$@"
 }
 
-config_dbootstrap () {
-    # Only here for woody installs (ie, skolelinux)
-    . /usr/share/debconf/confmodule
-    if db_get mirror/suite && [ "$RET" ] ; then
-        SUITE="$RET"
-    fi
-    (
-        echo "# inserted by prebaseconfig"
-        echo "SUITE=\"$SUITE\""
-    ) >> /target/root/dbootstrap_settings
-}
-
 test_ssh_install () {
     if [ "$TERM_TYPE" != network ] ; then
         return 1
@@ -45,6 +33,12 @@ config_inittab () {
     console=$(mapdevfs "$rawconsole")
     rawconsole=${rawconsole#/dev/}
     console=${console#/dev/}
+
+    BOOT_BASECONFIG="1"
+    if test_ssh_install ; then
+        log "Network installation: not configuring /etc/inittab to run base-config after reboot"
+        BOOT_BASECONFIG=""
+    fi
 
     case "$console" in
     ttyS*)
@@ -99,16 +93,6 @@ create_cd_link () {
         ln -sf "$CDDEV" /target/dev/cdrom
     fi
 }
-
-## MAINLINE
-config_dbootstrap
-
-BOOT_BASECONFIG="1"
-if test_ssh_install ; then
-    # Note: this test fixes #279090
-    log "Network installation: not configuring /etc/inittab to run base-config after reboot"
-    BOOT_BASECONFIG=""
-fi
 
 config_inittab
 
