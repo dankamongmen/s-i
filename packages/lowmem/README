@@ -67,9 +67,21 @@ Current hacks:
 	
 Possible future hacks:
 
+	remove locale definition
+		Removing /usr/lib/locale might be worth it. If done after
+		the main cdebconf is running, we should not even notice
+		this 300k of stuff is gone, unless cdebconf is started
+		on another VT or the like. It does cause cdebconf to not
+		display borders properly and some other display ugliness
+		for wide characters.
+
 	progressive udeb installation
-		Modify anna so it can install udebs on demand. Allows some
-		udebs to be loaded after partitioning has enabled swap.
+		Anna can install udebs on demand, so use this to defer
+		loading some udebs until we know we need them, and
+		particularly until after partitioning has enabled swap.
+		
+		For example, have os-prober only load its kernel module
+		udebs on demand.
 
 	find swap partitions and auto-swapon
 		Try to scan disks for existing swap partitions and swapon.
