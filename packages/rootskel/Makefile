@@ -1,14 +1,12 @@
 subdirs = \
 	src \
-	src-bootfloppy \
-	src-locale
+	src-bootfloppy
 
 build: build-recursive
 
 install:
 	@$(MAKE) install -C src DESTDIR=$(CURDIR)/debian/rootskel/
 	@$(MAKE) install -C src-bootfloppy DESTDIR=$(CURDIR)/debian/rootskel-bootfloppy/
-	@$(MAKE) install -C src-locale DESTDIR=$(CURDIR)/debian/rootskel-locale/
 
 clean: clean-recursive
 
