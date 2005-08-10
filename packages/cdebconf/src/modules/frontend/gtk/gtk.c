@@ -1328,9 +1328,20 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
      * mechanism that lets the user jump across questions to work
      */
     fe_data = obj->data;
-    strcpy(fe_data->jump_target, "");
-	fe_data->dummy_main_menu = FALSE;
-	fe_data->ask_jump_confirmation = FALSE;
+    fe_data->window = NULL;
+    fe_data->target_box = NULL;
+    fe_data->info_box = NULL;
+    fe_data->menu_box = NULL;
+    fe_data->button_next = NULL;
+    fe_data->button_prev = NULL;
+    fe_data->progress_bar = NULL;
+    fe_data->progress_bar_menubox = NULL;
+    fe_data->progress_bar_frame = NULL;
+    fe_data->setters = NULL;
+    fe_data->button_val = DC_NOTOK;
+    fe_data->ask_jump_confirmation = FALSE;
+    fe_data->dummy_main_menu = FALSE;
+    *fe_data->jump_target = '\0';
     fe_data->q_main = NULL;
 
     gtk_init (&args, &name);
