@@ -1603,7 +1603,13 @@ static void display_dummy_main_menu(struct frontend *obj)
     menubox = gtk_vbox_new(FALSE, 5);
     data->progress_bar_menubox=menubox;
     gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
-    gtkhandler_select_single_jump(obj, data->q_main, menubox);
+    /* TODO: q_main isn't set if we're in a progress bar at high priority
+     * (i.e. main-menu not displayed) and no questions have been asked yet.
+     * We probably ought to do something sensible in that case, but I don't
+     * know what. Attilio, please investigate.
+     */
+    if (data->q_main)
+        gtkhandler_select_single_jump(obj, data->q_main, menubox);
     gtk_widget_show_all(data->window);
 }
 
