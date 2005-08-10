@@ -4,6 +4,7 @@ tmpfs_size=5M
 
 # I hate this hack.  -- Md
 make_extra_nodes () {
+	[ -e /etc/udev/links.conf ] || return 0
 	grep '^[^#]' /etc/udev/links.conf | \
 	while read type name arg1; do
 		([ "$type" ] && [ "$name" ] && \
@@ -12,7 +13,7 @@ make_extra_nodes () {
 			L) ln -s "$arg1" "/dev/$name" ;;
 			D) mkdir -p "/dev/$name" ;;
 			M) mknod -m 600 "/dev/$name" $arg1 ;;
-			*) echo "unparseable line ($type $name $arg1)" ;;
+			*) echo "links.conf: unparseable line ($type $name $arg1)" ;;
 		esac
 	done
 }
@@ -26,7 +27,8 @@ if [ -x "$UDEVSTART" ] && [ -f /proc/sys/kernel/hotplug ]; then
 	esac
 
 	echo 'Mounting a tmpfs over /dev...'
-	mount -n -o size=$tmpfs_size,mode=0755 -t tmpfs none /dev
+	mount -n -o size=$tmpfs_size,mode=0755 -t tmpfs tmpfs /dev
+	mkdir /dev/.udevdb
 
 	# needed to make some programs (e.g. mdrun) behave correctly
 	mkdir -p /.dev
