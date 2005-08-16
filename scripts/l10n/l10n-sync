@@ -84,7 +84,14 @@ exit 1
 
 gettexterr() {
 echo "Error in a gettext operation, please investigate"
+echo "Lock file NOT removed"
 exit 2
+}
+
+criticalerr() {
+echo "Critical error during run, please investigate"
+echo "Lock file NOT removed"
+exit 3
 }
 
 ##  Command line parsing
@@ -199,6 +206,14 @@ if [ -n "$MERGEDIR" ] ; then
   fi   
 fi
 
+# Checking a few utilities we need
+for i in msgcat msgmerge msgattrib `echo $debconf-updatepo | awk '{print $1};'` ; do
+  if which $i >/dev/null 2>&1 ; then
+    echo $i not found in the PATH
+    exit 1
+  fi
+done
+
 # Do not accept working on an unclean copy
 if $(svn st $DI_COPY/packages | grep -q "^C") ; then
   echo $DI_COPY seems to contain some SVN conflict files
@@ -303,10 +318,10 @@ pots_new=""
 # Put packages from the SORT_ORDER list first
 # of course we check if they are really in the list
 for package in ${SORT_ORDER} ; do
-  #if [ ! -d ${package} ] ; then
-  #  echo Package $package from the sort list does not exist
-  #  exit 1
-  #fi
+  if [ ! -d ${package} ] ; then
+    echo Package $package from the sort list does not exist
+    criticalerr
+  fi
   if (echo ${packages} | grep $package >/dev/null 2>&1) ; then
     packages_new="${packages_new} ${package}"
     pots_new="${pots_new} ${package}/debian/po/templates.pot"
