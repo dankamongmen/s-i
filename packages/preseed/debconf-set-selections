@@ -19,6 +19,15 @@ IFS="$NEWLINE"
 # TODO: this squashes \r elsewhere in the line too
 for line in $(grep -v '^#' "$file" | tr -d '\r'); do
 	IFS="$OLDIFS"
+	
+	if [ "$line" != "${line%\\}" ]; then
+		multiline="$multiline${line%\\}"
+		continue
+	elif [ -n "$multiline" ]; then
+		line="$multiline"
+		multiline=""
+	fi
+	
 	set -- $line
 	#package="$1"
 	var="$2"
