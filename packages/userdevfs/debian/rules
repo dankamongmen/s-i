@@ -15,11 +15,28 @@ install-dirs:
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs usr/bin lib/debian-installer-startup.d dev/vc
+	dh_installdirs usr/bin lib/debian-installer-startup.d
 
 install: install-dirs
+	dh_testroot
 	install S10userdevfs debian/$(PACKAGE)/lib/debian-installer-startup.d
 	dh_install init-dev update-dev subarch-dev usr/bin
+	dh_installdirs dev dev/rd dev/vc dev/fb dev/pts
+	# needed in initrd for freeramdisk to work
+	mknod debian/$(PACKAGE)/dev/rd/0 b 1 0
+	# needed in initrd for console to work right
+	mknod debian/$(PACKAGE)/dev/tty c 5 0
+	mknod debian/$(PACKAGE)/dev/ttyS0 c 4 64
+	mknod debian/$(PACKAGE)/dev/ttyS1 c 4 65
+	mknod debian/$(PACKAGE)/dev/vc/0 c 4 0
+	mknod debian/$(PACKAGE)/dev/vc/1 c 4 1
+	mknod debian/$(PACKAGE)/dev/vc/2 c 4 2
+	mknod debian/$(PACKAGE)/dev/vc/3 c 4 3
+	mknod debian/$(PACKAGE)/dev/vc/4 c 4 4
+	# for bterm to use the framebuffer
+	mknod debian/$(PACKAGE)/dev/fb/0 c 29 0
+	mknod debian/$(PACKAGE)/dev/pts/0 c 136 0
+	mknod debian/$(PACKAGE)/dev/ptmx c 5 2
 
 binary-indep: install
 	dh_testdir

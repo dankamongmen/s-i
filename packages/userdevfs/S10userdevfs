@@ -1,24 +1,23 @@
 #!/bin/sh
 
-echo 'Setting up Userspace DevFS: '
+# run for 2.2.x kernels only unless devfs and udev are not started yet
+if [ "`uname -r | grep '^2.2.'`" != "" ] || \
+   ( [ ! -e /.dev ] && [ ! -e /dev/.devfsd ] ); then
 
-# run for 2.2.x kernels only
-if [ "`uname -r | grep '^2.2.'`" != "" ]; then
+	echo 'Setting up Userspace DevFS: '
 
-    if [ ! -d /proc/self ]; then
-	echo '  Mounting /proc ... '
-	mount /proc
-    fi
+	if [ ! -d /proc/self ]; then
+		echo '  Mounting /proc ... '
+		mount /proc
+	fi
 
-    echo '  Detecting cdrom devices ...'
-    /usr/bin/init-dev 
+	init-dev 
 
-    echo '  Hard disk and partitions ... '
-    /usr/bin/update-dev
-    
+	echo '  Hard disk and partitions ... '
+	update-dev
+
+	echo '  Userdevfs sub-arch specific handling ...'
+	subarch-dev
+
+	echo 'Userdevfs done.'
 fi
-
-echo '  Userdevfs sub-arch specific handling ...'
-/usr/bin/subarch-dev
-
-echo 'Userdevfs done.'
