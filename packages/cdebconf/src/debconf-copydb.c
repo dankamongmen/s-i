@@ -8,6 +8,7 @@
 #include "frontend.h"
 #include "database.h"
 #include "question.h"
+#include "template.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,9 +39,7 @@ int main(int argc, char **argv)
     struct template_db *tdb1, *tdb2;
     struct question_db *db1, *db2;
     struct question *q;
-#if 0
     struct template *t;
-#endif
     char *configpath1, *configpath2;
     const char *tdb1name, *tdb2name;
     char *db1name = 0, *db2name = 0;
@@ -132,6 +131,12 @@ int main(int argc, char **argv)
         }
 
         db2->methods.set(db2, q);
+        if ((t = tdb2->methods.get(tdb2, q->template->tag)) == NULL) {
+            /* Must copy the template as well */
+            t = tdb1->methods.get(tdb1, q->template->tag);
+            tdb2->methods.set(tdb2, t);
+        }
+        template_deref(t);
 nextq:
         question_deref(q);
     }
@@ -140,6 +145,7 @@ nextq:
         regfree(&pattern_regex);
 
     db2->methods.save(db2);
+    tdb2->methods.save(tdb2);
     question_db_delete(db1);
     question_db_delete(db2);
     template_db_delete(tdb1);
