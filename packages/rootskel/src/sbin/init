@@ -10,21 +10,21 @@ if [ "`uname -r | grep '^2.2.'`" = "" ]; then
 	umount initrd 2>/dev/null || true
 	if mount -t tmpfs -o size=100M tmpfs /mnt ; then
 		:
-	else
-		mount -t shm shm mnt
+	elif mount -t shm shm mnt; then
+		:
 	else
 		mount -t ramfs ramfs /mnt
 	fi
 	umount /proc
-	cp -a $(ls -1 / |grep -v '\(dev\|lost+found\|mnt\|proc\)') /mnt
+	cp -a $(ls -1 / |grep -v '\(lost+found\|mnt\|proc\)') /mnt
 	cd /mnt
 	pivot_root . initrd
-	mkdir proc dev
+	mkdir proc
 	if [ -x /sbin/udevstart ]; then
 		/lib/debian-installer/init-udev-devices
 	else
-		mount /dev
-		mount /dev/pts
+		mount /dev || true
+		mount /dev/pts || true
 	fi
 	mount /proc
 
