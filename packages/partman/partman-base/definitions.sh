@@ -638,6 +638,8 @@ default_disk_label () {
 		    echo msdos;;
 		bast)
 		    echo msdos;;
+		ads*)
+		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
