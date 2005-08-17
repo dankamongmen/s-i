@@ -793,4 +793,9 @@ if type udevstart >/dev/null 2>&1; then
 	udevstart
 fi
 
+# Also let userdevfs rescan the devices.
+if type update-dev >/dev/null 2>&1; then
+	update-dev
+fi
+
 exit 0
