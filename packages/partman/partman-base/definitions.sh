@@ -638,7 +638,7 @@ default_disk_label () {
 		    echo msdos;;
 		bast)
 		    echo msdos;;
-		ads*)
+		ads)
 		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
