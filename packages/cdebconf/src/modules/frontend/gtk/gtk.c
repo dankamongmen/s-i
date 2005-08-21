@@ -70,6 +70,12 @@
 #include <gtk/gtk.h>
 
 
+/* used to set internal horizontal padding between a question and questionbox frame */
+#define QUESTIONBOX_HPADDING 6
+/* used to set vertical padding between two adjacent questions inside questionbox */
+#define QUESTIONBOX_VPADDING 3
+
+
 /* used by the treeview widgets */
 enum
 {
@@ -611,7 +617,7 @@ static int
 gtkhandler_boolean_single(struct frontend *obj, struct question *q, 
 			  GtkWidget *qbox)
 {
-    GtkWidget *hbox;
+    GtkWidget *frame, *hpadbox;
     GtkWidget *check_button;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
@@ -622,9 +628,6 @@ gtkhandler_boolean_single(struct frontend *obj, struct question *q,
     data->obj = obj;
     data->q = q;
 
-    hbox = gtk_hbox_new (FALSE, 5);
-    gtk_box_pack_start (GTK_BOX(qbox), hbox, TRUE, TRUE, 5);
-
     check_button = gtk_check_button_new_with_label (q_get_description (q));
 	if (strcmp (defval, "true") == 0)
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(check_button), TRUE);
@@ -632,22 +635,18 @@ gtkhandler_boolean_single(struct frontend *obj, struct question *q,
     g_signal_connect (G_OBJECT(check_button), "toggled", G_CALLBACK(check_toggled_callback), q);
     g_signal_connect (G_OBJECT(check_button), "enter", G_CALLBACK (show_description), data);
 
-    gtk_box_pack_start (GTK_BOX(hbox), check_button, TRUE, TRUE, 5);
+    frame = gtk_frame_new(q_get_description (q));
+    gtk_container_add(GTK_CONTAINER (frame), check_button);
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), frame, TRUE, TRUE, QUESTIONBOX_HPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
-  /* FIXME: sensitive to the druid button 
-     if (obj->methods.can_go_back(obj, q) == FALSE)
-     {
-     gtk_widget_set_sensitive(back_button, FALSE);
-     }
-  */
- 
-  
-  return DC_OK;
+    return DC_OK;
 }
 
 static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *frame, *check;
+    GtkWidget *frame, *check, *hpadbox;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 
@@ -667,13 +666,15 @@ static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q,
     g_signal_connect (G_OBJECT(check), "toggled", G_CALLBACK (enable_jump_confirmation_callback), data);
     g_signal_connect (G_OBJECT(check), "destroy", G_CALLBACK (free_description_data), data);
 
-    frame = gtk_frame_new(NULL);
+    frame = gtk_frame_new(q_get_description (q));
     gtk_container_add(GTK_CONTAINER (frame), check);	
 
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), frame, TRUE, TRUE, QUESTIONBOX_HPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
     if (is_first_question(q))
-	gtk_widget_grab_focus(check);
+		gtk_widget_grab_focus(check);
 	
     register_setter(bool_setter, check, q, obj);
 
@@ -682,7 +683,6 @@ static int gtkhandler_boolean_multiple(struct frontend *obj, struct question *q,
 
 static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_boolean() called");
     if (q->next == NULL && q->prev == NULL)
         return gtkhandler_boolean_single(obj, q, qbox);
     else
@@ -691,7 +691,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
 
 static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *frame, *check_container, *check;
+    GtkWidget *frame, *check_container, *check, *hpadbox;
     char **choices, **choices_translated, **defvals;
     int i, j, count, defcount;
     struct frontend_question_data *data;
@@ -761,8 +761,9 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
 
     frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), check_container);	
-
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), frame, TRUE, TRUE, QUESTIONBOX_HPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
     register_setter(multi_setter, check_container, q, obj);
 
@@ -771,7 +772,7 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
 
 static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *frame, *label;
+    GtkWidget *frame, *label, *hpadbox;
 
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_note() called");
 
@@ -781,8 +782,9 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 
     frame = gtk_frame_new(q_get_description(q));
     gtk_container_add(GTK_CONTAINER (frame), label);	
-
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), frame, TRUE, TRUE, QUESTIONBOX_HPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 	
     return DC_OK;
 }
@@ -795,25 +797,21 @@ static int gtkhandler_text(struct frontend *obj, struct question *q, GtkWidget *
 
 static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *frame, *entry;
+    GtkWidget *frame, *entry, *hpadbox;
     struct frontend_question_data *data;
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_password() called");
+
+    data = NEW(struct frontend_question_data);
+    data->obj = obj;
+    data->q = q;
 
     entry = gtk_entry_new ();
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
     gtk_entry_set_visibility (GTK_ENTRY (entry), FALSE);
     gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
-    frame = gtk_frame_new(q_get_description(q));
-    gtk_container_add(GTK_CONTAINER (frame), entry);	
-
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
     if (is_first_question(q))
-	gtk_widget_grab_focus(entry);
-
-    data = NEW(struct frontend_question_data);
-    data->obj = obj;
-    data->q = q;
+		gtk_widget_grab_focus(entry);
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
     g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
@@ -825,6 +823,12 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
      * g_signal_connect (G_OBJECT(entry), "insert-at-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
      */
     g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
+
+	frame = gtk_frame_new(q_get_description(q));
+	gtk_container_add(GTK_CONTAINER (frame), entry );
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), frame, TRUE, TRUE, QUESTIONBOX_HPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 	
     register_setter(entry_setter, entry, q, obj);
 
@@ -1027,7 +1031,7 @@ static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, 
 
 static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *combo, *frame;
+    GtkWidget *combo, *frame, *hpadbox;
     GList *items = NULL;
     char **choices, **choices_translated;
     struct frontend_question_data *data;
@@ -1037,6 +1041,10 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     const gchar *indices = q_get_indices(q);
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_multiple() called"); */
+
+    data = NEW(struct frontend_question_data);
+    data->obj = obj;
+    data->q = q;
 
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
@@ -1069,26 +1077,21 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     	gtk_entry_set_text (GTK_ENTRY(GTK_COMBO(combo)->entry), "");
     gtk_combo_set_value_in_list (GTK_COMBO (combo), TRUE, FALSE);
 
-
-    frame = gtk_frame_new(q_get_description(q));
-    gtk_container_add(GTK_CONTAINER (frame), combo);	
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
-
     if (is_first_question(q))
         gtk_widget_grab_focus(combo);
 
-    data = NEW(struct frontend_question_data);
-    data->obj = obj;
-    data->q = q;
-
     g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "destroy",
                       G_CALLBACK (free_description_data), data);
-
 	g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "grab-focus",
                       G_CALLBACK (enable_jump_confirmation_callback), data);
-
     g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "grab-focus",
                       G_CALLBACK (show_description), data);
+
+	frame = gtk_frame_new(q_get_description(q));
+	gtk_container_add(GTK_CONTAINER (frame), combo);
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), frame, TRUE, TRUE, QUESTIONBOX_HPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
     register_setter(combo_setter, GTK_COMBO(combo)->entry, q, obj);
 
@@ -1106,11 +1109,15 @@ static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget
 
 static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *frame, *entry;
+    GtkWidget *frame, *entry, *hpadbox;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_string() called");
+
+    data = NEW(struct frontend_question_data);
+    data->obj = obj;
+    data->q = q;
 
     entry = gtk_entry_new ();
     if (defval != NULL)
@@ -1119,17 +1126,9 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
         gtk_entry_set_text (GTK_ENTRY(entry), "");
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
     gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
-    frame = gtk_frame_new(q_get_description(q));
-    gtk_container_add(GTK_CONTAINER (frame), entry);	
-
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
 
     if (is_first_question(q))
         gtk_widget_grab_focus(entry);
-
-    data = NEW(struct frontend_question_data);
-    data->obj = obj;
-    data->q = q;
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
     /*
@@ -1141,6 +1140,12 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
      * g_signal_connect (G_OBJECT(entry), "insert-at-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
      */
     g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
+
+	frame = gtk_frame_new(q_get_description(q));
+	gtk_container_add(GTK_CONTAINER (frame),entry );
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), frame, TRUE, TRUE, QUESTIONBOX_HPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
     register_setter(entry_setter, entry, q, obj);
 
