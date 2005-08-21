@@ -164,7 +164,8 @@ void control_read(FILE *f, struct package_t *p)
 		}
 #endif
 		/* This is specific to the Debian Installer. Ifdef? */
-		else if (strstr(buf, "installer-menu-item: ") == buf) 
+		else if ((strstr(buf, "Installer-Menu-Item: ") == buf) ||
+			 (strstr(buf, "installer-menu-item: ") == buf))
 		{
 			p->installer_menu_item = atoi(buf+21);
 		}
