@@ -164,40 +164,39 @@ void control_read(FILE *f, struct package_t *p)
 		}
 #endif
 		/* This is specific to the Debian Installer. Ifdef? */
-		else if ((strstr(buf, "Installer-Menu-Item: ") == buf) ||
-			 (strstr(buf, "installer-menu-item: ") == buf))
+		else if (strcasestr(buf, "Installer-Menu-Item: ") == buf)
 		{
 			p->installer_menu_item = atoi(buf+21);
 		}
-		else if (strstr(buf, "Priority: ") == buf)
+		else if (strcasestr(buf, "Priority: ") == buf)
 		{
 			p->priority = strdup(buf + 10);
 		}
-		else if (strstr(buf, "Section: ") == buf)
+		else if (strcasestr(buf, "Section: ") == buf)
 		{
 			p->section = strdup(buf + 9);
 		}
-		else if (strstr(buf, "Installed-Size: ") == buf)
+		else if (strcasestr(buf, "Installed-Size: ") == buf)
 		{
 			p->installed_size = strdup(buf + 16);
 		}
-		else if (strstr(buf, "Maintainer: ") == buf)
+		else if (strcasestr(buf, "Maintainer: ") == buf)
 		{
 			p->maintainer = strdup(buf + 12);
 		}
-		else if (strstr(buf, "Version: ") == buf)
+		else if (strcasestr(buf, "Version: ") == buf)
 		{
 			p->version = strdup(buf + 9);
 		}
-		else if (strstr(buf, "Suggests: ") == buf)
+		else if (strcasestr(buf, "Suggests: ") == buf)
 		{
 			p->suggests = strdup(buf + 10);
 		}
-		else if (strstr(buf, "Recommends: ") == buf)
+		else if (strcasestr(buf, "Recommends: ") == buf)
 		{
 			p->recommends = strdup(buf + 12);
 		}
-		else if (strstr(buf, "Conffiles: ") == buf)
+		else if (strcasestr(buf, "Conffiles: ") == buf)
 		{
                         p->conffiles = strdup("");
 			read_block(f, &p->conffiles);
@@ -378,7 +377,7 @@ int status_merge(void *status, struct package_t *pkgs)
 		}
 #endif
 		if (pkg->installer_menu_item)
-			fprintf(fout, "installer-menu-item: %i\n", pkg->installer_menu_item);
+			fprintf(fout, "Installer-Menu-Item: %i\n", pkg->installer_menu_item);
 		fputc('\n', fout);
 	}
 	
