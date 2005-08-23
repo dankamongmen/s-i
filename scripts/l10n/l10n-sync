@@ -399,11 +399,11 @@ if [ "$DEBUG" = "Y" ] ; then
   echo -n "Creating the general template.pot file..."
 fi
 # Check that the next msgcat will not fail (otherwise the template.pot would be empty!)
-if ! msgcat $pots >/dev/null ; then
+if ! msgcat $pots >/dev/null 2>&1 ; then
   svnerr
 fi
 if [ "$DEBUG" = "Y" ] ; then
-  msgcat $pots || svnerr | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new
+  msgcat $pots | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new
 else
   msgcat $pots  | sed 's/charset=CHARSET/charset=UTF-8/g'>$DI_COPY/packages/po/template.pot.new 2>/dev/null
 fi
@@ -485,7 +485,9 @@ for po in *.po ; do
      echo "     - Merge with $MERGEDIR/packages/po/$lang.po"
    fi
    if [ -f "$MERGEDIR/packages/po/$lang.po" ] ; then
-     msgcat --use-first "$MERGEDIR/packages/po/$lang.po" $po >$po.new
+     if ! msgcat --use-first "$MERGEDIR/packages/po/$lang.po" $po >$po.new ; then
+       gettexterr
+     fi
      mv $po.new $po
    fi
  fi
