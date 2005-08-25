@@ -240,11 +240,18 @@ For a language to appear in the languagechooser screen it must have entries in b
   ------------
 The format if the following:
 
-Language;locale;fallbacklocale;langcode;countrycode;langlist;console-data
+Language;supported_environments;locale;fallbacklocale;langcode;countrycode;langlist;console-data
  where:
 
    -Language        =language name, in English
                      It is recommended to refer to ISO-639
+   -Supported env.  =code to define in which environments this language
+                     can be supported by the installer
+                     0=only when the framebuffer is active
+                       (most often non Latin-1 languages)
+		     1=needs a Latin-1 aware environment (Linux console
+                       without framebuffer, some serial consoles)
+                     2=can work in any environments (ASCII-only language)
    -locale          =default locale
                      xx for languages with multiple countries
                      i.e. languages for which a valid locale may exist
