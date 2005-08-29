@@ -2,30 +2,40 @@ This was a message I sent to debian-l10n-arabic@lists.debian.org to
 explain what the spellchecker is about.
 
 ---
-Even if I couldn't find an Arabic dictionary for Aspell, I think you still
-can find useful informations for making better translations and spotting
-some errors.
 
-ar_all.txt - contains all the Arabic strings extracted from the po files:
-you can use any spellchecker against this file to look for typos.
+the spellchecker is a set of scripts which manipulate po files and
+output some statistic on a web page.  Spotting typos is the main
+feature, but translators can use it to improve the overall quality of
+their translations.
 
-ar_var.txt - contains the so called "suspect variables": a script compares
-variables ${LIKE_THIS} in the original msgid string and in the Arabic string
-and if it finds any incongruence, they're logged in the ar_var.txt file
-If we take as an example ar_var.txt for level1-post-sarge, I notice that
-the original string
+The statistics page contains the following columns for every language
+supported:
 
-msgid "The test of the swap space in partition #${PARTITION} of
-${DEVICE} found uncorrected errors."
+"Unknown words" - is the number of unique words not found in the
+dictionary of a particular language. "-" , means that the spellchecker
+is not configured as to check translations for this language (usually
+because an aspell dictionary for the language is not available)
 
-contains the two variables "#${PARTITION}" and "${DEVICE}" the
-translated string contains, besides those 2 vars, a third variable
-"${TYPE}"
+"Messages" - contains all the strings for lang extracted from the po
+files: you can use any spellchecker against this file to look for
+typos. This file is very useful also when improving consistency for
+the tranlations: when translations are spread over many po files, is
+difficult to make sure that certain rules are applied to all files, so
+here you can check for example that "CD-ROM" is written always the
+same way.
 
-the second string spotted by the script, contains no variables at all, but
-the
-translated string has two variables.
+"List of unknown words" - is a sorted list of words not found in the 
+aspell dictionary aogn with the number of occurrences.
 
-Could you please take a look and eventually fix what is wrong?
-I'd be also interested to know it there's an aspell dictionary for your language.
+"suspect variables" - po files often contain variables ${LIKE_THIS}; a
+script checks that the name of the variable in the msgid is matched in
+the msgstr. It's also checked that the number of variables in the
+msgstr is the same in the msgid.
+
+"custom wordlist" - translators can write a list of custom words not
+found in the aspell dictionary for their language. More details about
+wordlists can be found here (FIXME).
+
+"all files" - is a tarball containing all the above files. translators
+can download this and work offline.
 
