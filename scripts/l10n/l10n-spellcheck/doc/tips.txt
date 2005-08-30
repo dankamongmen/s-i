@@ -1,10 +1,8 @@
-This was a message I sent to debian-l10n-arabic@lists.debian.org to
-explain what the spellchecker is about.
-
----
+* Introduction
+  ------------
 
 the spellchecker is a set of scripts which manipulate po files and
-output some statistic on a web page.  Spotting typos is the main
+output some statistic on a web page. Spotting typos is the main
 feature, but translators can use it to improve the overall quality of
 their translations.
 
@@ -18,14 +16,13 @@ because an aspell dictionary for the language is not available)
 
 "Messages" - contains all the strings for lang extracted from the po
 files: you can use any spellchecker against this file to look for
-typos. This file is very useful also when improving consistency for
-the tranlations: when translations are spread over many po files, is
-difficult to make sure that certain rules are applied to all files, so
-here you can check for example that "CD-ROM" is written always the
-same way.
+typos. This file is very useful also when improving consistency: when
+translations are spread over many po files, is difficult to make sure
+that certain rules are applied to all files, so here you can check for
+example that "CD-ROM" is written always the same way.
 
 "List of unknown words" - is a sorted list of words not found in the 
-aspell dictionary aogn with the number of occurrences.
+aspell dictionary along with the number of occurrences.
 
 "suspect variables" - po files often contain variables ${LIKE_THIS}; a
 script checks that the name of the variable in the msgid is matched in
@@ -37,5 +34,70 @@ found in the aspell dictionary for their language. More details about
 wordlists can be found here (FIXME).
 
 "all files" - is a tarball containing all the above files. translators
-can download this and work offline.
+can download this and work off-line.
 
+
+* Spotting typos
+  --------------
+
+First of all you should look for errors: typically typos or wrong
+variables. The list of unknown words contains words not in the aspell
+dictionary and "out of their context"; once one has been found, you
+need to locate where the error is in the po file.
+
+Since "Messages" contains all the (translated) strings for all the po files,
+you can look for the wrong word there; the structure of the text file
+is the following:
+
+*** path1/lang.po
+- "strings for this file"
+
+*** path2/lang.po
+- "strings for this file"
+
+...
+
+*** pathN/lang.po
+- "strings for this file"
+
+
+if the word is easy to find you won't need any help from me to locate
+it and you just need to see which po file it belongs to. Emacs has a
+very handy function "forward-paragraph" (ctrl-up on my system) that
+takes you directly to the line containing the path. Otherwise you can
+search backward for "*** " to find it.
+
+Things can be more complicated if the unknown word is very short and
+so it's matched too many times inside the file because is "sub-word" of
+longer words; in that case you should use regexps to restrict your
+search. Here follow a few practical examples that can help you; refer
+to some documentation about regexp to find out more.
+
+If you use emacs you can match an exact word by using
+isearch-forward-regexp and "\<word\>"
+
+From the shell you can run 'grep -nw "word" lang_all.txt'
+("n" parameter will tell grep to print the line number where match
+occurs)
+
+Sometimes you may have to look for something like "a word composed
+by two letters: the first is "p" the second is not a printable char";
+in that case "word" in the previous examples can be replaced with
+"p."
+
+
+* Suspect variables
+  -----------------
+
+Variables in po files are of the form ${VARIABLE}; the spellchecker
+is able to catch the following common mistakes:
+
+- mispelled variable names
+- wrong braces
+- missing "$" character
+- different number of variables in the msgid and the msgstr
+
+the variable name should not be translated in the msgstr and braces
+should not be changed. The variable name is replaced with something
+more useful at run-time; if the translator manipulates it, the results
+will be rather ugly. 
