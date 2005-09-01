@@ -84,6 +84,8 @@ if [ -z "$PARTITIONS" ]; then
     die prep-installer/nopart 'No prep boot partitions found'
 fi
 
+KERNEL=`ls /target/boot/vmlinuz-2.*`
+
 # Well, we make it simple, since we can ensure that partman-prep will allow
 # for only one prep partition for now, so we will simply install in the first
 # one provided, without any questions or whatnot.
@@ -91,7 +93,7 @@ fi
 db_progress STEP 1
 db_progress INFO prep-installer/dd
 
-dd if=/target/boot/vmlinuz-2.6.8-powerpc of=$DEFAULT
+dd if=$KERNEL of=$DEFAULT
 
 db_progress STEP 1
 db_progress STOP
