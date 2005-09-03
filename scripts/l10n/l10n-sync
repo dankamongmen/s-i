@@ -181,7 +181,7 @@ if [ ! -d $DI_COPY ] ; then
   exit 1
 fi
 
-if [ ! -d $DI_COPY/.svn ] ; then
+if [ ! -d $DI_COPY/packages/.svn ] ; then
   echo No $DI_COPY/packages/.svn directory found
   echo $DI_COPY may not be a copy of Debian Installer SVN repository
   exit 1
@@ -253,6 +253,13 @@ else
   exit 1
 fi
 
+# Check the packages/po/packages_list file
+listfile=${DI_COPY}/packages/po/packages_list
+if [ ! -r ${listfile} ] ; then
+  echo No ${listfile} file: aborting...
+  exit 1
+fi
+
 # Do not accept working on a locked copy
 LOCKFILE=$DI_COPY/.l10n-sync.lock
 if [ -f $LOCKFILE ] ; then
@@ -299,43 +306,52 @@ if $(svn st $DI_COPY/packages | grep -q "^C") ; then
 fi
 
 # Build a list of all D-I packages with i18n material
-cd $DI_COPY/packages
-if [ "$DEBUG" = "Y" ] ; then
-  echo -n Building a list of all packages with i18n material...
-fi
-pots=$(find . -mindepth 3 -name templates.pot |\
-          grep /debian/po/templates.pot\$)
-packages=$(echo $pots |\
-          sed 's/\.\///g'|\
-          sed 's/\/debian\/po\/templates\.pot//g')
+# This is now disabled. The list is an explicit list in a file
+# named "packages_list" maintained in packages/po
+#cd $DI_COPY/packages
+#if [ "$DEBUG" = "Y" ] ; then
+#  echo -n Building a list of all packages with i18n material...
+#fi
+#pots=$(find . -mindepth 3 -name templates.pot |\
+#          grep /debian/po/templates.pot\$)
+#packages=$(echo $pots |\
+#          sed 's/\.\///g'|\
+#          sed 's/\/debian\/po\/templates\.pot//g')
+packages=$(cat ${listfile} | grep -v -E "^\#")
 if [ "$DEBUG" = "Y" ] ; then
   echo Done.
 fi
 
 # Sort packages
-packages_new=""
-pots_new=""
+# Now useless as the list is sorted
+#packages_new=""
+#pots_new=""
 # Put packages from the SORT_ORDER list first
 # of course we check if they are really in the list
-for package in ${SORT_ORDER} ; do
-  if [ ! -d ${package} ] ; then
-    echo Package $package from the sort list does not exist
-    criticalerr
-  fi
-  if (echo ${packages} | grep $package >/dev/null 2>&1) ; then
-    packages_new="${packages_new} ${package}"
-    pots_new="${pots_new} ${package}/debian/po/templates.pot"
-  fi
-done
+#for package in ${SORT_ORDER} ; do
+#  if [ ! -d ${package} ] ; then
+#    echo Package $package from the sort list does not exist
+#    criticalerr
+#  fi
+#  if (echo ${packages} | grep $package >/dev/null 2>&1) ; then
+#    packages_new="${packages_new} ${package}"
+#    pots_new="${pots_new} ${package}/debian/po/templates.pot"
+#  fi
+#done
+#for package in $packages ; do
+#  if ! (echo ${SORT_ORDER} | grep $package >/dev/null 2>&1) ; then
+#    packages_new="${packages_new} ${package}"
+#    pots_new="${pots_new} ${package}/debian/po/templates.pot"
+#  fi
+#done
+
+pots=""
 for package in $packages ; do
-  if ! (echo ${SORT_ORDER} | grep $package >/dev/null 2>&1) ; then
-    packages_new="${packages_new} ${package}"
-    pots_new="${pots_new} ${package}/debian/po/templates.pot"
-  fi
+    pots="${pots} ${package}/debian/po/templates.pot"
 done
 
-packages=${packages_new}
-pots=${pots_new}
+#packages=${packages_new}
+#pots=${pots_new}
 
 # Loop over packages
 #  1a) sync the debian/ directory
