@@ -232,13 +232,22 @@ log "Set debconf/language = '$LANGUAGELIST''"
 
 # Enable translations (if this is present, base-config generates the
 # required locale on boot)
-if [ "$LANGUAGE" != "C" ]; then
-	pkginstall locales
-fi
+# We use belocs-locales-data for languages which don't have a locale
+# in the locales package
+case "$LANGUAGE" in
+	C)
+	;;
+	ku)
+	    pkginstall belocs-locales-data
+	    pkginstall belocs-locales-bin
+	*)
+	    pkginstall locales
+	;;
+esac
 
 # Unicode font for languages requiring it
 case "$LANGUAGE" in
-	ar|el|he|ja|ko|tr|zh)
+	ar|el|fa|he|ja|ko|ku|tr|zh)
 		anna-install bterm-unifont
 	;;
 esac
