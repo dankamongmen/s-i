@@ -300,13 +300,15 @@ maplist_t *maplist_get (const char *name)
  * @brief	Get a keymap in a maplist; create if necessary
  * @list	maplist to search
  * @name	name of list
+ * @langs	if non-NULL, match these languages
  */
-keymap_t *keymap_get (maplist_t * list, char *name)
+keymap_t *keymap_get (maplist_t * list, const char *name, const char *langs)
 {
 	keymap_t *mp;
 
 	for (mp = list->maps ; mp != NULL; mp = mp->next)    {
-		if (strcmp (mp->name, name) == 0)
+		if (strcmp (mp->name, name) == 0 &&
+		    (!langs || strcmp (mp->langs, langs) == 0))
 			break;
 	}
 	if (mp)
@@ -363,7 +365,7 @@ maplist_parse_file (const char *name)
 		*tab2 = '\0';
 		*nl = '\0';
 
-		map = keymap_get (maplist, tab1 + 1);
+		map = keymap_get (maplist, tab1 + 1, buf);
 		if (!map->langs) {	// new keymap
 			map->langs = strdup (buf);
 			map->description = strdup (tab2 + 1);
@@ -745,7 +747,7 @@ keymap_select (char *arch, char *keymap)
 	// This is set if we can actually read preferred type from keyboard,
 	// and shouldn't have to ask the question.
 	if (kb->deflt) {
-		def = keymap_get (maplist_get (arch), kb->deflt);
+		def = keymap_get (maplist_get (arch), kb->deflt, NULL);
 		mydebconf_default_set (template, kb->deflt);
 	}
 	res = mydebconf_ask ( kb->deflt ? "low" : "high", template, &ptr);
