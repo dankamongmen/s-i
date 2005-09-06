@@ -36,7 +36,7 @@ rootfs=`grep ' /target ' $MTAB |cut -d' ' -f1 -s`
 rm -f /tmp/efi_boot.list
 
 for d in /dev/discs/*/disc; do
-    parted $d print | ( while read minor start end fs nameflags ; do
+    parted $d print | ( while read minor start end size fs nameflags ; do
       case "$minor" in
       Disk)
 	if [ "$start" = geometry ]; then
