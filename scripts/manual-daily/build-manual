@@ -116,6 +116,7 @@ architectures=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/archlist | cut -f 1`
 rm -R $destination/* &>/dev/null
 
 export manual_release="etch"
+export manual_target="for_alioth"
 
 echo "Starting D-I Manual build -- `date -u`" >$mainlog
 echo "" >>$mainlog
@@ -313,11 +314,17 @@ for lang in $languages; do
 done
 
 ## Extract preseeding example from the manual
-PRESEED="$source/en/appendix/example-preseed.xml"
+if [ "$manual_release" = "etch" ] ; then
+    PRESEED="$source/en/appendix/example-preseed-etch.xml"
+    LCKEEP="-v lckeep=1"
+else
+    PRESEED="$source/en/appendix/example-preseed-sarge.xml"
+    LCKEEP=""
+fi
 if [ -f $PRESEED ] && [ -f $ROOT/bin/preseed.awk ] ; then
     echo "" >>$mainlog
     echo "Extracting example-preseed.txt..." >>$mainlog
-    gawk -f $ROOT/bin/preseed.awk $PRESEED >$destination/example-preseed.txt
+    gawk -f $source/build/preseed.awk $LCKEEP $PRESEED >$destination/example-preseed.txt
 fi
 
 
