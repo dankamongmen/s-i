@@ -51,7 +51,8 @@ static struct map map_hardware[] = {
     { "FlexaNet" , "flexanet" },
     { "Freebird-HPC-1.1" , "hpc11" },
     { "2d3D, Inc. SA-1110 Development Board" , "2d3d" },
-    { "ADS" , "ads" }, /* Matches all ADS boards. Put any exceptions before. */
+    { "ADS" , "ads" }, /* Matches only ADS boards. Put any exceptions before. */
+    { "Applied Data Systems" , "ads" }, /* More ADS boards. */
     { "Compaq iPAQ H3600" , "ipaqh3600" },
     { "Compaq iPAQ H3100" , "ipaqh3100" },
     { "Compaq iPAQ H3800" , "ipaqh3800" },
