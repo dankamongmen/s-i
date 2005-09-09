@@ -16,7 +16,7 @@ VG_list () {
 # Create a new VG from a list of PV.  The PV will be pvcreate-d
 # $1 = the name
 # $2,$3,$4,.. = a non-empty list of PV
-new_VG () {
+VG_create () {
     local vg pv
     vg="$1"
     shift
