@@ -81,7 +81,7 @@ LV_create () {
 # Delete a LV
 # $1 = VG
 # $2 = LV
-delete_LV () {
+LV_remove () {
     lvremove -f /dev/$1/$2 >>/var/log/messages 2>&1
 }
 
