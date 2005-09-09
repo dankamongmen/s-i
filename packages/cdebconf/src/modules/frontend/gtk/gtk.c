@@ -6,14 +6,6 @@
  * File: gtk.c
  *
  * Description: gtk UI for cdebconf
- * Some notes on the implementation - optimistic at best. 
- *  mbc - just to get this off of the ground, Im' creating a dialog
- *        and calling gtk_main for each question. once I get the tests
- *        running, I'll probably send a delete_event signal in the
- *        next and back button callbacks. 
- *    
- *        There is some rudimentary attempt at implementing the next
- *        and back functionality. 
  *
  * $Id$
  *
@@ -835,28 +827,22 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     return DC_OK;
 }
 
-/* This handler function is basically a copy of gtkhandler_select_single()
- * and the only difference is that the callback function that manages
- * the user click on a button is jump_callback() instead of
- * button_single_callback(). Since the two handlers are almost identical
- * they could be melted into an unique function by passing an additional
- * input parameter that indicates what callback function should be used.
+/* This functions diplays the main menu, if enabled, in the left part of the screen.
+ * Input parameters
+ * bool sensitive_buttons : makes the buttons sensitive/unsensitive
+ * bool enable_jumping : indicates the appropriate callback function 
  */
-static int gtkhandler_select_single_jump(struct frontend *obj, struct question *q, GtkWidget *qbox)
+static int gtkhandler_main_menu(struct frontend *obj, struct question *q, GtkWidget *qbox, bool sensitive_buttons, bool jump_enabled)
 {
     GtkWidget *frame, *button, *button_box;
     char **choices, **choices_translated;
     int i, count;
-    struct frontend_data *fe_data = (struct frontend_data *) obj->data;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
 
-	if( fe_data->dummy_main_menu == FALSE )
-	    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_single_jump() called");
-	else
-		INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_single_jump() called, dummy mode");
+	INFO(INFO_DEBUG, "GTK_DI - gtkhandler_main_menu() called");
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -881,10 +867,16 @@ static int gtkhandler_select_single_jump(struct frontend *obj, struct question *
     for (i = 0; i < count; i++)
     {
         button = gtk_button_new_with_label(choices_translated[i]);
-        if( fe_data->dummy_main_menu == TRUE )
+        gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
+
+
+        if (sensitive_buttons == FALSE)
 	        gtk_widget_set_sensitive( GTK_WIDGET(button), FALSE );
-        gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
-        g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (jump_callback), data);
+
+        if (jump_enabled == TRUE)
+	        g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (jump_callback), data);
+	    else
+   	        g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (button_single_callback), data);
 
         /* g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data); */
         /* g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (clear_description), data); */
@@ -905,67 +897,6 @@ static int gtkhandler_select_single_jump(struct frontend *obj, struct question *
     return DC_OK;
 }
 
-static int gtkhandler_select_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
-{
-    GtkWidget *frame, *button, *button_box;
-    char **choices, **choices_translated;
-    int i, count;
-    struct frontend_question_data *data;
-    const char *defval = question_getvalue(q, "");
-    int *tindex = NULL;
-    const gchar *indices = q_get_indices(q);
-
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_single() called");
-
-    data = NEW(struct frontend_question_data);
-    data->obj = obj;
-    data->q = q;
-
-    count = strgetargc(q_get_choices_vals(q));
-    if (count <= 0)
-        return DC_NOTOK;
-    choices = malloc(sizeof(char *) * count);
-    choices_translated = malloc(sizeof(char *) * count);
-    tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
-        return DC_NOTOK;
-
-    button_box = gtk_vbutton_box_new();
-
-    frame = gtk_frame_new(q_get_description(q));
-    gtk_container_add(GTK_CONTAINER (frame), button_box);
-
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
-
-    for (i = 0; i < count; i++)
-    {
-        button = gtk_button_new_with_label(choices_translated[i]);
-        gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
-        g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (button_single_callback), data);
-
-        /* the following lines of code were previously introduced to give
-         * the user help about the main-menu, but since the help is just a
-         * "This is the main menu for the debian installer" I don't think
-         * if this can be useful
-         */
-        /* g_signal_connect (G_OBJECT(button), "enter", G_CALLBACK (show_description), data); */
-        /* g_signal_connect (G_OBJECT(button), "leave", G_CALLBACK (clear_description), data); */
-
-        gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
-        if (defval && strcmp(choices[tindex[i]], defval) == 0)
-        {
-            GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-            gtk_widget_grab_focus(button);
-            gtk_widget_grab_default(button);
-        }
-        free(choices[tindex[i]]);
-    }
-    free(choices);
-    free(choices_translated);
-    free(tindex);
-
-    return DC_OK;
-}
 
 static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
@@ -1294,13 +1225,16 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     /* This is where the main-menu will be displayed, in the left-area of
      * the screen
      */
-    menubox = gtk_vbox_new (FALSE, 10);
-    ((struct frontend_data*) obj->data)->menu_box = menubox;
-    menubox_scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (menubox_scroll), menubox);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (menubox_scroll),
-                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW (menubox_scroll), GTK_SHADOW_NONE);
+    if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
+	{
+	    menubox = gtk_vbox_new (FALSE, 10);
+	    ((struct frontend_data*) obj->data)->menu_box = menubox;
+	    menubox_scroll = gtk_scrolled_window_new(NULL, NULL);
+	    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (menubox_scroll), menubox);
+	    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (menubox_scroll),
+	                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+		gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW (menubox_scroll), GTK_SHADOW_NONE);
+	}
 
     /* Final packaging */
     gtk_box_pack_start(GTK_BOX (mainbox), targetbox_scroll, TRUE, TRUE, 5);	
@@ -1308,7 +1242,8 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_frame, FALSE, FALSE, 5);
 
     globalbox = gtk_hbox_new (TRUE, 10);
-    gtk_box_pack_start(GTK_BOX (globalbox), menubox_scroll, TRUE, TRUE, 5);
+	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
+    	gtk_box_pack_start(GTK_BOX (globalbox), menubox_scroll, TRUE, TRUE, 5);
     gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
 
     gtk_container_add(GTK_CONTAINER(window), globalbox);
@@ -1345,9 +1280,21 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     fe_data->setters = NULL;
     fe_data->button_val = DC_NOTOK;
     fe_data->ask_jump_confirmation = FALSE;
-    fe_data->dummy_main_menu = FALSE;
     *fe_data->jump_target = '\0';
     fe_data->q_main = NULL;
+	
+	/* Set this to TRUE/FALSE to enable/disable the main-menu hack
+	 */
+	fe_data->main_menu_enabled = TRUE;
+
+    /* If fe_data->main_menu_enabled is set to TRUE, then this filed
+     * has to match the tag of the question that is used as main-menu.
+     * Set this to "debian-installer/main-menu" for use in the debian installer
+     * or "test/select" to use the frontend with the testscripts that come with 
+     * cdebconf sources.
+     */     
+	/* fe_data->main_menu_tag = strdup("test/select"); */
+	fe_data->main_menu_tag = strdup("debian-installer/main-menu");
 
     gtk_init (&args, &name);
 
@@ -1376,123 +1323,111 @@ static int gtk_go(struct frontend *obj)
     GtkWidget *helpbox_view;
     GtkTextBuffer *helpbox_buffer;
 
-    /* this string is used to identify the main menu question
-     * (usually this is "debian-installer/main-menu" for the debian installer
-     * and "test/select" can be used with the testscripts that come with 
-     * cdebconf sources)
-     * Here we also assume that the main menu is always a SELECT question
-     */
-    /* const char *main_menu_tag = "test/select"; */
-    const char *main_menu_tag = "debian-installer/main-menu";
-
 	/* Users's jumps do not need to be confirmated unless he has activated a widget */
 	data->ask_jump_confirmation = FALSE;
+	data->setters = NULL;
 
 	helpbox_view = (GtkWidget*)data->info_box;
     helpbox_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (helpbox_view) );
 
     if (q == NULL) return DC_OK;
 
-    /* The main-menu question is stored in a private area of the frontend,
-     * so that it can be shown even if it's not passed to the frontend
-     */
-    if (strcmp(q->tag, main_menu_tag) == 0)
-    {
-        if (data->q_main)
-            question_delete(data->q_main);
-        data->q_main = question_dup(q);
-        INFO(INFO_DEBUG, "GTK_DI - gtk_go() main question \"%s\" stored in memory", main_menu_tag);
-    }
 
-    /* this piece of code implements the "jump" mechanism: if the "jump_target"
-     * string is not empty it means that a jump was previously programmed
-     * to be executed: we must tell cdebconf to go back until we reach the main menu,
-     * only then the "jump" can be performed
-     */
-    if (strcmp(data->jump_target, "") != 0)
-    {
-        if (strcmp(q->tag, main_menu_tag) == 0)
-        {
-            /* the d-i has eventually just told us to show the main menu: now
-             * the jump can be executed (basically we simulate the users's click
-             * on the programmed jump target)
-             */
-            INFO(INFO_DEBUG, "GTK_DI - gtk_go() jumping to \"%s\"", data->jump_target);
-            q = obj->questions;
-            question_setvalue(q, data->jump_target);
-            obj->qdb->methods.set(obj->qdb, q);
-            q->next=NULL;
-            
-            /* once the jump is set we must reset the "jump_target" string */
-            strcpy(data->jump_target,"");
+	if (((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
+	{
+	    /* The main-menu question is stored in a private area of the frontend,
+	     * so that it can be shown even if it's not passed to the frontend
+	     */
+	    if (strcmp(q->tag, data->main_menu_tag) == 0)
+	    {
+	        if (data->q_main)
+	            question_delete(data->q_main);
+	        data->q_main = question_dup(q);
+	        INFO(INFO_DEBUG, "GTK_DI - gtk_go() main question \"%s\" stored in memory", data->main_menu_tag);
+	    }
 
-            data->button_val = DC_OK;
+	    /* this piece of code implements the "jump" mechanism: if the "jump_target"
+	     * string is not empty it means that a jump was previously programmed
+	     * to be executed: we must tell cdebconf to go back until we reach the main menu,
+	     * only then the "jump" can be performed
+	     */
+	    if (strcmp(data->jump_target, "") != 0)
+	    {
+	        if (strcmp(q->tag, data->main_menu_tag) == 0)
+	        {
+	            /* the d-i has eventually just told us to show the main menu: now
+	             * the jump can be executed (basically we simulate the users's click
+	             * on the programmed jump target)
+	             */
+	            INFO(INFO_DEBUG, "GTK_DI - gtk_go() jumping to \"%s\"", data->jump_target);
+	            q = obj->questions;
+	            question_setvalue(q, data->jump_target);
+	            obj->qdb->methods.set(obj->qdb, q);
+	            q->next=NULL;
+	            
+	            /* once the jump is set we must reset the "jump_target" string */
+	            strcpy(data->jump_target,"");
 
-            return DC_OK;
-        }
-        else
-        {
-        	/* A jump is awaiting to be executed but the frontend was told to
-        	 * display something other than the main-menu: we must tell cdebconf
-        	 * to go back until it tells the frontend to display the main-menu:
-        	 * only then the jump will be executed
-        	 */
-            data->button_val = DC_GOBACK;
+	            data->button_val = DC_OK;
 
-            INFO(INFO_DEBUG, "GTK_DI - gtk_go() backing up to jump to \"%s\"", data->jump_target);
+	            return DC_OK;
+	        }
+	        else
+	        {
+	        	/* A jump is awaiting to be executed but the frontend was told to
+	        	 * display something other than the main-menu: we must tell cdebconf
+	        	 * to go back until it tells the frontend to display the main-menu:
+	        	 * only then the jump will be executed
+	        	 */
+	            data->button_val = DC_GOBACK;
 
-            return DC_GOBACK;
-        }
-    }
+	            INFO(INFO_DEBUG, "GTK_DI - gtk_go() backing up to jump to \"%s\"", data->jump_target);
 
-    data->setters = NULL;
+	            return DC_GOBACK;
+	        }
+	    }
 
-	/* The dummy menubox should be destroyed by gtk_progressbar_stop() but
-	 * since sometimes this function is not called we make sure the dummy
-	 * menubox has been destroyed before displaying the real one
-	 */	
-	if(data->progress_bar_menubox != NULL)
-		{
-		gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox));
-		data->progress_bar_menubox = NULL;
-		}
 
-    menubox = gtk_vbox_new(FALSE, 5);
+		/* The dummy menubox should be destroyed by gtk_progressbar_stop() but
+		 * since sometimes this function is not called we make sure the dummy
+		 * menubox has been destroyed before displaying the real one
+		 */	
+		if(data->progress_bar_menubox != NULL)
+			{
+			gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox));
+			data->progress_bar_menubox = NULL;
+			}
+
+	    menubox = gtk_vbox_new(FALSE, 5);
+	    gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
+	    
+	    if (strcmp (q->tag, data->main_menu_tag) == 0)
+	    {
+	        /* the first question in the question list is the main menu, so we
+	         * simply handle it
+	         */
+	        ret = gtkhandler_main_menu(obj, q, menubox, TRUE, FALSE);
+	        gtk_text_buffer_set_text (helpbox_buffer, q_get_extended_description(q), -1);
+	        q = q->next; 
+	    }
+	    else if (data->q_main)
+	    {
+	        /* the first question in the question list is not the main menu, so
+	         * we need to show it using the copy of the main menu stored
+	         * previously into memory.
+	         * If the first real question passed to the frontend doesn't alow to go
+	         * back we must prevent the user from jumping, since juping consists
+	         * of a sequence of "back" simulated commands
+	         */
+	        if ( obj->methods.can_go_back(obj, q) )
+		        ret = gtkhandler_main_menu(obj, data->q_main, menubox,TRUE ,TRUE);
+	      	else
+		        ret = gtkhandler_main_menu(obj, data->q_main, menubox,FALSE ,TRUE);
+	    }
+	}
+	
     questionbox = gtk_vbox_new(FALSE, 5);
-
-    gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
-
     gtk_box_pack_start(GTK_BOX(data->target_box), questionbox, FALSE, FALSE, 5);
-
-    /* The frontend should always display the main-menu to the user to allow
-     * him to jump from a step of the installation to another (even if debconf
-     * doesn't tell the frontend to display it)
-     */
-    q = obj->questions;
-    if (strcmp (q->tag, main_menu_tag) == 0)
-    {
-        /* the first question in the question list is the main menu, so we
-         * simply handle it
-         */
-        ret = gtkhandler_select_single(obj, q, menubox);
-        gtk_text_buffer_set_text (helpbox_buffer, q_get_extended_description(q), -1);
-        q = q->next; 
-    }
-    else if (data->q_main)
-    {
-        /* the first question in the question list is not the main menu, so
-         * we need to show it using the copy of the main menu stored
-         * previously into memory.
-         * If the first real question passed to the frontend doesn't alow to go
-         * back we must prevent the user from jumping, since juping consists
-         * of a sequence of "back" simulated commands
-         */
-        if ( obj->methods.can_go_back(obj, q) )
-      		data->dummy_main_menu = FALSE;
-      	else
-      		data->dummy_main_menu = TRUE;
-        ret = gtkhandler_select_single_jump(obj, data->q_main, menubox);
-    }
 
     /* now we can safely handle all other questions, if any */
     j = 0;
@@ -1573,7 +1508,9 @@ static int gtk_go(struct frontend *obj)
 
     di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
     gtk_widget_destroy(questionbox);
-    gtk_widget_destroy(menubox);
+    
+    if (((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
+    	gtk_widget_destroy(menubox);
 
 	gtk_widget_set_sensitive (data->button_prev, FALSE);
 	gtk_widget_set_sensitive (data->button_next, FALSE);
@@ -1591,10 +1528,10 @@ static bool gtk_can_go_back(struct frontend *obj, struct question *q)
     return (obj->capability & DCF_CAPB_BACKUP);
 }
 
-/* when the progressbar is started or is being updated a "dummy" 
- * mainmenu is drawn on the screen by this function
+/* If the main_menu is enabled then it has to be displayed with unsensitive
+ * buttons while the progressbar runs
  */
-static void display_dummy_main_menu(struct frontend *obj)
+static void display_main_menu_while_progressbar_runs(struct frontend *obj)
 {
 	struct frontend_data *data;
 	GtkWidget *menubox;
@@ -1604,7 +1541,6 @@ static void display_dummy_main_menu(struct frontend *obj)
 	 * is not already displayed
 	 */
 	if( data->progress_bar_menubox != NULL ) return;
-    data->dummy_main_menu = TRUE;
     menubox = gtk_vbox_new(FALSE, 5);
     data->progress_bar_menubox=menubox;
     gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
@@ -1614,7 +1550,8 @@ static void display_dummy_main_menu(struct frontend *obj)
      * know what. Attilio, please investigate.
      */
     if (data->q_main)
-        gtkhandler_select_single_jump(obj, data->q_main, menubox);
+    	gtkhandler_main_menu(obj, data->q_main, menubox,FALSE ,FALSE);
+    	
     gtk_widget_show_all(data->window);
 }
 
@@ -1622,7 +1559,8 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
 {
     GtkWidget *progress_bar, *progress_bar_frame;
 
-	display_dummy_main_menu(obj);
+	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
+		display_main_menu_while_progressbar_runs(obj);
     
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
     progress_bar_frame = ((struct frontend_data*)obj->data)->progress_bar_frame;
@@ -1644,7 +1582,8 @@ static void gtk_progress_set(struct frontend *obj, int val)
     gdouble progress;
     GtkWidget *progress_bar;
 
-	display_dummy_main_menu(obj);
+	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
+		display_main_menu_while_progressbar_runs(obj);
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val);
 
@@ -1666,7 +1605,8 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 {
     GtkWidget *progress_bar;
 
-	display_dummy_main_menu(obj);
+	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
+		display_main_menu_while_progressbar_runs(obj);
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info);
 
