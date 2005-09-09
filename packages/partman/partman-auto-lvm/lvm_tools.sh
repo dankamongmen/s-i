@@ -68,7 +68,7 @@ VG_extend () {
 # $1 = VG
 # $2 = size in bytes
 # $3 = name of the LV to create
-new_LV () {
+LV_create () {
 #    if [ "$2" = full ]; then
 # Using full VG not implemented until we have a way to get the free size of
 # a VG
