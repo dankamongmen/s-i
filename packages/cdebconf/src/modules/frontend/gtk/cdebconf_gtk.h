@@ -49,11 +49,18 @@ struct frontend_data
   /* Value of the button pressed to leave a form */
   int button_val;
 
+  /* If this is set to TRUE then the main-menu is always displayed in
+   * the left part of the screen
+   */
+  bool main_menu_enabled;
+
+  /* If main-menu_enabled==TRUE this string indicates the tag of 
+   * the SELECT question that has to be displayed as main-menu
+   */
+  char *main_menu_tag;
+
   /* tells the jump mechanism if jump confirmation dialog has to be displayed */
   bool ask_jump_confirmation;
-  
-  /*needed to tell gtkhandler_select_single_jump() to display unsensitive buttons */
-  bool dummy_main_menu;
    
   /*here a question tag is stored and represents the target for a jump*/     
   char jump_target[40];
