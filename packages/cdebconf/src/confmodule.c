@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <errno.h>
 
 #include <debian-installer.h>
 
@@ -53,6 +54,27 @@ static char *_confmodule_process(struct confmodule *mod, char *in)
     return NULL;
 }
 
+/*
+ * @brief helper function to configure SIGCHLD handler restarting
+ * @param int restart - true if system calls should restart after SIGCHLD
+ */
+static void _confmodule_sigchld_restart(int restart)
+{
+    struct sigaction sa;
+
+    if (sigaction(SIGCHLD, NULL, &sa) < 0)
+        return;
+    if (sa.sa_handler == SIG_DFL || sa.sa_handler == SIG_IGN)
+        return;
+
+    if (restart)
+        sa.sa_flags |= SA_RESTART;
+    else
+        sa.sa_flags &= ~SA_RESTART;
+
+    sigaction(SIGCHLD, &sa, NULL);
+}
+
 /* public functions */
 static int confmodule_communicate(struct confmodule *mod)
 {
@@ -77,20 +99,33 @@ static int confmodule_communicate(struct confmodule *mod)
     while (1) {
         buf[0] = 0;
         in[0] = 0;
+
+        /* Make read() return EINTR when a signal is received rather than
+         * restarting, so that we get the chance to shut down when the
+         * confmodule exits.
+         */
+        _confmodule_sigchld_restart(0);
+
         while (strchr(buf, '\n') == NULL) {
             if (signal_received) {
+                _confmodule_sigchld_restart(1);
                 free(in);
                 return DC_OK;
             }
 
             ret = read(mod->infd, buf, sizeof(buf));
+            _confmodule_sigchld_restart(1);
+            if (signal_received) {
+                free(in);
+                return DC_OK;
+            }
+            if (ret == 0 || (ret < 0 && errno == EINTR)) {
+                free(in);
+                return DC_OK;
+            }
             if (ret < 0) {
                 free(in);
                 return DC_NOTOK;
-            }
-            if (ret == 0) {
-                free(in);
-                return DC_OK;
             }
             buf[ret] = 0;
             if (strlen(in) + ret + 1 > insize) {
@@ -101,6 +136,7 @@ static int confmodule_communicate(struct confmodule *mod)
         }
 
         if (signal_received) {
+            _confmodule_sigchld_restart(1);
             free(in);
             return DC_OK;
         }
