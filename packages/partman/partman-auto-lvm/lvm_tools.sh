@@ -17,12 +17,10 @@ VG_list () {
 # $1 = the name
 # $2,$3,$4,.. = a non-empty list of PV
 VG_create () {
-    local vg pv
+    local vg
     vg="$1"
     shift
-    for pv in $*; do
-	pvcreate -ff -y $pv >>/var/log/messages 2>&1
-    done
+    pvcreate -ff -y $* >>/var/log/messages 2>&1
     vgcreate "$vg" $* >>/var/log/messages 2>&1 || return 1
     return 0
 }
