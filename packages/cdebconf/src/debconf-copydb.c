@@ -17,6 +17,7 @@
 #include <locale.h>
 #include <sys/types.h>
 #include <regex.h>
+#include <stdbool.h>
 
 static struct option g_dpc_args[] = {
     { "help", 0, NULL, 'h' },
@@ -47,6 +48,7 @@ int main(int argc, char **argv)
     regex_t pattern_regex;
     void *iter;
     int c;
+    bool tdb2_changed = false;
 
     setlocale(LC_ALL, "");
     
@@ -135,6 +137,7 @@ int main(int argc, char **argv)
             /* Must copy the template as well */
             t = tdb1->methods.get(tdb1, q->template->tag);
             tdb2->methods.set(tdb2, t);
+            tdb2_changed = true;
         }
         template_deref(t);
 nextq:
@@ -145,7 +148,8 @@ nextq:
         regfree(&pattern_regex);
 
     db2->methods.save(db2);
-    tdb2->methods.save(tdb2);
+    if (tdb2_changed)
+        tdb2->methods.save(tdb2);
     question_db_delete(db1);
     question_db_delete(db2);
     template_db_delete(tdb1);
