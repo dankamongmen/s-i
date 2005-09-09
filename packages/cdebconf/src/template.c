@@ -445,7 +445,7 @@ static void template_lset(struct template *t, const char *lang,
         return;
     }
 
-    /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
+    /*   If field is Foo-xx.UTF-8 then call template_lset(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
     {
         if (!allow_i18n())
