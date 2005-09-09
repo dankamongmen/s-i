@@ -59,7 +59,7 @@ VG_reduce () {
 # Add a new PV to a VG.  The PV will be pvcreate-d
 # $1 = PV
 # $2 = VG
-attach_PV () {
+VG_extend () {
     pvcreate -ff -y $1 >>/var/log/messages 2>&1 \
 	&& vgextend $2 $1 >>/var/log/messages 2>&1
 }
