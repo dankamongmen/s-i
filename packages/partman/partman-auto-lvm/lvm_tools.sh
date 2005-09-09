@@ -50,7 +50,7 @@ VG_of_PV () {
 
 # Make a PV not to be part of its VG
 # $1 = PV
-detach_PV () {
+VG_reduce () {
     local vg
     vg=`VG_of_PV $1` \
 	&& vgreduce $vg $1 >>/var/log/messages 2>&1
