@@ -6,8 +6,10 @@ set -e
 db_capb backup
 
 localecode="debian-installer/locale"
-langname="languagechooser/language-name"
-langname_nofb="languagechooser/language-name-nofb"
+langname_ascii="languagechooser/language-name-ascii"
+langname_latin="languagechooser/language-name-latin"
+langname_fb="languagechooser/language-name-fb"
+langname_all="languagechooser/language-name"
 fallbacklocalecode="debian-installer/fallbacklocale"
 languagecode="debian-installer/language"
 countrycode="debian-installer/country"
@@ -147,12 +149,18 @@ if test "$RET" ; then
 	LANGNAME=$(locale2langname "$LOCALE" "$LANGUAGELISTFILE")
 	LANGUAGE=$(locale2langcode "$LOCALE")
 	if test $LANGNAME ; then
+		db_set $langname_ascii $LANGNAME
+		log "Set $langname_ascii = '$LANGNAME'"
+		db_set $langname_latin $LANGNAME
+		log "Set $langname_nofb = '$LANGNAME'"
+		db_set $langname_fb $LANGNAME
+		log "Set $langname_fb = '$LANGNAME'"
 		db_set $langname $LANGNAME
 		log "Set $langname = '$LANGNAME'"
-		db_set $langname_nofb $LANGNAME
-		log "Set $langname_nofb = '$LANGNAME'"
+		db_fset $langname_ascii seen $seenflag || true
+		db_fset $langname_latin seen $seenflag || true
+		db_fset $langname_fb seen $seenflag || true
 		db_fset $langname seen $seenflag || true
-		db_fset $langname_nofb seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if test $COUNTRY ; then
 			if grep -q "$LANGUAGE" $SHORTLISTS ; then
@@ -177,29 +185,51 @@ if test "$RET" ; then
 	fi
 fi
 
-db_get debian-installer/framebuffer || true
-if [ "$RET" = "false" -o -z "$RET" ]  ; then
-	nofb=yes
-else
-	nofb=""
-fi
-
-if [ -z "$nofb" ] ; then
-	db_input high $langname || [ $? -eq 30 ]
-else
-	db_input high $langname_nofb || [ $? -eq 30 ]
-fi
-if db_go; then
-	if [ -z "$nofb" ] ; then
-		db_get $langname
-		value="$RET"
+# Find the display level
+#
+# No framebuffer and text interface      -->level 0 (only ASCII)
+# No framebuffer and other interface     -->level 1 (only Latin1)
+# Framebuffer and non graphical interface-->level 2 (no combining langs)
+# Framebuffer and graphical interface    -->level 3 (all langs)
+# Depending on these values, we use different templates with a different
+# list of languages. These lists are built at the package build-time
+# from the contents of the second field of languagelist entries
+case $DEBCONF_FRONTEND in
+    text)
+	# Stricto-sensu, the text interface can use all languages
+	template=${langname_ascii}
+    ;;
+    gtk)
+	# We assume that the GTK interface handles all languages
+	template=${langname_all}
+    ;;
+    *)
+	# Only keep Latin1 languages if we don't have the framebuffer
+	db_get debian-installer/framebuffer || true
+	if test "$RET" = "false" || test -z "$RET"  ; then
+	    template=${langname_latin}
 	else
-		db_get $langname_nofb
-		value="$RET"
+	    template=${langname_fb}
 	fi
-	if test "$value" ; then
-		db_set $langname "$value"
-		LANGNAME="$value"
+	# Try to detect serial consoles
+	test -f /lib/debian-installer/detect-console && . /lib/debian-installer/detect-console
+	if test "${TERM_TYPE}" = "serial"  ; then
+	    template=${langname_ascii}	    
+	fi
+	# For cases we have a dumb terminal, we're stuck with ASCII
+	if test "${TERM}" = "dumb"  ; then
+	    template=${langname_ascii}	    
+	fi
+    ;;
+esac
+
+db_input high $template || [ $? -eq 30 ]
+
+if db_go; then
+	db_get $template
+	if test "$RET" ; then
+		db_set ${langname_all} "$RET"
+		LANGNAME="$RET"
 		. languagemap
 		db_set "$languagecode" "$LANGUAGELIST"
 		db_set "$localecode"   "$LOCALE"

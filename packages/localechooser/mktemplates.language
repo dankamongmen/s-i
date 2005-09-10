@@ -13,7 +13,7 @@ my $listl10n   = shift;
 my $template   = shift;
 my $templatein = shift;
 
-my $debug = 0;
+my $debug = 1;
 
 my $show_locales = 1;
 
@@ -21,15 +21,16 @@ my %locales;
 
 sub get_language_names {
     my $list = shift;
+    my $level = shift;
     my @names;
-    print "Loading $list\n" if ($debug);
+    print "Loading $list for display level $level\n" if ($debug);
     open(L, "< $list") || die "Unable to read $list";
     while (<L>) {
 	print if ($debug);
 	chomp;
 	next if m/^\#/;
-	my ($name, $fb, $locale, ) = split(/;/);
-	push(@names, $name);
+	my ($name, $lev, $locale, ) = split(/;/);
+	push(@names, $name) if ("$lev" <= "$level");
 	$locale =~ s/@.+//;
 	# Drop modifier and charset part of locale
 	$locale =~ s/[@.].+$//;
@@ -37,22 +38,6 @@ sub get_language_names {
     }
     close(L);
     return @names;
-}
-
-sub get_language_names_nofb {
-    my $list = shift;
-    my @names_nofb;
-    print "Loading $list\n" if ($debug);
-    open(L, "< $list") || die "Unable to read $list";
-    while (<L>) {
-	print if ($debug);
-	chomp;
-	next if m/^\#/;
-	my ($name, $fb, $locale, ) = split(/;/);
-	push(@names_nofb, $name) if ($fb == 1);
-    }
-    close(L);
-    return @names_nofb;
 }
 
 sub get_translations {
@@ -92,8 +77,10 @@ sub get_translations {
     return %translations;
 }
 
-my @languagenames   = get_language_names($list);
-my @languagenames_nofb   = get_language_names_nofb($list);
+my @languagenames_ascii   = get_language_names($list,0);
+my @languagenames_latin   = get_language_names($list,1);
+my @languagenames_fb   = get_language_names($list,2);
+my @languagenames_all   = get_language_names($list,3);
 my %translationmap  = get_translations($listl10n);
 
 sub order_trans {
@@ -104,39 +91,68 @@ sub order_trans {
     return $a_locale cmp $b_locale;
 }
 
-my @translations;
-my @translations_nofb;
-my @sortedlanguagenames;
-my @sortedlanguagenames_nofb;
-for my $name (sort order_trans @languagenames) {
+my @translations_ascii;
+my @translations_latin;
+my @translations_fb;
+my @translations_all;
+my @sortedlanguagenames_ascii;
+my @sortedlanguagenames_latin;
+my @sortedlanguagenames_fb;
+my @sortedlanguagenames_all;
+for my $name (sort order_trans @languagenames_ascii) {
     if (exists $translationmap{$name}) {
-	push(@translations, $translationmap{$name});
-	push(@sortedlanguagenames, $name);
+	push(@translations_ascii, $translationmap{$name});
+	push(@sortedlanguagenames_ascii, $name);
     } else {
 	print "Missing $name in $listl10n\n";
     }
 }
-for my $name (sort order_trans @languagenames_nofb) {
+for my $name (sort order_trans @languagenames_latin) {
     if (exists $translationmap{$name}) {
-	push(@translations_nofb, $translationmap{$name});
-	push(@sortedlanguagenames_nofb, $name);
+	push(@translations_latin, $translationmap{$name});
+	push(@sortedlanguagenames_latin, $name);
     } else {
 	print "Missing $name in $listl10n\n";
     }
 }
-my $langstr=join(", ", @sortedlanguagenames);
-my $nativemessages=join(", ", @translations);
-my $langstr_nofb=join(", ", @sortedlanguagenames_nofb);
-my $nativemessages_nofb=join(", ", @translations_nofb);
+for my $name (sort order_trans @languagenames_fb) {
+    if (exists $translationmap{$name}) {
+	push(@translations_fb, $translationmap{$name});
+	push(@sortedlanguagenames_fb, $name);
+    } else {
+	print "Missing $name in $listl10n\n";
+    }
+}
+for my $name (sort order_trans @languagenames_all) {
+    if (exists $translationmap{$name}) {
+	push(@translations_all, $translationmap{$name});
+	push(@sortedlanguagenames_all, $name);
+    } else {
+	print "Missing $name in $listl10n\n";
+    }
+}
+
+my $langstr_ascii=join(", ", @sortedlanguagenames_ascii);
+my $nativemessages_ascii=join(", ", @translations_ascii);
+my $langstr_latin=join(", ", @sortedlanguagenames_latin);
+my $nativemessages_latin=join(", ", @translations_latin);
+my $langstr_fb=join(", ", @sortedlanguagenames_fb);
+my $nativemessages_fb=join(", ", @translations_fb);
+my $langstr_all=join(", ", @sortedlanguagenames_all);
+my $nativemessages_all=join(", ", @translations_all);
 
 open(TIN, "< $templatein") || die "Unable to read $templatein";
 open(TOUT, "> $template") || die "Unable to write $template";
 while (<TIN>) {
     next if m/^#/;
-    s/\@languagenames\@/$langstr/;
-    s/\@nativemessages\@/$nativemessages/;
-    s/\@languagenames_nofb\@/$langstr_nofb/;
-    s/\@nativemessages_nofb\@/$nativemessages_nofb/;
+    s/\@languagenames_ascii\@/$langstr_ascii/;
+    s/\@nativemessages_ascii\@/$nativemessages_ascii/;
+    s/\@languagenames_latin\@/$langstr_latin/;
+    s/\@nativemessages_latin\@/$nativemessages_latin/;
+    s/\@languagenames_fb\@/$langstr_fb/;
+    s/\@nativemessages_fb\@/$nativemessages_fb/;
+    s/\@languagenames_all\@/$langstr_all/;
+    s/\@nativemessages_all\@/$nativemessages_all/;
     print TOUT;
 }
 close(TOUT) || warn;
