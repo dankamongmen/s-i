@@ -409,7 +409,7 @@ if [ "$DEBUG" = "Y" ] ; then
   echo Done.
 fi
 
-# 2) Merge all templates.pot file together
+# 2) Merge all templates.pot files together
 cd $DI_COPY/packages
 if [ "$DEBUG" = "Y" ] ; then
   echo -n "Creating the general template.pot file..."
@@ -423,10 +423,19 @@ if [ "$DEBUG" = "Y" ] ; then
 else
   msgcat $pots | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new 2>/dev/null
 fi
+# Determine the most recent POT-Creation-Date for individual components
+# Include master templates.pot too so the timestamp will never be set back
+LASTDATE="$(
+  for i in $pots po/template.pot; do
+    date -ud "$(grep "POT-Creation-Date:" $i | sed 's/^.*: \(.*\)\\n.*$/\1/')" "+%F %R%z"
+  done | sort | tail -n 1)"
 # We don't want all templates.pot files headers as we don't care about them
 # So we merge the generated file with a simple header.pot file
 if [ -f po/header.pot -a -s po/template.pot.new ] ; then
-  msgcat --use-first po/header.pot po/template.pot.new | sed 's/charset=UTF-8/charset=CHARSET/g' > po/template.pot
+  msgcat --use-first po/header.pot po/template.pot.new | \
+      sed 's/charset=UTF-8/charset=CHARSET/g' | \
+      sed "s/^.*POT-Creation-Date:.*$/\"POT-Creation-Date: $LASTDATE\\\n\"/" \
+      > po/template.pot
   rm po/template.pot.new
 else
   echo ERROR : no $DI_COPY/packages/po/header.pot file. Cannot continue.
