@@ -149,18 +149,9 @@ if test "$RET" ; then
 	LANGNAME=$(locale2langname "$LOCALE" "$LANGUAGELISTFILE")
 	LANGUAGE=$(locale2langcode "$LOCALE")
 	if test $LANGNAME ; then
-		db_set $langname_ascii $LANGNAME
-		log "Set $langname_ascii = '$LANGNAME'"
-		db_set $langname_latin $LANGNAME
-		log "Set $langname_nofb = '$LANGNAME'"
-		db_set $langname_fb $LANGNAME
-		log "Set $langname_fb = '$LANGNAME'"
-		db_set $langname $LANGNAME
-		log "Set $langname = '$LANGNAME'"
-		db_fset $langname_ascii seen $seenflag || true
-		db_fset $langname_latin seen $seenflag || true
-		db_fset $langname_fb seen $seenflag || true
-		db_fset $langname seen $seenflag || true
+		db_set ${langname_all} $LANGNAME
+		log "Set ${langname_all} = '$LANGNAME'"
+		db_fset ${langname_all} seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if test $COUNTRY ; then
 			if grep -q "$LANGUAGE" $SHORTLISTS ; then
@@ -194,42 +185,54 @@ fi
 # Depending on these values, we use different templates with a different
 # list of languages. These lists are built at the package build-time
 # from the contents of the second field of languagelist entries
-case $DEBCONF_FRONTEND in
-    text)
-	# Stricto-sensu, the text interface can use all languages
-	template=${langname_ascii}
-    ;;
-    gtk)
-	# We assume that the GTK interface handles all languages
-	template=${langname_all}
-    ;;
-    *)
-	# Only keep Latin1 languages if we don't have the framebuffer
-	db_get debian-installer/framebuffer || true
-	if test "$RET" = "false" || test -z "$RET"  ; then
-	    template=${langname_latin}
-	else
-	    template=${langname_fb}
-	fi
-	# Try to detect serial consoles
-	test -f /lib/debian-installer/detect-console && . /lib/debian-installer/detect-console
-	if test "${TERM_TYPE}" = "serial"  ; then
-	    template=${langname_ascii}	    
-	fi
-	# For cases we have a dumb terminal, we're stuck with ASCII
-	if test "${TERM}" = "dumb"  ; then
-	    template=${langname_ascii}	    
-	fi
-    ;;
-esac
+#
+# We do this only when the language was not preseeded
+# If the language was preseeded, we assume the user was 
+# smart enough to preseed it to a supported value
+# so the template uses all possible values
+if test -z "$LANGNAME" ; then
+    case $DEBCONF_FRONTEND in
+	text)
+	    # Stricto-sensu, the text interface could use all languages
+	    # but it will most often be used in situation where the display
+	    # is "poor", so let's assume that only ASCII languages may be 
+	    # displayed, then
+	    template=${langname_ascii}
+	;;
+	gtk)
+	    # We assume that the GTK interface handles all languages
+	    template=${langname_all}
+	;;
+	*)
+	    # Only keep Latin1 languages if we don't have the framebuffer
+	    db_get debian-installer/framebuffer || true
+	    if test "$RET" = "false" || test -z "$RET"  ; then
+		template=${langname_latin}
+	    else
+		template=${langname_fb}
+	    fi
+	    # Try to detect serial consoles
+	    test -f /lib/debian-installer/detect-console && . /lib/debian-installer/detect-console
+	    if test "${TERM_TYPE}" = "serial"  ; then
+		template=${langname_ascii}	    
+	    fi
+	    # For cases we have a dumb terminal, we're stuck with ASCII
+	    if test "${TERM}" = "dumb"  ; then
+		template=${langname_ascii}	    
+	    fi
+	;;
+    esac
+else
+    template=${langname_all}
+fi
 
 db_input high $template || [ $? -eq 30 ]
 
 if db_go; then
 	db_get $template
 	if test "$RET" ; then
-		db_set ${langname_all} "$RET"
 		LANGNAME="$RET"
+		db_set ${langname_all} "$LANGNAME"
 		. languagemap
 		db_set "$languagecode" "$LANGUAGELIST"
 		db_set "$localecode"   "$LOCALE"
@@ -256,7 +259,6 @@ fi
 
 db_set "debconf/language" "$LANGUAGELIST"
 log "Set debconf/language = '$LANGUAGELIST''"
-
 
 # Install specific packages depending on languages
 
@@ -314,7 +316,6 @@ ar|he|fa)
 	pkginstall libfribidi0
 ;;
 esac
-
 # This is needed at the end of the script
 COUNTRYCODE_LANGUAGECHOOSER=$COUNTRY
 COUNTRY_LANGUAGECHOOSER=$(code2country $COUNTRY)
