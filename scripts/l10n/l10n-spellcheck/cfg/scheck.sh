@@ -1,5 +1,5 @@
 #!/bin/sh
-export PATH=${HOME}/aspell:${HOME}/l10n-spellcheck:$PATH
+export PATH=${HOME}/l10n-spellcheck:$PATH
 
 case "$1" in
 man)
