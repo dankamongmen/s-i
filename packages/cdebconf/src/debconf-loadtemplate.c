@@ -127,6 +127,12 @@ int main(int argc, char **argv)
                 q->template = t;
                 template_ref(t);
             }
+            else if (strcmp(q->template->tag, t->tag) != 0)
+            {
+                template_deref(q->template);
+                q->template = t;
+                template_ref(t);
+            }
             question_owner_add(q, owner);
             if (qdb->methods.set(qdb, q) != DC_OK)
                 INFO(INFO_ERROR, "Cannot add config %s", t->tag);
