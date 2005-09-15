@@ -574,14 +574,20 @@ gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *m
 return TRUE;
 }
 
-#if 0 /* currently unused */
 static const char *
 get_text(struct frontend *obj, const char *template, const char *fallback )
 {
     struct question *q = obj->qdb->methods.get(obj->qdb, template);
     return q ? q_get_description(q) : fallback;
 }
-#endif
+
+static GtkTextDirection get_text_direction(struct frontend *obj)
+{
+	const char *dirstr = get_text(obj, "debconf/text-direction", "LTR - default text direction");
+	if (dirstr[0] == 'R')
+		return GTK_TEXT_DIR_RTL;
+	return GTK_TEXT_DIR_LTR;
+}
 
 gboolean need_continue_button(struct frontend *obj)
 {
@@ -1490,7 +1496,9 @@ static int gtk_go(struct frontend *obj)
         gtk_widget_set_sensitive (data->button_prev, FALSE);
 
     gtk_widget_set_sensitive(GTK_WIDGET(data->button_next), TRUE);
-     
+    
+    gtk_widget_set_default_direction(get_text_direction(obj));
+
     gtk_widget_show_all(data->window);    
    
     gtk_main();
