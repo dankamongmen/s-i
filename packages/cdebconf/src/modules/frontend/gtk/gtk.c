@@ -1496,6 +1496,9 @@ static int gtk_go(struct frontend *obj)
         gtk_widget_set_sensitive (data->button_prev, FALSE);
 
     gtk_widget_set_sensitive(GTK_WIDGET(data->button_next), TRUE);
+
+	gtk_button_set_label (GTK_BUTTON(data->button_prev), get_text(obj, "debconf/button-goback", "Go Back") );
+	gtk_button_set_label (GTK_BUTTON(data->button_next), get_text(obj, "debconf/button-continue", "Continue") );
     
     gtk_widget_set_default_direction(get_text_direction(obj));
 
