@@ -840,7 +840,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
  */
 static int gtkhandler_main_menu(struct frontend *obj, struct question *q, GtkWidget *qbox, bool sensitive_buttons, bool jump_enabled)
 {
-    GtkWidget *frame, *button, *button_box;
+    GtkWidget *label, *button, *button_box;
     char **choices, **choices_translated;
     int i, count;
     struct frontend_question_data *data;
@@ -863,12 +863,12 @@ static int gtkhandler_main_menu(struct frontend *obj, struct question *q, GtkWid
     if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
         return DC_NOTOK;
 
+    label = gtk_label_new(q_get_description(q));
+    gtk_box_pack_start(GTK_BOX(qbox), label, FALSE, FALSE, 5);
+
     button_box = gtk_vbutton_box_new();
-
-    frame = gtk_frame_new(q_get_description(q));
-    gtk_container_add(GTK_CONTAINER (frame), button_box);
-
-    gtk_box_pack_start(GTK_BOX(qbox), frame, FALSE, FALSE, 5);
+    gtk_vbutton_box_set_layout_default(GTK_BUTTONBOX_SPREAD);
+    gtk_box_pack_start(GTK_BOX(qbox), button_box, FALSE, FALSE, 5);
 
     for (i = 0; i < count; i++)
     {
@@ -1120,8 +1120,9 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
 	0) Globalbox
 	1) Mainbox
-	2) menubox_scroll
-	3) menubox
+	2) menubox_vpad
+	3) menubox_scroll
+	9) menubox
 	4) targetbox_scroll
 	5) targetbox
 	6) actionbox
@@ -1131,14 +1132,14 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 	0_________________________
 	|  _____  |1 ___________  |
 	| |2___ | | |4_________ | |
-	| ||3  || | ||5        || |
-	| ||   || | ||_________|| |
-	| ||   || | |___________| |	
-	| ||   || |  ___________  |
-	| ||   || | |6          | |	
-	| ||   || | |___________| |
-	| ||   || |  ___________  |
-	| ||   || | |7__________| |	
+	| ||3_ || | ||5        || |
+	| |||9||| | ||_________|| |
+	| ||| ||| | |___________| |	
+	| ||| ||| |  ___________  |
+	| ||| ||| | |6          | |	
+	| ||| ||| | |___________| |
+	| ||| ||| |  ___________  |
+	| |||_||| | |7__________| |	
 	| ||___|| |  ___________  |
 	| |_____| | |8__________| |	
 	|_________|_______________|		
@@ -1147,7 +1148,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
     GtkWidget *mainbox, *globalbox;
     GtkWidget *targetbox, *targetbox_scroll;
-    GtkWidget *menubox, *menubox_scroll;
+    GtkWidget *menubox, *menubox_vpad, *menubox_scroll;
     GtkWidget *actionbox, *infobox;
     GtkWidget *button_next, *button_prev;
     GtkWidget *info_frame, *progress_bar_frame;
@@ -1233,6 +1234,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
      */
     if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
 	{
+		menubox_vpad = gtk_vbox_new (FALSE, 10);
 	    menubox = gtk_vbox_new (FALSE, 10);
 	    ((struct frontend_data*) obj->data)->menu_box = menubox;
 	    menubox_scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -1240,6 +1242,8 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 	    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (menubox_scroll),
 	                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 		gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW (menubox_scroll), GTK_SHADOW_NONE);
+		gtk_box_pack_start(GTK_BOX (menubox_vpad), menubox_scroll, TRUE, TRUE, 10);
+		
 	}
 
     /* Final packaging */
@@ -1249,7 +1253,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
     globalbox = gtk_hbox_new (TRUE, 10);
 	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
-    	gtk_box_pack_start(GTK_BOX (globalbox), menubox_scroll, TRUE, TRUE, 5);
+    	gtk_box_pack_start(GTK_BOX (globalbox), menubox_vpad, TRUE, TRUE, 5);
     gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
 
     gtk_container_add(GTK_CONTAINER(window), globalbox);
@@ -1323,6 +1327,7 @@ static int gtk_go(struct frontend *obj)
     struct frontend_data *data = (struct frontend_data *) obj->data;
     struct question *q = obj->questions;
     GtkWidget *questionbox, *menubox;
+    GtkWidget *image_button_forward, *image_button_back;
     di_slist *plugins;
     int i, j;
     int ret;
@@ -1499,6 +1504,18 @@ static int gtk_go(struct frontend *obj)
 
 	gtk_button_set_label (GTK_BUTTON(data->button_prev), get_text(obj, "debconf/button-goback", "Go Back") );
 	gtk_button_set_label (GTK_BUTTON(data->button_next), get_text(obj, "debconf/button-continue", "Continue") );
+	image_button_back = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_SMALL_TOOLBAR );
+	image_button_forward = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_SMALL_TOOLBAR );
+
+	/* gtk_button_set_image() was first implemented in GTK v. 2.6 while
+	 * the most recent working build of GTK with GDK DFB support is 2.0.9,
+	 * so we'll have to stay with text-only arrows until GDK DFB library
+	 * is update to compile with GTK v 2.8 :(
+     */
+     	
+	/* gtk_button_set_image (GTK_BUTTON(data->button_prev), image_button_back); */    
+	/* gtk_button_set_image (GTK_BUTTON(data->button_next), image_button_forward); */
+
     
     gtk_widget_set_default_direction(get_text_direction(obj));
 
