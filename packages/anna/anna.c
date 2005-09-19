@@ -6,6 +6,7 @@
 struct debconfclient *debconf = NULL;
 static char *running_kernel = NULL;
 static const char *subarchitecture;
+static int quiet = 0;
 
 di_packages *get_packages (void) {
 	di_packages_allocator *packages_allocator = di_system_packages_allocator_alloc();
@@ -257,7 +258,8 @@ install_modules(di_packages *status, di_packages *packages) {
 	if (pkg_count <= 0)
 		return 0;
 
-	debconf_progress_start(debconf, 0, 2*pkg_count,  "anna/progress_title");
+	if (!quiet)
+		debconf_progress_start(debconf, 0, 2*pkg_count, "anna/progress_title");
 
 	for (node = packages->list.head; node; node = node->next) {
 		package = node->data;
@@ -273,14 +275,17 @@ install_modules(di_packages *status, di_packages *packages) {
 			if (asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f) == -1) 
 				return 5;
 
-			debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
-			debconf_subst(debconf, "anna/progress_step_inst", "PACKAGE", package->package);
-			debconf_progress_info(debconf, "anna/progress_step_retr");
+			if (!quiet) {
+				debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
+				debconf_subst(debconf, "anna/progress_step_inst", "PACKAGE", package->package);
+				debconf_progress_info(debconf, "anna/progress_step_retr");
+			}
 			for (;;) {
 				if (retriever_retrieve(package, dest_file)) {
 					di_log(DI_LOG_LEVEL_WARNING, "package retrieval failed");
-					/* error handling may use a progress bar, so stop the current one */
-					debconf_progress_stop(debconf);
+					if (!quiet)
+						/* error handling may use a progress bar, so stop the current one */
+						debconf_progress_stop(debconf);
 					if (retriever_error("retrieve") != 1) {
 						/* Failed to handle error. */
 						free(dest_file);
@@ -289,15 +294,17 @@ install_modules(di_packages *status, di_packages *packages) {
 					}
 					else {
 						/* Handled error, retry. */
-						resume_progress_bar(progress_step, pkg_count, package);
+						if (!quiet)
+							resume_progress_bar(progress_step, pkg_count, package);
 						continue;
 					}
 				}
                 
 				if (! md5sum(package->md5sum, dest_file)) {
 					di_log(DI_LOG_LEVEL_WARNING, "bad md5sum");
-					/* error handling may use a progress bar, so stop the current one */
-					debconf_progress_stop(debconf);
+					if (!quiet)
+						/* error handling may use a progress bar, so stop the current one */
+						debconf_progress_stop(debconf);
 					if (retriever_error("retrieve") != 1) {
 						/* Failed to handle error. */
 						unlink(dest_file);
@@ -307,19 +314,23 @@ install_modules(di_packages *status, di_packages *packages) {
 					}
 					else {
 						/* Handled error, retry. */
-						resume_progress_bar(progress_step, pkg_count, package);
+						if (!quiet)
+							resume_progress_bar(progress_step, pkg_count, package);
 						continue;
 					}
 				}
 
 				break;
 			}
-			
-			debconf_progress_step(debconf, 1);
-			progress_step++;
-			debconf_progress_info(debconf, "anna/progress_step_inst");
+
+			if (!quiet) {
+				debconf_progress_step(debconf, 1);
+				progress_step++;
+				debconf_progress_info(debconf, "anna/progress_step_inst");
+			}
 			if (!unpack_package(dest_file)) {
-				debconf_progress_stop(debconf);
+				if (!quiet)
+					debconf_progress_stop(debconf);
 				debconf_subst(debconf, "anna/install_failed", "PACKAGE", package->package);
 				debconf_input(debconf, "critical", "anna/install_failed");
 				debconf_go(debconf);
@@ -330,7 +341,8 @@ install_modules(di_packages *status, di_packages *packages) {
 			}
 			if (!((di_system_package *)package)->installer_menu_item &&
 			    !configure_package(package->package)) {
-				debconf_progress_stop(debconf);
+				if (!quiet)
+					debconf_progress_stop(debconf);
 				debconf_subst(debconf, "anna/install_failed", "PACKAGE",
 				              package->package);
 				debconf_input(debconf, "critical", "anna/install_failed");
@@ -343,13 +355,16 @@ install_modules(di_packages *status, di_packages *packages) {
 
 			unlink(dest_file);
 			free(dest_file);
-			debconf_progress_step(debconf, 1);
-			progress_step++;
+			if (!quiet) {
+				debconf_progress_step(debconf, 1);
+				progress_step++;
+			}
 		}
 	}
 
-	debconf_progress_stop(debconf);
-    
+	if (!quiet)
+		debconf_progress_stop(debconf);
+
 OUT:
 	return ret;
 }
@@ -359,6 +374,7 @@ int main(int argc, char **argv) {
 	di_packages *packages, *status;
 	di_packages_allocator *status_allocator;
 	struct utsname uts;
+	const char *quiet_env;
 
 	debconf = debconfclient_new();
 	debconf_capb(debconf, "backup");
@@ -370,6 +386,10 @@ int main(int argc, char **argv) {
 	if (uname(&uts) == 0) {
 		running_kernel = strdup(uts.release);
 	}
+
+	quiet_env = getenv("ANNA_QUIET");
+	if (quiet_env && strcmp(quiet_env, "1") == 0)
+		quiet = 1;
 
 	status_allocator = di_system_packages_allocator_alloc();
 	status = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, status_allocator);
