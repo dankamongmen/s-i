@@ -1,0 +1,13 @@
+#! /bin/sh
+set -e
+
+if [ $# -lt 2 ]; then
+	echo "Usage: log-output TAG PROGRAM [ARGUMENTS]" >&2
+	exit 1
+fi
+
+TAG="$1"
+shift
+
+CODE="$( ((set +e; "$@" 2>&1; echo $? >&3) | logger -t "$TAG") 3>&1 | tail -n1 )"
+exit "$CODE"
