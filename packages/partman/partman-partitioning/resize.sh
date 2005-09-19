@@ -6,6 +6,7 @@ check_virtual () {
 }
 
 get_ntfs_resize_range () {
+    local backupdev num dev size
     open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
     read_line minsize cursize maxsize
     close_dialog
