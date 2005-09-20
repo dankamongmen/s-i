@@ -23,4 +23,25 @@ l4)
 l5)
 	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level5
 	;;
+all)
+	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/manual_d-i
+	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level1-post-sarge
+	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level1
+	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level2
+	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level3
+	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level4
+	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level5
+	;;
+*)
+	echo "Unknown parameter. Here's the list of known parameters:"
+	echo ""
+	echo "all - useful to force a re-run of the spellcheck"
+	echo "man"
+	echo "l1-ps"
+	echo "l1"
+	echo "l2"
+	echo "l3"
+	echo "l4"
+	echo "l5"
+	;;
 esac
