@@ -42,8 +42,7 @@ int local_priority = -1;
 static struct debconfclient *debconf;
 
 static int di_config_package(di_system_package *p,
-			     int (*virtfunc)(di_system_package *),
-			     int (*walkfunc)(di_system_package *));
+			     int (*virtfunc)(di_system_package *));
 /*
  * qsort comparison function (sort by menu item values, fall back to
  * lexical sort to resolve ties deterministically).
@@ -150,43 +149,12 @@ get_default_menu_item(di_slist *list)
 	return NULL;
 }
 
-/* Return the text of the menu entry for PACKAGE, translated to
-   LANGUAGE if possible.  */
-static size_t menu_entry(struct debconfclient *debconf, char *language, di_system_package *package, char *buf, size_t size)
+/* Return the text of the menu entry for PACKAGE.  */
+static size_t menu_entry(struct debconfclient *debconf, di_system_package *package, char *buf, size_t size)
 {
 	char question[256];
 
 	snprintf(question, sizeof(question), "debian-installer/%s/title", package->p.package);
-	if (language) {
-		/*  256 + strlen("Description-.UTF-8")  */
-		char field[256+18];
-		char *lang, *end, *und;
-
-		strcpy(field, "Description-");
-		lang = language;
-		do {
-			end = strchr(lang, ':');
-			if (end == NULL)
-				end = lang + strlen(lang);
-		        strncpy(field+12, lang, end-lang);
-		        strcpy(field+12+(end-lang), ".UTF-8");
-			if (!debconf_metaget(debconf, question, field)) {
-				strncpy(buf, debconf->value, size);
-				return strlen (buf);
-			}
-			// Was the language of the form xx_YY ? 
-			und = strchr(lang, '_');
-			if (und != NULL && (und - lang) < (end - lang)) {
-		        	strncpy(field+12, lang, und-lang);
-		        	strcpy(field+12+(und-lang), ".UTF-8");
-				if (!debconf_metaget(debconf, question, field)) {
-	                        	strncpy(buf, debconf->value, size);
-	                        	return strlen (buf);
-	                	}
-			}
-			lang = end+1;
-		} while (*end != '\0');
-	}
 	if (!debconf_metaget(debconf, question, "Description")) {
 		strncpy(buf, debconf->value, size);
 		return strlen (buf);
@@ -202,7 +170,6 @@ static size_t menu_entry(struct debconfclient *debconf, char *language, di_syste
 
 /* Displays the main menu via debconf and returns the selected menu item. */
 di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *allocator) {
-	char *language = NULL;
 	di_system_package **package_array, *p;
 	di_slist *list;
 	di_slist_node *node;
@@ -210,9 +177,6 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	int i = 0, num = 0;
 	char buf[256], *menu, *s;
 	int menu_size, menu_used, size;
-
-	if (debconf_get(debconf,"debian-installer/language") == 0 && debconf->value)
-		language = strdup(debconf->value);
 
 	for (node = packages->list.head; node; node = node->next) {
 		p = node->data;
@@ -246,7 +210,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 		if (!p->installer_menu_item ||
 		    !isinstallable(p))
 			continue;
-		size = menu_entry(debconf, language, p, buf, sizeof (buf));
+		size = menu_entry(debconf, p, buf, sizeof (buf));
 		if (menu_used + size + 2 > menu_size)
 		{
 			menu_size += 1024;
@@ -265,7 +229,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	debconf_capb(debconf);
 	debconf_subst(debconf, MAIN_MENU, "MENU", menu);
 	if (menudefault) {
-		menu_entry(debconf, language, menudefault, buf, sizeof (buf));
+		menu_entry(debconf, menudefault, buf, sizeof (buf));
 		debconf_set(debconf, MAIN_MENU, buf);
 	}
 	debconf_input(debconf, MENU_PRIORITY, MAIN_MENU);
@@ -276,7 +240,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	/* Figure out which menu item was selected. */
 	for (i = 0; i < num; i++) {
 		p = package_array[i];
-		menu_entry(debconf, language, p, buf, sizeof (buf));
+		menu_entry(debconf, p, buf, sizeof (buf));
 		if (strcmp(buf, s) == 0) {
 			ret = p;
 			break;
@@ -291,13 +255,10 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 		di_log(DI_LOG_LEVEL_WARNING, "Internal error! Cannot find \"%s\" in menu.", s);
 	}
 	
-	free(language);
 	free(package_array);
 
 	return ret;
 }
-
-static int check_special(di_system_package *p);
 
 /*
  * Satisfy the dependencies of a virtual package. Its dependencies
@@ -308,13 +269,9 @@ static int check_special(di_system_package *p);
 static int satisfy_virtual(di_system_package *p) {
 	di_slist_node *node;
 	di_system_package *dep, *defpkg = NULL;
-	char *language = NULL;
 	char buf[256], *menu, *s = NULL;
 	size_t menu_size, menu_used, size;
 	int is_menu_item = 0;
-
-	if (debconf_get(debconf, "debian-installer/language") == 0 && debconf->value)
-		language = strdup(debconf->value);
 
 	menu = di_malloc(1024);
 	menu[0] = '\0';
@@ -330,7 +287,7 @@ static int satisfy_virtual(di_system_package *p) {
 			/* Non-providing dependency */
 			di_log(DI_LOG_LEVEL_DEBUG, "non-providing dependency from %s to %s", p->p.package, dep->p.package);
 			if (dep->p.status != di_package_status_installed) {
-				switch (di_config_package(dep, satisfy_virtual, check_special)) {
+				switch (di_config_package(dep, satisfy_virtual)) {
 					case -1:
 						return -1;
 					case EXIT_BACKUP:
@@ -356,7 +313,7 @@ static int satisfy_virtual(di_system_package *p) {
 		if (dep->installer_menu_item)
 			is_menu_item = 1;
 
-		size = menu_entry(debconf, language, dep, buf, sizeof (buf));
+		size = menu_entry(debconf, dep, buf, sizeof (buf));
 		if (menu_used + size + 2 > menu_size)
 		{
 			menu_size += 1024;
@@ -385,7 +342,7 @@ static int satisfy_virtual(di_system_package *p) {
 			char *priority = "medium";
 			/* Only let the user choose if one of them is a menu item */
 			if (defpkg != NULL) {
-				menu_entry(debconf, language, defpkg, buf, sizeof(buf));
+				menu_entry(debconf, defpkg, buf, sizeof(buf));
 				debconf_set(debconf, MISSING_PROVIDE, buf);
 			} else {
 				/* TODO: How to figure out a default? */
@@ -404,12 +361,12 @@ static int satisfy_virtual(di_system_package *p) {
 		for (node = p->p.depends.head; node; node = node->next) {
 			di_package_dependency *d = node->data;
 			dep = (di_system_package *)d->ptr;
-			menu_entry(debconf, language, dep, buf, sizeof(buf));
+			menu_entry(debconf, dep, buf, sizeof(buf));
 			if (!is_menu_item || strcmp(s, buf) == 0) {
 				/* Ick. If we have a menu item it has to match the
 				 * debconf choice, otherwise we configure all of
 				 * the providing packages */
-				switch (di_config_package(dep, satisfy_virtual, check_special)) {
+				switch (di_config_package(dep, satisfy_virtual)) {
 					case -1:
 						return -1;
 					case EXIT_BACKUP:
@@ -422,37 +379,10 @@ static int satisfy_virtual(di_system_package *p) {
 	}
 	free(menu);
 	free(s);
-	free(language);
 	/* It doesn't make sense to configure virtual packages,
 	 * since they are, well, virtual. */
 	p->p.status = di_package_status_installed;
 	return 1;
-}
-
-static void update_language (void) {
-	debconf_get(debconf, "debian-installer/language");
-	if (*debconf->value != 0)
-		setenv("LANGUAGE", debconf->value, 1);
-}
-
-static int
-check_special(di_system_package *p)
-{
-	di_slist_node *node;
-
-	/*
-	 * A language selection package must provide the virtual
-	 * package 'language-selected'.
-	 * The LANGUAGE environment variable must be updated
-	 */
-	for (node = p->p.depends.head; node; node = node->next) {
-		di_package_dependency *d = node->data;
-		if (d->type == di_package_dependency_type_provides && strcmp(d->ptr->package, "language-selected") == 0) {
-			update_language();
-			break;
-		}
-	}
-	return 0;
 }
 
 static void set_package_title(di_system_package *p) {
@@ -469,7 +399,7 @@ static void set_package_title(di_system_package *p) {
 static int do_menu_item(di_system_package *p) {
 	di_log(DI_LOG_LEVEL_DEBUG, "Menu item '%s' selected", p->p.package);
 
-	return di_config_package(p, satisfy_virtual, check_special);
+	return di_config_package(p, satisfy_virtual);
 }
 
 static char *debconf_priorities[] =
@@ -556,14 +486,10 @@ static void adjust_default_priority (void) {
 }
 
 void notify_user_of_failure (di_system_package *p) {
-	char *language = NULL;
 	char buf[256];
 	
 	debconf_capb(debconf);
-	debconf_get(debconf,"debian-installer/language");
-	if (debconf->value)
-		language = strdup(debconf->value);
-	menu_entry(debconf, language, p, buf, sizeof (buf));
+	menu_entry(debconf, p, buf, sizeof (buf));
 	debconf_subst(debconf, ITEM_FAILURE, "ITEM", buf);
 	debconf_input(debconf, "critical", ITEM_FAILURE);
 	debconf_go(debconf);
@@ -681,8 +607,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
  * This is done depth-first.
  */
 static int di_config_package(di_system_package *p,
-			     int (*virtfunc)(di_system_package *),
-			     int (*walkfunc)(di_system_package *)) {
+			     int (*virtfunc)(di_system_package *)) {
 	char *configcommand;
 	int ret;
 	di_slist_node *node;
@@ -708,7 +633,7 @@ static int di_config_package(di_system_package *p,
 		if (d->type != di_package_dependency_type_depends)
 			continue;
 		/* Recursively configure this package */
-		switch (di_config_package(dep, virtfunc, walkfunc)) {
+		switch (di_config_package(dep, virtfunc)) {
 			case -1:
 				return -1;
 			case EXIT_BACKUP:
@@ -726,8 +651,6 @@ static int di_config_package(di_system_package *p,
 	switch (ret) {
 		case EXIT_OK:
 			p->p.status = di_package_status_installed;
-			if (walkfunc != NULL)
-				walkfunc(p);
 			break;
 		default:
 			di_log(DI_LOG_LEVEL_WARNING, "Configuring '%s' failed with error code %d", p->p.package, ret);
