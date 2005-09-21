@@ -455,43 +455,30 @@ keyboards_sort (kbd_t ** keyboards)
 }
 
 /**
- * @brief Get translated contents of a given template.
- * based on code from main-menu. 
- * TODO: merge into the cdebconf library someday
+ * @brief Get template contents (in the current language).
+ * @param template Template name
+ * @param type Kind of entry
+ * @return the translation, to be freed by caller
  */
 char *
-translated_template_get(char *template)
+template_get(const char *template, const char *type)
 {
-	int ret = 0;
-	static char *languages = NULL;
-	char *colon, *lang;
 	struct debconfclient *client = mydebconf_client();
-	
-	if (!languages) {
-		 ret = debconf_get(client,"debian-installer/language");
-		 if ((ret == 0) && client->value)
-			 languages = strdup(client->value);
-		 else
-			 languages = strdup("en_US:en_GB:en");
-	}
-	lang = strdup (languages);
-	while  (lang) {
-		char field[128];
-		
-		colon = strchr (lang, ':');
-		if (colon)
-			*colon = '\0';
-		snprintf(field, sizeof (field), "Description-%s.UTF-8", lang);
-		if (!debconf_metaget(client, template, field))  {
-			free (lang);
-			return (strdup(client->value));
-		}
-		lang = (colon) ? colon + 1 : NULL;
-	}
-	// Description must exist.
-	debconf_metaget(client, template, "Description");
-	free(lang);
-        return strdup(client->value);
+
+	/* cdebconf auto-translates */
+	debconf_metaget(client, template, type);
+	return strdup(client->value);
+}
+
+/**
+ * @brief Get translated description for a given template.
+ * @param template Template name
+ * @return the translation, to be freed by caller
+ */
+char *
+description_get(const char *template)
+{
+	return template_get(template, "Description");
 }
 
 /**
@@ -544,7 +531,7 @@ keyboards_get (void)
 	// translate the keyboard names
 	for (p = keyboards; p != NULL; p = p->next) {
 		sprintf(buf, "kbd-chooser/kbd/%s", p->name);
-		p->description = translated_template_get(buf);
+		p->description = description_get(buf);
 	}
 	return keyboards;
 }
@@ -698,7 +685,7 @@ keyboard_select (void)
 	}
 	sercon = check_if_serial_console();
 	umlcon = check_if_uml_console();
-	none = translated_template_get ("kbd-chooser/no-keyboard");
+	none = description_get ("kbd-chooser/no-keyboard");
 	if (sercon == SERIAL_PRESENT || umlcon == SERIAL_PRESENT) {
 		choices++;
 		s = insert_description (s, none, &first_entry);
