@@ -343,22 +343,28 @@ static const char *template_lget(const struct template *t,
     /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
     {
-        if (!allow_i18n())
-            return NULL;
         orig_field = strdup(field);
         altlang = strchr(orig_field, '-');
         *altlang = 0;
         altlang++;
-        cp = strstr(altlang, ".UTF-8");
-        if (cp + 6 == altlang + strlen(altlang) && cp != altlang + 1)
-        {
-            *cp = 0;
-            ret = template_lget(t, altlang, orig_field);
-        }
+        if (strcmp(altlang, "C") == 0)
+            ret = template_lget(t, NULL, orig_field);
+        else {
+            if (!allow_i18n()) {
+                free(orig_field);
+                return NULL;
+            }
+            cp = strstr(altlang, ".UTF-8");
+            if (cp + 6 == altlang + strlen(altlang) && cp != altlang + 1)
+            {
+                *cp = 0;
+                ret = template_lget(t, altlang, orig_field);
+            }
 #ifndef NODEBUG
-        else
-            fprintf(stderr, "Unknown localized field:\n%s\n", field);
+            else
+                fprintf(stderr, "Unknown localized field:\n%s\n", field);
 #endif
+        }
         free(orig_field);
         return ret;
     }
@@ -448,22 +454,28 @@ static void template_lset(struct template *t, const char *lang,
     /*   If field is Foo-xx.UTF-8 then call template_lset(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
     {
-        if (!allow_i18n())
-            return;
         orig_field = strdup(field);
         altlang = strchr(orig_field, '-');
         *altlang = 0;
         altlang++;
-        cp = strstr(altlang, ".UTF-8");
-        if (cp + 6 == altlang + strlen(altlang) && cp != altlang + 1)
-        {
-            *cp = 0;
-            template_lset(t, altlang, orig_field, value);
-        }
+        if (strcmp(altlang, "C") == 0)
+            template_lset(t, NULL, orig_field, value);
+        else {
+            if (!allow_i18n()) {
+                free(orig_field);
+                return;
+            }
+            cp = strstr(altlang, ".UTF-8");
+            if (cp + 6 == altlang + strlen(altlang) && cp != altlang + 1)
+            {
+                *cp = 0;
+                template_lset(t, altlang, orig_field, value);
+            }
 #ifndef NODEBUG
-        else
-            fprintf(stderr, "Unknown localized field:\n%s\n", field);
+            else
+                fprintf(stderr, "Unknown localized field:\n%s\n", field);
 #endif
+        }
         free(orig_field);
         return;
     }
