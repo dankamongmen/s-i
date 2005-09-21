@@ -1,6 +1,7 @@
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 CC = gcc
-CFLAGS = -W -Wall -Os
+CFLAGS = -W -Wall -Os -DARCH_TEXT='"$(DEB_HOST_ARCH)"'
 LD = gcc
 LDFLAGS = -ldebconfclient -ldebian-installer -lparted -ldl
 

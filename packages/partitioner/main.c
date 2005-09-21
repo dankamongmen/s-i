@@ -24,20 +24,6 @@ static PedExceptionOption my_exception_handler(PedException* ex) {
 	return PED_EXCEPTION_CANCEL;
 }
 
-static char *get_architecture(void) {
-	FILE *pcmd;
-	char arch[256];
-
-	pcmd = popen("/usr/bin/udpkg --print-architecture 2>/dev/null", "r");
-	if(pcmd == NULL)
-		return(NULL);
-	if(fscanf(pcmd, "%s", arch) < 1)
-		return(NULL);
-	pclose(pcmd);
-
-	return(strdup(arch));
-}
-
 static int get_all_disks(PedDevice *discs[], int max_disks) {
 	DIR *devdir;
 	struct dirent *direntry;
@@ -105,7 +91,7 @@ static char *execute_fdisk(void) {
 	 */
 
 	/* try to run arch fdisk command */
-	asprintf(&fdiskcmd, "%s/%s.sh", FDISK_PATH, get_architecture());
+	asprintf(&fdiskcmd, "%s/%s.sh", FDISK_PATH, ARCH_TEXT);
 	if(access(fdiskcmd, R_OK) == 0) {
 		di_log(DI_LOG_LEVEL_INFO, "Using architecture-dependent fdisk configuration!");
 		return(fdiskcmd);
