@@ -37,12 +37,14 @@ struct frontend_data
 
   /* Pointer to the Progress Bar, when initialized */
   GtkWidget *progress_bar; 
+  
   /* Pointer to the box containing the dummy mainmenu, used by gtk_progress_stop()
    * to destroy the box and the mainmenu packed inside
    */
   GtkWidget *progress_bar_menubox; 
-  /* Pointer to the frame encapsulating the progressbar */
-  GtkWidget *progress_bar_frame;
+  
+  /* Pointer to the progressbar's label */
+  GtkWidget *progress_bar_label;
 
   /* Struct to register the Set Functions of the Widgets */
   struct setter_struct *setters; 
