@@ -1,13 +1,42 @@
 #! /bin/sh
 set -e
 
+PASS_STDOUT=
+
+while [ $# -ne 0 ]; do
+	case $1 in
+		--pass-stdout)
+			# Pass stdout through rather than logging it.
+			PASS_STDOUT=1
+			shift
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
 if [ $# -lt 2 ]; then
-	echo "Usage: log-output TAG PROGRAM [ARGUMENTS]" >&2
+	echo "Usage: log-output [--pass-stdout] TAG PROGRAM [ARGUMENTS]" >&2
 	exit 1
 fi
 
 TAG="$1"
 shift
 
-CODE="$( ((set +e; "$@" 2>&1; echo $? >&3) | logger -t "$TAG") 3>&1 | tail -n1 )"
+# Don't look too hard at these redirections. They work, OK?
+CODE="$(
+	(
+		(
+			set +e
+			if [ "$PASS_STDOUT" ]; then
+				"$@" 2>&1 >&4
+			else
+				"$@" 2>&1
+			fi
+			echo $? >&3
+		) | logger -t "$TAG"
+	) 3>&1 4>&2 | tail -n1
+)" 2>&1
+
 exit "$CODE"
