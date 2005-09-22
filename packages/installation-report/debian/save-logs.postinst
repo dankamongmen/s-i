@@ -31,10 +31,17 @@ save_logs () {
     	done
 }
 
+db_capb backup
+
 db_input critical save-logs/menu || true
-db_go || true
+if ! db_go; then
+	exit 10 # back to menu
+fi
 db_get save-logs/menu
 METHOD="$RET"
+
+# TODO: no state machine, so can't sanely backup after this point
+db_capb
 
 db_progress START 0 2 debian-installer/save-logs/title
 report-hw > /var/log/hardware-summary
