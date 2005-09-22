@@ -6,14 +6,12 @@
 db_get rescue/enable
 [ "$RET" = true ] || exit 0
 
-MESSAGES=/var/log/messages
-
 log () {
 	logger -t rescue-mode "$@"
 }
 
 try_load_module () {
-	modprobe "$1" >>"$MESSAGES" 2>&1 || true
+	log-output rescue modprobe "$1" || true
 }
 
 chroot_has () {
@@ -43,13 +41,13 @@ try_load_module md
 try_load_module raid0
 try_load_module raid1
 try_load_module raid5
-mdrun >>"$MESSAGES" 2>&1 || true
+log-output rescue mdrun || true
 
 # LVM support
 try_load_module dm-mod
 try_load_module lvm-mod
-pvscan >>"$MESSAGES" 2>&1 || true
-vgscan >>"$MESSAGES" 2>&1 || true
+log-output rescue pvscan || true
+log-output rescue vgscan || true
 
 db_capb backup
 
@@ -58,7 +56,7 @@ PARTITIONS="$(find /dev/discs -follow -name part\* | sort | tr '\n' , | \
 
 if lvdisplay -c | cut -d: -f4 | grep 0 >/dev/null; then
 	# Some unavailable logical volumes; activate them
-	vgchange -a y >>"$MESSAGES" 2>&1 || true
+	log-output rescue vgchange -a y || true
 fi
 LVMPARTS="$(lvdisplay -c | sed 's/^ *//' | cut -d: -f1 | sort | tr '\n' , | \
 	sed 's/,$//; s/,/, /g')" || LVMPARTS=
@@ -92,8 +90,8 @@ while :; do
 	fi
 
 	mkdir -p /target
-	umount /target >>"$MESSAGES" 2>&1 || true
-	if ! mount "$rootdev" /target >>"$MESSAGES" 2>&1; then
+	log-output rescue umount /target || true
+	if ! log-output rescue mount "$rootdev" /target; then
 		log "mount '$rootdev' /target failed"
 		db_subst rescue/no-such-device DEVICE "$rootdev"
 		db_input critical rescue/mount-failed
@@ -146,7 +144,7 @@ if [ "$FALLBACK_SHELL" ]; then
 	db_subst "$FALLBACK_SHELL" DEVICE "$rootdev"
 	db_input critical "$FALLBACK_SHELL"
 	if ! db_go; then
-		umount /target >>"$MESSAGES" 2>&1 || true
+		log-output rescue umount /target || true
 		exit 10
 	fi
 	if [ "$FALLBACK_SHELL" != rescue/maybe-fallback-shell ] || \
