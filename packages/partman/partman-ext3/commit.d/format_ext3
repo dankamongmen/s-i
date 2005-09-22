@@ -56,7 +56,7 @@ for dev in $DEVICES/*; do
 		    close_dialog
 		    sync
 		    if [ "$status" = OK ]; then
-			/sbin/tune2fs -j $device >/dev/null 2>>/var/log/messages || status=failed
+			log-output -t partman --pass-stdout /sbin/tune2fs -j $device >/dev/null || status=failed
 			sync
 		    fi
 		fi
@@ -70,7 +70,7 @@ for dev in $DEVICES/*; do
 			usage=''
 		    fi
 		    if
-			mkfs.ext3 $device $usage >/dev/null 2>>/var/log/messages
+			log-output -t partman --pass-stdout mkfs.ext3 $device $usage >/dev/null
 		    then
 			sync
 			status=OK
@@ -90,10 +90,10 @@ for dev in $DEVICES/*; do
 			label=''
 		    fi
 		    if [ "$label" ]; then
-			tune2fs -L "$label" $device >/dev/null 2>>/var/log/messages
+			log-output -t partman --pass-stdout tune2fs -L "$label" $device >/dev/null
 		    fi
 		    if [ -f $id/reserved_for_root ]; then
-			tune2fs -m $(cat $id/reserved_for_root) $device >/dev/null 2>>/var/log/messages
+			log-output -t partman --pass-stdout tune2fs -m $(cat $id/reserved_for_root) $device >/dev/null
 		    fi
 		fi
 		if [ "$status" != OK ]; then
