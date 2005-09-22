@@ -20,8 +20,8 @@ VG_create () {
     local vg
     vg="$1"
     shift
-    pvcreate -ff -y $* >>/var/log/messages 2>&1
-    vgcreate "$vg" $* >>/var/log/messages 2>&1 || return 1
+    log-output partman-auto-lvm pvcreate -ff -y $*
+    log-output partman-auto-lvm vgcreate "$vg" $* || return 1
     return 0
 }
 
@@ -53,15 +53,15 @@ VG_of_PV () {
 VG_reduce () {
     local vg
     vg=`VG_of_PV $1` \
-	&& vgreduce $vg $1 >>/var/log/messages 2>&1
+	&& log-output partman-auto-lvm vgreduce $vg $1
 }
 
 # Add a new PV to a VG.  The PV will be pvcreate-d
 # $1 = PV
 # $2 = VG
 VG_extend () {
-    pvcreate -ff -y $1 >>/var/log/messages 2>&1 \
-	&& vgextend $2 $1 >>/var/log/messages 2>&1
+    log-output partman-auto-lvm pvcreate -ff -y $1 \
+	&& log-output partman-auto-lvm vgextend $2 $1
 }
 
 # Create a new LV in a VG
@@ -72,9 +72,9 @@ LV_create () {
 #    if [ "$2" = full ]; then
 # Using full VG not implemented until we have a way to get the free size of
 # a VG
-#	lvcreate -l$() -n $3 $1 >>/var/log/messages 2>&1
+#	log-output partman-auto-lvm lvcreate -l$() -n $3 $1
 #   else
-	lvcreate -L${2%???}k -n $3 $1 >>/var/log/messages 2>&1
+	log-output partman-auto-lvm lvcreate -L${2%???}k -n $3 $1
 #    fi
 }
 
@@ -82,7 +82,7 @@ LV_create () {
 # $1 = VG
 # $2 = LV
 LV_remove () {
-    lvremove -f /dev/$1/$2 >>/var/log/messages 2>&1
+    log-output partman-auto-lvm lvremove -f /dev/$1/$2
 }
 
 # Print a list of all LV in a VG, one per line using the following format:
@@ -100,4 +100,3 @@ LV_list () {
 	echo "${i}${TAB}${size}"
     done
 }
-
