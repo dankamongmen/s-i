@@ -685,18 +685,16 @@ keyboard_select (void)
 	}
 	sercon = check_if_serial_console();
 	umlcon = check_if_uml_console();
-	none = description_get ("kbd-chooser/no-keyboard");
 	if (sercon == SERIAL_PRESENT || umlcon == SERIAL_PRESENT) {
+		none = description_get ("kbd-chooser/no-keyboard");
 		choices++;
 		s = insert_description (s, none, &first_entry);
 		mydebconf_default_set ("console-tools/archs", none);
 	} else {
-		if (((preferred == NULL) || (preferred->present == UNKNOWN))
-		    && (sercon != SERIAL_PRESENT) && (umlcon != SERIAL_PRESENT)) {
-			di_info ("Can't tell if kbd present; add no keyboard option\n");
-			choices++;
-			s = insert_description (s, none, &first_entry);
-		}
+		// Add option to skip keyboard configuration (use kernel keymap)
+		none = description_get ("kbd-chooser/skip-config");
+		choices++;
+		s = insert_description (s, none, &first_entry);
 		mydebconf_default_set ("console-tools/archs",  
 				      preferred ? preferred->description : none);
 	}
