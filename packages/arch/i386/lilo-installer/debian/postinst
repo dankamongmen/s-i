@@ -6,8 +6,6 @@ set -e
 newline="
 "
 
-log=/var/log/messages
-
 log() {
 	logger -t lilo-installer "$@"
 }
@@ -420,7 +418,7 @@ db_progress step 1
 db_progress info lilo-installer/progress_running
 
 ERRCODE=0
-chroot /target /sbin/lilo >>"$log" 2>&1 || ERRCODE=$?
+log-output lilo-installer chroot /target /sbin/lilo || ERRCODE=$?
 if [ "$ERRCODE" != 0 ]; then
     db_subst lilo-installer/failed ERRCODE "$ERRCODE"
     db_input critical lilo-installer/failed || [ $? -eq 30 ]
