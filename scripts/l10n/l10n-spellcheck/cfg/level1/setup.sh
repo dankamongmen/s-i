@@ -9,6 +9,6 @@ export OUT_DIR="/var/lib/gforge/chroot/home/groups/d-i/htdocs/spellcheck/level1/
 export REMOVE_VARS="yes"
 export ASPELL_EXTRA_PARAM=
 
-export PLOT_TITLE="Statistics for the level1 (Sarge branch)"
+export PLOT_TITLE="Statistics for the level1"
 
 export HANDLE_SUSPECT_VARS="yes"

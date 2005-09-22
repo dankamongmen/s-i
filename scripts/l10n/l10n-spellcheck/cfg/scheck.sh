@@ -5,9 +5,6 @@ case "$1" in
 man)
 	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/manual_d-i
 	;;
-l1-ps)
-	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level1-post-sarge
-	;;
 l1)
 	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level1
 	;;
@@ -37,7 +34,6 @@ all)
 	echo ""
 	echo "all - useful to force a re-run of the spellcheck"
 	echo "man"
-	echo "l1-ps"
 	echo "l1"
 	echo "l2"
 	echo "l3"
