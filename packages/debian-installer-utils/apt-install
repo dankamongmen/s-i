@@ -1,6 +1,5 @@
 #!/bin/sh -e
 
-log=/var/log/messages
 queue=/var/lib/apt-install/queue
 
 mountpoints () {
@@ -95,7 +94,7 @@ fi
 
 disable_daemons
 ERRCODE=0
-chroot /target apt-get -y install $@ < /dev/null >> $log 2>&1 || ERRCODE=$?
+log-output apt-install chroot /target apt-get -y install $@ < /dev/null || ERRCODE=$?
 enable_daemons
 
 # Undo the mounts done by the packages during installation.
