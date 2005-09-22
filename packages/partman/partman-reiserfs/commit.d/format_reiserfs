@@ -68,10 +68,10 @@ for dev in $DEVICES/*; do
 			label=''
 		    fi
 		    if [ "$label" ]; then
-			mkfs.reiserfs -l "$label" -f -q $device >/dev/null 2>>/var/log/messages
+			log-output -t partman --pass-stdout mkfs.reiserfs -l "$label" -f -q $device >/dev/null
 			code=$?
 		    else
-			mkfs.reiserfs -f -q $device >/dev/null 2>>/var/log/messages
+			log-output -t partman --pass-stdout mkfs.reiserfs -f -q $device >/dev/null
 			code=$?
 		    fi
 		    if [ "$code" = 0 ]; then
