@@ -90,7 +90,7 @@ load_module() {
 	echo 0 > /proc/sys/kernel/printk
     
 	devs="$(snapshot_devs)"
-	if log-output hw-detect modprobe -v "$module" "$params"; then
+	if log-output -t hw-detect modprobe -v "$module" "$params"; then
 		if [ "$params" != "" ]; then
 			register-module "$module" "$params"
 		fi

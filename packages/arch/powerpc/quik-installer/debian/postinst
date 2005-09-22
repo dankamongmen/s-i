@@ -199,7 +199,7 @@ db_go || exit 10
 db_get "$WARNING_TEMPLATE"
 [ "$RET" = true ] || exit 10
 
-log-output quik-installer chroot /target quik -v -f || \
+log-output -t quik-installer chroot /target quik -v -f || \
     die quik-installer/quikerr "quik failed with exit status $?"
 
 # Configure OpenFirmware (OldWorld only)
@@ -210,10 +210,10 @@ db_progress INFO quik-installer/progress/openfirmware
 if [ "$ARCH" = powerpc/powermac_oldworld ]; then
     ofpath="`chroot /target ofpath "$disk"`"
     info "ofpath $disk: $ofpath"
-    log-output quik-installer chroot /target nvsetenv boot-device "${ofpath}0" || \
+    log-output -t quik-installer chroot /target nvsetenv boot-device "${ofpath}0" || \
 	die quik-installer/boot-device_failed \
 	    "nvsetenv boot-device \"${ofpath}0\" failed with exit status $?"
-    log-output quik-installer chroot /target \
+    log-output -t quik-installer chroot /target \
 	nvsetenv boot-command "begin ['] boot catch 1000 ms cr again" ||
 	die quik-installer/boot-command_failed \
 	    "nvsetenv boot-command failed with exit status $?"

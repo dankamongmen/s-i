@@ -34,11 +34,11 @@ if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
 	FLOPPYDEV=/dev/floppy/0
 	
 	if [ ! -e $FLOPPYDEV ]; then
-		log-output mountfloppy modprobe floppy || true
+		log-output -t mountfloppy modprobe floppy || true
 	fi
 
 	if ! grep -q ^vfat /proc/modules ; then
-		log-output mountfloppy modprobe vfat || true
+		log-output -t mountfloppy modprobe vfat || true
 	fi
 	
 	if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then

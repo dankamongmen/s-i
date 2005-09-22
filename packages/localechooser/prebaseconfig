@@ -76,7 +76,7 @@ EXTRAS="$(echo "$RET" | sed 's/,//g')"
 ) >> /target/etc/environment
 # If the locale isn't already valid, append it to locale.gen
 gen=
-if log-output --pass-stdout chroot /target/ /usr/sbin/validlocale $LOCALE \
+if log-output -t localechooser --pass-stdout chroot /target/ /usr/sbin/validlocale $LOCALE \
     >> /target/etc/locale.gen; then
     : # Nothing to do
 else
@@ -87,7 +87,7 @@ for loc in $EXTRAS; do
     if [ "$loc" = "$LOCALE" ]; then
         continue
     fi
-    if log-output --pass-stdout chroot /target/ /usr/sbin/validlocale $loc \
+    if log-output -t localechooser --pass-stdout chroot /target/ /usr/sbin/validlocale $loc \
         >> /target/etc/locale.gen; then
         : # Nothing to do
     else
@@ -96,5 +96,5 @@ for loc in $EXTRAS; do
     fi
 done
 if [ "$gen" ]; then
-    log-output localechooser chroot /target /usr/sbin/locale-gen --keep-existing
+    log-output -t localechooser chroot /target /usr/sbin/locale-gen --keep-existing
 fi

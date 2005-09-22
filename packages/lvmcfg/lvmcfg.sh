@@ -295,7 +295,7 @@ vg_mainmenu() {
 		VGRET=`echo "$RET" | \
 			sed -e 's/[[:space:]].*//' | \
 			tr '[A-Z]' '[a-z']`
-		log-output lvmcfg vgscan
+		log-output -t lvmcfg vgscan
 		case "$VGRET" in
 		"create")
 			vg_create
@@ -397,10 +397,10 @@ vg_create() {
 	fi
 
 	for p in `echo "$PARTITIONS" | sed -e 's/,/ /g'`; do
-		log-output lvmcfg pvcreate -ff -y $p
+		log-output -t lvmcfg pvcreate -ff -y $p
 	done
 
-	log-output lvmcfg vgcreate "$NAME" `echo "$PARTITIONS" | sed -e 's/,/ /g'`
+	log-output -t lvmcfg vgcreate "$NAME" `echo "$PARTITIONS" | sed -e 's/,/ /g'`
 }
 
 #
@@ -431,12 +431,12 @@ vg_delete() {
 	db_get lvmcfg/vgdelete_confirm
 	[ "$RET" != "true" ] && return
 
-	log-output lvmcfg vgchange -a n $VG && \
-		log-output lvmcfg vgremove $VG
+	log-output -t lvmcfg vgchange -a n $VG && \
+		log-output -t lvmcfg vgremove $VG
 	[ $? -eq 0 ] && return
 
 	# reactivate if deleting was failed
-	log-output lvmcfg vgchange -a y $VG
+	log-output -t lvmcfg vgchange -a y $VG
 	
 	db_set lvmcfg/vgdelete_error "false"
 	db_input high lvmcfg/vgdelete_error
@@ -489,8 +489,8 @@ vg_extend() {
 	fi
 
 	for p in `echo "$PARTITIONS" | sed -e 's/,/ /g'`; do
-		log-output lvmcfg pvcreate -ff -y $p && \
-			log-output lvmcfg vgextend $VG $p
+		log-output -t lvmcfg pvcreate -ff -y $p && \
+			log-output -t lvmcfg vgextend $VG $p
 		if [ $? -ne 0 ]; then	# on error
 			db_subst lvmcfg/vgextend_error PARTITION $p
 			db_subst lvmcfg/vgextend_error VG $VG
@@ -540,7 +540,7 @@ vg_reduce() {
 	db_get lvmcfg/vgreduce_parts
 	PARTITIONS=`echo "$RET" | cut -d " " -f1`
 
-	log-output lvmcfg vgreduce $VG $PARTITIONS
+	log-output -t lvmcfg vgreduce $VG $PARTITIONS
 	if [ $? -ne 0 ]; then
 		db_subst lvmcfg/vgreduce_error VG $VG
 		db_subst lvmcfg/vgreduce_error PARTITION $PARTITIONS
@@ -565,7 +565,7 @@ lv_mainmenu() {
 		LVRET=`echo "$RET" | \
 			sed -e 's/[[:space:]].*//' | \
 			tr '[A-Z]' '[a-z']`
-		log-output lvmcfg vgscan
+		log-output -t lvmcfg vgscan
 		case "$LVRET" in
 		"create")
 			lv_create
@@ -667,9 +667,9 @@ lv_create() {
 	# might not be accurate, resulting in an error because the VG is
 	# not big enough (see #250594).
 	if [ "$MAX_SIZE" = "$SIZE" ]; then
-		log-output lvmcfg lvcreate -l$(getfreepe_vg "$VG") -n "$NAME" $VG
+		log-output -t lvmcfg lvcreate -l$(getfreepe_vg "$VG") -n "$NAME" $VG
 	else
-		log-output lvmcfg lvcreate -L${SIZE} -n "$NAME" $VG
+		log-output -t lvmcfg lvcreate -L${SIZE} -n "$NAME" $VG
 	fi
 
 	if [ $? -ne 0 ]; then
@@ -721,7 +721,7 @@ lv_delete() {
 	[ "$RET" = "Leave" -o "$RET" = "false" ] && return
 	LV=`echo "$RET" | cut -d " " -f1`
 
-	log-output lvmcfg lvremove -f /dev/${VG}/${LV}
+	log-output -t lvmcfg lvremove -f /dev/${VG}/${LV}
 	if [ $? -ne 0 ]; then
 		db_subst lvmcfg/lvdelete_error VG $VG
 		db_subst lvmcfg/lvdelete_error LV $LV
@@ -751,8 +751,8 @@ if ! grep -q "[0-9] device-mapper$" /proc/misc ; then
 fi
 
 # scan for logical volumes
-log-output lvmcfg pvscan
-log-output lvmcfg vgscan
+log-output -t lvmcfg pvscan
+log-output -t lvmcfg vgscan
 
 # try to activate old volume groups
 set -- `vgdisplay -v | grep 'NOT \(active\|available\)' | wc -l`
@@ -762,7 +762,7 @@ if [ $1 -gt 0 -a ! -f /var/cache/lvmcfg/first ]; then
 	db_input critical lvmcfg/activevg
 	db_go
 	db_get lvmcfg/activevg
-	[ "$RET" = "true" ] && log-output lvmcfg vgchange -a y
+	[ "$RET" = "true" ] && log-output -t lvmcfg vgchange -a y
 fi
 # ask only the first time
 mkdir -p /var/cache/lvmcfg && touch /var/cache/lvmcfg/first

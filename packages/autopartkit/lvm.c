@@ -113,7 +113,7 @@ lvm_init(void)
     if ( ! lvm_isinstalled())
         return retval;
 
-    if (0 == (retval = system("log-output autopartkit vgscan")))
+    if (0 == (retval = system("log-output -t autopartkit vgscan")))
 	retval = 0;
     else
         autopartkit_log(2, "Executing vgscan returned error code %d\n",retval);
@@ -133,7 +133,7 @@ lvm_init_dev(const char *devpath)
     autopartkit_log(1, "Initializing LVM pv '%s'\n",
                     devpath ? devpath : "(null)");
 
-    asprintf(&cmd, "log-output autopartkit pvcreate %s", devpath);
+    asprintf(&cmd, "log-output -t autopartkit pvcreate %s", devpath);
     if (cmd)
     {
         retval = system(cmd);
@@ -161,7 +161,7 @@ lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
                     vgname ? vgname : "(null)");
 
     /* Call vgscan first, it seem to be required for vgcreate to work. */
-    if (0 != (retval = system("log-output autopartkit vgscan")))
+    if (0 != (retval = system("log-output -t autopartkit vgscan")))
         autopartkit_log(2, "Executing vgscan returned error code %d\n",retval);
 
     if (vg_exists(vgname))
@@ -169,7 +169,7 @@ lvm_volumegroup_add_dev(const char *vgname, const char *devpath)
     else
         progname = "vgcreate";
 
-    asprintf(&cmd, "log-output autopartkit %s %s %s", progname,
+    asprintf(&cmd, "log-output -t autopartkit %s %s %s", progname,
              vgname, devpath);
 
     retval = -1;
@@ -202,7 +202,7 @@ lvm_create_logicalvolume(const char *vgname, const char *lvname,
                     vgname ? vgname : "(null)",
                     mbsize);
 
-    asprintf(&cmd, "log-output autopartkit lvcreate -n%s -L%d %s",
+    asprintf(&cmd, "log-output -t autopartkit lvcreate -n%s -L%d %s",
              lvname, mbsize, vgname);
     if (cmd)
     {
