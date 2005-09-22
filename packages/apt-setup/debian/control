@@ -1,0 +1,27 @@
+Source: apt-setup
+Section: debian-installer
+Priority: extra
+Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
+Uploaders: Joey Hess <joeyh@debian.org>
+Build-Depends: debhelper (>= 4.2), dpkg-dev (>= 1.7.0), po-debconf (>= 0.5.0)
+
+Package: apt-setup
+XC-Package-Type: udeb
+Architecture: all
+Priority: standard
+XB-Installer-Menu-Item: 70
+Depends: ${shlibs:Depends}, apt-mirror-setup
+Description: Configure apt
+
+Package: apt-mirror-setup
+XC-Package-Type: udeb
+Architecture: all
+Depends: ${shlibs:Depends}, choose-mirror
+Description: set up a mirror in sources.list
+
+Package: apt-cdrom-setup
+XC-Package-Type: udeb
+Architecture: all
+Provides: apt-mirror-setup
+Depends: ${shlibs:Depends}, cdrom-detect
+Description: set up a CD in sources.list

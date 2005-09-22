@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+file="$1"
+
+# unmount CD so apt-cdrom can access it. Remount at end if it was mounted.
+CDDEV=$(mount | grep "on /cdrom" | cut -d ' ' -f 1)
+if [ -n "$CDDEV" ]; then
+	umount /cdrom || true
+fi
+cleanup () {
+	if [ -n "$CDDEV" ]; then
+		mount -t iso9660 -o ro,exec $CDDEV /cdrom || true
+	fi
+}
+trap EXIT cleanup
+
+if [ -n "$ROOT" ]; then
+        chroot=chroot
+else
+        chroot=
+fi
+
+tmp=$($chroot tempfile)
+printf > $tmp
+# apt-cdrom can be interactive, avoid that
+apt-cdrom add \
+	-o Dir::Etc::SourceList=$tmp \
+	-o Acquire::gpgv::Options::=--ignore-time-conflict \
+	</dev/null

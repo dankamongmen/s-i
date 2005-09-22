@@ -1,0 +1,29 @@
+apt-setup is used to generate an /etc/apt/sources.list for the installed
+system. It does this by creating a new sources.list file (commenting out
+the previous contents) and then running each program in
+/usr/lib/apt-setup/generators/ in turn (run-parts ordering). Each generator
+is passed the name of a temporary file that it can write sources.list lines
+(and comments) to.
+
+After the generator finishes writing the file, apt-setup-verify will be run
+on it to verify that each line of the sources sources works, and it will be
+added to the sources.list. If the verification fails, the sources will be
+discarded. Gnerators can also run apt-setup-verify themselves and do their
+own error recovery if it fails. apt-setup-verify tests each line of the file
+and comments out lins that do not work, and exits nonzero if all apt and
+apt-set lines in the file failed.
+
+Generators should add both "apt" lines and corresponding
+apt-src lines to the sources.list. apt-setup-verify will handle commenting
+out any apt-src lines for unavailable sources.
+
+Generators can ask configuration questions using debconf. To support
+backing up, generators should exit with the special return code of 10 if
+the user backs up from their first question. Each generator should provide
+a progress bar text template named apt-setup/progress/<generator>, where
+<generator> is the script's name with leading numbers removed.
+
+Note that apt-setup and its generators may be run against some other system
+in a chroot. (ie, when installing Debian.) If apt-setup is running this
+way, then ROOT will be set to the root of the chroot that it is acting on
+and all sources.list validation will occur inside the chroot.

@@ -1,0 +1,77 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+file="$1"
+
+STATE=1
+while true; do
+	case "$STATE" in
+		1)
+			db_input low apt-setup/non-free || true
+		;;
+		2)
+			# If they chose not use non-free, ask about
+			# contrib, with a default of no. If they chose to
+			# use non-free, they get contrib too..
+			db_get apt-setup/non-free
+			if [ "$RET" = false ]; then
+				db_fget apt-setup/contrib seen
+				if [ "$RET" = false ]; then
+					db_set apt-setup/contrib false
+				fi
+				db_input low apt-setup/contrib || true
+			else
+				db_fget apt-setup/contrib seen
+				if [ "$RET" = false ]; then
+					db_set apt-setup/contrib true
+				fi
+			fi
+		;;
+		*)
+			break
+		;;
+	esac
+
+	if db_go; then
+		STATE=$(($STATE + 1))
+	else
+		STATE=$(($STATE - 1))
+	fi
+done
+if [ $STATE -eq 1 ]; then
+	exit 10
+fi
+
+dists="main"
+db_get apt-setup/non-free
+if [ "$ret" = true ]; then
+	dists="$dists non-free"
+fi
+db_get apt-setup/contrib
+if [ "$ret" = true ]; then
+	dists="$dists contrib"
+fi
+
+db_get mirror/suite
+suite="$RET"
+db_get mirror/protocol
+protocol="$RET"
+db_get mirror/$protocol/hostname
+hostname="$RET"
+db_get mirror/$protocol/directory
+directory="$RET"
+
+if [ "$protocol" = http ]; then
+	db_get mirror/$protocol/proxy
+	proxy="$RET"
+	if [ -n "$proxy" ]; then
+		if ! grep -iq "Acquire::$procotol::Proxy" $ROOT/etc/apt/apt.conf; then
+			echo "Acquire::$protocol::Proxy \"$proxy\";" >> $ROOT/etc/apt/apt.conf
+		fi
+	fi
+fi
+
+echo "deb $protocol://$hostname/$directory $suite $dists" >> $file
+echo "deb-src $protocol://$hostname/$directory $suite $dists" >> $file

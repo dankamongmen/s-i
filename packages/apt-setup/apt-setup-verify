@@ -1,0 +1,55 @@
+#!/bin/sh
+# verify and optionally save out the file
+set -e
+
+file="$1"
+saveto="$2"
+
+if [ -n "$ROOT" ]; then
+	chroot=chroot
+else
+	chroot=
+fi
+
+saveline () {
+	echo "$*" > $saveto
+}
+
+valid () {
+	line="$1"
+
+	tmp=$($chroot tempfile)
+	echo "$line" > $ROOT$tmp
+	
+	if $chroot $ROOT apt-get -o APT::Get::List-Cleanup=false \
+		-o Dir::Etc::sourcelist=$tmp update
+	then
+		rm -f $ROOT$tmp
+	else
+		rm -f $ROOT$tmp
+		false
+	fi
+}
+
+items=0
+gooditems=0
+
+IFS="
+"
+for line in $(cat $file); do
+	if [ "$(expr "$line" : "#")" != 1 ]; then
+		items=$(expr "$items" + 1)
+		if valid "$line"; then
+			gooditems=$(expr "$gooditems" + 1)a
+			saveline "$line"
+		else
+			saveline "#$line"
+		fi
+	else
+		saveline "$line"
+	fi
+done
+
+if [ "$gooditems" != "$items" ]; then
+	exit 1
+fi

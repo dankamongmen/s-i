@@ -1,0 +1,55 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+db_capb backup
+
+gendir=/usr/lib/apt-setup/generators
+
+if [ "$1" ]; then
+	ROOT="$1"
+	chroot=chroot
+else
+	ROOT=
+	chroot=
+fi
+export ROOT
+
+log() {
+        logger -t apt-setup "$@"
+}
+warning() {
+        log "warning: $@"
+}
+
+gencount=`ls "$gendir"/* | wc -l`
+db_progress START 0 $gencount apt-setup/progress/title
+
+for generator in $gendir/*; do
+	base=$(basename $generator | sed 's/[0-9]*//')
+	if ! db_progress INFO apt-setup/progress/$base; then
+		db_subst apt-setup/progress/fallback SCRIPT "$base"
+		db_progress INFO apt-setup/progress/fallback
+	fi
+	
+	tmp=$($chroot tempfile)
+	echo > $tmp
+	if $generator $tmp; then
+		:
+		if ! apt-setup-verify $tmp $ROOT/etc/apt/sources.list; then
+			warning "$generator output did not verify"
+		fi
+	else
+		code="$?"
+		if [ "$code" = 10 ]; then
+			# TODO handle backup better
+			log "$generator backed up"
+			exit 10
+		fi
+		warning "$generator returned error code $code; discarding output"
+	fi
+	rm -f $tmp
+	db_progress STEP 1
+done
+
+db_progress STOP
