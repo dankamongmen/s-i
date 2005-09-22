@@ -2,8 +2,6 @@
 
 . /usr/share/debconf/confmodule
 
-LOG=/var/log/messages
-
 modify_cyrconfig() {
         if [ "$2" ]; then
            sed -e "s/^$1 .*\$/$1 $2/" \
@@ -78,8 +76,8 @@ EXTRAS="$(echo "$RET" | sed 's/,//g')"
 ) >> /target/etc/environment
 # If the locale isn't already valid, append it to locale.gen
 gen=
-if chroot /target/ /usr/sbin/validlocale $LOCALE \
-    >> /target/etc/locale.gen 2>> $LOG ; then
+if log-output --pass-stdout chroot /target/ /usr/sbin/validlocale $LOCALE \
+    >> /target/etc/locale.gen; then
     : # Nothing to do
 else
     # New locale added to locale.gen, generate it
@@ -89,8 +87,8 @@ for loc in $EXTRAS; do
     if [ "$loc" = "$LOCALE" ]; then
         continue
     fi
-    if chroot /target/ /usr/sbin/validlocale $loc \
-        >> /target/etc/locale.gen 2>> $LOG ; then
+    if log-output --pass-stdout chroot /target/ /usr/sbin/validlocale $loc \
+        >> /target/etc/locale.gen; then
         : # Nothing to do
     else
         # New locale added to locale.gen, generate it
