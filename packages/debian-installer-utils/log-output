@@ -1,10 +1,15 @@
 #! /bin/sh
 set -e
 
+TAG=log-output
 PASS_STDOUT=
 
 while [ $# -ne 0 ]; do
 	case $1 in
+		-t)
+			TAG="$2"
+			shift 2
+			;;
 		--pass-stdout)
 			# Pass stdout through rather than logging it.
 			PASS_STDOUT=1
@@ -16,13 +21,10 @@ while [ $# -ne 0 ]; do
 	esac
 done
 
-if [ $# -lt 2 ]; then
-	echo "Usage: log-output [--pass-stdout] TAG PROGRAM [ARGUMENTS]" >&2
+if [ $# -lt 1 ]; then
+	echo "Usage: log-output -t TAG [--pass-stdout] PROGRAM [ARGUMENTS]" >&2
 	exit 1
 fi
-
-TAG="$1"
-shift
 
 # Don't look too hard at these redirections. They work, OK?
 CODE="$(
