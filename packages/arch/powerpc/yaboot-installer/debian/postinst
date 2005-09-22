@@ -232,7 +232,7 @@ writeimages() {
 # Get the Open Firmware path for a device. Requires non-devfs syntax.
 map_of_path() {
     # TODO: look for shorter name using OF aliases?
-    chroot /target ofpath "$1" || return 1
+    log-output yaboot-installer chroot /target ofpath "$1" || return 1
 }
 
 OLDIFS="$IFS"
@@ -460,7 +460,7 @@ if [ "$ARCH" = powerpc/chrp_pegasos ]; then
     db_subst yaboot-installer/of_pegasos BOOT "boot $ofpath$partnr $yabootpath"
     db_input high yaboot-installer/of_pegasos || true
 else
-    chroot /target mkofboot -v -f || \
+    log-output yaboot-installer chroot /target mkofboot -v -f || \
 	die yaboot-installer/ybinerr "mkofboot failed with exit status $?"
 fi
 
