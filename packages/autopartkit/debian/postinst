@@ -27,9 +27,9 @@ run_parts() {
 # Try to load LVM support, and make sure the user tools are installed into
 # /target/.  It should be safe to try both alternatives, as only the working
 # one will be activated at boot.
-log-output depmod -a || true
-log-output dm-mod || true
-log-output lvm-mod || true
+log-output autopartkit depmod -a || true
+log-output autopartkit dm-mod || true
+log-output autopartkit lvm-mod || true
 apt-install lvm2 || true
 apt-install lvm10 || true
 

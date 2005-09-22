@@ -917,7 +917,7 @@ makefs(const char *devpath, const char *fstype)
 	autopartkit_log(1, "  Unknown fs '%s' for dev '%s'\n", fstype,devpath);
 	return -1;
       }
-    retval = asprintf(&cmd, "%s %s >> /var/log/messages 2>&1", mkfs, devpath);
+    retval = asprintf(&cmd, "log-output autopartkit %s %s", mkfs, devpath);
     if (-1 != retval)
       {
 	autopartkit_log(1, "Running command: %s\n", cmd);
