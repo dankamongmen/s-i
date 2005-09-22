@@ -73,16 +73,9 @@ write_bootblock () {
             ;;
     esac
     
-    case $(uname -r) in
-      2.2*)
-    	LD_LIBRARY_PATH=\"/target/lib:/target/usr/lib\" /target/sbin/vmelilo -f -w /target || die vmelilo-installer/booterr "Error writing vmelilo"
-	;;
-      2.4*)
-        mount -t proc proc /target/proc
-        chroot /target /sbin/vmelilo -f || die vmelilo-installer/booterr "Error writing vmelilo"
-	umount /target/proc
-	;;
-    esac
+    mount -t proc proc /target/proc
+    log-output vmelilo-installer chroot /target /sbin/vmelilo -f || die vmelilo-installer/booterr "Error writing vmelilo"
+    umount /target/proc
 }
 
 
