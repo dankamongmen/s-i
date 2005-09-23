@@ -7,7 +7,7 @@
 
 
 /*
- * Function: rfc822db_parse_stanza
+ * Function: rfc822_parse_stanza
  * Input: a FILE pointer to an open readable file containing a stanza in rfc822 
  *    format.
  * Output: a pointer to a dynamically allocated rfc822_header structure
@@ -30,7 +30,7 @@ struct rfc822_header* rfc822_parse_stanza(FILE *file)
     tail = &head;
     cur = NULL;
 
-    /*    fprintf(stderr,"rfc822db_parse_stanza(file)\n");*/
+    /*    fprintf(stderr,"rfc822_parse_stanza(file)\n");*/
     while (fgets(buf, buflen, file))
     {
         char *tmp;
@@ -94,11 +94,11 @@ struct rfc822_header* rfc822_parse_stanza(FILE *file)
 
 char *rfc822_header_lookup(struct rfc822_header *list, const char* key)
 {
-/*    fprintf(stderr,"rfc822db_header_lookup(list,key=%s)\n",key);*/
+/*    fprintf(stderr,"rfc822_header_lookup(list,key=%s)\n",key);*/
     while (list && (strcasecmp(key, list->header) != 0))
         list = list->next;
     if (!list)
         return NULL;
-/*    fprintf(stderr,"rfc822db_header_lookup returning: '%s'\n", list->value);*/
+/*    fprintf(stderr,"rfc822_header_lookup returning: '%s'\n", list->value);*/
     return list->value;
 }
