@@ -1309,7 +1309,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
 	
 	/* Set this to TRUE/FALSE to enable/disable the main-menu hack
 	 */
-	fe_data->main_menu_enabled = TRUE;
+	fe_data->main_menu_enabled = FALSE;
 
     /* If fe_data->main_menu_enabled is set to TRUE, then this filed
      * has to match the tag of the question that is used as main-menu.
