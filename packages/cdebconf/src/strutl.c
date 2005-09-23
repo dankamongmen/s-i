@@ -388,6 +388,9 @@ char *unescapestr(const char *in)
 	if (in == 0) return 0;
 
 	inlen = strlen(in) + 1;
+	/* This is slightly too much memory, because each escaped newline
+	 * will be unescaped; but an upper bound is fine.
+	 */
 	if (buflen < inlen) {
 		buflen = inlen;
 		buf = realloc(buf, buflen * sizeof *buf);
@@ -404,10 +407,17 @@ char *escapestr(const char *in)
 	static size_t buflen = 0;
 	static char *buf = NULL;
 	size_t inlen;
+	const char *p;
 
 	if (in == 0) return 0;
 
 	inlen = strlen(in) + 1;
+
+	/* Each newline will consume an additional byte due to escaping. */
+	for (p = in; *p; ++p)
+		if (*p == '\n')
+			++inlen;
+
 	if (buflen < inlen) {
 		buflen = inlen;
 		buf = realloc(buf, buflen * sizeof *buf);
