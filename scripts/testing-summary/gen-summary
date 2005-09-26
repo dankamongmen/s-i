@@ -151,11 +151,11 @@ foreach my $dist (@dists) {
 	print "<th>$dist</th>";
 }
 print "<th>age (days)</th></tr>\n";
-my $numcols=4 + @dists;
+my $numcols=3 + @dists;
 
 foreach my $package (sort keys %seenpackages) {
 	foreach my $transition (keys %{$transitions{$package}}) {
-		print "<tr><td><a href=\"http://bjorn.haxx.se/debian/testing.pl?package=$package\">$package</a></td>";
+		print "<tr><td><a href=\"http://changelogs.debian.net/$package\">$package</a></td>";
 		print "<td>".archname(@{$transitions{$package}{$transition}})."</td>";
 		my $some_arch=@{$transitions{$package}{$transition}}[0];
 		my @vers;
@@ -168,7 +168,12 @@ foreach my $package (sort keys %seenpackages) {
 			else {
 				push @vers, $version;
 			}
-			print "<td>$version</td>";
+			if ($dist eq 'testing') {
+				print "<td><a href=\"http://bjorn.haxx.se/debian/testing.pl?package=$package\">$version</a></td>";
+			}
+			else {
+				print "<td>$version</td>";
+			}
 		}
 		# Looking at the file modification date may not be
 		# safe. FIXME
