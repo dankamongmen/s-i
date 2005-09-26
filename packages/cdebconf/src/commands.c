@@ -762,7 +762,6 @@ command_data(struct confmodule *mod, char *arg)
     struct template *t = NULL;
     struct question *q = NULL;
     char *out;
-    char buf[1024];
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(== 3);
@@ -770,8 +769,7 @@ command_data(struct confmodule *mod, char *arg)
     tag = argv[0];
     item = argv[1];
 
-    strunescape(argv[2], buf, sizeof(buf), 0);
-    value = buf;
+    value = unescapestr(argv[2]);
 
     t = mod->templates->methods.get(mod->templates, tag);
     if (t == NULL)
