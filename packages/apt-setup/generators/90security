@@ -24,7 +24,7 @@ done
 db_get mirror/suite
 suite="$RET"
 
-# FIXME what if choose-mirror isn't avalable, ie full CD install?
+# FIXME what if choose-mirror isn't available, i.e. full CD install?
 db_fget mirror/http/proxy seen || true
 proxy="$RET"
 if [ -n "$proxy" ]; then
@@ -35,7 +35,7 @@ fi
 
 echo "deb http://$host/ $suite/updates $dists" >> $file
 if ! apt-setup-verify; then
-	db_sust apt-setup/security-updates-failed SECURITY_HOST "$host"
+	db_subst apt-setup/security-updates-failed SECURITY_HOST "$host"
 	db_input critical apt-setup/security-updates-failed || true
 	if ! db_go; then
 		exit 10 # back up
