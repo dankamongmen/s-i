@@ -6,14 +6,18 @@
 
 #define STATUS_FILE "/var/lib/lowmem"
 #define TEMPLATE_FILE_EXTENSION ".templates"
-#define TEMPLATE_LINE_MAX_LENGTH 2048
-#define DEFAULT_TO_REMOVE "Default-"
-#define DESCRIPTION_TO_REMOVE "Description-"
-#define CHOICES_TO_REMOVE "Choices-"
-#define DEFAULT_TO_KEEP "Default-en"
-#define DESCRIPTION_TO_KEEP "Description-en"
-#define CHOICES_TO_KEEP "Choices-en"
+#define TEMPLATE_LINE_MAX_LENGTH 10000 /* languagechooser/country-name is
+					* very very long */
 #define FILENAME_LENGTH 256
+#define TAG_LENGTH 30
+
+#define LANG_TO_KEEP "en"
+char tags_to_remove[][TAG_LENGTH] = {
+	"Default-",
+	"Description-",
+	"Choices-",
+	"Indices-"
+};
 
 int trimtemplate(char *filename) {
      int ignore = 0;
@@ -21,6 +25,9 @@ int trimtemplate(char *filename) {
      FILE *tmpfd = NULL;
      char template_line[TEMPLATE_LINE_MAX_LENGTH];
      char tmpfilename[FILENAME_LENGTH];
+     int i=0;
+     int nbr_tags = sizeof(tags_to_remove)/TAG_LENGTH;
+     char tag_to_keep[TAG_LENGTH];
 
      if ((fd = fopen(filename, "r")) == NULL) {
 	  perror("unable to open template file");
@@ -40,27 +47,22 @@ int trimtemplate(char *filename) {
      /* parse template file */
      while (fgets(template_line, 
 		  TEMPLATE_LINE_MAX_LENGTH, fd) != NULL) {
-	  if (ignore && 
+	  if (ignore == 1 && 
 	      strstr(template_line, " ") == template_line) {
 	       continue;
 	  }
 	  ignore = 0;
-	  if (strstr(template_line, DESCRIPTION_TO_REMOVE) 
-	      || strstr(template_line, CHOICES_TO_REMOVE)
-	      || strstr(template_line, DEFAULT_TO_REMOVE)
-	       ) {
-	       	  if (strstr(template_line, DESCRIPTION_TO_KEEP) 
-	              || strstr(template_line, CHOICES_TO_KEEP)
-	              || strstr(template_line, DEFAULT_TO_KEEP)
-		      ) {
-		         ignore = 0;
-			 continue;
-		  } else {
-		         ignore = 1;
-			 continue;
+	  for( i=0; i<nbr_tags && ignore == 0; i++ ) {
+		  snprintf(tag_to_keep,
+			   TAG_LENGTH,"%s%s",
+			   tags_to_remove[i], LANG_TO_KEEP);
+
+		  if( strstr(template_line, tag_to_keep) == NULL &&
+		      strstr(template_line, tags_to_remove[i]) != NULL ) {
+			  ignore = 1;
 		  }
 	  }
-	  if (fputs(template_line, tmpfd) == EOF) {
+	  if (ignore == 0 && fputs(template_line, tmpfd) == EOF) {
 	       perror("unable to write to temp file");
 	       return 0;
 	  }
@@ -93,7 +95,7 @@ int main(int argc, char** argv) {
      if( rename(STATUS_FILE, STATUS_FILE) != 0) { 
        return 0;
      } 
-     
+
      if (S_ISDIR(buf.st_mode)) {
 	  DIR  *dip = NULL;
 	  struct dirent *dit = NULL;

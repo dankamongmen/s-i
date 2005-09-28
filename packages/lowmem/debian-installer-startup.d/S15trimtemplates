@@ -1,0 +1,68 @@
+#!/bin/sh
+ram=$(grep ^MemTotal: /proc/meminfo | { read x y z; echo $y; }) || true # in kilobytes
+
+if [ "$ram" = "" ]; then
+	echo "Cannot determine system memory, skipping lowmem probe" >&2
+else
+	ram=$(expr "$ram" / 1024) # convert to megabytes
+
+	# Set level1 to the minimum amount of memory that will support an
+	# install not in lowmem mode. (This is the max memory footprint of
+	# the installer in non lowmem mode up to running the partitioner
+	# and swapon.)
+	# Set level2 to the minimum amount of memory that will support an
+	# install in lowmem mode. (This is the max memory footprint of the
+	# installer in lowmem mode up to running the partitioner
+	# and swapon.)
+	# Set min to absolute minimum of memory needed for an install.
+	ARCH=`udpkg --print-architecture`
+	case $ARCH in
+		i386)
+			level1=45
+			level2=28
+			min=22
+		;;
+		mips)
+			level1=36
+			level2=33
+			min=25 # 21 in userland, the comparison uses min-4
+		;;
+		mipsel)
+			level1=33
+			level2=22
+			min=23 # this is really 19 since the comparison uses min-4
+		;;
+		m68k)
+			level1=25
+			level2=0 #FIXME
+			min=0 #FIXME
+		;;
+		s390)
+			level1=28
+			level2=28
+			min=24
+		;;
+		*)
+			level1=45
+			level2=32
+			min=0 #FIXME
+		;;
+	esac
+
+	if [ "$ram" -lt "$level1" ]; then
+		echo "Entering low memory mode, please wait ..."
+
+		if [ "$ram" -lt "$level2" ]; then
+			echo 2 > /var/lib/lowmem
+		else
+			echo 1 > /var/lib/lowmem
+		fi
+		
+	       	trimtemplates /var/lib/dpkg/info || true
+
+		# 4 mb fuzz for kernel
+		if  [ "$ram" -lt "$(($min - 4))" ]; then
+			echo $min > /var/lib/lowmem_insufficient
+		fi
+	fi
+fi
