@@ -182,25 +182,16 @@ gboolean show_description (GtkWidget *widget, struct frontend_question_data* dat
 
 
 /* used to clear the help area */
-gboolean clear_description (GtkWidget *widget, struct frontend_question_data* data)
+void clear_description ( struct frontend_data* data)
 {
-    struct frontend *frontend_ptr;
-    struct frontend_data *frontend_data_ptr;
     GtkWidget *view;
-
     GtkTextBuffer *buffer;
 
-    frontend_ptr=data->obj;
-    frontend_data_ptr=frontend_ptr->data;
-    view=(GtkWidget*)frontend_data_ptr->info_box;
-
+    view = (GtkWidget*)data->info_box;
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view) );
-
     gtk_text_buffer_set_text (buffer, "", -1);
 
-    return DC_OK;
 }
-
 
 
 GtkWidget*
@@ -904,14 +895,15 @@ static int gtkhandler_main_menu(struct frontend *obj, struct question *q, GtkWid
 }
 
 
-static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, GtkWidget *qbox)
+static int gtkhandler_select_treeview_list(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    char **choices, **choices_translated;
+    char **choices, **choices_translated, *label_string;
     int i, count;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
+	GtkWidget *hpadbox, *vpadbox, *label;
 
 	GtkTreeModel        *model;
 	GtkListStore  		*store;
@@ -920,7 +912,7 @@ static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, 
 	GtkCellRenderer     *renderer;
 	GtkTreeSelection    *selection;
 
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview() called");
+    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_list() called");
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -936,14 +928,15 @@ static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, 
         return DC_NOTOK;
 
 	view = gtk_tree_view_new ();
-    gtk_box_pack_start(GTK_BOX(qbox), view, FALSE, FALSE, 0);
+	gtk_tree_view_set_headers_visible ( GTK_TREE_VIEW (view), FALSE);
     
 	renderer = gtk_cell_renderer_text_new ();
-	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", COL_NAME, NULL);
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", COL_NAME, NULL);	
 	store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
 
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
+
 	model = GTK_TREE_MODEL( store );
 	gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
 	g_object_unref (model);
@@ -954,6 +947,10 @@ static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, 
 		gtk_list_store_set (store, &iter, COL_NAME, choices_translated[i], -1);
         if (defval && strcmp(choices[tindex[i]], defval) == 0)
         {
+        	/* gtk_tree_view_scroll_to_cell() works only with GTKDFB 2.7/2.8
+        	 * and it doesn't with GTKDFB 2.0.9
+        	 */
+			gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model, &iter), NULL, FALSE, 0.5, 0);
         	gtk_tree_selection_select_iter  (selection, &iter );
         }
         free(choices[tindex[i]]);
@@ -962,6 +959,111 @@ static int gtkhandler_select_treeview(struct frontend *obj, struct question *q, 
     free(choices);
     free(choices_translated);
     free(tindex);
+
+	label = gtk_label_new("");
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
+	label_string = malloc(strlen(q_get_description(q)) + 8 );
+	sprintf(label_string,"<b>%s</b>",q_get_description(q));
+	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	vpadbox = gtk_vbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), view, TRUE, TRUE, 0);
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+	free(label_string);
+
+    return DC_OK;
+}
+
+/* some SELECT questions like "countrychooser/country-name" are
+ * better displayed with a tree rather than a list and this question
+ * handler is meant for this purpose
+ */
+static int gtkhandler_select_treeview_store(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    char **choices, **choices_translated, *label_string;
+    int i, count;
+    struct frontend_question_data *data;
+    const char *defval = question_getvalue(q, "");
+    int *tindex = NULL;
+    const gchar *indices = q_get_indices(q);
+	GtkWidget *hpadbox, *vpadbox, *label;
+
+	GtkTreeModel        *model;
+	GtkTreeStore  		*store;
+	GtkTreeIter    		iter, child;
+	GtkWidget           *view;
+	GtkCellRenderer     *renderer;
+	GtkTreeSelection    *selection;
+
+    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_store() called");
+
+    data = NEW(struct frontend_question_data);
+    data->obj = obj;
+    data->q = q;
+
+    count = strgetargc(q_get_choices_vals(q));
+    if (count <= 0)
+        return DC_NOTOK;
+    choices = malloc(sizeof(char *) * count);
+    choices_translated = malloc(sizeof(char *) * count);
+    tindex = malloc(sizeof(int) * count);
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+        return DC_NOTOK;
+
+	view = gtk_tree_view_new ();
+	gtk_tree_view_set_headers_visible ( GTK_TREE_VIEW (view), FALSE);
+    
+	renderer = gtk_cell_renderer_text_new ();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", COL_NAME, NULL);
+	store = gtk_tree_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
+
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
+	gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
+	model = GTK_TREE_MODEL( store );
+	gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
+	g_object_unref (model);
+
+    for (i = 0; i < count; i++)
+    {
+    	if( ((choices_translated[i][0]=='-') && (choices_translated[i][1]=='-')) )
+    	{	/* father */
+			gtk_tree_store_append (store, &iter,NULL);
+			gtk_tree_store_set (store, &iter, COL_NAME, choices_translated[i], -1);
+		}
+		else
+		{	/* child */
+			gtk_tree_store_append (store, &child, &iter);
+			gtk_tree_store_set (store, &child, COL_NAME, choices_translated[i], -1);
+
+	        if (defval && strcmp(choices[tindex[i]], defval) == 0)
+	        {
+		        gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&child), NULL, FALSE, 0.5, 0);
+		        gtk_tree_view_expand_row (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&iter), TRUE);                  
+				gtk_tree_selection_select_iter  (selection, &child );
+	        }
+		}
+
+        free(choices[tindex[i]]);
+    }
+    
+    free(choices);
+    free(choices_translated);
+    free(tindex);
+
+	label = gtk_label_new("");
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
+	label_string = malloc(strlen(q_get_description(q)) + 8 );
+	sprintf(label_string,"<b>%s</b>",q_get_description(q));
+	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	vpadbox = gtk_vbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), view, TRUE, TRUE, 0);
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+	free(label_string);
 
     return DC_OK;
 }
@@ -1045,7 +1147,13 @@ static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget
 {
 
     if (q->prev == NULL && q->next == NULL)
-        return gtkhandler_select_treeview(obj, q, qbox);
+    {
+	   	if (strcmp(q->tag, "countrychooser/country-name") == 0)
+    	//if (strcmp(q->tag, "test/select-register") == 0)
+        	return gtkhandler_select_treeview_store(obj, q, qbox);
+        else
+        	return gtkhandler_select_treeview_list(obj, q, qbox);
+	}
     else
 		return gtkhandler_select_multiple(obj, q, qbox);
 }
@@ -1168,6 +1276,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     GtkWidget *view;
     GtkTextBuffer *buffer;
     GtkWidget *progress_bar, *progress_bar_label, *progress_bar_box;
+	GtkWidget *logo_button, *logo_box;
 	
     int *ret_val;
 
@@ -1177,7 +1286,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     /* This is the set of boxes and the containing viewport where the
      * questions will be displayed
      */
-    targetbox = gtk_vbox_new (FALSE, 10);
+    targetbox = gtk_vbox_new (FALSE, 0);
     ((struct frontend_data*) obj->data)->target_box = targetbox;
 
     targetbox_scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -1220,6 +1329,10 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_text_view_set_editable (GTK_TEXT_VIEW(view), FALSE);
     gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(view), FALSE);
     gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
+	
+	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(view), 5);
+	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(view), 5);
+	
     gtk_text_view_set_left_margin (GTK_TEXT_VIEW(view), 5);
     gtk_text_view_set_right_margin (GTK_TEXT_VIEW(view), 5);
     ((struct frontend_data*) obj->data)->info_box = view;
@@ -1236,6 +1349,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     progress_bar = gtk_progress_bar_new ();
     ((struct frontend_data*)obj->data)->progress_bar = progress_bar;
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " ");
+    /* gtk_progress_bar_set_ellipsize (GTK_PROGRESS_BAR(progress_bar), PANGO_ELLIPSIZE_MIDDLE); */
     
     progress_bar_label = gtk_label_new("");
 	((struct frontend_data*)obj->data)->progress_bar_label = progress_bar_label;
@@ -1270,7 +1384,14 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     	gtk_box_pack_start(GTK_BOX (globalbox), menubox_vpad, TRUE, TRUE, 5);
     gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
 
-    gtk_container_add(GTK_CONTAINER(window), globalbox);
+	/* A nice logo is added in the left part of the screen */
+	logo_button = gtk_image_new_from_file("/etc/logo_debian.png");
+    logo_box = gtk_hbox_new (FALSE, 0);
+
+	gtk_box_pack_start(GTK_BOX (logo_box), logo_button, FALSE, FALSE, 0);	
+    gtk_box_pack_start(GTK_BOX (logo_box), globalbox, TRUE, TRUE, 0);
+
+    gtk_container_add(GTK_CONTAINER(window), logo_box);
 }
 
 static int gtk_initialize(struct frontend *obj, struct configuration *conf)
@@ -1556,6 +1677,7 @@ static int gtk_go(struct frontend *obj)
 
 	gtk_widget_set_sensitive (data->button_prev, FALSE);
 	gtk_widget_set_sensitive (data->button_next, FALSE);
+	clear_description (data);
 
     if (data->button_val == DC_OK)
         return DC_OK;
@@ -1606,6 +1728,7 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
 		display_main_menu_while_progressbar_runs(obj);
     
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
+	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);
     progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
@@ -1621,7 +1744,7 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_start(min=%d, max=%d, title=%s) called", min, max, title);
 
     while (gtk_events_pending ())
-	gtk_main_iteration ();
+		gtk_main_iteration ();
 }
 
 static void gtk_progress_set(struct frontend *obj, int val)
@@ -1635,6 +1758,7 @@ static void gtk_progress_set(struct frontend *obj, int val)
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val);
 
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
+	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);
 
     obj->progress_cur = val;
     if ((obj->progress_max - obj->progress_min) > 0)
@@ -1658,6 +1782,7 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info);
 
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
+	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);
       
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), info);
    
@@ -1685,7 +1810,8 @@ static void gtk_progress_stop(struct frontend *obj)
     
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0);
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " " );
-    gtk_label_set_text(GTK_LABEL(progress_bar_label), "");
+    gtk_label_set_text(GTK_LABEL(progress_bar_label), " ");
+	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), FALSE );
    
     gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
     while (gtk_events_pending ())
