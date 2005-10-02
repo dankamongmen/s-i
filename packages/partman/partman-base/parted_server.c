@@ -1498,7 +1498,8 @@ command_uses_extended()
         open_out();
         oprintf("OK\n");
         deactivate_exception_handler();
-        if (ped_disk_type_check_feature(disk->type, PED_DISK_TYPE_EXTENDED)
+        if (disk != NULL && disk->type != NULL
+            && ped_disk_type_check_feature(disk->type, PED_DISK_TYPE_EXTENDED)
             && 0 != strcmp(disk->type->name, "dvh"))
                 oprintf("yes\n");
         else
