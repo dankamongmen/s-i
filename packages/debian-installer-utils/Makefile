@@ -1,5 +1,5 @@
 ifndef TARGETS
-TARGETS=mapdevfs
+TARGETS=mapdevfs log-output
 endif
 
 CFLAGS=-Wall -W -Os -fomit-frame-pointer -g
@@ -10,6 +10,9 @@ STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 all: $(TARGETS)
 
 mapdevfs: mapdevfs.c
+	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
+
+log-output: log-output.c
 	$(CC) $(CFLAGS) $^ -o $@ -ldebian-installer
 
 strip: $(TARGETS)
