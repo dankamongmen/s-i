@@ -34,7 +34,7 @@ if [ -n "$proxy" ]; then
 fi
 
 echo "deb http://$host/ $suite/updates $dists" >> $file
-if ! apt-setup-verify; then
+if ! apt-setup-verify $file; then
 	db_subst apt-setup/security-updates-failed SECURITY_HOST "$host"
 	db_input critical apt-setup/security-updates-failed || true
 	if ! db_go; then
