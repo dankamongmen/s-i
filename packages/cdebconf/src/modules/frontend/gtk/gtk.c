@@ -1148,10 +1148,14 @@ static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget
 
     if (q->prev == NULL && q->next == NULL)
     {
-	   	if (strcmp(q->tag, "countrychooser/country-name") == 0)
-    	//if (strcmp(q->tag, "test/select-register") == 0)
-        	return gtkhandler_select_treeview_store(obj, q, qbox);
-        else
+    /* Crashes have been reported to occour with sid when using GTKDFB 2.0.9,
+     * crashes that do not occour with unstable: while investigating
+     * gtkhandler_select_treeview_store() is temporarily disabled.
+     *
+	 * 	 if (strcmp(q->tag, "countrychooser/country-name") == 0)
+     *      return gtkhandler_select_treeview_store(obj, q, qbox);
+     *   else
+     */
         	return gtkhandler_select_treeview_list(obj, q, qbox);
 	}
     else
@@ -1385,7 +1389,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
 
 	/* A nice logo is added in the left part of the screen */
-	logo_button = gtk_image_new_from_file("/etc/logo_debian.png");
+	logo_button = gtk_image_new_from_file("/usr/share/graphics/logo_debian.png");
     logo_box = gtk_hbox_new (FALSE, 0);
 
 	gtk_box_pack_start(GTK_BOX (logo_box), logo_button, FALSE, FALSE, 0);	
