@@ -14,9 +14,6 @@ if db_get "tzsetup/country/$CC"; then
 		exit 10 # back to menu
 	fi
 else
-	# unset backup capability
-	db_capb
-
 	db_register time/zone time/zone # might be registered to something else
 	# detect preseeding and avoid replacing with other value
 	db_fget time/zone seen
@@ -26,6 +23,8 @@ else
 
 		db_subst tzsetup/selected ZONE $zone
 		db_input medium tzsetup/selected || true
-		db_go
+		if ! db_go; then
+			exit 10 # back to menu
+		fi
 	fi
 fi
