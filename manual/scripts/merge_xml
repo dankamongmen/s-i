@@ -14,14 +14,16 @@ language=${1:-pl}
 
 SCRIPTDIR="./scripts"
 BUILDDIR="./build"
+
+LANGDIR="./$language"
+[ -d $LANGDIR ] || exit 1
+
 if [ -z "$PO_USEBUILD" ] ; then
     WORKDIR="./integrated"
 else
     WORKDIR="$BUILDDIR/build.po"
 fi
-LANGDIR="./$language"
-
-[ -d $LANGDIR ] || exit 1
+[ -d $WORKDIR ] || mkdir -p $WORKDIR
 
 TEMPDIR=/tmp/merge_xml.$$
 LOG=$TEMPDIR/merge_xml.$language.log
