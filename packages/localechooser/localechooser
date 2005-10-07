@@ -191,39 +191,39 @@ fi
 # smart enough to preseed it to a supported value
 # so the template uses all possible values
 if test -z "$LANGNAME" ; then
-    case $DEBCONF_FRONTEND in
+	case $DEBCONF_FRONTEND in
 	text)
-	    # Stricto-sensu, the text interface could use all languages
-	    # but it will most often be used in situation where the display
-	    # is "poor", so let's assume that only ASCII languages may be 
-	    # displayed, then
-	    template=${langname_ascii}
+		# Stricto-sensu, the text interface could use all languages
+		# but it will most often be used in situation where the display
+		# is "poor", so let's assume that only ASCII languages may be 
+		# displayed, then
+		template=${langname_ascii}
 	;;
 	gtk)
-	    # We assume that the GTK interface handles all languages
-	    template=${langname_all}
+		# We assume that the GTK interface handles all languages
+		template=${langname_all}
 	;;
 	*)
-	    # Only keep Latin1 languages if we don't have the framebuffer
-	    db_get debian-installer/framebuffer || true
-	    if test "$RET" = "false" || test -z "$RET"  ; then
-		template=${langname_latin}
-	    else
-		template=${langname_fb}
-	    fi
-	    # Try to detect serial consoles
-	    test -f /lib/debian-installer/detect-console && . /lib/debian-installer/detect-console
-	    if test "${TERM_TYPE}" = "serial"  ; then
-		template=${langname_ascii}	    
-	    fi
-	    # For cases we have a dumb terminal, we're stuck with ASCII
-	    if test "${TERM}" = "dumb"  ; then
-		template=${langname_ascii}	    
-	    fi
+		# Only keep Latin1 languages if we don't have the framebuffer
+		db_get debian-installer/framebuffer || true
+		if test "$RET" = "false" || test -z "$RET"  ; then
+			template=${langname_latin}
+		else
+			template=${langname_fb}
+		fi
+		# Try to detect serial consoles
+		test -f /lib/debian-installer/detect-console && . /lib/debian-installer/detect-console
+		if test "${TERM_TYPE}" = "serial"  ; then
+			template=${langname_ascii}	    
+		fi
+		# For cases we have a dumb terminal, we're stuck with ASCII
+		if test "${TERM}" = "dumb"  ; then
+			template=${langname_ascii}	    
+		fi
 	;;
-    esac
+	esac
 else
-    template=${langname_all}
+	template=${langname_all}
 fi
 
 db_input high $template || [ $? -eq 30 ]
@@ -485,7 +485,7 @@ fi
 # Install localization-config except when no localization happens
 # Install it anyway for powerpc arches (to handle subarches)
 if [ "$LOCALE" != "C" ] ||  [ "$ARCH" = "powerpc" ]; then
-    pkginstall localization-config
+	pkginstall localization-config
 fi
 
 
