@@ -7,6 +7,7 @@ logdir=$ROOT/log
 mainlog=$logdir/main.log
 builddate=`date +"%d %b %Y"`
 logpage="http://people.debian.org/~fjp/d-i_manual/log"
+myaddress="aragorn@tiscali.nl"
 
 [ -e "$logdir" ] && cd $logdir || exit 1
 
@@ -26,6 +27,7 @@ if [ -f $ROOT/do_not_build ] ; then
     add-svnlog
 
     mutt -s "D-I Manual build failed ($builddate)" fjp@fjphome.nl <$mainlog
+    mutt -s "D-I Manual build failed ($builddate)" $myaddress <$mainlog
     exit 0
 fi
 
@@ -87,8 +89,7 @@ echo "" >>$mainlog
 echo "Build successfull; logmails have been sent!" >>$mainlog
 add-svnlog
 
-#mutt -s "D-I Manual build success ($builddate)" fjp@fjphome.nl <$mainlog
-mutt -s "D-I Manual build success ($builddate)" aragorn@tiscali.nl <$mainlog
+mutt -s "D-I Manual build success ($builddate)" $myaddress <$mainlog
 
 rm /tmp/*.$$ &>/dev/null
 exit 0
