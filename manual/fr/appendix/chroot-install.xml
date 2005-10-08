@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28997 -->
+<!-- original version: 31190 -->
 
  <sect1 id="linux-upgrade">
  <title>Installer &debian; à partir d'un système Unix/Linux</title>
@@ -8,7 +8,7 @@
 
 Cette partie explique comment installer &debian; à partir d'un système
 Unix ou Linux existant, sans utiliser le système d'installation avec menus
-qui est expliqué dans la suite de ce manuel. Les utilisateurs
+qui est exposé dans la suite de ce manuel. Les utilisateurs
 qui changeaient leur distribution Red Hat, Mandrake et Suse pour &debian;
 réclamaient ce guide d'installation. Dans cette 
 partie, on suppose que le lecteur a acquis une certaine familiarité avec 
@@ -74,6 +74,13 @@ suite.
 </screen></informalexample>
 
 </para>
+<note><para>
+
+Si vous voulez que certaines parties du système de fichiers (p. ex /usr) soient
+montées sur des partitions distinctes, vous devez créer et monter ces répertoires
+vous-même avant de commencer l'étape suivante.
+
+</para></note>
   </sect2>
 
   <sect2>
@@ -119,6 +126,13 @@ installer le binaire.
 # cd /
 # zcat /full-path-to-work/work/data.tar.gz | tar xv
 </screen></informalexample>
+</para>
+<para>
+
+Il faut noter que pour exécuter <command>debootstrap</command> vous devez installer
+une version de <classname>glibc</classname> au moins égale à GLIBC_2.3. 
+<command>Debootstrap</command> est seulement un script mais il appelle 
+différents utilitaires qui exigent <classname>glibc</classname>.
 
 </para>
   </sect2>
@@ -196,8 +210,8 @@ Voici un exemple que vous pouvez modifier à votre convenance&nbsp;:
 # /etc/fstab: static file system information.
 #
 # file system    mount point   type    options                  dump pass
-/dev/XXX         /             ext2    defaults                 0    0
-/dev/XXX         /boot         ext2    ro,nosuid,nodev          0    2
+/dev/XXX         /             ext3    defaults                 0    1
+/dev/XXX         /boot         ext3    ro,nosuid,nodev          0    2
 
 /dev/XXX         none          swap    sw                       0    0
 proc             /proc         proc    defaults                 0    0
@@ -205,10 +219,10 @@ proc             /proc         proc    defaults                 0    0
 /dev/fd0         /mnt/floppy   auto    noauto,rw,sync,user,exec 0    0
 /dev/cdrom       /mnt/cdrom    iso9660 noauto,ro,user,exec      0    0
 
-/dev/XXX         /tmp          ext2    rw,nosuid,nodev          0    2
-/dev/XXX         /var          ext2    rw,nosuid,nodev          0    2
-/dev/XXX         /usr          ext2    rw,nodev                 0    2
-/dev/XXX         /home         ext2    rw,nosuid,nodev          0    2
+/dev/XXX         /tmp          ext3    rw,nosuid,nodev          0    2
+/dev/XXX         /var          ext3    rw,nosuid,nodev          0    2
+/dev/XXX         /usr          ext3    rw,nodev                 0    2
+/dev/XXX         /home         ext3    rw,nosuid,nodev          0    2
 </screen></informalexample>
 
 Utilisez <userinput>mount -a</userinput> pour monter l'ensemble des systèmes 
@@ -221,12 +235,22 @@ pour monter un à un chaque système de fichiers, utilisez&nbsp;:
 </screen></informalexample>
 
 Vous pouvez monter le système de fichiers proc plusieurs fois et à divers
-endroits, cependant on choisit d'habitude /proc. Si vous n'utilisez pas
-<userinput>mount -a</userinput>, assurez-vous d'avoir monté proc avant 
-d'aller plus loin&nbsp;:
+endroits, cependant on choisit d'habitude <filename>/proc</filename>. 
+Si vous n'utilisez pas <userinput>mount -a</userinput>, assurez-vous d'avoir monté proc 
+avant d'aller plus loin&nbsp;:
 
 <informalexample><screen>
 # mount -t proc proc /proc
+</screen></informalexample>
+
+</para>
+<para>
+
+La commande <userinput>ls /proc</userinput> affiche maintenant un répertoire
+non vide. Si cela échoue, vous pouvez monter proc hors du chroot de cette manière :
+
+<informalexample><screen>
+# mount -t proc proc /mnt/debinst/proc
 </screen></informalexample>
 
 </para>
@@ -242,6 +266,11 @@ Pour configurer votre clavier exécutez&nbsp;:
 <informalexample><screen>
 # dpkg-reconfigure console-data
 </screen></informalexample>
+
+</para><para>
+
+Il faut noter que le clavier ne peut pas être configuré à l'intérieur du chroot.
+Il sera configuré au prochain démarrage de la machine.
 
 </para>
    </sect3>
@@ -406,7 +435,7 @@ Voici un exemple simple de fichier <filename>/etc/lilo.conf</filename>&nbsp;:
 <informalexample><screen>
 boot=/dev/hda6
 root=/dev/hda6
-install=/boot/boot-menu.b
+install=menu
 delay=20
 lba32
 image=/vmlinuz
