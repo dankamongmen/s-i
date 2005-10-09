@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "POT-Creation-Date: 2001-02-09 01:25+0100\n"
-"PO-Revision-Date: 2005-09-16 21:05+0800\n"
+"PO-Revision-Date: 2005-10-09 13:49+0800\n"
 "Last-Translator: Ji YongGang<jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -2345,7 +2345,7 @@ msgid ""
 "If you want to have parts of the filesystem (e.g. /usr) mounted on separate "
 "partitions, you will need to create and mount these directories manually "
 "before proceding with the next stage."
-msgstr ""
+msgstr "如果您打算将部分文件系统(例如，/usr)放到独立的分区，在进入下一阶段之前，需要手动创建和加载这些目录。"
 
 #. Tag: title
 #: random-bits.xml:416
@@ -2428,7 +2428,7 @@ msgid ""
 "minimal version of <classname>glibc</classname> installed (currently "
 "GLIBC_2.3). <command>debootstrap</command> itself is a shell script, but it "
 "calls various utilities that require <classname>glibc</classname>."
-msgstr ""
+msgstr "注意，运行 <command>debootstrap</command> 可能需要您有最小版本的 <classname>glibc</classname> (当前为 GLIBC_2.3)。 <command>debootstrap</command> 本身是一个 shell 脚本，但它会调用 <classname>glibc</classname> 的一下工具。"
 
 #. Tag: title
 #: random-bits.xml:461
@@ -2524,7 +2524,7 @@ msgstr "分区的挂载"
 
 #. Tag: para
 #: random-bits.xml:512
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "You need to create <filename>/etc/fstab</filename>. "
 "<informalexample><screen>\n"
@@ -2558,13 +2558,12 @@ msgid ""
 msgstr ""
 "您需要新建 <filename>/etc/fstab</filename>。<informalexample><screen>\n"
 "# editor /etc/fstab\n"
-"</screen></informalexample> 这里有个样板，您不妨根据自己的情况来修改它： "
-"<informalexample><screen>\n"
+"</screen></informalexample> 这里有个样板，您不妨根据自己的情况来修改它： <informalexample><screen>\n"
 "# /etc/fstab: static file system information.\n"
 "#\n"
 "# file system    mount point   type    options                  dump pass\n"
-"/dev/XXX         /             ext2    defaults                 0    0\n"
-"/dev/XXX         /boot         ext2    ro,nosuid,nodev          0    2\n"
+"/dev/XXX         /             ext3    defaults                 0    1\n"
+"/dev/XXX         /boot         ext3    ro,nosuid,nodev          0    2\n"
 "\n"
 "/dev/XXX         none          swap    sw                       0    0\n"
 "proc             /proc         proc    defaults                 0    0\n"
@@ -2572,17 +2571,13 @@ msgstr ""
 "/dev/fd0         /mnt/floppy   auto    noauto,rw,sync,user,exec 0    0\n"
 "/dev/cdrom       /mnt/cdrom    iso9660 noauto,ro,user,exec      0    0\n"
 "\n"
-"/dev/XXX         /tmp          ext2    rw,nosuid,nodev          0    2\n"
-"/dev/XXX         /var          ext2    rw,nosuid,nodev          0    2\n"
-"/dev/XXX         /usr          ext2    rw,nodev                 0    2\n"
-"/dev/XXX         /home         ext2    rw,nosuid,nodev          0    2\n"
-"</screen></informalexample> 您可以通过 <userinput>mount -a</userinput> 来挂载"
-"您的 <filename>/etc/fstab</filename> 中所标明的所有文件系统，您也可以一个一个"
-"地分别挂载这些文件系统，像： <informalexample><screen>\n"
+"/dev/XXX         /tmp          ext3    rw,nosuid,nodev          0    2\n"
+"/dev/XXX         /var          ext3    rw,nosuid,nodev          0    2\n"
+"/dev/XXX         /usr          ext3    rw,nodev                 0    2\n"
+"/dev/XXX         /home         ext3    rw,nosuid,nodev          0    2\n"
+"</screen></informalexample> 您可以通过 <userinput>mount -a</userinput> 来挂载您的 <filename>/etc/fstab</filename> 中所标明的所有文件系统，您也可以一个一个地分别挂载这些文件系统，像： <informalexample><screen>\n"
 "# mount /path   # e.g.: mount /usr\n"
-"</screen></informalexample> 您可以多次挂载 proc 文件系统。尽管通常把它挂载"
-"到 /proc，但是它还是可以被挂载到任意的地方。如果您没有用 <userinput>mount -"
-"a</userinput>，那么请一定要再接着做之前先把 proc 挂载好："
+"</screen></informalexample> 您可以多次挂载 proc 文件系统。尽管通常把它挂载到 /proc，但是它还是可以被挂载到任意的地方。如果您没有用 <userinput>mount -a</userinput>，那么请一定要再接着做之前先把 proc 挂载好："
 
 #. Tag: screen
 #: random-bits.xml:532
@@ -2597,13 +2592,13 @@ msgid ""
 "The command <userinput>ls /proc</userinput> should now show a non-empty "
 "directory. Should this fail, you may be able to mount proc from outside the "
 "chroot:"
-msgstr ""
+msgstr "<userinput>ls /proc</userinput> 命令现在应该列出非空目录。如果失败，您应该从 chroot: 以为加载 proc。"
 
 #. Tag: screen
 #: random-bits.xml:540
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "# mount -t proc proc /mnt/debinst/proc"
-msgstr "# mount -t proc proc /proc"
+msgstr "# mount -t proc proc /mnt/debinst/proc"
 
 #. Tag: title
 #: random-bits.xml:546
@@ -2629,7 +2624,7 @@ msgstr "# dpkg-reconfigure console-data"
 msgid ""
 "Note that the keyboard cannot be set while in the chroot, but will be "
 "configured for the next reboot."
-msgstr ""
+msgstr "注意，在 chroot 里面不能设置键盘，但重新启动以后可以。"
 
 #. Tag: title
 #: random-bits.xml:562
@@ -2861,7 +2856,7 @@ msgstr "下面有一个简单的<filename>/etc/lilo.conf</filename> 作为例子
 
 #. Tag: screen
 #: random-bits.xml:667
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "boot=/dev/hda6\n"
 "root=/dev/hda6\n"
@@ -2873,7 +2868,7 @@ msgid ""
 msgstr ""
 "boot=/dev/hda6\n"
 "root=/dev/hda6\n"
-"install=/boot/boot-menu.b\n"
+"install=menu\n"
 "delay=20\n"
 "lba32\n"
 "image=/vmlinuz\n"
