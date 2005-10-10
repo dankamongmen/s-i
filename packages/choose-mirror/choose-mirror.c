@@ -18,10 +18,20 @@
 #if ! defined (WITH_HTTP) && ! defined (WITH_FTP)
 #error Must compile with at least one of FTP or HTTP
 #endif
+#define SUITE_LENGTH 32
 
 static struct debconfclient *debconf;
 static char *protocol = NULL;
 static char *country  = NULL;
+/* Stack of suites */
+static	const char suites[][SUITE_LENGTH] = {
+	/* higher preference */
+	PREFERRED_DISTRIBUTION,
+	"stable",
+	"testing",
+	"unstable"
+	/* lower preference */
+};
 
 /*
  * Returns a string on the form "DEBCONF_BASE/protocol/supplied".  The
@@ -249,6 +259,55 @@ static int choose_proxy(void) {
 	return 0;
 }
 
+/* Search the preferred suite in the mirror
+ * if no suite found: suite=NULL and ret !=0 */
+static int search_suite(const char **suite,
+			const char *protocol,
+			const char *hostname,
+			const char *directory) {
+  
+	char *command = NULL;
+	const char *preferred_dist = NULL;
+	int ret = -1;
+
+	*suite = NULL;
+
+	/* Allow the hardcoded default to be overridden by the
+	 * environment.
+	 */
+	preferred_dist = getenv("PREFERRED_DISTRIBUTION");
+	if (preferred_dist != NULL && *preferred_dist != '\0') {
+
+		asprintf(&command, 
+			 "exec wget -q %s://%s%s/dists/%s -O /dev/null",
+			 protocol, hostname, directory, preferred_dist);
+		ret = di_exec_shell_log(command);
+		free(command);
+	}
+
+	if (ret != 0) {
+		/* test other suites */
+		int nbr_suites = sizeof(suites)/SUITE_LENGTH;
+		int i = 0;
+		for( i=0; i<nbr_suites && ret != 0; i++ ) {
+			asprintf(&command, 
+				 "exec wget -q %s://%s%s/dists/%s -O /dev/null",
+				 protocol, hostname, directory, suites[i]);
+			ret = di_exec_shell_log(command);
+			free(command);
+			if (ret == 0) {
+				*suite = suites[i];
+			}
+		}
+
+	}
+	else {
+		*suite = preferred_dist;
+	}
+
+	return ret;
+}
+
 static int validate_mirror(void) {
 	char *mir;
 	char *host;
@@ -311,17 +370,12 @@ static int validate_mirror(void) {
 		char *command;
 		FILE *f = NULL;
 		char *hostname, *directory;
-		const char *preferred_dist;
+		const char *preferred_dist = NULL;
 
-		/* Allow the hardcoded default to be overridden by the
-		 * environment.
-		 */
-		preferred_dist = getenv("PREFERRED_DISTRIBUTION");
-		if (preferred_dist == NULL || *preferred_dist == '\0')
-			preferred_dist = PREFERRED_DISTRIBUTION;
-
-		debconf_progress_start(debconf, 0, 1, DEBCONF_BASE "checking_title");
-		debconf_progress_info(debconf, DEBCONF_BASE "checking_download");
+		debconf_progress_start(debconf, 0, 1, 
+				       DEBCONF_BASE "checking_title");
+		debconf_progress_info(debconf, 
+				      DEBCONF_BASE "checking_download");
 		
 		debconf_get(debconf, host);
 		hostname = strdup(debconf->value);
@@ -331,14 +385,20 @@ static int validate_mirror(void) {
 		if (proxy)
 			setenv(proxy_var, proxy, 1);
 		
-		asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-		         protocol, hostname, directory, preferred_dist);
-		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
-		
+		ret = search_suite(&preferred_dist,
+				   protocol, hostname, directory);
+		if (ret == 0) { 
+			asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+				 protocol, hostname, directory, 
+				 preferred_dist);
+			di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
+			f = popen(command, "r");
+			free(command);
+		}
+
 		free(hostname);
 		free(directory);
 		
-		f = popen(command, "r");
 		if (f != NULL) {
 			char suite[32];
 			if (fgets(suite, 31, f)) {
@@ -359,8 +419,6 @@ static int validate_mirror(void) {
 		else {
 			ret = 1;
 		}
-
-		free(command);
 		
 		if (proxy) {
 			unsetenv(proxy_var);
@@ -419,3 +477,9 @@ int main (void) {
 	}
 	return (state >= 0) ? 0 : 10; /* backed all the way out */
 }
+/*
+Local variables:
+c-file-style: "linux"
+End:
+*/
+
