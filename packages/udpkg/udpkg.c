@@ -255,7 +255,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	int r = 1;
 	char *cwd = 0;
 	char *p;
-	char buf[1024];
+	char buf[1024], buf2[1024];
 	FILE *f;
 
 	p = strrchr(pkg->file, '/');
@@ -263,6 +263,7 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	p = pkg->package = strdup(p);
 	while (*p != 0 && *p != '_' && *p != '.') p++;
 	*p = 0;
+        p = pkg->package;
 
 	cwd = getcwd(0, 0);
 	snprintf(buf, sizeof(buf), "%s%s", DPKGCIDIR, pkg->package);
@@ -273,9 +274,20 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 			pkg->file);
 		if (di_exec_shell_log(buf) == 0)
 		{
-			if ((f = fopen("control", "r")) != NULL) {
+			if ((f = fopen("control", "r")) != NULL) 
+                        {
 				control_read(f, pkg);
-				r = 0;
+                                if (strcmp(pkg->package, p) != 0) 
+                                {
+                                        snprintf(buf, sizeof(buf), "%s%s", DPKGCIDIR, p);
+                                        snprintf(buf2, sizeof(buf2), "%s%s", DPKGCIDIR, pkg->package);
+                                        r = rename(buf, buf2);
+                                }
+                                else 
+                                {
+                                        r = 0;
+                                }
+                                free(p);
 			}
 		}
 	}
