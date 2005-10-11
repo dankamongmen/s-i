@@ -85,7 +85,6 @@ locale2langname() {
 	langpart="${1%%_*}"
 	# Match the language code with 5th field in languagelist
 	line=$(cat $2 | grep -v "^#" | cut -f1,5 -d\;|grep ";$langpart")
-	log $(cat $2 | grep -v "^#" | cut -f1,5 -d\;)
 	if [ -n "$line" ] ; then
 		echo "${line%%;*}"
 	fi
@@ -225,6 +224,7 @@ if test -z "$LANGNAME" ; then
 else
 	template=${langname_all}
 fi
+log "Language input template is $template"
 
 db_input high $template || [ $? -eq 30 ]
 
