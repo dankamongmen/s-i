@@ -1,0 +1,45 @@
+#!/usr/bin/make -f
+
+DESTDIR=$(CURDIR)/debian/rootskel-gtk/
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+
+	$(MAKE) build
+
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+
+	$(MAKE) clean
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+
+	$(MAKE) install
+	ln -sf ../../etc/ $(DESTDIR)/usr/local
+	ln -sf ../../ $(DESTDIR)/usr/lib/gtk-2.0/2.0.0/loaders
+
+binary-indep: build install
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
