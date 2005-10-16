@@ -64,13 +64,15 @@ sub setup()
 
 sub help()
 {
-	print "\n\nUsage: $0 [-msgid|-msgstr] [-noignore] [filename]\n";
+	print "\n\nUsage: $0 [-msgid|-msgstr] [-noignore] [-filter=SOMESTRING] [filename]\n";
 	print "\nExtracts msgid or msgstr fields from a .po file.\n";
 	print "\t-msgid\n\t\textract msgid-s\n\t-msgstr\n\t\textract msgstr-s\n";
 	print "\t-noignore\n\t\tby default, the first msgid/msgstr is ignored because";
 	print "\n\t\tregular .po files have the header in there. If this";
 	print "\n\t\tparameter is specified then the first msgid/msgstr is";
 	print "\n\t\tincluded, too.\n";
+	print "\t-filter=SOMESTRING\n\t\tignore the messages which contain in the associated";
+	print "\n\t\tcomment the string SOMESTRING.\n";
 	print "\n\tfilename\n\t\tan optional filename that should be a valid po filename.\n";
 	print "\n\nExamples:\n\n\tperl -s $0 -msgid ro.po > ro_all.txt\n";
 	print "\n\tcat ro.po | perl -s $0 -msgid > ro_all.txt\n";
@@ -83,29 +85,41 @@ sub help()
 
 $ismsg = 0;
 $firsttime = 1;
+$printmsg = 'yes';
 
 setup();
 
-while (defined($line = <STDIN>)) 
+while (defined($line = <STDIN>))
 {
 	# process $line here
+
+	if ( ! $line )
+	{
+		$printmsg = 'yes';
+	}
+	
+	if ( $line =~ /^\s*$/ )
+	{
+		$printmsg = 'yes';
+	}
+	
 	unless ( $line =~ /^\s*#.*/ )
 	{
 		if ( $line =~ /^$msgmark($marksup)? .*/)
 		{
 			$line =~ s/^$msgmark($marksup)? (.*)/\2/;
-			unless ($line =~ /^\"\"/) { print "- $line";}
+			unless ($line =~ /^\"\"/) { $printmsg && print "- $line";}
 			#do not parse the header, if requested not to.
 			if ($firsttime == 0) {$ismsg = 1;}
 			$firsttime = 0;
 		}
-		else 
+		else
 		{
 			if ($ismsg eq 1)
 			{
 				if ( $line =~ /^\s*".+"/ )
 				{
-					print "- $line";
+					$printmsg && print "- $line";
 				}
 				else
 				{
@@ -114,4 +128,12 @@ while (defined($line = <STDIN>))
 			}
 		}
 	}
+	elsif ( $filter )
+	{
+		if ( $line =~ /^\s*#$filter$/ )
+		{
+			$printmsg = '';
+		}
+	}
 }
+
