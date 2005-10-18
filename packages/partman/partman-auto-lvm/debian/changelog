@@ -15,6 +15,53 @@ partman-auto-lvm (3) UNRELEASED; urgency=low
 
   [ Joey Hess ]
   * Use log-output.
+  * Merge remainder of Ubuntu patches from Fabio and Colin. Some manual
+    merging due to other changes and the patch including some of the
+    changes listed above. The other changes in this patch follow.
+
+  [ Colin Watson ]
+   * Disable ourselves on powerpc in a slightly more effective way.
+   * Disable ourselves on powerpc (closes: Ubuntu #14438).
+ 
+  [ Fabio M. Di Nitto ]
+   * Add 40 some_device_lvm based on partman-auto counterpart.
+   NOTE: all the next changes will make partman-auto-lvm useful only with
+   lvm2 and the lvm_tools.sh API rename is done to keep a bit of consistency
+   with what real lvm2 tools actually do.
+   * Use vgs to simplify VG_list (lvm_tools.sh).
+   * Use pvs to simplify VG_of_PV.
+   * Simplify VG_reduce.
+   * Implement the "full" option in LV_create.
+   * Cleanup LV_list.
+   NOTE: the following change requires partman-auto-41ubuntu3 or higher.
+   * Use expand_scheme and clean_method from recipe.sh to remove duplicate
+     code.
+   * expand_scheme needs a valid free_size value to return a proper $scheme
+     back. Also note the size hack in perform_recipe_by_lvm due to lvm
+     rounding issues. In order to fill up the space, the last partition will
+     be created using all the free_size and a 3% of the overall space is
+     reserved to ensure that the last partition is big enough.
+     There might be better methods to calculate, but right now this one seems
+     to fullfil its task.
+   * Map devfs names to real devices in vg_all_free/do_option since lvm2
+     tools don't like devfs names.
+   * Create a separate /boot and a vg on the selected device.
+   * Allign vg creation between vg_all_free and some_device_lvm.
+   * Add notes on scheme manipulation.
+   * Remove wrong call to clean_method in perform_recipe_by_lvm.
+   * Fix device mapper naming.
+   * Restart partman at the end of the process. This is required to get some
+     LVM info right.
+   * Add missing noheadings to LV_create.
+   * Strip the decimal in LV_create.
+   * Try to give more sensible names to partitions that are not mounted.
+   * Add db_progress info to perform_recipe_by_lvm.
+   * Fix partition size calculation using kbytes instead of Mbytes.
+     This operation removes any weird hack in calculating the partitions.
+   * brownpaper bag.. it's ok to switch to kbytes.. but not everything can
+     handle so big numbers.
+   * Remove "Use free space option". 
+     (see http://bugzilla.ubuntu.com/show_bug.cgi?id=15017)
 
  -- Joey Hess <joeyh@debian.org>  Thu, 22 Sep 2005 09:33:15 +0200
 

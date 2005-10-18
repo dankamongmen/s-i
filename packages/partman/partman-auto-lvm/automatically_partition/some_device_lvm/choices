@@ -1,0 +1,20 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+SUBARCH="$(archdetect)"
+case $SUBARCH in
+    powerpc/*)
+	exit
+	;;
+esac
+
+mypart=''
+mysize=0
+
+for dev in $DEVICES/*; do
+    [ -d "$dev" ] || continue
+    db_subst partman-auto-lvm/text/use_device DEVICE $(device_name $dev)
+    db_metaget partman-auto-lvm/text/use_device description
+    printf "$dev\t$RET\n"
+done

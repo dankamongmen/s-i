@@ -71,12 +71,6 @@ for dev in $DEVICES/*; do
     close_dialog
 done
 
-# we need to flush udev device creation queue or the next
-# loop will run without devices and fail miserably.
-if type udevstart >/dev/null 2>&1; then
-    udevstart
-fi
-
 # Reread device names as some of them may have changed
 pv_devices=''
 for part in $pv_list; do
@@ -101,7 +95,7 @@ while true; do
     db_get partman-auto-lvm/new_vg_name
     VG_name="$RET"
 
-    if VG_create "$VG_name" $pv_devices; then break; fi
+    if new_VG "$VG_name" $pv_devices; then break; fi
     noninteractive="exit 1"
 done
 
