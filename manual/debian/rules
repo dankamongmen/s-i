@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+
+ARCHS=alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc
+VERSION=$(shell LC_ALL=C dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
+DATE=$(shell echo $(VERSION) | cut -d '.' -f 1)
+SUITE=$(shell LC_ALL=C dpkg-parsechangelog | grep ^Distribution: | cut -d ' ' -f 2)
+ifeq (${SUITE},unstable)
+SUITE=etch
+endif
+
+MANTMP=$(shell pwd)/debian/manual
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean build-stamp
+	rm -rf $(MANTMP)
+
+build: build-stamp
+build-stamp:
+	rm -f $@
+	-rm -rf $(MANTMP)
+	set -e && cd build && \
+	    for arch in $(ARCHS) ; do \
+		official_build=1 manual_release=$(SUITE) \
+		architectures="$$arch" noarchdir=1 \
+		destination=$(MANTMP)/$$arch \
+		./build.sh ; \
+	    done
+	touch $@
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	
+binary-arch:
+
+binary-indep: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	for arch in $(ARCHS) ; do \
+		dh_installdocs -p debian-installer-manual-$$arch $(MANTMP)/$$arch/* ; \
+	done
+	dh_compress
+	dh_fixperms
+	dh_gencontrol -- -Vkernel:Package='$(KERNELPACKAGE)'
+	dh_builddeb
+
+	# Create a tarball for each arch for use in debian-cd
+	# Note: these should be uploaded manually
+	#set -e && cd $(MANTMP) && \
+	#    for arch in $(ARCHS) ; do \
+	#	tarname=di-manual-$${arch}_$(VERSION).tar.gz ; \
+	#	cd $$arch ; \
+	#	tar czf ../../../../$$tarname . ; \
+	#	cd .. ; \
+	#    done
+
+binary: binary-indep binary-arch 
+.PHONY: build build-images clean binary-indep binary-arch binary install 
