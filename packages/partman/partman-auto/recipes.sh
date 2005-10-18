@@ -320,3 +320,66 @@ choose_recipe () {
     fi
     recipe="$RET"
 }
+
+expand_scheme() {
+    # Make factors small numbers so we can multiply on them.
+    # Also ensure that fact, max and fs are valid
+    # (Ofcourse in valid recipes they must be valid.)
+    factsum=$(($(factor_sum) - $(min_size)))
+    scheme=$(
+        foreach_partition '
+            local min fact max fs
+            min=$1
+            fact=$((($2 - $min) * 100 / $factsum))
+            max=$3
+            fs=$4
+            case "$fs" in
+                ext2|ext3|linux-swap|fat16|fat32|hfs)
+                    true
+                    ;;
+                *)
+                    fs=ext2
+                    ;;
+            esac
+           shift; shift; shift; shift
+           echo $min $fact $max $fs $*'
+    )
+
+    oldscheme=''
+    while [ "$scheme" != "$oldscheme" ]; do
+        oldscheme="$scheme"
+        factsum=$(factor_sum)
+        unallocated=$(($free_size - $(min_size)))
+        if [ $unallocated -lt 0 ]; then
+            unallocated=0
+        fi
+        scheme=$(
+            foreach_partition '
+                local min fact max newmin
+                min=$1
+                fact=$2
+                max=$3
+                shift; shift; shift
+                newmin=$(($min + $unallocated * $fact / $factsum))
+                if [ $newmin -le $max ]; then
+                    echo $newmin $fact $max $*
+                else
+                    echo $max 0 $max $*
+                fi'
+        )
+    done
+}
+
+clean_method() {
+    for device in $DEVICES/*; do
+        [ -d "$device" ] || continue
+        cd $device
+        open_dialog PARTITIONS
+        while { read_line num id size type fs path name; [ "$id" ]; }; do
+            if [ -f $id/method ]; then
+                rm $id/method
+            fi
+        done
+       close_dialog
+    done
+}
