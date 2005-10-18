@@ -9,4 +9,20 @@ struct mirror_t {
 	char *root;
 };
 
+/* This is the codename of the preferred distribution; the one that the
+ * current version of d-i is targeted at installing. */
+#define PREFERRED_DISTRIBUTION "etch"
+
+#define SUITE_LENGTH 32
+
+/* Stack of suites */
+static	const char suites[][SUITE_LENGTH] = {
+	/* higher preference */
+	PREFERRED_DISTRIBUTION,
+	"stable",
+	"testing",
+	"unstable"
+	/* lower preference */
+};
+
 #define DEBCONF_BASE "mirror/"

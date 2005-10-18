@@ -1,7 +1,3 @@
-/* This is the codename of the preferred distribution; the one that the
- * current version of d-i is targeted at installing. */
-#define PREFERRED_DISTRIBUTION "etch"
-
 #include <debian-installer.h>
 #include <cdebconf/debconfclient.h>
 #include <string.h>
@@ -18,20 +14,10 @@
 #if ! defined (WITH_HTTP) && ! defined (WITH_FTP)
 #error Must compile with at least one of FTP or HTTP
 #endif
-#define SUITE_LENGTH 32
 
 static struct debconfclient *debconf;
 static char *protocol = NULL;
 static char *country  = NULL;
-/* Stack of suites */
-static	const char suites[][SUITE_LENGTH] = {
-	/* higher preference */
-	PREFERRED_DISTRIBUTION,
-	"stable",
-	"testing",
-	"unstable"
-	/* lower preference */
-};
 
 /*
  * Returns a string on the form "DEBCONF_BASE/protocol/supplied".  The
@@ -259,50 +245,29 @@ static int choose_proxy(void) {
 	return 0;
 }
 
-/* Search the preferred suite in the mirror
+/* Find the preferred suite in the mirror
  * if no suite found: suite=NULL and ret !=0 */
 static int search_suite(const char **suite,
-			const char *protocol,
-			const char *hostname,
-			const char *directory) {
+                        const char *protocol,
+                        const char *hostname,
+                        const char *directory) {
   
 	char *command = NULL;
-	const char *preferred_dist = NULL;
 	int ret = -1;
+	int nbr_suites = sizeof(suites)/SUITE_LENGTH;
+	int i = 0;
 
 	*suite = NULL;
 
-	/* Allow the hardcoded default to be overridden by the
-	 * environment.
-	 */
-	preferred_dist = getenv("PREFERRED_DISTRIBUTION");
-	if (preferred_dist != NULL && *preferred_dist != '\0') {
-
+	for (i=0; i < nbr_suites && ret != 0; i++) {
 		asprintf(&command, 
 			 "exec wget -q %s://%s%s/dists/%s -O /dev/null",
-			 protocol, hostname, directory, preferred_dist);
+			 protocol, hostname, directory, suites[i]);
 		ret = di_exec_shell_log(command);
 		free(command);
-	}
-
-	if (ret != 0) {
-		/* test other suites */
-		int nbr_suites = sizeof(suites)/SUITE_LENGTH;
-		int i = 0;
-		for( i=0; i<nbr_suites && ret != 0; i++ ) {
-			asprintf(&command, 
-				 "exec wget -q %s://%s%s/dists/%s -O /dev/null",
-				 protocol, hostname, directory, suites[i]);
-			ret = di_exec_shell_log(command);
-			free(command);
-			if (ret == 0) {
-				*suite = suites[i];
-			}
+		if (ret == 0) {
+			*suite = suites[i];
 		}
-
-	}
-	else {
-		*suite = preferred_dist;
 	}
 
 	return ret;
@@ -322,7 +287,7 @@ static int validate_mirror(void) {
 	prx = add_protocol("proxy");
 	
 	debconf_get(debconf, prx);
-	if (NULL != debconf->value) {
+	if (debconf->value != NULL) {
 		proxy = strdup(debconf->value);
 		if (proxy && *proxy == '\0')
 			proxy=NULL;
@@ -352,11 +317,11 @@ static int validate_mirror(void) {
 		/* ret is 0 if everything is ok, 1 else, aka retval */
 		/* Manual entry - check that the mirror is somewhat valid */
 		debconf_get(debconf, host);
-		if (debconf->value == NULL || strcmp(debconf->value,"") == 0 || strchr(debconf->value, '/') != NULL) {
+		if (debconf->value == NULL || strcmp(debconf->value, "") == 0 || strchr(debconf->value, '/') != NULL) {
 			ret = 1;
 		}
 		debconf_get(debconf, dir);
-		if (debconf->value == NULL || strcmp(debconf->value,"") == 0) {
+		if (debconf->value == NULL || strcmp(debconf->value, "") == 0) {
 			ret = 1;
 		}
 	}
@@ -364,9 +329,7 @@ static int validate_mirror(void) {
 	if (ret == 0) {
 		/* Download and parse the Release file for the preferred
 		 * distribution, to make sure that the mirror works, and to
-		 * work out which suite it is currently in. Note that this
-		 * assumes that mirrors w/o the preferred distribution are
-		 * broken. */
+		 * work out which suite it is currently in. */
 		char *command;
 		FILE *f = NULL;
 		char *hostname, *directory;
@@ -386,11 +349,11 @@ static int validate_mirror(void) {
 			setenv(proxy_var, proxy, 1);
 		
 		ret = search_suite(&preferred_dist,
-				   protocol, hostname, directory);
+		                   protocol, hostname, directory);
 		if (ret == 0) { 
 			asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-				 protocol, hostname, directory, 
-				 preferred_dist);
+			         protocol, hostname, directory, 
+			         preferred_dist);
 			di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
 			f = popen(command, "r");
 			free(command);
