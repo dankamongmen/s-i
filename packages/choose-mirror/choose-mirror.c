@@ -94,6 +94,7 @@ static char **mirrors_in(char *country) {
 	return ret;
 }
 
+/* returns true if there is a mirror in the specificed country */
 static inline int has_mirror(char *country) {
 	char **mirrors;
 	if (strcmp(country, "enter information manually") == 0)
@@ -254,7 +255,7 @@ static int set_proxy(void) {
 		setenv(proxy_var, debconf->value, 1);
 	}
 	else {
-		unsetenv(proxy_var)
+		unsetenv(proxy_var);
 	}
 	
 	free(proxy_var);
@@ -264,7 +265,7 @@ static int set_proxy(void) {
 }
 
 /* Find the preferred suite in the mirror
- * if no suite found: suite=NULL and ret !=0 */
+ * if no suite found: suite=NULL and ret = 0 */
 static int search_suite(const char **suite,
                         const char *protocol,
                         const char *hostname,
@@ -278,7 +279,7 @@ static int search_suite(const char **suite,
 	*suite = NULL;
 
 	for (i=0; i < nbr_suites && ret != 0; i++) {
-		asprintf(&command, 
+		asprintf(&command,
 			 "exec wget -q %s://%s%s/dists/%s -O /dev/null",
 			 protocol, hostname, directory, suites[i]);
 		ret = di_exec_shell_log(command);
@@ -288,14 +289,14 @@ static int search_suite(const char **suite,
 		}
 	}
 
-	return ret;
+	return !ret;
 }
 
 static int validate_mirror(void) {
 	char *mir;
 	char *host;
 	char *dir;
-	int ret = 0;
+	int valid = 1;
 
 	mir = add_protocol("mirror");
 	host = add_protocol("hostname");
@@ -316,87 +317,90 @@ static int validate_mirror(void) {
 		debconf_set(debconf, dir, mirror_root(mirror));
 		free(mirror);
 	} else {
-		/* ret is 0 if everything is ok, 1 else, aka retval */
 		/* Manual entry - check that the mirror is somewhat valid */
 		debconf_get(debconf, host);
 		if (debconf->value == NULL || strcmp(debconf->value, "") == 0 || strchr(debconf->value, '/') != NULL) {
-			ret = 1;
+			free(mir);
+			free(host);
+			free(dir);
+			return 1;
 		}
 		debconf_get(debconf, dir);
 		if (debconf->value == NULL || strcmp(debconf->value, "") == 0) {
-			ret = 1;
+			free(mir);
+			free(host);
+			free(dir);
+			return 1;
 		}
 	}
 
-	if (ret == 0) {
-		/* Download and parse the Release file for the preferred
-		 * distribution, to make sure that the mirror works, and to
-		 * work out which suite it is currently in. */
-		char *command;
-		FILE *f = NULL;
-		char *hostname, *directory;
-		const char *preferred_dist = NULL;
+	/* Download and parse the Release file for the preferred
+	 * distribution, to make sure that the mirror works, and to
+	 * work out which suite it is currently in. */
+	char *command;
+	FILE *f = NULL;
+	char *hostname, *directory;
+	const char *preferred_dist = NULL;
 
-		debconf_progress_start(debconf, 0, 1, 
-				       DEBCONF_BASE "checking_title");
-		debconf_progress_info(debconf, 
-				      DEBCONF_BASE "checking_download");
+	debconf_progress_start(debconf, 0, 1, 
+			       DEBCONF_BASE "checking_title");
+	debconf_progress_info(debconf, 
+			      DEBCONF_BASE "checking_download");
 		
-		debconf_get(debconf, host);
-		hostname = strdup(debconf->value);
-		debconf_get(debconf, dir);
-		directory = strdup(debconf->value);
+	debconf_get(debconf, host);
+	hostname = strdup(debconf->value);
+	debconf_get(debconf, dir);
+	directory = strdup(debconf->value);
 	
-		ret = search_suite(&preferred_dist,
-		                   protocol, hostname, directory);
-		if (ret == 0) { 
-			asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-			         protocol, hostname, directory, 
-			         preferred_dist);
-			di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
-			f = popen(command, "r");
-			free(command);
-		}
+	valid = search_suite(&preferred_dist,
+	                   protocol, hostname, directory);
+	if (valid) { 
+		asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+		         protocol, hostname, directory, 
+		         preferred_dist);
+		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
+		f = popen(command, "r");
+		free(command);
+	}
 
-		free(hostname);
-		free(directory);
+	free(hostname);
+	free(directory);
 		
-		if (f != NULL) {
-			char suite[32];
-			if (fgets(suite, 31, f)) {
-				if (suite[strlen(suite) - 1] == '\n')
-					suite[strlen(suite) - 1] = '\0';
-				/* Don't set the suite if the question
-				 * already has a value, to allow for
-				 * preseeding. */
-				debconf_get(debconf, DEBCONF_BASE "suite");
-				if (strlen(debconf->value) == 0)
-					debconf_set(debconf, DEBCONF_BASE "suite", suite);
-			}
-			else {
-				ret = 1;
-			}
-			pclose(f);
+	if (f != NULL) {
+		char suite[32];
+		if (fgets(suite, 31, f)) {
+			if (suite[strlen(suite) - 1] == '\n')
+				suite[strlen(suite) - 1] = '\0';
+			/* Don't set the suite if the question
+			 * already has a value, to allow for
+			 * preseeding. */
+			debconf_get(debconf, DEBCONF_BASE "suite");
+			if (strlen(debconf->value) == 0)
+				debconf_set(debconf, DEBCONF_BASE "suite", suite);
 		}
 		else {
-			ret = 1;
+			valid = 0;
 		}
+		pclose(f);
+	}
+	else {
+		valid = 0;
+	}
 		
-		debconf_progress_step(debconf, 1);
-		debconf_progress_stop(debconf);
+	debconf_progress_step(debconf, 1);
+	debconf_progress_stop(debconf);
 	
-		if (ret == 1) {
-			debconf_input(debconf, "critical", DEBCONF_BASE "bad");
-			if (debconf_go(debconf) == 30)
-				exit(10); /* back up to menu */
-		}
+	if (! valid) {
+		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
+		if (debconf_go(debconf) == 30)
+			exit(10); /* back up to menu */
 	}
 
 	free(mir);
 	free(host);
 	free(dir);
 
-	return ret;
+	return valid;
 }
 
 int main (void) {
