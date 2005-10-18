@@ -202,6 +202,8 @@ hotplug_type () {
 	if [ -f /proc/sys/kernel/hotplug ]; then
 		if [ -d /etc/hotplug ]; then
 			HOTPLUG_TYPE=real
+		elif [ "$(cat /proc/sys/kernel/hotplug)" = /sbin/udevsend ]; then
+			HOTPLUG_TYPE=udev
 		else
 			HOTPLUG_TYPE=fake
 		fi
@@ -360,9 +362,14 @@ fi
 
 # If using real hotplug, re-run the rc scripts to pick up new modules.
 # TODO: this just loads modules itself, rather than handing back a list
-if [ "$HOTPLUG_TYPE" = real ]; then
-	/lib/debian-installer/coldplug
-fi
+case $HOTPLUG_TYPE in
+	real)
+		/lib/debian-installer/coldplug
+		;;
+	udev)
+		udevsynthesize
+		;;
+esac
 
 ALL_HW_INFO=$(get_early_manual_hw_info; get_detected_hw_info; get_manual_hw_info)
 db_progress STEP $OTHER_STEPSIZE
