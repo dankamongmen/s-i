@@ -1,6 +1,6 @@
 dir = usr/share/graphics
 
-files += \
+files = \
 	logo_debian.png
 
 include ../../../../Makefile.inc

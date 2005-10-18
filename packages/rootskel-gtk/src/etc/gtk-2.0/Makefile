@@ -1,6 +1,6 @@
 dir = etc/gtk-2.0
 
-files += \
+files = \
 	gdk-pixbuf.loaders \
 	gtk.immodules \
 	gtkrc
