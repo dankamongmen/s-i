@@ -66,20 +66,25 @@ sub help()
 {
 	print "\n\nUsage: $0 [-msgid|-msgstr] [-noignore] [-filter=SOMESTRING] [filename]\n";
 	print "\nExtracts msgid or msgstr fields from a .po file.\n";
-	print "\t-msgid\n\t\textract msgid-s\n\t-msgstr\n\t\textract msgstr-s\n";
-	print "\t-noignore\n\t\tby default, the first msgid/msgstr is ignored because";
+	print "\n\t-msgid\n\t\tExtract msgid-s\n\t-msgstr\n\t\tExtract msgstr-s";
+	print "\n\t-noignore\n\t\tBy default, the first msgid/msgstr is ignored because";
 	print "\n\t\tregular .po files have the header in there. If this";
 	print "\n\t\tparameter is specified then the first msgid/msgstr is";
-	print "\n\t\tincluded, too.\n";
-	print "\t-filter=SOMESTRING\n\t\tignore the messages which contain in the associated";
-	print "\n\t\tcomment the string SOMESTRING.\n";
-	print "\n\tfilename\n\t\tan optional filename that should be a valid po filename.\n";
+	print "\n\t\tincluded, too.";
+	print "\n\t-filter=SOMESTRING\n\t\tIgnore the messages which contain in the associated";
+	print "\n\t\tcomment the string SOMESTRING.";
+	print "\n\t\tIn the input there should be a comment line '#SOMESTRING'";
+	print "\n\t\tif the next message should be omitted from the processing.\n";
+	print "\n\tfilename\n\t\tAn optional filename that should be a valid po filename.";
+	print "\n\t\tIf no file name is given, then the input is";
+	print "\n\t\texpected to come from stdin";
 	print "\n\nExamples:\n\n\tperl -s $0 -msgid ro.po > ro_all.txt\n";
 	print "\n\tcat ro.po | perl -s $0 -msgid > ro_all.txt\n";
+	print "\n\tperl -s $0 -msgstr -filter=IGNMSG manpg.po >manpg.msgstrs\n";
 	print "\nNOTE: This script needs to be run with Perl's -s option.";
 	print "\n\tThis should be taken care by the shebang,\n";
 	print "\tbut life is full of surprises :-)\n";
-	print "\tIf you are surprised, use the perl's parameter -s.\n\n";
+	print "\tIf you are surprised, use perl's parameter -s.\n\n";
 	die "\n";
 }
 
