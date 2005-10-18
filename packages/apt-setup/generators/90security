@@ -24,6 +24,11 @@ done
 db_get mirror/suite
 suite="$RET"
 
+# No updates for unstable. Never mind.
+if [ "$suite" = unstable ]; then
+	exit
+fi
+
 # FIXME what if choose-mirror isn't available, i.e. full CD install?
 db_fget mirror/http/proxy seen || true
 proxy="$RET"
