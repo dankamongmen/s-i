@@ -22,6 +22,7 @@ CFLAGS_ARCH = -DARCH=$(DEB_HOST_ARCH) -DCPU=$(DEB_HOST_ARCH_CPU) -DCPU_TEXT='"$(
 
 bindir=$(DESTDIR)/bin/
 hpdir=$(DESTDIR)/etc/hotplug.d
+udevdir=$(DESTDIR)/etc/udev/rules.d
 didir=$(DESTDIR)/lib/debian-installer.d
 pbcdir=$(DESTDIR)/usr/lib/prebaseconfig.d
 
@@ -43,6 +44,8 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL) hw-detect.sh $(bindir)/hw-detect
 	$(INSTALL) hotplug-pcmcia.sh $(bindir)/hotplug-pcmcia
 	$(INSTALL) sysfs-update-devnames.sh $(bindir)/sysfs-update-devnames
+	$(INSTALL) -d $(udevdir)
+	$(INSTALL_DATA) net-hotplug.rules $(udevdir)/010_net-hotplug.rules
 	$(INSTALL) -d $(hpdir)/net
 	$(INSTALL) net-hotplug.sh $(hpdir)/net/hw-detect.hotplug
 	$(INSTALL) -d $(pbcdir)
