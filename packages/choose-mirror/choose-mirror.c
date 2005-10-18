@@ -234,14 +234,20 @@ static int choose_mirror(void) {
 }
 
 static int choose_proxy(void) {
-	char *px;
-	char *proxy_var;
+	char *px = add_protocol("proxy");
 	
-	px = add_protocol("proxy");
-	asprintf(&proxy_var, "%s_proxy", protocol);
-
 	/* Always ask about a proxy. */
 	debconf_input(debconf, "high", px);
+
+	free(px);
+	return 0;
+}
+
+static int set_proxy(void) {
+	char *px = add_protocol("proxy");
+	char *proxy_var;
+	
+	asprintf(&proxy_var, "%s_proxy", protocol);
 	
 	debconf_get(debconf, px);
 	if (debconf->value != NULL && strlen(debconf->value)) {
@@ -251,8 +257,8 @@ static int choose_proxy(void) {
 		unsetenv(proxy_var)
 	}
 	
-	free(px);
 	free(proxy_var);
+	free(px);
 
 	return 0;
 }
@@ -403,6 +409,7 @@ int main (void) {
 		set_country,
 		choose_mirror,
 		choose_proxy,
+		set_proxy,
 		validate_mirror,
                 choose_suite,
 		NULL,
