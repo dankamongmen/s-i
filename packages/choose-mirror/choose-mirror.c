@@ -125,7 +125,7 @@ static int choose_country(void) {
 		if ((debconf_get(debconf, "debian-installer/country") == 0) &&
 		    (debconf->value != NULL) ) {
 			country = strdup (debconf->value);
-			debconf_set (debconf, DEBCONF_BASE "country", country);
+			debconf_set(debconf, DEBCONF_BASE "country", country);
 		}
 	}
 	else {
@@ -165,7 +165,7 @@ static int set_country(void) {
 	debconf_get(debconf, (strcasecmp(protocol,"http") == 0 ) ? 
 	            DEBCONF_BASE "http/countries" : DEBCONF_BASE "ftp/countries");
 	country = strdup(debconf->value);
-	debconf_set (debconf, DEBCONF_BASE "country", country);
+	debconf_set(debconf, DEBCONF_BASE "country", country);
 	return 0;
 }
 
@@ -235,12 +235,24 @@ static int choose_mirror(void) {
 
 static int choose_proxy(void) {
 	char *px;
-
+	char *proxy_var;
+	
 	px = add_protocol("proxy");
+	asprintf(&proxy_var, "%s_proxy", protocol);
 
 	/* Always ask about a proxy. */
 	debconf_input(debconf, "high", px);
+	
+	debconf_get(debconf, px);
+	if (debconf->value != NULL && strlen(debconf->value)) {
+		setenv(proxy_var, debconf->value, 1);
+	}
+	else {
+		unsetenv(proxy_var)
+	}
+	
 	free(px);
+	free(proxy_var);
 
 	return 0;
 }
@@ -277,27 +289,11 @@ static int validate_mirror(void) {
 	char *mir;
 	char *host;
 	char *dir;
-	char *prx;
-	char *proxy, *proxy_var;
 	int ret = 0;
 
 	mir = add_protocol("mirror");
 	host = add_protocol("hostname");
 	dir = add_protocol("directory");
-	prx = add_protocol("proxy");
-	
-	debconf_get(debconf, prx);
-	if (debconf->value != NULL) {
-		proxy = strdup(debconf->value);
-		if (proxy && *proxy == '\0')
-			proxy=NULL;
-		if (proxy)
-			asprintf(&proxy_var, "%s_proxy", protocol);
-	}
-	else {
-		proxy = NULL;
-	}
-	free(prx);
 
 	if (! manual_entry) {
 		char *mirror;
@@ -345,9 +341,6 @@ static int validate_mirror(void) {
 		debconf_get(debconf, dir);
 		directory = strdup(debconf->value);
 	
-		if (proxy)
-			setenv(proxy_var, proxy, 1);
-		
 		ret = search_suite(&preferred_dist,
 		                   protocol, hostname, directory);
 		if (ret == 0) { 
@@ -381,12 +374,6 @@ static int validate_mirror(void) {
 		}
 		else {
 			ret = 1;
-		}
-		
-		if (proxy) {
-			unsetenv(proxy_var);
-			free(proxy_var);
-			free(proxy);
 		}
 		
 		debconf_progress_step(debconf, 1);
