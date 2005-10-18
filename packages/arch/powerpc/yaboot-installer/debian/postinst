@@ -46,12 +46,20 @@ die() {
     exit 1
 }
 
+ARCH="$(archdetect)"
+info "architecture: $ARCH"
+
 # Install yaboot in /target
 
 db_progress INFO yaboot-installer/apt-install
 
-if ! apt-install yaboot; then
-    info "Calling 'apt-install yaboot' failed"
+PACKAGES=yaboot
+if [ "$ARCH" = powerpc/powermac_newworld ]; then
+    PACKAGES="$PACKAGES hfsutils"
+fi
+
+if ! apt-install $PACKAGES; then
+    info "Calling 'apt-install $PACKAGES' failed"
     # Hm, unable to install yaboot into /target/, what should we do?
     db_input critical yaboot-installer/apt-install-failed || [ $? -eq 30 ]
     if ! db_go; then
@@ -69,9 +77,6 @@ fi
 
 db_progress STEP 1
 db_progress INFO yaboot-installer/part
-
-ARCH="$(archdetect)"
-info "architecture: $ARCH"
 
 # Telling parted to create an Apple_Bootstrap partition doesn't work as well
 # as we might like: parted's probe function isn't intelligent enough to know
