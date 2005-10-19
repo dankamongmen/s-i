@@ -33,9 +33,9 @@ for generator in $gendir/*; do
 	fi
 	
 	tmp=$($chroot $ROOT tempfile)
-	echo > $tmp
-	if $generator $tmp; then
-		if ! apt-setup-verify $tmp $ROOT/etc/apt/sources.list.new; then
+	echo > $ROOT$tmp
+	if $generator $ROOT$tmp; then
+		if ! apt-setup-verify $ROOT$tmp $ROOT/etc/apt/sources.list.new; then
 			warning "$generator output did not verify"
 		fi
 	else
@@ -43,12 +43,13 @@ for generator in $gendir/*; do
 		if [ "$code" = 10 ]; then
 			# TODO handle backup better
 			log "$generator backed up"
+			rm -f $ROOT$tmp
 			db_progress STOP
 			exit 10
 		fi
 		warning "$generator returned error code $code; discarding output"
 	fi
-	rm -f $tmp
+	rm -f $ROOT$tmp
 	db_progress STEP 1
 done
 mv $ROOT/etc/apt/sources.list.new $ROOT/etc/apt/sources.list
