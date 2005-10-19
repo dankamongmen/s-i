@@ -326,12 +326,16 @@ static int satisfy_virtual(di_system_package *p) {
 			temp = di_malloc (menu_size);
 			strcpy(temp, menu);
 			strcpy(menu, buf);
-			strcat(menu, ", ");
-			strcat(menu, temp);
+			if (strlen(temp)) {
+				strcat(menu, ", ");
+				strcat(menu, temp);
+			}
 			di_free(temp);
 		} else {
+			if (strlen(menu)) {
+				strcat(menu, ", ");
+			}
 			strcat(menu, buf);
-			strcat(menu, ", ");
 		}
 		menu_used += size + 2;
 	}
