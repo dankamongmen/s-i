@@ -13,7 +13,7 @@ command="$RET"
 if [ "$command" != "" ]; then
 	log "running preseed command $ct: $command"
 	code=0
-	log-output eval $command || code=$?
+	log-output sh -c "$command" || code=$?
 	if [ "$code" != 0 ]; then
 		db_subst preseed/command_failed COMMAND "$command"
 		db_subst preseed/command_failed CODE "$code"
