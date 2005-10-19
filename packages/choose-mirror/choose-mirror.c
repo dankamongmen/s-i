@@ -115,6 +115,86 @@ static char *mirror_root(char *mirror) {
 	return NULL;
 }
 
+/*
+ * Using the current debconf settings for a mirror, figure out which suite
+ * to use from the mirror and set mirror/suite.
+ * 
+ * This is accomplished by downloading the Release file from the mirror.
+ * Suite selection tries each suite in turn, and stops at the first one that
+ * seems usable.
+ *
+ * If no Release file is found, returns false. That probably means the
+ * mirror is broken or unreachable.
+ */
+int find_suite (void) {
+	char *command;
+	FILE *f = NULL;
+	char *hostname, *directory;
+	int nbr_suites = sizeof(suites)/SUITE_LENGTH;
+	int i;
+	int ret = 0;
+
+	debconf_progress_start(debconf, 0, 1, 
+			       DEBCONF_BASE "checking_title");
+	debconf_progress_info(debconf, 
+			      DEBCONF_BASE "checking_download");
+		
+	hostname = add_protocol("hostname");
+	debconf_get(debconf, hostname);
+	free(hostname);
+	hostname = strdup(debconf->value);
+	directory = add_protocol("directory");
+	debconf_get(debconf, directory);
+	free(directory);
+	directory = strdup(debconf->value);
+
+	/* Try each suite in turn until one is found that works. */
+	for (i=0; i <= nbr_suites && ! ret; i++) {
+		char *suite;
+
+		if (i == 0) {
+			/* First check for a preseeded suite. */
+			debconf_get(debconf, DEBCONF_BASE "suite");
+			if (strlen(debconf->value) > 0) {
+				suite = strdup(debconf->value);
+			}
+			else {
+				continue;
+			}
+		}
+		else {
+			suite = strdup(suites[i - 1]);
+		}
+		
+		asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
+	        	 protocol, hostname, directory, suite);
+		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
+		f = popen(command, "r");
+		free(command);
+		
+		if (f != NULL) {
+			char buf[SUITE_LENGTH];
+			if (fgets(buf, SUITE_LENGTH - 1, f)) {
+				if (buf[strlen(buf) - 1] == '\n')
+				 	buf[strlen(buf) - 1] = '\0';
+				debconf_set(debconf, DEBCONF_BASE "suite", buf);
+				ret = 1;
+			}
+		}
+
+		pclose(f);
+		free(suite);
+	}
+	
+	free(hostname);
+	free(directory);
+		
+	debconf_progress_step(debconf, 1);
+	debconf_progress_stop(debconf);
+
+	return ret;
+}
+	
 static int choose_country(void) {
 	if (country)
 		free(country);
@@ -264,39 +344,11 @@ static int set_proxy(void) {
 	return 0;
 }
 
-/* Find the preferred suite in the mirror
- * if no suite found: suite=NULL and ret = 0 */
-static int search_suite(const char **suite,
-                        const char *protocol,
-                        const char *hostname,
-                        const char *directory) {
-  
-	char *command = NULL;
-	int ret = -1;
-	int nbr_suites = sizeof(suites)/SUITE_LENGTH;
-	int i = 0;
-
-	*suite = NULL;
-
-	for (i=0; i < nbr_suites && ret != 0; i++) {
-		asprintf(&command,
-			 "exec wget -q %s://%s%s/dists/%s -O /dev/null",
-			 protocol, hostname, directory, suites[i]);
-		ret = di_exec_shell_log(command);
-		free(command);
-		if (ret == 0) {
-			*suite = suites[i];
-		}
-	}
-
-	return !ret;
-}
-
 static int validate_mirror(void) {
 	char *mir;
 	char *host;
 	char *dir;
-	int valid = 1;
+	int valid;
 
 	mir = add_protocol("mirror");
 	host = add_protocol("hostname");
@@ -316,91 +368,43 @@ static int validate_mirror(void) {
 		debconf_set(debconf, host, mirror);
 		debconf_set(debconf, dir, mirror_root(mirror));
 		free(mirror);
-	} else {
-		/* Manual entry - check that the mirror is somewhat valid */
+
+		valid = find_suite();
+	}
+	else {
+		/* check to see if the entered data is basically ok */
+		int ok = 1;
 		debconf_get(debconf, host);
 		if (debconf->value == NULL || strcmp(debconf->value, "") == 0 || strchr(debconf->value, '/') != NULL) {
-			free(mir);
-			free(host);
-			free(dir);
-			return 1;
+			ok = 0;
 		}
 		debconf_get(debconf, dir);
 		if (debconf->value == NULL || strcmp(debconf->value, "") == 0) {
-			free(mir);
-			free(host);
-			free(dir);
-			return 1;
+			ok = 0;
 		}
-	}
-
-	/* Download and parse the Release file for the preferred
-	 * distribution, to make sure that the mirror works, and to
-	 * work out which suite it is currently in. */
-	char *command;
-	FILE *f = NULL;
-	char *hostname, *directory;
-	const char *preferred_dist = NULL;
-
-	debconf_progress_start(debconf, 0, 1, 
-			       DEBCONF_BASE "checking_title");
-	debconf_progress_info(debconf, 
-			      DEBCONF_BASE "checking_download");
 		
-	debconf_get(debconf, host);
-	hostname = strdup(debconf->value);
-	debconf_get(debconf, dir);
-	directory = strdup(debconf->value);
-	
-	valid = search_suite(&preferred_dist,
-	                   protocol, hostname, directory);
-	if (valid) { 
-		asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-		         protocol, hostname, directory, 
-		         preferred_dist);
-		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
-		f = popen(command, "r");
-		free(command);
-	}
-
-	free(hostname);
-	free(directory);
-		
-	if (f != NULL) {
-		char suite[32];
-		if (fgets(suite, 31, f)) {
-			if (suite[strlen(suite) - 1] == '\n')
-				suite[strlen(suite) - 1] = '\0';
-			/* Don't set the suite if the question
-			 * already has a value, to allow for
-			 * preseeding. */
-			debconf_get(debconf, DEBCONF_BASE "suite");
-			if (strlen(debconf->value) == 0)
-				debconf_set(debconf, DEBCONF_BASE "suite", suite);
+		if (ok) {
+			valid = find_suite();
 		}
 		else {
 			valid = 0;
 		}
-		pclose(f);
 	}
-	else {
-		valid = 0;
-	}
-		
-	debconf_progress_step(debconf, 1);
-	debconf_progress_stop(debconf);
 	
-	if (! valid) {
-		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
-		if (debconf_go(debconf) == 30)
-			exit(10); /* back up to menu */
-	}
-
 	free(mir);
 	free(host);
 	free(dir);
 
-	return valid;
+	if (valid) {
+		return 0;
+	}
+	else {
+		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
+		if (debconf_go(debconf) == 30)
+			exit(10); /* back up to menu */
+		else
+			return 1; /* back to beginning of questions */
+	}
 }
 
 int main (void) {
@@ -438,9 +442,3 @@ int main (void) {
 	}
 	return (state >= 0) ? 0 : 10; /* backed all the way out */
 }
-/*
-Local variables:
-c-file-style: "linux"
-End:
-*/
-

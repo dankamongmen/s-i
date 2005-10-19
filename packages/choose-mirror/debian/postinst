@@ -1,9 +1,13 @@
 #!/bin/sh -e
+. /usr/share/debconf/confmodule
+
 anna-install apt-mirror-setup || true
 
 if [ -f /etc/lsb-release ]; then
 	. /etc/lsb-release
-	export PREFERRED_DISTRIBUTION="$DISTRIB_CODENAME"
+	if [ -n "$DISTRIB_CODENAME" ]; then
+		db_set mirror/suite "$DISTRIB_CODENAME"
+	fi
 fi
 
 exec choose-mirror

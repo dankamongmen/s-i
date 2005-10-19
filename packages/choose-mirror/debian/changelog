@@ -21,9 +21,20 @@ choose-mirror (1.16) UNRELEASED; urgency=low
 
   [ Joey Hess ]
   * Move some configurable stuff to the .h file.
-  * Remove support for PREFERRED_DISTRIBUTION environment variable (tmtowtdi).
   * Formatting and comment fixes.
   * Move proxy env var handing code to its own function.
+  * Much code refactoring and cleanup.
+  * Combine the steps of checking for a suite that is on the mirror
+    and the Release file download and parse, so that the Release file is only
+    downloaded once.
+  * Display the "bad mirror" message if the manually entered values are
+    obviously wrong, rather than the old behavior of silently looping back to
+    the start.
+  * If a preseeded suite turns out to be bad, go ahead and try to find a
+    usable suite on the mirror, rather than the old behavior of accepting the
+    bad value and letting things fail later.
+  * Make the postinst set mirror/suite based on the lsb_release file
+    rather than using a separate environment variable.
 
  -- Joey Hess <joeyh@debian.org>  Tue, 18 Oct 2005 19:04:12 -0400
 

@@ -16,7 +16,7 @@ struct mirror_t {
 #define SUITE_LENGTH 32
 
 /* Stack of suites */
-static	const char suites[][SUITE_LENGTH] = {
+static const char suites[][SUITE_LENGTH] = {
 	/* higher preference */
 	PREFERRED_DISTRIBUTION,
 	"stable",
