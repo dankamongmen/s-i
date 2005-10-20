@@ -35,7 +35,7 @@ do_fatmountpoint () {
 
 	case "$RET" in
 	    Do?not?mount?it)
-                [ ! -f "$part/mountpoint" ] || rm $part/mountpoint
+                rm -f $part/mountpoint
 		break
 		;;
 	    Enter?manually)
@@ -123,7 +123,7 @@ case $1 in
 	if [ "$RET" ]; then
 	    echo "$RET" >$part/label
 	else
-	    [ ! -f $part/label ] || rm $part/label
+	    rm -f $part/label
 	fi
 	db_reset partman-basicfilesystems/choose_label
 	;;
@@ -141,7 +141,7 @@ case $1 in
 	if [ "$RET" ]; then
 	    echo "$RET" >$part/reserved_for_root
 	else
-	    [ ! -f $part/reserved_for_root ] || rm $part/reserved_for_root
+	    rm -f $part/reserved_for_root
 	fi
 	db_reset partman-basicfilesystems/specify_reserved
 	;;
@@ -161,7 +161,7 @@ case $1 in
 	if [ "$RET" != "$typical_usage" ]; then
 	    echo "$RET" >$part/usage
 	else
-	    [ ! -f $part/usage ] || rm $part/usage
+	    rm -f $part/usage
 	fi
 	;;
 esac
