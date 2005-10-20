@@ -376,9 +376,7 @@ clean_method() {
         cd $device
         open_dialog PARTITIONS
         while { read_line num id size type fs path name; [ "$id" ]; }; do
-            if [ -f $id/method ]; then
-                rm $id/method
-            fi
+            rm -f $id/method
         done
        close_dialog
     done
