@@ -404,9 +404,7 @@ error_handler () {
 	    write_line "unhandled"
 	fi
     done
-    if [ -f /var/lib/partman/progress_info ]; then
-	rm /var/lib/partman/progress_info
-    fi
+    rm -f /var/lib/partman/progress_info
 }
 
 open_dialog () {
