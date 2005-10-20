@@ -8,9 +8,9 @@ id=$2
 filesystems=$(
     for i in /lib/partman/valid_filesystems/*; do
 	[ -x $i ] || continue
-	$i $dev $id existing
-	$i $dev $id formatable
-    done | uniq
+	( $i $dev $id existing
+	  $i $dev $id formatable ) | sort -u
+    done
 )
 
 for fs in $filesystems; do
