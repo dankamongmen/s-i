@@ -15,6 +15,9 @@ else
 fi
 export ROOT
 
+# generators/01setup will create this
+export APT_CONFIG=/etc/apt/apt.conf.new
+
 log() {
         logger -t apt-setup "$@"
 }
@@ -53,5 +56,10 @@ for generator in $gendir/*; do
 	db_progress STEP 1
 done
 mv $ROOT/etc/apt/sources.list.new $ROOT/etc/apt/sources.list
+if [ -s $ROOT/etc/apt/apt.conf.new ]; then
+	mv $ROOT/etc/apt/apt.conf.new $ROOT/etc/apt/apt.conf
+else
+	rm -f $ROOT/etc/apt/apt.conf.new
+fi
 
 db_progress STOP
