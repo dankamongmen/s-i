@@ -61,9 +61,7 @@ fi
 # have partition names other don't have, some have extended and
 # logical partitions, others don't.  Hence we have to regenerate the
 # list of the visuals
-if [ -f visuals ]; then
-    rm visuals
-fi
+rm -f visuals
 
 partitions=''
 open_dialog PARTITIONS
@@ -78,8 +76,6 @@ done
 
 if [ "$chosen_type" = sun ]; then
     backupdir=../../backup/`basename $dev`
-    if [ -d "$backupdir" ]; then
-	rm -r "$backupdir"
-    fi
+    rm -rf "$backupdir"
     cp -a . "$backupdir"
 fi
