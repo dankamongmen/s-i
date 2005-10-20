@@ -15,21 +15,19 @@ cd $dev
 
 [ -d $id ] || mkdir $id
 
-if [ $fs = free ] && [ -f $id/method ]; then
-    rm $id/method
+if [ $fs = free ]; then
+    rm -f $id/method
 fi
 
 if [ ! -f $id/method ] || [ ! -f $id/use_filesystem ]; then
-    [ ! -f $id/acting_filesystem ] || rm $id/acting_filesystem
+    rm -f $id/acting_filesystem
     exit 0
 fi
 
 if [ -f $id/filesystem ]; then
     cp $id/filesystem $id/acting_filesystem
 else
-    if [ -f $id/acting_filesystem ]; then
-	rm $id/acting_filesystem
-    fi
+    rm -f $id/acting_filesystem
 fi
 
 open_dialog PARTITION_INFO $id
@@ -64,12 +62,12 @@ done
 if [ $existing = yes ]; then
     > $dev/$id/existing
 else
-    [ ! -f $dev/$id/existing ] || rm $dev/$id/existing
+    rm -f $dev/$id/existing
 fi
 
 if [ $formatable = yes ]; then
     > $dev/$id/formatable
 else
-    [ ! -f $dev/$id/formatable ] || rm $dev/$id/formatable
+    rm -f $dev/$id/formatable
 fi
 
