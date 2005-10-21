@@ -155,7 +155,7 @@ my $numcols=3 + @dists;
 
 foreach my $package (sort keys %seenpackages) {
 	foreach my $transition (keys %{$transitions{$package}}) {
-		print "<tr><td><a href=\"http://changelogs.debian.net/$package\">$package</a></td>";
+		print "<tr><td><a href=\"http://packages.debian.org/$package\">$package</a></td>";
 		print "<td>".archname(@{$transitions{$package}{$transition}})."</td>";
 		my $some_arch=@{$transitions{$package}{$transition}}[0];
 		my @vers;
@@ -164,15 +164,16 @@ foreach my $package (sort keys %seenpackages) {
 			if (! defined $version) {
 				$version="-";
 				push @vers, '';
+				print "<td>-</td>";
 			}
 			else {
 				push @vers, $version;
-			}
-			if ($dist eq 'testing' && $version ne '-') {
-				print "<td><a href=\"http://bjorn.haxx.se/debian/testing.pl?package=$package\">$version</a></td>";
-			}
-			else {
-				print "<td>$version</td>";
+				if ($dist eq 'testing') {
+					print "<td><a href=\"http://bjorn.haxx.se/debian/testing.pl?package=$package\">$version</a></td>";
+				}
+				else {
+					print "<td><a href=\"http://changelogs.debian.net/$package\">$version</a></td>";
+				}
 			}
 		}
 		# Looking at the file modification date may not be
