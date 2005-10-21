@@ -637,8 +637,8 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
 	sprintf(label_string,"<b>%s</b>",q_get_description(q));
 	gtk_label_set_markup(GTK_LABEL(label), label_string);
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX(vpadbox), check, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), check, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
@@ -759,8 +759,8 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 	sprintf(label_string,"<b>%s</b>",q_get_description(q));
 	gtk_label_set_markup(GTK_LABEL(label), label_string);
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label_note, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label_note, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
@@ -812,8 +812,8 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
 	sprintf(label_string,"<b>%s</b>",q_get_description(q));
 	gtk_label_set_markup(GTK_LABEL(label), label_string);
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX(vpadbox), entry, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), entry, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
@@ -908,7 +908,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
 	GtkTreeModel        *model;
 	GtkListStore  		*store;
 	GtkTreeIter    		iter;
-	GtkWidget           *view;
+	GtkWidget           *view, *scroll, *frame;
 	GtkCellRenderer     *renderer;
 	GtkTreeSelection    *selection;
 
@@ -960,14 +960,22 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     free(choices_translated);
     free(tindex);
 
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+	gtk_container_add(GTK_CONTAINER(scroll), view);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll),
+                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+
 	label = gtk_label_new("");
 	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
 	label_string = malloc(strlen(q_get_description(q)) + 8 );
 	sprintf(label_string,"<b>%s</b>",q_get_description(q));
 	gtk_label_set_markup(GTK_LABEL(label), label_string);
+
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX(vpadbox), view, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	frame = gtk_frame_new(NULL);
+	gtk_container_add(GTK_CONTAINER(frame), scroll);
+	gtk_box_pack_start (GTK_BOX(vpadbox), frame, TRUE, TRUE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
@@ -993,7 +1001,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
 	GtkTreeModel        *model;
 	GtkTreeStore  		*store;
 	GtkTreeIter    		iter, child;
-	GtkWidget           *view;
+	GtkWidget           *view, *scroll, *frame;
 	GtkCellRenderer     *renderer;
 	GtkTreeSelection    *selection;
 
@@ -1052,14 +1060,22 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
     free(choices_translated);
     free(tindex);
 
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+	gtk_container_add(GTK_CONTAINER(scroll), view);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll),
+                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+
 	label = gtk_label_new("");
 	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
 	label_string = malloc(strlen(q_get_description(q)) + 8 );
 	sprintf(label_string,"<b>%s</b>",q_get_description(q));
 	gtk_label_set_markup(GTK_LABEL(label), label_string);
+
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX(vpadbox), view, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	frame = gtk_frame_new(NULL);
+	gtk_container_add(GTK_CONTAINER(frame), scroll);
+	gtk_box_pack_start (GTK_BOX(vpadbox), frame, TRUE, TRUE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
@@ -1132,8 +1148,8 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 	sprintf(label_string,"<b>%s</b>",q_get_description(q));
 	gtk_label_set_markup(GTK_LABEL(label), label_string);
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX(vpadbox), combo, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), combo, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
@@ -1198,8 +1214,8 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
 	sprintf(label_string,"<b>%s</b>",q_get_description(q));
 	gtk_label_set_markup(GTK_LABEL(label), label_string);
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX(vpadbox), entry, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), entry, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
@@ -1243,17 +1259,16 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 	2) menubox_vpad
 	3) menubox_scroll
 	9) menubox
-	4) targetbox_scroll
-	5) targetbox
+	4) targetbox
 	6) actionbox
 	7) infobox
 	8) progress_bar
 	
 	0_________________________
 	|  _____  |1 ___________  |
-	| |2___ | | |4_________ | |
-	| ||3_ || | ||5        || |
-	| |||9||| | ||_________|| |
+	| |2___ | | |4          | |
+	| ||3_ || | |           | |
+	| |||9||| | |           | |
 	| ||| ||| | |___________| |	
 	| ||| ||| |  ___________  |
 	| ||| ||| | |6          | |	
@@ -1266,8 +1281,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
     */
 
-    GtkWidget *mainbox, *globalbox;
-    GtkWidget *targetbox, *targetbox_scroll;
+    GtkWidget *mainbox, *globalbox, *targetbox;
     GtkWidget *menubox, *menubox_vpad, *menubox_scroll;
     GtkWidget *actionbox, *infobox;
     GtkWidget *button_next, *button_prev;
@@ -1282,16 +1296,9 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     mainbox = gtk_vbox_new (FALSE, 10);
     gtk_container_set_border_width (GTK_CONTAINER(mainbox), 5);
 
-    /* This is the set of boxes and the containing viewport where the
-     * questions will be displayed
-     */
+    /* This is the box were question(s) will be displayed */
     targetbox = gtk_vbox_new (FALSE, 0);
     ((struct frontend_data*) obj->data)->target_box = targetbox;
-
-    targetbox_scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (targetbox_scroll), targetbox);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (targetbox_scroll),
-                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
     /* Here are the back and forward buttons */
     actionbox = gtk_hbutton_box_new();
@@ -1348,6 +1355,10 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     progress_bar = gtk_progress_bar_new ();
     ((struct frontend_data*)obj->data)->progress_bar = progress_bar;
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " ");
+	/* gtk_progress_bar_set_ellipsize() was introduced in GTK v 2.6.0
+	 * so this nice and useful function won't be usable while we're stuck
+	 * with GTKDFB 2.0.9
+	 */
     /* gtk_progress_bar_set_ellipsize (GTK_PROGRESS_BAR(progress_bar), PANGO_ELLIPSIZE_MIDDLE); */
     
     progress_bar_label = gtk_label_new("");
@@ -1373,8 +1384,12 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 		gtk_box_pack_start(GTK_BOX (menubox_vpad), menubox_scroll, TRUE, TRUE, 10);		
 	}
 
+	/* A logo is displayed in the upper area of the screen */
+	logo_button = gtk_image_new_from_file("/usr/share/graphics/logo_debian.png");
+    logo_box = gtk_vbox_new (FALSE, 0);
+
     /* Final packaging */
-    gtk_box_pack_start(GTK_BOX (mainbox), targetbox_scroll, TRUE, TRUE, 5);	
+    gtk_box_pack_start(GTK_BOX (mainbox), targetbox, TRUE, TRUE, 5);	
     gtk_box_pack_start(GTK_BOX (mainbox), infobox, FALSE, FALSE, 5);
     gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_box, FALSE, FALSE, 5);
 
@@ -1382,13 +1397,6 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
     	gtk_box_pack_start(GTK_BOX (globalbox), menubox_vpad, TRUE, TRUE, 5);
     gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
-
-	/* A nice logo is added in the left part of the screen 
-	 * With some buggy versions of GTKDFB libs this logo may not be display
-	 */
-	logo_button = gtk_image_new_from_file("/usr/share/graphics/logo_debian.png");
-    logo_box = gtk_hbox_new (FALSE, 0);
-
 	gtk_box_pack_start(GTK_BOX (logo_box), logo_button, FALSE, FALSE, 0);	
     gtk_box_pack_start(GTK_BOX (logo_box), globalbox, TRUE, TRUE, 0);
 
@@ -1462,7 +1470,7 @@ static int gtk_go(struct frontend *obj)
 {
     struct frontend_data *data = (struct frontend_data *) obj->data;
     struct question *q = obj->questions;
-    GtkWidget *questionbox, *menubox;
+    GtkWidget *questionbox, *questionbox_scroll, *menubox;
     GtkWidget *image_button_forward, *image_button_back;
     di_slist *plugins;
     int i, j;
@@ -1573,8 +1581,27 @@ static int gtk_go(struct frontend *obj)
 	    }
 	}
 	
-    questionbox = gtk_vbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(data->target_box), questionbox, FALSE, FALSE, 5);
+   	questionbox = gtk_vbox_new(FALSE, 5);
+
+	/* since all widgets used to display single questions (except MULTISELECT)
+	 * have native scrolling capabilities or do not need scrolling since they're
+	 * usually small they can manage scrolling be autonomously.
+	 * vice-versa the most simple approach when displaying multiple questions
+	 * togheter (whose handling wigets haven't native scrolling capabilities)
+	 * is to pack them all inside a viewport
+	 */
+	if ( (obj->questions->next==NULL && obj->questions->prev==NULL) && (strcmp(obj->questions->template->type,"multiselect")!=0) )
+	{
+    	gtk_box_pack_start(GTK_BOX(data->target_box), questionbox, TRUE, TRUE, 5);
+    }
+    else
+    {
+    	questionbox_scroll = gtk_scrolled_window_new(NULL, NULL);
+	    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (questionbox_scroll), questionbox);
+	    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (questionbox_scroll),
+	                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+		gtk_box_pack_start(GTK_BOX(data->target_box), questionbox_scroll, TRUE, TRUE, 5);
+    }
 
     /* now we can safely handle all other questions, if any */
     j = 0;
@@ -1671,8 +1698,12 @@ static int gtk_go(struct frontend *obj)
     }
 
     di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
-    gtk_widget_destroy(questionbox);
-    
+
+	if ( (obj->questions->next==NULL && obj->questions->prev==NULL) && (strcmp(obj->questions->template->type,"multiselect")!=0) )
+		gtk_widget_destroy(questionbox);
+	else
+    	gtk_widget_destroy(questionbox_scroll);
+    	
     if (((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
     	gtk_widget_destroy(menubox);
 
