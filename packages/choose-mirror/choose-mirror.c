@@ -176,7 +176,7 @@ int find_suite (void) {
 			char buf[SUITE_LENGTH];
 			if (fgets(buf, SUITE_LENGTH - 1, f)) {
 				if (buf[strlen(buf) - 1] == '\n')
-				 	buf[strlen(buf) - 1] = '\0';
+					buf[strlen(buf) - 1] = '\0';
 				debconf_set(debconf, DEBCONF_BASE "suite", buf);
 				ret = 1;
 			}
