@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
-ARCHS=alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc
+ARCHS=$(shell cd debian; ./getfromlist archlist)
+LANGS=$(shell cd debian; ./getfromlist langlist)
 VERSION=$(shell LC_ALL=C dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
 DATE=$(shell echo $(VERSION) | cut -d '.' -f 1)
 SUITE=$(shell LC_ALL=C dpkg-parsechangelog | grep ^Distribution: | cut -d ' ' -f 2)
@@ -15,7 +16,26 @@ clean:
 	dh_testroot
 	dh_clean build-stamp
 	rm -rf $(MANTMP)
+	dh_clean doc-base-stamp
+	rm -rf debian/installation-guide-*.doc-base.*
 	rm -rf build/build.out build/build.tmp build/build.po
+
+doc-base: doc-base-stamp
+doc-base-stamp:
+	@echo $(ARCHS)
+	rm -f $@
+	rm -rf debian/installation-guide-*.doc-base.*
+	set -e && cd debian && \
+	    for arch in $(ARCHS) ; do \
+		for lang in $(LANGS) ; do \
+		    arch_full="$$(grep "^$$arch[[:space:]]" archlist | cut -f 2)" ; \
+		    lang_full="$$(grep "^$$lang[[:space:]]" langlist | cut -f 2)" ; \
+		    sed -e "s/%ARCH%/$$arch/g" -e "s/%ARCH_FULL%/$$arch_full/g" \
+			-e "s/%LANG%/$$lang/g" -e "s/%LANG_FULL%/$$lang_full/g" \
+			doc-base.TEMPLATE > installation-guide-$$arch.doc-base.$$lang ; \
+		done ; \
+	    done
+	touch $@
 
 build: build-stamp
 build-stamp:
@@ -24,8 +44,8 @@ build-stamp:
 	set -e && cd build && \
 	    for arch in $(ARCHS) ; do \
 		official_build=1 manual_release=$(SUITE) \
-		architectures="$$arch" noarchdir=1 \
-		destination=$(MANTMP)/$$arch \
+		architectures="$$arch" languages="$(LANGS)" \
+		destination=$(MANTMP)/$$arch noarchdir=1 \
 		./build.sh ; \
 	    done
 	touch $@
@@ -38,7 +58,7 @@ install: build
 	
 binary-arch:
 
-binary-indep: install
+binary-indep: install doc-base
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
@@ -47,6 +67,7 @@ binary-indep: install
 	done
 	dh_compress
 	dh_fixperms
+	dh_installdeb
 	dh_gencontrol -- -Vkernel:Package='$(KERNELPACKAGE)'
 	dh_builddeb
 
