@@ -20,7 +20,7 @@ static char *protocol = NULL;
 static char *country  = NULL;
 
 /*
- * Returns a string on the form "DEBCONF_BASE/protocol/supplied".  The
+ * Returns a string on the form "DEBCONF_BASE/protocol/supplied". The
  * calling function is responsible for freeing the string afterwards.
  */
 static char *add_protocol(char *string) {
@@ -38,7 +38,7 @@ static char *add_protocol(char *string) {
 static char *debconf_list(char *list[]) {
 	int len, i, size = 1;
 	char *ret = 0;
-	
+
 	for (i = 0; list[i] != NULL; i++) {
 		len = strlen(list[i]);
 		size += len;
@@ -55,7 +55,7 @@ static char *debconf_list(char *list[]) {
 
 /*
  * Returns the correct mirror list, depending on whether protocol is
- * set to http or ftp.  Do NOT free the structure - it is a pointer to
+ * set to http or ftp. Do NOT free the structure - it is a pointer to
  * the static list in mirrors_protocol.h
  */
 static struct mirror_t *mirror_list(void) {
@@ -76,7 +76,7 @@ static struct mirror_t *mirror_list(void) {
 
 /* Returns an array of hostnames of mirrors in the specified country. */
 static char **mirrors_in(char *country) {
-        static char **ret;
+	static char **ret;
 	int i, j, num = 1;
 	struct mirror_t *mirrors = mirror_list();
 
@@ -100,7 +100,7 @@ static inline int has_mirror(char *country) {
 	if (strcmp(country, "enter information manually") == 0)
 		return 1;
 	mirrors = mirrors_in(country);
-	return  (mirrors[0] == NULL) ? 0 : 1;
+	return (mirrors[0] == NULL) ? 0 : 1;
 }
 
 /* Returns the root of the mirror, given the hostname. */
@@ -108,7 +108,7 @@ static char *mirror_root(char *mirror) {
 	int i;
 
 	struct mirror_t *mirrors = mirror_list();
-	
+
 	for (i = 0; mirrors[i].site != NULL; i++)
 		if (strcmp(mirrors[i].site, mirror) == 0)
 			return mirrors[i].root;
@@ -118,7 +118,7 @@ static char *mirror_root(char *mirror) {
 /*
  * Using the current debconf settings for a mirror, figure out which suite
  * to use from the mirror and set mirror/suite.
- * 
+ *
  * This is accomplished by downloading the Release file from the mirror.
  * Suite selection tries each suite in turn, and stops at the first one that
  * seems usable.
@@ -134,11 +134,11 @@ int find_suite (void) {
 	int i;
 	int ret = 0;
 
-	debconf_progress_start(debconf, 0, 1, 
+	debconf_progress_start(debconf, 0, 1,
 			       DEBCONF_BASE "checking_title");
-	debconf_progress_info(debconf, 
+	debconf_progress_info(debconf,
 			      DEBCONF_BASE "checking_download");
-		
+
 	hostname = add_protocol("hostname");
 	debconf_get(debconf, hostname);
 	free(hostname);
@@ -165,13 +165,13 @@ int find_suite (void) {
 		else {
 			suite = strdup(suites[i - 1]);
 		}
-		
+
 		asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-	        	 protocol, hostname, directory, suite);
+			 protocol, hostname, directory, suite);
 		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
 		f = popen(command, "r");
 		free(command);
-		
+
 		if (f != NULL) {
 			char buf[SUITE_LENGTH];
 			if (fgets(buf, SUITE_LENGTH - 1, f)) {
@@ -185,16 +185,16 @@ int find_suite (void) {
 		pclose(f);
 		free(suite);
 	}
-	
+
 	free(hostname);
 	free(directory);
-		
+
 	debconf_progress_step(debconf, 1);
 	debconf_progress_stop(debconf);
 
 	return ret;
 }
-	
+
 static int choose_country(void) {
 	if (country)
 		free(country);
@@ -235,16 +235,16 @@ static int choose_country(void) {
 			debconf_fget(debconf, DEBCONF_BASE "country", "seen");
 			debconf_fset(debconf, DEBCONF_BASE "http/countries", "seen", debconf->value);
 		}
- 		debconf_input(debconf, "high", DEBCONF_BASE "ftp/countries");
+		debconf_input(debconf, "high", DEBCONF_BASE "ftp/countries");
 	}
 #endif
-	
+
 	return 0;
 }
 
 static int set_country(void) {
-	debconf_get(debconf, (strcasecmp(protocol,"http") == 0 ) ? 
-	            DEBCONF_BASE "http/countries" : DEBCONF_BASE "ftp/countries");
+	debconf_get(debconf, (strcasecmp(protocol,"http") == 0 ) ?
+		    DEBCONF_BASE "http/countries" : DEBCONF_BASE "ftp/countries");
 	country = strdup(debconf->value);
 	debconf_set(debconf, DEBCONF_BASE "country", country);
 	return 0;
@@ -291,11 +291,11 @@ static int choose_mirror(void) {
 	if (! manual_entry) {
 		char *mir = add_protocol("mirror");
 
-                /* Prompt for mirror in selected country. */
+		/* Prompt for mirror in selected country. */
 		list=debconf_list(mirrors_in(country));
 		debconf_subst(debconf, mir, "mirrors", list);
 		free(list);
-		
+
 		debconf_input(debconf, "high", mir);
 		free(mir);
 	}
@@ -306,7 +306,7 @@ static int choose_mirror(void) {
 		/* Manual entry. */
 		debconf_input(debconf, "critical", host);
 		debconf_input(debconf, "critical", dir);
-		
+
 		free(host);
 		free(dir);
 	}
@@ -316,7 +316,7 @@ static int choose_mirror(void) {
 
 static int choose_proxy(void) {
 	char *px = add_protocol("proxy");
-	
+
 	/* Always ask about a proxy. */
 	debconf_input(debconf, "high", px);
 
@@ -327,9 +327,9 @@ static int choose_proxy(void) {
 static int set_proxy(void) {
 	char *px = add_protocol("proxy");
 	char *proxy_var;
-	
+
 	asprintf(&proxy_var, "%s_proxy", protocol);
-	
+
 	debconf_get(debconf, px);
 	if (debconf->value != NULL && strlen(debconf->value)) {
 		setenv(proxy_var, debconf->value, 1);
@@ -337,7 +337,7 @@ static int set_proxy(void) {
 	else {
 		unsetenv(proxy_var);
 	}
-	
+
 	free(proxy_var);
 	free(px);
 
@@ -382,7 +382,7 @@ static int validate_mirror(void) {
 		if (debconf->value == NULL || strcmp(debconf->value, "") == 0) {
 			ok = 0;
 		}
-		
+
 		if (ok) {
 			valid = find_suite();
 		}
@@ -390,7 +390,7 @@ static int validate_mirror(void) {
 			valid = 0;
 		}
 	}
-	
+
 	free(mir);
 	free(host);
 	free(dir);
@@ -419,7 +419,7 @@ int main (void) {
 		choose_proxy,
 		set_proxy,
 		validate_mirror,
-                choose_suite,
+		choose_suite,
 		NULL,
 	};
 
@@ -436,7 +436,7 @@ int main (void) {
 		else if (debconf_go(debconf)) { /* back up */
 			state = state - 1;
 		}
-		else  {
+		else {
 			state++;
 		}
 	}
