@@ -12,9 +12,7 @@ ifeq (1,${USE_FTP})
 CFLAGS:=$(CFLAGS) -DWITH_FTP
 templates:=$(templates) debian/choose-mirror.templates.ftp-in
 endif
-ifeq (11,${USE_HTTP}${USE_FTP})
 templates:=$(templates) debian/choose-mirror.templates.both-in
-endif
 
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=choose-mirror
