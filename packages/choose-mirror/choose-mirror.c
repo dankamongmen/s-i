@@ -407,6 +407,58 @@ static int validate_mirror(void) {
 	}
 }
 
+/* Get the codename for the selected suite. I think having the codename should
+ * be optional (at least for now), so return 0 on errors.
+ */
+int get_codename (void) {
+	char *command;
+	FILE *f = NULL;
+	char *hostname, *directory, *suite;
+	int ret = 1;
+
+	hostname = add_protocol("hostname");
+	debconf_get(debconf, hostname);
+	free(hostname);
+	hostname = strdup(debconf->value);
+	directory = add_protocol("directory");
+	debconf_get(debconf, directory);
+	free(directory);
+	directory = strdup(debconf->value);
+
+	/* As suite has been determined previously, this should not fail */
+	debconf_get(debconf, DEBCONF_BASE "suite");
+	if (strlen(debconf->value) > 0) {
+		suite = strdup(debconf->value);
+
+		asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Codename: | cut -d' ' -f 2",
+			 protocol, hostname, directory, suite);
+		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
+		f = popen(command, "r");
+		free(command);
+
+		if (f != NULL) {
+			char buf[SUITE_LENGTH];
+			if (fgets(buf, SUITE_LENGTH - 1, f)) {
+				if (buf[strlen(buf) - 1] == '\n')
+					buf[strlen(buf) - 1] = '\0';
+				debconf_set(debconf, DEBCONF_BASE "codename", buf);
+				di_log(DI_LOG_LEVEL_INFO, "codename set to: %s", buf);
+				ret = 0;
+			}
+		}
+		pclose(f);
+	}
+
+	if (ret != 0)
+		di_log(DI_LOG_LEVEL_ERROR, "Error getting codename");
+
+	free(hostname);
+	free(directory);
+	free(suite);
+
+	return ret;
+}
+
 int main (void) {
 	/* Use a state machine with a function to run in each state */
 	int state = 0;
@@ -420,6 +472,7 @@ int main (void) {
 		set_proxy,
 		validate_mirror,
 		choose_suite,
+		get_codename,
 		NULL,
 	};
 
