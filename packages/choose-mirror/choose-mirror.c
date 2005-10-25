@@ -447,13 +447,12 @@ int get_codename (void) {
 		pclose(f);
 	}
 
-	if (ret != 0)
-		di_log(DI_LOG_LEVEL_ERROR, "Error getting codename");
-
 	free(hostname);
 	free(directory);
 	free(suite);
 
+	if (ret != 0)
+		di_log(DI_LOG_LEVEL_ERROR, "Error getting codename");
 	return ret;
 }
 
