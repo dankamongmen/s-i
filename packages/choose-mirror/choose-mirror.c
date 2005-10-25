@@ -407,9 +407,7 @@ static int validate_mirror(void) {
 	}
 }
 
-/* Get the codename for the selected suite. I think having the codename should
- * be optional (at least for now), so return 0 on errors.
- */
+/* Get the codename for the selected suite. */
 int get_codename (void) {
 	char *command;
 	FILE *f = NULL;
