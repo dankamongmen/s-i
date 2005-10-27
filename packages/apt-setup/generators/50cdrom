@@ -5,18 +5,6 @@ set -e
 
 file="$1"
 
-# unmount CD so apt-cdrom can access it. Remount at end if it was mounted.
-CDDEV=$(mount | grep "on /cdrom" | cut -d ' ' -f 1)
-if [ -n "$CDDEV" ]; then
-	umount /cdrom || true
-fi
-cleanup () {
-	if [ -n "$CDDEV" ]; then
-		mount -t iso9660 -o ro,exec $CDDEV /cdrom || true
-	fi
-}
-trap cleanup EXIT
-
 if [ -n "$ROOT" ]; then
         chroot=chroot
 else
@@ -25,7 +13,7 @@ fi
 
 tmp=$($chroot $ROOT tempfile)
 # apt-cdrom can be interactive, avoid that
-$chroot $ROOT apt-cdrom add \
+$chroot $ROOT apt-cdrom -m add \
 	-o Dir::Etc::SourceList=$tmp \
 	-o Acquire::gpgv::Options::=--ignore-time-conflict \
 	</dev/null
