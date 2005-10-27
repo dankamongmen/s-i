@@ -1924,12 +1924,16 @@ command_get_resize_range()
         max_geom = ped_disk_get_max_partition_geometry(disk, part, constraint);
         if (part->type & PED_PARTITION_LOGICAL)
                 minimize_extended_partition(disk);
-        max_size = max_geom->length * PED_SECTOR_SIZE;
         min_size = constraint->min_size * PED_SECTOR_SIZE;
         current_size = (part->geom).length * PED_SECTOR_SIZE;
+        if (max_geom)
+                max_size = max_geom->length * PED_SECTOR_SIZE;
+        else
+                max_size = current_size;
         oprintf("OK\n");
         oprintf("%lli %lli %lli\n", min_size, current_size, max_size);
-        ped_geometry_destroy(max_geom);
+        if (max_geom)
+                ped_geometry_destroy(max_geom);
         ped_constraint_destroy(constraint);
         /* TODO: Probably there are memory leaks because of constraints. */
         activate_exception_handler();
@@ -1964,12 +1968,16 @@ command_get_virtual_resize_range()
         max_geom = ped_disk_get_max_partition_geometry(disk, part, constraint);
         if (part->type & PED_PARTITION_LOGICAL)
                 minimize_extended_partition(disk);
-        max_size = max_geom->length * PED_SECTOR_SIZE;
         min_size = constraint->min_size * PED_SECTOR_SIZE;
         current_size = (part->geom).length * PED_SECTOR_SIZE;
+        if (max_geom)
+                max_size = max_geom->length * PED_SECTOR_SIZE;
+        else
+                max_size = current_size;
         oprintf("OK\n");
         oprintf("%lli %lli %lli\n", min_size, current_size, max_size);
-        ped_geometry_destroy(max_geom);
+        if (max_geom)
+                ped_geometry_destroy(max_geom);
         ped_constraint_destroy(constraint);
         /* TODO: Probably there are memory leaks because of constraints. */
         activate_exception_handler();
