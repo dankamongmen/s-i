@@ -1,15 +1,9 @@
 #!/bin/sh
 tmp=$(tempfile)
 
-if ! wget http://$MACHINE/ -O - > $tmp; then
+if ! wget http://$MACHINE/ -O - > /dev/null; then
 	echo "wget http://$MACHINE/ failed" >&2
 	exit 1
 fi
-if ! grep -q "Test Page for Apache Installation" $tmp; then
-	echo "does not seem to be running apache (2)" >&2
-	cat $tmp
-	exit 1
-fi
-rm -f $tmp
 echo "Web server: ok"
 exit 0
