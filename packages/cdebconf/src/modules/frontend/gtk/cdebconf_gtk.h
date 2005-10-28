@@ -24,10 +24,12 @@ struct frontend_data
 {
   /* Main window of the frontend */
   GtkWidget *window;
+
+  /* Label used to display frontend's title */
+  GtkWidget *title;
+  
   /* Pointer to the box, where question widgets shall be stored in */
   GtkWidget *target_box; 
-  /* Pointer to the box, where help messages shall be stored in */
-  GtkWidget *info_box;
   /* Pointer to the box, where the main menu shall be stored in */
   GtkWidget *menu_box;
 
@@ -92,7 +94,3 @@ gboolean is_first_question(struct question *q);
    via callbacks. Can be used as a callback for the destroy signal of a widget associated
    to the question.*/
 void free_description_data( GtkObject *obj, struct frontend_question_data* data );
-
-/* Function which can be used as callback. Shows the description of specified question 
-   in the description area. Can be used when receiving focus */
-gboolean show_description( GtkWidget *widget, struct frontend_question_data* data );

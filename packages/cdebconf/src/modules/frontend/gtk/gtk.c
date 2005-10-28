@@ -68,6 +68,12 @@
 #define QUESTIONBOX_VPADDING 3
 
 
+/* standard gtkdfb 2.0.9 background color is d6d7d6 */
+#define BACKGROUND_RED  0xd600
+#define BACKGROUND_GREEN 0xd600
+#define BACKGROUND_BLUE 0xd700
+
+
 /* used by the treeview widgets */
 enum
 {
@@ -152,58 +158,6 @@ gboolean jump_confirmation (GtkWidget *widget, struct frontend_question_data* da
     gtk_widget_destroy (dialog);
 
     return result;
-}
-
-
-gboolean show_description (GtkWidget *widget, struct frontend_question_data* data)
-{
-    struct question *q;
-    struct frontend *frontend_ptr;
-    struct frontend_data *frontend_data_ptr;
-    GtkWidget *view;  		
-    GtkTextBuffer *buffer;
-  
-    frontend_ptr = data->obj;
-    frontend_data_ptr = frontend_ptr->data;
-    view = (GtkWidget*)frontend_data_ptr->info_box;
-    q = data->q;
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view) );
-
-	/* Workaround for questions missing extended description */
-    if (strlen(q_get_extended_description(q)) > 0)
-    	gtk_text_buffer_set_text (buffer, q_get_extended_description(q), -1);
-    else if (strlen(q_get_description(q)) > 0)
-    	gtk_text_buffer_set_text (buffer, q_get_description(q), -1);
-
-    /* INFO(INFO_DEBUG, "GTK_DI - show_description(%s) called", q_get_extended_description(q)); */
-
-    return DC_OK;
-}
-
-
-/* used to clear the help area */
-void clear_description ( struct frontend_data* data)
-{
-    GtkWidget *view;
-    GtkTextBuffer *buffer;
-
-    view = (GtkWidget*)data->info_box;
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view) );
-    gtk_text_buffer_set_text (buffer, "", -1);
-
-}
-
-
-GtkWidget*
-create_help_button (struct frontend_question_data *data)
-{
-  GtkWidget *button;
-
-  button = gtk_button_new_from_stock (GTK_STOCK_HELP);
-  g_signal_connect (G_OBJECT(button), "clicked",
-		    G_CALLBACK(show_description), data);
-
-  return button;
 }
 
 gboolean is_first_question (struct question *q)
@@ -602,12 +556,70 @@ gboolean need_back_button(struct frontend *obj)
     return TRUE;
 }
 
+GtkWidget* display_descriptions(struct question *q)
+{
+    GtkWidget *description_view, *ext_description_view;
+    GtkWidget *returned_box;
+    GtkTextBuffer *description_buffer, *ext_description_buffer;
+	GdkColor color;
+	GtkTextIter start, end;
+
+    color.red = BACKGROUND_RED;
+    color.green = BACKGROUND_GREEN;
+    color.blue = BACKGROUND_BLUE;
+
+    returned_box = gtk_vbox_new (FALSE, 0);
+
+	/* here is created the question's extended description, but only
+	 * if the question's extended description actually exists
+	 */
+	if (strlen (q_get_extended_description(q)) > 0)
+	{		
+	    ext_description_view = gtk_text_view_new ();
+	    ext_description_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (ext_description_view));
+	    gtk_text_buffer_set_text (ext_description_buffer, q_get_extended_description(q), -1);
+	    gtk_text_view_set_editable (GTK_TEXT_VIEW(ext_description_view), FALSE);
+	    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(ext_description_view), FALSE);
+	    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(ext_description_view), GTK_WRAP_WORD);
+		/*
+		 * gtk_text_buffer_create_tag (ext_description_buffer, "bold", "weight", PANGO_WEIGHT_BOLD, NULL);
+		 * gtk_text_buffer_create_tag (ext_description_buffer, "italic", "style", PANGO_STYLE_ITALIC, NULL);
+		 * g_object_set_data (G_OBJECT (ext_description_view), "tag", "bold");
+		 * g_object_set_data (G_OBJECT (ext_description_view), "tag", "italic");
+		 * gtk_text_buffer_get_start_iter  (ext_description_buffer, &start);
+		 * gtk_text_buffer_get_end_iter  (ext_description_buffer, &end);
+		 * gtk_text_buffer_apply_tag_by_name (ext_description_buffer, "bold", &start, &end);
+		 * gtk_text_buffer_apply_tag_by_name (ext_description_buffer, "italic", &start, &end);
+		 */
+	    gtk_widget_modify_base(GTK_WIDGET(ext_description_view), GTK_STATE_NORMAL, &color);	
+
+		gtk_box_pack_start(GTK_BOX (returned_box), ext_description_view, FALSE, FALSE, 2);
+	}
+
+	/* here is created the question's description */
+    description_view = gtk_text_view_new ();
+    description_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (description_view));
+    gtk_text_buffer_set_text (description_buffer, q_get_description(q), -1);
+    gtk_text_view_set_editable (GTK_TEXT_VIEW(description_view), FALSE);
+    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(description_view), FALSE);
+    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(description_view), GTK_WRAP_WORD);
+	gtk_text_buffer_create_tag (description_buffer, "italic", "style", PANGO_STYLE_ITALIC, NULL);
+	g_object_set_data (G_OBJECT (description_view), "tag", "italic");
+	gtk_text_buffer_get_start_iter  (description_buffer, &start);
+	gtk_text_buffer_get_end_iter  (description_buffer, &end);
+	gtk_text_buffer_apply_tag_by_name (description_buffer, "italic", &start, &end);
+    gtk_widget_modify_base(GTK_WIDGET(description_view), GTK_STATE_NORMAL, &color);
+
+	gtk_box_pack_start(GTK_BOX (returned_box), description_view, FALSE, FALSE, 3);
+
+	return returned_box;
+}
+
 static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-	GtkWidget *label, *check, *hpadbox, *vpadbox;
+	GtkWidget *description_box, *check, *hpadbox, *vpadbox;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
-	char *label_string;
 
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_boolean_multiple() called");
 
@@ -626,18 +638,12 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
     else
 	    register_setter(bool_setter, check, q, obj);
         
-    g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
-    g_signal_connect (G_OBJECT(check), "grab-focus", G_CALLBACK (show_description), data);
-    g_signal_connect (G_OBJECT(check), "toggled", G_CALLBACK (enable_jump_confirmation_callback), data);
     g_signal_connect (G_OBJECT(check), "destroy", G_CALLBACK (free_description_data), data);
 
-	label = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	description_box = display_descriptions(q);
+
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), check, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
@@ -646,23 +652,17 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
     if (is_first_question(q))
 		gtk_widget_grab_focus(check);
 
-    if ( (q->next != NULL) || (q->prev != NULL))
-
-
-	free(label_string);
-
     return DC_OK;
 }
 
 static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *label, *check_container, *check, *hpadbox, *vpadbox;
+    GtkWidget *description_box, *check_container, *check, *hpadbox, *vpadbox;
     char **choices, **choices_translated, **defvals;
     int i, j, count, defcount;
     struct frontend_question_data *data;
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
-	char *label_string;
     data = NEW(struct frontend_question_data);
     data->obj = obj;
     data->q = q;
@@ -707,8 +707,6 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
             if (strcmp(choices[tindex[i]], defvals[j]) == 0)
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
         }
-        g_signal_connect (G_OBJECT(check), "toggled", G_CALLBACK (enable_jump_confirmation_callback), data);
-        g_signal_connect (G_OBJECT(check), "enter", G_CALLBACK (show_description), data);
         gtk_box_pack_start(GTK_BOX(check_container), check, FALSE, FALSE, 0);
         if (is_first_question(q) && (i == 0) )
             gtk_widget_grab_focus(check);
@@ -724,47 +722,33 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
         free(defvals[j]);
     free(defvals);
 
-	label = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	description_box = display_descriptions(q);
+	
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, TRUE, TRUE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), check_container, TRUE, TRUE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
+	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
     register_setter(multi_setter, check_container, q, obj);
-	free(label_string);
 
     return DC_OK;
 }
 
 static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *label, *label_note, *hpadbox, *vpadbox;;
-	char *label_string;
+    GtkWidget *hpadbox, *vpadbox, *description_box;
 
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_note() called");
 
-    label_note = gtk_label_new (q_get_extended_description(q));
-    gtk_misc_set_alignment(GTK_MISC (label_note), 0.0, 0.0);
-    gtk_label_set_line_wrap(GTK_LABEL (label_note), TRUE);
-
-	label = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	description_box = display_descriptions(q);
+	
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label_note, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
-	free(label_string);
 	
     return DC_OK;
 }
@@ -777,9 +761,9 @@ static int gtkhandler_text(struct frontend *obj, struct question *q, GtkWidget *
 
 static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *label, *entry, *hpadbox, *vpadbox;
+    GtkWidget *description_box, *entry, *hpadbox, *vpadbox;
     struct frontend_question_data *data;
-	char *label_string;    
+ 
     
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_password() called");
 
@@ -792,34 +776,21 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     gtk_entry_set_visibility (GTK_ENTRY (entry), FALSE);
     gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
 
-    if (is_first_question(q))
-		gtk_widget_grab_focus(entry);
-
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
-    g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
-    /*
-     * TODO: also when inserting or deleting text the need to ask user if he wants to
-     * save changes before jumping should be communicated with an appropriate callback.
-     * at the moment the two following lines do not work properly.
-     * g_signal_connect (G_OBJECT(entry), "delete-from-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
-     * g_signal_connect (G_OBJECT(entry), "insert-at-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
-     */
-    g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
 
-	label = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	description_box = display_descriptions(q);
+		
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), entry, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
-	free(label_string);
 	
     register_setter(entry_setter, entry, q, obj);
+
+    if (is_first_question(q))
+		gtk_widget_grab_focus(entry);
 
     return DC_OK;
 }
@@ -894,16 +865,15 @@ static int gtkhandler_main_menu(struct frontend *obj, struct question *q, GtkWid
     return DC_OK;
 }
 
-
 static int gtkhandler_select_treeview_list(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    char **choices, **choices_translated, *label_string;
+    char **choices, **choices_translated;
     int i, count;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
-	GtkWidget *hpadbox, *vpadbox, *label;
+	GtkWidget *hpadbox, *vpadbox, *description_box;
 
 	GtkTreeModel        *model;
 	GtkListStore  		*store;
@@ -933,9 +903,9 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
 	renderer = gtk_cell_renderer_text_new ();
 	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", COL_NAME, NULL);	
 	store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
-
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
+	gtk_tree_view_set_enable_search (GTK_TREE_VIEW(view), TRUE);
 
 	model = GTK_TREE_MODEL( store );
 	gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
@@ -965,21 +935,18 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-	label = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	description_box = display_descriptions(q);
 
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	frame = gtk_frame_new(NULL);
 	gtk_container_add(GTK_CONTAINER(frame), scroll);
 	gtk_box_pack_start (GTK_BOX(vpadbox), frame, TRUE, TRUE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
-	free(label_string);
+
+	gtk_widget_grab_focus(view);
 
     return DC_OK;
 }
@@ -990,13 +957,13 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
  */
 static int gtkhandler_select_treeview_store(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    char **choices, **choices_translated, *label_string;
+    char **choices, **choices_translated;
     int i, count;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
-	GtkWidget *hpadbox, *vpadbox, *label;
+	GtkWidget *hpadbox, *vpadbox, *description_box;
 
 	GtkTreeModel        *model;
 	GtkTreeStore  		*store;
@@ -1029,6 +996,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
 
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
+	gtk_tree_view_set_enable_search (GTK_TREE_VIEW(view), TRUE);
 	model = GTK_TREE_MODEL( store );
 	gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
 	g_object_unref (model);
@@ -1065,30 +1033,27 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-	label = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	description_box = display_descriptions(q);
 
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	frame = gtk_frame_new(NULL);
 	gtk_container_add(GTK_CONTAINER(frame), scroll);
 	gtk_box_pack_start (GTK_BOX(vpadbox), frame, TRUE, TRUE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
-	free(label_string);
+
+	gtk_widget_grab_focus(view);
 
     return DC_OK;
 }
 
 static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *label, *combo, *hpadbox, *vpadbox;
+    GtkWidget *description_box, *combo, *hpadbox, *vpadbox;
     GList *items = NULL;
-    char **choices, **choices_translated, *label_string;;
+    char **choices, **choices_translated;
     struct frontend_question_data *data;
     int i, count;
     const char *defval = question_getvalue(q, "");
@@ -1137,24 +1102,16 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 
     g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "destroy",
                       G_CALLBACK (free_description_data), data);
-	g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "grab-focus",
-                      G_CALLBACK (enable_jump_confirmation_callback), data);
-    g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "grab-focus",
-                      G_CALLBACK (show_description), data);
 
-	label = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	description_box = display_descriptions(q);
+	
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), combo, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
     register_setter(combo_setter, GTK_COMBO(combo)->entry, q, obj);
-	free(label_string);
 
     return DC_OK;
 }
@@ -1175,10 +1132,9 @@ static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget
 
 static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *label, *entry, *hpadbox, *vpadbox;
+    GtkWidget *description_box, *entry, *hpadbox, *vpadbox;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
-	char *label_string;
 
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_string() called");
 
@@ -1194,34 +1150,22 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
     gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
 
-    if (is_first_question(q))
-        gtk_widget_grab_focus(entry);
-
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
-    /*
-     * TODO: also when inserting or deleting text the need to ask user if he wants to
-     * save changes before jumping should be communicated with an appropriate callback.
-     * at the moment the two following lines do not work properly.
-     * g_signal_connect (G_OBJECT(entry), "backspace", G_CALLBACK (enable_jump_confirmation_callback), data);
-     * g_signal_connect (G_OBJECT(entry), "delete-from-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
-     * g_signal_connect (G_OBJECT(entry), "insert-at-cursor", G_CALLBACK (enable_jump_confirmation_callback), data);
-     */
-    g_signal_connect (G_OBJECT(entry), "grab-focus", G_CALLBACK (show_description), data);
 
-	label = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
+	description_box = display_descriptions(q);
+	
 	vpadbox = gtk_vbox_new (FALSE, 5);
-	gtk_box_pack_start (GTK_BOX(vpadbox), label, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), entry, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, 5);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
-    register_setter(entry_setter, entry, q, obj);
-	free(label_string);
 
+    register_setter(entry_setter, entry, q, obj);
+
+    if (is_first_question(q))
+		gtk_widget_grab_focus(entry);
+		
     return DC_OK;
 }
 
@@ -1261,7 +1205,6 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 	9) menubox
 	4) targetbox
 	6) actionbox
-	7) infobox
 	8) progress_bar
 	
 	0_________________________
@@ -1273,8 +1216,8 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 	| ||| ||| |  ___________  |
 	| ||| ||| | |6          | |	
 	| ||| ||| | |___________| |
-	| ||| ||| |  ___________  |
-	| |||_||| | |7__________| |	
+	| ||| ||| |               |
+	| |||_||| |               |	
 	| ||___|| |  ___________  |
 	| |_____| | |8__________| |	
 	|_________|_______________|		
@@ -1283,14 +1226,12 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
     GtkWidget *mainbox, *globalbox, *targetbox;
     GtkWidget *menubox, *menubox_vpad, *menubox_scroll;
-    GtkWidget *actionbox, *infobox;
+    GtkWidget *actionbox;
     GtkWidget *button_next, *button_prev;
-    GtkWidget *info_frame;
-    GtkWidget *view;
-    GtkTextBuffer *buffer;
     GtkWidget *progress_bar, *progress_bar_label, *progress_bar_box;
 	GtkWidget *logo_button, *logo_box;
-	
+	GtkWidget *label_title, *h_title_box, *v_title_box;
+    GList *focus_chain = NULL;	
     int *ret_val;
 
     mainbox = gtk_vbox_new (FALSE, 10);
@@ -1303,7 +1244,6 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     /* Here are the back and forward buttons */
     actionbox = gtk_hbutton_box_new();
     gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END); 
-    gtk_box_pack_end (GTK_BOX(mainbox), actionbox, FALSE, FALSE, 5);
 
     button_prev = gtk_button_new_from_stock (GTK_STOCK_GO_BACK);
     ret_val = NEW(int);
@@ -1325,27 +1265,11 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     ((struct frontend_data*) obj->data)->button_prev = button_prev;
     ((struct frontend_data*) obj->data)->button_next = button_next;
 
-
-    /* Here a frame is created to display extended descriptions about the
-     * questions
-     */
-    view = gtk_text_view_new ();
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-    gtk_text_buffer_set_text (buffer, "", -1);
-    gtk_text_view_set_editable (GTK_TEXT_VIEW(view), FALSE);
-    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(view), FALSE);
-    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
-	
-	gtk_text_view_set_pixels_above_lines (GTK_TEXT_VIEW(view), 5);
-	gtk_text_view_set_pixels_below_lines (GTK_TEXT_VIEW(view), 5);
-	
-    gtk_text_view_set_left_margin (GTK_TEXT_VIEW(view), 5);
-    gtk_text_view_set_right_margin (GTK_TEXT_VIEW(view), 5);
-    ((struct frontend_data*) obj->data)->info_box = view;
-    info_frame = gtk_frame_new(NULL);
-    gtk_container_add(GTK_CONTAINER (info_frame), view);
-    infobox = gtk_vbox_new (FALSE, 10);
-    gtk_box_pack_start(GTK_BOX (infobox), info_frame, TRUE, TRUE, 5);
+	/* focus order inside actionbox */
+	focus_chain = g_list_append(focus_chain, button_next);
+	focus_chain = g_list_append(focus_chain, button_prev);
+    gtk_container_set_focus_chain(GTK_CONTAINER(actionbox), focus_chain);
+    g_list_free (focus_chain);
 
     /* Here the the progressbar is placed */
     obj->progress_title = NULL;
@@ -1388,19 +1312,28 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 	logo_button = gtk_image_new_from_file("/usr/share/graphics/logo_debian.png");
     logo_box = gtk_vbox_new (FALSE, 0);
 
-    /* Final packaging */
-    gtk_box_pack_start(GTK_BOX (mainbox), targetbox, TRUE, TRUE, 5);	
-    gtk_box_pack_start(GTK_BOX (mainbox), infobox, FALSE, FALSE, 5);
-    gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_box, FALSE, FALSE, 5);
+	/* A label is used to display the fontend's title */
+    label_title = gtk_label_new(NULL);
+    ((struct frontend_data*) obj->data)->title = label_title;
+    h_title_box = gtk_hbox_new (TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (h_title_box), label_title, TRUE, TRUE, 5);
+    v_title_box = gtk_vbox_new (TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (v_title_box), h_title_box, TRUE, TRUE, 5);
 
+    /* Final packaging */
+   	gtk_box_pack_start(GTK_BOX (mainbox), v_title_box, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (mainbox), targetbox, TRUE, TRUE, 5);	
+    gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_box, FALSE, FALSE, 5);
+    gtk_box_pack_end (GTK_BOX(mainbox), actionbox, FALSE, FALSE, 5);
     globalbox = gtk_hbox_new (TRUE, 10);
 	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
     	gtk_box_pack_start(GTK_BOX (globalbox), menubox_vpad, TRUE, TRUE, 5);
     gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
-	gtk_box_pack_start(GTK_BOX (logo_box), logo_button, FALSE, FALSE, 0);	
+	gtk_box_pack_start(GTK_BOX (logo_box), logo_button, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX (logo_box), globalbox, TRUE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(window), logo_box);
+
 }
 
 static int gtk_initialize(struct frontend *obj, struct configuration *conf)
@@ -1423,8 +1356,8 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
      */
     fe_data = obj->data;
     fe_data->window = NULL;
+    fe_data->title = NULL;
     fe_data->target_box = NULL;
-    fe_data->info_box = NULL;
     fe_data->menu_box = NULL;
     fe_data->button_next = NULL;
     fe_data->button_prev = NULL;
@@ -1471,19 +1404,14 @@ static int gtk_go(struct frontend *obj)
     struct frontend_data *data = (struct frontend_data *) obj->data;
     struct question *q = obj->questions;
     GtkWidget *questionbox, *questionbox_scroll, *menubox;
-    GtkWidget *image_button_forward, *image_button_back;
+    /* GtkWidget *image_button_forward, *image_button_back; */
     di_slist *plugins;
     int i, j;
-    int ret;
-    GtkWidget *helpbox_view;
-    GtkTextBuffer *helpbox_buffer;
+    int ret;;
 
 	/* Users's jumps do not need to be confirmated unless he has activated a widget */
 	data->ask_jump_confirmation = FALSE;
 	data->setters = NULL;
-
-	helpbox_view = (GtkWidget*)data->info_box;
-    helpbox_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (helpbox_view) );
 
     if (q == NULL) return DC_OK;
 
@@ -1562,7 +1490,6 @@ static int gtk_go(struct frontend *obj)
 	         * simply handle it
 	         */
 	        ret = gtkhandler_main_menu(obj, q, menubox, TRUE, FALSE);
-	        gtk_text_buffer_set_text (helpbox_buffer, q_get_extended_description(q), -1);
 	        q = q->next; 
 	    }
 	    else if (data->q_main)
@@ -1581,7 +1508,7 @@ static int gtk_go(struct frontend *obj)
 	    }
 	}
 	
-   	questionbox = gtk_vbox_new(FALSE, 5);
+   	questionbox = gtk_vbox_new(FALSE, 0);
 
 	/* since all widgets used to display single questions (except MULTISELECT)
 	 * have native scrolling capabilities or do not need scrolling since they're
@@ -1592,7 +1519,7 @@ static int gtk_go(struct frontend *obj)
 	 */
 	if ( (obj->questions->next==NULL && obj->questions->prev==NULL) && (strcmp(obj->questions->template->type,"multiselect")!=0) )
 	{
-    	gtk_box_pack_start(GTK_BOX(data->target_box), questionbox, TRUE, TRUE, 5);
+    	gtk_box_pack_start(GTK_BOX(data->target_box), questionbox, TRUE, TRUE, 0);
     }
     else
     {
@@ -1600,7 +1527,8 @@ static int gtk_go(struct frontend *obj)
 	    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (questionbox_scroll), questionbox);
 	    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (questionbox_scroll),
 	                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-		gtk_box_pack_start(GTK_BOX(data->target_box), questionbox_scroll, TRUE, TRUE, 5);
+		gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (questionbox_scroll), GTK_SHADOW_NONE);
+		gtk_box_pack_start(GTK_BOX(data->target_box), questionbox_scroll, TRUE, TRUE, 0);
     }
 
     /* now we can safely handle all other questions, if any */
@@ -1637,17 +1565,6 @@ static int gtk_go(struct frontend *obj)
                     di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
                     INFO(INFO_DEBUG, "GTK_DI - question %d: \"%s\" failed to display!", j, q->tag);
                 }
-				else
-				{
-					/* The (extended) description of the last handled question is
-					 * automatically displayed inside helpbox to give
-					 * the user better help
-					 */
-				    if (strlen(q_get_extended_description(q)) > 0)
-				    	gtk_text_buffer_set_text (helpbox_buffer, q_get_extended_description(q), -1);
-				    else if (strlen(q_get_description(q)) > 0)
-				    	gtk_text_buffer_set_text (helpbox_buffer, q_get_description(q), -1); 	
-				}
                 /* we've found the right handler for the question, so we break
                  * the for() loop
                  */
@@ -1667,20 +1584,23 @@ static int gtk_go(struct frontend *obj)
 
 	gtk_button_set_label (GTK_BUTTON(data->button_prev), get_text(obj, "debconf/button-goback", "Go Back") );
 	gtk_button_set_label (GTK_BUTTON(data->button_next), get_text(obj, "debconf/button-continue", "Continue") );
-	image_button_back = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_SMALL_TOOLBAR );
-	image_button_forward = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_SMALL_TOOLBAR );
 
 	/* gtk_button_set_image() was first implemented in GTK v. 2.6 while
 	 * the most recent working build of GTK with GDK DFB support is 2.0.9,
 	 * so we'll have to stay with text-only arrows until GDK DFB library
 	 * is update to compile with GTK v 2.8 :(
      */
-     	
+     
+	/* image_button_back = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_SMALL_TOOLBAR ); */
+	/* image_button_forward = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_SMALL_TOOLBAR ); */
 	/* gtk_button_set_image (GTK_BUTTON(data->button_prev), image_button_back); */    
 	/* gtk_button_set_image (GTK_BUTTON(data->button_next), image_button_forward); */
 
-    
     gtk_widget_set_default_direction(get_text_direction(obj));
+
+	/* The "Next" button is activated if the user presses "Enter" */
+	GTK_WIDGET_SET_FLAGS (GTK_WIDGET(data->button_next), GTK_CAN_DEFAULT);
+	gtk_widget_grab_default (GTK_WIDGET(data->button_next));
 
     gtk_widget_show_all(data->window);    
    
@@ -1709,7 +1629,6 @@ static int gtk_go(struct frontend *obj)
 
 	gtk_widget_set_sensitive (data->button_prev, FALSE);
 	gtk_widget_set_sensitive (data->button_next, FALSE);
-	clear_description (data);
 
     if (data->button_val == DC_OK)
         return DC_OK;
@@ -1717,6 +1636,21 @@ static int gtk_go(struct frontend *obj)
         return DC_GOBACK;
     else
         return DC_OK;
+}
+
+static void gtk_set_title(struct frontend *obj, const char *title)
+{
+	GtkWidget *label_title;
+	char *label_title_string;
+	
+    INFO(INFO_DEBUG, "GTK_DI - gtk_set_title() called");
+
+	label_title = ((struct frontend_data*) obj->data)->title;
+	gtk_misc_set_alignment(GTK_MISC(label_title), 0, 0);
+	label_title_string = malloc(strlen(title) + 8 );
+	sprintf(label_title_string,"<b>%s</b>", title);
+	gtk_label_set_markup(GTK_LABEL(label_title), label_title_string);
+
 }
 
 static bool gtk_can_go_back(struct frontend *obj, struct question *q)
@@ -1860,6 +1794,7 @@ struct frontend_module debconf_frontend_module =
 {
     initialize: gtk_initialize,
     go: gtk_go,
+    set_title: gtk_set_title,
     can_go_back: gtk_can_go_back,
     progress_start: gtk_progress_start,
     progress_info: gtk_progress_info,
