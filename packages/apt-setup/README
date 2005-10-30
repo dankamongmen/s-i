@@ -20,7 +20,10 @@ Generators can ask configuration questions using debconf. To support
 backing up, generators should exit with the special return code of 10 if
 the user backs up from their first question. Each generator should provide
 a progress bar text template named apt-setup/progress/<generator>, where
-<generator> is the script's name with leading numbers removed.
+<generator> is the script's name with leading numbers removed. Anything
+after the first dot (if any) will also be removed when constructing the
+progress template name, so that different scripts that share the same
+purpose can easily be written.
 
 Note that apt-setup and its generators may be run against some other system
 in a chroot. (i.e., when installing Debian.) If apt-setup is running this
