@@ -6,7 +6,6 @@
 # ${LANG}_wl = common_wl + ${LANG}_wl
 #
 # Davide Viti <zinosat@tiscali.it> 2005, for the Debian Project
-
 LANGUAGE_LIST=lang2dict.txt
 COMMON_WL=./wls/di_common_wl.txt
 
@@ -34,7 +33,8 @@ for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
 # build wl only if there's at least one of the "private" wls
 # "| perl -00lne'/\n/&&print'" would remove blank lines from wl: is it needed?
 	if [ ${WL_WARN} -ne 2 ] ; then
-	    cat ${COMMON_WL} ${SPECIFIC_WL} | sort -f | sed "s:\(^#.*\)::" > ${WLIST}.txt
+	    echo "[${LANG}]"
+	    cat ${COMMON_WL} ${SPECIFIC_WL} | sort -f | sed "s:\(^#.*\)::" | grep -v ^$ > ${WLIST}.txt
 	    
 # NB: --lang uses $LANG and not $DICT
 	    aspell --lang=${LANG} create master ${WLIST} < ${WLIST}.txt
