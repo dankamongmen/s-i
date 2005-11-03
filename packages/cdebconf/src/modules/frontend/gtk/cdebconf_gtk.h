@@ -81,6 +81,13 @@ struct frontend_question_data
     struct question *q;
 };
 
+/* needed to pass data to single MULTISELECT question callback function */
+struct question_treemodel_data
+{
+    struct question *q;
+	GtkTreeModel *treemodel;
+};
+
 /* Functions registered here will be called after each question run. It is to be used
    to retrieve the data from the widgets and store it in the question database */
 void register_setter(void (*func)(void*, struct question*), 

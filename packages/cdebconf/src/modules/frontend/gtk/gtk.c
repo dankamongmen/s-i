@@ -77,8 +77,15 @@
 /* used by the treeview widgets */
 enum
 {
-	COL_NAME = 0,
-	NUM_COLS
+	SELECT_COL_NAME,
+	SELECT_NUM_COLS
+} ;
+
+enum
+{
+  MULTISELECT_COL_BOOL ,
+  MULTISELECT_COL_NAME ,
+  MULTISELECT_NUM_COLS
 } ;
 
 typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
@@ -346,6 +353,79 @@ void boolean_single_callback(GtkWidget *button, struct frontend_question_data* d
     gtk_main_quit();
 }
 
+void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_string, struct question_treemodel_data* data)
+{
+    int i, count;
+    char **choices, **choices_translated;
+    int *tindex = NULL;
+    gchar *indices;
+    gchar *result = NULL, *copy = NULL ;
+	GtkTreeModel *model;
+	GtkTreePath *path; 
+	GtkTreeIter iter;
+	gboolean bool_var ;
+	struct question *q = data->q;
+	model = (GtkTreeModel *) data->treemodel;
+	char str_iter_index[4];
+
+	/* GtkTreeView is updated */
+	path  = gtk_tree_path_new_from_string(path_string);	
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_path_free(path);  
+	gtk_tree_model_get(model, &iter, MULTISELECT_COL_BOOL, &bool_var, -1);
+	bool_var ^= 1;
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, MULTISELECT_COL_BOOL, bool_var, -1);
+	
+	/* frontend's internal question struct is updated */
+	count = strgetargc(q_get_choices_vals(q));
+    if (count <= 0)
+        return /* DC_NOTOK */;
+	choices = malloc(sizeof(char *) * count);
+    choices_translated = malloc(sizeof(char *) * count);
+    tindex = malloc(sizeof(int) * count);
+   	indices = q_get_indices(q);	
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+        return /* DC_NOTOK */;
+
+
+    for (i = 0; i < count; i++)
+    {
+    	sprintf(str_iter_index, "%d", i);
+    	path  = gtk_tree_path_new_from_string(str_iter_index);	
+    	
+    	/*
+    	 * The above hack is needed since gtk_tree_path_new_from_indices()
+    	 * was implemented first in GTK v. 2.2
+	     * path  = gtk_tree_path_new_from_indices ( i, -1);
+	     */
+		gtk_tree_model_get_iter(model, &iter, path);
+		gtk_tree_path_free(path);  
+		gtk_tree_model_get(model, &iter, MULTISELECT_COL_BOOL, &bool_var, -1);
+		
+	    if((result != NULL) && bool_var==1)
+	    {
+			copy = g_strdup(result);
+			free(result);
+			result = g_strconcat(copy, ", ", choices[tindex[i]], NULL);
+			free(copy);
+	    }
+	    else if((result == NULL) && bool_var==1)
+			result = g_strdup(choices[tindex[i]]);
+	}
+
+	if (result == NULL)
+		result = g_strdup("");
+
+	question_setvalue(q, result);	
+//	printf("result: %s\n",result);
+    free(result);			
+	free(choices);
+	free(choices_translated);
+	free(tindex);
+	free(indices);
+
+}
+
 void exit_button_callback(GtkWidget *button, struct frontend* obj)
 {
     int value;
@@ -495,7 +575,7 @@ gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *m
 
 	if (gtk_tree_model_get_iter(model, &iter, path))
 		{
-	    gtk_tree_model_get(model, &iter, COL_NAME, &name, -1);
+	    gtk_tree_model_get(model, &iter, SELECT_COL_NAME, &name, -1);
 	    if (!path_currently_selected)
 		    {
 		    for (i = 0; i < count; i++)
@@ -559,7 +639,7 @@ gboolean need_back_button(struct frontend *obj)
 GtkWidget* display_descriptions(struct question *q)
 {
     GtkWidget *description_view, *ext_description_view;
-    GtkWidget *returned_box;
+    GtkWidget *returned_box, *description_box, *icon_box, *icon_button;
     GtkTextBuffer *description_buffer, *ext_description_buffer;
 	GdkColor color;
 	GtkTextIter start, end;
@@ -568,7 +648,9 @@ GtkWidget* display_descriptions(struct question *q)
     color.green = BACKGROUND_GREEN;
     color.blue = BACKGROUND_BLUE;
 
-    returned_box = gtk_vbox_new (FALSE, 0);
+    description_box = gtk_vbox_new (FALSE, 0);
+    icon_box = gtk_vbox_new (FALSE, 0);
+	returned_box = gtk_hbox_new (FALSE, 0);
 
 	/* here is created the question's extended description, but only
 	 * if the question's extended description actually exists
@@ -593,7 +675,7 @@ GtkWidget* display_descriptions(struct question *q)
 		 */
 	    gtk_widget_modify_base(GTK_WIDGET(ext_description_view), GTK_STATE_NORMAL, &color);	
 
-		gtk_box_pack_start(GTK_BOX (returned_box), ext_description_view, FALSE, FALSE, 2);
+		gtk_box_pack_start(GTK_BOX (description_box), ext_description_view, FALSE, FALSE, 2);
 	}
 
 	/* here is created the question's description */
@@ -610,8 +692,22 @@ GtkWidget* display_descriptions(struct question *q)
 	gtk_text_buffer_apply_tag_by_name (description_buffer, "italic", &start, &end);
     gtk_widget_modify_base(GTK_WIDGET(description_view), GTK_STATE_NORMAL, &color);
 
-	gtk_box_pack_start(GTK_BOX (returned_box), description_view, FALSE, FALSE, 3);
+	gtk_box_pack_start(GTK_BOX (description_box), description_view, FALSE, FALSE, 3);
 
+	if( strcmp(q->template->type,"note") == 0 )
+		{
+		icon_button = gtk_image_new_from_file("/usr/share/graphics/note_icon.png");
+		gtk_box_pack_start(GTK_BOX (icon_box), icon_button, FALSE, FALSE, 3);		
+		gtk_box_pack_start(GTK_BOX (returned_box), icon_box, FALSE, FALSE, 3);
+		}
+	else if( strcmp(q->template->type,"error") == 0 )
+		{
+		icon_button = gtk_image_new_from_file("/usr/share/graphics/warning_icon.png");
+		gtk_box_pack_start(GTK_BOX (icon_box), icon_button, FALSE, FALSE, 3);		
+		gtk_box_pack_start(GTK_BOX (returned_box), icon_box, FALSE, FALSE, 3);
+		}
+
+	gtk_box_pack_start(GTK_BOX (returned_box), description_box, TRUE, TRUE, 3);
 	return returned_box;
 }
 
@@ -655,7 +751,114 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
     return DC_OK;
 }
 
-static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkWidget *qbox)
+static int gtkhandler_multiselect_single(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+    GtkWidget *description_box, *hpadbox, *vpadbox;
+    char **choices, **choices_translated, **defvals;
+    int i, j, count, defcount;
+    struct question_treemodel_data *data;
+    int *tindex = NULL;
+    const gchar *indices = q_get_indices(q);
+
+	GtkTreeModel        *model;
+	GtkListStore  		*store;
+	GtkTreeIter    		iter;
+	GtkWidget           *view, *scroll, *frame;
+	GtkCellRenderer     *renderer, *renderer_check;
+	GtkTreeSelection 	*selection;
+
+    count = strgetargc(q_get_choices_vals(q));
+    if (count <= 0)
+        return DC_NOTOK;
+
+    choices = malloc(sizeof(char *) * count);
+    choices_translated = malloc(sizeof(char *) * count);
+    tindex = malloc(sizeof(int) * count);
+    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+        return DC_NOTOK;
+
+    defvals = malloc(sizeof(char *) * count);
+
+    defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
+
+    if (defcount < 0)
+        return DC_NOTOK;
+
+
+	view = gtk_tree_view_new ();
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
+	gtk_tree_view_set_headers_visible ( GTK_TREE_VIEW (view), FALSE);
+
+	store = gtk_list_store_new (MULTISELECT_NUM_COLS, G_TYPE_INT, G_TYPE_STRING );
+
+	renderer_check = gtk_cell_renderer_toggle_new();
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view), -1, NULL, renderer_check, "active", MULTISELECT_COL_BOOL, NULL);
+
+	renderer = gtk_cell_renderer_text_new ();
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, NULL, renderer, "text", MULTISELECT_COL_NAME, NULL);
+
+	model = GTK_TREE_MODEL( store );
+	gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
+    data = NEW(struct question_treemodel_data);
+    data->q = q;
+    data->treemodel = model;
+	g_signal_connect(G_OBJECT(renderer_check), "toggled", G_CALLBACK(multiselect_single_callback), data);   
+	g_object_unref (model);
+
+    for (i = 0; i < count; i++) 
+    {
+		gtk_list_store_append (store, &iter);
+
+		if (defcount == 0)
+			gtk_list_store_set (store, &iter, MULTISELECT_COL_BOOL, FALSE, MULTISELECT_COL_NAME, choices_translated[i],  -1);
+
+        else 
+        {	
+        	for (j = 0; j < defcount; j++)
+	        {
+	            if (strcmp(choices[tindex[i]], defvals[j]) == 0)
+	                {
+					gtk_list_store_set (store, &iter, MULTISELECT_COL_BOOL, TRUE, MULTISELECT_COL_NAME, choices_translated[i],  -1);
+					break;
+	                }
+	            else
+	            	{
+					gtk_list_store_set (store, &iter, MULTISELECT_COL_BOOL, FALSE, MULTISELECT_COL_NAME, choices_translated[i],  -1);
+	            	}
+	        }
+		}
+        free(choices[tindex[i]]);
+        free(choices_translated[i]);
+    }
+
+    free(choices);
+    free(choices_translated);
+    free(tindex);
+    for (j = 0; j < defcount; j++)
+        free(defvals[j]);
+    free(defvals);
+
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+	gtk_container_add(GTK_CONTAINER(scroll), view);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll),
+                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+
+	description_box = display_descriptions(q);
+
+	vpadbox = gtk_vbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
+	frame = gtk_frame_new(NULL);
+	gtk_container_add(GTK_CONTAINER(frame), scroll);
+	gtk_box_pack_start (GTK_BOX(vpadbox), frame, TRUE, TRUE, 0);
+
+	hpadbox = gtk_hbox_new (FALSE, 5);
+	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+
+    return DC_OK;
+}
+
+static int gtkhandler_multiselect_multiple(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
     GtkWidget *description_box, *check_container, *check, *hpadbox, *vpadbox;
     char **choices, **choices_translated, **defvals;
@@ -734,6 +937,16 @@ static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkW
     register_setter(multi_setter, check_container, q, obj);
 
     return DC_OK;
+}
+
+
+static int gtkhandler_multiselect(struct frontend *obj, struct question *q, GtkWidget *qbox)
+{
+
+    if (q->prev == NULL && q->next == NULL)
+	   	return gtkhandler_multiselect_single(obj, q, qbox);
+    else
+		return gtkhandler_multiselect_multiple(obj, q, qbox);
 }
 
 static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *qbox)
@@ -901,8 +1114,8 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
 	gtk_tree_view_set_headers_visible ( GTK_TREE_VIEW (view), FALSE);
     
 	renderer = gtk_cell_renderer_text_new ();
-	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", COL_NAME, NULL);	
-	store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", SELECT_COL_NAME, NULL);	
+	store = gtk_list_store_new (SELECT_NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
 	gtk_tree_view_set_enable_search (GTK_TREE_VIEW(view), TRUE);
@@ -914,7 +1127,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     for (i = 0; i < count; i++)
     {
 		gtk_list_store_append (store, &iter);
-		gtk_list_store_set (store, &iter, COL_NAME, choices_translated[i], -1);
+		gtk_list_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
         if (defval && strcmp(choices[tindex[i]], defval) == 0)
         {
         	/* gtk_tree_view_scroll_to_cell() works only with GTKDFB 2.7/2.8
@@ -991,8 +1204,8 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
 	gtk_tree_view_set_headers_visible ( GTK_TREE_VIEW (view), FALSE);
     
 	renderer = gtk_cell_renderer_text_new ();
-	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", COL_NAME, NULL);
-	store = gtk_tree_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
+	gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", SELECT_COL_NAME, NULL);
+	store = gtk_tree_store_new (SELECT_NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
 
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
@@ -1003,24 +1216,52 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
 
     for (i = 0; i < count; i++)
     {
-    	if( ((choices_translated[i][0]=='-') && (choices_translated[i][1]=='-')) )
-    	{	/* father */
-			gtk_tree_store_append (store, &iter,NULL);
-			gtk_tree_store_set (store, &iter, COL_NAME, choices_translated[i], -1);
-		}
-		else
-		{	/* child */
-			gtk_tree_store_append (store, &child, &iter);
-			gtk_tree_store_set (store, &child, COL_NAME, choices_translated[i], -1);
+    
+    	if(strcmp(q->tag, "countrychooser/country-name") == 0 )
+    	{
+	    	if( ((choices_translated[i][0]=='-') && (choices_translated[i][1]=='-')) )
+	    	{	/* father */
+				gtk_tree_store_append (store, &iter,NULL);
+				gtk_tree_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
+			}
+			else
+			{	/* child */
+				gtk_tree_store_append (store, &child, &iter);
+				gtk_tree_store_set (store, &child, SELECT_COL_NAME, choices_translated[i], -1);
 
-	        if (defval && strcmp(choices[tindex[i]], defval) == 0)
-	        {
-		        gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&child), NULL, FALSE, 0.5, 0);
-		        gtk_tree_view_expand_row (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&iter), TRUE);                  
-				gtk_tree_selection_select_iter  (selection, &child );
-	        }
+		        if (defval && strcmp(choices[tindex[i]], defval) == 0)
+		        {
+			        gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&child), NULL, FALSE, 0.5, 0);
+			        gtk_tree_view_expand_row (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&iter), TRUE);                  
+					gtk_tree_selection_select_iter  (selection, &child );
+		        }
+			}
 		}
+		else if(strcmp(q->tag, "partman/choose_partition") == 0 )
+    	{
+			if( strstr(choices_translated[i],"    ")!=NULL )
+			{	/* child */
+				gtk_tree_store_append (store, &child, &iter);
+				gtk_tree_store_set (store, &child, SELECT_COL_NAME, choices_translated[i], -1);
 
+		        if (defval && strcmp(choices[tindex[i]], defval) == 0)
+		        {
+			        gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&child), NULL, FALSE, 0.5, 0);
+					gtk_tree_selection_select_iter (selection, &child );
+		        }
+		        gtk_tree_view_expand_row (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&iter), TRUE);
+			}
+			else
+			{	/* father */
+				gtk_tree_store_append (store, &iter,NULL);
+				gtk_tree_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
+				if (defval && strcmp(choices[tindex[i]], defval) == 0)
+		        {
+			        gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model,&iter), NULL, FALSE, 0.5, 0);
+					gtk_tree_selection_select_iter (selection, &iter );
+		        }
+			}
+    	}
         free(choices[tindex[i]]);
     }
     
@@ -1121,7 +1362,7 @@ static int gtkhandler_select(struct frontend *obj, struct question *q, GtkWidget
 
     if (q->prev == NULL && q->next == NULL)
     {
-		if (strcmp(q->tag, "countrychooser/country-name") == 0)
+		if ( (strcmp(q->tag, "countrychooser/country-name") == 0) || (strcmp(q->tag, "partman/choose_partition") == 0) )
 			return gtkhandler_select_treeview_store(obj, q, qbox);
 		else
         	return gtkhandler_select_treeview_list(obj, q, qbox);
@@ -1244,6 +1485,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     /* Here are the back and forward buttons */
     actionbox = gtk_hbutton_box_new();
     gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END); 
+    gtk_box_set_spacing (GTK_BOX(actionbox), 6);
 
     button_prev = gtk_button_new_from_stock (GTK_STOCK_GO_BACK);
     ret_val = NEW(int);
@@ -1323,8 +1565,8 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     /* Final packaging */
    	gtk_box_pack_start(GTK_BOX (mainbox), v_title_box, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX (mainbox), targetbox, TRUE, TRUE, 5);	
-    gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_box, FALSE, FALSE, 5);
     gtk_box_pack_end (GTK_BOX(mainbox), actionbox, FALSE, FALSE, 5);
+    gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_box, FALSE, FALSE, 5);
     globalbox = gtk_hbox_new (TRUE, 10);
 	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
     	gtk_box_pack_start(GTK_BOX (globalbox), menubox_vpad, TRUE, TRUE, 5);
@@ -1517,7 +1759,7 @@ static int gtk_go(struct frontend *obj)
 	 * togheter (whose handling wigets haven't native scrolling capabilities)
 	 * is to pack them all inside a viewport
 	 */
-	if ( (obj->questions->next==NULL && obj->questions->prev==NULL) && (strcmp(obj->questions->template->type,"multiselect")!=0) )
+	if ( (obj->questions->next==NULL && obj->questions->prev==NULL) )
 	{
     	gtk_box_pack_start(GTK_BOX(data->target_box), questionbox, TRUE, TRUE, 0);
     }
@@ -1619,7 +1861,7 @@ static int gtk_go(struct frontend *obj)
 
     di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
 
-	if ( (obj->questions->next==NULL && obj->questions->prev==NULL) && (strcmp(obj->questions->template->type,"multiselect")!=0) )
+	if ( (obj->questions->next==NULL && obj->questions->prev==NULL) )
 		gtk_widget_destroy(questionbox);
 	else
     	gtk_widget_destroy(questionbox_scroll);
@@ -1687,21 +1929,16 @@ static void display_main_menu_while_progressbar_runs(struct frontend *obj)
 
 static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
-    GtkWidget *progress_bar, *progress_bar_label;
-	char *progress_bar_label_string;
+    GtkWidget *progress_bar;
 
 	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
 		display_main_menu_while_progressbar_runs(obj);
-    
-    progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
-	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);
-    progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
+
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
-    progress_bar_label_string = malloc(strlen(obj->progress_title) + 18 );
-	sprintf(progress_bar_label_string,"<b><i>%s...</i></b>",obj->progress_title);
-	gtk_label_set_markup(GTK_LABEL(progress_bar_label), progress_bar_label_string);
-	free(progress_bar_label_string);
+    progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
+	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);      
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), obj->progress_title);
     
     obj->progress_min = min;
     obj->progress_max = max;
@@ -1740,17 +1977,22 @@ static void gtk_progress_set(struct frontend *obj, int val)
 
 static void gtk_progress_info(struct frontend *obj, const char *info)
 {
-    GtkWidget *progress_bar;
+    GtkWidget *progress_bar, *progress_bar_label;
+	char *progress_bar_label_string;
 
 	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
 		display_main_menu_while_progressbar_runs(obj);
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info);
-
+    
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
 	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);
-      
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), info);
+    progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
+    progress_bar_label_string = malloc(strlen(info) + 18 );
+	sprintf(progress_bar_label_string,"<b><i>%s...</i></b>",info);
+	gtk_label_set_markup(GTK_LABEL(progress_bar_label), progress_bar_label_string);
+	free(progress_bar_label_string);
+
    
     while (gtk_events_pending ())
         gtk_main_iteration ();
