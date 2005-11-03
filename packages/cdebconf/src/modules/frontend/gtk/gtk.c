@@ -62,11 +62,19 @@
 #include <gtk/gtk.h>
 
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
+/* used to define horizontal and vertical padding of progressbar */
+#define PROGRESSBAR_HPADDING 60
+#define PROGRESSBAR_VPADDING 60
+
 /* used to set internal horizontal padding between a question and questionbox frame */
 #define QUESTIONBOX_HPADDING 6
 /* used to set vertical padding between two adjacent questions inside questionbox */
 #define QUESTIONBOX_VPADDING 3
 
+#define DEFAULT_PADDING 6
 
 /* standard gtkdfb 2.0.9 background color is d6d7d6 */
 #define BACKGROUND_RED  0xd600
@@ -124,47 +132,6 @@ void register_setter(void (*func)(void*, struct question*),
 void free_description_data( GtkObject *obj, struct frontend_question_data* data )
 {
     free(data);
-}
-
-/* If the user decides to "jump" we should always give him a first chance to
- * go back, to jump saving the data he entered or to jump discarding changes;
- * actually the first option is still unimplemented because i don't know how
- * to properly SETUP the signal handling needed to close the dialog window
- * without quitting the gtk_main()
-*/
-gboolean jump_confirmation (GtkWidget *widget, struct frontend_question_data* data)
-{
-    struct question *q;
-    struct frontend *obj;
-
-    GtkWidget *main_window;
-    GtkWidget *dialog, *label;
-    gint result;
-  
-    obj = data->obj;
-    q = data->q;
-
-    main_window = ((struct frontend_data*) obj->data)->window;
-
-    dialog = gtk_dialog_new_with_buttons ("My dialog",
-                                          GTK_WINDOW(main_window),
-                                          GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                          GTK_STOCK_OK,
-                                          GTK_RESPONSE_ACCEPT,
-                                          GTK_STOCK_NO,
-                                          GTK_RESPONSE_NO,
-                                          /* GTK_STOCK_CANCEL, */
-                                          /* GTK_RESPONSE_REJECT, */
-                                          NULL);
-
-	/* TODO: The following string should be more explicative and should be localized too */
-    label = gtk_label_new ("Do you want to save your changes before jumping?");
-    gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
-    gtk_widget_show_all (dialog);
-    result = gtk_dialog_run ( GTK_DIALOG(dialog) );
-    gtk_widget_destroy (dialog);
-
-    return result;
 }
 
 gboolean is_first_question (struct question *q)
@@ -441,114 +408,6 @@ void exit_button_callback(GtkWidget *button, struct frontend* obj)
     gtk_main_quit();
 }
 
-
-/* this callback function is called by gtkhandler_select_single_jump() only
- * and schedules the jump by copying in fe_data->jump_target the tag
- * of the question the user wants to jump to
- */
-void jump_callback(GtkWidget *button, struct frontend_question_data* data)
-{
-    struct frontend *obj = data->obj;
-    struct frontend_data *fe_data = obj->data;
-    struct question *q = data->q;
-    char **choices, **choices_translated;
-    int i, count;
-    int *tindex = NULL;
-    const gchar *indices = q_get_indices(q);
-    gint ret_val = GTK_RESPONSE_NONE;
-
-    count = strgetargc(q_get_choices_vals(q));
-    if (count <= 0)
-        return /* DC_NOTOK */;
-    choices = malloc(sizeof(char *) * count);
-    choices_translated = malloc(sizeof(char *) * count);
-    tindex = malloc(sizeof(int) * count);
-
-    INFO(INFO_DEBUG, "GTK_DI - button_single_callback(%s) called",
-         gtk_button_get_label(GTK_BUTTON(button)));
-
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
-        return /* DC_NOTOK */;
-    for (i = 0; i < count; i++)
-    {
-        if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0) 
-        {	
-            if( fe_data->ask_jump_confirmation == FALSE )
-        	{
-        		/* If the user jumps without having touched any widget there is no
-        		 * need to ask him if he wants to save the changes he made.
-        		 * This includes the case of a single note or text question, where
-        		 * the user can do no modifications.
-        		 */
-        		ret_val=GTK_RESPONSE_NO;
-        	}
-        	else if( strcmp(data->obj->questions->tag,"languagechooser/language-name")==0 )
-        	{
-        		/* This is just a temporary workaround to prevent the debian-installer from
-        		 * crashing when performing inter-language jumps.
-        		 */
-        		ret_val=GTK_RESPONSE_NO;
-				INFO(INFO_DEBUG, "GTK_DI - jump workaround to the inter language jump bug occourred" );
-        	}
-        	else
-        		{
-	            ret_val=jump_confirmation ( button, data);
-	            /* INFO(INFO_DEBUG, "GTK_DI - jump confirmation return value: %d", ret_val); */
-	            }
-            switch (ret_val)
-            {
-                case GTK_RESPONSE_ACCEPT:
-                    /* the user wants to save the changes made up to that
-                     * point and then do the jump
-                     */ 
-                    strcpy(fe_data->jump_target,choices[tindex[i]]);
-                    ((struct frontend_data*)obj->data)->button_val = DC_OK;
-                    INFO(INFO_DEBUG, "GTK_DI - jump programmed, modifications confirmed, target: \"%s\"", fe_data->jump_target);
-                    break;
-
-                case GTK_RESPONSE_NO:
-                    /* the user wants to forget the changes made up to that
-                     * point and then do the jump
-                     */ 
-                    strcpy(fe_data->jump_target,choices[tindex[i]]);
-                    ((struct frontend_data*)obj->data)->button_val = DC_GOBACK;
-                    INFO(INFO_DEBUG, "GTK_DI - jump programmed, modifications canceled, target: \"%s\"", fe_data->jump_target);
-                    break;
-
-                default:
-                    /* The user changed his mind and wants to cancel the jump. 
-                     * This is also the case GTK_RESPONSE_REJECT but until
-                     * the "cancel the jump" option works program control will
-                     * never reach this point
-                     */
-                    INFO(INFO_DEBUG, "GTK_DI - jump canceled");
-                    break;
-            }
-        }
-        free(choices[tindex[i]]);
-        free(choices_translated[i]);
-    }
-
-    free(choices);
-    free(choices_translated);
-    free(tindex);
-    free(data);
-   
-    if( (ret_val==GTK_RESPONSE_ACCEPT) | (ret_val==GTK_RESPONSE_NO) )
-        gtk_main_quit();
-}
-
-/* signals the need to ask the user if he wants to save changes before jumping */
-void enable_jump_confirmation_callback(GtkWidget *widget, struct frontend_question_data* data)
-{
-	struct frontend *obj;
-	struct frontend_data *fe_data;
-	obj=data->obj;
-	fe_data=obj->data;
-	fe_data->ask_jump_confirmation = TRUE;
-	
-}
-
 gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *model, GtkTreePath *path, gboolean path_currently_selected, struct frontend_question_data *data)
 {
     struct question *q = data->q;
@@ -560,8 +419,6 @@ gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *m
 	GtkTreeIter iter;
 	
 	INFO(INFO_DEBUG, "GTK_DI - gboolean select_treeview_callback() called");
-
-	enable_jump_confirmation_callback(NULL, data);
 
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
@@ -738,10 +595,10 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
 
 	description_box = display_descriptions(q);
 
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), check, FALSE, FALSE, 0);
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
@@ -845,13 +702,13 @@ static int gtkhandler_multiselect_single(struct frontend *obj, struct question *
 
 	description_box = display_descriptions(q);
 
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	frame = gtk_frame_new(NULL);
 	gtk_container_add(GTK_CONTAINER(frame), scroll);
 	gtk_box_pack_start (GTK_BOX(vpadbox), frame, TRUE, TRUE, 0);
 
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
@@ -927,10 +784,10 @@ static int gtkhandler_multiselect_multiple(struct frontend *obj, struct question
 
 	description_box = display_descriptions(q);
 	
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, TRUE, TRUE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), check_container, TRUE, TRUE, 0);
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
@@ -957,9 +814,9 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 
 	description_box = display_descriptions(q);
 	
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 	
@@ -993,10 +850,10 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
 
 	description_box = display_descriptions(q);
 		
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), entry, FALSE, FALSE, 0);
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 	
@@ -1004,76 +861,6 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
 
     if (is_first_question(q))
 		gtk_widget_grab_focus(entry);
-
-    return DC_OK;
-}
-
-/* This functions diplays the main menu, if enabled, in the left part of the screen.
- * Input parameters
- * bool sensitive_buttons : makes the buttons sensitive/unsensitive
- * bool enable_jumping : indicates the appropriate callback function 
- */
-static int gtkhandler_main_menu(struct frontend *obj, struct question *q, GtkWidget *qbox, bool sensitive_buttons, bool jump_enabled)
-{
-    GtkWidget *label, *button, *button_box;
-    char **choices, **choices_translated, *label_string;
-    int i, count;
-    struct frontend_question_data *data;
-    const char *defval = question_getvalue(q, "");
-    int *tindex = NULL;
-    const gchar *indices = q_get_indices(q);
-
-	INFO(INFO_DEBUG, "GTK_DI - gtkhandler_main_menu() called");
-
-    data = NEW(struct frontend_question_data);
-    data->obj = obj;
-    data->q = q;
-
-    count = strgetargc(q_get_choices_vals(q));
-    if (count <= 0)
-        return DC_NOTOK;
-    choices = malloc(sizeof(char *) * count);
-    choices_translated = malloc(sizeof(char *) * count);
-    tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
-        return DC_NOTOK;
-
-    label = gtk_label_new("");
-	label_string = malloc(strlen(q_get_description(q)) + 8 );
-	sprintf(label_string,"<b>%s</b>",q_get_description(q));
-	gtk_label_set_markup(GTK_LABEL(label), label_string);
-    gtk_box_pack_start(GTK_BOX(qbox), label, FALSE, FALSE, 5);
-
-    button_box = gtk_vbutton_box_new();
-    gtk_vbutton_box_set_layout_default(GTK_BUTTONBOX_SPREAD);
-    gtk_box_pack_start(GTK_BOX(qbox), button_box, FALSE, FALSE, 0);
-
-    for (i = 0; i < count; i++)
-    {
-        button = gtk_button_new_with_label(choices_translated[i]);
-        gtk_object_set_user_data(GTK_OBJECT(button), choices[tindex[i]]);
-
-        if (sensitive_buttons == FALSE)
-	        gtk_widget_set_sensitive( GTK_WIDGET(button), FALSE );
-
-        if (jump_enabled == TRUE)
-	        g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (jump_callback), data);
-	    else
-   	        g_signal_connect (G_OBJECT(button), "clicked", G_CALLBACK (button_single_callback), data);
-
-        gtk_box_pack_start(GTK_BOX(button_box), button, FALSE, FALSE, 5);
-        if (defval && strcmp(choices[tindex[i]], defval) == 0)
-        {
-            GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-            gtk_widget_grab_focus(button);
-            gtk_widget_grab_default(button);
-        }
-        free(choices[tindex[i]]);
-    }
-    free(choices);
-    free(choices_translated);
-    free(tindex);
-	free(label_string);
 
     return DC_OK;
 }
@@ -1150,12 +937,12 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
 
 	description_box = display_descriptions(q);
 
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	frame = gtk_frame_new(NULL);
 	gtk_container_add(GTK_CONTAINER(frame), scroll);
 	gtk_box_pack_start (GTK_BOX(vpadbox), frame, TRUE, TRUE, 0);
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
@@ -1276,12 +1063,12 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
 
 	description_box = display_descriptions(q);
 
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	frame = gtk_frame_new(NULL);
 	gtk_container_add(GTK_CONTAINER(frame), scroll);
 	gtk_box_pack_start (GTK_BOX(vpadbox), frame, TRUE, TRUE, 0);
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
@@ -1346,10 +1133,10 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 
 	description_box = display_descriptions(q);
 	
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), combo, FALSE, FALSE, 0);
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
     register_setter(combo_setter, GTK_COMBO(combo)->entry, q, obj);
@@ -1395,10 +1182,10 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
 
 	description_box = display_descriptions(q);
 	
-	vpadbox = gtk_vbox_new (FALSE, 5);
+	vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	gtk_box_pack_start (GTK_BOX(vpadbox), entry, FALSE, FALSE, 0);
-	hpadbox = gtk_hbox_new (FALSE, 5);
+	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
@@ -1429,7 +1216,7 @@ struct question_handlers {
 
 void set_window_properties(GtkWidget *window)
 {
-    gtk_widget_set_size_request (window, 800, 600);
+    gtk_widget_set_size_request (window, WINDOW_WIDTH, WINDOW_HEIGHT);
     gtk_window_set_resizable (GTK_WINDOW (window), TRUE);
     gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
     gtk_window_set_decorated (GTK_WINDOW (window), TRUE);
@@ -1437,46 +1224,24 @@ void set_window_properties(GtkWidget *window)
 
 void set_design_elements(struct frontend *obj, GtkWidget *window)
 {
-    /* a scheme of the hierarchy of boxes used to store widgets
 
-	0) Globalbox
-	1) Mainbox
-	2) menubox_vpad
-	3) menubox_scroll
-	9) menubox
-	4) targetbox
-	6) actionbox
-	8) progress_bar
-	
-	0_________________________
-	|  _____  |1 ___________  |
-	| |2___ | | |4          | |
-	| ||3_ || | |           | |
-	| |||9||| | |           | |
-	| ||| ||| | |___________| |	
-	| ||| ||| |  ___________  |
-	| ||| ||| | |6          | |	
-	| ||| ||| | |___________| |
-	| ||| ||| |               |
-	| |||_||| |               |	
-	| ||___|| |  ___________  |
-	| |_____| | |8__________| |	
-	|_________|_______________|		
-
-    */
-
-    GtkWidget *mainbox, *globalbox, *targetbox;
-    GtkWidget *menubox, *menubox_vpad, *menubox_scroll;
-    GtkWidget *actionbox;
+    GtkWidget *v_mainbox, *h_mainbox, *logobox, *targetbox, *actionbox;
     GtkWidget *button_next, *button_prev;
-    GtkWidget *progress_bar, *progress_bar_label, *progress_bar_box;
-	GtkWidget *logo_button, *logo_box;
-	GtkWidget *label_title, *h_title_box, *v_title_box;
+    GtkWidget *progress_bar, *progress_bar_label, *progress_bar_box, *h_progress_bar_box, *v_progress_bar_box;
+	GtkWidget *label_title, *h_title_box, *v_title_box, *logo_button;
     GList *focus_chain = NULL;	
     int *ret_val;
 
-    mainbox = gtk_vbox_new (FALSE, 10);
-    gtk_container_set_border_width (GTK_CONTAINER(mainbox), 5);
+	/* A logo is displayed in the upper area of the screen */
+	logo_button = gtk_image_new_from_file("/usr/share/graphics/logo_debian.png");
+
+	/* A label is used to display the fontend's title */
+    label_title = gtk_label_new(NULL);
+    ((struct frontend_data*) obj->data)->title = label_title;
+    h_title_box = gtk_hbox_new (TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (h_title_box), label_title, TRUE, TRUE, DEFAULT_PADDING);
+    v_title_box = gtk_vbox_new (TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (v_title_box), h_title_box, TRUE, TRUE, DEFAULT_PADDING);
 
     /* This is the box were question(s) will be displayed */
     targetbox = gtk_vbox_new (FALSE, 0);
@@ -1485,7 +1250,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     /* Here are the back and forward buttons */
     actionbox = gtk_hbutton_box_new();
     gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END); 
-    gtk_box_set_spacing (GTK_BOX(actionbox), 6);
+    gtk_box_set_spacing (GTK_BOX(actionbox), DEFAULT_PADDING);
 
     button_prev = gtk_button_new_from_stock (GTK_STOCK_GO_BACK);
     ret_val = NEW(int);
@@ -1493,7 +1258,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_object_set_user_data (GTK_OBJECT(button_prev), ret_val);
     g_signal_connect (G_OBJECT(button_prev), "clicked",
                       G_CALLBACK(exit_button_callback), obj);
-    gtk_box_pack_start (GTK_BOX(actionbox), button_prev, TRUE, TRUE, 2);
+    gtk_box_pack_start (GTK_BOX(actionbox), button_prev, TRUE, TRUE, DEFAULT_PADDING);
 
     button_next = gtk_button_new_from_stock (GTK_STOCK_GO_FORWARD);
     ret_val = NEW(int);
@@ -1501,7 +1266,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_object_set_user_data (GTK_OBJECT(button_next), ret_val);
     g_signal_connect (G_OBJECT(button_next), "clicked",
                       G_CALLBACK(exit_button_callback), obj);
-    gtk_box_pack_start (GTK_BOX(actionbox), button_next, TRUE, TRUE, 2);
+    gtk_box_pack_start (GTK_BOX(actionbox), button_next, TRUE, TRUE, DEFAULT_PADDING);
     GTK_WIDGET_SET_FLAGS (button_next, GTK_CAN_DEFAULT);
 
     ((struct frontend_data*) obj->data)->button_prev = button_prev;
@@ -1514,68 +1279,38 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     g_list_free (focus_chain);
 
     /* Here the the progressbar is placed */
-    obj->progress_title = NULL;
-    obj->progress_min = 0;
-    obj->progress_max = 100;
-    obj->progress_cur = 0;
     progress_bar = gtk_progress_bar_new ();
     ((struct frontend_data*)obj->data)->progress_bar = progress_bar;
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " ");
 	/* gtk_progress_bar_set_ellipsize() was introduced in GTK v 2.6.0
 	 * so this nice and useful function won't be usable while we're stuck
 	 * with GTKDFB 2.0.9
 	 */
     /* gtk_progress_bar_set_ellipsize (GTK_PROGRESS_BAR(progress_bar), PANGO_ELLIPSIZE_MIDDLE); */
-    
+	progress_bar_box = gtk_vbox_new (FALSE, 0);
+	v_progress_bar_box = gtk_vbox_new (FALSE, 0);
+	h_progress_bar_box = gtk_hbox_new (FALSE, 0);
     progress_bar_label = gtk_label_new("");
 	((struct frontend_data*)obj->data)->progress_bar_label = progress_bar_label;
 	gtk_misc_set_alignment(GTK_MISC(progress_bar_label), 0, 0);
-	progress_bar_box = gtk_vbox_new (FALSE, 0);
-	gtk_box_pack_start (GTK_BOX(progress_bar_box), progress_bar, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX(progress_bar_box), progress_bar_label, TRUE, TRUE, 0);    
-
-    /* This is where the main-menu will be displayed, in the left-area of
-     * the screen
-     */
-    if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
-	{
-		menubox_vpad = gtk_vbox_new (FALSE, 10);
-	    menubox = gtk_vbox_new (FALSE, 10);
-	    ((struct frontend_data*) obj->data)->menu_box = menubox;
-	    menubox_scroll = gtk_scrolled_window_new(NULL, NULL);
-	    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (menubox_scroll), menubox);
-	    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (menubox_scroll),
-	                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-		gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW (menubox_scroll), GTK_SHADOW_NONE);
-		gtk_box_pack_start(GTK_BOX (menubox_vpad), menubox_scroll, TRUE, TRUE, 10);		
-	}
-
-	/* A logo is displayed in the upper area of the screen */
-	logo_button = gtk_image_new_from_file("/usr/share/graphics/logo_debian.png");
-    logo_box = gtk_vbox_new (FALSE, 0);
-
-	/* A label is used to display the fontend's title */
-    label_title = gtk_label_new(NULL);
-    ((struct frontend_data*) obj->data)->title = label_title;
-    h_title_box = gtk_hbox_new (TRUE, 0);
-    gtk_box_pack_start(GTK_BOX (h_title_box), label_title, TRUE, TRUE, 5);
-    v_title_box = gtk_vbox_new (TRUE, 0);
-    gtk_box_pack_start(GTK_BOX (v_title_box), h_title_box, TRUE, TRUE, 5);
+	gtk_box_pack_start (GTK_BOX(progress_bar_box), progress_bar, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX(progress_bar_box), progress_bar_label, FALSE, FALSE, 0);    
+	gtk_box_pack_start (GTK_BOX(v_progress_bar_box), progress_bar_box, TRUE, TRUE, PROGRESSBAR_VPADDING);
+	gtk_box_pack_start (GTK_BOX(h_progress_bar_box), v_progress_bar_box, TRUE, TRUE, PROGRESSBAR_HPADDING);
+    ((struct frontend_data*)obj->data)->progress_bar_box = h_progress_bar_box;
 
     /* Final packaging */
-   	gtk_box_pack_start(GTK_BOX (mainbox), v_title_box, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX (mainbox), targetbox, TRUE, TRUE, 5);	
-    gtk_box_pack_end (GTK_BOX(mainbox), actionbox, FALSE, FALSE, 5);
-    gtk_box_pack_end(GTK_BOX (mainbox), progress_bar_box, FALSE, FALSE, 5);
-    globalbox = gtk_hbox_new (TRUE, 10);
-	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
-    	gtk_box_pack_start(GTK_BOX (globalbox), menubox_vpad, TRUE, TRUE, 5);
-    gtk_box_pack_start(GTK_BOX (globalbox), mainbox, TRUE, TRUE, 5);
-	gtk_box_pack_start(GTK_BOX (logo_box), logo_button, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX (logo_box), globalbox, TRUE, TRUE, 0);
-
-    gtk_container_add(GTK_CONTAINER(window), logo_box);
-
+    v_mainbox = gtk_vbox_new (FALSE, 0);
+    h_mainbox = gtk_hbox_new (FALSE, 0);
+    logobox = gtk_vbox_new (FALSE, 0);
+   	gtk_box_pack_start(GTK_BOX (v_mainbox), v_title_box, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (v_mainbox), h_progress_bar_box, FALSE, FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (v_mainbox), targetbox, TRUE, TRUE, DEFAULT_PADDING);	
+    gtk_box_pack_start(GTK_BOX (v_mainbox), actionbox, FALSE, FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (h_mainbox), v_mainbox, TRUE, TRUE, DEFAULT_PADDING);
+   	gtk_box_pack_start(GTK_BOX (logobox), logo_button, FALSE, FALSE, 0);
+   	gtk_box_pack_start(GTK_BOX (logobox), h_mainbox, TRUE, TRUE, 0);    
+    gtk_container_add(GTK_CONTAINER(window), logobox);
+	
 }
 
 static int gtk_initialize(struct frontend *obj, struct configuration *conf)
@@ -1600,30 +1335,12 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     fe_data->window = NULL;
     fe_data->title = NULL;
     fe_data->target_box = NULL;
-    fe_data->menu_box = NULL;
     fe_data->button_next = NULL;
     fe_data->button_prev = NULL;
     fe_data->progress_bar = NULL;
-    fe_data->progress_bar_menubox = NULL;
     fe_data->progress_bar_label = NULL;
     fe_data->setters = NULL;
     fe_data->button_val = DC_NOTOK;
-    fe_data->ask_jump_confirmation = FALSE;
-    *fe_data->jump_target = '\0';
-    fe_data->q_main = NULL;
-	
-	/* Set this to TRUE/FALSE to enable/disable the main-menu hack
-	 */
-	fe_data->main_menu_enabled = FALSE;
-
-    /* If fe_data->main_menu_enabled is set to TRUE, then this filed
-     * has to match the tag of the question that is used as main-menu.
-     * Set this to "debian-installer/main-menu" for use in the debian installer
-     * or "test/select" to use the frontend with the testscripts that come with 
-     * cdebconf sources.
-     */     
-	/* fe_data->main_menu_tag = strdup("test/select"); */
-	fe_data->main_menu_tag = strdup("debian-installer/main-menu");
 
     gtk_init (&args, &name);
 
@@ -1645,115 +1362,20 @@ static int gtk_go(struct frontend *obj)
 {
     struct frontend_data *data = (struct frontend_data *) obj->data;
     struct question *q = obj->questions;
-    GtkWidget *questionbox, *questionbox_scroll, *menubox;
+    GtkWidget *questionbox, *questionbox_scroll;
     /* GtkWidget *image_button_forward, *image_button_back; */
     di_slist *plugins;
     int i, j;
     int ret;;
 
-	/* Users's jumps do not need to be confirmated unless he has activated a widget */
-	data->ask_jump_confirmation = FALSE;
-	data->setters = NULL;
-
     if (q == NULL) return DC_OK;
 
-
-	if (((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
-	{
-	    /* The main-menu question is stored in a private area of the frontend,
-	     * so that it can be shown even if it's not passed to the frontend
-	     */
-	    if (strcmp(q->tag, data->main_menu_tag) == 0)
-	    {
-	        if (data->q_main)
-	            question_delete(data->q_main);
-	        data->q_main = question_dup(q);
-	        INFO(INFO_DEBUG, "GTK_DI - gtk_go() main question \"%s\" stored in memory", data->main_menu_tag);
-	    }
-
-	    /* this piece of code implements the "jump" mechanism: if the "jump_target"
-	     * string is not empty it means that a jump was previously programmed
-	     * to be executed: we must tell cdebconf to go back until we reach the main menu,
-	     * only then the "jump" can be performed
-	     */
-	    if (strcmp(data->jump_target, "") != 0)
-	    {
-	        if (strcmp(q->tag, data->main_menu_tag) == 0)
-	        {
-	            /* the d-i has eventually just told us to show the main menu: now
-	             * the jump can be executed (basically we simulate the users's click
-	             * on the programmed jump target)
-	             */
-	            INFO(INFO_DEBUG, "GTK_DI - gtk_go() jumping to \"%s\"", data->jump_target);
-	            q = obj->questions;
-	            question_setvalue(q, data->jump_target);
-	            obj->qdb->methods.set(obj->qdb, q);
-	            q->next=NULL;
-	            
-	            /* once the jump is set we must reset the "jump_target" string */
-	            strcpy(data->jump_target,"");
-
-	            data->button_val = DC_OK;
-
-	            return DC_OK;
-	        }
-	        else
-	        {
-	        	/* A jump is awaiting to be executed but the frontend was told to
-	        	 * display something other than the main-menu: we must tell cdebconf
-	        	 * to go back until it tells the frontend to display the main-menu:
-	        	 * only then the jump will be executed
-	        	 */
-	            data->button_val = DC_GOBACK;
-
-	            INFO(INFO_DEBUG, "GTK_DI - gtk_go() backing up to jump to \"%s\"", data->jump_target);
-
-	            return DC_GOBACK;
-	        }
-	    }
-
-
-		/* The dummy menubox should be destroyed by gtk_progressbar_stop() but
-		 * since sometimes this function is not called we make sure the dummy
-		 * menubox has been destroyed before displaying the real one
-		 */	
-		if(data->progress_bar_menubox != NULL)
-			{
-			gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox));
-			data->progress_bar_menubox = NULL;
-			}
-
-	    menubox = gtk_vbox_new(FALSE, 5);
-	    gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
-	    
-	    if (strcmp (q->tag, data->main_menu_tag) == 0)
-	    {
-	        /* the first question in the question list is the main menu, so we
-	         * simply handle it
-	         */
-	        ret = gtkhandler_main_menu(obj, q, menubox, TRUE, FALSE);
-	        q = q->next; 
-	    }
-	    else if (data->q_main)
-	    {
-	        /* the first question in the question list is not the main menu, so
-	         * we need to show it using the copy of the main menu stored
-	         * previously into memory.
-	         * If the first real question passed to the frontend doesn't alow to go
-	         * back we must prevent the user from jumping, since juping consists
-	         * of a sequence of "back" simulated commands
-	         */
-	        if ( obj->methods.can_go_back(obj, q) )
-		        ret = gtkhandler_main_menu(obj, data->q_main, menubox,TRUE ,TRUE);
-	      	else
-		        ret = gtkhandler_main_menu(obj, data->q_main, menubox,FALSE ,TRUE);
-	    }
-	}
+	data->setters = NULL;
 	
    	questionbox = gtk_vbox_new(FALSE, 0);
 
-	/* since all widgets used to display single questions (except MULTISELECT)
-	 * have native scrolling capabilities or do not need scrolling since they're
+	/* since all widgets used to display single questions have native
+	 * scrolling capabilities or do not need scrolling since they're
 	 * usually small they can manage scrolling be autonomously.
 	 * vice-versa the most simple approach when displaying multiple questions
 	 * togheter (whose handling wigets haven't native scrolling capabilities)
@@ -1770,7 +1392,7 @@ static int gtk_go(struct frontend *obj)
 	    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (questionbox_scroll),
 	                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 		gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (questionbox_scroll), GTK_SHADOW_NONE);
-		gtk_box_pack_start(GTK_BOX(data->target_box), questionbox_scroll, TRUE, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(data->target_box), questionbox_scroll, TRUE, TRUE, DEFAULT_PADDING);
     }
 
     /* now we can safely handle all other questions, if any */
@@ -1813,7 +1435,6 @@ static int gtk_go(struct frontend *obj)
                 break;
             }
         }
-
         q = q->next;
     }
 
@@ -1845,6 +1466,7 @@ static int gtk_go(struct frontend *obj)
 	gtk_widget_grab_default (GTK_WIDGET(data->button_next));
 
     gtk_widget_show_all(data->window);    
+    gtk_widget_hide(((struct frontend_data*)obj->data)->progress_bar_box) ;
    
     gtk_main();
 
@@ -1865,9 +1487,6 @@ static int gtk_go(struct frontend *obj)
 		gtk_widget_destroy(questionbox);
 	else
     	gtk_widget_destroy(questionbox_scroll);
-    	
-    if (((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
-    	gtk_widget_destroy(menubox);
 
 	gtk_widget_set_sensitive (data->button_prev, FALSE);
 	gtk_widget_set_sensitive (data->button_next, FALSE);
@@ -1900,46 +1519,19 @@ static bool gtk_can_go_back(struct frontend *obj, struct question *q)
     return (obj->capability & DCF_CAPB_BACKUP);
 }
 
-/* If the main_menu is enabled then it has to be displayed with unsensitive
- * buttons while the progressbar runs
- */
-static void display_main_menu_while_progressbar_runs(struct frontend *obj)
-{
-	struct frontend_data *data;
-	GtkWidget *menubox;
-	
-	data=obj->data;
-	/* before displaying a ghosted main menu we make sure another one
-	 * is not already displayed
-	 */
-	if( data->progress_bar_menubox != NULL ) return;
-    menubox = gtk_vbox_new(FALSE, 5);
-    data->progress_bar_menubox=menubox;
-    gtk_box_pack_start(GTK_BOX(data->menu_box), menubox, FALSE, FALSE, 5);
-    /* TODO: q_main isn't set if we're in a progress bar at high priority
-     * (i.e. main-menu not displayed) and no questions have been asked yet.
-     * We probably ought to do something sensible in that case, but I don't
-     * know what. Attilio, please investigate.
-     */
-    if (data->q_main)
-    	gtkhandler_main_menu(obj, data->q_main, menubox,FALSE ,FALSE);
-    	
-    gtk_widget_show_all(data->window);
-}
 
 static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
     GtkWidget *progress_bar;
 
-	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
-		display_main_menu_while_progressbar_runs(obj);
-
+    struct frontend_data *data = (struct frontend_data *) obj->data;
+	gtk_widget_show_all(data->window);    
+	
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
-    progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
-	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);      
+    progress_bar = ((struct frontend_data*)obj->data)->progress_bar;    
     gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), obj->progress_title);
-    
+	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0);    
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
@@ -1954,9 +1546,6 @@ static void gtk_progress_set(struct frontend *obj, int val)
 {
     gdouble progress;
     GtkWidget *progress_bar;
-
-	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
-		display_main_menu_while_progressbar_runs(obj);
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val);
 
@@ -1977,19 +1566,14 @@ static void gtk_progress_set(struct frontend *obj, int val)
 
 static void gtk_progress_info(struct frontend *obj, const char *info)
 {
-    GtkWidget *progress_bar, *progress_bar_label;
+    GtkWidget *progress_bar_label;
 	char *progress_bar_label_string;
-
-	if ( ((struct frontend_data*)obj->data)->main_menu_enabled == TRUE)
-		display_main_menu_while_progressbar_runs(obj);
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info);
     
-    progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
-	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);
     progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
-    progress_bar_label_string = malloc(strlen(info) + 18 );
-	sprintf(progress_bar_label_string,"<b><i>%s...</i></b>",info);
+    progress_bar_label_string = malloc(strlen(info) + 11 );
+	sprintf(progress_bar_label_string,"<i>%s...</i>",info);
 	gtk_label_set_markup(GTK_LABEL(progress_bar_label), progress_bar_label_string);
 	free(progress_bar_label_string);
 
@@ -2000,28 +1584,10 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 
 static void gtk_progress_stop(struct frontend *obj)
 {
-    GtkWidget *progress_bar, *progress_bar_label;
-
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_stop() called");
 
-    /* Altough logically correct, for cosmetic reasons it's better
-     * not to destroy the ghosted main menu until a question is
-     * asked to the user
-     */
-#if 0
-    gtk_widget_destroy(GTK_WIDGET(data->progress_bar_menubox));
-    data->progress_bar_menubox = NULL;
-#endif
+	gtk_widget_hide( ((struct frontend_data*)obj->data)->progress_bar_box );
     
-    progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
-    progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
-    
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), 0);
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), " " );
-    gtk_label_set_text(GTK_LABEL(progress_bar_label), " ");
-	gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), FALSE );
-   
-    gtk_widget_show_all(((struct frontend_data*)obj->data)->window);
     while (gtk_events_pending ())
         gtk_main_iteration ();
 }

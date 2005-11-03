@@ -30,8 +30,6 @@ struct frontend_data
   
   /* Pointer to the box, where question widgets shall be stored in */
   GtkWidget *target_box; 
-  /* Pointer to the box, where the main menu shall be stored in */
-  GtkWidget *menu_box;
 
   /* Buttons for the druid-like interface */
   GtkWidget *button_next;
@@ -40,38 +38,16 @@ struct frontend_data
   /* Pointer to the Progress Bar, when initialized */
   GtkWidget *progress_bar; 
   
-  /* Pointer to the box containing the dummy mainmenu, used by gtk_progress_stop()
-   * to destroy the box and the mainmenu packed inside
-   */
-  GtkWidget *progress_bar_menubox; 
-  
   /* Pointer to the progressbar's label */
   GtkWidget *progress_bar_label;
+
+  /* Pointer to the progressbar's container */
+  GtkWidget *progress_bar_box;
 
   /* Struct to register the Set Functions of the Widgets */
   struct setter_struct *setters; 
   /* Value of the button pressed to leave a form */
   int button_val;
-
-  /* If this is set to TRUE then the main-menu is always displayed in
-   * the left part of the screen
-   */
-  bool main_menu_enabled;
-
-  /* If main-menu_enabled==TRUE this string indicates the tag of 
-   * the SELECT question that has to be displayed as main-menu
-   */
-  char *main_menu_tag;
-
-  /* tells the jump mechanism if jump confirmation dialog has to be displayed */
-  bool ask_jump_confirmation;
-   
-  /*here a question tag is stored and represents the target for a jump*/     
-  char jump_target[40];
-
-  /*Here we store the main question to allow the jump mechanism*/
-  struct question *q_main;
-      
 };
 
 /* Embed frontend ans question in this object to pass it through an event handler */
