@@ -2,14 +2,14 @@
 kbdchooser=/usr/bin/kbd-chooser
 kbdmode=/usr/bin/kbd-mode
 
-set -e
+if [ "$TERM_TYPE" = virtual ]; then
+       # Set console mode to unicode, if necessary.
+       if [ -n "$TERM_UTF8" ] && [ -x $kbdmode ]; then
+               $kbdmode -u
+       fi
 
-# Set console mode to unicode
-if [ -x "$kbdmode" ] ; then
-	$kbdmode -u || true
-fi
-
-# Set the kbd early, if necessary
-if [ -x "$kbdchooser" -a "$bootkbd" ] ; then
-	$kbdchooser $bootkbd
+	# Set the kbd early, if necessary
+	if [ -n "$bootkbd" ] && [ -x $kbdchooser ]; then
+		$kbdchooser $bootkbd
+	fi
 fi
