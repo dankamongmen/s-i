@@ -1200,7 +1200,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
 	gtk_box_pack_start (GTK_BOX(vpadbox), entry, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
-	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, FALSE, FALSE, QUESTIONBOX_VPADDING);
 
     register_setter(entry_setter, entry, q, obj);
 
