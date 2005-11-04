@@ -1558,6 +1558,7 @@ static void gtk_progress_set(struct frontend *obj, int val)
 {
     gdouble progress;
     GtkWidget *progress_bar;
+    struct frontend_data *data = (struct frontend_data *) obj->data;
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val);
 
@@ -1572,6 +1573,8 @@ static void gtk_progress_set(struct frontend *obj, int val)
         gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), progress);
     }
 
+	gtk_widget_show_all(data->window);
+
     while (gtk_events_pending ())
         gtk_main_iteration ();
 }
@@ -1580,6 +1583,7 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 {
     GtkWidget *progress_bar_label;
 	char *progress_bar_label_string;
+    struct frontend_data *data = (struct frontend_data *) obj->data;
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info);
     
@@ -1589,6 +1593,7 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 	gtk_label_set_markup(GTK_LABEL(progress_bar_label), progress_bar_label_string);
 	free(progress_bar_label_string);
 
+	gtk_widget_show_all(data->window);    
    
     while (gtk_events_pending ())
         gtk_main_iteration ();
