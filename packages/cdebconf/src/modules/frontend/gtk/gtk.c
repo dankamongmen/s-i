@@ -531,8 +531,6 @@ GtkWidget* display_descriptions(struct question *q)
 		 * gtk_text_buffer_apply_tag_by_name (ext_description_buffer, "italic", &start, &end);
 		 */
 	    gtk_widget_modify_base(GTK_WIDGET(ext_description_view), GTK_STATE_NORMAL, &color);	
-
-		gtk_box_pack_start(GTK_BOX (description_box), ext_description_view, FALSE, FALSE, 2);
 	}
 
 	/* here is created the question's description */
@@ -549,7 +547,20 @@ GtkWidget* display_descriptions(struct question *q)
 	gtk_text_buffer_apply_tag_by_name (description_buffer, "italic", &start, &end);
     gtk_widget_modify_base(GTK_WIDGET(description_view), GTK_STATE_NORMAL, &color);
 
-	gtk_box_pack_start(GTK_BOX (description_box), description_view, FALSE, FALSE, 3);
+    gtk_container_set_focus_chain(GTK_CONTAINER(description_box), NULL);
+
+	if( (strcmp(q->template->type,"note") == 0) || (strcmp(q->template->type,"error") == 0))
+		{
+		gtk_box_pack_start(GTK_BOX (description_box), description_view, FALSE, FALSE, 3);
+		if (strlen (q_get_extended_description(q)) > 0)
+			gtk_box_pack_start(GTK_BOX (description_box), ext_description_view, FALSE, FALSE, 2);
+		}
+	else
+		{
+		if (strlen (q_get_extended_description(q)) > 0)
+			gtk_box_pack_start(GTK_BOX (description_box), ext_description_view, FALSE, FALSE, 2);
+		gtk_box_pack_start(GTK_BOX (description_box), description_view, FALSE, FALSE, 3);
+		}
 
 	if( strcmp(q->template->type,"note") == 0 )
 		{
@@ -600,7 +611,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
 	gtk_box_pack_start (GTK_BOX(vpadbox), check, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
-	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, FALSE, FALSE, QUESTIONBOX_VPADDING);
 
     if (is_first_question(q))
 		gtk_widget_grab_focus(check);
@@ -712,6 +723,8 @@ static int gtkhandler_multiselect_single(struct frontend *obj, struct question *
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);
 	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
 
+	gtk_widget_grab_focus(view);
+
     return DC_OK;
 }
 
@@ -789,7 +802,7 @@ static int gtkhandler_multiselect_multiple(struct frontend *obj, struct question
 	gtk_box_pack_start (GTK_BOX(vpadbox), check_container, TRUE, TRUE, 0);
 	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);
-	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, FALSE, FALSE, QUESTIONBOX_VPADDING);
 
     register_setter(multi_setter, check_container, q, obj);
 
@@ -818,7 +831,7 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 	gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
-	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, FALSE, FALSE, QUESTIONBOX_VPADDING);
 	
     return DC_OK;
 }
@@ -855,7 +868,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
 	gtk_box_pack_start (GTK_BOX(vpadbox), entry, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
-	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, FALSE, FALSE, QUESTIONBOX_VPADDING);
 	
     register_setter(entry_setter, entry, q, obj);
 
@@ -1138,7 +1151,7 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 	gtk_box_pack_start (GTK_BOX(vpadbox), combo, FALSE, FALSE, 0);
 	hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
 	gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);			
-	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, TRUE, TRUE, QUESTIONBOX_VPADDING);
+	gtk_box_pack_start(GTK_BOX(qbox), hpadbox, FALSE, FALSE, QUESTIONBOX_VPADDING);
     register_setter(combo_setter, GTK_COMBO(combo)->entry, q, obj);
 
     return DC_OK;
@@ -1310,7 +1323,6 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
    	gtk_box_pack_start(GTK_BOX (logobox), logo_button, FALSE, FALSE, 0);
    	gtk_box_pack_start(GTK_BOX (logobox), h_mainbox, TRUE, TRUE, 0);    
     gtk_container_add(GTK_CONTAINER(window), logobox);
-	
 }
 
 static int gtk_initialize(struct frontend *obj, struct configuration *conf)
