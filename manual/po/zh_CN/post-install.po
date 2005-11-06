@@ -456,14 +456,16 @@ msgstr "不要害怕尝试编译内核。它很有趣而且很合算。"
 
 #. Tag: para
 #: post-install.xml:328
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "To compile a kernel the Debian way, you need some packages: "
-"<classname>kernel-package</classname>, <classname>kernel-source-"
-"&kernelversion;</classname> (the most recent version at the time of this "
-"writing), <classname>fakeroot</classname> and a few others which are "
-"probably already installed (see <filename>/usr/share/doc/kernel-package/"
-"README.gz</filename> for the complete list)."
+"<classname>fakeroot</classname>, <classname>kernel-package</classname>, "
+"<phrase condition=\"classic-kpkg\"><classname>kernel-source-&kernelversion;</"
+"classname> (the most recent version at the time of this writing)</phrase> "
+"<phrase condition=\"common-kpkg\"><classname>linux-source-2.6</classname></"
+"phrase> and a few others which are probably already installed (see "
+"<filename>/usr/share/doc/kernel-package/README.gz</filename> for the "
+"complete list)."
 msgstr ""
 "为了以 Debian 的方式编译内核，您需要一些软件包： <classname>kernel-package</"
 "classname>，<classname>kernel-source-&kernelversion;</classname>(与此文档写作"
@@ -472,7 +474,7 @@ msgstr ""
 "filename> 以获得完整的列表)。"
 
 #. Tag: para
-#: post-install.xml:338
+#: post-install.xml:339
 #, no-c-format
 msgid ""
 "This method will make a .deb of your kernel source, and, if you have non-"
@@ -485,15 +487,16 @@ msgstr ""
 "filename> 目录将保存内核，System.map，以及当前编译的活动配置文件的日志。"
 
 #. Tag: para
-#: post-install.xml:346
-#, no-c-format
+#: post-install.xml:347
+#, fuzzy, no-c-format
 msgid ""
 "Note that you don't <emphasis>have</emphasis> to compile your kernel the "
 "<quote>Debian way</quote>; but we find that using the packaging system to "
 "manage your kernel is actually safer and easier. In fact, you can get your "
-"kernel sources right from Linus instead of <classname>kernel-source-"
-"&kernelversion;</classname>, yet still use the <classname>kernel-package</"
-"classname> compilation method."
+"kernel sources right from Linus instead of <phrase condition=\"classic-kpkg"
+"\"><classname>kernel-source-&kernelversion;</classname>,</phrase> <phrase "
+"condition=\"common-kpkg\"><classname>linux-source-2.6</classname>,</phrase> "
+"yet still use the <classname>kernel-package</classname> compilation method."
 msgstr ""
 "注意您不 <emphasis>需要</emphasis>编译内核以 <quote>Debian 方式</quote>；但我"
 "们发现使用软件包系统来管理您的内核确实可以更加安全和简单。事实上，您可以直接"
@@ -501,7 +504,7 @@ msgstr ""
 "内核源码，并仍然使用 <classname>kernel-package</classname> 的编译方法。"
 
 #. Tag: para
-#: post-install.xml:355
+#: post-install.xml:357
 #, no-c-format
 msgid ""
 "Note that you'll find complete documentation on using <classname>kernel-"
@@ -513,8 +516,8 @@ msgstr ""
 "入门指南。"
 
 #. Tag: para
-#: post-install.xml:362
-#, no-c-format
+#: post-install.xml:364
+#, fuzzy, no-c-format
 msgid ""
 "Hereafter, we'll assume you have free rein over your machine and will "
 "extract your kernel source to somewhere in your home directory<footnote> "
@@ -522,10 +525,13 @@ msgid ""
 "build your custom kernel, but this is easiest as it does not require special "
 "permissions. </para> </footnote>. We'll also assume that your kernel version "
 "is &kernelversion;. Make sure you are in the directory to where you want to "
-"unpack the kernel sources, extract them using <userinput>tar xjf /usr/src/"
-"kernel-source-&kernelversion;.tar.bz2</userinput> and change to the "
-"directory <filename>kernel-source-&kernelversion;</filename> that will have "
-"been created."
+"unpack the kernel sources, extract them using <userinput>tar xjf <phrase "
+"condition=\"classic-kpkg\">/usr/src/kernel-source-&kernelversion;.tar.bz2</"
+"phrase> <phrase condition=\"common-kpkg\">/usr/src/linux-source-"
+"&kernelversion;.tar.bz2</phrase></userinput> and change to the directory "
+"<phrase condition=\"classic-kpkg\"><filename>kernel-source-&kernelversion;</"
+"filename></phrase> <phrase condition=\"common-kpkg\"><filename>linux-source-"
+"&kernelversion;</filename></phrase> that will have been created."
 msgstr ""
 "此后，我们假设您具有操作您机器的权力，可以将内核源码解到您的 home 目录"
 "<footnote> <para> 可以在其他目录解开内核源码并 build 自定义内核，但是不需要额"
@@ -535,7 +541,7 @@ msgstr ""
 "<filename>kernel-source-&kernelversion;</filename> 刚才创建的目录。"
 
 #. Tag: para
-#: post-install.xml:382
+#: post-install.xml:387
 #, no-c-format
 msgid ""
 "Now, you can configure your kernel. Run <userinput>make xconfig</userinput> "
@@ -561,7 +567,7 @@ msgstr ""
 "quote> (它们默认并没有被选择)。否则，您的 Debian 安装将会遇到问题。"
 
 #. Tag: para
-#: post-install.xml:397
+#: post-install.xml:402
 #, no-c-format
 msgid ""
 "Clean the source tree and reset the <classname>kernel-package</classname> "
@@ -571,7 +577,7 @@ msgstr ""
 "<userinput>make-kpkg clean</userinput>。"
 
 #. Tag: para
-#: post-install.xml:402
+#: post-install.xml:407
 #, no-c-format
 msgid ""
 "Now, compile the kernel: <userinput>fakeroot make-kpkg --revision=custom.1.0 "
@@ -588,7 +594,7 @@ msgstr ""
 "取决于您的机器的性能。"
 
 #. Tag: para
-#: post-install.xml:412
+#: post-install.xml:417
 #, no-c-format
 msgid ""
 "If you require PCMCIA support, you'll also need to install the "
@@ -605,7 +611,7 @@ msgstr ""
 "modules_image</userinput>。"
 
 #. Tag: para
-#: post-install.xml:421
+#: post-install.xml:426
 #, no-c-format
 msgid ""
 "Once the compilation is complete, you can install your custom kernel like "
@@ -639,7 +645,7 @@ msgstr ""
 "必须同时安装该软件包。"
 
 #. Tag: para
-#: post-install.xml:442
+#: post-install.xml:447
 #, no-c-format
 msgid ""
 "It is time to reboot the system: read carefully any warning that the above "
@@ -649,23 +655,26 @@ msgstr ""
 "<userinput>shutdown -r now</userinput>。"
 
 #. Tag: para
-#: post-install.xml:447
-#, no-c-format
+#: post-install.xml:452
+#, fuzzy, no-c-format
 msgid ""
-"For more information on <classname>kernel-package</classname>, read the fine "
-"documentation in <filename>/usr/share/doc/kernel-package</filename>."
+"<phrase condition=\"etch\">For more information on Debian kernels and kernel "
+"compilation, see the <ulink url=\"&url-kernel-handbook;\">Debian Linux "
+"Kernel Handbook</ulink>.</phrase> For more information on <classname>kernel-"
+"package</classname>, read the fine documentation in <filename>/usr/share/doc/"
+"kernel-package</filename>."
 msgstr ""
 "欲获得关于 <classname>kernel-package</classname> 的更多信息，请参阅 "
 "<filename>/usr/share/doc/kernel-package</filename>。"
 
 #. Tag: title
-#: post-install.xml:461
+#: post-install.xml:469
 #, no-c-format
 msgid "Recovering a Broken System"
 msgstr "修复损坏的系统"
 
 #. Tag: para
-#: post-install.xml:462
+#: post-install.xml:470
 #, no-c-format
 msgid ""
 "Sometimes, things go wrong, and the system you've carefully installed is no "
@@ -683,7 +692,7 @@ msgstr ""
 "用于此目的。"
 
 #. Tag: para
-#: post-install.xml:472
+#: post-install.xml:480
 #, no-c-format
 msgid ""
 "To access rescue mode, type <userinput>rescue</userinput> at the "
@@ -706,7 +715,7 @@ msgstr ""
 "硬盘，网络设备等等可以使用。"
 
 #. Tag: para
-#: post-install.xml:487
+#: post-install.xml:495
 #, no-c-format
 msgid ""
 "Instead of the partitioning tool, you should now be presented with a list of "
@@ -720,7 +729,7 @@ msgstr ""
 "您也可以选择 RAID 和 LVM 设备上的分区，与直接在磁盘上创建一样。"
 
 #. Tag: para
-#: post-install.xml:495
+#: post-install.xml:503
 #, no-c-format
 msgid ""
 "If possible, the installer will now present you with a shell prompt in the "
@@ -737,7 +746,7 @@ msgstr ""
 "您可以通过输入这个命令 <userinput>grub-install '(hd0)'</userinput>。</phrase>"
 
 #. Tag: para
-#: post-install.xml:507
+#: post-install.xml:515
 #, no-c-format
 msgid ""
 "If the installer cannot run a usable shell in the root file system you "
@@ -755,13 +764,13 @@ msgstr ""
 "filename> 目录。"
 
 #. Tag: para
-#: post-install.xml:516
+#: post-install.xml:524
 #, no-c-format
 msgid "In either case, after you exit the shell, the system will reboot."
 msgstr "无论哪种情况，退出 shell 之后，系统将重启。"
 
 #. Tag: para
-#: post-install.xml:520
+#: post-install.xml:528
 #, no-c-format
 msgid ""
 "Finally, note that repairing broken systems can be difficult, and this "
