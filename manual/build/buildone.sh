@@ -67,7 +67,7 @@ create_profiled () {
     . arch-options/$arch
 
     # Join all architecture options into one big variable
-    condition="$fdisk;$network;$boot;$smp;$other;$goodies;$unofficial_build;$status;$manual_release"
+    condition="$kernelpackage;$fdisk;$network;$boot;$smp;$other;$goodies;$unofficial_build;$status;$manual_release"
     # Add build options for the manual
     condition="$condition;$unofficial_build;$status;$manual_release;$manual_target"
 

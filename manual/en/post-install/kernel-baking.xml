@@ -56,10 +56,11 @@ Don't be afraid to try compiling the kernel.  It's fun and profitable.
 </para><para>
 
 To compile a kernel the Debian way, you need some packages:
-<classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname> (the most recent version
-at the time of this writing), <classname>fakeroot</classname> and a
-few others which are probably already installed (see
+<classname>fakeroot</classname>, <classname>kernel-package</classname>,
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(the most recent version at the time of this writing)</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+and a few others which are probably already installed (see
 <filename>/usr/share/doc/kernel-package/README.gz</filename> for the
 complete list).
 
@@ -77,8 +78,9 @@ Note that you don't <emphasis>have</emphasis> to compile your kernel
 the <quote>Debian way</quote>; but we find that using the packaging system
 to manage your kernel is actually safer and easier.  In fact, you can get
 your kernel sources right from Linus instead of
-<classname>kernel-source-&kernelversion;</classname>, yet still use the
-<classname>kernel-package</classname> compilation method.
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+yet still use the <classname>kernel-package</classname> compilation method.
 
 </para><para>
 
@@ -103,8 +105,11 @@ permissions.
 </footnote>. We'll also assume that your kernel version is
 &kernelversion;. Make sure you are in the directory to where you want to
 unpack the kernel sources, extract them using <userinput>tar xjf
-/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput> and change
-to the directory <filename>kernel-source-&kernelversion;</filename>
+<phrase condition="classic-kpkg">/usr/src/kernel-source-&kernelversion;.tar.bz2</phrase>
+<phrase condition="common-kpkg">/usr/src/linux-source-&kernelversion;.tar.bz2</phrase></userinput>
+and change to the directory
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
 that will have been created.
 
 </para><para>
@@ -174,6 +179,9 @@ above step may have produced, then <userinput>shutdown -r now</userinput>.
 
 </para><para>
 
+<phrase condition="etch">For more information on Debian kernels and kernel
+compilation, see the <ulink url="&url-kernel-handbook;">Debian Linux Kernel
+Handbook</ulink>.</phrase>
 For more information on <classname>kernel-package</classname>, read
 the fine documentation in <filename>/usr/share/doc/kernel-package</filename>.
 
