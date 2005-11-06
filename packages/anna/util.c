@@ -4,7 +4,7 @@
 int get_lowmem_level (void) {
 	int l;
 	l=open(LOWMEM_STATUS_FILE, O_RDONLY);
-	if (l) {
+	if (l != -1) {
 		char buf[2];
 		read(l, buf, 1);
 		close(l);
