@@ -1,4 +1,10 @@
+subarch="$(archdetect)"
+subarch="${subarch#*/}"
 if [ "$DEBIAN_FRONTEND" = gtk ] ; then
-    modprobe evdev
-    modprobe psmouse
+    case $subarch in
+	chrp|chrp_pegasos|chrp_rs6k|prep)
+	    modprobe evdev
+	    modprobe psmouse
+	;;
+    esac
 fi
