@@ -471,28 +471,6 @@ static GtkTextDirection get_text_direction(struct frontend *obj)
     return GTK_TEXT_DIR_LTR;
 }
 
-gboolean need_continue_button(struct frontend *obj)
-{
-    if (obj->questions->next == NULL)
-    {
-        if (strcmp(obj->questions->template->type, "boolean") == 0)
-            return FALSE;
-        else if (strcmp(obj->questions->template->type, "select") == 0)
-            return FALSE;
-    }
-    return TRUE;
-}
-
-gboolean need_back_button(struct frontend *obj)
-{
-    if (obj->questions->next == NULL)
-    {
-        if (strcmp(obj->questions->template->type, "boolean") == 0)
-            return FALSE;
-    }
-    return TRUE;
-}
-
 GtkWidget* display_descriptions(struct question *q)
 {
     GtkWidget *description_view, *ext_description_view;
