@@ -21,5 +21,9 @@ ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
    files += \
 	S61mouse-support-x86
 endif
+ifneq (,$(filter powerpc,$(DEB_HOST_ARCH_CPU)))
+   files += \
+	S61mouse-support-powerpc
+endif
 
 include ../../../Makefile.inc
