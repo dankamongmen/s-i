@@ -633,7 +633,7 @@ static int gtkhandler_multiselect_single(struct frontend *obj, struct question *
     GtkTreeIter          iter;
     GtkWidget           *view, *scroll, *frame;
     GtkCellRenderer     *renderer, *renderer_check;
-	GtkTreePath 		*path;
+    GtkTreePath         *path;
 
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
@@ -695,11 +695,11 @@ static int gtkhandler_multiselect_single(struct frontend *obj, struct question *
         }
         
 		/* by default the first row gets selected if no default option is specified */
-		gtk_tree_model_get_iter_first (model,&iter);
-		path = gtk_tree_model_get_path (model, &iter);
-		gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, MULTISELECT_COL_BOOL, FALSE);
-		gtk_tree_path_free (path);
-        
+        gtk_tree_model_get_iter_first (model,&iter);
+        path = gtk_tree_model_get_path (model, &iter);
+        gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, MULTISELECT_COL_BOOL, FALSE);
+        gtk_tree_path_free (path);
+
         free(choices[tindex[i]]);
         free(choices_translated[i]);
     }
@@ -892,7 +892,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
     GtkWidget *hpadbox, *vpadbox, *description_box;
-	int flag_default_set = FALSE;
+    int flag_default_set = FALSE;
 
     GtkTreeModel        *model;
     GtkListStore        *store;
@@ -900,7 +900,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     GtkWidget           *view, *scroll, *frame;
     GtkCellRenderer     *renderer;
     GtkTreeSelection    *selection;
-	GtkTreePath 		*path;
+    GtkTreePath         *path;
 
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_list() called");
 
@@ -940,11 +940,11 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
             /* gtk_tree_view_scroll_to_cell() works only with GTKDFB 2.7/2.8
              * and it doesn't with GTKDFB 2.0.9
              */
-			path = gtk_tree_model_get_path(model, &iter);
-			gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-			gtk_tree_view_set_cursor        (GTK_TREE_VIEW(view), path, NULL, FALSE);
-			gtk_tree_path_free (path);
-			flag_default_set = TRUE;
+            path = gtk_tree_model_get_path(model, &iter);
+            gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
+            gtk_tree_view_set_cursor        (GTK_TREE_VIEW(view), path, NULL, FALSE);
+            gtk_tree_path_free (path);
+            flag_default_set = TRUE;
         }
         free(choices[tindex[i]]);
     }
@@ -1002,7 +1002,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
     GtkWidget           *view, *scroll, *frame;
     GtkCellRenderer     *renderer;
     GtkTreeSelection    *selection;
-	GtkTreePath 		*path;
+    GtkTreePath         *path;
 	
     INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_store() called");
 
@@ -1050,11 +1050,11 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
 
                 if (defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
-					path = gtk_tree_model_get_path(model, &iter);
-					gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-					gtk_tree_view_expand_row (GTK_TREE_VIEW(view), path, TRUE);
-					gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
-					gtk_tree_path_free (path);
+                    path = gtk_tree_model_get_path(model, &iter);
+                    gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
+                    gtk_tree_view_expand_row (GTK_TREE_VIEW(view), path, TRUE);
+                    gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
+                    gtk_tree_path_free (path);
                 }
             }
         }
@@ -1065,15 +1065,15 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
                 gtk_tree_store_append (store, &child, &iter);
                 gtk_tree_store_set (store, &child, SELECT_COL_NAME, choices_translated[i], -1);
 
-				path = gtk_tree_model_get_path(model, &iter);
+                path = gtk_tree_model_get_path(model, &iter);
                 if (defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
                     gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-		       		gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
+                    gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
                 }
                 path = gtk_tree_model_get_path(model, &iter);
                 gtk_tree_view_expand_row (GTK_TREE_VIEW(view), path, TRUE);
-				gtk_tree_path_free (path);
+                gtk_tree_path_free (path);
             }
             else
             {    /* father */
@@ -1081,10 +1081,10 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
                 gtk_tree_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
                 if (defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
-					path = gtk_tree_model_get_path(model, &iter);
-					gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-					gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
-					gtk_tree_path_free (path);
+                    path = gtk_tree_model_get_path(model, &iter);
+                    gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
+                    gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
+                    gtk_tree_path_free (path);
                 }
             }
         }
@@ -1339,13 +1339,13 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     v_mainbox = gtk_vbox_new (FALSE, 0);
     h_mainbox = gtk_hbox_new (FALSE, 0);
     logobox = gtk_vbox_new (FALSE, 0);
-       gtk_box_pack_start(GTK_BOX (v_mainbox), v_title_box, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (v_mainbox), v_title_box, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX (v_mainbox), h_progress_bar_box, FALSE, FALSE, DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX (v_mainbox), targetbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX (v_mainbox), actionbox, FALSE, FALSE, DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX (h_mainbox), v_mainbox, TRUE, TRUE, DEFAULT_PADDING);
-       gtk_box_pack_start(GTK_BOX (logobox), logo_button, FALSE, FALSE, 0);
-       gtk_box_pack_start(GTK_BOX (logobox), h_mainbox, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (logobox), logo_button, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (logobox), h_mainbox, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(window), logobox);
 }
 
