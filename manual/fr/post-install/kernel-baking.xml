@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28672 -->
+<!-- original version: 31881 -->
 
  <sect1 id="kernel-baking"><title>Compiler un nouveau noyau</title>
 <para>
@@ -59,10 +59,10 @@ de nouvelles choses.
 
 Pour compiler un noyau «&nbsp;façon Debian&nbsp;», vous avez besoin des 
 paquets suivants&nbsp;:
-<classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname> (la version la plus
-récente lors de la rédaction de ce document), 
-<classname>fakeroot</classname>
+<classname>fakeroot</classname>, <classname>kernel-package</classname>,
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(la version la plus récente lors de la rédaction de ce document)</phrase> 
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
 et quelques autres qui sont probablement déjà installés sur votre machine 
 (pour la liste complète, voyez
 <filename>/usr/share/doc/kernel-package/README.gz</filename>).
@@ -81,9 +81,11 @@ Il faut remarquer qu'il n'est pas <emphasis>obligatoire</emphasis> de
 compiler votre noyau «&nbsp;façon Debian&nbsp;»; mais vous vous rendrez compte 
 qu'utiliser le système de gestion des paquets pour
 gérer les noyaux rend leur installation plus simple et plus sûre.
-En fait, vous pouvez utiliser directement les sources de Linus et ne
-pas utiliser <classname>kernel-source-&kernelversion;</classname>, tout en 
-utilisant la méthode de compilation <classname>kernel-package</classname>.
+En fait, vous pouvez simplement télécharger les sources de Linus et non pas
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,
+</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+tout en utilisant la méthode de compilation <classname>kernel-package</classname>.
 
 </para><para>
 
@@ -104,9 +106,13 @@ le noyau, mais c'est le plus facile car aucun droit spécial n'est demandé.
 Nous supposerons aussi que la version du noyau est &kernelversion;. Allez 
 dans le répertoire où vous voulez désarchiver 
 les sources et désarchivez-les avec
-<userinput>tar xjf /usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>
-, et déplacez-vous dans le répertoire 
-<filename>kernel-source-&kernelversion;</filename> qui vient d'être créé.
+<phrase condition="classic-kpkg"><userinput>tar xjf /usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>, 
+et déplacez-vous dans le répertoire 
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
+qui vient d'être créé.
 
 </para><para>
 
@@ -140,12 +146,12 @@ Bien sûr, le numéro de version «&nbsp;1.0&nbsp;» peut être changé&nbsp;;
 il s'agit juste d'un moyen de suivre vos différentes
 versions du noyau. De la même façon, vous pouvez remplacer le mot 
 «&nbsp;custom\&nbsp;» par ce que vous voulez (par exemple le nom d'une 
-machine). La compilation d'un noyau peut être assez longue selon la puissance 
+machine). La compilation d'un noyau peut être assez longue, selon la puissance 
 de votre machine.
 
 </para><para condition="supports-pcmcia">
 
-Si vous avez besoin du PCMCIA, vous devrez installer le
+Si vous avez besoin des PCMCIA, vous devrez installer le
 paquet <classname>pcmcia-source</classname>. Désarchivez le fichier
 tar comprimé, en tant que superutilisateur, dans le répertoire 
 <filename>/usr/src</filename> (il est important que les modules soient à 
@@ -182,6 +188,11 @@ Vous devez maintenant redémarrer votre système&nbsp;: lisez attentivement les
 <userinput>shutdown -r now</userinput>.
 
 </para><para>
+
+<phrase condition="etch">D'autres informations sur la compilation des noyaux Debian
+se trouvent dans le 
+<ulink url="&url-kernel-handbook;"><quote>Debian Linux Kernel Handbook</quote></ulink>.
+</phrase>
 
 Pour plus d'informations sur <classname>kernel-package</classname>, lisez
 la documentation dans <filename>/usr/share/doc/kernel-package</filename>.
