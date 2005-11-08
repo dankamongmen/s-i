@@ -134,6 +134,11 @@ void free_description_data( GtkObject *obj, struct frontend_question_data* data 
     free(data);
 }
 
+void free_treemodel_data( GtkWidget *widget, struct question_treemodel_data* data )
+{
+    free(data);
+}
+
 gboolean is_first_question (struct question *q)
 {
     struct question *crawl;
@@ -646,7 +651,7 @@ static int gtkhandler_multiselect_single(struct frontend *obj, struct question *
     data->q = q;
     data->treemodel = model;
     g_signal_connect(G_OBJECT(renderer_check), "toggled", G_CALLBACK(multiselect_single_callback), data);
-
+    g_signal_connect (G_OBJECT(view), "destroy", G_CALLBACK (free_treemodel_data), data);
     g_object_unref (model);
 
     for (i = 0; i < count; i++)
@@ -903,6 +908,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     store = gtk_list_store_new (SELECT_NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
     gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
+    g_signal_connect (G_OBJECT(view), "destroy", G_CALLBACK (free_description_data), data);
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW(view), TRUE);
 
     model = GTK_TREE_MODEL( store );
@@ -1006,6 +1012,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
     gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
+    g_signal_connect (G_OBJECT(view), "destroy", G_CALLBACK (free_description_data), data);
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW(view), TRUE);
     model = GTK_TREE_MODEL( store );
     gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
@@ -1229,18 +1236,10 @@ struct question_handlers {
     { "",               NULL },
 };
 
-void set_window_properties(GtkWidget *window)
-{
-    gtk_widget_set_size_request (window, WINDOW_WIDTH, WINDOW_HEIGHT);
-    gtk_window_set_resizable (GTK_WINDOW (window), TRUE);
-    gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
-    gtk_window_set_decorated (GTK_WINDOW (window), TRUE);
-}
-
 void set_design_elements(struct frontend *obj, GtkWidget *window)
 {
 
-    GtkWidget *v_mainbox, *h_mainbox, *logobox, *targetbox, *actionbox;
+    GtkWidget *v_mainbox, *h_mainbox, *logobox, *targetbox, *actionbox, *h_actionbox;
     GtkWidget *button_next, *button_prev;
     GtkWidget *progress_bar, *progress_bar_label, *progress_bar_box, *h_progress_bar_box, *v_progress_bar_box;
     GtkWidget *label_title, *h_title_box, *v_title_box, *logo_button;
@@ -1256,7 +1255,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     h_title_box = gtk_hbox_new (TRUE, 0);
     gtk_box_pack_start(GTK_BOX (h_title_box), label_title, TRUE, TRUE, DEFAULT_PADDING);
     v_title_box = gtk_vbox_new (TRUE, 0);
-    gtk_box_pack_start(GTK_BOX (v_title_box), h_title_box, TRUE, TRUE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (v_title_box), h_title_box, TRUE, TRUE, 0);
 
     /* This is the box were question(s) will be displayed */
     targetbox = gtk_vbox_new (FALSE, 0);
@@ -1264,6 +1263,8 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
     /* Here are the back and forward buttons */
     actionbox = gtk_hbutton_box_new();
+    h_actionbox = gtk_hbox_new(FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (h_actionbox), actionbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END);
     gtk_box_set_spacing (GTK_BOX(actionbox), DEFAULT_PADDING);
 
@@ -1308,7 +1309,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     ((struct frontend_data*)obj->data)->progress_bar_label = progress_bar_label;
     gtk_misc_set_alignment(GTK_MISC(progress_bar_label), 0, 0);
     gtk_box_pack_start (GTK_BOX(progress_bar_box), progress_bar, FALSE, FALSE, 0);
-    gtk_box_pack_start (GTK_BOX(progress_bar_box), progress_bar_label, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX(progress_bar_box), progress_bar_label, FALSE, FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(v_progress_bar_box), progress_bar_box, TRUE, TRUE, PROGRESSBAR_VPADDING);
     gtk_box_pack_start (GTK_BOX(h_progress_bar_box), v_progress_bar_box, TRUE, TRUE, PROGRESSBAR_HPADDING);
     ((struct frontend_data*)obj->data)->progress_bar_box = h_progress_bar_box;
@@ -1320,10 +1321,10 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_box_pack_start(GTK_BOX (v_mainbox), v_title_box, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX (v_mainbox), h_progress_bar_box, FALSE, FALSE, DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX (v_mainbox), targetbox, TRUE, TRUE, DEFAULT_PADDING);
-    gtk_box_pack_start(GTK_BOX (v_mainbox), actionbox, FALSE, FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (v_mainbox), h_actionbox, FALSE, FALSE, DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX (h_mainbox), v_mainbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX (logobox), logo_button, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX (logobox), h_mainbox, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (logobox), h_mainbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_container_add(GTK_CONTAINER(window), logobox);
 }
 
@@ -1342,8 +1343,8 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     obj->data = NEW(struct frontend_data);
     obj->interactive = 1;
 
-    /* Here we setup in the frontend structure the fields needed for the
-     * mechanism that lets the user jump across questions to work
+    /* Always remember to set fields in frontend_data structure to NULL
+     * since otherwise GTKDFB tends to segfault.
      */
     fe_data = obj->data;
     fe_data->window = NULL;
@@ -1353,13 +1354,17 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     fe_data->button_prev = NULL;
     fe_data->progress_bar = NULL;
     fe_data->progress_bar_label = NULL;
+    fe_data->progress_bar_box = NULL;
     fe_data->setters = NULL;
     fe_data->button_val = DC_NOTOK;
 
     gtk_init (&args, &name);
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    set_window_properties (window);
+    gtk_widget_set_size_request (window, WINDOW_WIDTH, WINDOW_HEIGHT);
+    gtk_window_set_resizable (GTK_WINDOW (window), TRUE);
+    gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
+    gtk_window_set_decorated (GTK_WINDOW (window), TRUE);
     set_design_elements (obj, window);
     ((struct frontend_data*) obj->data)->window = window;
     gtk_widget_show_all(window);
