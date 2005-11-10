@@ -33,6 +33,7 @@ static struct map map_machine[] = {
 	{ "CHRP IBM,9113-550", "chrp_rs6k" },
 	{ "CHRP IBM,9117-570", "chrp_rs6k" },
 	{ "CHRP IBM,9124-720", "chrp_rs6k" },
+	{ "CHRP IBM", "chrp_rs6k" },
 	{ "CHRP", "chrp" },
 	{ "Amiga", "amiga" },
 	{ "64-bit iSeries Logical Partition", "iseries" },
