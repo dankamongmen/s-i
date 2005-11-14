@@ -731,13 +731,13 @@ default_disk_label () {
 		amiga)
 		    echo amiga;;
 		chrp)
-		    echo msdos;; # guess
-		chrp_rs6k)
-		    echo msdos;; # guess
+		    echo msdos;;
+		chrp_rs6k|chrp_ibm)
+		    echo msdos;;
 		chrp_pegasos)
 		    echo amiga;;
 		prep)
-		    echo msdos;; # guess
+		    echo msdos;;
 		powermac_newworld)
 		    echo mac;;
 		powermac_oldworld)
