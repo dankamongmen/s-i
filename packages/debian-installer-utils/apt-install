@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+KERNEL_MAJOR="$(uname -r | cut -d . -f 1,2)"
+
 queue=/var/lib/apt-install/queue
 
 mountpoints () {
@@ -87,10 +89,20 @@ export DEBIAN_FRONTEND
 mountpoints > /tmp/mount.pre
 
 # Some packages (eg. the kernel-image package) require a mounted /proc/
-# Only mount it if it isn't mounted already
+# Only mount it if not mounted already
 if [ ! -f /target/proc/cmdline ] ; then
 	mount -t proc proc /target/proc
 fi
+
+# For installing >=2.6.14 kernels we also need sysfs mounted
+# Only mount it if not mouted already and we're running 2.6
+case $KERNEL_MAJOR in
+    2.6)
+	if [ ! -d /target/sys/devices ] ; then
+		mount -t sysfs none /target/sys
+	fi
+	;;
+esac
 
 disable_daemons
 ERRCODE=0
