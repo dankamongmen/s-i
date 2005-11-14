@@ -230,8 +230,8 @@ get_ide_chipset_info() {
 get_detected_hw_info() {
 	if [ "${SUBARCH%%/*}" = powerpc ]; then
 		discover-mac-io
-		if [ "$SUBARCH" = powerpc/chrp_rs6k ]; then
-			discover-rs6k
+		if [ "$SUBARCH" = powerpc/chrp_rs6k ] || [ "$SUBARCH" = powerpc/chrp_ibm ]; then
+			discover-ibm
 		fi
 	fi
 	discover_hw

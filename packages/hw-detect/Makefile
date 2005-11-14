@@ -52,7 +52,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL) hw-detect.prebaseconfig $(pbcdir)/30hw-detect
 ifeq ($(DEB_HOST_ARCH),powerpc)
 	$(INSTALL) discover-mac-io.sh $(bindir)/discover-mac-io
-	$(INSTALL) discover-rs6k.sh $(bindir)/discover-rs6k
+	$(INSTALL) discover-ibm.sh $(bindir)/discover-ibm
 endif
 else
 	$(INSTALL) detect-stub.sh $(bindir)/hw-detect
