@@ -3,9 +3,11 @@ if [ -n "$TERM_FRAMEBUFFER_TRY" -a "`debconf-get debian-installer/framebuffer`" 
 	case $(uname -r) in
 	2.6.*)
 		if (modprobe -q vesafb >/dev/null 2>&1 && grep -q . /proc/fb && modprobe -q fbcon >/dev/null 2>&1) || (modprobe -q vga16fb >/dev/null 2>&1 && grep -q . /proc/fb && modprobe -q fbcon >/dev/null 2>&1); then
-			if [ -x /sbin/udevstart ]; then
-				# sledgehammer workaround for race condition
+			# sledgehammer workaround for race condition
+			if type udevstart >/dev/null 2>&1; then
 				udevstart
+			elif type udevsynthesize >/dev/null 2>&1; then
+				udevsynthesize
 			fi
 		fi
 		;;
