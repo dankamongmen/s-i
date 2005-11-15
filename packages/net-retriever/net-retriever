@@ -7,6 +7,7 @@ log() {
 }
 error() {
 	log "error: $@"
+	exit 1
 }
 
 db_get mirror/protocol
@@ -60,17 +61,14 @@ checkmatch() {
 			if [ "$file" = "$packages" ]; then
 				if [ "$md5" != "$pkgmd5" ]; then
 					error "MD5 mismatch for $packages ($md5 != $pkgmd5)."
-					exit 1
 				fi
 				if [ "$size" != "$pkgsize" ]; then
 					error "Size mismatch for $packages ($size != $pkgsize)."
-					exit 1
 				fi
 				return 0
 			fi
 		done
 		error "$packages not found in $release."
-		exit 1
 	)
 	set +e
 }
@@ -100,12 +98,10 @@ case "x$cmd" in
 		if type gpgv >/dev/null && [ -f "$keyring" ]; then
 			if ! fetch "dists/$suite/Release.gpg" "$Release.gpg"; then
 				error "dists/$suite/Release is unsigned."
-				exit 1
 			fi
 			if ! gpgv --keyring "$keyring" --ignore-time-conflict \
 			     "$Release.gpg" "$Release"; then
 				error "Bad signature on $Release."
-				exit 1
 			fi | logger -t net-retriever
 		fi
 
@@ -114,7 +110,6 @@ case "x$cmd" in
 		ret=1
 		if [ -z "$components" ]; then
 			error "No components listed in $Release."
-			exit 1
 		fi
 		for comp in $components; do
 			for ext in '.gz' ''; do
