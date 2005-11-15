@@ -3,10 +3,10 @@
 . /usr/share/debconf/confmodule
 
 log() {
-    logger -t net-retriever "$@"
+	logger -t net-retriever "$@"
 }
 error() {
-    log "error: $@"
+	log "error: $@"
 }
 
 db_get mirror/protocol
@@ -18,146 +18,149 @@ directory="$RET"
 db_get mirror/$protocol/proxy
 proxy="$RET"
 if [ -n "$proxy" ]; then
-    if [ "$protocol" = http ]; then
-        export http_proxy="$proxy"
-    elif [ "$protocol" = ftp ]; then
-        export ftp_proxy="$proxy"
-    fi
+	if [ "$protocol" = http ]; then
+		export http_proxy="$proxy"
+	elif [ "$protocol" = ftp ]; then
+		export ftp_proxy="$proxy"
+	fi
 fi
 keyring=/usr/share/keyrings/archive.gpg
 
 fetch() {
-    url="${protocol}://${hostname}${directory}/$1"
-    iters=0
-    while [ $iters -lt 3 ]; do
-	if [ ! -e "$2" ]; then
-	    wget -q "$url" -O "$2"
-	    return $?
-	else
-            # busybox wget can sometimes become confused while resuming,
-            # so if it fails, restart
-	    if wget -c -q "$url" -O "$2"; then
-		return 0
-	    else
-		wget -q "$url" -O "$2"
-		return $?
-	    fi
-	fi
-	iters=$(($iters + 1))
-    done
+	url="${protocol}://${hostname}${directory}/$1"
+	iters=0
+	while [ $iters -lt 3 ]; do
+		if [ ! -e "$2" ]; then
+			wget -q "$url" -O "$2"
+			return $?
+		else
+			# busybox wget can sometimes become confused while 
+			# resuming, so if it fails, restart
+			if wget -c -q "$url" -O "$2"; then
+				return 0
+			else
+				wget -q "$url" -O "$2"
+				return $?
+			fi
+		fi
+		iters=$(($iters + 1))
+	done
 }
 
 checkmatch() {
-    release="$1"
-    packages="$2"
-    pkgmd5="$3"
-    pkgsize="$4"
-    set -e
-    sed -n '/^MD5Sum:$/ b LOOP; b; : PRINT; /:$/q; p; : LOOP; n; b PRINT' \
-        "$release" | \
-    (while read md5 size file; do
-        if [ "$file" = "$packages" ]; then
-            if [ "$md5" != "$pkgmd5" ]; then
-                error "MD5 mismatch for $packages ($md5 != $pkgmd5)."
-                exit 1
-            fi
-            if [ "$size" != "$pkgsize" ]; then
-                error "Size mismatch for $packages ($size != $pkgsize)."
-                exit 1
-            fi
-            return 0
-        fi
-    done
-    error "$packages not found in $release."
-    exit 1)
-    set +e
+	release="$1"
+	packages="$2"
+	pkgmd5="$3"
+	pkgsize="$4"
+	
+	set -e
+	sed -n '/^MD5Sum:$/ b LOOP; b; : PRINT; /:$/q; p; : LOOP; n; b PRINT' \
+	       "$release" | (
+		while read md5 size file; do
+			if [ "$file" = "$packages" ]; then
+				if [ "$md5" != "$pkgmd5" ]; then
+					error "MD5 mismatch for $packages ($md5 != $pkgmd5)."
+					exit 1
+				fi
+				if [ "$size" != "$pkgsize" ]; then
+					error "Size mismatch for $packages ($size != $pkgsize)."
+					exit 1
+				fi
+				return 0
+			fi
+		done
+		error "$packages not found in $release."
+		exit 1
+	)
+	set +e
 }
 
 cmd="$1"
 shift
 
 case "x$cmd" in
-    xretrieve)
-        fetch "$@"
-        exit $?
-        ;;
-
-    xpackages)
-        rm -f "$1"
-        touch "$1"
-	
-        if ! db_get mirror/udeb/suite || [ -z "$RET" ]; then
-		db_get mirror/suite
-	fi
-        suite="$RET"
-	
-        Release="/tmp/net-retriever-$$-Release"
-        fetch "dists/$suite/Release" "$Release" || exit $?
-        if type gpgv >/dev/null && [ -f "$keyring" ]; then
-            # If gpgv and a keyring are installed, authentication is
-            # mandatory.
-            if ! fetch "dists/$suite/Release.gpg" "$Release.gpg"; then
-                error "dists/$suite/Release is unsigned."
-                exit 1
-            fi
-            if ! gpgv --keyring "$keyring" --ignore-time-conflict \
-                    "$Release.gpg" "$Release"; then
-                error "Bad signature on $Release."
-                exit 1
-            fi | logger -t net-retriever
-        fi
-        ARCH=`udpkg --print-architecture`
-        components="`grep ^Components: $Release | cut -d' ' -f2-`"
-        ret=1
-        if [ -z "$components" ]; then
-            error "No components listed in $Release."
-            exit 1
-        fi
-        for comp in $components; do
-            for ext in '.gz' ''; do
-                pkgfile="$comp/debian-installer/binary-$ARCH/Packages$ext"
-                line=`grep $pkgfile\$ $Release 2>/dev/null`
-                if [ $? != 0 ]; then
-                    continue
-                fi
-                Packages="/tmp/net-retriever-$$-Packages"
-                rm -f "$Packages"
-                fetch "dists/$suite/$pkgfile" "$Packages" || continue
-                checkmatch "$Release" "$pkgfile" \
-                    "$(md5sum "$Packages" | cut -d' ' -f1)" \
-                    "$(wc -c < "$Packages" | tr -d ' ')"
-                if [ "$ext" = '' ]; then
-                    cat "$Packages" >> "$1"
-                elif [ "$ext" = .gz ]; then
-                    zcat "$Packages" >> "$1"
-                fi
-                ret=0
-                break
-            done
-        done
-        exit $ret
-        ;;
-
-    xerror)
-	T="retriever/net/error"
-	db_set "$T" "Retry"
-	db_input critical "$T" || true
-	
-	if ! db_go; then
-		exit 2
-	fi
-	db_get "$T"
-	if [ "$RET" = "Retry" ]; then
-		exit 0
-	elif [ "$RET" = "Change mirror" ]; then
-		choose-mirror || true
-		exit 0
-	elif [ "$RET" = Cancel ]; then
-		exit 2
-	fi
+	xretrieve)
+		fetch "$@"
+		exit $?
 	;;
 
-    *)
-        # unknown command
-        exit 1
+	xpackages)
+		rm -f "$1"
+		touch "$1"
+	
+		if ! db_get mirror/udeb/suite || [ -z "$RET" ]; then
+			db_get mirror/suite
+		fi
+		suite="$RET"
+	
+		Release="/tmp/net-retriever-$$-Release"
+		fetch "dists/$suite/Release" "$Release" || exit $?
+		# If gpgv and a keyring are installed, authentication is
+		# mandatory.
+		if type gpgv >/dev/null && [ -f "$keyring" ]; then
+			if ! fetch "dists/$suite/Release.gpg" "$Release.gpg"; then
+				error "dists/$suite/Release is unsigned."
+				exit 1
+			fi
+			if ! gpgv --keyring "$keyring" --ignore-time-conflict \
+			     "$Release.gpg" "$Release"; then
+				error "Bad signature on $Release."
+				exit 1
+			fi | logger -t net-retriever
+		fi
+
+		ARCH=`udpkg --print-architecture`
+		components="`grep ^Components: $Release | cut -d' ' -f2-`"
+		ret=1
+		if [ -z "$components" ]; then
+			error "No components listed in $Release."
+			exit 1
+		fi
+		for comp in $components; do
+			for ext in '.gz' ''; do
+				pkgfile="$comp/debian-installer/binary-$ARCH/Packages$ext"
+				line=`grep $pkgfile\$ $Release 2>/dev/null`
+				if [ $? != 0 ]; then
+					continue
+				fi
+				Packages="/tmp/net-retriever-$$-Packages"
+				rm -f "$Packages"
+				fetch "dists/$suite/$pkgfile" "$Packages" || continue
+				checkmatch "$Release" "$pkgfile" \
+					"$(md5sum "$Packages" | cut -d' ' -f1)" \
+					"$(wc -c < "$Packages" | tr -d ' ')"
+				if [ "$ext" = '' ]; then
+					cat "$Packages" >> "$1"
+				elif [ "$ext" = .gz ]; then
+					zcat "$Packages" >> "$1"
+				fi
+				ret=0
+				break
+			done
+		done
+		exit $ret
+	;;
+
+	xerror)
+		T="retriever/net/error"
+		db_set "$T" "Retry"
+		db_input critical "$T" || true
+	
+		if ! db_go; then
+			exit 2
+		fi
+		db_get "$T"
+		if [ "$RET" = "Retry" ]; then
+			exit 0
+		elif [ "$RET" = "Change mirror" ]; then
+			choose-mirror || true
+			exit 0
+		elif [ "$RET" = Cancel ]; then
+			exit 2
+		fi
+	;;
+
+	*)
+		# unknown command
+		 exit 1
 esac
