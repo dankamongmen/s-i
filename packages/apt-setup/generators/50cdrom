@@ -19,3 +19,8 @@ $chroot $ROOT apt-cdrom add \
 	</dev/null
 cat $ROOT$tmp >> $file
 rm -f $ROOT$tmp $ROOT$tmp~
+
+if ! apt-setup-verify $file; then
+	db_input critical apt-setup/cdrom/failed || true
+	db_go || exit 10
+fi

@@ -54,24 +54,42 @@ if [ "$RET" = true ]; then
 	dists="$dists contrib"
 fi
 
-db_get mirror/suite
-suite="$RET"
-db_get mirror/protocol
-protocol="$RET"
-db_get mirror/$protocol/hostname
-hostname="$RET"
-db_get mirror/$protocol/directory
-directory="$RET"
+done=""
+while [ ! "$done" ]; do
+	db_get mirror/suite
+	suite="$RET"
+	db_get mirror/protocol
+	protocol="$RET"
+	db_get mirror/$protocol/hostname
+	hostname="$RET"
+	db_get mirror/$protocol/directory
+	directory="$RET"
 
-if [ "$protocol" = http ]; then
-	db_get mirror/$protocol/proxy
-	proxy="$RET"
-	if [ -n "$proxy" ]; then
-		if ! grep -iq "Acquire::$protocol::Proxy" $ROOT/etc/apt/apt.conf.new; then
-			echo "Acquire::$protocol::Proxy \"$proxy\";" >> $ROOT/etc/apt/apt.conf.new
+	if [ "$protocol" = http ]; then
+		db_get mirror/$protocol/proxy
+		proxy="$RET"
+		if [ -n "$proxy" ]; then
+			if ! grep -iq "Acquire::$protocol::Proxy" $ROOT/etc/apt/apt.conf.new; then
+				echo "Acquire::$protocol::Proxy \"$proxy\";" >> $ROOT/etc/apt/apt.conf.new
+			fi
 		fi
 	fi
-fi
 
-echo "deb $protocol://$hostname/$directory $suite $dists" >> $file
+	echo "deb $protocol://$hostname/$directory $suite $dists" > $file
+	
+	if apt-setup-verify $file; then
+		done=1
+	else
+		db_set apt-setup/mirror/error Retry
+		db_input critical apt-setup/mirror/error || true
+		db_go || exit 10
+		db_get apt-setup/mirror/error
+		if [ "$RET" = "Change mirror" ]; then
+			choose-mirror || true
+		elif [ "$RET" = Cancel ]; then
+			exit 1
+		fi
+	fi
+done
+
 echo "deb-src $protocol://$hostname/$directory $suite $dists" >> $file
