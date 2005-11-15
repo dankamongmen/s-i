@@ -99,10 +99,11 @@ case "x$cmd" in
 			if ! fetch "dists/$suite/Release.gpg" "$Release.gpg"; then
 				error "dists/$suite/Release is unsigned."
 			fi
-			if ! gpgv --keyring "$keyring" --ignore-time-conflict \
+			if ! log-output -t net-retriever gpgv \
+			     --keyring "$keyring" --ignore-time-conflict \
 			     "$Release.gpg" "$Release"; then
 				error "Bad signature on $Release."
-			fi | logger -t net-retriever
+			fi
 		fi
 
 		ARCH=`udpkg --print-architecture`
