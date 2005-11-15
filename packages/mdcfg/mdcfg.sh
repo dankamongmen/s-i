@@ -477,7 +477,7 @@ md_mainmenu() {
 # Try to load the necesarry modules.
 # Supported schemes: RAID 0, RAID 1, RAID 5
 depmod -a 1>/dev/null 2>&1
-modprobe md 1>/dev/null 2>&1
+modprobe md 1>/dev/null 2>&1 || modprobe md-mod 1>/dev/null 2>&1
 modprobe raid0 >/dev/null 2>&1
 modprobe raid1 1>/dev/null 2>&1
 modprobe raid5 >/dev/null 2>&1
