@@ -26,6 +26,16 @@ if [ -z "$2" ]; then
 		label_type=msdos # most widely used
 	fi
 	
+	# Use gpt instead of msdos disklabel for disks larger than 2TB
+	if expr "$types" : ".*gpt.*" >/dev/null; then
+		if [ "$label_type" = msdos ] ; then
+			disksize=$(cat size)
+			if $(longint_le $(human2longint 2TB) $disksize) ; then
+				label_type=gpt
+			fi
+		fi
+	fi
+
 	if [ "$label_type" = sun ]; then
 		db_input critical partman/confirm_write_new_label
 		db_go || exit 0
