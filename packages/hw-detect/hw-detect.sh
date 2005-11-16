@@ -798,6 +798,8 @@ sysfs-update-devnames
 # Make sure udev creates device nodes in time.
 if type udevstart >/dev/null 2>&1; then
 	udevstart
+elif type udevsynthesize >/dev/null 2>&1; then
+	udevsynthesize
 fi
 
 # Also let userdevfs rescan the devices.
