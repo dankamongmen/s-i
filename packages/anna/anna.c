@@ -114,8 +114,6 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 		if (!di_system_package_check_subarchitecture(package, subarchitecture))
 			continue;
 
-		di_log (DI_LOG_LEVEL_DEBUG, "lowmem: %d, debconf status: %s", lowmem, debconf->value);
-	
 		if (((di_system_package *)package)->kernel_version) {
 			if (running_kernel && strcmp(running_kernel, ((di_system_package *)package)->kernel_version) == 0) {
 				package->status_want = di_package_status_want_unknown;
