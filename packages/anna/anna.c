@@ -230,7 +230,6 @@ void resume_progress_bar (int progress_step, int pkg_count, di_package *package)
 	debconf_progress_start(debconf, 0, 2*pkg_count,  "anna/progress_title");
 	debconf_progress_set(debconf, progress_step);
 	debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
-	debconf_subst(debconf, "anna/progress_step_inst", "PACKAGE", package->package);
 	debconf_progress_info(debconf, "anna/progress_step_retr");
 }
 
@@ -257,7 +256,7 @@ install_modules(di_packages *status, di_packages *packages) {
 		return 0;
 
 	if (!quiet)
-		debconf_progress_start(debconf, 0, 2*pkg_count, "anna/progress_title");
+		debconf_progress_start(debconf, 0, pkg_count, "anna/progress_title");
 
 	for (node = packages->list.head; node; node = node->next) {
 		package = node->data;
@@ -275,7 +274,6 @@ install_modules(di_packages *status, di_packages *packages) {
 
 			if (!quiet) {
 				debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
-				debconf_subst(debconf, "anna/progress_step_inst", "PACKAGE", package->package);
 				debconf_progress_info(debconf, "anna/progress_step_retr");
 			}
 			for (;;) {
@@ -321,11 +319,6 @@ install_modules(di_packages *status, di_packages *packages) {
 				break;
 			}
 
-			if (!quiet) {
-				debconf_progress_step(debconf, 1);
-				progress_step++;
-				debconf_progress_info(debconf, "anna/progress_step_inst");
-			}
 			if (!unpack_package(dest_file)) {
 				if (!quiet)
 					debconf_progress_stop(debconf);
