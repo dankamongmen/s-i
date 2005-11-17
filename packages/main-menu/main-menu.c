@@ -232,6 +232,10 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 		menu_entry(debconf, menudefault, buf, sizeof (buf));
 		debconf_set(debconf, MAIN_MENU, buf);
 	}
+	else {
+		di_log(DI_LOG_LEVEL_INFO, "no default menu item"); 
+		modify_debconf_priority(LOWER);
+	}
 	debconf_input(debconf, MENU_PRIORITY, MAIN_MENU);
 	debconf_go(debconf);
 	debconf_get(debconf, MAIN_MENU);
