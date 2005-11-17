@@ -3,6 +3,9 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+db_progress START 0 1 clock-setup/progress/title
+db_progress INFO clock-setup/progress/working
+
 pri=high
 
 if db_fget clock-setup/utc seen && [ "$RET" = true ]; then
@@ -30,7 +33,11 @@ else
 	fi
 fi
 
+db_progress STEP 1
+
 db_input $pri clock-setup/utc || true
 if ! db_go; then
 	exit 10 # back to main menu
 fi
+
+db_progress stop
