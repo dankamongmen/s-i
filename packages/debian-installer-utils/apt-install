@@ -104,9 +104,11 @@ case $KERNEL_MAJOR in
 	;;
 esac
 
+APTOPTS='-o Acquire::gpgv::Options::=--ignore-time-conflict'
+
 disable_daemons
 ERRCODE=0
-log-output -t apt-install chroot /target apt-get -y install $@ < /dev/null || ERRCODE=$?
+log-output -t apt-install chroot /target apt-get $APTOPTS -y install $@ < /dev/null || ERRCODE=$?
 enable_daemons
 
 # Undo the mounts done by the packages during installation.
