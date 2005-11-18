@@ -13,7 +13,7 @@ my $listl10n   = shift;
 my $template   = shift;
 my $templatein = shift;
 
-my $debug = 1;
+my $debug = 0;
 
 my $show_locales = 1;
 
@@ -91,6 +91,16 @@ sub order_trans {
     return $a_locale cmp $b_locale;
 }
 
+#Sorts languages, making sure that the C locale is listed first
+sub sort_C_first {
+    my @full_list = @_;
+    my @C_locale = grep /^C$/, @full_list;
+    my @other_locales = grep !/^C$/, @full_list;
+    my @new_list = sort order_trans @other_locales;
+    unshift @new_list, @C_locale;
+    return @new_list;
+}
+
 my @translations_ascii;
 my @translations_latin;
 my @translations_fb;
@@ -99,7 +109,7 @@ my @sortedlanguagenames_ascii;
 my @sortedlanguagenames_latin;
 my @sortedlanguagenames_fb;
 my @sortedlanguagenames_all;
-for my $name (sort order_trans @languagenames_ascii) {
+for my $name (sort_C_first @languagenames_ascii) {
     if (exists $translationmap{$name}) {
 	push(@translations_ascii, $translationmap{$name});
 	push(@sortedlanguagenames_ascii, $name);
@@ -107,7 +117,7 @@ for my $name (sort order_trans @languagenames_ascii) {
 	print "Missing $name in $listl10n\n";
     }
 }
-for my $name (sort order_trans @languagenames_latin) {
+for my $name (sort_C_first @languagenames_latin) {
     if (exists $translationmap{$name}) {
 	push(@translations_latin, $translationmap{$name});
 	push(@sortedlanguagenames_latin, $name);
@@ -115,7 +125,7 @@ for my $name (sort order_trans @languagenames_latin) {
 	print "Missing $name in $listl10n\n";
     }
 }
-for my $name (sort order_trans @languagenames_fb) {
+for my $name (sort_C_first @languagenames_fb) {
     if (exists $translationmap{$name}) {
 	push(@translations_fb, $translationmap{$name});
 	push(@sortedlanguagenames_fb, $name);
@@ -123,7 +133,7 @@ for my $name (sort order_trans @languagenames_fb) {
 	print "Missing $name in $listl10n\n";
     }
 }
-for my $name (sort order_trans @languagenames_all) {
+for my $name (sort_C_first @languagenames_all) {
     if (exists $translationmap{$name}) {
 	push(@translations_all, $translationmap{$name});
 	push(@sortedlanguagenames_all, $name);
