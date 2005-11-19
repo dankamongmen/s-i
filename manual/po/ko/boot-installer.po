@@ -2273,11 +2273,11 @@ msgid ""
 msgstr ""
 "53c9x 기반 SCSI 버스를 사용하는 경우, <userinput>mac53c9x=1</userinput> 커널 "
 "파라미터를 써야 할 수 있습니다. Quadra 950처럼 그런 SCSI 버스가 두 개 있는 하"
-"드웨어의 경우 <userinput>mac53c9x=2</userinput> 파라미터를 사용해야 합니다."
-"대신,자동발견을 켜기 위해 <userinput>mac53c9x=-1,0</userinput>로 설정할 수 있습니다. "
-"하지만 이는 SCSI 연결해제를 불가능하게 할 수있습니다. 이 인수를 설정하는 것은 "
-"하나이상의 하드 디스크가 있을때 설정해야 합니다. 그외의 경우, 설정하지 않을 때 "
-"시스템이 더 빠르게 동작합니다."
+"드웨어의 경우 <userinput>mac53c9x=2</userinput> 파라미터를 사용해야 합니다.대"
+"신,자동발견을 켜기 위해 <userinput>mac53c9x=-1,0</userinput>로 설정할 수 있습"
+"니다. 하지만 이는 SCSI 연결해제를 불가능하게 할 수있습니다. 이 인수를 설정하"
+"는 것은 하나이상의 하드 디스크가 있을때 설정해야 합니다. 그외의 경우, 설정하"
+"지 않을 때 시스템이 더 빠르게 동작합니다."
 
 #. Tag: title
 #: boot-installer.xml:1638
@@ -4159,13 +4159,16 @@ msgstr "버그 보고"
 
 #. Tag: para
 #: boot-installer.xml:3097
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "If you get through the initial boot phase but cannot complete the install, "
-"the bug reporter menu choice may be helpful. It copies system error logs and "
-"configuration information to a user-supplied floppy. This information may "
-"provide clues as to what went wrong and how to fix it. If you are submitting "
-"a bug report you may want to attach this information to the bug report."
+"the bug reporter menu choice may be helpful. <phrase condition=\"sarge\"> It "
+"copies system error logs and configuration information to a user-supplied "
+"floppy. </phrase> <phrase condition=\"etch\"> It lets you store system error "
+"logs and configuration information from the installer to a floppy, or "
+"download them in a web browser. </phrase> This information may provide clues "
+"as to what went wrong and how to fix it. If you are submitting a bug report "
+"you may want to attach this information to the bug report."
 msgstr ""
 "최초 부팅 단계를 지나갔지만 설치를 마치지 못했다면, 버그 보고 메뉴가 도움이 "
 "될 수도 있습니다. 이 메뉴는 시스템 오류 로그와 설정 정보를 사용자의 플로피에 "
@@ -4173,7 +4176,7 @@ msgstr ""
 "들어 있습니다. 버그를 보고할 때, 이 정보를 버그 보고에 첨부해 주십시오."
 
 #. Tag: para
-#: boot-installer.xml:3106
+#: boot-installer.xml:3114
 #, no-c-format
 msgid ""
 "Other pertinent installation messages may be found in <filename>/var/log/</"
@@ -4185,38 +4188,50 @@ msgstr ""
 "filename>에 들어 있습니다."
 
 #. Tag: title
-#: boot-installer.xml:3117
+#: boot-installer.xml:3125
 #, no-c-format
 msgid "Submitting Installation Reports"
 msgstr "설치 보고 제출"
 
 #. Tag: para
-#: boot-installer.xml:3118
+#: boot-installer.xml:3126
 #, no-c-format
 msgid ""
 "If you still have problems, please submit an installation report. We also "
 "encourage installation reports to be sent even if the installation is "
 "successful, so that we can get as much information as possible on the "
-"largest number of hardware configurations. Please use this template when "
-"filling out installation reports, and file the report as a bug report "
-"against the <classname>installation-reports</classname> pseudo package, by "
-"sending it to <email>submit@bugs.debian.org</email>. "
-"<informalexample><screen>\n"
+"largest number of hardware configurations."
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3133
+#, no-c-format
+msgid ""
+"If you have a working Debian system, the esiest way to send an installation "
+"report is to install the installation-report and reportbug packages "
+"(<command>apt-get install installation-report reportbug</command>) and run "
+"the command <command>reportbug installation-report</command>."
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3140
+#, fuzzy, no-c-format
+msgid ""
+"Please use this template when filling out installation reports, and file the "
+"report as a bug report against the <classname>installation-reports</"
+"classname> pseudo package, by sending it to <email>submit@bugs.debian.org</"
+"email>. <informalexample><screen>\n"
 "Package: installation-reports\n"
 "\n"
-"Debian-installer-version: &lt;Fill in date and from where you got the "
-"image&gt;\n"
-"uname -a: &lt;The result of running uname -a on a shell prompt&gt;\n"
+"Boot method: &lt;How did you boot the installer? CD? floppy? network?&gt;\n"
+"Image version: &lt;Fill in date and from where you got the image&gt;\n"
 "Date: &lt;Date and time of the install&gt;\n"
-"Method: &lt;How did you install?  What did you boot off?  If network\n"
-"      install, from where?  Proxied?&gt;\n"
 "\n"
 "Machine: &lt;Description of machine (eg, IBM Thinkpad R32)&gt;\n"
 "Processor:\n"
 "Memory:\n"
-"Root Device: &lt;IDE?  SCSI?  Name of device?&gt;\n"
-"Root Size/partition table: &lt;Feel free to paste the full partition\n"
-"      table, with notes on which partitions are mounted where.&gt;\n"
+"Partitions: &lt;df -Tl will do; the raw partition table is preferred>\n"
+"\n"
 "Output of lspci and lspci -n:\n"
 "\n"
 "Base System Installation Checklist:\n"
