@@ -4,7 +4,11 @@
 
 set -e
 
-# umount -a will miss /target/proc, so make sure it's unmounted
-umount /target/proc || true
-
-umount -a || true
+for mpoint in $(mount | cut -d ' ' -f 3 | sort -r); do
+	if [ "$mpoint" = / ]; then
+		umount /proc || true
+		umount / || true
+	elif [ "$mpoint" != /proc ]; then
+		umount $mpoint || true
+	fi
+done
