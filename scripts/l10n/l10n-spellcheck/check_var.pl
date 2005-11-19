@@ -23,7 +23,12 @@ sub checkVars (@)
 {
         my $msgid = shift;
         my $var1 = getVars($msgid);
-        for (@_)
+
+	# Exceptions:
+	# - in kbd-chooser KBD-ARCHS should be translated with KBD-ARCHS-L10N
+	$var1 =~ s/KBD-ARCHS/KBD-ARCHS-L10N/;
+
+	for (@_)
         {
                 my $var2 = getVars($_);
                 return 0 if $var1 ne $var2;
