@@ -528,25 +528,12 @@ keyboards_get (void)
 		di_error (": No keyboards found\n");
 		exit (6);
 	}
-	// translate the keyboard names
+	// Get the (translated) keyboard names
 	for (p = keyboards; p != NULL; p = p->next) {
 		sprintf(buf, "kbd-chooser/kbd/%s", p->name);
 		p->description = description_get(buf);
 	}
 	return keyboards;
-}
-
-/**
- * @brief translate localised keyboard name back to kbd. arch name
- */
-char *keyboard_parse (char *reply)
-{
-	kbd_t *kb;
-	for (kb = keyboards_get(); kb != NULL; kb = kb->next) {
-		if (!strcmp (reply, kb->description))
-			break;
-	}
-	return (kb) ? kb->name : "none";
 }
 
 /**
@@ -645,12 +632,12 @@ int kbdtype_present (kbdtype_t *archlist, char *name) {
  * @return const char *  - priority of question
  */
 char *
-keyboard_select (void)
+keyboard_select (char *curr_arch)
 {
 	kbd_t *kp = NULL, *preferred = NULL;
 	kbdtype_t *archlist = NULL;
-	char buf[LINESIZE], *s = NULL, *none = NULL;
-	int choices = 0, first_entry = 1;
+	char buf_s[LINESIZE], *s = NULL, buf_t[LINESIZE], *t = NULL, *arch_descr = NULL;
+	int choices = 0, first_entry_s = 1, first_entry_t = 1;
 	sercon_state sercon;
 	sercon_state umlcon;
 	struct debconfclient *client = mydebconf_client ();
@@ -661,7 +648,7 @@ keyboard_select (void)
 	 * of keyboards present.
 	 */
 
-	s = buf;
+	s = buf_s; t = buf_t;
 	// Add the keyboards to debconf
 	for (kp = keyboards_get (); kp != NULL; kp = kp->next) {
 		di_info ("keyboard type %s: present: %s \n", kp->name,
@@ -670,7 +657,8 @@ keyboard_select (void)
 		if ((kp->present != FALSE) &&
 		    (kbdtype_present (archlist, kp->name) == FALSE)) {
 			choices++;
-			s = insert_description (s,  kp->description, &first_entry);
+			s = insert_description (s, kp->name, &first_entry_s);
+			t = insert_description (t, kp->description, &first_entry_t);
 			archlist = add_kbdtype (archlist, kp->name);
 			if (strcmp (PREFERRED_KBD, kp->name) == 0) {
 				if ((preferred == NULL) || (preferred->present == UNKNOWN)
@@ -686,22 +674,30 @@ keyboard_select (void)
 	sercon = check_if_serial_console();
 	umlcon = check_if_uml_console();
 	if (sercon == SERIAL_PRESENT || umlcon == SERIAL_PRESENT) {
-		none = description_get ("kbd-chooser/no-keyboard");
+		debconf_metaget(client, "kbd-chooser/no-keyboard", "Description");
+		arch_descr = strdup(client->value);
 		choices++;
-		s = insert_description (s, none, &first_entry);
-		mydebconf_default_set ("console-tools/archs", none);
+		s = insert_description (s, "no-keyboard", &first_entry_s);
+		t = insert_description (t, arch_descr, &first_entry_t);
+		mydebconf_default_set ("console-tools/archs", "none");
 	} else {
 		// Add option to skip keyboard configuration (use kernel keymap)
-		none = description_get ("kbd-chooser/skip-config");
+		debconf_metaget(client, "kbd-chooser/skip-config", "Description");
+		arch_descr = strdup(client->value);
 		choices++;
-		s = insert_description (s, none, &first_entry);
+		s = insert_description (s, "skip-config", &first_entry_s);
+		t = insert_description (t, arch_descr, &first_entry_t);
 		mydebconf_default_set ("console-tools/archs",  
-				      preferred ? preferred->description : none);
+				      preferred ? preferred->name : "skip-config");
 	}
-	debconf_subst (client, "console-tools/archs", "choices", buf);
-	free(none);
+	debconf_subst (client, "console-tools/archs", "KBD-ARCHS", buf_s);
+	debconf_subst (client, "console-tools/archs", "KBD-ARCHS-L10N", buf_t);
+	free(arch_descr);
+	// Set medium priority if current selection is no-keyboard or skip-config
 	return ((sercon == SERIAL_PRESENT) || (umlcon == SERIAL_PRESENT) ||
-		(preferred && preferred->present == TRUE)) ? "low" : "medium";
+		((preferred && preferred->present == TRUE) &&
+		 (strcmp (curr_arch, "skip-config") != 0) &&
+		 (strcmp (curr_arch, "no-keyboard") != 0))) ? "low" : "medium";
 }
 
 /**
@@ -755,14 +751,13 @@ keymap_set (struct debconfclient *client, char *keymap)
 	// NOTE: not a typo, using 'true' makes things fail. amck!!!
 	debconf_fset (client, "debian-installer/keymap", "seen", "yes");
 	loadkeys_wrapper (keymap);
-
 }
 
 
 int
 main (int argc, char **argv)
 {
-	char *kbd_priority, *arch = NULL, keymap[LINESIZE], buf[LINESIZE], *s;
+	char *kbd_priority, keymap[LINESIZE], buf[LINESIZE], *arch;
 	enum { GOBACK, CHOOSE_ARCH, CHOOSE_KEYMAP, QUIT } state = CHOOSE_ARCH;
 	struct debconfclient *client;
 
@@ -779,8 +774,10 @@ main (int argc, char **argv)
 	debconf_version (client,  2);
 
 	read_keymap_files (KEYMAPLISTDIR);
-	kbd_priority = keyboard_select ();
-	s = buf;
+	arch = buf;
+	if (debconf_get (client, "console-tools/archs") == CMD_SUCCESS)
+		arch = strdup(client->value);
+	kbd_priority = keyboard_select (arch);
 
 	while (state != QUIT)   {
 		switch (state)	{
@@ -788,17 +785,18 @@ main (int argc, char **argv)
 			di_info ("kbdchooser: GOBACK received; leaving");
 			exit (10);
 		case CHOOSE_ARCH: // First select a keyboard arch.
-			if (mydebconf_ask (kbd_priority, "console-tools/archs", &s)) {
+			if (mydebconf_ask (kbd_priority, "console-tools/archs", &arch)) {
 				state = GOBACK;
 			} else {
-				if (s == NULL || (strlen (s) == 0)) {
+				if (arch == NULL || (strlen (arch) == 0)) {
 					di_info ("kbd-chooser: not setting keymap (console-tools/archs not set)");
 					state = QUIT;
 					break;
 				}
-				arch = keyboard_parse(s);
-				if (strcmp (arch, "none") == 0)	 {
-					di_info ("kbd-chooser: not setting keymap (kbd == none selected)");
+				di_info ("kbd-chooser: arch %s selected", arch);
+				if ((strcmp (arch, "no-keyboard") == 0) ||
+				    (strcmp (arch, "skip-config") == 0))	 {
+					di_info ("kbd-chooser: not setting keymap");
 					state = QUIT;
 					break;
 				}
