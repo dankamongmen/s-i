@@ -10,12 +10,17 @@ Should be renamed to this, but don't want to break link from ch4 now.
 
 <para>
 
+This appendix explains the intricacies of preseeding answers to dialogs in
+&d-i; to automate your installation.
+
+</para><para>
+
 The configuration fragments used in this appendix are also available as an
 example preseed file from &urlset-example-preseed;.
 
 </para>
 
-<sect1 id="preseed-intro">
+ <sect1 condition="FIXME" id="preseed-intro">
  <title>Introduction</title>
 
 <itemizedlist>
@@ -39,21 +44,12 @@ example preseed file from &urlset-example-preseed;.
 </para></listitem>
 </itemizedlist>
 
-<para>
+ </sect1>
 
-<!--
-- Methods: initrd, net, file
-- General stuff from Startup
--->
-
-</para>
-
-</sect1>
-
-<sect1 id="preseed-using">
+ <sect1 id="preseed-using">
  <title>Using preseeding</title>
 
- <sect2 id="preseed-loading">
+  <sect2 id="preseed-loading">
   <title>Loading the preseed file</title>
 <para>
 
@@ -107,18 +103,18 @@ While you're at it, you may want to add a boot parameter
 questions even if the preseeding below misses some.
 
 </para>
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-bootparms">
+  <sect2 id="preseed-bootparms">
   <title>Using boot parameters to supplement preseeding</title>
 <para>
 
-Some parts of the installation process cannot be automated using
-some forms of preseeding, because the questions are asked before
-the preseed file is loaded. For example, if the preseed file is
-downloaded over the network, the network setup must be done first.
-One reason to use initrd preseeding is that it allows preseeding
-of even these early steps of the installation process.
+Some parts of the installation process cannot be automated using some forms
+of preseeding, because the questions are asked before the preseed file is
+loaded. For example, if the preseed file is downloaded over the network,
+the network setup must be done first. One reason to use initrd preseeding
+is that it allows preseeding of even these early steps of the installation
+process.
 
 </para><para>
 
@@ -137,23 +133,23 @@ excess options and 2.6 kernels will panic. With kernel 2.6.9 or newer,
 you can use 32 command line options and 32 environment options.
 
 </para></note>
-<note><para>
-
-It may not be possible to specify values with spaces for boot parameters,
-even if you delimit them with quotes.
-
-</para></note>
 <para>
 
-Some of the default options, like 'vga=normal' may be safely removed
-for most installations, which may allow you to add more options for
-preseeding.
+For most installations some of the default options in your bootloader
+configuration file, like 'vga=normal', may be safely removed which may
+allow you to add more options for preseeding.
 
 </para>
- </sect2>
-</sect1>
+<note><para>
 
-<sect1 id="preseed-creating">
+It may not always be possible to specify values with spaces for boot
+parameters, even if you delimit them with quotes.
+
+</para></note>
+  </sect2>
+ </sect1>
+
+ <sect1 condition="FIXME" id="preseed-creating">
  <title>Creating a preseed file</title>
 
 <itemizedlist>
@@ -161,7 +157,7 @@ preseeding.
   Relation with /var/lib/(c)debconf/templates
 </para></listitem>
 <listitem><para>
-  Most values need to be in English
+  Most values need to be in English or codes
 </para></listitem>
 <listitem><para>
   Using a manual installation as base
@@ -173,11 +169,14 @@ preseeding.
 
 <para>
 
+To check if the format of your preseed file is valid before performing an
+install, you can use the command <command>debconf-set-selections -c
+<replaceable>preseed.cfg</replaceable></command>.
+
 </para>
+ </sect1>
 
-</sect1>
-
-<sect1 id="preseed-stage1">
+ <sect1 id="preseed-stage1">
  <title>Preseeding the first stage of the installation</title>
 <para>
 
@@ -194,7 +193,7 @@ architecture.
 
 </para>
  
- <sect2 id="preseed-l10n">
+  <sect2 id="preseed-l10n">
   <title>Localization</title>
 <para>
 
@@ -215,24 +214,44 @@ d-i debian-installer/locale string en_US
 
 </para><para>
 
-Something about selecting keyboard architectures (needs new kbd-chooser) and how
-the keymap needs to match the architecture.
+Keyboard configuration consists of selecting a keyboard architecture and a
+keymap. In most cases the correct keyboard architecture is selected by
+default, so there's normally no need to preseed it. The keymap must of
+course be valid for the selected or preseeded architecture.
 
-<informalexample><screen>
-# Keyboard.
-#d-i console-tools/archs select at
-d-i console-keymaps-at/keymap select us
-</screen></informalexample>
+</para><para>
+
+To skip keyboard configuration preseed
+<classname>console-tools/archs</classname> with
+<userinput>skip-config</userinput>.
+This will result in the kernel keymap remaining active.
 
 </para>
- </sect2>
 
- <sect2 id="preseed-network">
+<informalexample><screen>
+# Keyboard selection.
+#d-i console-tools/archs select at
+d-i console-keymaps-at/keymap select us
+# Example for a different keyboard architecture
+#d-i console-keymaps-usb/keymap select mac-usb-us
+
+</screen></informalexample>
+
+<note><para>
+
+The changes in the input layer for 2.6 kernels have made the keyboard
+architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote>
+(<userinput>at</userinput>) keymap should be selected.
+
+</para></note>
+  </sect2>
+
+  <sect2 id="preseed-network">
   <title>Network configuration</title>
 <para>
 
 Of course, preseeding the network configuration won't work if you're
-loading your preseed file from the network! But it's great if you're
+loading your preseed file from the network. But it's great when you're
 booting from CD or USB stick. If you are loading preseed files from
 the network, you can pass network config parameters in using kernel
 boot parameters.
@@ -268,9 +287,9 @@ d-i netcfg/wireless_wep string
 #d-i netcfg/dhcp_hostname string radish
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-mirror">
+  <sect2 id="preseed-mirror">
   <title>Mirror settings</title>
 <para>
 
@@ -308,10 +327,29 @@ d-i mirror/http/proxy string
 #d-i mirror/udeb/suite string testing
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-partman">
+  <sect2 id="preseed-partman">
   <title>Partitioning</title>
+<para>
+
+Using preseeding to partition the harddisk is very much limited to what is
+supported by <classname>partman-auto</classname>. You can choose to either
+partition existing free space on a disk or a whole disk. The layout of the
+disk can be determined by using a predefined recipe, a custom recipe from
+a recipe file or a recipe included in the preseed file. It is currently not
+possible to partition multiple disks using preseeding nor to set up RAID or
+LVM.
+
+</para>
+
+<warning><para>
+
+The identification of disks is dependent on the order in which their drivers
+are loaded. If there are multiple disks in the system, make very sure the
+correct one will be selected before using preseeding.
+
+</para></warning>
 
 <informalexample><screen>
 # If the system has free space you can choose to only partition that space.
@@ -364,9 +402,9 @@ d-i partman/choose_partition \
 d-i partman/confirm boolean true
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-time">
+  <sect2 id="preseed-time">
   <title>Clock and time zone setup</title>
 
 <informalexample><screen>
@@ -378,9 +416,9 @@ d-i clock-setup/utc boolean true
 d-i time/zone string US/Eastern
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-account">
+  <sect2 id="preseed-account" condition="NOT-YET">
   <title>Account setup</title>
 <para>
 
@@ -423,15 +461,15 @@ access to a MD5 hash allows for brute force attacks.
 
 The <classname>passwd/root-password-crypted</classname> and
 <classname>passwd/user-password-crypted</classname> variables can also be
-preseeded with "!" as value. In that case, the corresponding account
-is disabled. This may be convenient for the root account, provided of
-course that an alternate method is setup to allow administrative
+preseeded with <quote>!</quote> as value. In that case, the corresponding
+account is disabled. This may be convenient for the root account, provided
+of course that an alternate method is setup to allow administrative
 activities or root login (for instance by using SSH key authentication).
 
 </para>
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-bootloader">
+  <sect2 id="preseed-bootloader">
   <title>Boot loader installation</title>
 
 <informalexample><screen>
@@ -454,9 +492,9 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/with_other_os boolean false
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-finish">
+  <sect2 id="preseed-finish">
   <title>Finishing up the first stage install</title>
 
 <informalexample><screen>
@@ -468,9 +506,9 @@ d-i prebaseconfig/reboot_in_progress note
 #d-i cdrom-detect/eject boolean false
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-shell">
+  <sect2 id="preseed-shell">
   <title>Shell commands</title>
 
 <informalexample><screen>
@@ -499,13 +537,13 @@ d-i prebaseconfig/reboot_in_progress note
 #      string apt-get install zsh; chsh -s /bin/zsh
 </screen></informalexample>
 
- </sect2>
-</sect1>
+  </sect2>
+ </sect1>
 
-<sect1 id="preseed-stage2">
+ <sect1 id="preseed-stage2">
  <title>Preseeding the second stage of the installation</title>
 
- <sect2 id="preseed-baseconfig">
+  <sect2 id="preseed-baseconfig">
   <title>Base config</title>
 
 <informalexample><screen>
@@ -525,9 +563,31 @@ base-config base-config/login note
 #popularity-contest popularity-contest/participate boolean false
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-apt">
+  <sect2 id="preseed-account">
+  <title>Account setup</title>
+
+<informalexample><screen>
+# To preseed the root password, you have to put it in the clear in this
+# file. That is not a very good idea, use caution!
+#passwd passwd/root-password password r00tme
+#passwd passwd/root-password-again password r00tme
+
+# If you want to skip creation of a normal user account.
+#passwd passwd/make-user boolean false
+
+# Alternatively, you can preseed the user's name and login.
+#passwd passwd/user-fullname string Debian User
+#passwd passwd/username string debian
+# And their password, but use caution!
+#passwd passwd/user-password password insecure
+#passwd passwd/user-password-again password insecure
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-apt">
   <title>Apt setup</title>
 
 <informalexample><screen>
@@ -551,31 +611,71 @@ base-config apt-setup/another boolean false
 base-config apt-setup/security-updates boolean true
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-tasksel">
+  <sect2 id="preseed-tasksel">
   <title>Package selection</title>
+<para>
+
+You can choose to install any combination of tasks that are available.
+Available tasks as of this writing include:
+
+<itemizedlist>
+<listitem><para>
+  <userinput>Standard system</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>Desktop environment</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>Web server</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>Print server</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>DNS server</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>File server</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>Mail server</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>SQL database</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>Laptop</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>manual package selection</userinput>
+</para></listitem>
+</itemizedlist>
+
+The last of these will run aptitude. You can also choose to install no tasks,
+and force the installation of a set of packages in some other way. We recommend
+always including the <userinput>Standard system</userinput> task.
+
+</para>
 
 <informalexample><screen>
-# You can choose to install any combination of tasks that are available.
-# Available tasks as of this writing include: Desktop environment,
-# Web server, Print server, DNS server, File server, Mail server,
-# SQL database, Laptop, Standard system, manual package selection. The
-# last of those will run aptitude. You can also choose to install no
-# tasks, and force the installation of a set of packages in some other
-# way. We recommend always including the Standard system task.
-tasksel tasksel/first multiselect Desktop environment, Standard system
-#tasksel tasksel/first multiselect Web server, Standard system
+tasksel tasksel/first multiselect Standard system, Desktop environment
+#tasksel tasksel/first multiselect Standard system, Web server
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-mailer">
+  <sect2 id="preseed-mailer">
   <title>Mailer configuration</title>
+<para>
+
+During a normal install, exim asks only a few questions. Here's how to
+avoid even those. More complicated preseeding is possible.
+
+</para>
 
 <informalexample><screen>
-# During a normal install, exim asks only a few questions. Here's how to
-# avoid even those. More complicated preseeding is possible.
 exim4-config exim4/dc_eximconfig_configtype \
        select no configuration at this time
 exim4-config exim4/no_config boolean true
@@ -587,16 +687,19 @@ exim4-config exim4/no_config boolean true
 exim4-config exim4/dc_postmaster string
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-X">
+  <sect2 id="preseed-X">
   <title>X configuration</title>
+<para>
+
+Preseeding Debian's X config is possible, but you probably need to know
+some details about the video hardware of the machine, since Debian's X
+configurator does not do fully automatic configuration of everything.
+
+</para>
 
 <informalexample><screen>
-# Preseeding Debian's X config is possible, but you probably need to know
-# some details about the video hardware of the machine, since Debian's X
-# configurator does not do fully automatic configuration of everything.
-
 # X can detect the right driver for some cards, but if you're preseeding,
 # you override whatever it chooses. Still, vesa will work most places.
 #xserver-xfree86 xserver-xfree86/config/device/driver select vesa
@@ -619,9 +722,9 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
 
- </sect2>
+  </sect2>
 
- <sect2 id="preseed-other">
+  <sect2 id="preseed-other">
   <title>Preseeding other packages</title>
 
 <informalexample><screen>
@@ -634,16 +737,23 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 #   debconf-get-selections >> file
 </screen></informalexample>
 
- </sect2>
-</sect1>
+  </sect2>
+ </sect1>
 
-<sect1 id="preseed-advanced">
+ <sect1 id="preseed-advanced">
  <title>Advanced options</title>
+<para>
+
+It is possible to include other preseed files from a preseed file. Any
+settings in those files will override pre-existing settings from files
+loaded earlier. This makes it possible to put, for example, general
+networking settings for your location in one file and more specific
+settings for certain configurations in other files.
+
+</para>
 
 <informalexample><screen>
-# If you like, you can include other preseed files into this one.
-# Any settings in those files will override pre-existing settings from this
-# file. More that one file can be listed, separated by spaces; all will be
+# More that one file can be listed, separated by spaces; all will be
 # loaded. The included files can have preseed/include directives of their
 # own as well. Note that if the filenames are relative, they are taken from
 # the same directory as the preseed file that includes them.
@@ -658,11 +768,7 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 # preseed files, includes those files. 
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
-
-# To check the format of your preseed file before performing an install,
-# you can use debconf-set-selections:
-#   debconf-set-selections -c preseed.cfg
 </screen></informalexample>
 
-</sect1>
+ </sect1>
 </appendix>
