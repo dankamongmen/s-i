@@ -1,4 +1,6 @@
-#! /bin/sh -e
+#! /bin/sh
+
+set -e
 
 . /usr/share/debconf/confmodule
 
@@ -62,6 +64,10 @@ esac
 db_get debian-installer/locale
 LOCALE="$RET"
 
+# Set locale to C if it has not yet been set
+# This can happen during e.g. s390 installs where localechooser is not run
+[ -z "$LOCALE" ] && LOCALE="C"
+
 db_get debian-installer/language
 LANGLIST="$RET"
 
@@ -70,13 +76,14 @@ EXTRAS="$(echo "$RET" | sed 's/,//g')"
 
 # Set global locale and language, and make sure the glibc locale is
 # generated.
-(
-    echo "LANG=\"$LOCALE\""
-    echo "LANGUAGE=\"$LANGLIST\""
-) >> /target/etc/environment
+DESTFILE="/target/etc/environment"
+echo "LANG=\"$LOCALE\"" > $DESTFILE
+if [ -n "$LANGLIST" ] ; then
+    echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
+fi
 # If the locale isn't already valid, append it to locale.gen
 gen=
-if log-output -t localechooser --pass-stdout chroot /target/ /usr/sbin/validlocale $LOCALE \
+if log-output -t localechooser --pass-stdout chroot /target/ /usr/sbin/validlocale "$LOCALE" \
     >> /target/etc/locale.gen; then
     : # Nothing to do
 else
@@ -87,7 +94,7 @@ for loc in $EXTRAS; do
     if [ "$loc" = "$LOCALE" ]; then
         continue
     fi
-    if log-output -t localechooser --pass-stdout chroot /target/ /usr/sbin/validlocale $loc \
+    if log-output -t localechooser --pass-stdout chroot /target/ /usr/sbin/validlocale "$loc" \
         >> /target/etc/locale.gen; then
         : # Nothing to do
     else
