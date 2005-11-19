@@ -21,6 +21,10 @@ kbd)
         ctconfig=/target/etc/console-tools/config
         acm=`echo $consolefont | sed -e 's/.*(//' -e 's/).*//'`
         [ "$acm" = utf8 ] && acm=
+	# A few workarounds of console-tools limitations below
+	# APP_CHARSET_MAP and console fonts are not set
+	# for all consoles. These workarounds should probably
+	# be removed when we switch to kbd
         if [ -n "$acm" ]; then
 	   echo "APP_CHARSET_MAP=$acm" >>$ctconfig
 	   echo "APP_CHARSET_MAP_vc1=$acm" >>$ctconfig
