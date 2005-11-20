@@ -1,0 +1,340 @@
+#!/bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+db_capb "backup"
+db_settitle user-setup/title
+
+if [ "$1" ]; then
+	ROOT="$1"
+	chroot=chroot
+else
+	ROOT=
+	chroot=
+fi
+export ROOT
+
+# Returns a true value if there seems to be a system user account.
+is_system_user () {
+        # Assume NIS, or any uid from 1000 to 29999,  means there is a user.
+        if $chroot $ROOT grep -q '^+:' /etc/passwd || \
+           $chroot $ROOT grep -q '^[^:]*:[^:]*:[1-9][0-9][0-9][0-9]:' /etc/passwd || \
+           $chroot $ROOT grep -q '^[^:]*:[^:]*:[12][0-9][0-9][0-9][0-9]:' /etc/passwd; then
+                return 0
+        else
+                return 1
+        fi
+}
+
+# Returns a true value if root already has a password.
+root_password () {
+	# Assume there is a root password if NIS is being used.
+	if $chroot $ROOT grep -q '^+:' /etc/passwd; then
+		return 0
+	fi
+
+	if [ -e $ROOT/etc/shadow ] && \
+	   [ "`$chroot $ROOT grep ^root: /etc/shadow | cut -d : -f 2`" -a \
+	     "`$chroot $ROOT grep ^root: /etc/shadow | cut -d : -f 2`" != '*' ]; then
+		return 0
+	fi
+	
+	if [ "`$chroot $ROOT grep ^root: /etc/passwd | cut -d : -f 2`" ] && \
+	   [ "`$chroot $ROOT grep ^root: /etc/passwd | cut -d : -f 2`" != 'x' ]; then
+		return 0
+	fi
+
+	return 1
+}
+
+# Set a password, via chpasswd.
+# Use perl rather than echo, to avoid the password
+# showing in the process table. (However, this is normally
+# only called when first booting the system, when root has no
+# password at all, so that should be an unnecessary precaution).
+#
+# Pass in three arguments: the user, the password, and 'true' if the
+# password has been pre-crypted (by preseeding).
+setpassword () {
+	SETPASSWD_PW="$2"
+	export SETPASSWD_PW
+
+	# This is very annoying. chpasswd cannot handle generating md5
+	# passwords as it is not PAM-aware. Thus, I have to work around
+	# that by crypting the password myself if md5 is used.
+	USE_MD5=1
+	export USE_MD5
+
+        if [ "$3" = true ]; then
+                PRECRYPTED=1
+        else
+                PRECRYPTED=''
+        fi
+        export PRECRYPTED
+        $chroot $ROOT perl -e '
+		sub CreateCryptSalt {
+			my $md5 = shift;
+
+			my @valid = split(//, "./0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+			my ($in, $out);
+
+			my $cryptsaltlen = ($md5 ? 8 : 2);
+
+			open (F, "</dev/urandom") || die "No /dev/urandom found!";
+			foreach (1..$cryptsaltlen) {
+				read(F, $in, 1);
+				$out .= $valid[ord($in) % ($#valid + 1)];
+			}
+			close F;
+			return ($md5 ? "\$1\$$out\$" : $out);
+		}
+	
+		open(P,"| $chroot $ROOT chpasswd -e");
+                if ($ENV{PRECRYPTED}) {
+                        print P shift().":$ENV{SETPASSWD_PW}\n";
+                } else {
+                        print P shift().":".
+                                crypt($ENV{SETPASSWD_PW}, CreateCryptSalt($ENV{USE_MD5})).
+                                "\n";
+                }
+		close P;
+        ' "$1"
+	SETPASSWD_PW=''
+	USE_MD5=''
+        PRECRYPTED=''
+}
+
+# Main loop starts here. Use a state machine to allow jumping back to
+# previous questions.
+STATE=0
+while [ "$STATE" != '10' ] && [ "$STATE" != '-1' ]; do
+	case "$STATE" in
+	0)
+		# Ask how the password files should be set up.
+		db_input low passwd/shadow || true
+	;;
+	1)	
+	# md5 passwords are now on by default. This step is dead.
+	:
+	;;
+	2)
+		# Enable shadowed passwords...or not
+		db_get passwd/shadow
+		if [ "$RET" = true ]; then
+			$chroot $ROOT shadowconfig on
+		else
+			$chroot $ROOT shadowconfig off
+		fi
+	;;
+	3)
+		# Prompt for a root password if there is none.
+		if ! root_password; then
+			# First check whether the root password was preseeded crypted
+			db_get passwd/root-password-crypted || true
+			if ! test "$RET" ; then
+			    # No preseed of the root password hash
+			    # we will prompt the user
+			    db_input critical passwd/root-password || true
+			    # Note that this runs at a slightly lower
+			    # priority, so it may not always be seen. If
+			    # it isn't, don't compare passwords.
+			    COMPARE_PW=''
+			    db_input critical passwd/root-password-again \
+				&& COMPARE_PW=1 || true
+			fi
+		fi
+	;;
+	4)
+		# Verify and set a root password.
+		if ! root_password; then
+			# First check whether the root password was preseeded crypted
+			db_get passwd/root-password-crypted || true
+			if ! test "$RET" ; then
+			    # Compare the two passwords, loop back if not
+			    # identical, or if empty.
+			    db_get passwd/root-password
+			    ROOT_PW="$RET"
+			    if [ -z "$ROOT_PW" ]; then
+				db_fset user-setup/password-empty seen false
+				db_input critical user-setup/password-empty
+				db_fset passwd/root-password seen false
+				db_fset passwd/root-password-again seen false
+				STATE=2
+				continue
+			    fi
+			    db_get passwd/root-password-again
+			    if [ "$COMPARE_PW" ] && [ "$ROOT_PW" != "$RET" ]; then
+				db_fset user-setup/password-mismatch seen false
+				db_input critical user-setup/password-mismatch
+				db_fset passwd/root-password seen false
+				db_fset passwd/root-password-again seen false
+				STATE=2
+				continue
+			    fi
+			
+			    # Clear root password from the db, and set the
+			    # password.
+			    db_set passwd/root-password ""
+			    db_set passwd/root-password-again ""
+			    setpassword root "$ROOT_PW" false
+			    ROOT_PW=''
+			else
+			    ROOT_PW="$RET"
+			    # The root password was preseeded encrypted
+			    # Clear it from the db, then set it
+			    db_set passwd/root-password-crypted ""
+			    setpassword root "$ROOT_PW" true
+			    ROOT_PW=''
+			fi
+			# Loop back to state #2 to make sure that there
+			# is a root password, and if not, prompt again.
+			STATE=2
+			continue
+		fi
+	;;
+	5)
+		# Ask if a non-root user should be made, if there is not
+		# already one.
+		if ! is_system_user; then
+			db_input medium passwd/make-user || true
+		fi
+	;;
+	6)
+		# Prompt for user info.
+		db_get passwd/make-user
+		if [ "$RET" = true ] && ! is_system_user; then
+			db_input critical passwd/user-fullname || true
+		fi
+	;;
+	7)
+		# Prompt for user info.
+		db_get passwd/make-user
+		if [ "$RET" = true ] && ! is_system_user; then
+			LOOP=""
+			db_get passwd/username
+			if [ -z "$RET" ]; then
+				db_get passwd/user-fullname
+				userdefault=`echo $RET | sed 's/ .*//' | tr A-Z a-z`
+				if test -n "$userdefault" && \
+				   expr "$userdefault" : '[a-z][-a-z0-9]*$' >/dev/null; then
+					db_set passwd/username "$userdefault"
+				fi
+			fi
+			db_input critical passwd/username || true
+		fi
+	;;
+	8)
+		# Verify and make user.
+		db_get passwd/make-user
+		if [ "$RET" = true ] && ! is_system_user; then
+			# Verify the user name, loop with message if bad.
+			db_get passwd/username
+			USER="$RET"
+			if ! expr "$USER" : '[a-z][-a-z0-9]*$' >/dev/null; then
+				db_fset passwd/username seen false
+				db_fset passwd/username-bad seen false
+				db_input critical passwd/username-bad
+				STATE=5
+				continue
+			fi
+			
+			db_get passwd/user-password-crypted || true
+			if ! test "$RET" ; then
+			    db_input critical passwd/user-password || true
+			    COMPARE_PW=''
+			    db_input critical passwd/user-password-again \
+				&& COMPARE_PW=1 || true
+			fi
+		fi
+	;;
+	9)
+		db_get passwd/make-user
+		if [ "$RET" = true ] && ! is_system_user; then
+			db_get passwd/user-password-crypted || true
+			if ! test "$RET" ; then
+			    # Compare the two passwords, loop with message if not
+			    # identical, or if empty.
+			    db_get passwd/user-password
+			    USER_PW="$RET"
+			    db_get passwd/user-password-again
+			    if [ "$COMPARE_PW" ] && [ "$USER_PW" != "$RET" ]; then
+				db_set passwd/user-password ""
+				db_set passwd/user-password-again ""
+				db_fset user-setup/password-mismatch seen false
+				db_input critical user-setup/password-mismatch
+				db_fset passwd/user-password seen false
+				db_fset passwd/user-password-again seen false
+				STATE=8
+				continue
+			    fi
+			    if [ -z "$USER_PW" ]; then
+				db_set passwd/user-password ""
+				db_set passwd/user-password-again ""
+				db_fset user-setup/password-empty seen false
+				db_input critical user-setup/password-empty
+				db_fset passwd/user-password seen false
+				db_fset passwd/user-password-again seen false
+				STATE=8
+				continue
+			    fi
+			else
+			    USER_PW=$RET
+			fi
+
+			if db_get passwd/user-uid && [ "$RET" ]; then
+			    if test -x $ROOT/usr/sbin/adduser; then
+				UIDOPT="--uid $RET"
+			    else
+				UIDOPT="-u $RET"
+			    fi
+			else
+			    UIDOPT=
+			fi
+
+			# Add the user to the database, using adduser in
+			# noninteractive mode.
+			db_get passwd/user-fullname
+
+			if test -x $ROOT/usr/sbin/adduser; then
+			    $chroot $ROOT adduser --disabled-password --gecos "$RET" $UIDOPT "$USER" >/dev/null || true
+			else
+			    $chroot $ROOT useradd -c "$RET" -m "$USER" $UIDOPT >/dev/null || true
+			fi
+			
+			db_get passwd/user-password-crypted || true
+			if ! test "$RET" ; then
+			    # Clear password from the db, and set the password.
+			    db_set passwd/user-password ""
+			    db_set passwd/user-password-again ""
+			    db_get passwd/username
+			    setpassword "$USER" "$USER_PW" false
+			    USER_PW=''
+			else
+			    USER_PW="$RET"
+			    # The user password was preseeded encrypted
+			    # Clear it from the db, then set it
+			    db_set passwd/root-password-crypted ""
+			    setpassword "$USER" "$USER_PW" true
+			    USER_PW=''
+			fi
+
+			# Loop back through to make sure the user was
+			# added.
+			STATE=5
+			continue
+		fi
+	;;
+	esac
+
+	if db_go; then
+		STATE=$(($STATE + 1))
+	else
+		STATE=$(($STATE - 1))
+	fi
+#	echo "ON STATE: $STATE"
+done
+
+if test "$STATE" = -1 
+then
+	exit 30
+fi
