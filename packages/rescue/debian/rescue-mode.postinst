@@ -18,13 +18,8 @@ chroot_has () {
 	PATH="$CHROOT_PATH" search-path "$1"
 }
 
-disconnect_run () {
-	env -i PATH="$PATH" TERM="$TERM" HOME=/ "$@" \
-		<&$OLD_STDIN >&$OLD_STDOUT 2>&$OLD_STDERR
-}
-
 chroot_run () {
-	disconnect_run chroot /target "$@"
+	debconf-disconnect chroot /target "$@"
 }
 
 try_load_module ext2
@@ -116,10 +111,6 @@ for element in $PATH; do
 done
 IFS="$OLD_IFS"
 
-OLD_STDIN="$DEBCONF_OLD_FD_BASE"
-OLD_STDOUT="$(($DEBCONF_OLD_FD_BASE + 1))"
-OLD_STDERR="$(($DEBCONF_OLD_FD_BASE + 2))"
-
 FALLBACK_SHELL=
 
 shell_failed () {
@@ -150,11 +141,11 @@ if [ "$FALLBACK_SHELL" ]; then
 	if [ "$FALLBACK_SHELL" != rescue/maybe-fallback-shell ] || \
 	   (db_get "$FALLBACK_SHELL" && [ "$RET" = true ]); then
 		# If this fails, we're doomed anyway!
-		disconnect_run /bin/sh -i || true
+		debconf-disconnect /bin/sh -i || true
 	fi
 fi
 
-disconnect_run printf '\nRebooting...\n'
+debconf-disconnect printf '\nRebooting...\n'
 
 umount -a || true
 
