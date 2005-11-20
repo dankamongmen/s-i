@@ -1,3 +1,9 @@
 #!/bin/sh
 set -e
-user-setup /target
+CODE=0
+user-setup /target || CODE="$?"
+if [ "$CODE" = 30 ]; then
+	exit 10
+else
+	exit $CODE
+fi
