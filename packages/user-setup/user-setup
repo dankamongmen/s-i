@@ -210,7 +210,6 @@ while [ "$STATE" != '10' ] && [ "$STATE" != '-1' ]; do
 		# Prompt for user info.
 		db_get passwd/make-user
 		if [ "$RET" = true ] && ! is_system_user; then
-			LOOP=""
 			db_get passwd/username
 			if [ -z "$RET" ]; then
 				db_get passwd/user-fullname
@@ -306,7 +305,6 @@ while [ "$STATE" != '10' ] && [ "$STATE" != '-1' ]; do
 			    # Clear password from the db, and set the password.
 			    db_set passwd/user-password ""
 			    db_set passwd/user-password-again ""
-			    db_get passwd/username
 			    setpassword "$USER" "$USER_PW" false
 			    USER_PW=''
 			else
