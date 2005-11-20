@@ -5,8 +5,8 @@ _Description: Enter rescue mode
 Template: rescue/root
 Type: select
 Choices: ${PARTITIONS}
-_Description: Device to mount as root file system:
- Enter a device you wish to mount as your root file system.
+_Description: Device to use as root file system:
+ Enter a device you wish to use as your root file system.
  .
  After this message, if the file system was mounted successfully, you
  will be given a shell with that file system on "/". If you need any
@@ -29,25 +29,55 @@ _Description: Mount failed
  .
  Please check the syslog for more information.
 
-Template: rescue/fallback-shell
-Type: note
+Template: rescue/menu
+Type: select
+Choices: ${CHOICES}
+_Description: What do you want to do with ${DEVICE}?
+
+Template: rescue/menu-error
+Type: error
+_Description: Rescue operation failed
+ The rescue operation '${OPERATION}' failed with exit code ${CODE}.
+
+Template: rescue/menu/shell
+Type: text
+_Description: Execute a shell in ${DEVICE}
+
+Template: rescue/menu/initrd-shell
+Type: text
+_Description: Execute a shell in the installer environment
+
+Template: rescue/menu/change-root
+Type: text
+_Description: Choose a different root file system
+
+Template: rescue/menu/reboot
+Type: text
+_Description: Reboot the system
+
+Template: rescue/shell/intro
+Type: text
+_Description: Executing a shell
+ After this message, you will be given a shell with ${DEVICE} mounted on
+ "/". If you need any other file systems (such as a separate "/usr"), you
+ will have to mount those yourself.
+
+Template: rescue/shell/run-failed
+Type: error
+_Description: Error running shell in /target
+ A shell (${SHELL}) was found on your root file system (${DEVICE}), but an
+ error occurred while running it.
+
+Template: rescue/shell/not-found
+Type: error
 _Description: No shell found in /target
  No usable shell was found on your root file system (${DEVICE}).
- .
- You will now be given a shell in the installer environment instead.
- Your root file system is mounted on /target.
- .
- When you exit this shell, the system will reboot.
 
-Template: rescue/maybe-fallback-shell
-Type: boolean
-Default: true
-_Description: Try fallback shell?
- A shell (${SHELL}) was found on your root file system (${DEVICE}),
- but an error occurred while running it.
- .
- Please confirm whether you want to use a shell in the installer environment
- instead. Your root file system will be mounted on /target.
- .
- When you exit this shell, or if you choose not to run it, the system
- will reboot.
+Template: rescue/initrd-shell/intro
+Type: text
+_Description: Executing a shell
+ After this message, you will be given a shell with ${DEVICE} mounted on
+ "/target". You may work on it using the tools available in the installer
+ environment. If you want to make it your root filesystem temporarily, run
+ "chroot /target". If you need any other file systems (such as a separate
+ "/usr"), you will have to mount those yourself.

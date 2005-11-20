@@ -1,0 +1,15 @@
+#! /bin/sh -e
+
+lib="debian/$1/lib"
+
+install -d "$lib/$2"
+
+cp -r "$2"/* "$lib/$2"
+
+if [ -f "$lib/$2/_numbers" ]; then
+	numbers="$(cat "$lib/$2/_numbers")"
+	rm "$lib/$2/_numbers"
+	echo "$numbers" | while read number name; do
+		mv "$lib/$2/$name" "$lib/$2/$number$name"
+	done
+fi

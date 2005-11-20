@@ -14,14 +14,6 @@ try_load_module () {
 	log-output -t rescue modprobe "$1" || true
 }
 
-chroot_has () {
-	PATH="$CHROOT_PATH" search-path "$1"
-}
-
-chroot_run () {
-	debconf-disconnect chroot /target "$@"
-}
-
 try_load_module ext2
 try_load_module ext3
 try_load_module jfs
@@ -46,37 +38,38 @@ log-output -t rescue vgscan || true
 
 db_capb backup
 
-PARTITIONS="$(find /dev/discs -follow -name part\* | sort | tr '\n' , | \
-	sed 's/,$//; s/,/, /g')"
+# Choose a root filesystem.
+choose_root () {
+	PARTITIONS="$(find /dev/discs -follow -name part\* | sort | \
+		tr '\n' , | sed 's/,$//; s/,/, /g')"
 
-if lvdisplay -c | cut -d: -f4 | grep 0 >/dev/null; then
-	# Some unavailable logical volumes; activate them
-	log-output -t rescue vgchange -a y || true
-fi
-LVMPARTS="$(lvdisplay -c | sed 's/^ *//' | cut -d: -f1 | sort | tr '\n' , | \
-	sed 's/,$//; s/,/, /g')" || LVMPARTS=
-if [ "$LVMPARTS" ]; then
-	PARTITIONS="${PARTITIONS:+$PARTITIONS, }$LVMPARTS"
-fi
+	if lvdisplay -c | cut -d: -f4 | grep 0 >/dev/null; then
+		# Some unavailable logical volumes; activate them
+		log-output -t rescue vgchange -a y || true
+	fi
+	LVMPARTS="$(lvdisplay -c | sed 's/^ *//' | cut -d: -f1 | sort | \
+		tr '\n' , | sed 's/,$//; s/,/, /g')" || LVMPARTS=
+	if [ "$LVMPARTS" ]; then
+		PARTITIONS="${PARTITIONS:+$PARTITIONS, }$LVMPARTS"
+	fi
 
-if [ -z "$PARTITIONS" ]; then
-	# TODO: need a sensible error here, or perhaps drop through to a
-	# fallback shell?
-	log "no partitions found!"
-	exit 1
-fi
-log "partitions found: $PARTITIONS"
-db_subst rescue/root PARTITIONS "$PARTITIONS"
+	if [ -z "$PARTITIONS" ]; then
+		# TODO: need a sensible error here, or perhaps drop through
+		# to a fallback shell?
+		log "no partitions found!"
+		exit 1
+	fi
+	log "partitions found: $PARTITIONS"
+	db_subst rescue/root PARTITIONS "$PARTITIONS"
 
-while :; do
 	db_input critical rescue/root
 	db_go || exit 10
 	db_get rescue/root
-	rootdev="$RET"
-	log "selected root device '$rootdev'"
-	if [ ! -e "$rootdev" ]; then
-		log "'$rootdev' does not exist"
-		db_subst rescue/no-such-device DEVICE "$rootdev"
+	export RESCUE_ROOTDEV="$RET"
+	log "selected root device '$RESCUE_ROOTDEV'"
+	if [ ! -e "$RESCUE_ROOTDEV" ]; then
+		log "'$RESCUE_ROOTDEV' does not exist"
+		db_subst rescue/no-such-device DEVICE "$RESCUE_ROOTDEV"
 		db_input critical rescue/no-such-device
 		# Since continuing returns to the rescue/root question,
 		# backing up returns to the main menu.
@@ -86,67 +79,104 @@ while :; do
 
 	mkdir -p /target
 	log-output -t rescue umount /target || true
-	if ! log-output -t rescue mount "$rootdev" /target; then
-		log "mount '$rootdev' /target failed"
-		db_subst rescue/no-such-device DEVICE "$rootdev"
+	if ! log-output -t rescue mount "$RESCUE_ROOTDEV" /target; then
+		log "mount '$RESCUE_ROOTDEV' /target failed"
+		db_subst rescue/no-such-device DEVICE "$RESCUE_ROOTDEV"
 		db_input critical rescue/mount-failed
 		# Since continuing returns to the rescue/root question,
 		# backing up returns to the main menu.
 		db_go || exit 10
 		continue
 	fi
-
-	break
-done
-
-# Work out a sensible $PATH with respect to /target.
-CHROOT_PATH=
-OLD_IFS="$IFS"
-IFS=:
-for element in $PATH; do
-	# Only include absolute elements.
-	if [ "${element#/}" != "$element" ]; then
-		CHROOT_PATH="${CHROOT_PATH:+$CHROOT_PATH:}/target$element"
-	fi
-done
-IFS="$OLD_IFS"
-
-FALLBACK_SHELL=
-
-shell_failed () {
-	FALLBACK_SHELL=rescue/maybe-fallback-shell
-	db_subst "$FALLBACK_SHELL" SHELL "$*"
 }
 
-if [ -f /target/bin/sh ] && [ -x /target/bin/sh ]; then
-	chroot_run /bin/sh -i || shell_failed '/bin/sh -i'
-elif chroot_has sash; then
-	chroot_run sash || shell_failed sash
-	:
-elif chroot_has busybox; then
-	# Try this last even though busybox is useful, since it might fail
-	# due to a missing sh applet.
-	chroot_run busybox sh || shell_failed 'busybox sh'
-else
-	FALLBACK_SHELL=rescue/fallback-shell
-fi
+# Prepare a menu of the things you can do to this root filesystem.
+prep_menu () {
+	mkdir -p /var/lib/rescue
+	>/var/lib/rescue/menu-mapping
+	CHOICES=
+	ITEMS="$(find /lib/rescue.d/ -type f -perm -100 | sort)"
+	for item in $ITEMS; do
+		base="${item##*/}"
+		name="${base#[0-9][0-9]}"
+		case $name in
+			*.*)	continue ;;
+		esac
+		if [ -x "$item.tst" ] && ! "$item.tst"; then
+			continue
+		fi
+		db_subst "rescue/menu/$name" DEVICE "$RESCUE_ROOTDEV" \
+			|| continue
+		db_metaget "rescue/menu/$name" description || continue
+		echo "$base:$RET" >> /var/lib/rescue/menu-mapping
+		RET="$(echo "$RET" | sed 's/,/\\,/g')"
+		CHOICES="${CHOICES:+$CHOICES, }$RET"
+	done
+	db_subst rescue/menu CHOICES "$CHOICES"
+	db_subst rescue/menu DEVICE "$RESCUE_ROOTDEV"
+}
 
-if [ "$FALLBACK_SHELL" ]; then
-	db_subst "$FALLBACK_SHELL" DEVICE "$rootdev"
-	db_input critical "$FALLBACK_SHELL"
-	if ! db_go; then
-		log-output -t rescue umount /target || true
-		exit 10
-	fi
-	if [ "$FALLBACK_SHELL" != rescue/maybe-fallback-shell ] || \
-	   (db_get "$FALLBACK_SHELL" && [ "$RET" = true ]); then
-		# If this fails, we're doomed anyway!
-		debconf-disconnect /bin/sh -i || true
-	fi
-fi
+# Work out which menu item was selected.
+get_menu_item () {
+	newline='
+'
+	IFS_SAVE="$IFS"
+	IFS="$newline"
+	for line in $(cat /var/lib/rescue/menu-mapping); do
+		IFS="$IFS_SAVE"
+		if [ "${line#*:}" = "$1" ]; then
+			echo "${line%%:*}"
+			return
+		fi
+		IFS="$newline"
+	done
+	IFS="$IFS_SAVE"
+}
 
-debconf-disconnect printf '\nRebooting...\n'
-
-umount -a || true
-
-/lib/debian-installer/exit
+STATE=1
+while :; do
+	case $STATE in
+		1)
+			choose_root
+			STATE=2
+			;;
+		2)
+			prep_menu
+			db_input critical rescue/menu
+			if ! db_go; then
+				STATE=1
+				continue
+			fi
+			db_get rescue/menu
+			item="$(get_menu_item "$RET")"
+			if [ -z "$item" ]; then
+				log "Could not find menu item for '$RET'!"
+				continue
+			fi
+			db_input high "rescue/$item/intro" || true
+			db_go || true
+			code=0
+			"/lib/rescue.d/$item" || code=$?
+			case $code in
+				0)	: ;;
+				10)	STATE=1 ;;
+				*)
+					# This is just a fallback; on error,
+					# rescue operations should display a
+					# more specific error message and
+					# exit zero to indicate that the
+					# error has been handled.
+					db_capb
+					db_subst rescue/menu-error OPERATION "$item"
+					db_subst rescue/menu-error CODE "$code"
+					db_input critical rescue/menu-error
+					db_go || true
+					db_capb backup
+					;;
+			esac
+			;;
+		*)
+			exit 10
+			;;
+	esac
+done
