@@ -42,11 +42,20 @@ for ORIGXML in `find $SOURCEDIR -name "*.xml"` ; do
 
     if [ -f $PO ] ; then
         echo "- creating $BASENAME.xml"
-        po2xml $ORIGXML $PO > $XML
+        # Make sure po file is UTF8 encoded; po2xml does no conversion
+        msgconv -t utf-8 $PO >/tmp/tmp.po.$$
+        RC=$?
+        if [ $RC -ne 0 ] ; then
+            RET=$RC
+            echo "Error: error $RC while executing msgconv"
+            continue
+        fi
+        po2xml $ORIGXML /tmp/tmp.po.$$ > $XML
         RC=$?
         if [ $RC -ne 0 ] ; then
             RET=$RC
             echo "Error: error $RC while executing po2xml"
+            continue
         fi
     else
         echo "Warning: no PO file found for '$BASENAME'; copying English original"
@@ -54,4 +63,5 @@ for ORIGXML in `find $SOURCEDIR -name "*.xml"` ; do
     fi
 done
 
+rm -f /tmp/tmp.po.$$
 exit $RET
