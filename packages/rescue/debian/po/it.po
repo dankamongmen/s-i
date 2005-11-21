@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-09-22 18:33-0600\n"
+"POT-Creation-Date: 2005-11-20 18:35-0700\n"
 "PO-Revision-Date: 2005-09-23 19:03+0200\n"
 "Last-Translator: Giuseppe Sacco <eppesuig@debian.org>\n"
 "Language-Team:   Italian <debian-l10n-italian@lists.debian.org>\n"
@@ -49,13 +49,15 @@ msgstr "Avviare il modo ripristino"
 #. Type: select
 #. Description
 #: ../rescue-mode.templates:8
-msgid "Device to mount as root file system:"
+#, fuzzy
+msgid "Device to use as root file system:"
 msgstr "Periferica da montare come file system di root:"
 
 #. Type: select
 #. Description
 #: ../rescue-mode.templates:8
-msgid "Enter a device you wish to mount as your root file system."
+#, fuzzy
+msgid "Enter a device you wish to use as your root file system."
 msgstr "Inserire la periferica che si vuole montare come file system di root."
 
 #. Type: select
@@ -69,6 +71,12 @@ msgstr ""
 "Dopo questo messaggio, se il file system è stato montato con successo, verrà "
 "presentata una shell con quel file system su \"/\". Se si necessita di altri "
 "file system (ad esempio \"/usr\" separato), si dovranno montare manualmente."
+
+#. Type: select
+#. Description
+#: ../rescue-mode.templates:8
+msgid "When you exit this shell, the system will reboot."
+msgstr "Quando si esce da questa shell, il sistema sarà riavviato."
 
 #. Type: error
 #. Description
@@ -107,45 +115,72 @@ msgstr ""
 msgid "Please check the syslog for more information."
 msgstr "Controllare il syslog per maggiori informazioni."
 
-#. Type: note
+#. Type: select
 #. Description
-#: ../rescue-mode.templates:34
-msgid "No shell found in /target"
+#: ../rescue-mode.templates:35
+msgid "What do you want to do with ${DEVICE}?"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../rescue-mode.templates:39
+msgid "Rescue operation failed"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../rescue-mode.templates:39
+msgid "The rescue operation '${OPERATION}' failed with exit code ${CODE}."
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:44
+msgid "Execute a shell in ${DEVICE}"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:48
+msgid "Execute a shell in the installer environment"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:52
+#, fuzzy
+msgid "Choose a different root file system"
+msgstr "Periferica da montare come file system di root:"
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:56
+msgid "Reboot the system"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:60
+#, fuzzy
+msgid ""
+"After this message, you will be given a shell with ${DEVICE} mounted on \"/"
+"\". If you need any other file systems (such as a separate \"/usr\"), you "
+"will have to mount those yourself."
+msgstr ""
+"Dopo questo messaggio, se il file system è stato montato con successo, verrà "
+"presentata una shell con quel file system su \"/\". Se si necessita di altri "
+"file system (ad esempio \"/usr\" separato), si dovranno montare manualmente."
+
+#. Type: error
+#. Description
+#: ../rescue-mode.templates:67
+#, fuzzy
+msgid "Error running shell in /target"
 msgstr "Nessuna shell trovata in /target"
 
-#. Type: note
+#. Type: error
 #. Description
-#: ../rescue-mode.templates:34
-msgid "No usable shell was found on your root file system (${DEVICE})."
-msgstr ""
-"Non sono state trovate shell utilizzabili nel file system di root "
-"(${DEVICE})."
-
-#. Type: note
-#. Description
-#: ../rescue-mode.templates:34
-msgid ""
-"You will now be given a shell in the installer environment instead. Your "
-"root file system is mounted on /target."
-msgstr ""
-"Invece, ora una shell sarà data nell'ambiente di installazione. Il file "
-"system di root è montato su /target."
-
-#. Type: note
-#. Description
-#: ../rescue-mode.templates:34
-msgid "When you exit this shell, the system will reboot."
-msgstr "Quando si esce da questa shell, il sistema sarà riavviato."
-
-#. Type: boolean
-#. Description
-#: ../rescue-mode.templates:45
-msgid "Try fallback shell?"
-msgstr "Provare la shell di riserva?"
-
-#. Type: boolean
-#. Description
-#: ../rescue-mode.templates:45
+#: ../rescue-mode.templates:67
 msgid ""
 "A shell (${SHELL}) was found on your root file system (${DEVICE}), but an "
 "error occurred while running it."
@@ -153,20 +188,60 @@ msgstr ""
 "È stata trovata una shell (${SHELL}) nel file system di root (${DEVICE}) ma "
 "è incorso un errore nell'eseguirla."
 
-#. Type: boolean
+#. Type: error
 #. Description
-#: ../rescue-mode.templates:45
-msgid ""
-"Please confirm whether you want to use a shell in the installer environment "
-"instead. Your root file system will be mounted on /target."
-msgstr ""
-"Confermare se si vuole utilizzare una shell nell'ambiente dell'installatore. "
-"Il file system principale verrà montato su /target."
+#: ../rescue-mode.templates:73
+msgid "No shell found in /target"
+msgstr "Nessuna shell trovata in /target"
 
-#. Type: boolean
+#. Type: error
 #. Description
-#: ../rescue-mode.templates:45
+#: ../rescue-mode.templates:73
+msgid "No usable shell was found on your root file system (${DEVICE})."
+msgstr ""
+"Non sono state trovate shell utilizzabili nel file system di root "
+"(${DEVICE})."
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:78
+msgid "Executing a shell"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:78
+#, fuzzy
 msgid ""
-"When you exit this shell, or if you choose not to run it, the system will "
-"reboot."
-msgstr "Uscendo da questa shell o non eseguendola il sistema verrà riavviato."
+"After this message, you will be given a shell with ${DEVICE} mounted on \"/"
+"target\". You may work on it using the tools available in the installer "
+"environment. If you want to make it your root filesystem temporarily, run "
+"\"chroot /target\". If you need any other file systems (such as a separate "
+"\"/usr\"), you will have to mount those yourself."
+msgstr ""
+"Dopo questo messaggio, se il file system è stato montato con successo, verrà "
+"presentata una shell con quel file system su \"/\". Se si necessita di altri "
+"file system (ad esempio \"/usr\" separato), si dovranno montare manualmente."
+
+#~ msgid ""
+#~ "You will now be given a shell in the installer environment instead. Your "
+#~ "root file system is mounted on /target."
+#~ msgstr ""
+#~ "Invece, ora una shell sarà data nell'ambiente di installazione. Il file "
+#~ "system di root è montato su /target."
+
+#~ msgid "Try fallback shell?"
+#~ msgstr "Provare la shell di riserva?"
+
+#~ msgid ""
+#~ "Please confirm whether you want to use a shell in the installer "
+#~ "environment instead. Your root file system will be mounted on /target."
+#~ msgstr ""
+#~ "Confermare se si vuole utilizzare una shell nell'ambiente "
+#~ "dell'installatore. Il file system principale verrà montato su /target."
+
+#~ msgid ""
+#~ "When you exit this shell, or if you choose not to run it, the system will "
+#~ "reboot."
+#~ msgstr ""
+#~ "Uscendo da questa shell o non eseguendola il sistema verrà riavviato."

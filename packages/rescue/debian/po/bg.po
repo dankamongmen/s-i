@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-09-22 18:33-0600\n"
+"POT-Creation-Date: 2005-11-20 18:35-0700\n"
 "PO-Revision-Date: 2005-04-24 09:45+0300\n"
 "Last-Translator:  Ognyan Kulev <ogi@fmi.uni-sofia.bg>\n"
 "Language-Team: Bulgarian <dict@fsa-bg.org>\n"
@@ -37,13 +37,15 @@ msgstr "Влизане в спасителен режим"
 #. Type: select
 #. Description
 #: ../rescue-mode.templates:8
-msgid "Device to mount as root file system:"
+#, fuzzy
+msgid "Device to use as root file system:"
 msgstr "Устройство за монтиране като коренова файлова система:"
 
 #. Type: select
 #. Description
 #: ../rescue-mode.templates:8
-msgid "Enter a device you wish to mount as your root file system."
+#, fuzzy
+msgid "Enter a device you wish to use as your root file system."
 msgstr "Въведете дял, който да бъде монтиран като коренова файлова система."
 
 #. Type: select
@@ -58,6 +60,12 @@ msgstr ""
 "предоставена обвивка с тази файлова система като \"/\". Ако се нуждаете от "
 "други файлови системи (като напр. отделна директория \"/usr\"), ще трябва да "
 "си ги монтирате сами."
+
+#. Type: select
+#. Description
+#: ../rescue-mode.templates:8
+msgid "When you exit this shell, the system will reboot."
+msgstr "Когато излезете от тази обвивка, системата ще рестартира."
 
 #. Type: error
 #. Description
@@ -100,45 +108,73 @@ msgstr ""
 "Моля, проверете журнала за грешки в третата конзола или /var/log/messages за "
 "повече информация."
 
-#. Type: note
+#. Type: select
 #. Description
-#: ../rescue-mode.templates:34
-msgid "No shell found in /target"
+#: ../rescue-mode.templates:35
+msgid "What do you want to do with ${DEVICE}?"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../rescue-mode.templates:39
+msgid "Rescue operation failed"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../rescue-mode.templates:39
+msgid "The rescue operation '${OPERATION}' failed with exit code ${CODE}."
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:44
+msgid "Execute a shell in ${DEVICE}"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:48
+msgid "Execute a shell in the installer environment"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:52
+#, fuzzy
+msgid "Choose a different root file system"
+msgstr "Устройство за монтиране като коренова файлова система:"
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:56
+msgid "Reboot the system"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:60
+#, fuzzy
+msgid ""
+"After this message, you will be given a shell with ${DEVICE} mounted on \"/"
+"\". If you need any other file systems (such as a separate \"/usr\"), you "
+"will have to mount those yourself."
+msgstr ""
+"След това съобщение, ако файловата система е монтирана успешно, ще Ви бъде "
+"предоставена обвивка с тази файлова система като \"/\". Ако се нуждаете от "
+"други файлови системи (като напр. отделна директория \"/usr\"), ще трябва да "
+"си ги монтирате сами."
+
+#. Type: error
+#. Description
+#: ../rescue-mode.templates:67
+#, fuzzy
+msgid "Error running shell in /target"
 msgstr "Не е намерена обвивка в /target"
 
-#. Type: note
+#. Type: error
 #. Description
-#: ../rescue-mode.templates:34
-msgid "No usable shell was found on your root file system (${DEVICE})."
-msgstr ""
-"Не е намерена използваема обвивка във Вашата коренова файлова система "
-"(${DEVICE})."
-
-#. Type: note
-#. Description
-#: ../rescue-mode.templates:34
-msgid ""
-"You will now be given a shell in the installer environment instead. Your "
-"root file system is mounted on /target."
-msgstr ""
-"Сега ще ви бъде предоставена обвивка вместо средата на инсталатора. Вашата "
-"коренова файлова система е монтирана в /target."
-
-#. Type: note
-#. Description
-#: ../rescue-mode.templates:34
-msgid "When you exit this shell, the system will reboot."
-msgstr "Когато излезете от тази обвивка, системата ще рестартира."
-
-#. Type: boolean
-#. Description
-#: ../rescue-mode.templates:45
-msgid "Try fallback shell?"
-msgstr "Пробване на резервна обвивка?"
-
-#. Type: boolean
-#. Description
-#: ../rescue-mode.templates:45
+#: ../rescue-mode.templates:67
 msgid ""
 "A shell (${SHELL}) was found on your root file system (${DEVICE}), but an "
 "error occurred while running it."
@@ -146,22 +182,62 @@ msgstr ""
 "Намерена е обвивка (${SHELL}) във Вашата коренова файлова система "
 "(${DEVICE}), но се получи грешка при стартирането й."
 
-#. Type: boolean
+#. Type: error
 #. Description
-#: ../rescue-mode.templates:45
-msgid ""
-"Please confirm whether you want to use a shell in the installer environment "
-"instead. Your root file system will be mounted on /target."
-msgstr ""
-"Моля, потвърдете дали искате да използвате обвивка вместо средата на "
-"инсталатора. Вашата коренова файлова система ще бъде монтирана в /target."
+#: ../rescue-mode.templates:73
+msgid "No shell found in /target"
+msgstr "Не е намерена обвивка в /target"
 
-#. Type: boolean
+#. Type: error
 #. Description
-#: ../rescue-mode.templates:45
-msgid ""
-"When you exit this shell, or if you choose not to run it, the system will "
-"reboot."
+#: ../rescue-mode.templates:73
+msgid "No usable shell was found on your root file system (${DEVICE})."
 msgstr ""
-"Когато излезете от тази обвивка, или ако изберете да не влезете в нея, "
-"системата ще рестартира."
+"Не е намерена използваема обвивка във Вашата коренова файлова система "
+"(${DEVICE})."
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:78
+msgid "Executing a shell"
+msgstr ""
+
+#. Type: text
+#. Description
+#: ../rescue-mode.templates:78
+#, fuzzy
+msgid ""
+"After this message, you will be given a shell with ${DEVICE} mounted on \"/"
+"target\". You may work on it using the tools available in the installer "
+"environment. If you want to make it your root filesystem temporarily, run "
+"\"chroot /target\". If you need any other file systems (such as a separate "
+"\"/usr\"), you will have to mount those yourself."
+msgstr ""
+"След това съобщение, ако файловата система е монтирана успешно, ще Ви бъде "
+"предоставена обвивка с тази файлова система като \"/\". Ако се нуждаете от "
+"други файлови системи (като напр. отделна директория \"/usr\"), ще трябва да "
+"си ги монтирате сами."
+
+#~ msgid ""
+#~ "You will now be given a shell in the installer environment instead. Your "
+#~ "root file system is mounted on /target."
+#~ msgstr ""
+#~ "Сега ще ви бъде предоставена обвивка вместо средата на инсталатора. "
+#~ "Вашата коренова файлова система е монтирана в /target."
+
+#~ msgid "Try fallback shell?"
+#~ msgstr "Пробване на резервна обвивка?"
+
+#~ msgid ""
+#~ "Please confirm whether you want to use a shell in the installer "
+#~ "environment instead. Your root file system will be mounted on /target."
+#~ msgstr ""
+#~ "Моля, потвърдете дали искате да използвате обвивка вместо средата на "
+#~ "инсталатора. Вашата коренова файлова система ще бъде монтирана в /target."
+
+#~ msgid ""
+#~ "When you exit this shell, or if you choose not to run it, the system will "
+#~ "reboot."
+#~ msgstr ""
+#~ "Когато излезете от тази обвивка, или ако изберете да не влезете в нея, "
+#~ "системата ще рестартира."
