@@ -772,10 +772,18 @@ case "$DISCOVER_VERSION" in
 		;;
 esac
 
-# Install hotplug as well (for USB, IEEE1394, CardBus, and some SCSI)
-if [ -f /proc/sys/kernel/hotplug ]; then 
-	log "Detected hotplug support, installing hotplug."
+# Install udev/hotplug as well, as appropriate.
+if type udevd >/dev/null 2>&1; then
+	log "Detected udev support, installing udev."
+	apt-install udev || true
+elif [ -f /proc/sys/kernel/hotplug ]; then 
+	log "Detected hotplug support (and no udev), installing hotplug."
 	apt-install hotplug || true
+fi
+
+# TODO: should this really be conditional on hotplug support?
+if [ -f /proc/sys/kernel/hotplug ]; then
+	log "Detected hotplug support, installing usbutils."
 	apt-install usbutils || true
 fi
 
