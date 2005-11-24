@@ -1,0 +1,147 @@
+#! /bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+if [ "$1" ]; then
+	ROOT="$1"
+	chroot=chroot
+	log='log-output -t user-setup'
+else
+	ROOT=
+	chroot=
+	log=
+fi
+
+. /usr/lib/user-setup/functions.sh
+
+# Set a password, via chpasswd.
+# Use perl rather than echo, to avoid the password
+# showing in the process table. (However, this is normally
+# only called when first booting the system, when root has no
+# password at all, so that should be an unnecessary precaution).
+#
+# Pass in three arguments: the user, the password, and 'true' if the
+# password has been pre-crypted (by preseeding).
+setpassword () {
+	SETPASSWD_PW="$2"
+	export SETPASSWD_PW
+
+	# This is very annoying. chpasswd cannot handle generating md5
+	# passwords as it is not PAM-aware. Thus, I have to work around
+	# that by crypting the password myself if md5 is used.
+	USE_MD5=1
+	export USE_MD5
+
+        if [ "$3" = true ]; then
+                PRECRYPTED=1
+        else
+                PRECRYPTED=''
+        fi
+        export PRECRYPTED
+        $chroot $ROOT perl -e '
+		sub CreateCryptSalt {
+			my $md5 = shift;
+
+			my @valid = split(//, "./0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+			my ($in, $out);
+
+			my $cryptsaltlen = ($md5 ? 8 : 2);
+
+			open (F, "</dev/urandom") || die "No /dev/urandom found!";
+			foreach (1..$cryptsaltlen) {
+				read(F, $in, 1);
+				$out .= $valid[ord($in) % ($#valid + 1)];
+			}
+			close F;
+			return ($md5 ? "\$1\$$out\$" : $out);
+		}
+	
+		open(P,"| $chroot $ROOT chpasswd -e");
+                if ($ENV{PRECRYPTED}) {
+                        print P shift().":$ENV{SETPASSWD_PW}\n";
+                } else {
+                        print P shift().":".
+                                crypt($ENV{SETPASSWD_PW}, CreateCryptSalt($ENV{USE_MD5})).
+                                "\n";
+                }
+		close P;
+        ' "$1"
+	SETPASSWD_PW=''
+	USE_MD5=''
+        PRECRYPTED=''
+}
+
+# Enable/disable shadow passwords.
+db_get passwd/shadow
+if [ "$RET" = true ]; then
+	$log $chroot $ROOT shadowconfig on
+else
+	$log $chroot $ROOT shadowconfig off
+fi
+
+if ! root_password; then
+	# Was the root password preseeded encrypted?
+	if db_get passwd/root-password-crypted && [ "$RET" ]; then
+		ROOT_PW="$RET"
+		# The root password was preseeded encrypted. Clear it from
+		# the database, then set it.
+		db_set passwd/root-password-crypted ''
+		setpassword root "$ROOT_PW" true
+		ROOT_PW=
+	else
+		db_get passwd/root-password
+		ROOT_PW="$RET"
+		# Clear the root password from the database, and set the
+		# password.
+		db_set passwd/root-password ''
+		db_set passwd/root-password-again ''
+		setpassword root "$ROOT_PW" false
+		ROOT_PW=
+	fi
+fi
+
+db_get passwd/make-user
+if [ "$RET" = true ] && ! is_system_user; then
+	if db_get passwd/user-password-crypted && [ "$RET" ]; then
+		USER_PW="$RET"
+		USER_PW_CRYPTED=true
+	else
+		db_get passwd/user-password
+		USER_PW="$RET"
+		USER_PW_CRYPTED=false
+	fi
+
+	if db_get passwd/user-uid && [ "$RET" ]; then
+		if [ -x $ROOT/usr/sbin/adduser ]; then
+			UIDOPT="--uid $RET"
+		else
+			UIDOPT="-u $RET"
+		fi
+	else
+		UIDOPT=
+	fi
+
+	# Add the user to the database, using adduser in noninteractive
+	# mode.
+	db_get passwd/username
+	USER="$RET"
+	db_get passwd/user-fullname
+
+	if [ -x $ROOT/usr/sbin/adduser ]; then
+		$chroot $ROOT adduser --disabled-password --gecos "$RET" $UIDOPT "$USER" >/dev/null || true
+	else
+		$chroot $ROOT useradd -c "$RET" -m "$USER" $UIDOPT >/dev/null || true
+	fi
+
+	# Clear the user password from the database.
+	if [ "$USER_PW_CRYPTED" = true ]; then
+		db_set passwd/user-password-crypted ''
+	else
+		db_set passwd/user-password ''
+		db_set passwd/user-password-again ''
+	fi
+	setpassword "$USER" "$USER_PW" "$USER_PW_CRYPTED"
+fi
+
+exit 0
