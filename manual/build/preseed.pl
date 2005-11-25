@@ -1,35 +1,93 @@
 #!/usr/bin/perl -w
 
+# Script parses the XML file for the appendix on preseeding and extracts
+# example snippts to form the raw preseed example file. Section titles are
+# added as headers.
+# The script will include all text between <informalexample> tags, except
+# if a 'condition' attribute is in force that does not match the specified
+# release or if an 'arch' attribute is in force that does not match the
+# specified architecture.
+
 # Define module to use
 use HTML::Parser();
+use Getopt::Std;
 
 local %tagstatus;
 local %example;
-local $prevtag='', $titletag;
-local $settitle=0;
+local %ignore;
+local $prevtag = '';
+local $titletag;
+local $settitle = 0;
 
 $example{'print'} = 0;
 $example{'in_sect'} = 0;
 $example{'first'} = 1;
 $example{'new'} = 0;
 
+getopts('hda:r:') || die "Unknown command line arguments! Try $0 -h\n";
+use vars qw($opt_h $opt_d $opt_a $opt_r);
+
+if ($opt_h) {
+	print <<END;
+preseed.pl: parses preseed appendix xml file to extract preseed example file
+
+Usage: $0 [-hdac] <xml-file>
+
+Options:
+        -h              display this help information
+        -d              debug mode
+        -a <arch>       architecture for which to generate the example
+                        (default: i386)
+        -r <release>    release for which to generate the example (required)
+END
+	exit 0;
+}
+
+die "Must specify release for which to generate example." if ! $opt_r;
+
+my $xmlfile = shift;
+die "Must specify XML file to parse!" if ! $xmlfile;
+die "Specified XML file \"$xmlfile\" not found." if ! -f $xmlfile;
+
+my $arch = $opt_a ? "$opt_a" : "i386";
+my $release = $opt_r;
+
+
 # Create instance
 $p = HTML::Parser->new(
 	start_h => [\&start_rtn, 'tagname, text, attr'],
 	text_h => [\&text_rtn, 'text'],
 	end_h => [\&end_rtn, 'tagname']);
-# Start parsing the following HTML string
-$p->parse_file('example-preseed-etch-new.xml');
- 
+
+# Start parsing the specified file
+$p->parse_file($xmlfile);
+
 # Execute when start tag is encountered
 sub start_rtn {
 	my ($tagname, $text, $attr) = @_;
-	#print "\nStart: $tagname\n";
-	#print "Condition: $attr->{condition}\n" if exists $attr->{condition};
-	#print "Architecture: $attr->{arch}\n" if exists $attr->{arch};
+	print STDERR "\nStart: $tagname\n" if $opt_d;
 	if ( $tagname =~ /appendix|sect1|sect2|sect3|para/ ) {
 		$tagstatus{$tagname}{'count'} += 1;
-		#print "$tagname  $tagstatus{$tagname}{'count'}\n";
+		print STDERR "$tagname  $tagstatus{$tagname}{'count'}\n" if $opt_d;
+
+		if ( ! exists $ignore{'tag'} ) {
+			if ( exists $attr->{condition} ) {
+				print STDERR "Condition: $attr->{condition}\n" if $opt_d;
+				if ( $attr->{condition} ne $release ) {
+					$ignore{'tag'} = $tagname;
+					$ignore{'depth'} = $tagstatus{$tagname}{'count'};
+					print STDERR "Start ignore because of condition" if $opt_d;
+				}
+			}
+			if ( exists $attr->{arch} ) {
+				print STDERR "Architecture: $attr->{arch}\n" if $opt_d;
+				if ( $attr->{arch} ne $arch ) {
+					$ignore{'tag'} = $tagname;
+					$ignore{'depth'} = $tagstatus{$tagname}{'count'};
+					print STDERR "Start ignore because of architecture" if $opt_d;
+				}
+			}
+		}
 	}
 	# Assumes that <title> is the first tag after a section tag
 	if ( $prevtag =~ /sect1|sect2|sect3/ ) {
@@ -38,7 +96,7 @@ sub start_rtn {
 		$example{'in_sect'} = 0;
 	}
 	$prevtag = $tagname;
-	if ( $tagname eq 'informalexample' ) {
+	if ( $tagname eq 'informalexample' && ! exists $ignore{'tag'} ) {
 		$example{'print'} = 1;
 		$example{'new'} = 1;
 	}
@@ -46,8 +104,11 @@ sub start_rtn {
  
 # Execute when text is encountered
 sub text_rtn {
-my ($text) = @_;
+	my ($text) = @_;
 	if ( $settitle ) {
+		# Clean leading and trailing whitespace for titles
+		$text =~ s/^[[:space:]]*//;
+		$text =~ s/[[:space:]]*$//;
 		$tagstatus{$titletag}{'title'} = $text;
 		$settitle = 0;
 	}
@@ -75,21 +136,29 @@ my ($text) = @_;
 		$example{'in_sect'} = 1;
 	}
 }
- 
+
 # Execute when the end tag is encountered
 sub end_rtn {
 	my ($tagname) = @_;
-	#print "\nEnd: $tagname\n";
+	print STDERR "\nEnd: $tagname\n" if $opt_d;
 	if ( $tagname eq 'informalexample' ) {
 		$example{'print'} = 0;
 	}
 	if ( $tagname =~ /appendix|sect1|sect2|sect3|para/ ) {
 		delete $tagstatus{$tagname}{'title'} if exists $tagstatus{$tagname}{'title'};
+
+		if ( exists $ignore{'tag'} ) {
+			if ( $ignore{'tag'} eq $tagname && $ignore{'depth'} == $tagstatus{$tagname}{'count'} ) {
+				delete $ignore{'tag'};
+			}
+		}
+
 		if ( $example{'in_sect'} ) {
 			print "\n";
 			$example{'in_sect'} = 0;
 		}
 		$tagstatus{$tagname}{'count'} -= 1;
-		#print "$tagname  $tagstatus{$tagname}{'count'}\n";
+		print STDERR "$tagname  $tagstatus{$tagname}{'count'}\n" if $opt_d;
+		die "Invalid XML file: negative count for tag <$tagname>!" if $tagstatus{$tagname}{'count'} < 0;
 	}
 }
