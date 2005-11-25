@@ -2,10 +2,17 @@
 <!-- $Id: example-preseed-etch.xml 32158 2005-11-16 01:20:19Z joeyh $ -->
 
 <!--
-Should be renamed to this, but don't want to break link from ch4 now.
-<appendix id="appendix-preseed" condition="etch">
+Be carefull with the format of this file as it is parsed to generate
+the example preseed file.
+In that file all text between <informalexample> tags that have the
+attribute 'role="example"' set is included, except if a 'condition'
+attribute is in force that does not match the specified release or if an
+'arch' attribute is in force that does not match the specified architecture.
+
+Currently only a single variant of the example file is generated (for i386).
 -->
-<appendix id="example-preseed" condition="etch">
+
+<appendix id="appendix-preseed" condition="etch">
 <title>Automating the installation using preseeding</title>
 
 <para>
@@ -20,40 +27,256 @@ example preseed file from &urlset-example-preseed;.
 
 </para>
 
- <sect1 condition="FIXME" id="preseed-intro">
+ <sect1 id="preseed-intro">
  <title>Introduction</title>
+<para>
+
+Preseeding provides a way to set answers to dialogs without having to manually
+enter the answers while the installation is running. This makes it possible to
+fully automate most types of installation and even offers some features not
+available during normal installations.
+
+</para><para>
+
+Using preseeding it is possible to fill in answers to questions asked during
+both the first stage of the installation (before the reboot into the new
+system) and the second stage.
+
+</para>
+
+  <sect2 id="preseed-methods">
+  <title>Preseeding methods</title>
+<para>
+
+There are three methods that can be used for preseeding:
+<firstterm>initrd</firstterm>, <firstterm>file</firstterm> and
+<firstterm>network</firstterm>. Initrd preseeding will work with any
+installation method and gives the fullest coverage, but is requires the most
+preparation. File and network preseeding each can be used with different
+installation methods. With file and network preseeding the first few installer
+questions cannot be preseeded because the preseed configuration file is only
+loaded after they have been asked.
+
+</para><para>
+
+The following table shows which preseeding methods can be used with which
+installation methods.
+
+<informaltable>
+<tgroup cols="4">
+<thead>
+<row>
+  <entry>Installation method</entry><entry>initrd</entry>
+  <entry>file</entry><entry>network</entry>
+</row>
+</thead>
+
+<tbody>
+<row>
+  <entry>CD/DVD based</entry>
+  <entry>yes</entry>
+  <entry>yes</entry>
+  <entry>no</entry>
+</row><row>
+  <entry>netboot</entry>
+  <entry>yes</entry>
+  <entry>no</entry>
+  <entry>yes</entry>
+</row><row>
+  <entry>hd-media <phrase condition="bootable-usb">(including usb-stick)</phrase></entry>
+  <entry>yes</entry>
+  <entry>yes</entry>
+  <entry>no</entry>
+</row><row condition="supports-floppy-boot">
+  <entry>floppy based (cd-drivers)</entry>
+  <entry>yes</entry>
+  <entry>yes</entry>
+  <entry>no</entry>
+</row><row condition="supports-floppy-boot">
+  <entry>floppy based (net-drivers)</entry>
+  <entry>yes</entry>
+  <entry>no</entry>
+  <entry>yes</entry>
+</row><row arch="s390">
+  <entry>generic/tape</entry>
+  <entry>yes</entry>
+  <entry>no</entry>
+  <entry>yes</entry>
+</row>
+</tbody>
+
+</tgroup></informaltable>
+
+</para><para>
+
+An important difference between the preseeding methods is the point at which
+the preseed configuration file is loaded and processed. For initrd preseeding
+this is right at the start of the installation, before the first question is
+even processed. For file preseeding this is after the CD or CD image has been
+loaded. For network preseeding it is only after the network has been
+configured.
+
+</para><para>
+
+In practical terms this means for file and network preseeding that the
+questions about language, country and keyboard selection will already have
+been asked. For network preseeding add to that any questions related to
+network configuration. Some other questions that are only displayed
+at medium or low priority (like the first hardware detection run) will
+already have been processed.
+
+</para><para>
+
+Obviously, any questions that have been processed before the
+preseeding configuration file is loaded, cannot be preseeded. Section
+<xref linkend="preseed-bootparms"/> offers a way to avoid these
+questions being asked.
+
+</para>
+  </sect2>
+
+  <sect2 id="preseed-limitations">
+  <title>Limitations</title>
+<para>
+
+Although most dialogs used by &d-i; can be preseeded using this method,
+there are some notable exceptions. You can (re)partition an entire disk
+or use available free space on a disk; it is not possible to use existing
+partitions. You currently cannot use preseeding to set up RAID and LVM.
+
+</para>
+  </sect2>
+
+  <sect2 id="preseed-debconf">
+  <title>Debconf basics</title>
+<para>
+
+Preseeding makes use of the <classname>debconf</classname> framework. This
+framework is the preferred mechanism used in Debian to interact with the user
+when configuring packages and also forms the heart of &d-i;.
+In the <classname>debconf</classname> framework questions or dialogs are
+based on <firstterm>templates</firstterm>. There are different types of
+templates for different types of questions. The actual questions are
+<quote>generated</quote> from templates at runtime;  multiple questions can
+use the same template.
+
+</para><para>
+
+The following types of templates are relevant for preseeding.
+
+</para>
 
 <itemizedlist>
 <listitem><para>
-  Supports 1st and 2nd stage
+  string: allows the user to type any value
 </para></listitem>
 <listitem><para>
-  Methods: initrd, net, file
+  password: similar to string but the value typed is not displayed
 </para></listitem>
 <listitem><para>
-  Hooks
+  boolean: for yes/no or true/false type of questions
 </para></listitem>
 <listitem><para>
-  Seen flags
+  select: allows the user to select one option from a list
 </para></listitem>
 <listitem><para>
-  Limitations
+  multiselect: allows the user to select zero, one or more options from a list
 </para></listitem>
 <listitem><para>
-  How 2nd stage preseeding works
+  note: used to display a message
 </para></listitem>
 </itemizedlist>
 
+<para>
+
+In &d-i; templates are stored in a readable file
+<filename>/var/lib/templates.dat</filename>. This file contains all fixed
+text and all translations. It can also contain a default value for the
+template. The fixed text can include variables that will be replaced at
+runtime.
+
+</para><para>
+
+Another readable file <filename>/var/lib/questions.dat</filename> is used
+to store the values for variables and the answers given to questions.
+A question always refers to the template used to ask it. For obvious
+security reasons the values for templates of type <quote>password</quote>
+are stored in a separate, non-readable file in the same directory.
+
+</para>
+  </sect2>
+
+  <sect2 id="preseed-hooks">
+  <title>Running custom commands during the installation</title>
+<para>
+
+A very powerfull and flexible option offered by the preseeding tools is the
+ability to run commands or scripts at certain points in the installation.
+See <xref linkend="preseed-shell"/> for details.
+
+</para>
+
+<itemizedlist>
+<listitem><para>
+  <userinput>preseed/early_command</userinput>: is run as soon as the the
+  preseeding configuration file has been loaded
+</para></listitem>
+<listitem><para>
+  <userinput>preseed/late_command</userinput>: is run just before the reboot
+  at the end of the first stage of the installation, but before the
+  <filename>/target</filename> filesystem has been unmounted
+</para></listitem>
+<listitem><para>
+  <userinput>base-config/early_command</userinput>: is run early in the second
+  stage of the installation when <command>base-config</command> is starting up
+</para></listitem>
+<listitem><para>
+  <userinput>base-config/late_command</userinput>: is run at the end of
+  <command>base-config</command>, just before the login prompt
+</para></listitem>
+</itemizedlist>
+
+  </sect2>
+
+  <sect2 id="preseed-seenflag">
+  <title>Using preseeding to change default values</title>
+<para>
+
+It is possible to use preseeding to change the default answer for a
+question, but still have the question asked. To do this the
+<firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
+setting the value for a template.
+
+</para>
+
+<informalexample><screen>
+d-i foo/bar string value
+d-i foo/bar seen false
+</screen></informalexample>
+
+  </sect2>
  </sect1>
 
  <sect1 id="preseed-using">
  <title>Using preseeding</title>
+<para>
+
+Of course you will first need to create a preseed file and place it in the
+location from where you want to use it. Creating the preseed file is covered
+later in this appendix. Putting it in the correct location is fairly
+straightforward for network preseeding or if you want to read the file off
+a floppy or usb-stick. If you want to include the file on a CD or DVD, you
+will have to remaster the ISO image. How to get the preseed file included
+in the initrd is outside the scope of this document; please consult the
+developers documentation for &d-i;.
+
+</para>
 
   <sect2 id="preseed-loading">
   <title>Loading the preseed file</title>
 <para>
 
-If you using initrd preseeding, you only have to make sure a file named
+If you are using initrd preseeding, you only have to make sure a file named
 <filename>preseed.cfg</filename> is included in the root directory of the
 initrd. The installer will automatically check if this file is present and
 load it.
@@ -62,15 +285,16 @@ load it.
 
 For the other preseeding methods you need to tell the installer what file to
 use when you boot it. This is done by passing the kernel a boot parameter,
-either manually at boot or by editing the <filename>syslinux.cfg</filename>
-(or similar) file and adding the parameter to the end of the append line(s)
-for the kernel.
+either manually at boot time or by editing the bootloader configuration file
+(e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end
+of the append line(s) for the kernel.
 
 </para><para>
 
-If you do specify the preseed file in the syslinux configuration, you might
-set the timeout to 1 in syslinux.cfg to avoid needing to hit enter to boot
-the installer.
+If you do specify the preseed file in the bootloader configuration, you might
+change the configuration so you don't need to hit enter to boot the installer.
+For syslinux this means setting the timeout to 1 in
+<filename>syslinux.cfg</filename>.
 
 </para><para>
 
@@ -81,19 +305,19 @@ specified it must match the preseed file or the installer will refuse to use it.
 </para>
 
 <informalexample><screen>
-# Boot parameters to specify:
-# - if you're netbooting:
-#   preseed/url=http://host/path/to/preseed
-#   preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
-#
-# - if you're booting a remastered CD:
-#   preseed/file=/cdrom/preseed
-#   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
-#
-# - if you're installing from USB media (put the preseed file in the
-#   toplevel directory of the USB stick):
-#   preseed/file=/hd-media/preseed
-#   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
+Boot parameters to specify:
+- if you're netbooting:
+  preseed/url=http://host/path/to/preseed.cfg
+  preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
+
+- if you're booting a remastered CD:
+  preseed/file=/cdrom/preseed.cfg
+  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
+
+- if you're installing from USB media (put the preseed file in the
+  toplevel directory of the USB stick):
+  preseed/file=/hd-media/preseed.cfg
+  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 </screen></informalexample>
 
 <para>
@@ -110,7 +334,7 @@ questions even if the preseeding below misses some.
 <para>
 
 Some parts of the installation process cannot be automated using some forms
-of preseeding, because the questions are asked before the preseed file is
+of preseeding because the questions are asked before the preseed file is
 loaded. For example, if the preseed file is downloaded over the network,
 the network setup must be done first. One reason to use initrd preseeding
 is that it allows preseeding of even these early steps of the installation
@@ -129,7 +353,7 @@ for any of the preseed variables listed in the examples.
 The 2.4 kernel accepts a maximum of 8 command line options and
 8 environment options (including any options added by default for the
 installer). If these numbers are exceeded, 2.4 kernels will drop any
-excess options and 2.6 kernels will panic. With kernel 2.6.9 or newer,
+excess options and 2.6 kernels will panic. For kernel 2.6.9 and later,
 you can use 32 command line options and 32 environment options.
 
 </para></note>
@@ -151,10 +375,25 @@ parameters, even if you delimit them with quotes.
 
  <sect1 condition="FIXME" id="preseed-creating">
  <title>Creating a preseed file</title>
+<para>
+
+The preconfiguration file is in the format used by the
+<command>debconf-set-selections</command> command.
+
+</para>
 
 <itemizedlist>
 <listitem><para>
+  File format
+</para></listitem>
+<listitem><para>
+  Only single space allowed between template type and value
+</para></listitem>
+<listitem><para>
   Relation with /var/lib/(c)debconf/templates
+</para></listitem>
+<listitem><para>
+  Types of templates and how to provide values for them
 </para></listitem>
 <listitem><para>
   Most values need to be in English or codes
@@ -207,7 +446,7 @@ The locale can be used to specify both language and country.
 To specify the locale as a boot parameter, use
 <userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>.
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # Locale sets language and country.
 d-i debian-installer/locale string en_US
 </screen></informalexample>
@@ -219,6 +458,14 @@ keymap. In most cases the correct keyboard architecture is selected by
 default, so there's normally no need to preseed it. The keymap must of
 course be valid for the selected or preseeded architecture.
 
+<informalexample role="example"><screen>
+# Keyboard selection.
+#d-i console-tools/archs select at
+d-i console-keymaps-at/keymap select us
+# Example for a different keyboard architecture
+#d-i console-keymaps-usb/keymap select mac-usb-us
+</screen></informalexample>
+
 </para><para>
 
 To skip keyboard configuration preseed
@@ -227,15 +474,6 @@ To skip keyboard configuration preseed
 This will result in the kernel keymap remaining active.
 
 </para>
-
-<informalexample><screen>
-# Keyboard selection.
-#d-i console-tools/archs select at
-d-i console-keymaps-at/keymap select us
-# Example for a different keyboard architecture
-#d-i console-keymaps-usb/keymap select mac-usb-us
-
-</screen></informalexample>
 
 <note><para>
 
@@ -258,7 +496,7 @@ boot parameters.
 
 </para>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # netcfg will choose an interface that has link if possible. This makes it
 # skip displaying a list if there is more than one interface.
 d-i netcfg/choose_interface select auto
@@ -315,7 +553,7 @@ as <classname>mirror/suite</classname>.
 
 </para>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 d-i mirror/country string enter information manually
 d-i mirror/http/hostname string http.us.debian.org
 d-i mirror/http/directory string /debian
@@ -351,7 +589,7 @@ correct one will be selected before using preseeding.
 
 </para></warning>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # If the system has free space you can choose to only partition that space.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
@@ -407,7 +645,7 @@ d-i partman/confirm boolean true
   <sect2 id="preseed-time">
   <title>Clock and time zone setup</title>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # Controls whether or not the hardware clock is set to UTC.
 d-i clock-setup/utc boolean true
 
@@ -418,7 +656,7 @@ d-i time/zone string US/Eastern
 
   </sect2>
 
-  <sect2 id="preseed-account" condition="NOT-YET">
+  <sect2 id="preseed-account">
   <title>Account setup</title>
 <para>
 
@@ -437,7 +675,7 @@ access to a MD5 hash allows for brute force attacks.
 
 </para></warning>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # Root password, either in clear text
 #passwd passwd/root-password password r00tme
 #passwd passwd/root-password-again password r00tme
@@ -472,7 +710,7 @@ activities or root login (for instance by using SSH key authentication).
   <sect2 id="preseed-bootloader">
   <title>Boot loader installation</title>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # Grub is the default boot loader (for x86). If you want lilo installed
 # instead, uncomment this:
 #d-i grub-installer/skip boolean true
@@ -497,44 +735,13 @@ d-i grub-installer/with_other_os boolean true
   <sect2 id="preseed-finish">
   <title>Finishing up the first stage install</title>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # Avoid that last message about the install being complete.
 d-i prebaseconfig/reboot_in_progress note
 
 # This will prevent the installer from ejecting the CD during the reboot,
 # which is useful in some situations.
 #d-i cdrom-detect/eject boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-shell">
-  <title>Shell commands</title>
-
-<informalexample><screen>
-# d-i preseeding is inherently not secure. Nothing in the installer checks
-# for attempts at buffer overflows or other exploits of the values of a
-# preseed file like this one. Only use preseed files from trusted
-# locations! To drive that home, and because it's generally useful, here's
-# a way to run any shell command you'd like inside the installer,
-# automatically.
-
-# This first command is run as early as possible, just after
-# preseeding is read.
-#d-i preseed/early_command string anna-install some-udeb
-
-# This command is run just before the install finishes, but when there is
-# still a usable /target directory.
-#d-i preseed/late_command string echo foo > /target/etc/bar
-
-# This command is run just as base-config is starting up.
-#base-config base-config/early_command string echo hi mom
-
-# This command is run after base-config is done, just before the login:
-# prompt. This is a good way to install a set of packages you want, or to
-# tweak the configuration of the system.
-#base-config base-config/late_command \
-#      string apt-get install zsh; chsh -s /bin/zsh
 </screen></informalexample>
 
   </sect2>
@@ -546,7 +753,7 @@ d-i prebaseconfig/reboot_in_progress note
   <sect2 id="preseed-baseconfig">
   <title>Base config</title>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # Avoid the introductory message.
 base-config base-config/intro note
 
@@ -565,32 +772,10 @@ base-config base-config/login note
 
   </sect2>
 
-  <sect2 id="preseed-account">
-  <title>Account setup</title>
-
-<informalexample><screen>
-# To preseed the root password, you have to put it in the clear in this
-# file. That is not a very good idea, use caution!
-#passwd passwd/root-password password r00tme
-#passwd passwd/root-password-again password r00tme
-
-# If you want to skip creation of a normal user account.
-#passwd passwd/make-user boolean false
-
-# Alternatively, you can preseed the user's name and login.
-#passwd passwd/user-fullname string Debian User
-#passwd passwd/username string debian
-# And their password, but use caution!
-#passwd passwd/user-password password insecure
-#passwd passwd/user-password-again password insecure
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-apt">
   <title>Apt setup</title>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # This question controls what source the second stage installation uses
 # for packages. Choices are cdrom, http, ftp, filesystem, edit sources list
 # by hand
@@ -619,6 +804,8 @@ base-config apt-setup/security-updates boolean true
 
 You can choose to install any combination of tasks that are available.
 Available tasks as of this writing include:
+
+</para>
 
 <itemizedlist>
 <listitem><para>
@@ -653,13 +840,15 @@ Available tasks as of this writing include:
 </para></listitem>
 </itemizedlist>
 
+<para>
+
 The last of these will run aptitude. You can also choose to install no tasks,
 and force the installation of a set of packages in some other way. We recommend
 always including the <userinput>Standard system</userinput> task.
 
 </para>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
 </screen></informalexample>
@@ -675,7 +864,7 @@ avoid even those. More complicated preseeding is possible.
 
 </para>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 exim4-config exim4/dc_eximconfig_configtype \
        select no configuration at this time
 exim4-config exim4/no_config boolean true
@@ -699,7 +888,7 @@ configurator does not do fully automatic configuration of everything.
 
 </para>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # X can detect the right driver for some cards, but if you're preseeding,
 # you override whatever it chooses. Still, vesa will work most places.
 #xserver-xfree86 xserver-xfree86/config/device/driver select vesa
@@ -727,7 +916,7 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
   <sect2 id="preseed-other">
   <title>Preseeding other packages</title>
 
-<informalexample><screen>
+<informalexample role="example"><screen>
 # Depending on what software you choose to install, or if things go wrong
 # during the installation process, it's possible that other questions may
 # be asked. You can preseed those too, of course. To get a list of every
@@ -742,6 +931,40 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 
  <sect1 id="preseed-advanced">
  <title>Advanced options</title>
+
+  <sect2 id="preseed-shell">
+  <title>Shell commands</title>
+
+<informalexample role="example"><screen>
+# d-i preseeding is inherently not secure. Nothing in the installer checks
+# for attempts at buffer overflows or other exploits of the values of a
+# preseed file like this one. Only use preseed files from trusted
+# locations! To drive that home, and because it's generally useful, here's
+# a way to run any shell command you'd like inside the installer,
+# automatically.
+
+# This first command is run as early as possible, just after
+# preseeding is read.
+#d-i preseed/early_command string anna-install some-udeb
+
+# This command is run just before the install finishes, but when there is
+# still a usable /target directory.
+#d-i preseed/late_command string echo foo > /target/etc/bar
+
+# This command is run just as base-config is starting up.
+#base-config base-config/early_command string echo hi mom
+
+# This command is run after base-config is done, just before the login:
+# prompt. This is a good way to install a set of packages you want, or to
+# tweak the configuration of the system.
+#base-config base-config/late_command \
+#      string apt-get install zsh; chsh -s /bin/zsh
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-chainload">
+  <title>Chainloading preseed files</title>
 <para>
 
 It is possible to include other preseed files from a preseed file. Any
@@ -770,5 +993,6 @@ settings for certain configurations in other files.
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 </screen></informalexample>
 
+  </sect2>
  </sect1>
 </appendix>
