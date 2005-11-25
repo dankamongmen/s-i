@@ -3,10 +3,10 @@
 # Script parses the XML file for the appendix on preseeding and extracts
 # example snippts to form the raw preseed example file. Section titles are
 # added as headers.
-# The script will include all text between <informalexample> tags, except
-# if a 'condition' attribute is in force that does not match the specified
-# release or if an 'arch' attribute is in force that does not match the
-# specified architecture.
+# The script will include all text between <informalexample> tags that have
+# the attribute 'role="example"' set, except if a 'condition' attribute is
+# in force that does not match the specified release or if an 'arch' attribute
+# is in force that does not match the specified architecture.
 
 # Define module to use
 use HTML::Parser();
@@ -97,8 +97,10 @@ sub start_rtn {
 	}
 	$prevtag = $tagname;
 	if ( $tagname eq 'informalexample' && ! exists $ignore{'tag'} ) {
-		$example{'print'} = 1;
-		$example{'new'} = 1;
+		if ( exists $attr->{role} && $attr->{role} eq "example" ) {
+			$example{'print'} = 1;
+			$example{'new'} = 1;
+		}
 	}
 }
  
