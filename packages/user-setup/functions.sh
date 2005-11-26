@@ -27,13 +27,10 @@ root_password () {
 		return 0
 	fi
 	
-	if [ -e $ROOT/etc/passwd ] ; then
-		if [ "`$chroot $ROOT grep ^root: /etc/passwd | cut -d : -f 2`" ] && \
-	   [ "`$chroot $ROOT grep ^root: /etc/passwd | cut -d : -f 2`" != 'x' ]; then
+	if [ -e $ROOT/etc/passwd ] && \
+		[ "`$chroot $ROOT grep ^root: /etc/passwd | cut -d : -f 2`" ] && \
+		[ "`$chroot $ROOT grep ^root: /etc/passwd | cut -d : -f 2`" != 'x' ]; then
 			return 0
-		fi
-	else
-		return 0
 	fi
 
 	return 1
