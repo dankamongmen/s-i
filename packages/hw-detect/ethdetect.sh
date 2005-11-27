@@ -88,8 +88,10 @@ ethernet_found() {
 
 	for iface in $(sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//"| sed "s/^ *//"); do
 		ifaces=$(expr $ifaces + 1)
-		if grep "^$iface:" /etc/network/devnames | grep -q -i firewire; then
-			firewire=$(expr $firewire + 1)
+		if [ -f /etc/network/devnames ]; then
+			if grep "^$iface:" /etc/network/devnames | grep -q -i firewire; then
+				firewire=$(expr $firewire + 1)
+			fi
 		fi
 	done
 	
