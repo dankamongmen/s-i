@@ -62,18 +62,18 @@ compare_devs() {
 	echo ${devs#$olddevs} | sed -e 's/^ //'
 }
 
-DEVNAMES=/etc/network/devnames.gz
+DEVNAMES_STATIC=/etc/network/devnames-static.gz
 TEMP_EXTRACT=/tmp/devnames-static.txt
 get_static_modinfo() {
 	local module="$(echo $1 | sed 's/\.k\?o//')"
 	local modinfo=""
 
 	if [ ! -f "$TEMP_EXTRACT" ]; then
-		zcat $DEVNAMES > $TEMP_EXTRACT
+		zcat $DEVNAMES_STATIC > $TEMP_EXTRACT
 	fi
 	
 	if grep -q "^${module}:" $TEMP_EXTRACT; then 
-		modinfo=$(zcat $DEVNAMES | grep "^${module}:" | head -n 1 | cut -d':' -f2-)
+		modinfo=$(zcat $DEVNAMES_STATIC | grep "^${module}:" | head -n 1 | cut -d':' -f2-)
 	fi
 	echo "$modinfo"
 }
