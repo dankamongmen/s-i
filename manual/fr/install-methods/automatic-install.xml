@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28672 -->
+<!-- original version: 32424 -->
 
  <sect1 id="automatic-install">
  <title>Installation automatisée</title>
@@ -25,25 +25,29 @@ de préconfiguration. Un fichier de préconfiguration peut se trouver sur le
 réseau ou sur un support amovible. Il sert à répondre aux questions qui seront
 posées pendant l'installation.
 </para>
-
-<para>
+<para condition="etch">
+Une bonne documentation, avec un fichier d'exemple que l'on peut modifier,
+se trouve dans l'<xref linkend="appendix-preseed"/>
+</para>
+<para condition="sarge">
 La plupart des dialogues de l'installateur Debian peuvent être
 préconfigurés de cette manière. Il y a cependant des exceptions
 notables. On peut partitionner tout un disque ou partitionner seulement
 une partie de l'espace disponible&nbsp;; on ne peut pas utiliser des
 partitions existantes .
 On ne peut pas installer RAID et LVM en utilisant cette méthode.
-<phrase condition="sarge">Il n'est pas possible non plus de
+Il n'est pas possible non plus de
 préconfigurer les paramètres des modules du noyau, à l'exception des
-modules réseau.</phrase>
+modules réseau.
 </para>
 
-<para>
+<para condition="sarge">
 Le format de ce fichier est celui de la commande debconf-set-selections. 
 Un exemple fonctionnel et bien documenté, que vous pouvez modifier, se trouve 
 dans <xref linkend="example-preseed"/>.
 </para>
-<para>
+
+<para condition="sarge">
 Une façon simple de créer le fichier complet est de faire une installation,
 puis d'utiliser la commande <filename>debconf-get-selections</filename> qui 
 se trouve dans le paquet <classname>debconf-utils</classname> pour copier les 
@@ -59,13 +63,13 @@ Cependant, un fichier créé de cette manière possédera des éléments qu'on ne
 doit pas préconfigurer&nbsp;; le fichier dans <xref linkend="example-preseed"/>
 est un meilleur point de départ pour la plupart des utilisateurs.
 </para>
-<para>
+<para condition="sarge">
 Une fois que vous avez créé ce fichier de préconfiguration, vous pouvez le
 modifier, le placer sur un serveur web ou le copier sur le support de
 l'installateur. Mais, quelque soit sa place, vous devez dire à l'installateur
 de l'utiliser au moment de l'amorçage.
 </para>
-<para>
+<para condition="sarge">
 Pour que l'installateur utilise un fichier de préconfiguration sur le réseau,
 il faut ajouter preseed/url=http://url/to/preseed.cfg aux paramètres 
 d'amorçage du noyau. Bien sûr, la préconfiguration ne fonctionnera pas avant 
@@ -75,36 +79,18 @@ de questions. On peut aussi régler la priorité à «&nbsp;critique&nbsp;» pour
 éviter toute question pendant l'installation du réseau.
 Voyez <xref linkend="installer-args"/>.
 </para>
-<para>
+<para condition="sarge">
 Pour mettre un fichier de préconfiguration sur un cédérom, il faut recréer
 l'image ISO et y ajouter le fichier. Voyez la page de manuel de mkisofs.
 Vous pouvez aussi mettre le fichier de préconfiguration sur une disquette et
 utiliser preseed/file=/floppy/preseed.cfg
 </para>
-<para arch="i386">
+<para arch="i386" condition="sarge">
 Si vous voulez amorcer à partir d'une clé USB, vous pouvez copier le fichier de
 préconfiguration sur le système de fichiers de la clé, modifier le fichier
 syslinux.cfg et y ajouter preseed/file=/hd-media/preseed.cfg pour les 
 paramètres d'amorçage du noyau.
 </para>
-
-   <sect3 condition="etch">
-   <title>Préconfiguration des valeurs par défaut</title>
-<para>
-
-Il est possible de préconfigurer la réponse à une question tout en
-permettant que la question soit posée. Le drapeau
-<firstterm>seen</firstterm> doit être mis à <quote>false</quote> une
-fois la valeur déclarée.
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-</para>
-   </sect3>
-
 </sect2>
 </sect1>
 
