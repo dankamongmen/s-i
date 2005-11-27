@@ -4,7 +4,7 @@
 
 set -e
 
-for mpoint in $(mount | cut -d ' ' -f 3 | sort -r); do
+for mpoint in $(cut -d ' ' -f 2 /proc/mounts | sort -r); do
 	if [ "$mpoint" = / ]; then
 		umount /proc || true
 		umount / || true
