@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 untranslated -->
+<!-- original version: 32424 untranslated -->
 
  <sect1 id="automatic-install">
  <title>Automatic Installation</title>
@@ -21,25 +21,30 @@ the Debian Installer itself.
 
 The Debian Installer supports automating installs via preconfiguration
 files. A preconfiguration file can be loaded from the network or from
-removable media, and used to fill in answers to question asked during the
+removable media, and used to fill in answers to questions asked during the
 installation process.
 
-</para><para>
+</para><para condition="etch">
+
+Full documentation on preseeding including a working example that you can
+edit is in <xref linkend="appendix-preseed"/>.
+
+</para><para condition="sarge">
 
 Although most dialogs used by &d-i; can be preseeded using this method,
 there are some notable exceptions. You can (re)partition an entire disk
 or use available free space on a disk; it is not possible to use existing
 partitions. You currently cannot use preseeding to set up RAID and LVM.
-<phrase condition="sarge">Also, with the exception of network driver modules,
-it is not possible to preconfigure kernel module parameters.</phrase>
+Also, with the exception of network driver modules, it is not possible
+to preconfigure kernel module parameters.
 
-</para><para>
+</para><para condition="sarge">
 
 The preconfiguration file is in the format used by the
-debconf-set-selections command. A well documented and working example that
-you can edit is in <xref linkend="example-preseed"/>.
+debconf-set-selections command. A well documented and working example
+that you can edit is in <xref linkend="example-preseed"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 Alternatively, one way to get a complete file listing
 all the values that can be preseeded is to do a manual install,
@@ -57,14 +62,14 @@ However, a file generated in this manner will have some items that should
 not be preseeded, and the file in <xref linkend="example-preseed"/> is a
 better starting place for most users.
 
-</para><para>
+</para><para condition="sarge">
 
 Once you have a preconfiguration file, you can edit it if necessary, and
 place it on a web server, or copy it onto the installer's boot media. Wherever
 you place the file, you need to pass a parameter to the installer at boot
 time to tell it to use the file.
 
-</para><para>
+</para><para condition="sarge">
 
 To make the installer use a preconfiguration file downloaded from the
 network, add preseed/url=http://url/to/preseed.cfg to the kernel boot
@@ -75,14 +80,14 @@ any questions. You may want to set the installation priority to critical to
 avoid any questions while the network is being configured. See
 <xref linkend="installer-args"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 To place a preconfiguration file on a CD, you would need to remaster the
 ISO image to include your preconfiguration file. See the manual page for
 mkisofs for details. Alternatively, put the preseed file on a floppy, and
 use preseed/file=/floppy/preseed.cfg
 
-</para><para arch="i386">
+</para><para arch="i386" condition="sarge">
 
 If you'll be booting from a USB memory stick, then you can simply copy your
 preconfiguration file onto the memory stick's filesystem, and edit the
@@ -90,22 +95,5 @@ syslinux.cfg file to add preseed/file=/hd-media/preseed.cfg to the kernel boot
 parameters.
 
 </para>
-
-   <sect3 condition="etch">
-   <title>Using Preseeding to Change Default Values</title>
-<para>
-
-It is also possible to use preseeding to change the default answer for a
-question, but still have the question asked. To do this the
-<firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
-setting the value for a template.
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-</para>
-   </sect3>
   </sect2>
  </sect1>
