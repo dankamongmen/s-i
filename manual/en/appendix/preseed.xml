@@ -17,7 +17,7 @@ Currently only a single variant of the example file is generated (for i386).
 
 <para>
 
-This appendix explains the intricacies of preseeding answers to dialogs in
+This appendix explains the intricacies of preseeding answers to questions in
 &d-i; to automate your installation.
 
 </para><para>
@@ -31,7 +31,7 @@ example preseed file from &urlset-example-preseed;.
  <title>Introduction</title>
 <para>
 
-Preseeding provides a way to set answers to dialogs without having to manually
+Preseeding provides a way to set answers to questions without having to manually
 enter the answers while the installation is running. This makes it possible to
 fully automate most types of installation and even offers some features not
 available during normal installations.
@@ -51,11 +51,11 @@ system) and the second stage.
 There are three methods that can be used for preseeding:
 <firstterm>initrd</firstterm>, <firstterm>file</firstterm> and
 <firstterm>network</firstterm>. Initrd preseeding will work with any
-installation method and gives the fullest coverage, but is requires the most
-preparation. File and network preseeding each can be used with different
-installation methods. With file and network preseeding the first few installer
-questions cannot be preseeded because the preseed configuration file is only
-loaded after they have been asked.
+installation method and supports preseeding of more things, but it requires
+the most preparation. File and network preseeding each can be used with
+different installation methods. With file and network preseeding the first
+few installer questions cannot be preseeded because the preseed configuration
+file is only loaded after they have been asked.
 
 </para><para>
 
@@ -73,7 +73,7 @@ installation methods.
 
 <tbody>
 <row>
-  <entry>CD/DVD based</entry>
+  <entry>CD/DVD</entry>
   <entry>yes</entry>
   <entry>yes</entry>
   <entry>no</entry>
@@ -112,7 +112,7 @@ installation methods.
 An important difference between the preseeding methods is the point at which
 the preseed configuration file is loaded and processed. For initrd preseeding
 this is right at the start of the installation, before the first question is
-even processed. For file preseeding this is after the CD or CD image has been
+even asked. For file preseeding this is after the CD or CD image has been
 loaded. For network preseeding it is only after the network has been
 configured.
 
@@ -123,12 +123,12 @@ questions about language, country and keyboard selection will already have
 been asked. For network preseeding add to that any questions related to
 network configuration. Some other questions that are only displayed
 at medium or low priority (like the first hardware detection run) will
-already have been processed.
+also already have been processed.
 
 </para><para>
 
 Obviously, any questions that have been processed before the
-preseeding configuration file is loaded, cannot be preseeded. Section
+preseeding configuration file is loaded, cannot be preseeded.
 <xref linkend="preseed-bootparms"/> offers a way to avoid these
 questions being asked.
 
@@ -139,8 +139,8 @@ questions being asked.
   <title>Limitations</title>
 <para>
 
-Although most dialogs used by &d-i; can be preseeded using this method,
-there are some notable exceptions. You can (re)partition an entire disk
+Although most questions used by &d-i; can be preseeded using this method,
+there are some notable exceptions. You must (re)partition an entire disk
 or use available free space on a disk; it is not possible to use existing
 partitions. You currently cannot use preseeding to set up RAID and LVM.
 
@@ -190,15 +190,15 @@ The following types of templates are relevant for preseeding.
 <para>
 
 In &d-i; templates are stored in a readable file
-<filename>/var/lib/templates.dat</filename>. This file contains all fixed
+<filename>/var/cache/debconf/templates.dat</filename>. This file contains all fixed
 text and all translations. It can also contain a default value for the
 template. The fixed text can include variables that will be replaced at
 runtime.
 
 </para><para>
 
-Another readable file <filename>/var/lib/questions.dat</filename> is used
-to store the values for variables and the answers given to questions.
+Another readable file <filename>/var/cache/debconf/questions.dat</filename>
+is used to store the values for variables and the answers given to questions.
 A question always refers to the template used to ask it. For obvious
 security reasons the values for templates of type <quote>password</quote>
 are stored in a separate, non-readable file in the same directory.
@@ -427,7 +427,7 @@ example preseed file from &urlset-example-preseed;.
 Note that this example is based on an installation for the Intel x86
 architecture. If you are installing a different architecture, some of the
 examples (like keyboard selection and bootloader installation) may not be
-relevant and will need to be replaced by debconf settings valid for your
+relevant and will need to be replaced by debconf settings appropriate for your
 architecture.
 
 </para>
@@ -455,8 +455,8 @@ d-i debian-installer/locale string en_US
 
 Keyboard configuration consists of selecting a keyboard architecture and a
 keymap. In most cases the correct keyboard architecture is selected by
-default, so there's normally no need to preseed it. The keymap must of
-course be valid for the selected or preseeded architecture.
+default, so there's normally no need to preseed it. The keymap must
+be valid for the selected  keyboard architecture.
 
 <informalexample role="example"><screen>
 # Keyboard selection.
@@ -668,10 +668,10 @@ text values or MD5 <emphasis>hashes</emphasis>.
 <warning><para>
 
 Be aware that preseeding passwords is not completely secure as everyone
-with physical access to the preseed file will have the knowledge of these
-passwords. Using MD5 hashes is considered slightly better in terms of
-security but it might also give a false sense of security as physical
-access to a MD5 hash allows for brute force attacks.
+with access to the preseed file will have the knowledge of these passwords.
+Using MD5 hashes is considered slightly better in terms of security but it
+might also give a false sense of security as access to a MD5 hash allows
+for brute force attacks.
 
 </para></warning>
 
@@ -699,10 +699,11 @@ access to a MD5 hash allows for brute force attacks.
 
 The <classname>passwd/root-password-crypted</classname> and
 <classname>passwd/user-password-crypted</classname> variables can also be
-preseeded with <quote>!</quote> as value. In that case, the corresponding
+preseeded with <quote>!</quote> as their value. In that case, the corresponding
 account is disabled. This may be convenient for the root account, provided
 of course that an alternate method is setup to allow administrative
-activities or root login (for instance by using SSH key authentication).
+activities or root login (for instance by using SSH key authentication or
+sudo).
 
 </para>
   </sect2>
