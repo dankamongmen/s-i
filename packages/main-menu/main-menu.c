@@ -43,6 +43,9 @@ static struct debconfclient *debconf;
 
 static int di_config_package(di_system_package *p,
 			     int (*virtfunc)(di_system_package *));
+
+static void modify_debconf_priority (int raise_or_lower);
+
 /*
  * qsort comparison function (sort by menu item values, fall back to
  * lexical sort to resolve ties deterministically).
