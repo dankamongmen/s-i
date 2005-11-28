@@ -1,4 +1,18 @@
 #! /bin/sh
+
 debconf-disconnect printf '\nRebooting...\n'
-umount -a
+
+for mpoint in $(cut -d ' ' -f 2 /proc/mounts | sort -r); do
+	case $mpoint in
+		/)
+			umount /proc || true
+			umount / || true
+			;;
+		/proc)	;;
+		*)
+			umount $mpoint || true
+			;;
+	esac
+done
+
 /lib/debian-installer/exit
