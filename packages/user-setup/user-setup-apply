@@ -18,7 +18,7 @@ fi
 # Set a password, via chpasswd.
 # Use perl rather than echo, to avoid the password
 # showing in the process table. (However, this is normally
-# only called when first booting the system, when root has no
+# only called when first installing the system, when root has no
 # password at all, so that should be an unnecessary precaution).
 #
 # Pass in three arguments: the user, the password, and 'true' if the
@@ -144,12 +144,9 @@ if [ "$RET" = true ] && ! is_system_user; then
 	setpassword "$USER" "$USER_PW" "$USER_PW_CRYPTED"
 
 	if [ -n "$USER" ]; then
-		$log $chroot $ROOT adduser "$USER" audio >/dev/null 2>&1 || true
-		$log $chroot $ROOT adduser "$USER" cdrom >/dev/null 2>&1 || true
-		$log $chroot $ROOT adduser "$USER" dialout >/dev/null 2>&1 || true
-		$log $chroot $ROOT adduser "$USER" floppy >/dev/null 2>&1 || true
-		$log $chroot $ROOT adduser "$USER" video >/dev/null 2>&1 || true
-		$log $chroot $ROOT adduser "$USER" plugdev >/dev/null 2>&1 || true
+		for group in audio cdrom dialout floppy video plugdev; do
+			$log $chroot $ROOT adduser "$USER" $group >/dev/null 2>&1 || true
+		done
 	fi
 fi
 
