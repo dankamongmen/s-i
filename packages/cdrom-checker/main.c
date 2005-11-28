@@ -168,6 +168,12 @@ int main(int argc, char **argv) {
 	debconf_go(debconf);
 	debconf_get(debconf, "cdrom-checker/start");
 	if(!strstr(debconf->value, "true")) {	/* return to main-menu */
+		if (strcmp(getenv("MENU"), argv[0]) == 0) {
+			/* We're being called as the main menu, then reboot
+			 * afterwards. 12 is a magic value used by rootskel to
+			 * signal that we want to reboot */
+			return(12);
+		}
 		return(EXIT_SUCCESS);
 	}
 	system("logger after-quest");
@@ -210,6 +216,12 @@ int main(int argc, char **argv) {
 	debconf_go(debconf);
 	di_exec_shell_log("udpkg --force-configure --configure cdrom-detect");
 
+	if (strcmp(getenv("MENU"), argv[0]) == 0) {
+		/* We're being called as the main menu, then reboot
+		 * afterwards. 12 is a magic value used by rootskel to
+		 * signal that we want to reboot */
+		return(12);
+	}
 	return(EXIT_SUCCESS);
 }
 
