@@ -129,9 +129,9 @@ if [ "$RET" = true ] && ! is_system_user; then
 	db_get passwd/user-fullname
 
 	if [ -x $ROOT/usr/sbin/adduser ]; then
-		$chroot $ROOT adduser --disabled-password --gecos "$RET" $UIDOPT "$USER" >/dev/null || true
+		$log $chroot $ROOT adduser --disabled-password --gecos "$RET" $UIDOPT "$USER" >/dev/null || true
 	else
-		$chroot $ROOT useradd -c "$RET" -m "$USER" $UIDOPT >/dev/null || true
+		$log $chroot $ROOT useradd -c "$RET" -m "$USER" $UIDOPT >/dev/null || true
 	fi
 
 	# Clear the user password from the database.
@@ -142,6 +142,15 @@ if [ "$RET" = true ] && ! is_system_user; then
 		db_set passwd/user-password-again ''
 	fi
 	setpassword "$USER" "$USER_PW" "$USER_PW_CRYPTED"
+
+	if [ -n "$USER" ]; then
+		$log $chroot $ROOT adduser "$USER" audio >/dev/null 2>&1 || true
+		$log $chroot $ROOT adduser "$USER" cdrom >/dev/null 2>&1 || true
+		$log $chroot $ROOT adduser "$USER" dialout >/dev/null 2>&1 || true
+		$log $chroot $ROOT adduser "$USER" floppy >/dev/null 2>&1 || true
+		$log $chroot $ROOT adduser "$USER" video >/dev/null 2>&1 || true
+		$log $chroot $ROOT adduser "$USER" plugdev >/dev/null 2>&1 || true
+	fi
 fi
 
 exit 0
