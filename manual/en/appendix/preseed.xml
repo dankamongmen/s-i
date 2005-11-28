@@ -147,6 +147,7 @@ partitions. You currently cannot use preseeding to set up RAID and LVM.
 </para>
   </sect2>
 
+<!-- Joeyh feels this is too technical, so leave it out for now
   <sect2 id="preseed-debconf">
   <title>Debconf basics</title>
 <para>
@@ -205,6 +206,7 @@ are stored in a separate, non-readable file in the same directory.
 
 </para>
   </sect2>
+-->
 
   <sect2 id="preseed-hooks">
   <title>Running custom commands during the installation</title>
@@ -269,6 +271,12 @@ a floppy or usb-stick. If you want to include the file on a CD or DVD, you
 will have to remaster the ISO image. How to get the preseed file included
 in the initrd is outside the scope of this document; please consult the
 developers documentation for &d-i;.
+
+</para><para>
+
+An example preseed file that you can use as basis for your preseed file is
+available from &urlset-example-preseed;. This file is based on the
+configuration fragments included in this appendix.
 
 </para>
 
@@ -656,6 +664,27 @@ d-i time/zone string US/Eastern
 
   </sect2>
 
+  <sect2 id="preseed-apt">
+  <title>Apt setup</title>
+<para>
+
+Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
+options is fully automated based on your installation method and answers to
+earlier questions. Only the two variables below are relevant for preseeding.
+
+</para>
+
+<informalexample role="example"><screen>
+# You can choose to install non-free and contrib software.
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+
+# Do enable security updates.
+d-i apt-setup/security-updates boolean true
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-account">
   <title>Account setup</title>
 <para>
@@ -704,6 +733,14 @@ account is disabled. This may be convenient for the root account, provided
 of course that an alternate method is setup to allow administrative
 activities or root login (for instance by using SSH key authentication or
 sudo).
+
+</para><para>
+
+An MD5 hash for a password can be generated using the following command.
+
+<informalexample><screen>
+$ echo "r00tme" | mkpasswd -s -H MD5
+</screen></informalexample>
 
 </para>
   </sect2>
@@ -769,32 +806,6 @@ base-config base-config/login note
 # The default is not to report back, but sending reports helps the project
 # determine what software is most popular and include it on CDs.
 #popularity-contest popularity-contest/participate boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-apt">
-  <title>Apt setup</title>
-
-<informalexample role="example"><screen>
-# This question controls what source the second stage installation uses
-# for packages. Choices are cdrom, http, ftp, filesystem, edit sources list
-# by hand
-base-config apt-setup/uri_type select http
-
-# If you choose ftp or http, you'll be asked for a country and a mirror.
-base-config apt-setup/country select enter information manually
-base-config apt-setup/hostname string http.us.debian.org
-base-config apt-setup/directory string /debian
-# Stop after choosing one mirror.
-base-config apt-setup/another boolean false
-
-# You can choose to install non-free and contrib software.
-#base-config apt-setup/non-free boolean true
-#base-config apt-setup/contrib boolean true
-
-# Do enable security updates.
-base-config apt-setup/security-updates boolean true
 </screen></informalexample>
 
   </sect2>
