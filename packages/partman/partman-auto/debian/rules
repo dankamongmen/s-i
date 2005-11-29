@@ -26,6 +26,12 @@ install: build
 			debian/install-rc $$sub; \
 		fi; \
 	done
+ifeq ($(ARCH),powerpc)
+	# temporary hack until chrp_rs6k goes away entirely
+	rm -rf debian/partman-auto/lib/partman/recipes-powerpc-chrp_rs6k
+	dh_link lib/partman/recipes-powerpc-chrp_ibm \
+		lib/partman/recipes-powerpc-chrp_rs6k
+endif
 	debian/install-rc choose_partition
 	debian/install-rc free_space
 	debian/install-rc automatically_partition
