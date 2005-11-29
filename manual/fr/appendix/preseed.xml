@@ -657,88 +657,91 @@ d-i partman/confirm boolean true
   </sect2>
 
   <sect2 id="preseed-time">
-  <title>Clock and time zone setup</title>
+  <title>Configuration du fuseau horaire</title>
 
 <informalexample role="example"><screen>
-# Controls whether or not the hardware clock is set to UTC.
+# Cette commande règle l'horloge matérielle sur UTC :
 d-i clock-setup/utc boolean true
 
-# You may set this to any valid setting for $TZ; see the contents of
-# /usr/share/zoneinfo/ for valid values.
+# Vous pouvez mettre toute valeur acceptée pour $TZ.
+# Voyez ce que contient /usr/share/zoneinfo/ pour des options.
 d-i time/zone string US/Eastern
 </screen></informalexample>
 
   </sect2>
 
   <sect2 id="preseed-account">
-  <title>Account setup</title>
+  <title>Configuration des comptes</title>
 <para>
 
-The password for the root account and name and password for a first regular
-user's account can be preseeded. For the passwords you can use either clear
-text values or MD5 <emphasis>hashes</emphasis>.
+Le mot de passe de root et le nom et le mot de passe d'un premier utilisateur
+peuvent être préconfigurés. Pour les mots de passe, vous pouvez utiliser
+simplement du texte ou bien utiliser le <emphasis>hachage</emphasis> MD5.
 
 </para>
 <warning><para>
 
-Be aware that preseeding passwords is not completely secure as everyone
-with physical access to the preseed file will have the knowledge of these
-passwords. Using MD5 hashes is considered slightly better in terms of
-security but it might also give a false sense of security as physical
-access to a MD5 hash allows for brute force attacks.
+Il faut être conscient que la préconfiguration des mots de passe n'est pas
+entièrement sécurisée. On peut en effet lire le fichier de préconfiguration 
+quand on y a accès et donc connaître les mots de passe. Le hachage MD5 semble 
+meilleur en termes de sécurité. Cependant il peut donner un faux sentiment de sécurité
+car un accès au hachage MD5 permet les attaques en force.
 
 </para></warning>
 
 <informalexample role="example"><screen>
-# Root password, either in clear text
+#Le mot de passe de root en clair...
 #passwd passwd/root-password password r00tme
 #passwd passwd/root-password-again password r00tme
-# or encrypted using an MD5 hash.
+# ... ou chiffré avec un hachage MD5
 #passwd passwd/root-password-crypted password [MD5 hash]
 
-# Skip creation of a normal user account.
+# Si vous voulez ne pas créer d'utilisateur :
 #passwd passwd/make-user boolean false
 
-# Alternatively, create a normal user account.
+# Vous pouvez aussi présélectionner le nom de l'utilisateur et son identifiant
+# de connexion
 #passwd passwd/user-fullname string Debian User
 #passwd passwd/username string debian
-# Normal user's password, either in clear text
+# Mot de passe de l'utilisateur en clair...
 #passwd passwd/user-password password insecure
 #passwd passwd/user-password-again password insecure
-# or encrypted using an MD5 hash.
+# ... ou chiffré avec un hachage MD5
 #passwd passwd/user-password-crypted password [MD5 hash]
 </screen></informalexample>
 
 <para>
 
-The <classname>passwd/root-password-crypted</classname> and
-<classname>passwd/user-password-crypted</classname> variables can also be
-preseeded with <quote>!</quote> as value. In that case, the corresponding
-account is disabled. This may be convenient for the root account, provided
-of course that an alternate method is setup to allow administrative
-activities or root login (for instance by using SSH key authentication).
+Les variables <classname>passwd/root-password-crypted</classname> et
+<classname>passwd/user-password-crypted</classname> peuvent être aussi
+préconfigurées avec la valeur <quote>!</quote>. Dans ce cas, l'identifiant
+correspondant est désactivé. Cette méthode convient pour le compte root. Mais
+il faut pouvoir autoriser la gestion administrative ou la connexion de root d'une
+autre manière, par exemple authentification avec clé SSH.
 
 </para>
   </sect2>
 
   <sect2 id="preseed-bootloader">
-  <title>Boot loader installation</title>
+  <title>Installation du programme d'amorçage</title>
 
 <informalexample role="example"><screen>
-# Grub is the default boot loader (for x86). If you want lilo installed
-# instead, uncomment this:
+# Grub est le programme d'amorçage par défaut (pour x86). Si vous préférez
+# LILO, décommentez la ligne suivante :
 #d-i grub-installer/skip boolean true
 
-# This is fairly safe to set, it makes grub install automatically to the MBR
-# if no other operating system is detected on the machine.
+# Il n'y a aucun danger à donner ce paramètre : il installe grub sur le
+# secteur d'amorçage principal s'il n'existe aucun autre système d'exploitation
+# sur la machine.
 d-i grub-installer/only_debian boolean true
 
-# This one makes grub-installer install to the MBR if if finds some other OS
-# too, which is less safe as it might not be able to boot that other OS.
+# Ce paramètre installe grub sur le secteur d'amorçage principal même s'il
+# existe un autre système d'exploitation, ce qui est moins sûr car il pourrait
+# ne pas savoir amorcer cet autre système.
 d-i grub-installer/with_other_os boolean true
 
-# Alternatively, if you want to install to a location other than the mbr,
-# uncomment and edit these lines:
+# Vous pouvez aussi l'installer ailleurs que dans le secteur d'amorçage 
+# principal. Décommentez et modifiez les lignes suivantes :
 #d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
@@ -747,14 +750,14 @@ d-i grub-installer/with_other_os boolean true
   </sect2>
 
   <sect2 id="preseed-finish">
-  <title>Finishing up the first stage install</title>
+  <title>Terminer la première étape de l'installation</title>
 
 <informalexample role="example"><screen>
-# Avoid that last message about the install being complete.
+# Pour éviter le dernier message disant que l'installation est terminée
 d-i prebaseconfig/reboot_in_progress note
 
-# This will prevent the installer from ejecting the CD during the reboot,
-# which is useful in some situations.
+# Pour empêcher l'éjection du cédérom au moment du redémarrage,
+# c'est utile parfois :
 #d-i cdrom-detect/eject boolean false
 </screen></informalexample>
 
@@ -762,104 +765,74 @@ d-i prebaseconfig/reboot_in_progress note
  </sect1>
 
  <sect1 id="preseed-stage2">
- <title>Preseeding the second stage of the installation</title>
+ <title>Préconfiguration de la deuxième partie de l'installation</title>
 
   <sect2 id="preseed-baseconfig">
-  <title>Base config</title>
+  <title>Préconfiguration de base-config</title>
 
 <informalexample role="example"><screen>
-# Avoid the introductory message.
+# Pour éviter le message d'introduction
 base-config base-config/intro note
 
-# Avoid the final message.
+# Pour éviter le dernier message
 base-config base-config/login note
 
-# If you installed a display manager, but don't want to start it immediately
-# after base-config finishes.
+# Si vous installez un gestionnaire d'affichage et si vous ne voulez pas le
+# lancer immédiatemment après base-config :
 #base-config base-config/start-display-manager boolean false
 
-# Some versions of the installer can report back on what you've installed.
-# The default is not to report back, but sending reports helps the project
-# determine what software is most popular and include it on CDs.
+# Certaines versions de l'installateur peuvent dire ce que vous avez installé.
+# Par défaut, rien n'est signalé. Mais l'envoi de rapport d'installation aide le projet
+# à connaître les logiciels populaires. 
 #popularity-contest popularity-contest/participate boolean false
 </screen></informalexample>
 
   </sect2>
 
-  <sect2 id="preseed-apt">
-  <title>Apt setup</title>
-
-<informalexample role="example"><screen>
-# This question controls what source the second stage installation uses
-# for packages. Choices are cdrom, http, ftp, filesystem, edit sources list
-# by hand
-base-config apt-setup/uri_type select http
-
-# If you choose ftp or http, you'll be asked for a country and a mirror.
-base-config apt-setup/country select enter information manually
-base-config apt-setup/hostname string http.us.debian.org
-base-config apt-setup/directory string /debian
-# Stop after choosing one mirror.
-base-config apt-setup/another boolean false
-
-# You can choose to install non-free and contrib software.
-#base-config apt-setup/non-free boolean true
-#base-config apt-setup/contrib boolean true
-
-# Do enable security updates.
-base-config apt-setup/security-updates boolean true
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-tasksel">
-  <title>Package selection</title>
+  <title>Choix des paquets</title>
 <para>
 
-You can choose to install any combination of tasks that are available.
-Available tasks as of this writing include:
-
-</para>
+Vous pouvez installer toute combinaison de tâches parmi celles disponibles.
+Pour l'heure, les tâches disponibles sont les suivantes :
 
 <itemizedlist>
 <listitem><para>
-  <userinput>Standard system</userinput>
+  <userinput>Système standard</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Desktop environment</userinput>
+  <userinput>Machine de bureau</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Web server</userinput>
+  <userinput>Serveur web</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Print server</userinput>
+  <userinput>Serveur d'impression</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>DNS server</userinput>
+  <userinput>Serveur DNS</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>File server</userinput>
+  <userinput>Serveur de fichiers</userinput>
 </para></listitem>
 <listitem><para>
   <userinput>Mail server</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>SQL database</userinput>
+  <userinput>Base de données SQL</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Laptop</userinput>
+  <userinput>Portable</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>manual package selection</userinput>
+  <userinput>choix paquet par paquet</userinput>
 </para></listitem>
 </itemizedlist>
 
 <para>
-
-The last of these will run aptitude. You can also choose to install no tasks,
-and force the installation of a set of packages in some other way. We recommend
-always including the <userinput>Standard system</userinput> task.
-
+Pour les dernières tâches, aptitude est utilisé. Vous pouvez aussi
+choisir de n'installer aucune tâche et forcer l'installation de paquets par un autre moyen.
+Il est recommandé de toujours inclure la tâche Système standard.
 </para>
 
 <informalexample role="example"><screen>
@@ -870,12 +843,10 @@ tasksel tasksel/first multiselect Standard system, Desktop environment
   </sect2>
 
   <sect2 id="preseed-mailer">
-  <title>Mailer configuration</title>
+  <title>Configuration du MTA</title>
 <para>
-
-During a normal install, exim asks only a few questions. Here's how to
-avoid even those. More complicated preseeding is possible.
-
+Pendant une installation normale, exim pose peu de questions. Voici
+ comment les éviter. Une préconfiguration plus complexe est possible.
 </para>
 
 <informalexample role="example"><screen>
@@ -883,130 +854,122 @@ exim4-config exim4/dc_eximconfig_configtype \
        select no configuration at this time
 exim4-config exim4/no_config boolean true
 exim4-config exim4/no_config boolean true
-
-# It's a good idea to set this to whatever user account you choose to
-# create. Leaving the value blank results in postmaster mail going to
-# /var/mail/mail.
 exim4-config exim4/dc_postmaster string
 </screen></informalexample>
 
   </sect2>
 
   <sect2 id="preseed-X">
-  <title>X configuration</title>
+  <title>Configuration du serveur X</title>
 <para>
 
-Preseeding Debian's X config is possible, but you probably need to know
-some details about the video hardware of the machine, since Debian's X
-configurator does not do fully automatic configuration of everything.
-
+Préconfigurer le serveur X est possible, mais vous devrez sans doute 
+connaître les caractéristiques du matériel video de votre machine. Le
+configurateur Debian du serveur X ne configure rien automatiquement.
 </para>
-
 <informalexample role="example"><screen>
-# X can detect the right driver for some cards, but if you're preseeding,
-# you override whatever it chooses. Still, vesa will work most places.
+# X peut détecter le bon pilote pour certaines cartes, mais si vous faites une
+# préconfiguration, vous annulez ce qu'il aura choisi. Cependant vesa
+# fonctionne la plupart du temps.
 #xserver-xfree86 xserver-xfree86/config/device/driver select vesa
 
-# A caveat with mouse autodetection is that if it fails, X will retry it
-# over and over. So if it's preseeded to be done, there is a possibility of
-# an infinite loop if the mouse is not autodetected.
+# Pour la détection automatique de la souris, il faut savoir que si elle
+# échoue, X recommence sans fin le processus. Donc, s'il y a préconfiguration,
+# une boucle infinie peut apparaître si la souris n'est pas détectée.
 #xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
 
-# Monitor autodetection is recommended.
+# La détection automatique du moniteur est recommandée.
 xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
-# Uncomment if you have an LCD display.
+# Décommentez la ligne suivante si vous posséder un écran LCD.
 #xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
-# X has three configuration paths for the monitor. Here's how to preseed
-# the "medium" path, which is always available. The "simple" path may not
-# be available, and the "advanced" path asks too many questions.
+# X possède trois adresses pour la configuration du moniteur. Voici comment
+# présélectionner l'adresse « medium », qui est toujours disponible.
+# L'adresse « simple » peut ne pas être disponible et l'adresse
+# « advanced » pose trop de questions.
 xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
        select medium
 xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
-
-  </sect2>
+</sect2>
 
   <sect2 id="preseed-other">
-  <title>Preseeding other packages</title>
+  <title>Les autres questions</title>
 
 <informalexample role="example"><screen>
-# Depending on what software you choose to install, or if things go wrong
-# during the installation process, it's possible that other questions may
-# be asked. You can preseed those too, of course. To get a list of every
-# possible question that could be asked during an install, do an
-# installation, and then run these commands:
+# Selon les logiciels que vous avez installés et s'il y a eu des problèmes
+# pendant le processus d'installation, d'autres questions peuvent être posées.
+# Vous pouvez bien sûr les préconfigurer ! Pour obtenir la liste de toutes
+# les questions possibles, faites une installation, et exécutez ces 
+# commandes :
 #   debconf-get-selections --installer > file
 #   debconf-get-selections >> file
 </screen></informalexample>
-
-  </sect2>
- </sect1>
+</sect2>
+</sect1>
 
  <sect1 id="preseed-advanced">
- <title>Advanced options</title>
+ <title>Options complexes</title>
 
   <sect2 id="preseed-shell">
-  <title>Shell commands</title>
+  <title>Commandes Shell</title>
 
 <informalexample role="example"><screen>
-# d-i preseeding is inherently not secure. Nothing in the installer checks
-# for attempts at buffer overflows or other exploits of the values of a
-# preseed file like this one. Only use preseed files from trusted
-# locations! To drive that home, and because it's generally useful, here's
-# a way to run any shell command you'd like inside the installer,
-# automatically.
+# La préconfiguration de l'installation n'est pas sécurisée. Rien dans 
+# dans l'installateur ne vérifie que des dépassements de tampons ou des
+# exploitations quelconques des valeurs données dans ce fichier n'ont pas lieu.
+# N'utilisez que les fichiers dont vous connaissez la provenance !
+# Pour tout dire, et parce que c'est en général utile, voici un
+# moyen d'exécuter automatiquement une commande dans l'installateur.
 
-# This first command is run as early as possible, just after
-# preseeding is read.
+# La première commande est exécutée aussi tôt que possible, juste après
+# la lecture du fichier.
 #d-i preseed/early_command string anna-install some-udeb
 
-# This command is run just before the install finishes, but when there is
-# still a usable /target directory.
+# Cette commande est exécutée juste avant que l'installation ne se termine,
+# mais quand le répertoire /target est encore utilisable.
 #d-i preseed/late_command string echo foo > /target/etc/bar
 
-# This command is run just as base-config is starting up.
+# Cette commande est exécutée au moment où base-config commence.
 #base-config base-config/early_command string echo hi mom
 
-# This command is run after base-config is done, just before the login:
-# prompt. This is a good way to install a set of packages you want, or to
-# tweak the configuration of the system.
-#base-config base-config/late_command \
-#      string apt-get install zsh; chsh -s /bin/zsh
+# Cette commande est exécutée après base-config, juste avant la connexion.
+# C'est un bon moyen d'installer les paquets que vous voulez ou d'affiner la
+# la configuration du système.
+#base-config base-config/late_command string \
+#    apt-get install zsh; chsh -s /bin/zsh
 </screen></informalexample>
-
-  </sect2>
+</sect2>
 
   <sect2 id="preseed-chainload">
-  <title>Chainloading preseed files</title>
+  <title>Chaîner les fichiers de préconfiguration</title>
 <para>
-
-It is possible to include other preseed files from a preseed file. Any
-settings in those files will override pre-existing settings from files
-loaded earlier. This makes it possible to put, for example, general
-networking settings for your location in one file and more specific
-settings for certain configurations in other files.
-
+Vous pouvez inclure dans ce fichier d'autres fichiers de
+de préconfiguration. Toutes les valeurs de ces fichiers annuleront les
+valeurs préexistantes. Vous pouvez par exemple mettre la configuration du
+réseau dans un fichier et certaines configurations plus spécifiques dans 
+un autre fichier.
 </para>
 
 <informalexample><screen>
-# More that one file can be listed, separated by spaces; all will be
-# loaded. The included files can have preseed/include directives of their
-# own as well. Note that if the filenames are relative, they are taken from
-# the same directory as the preseed file that includes them.
+#Vous pouvez indiquer plus d'un fichier, en les séparant par des espaces ; 
+#tous seront chargés. Ces fichiers peuvent à leur tour contenir d'autres 
+#directives de préconfiguration ou d'inclusion. Notez que si les fichiers sont relatifs, 
+#ils seront pris dans le répertoire où se trouve le fichier qui les inclut.
 #d-i preseed/include string x.cfg
 
-# The installer can optionally verify checksums of preseed files before
-# using them. Currently only md5sums are supported, list the md5sums
-# in the same order as the list of files to include.
+# L'installateur peut vérifier la somme de contrôle des fichiers de
+# préconfiguration avant de les utiliser.  Pour le moment, cette somme doit être
+# de type md5sum. Il faut lister les sommes de contrôles dans le même ordre
+# que les fichiers à inclure. 
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
 
-# More flexibly, this runs a shell command and if it outputs the names of
-# preseed files, includes those files. 
-#d-i preseed/include_command \
-#      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+# D'une manière plus souple, cela exécute des commandes du shell et si le 
+# résultat donne les noms de ces fichiers, ils sont inclus. 
+#d-i preseed/include_command string \
+#   string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 </screen></informalexample>
+</sect2>
 
-  </sect2>
- </sect1>
+</sect1>
 </appendix>
