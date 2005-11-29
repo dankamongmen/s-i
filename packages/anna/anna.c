@@ -391,7 +391,7 @@ int main(int argc, char **argv) {
 	}
 	else if (strcmp(argv[1], "install") == 0) {
 		di_slist_node *node;
-		di_package *package;
+		di_package *package = NULL;
 		int i;
 
 		if (get_retriever() == NULL) {
@@ -412,7 +412,31 @@ int main(int argc, char **argv) {
 		}
 		
 		for (i = 2; i < argc; i++) {
+			int installed = 0;
 			int found = 0;
+			
+			for (node = status->list.head; node; node = node->next) {
+				di_slist_node *node1;
+				package = node->data;
+				if (strcmp(package->package, argv[i]) == 0) {
+					installed = 1;
+					continue;
+				}
+				for (node1 = package->depends.head; node1; node1 = node1->next) {
+					di_package_dependency *d = node1->data;
+					if (d->type == di_package_dependency_type_provides
+					    && d->ptr && strcmp(d->ptr->package, argv[i]) == 0) {
+						installed = 1;
+						continue;
+					}
+				}
+			}
+
+			if (installed) {
+				di_log (DI_LOG_LEVEL_DEBUG, "skipping already installed %s", argv[i]);
+				continue;
+			}
+			
 			for (node = packages->list.head; node; node = node->next) {
 				package = node->data;
 
