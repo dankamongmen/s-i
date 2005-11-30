@@ -449,7 +449,7 @@ modifier avec les valeurs adéquates.
 
 Choisir la langue et le pays ne fonctionne qu'avec une préconfiguration de type initrd.
 Pour les autres formes de préconfiguration, le fichier de préconfiguration n'est chargé
-qu'après que les questions ont été posée
+qu'après que les questions ont été posées
 
 </para><para>
 
@@ -670,6 +670,24 @@ d-i time/zone string US/Eastern
 
   </sect2>
 
+  <sect2 id="preseed-apt">
+  <title>Apt setup</title>
+<para>
+
+La création du fichier <filename>/etc/apt/sources.list</filename> et 
+les principales options de configuration se font automatiquement à partir
+de la méthode d'installation choisie et des réponses aux précédentes questions.
+Seules les deux variables suivantes relèvent de la préconfiguration.
+</para>
+
+<informalexample role="example"><screen>
+# Vous pouvez installer des logiciels des distributions non-free et contrib.
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+</screen></informalexample>
+
+</sect2>
+
   <sect2 id="preseed-account">
   <title>Configuration des comptes</title>
 <para>
@@ -795,6 +813,7 @@ base-config base-config/login note
 
 Vous pouvez installer toute combinaison de tâches parmi celles disponibles.
 Pour l'heure, les tâches disponibles sont les suivantes :
+</para>
 
 <itemizedlist>
 <listitem><para>
@@ -846,7 +865,7 @@ tasksel tasksel/first multiselect Standard system, Desktop environment
   <title>Configuration du MTA</title>
 <para>
 Pendant une installation normale, exim pose peu de questions. Voici
- comment les éviter. Une préconfiguration plus complexe est possible.
+comment les éviter. Une préconfiguration plus complexe est possible.
 </para>
 
 <informalexample role="example"><screen>
