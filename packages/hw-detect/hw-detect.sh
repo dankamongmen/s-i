@@ -202,10 +202,16 @@ hotplug_type () {
 	if [ -f /proc/sys/kernel/hotplug ]; then
 		if [ -d /etc/hotplug ]; then
 			HOTPLUG_TYPE=real
-		elif [ "$(cat /proc/sys/kernel/hotplug)" = /sbin/udevsend ]; then
-			HOTPLUG_TYPE=udev
 		else
-			HOTPLUG_TYPE=fake
+			HOTPLUG_HANDLER="$(cat /proc/sys/kernel/hotplug)"
+			case $HOTPLUG_HANDLER in
+				''|/sbin/udevsend)
+					HOTPLUG_TYPE=udev
+					;;
+				*)
+					HOTPLUG_TYPE=fake
+					;;
+			esac
 		fi
 	else
 		HOTPLUG_TYPE=
