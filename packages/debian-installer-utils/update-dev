@@ -1,0 +1,11 @@
+#! /bin/sh
+
+# Make sure /dev is up to date after loading modules.
+
+if [ -x /lib/userdevfs/update-dev ]; then
+	/lib/userdevfs/update-dev
+elif type udevstart >/dev/null 2>&1; then
+	udevstart
+elif type udevsynthesize >/dev/null 2>&1; then
+	udevsynthesize
+fi
