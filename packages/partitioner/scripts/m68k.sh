@@ -26,9 +26,9 @@ case "`archdetect`" in
 	;;
 esac
 
-if [ -x /usr/bin/update-dev ]; then
+if type update-dev >/dev/null 2>&1; then
 	logger -t "partitioner" "userdevfs: update-dev"
-        /usr/bin/update-dev 2>&1 | logger -t "update-dev"
+	update-dev 2>&1 | logger -t "update-dev"
 fi
 
 exit $?
