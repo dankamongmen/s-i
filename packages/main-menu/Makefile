@@ -22,7 +22,9 @@ demo: $(BIN)
 # Size optimized and stripped binary target.
 small: CFLAGS:=-Os $(CFLAGS) -DSMALL
 small: clean $(BIN)
+ifndef DEBUG
 	strip --remove-section=.comment --remove-section=.note $(BIN)
+endif
 	ls -l $(BIN)
 
 clean:
