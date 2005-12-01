@@ -592,11 +592,6 @@ addfunc(struct kbsentry kbs) {
         int sh, i;
 	char *p, *q, *r;
 
-        if (kbs.kb_func >= MAX_NR_FUNC) {
-	        di_error (": addfunc called with bad func %d\n",
-			 kbs.kb_func);
-		exit(1);
-	}
 	if ((q = func_table[kbs.kb_func])) { /* throw out old previous def */
 	        sh = strlen(q) + 1;
 		p = q + sh;
