@@ -23,6 +23,20 @@ partman-auto (46) UNRELEASED; urgency=low
   [ Colin Watson ]
   * Remove duplicated chrp_rs6k recipes and install a symlink instead.
 
+  [ Fabio M. Di Nitto ]
+  * Start implementing bits required to avoid code duplication with
+    partman-auto-lvm as per discussion on debian-boot mailing list.
+    (See http://lists.debian.org/debian-boot/2005/10/msg00842.html)
+  * Add lvmok{ } to recipes as per discussion on debian-boot mailing list.
+    NOTES:
+      - nobody objected to a tag/properties/flag name or proposed something
+        different. It is clearly ok to rename it if it doesn't fit.
+      - swap will stay out of LVM for now. In some cases it is known to break
+        suspend/resume. It seems not all kernels are able to resume from it.
+      - porters will have to adjust their recipes. I could only test
+        i386/amd64 (via recipes) and powerpc-powermac_newworld (via
+        recipes-powerpc-powermac_newworld).
+
  -- Steve Langasek <vorlon@debian.org>  Wed, 16 Nov 2005 15:35:46 -0800
 
 partman-auto (45) unstable; urgency=low
