@@ -3,20 +3,10 @@
 
 logsavedir=/target/var/log/installer
 
-# Make sure the debconf priority is in questions.dat for base-config.
-# (Gross hack; there must be a better way.)
-. /usr/share/debconf/confmodule
-db_get debconf/priority
-db_set debconf/priority $RET
 # Make sure debconf has saved the database.
 db_x_save
 
 test -d $logsavedir || mkdir $logsavedir
-# Transition support for the old logsavedir /var/log/debian-installer
-# as used by sarge base-config.
-if [ ! -L /target/var/log/debian-installer ]; then 
-	ln -s installer /target/var/log/debian-installer
-fi
 
 # Copy current debconf database
 mkdir -p $logsavedir/cdebconf
