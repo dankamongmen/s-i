@@ -2,6 +2,7 @@
 
 . /lib/partman/definitions.sh
 . /lib/partman/recipes.sh
+. /lib/partman/auto-shared.sh
 
 dev=$1
 free_space=$2
@@ -38,101 +39,11 @@ clean_method
 
 db_progress STEP 1
 
-cd $dev
-
-while
-    [ "$free_type" = pri/log ] \
-    && echo $scheme | grep '\$primary{' >/dev/null
-do
-    pull_primary
-    set -- $primary
-    open_dialog NEW_PARTITION primary $4 $free_space beginning ${1}000001
-    read_line num id size type fs path name
-    close_dialog
-    if [ -z "$id" ]; then
-	db_progress STOP
-	autopartitioning_failed
-    fi
-    neighbour=$(partition_after $id)
-    if [ "$neighbour" ]; then
-	open_dialog PARTITION_INFO $neighbour
-	read_line x1 new_free_space x2 new_free_type fs x3 x4
-	close_dialog
-    fi
-    if 
-	[ -z "$neighbour" -o "$fs" != free \
-	  -o "$new_free_type" = primary -o "$new_free_type" = unusable ]
-    then
-	open_dialog DELETE_PARTITION $id
-	close_dialog
-	open_dialog NEW_PARTITION primary $4 $free_space end ${1}000001
-	read_line num id size type fs path name
-	close_dialog
-	if [ -z "$id" ]; then
-	    db_progress STOP
-	    autopartitioning_failed
-	fi
-	neighbour=$(partition_before $id)
-	if [ "$neighbour" ]; then
-	    open_dialog PARTITION_INFO $neighbour
-	    read_line x1 new_free_space x2 new_free_type fs x3 x4
-	    close_dialog
-	fi
-	if 
-	    [ -z "$neighbour" -o "$fs" != free -o "$new_free_type" = unusable ]
-	then
-	    open_dialog DELETE_PARTITION $id
-	    close_dialog
-	    break
-	fi
-    fi
-    shift; shift; shift; shift
-    setup_partition $id $*
-    primary=''
-    scheme="$logical"
-    free_space=$new_free_space
-    free_type="$new_free_type"
-done
+create_primary_partitions
 
 db_progress STEP 1
 
-foreach_partition '
-    if [ -z "$free_space" ]; then
-        db_progress STOP
-	autopartitioning_failed
-    fi
-    open_dialog PARTITION_INFO $free_space
-    read_line x1 free_space x2 free_type fs x3 x4
-    close_dialog
-    if [ "$fs" != free ]; then
-        free_type=unusable
-    fi
-    case "$free_type" in
-	primary|logical)
-	    type="$free_type"
-	    ;;
-	pri/log)
-	    type=logical
-	    ;;
-	unusable)
-            db_progress STOP
-	    autopartitioning_failed
-	    ;;
-    esac
-    if [ "$last" = yes ]; then
-        open_dialog NEW_PARTITION $type $4 $free_space full ${1}000001
-    else
-        open_dialog NEW_PARTITION $type $4 $free_space beginning ${1}000001
-    fi
-    read_line num id size type fs path name
-    close_dialog
-    if [ -z "$id" ]; then
-        db_progress STOP
-	autopartitioning_failed
-    fi
-    shift; shift; shift; shift
-    setup_partition $id $*
-    free_space=$(partition_after $id)'
+create_partitions
 
 db_progress STEP 1
 

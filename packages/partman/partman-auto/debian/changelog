@@ -36,6 +36,18 @@ partman-auto (46) UNRELEASED; urgency=low
       - porters will have to adjust their recipes. I could only test
         i386/amd64 (via recipes) and powerpc-powermac_newworld (via
         recipes-powerpc-powermac_newworld).
+  * Move common code into auto-shared.sh shelllib and create 3 functions:
+    wipe_disk, create_primary_partitions (see comments in the file) and
+    create_partitions.
+  * Install auto-shared.sh in /lib/partman (chages debian/rules)
+  * Make perform_recipe and autopartition use auto-shared.sh.
+  * Make create_partitions set a var for all the devices that will be marked
+    as pv. This is actually only used by partman-auto-lvm, but it is generic
+    enough that could be used later on for other tasks.
+    NOTES: the above changes have been tested on i386/amd64/ppc and there is
+    no known breakage. The code is only moved around and none of the actual
+    recipes use method{ lvm } used by partman-auto-lvm to mark partitions as
+    pv volumes.
 
  -- Steve Langasek <vorlon@debian.org>  Wed, 16 Nov 2005 15:35:46 -0800
 
