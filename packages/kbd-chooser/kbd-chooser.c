@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2002,2003 Alastair McKinstry, <mckinstry@debian.org>
+ * Copyright (C) 2002,2003, 2005 Alastair McKinstry, <mckinstry@debian.org>
  * Released under the GPL
  *
  * $Id$
@@ -25,15 +25,6 @@
 #include "xmalloc.h"
 #include "kbd-chooser.h"
 
-
-// TODO Move this into debian-installer.h
-
-#ifndef di_info
-#define di_info(format...)   di_log(DI_LOG_LEVEL_INFO, format)
-#endif
-#ifndef di_debug
-#define di_debug(format...)  di_log(DI_LOG_LEVEL_INFO, format)
-#endif
 
 extern int loadkeys_wrapper (char *map);	// in loadkeys.y
 
