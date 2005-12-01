@@ -86,7 +86,7 @@ static const char *status_print(unsigned long flags)
 		}
 		if (statuswords[i][j] == 0)
 		{
-			fprintf(stderr, "corrupted status flag!!\n");
+			fprintf(stderr, "corrupted status flag!!: %x\n",flags);
 			return NULL;
 		}
 	}

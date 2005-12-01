@@ -24,7 +24,7 @@ static int force_configure = 0;
 static int is_file(const char *fn)
 {
 	struct stat statbuf;
-
+	
 	if (stat(fn, &statbuf) < 0) return 0;
 	return S_ISREG(statbuf.st_mode);
 }
@@ -128,7 +128,7 @@ static int dpkg_dounpack(struct package_t *pkg)
                                  "config" };
 #ifdef DOREMOVE
 	char *p;
-	FILE *infp, *outfp;
+	FILE *infp = NULL, *outfp = NULL;
 #endif
 
 	DPRINTF("Unpacking %s\n", pkg->package);
@@ -193,8 +193,8 @@ static int dpkg_dounpack(struct package_t *pkg)
 		 * why oh why does dpkg create the list file
 		 * so oddly...
 		 */
-		snprintf(buf, sizeof(buf), 
-			"ar -p %s data.tar.gz|tar -tzf -", 
+		snprintf(buf, sizeof(buf),
+			"ar -p %s data.tar.gz|tar -tzf -",
 			pkg->file);
 		snprintf(buf2, sizeof(buf2),
 			"%s%s.list", INFODIR, pkg->package);
@@ -398,7 +398,7 @@ static int dpkg_install(struct package_t *pkgs)
 }
 
 static int dpkg_fields(struct package_t *pkg)
-{
+{  
 	char *command;
 	int ret;
 
@@ -416,13 +416,59 @@ static int dpkg_fields(struct package_t *pkg)
 static int dpkg_remove(struct package_t *pkgs)
 {
 #ifdef DOREMOVE
+	int r=0;
 	struct package_t *p;
+	char buf[1024], buf2[1024];
+	FILE *fp;
 	void *status = status_read();
+
 	for (p = pkgs; p != 0; p = p->next)
 	{
+		di_debug("Start removing  package %s", p->package);
+		snprintf(buf, sizeof(buf),
+			 "%s%s.list", INFODIR, p->package);
+		if ((fp = fopen(buf, "r")) == NULL)
+		{
+			FPRINTF(stderr, "Cannot read %s\n",
+				buf);
+			r = 1;
+		}
+		else
+		{
+			while (fgets(buf, sizeof(buf), fp) &&
+			       !feof(fp))
+			{
+				/* we remove only files, not directories */
+				if (is_file(buf))
+				{
+					snprintf(buf2, sizeof(buf2), "rm -f -- %s", buf);
+					if (di_exec_shell_log(buf2) != 0)
+						r = 1;
+					di_debug("File %s removed",buf);
+				}
+			}
+		}
+
+		if (r == 0) {
+		  snprintf(buf, sizeof(buf),
+			   "rm -f -- %s%s.*", INFODIR, p->package);
+		  if (di_exec_shell_log(buf) != 0)
+		    r = 1;
+		}
+		p->status &= STATUS_WANTMASK;
+		p->status |= STATUS_WANTDEINSTALL;
+		p->status &= STATUS_FLAGMASK;
+		p->status |= STATUS_FLAGOK;
+		p->status &= STATUS_STATUSMASK;
+		if (r == 0)
+		  p->status |= STATUS_STATUSNOTINSTALLED;
+		else
+		  /* do not know which best status flag
+		   * should be used */
+		  p->status |= STATUS_STATUSHALFINSTALLED;
 	}
-	status_merge(status, 0);
-	return 0;
+	status_merge(status, pkgs);
+	return r;
 #else
 	FPRINTF(stderr, "udpkg: No support for -r.\n");
 	return 1;
