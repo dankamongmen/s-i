@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <debian-installer.h>
+#include <sys/ioctl.h>
 #include "ksyms.h"
 #include "getfd.h"
 #include "nls.h"
