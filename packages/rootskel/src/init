@@ -4,13 +4,13 @@ export PATH
 . /lib/debian-installer/init-debug
 debugshell "just booted"
 
+mount /proc
 if [ -x /sbin/udevd ]; then
 	/lib/debian-installer/init-udev-devices
 else
 	mount /dev
 	mount /dev/pts
 fi
-mount /proc
 init='busybox init'
 for i in $(cat /proc/cmdline); do
 	case $i in
