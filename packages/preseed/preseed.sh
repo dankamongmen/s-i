@@ -1,5 +1,7 @@
 #!/bin/sh
 
+logfile=/var/log/debconf-seed
+
 log () {
 	logger -t preseed "$@"
 }
@@ -20,7 +22,6 @@ preseed_location () {
 	local checksum="$2"
 	
 	local tmp=/tmp/debconf-seed
-	local logfile=/var/log/debconf-seed
 	
 	if ! preseed_fetch $location $tmp; then
 		error retrieve_error "$location"
