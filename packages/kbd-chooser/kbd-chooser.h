@@ -63,7 +63,7 @@ char *locale_get (void);
 #endif
 
 #if defined(__m68k___)
-#define PREFERRED_KBD "no-keyboard"
+#define PREFERRED_KBD "skip-config"
 #endif
 
 #if defined(AT_KBD) && !defined(PREFERRED_KBD)
@@ -71,7 +71,7 @@ char *locale_get (void);
 #endif
 
 #if !defined(PREFERRED_KBD)
-#define PREFERRED_KBD "no-keyboard"
+#define PREFERRED_KBD "skip-config"
 #endif
 
 #endif  /* KBD_CHOOSER_H */

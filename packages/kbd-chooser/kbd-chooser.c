@@ -725,7 +725,7 @@ keymap_select (char *arch, char *keymap)
 	res = mydebconf_ask ( kb->deflt ? "low" : "high", template, &ptr);
 	if (res != CMD_SUCCESS)
 		return res;
-	strcpy (keymap, (strlen (ptr) == 0) ? "no-keyboard" : ptr);
+	strcpy (keymap, (strlen (ptr) == 0) ? "skip-config" : ptr);
 
 	return CMD_SUCCESS;
 }
