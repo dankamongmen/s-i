@@ -670,7 +670,7 @@ keyboard_select (char *curr_arch)
 		choices++;
 		s = insert_description (s, "no-keyboard", &first_entry_s);
 		t = insert_description (t, arch_descr, &first_entry_t);
-		mydebconf_default_set ("console-tools/archs", "none");
+		mydebconf_default_set ("console-tools/archs", "no-keyboard");
 	} else {
 		// Add option to skip keyboard configuration (use kernel keymap)
 		debconf_metaget(client, "kbd-chooser/skip-config", "Description");
@@ -725,7 +725,7 @@ keymap_select (char *arch, char *keymap)
 	res = mydebconf_ask ( kb->deflt ? "low" : "high", template, &ptr);
 	if (res != CMD_SUCCESS)
 		return res;
-	strcpy (keymap, (strlen (ptr) == 0) ? "none" : ptr);
+	strcpy (keymap, (strlen (ptr) == 0) ? "no-keyboard" : ptr);
 
 	return CMD_SUCCESS;
 }
