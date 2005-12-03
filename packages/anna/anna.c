@@ -450,6 +450,10 @@ int main(int argc, char **argv) {
 				}
 
 				if (((di_system_package *)package)->kernel_version) {
+		                        if (running_kernel && strcmp(running_kernel, ((di_system_package *)package)->kernel_version) != 0) {
+						di_log (DI_LOG_LEVEL_DEBUG, "skipping %s, wrong kernel version", package->package);
+						continue;
+					}
 					di_slist_node *node1;
 					for (node1 = package->depends.head; node1; node1 = node1->next) {
 						di_package_dependency *d = node1->data;
