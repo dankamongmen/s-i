@@ -1,22 +1,22 @@
 #!/bin/sh
 set -e
-. /usr/share/debconf/confmodule
+. /lib/chroot-setup.sh
 
-db_get debian-installer/locale
-if [ "$RET" ]; then
-	TARGETLANG="$RET"
+chroot_setup
+
+DEBCONF_READFD=0
+export DEBCONF_READFD
+DEBCONF_WRITEFD=3
+export DEBCONF_WRITEFD
+DEBIAN_FRONTEND=passthrough
+export DEBIAN_FRONTEND
+ERRCODE=0
+log-output -t in-target chroot /target "$@" || ERRCODE=$?
+
+chroot_cleanup
+
+if [ "$ERRCODE" != 0 ]; then
+	exit 1
 else
-	TARGETLANG=C
+	exit 0
 fi
-
-db_get debconf/priority
-TARGETPRIO="$RET"
-
-# make debconf passthrough work
-env -u DEBIAN_HAS_FRONTEND -u DEBIAN_FRONTEND \
-    -u DEBCONF_REDIR -u DEBCONF_OLD_FD_BASE \
-    DEBCONF_READFD=0 DEBCONF_WRITEFD=3 \
-    DEBIAN_FRONTEND=passthrough \
-    DEBIAN_PRIORITY="$TARGETPRIO" \
-    LANG="$TARGETLANG" \
-    chroot /target "$@"
