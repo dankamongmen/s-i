@@ -60,10 +60,14 @@
 #include <debian-installer/slist.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
+
+/* maximum lenght for string questions */
+#define STRING_MAX_LENGHT 128
 
 /* used to define horizontal and vertical padding of progressbar */
 #define PROGRESSBAR_HPADDING 60
@@ -396,6 +400,17 @@ void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_
     free(tindex);
     free(indices);
 
+}
+
+static gboolean key_press_event( GtkWidget *widget, GdkEvent  *event, GtkButton *button )
+{
+    GdkEventKey* key = (GdkEventKey*)event;
+    if ( key->keyval  == GDK_Escape ) {
+        INFO(INFO_DEBUG, "GTK_DI - ESC key pressed\n");
+        gtk_button_clicked ( button );
+    }
+
+    return TRUE;
 }
 
 void exit_button_callback(GtkWidget *button, struct frontend* obj)
@@ -1199,7 +1214,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
         gtk_entry_set_text (GTK_ENTRY(entry), defval);
     else
         gtk_entry_set_text (GTK_ENTRY(entry), "");
-    gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
+    gtk_entry_set_max_length (GTK_ENTRY (entry), STRING_MAX_LENGHT );
     gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
@@ -1326,6 +1341,9 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_box_pack_start(GTK_BOX (logobox), logo_button, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX (logobox), h_mainbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_container_add(GTK_CONTAINER(window), logobox);
+    /* pressing ESC key simulates a user's click on the "Back" button*/
+    g_signal_connect_after (window, "key_press_event", G_CALLBACK (key_press_event), button_prev );
+     
 }
 
 static int gtk_initialize(struct frontend *obj, struct configuration *conf)
