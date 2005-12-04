@@ -26,6 +26,16 @@ exit 0
 EOF
 	chmod a+rx /target/sbin/start-stop-daemon
 	
+	# Don't let apt fail because of back clock settings.
+	[ ! -d /target/etc/apt/apt.conf.d ] && mkdir -p /target/etc/apt/apt.conf.d
+	cat > /target/etc/apt/apt.conf.d/00ignore-time-conflict <<EOT
+Acquire {
+	gpgv {
+		Options {"--ignore-time-conflict";}
+	};
+}
+EOT
+
 	# Record the current mounts
 	mountpoints > /tmp/mount.pre
 
@@ -60,15 +70,6 @@ EOF
 	DEBIAN_PRIORITY=$(debconf-get debconf/priority || true)
 	export DEBIAN_PRIORITY
 
-	# Pass installation language.
-	RET=$(debconf-get debian-installer/locale || true)
-	if [ "$RET" ]; then
-	        LANG="$RET"
-	else
-	        LANG=C
-	fi
-	export LANG
-
 	# Unset variables that would make scripts in the target think
 	# that debconf is already running there.
 	unset DEBIAN_HAS_FRONTEND
@@ -84,6 +85,7 @@ chroot_cleanup () {
 	rm -f /target/usr/sbin/policy-rc.d
 	rm /target/sbin/start-stop-daemon
 	mv /target/sbin/start-stop-daemon.REAL /target/sbin/start-stop-daemon
+	rm -f /target/etc/apt/apt.conf.d/00ignore-time-conflict
 
 	# Undo the mounts done by the packages during installation.
 	# Reverse sorting to umount the deepest mount points first.

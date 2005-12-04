@@ -23,11 +23,9 @@ fi
 DEBIAN_FRONTEND=noninteractive
 export DEBIAN_FRONTEND
 
-APTOPTS='-o Acquire::gpgv::Options::=--ignore-time-conflict'
-
 chroot_setup
 ERRCODE=0
-log-output -t apt-install chroot /target apt-get $APTOPTS -y install $@ < /dev/null || ERRCODE=$?
+log-output -t apt-install chroot /target apt-get -y install $@ < /dev/null || ERRCODE=$?
 chroot_cleanup
 
 if [ "$ERRCODE" != 0 ]; then
