@@ -402,12 +402,15 @@ void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_
 
 }
 
-static gboolean key_press_event( GtkWidget *widget, GdkEvent  *event, GtkButton *button )
+static gboolean key_press_event( GtkWidget *widget, GdkEvent  *event, struct frontend* obj )
 {
     GdkEventKey* key = (GdkEventKey*)event;
-    if ( key->keyval  == GDK_Escape ) {
+    struct frontend_data *data = (struct frontend_data *) obj->data;
+    struct question *q = obj->questions;
+    
+    if ( (key->keyval  == GDK_Escape) && (obj->methods.can_go_back(obj, q)) ) {
         INFO(INFO_DEBUG, "GTK_DI - ESC key pressed\n");
-        gtk_button_clicked ( button );
+        gtk_button_clicked ( GTK_BUTTON(data->button_prev) );
     }
 
     return TRUE;
@@ -1341,8 +1344,9 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_box_pack_start(GTK_BOX (logobox), logo_button, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX (logobox), h_mainbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_container_add(GTK_CONTAINER(window), logobox);
+    
     /* pressing ESC key simulates a user's click on the "Back" button*/
-    g_signal_connect_after (window, "key_press_event", G_CALLBACK (key_press_event), button_prev );
+    g_signal_connect_after (window, "key_press_event", G_CALLBACK (key_press_event), obj );
      
 }
 
