@@ -1,12 +1,10 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 32427 -->
 
 
  <sect1 id="boot-troubleshooting">
  <!--<title>Troubleshooting the Installation Process</title>-->
  <title>Risolvere eventuali problemi del processo d'installazione</title>
-<para>
-</para>
 
   <sect2 condition="supports-floppy-boot" id="unreliable-floppies">
   <!--<title>Floppy Disk Reliability</title>-->
@@ -364,8 +362,15 @@ kernel personalizzato (si veda <xref linkend="kernel-baking"/>).
 
 <!--
 If you get through the initial boot phase but cannot complete the
-install, the bug reporter menu choice may be helpful. It copies system
-error logs and configuration information to a user-supplied floppy.
+install, the bug reporter menu choice may be helpful.
+<phrase condition="sarge">
+It copies system error logs and configuration information to a user-supplied
+floppy.
+</phrase>
+<phrase condition="etch">
+It lets you store system error logs and configuration information from the
+installer to a floppy, or download them in a web browser.
+</phrase>
 This information may provide clues as to what went wrong and how to
 fix it.  If you are submitting a bug report you may want to attach
 this information to the bug report.
@@ -373,8 +378,16 @@ this information to the bug report.
 
 Se si riesce a passare la fase di avvio iniziale ma non si può completare
 l'installazione, la voce "Segnalazione di un problema" del menu potrebbe
-tornare utile. Essa copierà gli errori dai log di sistema e delle
-informazioni sulla configurazione su un dischetto. Queste informazioni
+tornare utile.
+<phrase condition="sarge">
+Essa copierà gli errori dai log di sistema e delle informazioni sulla
+configurazione su un dischetto.
+</phrase>
+<phrase condition="etch">
+Essa salverà gli errori dai log di sistema e delle informazioni sulla
+configurazione dall'installatore su un dischetto oppure in un browser web.
+</phrase>
+Queste informazioni
 potrebbero fornire indizi utili a capire che cosa sia andato storto e come
 rimediare. Se si vuole inviare una segnalazione di bug è bene allegare
 anche queste informazioni.
@@ -405,16 +418,40 @@ computer è stato avviato con il sistema appena installato.
 If you still have problems, please submit an installation report. We also
 encourage installation reports to be sent even if the installation is
 successful, so that we can get as much information as possible on the largest
-number of hardware configurations. Please use this template when filling out
-installation reports, and file the report as a bug report against the
-<classname>installation-reports</classname> pseudo package, by sending it to
-<email>submit@bugs.debian.org</email>.
+number of hardware configurations.
 -->
 
 Se non si riesce a risolvere qualche problema si invii un rapporto di
 installazione. Si incoraggia l'invio del rapporto anche quando l'installazione
 avviene con successo, in questo modo possiamo reperire quante più informazioni
-possibili sulle diverse configurazioni hardware. Si prega di usare il seguente
+possibili sulle diverse configurazioni hardware.
+
+</para><para condition="etch">
+
+<!--
+If you have a working Debian system, the easiest way to send an installation
+report is to install the installation-report and reportbug packages
+(<command>apt-get install installation-report reportbug</command>) and run
+the command <command>reportbug installation-report</command>.
+-->
+
+Nel caso si riesca ad avere un sistema Debian funzionante il modo più
+semplice per inviare un rapporto d'installazione è installare i pacchetti
+installation-report e reportbug (<command>apt-get install installation-report
+reportbug</command>) ed eseguire il comando <command>reportbug
+installation-report</command>.
+
+</para><para>
+
+<!--
+Please use this template when filling out
+installation reports, and file the report as a bug report against the
+<classname>installation-reports</classname> pseudo package, by sending it to
+<email>submit@bugs.debian.org</email>.
+-->
+
+
+Si prega di usare il seguente
 modello per i rapporti d'installazione e poi di inviarlo come segnalazione di
 bug verso lo pseudopacchetto <classname>installation-reports</classname>
 all'indirizzo <email>submit@bugs.debian.org</email>.
@@ -423,18 +460,15 @@ all'indirizzo <email>submit@bugs.debian.org</email>.
 <!--
 Package: installation-reports
 
-Debian-installer-version: &lt;Fill in date and from where you got the image&gt;
-uname -a: &lt;The result of running uname -a on a shell prompt&gt;
+Boot method: &lt;How did you boot the installer? CD? floppy? network?&gt;
+Image version: &lt;Fill in date and from where you got the image&gt;
 Date: &lt;Date and time of the install&gt;
-Method: &lt;How did you install?  What did you boot off?  If network
-      install, from where?  Proxied?&gt;
 
 Machine: &lt;Description of machine (eg, IBM Thinkpad R32)&gt;
 Processor:
 Memory:
-Root Device: &lt;IDE?  SCSI?  Name of device?&gt;
-Root Size/partition table: &lt;Feel free to paste the full partition
-      table, with notes on which partitions are mounted where.&gt;
+Partitions: &lt;df -Tl will do; the raw partition table is preferred&gt;
+
 Output of lspci and lspci -n:
 
 Base System Installation Checklist:
@@ -460,19 +494,17 @@ Comments/Problems:
 -->
 Package: installation-reports
 
-Debian-installer-version: &lt;Inserire la data e da dove si sono recuperate
-      le immagini&gt;
-uname -a: &lt;Il risultato di «uname -a» da una shell&gt;
+Boot method: &lt;Come è stata avviata l'installazione? Da un CD? Da un
+      dischetto? Dalla rete?&gt;
+Image version: &lt;Inserire la data e da dove si sono recuperate le immagini&gt;
 Date: &lt;Giorno e ora di installazione&gt;
-Method: &lt;Come si è svolta l'installazione? Quale metodo si è usato per il
-      boot? Se si è usata la rete da dove? Con un proxy?
 
 Machine: &lt;Descrizione della macchina (pe, IBM Thinkpad R32)&gt;
 Processor: &lt;Tipo di processore&gt;
 Memory: &lt;Quantità di memoria RAM&gt;
-Root Device: &lt;IDE? SCSI? Nome del device?&gt;
-Root Size/partition table: &lt;Fare il copia incolla di tutta la tabella
-      delle partizioni comprese le indicazioni su come e dove sono montate&gt;
+Partitions: &lt;L'output di «df -Tl»; è preferibile la tabella delle partizioni
+      in formatto grezzo&gt;
+
 Output of lspci and lspci -n: &lt;L'output dei comandi «lspci» e «lspci -n»&gt;
 
 Base System Installation Checklist: &lt;Inserire nella casellina una «O» se

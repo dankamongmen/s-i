@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 31905 -->
 
 
  <sect1 id="kernel-baking">
@@ -10,19 +10,26 @@
 
 <!-- Why would someone want to compile a new kernel? It is often not
 necessary since the default kernel shipped with Debian handles most
-configurations. However, it is useful to compile a new kernel in order
-to: -->
+configurations. Also, Debian often offers several alternative kernels.
+So you may want to check first if there is an alternative kernel image
+package that better corresponds to your hardware. However, it can be
+useful to compile a new kernel in order to:
+-->
 
 Perché qualcuno dovrebbe compilarsi un nuovo kernel? Spesso non è
 necessario dato che il kernel inserito in Debian gestisce la
-maggior parte delle configurazioni. Comunque può essere utile compilare
-un nuovo kernel per poter:
+maggior parte delle configurazioni. Inoltre Debian offre parecchi kernel
+alternativi, quindi si dovrebbe come prima cosa controllare se fra i
+pacchetti con kernel alternativi ce n'è uno che si adatta meglio al proprio
+hardware. Comunque può essere utile compilare un nuovo kernel per poter:
 
 <itemizedlist>
 <listitem><para>
 
-<!-- handle special hardware needs, or hardware conflicts with the pre-supplied
-kernels -->
+<!--
+handle special hardware needs, or hardware conflicts with the
+kernels pre-supplied kernels
+-->
 
 gestire hardware particolare o gestire conflitti hardware con kernel
 preconfezionati
@@ -30,17 +37,20 @@ preconfezionati
 </para></listitem>
 <listitem><para>
 
-<!-- handle hardware or options not included in the stock kernel, such as
-APM or SMP -->
+<!--
+use options of the kernel which are not supported in the pre-supplied
+kernels (such as high memory support)
+-->
 
-gestire hardware o funzioni non incluse nel kernel normale, come APM
-o SMP
+usare opzioni del kernel che non sono supportate dai kernel preconfezionati
+(per esempio il supporto per la memoria alta)
 
 </para></listitem>
 <listitem><para>
 
-<!-- optimize the kernel by removing useless drivers to speed up boot
-time -->
+<!--
+optimize the kernel by removing useless drivers to speed up boot time
+-->
 
 ottimizzare il kernel rimuovendo i driver inutili in modo da velocizzare
 l'avvio del sistema
@@ -48,11 +58,11 @@ l'avvio del sistema
 </para></listitem>
 <listitem><para>
 
-<!-- use options of the kernel which are not supported by the default
-kernel (such as high memory support) -->
+<!--
+create a monolithic instead of a modularized kernel
+-->
 
-usare le opzioni del kernel che non sono supportate dal kernel
-predefinito (come il supporto per la memoria alta)
+creare un kernel monolitico al posto di uno modulare
 
 </para></listitem>
 <listitem><para>
@@ -64,9 +74,11 @@ usare un kernel aggiornato o di sviluppo
 </para></listitem>
 <listitem><para>
 
-<!-- impress your friends, try new things -->
+<!-- 
+learn more about linux kernels
+-->
 
-impressionare gli amici o per provare cose nuove
+imparare cose nuove sui kernel linux
 
 </para></listitem>
 </itemizedlist>
@@ -86,18 +98,23 @@ divertente e utile.
 
 </para><para>
 
-<!-- To compile a kernel the Debian way, you need some packages:
-<classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname> (the most recent version
-at the time of this writing), <classname>fakeroot</classname> and a
-few others which are probably already installed (see
+<!--
+To compile a kernel the Debian way, you need some packages:
+<classname>fakeroot</classname>, <classname>kernel-package</classname>,
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(the most recent version at the time of this writing)</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+and a few others which are probably already installed (see 
 <filename>/usr/share/doc/kernel-package/README.gz</filename> for the
-complete list). -->
+complete list).
+-->
 
 Per compilare il kernel con il metodo seguito da Debian sono necessari
-alcuni pacchetti: <classname>kernel-package</classname>,
+alcuni pacchetti: <classname>fakeroot</classname>,
+<classname>kernel-package</classname><phrase condition="classic-kpkg">,
 <classname>kernel-source-&kernelversion;</classname> (la versione più
-recente al momento della scrittura), <classname>fakeroot</classname>
+recente al momento della scrittura)</phrase><phrase condition="common-kpkg">,
+<classname>linux-source-2.6</classname></phrase>
 e pochi altri che probabilmente sono già installati (si consulti
 <filename>/usr/share/doc/kernel-package/README.gz</filename> per
 l'elenco completo).
@@ -122,15 +139,20 @@ System.map e un log con le configurazioni attive durante la compilazione.
 the <quote>Debian way</quote>; but we find that using the packaging system
 to manage your kernel is actually safer and easier.  In fact, you can get
 your kernel sources right from Linus instead of
-<classname>kernel-source-&kernelversion;</classname>, yet still use the
-<classname>kernel-package</classname> compilation method. -->
+<phrase condition="classic-kpkg"><classname>kernel-source-
+&kernelversion;</classname>,</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+yet still use the <classname>kernel-package</classname> compilation method. 
+-->
 
 Notare che <emphasis>non</emphasis> è obbligatorio compilare il kernel
 <quote>alla Debian</quote>; ma l'uso del sistema di pacchetti per gestire
 il kernel è realmente più sicuro e più semplice. In pratica si possono
 anche reperire i sorgenti del kernel direttamente da Linus anziché da
-<classname>kernel-source-&kernelversion;</classname> e comunque usare il
-metodo di compilazione con <classname>kernel-package</classname>.
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname></phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+e comunque usare il metodo di compilazione con
+<classname>kernel-package</classname>.
 
 </para><para>
 
@@ -167,16 +189,26 @@ se questa operazione non richiede dei permessi speciali.
 
 <!-- </footnote>. We'll also assume that your kernel version is
 &kernelversion;. Make sure you are in the directory to where you want to
-unpack the kernel sources, extract them using <userinput>tar xjf
-/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput> and change
-to the directory <filename>kernel-source-&kernelversion;</filename>
+unpack the kernel sources, extract them using 
+<phrase condition="classic-kpkg"><userinput>tar xjf
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>
+and change to the directory
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
 that will have been created. -->
 
 </footnote>. Si suppone anche che la versione del kernel sia
 &kernelversion;. Assicurarsi di trovarsi nella directory in cui si vuole
-scompattare i sorgenti del kernel, estrarli usando <userinput>tar xjf
-/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput> e cambiare la
-directory corrente in <filename>kernel-source-&kernelversion;</filename>
+scompattare i sorgenti del kernel, estrarli usando
+<phrase condition="classic-kpkg"><userinput>tar xjf
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>
+e cambiare la directory corrente in
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
 che è stata appena creata.
 
 </para><para>
@@ -304,10 +336,18 @@ poi eseguire <userinput>shutdown -r now</userinput>.
 
 </para><para>
 
-<!-- For more information on <classname>kernel-package</classname>,
+<!--
+<phrase condition="etch">For more information on Debian kernels and kernel
+compilation, see the <ulink url="&url-kernel-handbook;">Debian Linux Kernel
+Handbook</ulink>.</phrase>
+For more information on <classname>kernel-package</classname>,
 read the fine documentation in
 <filename>/usr/share/doc/kernel-package</filename>. -->
 
+<phrase condition="etch">Per ulteriori informazioni sui kernel Debian e sulla
+compilazione del kernel si consulti il
+<ulink url="&url-kernel-handbook;">Debian Linux Kernel
+Handbook</ulink>.</phrase>
 Per ulteriori informazioni su <classname>kernel-package</classname>
 si consulti l'eccellente documentazione in
 <filename>/usr/share/doc/kernel-package</filename>.

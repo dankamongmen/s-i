@@ -1,18 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28730 untranslated -->
+<!-- original version: 28730 -->
 
 
 <chapter id="boot-new">
- <title>Booting Into Your New Debian System</title>
+<!-- <title>Booting Into Your New Debian System</title> -->
+<title>Avvio del nuovo sistema Debian</title>
 
- <sect1 id="base-boot"><title>The Moment of Truth</title>
+ <sect1 id="base-boot">
+ <!-- <title>The Moment of Truth</title> -->
+ <title>Il momento della verità</title>
+
 <para>
 
+<!--
 Your system's first boot on its own power is what electrical engineers
 call the <quote>smoke test</quote>.
+-->
+
+Il primo avvio del sistema operativo in tutta la sua potenza è ciò
+che gli ingegneri elettronici chiamano la <quote>prova del fumo</quote>.
 
 </para><para>
 
+<!--
 If you are booting directly into Debian, and the system doesn't start
 up, either use your original installation boot media, or insert the
 custom boot floppy if you have one, and reset your system.  This way,
@@ -24,44 +35,83 @@ you will probably need to add some boot arguments like
 Alternatively, see <xref linkend="rescue"/> for instructions on using
 the installer's built-in rescue mode.
 </phrase>
+-->
+
+Se si sta facendo l'avvio direttamente in Debian e il sistema non parte,
+si può usare lo stesso disco d'avvio usato per l'installazione oppure
+inserire un dischetto d'avvio personalizzato, se se ne dispone, e
+riavviare il sistema. Probabilmente si devono aggiungere dei parametri
+d'avvio come <userinput>root=<replaceable>root</replaceable></userinput>,
+dove <replaceable>root</replaceable> è la partizione di root, per esempio
+<filename>/dev/sda1</filename>.
+<phrase condition="etch">
+Oppure si consulti <xref linkend="rescue"/> per avere istruzioni su
+come utilizzare la modalità di ripristino compresa nel programma
+d'installazione.
+</phrase>
 
 </para>
 
-  <sect2 arch="m68k"><title>BVME 6000 Booting</title>
+  <sect2 arch="m68k">
+  <!-- <title>BVME 6000 Booting</title> -->
+  <title>Avvio di BVME 6000</title>
 <para>
 
+<!--
 If you have just performed a diskless install on a BVM or Motorola
 VMEbus machine: once the system has loaded the
 <command>tftplilo</command> program from the TFTP server, from the
 <prompt>LILO Boot:</prompt> prompt enter one of:
+-->
+
+Se fosse appena stata ultimata un'installazione diskless su un pc BVM
+o Motorola: una volta che il sistema abbia caricato il programma
+<command>tftplilo</command> dal server TFTP, dal prompt
+<prompt>LILO Boot:</prompt> inserire una delle stringhe che seguono:
 
 <itemizedlist>
 <listitem><para>
 
+<!--
 <userinput>b6000</userinput> followed by &enterkey;
 to boot a BVME 4000/6000
+-->
+
+<userinput>b6000</userinput> seguito da &enterkey;
+per avviare un a BVME 4000/6000
 
 </para></listitem><listitem><para>
 
+<!--
 <userinput>b162</userinput> followed by &enterkey;
 to boot an MVME162
+-->
+
+<userinput>b162</userinput> seguito da &enterkey;
+per avviare un MUME162
 
 </para></listitem><listitem><para>
 
+<!--
 <userinput>b167</userinput> followed by &enterkey;
 to boot an MVME166/167
+-->
+
+<userinput>b167</userinput> seguito da &enterkey;
+per avviare un MVME166/167
 
 </para></listitem>
 </itemizedlist>
 
 </para>
+  </sect2>
 
-   </sect2>
-
-  <sect2 arch="m68k"><title>Macintosh Booting</title>
-
+  <sect2 arch="m68k">
+  <!-- <title>Macintosh Booting</title> -->
+  <title>Avvio del Macintosh</title>
 <para>
 
+<!--
 Go to the directory containing the installation files and start up the
 <command>Penguin</command> booter, holding down the
 <keycap>command</keycap> key.  Go to the
@@ -69,9 +119,19 @@ Go to the directory containing the installation files and start up the
 <keycap>command</keycap> <keycap>T</keycap> </keycombo>), and locate
 the kernel options line which should look like
 <userinput>root=/dev/ram video=font:VGA8x16</userinput> or similar.
+-->
+
+Andare nella directory che contiene i file di installazione e avviare
+il lanciatore <command>Penguin</command>, premendo il tasto
+<keycap>command</keycap>. Nella finestra di dialogo
+<userinput>Settings</userinput> selezionare (<keycombo>
+<keycap>command</keycap> <keycap>T</keycap> </keycombo>), e inserire
+la riga per le opzioni del kernel che potrebbe apparire come
+<userinput>root=/dev/ram video=font:VGA8x16</userinput> o simile.
 
 </para><para>
 
+<!--
 You need to change the entry to
 <userinput>root=/dev/<replaceable>yyyy</replaceable></userinput>.
 Replace the <replaceable>yyyy</replaceable> with the Linux name of the
@@ -82,33 +142,68 @@ for users with tiny screens. The kernel would pick a prettier (6x11)
 font but the console driver for this font can hang the machine, so
 using 8x16 or 8x8 is safer at this stage.  You can change this at any
 time.
+-->
+
+È necessario cambiare la riga in
+<userinput>root=/dev/<replaceable>yyyy</replaceable></userinput>.
+Sostituire le <replaceable>yyyy</replaceable> con il nome Linux
+della partizione in cui è stato installato il sistema
+(ad esempio <filename>/dev/sda1</filename>); ciò è già stato scritto
+prima.
+<userinput>video=font:VGA8x8</userinput> è consigliabile soprattutto
+per coloro che avessero schermi piccoli. Il kernel potrebbe utilizzare
+un font più bello (6x11) ma il driver di console per questo font
+potrebbe resettare la macchina, perciò, usare 8x16 od 8x8 a questo
+punto è più sicuro. Si potrà modificare tutto ciò in qualunque momento.
 
 </para><para>
 
+<!--
 If you don't want to start GNU/Linux immediately each time you start,
 uncheck the <userinput>Auto Boot</userinput> option. Save your
 settings in the <filename>Prefs</filename> file using the
 <userinput>Save Settings As Default</userinput> option.
+-->
+
+Se non si vuole che GNU/Linux si avvii subito ogni volta che si accende
+la macchina, deselezionare l'opzione <userinput>Auto Boot</userinput>.
+Salvare le impostazioni nel file <filename>Prefs</filename> usando
+l'opzione <userinput>Save Settings As Default</userinput>.
 
 </para><para>
 
+<!--
 Now select <userinput>Boot Now</userinput> (<keycombo>
 <keycap>command</keycap> <keycap>B</keycap> </keycombo>) to start your
 freshly installed GNU/Linux instead of the RAMdisk installer system.
+-->
+
+Ora selezionare <userinput>Boot Now</userinput>
+(<keycombo><keycap>command</keycap> <keycap>B</keycap> </keycombo>)
+per avviare il vostro GNU/Linux appena installato invece che il RAMdisk
+con il sistema d'installazione.
 
 </para><para>
 
+<!--
 Debian should boot, and you should see the same messages as
 when you first booted the installation system, followed by some new
 messages.
+-->
+
+Debian dovrebbe avviarsi e si potrebbero vedere gli stessi messaggi di
+quando è stato avviato per la prima volta il sistema di installazione,
+seguiti da qualche nuovo messaggio.
 
 </para>
-   </sect2>
+  </sect2>
 
-
-  <sect2 arch="powerpc"><title>OldWorld PowerMacs</title>
+  <sect2 arch="powerpc">
+  <!-- <title>OldWorld PowerMacs</title> -->
+  <title>I PowerMac alla vecchia maniera</title>
 <para>
 
+<!--
 If the machine fails to boot after completing the installation, and
 stops with a <prompt>boot:</prompt> prompt, try typing
 <userinput>Linux</userinput> followed by &enterkey;. (The default boot
@@ -120,9 +215,24 @@ the <filename>/target/etc/quik.conf</filename> placed there by the
 <guimenuitem>Install Quik on a Hard Disk</guimenuitem> step. Clues
 for dealing with <command>quik</command> are available at
 <ulink url="&url-powerpc-quik-faq;"></ulink>.
+-->
+
+Se la macchina non riuscisse ad avviarsi dopo il completamento
+dell'installazione e si blocca su un prompt <prompt>boot:</prompt>,
+provare a digitare <userinput>Linux</userinput> seguito da &enterkey;
+(la configurazione predefinita di avvio in
+<filename>quik.conf</filename> è etichettata Linux). Le etichette
+definite in <filename>quik.conf</filename> saranno visualizzate premendo
+il tasto <keycap>Tab</keycap> al prompt <prompt>boot:</prompt>. Si può
+anche provare a riavviare nuovamente il programma di installazione ed
+editare il file <filename>/target/etc/quik.conf</filename> messo lì
+al passo <guimenuitem>Install Quik on a Hard Disk</guimenuitem>.
+Indicazioni su come comportarsi con <command>quik</command> sono
+disponibili presso <ulink url="&url-powerpc-quik-faq;"></ulink>.
 
 </para><para>
 
+<!--
 To boot back into MacOS without resetting the nvram, type
 <userinput>bye</userinput> at the OpenFirmware prompt (assuming MacOS
 has not been removed from the machine). To obtain an OpenFirmware
@@ -133,68 +243,132 @@ the OpenFirmware nvram changes to the MacOS default in order to boot
 back to MacOS, hold down the <keycombo> <keycap>command</keycap>
 <keycap>option</keycap> <keycap>p</keycap> <keycap>r</keycap>
 </keycombo> keys while cold booting the machine.
+-->
+
+Per avviare nuovamente MacOS senza ripristinare la nvram, digitare
+<userinput>bye</userinput> al prompt di OpenFirmware (posto che MacOS
+non sia stato rimosso dalla macchina). Per ottenere un prompt di
+OpenFirmware, tenere premuti i tasti <keycombo> <keycap>command</keycap>
+<keycap>option</keycap> <keycap>o</keycap> <keycap>f</keycap>
+</keycombo> mentre si riavvia a freddo la macchina. Se è necessario
+azzerare le modifiche della nvram di OpenFirmware alle impostazioni
+predefinite di MacOS in modo da riavviare in MacOS, tenere premuti i
+tasti <keycombo> <keycap>command</keycap> <keycap>option</keycap>
+<keycap>p</keycap> <keycap>r</keycap> </keycombo> mentre si riavvia a
+freddo la macchina.
 
 </para><para>
 
+<!--
 If you use <command>BootX</command> to boot into the installed system,
 just select your desired kernel in the <filename>Linux
 Kernels</filename> folder, un-choose the ramdisk option, and add
 a root device corresponding to your installation;
 e.g. <userinput>/dev/hda8</userinput>.
+-->
+
+Se usate <command>BootX</command> per avviare il sistema installato,
+selezionare il kernel desiderato nella cartella <filename>Linux
+Kernels</filename>, deselezionare l'opzione ramdisk e inserire un
+dispositivo di root che corrisponda con quello dell'installazione;
+per esempio <userinput>/dev/hda8</userinput>.
 
 </para>
-   </sect2>
+  </sect2>
 
-
-  <sect2 arch="powerpc"><title>NewWorld PowerMacs</title>
+  <sect2 arch="powerpc">
+  <!-- <title>NewWorld PowerMacs</title> -->
+  <title>PowerMac di nuova generazione</title>
 <para>
 
+<!--
 On G4 machines and iBooks, you can hold down the
 <keycap>option</keycap> key and get a graphical screen with a button
 for each bootable OS, &debian; will be a button with a small penguin
 icon.
+-->
+
+Sulle macchine G4 e sugli iBook, si può tenere premuto il tasto
+<keycap>option</keycap> e ottenere uno schermo grafico con un
+pulsante per ogni OS avviabile, &debian; sarà un pulsante con
+l'icona rappresentante un piccolo pinguino.
 
 </para><para>
 
+<!--
 If you kept MacOS and at some point it changes the OpenFirmware
 <envar>boot-device</envar> variable you should reset OpenFirmware to
 its default configuration.  To do this hold down the <keycombo>
 <keycap>command</keycap> <keycap>option</keycap> <keycap>p</keycap>
 <keycap>r</keycap> </keycombo> keys while cold booting the machine.
+-->
+
+Se si è selezionato MacOS e a un certo punto viene modificata la variabile
+di OpenFirmware <envar>boot-device</envar> si potrebbe voler riportare
+OpenFirmware alla sua configurazione predefinita. Per fare ciò tenere
+premuti i tasti <keycombo> <keycap>command</keycap> <keycap>option</keycap>
+<keycap>p</keycap> <keycap>r</keycap> </keycombo> mentre si riavvia a
+freddo la macchina.
 
 </para><para>
 
+<!--
 The labels defined in <filename>yaboot.conf</filename> will be
 displayed if you press the <keycap>Tab</keycap> key at the
 <prompt>boot:</prompt> prompt.
+-->
+
+Le etichette definite in <filename>yaboot.conf</filename> saranno
+visualizzate se verrà premuto il tasto <keycap>Tab</keycap> al prompt
+<prompt>boot:</prompt>.
 
 </para><para>
 
+<!--
 Resetting OpenFirmware on G3 or G4 hardware will cause it to boot
 &debian; by default (if you correctly partitioned and placed the
 Apple_Bootstrap partition first).  If you have &debian; on a SCSI disk
 and MacOS on an IDE disk this may not work and you will have to enter
 OpenFirmware and set the <envar>boot-device</envar> variable,
 <command>ybin</command> normally does this automatically.
+-->
+
+Ripristinare OpenFirmware sull'hardware del G3 o del G4 farà avviare
+&debian; in modo predefinito (se prima si è partizionato e piazzato
+correttamente la partizione Apple_Bootstrap). Se si ha &debian; su un
+disco SCSI e MacOS su un disco IDE, ciò potrebbe non funzionare e ci
+sarà bisogno di accedere a OpenFirmware e impostare la variabile
+<envar>boot-device</envar>, normalmente <command>ybin</command> fa
+ciò automaticamente.
 
 </para><para>
 
+<!--
 After you boot &debian; for the first time you can add any additional
 options you desire (such as dual boot options) to
 <filename>/etc/yaboot.conf</filename> and run <command>ybin</command>
 to update your boot partition with the changed configuration.  Please
 read the <ulink url="&url-powerpc-yaboot-faq;">yaboot HOWTO</ulink>
 for more information.
+-->
+
+Dopo aver avviato per la prima volta &debian; si possono aggiungere
+eventuali opzioni aggiuntive desiderate (come le opzioni per l'avvio
+duale) a <filename>/etc/yaboot.conf</filename> ed eseguire
+<command>ybin</command> per aggiornare la partizione di boot con
+la configurazione modificata. Per ulteriori informazioni si legga
+<ulink url="&url-powerpc-yaboot-faq;">yaboot HOWTO</ulink>.
 
 </para>
-   </sect2>
+  </sect2>
  </sect1>
 
  <sect1 id="base-config">
- <title>Debian Post-Boot (Base) Configuration</title>
-
+ <!-- <title>Debian Post-Boot (Base) Configuration</title> -->
+ <title>Configurazione (di base) di Debian dopo l'avvio</title>
 <para>
 
+<!--
 After booting, you will be prompted to complete the configuration of
 your basic system, and then to select what additional packages you
 wish to install.  The application which guides you through this
@@ -204,11 +378,28 @@ very similar to the &d-i; from the first stage.  Indeed,
 components, where each component handles one configuration task,
 contains <quote>hidden menu in the background</quote> and also uses
 the same navigation system.
+-->
+
+Dopo avere avviato verrà chiesto di ultimare la configurazione del
+sistema di base e quindi scegliere quali altri pacchetti si intende
+installare. L'applicativo che guiderà attraverso questa procedura
+si chiama <classname>base-config</classname>. Il suo principio è assai
+simile a quello di &d-i; dal primo stadio. In realtà
+<classname>base-config</classname> consiste di alcune componenti
+specializzate, ove ogni componente si occupa di un solo compito di
+configurazione, contiene <quote>un menu nascosto nello sfondo</quote>
+e impiega anche lo stesso sistema di navigazione.
 
 </para><para>
 
+<!--
 If you wish to re-run the <classname>base-config</classname> at any
 point after installation is complete, as root run
+<userinput>base-config</userinput>.
+-->
+
+Volendo riavviare <classname>base-config</classname> in qualunque
+momento dopo l'ultimazione dell'installazione, come root si digiti
 <userinput>base-config</userinput>.
 
 </para>
@@ -224,68 +415,126 @@ point after installation is complete, as root run
  </sect1>
 
  <sect1 id="login">
- <title>Log In</title>
-
+ <!-- <title>Log In</title> -->
+ <title>Accesso</title>
 <para>
 
+<!--
 After you've installed packages, you'll be presented with the login
 prompt.  Log in using the personal login and password you
 selected. Your system is now ready to use.
+-->
+
+Dopo avere installato i pacchetti verrà mostrato il prompt di login.
+Accedere usando il nome di utente e la password che sarà stata scelta.
+Il sistema è ora pronto per venire adoperato.
 
 </para><para>
 
+<!--
 If you are a new user, you may want to explore the documentation which
 is already installed on your system as you start to use it. There are
 currently several documentation systems, work is proceeding on
 integrating the different types of documentation. Here are a few
 starting points.
+-->
+
+Se si fosse un nuovo utente si potrebbe voler esaminare la documentazione
+che è già stata installata nel vostro sistema al momento in cui si inizia
+ad adoperarlo. Attualmente ci sono diversi sistemi di documentazione,
+il lavoro consiste nell'integrazione dei diversi tipi di documentazione.
+Ecco qualche punto di partenza.
 
 </para><para>
 
+<!--
 Documentation accompanying programs you have installed is in
 <filename>/usr/share/doc/</filename>, under a subdirectory named after
 the program.  For example, the APT User's Guide for using
 <command>apt</command> to install other programs on your system, is
 located in
 <filename>/usr/share/doc/apt/guide.html/index.html</filename>.
+-->
+
+La documentazione allegata ai programmi che sono stati installati si
+trova in <filename>/usr/share/doc/</filename>, all'interno di una
+sottodirectory chiamata come il programma. Ad esempio, la guida
+dell'utente riguardo all'uso di <command>apt</command> per installare
+altri programmi sul sistema si trova in
+<filename>/usr/share/doc/apt/guide.html/index.html</filename>.
 
 </para><para>
 
+<!--
 In addition, there are some special folders within the
 <filename>/usr/share/doc/</filename> hierarchy. Linux HOWTOs are
 installed in <emphasis>.gz</emphasis> format, in
 <filename>/usr/share/doc/HOWTO/en-txt/</filename>. After installing
 <command>dhelp</command> you will find a browse-able index of
 documentation in <filename>/usr/share/doc/HTML/index.html</filename>.
+-->
+
+Inoltre ci sono alcune cartelle speciali nella gerarchia di
+<filename>/usr/share/doc/</filename>. Gli HOWTO di Linux sono
+installati nel formato <emphasis>.gz</emphasis>, in
+<filename>/usr/share/doc/HOWTO/en-txt/</filename>. Dopo avere installato
+<command>dhelp</command> si troverà un indice adatto alla navigazione della
+documentazione in <filename>/usr/share/doc/HTML/index.html</filename>.
 
 </para><para>
 
+<!--
 One easy way to view these documents is to <userinput>cd
 /usr/share/doc/</userinput>, and type <userinput>lynx</userinput>
 followed by a space and a dot (the dot stands for the current
 directory).
+-->
+
+Un modo semplice per consultare questi documenti è di eseguire
+<userinput>cd /usr/share/doc/</userinput>, e scrivere
+<userinput>lynx</userinput> seguito da uno spazio e un punto
+(il punto sta per la directory attuale).
 
 </para><para>
 
+<!--
 You can also type <userinput>info
 <replaceable>command</replaceable></userinput> or <userinput>man
 <replaceable>command</replaceable></userinput> to see documentation on
 most commands available at the command prompt. Typing
 <userinput>help</userinput> will display help on shell commands. And
-typing a command followed by <userinput>--help</userinput> will
+typing a command followed by <userinput>- -help</userinput> will
 usually display a short summary of the command's usage. If a command's
 results scroll past the top of the screen, type <userinput>|
 more</userinput> after the command to cause the results to pause
 before scrolling past the top of the screen. To see a list of all
 commands available which begin with a certain letter, type the letter
 and then two tabs.
+-->
+
+Si può anche usare <userinput>info <replaceable>comando</replaceable>
+</userinput> o <userinput>man <replaceable>comando</replaceable>
+</userinput> per poter vedere della documentazione per la
+maggior parte dei comandi disponibili dalla riga di comando.
+Digitando <userinput>help</userinput> mostrerà un aiuto sui comandi
+della shell. E scrivendo un comando seguito da <userinput>--help</userinput>
+farà comparire un breve riassunto sull'uso dei comandi. Se il risultato
+di un comando risultasse di essere passato oltre l'inizio dello schermo,
+digitare <userinput>|more</userinput> dopo il comando affinché i risultati
+si fermino prima di scorrere oltre la parte alta dello schermo. Per
+vedere un elenco di tutti i comandi disponibili che cominciano con una
+data lettera, scrivere la lettera seguita da due tabulatori.
 
 </para><para>
 
+<!--
 For a more complete introduction to Debian and GNU/Linux, see
+<filename>/usr/share/doc/debian-guide/html/noframes/index.html</filename>.
+-->
+
+Per una introduzione più completa a Debian e a GNU/Linux vedere
 <filename>/usr/share/doc/debian-guide/html/noframes/index.html</filename>.
 
 </para>
-
  </sect1>
 </chapter>

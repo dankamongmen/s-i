@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 32424 -->
 
 
  <sect1 id="automatic-install">
@@ -30,7 +30,7 @@ completamente automatizzate. I pacchetti Debian adatti a questo scopo sono
 
 <!-- The Debian Installer supports automating installs via preconfiguration
 files. A preconfiguration file can be loaded from the network or from
-removable media, and used to fill in answers to question asked during the
+removable media, and used to fill in answers to questions asked during the
 installation process. -->
 
 L'Installatore Debian supporta le installazioni automatizzate tramite dei
@@ -38,36 +38,47 @@ file di preconfigurazione. Un file di preconfigurazione può essere caricato
 dalla rete o da un supporto rimovibile ed è usato per rispondere alle
 domande che sarebbero normalmente poste durante il processo di installazione.
 
-</para><para>
+</para><para condition="etch">
+
+<!--
+Full documentation on preseeding including a working example that you can
+edit is in <xref linkend="appendix-preseed"/>.
+-->
+
+La documentazione completa sulla preconfigurazione che comprende anche
+un esempio funzionante, che è possibile modificare, si trova in
+<xref linkend="appendix-preseed"/>.
+
+</para><para condition="sarge">
 
 <!-- Although most dialogs used by &d-i; can be preseeded using this method,
 there are some notable exceptions. You can (re)partition an entire disk
 or use available free space on a disk; it is not possible to use existing
 partitions. You currently cannot use preseeding to set up RAID and LVM.
-<phrase condition="sarge">Also, with the exception of network driver modules,
-it is not possible to preconfigure kernel module
-parameters.</phrase> -->
+Also, with the exception of network driver modules, it is not possible
+to preconfigure kernel module parameters.
+-->
 
 Nonostante che la maggior parte delle impostazioni richieste da &d-i;
 possano essere preconfigurate con questo metodo ci sono alcune eccezioni
 notevoli; si può (ri)partizionare l'intero disco oppure usare solo lo
 spazio disponibile sul disco: non si possono usare delle partizioni già
 esistenti. Attualmente non è possibile preconfigurare le impostazioni di
-RAID e LVM. <phrase condition="sarge">Inoltre, con l'eccezione dei moduli
-con i driver di rete, non è possibile preconfigurare i moduli del
-kernel.</phrase>
+RAID e LVM. Inoltre, con l'eccezione dei moduli con i driver di rete, non
+è possibile preconfigurare i moduli del kernel.
 
-</para><para>
+</para><para condition="sarge">
 
 <!-- The preconfiguration file is in the format used by the
-debconf-set-selections command. A well documented and working example that
-you can edit is in <xref linkend="example-preseed"/>. -->
+debconf-set-selections command. A well documented and working example
+that you can edit is in <xref linkend="example-preseed"/>.
+-->
 
 Il file di preconfigurazione ha lo stesso formato usato dal comando
 debconf-set-selections. Un esempio ben documentato e funzionante, che è
 possibile modificare, si trova in <xref linkend="example-preseed"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 <!-- Alternatively, one way to get a complete file listing
 all the values that can be preseeded is to do a manual install,
@@ -96,7 +107,7 @@ Un file creato con questo metodo conterrà anche dei parametri che non devono
 essere preinseriti; il file in <xref linkend="example-preseed"/> è il miglior
 punto di partenza per la maggior parte degli utenti.
 
-</para><para>
+</para><para condition="sarge">
 
 <!-- Once you have a preconfiguration file, you can edit it if necessary, and
 place it on a web server, or copy it onto the installer's boot media. Wherever
@@ -109,7 +120,7 @@ supporto di avvio dell'installatore. Qualsiasi sia la posizione scelta per
 il file è necessario passare un parametro all'avvio dell'installatore per
 forzarne l'uso.
 
-</para><para>
+</para><para condition="sarge">
 
 <!-- To make the installer use a preconfiguration file downloaded from the
 network, add preseed/url=http://url/to/preseed.cfg to the kernel boot
@@ -129,7 +140,7 @@ senza dover rispondere a nessuna domanda. È possibile impostare la priorità
 dell'installazione a critica in modo da evitare qualsiasi domanda durante la
 configurazione della rete. Consultare <xref linkend="installer-args"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 <!-- To place a preconfiguration file on a CD, you would need to remaster the
 ISO image to include your preconfiguration file. See the manual page for
@@ -141,7 +152,7 @@ l'immagine ISO del CD e inserirvi il file di preconfigurazione. Per maggiori
 dettagli consultare la pagina man di mkisofs. In alternativa mettere il file
 di preconfigurazione su un dischetto e usare preseed/file=/floppy/preseed.cfg.
 
-</para><para arch="i386">
+</para><para arch="i386" condition="sarge">
 
 <!-- If you'll be booting from a USB memory stick, then you can simply copy
 your preconfiguration file onto the memory stick's filesystem, and edit the
@@ -154,31 +165,5 @@ syslinux.cfg aggiungendo preseed/file=/hd-media/preseed.cfg ai parametri di
 avvio del kernel.
 
 </para>
-
-   <sect3 condition="etch">
-   <!--<title>Using Preseeding to Change Default Values</title>-->
-   <title>Uso della preconfigurazione per modificare i valori
-   predefiniti</title>
-<para>
-
-<!--
-It is also possible to use preseeding to change the default answer for a
-question, but still have the question asked. To do this the
-<firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
-setting the value for a template.
--->
-
-È anche possibile usare la preconfigurazione per modificare le risposte
-predefinite alle domande lasciando comunque la possibilità di dare risposte
-diverse. Per fare questo si deve impostare il flag <firstterm>seen</firstterm>
-a <quote>false</quote> dopo aver inserito il valore per il modello.
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-</para>
-   </sect3>
   </sect2>
  </sect1>
