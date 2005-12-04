@@ -2,4 +2,63 @@
 set -e
 . /usr/share/debconf/confmodule
 
-in-target tasksel --new-install --debconf-apt-progress="--logstderr"
+cleanup () {
+	# If X was not installed, remove the hardware detection programs.
+	if [ -n "$extra" ] && \
+	   ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
+   	then
+		chroot /target dpkg --purge $extra
+	fi
+
+	rm -f /target/usr/bin/scrollkeeper-update /target/usr/bin/scrollkeeper-rebuilddb
+	log-output -t pkgsel chroot /target dpkg-divert --package pkgsel \
+		--rename --quiet --remove /usr/bin/scrollkeeper-update
+	log-output -t pkgsel chroot /target dpkg-divert --package pkgsel \
+		--rename --quiet --remove /usr/bin/scrollkeeper-rebuilddb
+}
+
+# TODO: progress bar should start here
+
+# scrollkeeper takes forever, so divert it for the duration
+log-output -t pkgsel chroot /target dpkg-divert --package pkgsel --rename \
+	--quiet --add /usr/bin/scrollkeeper-update
+log-output -t pkgsel chroot /target dpkg-divert --package pkgsel --rename \
+	--quiet --add /usr/bin/scrollkeeper-rebuilddb
+ln -sf /bin/true /target/usr/bin/scrollkeeper-update
+ln -sf /bin/true /target//usr/bin/scrollkeeper-rebuilddb
+
+# See if any known X servers are available.
+if chroot /target apt-cache show xserver-xfree86 xserver-xorg >/dev/null 2>&1; then
+	# X needs some packages installed before its debconf config is run
+	# to make it do hardware autodetection. The only way to make sure
+	# these are installed properly is to install them now, before packages
+	# are selected.
+	for pkg in mdetect read-edid ; do
+		if chroot /target apt-cache show "$pkg" >/dev/null 2>&1; then
+			if in-target apt-get -y -f install "$pkg"; then
+				extra="$pkg $extra"
+			fi
+		fi
+	done
+fi
+
+# Install popularity-contest but remove it if the user decides not to
+# participate.
+if in-target apt-get -y -f install popularity-contest; then
+	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
+		chroot /target dpkg --purge popularity-contest
+	fi
+fi
+
+if ! in-target tasksel --new-install --debconf-apt-progress="--logstderr"; then
+	# TODO useful error message here
+	cleanup
+	db_progress stop
+	exit 1
+fi
+
+cleanup
+
+if [ -x /target/usr/bin/scrollkeeper-update ]; then
+	log-output -t pkgsel chroot /target scrollkeeper-update -q || true
+fi
