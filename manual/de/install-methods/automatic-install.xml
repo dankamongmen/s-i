@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 32424 -->
 
  <sect1 id="automatic-install">
  <title>Automatische Installation</title>
@@ -23,7 +23,13 @@ Voreinstellungs-Dateien an. Eine solche Voreinstellungs-Datei kann über das Net
 von einem Wechselmedium geladen werden und wird benutzt, um Fragen zu beantworten,
 die während des Installationsprozesses auftreten.
 
-</para><para>
+</para><para condition="etch">
+
+Eine vollständige Dokumentation über das Voreinstellen inklusive einer
+funktionsfähigen Beispieldatei, die Sie sich anpassen können, finden Sie im
+<xref linkend="appendix-preseed"/>.
+
+</para><para condition="sarge">
 
 Obwohl die meisten vom &d-i; genutzten Dialoge mit dieser Methode
 voreingestellt werden können, gibt es einige erwähnenswerte Ausnahmen.
@@ -36,11 +42,11 @@ einzurichten.
 für Kernelmodule voreinstellen, (dies gilt jedoch nicht für
 Netzwerktreiber-Module).</phrase>
 
-</para><para>
+</para><para condition="sarge">
 
 Die Voreinstellungs-Dateien haben das gleiche Format, das auch
 von dem »debconf-set-selections«-Befehl genutzt wird. Eine gut dokumentierte
-und funktionierende Beispieldatei, die Sie sich selbst anpassen können,
+und funktionsfähige Beispieldatei, die Sie sich anpassen können,
 finden Sie im <xref linkend="example-preseed"/>.
 
 </para><para>
@@ -61,7 +67,7 @@ Allerdings enthält eine so erstellte Datei einige Einträge, die besser nicht
 voreingestellt sein sollten; die Datei im <xref linkend="example-preseed"/>
 ist deshalb für die meisten Benutzer wohl ein besserer Ausgangspunkt.
 
-</para><para>
+</para><para condition="sarge">
 
 Wenn Sie einmal eine Voreinstellungs-Datei haben, können Sie sie bei Bedarf
 verändern und auf einem Web-Server speichern oder auf das Boot-Medium des
@@ -69,7 +75,7 @@ Installers kopieren. Wo immer Sie die Datei auch ablegen, Sie müssen dem
 Installer auf jeden Fall einen Boot-Parameter mitgeben, so dass er die Datei
 benutzt.
 
-</para><para>
+</para><para condition="sarge">
 
 Um zu erreichen, dass der Installer eine Voreinstellungs-Datei nutzt,
 die per Netzwerk heruntergeladen werden muss,
@@ -83,7 +89,7 @@ Fragen stellen muss. Sie sollten vielleicht die Priorität für die Installation
 auf »critical« (kritisch) setzen, um Fragen während der Netzwerkkonfiguration zu vermeiden.
 Siehe dazu auch <xref linkend="installer-args"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 Wenn Sie eine Voreinstellungs-Datei auf einer CD abspeichern wollen,
 müssen Sie das ISO-Image remastern, um Ihre Datei einzufügen. Lesen Sie die
@@ -92,7 +98,7 @@ Alternativ dazu können Sie die Datei auf einer Floppy-Disk speichern
 und den Boot-Parameter <userinput>preseed/file=/floppy/preseed.cfg</userinput>
 benutzen.
 
-</para><para arch="i386">
+</para><para arch="i386" condition="sarge">
 
 Wenn Sie von einem USB-Speicher booten, können Sie die
 Voreinstellungs-Datei einfach auf dem Dateisystem des Memory-Sticks speichern
@@ -101,23 +107,5 @@ und dann die Datei <filename>syslinux.cfg</filename> editieren, um
 zu den Kernel-Bootparametern hinzuzufügen.
 
 </para>
-
-<sect3 condition="etch">
-<title>Standardwerte verändern mittels Voreinstellung</title>
-<para>
-
-Es ist ebenfalls möglich, die Standardantwort für eine Frage zu ändern,
-die Frage aber trotzdem stellen zu lassen. Dabei muss die
-<firstterm>seen</firstterm>-Markierung auf <quote>false</quote>
-zurückgesetzt werden, nachdem die gewünschte Einstellung für den Wert
-gesetzt wurde:
- 
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
- 
-</para>
-</sect3>
 </sect2>
  </sect1>

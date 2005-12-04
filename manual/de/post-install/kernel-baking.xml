@@ -1,13 +1,16 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 31905 -->
 
  <sect1 id="kernel-baking"><title>Einen neuen Kernel kompilieren</title>
 <para>
 
 Warum sollte jemand einen neuen, eigenen Kernel kompilieren wollen?
 Es ist oft nicht nötig, da der Standardkernel in Debian die meisten
-Konfigurationen bedient. Allerdings kann es unter folgenden Umständen nützlich
-sein, einen neuen Kernel zu kompilieren:
+Konfigurationen bedient. Auch bietet Debian häufig verschiedene 
+alternative Kernel an. Sie sollten also vielleicht erst prüfen, ob ein
+alternatives Kernel-Image verfügbar ist, das besser zu Ihrer Hardware
+passt. Allerdings kann es unter folgenden Umständen trotzdem nützlich
+sein, einen neuen, eigenen Kernel zu kompilieren:
 
 <itemizedlist>
 <listitem><para>
@@ -18,8 +21,9 @@ vorkompilierten Kernel
 </para></listitem>
 <listitem><para>
 
-Hardware oder zusätzliche Optionen unterstützen, die im Standardkernel nicht
-enthalten sind, wie z.B. APM oder SMP
+Kerneloptionen nutzen, die im Standardkernel nicht unterstützt werden,
+wie z.B. Unterstützung für extrem viel Arbeitsspeicher
+(high memory support)
 
 </para></listitem>
 <listitem><para>
@@ -30,8 +34,7 @@ um die Bootzeit zu verkürzen
 </para></listitem>
 <listitem><para>
 
-Optionen des Kernels nutzen, die vom Standardkernel nicht unterstützt werden,
-wie z.B. Unterstützung für viel Arbeitsspeicher (high memory support)
+einen monolithischen Kernel erstellen statt eines modularen
 
 </para></listitem>
 <listitem><para>
@@ -41,7 +44,7 @@ einen aktualisierten oder Entwicklerkernel verwenden
 </para></listitem>
 <listitem><para>
 
-seine Freunde beeindrucken, neue Sachen ausprobieren
+mehr über Linux-Kernel lernen
 
 </para></listitem>
 </itemizedlist>
@@ -57,9 +60,11 @@ zu kompilieren. Es macht Spaß und lohnt sich.
 </para><para>
 
 Um auf die debiansche Art einen Kernel zu kompilieren, benötigen
-Sie ein paar Pakete: <classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname> (dies war die neueste Version
-zum Zeitpunkt, als dies geschrieben wurde), <classname>fakeroot</classname>
+Sie ein paar Pakete:
+<classname>fakeroot</classname>, <classname>kernel-package</classname>,
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(das war die neueste Version zum Zeitpunkt, als dies geschrieben wurde)</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
 und ein paar weitere, die vielleicht schon installiert sind
 (<filename>/usr/share/doc/kernel-package/README.gz</filename> enthält die
 komplette Liste).
@@ -79,9 +84,11 @@ Kernels.
 Beachten Sie, dass Sie Ihren Kernel nicht auf <quote>Debian-Art</quote> kompilieren
 <emphasis>müssen</emphasis>, aber wir meinen, dass es erheblich sicherer
 und einfacher ist, das Paketsystem zur Verwaltung der Kernel zu verwenden.
-Sie können auch Ihre Kernelquellen direkt von Linus beziehen statt aus
-dem <classname>kernel-source-&kernelversion;</classname>-Paket, aber
-trotzdem die <classname>kernel-package</classname>-Methode zum
+Sie können Ihre Kernelquellen auch direkt von Linus beziehen statt aus
+dem Paket
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+und trotzdem die <classname>kernel-package</classname>-Methode zum
 Kompilieren nutzen.
 
 </para><para>
@@ -107,9 +114,14 @@ da er keine speziellen Berechtigungen erfordert.
 </footnote>. Ebenso gehen wird davon aus, dass Ihre zu bauende Kernel-Version
 &kernelversion; ist. Vergewissern Sie sich, dass Sie sich in dem Verzeichnis
 befinden, in das Sie die Kernelquellen entpacken möchten und extrahieren Sie
-sie mittels <userinput>tar xjf /usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>.
-Wechseln Sie in das Verzeichnis <filename>kernel-source-&kernelversion;</filename>,
-das erzeugt wurde. 
+sie mittels
+<phrase condition="classic-kpkg"><userinput>tar xjf
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>.
+Wechseln Sie in das neu erstellte Verzeichnis
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>.
 
 </para><para>
 
@@ -183,8 +195,12 @@ und tippen Sie dann <userinput>shutdown -r now</userinput> ein.
 
 </para><para>
 
-Mehr Informationen über <classname>kernel-package</classname> enthält
-die tolle Dokumentation in <filename>/usr/share/doc/kernel-package</filename>.
+<phrase condition="etch">Mehr Infos über Debiankernel und das Kompilieren
+von Kernel finden Sie im <ulink url="&url-kernel-handbook;">Debian Linux Kernel
+Handbook</ulink>.</phrase>
+
+Die tolle Dokumentation in <filename>/usr/share/doc/kernel-package</filename>
+enthält zusätzliche Informationen über <classname>kernel-package</classname>.
 
 </para>
   </sect2>

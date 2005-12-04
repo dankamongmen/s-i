@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 32427 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Beseitigen von Problemen während der Installation</title>
@@ -208,10 +208,18 @@ ist, können Sie später einen eigenen, maßgeschneiderten Kernel erstellen
 <para>
 Wenn Sie zwar die anfängliche Boot-Phase hinter sich bringen, aber
 die Installation nicht abschließen können, kann die Auswahl des
-Eintrags <quote>Debug-Logs speichern</quote> hilfreich sein. Sie kopiert System-Fehlermeldungen
-und Konfigurationsdaten auf eine vom Benutzer bereitgestellte Floppy-Disk.
+Eintrags <quote>Debug-Logs speichern</quote> hilfreich sein.
+<phrase condition="sarge">
+System-Fehlermeldungen und Konfigurationsdaten werden dabei auf eine
+vom Benutzer bereitgestellte Floppy-Disk kopiert.
+</phrase>
+<phrase condition="etch">
+Dabei können System-Fehlermeldungen und Konfigurationsdaten vom Installer
+auf eine Floppy-Disk gespeichert oder in einen Webbrowser heruntergeladen
+werden.
+</phrase>
 Diese Informationen können Hinweise darauf geben, was schief gelaufen ist
-und wie man es beheben kann. Wenn Sie einen Fehlerbericht einschicken,
+und wie man dies beheben kann. Wenn Sie einen Fehlerbericht einschicken,
 sollten Sie diese Informationen dem Bericht beilegen.
 
 </para><para>
@@ -232,6 +240,18 @@ Installationsbericht (in englischer Sprache bitte). Wir bitten ebenfalls
 darum, uns Berichte schicken,
 wenn die Installation erfolgreich war, so dass wir so viele Informationen
 wie möglich über die riesige Zahl von Hardwarekonfigurationen bekommen.
+
+</para><para condition="etch">
+
+Falls Sie bereits ein funktionierendes Debian-System haben, ist der einfachste
+Weg, uns einen Installationsbericht zu schicken, die Pakete
+<quote>installation-report</quote> und <quote>reportbug</quote> zu
+installieren (<command>apt-get install installation-report reportbug</command>)
+und den Befehl <command>reportbug installation-report</command>
+auszuführen.
+
+</para><para>
+
 Nutzen Sie bitte diese Vorlage, um Installationsberichte zu verfassen,
 und schicken Sie ihn als Fehlerbericht gegen das Pseudo-Paket
 <classname>installation-reports</classname> ein, indem Sie ihn an
@@ -240,18 +260,15 @@ und schicken Sie ihn als Fehlerbericht gegen das Pseudo-Paket
 <informalexample><screen>
 Package: installation-reports
 
-Debian-installer-version: &lt;Fill in date and from where you got the image&gt;
-uname -a: &lt;The result of running uname -a on a shell prompt&gt;
+Boot method: &lt;How did you boot the installer? CD? floppy? network?&gt;
+Image version: &lt;Fill in date and from where you got the image&gt;
 Date: &lt;Date and time of the install&gt;
-Method: &lt;How did you install?  What did you boot off?  If network
-      install, from where?  Proxied?&gt;
 
 Machine: &lt;Description of machine (eg, IBM Thinkpad R32)&gt;
 Processor:
 Memory:
-Root Device: &lt;IDE?  SCSI?  Name of device?&gt;
-Root Size/partition table: &lt;Feel free to paste the full partition
-      table, with notes on which partitions are mounted where.&gt;
+Partitions: &lt;df -Tl will do; the raw partition table is preferred&gt;
+
 Output of lspci and lspci -n:
 
 Base System Installation Checklist:
