@@ -6,16 +6,16 @@
 <para>
 
 Si votre machine est connectée à un réseau local, vous pouvez l'amorcer 
-directement à travers le réseau à partir d'une autre machine en utilisant 
-TFTP. Si vous décidez de le faire, les fichiers d'amorçage doivent être 
+directement à partir d'une autre machine de ce réseau en utilisant 
+TFTP. Pour cela, les fichiers d'amorçage doivent être 
 placés à un endroit spécifique de cette machine et elle doit savoir 
 amorcer votre propre machine.
 
 </para><para>
 
 Vous devez configurer un serveur TFTP et, pour beaucoup de machines, 
-un serveur BOOTP<phrase condition="supports-rarp">, ou un serveur RARP</phrase>
-<phrase condition="supports-dhcp">, ou un serveur DHCP</phrase>.
+un serveur BOOTP<phrase condition="supports-rarp">, un serveur RARP</phrase>
+<phrase condition="supports-dhcp">ou un serveur DHCP</phrase>.
 
 </para><para>
 
@@ -37,7 +37,7 @@ d'amorçage.</phrase>
 («&nbsp;Dynamic Host Configuration Protocole&nbsp;», Protocole de 
 configuration dynamique des hôtes) est une extension bien plus flexible 
 de BOOTP (et respectant la compatibilité ascendante). Certains systèmes ne 
-peuvent être configurés que via DHCP.</phrase>
+peuvent être configurés que par DHCP.</phrase>
 
 </para><para arch="powerpc">
 
@@ -72,7 +72,7 @@ BOOTP. Un paquet <classname>RBOOTD</classname> est disponible dans l'archive Deb
 
 Le protocole trivial de transfert des fichiers («&nbsp;Trivial Transfert File 
 Protocol&nbsp;» ou TFTP) est utilisé pour transférer l'image d'amorçage 
-au client. Théoriquement, tout serveur sur toutes les plateformes qui
+au client. Théoriquement, tout serveur sur les plateformes qui
 implémentent ces protocoles peut être utilisé. Dans les exemples qui vont 
 suivre, on donnera les commandes pour SunOS 4.x, SunOS 5.x (mieux connu sous 
 le nom de Solaris) et GNU/Linux.
@@ -105,11 +105,11 @@ grâce à la ligne suivante dans <filename>/etc/inetd.conf</filename>&nbsp;:
 tftp dgram udp wait root /usr/sbin/tcpd in.tftpd /tftpboot
 </screen></informalexample>
 
-Les paquets Debian, quand ils sont installés, écrivent correctement cette
+Les paquets Debian, quand ils sont installés, placent correctement cette
 ligne.
 </para><para> 
 
-Lisez ce fichier et mémorisez le répertoire passé en argument de 
+Lisez ce fichier et mémorisez le répertoire passé en argument à 
 <command>in.tftpd</command>&nbsp;; vous en aurez besoin ultérieurement. 
 L'option <userinput>-l</userinput> autorise certaines versions de 
 <command>in.tftpd</command> à enregistrer toutes les requêtes dans le journal 
@@ -154,8 +154,8 @@ Ensuite, placez les images TFTP dont vous avez besoin (décrites dans la
 <xref linkend="where-files"/>) dans le répertoire des images d'amorce 
 de <command>tftpd</command>. Généralement, ce répertoire s'appelle 
 <filename>/tftpboot</filename>. Vous aurez à faire un lien depuis ce fichier 
-vers le fichier que <command>tftpd</command> utilisera pour amorcer un client
-particulier. Malheureusement, le nom du fichier est déterminé par le client 
+vers le fichier que <command>tftpd</command> utilisera pour amorcer le client.
+Malheureusement, le nom du fichier est déterminé par le client 
 TFTP et il n'y a pas vraiment de standard.
 
 </para>
