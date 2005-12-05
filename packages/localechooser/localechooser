@@ -254,10 +254,6 @@ else
 	:
 fi
 
-if [ "$LOCALE" = "C" ] ; then
-	exit 0
-fi
-
 db_set "debconf/language" "$LANGUAGELIST"
 log "Set debconf/language = '$LANGUAGELIST''"
 
@@ -338,7 +334,9 @@ else
 fi
 
 # At this step we should have either xx, or xx_YY in LANGNAME
-if [ "$LANGUAGE" != "C" ]; then
+# Before 0.24 we skipped the country step when LOCALE=C
+# we no more do it now #315925
+# if [ "$LANGUAGE" != "C" ]; then
 	STATE=1
 	LASTSTATE=3
 	fullprio=high
@@ -402,6 +400,11 @@ if [ "$LANGUAGE" != "C" ]; then
 	fi
 	db_set "$countrycode"  "$COUNTRYCODE"
 	log "Set $countrycode = '$COUNTRYCODE'"
+# fi
+
+# If the locale is C, we don't want to go further
+if [ "$LOCALE" = "C" ] ; then
+	exit 0
 fi
 
 # Search for a supported locale which most closely resembles.
