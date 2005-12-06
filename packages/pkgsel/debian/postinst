@@ -7,7 +7,7 @@ cleanup () {
 	if [ -n "$extra" ] && \
 	   ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
    	then
-		chroot /target dpkg --purge $extra
+		log-output -t pkgsel chroot /target dpkg --purge $extra
 	fi
 
 	rm -f /target/usr/bin/scrollkeeper-update /target/usr/bin/scrollkeeper-rebuilddb
@@ -33,24 +33,22 @@ if chroot /target apt-cache show xserver-xfree86 xserver-xorg >/dev/null 2>&1; t
 	# to make it do hardware autodetection. The only way to make sure
 	# these are installed properly is to install them now, before packages
 	# are selected.
-	for pkg in mdetect read-edid ; do
-		if chroot /target apt-cache show "$pkg" >/dev/null 2>&1; then
-			if in-target apt-get -y -f install "$pkg"; then
-				extra="$pkg $extra"
-			fi
+	for pkg in mdetect read-edid; do
+		if log-output -t pkgsel in-target debconf-apt-progress --logstderr -- apt-get -y -f install "$pkg"; then
+			extra="$pkg $extra"
 		fi
 	done
 fi
 
 # Install popularity-contest but remove it if the user decides not to
 # participate.
-if in-target apt-get -y -f install popularity-contest; then
+if log-output -t pkgsel in-target debconf-apt-progress --logstderr -- apt-get -y -f install popularity-contest; then
 	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
-		chroot /target dpkg --purge popularity-contest
+		log-output -t pkgsel chroot /target dpkg --purge popularity-contest
 	fi
 fi
 
-if ! in-target tasksel --new-install --debconf-apt-progress="--logstderr"; then
+if ! log-output -t pkgsel in-target tasksel --new-install --debconf-apt-progress="--logstderr"; then
 	# TODO useful error message here
 	cleanup
 	db_progress stop
