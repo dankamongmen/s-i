@@ -1,13 +1,15 @@
 #!/bin/sh
+Template: pkgsel/progress/init
+Type: text
+_Description: Setting up ...
 set -e
 . /usr/share/debconf/confmodule
-
+set -x
 cleanup () {
 	# If X was not installed, remove the hardware detection programs.
-	if [ -n "$extra" ] && \
-	   ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
+	if ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
    	then
-		log-output -t pkgsel chroot /target dpkg --purge $extra
+		log-output -t pkgsel chroot /target dpkg --purge read-edid mdetect
 	fi
 
 	rm -f /target/usr/bin/scrollkeeper-update /target/usr/bin/scrollkeeper-rebuilddb
@@ -17,7 +19,8 @@ cleanup () {
 		--rename --quiet --remove /usr/bin/scrollkeeper-rebuilddb
 }
 
-# TODO: progress bar should start here
+db_progress START 0 100 debian-installer/base-installer/title
+db_progress INFO pkgsel/progress/init
 
 # scrollkeeper takes forever, so divert it for the duration
 log-output -t pkgsel chroot /target dpkg-divert --package pkgsel --rename \
@@ -27,36 +30,45 @@ log-output -t pkgsel chroot /target dpkg-divert --package pkgsel --rename \
 ln -sf /bin/true /target/usr/bin/scrollkeeper-update
 ln -sf /bin/true /target//usr/bin/scrollkeeper-rebuilddb
 
+# get debconf-apt-progress config, which will make it run properly later
+config=$(chroot /target debconf-apt-progress --config| sed "s/$/;/")
+
+db_progress step 1
+
 # See if any known X servers are available.
 if chroot /target apt-cache show xserver-xfree86 xserver-xorg >/dev/null 2>&1; then
 	# X needs some packages installed before its debconf config is run
 	# to make it do hardware autodetection. The only way to make sure
 	# these are installed properly is to install them now, before packages
 	# are selected.
-	for pkg in mdetect read-edid; do
-		if log-output -t pkgsel in-target debconf-apt-progress --logstderr -- apt-get -y -f install "$pkg"; then
-			extra="$pkg $extra"
-		fi
-	done
+	in-target sh -c "$config debconf-apt-progress --from 1 --to 5 --logstderr -- apt-get -y -f install read-edid" || true
+	in-target sh -c "$config debconf-apt-progress --from 5 --to 10 --logstderr -- apt-get -y -f install mdetect" || true
 fi
 
 # Install popularity-contest but remove it if the user decides not to
 # participate.
-if log-output -t pkgsel in-target debconf-apt-progress --logstderr -- apt-get -y -f install popularity-contest; then
+if in-target sh -c "$config debconf-apt-progress --from 10 --to 15 --logstderr -- apt-get -y -f install popularity-contest"; then
 	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
 		log-output -t pkgsel chroot /target dpkg --purge popularity-contest
 	fi
 fi
 
-if ! log-output -t pkgsel in-target tasksel --new-install --debconf-apt-progress="--logstderr"; then
+db_progress INFO pkgsel/progress/tasksel
+if ! in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 15 --to 95 --logstderr'"; then
 	# TODO useful error message here
+	db_progress INFO pkgsel/progress/cleanup
 	cleanup
 	db_progress stop
 	exit 1
 fi
 
+db_progress INFO pkgsel/progress/cleanup
 cleanup
+db_progress step 2
 
 if [ -x /target/usr/bin/scrollkeeper-update ]; then
 	log-output -t pkgsel chroot /target scrollkeeper-update -q || true
 fi
+
+db_progress step 3
+db_progress stop
