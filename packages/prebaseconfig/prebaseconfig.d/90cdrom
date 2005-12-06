@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+ 
+# Set up /dev/cdrom link to point to the device used for /media/cdrom0 in
+# /target; various programs want a /dev/cdrom.
+CDDEV=$(grep "[[:space:]]/media/cdrom0[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+if [ -z "$CDDEV" ]; then
+	CDDEV=$(grep "[[:space:]]/media/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+fi
+if [ -z "$CDDEV" ]; then
+	CDDEV=$(grep "[[:space:]]/cdrom[[:space:]]" /target/etc/fstab | cut -d ' ' -f 1) || true
+fi
+if [ -n "$CDDEV" ] && [ -e "/target/$CDDEV" ]; then
+	chown 0:24 /target$CDDEV || true
+	ln -sf "$CDDEV" /target/dev/cdrom
+fi
