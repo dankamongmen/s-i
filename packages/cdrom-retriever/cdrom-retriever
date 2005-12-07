@@ -47,12 +47,13 @@ case "x$cmd" in
 		info "Retrieving package list."
 		rm -f "$1"
 		touch "$1"
-		if db_get mirror/suite && [ "$RET" ]; then
-			suite=$RET
+		if db_get mirror/codename && [ "$RET" ]; then
+			codename=$RET
 		else
-			suite=stable
+			# Not really nice defaulting codename to a suite...
+			codename=stable
 		fi
-		Release="$CDMNT/dists/$suite/Release"
+		Release="$CDMNT/dists/$codename/Release"
 		components="`grep ^Components: $Release | cut -d' ' -f2-`"
 		ret=1
 		if [ -z "$components" ]; then
@@ -67,7 +68,7 @@ case "x$cmd" in
 					warning "Unable to find $pkgfile in $Release."
 					continue
 				fi
-				Packages="$CDMNT/dists/$suite/$pkgfile"
+				Packages="$CDMNT/dists/$codename/$pkgfile"
 				if [ ! -e "$Packages" ]; then
 					warning "File $Packages does not exist."
 					continue
