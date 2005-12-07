@@ -53,7 +53,7 @@ checkmatch() {
 	packages="$2"
 	pkgmd5="$3"
 	pkgsize="$4"
-	
+
 	set -e
 	sed -n '/^MD5Sum:$/ b LOOP; b; : PRINT; /:$/q; p; : LOOP; n; b PRINT' \
 	       "$release" | (
@@ -85,19 +85,20 @@ case "x$cmd" in
 	xpackages)
 		rm -f "$1"
 		touch "$1"
-	
+
+		# Setting codename to a suite is not very nice, but can do no harm
 		if ! db_get mirror/udeb/suite || [ -z "$RET" ]; then
-			db_get mirror/suite
+			db_get mirror/codename
 		fi
-		suite="$RET"
-	
+		codename="$RET"
+
 		Release="/tmp/net-retriever-$$-Release"
-		fetch "dists/$suite/Release" "$Release" || exit $?
+		fetch "dists/$codename/Release" "$Release" || exit $?
 		# If gpgv and a keyring are installed, authentication is
 		# mandatory.
 		if type gpgv >/dev/null && [ -f "$keyring" ]; then
-			if ! fetch "dists/$suite/Release.gpg" "$Release.gpg"; then
-				error "dists/$suite/Release is unsigned."
+			if ! fetch "dists/$codename/Release.gpg" "$Release.gpg"; then
+				error "dists/$codename/Release is unsigned."
 			fi
 			if ! log-output -t net-retriever gpgv \
 			     --keyring "$keyring" --ignore-time-conflict \
@@ -121,7 +122,7 @@ case "x$cmd" in
 				fi
 				Packages="/tmp/net-retriever-$$-Packages"
 				rm -f "$Packages"
-				fetch "dists/$suite/$pkgfile" "$Packages" || continue
+				fetch "dists/$codename/$pkgfile" "$Packages" || continue
 				checkmatch "$Release" "$pkgfile" \
 					"$(md5sum "$Packages" | cut -d' ' -f1)" \
 					"$(wc -c < "$Packages" | tr -d ' ')"
@@ -141,7 +142,7 @@ case "x$cmd" in
 		T="retriever/net/error"
 		db_set "$T" "Retry"
 		db_input critical "$T" || true
-	
+
 		if ! db_go; then
 			exit 2
 		fi
