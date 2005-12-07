@@ -411,7 +411,7 @@ static int validate_mirror(void) {
 int get_codename (void) {
 	char *command;
 	FILE *f = NULL;
-	char *hostname, *directory, *suite;
+	char *hostname, *directory, *suite = NULL;
 	int ret = 1;
 
 	hostname = add_protocol("hostname");
@@ -449,7 +449,8 @@ int get_codename (void) {
 
 	free(hostname);
 	free(directory);
-	free(suite);
+	if (suite)
+		free(suite);
 
 	if (ret != 0)
 		di_log(DI_LOG_LEVEL_ERROR, "Error getting codename");
