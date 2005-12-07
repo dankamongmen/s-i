@@ -20,12 +20,12 @@ for dist in contrib non-free; do
 	fi
 done
 
-# mirror/suite is also set by cdrom methods
-db_get mirror/suite
-suite="$RET"
+# mirror/codename is also set by cdrom methods
+db_get mirror/codename
+codename="$RET"
 
-# No updates for unstable. Never mind.
-if [ "$suite" = unstable ]; then
+# No updates for sid (unstable). Never mind.
+if [ "$codename" = sid ]; then
 	exit
 fi
 
@@ -38,7 +38,7 @@ if [ -n "$proxy" ]; then
 	fi
 fi
 
-echo "deb http://$host/ $suite/updates $dists" >> $file
+echo "deb http://$host/ $codename/updates $dists" >> $file
 if ! apt-setup-verify $file; then
 	db_subst apt-setup/security-updates-failed SECURITY_HOST "$host"
 	db_input critical apt-setup/security-updates-failed || true
@@ -47,4 +47,4 @@ if ! apt-setup-verify $file; then
 	fi
 fi
 
-echo "deb-src http://$host/ $suite/updates $dists" >> $file
+echo "deb-src http://$host/ $codename/updates $dists" >> $file

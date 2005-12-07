@@ -38,8 +38,8 @@ if [ "$RET" = true ]; then
 	dists="$dists restricted"
 fi
 
-db_get mirror/suite
-suite="$RET"
+db_get mirror/codename
+codename="$RET"
 db_get mirror/protocol
 protocol="$RET"
 db_get mirror/$protocol/hostname
@@ -58,13 +58,13 @@ if [ "$protocol" = http ]; then
 fi
 
 cat >> $file <<EOF
-deb $protocol://$hostname/$directory $suite $dists
-deb-src $protocol://$hostname/$directory $suite $dists
+deb $protocol://$hostname/$directory $codename $dists
+deb-src $protocol://$hostname/$directory $codename $dists
 
 ## Major bug fix updates produced after the final release of the
 ## distribution.
-deb $protocol://$hostname/$directory $suite-updates $dists
-deb-src $protocol://$hostname/$directory $suite-updates $dists
+deb $protocol://$hostname/$directory $codename-updates $dists
+deb-src $protocol://$hostname/$directory $codename-updates $dists
 EOF
 
 # Even if universe isn't enabled, we write example lines for it.
@@ -84,8 +84,8 @@ cat >> $file <<EOF
 ## your rights to use the software. Also, please note that software in
 ## universe WILL NOT receive any review or updates from the Ubuntu security
 ## team.
-${COMMENT}deb $protocol://$hostname/$directory $suite universe
-${COMMENT}deb-src $protocol://$hostname/$directory $suite universe
+${COMMENT}deb $protocol://$hostname/$directory $codename universe
+${COMMENT}deb-src $protocol://$hostname/$directory $codename universe
 EOF
 
 # Likewise for backports.
@@ -105,6 +105,6 @@ cat >> $file <<EOF
 ## newer versions of some applications which may provide useful features.
 ## Also, please note that software in backports WILL NOT receive any review
 ## or updates from the Ubuntu security team.
-${COMMENT}deb $protocol://$hostname/$directory $suite-backports main restricted universe multiverse
-${COMMENT}deb-src $protocol://$hostname/$directory $suite-backports main restricted universe multiverse
+${COMMENT}deb $protocol://$hostname/$directory $codename-backports main restricted universe multiverse
+${COMMENT}deb-src $protocol://$hostname/$directory $codename-backports main restricted universe multiverse
 EOF
