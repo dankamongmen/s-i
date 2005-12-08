@@ -15,5 +15,8 @@ kernel=$1
 		$lf=$f;
 		$ld=$d
 	}
-	die "some modules are in more than one package\n" if $dups;
+	if ($dups) {
+		print STDERR "some modules are in more than one package\n";
+		exit 1 unless -e "ignore-dups";
+	}
 '
