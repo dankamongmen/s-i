@@ -484,7 +484,7 @@ modprobe raid5 >/dev/null 2>&1
 mkdir -p /dev/md
 
 # Try to detect MD devices, and start them
-/sbin/mdrun
+mdrun
 
 # Make sure that we have md-support
 if [ ! -e /proc/mdstat ]; then
