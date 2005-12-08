@@ -507,34 +507,32 @@ void notify_user_of_failure (di_system_package *p) {
 	debconf_capb(debconf, "backup");
 }
 
-/* Cheap-and-cheerful run-parts-a-like for /lib/main-menu.d. Allows packages
- * to register scripts to be run at main-menu startup that need to share
- * main-menu's debconf frontend but that don't merit a menu item, such as
- * setting an info message.
- */
-static void menu_startup (void) {
+/* execute scripts in a directory */
+static void do_scripts (const char *dir) {
 	struct dirent **namelist;
 	int entries, i;
 
 	/* scandir() isn't POSIX, but it makes things easy. */
-	entries = scandir(MAIN_MENU_DIR, &namelist, NULL, alphasort);
+	entries = scandir(dir, &namelist, NULL, alphasort);
 	if (entries < 0)
 		return;
 
 	for (i = 0; i < entries; ++i) {
+		int ret;
+		
 		size_t len;
 		char *filename;
 		struct stat st;
-		int ret;
-
+		
 		if (strcmp(namelist[i]->d_name, ".") == 0 || strcmp(namelist[i]->d_name, "..") == 0)
 			continue;
-
+		
 		/* sizeof(MAIN_MENU_DIR) includes trailing \0 */
-		len = sizeof(MAIN_MENU_DIR) + 1 + strlen(namelist[i]->d_name);
+		len = strlen(dir) + 1 + strlen(namelist[i]->d_name) + 1;
 		filename = di_new(char, len);
-		snprintf(filename, len, "%s/%s", MAIN_MENU_DIR, namelist[i]->d_name);
-
+		
+		snprintf(filename, len, "%s/%s", dir, namelist[i]->d_name);
+		di_log(DI_LOG_LEVEL_INFO, "filename=%s", filename);
 		if (stat(filename, &st) != 0) {
 			di_log(DI_LOG_LEVEL_WARNING, "Can't stat %s (%s)", filename, strerror(errno));
 			di_free(filename);
@@ -550,14 +548,46 @@ static void menu_startup (void) {
 			di_free(filename);
 			continue;
 		}
-
+		
 		di_log(DI_LOG_LEVEL_DEBUG, "Executing %s", filename);
 		ret = system(filename);
 		if (ret != 0)
 			di_log(DI_LOG_LEVEL_WARNING, "%s exited with status %d", filename, ret);
-
+		
 		di_free(filename);
 	}
+}
+
+/* Cheap-and-cheerful run-parts-a-like for /lib/main-menu.d. Allows packages
+ * to register scripts to be run at main-menu startup that need to share
+ * main-menu's debconf frontend but that don't merit a menu item, such as
+ * setting an info message.
+ */
+static void menu_startup (void) {
+	do_scripts(MAIN_MENU_DIR);
+}
+
+static void package_scripts(char *pkg_name, char *dir) {
+	size_t len;
+	char *pkg_dir_name;
+
+	len = strlen(dir) + 1 + strlen(pkg_name) + 1;
+	pkg_dir_name = di_new(char, len);
+	
+	snprintf(pkg_dir_name, len, "%s/%s", dir, pkg_name);
+	di_log(DI_LOG_LEVEL_INFO, "pkg_dir_name=%s", pkg_dir_name);
+
+	do_scripts(pkg_dir_name);
+	di_free(pkg_dir_name);
+}
+
+static void package_pre(char *pkg_name) {
+	di_log(DI_LOG_LEVEL_INFO, "Start Pre-scripts for package %s", pkg_name);
+	package_scripts(pkg_name, MAIN_MENU_PRE_DIR);
+}
+static void package_post(char *pkg_name) {
+	di_log(DI_LOG_LEVEL_INFO, "Start Post-scripts for package %s", pkg_name);
+	package_scripts(pkg_name, MAIN_MENU_POST_DIR);
 }
 
 int main (int argc __attribute__ ((unused)), char **argv) {
@@ -577,11 +607,14 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	allocator = di_system_packages_allocator_alloc ();
 	packages = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, allocator);
 	while ((p=show_main_menu(packages, allocator))) {
+		package_pre(p->p.package);
 		ret = do_menu_item(p);
 		adjust_default_priority();
 		switch (ret) {
 			case EXIT_OK:
 				/* Success */
+				package_post(p->p.package);
+
 				if (p->installer_menu_item < NEVERDEFAULT) {
 					last_successful_item = p->installer_menu_item;
 					modify_debconf_priority(RAISE);

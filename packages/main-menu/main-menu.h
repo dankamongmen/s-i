@@ -13,6 +13,8 @@
 #define MISSING_PROVIDE "debian-installer/missing-provide"
 #define ITEM_FAILURE	"debian-installer/main-menu/item-failure"
 #define MAIN_MENU_DIR	"/lib/main-menu.d"
+#define MAIN_MENU_PRE_DIR	"/lib/main-menu-pre.d"
+#define MAIN_MENU_POST_DIR	"/lib/main-menu-post.d"
 
 #include <debian-installer.h>
 
