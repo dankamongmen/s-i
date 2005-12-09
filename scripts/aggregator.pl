@@ -101,7 +101,7 @@ sub aggregate {
 	print GNUPLOT qq{
 set timefmt "%m/%d/%Y %H:%M"
 set xdata time
-set format x "%d/%m/%y"
+set format x "%m/%y"
 set yrange [0 to 100]
 set ylabel 'percent'
 set terminal png giant
