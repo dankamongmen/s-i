@@ -15,7 +15,6 @@ sub aggregate {
 	my $old=0;
 	
 	open (STATS, ">>$basename.stats") || die "$basename.stats: $!";
-	my @t=gmtime;
 	print STATS strftime("%m/%d/%Y %H:%M", gmtime);
 	
 	foreach my $log (@_) {
