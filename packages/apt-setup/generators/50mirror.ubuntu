@@ -70,13 +70,13 @@ EOF
 # Even if universe isn't enabled, we write example lines for it.
 echo >> $file
 if db_get apt-setup/universe && [ "$RET" = true ]; then
+	COMMENT=
+else
 	cat >> $file <<EOF
 ## Uncomment the following two lines to add software from the 'backports'
 ## repository.
 EOF
 	COMMENT='# '
-else
-	COMMENT=
 fi
 cat >> $file <<EOF
 ## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
@@ -91,13 +91,13 @@ EOF
 # Likewise for backports.
 echo >> $file
 if db_get apt-setup/backports && [ "$RET" = true ]; then
+	COMMENT=
+else
 	cat >> $file <<EOF
 ## Uncomment the following two lines to add software from the 'backports'
 ## repository.
 EOF
 	COMMENT='# '
-else
-	COMMENT=
 fi
 cat >> $file <<EOF
 ## N.B. software from this repository may not have been tested as
