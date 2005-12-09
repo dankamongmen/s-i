@@ -54,7 +54,7 @@ EOT
 		fi
 	;;
 	esac
-	
+
 	# Try to enable proxy when using HTTP.
 	# What about using ftp_proxy for FTP sources?
 	RET=$(debconf-get mirror/protocol || true)
@@ -65,10 +65,14 @@ EOT
 			export http_proxy
 		fi
 	fi
-	
+
 	# Pass debconf priority through.
 	DEBIAN_PRIORITY=$(debconf-get debconf/priority || true)
 	export DEBIAN_PRIORITY
+
+	# Set LANG. Not doing so causes endless perl warnings.
+	LANG=C
+	export LANG
 
 	# Unset variables that would make scripts in the target think
 	# that debconf is already running there.
