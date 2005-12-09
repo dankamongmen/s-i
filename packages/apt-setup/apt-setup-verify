@@ -38,8 +38,11 @@ gooditems=0
 
 IFS="
 "
-for line in $(cat $file); do
-	if [ "$(expr "$line" : "#")" != 1 ]; then
+# Can't just iterate over $(cat $file) because that kills newlines, so
+# introduce a dummy colon.
+for line in $(sed 's/^/:/' $file); do
+	line="${line#:}"
+	if expr "$line" : '.*[^ ].*' >/dev/null && [ "$(expr "$line" : "#")" != 1 ]; then
 		items=$(expr "$items" + 1)
 		if valid "$line"; then
 			gooditems=$(expr "$gooditems" + 1)
