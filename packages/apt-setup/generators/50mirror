@@ -63,7 +63,7 @@ while [ ! "$done" ]; do
 	db_get mirror/$protocol/hostname
 	hostname="$RET"
 	db_get mirror/$protocol/directory
-	directory="$RET"
+	directory="/${RET#/}"
 
 	if [ "$protocol" = http ]; then
 		db_get mirror/$protocol/proxy
@@ -75,7 +75,7 @@ while [ ! "$done" ]; do
 		fi
 	fi
 
-	echo "deb $protocol://$hostname/$directory $codename $dists" > $file
+	echo "deb $protocol://$hostname$directory $codename $dists" > $file
 	
 	if apt-setup-verify $file; then
 		done=1
@@ -92,4 +92,4 @@ while [ ! "$done" ]; do
 	fi
 done
 
-echo "deb-src $protocol://$hostname/$directory $codename $dists" >> $file
+echo "deb-src $protocol://$hostname$directory $codename $dists" >> $file
