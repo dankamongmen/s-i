@@ -21,6 +21,8 @@
 # Example:
 # i386 (Thu Apr 22 21:08:03 EDT 2004) joey@home elephant-d-i success
 
+# Note: only add items to the end of the list, do not reorder items or it
+# will mess up the stats file used for the graph.
 my @buildlist = (
 	{
 		url => 'http://dilab.debian.net:800/~joey/d-i/logs/alpha/',
@@ -109,7 +111,7 @@ print OUT <<EOS;
 <ul>
 EOS
 
-my ($total, $failed, $success, $old) = aggregate(*OUT, @buildlist);
+my ($total, $failed, $success, $old) = aggregate(*OUT, $basename, @buildlist);
 
 my $date=`LANG=C TZ=GMT date`;
 chomp $date;
@@ -117,6 +119,8 @@ print OUT <<"EOS";
 </ul>
 
 Totals: $total tests ($failed failed, $old old)
+
+<img src="$basename.png" alt=graph>
 
 <hr>
 $date

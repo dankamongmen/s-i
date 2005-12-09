@@ -3,16 +3,25 @@
 
 use warnings;
 use strict;
+use POSIX q{strftime};
 
 sub aggregate {
 	my $fh=shift;
+	my $basename=shift;
 	
 	my $success=0;
 	my $failed=0;
 	my $total=0;
 	my $old=0;
 	
+	open (STATS, ">>$basename.stats") || die "$basename.stats: $!";
+	my @t=gmtime;
+	print STATS strftime("%m/%d/%Y %H:%M", gmtime);
+	
 	foreach my $log (@_) {
+		my $onesuccess=0;
+		my $onefailed=0;
+		
 		print $fh "<li><a href=\"".$log->{url}."\">".$log->{description}."</a><br>\n";
 		my $logurl=$log->{logurl}."overview".$log->{logext}."\n";
 		if ($logurl=~m#.*://#) {
@@ -26,6 +35,7 @@ sub aggregate {
 		my @lines=<LOG>;
 		if (! close LOG) {
 			print $fh "<b>failed</b> to download <a href=\"$logurl\">summary log</a>";
+			print STATS "\t0";
 			next;
 		}
 		if (! @lines) {
@@ -57,9 +67,11 @@ sub aggregate {
 				if ($status eq 'failed') {
 					$status='<b>failed</b>';
 					$failed++;
+					$onefailed++;
 				}
 				elsif ($status eq 'success') {
 					$success++;
+					$onesuccess++;
 				}
 				$total++;
 				if (defined $notes && length $notes) {
@@ -72,8 +84,40 @@ sub aggregate {
 			}
 		}
 		print $fh "</ul>\n";
+		print STATS "\t";
+		if ($onesuccess+$onefailed > 0) {
+			print STATS ($onesuccess / ($onesuccess+$onefailed) * 100);
+		}
+		else {
+			print STATS 0;
+		}
 	}
-
+	print STATS "\t";
+	print STATS $success / ($success+$failed) * 100;
+	print STATS "\n";
+	close STATS;
+	
+	# plot the stats
+	open (GNUPLOT, "| gnuplot") || die "gnuplot: $!";
+	print GNUPLOT qq{
+set timefmt "%m/%d/%Y %H:%M"
+set xdata time
+set format x "%d/%m/%y"
+set yrange [0 to 100]
+set ylabel 'percent'
+set terminal png giant
+set output '$basename.png'
+};
+	my $c=2;
+	print GNUPLOT "plot";
+	foreach my $log (@_) {
+		$c++;
+		print GNUPLOT " '$basename.stats' using 1:$c title \"".$log->{description}."\" with lp,";
+	}
+	$c++;
+	print GNUPLOT " '$basename.stats' using 1:$c title 'overall' with lp\n";
+	close GNUPLOT;
+	
 	return ($total, $failed, $success, $old);
 }
 

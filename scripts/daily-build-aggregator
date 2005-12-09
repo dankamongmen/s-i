@@ -23,6 +23,8 @@
 # i386 (Thu Apr 22 21:08:33 EDT 2004) joey@kite build_floppy_speakup success
 # i386 (Thu Apr 22 21:09:29 EDT 2004) joey@kite build_floppy_root success
 
+# Note: only add items to the end of the list, do not reorder items or it
+# will mess up the stats file used for the graph.
 my @buildlist = (
 	{
 		url => 'http://people.debian.org/~vorlon/d-i/alpha/daily/',
@@ -171,7 +173,7 @@ print OUT <<EOS;
 <ul>
 EOS
 
-my ($total, $failed, $success, $old) = aggregate(*OUT, @buildlist);
+my ($total, $failed, $success, $old) = aggregate(*OUT, $basename, @buildlist);
 
 my $date=`LANG=C TZ=GMT date`;
 chomp $date;
@@ -179,6 +181,8 @@ print OUT <<"EOS";
 </ul>
 
 Totals: $total builds ($failed failed, $old old)
+
+<img src="$basename.png" alt=graph>
 
 <hr>
 
