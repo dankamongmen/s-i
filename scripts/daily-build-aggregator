@@ -176,13 +176,14 @@ EOS
 my ($total, $failed, $success, $old) = aggregate(*OUT, $basename, @buildlist);
 
 my $date=`LANG=C TZ=GMT date`;
+my ($basebasename)=($basename)=~m/(?:.*\/)?(.*)/;
 chomp $date;
 print OUT <<"EOS";
 </ul>
 
 Totals: $total builds ($failed failed, $old old)
 
-<img src="$basename.png" alt=graph>
+<img src="$basebasename.png" alt=graph>
 
 <hr>
 
