@@ -68,6 +68,9 @@ for SCHEME in $@; do
 	touch $LOGDIR/overview.log
 
 	overview $LOGDIR "incomplete"
+
+	FAILURE_STATUS_FILE=$(tempfile)
+	export FAILURE_STATUS_FILE
 	
 	(if $DIGRESSDIR/test-harness $MACHINE $SCHEME; then
 		overview $LOGDIR success
@@ -76,11 +79,13 @@ for SCHEME in $@; do
 			if $DIGRESSDIR/test-harness $MACHINE $SCHEME 2>&1; then
 				overview $LOGDIR "success second try"
 			else
-				overview $LOGDIR failed
+				overview $LOGDIR failed "$(cat $FAILURE_STATUS_FILE)"
 			fi
 		else
-			overview $LOGDIR failed
+			overview $LOGDIR failed "$(cat $FAILURE_STATUS_FILE)"
 		fi
 	fi) 2>&1 | log $MACHINE $SCHEME
 	ln -f $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log $LOGDIR/$MACHINE-$SCHEME.log
+
+	rm -f $FAILURE_STATUS_FILE
 done

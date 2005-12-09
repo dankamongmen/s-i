@@ -49,6 +49,11 @@ do_shutdown () {
 
 error () {
 	unlock
+	category="$1"
+	shift 1
+	if [ -n "$FAILURE_STATUS_FILE" ]; then
+		echo "$category" > "$FAILURE_STATUS_FILE"
+	fi
 	if [ "$started" ]; then
 		echo
 		header "Unsuccessful finish: $SCHEME"
@@ -64,7 +69,7 @@ error () {
 }
 
 sigout () {
-	error "Exiting on signal."
+	error SIGNAL "Exiting on signal."
 }
 
 config () {
@@ -100,7 +105,7 @@ export DIGRESSDIR=$(dirname $0)
 if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
 	export DI_TESTDIR=$DIGRESSDIR
 	if [ -z "$DI_TESTDIR" ] || [ ! -e "$DI_TESTDIR/config" ]; then
-		error "Cannot determine DI_TESTDIR"
+		error CONF "Cannot determine DI_TESTDIR"
 	fi
 fi
 
@@ -126,7 +131,7 @@ if [ -z "$SCHEME" ]; then
 fi
 
 if [ ! -e "$DI_TESTDIR/schemes/$MACHINE" ]; then
-	error "Unknown machine $MACHINE"
+	error CONF "Unknown machine $MACHINE"
 fi
 
 use common
@@ -135,7 +140,7 @@ use $SCHEME
 trap sigout INT QUIT
 
 if [ -z "$STATE_DIR" ]; then
-	error "STATE_DIR not set"
+	error CONF "STATE_DIR not set"
 fi
 mkdir -p "$STATE_DIR"
 
@@ -145,7 +150,7 @@ lock
 if [ -n "$ROOT_PASSWORD_FILE" ]; then
 	ROOT_PASSWORD=$(cat $ROOT_PASSWORD_FILE) || true
 	if [ -z "$ROOT_PASSWORD" ]; then
-		error "ROOT_PASSWORD_FILE contains no password"
+		error CONF "ROOT_PASSWORD_FILE contains no password"
 	fi
 	export ROOT_PASSWORD # yikes!
 fi
@@ -153,7 +158,7 @@ fi
 if [ -n "$USER_PASSWORD_FILE" ]; then
 	USER_PASSWORD=$(cat $USER_PASSWORD_FILE) || true
 	if [ -z "$USER_PASSWORD" ]; then
-		error "USER_PASSWORD_FILE contains no password"
+		error CONF "USER_PASSWORD_FILE contains no password"
 	fi
 	export USER_PASSWORD
 fi
@@ -161,7 +166,7 @@ fi
 if [ -n "$HP_ILO_PASSWORD_FILE" ]; then
 	HP_ILO_PASSWORD=$(cat $HP_ILO_PASSWORD_FILE) || true
 	if [ -z "$HP_ILO_PASSWORD" ]; then
-		error "HP_ILO_PASSWORD contains no password"
+		error CONF "HP_ILO_PASSWORD contains no password"
 	fi
 	export HP_ILO_PASSWORD
 fi
@@ -170,7 +175,7 @@ if [ -n "$HP_GSP_PASSWORD_FILE" ]; then
 	HP_GSP_PASSWORD=$(cat $HP_GSP_PASSWORD_FILE) || true
 	export HP_GSP_PASSWORD
 	if [ -z "$HP_GSP_PASSWORD" ]; then
-		error "HP_GSP_PASSWORD contains no password"
+		error CONF "HP_GSP_PASSWORD contains no password"
 	fi
 fi
 
@@ -182,7 +187,7 @@ if [ -n "$PREBOOT" ]; then
 	echo "Setting up..."
 	for p in $PREBOOT; do
 		if ! $p; then
-			error "PREBOOT $p failed"
+			error PREBOOT "PREBOOT $p failed"
 		fi
 	done
 fi
@@ -195,7 +200,7 @@ if [ -n "$BOOT" ]; then
 	endheader
 	for t in $BOOT; do
 		if ! $t; then
-			error "BOOT $t failed"
+			error BOOT "BOOT $t failed"
 		fi
 	done
 fi
@@ -206,7 +211,7 @@ if [ -n "$TEST_1" ]; then
 	endheader
 	for t in $TEST_1; do
 		if ! $t; then
-			error "TEST_1 $t failed"
+			error TEST_1 "TEST_1 $t failed"
 		fi
 	done
 fi
@@ -217,7 +222,7 @@ if [ -n "$TEST_2" ]; then
 	endheader
 	for t in $TEST_2; do
 		if ! $t; then
-			error "TEST_2 $t failed"
+			error TEST_2 "TEST_2 $t failed"
 		fi
 	done
 fi
