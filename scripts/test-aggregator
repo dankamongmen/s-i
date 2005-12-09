@@ -93,7 +93,14 @@ use warnings;
 use strict;
 require "aggregator.pl";
 
-print <<EOS;
+my $basename=shift;
+if (! defined $basename) {
+	die "usage: $0 basename\n";
+}
+
+open (OUT, ">$basename.html.new") || die "$basename.html.new: $!";
+
+print OUT <<EOS;
 <html>
 <head>
 <title>debian-installer test overview</title>
@@ -102,11 +109,11 @@ print <<EOS;
 <ul>
 EOS
 
-my ($total, $failed, $success, $old) = aggregate(@buildlist);
+my ($total, $failed, $success, $old) = aggregate(*OUT, @buildlist);
 
 my $date=`LANG=C TZ=GMT date`;
 chomp $date;
-print <<"EOS"
+print OUT <<"EOS";
 </ul>
 
 Totals: $total tests ($failed failed, $old old)
@@ -116,3 +123,6 @@ $date
 </body>
 </html>
 EOS
+
+close OUT;
+rename("$basename.html.new", "$basename.html") || die "rename: $!";

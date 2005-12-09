@@ -5,39 +5,41 @@ use warnings;
 use strict;
 
 sub aggregate {
+	my $fh=shift;
+	
 	my $success=0;
 	my $failed=0;
 	my $total=0;
 	my $old=0;
 	
 	foreach my $log (@_) {
-		print "<li><a href=\"".$log->{url}."\">".$log->{description}."</a><br>\n";
+		print $fh "<li><a href=\"".$log->{url}."\">".$log->{description}."</a><br>\n";
 		my $logurl=$log->{logurl}."overview".$log->{logext}."\n";
 		if ($logurl=~m#.*://#) {
 			if (! open (LOG, "wget --tries=3 --timeout=5 --quiet -O - $logurl |")) {
-				print "<b>wget error</b>\n";
+				print $fh "<b>wget error</b>\n";
 			}
 		}
 		else {
-			open (LOG, $logurl) || print "<b>cannot open $logurl</b>\n";
+			open (LOG, $logurl) || print $fh "<b>cannot open $logurl</b>\n";
 		}
 		my @lines=<LOG>;
 		if (! close LOG) {
-			print "<b>failed</b> to download <a href=\"$logurl\">summary log</a>";
+			print $fh "<b>failed</b> to download <a href=\"$logurl\">summary log</a>";
 			next;
 		}
 		if (! @lines) {
-			print "<b>empty</b> <a href=\"$logurl\">log</a>";
+			print $fh "<b>empty</b> <a href=\"$logurl\">log</a>";
 		}
 		else {
-			print "<ul>\n";
+			print $fh "<ul>\n";
 		}
 		foreach my $line (@lines) {
 			chomp $line;
 			my ($arch, $date, $builder, $ident, $status, $notes) = 
 				$line =~ /^(.*?)\s+\((.*?)\)\s+(.*?)\s+(.*?)\s+(.*?)(?:\s+(.*))?$/;
 			if (! defined $status) {
-				print "<li><b>unparsable</b> entry:</i> $line\n";
+				print $fh "<li><b>unparsable</b> entry:</i> $line\n";
 			}
 			else {
 				$date=~s/[^A-Za-z0-9: ]//g; # untrusted string
@@ -66,10 +68,10 @@ sub aggregate {
 				else {
 					$notes="";
 				}
-				print "<li>$arch $shortdate $builder <a href=\"".$log->{logurl}."$ident".$log->{logext}."\">$status</a> $ident $notes\n";
+				print $fh "<li>$arch $shortdate $builder <a href=\"".$log->{logurl}."$ident".$log->{logext}."\">$status</a> $ident $notes\n";
 			}
 		}
-		print "</ul>\n";
+		print $fh "</ul>\n";
 	}
 
 	return ($total, $failed, $success, $old);
