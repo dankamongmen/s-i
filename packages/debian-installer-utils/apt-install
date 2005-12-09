@@ -19,11 +19,12 @@ if [ ! -f /target/etc/apt/sources.list ] ; then
 	exit 1 # Return error as the package is not ready to be used yet.
 fi
 
+chroot_setup
+
 # Disable debconf questions.
 DEBIAN_FRONTEND=noninteractive
 export DEBIAN_FRONTEND
 
-chroot_setup
 ERRCODE=0
 log-output -t apt-install chroot /target apt-get -y install $@ < /dev/null || ERRCODE=$?
 chroot_cleanup
