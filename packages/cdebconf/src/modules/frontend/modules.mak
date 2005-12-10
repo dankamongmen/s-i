@@ -10,7 +10,7 @@ $(SOBJ): $(OBJS)
 	@echo Creating DSO $@ from $^
 	$(CC) $(CFLAGS) -shared -o $@ $^ $(LDFLAGS)
 
-install:
+install::
 	install -d -m 755 $(DESTDIR)${moddir}/frontend
 	install -m 755 $(SOBJ) $(DESTDIR)${moddir}/frontend
 
