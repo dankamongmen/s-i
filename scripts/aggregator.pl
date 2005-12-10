@@ -111,10 +111,10 @@ set output '$basename.png'
 	print GNUPLOT "plot";
 	foreach my $log (@_) {
 		$c++;
-		print GNUPLOT " '$basename.stats' using 1:$c title \"".$log->{description}."\" with lp,";
+		print GNUPLOT " '$basename.stats' using 1:$c title \"".$log->{description}."\" with lines,";
 	}
 	$c++;
-	print GNUPLOT " '$basename.stats' using 1:$c title 'overall' with lp\n";
+	print GNUPLOT " '$basename.stats' using 1:$c title 'overall' with lines\n";
 	close GNUPLOT;
 	
 	return ($total, $failed, $success, $old);
