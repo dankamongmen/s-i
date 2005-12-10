@@ -74,12 +74,6 @@ struct newt_data {
 
 typedef int (newt_handler)(struct frontend *obj, struct question *q);
 
-#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
-#define q_get_description(q)  		question_get_field((q), "", "description")
-#define q_get_choices(q)		question_get_field((q), "", "choices")
-#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_indices(q)		question_get_field((q), "", "indices")
-
 #define create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
 
 /*  Horizontal offset between buttons and text box */
@@ -87,51 +81,35 @@ typedef int (newt_handler)(struct frontend *obj, struct question *q);
 /*  Horizontal offset between text box and borders */
 #define BUTTON_PADDING 4
 
-/*
- * Function: get_text
- * Input: struct frontend *obj - frontend object
- *        const char *template - template name
- *        const char *fallback - string to use if not available
- * Output: const char * - ptr to string, translated if possible
- * Description: get the translated version of a string
- * Assumptions: None.
- */
-static const char *
-get_text(struct frontend *obj, const char *template, const char *fallback )
-{
-	struct question *q = obj->qdb->methods.get(obj->qdb, template);
-	return q ? q_get_description(q) : fallback;
-}
-
 /* gettext would be much nicer :-( */
 static const char *
 continue_text(struct frontend *obj)
 {
-    return get_text(obj, "debconf/button-continue", "Continue");
+    return question_get_text(obj, "debconf/button-continue", "Continue");
 }
 
 static const char *
 goback_text(struct frontend *obj)
 {
-    return get_text(obj, "debconf/button-goback", "Go Back");
+    return question_get_text(obj, "debconf/button-goback", "Go Back");
 }
 
 static const char *
 yes_text(struct frontend *obj)
 {
-    return get_text(obj, "debconf/button-yes", "Yes");
+    return question_get_text(obj, "debconf/button-yes", "Yes");
 }
 
 static const char *
 no_text(struct frontend *obj)
 {
-    return get_text(obj, "debconf/button-no", "No");
+    return question_get_text(obj, "debconf/button-no", "No");
 }
 
 static const char *
 help_text(struct frontend *obj)
 {
-    return get_text(obj, "debconf/help-line", "<Tab> moves between items; <Space> selects; <Enter> activates buttons");
+    return question_get_text(obj, "debconf/help-line", "<Tab> moves between items; <Space> selects; <Enter> activates buttons");
 }
 
 static void

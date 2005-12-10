@@ -4,6 +4,7 @@
 #include "strutl.h"
 #include "configuration.h"
 #include "database.h"
+#include "frontend.h"
 #include <assert.h>
 
 struct question *question_new(const char *tag)
@@ -237,5 +238,22 @@ char *question_get_field(const struct question *q, const char *lang,
         return strdup("");
     else
         return ret;
+}
+
+/*
+ * Function: question_get_text
+ * Input: struct frontend *obj - frontend object
+ *        const char *template - template name
+ *        const char *fallback - string to use if not available
+ * Output: const char * - ptr to string, translated if possible
+ * Description: get the translated version of a string
+ * Assumptions: None.
+ */
+const char *
+question_get_text(struct frontend *obj, const char *template, 
+                  const char *fallback)
+{
+	struct question *q = obj->qdb->methods.get(obj->qdb, template);
+	return q ? q_get_description(q) : fallback;
 }
 

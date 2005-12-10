@@ -8,7 +8,14 @@
 #define DC_QFLAG_SEEN		(1 << 0)
 #define DC_QFLAG_DONTPARSE	(1 << 1)
 
+#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
+#define q_get_description(q)  		question_get_field((q), "", "description")
+#define q_get_choices(q)		question_get_field((q), "", "choices")
+#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
+#define q_get_indices(q)		question_get_field((q), "", "indices")
+
 struct template;
+struct frontend;
 
 struct questionvariable {
 	char *variable;
@@ -60,5 +67,8 @@ void question_owner_add(struct question *q, const char *owner);
 void question_owner_delete(struct question *q, const char *owner);
 char *question_get_field(const struct question *q, const char *lang,
 	const char *field);
+
+const char *question_get_text(struct frontend *obj, const char *template,
+              const char *fallback);
 
 #endif

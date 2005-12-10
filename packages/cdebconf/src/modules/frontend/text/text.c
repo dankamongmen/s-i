@@ -66,12 +66,6 @@ struct frontend_data {
 
 typedef int (text_handler)(struct frontend *obj, struct question *q);
 
-#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
-#define q_get_description(q)		question_get_field((q), "", "description")
-#define q_get_choices(q)		question_get_field((q), "", "choices")
-#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_indices(q)		question_get_field((q), "", "indices")
-
 #define MAKE_UPPER(C) do { if (islower((int) C)) { C = (char) toupper((int) C); } } while(0)
 
 #define CHAR_GOBACK '<'
@@ -136,22 +130,6 @@ static int getwidth(void)
 }
 
 /*
- * Function: get_text
- * Input: struct frontend *obj - frontend object
- *        const char *template - template name
- *        const char *fallback - string to use if not available
- * Output: const char * - ptr to string, translated if possible
- * Description: get the translated version of a string
- * Assumptions: None.
- */
-static const char *
-get_text(struct frontend *obj, const char *template, const char *fallback)
-{
-	struct question *q = obj->qdb->methods.get(obj->qdb, template);
-	return q ? q_get_description(q) : fallback;
-}
-
-/*
  * Function: wrap_print
  * Input: const char *str - string to display
  * Output: none
@@ -189,7 +167,7 @@ static void text_handler_displaydesc(struct frontend *obj, struct question *q)
 	    strcmp(q->template->type, "error") == 0)
 	{
 		if (strcmp(q->template->type, "error") == 0)
-			printf(get_text(obj, "debconf/text-error", "!! ERROR: %s"), descr);
+			printf(question_get_text(obj, "debconf/text-error", "!! ERROR: %s"), descr);
 		else
 			printf("%s", descr);
 		printf("\n\n");
@@ -217,18 +195,18 @@ static void
 show_help (struct frontend *obj, struct question *q)
 {
 	char *descr = q_get_description(q);
-	printf("%s", get_text(obj, "debconf/text-help-keystrokes", "KEYSTROKES:"));
+	printf("%s", question_get_text(obj, "debconf/text-help-keystrokes", "KEYSTROKES:"));
 	printf("\n  %c  ", CHAR_HELP);
-	printf("%s", get_text(obj, "debconf/text-help-help", "Display this help message"));
+	printf("%s", question_get_text(obj, "debconf/text-help-help", "Display this help message"));
 	if (obj->methods.can_go_back (obj, q)) {
 		printf("\n  %c  ", CHAR_GOBACK);
-		printf("%s", get_text(obj, "debconf/text-help-goback", "Go back to previous question"));
+		printf("%s", question_get_text(obj, "debconf/text-help-goback", "Go back to previous question"));
 	}
 	if (strcmp(q->template->type, "string") == 0 ||
 	    strcmp(q->template->type, "passwd") == 0 ||
 	    strcmp(q->template->type, "multiselect") == 0) {
 		printf("\n  %c  ", CHAR_CLEAR);
-		printf("%s", get_text(obj, "debconf/text-help-clear", "Select an empty entry"));
+		printf("%s", question_get_text(obj, "debconf/text-help-clear", "Select an empty entry"));
 	}
 	printf("\n");
 	wrap_print(descr);
@@ -363,14 +341,14 @@ static int text_handler_boolean(struct frontend *obj, struct question *q)
 	}
 
 	do {
-		printf("  %d. %s%s", 1, get_text(obj, "debconf/yes", "Yes"), (1 == def ? " [*]" : "    "));
-		printf("  %d. %s%s", 2, get_text(obj, "debconf/no", "No"), (2 == def ? " [*]" : ""));
+		printf("  %d. %s%s", 1, question_get_text(obj, "debconf/yes", "Yes"), (1 == def ? " [*]" : "    "));
+		printf("  %d. %s%s", 2, question_get_text(obj, "debconf/no", "No"), (2 == def ? " [*]" : ""));
 		printf("\n");
 		if (def)
-			printf(get_text(obj, "debconf/text-prompt-default",
+			printf(question_get_text(obj, "debconf/text-prompt-default",
 					"Prompt: '%c' for help, default=%d> "), CHAR_HELP, def);
 		else
-			printf(get_text(obj, "debconf/text-prompt",
+			printf(question_get_text(obj, "debconf/text-prompt",
 					"Prompt: '%c' for help> "), CHAR_HELP);
 		get_answer(buf, sizeof(buf));
 		if (buf[0] == CHAR_HELP && buf[1] == 0)
@@ -454,7 +432,7 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 
   DISPLAY:
 	printlist (obj, q, count, choices_translated, tindex, selected);
-	printf(get_text(obj, "debconf/text-prompt-default-string", 
+	printf(question_get_text(obj, "debconf/text-prompt-default-string", 
 		"Prompt: '%c' for help, default=%s> "), CHAR_HELP, defval);
 	get_answer(answer, sizeof(answer));
 	if (answer[0] == CHAR_HELP && answer[1] == 0)
@@ -574,11 +552,11 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 	do {
 		printlist (obj, q, count, choices_translated, tindex, selected);
 		if (def >= 0 && choices_translated[def]) {
-			printf(get_text(obj, "debconf/text-prompt-default", 
+			printf(question_get_text(obj, "debconf/text-prompt-default", 
 				"Prompt: '%c' for help, default=%d> "),
 					CHAR_HELP, def+1);
 		} else {
-			printf(get_text(obj, "debconf/text-prompt",
+			printf(question_get_text(obj, "debconf/text-prompt",
 				"Prompt: '%c' for help> "), CHAR_HELP);
 		}
 		get_answer(answer, sizeof(answer));
@@ -627,7 +605,7 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 static int text_handler_note(struct frontend *obj, struct question *q)
 {
 	char buf[100] = {0};
-	printf("%s ", get_text(obj, "debconf/cont-prompt",
+	printf("%s ", question_get_text(obj, "debconf/cont-prompt",
 			       "[Press enter to continue]"));
 	fflush(stdout);
 	while (1)
@@ -711,9 +689,9 @@ static int text_handler_string(struct frontend *obj, struct question *q)
 	const char *defval = question_getvalue(q, "");
 	while (1) {
 		if (defval)
-			printf(get_text(obj, "debconf/text-prompt-default-string", "Prompt: '%c' for help, default=%s> "), CHAR_HELP, defval);
+			printf(question_get_text(obj, "debconf/text-prompt-default-string", "Prompt: '%c' for help, default=%s> "), CHAR_HELP, defval);
 		else
-			printf(get_text(obj, "debconf/text-prompt", "Prompt: '%c' for help> "), CHAR_HELP);
+			printf(question_get_text(obj, "debconf/text-prompt", "Prompt: '%c' for help> "), CHAR_HELP);
 		fflush(stdout);
 		get_answer(buf, sizeof(buf));
 		if (buf[0] == CHAR_HELP && buf[1] == 0)
