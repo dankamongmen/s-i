@@ -102,7 +102,7 @@ sub aggregate {
 set timefmt "%m/%d/%Y %H:%M"
 set xdata time
 set format x "%m/%y"
-set yrange [0 to 100]
+set yrange [0 to 102]
 set ylabel 'percent'
 set terminal png giant
 set output '$basename.png'
