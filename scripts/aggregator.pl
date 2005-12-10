@@ -20,6 +20,7 @@ sub aggregate {
 	foreach my $log (@_) {
 		my $onesuccess=0;
 		my $onefailed=0;
+		my $oneother=0;
 		
 		print $fh "<li><a href=\"".$log->{url}."\">".$log->{description}."</a><br>\n";
 		my $logurl=$log->{logurl}."overview".$log->{logext}."\n";
@@ -72,6 +73,9 @@ sub aggregate {
 					$success++;
 					$onesuccess++;
 				}
+				else {
+					$oneother++;
+				}
 				$total++;
 				if (defined $notes && length $notes) {
 					$notes="($notes)";
@@ -84,8 +88,8 @@ sub aggregate {
 		}
 		print $fh "</ul>\n";
 		print STATS "\t";
-		if ($onesuccess+$onefailed > 0) {
-			print STATS ($onesuccess / ($onesuccess+$onefailed) * 100);
+		if ($onesuccess+$onefailed+$oneother > 0) {
+			print STATS ($onesuccess / ($onesuccess+$onefailed+$oneother) * 100);
 		}
 		else {
 			print STATS 0;
