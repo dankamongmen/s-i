@@ -7,9 +7,9 @@
 #   . languagemap
 
 for list in /etc/languagelist /usr/share/languagelist ./languagelist ; do 
-    if [ -f "$list" ] ; then
-	languages="$list"
-    fi
+	if [ -f "$list" ] ; then
+		languages="$list"
+	fi
 done
 
 log "LANGNAME=$LANGNAME"
@@ -18,30 +18,28 @@ line=$(grep "^${LANGNAME};" $languages || true)
 
 log "line=$line"
 if [ "$line" ] ; then
-    OLD_IFS="$IFS"
-    IFS=';'
-    set $line
-    IFS="$OLD_IFS"
+	OLD_IFS="$IFS"
+	IFS=';'
+	set $line
+	IFS="$OLD_IFS"
 
-    #echo "C: $*"
+	#echo "C: $*"
 
-    if [ "$3" ] ; then LOCALE="$3" ; fi
-    if [ "$4" ] ; then FALLBACKLOCALE="$4" ; fi
-    if [ "$5" ] ; then LANGUAGE="$5" ; fi
-    if [ "$6" ] ; then COUNTRY="$6" ; fi
-    if [ "$7" ] ; then LANGUAGELIST="$7"; fi
-    if [ "$8" ] ; then CONSOLE="$8"; fi
+	if [ "$3" ] ; then LOCALE="$3" ; fi
+	if [ "$4" ] ; then FALLBACKLOCALE="$4" ; fi
+	if [ "$5" ] ; then LANGUAGE="$5" ; fi
+	if [ "$6" ] ; then COUNTRY="$6" ; fi
+	if [ "$7" ] ; then LANGUAGELIST="$7"; fi
+	if [ "$8" ] ; then CONSOLE="$8"; fi
 
-    if [ -z "$LANGUAGELIST" ] ; then
-	LANGUAGELIST="$LANGUAGE"
-    fi
-
+	if [ -z "$LANGUAGELIST" ] ; then
+		LANGUAGELIST="$LANGUAGE"
+	fi
 else
-    echo "error: Unable to locate info on language '$LANGNAME'"
-    log "error: Unable to locate info on language '$LANGNAME'"
-    FALLBACKLOCALE=""""
-    LANGUAGE=""
-    LOCALE=C
-    COUNTRY=US
+	echo "error: Unable to locate info on language '$LANGNAME'"
+	log "error: Unable to locate info on language '$LANGNAME'"
+	FALLBACKLOCALE=""""
+	LANGUAGE=""
+	LOCALE=C
+	COUNTRY=US
 fi
-

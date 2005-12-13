@@ -5,71 +5,71 @@ set -e
 . /usr/share/debconf/confmodule
 
 modify_cyrconfig() {
-        if [ "$2" ]; then
-           sed -e "s/^$1 .*\$/$1 $2/" \
-                  $cyrconfig > $cyrconfig.tmp && \
-           mv $cyrconfig.tmp $cyrconfig
-        fi
+	if [ "$2" ]; then
+		sed -e "s/^$1 .*\$/$1 $2/" \
+		    $cyrconfig > $cyrconfig.tmp && \
+		    mv $cyrconfig.tmp $cyrconfig
+	fi
 }
 
 db_get debian-installer/consoledisplay || true
 consoletype=`echo $RET | sed -e 's/=.*$//'`
 case "$consoletype" in
-kbd)
-    consolefont=`echo $RET | sed -e 's/^kbd=//'`
-    if apt-install console-tools; then
-        ctconfig=/target/etc/console-tools/config
-        acm=`echo $consolefont | sed -e 's/.*(//' -e 's/).*//'`
-        [ "$acm" = utf8 ] && acm=
-	# A few workarounds of console-tools limitations below
-	# APP_CHARSET_MAP and console fonts are not set
-	# for all consoles. These workarounds should probably
-	# be removed when we switch to kbd
-        if [ -n "$acm" ]; then
-	   echo "APP_CHARSET_MAP=$acm" >>$ctconfig
-	   echo "APP_CHARSET_MAP_vc1=$acm" >>$ctconfig
-	   echo "APP_CHARSET_MAP_vc2=$acm" >>$ctconfig
-	   echo "APP_CHARSET_MAP_vc3=$acm" >>$ctconfig
-	   echo "APP_CHARSET_MAP_vc4=$acm" >>$ctconfig
-	   echo "APP_CHARSET_MAP_vc5=$acm" >>$ctconfig
-	   echo "APP_CHARSET_MAP_vc6=$acm" >>$ctconfig
-        fi
-        consolefont=`echo $consolefont | sed -e 's/(.*//'`
-        if [ -n "$consolefont" ]; then
-            echo "SCREEN_FONT=$consolefont" >>$ctconfig
-            echo "SCREEN_FONT_vc2=$consolefont" >>$ctconfig
-            echo "SCREEN_FONT_vc3=$consolefont" >>$ctconfig
-            echo "SCREEN_FONT_vc4=$consolefont" >>$ctconfig
-            echo "SCREEN_FONT_vc5=$consolefont" >>$ctconfig
-            echo "SCREEN_FONT_vc6=$consolefont" >>$ctconfig
-        fi
-    fi
-    ;;
-cyr)
-    consolefont=`echo $RET | sed -e 's/^cyr=//'`
-    if apt-install console-cyrillic; then
-        cyrconfig=/target/etc/console-cyrillic
-        # format of the consolefont is:
-        # style,size,encoding,layout(option1 option2)
-        style=`echo $consolefont | sed -e 's/,.*$//'`
-        size=`echo $consolefont | sed -e 's/^[^,]*,\([^,]*\),.*$/\1/'`
-        encoding=`echo $consolefont | sed -e 's/^[^,]*,[^,]*,\([^,]*\),.*$/\1/'`
-        layoutopts=`echo $consolefont | sed -e 's/^[^,]*,[^,]*,[^,]*,\([^)]*)\).*$/\1/'`
-        layout=`echo $layoutopts | sed -e 's/(.*)$//'`
-        options=`echo $layoutopts | sed -e 's/.*(//' -e 's/).*//'`
-        modify_cyrconfig style "$style"
-        modify_cyrconfig size "$size"
-        modify_cyrconfig encoding "$encoding"
-        modify_cyrconfig layout "$layout"
-        modify_cyrconfig options "$options"
-        sed -e 's/^.*Bootsetup: .*$/# Bootsetup: YES/' $cyrconfig > $cyrconfig.tmp && \
-           mv $cyrconfig.tmp $cyrconfig
-        sed -e 's/^.*Debconf: .*$/# Debconf: NO/' $cyrconfig > $cyrconfig.tmp && \
-           mv $cyrconfig.tmp $cyrconfig
-    fi
-    ;;
+    kbd)
+	consolefont=`echo $RET | sed -e 's/^kbd=//'`
+	if apt-install console-tools; then
+		ctconfig=/target/etc/console-tools/config
+		acm=`echo $consolefont | sed -e 's/.*(//' -e 's/).*//'`
+		[ "$acm" = utf8 ] && acm=
+		# A few workarounds of console-tools limitations below
+		# APP_CHARSET_MAP and console fonts are not set
+		# for all consoles. These workarounds should probably
+		# be removed when we switch to kbd
+		if [ -n "$acm" ]; then
+			echo "APP_CHARSET_MAP=$acm" >>$ctconfig
+			echo "APP_CHARSET_MAP_vc1=$acm" >>$ctconfig
+			echo "APP_CHARSET_MAP_vc2=$acm" >>$ctconfig
+			echo "APP_CHARSET_MAP_vc3=$acm" >>$ctconfig
+			echo "APP_CHARSET_MAP_vc4=$acm" >>$ctconfig
+			echo "APP_CHARSET_MAP_vc5=$acm" >>$ctconfig
+			echo "APP_CHARSET_MAP_vc6=$acm" >>$ctconfig
+		fi
+		consolefont=`echo $consolefont | sed -e 's/(.*//'`
+		if [ -n "$consolefont" ]; then
+			echo "SCREEN_FONT=$consolefont" >>$ctconfig
+			echo "SCREEN_FONT_vc2=$consolefont" >>$ctconfig
+			echo "SCREEN_FONT_vc3=$consolefont" >>$ctconfig
+			echo "SCREEN_FONT_vc4=$consolefont" >>$ctconfig
+			echo "SCREEN_FONT_vc5=$consolefont" >>$ctconfig
+			echo "SCREEN_FONT_vc6=$consolefont" >>$ctconfig
+		fi
+	fi
+	;;
+    cyr)
+	consolefont=`echo $RET | sed -e 's/^cyr=//'`
+	if apt-install console-cyrillic; then
+		cyrconfig=/target/etc/console-cyrillic
+		# format of the consolefont is:
+		# style,size,encoding,layout(option1 option2)
+		style=`echo $consolefont | sed -e 's/,.*$//'`
+		size=`echo $consolefont | sed -e 's/^[^,]*,\([^,]*\),.*$/\1/'`
+		encoding=`echo $consolefont | sed -e 's/^[^,]*,[^,]*,\([^,]*\),.*$/\1/'`
+		layoutopts=`echo $consolefont | sed -e 's/^[^,]*,[^,]*,[^,]*,\([^)]*)\).*$/\1/'`
+		layout=`echo $layoutopts | sed -e 's/(.*)$//'`
+		options=`echo $layoutopts | sed -e 's/.*(//' -e 's/).*//'`
+		modify_cyrconfig style "$style"
+		modify_cyrconfig size "$size"
+		modify_cyrconfig encoding "$encoding"
+		modify_cyrconfig layout "$layout"
+		modify_cyrconfig options "$options"
+		sed -e 's/^.*Bootsetup: .*$/# Bootsetup: YES/' $cyrconfig > $cyrconfig.tmp && \
+		    mv $cyrconfig.tmp $cyrconfig
+		sed -e 's/^.*Debconf: .*$/# Debconf: NO/' $cyrconfig > $cyrconfig.tmp && \
+		    mv $cyrconfig.tmp $cyrconfig
+	fi
+	;;
 esac
- 
+
 db_get debian-installer/locale
 LOCALE="$RET"
 
@@ -88,29 +88,32 @@ EXTRAS="$(echo "$RET" | sed 's/,//g')"
 DESTFILE="/target/etc/environment"
 echo "LANG=\"$LOCALE\"" > $DESTFILE
 if [ -n "$LANGLIST" ] ; then
-    echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
+	echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
 fi
 # If the locale isn't already valid, append it to locale.gen
 gen=
-if log-output -t localechooser --pass-stdout chroot /target/ /usr/sbin/validlocale "$LOCALE" \
+if log-output -t localechooser --pass-stdout \
+    chroot /target/ /usr/sbin/validlocale "$LOCALE" \
     >> /target/etc/locale.gen; then
-    : # Nothing to do
+	: # Nothing to do
 else
-    # New locale added to locale.gen, generate it
-    gen=1
+	# New locale added to locale.gen, generate it
+	gen=1
 fi
 for loc in $EXTRAS; do
-    if [ "$loc" = "$LOCALE" ]; then
-        continue
-    fi
-    if log-output -t localechooser --pass-stdout chroot /target/ /usr/sbin/validlocale "$loc" \
-        >> /target/etc/locale.gen; then
-        : # Nothing to do
-    else
-        # New locale added to locale.gen, generate it
-        gen=1
-    fi
+	if [ "$loc" = "$LOCALE" ]; then
+		continue
+	fi
+	if log-output -t localechooser --pass-stdout \
+	    chroot /target/ /usr/sbin/validlocale "$loc" \
+	    >> /target/etc/locale.gen; then
+		: # Nothing to do
+	else
+		# New locale added to locale.gen, generate it
+		gen=1
+	fi
 done
 if [ "$gen" ]; then
-    log-output -t localechooser chroot /target /usr/sbin/locale-gen --keep-existing
+	log-output -t localechooser \
+	    chroot /target /usr/sbin/locale-gen --keep-existing
 fi
