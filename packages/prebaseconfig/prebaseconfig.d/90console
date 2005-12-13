@@ -25,7 +25,7 @@ ttyS*)
 	if [ -z "$ttyterm" ]; then ttyterm=vt100; fi
 	if [ -z "$ttyspeed" ]; then ttyspeed=9600; fi
 	sed -i -e "s/^\([1-6]\):/#\1:/" \
-	    -e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/"
+	    -e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
 	    /target/etc/inittab
 	echo "# serial console added by debian-installer" >> /target/etc/securetty
 	echo "$rawconsole" >> /target/etc/securetty
