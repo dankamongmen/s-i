@@ -96,7 +96,12 @@ sub aggregate {
 		}
 	}
 	print STATS "\t";
-	print STATS $success / ($success+$failed) * 100;
+	if ($success+$failed > 0) {
+		print STATS $success / ($success+$failed) * 100;
+	}
+	else {
+		print STATS 0;
+	}
 	print STATS "\n";
 	close STATS;
 	
