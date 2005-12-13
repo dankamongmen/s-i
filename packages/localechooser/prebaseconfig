@@ -77,10 +77,8 @@ LOCALE="$RET"
 # This can happen during e.g. s390 installs where localechooser is not run
 [ -z "$LOCALE" ] && LOCALE="C"
 
-if [ "$LOCALE" != "C" ] ; then
-	db_get debian-installer/language
-	LANGLIST="$RET"
-fi
+db_get debian-installer/language
+LANGLIST="$RET"
 
 db_get localechooser/supported-locales
 EXTRAS="$(echo "$RET" | sed 's/,//g')"

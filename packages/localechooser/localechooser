@@ -325,13 +325,12 @@ EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
 FIRST_LANG="${LANGUAGELIST%%:*}"
 
 # We use /etc/shortlists to check if we should present a shortlist
-use_lang=""
 if grep -q "^$FIRST_LANG" $SHORTLISTS; then
 	use_lang=$FIRST_LANG
 elif grep -q "^$LANGUAGE" $SHORTLISTS; then
-	if [ "$LOCALE != C ] ; then
-		use_lang=$LANGUAGE
-	fi
+	use_lang=$LANGUAGE
+else
+	use_lang=""
 fi
 
 # At this step we should have either xx, or xx_YY in LANGNAME
@@ -404,10 +403,9 @@ fi
 # fi
 
 # If the locale is C, we don't want to go further
-# FJP: Yes we do. There are all sorts of checks after this point that use LOCALE.
-#if [ "$LOCALE" = "C" ] ; then
-#	exit 0
-#fi
+if [ "$LOCALE" = "C" ] ; then
+	exit 0
+fi
 
 # Search for a supported locale which most closely resembles.
 OLDLOCALE=$LOCALE
