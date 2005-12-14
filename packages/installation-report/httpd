@@ -42,29 +42,11 @@ done
 if [ -d "$DOCROOT/$page" ]; then
 	header 200 OK "text/html"
 	echo "<html><head><title>Debian-installer logs and screenshots</title></head><body>"
-	echo "<b>Debian-installer logs and screenshots</b><br><br><b>Log files</b><ul>"
-
-	#outputs log files list only
+	echo "<b>Debian-installer logs and screenshots</b><br><br><ul>"
 	for file in $(cd "$DOCROOT/$page"; find -type f 2>/dev/null | sed 's/^\.\///'); do
-		#workaround for command "find \( -type f ! -name 'dfb*.ppm' \)" not being supported by busybox
-		if [ $(echo $file |grep ppm|wc -l) -eq "0" ]; then
-			echo "<li><a href=\"$file\">$file</a>"
-		fi
+		echo "<li><a href=\"$file\">$file</a>"
 	done
-	echo "</ul>"
-
-	#outputs screenshots list only
-	screenshots_list=$(cd "$DOCROOT/$page"; find -type f -name 'dfb*.ppm' 2>/dev/null | sed 's/^\.\///'|sort)
-	if [ $(echo -n $screenshots_list| wc -w) -gt "0" ]; then
-		echo "<b>Screenshots</b>"
-		echo "<ul>"
-		for file in $screenshots_list; do
-			echo "<li><a href=\"$file\">$file</a>"
-		done
-		echo "</ul>"
-	fi	
-
-	echo "</body></html>"
+	echo "</ul></body></html>"
 elif [ -e "$DOCROOT/$page" ]; then
 	if [ "${page%.ppm}" != "$page" ]; then
 		header 200 "OK" "image/x-portable-pixmap"
