@@ -263,9 +263,8 @@ log "Set debconf/language = '$LANGUAGELIST'"
 # required locale on boot)
 # We use belocs-locales-data for languages which don't have a locale
 # in the locales package
-case "$LANGUAGE" in
-	C)
-	;;
+if [ "$LOCALE" != "C" ] ; then
+	case "$LANGUAGE" in
 	ku|sa)
 	    pkginstall belocs-locales-data
 	    pkginstall belocs-locales-bin
@@ -273,42 +272,44 @@ case "$LANGUAGE" in
 	*)
 	    pkginstall locales
 	;;
-esac
+	esac
 
-# Unicode font for languages requiring it
-case "$LANGUAGE" in
+	# Unicode font for languages requiring it
+	case "$LANGUAGE" in
 	ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh)
 		anna-install bterm-unifont
 	;;
-esac
+	esac
 
-if [ "$LANGUAGE" != "en" -a "$LANGUAGE" != "C" ]; then
-	pkginstall iso-codes
+	if [ "$LANGUAGE" != "en" -a "$LANGUAGE" != "C" ]; then
+		pkginstall iso-codes
+	fi
+
+	# Other language specific packages
+	case "$LANGUAGE" in
+	ja|ko|ko_KR|el|zh|zh_CN|zh_TW|bg|vi|wo)
+		# Japanese, Korean, Greek, Chinese, Bulgarian
+		pkginstall jfbterm
+		pkginstall unifont
+	;;
+#	ru)
+#		# Russian
+#		pkginstall console-cyrillic
+#		pkginstall console-terminus
+#	;;
+	tr|ku|ro)
+		# Turkish, Kurdish, Romanian
+		pkginstall console-terminus
+	;;
+	ar|he|fa)
+		# RTL languages (Arabic, Hebrew, Farsi)
+		pkginstall jfbterm
+		pkginstall unifont
+		pkginstall libfribidi0
+	;;
+	esac
 fi
 
-# Other language specific packages
-case "$LANGUAGE" in
-ja|ko|ko_KR|el|zh|zh_CN|zh_TW|bg|vi|wo)
-	# Japanese, Korean, Greek, Chinese, Bulgarian
-	pkginstall jfbterm
-	pkginstall unifont
-;;
-#ru)
-#	# Russian
-#	pkginstall console-cyrillic
-#	pkginstall console-terminus
-#;;
-tr|ku|ro)
-	# Turkish, Kurdish, Romanian
-	pkginstall console-terminus
-;;
-ar|he|fa)
-	# RTL languages (Arabic, Hebrew, Farsi)
-	pkginstall jfbterm
-	pkginstall unifont
-	pkginstall libfribidi0
-;;
-esac
 # This is needed at the end of the script
 COUNTRYCODE_LANGUAGECHOOSER=$COUNTRY
 COUNTRY_LANGUAGECHOOSER=$(code2country $COUNTRY)
@@ -325,12 +326,13 @@ EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
 FIRST_LANG="${LANGUAGELIST%%:*}"
 
 # We use /etc/shortlists to check if we should present a shortlist
-if grep -q "^$FIRST_LANG" $SHORTLISTS; then
-	use_lang=$FIRST_LANG
-elif grep -q "^$LANGUAGE" $SHORTLISTS; then
-	use_lang=$LANGUAGE
-else
-	use_lang=""
+use_lang=""
+if [ "$LOCALE" != "C" ] ; then
+	if grep -q "^$FIRST_LANG" $SHORTLISTS; then
+		use_lang=$FIRST_LANG
+	elif grep -q "^$LANGUAGE" $SHORTLISTS; then
+		use_lang=$LANGUAGE
+	fi
 fi
 
 # At this step we should have either xx, or xx_YY in LANGNAME
@@ -402,20 +404,16 @@ fi
 	log "Set $countrycode = '$COUNTRYCODE'"
 # fi
 
-# If the locale is C, we don't want to go further
-if [ "$LOCALE" = "C" ] ; then
-	exit 0
-fi
 
 # Search for a supported locale which most closely resembles.
-OLDLOCALE=$LOCALE
-LOCALE=""
-
-# Locale refinment : we try to use the modifier inherited from the language
-# chooser. However, we do this only if the local is valid
-# 
+# Locale refinment: we try to use the modifier inherited from the language
+# chooser. However, we do this only if the locale is valid.
+ 
 # No refinment if the locale was preseeded
 if [ "$LOCALE" != "C" ] ; then 
+	OLDLOCALE=$LOCALE
+	LOCALE=""
+
 	db_get $localecode
 	if [ -z "$LOG" -o -z "$RET" ] ; then
 		for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
@@ -484,10 +482,9 @@ fi
 
 # Install localization-config except when no localization happens
 # Install it anyway for powerpc arches (to handle subarches)
-if [ "$LOCALE" != "C" ] ||  [ "$ARCH" = "powerpc" ]; then
+if [ "$LOCALE" != "C" ] || [ "$ARCH" = "powerpc" ]; then
 	pkginstall localization-config
 fi
-
 
 
 # Third step : ask for a locale at medium priority
@@ -517,27 +514,28 @@ if [ "$LOCALE" != "C" ] ; then
 		db_get $localecode
 		LOCALE="$RET"
 	fi
-fi
 
-CHOICES=
-# *.UTF-8@euro locales are deprecated; don't use them.
-for i in $(grep -v '\.UTF-8@euro$' $SUPPORTEDLOCALES); do
-	if [ -z "$CHOICES" ]; then
-		CHOICES="$i"
-	else
-		CHOICES="$CHOICES, $i"
+	# Ask for additional locales to be generated
+	CHOICES=
+	# *.UTF-8@euro locales are deprecated; don't use them.
+	for i in $(grep -v '\.UTF-8@euro$' $SUPPORTEDLOCALES); do
+		if [ -z "$CHOICES" ]; then
+			CHOICES="$i"
+		else
+			CHOICES="$CHOICES, $i"
+		fi
+	done
+	db_subst $supportedlocales LOCALELIST "$CHOICES"
+	db_fget $supportedlocales seen
+	if [ "$RET" = false ]; then
+		db_set $supportedlocales "$LOCALE"
 	fi
-done
-db_subst $supportedlocales LOCALELIST "$CHOICES"
-db_fget $supportedlocales seen
-if [ "$RET" = false ]; then
-	db_set $supportedlocales "$LOCALE"
-fi
-db_input medium $supportedlocales || [ $? -eq 30 ]
-if db_go; then
-	log "Supported locales successfully set"
-else
-	exit 10
+	db_input medium $supportedlocales || [ $? -eq 30 ]
+	if db_go; then
+		log "Supported locales successfully set"
+	else
+		exit 10
+	fi
 fi
 
 exit 0
