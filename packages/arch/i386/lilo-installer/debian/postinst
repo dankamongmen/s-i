@@ -23,13 +23,16 @@ findfs () {
 }
 
 lvm_vg () {
-	# Map from /dev/mapper/<vg>-<lv> to /dev/<vg>/<lv> for 
-	# Dup of code in partman.
+	# Map from /dev/mapper/<vg>-<lv> to /dev/<vg>/<lv>
 	vglv=${1#/dev/mapper/}
-	vglv=`echo "$vglv" | sed -e 's/\([^-]\)-\([^-]\)/\1 \2/' | sed -e 's/--/-/g'`
-	vg=`echo "$vglv" | cut -d" " -f1`
-	lv=`echo "$vglv" | cut -d" " -f2`
-	lvdisplay -c "/dev/$vg/$lv"| sed 's/^[^:]*:\([^:]*\):.*$/\1/'
+	if [ "$vglv" != "$1" ]; then
+		vglv=`echo "$vglv" | sed -e 's/\([^-]\)-\([^-]\)/\1 \2/' | sed -e 's/--/-/g'`
+		vg=`echo "$vglv" | cut -d" " -f1`
+		lv=`echo "$vglv" | cut -d" " -f2`
+		lvdisplay -c "/dev/$vg/$lv"| sed 's/^[^:]*:\([^:]*\):.*$/\1/'
+	else
+		lvdisplay -c "$1" 2>/dev/null | cut -d: -f2
+	fi
 }
 
 first_pv () {
