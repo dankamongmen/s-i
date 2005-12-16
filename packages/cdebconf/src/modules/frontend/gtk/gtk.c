@@ -268,6 +268,54 @@ void call_setters(struct frontend *obj)
     }
 }
 
+void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
+{
+    GdkWindow *gdk_window;
+    GdkPixbuf *gdk_pixbuf;
+    GtkWidget *dialog, *label;
+    gint x, y, width, height, depth;
+    int i, j;
+    char screenshot_name[256];
+	char popup_message[256];
+	
+    gdk_window = gtk_widget_get_parent_window ( button );
+    gdk_window_get_geometry( gdk_window, &x, &y, &width, &height, &depth);
+    gdk_pixbuf = gdk_pixbuf_get_from_drawable(NULL, gdk_window, gdk_colormap_get_system(),0,0,0,0, width, height);
+    i=0;
+	while (TRUE) {
+        sprintf(screenshot_name, "%s_%d.png", (obj->questions)->tag, i );
+        for(j=0; j<strlen(screenshot_name); j++) {
+	        if (screenshot_name[j] == '/')
+	            screenshot_name[j] = '_';
+        }
+        sprintf(popup_message, "/var/log/screenshot_%s", screenshot_name );
+        sprintf(screenshot_name, "%s", popup_message );
+        if ( ! access(screenshot_name, R_OK) )
+            i++;
+        else {
+            //printf ("nome: %s.png\nx: %d\ny: %d\nwidth: %d\nheight: %d\ndepth=%d\n", screenshot_name, x, y, width, height, depth);
+            break;
+        }
+    }
+    gdk_pixbuf_save (gdk_pixbuf, screenshot_name, "png", NULL, NULL);
+    g_object_unref(gdk_pixbuf);
+
+    dialog = gtk_dialog_new_with_buttons (NULL,
+                                          GTK_WINDOW(((struct frontend_data*) obj->data)->window),
+                                          GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                          GTK_STOCK_OK,
+                                          GTK_RESPONSE_ACCEPT,
+                                          NULL);
+
+    sprintf(popup_message, "Screenshot saved as\n%s", screenshot_name );
+    label = gtk_label_new (popup_message);
+    gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
+    gtk_widget_show_all (dialog);
+    gtk_dialog_run ( GTK_DIALOG(dialog) );
+    gtk_widget_destroy (dialog);
+
+}
+
 void button_single_callback(GtkWidget *button, struct frontend_question_data* data)
 {
     struct frontend *obj = data->obj;
@@ -844,7 +892,6 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 
 static int gtkhandler_text(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    /* FIXME: text probably shouldn't be quite so interactive as note */
     return gtkhandler_note(obj, q, qbox);
 }
 
@@ -1258,7 +1305,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 {
 
     GtkWidget *v_mainbox, *h_mainbox, *logobox, *targetbox, *actionbox, *h_actionbox;
-    GtkWidget *button_next, *button_prev;
+    GtkWidget *button_next, *button_prev, *button_screenshot;
     GtkWidget *progress_bar, *progress_bar_label, *progress_bar_box, *h_progress_bar_box, *v_progress_bar_box;
     GtkWidget *label_title, *h_title_box, *v_title_box, *logo_button;
     GList *focus_chain = NULL;
@@ -1279,13 +1326,18 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     targetbox = gtk_vbox_new (FALSE, 0);
     ((struct frontend_data*) obj->data)->target_box = targetbox;
 
-    /* Here are the back and forward buttons */
     actionbox = gtk_hbutton_box_new();
     h_actionbox = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX (h_actionbox), actionbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END);
     gtk_box_set_spacing (GTK_BOX(actionbox), DEFAULT_PADDING);
 
+    /* button to take screenshots of the frontend */
+    button_screenshot = gtk_button_new_with_label ("Screenshot");
+    g_signal_connect (G_OBJECT (button_screenshot), "clicked", G_CALLBACK (screenshot_button_callback), obj );
+    gtk_box_pack_start (GTK_BOX(actionbox), button_screenshot, TRUE, TRUE, DEFAULT_PADDING);
+
+    /* Here are the back and forward buttons */
     button_prev = gtk_button_new_from_stock (GTK_STOCK_GO_BACK);
     ret_val = NEW(int);
     *ret_val = DC_GOBACK;
@@ -1413,7 +1465,7 @@ static int gtk_go(struct frontend *obj)
 
     data->setters = NULL;
 
-       questionbox = gtk_vbox_new(FALSE, 0);
+    questionbox = gtk_vbox_new(FALSE, 0);
 
     /* since all widgets used to display single questions have native
      * scrolling capabilities or do not need scrolling since they're
