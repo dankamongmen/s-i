@@ -43,13 +43,15 @@ if [ -d "$DOCROOT/$page" ]; then
 	header 200 OK "text/html"
 	echo "<html><head><title>Debian-installer logs and screenshots</title></head><body>"
 	echo "<b>Debian-installer logs and screenshots</b><br><br><ul>"
-	for file in $(cd "$DOCROOT/$page"; find -type f 2>/dev/null | sed 's/^\.\///'); do
+	for file in $(cd "$DOCROOT/$page"; find -type f 2>/dev/null | sed 's/^\.\///' | sort); do
 		echo "<li><a href=\"$file\">$file</a>"
 	done
 	echo "</ul></body></html>"
 elif [ -e "$DOCROOT/$page" ]; then
 	if [ "${page%.ppm}" != "$page" ]; then
 		header 200 "OK" "image/x-portable-pixmap"
+	elif [ "${page%.png}" != "$page" ]; then
+		header 200 "OK" "image/x-png"		
 	else
 		header 200 "OK" "text/plain"
 	fi
