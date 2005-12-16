@@ -93,9 +93,9 @@ while :; do
 			db_get passwd/username
 			if [ -z "$RET" ]; then
 				db_get passwd/user-fullname
-				userdefault=`echo $RET | sed 's/ .*//' | tr A-Z a-z`
+				userdefault=`echo $RET | sed 's/ .*//' | LC_ALL=C tr A-Z a-z`
 				if test -n "$userdefault" && \
-				   expr "$userdefault" : '[a-z][-a-z0-9]*$' >/dev/null; then
+				   LC_ALL=C expr "$userdefault" : '[a-z][-a-z0-9]*$' >/dev/null; then
 					db_set passwd/username "$userdefault"
 				fi
 			fi
@@ -109,7 +109,7 @@ while :; do
 			# Verify the user name, loop with message if bad.
 			db_get passwd/username
 			USER="$RET"
-			if ! expr "$USER" : '[a-z][-a-z0-9]*$' >/dev/null; then
+			if ! LC_ALL=C expr "$USER" : '[a-z][-a-z0-9]*$' >/dev/null; then
 				db_fset passwd/username seen false
 				db_fset passwd/username-bad seen false
 				db_input critical passwd/username-bad
