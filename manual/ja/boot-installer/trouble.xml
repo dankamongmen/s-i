@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 32427 -->
 
  <sect1 id="boot-troubleshooting">
  <title>インストールプロセスのトラブルシューティング</title>
@@ -367,15 +367,31 @@ custom kernel later (see <xref linkend="kernel-baking"/>).
 
 <!--
 If you get through the initial boot phase but cannot complete the
-install, the bug reporter menu choice may be helpful. It copies system
-error logs and configuration information to a user-supplied floppy.
+install, the bug reporter menu choice may be helpful.
+<phrase condition="sarge">
+It copies system error logs and configuration information to a user-supplied
+floppy.
+</phrase>
+<phrase condition="etch">
+It lets you store system error logs and configuration information from the
+installer to a floppy, or download them in a web browser.
+</phrase>
+-->
+最初の起動段階は通過したのに、インストールが完了できなかった場合は、
+バグリポータメニューを選択するといいかもしれません。
+<phrase condition="sarge">
+これはユーザのフロッピーに、システムのエラーログや設定情報をコピーします。
+</phrase>
+<phrase condition="etch">
+インストーラからのシステムのエラーログや設定情報をフロッピーに格納したり、
+web ブラウザでダウンロードしたりできるようになります。
+</phrase>
+
+<!--       
 This information may provide clues as to what went wrong and how to
 fix it.  If you are submitting a bug report you may want to attach
 this information to the bug report.
 -->
-最初の起動段階は通過したのに、インストールが完了できなかった場合は、
-バグリポータメニューを選択するといいかもしれません。
-これはユーザのフロッピーに、システムのエラーログや設定情報をコピーします。
 この情報は、何が間違っていてどのように修正するか、
 といった手がかりを示しているかもしれません。
 バグ報告を送る際に、バグ報告にこの情報を付けることができます。
@@ -404,14 +420,34 @@ after the computer has been booted into the installed system.
 If you still have problems, please submit an installation report. We also
 encourage installation reports to be sent even if the installation is
 successful, so that we can get as much information as possible on the largest
-number of hardware configurations. Please use this template when filling out
-installation reports, and file the report as a bug report against the
-<classname>installation-reports</classname> pseudo package, by sending it to
-<email>submit@bugs.debian.org</email>.
+number of hardware configurations. 
 -->
 まだ問題がある場合には、インストールレポートをお送りください。
 また、インストールが成功したときのインストールレポートもお送りください。
 そうすると、たくさんのハードウェア設定情報を手に入れることができます。
+
+</para><para condition="etch">
+
+<!--
+If you have a working Debian system, the easiest way to send an installation
+report is to install the installation-report and reportbug packages
+(<command>apt-get install installation-report reportbug</command>) and run
+the command <command>reportbug installation-report</command>.
+-->
+動作する Debian システムがある場合、
+インストールレポートを送る最も簡単な方法は以下のようになります。
+installation-report と reportbug パッケージをインストール
+(<command>apt-get install installation-report reportbug</command>) し、
+<command>reportbug installation-report</command> を実行してください。
+
+</para><para>
+
+<!--
+Please use this template when filling out
+installation reports, and file the report as a bug report against the
+<classname>installation-reports</classname> pseudo package, by sending it to
+<email>submit@bugs.debian.org</email>.
+-->
 インストールレポートを記入する際には、以下のテンプレートをお使いください。
 そのファイルを、<classname>installation-reports</classname> 疑似パッケージのバグ報告として、
 <email>submit@bugs.debian.org</email> 宛にお送りください。
@@ -419,19 +455,17 @@ installation reports, and file the report as a bug report against the
 <informalexample><screen>
 Package: installation-reports
 
-Debian-installer-version: &lt;イメージを取得した場所と日付&gt;
 
-uname -a: &lt;シェルプロンプトで uname -a を実行した結果&gt;
+Boot method: &lt;インストーラの起動方法は? CD? フロッピー? ネットワーク?&gt;
+Image version: &lt;イメージを取得した場所と日時&gt;
 Date: &lt;インストールした日時&gt;
-Method: &lt;どのようにインストールしたか? どのように起動したか? 
-       ネットワークインストールならどこからか? プロキシは?&gt;
 
 Machine: &lt;マシンの説明 (例 IBM Thinkpad R32)&gt;
 Processor:
 Memory:
 Root Device: &lt;IDE?  SCSI?  デバイス名は?&gt;
-Root Size/partition table: &lt;どこにマウントしたかの注をつけて、
-      全パーティションテーブルを自由に張り付けてください。&gt;
+Partitions: &lt;df -Tl の結果; 優先される生のパーティションテーブル&gt;
+
 Output of lspci and lspci -n:
 
 Base System Installation Checklist:

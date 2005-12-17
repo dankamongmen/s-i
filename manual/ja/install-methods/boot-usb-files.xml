@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 25496 -->
+<!-- original version: 32124 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>USB メモリスティックでの起動用ファイルの準備</title>
@@ -54,15 +54,8 @@ have to extract it directly to to your USB stick:
 以下のように USB スティックに直接展開してください。
 
 <informalexample><screen>
-# gzip -dc boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
+# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
 </screen></informalexample>
-
-<!--
-Of course this will destroy anything already on the device, so take
-care that you use the correct device name for your USB stick.
--->
-もちろんこれはデバイス上の既存データを破壊しますので、
-正しい USB スティックのデバイス名を使用するよう注意してください。
 
 </para><para arch="powerpc">
 
@@ -83,17 +76,21 @@ USB スティックに "Apple_Bootstrap" タイプパーティションを作成し、
 以下のように USB スティックに直接展開してください。
 
 <informalexample><screen>
-# gzip -dc boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
+# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
 </screen></informalexample>
 
-<!--
-Of course this will destroy anything already on the device, so take
-care that you use the correct device name for your USB stick.
--->
-もちろんこれはデバイス上の既存データを破壊しますので、
-正しい USB スティックのデバイス名を使用するよう注意してください。
+</para>
+<warning><para>
 
-</para><para>
+<!--
+Using this method will destroy anything already on the device. Make sure
+that you use the correct device name for your USB stick.
+-->
+この方法を使うとデバイス上の既存の物は破壊してしまいます。
+USB スティックの正しいデバイス名を確認して使用してください。
+
+</para></warning>
+<para>
 
 <!--
 After that, mount the USB memory stick (<userinput>mount
