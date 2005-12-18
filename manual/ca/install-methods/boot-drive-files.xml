@@ -1,63 +1,61 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 28997 -->
 
  <sect1 condition="bootable-disk" id="boot-drive-files">
- <title>Preparing Files for Hard Disk Booting</title>
+ <title>Preparant els fitxers per arrencar des del disc dur</title>
 <para>
 
-The installer may be booted using boot files placed on an
-existing hard drive partition, either launched from another operating
-system or by invoking a boot loader directly from the BIOS.
+L'instal·lador es pot arrencar fent ús de fitxers que són a una
+partició d'un disc dur: o bé llençat des d'un altre sistema operatiu,
+o bé cridant directament un carregador des de la BIOS.
 
 </para><para>
 
-A full, <quote>pure network</quote> installation can be achieved using this
-technique. This avoids all hassles of removable media, like finding
-and burning CD images or struggling with too numerous and
-unreliable floppy disks.
+Es pot aconseguir una instal·lació completa amb <quote>xarxa pura</quote>
+utilitzant aquesta tècnica. Açò evita tota la confusió de mitjans extraïbles,
+com trobar i gravar imatges de CD o barallar-se amb nombrosos i poc fiables
+disquets.
 
 </para><para arch="i386">
 
-The installer cannot boot from files on an NTFS file system.
+L'instal·lador no pot arrencar des d'un sistema de fitxers NTFS.
 
 </para><para arch="powerpc">
 
-The installer cannot boot from files on an HFS+ file system.  MacOS
-System 8.1 and above may use HFS+ file systems; NewWorld PowerMacs all
-use HFS+. To determine whether your existing file system is HFS+,
-select <userinput>Get Info</userinput> for the volume in question. HFS
-file systems appear as <userinput>Mac OS Standard</userinput>, while
-HFS+ file systems say <userinput>Mac OS Extended</userinput>. You must
-have an HFS partition in order to exchange files between MacOS and
-Linux, in particular the installation files you download.
+L'instal·lador no pot arrencar des d'un sistema de fitxers HFS+.  Els
+MacOS System 8.1 i posteriors poden utilitzar el sistema de fitxers HFS+;
+tots els NewWorld PowerMacs utilitzen HFS+. Per determinar si el vostre
+sistema de fitxers és HFS+, seleccioneu <userinput>Get Info</userinput> pel
+volum en qüestió. El sistema de fitxers HFS apareix com
+<userinput>Mac OS Standard</userinput>, mentre que al HFS+ diu
+<userinput>Mac OS Extended</userinput>. Hauríeu de tenir una partició HFS
+per poder intercanviar fitxers entre MacOS i Linux, en particular els fitxers
+d'instal·lació que descarregueu.
 
 </para><para arch="powerpc">
 
-Different programs are used for hard disk installation system booting,
-depending on whether the system is a <quote>NewWorld</quote> or an
-<quote>OldWorld</quote> model.
-
-</para>
+S'utilitzen programes diferents pel sistema d'arrencada amb disc dur
+depenent de si el sistema és un model <quote>NewWorld</quote> o un
+<quote>OldWorld</quote>.
 
   <sect2 arch="i386" id="files-lilo">
-  <title>Hard disk installer booting using <command>LILO</command> or
-  <command>GRUB</command></title>
+  <title>Arranc de l'instal·lador des de disc dur fent ús de
+         <command>LILO</command> o <command>GRUB</command></title>
 <para>
 
-This section explains how to add to or even replace an existing linux
-installation using either <command>LILO</command> or
-<command>GRUB</command>.
+Aquesta secció explica com afegir o com reemplaçar una instal·lació existent
+utilitzant <command>LILO</command> o <command>GRUB</command>.
 
 </para><para>
 
-At boot time, both bootloaders support loading in memory not
-only the kernel, but also a disk image. This RAM disk can be used as
-the root file-system by the kernel.
+Al moment d'arrencar, ambdós carregadors suporten carregar a memòria no
+tan sols el nucli, sinó també una imatge del disc. Aquest disc RAM pot ser
+utilitzat pel nucli com el sistema de fitxers arrel.
 
 </para><para>
 
-Copy the following files from the Debian archives to a
-convenient location on your hard drive, for instance to
+Copieu els fitxers següents des dels arxius de Debian a un lloc
+còmode al vostre disc dur, per exemple a
 <filename>/boot/newinstall/</filename>.
 
 <itemizedlist>
@@ -75,7 +73,7 @@ convenient location on your hard drive, for instance to
 
 </para><para>
 
-Finally, to configure the bootloader proceed to
+Finalment, per configurar el carregador continueu a
 <xref linkend="boot-initrd"/>.
 
 </para>
@@ -83,58 +81,56 @@ Finally, to configure the bootloader proceed to
 
 
   <sect2 arch="powerpc" id="files-oldworld">
-  <title>Hard Disk Installer Booting for OldWorld Macs</title>
+  <title>Arrencar l'instal·lador des de disc dur per a Macs OldWorld</title>
 <para>
 
-The <filename>boot-floppy-hfs</filename> floppy uses
-<application>miBoot</application> to launch Linux installation, but
-<application>miBoot</application> cannot easily be used for hard disk
-booting. <application>BootX</application>, launched from MacOS,
-supports booting from files placed on the hard
-disk. <application>BootX</application> can also be used to dual-boot
-MacOS and Linux after your Debian installation is complete. For the
-Performa 6360, it appears that <command>quik</command> cannot make the
-hard disk bootable.  So <application>BootX</application> is required
-on that model.
+El disquet <filename>boot-floppy-hfs</filename> utilitza
+<application>miBoot</application> per arrencar la instal·lació, però
+<application>miBoot</application> no és fàcil d'utilitzar per arrencar
+des de disc dur. <application>BootX</application>, llençat des de MacOS,
+suporta arrencar des de fitxers al disc dur. També es pot utilitzar
+<application>BootX</application> com arranc dual MacOS i Linux després
+d'haver completat la instal·lació del vostre Debian. Pel Performa 6360,
+pareix que el <command>quik</command> no pot fer el disc arrencable. Així
+que per aquest model el <application>BootX</application> és imprescindible.
 
 </para><para>
 
-Download and unstuff the <application>BootX</application>
-distribution, available from <ulink url="&url-powerpc-bootx;"></ulink>,
-or in the
+Descarregueu i desempaqueteu el <application>BootX</application>,
+disponible a <ulink url="&url-powerpc-bootx;"></ulink>, o al directori
 <filename>dists/woody/main/disks-powerpc/current/powermac</filename>
-directory on Debian http/ftp mirrors and official Debian CDs. Use
-<application>Stuffit Expander</application> to extract it from its
-archive. Within the package, there is an empty folder called
-<filename>Linux Kernels</filename>. Download
-<filename>linux.bin</filename> and
-<filename>ramdisk.image.gz</filename> from the
-<filename>disks-powerpc/current/powermac</filename> folder, and place
-them in the <filename>Linux Kernels</filename> folder. Then place the
-<filename>Linux Kernels</filename> folder in the active System Folder.
+a les rèpliques http/ftp oficials i als CD oficials de Debian. Utilitzeu
+<application>Stuffit Expander</application> per extraure aquest arxiu.
+Dins el paquet, hi ha una carpeta buida amb el nom
+<filename>Linux Kernels</filename>. Descarregueu el
+<filename>linux.bin</filename> i el
+<filename>ramdisk.image.gz</filename> des del directori
+<filename>disks-powerpc/current/powermac</filename>, i poseu-los a la carpeta
+<filename>Linux Kernels</filename>. Aleshores poseu la carpeta
+<filename>Linux Kernels</filename> al Sistema de Carpetes actiu.
 
 </para>
   </sect2>
 
   <sect2 arch="powerpc" id="files-newworld">
-  <title>Hard Disk Installer Booting for NewWorld Macs</title>
+  <title>Arrencar l'instal·lador des de disc dur per a Macs NewWorld</title>
 <para>
 
-NewWorld PowerMacs support booting from a network or an ISO9660
-CD-ROM, as well as loading ELF binaries directly from the hard
-disk. These machines will boot Linux directly via
-<command>yaboot</command>, which supports loading a kernel and RAMdisk
-directly from an ext2 partition, as well as dual-booting with
-MacOS. Hard disk booting of the installer is particularly appropriate
-for newer machines without floppy drives. <command>BootX</command> is
-not supported and must not be used on NewWorld PowerMacs.
+Els PowerMacs NewWorld suporten arrancar des d'una xarxa o un
+CD-ROM ISO9660, així com carregar els binaris ELF directament des
+del disc dur. Aquestes màquines arranquen directament Linux utilitzant
+<command>yaboot</command>, que suporta la càrrega d'un nucli i un RAMdisk
+directament des de una partició ext2, així com l'arranc dual amb MacOS.
+Arrancar l'instal·lador des de disc dur és apropiat particularment per
+màquines noves sense disquetera. El <command>BootX</command> no està
+suportat i no s'hauria d'utilitzar a PowerMacs NewWorld.
 
 </para><para>
 
-<emphasis>Copy</emphasis> (not move) the following four files which
-you downloaded earlier from the Debian archives, onto the root level
-of your hard drive (this can be accomplished by
-<keycap>option</keycap>-dragging each file to the hard drive icon).
+<emphasis>Copieu</emphasis> (no mogueu) els quatre fitxers següents que
+heu descarregat anteriorment des de l'arxiu de Debian, a l'arrel del vostre
+disc dur (açò podria aconseguir-se amb <keycap>option</keycap>-arrossegar
+cada fitxer a la icona del disc dur).
 
 <itemizedlist>
 <listitem><para>
@@ -161,15 +157,15 @@ of your hard drive (this can be accomplished by
 
 </para><para>
 
-Make a note of the partition number of the MacOS partition where you
-place these files. If you have the MacOS <command>pdisk</command>
-program, you can use the L command to check for the partition
-number. You will need this partition number for the command you type
-at the Open Firmware prompt when you boot the installer.
+Anoteu el nombre de la partició del MacOS on poseu aquests fitxers.
+Si teniu el programa de MacOS <command>pdisk</command>, podeu fer servir
+la comanda L per comprovar el nombre de la partició. Necessitareu aquest
+nombre de partició per la comanda que escriureu a la sol·licitud de l'Open
+Firmware quan arranqueu l'instal·lador.
 
 </para><para>
 
-To boot the installer, proceed to <xref linkend="boot-newworld"/>.
+Per arrancar l'instal·lador, continueu a <xref linkend="boot-newworld"/>.
 
 </para>
   </sect2>

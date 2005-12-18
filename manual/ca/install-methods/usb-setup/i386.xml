@@ -1,101 +1,105 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 32141 untranslated -->
+<!-- original version: 32141 -->
 
    <sect3 arch="i386">
-   <title>USB stick partitioning on &arch-title;</title>
+   <title>Particionar un llapis USB a &arch-title;</title>
 <para>
 
-We will show how to setup the memory stick to use the first partition,
-instead of the entire device.
+Mostrarem com configurar un llapis de memòria per utilitzar la primera
+partició d'aquest, en comptes del dispositiu complet.
 
 </para><note><para>
 
-Since most USB sticks come pre-configured with a single FAT16
-partition, you probably won't have to repartition or reformat the
-stick.  If you have to do that anyway, use <command>cfdisk</command>
-or any other partitioning tool for creating a FAT16 partition and then
-create the filesystem using:
+La major part dels llapis USB venen preconfigurats amb una única
+partició FAT16, així que en general no serà necessari reparticionar o
+reformatar-lo. Si heu de fer-ho, utilitzeu el <command>cfdisk</command>
+o qualsevol altra ferramenta per crear la partició FAT16, i aleshores
+creeu el sistema de fitxers fent:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sda1</replaceable>
 </screen></informalexample>
 
-Take care that you use the correct device name for your USB stick. The
-<command>mkdosfs</command> command is contained in the
-<classname>dosfstools</classname> Debian package.
+Aneu en compte d'utilitzar el nom del dispositiu correcte pel vostre
+llapis USB. L'ordre <command>mkdosfs</command> és al paquet Debian
+<classname>dosfstools</classname>.
 
 </para></note><para>
 
-In order to start the kernel after booting from the USB stick, we will
-put a boot loader on the stick. Although any boot loader
-(e.g. <command>LILO</command>) should work, it's convenient to use
-<command>SYSLINUX</command>, since it uses a FAT16 partition and can
-be reconfigured by just editing a text file. Any operating system
-which supports the FAT file system can be used to make changes to the
-configuration of the boot loader.
+Per arrencar el nucli després d'arrencar des del llapis USB, posarem un
+carregador de l'arrencada al llapis. Malgrat que hauria de funcionar
+qualsevol carregador (p.ex. <command>LILO</command>), és convenient
+utilitzar <command>SYSLINUX</command>, ja que utilitza una partició FAT16
+i pot reconfigurar-se editant tan sols un fitxer de text. Qualsevol sistema
+operatiu que suporte el sistema de fitxers FAT pot utilitzar-se per canviar
+la configuració del carregador de l'arrencada.
 
 </para><para>
 
-To put <command>SYSLINUX</command> on the FAT16 partition on your USB
-stick, install the <classname>syslinux</classname> and
-<classname>mtools</classname> packages on your system, and do:
+Per posar el <command>SYSLINUX</command> a la partició FAT16 del vostre
+llapis USB, instal·leu els paquets <classname>syslinux</classname> i
+<classname>mtools</classname> al vostre sistema i executeu:
 
 <informalexample><screen>
 # syslinux /dev/<replaceable>sda1</replaceable>
 </screen></informalexample>
 
-Again, take care that you use the correct device name. The partition
-must not be mounted when starting <command>SYSLINUX</command>. This
-procedure writes a boot sector to the partition and creates the file
-<filename>ldlinux.sys</filename> which contains the boot loader code.
+Altra vegada, aneu en compte i utilitzeu el nom correcte pel dispositiu.
+La partició no hauria d'estar muntada quan executeu l'ordre
+<command>SYSLINUX</command>.
+Aquest procediment escriu un sector d'arrencada a la partició i crea el fitxer
+<filename>ldlinux.sys</filename> que conté el codi del carregador d'arrencada.
 
 </para><para>
 
-Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and
-copy the following files from the Debian archives to the stick:
+Munteu la partició (<userinput>mount /dev/sda1 /mnt</userinput>) i copieu
+els fitxers següents al llapis:
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (kernel binary)
+<filename>vmlinuz</filename> (nucli binari)
 
 </para></listitem>
 <listitem><para>
 
-<filename>initrd.gz</filename> (initial ramdisk image)
+<filename>initrd.gz</filename> (imatge inicial del disc ram)
 
 </para></listitem>
 <listitem><para>
 
-<filename>syslinux.cfg</filename> (SYSLINUX configuration file)
+<filename>syslinux.cfg</filename> (fitxer de configuració del SYSLINUX)
 
 </para></listitem>
 <listitem><para>
 
-Optional kernel modules
+Mòduls del nucli opcionals
 
 </para></listitem>
 </itemizedlist>
 
-If you want to rename the files, please note that
-<command>SYSLINUX</command> can only process DOS (8.3) file names.
+Si voleu canviar el nom dels fitxers, aneu en compte de que el
+<command>SYSLINUX</command> tan sols pot utilitzar nom de fitxers tipus
+DOS (8.3).
 
 </para><para>
 
-The <filename>syslinux.cfg</filename> configuration file should
-contain the following two lines:
+
+El fitxer de configuració <filename>syslinux.cfg</filename> hauria de contenir
+les següents línies:
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw
 </screen></informalexample>
 
-Please note that the <userinput>ramdisk_size</userinput> parameter
-may need to be increased, depending on the image you are booting.
+Fixeu-vos que el paràmetre <userinput>ramdisk_size</userinput> hauria de
+incrementar-se depenent de la imatge que esteu arrencant.
 <phrase condition="sarge">
-If the boot fails, you can try adding <userinput>devfs=mount,dall</userinput>
-to the <quote>append</quote> line.
+Si l'arranc falla, podeu afegir <userinput>devfs=mount,dall</userinput>
+a la línia <quote>append</quote>.
 </phrase>
 
 </para>
    </sect3>
+
