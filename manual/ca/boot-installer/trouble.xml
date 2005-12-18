@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 32427 untranslated -->
 
  <sect1 id="boot-troubleshooting">
  <title>Troubleshooting the Installation Process</title>
@@ -198,8 +198,16 @@ custom kernel later (see <xref linkend="kernel-baking"/>).
 <para>
 
 If you get through the initial boot phase but cannot complete the
-install, the bug reporter menu choice may be helpful. It copies system
-error logs and configuration information to a user-supplied floppy.
+install, the bug reporter menu choice may be helpful.
+<phrase condition="sarge">
+It copies system error logs and configuration information to a user-supplied
+floppy.
+</phrase>
+<phrase condition="etch">
+It lets you store system error logs and configuration information from the
+installer to a floppy, or download them in a web browser.
+</phrase>
+	
 This information may provide clues as to what went wrong and how to
 fix it.  If you are submitting a bug report you may want to attach
 this information to the bug report.
@@ -221,7 +229,18 @@ after the computer has been booted into the installed system.
 If you still have problems, please submit an installation report. We also
 encourage installation reports to be sent even if the installation is
 successful, so that we can get as much information as possible on the largest
-number of hardware configurations. Please use this template when filling out
+number of hardware configurations. 
+
+</para><para condition="etch">
+
+If you have a working Debian system, the easiest way to send an installation
+report is to install the installation-report and reportbug packages
+(<command>apt-get install installation-report reportbug</command>) and run
+the command <command>reportbug installation-report</command>.
+
+</para><para>
+
+Please use this template when filling out
 installation reports, and file the report as a bug report against the
 <classname>installation-reports</classname> pseudo package, by sending it to
 <email>submit@bugs.debian.org</email>.
@@ -229,18 +248,15 @@ installation reports, and file the report as a bug report against the
 <informalexample><screen>
 Package: installation-reports
 
-Debian-installer-version: &lt;Fill in date and from where you got the image&gt;
-uname -a: &lt;The result of running uname -a on a shell prompt&gt;
+Boot method: &lt;How did you boot the installer? CD? floppy? network?&gt;
+Image version: &lt;Fill in date and from where you got the image&gt;
 Date: &lt;Date and time of the install&gt;
-Method: &lt;How did you install?  What did you boot off?  If network
-      install, from where?  Proxied?&gt;
 
 Machine: &lt;Description of machine (eg, IBM Thinkpad R32)&gt;
 Processor:
 Memory:
-Root Device: &lt;IDE?  SCSI?  Name of device?&gt;
-Root Size/partition table: &lt;Feel free to paste the full partition
-      table, with notes on which partitions are mounted where.&gt;
+Partitions: &lt;df -Tl will do; the raw partition table is preferred&gt;
+
 Output of lspci and lspci -n:
 
 Base System Installation Checklist:
