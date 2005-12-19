@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 32424 -->
 
  <sect1 id="automatic-install">
  <title>Instal·lació automàtica</title>
@@ -25,25 +25,28 @@ preconfiguració des de la xarxa o des d'un mitjà extraïble, i el que
 fa és emplenar amb respostes totes les preguntes fetes al procés
 d'instal·lació.
 
-</para><para>
+</para><para condition="etch">
+
+Podeu trobar la documentació completa per a fer precarrega incloent un
+exemple funcional que podeu editar a <xref linkend="appendix-preseed"/>.
+
+</para><para condition="sarge">
 
 Malgrat que els diàlegs utilitzats pel &d-i; es poden precarregar
 utilitzant aquest mètode, hi ha algunes excepcions. Podeu (re)particionar
 un disc complet o utilitzar l'espai buit a un disc, però no és possible
 utilitzar les particions que ja teniu. En aquest moment no podeu
 precarregar les opcions de configuració de RAID i LVM.
-<phrase condition="sarge">A més a més, amb l'excepció dels mòduls dels
-controladors de xarxa, no és possible preconfigurar els paràmetres dels
-mòduls del nucli.
-</phrase>
+A més a més, amb l'excepció dels mòduls dels controladors de xarxa, no és
+possible preconfigurar els paràmetres dels mòduls del nucli.
 
-</para><para>
+</para><para condition="sarge">
 
 El fitxer de preconfiguració està en el format que utilitza l'ordre
 «debconf-set-selections». Podeu trobar un exemple ben documentat i funcional
 que podeu editar a <xref linkend="example-preseed"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 D'altra banda, una forma d'aconseguir un fitxer amb una llista completa amb
 tots els valors que poden ser precarregats, és fer una instal·lació
@@ -61,7 +64,7 @@ Però un fitxer generat d'aquesta manera, tindrà també alguns valors que no
 haurien de ser precarregats, i el fitxer <xref linkend="example-preseed"/>
 és un millor punt de partida per la majoria dels usuaris.
 
-</para><para>
+</para><para condition="sarge">
 
 Quan estigui preparat el fitxer de preconfiguració, podeu editar-lo si ho
 necessiteu, i podeu posar-lo a un servidor web, o copiar-lo a un mitjà
@@ -69,7 +72,7 @@ d'instal·lació. A qualsevol lloc que poseu el fitxer, necessitareu passar-li
 un paràmetre a l'instal·lador en el moment de l'arrencada per dir-li que
 utilitze el fitxer.
 
-</para><para>
+</para><para condition="sarge">
 
 Per fer que l'instal·lador utilitze un fitxer de preconfiguració baixant-lo
 de la xarxa, afegiu preseed/url=http://url/to/preseed.cfg als paràmetres
@@ -80,14 +83,14 @@ pregunta. Si voleu, podeu configurar la prioritat d'instal·lació a «critical�
 per evitar les preguntes fins que la xarxa estigui configurada. Vegeu
 <xref linkend="installer-args"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 Per posar el fitxer de preconfiguració a un CD, necessitaríeu remasteritzar
 la imatge ISO per incloure el fitxer de preconfiguració. Vegeu els detalls
 a la pàgina del manual de mkisofs. De forma alternativa, poseu el fitxer de
 preconfiguració a un disquet, i utilitzeu preseed/file=/floppy/preseed.cfg.
 
-</para><para arch="i386">
+</para><para arch="i386" condition="sarge">
 
 Si arrenqueu des d'un llapis de memòria USB, aleshores podeu copiar el fitxer
 de preconfiguració al llapis de memòria i editar el fitxer syslinux.cfg per
@@ -95,22 +98,5 @@ afegir preseed/file=/hd-media/preseed.cfg als paràmetres d'arrencada del
 nucli.
 
 </para>
-
-   <sect3 condition="etch">
-   <title>Utilització de precàrrega per canviar els valors predeterminats</title>
-<para>
-
-És possible utilitzar les precàrregues per canviar les respostes
-predeterminades a les preguntes, però tot i així haver-les de respondre.
-Per fer-ho, la marca <firstterm>seen</firstterm> ha de posar-se a
-<quote>false</quote> desprès de definir el valor a la plantilla.
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-</para>
-   </sect3>
   </sect2>
  </sect1>

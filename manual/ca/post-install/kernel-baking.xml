@@ -1,13 +1,15 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 31905 -->
 
  <sect1 id="kernel-baking"><title>Compilant un nou kernel</title>
 <para>
 
 Per què algú voldria compilar un nou nucli? Sovint no és necessari,
 ja que el nucli que distribueix Debian gestiona la majoria de les
-configuracions. Tot i això, compilar un nou nucli és útil
-per:
+configuracions. Debian també ofereix sovint uns quants nuclis alternatius.
+Per tant, pot ser que vulgueu comprovar primer si hi ha algun paquet d'imatge
+de nucli alternatiu que correspon millor al vostre maquinari. Tot i això,
+compilar un nou nucli pot ser útil per:
 
 <itemizedlist>
 <listitem><para>
@@ -18,8 +20,8 @@ nuclis proporcionats
 </para></listitem>
 <listitem><para>
 
-gestionar maquinari o opcions que no estan incloses en el nucli estàndard,
-alguns exemples poden ser l'APM o l'SMP
+utilitzar opcions del nucli que no estan suportades pels nuclis
+proporcionats (algunes com suport de gran memòria)
 
 </para></listitem>
 <listitem><para>
@@ -30,8 +32,7 @@ d'agilitzar el temps d'arrencada
 </para></listitem>
 <listitem><para>
 
-utilitzar opcions del nucli que no estan suportades pel nucli
-predeterminat
+crear un nucli monolític en comptes d'un de modular
 
 </para></listitem>
 <listitem><para>
@@ -41,7 +42,7 @@ executar un nucli actualitzat o de desenvolupament
 </para></listitem>
 <listitem><para>
 
-impresionar als vostres amics, provar noves coses
+aprendre més sobre nuclis de linux
 
 </para></listitem>
 </itemizedlist>
@@ -56,9 +57,10 @@ No tingueu por a l'hora de compilar el nucli. És divertit i profitós.
 </para><para>
 
 Per compilar un nucli a la manera de Debian, necessiteu alguns paquets:
-<classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname> (l'última versió
-en el moment d'escriure aquest document), <classname>fakeroot</classname>
+<classname>fakeroot</classname>, <classname>kernel-package</classname>,
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(l'última versió en el moment d'escriure aquest document)</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
 i alguns d'altres que probablement ja teniu instal·lats
 (per accedir a la llista completa vegeu
 <filename>/usr/share/doc/kernel-package/README.gz</filename>).
@@ -76,9 +78,10 @@ un registre del fitxer de configuració actiu del muntatge.
 Recordeu que no <emphasis>forçosament heu</emphasis> de compilar el kernel
 seguint el <quote>mètode Debian</quote>; però creiem que utilitzar el sistema
 d'empaquetat per gestionar el nucli és la manera més segura i fàcil. De fet,
-podeu descarregar el codi font del nucli directament del Linus en comptes
-de <classname>kernel-source-&kernelversion;</classname>, ja que utilitza
-el mètode de compilació <classname>kernel-package</classname>.
+podeu descarregar el codi font del nucli directament del Linus en comptes de
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+ja que utilitza el mètode de compilació <classname>kernel-package</classname>.
 
 </para><para>
 
@@ -104,8 +107,15 @@ de permisos especials.
 </footnote>. Assumirem que la vostra versió del nucli és &kernelversion;.
 Assegureu-vos d'estar al directori on voleu desempaquetar el codi
 font del nucli, extraieu-lo utilitzant l'ordre
-<userinput>tar xjf /usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>
-i entreu al directori que s'haurà creat <filename>kernel-source-&kernelversion;</filename>.
+<phrase condition="classic-kpkg"><userinput>tar xjf
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>
+i entreu al directori que s'haurà creat 
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
+.
+
 
 </para><para>
 
@@ -176,6 +186,9 @@ un paquet de mòduls, ex. si diposeu de PCMCIA, també haureu d'instal·lar-lo.
 produït pel pas anterior i executeu l'ordre <userinput>shutdown -r now</userinput>.
 </para><para>
 
+<phrase condition="etch">Per a veure més informació sobre els nuclis de Debian
+i compilacions de nuclis, vegeu el <ulink url="&url-kernel-handbook;">Llibre de
+butxaca de nuclis Linux de Debian</ulink>.</phrase>
 Per a veure més informació sobre <classname>kernel-package</classname> llegiu
 la documentació del directori <filename>/usr/share/doc/kernel-package</filename>.
 
