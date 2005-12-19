@@ -1,6 +1,17 @@
 #! /bin/bash
 
-strip=/home/fjp/projects/d-i/scripts/g-i/strip_glyphs.pe
+exepath=$(dirname $0)
+strip=$exepath/strip_glyphs.pe
+
+if [ $# -ne 2 ] ; then
+	echo "Usage: $(basename $0) fontfile_in fontfile_out"
+	exit 0
+fi
+
+if [ ! -x "$strip" ] ; then
+	echo "Script not found: $strip"
+	exit 1
+fi
 
 if [ ! -f "$1" ] ; then
 	echo "File does not exist: $1"
