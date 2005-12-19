@@ -154,7 +154,9 @@ while :; do
 				continue
 			fi
 			db_input high "rescue/${item#[0-9][0-9]}/intro" || true
-			db_go || true
+			if ! db_go; then
+				continue
+			fi
 			code=0
 			"/lib/rescue.d/$item" || code=$?
 			case $code in
