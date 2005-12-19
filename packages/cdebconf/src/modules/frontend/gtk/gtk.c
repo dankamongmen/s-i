@@ -120,6 +120,8 @@ struct setter_struct
 
 typedef int (custom_func_t)(struct frontend*, struct question*, GtkWidget*);
 
+static const char * get_text(struct frontend *obj, const char *template, const char *fallback );
+
 void register_setter(void (*func)(void*, struct question*),
              void *data, struct question *q, struct frontend *obj)
 {
@@ -288,7 +290,7 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
 	        if (screenshot_name[j] == '/')
 	            screenshot_name[j] = '_';
         }
-        sprintf(popup_message, "/var/log/screenshot_%s", screenshot_name );
+        sprintf(popup_message, "/var/log/%s", screenshot_name );
         sprintf(screenshot_name, "%s", popup_message );
         if ( ! access(screenshot_name, R_OK) )
             i++;
@@ -307,7 +309,7 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
                                           GTK_RESPONSE_ACCEPT,
                                           NULL);
 
-    sprintf(popup_message, "Screenshot saved as\n%s", screenshot_name );
+    sprintf(popup_message, "%s %s", get_text(obj, "debconf/gtk-screenshot-saved", "Screenshot saved as"), screenshot_name );
     label = gtk_label_new (popup_message);
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
     gtk_widget_show_all (dialog);
@@ -1333,7 +1335,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_box_set_spacing (GTK_BOX(actionbox), DEFAULT_PADDING);
 
     /* button to take screenshots of the frontend */
-    button_screenshot = gtk_button_new_with_label ("Screenshot");
+    button_screenshot = gtk_button_new_with_label (get_text(obj, "debconf/gtk-button-screenshot", "Screenshot"));
     g_signal_connect (G_OBJECT (button_screenshot), "clicked", G_CALLBACK (screenshot_button_callback), obj );
     gtk_box_pack_start (GTK_BOX(actionbox), button_screenshot, TRUE, TRUE, DEFAULT_PADDING);
 
