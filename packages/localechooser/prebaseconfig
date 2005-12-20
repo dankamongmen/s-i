@@ -12,6 +12,23 @@ modify_cyrconfig() {
 	fi
 }
 
+db_get debian-installer/locale
+LOCALE="$RET"
+
+# Set locale to C if it has not yet been set
+# This can happen during e.g. s390 installs where localechooser is not run
+[ -z "$LOCALE" ] && LOCALE="C"
+
+if [ "$LOCALE" != "C" ] ; then
+	db_get debian-installer/language
+	LANGLIST="$RET"
+fi
+
+EXTRAS=""
+if db_get localechooser/supported-locales ; then
+	EXTRAS="$(echo "$RET" | sed 's/,//g')"
+fi
+
 LANGUAGE=${LOCALE%%_*}
 
 # Install specific packages depending on selected language
@@ -122,23 +139,6 @@ case "$consoletype" in
 	fi
 	;;
 esac
-
-db_get debian-installer/locale
-LOCALE="$RET"
-
-# Set locale to C if it has not yet been set
-# This can happen during e.g. s390 installs where localechooser is not run
-[ -z "$LOCALE" ] && LOCALE="C"
-
-if [ "$LOCALE" != "C" ] ; then
-	db_get debian-installer/language
-	LANGLIST="$RET"
-fi
-
-EXTRAS=""
-if db_get localechooser/supported-locales ; then
-	EXTRAS="$(echo "$RET" | sed 's/,//g')"
-fi
 
 # Set global locale and language, and make sure the glibc locale is
 # generated.
