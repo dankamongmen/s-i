@@ -309,7 +309,7 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
                                           GTK_RESPONSE_ACCEPT,
                                           NULL);
 
-    sprintf(popup_message, "%s %s", get_text(obj, "debconf/gtk-screenshot-saved", "Screenshot saved as"), screenshot_name );
+    sprintf(popup_message, get_text(obj, "debconf/gtk-screenshot-saved", "Screenshot saved as %s"), screenshot_name );
     label = gtk_label_new (popup_message);
     gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
     gtk_widget_show_all (dialog);
