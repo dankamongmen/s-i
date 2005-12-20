@@ -2,6 +2,10 @@
 set -e
 . /usr/share/debconf/confmodule
 
+# Avoid perl warnings in any of the chroot calls below.
+LANG=C
+export LANG
+
 cleanup () {
 	# If X was not installed, remove the hardware detection programs.
 	if ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
