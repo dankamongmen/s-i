@@ -9,7 +9,7 @@ LOCALE="$RET"
 
 # Set locale to C if it has not yet been set
 # This can happen during e.g. s390 installs where localechooser is not run
-[ -z "$LOCALE" ] && LOCALE="C"
+[ "$LOCALE" ] || LOCALE="C"
 
 if [ "$LOCALE" != "C" ] ; then
 	db_get debian-installer/language
@@ -21,7 +21,7 @@ if db_get localechooser/supported-locales ; then
 	EXTRAS="$(echo "$RET" | sed 's/,//g')"
 fi
 
-LANGUAGE=${LOCALE%%_*}
+LANGUAGE="${LOCALE%%_*}"
 
 # Enable translations. We use belocs-locales-data for languages which
 # don't have a locale in the locales package.
@@ -42,7 +42,7 @@ fi
 # generated.
 DESTFILE="/target/etc/environment"
 echo "LANG=\"$LOCALE\"" > $DESTFILE
-if [ -n "$LANGLIST" ] ; then
+if [ "$LANGLIST" ]; then
 	echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
 fi
 # If the locale isn't already valid, append it to locale.gen
