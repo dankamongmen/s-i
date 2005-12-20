@@ -37,21 +37,21 @@ if [ "$LOCALE" != "C" ] ; then
 
 	# FIXME: why this?
 	if [ "$LANGUAGE" != "en" ] ; then
-		apt-install iso-codes
+		apt-install iso-codes || true
 	fi
 
 	# Other language specific packages
 	case "$LANGUAGE" in
 	    ja|ko|ko_KR|el|zh|zh_CN|zh_TW|bg|vi|wo)
 		# Languages needing jfbterm in 2nd stage
-		apt-install jfbterm
-		apt-install unifont
+		apt-install jfbterm || true
+		apt-install unifont || true
 		;;
 	    ar|he|fa)
 		# RTL languages (Arabic, Hebrew, Farsi)
-		apt-install jfbterm
-		apt-install unifont
-		apt-install libfribidi0
+		apt-install jfbterm || true
+		apt-install unifont || true
+		apt-install libfribidi0 || true
 		;;
 	esac
 fi
@@ -90,7 +90,7 @@ case "$consoletype" in
 			echo "SCREEN_FONT_vc6=$consolefont" >>$ctconfig
 		fi
 		if echo "$consolefont" | grep -q "^ter-"; then
-			apt-install console-terminus
+			apt-install console-terminus || true
 		fi
 	fi
 	;;
