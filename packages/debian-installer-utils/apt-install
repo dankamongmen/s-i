@@ -12,6 +12,7 @@ if [ ! -f /target/etc/apt/sources.list ] ; then
 	touch $queue
 	for pkg in $@ ; do
 		if ! grep -q "^$pkg$" $queue; then
+			logger -t apt-install "Queueing package $pkg for later installation"
 			echo "$pkg" >> $queue
 		fi
 	done
