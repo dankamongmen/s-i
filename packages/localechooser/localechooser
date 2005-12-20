@@ -262,59 +262,6 @@ db_set "debconf/language" "$LANGUAGELIST"
 log "Set debconf/language = '$LANGUAGELIST'"
 
 
-# Install specific packages depending on selected language
-
-# Enable translations (if this is present, base-config generates the
-# required locale on boot)
-# We use belocs-locales-data for languages which don't have a locale
-# in the locales package
-if [ "$LOCALE" != "C" ] ; then
-	case "$LANGUAGE" in
-	    ku|sa)
-		pkginstall belocs-locales-data
-		pkginstall belocs-locales-bin
-		;;
-	    *)
-		pkginstall locales
-		;;
-	esac
-
-	# Unicode font for languages requiring it
-	case "$LANGUAGE" in
-	    ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh)
-		anna-install bterm-unifont
-		;;
-	esac
-
-	if [ "$LANGUAGE" != "en" ] ; then
-		pkginstall iso-codes
-	fi
-
-	# Other language specific packages
-	case "$LANGUAGE" in
-	    ja|ko|ko_KR|el|zh|zh_CN|zh_TW|bg|vi|wo)
-		# Japanese, Korean, Greek, Chinese, Bulgarian
-		pkginstall jfbterm
-		pkginstall unifont
-		;;
-#	    ru)
-#		# Russian
-#		pkginstall console-cyrillic
-#		pkginstall console-terminus
-#		;;
-	    tr|ku|ro)
-		# Turkish, Kurdish, Romanian
-		pkginstall console-terminus
-		;;
-	    ar|he|fa)
-		# RTL languages (Arabic, Hebrew, Farsi)
-		pkginstall jfbterm
-		pkginstall unifont
-		pkginstall libfribidi0
-		;;
-	esac
-fi
-
 
 # BEGIN COUNTRY SELECTION
 
