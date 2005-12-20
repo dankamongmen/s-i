@@ -70,8 +70,7 @@ EOT
 	DEBIAN_PRIORITY=$(debconf-get debconf/priority || true)
 	export DEBIAN_PRIORITY
 
-	# Set LANG. Not doing so causes endless perl warnings.
-	LANG=C
+	LANG=$(debconf-get debian-installer/locale || true)
 	export LANG
 
 	# Unset variables that would make scripts in the target think
