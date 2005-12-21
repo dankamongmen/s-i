@@ -4,6 +4,8 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+ARCH=`udpkg --print-architecture`
+
 modify_cyrconfig() {
 	if [ "$2" ]; then
 		sed -e "s/^$1 .*\$/$1 $2/" \
@@ -56,6 +58,11 @@ if [ "$LOCALE" != "C" ] ; then
 	esac
 fi
 
+# Install localization-config except when no localization happens
+# Install it anyway for powerpc (to handle subarches)
+if [ "$LOCALE" != "C" ] || [ "$ARCH" = "powerpc" ]; then
+        apt-install localization-config || true
+fi
 
 
 db_get debian-installer/consoledisplay || true

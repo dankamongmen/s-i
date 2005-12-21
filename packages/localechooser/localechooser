@@ -17,7 +17,6 @@ consoledisplay="debian-installer/consoledisplay"
 shortlist="countrychooser/shortlist"
 fulllist="countrychooser/country-name"
 supportedlocales="localechooser/supported-locales"
-ARCH=`udpkg --print-architecture`
 
 # This is the iso_3166.tab file location
 ISO3166TAB=/usr/share/iso-codes/iso_3166.tab
@@ -431,12 +430,6 @@ if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n
 	# Languagelist setting
 	db_set "$languagecode" "$LANGUAGELIST"
 	log "Set $languagecode = '$LANGUAGELIST'"
-fi
-
-# Install localization-config except when no localization happens
-# Install it anyway for powerpc arches (to handle subarches)
-if [ "$LOCALE" != "C" ] || [ "$ARCH" = "powerpc" ]; then
-	pkginstall localization-config
 fi
 
 
