@@ -112,7 +112,7 @@ set timefmt "%m/%d/%Y %H:%M"
 set xdata time
 set format x "%m/%y"
 set yrange [0 to 102]
-set ylabel 'percent'
+set ylabel 'percent successful'
 set terminal png giant
 set output '$basename.png'
 };
