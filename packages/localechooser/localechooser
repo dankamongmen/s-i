@@ -177,10 +177,17 @@ else
 fi
 
 # Support preseeding of the locale all in one variable for convenience.
-db_get $localecode
-if [ "$RET" ] ; then
-	do_preseed $RET
+# Only check for preseeding if this is the first time localechooser is run.
+db_get localechooser/alreadyrun
+if [ "$RET" = true ] ; then
+	if db_get $localecode && [ "$RET" ] ; then
+		do_preseed $RET
+	fi
 fi
+
+# Prevent preseeding from being checked a second time
+db_set localechooser/alreadyrun "true" || true
+
 
 # Find the display level
 #
