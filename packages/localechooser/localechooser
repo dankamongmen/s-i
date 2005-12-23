@@ -116,30 +116,8 @@ locale2langcode() {
 	fi
 }
 
-# Reset all variables
-LANGNAME=""
-COUNTRY=""
-COUTRYNAME=""
-LOCALE=""
-LANGUAGE=""
-
-# BEGIN LANGUAGE SELECTION
-
-# debconf/language is an alias for debian-installer/language
-db_register "$languagecode" "debconf/language"
-
-# Only display the translated texts (ie the English "translation")
-# when in UTF-8 mode.
-if echo $LANG $LC_CTYPE | grep -q UTF-8; then
-	db_set debconf/language en
-else
-	db_set debconf/language C
-fi
-
-# Support preseeding of the locale all in one variable for convenience.
-db_get $localecode
-if [ "$RET" ] ; then
-	LOCALE="$RET"
+do_preseed() {
+	LOCALE="$1"
 	log "Locale has been preseeded to $LOCALE"
 
 	# Only mark variables seen if this one was preseeded seen.
@@ -176,6 +154,32 @@ if [ "$RET" ] ; then
 			LOCALE=""
 		fi
 	fi
+}
+
+# Reset all variables
+LANGNAME=""
+COUNTRY=""
+COUTRYNAME=""
+LOCALE=""
+LANGUAGE=""
+
+# BEGIN LANGUAGE SELECTION
+
+# debconf/language is an alias for debian-installer/language
+db_register "$languagecode" "debconf/language"
+
+# Only display the translated texts (ie the English "translation")
+# when in UTF-8 mode.
+if echo $LANG $LC_CTYPE | grep -q UTF-8; then
+	db_set debconf/language en
+else
+	db_set debconf/language C
+fi
+
+# Support preseeding of the locale all in one variable for convenience.
+db_get $localecode
+if [ "$RET" ] ; then
+	do_preseed $RET
 fi
 
 # Find the display level
