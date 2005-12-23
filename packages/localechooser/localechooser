@@ -75,6 +75,9 @@ country2code() {
 	fi
 }
 
+# Note: this function does not properly support languages like pt_BR and zh_*;
+#	to support this, the languagelist would have to be modified
+# Note: this function is broken if C.UTF8 would be preseeded
 locale2langname() {
 	if [ ! -f $2 ] ; then
 		echo "$2 does not exist"
@@ -83,7 +86,7 @@ locale2langname() {
 	langpart="${1%%_*}"
 	if [ "$1" != "C" ]; then
 		# Match the language code with 5th field in languagelist
-		line=$(grep -v "^#" $LANGUAGELISTFILE | cut -f1,5 -d\; | grep ";$langpart")
+		line=$(grep -v "^#" $LANGUAGELISTFILE | cut -f1,5 -d\; | grep ";$langpart" | head -n1)
 		if [ -n "$line" ] ; then
 			echo "${line%%;*}"
 		fi
