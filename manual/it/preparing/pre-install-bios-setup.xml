@@ -1,11 +1,13 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 28997 -->
 
 
  <sect1 id="pre-install-bios-setup">
- <title>Pre-Installation Hardware and Operating System Setup</title>
+ <!-- <title>Pre-Installation Hardware and Operating System Setup</title> -->
+ <title>Configurazione di hardware e sistema operativo prima dell'installazione</title>
 <para>
 
+<!--
 This section will walk you through pre-installation hardware setup, if
 any, that you will need to do prior to installing Debian.  Generally,
 this involves checking and possibly changing firmware settings for
@@ -13,6 +15,16 @@ your system.  The <quote>firmware</quote> is the core software used by the
 hardware; it is most critically invoked during the bootstrap process
 (after power-up). Known hardware issues affecting the reliability of
 &debian; on your system are also highlighted.
+-->
+
+Questa sezione guida il lettore attraverso la riconfigurazione dell'hardware
+che in alcuni casi potrebbe essere necessaria prima di installare Debian.
+Generalmente si tratta di controllare e, nel caso, di modificare le
+impostazioni del firmware del proprio sistema. Il <quote>firmware</quote>
+è il software essenziale usato dall'hardware. Ne viene fatto un utilizzo
+critico durante il processo di bootstrap (che segue l'accensione). Verranno
+anche evidenziati problemi noti con hardware particolare che potrebbero
+incidere sull'affidabilità di &debian;.
 
 </para>
 
@@ -22,9 +34,12 @@ hardware; it is most critically invoked during the bootstrap process
 &bios-setup-sparc.xml;
 &bios-setup-s390.xml;
 
-  <sect2><title>Hardware Issues to Watch Out For</title>
+  <sect2>
+  <!-- <title>Hardware Issues to Watch Out For</title> -->
+  <title>Questioni hardware a cui prestare attenzione</title>
 <para arch="not-s390">
 
+<!--
 Many people have tried operating their 90 MHz CPU at 100 MHz, etc.  It
 sometimes works, but is sensitive to temperature and other factors and
 can actually damage your system. One of the authors of this document
@@ -32,9 +47,19 @@ over-clocked his own system for a year, and then the system started
 aborting the <command>gcc</command> program with an unexpected signal
 while it was compiling the operating system kernel. Turning the CPU
 speed back down to its rated value solved the problem.
+-->
+
+Molta gente prova a far funzionare a 100&nbsp;MHz delle CPU a 90&nbsp;MHz
+e cose del genere. Qualche volta funziona ma, a causa del surriscaldamento
+e di altri fattori, il sistema rischia in realtà di subire danni seri. Uno
+degli autori di questo documento tenne la sua macchina in overclock per un
+anno, poi il sistema iniziò ad abortire l'esecuzione di
+<command>gcc</command> con un segnale inaspettato durante la compilazione
+del kernel. Ritornare alla velocità originale della CPU risolse il problema.
 
 </para><para arch="not-s390">
 
+<!--
 The <command>gcc</command> compiler is often the first thing to die
 from bad memory modules (or other hardware problems that change data
 unpredictably) because it builds huge data structures that it
@@ -42,12 +67,28 @@ traverses repeatedly.  An error in these data structures will cause it
 to execute an illegal instruction or access a non-existent
 address. The symptom of this will be <command>gcc</command> dying from
 an unexpected signal.
+-->
+
+Il compilatore <command>gcc</command> è spesso il primo componente che
+risente di moduli di memoria difettosi (o di altri problemi hardware
+che provocano mutazioni non predicibili dei dati), dato che costruisce
+strutture dati enormi, che attraversa ripetutamente. Un errore in tali
+strutture dati provoca l'esecuzione di istruzioni illegali o il tentativo
+di accedere a indirizzi inesistenti. Un indizio è l'arresto di
+<command>gcc</command> per un segnale inaspettato.
 
 </para><para arch="m68k">
 
+<!--
 Atari TT RAM boards are notorious for RAM problems under Linux; if you
 encounter any strange problems, try running at least the kernel in
 ST-RAM.  Amiga users may need to exclude RAM using a booter memfile.
+-->
+
+Le schede RAM TT Atari danno notoriamente problemi sotto Linux. Se ci si
+imbatte in problemi inspiegabili, provare a far girare almeno il kernel
+nella RAM ST. Gli utenti Amiga potrebbero dover escludere la RAM e usare
+un file di memoria per il boot.
 
 <phrase condition="FIXME"><emphasis>
 
@@ -57,6 +98,7 @@ FIXME: more description of this needed.
 
 </para><para arch="i386">
 
+<!--
 The very best motherboards support parity RAM and will actually tell
 you if your system has a single-bit error in RAM. Unfortunately, they
 don't have a way to fix the error, thus they generally crash
@@ -65,18 +107,37 @@ to be told you have bad memory than to have it silently insert errors
 in your data. Thus, the best systems have motherboards that support
 parity and true-parity memory modules; see
 <xref linkend="Parity-RAM"/>.
+-->
+
+Le schede madri migliori supportano la RAM con parità e sono in grado di
+accorgersi di un errore in un singolo bit nella RAM. Sfortunatamente non
+hanno modo di correggerlo, perciò di solito vanno in crash immediatamente
+dopo aver comunicato l'errore nella RAM. Comunque è sempre meglio venir
+avvisati di difetti della memoria piuttosto che subire, ignari, inserimenti
+di errori nei propri dati. Perciò i sistemi migliori hanno schede madri che
+supportano la parità e i moduli di memoria a parità reale, si veda
+<xref linkend="Parity-RAM"/>.
 
 </para><para arch="i386">
 
+<!--
 If you do have true-parity RAM and your motherboard can handle it, be
 sure to enable any BIOS settings that cause the motherboard to
 interrupt on memory parity errors.
+-->
+
+Se si dispone di RAM a parità reale e la scheda madre è in grado di gestirla,
+assicurarsi di abilitare eventuali opzioni del BIOS che facciano interrompere
+il lavoro della scheda madre quando rileva un errore di parità.
 
 </para>
 
-   <sect3 arch="i386"><title>The Turbo Switch</title>
+   <sect3 arch="i386">
+   <!-- <title>The Turbo Switch</title> -->
+   <title>L'interruttore turbo</title>
 <para>
 
+<!--
 Many systems have a <emphasis>turbo</emphasis> switch that controls
 the speed of the CPU.  Select the high-speed setting. If your BIOS
 allows you to disable software control of the turbo switch (or
@@ -84,51 +145,96 @@ software control of CPU speed), do so and lock the system in
 high-speed mode. We have one report that on a particular system, while
 Linux is auto-probing (looking for hardware devices) it can
 accidentally touch the software control for the turbo switch.
+-->
+
+Molti sistemi hanno un pulsante <emphasis>turbo</emphasis> che controlla
+la velocità della CPU. Usare la velocità più alta. Se il proprio BIOS lo
+permette, disabilitare il controllo via software del turbo (o della velocità
+della CPU) e bloccare il sistema in modalità ad alta velocità. È stato
+riferito che, in un caso particolare, Linux durante l'autorilevamento può
+accidentalmente toccare il controllo software del turbo.
 
 </para>
    </sect3>
 
-   <sect3 arch="i386"><title>Cyrix CPUs and Floppy Disk Errors</title>
+   <sect3 arch="i386">
+   <!-- <title>Cyrix CPUs and Floppy Disk Errors</title> -->
+   <title>Errori dei dischetti con le CPU Cyrix</title>
 <para>
 
+<!--
 Many users of Cyrix CPUs have had to disable the cache in their
 systems during installation, because the floppy disk has errors if
 they do not.  If you have to do this, be sure to re-enable your cache
 when you are finished with installation, as the system runs
 <emphasis>much</emphasis> slower with the cache disabled.
+-->
+
+Molti utenti con CPU Cyrix hanno dovuto disabilitare la cache durante
+l'installazione, poiché altrimenti ottenevano errori coi dischetti. Se è
+necessario farlo anche sul proprio sistema, assicurarsi di abilitarla di
+nuovo una volta completata l'installazione, dato che senza di essa il
+sistema è <emphasis>molto</emphasis> più lento.
 
 </para><para>
 
+<!--
 We don't think this is necessarily the fault of the Cyrix CPU. It may
 be something that Linux can work around. We'll continue to look into
 the problem.  For the technically curious, we suspect a problem with
 the cache being invalid after a switch from 16-bit to 32-bit code.
+-->
+
+Pensiamo che non sia necessariamente un difetto della CPU Cyrix. Potrebbe
+essere qualcosa di risolvibile da Linux. Continueremo a studiare il problema.
+Per chi è curioso di conoscere i dettagli tecnici, sospettiamo che dipenda
+dall'invalidazione della cache a seguito di un passaggio da codice a
+16&nbsp;bit a codice a 32&nbsp;bit.
 
 </para>
    </sect3>
 
-   <sect3 arch="i386"><title>Peripheral Hardware Settings</title>
+   <sect3 arch="i386">
+   <!-- <title>Peripheral Hardware Settings</title> -->
+   <title>Impostazioni delle periferiche</title>
 <para>
 
+<!--
 You may have to change some settings or jumpers on your computer's
 peripheral cards.  Some cards have setup menus, while others rely on
 jumpers.  This document cannot hope to provide complete information on
 every hardware device; what it hopes to provide is useful tips.
+-->
+
+Potrebbe essere necessario modificare alcune impostazioni delle periferiche,
+in alcuni casi via software, tramite menu di configurazione, in altri tramite
+ponticelli (<quote>jumper</quote>). Non possiamo certo fornire qui informazioni
+complete su tutti i dispositivi hardware esistenti, però possiamo fornire
+qualche suggerimento utile.
 
 </para><para>
 
+<!--
 If any cards provide <quote>mapped memory</quote>, the memory should be mapped
 somewhere between 0xA0000 and 0xFFFFF (from 640K to just below 1
 megabyte) or at an address at least 1 megabyte greater than the total
 amount of RAM in your system.
+-->
+
+Se si hanno delle schede <quote>mappate in memoria</quote>, la memoria
+dovrebbe essere mappata da qualche parte tra 0xA0000 e 0xFFFFF (da 640K a
+poco sotto 1&nbsp;megabyte) o a un indirizzo almeno 1&nbsp;megabyte più
+grande della memoria RAM totale presente sul sistema.
 
 </para>
    </sect3>
 
    <sect3 arch="i386" id="usb-keyboard-config">
-   <title>USB keyboards</title>
+   <!-- <title>USB keyboards</title> -->
+   <title>Tastiere USB</title>
 <para>
 
+<!--
 If you have no AT-style keyboard and only a USB model, you may need
 to enable legacy AT keyboard emulation in your BIOS setup. Only do this if
 the installation system fails to use your keyboard in USB mode. Conversely,
@@ -136,15 +242,33 @@ for some systems (especially laptops) you may need to disable legacy USB
 support if your keyboard does not respond.
 Consult your main board manual and look in the BIOS for <quote>Legacy
 keyboard emulation</quote> or <quote>USB keyboard support</quote> options.
+-->
+
+Se non si dispone di una tastiera AT e si ha solo una tastiera USB potrebbe
+essere necessario attivare nella configurazione del BIOS l'emulazione di
+tastiera AT. Questa configurazione deve essere fatta solo se il sistema
+d'installazione non riesce a usare la tatiera in modalità USB. Al contrario
+(in particolare sui portatili) potrebbe essere necessario disattivare il
+supporto per USB se la tastiera non risponde. Si consulti il manuale della
+scheda madre cercando le voci <quote>Legacy keyboard emulation</quote> o
+<quote>USB keyboard support</quote>.
 
 </para>
    </sect3>
 
-   <sect3><title>More than 64 MB RAM</title>
+   <sect3>
+   <!-- <title>More than 64 MB RAM</title> -->
+   <title>Più di 64&nbsp;MB di RAM</title>
 <para>
 
+<!--
 The Linux Kernel cannot always detect what amount of RAM you have.  If
 this is the case please look at <xref linkend="boot-parms"/>.
+-->
+
+Il kernel Linux non sempre è in grado di scovare quanta memoria RAM
+è presente sul sistema. In caso non ci riesca, si consulti
+<xref linkend="boot-parms"/>.
 
 </para>
    </sect3>
