@@ -39,7 +39,7 @@ ln -sf /bin/true /target//usr/bin/scrollkeeper-rebuilddb
 # get debconf-apt-progress config, which will make it run properly later
 config=$(chroot /target debconf-apt-progress --config| sed "s/$/;/")
 
-db_progress step 1
+db_progress STEP 1
 
 # See if any known X servers are available.
 if chroot /target apt-cache show xserver-xfree86 xserver-xorg >/dev/null 2>&1; then
@@ -64,17 +64,17 @@ if ! in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--fr
 	# TODO useful error message here
 	db_progress INFO pkgsel/progress/cleanup
 	cleanup
-	db_progress stop
+	db_progress STOP
 	exit 1
 fi
 
 db_progress INFO pkgsel/progress/cleanup
 cleanup
-db_progress step 2
+db_progress STEP 2
 
 if [ -x /target/usr/bin/scrollkeeper-update ]; then
 	log-output -t pkgsel chroot /target scrollkeeper-update -q || true
 fi
 
-db_progress step 3
-db_progress stop
+db_progress STEP 3
+db_progress STOP
