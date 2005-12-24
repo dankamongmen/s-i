@@ -4,10 +4,8 @@ if [ -n "$TERM_FRAMEBUFFER_TRY" -a "`debconf-get debian-installer/framebuffer`" 
 	2.6.*)
 		if (modprobe -q vesafb >/dev/null 2>&1 && grep -q . /proc/fb && modprobe -q fbcon >/dev/null 2>&1) || (modprobe -q vga16fb >/dev/null 2>&1 && grep -q . /proc/fb && modprobe -q fbcon >/dev/null 2>&1); then
 			# sledgehammer workaround for race condition
-			if type udevstart >/dev/null 2>&1; then
-				udevstart
-			elif type udevsynthesize >/dev/null 2>&1; then
-				udevsynthesize
+			if type update-dev >/dev/null 2>&1; then
+				update-dev
 			fi
 		fi
 		;;
