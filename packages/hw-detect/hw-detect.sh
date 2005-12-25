@@ -765,13 +765,15 @@ if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>
 fi
 
 # Ask for discover to be installed into /target/, to make sure the
-# required drivers are loaded.
+# required drivers are loaded. We need to do this even if d-i isn't using
+# discover, since X's maintainer scripts use discover to find out what
+# video hardware is in use.
 case "$DISCOVER_VERSION" in
 	2)
 		log "Detected discover version 2, installing discover."
 		apt-install discover || true
 		;;
-	1)
+	1|'')
 		# This will break woody install, as discover1 is
 		# missing in woody.  We should try to find out which
 		# packages are available when selecting it for
