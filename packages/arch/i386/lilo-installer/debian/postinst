@@ -48,6 +48,7 @@ rootfs=$(mapdevfs $rootfs_devfs)
 bootvg=$(lvm_vg $bootfs_devfs)
 if [ -n "$bootvg" ]; then
 	bootfs_devfs=$(first_pv $bootvg)
+	bootfs_devfs="$(readlink -f "$bootfs_devfs" 2>/dev/null || echo "$bootfs_devfs")"
 fi
 
 bootfs=$(mapdevfs $bootfs_devfs)
