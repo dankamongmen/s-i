@@ -2,6 +2,7 @@
 #include "common.h"
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #ifdef SYSLOG_LOGGING
 #include <syslog.h>
 #endif
@@ -14,8 +15,18 @@ void debug_printf(int level, char *fmt, ...)
 
 	if (loglevel < 0)
 	{
-		loglevel = (getenv("DEBCONF_DEBUG") 
-			? atoi(getenv("DEBCONF_DEBUG")) : 0);
+		const char *loglevel_env = getenv("DEBCONF_DEBUG");
+		if (loglevel_env) {
+			/* Allow DEBCONF_DEBUG=. to match everything, to
+			 * make it easier to debug cdebconf and debconf
+			 * simultaneously.
+			 */
+			if (strcmp(loglevel_env, ".") == 0)
+				loglevel = 20;
+			else
+				loglevel = atoi(loglevel_env);
+		} else
+			loglevel = 0;
 
 		if (getenv("DEBCONF_DEBUGFILE") == NULL ||
 		    (fp = fopen(getenv("DEBCONF_DEBUGFILE"), "a")) == NULL)
