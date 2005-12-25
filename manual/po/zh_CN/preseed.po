@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "POT-Creation-Date: 2005-12-03 10:27+0000\n"
-"PO-Revision-Date: 2005-12-24 14:25+0800\n"
+"PO-Revision-Date: 2005-12-25 11:50+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -134,7 +134,7 @@ msgstr "基于软盘 (net-drivers)"
 #, no-c-format
 #. Tag: entry
 msgid "generic/tape"
-msgstr ""
+msgstr "generic/tape"
 
 #: preseed.xml:110
 #, no-c-format
@@ -152,7 +152,7 @@ msgstr "操作时，这意味着 file 和 network 方法仍要询问语言、国
 #, no-c-format
 #. Tag: para
 msgid "Obviously, any questions that have been processed before the preseeding configuration file is loaded, cannot be preseeded. <xref linkend=\"preseed-bootparms\"/> offers a way to avoid these questions being asked."
-msgstr "显而易见，在加载预置文件之前所需要的过程都不能预置。<xref linkend=\"preseed-bootparms\"/> 提供了避免这些问题被询问的方法。\n"
+msgstr "显而易见，在加载预置文件之前所需要的过程都不能预置。<xref linkend=\"preseed-bootparms\"/> 提供了避免这些问题被询问的方法。"
 
 #: preseed.xml:139
 #, no-c-format
@@ -228,49 +228,49 @@ msgstr ""
 #, no-c-format
 #. Tag: title
 msgid "Using preseeding"
-msgstr ""
+msgstr "使用预置"
 
 #: preseed.xml:261
 #, no-c-format
 #. Tag: para
 msgid "Of course you will first need to create a preseed file and place it in the location from where you want to use it. Creating the preseed file is covered later in this appendix. Putting it in the correct location is fairly straightforward for network preseeding or if you want to read the file off a floppy or usb-stick. If you want to include the file on a CD or DVD, you will have to remaster the ISO image. How to get the preseed file included in the initrd is outside the scope of this document; please consult the developers documentation for &d-i;."
-msgstr ""
+msgstr "毫无疑问，您首先要创建一个预置文件，并将它至于您希望使用的地方。创建预置文件在后面的附录中有说明。如果您打算使用网络预置或者从软盘或 U 盘读取，直接将它放到那里就可以了。如果您希望将它放到 CD 活 DVD 上面，那就需要重新制作一个 ISO 映像文件。而如何将预置文件包含到 initrd 里面，这部分内容超出了本文档的范围；请查询 debian-installer 的开发者文档。"
 
 #: preseed.xml:272
 #, no-c-format
 #. Tag: para
 msgid "An example preseed file that you can use as basis for your preseed file is available from &urlset-example-preseed;. This file is based on the configuration fragments included in this appendix."
-msgstr ""
+msgstr "有一个预置文件的例子放在 &urlset-example-preseed;，您可以拿它作为自己预置文件的基础。此文件基于本附录所列的配置文件片段。"
 
 #: preseed.xml:281
 #, no-c-format
 #. Tag: title
 msgid "Loading the preseed file"
-msgstr ""
+msgstr "加载预置文件"
 
 #: preseed.xml:282
 #, no-c-format
 #. Tag: para
 msgid "If you are using initrd preseeding, you only have to make sure a file named <filename>preseed.cfg</filename> is included in the root directory of the initrd. The installer will automatically check if this file is present and load it."
-msgstr ""
+msgstr "如果使用 initrd 预置，您只需确保一个名为 <filename>preseed.cfg</filename> 的文件包含在 initrd 的根目录里面。安装程序会自动检测并加载。"
 
 #: preseed.xml:289
 #, no-c-format
 #. Tag: para
 msgid "For the other preseeding methods you need to tell the installer what file to use when you boot it. This is done by passing the kernel a boot parameter, either manually at boot time or by editing the bootloader configuration file (e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end of the append line(s) for the kernel."
-msgstr ""
+msgstr "其他的预置方法，您需要在启动的时候告诉安装程序所使用的文件。这通过给内核传递引导参数完成，可以在启动时手动指定或者编辑启动加载器的配置文件(例如，<filename>syslinux.cfg</filename>)，并在内核附加行末添加参数。"
 
 #: preseed.xml:297
 #, no-c-format
 #. Tag: para
 msgid "If you do specify the preseed file in the bootloader configuration, you might change the configuration so you don't need to hit enter to boot the installer. For syslinux this means setting the timeout to 1 in <filename>syslinux.cfg</filename>."
-msgstr ""
+msgstr "如果在引导加载器里指定预置文件，可以修改配置让您不再需要键入回车启动安装程序。对于 syslinux，这意味着在 <filename>syslinux.cfg</filename> 里面设置 timeout 为 1。"
 
 #: preseed.xml:304
 #, no-c-format
 #. Tag: para
 msgid "To make sure the installer gets the right preseed file, you can optionally specify a checksum for the file. Currently this needs to be a md5sum, and if specified it must match the preseed file or the installer will refuse to use it."
-msgstr ""
+msgstr "为了保证安装程序得到正确的预置文件，您可以选择性地为预置文件指定校验和。当前使用 md5sum，如果指定了，配置文件必须匹配，否则安装程序将拒绝使用它。"
 
 #: preseed.xml:312
 #, no-c-format
@@ -290,48 +290,61 @@ msgid ""
       "  preseed/file=/hd-media/preseed.cfg\n"
       "  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d"
 msgstr ""
+"Boot parameters to specify:\n"
+"- if you're netbooting:\n"
+"  preseed/url=http://host/path/to/preseed.cfg\n"
+"  preseed/url/checksum=5da499872becccfeda2c4872f9171c3d\n"
+"\n"
+"- if you're booting a remastered CD:\n"
+"  preseed/file=/cdrom/preseed.cfg\n"
+"  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d\n"
+"\n"
+"- if you're installing from USB media (put the preseed file in the\n"
+"  toplevel directory of the USB stick):\n"
+"  preseed/file=/hd-media/preseed.cfg\n"
+"  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d"
 
 #: preseed.xml:314
 #, no-c-format
 #. Tag: para
 msgid "While you're at it, you may want to add a boot parameter <userinput>debconf/priority=critical</userinput>. This will avoid most questions even if the preseeding below misses some."
-msgstr ""
+msgstr "编辑的时候，您也许需要添加一个引导参数 <userinput>debconf/priority=critical</usr/input>。它会避免过多的问题，即使下面的预置漏了一些。"
 
 #: preseed.xml:324
 #, no-c-format
 #. Tag: title
 msgid "Using boot parameters to supplement preseeding"
-msgstr ""
+msgstr "使用引导参数支持预置"
 
 #: preseed.xml:325
 #, no-c-format
 #. Tag: para
 msgid "Some parts of the installation process cannot be automated using some forms of preseeding because the questions are asked before the preseed file is loaded. For example, if the preseed file is downloaded over the network, the network setup must be done first. One reason to use initrd preseeding is that it allows preseeding of even these early steps of the installation process."
-msgstr ""
+msgstr "有些形式的预置，安装过程的一些部分无法自动进行，因为这些问题是在预置文件加载之前询问的。例如，如果预置文件从网络下载，首先需要设置网络。采用 initrd 预置的一个原因正是它可以设置安装过程的这些前期步骤。"
 
 #: preseed.xml:334
 #, no-c-format
 #. Tag: para
 msgid "If a preseed file cannot be used to preseed some steps, the install can still be fully automated, since you can pass preseed values to the kernel on the command line. Just pass <userinput>path/to/var=value</userinput> for any of the preseed variables listed in the examples."
-msgstr ""
+msgstr "如果预置文件无法设置一些步骤，安装也可以完全自动进行，这是因为您可以在命令行上为内核传递预置的值。只需按 <userinput>path/to/var=value</userinput> 形式传递例子中的这些预置值。"
 
 #: preseed.xml:342
 #, no-c-format
 #. Tag: para
 msgid "The 2.4 kernel accepts a maximum of 8 command line options and 8 environment options (including any options added by default for the installer). If these numbers are exceeded, 2.4 kernels will drop any excess options and 2.6 kernels will panic. For kernel 2.6.9 and later, you can use 32 command line options and 32 environment options."
-msgstr ""
+msgstr "对于 2.4 内核，它最多可以接受 8 个命令行选项和 8 个环境变量选项(包括安装程序使用的默认选项)。如果超出，2.4 内核将丢弃多余部分，但 2.6 内核会崩溃。2.6.9 以后的内核，您可以指定 32 个命令行选项和 32 个环境变量选项。"
 
 #: preseed.xml:351
 #, no-c-format
 #. Tag: para
 msgid "For most installations some of the default options in your bootloader configuration file, like 'vga=normal', may be safely removed which may allow you to add more options for preseeding."
-msgstr ""
+msgstr "大多数安装过程，在引导配置文件中一些默认的选项，比如 'vga=normal'，可以放心地删除，这让您可以添加更多的预置选项。"
 
 #: preseed.xml:358
 #, no-c-format
 #. Tag: para
 msgid "It may not always be possible to specify values with spaces for boot parameters, even if you delimit them with quotes."
-msgstr ""
+msgstr "引导参数中即使使用引号，也可能无法夹杂空格。"
 
 #: preseed.xml:368
 #, no-c-format
