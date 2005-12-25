@@ -274,11 +274,11 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
 {
     GdkWindow *gdk_window;
     GdkPixbuf *gdk_pixbuf;
-    GtkWidget *dialog, *label;
+    GtkWidget *window, *frame, *message_label, *title_label, *h_box, *v_box, *v_box_outer, *close_button, *actionbox, *separator;
     gint x, y, width, height, depth;
     int i, j;
-    char screenshot_name[256];
-	char popup_message[256];
+    char screenshot_name[256], popup_message[256];
+    char *label_title_string;
 	
     gdk_window = gtk_widget_get_parent_window ( button );
     gdk_window_get_geometry( gdk_window, &x, &y, &width, &height, &depth);
@@ -295,27 +295,54 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
         if ( ! access(screenshot_name, R_OK) )
             i++;
         else {
-            //printf ("nome: %s.png\nx: %d\ny: %d\nwidth: %d\nheight: %d\ndepth=%d\n", screenshot_name, x, y, width, height, depth);
+            /* printf ("name: %s.png\nx: %d\ny: %d\nwidth: %d\nheight: %d\ndepth=%d\n", screenshot_name, x, y, width, height, depth); */
             break;
         }
     }
     gdk_pixbuf_save (gdk_pixbuf, screenshot_name, "png", NULL, NULL);
     g_object_unref(gdk_pixbuf);
 
-    dialog = gtk_dialog_new_with_buttons (NULL,
-                                          GTK_WINDOW(((struct frontend_data*) obj->data)->window),
-                                          GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                          GTK_STOCK_OK,
-                                          GTK_RESPONSE_ACCEPT,
-                                          NULL);
+    /* A message inside a popup window tells the user the sceenshot has
+     * been saved correctly
+     */
+    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_resizable (GTK_WINDOW (window), FALSE);
+    gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
+    gtk_window_set_decorated (GTK_WINDOW (window), FALSE);
+    gtk_container_set_border_width (GTK_CONTAINER (window), 0);
 
+    title_label = gtk_label_new (get_text(obj, "debconf/gtk-button-screenshot", "Screenshot"));
+    gtk_misc_set_alignment(GTK_MISC(title_label), 0, 0);
+    label_title_string = malloc(strlen(get_text(obj, "debconf/gtk-button-screenshot", "Screenshot")) + 8 );
+    sprintf(label_title_string,"<b>%s</b>", get_text(obj, "debconf/gtk-button-screenshot", "Screenshot"));
+    gtk_label_set_markup(GTK_LABEL(title_label), label_title_string);
     sprintf(popup_message, get_text(obj, "debconf/gtk-screenshot-saved", "Screenshot saved as %s"), screenshot_name );
-    label = gtk_label_new (popup_message);
-    gtk_container_add (GTK_CONTAINER (GTK_DIALOG(dialog)->vbox), label);
-    gtk_widget_show_all (dialog);
-    gtk_dialog_run ( GTK_DIALOG(dialog) );
-    gtk_widget_destroy (dialog);
+    message_label = gtk_label_new (popup_message);
 
+    actionbox = gtk_hbutton_box_new();
+    gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END);
+    close_button = gtk_button_new_with_label (get_text(obj, "debconf/button-continue", "Continue"));
+    g_signal_connect_swapped (G_OBJECT (close_button), "clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (window));
+    gtk_box_pack_end (GTK_BOX(actionbox), close_button, TRUE, TRUE, DEFAULT_PADDING);
+
+    v_box = gtk_vbox_new(FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (v_box), title_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (v_box), message_label, FALSE, FALSE, DEFAULT_PADDING);
+    separator = gtk_hseparator_new();
+    gtk_box_pack_start(GTK_BOX (v_box), separator, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX (v_box), actionbox, FALSE, FALSE, 0);
+    h_box = gtk_hbox_new(FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (h_box), v_box, FALSE, FALSE, DEFAULT_PADDING);
+    v_box_outer = gtk_vbox_new(FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (v_box_outer), h_box, FALSE, FALSE, DEFAULT_PADDING);
+    
+    frame = gtk_frame_new(NULL);
+    gtk_frame_set_shadow_type (GTK_FRAME(frame), GTK_SHADOW_OUT);
+    gtk_container_add (GTK_CONTAINER (frame), v_box_outer);
+    gtk_container_add (GTK_CONTAINER (window), frame);
+    gtk_widget_show_all (window);
+
+    free(label_title_string);
 }
 
 void button_single_callback(GtkWidget *button, struct frontend_question_data* data)
@@ -1338,6 +1365,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     button_screenshot = gtk_button_new_with_label (get_text(obj, "debconf/gtk-button-screenshot", "Screenshot"));
     g_signal_connect (G_OBJECT (button_screenshot), "clicked", G_CALLBACK (screenshot_button_callback), obj );
     gtk_box_pack_start (GTK_BOX(actionbox), button_screenshot, TRUE, TRUE, DEFAULT_PADDING);
+    ((struct frontend_data*) obj->data)->button_screenshot = button_screenshot;
 
     /* Here are the back and forward buttons */
     button_prev = gtk_button_new_from_stock (GTK_STOCK_GO_BACK);
@@ -1539,7 +1567,9 @@ static int gtk_go(struct frontend *obj)
         gtk_widget_set_sensitive (data->button_prev, FALSE);
 
     gtk_widget_set_sensitive(GTK_WIDGET(data->button_next), TRUE);
+    gtk_widget_set_sensitive (data->button_screenshot, TRUE);
 
+    gtk_button_set_label (GTK_BUTTON(data->button_screenshot), get_text(obj, "debconf/gtk-button-screenshot", "Screenshot") );
     gtk_button_set_label (GTK_BUTTON(data->button_prev), get_text(obj, "debconf/button-goback", "Go Back") );
     gtk_button_set_label (GTK_BUTTON(data->button_next), get_text(obj, "debconf/button-continue", "Continue") );
 
@@ -1618,6 +1648,7 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     GtkWidget *progress_bar;
 
     struct frontend_data *data = (struct frontend_data *) obj->data;
+    gtk_widget_set_sensitive (data->button_screenshot, FALSE);
     gtk_widget_show_all(data->window);
 
     DELETE(obj->progress_title);
@@ -1640,6 +1671,7 @@ static void gtk_progress_set(struct frontend *obj, int val)
     gdouble progress;
     GtkWidget *progress_bar;
     struct frontend_data *data = (struct frontend_data *) obj->data;
+    gtk_widget_set_sensitive (data->button_screenshot, FALSE);
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val);
 
@@ -1665,6 +1697,7 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
     GtkWidget *progress_bar_label;
     char *progress_bar_label_string;
     struct frontend_data *data = (struct frontend_data *) obj->data;
+    gtk_widget_set_sensitive (data->button_screenshot, FALSE);
 
     INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info);
 

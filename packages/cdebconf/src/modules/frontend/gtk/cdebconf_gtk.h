@@ -34,6 +34,7 @@ struct frontend_data
   /* Buttons for the druid-like interface */
   GtkWidget *button_next;
   GtkWidget *button_prev;
+  GtkWidget *button_screenshot;
 
   /* Pointer to the Progress Bar, when initialized */
   GtkWidget *progress_bar; 
