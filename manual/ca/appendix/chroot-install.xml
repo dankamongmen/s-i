@@ -1,57 +1,57 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31190 untranslated -->
+<!-- original version: 31190 -->
 
  <sect1 id="linux-upgrade">
- <title>Installing &debian; from a Unix/Linux System</title>
+ <title>Instal·lant &debian; des d'un sistema Unix/Linux</title>
 
 <para>
 
-This section explains how to install &debian; from an existing
-Unix or Linux system, without using the menu-driven installer as
-explained in the rest of the manual. This <quote>cross-install</quote>
-HOWTO has been requested by users switching to &debian; from
-Red Hat, Mandrake, and SUSE. In this section some familiarity with
-entering *nix commands and navigating the file system is assumed. In
-this section, <prompt>$</prompt> symbolizes a command to be entered in
-the user's current system, while <prompt>#</prompt> refers to a
-command entered in the Debian chroot.
+Aquesta secció explica com instal·lar &debian; des d'un
+Unix o Linux, sense utilitzar el sistema de menús de l'instal·lador com
+s'explica a tot aquest manual. Aquest COM ES FA d'<quote>instal·lació
+creuada</quote> l'han demanat usuaris de Red Hat, Mandrake i SuSE que
+migren a &debian;. En aquesta secció es pressuposa una certa familiaritat
+amb la introducció d'ordres *nix i la navegació pel sistema de fitxers.
+En aquesta secció, <prompt>$</prompt> significa que l'ordre s'ha d'introduir
+a sistema actual de l'usuari, i <prompt>#</prompt> significa que l'ordre
+s'ha d'introduir al chroot de Debian.
 
 </para><para>
 
-Once you've got the new Debian system configured to your preference,
-you can migrate your existing user data (if any) to it, and keep on
-rolling. This is therefore a <quote>zero downtime</quote> &debian;
-install. It's also a clever way for dealing with hardware that
-otherwise doesn't play friendly with various boot or installation
-media.
+Una vegada tingueu configurat el sistema Debian a la vostra mida,
+podreu migrar totes les dades existents (si hi ha alguna) i continuar
+treballant. Aquesta és per tant una instal·lació &debian; amb <quote>temps
+de fora de servei zero</quote>. També és una manera intel·ligent de
+treballar amb maquinari que d'altra manera no vol funcionar bé amb
+diferents arrencades o mitjans d'instal·lació.
 
 </para>
 
   <sect2>
-  <title>Getting Started</title>
+  <title>Començant</title>
 <para>
 
-With your current *nix partitioning tools, repartition the hard
-drive as needed, creating at least one filesystem plus swap. You
-need at least 150MB of space available for a console only install,
-or at least 300MB if you plan to install X.
+Amb les actuals eines *nix, es necessita reparticionar el disc,
+creant al menys un sistema de fitxers i una partició d'intercanvi.
+Necessitareu al menys 150 MiB d'espai per una instal·lació de consola,
+o bé al menys 300 MiB si voleu instal·lar X.
 
 </para><para>
 
-To create file systems on your partitions. For example, to create an
-ext3 file system on partition <filename>/dev/hda6</filename> (that's
-our example root partition):
+Per exemple, per crear un sistema de fitxers ext3 a la partició
+<filename>/dev/hda6</filename> (que és el nostre exemple per la
+partició arrel):
 
 <informalexample><screen>
 # mke2fs -j /dev/hda6
 </screen></informalexample>
 
-To create an ext2 file system instead, omit <userinput>-j</userinput>.
+Si voleu crear un sistema de fitxers ext2, ometeu <userinput>-j</userinput>.
 
 </para><para>
 
-Initialize and activate swap (substitute the partition number for
-your intended Debian swap partition):
+Inicialitzeu i activeu l'intercanvi (substituïu el nombre de la partició per
+la vostra partició d'intercanvi de Debian):
 
 <informalexample><screen>
 # mkswap /dev/hda5
@@ -59,10 +59,10 @@ your intended Debian swap partition):
 # swapon /dev/hda5
 </screen></informalexample>
 
-Mount one partition as <filename>/mnt/debinst</filename> (the
-installation point, to be the root (<filename>/</filename>) filesystem
-on your new system). The mount point name is strictly arbitrary, it is
-referenced later below.
+Munteu la partició a <filename>/mnt/debinst</filename> (el lloc
+d'instal·lació, per ser l'arrel (<filename>/</filename>) del sistema de
+fitxers del nou sistema). El punt de muntatge és arbitrari, i se'n farà
+ús desprès.
 
 <informalexample><screen>
 # mkdir /mnt/debinst
@@ -72,48 +72,47 @@ referenced later below.
 </para>
 <note><para>
 
-If you want to have parts of the filesystem (e.g. /usr) mounted on
-separate partitions, you will need to create and mount these directories
-manually before proceding with the next stage.
+Si voleu tenir parts del vostre sistema de fitxers (p.ex. /usr) muntats
+en particions separades, haureu de crear i muntar aquests directoris
+manualment abans de procedir amb la següent fase.
 
 </para></note>
   </sect2>
 
   <sect2>
-  <title>Install <command>debootstrap</command></title>
+  <title>Instal·lar <command>debootstrap</command></title>
 <para>
 
-The tool that the Debian installer uses, which is recognized as the
-official way to install a Debian base system, is
-<command>debootstrap</command>. It uses <command>wget</command> and
-<command>ar</command>, but otherwise depends only on
-<classname>/bin/sh</classname>. Install <command>wget</command> and
-<command>ar</command> if they aren't already on your current system,
-then download and install <command>debootstrap</command>.
+L'eina que utilitza l'instal·lador de Debian, que és reconeguda
+oficialment com la manera d'instal·lar un sistema base de Debian, és
+<command>debootstrap</command>. Fa ús de <command>wget</command> i
+<command>ar</command>, i per altra part tan sols depèn de
+<classname>/bin/sh</classname>. Instal·leu <command>wget</command> i
+<command>ar</command> si no hi són ara al vostre sistema, i descarregueu
+i instal·leu <command>debootstrap</command>.
 
 </para><para>
 
-If you have an rpm-based system, you can use alien to convert the
-.deb into .rpm, or download an rpm-ized version at
+Si el vostre sistema està basat en rpm, podeu fer ús d'alien per convertir
+el .deb a .rpm, o descarregar una versió en rpm des de
 <ulink url="http://people.debian.org/~blade/install/debootstrap"></ulink>
 
 </para><para>
 
-Or, you can use the following procedure to install it
-manually. Make a work folder for extracting the .deb into:
+Podeu també utilitzar el procediment següent per fer la instal·lació
+de forma manual. Creeu un directori de treball per extreure els .deb dins:
 
 <informalexample><screen>
 # mkdir work
 # cd work
 </screen></informalexample>
 
-The <command>debootstrap</command> binary is located in the Debian
-archive (be sure to select the proper file for your
-architecture). Download the <command>debootstrap</command> .deb from
-the <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
-pool</ulink>, copy the package to the work folder, and extract the
-binary files from it. You will need to have root privileges to install
-the binaries.
+El binari de <command>debootstrap</command> el podeu trobar a l'arxiu de
+Debian (assegureu-vos de seleccionar l'arxiu correcte per la vostra
+arquitectura). Descarregueu el .deb <command>debootstrap</command> del
+<ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
+repositori</ulink>, copieu el paquet al directori i extraieu els fitxers del
+binari. Necessitareu tenir privilegis de root per instal·lar els binaris.
 
 <informalexample><screen>
 # ar -x debootstrap_0.X.X_arch.deb
@@ -123,35 +122,36 @@ the binaries.
 
 </para><para>
 
-Note that running <command>debootstrap</command> may require you to have
-a minimal version of <classname>glibc</classname> installed (currently
-GLIBC_2.3). <command>debootstrap</command> itself is a shell script, but
-it calls various utilities that require <classname>glibc</classname>.
+Tingueu en compte que executant <command>debootstrap</command> pot requerir
+que tingueu una versió mínima de <classname>glibc</classname> instal·lada
+(actualment GLIBC_2.3). <command>debootstrap</command> és un guió
+d'intèrpret d'ordres, però crida diverses utilitats que requereixen
+<classname>glibc</classname>.
 
 </para>
   </sect2>
 
   <sect2>
-  <title>Run <command>debootstrap</command></title>
+  <title>Executar <command>debootstrap</command></title>
 <para>
 
-<command>debootstrap</command> can download the needed files directly
-from the archive when you run it. You can substitute any Debian
-archive mirror for <userinput>http.us.debian.org/debian</userinput> in
-the command example below, preferably a mirror close to you
-network-wise. Mirrors are listed at
+Podeu descarregar els fitxers que necessiteu del <command>debootstrap</command>
+directament de l'arxiu quan l'executeu. Podeu substituir
+<userinput>ftp.es.debian.org/debian</userinput> per qualsevol mirall de
+l'arxiu a l'ordre de l'exemple de baix, preferiblement per un que estigui
+a prop vostre. Teniu una llista dels miralls a
 <ulink url="http://www.debian.org/misc/README.mirrors"></ulink>.
 
 </para><para>
 
-If you have a &releasename; &debian; CD mounted at
-<filename>/cdrom</filename>, you could substitute a file URL instead
-of the http URL: <userinput>file:/cdrom/debian/</userinput>
+Si teniu un CD de &debian; &releasename; muntat a
+<filename>/cdrom</filename>, podeu substituir l'adreça del http per:
+<userinput>file:/cdrom/debian/</userinput>
 
 </para><para>
 
-Substitute one of the following for <replaceable>ARCH</replaceable>
-in the <command>debootstrap</command> command:
+Substituïu una de les següents per <replaceable>ARCH</replaceable>
+a l'ordre <command>debootstrap</command>:
 
 <userinput>alpha</userinput>,
 <userinput>arm</userinput>,
@@ -162,23 +162,23 @@ in the <command>debootstrap</command> command:
 <userinput>mips</userinput>,
 <userinput>mipsel</userinput>,
 <userinput>powerpc</userinput>,
-<userinput>s390</userinput>, or
+<userinput>s390</userinput> o
 <userinput>sparc</userinput>.
 
 <informalexample><screen>
 # /usr/sbin/debootstrap --arch ARCH &releasename; \
-     /mnt/debinst http://http.us.debian.org/debian
+     /mnt/debinst http://ftp.es.debian.org/debian
 </screen></informalexample>
 
 </para>
   </sect2>
 
   <sect2>
-  <title>Configure The Base System</title>
+  <title>Configurar el sistema base</title>
 <para>
 
-Now you've got a real Debian system, though rather lean, on disk.
-<command>Chroot</command> into it:
+Ara ja teniu un sistema Debian real al disc, això si, molt petit.
+Feu <command>chroot</command>:
 
 <informalexample><screen>
 # LANG= chroot /mnt/debinst /bin/bash
@@ -187,21 +187,22 @@ Now you've got a real Debian system, though rather lean, on disk.
 </para>
 
    <sect3>
-   <title>Mount Partitions</title>
+   <title>Muntatge de les particions</title>
 <para>
 
-You need to create <filename>/etc/fstab</filename>.
+Necessitareu crear el fitxer <filename>/etc/fstab</filename>.
 
 <informalexample><screen>
 # editor /etc/fstab
 </screen></informalexample>
 
-Here is a sample you can modify to suit:
+Aquest és un exemple que podeu modificar per que s'ajuste a los vostres
+necessitats:
 
 <informalexample><screen>
-# /etc/fstab: static file system information.
+# /etc/fstab: informació estàtica del sistema de fitxers.
 #
-# file system    mount point   type    options                  dump pass
+# s. fitxers    punt muntatge  tipus   opcions                  dump passades
 /dev/XXX         /             ext3    defaults                 0    1
 /dev/XXX         /boot         ext3    ro,nosuid,nodev          0    2
 
@@ -217,17 +218,18 @@ proc             /proc         proc    defaults                 0    0
 /dev/XXX         /home         ext3    rw,nosuid,nodev          0    2
 </screen></informalexample>
 
-Use <userinput>mount -a</userinput> to mount all the file systems you
-have specified in your <filename>/etc/fstab</filename>, or to mount
-file systems individually use:
+Utilitzeu <userinput>mount -a</userinput> per muntar tot el sistema de
+fitxers que heu especificat al vostre <filename>/etc/fstab</filename>,
+o bé munteu cada sistema de fitxers de forma individual:
 
 <informalexample><screen>
 # mount /path   # e.g.: mount /usr
 </screen></informalexample>
 
-You can mount the proc file system multiple times and to arbitrary
-locations, though <filename>/proc</filename> is customary. If you didn't use
-<userinput>mount -a</userinput>, be sure to mount proc before continuing:
+Podeu muntar el sistema de fitxers proc varies vegades i a llocs arbitraris,
+però s'espera tenir el <filename>/proc</filename>. Si no utilitzeu
+<userinput>mount -a</userinput>, assegureu-vos de muntar proc abans
+de continuar:
 
 <informalexample><screen>
 # mount -t proc proc /proc
@@ -235,9 +237,9 @@ locations, though <filename>/proc</filename> is customary. If you didn't use
 
 </para><para>
 
-The command <userinput>ls /proc</userinput> should now show a non-empty
-directory. Should this fail, you may be able to mount proc from outside
-the chroot:
+L'ordre <userinput>ls /proc</userinput> ha de mostrar ara un directori
+no buit. Si això fallés, podeu provar de muntar proc des de fora
+del chroot:
 
 <informalexample><screen>
 # mount -t proc proc /mnt/debinst/proc
@@ -247,10 +249,10 @@ the chroot:
    </sect3>
 
    <sect3>
-   <title>Configure Keyboard</title>
+   <title>Configurar el teclat</title>
 <para>
 
-To configure your keyboard:
+Per configurar el vostre teclat:
 
 <informalexample><screen>
 # dpkg-reconfigure console-data
@@ -258,46 +260,47 @@ To configure your keyboard:
 
 </para><para>
 
-Note that the keyboard cannot be set while in the chroot, but will be
-configured for the next reboot.
+Tingueu en compte que no es pot establir el teclat mentre esteu dins
+del chroot, però serà configurat per al següent reinici.
 
 </para>
    </sect3>
 
    <sect3>
-   <title>Configure Networking</title>
+   <title>Configurar la xarxa</title>
 <para>
 
-To configure networking, edit
+Per configurar la xarxa, editeu
 <filename>/etc/network/interfaces</filename>,
-<filename>/etc/resolv.conf</filename>, and
+<filename>/etc/resolv.conf</filename> i
 <filename>/etc/hostname</filename>.
 
 <informalexample><screen>
 # editor /etc/network/interfaces
 </screen></informalexample>
 
-Here are some simple examples from
+Ací teniu alguns exemples senzills de
 <filename>/usr/share/doc/ifupdown/examples</filename>:
 
 <informalexample><screen>
 ######################################################################
-# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)
-# See the interfaces(5) manpage for information on what options are
-# available.
+# /etc/network/interfaces -- fitxer de configuració per ifup(8), ifdown(8)
+# Llegiu la pàgina del manual de interfaces(5) per veure quines
+# opcions teniu al vostre abast.
 ######################################################################
 
-# We always want the loopback interface.
+# Sempre voldrem l'interfície loopback
 #
 auto lo
 iface lo inet loopback
 
-# To use dhcp:
+# Per utilitzar dhcp:
 #
 # auto eth0
 # iface eth0 inet dhcp
 
-# An example static IP setup: (broadcast and gateway are optional)
+# Un exemple de configuració amb IP estàtica (broadcast i gateway són
+# opcionals):
 #
 # auto eth0
 # iface eth0 inet static
@@ -308,14 +311,14 @@ iface lo inet loopback
 #     gateway 192.168.0.1
 </screen></informalexample>
 
-Enter your nameserver(s) and search directives in
+Introduïu el nom del(s) vostre(s) servidor(s) de noms a
 <filename>/etc/resolv.conf</filename>:
 
 <informalexample><screen>
 # editor /etc/resolv.conf
 </screen></informalexample>
 
-A simple <filename>/etc/resolv.conf</filename>:
+Un exemple senzill de <filename>/etc/resolv.conf</filename>:
 
 <informalexample><screen>
 search hqdom.local\000
@@ -323,26 +326,26 @@ nameserver 10.1.1.36
 nameserver 192.168.9.100
 </screen></informalexample>
 
-Enter your system's host name (2 to 63 characters):
+Introduïu el nom del vostre sistema (de 2 a 63 caràcters):
 
 <informalexample><screen>
 # echo DebianHostName &gt; /etc/hostname
 </screen></informalexample>
 
-If you have multiple network cards, you should arrange the names of
-driver modules in the <filename>/etc/modules</filename> file into the
-desired order. Then during boot, each card will be associated with the
-interface name (eth0, eth1, etc.) that you expect.
+Si teniu vàries targes de xarxa, ordeneu els noms dels mòduls dels
+controladors al fitxer <filename>/etc/modules</filename> amb l'ordre desitjat.
+A l'arrencada, cada tarja s'associarà amb el nom de l'interfície 
+(eth0, eth1, etc.) que esperàveu.
 
 </para>
    </sect3>
 
    <sect3>
-   <title>Configure Timezone, Users, and APT</title>
+   <title>Configurar la zona horària, usuaris i APT</title>
 <para>
 
-Set your timezone, add a normal user, and choose your <command>apt</command>
-sources by running
+Configureu la vostra zona horària, afegiu un usuari normal i escolliu els
+fonts per l'<command>apt</command> executant
 
 <informalexample><screen>
 # /usr/sbin/base-config new
@@ -352,37 +355,39 @@ sources by running
    </sect3>
 
    <sect3>
-   <title>Configure Locales</title>
+   <title>Configurar locals</title>
 <para>
 
-To configure your locale settings to use a language other than
-English, install the locales support package and configure it:
+Per configurar els vostres paràmetres locals per utilitzar un idioma
+que no sigui l'anglès, instal·leu el paquet per suportar els locals i
+configureu-lo:
 
 <informalexample><screen>
 # apt-get install locales
 # dpkg-reconfigure locales
 </screen></informalexample>
 
-NOTE: Apt must be configured before, ie. during the base-config phase.
-Before using locales with character sets other than ASCII or latin1,
-please consult the appropriate localization HOWTO.
+AVÍS: L'apt s'ha de configurar abans, es a dir a la fase base-config.
+Abans d'utilitzar locals amb altres conjunts de caràcters diferents de
+ASCII o latin1, consulteu el COM ES FA de localització apropiat.
 
 </para>
    </sect3>
   </sect2>
 
   <sect2>
-  <title>Install a Kernel</title>
+  <title>Instal·lar un nucli</title>
 <para>
 
-If you intend to boot this system, you probably want a Linux kernel
-and a boot loader. Identify available pre-packaged kernels with
+Si intenteu arrencar aquest sistema, probablement voldreu un nucli Linux i
+una carregador d'arrencada. Identifiqueu si hi ha algun nucli
+pre-empaquetat amb
 
 <informalexample><screen>
 # apt-cache search kernel-image
 </screen></informalexample>
 
-Then install your choice using its package name.
+Aleshores instal·leu la vostra elecció utilitzant el nom del paquet.
 
 <informalexample><screen>
 # apt-get install kernel-image-<replaceable>2.X.X-arch-etc</replaceable>
@@ -392,28 +397,29 @@ Then install your choice using its package name.
   </sect2>
 
   <sect2>
-<title>Set up the Boot Loader</title>
+<title>Configurant el carregador d'arrencada</title>
 <para>
 
-To make your &debian; system bootable, set up your boot loader to load
-the installed kernel with your new root partition. Note that debootstrap
-does not install a boot loader, though you can use apt-get inside your
-Debian chroot to do so.
+Per fer que el vostre sistema &debian; es pugui arrencar, configureu el
+vostre carregador d'arrencada per que carregui el nucli instal·lat a la
+vostra nova partició arrel. Adoneu-vos que el debootstrap no instal·la un
+carregador d'arrencada, encara que podeu utilitzar l'apt-get dins del
+vostre chroot per fer-ho.
 
 </para><para arch="i386">
 
-Check <userinput>info grub</userinput> or <userinput>man
-lilo.conf</userinput> for instructions on setting up the
-bootloader.  If you are keeping the system you used to install Debian, just
-add an entry for the Debian install to your existing grub
-<filename>menu.lst</filename> or <filename>lilo.conf</filename>.  For
-<filename>lilo.conf</filename>, you could also copy it to the new system and
-edit it there. After you are done editing, call lilo (remember it will use
-<filename>lilo.conf</filename> relative to the system you call it from).
+Comproveu l'informació de <userinput>info grub</userinput> o <userinput>man
+lilo.conf</userinput> per com configurar el carregador d'arrencada. Si el
+vostre sistema era ja Debian, afegiu una entrada per la instal·lació al
+vostre fitxer existent <filename>menu.lst</filename> o
+<filename>lilo.conf</filename>. Pel <filename>lilo.conf</filename>,
+podeu copiar-lo al nou sistema i editar-lo allí. Després de editar-lo,
+executeu lilo (recordeu que utilitzarà el <filename>lilo.conf</filename>
+relatiu al sistema des d'on el crideu).
 
 </para><para arch="i386">
 
-Here is a basic <filename>/etc/lilo.conf</filename> as an example:
+Ací teniu un exemple bàsic de <filename>/etc/lilo.conf</filename>:
 
 <informalexample><screen>
 boot=/dev/hda6
@@ -427,17 +433,16 @@ label=Debian
 
 </para><para arch="powerpc">
 
-Check <userinput>man yaboot.conf</userinput> for instructions on
-setting up the bootloader.  If you are keeping the system you used to
-install Debian, just add an entry for the Debian install to your
-existing <filename>yaboot.conf</filename>.  You could also copy it to
-the new system and
-edit it there. After you are done editing, call ybin (remember it will
-use <filename>yaboot.conf</filename> relative to the system you call it from).
+Llegiu <userinput>man yaboot.conf</userinput> per tenir més informació de
+com configurar el carregador d'arrencada. Si esteu a un sistema on
+prèviament teníeu ja instal·lat Debian, copieu el vostre fitxer ja existent
+<filename>yaboot.conf</filename>. Podeu copiar-lo al nou sistema i
+editar-lo allí. Desprès d'editar-lo, executeu ybin (recordeu que utilitzarà
+el <filename>yaboot.conf</filename> relatiu al sistema des d'on l'executeu).
 
 </para><para arch="powerpc">
 
-Here is a basic <filename>/etc/yaboot.conf</filename> as an example:
+Un exemple bàsic de <filename>/etc/yaboot.conf</filename> podria ser:
 
 <informalexample><screen>
 boot=/dev/hda2
@@ -450,8 +455,8 @@ image=/vmlinux
 label=Debian
 </screen></informalexample>
 
-On some machines, you may need to use <userinput>ide0:</userinput>
-instead of <userinput>hd:</userinput>.
+A algunes màquines, podríeu necessitar utilitzar <userinput>ide0:</userinput>
+en comptes de <userinput>hd:</userinput>.
 
 </para>
   </sect2>
