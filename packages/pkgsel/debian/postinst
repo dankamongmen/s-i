@@ -9,7 +9,7 @@ export LANG
 cleanup () {
 	# If X was not installed, remove the hardware detection programs.
 	if ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
-   	then
+	then
 		log-output -t pkgsel chroot /target dpkg --purge read-edid mdetect
 	fi
 
@@ -63,7 +63,7 @@ db_progress INFO pkgsel/progress/tasksel
 ret=0
 in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 15 --to 95 --logstderr'" || ret=$?
 if [ "$ret" != 0 ]; then
- 	# TODO useful error message here (for ret != 30)
+	# TODO useful error message here (for ret != 30)
 	db_progress INFO pkgsel/progress/cleanup
 	cleanup
 	db_progress STOP
