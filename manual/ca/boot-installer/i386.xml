@@ -1,12 +1,12 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 25149 -->
+<!-- original version: 31616 -->
 
   <sect2 arch="i386"><title>Arrencant des d'un CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
 
 <!-- We'll comment the following section until we know exact layout -->
-<!-- 
+<!--
 CD #1 of official Debian CD-ROM sets for &arch-title; will present a
 <prompt>boot:</prompt> prompt on most hardware. Press
 <keycap>F3</keycap> to see the list of kernel options available
@@ -17,17 +17,17 @@ followed by &enterkey;.
 </para><para>
 
 If your hardware doesn't support booting of multiple images, put one
-of the other CDs in the drive. It appears that most SCSI CD-ROM drives 
+of the other CDs in the drive. It appears that most SCSI CD-ROM drives
 do not support <command>isolinux</command> multiple image booting, so users
-with SCSI CD-ROMs should try either CD2 (vanilla) or CD3 (compact), 
-or CD5 (bf2.4). 
+with SCSI CD-ROMs should try either CD2 (vanilla) or CD3 (compact),
+or CD5 (bf2.4).
 
 </para><para>
 
-CD's 2 through 5 will each boot a 
+CD's 2 through 5 will each boot a
 different ``flavor'' depending on which CD-ROM is
 inserted. See <xref linkend="kernel-choice"/> for a discussion of the
-different flavors.  Here's how the flavors are laid out on the
+different flavors. Here's how the flavors are laid out on the
 different CD-ROMs:
 
 <variablelist>
@@ -35,31 +35,31 @@ different CD-ROMs:
 <term>CD 1</term><listitem><para>
 
 Allows a selection of kernel images to boot from (the idepci flavor is
-the default if no selection is made). 
+the default if no selection is made).
 
 </para></listitem></varlistentry>
 <varlistentry>
 <term>CD 2</term><listitem><para>
 
-Boots the `vanilla' flavor.
+Boots the <quote>vanilla</quote> flavor.
 
 </para></listitem></varlistentry>
 <varlistentry>
 <term>CD 3</term><listitem><para>
 
-Boots the `compact' flavor.
+Boots the <quote>compact</quote> flavor.
 
 </para></listitem></varlistentry>
 <varlistentry>
 <term>CD 4</term><listitem><para>
 
-Boots the `idepci' flavor.
+Boots the <quote>idepci</quote> flavor.
 
 </para></listitem></varlistentry>
 <varlistentry>
 <term>CD 5</term><listitem><para>
 
-Boots the `bf2.4' flavor.
+Boots the <quote>bf2.4</quote> flavor.
 
 </para></listitem></varlistentry>
 
@@ -83,15 +83,15 @@ Boots the `bf2.4' flavor.
 
 Boot into DOS (not Windows) without any drivers being loaded.  To do
 this, you have to press <keycap>F8</keycap> at exactly the right
-moment (and optionally select the `safe mode command prompt only'
+moment (and optionally select the <quote>safe mode command prompt only</quote>
 option).  Enter the subdirectory for the flavor you chose, e.g.,
 
 <informalexample><screen>
 cd c:\install
-</screen></informalexample>.  
+</screen></informalexample>.
 
 Next, execute <command>install.bat</command>.
-The kernel will load and launch the installer system. 
+The kernel will load and launch the installer system.
 
 </para><para>
 
@@ -106,8 +106,8 @@ bf2.4 flavor. The symptom of the problem is an
 END FIXME -->
 
   <sect2 arch="i386" id="boot-initrd">
-  <title>Arrencant des del Linux utilitzant el <command>LILO</command> o el
-  <command>GRUB</command></title>
+  <title>Arrencant des del Linux utilitzant el <command>LILO</command> o
+         el <command>GRUB</command></title>
 
 <para>
 
@@ -119,13 +119,12 @@ els fitxers necessaris tal i com es descriu a
 
 <para>
 
-Si voleu utilitzar el disc dur únicament per a l'arrencada i
-voleu baixar-ho tot des de la xarxa, hauríeu de baixar el fitxer
-<filename>netboot/debian-installer/i386/initrd.gz</filename>
-i el nucli corresponent.
-
-Us permetrà tornar a particionar el disc dur del qual heu arrencat
-l'instal·lador, tot i això, ho hauríeu de fer amb molt de compte.
+Si voleu utilitzar el disc dur únicament per a l'arrencada i voleu
+baixar-ho tot des de la xarxa, hauríeu de baixar el fitxer
+<filename>netboot/debian-installer/i386/initrd.gz</filename> i el
+nucli corresponent. Us permetrà tornar a particionar el disc dur del
+qual heu arrencat l'instal·lador, tot i això, ho hauríeu de fer amb
+molt de compte.
 
 </para>
 
@@ -135,9 +134,9 @@ Si durant la instal·lació preteneu mantenir sense modificacions una
 partició existent al disc dur, podeu baixar el fitxer
 <filename>hd-media/initrd.gz</filename> i el nucli corresponent, i
 també copiar una imatge iso del CD al dispositiu (assegureu-vos
-que el nom del fitxer acaba amb «.iso»). En aquest cas l'instal·lador
-pot arrencar del dispositiu i instal·lar des de la imatge del CD sense
-necessitar la xarxa.
+que el nom del fitxer acaba amb <literal>.iso</literal>). En aquest
+cas l'instal·lador pot arrencar del dispositiu i instal·lar des de
+la imatge del CD sense necessitar la xarxa.
 
 </para>
 
@@ -170,7 +169,7 @@ image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
        root=/dev/ram0
-       append="devfs=mount,dall ramdisk_size=12000"
+       append="<phrase condition="sarge">devfs=mount,dall </phrase>ramdisk_size=12000"
 </screen></informalexample>
 
 Per a més informació vegeu les pàgines del manual
@@ -193,8 +192,10 @@ kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram0 ramdisk_size=12000
 initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
-i reinicieu el sistema. Si l'arrencada falla, podeu provar afegint
-<userinput>devfs=mount,dall</userinput> a la línia <quote>kernel</quote>.
+i reinicieu el sistema. <phrase condition="sarge">Si l'arrencada falla,
+podeu provar afegint <userinput>devfs=mount,dall</userinput> a la línia
+<quote>kernel</quote>.
+</phrase>
 
 </para><para>
 Recordeu que el valor de <userinput>ramdisk_size</userinput> s'hauria
@@ -257,13 +258,13 @@ suportada a partir de la versió del nucli 2.4.
 
 </para><para>
 
-Recodeu que en alguns ordinadors la combinació
+Recordeu que en alguns ordinadors la combinació
 <keycombo><keycap>Control</keycap>
 <keycap>Alt</keycap> <keycap>Delete</keycap></keycombo>
 no reinicia correctament l'ordinador i es recomana
-reiniciar-lo manualment. Si ho esteu instal·lant des d'un sistema operatiu
-existent (ex. des d'un DOS) teniu l'opció. Si no és el cas reinicieu-lo
-manualment durant l'arrencada.
+reiniciar-lo manualment. Si ho esteu instal·lant des d'un sistema
+operatiu existent (ex. des d'un DOS) teniu l'opció. Si no és el cas
+reinicieu-lo manualment durant l'arrencada.
 
 </para><para>
 
@@ -283,7 +284,7 @@ Per a més informació d'aquesta fase del procés d'arrencada vegeu
 </para><para>
 
 Un cop arrencat des del disquet d'arrencada se us sol·licitarà
-el disquet arrel. Inserteu el disquet arrel i permeu &enterkey;,
+el disquet arrel. Inseriu el disquet arrel i premeu &enterkey;,
 seguidament es carregaran els continguts a la memòria.
 El programa instal·lador <command>debian-installer</command>
 s'iniciarà automàticament. 
@@ -337,109 +338,59 @@ que permeten l'arrencada via TFTP.
    </sect3>
   </sect2>
 
-  <sect2 arch="i386"><title>Paràmetre d'arrencada i386</title>
+  <sect2 arch="i386"><title>L'indicador d'arrencada</title>
 <para>
 
-Quan arrenqui l'instal·lador us apareixerà l'indicador d'arrencada
-<prompt>boot:</prompt>. En l'indicador <prompt>boot:</prompt> podeu
-fer dues coses. Podeu prémer les tecles de <keycap>F1</keycap>
-a <keycap>F10</keycap> per visualitzar pàgines d'informació útil,
-o podeu prémer <keycap>Enter</keycap> per reiniciar el sistema.
+Quan arrenqui l'instal·lador us apareixerà una pantalla gràfica
+amigable mostrant el logotip de Debian i l'indicador d'arrencada:
+
+<informalexample><screen>
+Press F1 for help, or ENTER to boot:
+</screen></informalexample>
+
+A l'indicador d'arrencada podeu o bé prémer &enterkey; per arrencar
+l'instal·lador amb les opcions predeterminades o introduir un mètode
+especific d'arrencada amb paràmetres opcionals.
 
 </para><para>
 
-Podeu accedir a informació interessant sobre els paràmetre d'arrencada
-prement les tecles de <keycap>F3</keycap> a <keycap>F7</keycap>.
-Si afegiu qualsevol paràmetre a la línia d'ordres d'arrencada,
-assegureu-vos d'escriure el mètode d'arrencada (el predeterminat és
-<userinput>linux</userinput>) i un espai abans del primer paràmetre
-(ex. <userinput>linux floppy=thinkpad</userinput>). Prémer &enterkey;,
-és el mateix que escriure <userinput>linux</userinput> sense cap
-paràmetre especial.
+Podeu accedir a informació útil sobre els mètodes d'arrencada i
+paràmetres d'arrencada prement les tecles de <keycap>F2</keycap> a
+<phrase condition="sarge"><keycap>F7</keycap></phrase><phrase
+condition="etch"><keycap>F8</keycap></phrase>. Si afegiu algun
+paràmetre a la línia d'ordres d'arrencada, assegureu-vos d'escriure
+el mètode d'arrencada (el predeterminat és <userinput>linux</userinput>)
+i un espai abans del primer paràmetre (ex.
+<userinput>linux debconf/priority=medium</userinput>).
 
-</para><para>
+<note><para>
 
-Alguns sistemes tenen disqueteres amb els "DCL invertits". Si
-us apareixen errors mentre esteu llegint de la disquetera tot
-i saber que funciona correctament, proveu d'utilitzar el paràmetre
-<userinput>floppy=thinkpad</userinput>.
-
-</para><para>
-
-En alguns sistemes com els IBM PS/1 o el ValuePoint (que disposa
-dels controladors de disc del ST-506) la unitat IDE no es reconeixerà
-correctament. En aquest cas proveu-ho sense paràmetres i espereu si
-es reconeix correctament. Si no és el cas, cerqueu els paràmetres
-del dispositiu (cilindres, capçals i sectors) i utilitzeu el paràmetre
-<userinput>hd=<replaceable>cilindres</replaceable>,<replaceable>capçals</replaceable>,<replaceable>sectors</replaceable></userinput>.
-
-</para><para>
-
-Si disposeu d'un ordinador molt vell i el nucli es penja
-després de mostrar el missatge
-<computeroutput>Checking 'hlt' instruction...</computeroutput>,
-hauríeu de provar el paràmetre d'arrencada que inhabilita la prova
-<userinput>no-hlt</userinput>.
-
-</para><para>
-
-Si durant l'arrencada del nucli apareixen caràcters estranys a la pantalla,
-és possible que el sistema disposi d'una tarja de vídeo problemàtica
-que no commuta correctament al mode framebuffer. En aquest cas podeu
-utilitzar el paràmetre d'arrencada
-<userinput>debian-installer/framebuffer=false</userinput> o
-<userinput>video=vga16:off</userinput> per inhabilitar el frambuffer.
-Durant la instal·lació únicament es disposarà de l'idioma anglès
-arran de les limitacions de la consola. Per a més informació
-vegeu
-<xref linkend="boot-parms"/>.
-
-</para>
-  </sect2>
-
-  <sect2 arch="i386">
-  <title>El sistema queda congelat durant la fase de configuració de la PCMCIA</title>
+Si esteu instal·lant el sistema via un dispositiu d'administració remot
+que proveeixi una interfície de text a la consola VGA, pot ser que no
+veieu la pantalla flaix gràfica en arrencar l'instal·lador, fins i tot
+pot ser que no veieu l'indicador d'arrencada. Exemples d'aquests
+dispositius inclouen la consola de text <quote>integrated Lights Out</quote>
+(iLO) de Compaq i l'<quote>Integrated Remote Assistant</quote> (IRA)
+d'HP. Podeu prémer F1 a cegues<footnote>
 
 <para>
 
-Alguns models d'ordinadors portàtils produïts per Dell són coneguts
-per penjar-se quan la detecció de dispositius PCMCIA intenta accedir a
-algunes adreces de maquinari. D'altres portàtils poden descriure
-problemàtiques similars. Si patiu algun problema similar i durant
-la instal·lació no preciseu del suport PCMCIA, el podeu inhabilitar
-utilitzant el paràmetre d'arrencada
-<userinput>hw-detect/start_pcmcia=false</userinput>.
-Podeu configurar el suport de PCMCIA després de la instal·lació
-i excloure'n el rang de recursos problemàtic.
-
-</para><para>
-
-D'altra banda, podeu arrencar l'instal·lador en mode expert. Se us
-demanarà que introduïu les opcions del rang de recursos que precisa
-el vostre maquinari. Per exemple, si disposeu d'un dels ordinadors
-portàtils Dell anomenats anteriorment, hauríeu d'introduir-hi
-<userinput>exclude port 0x800-0x8ff</userinput>. Disposeu d'una llista
-de les opcions del rangs de recursos més habituals a
-<ulink url="http://pcmcia-cs.sourceforge.net/ftp/doc/PCMCIA-HOWTO-1.html#ss1.12">System
-resource settings section of the PCMCIA HOWTO</ulink>.
-Recordeu que heu d'evitar la utilització de les comes a l'hora
-d'introduir els valors a l'instal·lador.
+En algunes casos aquests dispositius requeriran seqüències d'escapament
+especials per tal que al prémer la tecla sorgeixi efecte,
+per exemple IRA usa <keycombo> <keycap>Ctrl</keycap>
+<keycap>F</keycap> </keycombo>,&nbsp;<keycap>1</keycap>.
 
 </para>
-  </sect2>
 
-  <sect2 arch="i386">
-  <title>El sistema queda congelat durant la càrrega dels mòduls USB</title>
-<para>
+</footnote> per a saltar-vos aquesta pantalla i veure el text d'ajuda.
+Un cop hàgiu deixat enrere la pantalla flaix gràfica i estigueu al
+text d'ajuda les pulsacions de tecles es mostraran a l'indicador com
+s'espera. Per a deshabilitar el framebuffer per a la resta de
+la instal·lació, haureu d'afegir també
+<userinput>debian-installer/framebuffer=false</userinput> a l'indicador
+d'arrencada com descriu el text d'ajuda.
 
-El nucli acostuma a intentar instal·lar els mòduls USB i els controladors
-del teclat USB per suportar alguns teclats USB no estàndards. Tot i això,
-hi ha alguns sistemes USB inconsistents en els quals el controlador
-es penja durant la càrrega. Una possible solució és inhabilitar el controlador
-USB en la configuració de la BIOS de la placa mare. Una altra opció és
-passsar el paràmetre
-<userinput>debian-installer/probe/usb=false</userinput>
-a l'indicador d'arrencada, que evitarà que es carreguin els mòduls.
-
+</para></note>
 </para>
+
   </sect2>

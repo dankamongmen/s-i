@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 25171 -->
+<!-- original version: 30084 -->
 
  <sect1 id="boot-parms"><title>Paràmetres d'arrencada</title>
 <para>
@@ -38,13 +38,13 @@ Memòria:<replaceable>dispo</replaceable>k/<replaceable>total</replaceable>k dis
 </screen></informalexample>
 
 <replaceable>total</replaceable> hauria d'indicar la quantitat
-total de RAM en kilobytes. Si no coincideix amb la quantitat de RAM que
-teniu instal·lada utilitzeu el paràmetre
+total de RAM en kilobytes. Si no coincideix amb la quantitat de RAM
+que teniu instal·lada utilitzeu el paràmetre
 <userinput>mem=<replaceable>ram</replaceable></userinput>,
 on <replaceable>ram</replaceable> correspon a la quantitat de memòria,
-amb el sufix 'k' pels kilobytes, o 'm' per les megabytes. Per exemple,
-<userinput>mem=65536K</userinput> i <userinput>mem=64M</userinput>
-corresponen a 65MB de RAM.
+amb el sufix <quote>k</quote> pels kilobytes, o <quote>m</quote> pels
+megabytes. Per exemple, <userinput>mem=65536K</userinput> i
+<userinput>mem=64M</userinput> corresponen a 65 MiB de RAM.
 
 </para><para condition="supports-serial-console">
 
@@ -79,7 +79,8 @@ Tingueu en compte que el nucli accepta un màxim de 8 paràmetres de línia
 d'ordres i 8 paràmetres d'entorn (incloent qualsevol paràmetre afegit de
 forma predeterminada per l'instal·lador). Si s'excedeixen aquests números,
 els nuclis 2.4 ignoraran qualsevol paràmetre restant i els nuclis 2.6
-produiran un pànic.
+produiran un pànic. <phrase condition="etch">Amb un nucli 2.6.9 o més nou,
+podeu usar 32 opcions de línia d'ordres i 32 opcions d'entorn.</phrase>
 
 </para>
 
@@ -162,8 +163,11 @@ disponible en el mitjà d'instal·lació predeterminat és el
 <term>BOOT_DEBUG</term>
 <listitem><para>
 
-Utilitzant aquest paràmetre d'arrencada induirà l'arrencada a mostrar
-més missatges.
+Establint aquest paràmetre d'arrencada a 2 induirà el procés d'arrencada
+de l'instal·lador a mostrar més missatges. Establint-lo a 3 farà
+disponible en punts estratègics del procés d'arrencada intèrprets de
+depuració (sortiu dels intèrprets per a continuar amb el procés
+d'arrencada).
 
 <variablelist>
 <varlistentry>
@@ -187,7 +191,7 @@ més missatges.
 
 Durant el procés d'arrencada s'executen diversos intèrprets d'ordres
 que permeten una depuració més detallada. Per continuar l'arrencada
-hareu de sortir de l'intèrpret d'ordres.
+haureu de sortir de l'intèrpret d'ordres.
 
 </para></listitem>
 </varlistentry>
@@ -220,7 +224,7 @@ en aquest dispositiu.
 
 Algunes arquitectures utilitzen el framebuffer del nucli per oferir
 la instal·lació en diferents idiomes. Si el framebuffer us provoca
-errors al sistema, podeu habilitar la característica utilitzant
+errors al sistema, podeu deshabilitar la característica utilitzant
 el paràmetre <userinput>debian-installer/framebuffer=false</userinput>.
 Els símptomes del problema són missatges d'error referents al
 bogl, una pantalla en blanc o que es quedi congelat durant uns quants
@@ -241,7 +245,17 @@ La problemàtica s'ha detectat a l'Amiga 1220 i SE/30.
 
 La problemàtica s'ha detectat a l'hppa.
 
-</para></listitem>
+</para><note arch="sparc"><para>
+
+Degut a problemes de visualització en alguns sistemes, el suport de
+framebuffer està <emphasis>desactivat de manera predeterminada</emphasis>
+per a &arch-title;. Això pot resultar en visualitzacions lletges
+en sistemes que suporten adequadament el framebuffer, com els que
+tenen targes gràfiques ATI. Si veieu problemes de visualització
+en l'instal·lador, podeu provar d'arrencar amb el paràmetre
+<userinput>debian-installer/framebuffer=true</userinput>.
+
+</para></note></listitem>
 </varlistentry>
 
 <varlistentry>
@@ -258,7 +272,7 @@ el podeu evitar seleccionant <userinput>false</userinput>.
 <term>netcfg/disable_dhcp</term>
 <listitem><para>
 
-El &d-i; procura, per defecte,  configurar la xarxa automàticament
+El &d-i; procura, per defecte, configurar la xarxa automàticament
 utilitzant el DHCP. Si la configuració es realitza correctament
 no podreu revisar-ne i modificar-ne els paràmetres obtinguts.
 L'accés a la configuració manual de la xarxa només es donarà
@@ -300,9 +314,32 @@ Per a més informació vegeu <xref linkend="automatic-install"/>.
 <term>preseed/file</term>
 <listitem><para>
 
-Especifica l'URL que enllaça a un fitxer de preconfiguració
+Especifica el camí que enllaça a un fitxer de preconfiguració
 a carregar per automatitzar la instal·lació. Per a més
 informació vegeu <xref linkend="automatic-install"/>
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="etch">
+<term>cdrom-detect/eject</term>
+<listitem><para>
+
+De manera predeterminada, abans de reiniciar, &d-i; expulsa
+automàticament els medis òptics emprats durant la instal·lació. Això
+pot ser innecessari si el sistema no arrenca automàticament del CD.
+En alguns casos pot ser fins i tot, no desitjat, per exemple si la
+unitat òptica no pot reinserir el medi per sí sola i l'usuari no
+està allà per a fer-ho manualment. Moltes unitats de tipus carrega
+per ranura, línia fina o caddy no poden recarregar el medi
+automàticament.
+
+</para><para>
+
+Establiu-ho a <userinput>false</userinput> per a deshabilitar
+l'expulsió automàtica i tingueu present que pot ser que hàgiu
+d'assegurar-vos que el sistema no arrenca automàticament de la
+unitat òptica després de la instal·lació inicial.
 
 </para></listitem>
 </varlistentry>
@@ -313,6 +350,17 @@ informació vegeu <xref linkend="automatic-install"/>
 
 Si utilitzeu un nucli 2.2.x, probablement haureu d'especificar
 la &ramdisksize;.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="etch">
+<term>rescue/enable</term>
+<listitem><para>
+
+Establiu-ho a <userinput>true</userinput> per entrar en mode
+de rescat en comptes de realitzar una instal·lació normal.
+Vegeu <xref linkend="rescue"/>.
 
 </para></listitem>
 </varlistentry>
