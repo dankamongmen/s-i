@@ -56,7 +56,10 @@ fi
 # participate.
 if in-target sh -c "$config debconf-apt-progress --from 10 --to 15 --logstderr -- apt-get -q -y -f install popularity-contest"; then
 	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
-		log-output -t pkgsel chroot /target dpkg --purge popularity-contest
+		# Skip the removal for now; cdebconf crashes when processing
+		# the PURGE command.
+		# log-output -t pkgsel chroot /target dpkg --purge popularity-contest
+		:
 	fi
 fi
 
