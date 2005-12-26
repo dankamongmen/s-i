@@ -255,9 +255,9 @@ BUILD_OK=""
 BUILD_FAIL=""
 for format in $formats ; do
     case "$language" in
-        el|ja|ko|zh_CN|zh_TW)
+        el|ja|ko|vi|zh_CN|zh_TW)
             if [ "$format" = "pdf" -o "$format" = "ps" ] ; then
-                echo "Warning: pdf and ps formats are currently not supported for Chinese, Greek, Japanese and Korean"
+                echo "Warning: pdf and ps formats are currently not supported for Chinese, Greek, Japanese, Korean and Vietnamese"
                 BUILD_SKIP="$BUILD_SKIP $format"
                 continue
             fi
