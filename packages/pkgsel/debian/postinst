@@ -6,6 +6,8 @@ set -e
 LANG=C
 export LANG
 
+DIVERTS='/usr/bin/scrollkeeper-update /usr/bin/scrollkeeper-rebuilddb'
+
 cleanup () {
 	# If X was not installed, remove the hardware detection programs.
 	if ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
@@ -13,11 +15,11 @@ cleanup () {
 		log-output -t pkgsel chroot /target dpkg --purge read-edid mdetect
 	fi
 
-	rm -f /target/usr/bin/scrollkeeper-update /target/usr/bin/scrollkeeper-rebuilddb
-	log-output -t pkgsel chroot /target dpkg-divert --package pkgsel \
-		--rename --quiet --remove /usr/bin/scrollkeeper-update
-	log-output -t pkgsel chroot /target dpkg-divert --package pkgsel \
-		--rename --quiet --remove /usr/bin/scrollkeeper-rebuilddb
+	for divert in $DIVERTS; do
+		rm -f "/target$divert"
+		log-output -t pkgsel chroot /target dpkg-divert \
+			--package pkgsel --rename --quiet --remove "$divert"
+	done
 }
 
 db_progress START 0 100 debian-installer/pkgsel/title
@@ -29,12 +31,11 @@ debconf-copydb -p \
 	configdb target_configdb
 
 # scrollkeeper takes forever, so divert it for the duration
-log-output -t pkgsel chroot /target dpkg-divert --package pkgsel --rename \
-	--quiet --add /usr/bin/scrollkeeper-update
-log-output -t pkgsel chroot /target dpkg-divert --package pkgsel --rename \
-	--quiet --add /usr/bin/scrollkeeper-rebuilddb
-ln -sf /bin/true /target/usr/bin/scrollkeeper-update
-ln -sf /bin/true /target/usr/bin/scrollkeeper-rebuilddb
+for divert in $DIVERTS; do
+	log-output -t pkgsel chroot /target dpkg-divert --package pkgsel \
+		--rename --quiet --add "$divert"
+	ln -sf /bin/true "/target$divert"
+done
 
 # get debconf-apt-progress config, which will make it run properly later
 config=$(chroot /target debconf-apt-progress --config| sed "s/$/;/")
