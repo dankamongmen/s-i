@@ -252,6 +252,7 @@ static int question_db_disownall(struct question_db *db, const char *owner)
 	while ((q = db->methods.iterate(db, &iter)))
 	{
 		db->methods.disown(db, q->tag, owner);
+		question_deref(q);
 	}
 	return 0;
 }
