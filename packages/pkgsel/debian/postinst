@@ -12,7 +12,7 @@ cleanup () {
 	# If X was not installed, remove the hardware detection programs.
 	if ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
 	then
-		in-target sh -c "$config debconf-apt-progress --from 100 --to 100 --logstderr -- apt-get -q -y -f --purge remove read-edid mdetect"
+		in-target dpkg --purge read-edid mdetect
 	fi
 
 	for divert in $DIVERTS; do
@@ -56,7 +56,7 @@ fi
 # participate.
 if in-target sh -c "$config debconf-apt-progress --from 10 --to 15 --logstderr -- apt-get -q -y -f install popularity-contest"; then
 	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
-		in-target sh -c "$config debconf-apt-progress --from 15 --to 15 --logstderr -- apt-get -q -y -f --purge remove popularity-contest"
+		in-target dpkg --purge popularity-contest
 	fi
 fi
 
@@ -72,9 +72,12 @@ if [ "$ret" != 0 ]; then
 fi
 
 db_progress INFO pkgsel/progress/cleanup
+cleanup
+db_progress STEP 2
+
 if [ -x /target/usr/bin/scrollkeeper-update ]; then
 	log-output -t pkgsel chroot /target scrollkeeper-update -q || true
 fi
+
 db_progress STEP 3
-cleanup
 db_progress STOP
