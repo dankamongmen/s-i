@@ -46,8 +46,8 @@ KEY_FINGERPRINT=$(ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' ')
 
 /usr/sbin/sshd
 
-# Queue installation of network-console-config
-apt-install network-console-config || true
+# Queue installation of ssh to make sure we can log in after reboot
+apt-install ssh || true
 
 db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
 db_input critical $TEMPLATE_ROOT/start || true
