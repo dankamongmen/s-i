@@ -24,16 +24,6 @@ SUPPORTEDLOCALES=/etc/SUPPORTED-short
 SHORTLISTS=/etc/shortlists
 LANGUAGELISTFILE=/usr/share/languagelist
 
-# This function installs a package (or marks it for install)
-# without failing if the install fails
-# It outputs a message to the log file
-pkginstall() {
-	if [ -n "$1" ] ; then
-		apt-install $1 || true
-		log "Requesting installation of package $1"
-	fi
-}
-
 error() {
 	logger -t localechooser "error: $@"
 	exit 1
