@@ -27,12 +27,6 @@ setpassword () {
 	SETPASSWD_PW="$2"
 	export SETPASSWD_PW
 
-	# This is very annoying. chpasswd cannot handle generating md5
-	# passwords as it is not PAM-aware. Thus, I have to work around
-	# that by crypting the password myself if md5 is used.
-	USE_MD5=1
-	export USE_MD5
-
         if [ "$3" = true ]; then
                 PRECRYPTED=1
         else
@@ -40,35 +34,11 @@ setpassword () {
         fi
         export PRECRYPTED
         $chroot $ROOT perl -e '
-		sub CreateCryptSalt {
-			my $md5 = shift;
-
-			my @valid = split(//, "./0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-			my ($in, $out);
-
-			my $cryptsaltlen = ($md5 ? 8 : 2);
-
-			open (F, "</dev/urandom") || die "No /dev/urandom found!";
-			foreach (1..$cryptsaltlen) {
-				read(F, $in, 1);
-				$out .= $valid[ord($in) % ($#valid + 1)];
-			}
-			close F;
-			return ($md5 ? "\$1\$$out\$" : $out);
-		}
-	
-		open(P,"| chpasswd -e");
-                if ($ENV{PRECRYPTED}) {
-                        print P shift().":$ENV{SETPASSWD_PW}\n";
-                } else {
-                        print P shift().":".
-                                crypt($ENV{SETPASSWD_PW}, CreateCryptSalt($ENV{USE_MD5})).
-                                "\n";
-                }
+		open(P,"| chpasswd ".($ENV{PRECRYPTED} ? "-e " : "")." -m");
+                print P shift().":$ENV{SETPASSWD_PW}\n";
 		close P;
         ' "$1"
 	SETPASSWD_PW=''
-	USE_MD5=''
         PRECRYPTED=''
 }
 
