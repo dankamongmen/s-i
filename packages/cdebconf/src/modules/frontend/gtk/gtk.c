@@ -385,7 +385,7 @@ void check_toggled_callback (GtkWidget *toggle, gpointer data)
     struct question *q = (struct question*)data;
     gboolean value;
 
-    INFO(INFO_DEBUG, "GTK_DI - check_toggled_callback() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - check_toggled_callback() called"); */
     value = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(toggle));
     bool_setter (toggle, q);
 }
@@ -396,7 +396,7 @@ void boolean_single_callback(GtkWidget *button, struct frontend_question_data* d
     struct question *q = data->q;
     char *ret;
 
-    INFO(INFO_DEBUG, "GTK_DI - boolean_single_callback() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - boolean_single_callback() called"); */
     ret = (char*) gtk_object_get_user_data(GTK_OBJECT(button));
     question_setvalue(q, ret);
     free(ret);
@@ -486,7 +486,7 @@ static gboolean key_press_event( GtkWidget *widget, GdkEvent  *event, struct fro
     struct question *q = obj->questions;
     
     if ( (key->keyval  == GDK_Escape) && (obj->methods.can_go_back(obj, q)) ) {
-        INFO(INFO_DEBUG, "GTK_DI - ESC key pressed\n");
+        /* INFO(INFO_DEBUG, "GTK_DI - ESC key pressed\n"); */
         gtk_button_clicked ( GTK_BUTTON(data->button_prev) );
     }
 
@@ -501,7 +501,7 @@ void exit_button_callback(GtkWidget *button, struct frontend* obj)
     ret = gtk_object_get_user_data(GTK_OBJECT(button));
     value = *(int*) ret;
 
-    INFO(INFO_DEBUG, "GTK_DI - exit_button_callback() called, value: %d", value);
+    /* INFO(INFO_DEBUG, "GTK_DI - exit_button_callback() called, value: %d", value); */
 
     ((struct frontend_data*)obj->data)->button_val = value;
 
@@ -518,7 +518,7 @@ gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *m
     gchar *name;
     GtkTreeIter iter;
 
-    INFO(INFO_DEBUG, "GTK_DI - gboolean select_treeview_callback() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gboolean select_treeview_callback() called"); */
 
     count = strgetargc(q_get_choices_vals(q));
     if (count <= 0)
@@ -663,7 +663,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_boolean_multiple() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_boolean_multiple() called"); */
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -906,7 +906,7 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 {
     GtkWidget *hpadbox, *vpadbox, *description_box;
 
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_note() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_note() called"); */
 
     description_box = display_descriptions(q);
 
@@ -929,8 +929,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     GtkWidget *description_box, *entry, *hpadbox, *vpadbox;
     struct frontend_question_data *data;
 
-
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_password() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_password() called"); */
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -979,7 +978,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     GtkTreeSelection    *selection;
     GtkTreePath         *path;
 
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_list() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_list() called"); */
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -1082,7 +1081,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
     GtkTreeSelection    *selection;
     GtkTreePath         *path;
 	
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_store() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_store() called"); */
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -1226,7 +1225,6 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
 
     for (i = 0; i < count; i++)
     {
-        /* steal memory */
         items = g_list_append (items, choices_translated[i]);
         /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_multiple(\"%s\")", choices_translated[i]); */
     }
@@ -1282,7 +1280,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 
-    INFO(INFO_DEBUG, "GTK_DI - gtkhandler_string() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_string() called"); */
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -1443,7 +1441,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     name[0] = strdup("debconf");
     name[1] = NULL;
 
-    INFO(INFO_DEBUG, "GTK_DI - gtk_initialize() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtk_initialize() called"); */
     obj->data = NEW(struct frontend_data);
     obj->interactive = 1;
 
@@ -1524,7 +1522,7 @@ static int gtk_go(struct frontend *obj)
     while (q != NULL)
     {
         j++;
-        INFO(INFO_DEBUG, "GTK_DI - question %d: %s (type %s)", j, q->tag, q->template->type);
+        /* INFO(INFO_DEBUG, "GTK_DI - question %d: %s (type %s)", j, q->tag, q->template->type); */
         for (i = 0; i < DIM(question_handlers); i++)
         {
             gtk_handler *handler;
@@ -1629,7 +1627,7 @@ static void gtk_set_title(struct frontend *obj, const char *title)
     GtkWidget *label_title;
     char *label_title_string;
 
-    INFO(INFO_DEBUG, "GTK_DI - gtk_set_title() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtk_set_title() called"); */
 
     label_title = ((struct frontend_data*) obj->data)->title;
     gtk_misc_set_alignment(GTK_MISC(label_title), 0, 0);
@@ -1660,7 +1658,7 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     obj->progress_max = max;
     obj->progress_cur = min;
 
-    INFO(INFO_DEBUG, "GTK_DI - gtk_progress_start(min=%d, max=%d, title=%s) called", min, max, title);
+    /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_start(min=%d, max=%d, title=%s) called", min, max, title); */
 
     while (gtk_events_pending ())
         gtk_main_iteration ();
@@ -1673,7 +1671,7 @@ static void gtk_progress_set(struct frontend *obj, int val)
     struct frontend_data *data = (struct frontend_data *) obj->data;
     gtk_widget_set_sensitive (data->button_screenshot, FALSE);
 
-    INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val);
+    /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val); */
 
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
     gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);
@@ -1699,7 +1697,7 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
     struct frontend_data *data = (struct frontend_data *) obj->data;
     gtk_widget_set_sensitive (data->button_screenshot, FALSE);
 
-    INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info);
+    /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info); */
 
     progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
     progress_bar_label_string = malloc(strlen(info) + 11 );
@@ -1715,7 +1713,7 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 
 static void gtk_progress_stop(struct frontend *obj)
 {
-    INFO(INFO_DEBUG, "GTK_DI - gtk_progress_stop() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_stop() called"); */
 
     gtk_widget_hide( ((struct frontend_data*)obj->data)->progress_bar_box );
 
@@ -1725,7 +1723,7 @@ static void gtk_progress_stop(struct frontend *obj)
 
 static unsigned long gtk_query_capability(struct frontend *f)
 {
-    INFO(INFO_DEBUG, "GTK_DI - gtk_query_capability() called");
+    /* INFO(INFO_DEBUG, "GTK_DI - gtk_query_capability() called"); */
     return DCF_CAPB_BACKUP;
 }
 
