@@ -64,6 +64,9 @@ db_progress INFO pkgsel/progress/tasksel
 ret=0
 in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 15 --to 95 --logstderr'" || ret=$?
 if [ "$ret" != 0 ]; then
+	# In case packages failed to install, try to clean up.
+	in-target dpkg --configure -a || true
+	
 	# TODO useful error message here (for ret != 30)
 	db_progress INFO pkgsel/progress/cleanup
 	cleanup
