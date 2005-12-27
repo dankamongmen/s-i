@@ -8,16 +8,7 @@ install-network-console:
 	install -d $(DESTDIR)/bin
 	install -m755 gen-crypt network-console network-console-menu $(DESTDIR)/bin
 	install -d $(DESTDIR)/etc/ssh
-	install -m644 sshd_config sshd_config_target $(DESTDIR)/etc/ssh
-	install -d $(DESTDIR)/usr/lib/prebaseconfig.d/
-	install -m755 prebaseconfig $(DESTDIR)/usr/lib/prebaseconfig.d/80prepare-network-console
-
-install-network-console-config:
-	install -d $(DESTDIR)/usr/lib/base-config/menu
-	install -m755 base-config $(DESTDIR)/usr/lib/base-config/menu/network-console
-	install -m644 base-config.mnu $(DESTDIR)/usr/lib/base-config/menu/network-console.mnu
-	install -d $(DESTDIR)/usr/sbin
-	install -m755 base-config-network-console $(DESTDIR)/usr/sbin
+	install -m644 sshd_config $(DESTDIR)/etc/ssh
 
 clean:
 	rm -f gen-crypt

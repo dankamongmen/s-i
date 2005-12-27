@@ -21,11 +21,6 @@ clean:
 	dh_clean
 
 install-indep:
-	dh_testdir
-	dh_testroot
-	dh_clean -k -i
-
-	$(MAKE) install-network-console-config DESTDIR=$(CURDIR)/debian/network-console-config
 
 install-arch:
 	dh_testdir
@@ -36,18 +31,6 @@ install-arch:
 
 # Build architecture-independent files here.
 binary-indep: build install-indep
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs -i
-	dh_installdebconf -i
-	dh_installdocs -i
-	dh_link -i
-	dh_strip -i
-	dh_compress -i
-	dh_fixperms -i
-	dh_installdeb -i
-	dh_gencontrol -i
-	dh_builddeb -i
 
 # Build architecture-dependent files here.
 binary-arch: build install-arch
