@@ -1,41 +1,42 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 27345 untranslated -->
+<!-- original version: 27345 -->
 
    <sect3 arch="powerpc">
-   <title>USB stick partitioning on &arch-title;</title>
+   <title>Particionament de dispositius USB a &arch-title;</title>
 <para>
 
-Most USB sticks do not come pre-configured in such a way that Open
-Firmware can boot from them, so you will need to repartition the stick.
-On Mac systems, run <userinput>mac-fdisk /dev/sda</userinput>,
-initialise a new partition map using the <userinput>i</userinput>
-command, and create a new partition of type Apple_Bootstrap using the
-<userinput>C</userinput> command. (Note that the first "partition" will
-always be the partition map itself.) Then type
+La major part dels dispositius USB no venen preconfigurats de manera
+que l'Open Firmware pugui arrencar des d'ell, així que necessitareu
+reparticionar el dispositiu. Als sistemes Mac, executeu
+<userinput>mac-fdisk /dev/sda</userinput>, i inicieu la nova taula
+de particions utilitzant l'ordre <userinput>i</userinput>, i creeu una
+nova partició de tipus Apple_Bootstrap utilitzant l'ordre
+<userinput>C</userinput> . (Adoneu-vos que la primera "partició" serà
+sempre la taula de particions.) Aleshores escriviu
 
 <informalexample><screen>
 $ hformat /dev/<replaceable>sda2</replaceable>
 </screen></informalexample>
 
-Take care that you use the correct device name for your USB stick. The
-<command>hformat</command> command is contained in the
-<classname>hfsutils</classname> Debian package.
+Aneu en compte de utilitzar en nom del dispositiu correcte al vostre USB.
+L'ordre <command>hformat</command> la podeu trobar al paquet de Debian
+<classname>hfsutils</classname> .
 
 </para><para>
 
-In order to start the kernel after booting from the USB stick, we will
-put a boot loader on the stick. The <command>yaboot</command> boot
-loader can be installed on an HFS filesystem and can be reconfigured by
-just editing a text file. Any operating system which supports the HFS
-file system can be used to make changes to the configuration of the boot
-loader.
+Per iniciar el nucli desprès d'arrancar des del dispositiu USB, afegirem un
+carregador de l'arrencada al dispositiu. El carregador de l'arrancada
+<command>yaboot</command> es pot instal·lar al sistema de fitxers HFS i es
+pot reconfigurar editant tan sols un fitxer de text. Qualsevol sistema
+operatiu que suporte el sistema de fitxer HFS es pot utilitzar per fer
+els canvis a la configuració del carregador de l'arrancada.
 
 </para><para>
 
-The normal <command>ybin</command> tool that comes with
-<command>yaboot</command> does not yet understand USB storage devices,
-so you will have to install <command>yaboot</command> by hand using the
-<classname>hfsutils</classname> tools. Type
+L'eina normal <command>ybin</command> que ve amb <command>yaboot</command>
+no pot utilitzar dispositius d'emmagatzemament USB, així que haureu
+d'instal·lar <command>yaboot</command> manualment utilitzant les eines de
+<classname>hfsutils</classname>. Escriviu
 
 <informalexample><screen>
 $ hmount /dev/sda2
@@ -45,50 +46,50 @@ $ hattrib -b :
 $ humount
 </screen></informalexample>
 
-Again, take care that you use the correct device name. The partition
-must not be otherwise mounted during this procedure. This procedure
-writes the boot loader to the partition, and uses the HFS utilities to
-mark it in such a way that Open Firmware will boot it. Having done this,
-the rest of the USB stick may be prepared using the normal Unix
-utilities.
+Altra vegada, aneu en compte d'utilitzar el nom de dispositiu correcte.
+La partició no s'hauria de muntar en aquest procediment. Aquest procediment
+escriu el carregador de l'arrancada a la partició, i fa ús de les utilitats
+HFS per marcar-la de manera que l'Open Firmware la pugui arrancar. Fent
+açò, la resta del dispositiu USB es podria preparar per fer ús de les
+utilitats Unix normals.
 
 </para><para>
 
-Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and
-copy the following files from the Debian archives to the stick:
+Munteu la partició (<userinput>mount /dev/sda2 /mnt</userinput>) i copieu
+els arxius següents des dels arxius de Debian a l'USB:
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinux</filename> (kernel binary)
+<filename>vmlinux</filename> (binari del nucli)
 
 </para></listitem>
 <listitem><para>
 
-<filename>initrd.gz</filename> (initial ramdisk image)
+<filename>initrd.gz</filename> (imatge inicial del disc RAM)
 
 </para></listitem>
 <listitem><para>
 
-<filename>yaboot.conf</filename> (yaboot configuration file)
+<filename>yaboot.conf</filename> (fitxer de configuració del yaboot)
 
 </para></listitem>
 <listitem><para>
 
-<filename>boot.msg</filename> (optional boot message)
+<filename>boot.msg</filename> (missatge opcional d'arranc)
 
 </para></listitem>
 <listitem><para>
 
-Optional kernel modules
+Mòduls de nucli opcionals
 
 </para></listitem>
 </itemizedlist>
 
 </para><para>
 
-The <filename>yaboot.conf</filename> configuration file should
-contain the following lines:
+El fitxer de configuració de <filename>yaboot.conf</filename> hauria de
+contenir les línies següents:
 
 <informalexample><screen>
 default=install
@@ -104,8 +105,8 @@ image=/vmlinux
         read-only
 </screen></informalexample>
 
-Please note that the <userinput>initrd-size</userinput> parameter
-may need to be increased, depending on the image you are booting.
+Adoneu-vos que el paràmetre <userinput>initrd-size</userinput> es podria
+incrementar, depenent de la imatge que esteu arrancant.
 
 </para>
    </sect3>
