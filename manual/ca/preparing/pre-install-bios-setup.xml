@@ -1,17 +1,18 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 28997 -->
 
  <sect1 id="pre-install-bios-setup">
- <title>Pre-Installation Hardware and Operating System Setup</title>
+ <title>Configuració del maquinari i del sistema operatiu prèvia a la instal·lació</title>
 <para>
 
-This section will walk you through pre-installation hardware setup, if
-any, that you will need to do prior to installing Debian.  Generally,
-this involves checking and possibly changing firmware settings for
-your system.  The <quote>firmware</quote> is the core software used by the
-hardware; it is most critically invoked during the bootstrap process
-(after power-up). Known hardware issues affecting the reliability of
-&debian; on your system are also highlighted.
+Aquesta secció explica el procés de configuració prèvia a la
+instal·lació del maquinari, si s'escau, que cal fer abans d'instal·lar
+la Debian. Normalment es tracta de fer comprovacions dels ajusts del
+firmware del sistema, i de vegades de canviar-los. El <quote>firmware</quote>
+és el programari bàsic emprat pel maquinari; és absolutament necessari
+durant el procés d'arrencada (després d'engegar l'ordinador). Els problemes
+de maquinari coneguts que afecten la fiabilitat de &debian; en el vostre
+sistema també s'indiquen.
 
 </para>
 
@@ -21,129 +22,132 @@ hardware; it is most critically invoked during the bootstrap process
 &bios-setup-sparc.xml;
 &bios-setup-s390.xml;
 
-  <sect2><title>Hardware Issues to Watch Out For</title>
+  <sect2><title>Aspectes del maquinari que cal tenir en compte</title>
 <para arch="not-s390">
 
-Many people have tried operating their 90 MHz CPU at 100 MHz, etc.  It
-sometimes works, but is sensitive to temperature and other factors and
-can actually damage your system. One of the authors of this document
-over-clocked his own system for a year, and then the system started
-aborting the <command>gcc</command> program with an unexpected signal
-while it was compiling the operating system kernel. Turning the CPU
-speed back down to its rated value solved the problem.
+Molta gent ha provat de fer funcionar llurs CPU de 90 MHz a 100 MHz, etc.
+Això funciona de vegades, però n'afecta la temperatura i altres factors, i
+pot espatllar realment el vostre sistema. Un dels autors d'aquest document
+va forçar durant un any la freqüència de treball del seu sistema, i
+després, en iniciar-se aquest, el programa <command>gcc</command>
+s'avortava amb un senyal inesperat mentre es compilava el nucli del
+sistema operatiu. En tornar a baixar la freqüència de la CPU al nivell
+recomanat va desaparèixer el problema.
 
 </para><para arch="not-s390">
 
-The <command>gcc</command> compiler is often the first thing to die
-from bad memory modules (or other hardware problems that change data
-unpredictably) because it builds huge data structures that it
-traverses repeatedly.  An error in these data structures will cause it
-to execute an illegal instruction or access a non-existent
-address. The symptom of this will be <command>gcc</command> dying from
-an unexpected signal.
+El compilador <command>gcc</command> és sovint el primer element que no
+funciona a causa del mal estat dels mòduls de memòria (o d'altres problemes
+de maquinari que modifiquen les dades de manera indeterminable) ja que
+construeix estructures de dades enormes i les recorre de manera repetida. Un
+error en aquestes estructures farà que s'execute una instrucció il·legal o
+que s'accedisca a una adreça inexistent. Símptoma d'això és l'acabament
+del <command>gcc</command> amb un senyal inesperat.
 
 </para><para arch="m68k">
 
-Atari TT RAM boards are notorious for RAM problems under Linux; if you
-encounter any strange problems, try running at least the kernel in
-ST-RAM.  Amiga users may need to exclude RAM using a booter memfile.
+Els problemes de les plaques RAM Atari TT amb el Linux són coneguts; si
+hi teniu cap problema estrany, proveu d'executar, si més no, el nucli en
+una ST-RAM. Els usuaris d'Amiga potser hagen de descartar RAM fent servir
+un fitxer de memòria per a l'arrencador.
 
 <phrase condition="FIXME"><emphasis>
 
-FIXME: more description of this needed.
+FIXME: cal més descripció sobre això.
 
 </emphasis></phrase>
 
 </para><para arch="i386">
 
-The very best motherboards support parity RAM and will actually tell
-you if your system has a single-bit error in RAM. Unfortunately, they
-don't have a way to fix the error, thus they generally crash
-immediately after they tell you about the bad RAM. Still, it's better
-to be told you have bad memory than to have it silently insert errors
-in your data. Thus, the best systems have motherboards that support
-parity and true-parity memory modules; see
+Les millors plaques base permeten l'ús de RAM de paritat, que us indicaran
+si aquesta té un error fins i toten un únic bit. Tanmateix, no poden
+arreglar-lo, per tant solen trencar-se tot just després d'informar-hi.
+Amb tot, és millor saber que la memòria està malament que no pas patir
+sense cap avís errors a les vostres dades. Els millors sistemes tenen
+plaques base que permeten l'ús de mòduls de memòria de paritat i de paritat
+real; vegeu
 <xref linkend="Parity-RAM"/>.
 
 </para><para arch="i386">
 
-If you do have true-parity RAM and your motherboard can handle it, be
-sure to enable any BIOS settings that cause the motherboard to
-interrupt on memory parity errors.
+Si teniu RAM de paritat real i la placa base la pot fer servir, no dubteu a
+habilitar els ajusts de la BIOS que interrompen el funcionament de la placa
+quan es detecten errors de paritat de la memòria.
 
 </para>
 
-   <sect3 arch="i386"><title>The Turbo Switch</title>
+   <sect3 arch="i386"><title>El commutador turbo</title>
 <para>
 
-Many systems have a <emphasis>turbo</emphasis> switch that controls
-the speed of the CPU.  Select the high-speed setting. If your BIOS
-allows you to disable software control of the turbo switch (or
-software control of CPU speed), do so and lock the system in
-high-speed mode. We have one report that on a particular system, while
-Linux is auto-probing (looking for hardware devices) it can
-accidentally touch the software control for the turbo switch.
-
-</para>
-   </sect3>
-
-   <sect3 arch="i386"><title>Cyrix CPUs and Floppy Disk Errors</title>
-<para>
-
-Many users of Cyrix CPUs have had to disable the cache in their
-systems during installation, because the floppy disk has errors if
-they do not.  If you have to do this, be sure to re-enable your cache
-when you are finished with installation, as the system runs
-<emphasis>much</emphasis> slower with the cache disabled.
-
-</para><para>
-
-We don't think this is necessarily the fault of the Cyrix CPU. It may
-be something that Linux can work around. We'll continue to look into
-the problem.  For the technically curious, we suspect a problem with
-the cache being invalid after a switch from 16-bit to 32-bit code.
+Molts sistemes tenen un commutador <emphasis>turbo</emphasis> que controla
+la freqüència de la CPU. Seleccioneu-ne un valor alt. Si la BIOS ho permet,
+deshabiliteu el control per programari del commutador (o el control per
+programari de la freqüència de la CPU) i fixeu el sistema en mode de
+velocitat alta. Hi ha un informe segons el qual en un determinat sistema,
+mentre Linux està fent comprovacions automàtiques (cercant dispositius de
+maquinari) pot manipular el programari de control del commutador turbo.
 
 </para>
    </sect3>
 
-   <sect3 arch="i386"><title>Peripheral Hardware Settings</title>
+   <sect3 arch="i386"><title>Les CPU Cyrix i els errors de disquet</title>
 <para>
 
-You may have to change some settings or jumpers on your computer's
-peripheral cards.  Some cards have setup menus, while others rely on
-jumpers.  This document cannot hope to provide complete information on
-every hardware device; what it hopes to provide is useful tips.
+Molts usuaris de CPU Cyrix han hagut de deshabilitar la memòria cau de llurs
+sistemes durant la instal·lació, ja que si no ho fan el disquet els dóna
+errors. Si heu de fer això, assegureu-vos de tornar a habilitar la memòria
+cau quan hàgeu acabat la instal·lació, car el sistema funciona
+<emphasis>molt més</emphasis> lentament amb la memòria cau deshabilitada.
 
 </para><para>
 
-If any cards provide <quote>mapped memory</quote>, the memory should be
-mapped somewhere between 0xA0000 and 0xFFFFF (from 640K to just below 1
-megabyte) or at an address at least 1 megabyte greater than the total
-amount of RAM in your system.
+Això no és necessàriament problema de la CPU Cyrix. Potser és un problema
+que el Linux pot superar. Continuarem examinant-lo. Per als qui hi tenen
+curiositat, tenim la sospita que la memòria cau no és vàlida després de
+commutar del codi 16 bits al de 32.
+
+</para>
+   </sect3>
+
+   <sect3 arch="i386"><title>Configuració dels perifèrics</title>
+<para>
+
+Potser hàgeu de canviar alguns ajusts o ponts de les targetes dels perifèrics
+del vostre ordinador. Algunes tenen menús de configuració, mentre que d'altres
+es basen en ponts. Aquest document no pot proporcionar informació completa
+sobre cada dispositiu de maquinari; pretén en canvi donar-hi consells útils.
+
+</para><para>
+
+Si alguna targeta té <quote>mapped memory</quote>, the memory should be
+mapped somewhere between 0xA0000 and 0xFFFFF (de 640 KiB a to just per sota
+d'1 MiB) or at an adreça superior en almenys 1 MiB a la quantitat total de
+RAM del sistema.
 
 </para>
    </sect3>
 
    <sect3 arch="i386" id="usb-keyboard-config">
-   <title>USB BIOS support and keyboards</title>
+   <title>Funcionalitats USB de la BIOS i teclats</title>
 <para>
 
-If you have no AT-style keyboard and only a USB model, you may need
-to enable legacy AT keyboard emulation in your BIOS setup. Only do this if
-the installation system fails to use your keyboard in USB mode. Conversely,
-for some systems (especially laptops) you may need to disable legacy USB
-support if your keyboard does not respond.
-Consult your main board manual and look in the BIOS for <quote>Legacy
-keyboard emulation</quote> or <quote>USB keyboard support</quote> options.
+Si en lloc d'un teclat de tipus AT teniu un model USB, potser hàgeu
+d'habilitar l'emulació antiga de teclats AT en la configuració de la BIOS.
+Feu això només si el sistema d'instal·lació no pot fer funcionar el teclat
+en mode USB. Recíprocament, en alguns sistemes (especialment en els
+portàtils) potser hàgeu de deshabilitar el suport antic d'USB si el teclat
+no respon. Consulteu el manual de la placa base i cerqueu, a la BIOS, les
+opcions <quote>Legacy keyboard emulation</quote> o
+<quote>USB keyboard support</quote>.
 
 </para>
    </sect3>
 
-   <sect3><title>More than 64 MB RAM</title>
+   <sect3><title>Més de 64 MiB de RAM</title>
 <para>
 
-The Linux Kernel cannot always detect what amount of RAM you have.  If
-this is the case please look at <xref linkend="boot-parms"/>.
+El nucli del Linux no sempre pot detectar la quantitat de RAM. Si és aquest
+el cas vegeu <xref linkend="boot-parms"/>.
 
 </para>
    </sect3>

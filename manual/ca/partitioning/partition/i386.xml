@@ -1,94 +1,93 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31618 untranslated -->
+<!-- original version: 31618 -->
 
 
-  <sect2 arch="i386"><title>Partitioning for &arch-title;</title>
+  <sect2 arch="i386"><title>Particionat per a &arch-title;</title>
 <para>
 
-If you have an existing other operating system such as DOS or Windows and
-you want to preserve that operating system while installing Debian, you may
-need to resize its partition to free up space for the Debian installation.
-The installer supports resizing of both FAT and NTFS filesystems; when you
-get to the installer's partitioning step, select the option to partition
-manually and then simply select an existing partition and change its size.
+Si teniu instal·lat un altre sistema operatiu com el DOS o el Windows i
+voleu conservar-lo, potser hàgeu de redimensionar-ne la partició a fi
+d'alliberar espai per a la instal·lació de la Debian. L'instal·lador pot
+redimensionar tant els sistemes de fitxers FAT com els NTFS; quan arribeu
+al moment de particionar, escolliu l'opció de particionar manualment i
+només cal que seleccioneu una partició existent i li canvieu la mida.
 
 </para><para>
 
-The PC BIOS generally adds additional constraints for disk
-partitioning.  There is a limit to how many <quote>primary</quote> and
-<quote>logical</quote> partitions a drive can contain.  Additionally, with pre
-1994&ndash;98 BIOSes, there are limits to where on the drive the BIOS can boot
-from.  More information can be found in the
-<ulink url="&url-partition-howto;">Linux Partition HOWTO</ulink> and the
-<ulink url="&url-phoenix-bios-faq-large-disk;">Phoenix BIOS FAQ</ulink>, but
-this section will include a brief overview to help you plan most situations.
+Normalment, la BIOS del PC posa limitacions al particionat del disc.
+El nombre de particions <quote>primàries</quote> i <quote>lògiques</quote>
+que pot contenir una unitat és limitat. A més a més, les BIOS anteriors a
+1994&ndash;98 tenen límits quant al lloc de la unitat des del qual es pot
+arrencar.  Hi ha més informació al
+<ulink url="&url-partition-howto;">Linux Partition HOWTO</ulink> i el
+<ulink url="&url-phoenix-bios-faq-large-disk;">Phoenix BIOS FAQ</ulink>,
+però aquesta secció inclou també un breu resum, útil en la majoria de
+situacions.
 
 </para><para>
 
-<quote>Primary</quote> partitions are the original partitioning scheme for PC
-disks.  However, there can only be four of them.  To get past this
-limitation, <quote>extended</quote> and <quote>logical</quote> partitions were invented.  By
-setting one of your primary partitions as an extended partition, you
-can subdivide all the space allocated to that partition into logical
-partitions.  You can create up to 60 logical partitions per extended
-partition; however, you can only have one extended partition per
-drive.
+Les particions <quote>primàries</quote> constitueixen l'esquema original
+de particionat dels discs de PC. Tanmateix, només n'hi pot haver quatre.
+Per evitar això, es van inventar les particions <quote>estesa</quote> i
+<quote>lògica</quote>. Si configureu una partició primària com a estesa,
+podeu subdividir-ne l'espai en particions lògiques. Es poden crear fins a
+60 particions lògiques per partició estesa; amb tot, sols podeu tenir una
+partició estesa per cada unitat física.
 
 </para><para>
 
-Linux limits the partitions per drive to 15 partitions for SCSI disks
-(3 usable primary partitions, 12 logical partitions), and 63
-partitions on an IDE drive (3 usable primary partitions, 60 logical
-partitions). However the normal &debian; system provides
-only 20 devices for partitions, so you may not install on partitions
-higher than 20 unless you first manually create devices for those
-partitions.
+El Linux limita les particions per unitat física a 15 en discs SCSI
+(3 de primàries, 12 de lògiques), i a 63 en una unitat IDE (3 de
+primàries, 60 de lògiques). Tanmateix el sistema &debian; normal sols
+proporciona 20 dispositius per a particions, de manera que no podreu
+instal·lar-ne més de 20 si abans no creeu manualment dispositius per
+a elles.
 
 </para><para>
 
-If you have a large IDE disk, and are using neither LBA addressing,
-nor overlay drivers (sometimes provided by hard disk manufacturers),
-then the boot partition (the partition containing your kernel image)
-must be placed within the first 1024 cylinders of your hard drive
-(usually around 524 megabytes, without BIOS translation).
+Si teniu un disc IDE gran i no esteu fent servir ni l'adreçament LBA
+ni controladors superposats (de vegades proporcionats pels fabricants),
+aleshores la partició d'arrencada (la que conté la imatge del nucli)
+s'ha de col·locar dins els primers 1024 cilindres del disc (normalment
+uns 524 megabytes, sense traducció de la BIOS).
 
 </para><para>
 
-This restriction doesn't apply if you have a BIOS newer than around
-1995&ndash;98 (depending on the manufacturer) that supports the <quote>Enhanced
-Disk Drive Support Specification</quote>.  Both Lilo, the Linux loader, and
-Debian's alternative <command>mbr</command> must use the BIOS to read the
-kernel from the disk into RAM.  If the BIOS int 0x13 large disk access
-extensions are found to be present, they will be utilized. Otherwise,
-the legacy disk access interface is used as a fall-back, and it cannot
-be used to address any location on the disk higher than the 1023rd
-cylinder.  Once Linux is booted, no matter what BIOS your computer
-has, these restrictions no longer apply, since Linux does not use the
-BIOS for disk access.
+Aquesta restricció no s'aplica si la BIOS és posterior a 1995&ndash;98
+(segons el fabricant) i conté l'<quote>Especificació de funcionalitat
+millorada d'unitats de disc</quote>. Tant el Lilo, el carregador del
+Linux, com l'<command>mbr</command>, l'alternativa de Debian, han d'emprar
+la BIOS per traslladar el nucli del disc a la RAM. Si es troben a la BIOS
+les extensions int 0x13 d'accés a discs grans, s'empraran. Si no, es farà
+servir la interfície antiga d'accés al disc, i no es podrà emprar per
+adreçar-se a cap lloc del disc superior al cilindre 1023è. Una vegada
+s'ha arrencat el Linux, independentment de la BIOS de l'ordinador,
+aquestes restriccions ja no s'apliquen, car el Linux no fa servir la BIOS
+per accedir al disc.
 
 </para><para>
 
-If you have a large disk, you might have to use cylinder translation
-techniques, which you can set from your BIOS setup program, such as
-LBA (Logical Block Addressing) or CHS translation mode (<quote>Large</quote>).
-More information about issues with large disks can be found in the
-<ulink url="&url-large-disk-howto;">Large Disk HOWTO</ulink>.  If you
-are using a cylinder translation scheme, and the BIOS does not support
-the large disk access extensions, then your boot partition has to fit
-within the <emphasis>translated</emphasis> representation of the
-1024th cylinder.
+Si teniu un disc gran, potser us caldrà emprar tècniques de traducció de
+cilindres, que podeu emprar des del programa de configuració de la BIOS,
+com ara l'LBA (Adreçament de blocs lògics) o el mode de traducció CHS
+(<quote>Gran</quote>). Trobareu més informació sobre discs grans al
+<ulink url="&url-large-disk-howto;">Large Disk HOWTO</ulink>.  Si esteu
+fent servir un esquema de traducció de cilindres i la BIOS no permet l'ús
+d'extensions d'accés a discs grans, aleshores la partició d'arrencada ha
+d'ajustar-se a la representació <emphasis>traduïda</emphasis> del cilindre
+1024è.
 
 </para><para>
 
-The recommended way of accomplishing this is to create a small (5&ndash;10MB
-should suffice) partition at the beginning of the disk to be used as
-the boot partition, and then create whatever other partitions you wish
-to have, in the remaining area.  This boot partition
-<emphasis>must</emphasis> be mounted on <filename>/boot</filename>,
-since that is the directory where the Linux kernel(s) will be stored.
-This configuration will work on any system, regardless of whether LBA
-or large disk CHS translation is used, and regardless of whether your
-BIOS supports the large disk access extensions.
+La manera recomanada de fer això és crear una partició petita (5&ndash;10
+MiB són prou) al principi del disc, a fi d'emprar-la com a partició
+d'arrencada, i després crear les particions que vulgueu a l'espai restant.
+Aquesta partició d'arrencada <emphasis>s'ha de</emphasis> muntar a
+<filename>/boot</filename>, car aquest és el directori d'emmagatzematge
+del(s) nucli(s) del Linux. Aquesta configuració funciona en qualsevol
+sistema, independentment de si es fa servir l'LBA o la traducció CHS de
+discs grans, i independentment també de si la BIOS permet l'ús
+d'extensions d'accés a discs grans.
 
 </para>
   </sect2>
