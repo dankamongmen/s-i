@@ -4,15 +4,4 @@
 
 set -e
 
-for mpoint in $(cut -d ' ' -f 2 /proc/mounts | sort -r); do
-	case $mpoint in
-		/)
-			umount /proc || true
-			umount / || true
-			;;
-		/proc)	;;
-		*)
-			umount $mpoint || true
-			;;
-	esac
-done
+umount -a || true
