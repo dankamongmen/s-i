@@ -31,26 +31,6 @@ int nodequestioncomp(const void *pa, const void *pb) {
                 ((struct question *)pb)->tag);
 }
 
-/* TODO: This is an ugly hack because there's no better way to do this
- * within the constraints of twalk() (since there's no user-data argument).
- * If we ever switch to some other tree API, this should go away
- * immediately. If we ever need iterate() to be thread-safe, this *needs* to
- * go away.
- */
-di_slist *iterator;
-void rfc822db_makeiterator(const void *node, const VISIT which, const int depth)
-{
-    if (which == postorder || which == leaf)
-        /* cast is OK; node is never actually written to */
-        di_slist_append(iterator, (void *) node);
-}
-
-void rfc822db_destroyiterator(void *data)
-{
-    /* We only store pointers; nothing to destroy. */
-    (void) data;
-}
-
 
 static void parse_variables(struct question *q, char *string)
 {
@@ -341,6 +321,26 @@ static int rfc822db_template_remove(struct template_db *db, const char *tag)
     return DC_NOTOK;
 }
 
+/* TODO: This is an ugly hack because there's no better way to do this
+ * within the constraints of twalk() (since there's no user-data argument).
+ * If we ever switch to some other tree API, this should go away
+ * immediately. If we ever need iterate() to be thread-safe, this *needs* to
+ * go away.
+ */
+di_slist *template_iterator;
+void rfc822db_template_makeiterator(const void *nodep, const VISIT which,
+    const int depth)
+{
+    if (which == postorder || which == leaf)
+        di_slist_append(template_iterator,
+                        template_dup(*(struct template **) nodep));
+}
+
+void rfc822db_template_destroyiterator(void *data)
+{
+    template_deref((struct template *) data);
+}
+
 static struct template *rfc822db_template_iterate(struct template_db *db,
     void **iter)
 {
@@ -353,22 +353,23 @@ static struct template *rfc822db_template_iterate(struct template_db *db,
     node = *(di_slist_node **) iter;
     if (node == NULL) {
         if (dbdata->iterator)
-            di_slist_destroy(dbdata->iterator, rfc822db_destroyiterator);
+            di_slist_destroy(dbdata->iterator,
+                             rfc822db_template_destroyiterator);
         dbdata->iterator = di_slist_alloc();
-        iterator = dbdata->iterator; /* non-thread-safe */
-        twalk(dbdata->root, rfc822db_makeiterator);
-        iterator = NULL;
+        template_iterator = dbdata->iterator; /* non-thread-safe */
+        twalk(dbdata->root, rfc822db_template_makeiterator);
+        template_iterator = NULL;
         *iter = node = dbdata->iterator->head;
     } else
         *iter = node = node->next;
 
     if (node == NULL) {
-        di_slist_destroy(dbdata->iterator, rfc822db_destroyiterator);
+        di_slist_destroy(dbdata->iterator, rfc822db_template_destroyiterator);
         dbdata->iterator = NULL;
         return NULL;
     }
 
-    t = *(struct template **) node->data;
+    t = (struct template *) node->data;
     template_ref(t);
     return t;
 }
@@ -602,6 +603,26 @@ static int rfc822db_question_disown(struct question_db *db, const char *tag,
     return DC_OK;
 }
 
+/* TODO: This is an ugly hack because there's no better way to do this
+ * within the constraints of twalk() (since there's no user-data argument).
+ * If we ever switch to some other tree API, this should go away
+ * immediately. If we ever need iterate() to be thread-safe, this *needs* to
+ * go away.
+ */
+di_slist *question_iterator;
+void rfc822db_question_makeiterator(const void *nodep, const VISIT which,
+    const int depth)
+{
+    if (which == postorder || which == leaf)
+        di_slist_append(question_iterator,
+                        question_dup(*(struct question **) nodep));
+}
+
+void rfc822db_question_destroyiterator(void *data)
+{
+    question_deref((struct question *) data);
+}
+
 static struct question *rfc822db_question_iterate(struct question_db *db,
     void **iter)
 {
@@ -614,22 +635,23 @@ static struct question *rfc822db_question_iterate(struct question_db *db,
     node = *(di_slist_node **) iter;
     if (node == NULL) {
         if (dbdata->iterator)
-            di_slist_destroy(dbdata->iterator, rfc822db_destroyiterator);
+            di_slist_destroy(dbdata->iterator,
+                             rfc822db_question_destroyiterator);
         dbdata->iterator = di_slist_alloc();
-        iterator = dbdata->iterator; /* non-thread-safe */
-        twalk(dbdata->root, rfc822db_makeiterator);
-        iterator = NULL;
+        question_iterator = dbdata->iterator; /* non-thread-safe */
+        twalk(dbdata->root, rfc822db_question_makeiterator);
+        question_iterator = NULL;
         *iter = node = dbdata->iterator->head;
     } else
         *iter = node = node->next;
 
     if (node == NULL) {
-        di_slist_destroy(dbdata->iterator, rfc822db_destroyiterator);
+        di_slist_destroy(dbdata->iterator, rfc822db_question_destroyiterator);
         dbdata->iterator = NULL;
         return NULL;
     }
 
-    q = *(struct question **) node->data;
+    q = (struct question *) node->data;
     question_ref(q);
     return q;
 }
