@@ -27,19 +27,19 @@ setpassword () {
 	SETPASSWD_PW="$2"
 	export SETPASSWD_PW
 
-        if [ "$3" = true ]; then
-                PRECRYPTED=1
-        else
-                PRECRYPTED=''
-        fi
-        export PRECRYPTED
-        $chroot $ROOT perl -e '
+	if [ "$3" = true ]; then
+		PRECRYPTED=1
+	else
+		PRECRYPTED=''
+	fi
+	export PRECRYPTED
+	$chroot $ROOT perl -e '
 		open(P,"| chpasswd ".($ENV{PRECRYPTED} ? "-e " : "")." -m");
-                print P shift().":$ENV{SETPASSWD_PW}\n";
+		print P shift().":$ENV{SETPASSWD_PW}\n";
 		close P;
-        ' "$1"
+	' "$1"
 	SETPASSWD_PW=''
-        PRECRYPTED=''
+	PRECRYPTED=''
 }
 
 # Enable/disable shadow passwords.
