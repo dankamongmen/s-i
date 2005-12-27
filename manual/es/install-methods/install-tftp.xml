@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 25834 -->
+<!-- original version: 31138 -->
 <!-- revisado por nahoo, 1 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
 
@@ -17,8 +17,8 @@ en esa máquina, y debe configurarla para soportar el arranque desde ella.
 
 Necesita configurar un servidor TFTP, y en caso de que tenga varias máquinas, un
 servidor BOOTP
-<phrase condition="supports-rarp">, ó un servidor RARP</phrase>
-<phrase condition="supports-dhcp">, ó un servidor DHCP</phrase>.
+<phrase condition="supports-rarp">, o un servidor RARP</phrase>
+<phrase condition="supports-dhcp">, o un servidor DHCP</phrase>.
 
 </para><para>
 
@@ -30,13 +30,13 @@ debe usar. Otra forma es usar el protocolo BOOTP. </phrase>
 ordenador de su dirección IP y desde dónde puede obtener una imagen de arranque 
 en la red.</phrase>
 
-<phrase arch="m68k">Otra alternativa más existe en los sistemas VMEbus:
-La dirección IP puede ser configurada manualmente en la ROM de arranque.
+<phrase arch="m68k">Existe otra alternativa más en los sistemas VMEbus:
+Se puede configurar manualemnte la dirección IP en la ROM de arranque.
 </phrase>
 
 <phrase condition="supports-dhcp">El DHCP (Protocolo de configuración dinámica
 de sistema) es una extensión de BOOTP compatible con éste, pero más flexible.
-Algunos sistemas solamente pueden configurarse a través de DHCP. </phrase>
+Algunos sistemas solamente se pueden configurar a través de DHCP. </phrase>
 
 </para><para arch="powerpc">
 
@@ -49,24 +49,24 @@ recientes solamente pueden arrancar usando BOOTP.
 A diferencia del «Open Firmware» encontrado en máquinas Sparc y PowerPC,
 la consola SRM <emphasis>no</emphasis> usará RARP para obtener su
 dirección IP, y por consiguiente deberá usar BOOTP para el arranque
-a través de red en su sistema Alpha. También puede ingresar directamente la
-configuración IP de las interfaces de red en la consola de SRM.
+a través de red en su sistema Alpha<footnote>
 
-<footnote>
 <para>
 
-Los sistemas Alpha también pueden arrancarse usando DECNet MOP 
+Los sistemas Alpha también se pueden arrancar usando DECNet MOP 
 (Protocolo de operaciones de mantenimiento), pero esto no se detalla
 aquí. Presumiblemente, su operador de OpenVMS local estará gustoso de
 asistirlo, deberá tener alguna razón de peso si quiere usar MOP para
 arrancar Linux en su Alpha.
-
 </para>
-</footnote></para><para arch="hppa"> 
+</footnote>. También puede ingresar la configuración de las interfaces
+de red directamente en la consola SRM.
+
+</para><para arch="hppa"> 
 
 Algunas máquinas HPPA antiguas (como 715/75) usan RBOOTD en lugar de
-BOOTP. Existe un paquete RBOOTD disponible en el sitio web de
-parisc-linux.
+BOOTP. Existe un paquete llamado <classname>rbootd</classname> disponible 
+en Debian.
 
 </para><para>
 
@@ -83,7 +83,7 @@ Para usar el método de arranque de TFTP llamado
 de TFTP con soporte de <userinput>tsize</userinput>. En el caso de que
 esté utilizando un servidor &debian; los paquetes
 <classname>atftpd</classname> y
-<classname>tftpd-hpa</classname> tienen soporte de éste. Le recomendamos
+<classname>tftpd-hpa</classname> ofrecen dicho soporte; le recomendamos
 que utilice <classname>tftpd-hpa</classname>.
 
 </para></note>
@@ -95,10 +95,10 @@ que utilice <classname>tftpd-hpa</classname>.
 &tftp-dhcp.xml;
 
   <sect2 id="tftpd">
-  <title>Habilitación del servidor TFTP</title>
+  <title>Habilitar el servidor TFTP</title>
 <para>
 
-Para tener listo el servidor TFTP, primero deberá asegurarse que
+Para tener listo el servidor TFTP, primero deberá asegurarse de que
 <command>tftpd</command> está habilitado. Generalmente se hace
 añadiendo a <filename>/etc/inetd.conf</filename> algo
 similar a lo siguiente:
@@ -107,7 +107,7 @@ similar a lo siguiente:
 tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
 </screen></informalexample>
 
-Los paquetes de Debian cuando se instalan, por lo general, lo configuran
+Cuando se instalan los paquetes de Debian, por lo general, lo configuran
 correctamente de forma predeterminada.
 
 </para><para>
@@ -119,7 +119,7 @@ versiones de <command>in.tftpd</command> registren todas las peticiones en los
 registros del sistema; es útil para diagnosticar fallos de arranque. Si
 ha tenido que cambiar <filename>/etc/inetd.conf</filename>, deberá
 notificar al proceso <command>inetd</command> en ejecución que el
-fichero ha cambiado. En una sistema Debian, ejecute
+fichero ha cambiado. En un sistema Debian, ejecute
 <userinput>/etc/init.d/inetd reload</userinput>; en otros sistemas,
 busque el ID del proceso <command>inetd</command>, y ejecute
 <userinput>kill -HUP <replaceable>id-de-inetd</replaceable></userinput>.
@@ -127,20 +127,20 @@ busque el ID del proceso <command>inetd</command>, y ejecute
 </para><para arch="mips">
 
 Si pretende instalar Debian en una máquina SGI y su servidor TFTP es una máquina
-GNU/Linux ejecutando Linux 2.4 necesitará configurar lo siguiente en su servidor
+GNU/Linux ejecutando Linux 2.4 necesitará configurar en su servidor lo siguiente:
 
 <informalexample><screen>
-# echo 1 > /proc/sys/net/ipv4/ip_no_pmtu_disc
+# echo 1 &gt; /proc/sys/net/ipv4/ip_no_pmtu_disc
 </screen></informalexample>
 
 para desactivar el descubrimiento de ruta MTU, de otro modo el PROM
-no podrá descargar el núcleo. Adicionalmente, asegúrese de que los
+de Indy no podrá descargar el núcleo. Adicionalmente, asegúrese de que los
 paquetes de TFTP se envían desde un puerto origen inferior al 32767,
-o la descarga se parará después del primer paquete. Nuevamente, es Linux
+o la descarga se interrumpirá después del primer paquete. Nuevamente, es Linux
 2.4.x el que presenta este fallo en la PROM, y puede evitarlo configurando
 
 <informalexample><screen>
-# echo "2048 32767" > /proc/sys/net/ipv4/ip_local_port_range
+# echo "2048 32767" &gt; /proc/sys/net/ipv4/ip_local_port_range
 </screen></informalexample>
 
 para ajustar el rango de puertos origen que usa el servidor TFTP.
@@ -152,20 +152,20 @@ para ajustar el rango de puertos origen que usa el servidor TFTP.
   <title>Mover las imágenes TFTP a su ubicación</title>
 <para>
 
-Seguidamente, localice la imagen TFTP de arranque que necesita, como se
+Seguidamente, ubique la imagen TFTP de arranque que necesita, como se
 describe en la <xref linkend="where-files"/>, en el directorio de
 imagen de arranque de <command>tftpd</command>. Generalmente, este
 directorio será <filename>/tftpboot</filename>. Tendrá que hacer un
 enlace desde este fichero hacia el fichero que usará 
-<command>tftpd</command> para arrancar un cliente en particular. 
+<command>tftpd</command> para arrancar un cliente en específico. 
 Desafortunadamente, el nombre del fichero es determinado por el 
 cliente TFTP, y no existe un estándar definido.
 
 </para><para arch="powerpc">
 
 En máquinas Power Macintosh NewWorld, necesitará configurar
-el gestor de arranque <command>yaboot</command> como imagen de
-arranque de TFTP. Entonces <command>yaboot</command> recuperará las
+el gestor de arranque <command>yaboot</command> como la imagen de
+arranque de TFTP. Entonces <command>yaboot</command> obtendrá las
 imágenes del núcleo y del disco RAM a través del propio TFTP. Para el
 arranque a través de red, use <filename>yaboot-netboot.conf</filename>.  
 Simplemente renómbrelo a <filename>yaboot.conf</filename> en el 
@@ -175,20 +175,20 @@ directorio de TFTP.
 
 Para arranque PXE, todo lo que necesitará es colocar el fichero tar
 <filename>netboot/netboot.tar.gz</filename>. Simplemente 
-extraiga este fichero en el directorio de imágenes de arranque de 
+extraiga este fichero tar en el directorio de imágenes de arranque de 
 <command>tftpd</command>. Asegúrese de que su servidor DHCP está configurado
 para pasar <filename>/pxelinux.0</filename> a <command>tftpd</command> como
-fichero a arrancar.
+el nombre del fichero a arrancar.
 
 </para><para arch="ia64">
 
 Para arranque PXE, todo lo que necesitará es colocar el fichero tar
 <filename>netboot/netboot.tar.gz</filename>. Simplemente 
-extraiga este fichero en el directorio de imágenes de arranque de 
+extraiga este fichero tar en el directorio de imágenes de arranque de 
 <command>tftpd</command>.
 Asegúrese de que su servidor DHCP está configurado para pasar 
 <filename>/debian-installer/ia64/elilo.efi</filename> a
-<command>tftpd</command> como fichero a arrancar.
+<command>tftpd</command> como el nombre del fichero a arrancar.
 
 </para>
 
@@ -196,22 +196,22 @@ Asegúrese de que su servidor DHCP está configurado para pasar
    <title>Imágenes TFTP para DECstation</title>
 <para>
 
-Para DECstations, existen ficheros «tftpimage» para cada subarquitectura,
-contienen tanto el núcleo como el instalador en un solo fichero. Por convenio
+Para DECstations existen ficheros «tftpimage» para cada subarquitectura
+que contienen tanto el núcleo como el instalador en un solo fichero. Por convención
 los nombres son del tipo
 <replaceable>subarquitectura</replaceable>/netboot-boot.img.
 Copie el fichero «tftpimage» que desee usar a
 <userinput>/tftpboot/tftpboot.img</userinput> si está usando la configuración
-BOOTP/DHCP de ejemplo, descrita anteriormente.
+BOOTP/DHCP de ejemplo descrita anteriormente.
 
 </para><para>
 
-El firmware de DECstations arranca por TFTP con la orden
+El firmware de DECstations se arranca por TFTP con la orden
 <userinput>boot <replaceable>#</replaceable>/tftp</userinput>, donde
 <replaceable>#</replaceable> es el número del dispositivo TurboChannel
-desde donde arrancar. En la mayoría de DECstations es «3». Si el servidor
+desde el cual arrancar. En la mayoría de DECstations es «3». Si el servidor
 BOOTP/DHCP no provee el nombre del fichero o necesita pasar parámetros adicionales,
-pueden añadirse opcionalmente con la siguiente sintaxis:
+estos se pueden añadir opcionalmente con la siguiente sintaxis:
 
 </para><para>
 
@@ -219,10 +219,10 @@ pueden añadirse opcionalmente con la siguiente sintaxis:
 
 </para><para>
 
-Varias revisiones del firmware de DECstations muestran un problema
+Varias revisiones del firmware de DECstations presentan un problema
 respecto al arranque a través de red: la transferencia se inicia, pero después
-de algún tiempo para con un mensaje <computeroutput>a.out err</computeroutput>. 
-Puede haber diferentes razones:
+de algún tiempo se para mostranto el mensaje <computeroutput>a.out err</computeroutput>. 
+Esto puede deberse a diversas razones:
 
 <orderedlist>
 <listitem><para>
@@ -231,7 +231,7 @@ El firmware no responde a solicitudes ARP durante una transferencia
 TFTP. Esto lleva a que expire el tiempo máximo de ARP y a la paralización de la
 transferencia. La solución es añadir la dirección MAC de la tarjeta
 Ethernet de la DECstation estáticamente a la tabla ARP del servidor
-TFTP. Se hace ejecutando
+TFTP. Esto se hace ejecutando
 <userinput>arp -s
 <replaceable>Dirección IP</replaceable>
 <replaceable>Dirección MAC</replaceable></userinput> 
@@ -248,7 +248,7 @@ arrancarse a través de TFTP.
 </para></listitem>
 </orderedlist>
 
-También existen revisiones de firmware que no pueden arrancar por
+También existen revisiones de firmware que no pueden arrancar 
 en absoluto a través de TFTP. Puede encontrar una descripción sobre las 
 diferentes revisiones de firmware en las páginas web de NetBSD:
 <ulink url="http://www.netbsd.org/Ports/pmax/board-list.html#proms"></ulink>.
@@ -261,10 +261,10 @@ diferentes revisiones de firmware en las páginas web de NetBSD:
 <para>
 En Alpha, debe especificar el nombre del fichero (como una ruta relativa
 al directorio de imagen de arranque) usando el argumento
-<userinput>-file</userinput> de la orden <userinput>boot</userinput> de SRM,
+<userinput>-file</userinput> a la orden <userinput>boot</userinput> de SRM,
 o definiendo la variable de entorno <userinput>BOOT_FILE</userinput>.
-Alternativamente, el nombre del fichero puede darse a través de BOOTP
-(en <command>dhcpd</command> de ISC,
+Alternativamente, se puede dar el nombre del fichero a través de BOOTP
+(en la versión de <command>dhcpd</command> de ISC,
 use la directiva <userinput>filename</userinput>). A diferencia de 
 «Open Firmware», en SRM <emphasis>no existe ningún nombre de fichero
 predeterminado</emphasis>, de modo que <emphasis>debe</emphasis> especificar
@@ -277,7 +277,7 @@ un nombre de fichero por cualquiera de estos métodos.
    <title>Arranque de TFTP en SPARC</title>
 <para>
 
-Las arquitecturas SPARC por ejemplo usan los nombres de las subarquitecturas,
+Las arquitecturas SPARC, por ejemplo, usan los nombres de las subarquitecturas,
 como «SUN4M» o «SUN4C»; en algunos casos, la arquitectura se deja en
 blanco, de modo que el fichero que el cliente busca es simplemente
 <filename>ip-del-cliente-en-hex</filename>. Esto es, si la subarquitectura
@@ -290,14 +290,14 @@ $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 </screen></informalexample>
 
 Esto mostrará la IP en hexadecimal, para obtener el nombre correcto, necesita
-cambiar todas las letras a mayúsculas y añadir si es necesario el nombre de la
+cambiar todas las letras a mayúsculas y añadir, si es necesario, el nombre de la
 subarquitectura.
 
 </para><para>
 
 También puede forzar algunos sistemas sparc para buscar un fichero
-específico añadiéndolo al final de la orden boot de OpenPROM, como
-<userinput>boot net mi-imagen.sparc</userinput>. Ésta deberá
+en específico al añadirlo al final de la orden boot de OpenPROM, como
+<userinput>boot net mi-imagen.sparc</userinput>. Éste deberá
 encontrarse en el directorio en el que busca el servidor TFTP.
 
 </para>
@@ -314,9 +314,9 @@ Para sistemas BVM y Motorola VMEbus copie los ficheros
 
 Seguidamente, configure sus ROMs de arranque o servidor BOOTP para cargar
 inicialmente los ficheros <filename>tftplilo.bvme</filename> o
-<filename>tftplilo.mvme</filename> desde el servidor TFTP. Vea el fichero
+<filename>tftplilo.mvme</filename> desde el servidor TFTP. Véase el fichero
 <filename>tftplilo.txt</filename> para información adicional sobre
-configuraciones específicas de su subarquitectura.
+configuraciones específicas para su subarquitectura.
 
 </para>
    </sect3>
