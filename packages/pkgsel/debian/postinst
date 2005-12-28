@@ -8,6 +8,10 @@ export LANG
 
 DIVERTS='/usr/bin/scrollkeeper-update /usr/bin/scrollkeeper-rebuilddb'
 
+log() {
+	logger -t pkgsel "$@"
+}
+
 cleanup () {
 	# If X was not installed, remove the hardware detection programs.
 	if ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
@@ -69,13 +73,17 @@ if [ "$ret" != 0 ]; then
 	
 	# TODO useful error message here (for ret != 30)
 	db_progress INFO pkgsel/progress/cleanup
-	cleanup
+	if ! cleanup; then
+		log "cleanup failed"
+	fi
 	db_progress STOP
 	exit $ret
 fi
 
 db_progress INFO pkgsel/progress/cleanup
-cleanup
+if ! cleanup; then
+	log "cleanup failed"
+fi
 db_progress STEP 2
 
 if [ -x /target/usr/bin/scrollkeeper-update ]; then
