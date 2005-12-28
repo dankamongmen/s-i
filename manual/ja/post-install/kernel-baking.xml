@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 31905 -->
 
  <sect1 id="kernel-baking"><title>新しいカーネルのコンパイル</title>
 <para>
@@ -8,20 +8,24 @@
 <!--
 Why would someone want to compile a new kernel? It is often not
 necessary since the default kernel shipped with Debian handles most
-configurations. However, it is useful to compile a new kernel in order
-to:
+configurations. Also, Debian often offers several alternative kernels.
+So you may want to check first if there is an alternative kernel image
+package that better corresponds to your hardware. However, it can be
+useful to compile a new kernel in order to:
 -->
-新しいカーネルをコンパイルしようとする動機はなんでしょう?
-Debian では、標準で入っているカーネルで多くの機能をサポートしてい
-るので、ほとんどその必要はありません。しかし、以下のような目的のためには、
-新しいカーネルをコンパイルすることは有益です。
+新しいカーネルをコンパイルしようとする動機はなんでしょう? Debian では、
+標準で入っているカーネルで多くの機能をサポートしているので、ほとんどその
+必要はありません。また、Debian は多くの場合、いくつかの代替カーネルを
+提供しています。ですからおそらく、もっと自分のハードウェアに対応する代わりの
+カーネルイメージパッケージがあるかどうかをまず確認したいと思うでしょう。
+しかし、以下のような目的のためには、新しいカーネルをコンパイルすることは有益です。
 
 <itemizedlist>
 <listitem><para>
 
 <!--
-handle special hardware needs, or hardware conflicts with the pre-supplied
-kernels
+handle special hardware needs, or hardware conflicts with the
+pre-supplied kernels
 -->
 特殊なハードウェアを使ったり、
 標準カーネルとハードウェアとの競合を回避するため
@@ -30,18 +34,17 @@ kernels
 <listitem><para>
 
 <!--
-handle hardware or options not included in the stock kernel, such as
-APM or SMP
+use options of the kernel which are not supported in the pre-supplied
+kernels (such as high memory support)
 -->
-APM や SMP など、
-既存のカーネルがサポートしていないハードウェアや機能を利用するため
+(ハイメモリサポートなど)
+標準カーネルでサポートされていない機能を利用するため
 
 </para></listitem>
 <listitem><para>
 
 <!--
-optimize the kernel by removing useless drivers to speed up boot
-time
+optimize the kernel by removing useless drivers to speed up boot time
 -->
 使わないドライバを取り除くことでカーネルを最適化し、
 起動にかかる時間を短くするため
@@ -50,11 +53,9 @@ time
 <listitem><para>
 
 <!--
-use options of the kernel which are not supported by the default
-kernel (such as high memory support)
+create a monolithic instead of a modularized kernel
 -->
-(ハイメモリサポートなど)
-デフォルトのカーネルでサポートされていない機能を利用するため
+モジュール化されたカーネルの代わりに、一体化したカーネルを作成するため
 
 </para></listitem>
 <listitem><para>
@@ -68,9 +69,9 @@ run an updated or development kernel
 <listitem><para>
 
 <!--
-impress your friends, try new things
+learn more about linux kernels
 -->
-目新しいことをして友達を感心させるため
+linux カーネルに関してもっと学ぶため
 
 </para></listitem>
 </itemizedlist>
@@ -92,18 +93,20 @@ Don't be afraid to try compiling the kernel.  It's fun and profitable.
 
 <!--
 To compile a kernel the Debian way, you need some packages:
-<classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname> (the most recent version
-at the time of this writing), <classname>fakeroot</classname> and a
-few others which are probably already installed (see
+<classname>fakeroot</classname>, <classname>kernel-package</classname>,
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(the most recent version at the time of this writing)</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+and a few others which are probably already installed (see
 <filename>/usr/share/doc/kernel-package/README.gz</filename> for the
 complete list).
 -->
 Debian 流にカーネルをコンパイルするのに必要なパッケージは、
-<classname>kernel-package</classname>、
-<classname>kernel-source-&kernelversion;</classname> (この文書を執筆している
-時点で最も新しいバージョンです)、<classname>fakeroot</classname>、あとは
-多分すでにインストール済みのパッケージがいくつか、です (完全な一覧については 
+<classname>fakeroot</classname>、<classname>kernel-package</classname>、
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(この文書を執筆している時点で最も新しいバージョンです)</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+、あとは多分すでにインストール済みのパッケージがいくつか、です (完全な一覧については 
 <filename>/usr/share/doc/kernel-package/README.gz</filename> を
 ご覧ください)。
 
@@ -129,15 +132,17 @@ Note that you don't <emphasis>have</emphasis> to compile your kernel
 the <quote>Debian way</quote>; but we find that using the packaging system
 to manage your kernel is actually safer and easier.  In fact, you can get
 your kernel sources right from Linus instead of
-<classname>kernel-source-&kernelversion;</classname>, yet still use the
-<classname>kernel-package</classname> compilation method.
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+yet still use the <classname>kernel-package</classname> compilation method.
 -->
 必ずしも「Debian 流」にカーネルをコンパイルする必要は
 <emphasis>ありません</emphasis>。しかし、カーネルの管理にもパッケージング
 システムを用いるほうが、実際に安全で簡単です。実は
-<classname>kernel-source-&kernelversion;</classname> ではなく、Linus が
-配付しているカーネルソースをそのまま利用することもできますが、その場合でも 
-<classname>kernel-package</classname> を用いてコンパイルしてください。
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname></phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+ではなく、Linus が配付しているカーネルソースをそのまま利用することもできますが、
+その場合でも <classname>kernel-package</classname> を用いてコンパイルしてください。
 
 </para><para>
 
@@ -176,15 +181,25 @@ permissions.
 <!--
 </footnote>. We'll also assume that your kernel version is
 &kernelversion;. Make sure you are in the directory to where you want to
-unpack the kernel sources, extract them using <userinput>tar xjf
-/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput> and change
-to the directory <filename>kernel-source-&kernelversion;</filename>
+unpack the kernel sources, extract them using
+<phrase condition="classic-kpkg"><userinput>tar xjf
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>
+and change to the directory
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
 that will have been created.
 -->
 </footnote>。また、カーネルバージョンが &kernelversion; だと仮定します。
 カーネルソースを取り出したいディレクトリにいることを確認してから、
-<userinput>tar xjf /usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>
-としてソースを展開し、作成された <filename>kernel-source-&kernelversion;</filename> 
+<phrase condition="classic-kpkg"><userinput>tar xjf
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>
+としてソースを展開し、作成された
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
 ディレクトリに移動してください。
 
 </para><para>
@@ -315,9 +330,14 @@ above step may have produced, then <userinput>shutdown -r now</userinput>.
 </para><para>
 
 <!--
+<phrase condition="etch">For more information on Debian kernels and kernel
+compilation, see the <ulink url="&url-kernel-handbook;">Debian Linux Kernel
+Handbook</ulink>.</phrase>
 For more information on <classname>kernel-package</classname>, read
 the fine documentation in <filename>/usr/share/doc/kernel-package</filename>.
 -->
+<phrase condition="etch">Debian カーネルやカーネルのコンパイルに関するより詳しい情報については、
+<ulink url="&url-kernel-handbook;">Debian Linux Kernel Handbook</ulink> をご覧ください。</phrase>
 <classname>kernel-package</classname> に関するより詳しい情報については、
 <filename>/usr/share/doc/kernel-package</filename> にある素晴しいドキュメントをお読みください。
 
