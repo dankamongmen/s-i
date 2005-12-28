@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 31190 -->
 
  <sect1 id="linux-upgrade">
  <title>Unix/Linux System システムからの &debian; のインストール</title>
@@ -122,6 +122,18 @@ referenced later below.
 </screen></informalexample>
 
 </para>
+<note><para>
+
+<!--
+If you want to have parts of the filesystem (e.g. /usr) mounted on
+separate partitions, you will need to create and mount these directories
+manually before proceding with the next stage.
+-->
+分割したパーティションをファイルシステムの一部 (例 /usr) にマウントする場合、
+次のステージに進む前に、
+手動でそのディレクトリを作成・マウントする必要があります。
+
+</para></note>
   </sect2>
 
   <sect2>
@@ -194,6 +206,21 @@ pool</ulink> から <command>debootstrap</command> .deb をダウンロードして、
 # cd /
 # zcat /full-path-to-work/work/data.tar.gz | tar xv
 </screen></informalexample>
+
+</para><para>
+
+<!--
+Note that running <command>debootstrap</command> may require you to have
+a minimal version of <classname>glibc</classname> installed (currently
+GLIBC_2.3). <command>debootstrap</command> itself is a shell script, but
+it calls various utilities that require <classname>glibc</classname>.
+-->
+<command>debootstrap</command> を実行するには、
+最小版の <classname>glibc</classname> (現在は GLIBC_2.3)
+がインストールされている必要があります。
+<command>debootstrap</command> 自身は、シェルスクリプトですが、
+ここから呼ばれる様々なユーティリティが <classname>glibc</classname>
+を必要としています。
 
 </para>
   </sect2>
@@ -300,8 +327,8 @@ Here is a sample you can modify to suit:
 # /etc/fstab: static file system information.
 #
 # file system    mount point   type    options                  dump pass
-/dev/XXX         /             ext2    defaults                 0    0
-/dev/XXX         /boot         ext2    ro,nosuid,nodev          0    2
+/dev/XXX         /             ext3    defaults                 0    1
+/dev/XXX         /boot         ext3    ro,nosuid,nodev          0    2
 
 /dev/XXX         none          swap    sw                       0    0
 proc             /proc         proc    defaults                 0    0
@@ -309,10 +336,10 @@ proc             /proc         proc    defaults                 0    0
 /dev/fd0         /mnt/floppy   auto    noauto,rw,sync,user,exec 0    0
 /dev/cdrom       /mnt/cdrom    iso9660 noauto,ro,user,exec      0    0
 
-/dev/XXX         /tmp          ext2    rw,nosuid,nodev          0    2
-/dev/XXX         /var          ext2    rw,nosuid,nodev          0    2
-/dev/XXX         /usr          ext2    rw,nodev                 0    2
-/dev/XXX         /home         ext2    rw,nosuid,nodev          0    2
+/dev/XXX         /tmp          ext3    rw,nosuid,nodev          0    2
+/dev/XXX         /var          ext3    rw,nosuid,nodev          0    2
+/dev/XXX         /usr          ext3    rw,nodev                 0    2
+/dev/XXX         /home         ext3    rw,nosuid,nodev          0    2
 </screen></informalexample>
 
 <!--
@@ -330,17 +357,31 @@ file systems individually use:
 
 <!--
 You can mount the proc file system multiple times and to arbitrary
-locations, though /proc is customary. If you didn't use
-<userinput>mount -a</userinput>, be sure to mount proc before
-continuing:
+locations, though <filename>/proc</filename> is customary. If you didn't use
+<userinput>mount -a</userinput>, be sure to mount proc before continuing:
 -->
 proc ファイルシステムは、どこでも何度でもマウントすることができますが、
-慣習的に /proc にマウントします。
+慣習的に <filename>/proc</filename> にマウントします。
 <userinput>mount -a</userinput> を使用しなかった場合は、
 以下のように先に進む前に必ず proc をマウントしてください。
 
 <informalexample><screen>
 # mount -t proc proc /proc
+</screen></informalexample>
+
+</para><para>
+
+<!--
+The command <userinput>ls /proc</userinput> should now show a non-empty
+directory. Should this fail, you may be able to mount proc from outside
+the chroot:
+-->
+<userinput>ls /proc</userinput> コマンドは、
+今度は空のディレクトリにはならいはずです。これが失敗するようなら、
+以下のように chroot の外側から proc をマウントできるかもしれません。
+
+<informalexample><screen>
+# mount -t proc proc /mnt/debinst/proc
 </screen></informalexample>
 
 </para>
@@ -358,6 +399,15 @@ To configure your keyboard:
 <informalexample><screen>
 # dpkg-reconfigure console-data
 </screen></informalexample>
+
+</para><para>
+
+<!--
+Note that the keyboard cannot be set while in the chroot, but will be
+configured for the next reboot.
+-->
+chroot 内では、キーボードを設定できませんが、
+再起動後に有効になることに注意してください。
 
 </para>
    </sect3>
@@ -587,7 +637,7 @@ Here is a basic <filename>/etc/lilo.conf</filename> as an example:
 <informalexample><screen>
 boot=/dev/hda6
 root=/dev/hda6
-install=/boot/boot-menu.b
+install=menu
 delay=20
 lba32
 image=/vmlinuz
