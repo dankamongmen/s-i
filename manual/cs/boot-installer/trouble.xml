@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 28997 -->
+<!-- original version: 32427 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Problémy s instalačním systémem</title>
@@ -199,10 +199,12 @@ vlastní jádro (viz <xref linkend="kernel-baking"/>).
 
 Jestliže se dostanete přes úvodní fázi zavedení systému, ale nemůžete
 instalaci dokončit, můžete použít menu <quote>Report a Problem</quote>
-(nahlášení chyby). Tato volba zkopíruje na disketu chybové hlášky,
-stav systému a jiné užitečné informace, které vám mohou naznačit,
-v čem je problém a jak ho vyřešit. Tyto údaje nám také můžete poslat
-spolu s hlášením o chybě.
+(nahlášení chyby). Tato volba <phrase condition="sarge">zkopíruje na
+disketu</phrase> <phrase>vám umožní uložit na disketu nebo zpřístupnit
+přes webové rozhraní</phrase> chybové hlášky, stav systému a jiné
+užitečné informace, které vám mohou naznačit, v čem je problém a jak
+ho vyřešit. Tyto údaje nám také můžete poslat spolu s hlášením
+o chybě.
 
 </para><para>
 
@@ -220,7 +222,19 @@ Další užitečné informace můžete najít během instalace v adresáři
 Pokud problém přetrvává, prosíme vás o zaslání zprávy o průběhu
 instalace. Zprávu o instalaci můžete zaslat i v případě, že vše
 proběhlo bez problémů &mdash; získáme tak přehled o nejrůznějších
-hardwarových konfiguracích. Při psaní, prosím, použijte následující
+hardwarových konfiguracích.
+
+</para><para condition="etch">
+
+Máte-li funkční systém s Debianem, je nejjednodušší zaslat zprávu
+pomocí balíčku <classname>reportbug</classname>. Nainstalujte si
+potřebné balíčky (<command>apt-get install installation-report
+reportbug</command>) a spusťte příkaz <command>reportbug
+installation-report</command>.
+
+</para><para>
+
+Při psaní, prosím, použijte následující
 šablonu, kterou pak zašlete jako hlášení o chybě vůči pseudobalíku
 <classname>installation-report</classname> na adresu
 <email>submit@bugs.debian.org</email>.
@@ -228,18 +242,15 @@ hardwarových konfiguracích. Při psaní, prosím, použijte následující
 <informalexample><screen>
 Package: installation-reports
 
-Debian-installer-version: <replaceable>&lt;Kdy a odkud jste stáhli obraz(y)&gt;</replaceable>
-uname -a: <replaceable>&lt;Výstup příkazu uname -a&gt;</replaceable>
+Boot method: <replaceable>&lt;Jak jste zavedli instalaci? CD? Disketa? Síť?&gt;</replaceable>
+Image version: <replaceable>&lt;Kdy a odkud jste stáhli obraz(y)&gt;</replaceable>
 Date: <replaceable>&lt;Datum a čas instalace&gt;</replaceable>
-Method: <replaceable>&lt;Jak jste instalovali? Z čeho jste zaváděli? Které zrcadlo
-      jste použili při síťové instalaci? Přes proxy?&gt;</replaceable>
 
 Machine: <replaceable>&lt;Popis počítače (např. IBM Thinkpad T41)&gt;</replaceable>
 Processor:
 Memory:
-Root Device: <replaceable>&lt;IDE?  SCSI?  Jméno zařízení?&gt;</replaceable>
-Root Size/partition table: <replaceable>&lt;Sem vložte celou tabulku rozdělení
-      disku s poznámkami, kam jsou oblasti připojeny.&gt;</replaceable>
+Partitions: <replaceable>&lt;Výstup příkazu df -Tl;&gt;</replaceable>
+
 Output of lspci and lspci -n:
 
 Base System Installation Checklist:

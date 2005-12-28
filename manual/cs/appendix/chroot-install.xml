@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 28997 -->
+<!-- original version: 31190 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalace Debianu ze stávajícího unixového/linuxového systému</title>
@@ -71,7 +71,13 @@ nezáleží.
 <prompt>#</prompt> <userinput>mount /dev/hda6 /mnt/debinst</userinput>
 </screen></informalexample>
 
-</para>
+</para><note><para>
+
+Chcete-li mít části souborového systému (např. /usr) připojené na
+různých oblastech, musíte tyto adresáře vytvořit a připojit ručně
+ještě před příští kapitolou.
+
+</para></note>
   </sect2>
 
   <sect2>
@@ -113,6 +119,14 @@ binární soubory. K instalaci souborů musíte mít rootovská práva.
 <prompt>#</prompt> <userinput>cd /</userinput>
 <prompt>#</prompt> <userinput>zcat /cesta-k-pracovnimu-adresari/work/data.tar.gz | tar xv</userinput>
 </screen></informalexample>
+
+</para><para>
+
+Pro běh <command>debootstrap</command>u musíte mít nainstalovanou
+rozumnou minimální verzi knihovny <classname>glibc</classname>
+(momentálně GLIBC_2.3). <command>debootstrap</command> samotný je
+shellový skript, ale využívá různé nástroje, které vyžadují
+<classname>glibc</classname>.
 
 </para>
   </sect2>
@@ -191,8 +205,8 @@ Jako vzor můžete použít následující šablonu (místo
 # /etc/fstab: static file system information.
 #
 # file system    mount point   type    options                  dump pass
-/dev/XXX         /             ext2    defaults                 0    0
-/dev/XXX         /boot         ext2    ro,nosuid,nodev          0    2
+/dev/XXX         /             ext3    defaults                 0    1
+/dev/XXX         /boot         ext3    ro,nosuid,nodev          0    2
 
 /dev/XXX         none          swap    sw                       0    0
 proc             /proc         proc    defaults                 0    0
@@ -200,10 +214,10 @@ proc             /proc         proc    defaults                 0    0
 /dev/fd0         /mnt/floppy   auto    noauto,rw,sync,user,exec 0    0
 /dev/cdrom       /mnt/cdrom    iso9660 noauto,ro,user,exec      0    0
 
-/dev/XXX         /tmp          ext2    rw,nosuid,nodev          0    2
-/dev/XXX         /var          ext2    rw,nosuid,nodev          0    2
-/dev/XXX         /usr          ext2    rw,nodev                 0    2
-/dev/XXX         /home         ext2    rw,nosuid,nodev          0    2
+/dev/XXX         /tmp          ext3    rw,nosuid,nodev          0    2
+/dev/XXX         /var          ext3    rw,nosuid,nodev          0    2
+/dev/XXX         /usr          ext3    rw,nodev                 0    2
+/dev/XXX         /home         ext3    rw,nosuid,nodev          0    2
 </screen></informalexample>
 
 Souborové systémy, které jste zadali do
@@ -221,6 +235,16 @@ systém <filename>/proc</filename>. Pokud tomu tak není, připojte jej:
 <prompt>#</prompt> <userinput>mount -t proc proc /proc</userinput>
 </screen></informalexample>
 
+</para><para>
+
+Príkaz <userinput>ls /proc</userinput> by nyní měll vypsat neprázdný
+adresář. Pokud by se tak nestalo, stále byste měli být schopni
+připojit <filename>proc</filename> z vnějšku chrootu:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount -t proc proc /mnt/debinst/proc</userinput>
+</screen></informalexample>
+
 </para>
    </sect3>
 
@@ -233,6 +257,11 @@ Klávesnici nastavíte:
 <informalexample><screen>
 <prompt>#</prompt> <userinput>dpkg-reconfigure console-data</userinput>
 </screen></informalexample>
+
+</para><para>
+
+Klávesnici nemůžete v chrootu nastavit, změna se projeví až po příštím
+restartu.
 
 </para>
    </sect3>
@@ -393,7 +422,7 @@ Pro inspiraci nabízíme minimální <filename>/etc/lilo.conf</filename>:
 <informalexample><screen>
 boot=/dev/hda6
 root=/dev/hda6
-install=/boot/boot-menu.b
+install=menu
 delay=20
 lba32
 image=/vmlinuz

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<!-- $Id$ -->
+<!-- original version: 29687 -->
+
+ <sect1 id="plip" arch="i386">
+ <title>Instalace &debian;u přes paralelní port (PLIP)</title>
+
+<para>
+
+Tato část vysvětluje instalaci &debian;u na počítači bez ethernetové
+karty, ale na kterém funguje paralelní port, přes který je připojen
+druhý počítač (brána) pomocí nullmodemového kabelu. Počítač sloužící
+jako brána by měl být připojen do sítě, která obsahuje zrcadlo Debianu
+(např. Internet).
+
+</para><para>
+
+V příkladu použijeme pro PLIP spojení k bráně IP adresy 192.168.0.1
+a 192.168.0.2. Pokud tyto kolidují s adresami vaší lokální sítě,
+zvolte si nějaké vhodnější. Brána je do Internetu připojena pomocí
+vytáčeného připojení (ppp0).
+
+</para><para>
+
+PLIP připojení, které během instalace vytvoříme, bude dostupné i po
+restartu do nainstalovaného systému (viz <xref linkend="boot-new"/>).
+
+</para><para>
+
+Před začátkem instalace byste měli zkontrolovat nastavení BIOSu
+a poznamenat si přerušení (IRQ) a bázovou VV adresu (IO base address)
+paralelních portů na obou spojovaných systémech. Nejběžnější hodnoty
+jsou <literal>io=0x378</literal> a <literal>irq=7</literal>.
+
+</para>
+
+  <sect2>
+  <title>Požadavky</title>
+
+<itemizedlist>
+<listitem><para>
+
+Cílový počítač <emphasis>nahepc</emphasis>, na který budeme instalovat.
+
+</para></listitem>
+<listitem><para>
+
+Instalační média, viz <xref linkend="installation-media"/>.
+
+</para></listitem>
+<listitem><para>
+
+Pomocný počítač <emphasis>earthsimulator</emphasis> připojený
+k Internetu, který bude sloužit jako brána.
+
+</para></listitem>
+<listitem><para>
+
+Nullmodemový kabel DB-25. Podrobnosti o kabelu naleznete v <ulink
+url="&url-plip-install-howto;">PLIP-Install-HOWTO</ulink> společně
+s návodem, jak si můžete tento kabel vyrobit vlastními silami.
+
+</para></listitem>
+</itemizedlist>
+
+  </sect2>
+
+  <sect2>
+  <title>Nastavení stroje earthsimulator</title>
+<para>
+
+Následujíc skript ukazuje možné nastavení earthsimulatoru jako brány
+do Internetu pomocí ppp0.
+
+<informalexample><screen>
+#!/bin/sh
+
+# Odstraníme z jádra následující moduly, abychom se vyhnuli
+# konfliktům a abychom je mohli nastavit ručně.
+modprobe -r lp parport_pc
+modprobe parport_pc io=<replaceable>0x378</replaceable> irq=<replaceable>7</replaceable>
+modprobe plip
+
+# Nastavení rozhraní plip (zde je to plip0, viz dmesg | grep plip)
+ifconfig <replaceable>plip0 192.168.0.2</replaceable> pointopoint <replaceable>192.168.0.1</replaceable> netmask 255.255.255.255 up
+
+# Nastavení brány
+modprobe iptable_nat
+iptables -t nat -A POSTROUTING -o <replaceable>ppp0</replaceable> -j MASQUERADE
+echo 1 > /proc/sys/net/ipv4/ip_forward
+</screen></informalexample>
+
+</para>
+  </sect2>
+
+  <sect2>
+  <title>Instalace na nahepc</title>
+<para>
+
+Zaveďte systém z instalačních médií v expertním režimu (např. na
+zaváděcí výzvě zadejte <userinput>expert</userinput>) a poté během
+instalace odpovězte na následující otázky naznačeným způsobem.
+
+</para>
+
+<orderedlist>
+<listitem><para>
+
+<guimenuitem>Nahrát komponenty instalátoru</guimenuitem>
+
+</para><para>
+
+Ze seznamu vyberte možnost <userinput>plip-modules</userinput>; tím se
+instalačnímu systému zpřístupní ovladače pro PLIP.
+
+</para></listitem>
+<listitem><para>
+
+<guimenuitem>Rozpoznat síťový hardware</guimenuitem>
+
+</para>
+
+ <itemizedlist>
+ <listitem><para>
+
+Pokud nahepc <emphasis>obsahuje</emphasis> síťové karty, zobrazí se
+seznam modulů pro všechny rozpoznané karty. Trváte-li na použití PLIP,
+musíte všechny vybrané moduly odznačit. Samozřejmě že pokud nejsou
+rozpoznány žádné karty, seznam se nezobrazí.
+
+ </para></listitem>
+ <listitem><para>
+
+Dotazovat se na parametry modulů: Ano
+
+ </para></listitem>
+ <listitem><para>
+
+Protože nebyly nalezeny/vybrány žádné síťové karty, instalační systém
+vás požádá o výběr vhodného modulu s ovladačem. Vyberte modul
+<userinput>plip</userinput>.
+
+ </para></listitem>
+ <listitem><para>
+
+Dodatečné parametry pro modul parport_pc:
+<userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
+
+ </para></listitem>
+ <listitem><para>
+
+Dodatečné parametry pro modul plip: ponechte prázdné
+
+ </para></listitem>
+ </itemizedlist>
+
+</listitem>
+<listitem><para>
+
+<guimenuitem>Nastavit síť</guimenuitem>
+
+ <itemizedlist>
+ <listitem><para>
+
+Automaticky nastavit síť přes DHCP: Ne
+
+ </para></listitem>
+ <listitem><para>
+
+IP adresa: <userinput><replaceable>192.168.0.1</replaceable></userinput>
+
+ </para></listitem>
+ <listitem><para>
+
+Point-to-point adresa:
+<userinput><replaceable>192.168.0.2</replaceable></userinput>
+
+ </para></listitem>
+ <listitem><para>
+
+Adresy jmenných serverů: můžete zadat stejnou hodnotu, jako máte na
+earthsimulatoru (viz soubor <filename>/etc/resolv.conf</filename>)
+
+ </para></listitem>
+ </itemizedlist>
+
+</para></listitem>
+</orderedlist>
+
+  </sect2>
+ </sect1>

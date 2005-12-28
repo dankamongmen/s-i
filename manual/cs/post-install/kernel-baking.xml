@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 28672 -->
+<!-- original version: 31905 -->
 
  <sect1 id="kernel-baking"><title>Kompilace nového jádra</title>
 <para>
 
 Proč byste si chtěli sestavit nové jádro? Obvykle nejde o
 nutnost, poněvadž jádro dodávané s Debianem funguje ve většině
-počítačů. Nové jádro může být užitečné v následujících situacích:
+počítačů. V Debianu také bývají dostupná alternativní jádra, která
+mohou odpovídat vašemu hardwaru lépe než jádro výchozí, takže byste se
+na ně určitě měli podívat. Nicméně nové jádro může být užitečné
+v následujících situacích:
 
 <itemizedlist>
 <listitem><para>
@@ -19,7 +22,7 @@ hardwaru, které dodávané jádro nezvládne.
 <listitem><para>
 
 Ve standardním jádře postrádáte podporu zařízení nebo nějakou službu
-(např. Advanced power management nebo SMP).
+(např. podporu vysoké paměti).
 
 </para></listitem>
 <listitem><para>
@@ -30,7 +33,7 @@ systému a ušetříte paměť.
 </para></listitem>
 <listitem><para>
 
-Chcete jádro rozšířit o nějakou funkci (např. podporu vysoké paměti).
+Chcete monolitické jádro místo modulárního.
 
 </para></listitem>
 <listitem><para>
@@ -40,7 +43,7 @@ Chcete jádro z vývojové řady.
 </para></listitem>
 <listitem><para>
 
-Chcete udělat dojem na známé, vyzkoušet něco nového.
+Chcete se o jádře dozvědět něco víc.
 
 </para></listitem>
 </itemizedlist>
@@ -55,9 +58,11 @@ Nebojte se kompilace jádra, je to zábava a budete z ní mít užitek.
 </para><para>
 
 Doporučený způsob kompilace jádra v Debianu vyžaduje tyto balíky:
-<classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname> (aktuální verze v
-době vzniku dokumentu), <classname>fakeroot</classname> a další, které
+<classname>fakeroot</classname>, <classname>kernel-package</classname>,
+<phrase condition="classic-kpkg">
+<classname>kernel-source-&kernelversion;</classname> (aktuální verze
+v době vzniku dokumentu)</phrase> <phrase condition="common-kpkg">
+<classname>linux-source-2.6</classname> </phrase> a další, které
 již máte patrně nainstalované (úplný seznam je v souboru
 <filename>/usr/share/doc/kernel-package/README.gz</filename>).
 
@@ -74,8 +79,13 @@ aktuální konfigurace.
 Jádro <emphasis>nemusíte</emphasis> připravovat touto cestou, ale
 domníváme se, že s využitím balíčkovacího softwaru se proces
 zjednoduší a je také bezpečnější. Místo balíku
-<classname>kernel-source-&kernelversion;</classname> si klidně můžete
-stáhnout poslední zdrojové texty jádra přímo od Linuse.
+<phrase condition="classic-kpkg">
+  <classname>kernel-source-&kernelversion;</classname>
+</phrase> <phrase condition="common-kpkg">
+  <classname>linux-source-2.6</classname>
+</phrase>
+si klidně můžete stáhnout poslední zdrojové texty jádra přímo od
+Linuse.
 
 </para><para>
 
@@ -97,10 +107,23 @@ použitá možnost je nejjednodušší a nevyžaduje žádná speciální práva.
 
 Přejděte do adresáře, kde chcete mít zdrojové texty jádra
 (<userinput>cd <replaceable>~/build</replaceable></userinput>),
-rozbalte archiv (<userinput>tar xjf
+rozbalte archiv
+
+<phrase condition="classic-kpkg">
+
+(<userinput>tar xjf
 /usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>) a vejděte
 do vzniklého adresáře (<userinput>cd
 kernel-source-&kernelversion;/</userinput>).
+
+</phrase><phrase condition="common-kpkg">
+
+(<userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput>) a vejděte
+do vzniklého adresáře (<userinput>cd
+linux-source-&kernelversion;/</userinput>).
+
+</phrase>
 
 </para><para>
 
@@ -168,6 +191,9 @@ dobře, restartujte příkazem <userinput>shutdown -r now</userinput>.
 
 </para><para>
 
+<phrase condition="etch">Více informací o debianích jádrech
+a o kompilaci jader si můžete přečíst v <ulink
+url="&url-kernel-handbook;">Debian Linux Kernel Handbook</ulink>.</phrase>
 Popis balíku <classname>kernel-package</classname> najdete v adresáři
 <filename>/usr/share/doc/kernel-package</filename>.
 

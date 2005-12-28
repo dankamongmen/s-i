@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-2"?>
+<!-- $Id$ -->
+<!-- original version: 31173 -->
+
+   <sect3 id="network-console">
+   <title>Instalace přes síť</title>
+
+<para arch="not-s390">
+
+Jednou ze zajímavějších komponent je
+<firstterm>network-console</firstterm>, která vám umožní provádět
+větší část instalace vzdáleně přes SSH. Použití sítě naznačuje, že
+budete muset provést několik prvních kroků instalace (minimálně po
+nastavení sítě) lokálně a teprve pak pokračovat vzdáleně. Lokální část
+však můžete automatizovat použitím <xref
+linkend="automatic-install"/>.)
+
+</para><para arch="not-s390">
+
+Tato komponenta se implicitně nenahrává do instalačního menu a proto
+o ni budete muset požádat.
+
+Nejprve musíte zavést instalační systém se střední prioritou otázek,
+nebo jiným způsobem vyvolat hlavní instalační menu a vybrat položku
+<guimenuitem>Nahrát komponenty instalátoru z CD</guimenuitem> (nebo ze
+sítě) a ze seznamu dodatečných komponent vybrat
+<guimenuitem>network-console: Continue installation remotely using
+SSH</guimenuitem>. Úspěšné načtení komponenty se projeví tak, že
+v menu přibude nová položka nazvaná <guimenuitem>Pokračovat
+v instalaci vzdáleně přes SSH</guimenuitem>.
+
+</para><para arch="s390">
+
+Pro instalace na &arch-title; to je běžný způsob, na který se přechází
+ihned po nastavení sítě.
+
+</para><para>
+
+<phrase arch="not-s390">Po výběru této nové položky</phrase> <phrase
+arch="s390">Nejprve</phrase> budete požádáni o zadání nového hesla,
+které se použije pro připojení do instalovaného systému.  Následuje
+rutinní potvrzení hesla, zda bylo zadáno správně. Toť vše.  Nyní
+uvidíte obrazovku s nápovědou, která říká, že se máte vzdáleně
+připojit k systému jako uživatel <emphasis>installer</emphasis>
+s heslem, které jste právě zadali. Další důležitá věc na obrazovce je
+kryptografický otisk tohoto systému. Tento otisk musíte zabezpečeně
+předat osobě, která bude v instalaci pokračovat vzdáleně.
+
+</para><para>
+
+Pokud byste se náhodou rozhodli pokračovat v instalaci lokálně, můžete
+vždycky stisknout &enterkey;, což vás vrátí zpět do hlavního menu, kde
+můžete vybrat další krok.
+
+</para><para>
+
+Nyní se přepojme na druhý konec drátu. Nejprve byste se měli ujistit,
+že máte terminál přepnutý do kódování UTF-8, protože jej používá
+instalační systém. Pokud tak neučiníte, vzdálenou instalaci by to
+nemělo nijak ovlivnit, ale je pravděpodobné, že uvidíte na displeji
+různé artefakty jako porušené rámečky dialogových oken a rozsypaný čaj
+z písmen, které nespadají do sedmibitového ASCII. Pro navázání spojení
+stačí napsat:
+
+<informalexample><screen>
+<prompt>$</prompt> <userinput>ssh -l installer <replaceable>instalovany_pocitac</replaceable></userinput>
+</screen></informalexample>
+
+kde <replaceable>instalovany_pocitac</replaceable> je buď jméno nebo
+IP adresa instalovaného počítače. Před samotným přihlášením se zobrazí
+kryptografický otisk vzdáleného systému, který budete muset potvrdit,
+zda je správný.
+
+</para><note><para>
+
+Instalujete-li postupně několik počítačů, které mají stejnou IP adresu
+nebo jméno, <command>ssh</command> se odmítne k takovému počítači
+připojit. Důvodem je odlišný kryptografický otisk, což obvykle
+indikuje útok, kdy se záškodník vydává za cílový počítač. Pokud jste
+si jisti, že to není tento případ, budete muset ze souboru
+<filename>~/.ssh/known_hosts</filename> smazat příslušný řádek
+a připojení zopakovat.
+
+</para></note><para>
+
+Po přihlášení vám bude nabídnuta úvodní obrazovka, kde můžete volit
+mezi možností <guimenuitem>Spustit menu</guimenuitem>
+a <guimenuitem>Spustit shell</guimenuitem>. První možnost vás přenese
+do hlavního instalačního menu, kde můžete pokračovat v instalaci
+obvyklým způsobem. Druhá možnost spustí shell, ve kterém můžete
+zkoumat a případně opravit vzdálený systém. Přestože počet SSH spojení
+do instalovaného systému není omezen, měli byste mít pouze jedno
+spojení, kterým ovládáte instalaci (na rozdíl od shellů, kterých si
+můžete spustit dle libosti).
+
+</para><warning><para>
+
+Po zahájení vzdálené instalace byste se již neměli vracet zpět
+k lokální instalaci, protože by to mohlo porušit databázi, ve které je
+uloženo nastavení nového systému, což by následně vedlo k nefunkční
+instalaci nebo k problémům v novém systému.
+
+</para><para>
+
+Také pokud spouštíte SSH spojení z terminálového okna v X, neměli
+byste měnit jeho velikost, protože by to způsobilo ukončení spojení.
+
+</para></warning>
+
+   </sect3>
