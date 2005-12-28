@@ -18,10 +18,10 @@ mismo instalador de Debian.
 
 </para>
 
-<sect2>
-<title>Utilizar el instalador de Debian para realizar una instalación automática</title>
-
+  <sect2 id="preseed">
+  <title>Utilizar el instalador de Debian para realizar una instalación automática</title>
 <para>
+
 El instalador de Debian soporta instalaciones automatizadas a través
 de ficheros de preconfiguración. Puede cargar un fichero de
 preconfiguración bien utilizando la red o bien utilizando medios
@@ -29,13 +29,29 @@ extraíbles y hacer uso de éste para responder a las preguntas que se
 formulan durante el proceso de instalación.
 
 </para><para>
+<para condition="etch">
+
+Puede encontrar la documentación completa sobre la configuración de semillas
+de preconfiguración y un ejemplo que puede editar para trabajar en
+<xref linkend="appendix-preseed"/>.
+
+</para><para condition="sarge">
+
+Aunque puede definir semillas para la mayoría de los diálogos de &d-i; con
+éste método hay algunas excepciones notables. Por ejemplo, puede (re)particionar
+el disco entero o utilizar el espacio disponible pero no puede utilizar particiones
+existentes. Tampoco puede utilizar la preconfiguración para configurar RAID o LVM.
+Además no puede preconfigurar parámetros de los módulos del núcleo,
+salvo en el caso de los módulos de los controladores de red.
+
+</para><para condition="sarge">
 
 El fichero de preconfiguración usa el mismo formato que
 la orden «debconf-set-selections». Encontrará un ejemplo que funciona, muy bien
 documentado y que puede utilizar para editarlo a su gusto en la
 <xref linkend="example-preseed"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 Otra forma de obtener un fichero completo
 que liste todos los valores que pueden ser preconfigurados de antemano,
@@ -55,7 +71,7 @@ elementos que no deben ser preconfigurados. Para la mayoría de los
 usuarios el fichero en la <xref linkend="example-preseed"/> es un punto
 de partida mejor.
 
-</para><para>
+</para><para condition="sarge">
 
 Una vez que tenga un fichero de preconfiguración, puede editarlo, en
 caso de que sea necesario, y colocarlo en un servidor web, o copiarlo
@@ -63,8 +79,7 @@ en el medio de instalación del instalador. Necesitará indicar al
 instalador durante el arranque, a través de un parámetro, la ubicación
 de este fichero para que lo utilice.
 
-
-</para><para>
+</para><para condition="sarge">
 
 Añada «preseed/url=http://url/a/preseed.cfg» a los parámetros de
 arranque del núcleo para que el instalador use un fichero de
@@ -76,7 +91,7 @@ preguntas. Podría querer definir la prioridad de la instalación a
 «critical» para evitar cualquier pregunta mientras se configura la
 red. Consulte la <xref linkend="installer-args"/>.
 
-</para><para>
+</para><para condition="sarge">
 
 Necesitará remasterizar la imagen ISO para incluir su fichero de
 preconfiguración si quiere colocar un fichero de preconfiguración en
@@ -84,7 +99,7 @@ un CD.  Para más información consulte la página de manual de
 «mkisofs». También puede poner el fichero de preconfiguración en un
 disquete y usar el parámetro «preseed/file=/floppy/preseed.cfg»
 
-</para><para arch="i386">
+</para><para arch="i386" condition="sarge">
 
 Si va a arrancar desde un dispositivo de memoria USB, puede
 simplemente copiar su fichero de preconfiguración en el sistema de
@@ -93,5 +108,5 @@ ficheros de este medio, editar el fichero «syslinux.cfg» y añadir
 núcleo.
 
 </para>
-</sect2>
+  </sect2>
  </sect1>
