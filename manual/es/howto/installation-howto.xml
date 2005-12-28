@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 24602 -->
+<!-- original version: 32251 -->
 <!-- Revisado por jfs, 6 dic 2004 -->
 <!-- revisado Rudy Godoy, 23 feb. 2005 -->
 
@@ -155,7 +155,7 @@ monte el dispositivo de memoria, que ahora tendrá un sistema
 de ficheros FAT. Por último, descargue una imagen de CD «netinst»
 de Debian y copie este fichero en el dispositivo de memoria.
 Puede asignar cualquier nombre al fichero, siempre que termine en
-«.iso». 
+<literal>.iso</literal>. 
 
 </para><para>
 
@@ -173,7 +173,7 @@ manual de «OpenFirmware». Para más indicaciones, vea <xref linkend="usb-boot" />
 
 Algunas BIOS pueden arrancar directamente desde dispositivos de
 almacenamiento USB, pero otras no. Puede que necesite configurar su BIOS
-para arrancar desde un «dispositivo extraíble» o incluso un «USB-ZIP» para
+para arrancar desde un <quote>dispositivo extraíble</quote> o incluso un <quote>USB-ZIP</quote> para
 hacerlo arrancar desde el dispositivo USB. Si no consigue que arranque desde
 éste, puede arrancar desde un disquete y usar el dispositivo de memoria USB
 para el resto de la instalación. Puede encontrar algunos consejos útiles y
@@ -201,7 +201,7 @@ sea usando PXE. Extraiga el fichero
 para su servidor tftp. Configure su servidor DHCP para
 pasar el fichero <filename>/pxelinux.0</filename> a los clientes,
 y, con suerte, todo funcionará correctamente.
-Para instrucciones detalladas, vea <xref linkend="install-tftp" />
+Para instrucciones detalladas, vea <xref linkend="install-tftp" />.
 
 </para>
   </sect2>
@@ -215,7 +215,7 @@ dispone de un disco duro existente, el cual puede tener un sistema operativo
 diferente. Descargue <filename>hd-media/initrd.gz</filename>,
 <filename>hd-media/vmlinuz</filename>, y una imagen de CD de Debian en el
 directorio de nivel más alto en el disco duro. Asegúrese de que la imagen de
-CD tiene un nombre de fichero que termine en «.iso». Ahora sólo es cuestión
+CD tiene un nombre de fichero que termine en <literal>.iso</literal>. Ahora sólo es cuestión
 de arrancar linux con initrd. <phrase arch="i386"> <xref
 linkend="boot-initrd" /> explica una forma de hacerlo. </phrase>
 
@@ -230,12 +230,25 @@ Una vez que se inicie el instalador, se le mostrará una pantalla inicial de bien
 Pulse &enterkey; para arrancar, o lea las instrucciones
 para obtener información de otros métodos y parámetros para la instalación (vea <xref linkend="boot-parms" />).
 <phrase arch="i386">
+<phrase condition="sarge">
 Si desea un núcleo 2.6, escriba <userinput>linux26</userinput> en
 el cursor <prompt>boot:</prompt>.
+</phrase>
+<phrase condition="etch">
+<phrase condition="etch">
+Si desea un núcleo 2.4, escriba <userinput>install24</userinput> en el 
+cursor <prompt>boot:</prompt>.
+</phrase>
 <footnote><para>
 
+<phrase condition="sarge">
 El núcleo 2.6 esta disponible para la mayoría de los métodos
 de arranque, con excepción del arranque desde disquete.
+</phrase>
+<phrase condition="etch">
+El núcleo 2.6 es la versión que se utiliza por omisión en la mayoría
+de los métodos de arranque, pero no está disponible en el arranque desde disquete.
+</phrase>
 
 </para></footnote>
 </phrase>
@@ -285,7 +298,7 @@ de: simplemente seleccione la partición y especifique su nuevo tamaño.
 
 En la siguiente pantalla verá su tabla de particiones, cómo
 se formatearán las particiones, y dónde serán montadas. Elija una partición si desea modificarla o eliminarla. Si ha efectuado un particionado automático,
-solamente se le permitirá elegir «Finalizar particionado»
+solamente se le permitirá elegir <guimenuitem>Finalizar particionado</guimenuitem>
 en el menú, para usar lo que se ha definido. Recuerde que debe crear por
 lo menos una partición de intercambio y montar una partición en
 <filename>/</filename>. Dispone de más información sobre particionado en
@@ -326,12 +339,20 @@ proceso de instalación.
 <para>
 
 Si ha realizado una instalación con éxito con el &d-i;, por favor, tómese un
-momento para enviarnos un informe. Existe una plantilla llamada
+momento para enviarnos un informe. 
+<phrase condition="sarge">
+Existe una plantilla llamada
 <filename>install-report.template</filename> en el directorio
 <filename>/root</filename> del nuevo sistema recién instalado. Por favor,
 rellénela y envíela como errata asignada al paquete
 <classname>installation-reports</classname>, como se explica en <xref
 linkend="submit-bug" />.
+</phrase>
+<phrase condition="etch">
+La forma más sencilla es instalar el paquete reportbu
+(<command>apt-get install reportbug</command>), y ejecutar
+<command>reportbug installation-report</command>.
+</phrase>
 
 </para><para>
 
