@@ -461,79 +461,81 @@ más apropiados a su arquitectura.
 </para>
 
   <sect2 id="preseed-l10n">
-  <title>Localization</title>
+  <title>Localización</title>
 <para>
 
-Setting localization values will only work if you are using initrd preseeding.
-With all other methods the preseed file will only be loaded after these
-questions have been asked.
+La configuración de los valores de localización sólo funcionará si está
+utilizando preconfiguración a través de initrd. Con cualquier otro método
+el fichero de preconfiguración se cargará después de haber hecho estas preguntas.
 
 </para><para>
 
-The locale can be used to specify both language and country.
-To specify the locale as a boot parameter, use
+La localización puede utilizarse para espceificar tanto el idioma como el país.
+Puede utilizar
 <userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>.
+para especificar la localización como un parámetro de arranque.
 
 <informalexample role="example"><screen>
-# Locale sets language and country.
+# Configuración de localización para el idioma y país.
 d-i debian-installer/locale string en_US
 </screen></informalexample>
 
 </para><para>
 
-Keyboard configuration consists of selecting a keyboard architecture and a
-keymap. In most cases the correct keyboard architecture is selected by
-default, so there's normally no need to preseed it. The keymap must
-be valid for the selected  keyboard architecture.
+La configuración del teclado consiste en la selección de una arquitectura
+de teclado y un mapa de teclado. En la mayor parte de los casos se selecciona
+una arquitectura de teclado correcta por omisión y no es necesario preconfigurarla.
+El mapa de teclado debe ser válido para la arquitectura de teclado seleccionada.
 
 <informalexample role="example"><screen>
-# Keyboard selection.
+# Selección de teclado
 #d-i console-tools/archs select at
 d-i console-keymaps-at/keymap select us
-# Example for a different keyboard architecture
+# Ejemplo de cómo configurar una arquitectura de teclado distinta
 #d-i console-keymaps-usb/keymap select mac-usb-us
 </screen></informalexample>
 
 </para><para>
 
-To skip keyboard configuration preseed
-<classname>console-tools/archs</classname> with
+Para obviar la configuración de teclado preconfigure
+<classname>console-tools/archs</classname> con
 <userinput>skip-config</userinput>.
-This will result in the kernel keymap remaining active.
+Esto hará que sea el mapa de teclado del núcleo el permanezca activo.
 
 </para>
 
 <note><para>
 
-The changes in the input layer for 2.6 kernels have made the keyboard
-architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote>
-(<userinput>at</userinput>) keymap should be selected.
+Los cambios en la capa de entrada para los núcleos 2.6 han hecho que la
+arquitectura de teclado esté practicamente obsoleta. En el caso de los núcleos
+2.6 debería seleccionarse generalmente un mapa de teclado <quote>PC</quote>
+(<userinput>at</userinput>).
 
 </para></note>
   </sect2>
 
   <sect2 id="preseed-network">
-  <title>Network configuration</title>
+  <title>Configuración de red</title>
 <para>
 
-Of course, preseeding the network configuration won't work if you're
-loading your preseed file from the network. But it's great when you're
-booting from CD or USB stick. If you are loading preseed files from
-the network, you can pass network config parameters in using kernel
-boot parameters.
+Por supuesto, no funcionará la preconfiguración de la tarjeta de red si está
+obteniendo el fichero de preconfiguración de la red. Pero esta opción es muy
+cómoda cuando está arrancando de un CD o memoria USB. Si carga ficheros de
+preconfiguración de la red puede dar los parámetros de configuración de la red
+a través de parámetro de arranque del núcleo.
 
 </para>
 
 <informalexample role="example"><screen>
-# netcfg will choose an interface that has link if possible. This makes it
-# skip displaying a list if there is more than one interface.
+# netcfg escojerá el interfaz que tiene enlace si puede. Esto hace que no
+# muestre la lista si hay más de uno.
 d-i netcfg/choose_interface select auto
 
-# If you have a slow dhcp server and the installer times out waiting for
-# it, this might be useful.
+# Si tiene un servidor de dhcp lento y el instalador expira intentando
+# conectarse a él, ésto puede serle útil.
 #d-i netcfg/dhcp_timeout string 60
 
-# If you prefer to configure the network manually, here's how:
+# Así es como puede configurar la red manualmente:
 #d-i netcfg/disable_dhcp boolean true
 #d-i netcfg/get_nameservers string 192.168.1.1
 #d-i netcfg/get_ipaddress string 192.168.1.42
@@ -541,19 +543,21 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
 
-# Any hostname and domain names assigned from dhcp take precedence over
-# values set here. However, setting the values still prevents the questions
-# from being shown, even if values come from dhcp.
+# Cualquier nombre de host y de dominio que se obtengan por DHCP se utilizan
+# antes que los valores aquí definidos. Sin embargo, definir los valores evita
+# que la pregunta se muestre aunque los valores vengan del dhcp.
 d-i netcfg/get_hostname string unassigned-hostname
 d-i netcfg/get_domain string unassigned-domain
 
-# Disable that annoying WEP key dialog.
+# Deshabilitar el molesto diálogo de clave WEP
 d-i netcfg/wireless_wep string
-# The wacky dhcp hostname that some ISPs use as a password of sorts.
+# El nombre de servidor raro que algunos ISP utilizan como una especie de contraseña
 #d-i netcfg/dhcp_hostname string radish
 </screen></informalexample>
 
   </sect2>
+
+<!-- POR HACER -->
 
   <sect2 id="preseed-mirror">
   <title>Mirror settings</title>
@@ -1013,7 +1017,7 @@ settings for certain configurations in other files.
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
 
 # More flexibly, this runs a shell command and if it outputs the names of
-# preseed files, includes those files.
+# preseed files, includes those files. 
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 </screen></informalexample>
