@@ -283,169 +283,180 @@ desarrolladores de &d-i; si está interesado.
 
 </para><para>
 
-An example preseed file that you can use as basis for your preseed file is
-available from &urlset-example-preseed;. This file is based on the
-configuration fragments included in this appendix.
+Tiene un fichero de preconfiguración de ejemplo, que puede utilizar como base
+para su propio fichero de preconfiguración, en &urlset-example-preseed;. Este
+fichero está basado en fragmentos de configuración incluídos en este apéndice.
 
 </para>
 
   <sect2 id="preseed-loading">
-  <title>Loading the preseed file</title>
+  <title>Cargar el fichero de preconfiguración</title>
 <para>
 
-If you are using initrd preseeding, you only have to make sure a file named
-<filename>preseed.cfg</filename> is included in the root directory of the
-initrd. The installer will automatically check if this file is present and
-load it.
+Si está utilizando la preconfiguración por initrd tiene que asegurarse que
+existe un fichero con el nombre de <filename>preseed.cfg</filename> en el
+directorio raíz del initrd. El instalador buscará automáticamente este fichero
+y lo cargará.
 
 </para><para>
 
-For the other preseeding methods you need to tell the installer what file to
-use when you boot it. This is done by passing the kernel a boot parameter,
-either manually at boot time or by editing the bootloader configuration file
-(e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end
-of the append line(s) for the kernel.
+Para otros métodos de preconfiguración tiene que decirle al instalador qué
+ficheros utilizar cuando se arranca. Ésto se hace dadno un valor al parámetro
+de arranque del núcleo, bien manualmente en el arranque o bien editando el
+fichero de configuración del cargador de arranque (e.g.
+<filename>syslinux.cfg</filename>) y añadiendo el parámetro al final de la/s
+línea/s <quote>append</quote> para el núcleo.
 
 </para><para>
 
-If you do specify the preseed file in the bootloader configuration, you might
-change the configuration so you don't need to hit enter to boot the installer.
-For syslinux this means setting the timeout to 1 in
-<filename>syslinux.cfg</filename>.
+Si especifica un fichero de preconfiguración en la configuración del cargador
+de arranque podrá cambiar la configuración para que no tenga que pulsar enter
+en el arranque del instalador. En el caso de syslinux esto signfica que
+tiene que poner el valor de <quote>timeout</quote> en
+<filename>syslinux.cfg</filename> a uno.
 
 </para><para>
 
-To make sure the installer gets the right preseed file, you can optionally
-specify a checksum for the file. Currently this needs to be a md5sum, and if
-specified it must match the preseed file or the installer will refuse to use it.
+Para asegurarse de que el instalador obtiene el fichero de preconfiguración
+correcto puede especificar (opcionalmente) una marca identificativa para el
+fichero. Esta marca es actualmente una suma MD5 y, si se especifica, debe
+coincidir el valor que se obtenga del fichero de preconfiguración o el
+instalador se negará a utilizarlo.
 
 </para>
 
 <informalexample><screen>
-Boot parameters to specify:
-- if you're netbooting:
+Párametros de arranque a especificar:
+- si está arrancando de red:
   preseed/url=http://host/path/to/preseed.cfg
   preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
 
-- if you're booting a remastered CD:
+- si está arrancando de un CD remasterizado:
   preseed/file=/cdrom/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 
-- if you're installing from USB media (put the preseed file in the
-  toplevel directory of the USB stick):
+- si está instalando de un medio USB (ponga el fichero de preconfiguración
+  en el directorio principal de la memoria USB):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 </screen></informalexample>
 
 <para>
 
-While you're at it, you may want to add a boot parameter
-<userinput>debconf/priority=critical</userinput>. This will avoid most
-questions even if the preseeding below misses some.
+Cuando haga esto puede quere añadir el parámetro
+<userinput>debconf/priority=critical</userinput> en el arranque. Esto impedirá
+que se haga ninguna pregunta aunque la preconfiguración mostrada más abajo no
+responda a alguna.
 
 </para>
   </sect2>
 
   <sect2 id="preseed-bootparms">
-  <title>Using boot parameters to supplement preseeding</title>
+  <title>Utilizar parámetros de arranque para complementar la preconfiguración</title>
 <para>
 
-Some parts of the installation process cannot be automated using some forms
-of preseeding because the questions are asked before the preseed file is
-loaded. For example, if the preseed file is downloaded over the network,
-the network setup must be done first. One reason to use initrd preseeding
-is that it allows preseeding of even these early steps of the installation
-process.
+Hay algunas partes del proceso de instalación que no pueden automatizarse con
+algunos métodos de preconfiguración porque las preguntas se responden antes de
+que se cargue el fichero de preconfiguración. Por ejemplo, será necesario
+configurar primero la red si el fichero de preconfiguración se descarga de
+ésta.  Una razón para utilizar la preconfiguración de initrd es que permite la
+preconfiguración incluso en estas etapas iniciales del proceso de instalación.
 
 </para><para>
 
-If a preseed file cannot be used to preseed some steps, the install can
-still be fully automated, since you can pass preseed values to the kernel
-on the command line. Just pass <userinput>path/to/var=value</userinput>
-for any of the preseed variables listed in the examples.
+La instalación puede automatizarse por completo aún cuando  el fichero de
+preconfiguración no puede utilizarse para preconfigurara ya que se pueden dar
+valores de preconfiguración al núcleo en la línea de órdenes. Sólo es necesario
+dar parámetros del tipo <userinput>ruta/a/variable=valor</userinput> para
+cualquiera de las variables de preconfiguración que se detallan en los
+ejemplos.
 
 </para>
 <note><para>
 
-The 2.4 kernel accepts a maximum of 8 command line options and
-8 environment options (including any options added by default for the
-installer). If these numbers are exceeded, 2.4 kernels will drop any
-excess options and 2.6 kernels will panic. For kernel 2.6.9 and later,
-you can use 32 command line options and 32 environment options.
+El núcleo 2.4 acepta un máximo de ocho opciones en línea de órdenes y
+ocho opciones de entorno (incluyendo las opciones que añade por omisio el
+propio instalador). Si se excede esta cantidad los núcleos 2.4 descartarán las
+opciones que lo sobrepasen y los núcleos 2.6 abortarán (con un
+<quote>panic</quote>). Se pueden utilizar hasta treinta y dos opciones de línea
+de órdenes y treinta y dos opciones de entorno en el caso de las versiones del
+núcleo 2.6.9 y posteriores.
 
 </para></note>
 <para>
 
-For most installations some of the default options in your bootloader
-configuration file, like 'vga=normal', may be safely removed which may
-allow you to add more options for preseeding.
+Para la mayoría de las instalaciones se pueden eliminar algunas de las opciones
+del fichero de configuracio del cargado de arranque, como por ejemplo
+<quote>vga=normal</quote> lo que permite añadir más opciones para la
+preconfiguración.
 
 </para>
 <note><para>
 
-It may not always be possible to specify values with spaces for boot
-parameters, even if you delimit them with quotes.
+No siempre es posible especificar valores con espacios para los parámetros
+de arranque aunque se delimiten con comillas dobles.
 
 </para></note>
   </sect2>
  </sect1>
 
  <sect1 condition="FIXME" id="preseed-creating">
- <title>Creating a preseed file</title>
+ <title>Crear un fichero de preconfiguración</title>
 <para>
 
-The preconfiguration file is in the format used by the
-<command>debconf-set-selections</command> command.
+El fichero de preconfiguración tiene el formato que utiliza la orden
+<command>debconf-set-selections</command>.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  File format
+  Fichero formato
 </para></listitem>
 <listitem><para>
-  Only single space allowed between template type and value
+  Sólo se permite un espacio entre tipo de plantilla y valor.
 </para></listitem>
 <listitem><para>
-  Relation with /var/lib/(c)debconf/templates
+  Relacionado con /var/lib/(c)debconf/templates.
 </para></listitem>
 <listitem><para>
-  Types of templates and how to provide values for them
+  Tipos de plantillas y cómo darles valor.
 </para></listitem>
 <listitem><para>
-  Most values need to be in English or codes
+  La mayoría de los valores tienen que estar en inglés o ser códigos.
 </para></listitem>
 <listitem><para>
-  Using a manual installation as base
+  Utilizar un manual de instalación como base.
 </para></listitem>
 <listitem><para>
-  Finding other possible values
+  Encontrar otros valores posibles.
 </para></listitem>
 </itemizedlist>
 
 <para>
 
-To check if the format of your preseed file is valid before performing an
-install, you can use the command <command>debconf-set-selections -c
-<replaceable>preseed.cfg</replaceable></command>.
+Para comprobar si el formato de su fichero de preconfiguración es válido
+antes de hacer una instalación puede utilizar la orden
+<command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>.
 
 </para>
  </sect1>
 
  <sect1 id="preseed-stage1">
- <title>Preseeding the first stage of the installation</title>
+ <title>Preconfiguración de la primera etapa de instalación</title>
 <para>
 
-The configuration fragments used in this appendix are also available as an
-example preseed file from &urlset-example-preseed;.
+Los fragmentos de configuración que se utilizan en este apéndice también están
+disponible como un ejemplo de fichero de preconfiguración en 
+&urlset-example-preseed;.
 
 </para><para>
 
-Note that this example is based on an installation for the Intel x86
-architecture. If you are installing a different architecture, some of the
-examples (like keyboard selection and bootloader installation) may not be
-relevant and will need to be replaced by debconf settings appropriate for your
-architecture.
+Tenga en cuenta que este ejemplo está basado en una instalación para la
+arquitectura Intel x86. Si está instalando en otra arquitectura no serán
+relevantes algunos de los ejemplos (como la seleccio de teclado o la
+instalación del cargador) y tendrá que reemplazarlos por los valores de debconf
+más apropiados a su arquitectura.
 
 </para>
 
