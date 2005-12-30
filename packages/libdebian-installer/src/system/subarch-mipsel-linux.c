@@ -73,6 +73,16 @@ static struct cpu system_necddb_rockhopper2_cpu[] = {
 	{ NULL, "unknown" }
 };
 
+static struct cpu system_bcm_bcm947xx_cpu[] = {
+	/* 2.4 */
+	{ "BCM3302", "bcm947xx"},
+	{ "BCM4710", "bcm947xx"},
+	/* 2.6 */
+	{ "Broadcom BCM3302", "bcm947xx"},
+	{ "Broadcom BCM4710", "bcm947xx" },
+	{ NULL, "unknown" }
+}
+
 /* add new system types here */
 
 static struct cpu system_unknown_cpu[] = {
@@ -112,6 +122,8 @@ static struct systype system_type[] = {
 	{"NEC DDB Vrc-5477", system_necddb_5477_cpu },
 	{"NEC Rockhopper", system_necddb_rockhopper_cpu },
 	{"NEC RockhopperII", system_necddb_rockhopper2_cpu },
+	/* Broadcom based APs/NAS */
+	{"Broadcom BCM947XX", system_bcm_bcm947xx_cpu },
 	/* add new system types here */
 	{ NULL, system_unknown_cpu }
 };
