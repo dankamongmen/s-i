@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 25834 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 31138 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparando os arquivos para inicialização via rede usando TFTP</title>
@@ -44,30 +45,29 @@ Para o PowerPC, se tiver uma máquina Power Macintosh NewWorld,
 será uma boa idéia de usar o DHCP ao invés do BOOTP. Algumas das 
 últimas máquinas sã incapazes de inicializar usando o BOOTP.
 
-</para><para arch="alpha"> 
+</para><para arch="alpha">
 
 Ao contrário do Open Firmware encontrado em máquinas Sparc e PowerPC, 
 o console SRM <emphasis>não</emphasis> usará RARP para obter seu 
 endereço IP, e então você deverá usar o BOOTP para inicializar via 
-rede em seu Alpha. Você também poderá entrar com a configuração IP de suas
-interfaces de rede diretamente no console SRM.
+rede seu Alpha<footnote>
 
-<footnote>
 <para>
-
 Os sistemas Alpha também podem ser inicializados via rede usando o 
 DECNet MOP (Maintenance Operations Protocol), mas isto nao será 
 discutido aqui. Presumivelmente, seu 
 operador local do OpenVMS estará satisfeito em ajuda-lo se você 
 tiver que esquentar a cabeça para usar o MOP para inicializar o 
 Linux em seu Alpha.
-
 </para>
-</footnote></para><para arch="hppa"> 
 
-Algumas máquinas HPPA antigas (e.g. 715/75) usarão o RBOOTD ao invés
-do BOOTP. Um pacote RBOOTD está disponível na página internet
-parisc-linux.
+</footnote>. Você também poderá entrar com a configuração IP de suas
+interfaces de rede diretamente no console SRM.
+
+</para><para arch="hppa"> 
+
+Algumas máquinas HPPA antigas (e.g. 715/75) usarão o RBOOTD ao invés do BOOTP. 
+Há um pacote <classname>rbootd</classname> disponível no Debian.
 
 </para><para>
 
@@ -162,7 +162,7 @@ que precisa, como encontrada no
 do <command>tftpd</command>. Geralmente este diretório será
 <filename>/tftpboot</filename>. Você tera que fazer um link
 deste arquivo para o arquivo que o <command>tftpd</command> usará
-para inicializar em cliente em particular. Infelizmente, o nome do 
+para inicializar em cliente em particular. Infelizmente, o nome do
 arquivo é determinado pelo client e TFTP e não existem padrões
 rígidos.
 
@@ -213,7 +213,7 @@ A firmware do DECstation é inicializada pelo TFTP com o comando
 <userinput>boot<replaceable>#</replaceable>/tftp</userinput>, onde
 <replaceable>#</replaceable> é o número do dispositivo TurboChannel
 que será inicializado. Na maioria das DECstations este número é
-o "3". Se o servidor BOOTP/DHCP não fornecer o nome de arquivo
+o <quote>3</quote>. Se o servidor BOOTP/DHCP não fornecer o nome de arquivo
 ou você precisar passar parâmetros adicionais, eles poderão 
 ser opcionalmente adicionados com a seguinte sintaxe:
 
@@ -282,8 +282,8 @@ usando um destes métodos.
 <para>
 
 As arquiteturas SPARC usam os nomes de sub-arquiteturas, tais como
-"SUN4M" ou "SUN4C"; em alguns casos, a arquitetura é deixada em 
-branco, assim o arquivo que o cliente procura é simplesmente
+<quote>SUN4M</quote> ou <quote>SUN4C</quote>; em alguns casos, a arquitetura é
+deixada em branco, assim o arquivo que o cliente procura é simplesmente
 <filename>client-ip-in-hex</filename>. Assim, caso a sub-arquitetura 
 do seu sistema seja SUN4C e seu endereço IP 192.168.1.3, o nome 
 de arquivo deverá ser <filename>C0A80103.SUN4C</filename>. 
@@ -353,7 +353,7 @@ passará o caminho completo do arquivo que será carregado para o CFE.
 
 <!-- FIXME: commented out since it seems too old to be usable and a current
             way is not known
-  
+
   <sect2 id="tftp-low-memory">
   <title>Instalação via TFTP em sistemas com pouca memória</title>
 <para>
@@ -381,7 +381,7 @@ que estiver inicializando.
 <listitem><para>
 
 Descompacte o arquivo raíz tar em seu servidor NFS (pode ser o mesmo
-sistema que seu servidor TFTP): 
+sistema que seu servidor TFTP):
 
 <informalexample><screen>
 # cd /tftpboot
@@ -430,10 +430,10 @@ caso o endereço IP do cliente seja 192.168.1.3, faça:
   <title>Instalando com o TFTP e NFS root</title>
 <para>
 
-A instalação com TFTP e NFS raíz é similar a
-<xref linkend="tftp-low-memory"/> porque você não precisará 
+A instalação com TFTP e NFS raiz é similar a
+<xref linkend="tftp-low-memory"/> porque você não precisará
 carregar o disco RAM mas inicializará através do seu novo
-sistema de arquivos NFS criado. Você precisará então substituir o link 
+sistema de arquivos NFS criado. Você precisará então substituir o link
 simbólico para a imagem tftpboot por um link simbólico apontando para
 uma imagem de kernel (por exemplo,
 <filename>linux-a.out</filename>).
