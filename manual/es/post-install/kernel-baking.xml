@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 25152 -->
+<!-- original version: 31905 -->
 <!-- Revisado por Steve Langasek -->
 <!-- Revisado Rudy Godoy, 23 feb. 2005 -->
 
@@ -8,7 +8,10 @@
 
 ¿Por qué querría alguien compilar un nuevo núcleo? La mayoría de las
 veces no será necesario puesto que el núcleo estándar entregado
-con Debian gestiona la mayoría de configuraciones. En cualquier caso
+con Debian gestiona la mayoría de configuraciones. Además, Debian
+ofrece habitualmente varios núcleos alternativos. Así, debería comprobar
+si hay un paquete de imagen de núcleo alternativa que se ajuste mejor
+a su hardware. En cualquier caso
 es útil compilar un nuevo núcleo para:
 
 <itemizedlist>
@@ -20,8 +23,8 @@ núcleos predeterminados.
 </para></listitem>
 <listitem><para>
 
-tratar hardware u opciones no incluidas en el núcleo predeterminado, como
-por ejemplo APM ó SMP.
+utilizar opciones del núcleo que no están soportadas en los núcleos preparados,
+como puede ser el caso del soporte de memoria elevada (más de 4GB).
 
 </para></listitem>
 
@@ -33,8 +36,7 @@ el tiempo de arranque.
 </para></listitem>
 <listitem><para>
 
-usar opciones del núcleo que no estén soportadas por el núcleo
-estándar (como el soporte de valores superiores de memoria).
+crear un núcleo monolítico en lugar de uno modular.
 
 </para></listitem>
 <listitem><para>
@@ -44,7 +46,7 @@ ejecutar un núcleo actualizado o de desarrollo.
 </para></listitem>
 <listitem><para>
 
-impresionar a sus amigos, probar nuevas cosas.
+aprender más de los núcleos de Linux.
 
 </para></listitem>
 </itemizedlist>
@@ -60,12 +62,13 @@ No tenga temor de intentar compilar el núcleo. Es divertido y fructífero.
 
 Para compilar un núcleo al <quote>estilo Debian</quote>,
 necesita algunos paquetes:
+<classname>fakeroot</classname>,
 <classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname>
-(la versión más reciente en el momento de editar este documento),
-<classname>fakeroot</classname> y
-algunos otros que probablemente ya estén instalados (vea
-<filename>/usr/share/doc/kernel-package/README.gz</filename> para una
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(la versión más reciente en el momento de editar este documento),</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+y algunos otros que probablemente ya estén instalados (vea
+<filename>/usr/share/doc/kernel-package/README.gz</filename> si desea una
 lista completa.
 
 </para><para>
@@ -82,8 +85,9 @@ Observe que no <emphasis>tiene</emphasis> que compilar su núcleo
 <quote>al estilo Debian</quote>; pero creemos que usar el sistema de paquetes para
 gestionar su núcleo es realmente más seguro y sencillo. De hecho, puede
 obtener las fuentes de su núcleo directamente de Linus en lugar de
-<classname>kernel-source-&kernelversion;</classname>, y aún así usar el método
-de compilación <classname>kernel-package</classname>.
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+y aún así usar el método de compilación <classname>kernel-package</classname>.
 
 </para><para>
 
@@ -111,8 +115,13 @@ núcleo es &kernelversion;. Ubíquese en el directorio
 donde desee desempaquetar las fuentes del
 núcleo, extraiga las fuentes del
 mismo usando
-<userinput>tar xjf /usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>
-, y cámbiese al directorio <filename>kernel-source-&kernelversion;</filename>
+<phrase condition="classic-kpkg"><userinput>tar xjf
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>
+, y cámbiese al directorio
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
 que se habrá creado.
 
 </para><para>
@@ -187,9 +196,12 @@ que pueda haberse producido, luego ejecute <userinput>shutdown -r now</userinput
 
 </para><para>
 
-Para más información sobre <classname>kernel-package</classname>, vea
-la excelente documentación en
-<filename>/usr/share/doc/kernel-package</filename>.
+<phrase condition="etch">Si desea más información sobre los núcleos de Debian
+y la compilación del núcleo consulte el <ulink url="&url-kernel-handbook;">Debian Linux Kernel
+Handbook</ulink>.</phrase>
+Consulte la excelente documentación disponible en
+<filename>/usr/share/doc/kernel-package</filename>
+si desea más información sobre <classname>kernel-package</classname>.
 
 </para>
 

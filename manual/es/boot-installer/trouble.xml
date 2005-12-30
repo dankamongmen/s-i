@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 24663 -->
+<!-- original version: 32427 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 <!-- revisado Rudy Godoy, 22 feb. 2005 -->
 
@@ -8,13 +8,13 @@
 <para>
 </para>
 
-  <sect2 id="unreliable-floppies">
+  <sect2 condition="supports-floppy-boot" id="unreliable-floppies">
   <title>Fiabilidad de los disquetes</title>
 
 <para>
 
-El problema más habitual para las personas que instalan Debian por primera
-vez suele ser la fiabilidad de los disquetes.
+El problema más habitual para las personas que utilizan disquetes para instalar
+Debian por primera vez suele ser la fiabilidad de los disquetes.
 
 </para><para>
 
@@ -91,6 +91,95 @@ bloquea cuando arranca el núcleo, utilice, por ejemplo,
 </para>
   </sect2>
 
+  <sect2 arch="i386" id="i386-boot-problems">
+  <title>Problemas comúnes durante la instalación en &arch-title;</title>
+<para>
+
+Hay algunos problemas comúnes que se producen en la instalación y que pueden
+resolverse o evitarse pasando ciertos parámetros de arranque al instalador.
+
+</para><para>
+
+Algunos sistemas tienen disquetes con <quote>DCLs invertidos</quote>. Si
+obtiene errores en la lectura del disquete y está seguro de que el disquete
+es bueno y está bien grabado intente utilizar el parámetro
+<userinput>floppy=thinkpad</userinput>.
+
+</para><para>
+
+Puede no reconocerse la unidad IDE en algunos sistemas, como es el caso del IBM
+PS/1 o ValuePoint (que tienen una unidad de disco ST-506). Intente primero
+arrancar la instalación sin introducir ningún parámetro para ver si la unidad
+IDE se detecta correctamente. Si no se detecta, debe obtener la información de
+geometría de la unidad (cilindros, cabezas y sectores) y utilizar el parámetro
+<userinput>hd=<replaceable>cilindros</replaceable>,<replaceable>cabezas</replaceable>,<replaceable>sectores</replaceable></userinput>.
+
+</para><para>
+
+Si el núcleo se queda parado después de decir <computeroutput>Checking 'hlt'
+instruction...</computeroutput> y tiene un sistema muy antiguo debería probar a
+deshabilitar esta prueba con el argumento de arranque
+<userinput>no-hlt</userinput>.
+
+</para><para>
+
+Si su pantalla empieza a mostrar una imagen rara cuando arranca el núcleo, como
+pudiera ser mostrarse todo en blanco, o todo en negro, o con algunos pixels
+coloreados al azar mal, puede que tenga una tarjeta de vídeo problemática que
+no es capaz de cambiar al modo <quote>framebuffer</quote> correctamente. Puede
+utilizar el parámetro del arranque
+<userinput>debian-installer/framebuffer=false</userinput> o
+<userinput>video=vga16:off</userinput> para deshabilitar el framebuffer en
+consola.  Si hace esto, sólo podrá ver la instalación en el idioma inglés
+debido a las funcionalidades limitadas de la consola. Si quiere los detalles,
+consulte <xref linkend="boot-parms"/>.
+
+</para>
+
+  <sect3>
+  <title>Parada del sistema durante la fase de configuración de PCMCIA</title>
+<para>
+
+Se sabe de algunos modelos de ordenador portátil de Dell que se quedan parados
+cuando la detección de dispositivos PCMCIA intenta acceder a algunas
+direcciones hardware. Es posible que otros ordenadores portátiles sufran
+problemas parecidos. Si tiene este problema y no necesita soporte de PCMCIA
+durante la instalación puede deshabilitar PCMCIA con el parámetro de arranque 
+<userinput>hw-detect/start_pcmcia=false</userinput>. Podrá configurar PCMCIA
+una vez termine la instalación y excluir el rango de recursos que causa el problema.
+
+</para><para>
+
+También puede intentar arrancar el instalador en modo experto. Si lo hace,
+se le preguntará las opciones del rango de recursos para sus necesidades
+hardware. Por ejemplo, si tiene alguno de los ordenadores portátiles Dell
+mencionados anteriormente podría introducir aquí 
+<userinput>exclude port 0x800-0x8ff</userinput>. Encontrará un listado 
+de opciones de configuración de recursos habituales en
+<ulink
+url="http://pcmcia-cs.sourceforge.net/ftp/doc/PCMCIA-HOWTO-1.html#ss1.12">System
+resource settings section of the PCMCIA HOWTO</ulink>. Tenga en cuenta que ha
+de omitir cualquier coma, si la hay, cuando introduzca este valor en el instalador.
+
+</para>
+   </sect3>
+
+   <sect3>
+   <title>Parada del sistema durante la carga de módulos USB</title>
+<para>
+
+El núcleo intenta generalmente cargar los módulos USB y el controlador de teclado
+USB para poder operar con algunos teclados USB no estándar. Hay, sin embargo, algunos
+sistemas USB mal hechos donde el controlador cuelga el sistema al arrancar. Una
+opción para evitar esta parada es deshabilitar el controlador USB en la
+configuración de la BIOS de su placa base. Otra opción es pasar el parámetro
+<userinput>debian-installer/probe/usb=false</userinput> en el arranque para
+impedir que se cargen los módulos USB.
+
+</para>
+   </sect3>
+  </sect2>
+
   <sect2 id="kernel-msgs">
   <title>Interpretar los mensajes de inicio del núcleo</title>
 
@@ -124,11 +213,18 @@ arrancar el sistema es muy largo.
   <title>Informar de fallos</title>
 <para>
 
-Podría serle útil la opción de informe de fallos
+Podría serle útil la opción de informe de fallos del menú
 si ha pasado la fase inicial de arranque pero no puede completar
 la instalación.
+<phrase condition="sarge">
 Esta opción copia los registros de fallos de sistema y la información de
 configuración al disquete que usted proporcione.
+</phrase>
+<phrase condition="etch">
+Esta opción le permite copiar  los registros de fallos de sistema y la información de
+configuración a un disquete, o descargarlas con un navegador web.
+</phrase>
+
 Esta información puede darle pistas sobre lo que ha fallado y cómo
 solucionarlo. Podría también querer adjuntar esta información si va a
 enviar un informe de fallos.
@@ -150,24 +246,36 @@ que el ordenador ha sido arrancado con el sistema instalado.
 Por favor, envíe un informe de su instalación si tiene problemas.
 Le animamos a hacerlo incluso si la instalación tiene éxito, de
 esta forma podremos obtener la mayor información posible sobre la
-mayor cantidad de configuraciones de hardware. Haga uso de la plantilla
-mostrada a continuación cuando haga un informe de instalación, y envíelo como
-un informe de fallo para el pseudo paquete «installation-reports»
-enviándolo a <email>submit@bugs.debian.org</email>.
+mayor cantidad de configuraciones de hardware.
+
+</para><para condition="etch">
+
+La forma más sencilla de enviar un informe de instalación si tiene un sistema
+Debian funcionando es instalar los paquetes <quote>installation-report</quote>
+y <quote>reportbug</quote> (<command>apt-get install installation-report
+reportbug</command>) y ejecutar la orden <command>reportbug
+installation-report</command>.
+
+</para><para>
+
+Haga uso de la plantilla mostrada a continuación cuando haga un informe de
+instalación, y envíelo (en inglés) como un informe de fallo para el pseudo paquete
+<classname>installation-reports</classname> a la dirección
+<email>submit@bugs.debian.org</email>.
 
 <informalexample><screen>
 Package: installation-reports
-Debian-installer-version: &lt;Escriba la fecha y desde donde obtuvo la imagen&gt;
-uname -a &lt;El resultado de ejecutar uname -a en el indicador del intérprete de órdenes&gt;
+
+Boot method: &lt;Cómo arrancó la instalación? ¿Con un CD? ¿Con un disquete? ¿Desde la red?&gt;
+Image version: &lt;Escriba la fecha y desde donde obtuvo la imagen&gt;
 Date: &lt;Fecha y hora de la instalación&gt;
-Method: &lt;¿Cómo lo instaló? ¿Qué arrancó? Si fue una instalación a través
-        de red, ¿desde dónde? ¿utilizó un servidor proxy?&gt;
+
 Machine: &lt;Descripción de la máquina (p. ej., IBM Thinkpad R32)&gt;
 Processor: &lt;Tipo de procesador&gt;
 Memory: &lt;Cantidad de memoria RAM&gt;
 Root Device: &lt;¿IDE o SCSI? Tipo del dispositivo raíz&gt;
-Root Size/partition table: &lt;Puede incluir aquí su tabla de particiones,
-     incluyendo algunas notas que indiquen que particiones se montan y donde.&gt;
+Partitions: &lt;Basta con la salida de «df -Tl», es preferible la tabla de particiones sin editar&gt;
+
 Output of lspci and lspci -n: &lt;Salida de la órdenes «lspci» y «lspci -n»&gt;
 
 Base System Installation Checklist: &lt;Marque según sea su caso: Escriba «O»

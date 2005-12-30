@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 26488 -->
+<!-- original version: 30084 -->
 <!-- revisado jfs, 23 feb. 2005 -->
 
  <sect1 id="boot-parms"><title>Parámetros de arranque</title>
 <para>
 
-Los «parámetros de arranque» son los parámetros del núcleo
+Los <quote>parámetros de arranque</quote> son los parámetros del núcleo
 de Linux que generalmente se utilizan para asegurar la
 correcta gestión de los periféricos.
 En la mayoría de los casos el núcleo puede auto-detectar toda la
@@ -45,7 +45,7 @@ disponible, en Kilobytes. Si no corresponde al tamaño real de la RAM que tiene
 instalada en su sistema, debe usar el parámetro
 <userinput>mem=<replaceable>ram</replaceable></userinput>,
 definiendo la cantidad de memoria en <replaceable>ram</replaceable> y
-utilizando el sufijo «k» para indicar Kilobytes, o «m» para indicar Megabytes.
+utilizando el sufijo <quote>k</quote> para indicar Kilobytes, o <quote>m</quote> para indicar Megabytes.
 Por ejemplo, para indicar que su sistema tiene 64 MB de RAM puede utilizar
 tanto <userinput>mem=65536k</userinput> como
 <userinput>mem=64m</userinput>.
@@ -65,7 +65,7 @@ y será generalmente parecido a <filename>ttyS0</filename>.
 
 Los dispositivos serie de &arch-title; son <filename>ttya</filename> o
 <filename>ttyb</filename>.
-También puede definir en «OpenPROM» las variables
+También puede definir en <quote>OpenPROM</quote> las variables
 <envar>input-device</envar> y
 <envar>output-device</envar> a <filename>ttya</filename>.
 
@@ -83,6 +83,10 @@ línea de órdenes y ocho del entorno, incluyendo cualquier
 opción que el instalador añada por omisión. Si excede este número, los
 núcleos de versión 2.4 descartarán las opciones que lo sobrepasen y
 los núcleos 2.6 se bloquearán.
+<phrase condition="etch">Con el núcleo kernel 2.6.9, o versiones más recientes,
+puede utilizar treinta y dos opciones de línea de órdenes y treinta y dos
+opciones de entorno.</phrase>
+
 </para>
 
 </footnote> pueden serle útiles.
@@ -168,8 +172,10 @@ predeterminado.
 <term>BOOT_DEBUG</term>
 <listitem><para>
 
-Si utiliza este parámetro de arranque hará que se generen registros
-más detallados del arranque.
+Si establece este parámetro a dos conseguirá que el proceso de arranque del
+instalador genere registros más detallados. Si lo establece a tres obtendrá un
+intérprete de línea de órdenes en puntos estratégiso del proceso de arranque
+(salga del intérprete para continuar con el proceso de arranque).
 
 <variablelist>
 <varlistentry>
@@ -231,7 +237,7 @@ Si el uso de este dispositivo origina problemas en su
 sistema puede deshabilitar esta característica con
 el parámetro
 <userinput>debian-installer/framebuffer=false</userinput>.
-Algunos síntomas de este problema son mensajes que traten sobre «bterm» o «bogl»,
+Algunos síntomas de este problema son mensajes que traten sobre <quote>bterm</quote> o <quote>bogl</quote>,
 la aparición de una pantalla en blanco o que el sistema se quede congelado
 algunos minutos después de iniciarse la instalación.
 
@@ -312,10 +318,32 @@ ser recomendable deshabilitarlo.
 <term>preseed/url</term>
 <listitem><para>
 
-Este valor especifica la url de un fichero de preconfiguración que
+Este valor especifica la ruta de un fichero de preconfiguración que
 se descargará y utilizará para automatizar la instalación.
 Vea <xref linkend="automatic-install"/>.
 
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="etch">
+<term>cdrom-detect/eject</term>
+<listitem><para>
+
+Antes de reiniciar, &d-i; expulsa automáticamente el medio óptico utilizado
+durante la instalación por omisión. Esto puede no ser necesario si el sistema
+no arranca automáticamente del CD. En algunos casos puede ser incluso indeseable,
+por ejemplo, si la unidad óptica no puede volver a insertar el medio por sí
+mismo y el usuario no está allí para hacerlo manualmente. Muchas unidades
+especiales no son capaces de recargar medios de forma automática, entre éstas
+se encuentran las denominadas <quote>slot loading</quote>, <quote>+slim-line</quote>,
+y estilo <quote>caddy</quote>.
+
+</para><para>
+
+Fijelo al valor <userinput>false</userinput> para deshabilitar la expulsión
+automática, pero debe ser consciente de que tiene que asegurar que el sistema
+no arranca automáticamente de la unidad óptica una vez se haya realizado
+la instalación inicial y el sistema se reinicie.
 </para></listitem>
 </varlistentry>
 
@@ -336,6 +364,17 @@ Consulte <xref linkend="automatic-install"/>.
 
 Puede necesitar definir &ramdisksize; si está usando un núcleo en la
 versión 2.2.x.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="etch">
+<term>rescue/enable</term>
+<listitem><para>
+
+Fije este valor a  <userinput>true</userinput> si desea entrar en el modo de rescate
+en lugar de hacer una instalación normal. Si desea más información consulte
+<xref linkend="rescue"/>.
 
 </para></listitem>
 </varlistentry>
