@@ -1,71 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 32512 untranslated -->
+<!-- traducido por jfs, 30 dic 2005 -->
 
 <!--
-Be carefull with the format of this file as it is parsed to generate
-the example preseed file.
-In that file all text between <informalexample> tags that have the
-attribute 'role="example"' set is included, except if a 'condition'
-attribute is in force that does not match the specified release or if an
-'arch' attribute is in force that does not match the specified architecture.
+Tened cuidado con el formato de este fichero dado que se parsea
+para generar el fichero de preconfiguración.
 
-Currently only a single variant of the example file is generated (for i386).
+En ese fichero se incluye todo el texto dentro de marcas
+<informalexample> que tienen el atributo 'role="example"'. 
+Salvo si hay un atributo 'condition' que hace que no aplique a 
+la versión específica o un atributo 'arch' que hace que no aplique
+a una arquitectura específica.
+
+Actualmente sólo se genera una variante del fichero de ejemplo (para i386).
 -->
 
 <appendix id="appendix-preseed" condition="etch">
-<title>Automating the installation using preseeding</title>
+<title>Instalar automáticamente utilizando preconfiguración</title>
 
 <para>
 
-This appendix explains the intricacies of preseeding answers to questions in
-&d-i; to automate your installation.
+Este apéndice explica los detalles de preconfigurar respuesas a preguntas
+en &d-i;  para poder así automatizar una instalación.
 
 </para><para>
 
-The configuration fragments used in this appendix are also available as an
-example preseed file from &urlset-example-preseed;.
+Los fragmentos de configuración que se utilizan en este apéndice están también
+disponibles como un fichero de preconfiguración de ejemplo en
+&urlset-example-preseed;.
 
 </para>
 
  <sect1 id="preseed-intro">
- <title>Introduction</title>
+ <title>Introducción</title>
 <para>
 
-Preseeding provides a way to set answers to questions without having to manually
-enter the answers while the installation is running. This makes it possible to
-fully automate most types of installation and even offers some features not
-available during normal installations.
+La preconfiguración ofrece un mecanismo para responder a preguntas sin tener
+que introducir manualmente las respuestas mientras se ejecuta la instalación.
+Esto hace posible que se automatizen la mayoría de las instalaciones e incluso
+ofrece funcionalidades que no están disponibles durante una instalación normal.
 
 </para><para>
 
-Using preseeding it is possible to fill in answers to questions asked during
-both the first stage of the installation (before the reboot into the new
-system) and the second stage.
+Es posible responder a las preguntas que se realizan durante la primera
+fase de la instalación (antes del reinicio al nuevo sistema) y también
+a preguntas en la segunda fase utilizando la preconfiguración.
 
 </para>
 
   <sect2 id="preseed-methods">
-  <title>Preseeding methods</title>
+  <title>Métodos de preconfiguración</title>
 <para>
 
-There are three methods that can be used for preseeding:
-<firstterm>initrd</firstterm>, <firstterm>file</firstterm> and
-<firstterm>network</firstterm>. Initrd preseeding will work with any
-installation method and supports preseeding of more things, but it requires
-the most preparation. File and network preseeding each can be used with
-different installation methods. With file and network preseeding the first
-few installer questions cannot be preseeded because the preseed configuration
-file is only loaded after they have been asked.
+Se pueden utilizar tres métodos de preconfiguración:
+<firstterm>initrd</firstterm>, <firstterm>file</firstterm> (fichero, n. del t.)
+y <firstterm>network</firstterm> (red, n. del t.). La preconfiguración a través
+de initrd funciona en cualquier método de instalación y permite preconfigurar
+más cosas, pero es la que más preparación requiere. Los metodos de
+preconfiguración con fichero o vía red pueden utilizarse en distintos métodos
+de instalación. No se pueden preconfigurar las primeras preguntas de la
+instalación tanto en el caso de la precofinguración a través fichero o vía red
+dado que sólo se cargan una vez se han preguntado.
 
 </para><para>
 
-The following table shows which preseeding methods can be used with which
-installation methods.
+La siguiente tabla muestra los métodos de preconfiguración que pueden utilizarse
+con los distintos métodos de instalación.
 
 <informaltable>
 <tgroup cols="4">
 <thead>
 <row>
-  <entry>Installation method</entry><entry>initrd</entry>
+  <entry>Método de instalación</entry><entry>initrd</entry>
   <entry>file</entry><entry>network</entry>
 </row>
 </thead>
@@ -73,34 +79,34 @@ installation methods.
 <tbody>
 <row>
   <entry>CD/DVD</entry>
-  <entry>yes</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
+  <entry>sí</entry>
   <entry>no</entry>
 </row><row>
   <entry>netboot</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
   <entry>no</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
 </row><row>
-  <entry>hd-media <phrase condition="bootable-usb">(including usb-stick)</phrase></entry>
-  <entry>yes</entry>
-  <entry>yes</entry>
+  <entry>hd-media <phrase condition="bootable-usb">(incluyendo memorias usb)</phrase></entry>
+  <entry>sí</entry>
+  <entry>sí</entry>
   <entry>no</entry>
 </row><row condition="supports-floppy-boot">
-  <entry>floppy based (cd-drivers)</entry>
-  <entry>yes</entry>
-  <entry>yes</entry>
+  <entry>basado en disquete (controladores de cd)</entry>
+  <entry>sí</entry>
+  <entry>sí</entry>
   <entry>no</entry>
 </row><row condition="supports-floppy-boot">
-  <entry>floppy based (net-drivers)</entry>
-  <entry>yes</entry>
+  <entry>basado en disquete (controladores de red)</entry>
+  <entry>sí</entry>
   <entry>no</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
 </row><row arch="s390">
-  <entry>generic/tape</entry>
-  <entry>yes</entry>
+  <entry>genérico/cinta</entry>
+  <entry>sí</entry>
   <entry>no</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
 </row>
 </tbody>
 
@@ -108,47 +114,50 @@ installation methods.
 
 </para><para>
 
-An important difference between the preseeding methods is the point at which
-the preseed configuration file is loaded and processed. For initrd preseeding
-this is right at the start of the installation, before the first question is
-even asked. For file preseeding this is after the CD or CD image has been
-loaded. For network preseeding it is only after the network has been
-configured.
+Una diferencia importante entre los métodos de preconfiguración es el punto en
+el que se carga y procesa el fichero de preconfiguracio. Para la
+preconfiguración a través del initrd ésto se produce justo al comienzo de la
+instalación, antes de hacer siquiera la primera pregunta. Para la
+preconfiguración con fichero ésto se hace después de que el CD o la imagen de
+CD se haya cargado. Para la preconfiguración de red ésto se hace sólo después
+de que se haya configurado la red.
 
 </para><para>
 
-In practical terms this means for file and network preseeding that the
-questions about language, country and keyboard selection will already have
-been asked. For network preseeding add to that any questions related to
-network configuration. Some other questions that are only displayed
-at medium or low priority (like the first hardware detection run) will
-also already have been processed.
+En términos prácticos esto significa que en la preconfiguración por fichero y
+vía red ya se habrá tenido que responder a las preguntas sobre idioma, país y
+seleccio de teclado. Además, para la preconfiguración vía red, se habrán
+respondido  todas las preguntas relacionadas con la configuración de red.
+Algunas preguntas que sólo se muestra en prioridad media o baja (como el primer
+intento de detección automática de hardware) también se habrán respondido en
+este caso.
 
 </para><para>
 
-Obviously, any questions that have been processed before the
-preseeding configuration file is loaded, cannot be preseeded.
-<xref linkend="preseed-bootparms"/> offers a way to avoid these
-questions being asked.
+Obviamente, cualquier pregunta que se haya procesado antes de cargar el
+fichero de preconfiguración no puede preconfigurarse.
+Puede encontrar una forma para evitar que se omitan estas preguntas con
+<xref linkend="preseed-bootparms"/>.
 
 </para>
   </sect2>
 
   <sect2 id="preseed-limitations">
-  <title>Limitations</title>
+  <title>Limitaciones</title>
 <para>
 
-Although most questions used by &d-i; can be preseeded using this method,
-there are some notable exceptions. You must (re)partition an entire disk
-or use available free space on a disk; it is not possible to use existing
-partitions. You currently cannot use preseeding to set up RAID and LVM.
+Aunque la mayoría de las preguntas que utiliza &d-i; pueden preconfigurarse
+con este mecanismo hay algunas excepciones importantes. Tiene que (re)particionar
+el disco completo o utilizar el espacio en disco libre disponible, no puede usar
+particiones existentes. Tampoco puede aún utilizar la preconfiguración para 
+configurar RAID ó LVM.
 
 </para>
   </sect2>
 
 <!-- Joeyh feels this is too technical, so leave it out for now
   <sect2 id="preseed-debconf">
-  <title>Debconf basics</title>
+  <title>Información básica de Debconf</title>
 <para>
 
 Preseeding makes use of the <classname>debconf</classname> framework. This
@@ -208,45 +217,45 @@ are stored in a separate, non-readable file in the same directory.
 -->
 
   <sect2 id="preseed-hooks">
-  <title>Running custom commands during the installation</title>
+  <title>Ejecución de órdenes a medida durante la instalación</title>
 <para>
 
-A very powerfull and flexible option offered by the preseeding tools is the
-ability to run commands or scripts at certain points in the installation.
-See <xref linkend="preseed-shell"/> for details.
+Una opcio muy poderosa y flexible que ofrecen las herramientas de preconfiguración
+es la capacidad de ejecutar órdenes o guiones en puntos específicos de la instalación.
+Tiene más detalles en <xref linkend="preseed-shell"/>.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  <userinput>preseed/early_command</userinput>: is run as soon as the the
-  preseeding configuration file has been loaded
+  <userinput>preseed/early_command</userinput>: se procesa tan pronto como se haya
+  cargado el fichero de preconfiguración.
 </para></listitem>
 <listitem><para>
-  <userinput>preseed/late_command</userinput>: is run just before the reboot
-  at the end of the first stage of the installation, but before the
-  <filename>/target</filename> filesystem has been unmounted
+  <userinput>preseed/late_command</userinput>: se procesa justo antes del reinicio
+  del equipo al final de la primera fase de la instalación pero antes de que
+  se desmonte el sistema de ficheros <filename>/target</filename>.
 </para></listitem>
 <listitem><para>
-  <userinput>base-config/early_command</userinput>: is run early in the second
-  stage of the installation when <command>base-config</command> is starting up
+  <userinput>base-config/early_command</userinput>: se procesa en la segunda
+  fase de la instalación cuando se arranca <command>base-config</command>
 </para></listitem>
 <listitem><para>
-  <userinput>base-config/late_command</userinput>: is run at the end of
-  <command>base-config</command>, just before the login prompt
+  <userinput>base-config/late_command</userinput>: se procesa al final de la ejecución
+  de <command>base-config</command>, justo antes de mostrar el indicador de acceso al sistema.
 </para></listitem>
 </itemizedlist>
 
   </sect2>
 
   <sect2 id="preseed-seenflag">
-  <title>Using preseeding to change default values</title>
+  <title>Utilizar la preconfiguración para cambiar los valore por omisión</title>
 <para>
 
-It is possible to use preseeding to change the default answer for a
-question, but still have the question asked. To do this the
-<firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
-setting the value for a template.
+Es posible utilizar la preconfiguración para cambiar las respuestas por omisión
+a una pregunta, pero haciendo que esta pregunta se realice. Para hacer ésto
+debe definirse la marca <firstterm>seen</firstterm> (visto, n. del t.) a
+<quote>false</quote> una vez se ha fijado un valor para la plantilla.
 
 </para>
 
@@ -259,17 +268,18 @@ d-i foo/bar seen false
  </sect1>
 
  <sect1 id="preseed-using">
- <title>Using preseeding</title>
+ <title>Utilizar la preconfiguración</title>
 <para>
 
-Of course you will first need to create a preseed file and place it in the
-location from where you want to use it. Creating the preseed file is covered
-later in this appendix. Putting it in the correct location is fairly
-straightforward for network preseeding or if you want to read the file off
-a floppy or usb-stick. If you want to include the file on a CD or DVD, you
-will have to remaster the ISO image. How to get the preseed file included
-in the initrd is outside the scope of this document; please consult the
-developers documentation for &d-i;.
+Por supuesto, en primer lugar ha de crear primero el fichero de preconfiguracio
+y ponerlo en la localización donde pretende utilizarlo. La creación del fichero
+de preconfiguración se describe más adelante en este apéndice. Colocar el
+fichero en la ubicación correcta es algo relativamente sencillo para la
+preconfiguración vía red o si quiere leer el fichero de un disquete o una
+memoria usb. Si desea incluir el fichero en un CD o DVD tendrá que rehacer la
+imagen ISO. La inclusión del fichero de preconfiguración en el initrd queda
+fuera del alcance de este documento, consulte la documentación de
+desarrolladores de &d-i; si está interesado.
 
 </para><para>
 
