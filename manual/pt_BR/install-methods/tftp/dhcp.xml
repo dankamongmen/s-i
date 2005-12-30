@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 26472 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 29400 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
 
   <sect2 condition="supports-dhcp" id="dhcpd">
    <title>Configurando um servidor DHCP</title>
 <para>
 
 Um servidor DHCP livre é o ISC <command>dhcpd</command>. Na
-&debian;, ele está disponível no pacote <classname>dhcp</classname>. 
+&debian;, ele está disponível no pacote <classname>dhcp</classname>.
 Aqui está um modelo de configuração deste pacote (normalmente
 <filename>/etc/dhcpd.conf</filename>):
 
@@ -27,20 +29,20 @@ host clientname {
   filename "/tftpboot/tftpboot.img";
   server-name "servername";
   next-server servername;
-  hardware ethernet 01:23:45:67:89:AB; 
+  hardware ethernet 01:23:45:67:89:AB;
   fixed-address 192.168.1.90;
 }
 </screen></informalexample>
 
-Nota: O novo (e preferido) pacote <classname>dhcp3</classname> utiliza o 
+Nota: O novo (e preferido) pacote <classname>dhcp3</classname> utiliza o
 arquivo de configuração <filename>/etc/dhcp3/dhcpd.conf</filename>.
 
 </para><para>
-Neste exemplo, existe somente um servidor 
-<replaceable>"servername"</replaceable> que faz todo o trabalho 
-do DHCP, servidor, servidor TFTP e gateway de rede. Você precisará 
-modificar as opções domain-name assim como o nome do servidor e 
-endereço de hardware do cliente. A opção <replaceable>"filename"</replaceable> 
+Neste exemplo, existe somente um servidor
+<replaceable>servername</replaceable> que faz todo o trabalho
+do servidor DHCP, servidor TFTP e gateway de rede. Você precisará
+modificar as opções domain-name assim como o nome do servidor e
+endereço de hardware do cliente. A opção <replaceable>filename</replaceable>
 deve ter o nome do arquivo que será baixado via TFTP.
 
 </para><para>
@@ -53,7 +55,7 @@ reinice-o com <userinput>/etc/init.d/dhcpd restart</userinput>.
    <sect3 arch="i386">
    <title>Habilitando a inicialização através de PXE no servidor DHCP</title>
 <para>
-Aqui está outro exemplo para o <filename>dhcp.conf</filename> usando o 
+Aqui está outro exemplo para o <filename>dhcp.conf</filename> usando o
 método Pre-boot Execution Environment (PXE) do TFTP.
 
 <informalexample><screen>
@@ -69,7 +71,7 @@ allow bootp;
 subnet 192.168.1.0 netmask 255.255.255.0 {
   range 192.168.1.200 192.168.1.253;
   option broadcast-address 192.168.1.255;
-# the gateway address which can be different 
+# the gateway address which can be different
 # (access to the internet for instance)
   option routers 192.168.1.1;
 # indicate the dns you want to use
@@ -86,8 +88,8 @@ group {
 }
 </screen></informalexample>
 
-Note que para a inicialização via PXE, o nome do arquivo do 
-cliente <filename>pxelinux.0</filename> é o gerenciador de partida, 
+Note que para a inicialização via PXE, o nome do arquivo do
+cliente <filename>pxelinux.0</filename> é o gerenciador de partida,
 e não a imagem do kernel (veja <xref linkend="tftp-images"/> abaixo).
 
 </para>
