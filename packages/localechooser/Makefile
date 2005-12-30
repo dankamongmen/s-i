@@ -29,8 +29,7 @@ check-utf8: $(L10NLIST)
 	iconv -f utf-8 -t unicode $(L10NLIST) > /dev/null
 
 check-data:
-	# Check that the listed locale is supported, to make sure base-config knows
-	# how to handle it.
+	# Check that the listed locale is supported, to make sure it will work.
 	@for locale in `grep -v "^#" $(LIST) | cut -d\; -f2 | grep _` ; do \
 		if grep -q "^$$locale " /usr/share/i18n/SUPPORTED ; then \
 			: ; \
