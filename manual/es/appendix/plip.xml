@@ -1,64 +1,69 @@
-<!-- original version: 29687 untranslated -->
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- original version: 29687 -->
+<!-- traducido por jfs, 30 dic 2005 -->
 
  <sect1 id="plip" arch="i386">
- <title>Installing &debian; over Parallel Line IP (PLIP)</title>
+ <title>Instalar &debian; a través de una linea IP paralela (PLIP)</title>
 
 <para>
 
-This section explains how to install &debian; on a computer without
-Ethernet card, but with just a remote gateway computer attached via
-a Null-Modem cable (also called Null-Printer cable). The gateway
-computer should be connected to a network that has a Debian mirror
-on it (e.g. to the Internet).
+Esta sección explica cómo se puede instalar &debian; en un ordenador que
+carezca de tarjeta de red y que sólo tiene un ordenador actuando como pasarela
+conectado a través de un cable <quote>null-modem</quote> (también llamado cable
+<quote>null-printer</quote>). El sistema pasarela debería estar conectado a una
+red por la que se pueda acceder a una réplica de Debian (por ejemplo, en
+Internet).
 
 </para><para>
 
-In the example in this appendix we will set up a PLIP connection using
-a gateway connected to the Internet over a dial-up connection (ppp0).
-We will use IP addresses 192.168.0.1 and 192.168.0.2 for the PLIP
-interfaces on the target system and the source system respectively
-(these addresses should be unused within your network address space).
+En el ejemplo de este apéndice se configura una conexio PLIP con una
+pasarela que está conectada a Internet a través de una conexión de 
+acceso telefónico (ppp0). Se utilizarán las direcciones IP 192.168.0.1
+y 192.168.0.2 para las interfaces PLIP en el sistema a instalar (objetivo) y en
+el sistema fuente respectivamente (estas direcciones IP deberían
+estar libres en su espacio direccionamiento de red).
 
 </para><para>
 
-The PLIP connection set up during the installation will also be available
-after the reboot into the installed system (see <xref linkend="boot-new"/>).
+La conexión PLIP que se configura durante la instalación también estará
+disponible después del reinicio del sistema en el propio sistema instalado
+(véase <xref linkend="boot-new"/>).
 
 </para><para>
 
-Before you start, you will need to check the BIOS configuration (IO base
-address and IRQ) for the parallel ports of both the source and target
-systems. The most common values are <literal>io=0x378</literal>,
+Antes de empezar deberá comprobar que la configuración de la BIOS
+para el puerto paralelo (dirección base IO e IRQ) de ambos sistemas, fuente y
+objetivo. Los valores más habituales son <literal>io=0x378</literal> e
 <literal>irq=7</literal>.
 
 </para>
 
   <sect2>
-  <title>Requirements</title>
+  <title>Requisitos</title>
 
 <itemizedlist>
 <listitem><para>
 
-A target computer, called <emphasis>target</emphasis>, where Debian will be
-installed.
+Un sistema destino, llamado <emphasis>objetivo</emphasis> donde se va a instalar
+Debian.
 
 </para></listitem>
 <listitem><para>
 
-System installation media; see <xref linkend="installation-media"/>.
+Los medios para la instalación del sistema, véase <xref linkend="installation-media"/>.
 
 </para></listitem>
 <listitem><para>
 
-Another computer connected to the Internet, called <emphasis>source</emphasis>,
-that will function as the gateway.
+Otro sistema conectado a Internet que actuará como pasarela y llamaremos aquí
+<emphasis>fuente</emphasis>.
 
 </para></listitem>
 <listitem><para>
 
-A DB-25 Null-Modem cable. See the
-<ulink url="&url-plip-install-howto;">PLIP-Install-HOWTO</ulink> for more
-information on this cable and instructions how to make your own.
+Un cable <quote>null-modem</quote> DB-25. Para más información sobre
+este cable e instrucciones de cómo hacerse uno puede consultar el documento
+<ulink url="&url-plip-install-howto;">PLIP-Install-HOWTO</ulink>.
 
 </para></listitem>
 </itemizedlist>
@@ -66,25 +71,25 @@ information on this cable and instructions how to make your own.
   </sect2>
 
   <sect2>
-  <title>Setting up source</title>
+  <title>Configurar la fuente</title>
 <para>
 
-The following shell script is a simple example of how to configure the
-source computer as a gateway to the Internet using ppp0.
+El programa mostrado a continuación es un ejemplo sencillo que configura
+el ordenador fuente como una pasarela a Internet utilizando pp0.
 
 <informalexample><screen>
 #!/bin/sh
 
-# We remove running modules from kernel to avoid conflicts and to
-# reconfigure them manually.
+# Eliminamos los módulos que están ejecutándose en el núcleo para evitar
+# conflictos y para reconfigurarlos manualmente
 modprobe -r lp parport_pc
 modprobe parport_pc io=<replaceable>0x378</replaceable> irq=<replaceable>7</replaceable>
 modprobe plip
 
-# Configure the plip interface (plip0 for me, see dmesg | grep plip)
+# Configura la interfaz plip (plip0 en este caso, consulte dmesg | grep plip)
 ifconfig <replaceable>plip0 192.168.0.2</replaceable> pointopoint <replaceable>192.168.0.1</replaceable> netmask 255.255.255.255 up
 
-# Configure gateway
+# Configurar la pasarela
 modprobe iptable_nat
 iptables -t nat -A POSTROUTING -o <replaceable>ppp0</replaceable> -j MASQUERADE
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -94,64 +99,65 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
   </sect2>
 
   <sect2>
-  <title>Installing target</title>
+  <title>Instalar el objetivo</title>
 <para>
 
-Boot the installation media. The installation needs to be run in
-expert mode; enter <userinput>expert</userinput> at the boot prompt.
-Below are the answers that should be given during various stages of
-the installation.
+Arranque del medio de instalación. Tiene que ejecutar la instalación
+en modo experto, utilice <userinput>expert</userinput> en el cursor de arranque.
+Abajo se dan las respuestas que debería dar durante las distintas fases de la
+instalación.
 
 </para>
 
 <orderedlist>
 <listitem><para>
 
-<guimenuitem>Load installer components</guimenuitem>
+<guimenuitem>Cargar componentes del instalador desde CD</guimenuitem>
 
 </para><para>
 
-Select the <userinput>plip-modules</userinput> option from the list; this
-will make the PLIP drivers available to the installation system.
+Seleccione la opción <userinput>plip-modules</userinput> de la lista, ésto hará
+que el sistema de instalación pueda utilizar los controladores PLIP.
 
 </para></listitem>
 <listitem><para>
 
-<guimenuitem>Detect network hardware</guimenuitem>
+<guimenuitem>Detección del hardware de red</guimenuitem>
 
 </para>
 
  <itemizedlist>
  <listitem><para>
 
-If target <emphasis>does</emphasis> have a network card, a list of driver
-modules for detected cards will be shown. If you want to force &d-i; to
-use plip instead, you have to deselect all listed driver modules.
-Obviously, if target doesn't have a network card, the installer will not
-show this list.
+Si el objetivo <emphasis>tiene</emphasis> una tarjeta de red se mostrará una
+lista de los módulos de controladora para las tarjetas detectadas.  Si quiere
+hacer que &d-i; utilice plip en lugar de éstas tendrá que deseleccionar todos
+los módulos de controladores listados. Obviamente, si el objetivo no tiene una
+tarjeta de red el instalador no mostrará esta lista.
 
  </para></listitem>
  <listitem><para>
 
-Prompt for module parameters: Yes
+¿Solicitar los parámetros de los módulos? Si
 
  </para></listitem>
  <listitem><para>
 
-Because no network card was detected/selected earlier, the installer will
-ask you to select a network driver module from a list.
-Select the <userinput>plip</userinput> module.
+El instalador le preguntará si quiere seleccionar un módulo de controlador de red
+de la lista dado que antes no se ha seleccionado ni detectado una tarjeta de red.
+Seleccione el módulo <userinput>plip</userinput>.
 
  </para></listitem>
  <listitem><para>
 
-Additional parameters for module parport_pc:
+Por favor, introduzca los parámetros adicionales para el módulo parport_pc:
 <userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
 
  </para></listitem>
  <listitem><para>
 
-Additional parameters for module plip: leave empty
+Por favor, introduzca los parámetros adicionales para el módulo plip:
+dejar en blanco
 
  </para></listitem>
  </itemizedlist>
@@ -159,29 +165,29 @@ Additional parameters for module plip: leave empty
 </listitem>
 <listitem><para>
 
-<guimenuitem>Configure the network</guimenuitem>
+<guimenuitem>Configurar la red</guimenuitem>
 
  <itemizedlist>
  <listitem><para>
 
-Auto-configure network with DHCP: No
+¿Desea configurar automáticamente la red con DHCP? No
 
  </para></listitem>
  <listitem><para>
 
-IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>
+Dirección IP: <userinput><replaceable>192.168.0.1</replaceable></userinput>
 
  </para></listitem>
  <listitem><para>
 
-Point-to-point address:
+Dirección punto a punto:
 <userinput><replaceable>192.168.0.2</replaceable></userinput>
 
  </para></listitem>
  <listitem><para>
 
-Name server addresses: you can enter the same addresses used on
-source (see <filename>/etc/resolv.conf</filename>)
+Direcciones de servidores de nombres: puede introducir la misma dirección que la 
+que utiliza la fuente (consúltela en <filename>/etc/resolv.conf</filename>)
 
  </para></listitem>
  </itemizedlist>
