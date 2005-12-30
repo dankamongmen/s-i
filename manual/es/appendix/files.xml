@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 25763 -->
+<!-- original version: 28672 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 
 
@@ -189,10 +189,21 @@ siguientes líneas al fichero <filename>/etc/sysctl.conf</filename>.
 
  <sect1 id="tasksel-size-list">
  <title>Espacio en disco requerido para las tareas</title>
+
+<!-- Note for d-i and manual maintainers
+ Sizes of tasks should be determined by running "tasksel new" on a system
+ that been fully installed without selecting any tasks. By selecting a
+ task together with the "manual selection" option, aptitude will be started
+ and show the sizes for the task. After deselecting the packages to be
+ installed, quit aptitude and repeat for other tasks.
+ Space requirements need to be determined from tasksel as tasksel will not
+ install recommended packages while selecting a task from aptitude will.
+-->
+
 <para>
 
-La instalación base de sarge para i386, incluyendo todos
-los paquetes estándar, requiere 178 MB de espacio en disco.
+La instalación base de sarge para i386 con el núcleo 2.4 por omisión
+e incluyendo todos los paquetes estándar requiere de 573 MB de espacio en disco.
 
 </para><para>
 
@@ -204,12 +215,20 @@ sus tamaños individualmente.
 
 </para><para>
 
+Tenga en cuenta que tendrá que añadir los tamaños que se indican en la tabla al 
+tamaño de la instalación base para poder determinar el tamaño de sus particiones.
+La mayoría del espacio en disco que se indica en <quote>Tamaño instalado</quote> 
+acabará utilizándose de <filename>/usr</filename>. Por otro lado, el tamaño
+que se indica en <quote>Tamaño de descarga</quote> será necesario (temporalmente)
+en <filename>/var</filename>.
+</para><para>
+
 <informaltable><tgroup cols="4">
 <thead>
 <row>
   <entry>Tarea</entry>
   <entry>Tamaño instalado (MB)</entry>
-  <entry>Tamaño descarga (MB)</entry>
+  <entry>Tamaño de descarga (MB)</entry>
   <entry>Espacio necesario para instalar (MB)</entry>
 </row>
 </thead>
@@ -217,44 +236,51 @@ sus tamaños individualmente.
 <tbody>
 <row>
   <entry>Entorno de escritorio</entry>
-  <entry>1537</entry>
-  <entry>521</entry>
-  <entry>2058</entry>
+  <entry>1392</entry>
+  <entry>460</entry>
+  <entry>1852</entry>
 </row>
 
 <row>
   <entry>Servidor Web</entry>
-  <entry>71</entry>
-  <entry>21</entry>
-  <entry>92</entry>
+  <entry>36</entry>
+  <entry>12</entry>
+  <entry>48</entry>
 </row>
 
 <row>
   <entry>Servidor de impresión</entry>
-  <entry>240</entry>
-  <entry>83</entry>
-  <entry>323</entry>
+  <entry>168</entry>
+  <entry>58</entry>
+  <entry>226</entry>
 </row>
 
 <row>
-  <entry>Servidor de correo</entry>
-  <entry>41</entry>
-  <entry>12</entry>
-  <entry>53</entry>
+  <entry>Servidor de DNS</entry>
+  <entry>2</entry>
+  <entry>1</entry>
+  <entry>3</entry>
 </row>
 
 <row>
   <entry>Servidor de ficheros</entry>
-  <entry>85</entry>
-  <entry>34</entry>
-  <entry>119</entry>
+  <entry>47</entry>
+  <entry>24</entry>
+  <entry>71</entry>
+</row>
+
+<row>
+  <entry>Servidor de correo</entry>
+  <entry>10</entry>
+  <entry>3</entry>
+  <entry>13</entry>
 </row>
 
 <row>
   <entry>Base de datos SQL</entry>
-  <entry>108</entry>
-  <entry>33</entry>
-  <entry>141</entry>
+  <entry>66</entry>
+  <entry>21</entry>
+  <entry>87</entry>
 </row>
 
 </tbody>
@@ -267,6 +293,14 @@ los entornos de escritorio de Gnome y KDE.
 
 </para></note>
 
+</para><para>
+
+Puede que <command>tasksel</command> instale automáticamente una
+<firstterm>tarea de localización</firstterm> si está realizando la instalación
+en un idioma que no sea el inglés, siempre y cuando haya una disponible para su
+idioma. Los requisitos de espacio varían por idioma pero debería, en este caso,
+tener en cuenta que podría necesitar 200MB en total para la descarga e instalación
+de esta tarea.
 
 </para>
  </sect1>
