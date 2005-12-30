@@ -113,8 +113,9 @@ set xdata time
 set format x "%m/%y"
 set yrange [0 to 102]
 set ylabel 'percent successful'
-set terminal png giant
+set terminal png giant size 640,640
 set output '$basename.png'
+set key below
 };
 	my $c=2;
 	print GNUPLOT "plot";
