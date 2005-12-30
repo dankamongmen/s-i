@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 24663 -->
+<!-- original version: 32141 -->
 
    <sect3 arch="i386">
    <title>Particionado de las memorias USB en &arch-title;</title>
@@ -20,9 +20,9 @@ para crear la partición FAT16 y luego escriba
 # mkdosfs /dev/<replaceable>sda1</replaceable>
 </screen></informalexample>
 
-Tenga cuidado y use el nombre de dispositivo correcto para su memoria
+Tenga cuidado de usar el nombre de dispositivo correcto para su memoria
 USB. La orden <command>mkdosfs</command> se encuentra en el paquete
-de Debian <classname>dosfstools</classname>.
+<classname>dosfstools</classname> de Debian.
 
 </para></note><para>
 
@@ -37,7 +37,7 @@ gestor de arranque.
 
 </para><para>
 
-Para poner <command>SYSLINUX</command> en la partición FAT16 de su
+Para ubicar <command>SYSLINUX</command> en la partición FAT16 de su
 memoria USB, instale los paquetes <classname>syslinux</classname> y
 <classname>mtools</classname> en su sistema, y escriba
 
@@ -45,7 +45,7 @@ memoria USB, instale los paquetes <classname>syslinux</classname> y
 # syslinux /dev/<replaceable>sda1</replaceable>
 </screen></informalexample>
 
-Nuevamente, tenga cuidado al usar el nombre de dispositivo correcto. La
+Nuevamente, tenga cuidado de usar el nombre de dispositivo correcto. La
 partición no debe estar montada cuando ejecute <command>SYSLINUX</command>.
 Este procedimiento escribe un sector de arranque en la partición y
 crea el fichero <filename>ldlinux.sys</filename> que contiene el código
@@ -91,12 +91,16 @@ contener las dos líneas siguientes:
 
 <informalexample><screen>
 default vmlinuz
-append initrd=initrd.gz ramdisk_size=10000 root=/dev/rd/0 init=/linuxrc devfs=mount,dall rw
+append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw
 </screen></informalexample>
 
-Por favor, en algunos casos es necesario incrementar el parámetro
+Por favor tenga en cuenta que en algunos casos es necesario incrementar el parámetro
 <userinput>ramdisk_size</userinput> dependiendo de la imagen que esté
 arrancando.
+<phrase condition="sarge">
+Si falla el arranque, puede intentar añadir <userinput>devfs=mount,dall</userinput>
+a la línea <quote>append</quote>.
+</phrase>
 
 </para>
    </sect3>
