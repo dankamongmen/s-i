@@ -1,65 +1,68 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 29687 untranslated -->
+<!-- original version: 29687 -->
 
  <sect1 id="plip" arch="i386">
- <title>Installing &debian; over Parallel Line IP (PLIP)</title>
+ <title>Instal·lació de &debian; per Parallel Line IP (PLIP)</title>
 
 <para>
 
-This section explains how to install &debian; on a computer without
-Ethernet card, but with just a remote gateway computer attached via
-a Null-Modem cable (also called Null-Printer cable). The gateway
-computer should be connected to a network that has a Debian mirror
-on it (e.g. to the Internet).
+Aquesta secció explica com instal·lar &debian; en un ordinador sense una
+targeta Ethernet, però amb un ordinador passarel·la remot adjunt per mitjà
+d'un cable Null-Modem (també anomenat cable Null-Printer). És recomanable
+que l'ordinador passarel·la estigui connectat a una xarxa que tingui una
+rèplica de Debian (per exemple a Internet).
 
 </para><para>
 
-In the example in this appendix we will set up a PLIP connection using
-a gateway connected to the Internet over a dial-up connection (ppp0).
-We will use IP addresses 192.168.0.1 and 192.168.0.2 for the PLIP
-interfaces on the target system and the source system respectively
-(these addresses should be unused within your network address space).
+En l'exemple d'aquest apèndix configurarem una connexió PLIP utilitzant
+una passarel·la connectada a Internet a través d'una connexió de marcatge
+directe (ppp0). Farem servir les adreces IP 192.168.0.1 i 192.168.0.2 per a
+les interfícies PLIP del sistema destí i origen respectivament
+(és recomanable que aquestes adreces no s'utilitzin dins de l'espai
+d'adreces de la vostra xarxa).
 
 </para><para>
 
-The PLIP connection set up during the installation will also be available
-after the reboot into the installed system (see <xref linkend="boot-new"/>).
+La connexió PLIP configurada durant la instal·lació romandrà disponible
+després d'arrencar el sistema instal·lat (consulteu <xref linkend="boot-new"/>).
 
 </para><para>
 
-Before you start, you will need to check the BIOS configuration (IO base
-address and IRQ) for the parallel ports of both the source and target
-systems. The most common values are <literal>io=0x378</literal>,
+Abans de començar, necessitareu comprovar la configuració de la BIOS (adreces
+base IO i IRQ) per als ports paral·lels dels sistemes origen i destí.
+Els valors més habituals són <literal>io=0x378</literal>,
 <literal>irq=7</literal>.
 
 </para>
 
   <sect2>
-  <title>Requirements</title>
+  <title>Requeriments</title>
 
 <itemizedlist>
 <listitem><para>
 
-A target computer, called <emphasis>target</emphasis>, where Debian will be
-installed.
+Un ordinador destí, anomenat <emphasis>destí</emphasis>, on s'instal·larà el
+sistema Debian.
 
 </para></listitem>
 <listitem><para>
 
-System installation media; see <xref linkend="installation-media"/>.
+Suports d'instal·lació del sistema, consulteu
+<xref linkend="installation-media"/>.
 
 </para></listitem>
 <listitem><para>
 
-Another computer connected to the Internet, called <emphasis>source</emphasis>,
-that will function as the gateway.
+Un altre ordinador connectat a Internet, anomenat <emphasis>origen</emphasis>,
+que farà de passarel·la.
 
 </para></listitem>
 <listitem><para>
 
-A DB-25 Null-Modem cable. See the
-<ulink url="&url-plip-install-howto;">PLIP-Install-HOWTO</ulink> for more
-information on this cable and instructions how to make your own.
+Un cable Null-Modem DB-25. Consulteu el
+<ulink url="&url-plip-install-howto;">PLIP-Install-HOWTO</ulink> per a més
+informació sobre aquest cable i instruccions de com elaborar-ne el vostre
+propi.
 
 </para></listitem>
 </itemizedlist>
@@ -67,25 +70,26 @@ information on this cable and instructions how to make your own.
   </sect2>
 
   <sect2>
-  <title>Setting up source</title>
+  <title>Configuració de l'origen</title>
 <para>
 
-The following shell script is a simple example of how to configure the
-source computer as a gateway to the Internet using ppp0.
+La següent seqüència d'intèrpret d'ordres és un exemple simple de com
+configurar l'ordinador origen com a passarel·la cap a Internet fent servir
+ppp0.
 
 <informalexample><screen>
 #!/bin/sh
 
-# We remove running modules from kernel to avoid conflicts and to
-# reconfigure them manually.
+# Eliminem els mòduls que s'executen al nucli per evitar conflictes i per a
+# tornar-los a configurar manualment.
 modprobe -r lp parport_pc
 modprobe parport_pc io=<replaceable>0x378</replaceable> irq=<replaceable>7</replaceable>
 modprobe plip
 
-# Configure the plip interface (plip0 for me, see dmesg | grep plip)
+# Configurem la intefície PLIP (en aquest cas plip0, vegeu dmesg | grep plip)
 ifconfig <replaceable>plip0 192.168.0.2</replaceable> pointopoint <replaceable>192.168.0.1</replaceable> netmask 255.255.255.255 up
 
-# Configure gateway
+# Configurem la passarel·la
 modprobe iptable_nat
 iptables -t nat -A POSTROUTING -o <replaceable>ppp0</replaceable> -j MASQUERADE
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -95,64 +99,64 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
   </sect2>
 
   <sect2>
-  <title>Installing target</title>
+  <title>Instal·lació del destí</title>
 <para>
 
-Boot the installation media. The installation needs to be run in
-expert mode; enter <userinput>expert</userinput> at the boot prompt.
-Below are the answers that should be given during various stages of
-the installation.
+Arrenqueu el suport d'instal·lació. És necessari executar la instal·lació
+en mode expert; introduïu <userinput>expert</userinput> a l'indicador
+d'arrencada. A continuació hi ha les respostes recomanades de diverses fases
+de la instal·lació.
 
 </para>
 
 <orderedlist>
 <listitem><para>
 
-<guimenuitem>Load installer components</guimenuitem>
+<guimenuitem>Carrega els components de l'instal·lador</guimenuitem>
 
 </para><para>
 
-Select the <userinput>plip-modules</userinput> option from the list; this
-will make the PLIP drivers available to the installation system.
+Seleccioneu l'opció <userinput>plip-modules</userinput> de la llista;
+això farà disponibles els controladors de PLIP al sistema d'instal·lació.
 
 </para></listitem>
 <listitem><para>
 
-<guimenuitem>Detect network hardware</guimenuitem>
+<guimenuitem>Detecta el maquinari de xarxa</guimenuitem>
 
 </para>
 
  <itemizedlist>
  <listitem><para>
 
-If target <emphasis>does</emphasis> have a network card, a list of driver
-modules for detected cards will be shown. If you want to force &d-i; to
-use plip instead, you have to deselect all listed driver modules.
-Obviously, if target doesn't have a network card, the installer will not
-show this list.
+Si el destí <emphasis>té</emphasis> una targeta de xarxa, es mostrarà una
+llista dels controladors per a les targetes detectades. Si voleu
+imposar que el &d-i; utilitzi PLIP, heu de desseleccionar tots els mòduls
+llistats. Òbviament, si l'ordinador destí no té cap targeta de xarxa,
+l'instal·lador no mostrarà aquesta llista.
 
  </para></listitem>
  <listitem><para>
 
-Prompt for module parameters: Yes
+Sol·licita els paràmetres dels mòduls: Sí
 
  </para></listitem>
  <listitem><para>
 
-Because no network card was detected/selected earlier, the installer will
-ask you to select a network driver module from a list.
-Select the <userinput>plip</userinput> module.
+Com que anteriorment no s'ha detecat/seleccionat cap xarxa, l'instal·lador
+us demanarà que seleccioneu un controlador de xarxa d'una llista.
+Seleccioneu el mòdul <userinput>plip</userinput>.
 
  </para></listitem>
  <listitem><para>
 
-Additional parameters for module parport_pc:
+Paràmetres addicionals per al mòdul parport_pc:
 <userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
 
  </para></listitem>
  <listitem><para>
 
-Additional parameters for module plip: leave empty
+Paràmetres addicionals per al mòdul plip: deixeu-ho en blanc
 
  </para></listitem>
  </itemizedlist>
@@ -160,29 +164,29 @@ Additional parameters for module plip: leave empty
 </listitem>
 <listitem><para>
 
-<guimenuitem>Configure the network</guimenuitem>
+<guimenuitem>Configuració de la xarxa</guimenuitem>
  
  <itemizedlist>
  <listitem><para>
 
-Auto-configure network with DHCP: No
+Configuració automàtica de la xarxa amb DHCP: No
 
  </para></listitem>
  <listitem><para>
 
-IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>
+Adreça IP: <userinput><replaceable>192.168.0.1</replaceable></userinput>
 
  </para></listitem>
  <listitem><para>
 
-Point-to-point address:
+Adreça punt a punt:
 <userinput><replaceable>192.168.0.2</replaceable></userinput>
 
  </para></listitem>
  <listitem><para>
 
-Name server addresses: you can enter the same addresses used on
-source (see <filename>/etc/resolv.conf</filename>)
+Adreces dels servidors de noms: podeu introduir les mateixes adreces que
+les utilitzades a l'origen (vegeu <filename>/etc/resolv.conf</filename>)
 
  </para></listitem>
  </itemizedlist>
