@@ -1,71 +1,72 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28732 untranslated -->
+<!-- original version: 28732 -->
+<!-- translated by Marco Carvalho (macs) 2005.12.30 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.31 -->
 
  <sect1 id="rescue" condition="etch">
- <title>Recovering a Broken System</title>
+ <title>Recuperando um Sistema Quebrado</title>
 <para>
 
-Sometimes, things go wrong, and the system you've carefully installed is no
-longer bootable. Perhaps the boot loader configuration broke while trying
-out a change, or perhaps a new kernel you installed won't boot, or perhaps
-cosmic rays hit your disk and flipped a bit in
-<filename>/sbin/init</filename>. Regardless of the cause, you'll need to
-have a system to work from while you fix it, and rescue mode can be useful
-for this.
+Algumas vezes, coisas dão errado, e o sistema que você cuidadosamente instalou
+não mais inicia. Talvez o carregador de inicialização tenha quebrado enquanto
+tentava uma mudança, ou talvez o novo kernel que você instalou não inicie, ou
+talvez raios cósmicos tenham atingido seus discos e trocado alguns bits no
+<filename>/sbin/init</filename>. Seja qual for a causa, você precisa ter um
+sistema para trabalhar enquanto corrige, e o modo de recuperação pode ser
+útil para isso.
 
 </para><para>
 
 <!-- TODO: describe what to do on arches where this isn't set up in the
      bootloader -->
 
-To access rescue mode, type <userinput>rescue</userinput> at the
-<prompt>boot:</prompt> prompt, or boot with the
-<userinput>rescue/enable=true</userinput> boot parameter. You'll be shown
-the first few screens of the installer, with a note in the corner of the
-display to indicate that this is rescue mode, not a full installation. Don't
-worry, your system is not about to be overwritten! Rescue mode simply takes
-advantage of the hardware detection facilities available in the installer to
-ensure that your disks, network devices, and so on are available to you
-while repairing your system.
+Para acessar o modo de recuperação, digite <userinput>rescue</userinput> no
+prompt <prompt>boot:</prompt> ou inicie com o parâmetro de inicialização
+<userinput>rescue/enable=true</userinput>. Você verá as primeiras telas do
+instalador, com uma nota no canto da tela indicando que está no modo de
+recuperação, não numa instalação completa. Não se preocupe, seu sistema não
+será sobrescrito! O modo de recuperação simplesmente tira vantagem da detecção
+de hardware disponível no instalador para ter certeza que seu discos,
+dispositivos de rede, e tudo o mais estão disponíveis para você enquanto repara
+seu sistema.
 
 </para><para>
 
-Instead of the partitioning tool, you should now be presented with a list of
-the partitions on your system, and asked to select one of them. Normally,
-you should select the partition containing the root file system that you
-need to repair. You may select partitions on RAID and LVM devices as well as
-those created directly on disks.
+Ao invés da ferramenta de particionamento, você verá uma lista da partições
+em seu sistema, e será convidado a escolher uma delas, Normalmente, você
+deverá escolher a partição que contém o sistema de arquivos raiz que você
+precisa reparar. Você poderá escolher partições em dispositivos em RAID e LVM
+bem como as criadas diretamente nos discos.
 
 </para><para>
 
-If possible, the installer will now present you with a shell prompt in the
-file system you selected, which you can use to perform any necessary
-repairs.
+Se possível, o instalador irá apresentar agora um prompt shell no sistema de
+arquivos que você escolheu, onde você poderá fazer qualquer reparo necessário.
 
 <phrase arch="i386">
-For example, if you need to reinstall the GRUB boot loader into the master
-boot record of the first hard disk, you could enter the command
-<userinput>grub-install '(hd0)'</userinput> to do so.
+Por exemplo, se você precisa reinstalar o carregador de inicialização GRUB no
+master boot record do primeiro disco rígido, você poderá usar o comando
+<userinput>grub-install '(hd0)'</userinput> para isso.
 </phrase>
 
 </para><para>
 
-If the installer cannot run a usable shell in the root file system you
-selected, perhaps because the file system is corrupt, then it will issue a
-warning and offer to give you a shell in the installer environment instead.
-You may not have as many tools available in this environment, but they will
-often be enough to repair your system anyway. The root file system you
-selected will be mounted on the <filename>/target</filename> directory.
+Se o instalador não puder executar um shell usável no sistema de arquivos
+raiz que você selecionou, talvez porque o sistema de arquivos esteja corrompido,
+será dado um aviso e oferecerá para lhe dar um shell no ambiente do instalador
+no lugar, mas isso poderá ser suficiente para reparar seu sistema de qualquer
+forma. O sistema de arquivos raiz que você escolheu será montado no diretório
+<filename>/target</filename>.
 
 </para><para>
 
-In either case, after you exit the shell, the system will reboot.
+Neste caso, após deixar o shell o sistema será reiniciado.
 
 </para><para>
 
-Finally, note that repairing broken systems can be difficult, and this
-manual does not attempt to go into all the things that might have gone wrong
-or how to fix them. If you have problems, consult an expert.
+Finalmente, note que reparar sistemas quebrados pode ser difícil, e este manual
+não irá apresentar todas as coisas que podem ter saído errado ou como corrigir.
+Se você tiver problemas, consulte um especialista.
 
 </para>
  </sect1>
