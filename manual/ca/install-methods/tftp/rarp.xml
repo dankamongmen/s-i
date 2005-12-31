@@ -1,26 +1,26 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 28997 -->
 
 
   <sect2 condition="supports-rarp" id="tftp-rarp">
-   <title>Setting up RARP server</title>
+   <title>Configurant un servidor RARP</title>
 <para>
 
-To setup RARP, you need to know the Ethernet address (a.k.a. the MAC address)
-of the client computers to be installed.
-If you don't know this information, you can
+Per configurar el RARP, necessitareu la adreça Ethernet (és a dir l'adreça
+MAC) dels clients on instal·lar-se.
 
-<phrase arch="sparc"> pick it off the initial OpenPROM boot messages, use the
-OpenBoot <userinput>.enet-addr</userinput> command, or </phrase>
+Si no sabeu aquesta informació, podeu
 
-boot into <quote>Rescue</quote> mode (e.g., from the rescue floppy) and use the
-command <userinput>/sbin/ifconfig eth0</userinput>.
+<phrase arch="sparc">agafar-la dels missatges d'arrancada de l'OpenPROM,
+utilitzar l'ordre   OpenBoot <userinput>.enet-addr</userinput>, o </phrase>
+
+arrencar amb el mode de <quote>recuperació</quote> (es a dir des del disquet
+de recuperació) i utilitzar l'ordre <userinput>/sbin/ifconfig eth0</userinput>.
 
 </para><para>
 
-On a RARP server system using a Linux 2.2.x kernel,
-you need to populate the kernel's RARP table.
-To do this, run the following commands:
+Si utilitzeu el nucli de Linux 2.2.x al servidor RARP, necessitareu omplir
+la taula RARP del nucli. Per fer-ho, executeu les ordres següents:
 
 <informalexample><screen>
 # <userinput>/sbin/rarp -s
@@ -32,32 +32,31 @@ To do this, run the following commands:
 <replaceable>client-enet-addr</replaceable></userinput>
 </screen></informalexample>
 
-If you get
+Si obteniu:
 
 <informalexample><screen>
 SIOCSRARP: Invalid argument
 </screen></informalexample>
 
-you probably need to load the RARP kernel module or else recompile the
-kernel to support RARP.  Try <userinput>modprobe rarp</userinput> and
-then try the <command>rarp</command> command again.
+Probablement, necessitareu carregar el mòdul del nucli pel RARP o bé
+recompilar el nucli per que suporti RARP. Executeu
+<userinput>modprobe rarp</userinput> i desprès altra vegada l'ordre
+<command>rarp</command>.
 
 </para><para>
 
-On a RARP server system using a Linux 2.4.x kernel,
-there is no RARP module, and
-you should instead use the <command>rarpd</command> program.  The
-procedure is similar to that used under SunOS in the following
-paragraph.
+Si utilitzeu un nucli de Linux 2.4.x al servidor RARP, no hi ha cap mòdul
+RARP, i hauríeu d'utilitzar el programa <command>rarpd</command>.  El
+procediment és semblant al utilitzat pel SunOS al paràgraf següent.
 
 </para><para>
 
-Under SunOS, you need to ensure that the Ethernet hardware address for
-the client is listed in the <quote>ethers</quote> database (either in the
-<filename>/etc/ethers</filename> file, or via NIS/NIS+) and in the
-<quote>hosts</quote> database. Then you need to start the RARP daemon.
-In SunOS 4, issue the command (as root):
-<userinput>/usr/etc/rarpd -a</userinput>; in SunOS 5, use
+Al SunOS, necessitareu estar segurs que l'adreça física del client és
+a la base de dades <quote>ethers</quote> (o bé al fitxer
+<filename>/etc/ethers</filename>, o via NIS/NIS+) i a la base de dades
+<quote>hosts</quote>. Necessitareu aleshores engegar el dimoni RARP.
+Al SunOS 4, introduïu (com a root) l'ordre:
+<userinput>/usr/etc/rarpd -a</userinput>; al SunOS 5, utilitzeu
 <userinput>/usr/sbin/rarpd -a</userinput>.
 
 </para>

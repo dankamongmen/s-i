@@ -1,58 +1,58 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 28997 -->
 
 
-  <sect2 arch="alpha"><title>Partitioning for &arch-title;</title>
+  <sect2 arch="alpha"><title>Particionament per &arch-title;</title>
 <para>
 
-Booting Debian from the SRM console (the only disk boot method supported
-by &releasename;) requires you to have a BSD disk label, not a DOS
-partition table, on your boot disk.  (Remember, the SRM boot block is
-incompatible with MS-DOS partition tables &mdash; see
-<xref linkend="alpha-firmware"/>.)  As a result, <command>partman</command>
-creates BSD disk labels when running on &architecture;, but if your disk
-has an existing DOS partition table the existing partitions will need to
-be deleted before partman can convert it to use a disk label.
+Per arrencar Debian des de la consola SRM (l'únic mètode d'arrencada de
+disc suportat per &releasename;) necessiteu tenir una etiqueta de disc BSD,
+i no una taula de particions DOS, al vostre disc d'arrencada. (Recordeu, el
+bloc d'arrencada de SRM és incompatible amb les tabules de particions
+MS-DOS &mdash; vegeu <xref linkend="alpha-firmware"/>). Quan s'executa
+<command>partman</command> a una arquitectura &architecture;, crea un disc
+amb etiqueta BSD, però si el vostre disc té una taula de particions DOS al
+disc, partman necessitarà esborrar primer la taula de particions existents
+per que la pugui convertir en un disc amb etiqueta.
 
 </para><para>
 
-If you have chosen to use <command>fdisk</command> to partition your
-disk, and the disk that you have selected for partitioning does not
-already contain a BSD disk label, you must use the <quote>b</quote>
-command to enter disk label mode.
+Si heu escollit el <command>fdisk</command> per particionar el vostre
+disc, i el disc que esteu particionant no té una etiqueta de disc BSD,
+hauríeu d'utilitzar l'ordre <quote>b</quote> per accedir al mode d'etiqueta
+de disc.
 
 </para><para>
 
-Unless you wish to use the disk you are partitioning from Tru64 Unix
-or one of the free 4.4BSD-Lite derived operating systems (FreeBSD,
-OpenBSD, or NetBSD), it is suggested that you do
-<emphasis>not</emphasis> make the third partition contain the whole
-disk.  This is not required by <command>aboot</command>, and in fact,
-it may lead to confusion since the <command>swriteboot</command>
-utility used to install <command>aboot</command> in the boot sector
-will complain about a partition overlapping with the boot block.
+A no ser que desitgeu utilitzar el disc que esteu particionant des del
+Unix Tru64 o un dels sistemes operatius lliures derivats de 4.4BSD-Lite
+(FreeBSD, OpenBSD o NetBSD), es suggereix que <emphasis>no</emphasis>
+feu que la tercera partició contingui el disc complet. No és necessària
+per l'ordre <command>aboot</command>, i de fet, porta a confusió ja que
+la utilitat <command>swriteboot</command> que s'utilitza per instal·lar
+l'<command>aboot</command> al sector d'arrencada es queixarà de que s'està
+xafant la partició amb el bloc d'arrencada.
 
 </para><para>
 
-Also, because <command>aboot</command> is written to the first few
-sectors of the disk (currently it occupies about 70 kilobytes, or 150
-sectors), you <emphasis>must</emphasis> leave enough empty space at
-the beginning of the disk for it.  In the past, it was suggested that
-you make a small partition at the beginning of the disk, to be left
-unformatted.  For the same reason mentioned above, we now suggest that
-you do not do this on disks that will only be used by GNU/Linux.  When
-using <command>partman</command>, a small partition will still be
-created for <command>aboot</command> for convenience reasons.
+També, com que el <command>aboot</command> s'escriu als primers sectors
+del disc (en aquest moment ocupa uns 70 KiB o 150 sectors),
+<emphasis>necessiteu</emphasis> deixar prou espai buit al principi del
+disc per ell. Abans es suggeria que es fera una xicoteta partició al inici
+del disc, i que es deixara per formatar. Per la mateixa raó d'abans, ara
+suggerim que no feu això al discs que tan sols utilitzen GNU/Linux. Quan
+utilitzeu <command>partman</command>, crearà una partició xicoteta per
+l'<command>aboot</command> per que es considera convenient.
 
 </para><para condition="FIXME">
 
-For ARC installations, you should make a small FAT partition at the
-beginning of the disk to contain <command>MILO</command> and
-<command>linload.exe</command> &mdash; 5 megabytes should be sufficient, see
-<xref linkend="non-debian-partitioning"/>. Unfortunately, making FAT
-file systems from the menu is not yet supported, so you'll have to do
-it manually from the shell using <command>mkdosfs</command> before
-attempting to install the boot loader.
+Per instal·lacions ARC, hauríeu de fer una partició xicoteta FAT al
+principi del disc per que contingui el <command>MILO</command> i el
+<command>linload.exe</command> &mdash; 5 MiB seran suficients, vegeu
+<xref linkend="non-debian-partitioning"/>. Malauradament, fer sistemes de
+fitxers FAT no està encara suportat des del menú, així que haureu de fer-ho
+manualment des de l'intèrpret d'ordres utilitzant <command>mkdosfs</command>
+abans d'intentar instal·lar el carregador de l'arrencada.
 
 </para>
   </sect2>
