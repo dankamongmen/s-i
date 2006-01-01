@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 29687 -->
+<!-- revisado por ender, 31 dic 2005 -->
 <!-- traducido por jfs, 30 dic 2005 -->
 
  <sect1 id="plip" arch="i386">
- <title>Instalar &debian; a través de una linea IP paralela (PLIP)</title>
+ <title>Instalar &debian; a través de una línea IP paralela (PLIP)</title>
 
 <para>
 
 Esta sección explica cómo se puede instalar &debian; en un ordenador que
 carezca de tarjeta de red y que sólo tiene un ordenador actuando como pasarela
-conectado a través de un cable <quote>null-modem</quote> (también llamado cable
-<quote>null-printer</quote>). El sistema pasarela debería estar conectado a una
-red por la que se pueda acceder a una réplica de Debian (por ejemplo, en
-Internet).
+conectado a través de un cable de <quote>módem nulo</quote> (también llamado cable
+<quote>null-modem</quote> o <quote>null-printer</quote>). El sistema pasarela
+debería estar conectado a una red por la que se pueda acceder a una réplica de
+Debian (por ejemplo, en Internet).
 
 </para><para>
 
-En el ejemplo de este apéndice se configura una conexio PLIP con una
+En el ejemplo de este apéndice se configura una conexión PLIP con una
 pasarela que está conectada a Internet a través de una conexión de 
 acceso telefónico (ppp0). Se utilizarán las direcciones IP 192.168.0.1
 y 192.168.0.2 para las interfaces PLIP en el sistema a instalar (objetivo) y en
-el sistema fuente respectivamente (estas direcciones IP deberían
-estar libres en su espacio direccionamiento de red).
+el sistema origen, respectivamente (estas direcciones IP deberían
+estar libres en su espacio de direcciones de red).
 
 </para><para>
 
@@ -31,9 +32,9 @@ disponible después del reinicio del sistema en el propio sistema instalado
 
 </para><para>
 
-Antes de empezar deberá comprobar que la configuración de la BIOS
-para el puerto paralelo (dirección base IO e IRQ) de ambos sistemas, fuente y
-objetivo. Los valores más habituales son <literal>io=0x378</literal> e
+Antes de empezar deberá comprobar que la configuración de BIOS
+para el puerto paralelo (dirección base de E/S (<quote>IO address</quote>) e IRQ)
+de ambos sistemas, origen y objetivo. Los valores más habituales son <literal>io=0x378</literal> e
 <literal>irq=7</literal>.
 
 </para>
@@ -44,25 +45,25 @@ objetivo. Los valores más habituales son <literal>io=0x378</literal> e
 <itemizedlist>
 <listitem><para>
 
-Un sistema destino, llamado <emphasis>objetivo</emphasis> donde se va a instalar
+Un sistema destino, llamado <emphasis>objetivo</emphasis>, donde se va a instalar
 Debian.
 
 </para></listitem>
 <listitem><para>
 
-Los medios para la instalación del sistema, véase <xref linkend="installation-media"/>.
+Los medios para la instalación del sistema; véase <xref linkend="installation-media"/>.
 
 </para></listitem>
 <listitem><para>
 
 Otro sistema conectado a Internet que actuará como pasarela y llamaremos aquí
-<emphasis>fuente</emphasis>.
+<emphasis>sistema origen</emphasis> o simplemente <emphasis>origen</emphasis>.
 
 </para></listitem>
 <listitem><para>
 
-Un cable <quote>null-modem</quote> DB-25. Para más información sobre
-este cable e instrucciones de cómo hacerse uno puede consultar el documento
+Un cable <quote>módem nulo</quote> DB-25. Para más información sobre
+este cable e instrucciones de cómo hacer uno, puede consultar el documento
 <ulink url="&url-plip-install-howto;">PLIP-Install-HOWTO</ulink>.
 
 </para></listitem>
@@ -71,25 +72,25 @@ este cable e instrucciones de cómo hacerse uno puede consultar el documento
   </sect2>
 
   <sect2>
-  <title>Configurar la fuente</title>
+  <title>Configurar el sistema origen</title>
 <para>
 
 El programa mostrado a continuación es un ejemplo sencillo que configura
-el ordenador fuente como una pasarela a Internet utilizando pp0.
+el ordenador fuente como una pasarela a Internet utilizando ppp0.
 
 <informalexample><screen>
 #!/bin/sh
 
 # Eliminamos los módulos que están ejecutándose en el núcleo para evitar
-# conflictos y para reconfigurarlos manualmente
+# conflictos y para reconfigurarlos manualmente.
 modprobe -r lp parport_pc
 modprobe parport_pc io=<replaceable>0x378</replaceable> irq=<replaceable>7</replaceable>
 modprobe plip
 
-# Configura la interfaz plip (plip0 en este caso, consulte dmesg | grep plip)
+# Configura la interfaz plip (plip0 en este caso, pruebe en caso de duda "dmesg | grep plip" ).
 ifconfig <replaceable>plip0 192.168.0.2</replaceable> pointopoint <replaceable>192.168.0.1</replaceable> netmask 255.255.255.255 up
 
-# Configurar la pasarela
+# Configurar la pasarela.
 modprobe iptable_nat
 iptables -t nat -A POSTROUTING -o <replaceable>ppp0</replaceable> -j MASQUERADE
 echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -102,8 +103,8 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
   <title>Instalar el objetivo</title>
 <para>
 
-Arranque del medio de instalación. Tiene que ejecutar la instalación
-en modo experto, utilice <userinput>expert</userinput> en el cursor de arranque.
+Arranque con el medio de instalación. Tiene que ejecutar la instalación
+en modo experto, utilizando <userinput>expert</userinput> en el indicador de sistema del arranque.
 Abajo se dan las respuestas que debería dar durante las distintas fases de la
 instalación.
 
@@ -130,7 +131,7 @@ que el sistema de instalación pueda utilizar los controladores PLIP.
  <listitem><para>
 
 Si el objetivo <emphasis>tiene</emphasis> una tarjeta de red se mostrará una
-lista de los módulos de controladora para las tarjetas detectadas.  Si quiere
+lista de los módulos con controladores para las tarjetas detectadas.  Si quiere
 hacer que &d-i; utilice plip en lugar de éstas tendrá que deseleccionar todos
 los módulos de controladores listados. Obviamente, si el objetivo no tiene una
 tarjeta de red el instalador no mostrará esta lista.
@@ -138,7 +139,7 @@ tarjeta de red el instalador no mostrará esta lista.
  </para></listitem>
  <listitem><para>
 
-¿Solicitar los parámetros de los módulos? Si
+¿Solicitar los parámetros de los módulos? Sí
 
  </para></listitem>
  <listitem><para>
@@ -157,7 +158,7 @@ Por favor, introduzca los parámetros adicionales para el módulo parport_pc:
  <listitem><para>
 
 Por favor, introduzca los parámetros adicionales para el módulo plip:
-dejar en blanco
+(Déjelos en blanco)
 
  </para></listitem>
  </itemizedlist>

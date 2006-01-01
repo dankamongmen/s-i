@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 31173 -->
+<!-- revisado por ender, 31 dic 2005 -->
 <!-- traducido por jfs, 30 dic 2005 -->
 
    <sect3 id="network-console">
@@ -14,11 +15,11 @@ El uso de la red implica que tiene que llevar a cabo los primeros
 pasos de la instalación a través de la consola al menos hasta 
 llegar al punto en el que se configura la red (aunque puede 
 automatizar esta parte con 
-<xref linkend="automatic-install"/>.)
+<xref linkend="automatic-install"/>).
 
 </para><para arch="not-s390">
 
-Este componente no se carga en el menú instalación por omisión por
+Este componente no aparece en el menú de la instalación por omisión, por
 lo que tiene que pedirlo explícitamente.
 
 En el caso de que esté instalando desde CD debe arrancar fijando la prioridad a
@@ -43,7 +44,7 @@ que le indica que debe conectarse de forma remota con el identificador de
 usuario <emphasis>installer</emphasis> y la contraseña que introdujo. Un detalle
 importante a destacar es que se le indicará también la huella digital del
 sistema que está instalando. Tiene que transferir esta huella de forma
-seguroa a la <quote>persona que continuará con la instalación remota</quote>.
+segura a la <quote>persona que continuará con la instalación remota</quote>.
 
 </para><para>
 
@@ -54,30 +55,30 @@ componente.
 </para><para>
 
 En el otro extremo de la comunicación, como prerequisito, deberá
-configuar su terminal para que utilice codificación UTF-8 porque es 
+configuar su terminal para que utilice codificación UTF-8, porque es 
 la que utiliza el sistema de instalación. Si no lo hace podrá 
-hacer la instalación pero puede que se vea caracteres extraños en la
+hacer la instalación pero puede que vea caracteres extraños en la
 pantalla, como puedan ser bordes de cuadro de diálogo rotos o caracteres
-no ASCII ilegibles. Para conectarse al sistema de instalación remoto
+no americanos ilegibles. Para conectarse al sistema de instalación remoto
 sólo tiene que escribir:
 
 <informalexample><screen>
-<prompt>$</prompt> <userinput>ssh -l installer <replaceable>sistema_instalacion</replaceable></userinput>
+<prompt>$</prompt> <userinput>ssh -l installer <replaceable>sistema_a_instalar</replaceable></userinput>
 </screen></informalexample>
 
-Donde <replaceable>sistema_instalacion</replaceable> es o bien el nombre
+donde <replaceable>sistema_a_instalar</replaceable> es o bien el nombre
 o bien la dirección IP del equipo que está instalando. Antes de conectarse
-se le mostrará la huella digital del sistema remoto y deberá confirmar que 
+se le mostrará la huella digital del sistema remoto y deberá confirmar que
 es la correcta.
 
 </para><note><para>
 
-Si instala muchos sistemas uno tras otro y, por casualidad, comparten la
-dirección IP o nombre de equipo puede tener problemas para conectarse a éstos
-porque <command>ssh</command> se negará a conectarse a los sistemas. La razón
-es que cada sistema tiene una huella digital distinta lo que para <command>ssh</command>
-es indicativo de un ataque de suplantación. Si está seguro de que no
-se trata de ningún ataque deberá eliminar la línea del sistema de
+Si instala muchos sistemas de forma consecutiva y, por casualidad, comparten la
+dirección IP o nombre de equipo, puede tener problemas para conectarse a éstos
+porque <command>ssh</command> se negará a conectarse a ellos, ya
+que cada sistema tiene una huella digital distinta, lo que para <command>ssh</command>
+es indicativo de un posible ataque de suplantación. Si está seguro de que no
+se trata de ningún ataque deberá eliminar la línea del equipo en cuestión del fichero
 <filename>~/.ssh/known_hosts</filename> y volver a intentarlo.
 
 </para></note><para>
@@ -85,25 +86,25 @@ se trata de ningún ataque deberá eliminar la línea del sistema de
 Después de acceder al sistema se le mostrará una pantalla de instalación inicial
 donde tendrá dos posibilidades: <guimenuitem>Arrancar menú</guimenuitem> y
 <guimenuitem>Arrancar consola</guimenuitem>. La primera de estas opciones
-le llevará al menú de instalación donde podrá seguir con la instalación
+le llevará al menú de instalación, donde podrá seguir con la instalación
 como lo hace habitualmente. La segunda de estas opciones ejecuta un
-intérprete de línea de órdenes desde el que puede examinar y, quizás, arreglar
+intérprete de línea de órdenes desde el que puede examinar, y quizás arreglar,
 el sistema remoto. Sólo debería arrancar una sesión de SSH para el menú de
-instalación aunque puede tener tantas sesiones como quiera con consolas
+instalación, aunque puede tener tantas sesiones como quiera con consolas
 remotas.
 
 </para><warning><para>
 
 Una vez ha arrancado la instalación por SSH de forma remota no debería
 volver a la sesión de instalación que se está ejecutando en la consola local.
-Si lo hace, podrá corromper la base de datos que guarda la configuración
-del nuevo sistema. Esto podría llevar a que la instalación fallara o
-a que tuviera problemas con el sistema que ha instalado.
+Si lo hace, podría corromper la base de datos que guarda la configuración
+del nuevo sistema, al realizar accesos simultáneos a ella. Esto podría llevar
+a que la instalación fallara o a que tuviera problemas con el sistema que ha instalado.
 
 </para><para>
 
-Además, si está ejecutando la sesión SSH desde un terminal X no debería
-cambiar el tamaño de la ventana ya que esto haría que se desconectara la sesión.
+Además, si está ejecutando la sesión SSH desde un terminal de X no debería
+cambiar el tamaño de la ventana, ya que esto haría que se desconectara la sesión.
 
 </para></warning>
 
