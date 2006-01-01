@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 30372 -->
+<!-- revisado ender, 1 enero 2005 -->
+<!-- revisado jfs, 1 enero 2005 -->
 <!-- revisado y actualizado por rudy, 31 dic 2005 -->
 
-<!-- Nota a traductores: el texto de los strings y selects
-     no debe traducirse -->
+<!-- Nota a traductores: el texto de los campos «string» y «select»
+      no debe traducirse -->
 
 <informalexample  condition="sarge"><screen>
 #### Arranque
@@ -11,26 +13,32 @@
 # Para utilizar un fichero de preconfiguración, primero necesitará arrancar
 # el instalador, e indicar el fichero de preconfiguración que quiere utilizar.
 # Esto se hace pasando un parámetro de arranque al núcleo, bien en forma
-# manual o al editar el fichero syslinux.cfg (o similar), y adicionando el
-# parámetro al final de la(s) línea(s) append para el núcleo.
+# manual o al editar el fichero syslinux.cfg (o similar), y añadiendo el
+# parámetro al final de la(s) línea(s) «append», que son los parámetros para el núcleo.
 #
-# Si está arrancando desde red, use este:
-#   preseed/url=http://maquina/ruta/hacia/fichero/preseed
-# Si está remasterizando un CD, podría usar este otro:
-#   preseed/file=/cdrom/preseed
+# Normalmente, este fichero se llama «preseed» en inglés, pero usted puede
+# escoger el nombre que desee. Simplemente ha de ser congruente el nombre que
+# escoja con el que indique al instalador. En los siguientes ejemplos se
+# ha escogido por simplicidad «fichero_preconfiguracion».
+#
+# Si está arrancando desde red, use algo como:
+#   preseed/url=http://maquina/ruta/hacia/fichero_preconfiguracion
+# Si está rehaciendo un CD, podría usar este otro:
+#   preseed/file=/cdrom/fichero_preconfiguracion
 # Si está instalando desde un medio USB, use el siguiente parámetro, y coloque
-# el fichero de preconfiguración en el directorio raíz del dispositivo USB.
-#   preseed/file=/hd-media/preseed
-# Asegúrese de copiar este fichero a la ubicación que ha especificado.
+# el fichero de preconfiguración en el directorio raíz del dispositivo USB, algo como:
+#   preseed/file=/hd-media/fichero_preconfiguracion
+# Asegúrese de copiar este fichero a la ubicación que ha especificado con el
+# nombre que ha indicado.
 #
 # Algunas partes de proceso de instalación no se pueden automatizar usando
-# un método de preconfiguración debido a que las preguntas son
-# formuladas antes que se cargue el fichero de preconfiguración. Por ejemplo,
-# primero debe configurarse la red si el fichero se descarga a través de la
-# red.
-# Una razón para utilizar la preconfiguración de initrd es que 
-# permite la preconfiguración incluso en esta temprana etapa del
-# proceso de instalación.
+# algunos métodos de preconfiguración debido a que las preguntas son formuladas
+# antes que se cargue el fichero de preconfiguración. Por ejemplo, primero
+# deberá responder a las preguntas para configurar la red si el fichero se
+# descarga a través de la red.
+#
+# Una razón para utilizar la preconfiguración de initrd es que permite la
+# preconfiguración incluso en esta etapa temprana del proceso de instalación.
 #
 # Aunque no se pueda utilizar un fichero para preconfigurar algunos
 # pasos aún puede automatizar la instalación, puesto que
@@ -38,11 +46,11 @@
 # de órdenes. Simplemente pase ruta/a/var=valor para cualquiera
 # de las variables listadas a continuación.
 #
-# Cuando haga esto quizás quiera definir 
-# debconf/priority=critical, para obviar la mayoría de preguntas incluso
-# aunque la preconfiguración excluya alguna.
-# También podría definir el tiempo de espera a 1 en syslinux.cfg para
-# evitar la necesidad de presionar «Enter» para arrancar el instalador.
+# Cuando haga esto quizás quiera añadir el parámetro debconf/priority=critical,
+# para omitir la mayoría de preguntas no importantes, incluso aunque la
+# preconfiguración excluya alguna. 
+# También podría definir el tiempo de espera a 1 en syslinux.cfg para evitar la
+# necesidad de presionar «Enter» para arrancar el instalador.
 #
 # Tenga en cuenta que el núcleo acepta un máximo de 8 opciones de línea de órdenes
 # y 8 opciones de entorno (incluyendo cualquier opción añadida en forma
@@ -51,9 +59,9 @@
 # de «panic». Con los núcleos 2.6.9 o superiores puede usar hasta 32 opciones
 # de línea de órdenes y 32 opciones de entorno.
 #
-# Puede eliminar en la mayoría de las instalaciones
-# algunas opciones predeterminadas, como «vga=normal»,
-# lo cual le permitiría añadir más opciones para preconfiguración.
+# Puede eliminar en la mayoría de las instalaciones algunas opciones
+# predeterminadas, como «vga=normal», lo cual le permitiría añadir más opciones
+# para preconfiguración.
 #
 # No es posible usar la preconfiguración para la selección de idioma, 
 # país y teclado. En su lugar debe usar parámetros del núcleo.
@@ -66,9 +74,9 @@
 #### Configuración de red.
 
 # Obviamente, ¡esto no funcionará si está cargando su fichero de
-# preconfiguración desde la red!. Pero es fantástico si está arrancando
-# desde CD o desde una memoria USB. También puede pasar parámetros de configuración
-# de red en los parámetros del núcleo si está cargando el fichero de
+# preconfiguración desde la red! Pero es fantástico si está arrancando desde CD
+# o desde una memoria USB. También puede pasar parámetros de configuración de
+# red en los parámetros del núcleo si está cargando el fichero de
 # preconfiguración desde la red.
 
 # «netcfg» elegirá, si existe, una interfaz que esté conectada. Esta opción
@@ -76,7 +84,7 @@
 d-i  netcfg/choose_interface select auto
 
 # Puede serle útil especificar este valor
-# si tiene un servidor dhcp lento y el instalador expira porque éste no
+# si tiene un servidor de DHCP lento y el instalador expira porque éste no
 # responde a tiempo.
 #d-i netcfg/dhcp_timeout string 60
 
@@ -88,36 +96,36 @@ d-i  netcfg/choose_interface select auto
 #d-i netcfg/get_gateway		string 192.168.1.1
 #d-i netcfg/confirm_static	boolean true
 
-# Tenga en cuenta que cualquier nombre de máquina o dominio asignado por dhcp
+# Tenga en cuenta que cualquier nombre de máquina o dominio asignado por DHCP 
 # tomará precedencia sobre los valores definidos aquí. Sin embargo,
 # si define estos valores las preguntas no se mostrarán aún cuando los
-# valores provengan del servidor dhcp.
+# valores provengan del servidor de DHCP.
 d-i netcfg/get_hostname		string unassigned-hostname
 d-i netcfg/get_domain		string unassigned-domain
 
-# Deshabilita el molesto cuadro de diálogo de clave WEP
+# Deshabilita el molesto mensaje sobre la clave WEP
 d-i netcfg/wireless_wep		string
-# El nombre de máquina dhcp que algunos ISPs usan como una clave de algún tipo.
+# El nombre de máquina DHCP que algunos ISPs usan como una clave de algún tipo.
 #d-i netcfg/dhcp_hostname	string radish
 
-#### Configuración de servidor espejo (réplica)
+#### Configuración de réplica de Debian.
 
 d-i mirror/country		string enter information manually
-d-i mirror/http/hostname	string http.es.debian.org
+d-i mirror/http/hostname	string ftp.es.debian.org
 d-i mirror/http/directory	string /debian
 d-i mirror/suite		string testing
 d-i mirror/http/proxy		string
 
 ### Particionado.
 
-# Si el sistema tiene espacio libre puede elegir particionar solamente
-# este espacio.
+# Si el sistema tiene espacio libre puede elegir particionar solamente este
+# espacio.
 #d-i partman-auto/init_automatically_partition \
 #    select Use the largest continuous free space
 #
-# También puede especificar un disco a particionar. El nombre del
-# dispositivo se puede introducir tanto en formato tradicional o en formato devfs.
-# Por ejemplo, puede utilizar este valor para usar el primer disco devfs:
+# También puede especificar un disco a particionar. El nombre del dispositivo
+# se puede introducir tanto en formato tradicional como en formato devfs.
+# Por ejemplo, puede utilizar este valor para usar el primer disco por devfs:
 d-i  partman-auto/disk		string /dev/discs/disc0/disc
 
 # Puede elegir cualquiera de las recetas de particionado predefinidas:
@@ -129,13 +137,13 @@ d-i  partman-auto/choose_recipe	select \
 # O indicar su propia receta...
 # El formato de las recetas está documentado en el fichero
 # devel/partman-auto-recipe.txt.
-# Si tiene una forma de colocar el fichero de receta dentro del entorno
-# del d-i, simplemente puede direccionarlo a éste.
+# Si tiene una forma de colocar el fichero de receta dentro del entorno del
+# d-i, simplemente puede direccionarlo a éste.
 #d-i partman-auto/expert_recipe_file	string /hd-media/recipe
 
-# Si no, puede colocar la receta en una línea. Este ejemplo crea una
-# partición /boot pequeña, una partición de intercambio apropiada y usa el resto
-# del espacio para la partición raíz:
+# Si no, puede colocar la receta en una línea. Este ejemplo crea una partición
+# /boot pequeña, una partición de intercambio apropiada y usa el resto del
+# espacio para la partición raíz:
 #d-i partman-auto/expert_recipe		string boot-root :: \
 #    20 50 100 ext3 $primary{ } $bootable{ } method{ format } format{ } \
 #    use_filesystem{ } filesystem{ ext3 } mountpoint{ /boot } . \
@@ -160,8 +168,8 @@ d-i  partman-auto/choose_recipe	select \
 #		method{ swap } format{ }
 #	.
 
-# La siguiente receta hace que «partman» particione automáticamente el
-# espacio sin confirmación.
+# La siguiente receta hace que «partman» particione automáticamente el espacio
+# sin confirmación.
 d-i partman/confirm_write_new_label	boolean true
 d-i partman/choose_partition		select \
     Finish partitioning and write changes to disk
@@ -174,13 +182,13 @@ d-i partman/confirm			boolean	true
 #d-i grub-installer/skip		boolean true
 
 # Esta es una configuración adecuada y segura, hace que grub se instale
-# automáticamente en el MBR si no se detecta otro sistema operativo en
-# la máquina.
+# automáticamente en el MBR si no se detecta otro sistema operativo en la
+# máquina.
 d-i grub-installer/only_debian		boolean true
 
-# Lo siguiente hace que el «grub-installer» instale en el MBR en caso de
-# que se encuentre instalado otro sistema operativo. Esto es menos seguro puesto
-# que podría hacer que el otro sistema operativo no se pudiera arrancar.
+# Lo siguiente hace que el «grub-installer» instale en el MBR en caso de que se
+# encuentre instalado otro sistema operativo. Esto es menos seguro, puesto que
+# podría hacer que el otro sistema operativo no se pudiera arrancar.
 d-i grub-installer/with_other_os	boolean true
 
 # Alternativamente, descomente y edite estas líneas
@@ -197,7 +205,7 @@ d-i prebaseconfig/reboot_in_progress	note
 #### Órdenes del intérprete de comandos.
 
 # La preconfiguración de d-i es inherentemente insegura. Ninguna parte del
-# instalador verifica intentos de desbordamiento de buffer u otras
+# instalador verifica intentos de desbordamiento de búfer u otras
 # formas de malversación de los valores de un fichero de preconfiguración
 # como éste. ¡Use solamente ficheros de preconfiguración de fuentes
 # confiables! Para poder gestionar esto, y porque generalmente es útil,
@@ -213,7 +221,7 @@ d-i prebaseconfig/reboot_in_progress	note
 #d-i preseed/late_command string echo foo > /target/etc/bar
 
 # Ésta orden se ejecuta tan pronto como se inicia el programa «base-config»:
-#base-config base-config/early_command	string echo hola mama
+#base-config base-config/early_command	string echo Hola mamá
 
 # Ésta orden se ejecuta después de que termine «base-config», y
 # antes de presentar el indicador de entrada al sistema («login:»). 
@@ -287,7 +295,7 @@ base-config  tzconfig/choose_country_zone_single boolean true
 # del nombre completo.
 #passwd	passwd/user-fullname		string Usuario de Debian
 #passwd	passwd/username			string debian
-# Y su clave, ¡pero uselo con precaución!
+# Y su clave, ¡pero úselo con precaución!
 #passwd	passwd/user-password		password insegura
 #passwd	passwd/user-password-again	password insegura
 
@@ -298,12 +306,11 @@ base-config  tzconfig/choose_country_zone_single boolean true
 # filesystem y editar la lista manualmente.
 base-config  apt-setup/uri_type		select http
 
-# Se le preguntará el país y un servidor de réplica
-# si elige ftp o http.
+# Se le preguntará el país y una réplica si elige ftp o http.
 base-config  apt-setup/country		select enter information manually
-base-config  apt-setup/hostname		string http.es.debian.org
+base-config  apt-setup/hostname		string ftp.es.debian.org
 base-config  apt-setup/directory	string /debian
-# Terminar una vez haya elegido un servidor espejo.
+# Terminar una vez haya elegido una réplica.
 base-config  apt-setup/another	boolean false
 
 # Puede elegir instalar software de las fuentes «non-free» y «contrib».
@@ -397,7 +404,7 @@ xserver-xfree86	xserver-xfree86/config/monitor/mode-list \
 # Esta opción es todavía más flexible: se ejecuta una orden de shell y si ésta
 # presenta como resultado los nombres de los ficheros de preconfiguración entonces
 # se incluyen. Por ejemplo, para poder alternar entre configuraciones basadas en
-# un dispositivo de almacenamiento usb particular (en este caso, un
+# un dispositivo de almacenamiento USB particular (en este caso, un
 # lector de tarjetas integrado) podría hacer esto:
 #d-i preseed/include_command	string \
 #    if $(grep -q "GUID: 0aec3050aec305000001a003"  /proc/scsi/usb-storage-*/*); \
