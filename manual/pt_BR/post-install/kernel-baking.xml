@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 25152 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 31905 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.31 -->
+
 
  <sect1 id="kernel-baking"><title>Compilando um novo Kernel</title>
 <para>
 
 Porque alguém desejaria compilar um um novo kernel? É mais provável que
-não precise fazer isto, pois o kernel da debian padrão trabalha com a 
-maioria das configurações. No entanto, é útil compilar um novo kernel
-para:
+não precise fazer isto, pois o kernel da debian padrão trabalha com a
+maioria das configurações. Além disso, Debian freqüentemente oferece várias
+alternativas de kernel. Então você pode preferir checar primeiro se há um
+pacote de imagem do kernel que corresponde melhor ao seu hardware. No entanto,
+pode ser útil compilar um novo kernel para:
 
 <itemizedlist>
 <listitem><para>
 
-adicionar suporte a hardwares especiais, ou hardwares que conflitam com 
-os kernels padrões
+adicionar suporte a hardwares especiais, ou hardwares que conflitam com
+os kernels pré-fornecidos
 
 </para></listitem>
 <listitem><para>
 
-adicionar suporte a hardware ou opções não incluídas no kernel padrão, tal
-como APM ou SMP
+usar opções do kernel que não são suportadas nos kernels pré-fornecidos
+(como suporte a altas quantidade de memória)
 
 </para></listitem>
 
@@ -42,7 +47,7 @@ executar um kernel atualizado ou em desenvolvimento
 </para></listitem>
 <listitem><para>
 
-impressionar seus amigos, tentando coisas novas
+aprender mais sobre o kernel do linux
 
 </para></listitem>
 </itemizedlist>
@@ -58,43 +63,45 @@ Não tema tentar compilar um novo kernel. É divertido e proveitoso.
 
 Para compilar um kernel usando o método da Debian, será necessário
 instalar alguns pacotes:
-<classname>kernel-package</classname>,
-<classname>kernel-source-&kernelversion;</classname> (a versão mais 
-recente quando este documento foi escrito), <classname>fakeroot</classname> e 
-alguns outros pacotes que provavelmente já estão instalados (veja
-<filename>/usr/share/doc/kernel-package/README.gz</filename> para ver a 
+<classname>fakeroot</classname>, <classname>kernel-package</classname>,
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
+(a versão mais recente quando este documento foi escrito),</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+e alguns outros pacotes que provavelmente já estão instalados (veja
+<filename>/usr/share/doc/kernel-package/README.gz</filename> para ver a
 lista completa).
 
 </para><para>
 
 Este método construirá um .deb do seu fonte do kernel e caso tenha
-módulos não-padrões, criar um arquivo .deb dependente destes também.
-É uma ótima maneira de gerenciar imagens do kernel; O
-kernel será gravado em <filename>/boot</filename>, incluindo o arquivo 
-System.map e um log do arquivo de configuração ativo da compilação.
+módulos não-padrões, criará um arquivo .deb dependente destes também.
+É uma ótima maneira de gerenciar imagens do kernel; o kernel será gravado em
+<filename>/boot</filename>, incluindo o arquivo System.map e um log do arquivo
+de configuração ativo da compilação.
 
 </para><para>
 
 Note que não <emphasis>precisará</emphasis> compilar seu kernel usando
-o <quote>Método da Debian</quote>; mas nós achamos que o uso do sistema de 
-empacotamento para gerenciamento do kernel é seguro e fácil. De fato, você 
+o <quote>Método da Debian</quote>; mas nós achamos que o uso do sistema de
+empacotamento para gerenciamento do kernel é seguro e fácil. De fato, você
 poderá pegar os fontes do kernel do Linus ao invés do
-<classname>kernel-source-&kernelversion;</classname> e ainda usar o método
-de compilação do <classname>kernel-package</classname>. 
+<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,</phrase>
+<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+e ainda usar o método de compilação do <classname>kernel-package</classname>.
 
 </para><para>
 
-A documentação completa do <classname>kernel-package</classname> 
-é encontrada sob o diretório <filename>/usr/share/doc/kernel-package</filename>. 
+A documentação completa do <classname>kernel-package</classname>
+é encontrada sob o diretório <filename>/usr/share/doc/kernel-package</filename>.
 Esta seção contém somente um breve tutorial.
 
 </para><para>
 
-Para mais adiante, nós assumiremos que tem controle completo sobre sua máquina 
-e descompactará seu fonte do kernel em algum lugar dentro do seu diretório 
+Para mais adiante, nós assumiremos que tem controle completo sobre sua máquina
+e descompactará seu fonte do kernel em algum lugar dentro do seu diretório
 de usuário
 <footnote>
- 
+
 <para>
 
 Existem outras localizações onde pode descompactar os fontes do kernel
@@ -105,71 +112,78 @@ requer permissões especiais.
 
 </footnote>. Nós assumiremos que sua versão do kernel é
 &kernelversion;. Tenha certeza que está no diretório que deseja descompactar os
-fontes do kernel, descompacte-os usando <userinput>tar xjf
-/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput> e mude para 
-aquele diretório <filename>kernel-source-&kernelversion;</filename>
+fontes do kernel, descompacte-os usando 
+<phrase condition="classic-kpkg"><userinput>tar xjf
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
+<phrase condition="common-kpkg"><userinput>tar xjf
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>
+e mude para o diretório
+<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
+<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
 que foi criado.
 
 </para><para>
 
 Agora você poderá configurar seu kernel. Execute o comando <userinput>make
-xconfig</userinput> caso o X11 esteja instalado, configurado e 
-sendo executado, <userinput>make menuconfig</userinput> (será necessário o pacote
-<classname>libncurses5-dev</classname> instalado). Leve algum tempo lendo as 
-mensagens de ajuda on-line e selecione as opções cuidadosamente. Quando 
-estiver em dúvida, é melhor incluir o controlador de dispositivo 
-(o programa que gerencia periféricos de hardware, tal como placas 
+xconfig</userinput> caso o X11 esteja instalado, configurado e sendo executado,
+<userinput>make menuconfig</userinput> (será necessário o pacote
+<classname>libncurses5-dev</classname> instalado). Leve algum tempo lendo as
+mensagens de ajuda on-line e selecione as opções cuidadosamente. Quando
+estiver em dúvida, é melhor incluir o controlador de dispositivo
+(o programa que gerencia periféricos de hardware, tal como placas
 Ethernet, controladores SCSI e outras). Tenha cuidado: outras opções
-não relacionadas a hardwares específicos, devem ser deixadas no 
-valor padrão caso não as entenda. Não se esqueça de selecionar a 
-opção <quote>Kernel module loader</quote> em <quote>Loadable module support</quote>
-(esta opção não é selecionada por padrão). Caso não estiver incluida, as 
+não relacionadas a hardwares específicos, devem ser deixadas no
+valor padrão caso não as entenda. Não se esqueça de selecionar a opção
+<quote>Kernel module loader</quote> em <quote>Loadable module support</quote>
+(esta opção não é selecionada por padrão). Caso não esteja incluída, as
 instalações usando a Debian podem apresentar problemas.
 
 </para><para>
 
-Limpe a árvore de fontes e resete os parâmetros do pacote <classname>kernel-package</classname>.
+Limpe a árvore de fontes e resete os parâmetros do pacote
+<classname>kernel-package</classname>.
 Para fazer isto, execute o comando <userinput>make-kpkg clean</userinput>.
 
 </para><para>
 
-Agora, compile o kernel: 
-<userinput>fakeroot make-kpkg --revision=custom.1.0 kernel_image</userinput>. 
-O número de versão <quote>1.0</quote> poderá ser modificado se desejar; este é 
-somente um número de versão que usará como controle sobre as construções do 
+Agora, compile o kernel:
+<userinput>fakeroot make-kpkg --revision=custom.1.0 kernel_image</userinput>.
+O número de versão <quote>1.0</quote> poderá ser modificado se desejar; este é
+somente um número de versão que usará como controle sobre as construções do
 seu kernel. De forma parecida, poderá colocar uma palavra no lugar
-de <quote>custom</quote> (e.g., um nome de máquina). A compilação do Kernel 
+de <quote>custom</quote> (e.g., um nome de máquina). A compilação do Kernel
 poderá levar um tempo, dependendo do poder de processamento da sua máquina.
 
 </para><para condition="supports-pcmcia">
 
-Caso precise do suporte a PCMCIA, você também precisará instalar o 
-pacote <classname>pcmcia-source</classname>. Descompacte o arquivo 
+Caso precise do suporte a PCMCIA, você também precisará instalar o
+pacote <classname>pcmcia-source</classname>. Descompacte o arquivo
 tar.gz como root no diretório <filename>/usr/src</filename> (é importante
-que os módulos sejam encontrados no local onde o programa espere encontra-los, 
-no caso, o diretório <filename>/usr/src/modules</filename>). Então, digite como 
-usuário root <userinput>make-kpkg modules_image</userinput>.  
+que os módulos sejam encontrados no local onde o programa espere encontrá-los,
+no caso, o diretório <filename>/usr/src/modules</filename>). Então, digite como
+usuário root <userinput>make-kpkg modules_image</userinput>.
 
 </para><para>
 
 Assim que a compilação estiver concluída, você poderá instalar o kernel
-personalizado como qualquer pacote. Como root, execute o comando <userinput>dpkg -i 
-../kernel-image-&kernelversion;-<replaceable>sub-arquitetura</replaceable>_custom.1.0_&architecture;.deb</userinput>.
-A parte <replaceable>sub-arquitetura</replaceable> é uma sub-arquitetura 
+personalizado como qualquer pacote. Como root, execute o comando
+<userinput>dpkg -i ../kernel-image-&kernelversion;-<replaceable>sub-arquitetura
+</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+A parte <replaceable>sub-arquitetura</replaceable> é uma sub-arquitetura
 opcional,
 <phrase arch="i386"> tal como <quote>i586</quote>, </phrase>
 dependendo das opções do kernel que escolheu.
 O comando <userinput>dpkg -i kernel-image...</userinput> instalará o kernel,
-junto com outros arquivos de suporte. Por exemplo, o 
+junto com outros arquivos de suporte. Por exemplo, o
 <filename>System.map</filename> será instalado
 (útil para depurar problemas no kernel) assim como o
 <filename>/boot/config-&kernelversion;</filename>
 (contendo seu conjunto de configurações do kernel). Seu novo pacote
-<classname>kernel-image-&kernelversion;</classname> é também 
+<classname>kernel-image-&kernelversion;</classname> é também
 inteligente o bastante para usar automaticamente o gerenciador de partida
-de sua plataforma para executar uma atualização do setor de partida para 
+de sua plataforma para executar uma atualização do setor de partida para
 que a inicialização ocorra sem problemas. Caso tenha criado um pacote
-PCMCIA, você precisará instala-lo também.
+PCMCIA, você precisará instalá-lo também.
 
 </para><para>
 
@@ -178,6 +192,9 @@ acima produziu, então execute o comando <userinput>shutdown -r now</userinput>.
 
 </para><para>
 
+<phrase condition="etch">Para maiores informações sobre os kernels do Debian e
+a compilação do kernel, veja o <ulink url="&url-kernel-handbook;">Debian Linux
+Kernel Handbook</ulink>.</phrase>
 Para mais informações sobre o <classname>kernel-package</classname>, leia
 a bela documentação em <filename>/usr/share/doc/kernel-package</filename>.
 
