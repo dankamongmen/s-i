@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 27824 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 30084 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.01.01 -->
 
  <sect1 id="boot-parms"><title>Parâmetros de Inicialização</title>
 <para>
 
 Os parâmetros de inicialização são parâmetros passados ao kernel do
 Linux que são geralmente usados para fazer que os periféricos funcionem
-adequadamente. Para a maior parte, o kernel poderá auto-detectar 
-informações sobre seus periféricos. No entanto, em alguns casos 
+adequadamente. Para a maior parte, o kernel poderá auto-detectar
+informações sobre seus periféricos. No entanto, em alguns casos
 você terá que ajudar um pouco o kernel.
 
 </para><para>
 
 Se esta for a primeira vez que iniciou o sistema, tente os parâmetros
-padrões de inicialização (i.e., não passe parâmetros) e veja se o 
+padrões de inicialização (i.e., não passe parâmetros) e veja se o
 sistema funciona corretamente. Ele provavelmente funcionará. Caso
-não seja esse o caso, reinicie mais tarde e descubra qualquer 
+não seja esse o caso, reinicie mais tarde e descubra qualquer
 parâmetro especial que precisa para informar ao sistema sobre seu hardware.
 
 </para><para>
@@ -23,7 +25,7 @@ parâmetro especial que precisa para informar ao sistema sobre seu hardware.
 Informações sobre muitos parâmetros de inicialização poderão
 ser encontrados no <ulink url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html">Linux
 BootPrompt HOWTO</ulink>, o que inclui dicas para hardwares obscuros. Esta seção
-contém somente um resumo para os parâmetros mais usados. Algumas dicas 
+contém somente um resumo para os parâmetros mais usados. Algumas dicas
 comuns estão incluídas abaixo em
 <xref linkend="boot-troubleshooting"/>.
 
@@ -32,29 +34,30 @@ comuns estão incluídas abaixo em
 Quando o kernel inicia, uma mensagem
 
 <informalexample><screen>
-Memory:<replaceable>avail</replaceable>k/<replaceable>total</replaceable>k available 
+Memory:<replaceable>avail</replaceable>k/<replaceable>total</replaceable>k available
 </screen></informalexample>
 
 deverá ser mostrada durante o processo.
-<replaceable>total</replaceable> deverá conferir com a quantidade 
-total de memória RAM, em kilobytes. Caso não conferir com a 
+<replaceable>total</replaceable> deverá conferir com a quantidade
+total de memória RAM, em kilobytes. Caso não conferir com a
 quantidade total de memória RAM que tem instalado, você precisará usar
 o parâmetro <userinput>mem=<replaceable>ram</replaceable></userinput>,
-onde <replaceable>ram</replaceable> será ajustado para a quantidade de 
-memória, seguindo os sufixos "k" para kilobytes, ou "m" para megabytes.
+onde <replaceable>ram</replaceable> será ajustado para a quantidade de
+memória, seguindo os sufixos <quote>k</quote> para kilobytes, ou
+<quote>m</quote> para megabytes.
 <userinput>mem=64m</userinput> significa 64MB de RAM.
 
 
 </para><para condition="supports-serial-console">
 
-Caso estiver inicializando a partir de um console serial, 
+Caso estiver inicializando a partir de um console serial,
 o kernel geralmente auto-detectará isto
 <phrase arch="mipsel">(embora isto não ocorra em DECstations)</phrase>
-Caso tenha uma placa de vídeo (framebuffer) e um teclado também 
-conectados ao computador que deseje inicializar via console serial, 
+Caso tenha uma placa de vídeo (framebuffer) e um teclado também
+conectados ao computador que deseje inicializar via console serial,
 você poderá ter que passar o argumento
 <userinput>console=<replaceable>device</replaceable></userinput>
-ao kernel, onde <replaceable>device</replaceable> é 
+ao kernel, onde <replaceable>device</replaceable> é
 seu dispositivo serial, que normalmente é algo como
 <filename>ttyS0</filename>.
 
@@ -74,17 +77,19 @@ Alternativamente, ajuste as variáveis do OpenPROM <envar>input-device</envar> e
 
 O sistema de instalação reconhece alguns parâmetros adicionais de inicialização
 <footnote>
- 
+
 <para>
 
 Note que o kernel aceita um máximo de 8 opções de linha de comando
-e 8 opções de ambiente (incluindo quaisquer opções adicionadas por 
+e 8 opções de ambiente (incluindo quaisquer opções adicionadas por
 padrão pelo programa de instalação). Caso estes números sejam excedidos,
-os kernels 2.4 ignorarão qualquer opção que ultrapasse e os kernels da 
+os kernels 2.4 ignorarão qualquer opção que ultrapasse e os kernels da
 série 2.6 entrarão em kernel panic.
+<phrase condition="etch">Para o kernel 2.6.9 e posteriores, você pode usar 32
+opções de linha de comando e 32 opções de ambiente.</phrase>
 
 </para>
- 
+
 </footnote>
 que podem ser úteis.
 
@@ -95,7 +100,7 @@ que podem ser úteis.
 <term>debconf/priority</term>
 <listitem><para>
 
-Este parâmetro definirá qual o a prioridade mais baixa de mensagens que 
+Este parâmetro definirá qual o a prioridade mais baixa de mensagens que
 serão mostradas.
 
 
@@ -103,21 +108,21 @@ serão mostradas.
 
 
 A instalação padrão usa <userinput>debconf/priority=high</userinput>.
-Isto significa que ambas mensagens com prioridade "high" (alta) e 
-"critical" (crítica) serão mostradas, mas não as de prioridade média e baixa.
-Caso encontre problemas, o programa de instalação ajustará a prioridade conforme
-necessário.
+Isto significa que ambas mensagens com prioridade <quote>high</quote> (alta) e
+<quote>critical</quote> (crítica) serão mostradas, mas não as de prioridade
+média e baixa. Caso encontre problemas, o programa de instalação ajustará a
+prioridade conforme necessário.
 
 </para><para>
 
 
-Se adicionar <userinput>debconf/priority=medium</userinput> com parâmetro de 
+Se adicionar <userinput>debconf/priority=medium</userinput> com parâmetro de
 inicialização, lhe será mostrado um menu de instalação e ganhará mais controle
 através da instalação
 Quando <userinput>debconf/priority=low</userinput> for usado, todas as mensagens
-são mostradas
-(esta opção é equivalente ao método de inicialização <emphasis>expert</emphasis>).
-Com <userinput>debconf/priority=critical</userinput> o sistema de instalação 
+são mostradas (esta opção é equivalente ao método de inicialização
+<emphasis>expert</emphasis>).
+Com <userinput>debconf/priority=critical</userinput> o sistema de instalação
 mostrará somente mensagens críticas e tentará fazer a coisa certa sem bagunça.
 
 </para></listitem>
@@ -151,8 +156,8 @@ usada para o programa de instalação. Os parâmetros possíveis são:
 </itemizedlist>
 
 A interface padrão é <userinput>DEBIAN_FRONTEND=newt</userinput>.
-<userinput>debconf/frontend=text</userinput> pode ser preferível para 
-a instalação através de console serial. Geralmente somente a interface 
+<userinput>debconf/frontend=text</userinput> pode ser preferível para
+a instalação através de console serial. Geralmente somente a interface
 com o usuário <userinput>newt</userinput> está disponível na mídia padrão
 de instalação, assim a seleção desta opção não é tão útil por agora.
 
@@ -163,8 +168,10 @@ de instalação, assim a seleção desta opção não é tão útil por agora.
 <term>BOOT_DEBUG</term>
 <listitem><para>
 
-A passagem deste parâmetro de inicialização fará a inicialização ser 
-registrada com mais detalhes.
+Definindo este parâmetro de boot como 2 fará com que o processo de boot do
+instalador seja logado com mais informações. Definindo como 3 fará com que
+shells de depuração estejam disponíveis em pontos estratégicos do processo
+de boot. (Sair do shell continua o processo de boot.)
 
 <variablelist>
 <varlistentry>
@@ -186,8 +193,8 @@ registrada com mais detalhes.
 <term><userinput>BOOT_DEBUG=3</userinput></term>
 <listitem><para>
 
-Interpretadores de comandos são executados em vários pontos do 
-processo de inicialização para permitir depuração detalhada. Saia do 
+Interpretadores de comandos são executados em vários pontos do
+processo de inicialização para permitir depuração detalhada. Saia do
 interpretador de comandos para continuar a inicialização do sistema.
 
 </para></listitem>
@@ -202,15 +209,15 @@ interpretador de comandos para continuar a inicialização do sistema.
 <term>INSTALL_MEDIA_DEV</term>
 <listitem><para>
 
-O valor do parâmetro é o caminho para o dispositivo que carregará o 
+O valor do parâmetro é o caminho para o dispositivo que carregará o
 Debian installer. Por exemplo,
 <userinput>INSTALL_MEDIA_DEV=/dev/floppy/0</userinput>
 
 </para><para>
 
-Para inicializar via disquete, que normalmente procura por disquetes e 
-dispositivos de armazenamento USB onde pode encontrar o disquete raíz, 
-pode ser alterado com este parâmetro para procurar somente em um 
+Para inicializar via disquete, que normalmente procura por disquetes e
+dispositivos de armazenamento USB onde pode encontrar o disquete raíz,
+pode ser alterado com este parâmetro para procurar somente em um
 dispositivo específico.
 
 </para></listitem>
@@ -220,17 +227,17 @@ dispositivo específico.
 <term>debian-installer/framebuffer</term>
 <listitem><para>
 
-Algumas arquiteturas utilizam o framebuffer do kernel para fornecer a 
-instalação em um grande número de idiomas. Caso o framebuffer cause um 
+Algumas arquiteturas utilizam o framebuffer do kernel para fornecer a
+instalação em um grande número de idiomas. Caso o framebuffer cause um
 problema em seu sistema, a opção <userinput>debian-installer/framebuffer</userinput>
-deverá ser usada para desativar este recurso. Sintomas do problema são mensagens 
-de erro sobre o bterm ou bogl, uma tela preta ou travamento depois de alguns 
+deverá ser usada para desativar este recurso. Sintomas do problema são mensagens
+de erro sobre o bterm ou bogl, uma tela preta ou travamento depois de alguns
 minutos após iniciar a instalação.
 
 </para><para arch="i386">
 
 O argumento <userinput>video=vga16:off</userinput> também pode ser usado para
-desativar o framebuffer. Tais problemas foram reportados em uma 
+desativar o framebuffer. Tais problemas foram reportados em uma
 Dell Inspiron com uma placa Radeon móvel.
 
 </para><para arch="m68k">
@@ -243,8 +250,8 @@ Tais problemas foram relatados no hppa.
 </para><note arch="sparc"><para>
 
 Por causa de problemas de exibição em alguns sistemas, o suporte a
-framebuffer é <emphasis>desativado por padrão</emphasis> na &arch-title;. 
-Isto pode resultar em uma tela não não bonita em sistemas que suportam 
+framebuffer é <emphasis>desativado por padrão</emphasis> na &arch-title;.
+Isto pode resultar em uma tela não não bonita em sistemas que suportam
 adequadamente o framebuffer, como os que utilizam placas gráficas ATI.
 Se ver estes problemas durante a instalação, tente inicializar usando o
 parâmetro <userinput>debian-installer/framebuffer=true</userinput>.
@@ -257,8 +264,8 @@ parâmetro <userinput>debian-installer/framebuffer=true</userinput>.
 <term>debian-installer/probe/usb</term>
 <listitem><para>
 
-Ajuste o valor desta opção para <userinput>false</userinput> para evitar a 
-detecção de hardwares USB na inicialização do sistema, caso esteja dando 
+Ajuste o valor desta opção para <userinput>false</userinput> para evitar a
+detecção de hardwares USB na inicialização do sistema, caso esteja dando
 problemas.
 
 </para></listitem>
@@ -268,15 +275,15 @@ problemas.
 <term>netcfg/disable_dhcp</term>
 <listitem><para>
 
-Por padrão, o &d-i; automaticamente detecta a configuração de rede 
-através do DHCP. Caso a detecção seja realizada, você não terá a chance de 
-revisar e alterar as configurações obtidas. Você verá somente a 
+Por padrão, o &d-i; automaticamente detecta a configuração de rede
+através do DHCP. Caso a detecção seja realizada, você não terá a chance de
+revisar e alterar as configurações obtidas. Você verá somente a
 configuração manual de rede caso a detecção do DHCP falhe.
 
 </para><para>
 
-Se tiver um servidor DHCP em sua rede local, mas deseja evita-lo por 
-algum motivo (e.g. ele envia respostas incorretas), você pode usar o 
+Se tiver um servidor DHCP em sua rede local, mas deseja evita-lo por
+algum motivo (e.g. ele envia respostas incorretas), você pode usar o
 parâmetro <userinput>netcfg/disable_dhcp=true</userinput> para evitar
 a configuração da rede via DHCP e entrar com os dados manualmente.
 
@@ -288,7 +295,7 @@ a configuração da rede via DHCP e entrar com os dados manualmente.
 <listitem><para>
 
 Ajuste seu valor para <userinput>false</userinput> evitando que o sistema
-inicie os serviços PCMCIA, caso lhe tragam problemas. Alguns modelos de 
+inicie os serviços PCMCIA, caso lhe tragam problemas. Alguns modelos de
 notebooks apresentam este mal comportamento.
 
 </para></listitem>
@@ -298,7 +305,7 @@ notebooks apresentam este mal comportamento.
 <term>preseed/url</term>
 <listitem><para>
 
-Especifique uma url para o arquivo de configuração que será baixado e usado 
+Especifique uma url para o arquivo de configuração que será baixado e usado
 para fazer a instalação automática. Veja <xref linkend="automatic-install"/>.
 
 </para></listitem>
@@ -308,8 +315,8 @@ para fazer a instalação automática. Veja <xref linkend="automatic-install"/>.
 <term>preseed/file</term>
 <listitem><para>
 
-Especifique o caminho o arquivo de configuração que será 
-carregado para realizar a configuração automática. Veja 
+Especifique o caminho o arquivo de configuração que será
+carregado para realizar a configuração automática. Veja
 <xref linkend="automatic-install"/>.
 
 </para></listitem>
@@ -321,16 +328,16 @@ carregado para realizar a configuração automática. Veja
 
 Automaticamente, antes de reiniciar, o &d-i; ejetará a mídia ótica
 usada durante a instalação. Isto pode ser desnecessário caso o sistema
-não esteja inicializando diretamente através da unidade de 
+não esteja inicializando diretamente através da unidade de
 CD. Em alguns casos, podem até mesmo ser desnecessário, por exemplo
-se a unidade ótica não puder sozinha carregar uma nova mídia e o 
-usuário não está lá para fazer isto manualmente. Muitos slots de 
-mídias, slim-line e unidades estili caddy não podem inserir 
+se a unidade ótica não puder sozinha carregar uma nova mídia e o
+usuário não está lá para fazer isto manualmente. Muitos slots de
+mídias, slim-line e unidades estili caddy não podem inserir
 automaticamente mídia.
 </para><para>
 
 Defina esta opção para <userinput>false</userinput> para impedir que a mídia seja
-ejetada automaticamente, e tenha cuidado para que seu sistema não inicialize 
+ejetada automaticamente, e tenha cuidado para que seu sistema não inicialize
 automaticamente através da unidade óptica após a instalação inicial.
 
 </para></listitem>
@@ -341,11 +348,22 @@ automaticamente através da unidade óptica após a instalação inicial.
 <term>ramdisk_size</term>
 <listitem><para>
 
-Se estiver usando um kernel da série 2.2.x, você pode precisa ajustar &ramdisksize;.
+Se estiver usando um kernel da série 2.2.x, você pode precisa ajustar
+&ramdisksize;.
 
 </para></listitem>
 </varlistentry>
 
+<varlistentry condition="etch">
+<term>rescue/enable</term>
+<listitem><para>
+
+Defina como <userinput>true</userinput> para entrar no modo <quote>rescue
+(recuperação)</quote> ao invés de executar uma instalação normal. Veja
+<xref linkend="rescue"/>.
+
+</para></listitem>
+</varlistentry>
 
 </variablelist>
   </sect2>

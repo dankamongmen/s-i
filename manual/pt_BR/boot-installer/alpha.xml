@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 26932 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 29334 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.01.01 -->
 
  <sect2 arch="alpha" id="alpha-firmware">
  <title>Firmware do Console Alpha</title>
 <para>
 
 O firmware do console é armazenado em uma flash ROM e inicializado
-quando sistema Alpha é ligado ou reiniciado. Existem dois tipos
-diferentes de especificações de consoles usados nos sistemas Alpha, 
+quando o sistema Alpha é ligado ou reiniciado. Existem dois tipos
+diferentes de especificações de consoles usados nos sistemas Alpha,
 e duas classes de firmwares de consoles disponíveis:
 
 </para>
@@ -15,8 +17,8 @@ e duas classes de firmwares de consoles disponíveis:
 <itemizedlist>
 <listitem><para>
 
-  <emphasis>console SRM</emphasis>, baseado no subsistema de console 
-  da especificação Alpha, que oferece um ambiente operacional para o 
+  <emphasis>console SRM</emphasis>, baseado no subsistema de console
+  da especificação Alpha, que oferece um ambiente operacional para o
   OpenVMS, UNIX Tru64 e sistema operacional Linux.
 
 </para></listitem>
@@ -31,57 +33,61 @@ e duas classes de firmwares de consoles disponíveis:
 
 <para>
 
-Da perspectiva do usuário, a diferença mais importante entre o 
+Da perspectiva do usuário, a diferença mais importante entre o
 SRM e o ARC é que a escolha do console se restringem a possibilidade
-do esquema de particionamento do disco rígido a partir do qual 
+do esquema de particionamento do disco rígido a partir do qual
 inicializou.
 
 </para><para>
 
 O ARC requer que utilize uma tabela de partição MS-DOS (como
 criada pelo comando <command>cfdisk</command>) para o disco de inicialização.
-As tabelas de partição MS-DOS são partições no formato "nativo" quando
-inicializa o sistema através do ARC. De fato, pois o AlphaBIOS contém um utilitário
-de particionamento de disco, você pode preferir particionar seus discos
-através dos menus da firmware antes de instalar o Linux.
+As tabelas de partição MS-DOS são partições no formato <quote>nativo</quote>
+quando inicializa o sistema através do ARC. De fato, pois o AlphaBIOS contém um
+utilitário de particionamento de disco, você pode preferir particionar seus
+discos através dos menus da firmware antes de instalar o Linux.
 
 </para><para>
 
-De modo oposto, o SRM é <emphasis>incompatível</emphasis> com tabelas
-de partição do MS-DOS.
-<footnote><para>Especificamente, o formato do setor de inicialização
-requerida pela especificação do sub-sistema, conflita com a substituição
-da tabela de partição do DOS.</para></footnote> Pois sistemas Unix Tru64
-usa o formato BSD como volume de disco, este é o formato nativo de partições para
-as instalações SRM.
+De modo oposto, o SRM é <emphasis>incompatível</emphasis><footnote>
+
+<para>
+Especificamente, o formato do setor de inicialização requerida pela
+Especificação do Sub-sistema Console, conflita com a posição da tabela de
+partição do DOS.
+</para>
+
+</footnote> com tabelas de partição MS-DOS. Pois sistemas Unix Tru64
+usa o formato BSD como volume de disco, este é o formato <quote>nativo</quote>
+de partições para as instalações SRM.
 
 </para><para>
 
-O GNU/Linux é o único sistema operacional na Alpha que pode ser 
-inicializado através de ambos os tipos de console, mas a &debian; 
-&release; somente suporta a inicialização em sistemas baseados 
-em SRM. Se tiver um Alpha em que nenhuma versão do SRM esteja 
-disponível, se estiver fazendo dupla inicializaçào do sistema com 
+O GNU/Linux é o único sistema operacional na Alpha que pode ser
+inicializado através de ambos os tipos de console, mas a &debian;
+&release; somente suporta a inicialização em sistemas baseados
+em SRM. Se tiver um Alpha em que nenhuma versão do SRM esteja
+disponível, se estiver fazendo dupla inicializaçào do sistema com
 o Windows NT ou se seu dispositivo de inicialização requer o suporte
-a console ARC para a inicializaçõa da BIOS, não será possível 
-usar o programa de instalação da &debian; &release;. Você ainda 
-poderá executar a &debian; &release; em tal sistema usando outra 
+a console ARC para a inicializaçõa da BIOS, não será possível
+usar o programa de instalação da &debian; &release;. Você ainda
+poderá executar a &debian; &release; em tal sistema usando outra
 mídia de instalação; por exemplo, poderá instalar a Debian woody com
 o MILO e realizar a atualização.
 
 </para><para>
 
-Devido ao <command>MILO</command> não estar disponível para 
-qualquer sistema Alpha em produção (em Fevereiro 2000) e porque 
-não é mais necessário comprar uma licença do OpenVMS ou Unix Tru64 para 
-ter uma firmware SRM em seu Alpha antigo, é recomendado que utilize uma 
+Devido ao <command>MILO</command> não estar disponível para
+qualquer sistema Alpha em produção (em Fevereiro 2000) e porque
+não é mais necessário comprar uma licença do OpenVMS ou Unix Tru64 para
+ter uma firmware SRM em seu Alpha antigo, é recomendado que utilize uma
 firmware SRM quando possível.
 
 </para><para>
 
 A seguinte tabela resume os sistemas disponíveis e suportados
-entre as combinações de tipo/console (veja <xref linkend="alpha-cpus"/> 
-para os nomes dos tipos de sistema). A palavra "ARC" abaixo denota
+entre as combinações de tipo/console (veja <xref linkend="alpha-cpus"/>
+para os nomes dos tipos de sistema). A palavra <quote>ARC</quote> abaixo denota
 qualquer um dos tipos de consoles compatíveis com o ARC.
 
 </para><para>
@@ -184,51 +190,51 @@ qualquer um dos tipos de consoles compatíveis com o ARC.
 
 </para><para>
 
-Geralmente, nenhum destes consoles podem inicializar o Linux 
+Geralmente, nenhum destes consoles podem inicializar o Linux
 diretamente assim é necessária a assistência de um gerenciador
-de partida intermediário. Para o console SRM, é utilizado o 
-<command>aboot</command>, um gerenciador de partida pequeno e 
-independente de plataforma. Veja o (infelizmente desatualizado) <ulink 
+de partida intermediário. Para o console SRM, é utilizado o
+<command>aboot</command>, um gerenciador de partida pequeno e
+independente de plataforma. Veja o (infelizmente desatualizado) <ulink
 url="&url-srm-howto;">SRM HOWTO</ulink> para mais informações
 sobre o <command>aboot</command>.
 
 </para><para condition="FIXME">
 
-Os seguines parágrafos foram retirados do manual de instalação da 
+Os seguines parágrafos foram retirados do manual de instalação da
 Woody e estão incluidos aqui para referência; eles podem ser úteis para
 alguém em um estágio mais avançado quando a Debian suportará novamente
 instalações baseados no MILO.
 
 </para><para condition="FIXME">
 
-Geralmente nenhum destes consoles podem ser iniciados diretamente no 
+Geralmente nenhum destes consoles podem ser iniciados diretamente no
 Linux, assim é requerida a assistência de um gerenciador
 de partida intermediário. Existem dois gerenciadores principais
 no Linux: o <command>MILO</command> e o <command>aboot</command>.
 
 </para><para condition="FIXME">
 
-O <command>MILO</command> por si próprio é um console, que substitui 
+O <command>MILO</command> por si próprio é um console, que substitui
 o ARC ou SRM na memória. O <command>MILO</command> pode ser diretamente
-inicializado a partir do ARC e SRM e é o único método de inicializar o 
+inicializado a partir do ARC e SRM e é o único método de inicializar o
 Linux através do console ARC.
 O <command>MILO</command> é específico de plataforma (um <command>MILO</command>
-diferente é necessário para cada tipo de sistema) e existe somente para 
-estes sistemas, no qual o suporte ao ARC é mostrado na tabela acima. 
+diferente é necessário para cada tipo de sistema) e existe somente para
+estes sistemas, no qual o suporte ao ARC é mostrado na tabela acima.
 Veja também o (infelizmente desatualizado)
 <ulink url="&url-milo-howto;">MILO HOWTO</ulink>.
 
 </para><para condition="FIXME">
 
-O <command>aboot</command> é um gerenciador de partida pequeno e 
-independente de plataforma que somente roda a partir do SRM. 
+O <command>aboot</command> é um gerenciador de partida pequeno e
+independente de plataforma que somente roda a partir do SRM.
 Veja o (também infelizmente desatualizado) <ulink
-url="&url-srm-howto;">SRM HOWTO</ulink> para mais informações sobre o 
+url="&url-srm-howto;">SRM HOWTO</ulink> para mais informações sobre o
 <command>aboot</command>.
 
 </para><para condition="FIXME">
 
-Assim, três cenários são possíveis, dependendo do firmware do 
+Assim, três cenários são possíveis, dependendo do firmware do
 console do sistema e se o <command>MILO</command> estiver ou não
 disponível:
 
@@ -240,33 +246,38 @@ ARC -&gt; MILO
 
 </screen></informalexample>
 
-Por causa que o <command>MILO</command> não está disponível para qualquer 
-um dos sistemas alpha atualmente em produção (em Fevereiro de 2000) e 
-porque não é mais necessária a compra de licenças OpenVMS ou 
+Por causa que o <command>MILO</command> não está disponível para qualquer
+um dos sistemas alpha atualmente em produção (em Fevereiro de 2000) e
+porque não é mais necessária a compra de licenças OpenVMS ou
 Unix Tru64 para ter uma firmware SRM em seu antigo Alpha, é recomendado
 que você use o SRM e o <command>aboot</command> em novas instalações do
-GNU/Linux, a não ser que deseje fazer dupla inicialização com o 
+GNU/Linux, a não ser que deseje fazer dupla inicialização com o
 Windows NT.
 
 </para><para>
 
-A maioria dos servidores Alpha e todos os produtos servidores e estações 
+A maioria dos servidores Alpha e todos os produtos servidores e estações
 contém ambos o SRM e o AlphaBIOS em sua firmware. Para máquinas
-"falf-flash" tal como as várias placas de avaliação. É possível
-mudar de uma versão para outra regravando a firmware. Também, 
+<quote>half-flash</quote> tal como as várias placas de avaliação. É possível
+mudar de uma versão para outra regravando a firmware. Também,
 assim que o SRM estiver instalado, é possível executar o
-ARC/AlphaBIOS a partir de um disquete (usando o comando <command>arc</command>).  
+ARC/AlphaBIOS a partir de um disquete (usando o comando <command>arc</command>).
 Pelas razões mencionadas acima, nós recomendamos mudar para o SRM antes
 de instalar a &debian;.
 
 </para><para>
 
 Como em outras arquiteturas, você deverá instalar a revisão mais
-nova disponível de sua firmware <footnote><para>Com excessão das Jensen, 
-onde o Linux não é suportado nas versões de firmwares mais novas que
-a 1.7 &mdash; Veja <ulink url="&url-jensen-howto;"></ulink> para mais
-informações</para></footnote> Antes de instalar a  &debian;. Para a 
-Alpha, as atualizações de firmware podem ser obtidas de
+nova disponível de sua firmware<footnote>
+
+<para>
+Com excessão das Jensen, onde o Linux não é suportado nas versões de firmwares
+mais novas que a 1.7 &mdash; Veja <ulink url="&url-jensen-howto;"></ulink> para
+mais informações.
+</para>
+
+</footnote> antes de instalar a &debian;.
+Para a Alpha, as atualizações de firmware podem ser obtidas de
 <ulink url="&url-alpha-firmware;">Atualizações de Firmwares do Alpha</ulink>.
 
 </para>
@@ -276,9 +287,9 @@ Alpha, as atualizações de firmware podem ser obtidas de
   <sect2 arch="alpha"><title>Inicializando com o TFTP</title>
 <para>
 
-No SRM, as interfaces Ethernet são nomeadas com o prefixo <userinput>ewa</userinput>, 
-e será listada na saída do comando <userinput>show dev</userinput>,
-como este (levemente editado):
+No SRM, as interfaces Ethernet são nomeadas com o prefixo
+<userinput>ewa</userinput>, e será listada na saída do comando
+<userinput>show dev</userinput>, como este (levemente editado):
 
 <informalexample><screen>
 &gt;&gt;&gt; show dev
@@ -309,22 +320,22 @@ digitar:
 &gt;&gt;&gt; boot ewa0 -flags ""
 </screen></informalexample>
 
-Isto fará a inicialização usando os parâmetros padrões do kernel como incluídas na
-imagem de inicialização netboot.
+Isto fará a inicialização usando os parâmetros padrões do kernel como incluídas
+na imagem de inicialização netboot.
 
 </para><para>
 
 
 Se deseja usar uma console serial, você <emphasis>deve</emphasis>
 passar o argumento <userinput>console=</userinput> ao kernel.
-Isto pode ser feito usando o argumento <userinput>-flags</userinput> 
-ao comando <userinput>boot</userinput> do console SRM. As portas 
-seriais tem o mesmo nome dos seus arquivos correspondentes em 
-<userinput>/dev</userinput>. Também, quando especificar parâmetros 
+Isto pode ser feito usando o argumento <userinput>-flags</userinput>
+ao comando <userinput>boot</userinput> do console SRM. As portas
+seriais tem o mesmo nome dos seus arquivos correspondentes em
+<userinput>/dev</userinput>. Também, quando especificar parâmetros
 adicionais de kernel, você deverá repetir certas opções adicionais
-que são necessárias pelas imagens do &d-i;. Por exemplo, para inicializar 
-através de <userinput>ewa0</userinput> e usar uma console na 
-primeira porta serial, você deverá digitar: 
+que são necessárias pelas imagens do &d-i;. Por exemplo, para inicializar
+através de <userinput>ewa0</userinput> e usar uma console na
+primeira porta serial, você deverá digitar:
 
 <informalexample><screen>
 &gt;&gt;&gt;boot ewa0 -flags console=ttyS0
@@ -353,11 +364,11 @@ na notação do SRM.
 <para>
 
 Para inicializar através de um CD-ROM a partir do console ARC, encontre
-seu nome de código de sub-arquitetura (veja <xref linkend="alpha-cpus"/>), 
-então digite <filename>\milo\linload.exe</filename> como gerenciador de 
-inicialização e <filename>\milo\<replaceable>subarch</replaceable></filename> 
-(aonde <replaceable>subarch</replaceable> é o nome de sub-arquitetura apropriada)
-como caminho do OS no menu "OS Selection Setup". Ruffians fez uma 
+seu nome de código de sub-arquitetura (veja <xref linkend="alpha-cpus"/>),
+então digite <filename>\milo\linload.exe</filename> como gerenciador de
+inicialização e <filename>\milo\<replaceable>subarch</replaceable></filename>
+(aonde <replaceable>subarch</replaceable> é o nome de sub-arquitetura
+apropriada) como caminho do OS no menu "OS Selection Setup". Ruffians fez uma
 excessão: você precisará usar <filename>\milo\ldmilo.exe</filename> como
 gerenciador de partida.
 
@@ -376,14 +387,14 @@ comando:
 &gt;&gt;&gt; boot dva0 -flags 0
 </screen></informalexample>
 
-Possivelmente substituindo <filename>dva0</filename> com o nome de 
+Possivelmente substituindo <filename>dva0</filename> com o nome de
 dispositivo atual. Normalmente <filename>dva0</filename> é o disquete; digite
 
 <informalexample><screen>
 &gt;&gt;&gt; show dev
 </screen></informalexample>
 
-para ver a lista de dispositivos (e.g., caso deseje inicializar a partir de 
+para ver a lista de dispositivos (e.g., caso deseje inicializar a partir de
 uma unidade de CD).
 Note que se se estiver inicializando através do MILO, o argumento
 <command>-flags</command> será ignorado, assim você poderá só digitar
@@ -392,14 +403,14 @@ Se tudo funcionar bem, você verá o kernel do Linux iniciando.
 
 </para><para>
 
-Se quiser especificar parâmetros de inicialização do 
+Se quiser especificar parâmetros de inicialização do
 kernel via <command>aboot</command>, use o seguinte comando:
 <informalexample><screen>
 &gt;&gt;&gt; boot dva0 -file linux.bin.gz -flags "root=/dev/fd0 load_ramdisk=1 argumentos"
 </screen></informalexample>
 
 (digite um por linha), substituindo, se necessário, o nome atual
-do dispositivo de inicialização SRM por <filename>dva0</filename>, 
+do dispositivo de inicialização SRM por <filename>dva0</filename>,
 o nome do dispositivo de inicialização do Linux por
 <filename>fd0</filename> e os parâmetros designados do kernel por
 <filename>argumentos</filename>.
@@ -407,8 +418,9 @@ o nome do dispositivo de inicialização do Linux por
 </para><para>
 
 Se desejar especificar parâmetros do kernel quando inicializar via
-<command>MILO</command>, você terá que interromper o processo de 
-inicialização assim que entrar no MILO. Veja <xref linkend="booting-from-milo"/>.
+<command>MILO</command>, você terá que interromper o processo de
+inicialização assim que entrar no MILO. Veja
+<xref linkend="booting-from-milo"/>.
 </para>
   </sect2>
 
@@ -418,9 +430,10 @@ inicialização assim que entrar no MILO. Veja <xref linkend="booting-from-milo"/>
 
 <para>
 
-No menu de seleção de sistema operacional, defina o <command>linload.exe</command> 
-como gerenciador de partida e <command>milo</command> como o caminho do 
-sistema operacional. Inicialize usando a nova entrada criada.
+No menu de seleção de sistema operacional, defina o
+<command>linload.exe</command> como gerenciador de partida e
+<command>milo</command> como o caminho do sistema operacional. Inicialize
+usando a nova entrada criada.
 
 </para>
   </sect2>
@@ -429,14 +442,14 @@ sistema operacional. Inicialize usando a nova entrada criada.
 <sect2 arch="alpha" condition="FIXME" id="booting-from-milo"><title>Inicializando com o MILO</title>
 <para>
 
-O MILO contido na mídia de inicialização está configurado para 
+O MILO contido na mídia de inicialização está configurado para
 iniciar automaticamente o Linux. Caso deseje intervir, tudo
-que precisa fazer é pressionar espaço durante a contagem regressiva 
+que precisa fazer é pressionar espaço durante a contagem regressiva
 do MILO.
 
 </para><para>
 
-Caso deseje especificar todos os bits explicitamente (por exemplo, 
+Caso deseje especificar todos os bits explicitamente (por exemplo,
 para fornecer parâmetros adicionais), você poderá usar um comando
 como este:
 
@@ -444,9 +457,9 @@ como este:
 MILO> boot fd0:linux.bin.gz root=/dev/fd0 load_ramdisk=1 <!-- argumentos -->
 </screen></informalexample>
 
-Se estiver inicializando através de alguma outra mídia que não seja 
+Se estiver inicializando através de alguma outra mídia que não seja
 um disquete, substitua <filename>fd0</filename> do exemplo acima com
-o nome de dispositivo apropriado na notação do Linux. O comando 
+o nome de dispositivo apropriado na notação do Linux. O comando
 <command>help</command> deve lhe dar uma breve referência do MILO.
 
 </para>
