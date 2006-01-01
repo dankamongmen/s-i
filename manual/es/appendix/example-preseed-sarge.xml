@@ -24,40 +24,40 @@
 # Asegúrese de copiar este fichero a la ubicación que ha especificado.
 #
 # Algunas partes de proceso de instalación no se pueden automatizar usando
-# algún método de preconfiguración, debido a que las preguntas son
-# formuladas antes que se cargue el fichero de preconfiguración. Por
-# ejemplo, si éste se descarga a través de la red, primero se debe
-# configurar la red.
-# Un motivo para utilizar la preconfiguración de initrd es que 
+# un método de preconfiguración debido a que las preguntas son
+# formuladas antes que se cargue el fichero de preconfiguración. Por ejemplo,
+# primero debe configurarse la red si el fichero se descarga a través de la
+# red.
+# Una razón para utilizar la preconfiguración de initrd es que 
 # permite la preconfiguración incluso en esta temprana etapa del
 # proceso de instalación.
 #
-# Si no se puede utilizar un fichero para preconfigurar algunos
-# pasos, todavía puede automatizar la instalación, puesto que
+# Aunque no se pueda utilizar un fichero para preconfigurar algunos
+# pasos aún puede automatizar la instalación, puesto que
 # puede pasar valores de preconfiguración al núcleo en la línea
 # de órdenes. Simplemente pase ruta/a/var=valor para cualquiera
 # de las variables listadas a continuación.
 #
-# Mientras está realizando esto, tal vez quiera cambiar allí a
-# debconf/priority=critical, para obviar la mayoría de preguntas, incluso
-# si la siguiente preconfiguración excluye alguna.
+# Cuando haga esto quizás quiera definir 
+# debconf/priority=critical, para obviar la mayoría de preguntas incluso
+# aunque la preconfiguración excluya alguna.
 # También podría definir el tiempo de espera a 1 en syslinux.cfg para
 # evitar la necesidad de presionar «Enter» para arrancar el instalador.
 #
-# Note que el núcleo acepta un máximo de 8 opciones de línea de órdenes
+# Tenga en cuenta que el núcleo acepta un máximo de 8 opciones de línea de órdenes
 # y 8 opciones de entorno (incluyendo cualquier opción añadida en forma
-# predeterminada por el instalador). Si éstos se exceden, los núcleos
-# 2.4 eliminarán cualquier opción de exceso y los 2.6 darán un mensaje
+# predeterminada por el instalador). Si exceda este número los núcleos
+# 2.4 eliminarán cualquier opción de exceso y los 2.6 abortarán con un mensaje
 # de «panic». Con los núcleos 2.6.9 o superiores puede usar hasta 32 opciones
 # de línea de órdenes y 32 opciones de entorno.
 #
-# Algunas opciones predeterminadas, como «vga=normal» se podrían
-# eliminar sin problemas para la mayoría de instalaciones,
+# Puede eliminar en la mayoría de las instalaciones
+# algunas opciones predeterminadas, como «vga=normal»,
 # lo cual le permitiría añadir más opciones para preconfiguración.
 #
 # No es posible usar la preconfiguración para la selección de idioma, 
-# país y teclado no se pueden preconfigurar.
-# En su lugar debe usar parámetros de núcleo. Ejemplo:
+# país y teclado. En su lugar debe usar parámetros del núcleo.
+# Por ejemplo:
 #    languagechooser/language-name=Spanish
 #    countrychooser/shortlist=ES
 #    console-keymaps-at/keymap=es
@@ -67,16 +67,17 @@
 
 # Obviamente, ¡esto no funcionará si está cargando su fichero de
 # preconfiguración desde la red!. Pero es fantástico si está arrancando
-# desde CD o memoria USB. También puede pasar parámetros de configuración
+# desde CD o desde una memoria USB. También puede pasar parámetros de configuración
 # de red en los parámetros del núcleo si está cargando el fichero de
 # preconfiguración desde la red.
 
-# «netcfg» elegirá una interfaz que en lo posible tenga conexión. Esto
-# hace que se evite mostrar una lista si existe más de una interfaz.
+# «netcfg» elegirá, si existe, una interfaz que esté conectada. Esta opción
+# hace que no se muestre la lista de interfaces si existe más de una interfaz conectada.
 d-i  netcfg/choose_interface select auto
 
-# Si tiene un servidor dhcp lento y el instalador finaliza la espera
-# por éste, podría serle útil lo siguiente.
+# Puede serle útil especificar este valor
+# si tiene un servidor dhcp lento y el instalador expira porque éste no
+# responde a tiempo.
 #d-i netcfg/dhcp_timeout string 60
 
 # Si prefiere configurar la red manualmente, puede hacer lo siguiente:
@@ -87,19 +88,19 @@ d-i  netcfg/choose_interface select auto
 #d-i netcfg/get_gateway		string 192.168.1.1
 #d-i netcfg/confirm_static	boolean true
 
-# Note que cualquier nombre de máquina o dominio asignado desde dhcp
+# Tenga en cuenta que cualquier nombre de máquina o dominio asignado por dhcp
 # tomará precedencia sobre los valores definidos aquí. Sin embargo,
-# el hacerlo evita que se muestren las preguntas incluso si los
-# valores vienen desde dhcp.
+# si define estos valores las preguntas no se mostrarán aún cuando los
+# valores provengan del servidor dhcp.
 d-i netcfg/get_hostname		string unassigned-hostname
 d-i netcfg/get_domain		string unassigned-domain
 
 # Deshabilita el molesto cuadro de diálogo de clave WEP
 d-i netcfg/wireless_wep		string
-# El nombre de máquina dhcp que algunos ISPs usan como un tipo de claves.
+# El nombre de máquina dhcp que algunos ISPs usan como una clave de algún tipo.
 #d-i netcfg/dhcp_hostname	string radish
 
-#### Configuración de servidor espejo
+#### Configuración de servidor espejo (réplica)
 
 d-i mirror/country		string enter information manually
 d-i mirror/http/hostname	string http.es.debian.org
@@ -114,9 +115,9 @@ d-i mirror/http/proxy		string
 #d-i partman-auto/init_automatically_partition \
 #    select Use the largest continuous free space
 #
-# Alternativamente, puede especificar un disco a particionar. El nombre del
-# dispositivo se puede ingresar tanto en formato tradicional o en devfs.
-# Por ejemplo, para usar el primer disco dvfs:
+# También puede especificar un disco a particionar. El nombre del
+# dispositivo se puede introducir tanto en formato tradicional o en formato devfs.
+# Por ejemplo, puede utilizar este valor para usar el primer disco devfs:
 d-i  partman-auto/disk		string /dev/discs/disc0/disc
 
 # Puede elegir cualquiera de las recetas de particionado predefinidas:
@@ -125,7 +126,7 @@ d-i  partman-auto/choose_recipe	select \
 #d-i partman-auto/choose_recipe		select Desktop machine
 #d-i partman-auto/choose_recipe		select Multi-user workstation
 
-# O indique su propia receta
+# O indicar su propia receta...
 # El formato de las recetas está documentado en el fichero
 # devel/partman-auto-recipe.txt.
 # Si tiene una forma de colocar el fichero de receta dentro del entorno
@@ -133,7 +134,7 @@ d-i  partman-auto/choose_recipe	select \
 #d-i partman-auto/expert_recipe_file	string /hd-media/recipe
 
 # Si no, puede colocar la receta en una línea. Este ejemplo crea una
-# partición /boot pequeña, una partición de intercambio y usa el resto
+# partición /boot pequeña, una partición de intercambio apropiada y usa el resto
 # del espacio para la partición raíz:
 #d-i partman-auto/expert_recipe		string boot-root :: \
 #    20 50 100 ext3 $primary{ } $bootable{ } method{ format } format{ } \
@@ -141,7 +142,7 @@ d-i  partman-auto/choose_recipe	select \
 #    500 10000 1000000000 ext3 method{ format } format{ } \
 #    use_filesystem{ } filesystem{ ext3 } mountpoint{ / } .  \
 #    64 512 300% linux-swap method{ swap } format{ } .
-# Para que sirva de referencia, aquí puede ver la misma recenta
+# Para que sirva de referencia, aquí puede ver la misma receta
 # en un formato más legible:
 #   boot-root ::
 # 	40 50 100 ext3
@@ -159,7 +160,8 @@ d-i  partman-auto/choose_recipe	select \
 #		method{ swap } format{ }
 #	.
 
-# Lo siguiente hace que «partman» particione automáticamente sin confirmación.
+# Lo siguiente receta hace que «partman» particione automáticamente el
+# espacio sin confirmación.
 d-i partman/confirm_write_new_label	boolean true
 d-i partman/choose_partition		select \
     Finish partitioning and write changes to disk
@@ -167,8 +169,8 @@ d-i partman/confirm			boolean	true
 
 #### Instalación del gestor de arranque.
 
-# GRUB es el gestor de arranque predeterminado (para x86). Si quiere instalar
-# lilo en su lugar, descomente esto:
+# GRUB es el gestor de arranque predeterminado (para arquitectura x86).
+# Descomente esta opción si quiere instalar lilo en su lugar:
 #d-i grub-installer/skip		boolean true
 
 # Esta es una configuración adecuada y segura, hace que grub se instale
@@ -177,12 +179,12 @@ d-i partman/confirm			boolean	true
 d-i grub-installer/only_debian		boolean true
 
 # Lo siguiente hace que el «grub-installer» se instale en el MBR en caso de
-# que también se encuentre otro sistema operativo, lo cual es menos seguro puesto
-# que podría dejar sin posibilidad de arrancar al otro sistema operativo.
+# que se encuentre instalado otro sistema operativo. Esto es menos seguro puesto
+# que podría hacer que el otro sistema operativo no se pudiera arrancar.
 d-i grub-installer/with_other_os	boolean true
 
-# Alternativamente, si desea instalar en una ubicación distinta al MBR,
-# descomente y edite estas líneas:
+# Alternativamente, descomente y edite estas líneas:
+# si desea instalar en una ubicación distinta al MBR,
 #d-i grub-installer/bootdev		string (hd0,0)
 #d-i grub-installer/only-debian		boolean false
 #d-i grub-installer/with_other_os	boolean false
@@ -196,13 +198,13 @@ d-i prebaseconfig/reboot_in_progress	note
 
 # La preconfiguración de d-i es inherentemente insegura. Ninguna parte del
 # instalador verifica intentos de desbordamiento de buffer u otras
-# formas de vulneración de los valores de un fichero de preconfiguración
+# formas de malversación de los valores de un fichero de preconfiguración
 # como éste. ¡Use solamente ficheros de preconfiguración de fuentes
 # confiables! Para poder gestionar esto, y porque generalmente es útil,
 # a continuación ofrecemos una forma de ejecutar automáticamente cualquier 
 # orden de shell que desee dentro del instalador.
 
-# La primera orden que se ejecuta tan pronto como sea posible, después de que
+# Esta primera orden se ejecuta tan pronto como sea posible, después de que
 # se lea el fichero de preconfiguración:
 #d-i preseed/early_command string anna-install some-udeb
 
@@ -210,19 +212,20 @@ d-i prebaseconfig/reboot_in_progress	note
 # pero cuando todavía existe un directorio /target usable:
 #d-i preseed/late_command string echo foo > /target/etc/bar
 
-# Ésta orden se ejecuta tan pronto como se inicie «base-config»:
+# Ésta orden se ejecuta tan pronto como se inicia el programa «base-config»:
 #base-config base-config/early_command	string echo hola mama
 
-# Ésta orden se ejecuta después de que finalice «base-config», y
-# antes de presentar el cursor «login:». Este es un buen método de
-# instalar el conjunto de paquetes que desea, o de modificar la
+# Ésta orden se ejecuta después de que termine «base-config», y
+# antes de presentar el indicador de entrada al sistema («login:»). 
+# Éste es un buen método que puede utilizar para 
+# instalar el conjunto de paquetes que desee, o para modificar la
 # configuración del sistema:
 #base-config base-config/late_command	string \
 #    apt-get install zsh; chsh -s /bin/zsh
 
 ###### Preconfiguración de la segunda fase de la instalación
 
-##### Preconfiguración de base-config.
+##### Preconfiguración de «base-config».
 
 # Obviar el mensaje de bienvenida.
 base-config base-config/intro	note
@@ -235,18 +238,19 @@ base-config base-config/login	note
 #base-config base-config/start-display-manager	boolean false
 
 # Algunas versiones del instalador pueden informarnos lo que ha instalado.
-# Lo predeterminado es no hacerlo, pero el envio de informes ayuda al
+# La operación por omisión es no hacerlo, pero el envio de informes ayuda al
 # proyecto a determinar qué software es más popular e incluirlo en
 # los CDs.
 #popularity-contest popularity-contest/participate boolean false
 
 ###### Configuración de zona horaria.
 
-# Controla si el reloj de hardware está configurado a UTC o no.
+# Controla si el reloj de hardware está o no configurado a UTC 
+# (Tiempo Universal Coordinado)
 base-config tzconfig/gmt		boolean true
 
-# Si indica al instalador que se encuentra en los Estados Unidos, entonces
-# puede definir la zona horaria usando esta variable.
+# Puede definir la zona horaria usando esta variable
+# si indica al instalador que se encuentra en los Estados Unidos.
 # (Las opciones son: Eastern, Central, Mountain, Pacific, Alaska, Hawaii,
 # Aleutian, Arizona East-Indiana, Indiana-Starke, Michigan, Samoa, other)
 base-config  tzconfig/choose_country_zone/US	select Eastern
@@ -258,23 +262,23 @@ base-config  tzconfig/choose_country_zone/CA	select Eastern
 # DeNoronha, other)
 base-config  tzconfig/choose_country_zone/BR	select East
 # Muchos países solamente tienen una zona horaria. Si indica al instalador
-# que se encuentra en una de estas, puede elegir su zona horaria estándar
+# que se encuentra en una de éstas puede elegir su zona horaria estándar
 # a través de esta pregunta.
 base-config  tzconfig/choose_country_zone_single boolean true
-# Esta pregunta se formula como un método de soporte para otros países
-# distintos a los mencionados antes, y que tienen más de una zona horaria.
+# Esta pregunta se formula como un mecanismo en el caso que se configure un país
+# distinto a los mencionados previaemten y que tenga más de una zona horaria.
 # Puede preconfigurar una de las zonas horarias o «other».
 #base-config  tzconfig/choose_country_zone_multiple select
 
-###### Configuración de cuenta.
+###### Configuración de cuentas de usuario.
 
-# Para preconfigurar la clave de superusuario, debe colocarla en
-# texto legible en este fichero. Esta no es una buena idea, ¡usela con
+# Debe colocar la contraseña del superusuario en
+# texto legible dentro de este fichero. Ésta no es una buena idea, ¡usela con
 # precaución!
 #passwd passwd/root-password		password r00tme
 #passwd	passwd/root-password-again	password r00tme
 
-# Si desea saltar la creación de una cuenta de usuario común.
+# Si desea omitir la creación de una cuenta de usuario común.
 #passwd	passwd/make-user		boolean false
 
 # Alternativamente, puede preconfigurar el nombre del usuario. Note que
@@ -289,19 +293,20 @@ base-config  tzconfig/choose_country_zone_single boolean true
 
 ###### Configuración de Apt.
 
-# Esta pregunta controla que fuente usará la segunda fase de la
-# instalación para obtener paquetes. Las opciones son cdrom, http, ftp,
-# filesystem y editar la lista en forma manual.
+# Esta pregunta controla qué fuente usará la segunda fase de la
+# instalación para obtener paquetes. Las opciones son: cdrom, http, ftp,
+# filesystem y editar la lista manualmente.
 base-config  apt-setup/uri_type		select http
 
-# Si elige ftp o http, se le preguntará el país y un servidor de réplica.
+# Se le preguntará el país y un servidor de réplica
+# si elige ftp o http.
 base-config  apt-setup/country		select enter information manually
 base-config  apt-setup/hostname		string http.es.debian.org
 base-config  apt-setup/directory	string /debian
-# Para luego de elegir un servidor espejo.
+# Terminar una vez haya elegido un servidor espejo.
 base-config  apt-setup/another	boolean false
 
-# Puede elegir instalar software desde «non-free» y «contrib».
+# Puede elegir instalar software de las fuentes «non-free» y «contrib».
 #base-config  apt-setup/non-free	boolean true
 #base-config  apt-setup/contrib		boolean true
 
@@ -310,59 +315,59 @@ base-config  apt-setup/security-updates	boolean true
 
 ###### Selección de paquetes.
 
-# Puede elegir instalar cualquier combinación de paquetes que esté
-# disponible. Las tareas disponibles al momento de escribir este fichero
-# incluyen: Desktop environment, Web server, Print server, DNS server, 
+# Puede elegir instalar cualquier combinación de paquetes disponible.
+# Las tareas disponibles en ell momento de escribir este fichero
+# son: Desktop environment, Web server, Print server, DNS server, 
 # File server, Mail server, SQL database, Laptop, Standard system, 
 # manual package selection. 
 # (N. de t. Entorno de escritorio, servidor web, servidor de impresión, 
 # servidor DNS, servidor de ficheros, servidor de correo, base de datos, 
 # ordenador portátil, sistema estándar, selección manual de paquetes).
-# La última de éstas ejecutará aptitude.
-# También puede elegir el no instalar tareas y forzar la instalación de
+# La última de estas opciónes hará que se ejecute aptitude.
+# También puede elegir no instalar tareas y forzar la instalación de
 # un conjunto de paquetes de alguna otra manera.
 tasksel     tasksel/first	multiselect Desktop environment
 #tasksel     tasksel/first	multiselect Web server, Standard system
 
-###### Configuración de agente de correo.
+###### Configuración del agente de correo.
 
-# Durante una instalación común, exim solamente formula dos preguntas.
-# Esta es una forma de evitar incluso éstas. Es posible crear una
+# Exim solamente formula dos preguntas durante una instalación común.
+# Ésta es una forma de evitar incluso éstas. Además, es posible crear una
 # preconfiguración más complicada.
 exim4-config exim4/dc_eximconfig_configtype \
     select no configuration at this time
 exim4-config exim4/no_config boolean true
 exim4-config exim4/no_config boolean true
 
-# Es una buena idea configurar esto a la cuenta que ha elegido crear.
-# El dejar el valor en blanco va a significar que el correo de postmaster
-# se entregue en «/var/mail/mail».
+# Es una buena idea configurar esta opción a la cuenta de usuario que ha elegido crear.
+# Dejar el valor en blanco significa que el correo de postmaster
+# se entregará en «/var/mail/mail».
 exim4-config exim4/dc_postmaster		string
 
-###### Configuración de X.
+###### Configuración del entorno de ventanas X.
 
-# La preconfiguración de X en Debian es posible, pero probablemente
+# Es posible preconfigurar el entorno de las X en Debian, pero probablemente
 # necesitará saber algunos detalles sobre el hardware de vídeo de la
-# máquina, puesto que el programa de configuración no efectúa una
+# máquina puesto que el programa de configuración no efectúa una
 # configuración totalmente automática de todo.
 
 # X puede detectar el controlador adecuado para algunas tarjetas, pero
-# si está preconfigurando, puede modificar el que éste elija. Incluso así,
+# si está preconfigurando puede modificar el que éste elija. Incluso en este caso,
 # vesa funcionará para la mayoría de hardware.
 #xserver-xfree86 xserver-xfree86/config/device/driver	select vesa
 
-# Un problema con la autodetección del ratón es que si falla, X
-# reintentará vez tras vez. De modo que si se efectúa la preconfiguración,
-# existe la posibilidad de un bucle infinito si no se autodetecta el ratón.
+# Un problema con la autodetección del ratón es que si ésta falla, X
+# reintentará el proceso una y otra vez. De modo que si se efectúa la preconfiguración,
+# existe la posibilidad de que se produzca un bucle infinito si no se autodetecta el ratón.
 #xserver-xfree86 xserver-xfree86/autodetect_mouse	boolean true
 
-# Se recomienda autodetección de monitor.
+# Se recomienda la autodetección del monitor.
 xserver-xfree86	xserver-xfree86/autodetect_monitor	boolean true
-# Descomente si tiene una pantalla LCD.
+# Descomente este valor si tiene una pantalla LCD.
 #xserver-xfree86 xserver-xfree86/config/monitor/lcd	boolean true
-# X tiene tres métodos de configuración para el monitor. Esta es la forma
-# de preconfigurar el método «medio», que siempre esta disponible. El
-# método «simple» podría no estar disponible y la «avanzada» hace
+# X tiene tres métodos de configuración para el monitor. Ésta es la forma
+# de preconfigurar el método «medio», que siempre está disponible. El
+# método «simple» podría no estar disponible y el «avanzado» hace
 # muchas preguntas.
 xserver-xfree86	xserver-xfree86/config/monitor/selection-method	\
     select medium
@@ -373,32 +378,33 @@ xserver-xfree86	xserver-xfree86/config/monitor/mode-list \
 
 # Dependiendo del software que elija instalar, o si las cosas no salen
 # bien durante el proceso de instalación, es posible que se formulen
-# otra preguntas. También puede preconfigurar éstas, por supuesto.
-# Para obtener una lista de cada posible pregunta que podría ser
-# formulada durante una instalación, efectúe una instalación y
-# ejecute estas órdenes:
+# otra preguntas. Por supuesto también puede preconfigurar éstas.
+# Para obtener una lista de cada pregunta posible que podría llegar a ser
+# formulada durante una instalación puede hacer una instalación y
+# ejecutar estas órdenes:
 #   debconf-get-selections --installer > fichero
 #   debconf-get-selections >> fichero
 
-# Si gusta, puede incluir otros ficheros de preconfiguración en éste.
+# Si lo desea puede incluir otros ficheros de preconfiguración en éste.
 # Cualquier configuración en estos ficheros modificará los valores
 # preexistentes de este fichero. Se puede listar más de un fichero,
-# separado por espacios, todos éstos serán cargados. Los ficheros
+# separado por espacios y se cargarán todos. Los ficheros
 # incluidos también pueden tener directivas propias de preconfiguración o
-# inclusión. Note que si los nombres de fichero son relativos, éstos son
+# inclusión. Tenga en cuenta que si los nombres de fichero son relativos, éstos son
 # tomados del mismo directorio donde se ubica el fichero que los incluye.
 #d-i preseed/include	string x.cfg
 
-# Esto es todavía más flexible, se ejecuta una orden de shell y si ésta
-# presenta como resultado los nombres de los ficheros de preconfiguración,
-# éstos se incluyen. Por ejemplo, para alternar configuraciones basadas en
+# Esta opción es todavía más flexible: se ejecuta una orden de shell y si ésta
+# presenta como resultado los nombres de los ficheros de preconfiguración entonces
+# se incluyen. Por ejemplo, para poder alternar entre configuraciones basadas en
 # un dispositivo de almacenamiento usb particular (en este caso, un
-# lector de tarjetas integrado):
+# lector de tarjetas integrado) podría hacer esto:
 #d-i preseed/include_command	string \
 #    if $(grep -q "GUID: 0aec3050aec305000001a003"  /proc/scsi/usb-storage-*/*); \
 #    then echo kraken.cfg; else echo otherusb.cfg; fi
 
-# Para verificar el formato de su fichero de preconfiguración antes de
-# efectuar una instalación, puede utilizar debconf-set-selections:
+# Puede utilizar debconf-set-selections
+# para verificar el formato de su fichero de preconfiguración antes de
+# efectuar una instalación:
 #   debconf-set-selections -c preseed.cfg
 </screen></informalexample>
