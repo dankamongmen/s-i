@@ -1,53 +1,90 @@
+<?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 32512 untranslated -->
+<!-- original version: 32512 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
 the example preseed file.
+このファイルをパースしてサンプル preseed ファイルを生成するので、
+形式に注意してください。
 In that file all text between <informalexample> tags that have the
 attribute 'role="example"' set is included, except if a 'condition'
 attribute is in force that does not match the specified release or if an
 'arch' attribute is in force that does not match the specified architecture.
+このファイルには、'role="example"' 属性が設定された <informalexample>
+タグの間のすべてのテキストが含まれています。
+'condition' 属性が有効な場合に指定されたリリースに一致しない物や、
+'arch' 属性が有効な場合に指定されたアーキテクチャに一致しない物は除かれます。
 
 Currently only a single variant of the example file is generated (for i386).
+現在、サンプルファイルは 1 種類 (i386 用) しか生成しません。
+(訳注 訳してしまうとサンプルファイルが動作するか分からないので、未訳のままにします)
 -->
 
 <appendix id="appendix-preseed" condition="etch">
+<!--
 <title>Automating the installation using preseeding</title>
+-->
+<title>preseed を利用したインストールの自動化</title>
 
 <para>
 
+<!--
 This appendix explains the intricacies of preseeding answers to questions in
 &d-i; to automate your installation.
+-->
+本付録は preseed の説明を行い、
+インストールの自動化に関する &d-i; の質問への回答です。
 
 </para><para>
 
+<!--
 The configuration fragments used in this appendix are also available as an
 example preseed file from &urlset-example-preseed;.
+-->
+本付録で使用した設定の断片は、
+&urlset-example-preseed; にあるサンプル preseed ファイルでも利用できます。
 
 </para>
 
  <sect1 id="preseed-intro">
+<!--
  <title>Introduction</title>
+-->
+ <title>はじめに</title>
 <para>
 
+<!--
 Preseeding provides a way to set answers to questions without having to manually
 enter the answers while the installation is running. This makes it possible to
 fully automate most types of installation and even offers some features not
 available during normal installations.
+-->
+preseed は、インストールの実行中に手動で回答を入力せずに、
+質問の答えを設定する方法を提供します。
+これにより、ほとんどの方法のインストールを自動化し、
+さらに通常のインストールでは利用できない特徴もあります。
 
 </para><para>
 
+<!--
 Using preseeding it is possible to fill in answers to questions asked during
 both the first stage of the installation (before the reboot into the new
 system) and the second stage.
+-->
+preseed を使用して、インストールの第 1 段階 (新しいシステムで再起動する前まで)
+と第 2 段階の両方で行われる質問に、回答を与えることができます。
 
 </para>
 
   <sect2 id="preseed-methods">
+<!--
   <title>Preseeding methods</title>
+-->
+  <title>preseed の方法</title>
 <para>
 
+<!--
 There are three methods that can be used for preseeding:
 <firstterm>initrd</firstterm>, <firstterm>file</firstterm> and
 <firstterm>network</firstterm>. Initrd preseeding will work with any
@@ -56,18 +93,36 @@ the most preparation. File and network preseeding each can be used with
 different installation methods. With file and network preseeding the first
 few installer questions cannot be preseeded because the preseed configuration
 file is only loaded after they have been asked.
+-->
+preseed を利用するには、3 種類方法があります。
+<firstterm>initrd</firstterm>, <firstterm>ファイル</firstterm>,
+<firstterm>ネットワーク</firstterm> です。
+initrd preseed は、いずれのインストール方法でも動作し、
+より多くの preseed をサポートしますが、大量の準備が必要です。
+ファイル preseed やネットワーク preseed は、
+それぞれインストール方法が異なる場合に使用されます。
+ファイル preseed やネットワーク preseed では、
+preseed 設定ファイルが読み込まれる前にいくつか質問されてしまうため、
+その質問を preseed に含めることができません。
 
 </para><para>
 
+<!--
 The following table shows which preseeding methods can be used with which
 installation methods.
+-->
+以下の表では、各インストール方法で使用できる preseed 方法を示します。
 
 <informaltable>
 <tgroup cols="4">
 <thead>
 <row>
+<!--
   <entry>Installation method</entry><entry>initrd</entry>
   <entry>file</entry><entry>network</entry>
+-->
+  <entry>インストール方法</entry><entry>initrd</entry>
+  <entry>ファイル</entry><entry>ネットワーク</entry>
 </row>
 </thead>
 
@@ -83,21 +138,33 @@ installation methods.
   <entry>no</entry>
   <entry>yes</entry>
 </row><row>
+<!--
   <entry>hd-media <phrase condition="bootable-usb">(including usb-stick)</phrase></entry>
+-->
+  <entry>hd-media <phrase condition="bootable-usb">(USB スティック含む)</phrase></entry>
   <entry>yes</entry>
   <entry>yes</entry>
   <entry>no</entry>
 </row><row condition="supports-floppy-boot">
+<!--
   <entry>floppy based (cd-drivers)</entry>
+-->
+  <entry>フロッピーベース (CD ドライバ)</entry>
   <entry>yes</entry>
   <entry>yes</entry>
   <entry>no</entry>
 </row><row condition="supports-floppy-boot">
+<!--
   <entry>floppy based (net-drivers)</entry>
+-->
+  <entry>フロッピーベース (ネットドライバ)</entry>
   <entry>yes</entry>
   <entry>no</entry>
   <entry>yes</entry>
 </row><row arch="s390">
+<!--
+  <entry>generic/tape</entry>
+-->
   <entry>generic/tape</entry>
   <entry>yes</entry>
   <entry>no</entry>
@@ -109,45 +176,77 @@ installation methods.
 
 </para><para>
 
+<!--
 An important difference between the preseeding methods is the point at which
 the preseed configuration file is loaded and processed. For initrd preseeding
 this is right at the start of the installation, before the first question is
 even asked. For file preseeding this is after the CD or CD image has been
 loaded. For network preseeding it is only after the network has been
 configured.
+-->
+preseed 方法の重要な違いは、preseed 設定ファイルを読込・処理するポイントです。
+initrd preseed では、インストールの始め (最初の質問が行われる前) で読み込まれます。
+ファイル preseed では、CD や CD イメージが読み込まれた後です。
+ネットワーク preseed では、ネットワークの設定の後でないと読み込まれません。
 
 </para><para>
 
+<!--
 In practical terms this means for file and network preseeding that the
 questions about language, country and keyboard selection will already have
 been asked. For network preseeding add to that any questions related to
 network configuration. Some other questions that are only displayed
 at medium or low priority (like the first hardware detection run) will
 also already have been processed.
+-->
+実際の話をすると、ファイル preseed やネットワーク preseed では、
+言語、国、キーボードの選択について質問は、既にされてしまっています。
+ネットワーク preseed では、そこにネットワークの設定についても加えてください。
+その他、優先度が「中」や「低」でしか表示されない質問
+(はじめのハードウェア検出など) は、既に処理されてしまっています。
 
 </para><para>
 
+<!--
 Obviously, any questions that have been processed before the
 preseeding configuration file is loaded, cannot be preseeded.
 <xref linkend="preseed-bootparms"/> offers a way to avoid these
 questions being asked.
+-->
+言うまでもなく、preseed 設定ファイルが読み込まれる前に処理される質問は、
+preseed できません。
+<xref linkend="preseed-bootparms"/> では、
+そういった質問が出ないようにする方法を提供しています。
 
 </para>
   </sect2>
 
   <sect2 id="preseed-limitations">
+<!--
   <title>Limitations</title>
+-->
+  <title>制限</title>
 <para>
 
+<!--
 Although most questions used by &d-i; can be preseeded using this method,
 there are some notable exceptions. You must (re)partition an entire disk
 or use available free space on a disk; it is not possible to use existing
 partitions. You currently cannot use preseeding to set up RAID and LVM.
+-->
+&d-i; で行われる質問のほとんどはこの方法で preseed できますが、
+いくつか注目すべき例外があります。
+ディスク全体を (再度) パーティション分割をするか、
+ディスクの空き領域を利用しなければなりません。
+つまり既存のパーティションを利用できないと言うことです。
+また現在、RAID や LVM のセットアップに preseed を利用できません。
 
 </para>
   </sect2>
 
 <!-- Joeyh feels this is too technical, so leave it out for now
+     Joeyh は技術的すぎると感じています。現在この項は外しています。
+     (訳注)なので訳を省略します。
   <sect2 id="preseed-debconf">
   <title>Debconf basics</title>
 <para>
@@ -209,45 +308,81 @@ are stored in a separate, non-readable file in the same directory.
 -->
 
   <sect2 id="preseed-hooks">
+<!--
   <title>Running custom commands during the installation</title>
+-->
+  <title>インストール中でのカスタムコマンドの実行</title>
 <para>
 
+<!--
 A very powerfull and flexible option offered by the preseeding tools is the
 ability to run commands or scripts at certain points in the installation.
 See <xref linkend="preseed-shell"/> for details.
+-->
+preseed ツールで提供される、とても強力で柔軟なオプションに、
+インストールの決まった場所でコマンドやスクリプトを実行する機能があります。
+詳細は <xref linkend="preseed-shell"/> をご覧ください。
 
 </para>
 
 <itemizedlist>
 <listitem><para>
+<!--
   <userinput>preseed/early_command</userinput>: is run as soon as the the
   preseeding configuration file has been loaded
+-->
+  <userinput>preseed/early_command</userinput>: は、
+  preseed 設定ファイルが読み込まれるとすぐに実行します。
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>preseed/late_command</userinput>: is run just before the reboot
   at the end of the first stage of the installation, but before the
   <filename>/target</filename> filesystem has been unmounted
+-->
+  <userinput>preseed/late_command</userinput>: は、
+  インストールの第 1 段階が終わって再起動する直前、
+  <filename>/target</filename> ファイルシステムをアンマウントする前に実行します。
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>base-config/early_command</userinput>: is run early in the second
   stage of the installation when <command>base-config</command> is starting up
+-->
+  <userinput>base-config/early_command</userinput>: は、
+  インストールの第 2 段階の始め、
+  <command>base-config</command> を実行し始めるときに実行します。
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>base-config/late_command</userinput>: is run at the end of
   <command>base-config</command>, just before the login prompt
+-->
+  <userinput>base-config/late_command</userinput>: は、
+  <command>base-config</command> の最後、
+  ログインプロンプトを出す直前に実行します。
 </para></listitem>
 </itemizedlist>
 
   </sect2>
 
   <sect2 id="preseed-seenflag">
+<!--
   <title>Using preseeding to change default values</title>
+-->
+  <title>デフォルト値の変更に関する preseed の利用</title>
 <para>
 
+<!--
 It is possible to use preseeding to change the default answer for a
 question, but still have the question asked. To do this the
 <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
 setting the value for a template.
+-->
+訊かれる質問に対するデフォルトの回答を変更するのに preseed を利用できます。
+これには、テンプレートに値を設定した後で、
+<firstterm>seen</firstterm> フラグを <quote>false</quote>
+に設定しなければなりません。
 
 </para>
 
@@ -260,9 +395,13 @@ d-i foo/bar seen false
  </sect1>
 
  <sect1 id="preseed-using">
+<!--
  <title>Using preseeding</title>
+-->
+ <title>preseed の利用</title>
 <para>
 
+<!--
 Of course you will first need to create a preseed file and place it in the
 location from where you want to use it. Creating the preseed file is covered
 later in this appendix. Putting it in the correct location is fairly
@@ -271,47 +410,92 @@ a floppy or usb-stick. If you want to include the file on a CD or DVD, you
 will have to remaster the ISO image. How to get the preseed file included
 in the initrd is outside the scope of this document; please consult the
 developers documentation for &d-i;.
+-->
+もちろん最初に preseed ファイルを作成し、使用したい場所に配置する必要があります。
+preseed ファイルの作成は本付録で後ほど扱います。
+ネットワーク preseed の場合や、
+ファイルをフロッピーや USB スティックから読み込みたい場合、
+正しい位置に preseed ファイルを配置するのは簡単です。
+CD や DVD にファイルを含めたければ、
+ISO イメージを再度マスタリングする必要があります。
+initrd に含まれている preseed ファイルを取り出すのは、この文書では扱いません。
+&d-i; の開発者向け文書を当たってください。
 
 </para><para>
 
+<!--
 An example preseed file that you can use as basis for your preseed file is
 available from &urlset-example-preseed;. This file is based on the
 configuration fragments included in this appendix.
+-->
+preseed ファイルの基礎にできる preseed ファイルのサンプルは、
+&urlset-example-preseed; から取得できます。
+このファイルは、この付録にある設定片を元にしています。
 
 </para>
 
   <sect2 id="preseed-loading">
+<!--
   <title>Loading the preseed file</title>
+-->
+  <title>preseed ファイルの読み込み</title>
 <para>
 
+<!--
 If you are using initrd preseeding, you only have to make sure a file named
 <filename>preseed.cfg</filename> is included in the root directory of the
 initrd. The installer will automatically check if this file is present and
 load it.
+-->
+initrd preseed を使用する場合、<filename>preseed.cfg</filename>
+というファイルがinitrd のルートディレクトリに確実にある必要があります。
+インストーラは、このファイルがあるか自動的にチェックし、読み込みます。
 
 </para><para>
 
+<!--
 For the other preseeding methods you need to tell the installer what file to
 use when you boot it. This is done by passing the kernel a boot parameter,
 either manually at boot time or by editing the bootloader configuration file
 (e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end
 of the append line(s) for the kernel.
+-->
+他の preseed 方法では、ブート時にどのファイルを読み込むか、
+インストーラに指定する必要があります。
+カーネルのブートパラメータで渡して行います。
+これは起動時に手動で与えるか、
+ブートローダ設定ファイル (例: <filename>syslinux.cfg</filename>) を編集し、
+カーネルへのappend行の最後にパラメータを追加して与えます。
 
 </para><para>
 
+<!--
 If you do specify the preseed file in the bootloader configuration, you might
 change the configuration so you don't need to hit enter to boot the installer.
 For syslinux this means setting the timeout to 1 in
 <filename>syslinux.cfg</filename>.
+-->
+ブートローダの設定で preseed ファイルを指定するなら、
+設定を変更すれば、インストーラの起動時に ENTER を押す必要はありません。
+syslinux ではこの設定をするのに、
+<filename>syslinux.cfg</filename> でタイムアウトを 1 にします。
 
 </para><para>
 
+<!--
 To make sure the installer gets the right preseed file, you can optionally
 specify a checksum for the file. Currently this needs to be a md5sum, and if
 specified it must match the preseed file or the installer will refuse to use it.
+-->
+インストーラが確実に正しい preseed ファイルを取得するには、
+このファイルのチェックサムを指定することができます。
+現在、これには md5sum が必要です。
+また、指定した物と preseed ファイル一致しなければなりません。
+そうでなければインストーラはこのファイルを使用しません。
 
 </para>
 
+<!--
 <informalexample><screen>
 Boot parameters to specify:
 - if you're netbooting:
@@ -327,132 +511,253 @@ Boot parameters to specify:
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 </screen></informalexample>
+-->
+<informalexample><screen>
+ブートパラメータの設定:
+- netboot の場合:
+  preseed/url=http://host/path/to/preseed.cfg
+  preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
+
+- リマスタリングした CD で起動する場合:
+  preseed/file=/cdrom/preseed.cfg
+  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
+
+- USB メディアで起動する場合 (preseed ファイルを USB スティックの
+  トップレベルディレクトリにおくこと)
+  toplevel directory of the USB stick):
+  preseed/file=/hd-media/preseed.cfg
+  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
+</screen></informalexample>
 
 <para>
 
+<!--
 While you're at it, you may want to add a boot parameter
 <userinput>debconf/priority=critical</userinput>. This will avoid most
 questions even if the preseeding below misses some.
+-->
+実行するにあたり、ブートパラメータに
+<userinput>debconf/priority=critical</userinput> を追加したいかもしれません。
+preseed でいくつか以下の設定を漏らしても、
+ほとんどの質問が表示されなくなります。
 
 </para>
   </sect2>
 
   <sect2 id="preseed-bootparms">
+<!--
   <title>Using boot parameters to supplement preseeding</title>
+-->
+  <title>preseed を補足するブートパラメータの利用</title>
 <para>
 
+<!--
 Some parts of the installation process cannot be automated using some forms
 of preseeding because the questions are asked before the preseed file is
 loaded. For example, if the preseed file is downloaded over the network,
 the network setup must be done first. One reason to use initrd preseeding
 is that it allows preseeding of even these early steps of the installation
 process.
+-->
+インストールプロセスのいくつかの部分は、
+preseed ファイルが読み込まれる前に質問が起きるので、
+自動で行うことができません。
+例えば、preseed ファイルをネットワークからダウンロードする場合、
+まずネットワークの設定が完了していなければなりません。
+initrd preseed を使用する理由のひとつに、
+これがインストールプロセスの初めから preseed できると言うことがあります。
 
 </para><para>
 
+<!--
 If a preseed file cannot be used to preseed some steps, the install can
 still be fully automated, since you can pass preseed values to the kernel
 on the command line. Just pass <userinput>path/to/var=value</userinput>
 for any of the preseed variables listed in the examples.
+-->
+preseed ファイルを preseed に使用できないステップがあっても、
+コマンドラインから preseed の値をカーネルに渡せますので、
+まだ完全に自動化できます。
+<userinput>path/to/var=value</userinput> というように、
+サンプルにある preseed 変数を渡してください。
 
 </para>
 <note><para>
 
+<!--
 The 2.4 kernel accepts a maximum of 8 command line options and
 8 environment options (including any options added by default for the
 installer). If these numbers are exceeded, 2.4 kernels will drop any
 excess options and 2.6 kernels will panic. For kernel 2.6.9 and later,
 you can use 32 command line options and 32 environment options.
+-->
+カーネル 2.4 では最大 (インストーラがデフォルトで指定するオプションを含め) 
+コマンドラインオプションを 8 つ、環境オプションを 8 つ受け取れます。
+この数を超えると、カーネル 2.4 では超過したオプションを取りこぼしてしまい、
+カーネル 2.6 ではパニックしてしまいます。
+カーネル 2.6.9 以降では、コマンドラインオプションを 32、
+環境オプションを 32 受け取れます。
 
 </para></note>
 <para>
 
+<!--
 For most installations some of the default options in your bootloader
 configuration file, like 'vga=normal', may be safely removed which may
 allow you to add more options for preseeding.
+-->
+ほとんどのインストールでは、ブートローダ設定ファイルにある
+('vga=normal' のような) デフォルトオプションを安全に削除できるかもしれません。
+これにより preseed 用にもっとオプションを追加できます。
 
 </para>
 <note><para>
 
+<!--
 It may not always be possible to specify values with spaces for boot
 parameters, even if you delimit them with quotes.
+-->
+ブートパラメータに空白を含んだ値を設定するのは、
+引用符で区切ったとしてもいつもうまくいくとは限りません。
 
 </para></note>
   </sect2>
  </sect1>
 
  <sect1 condition="FIXME" id="preseed-creating">
+<!--
  <title>Creating a preseed file</title>
+-->
+ <title>preseed ファイルの作成</title>
 <para>
 
+<!--
 The preconfiguration file is in the format used by the
 <command>debconf-set-selections</command> command.
+-->
+事前設定ファイルは、<command>debconf-set-selections</command>
+コマンドで使用されるフォーマットです。
 
 </para>
 
 <itemizedlist>
 <listitem><para>
+<!--
   File format
+-->
+  ファイルフォーマット
 </para></listitem>
 <listitem><para>
+<!--
   Only single space allowed between template type and value
+-->
+  テンプレートの型と値の間には空白がひとつだけ有効
 </para></listitem>
 <listitem><para>
+<!--
   Relation with /var/lib/(c)debconf/templates
+-->
+  /var/lib/(c)debconf/templates との関連
 </para></listitem>
 <listitem><para>
+<!--
   Types of templates and how to provide values for them
+-->
+  テンプレートの型と値の提供方法
 </para></listitem>
 <listitem><para>
+<!--
   Most values need to be in English or codes
+-->
+  ほとんどの値は英語かコード
 </para></listitem>
 <listitem><para>
+<!--
   Using a manual installation as base
+-->
+  手動インストールを基礎として使用する。
 </para></listitem>
 <listitem><para>
+<!--
   Finding other possible values
+-->
+  有効な値の検索
 </para></listitem>
 </itemizedlist>
 
 <para>
 
+<!--
 To check if the format of your preseed file is valid before performing an
 install, you can use the command <command>debconf-set-selections -c
 <replaceable>preseed.cfg</replaceable></command>.
+-->
+preseed ファイルのフォーマットがインストールを実行する前に有効か調べるには、
+<command>debconf-set-selections -c
+<replaceable>preseed.cfg</replaceable></command> を使用できます。
 
 </para>
  </sect1>
 
  <sect1 id="preseed-stage1">
+<!--
  <title>Preseeding the first stage of the installation</title>
+-->
+ <title>インストール第 1 段階の preseed</title>
 <para>
 
+<!--
 The configuration fragments used in this appendix are also available as an
 example preseed file from &urlset-example-preseed;.
+-->
+本付録で使用する設定片は、
+&urlset-example-preseed; のサンプル preseed ファイルでも利用できます。
 
 </para><para>
 
+<!--
 Note that this example is based on an installation for the Intel x86
 architecture. If you are installing a different architecture, some of the
 examples (like keyboard selection and bootloader installation) may not be
 relevant and will need to be replaced by debconf settings appropriate for your
 architecture.
+-->
+本サンプルは、
+Intel x86 アーキテクチャ用インストールを元にしていることに注意してください。
+他のアーキテクチャにインストールする場合、
+いくつかのサンプル (キーボードの選択やブートローダの選択など) 
+は関連がないかもしれませんし、
+そのアーキテクチャ用に適切な debconf 設定で置き換える必要があるでしょう。
 
 </para>
  
   <sect2 id="preseed-l10n">
+<!--
   <title>Localization</title>
+-->
+  <title>地域化</title>
 <para>
 
+<!--
 Setting localization values will only work if you are using initrd preseeding.
 With all other methods the preseed file will only be loaded after these
 questions have been asked.
+-->
+地域化の設定値は initrd preseed を利用しているときのみ動作します。
+他のすべての方法では、
+この質問をされた後にでしか preseed ファイルを読み込めません。
 
 </para><para>
 
+<!--
 The locale can be used to specify both language and country.
 To specify the locale as a boot parameter, use
 <userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>.
+-->
+ロケールは言語と国を両方指定します。
+ブートパラメータでロケールを指定するには、
+<userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>
+としてください。
 
 <informalexample role="example"><screen>
 # Locale sets language and country.
@@ -461,10 +766,17 @@ d-i debian-installer/locale string en_US
 
 </para><para>
 
+<!--
 Keyboard configuration consists of selecting a keyboard architecture and a
 keymap. In most cases the correct keyboard architecture is selected by
 default, so there's normally no need to preseed it. The keymap must
 be valid for the selected  keyboard architecture.
+-->
+キーボード設定は、
+キーボードアーキテクチャとキーマップを選択することから成っています。
+ほとんどの場合、正しいキーボードアーキテクチャはデフォルトで選択されています。
+そのため、通常 preseed する必要はありません。
+キーマップは選択したキーボードアーキテクチャで、有効でなくてはなりません。
 
 <informalexample role="example"><screen>
 # Keyboard selection.
@@ -476,31 +788,53 @@ d-i console-keymaps-at/keymap select us
 
 </para><para>
 
+<!--
 To skip keyboard configuration preseed
 <classname>console-tools/archs</classname> with
 <userinput>skip-config</userinput>.
 This will result in the kernel keymap remaining active.
+-->
+キーボード設定をスキップするには、
+<classname>console-tools/archs</classname> を 
+<userinput>skip-config</userinput> と preseed してください。
+これにより、カーネルのキーマップが有効になったままとなります。
 
 </para>
 
 <note><para>
 
+<!--
 The changes in the input layer for 2.6 kernels have made the keyboard
 architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote>
 (<userinput>at</userinput>) keymap should be selected.
+-->
+カーネル 2.6 では入力レイヤが変更され、
+キーボードアーキテクチャは事実上時代遅れです。
+カーネル 2.6 では通常、<quote>PC</quote> (<userinput>at</userinput>) 
+キーマップが既に選択されています。
 
 </para></note>
   </sect2>
 
   <sect2 id="preseed-network">
+<!--
   <title>Network configuration</title>
+-->
+  <title>ネットワーク設定</title>
 <para>
 
+<!--
 Of course, preseeding the network configuration won't work if you're
 loading your preseed file from the network. But it's great when you're
 booting from CD or USB stick. If you are loading preseed files from
 the network, you can pass network config parameters in using kernel
 boot parameters.
+-->
+もちろん、ネットワークから preseed ファイルを読み込むなら、
+preseed のネットワーク設定は動作しません。
+しかし、CD や USB スティックから起動するときには重要です。
+ネットワークから preseed ファイルを読み込む場合、
+ネットワーク設定パラメータを、カーネルブートパラメータで渡せます。
 
 </para>
 
@@ -536,21 +870,35 @@ d-i netcfg/wireless_wep string
   </sect2>
 
   <sect2 id="preseed-mirror">
+<!--
   <title>Mirror settings</title>
+-->
+  <title>ミラー設定</title>
 <para>
 
+<!--
 Depending on the installation method you use, a mirror may used both to
 download additional components of the installer, the base system and to
 set up the <filename>/etc/apt/sources.list</filename> for the installed
 system.
+-->
+使用するインストール方法に依存しますが、
+インストーラの追加コンポーネントのダウンロードや、基本システム、
+インストールしたシステムの <filename>/etc/apt/sources.list</filename> の
+セットアップにミラーを使用できます。
 
 </para><para>
 
+<!--
 The parameter <classname>mirror/suite</classname> determines the suite for
 the installed system.
+-->
+<classname>mirror/suite</classname> パラメータでは、
+インストールするシステム用の組を設定します。
 
 </para><para>
 
+<!--
 The parameter <classname>mirror/udeb/suite</classname> determines the suite
 for additional components for the installer. It is only useful to set this
 if components are actually downloaded over the network and should match the
@@ -558,6 +906,14 @@ suite that was used to build the initrd for the installation method used for
 the installation.
 By default the value for <classname>mirror/udeb/suite</classname> is the same
 as <classname>mirror/suite</classname>.
+-->
+<classname>mirror/udeb/suite</classname> パラメータでは、
+インストーラの追加コンポーネントの組を設定します。
+実際にコンポーネントをネットワークでダウンロードする場合に役立つだけです。
+また、インストールで使用するインストール方法のための initrd を生成するには、
+この組が一致していなければなりません。
+<classname>mirror/udeb/suite</classname> のデフォルト値は、
+<classname>mirror/suite</classname> と同じです。
 
 </para>
 
@@ -576,9 +932,13 @@ d-i mirror/http/proxy string
   </sect2>
 
   <sect2 id="preseed-partman">
+<!--
   <title>Partitioning</title>
+-->
+  <title>パーティション分割</title>
 <para>
 
+<!--
 Using preseeding to partition the harddisk is very much limited to what is
 supported by <classname>partman-auto</classname>. You can choose to either
 partition existing free space on a disk or a whole disk. The layout of the
@@ -586,14 +946,28 @@ disk can be determined by using a predefined recipe, a custom recipe from
 a recipe file or a recipe included in the preseed file. It is currently not
 possible to partition multiple disks using preseeding nor to set up RAID or
 LVM.
+-->
+ハードディスクのパーティション分割に preseed を使用するのは、
+<classname>partman-auto</classname> でサポートしている機能に限定されています。
+パーティションはディスクに既存の空き領域とディスク全体のどちらかから選べます。
+ディスクレイアウトは、あらかじめ定義したレシピ、
+レシピファイルによるカスタムレシピ、
+preseed ファイルに書いたレシピから選択できます。
+現在、パーティションに preseed を用いて複数のディスクを割り当てられませんし、
+RAID や LVM の設定もできません。
 
 </para>
 
 <warning><para>
 
+<!--
 The identification of disks is dependent on the order in which their drivers
 are loaded. If there are multiple disks in the system, make very sure the
 correct one will be selected before using preseeding.
+-->
+ディスクの識別は、ドライバの読み込み順に依存します。
+複数のディスクがシステムにある場合、
+preseed を使用する前に確実に正しい物を選択するようにしなければなりません。
 
 </para></warning>
 
@@ -651,7 +1025,10 @@ d-i partman/confirm boolean true
   </sect2>
 
   <sect2 id="preseed-time">
+<!--
   <title>Clock and time zone setup</title>
+-->
+  <title>時計・タイムゾーン設定</title>
 
 <informalexample role="example"><screen>
 # Controls whether or not the hardware clock is set to UTC.
@@ -665,12 +1042,21 @@ d-i time/zone string US/Eastern
   </sect2>
 
   <sect2 id="preseed-apt">
+<!--
   <title>Apt setup</title>
+-->
+  <title>Apt 設定</title>
 <para>
 
+<!--
 Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
 options is fully automated based on your installation method and answers to
 earlier questions. Only the two variables below are relevant for preseeding.
+-->
+<filename>/etc/apt/sources.list</filename>
+のセットアップと基本設定オプションは、
+インストール方法と初期の質問への回答から、完全に自動的に行われます。
+preseed に関連する変数は 2 つしかありません。
 
 </para>
 
@@ -683,21 +1069,38 @@ earlier questions. Only the two variables below are relevant for preseeding.
   </sect2>
 
   <sect2 id="preseed-account">
+<!--
   <title>Account setup</title>
+-->
+  <title>アカウント設定</title>
 <para>
 
+<!--
 The password for the root account and name and password for a first regular
 user's account can be preseeded. For the passwords you can use either clear
 text values or MD5 <emphasis>hashes</emphasis>.
+-->
+root アカウント用のパスワードや、
+最初のユーザアカウントの名前・パスワードは preseed できます。
+パスワードには、クリアテキストか MD5 <emphasis>ハッシュ</emphasis>のどちらかを
+使用できます。
 
 </para>
 <warning><para>
 
+<!--
 Be aware that preseeding passwords is not completely secure as everyone
 with access to the preseed file will have the knowledge of these passwords.
 Using MD5 hashes is considered slightly better in terms of security but it
 might also give a false sense of security as access to a MD5 hash allows
 for brute force attacks.
+-->
+preseed のパスワードは、
+パスワードを知っている preseed ファイルが誰でもアクセスできるために、
+完全に安全でないことを知っておいてください。
+MD5 ハッシュを使えば、セキュリティ的には多少ましと言えますが、
+MD5 ハッシュは総当たり攻撃にかけられることを考えると、
+誤った感覚を与えるかもしれません。
 
 </para></warning>
 
@@ -723,6 +1126,7 @@ for brute force attacks.
 
 <para>
 
+<!--
 The <classname>passwd/root-password-crypted</classname> and
 <classname>passwd/user-password-crypted</classname> variables can also be
 preseeded with <quote>!</quote> as their value. In that case, the corresponding
@@ -730,10 +1134,21 @@ account is disabled. This may be convenient for the root account, provided
 of course that an alternate method is setup to allow administrative
 activities or root login (for instance by using SSH key authentication or
 sudo).
+-->
+<classname>passwd/root-password-crypted</classname> 変数や
+<classname>passwd/user-password-crypted</classname> 変数では、
+preseed で <quote>!</quote> という値を取れます。
+この場合、そのアカウントは無効となります。
+もちろん管理権限での実行や root ログインを許可する代替手段
+(例えば SSH キー認証や sudo) を用意しておいた上で、
+root アカウントに設定すると便利です。
 
 </para><para>
 
+<!--
 An MD5 hash for a password can be generated using the following command.
+-->
+パスワードの MD5 ハッシュは以下のコマンドで生成できます。
 
 <informalexample><screen>
 $ echo "r00tme" | mkpasswd -s -H MD5
@@ -743,7 +1158,10 @@ $ echo "r00tme" | mkpasswd -s -H MD5
   </sect2>
 
   <sect2 id="preseed-bootloader">
+<!--
   <title>Boot loader installation</title>
+-->
+  <title>ブートローダのインストール</title>
 
 <informalexample role="example"><screen>
 # Grub is the default boot loader (for x86). If you want lilo installed
@@ -768,7 +1186,10 @@ d-i grub-installer/with_other_os boolean true
   </sect2>
 
   <sect2 id="preseed-finish">
+<!--
   <title>Finishing up the first stage install</title>
+-->
+  <title>インストール第 1 段階の仕上</title>
 
 <informalexample role="example"><screen>
 # Avoid that last message about the install being complete.
@@ -783,7 +1204,10 @@ d-i prebaseconfig/reboot_in_progress note
  </sect1>
 
  <sect1 id="preseed-stage2">
+<!--
  <title>Preseeding the second stage of the installation</title>
+-->
+ <title>インストール第 2 段階の preseed</title>
 
   <sect2 id="preseed-baseconfig">
   <title>Base config</title>
@@ -808,52 +1232,95 @@ base-config base-config/login note
   </sect2>
 
   <sect2 id="preseed-tasksel">
+<!--
   <title>Package selection</title>
+-->
+  <title>パッケージ選択</title>
 <para>
 
+<!--
 You can choose to install any combination of tasks that are available.
 Available tasks as of this writing include:
+-->
+有効なタスクを組み合わせてインストールするものを選ぶことができます。
+有効なタスクを以下に書き出します。
 
 </para>
 
 <itemizedlist>
 <listitem><para>
+<!--
   <userinput>Standard system</userinput>
+-->
+  <userinput>Standard system (標準システム)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>Desktop environment</userinput>
+-->
+  <userinput>Desktop environment (デスクトップ環境)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>Web server</userinput>
+-->
+  <userinput>Web server (Web サーバ)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>Print server</userinput>
+-->
+  <userinput>Print server (印刷サーバ)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>DNS server</userinput>
+-->
+  <userinput>DNS server (DNS サーバ)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>File server</userinput>
+-->
+  <userinput>File server (ファイルサーバ)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>Mail server</userinput>
+-->
+  <userinput>Mail server (メールサーバ)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>SQL database</userinput>
+-->
+  <userinput>SQL database (SQL サーバ)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>Laptop</userinput>
+-->
+  <userinput>Laptop (ラップトップ)</userinput>
 </para></listitem>
 <listitem><para>
+<!--
   <userinput>manual package selection</userinput>
+-->
+  <userinput>manual package selection (マニュアルパッケージ集)</userinput>
 </para></listitem>
 </itemizedlist>
 
 <para>
 
+<!--
 The last of these will run aptitude. You can also choose to install no tasks,
 and force the installation of a set of packages in some other way. We recommend
 always including the <userinput>Standard system</userinput> task.
+-->
+この後に aptitude を実行します。
+タスクをインストールしないこともできますし、
+他の方法でパッケージのセットが強制的にインストールされることもあります。
+<userinput>Standard system</userinput> タスクは常に含めるのをお奨めします。
 
 </para>
 
@@ -865,11 +1332,19 @@ tasksel tasksel/first multiselect Standard system, Desktop environment
   </sect2>
 
   <sect2 id="preseed-mailer">
+<!--
   <title>Mailer configuration</title>
+-->
+  <title>メール設定</title>
 <para>
 
+<!--
 During a normal install, exim asks only a few questions. Here's how to
 avoid even those. More complicated preseeding is possible.
+-->
+通常のインストールでは、exim は少々質問しますが、
+さらにこれを避ける方法もあります。
+もっと複雑な preseed も可能です。
 
 </para>
 
@@ -884,12 +1359,21 @@ exim4-config exim4/dc_postmaster string
   </sect2>
 
   <sect2 id="preseed-X">
+<!--
   <title>X configuration</title>
+-->
+  <title>X 設定</title>
 <para>
 
+<!--
 Preseeding Debian's X config is possible, but you probably need to know
 some details about the video hardware of the machine, since Debian's X
 configurator does not do fully automatic configuration of everything.
+-->
+Debian の X 設定を preseed が可能です。
+しかし、マシンのビデオハードウェアについて、
+詳細を知っている必要があるかもしれません。
+Debian の X コンフィグレータはすべてを自動設定するわけには行かないのです。
 
 </para>
 
@@ -919,7 +1403,10 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
   </sect2>
 
   <sect2 id="preseed-other">
+<!--
   <title>Preseeding other packages</title>
+-->
+  <title>他パッケージの preseed</title>
 
 <informalexample role="example"><screen>
 # Depending on what software you choose to install, or if things go wrong
@@ -935,10 +1422,16 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
  </sect1>
 
  <sect1 id="preseed-advanced">
+<!--
  <title>Advanced options</title>
+-->
+ <title>高度なオプション</title>
 
   <sect2 id="preseed-shell">
+<!--
   <title>Shell commands</title>
+-->
+  <title>シェルコマンド</title>
 
 <informalexample role="example"><screen>
 # d-i preseeding is inherently not secure. Nothing in the installer checks
@@ -969,14 +1462,24 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
   </sect2>
 
   <sect2 id="preseed-chainload">
+<!--
   <title>Chainloading preseed files</title>
+-->
+  <title>preseed ファイルの連鎖読み込み</title>
 <para>
 
+<!--
 It is possible to include other preseed files from a preseed file. Any
 settings in those files will override pre-existing settings from files
 loaded earlier. This makes it possible to put, for example, general
 networking settings for your location in one file and more specific
 settings for certain configurations in other files.
+-->
+preseed ファイルから他の preseed ファイルを読み込めます。
+前に読み込まれたファイルの既存設定を、
+後から読み込まれたいずれの設定でも上書きします。
+これは例えば、あるファイルに一般的なネットワークの設定を書いておき、
+他のファイルでより確かな設定を指定するという使い方ができます。
 
 </para>
 
