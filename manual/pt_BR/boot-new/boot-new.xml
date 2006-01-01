@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 26574 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 28730 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.01.01 -->
 
 <chapter id="boot-new">
  <title>Inicializando em seu novo sistema Debian</title>
@@ -7,25 +9,29 @@
  <sect1 id="base-boot"><title>O momento da verdade</title>
 <para>
 
-A primeira inicialização do seu sistema é o que o os engenheiro elétricos
+A primeira inicialização do seu sistema é o que os engenheiros elétricos
 chamam de <quote>teste de fumaça</quote>.
 
 </para><para>
 
 Se estiver inicializando diretamente na Debian e o sistema não inicializar,
-ou use sua mídia original de partida ou insira um disquete personalizado, 
+ou use sua mídia original de partida ou insira um disquete personalizado,
 se tiver um, e reinicie seu sistema. Desta forma, você provavelmente precisará
 especificar alguns argumentos como
 <userinput>root=<replaceable>root</replaceable></userinput> onde
 <replaceable>root</replaceable> é sua partição raíz, tal como
 <filename>/dev/sda1</filename>.
+<phrase condition="etch">
+Alternativamente, veja <xref linkend="rescue"/> para instruções sobre usar
+o módulo de recuperação (rescue) do instalador.
+</phrase>
 
 </para>
 
   <sect2 arch="m68k"><title>Inicialização no BVME 6000</title>
 <para>
 
-Se tiver fazendo uma instalação sem discos em uma máquina BVM ou Motorola
+Se estiver fazendo uma instalação sem discos em uma máquina BVM ou Motorola
 VMEbus: assim que o sistema carregar o programa
 <command>tftplilo</command> a partir do servidor TFTP, no aviso de comandos
 do <prompt>LILO Boot:</prompt> entre com um dos parâmetros:
@@ -57,13 +63,13 @@ para inicializar em um MVME166/167
 
 <para>
 
-Vá para o diretório contendo os arquivos de instalação e inicie o 
+Vá para o diretório contendo os arquivos de instalação e inicie o
 gerenciador de partida <command>Penguin</command>, segurando a tecla
-<keycap>command</keycap>. Vá para o diálogo <userinput>Configurações</userinput> 
-(<keycombo>
-<keycap>command</keycap> <keycap>T</keycap> </keycombo>) e localize a linha que 
-contém as opções de kernel que se devem parecer com 
-<userinput>root=/dev/ram video=font:VGA8x16</userinput> ou parecido.
+<keycap>command</keycap>. Vá para o diálogo
+<userinput>Configurações</userinput> (<keycombo>
+<keycap>command</keycap> <keycap>T</keycap> </keycombo>) e localize
+a linha que contém as opções de kernel que devem parecer com
+<userinput>root=/dev/ram video=font:VGA8x16</userinput> ou similar.
 
 </para><para>
 
@@ -75,26 +81,27 @@ no qual instalou o sistema
 A opção <userinput>video=font:VGA8x8</userinput> é recomendada especialmente
 para usuários que tem monitores pequenos. O kernel pegará uma fonte
 bonita (6x11) mas o controlador de console desta fonte também pode travar
-a máquina, assim o uso de uma fonte de 8x16 ou 8x8 é mais seguro neste estágio. 
+a máquina, assim o uso de uma fonte de 8x16 ou 8x8 é mais seguro neste estágio.
 Você poderá alterar isto a qualquer momento.
 
 </para><para>
 
-Se não quiser iniciar automaticamente o GNU/Linux a cada vez que 
+Se não quiser iniciar automaticamente o GNU/Linux a cada vez que
 ligar o computador, desmarque a opção <userinput>Auto Boot</userinput>. Salve
 suas configurações no arquivo <filename>Prefs</filename> usando a opção
-<userinput>Save Settings As Default</userinput> (Salvar configurações como padrão).
+<userinput>Save Settings As Default</userinput> (Salvar configurações como
+padrão).
 
 </para><para>
 
 Agora selecione <userinput>Boot Now</userinput>(iniciar agora) (<keycombo>
-<keycap>command</keycap> <keycap>B</keycap> </keycombo>) para inicializar 
+<keycap>command</keycap> <keycap>B</keycap> </keycombo>) para inicializar
 em seu sistema GNU/Linux recém instalado ao invés do sistema de instalação
 no disco RAM.
 
 </para><para>
 
-A Debian deverá inicializar e você verá as mesmas mensagens que 
+A Debian deverá inicializar e você verá as mesmas mensagens que
 viu quando iniciou pela primeira vez o programa de instalação, seguida
 de algumas mensagens novas.
 
@@ -108,34 +115,36 @@ de algumas mensagens novas.
 Caso a máquina falhe ao tentar inicializar após completar a instalação
 e pare com um aviso <prompt>boot:</prompt>, tente digitar
 <userinput>Linux</userinput> seguido de &enterkey;. (A configuração
-padrão de partida em <filename>quik.conf</filename> é chamada Linux). As 
-identificações definidas no <filename>quik.conf</filename> serão mostradas 
-caso a tecla <keycap>Tab</keycap> seja pressionada no aviso <prompt>boot:</prompt>.
-Você pode também tentar voltar ao programa de instalação e editando o 
-<filename>/target/etc/quik.conf</filename> colocado gravado pelo passo 
-<guimenuitem>Instalar o Quik no Disco Rígido</guimenuitem>. 
-As dicas para se trabalhar com o 
+padrão de partida em <filename>quik.conf</filename> é chamada Linux). As
+identificações definidas no <filename>quik.conf</filename> serão mostradas
+caso a tecla <keycap>Tab</keycap> seja pressionada no aviso
+<prompt>boot:</prompt>.
+Você pode também tentar voltar ao programa de instalação e editando o
+<filename>/target/etc/quik.conf</filename> colocado ali pelo passo
+<guimenuitem>Instalar o Quik no Disco Rígido</guimenuitem>.
+As dicas para se trabalhar com o
 <command>quik</command> estão disponíveis em <ulink
 url="&url-powerpc-quik-faq;"></ulink>.
 
 </para><para>
 
-Para inicializar novamente no MacOS sem precisar reiniciar a nvram, 
-digite <userinput>bye</userinput> no aviso da OpenFirmware (assumindo que o MacOS
-ainda não foi removido da máquina). Para obter um aviso de comando do OpenFirmware,
-pressione a combinação de teclas <keycombo> <keycap>command</keycap>
+Para inicializar novamente no MacOS sem precisar reiniciar a nvram,
+digite <userinput>bye</userinput> no aviso da OpenFirmware (assumindo que o
+MacOS ainda não foi removido da máquina). Para obter um aviso de comando do
+OpenFirmware, pressione a combinação de teclas
+<keycombo> <keycap>command</keycap>
 <keycap>option</keycap> <keycap>o</keycap> <keycap>f</keycap>
 </keycombo> enquanto faz uma reinicialização pesada na máquina. Se precisar
-resetar a OpenFirmware para o padrão do MacOS para inicializar de volta no 
+resetar a OpenFirmware para o padrão do MacOS para inicializar de volta no
 MacOS, pressione a combinação de teclas <keycombo> <keycap>command</keycap>
 <keycap>option</keycap> <keycap>p</keycap> <keycap>r</keycap>
 </keycombo> enquanto reinicia de forma pesada a máquina.
 
 </para><para>
 
-Caso usar o <command>BootX</command> para inicializar no sistema de instalação, 
+Caso usar o <command>BootX</command> para inicializar no sistema de instalação,
 apenas selecione o kernel desejado na pasta <filename>Linux
-Kernels</filename>, desmarque a opção ramdisk e adicione um dispositivo 
+Kernels</filename>, desmarque a opção ramdisk e adicione um dispositivo
 raíz correspondendo a sua instalação;
 e.g. <userinput>/dev/hda8</userinput>.
 
@@ -146,19 +155,19 @@ e.g. <userinput>/dev/hda8</userinput>.
   <sect2 arch="powerpc"><title>PowerMacs NewWorld</title>
 <para>
 
-Em máquinas G4 e Ibooks, você poderá manter pressionada a tecla 
+Em máquinas G4 e Ibooks, você poderá manter pressionada a tecla
 <keycap>option</keycap> e obter uma tela gráfica com um botão para
 cada sistema operacional inicializável, a &debian; será um botão com um ícone
-de pinguim pequeno.
+de pingüim pequeno.
 
 </para><para>
 
 Se manter o MacOS e em algum ponto ele alterar a variável
-<envar>boot-device</envar> do OpenFirmware, você deverá 
+<envar>boot-device</envar> do OpenFirmware, você deverá
 resetar o OpenFirmware para sua configuração padrão. Para fazer
 isto mantenha pressionada a combinação de teclas <keycombo>
 <keycap>command</keycap> <keycap>option</keycap> <keycap>p</keycap>
-<keycap>r</keycap> </keycombo> enquanto reinicia de forma pesada a 
+<keycap>r</keycap> </keycombo> enquanto reinicia de forma pesada a
 máquina.
 
 </para><para>
@@ -169,19 +178,19 @@ mostradas se pressionar a tecla <keycap>Tab</keycap> no aviso de comando
 
 </para><para>
 
-Se resetar a OpenFirmware no G3 e G4, fará com que ele inicialize na 
-&debian; por padrão (se você particionou e colocou a partição 
+Se resetar a OpenFirmware no G3 e G4, fará com que ele inicialize na
+&debian; por padrão (se você particionou e colocou a partição
 Apple_Bootstrap primeiro). Se tiver a &debian; em um disco SCSI
-e o MacOS em um disco IDE, isto poderá não funcionar e você terá que entrar 
+e o MacOS em um disco IDE, isto poderá não funcionar e você terá que entrar
 no OpenFirmware e ajustar a variável <envar>boot-device</envar>.
 o <command>ybin</command> normalmente faz isto automaticamente.
 
 </para><para>
 
-Após inicializar na &debian; pela primeira vez, você poderá adicionar qualquer 
+Após inicializar na &debian; pela primeira vez, você poderá adicionar qualquer
 opção adicional que desejar (tais como opções de dupla inicialização) no arquivo
 <filename>/etc/yaboot.conf</filename> e executar o <command>ybin</command>
-para atualizar sua partição de inicialização com a configuração modificada. 
+para atualizar sua partição de inicialização com a configuração modificada.
 Por favor, leia o <ulink url="&url-powerpc-yaboot-faq;">yaboot HOWTO</ulink>
 para mais detalhes.
 
@@ -196,17 +205,17 @@ para mais detalhes.
 
 Após a reinicialização, você será perguntado para completar a configuração
 do seu sistema básico e então selecionar que pacotes adicionais deseja
-instalar. A aplicação que lhe guiará durante este processo é chamada 
-<classname>base-config</classname>. Seu conceito é muito parecido 
-com o do &d-i; no primeiro estágio. De forma parecida, o 
-<classname>base-config</classname> consiste em um número de componentes 
-especializados, onde cada componente manipula uma tarefa de configuração, 
+instalar. A aplicação que lhe guiará durante este processo é chamada
+<classname>base-config</classname>. Seu conceito é muito parecido
+com o do &d-i; no primeiro estágio. De forma parecida, o
+<classname>base-config</classname> consiste em um número de componentes
+especializados, onde cada componente manipula uma tarefa de configuração,
 contém um<quote>menu oculto em segundo plano</quote> e também usa o mesmo
 sistema de navegação.
 
 </para><para>
 
-Caso queira re-executar o <classname>base-config</classname> em qualquer 
+Caso queira re-executar o <classname>base-config</classname> em qualquer
 ponto após concluir a instalação, digite como root:
 <userinput>base-config</userinput>.
 
@@ -227,35 +236,35 @@ ponto após concluir a instalação, digite como root:
 
 <para>
 
-Após instalar os pacotes, você será presenteado com o aviso de login. Entre usando
-seu login e senha escolhidos durante a instalação. Seu sistema agora está
-pronto para ser usado.
+Após instalar os pacotes, você será presenteado com o aviso de login. Entre
+usando seu login e senha escolhidos durante a instalação. Seu sistema agora
+está pronto para ser usado.
 
 </para><para>
 
 Caso seja um novo usuário, você pode desejar explorar a documentação
-que já está instalada em seu sistema assim que começar a usa-lo. Existem
+que já está instalada em seu sistema assim que começar a usá-lo. Existem
 diversos sistemas de documentação, alguns trabalhos estão sendo feitos
 para integrar os diferentes tipos de documentação. Aqui estão alguns
 pontos iniciais.
 
 </para><para>
 
-A documentação que acompanha programas foram instaladas no 
-diretório <filename>/usr/share/doc/</filename> sob um subdiretório 
+A documentação que acompanha programas foram instaladas no
+diretório <filename>/usr/share/doc/</filename> sob um subdiretório
 após o programa. Por exemplo, o guia do usuário do APT para usar
-o <command>apt</command> na instalação de outros programas em seu 
+o <command>apt</command> na instalação de outros programas em seu
 sistema, está localizado em
 <filename>/usr/share/doc/apt/guide.html/index.html</filename>.
 
 </para><para>
 
 
-Em adição, existem alguns diretórios especiais dentro da 
+Em adição, existem alguns diretórios especiais dentro da
 hierarquia <filename>/usr/share/doc/</filename>. Os HOWTO's do Linux estão
 instalados em formato <emphasis>.gz</emphasis>, dentro de
-<filename>/usr/share/doc/HOWTO/en-txt/</filename>.Após instalar o 
-<command>dhelp</command>, você encontrará um índice da 
+<filename>/usr/share/doc/HOWTO/en-txt/</filename>.Após instalar o
+<command>dhelp</command>, você encontrará um índice da
 documentação em <filename>/usr/share/doc/HTML/index.html</filename>.
 
 </para><para>
@@ -269,13 +278,13 @@ seguido de um espaço e ponto (o ponto significa o diretório atual).
 Você também poderá digitar <userinput>info
 <replaceable>comando</replaceable></userinput> ou <userinput>man
 <replaceable>comando</replaceable></userinput> para ver a documentação
-da maioria dos comandos disponíveis no aviso de comando. Digitando-se 
-<userinput>help</userinput> exibirá a ajuda sobre os comandos do 
-interpretador de comandos. Digitando um comando seguido de 
+da maioria dos comandos disponíveis no aviso de comando. Digitando-se
+<userinput>help</userinput> exibirá a ajuda sobre os comandos do
+interpretador de comandos. Digitando um comando seguido de
 <userinput>--help</userinput> normalmente mostrará um resumo simples de
-uso de comandos. Se um comando ultrapassar o espaço da tela, 
-acrescente <userinput>|more</userinput> após o comando para fazer o 
-resultado pausar antes de ultrapassar o topo da tela. Para ver uma 
+uso de comandos. Se um comando ultrapassar o espaço da tela,
+acrescente <userinput>|more</userinput> após o comando para fazer o
+resultado pausar antes de ultrapassar o topo da tela. Para ver uma
 lista de todos os comandos disponíveis que começam com uma determinada
 letra, digite a letra e então aperte duas vezes seguidas a tecla tab.
 
