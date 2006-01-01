@@ -43,11 +43,15 @@ for XML in `find $SOURCEDIR -name "*.xml"` ; do
         echo "Error: error $RC while executing xml2pot"
     fi
 
-    # Revert changes if the only thing changed is the POT-Creation-Date
-    if diff $PODIR/pot/$POT $PODIR/pot/$POT.new | grep "^[><]" | grep -qv "POT-Creation-Date: " ; then
+    if [ ! -f $PODIR/pot/$POT ] ; then
         mv $PODIR/pot/$POT.new $PODIR/pot/$POT
     else
-        rm $PODIR/pot/$POT.new
+        if diff $PODIR/pot/$POT $PODIR/pot/$POT.new | grep "^[><]" | grep -qv "POT-Creation-Date: " ; then
+            mv $PODIR/pot/$POT.new $PODIR/pot/$POT
+        else
+            # Revert changes if the only thing changed is the POT-Creation-Date
+            rm $PODIR/pot/$POT.new
+        fi
     fi
 done
 
