@@ -26,7 +26,8 @@ install: build
 	mkdir -p debian/$(PACKAGE)/DEBIAN
 	install -m0755 post-base-installer debian/$(PACKAGE)/usr/lib/post-base-installer.d/05localechooser
 	install -m0755 prebaseconfig debian/$(PACKAGE)/usr/lib/prebaseconfig.d/05localechooser
-	install -m644 languagelist debian/$(PACKAGE)/usr/share/languagelist
+	cat languagelist | grep -v "^#.*" >debian/$(PACKAGE)/usr/share/localechooser/languagelist
+	chmod 0644 debian/$(PACKAGE)/usr/share/localechooser/languagelist
 	dh_installdirs etc
 	# The following while we have no other way to get SUPPORTED
 	# Should become useless when we will have it
