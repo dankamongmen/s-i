@@ -721,6 +721,8 @@ default_disk_label () {
 		    echo msdos;;
 		cobalt)
 		    echo msdos;;
+		bcm947xx)
+		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
