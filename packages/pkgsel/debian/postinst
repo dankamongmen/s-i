@@ -13,12 +13,6 @@ log() {
 }
 
 cleanup () {
-	# If X was not installed, remove the hardware detection programs.
-	if ! chroot /target dpkg --get-selections | grep 'xserver-\(xfree86\|xorg\)' | grep -q install
-	then
-		in-target dpkg --purge read-edid mdetect
-	fi
-
 	for divert in $DIVERTS; do
 		rm -f "/target$divert"
 		log-output -t pkgsel chroot /target dpkg-divert \
@@ -46,19 +40,9 @@ config=$(chroot /target debconf-apt-progress --config| sed "s/$/;/")
 
 db_progress STEP 1
 
-# See if any known X servers are available.
-if chroot /target apt-cache show xserver-xfree86 xserver-xorg >/dev/null 2>&1; then
-	# X needs some packages installed before its debconf config is run
-	# to make it do hardware autodetection. The only way to make sure
-	# these are installed properly is to install them now, before packages
-	# are selected.
-	in-target sh -c "$config debconf-apt-progress --from 1 --to 5 --logstderr -- apt-get -q -y -f install read-edid" || true
-	in-target sh -c "$config debconf-apt-progress --from 5 --to 10 --logstderr -- apt-get -q -y -f install mdetect" || true
-fi
-
 # Install popularity-contest but remove it if the user decides not to
 # participate.
-if in-target sh -c "$config debconf-apt-progress --from 10 --to 15 --logstderr -- apt-get -q -y -f install popularity-contest"; then
+if in-target sh -c "$config debconf-apt-progress --from 1 --to 5 --logstderr -- apt-get -q -y -f install popularity-contest"; then
 	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
 		in-target dpkg --purge popularity-contest
 	fi
@@ -66,7 +50,7 @@ fi
 
 db_progress INFO pkgsel/progress/tasksel
 ret=0
-in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 15 --to 95 --logstderr'" || ret=$?
+in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 5 --to 95 --logstderr'" || ret=$?
 if [ "$ret" != 0 ]; then
 	# In case packages failed to install, try to clean up.
 	in-target dpkg --configure -a || true
