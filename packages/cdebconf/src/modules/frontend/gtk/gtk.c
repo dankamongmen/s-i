@@ -270,6 +270,32 @@ void call_setters(struct frontend *obj)
     }
 }
 
+gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct frontend *obj)
+{
+    PangoLayout *layout; 
+    gint w, h;
+    char *message;
+
+    if (obj->info != NULL) {
+        char *text = q_get_description(obj->info);
+        if (text) {
+            message = malloc(strlen(text) + 8 );
+            /* setting custom font colours would make GTKDFB 2.0.9 crash */
+            /* this issue has already been fixed in GTKDFB 2.8.3 */
+            /* sprintf(message,"<b><span foreground=\"#ffffff\">%s</span></b>", text); */
+            sprintf(message,"<b>%s</b>", text);
+            layout = gtk_widget_create_pango_layout(wid, NULL);
+            pango_layout_set_markup(layout, message, strlen(message));
+            pango_layout_set_font_description(layout, pango_font_description_from_string("Sans 12"));
+            pango_layout_get_pixel_size(layout, &w, &h);
+            /* obj->info is drawn over the debian banner, top-right corner of the screen */
+            gdk_draw_layout(wid->window, gdk_gc_new(wid->window),  WINDOW_WIDTH - w - 4, 4, layout);
+        }
+        free(text);
+    }
+    return FALSE;
+}
+
 void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
 {
     GdkWindow *gdk_window;
@@ -663,7 +689,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 
-    /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_boolean_multiple() called"); */
+    /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_boolean() called"); */
 
     data = NEW(struct frontend_question_data);
     data->obj = obj;
@@ -1340,7 +1366,8 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
     /* A logo is displayed in the upper area of the screen */
     logo_button = gtk_image_new_from_file("/usr/share/graphics/logo_debian.png");
-
+    g_signal_connect_after(G_OBJECT(logo_button), "expose_event", G_CALLBACK(expose_event_callback), obj);
+  
     /* A label is used to display the fontend's title */
     label_title = gtk_label_new(NULL);
     ((struct frontend_data*) obj->data)->title = label_title;
