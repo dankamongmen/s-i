@@ -33,8 +33,8 @@ Currently only a single variant of the example file is generated (for i386).
 This appendix explains the intricacies of preseeding answers to questions in
 &d-i; to automate your installation.
 -->
-本付録は preseed の説明を行い、
-インストールの自動化に関する &d-i; の質問への回答です。
+本付録は preseed の説明を行います。
+これは &d-i; の質問に回答しておきインストールを自動化するものです。
 
 </para><para>
 
@@ -61,7 +61,7 @@ fully automate most types of installation and even offers some features not
 available during normal installations.
 -->
 preseed は、インストールの実行中に手動で回答を入力せずに、
-質問の答えを設定する方法を提供します。
+質問の答を設定する方法を提供します。
 これにより、ほとんどの方法のインストールを自動化し、
 さらに通常のインストールでは利用できない特徴もあります。
 
@@ -94,9 +94,9 @@ different installation methods. With file and network preseeding the first
 few installer questions cannot be preseeded because the preseed configuration
 file is only loaded after they have been asked.
 -->
-preseed を利用するには、3 種類方法があります。
+preseed を利用するには、
 <firstterm>initrd</firstterm>, <firstterm>ファイル</firstterm>,
-<firstterm>ネットワーク</firstterm> です。
+<firstterm>ネットワーク</firstterm> と 3 種類の方法があります。
 initrd preseed は、いずれのインストール方法でも動作し、
 より多くの preseed をサポートしますが、大量の準備が必要です。
 ファイル preseed やネットワーク preseed は、
@@ -141,7 +141,7 @@ installation methods.
 <!--
   <entry>hd-media <phrase condition="bootable-usb">(including usb-stick)</phrase></entry>
 -->
-  <entry>hd-media <phrase condition="bootable-usb">(USB スティック含む)</phrase></entry>
+  <entry>hd-media <phrase condition="bootable-usb">(USB スティックを含む)</phrase></entry>
   <entry>yes</entry>
   <entry>yes</entry>
   <entry>no</entry>
@@ -185,7 +185,7 @@ loaded. For network preseeding it is only after the network has been
 configured.
 -->
 preseed 方法の重要な違いは、preseed 設定ファイルを読込・処理するポイントです。
-initrd preseed では、インストールの始め (最初の質問が行われる前) で読み込まれます。
+initrd preseed では、インストールの始め (最初の質問が行われる前) に読み込まれます。
 ファイル preseed では、CD や CD イメージが読み込まれた後です。
 ネットワーク preseed では、ネットワークの設定の後でないと読み込まれません。
 
@@ -236,7 +236,7 @@ partitions. You currently cannot use preseeding to set up RAID and LVM.
 -->
 &d-i; で行われる質問のほとんどはこの方法で preseed できますが、
 いくつか注目すべき例外があります。
-ディスク全体を (再度) パーティション分割をするか、
+ディスク全体を (再度) パーティション分割するか、
 ディスクの空き領域を利用しなければなりません。
 つまり既存のパーティションを利用できないと言うことです。
 また現在、RAID や LVM のセットアップに preseed を利用できません。
@@ -350,7 +350,7 @@ preseed ツールで提供される、とても強力で柔軟なオプションに、
   stage of the installation when <command>base-config</command> is starting up
 -->
   <userinput>base-config/early_command</userinput>: は、
-  インストールの第 2 段階の始め、
+  インストールの第 2 段階の先頭、
   <command>base-config</command> を実行し始めるときに実行します。
 </para></listitem>
 <listitem><para>
@@ -418,8 +418,8 @@ preseed ファイルの作成は本付録で後ほど扱います。
 正しい位置に preseed ファイルを配置するのは簡単です。
 CD や DVD にファイルを含めたければ、
 ISO イメージを再度マスタリングする必要があります。
-initrd に含まれている preseed ファイルを取り出すのは、この文書では扱いません。
-&d-i; の開発者向け文書を当たってください。
+initrd に含まれている preseed ファイルを取り出す方法は、
+この文書では扱いません。&d-i; の開発者向け文書を当たってください。
 
 </para><para>
 
@@ -430,7 +430,7 @@ configuration fragments included in this appendix.
 -->
 preseed ファイルの基礎にできる preseed ファイルのサンプルは、
 &urlset-example-preseed; から取得できます。
-このファイルは、この付録にある設定片を元にしています。
+このファイルは、この付録にある設定の断片を元にしています。
 
 </para>
 
@@ -448,7 +448,7 @@ initrd. The installer will automatically check if this file is present and
 load it.
 -->
 initrd preseed を使用する場合、<filename>preseed.cfg</filename>
-というファイルがinitrd のルートディレクトリに確実にある必要があります。
+というファイルが initrd のルートディレクトリに確実にある必要があります。
 インストーラは、このファイルがあるか自動的にチェックし、読み込みます。
 
 </para><para>
@@ -465,7 +465,7 @@ of the append line(s) for the kernel.
 カーネルのブートパラメータで渡して行います。
 これは起動時に手動で与えるか、
 ブートローダ設定ファイル (例: <filename>syslinux.cfg</filename>) を編集し、
-カーネルへのappend行の最後にパラメータを追加して与えます。
+カーネルへの append 行の最後にパラメータを追加して与えます。
 
 </para><para>
 
@@ -489,9 +489,9 @@ specified it must match the preseed file or the installer will refuse to use it.
 -->
 インストーラが確実に正しい preseed ファイルを取得するには、
 このファイルのチェックサムを指定することができます。
-現在、これには md5sum が必要です。
-また、指定した物と preseed ファイル一致しなければなりません。
-そうでなければインストーラはこのファイルを使用しません。
+現在、これには md5sum 値の指定が必要です。
+指定した値と preseed ファイルの値は一致しなければなりません。
+一致しない場合は、インストーラは preseed ファイルを使用しません。
 
 </para>
 
@@ -523,8 +523,7 @@ Boot parameters to specify:
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 
 - USB メディアで起動する場合 (preseed ファイルを USB スティックの
-  トップレベルディレクトリにおくこと)
-  toplevel directory of the USB stick):
+  トップレベルディレクトリにおくこと):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 </screen></informalexample>
@@ -559,13 +558,13 @@ the network setup must be done first. One reason to use initrd preseeding
 is that it allows preseeding of even these early steps of the installation
 process.
 -->
-インストールプロセスのいくつかの部分は、
-preseed ファイルが読み込まれる前に質問が起きるので、
-自動で行うことができません。
+インストールプロセスのうちのある部分の質問は、
+preseed ファイルが読み込まれる前になされるため、
+自動化することができません。
 例えば、preseed ファイルをネットワークからダウンロードする場合、
 まずネットワークの設定が完了していなければなりません。
-initrd preseed を使用する理由のひとつに、
-これがインストールプロセスの初めから preseed できると言うことがあります。
+インストールプロセスの早い段階から preseed できるというのが，
+initrd preseed を使用する理由のひとつです．
 
 </para><para>
 
@@ -576,7 +575,7 @@ on the command line. Just pass <userinput>path/to/var=value</userinput>
 for any of the preseed variables listed in the examples.
 -->
 preseed ファイルを preseed に使用できないステップがあっても、
-コマンドラインから preseed の値をカーネルに渡せますので、
+コマンドラインから preseed の値をカーネルに渡せるので、
 まだ完全に自動化できます。
 <userinput>path/to/var=value</userinput> というように、
 サンプルにある preseed 変数を渡してください。
@@ -592,11 +591,11 @@ excess options and 2.6 kernels will panic. For kernel 2.6.9 and later,
 you can use 32 command line options and 32 environment options.
 -->
 カーネル 2.4 では最大 (インストーラがデフォルトで指定するオプションを含め) 
-コマンドラインオプションを 8 つ、環境オプションを 8 つ受け取れます。
+コマンドラインオプションを 8 個、環境オプションを 8 個受け取れます。
 この数を超えると、カーネル 2.4 では超過したオプションを取りこぼしてしまい、
 カーネル 2.6 ではパニックしてしまいます。
-カーネル 2.6.9 以降では、コマンドラインオプションを 32、
-環境オプションを 32 受け取れます。
+カーネル 2.6.9 以降では、コマンドラインオプションを 32 個、
+環境オプションを 32 個受け取れます。
 
 </para></note>
 <para>
@@ -635,8 +634,8 @@ parameters, even if you delimit them with quotes.
 The preconfiguration file is in the format used by the
 <command>debconf-set-selections</command> command.
 -->
-事前設定ファイルは、<command>debconf-set-selections</command>
-コマンドで使用されるフォーマットです。
+事前設定ファイルのフォーマットは、<command>debconf-set-selections</command>
+コマンドで使用されるものと同じです。
 
 </para>
 
@@ -651,7 +650,7 @@ The preconfiguration file is in the format used by the
 <!--
   Only single space allowed between template type and value
 -->
-  テンプレートの型と値の間には空白がひとつだけ有効
+  テンプレートの型と値の間には空白ひとつしか許されない。
 </para></listitem>
 <listitem><para>
 <!--
@@ -675,7 +674,7 @@ The preconfiguration file is in the format used by the
 <!--
   Using a manual installation as base
 -->
-  手動インストールを基礎として使用する。
+  手動インストールを基礎として使用
 </para></listitem>
 <listitem><para>
 <!--
@@ -692,9 +691,10 @@ To check if the format of your preseed file is valid before performing an
 install, you can use the command <command>debconf-set-selections -c
 <replaceable>preseed.cfg</replaceable></command>.
 -->
-preseed ファイルのフォーマットがインストールを実行する前に有効か調べるには、
+インストールを実行する前に、
+preseed ファイルのフォーマットが適切かどうかを調べるには、
 <command>debconf-set-selections -c
-<replaceable>preseed.cfg</replaceable></command> を使用できます。
+<replaceable>preseed.cfg</replaceable></command> が使えます。
 
 </para>
  </sect1>
@@ -710,7 +710,7 @@ preseed ファイルのフォーマットがインストールを実行する前に有効か調べるには、
 The configuration fragments used in this appendix are also available as an
 example preseed file from &urlset-example-preseed;.
 -->
-本付録で使用する設定片は、
+本付録で使用する設定の断片は、
 &urlset-example-preseed; のサンプル preseed ファイルでも利用できます。
 
 </para><para>
@@ -725,8 +725,8 @@ architecture.
 本サンプルは、
 Intel x86 アーキテクチャ用インストールを元にしていることに注意してください。
 他のアーキテクチャにインストールする場合、
-いくつかのサンプル (キーボードの選択やブートローダの選択など) 
-は関連がないかもしれませんし、
+サンプルのいくつかは (キーボードの選択やブートローダの選択など) 
+は適切でないかもしれませんので、
 そのアーキテクチャ用に適切な debconf 設定で置き換える必要があるでしょう。
 
 </para>
@@ -745,7 +745,7 @@ questions have been asked.
 -->
 地域化の設定値は initrd preseed を利用しているときのみ動作します。
 他のすべての方法では、
-この質問をされた後にでしか preseed ファイルを読み込めません。
+この質問をされた後にしか preseed ファイルを読み込めません。
 
 </para><para>
 
@@ -834,7 +834,7 @@ boot parameters.
 preseed のネットワーク設定は動作しません。
 しかし、CD や USB スティックから起動するときには重要です。
 ネットワークから preseed ファイルを読み込む場合、
-ネットワーク設定パラメータを、カーネルブートパラメータで渡せます。
+ネットワーク設定パラメータは、カーネルブートパラメータで渡すことになります。
 
 </para>
 
@@ -953,8 +953,8 @@ LVM.
 ディスクレイアウトは、あらかじめ定義したレシピ、
 レシピファイルによるカスタムレシピ、
 preseed ファイルに書いたレシピから選択できます。
-現在、パーティションに preseed を用いて複数のディスクを割り当てられませんし、
-RAID や LVM の設定もできません。
+現在のところ、パーティションに preseed を用いて複数のディスクを割り当ることや、
+RAID や LVM の設定することはできません。
 
 </para>
 
@@ -966,8 +966,8 @@ are loaded. If there are multiple disks in the system, make very sure the
 correct one will be selected before using preseeding.
 -->
 ディスクの識別は、ドライバの読み込み順に依存します。
-複数のディスクがシステムにある場合、
-preseed を使用する前に確実に正しい物を選択するようにしなければなりません。
+複数のディスクがシステムにある場合、preseed を使用する前に、
+正しいディスクを確実に選択できるようにしなければなりません。
 
 </para></warning>
 
@@ -1189,7 +1189,7 @@ d-i grub-installer/with_other_os boolean true
 <!--
   <title>Finishing up the first stage install</title>
 -->
-  <title>インストール第 1 段階の仕上</title>
+  <title>インストール第 1 段階の仕上げ</title>
 
 <informalexample role="example"><screen>
 # Avoid that last message about the install being complete.
@@ -1370,7 +1370,7 @@ Preseeding Debian's X config is possible, but you probably need to know
 some details about the video hardware of the machine, since Debian's X
 configurator does not do fully automatic configuration of everything.
 -->
-Debian の X 設定を preseed が可能です。
+Debian の X 設定を preseed 可能です。
 しかし、マシンのビデオハードウェアについて、
 詳細を知っている必要があるかもしれません。
 Debian の X コンフィグレータはすべてを自動設定するわけには行かないのです。
