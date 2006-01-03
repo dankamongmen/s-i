@@ -236,6 +236,8 @@ static int corba_go(struct frontend *f) {
 	  return ret;
 	break;
       }
+    if (i == DIM(question_handlers))
+      return DC_NOTIMPL;
   }
   
   return DC_OK;

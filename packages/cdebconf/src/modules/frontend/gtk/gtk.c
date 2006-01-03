@@ -1583,6 +1583,10 @@ static int gtk_go(struct frontend *obj)
                 break;
             }
         }
+
+        if (i == DIM(question_handlers))
+            return DC_NOTIMPL; /* TODO: leak? */
+
         q = q->next;
     }
 

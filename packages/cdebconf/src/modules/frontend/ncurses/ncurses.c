@@ -553,6 +553,9 @@ static int ncurses_go(struct frontend *obj)
 				}
 				break;
 			}
+		if (i == DIM(question_handlers))
+			return DC_NOTIMPL;
+
 		if (ret == DC_OK)
 		{
 			qlast = q;

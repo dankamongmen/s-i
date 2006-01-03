@@ -248,8 +248,12 @@ static int bogl_go(struct frontend *ui)
 
 	while(q)
 	{
+		handler_t hdl;
 		ret = DC_OK;
-		(*handler(q->template->type))(ui, q);
+		hdl = handler(q->template->type);
+		if (hdl == NULL)
+			return DC_NOTIMPL;
+		(*hdl)(ui, q);
 		if(ret == DC_OK)
 			ui->qdb->methods.set(ui->qdb, q);
 		else
