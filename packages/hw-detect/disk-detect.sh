@@ -26,14 +26,25 @@ list_disk_modules() {
 }
 
 disk_found() {
-	if search-path parted_devices; then
-		# Use partman's parted_devices if available.
-		[ -n "$(parted_devices)" ]
-	else
-		# Essentially the same approch used by partitioner and
-		# autopartkit to find their disks.
-		[ -n "$(ls /dev/discs/ 2>/dev/null)" ]
-	fi
+	for try in 1 2 3; do
+		if search-path parted_devices; then
+			# Use partman's parted_devices if available.
+			if [ -n "$(parted_devices)" ]; then
+				return 0
+			fi
+		else
+			# Essentially the same approch used by partitioner and
+			# autopartkit to find their disks.
+			if [ -n "$(ls /dev/discs/ 2>/dev/null)" ]; then
+				return 0
+			fi
+		fi
+
+		# Wait for disk to be activated.
+		if [ "$try" != 3 ]; then
+			sleep 2
+		fi
+	done
 }
 
 module_probe() {
