@@ -31,16 +31,11 @@ example preseed file from &urlset-example-preseed;.
  <title>Introduction</title>
 <para>
 
-Preseeding provides a way to set answers to questions without having to manually
-enter the answers while the installation is running. This makes it possible to
-fully automate most types of installation and even offers some features not
-available during normal installations.
-
-</para><para>
-
-Using preseeding it is possible to fill in answers to questions asked during
-both the first stage of the installation (before the reboot into the new
-system) and the second stage.
+Preseeding provides a way to set answers to questions asked during the
+installation process, without having to manually enter the answers while
+the installation is running. This makes it possible to fully automate most
+types of installation and even offers some features not available during
+normal installations.
 
 </para>
 
@@ -225,16 +220,8 @@ See <xref linkend="preseed-shell"/> for details.
 </para></listitem>
 <listitem><para>
   <userinput>preseed/late_command</userinput>: is run just before the reboot
-  at the end of the first stage of the installation, but before the
-  <filename>/target</filename> filesystem has been unmounted
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/early_command</userinput>: is run early in the second
-  stage of the installation when <command>base-config</command> is starting up
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/late_command</userinput>: is run at the end of
-  <command>base-config</command>, just before the login prompt
+  at the end of the install, but before the <filename>/target</filename>
+  filesystem has been unmounted
 </para></listitem>
 </itemizedlist>
 
@@ -423,8 +410,8 @@ install, you can use the command <command>debconf-set-selections -c
 </para>
  </sect1>
 
- <sect1 id="preseed-stage1">
- <title>Preseeding the first stage of the installation</title>
+ <sect1 id="preseed-contents">
+ <title>Contents of the preseed file</title>
 <para>
 
 The configuration fragments used in this appendix are also available as an
@@ -670,7 +657,7 @@ d-i time/zone string US/Eastern
 
 Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
 options is fully automated based on your installation method and answers to
-earlier questions. Only the two variables below are relevant for preseeding.
+earlier questions. Only the three variables below are relevant for preseeding.
 
 </para>
 
@@ -678,6 +665,9 @@ earlier questions. Only the two variables below are relevant for preseeding.
 # You can choose to install non-free and contrib software.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+# To avoid adding security sources, or to use a different server
+# than security.debian.org.
+#d-i apt-setup/security_host string 
 </screen></informalexample>
 
   </sect2>
@@ -767,47 +757,7 @@ d-i grub-installer/with_other_os boolean true
 
   </sect2>
 
-  <sect2 id="preseed-finish">
-  <title>Finishing up the first stage install</title>
-
-<informalexample role="example"><screen>
-# Avoid that last message about the install being complete.
-d-i prebaseconfig/reboot_in_progress note
-
-# This will prevent the installer from ejecting the CD during the reboot,
-# which is useful in some situations.
-#d-i cdrom-detect/eject boolean false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
- <sect1 id="preseed-stage2">
- <title>Preseeding the second stage of the installation</title>
-
-  <sect2 id="preseed-baseconfig">
-  <title>Base config</title>
-
-<informalexample role="example"><screen>
-# Avoid the introductory message.
-base-config base-config/intro note
-
-# Avoid the final message.
-base-config base-config/login note
-
-# If you installed a display manager, but don't want to start it immediately
-# after base-config finishes.
-#base-config base-config/start-display-manager boolean false
-
-# Some versions of the installer can report back on what you've installed.
-# The default is not to report back, but sending reports helps the project
-# determine what software is most popular and include it on CDs.
-#popularity-contest popularity-contest/participate boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-tasksel">
+  <sect2 id="preseed-pkgsel">
   <title>Package selection</title>
 <para>
 
@@ -844,22 +794,39 @@ Available tasks as of this writing include:
 <listitem><para>
   <userinput>Laptop</userinput>
 </para></listitem>
-<listitem><para>
-  <userinput>manual package selection</userinput>
-</para></listitem>
 </itemizedlist>
 
 <para>
 
-The last of these will run aptitude. You can also choose to install no tasks,
-and force the installation of a set of packages in some other way. We recommend
-always including the <userinput>Standard system</userinput> task.
+You can also choose to install no tasks, and force the installation of a
+set of packages in some other way. We recommend always including the
+<userinput>Standard system</userinput> task.
 
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
+
+# Some versions of the installer can report back on what software you have
+# installed, and what software you ue. The default is not to report back,
+# but sending reports helps the project determine what software is most
+# popular and include it on CDs.
+#popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-finish">
+  <title>Finishing up the first stage install</title>
+
+<informalexample role="example"><screen>
+# Avoid that last message about the install being complete.
+d-i prebaseconfig/reboot_in_progress note
+
+# This will prevent the installer from ejecting the CD during the reboot,
+# which is useful in some situations.
+#d-i cdrom-detect/eject boolean false
 </screen></informalexample>
 
   </sect2>
@@ -953,17 +920,10 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 #d-i preseed/early_command string anna-install some-udeb
 
 # This command is run just before the install finishes, but when there is
-# still a usable /target directory.
-#d-i preseed/late_command string echo foo > /target/etc/bar
-
-# This command is run just as base-config is starting up.
-#base-config base-config/early_command string echo hi mom
-
-# This command is run after base-config is done, just before the login:
-# prompt. This is a good way to install a set of packages you want, or to
-# tweak the configuration of the system.
-#base-config base-config/late_command \
-#      string apt-get install zsh; chsh -s /bin/zsh
+# still a usable /target directory. You can chroot to /target and use it
+# directly, or use the apt-install and in-target commands to easily install
+# packages and run commands in the target system.
+#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 </screen></informalexample>
 
   </sect2>
