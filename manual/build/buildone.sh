@@ -53,7 +53,7 @@ create_profiled () {
     fi
 
     if [ -z "$manual_release" ]; then
-        manual_release="sarge"
+        manual_release="etch"
     fi
     if [ -z "$manual_target" ]; then
         manual_target="for_cd"

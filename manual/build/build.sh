@@ -68,11 +68,9 @@ for lang in $languages; do
     [ -n "$USES_PO" ] && rm -r ../$lang || true
 done
 
-if [ "$manual_release" != "sarge" ] ; then
-    PRESEED="../en/appendix/preseed.xml"
-    if [ -f $PRESEED ] && [ -f preseed.pl ] ; then
-	./preseed.pl -r $manual_release $PRESEED >$destination/example-preseed.txt
-    fi
+PRESEED="../en/appendix/preseed.xml"
+if [ -f $PRESEED ] && [ -f preseed.pl ] ; then
+    ./preseed.pl -r $manual_release $PRESEED >$destination/example-preseed.txt
 fi
 
 clear_po
