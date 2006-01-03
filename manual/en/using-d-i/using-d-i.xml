@@ -81,22 +81,22 @@ ssh session to view the logs described below.
 
 </para><para>
 
-Error messages are redirected to the third console.
+Error messages and logs are redirected to the fourth console.
 You can access this console by
-pressing <keycombo><keycap>Left Alt</keycap><keycap>F3</keycap></keycombo>
+pressing <keycombo><keycap>Left Alt</keycap><keycap>F4</keycap></keycombo>
 (hold the left <keycap>Alt</keycap> key while pressing the
-<keycap>F3</keycap> function key); get back to
+<keycap>F4</keycap> function key); get back to
 the main installer process with
 <keycombo><keycap>Left Alt</keycap><keycap>F1</keycap></keycombo>.
 
 </para><para>
 
 These messages can also be found in
-<filename>/var/log/messages</filename>.  After installation, this log
-is copied to <filename>/var/log/debian-installer/messages</filename> on your
+<filename>/var/log/syslog</filename>.  After installation, this log
+is copied to <filename>/var/log/installer/syslog</filename> on your
 new system. Other installation messages may be found in
 <filename>/var/log/</filename> during the
-installation, and <filename>/var/log/debian-installer/</filename>
+installation, and <filename>/var/log/debian/</filename>
 after the computer has been booted into the installed system.
 
 </para>
@@ -306,6 +306,30 @@ newer motherboards.
 </para></listitem>
 </varlistentry>
 <varlistentry>
+	
+<term>tzsetup</term><listitem><para>
+
+Selects the time zone, based on the location selected earlier
+		
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>clock-setup</term><listitem><para>
+
+Determines whether the clock is set to UTC or not.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+	
+<term>user-setup</term><listitem><para>
+
+Sets up the root password, and adds a non-root user.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
 
 <term>base-installer</term><listitem><para>
 
@@ -315,7 +339,24 @@ the computer to operate under Linux when rebooted.
 </para></listitem>
 </varlistentry>
 <varlistentry>
+	
+<term>apt-setup</term><listitem><para>
 
+Configures apt, mostly automatically, based on what media the installer is
+running from.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+	
+<term>pkgsel</term><listitem><para>
+
+Uses tasksel to select and install additional software.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+	
 <term>os-prober</term><listitem><para>
 
 Detects currently installed operating systems on the computer and
@@ -330,20 +371,10 @@ which operating system to start.
 
 <term>bootloader-installer</term><listitem><para>
 
-Installs a boot loader program on the hard disk, which is necessary
-for the computer to start up using Linux without using a floppy or
-CD-ROM.  Many boot loaders allow the user to choose an alternate
-operating system each time the computer boots.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>base-config</term><listitem><para>
-
-Provides dialogs for setting up the base system packages according
-to user preferences. This is normally done after rebooting the
-computer; it is the <quote>first run</quote> of the new Debian system.
+The various bootloader installers each install a boot loader program on the
+hard disk, which is necessary for the computer to start up using Linux
+without using a floppy or CD-ROM.  Many boot loaders allow the user to
+choose an alternate operating system each time the computer boots.
 
 </para></listitem>
 </varlistentry>
