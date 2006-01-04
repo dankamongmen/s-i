@@ -73,6 +73,16 @@ checkmatch() {
 	set +e
 }
 
+read_gpg_status() {
+	while read prefix keyword rest; do
+		[ "$prefix" = '[GNUPG:]' ] || continue
+		if [ "$keyword" = VALIDSIG ]; then
+			exit 0
+		fi
+	done
+	exit 1
+}
+
 cmd="$1"
 shift
 
@@ -100,9 +110,10 @@ case "x$cmd" in
 			if ! fetch "dists/$codename/Release.gpg" "$Release.gpg"; then
 				error "dists/$codename/Release is unsigned."
 			fi
-			if ! log-output -t net-retriever gpgv \
-			     --keyring "$keyring" --ignore-time-conflict \
-			     "$Release.gpg" "$Release"; then
+			if ! log-output -t net-retriever --pass-stdout \
+			     gpgv --status-fd 1 --keyring "$keyring" \
+			     --ignore-time-conflict \
+			     "$Release.gpg" "$Release" | read_gpg_status; then
 				error "Bad signature on $Release."
 			fi
 		fi
