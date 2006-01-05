@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "POT-Creation-Date: 2006-01-03 19:55+0000\n"
-"PO-Revision-Date: 2005-12-26 15:03+0800\n"
+"PO-Revision-Date: 2006-01-05 18:58+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -40,7 +40,7 @@ msgstr "介绍"
 
 #. Tag: para
 #: preseed.xml:32
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Preseeding provides a way to set answers to questions asked during the "
 "installation process, without having to manually enter the answers while the "
@@ -247,7 +247,7 @@ msgstr "<userinput>preseed/early_command</userinput>: 在预置文件加载的�
 
 #. Tag: para
 #: preseed.xml:221
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "<userinput>preseed/late_command</userinput>: is run just before the reboot "
 "at the end of the install, but before the <filename>/target</filename> "
@@ -557,9 +557,9 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:397
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Contents of the preseed file"
-msgstr "加载预置文件"
+msgstr "预置文件的内容"
 
 #. Tag: para
 #: preseed.xml:403
@@ -974,19 +974,17 @@ msgstr "设置 apt"
 
 #. Tag: para
 #: preseed.xml:537
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
 "configuration options is fully automated based on your installation method "
 "and answers to earlier questions. Only the three variables below are "
 "relevant for preseeding."
-msgstr ""
-"设置 <filename>/etc/apt/sources.list</filename> 和其他的基本设置将自动基于您"
-"使用的安装方式和前面回答的问题。只有下面两个变量与预置有关。"
+msgstr "设置 <filename>/etc/apt/sources.list</filename> 和其他的基本设置将自动基于您使用的安装方式和前面回答的问题。只有下面三个变量与预置有关。"
 
 #. Tag: screen
 #: preseed.xml:545
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
@@ -997,7 +995,10 @@ msgid ""
 msgstr ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
-"#d-i apt-setup/contrib boolean true"
+"#d-i apt-setup/contrib boolean true\n"
+"# To avoid adding security sources, or to use a different server\n"
+"# than security.debian.org.\n"
+"#d-i apt-setup/security_host string"
 
 #. Tag: title
 #: preseed.xml:550
@@ -1219,18 +1220,16 @@ msgstr "便携机"
 
 #. Tag: para
 #: preseed.xml:635
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "You can also choose to install no tasks, and force the installation of a set "
 "of packages in some other way. We recommend always including the "
 "<userinput>Standard system</userinput> task."
-msgstr ""
-"最后一项将执行 apitutde。您可以不选任务，并用其他方法安装一系列软件包。我们推"
-"荐选上 <userinput>基本系统</userinput> 任务。"
+msgstr "您可以不选任务，并用其他方法安装一系列软件包。我们推荐选上 <userinput>基本系统</userinput> 任务。"
 
 #. Tag: screen
 #: preseed.xml:643
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "tasksel tasksel/first multiselect Standard system, Desktop environment\n"
 "#tasksel tasksel/first multiselect Standard system, Web server\n"
@@ -1241,20 +1240,13 @@ msgid ""
 "# popular and include it on CDs.\n"
 "#popularity-contest popularity-contest/participate boolean false"
 msgstr ""
-"# Avoid the introductory message.\n"
-"base-config base-config/intro note\n"
+"tasksel tasksel/first multiselect Standard system, Desktop environment\n"
+"#tasksel tasksel/first multiselect Standard system, Web server\n"
 "\n"
-"# Avoid the final message.\n"
-"base-config base-config/login note\n"
-"\n"
-"# If you installed a display manager, but don't want to start it "
-"immediately\n"
-"# after base-config finishes.\n"
-"#base-config base-config/start-display-manager boolean false\n"
-"\n"
-"# Some versions of the installer can report back on what you've installed.\n"
-"# The default is not to report back, but sending reports helps the project\n"
-"# determine what software is most popular and include it on CDs.\n"
+"# Some versions of the installer can report back on what software you have\n"
+"# installed, and what software you ue. The default is not to report back,\n"
+"# but sending reports helps the project determine what software is most\n"
+"# popular and include it on CDs.\n"
 "#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
@@ -1417,7 +1409,7 @@ msgstr "shell 命令"
 
 #. Tag: screen
 #: preseed.xml:695
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
 "# for attempts at buffer overflows or other exploits of the values of a\n"
@@ -1448,17 +1440,10 @@ msgstr ""
 "#d-i preseed/early_command string anna-install some-udeb\n"
 "\n"
 "# This command is run just before the install finishes, but when there is\n"
-"# still a usable /target directory.\n"
-"#d-i preseed/late_command string echo foo > /target/etc/bar\n"
-"\n"
-"# This command is run just as base-config is starting up.\n"
-"#base-config base-config/early_command string echo hi mom\n"
-"\n"
-"# This command is run after base-config is done, just before the login:\n"
-"# prompt. This is a good way to install a set of packages you want, or to\n"
-"# tweak the configuration of the system.\n"
-"#base-config base-config/late_command \\\n"
-"#      string apt-get install zsh; chsh -s /bin/zsh"
+"# still a usable /target directory. You can chroot to /target and use it\n"
+"# directly, or use the apt-install and in-target commands to easily install\n"
+"# packages and run commands in the target system.\n"
+"#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
 #: preseed.xml:700
@@ -1515,45 +1500,3 @@ msgstr ""
 "# preseed files, includes those files. \n"
 "#d-i preseed/include_command \\\n"
 "#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi"
-
-#~ msgid ""
-#~ "Using preseeding it is possible to fill in answers to questions asked "
-#~ "during both the first stage of the installation (before the reboot into "
-#~ "the new system) and the second stage."
-#~ msgstr ""
-#~ "在安装过程的第一阶段(重启进入新系统之前)和第二阶段，都可以使用预置来填写问"
-#~ "题的答案。"
-
-#~ msgid ""
-#~ "<userinput>base-config/early_command</userinput>: is run early in the "
-#~ "second stage of the installation when <command>base-config</command> is "
-#~ "starting up"
-#~ msgstr ""
-#~ "<userinput>base-config/early_command</userinput>: 在安装的第二阶段，"
-#~ "<command>base-config</command> 启动之前运行"
-
-#~ msgid ""
-#~ "<userinput>base-config/late_command</userinput>: is run at the end of "
-#~ "<command>base-config</command>, just before the login prompt"
-#~ msgstr ""
-#~ "<userinput>base-config/late_command</userinput>: 在 <command>base-config</"
-#~ "command> 结束的时候，login 提示符出现之前运行"
-
-#~ msgid "Preseeding the first stage of the installation"
-#~ msgstr "为安装的第一阶段预置"
-
-#~ msgid "Preseeding the second stage of the installation"
-#~ msgstr "为安装的第二阶段预置"
-
-#~ msgid "Base config"
-#~ msgstr "基本设置"
-
-#~ msgid "manual package selection"
-#~ msgstr "手动选择软件包"
-
-#~ msgid ""
-#~ "tasksel tasksel/first multiselect Standard system, Desktop environment\n"
-#~ "#tasksel tasksel/first multiselect Standard system, Web server"
-#~ msgstr ""
-#~ "tasksel tasksel/first multiselect Standard system, Desktop environment\n"
-#~ "#tasksel tasksel/first multiselect Standard system, Web server"
