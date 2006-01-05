@@ -2,12 +2,13 @@
 # Miguel Figueiredo <elmig@debianpt.org> & Marco Ferra <mferra@sdf.lonestar.org>, 2005
 #
 # 2005-12-11 - Miguel Figueiredo <elmig@debianpt.org> - Initial translation
+# 2006-01-04 - Miguel Figueiredo <elmig@debianpt.org> - 8f
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "POT-Creation-Date: 2006-01-03 19:55+0000\n"
-"PO-Revision-Date: 2005-12-11 21:51+0000\n"
+"PO-Revision-Date: 2006-01-04 21:29+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -49,7 +50,7 @@ msgstr "Introdução"
 
 #. Tag: para
 #: preseed.xml:32
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Preseeding provides a way to set answers to questions asked during the "
 "installation process, without having to manually enter the answers while the "
@@ -57,11 +58,7 @@ msgid ""
 "of installation and even offers some features not available during normal "
 "installations."
 msgstr ""
-"O preseed disponibiliza um modo de indicar respostas às questões sem ter de "
-"manualmente escrever as respostas enquanto está a decorrer a instalação. "
-"Isto torna possível automatizar totalmente a maioria dos tipos de "
-"instalações e mesmo ofereçer algumas funcionalidades não disponíveis durante "
-"as instalações normais."
+"O preseed disponibiliza um modo de indicar respostas às questões colocadas durante o processo de instalação, sem ter de manualmente escrever as respostas enquanto está a decorrer a instalação. Isto torna possível automatizar totalmente a maioria dos tipos de instalação e mesmo oferecer algumas funcionalidades não disponíveis durante as instalações normais."
 
 #. Tag: title
 #: preseed.xml:43
@@ -279,15 +276,14 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:221
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "<userinput>preseed/late_command</userinput>: is run just before the reboot "
 "at the end of the install, but before the <filename>/target</filename> "
 "filesystem has been unmounted"
 msgstr ""
 "<userinput>preseed/late_command</userinput>: é executado mesmo antes de re-"
-"iniciar no final da primeira etapa da instalação, mas antes do sistema de "
-"ficheiros <filename>/target</filename> ter sido desmontado"
+"iniciar no final da instalação, mas antes do sistema de ficheiros <filename>/target</filename> ter sido desmontado"
 
 #. Tag: title
 #: preseed.xml:231
@@ -619,9 +615,9 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:397
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Contents of the preseed file"
-msgstr "Carregar o ficheiro preseed"
+msgstr "Conteúdo do ficheiro preseed"
 
 #. Tag: para
 #: preseed.xml:403
@@ -1070,7 +1066,7 @@ msgstr "configuração do Apt"
 
 #. Tag: para
 #: preseed.xml:537
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
 "configuration options is fully automated based on your installation method "
@@ -1079,12 +1075,12 @@ msgid ""
 msgstr ""
 "A configuração do <filename>/etc/apt/sources.list</filename> e as opções de "
 "configuração básica são totalmente automatizadas baseadas no seu método de "
-"instalação e respostas às questões anteriores. Apenas as duas variáveis "
+"instalação e respostas às questões anteriores. Apenas as três variáveis "
 "abaixo são relevantes para o preseeding."
 
 #. Tag: screen
 #: preseed.xml:545
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
@@ -1093,9 +1089,12 @@ msgid ""
 "# than security.debian.org.\n"
 "#d-i apt-setup/security_host string"
 msgstr ""
-"# Pode escolher instalar software das secções non-free e contrib.\n"
+"# Pode escolher instalar software non-free e contrib.\n"
 "#d-i apt-setup/non-free boolean true\n"
 "#d-i apt-setup/contrib boolean true"
+"# Para evitar acrescentar fontes de segurança, ou utilizar um servidor\n"
+"# diferente de security.debian.org.\n"
+"#d-i apt-setup/security_host string"
 
 #. Tag: title
 #: preseed.xml:550
@@ -1328,20 +1327,17 @@ msgstr "Portátil"
 
 #. Tag: para
 #: preseed.xml:635
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "You can also choose to install no tasks, and force the installation of a set "
 "of packages in some other way. We recommend always including the "
 "<userinput>Standard system</userinput> task."
 msgstr ""
-"O último destes irá correr o aptitude. Pode também escolher não instalar "
-"nenhuma tarefa, e forçar a instalação de um conjunto de pacotes de alguma "
-"outra forma. Nós recomendamos sempre a inclusão da tarefa <userinput>Sistema "
-"standard</userinput>."
+"Pode também escolher não instalar nenhuma tarefa, e forçar a instalação de um conjunto de pacotes de alguma outra forma. Nós recomendamos sempre a inclusão da tarefa <userinput>Sistema standard</userinput>."
 
 #. Tag: screen
 #: preseed.xml:643
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "tasksel tasksel/first multiselect Standard system, Desktop environment\n"
 "#tasksel tasksel/first multiselect Standard system, Web server\n"
@@ -1352,20 +1348,13 @@ msgid ""
 "# popular and include it on CDs.\n"
 "#popularity-contest popularity-contest/participate boolean false"
 msgstr ""
-"# Evitar a mensagem introdutória.\n"
-"base-config base-config/intro note\n"
+"tasksel tasksel/first multiselect Standard system, Desktop environment\n"
+"#tasksel tasksel/first multiselect Standard system, Web server\n"
 "\n"
-"# Evitar a mensagem final.\n"
-"base-config base-config/login note\n"
-"\n"
-"# Se instalou um gestor de display, mas não deseja inicia-lo imediatamente\n"
-"# after base-config finishes.\n"
-"#base-config base-config/start-display-manager boolean false\n"
-"\n"
-"# Algumas versões do instalador podem relatar de volta o que você instalou.\n"
-"# Por omissão não devolve o relatório. mas enviar relatórios ajuda o "
-"projecto\n"
-"a determinar qual o software mais popular e incluí-lo nos CDs.\n"
+"# Algumas versões do instalador podem relatar de volta que software você\n"
+"# instalou, e que software você utiliza. Por omissão não é devolvido o\n"
+"# relatório. mas enviar relatórios ajuda o projecto a determinar qual o\n"
+"software mais popular e incluí-lo nos CDs.\n"
 "#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
@@ -1536,7 +1525,7 @@ msgstr "Comandos da shell"
 
 #. Tag: screen
 #: preseed.xml:695
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
 "# for attempts at buffer overflows or other exploits of the values of a\n"
@@ -1556,32 +1545,22 @@ msgid ""
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 msgstr ""
 "# o preseed do d-i é inerentemente não seguro. Nada no instalador verifica\n"
-"# se existem tentativas de buffer overflows e outros exploits nos valores "
-"do\n"
-"# ficheiro de preseed tal como este. Utilize apenas ficheiros de preseed de\n"
-"# proveniência de confiança! Para conseguir isso, e porque normalmente é "
-"útil,\n"
-"# aqui está uma forma de correr qualquer comando da shell que queira dentro\n"
-"# do instalador, automaticamente.\n"
+"# se existem tentativas de buffer overflows e outros exploits nos valores\n "
+"# do ficheiro de preseed tal como este. Utilize apenas ficheiros de preseed\n"
+"# de proveniência de confiança! Para conseguir isso, e porque normalmente\n"
+"# é útil, aqui está uma forma de correr qualquer comando da shell que\n"
+"# queira dentro do instalador, automaticamente.\n"
 "\n"
 "# Este primeiro comando é corrido tão cedo quanto possível, logo após o\n"
 "# preseed ser lido.\n"
 "#d-i preseed/early_command string anna-install some-udeb\n"
 "\n"
-"# Este comando é corrido mesmo antes da instalação terminar, mas quando "
-"ainda\n"
-"# existe um directório /target utilizável.\n"
-"#d-i preseed/late_command string echo foo > /target/etc/bar\n"
-"\n"
-"# Este comando é corrido assim que o base-config iniciar.\n"
-"#base-config base-config/early_command string echo hi mom\n"
-"\n"
-"# Este comando é corrido após o base-config terminar, mesmo antes da prompt "
-"de login:\n"
-"# Esta é uma maneira de instalar um conjunto de pacotes que queira, ou para\n"
-"# alterar a configuração do sistema.\n"
-"#base-config base-config/late_command \\\n"
-"#      string apt-get install zsh; chsh -s /bin/zsh"
+"# Este comando é corrido mesmo antes da instalação terminar, mas quando\n"
+"# ainda existe um directório /target utilizável. Pode fazer chroot a\n"
+"# /target e utiliza-lo directamente, ou utilizar o apt-get install e\n"
+"# comandos no alvo para instalar facilmente pacotes e correr comandos\n"
+"# no sistema alvo.\n"
+"#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
 #: preseed.xml:700
