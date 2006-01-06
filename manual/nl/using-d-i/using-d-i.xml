@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28997 -->
+<!-- original version: 33819 -->
 
  <chapter id="d-i-intro"><title>Het Debian installatiesysteem gebruiken</title>
 
@@ -86,23 +86,23 @@ ssh sessie openen om de hieronder beschreven logboeken te bekijken.
 
 </para><para>
 
-Foutmeldingen worden omgeleid naar de derde console.
+Foutmeldingen worden omgeleid naar de vierde console.
 U kunt toegang krijgen tot deze console door
-op <keycombo><keycap>linker Alt</keycap><keycap>F3</keycap></keycombo>
+op <keycombo><keycap>linker Alt</keycap><keycap>F4</keycap></keycombo>
 te drukken (houd de linker <keycap>Alt</keycap> toets vast terwijl u de
-<keycap>F3</keycap> functietoets indrukt); u keert terug naar het hoofd
+<keycap>F4</keycap> functietoets indrukt); u keert terug naar het hoofd
 installatiescherm met
 <keycombo><keycap>linker Alt</keycap><keycap>F1</keycap></keycombo>.
 
 </para><para>
 
 Deze meldingen kunnen ook worden teruggevonden in
-<filename>/var/log/messages</filename>. Na de installatie wordt dit logbestand
-gekopieerd naar <filename>/var/log/debian-installer/messages</filename> op uw
+<filename>/var/log/syslog</filename>. Na de installatie wordt dit logbestand
+gekopieerd naar <filename>/var/log/installer/syslog</filename> op uw
 nieuwe systeem. Andere installatiemeldingen kunnen tijdens de installatie worden
 gevonden in <filename>/var/log/</filename> en, nadat de computer opnieuw is
-opgestart met het nieuwe systeem, in
-<filename>/var/log/debian-installer/</filename>.
+opgestart met het nieuwe systeem, in <filename>/var/log/installer/</filename>.
+
 </para>
  </sect1>
 
@@ -139,27 +139,7 @@ uit de op dat moment actieve module.
 
 </para></listitem>
 </varlistentry>
-<varlistentry condition="sarge">
-
-<term>languagechooser</term><listitem><para>
-
-De module 'languagechooser' (taalkiezer) toont een lijst van talen en
-varianten daarvan. Tijdens de installatie zullen boodschappen in de gekozen
-taal worden getoond, tenzij de vertaling voor die taal niet compleet is. Als
-een vertaling niet compleet is, worden de boodschappen in het Engels getoond.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="sarge">
-
-<term>countrychooser</term><listitem><para>
-
-De module 'countrychooser' (landkiezer) toont een lijst van landen waaruit de
-gebruiker het land waar hij woont kan kiezen.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="etch">
+<varlistentry>
 
 <term>localechooser</term><listitem><para>
 
@@ -323,10 +303,53 @@ die op sommige nieuwere moederborden voorkomen.
 </varlistentry>
 <varlistentry>
 
+<term>tzsetup</term><listitem><para>
+
+Selecteert de tijdzone op basis van de eerder geselecteerde locatie.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>clock-setup</term><listitem><para>
+
+Bepaalt of de interne klok is ingesteld op UTC of niet.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>user-setup</term><listitem><para>
+
+Stelt het wachtwoord voor het "root" account in en voegt een account voor
+een normale gebruiker toe.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
 <term>base-installer</term><listitem><para>
 
 Installeert een basisset van pakketten die het mogelijk maken om de
 computer, nadat deze is herstart, onder Linux te laten functioneren.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>apt-setup</term><listitem><para>
+
+Verzorgt de configuratie van apt. Dit gebeurt grotendeels automatisch op
+basis van de gebruikte installatiemethode.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>pkgsel</term><listitem><para>
+
+Maakt gebruik van <classname>tasksel</classname> voor de selecte en
+installatie van aanvullende programmatuur.
 
 </para></listitem>
 </varlistentry>
@@ -352,16 +375,12 @@ is noodzakelijk om de computer onder Linux te laten opstarten zonder een
 diskette of CD te gebruiken. Veel opstartladers kennen de mogelijkheid om
 de gebruiker &mdash; elke keer dat de computer wordt opgestart &mdash; te
 laten kiezen uit verschillende besturingssystemen.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>base-config</term><listitem><para>
-
-Voorziet in configuratieschermen om de pakketten van het basissysteem te
-configureren conform de voorkeuren van de gebruiker. Dit gebeurt normaal
-gesproken nadat de computer voor de eerste keer opnieuw is opgestart.
+De installatieprogramma's voor de diverse opstartladers installeren alle een
+opstartlader op de harde schijf. Een opstartlader is noodzakelijk om de
+computer onder Linux te laten opstarten zonder een diskette of CD te gebruiken.
+Veel opstartladers kennen de mogelijkheid om de gebruiker &mdash; elke keer
+dat de computer wordt opgestart &mdash; te laten kiezen uit alternatieve
+besturingssystemen.
 
 </para></listitem>
 </varlistentry>
@@ -378,11 +397,11 @@ een shell te starten.
 </varlistentry>
 <varlistentry>
 
-<term condition="sarge">bugreporter</term><term condition="etch">save-logs</term><listitem><para>
+<term>save-logs</term><listitem><para>
 
 Stelt de gebruiker in staat om, wanneer problemen worden tegengekomen,
-informatie op een diskette<phrase condition="etch">, via het network,
-op harde schijf of op een ander medium</phrase> te bewaren.
+informatie op een diskette, via het network, op harde schijf of op een
+ander medium te bewaren.
 Hiermee kan later een nauwkeurig verslag van problemen met het
 installatiesysteem worden gestuurd aan de Debian ontwikkelaars.
 

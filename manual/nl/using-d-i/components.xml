@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 29895 -->
+<!-- original version: 33730 -->
 
  <sect1 id="module-details">
  <title>Individuele modules gebruiken</title>
@@ -43,8 +43,6 @@ zijn, moet de hardwareherkenning later in het proces worden herhaald.
 </para>
 
 &module-lowmem.xml;
-&module-languagechooser.xml;
-&module-countrychooser.xml;
 &module-localechooser.xml;
 &module-kbd-chooser.xml;
 &module-s390-netdevice.xml;
@@ -85,14 +83,47 @@ LVM of RAID worden geconfigureerd.
   <title>Installatie van het Basissysteem</title>
 <para>
 
-Hoewel dit stadium het minst problematisch is, neemt het wel de meeste tijd in
-beslag omdat hier het volledige basissysteem wordt opgehaald, geverifieerd en
-uitgepakt. Als u een langzame computer of netwerkverbinding heeft, kan dit
-enige tijd in beslag nemen.
+Na de schijfindeling stelt het installatiesysteem nog enkele vragen die
+gebruikt zullen worden voor de instelling van het systeem dat vervolgens
+geïnstalleerd wordt.
+
+</para>
+
+&module-tzsetup.xml;
+&module-clock-setup.xml;
+&module-user-setup.xml;
+  </sect2>
+
+  <sect2 id="di-install-base">
+  <title>Installatie van het Basissysteem</title>
+<para>
+
+Hoewel dit stadium het minst problematisch is, beslaat het wel een significant
+deel van de tijd van de installatie omdat hier het volledige basissysteem wordt
+opgehaald, geverifieerd en uitgepakt. Als u een langzame computer of
+netwerkverbinding heeft, kan dit enige tijd in beslag nemen.
 
 </para>
 
 &module-base-installer.xml;
+  </sect2>
+
+
+  <sect2 id="di-install-software">
+  <title>Installing Additional Software</title>
+<para>
+
+Nadat het basissysteem is geïnstalleerd, beschikt u over een bruikbaar systeem,
+maar met beperkte functionaliteit. De meeste gebruikers zullen aanvullende
+programmatuur op het systeem willen installeren om het aan te passen aan hun
+behoeften. Het installatiesysteem maakt dit mogelijk. Deze stap kan, zeker
+indien u een langzame computer of netwerkverbinding heeft, nog meer tijd in
+beslag nemen dan de installatie van het basissysteem
+
+</para>
+
+&module-apt-setup.xml;
+&module-pkgsel.xml;
   </sect2>
 
   <sect2 id="di-make-bootable">
@@ -132,11 +163,11 @@ dient u de documentatie van uw opstartlader te raadplegen.
   </sect2>
 
   <sect2 id="di-finish">
-  <title>De eerste fase van de installatie afronden</title>
+  <title>De installatie afronden</title>
 <para>
 
 Dit zijn de laatste acties die moeten worden uitgevoerd voordat de
-computer kan worden opgestart met uw nieuwe Debian systeem. Het bestaat
+computer kan worden opgestart met uw nieuwe systeem. Het bestaat
 voornamelijk uit het afwerken van losse eindjes van &d-i;.
 
 </para>
