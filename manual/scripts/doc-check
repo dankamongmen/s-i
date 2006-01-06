@@ -112,8 +112,25 @@ sub process
 	$plfname =~ s,^en/,$lang/,;
 	checkdiff($plfname, $enfname);
 }
+
+sub process_obsolete
+{
+	my $plfname = $File::Find::name;
+	return unless $plfname =~ m/\.xml$/;
+	my $enfname = $plfname;
+	$enfname =~ s,^$lang/,en/,;
+	open FILE, $enfname or warn "$plfname: Probably obsoleted\n" and return;
+	close FILE;
+}
+
+warn "\nChecking for outdated or missing translations...\n" if $opt_v;
 File::Find::find({ wanted => \&process, no_chdir => 1 }, 'en');
+warn "\nChecking for obsoleted translations...\n" if $opt_v;
+File::Find::find({ wanted => \&process_obsolete, no_chdir => 1 }, $lang);
+
 #checkdiff("build/install.$lang.xml", "build/install.en.xml");
 #checkdiff("release-notes.$lang.sgml","release-notes.sgml");
 #checkdiff("index.$lang.html.m4","index.en.html.m4");
 #checkdiff("dselect-beginner.$lang.sgml","dselect-beginner.sgml");
+
+warn "All done.\n" if $opt_v;
