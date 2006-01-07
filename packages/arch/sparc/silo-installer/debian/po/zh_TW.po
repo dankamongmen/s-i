@@ -77,9 +77,8 @@ msgstr "將 SILO 開機程式安裝至硬碟上"
 #. Type: note
 #. Description
 #: ../silo-installer.templates:27
-#, fuzzy
 msgid "Unsupported boot filesystem type"
-msgstr "在 /boot 上使用不被支援的檔案系統？"
+msgstr "開機檔案系統的格式不被支援"
 
 #. Type: note
 #. Description
@@ -90,13 +89,15 @@ msgid ""
 "partitioning scheme the kernel is going to be installed on the ${SILO_PART} "
 "partition of type ${SILO_TYPE}."
 msgstr ""
+"為了能順利被 SILO (Sparc Linux Loader) 呼叫，Kernel 必須位於 ext2、ext3 或 "
+"utf 格式的分割區內。而以目前的磁碟分割表狀態，Kernel 將會被安裝在 "
+"${SILO_TYPE} 格式的 ${SILO_PART} 分割區。"
 
 #. Type: note
 #. Description
 #: ../silo-installer.templates:39
-#, fuzzy
 msgid "Boot partition may cause problems with SILO"
-msgstr "Root 分割區必須為 ext2"
+msgstr "開機分割區可能無法和 SILO 搭配使用"
 
 #. Type: note
 #. Description
@@ -106,6 +107,8 @@ msgid ""
 "impossible for SILO (Sparc Linux Loader) to boot a kernel placed farther "
 "than 1 GB from the beginning of the disk."
 msgstr ""
+"這個機器很可能會受到韌體上的一些問題所影響，使得它無法使用 SILO (Sparc Linux "
+"Loader) 來啟動位於磁碟開頭 1GB 以外的 Kernel。"
 
 #. Type: note
 #. Description
@@ -118,13 +121,16 @@ msgid ""
 "${SILO_PART} partition which extends up to ${SILO_OFF} mark. Keeping this "
 "configuration may result in an unbootable system."
 msgstr ""
+"為了避免這個問題，在此強烈建議您能將 Kernel 安裝在一個完全位於磁碟開頭 1GB 內"
+"的磁碟分割區上。（比如說，在磁碟的開頭建立一個小的 /boot 分割區）。在目前的磁"
+"碟分割設定裡，它將會被安裝在一個會延伸到 ${SILO_OFF} 標記的 ${SILO_PART} 分割"
+"區上。繼續使用這樣的設定可能會導致系統無法開機。"
 
 #. Type: note
 #. Description
 #: ../silo-installer.templates:53
-#, fuzzy
 msgid "Unsupported partition table on the boot disk"
-msgstr "Root 分割區並沒有位於第一顆磁碟上"
+msgstr "在開機磁碟上有著不被支援的磁碟分割表"
 
 #. Type: note
 #. Description
@@ -135,6 +141,9 @@ msgid ""
 "to be installed on the ${SILO_PART} partition located on a disk with the "
 "partition table of type \"${SILO_DISK}\"."
 msgstr ""
+"SILO (Sparc Linux Loader) 只能啟動使用了 sun 分割表的磁碟上的 Kernel。在目前"
+"的磁碟分割設定裡，Kernel 將會被安裝在使用了 ${SILO_DISK} 格式分割表的磁碟裡"
+"的 ${SILO_PART} 分割區。"
 
 #. Type: note
 #. Description
@@ -144,3 +153,5 @@ msgid ""
 "problem. Keeping the current configuration may result in an unbootable "
 "system."
 msgstr ""
+"在此強烈建議您能返回重新切割硬碟並修正這個問題。繼續使用這樣的設定可能會導致"
+"系統無法開機。"
