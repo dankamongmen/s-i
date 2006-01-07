@@ -266,6 +266,17 @@ fi
 db_set "debconf/language" "$LANGUAGELIST"
 log "Set debconf/language = '$LANGUAGELIST'"
 
+# Install specific packages depending on selected language   
+# Those we install here are those required immediately
+# Otherwise we will install them in prebaseconfig
+if [ "$LOCALE" != "C" ] ; then
+	case "$LANGUAGE" in
+		ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh)
+		# We need a complete font for later steps
+		anna-install bterm-unifont
+		;;
+	esac
+fi     
 
 # BEGIN COUNTRY SELECTION
 
