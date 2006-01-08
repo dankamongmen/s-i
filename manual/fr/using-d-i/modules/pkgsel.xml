@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- original version: 33814 -->
+
+   <sect3 id="pkgsel">
+   <title>Sélection et installation des paquets</title>
+
+<para>
+
+Pendant l'installation, il vous est proposé de choisir des logiciels à installer.
+Plutôt que de choisir les paquets un par un parmi les &num-of-distrib-pkgs; paquets
+disponibles, vous pourrez, pendant cette phase de l'installation, sélectionner et
+installer un certain nombre de configurations logicielles prédéfinies.
+
+</para><para>
+
+Vous pouvez donc choisir des <emphasis>tâches</emphasis>, et ensuite
+ajouter des paquets individuellement. Ces tâches représentent
+grosso modo les différents travaux qu'on peut faire avec son ordinateur,
+par exemple de la <quote>bureautique</quote>, du <quote>service web</quote>
+ou encore du <quote>service d'impression</quote> <footnote>
+
+<para>
+
+Il faut savoir que pour présenter cette liste, l'installateur
+appelle simplement le programme <command>tasksel</command>. Ce programme peut être 
+utilisé à tout moment une fois l'installation terminée pour installer ou supprimer
+des paquets. Pour une sélection manuelle des paquets, c'est <command>aptitude</command> qui est
+exécuté. Une fois que l'installation est terminée, si vous voulez un paquet particulier, 
+exécutez simplement <userinput>aptitude install <replaceable>paquet</replaceable></userinput>,
+où <replaceable>paquet</replaceable> est le nom du paquet voulu.
+
+</para>
+
+</footnote>. L'espace nécessaire pour chaque tâche est indiqué dans
+<xref linkend="tasksel-size-list"/>.
+
+</para><para>
+
+Une fois les tâches sélectionnées, choisissez <guibutton>Ok</guibutton>.
+<command>Aptitude</command> installera les paquets demandés.
+
+<note><para>
+
+In the standard user interface of the installer, you can use the space bar
+to toggle selection of a task.
+
+</para></note>
+
+<note><para>
+
+Il faut noter que certaines tâches peuvent avoir été présélectionnées en fonction
+de la machine sur laquelle vous faites l'installation. Si vous n'êtes pas d'accord
+avec ces sélections, vous pouvez déselectionner ces tâches&nbsp;; vous pouvez même
+n'installer aucune tâche.
+
+</para></note>
+
+</para><para>
+
+Chaque paquet sélectionné avec <command>tasksel</command> est téléchargé,
+dépaqueté et installé par les programmes <command>apt-get</command> et
+<command>dpkg</command>. Quand un programme demande des informations particulières,
+il vous posera des questions pendant le processus.
+
+</para>
+ <sect4 id="config-mta">
+ <title>Configuration de l'agent de transport du courrier <quote>MTA</quote></title>
+
+<para>
+
+Le courrier électronique tient aujourd'hui une grande place dans la vie des
+gens&nbsp;; ce n'est donc pas surprenant que Debian permette la configuration
+du système de courrier pendant le processus d'installation. L'agent de
+transport du courrier installé par défaut est <command>exim4</command>, un
+programme relativement petit, souple et facile à apprendre.
+
+</para><para>
+
+Vous pourriez demander si l'installer sur un ordinateur non connecté est
+vraiment nécessaire. La réponse courte est : oui. Une explication plus
+longue&nbsp;: certains utilitaires du système comme <command>cron</command>,
+<command>quota</command>, <command>aide</command>&hellip; peuvent vous
+envoyer des messages importants sous forme de courriel.
+
+</para><para>
+
+Sur le premier écran, les scénarios les plus courants concernant les systèmes
+de courrier vous seront présentés. Choisissez celui qui s'accorde le mieux
+avec vos besoins.
+
+</para>
+
+<variablelist>
+<varlistentry>
+<term>site internet</term>
+<listitem><para>
+
+Votre système est connecté à un réseau et le courrier est expédié et reçu
+directement avec SMTP. Dans les écrans suivants, on vous posera quelques
+questions élémentaires comme le nom de votre machine pour le courrier, les
+domaines dont vous acceptez ou relayez les courriels.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>courrier envoyé par une machine relais (<quote>smarthost</quote>)</term>
+<listitem><para>
+
+Dans ce scénario, le courrier sortant est envoyé à une autre machine, appelé
+le « smarthost » qui fait le travail pour vous. Cette machine relais garde les
+courriels qui vous sont adressés et vous permet de ne pas être constamment
+connecté. Vous devez donc récupérer vos courriels sur cette machine avec des
+programmes comme fetchmail. C'est l'option adaptée à un système connecté par
+le réseau téléphonique.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>distribution locale seulement</term>
+<listitem><para>
+
+Le système n'est pas sur un réseau. Le courrier est uniquement envoyé et reçu
+par des utilisateurs locaux. Même si vous n'avez pas l'intention d'envoyer des
+messages, cette option est hautement conseillée car certains utilitaires du
+système peuvent vous envoyer divers messages d'alerte, p. ex. le bien aimé
+<quote>Disk quota exceeded</quote>. Cette option convient aussi aux nouveaux
+utilisateurs, elle ne posera pas de question.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>pas de configuration pour le moment</term>
+<listitem><para>
+
+Choisissez cette option si vous êtes absolument certain de savoir ce que vous
+faites. Le système de courrier ne sera pas configuré. Tant qu'il ne le sera
+pas, vous ne pourrez ni envoyer ni recevoir des courriels. Les messages
+importants venant des utilitaires du système ne vous parviendront pas.
+
+</para></listitem>
+</varlistentry>
+</variablelist>
+
+<para>
+
+Si aucun de ces scénarios ne s'accorde à vos besoins, ou si vous voulez un
+réglage très fin, vous devrez modifier les fichiers de configuration qui se
+trouvent dans le répertoire <filename>/etc/exim4</filename>. D'autres
+informations sur le programme <command>exim4</command> se trouvent dans
+<filename>/usr/share/doc/exim4</filename>.
+
+</para>
+ </sect4>
+   </sect3>

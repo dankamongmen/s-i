@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28997 -->
+<!-- original version: 33819 -->
 
 <chapter id="d-i-intro"><title>Comment utiliser l'installateur Debian ?</title>
 
@@ -80,24 +80,24 @@ décrits ci-dessous.
 
 </para><para>
 
-Les messages d'erreur sont redirigés vers la troisième console. Vous pouvez 
-y accéder en pressant 
-<keycombo><keycap>Left Alt</keycap><keycap>F3</keycap></keycombo> 
-(garder la touche <keycap>Alt</keycap> enfoncée pendant que vous appuyez 
-sur la touche de fonction <keycap>F3</keycap>). Revenez sur le processus
+Le journal de l'installation et les messages d'erreur sont redirigés vers la quatrième console.
+Vous pouvez y accéder en pressant 
+<keycombo><keycap>Left Alt</keycap><keycap>F4</keycap></keycombo> 
+(il faut garder la touche <keycap>Alt</keycap> enfoncée pendant que vous appuyez 
+sur la touche de fonction <keycap>F4</keycap>). Revenez sur le processus
 d'installation avec 
 <keycombo><keycap>Left Alt</keycap><keycap>F1</keycap></keycombo>.
 
 </para><para>
 
 Ces messages se retrouvent aussi dans
-<filename>/var/log/messages</filename>. Après l'installation, ce
-fichier-journal est copié dans <filename>/var/log/installer.log</filename>
+<filename>/var/log/syslog</filename>. Après l'installation, ce
+journal est copié dans <filename>/var/log/installer/syslog</filename>
 sur votre nouveau système. D'autres messages d'installation se trouvent,
 pendant l'installation, dans le fichier
 <filename>/var/log/</filename>, et, quand la
 machine a démarré le nouveau système, ces messages se trouvent dans
-<filename>/var/log/debian-installer/</filename>.
+<filename>/var/log/debian/</filename>.
 
 </para>
  </sect1>
@@ -131,25 +131,8 @@ Depuis le composant en cours, vous pouvez revenir au menu principal en
 sélectionnant plusieurs fois le bouton <quote>Back</quote>.
 </para></listitem>
 </varlistentry>
-<varlistentry condition="sarge">
 
-<term>languagechooser</term><listitem><para>
-
-Affiche une liste des langues. L'installateur affichera les messages dans
-la langue choisie, à moins que certains messages ne soient pas traduits.
-Dans ce cas, les messages sont affichés en anglais.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="sarge">
-
-<term>countrychooser</term><listitem><para>
-
-Permet à l'utilisateur de choisir le pays où il vit dans une liste.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="etch">
+<varlistentry>
 
 <term>localechooser</term><listitem><para>
 
@@ -293,12 +276,54 @@ contrôleurs IDE qu'on trouve sur les cartes mère récentes.
 
 </para></listitem>
 </varlistentry>
+ <varlistentry>
+
+<term>tzsetup</term><listitem><para>
+
+Sélection du fuseau horaire à partir du lieu indiqué précédemment.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>clock-setup</term><listitem><para>
+
+Vérification du réglage de l'horloge (UTC ou non).
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>user-setup</term><listitem><para>
+
+Création du mot de passe pour root et ajout d'un utilisateur ordinaire.
+
+</para></listitem>
+</varlistentry>
 <varlistentry>
 
 <term>base-installer</term><listitem><para>
 
 Ce programme installe l'ensemble des programmes de base qui permettront
 le fonctionnement de l'ordinateur sous Linux après le redémarrage.
+
+</para></listitem>
+</varlistentry>
+ <varlistentry>
+
+<term>apt-setup</term><listitem><para>
+
+Configuration d'apt, presque automatique, à partir d'informations tirées du
+support d'installation.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>pkgsel</term><listitem><para>
+
+Utilisation de <classname>tasksel</classname> pour sélectionner et installer
+des logiciels supplémentaires.
 
 </para></listitem>
 </varlistentry>
@@ -327,17 +352,6 @@ d'exploitation que l'on veut lancer au démarrage de la machine.
 </varlistentry>
 <varlistentry>
 
-<term>base-config</term><listitem><para>
-
-Ce programme fournit les dialogues qui permettent la configuration des
-paquets du système de base selon les préférences de l'utilisateur.
-Cette configuration est faite après le redémarrage de la machine, c'est la
-<quote>première</quote> du nouveau système Debian.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
 <term>shell</term><listitem><para>
 
 Ce programme permet d'exécuter un interpréteur de commandes, à partir du menu 
@@ -347,11 +361,11 @@ ou dans la deuxième console.
 </varlistentry>
 <varlistentry>
 
-<term condition="sarge">bugreporter</term><term condition="etch">save-logs</term><listitem><para>
+<term>save-logs</term><listitem><para>
 
-Ce programme permet d'enregistrer des informations sur une disquette 
-<phrase condition="etch">, un réseau, un disque dur ou un autre support</phrase>quand
-quelque chose se passe mal&nbsp;; ainsi on peut par la suite envoyer des 
+Ce programme permet d'enregistrer des informations sur une disquette,
+un réseau, un disque dur, etc. quand quelque chose se passe mal&nbsp;; 
+ainsi on peut par la suite envoyer des 
 informations précises aux développeurs Debian
 
 </para></listitem>

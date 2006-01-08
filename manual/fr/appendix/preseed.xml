@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 32512 -->
+<!-- original version: 33825 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -12,7 +12,7 @@ attribute is in force that does not match the specified release or if an
 Currently only a single variant of the example file is generated (for i386).
 -->
 
-<appendix id="appendix-preseed" condition="etch">
+<appendix id="appendix-preseed">
 <title>Automatisation de l'installation et préconfiguration</title>
 
 <para>
@@ -31,9 +31,9 @@ fichier dans &urlset-example-preseed;.
  <title>Introduction</title>
 <para>
 
-La préconfiguration est une façon de donner des réponses à des questions sans
-avoir à les saisir pendant le processus d'installation. Cela rend possible une 
-automatisation complète de ce processus et cela offre même des fonctionnalités qui
+La préconfiguration est une façon de donner des réponses aux questions posées par le 
+processus d'installation sans avoir à les saisir pendant le processus lui-même. Cela rend 
+possible une automatisation complète de ce processus et cela offre même des fonctionnalités qui
 ne sont pas disponibles autrement.
 
 </para><para>
@@ -228,16 +228,8 @@ moments de l'installation. Voyez <xref linkend="preseed-shell"/> pour des précis
 </para></listitem>
 <listitem><para>
   <userinput>preseed/late_command</userinput> : commande lancée juste avant le redémarrage,
-  à la fin de la première partie de l'installation, mais avant que le système de fichiers 
+  à la fin de l'installation, mais avant que le système de fichiers 
   <filename>/target</filename> ait été démonté
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/early_command</userinput> : commande lancée au début de la
-  deuxième partie de l'installation, quand <command>base-config</command> débute
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/late_command</userinput> : commande lancée à la fin de
-  <command>base-config</command>, juste avant l'invite de connexion
 </para></listitem>
 </itemizedlist>
 
@@ -427,8 +419,8 @@ commencer une installation, vous pouvez utiliser la commande
 </para>
  </sect1>
 
- <sect1 id="preseed-stage1">
- <title>Préconfigurer la première partie de l'installation</title>
+ <sect1 id="preseed-contents">
+ <title>Contenu du fichier de préconfiguration</title>
 <para>
 
 Un exemple de fichier de préconfiguration basé sur les éléments de cette annexe
@@ -676,13 +668,16 @@ d-i time/zone string US/Eastern
 La création du fichier <filename>/etc/apt/sources.list</filename> 
 et les principales options de configuration se font automatiquement à partir
 de la méthode d'installation choisie et des réponses aux précédentes questions.
-Seules les deux variables suivantes relèvent de la préconfiguration.
+Seules les trois variables suivantes relèvent de la préconfiguration.
 </para>
 
 <informalexample role="example"><screen>
 # Vous pouvez installer des logiciels des distributions non-free et contrib.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+#Pour éviter d'ajouter des sources sécurisées ou pour utiliser un autre serveur
+#que security.debian.org.
+#d-i apt-setup/security_host string
 </screen></informalexample>
 
 </sect2>
@@ -748,6 +743,22 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 
   </sect2>
 
+  <sect2 id="preseed-base-installer">
+  <title>Installation du système de base</title>
+<para>
+
+Peu d'éléments peuvent être préconfigurés à cette étape de l'installation.
+Les seules questions posées concernent l'installation du noyau
+
+</para>
+
+<informalexample role="example"><screen>
+# Choix du générateur initramfs pour créer l'initrd des noyaux 2.6.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-bootloader">
   <title>Installation du programme d'amorçage</title>
 
@@ -775,47 +786,8 @@ d-i grub-installer/with_other_os boolean true
 
   </sect2>
 
-  <sect2 id="preseed-finish">
-  <title>Terminer la première étape de l'installation</title>
 
-<informalexample role="example"><screen>
-# Pour éviter le dernier message disant que l'installation est terminée
-d-i prebaseconfig/reboot_in_progress note
-
-# Pour empêcher l'éjection du cédérom au moment du redémarrage,
-# c'est utile parfois :
-#d-i cdrom-detect/eject boolean false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
- <sect1 id="preseed-stage2">
- <title>Préconfiguration de la deuxième partie de l'installation</title>
-
-  <sect2 id="preseed-baseconfig">
-  <title>Préconfiguration de base-config</title>
-
-<informalexample role="example"><screen>
-# Pour éviter le message d'introduction
-base-config base-config/intro note
-
-# Pour éviter le dernier message
-base-config base-config/login note
-
-# Si vous installez un gestionnaire d'affichage et si vous ne voulez pas le
-# lancer immédiatemment après base-config :
-#base-config base-config/start-display-manager boolean false
-
-# Certaines versions de l'installateur peuvent dire ce que vous avez installé.
-# Par défaut, rien n'est signalé. Mais l'envoi de rapport d'installation aide le projet
-# à connaître les logiciels populaires. 
-#popularity-contest popularity-contest/participate boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-tasksel">
+  <sect2 id="preseed-pkgsel">
   <title>Choix des paquets</title>
 <para>
 
@@ -851,23 +823,39 @@ Pour l'heure, les tâches disponibles sont les suivantes :
 <listitem><para>
   <userinput>Laptop</userinput>
 </para></listitem>
-<listitem><para>
-  <userinput>manual package selection</userinput>
-</para></listitem>
 </itemizedlist>
 
 <para>
-Pour les dernières tâches, aptitude est utilisé. Vous pouvez aussi
-choisir de n'installer aucune tâche et forcer l'installation de paquets par un autre moyen.
-Il est recommandé de toujours inclure la tâche Système standard.
+Vous pouvez aussi choisir de n'installer aucune tâche et forcer l'installation de paquets 
+par un autre moyen.
+Il est recommandé de toujours inclure la tâche <quote>Standard system</quote>.
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
+
+# Certaines versions de l'installateur peuvent signaler les logiciels que vous avez installés
+# et ceux que vous utilisez. Par défaut, rien n'est signalé. Mais l'envoi de rapport 
+# d'installation aide le projet à connaître les logiciels populaires.
+#popularity-contest popularity-contest/participate boolean false
 </screen></informalexample>
 
   </sect2>
+
+  <sect2 id="preseed-finish">
+  <title>Pour terminer la première partie de l'installation</title>
+
+<informalexample role="example"><screen>
+# Pour éviter le dernier message disant que l'installation est terminée.
+d-i prebaseconfig/reboot_in_progress note
+
+# Pour empêcher l'éjection du cédérom au moment du redémarrage,
+# c'est utile parfois :
+#d-i cdrom-detect/eject boolean false
+</screen></informalexample>
+
+</sect2>
 
   <sect2 id="preseed-mailer">
   <title>Configuration du MTA</title>
@@ -954,18 +942,13 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 #d-i preseed/early_command string anna-install some-udeb
 
 # Cette commande est exécutée juste avant que l'installation ne se termine,
-# mais quand le répertoire /target est encore utilisable.
-#d-i preseed/late_command string echo foo > /target/etc/bar
-
-# Cette commande est exécutée au moment où base-config commence.
-#base-config base-config/early_command string echo hi mom
-
-# Cette commande est exécutée après base-config, juste avant la connexion.
-# C'est un bon moyen d'installer les paquets que vous voulez ou d'affiner la
-# la configuration du système.
-#base-config base-config/late_command string \
-#    apt-get install zsh; chsh -s /bin/zsh
+# mais quand le répertoire /target est encore utilisable. Vous pouvez exécuter
+# chroot /target et utiliser cet environnement directement&nbsp;; ou bien vous
+# pouvez utiliser les commandes apt-install et in-target pour installer des
+# paquets et lancer des commandes dans le répertoire target.
+#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 </screen></informalexample>
+
 </sect2>
 
   <sect2 id="preseed-chainload">
