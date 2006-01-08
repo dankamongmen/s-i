@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 32512 -->
+<!-- original version: 33825 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -13,7 +13,7 @@ attribute is in force that does not match the specified release or if an
 Currently only a single variant of the example file is generated (for i386).
 -->
 
-<appendix id="appendix-preseed" condition="etch">
+<appendix id="appendix-preseed">
 <title>Automatizování instalací pomocí přednastavení</title>
 
 <para>
@@ -219,17 +219,9 @@ instalace. Podrobnosti naleznete v <xref linkend="preseed-shell"/>.
   načtení souboru s přednastavením
 </para></listitem>
 <listitem><para>
-  <userinput>preseed/late_command</userinput>: spustí se těsně před
-  koncem první fáze instalace, ale ještě před odpojením souborového
+  <userinput>preseed/late_command</userinput>: spustí se na závěr
+  instalace těsně před restartem, ale ještě před odpojením souborového
   systému <filename>/target</filename>
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/early_command</userinput>: spustí se při
-  startu <command>base-config</command>u
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/late_command</userinput>: spustí se na konci
-  <command>base-config</command>u, těsně před výzvou k přihlášení
 </para></listitem>
 </itemizedlist>
 
@@ -422,8 +414,8 @@ souboru příkazem <command>debconf-set-selections -c
 </para>
  </sect1>
 
- <sect1 id="preseed-stage1">
- <title>Přednastavení první fáze instalace</title>
+ <sect1 id="preseed-contents">
+ <title>Obsah souboru s přednastavením</title>
 <para>
 
 Útržky konfigurace použité v této části jsou také dostupné jako
@@ -665,7 +657,7 @@ d-i time/zone string US/Eastern
 Nastavení souboru <filename>/etc/apt/sources.list</filename>
 a několika základních parametrů je plně řízeno typem instalace
 a dříve zodpovězenými otázkami, takže pro přednastavení zbývají pouze
-dvě relevantní proměnné.
+tři relevantní proměnné.
 
 </para>
 
@@ -673,6 +665,9 @@ dvě relevantní proměnné.
 # Můžete si zvolit instalaci softwaru ze sekcí non-free a contrib.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+# Pokud nechcete přidat zdroje s opravami, nebo pokud chcete použít
+# jiný server než security.debian.org.
+#d-i apt-setup/security_host string
 </screen></informalexample>
 
   </sect2>
@@ -735,6 +730,23 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 </para>
   </sect2>
 
+  <sect2 id="preseed-base-installer">
+  <title>Instalace základního systému</title>
+<para>
+
+V této fázi instalace se toho moc nastavit nedá. Jediné otázky se
+týkají instalace jádra.
+
+</para>
+
+<informalexample role="example"><screen>
+# Vybere generátor initramfs, kterým se vygeneruje initrd pro jádra
+# řady 2.6.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-bootloader">
   <title>Instalace zavaděče</title>
 
@@ -760,48 +772,7 @@ d-i grub-installer/with_other_os boolean true
 
   </sect2>
 
-  <sect2 id="preseed-finish">
-  <title>Dokončení první fáze instalace</title>
-
-<informalexample role="example"><screen>
-# Vynechá poslední hlášku, že je instalace kompletní.
-d-i prebaseconfig/reboot_in_progress note
-
-# Zakáže vysunutí CD během restartu, což se občas může hodit.
-#d-i cdrom-detect/eject boolean false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
- <sect1 id="preseed-stage2">
- <title>Přednastavení druhé fáze instalace</title>
-
-  <sect2 id="preseed-baseconfig">
-  <title>Base config</title>
-
-<informalexample role="example"><screen>
-# Vynechá úvodní hlášku.
-base-config base-config/intro note
-
-# Vynechá závěrečnou hlášku.
-base-config base-config/login note
-
-# Pokud jste instalovali správce zobrazení, ale nechcete jej spustit
-# hned po dokončení base-config.
-#base-config base-config/start-display-manager boolean false
-
-# Některé verze instalačního systému mohou vývojářům Debianu hlásit
-# seznam balíků, které jste nainstalovali, což pomáhá při
-# rozhodování, který software je oblíbený a proto by měl být zařazen
-# na CD. Výchozí hodnotou je zákaz posílání tohoto seznamu, ale měli
-# byste zvážit jeho povolení.
-#popularity-contest popularity-contest/participate boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-tasksel">
+  <sect2 id="preseed-pkgsel">
   <title>Výběr balíků.</title>
 <para>
 
@@ -838,22 +809,39 @@ to zahrnuje:
 <listitem><para>
   <userinput>Laptop</userinput>
 </para></listitem>
-<listitem><para>
-  <userinput>manual package selection</userinput>
-</para></listitem>
 </itemizedlist>
 
 <para>
 
-Poslední možnost spustí aptitude. Také můžete instalaci úloh vynechat
-a instalovat balíku nějakou jinou cestou. Úlohu <userinput>Standard
-system</userinput> doporučujeme instalovat vždy.
+Instalaci úloh můžete vynechat a instalovat balíky nějakou jinou
+cestou. Úlohu <userinput>Standard system</userinput> však doporučujeme
+instalovat vždy.
 
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
+
+# Některé verze instalačního systému mohou vývojářům Debianu hlásit
+# seznam balíků, které jste nainstalovali, což pomáhá při
+# rozhodování, který software je oblíbený a proto by měl být zařazen
+# na CD. Výchozí hodnotou je zákaz posílání tohoto seznamu, ale měli
+# byste zvážit jeho povolení.
+#popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-finish">
+  <title>Dokončení první fáze instalace</title>
+
+<informalexample role="example"><screen>
+# Vynechá poslední hlášku, že je instalace kompletní.
+d-i prebaseconfig/reboot_in_progress note
+
+# Zakáže vysunutí CD během restartu, což se občas může hodit.
+#d-i cdrom-detect/eject boolean false
 </screen></informalexample>
 
   </sect2>
@@ -944,17 +932,11 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 #d-i preseed/early_command string anna-install nejaky-udeb
 
 # Tento příkaz je spuštěn těsně před koncem instalace, ale ještě je
-# připojen adresář /target.
-#d-i preseed/late_command string echo foo > /target/etc/bar
-
-# Tento příkaz je spuštěn při startu base-config.
-#base-config base-config/early_command string echo ahoj mami
-
-# Poslední příkaz je spuštěn po skončení base-config, těsně před
-# výzvou login:. Takto můžete doinstalovat balíky, nebo také doladit
-# nastavení systému.
-#base-config base-config/late_command \
-#      string apt-get install zsh; chsh -s /bin/zsh
+# připojen adresář /target. Buď můžete použít chroot na /target
+# a pracovat přímo v něm, nebo můžete použít příkaz apt-install
+# resp. in-target pro jednoduchou instalaci balíků resp. spouštění
+# příkazů v nově instalovaném systému
++#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 </screen></informalexample>
 
   </sect2>

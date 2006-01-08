@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 32424 -->
+<!-- original version: 33725 -->
 
  <sect1 id="automatic-install">
  <title>Automatická Instalace</title>
@@ -25,72 +25,10 @@ soubor obsahuje odpovědi na otázky, které se &d-i; ptá během
 instalace. Tento soubor můžete nahrát ze sítě nebo z vyměnitelného
 média.
 
-</para><para condition="etch">
+</para><para>
 
 Kompletní dokumentaci o přednastavení včetně funkčního příkladu
 naleznete v <xref linkend="appendix-preseed"/>.
-
-</para><para condition="sarge">
-
-Touto metodou můžete přednastavit hodnoty pro většinu dialogů
-v &d-i;, ale existuje několik výjimek. Můžete použít volné místo nebo
-rozdělit celý disk, ale nemůžete využít stávající oblasti. Momentálně
-také nelze přednastavit RAID a LVM. S výjimkou síťových modulů nelze
-nastavit ani parametry modulů jádra.
-
-</para><para condition="sarge">
-
-Předkonfigurační soubor má stejný formát jako používá příkaz
-<command>debconf-set-selections</command>. Dobře dokumentovaný funkční
-příklad takového souboru naleznete v dodatku <xref
-linkend="example-preseed"/>. Další možností je projít ruční instalací
-a poté příkazem <command>debconf-get-selections</command> (z balíku
-<classname>debconf-utils</classname>) uložit databáze debconfu
-a cdebconfu (<filename>/var/log/debian-installer/cdebconf</filename>)
-do jediného souboru:
-
-<informalexample><screen>
-<prompt>$</prompt> <userinput>debconf-get-selections --installer &gt; <replaceable>soubor</replaceable></userinput>
-<prompt>$</prompt> <userinput>debconf-get-selections &gt;&gt; <replaceable>soubor</replaceable></userinput>
-</screen></informalexample>
-
-Takto vytvořený soubor však bude obsahovat položky, které by neměly
-být přednastaveny a ty mohou způsobit problémy. Soubor z dodatku
-<xref linkend="example-preseed"/> je pro většinu uživatelů lepší
-volba.
-
-</para><para condition="sarge">
-
-Předkonfigurační soubor pak můžete upravit dle potřeb a nahrát na
-webový server nebo umístit na zaváděcí média &d-i;u.  V obou případech
-však budete muset sdělit instalačnímu programu, kde má soubor hledat.
-
-</para><para condition="sarge">
-
-Aby se předkonfigurační soubor stáhl ze sítě, přidejte k zaváděcím
-parametrům
-<userinput>preseed/url=http://url/k/preseed.cfg</userinput>.  Je
-zřejmé, že předkonfigurace začne fungovat až poté, co zprovozníte
-síť. Z tohoto pohledu je dobré, když můžete nastavit síť přes DHCP bez
-zbytečných otázek. Chcete-li potlačit otázky během konfigurace sítě,
-nastavte prioritu otázek na kritickou. Viz <xref
-linkend="installer-args"/>.
-
-</para><para condition="sarge">
-
-Při umístění předkonfiguračního souboru na CD budete muset vytvořit
-nový ISO obraz CD. Podrobnosti naleznete v manuálové stránce
-<citerefentry> <refentrytitle>mkisofs</refentrytitle>
-<manvolnum>8</manvolnum> </citerefentry>. Volitelně můžete soubor
-umístit na disketu a použít
-<userinput>preseed/file=/floppy/preseed.cfg</userinput>.
-
-</para><para arch="i386" condition="sarge">
-
-Jestliže zavádíte z USB klíčenky, jednoduše nakopírujte
-předkonfigurační soubor na její souborový systém a upravte soubor
-<filename>syslinux.cfg</filename>, aby k zaváděcím parametrům jádra
-přidal <userinput>preseed/file=/hd-media/preseed.cfg</userinput>.
 
 </para>
   </sect2>

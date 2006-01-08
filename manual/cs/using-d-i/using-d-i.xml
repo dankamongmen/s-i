@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 28997 -->
+<!-- original version: 33819 -->
 
  <chapter id="d-i-intro">
  <title>Používáme instalační program Debianu</title>
@@ -80,22 +80,22 @@ soubory (viz dále) prohlížet ve druhé (nebo i třetí) ssh seanci.
 
 </para><para>
 
-Chybové hlášky jsou přesměrovány na třetí konzolu (známou jako
-<userinput>tty3</userinput>). Do této konzoly se můžete přepnout
+Chybové hlášky jsou přesměrovány na čtvrtou konzolu (známou jako
+<userinput>tty4</userinput>). Do této konzoly se můžete přepnout
 klávesami
-<keycombo><keycap>Levý Alt</keycap><keycap>F3</keycap></keycombo>
+<keycombo><keycap>Levý Alt</keycap><keycap>F4</keycap></keycombo>
 (držte levou klávesu <keycap>Alt</keycap> a stiskněte funkční klávesu
-<keycap>F3</keycap>). Zpět do instalačního programu se vrátíte stiskem
+<keycap>F4</keycap>). Zpět do instalačního programu se vrátíte stiskem
 <keycombo><keycap>Levý Alt</keycap><keycap>F1</keycap></keycombo>.
 
 </para><para>
 
 Hlášky ze třetí konzoly se také ukládají do souboru
-<filename>/var/log/messages</filename>. Po instalaci jej naleznete
+<filename>/var/log/syslog</filename>. Po instalaci jej naleznete
 v novém systému pod jménem
-<filename>/var/log/debian-installer/messages</filename>.  Další hlášky
+<filename>/var/log/installer/syslog</filename>.  Další hlášky
 instalace můžete najít v adresáři <filename>/var/log/</filename>, nebo
-po instalaci ve <filename>/var/log/debian-installer/</filename>.
+po instalaci ve <filename>/var/log/installer/</filename>.
 
 </para>
  </sect1>
@@ -129,26 +129,7 @@ Zpět do menu se můžete dostat opakovaným stiskem tlačítka
 
 </para></listitem>
 </varlistentry>
-<varlistentry condition="sarge">
-
-<term>languagechooser</term><listitem><para>
-
-Zobrazí seznam jazyků a jejich variant. Instalační program bude
-zobrazovat zprávy ve vybraném jazyce. (Ovšem za předpokladu že je
-překlad kompletní. Pokud není, některé texty se zobrazí anglicky.)
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="sarge">
-
-<term>countrychooser</term><listitem><para>
-
-Zobrazí seznam států, ze kterého si můžete vybrat zemi, ve které se
-nacházíte.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="etch">
+<varlistentry>
 
 <term>localechooser</term><listitem><para>
 
@@ -300,10 +281,53 @@ deskách.
 </varlistentry>
 <varlistentry>
 
+<term>tzsetup</term><listitem><para>
+
+Podle dříve zvolené kombinace jazyk/země nastaví časové pásmo.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>clock-setup</term><listitem><para>
+
+Určí, zda jsou hodiny nastaveny na univerzální koordinovaný čas.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>user-setup</term><listitem><para>
+
+Nastaví heslo uživatele root a vytvoří neprivilegovaného uživatele pro
+běžnou práci.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
 <term>base-installer</term><listitem><para>
 
 Nainstaluje základní množinu balíků, které jsou potřeba pro
 samostatný běh Debianu.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>apt-setup</term><listitem><para>
+
+Nastaví apt, což se většinou děje automaticky na základě média, ze
+kterého je spuštěn instalační systém.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>pkgsel</term><listitem><para>
+
+Umožní vybrat a nainstalovat dodatečný software pomocí nástroje
+<classname>tasksel</classname>.
 
 </para></listitem>
 </varlistentry>
@@ -323,19 +347,10 @@ vybrat, který operační systém chcete zavést.
 
 <term>bootloader-installer</term><listitem><para>
 
-Nainstaluje zavaděč na disk. Tento krok je důležitý, protože bez něj
-byste museli Debian zavádět z diskety nebo CD-ROM. Mnoho zavaděčů vám
-při startu nabídne možnost zavést i jiné operační systémy.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>base-config</term><listitem><para>
-
-Provede vás prvotním přizpůsobením nového systému. Obvykle se
-spouští až po restartu počítače a bývá to <quote>první skutečný
-úkol</quote> nového systému.
+Nainstaluje na disk některý z dostupných zavaděčů. Tento krok je
+důležitý, protože bez něj byste museli Debian zavádět z diskety nebo
+CD-ROM. Mnoho zavaděčů vám při startu nabídne možnost zavést i jiné
+operační systémy.
 
 </para></listitem>
 </varlistentry>
@@ -349,12 +364,10 @@ Umožní vám spustit shell (buď z menu, nebo na druhé konzoli).
 </varlistentry>
 <varlistentry>
 
-<term condition="sarge">bugreporter</term><term condition="etch">save-logs</term>
-<listitem><para>
+<term>save-logs</term><listitem><para>
 
-Umí na disketu<phrase condition="etch">, síť, pevný disk nebo jiné
-médium</phrase> uložit informace, které se vám mohou hodit při
-analyzování případného problému.
+Umí na disketu, síť, pevný disk nebo jiné médium uložit informace,
+které se vám mohou hodit při analyzování případného problému.
 
 </para></listitem>
 </varlistentry>
