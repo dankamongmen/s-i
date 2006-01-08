@@ -1,35 +1,70 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 30377 untranslated -->
+<!-- original version: 33725 untranslated -->
 
 
    <sect3 id="mdcfg">
-   <title>Configuring Multidisk Device (Software RAID)</title>
+   <!-- <title>Configuring Multidisk Device (Software RAID)</title> -->
+   <title>Configurazione di device multidisk (RAID software)</title>
 <para>
 
-If you have more than one harddrive<footnote><para>
+<!--
+If you have more than one harddrive<footnote>
+-->
 
+Se nel proprio sistema ci sono più dischi fissi<footnote>
+
+<para>
+
+<!--
 To be honest, you can construct MD device even from partitions
 residing on single physical drive, but that won't bring you anything
 useful.
+-->
 
-</para></footnote> in your computer, you can use
+In verità si può creare un device MD anche usando delle partizioni che
+risiedono sullo stesso disco ma in questo modo non si ottiene nulla di
+utile.
+
+</para>
+
+<!--
+</footnote> in your computer, you can use
 <command>mdcfg</command> to setup your drives for increased
 performance and/or better reliability of your data. The result is
 called <firstterm>Multidisk Device</firstterm> (or after its most
 famous variant <firstterm>software RAID</firstterm>).
+-->
+
+</footnote> si può usare <command>mdcfg</command> per configurare i
+dischi in modo da incrementare le prestazioni e/o migliorare l'affidabilità
+dei dati. Il risultato è un <firstterm>Multidisk Device</firstterm> (o
+almeno la sua variante più famosa, il <firstterm>RAID software</firstterm>).
 
 </para><para>
 
+<!--
 MD is basically a bunch of partitions located on different disks and
 combined together to form a <emphasis>logical</emphasis> device. This
 device can then be used like an ordinary partition (i.e. in
 <command>partman</command> you can format it, assign a mountpoint,
 etc.).
+-->
+
+Un MD è un insieme di partizioni localizzate su dischi differenti e combinate
+insieme per formare un dispositivo <emphasis>logico</emphasis>. Questo device
+può quindi essere usato come una normale partizione (cioè lo si può
+partizionare con <command>partman</command>, si può assegnargli un mount
+point, ecc.).
 
 </para><para>
 
+<!--
 The benefit you gain depends on a type of a MD device you are
 creating. Currently supported are:
+-->
+
+I benefici che è possibile ricavare dipendono dal tipo di dispositivo MD
+che si intende creare. Attualmente quelli supportati sono:
 
 <variablelist>
 <varlistentry>
@@ -46,7 +81,11 @@ failed disk).
 
 </para><para>
 
+<!--
 The typical use for RAID0 is a partition for video editing.
+-->
+
+Un uso tipico di RAID0 è una partizione per l'editing video.
 
 </para></listitem>
 </varlistentry>
@@ -66,8 +105,13 @@ server, that tends to be loaded with more disk reads than writes.
 
 </para><para>
 
+<!--
 Optionally you can have a spare disk in the array which will take the
 place of the failed disk in the case of failure.
+-->
+
+Nell'array è possibile inserire anche un disco di scorta che in caso di
+rottura di uno degli altri dischi lo rimpiazza.
 
 </para></listitem>
 </varlistentry>
@@ -89,26 +133,37 @@ which will take the place of the failed disk in the case of failure.
 
 </para><para>
 
+<!--
 As you can see, RAID5 has similar degree of reliability like RAID1
 while achieving less redundancy. On the other hand it might be a bit
 slower on write operation than RAID0 due to computation of parity
 information.
+-->
+
+Come si può notare il RAID5 ha un grado di affidabilità simile al RAID1 con
+minor richiesta di ridondanza. D'altra parte le operazioni di scrittura
+possono essere un po' più lente rispetto al RAID0 a causa del calcolo delle
+informazioni di parità.
 
 </para></listitem>
 </varlistentry>
 </variablelist>
 
+<!--
 To sum it up:
+-->
+
+Riassumendo:
 
 <informaltable>
 <tgroup cols="5">
 <thead>
 <row>
-  <entry>Type</entry>
-  <entry>Minimum Devices</entry>
-  <entry>Spare Device</entry>
-  <entry>Survives disk failure?</entry>
-  <entry>Available Space</entry>
+  <entry><!-- Type -->Tipo</entry>
+  <entry><!-- Minimum Devices -->Numero minimo di device</entry>
+  <entry><!-- Spare Device -->Device di scorta</entry>
+  <entry><!-- Survives disk failure? -->Resiste a rotture del disco?</entry>
+  <entry><!-- Available Space -->Spazio disponibile</entry>
 </row>
 </thead>
 
@@ -118,25 +173,41 @@ To sum it up:
   <entry>2</entry>
   <entry>no</entry>
   <entry>no</entry>
-  <entry>Size of the smallest partition multiplied by number of devices in RAID</entry>
+  <entry>
+  <!--
+    Size of the smallest partition multiplied by number of devices
+    in RAID
+  -->
+    La dimensione della partizione più piccola moltiplicata per il numero
+    di device in RAID.
+  </entry>
 </row>
 
 <row>
   <entry>RAID1</entry>
   <entry>2</entry>
   <entry>optional</entry>
-  <entry>yes</entry>
-  <entry>Size of the smallest partition in RAID</entry>
+  <entry><!-- yes -->sì</entry>
+  <entry>
+  <!--
+    Size of the smallest partition in RAID
+  -->
+    La dimensione della partizione più piccola in RAID
+  </entry>
 </row>
 
 <row>
   <entry>RAID5</entry>
   <entry>3</entry>
   <entry>optional</entry>
-  <entry>yes</entry>
+  <entry><!-- yes -->sì</entry>
   <entry>
+  <!-- 
     Size of the smallest partition multiplied by (number of devices in
     RAID minus one)
+  -->
+    La dimensione della partizione più piccola moltiplicata per il numero
+    di device in RAID meno 1.
   </entry>
 </row>
 
@@ -144,16 +215,14 @@ To sum it up:
 
 </para><para>
 
+<!--
 If you want to know the whole truth about Software RAID, have a look
 at <ulink url="&url-software-raid-howto;">Software RAID HOWTO</ulink>.
+-->
 
-<note arch="powerpc" condition="sarge"><para>
-
-There is no widely accepted standard to identify partitions containing
-RAID data on Apple Power Macintosh hardware. This means that &d-i;
-currently does not support setting up RAID on this platform.
-
-</para></note>
+Se si desidera conoscere tutto ciò che c'è da sapere sul RAID software
+si consulti il <ulink url="&url-software-raid-howto;">Software RAID
+HOWTO</ulink>.
 
 </para><para>
 
@@ -205,27 +274,50 @@ continue until you correct the issue.
 </para></listitem>
 <listitem><para>
 
+<!--
 RAID5 has similar setup procedure as RAID1 with the exception that you
 need to use at least <emphasis>three</emphasis> active partitions.
+-->
+
+La procedura di configurazione di RAID5 è simile a quella per RAID1 con una
+eccezione, è necessario usare almeno <emphasis>tre</emphasis> partizioni
+attive.
 
 </para></listitem>
 </itemizedlist>
 
 <para>
 
+<!--
 It is perfectly possible to have several types of MD at once. For
 example if you have three 200 GB hard drives dedicated to MD, each
 containing two 100 GB partitions, you can combine first partitions on
 all three disk into the RAID0 (fast 300 GB video editing partition)
 and use the other three partitions (2 active and 1 spare) for RAID1
 (quite reliable 100 GB partition for <filename>/home</filename>).
+-->
+
+È possibile avere diversi tipi di MD contemporaneamente. Per esempio se
+si dedicano al MD 3 hard disk da 200&nbsp;GB, ciascun disco con due
+partizioni da 100&nbsp;GB, si possono combinare le prime partizioni di
+tutti e tre i dischi in un RAID0 (partizione veloce da 300&nbsp;GB per
+l'editing video) e usare le altre tre partizioni (2 attive e 1 di scorta)
+in RAID1 (come partizione da 100&nbsp;GB più affidabile per la
+<filename>/home</filename>).
 
 </para><para>
 
+<!--
 After you setup MD devices to your liking, you can
 <guimenuitem>Finish</guimenuitem> <command>mdcfg</command> to return
 back to the <command>partman</command> to create filesystems on your
 new MD devices and assign them the usual attributes like mountpoints.
+-->
+
+Dopo aver preparato i device MD a proprio piacimento si può
+<guimenuitem>Terminare</guimenuitem> <command>mdcfg</command> e tornare a
+<command>partman</command> per creare i filesystem sui nuovi device MD e
+per assegnare i normali attributi, per esempio il mount point.
 
 </para>
    </sect3>

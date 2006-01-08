@@ -1,0 +1,269 @@
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 33814 untranslated -->
+
+
+   <sect3 id="pkgsel">
+   <!-- <title>Selecting and Installing Software</title> -->
+   <title>Selezione e installazione dei pacchetti</title>
+
+<para>
+
+During the installation process, you are given the opportunity to select
+additional software to install. Rather than picking individual software
+packages from the &num-of-distrib-pkgs; available packages, this stage of
+the installation process focuses on selecting and installing predefined
+collections of software to quickly set up your computer to perform various
+tasks.
+
+</para><para>
+
+<!--
+So, you have the ability to choose <emphasis>tasks</emphasis> first,
+and then add on more individual packages later.  These tasks loosely
+represent a number of different jobs or things you want to do with
+your computer, such as <quote>Desktop environment</quote>,
+<quote>Web server</quote>, or <quote>Print server</quote><footnote>
+-->
+
+Così si avrà la possibilità di scegliere delle
+<emphasis>funzionalità</emphasis> prima, e poi aggiungervi in seguito più
+pacchetti singoli. Queste funzionalità rappresentano con semplicità molti
+diversi lavori o cose che si intendano fare con il computer, come
+<quote>l'ambiente desktop</quote>, <quote>il server web</quote>, o
+<quote>il server di stampa</quote><footnote>
+
+<para>
+
+<!--
+You should know that to present this list, the installer is merely
+invoking the <command>tasksel</command> program. It can be
+run at any time after installation to install (or remove) more
+packages, or you can use a more fine-grained tool such as <command>aptitude</command>.
+If you are looking for a specific single package, after
+installation is complete, simply run <userinput>aptitude install
+<replaceable>package</replaceable></userinput>, where
+<replaceable>package</replaceable> is the name of the package you are
+looking for.
+-->
+
+Si deve sapere che nel visualizzare quest'elenco,
+<command>base-config</command> sta soltanto richiamando il programma
+<command>tasksel</command>. Per la selezione manuale dei pacchetti verrà
+eseguito il programma <command>aptitude</command>. Entrambi possono
+essere avviati in qualunque momento dopo l'installazione per aggiungere
+(o togliere) più pacchetti.
+Se si cerca un singolo pacchetto specifico, dopo che l'installazione è
+stata compiuta, semplicemente si deve avviare <userinput>aptitude install
+<replaceable>pacchetto</replaceable></userinput>, dove
+<replaceable>pacchetto</replaceable> è il nome del pacchetto che si sta
+cercando.
+
+</para>
+
+<!--
+</footnote>. <xref linkend="tasksel-size-list"/> lists the space
+requirements for the available tasks.
+-->
+
+</footnote>. <xref linkend="tasksel-size-list"/> mostra lo spazio
+necessario per ogni funzionalità disponibile.
+
+</para><para>
+
+<!--
+Once you've selected your tasks, select
+<guibutton>Ok</guibutton>. At this point,
+<command>aptitude</command> will install the packages you've
+selected.
+-->
+
+Dopo avere selezionato il tipo di programmi che si desidera installare,
+si prema <guibutton>Ok</guibutton>. Adesso <command>aptitude</command>
+installerà i pacchetti selezionati.
+
+<note><para>
+
+In the standard user interface of the installer, you can use the space bar
+to toggle selection of a task.
+
+</para></note>
+
+<note><para>
+
+Note that some tasks may be pre-selected based on the characteristics of the
+computer you are installing. If you disagree with these selections you can
+un-select the tasks. You can even opt to install no tasks at all at this point.
+
+</para></note>
+
+</para><para>
+
+Each package you selected with <command>tasksel</command> is downloaded,
+unpacked and then installed in turn by the <command>apt-get</command> and
+<command>dpkg</command> programs. If a particular program needs more
+information from the user, it will prompt you during this process.
+
+
+</para>
+
+    <sect4 id="config-mta">
+    <!-- <title>Configuring Your Mail Transport Agent</title> -->
+    <title>Configurazione del MTA (Mail Transport Agent)</title>
+
+<para>
+
+<!--
+Today, email is a very important part of many people's life, so it's
+no surprise Debian lets you configure your mail system right as a part
+of the installation process. The standard mail transport agent in
+Debian is <command>exim4</command>, which is relatively small,
+flexible, and easy to learn.
+-->
+
+Oggi l'email è una parte molto importante nella vita di molti, così non è
+sorprendente che Debian consenta di configurare correttamente il sistema
+di posta quale parte del processo di installazione. L'agente di trasporto
+della posta (MTA) standard in Debian è <command>exim4</command>,
+relativamente leggero, flessibile e semplice da apprendere.
+
+</para><para>
+
+<!--
+You may ask if this is needed even if your computer is not connected
+to any network. The short answer is: Yes. The longer explanation: Some
+system utilities (like <command>cron</command>,
+<command>quota</command>, <command>aide</command>, &hellip;) may send
+you important notices via email.
+-->
+
+Ci si potrebbe chiedere se ciò sia necessario anche quando il computer non
+è connesso ad alcuna rete. La risposta stringata è: sì. La spiegazione più
+dettagliata: alcune utilità del sistema (come <command>cron</command>,
+<command>quota</command>, <command>aide</command>, &hellip;) possono
+inviare informazioni importanti via email.
+
+</para><para>
+
+<!--
+So on the first screen you will be presented with several common mail
+scenarios. Choose the one that most closely resembles your needs:
+-->
+
+Così nella prima schermata vengono mostrati diversi scenari di posta comuni.
+Dovrà esserne selezionato uno corrispondente alle proprie necessità:
+
+</para>
+
+<variablelist>
+<varlistentry>
+<!-- <term>internet site</term> -->
+<term>sito internet</term>
+<listitem><para>
+
+<!--
+Your system is connected to a network and your mail is sent and
+received directly using SMTP. On the following screens you will be
+asked a few basic questions, like your machine's mail name, or a list of
+domains for which you accept or relay mail.
+-->
+
+Il sistema è connesso ad una rete e la posta viene spedita e ricevuta
+direttamente mediante SMTP. Nelle schermate successive verranno poste
+alcune domande fondamentali, quali il nome di posta della macchina o
+un elenco di domini dai quali possa essere accettata od inoltrata la
+posta.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<!-- <term>mail sent by smarthost</term> -->
+<term>posta inviata tramite uno smarthost</term>
+<listitem><para>
+
+<!--
+In this scenario is your outgoing mail forwarded to another machine,
+called a <quote>smarthost</quote>, which does the actual job for
+you. Smarthost also usually stores incoming mail addressed to your
+computer, so you don't need to be permanently online. That also means
+you have to download your mail from the smarthost via programs like
+fetchmail. This option is suitable for dial-up users.
+-->
+
+In questo scenario la posta in uscita viene inoltrata ad un'altra macchina
+chiamata <quote>smarthost</quote>, che esegue tale compito. Uno smarthost
+di solito conserva la posta in arrivo indirizzata al computer destinatario,
+pertanto questo non dovrà essere permanentemente connesso alla rete. Ciò
+significa che bisognerà scaricare la posta dallo smarthost tramite programmi
+come fetchmail. Questa opzione è conveniente per gli utenti dial-up.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<!-- <term>local delivery only</term> -->
+<term>solo consegna di posta locale</term>
+<listitem><para>
+
+<!--
+Your system is not on a network and mail is sent or received only
+between local users. Even if you don't plan to send any messages, this
+option is highly recommended, because some system utilities may send
+you various alerts from time to time (e.g. beloved <quote>Disk quota
+exceeded</quote>). This option is also convenient for new users,
+because it doesn't ask any further questions.
+-->
+
+Il computer non è connesso ad una rete e la posta viene spedita e
+ricevuta solo tra gli utenti locali. Anche se non si pensa di dover
+spedire alcun messaggio questa opzione è caldamente raccomandata, perché
+alcune utilità di sistema possono dover inviare di volta in volta degli
+avvertimenti (esempio preferito <quote>Disk quota exceeded</quote>).
+Questa opzione è conveniente anche per i nuovi utenti, poiché non pone
+altre domande.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<!-- <term>no configuration at this time</term> -->
+<term>per adesso nessuna configurazione</term>
+<listitem><para>
+
+<!--
+Choose this if you are absolutely convinced you know what you are
+doing. This will leave you with an unconfigured mail system &mdash;
+until you configure it, you won't be able to send or receive any mail
+and you may miss some important messages from your system utilities.
+-->
+
+Questa opzione può venire selezionata se si è assolutamente sicuri di ciò
+che si sta facendo. Essa lascerà il sistema di posta non configurato,
+fino a quando non lo verrà non si potrà spedire o ricevere alcun messaggio
+e potrebbero andare perse delle segnalazioni importanti da parte delle
+utilità di sistema.
+
+</para></listitem>
+</varlistentry>
+</variablelist>
+
+<para>
+
+<!--
+If none of these scenarios suits your needs, or if you need a finer
+setup, you will need to edit configuration files under the
+<filename>/etc/exim4</filename> directory after the installation is
+complete. More information about <command>exim4</command> may be found
+under <filename>/usr/share/doc/exim4</filename>.
+-->
+
+Se nessuno di questi scenari rispecchiasse le proprie necessità, o servisse
+una configurazione maggiormente accurata, sarà necessario modificare i file
+di configurazione posti nella directory <filename>/etc/exim4</filename>
+dopo il completamento dell'installazione. Più informazioni circa
+<command>exim4</command> sono reperibili in
+<filename>/usr/share/doc/exim4</filename>.
+
+</para>
+    </sect4>
+   </sect3>

@@ -1,5 +1,5 @@
-﻿<!-- retain these comments for translator revision tracking -->
-<!-- original version: 32512 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 33825 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -12,7 +12,7 @@ attribute is in force that does not match the specified release or if an
 Currently only a single variant of the example file is generated (for i386).
 -->
 
-<appendix id="appendix-preseed" condition="etch">
+<appendix id="appendix-preseed">
 <!-- <title>Automating the installation using preseeding</title> -->
 <title>Installazione automatica tramite preconfigurazione</title>
 
@@ -45,10 +45,11 @@ file di preconfigurazione di esempio &urlset-example-preseed;.
 <para>
 
 <!--
-Preseeding provides a way to set answers to questions without having to manually
-enter the answers while the installation is running. This makes it possible to
-fully automate most types of installation and even offers some features not
-available during normal installations.
+Preseeding provides a way to set answers to questions asked during the
+installation process, without having to manually enter the answers while
+the installation is running. This makes it possible to fully automate most
+types of installation and even offers some features not available during
+normal installations.
 -->
 
 La preconfigurazione offre un modo per impostare le risposte alle domande
@@ -56,18 +57,6 @@ poste durante l'installazione senza doverle inserire manualmente. Questo
 permette di automatizzare completamente la maggior parte dei tipi
 d'installazione e offre persino alcune funzionalità che non sono disponibili
 durante l'installazione tradizionale.
-
-</para><para>
-
-<!--
-Using preseeding it is possible to fill in answers to questions asked during
-both the first stage of the installation (before the reboot into the new
-system) and the second stage.
--->
-
-Si può usare la preconfigurazione per dare le risposte alle domande poste
-durante la prima fase dell'installazione (cioè prima del riavvio nel
-nuovo sistema) e durante la seconda.
 
 </para>
 
@@ -318,24 +307,11 @@ in determinati momenti dell'installazione. Si consulti
 </para></listitem>
 <listitem><para>
   <!-- <userinput>preseed/late_command</userinput>: is run just before the reboot
-  at the end of the first stage of the installation, but before the
-  <filename>/target</filename> filesystem has been unmounted -->
+  at the end of the install, but before the <filename>/target</filename>
+  filesystem has been unmounted -->
   <userinput>preseed/late_command</userinput>: è eseguito appena prima il
-  riavvio al termine della prima fase dell'installazione ma prima che sia
+  riavvio al termine dell'installazione ma prima che sia
   smontato il file system su <filename>/target</filename>
-</para></listitem>
-<listitem><para>
-  <!-- <userinput>base-config/early_command</userinput>: is run early in the second
-  stage of the installation when <command>base-config</command> is starting up -->
-  <userinput>base-config/early_command</userinput>: è eseguito all'inizio
-  della seconda fase dell'installazione, non appena
-  <command>base-config</command> si sta avviando.
-</para></listitem>
-<listitem><para>
-  <!-- <userinput>base-config/late_command</userinput>: is run at the end of
-  <command>base-config</command>, just before the login prompt -->
-  <userinput>base-config/late_command</userinput>: è eseguito dopo che
-  <command>base-config</command> è terminato, appena prima del prompt di login
 </para></listitem>
 </itemizedlist>
 
@@ -360,13 +336,13 @@ dopo aver impostato il valore per un modello.
 
 </para>
 
-<informalexample><screen>
 <!--
-d-i foo/bar string value
+<informalexample><screen>
+d-i foo/bar string value 
 -->
+<informalexample><screen>
 d-i foo/bar string valore
 d-i foo/bar seen false
-
 </screen></informalexample>
 
   </sect2>
@@ -478,23 +454,22 @@ non userà quel file.
 
 </para>
 
-<informalexample><screen>
 <!--
+<informalexample><screen>
 Boot parameters to specify:
 - if you're netbooting:
 -->
+<informalexample><screen>
 Parametri d'avvio da specificare:
 - con avvio da rete:
   preseed/url=http://host/path/to/preseed.cfg
   preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
-
 <!--
 - if you're booting a remastered CD:
 -->
 - con avvio da un CD masterizzato:
   preseed/file=/cdrom/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
-
 <!--
 - if you're installing from USB media (put the preseed file in the
   toplevel directory of the USB stick):
@@ -503,7 +478,6 @@ Parametri d'avvio da specificare:
   nella directory principale della penna USB):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
-
 </screen></informalexample>
 
 <para>
@@ -668,9 +642,9 @@ prima di effettuare un'installazione si può usare il comando
 </para>
  </sect1>
 
- <sect1 id="preseed-stage1">
- <!-- <title>Preseeding the first stage of the installation</title> -->
- <title>Preconfigurazione della prima fase dell'installazione</title>
+ <sect1 id="preseed-contents">
+ <!-- <title>Contents of the preseed file</title> -->
+ <title>Contenuto del file di preconfigurazione</title>
 <para>
 
 <!--
@@ -1115,13 +1089,13 @@ d-i time/zone string US/Eastern
 <!--
 Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
 options is fully automated based on your installation method and answers to
-earlier questions. Only the two variables below are relevant for preseeding.
+earlier questions. Only the three variables below are relevant for preseeding.
 -->
 
 L'impostazione di <filename>/etc/apt/sources.list</filename> e la
 configurazione delle opzioni di base è completamente automatizzata in base
 la metodo d'installazione e alle risposte date in precedenza. Per la
-preconfigurazione sono rilevanti solo le prossime due variabili.
+preconfigurazione sono rilevanti solo le prossime tre variabili.
 
 </para>
 
@@ -1132,6 +1106,13 @@ preconfigurazione sono rilevanti solo le prossime due variabili.
 # È possibile scegliere di installare software non-free e contrib.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+<!--
+# To avoid adding security sources, or to use a different server
+# than security.debian.org.
+-->
+# Per evitare l'inserimento delle sorgenti per la sicurezza oppure per
+# usare un server diverso da security.debian.org.
+#d-i apt-setup/security_host string 
 </screen></informalexample>
 
   </sect2>
@@ -1243,6 +1224,32 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 </para>
   </sect2>
 
+  <sect2 id="preseed-base-installer">
+  <!-- <title>Base system installation</title> -->
+  <title>Installazione del sistema di base</title>
+
+<para>
+
+<!--
+There is actually not very much that can be preseeded for this stage of the
+installation. The only questions asked concern the installation of the kernel.
+-->
+
+Al momento non ci sono molte cose da preconfigurare in questo passo
+dell'installazione. Le uniche domande riguardano l'installazione del kernel.
+
+</para>
+
+<informalexample role="example"><screen>
+<!--
+# Select the initramfs generator used to generate the initrd for 2.6 kernels.
+-->
+# Seleziona il programma per la creazione dell'initrd per i kernel 2.6.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-bootloader">
   <!-- <title>Boot loader installation</title> -->
   <title>Installazione del boot loader</title>
@@ -1287,73 +1294,7 @@ d-i grub-installer/with_other_os boolean true
 
   </sect2>
 
-  <sect2 id="preseed-finish">
-  <!-- <title>Finishing up the first stage install</title> -->
-  <title>Termine della prima fase dell'installazione</title>
-
-<informalexample role="example"><screen>
-<!--
-# Avoid that last message about the install being complete.
--->
-# Evita l'ultimo messaggio riguardo il completamento dell'installazione.
-d-i prebaseconfig/reboot_in_progress note
-
-<!--
-# This will prevent the installer from ejecting the CD during the reboot,
-# which is useful in some situations.
--->
-# Impedisce che il programma d'installazione espelli il CD prima del riavvio,
-# in alcuni casi può essere utile.
-#d-i cdrom-detect/eject boolean false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
- <sect1 id="preseed-stage2">
- <!-- <title>Preseeding the second stage of the installation</title> -->
- <title>Preconfigurazione della seconda fase dell'installazione</title>
-
-  <sect2 id="preseed-baseconfig">
-  <!-- <title>Base config</title> -->
-  <title>Configurazione di base</title>
-
-<informalexample role="example"><screen>
-<!--
-# Avoid the introductory message.
--->
-# Evita il messaggio di introduzione.
-base-config base-config/intro note
-
-<!--
-# Avoid the final message.
--->
-# Evita il messaggio finale.
-base-config base-config/login note
-
-<!--
-# If you installed a display manager, but don't want to start it immediately
-# after base-config finishes.
--->
-# Se si è installato un gestore di visualizzazione ma non si vuole avviarlo
-# immediatamente dopo il termine di base-config.
-#base-config base-config/start-display-manager boolean false
-
-<!--
-# Some versions of the installer can report back on what you've installed.
-# The default is not to report back, but sending reports helps the project
-# determine what software is most popular and include it on CDs.
--->
-# Alcune versioni dell'installatore possono trasmettere un report di ciò che
-# si è installato. L'impostazione predefinita è di non inviare report, ma
-# l'invio dei report aiuta il progetto nel determinare quale software è più
-# popolare per includerlo nei CD.
-#popularity-contest popularity-contest/participate boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-tasksel">
+  <sect2 id="preseed-pkgsel">
   <!-- <title>Package selection</title> -->
   <title>Selezione dei pacchetti</title>
 <para>
@@ -1396,22 +1337,18 @@ siano disponibili. I task attualmente disponibili includono:
 <listitem><para>
   <userinput>Laptop (computer portatile)</userinput>
 </para></listitem>
-<listitem><para>
-  <userinput>manual package selection (selezione manuale dei pacchetti)</userinput>
-</para></listitem>
 </itemizedlist>
 
 <para>
 
 <!--
-The last of these will run aptitude. You can also choose to install no tasks,
-and force the installation of a set of packages in some other way. We recommend
-always including the <userinput>Standard system</userinput> task.
+You can also choose to install no tasks, and force the installation of a
+set of packages in some other way. We recommend always including the
+<userinput>Standard system</userinput> task.
 -->
 
-L'ultimo di questi eseguirà aptitude. Si può anche
-scegliere di non installare alcun task e forzare l'installazione di un
-insieme di pacchetti in qualche altro modo. Raccomandiamo di includere
+Si può anche scegliere di non installare alcun task e forzare l'installazione
+di un insieme di pacchetti in qualche altro modo. Raccomandiamo di includere
 sempre il task <userinput>Sistema standard</userinput>.
 
 </para>
@@ -1419,6 +1356,40 @@ sempre il task <userinput>Sistema standard</userinput>.
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
+
+<!--
+# Some versions of the installer can report back on what software you have
+# installed, and what software you use. The default is not to report back,
+# but sending reports helps the project determine what software is most
+# popular and include it on CDs.
+-->
+# Alcune versioni dell'installatore possono inviare un resoconto di quali
+# programmi sono stati installati e quali sono usati. Questo resoconto, la
+# cui ricezione aiuta il progetto a determinare quali sono i programmi più
+# popolari per inserirli nei CD, normalmente non viene inviato.
+#popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-finish">
+  <!-- <title>Finishing up the first stage install</title> -->
+  <title>Termine della prima fase dell'installazione</title>
+
+<informalexample role="example"><screen>
+<!--
+# Avoid that last message about the install being complete.
+-->
+# Evita l'ultimo messaggio riguardo il completamento dell'installazione.
+d-i prebaseconfig/reboot_in_progress note
+
+<!--
+# This will prevent the installer from ejecting the CD during the reboot,
+# which is useful in some situations.
+-->
+# Impedisce che il programma d'installazione espelli il CD prima del riavvio,
+# in alcuni casi può essere utile.
+#d-i cdrom-detect/eject boolean false
 </screen></informalexample>
 
   </sect2>
@@ -1577,29 +1548,16 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 
 <!--
 # This command is run just before the install finishes, but when there is
-# still a usable /target directory.
++# still a usable /target directory. You can chroot to /target and use it
++# directly, or use the apt-install and in-target commands to easily install
++# packages and run commands in the target system.
 -->
 # Questo comando è eseguito appena prima che l'installatore termini, ma
-# quando c'è ancora una directory /target usabile.
-#d-i preseed/late_command string echo foo > /target/etc/bar
-
-<!--
-# This command is run just as base-config is starting up.
-#base-config base-config/early_command string echo hi mom
--->
-# Questo comando è eseguito non appena base-config si sta avviando.
-#base-config base-config/early_command string echo ciao mamma
-
-<!--
-# This command is run after base-config is done, just before the login:
-# prompt. This is a good way to install a set of packages you want, or to
-# tweak the configuration of the system.
--->
-# Questo comando è eseguito dopo che base-config è terminato, appena prima
-# del prompt login:. Questo è un buon modo per installare un insieme di
-# pacchetti che si vuole o per mettere a punto la configurazione del sistema.
-#base-config base-config/late_command \
-#      string apt-get install zsh; chsh -s /bin/zsh
+# quando c'è ancora una directory /target usabile. È possibile fare un
+# chroot su /target e usarlo direttamente oppure usare i comandi apt-install
+# e in-target per installare dei pacchetti ed eseguire comandi nel file
+# system target.
+#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 </screen></informalexample>
 
   </sect2>
@@ -1625,20 +1583,20 @@ un file e di mettere alcune configurazioni particolari in altri file.
 
 </para>
 
-<informalexample><screen>
 <!--
+<informalexample><screen>
 # More that one file can be listed, separated by spaces; all will be
 # loaded. The included files can have preseed/include directives of their
 # own as well. Note that if the filenames are relative, they are taken from
 # the same directory as the preseed file that includes them.
 -->
+<informalexample><screen>
 # Si possono elencare più file separandoli con degli spazi; verranno caricati
 # tutti. Anche i file inclusi possono avere al loro interno delle direttive
 # preseed/include. Si noti che i nomi dei file sono relativi, sono prelevati
 # dalla stessa directory del file di preconfigurazione e sono processati
 # nell'ordine con cui sono inclusi.
 #d-i preseed/include string x.cfg
-
 <!--
 # The installer can optionally verify checksums of preseed files before
 # using them. Currently only md5sums are supported, list the md5sums
@@ -1648,7 +1606,6 @@ un file e di mettere alcune configurazioni particolari in altri file.
 # dei file prima di processarli. Attualmente sono supportati solo le checksum
 # md5sum che vanno elencate nello stesso ordine con cui sono inclusi i file.
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
-
 <!--
 # More flexibly, this runs a shell command and if it outputs the names of
 # preseed files, includes those files. 

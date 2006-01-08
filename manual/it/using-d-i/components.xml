@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 29895 -->
+<!-- original version: 33730 -->
 
  <sect1 id="module-details">
- <!--<title>Using Individual Components</title>-->
+ <!-- <title>Using Individual Components</title >-->
  <title>Usare i singoli componenti</title>
 <para>
 
@@ -16,7 +15,7 @@ for every installation; which modules are actually used depends on
 the installation method you use and on your hardware.
 -->
 
-In questa sezione si descriverà ogni componente dell'installatore in
+In questa sezione si descriverÃ  ogni componente dell'installatore in
 dettaglio. I componenti sono stati raggruppati in fasi che siano
 identificabili dagli utenti. Essi sono presentati nell'ordine in cui
 appaiono durante l'installazione; quali moduli siano davvero usati
@@ -25,7 +24,7 @@ dipende dal metodo di installazione usato e dall'hardware.
 </para>
 
   <sect2 id="di-setup">
-  <!--<title>Setting up Debian Installer and Hardware Configuration</title>-->
+  <!-- <title>Setting up Debian Installer and Hardware Configuration</title> -->
   <title>Impostazione dell'installatore Debian e configurazione dell'hardware</title>
 <para>
 
@@ -39,11 +38,11 @@ of its components and upgrade itself to a capable installation system.
 -->
 
 Supponiamo che l'installatore Debian si sia avviato e che ci si trovi
-davanti alla sua prima schermata. A questo punto, le funzionalità di
-&d-i; sono ancora pressoché limitate. Esso non conosce molto riguardo
+davanti alla sua prima schermata. A questo punto, le funzionalitÃ  di
+&d-i; sono ancora pressochÃ© limitate. Esso non conosce molto riguardo
 l'hardware, la lingua preferita o addirittura i compiti che dovrebbe
-eseguire. Non preoccupiamoci. Poiché &d-i; è abbastanza intelligente,
-esso può sondare automaticamente l'hardware, localizzare il resto dei
+eseguire. Non preoccupiamoci. PoichÃ© &d-i; Ã¨ abbastanza intelligente,
+esso puÃ² sondare automaticamente l'hardware, localizzare il resto dei
 suoi componenti e aggiornare se stesso ad un sistema di installazione
 capace.
 
@@ -53,8 +52,8 @@ determine automatically (like selecting your preferred language, keyboard
 layout or desired network mirror).
 -->
 
-Naturalmente, è ancora necessario aiutare &d-i; con qualche informazione
-che esso non può determinare automaticamente (come selezionare la lingua
+Naturalmente, Ã¨ ancora necessario aiutare &d-i; con qualche informazione
+che esso non puÃ² determinare automaticamente (come selezionare la lingua
 preferita, la mappa della tastiera o il mirror di rete preferito).
 
 </para><para>
@@ -67,19 +66,17 @@ network card). As not all drivers may be available during this first run,
 hardware detection needs to be repeated later in the process.
 -->
 
-Si noterà che &d-i; esegue <firstterm>il rilevamento
+Si noterÃ  che &d-i; esegue <firstterm>il rilevamento
 dell'hardware</firstterm> diverse volte durante questa fase. La prima
-volta è finalizzata specificamente all'hardware necessario a caricare i
+volta Ã¨ finalizzata specificamente all'hardware necessario a caricare i
 componenti dell'installatore (ad es. il CD-ROM o la scheda di rete).
-Poiché non tutti i driver possono essere disponibili durante questa
-prima esecuzione, è necessario ripetere il rilevamento dell'hardware
-più avanti, nel processo.
+PoichÃ© non tutti i driver possono essere disponibili durante questa
+prima esecuzione, Ã¨ necessario ripetere il rilevamento dell'hardware
+piÃ¹ avanti, nel processo.
 
 </para>
 
 &module-lowmem.xml;
-&module-languagechooser.xml;
-&module-countrychooser.xml;
 &module-localechooser.xml;
 &module-kbd-chooser.xml;
 &module-s390-netdevice.xml;
@@ -93,7 +90,7 @@ più avanti, nel processo.
   </sect2>
 
   <sect2 id="di-partition">
-  <!--<title>Partitioning and Mount Point Selection</title>-->
+  <!-- <title>Partitioning and Mount Point Selection</title> -->
   <title>Partizionamento e selezione del punto di mount</title>
 <para>
 
@@ -103,7 +100,7 @@ At this time, after hardware detection has been executed a final time,
 and ready to do some real work.
 -->
 
-A questo punto, dopo che il rilevamento dell'hardware è stato eseguito
+A questo punto, dopo che il rilevamento dell'hardware Ã¨ stato eseguito
 per l'ultima volta, &d-i; dovrebbe trovarsi alla sua massima potenza,
 personalizzato per le esigenze dell'utente e pronto a fare un po' di
 lavoro vero.
@@ -130,32 +127,82 @@ dispositivi LVM o RAID.
 &module-partconf.xml;
 &module-lvmcfg.xml;
 &module-mdcfg.xml;
+
+  </sect2>
+
+  <sect2 id="di-system-setup">
+  <!-- <title>Setting up the System</title> -->
+  <title>Configurazione del sistema</title>
+<para>
+ 
+<!--
+After partitioning the installer asks a few more questions that will be
+used to set up the system it is about to install.
+-->
+
+Dopo il partizionamento il programma pone qualche altra domanda necessaria
+per la configurazione del sistema che si sta installando.
+
+</para>
+
+&module-tzsetup.xml;
+&module-clock-setup.xml;
+&module-user-setup.xml;
+
   </sect2>
 
   <sect2 id="di-install-base">
-  <!--<title>Installing the Base System</title>-->
+  <!-- <title>Installing the Base System</title> -->
   <title>Installazione del sistema base</title>
 <para>
 
 <!--
-Although this stage is the least problematic, it consumes most time of
-the install because it downloads, verifies and unpacks the whole base
-system. If you have a slow computer or network connection, this could
+Although this stage is the least problematic, it consumes a significant
+fraction of the install because it downloads, verifies and unpacks the whole
+base system. If you have a slow computer or network connection, this could
 take some time.
 -->
 
-Nonostante questa fase sia la meno problematica, essa consuma la
-maggior parte del tempo di installazione perché scarica, verifica e
+Nonostante questa fase sia la meno problematica, richiede una parte
+significante del tempo di installazione perchÃ© scarica, verifica e
 scompatta l'intero sistema base. Se si possiede un computer lento o una
-connessione di rete lenta, ciò potrebbe richiedere un certo tempo.
+connessione di rete lenta, ciÃ² potrebbe richiedere un certo tempo.
 
 </para>
 
 &module-base-installer.xml;
+
+  </sect2>
+
+  <sect2 id="di-install-software">
+  <!-- <title>Installing Additional Software</title> -->
+  <title>Installazione di altri programmi</title>
+<para>
+ 
+<!--
+After the base system is installed, you have a usable but limited system.
+Most users will want to add additional software to the system to tune it to
+their needs, and the installer lets you do so. This step can take even
+longer than installing the base system if you have a slow computer or
+network.
+-->
+
+Dopo l'installazione del sistema di base Ã¨ disponibile un sistema usabile ma
+molto limitato. La maggior parte degli utenti vuole installare altri programmi
+per adattare il sistema alle proprie necessitÃ , e il programma d'installazione
+consente di farlo. Se si possiede un computer lento o una connessione di rete
+lenta, ciÃ² potrebbe richiedere molto piÃ¹ tempo rispetto aell'installazione del
+sistema di base.
+
+</para>
+
+&module-apt-setup.xml;
+&module-pkgsel.xml;
+
   </sect2>
 
   <sect2 id="di-make-bootable">
-  <!--<title>Making Your System Bootable</title>-->
+  <!-- <title>Making Your System Bootable</title> -->
   <title>Rendere avviabile il sistema</title>
 
 <para condition="supports-nfsroot">
@@ -169,8 +216,8 @@ linkend="boot-dev-select-sun"/>.</phrase>
 -->
 
 Se si sta installando un terminale di lavoro senza disco, ovviamente,
-avviare dal disco locale non è un'opzione significativa e questo passo
-sarà saltato. <phrase arch="sparc">Si potrebbe voler impostare OpenBoot
+avviare dal disco locale non Ã¨ un'opzione significativa e questo passo
+sarÃ  saltato. <phrase arch="sparc">Si potrebbe voler impostare OpenBoot
 per avviare da rete come impostazione predefinita; si veda <xref
 linkend="boot-dev-select-sun"/>.</phrase>
 
@@ -185,7 +232,7 @@ documentation for more information.
 -->
 
 Notare che l'avvio di sistemi operativi multipli su una singola macchina
-è ancora una sorta di magia nera. Questo documento non tenta di certo di
+Ã¨ ancora una sorta di magia nera. Questo documento non tenta di certo di
 documentare i vari gestori di avvio, che possono cambiare a seconda
 dell'architettura e persino della sottoarchitettura. Per ulteriori
 informazioni si dovrebbe vedere la documentazione del proprio gestore di
@@ -207,20 +254,21 @@ avvio.
 &module-s390-zipl-installer.xml;
 &module-sparc-silo-installer.xml;
 &module-nobootloader.xml;
+
   </sect2>
 
   <sect2 id="di-finish">
-  <!--<title>Finishing the First Stage</title>-->
-  <title>Completamento della prima fase</title>
+  <!-- <title>Finishing the Installation</title> -->
+  <title>Completamento dell'installazione</title>
 <para>
 
 <!--
-These are the last bits to do before rebooting to your new Debian. It
+These are the last bits to do before rebooting to your new system. It
 mostly consists of tidying up after the &d-i;.
 -->
 
-Sono le ultime piccole cose da fare prima di riavviare la nuova Debian.
-Consiste principalmente nel mettere in ordine dopo il &d-i;.
+Sono le ultime piccole cose da fare prima di riavviare il nuovo sistema.
+Consistono principalmente nel mettere in ordine dopo il &d-i;.
 
 </para>
 
@@ -228,7 +276,7 @@ Consiste principalmente nel mettere in ordine dopo il &d-i;.
   </sect2>
 
   <sect2 id="di-miscellaneous">
-  <!--<title>Miscellaneous</title>-->
+  <!-- <title>Miscellaneous</title> -->
   <title>Varie</title>
 <para>
 
@@ -249,6 +297,6 @@ aiutare l'utente nel caso che qualcosa vada storto.
 &module-shell.xml;
 &module-network-console.xml;
 &module-baseconfig.xml;
+
   </sect2>
  </sect1>
-
