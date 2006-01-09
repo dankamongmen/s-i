@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 32512 -->
+<!-- original version: 33890 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -21,7 +21,7 @@ Currently only a single variant of the example file is generated (for i386).
 (訳注 訳してしまうとサンプルファイルが動作するか分からないので、未訳のままにします)
 -->
 
-<appendix id="appendix-preseed" condition="etch">
+<appendix id="appendix-preseed">
 <!--
 <title>Automating the installation using preseeding</title>
 -->
@@ -55,25 +55,16 @@ example preseed file from &urlset-example-preseed;.
 <para>
 
 <!--
-Preseeding provides a way to set answers to questions without having to manually
-enter the answers while the installation is running. This makes it possible to
-fully automate most types of installation and even offers some features not
-available during normal installations.
+Preseeding provides a way to set answers to questions asked during the
+installation process, without having to manually enter the answers while
+the installation is running. This makes it possible to fully automate most
+types of installation and even offers some features not available during
+normal installations.
 -->
 preseed は、インストールの実行中に手動で回答を入力せずに、
-質問の答を設定する方法を提供します。
+インストールプロセス中の質問の答を設定する方法を提供します。
 これにより、ほとんどの方法のインストールを自動化し、
 さらに通常のインストールでは利用できない特徴もあります。
-
-</para><para>
-
-<!--
-Using preseeding it is possible to fill in answers to questions asked during
-both the first stage of the installation (before the reboot into the new
-system) and the second stage.
--->
-preseed を使用して、インストールの第 1 段階 (新しいシステムで再起動する前まで)
-と第 2 段階の両方で行われる質問に、回答を与えることができます。
 
 </para>
 
@@ -209,7 +200,7 @@ also already have been processed.
 
 <!--
 Obviously, any questions that have been processed before the
-preseeding configuration file is loaded, cannot be preseeded.
+preseeding configuration file is loaded cannot be preseeded.
 <xref linkend="preseed-bootparms"/> offers a way to avoid these
 questions being asked.
 -->
@@ -315,7 +306,7 @@ are stored in a separate, non-readable file in the same directory.
 <para>
 
 <!--
-A very powerfull and flexible option offered by the preseeding tools is the
+A very powerful and flexible option offered by the preseeding tools is the
 ability to run commands or scripts at certain points in the installation.
 See <xref linkend="preseed-shell"/> for details.
 -->
@@ -337,30 +328,12 @@ preseed ツールで提供される、とても強力で柔軟なオプションに、
 <listitem><para>
 <!--
   <userinput>preseed/late_command</userinput>: is run just before the reboot
-  at the end of the first stage of the installation, but before the
-  <filename>/target</filename> filesystem has been unmounted
+  at the end of the install, but before the <filename>/target</filename>
+  filesystem has been unmounted
 -->
   <userinput>preseed/late_command</userinput>: は、
-  インストールの第 1 段階が終わって再起動する直前、
+  インストールが終わって再起動する直前、
   <filename>/target</filename> ファイルシステムをアンマウントする前に実行します。
-</para></listitem>
-<listitem><para>
-<!--
-  <userinput>base-config/early_command</userinput>: is run early in the second
-  stage of the installation when <command>base-config</command> is starting up
--->
-  <userinput>base-config/early_command</userinput>: は、
-  インストールの第 2 段階の先頭、
-  <command>base-config</command> を実行し始めるときに実行します。
-</para></listitem>
-<listitem><para>
-<!--
-  <userinput>base-config/late_command</userinput>: is run at the end of
-  <command>base-config</command>, just before the login prompt
--->
-  <userinput>base-config/late_command</userinput>: は、
-  <command>base-config</command> の最後、
-  ログインプロンプトを出す直前に実行します。
 </para></listitem>
 </itemizedlist>
 
@@ -699,11 +672,11 @@ preseed ファイルのフォーマットが適切かどうかを調べるには、
 </para>
  </sect1>
 
- <sect1 id="preseed-stage1">
+ <sect1 id="preseed-contents">
 <!--
- <title>Preseeding the first stage of the installation</title>
+ <title>Contents of the preseed file</title>
 -->
- <title>インストール第 1 段階の preseed</title>
+ <title>preseed ファイルの内容</title>
 <para>
 
 <!--
@@ -836,12 +809,26 @@ preseed のネットワーク設定は動作しません。
 ネットワークから preseed ファイルを読み込む場合、
 ネットワーク設定パラメータは、カーネルブートパラメータで渡すことになります。
 
-</para>
+</para><para>
+
+<!--
+If you need to pick a particular interface when netbooting before loading
+a preseed file from the network, use a boot parameter such as
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+-->
+ネットワークから preseed ファイルを読み込む前に netboot するとき、
+特定のインターフェースを選ぶ必要があるなら、
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>
+のようにブートパラメータを使用してください。
+
 
 <informalexample role="example"><screen>
 # netcfg will choose an interface that has link if possible. This makes it
 # skip displaying a list if there is more than one interface.
 d-i netcfg/choose_interface select auto
+
+# To pick a particular interface instead:
+#d-i netcfg/choose_interface select eth1
 
 # If you have a slow dhcp server and the installer times out waiting for
 # it, this might be useful.
@@ -877,7 +864,7 @@ d-i netcfg/wireless_wep string
 <para>
 
 <!--
-Depending on the installation method you use, a mirror may used both to
+Depending on the installation method you use, a mirror may be used both to
 download additional components of the installer, the base system and to
 set up the <filename>/etc/apt/sources.list</filename> for the installed
 system.
@@ -1051,12 +1038,12 @@ d-i time/zone string US/Eastern
 <!--
 Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
 options is fully automated based on your installation method and answers to
-earlier questions. Only the two variables below are relevant for preseeding.
+earlier questions. Only the three variables below are relevant for preseeding.
 -->
 <filename>/etc/apt/sources.list</filename>
 のセットアップと基本設定オプションは、
 インストール方法と初期の質問への回答から、完全に自動的に行われます。
-preseed に関連する変数は 2 つしかありません。
+preseed に関連する変数は 3 つしかありません。
 
 </para>
 
@@ -1064,6 +1051,9 @@ preseed に関連する変数は 2 つしかありません。
 # You can choose to install non-free and contrib software.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+# To avoid adding security sources, or to use a different server
+# than security.debian.org.
+#d-i apt-setup/security_host string 
 </screen></informalexample>
 
   </sect2>
@@ -1106,22 +1096,22 @@ MD5 ハッシュは総当たり攻撃にかけられることを考えると、
 
 <informalexample role="example"><screen>
 # Root password, either in clear text
-#passwd passwd/root-password password r00tme
-#passwd passwd/root-password-again password r00tme
+#d-i passwd/root-password password r00tme
+#d-i passwd/root-password-again password r00tme
 # or encrypted using an MD5 hash.
-#passwd passwd/root-password-crypted password [MD5 hash]
+#d-i passwd/root-password-crypted password [MD5 hash]
 
 # Skip creation of a normal user account.
-#passwd passwd/make-user boolean false
+#d-i passwd/make-user boolean false
 
 # Alternatively, create a normal user account.
-#passwd passwd/user-fullname string Debian User
-#passwd passwd/username string debian
+#d-i passwd/user-fullname string Debian User
+#d-i passwd/username string debian
 # Normal user's password, either in clear text
-#passwd passwd/user-password password insecure
-#passwd passwd/user-password-again password insecure
+#d-i passwd/user-password password insecure
+#d-i passwd/user-password-again password insecure
 # or encrypted using an MD5 hash.
-#passwd passwd/user-password-crypted password [MD5 hash]
+#d-i passwd/user-password-crypted password [MD5 hash]
 </screen></informalexample>
 
 <para>
@@ -1157,6 +1147,29 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 </para>
   </sect2>
 
+  <sect2 id="preseed-base-installer">
+<!--
+  <title>Base system installation</title>
+-->
+  <title>基本システムのインストール</title>
+<para>
+
+<!--
+There is actually not very much that can be preseeded for this stage of the
+installation. The only questions asked concern the installation of the kernel.
+-->
+インストールのこの段階では、実際にはうまく preseed できないことがあります。
+その唯一のものが、カーネルのインストールについての質問です。
+
+</para>
+
+<informalexample role="example"><screen>
+# Select the initramfs generator used to generate the initrd for 2.6 kernels.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-bootloader">
 <!--
   <title>Boot loader installation</title>
@@ -1185,53 +1198,7 @@ d-i grub-installer/with_other_os boolean true
 
   </sect2>
 
-  <sect2 id="preseed-finish">
-<!--
-  <title>Finishing up the first stage install</title>
--->
-  <title>インストール第 1 段階の仕上げ</title>
-
-<informalexample role="example"><screen>
-# Avoid that last message about the install being complete.
-d-i prebaseconfig/reboot_in_progress note
-
-# This will prevent the installer from ejecting the CD during the reboot,
-# which is useful in some situations.
-#d-i cdrom-detect/eject boolean false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
- <sect1 id="preseed-stage2">
-<!--
- <title>Preseeding the second stage of the installation</title>
--->
- <title>インストール第 2 段階の preseed</title>
-
-  <sect2 id="preseed-baseconfig">
-  <title>Base config</title>
-
-<informalexample role="example"><screen>
-# Avoid the introductory message.
-base-config base-config/intro note
-
-# Avoid the final message.
-base-config base-config/login note
-
-# If you installed a display manager, but don't want to start it immediately
-# after base-config finishes.
-#base-config base-config/start-display-manager boolean false
-
-# Some versions of the installer can report back on what you've installed.
-# The default is not to report back, but sending reports helps the project
-# determine what software is most popular and include it on CDs.
-#popularity-contest popularity-contest/participate boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-tasksel">
+  <sect2 id="preseed-pkgsel">
 <!--
   <title>Package selection</title>
 -->
@@ -1302,22 +1269,15 @@ Available tasks as of this writing include:
 -->
   <userinput>Laptop (ラップトップ)</userinput>
 </para></listitem>
-<listitem><para>
-<!--
-  <userinput>manual package selection</userinput>
--->
-  <userinput>manual package selection (マニュアルパッケージ集)</userinput>
-</para></listitem>
 </itemizedlist>
 
 <para>
 
 <!--
-The last of these will run aptitude. You can also choose to install no tasks,
-and force the installation of a set of packages in some other way. We recommend
-always including the <userinput>Standard system</userinput> task.
+You can also choose to install no tasks, and force the installation of a
+set of packages in some other way. We recommend always including the
+<userinput>Standard system</userinput> task.
 -->
-この後に aptitude を実行します。
 タスクをインストールしないこともできますし、
 他の方法でパッケージのセットが強制的にインストールされることもあります。
 <userinput>Standard system</userinput> タスクは常に含めるのをお奨めします。
@@ -1327,6 +1287,29 @@ always including the <userinput>Standard system</userinput> task.
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
+
+# Some versions of the installer can report back on what software you have
+# installed, and what software you use. The default is not to report back,
+# but sending reports helps the project determine what software is most
+# popular and include it on CDs.
+#popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-finish">
+<!--
+  <title>Finishing up the first stage install</title>
+-->
+  <title>インストール第 1 段階の仕上げ</title>
+
+<informalexample role="example"><screen>
+# Avoid that last message about the install being complete.
+d-i prebaseconfig/reboot_in_progress note
+
+# This will prevent the installer from ejecting the CD during the reboot,
+# which is useful in some situations.
+#d-i cdrom-detect/eject boolean false
 </screen></informalexample>
 
   </sect2>
@@ -1380,23 +1363,23 @@ Debian の X コンフィグレータはすべてを自動設定するわけには行かないのです。
 <informalexample role="example"><screen>
 # X can detect the right driver for some cards, but if you're preseeding,
 # you override whatever it chooses. Still, vesa will work most places.
-#xserver-xfree86 xserver-xfree86/config/device/driver select vesa
+#xserver-xorg xserver-xorg/config/device/driver select vesa
 
 # A caveat with mouse autodetection is that if it fails, X will retry it
 # over and over. So if it's preseeded to be done, there is a possibility of
 # an infinite loop if the mouse is not autodetected.
-#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
+#xserver-xorg xserver-xorg/autodetect_mouse boolean true
 
 # Monitor autodetection is recommended.
-xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
+xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # Uncomment if you have an LCD display.
-#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
+#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
 # X has three configuration paths for the monitor. Here's how to preseed
 # the "medium" path, which is always available. The "simple" path may not
 # be available, and the "advanced" path asks too many questions.
-xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
+xserver-xorg xserver-xorg/config/monitor/selection-method \
        select medium
-xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
+xserver-xorg xserver-xorg/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
 
@@ -1446,17 +1429,10 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 #d-i preseed/early_command string anna-install some-udeb
 
 # This command is run just before the install finishes, but when there is
-# still a usable /target directory.
-#d-i preseed/late_command string echo foo > /target/etc/bar
-
-# This command is run just as base-config is starting up.
-#base-config base-config/early_command string echo hi mom
-
-# This command is run after base-config is done, just before the login:
-# prompt. This is a good way to install a set of packages you want, or to
-# tweak the configuration of the system.
-#base-config base-config/late_command \
-#      string apt-get install zsh; chsh -s /bin/zsh
+# still a usable /target directory. You can chroot to /target and use it
+# directly, or use the apt-install and in-target commands to easily install
+# packages and run commands in the target system.
+#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 </screen></informalexample>
 
   </sect2>

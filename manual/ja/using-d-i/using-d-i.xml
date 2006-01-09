@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 33819 -->
 
 
  <chapter id="d-i-intro"><title>Debian Installer の使用法</title>
@@ -150,19 +150,19 @@ S/390 は仮想コンソールをサポートしません。以下で説明するように、
 </para><para>
 
 <!--
-Error messages are redirected to the third console.
+Error messages and logs are redirected to the fourth console.
 You can access this console by
-pressing <keycombo><keycap>Left Alt</keycap><keycap>F3</keycap></keycombo>
+pressing <keycombo><keycap>Left Alt</keycap><keycap>F4</keycap></keycombo>
 (hold the left <keycap>Alt</keycap> key while pressing the
-<keycap>F3</keycap> function key); get back to
+<keycap>F4</keycap> function key); get back to
 the main installer process with
 <keycombo><keycap>Left Alt</keycap><keycap>F1</keycap></keycombo>.
 -->
-エラーメッセージは第 3 コンソールに
+エラーメッセージとログは第 4 コンソールに
 リダイレクトされます。このコンソールへは
-<keycombo><keycap>左 Alt</keycap><keycap>F3</keycap></keycombo> 
+<keycombo><keycap>左 Alt</keycap><keycap>F4</keycap></keycombo> 
 (左 <keycap>Alt</keycap> キーを押しながら
-<keycap>F3</keycap> ファンクションキーを押す) を押してアクセスしてください。
+<keycap>F4</keycap> ファンクションキーを押す) を押してアクセスしてください。
 <keycombo><keycap>左 Alt</keycap><keycap>F1</keycap></keycombo> で、
 メインのインストーラプロセスに戻ります。
 
@@ -170,21 +170,21 @@ the main installer process with
 
 <!--
 These messages can also be found in
-<filename>/var/log/messages</filename>.  After installation, this log
-is copied to <filename>/var/log/debian-installer/messages</filename> on your
+<filename>/var/log/syslog</filename>.  After installation, this log
+is copied to <filename>/var/log/installer/syslog</filename> on your
 new system. Other installation messages may be found in
 <filename>/var/log/</filename> during the
-installation, and <filename>/var/log/debian-installer/</filename>
+installation, and <filename>/var/log/debian/</filename>
 after the computer has been booted into the installed system.
 -->
-これらのメッセージは <filename>/var/log/messages</filename> で
+これらのメッセージは <filename>/var/log/syslog</filename> で
 見つけることもできます。
 インストールの後、このログはあなたの新システムの 
-<filename>/var/log/debian-installer/messages</filename> にコピーされます。
+<filename>/var/log/installer/syslog</filename> にコピーされます。
 他のインストールメッセージは、インストール中には
 <filename>/var/log/</filename> に、
 インストールしたシステムでコンピュータが起動した後には 
-<filename>/var/log/debian-installer/</filename> にあります。
+<filename>/var/log/debian/</filename> にあります。
 
 </para>
  </sect1>
@@ -240,36 +240,7 @@ repeatedly to back all the way out of the currently running component.
 
 </para></listitem>
 </varlistentry>
-<varlistentry condition="sarge">
-
-<term>languagechooser</term><listitem><para>
-
-<!--
-Shows a list of languages and language variants. The installer will
-display messages in the chosen language, unless the translation for
-that language is not complete. When a translation is not complete,
-English messages are shown.
--->
-言語と言語の変種のリストを表示します。
-インストーラは、翻訳が完了していない言語を除いて選択された言語で、
-メッセージを表示します。
-翻訳が完了していない言語は、英語のメッセージが表示されます。
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="sarge">
-
-<term>countrychooser</term><listitem><para>
-
-<!--
-Shows a list of countries. The user may choose the country he lives
-in.
--->
-国のリストを表示します。ユーザが住んでいる国を選択できます。
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="etch">
+<varlistentry>
 
 <term>localechooser</term><listitem><para>
 
@@ -493,6 +464,39 @@ newer motherboards.
 </para></listitem>
 </varlistentry>
 <varlistentry>
+       
+<term>tzsetup</term><listitem><para>
+
+<!--
+Selects the time zone, based on the location selected earlier.
+-->
+あらかじめ選択した場所を元に、タイムゾーンを選択します。
+               
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>clock-setup</term><listitem><para>
+
+<!--
+Determines whether the clock is set to UTC or not.
+-->
+クロックを UTC に設定するかどうかを決定します。
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+       
+<term>user-setup</term><listitem><para>
+
+<!--
+Sets up the root password, and adds a non-root user.
+-->
+root パスワードの設定や、root 以外のユーザの追加を行います。
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
 
 <term>base-installer</term><listitem><para>
 
@@ -506,7 +510,31 @@ the computer to operate under Linux when rebooted.
 </para></listitem>
 </varlistentry>
 <varlistentry>
+       
+<term>apt-setup</term><listitem><para>
 
+<!--
+Configures apt, mostly automatically, based on what media the installer is
+running from.
+-->
+インストーラを起動したメディアを元に、ほとんど自動で apt の設定を行います。
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+       
+<term>pkgsel</term><listitem><para>
+
+<!--
+Uses <classname>tasksel</classname> to select and install additional software.
+-->
+追加ソフトウェアをインストールするのに
+<classname>tasksel</classname> を使用します。
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+       
 <term>os-prober</term><listitem><para>
 
 <!--
@@ -529,30 +557,16 @@ bootloader-installer へ渡します。
 <term>bootloader-installer</term><listitem><para>
 
 <!--
-Installs a boot loader program on the hard disk, which is necessary
-for the computer to start up using Linux without using a floppy or
-CD-ROM.  Many boot loaders allow the user to choose an alternate
-operating system each time the computer boots.
+The various bootloader installers each install a boot loader program on the
+hard disk, which is necessary for the computer to start up using Linux
+without using a floppy or CD-ROM.  Many boot loaders allow the user to
+choose an alternate operating system each time the computer boots.
 -->
+様々なブートローダインストーラがそれぞれ、
 ハードディスクにブートローダプログラムをインストールします。
 これは、フロッピーや CD-ROM を使用しないで Linux を起動するのに必要です。
 ブートローダの多くは、コンピュータが起動するごとに
 代替オペレーティングシステムを選ぶことができます。
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>base-config</term><listitem><para>
-
-<!--
-Provides dialogs for setting up the base system packages according
-to user preferences. This is normally done after rebooting the
-computer; it is the <quote>first run</quote> of the new Debian system.
--->
-設定によって基本システムのパッケージをセットアップするダイアログを提供します。
-これは通常、コンピュータを再起動した後に行われます。
-そのため新しい Debian システムの<quote>初稼働</quote>となります。
 
 </para></listitem>
 </varlistentry>
@@ -570,17 +584,16 @@ console.
 </varlistentry>
 <varlistentry>
 
-<term condition="sarge">bugreporter</term><term condition="etch">save-logs</term><listitem><para>
+<term>save-logs</term><listitem><para>
 
 <!--
-Provides a way for the user to record information on a floppy
-disk<phrase condition="etch">, network, hard disk, or other media</phrase>
-when trouble is encountered, in order to accurately report installer
-software problems to Debian developers later.
+Provides a way for the user to record information on a floppy disk, network,
+hard disk, or other media when trouble is encountered, in order to accurately
+report installer software problems to Debian developers later.
 -->
 後で Debian 開発者へ、インストーラソフトウェアの障害を正確に報告するために、
-障害に遭遇した際の、フロッピーディスク<phrase condition="etch">やネットワーク、
-ハードディスク、その他メディア</phrase>に情報を記録する方法を提供します。
+障害に遭遇した際の、フロッピーディスク、ネットワーク、
+ハードディスク、その他メディアに情報を記録する方法を提供します。
 
 </para></listitem>
 </varlistentry>

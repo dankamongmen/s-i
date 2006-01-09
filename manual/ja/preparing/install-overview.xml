@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 33719 -->
 
  <sect1 id="install-overview">
+<!--
+ <title>Overview of the Installation Process</title>
+-->
  <title>インストールプロセスの概要</title>
 <para>
 
@@ -94,6 +97,7 @@ before starting the installation.
 Create partition-able space for Debian on your hard disk.
 -->
 ハードディスクに Debian のパーティションに使える領域を確保する。
+
 </para></listitem>
 <listitem><para>
 
@@ -123,7 +127,7 @@ Boot the installation system.
 インストールシステムを起動する。
 
 </para></listitem>
-<listitem><para>
+<listitem arch="not-s390"><para>
 
 <!--
 Select installation language.
@@ -151,9 +155,9 @@ Configure one network interface.
 <listitem arch="s390"><para>
 
 <!--
-Open a telnet connection to the new system.
+Open a ssh connection to the new system.
 -->
-新しいシステムに telnet 接続する。
+新しいシステムに ssh 接続する。
 
 </para></listitem>
 <listitem arch="s390"><para>
@@ -196,20 +200,9 @@ which can start up &debian; and/or your existing system.
 <listitem><para>
 
 <!--
-Load the newly installed system for the first time, and make some
-initial system settings.
+Load the newly installed system for the first time.
 -->
-新しいシステムを初めて起動し、システムの初期設定を行う。
-
-</para></listitem>
-<listitem><para>
-
-<!--
-Install additional software (<firstterm>tasks</firstterm>
-and/or <firstterm>packages</firstterm>), at your discretion.
--->
-追加ソフトウェア (<firstterm>タスク</firstterm> 
-や <firstterm>パッケージ</firstterm>) を好みに応じてインストールする。
+新しいシステムを初めて起動する。
 
 </para></listitem>
 </orderedlist>
@@ -249,22 +242,13 @@ you load the new system for the first time.
 </para><para>
 
 <!--
-Upon loading the new base system, <classname>base-config</classname>
-supervises adding users, setting a time zone (via
-<classname>tzsetup</classname>), and setting up the
-package installation system (using <classname>apt-setup</classname>). It then
-launches <classname>tasksel</classname> which can be used to select large
-groups of related programs, and in turn can run <classname>aptitude</classname>
-allows you to choose individual software packages.
+To tune the system to your needs, <classname>tasksel</classname> allows you
+to choose to install various predefined bundles of software like a Web
+server or a Desktop environment.
 -->
-新しい基本システムを起動する際、<classname>base-config</classname> は、
-ユーザの追加、時間帯の設定 (<classname>tzsetup</classname>)、
-パッケージインストールシステムの設定 (<classname>apt-setup</classname>を使用) 
-を司ります。
-その後で、関連プログラムのグループをインストールする 
-<classname>tasksel</classname>を起動します。
-その後、個々のパッケージソフトを選べる <classname>aptitude</classname> 
-を起動できます。
+システムをお好みに調整するには、<classname>tasksel</classname> を使用して 
+Web サーバやデスクトップ環境といった、
+様々なソフトウェアの定義済みセットを選択・インストールできます。
 
 </para><para>
 
@@ -272,17 +256,15 @@ allows you to choose individual software packages.
 When <classname>debian-installer</classname> finishes, before the
 first system load, you have only a very basic command line driven
 system. The graphical interface which displays windows on your monitor
-will not be installed unless you select it during the final steps,
-with either <classname>tasksel</classname> or
-<classname>aptitude</classname>.  It's optional because many &debian;
-systems are servers which don't really have any need for a graphical
-user interface to do their job.
+will not be installed unless you select it with <classname>tasksel</classname>.
+It's optional because many &debian; systems are servers which don't really
+have any need for a graphical user interface to do their job.
 -->
 初めてシステムを起動する前で、<classname>debian-installer</classname> が
 完了した時には、システムを操作するのに、非常に基本的なコマンドラインしか
 ありません。モニタにウィンドウを表示するようなグラフィカルインターフェースは、
-最終ステップで <classname>tasksel</classname> や 
-<classname>aptitude</classname> を使って選択しないとインストールされません。
+最終ステップで <classname>tasksel</classname> を使って選択しないと
+インストールされません。
 多くの &debian; システムは、処理を行う上で本当なら
 グラフィカルユーザインターフェースを特に必要としないようなサーバであるため、
 これはオプションとなっています。

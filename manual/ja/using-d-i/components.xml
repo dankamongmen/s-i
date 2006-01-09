@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 29895 -->
+<!-- original version: 33730 -->
 
  <sect1 id="module-details">
  <title>それぞれのコンポーネントの使用法</title>
@@ -72,8 +72,6 @@ hardware detection needs to be repeated later in the process.
 </para>
 
 &module-lowmem.xml;
-&module-languagechooser.xml;
-&module-countrychooser.xml;
 &module-localechooser.xml;
 &module-kbd-chooser.xml;
 &module-s390-netdevice.xml;
@@ -120,19 +118,33 @@ LVM や RAID 装置のような密接に関係する件のオプション設定を行うことです。
 &module-lvmcfg.xml;
 &module-mdcfg.xml;
   </sect2>
+  
+  <sect2 id="di-system-setup">
+  <title>Setting up the System</title>
+<para>
+
+After partitioning the installer asks a few more questions that will be
+used to set up the system it is about to install.
+       
+</para>
+
+&module-tzsetup.xml;
+&module-clock-setup.xml;
+&module-user-setup.xml;
+</sect2>
 
   <sect2 id="di-install-base">
   <title>基本システムのインストール</title>
 <para>
 
 <!--
-Although this stage is the least problematic, it consumes most time of
-the install because it downloads, verifies and unpacks the whole base
-system. If you have a slow computer or network connection, this could
+Although this stage is the least problematic, it consumes a significant
+fraction of the install because it downloads, verifies and unpacks the whole
+base system. If you have a slow computer or network connection, this could
 take some time.
 -->
 この段階が最重要問題でないとはいえ、全体の基本システムをダウンロード、確認、
-展開にインストールのほとんどの時間を費やします。
+展開にインストールのかなりの部分を費やします。
 遅いコンピュータや遅いネットワーク接続しか持っていなければ、
 ある程度時間がかかるかもしれません。
 
@@ -140,7 +152,34 @@ take some time.
 
 &module-base-installer.xml;
   </sect2>
+  
+  <sect2 id="di-install-software">
+<!--
+  <title>Installing Additional Software</title>
+-->
+  <title>追加ソフトウェアのインストール</title>
+<para>
 
+<!--
+After the base system is installed, you have a usable but limited system.
+Most users will want to add additional software to the system to tune it to
+their needs, and the installer lets you do so. This step can take even
+longer than installing the base system if you have a slow computer or
+network.
+-->
+基本システムのインストールが終わると、
+利用できますが制限されたシステムになります。
+ほとんどのユーザは、お好みに調整するのに、
+追加ソフトウェアをシステムに入れたいでしょう。
+そしてこれはインストーラから行えます。
+遅いコンピュータや回線を使用していると、
+このステップは基本システムのインストールよりも時間がかかります。
+
+</para>
+&module-apt-setup.xml;
+&module-pkgsel.xml;
+  </sect2>
+       
   <sect2 id="di-make-bootable">
   <title>システム起動可能化</title>
 <para condition="supports-nfsroot">
@@ -192,14 +231,17 @@ documentation for more information.
   </sect2>
 
   <sect2 id="di-finish">
-  <title>第 1 ステージ完了</title>
+<!--
+  <title>Finishing the Installation</title>
+-->
+  <title>インストールの完了</title>
 <para>
 
 <!--
-These are the last bits to do before rebooting to your new Debian. It
+These are the last bits to do before rebooting to your new system. It
 mostly consists of tidying up after the &d-i;.
 -->
-新しい Debian を再起動する前にちょっとすることがあります。
+新しいシステムを再起動する前にちょっとすることがあります。
 ほとんどが &d-i; の後片付けです。
 
 </para>
