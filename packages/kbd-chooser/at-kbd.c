@@ -21,12 +21,6 @@ kbd_t *at_kbd_get (kbd_t *keyboards, const char *subarch)
 {
 	kbd_t *k = NULL;
 
-#if defined(__m68k__)
-	// On m68k, only mvme, bvme, and q40 have PC-style keyboards
-	if ((strstr(subarch, "vme") == NULL) &&
-	    (strstr(subarch, "q40") == NULL))
-		return keyboards;
-#endif
 #if defined(__powerpc__)
 	// On powerpc, only prep and chrp machines have pc keyboards
 	if ((strstr(subarch, "prep") == NULL) &&
