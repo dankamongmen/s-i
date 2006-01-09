@@ -1,83 +1,84 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 28997 -->
 
 
-  <sect2 arch="alpha"><title>Partitioning in Tru64 UNIX</title>
+  <sect2 arch="alpha"><title>Particionament al UNIX Tru64</title>
 <para>
 
-Tru64 UNIX, formerly known as Digital UNIX, which is in turn formerly
-known as OSF/1, uses the partitioning scheme similar to the BSD <quote>disk
-label</quote>, which allows for up to eight partitions per disk drive.  The
-partitions are numbered <quote>1</quote> through to <quote>8</quote> in
-Linux and <quote>lettered</quote> <quote>a</quote> through to
-<quote>h</quote> in UNIX.  Linux kernels 2.2 and higher always correspond
-<quote>1</quote> to <quote>a</quote>, <quote>2</quote> to <quote>b</quote>
-and so on.  For example, <filename>rz0e</filename> in Tru64 UNIX would most
-likely be called <filename>sda5</filename> in Linux.
+L'UNIX Tru64, conegut formalment com Digital UNIX, i alternativament
+conegut com OSF/1, utilitza un esquema de particions paregut al de
+<quote>etiquetes de disc</quote> de BSD, que permet fins vuit particions
+per unitat de disc. Les particions van numerades des de l'<quote>1</quote>
+fins al <quote>8</quote> a linux i <quote>retolats</quote> des de
+l'<quote>a</quote> fins l'<quote>h</quote> a UNIX.  Als nuclis de
+Linux 2.2 i superiors es correspon sempre l'<quote>1</quote> amb la
+<quote>a</quote>, <quote>2</quote> amb la <quote>b</quote> i així
+successivament. Per exemple, el <filename>rz0e</filename> de UNIX Tru64 a
+Linux es dirà <filename>sda5</filename>.
 
 </para><para>
 
-Partitions in a Tru64 disk label may overlap.  Moreover, if this disk
-will be used from Tru64, the <quote>c</quote> partition is required to span
-the entire disk (thus overlapping all other non-empty partitions).  Under
-Linux this makes <filename>sda3</filename> identical to
-<filename>sda</filename> (<filename>sdb3</filename> to
-<filename>sdb</filename>, if present, and so on).  However, the partman
-partitioning tool used by &d-i; cannot handle overlapping partitions at
-present.  As a result, it is currently not recommended to share disks
-between Tru64 and Debian.  Partitions on Tru64 disks can be mounted
-under Debian after installation has been completed.
+Les particions amb etiquetes Tru64 es poden encavalcar. És més, si el disc
+s'utilitzarà des de Tru64, es necessitarà de la partició <quote>c</quote>
+per estendre el disc complet (i així encavalcant totes les altres particions
+no buides). Açò fa que a Linux <filename>sda3</filename>  sigui idèntic a
+<filename>sda</filename> (<filename>sdb3</filename> a
+<filename>sdb</filename> si hi ha, i així successivament). Per altra banda,
+l'eina de particionament partman utilitzada pel &d-i; no pot utilitzar en
+aquest moment particions solapades. Per tant, no es recomana compartir
+discos entre Tru64 i Debian. Les particions a discos Tru64 es poden muntar
+desprès de tenir la instal·lació completa.
 
 </para><para>
 
-Another conventional requirement is for the <quote>a</quote> partition to
-start from the beginning of the disk, so that it always includes the boot
-block with the disk label. If you intend to boot Debian from that disk, you
-need to size it at least 2MB to fit aboot and perhaps a kernel.
-Note that this partition is only required for compatibility; you must
-not put a file system onto it, or you'll destroy data.
+Un altre requeriment és que la partició <quote>a</quote> tingui el seu
+començament al principi del disc, així que sempre inclou el bloc d'arrencada
+amb l'etiqueta del disc. Si intenteu arrencar Debian des d'eixe disc,
+necessitareu que tingui una mida mínima de 2 MiB per contenir l'arrencada i
+pot ser un nucli. Adoneu-vos que aquesta partició tan sols es necessita per
+raons de compatibilitat; no poseu cap sistema de fitxers en ella, o perdreu
+dades.
 
 </para><para>
 
-It is possible, and indeed quite reasonable, to share a swap partition
-between UNIX and Linux.  In this case it will be needed to do a
-<command>mkswap</command> on that partition every time the system is rebooted
-from UNIX into Linux, as UNIX will damage the swap signature.  You may
-want to run <command>mkswap</command> from the Linux start-up scripts before
-adding swap space with <command>swapon -a</command>.
+És possible, i en efecte prou raonable, compartir la partició d'intercanvi
+entre Linux i UNIX. En aquest cas necessitareu fer un
+<command>mkswap</command> a eixa partició cada vegada que reinicieu des
+de UNIX a Linux, ja que UNIX farà malbé la signatura del disc d'intercanvi.
+Podeu executar <command>mkswap</command> des dels guions d'arrencada de
+Linux abans d'afegir l'espai d'intercanvi amb <command>swapon -a</command>.
 
 </para><para>
 
-If you want to mount UNIX partitions under Linux, note that Digital UNIX
-can use two different file system types, UFS and AdvFS, of which Linux
-only understands the former.
+Si voleu muntar les particions UNIX a Linux, adoneu-vos que el Digital UNIX
+pot utilitzar dos tipus diferents de sistemes de fitxers, UFS i AdvFS, dels
+quals Linux tan sols entén l'antic.
 
 </para>
   </sect2>
 
-  <sect2 arch="alpha"><title>Partitioning in Windows NT</title>
+  <sect2 arch="alpha"><title>Particionament a Windows NT</title>
 
 <para>
 
-Windows NT uses the PC-style partition table.  If you are manipulating
-existing FAT or NTFS partitions, it is recommended that you use the
-native Windows NT tools (or, more conveniently, you can also
-repartition your disk from the AlphaBIOS setup menu).  Otherwise, it
-is not really necessary to partition from Windows; the Linux
-partitioning tools will generally do a better job.  Note that when you
-run NT, the Disk Administrator may offer you to write a <quote>harmless
-signature</quote> on non-Windows disks if you have any.
-<emphasis>Never</emphasis> let it do that, as this signature will destroy
-the partition information.
+El Windows NT utilitza una taula de particions de tipus PC. Si manipuleu
+particions FAT o NTFS, es recomana que utilitzeu les eines natives de
+Windows NT (o, millor, podeu reparticionar el vostre disc des del menú
+de configuració de AlphaBIOS; les eines de particionament de Linux faran
+la feina millor. Adoneu-vos que quan arrenqueu NT, l'administrador de
+discs us oferirà escriure una <quote>signatura inofensiva</quote> als
+discs no Windows si en teniu algun. No ho feu <emphasis>mai</emphasis>,
+ja que aquesta signatura destruirà la informació de la partició
 
 </para><para>
 
-If you plan to boot Linux from an ARC/AlphaBIOS/ARCSBIOS console, you
-will need a (small) FAT partition for MILO.  5 MB is quite
-sufficient.  If Windows NT is installed, its 6 MB bootstrap partition
-can be employed for this purpose.  Debian &releasename; does not support
-installing MILO.  If you already have MILO installed on your system, or
-install MILO from other media, Debian can still be booted from ARC.
+Si esteu pensant d'arrencar Linux des de la consola d'ARC/AlphaBIOS/ARCSBIOS,
+necessitareu una partició xicoteta FAT pel MILO. 5 MiB és més que suficient.
+Si teniu Windows NT instal·lat, La seva partició d'arrencada de 6 MiB es pot
+utilitzar amb aquest propòsit. Debian &releasename; no suporta la
+instal·lació de MILO, Si teniu instal·lat MILO al vostre sistema, o
+instal·leu MILO des d'un altra manera, Debian pot encara arrencar-se des
+d'ARC.
 
 </para>
   </sect2>

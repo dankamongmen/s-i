@@ -1,106 +1,104 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31173 untranslated -->
+<!-- original version: 31173 -->
 
    <sect3 id="network-console">
-   <title>Installation Over the Network</title>
+   <title>Instal·lació a través de la xarxa</title>
 
 <para arch="not-s390">
 
-One of the more interesting components is
-<firstterm>network-console</firstterm>. It allows you to do a large
-part of the installation over the network via SSH. The use of the
-network implies you will have to perform the first steps of the
-installation from the console, at least to the point of setting up
-the networking. (Although you can automate that part with
-<xref linkend="automatic-install"/>.)
+Un dels components més interessants és
+<firstterm>network-console</firstterm>. Permet realitzar una bona part
+de la instal·lació per xarxa, via SSH. L'ús de la xarxa implica
+que haureu de seguir els primers passos de la instal·lació des de la
+consola, almenys fins a tenir configurada la xarxa (tot i que podeu
+automatitzar també aquesta part, <xref linkend="automatic-install"/>).
 
 </para><para arch="not-s390">
 
-This component is not loaded into the main installation menu by default,
-so you have to explicitly ask for it.
+Aquest component no es carrega al menú principal de la instal·lació
+predeterminada, s'ha de fer explícitament.
 
-If you are installing from CD, you need to boot with medium priority or
-otherwise invoke the main installation menu and choose <guimenuitem>Load
-installer components from CD</guimenuitem> and from the list of
-additional components select <guimenuitem>network-console: Continue
-installation remotely using SSH</guimenuitem>. Successful load is
-indicated by a new menu entry called <guimenuitem>Continue
-installation remotely using SSH</guimenuitem>.
+Si esteu instal·lant des de CD, haureu d'arrencar amb prioritat mitja o
+bé triar <guimenuitem>Carrega components de l'instal·lador des d'un
+CD</guimenuitem> al menú principal d'instal·lació, i seleccionar
+<guimenuitem>network-console: Continua la instal·lació remotament
+utilitzant SSH</guimenuitem> a la llista de components addicionals.
 
 </para><para arch="s390">
 
-For installations on &arch-title;, this is the default method after
-setting up the network.
+Per a instal·lacions a &arch-title;, aquest és el mètode predeterminat
+després de configurar la xarxa.
 
 </para><para>
 
-<phrase arch="not-s390">After selecting this new entry, you</phrase>
-<phrase arch="s390">You</phrase> will be asked for a new password
-to be used for connecting to the installation system and for its
-confirmation. That's all. Now you should see a screen which instructs
-you to login remotely as the user <emphasis>installer</emphasis> with
-the password you just provided. Another important detail to notice on
-this screen is the fingerprint of this system.  You need to transfer
-the fingerprint securely to the <quote>person who will continue the
-installation remotely</quote>.
+<phrase arch="not-s390">Després de seleccionar aquesta nova entrada,
+haureu</phrase><phrase arch="s390">Haureu</phrase> d'introduir
+una contrasenya nova, que s'utilitzarà per connectar al sistema
+d'instal·lació i per a la seva confirmació. Això és tot. A
+continuació veureu una pantalla d'entrada que us instruirà a entrar
+remotament com a usuari <emphasis>installer</emphasis> i la contrasenya
+que acabeu de proporcionar. Un altre detall important que s'ha de tenir
+en compte en aquest punt és l'empremta digital del sistema. Caldrà
+transferir-la de manera segura a la <quote>persona encarregada de
+continuar amb la instal·lació remota</quote>.
 
 </para><para>
 
-Should you decide to continue with the installation locally, you
-can always press &enterkey;, which will bring you back to
-the main menu, where you can select another component.
+Si decidiu continuar la instal·lació localment, sempre podeu prémer
+&enterkey;, que us tornarà al menú principal, on novament podreu
+seleccionar un altre component.
 
 </para><para>
 
-Now let's switch to the other side of the wire. As a prerequisite, you
-need to configure your terminal for UTF-8 encoding, because that is
-what the installation system uses. If you do not, remote installation
-will be still possible, but you may encounter strange display
-artefacts like destroyed dialog borders or unreadable non-ascii
-characters. Establishing a connection with the installation system
-is as simple as typing:
+Tornem ara a l'altra banda del cable. En primer lloc, és necessari
+que configureu el vostre terminal per a UTF-8, ja que aquesta és la
+codificació que utilitza el sistema d'instal·lació. Si no ho feu,
+la instal·lació remota encara serà possible, però segurament certs
+diàlegs o caràcters no es visualitzaran correctament. Establir una
+connexió amb el sistema d'instal·lació és tan fàcil com teclejar:
 
 <informalexample><screen>
-<prompt>$</prompt> <userinput>ssh -l installer <replaceable>install_host</replaceable></userinput>
+<prompt>$</prompt> <userinput>ssh -l installer <replaceable>ordinador_a_instal·lar</replaceable></userinput>
 </screen></informalexample>
 
-Where <replaceable>install_host</replaceable> is either the name
-or IP address of the computer being installed. Before the actual
-login the fingerprint of the remote system will be displayed and
-you will have to confirm that it is correct.
+On <replaceable>ordinador_a_instal·lar</replaceable> és el nom o
+l'adreça IP de l'ordinador que s'està instal·lant. Abans de fer
+l'entrada de debò, es mostrarà l'empremta digital del sistema remot,
+i haureu de confirmar que és correcta.
 
 </para><note><para>
 
-If you install several computers in turn and they happen to have the
-same IP address or hostname, <command>ssh</command> will refuse to connect
-to such host. The reason is that it will have different fingerprint, which
-is usually a sign of a spoofing attack. If you are sure this is not the
-case, you will need to delete the relevant line from
-<filename>~/.ssh/known_hosts</filename> and try again.
+Si instal·leu molts ordinadors alhora i casualment tenen la mateixa
+adreça IP o el mateix nom, <command>ssh</command> rebutjarà la
+connexió. El problema és que hi haurà empremtes digitals diferents
+per a un mateix identificador, fet que normalment s'interpreta com un
+atac. Si esteu segurs que no és el cas, esborreu la línia corresponent
+del fitxer <filename>~/.ssh/known_hosts</filename> i torneu a intentar-ho.
 
 </para></note><para>
 
-After the login you will be presented with an initial screen where you
-have two possibilities called <guimenuitem>Start menu</guimenuitem> and
-<guimenuitem>Start shell</guimenuitem>. The former brings you to the
-main installer menu, where you can continue with the installation as
-usual. The latter starts a shell from which you can examine and possibly
-fix the remote system. You should only start one SSH session for the
-installation menu, but may start multiple sessions for shells.
+Després d'entrar, veureu la pantalla inicial, des d'on teniu dos
+possibilitats anomenades <guimenuitem>Inicia el menú</guimenuitem>
+i <guimenuitem>Inicia un intèrpret d'ordres</guimenuitem>. La primera
+us durà al menú principal de l'instal·lador, on podreu continuar la
+instal·lació normalment. L'altra, iniciarà un intèrpret d'ordres des
+del que podreu examinar, i potser arreglar, el sistema remot. Només
+hauríeu de començar una sessió SSH per al menú d'instal·lació,
+però podeu iniciar més intèrprets d'ordres.
 
 </para><warning><para>
 
-After you have started the installation remotely over SSH, you should
-not go back to the installation session running on the local console.
-Doing so may corrupt the database that holds the configuration of
-the new system. This in turn may result in a failed installation or
-problems with the installed system.
+Després d'iniciar la instal·lació remotament sobre SSH, no hauríeu
+de tornar a la sessió que hi ha a la consola local. Podria corrompre's
+la base de dades que manté la configuració del nou sistema. Això
+pot provocar alhora problemes al sistema instal·lat, o fins i tot que
+la instal·lació no finalitzi correctament.
 
 </para><para>
 
-Also, if you are running the SSH session from an X terminal, you should
-not resize the window as that will result in the connection being
-terminated.
+També hauríeu de tenir en compte que si executeu la sessió SSH des
+d'un terminal X, no s'ha de redimensionar la finestra ja que això
+tallaria la connexió.
 
 </para></warning>
 

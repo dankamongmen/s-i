@@ -1,57 +1,56 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 23146 untranslated -->
+<!-- original version: 23146 -->
 
 
-  <sect2 arch="powerpc"><title>Partitioning Newer PowerMacs</title>
+  <sect2 arch="powerpc"><title>Particionament als nous PowerMac</title>
 <para>
 
-If you are installing onto a NewWorld PowerMac you must create a
-special bootstrap partition to hold the boot loader. The size of this
-partition must be 800KB and its partition type must be
-<emphasis>Apple_Bootstrap</emphasis>.  If the bootstrap partition is
-not created with the <emphasis>Apple_Bootstrap</emphasis> type your
-machine cannot be made bootable from the hard disk.  This partition
-can easily be created by creating a new partition in
-<command>partman</command> and telling it to use it as a <quote>NewWorld
-boot partition</quote>, or in <command>mac-fdisk</command> using the
-<userinput>b</userinput> command.
+Si esteu instal·lant a un PowerMac NewWorld necessitareu crear una
+partició especial d'inicialització que contingui el carregador. La mida
+d'aquesta partició ha de ser 800 KiB i ha de ser de tipus
+<emphasis>Apple_Bootstrap</emphasis>. Si la partició d'inicialització
+no es crea del tipus <emphasis>Apple_Bootstrap</emphasis> la vostra
+màquina no es podrà arrencar des del disc dur. Aquesta partició és fàcil de
+crear utilitzant el <command>partman</command> i dient-li que utilitze la
+<quote>partició d'arrencada NewWorld</quote>, o al <command>mac-fdisk</command>
+utilitzant l'ordre <userinput>b</userinput>.
 
 </para><para>
 
-The special partition type Apple_Bootstrap is required to prevent
-MacOS from mounting and damaging the bootstrap partition, as there are
-special modifications made to it in order for OpenFirmware to boot it
-automatically.
+Es necessita tenir la partició especial de tipus Apple_Bootstrap per
+prevenir que el MacOS munte i danye la partició d'inicialització, ja que
+hi ha modificacions especials fetes per que el OpenFirmware l'arrenqui
+automàticament.
 
 </para><para>
 
-Note that the bootstrap partition is only meant to hold 3 very small
-files: the <command>yaboot</command> binary, its configuration
-<filename>yaboot.conf</filename>, and a first stage OpenFirmware
-loader <command>ofboot.b</command>.  It need not and must not be
-mounted on your file system nor have kernels or anything else copied
-to it. The <command>ybin</command> and <command>mkofboot</command>
-utilities are used to manipulate this partition.
+Adoneu-vos què la partició d'inicialització té tan sols significat
+per contenir 3 fitxers molt menuts: el binari de <command>yaboot</command>,
+la seva configuració <filename>yaboot.conf</filename>, i un primer pas al
+carregador d'OpenFirmware <command>ofboot.b</command>. No fa falta, i no
+hauria de muntar-se al vostre sistema de fitxers ni tenir nuclis o
+qualsevol altra cosa copiada dins. Les ordres <command>ybin</command> i
+<command>mkofboot</command> s'utilitzen per manipular aquesta partició.
 
 </para><para>
 
-In order for OpenFirmware to automatically boot &debian; the bootstrap
-partition should appear before other boot partitions on the disk,
-especially MacOS boot partitions.  The bootstrap partition should be
-the first one you create. However, if you add a bootstrap partition
-later, you can use <command>mac-fdisk</command>'s
-<userinput>r</userinput> command to reorder the partition map so the
-bootstrap partition comes right after the map (which is always
-partition 1). It's the logical map order, not the physical address
-order, that counts.
+Per que el OpenFirmware arrenqui automàticament &debian; la partició
+d'inicialització hauria d'aparèixer abans que les altres particions al
+disc, especialment que les particions d'arrencada de MacOS. La partició
+d'inicialització hauria de ser la primera en crear-se. Per altra banda,
+si afegiu la partició d'inicialització mes tard, podeu fer-ho utilitzant
+l'ordre <userinput>r</userinput> de <command>mac-fdisk</command> per
+reordenar la taula de particions de manera que la partició d'inicialització
+estigui desprès de la taula (que està sempre a la partició 1). El que conta
+és l'ordre lògic de la taula, no l'ordre físic.
 
 </para><para>
 
-Apple disks normally have several small driver partitions. If you
-intend to dual boot your machine with MacOSX, you should retain these
-partitions and a small HFS partition (800k is the minimum size). That
-is because MacOSX, on every boot, offers to initialize any disks which do
-not have active MacOS partitions and driver partitions.
+Els discs d'Apple solen tenir vàries particions amb controladors xicotetes.
+Si intenteu arrencar la vostra màquina amb MacOSX, hauríeu de conservar-les i
+a més a més una partició xicoteta HFS (de mida mínima 800 KiB). Açò és
+perquè a cada arrencada el MacOSX, ofereix inicialitzar qualsevol disc que
+no tingui una partició MacOS activa i les particions dels controladors.
 
 </para>
   </sect2>

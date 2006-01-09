@@ -1,23 +1,22 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 untranslated -->
+<!-- original version: 28672 -->
 
-  <sect2 arch="arm" id="boot-tftp"><title>Booting from TFTP</title>
+  <sect2 arch="arm" id="boot-tftp"><title>Arrencant des de TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <sect3 arch="arm"><title>Booting from TFTP on NetWinder</title>
+  <sect3 arch="arm"><title>Arrencant des de TFTP a NetWinder</title>
 
 <para>
 
-NetWinders have two network interfaces: The 10Mbps NE2000-compatible
-card is <filename>eth0</filename> and the 100Mbps Tulip card is
+NetWinders té dues interfícies de xarxa: la tarja compatible de
+10Mbps és <filename>eth0</filename> i la tarja Tulip de 100Mbps és
 <filename>eth1</filename>.
 
 </para><note><para>
 
-You need NeTTrom 2.2.1 or later to boot the
-installation system. NeTTrom 2.3.3 is recommended: get these files
-from
+Necessiteu NeTTrom 2.2.1 o posterior per arrencar el sistema
+d'instal·lació. Recomanem NeTTrom 2.3.3: obté aquests fitxers des de
 <ulink url="ftp://ftp.netwinder.org/pub/netwinder/firmware/"></ulink>:
 <itemizedlist>
 <listitem><para>
@@ -39,23 +38,24 @@ from
 
 </para></note><para>
 
-After rebooting and interrupting the boot process during the countdown, you
-must first configure the network either with a static address:
+Després d'arrencar de nou i interrompre el procés durant el compte enrere,
+heu de configurar primer la xarxa amb una adreça estàtica:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
 </screen></informalexample>
 
-where 24 is the number of set bits in the netmask, or a dynamic address:
+on 24 és el número de bits especificats a la màscara de xarxa, o una adreça
+dinàmica:
 
 <informalexample><screen>
     NeTTrom command-&gt; boot diskless
 </screen></informalexample>
 
-You may also need to configure the <userinput>route1</userinput>
-settings if the TFTP
-server is not on the local subnet.  The rest of the config is pretty
-standard (the save-all step is optional):
+Podeu necessitar també de configurar els paràmetres
+<userinput>route1</userinput> si el servidor TFTP no és a la subxarxa
+local. La resta de la configuració és força estàndard (el pas save-all
+és opcional):
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
@@ -67,32 +67,32 @@ standard (the save-all step is optional):
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram
 </screen></informalexample>
 
-Only the last four of these interfere with normal disk booting, so it is
-safe to issue <command>save-all</command> right before them, which will
-store the network settings in case you need to boot from the network
-again.
+Només els últims quatre interferiran amb l'arrencada normal de disc, per
+tant és més segur executar <command>save-all</command> abans, el qual
+guardarà els paràmetres de xarxa per si necessiteu arrencar des de xarxa
+una altra vegada.
 
-If you want to use the serial console to install your NetWinder, you also
-need the following setting:
+Si voleu usar la consola serie per instal·lar el vostre NetWinder, també
+necessitareu els paràmetres següents:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
 </screen></informalexample>
 
-Use the <command>printenv</command> command to review your
-environment settings. Finally, if your <envar>cmdappend</envar>
-NeTTrom variable has the <option>noinitrd</option> option, you must
-remove it so the downloaded kernel can boot with its attached ramdisk.
+Useu l'ordre <command>printenv</command> per revisar els vostres
+paràmetres d'entorn. Finalment, si la vostra variable NeTTrom
+<envar>cmdappend</envar> té la opció <option>noinitrd</option>, podeu
+esborrar-la i el nucli descarregat pot arrencar amb el disc ram associat.
 
 </para>
   </sect3>
 
-  <sect3 arch="arm"><title>Booting from TFTP on CATS</title>
+  <sect3 arch="arm"><title>Arrencant des de TFTP a CATS</title>
 
 <para>
 
-On CATS machines, use <command>boot de0:</command> or similar at the
-Cyclone prompt.
+A màquines CATS, useu <command>boot de0:</command> o similar a
+l'indicador Cyclone.
 
 </para>
    </sect3>
@@ -100,14 +100,14 @@ Cyclone prompt.
 
 
 
-  <sect2 arch="arm"><title>Booting from CD-ROM</title>
+  <sect2 arch="arm"><title>Arrencant des de CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
 
 <para>
 
-To boot a CD-ROM from the Cyclone console prompt, use the command
-<command>boot cd0:cats.bin</command>
+Per arrencar un CD-ROM des de l'indicador de consola Cyclone, useu
+l'ordre <command>boot cd0:cats.bin</command>
 
 </para>
   </sect2>

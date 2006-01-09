@@ -1,73 +1,75 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 30372 untranslated -->
+<!-- original version: 30372 -->
 
 <informalexample condition="sarge"><screen>
-#### Startup.
+#### Inici.
 
-# To use a preseed file, you'll first need to boot the installer,
-# and tell it what preseed file to use. This is done by passing the
-# kernel a boot parameter, either manually at boot or by editing the
-# syslinux.cfg (or similar) file and adding the parameter to the end
-# of the append line(s) for the kernel.
+# Si aneu a emprar un fitxer de configuració prèvia, primer heu d'arrencar
+# l'instal·lador, i indicar-li el fitxer que aneu a emprar. Això es fa
+# indicant-li al nucli un paràmetre d'arrencada, bé manualment en arrencar
+# o bé editant el fitxer syslinux.cfg (o un altre de semblant) i afegint-hi
+# el paràmetre al final de les línies addicionals per al nucli.
 #
-# If you're netbooting, use this:
-#   preseed/url=http://host/path/to/preseed
-# If you're remastering a CD, you could use this:
-#   preseed/file=/cdrom/preseed
-# If you're installing from USB media, use this, and put the preseed file
-# in the toplevel directory of the USB stick.
-#   preseed/file=/hd-media/preseed
-# Be sure to copy this file to the location you specify.
+# Si arrenqueu en xarxa, empreu això:
+#   preseed/url=http://camí/a/l'ordinador/principal/del/fitxer
+# Si esteu reconfigurant-vos un CD, podeu emprar això:
+#   preseed/file=/cdrom/fitxer
+# Si esteu instal·lant des d'un dispositiu USB, empreu això, i poseu el
+# fitxer de configuració al directori principal de la memòria USB.
+#   preseed/file=/hd-media/fitxer
+# Assegureu-vos de copiar el fitxer al lloc que especifiqueu.
 #
-# Some parts of the installation process cannot be automated using
-# some forms of preseeding, because the questions are asked before
-# the preseed file is loaded. For example, if the preseed file is
-# downloaded over the network, the network setup must be done first.
-# One reason to use initrd preseeding is that it allows preseeding
-# of even these early steps of the installation process.
+# Hi ha parts del procés d'instal·lació que no es poden automatitzar fent
+# servir algunes formes de configuració prèvia, car les preguntes es fan
+# abans de carregar el fitxer de configuració. Per exemple, si descarregueu
+# el fitxer d'una xarxa, cal que aquesta estiga ja configurada. Una raó per
+# emprar la configuració prèvia de l'initrd és que permet la configuració
+# prèvia de fins i tot aquests passos incials del procés d'instal·lació.
 #
-# If a preseed file cannot be used to preseed some steps, the install can
-# still be fully automated, since you can pass preseed values to the kernel
-# on the command line. Just pass path/to/var=value for any of the preseed
-# variables listed below.
+# Encara que no es puga emprar un fitxer de configuració prèvia en alguns
+# passos, la instal·lació es pot automatitzar del tot, car podeu indicar-li
+# al nucli valors de configuració prèvia a la línia d'ordres. Simplement
+# indiqueu el camí/a/var=valor per a qualsevol de les variables de
+# configuració prèvia enumerades a sota.
 #
-# While you're at it, you may want to throw a debconf/priority=critical in
-# there, to avoid most questions even if the preseeding below misses some.
-# And you might set the timeout to 1 in syslinux.cfg to avoid needing to hit
-# enter to boot the installer.
+# Mentre hi estigueu a la línia d'ordres, potser voldreu introduir-hi
+# debconf/priority=critical a fi d'evitar la majoria de preguntes fins i
+# tot si la configuració prèvia present se'n deixa alguna. I podeu també
+# ajustar a 1 el temps d'espera a syslinux.cfg per no haver de prémer enter
+# per arrencar l'instal·lador.
 #
-# Note that the kernel accepts a maximum of 8 command line options and
-# 8 environment options (including any options added by default for the
-# installer). If these numbers are exceeded, 2.4 kernels will drop any
-# excess options and 2.6 kernels will panic. With kernel 2.6.9 or newer,
-# you can use 32 command line options and 32 environment options.
+# Tingueu en compte que el nucli accepta un màxim de 8 opcions de línia
+# d'ordres i de 8 opcions d'entorn (incloent-hi qualsevol opció afegida per
+# defecte per a l'instal·lador). Si s'excedeixen aquestes xifres, els nuclis
+# 2.4 les ignoren, mentre que els 2.6 s'esquallen. A partir del 2.6.9 podeu
+# emprar 32 opcions de línia d'ordres i 32 opcions d'entorn.
 #
-# Some of the default options, like 'vga=normal' may be safely removed
-# for most installations, which may allow you to add more options for
-# preseeding.
+# Algunes de les opcions predeterminades, com 'vga=normal' es poden eliminar
+# sense cap problema a la majoria d'instal·lacions, cosa que pot permetre-vos
+# afegir més opcions per a la configuració prèvia.
 
-# It is not possible to use preseeding to set language, country, and
-# keyboard. Instead you should use kernel parameters. Example:
+# No es pot fer servir la configuració prèvia per establir ni l'idioma,
+# ni el país ni el teclat. Cal emprar paràmetres del nucli. Per exemple:
 # languagechooser/language-name=English
 # countrychooser/shortlist=US
 # console-keymaps-at/keymap=us
 
-#### Network configuration.
+#### Configuració de la xarxa.
 
-# Of course, this won't work if you're loading your preseed file from the
-# network! But it's great if you're booting from CD or USB stick. You can
-# also pass network config parameters in on the kernel params if you are
-# loading preseed files from the network.
+# Òbviament, no funcionarà si carregueu el fitxer de configuració prèvia des
+# de la xarxa! Però va molt bé si esteu arrencant des d'un CD o una memòria
+# USB. També podeu indicar-li al nucli els paràmetres de configuració de la
+# xarxa si carregueu fitxers de configuració prèvia des de la xarxa.
 
-# netcfg will choose an interface that has link if possible. This makes it
-# skip displaying a list if there is more than one interface.
+# Si és possible, el netcfg escollirà una interfície que tinga un enllaç. El
+# següent evita que es mostre una llista si hi ha més d'una interfície.
 d-i netcfg/choose_interface select auto
 
-# If you have a slow dhcp server and the installer times out waiting for
-# it, this might be useful.
+# Si teniu un servidor dhcp lent i l'instal·lador finalitza l'espera, això us
+# pot ser d'utilitat.
 #d-i netcfg/dhcp_timeout string 60
 
-# If you prefer to configure the network manually, here's how:
+# Si preferiu configurar la xarxa a mà, aquí teniu com:
 #d-i netcfg/disable_dhcp boolean true
 #d-i netcfg/get_nameservers string 192.168.1.1
 #d-i netcfg/get_ipaddress string 192.168.1.42
@@ -75,18 +77,19 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
 
-# Note that any hostname and domain names assigned from dhcp take
-# precedence over values set here. However, setting the values still
-# prevents the questions from being shown even if values come from dhcp.
+# Tingueu en compte que qualsevol nom d'ordinador principal i de domini
+# assignats amb el dhcp tenen preferència sobre els valors indicats aquí.
+# Tanmateix, establir aquests encara evitarà que es mostren qüestions fins i
+# tot si els valors provenen del dhcp.
 d-i netcfg/get_hostname string unassigned-hostname
 d-i netcfg/get_domain string unassigned-domain
 
-# Disable that annoying WEP key dialog.
+# Per deshabilitar el molest diàleg sobre la clau WEP.
 d-i netcfg/wireless_wep string
-# The wacky dhcp hostname that some ISPs use as a password of sorts.
+# El fastigós nom del servidor dhcp que alguns ISP empren com a contrasenya.
 #d-i netcfg/dhcp_hostname string radish
 
-#### Mirror settings.
+#### Configuració del servidor rèplica.
 
 d-i mirror/country string enter information manually
 d-i mirror/http/hostname string http.us.debian.org
@@ -94,39 +97,39 @@ d-i mirror/http/directory string /debian
 d-i mirror/suite string testing
 d-i mirror/http/proxy string
 
-#### Partitioning.
+#### Particionat.
 
-# If the system has free space you can choose to only partition that space.
+# Si el sistema disposa d'espai lliure podeu triar de particionar només aquest.
 #d-i partman-auto/init_automatically_partition \
-#    select Use the largest continuous free space
+#    seleccioneu Empra l'espai lliure continu més gran
 
-# Alternatively, you can specify a disk to partition. The device name can
-# be given in either devfs or traditional non-devfs format.
-# For example, to use the first disk devfs knows of:
+# També podeu especificar el disc que es particionarà. El nom del dispositiu
+# es pot indicar bé en el format devfs o bé en el format tradicional. Per
+# exemple, per emprar el primer disc que detecta el devfs:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
-# You can choose from any of the predefined partitioning recipes:
+# Podeu triar qualsevol de les receptes de particionat predefinides:
 d-i partman-auto/choose_recipe select \
      All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe select Desktop machine
 #d-i partman-auto/choose_recipe select Multi-user workstation
 
-# Or provide a recipe of your own...
-# The recipe format is documented in the file devel/partman-auto-recipe.txt.
-# If you have a way to get a recipe file into the d-i environment, you can
-# just point at it.
+# O indicar-ne una pròpia...
+# El format de la recepta es descriu al fitxer devel/partman-auto-recipe.txt.
+# Si podeu obtenir un fitxer de recepta per a l'entorn de l'instal·lador,
+# podeu simplement apuntar-hi.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
-# If not, you can put an entire recipe in one line. This example creates
-# a small /boot partition, suitable swap, and uses the rest of the space
-# for the root partition:
+# Si no, podeu posar una recepta sencera en una línia. Aquest exemple crea
+# una petita partició /boot, un espai d'intercanvi adient, i empra la resta
+# de l'espai per a la partició arrel:
 #d-i partman-auto/expert_recipe string boot-root :: \
 #    20 50 100 ext3 $primary{ } $bootable{ } method{ format } format{ } \
 #    use_filesystem{ } filesystem{ ext3 } mountpoint{ /boot } . \
 #    500 10000 1000000000 ext3 method{ format } format{ } \
 #    use_filesystem{ } filesystem{ ext3 } mountpoint{ / } . \
 #    64 512 300% linux-swap method{ swap } format{ } .
-# For reference, here is that same recipe in a more readable form:
+# Com a referència, aquí teniu la mateixa recepta en forma més llegible:
 #    boot-root ::
 #       40 50 100 ext3
 #          $primary{ } $bootable{ }
@@ -143,224 +146,237 @@ d-i partman-auto/choose_recipe select \
 #          method{ swap } format{ }
 #       .
 
-# This makes partman automatically partition without confirmation.
+# Això fa que el partman particione automàticament sense demanar confirmació.
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition select \
     Finish partitioning and write changes to disk
 d-i partman/confirm boolean true
 
-#### Boot loader installation.
+#### Instal·lació del carregador.
 
-# Grub is the default boot loader (for x86). If you want lilo installed
-# instead, uncomment this:
+# El Grub és el carregador predeterminat (per a l'x86). Si voleu instal·lar el
+# lilo, tragueu-hi el comentari:
 #d-i grub-installer/skip boolean true
 
-# This is fairly safe to set, it makes grub install automatically to the MBR
-# if no other operating system is detected on the machine.
+# Això, que és segur de fer, fa que el grub s'instal·le automàticament al
+# registre principal d'arrencada (MBR) si no es detecta cap altre sistema
+# operatiu a la màquina.
 d-i grub-installer/only_debian boolean true
 
-# This one makes grub-installer install to the MBR if if finds some other OS
-# too, which is less safe as it might not be able to boot that other OS.
+# Això altre fa també que l'instal·lador del grub el pose a l'MBR si troba
+# qualsevol altre sistema operatiu, la qual cosa és menys segura ja que pot
+# no ser possible d'arrencar aquest altre sistema operatiu.
 d-i grub-installer/with_other_os boolean true
 
-# Alternatively, if you want to install to a location other than the mbr,
-# uncomment and edit these lines:
+# Com a alternativa, si voleu instal·lar-lo a un lloc diferent de l'MBR,
+# tragueu-ne el comentari i editeu aquestes línies:
 #d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
 
-#### Finishing up the first stage install.
+#### Finalització de la primera etapa de la instal·lació.
 
-# Avoid that last message about the install being complete.
+# Evita el darrer missatge de la instal·lació que apareix indicant-ne l'estat
+# complet.
 d-i prebaseconfig/reboot_in_progress note
 
-#### Shell commands.
+#### Ordres de l'intèrpret.
 
-# d-i preseeding is inherently not secure. Nothing in the installer checks
-# for attempts at buffer overflows or other exploits of the values of a
-# preseed file like this one. Only use preseed files from trusted
-# locations! To drive that home, and because it's generally useful, here's
-# a way to run any shell command you'd like inside the installer,
-# automatically.
+# Necessàriament, la configuració prèvia de l'instal·lador del Debian no pot
+# ser segura. No hi ha res que comprove els intents de sobreeiximent de
+# memòria intermèdia o d'altres abusos sobre els valors d'un fitxer de
+# configuració prèvia com el present. Feu servir només aquests fitxers si
+# provenen de llocs de confiança! Per raons de control, i perquè és útil en
+# general, aquí teniu una manera d'executar de forma automàtica qualsevol
+# ordre de l'intèrpret que vulgueu dins l'instal·lador.
 
-# This first command is run as early as possible, just after
-# preseeding is read.
+# Aquesta primera ordre s'executa tan prompte com es pot, tot just després
+# de llegir el fitxer de configuració prèvia.
 #d-i preseed/early_command string anna-install some-udeb
 
-# This command is run just before the install finishes, but when there is
-# still a usable /target directory.
+# Aquesta s'executa just abans que finalitze la instal·lació, però quan
+# encara es pot usar un directori de destí /target.
 #d-i preseed/late_command string echo foo > /target/etc/bar
 
-# This command is run just as base-config is starting up.
+# Aquesta ordre s'executa en iniciar-se la configuració bàsica (base-config).
 #base-config base-config/early_command string echo hi mom
 
-# This command is run after base-config is done, just before the login:
-# prompt. This is a good way to install a set of packages you want, or to
-# tweak the configuration of the system.
+# Aquesta ordre s'executa després de la configuració bàsica, abans de
+# l'indicador d'entrada. És una bona manera d'instal·lar un conjunt de
+# paquets que us interessen, o de retocar la configuració del sistema.
 #base-config base-config/late_command string \
 #    apt-get install zsh; chsh -s /bin/zsh
 
-###### Preseeding the 2nd stage of the installation.
+###### Configuració prèvia de la segona etapa de la instal·lació.
 
-#### Preseeding base-config.
+#### Configuració prèvia de la configuració bàsica (base-config).
 
-# Avoid the introductory message.
+# Per evitar el missatge introductori.
 base-config base-config/intro note
 
-# Avoid the final message.
+# Per evitar el missatge final.
 base-config base-config/login note
 
-# If you installed a display manager, but don't want to start it immediately
-# after base-config finishes.
+# Per si heu instal·lat un gestor de visualització però no voleu engegar-lo
+# immediatament després de la configuració bàsica.
 #base-config base-config/start-display-manager boolean false
 
-# Some versions of the installer can report back on what you've installed.
-# The default is not to report back, but sending reports helps the project
-# determine what software is most popular and include it on CDs.
+# Algunes versions de l'instal·lador poden emetre un informe del que heu
+# instal·lat. Per defecte, no es fan informes, però enviar-n'hi ajuda el
+# projecte a determinar quin programari s'empra més, a fi d'incloure'l als CD.
 #popularity-contest popularity-contest/participate boolean false
 
-#### Clock and time zone setup.
+#### Configuració del rellotge i de la zona horària.
 
-# Controls whether or not the hardware clock is set to UTC.
+# Per controlar si el rellotge del maquinari s'ajusta al temps universal
+# coordinat (UTC).
 #base-config tzconfig/gmt boolean true
-# If you told the installer that you're in the United States, then you
-# can set the time zone using this variable.
-# (Choices are: Eastern, Central, Mountain, Pacific, Alaska, Hawaii,
-# Aleutian, Arizona East-Indiana, Indiana-Starke, Michigan, Samoa, other)
+# Si li heu dit a l'instal·lador que sou als EUA, podeu ajustar la zona
+# horària fent servir aquesta variable. (Les opcions són: Eastern, Central,
+# Mountain, Pacific, Alaska, Hawaii, Aleutian, Arizona East-Indiana,
+# Indiana-Starke, Michigan, Samoa, other)
 #base-config tzconfig/choose_country_zone/US select Eastern
-# If you told it you're in Canada.
-# (Choices are: Newfoundland, Atlantic, Eastern, Central,
-# East-Saskatchewan, Saskatchewan, Mountain, Pacific, Yukon, other)
+# Si li heu dit que sou al Canadà. (Les opcions són: Newfoundland, Atlantic,
+# Eastern, Central, East-Saskatchewan, Saskatchewan, Mountain, Pacific,
+# Yukon, altres)
 #base-config tzconfig/choose_country_zone/CA select Eastern
-# If you told it you're in Brazil. (Choices are: East, West, Acre,
-# DeNoronha, other)
+# Si li heu dit que sou al Brazil. (Les opcions són: East, West, Acre,
+# DeNoronha, altres)
 #base-config tzconfig/choose_country_zone/BR select East
-# Many countries have only one time zone. If you told the installer you're
-# in one of those countries, you can choose its standard time zone via this
-# question.
+# Molts països tenen només una zona horària. Si li heu dit a l'instal·lador
+# que sou a algun d'aquests, podeu triar-ne la zona horària estàndard
+# mitjançant aquesta pregunta.
 #base-config tzconfig/choose_country_zone_single boolean true
-# This question is asked as a fallback for countries other than those
-# listed above, which have more than one time zone. You can preseed one of
-# the time zones, or "other".
+# Aquesta pregunta es fa com a recurs alternatiu per a països diferents dels
+# enumerats abans, els quals tenen més d'una zona horària. Podeu configurar
+# prèviament una de les zones horàries, o una altra («other»).
 #base-config tzconfig/choose_country_zone_multiple select
 
-#### Account setup.
+#### Configuració prèvia de comptes.
 
-# To preseed the root password, you have to put it in the clear in this
-# file. That is not a very good idea, use caution!
+# Per fer una configuració prèvia de la contrasenya de superusuari, cal que
+# la indiqueu explícitament en aquest fitxer. Això no és bona idea, sigueu-ne
+# conscients!
 #passwd passwd/root-password password r00tme
 #passwd passwd/root-password-again password r00tme
 
-# If you want to skip creation of a normal user account.
+# Per ometre la creació d'un compte d'usuari normal.
 #passwd passwd/make-user boolean false
 
-# Alternatively, you can preseed the user's name and login.
+# Per configurar prèviament el nom d'usuari complet i el que tindrà al sistema.
 #passwd passwd/user-fullname string Debian User
 #passwd passwd/username string debian
-# And their password, but use caution!
+# I la contrasenya, però empreu això amb molta precaució!
 #passwd passwd/user-password password insecure
 #passwd passwd/user-password-again password insecure
 
-#### Apt setup.
+#### Configuració de l'apt.
 
-# This question controls what source the second stage installation uses
-# for packages. Choices are cdrom, http, ftp, filesystem, edit sources list
-# by hand
+# Amb això es controla quina font de paquets es fa servir en la segona fase
+# de la instal·lació. Les opcions són: cdrom, http, ftp, filesystem (sistema
+# de fitxers), edit sources list by hand (edició manual de la llista de fonts)
 base-config apt-setup/uri_type select http
 
-# If you choose ftp or http, you'll be asked for a country and a mirror.
+# Si escolliu ftp o http, se us demanarà un país i un servidor rèplica.
 base-config apt-setup/country select enter information manually
 base-config apt-setup/hostname string http.us.debian.org
 base-config apt-setup/directory string /debian
-# Stop after choosing one mirror.
+# Perquè s'ature després d'escollir el servidor rèplica.
 base-config apt-setup/another boolean false
 
-# You can choose to install non-free and contrib software.
+# Podeu instal·lar programari no lliure (non-free) i de contribució (contrib).
 #base-config apt-setup/non-free boolean true
 #base-config apt-setup/contrib boolean true
 
-# Do enable security updates.
+# Per habilitar actualitzacions de seguretat.
 base-config apt-setup/security-updates boolean true
 
-#### Package selection.
+#### Selecció de paquets.
 
-# You can choose to install any combination of tasks that are available.
-# Available tasks as of this writing include: Desktop environment,
-# Web server, Print server, DNS server, File server, Mail server,
-# SQL database, Laptop, Standard system, manual package selection. The
-# last of those will run aptitude. You can also choose to install no
-# tasks, and force the installation of a set of packages in some other
-# way. We recommend always including the Standard system task.
+# Podeu instal·lar qualsevol combinació de tasques que hi haja a l'abast.
+# En aquest moment les tasques que hi ha són: Entorn d'escriptori (Desktop
+# environment), Servidor web (Web server), Servidor d'impressió (Print server),
+# Servidor DNS (DNS server), Servidor de fitxers (File server), Servidor de
+# correu (Mail server), Base de dades SQL (SQL database), Portàtil (Laptop),
+# Sistema estàndard (Standard system), Selecció manual de paquets (manual
+# package selection). La darrera executarà l'aptitude. Podeu també no
+# instal·lar cap tasca i forçar la instal·lació d'un conjunt de paquets
+# d'alguna altra manera. És recomanable incloure sempre la tasca Sistema
+# estàndard.
 tasksel tasksel/first multiselect Desktop environment, Standard system
 #tasksel tasksel/first multiselect Web server, Standard system
 
-#### Mailer configuration.
+#### Configuració de l'administrador de correu.
 
-# During a normal install, exim asks only a few questions. Here's how to
-# avoid even those. More complicated preseeding is possible.
+# Durant una instal·lació normal, l'exim sols fa unes poques preguntes. Aquí
+# teniu la manera d'evitar fins i tot aquestes. Però encara es pot configurar
+# de manera més complexa.
 exim4-config exim4/dc_eximconfig_configtype \
     select no configuration at this time
 exim4-config exim4/no_config boolean true
 exim4-config exim4/no_config boolean true
 
-# It's a good idea to set this to whatever user account you choose to
-# create. Leaving the value blank results in postmaster mail going to
+# És bona idea ajustar el següent a qualsevol dels comptes d'usuari que hàgeu
+# creat. Si ho deixeu en blanc, el correu de l'administrador de correu anirà a
 # /var/mail/mail.
 exim4-config exim4/dc_postmaster string
 
-#### X Configuration.
+#### Configuració de l'X.
 
-# Preseeding Debian's X config is possible, but you probably need to know
-# some details about the video hardware of the machine, since Debian's X
-# configurator does not do fully automatic configuration of everything.
+# Es pot fer una configuració prèvia de l'X, però probablement us caldrà saber
+# alguns detalls sobre el maquinari de vídeo, car el configurador de l'X
+# no ho configura tot automàticament.
 
-# X can detect the right driver for some cards, but if you're preseeding,
-# you override whatever it chooses. Still, vesa will work most places.
+# L'X pot detectar el controlador adient per a algunes targetes, però si
+# empreu una configuració prèvia, substituireu tot el que aquell seleccione.
+# Amb tot, el controlador vesa funcionarà la majoria de vegades.
 #xserver-xfree86 xserver-xfree86/config/device/driver select vesa
 
-# A caveat with mouse autodetection is that if it fails, X will retry it
-# over and over. So if it's preseeded to be done, there is a possibility of
-# an infinite loop if the mouse is not autodetected.
+# Un problema amb l'detecció automàtica del ratolí és que si falla, l'X la
+# tornarà intentar indefinidament. Per tant, si l'heu inclosa en la
+# configuració prèvia, hi ha la possibilitat de caure en un bucle infinit,
+# si falla la detecció.
 #xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
 
-# Monitor autodetection is recommended.
+# Es recomana fer servir la detecció automàtica del monitor.
 xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
-# Uncomment if you have an LCD display.
+# Tragueu el comentari a això si teniu una pantalla LCD.
 #xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
-# X has three configuration paths for the monitor. Here's how to preseed
-# the "medium" path, which is always available. The "simple" path may not
-# be available, and the "advanced" path asks too many questions.
+# L'X té tres maneres de configurar el monitor. Aquí teniu com configurar
+# prèviament la «intermèdia» (medium), que sempre és a l'abast. La «simple»
+# pot no ser-hi, i l' «avançada» (advanced) fa massa preguntes.
 xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
     select medium
 xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
     select 1024x768 @ 60 Hz
 
-#### Everything else.
+#### Altres qüestions.
 
-# Depending on what software you choose to install, or if things go wrong
-# during the installation process, it's possible that other questions may
-# be asked. You can preseed those too, of course. To get a list of every
-# possible question that could be asked during an install, do an
-# installation, and then run these commands:
+# Segons el programari instal·lat, o si les coses van malament durant el
+# procés d'instal·lació, és possible rebre preguntes sobre altres qüestions.
+# També podeu fer-ne una configuració prèvia. Per obtenir una llista de totes
+# les preguntes que es poden fer durant la instal·lació, feu una instal·lació,
+# i després executeu aquestes ordres:
 #   debconf-get-selections --installer > file
 #   debconf-get-selections >> file
 
-# If you like, you can include other preseed files into this one.
-# Any settings in those files will override pre-existing settings from this
-# file. More that one file can be listed, separated by spaces; all will be
-# loaded. The included files can have preseed/include directives of their
-# own as well. Note that if the filenames are relative, they are taken from
-# the same directory as the preseed file that includes them.
+# Si voleu, podeu incloure altres fitxers de configuració prèvia en aquest.
+# Qualsevol ajust d'aquests fitxers prevaldrà sobre els del fitxer present.
+# Es pot incloure més d'un fitxer, separat per espais; es carregaran tots.
+# Els fitxers inclosos poden tenir directrius de configuració prèvia pròpies o
+# bé incloure fitxers amb d'altres. Tingueu en compte que si els noms de fitxer
+# són relatius, s'agafen del mateix directori que el del fitxer que els inclou.
 #d-i preseed/include string x.cfg
 
-# More flexibly, this runs a shell command and if it outputs the names of
-# preseed files, includes those files. For example, to switch configs based
-# on a particular usb storage device (in this case, a built-in card reader):
+# Més flexible que això és el següent, que executa una ordre a l'intèpret i,
+# si s'obté cap nom d'un fitxer de configuració prèvia, s'hi inclou. Per
+# exemple, per activar les configuracions basades en un determinat dispositiu
+# USB d'emmagatzematge (en aquest cas, un lector incorporat de targetes):
 #d-i preseed/include_command string \
 #    if $(grep -q "GUID: 0aec3050aec305000001a003" /proc/scsi/usb-storage-*/*); \
 #    then echo kraken.cfg; else echo otherusb.cfg; fi
 
-# To check the format of your preseed file before performing an install,
-# you can use debconf-set-selections:
+# Per configurar el format d'un fitxer de configuració prèvia abans d'efectuar
+# la instal·lació, podeu fer servir les debconf-set-selections:
 #   debconf-set-selections -c preseed.cfg
 </screen></informalexample>

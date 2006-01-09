@@ -1,72 +1,70 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 24321 untranslated -->
+<!-- original version: 24321 -->
 
   <sect3 arch="ia64">
-  <title>Install the <command>ELILO</command> Boot Loader
-         on a Hard Disk</title>
+  <title>Instal·lació del carregador <command>ELILO</command>
+         a un disc dur</title>
 <para>
 
-The &architecture; boot loader is called <quote>elilo</quote>.
-It is modeled on the <quote>lilo</quote> boot loader for the
-x86 architecture and uses a similar configuration file.
-However, instead of writing an MBR or partition boot record to
-the disk, it copies the necessary files to a separate FAT formatted
-disk partition and modifies the <guimenuitem>EFI Boot Manager</guimenuitem>
-menu in the firmware to point to the files in the EFI partition.
-The <command>elilo</command> boot loader is really in two parts.
-The <filename>/usr/sbin/elilo</filename> command manages the partition and
-copies file into it.
-The <filename>elilo.efi</filename> program is copied into the EFI
-partition and then run by the <quote>EFI Boot Manager</quote> to actually
-do the work of loading and starting the Linux kernel.
+El carregador per a l'&architecture; s'anomena <quote>elilo</quote>.
+Està basat en el carregador <quote>lilo</quote>, de l'arquitectura x86,
+i fa servir un fitxer de configuració semblant. Tanmateix, en lloc
+d'escriure un MBR o un registre d'arrencada de partició al disc, copia
+els fitxers necessaris a una partició FAT separada i modifica el menú del
+<guimenuitem>gestor d'arrencada EFI</guimenuitem> del firmware perquè apunte
+als fitxers de la partició EFI. El carregador <command>elilo</command>
+té en realitat dues parts. L'ordre <filename>/usr/sbin/elilo</filename>
+gestiona la partició i hi copia els fitxers. El programa
+<filename>elilo.efi</filename> es copia a la partició EFI i després
+és executat pel <quote>gestor d'arrencada EFI</quote> a fi de dur a
+terme realment la feina de carregar i iniciar el nucli del Linux.
 
 </para><para>
 
-The <quote>elilo</quote> configuration and installation is done as the
-last step of installing the packages of the base installation.
-&d-i; will present you with a list of potential disk partitions that it
-has found suitable for an EFI partition.
-Select the partition you set up earlier in the installation, typically
-a partition on the same disk that contains your
-<emphasis>root</emphasis> filesystem.
+La instal·lació i configuració de l'<quote>elilo</quote> constitueix el
+darrer pas de la instal·lació dels paquets de la instal·lació bàsica.
+El &d-i; us presentarà una llista de possibles particions del disc adients
+per a esdevenir una partició EFI. Seleccioneu la partició que heu
+configurat abans durant la instal·lació, que serà normalment una
+partició al mateix disc dur que conté el sistema de fitxers
+<emphasis>arrel</emphasis>.
 
 </para>
 
-  <warning><title>Choose the correct partition!</title>
+  <warning><title>Trieu la partició correcta!</title>
 
 <para>
 
-The criteria for selecting a partition is that it is FAT format
-filesystem with its <emphasis>boot</emphasis> flag set.
-&d-i; may show multiple choices depending on what it finds from scanning
-all of the disks of the system including EFI partitions of other system
-disks and EFI diagnostic partitions.
-Remember, the <command>elilo</command> may format the partition during
-the installation, erasing any previous contents!
+Els criteris per seleccionar una partició són: tenir el sistema de fitxers
+en format FAT amb el senyalador <emphasis>boot (arrencada)</emphasis>
+activat. El &d-i; pot mostrar nombroses opcions segons el que haja trobat
+en analitzar els discs del sistema, incloent-hi les particions EFI d'altres
+discs del sistema i les particions de diagnòstic EFI. Recordeu que
+l'<command>elilo</command> pot formatejar la partició durant la
+instal·lació i que això esborrarà qualsevol contingut que hi haja!
 
 </para></warning>
 
   </sect3>
 
   <sect3 arch="ia64">
-  <title>EFI Partition Contents</title>
+  <title>Continguts de la partició EFI</title>
 
 <para>
 
-The EFI partition is a FAT filesystem format partition on one of the
-hard disks of the system, usually the same disk that contains the
-<emphasis>root</emphasis> filesystem.
-It is normally not mounted on a running system as it is only needed
-by the <quote>EFI Boot Manager</quote> to load the system and the
-installer part of the <command>elilo</command> writes to the filesystem
-directly.
-The <command>/usr/sbin/elilo</command> utility writes the following files
-into the <filename>efi/debian</filename> directory of the EFI
-partition during the installation.
-Note that the <quote>EFI Boot Manager</quote> would find these files
-using the path <filename>fs<replaceable>n</replaceable>:\efi\debian</filename>.
-There may be other files in this filesystem as well over time as
-the system is updated or re-configured.
+La partició EFI és una partició de format de sistema de fitxers FAT,
+situada a un dels discs durs del sistema, normalment el mateix que conté
+el sistema de fitxers <emphasis>arrel</emphasis>. No sol estar muntada a
+un sistema que estiga en execució, ja que solament la necessita el
+<quote>gestor d'arrencada EFI</quote> per carregar el sistema i la part
+de l'instal·lador que l'<command>elilo</command> escriu al sistema de
+fitxers directament. La utilitat <command>/usr/sbin/elilo</command> escriu
+els següents fitxers al directori <filename>efi/debian</filename> de la
+partició EFI durant la instal·lació. Tingueu en compte que el
+<quote>gestor de càrrega EFI</quote> trobarà aquests fitxers emprant el
+camí <filename>fs<replaceable>n</replaceable>:\efi\debian</filename>.
+Podrà haver-hi altres fitxers en aquest sistema de fitxers a mesura que,
+amb el temps, s'actualitze o es reconfigure el sistema.
 
 </para>
 
@@ -76,9 +74,10 @@ the system is updated or re-configured.
 <term><filename>elilo.conf</filename></term>
 <listitem><para>
 
-This is the configuration file read by the boot loader when it starts.
-It is a copy of the <filename>/etc/elilo.conf</filename> with
-the filenames re-written to refer to files in the EFI partition.
+Aquest és el fitxer de configuració que llegeix el carregador quan
+s'inicia. És una còpia de l'<filename>/etc/elilo.conf</filename> amb
+els noms de fitxer reescrits per referir-se als fitxers de la partició
+EFI.
 
 </para></listitem></varlistentry>
 
@@ -86,10 +85,10 @@ the filenames re-written to refer to files in the EFI partition.
 <term><filename>elilo.efi</filename></term>
 <listitem><para>
 
-This is the boot loader program that the <quote>EFI Boot Manager</quote>
-runs to boot the system.
-It is the program behind the <guimenuitem>Debian GNU/Linux</guimenuitem>
-menu item of the <quote>EFI Boot Manager</quote> command menu.
+Aquest és el programa carregador que el <quote>gestor d'arrencada EFI</quote>
+executa per arrencar el sistema. És el programa que hi ha al darrere de
+l'ítem <guimenuitem>Debian GNU/Linux</guimenuitem> del menú d'ordres
+del <quote>gestor d'arrencada EFI</quote>.
 
 </para></listitem></varlistentry>
 
@@ -97,12 +96,11 @@ menu item of the <quote>EFI Boot Manager</quote> command menu.
 <term><filename>initrd.img</filename></term>
 <listitem><para>
 
-This is the initial root filesystem used to boot the kernel.
-It is a copy of the file referenced in the
-<filename>/etc/elilo.conf</filename>.
-In a standard Debian installation it would be the file in
-<filename>/boot</filename> pointed to by the symbolic link
-<filename>/initrd.img</filename>.
+Aquest és el sistema de fitxers arrel inicial emprat per arrencar el
+nucli. És una còpia del fitxer referenciat a
+<filename>/etc/elilo.conf</filename>. En una instal·lació estàndard de
+Debian seria el fitxer de <filename>/boot</filename> al qual apunta
+l'enllaç simbòlic <filename>/initrd.img</filename>.
 
 </para></listitem></varlistentry>
 
@@ -110,10 +108,10 @@ In a standard Debian installation it would be the file in
 <term><filename>readme.txt</filename></term>
 <listitem><para>
 
-This is a small text file warning you that the contents of the
-directory are managed by the <command>elilo</command> and that
-any local changes would be lost at the next time
-<filename>/usr/sbin/elilo</filename> is run.
+És un petit fitxer de text que us informa que els continguts del
+directori són gestionats per l'<command>elilo</command> i que
+qualsevol canvi local es perdrà la propera vegada que s'execute
+l'<filename>/usr/sbin/elilo</filename>.
 
 </para></listitem></varlistentry>
 
@@ -121,12 +119,10 @@ any local changes would be lost at the next time
 <term><filename>vmlinuz</filename></term>
 <listitem><para>
 
-This is the compressed kernel itself.
-It is a copy of the file referenced in the
-<filename>/etc/elilo.conf</filename>.
-In a standard Debian installation it would be the file in
-<filename>/boot</filename> pointed to by the symbolic link
-<filename>/vmlinuz</filename>.
+És el nucli comprimit. És una còpia del fitxer referenciat a
+<filename>/etc/elilo.conf</filename>. En una instal·lació estàndard
+de Debian, seria el fitxer de <filename>/boot</filename> al qual
+apunta l'enllaç simbòlic <filename>/vmlinuz</filename>.
 
 </para></listitem></varlistentry>
 
