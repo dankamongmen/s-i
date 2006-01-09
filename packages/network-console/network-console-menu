@@ -3,6 +3,10 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+if db_get debconf/language && [ "$RET" ] ; then
+        db_set debconf/language $RET
+fi
+
 TEMPLATE_ROOT=network-console
 
 db_input critical $TEMPLATE_ROOT/login
