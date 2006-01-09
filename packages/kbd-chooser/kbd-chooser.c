@@ -748,7 +748,8 @@ keymap_set (struct debconfclient *client, char *keymap)
 int
 main (int argc, char **argv)
 {
-	char *kbd_priority, keymap[LINESIZE], buf[LINESIZE], *arch;
+	char *kbd_priority, buf[LINESIZE], *arch;
+	char keymap[LINESIZE]="no keymap";
 	enum { GOBACK, CHOOSE_ARCH, CHOOSE_KEYMAP, QUIT } state = CHOOSE_ARCH;
 	struct debconfclient *client;
 
