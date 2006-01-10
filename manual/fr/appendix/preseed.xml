@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 33825 -->
+<!-- original version: 33891 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -497,11 +497,21 @@ aux paramètres du noyau si vous récupérez le fichier de préconfiguration
 sur le réseau.
 
 </para>
+<para>
+
+Si, quand vous amorcez par le réseau, vous avez besoin d'une interface particulière
+avant de charger le fichier de préconfiguration, utilisez un paramètre comme celui-ci&nbsp;:
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+
+ </para>
 
 <informalexample role="example"><screen>
 #Netcfg choisira une interface connectée si possible. Cela empêchera d'afficher
 #une liste s'il y a plusieurs interfaces.
 d-i netcfg/choose_interface select auto
+
+# Pour utiliser une interface particulière :
+#d-i netcfg/choose_interface select eth1
 
 #Quand le serveur dhcp est lent et que l'installateur s'arrête pour l'attendre,
 #ceci peut être utile.
@@ -703,23 +713,24 @@ car un accès au hachage MD5 permet les attaques en force.
 
 <informalexample role="example"><screen>
 #Le mot de passe de root en clair...
-#passwd passwd/root-password password r00tme
-#passwd passwd/root-password-again password r00tme
+#d-i passwd/root-password password r00tme
+#d-i passwd/root-password-again password r00tme
 # ... ou chiffré avec un hachage MD5
-#passwd passwd/root-password-crypted password [MD5 hash]
+#d-i passwd/root-password-crypted password [MD5 hash]
 
 # Si vous voulez ne pas créer d'utilisateur :
-#passwd passwd/make-user boolean false
+#d-i passwd/make-user boolean false
 
 # Vous pouvez aussi présélectionner le nom de l'utilisateur et son identifiant
 # de connexion
-#passwd passwd/user-fullname string Debian User
-#passwd passwd/username string debian
+#d-i passwd/user-fullname string Debian User
+#d-i passwd/username string debian
+
 # Mot de passe de l'utilisateur en clair...
-#passwd passwd/user-password password insecure
-#passwd passwd/user-password-again password insecure
+#d-i passwd/user-password password insecure
+#d-i passwd/user-password-again password insecure
 # ... ou chiffré avec un hachage MD5
-#passwd passwd/user-password-crypted password [MD5 hash]
+#d-i passwd/user-password-crypted password [MD5 hash]
 </screen></informalexample>
 
 <para>
@@ -886,24 +897,24 @@ configurateur Debian du serveur X ne configure rien automatiquement.
 # X peut détecter le bon pilote pour certaines cartes, mais si vous faites une
 # préconfiguration, vous annulez ce qu'il aura choisi. Cependant vesa
 # fonctionne la plupart du temps.
-#xserver-xfree86 xserver-xfree86/config/device/driver select vesa
+#xserver-xorg xserver-xorg/config/device/driver select vesa
 
 # Pour la détection automatique de la souris, il faut savoir que si elle
 # échoue, X recommence sans fin le processus. Donc, s'il y a préconfiguration,
 # une boucle infinie peut apparaître si la souris n'est pas détectée.
-#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
+#xserver-xorg xserver-xorg/autodetect_mouse boolean true
 
 # La détection automatique du moniteur est recommandée.
-xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
+xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # Décommentez la ligne suivante si vous possédez un écran LCD.
 #xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
 # X possède trois méthodes pour la configuration du moniteur. Voici comment
 # présélectionner la méthode « medium », qui est toujours disponible.
 # La méthode « simple » peut ne pas être disponible et la méthode
 # « advanced » pose trop de questions.
-xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
+xserver-xorg xserver-xorg/config/monitor/selection-method \
        select medium
-xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
+xserver-xorg xserver-xorg/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
 </sect2>
