@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33865 untranslated -->
+<!-- original version: 33891 untranslated -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -123,7 +123,7 @@ also already have been processed.
 </para><para>
 
 Obviously, any questions that have been processed before the
-preseeding configuration file is loaded, cannot be preseeded.
+preseeding configuration file is loaded cannot be preseeded.
 <xref linkend="preseed-bootparms"/> offers a way to avoid these
 questions being asked.
 
@@ -207,7 +207,7 @@ are stored in a separate, non-readable file in the same directory.
   <title>Running custom commands during the installation</title>
 <para>
 
-A very powerfull and flexible option offered by the preseeding tools is the
+A very powerful and flexible option offered by the preseeding tools is the
 ability to run commands or scripts at certain points in the installation.
 See <xref linkend="preseed-shell"/> for details.
 
@@ -489,12 +489,21 @@ booting from CD or USB stick. If you are loading preseed files from
 the network, you can pass network config parameters in using kernel
 boot parameters.
 
+</para><para>
+
+If you need to pick a particular interface when netbooting before loading
+a preseed file from the network, use a boot parameter such as
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+
 </para>
 
 <informalexample role="example"><screen>
 # netcfg will choose an interface that has link if possible. This makes it
 # skip displaying a list if there is more than one interface.
 d-i netcfg/choose_interface select auto
+
+# To pick a particular interface instead:
+#d-i netcfg/choose_interface select eth1
 
 # If you have a slow dhcp server and the installer times out waiting for
 # it, this might be useful.
@@ -526,7 +535,7 @@ d-i netcfg/wireless_wep string
   <title>Mirror settings</title>
 <para>
 
-Depending on the installation method you use, a mirror may used both to
+Depending on the installation method you use, a mirror may be used both to
 download additional components of the installer, the base system and to
 set up the <filename>/etc/apt/sources.list</filename> for the installed
 system.
@@ -879,23 +888,23 @@ configurator does not do fully automatic configuration of everything.
 <informalexample role="example"><screen>
 # X can detect the right driver for some cards, but if you're preseeding,
 # you override whatever it chooses. Still, vesa will work most places.
-#xserver-xfree86 xserver-xfree86/config/device/driver select vesa
+#xserver-xorg xserver-xorg/config/device/driver select vesa
 
 # A caveat with mouse autodetection is that if it fails, X will retry it
 # over and over. So if it's preseeded to be done, there is a possibility of
 # an infinite loop if the mouse is not autodetected.
-#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
+#xserver-xorg xserver-xorg/autodetect_mouse boolean true
 
 # Monitor autodetection is recommended.
-xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
+xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # Uncomment if you have an LCD display.
-#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
+#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
 # X has three configuration paths for the monitor. Here's how to preseed
 # the "medium" path, which is always available. The "simple" path may not
 # be available, and the "advanced" path asks too many questions.
-xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
+xserver-xorg xserver-xorg/config/monitor/selection-method \
        select medium
-xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
+xserver-xorg xserver-xorg/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
 
