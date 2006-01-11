@@ -78,6 +78,7 @@ static struct map map_hardware[] = {
     { "Simtec-BAST" , "bast" },
     { "Iyonix" , "iyonix" },
     { "Baloon" , "baloon" },
+    { "Linksys NSLU2", "nslu2" },
     { NULL, NULL }
 };
 
