@@ -666,6 +666,15 @@ default_disk_label () {
 		    echo msdos;;
 		ads)
 		    echo msdos;;
+		nslu2)
+		    echo msdos;;
+		*)
+		    echo UNKNOWN;;
+	    esac;;
+	armeb)
+	    case "$sub" in
+		nslu2)
+		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
