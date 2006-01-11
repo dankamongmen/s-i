@@ -8,33 +8,15 @@ set -e
 preseed_fetch () {
 	local url="$1"
 	local file="$2"
-	case "$url" in
-		nfs://*)
-			url=${url#nfs://}
-			host=$(echo "$url" | cut -d / -f 1)
-			url=${url#$host}
-			path=`dirname $url`
-			file=`basename $url`
-			mnt=/tmp/nfs-preseed
-			mkdir $mnt
-			mount -t nfs $host:$path $mnt
-			cp $mnt/$file $file
-			umount $mnt
-			rmdir $mnt
+	iters=0
+	while [ $iters -lt 3 ]; do
+		# TODO proxy support? Would it be useful?
+		# TODO add progress bar
+		if wget -q "$url" -O "$file"; then
 			return 0
-			;;
-		*)
-			iters=0
-			while [ $iters -lt 3 ]; do
-				# TODO proxy support? Would it be useful?
-				# TODO add progress bar
-				if wget -q "$url" -O "$file"; then
-					return 0
-				fi
-				iters=$(($iters + 1))
-			done
-			;;
-	esac
+		fi
+        	iters=$(($iters + 1))
+	done
 	return 1
 }
 preseed_relative () {
