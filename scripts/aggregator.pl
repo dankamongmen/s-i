@@ -23,6 +23,9 @@ sub aggregate {
 		my $oneother=0;
 		
 		print $fh "<li><a href=\"".$log->{url}."\">".$log->{description}."</a><br>\n";
+		if (length $log->{notes}) {
+			print $fh "Notes: ".$log->{notes}."<br>\n";
+		}
 		my $logurl=$log->{logurl}."overview".$log->{logext}."\n";
 		if ($logurl=~m#.*://#) {
 			if (! open (LOG, "wget --tries=3 --timeout=5 --quiet -O - $logurl |")) {
