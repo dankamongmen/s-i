@@ -82,6 +82,7 @@ typedef enum {
 	CMD_INPUTINVISIBLE	= 30, // from debconf_input()
 	CMD_BADVERSION		= 30, // from debconf_version()
 	CMD_GOBACK		= 30, // from debconf_go()
+	CMD_PROGRESSCANCELLED	= 30, // from debconf_progress_{set,step,info}()
 	CMD_INTERNALERROR	= 100
 } cmdstatus_t;
 
