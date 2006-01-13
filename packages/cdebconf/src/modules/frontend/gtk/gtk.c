@@ -1412,6 +1412,8 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
     ((struct frontend_data*) obj->data)->button_prev = button_prev;
     ((struct frontend_data*) obj->data)->button_next = button_next;
+    gtk_widget_set_sensitive (button_prev, FALSE);
+    gtk_widget_set_sensitive (button_next, FALSE);
 
     /* focus order inside actionbox */
     focus_chain = g_list_append(focus_chain, button_next);
