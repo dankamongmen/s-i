@@ -1393,7 +1393,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     ((struct frontend_data*) obj->data)->button_screenshot = button_screenshot;
 
     /* Here are the back and forward buttons */
-    button_prev = gtk_button_new_from_stock (GTK_STOCK_GO_BACK);
+    button_prev = gtk_button_new_with_label (get_text(obj, "debconf/button-goback", "Go Back"));
     ret_val = NEW(int);
     *ret_val = DC_GOBACK;
     gtk_object_set_user_data (GTK_OBJECT(button_prev), ret_val);
@@ -1401,7 +1401,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
                       G_CALLBACK(exit_button_callback), obj);
     gtk_box_pack_start (GTK_BOX(actionbox), button_prev, TRUE, TRUE, DEFAULT_PADDING);
 
-    button_next = gtk_button_new_from_stock (GTK_STOCK_GO_FORWARD);
+    button_next = gtk_button_new_with_label (get_text(obj, "debconf/button-continue", "Continue"));
     ret_val = NEW(int);
     *ret_val = DC_OK;
     gtk_object_set_user_data (GTK_OBJECT(button_next), ret_val);
@@ -1679,8 +1679,6 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     struct frontend_data *data = (struct frontend_data *) obj->data;
     gtk_widget_set_sensitive (data->button_screenshot, FALSE);
     gtk_widget_show_all(data->window);
-    gtk_widget_hide(data->button_next);
-    gtk_widget_hide(data->button_prev);
 
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
@@ -1718,8 +1716,6 @@ static int gtk_progress_set(struct frontend *obj, int val)
     }
 
     gtk_widget_show_all(data->window);
-    gtk_widget_hide(data->button_next);
-    gtk_widget_hide(data->button_prev);
 
     while (gtk_events_pending ())
         gtk_main_iteration ();
@@ -1743,8 +1739,6 @@ static int gtk_progress_info(struct frontend *obj, const char *info)
     free(progress_bar_label_string);
 
     gtk_widget_show_all(data->window);
-    gtk_widget_hide(data->button_next);
-    gtk_widget_hide(data->button_prev);
 
     while (gtk_events_pending ())
         gtk_main_iteration ();
