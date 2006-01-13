@@ -1679,6 +1679,8 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     struct frontend_data *data = (struct frontend_data *) obj->data;
     gtk_widget_set_sensitive (data->button_screenshot, FALSE);
     gtk_widget_show_all(data->window);
+    gtk_widget_hide(data->button_next);
+    gtk_widget_hide(data->button_prev);
 
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
@@ -1716,6 +1718,8 @@ static int gtk_progress_set(struct frontend *obj, int val)
     }
 
     gtk_widget_show_all(data->window);
+    gtk_widget_hide(data->button_next);
+    gtk_widget_hide(data->button_prev);
 
     while (gtk_events_pending ())
         gtk_main_iteration ();
@@ -1739,6 +1743,8 @@ static int gtk_progress_info(struct frontend *obj, const char *info)
     free(progress_bar_label_string);
 
     gtk_widget_show_all(data->window);
+    gtk_widget_hide(data->button_next);
+    gtk_widget_hide(data->button_prev);
 
     while (gtk_events_pending ())
         gtk_main_iteration ();
