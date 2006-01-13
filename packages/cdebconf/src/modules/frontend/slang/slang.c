@@ -832,7 +832,7 @@ static int slang_go(struct frontend *obj)
 	return DC_OK;
 }
 
-static void
+static int
 slang_progress_set(struct frontend *obj, int val);
 
 static void
@@ -851,7 +851,7 @@ slang_progress_start(struct frontend *obj, int min, int max, const char *title)
 	slang_progress_set(obj, min);
 }
 
-static void
+static int
 slang_progress_set(struct frontend *obj, int val)
 {
 	struct uidata *uid = UIDATA(obj);
@@ -894,9 +894,11 @@ slang_progress_set(struct frontend *obj, int val)
 	}
 	
 	free(percstr);
+
+	return DC_OK;
 }
 
-static void
+static int
 slang_progress_info(struct frontend *obj, const char *info)
 {
 	struct uidata *uid = UIDATA(obj);
@@ -912,6 +914,8 @@ slang_progress_info(struct frontend *obj, const char *info)
 	slang_flush();
 
 	free(buf);
+
+	return DC_OK;
 }
 
 static void

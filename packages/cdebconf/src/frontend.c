@@ -95,6 +95,11 @@ static bool frontend_can_go_forward(struct frontend *ui, struct question *q)
 	return true;
 }
 
+static bool frontend_can_cancel_progress(struct frontend *ui)
+{
+	return false;
+}
+
 static void frontend_progress_start(struct frontend *ui, int min, int max, const char *title)
 {
     DELETE(ui->progress_title);
@@ -104,18 +109,20 @@ static void frontend_progress_start(struct frontend *ui, int min, int max, const
     ui->progress_cur = min;
 }
 
-static void frontend_progress_set(struct frontend *ui, int val)
+static int frontend_progress_set(struct frontend *ui, int val)
 {
     ui->progress_cur = val;
+    return DC_OK;
 }
 
-static void frontend_progress_step(struct frontend *ui, int step)
+static int frontend_progress_step(struct frontend *ui, int step)
 {
-    ui->methods.progress_set(ui, ui->progress_cur + step);
+    return ui->methods.progress_set(ui, ui->progress_cur + step);
 }
 
-static void frontend_progress_info(struct frontend *ui, const char *info)
+static int frontend_progress_info(struct frontend *ui, const char *info)
 {
+    return DC_OK;
 }
 
 static void frontend_progress_stop(struct frontend *ui)
@@ -198,6 +205,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	SETMETHOD(clear);
 	SETMETHOD(can_go_back);
 	SETMETHOD(can_go_forward);
+	SETMETHOD(can_cancel_progress);
     SETMETHOD(progress_start);
     SETMETHOD(progress_set);
     SETMETHOD(progress_step);

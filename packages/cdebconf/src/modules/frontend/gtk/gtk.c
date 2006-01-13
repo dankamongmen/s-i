@@ -1695,7 +1695,7 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
         gtk_main_iteration ();
 }
 
-static void gtk_progress_set(struct frontend *obj, int val)
+static int gtk_progress_set(struct frontend *obj, int val)
 {
     gdouble progress;
     GtkWidget *progress_bar;
@@ -1719,9 +1719,11 @@ static void gtk_progress_set(struct frontend *obj, int val)
 
     while (gtk_events_pending ())
         gtk_main_iteration ();
+
+    return DC_OK;
 }
 
-static void gtk_progress_info(struct frontend *obj, const char *info)
+static int gtk_progress_info(struct frontend *obj, const char *info)
 {
     GtkWidget *progress_bar_label;
     char *progress_bar_label_string;
@@ -1740,6 +1742,8 @@ static void gtk_progress_info(struct frontend *obj, const char *info)
 
     while (gtk_events_pending ())
         gtk_main_iteration ();
+
+    return DC_OK;
 }
 
 static void gtk_progress_stop(struct frontend *obj)

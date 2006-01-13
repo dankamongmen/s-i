@@ -17,6 +17,7 @@ struct question;
 struct frontend;
 
 #define DCF_CAPB_BACKUP		(1UL << 0)
+#define DCF_CAPB_PROGRESSCANCEL	(1UL << 1)
 
 struct frontend_module {
     int (*initialize)(struct frontend *, struct configuration *);
@@ -29,12 +30,13 @@ struct frontend_module {
     void (*clear)(struct frontend *);
     bool (*can_go_back)(struct frontend *, struct question *);
     bool (*can_go_forward)(struct frontend *, struct question *);
+    bool (*can_cancel_progress)(struct frontend *);
 
     void (*progress_start)(struct frontend *fe, int min, int max, const char *title);
-    void (*progress_set) (struct frontend *fe, int val);
+    int (*progress_set) (struct frontend *fe, int val);
     /* You do not have to implement _step, it will call _set by default */
-    void (*progress_step)(struct frontend *fe, int step);
-    void (*progress_info)(struct frontend *fe, const char *info);
+    int (*progress_step)(struct frontend *fe, int step);
+    int (*progress_info)(struct frontend *fe, const char *info);
     void (*progress_stop)(struct frontend *fe);
 };
 

@@ -884,7 +884,7 @@ static void text_progress_start(struct frontend *obj, int min, int max, const ch
 	fflush(stdout);
 }
 
-static void text_progress_set(struct frontend *obj, int val)
+static int text_progress_set(struct frontend *obj, int val)
 {
 	static int last = 0;
 	int new;
@@ -900,6 +900,8 @@ static void text_progress_set(struct frontend *obj, int val)
 	last = new;
 	printf("..%d%%", new);
 	fflush(stdout);
+
+	return DC_OK;
 }
 
 static void text_progress_stop(struct frontend *obj)

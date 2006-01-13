@@ -122,11 +122,14 @@ command_capb(struct confmodule *mod, char *arg)
     /* FIXME: frontend.h should provide a method to prevent direct
      *        access to capability member */
     mod->frontend->capability = 0;
-    for (i = 0; i < argc; i++)
+    for (i = 0; i < argc; i++) {
         if (strcmp(argv[i], "backup") == 0)
             mod->frontend->capability |= DCF_CAPB_BACKUP;
+        else if (strcmp(argv[i], "progresscancel") == 0)
+            mod->frontend->capability |= DCF_CAPB_PROGRESSCANCEL;
+    }
 
-    if (asprintf(&out, "%u multiselect backup", CMDSTATUS_SUCCESS) == -1)
+    if (asprintf(&out, "%u multiselect backup progresscancel", CMDSTATUS_SUCCESS) == -1)
         DIE("Out of memory");
 
     plugin_state = NULL;
@@ -600,6 +603,7 @@ command_progress(struct confmodule *mod, char *arg)
     char *argv[6];
     int argc;
     char *out;
+    int ret;
 
     argc = strcmdsplit(arg, argv, DIM(argv));
     CHECKARGC(>= 1);
@@ -639,12 +643,24 @@ command_progress(struct confmodule *mod, char *arg)
     else if (strcasecmp(argv[0], "set") == 0)
     {
         CHECKARGC(== 2);
-        mod->frontend->methods.progress_set(mod->frontend, atoi(argv[1]));
+        ret = mod->frontend->methods.progress_set(mod->frontend, atoi(argv[1]));
+        if (ret == DC_GOBACK)
+        {
+            asprintf(&out, "%u progress bar cancelled",
+                    CMDSTATUS_PROGRESSCANCELLED);
+            return out;
+        }
     }
     else if (strcasecmp(argv[0], "step") == 0)
     {
         CHECKARGC(== 2);
-        mod->frontend->methods.progress_step(mod->frontend, atoi(argv[1]));
+        ret = mod->frontend->methods.progress_step(mod->frontend, atoi(argv[1]));
+        if (ret == DC_GOBACK)
+        {
+            asprintf(&out, "%u progress bar cancelled",
+                    CMDSTATUS_PROGRESSCANCELLED);
+            return out;
+        }
     }
     else if (strcasecmp(argv[0], "info") == 0)
     {
@@ -663,8 +679,14 @@ command_progress(struct confmodule *mod, char *arg)
                     CMDSTATUS_BADQUESTION, argv[1]);
             return out;
         }
-        mod->frontend->methods.progress_info(mod->frontend, value);
+        ret = mod->frontend->methods.progress_info(mod->frontend, value);
         free(value);
+        if (ret == DC_GOBACK)
+        {
+            asprintf(&out, "%u progress bar cancelled",
+                    CMDSTATUS_PROGRESSCANCELLED);
+            return out;
+        }
     }
     else if (strcasecmp(argv[0], "stop") == 0)
     {
