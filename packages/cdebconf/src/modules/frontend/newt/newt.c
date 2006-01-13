@@ -106,6 +106,12 @@ no_text(struct frontend *obj)
 {
     return question_get_text(obj, "debconf/button-no", "No");
 }
+ 
+static const char *
+cancel_text(struct frontend *obj)
+{
+    return question_get_text(obj, "debconf/button-cancel", "Cancel");
+}
 
 static const char *
 help_text(struct frontend *obj)
@@ -1119,7 +1125,7 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     data->scale_form = create_form(NULL);
     newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
     if (obj->methods.can_cancel_progress(obj)) {
-        data->scale_cancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, goback_text(obj));
+        data->scale_cancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, cancel_text(obj));
         newtFormAddComponent(data->scale_form, data->scale_cancel);
     } else
         data->scale_cancel = NULL;
@@ -1204,7 +1210,7 @@ newt_progress_info(struct frontend *obj, const char *info)
 	    data->scale_form = create_form(NULL);
 	    newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
 	    if (obj->methods.can_cancel_progress(obj)) {
-		data->scale_cancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, goback_text(obj));
+		data->scale_cancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, cancel_text(obj));
 		newtFormAddComponent(data->scale_form, data->scale_cancel);
 	    } else
 		data->scale_cancel = NULL;
