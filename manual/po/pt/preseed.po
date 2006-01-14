@@ -3,12 +3,13 @@
 #
 # 2005-12-11 - Miguel Figueiredo <elmig@debianpt.org> - Initial translation
 # 2006-01-04 - Miguel Figueiredo <elmig@debianpt.org> - 8f
+# 2006-01-14 - Miguel Figueiredo <elmig@debianpt.org> - 8f2u
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "POT-Creation-Date: 2006-01-10 21:34+0000\n"
-"PO-Revision-Date: 2006-01-04 21:29+0000\n"
+"PO-Revision-Date: 2006-01-14 14:44+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -218,7 +219,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:123
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Obviously, any questions that have been processed before the preseeding "
 "configuration file is loaded cannot be preseeded. <xref linkend=\"preseed-"
@@ -258,7 +259,7 @@ msgstr "Executar comandos personalizados durante a instalação"
 
 #. Tag: para
 #: preseed.xml:208
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "A very powerful and flexible option offered by the preseeding tools is the "
 "ability to run commands or scripts at certain points in the installation. "
@@ -759,21 +760,20 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:466
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If you need to pick a particular interface when netbooting before loading a "
 "preseed file from the network, use a boot parameter such as "
 "<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></"
 "userinput>."
 msgstr ""
-"O locale pode ser utilizado para especificar o idioma e o país. Para "
-"especfificar o locale como um parâmetro de arranque, utilize "
-"<userinput>debian-installer/locale=<replaceable>en_US</replaceable></"
-"userinput>."
+"Se necessitar escolher um determinado interface quando arrancar através da rede "
+"antes de carregar um ficheiro de preseed pela rede, utilize um pârametro de "
+"arranque como o <userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>."
 
 #. Tag: screen
 #: preseed.xml:474
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# netcfg will choose an interface that has link if possible. This makes it\n"
 "# skip displaying a list if there is more than one interface.\n"
@@ -805,16 +805,19 @@ msgid ""
 "# The wacky dhcp hostname that some ISPs use as a password of sorts.\n"
 "#d-i netcfg/dhcp_hostname string radish"
 msgstr ""
-"# se possível o netcfg irá escolher um interface que tenha link. Isto fará\n"
-"# previnir que mostre uma lista se existir mais que um dispositivo de rede.\n"
+"# se possível o netcfg irá escolher um interface que tenha ligação.\n"
+"# Isto fará prevenir que seja mostrada uma lista se existir mais que um\n"
+"# dispositivo de rede.\n"
 "d-i netcfg/choose_interface select auto\n"
 "\n"
-"# Se tem um servidor de dhcp lento e o instalador não puder receber os "
-"dados\n"
-"# atempadamente talvez seja útil mudar este valor.\n"
+"# Em vez disso para escolher um determinado interface:\n"
+"#d-i netcfg/choose_interface select eth1\n"
+"\n"
+"# Se tem um servidor de dhcp lento e o instalador esgotar o tempo à espera,\n"
+"isto poderá ser útil.\n"
 "#d-i netcfg/dhcp_timeout string 60\n"
 "\n"
-"# Se preferir definir os dados da rede manualmente aqui fica como o fazer:\n"
+"# Se preferir configurar a rede manualmente, aqui fica como o fazer:\n"
 "#d-i netcfg/disable_dhcp boolean true\n"
 "#d-i netcfg/get_nameservers string 192.168.1.1\n"
 "#d-i netcfg/get_ipaddress string 192.168.1.42\n"
@@ -822,19 +825,16 @@ msgstr ""
 "#d-i netcfg/get_gateway string 192.168.1.1\n"
 "#d-i netcfg/confirm_static boolean true\n"
 "\n"
-"# Todos e quaisquer nomes de hosts e nomes de domínio advindos do dhcp têm\n"
-"# precedência sobre os valores mostrados a seguir.  No entanto, definir "
-"estes\n"
-"# valores fará com que as questões não sejam mostradas, mesmo que esses "
-"valores\n"
-"# venham do dhcp.\n"
+"# Quaisquer nomes de hosts e nomes de domínio advindos do dhcp têm\n"
+"# precedência sobre os valores mostrados a seguir.  No entanto, definir\n "
+"# estes valores fará com que as questões não sejam mostradas, mesmo que\n"
+"# esses valores venham do dhcp.\n"
 "d-i netcfg/get_hostname string unassigned-hostname\n"
 "d-i netcfg/get_domain string unassigned-domain\n"
 "\n"
 "# Fazer desaparecer a aborrecida caixa de diálogo sobre a chave do WEP.\n"
 "d-i netcfg/wireless_wep string\n"
-"# A password esquisita que alguns ISP's usam como hostname no seu servidor "
-"dhcp.\n"
+"# O nome de host dhcp esquisito que alguns ISP's usam como password.\n"
 "#d-i netcfg/dhcp_hostname string radish"
 
 #. Tag: title
@@ -845,16 +845,13 @@ msgstr "Parâmetros do mirror"
 
 #. Tag: para
 #: preseed.xml:480
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Depending on the installation method you use, a mirror may be used both to "
 "download additional components of the installer, the base system and to set "
 "up the <filename>/etc/apt/sources.list</filename> for the installed system."
 msgstr ""
-"Dependendo do método de instalação que decidir utilizar, um mirror pode ser "
-"usado tanto para fazer o download de componentes adicionais do instalador, "
-"do sistema base, como para ajustar o ficheiro <filename>/etc/apt/sources."
-"list</filename> para o sistema instalado."
+"Dependendo do método de instalação que utilizar, pode ser utilizado um mirror tanto para fazer o download de componentes adicionais do instalador, do sistema base, como para definir o ficheiro <filename>/etc/apt/sources.list</filename> para o sistema instalado."
 
 #. Tag: para
 #: preseed.xml:487
@@ -1154,7 +1151,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:574
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Root password, either in clear text\n"
 "#d-i passwd/root-password password r00tme\n"
@@ -1175,22 +1172,22 @@ msgid ""
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 msgstr ""
 "# Password de root, quer em texto simples\n"
-"#passwd passwd/root-password password r00tme\n"
-"#passwd passwd/root-password-again password r00tme\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
 "# ou encriptada utilizando um hash de MD5.\n"
-"#passwd passwd/root-password-crypted password [MD5 hash]\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
 "\n"
 "# Saltar a criação de uma conta de utilizador normal.\n"
-"#passwd passwd/make-user boolean false\n"
+"#d-i passwd/make-user boolean false\n"
 "\n"
 "# Em alternativa, criar uma conta de utilizador normal.\n"
-"#passwd passwd/user-fullname string Debian User\n"
-"#passwd passwd/username string debian\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
 "# Password de utilizador normal, quer em texto simples\n"
-"#passwd passwd/user-password password insecure\n"
-"#passwd passwd/user-password-again password insecure\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
 "# ou encriptada utilizando um hash MD5.\n"
-"#passwd passwd/user-password-crypted password [MD5 hash]"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
 #: preseed.xml:576
@@ -1228,9 +1225,9 @@ msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 
 #. Tag: title
 #: preseed.xml:596
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Base system installation"
-msgstr "Instalação do gestor de arranque"
+msgstr "Instalação do sistema base"
 
 #. Tag: para
 #: preseed.xml:597
@@ -1240,7 +1237,7 @@ msgid ""
 "installation. The only questions asked concern the installation of the "
 "kernel."
 msgstr ""
-
+"Na verdade não há muito a que possa ser feito preseed nesta etapa da instalação. As únicas perguntas colocadas referem-se à instalação do kernel."
 #. Tag: screen
 #: preseed.xml:604
 #, no-c-format
@@ -1249,6 +1246,9 @@ msgid ""
 "kernels.\n"
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 msgstr ""
+"# Escolhe o gerador de initramfs utilizado para gerar o initrd para os\n"
+"# kernels 2.6.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
 #: preseed.xml:609
@@ -1481,7 +1481,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:696
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# X can detect the right driver for some cards, but if you're preseeding,\n"
 "# you override whatever it chooses. Still, vesa will work most places.\n"
@@ -1506,28 +1506,26 @@ msgid ""
 "       select 1024x768 @ 60 Hz"
 msgstr ""
 "# O X pode detectar o driver correcto para algumas placas, mas se estiver a\n"
-"# fazer preseed, você sobrepõe o quer que tenha sido escolhido. Mesmo "
-"assim,\n"
+"# fazer preseed, você sobrepõe o quer que seja escolhido. Mesmo assim,\n"
 "# vesa irá funcionar na maioria dos casos.\n"
-"#xserver-xfree86 xserver-xfree86/config/device/driver select vesa\n"
+"#xserver-xorg xserver-xorg/config/device/driver select vesa\n"
 "\n"
 "# Uma situação melindrosa com a auto-detecção do rato é que se falhar, o X\n"
 "# irá tentar sempre novamente. Por isso se for feito o preseed, existe a\n"
 "# possibilidade de um ciclo infinito se o rato não for auto-detectado.\n"
-"#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true\n"
+"#xserver-xorg xserver-xorg/autodetect_mouse boolean true\n"
 "\n"
 "# É recomendada a auto-detecção do monitor.\n"
-"xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true\n"
+"xserver-xorg xserver-xorg/autodetect_monitor boolean true\n"
 "# Descomente se tem um ecrã LCD.\n"
-"#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true\n"
-"# O X tem três caminhos para a configuração do monitor. Aqui está como "
-"fazer\n"
-"# o preseed o caminho \"medium\", que está sempre disponível. O caminho\n"
+"#xserver-xorg xserver-xorg/config/monitor/lcd boolean true\n"
+"# O X tem três caminhos para a configuração do monitor. Aqui está como\n"
+"# fazer o preseed o caminho \"medium\", que está sempre disponível. O caminho\n"
 "# \"simple\" pode não estar disponível, e o caminho \"advanced\" que coloca\n"
 "# demasiadas perguntas.\n"
-"xserver-xfree86 xserver-xfree86/config/monitor/selection-method \\\n"
+"xserver-xorg xserver-xorg/config/monitor/selection-method \\\n"
 "       select medium\n"
-"xserver-xfree86 xserver-xfree86/config/monitor/mode-list \\\n"
+"xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
 "       select 1024x768 @ 60 Hz"
 
 #. Tag: title
