@@ -1,82 +1,84 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 24663 untranslated -->
+<!-- original version: 24663 -->
 
 
-  <sect2 arch="mips" id="boot-tftp"><title>Booting with TFTP</title>
+  <sect2 arch="mips" id="boot-tftp"><title>Arrencada amb el TFTP</title>
 
    <sect3>
-   <title>SGI Indys TFTP Booting</title>
+   <title>Arrencada amb el TFTP en SGI Indy</title>
 <para>
 
-After entering the command monitor use
+Després d'entrar al monitor d'ordres, utilitzeu
 
 <informalexample><screen>
 bootp():
 </screen></informalexample>
 
-on SGI Indys to boot linux and to begin installation of the Debian
-Software.  In order to make this
-work you may have to unset the <envar>netaddr</envar> environment
-variable. Type
+en màquines SGI Indy per arrencar linux i començar la instal·lació
+del programari de Debian. Per tal que això funcioni, potser haureu de
+desactivar la variable d'entorn <envar>netaddr</envar>. Per fer-ho
+teclegeu
 
 <informalexample><screen>
 unsetenv netaddr
 </screen></informalexample>
 
-in the command monitor to do this.
+al monitor d'ordres.
 
 </para>
   </sect3>
 
    <sect3>
-   <title>Broadcom BCM91250A TFTP Booting</title>
+   <title>Arrencada amb el TFTP en Broadcom BCM91250A</title>
 <para>
 
-On the Broadcom BCM91250A evaluation board, you have to load the SiByl boot
-loader via TFTP which will then load and start the Debian installer.  In
-most cases, you will first obtain an IP address via DHCP but it is also
-possible to configure a static address.  In order to use DHCP, you can
-enter the following command on the CFE prompt:
+En plaques d'avaluació Broadcom BCM91250A, haureu de carregar el
+carregador d'arrencada SiByl, i aquest s'encarregarà aleshores d'iniciar
+l'instal·lador de Debian. En la majoria de casos, primer obtindreu
+l'adreça IP mitjançant DHCP, però també és possible configurar una
+adreça estàtica. Per usar DHCP, podeu introduir l'ordre següent a
+l'indicador CFE:
 
 <informalexample><screen>
 ifconfig eth0 -auto
 </screen></informalexample>
 
-Once you have obtained an IP address, you can load SiByl with the following
-command:
+Una vegada heu obtingut una adreça IP, podeu carregar SiByl amb l'ordre
+següent:
 
 <informalexample><screen>
 boot 192.168.1.1:/boot/sibyl
 </screen></informalexample>
 
-You need to substitute the IP address listed in this example with either
-the name or the IP address of your TFTP server.  Once you issue this
-command, the installer will be loaded automatically.
+Haureu de substituir l'adreça IP de l'exemple pel nom o l'adreça del
+vostre servidor TFTP. Tan bon punt s'executi l'ordre, l'instal·lador
+es carregarà automàticament.
 
 </para>
 </sect3>
   </sect2>
 
-  <sect2 arch="mips"><title>Boot Parameters</title>
+  <sect2 arch="mips"><title>Paràmetres d'arrencada</title>
 
    <sect3>
-   <title>SGI Indys TFTP Booting</title>
+   <title>Arrencada amb el TFTP en SGI Indy</title>
 <para>
 
-On SGI Indys you can append boot parameters to the
-<command>bootp():</command> command in the command monitor.
+En SGI Indy, podeu afegir paràmetres d'arrencada a l'ordre
+<command>bootp():</command> del monitor d'ordres.
 
 </para><para>
 
-Following the <command>bootp():</command> command you can give the
-path and name of the file to boot if you did not give an explicit name
-via your bootp/dhcp server. Example:
+Seguint l'ordre <command>bootp():</command>, podeu indicar el camí i el
+nom del fitxer per arrencar en cas que no ho hàgiu fet explícitament
+mitjançant el servidor bootp/dhcp. Exemple:
 
 <informalexample><screen>
 bootp():/boot/tftpboot.img
 </screen></informalexample>
 
-Further kernel parameters can be passed via <command>append</command>:
+També es poden passar altres paràmetres del nucli amb
+<command>append</command>:
 
 <informalexample><screen>
 bootp(): append="root=/dev/sda1"
@@ -86,13 +88,13 @@ bootp(): append="root=/dev/sda1"
   </sect3>
 
    <sect3>
-   <title>Broadcom BCM91250A TFTP Booting</title>
+   <title>Arrencada amb el TFTP en Broadcom BCM91250A</title>
 <para>
 
-You cannot pass any boot parameters directly from the CFE prompt.  Instead,
-you have to edit the <filename>/boot/sibyl.conf</filename> file on the TFTP
-server and add your parameters to the <replaceable>extra_args</replaceable>
-variable.
+No podeu passar cap paràmetre d'arrencada directament des de
+l'indicador CFE. En comptes d'això, haureu d'editar el fitxer
+<filename>/boot/sibyl.conf</filename> al servidor TFTP i afegir els
+paràmetres desitjats a la variable <replaceable>extra_args</replaceable>.
 
 </para>
   </sect3>

@@ -1,99 +1,99 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 28997 -->
 
 
-  <sect2 arch="sparc" id="invoking-openboot"><title>Invoking OpenBoot</title>
+  <sect2 arch="sparc" id="invoking-openboot"><title>Invocant OpenBoot</title>
 
 <para>
 
-OpenBoot provides the basic functions needed to boot the &arch-title;
-architecture.  This is rather similar in function to the BIOS in the
-x86 architecture, although much nicer.  The Sun boot PROMs have a
-built-in forth interpreter which lets you do quite a number of things
-with your machine, such as diagnostics, simple scripts, etc.
+OpenBoot ens ofereix les funcions bàsiques necessàries per arrencar
+l'arquitectura &arch-title;. És bastant similar en quan a funció a la BIOS
+a l'arquitectura x86, tot i que més polit. Les PROM d'arrencada de Sun
+tenen un interpret incorporat de «forth» el qual permet fer força
+coses amb la màquina, com ara diagnòstics, guions simples, etc.
 
 </para><para>
 
-To get to the boot prompt you need to hold down the
-<keycap>Stop</keycap> key (on older type 4 keyboards, use the
-<keycap>L1</keycap> key, if you have a PC keyboard adapter, use
-the <keycap>Break</keycap> key) and press the
-<keycap>A</keycap> key. The boot PROM will give you a prompt,
-either <userinput>ok</userinput> or <userinput>&gt;</userinput>. It is
-preferred to have the <userinput>ok</userinput> prompt. So if you get
-the old style prompt, hit the <keycap>n</keycap> key to get the new
-style prompt.
+Per arribar a l'indicador d'arrencada necessiteu mantenir premuda la
+tecla <keycap>Stop</keycap> (en teclats antics de tipus 4, useu la
+tecla <keycap>L1</keycap>, si teniu un adaptador de teclat de PC, useu
+la tecla <keycap>Break</keycap>) i premeu la tecla <keycap>A</keycap>. La
+PROM d'arrencada us donarà un indicador, o <userinput>ok</userinput> o
+<userinput>&gt;</userinput>. És preferible tenir l'indicador
+<userinput>ok</userinput>. Si teniu l'indicador antic, premeu la
+tecla <keycap>n</keycap> per obtenir l'indicador actual.
 
 </para><para>
 
-If you are using a serial console, send a break to the machine. With Minicom,
-use <keycap>Ctrl-A F</keycap>, with cu, hit <keycap>Enter</keycap>, then type
-<userinput>%~break</userinput>. Consult the documentation of your terminal
-emulator if you are using a different program.
+Si esteu usant una consola serie, envieu una interrupció a la màquina.
+Amb Minicom, useu <keycap>Ctrl-A F</keycap>, amb cu, premeu
+<keycap>Enter</keycap>, després premeu <userinput>%~break</userinput>.
+Consulteu la documentació del vostre emulador de terminal si esteu usant
+un programa diferent.
 
 </para>
   </sect2>
 
   <sect2 arch="sparc" id="boot-dev-select-sun">
-  <title>Boot Device Selection</title>
+  <title>Selecció del dispositiu d'arrencada</title>
 
 <para>
 
-You can use OpenBoot to boot from specific devices, and also to change
-your default boot device.  However, you need to know some details
-about how OpenBoot names devices; it's much different from Linux
-device naming, described in <xref linkend="device-names"/>.
-Also, the command will vary a bit, depending on what version of
-OpenBoot you have.  More information about OpenBoot can be found in
-the <ulink url="&url-openboot;">Sun OpenBoot Reference</ulink>.
+Podeu usar OpenBoot per arrencar des d'un dispositiu específic, i també
+per canviar el dispositiu d'arrencada predeterminat. Tot i això, necessiteu
+saber alguns detalls sobre com OpenBoot anomena als dispositius; és molt
+diferent de com ho fa Linux, descrit a <xref linkend="device-names"/>.
+L'ordre pot variar una mica, depenent de quina versió d'OpenBoot
+tingueu. Podeu trobar més informació sobre OpenBoot a
+<ulink url="&url-openboot;">Guia de referència de Sun OpenBoot</ulink>.
 
 </para><para>
 
-Typically, with newer revisions, you can use OpenBoot device such as
+Amb les noves versions, podeu usar dispositius OpenBoot com
 <quote>floppy</quote>, <quote>cdrom</quote>, <quote>net</quote>,
-<quote>disk</quote>, or <quote>disk2</quote>.  These have the obvious
-meanings; the <quote>net</quote> device is for booting from the network.
-Additionally, the device name can specify a particular partition of a disk,
-such as <quote>disk2:a</quote> to boot disk2, first partition.  Full
-OpenBoot device names have the form
+<quote>disk</quote> o <quote>disk2</quote>. Aquests tenen significat
+obvi; el dispositiu <quote>net</quote> és per arrencar usant la xarxa.
+Addicionalment, el nom del dispositiu por especificar una determinada
+partició d'un disc, com <quote>disk2:a</quote> per arrencar disk2, primera
+partició. Tots els noms de dispositiu OpenBoot tenen la forma
 
 <informalexample>
 <screen>
-<replaceable>driver-name</replaceable>@
-<replaceable>unit-address</replaceable>:
-<replaceable>device-arguments</replaceable>
+<replaceable>nom-del-controlador</replaceable>@
+<replaceable>adreça-d'unitat</replaceable>:
+<replaceable>arguments-del-dispositiu</replaceable>
 </screen></informalexample>.
 
-In older revisions of OpenBoot, device naming is a bit different: the
-floppy device is called <quote>/fd</quote>, and SCSI disk devices are of
-the form <quote>sd(<replaceable>controller</replaceable>,
-<replaceable>disk-target-id</replaceable>,
-<replaceable>disk-lun</replaceable>)</quote>.  The command
-<userinput>show-devs</userinput> in newer OpenBoot revisions is useful
-for viewing the currently configured devices.  For full information,
-whatever your revision, see the
-<ulink url="&url-openboot;">Sun OpenBoot Reference</ulink>.
+A antigues revisions d'OpenBoot, la nomenclatura de dispositius és una
+mica diferent: el dispositiu «floppy» s'anomena <quote>/fd</quote>, i
+els dispositius de disc SCSI tenen la forma
+<quote>sd(<replaceable>controlador</replaceable>,
+<replaceable>id-de-disc-objectiu</replaceable>,
+<replaceable>lun-de-disc</replaceable>)</quote>. L'ordre
+<userinput>show-devs</userinput> en les revisions més noves d'OpenBoot
+és útil per veure els dispositius configurats actualment. Per informació
+completa, sigui quina sigui la vostra revisió, vegeu la
+<ulink url="&url-openboot;">Guia de Referència de Sun OpenBoot</ulink>.
 
 </para><para>
 
-To boot from a specific device, use the command <userinput>boot
-<replaceable>device</replaceable></userinput>.  You can set this
-behavior as the default using the <userinput>setenv</userinput>
-command.  However, the name of the variable to set changed between
-OpenBoot revisions.  In OpenBoot 1.x, use the command
-<userinput>setenv boot-from
-<replaceable>device</replaceable></userinput>.  In later revisions of
-OpenBoot, use the command <userinput>setenv boot-device
-<replaceable>device</replaceable></userinput>. Note, this is also
-configurable using the <command>eeprom</command> command on Solaris,
-or modifying the appropriate files in
-<filename>/proc/openprom/options/</filename>, for example under Linux:
+Per arrencar des d'un dispositiu específic, useu l'ordre
+<userinput>boot <replaceable>dispositiu</replaceable></userinput>. Podeu
+definir-ho com a opció predeterminada usant l'ordre
+<userinput>setenv</userinput>. De totes maneres, el nom de la variable
+a canviar varia entre revisions d'OpenBoot. A OpenBoot 1.x, useu l'ordre
+<userinput>setenv boot-from <replaceable>dispositiu</replaceable></userinput>.
+En revisions posteriors d'OpenBoot, useu l'ordre
+<userinput>setenv boot-device <replaceable>dispositiu</replaceable></userinput>.
+Tingueu en compte que això també és configurable usant l'ordre
+<command>eeprom</command> a Solaris, o modificant els fitxers apropiats
+a <filename>/proc/openprom/options/</filename>, per exemple sota Linux:
 
 <informalexample><screen>
 # echo disk1:1 &gt; /proc/openprom/options/boot-device
 </screen></informalexample>
 
-and under Solaris:
+i sota Solaris:
 
 <informalexample><screen>
 eeprom boot-device=disk1:1
