@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 32512 untranslated -->
+<!-- original version: 32512 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -13,95 +13,95 @@ Currently only a single variant of the example file is generated (for i386).
 -->
 
 <appendix id="appendix-preseed" condition="etch">
-<title>Automating the installation using preseeding</title>
+<title>Automatització de la instal·lació fent servir una configuració prèvia</title>
 
 <para>
 
-This appendix explains the intricacies of preseeding answers to questions in
-&d-i; to automate your installation.
+Aquest apèndix explica els detalls de les respostes de la configuració prèvia
+a les preguntes del &d-i; per automatitzar la instal·lació.
 
 </para><para>
 
-The configuration fragments used in this appendix are also available as an
-example preseed file from &urlset-example-preseed;.
+Els fragments de configuració emprats a aquest apèndix també són a l'abast
+com a exemple de fitxer de configuració prèvia a &urlset-example-preseed;.
 
 </para>
 
  <sect1 id="preseed-intro">
- <title>Introduction</title>
+ <title>Introducció</title>
 <para>
 
-Preseeding provides a way to set answers to questions without having to manually
-enter the answers while the installation is running. This makes it possible to
-fully automate most types of installation and even offers some features not
-available during normal installations.
+La configuració prèvia proporciona una manera de respondre preguntes sense
+haver d'introduir manualment les respostes mentre s'executa la instal·lació.
+Això fa possible l'automatització de la majoria de tipus d'instal·lació i
+fins i tot presenta algunes funcionalitats no disponibles durant les
+instal·lacions normals.
 
 </para><para>
 
-Using preseeding it is possible to fill in answers to questions asked during
-both the first stage of the installation (before the reboot into the new
-system) and the second stage.
+Si empreu la configuració prèvia es poden respondre preguntes tant de la
+primera fase de la instal·lació (abans d'arrencar el nou sistema) com de
+la segona.
 
 </para>
 
   <sect2 id="preseed-methods">
-  <title>Preseeding methods</title>
+  <title>Mètodes de configuració prèvia</title>
 <para>
 
-There are three methods that can be used for preseeding:
-<firstterm>initrd</firstterm>, <firstterm>file</firstterm> and
-<firstterm>network</firstterm>. Initrd preseeding will work with any
-installation method and supports preseeding of more things, but it requires
-the most preparation. File and network preseeding each can be used with
-different installation methods. With file and network preseeding the first
-few installer questions cannot be preseeded because the preseed configuration
-file is only loaded after they have been asked.
+N'hi ha tres: <firstterm>initrd</firstterm>, <firstterm>fitxer</firstterm> i
+<firstterm>xarxa</firstterm>. El d'initrd funciona amb qualsevol mètode
+d'instal·lació i permet la configuració prèvia de més coses, però requereix
+la preparació més acurada. Els de fitxer i xarxa es poden fer servir amb
+diferents mètodes d'instal·lació. En aquests les primeres preguntes de
+l'instal·lador no es poden configurar perquè el fitxer de configuració
+prèvia només es carrega després que aquelles s'hagen respost.
 
 </para><para>
 
-The following table shows which preseeding methods can be used with which
-installation methods.
+La taula següent mostra els mètodes de configuració prèvia es poden fer
+servir amb els diferents mètodes d'instal·lació.
 
 <informaltable>
 <tgroup cols="4">
 <thead>
 <row>
-  <entry>Installation method</entry><entry>initrd</entry>
-  <entry>file</entry><entry>network</entry>
+  <entry>Mètode d'instal·lació</entry><entry>initrd</entry>
+  <entry>fitxer</entry><entry>xarxa</entry>
 </row>
 </thead>
 
 <tbody>
 <row>
   <entry>CD/DVD</entry>
-  <entry>yes</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
+  <entry>sí</entry>
   <entry>no</entry>
 </row><row>
-  <entry>netboot</entry>
-  <entry>yes</entry>
+  <entry>arrencada en xarxa</entry>
+  <entry>sí</entry>
   <entry>no</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
 </row><row>
-  <entry>hd-media <phrase condition="bootable-usb">(including usb-stick)</phrase></entry>
-  <entry>yes</entry>
-  <entry>yes</entry>
+  <entry>hd-media <phrase condition="bootable-usb">(incloent-hi memòries USB)</phrase></entry>
+  <entry>sí</entry>
+  <entry>sí</entry>
   <entry>no</entry>
 </row><row condition="supports-floppy-boot">
-  <entry>floppy based (cd-drivers)</entry>
-  <entry>yes</entry>
-  <entry>yes</entry>
+  <entry>basat en disquet (controladors al CD)</entry>
+  <entry>sí</entry>
+  <entry>sí</entry>
   <entry>no</entry>
 </row><row condition="supports-floppy-boot">
-  <entry>floppy based (net-drivers)</entry>
-  <entry>yes</entry>
+  <entry>basat en disquet (controladors a la xarxa)</entry>
+  <entry>sí</entry>
   <entry>no</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
 </row><row arch="s390">
-  <entry>generic/tape</entry>
-  <entry>yes</entry>
+  <entry>genèric/cinta</entry>
+  <entry>sí</entry>
   <entry>no</entry>
-  <entry>yes</entry>
+  <entry>sí</entry>
 </row>
 </tbody>
 
@@ -109,40 +109,41 @@ installation methods.
 
 </para><para>
 
-An important difference between the preseeding methods is the point at which
-the preseed configuration file is loaded and processed. For initrd preseeding
-this is right at the start of the installation, before the first question is
-even asked. For file preseeding this is after the CD or CD image has been
-loaded. For network preseeding it is only after the network has been
-configured.
+Una diferència important entre els mètodes de configuració prèvia és el punt
+en què es carrega i es processa el fitxer de configuració prèvia. En el cas
+de l'initrd això té lloc just al principi de la instal·lació, abans que ni
+tan sols es faça la primera pregunta. En el cas del fitxer, té lloc després
+que s'haja carregat el CD o la imatge del CD. En el cas de la xarxa, després
+que aquesta s'haja configurat.
 
 </para><para>
 
-In practical terms this means for file and network preseeding that the
-questions about language, country and keyboard selection will already have
-been asked. For network preseeding add to that any questions related to
-network configuration. Some other questions that are only displayed
-at medium or low priority (like the first hardware detection run) will
-also already have been processed.
+En concret això vol dir que en el cas del fitxer i la xarxa les preguntes
+sobre la llengua, el país i el teclat ja hauran estat fetes. En el cas de
+la xarxa, cal afegir-hi qualsevol pregunta relacionada amb la configuració
+d'aquesta. Algunes preguntes que sols es fan en mode de prioritat mitjana o
+baixa (com la primera execució de la detecció de maquinari) també hauran
+estat processades.
 
 </para><para>
 
-Obviously, any questions that have been processed before the
-preseeding configuration file is loaded, cannot be preseeded.
-<xref linkend="preseed-bootparms"/> offers a way to avoid these
-questions being asked.
+Òbviament, qualsevol pregunta que haja estat processada abans de carregar
+la configuració prèvia, no es pot incloure en aquesta.
+<xref linkend="preseed-bootparms"/> ofereix una manera d'evitar aquestes
+preguntes.
 
 </para>
   </sect2>
 
   <sect2 id="preseed-limitations">
-  <title>Limitations</title>
+  <title>Limitacions</title>
 <para>
 
-Although most questions used by &d-i; can be preseeded using this method,
-there are some notable exceptions. You must (re)partition an entire disk
-or use available free space on a disk; it is not possible to use existing
-partitions. You currently cannot use preseeding to set up RAID and LVM.
+Tot i que la majoria de preguntes emprades pel &d-i; poden configurar-se
+prèviament fent servir aquest mètode, hi algunes excepcions remarcables. Cal
+(tornar a) particionar un disc sencer o emprar-ne l'espai lliure disponible;
+no es poden emprar particions ja existents. Actualment tampoc es pot fer
+servir la configuració prèvia per configurar un RAID o un LVM.
 
 </para>
   </sect2>
@@ -209,42 +210,44 @@ are stored in a separate, non-readable file in the same directory.
 -->
 
   <sect2 id="preseed-hooks">
-  <title>Running custom commands during the installation</title>
+  <title>Execució d'ordres discrecionals durant la instal·lació</title>
 <para>
 
-A very powerfull and flexible option offered by the preseeding tools is the
-ability to run commands or scripts at certain points in the installation.
-See <xref linkend="preseed-shell"/> for details.
+Una opció molt potent i flexible que ofereixen les eines de configuració
+prèvia és l'execució d'ordres o guions en determinants moments de la
+instal·lació. Consulteu-ne els detalls a <xref linkend="preseed-shell"/>.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  <userinput>preseed/early_command</userinput>: is run as soon as the the
-  preseeding configuration file has been loaded
+  <userinput>preseed/early_command</userinput>: s'executa tan bon punt el
+  fitxer de configuració prèvia s'haja carregat
 </para></listitem>
 <listitem><para>
-  <userinput>preseed/late_command</userinput>: is run just before the reboot
-  at the end of the first stage of the installation, but before the
-  <filename>/target</filename> filesystem has been unmounted
+  <userinput>preseed/late_command</userinput>: s'executa just abans de
+  l'arrencada posterior al final de la primera fase de la instal·lació,
+  però abans que el sistema de fitxers <filename>/target</filename>
+  s'haja desmuntat
 </para></listitem>
 <listitem><para>
-  <userinput>base-config/early_command</userinput>: is run early in the second
-  stage of the installation when <command>base-config</command> is starting up
+  <userinput>base-config/early_command</userinput>: s'executa al principi
+  de la segona fase de la instal·lació, quan s'engega la
+  <command>base-config</command>
 </para></listitem>
 <listitem><para>
-  <userinput>base-config/late_command</userinput>: is run at the end of
-  <command>base-config</command>, just before the login prompt
+  <userinput>base-config/late_command</userinput>: s'executa al final de la
+  <command>base-config</command>, just abans de l'indicador d'entrada
 </para></listitem>
 </itemizedlist>
 
   </sect2>
 
   <sect2 id="preseed-seenflag">
-  <title>Utilització de precàrrega per canviar els valors predeterminats</title>
+  <title>Utilització de la configuració prèvia per canviar els valors predeterminats</title>
 <para>
 
-És possible utilitzar les precàrregues per canviar les respostes
+És pot emprar la configuració prèvia per canviar les respostes
 predeterminades a les preguntes, però tot i així haver-les de respondre.
 Per fer-ho, la marca <firstterm>seen</firstterm> ha de posar-se a
 <quote>false</quote> desprès de definir el valor a la plantilla.
@@ -260,260 +263,266 @@ d-i foo/bar seen false
  </sect1>
 
  <sect1 id="preseed-using">
- <title>Using preseeding</title>
+ <title>Utilització de la configuració prèvia</title>
 <para>
 
-Of course you will first need to create a preseed file and place it in the
-location from where you want to use it. Creating the preseed file is covered
-later in this appendix. Putting it in the correct location is fairly
-straightforward for network preseeding or if you want to read the file off
-a floppy or usb-stick. If you want to include the file on a CD or DVD, you
-will have to remaster the ISO image. How to get the preseed file included
-in the initrd is outside the scope of this document; please consult the
-developers documentation for &d-i;.
+Sens dubte, primer de tot heu de crear un fitxer de configuració prèvia i
+posar-lo al lloc des d'on voleu fer-lo servir. La creació de fitxers de
+configuració prèvia es tractarà després. Col·locar-los correctament és
+fàcil en el cas de la configuració per xarxa o si voleu llegir el fitxer
+des d'un disquet o una memòria USB. Si voleu incloure el fitxer a un CD o
+un DVD, heu de reconfigurar la imatge ISO. El procediment per incloure el
+fitxer a l'initrd no s'explica aquí; consulteu la documentació per als
+desenvolupadors del &d-i;.
 
 </para><para>
 
-An example preseed file that you can use as basis for your preseed file is
-available from &urlset-example-preseed;. This file is based on the
-configuration fragments included in this appendix.
+Teniu a l'abast un exemple de fitxer de configuració prèvia que podeu
+emprar com a base per al vostre a &urlset-example-preseed;. Aquest fitxer
+es basa en els fragments de configuració inclosos en aquest apèndix.
 
 </para>
 
   <sect2 id="preseed-loading">
-  <title>Loading the preseed file</title>
+  <title>Càrrega del fitxer de configuració prèvia</title>
 <para>
 
-If you are using initrd preseeding, you only have to make sure a file named
-<filename>preseed.cfg</filename> is included in the root directory of the
-initrd. The installer will automatically check if this file is present and
-load it.
+Si esteu emprant una configuració prèvia de l'initrd, només heu
+d'assegurar-vos que hi haja un fitxer <filename>preseed.cfg</filename>
+inclòs al directori arrel de l'initrd. L'instal·lador comprovarà
+automàticament si aquest fitxer és present i el carregarà.
 
 </para><para>
 
-For the other preseeding methods you need to tell the installer what file to
-use when you boot it. This is done by passing the kernel a boot parameter,
-either manually at boot time or by editing the bootloader configuration file
-(e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end
-of the append line(s) for the kernel.
+En els altres mètodes de configuració prèvia heu de dir-li a
+l'instal·lador el fitxer que s'usarà quan l'arrenqueu. Això es fa
+indicant-li al nucli un paràmetre d'arrencada, bé manualment en el
+moment d'arrencar o bé editant el fitxer de configuració del carregador
+(p.ex. <filename>syslinux.cfg</filename>) i afegint-hi el paràmetre al
+final de la (les) línia (línies) addicionals per al nucli.
 
 </para><para>
 
-If you do specify the preseed file in the bootloader configuration, you might
-change the configuration so you don't need to hit enter to boot the installer.
-For syslinux this means setting the timeout to 1 in
-<filename>syslinux.cfg</filename>.
+Si especifiqueu el fitxer a la configuració del carregador, podeu modificar
+la configuració prèvia per no haver de prémer enter per arrencar
+l'instal·lador. En el syslinux això vol dir ajustar el temps d'espera
+(timeout) a 1, a <filename>syslinux.cfg</filename>.
 
 </para><para>
 
-To make sure the installer gets the right preseed file, you can optionally
-specify a checksum for the file. Currently this needs to be a md5sum, and if
-specified it must match the preseed file or the installer will refuse to use it.
+Per assegurar-vos que l'instal·lador obté el fitxer de configuració prèvia
+correcte, podeu especificar-ne una suma de verificació. Actualment ha de
+ser una md5sum, i si l'especifiqueu ha de correspondre al fitxer, altrament
+l'instal·lador no voldrà fer-la servir.
 
 </para>
 
 <informalexample><screen>
-Boot parameters to specify:
-- if you're netbooting:
+Paràmetres d'arrencada que cal especificar:
+- si esteu arrencant en xarxa:
   preseed/url=http://host/path/to/preseed.cfg
   preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
 
-- if you're booting a remastered CD:
+- si esteu arrencant amb un CD reconfigurat:
   preseed/file=/cdrom/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 
-- if you're installing from USB media (put the preseed file in the
-  toplevel directory of the USB stick):
+- si esteu instal·lant des d'un dispositiu USB (poseu el fitxer al directori
+  principal de la memòria USB):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 </screen></informalexample>
 
 <para>
 
-While you're at it, you may want to add a boot parameter
-<userinput>debconf/priority=critical</userinput>. This will avoid most
-questions even if the preseeding below misses some.
+Podeu afegir a l'indicador d'arrencada el paràmetre
+<userinput>debconf/priority=critical</userinput>, que evitarà la majoria de
+preguntes fins i tot si la configuració prèvia no en contesta algunes.
 
 </para>
   </sect2>
 
   <sect2 id="preseed-bootparms">
-  <title>Using boot parameters to supplement preseeding</title>
+  <title>Utilització dels paràmetres d'arrencada per complementar la configuració prèvia</title>
 <para>
 
-Some parts of the installation process cannot be automated using some forms
-of preseeding because the questions are asked before the preseed file is
-loaded. For example, if the preseed file is downloaded over the network,
-the network setup must be done first. One reason to use initrd preseeding
-is that it allows preseeding of even these early steps of the installation
-process.
+Hi ha parts del procés d'instal·lació no es poden automatitzar fent servir
+algunes formes de configuració prèvia perquè les preguntes es fan abans que
+es carregue el fitxer de configuració prèvia. Per exemple, si el fitxer es
+carrega a través d'una xarxa, la configuració d'aquesta s'ha de fer primer.
+Una raó per emprar la configuració prèvia de l'initrd és que permet
+configurar prèviament fins i tot aquests primers passos del procés
+d'instal·lació.
 
 </para><para>
 
-If a preseed file cannot be used to preseed some steps, the install can
-still be fully automated, since you can pass preseed values to the kernel
-on the command line. Just pass <userinput>path/to/var=value</userinput>
-for any of the preseed variables listed in the examples.
+En cas que un fitxer de configuració prèvia no es puga fer servir per a
+alguns passos, la instal·lació encara es podrà automatitzar del tot si li
+indiqueu al nucli, mitjançant la línia d'ordres, els valors de configuració
+prèvia. Simplement indiqueu el <userinput>camí/a/var=valor</userinput> per
+a qualsevol de les variables de configuració prèvia llistades als exemples.
 
 </para>
 <note><para>
 
-The 2.4 kernel accepts a maximum of 8 command line options and
-8 environment options (including any options added by default for the
-installer). If these numbers are exceeded, 2.4 kernels will drop any
-excess options and 2.6 kernels will panic. For kernel 2.6.9 and later,
-you can use 32 command line options and 32 environment options.
+El nucli 2.4 kernel accepta un màxim de 8 opcions de línia d'ordres i de 8
+opcions d'entorn (incloent-hi qualsevol opció afegida per defecte per a
+l'instal·lador). Si s'excedeixen aquestes xifres, els nuclis 2.4 kernels les
+ignoren, mentre que els 2.6 s'esquallen. A partir del 2.6.9 podeu emprar 32
+opcions de línia d'ordres i 32 opcions d'entorn.
 
 </para></note>
 <para>
 
-For most installations some of the default options in your bootloader
-configuration file, like 'vga=normal', may be safely removed which may
-allow you to add more options for preseeding.
+A la majoria d'instal·lacions, algunes de les opcions per defecte del fitxer
+de configuració del carregador, com 'vga=normal', es poden eliminar sense
+cap problema, la qual cosa us permet afegir més opcions de configuració
+prèvia.
 
 </para>
 <note><para>
 
-It may not always be possible to specify values with spaces for boot
-parameters, even if you delimit them with quotes.
+No sempre és possible especificar valors amb espais per als paràmetres
+d'arrencada, fins i tot si els delimiteu amb cometes.
 
 </para></note>
   </sect2>
  </sect1>
 
  <sect1 condition="FIXME" id="preseed-creating">
- <title>Creating a preseed file</title>
+ <title>Creació d'un fitxer de configuració prèvia</title>
 <para>
 
-The preconfiguration file is in the format used by the
-<command>debconf-set-selections</command> command.
+El fitxer de configuració prèvia és en el format emprat per l'ordre
+<command>debconf-set-selections</command>.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  File format
+  Format de fitxer
 </para></listitem>
 <listitem><para>
-  Only single space allowed between template type and value
+  Solament és permès un únic espai entre el tipus de la plantilla i el valor
 </para></listitem>
 <listitem><para>
-  Relation with /var/lib/(c)debconf/templates
+  Relació amb /var/lib/(c)debconf/templates
 </para></listitem>
 <listitem><para>
-  Types of templates and how to provide values for them
+  Tipus de plantilles i com proporcionar-hi valors
 </para></listitem>
 <listitem><para>
-  Most values need to be in English or codes
+  La majoria de valors han d'estar en anglès o codificats
 </para></listitem>
 <listitem><para>
-  Using a manual installation as base
+  Utilització d'una instal·lació manual com a base
 </para></listitem>
 <listitem><para>
-  Finding other possible values
+  Cerca d'altres valors possibles
 </para></listitem>
 </itemizedlist>
 
 <para>
 
-To check if the format of your preseed file is valid before performing an
-install, you can use the command <command>debconf-set-selections -c
-<replaceable>preseed.cfg</replaceable></command>.
+Per comprovar si el format el fitxer de configuració prèvia és vàlid abans
+de dur a terme la instal·lació, empreu l'ordre
+<command>debconf-set-selections -c<replaceable>preseed.cfg</replaceable></command>.
 
 </para>
  </sect1>
 
  <sect1 id="preseed-stage1">
- <title>Preseeding the first stage of the installation</title>
+ <title>Configuració prèvia de la primera etapa de la instal·lació</title>
 <para>
 
-The configuration fragments used in this appendix are also available as an
-example preseed file from &urlset-example-preseed;.
+Els fragments de configuració emprats en aquest apèndix també són a l'abast
+com un exemple de fitxer de configuració prèvia a &urlset-example-preseed;.
 
 </para><para>
 
-Note that this example is based on an installation for the Intel x86
-architecture. If you are installing a different architecture, some of the
-examples (like keyboard selection and bootloader installation) may not be
-relevant and will need to be replaced by debconf settings appropriate for your
-architecture.
+Tingueu en compte que aquest exemple es basa en una instal·lació per a una
+arquitectura Intel x86. Si l'arquitectura és diferent, alguns dels exemples
+(com la selecció del teclat i la instal·lació del carregador) poden no ser
+adients i hauran de substituir-se per ajusts de configuració adequats a
+l'arquitectura en qüestió.
 
 </para>
  
   <sect2 id="preseed-l10n">
-  <title>Localization</title>
+  <title>Localització</title>
 <para>
 
-Setting localization values will only work if you are using initrd preseeding.
-With all other methods the preseed file will only be loaded after these
-questions have been asked.
+L'ajust dels valors de localització només funcionaran si empreu la
+configuració prèvia de l'initrd. En tota la resta de mètodes el fitxer
+sols es carregarà després d'haver respost aquestes preguntes.
 
 </para><para>
 
-The locale can be used to specify both language and country.
-To specify the locale as a boot parameter, use
-<userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>.
+Es pot fer servir el locale per a especificar tant la llengua com el país.
+Per a especificar el locale com un paràmetre d'arrencada, empreu
+<userinput>debian-installer/locale=<replaceable>ca_ES</replaceable></userinput>.
 
 <informalexample role="example"><screen>
-# Locale sets language and country.
-d-i debian-installer/locale string en_US
+# El locale estableix la llengua i el país.
+d-i debian-installer/locale string ca_ES
 </screen></informalexample>
 
 </para><para>
 
-Keyboard configuration consists of selecting a keyboard architecture and a
-keymap. In most cases the correct keyboard architecture is selected by
-default, so there's normally no need to preseed it. The keymap must
-be valid for the selected  keyboard architecture.
+La configuració del teclat consisteix en la selecció d'una arquitectura i
+un mapa de teclat. En la majoria de casos l'arquitectura de teclat correcta
+és seleccionada per defecte, de manera que normalment no cal configurar-la
+prèviament. El mapa de teclat ha de ser vàlid per a l'arquitectura de
+teclat seleccionada.
 
 <informalexample role="example"><screen>
-# Keyboard selection.
+# Selecció del teclat.
 #d-i console-tools/archs select at
-d-i console-keymaps-at/keymap select us
-# Example for a different keyboard architecture
-#d-i console-keymaps-usb/keymap select mac-usb-us
+d-i console-keymaps-at/keymap select es
+# Exemple per a una arquitectura de teclat diferent
+#d-i console-keymaps-usb/keymap select mac-usb-es
 </screen></informalexample>
 
 </para><para>
 
-To skip keyboard configuration preseed
-<classname>console-tools/archs</classname> with
+Per a ometre la configuració prèvia del teclat empreu
+<classname>console-tools/archs</classname> amb
 <userinput>skip-config</userinput>.
-This will result in the kernel keymap remaining active.
+Això farà que romanga actiu el mapa de teclat del nucli.
 
 </para>
 
 <note><para>
 
-The changes in the input layer for 2.6 kernels have made the keyboard
-architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote>
-(<userinput>at</userinput>) keymap should be selected.
+Els canvis en l'estrat d'entrada dels nuclis 2.6 han fet pràcticament
+obsoleta l'arquitectura de teclat. Per als nuclis 2.6 normalment s'ha de
+seleccionar un mapa de teclat <quote>PC</quote> (<userinput>at</userinput>).
 
 </para></note>
   </sect2>
 
   <sect2 id="preseed-network">
-  <title>Network configuration</title>
+  <title>Configuració de la xarxa</title>
 <para>
 
-Of course, preseeding the network configuration won't work if you're
-loading your preseed file from the network. But it's great when you're
-booting from CD or USB stick. If you are loading preseed files from
-the network, you can pass network config parameters in using kernel
-boot parameters.
+Sens dubte, la configuració prèvia de la xarxa no funcionarà si carregueu
+el fitxer de configuració des de la xarxa. Però va molt bé si esteu
+carregant-lo des d'un CD o una memòria USB. Si ho feu des de la xarxa,
+podeu indicar-li al nucli els paràmetres d'arrencada de configuració de
+la xarxa.
 
 </para>
 
 <informalexample role="example"><screen>
-# netcfg will choose an interface that has link if possible. This makes it
-# skip displaying a list if there is more than one interface.
+# Si és possible, el netcfg escollirà una interfície que tinga un enllaç.
+# El següent evita que es mostre una llista si hi ha més d'una interfície.
 d-i netcfg/choose_interface select auto
 
-# If you have a slow dhcp server and the installer times out waiting for
-# it, this might be useful.
+# Si teniu un servidor dhcp lent i l'instal·lador finalitza l'espera, això
+# us pot ser d'utilitat.
 #d-i netcfg/dhcp_timeout string 60
 
-# If you prefer to configure the network manually, here's how:
+# Si preferiu configurar la xarxa a mà, aquí teniu com:
 #d-i netcfg/disable_dhcp boolean true
 #d-i netcfg/get_nameservers string 192.168.1.1
 #d-i netcfg/get_ipaddress string 192.168.1.42
@@ -521,43 +530,44 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
 
-# Any hostname and domain names assigned from dhcp take precedence over
-# values set here. However, setting the values still prevents the questions
-# from being shown, even if values come from dhcp.
+# Qualsevol nom d'ordinador principal i de domini assignats amb el dhcp tenen
+# preferència sobre els valors indicats aquí. Tanmateix, establir aquests
+# encara evitarà que es mostren qüestions fins i tot si els valors provenen
+# del dhcp.
 d-i netcfg/get_hostname string unassigned-hostname
 d-i netcfg/get_domain string unassigned-domain
 
-# Disable that annoying WEP key dialog.
+# Per deshabilitar el molest diàleg sobre la clau WEP.
 d-i netcfg/wireless_wep string
-# The wacky dhcp hostname that some ISPs use as a password of sorts.
+# El fastigós nom del servidor dhcp que alguns ISP empren com a contrasenya.
 #d-i netcfg/dhcp_hostname string radish
 </screen></informalexample>
 
   </sect2>
 
   <sect2 id="preseed-mirror">
-  <title>Mirror settings</title>
+  <title>Configuració del servidor rèplica</title>
 <para>
 
-Depending on the installation method you use, a mirror may used both to
-download additional components of the installer, the base system and to
-set up the <filename>/etc/apt/sources.list</filename> for the installed
-system.
+Segons el mètode d'instal·lació, un servidor rèplica es pot emprar tant per
+a descarregar components addicionals de l'instal·lador i el sistema base
+com per a configurar el fitxer <filename>/etc/apt/sources.list</filename>
+del sistema.
 
 </para><para>
 
-The parameter <classname>mirror/suite</classname> determines the suite for
-the installed system.
+El paràmetre <classname>mirror/suite</classname> determina el conjunt de
+programes del sistema.
 
 </para><para>
 
-The parameter <classname>mirror/udeb/suite</classname> determines the suite
-for additional components for the installer. It is only useful to set this
-if components are actually downloaded over the network and should match the
-suite that was used to build the initrd for the installation method used for
-the installation.
-By default the value for <classname>mirror/udeb/suite</classname> is the same
-as <classname>mirror/suite</classname>.
+El paràmetre <classname>mirror/udeb/suite</classname> determina el conjunt
+de de components addicionals que emprarà l'instal·lador. Això només és útil
+si els components es descarreguen realment des de la xarxa i han de
+correspondre amb el conjunt d'eines emprat per construir l'initrd per al
+mètode d'instal·lació emprat en la instal·lació. De manera predeterminada,
+el valor de <classname>mirror/udeb/suite</classname> és el mateix que el
+de <classname>mirror/suite</classname>.
 
 </para>
 
@@ -567,47 +577,50 @@ d-i mirror/http/hostname string http.us.debian.org
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
 
-# Suite to install.
+# Conjunt de programes que s'instal·larà.
 #d-i mirror/suite string testing
-# Suite to use for loading installer components (optional).
+# Conjunt de programes que s'empraà per a carregar components de
+# l'instal·lador (opcional).
 #d-i mirror/udeb/suite string testing
 </screen></informalexample>
 
   </sect2>
 
   <sect2 id="preseed-partman">
-  <title>Partitioning</title>
+  <title>Particionat</title>
 <para>
 
-Using preseeding to partition the harddisk is very much limited to what is
-supported by <classname>partman-auto</classname>. You can choose to either
-partition existing free space on a disk or a whole disk. The layout of the
-disk can be determined by using a predefined recipe, a custom recipe from
-a recipe file or a recipe included in the preseed file. It is currently not
-possible to partition multiple disks using preseeding nor to set up RAID or
-LVM.
+La configuració prèvia del particionat de discs durs està molt limitada per
+les possibilitats oferides pel <classname>partman-auto</classname>. Podeu o
+bé particionar l'espai lliure existent al disc o bé el disc sencer. La
+distribució del disc es pot determinar fent servir una recepta definida
+prèviament, una de personalitzada procedent d'un fitxer recepta, o una
+inclosa dins els fitxers de configuració prèvia. Actualment no es poden
+particionar discs múltiples emprant la configuració prèvia, ni tampoc
+configurar un RAID o un LVM.
 
 </para>
 
 <warning><para>
 
-The identification of disks is dependent on the order in which their drivers
-are loaded. If there are multiple disks in the system, make very sure the
-correct one will be selected before using preseeding.
+La identificació dels discs depèn de l'ordre en què es carreguen llurs
+controladors. Si el sistema té més d'un disc, assegureu-vos que se
+seleccione el correcte abans d'utilitzar la configuració prèvia.
 
 </para></warning>
 
 <informalexample role="example"><screen>
-# If the system has free space you can choose to only partition that space.
+# Si el sistema disposa d'espai lliure podeu triar de particionar només
+# aquest.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 
-# Alternatively, you can specify a disk to partition. The device name can
-# be given in either devfs or traditional non-devfs format.
-# For example, to use the first disk devfs knows of:
+# També podeu especificar el disc que es particionarà. El nom del dispositiu
+# es pot indicar bé en el format devfs o bé en el format tradicional.
+# Per exemple, per emprar el primer disc que detecta el devfs:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
-# You can choose from any of the predefined partitioning recipes:
+# Podeu triar qualsevol de les receptes de particionat predefinides:
 d-i partman-auto/choose_recipe \
        select All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe \
@@ -615,15 +628,15 @@ d-i partman-auto/choose_recipe \
 #d-i partman-auto/choose_recipe \
 #       select Separate /home, /usr, /var, and /tmp partitions
 
-# Or provide a recipe of your own...
-# The recipe format is documented in the file devel/partman-auto-recipe.txt.
-# If you have a way to get a recipe file into the d-i environment, you can
-# just point at it.
+# O indicar-ne una pròpia...
+# El format de la recepta es descriu al fitxer devel/partman-auto-recipe.txt.
+# Si podeu obtenir un fitxer de recepta per a l'entorn de l'instal·lador,
+# podeu simplement apuntar-hi.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
-# If not, you can put an entire recipe the preseed file in one (logical)
-# line. This example creates a small /boot partition, suitable swap, and
-# uses the rest of the space for the root partition:
+# Si no, podeu posar una recepta sencera en una línia (lògica). Aquest exemple
+# crea una petita partició /boot, un espai d'intercanvi adient, i empra la
+# resta de l'espai per a la partició arrel:
 #d-i partman-auto/expert_recipe string                         \
 #      boot-root ::                                            \
 #              40 50 100 ext3                                  \
@@ -641,7 +654,7 @@ d-i partman-auto/choose_recipe \
 #                      method{ swap } format{ }                \
 #              .
 
-# This makes partman automatically partition without confirmation.
+# Això fa que el partman particione automàticament sense demanar confirmació.
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
        select Finish partitioning and write changes to disk
@@ -651,31 +664,34 @@ d-i partman/confirm boolean true
   </sect2>
 
   <sect2 id="preseed-time">
-  <title>Clock and time zone setup</title>
+  <title>Configuració del rellotge i de la zona horària</title>
 
 <informalexample role="example"><screen>
-# Controls whether or not the hardware clock is set to UTC.
+# Per controlar si el rellotge del maquinari s'ajusta al temps universal
+# coordinat (UTC).
 d-i clock-setup/utc boolean true
 
-# You may set this to any valid setting for $TZ; see the contents of
-# /usr/share/zoneinfo/ for valid values.
-d-i time/zone string US/Eastern
+# Podeu ajustar això a qualsevol valor vàlid de $TZ; vegeu /usr/share/zoneinfo/
+# per als valors vàlids.
+d-i time/zone string Europe/Madrid
 </screen></informalexample>
 
   </sect2>
 
   <sect2 id="preseed-apt">
-  <title>Apt setup</title>
+  <title>Configuració de l'apt</title>
 <para>
 
-Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
-options is fully automated based on your installation method and answers to
-earlier questions. Only the two variables below are relevant for preseeding.
+La configuració del fitxer <filename>/etc/apt/sources.list</filename> i de
+les opcions de configuració bàsica estarà completament automatitzada segons
+el mètode d'instal·lació emprat i les respostes de les primeres preguntes.
+Solament les dues variables de sota són rellevants per a la configuració
+prèvia.
 
 </para>
 
 <informalexample role="example"><screen>
-# You can choose to install non-free and contrib software.
+# Podeu instal·lar programari no lliure (non-free) i de contribució (contrib).
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
 </screen></informalexample>
@@ -683,57 +699,59 @@ earlier questions. Only the two variables below are relevant for preseeding.
   </sect2>
 
   <sect2 id="preseed-account">
-  <title>Account setup</title>
+  <title>Configuració de comptes</title>
 <para>
 
-The password for the root account and name and password for a first regular
-user's account can be preseeded. For the passwords you can use either clear
-text values or MD5 <emphasis>hashes</emphasis>.
+Es poden configurar prèviament el compte del superusuari i el nom i la
+contrasenya d'un usuari ordinari. Les contrasenyes es poden indicar bé
+de manera explícita o bé en forma de <emphasis>capolaments</emphasis> MD5.
 
 </para>
 <warning><para>
 
-Be aware that preseeding passwords is not completely secure as everyone
-with access to the preseed file will have the knowledge of these passwords.
-Using MD5 hashes is considered slightly better in terms of security but it
-might also give a false sense of security as access to a MD5 hash allows
-for brute force attacks.
+Sigueu conscients que la configuració prèvia de contrasenyes no és
+completament segura ja que qualsevol persona amb accés al fitxer de
+configuració prèvia les podrà saber. Emprar capolaments MD5 es considera
+un poc millor a efectes de seguretat, però això pot generar, falsament,
+sensació de seguretat, car l'accés als capolaments MD5 permet els atacs
+de força bruta.
 
 </para></warning>
 
 <informalexample role="example"><screen>
-# Root password, either in clear text
+# Contrasenya de superusuari, bé explícita
 #passwd passwd/root-password password r00tme
 #passwd passwd/root-password-again password r00tme
-# or encrypted using an MD5 hash.
+# o bé xifrada fent servir un capolament MD5.
 #passwd passwd/root-password-crypted password [MD5 hash]
 
-# Skip creation of a normal user account.
+# Per ometre la creació d'un compte d'usuari normal.
 #passwd passwd/make-user boolean false
 
-# Alternatively, create a normal user account.
-#passwd passwd/user-fullname string Debian User
+# Per crear un compte d'usuari normal.
+#passwd passwd/user-fullname string Usuari de Debian
 #passwd passwd/username string debian
-# Normal user's password, either in clear text
+# Contrasenya de l'usuari normal, bé explícita
 #passwd passwd/user-password password insecure
 #passwd passwd/user-password-again password insecure
-# or encrypted using an MD5 hash.
+# o bé xifrada fent servir un capolament MD5.
 #passwd passwd/user-password-crypted password [MD5 hash]
 </screen></informalexample>
 
 <para>
 
-The <classname>passwd/root-password-crypted</classname> and
-<classname>passwd/user-password-crypted</classname> variables can also be
-preseeded with <quote>!</quote> as their value. In that case, the corresponding
-account is disabled. This may be convenient for the root account, provided
-of course that an alternate method is setup to allow administrative
-activities or root login (for instance by using SSH key authentication or
-sudo).
+Les variables <classname>passwd/root-password-crypted</classname> i
+<classname>passwd/user-password-crypted</classname> també es poden
+configurar prèviament posant <quote>!</quote> com a valor. En aquest cas,
+el compte corresponent es deshabilitarà. Això pot ser convenient per al
+compte de superusuari en cas que, evidentment, s'haja establert un altre
+mètode per permetre les tasques d'administració o per entrar com a
+superusuari (per exemple fent servir l'autenticació de la clau SSH o
+el sudo).
 
 </para><para>
 
-An MD5 hash for a password can be generated using the following command.
+Es pot capolar una contrasenya en MD5 amb la següent ordre.
 
 <informalexample><screen>
 $ echo "r00tme" | mkpasswd -s -H MD5
@@ -743,23 +761,25 @@ $ echo "r00tme" | mkpasswd -s -H MD5
   </sect2>
 
   <sect2 id="preseed-bootloader">
-  <title>Boot loader installation</title>
+  <title>Instal·lació del carregador</title>
 
 <informalexample role="example"><screen>
-# Grub is the default boot loader (for x86). If you want lilo installed
-# instead, uncomment this:
+# El Grub és el carregador predeterminat (per a l'x86). Si voleu instal·lar
+# el lilo, tragueu-hi el comentari:
 #d-i grub-installer/skip boolean true
 
-# This is fairly safe to set, it makes grub install automatically to the MBR
-# if no other operating system is detected on the machine.
+# Això, que és segur de fer, fa que el grub s'instal·le automàticament al
+# registre principal d'arrenacada (MBR) si no es detecta cap altre sistema
+# operatiu a la màquina.
 d-i grub-installer/only_debian boolean true
 
-# This one makes grub-installer install to the MBR if if finds some other OS
-# too, which is less safe as it might not be able to boot that other OS.
+# Això altre fa també que l'instal·lador del grub el pose a l'MBR si troba
+# qualsevol altre sistema operatiu, la qual cosa és menys segura ja que pot
+# no ser possible d'arrencar aquest altre sistema operatiu.
 d-i grub-installer/with_other_os boolean true
 
-# Alternatively, if you want to install to a location other than the mbr,
-# uncomment and edit these lines:
+# Com a alternativa, si voleu instal·lar-lo a un lloc diferent de l'MBR,
+# tragueu-ne el comentari i editeu aquestes línies:
 #d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
@@ -768,14 +788,15 @@ d-i grub-installer/with_other_os boolean true
   </sect2>
 
   <sect2 id="preseed-finish">
-  <title>Finishing up the first stage install</title>
+  <title>Finalització de la primera etapa de la instal·lació</title>
 
 <informalexample role="example"><screen>
-# Avoid that last message about the install being complete.
+# Evita el darrer missatge de la instal·lació que apareix indicant-ne l'estat
+# complet.
 d-i prebaseconfig/reboot_in_progress note
 
-# This will prevent the installer from ejecting the CD during the reboot,
-# which is useful in some situations.
+# Això eivta que l'instal·lador expulse el CD quan es torna a arrencar, la
+# qual cosa és útil en algunes situacions.
 #d-i cdrom-detect/eject boolean false
 </screen></informalexample>
 
@@ -783,77 +804,78 @@ d-i prebaseconfig/reboot_in_progress note
  </sect1>
 
  <sect1 id="preseed-stage2">
- <title>Preseeding the second stage of the installation</title>
+ <title>Configuració prèvia de la segona etapa de la instal·lació</title>
 
   <sect2 id="preseed-baseconfig">
-  <title>Base config</title>
+  <title>Configuració bàsica (base config)</title>
 
 <informalexample role="example"><screen>
-# Avoid the introductory message.
+# Per evitar el missatge introductori.
 base-config base-config/intro note
 
-# Avoid the final message.
+# Per evitar el missatge final.
 base-config base-config/login note
 
-# If you installed a display manager, but don't want to start it immediately
-# after base-config finishes.
+# Per si heu instal·lat un gestor de visualització però no voleu engegar-lo
+# immediatament després de la configuració bàsica.
 #base-config base-config/start-display-manager boolean false
 
-# Some versions of the installer can report back on what you've installed.
-# The default is not to report back, but sending reports helps the project
-# determine what software is most popular and include it on CDs.
+# Algunes versions de l'instal·lador poden emetre un informe del que heu
+# instal·lat. Per defecte, no es fan informes, però enviar-n'hi ajuda el
+# projecte a determinar quin programari s'empra més, a fi d'incloure'l
+# als CD.
 #popularity-contest popularity-contest/participate boolean false
 </screen></informalexample>
 
   </sect2>
 
   <sect2 id="preseed-tasksel">
-  <title>Package selection</title>
+  <title>Selecció de paquets</title>
 <para>
 
-You can choose to install any combination of tasks that are available.
-Available tasks as of this writing include:
+Podeu instal·lar qualsevol combinació de tasques que hi haja a l'abast.
+En aquest moment les tasques que hi ha són:
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  <userinput>Standard system</userinput>
+  <userinput>Sistema estàndard</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Desktop environment</userinput>
+  <userinput>Entorn d'escriptori</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Web server</userinput>
+  <userinput>Servidor web</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Print server</userinput>
+  <userinput>Servidor d'impressió</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>DNS server</userinput>
+  <userinput>Servidor DNS</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>File server</userinput>
+  <userinput>Servidor de fitxers</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Mail server</userinput>
+  <userinput>Servidor de correu</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>SQL database</userinput>
+  <userinput>Base de dades SQL</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Laptop</userinput>
+  <userinput>Portàtil</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>manual package selection</userinput>
+  <userinput>selecció manual de paquets</userinput>
 </para></listitem>
 </itemizedlist>
 
 <para>
 
-The last of these will run aptitude. You can also choose to install no tasks,
-and force the installation of a set of packages in some other way. We recommend
-always including the <userinput>Standard system</userinput> task.
+La darrera executarà l'aptitude. Podeu també no instal·lar cap tasca i forçar
+la instal·lació d'un conjunt de paquets d'alguna altra manera. És recomanable
+incloure sempre la tasca <userinput>Sistema estàndard</userinput>.
 
 </para>
 
@@ -865,11 +887,12 @@ tasksel tasksel/first multiselect Standard system, Desktop environment
   </sect2>
 
   <sect2 id="preseed-mailer">
-  <title>Mailer configuration</title>
+  <title>Configuració de l'administrador de correu</title>
 <para>
 
-During a normal install, exim asks only a few questions. Here's how to
-avoid even those. More complicated preseeding is possible.
+Durant una instal·lació normal, l'exim sols fa unes poques preguntes. Aquí
+teniu la manera d'evitar fins i tot aquestes. Però encara es pot configurar
+de manera més complexa.
 
 </para>
 
@@ -884,32 +907,34 @@ exim4-config exim4/dc_postmaster string
   </sect2>
 
   <sect2 id="preseed-X">
-  <title>X configuration</title>
+  <title>Configuració de l'X</title>
 <para>
 
-Preseeding Debian's X config is possible, but you probably need to know
-some details about the video hardware of the machine, since Debian's X
-configurator does not do fully automatic configuration of everything.
+Es pot fer una configuració prèvia de l'X, però probablement us caldrà saber
+alguns detalls sobre el maquinari de vídeo, car el configurador de l'X
+no ho configura tot automàticament.
 
 </para>
 
 <informalexample role="example"><screen>
-# X can detect the right driver for some cards, but if you're preseeding,
-# you override whatever it chooses. Still, vesa will work most places.
+# L'X pot detectar el controlador adient per a algunes targetes, però si
+# empreu una configuració prèvia, substituireu tot el que aquell seleccione.
+# Amb tot, el controlador vesa funcionarà la majoria de vegades.
 #xserver-xfree86 xserver-xfree86/config/device/driver select vesa
 
-# A caveat with mouse autodetection is that if it fails, X will retry it
-# over and over. So if it's preseeded to be done, there is a possibility of
-# an infinite loop if the mouse is not autodetected.
+# Un problema amb l'detecció automàtica del ratolí és que si falla, l'X la
+# tornarà intentar indefinidament. Per tant, si l'heu inclosa en la
+# configuració prèvia, hi ha la possibilitat de caure en un bucle infinit,
+# si falla la detecció.
 #xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
 
-# Monitor autodetection is recommended.
+# Es recomana fer servir la detecció automàtica del monitor.
 xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
-# Uncomment if you have an LCD display.
+# Tragueu el comentari a això si teniu una pantalla LCD.
 #xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
-# X has three configuration paths for the monitor. Here's how to preseed
-# the "medium" path, which is always available. The "simple" path may not
-# be available, and the "advanced" path asks too many questions.
+# L'X té tres maneres de configurar el monitor. Aquí teniu com configurar
+# prèviament la «intermèdia» (medium), que sempre és a l'abast. La «simple»
+# pot no ser-hi, i l'«avançada» (advanced) fa massa preguntes.
 xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
        select medium
 xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
@@ -919,14 +944,14 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
   </sect2>
 
   <sect2 id="preseed-other">
-  <title>Preseeding other packages</title>
+  <title>Configuració prèvia d'altres paquets</title>
 
 <informalexample role="example"><screen>
-# Depending on what software you choose to install, or if things go wrong
-# during the installation process, it's possible that other questions may
-# be asked. You can preseed those too, of course. To get a list of every
-# possible question that could be asked during an install, do an
-# installation, and then run these commands:
+# Segons el programari instal·lat, o si les coses van malament durant el
+# procés d'instal·lació, és possible rebre preguntes sobre altres qüestions.
+# També podeu fer-ne una configuració prèvia. Per obtenir una llista de totes
+# les preguntes que es poden fer durant la instal·lació, feu una instal·lació,
+# i després executeu aquestes ordres:
 #   debconf-get-selections --installer > file
 #   debconf-get-selections >> file
 </screen></informalexample>
@@ -935,33 +960,34 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
  </sect1>
 
  <sect1 id="preseed-advanced">
- <title>Advanced options</title>
+ <title>Opcions avançades</title>
 
   <sect2 id="preseed-shell">
-  <title>Shell commands</title>
+  <title>Ordres de l'intèrpret</title>
 
 <informalexample role="example"><screen>
-# d-i preseeding is inherently not secure. Nothing in the installer checks
-# for attempts at buffer overflows or other exploits of the values of a
-# preseed file like this one. Only use preseed files from trusted
-# locations! To drive that home, and because it's generally useful, here's
-# a way to run any shell command you'd like inside the installer,
-# automatically.
+# Necessàriament, la configuració prèvia de l'instal·lador del Debian no pot
+# ser segura. No hi ha res que comprove els intents de sobreeiximent de
+# memòria intermèdia o d'altres abusos sobre els valors d'un fitxer de
+# configuració prèvia com el present. Feu servir només aquests fitxers si
+# provenen de llocs de confiança! Per raons de control, i perquè és útil
+# en general, aquí teniu una manera d'executar de forma automàtica
+# qualsevol ordre de l'intèrpret que vulgueu dins l'instal·lador.
 
-# This first command is run as early as possible, just after
-# preseeding is read.
+# Aquesta primera ordre s'executa tan prompte com es pot, tot just després
+# de llegir el fitxer de configuració prèvia.
 #d-i preseed/early_command string anna-install some-udeb
 
-# This command is run just before the install finishes, but when there is
-# still a usable /target directory.
+# Aquesta s'executa just abans que finalitze la instal·lació, però quan encara
+# es pot usar un directori de destí /target.
 #d-i preseed/late_command string echo foo > /target/etc/bar
 
-# This command is run just as base-config is starting up.
-#base-config base-config/early_command string echo hi mom
+# Aquesta ordre s'executa en iniciar-se la configuració bàsica (base-config).
+#base-config base-config/early_command string echo hola mare
 
-# This command is run after base-config is done, just before the login:
-# prompt. This is a good way to install a set of packages you want, or to
-# tweak the configuration of the system.
+# Aquesta ordre s'executa després de la configuració bàsica, abans de
+# l'indicador d'entrada. És una bona manera d'instal·lar un conjunt de
+# paquets que us interessen, o de retocar la configuració del sistema.
 #base-config base-config/late_command \
 #      string apt-get install zsh; chsh -s /bin/zsh
 </screen></informalexample>
@@ -969,31 +995,32 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
   </sect2>
 
   <sect2 id="preseed-chainload">
-  <title>Chainloading preseed files</title>
+  <title>Càrrega en cadena de fitxers de configuració prèvia</title>
 <para>
 
-It is possible to include other preseed files from a preseed file. Any
-settings in those files will override pre-existing settings from files
-loaded earlier. This makes it possible to put, for example, general
-networking settings for your location in one file and more specific
-settings for certain configurations in other files.
+En un fitxer de configuració prèvia se'n poden incloure d'altres.
+Qualsevol ajust d'aquests fitxers prevaldrà sobre els dels fitxers
+carregats primer. Això fa possible, per exemple, indicar la configuració
+general de la xarxa a un fitxer i els ajusts més específics a altres.
 
 </para>
 
 <informalexample><screen>
-# More that one file can be listed, separated by spaces; all will be
-# loaded. The included files can have preseed/include directives of their
-# own as well. Note that if the filenames are relative, they are taken from
-# the same directory as the preseed file that includes them.
+# Es pot incloure més d'un fitxer, separat per espais; es carregaran tots.
+# Els fitxers inclosos poden tenir directrius de configuració prèvia pròpies
+# o bé incloure fitxers amb d'altres. Tingueu en compte que si els noms de
+# fitxer són relatius, s'agafen del mateix directori que el del fitxer que
+# els inclou.
 #d-i preseed/include string x.cfg
 
-# The installer can optionally verify checksums of preseed files before
-# using them. Currently only md5sums are supported, list the md5sums
-# in the same order as the list of files to include.
+# L'instal·lador pot comprovar sumes de verificació de fitxers de configuració
+# prèvia abans de fer-los servir. Actualment sols es pot poden emprar md5sums.
+# Indiqueu els md5sums en el mateix ordre que la llista de fitxers que s'ha
+# d'incloure.
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
 
-# More flexibly, this runs a shell command and if it outputs the names of
-# preseed files, includes those files. 
+# Més flexible que això és el següent, que executa una ordre a l'intèpret i,
+# si s'obté cap nom d'un fitxer de configuració prèvia, s'hi inclou.
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 </screen></informalexample>
