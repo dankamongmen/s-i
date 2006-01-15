@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33825 -->
+<!-- original version: 33891 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -184,7 +184,7 @@ al primo riconoscimento dell'hardware).
 
 <!--
 Obviously, any questions that have been processed before the
-preseeding configuration file is loaded, cannot be preseeded.
+preseeding configuration file is loaded cannot be preseeded.
 <xref linkend="preseed-bootparms"/> offers a way to avoid these
 questions being asked.
 -->
@@ -286,7 +286,7 @@ are stored in a separate, non-readable file in the same directory.
 <para>
 
 <!--
-A very powerfull and flexible option offered by the preseeding tools is the
+A very powerful and flexible option offered by the preseeding tools is the
 ability to run commands or scripts at certain points in the installation.
 See <xref linkend="preseed-shell"/> for details.
 -->
@@ -336,12 +336,10 @@ dopo aver impostato il valore per un modello.
 
 </para>
 
+<informalexample><screen>
 <!--
-<informalexample><screen>
 d-i foo/bar string value 
--->
-<informalexample><screen>
-d-i foo/bar string valore
+-->d-i foo/bar string valore
 d-i foo/bar seen false
 </screen></informalexample>
 
@@ -454,15 +452,14 @@ non userà quel file.
 
 </para>
 
-<!--
 <informalexample><screen>
+<!--
 Boot parameters to specify:
 - if you're netbooting:
--->
-<informalexample><screen>
-Parametri d'avvio da specificare:
-- con avvio da rete:
   preseed/url=http://host/path/to/preseed.cfg
+-->Parametri d'avvio da specificare:
+- con avvio da rete:
+  preseed/url=http://host/parcorso/di/preseed.cfg
   preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
 <!--
 - if you're booting a remastered CD:
@@ -705,8 +702,7 @@ il locale come parametro d'avvio utilizzare
 <!--
 # Locale sets language and country.
 d-i debian-installer/locale string en_US
--->
-# Con locale si impostano lingua e paese.
+--># Con locale si impostano lingua e paese.
 d-i debian-installer/locale string it_IT
 </screen></informalexample>
 
@@ -728,14 +724,12 @@ essere una valida per l'architettura della tastiera scelta.
 <informalexample role="example"><screen>
 <!--
 # Keyboard selection.
--->
-# Selezione della tastiera.
+--># Selezione della tastiera.
 #d-i console-tools/archs select at
 d-i console-keymaps-at/keymap select us
 <!--
 # Example for a different keyboard architecture
--->
-# Esempio con una diversa architettura della tastriera
+--># Esempio con una diversa architettura della tastriera
 #d-i console-keymaps-usb/keymap select mac-usb-us
 </screen></informalexample>
 
@@ -790,18 +784,32 @@ o da penna USB. È anche possibile passare in ingresso parametri di
 configurazione di rete sui parametri del kernel, se si stanno caricando
 file di preconfigurazione dalla rete.
 
+</para><para>
+
+<!--
+If you need to pick a particular interface when netbooting before loading
+a preseed file from the network, use a boot parameter such as
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+-->
+
+Se necessario è possibile scegliere una particolare interfaccia prima di
+caricare il file di preconfigurazione dalla rete usando il parametro d'avvio
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+
 </para>
 
 <informalexample role="example"><screen>
 <!--
 # netcfg will choose an interface that has link if possible. This makes it
 # skip displaying a list if there is more than one interface.
--->
-# netcfg sceglierà, se possibile, un'interfaccia che abbia un collegamento.
-# Questa farà in modo di evitare di visualizzare una lista se è presente più
-# di un'interfaccia.
+--># netcfg sceglierà, se possibile, un'interfaccia che abbia un collegamento.
+# Questo evita la visualizzazione di una lista se è presente più di
+# un'interfaccia.
 d-i netcfg/choose_interface select auto
-
+<!--
+# To pick a particular interface instead:
+--># Oppure scegliere un'interfaccia ben precisa:
+#d-i netcfg/choose_interface select eth1
 <!--
 # If you have a slow dhcp server and the installer times out waiting for
 # it, this might be useful.
@@ -809,7 +817,6 @@ d-i netcfg/choose_interface select auto
 # Se si ha un server dhcp lento e l'installatore andrà in timeout in attesa
 # di esso, questo potrebbe essere utile.
 #d-i netcfg/dhcp_timeout string 60
-
 <!--
 # If you prefer to configure the network manually, here's how:
 -->
@@ -820,7 +827,6 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_netmask string 255.255.255.0
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
-
 <!--
 # Any hostname and domain names assigned from dhcp take precedence over
 # values set here. However, setting the values still prevents the questions
@@ -832,7 +838,6 @@ d-i netcfg/choose_interface select auto
 # da dhcp.
 d-i netcfg/get_hostname string unassigned-hostname
 d-i netcfg/get_domain string unassigned-domain
-
 <!--
 # Disable that annoying WEP key dialog.
 -->
@@ -840,9 +845,8 @@ d-i netcfg/get_domain string unassigned-domain
 d-i netcfg/wireless_wep string
 <!--
 # The wacky dhcp hostname that some ISPs use as a password of sorts.
--->
-# Lo stupido nome dell'host da dhcp che alcuni ISP usano come una sorta di
-# password.
+--># Lo stupido nome dell'host da dhcp che alcuni ISP usano come una sorta
+# di password.
 #d-i netcfg/dhcp_hostname string radish
 </screen></informalexample>
 
@@ -854,7 +858,7 @@ d-i netcfg/wireless_wep string
 <para>
 
 <!--
-Depending on the installation method you use, a mirror may used both to
+Depending on the installation method you use, a mirror may be used both to
 download additional components of the installer, the base system and to
 set up the <filename>/etc/apt/sources.list</filename> for the installed
 system.
@@ -900,15 +904,11 @@ initrd per il metodo d'installazione scelto. Il valore predefinito per
 <informalexample role="example"><screen>
 <!--
 d-i mirror/country string enter information manually
--->
-d-i mirror/country string inserire manualmente le informazioni
-<!--
 d-i mirror/http/hostname string http.us.debian.org
--->
+-->d-i mirror/country string inserire manualmente le informazioni
 d-i mirror/http/hostname string http.it.debian.org
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
-
 <!--
 # Suite to install.
 -->
@@ -916,9 +916,7 @@ d-i mirror/http/proxy string
 #d-i mirror/suite string testing
 <!--
 # Suite to use for loading installer components (optional).
--->
-# Versione da usare per il caricamento dei componenti dell'installatore
-# (opzionale).
+--># Versione dei componenti dell'installatore da caricare (opzionale).
 #d-i mirror/udeb/suite string testing
 </screen></informalexample>
 
@@ -969,12 +967,10 @@ preconfigurazione.
 # If the system has free space you can choose to only partition that space.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
--->
-# Se il sistema ha spazio libero è possibile scegliere di partizionare
+--># Se il sistema ha spazio libero è possibile scegliere di partizionare
 # soltanto quello spazio.
 #d-i partman-auto/init_automatically_partition \
 #    select Usa lo spazio libero continuo più grande
-
 <!--
 # Alternatively, you can specify a disk to partition. The device name can
 # be given in either devfs or traditional non-devfs format.
@@ -985,7 +981,6 @@ preconfigurazione.
 # formato non-devfs.
 # Per esempio, per usare il primo disco riconosciuto da devfs:
 d-i partman-auto/disk string /dev/discs/disc0/disc
-
 <!--
 # You can choose from any of the predefined partitioning recipes:
 -->
@@ -994,19 +989,15 @@ d-i partman-auto/disk string /dev/discs/disc0/disc
 d-i partman-auto/choose_recipe \
 <!--
        select All files in one partition (recommended for new users)
--->
-       select Tutti i file in una partizione (raccomandata ai nuovi utenti)
+-->       select Tutti i file in una partizione (raccomandata ai nuovi utenti)
 #d-i partman-auto/choose_recipe \
 <!--
 #       select Separate /home partition
--->
-#       select Una partizione separata per /home
+-->#       select Una partizione separata per /home
 #d-i partman-auto/choose_recipe \
 <!--
 #       select Separate /home, /usr, /var, and /tmp partitions
--->
-#       select Partizioni separate per /home, /usr, /var e /tmp
-
+-->#       select Partizioni separate per /home, /usr, /var e /tmp
 <!--
 # Or provide a recipe of your own...
 # The recipe format is documented in the file devel/partman-auto-recipe.txt.
@@ -1018,7 +1009,6 @@ d-i partman-auto/choose_recipe \
 # Se si ha modo di importare un file ricetta dentro l'ambiente
 # dell'installatore, è possibile semplicemente puntare a questo.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
-
 <!--
 # If not, you can put an entire recipe the preseed file in one (logical)
 # line. This example creates a small /boot partition, suitable swap, and
@@ -1043,7 +1033,6 @@ d-i partman-auto/choose_recipe \
 #              64 512 300% linux-swap                          \
 #                      method{ swap } format{ }                \
 #              .
-
 <!--
 # This makes partman automatically partition without confirmation.
 -->
@@ -1052,8 +1041,7 @@ d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
 <!--
        select Finish partitioning and write changes to disk
--->
-       select Termina il partizionamento e scrivi le modifiche sul disco
+-->       select Termina il partizionamento e scrivi le modifiche sul disco
 d-i partman/confirm boolean true
 </screen></informalexample>
 
@@ -1066,10 +1054,8 @@ d-i partman/confirm boolean true
 <informalexample role="example"><screen>
 <!--
 # Controls whether or not the hardware clock is set to UTC.
--->
-# Controlla se l'orologio hardware è impostato o meno su UTC.
+--># Controlla se l'orologio hardware è impostato o meno su UTC.
 d-i clock-setup/utc boolean true
-
 <!--
 # You may set this to any valid setting for $TZ; see the contents of
 # /usr/share/zoneinfo/ for valid values.
@@ -1102,15 +1088,13 @@ preconfigurazione sono rilevanti solo le prossime tre variabili.
 <informalexample role="example"><screen>
 <!--
 # You can choose to install non-free and contrib software.
--->
-# È possibile scegliere di installare software non-free e contrib.
+--># È possibile scegliere di installare software non-free e contrib.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
 <!--
 # To avoid adding security sources, or to use a different server
 # than security.debian.org.
--->
-# Per evitare l'inserimento delle sorgenti per la sicurezza oppure per
+--># Per evitare l'inserimento delle sorgenti per la sicurezza oppure per
 # usare un server diverso da security.debian.org.
 #d-i apt-setup/security_host string 
 </screen></informalexample>
@@ -1154,39 +1138,33 @@ poiché un hash MD5 consente attacchi di tipo brute force.
 <informalexample role="example"><screen>
 <!--
 # Root password, either in clear text
--->
-# Password di root, in chiaro entrambe le volte
-#passwd passwd/root-password password r00tme
-#passwd passwd/root-password-again password r00tme
+--># Password di root, in chiaro entrambe le volte
+#d-i passwd/root-password password r00tme
+#d-i passwd/root-password-again password r00tme
 <!--
 # or encrypted using an MD5 hash.
--->
-# oppure criptata in un hash MD5.
-#passwd passwd/root-password-crypted password [MD5 hash]
-
+--># oppure criptata in un hash MD5.
+#d-i passwd/root-password-crypted password [MD5 hash]
 <!--
 # Skip creation of a normal user account.
 -->
 # Saltare la creazione dell'account di un utente normale.
-#passwd passwd/make-user boolean false
-
+#d-i passwd/make-user boolean false
 <!--
 # Alternatively, create a normal user account.
 -->
 # In alternativa, è possibile creare l'account per un utente normale.
-#passwd passwd/user-fullname string Debian User
-#passwd passwd/username string debian
+#d-i passwd/user-fullname string Debian User
+#d-i passwd/username string debian
 <!--
 # Normal user's password, either in clear text
--->
-# La password dell'utente, in chiaro entrambe le volte
-#passwd passwd/user-password password insecure
-#passwd passwd/user-password-again password insecure
+--># La password dell'utente, in chiaro entrambe le volte
+#d-i passwd/user-password password insecure
+#d-i passwd/user-password-again password insecure
 <!--
 # or encrypted using an MD5 hash.
--->
-# oppure criptata in un hash MD5.
-#passwd passwd/user-password-crypted password [MD5 hash]
+--># oppure criptata in un hash MD5.
+#d-i passwd/user-password-crypted password [MD5 hash]
 </screen></informalexample>
 
 <para>
@@ -1243,8 +1221,7 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 <informalexample role="example"><screen>
 <!--
 # Select the initramfs generator used to generate the initrd for 2.6 kernels.
--->
-# Seleziona il programma per la creazione dell'initrd per i kernel 2.6.
+--># Seleziona il programma per la creazione dell'initrd per i kernel 2.6.
 #d-i base-installer/kernel/linux/initramfs-generators string yaird
 </screen></informalexample>
 
@@ -1258,11 +1235,9 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 <!--
 # Grub is the default boot loader (for x86). If you want lilo installed
 # instead, uncomment this:
--->
-# Grub è il caricatore di avvio predefinito (per x86). Se si desidera,
+--># Grub è il caricatore di avvio predefinito (per x86). Se si desidera,
 # invece, che sia installato lilo, scommentare questa:
 #d-i grub-installer/skip boolean true
-
 <!--
 # This is fairly safe to set, it makes grub install automatically to the MBR
 # if no other operating system is detected on the machine.
@@ -1271,7 +1246,6 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 # installato automaticamente nel MBR se nessun altro sistema operativo è
 # rilevato nella macchina.
 d-i grub-installer/only_debian boolean true
-
 <!--
 # This one makes grub-installer install to the MBR if if finds some other OS
 # too, which is less safe as it might not be able to boot that other OS.
@@ -1280,7 +1254,6 @@ d-i grub-installer/only_debian boolean true
 # qualche altro sistema operativo, che è un po' meno sicuro poiché potrebbe
 # non riuscire ad avviare gli altri sistemi operativi.
 d-i grub-installer/with_other_os boolean true
-
 <!--
 # Alternatively, if you want to install to a location other than the mbr,
 # uncomment and edit these lines:
@@ -1356,7 +1329,6 @@ sempre il task <userinput>Sistema standard</userinput>.
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
-
 <!--
 # Some versions of the installer can report back on what software you have
 # installed, and what software you use. The default is not to report back,
@@ -1379,10 +1351,8 @@ tasksel tasksel/first multiselect Standard system, Desktop environment
 <informalexample role="example"><screen>
 <!--
 # Avoid that last message about the install being complete.
--->
-# Evita l'ultimo messaggio riguardo il completamento dell'installazione.
+--># Evita l'ultimo messaggio riguardo il completamento dell'installazione.
 d-i prebaseconfig/reboot_in_progress note
-
 <!--
 # This will prevent the installer from ejecting the CD during the reboot,
 # which is useful in some situations.
@@ -1414,8 +1384,7 @@ possibile.
 exim4-config exim4/dc_eximconfig_configtype \
 <!--
        select no configuration at this time
--->
-       non selezionare alcuna configurazione in questo momento
+-->       non selezionare alcuna configurazione in questo momento
 exim4-config exim4/no_config boolean true
 exim4-config exim4/no_config boolean true
 exim4-config exim4/dc_postmaster string
@@ -1445,12 +1414,10 @@ a fare una configurazione automatica di tutto.
 <!--
 # X can detect the right driver for some cards, but if you're preseeding,
 # you override whatever it chooses. Still, vesa will work most places.
--->
-# X può rilevare il driver corretto per alcune schede, ma se si sta
+--># X può rilevare il driver corretto per alcune schede, ma se si sta
 # preconfigurando, si sovrascriverà qualsiasi cosa esso scelga. Nella
 # maggioranza dei casi vesa funzionerà ancora.
-#xserver-xfree86 xserver-xfree86/config/device/driver select vesa
-
+#xserver-xorg xserver-xorg/config/device/driver select vesa
 <!--
 # A caveat with mouse autodetection is that if it fails, X will retry it
 # over and over. So if it's preseeded to be done, there is a possibility of
@@ -1460,30 +1427,27 @@ a fare una configurazione automatica di tutto.
 # fallisce, X lo proverà ancora e così via. Pertanto, se si è preconfigurato
 # che debba essere fatto, c'è la possibilità di un ciclo infinito se il
 # mouse non è rilevato automaticamente.
-#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
-
+#xserver-xorg xserver-xorg/autodetect_mouse boolean true
 <!--
 # Monitor autodetection is recommended.
 -->
 # Il rilevamento automatico del monitor è raccomandato.
-xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
+xserver-xorg xserver-xorg/autodetect_monitor boolean true
 <!--
 # Uncomment if you have an LCD display.
--->
-# Scommentare se si ha uno schermo LCD.
-#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
+--># Scommentare se si ha uno schermo LCD.
+#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
 <!--
 # X has three configuration paths for the monitor. Here's how to preseed
 # the "medium" path, which is always available. The "simple" path may not
 # be available, and the "advanced" path asks too many questions.
--->
-# X ha tre percorsi di configurazione per il monitor. Ecco come
+--># X ha tre percorsi di configurazione per il monitor. Ecco come
 # preconfigurare il percorso "medium", che è sempre disponibile. Il percorso
 # "simple" potrebbe non essere disponibile e il percorso "advanced" pone
 # troppe domande.
-xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
+xserver-xorg xserver-xorg/config/monitor/selection-method \
        select medium
-xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
+xserver-xorg xserver-xorg/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
 
@@ -1500,8 +1464,7 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 # be asked. You can preseed those too, of course. To get a list of every
 # possible question that could be asked during an install, do an
 # installation, and then run these commands:
--->
-# A seconda del software che si sceglie di installare, o se le cose vanno
+--># A seconda del software che si sceglie di installare, o se le cose vanno
 # storte durante il processo di installazione, è possibile che altre domande
 # possano essere poste. Si possono preconfigurare anche quelle,
 # naturalmente. Per ottenere una lista di ogni possibile domanda che possa
@@ -1530,14 +1493,12 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 # locations! To drive that home, and because it's generally useful, here's
 # a way to run any shell command you'd like inside the installer,
 # automatically.
--->
-# La preconfigurazione del d-i è intrinsecamente non sicura. Niente
+--># La preconfigurazione del d-i è intrinsecamente non sicura. Niente
 # nell'installatore verifica i tentativi di buffer overflow o altri
 # exploit dei valori di un file di preconfigurazione come questo. Usare
 # solo file di preconfigurazione da locazioni fidate! Per riuscire in ciò, e
 # poiché è generalmente utile, ecco un modo per eseguire eventuali comandi
 # da shell che si desiderano dentro l'installatore, automaticamente.
-
 <!--
 # This first command is run as early as possible, just after
 # preseeding is read.
@@ -1545,12 +1506,11 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 # Questo primo comando è eseguito prima possibile, appena dopo la lettura
 # della preconfigurazione.
 #d-i preseed/early_command string anna-install some-udeb
-
 <!--
 # This command is run just before the install finishes, but when there is
-+# still a usable /target directory. You can chroot to /target and use it
-+# directly, or use the apt-install and in-target commands to easily install
-+# packages and run commands in the target system.
+# still a usable /target directory. You can chroot to /target and use it
+# directly, or use the apt-install and in-target commands to easily install
+# packages and run commands in the target system.
 -->
 # Questo comando è eseguito appena prima che l'installatore termini, ma
 # quando c'è ancora una directory /target usabile. È possibile fare un
@@ -1583,19 +1543,17 @@ un file e di mettere alcune configurazioni particolari in altri file.
 
 </para>
 
-<!--
 <informalexample><screen>
+<!--
 # More that one file can be listed, separated by spaces; all will be
 # loaded. The included files can have preseed/include directives of their
 # own as well. Note that if the filenames are relative, they are taken from
 # the same directory as the preseed file that includes them.
--->
-<informalexample><screen>
-# Si possono elencare più file separandoli con degli spazi; verranno caricati
-# tutti. Anche i file inclusi possono avere al loro interno delle direttive
-# preseed/include. Si noti che i nomi dei file sono relativi, sono prelevati
-# dalla stessa directory del file di preconfigurazione e sono processati
-# nell'ordine con cui sono inclusi.
+--># Si possono elencare più file separandoli con degli spazi; verranno
+# caricati tutti. Anche i file inclusi possono avere al loro interno delle
+# direttive preseed/include. Si noti che i nomi dei file sono relativi, sono
+# prelevati dalla stessa directory del file di preconfigurazione e sono
+# processati nell'ordine con cui sono inclusi.
 #d-i preseed/include string x.cfg
 <!--
 # The installer can optionally verify checksums of preseed files before

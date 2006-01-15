@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33725 untranslated -->
+<!-- original version: 33725 -->
 
 
    <sect3 id="lvmcfg">
@@ -7,14 +7,24 @@
    <title>Configurazione del Logical Volume Manager (LVM)</title>
 <para>
 
+<!--
 If you are working with computers at the level of system administrator
 or <quote>advanced</quote> user, you have surely seen the situation
 where some disk partition (usually the most important one) was short on
 space, while some other partition was grossly underused and you had to
 manage this situation with moving stuff around, symlinking, etc.
+-->
+
+Se si lavora con i computer come amministratore di sistema o come utente
+<quote>esperto</quote> sicuramente si conoscerà la situazione in cui
+qualche partizione del disco (di solito quella più importante) è quasi
+completamente occupata, mentre altre partizioni sono abbondantemente
+sottoutilizzate che si gestisce spostando i dati, facendo dei link
+simbolici, ecc.
 
 </para><para>
 
+<!--
 To avoid the described situation you can use Logical Volume Manager
 (LVM). Simply said, with LVM you can combine your partitions
 (<firstterm>physical volumes</firstterm> in LVM lingo) to form
@@ -22,14 +32,19 @@ a virtual disc (so called <firstterm>volume group</firstterm>), which
 can then be divided into virtual partitions (<firstterm>logical
 volumes</firstterm>). The point is that logical volumes (and of course
 underlying volume groups) can span across several physical discs.
-
-<!--
-Per evitare la situazione descritta sopra si può usare un Logical Volume
-Manager (LVM). 
 -->
+
+Per evitare la situazione descritta sopra si può usare un Logical Volume
+Manager (LVM). In poche parole con LVM si possono combinare le partizioni
+(i <firstterm>volumi fisici</firstterm> nel gergo di LVM) in un disco
+virtuale (chiamato <firstterm>gruppo di volumi</firstterm>) che poi può
+essere diviso in partizioni virtuali (i <firstterm>volumi logici</firstterm>).
+La cosa importante è che i volumi logici (e ovviamente i gruppi di volumi
+sottostanti) possono estendersi su più dischi fisici.
 
 </para><para>
 
+<!--
 Now when you realize you need more space for your old 160GB
 <filename>/home</filename> partition, you can simply add a new 300GB
 disc to the computer, join it with your existing volume group and then
@@ -38,9 +53,20 @@ filesystem and voila &mdash; your users have some room again on their
 renewed 460GB partition.  This example is of course a bit
 oversimplified. If you haven't read it yet, you should consult the
 <ulink url="&url-lvm-howto;">LVM HOWTO</ulink>.
+-->
+
+Quando ci si accorge che per la propria partizione <filename>/home</filename>
+si ha bisogno di più degli attuali 160&nbsp;GB si può semplicemente
+aggiungere un disco da 300&nbsp;GB al computer, unirlo al gruppo di
+volumi esistente e infine ridimensionare il volume logico che contiene
+il filesystem <filename>/home</filename>; adesso gli utenti avranno a
+disposizione una nuova partizione da 460&nbsp;GB. Questo esempio è stato
+semplificato al massimo. Se ancora non si è letto
+l'<ulink url="&url-lvm-howto;">LVM HOWTO</ulink> si consiglia di farlo.
 
 </para><para>
 
+<!--
 LVM setup in &d-i; is quite simple. At first, you have to mark your
 partitions to be used as physical volumes for LVM. (This is done in
 <command>partman</command> in the <guimenu>Partition
@@ -53,13 +79,33 @@ physical volumes to volume group(s) under the <guimenuitem>Modify
 volume groups (VG)</guimenuitem> menu. After that, you should create
 logical volumes on the top of volume groups from the menu
 <guimenuitem>Modify logical volumes (LV)</guimenuitem>.
+-->
+
+La configurazione di LVM con il &d-i; è abbastanza semplice. Come prima
+cosa si devono marcare le partizioni da usare come volumi fisici per LVM
+(questo si può fare con <command>partman</command>, nel menu
+<guimenu>Impostazioni della partizione</guimenu> scegliere <menuchoice>
+<guimenu>Usato come:</guimenu> <guimenuitem>volume fisico per
+LVM</guimenuitem> </menuchoice>). Poi avviare il modulo
+<command>lvmcfg</command> (direttamente da <command>partman</command>
+oppure dal menu principale del &d-i;) e combinare i volumi fisici in uno
+o più gruppi di volumi con il menu <guimenuitem>Modificare i gruppi di
+volumi (VG)</guimenuitem>. Infine, sopra i gruppi di volumi, si possono
+creare i volumi logici usando il menu <guimenuitem>Modificare i volumi
+logici (LV)</guimenuitem>.
 
 </para><para>
 
+<!--
 After returning from <command>lvmcfg</command> back to
 <command>partman</command>, you will see any created logical volumes
 in the same way as ordinary partitions (and you should treat them like
 that).
+-->
+
+Al rientro in <command>partman</command> da <command>lvmcfg</command>
+si possono vedere tutti i volumi logici appena creati elencati come se
+fossero delle normali partizioni (e devono essere trattati come tali).
 
 </para>
    </sect3>
