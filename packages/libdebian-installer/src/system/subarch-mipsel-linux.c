@@ -81,7 +81,7 @@ static struct cpu system_bcm_bcm947xx_cpu[] = {
 	{ "Broadcom BCM3302", "bcm947xx" },
 	{ "Broadcom BCM4710", "bcm947xx" },
 	{ NULL, "unknown" }
-}
+};
 
 /* add new system types here */
 
