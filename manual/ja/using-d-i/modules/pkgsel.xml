@@ -1,28 +1,49 @@
+<?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id: $ -->
+<!-- original version: 33814 -->
 
    <sect3 id="pkgsel">
+<!--
    <title>Selecting and Installing Software</title>
+-->
+   <title>ソフトウェアの選択・インストール</title>
 
 <para>
 
+<!--
 During the installation process, you are given the opportunity to select
 additional software to install. Rather than picking individual software
 packages from the &num-of-distrib-pkgs; available packages, this stage of
 the installation process focuses on selecting and installing predefined
 collections of software to quickly set up your computer to perform various
 tasks.
+-->
+インストール処理中に、追加ソフトウェアをインストールする機会があります。
+&num-of-distrib-pkgs; 個もの利用可能パッケージから、
+個々のパッケージを取り上げるよりも、インストール処理のこの段階では、
+いち早く様々なコンピュータのタスクをセットアップするよう、
+定義済みのソフトウェア集合を選択・インストールするのに集中します。
+
 
 </para><para>
 
+<!--
 So, you have the ability to choose <emphasis>tasks</emphasis> first,
 and then add on more individual packages later.  These tasks loosely
 represent a number of different jobs or things you want to do with
 your computer, such as <quote>Desktop environment</quote>,
 <quote>Web server</quote>, or <quote>Print server</quote><footnote>
+-->
+ですから、まず<emphasis>タスク</emphasis>を選択し、
+後で個々のパッケージを追加できます。
+タスクは、様々なジョブやあなたがコンピュータにやらせたいことを、
+いくつか大まかに表しています。<quote>デスクトップ環境</quote>、
+<quote>Web サーバ</quote>、<quote>Print サーバ</quote>といった具合です
+<footnote>
 
 <para>
 
+<!--
 You should know that to present this list, the installer is merely
 invoking the <command>tasksel</command> program. It can be
 run at any time after installation to install (or remove) more
@@ -32,117 +53,217 @@ installation is complete, simply run <userinput>aptitude install
 <replaceable>package</replaceable></userinput>, where
 <replaceable>package</replaceable> is the name of the package you are
 looking for.
+-->
+表示されるリストは、
+インストーラが単に <command>tasksel</command> プログラムを起動しているだけ、
+ということを知っておいてください。
+インストールの後で、もっとパッケージをインストール (もしくは削除) 
+するのにいつでも実行できます。
+また <command>aptitude</command> のような、よりきめ細かいツールも利用できます。
+インストール完了後、特定の 1 パッケージを探すのなら、単に 
+<userinput>aptitude install <replaceable>パッケージ名</replaceable></userinput>
+を実行してください。
+<replaceable>パッケージ名</replaceable>は、探したいパッケージ名です。
 
 </para>
 
+<!--
 </footnote>. <xref linkend="tasksel-size-list"/> lists the space
 requirements for the available tasks.
+-->
+</footnote>。 <xref linkend="tasksel-size-list"/> に、
+利用可能タスクの必要容量一覧があります。
 
 </para><para>
 
+<!--
 Once you've selected your tasks, select
 <guibutton>Ok</guibutton>. At this point,
 <command>aptitude</command> will install the packages you've
 selected.
+-->
+タスクを選択したら、<guibutton>Ok</guibutton> を選択してください。
+<command>aptitude</command> が選択したパッケージのインストールを開始します。
 
 <note><para>
 
+<!--
 In the standard user interface of the installer, you can use the space bar
 to toggle selection of a task.
+-->
+インストーラの標準ユーザインターフェースでは、
+タスクの選択をスペースバーでトグルできます。
 
 </para></note>
 
 <note><para>
 
+<!--
 Note that some tasks may be pre-selected based on the characteristics of the
 computer you are installing. If you disagree with these selections you can
 un-select the tasks. You can even opt to install no tasks at all at this point.
+-->
+いくつかのタスクは、インストールしているコンピュータの特性により、
+あらかじめ選択されている可能性があります。
+選択状態が合わなければ、そのタスクの選択を解除できます。
+ここで、タスクをすべて選択しないようにすらできます。
 
 </para></note>
 
 </para><para>
 
+<!--
 Each package you selected with <command>tasksel</command> is downloaded,
 unpacked and then installed in turn by the <command>apt-get</command> and
 <command>dpkg</command> programs. If a particular program needs more
 information from the user, it will prompt you during this process.
+-->
+<command>tasksel</command> で選択したパッケージを、
+今度は <command>apt-get</command> プログラムと 
+<command>dpkg</command> プログラムでそれぞれダウンロード・展開し、
+インストールします。
+口うるさいプログラムが、ユーザからの情報をもっと必要とする場合は、
+この処理中に入力をうながしてきます。
 
 </para>
  <sect4 id="config-mta">
+<!--
  <title>Configuring Your Mail Transport Agent</title>
+-->
+ <title>メール配送エージェント (MTA) の設定</title>
 
 <para>
 
+<!--
 Today, email is a very important part of many people's life, so it's
 no surprise Debian lets you configure your mail system right as a part
 of the installation process. The standard mail transport agent in
 Debian is <command>exim4</command>, which is relatively small,
 flexible, and easy to learn.
+-->
+今日、email は多くの人々の生活で非常に重要な位置を占めています。
+ですからインストール処理中で、
+Debian がメールシステムを正しく設定させるのは驚くべきことではありません。
+Debian の標準メール配送エージェントは <command>exim4</command> です。
+これは、比較的小さく、柔軟で学習が容易です。
 
 </para><para>
 
+<!--
 You may ask if this is needed even if your computer is not connected
 to any network. The short answer is: Yes. The longer explanation: Some
 system utilities (like <command>cron</command>,
 <command>quota</command>, <command>aide</command>, &hellip;) may send
 you important notices via email.
+-->
+ネットワークに繋がっていないコンピュータでも、必要なのか聞きたそうですね。
+簡単に言えば Yes です。もう少し長く説明すると、
+(<command>cron</command>, <command>quota</command>, <command>aide</command>,
+&hellip; といった) システムユーティリティには、
+重要な通知を email で送信するものがあるのです。
 
 </para><para>
 
+<!--
 So on the first screen you will be presented with several common mail
 scenarios. Choose the one that most closely resembles your needs:
+-->
+そのため、最初の画面では、いくつか一般的なメールのシナリオが提示されます。
+ニーズに最も近いものを選択してください。
 
 </para>
 
 <variablelist>
 <varlistentry>
+<!--
 <term>internet site</term>
+-->
+<term>インターネットサイト</term>
 <listitem><para>
 
+<!--
 Your system is connected to a network and your mail is sent and
 received directly using SMTP. On the following screens you will be
 asked a few basic questions, like your machine's mail name, or a list of
 domains for which you accept or relay mail.
+-->
+システムがネットワークに繋がっており、メールを直接 SMTP で送受信します。
+マシンのメール名やメールを受け付け・リレーするドメインのリストといった
+基本的な質問が続きます。
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
+<!--
 <term>mail sent by smarthost</term>
+-->
+<term>スマートホストでメール送信</term>
 <listitem><para>
 
+<!--
 In this scenario is your outgoing mail forwarded to another machine,
 called a <quote>smarthost</quote>, which does the actual job for
 you. Smarthost also usually stores incoming mail addressed to your
 computer, so you don't need to be permanently online. That also means
 you have to download your mail from the smarthost via programs like
 fetchmail. This option is suitable for dial-up users.
+-->
+このシナリオは、
+実際に配送を行う<quote>スマートホスト</quote>と呼ばれる別のマシンに、
+出ていくメールをフォワードしてもらいます。
+またスマートホストは、
+通常あなたのコンピュータ宛に入ってくるメールを格納するため、
+ずっとオンラインである必要はありません。
+またこれは、スマートホストから fetchmail のようなプログラムを用いて、
+メールをダウンロードしなければならない、と言うことでもあります。
+このオプションは、ダイアルアップユーザに最適です。
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
+<!--
 <term>local delivery only</term>
+-->
+<term>ローカル配信のみ</term>
 <listitem><para>
 
+<!--
 Your system is not on a network and mail is sent or received only
 between local users. Even if you don't plan to send any messages, this
 option is highly recommended, because some system utilities may send
 you various alerts from time to time (e.g. beloved <quote>Disk quota
 exceeded</quote>). This option is also convenient for new users,
 because it doesn't ask any further questions.
+-->
+システムがネットワーク上になく、メールの送受信をローカルユーザとのみ行います。
+いずれのメッセージを送信する予定がなくとも、このオプションを強くお奨めします。
+システムユーティリティの中には、時々様々な警告 
+(愛しい <quote>Disk quota exceeded</quote> など) を挙げるものがあるからです。
+このオプションは他に質問を発しないので、新しいユーザにとって便利です。
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
+<!--
 <term>no configuration at this time</term>
+-->
+<term>今は設定しない</term>
 <listitem><para>
 
+<!--
 Choose this if you are absolutely convinced you know what you are
 doing. This will leave you with an unconfigured mail system &mdash;
 until you configure it, you won't be able to send or receive any mail
 and you may miss some important messages from your system utilities.
+-->
+何をしようとしているか、絶対に確信しているなら、これを選択してください。
+これにより、設定されていないメールシステムが残ります。&mdash;
+設定するまで、どんなメールも送受信できませんし、
+システムユーティリティからの重要なメッセージを見逃してしまうことでしょう。
+
 
 </para></listitem>
 </varlistentry>
@@ -150,11 +271,18 @@ and you may miss some important messages from your system utilities.
 
 <para>
 
+<!--
 If none of these scenarios suits your needs, or if you need a finer
 setup, you will need to edit configuration files under the
 <filename>/etc/exim4</filename> directory after the installation is
 complete. More information about <command>exim4</command> may be found
 under <filename>/usr/share/doc/exim4</filename>.
+-->
+ニーズに合ったシナリオがなかったり、もっとよいセットアップが必要なら、
+<filename>/etc/exim4</filename> ディレクトリ以下にある設定ファイルを、
+インストール完了後に編集してください。
+<command>exim4</command> についてのさらなる情報は、
+<filename>/usr/share/doc/exim4</filename> 以下にあります。
 
 </para>
  </sect4>
