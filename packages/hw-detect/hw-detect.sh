@@ -373,7 +373,7 @@ case $HOTPLUG_TYPE in
 		/lib/debian-installer/coldplug
 		;;
 	udev)
-		udevsynthesize
+		update-dev
 		;;
 esac
 
