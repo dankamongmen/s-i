@@ -75,10 +75,10 @@ static struct cpu system_necddb_rockhopper2_cpu[] = {
 
 static struct cpu system_bcm_bcm947xx_cpu[] = {
 	/* 2.4 */
-	{ "BCM3302", "bcm947xx"},
-	{ "BCM4710", "bcm947xx"},
+	{ "BCM3302", "bcm947xx" },
+	{ "BCM4710", "bcm947xx" },
 	/* 2.6 */
-	{ "Broadcom BCM3302", "bcm947xx"},
+	{ "Broadcom BCM3302", "bcm947xx" },
 	{ "Broadcom BCM4710", "bcm947xx" },
 	{ NULL, "unknown" }
 }
