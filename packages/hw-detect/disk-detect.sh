@@ -33,7 +33,7 @@ disk_found() {
 				return 0
 			fi
 		else
-			# Essentially the same approch used by partitioner and
+			# Essentially the same approach used by partitioner and
 			# autopartkit to find their disks.
 			if [ -n "$(ls /dev/discs/ 2>/dev/null)" ]; then
 				return 0
