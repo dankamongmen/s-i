@@ -27,20 +27,26 @@
 
 set -e
 
-export BUILDDIR=$(pwd)/d-i_build
+[ "${PIC}" ] || export PIC=yes
+[ "${TOPDIR}" ] || export TOPDIR=$(pwd)/gtkdfb/
+export BUILDDIR=${TOPDIR}/d-i_build
 export LD_LIBRARY_PATH=${BUILDDIR}/lib
 export PKG_CONFIG_PATH=${LD_LIBRARY_PATH}/pkgconfig
 LIBRARIES="DirectFB cairo gtk+"
 
+if [ ! -d ${TOPDIR} ] ; then
+	mkdir -p ${TOPDIR}
+fi
+
 function check() {
    for DIR in ${LIBRARIES} ; do
-      if [ ! -d ${DIR} ] ; then
+      if [ ! -d ${TOPDIR}${DIR} ] ; then
          echo "Error: ${DIR} is not installed"
          exit 1
       fi
    done
 
-   if [ ! -d gtk+/gdk/directfb ] ; then
+   if [ ! -d ${TOPDIR}gtk+/gdk/directfb ] ; then
       echo "*** Error: looks like gtk+ has not been patched ***" 
       exit 1      
    fi
@@ -50,15 +56,19 @@ function pass() {
    step=$1
    HERE=$(pwd)
    for DIR in ${LIBRARIES} ; do
-      cd ${DIR}
+      cd ${TOPDIR}${DIR}
 
       echo -n "${DIR} (Pass${step})... "
 
+      if [ "${PIC}" = "yes" ]; then
+         DEFAULT_OPTS="--with-pic"
+      fi
+
       if [ ${step} = 1 ] ; then
-         DEFAULT_OPTS="--prefix=${BUILDDIR}"
+         DEFAULT_OPTS="${DEFAULT_OPTS} --prefix=${BUILDDIR}"
          DESTINATION=""
       else
-         DEFAULT_OPTS="--prefix=/usr --sysconfdir=/etc"
+         DEFAULT_OPTS="${DEFAULT_OPTS} --prefix=/usr --sysconfdir=/etc"
          DESTINATION="DESTDIR=${INSTALLDIR}"
       fi
 
@@ -94,7 +104,7 @@ case "$1" in
       ;;
    pass2)
       check;
-      export INSTALLDIR=$(pwd)/d-i_runtime
+      export INSTALLDIR=${TOPDIR}d-i_runtime
       pass 2;
       ;;
    all)
@@ -102,15 +112,15 @@ case "$1" in
       export LDFLAGS=-L${BUILDDIR}/lib
       pass 1;
       export LDFLAGS=""
-      export INSTALLDIR=$(pwd)/d-i_runtime
+      export INSTALLDIR=${TOPDIR}d-i_runtime
       pass 2;
       mkdir -p ${INSTALLDIR}/etc/gtk-2.0
       cat ${BUILDDIR}/etc/gtk-2.0/gdk-pixbuf.loaders | sed "s|${BUILDDIR}|/usr|" > ${INSTALLDIR}/etc/gtk-2.0/gdk-pixbuf.loaders
       ;;
    split)
-      export INSTALLDIR="$(pwd)/d-i_split"
+      export INSTALLDIR="${TOPDIR}d-i_split"
       for DIR in ${LIBRARIES} ; do
-	  cd ${DIR}	  
+	  cd ${TOPDIR}${DIR}	  
 	  make install DESTDIR="${INSTALLDIR}/${DIR}"
 	  cd ..
       done
