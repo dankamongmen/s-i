@@ -21,7 +21,7 @@
 # Grab all the sources out of CVS and apply the gdk-directfb patch
 
 cvs -d:pserver:anonymous@anoncvs.gnome.org:/cvs/gnome -z3 co -r GTK_2_8_10 gtk+
-cvs -d :pserver:anoncvs@cvs.cairographics.org:/cvs/cairo co -D "20060118" cairo
+cvs -d:pserver:anoncvs@cvs.cairographics.org:/cvs/cairo co -D "20060118" cairo
 cvs -d:pserver:anonymous@cvs.directfb.org:/cvs/directfb -z3 co -D "20060110" DirectFB
 cvs -d:pserver:anonymous@cvs.directfb.org:/cvs/directfb -z3 co -D "20060118" gdk-directfb
 
