@@ -1,0 +1,54 @@
+#!/bin/bash
+# -*-sh-*-
+#
+#     Copyright (C) 2005 Davide Viti <zinosat@tiscali.it>
+#
+#     
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License
+#     as published by the Free Software Foundation; either version 2
+#     of the License, or (at your option) any later version.
+#     
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#     
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# ** This script is not meant to be run explicitily** : I just gathered all
+# the commands which need to be run here and there while debugging
+# mainly font issues; so it's more a set of notes than a proper script
+
+## Once you've compiled mini.iso, you can runs some tests
+## by chroot-ing inside build/tmp/gtk-miniiso/tree/
+
+
+# In case you need to bring something inside the chroot
+# which needs an unstribbed libc, take it from the proper place
+dpkg -x build/apt.udeb/cache/archives/libc6-*.udeb build/tmp/gtk-miniiso/tree/
+
+cp /usr/bin/strace tree/usr/bin/
+
+chroot tree /bin/ash
+debconf-loadtemplate d-i /var/lib/dpkg/info/*.templates
+mknod /dev/fb0 c 29 0
+mknod /dev/tty0 c 4 0
+mknod /dev/tty9 c 4 9
+# mknod /dev/psaux c 10 1
+
+mount /proc
+export DEBIAN_FRONTEND=gtk
+
+TERM_UTF8=yes
+export LANG=C.UTF-8
+echo -ne "\033%G" # Enable UTF-8 console
+
+# sudo kill -9 $(ps aux | grep debconf | awk '{print $2}' | head -n1)
+# run from another shell will terminate it (eventually use bash and ctrl-c)
+debconf -o d-i /usr/bin/main-menu
+
+# If you tweak fonts somehow remember to run this
+fc-cache -fv
