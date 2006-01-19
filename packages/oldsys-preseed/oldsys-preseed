@@ -1,0 +1,106 @@
+#!/bin/sh
+
+# Copyright (C) 2005, 2006  Martin Michlmayr <tbm@cyrius.com>
+
+# This code is covered by the GNU General Public License.
+
+set -e
+
+. /usr/lib/oldsys-preseed/functions
+
+log() {
+	logger -t oldsys-preseed "$@"
+}
+
+# If this is set to "yes", the user *absolutely* cannot input anything
+# before network-console comes up.  Therefore, preseed some info which
+# is not optimal but which will ensure that network-console is reached
+# without prompting for user input.
+NONINTERACTIVE="yes"
+FILE=/preseed.cfg
+
+if [ "$NONINTERACTIVE" = "yes" ]; then
+	# localechooser yet needs a way to run after network-console;
+	# in the meantime, preseed this information.
+	add "$FILE" "debian-installer/locale" "string" "C"
+	add "$FILE" "countrychooser/country-name" "select" "United States"
+	# Just continue if d-i enters lowmem mode
+	add "$FILE" "lowmem/low" "note"
+	# Any hostname and domain names assigned from DHCP take precedence
+	# over values set here.  However, setting the values still prevents
+	# the questions from being shown, even if values come from dhcp.
+	add "$FILE" "netcfg/get_hostname" "string" "debian"
+	add "$FILE" "netcfg/get_domain" "string" "example.org"
+	# I'm not terribly happy to preseed a generic password but I guess
+	# there's no other way on some machines.
+	add "$FILE" "network-console/password" "password" "install"
+	add "$FILE" "network-console/password-again" "password" "install"
+fi
+
+case "`archdetect`" in
+	arm/nslu2 | armeb/nslu2)
+		check_file /proc/mtd
+		sysconf=$(get_mtdblock "SysConf")
+		if [ -z "$sysconf" ]; then
+			log "Can't find SysConf MTD partition"
+			exit
+		fi
+		parse_sysconf "/dev/$sysconf"
+		# The original NSLU2 uses a different name for the network interface
+		if [ "$INTERFACE" = "ixp0" ]; then
+			INTERFACE=eth0
+		fi
+		# Use DHCP if the original IP from the firmware has never been changed
+		if [ "$IPADDRESS" = "192.168.1.77" ]; then
+			unset NET_CONFIG
+		fi
+		if [ "$NET_CONFIG" != "static" ]; then
+			IPADDRESS=192.168.1.77
+			NETMASK=255.255.255.0
+			GATEWAY=192.168.1.1
+			[ -z "$NAMESERVERS" ] && NAMESERVERS=192.168.1.1
+			dhcp_fallback $FILE
+		fi
+		if [ "$NONINTERACTIVE" = "yes" ]; then
+			add "$FILE" "ethdetect/use_firewire_ethernet" "boolean" "false"
+		fi
+	;;
+	mipsel/bcm947xx)
+		# Some BCM947xx devices use NVRAM to store their Linux
+		# configuration, some use a Linux filesystem.  We only
+		# support the latter at the moment.
+		if [ 1 ]; then
+			check_file /proc/mtd
+			config=$(get_mtdblock "config")
+			if [ -z "$config" ]; then
+				log "Can't find MTD partition holding Linux config"
+				exit
+			fi
+			path=/tmp/oldsys-preseed
+			mkdir -p $path/mnt $path/lpr
+			mount -t minix /dev/$config $path/mnt
+			if [ ! -e $path/mnt/config.lrp ]; then
+				log "config.lrp does not exist in $path/mnt"
+				umount $path/mnt
+				exit
+			fi
+			cd $path/lpr
+			tar -xzf $path/mnt/config.lrp
+			parse_unix_tree $path/lpr
+			parse_leaf_tree $path/lpr
+			parse_network_interfaces $path/lpr/etc/network/interfaces "vlan6"
+			if [ "$INTERFACE" = "vlan6" ]; then
+				INTERFACE=eth0
+			fi
+			DEFAULT_HOSTNAME="WGT634U"
+			umount $path/mnt
+			rm -rf $path/lpr
+			rmdir $path/mnt $path || true
+		else
+			parse_bcm947xx_nvram "$(nvram show)"
+		fi
+	;;
+esac
+
+generate_preseed_file $FILE
+

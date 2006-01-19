@@ -1,0 +1,49 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+PACKAGE = oldsys-preseed
+
+ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
+ifeq ($(ARCH),arm)
+DEPENDS=devio-udeb
+endif
+
+build:
+# Ye olde no-op.
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f `find . -name '*~'`
+	rm -f build-stamp
+	dh_clean
+
+build: build-stamp
+
+build-stamp:
+	cd tests && ./runtests
+	touch build-stamp
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_install functions usr/lib/$(PACKAGE)
+	dh_install oldsys-preseed usr/bin
+	dh_install debian-installer-startup.d lib
+	rm -rf `find debian/$(PACKAGE) -name .svn`
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol -- -Vdepends='$(DEPENDS)'
+	dh_builddeb
+
+binary-indep: build install
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

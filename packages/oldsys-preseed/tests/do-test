@@ -1,0 +1,27 @@
+#!/bin/sh
+
+. ../functions
+
+[ "$TEST_VERBOSE" ] || TEST_VERBOSE=0
+log() {
+	if [ $TEST_VERBOSE -gt 1 ]; then
+		echo "$@" 1>&2
+	fi
+}
+
+NONINTERACTIVE="yes"
+
+test="$1"
+TEST_DIR=$PWD/$(dirname "$test")
+tmp=$(tempfile)
+. $test.test "$tmp"
+generate_preseed_file $tmp
+if $(cmp -s $test.preseed $tmp); then
+	exit 0
+else
+	if [ $TEST_VERBOSE ]; then
+		diff -urN $test.preseed $tmp 1>&2
+	fi
+	exit 1
+fi
+
