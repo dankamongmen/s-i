@@ -30,26 +30,41 @@
 # which needs an unstripped libc, take it from the proper place
 #dpkg -x build/apt.udeb/cache/archives/libc6-*.udeb build/tmp/gtk-miniiso/tree/
 
-[ -f /usr/bin/strace ] && cp /usr/bin/strace tree/usr/bin/
+if [ -f /usr/bin/strace ]
+then
+	cp /usr/bin/strace tree/usr/bin/
+else
+	echo 'strace was not found please install it in the Sid environment (not the d-i tree), if you want strace!'
+fi
 
-chroot tree /bin/ash <<-END_AUTO_CMD
+mount -t proc proc tree/proc/
+mount -t sysfs sysfs tree/sys/
+mknod tree/dev/fb0 c 29 0
+mknod tree/dev/tty0 c 4 0
+mknod tree/dev/tty1 c 4 1
+mknod tree/dev/tty2 c 4 2
+mknod tree/dev/tty3 c 4 3
+mknod tree/dev/tty4 c 4 4
+mknod tree/dev/tty9 c 4 9
+mknod tree/dev/tty10 c 4 10
+# mknod tree/dev/psaux c 10 1
+
+
+cat >tree/run_gtk <<-GTK_RUN_CMDS
 debconf-loadtemplate d-i /var/lib/dpkg/info/*.templates
-mknod /dev/fb0 c 29 0
-mknod /dev/tty0 c 4 0
-mknod /dev/tty9 c 4 9
-# mknod /dev/psaux c 10 1
-
-mount /proc
 export DEBIAN_FRONTEND=gtk
 
 TERM_UTF8=yes
 export LANG=C.UTF-8
 echo -ne "\033%G" # Enable UTF-8 console
+debconf -o d-i /usr/bin/main-menu
+GTK_RUN_CMDS
+
+chmod +x tree/run_gtk
 
 echo You have now a debian installer chroot prepared for debugging. Have fun!
-echo Just type "chroot tree" and start debugging
+echo Just type \'chroot tree /bin/ash\' and then run /run_gtk and start debugging
 
-END_AUTO_CMD
 
 # sudo kill -9 $(ps aux | grep debconf | awk '{print $2}' | head -n1)
 ## ran from another shell will terminate it (eventually use bash and ctrl-c)
