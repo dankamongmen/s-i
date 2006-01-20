@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <errno.h>
 
 #include <debian-installer.h>
 
@@ -85,6 +86,8 @@ static int confmodule_communicate(struct confmodule *mod)
 
             ret = read(mod->infd, buf, sizeof(buf));
             if (ret < 0) {
+                if (errno == EINTR)
+                    continue;
                 free(in);
                 return DC_NOTOK;
             }
