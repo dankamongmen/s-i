@@ -27,12 +27,12 @@
 
 
 # In case you need to bring something inside the chroot
-# which needs an unstribbed libc, take it from the proper place
-dpkg -x build/apt.udeb/cache/archives/libc6-*.udeb build/tmp/gtk-miniiso/tree/
+# which needs an unstripped libc, take it from the proper place
+#dpkg -x build/apt.udeb/cache/archives/libc6-*.udeb build/tmp/gtk-miniiso/tree/
 
-cp /usr/bin/strace tree/usr/bin/
+[ -f /usr/bin/strace ] && cp /usr/bin/strace tree/usr/bin/
 
-chroot tree /bin/ash
+chroot tree /bin/ash <<-END_AUTO_CMD
 debconf-loadtemplate d-i /var/lib/dpkg/info/*.templates
 mknod /dev/fb0 c 29 0
 mknod /dev/tty0 c 4 0
@@ -46,9 +46,14 @@ TERM_UTF8=yes
 export LANG=C.UTF-8
 echo -ne "\033%G" # Enable UTF-8 console
 
-# sudo kill -9 $(ps aux | grep debconf | awk '{print $2}' | head -n1)
-# run from another shell will terminate it (eventually use bash and ctrl-c)
-debconf -o d-i /usr/bin/main-menu
+echo You have now a debian installer chroot prepared for debugging. Have fun!
+echo Just type "chroot tree" and start debugging
 
-# If you tweak fonts somehow remember to run this
-fc-cache -fv
+END_AUTO_CMD
+
+# sudo kill -9 $(ps aux | grep debconf | awk '{print $2}' | head -n1)
+## ran from another shell will terminate it (eventually use bash and ctrl-c)
+#debconf -o d-i /usr/bin/main-menu
+
+# If you tweak fonts somehow, remember to run this
+#fc-cache -fv
