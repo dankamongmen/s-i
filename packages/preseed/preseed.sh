@@ -1,6 +1,6 @@
 #!/bin/sh
 
-logfile=/var/log/debconf-seed
+logfile=/var/lib/preseed/log
 
 log () {
 	logger -t preseed "$@"
