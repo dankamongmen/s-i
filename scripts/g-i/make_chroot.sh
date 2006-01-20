@@ -67,7 +67,7 @@ mkdir /build-di
 cd /build-di
 echo '************************************'
 echo 'checking out a copy of debian installer'
-svn co svn://svn.debian.org/svn/d-i/trunk debian-installer
+svn co svn://svn.debian.org/svn/d-i/trunk/installer debian-installer
 apt-get -y install \
     debconf dpkg-dev libdebconfclient0 libdebconfclient0-dev \
     libdebian-installer4 libdebian-installer-extra4 libdebian-installer4-dev
