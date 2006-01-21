@@ -73,6 +73,41 @@ struct newt_data {
     int           scale_textbox_height;
 };
 
+struct newtColors newtAltColorPalette = {
+	"white", "blue", 			/* root fg, bg */
+	/*"black", "lightgray",*/			/* border fg, bg */
+	"white", "black",			/* border fg, bg */
+	/*"black", "lightgray",*/			/* window fg, bg */
+	"white", "black",			/* window fg, bg */
+	/*"white", "black",*/			/* shadow fg, bg */
+	"white", "blue",			/* shadow fg, bg */
+	/*"red", "lightgray",*/			/* title fg, bg */
+	"yellow", "black",			/* title fg, bg */
+	"lightgray", "red",			/* button fg, bg */
+	"red", "lightgray",			/* active button fg, bg */
+	"yellow", "blue",			/* checkbox fg, bg */
+	"blue", "brown",			/* active checkbox fg, bg */
+	"yellow", "blue",			/* entry box fg, bg */
+	/*"blue", "lightgray",*/			/* label fg, bg */
+	"brightred", "black",			/* label fg, bg */
+	/*"black", "lightgray",*/			/* listbox fg, bg */
+	"lightgray", "black",			/* listbox fg, bg */
+	"yellow", "blue",			/* active listbox fg, bg */
+	/*"black", "lightgray",*/			/* textbox fg, bg */
+	"white", "black",			/* textbox fg, bg */
+	"lightgray", "black",			/* active textbox fg, bg */
+	/*"white", "blue",*/			/* help line */
+	"white", "black",			/* help line */
+	"yellow", "blue",			/* root text */
+	"blue",					/* scale full */
+	"red",					/* scale empty */
+	"blue", "lightgray",			/* disabled entry fg, bg */
+	/*"black", "lightgray",*/			/* compact button fg, bg */
+	"lightgray", "black",			/* compact button fg, bg */
+	"yellow", "red",			/* active & sel listbox */
+	"black", "brown"			/* selected listbox */
+};
+
 typedef int (newt_handler)(struct frontend *obj, struct question *q);
 
 #include "config-newt.h"
@@ -942,15 +977,19 @@ newt_handler_text(struct frontend *obj, struct question *q)
 static int
 newt_handler_error(struct frontend *obj, struct question *q)
 {
-    char *oldcolor;
+    char *oldrootBg, *oldshadowBg;
     int ret;
-    struct newtColors palette = newtDefaultColorPalette;
+    struct newtColors palette = newtAltColorPalette;
 
-    oldcolor = palette.rootBg;
+    oldrootBg = palette.rootBg;
+    oldshadowBg = palette.shadowBg;
+    if (strcmp(oldrootBg, oldshadowBg) == 0)
+    	palette.shadowBg = "red";
     palette.rootBg = "red";
     newtSetColors(palette);
     ret = newt_handler_note(obj, q);
-    palette.rootBg = oldcolor;
+    palette.rootBg = oldrootBg;
+    palette.shadowBg = oldshadowBg;
     newtSetColors(palette);
     return ret;
 }
@@ -986,11 +1025,16 @@ static int
 newt_initialize(struct frontend *obj, struct configuration *conf)
 {
     int i, width = 80, height = 24;
+    const char *palette;
 
     obj->interactive = 1;
     obj->data = calloc(1, sizeof(struct newt_data));
     SLang_init_tty(0, 1, 0); /* disable flow control */
     newtInit();
+    palette = getenv("bg");
+    if (palette == NULL || strcmp(palette, "dark") != 0)
+        newtAltColorPalette = newtDefaultColorPalette;
+    newtSetColors(newtAltColorPalette);
     newtGetScreenSize(&width, &height);
     // Fill the screen so people can shift-pgup properly
     for (i = 0; i < height; i++)
@@ -1038,6 +1082,7 @@ newt_go(struct frontend *obj)
                     cleared = 1;
                     SLang_init_tty(0, 1, 0); /* disable flow control */
                     newtInit();
+                    newtSetColors(newtAltColorPalette);
                     newtCls();
                 }
                 if (obj->info != NULL) {
@@ -1104,6 +1149,7 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     obj->progress_cur = min;
     SLang_init_tty(0, 1, 0); /* disable flow control */
     newtInit();
+    newtSetColors(newtAltColorPalette);
     newtCls();
     if (obj->info != NULL) {
         char *text = q_get_description(obj->info);
