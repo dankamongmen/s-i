@@ -1031,7 +1031,7 @@ newt_initialize(struct frontend *obj, struct configuration *conf)
     obj->data = calloc(1, sizeof(struct newt_data));
     SLang_init_tty(0, 1, 0); /* disable flow control */
     newtInit();
-    palette = getenv("bg");
+    palette = getenv("FRONTEND_BACKGROUND");
     if (palette == NULL || strcmp(palette, "dark") != 0)
         newtAltColorPalette = newtDefaultColorPalette;
     newtSetColors(newtAltColorPalette);
