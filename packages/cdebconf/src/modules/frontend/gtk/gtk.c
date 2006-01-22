@@ -66,8 +66,8 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-/* maximum lenght for string questions */
-#define STRING_MAX_LENGHT 128
+/* maximum length for string questions */
+#define STRING_MAX_LENGTH 128
 
 /* used to define horizontal and vertical padding of progressbar */
 #define PROGRESSBAR_HPADDING 60
@@ -962,7 +962,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
     data->q = q;
 
     entry = gtk_entry_new ();
-    gtk_entry_set_max_length (GTK_ENTRY (entry), 50);
+    gtk_entry_set_max_length (GTK_ENTRY (entry), STRING_MAX_LENGTH);
     gtk_entry_set_visibility (GTK_ENTRY (entry), FALSE);
     gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
 
@@ -1317,7 +1317,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
         gtk_entry_set_text (GTK_ENTRY(entry), defval);
     else
         gtk_entry_set_text (GTK_ENTRY(entry), "");
-    gtk_entry_set_max_length (GTK_ENTRY (entry), STRING_MAX_LENGHT );
+    gtk_entry_set_max_length (GTK_ENTRY (entry), STRING_MAX_LENGTH );
     gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
@@ -1497,6 +1497,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
     gtk_window_set_decorated (GTK_WINDOW (window), TRUE);
     set_design_elements (obj, window);
+    gtk_rc_reparse_all();
     ((struct frontend_data*) obj->data)->window = window;
     gtk_widget_show_all(window);
 
@@ -1521,6 +1522,8 @@ static int gtk_go(struct frontend *obj)
     if (q == NULL) return DC_OK;
 
     data->setters = NULL;
+
+    gtk_rc_reparse_all();
 
     questionbox = gtk_vbox_new(FALSE, 0);
 
