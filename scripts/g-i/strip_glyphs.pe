@@ -32,6 +32,13 @@ if ($argc < 4)
    Quit()
 endif
 
+# If --invert is present, then we only include the selection
+if (Strstr($1, "--invert") != -1)
+	use_inverted_selection = 1
+else
+	use_inverted_selection = 0
+endif
+
 
 Open($1); shift
 Reencode("unicode")
@@ -74,6 +81,9 @@ while ($argc > 1)
 
   shift
 endloop
+
+if (use_inverted_selection == 1)
+	SelectInvert()
 
 Clear()
 
