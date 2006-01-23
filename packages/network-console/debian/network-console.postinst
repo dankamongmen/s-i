@@ -6,12 +6,24 @@ set -e
 TEMPLATE_ROOT=network-console
 
 KEY_FILE=/etc/ssh/ssh_host_rsa_key
+ARCHDETECT="$(archdetect)"
 
 if [ ! -f $KEY_FILE ]; then
   db_progress START 0 1 $TEMPLATE_ROOT/key
   ssh-keygen -b 2048 -t rsa -N '' -f $KEY_FILE -q
   db_progress STOP
 fi
+
+db_get $TEMPLATE_ROOT/password
+ROOT_PWD="$RET"
+case "$ARCHDETECT" in
+	mipsel/cobalt)
+		if [ -z "$ROOT_PWD" ]; then
+			PASSWORD=$(pwgen -1 8)
+			DISPLAY_PWD="passwd: $PASSWORD"
+		fi
+	;;
+esac
 
 while [ -z "$PASSWORD" ]; do
 
@@ -50,5 +62,20 @@ KEY_FINGERPRINT=$(ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' ')
 apt-install openssh-server || true
 
 db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
+IPADDR=$(ifconfig | grep 'inet addr:' | head -n 1 | \
+    sed 's/.*inet addr:\([0-9.]*\).*/\1/')
+case "$ARCHDETECT" in
+	mipsel/cobalt)
+		OLD_IFS="$IFS"
+		IFS=""
+		kill `pidof paneld` || true
+		paneld -d "SSH to installer" "@$IPADDR" \
+		    $(echo $KEY_FINGERPRINT | cut -d ":" -f  1-8 | sed 's/://g') \
+		    $(echo $KEY_FINGERPRINT | cut -d ":" -f 9-16 | sed 's/://g') \
+		    $DISPLAY_PWD
+		IFS="$OLD_IFS"
+	;;
+esac
 db_input critical $TEMPLATE_ROOT/start || true
 db_go
+
