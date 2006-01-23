@@ -18,6 +18,7 @@ hpdir=$(DESTDIR)/etc/hotplug.d
 udevdir=$(DESTDIR)/etc/udev/rules.d
 didir=$(DESTDIR)/lib/debian-installer.d
 pbcdir=$(DESTDIR)/usr/lib/prebaseconfig.d
+sharedir=$(DESTDIR)/usr/share/hw-detect/
 
 INSTALL=install
 INSTALL_DATA = ${INSTALL} -m 644
@@ -46,6 +47,11 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 ifeq ($(DEB_HOST_ARCH),powerpc)
 	$(INSTALL) discover-mac-io.sh $(bindir)/discover-mac-io
 	$(INSTALL) discover-ibm.sh $(bindir)/discover-ibm
+endif
+ifeq ($(DEB_HOST_ARCH),sparc)
+	$(INSTALL) discover-sbus.sh $(bindir)/discover-sbus
+	$(INSTALL) -d $(sharedir)
+	$(INSTALL_DATA) sbus.list $(sharedir)/sbus.list
 endif
 else
 	$(INSTALL) detect-stub.sh $(bindir)/hw-detect

@@ -240,6 +240,9 @@ get_detected_hw_info() {
 			discover-ibm
 		fi
 	fi
+	if [ "${SUBARCH%%/*}" = sparc ]; then
+		discover-sbus
+	fi
 	discover_hw
 	if [ -d /proc/bus/usb ]; then
 		echo "usb-storage:USB storage"
