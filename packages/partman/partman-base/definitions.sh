@@ -504,6 +504,29 @@ humandev () {
 		printf "$RET" ${idenum} "$part" "${linux}"
 	    fi
 	    ;;
+	/dev/hd[a-z])
+	    drive=$(printf '%d' "'$(echo $1 | sed 's,^/dev/hd\([a-z]\).*,\1,')")
+	    drive=$(($drive - 97))
+	    linux=${1#/dev/}
+	    if [ "$(($drive % 2))" = 0 ]; then
+		db_metaget partman/text/ide_master_disk description
+	    else
+		db_metaget partman/text/ide_slave_disk description
+	    fi
+	    printf "$RET" "$(($drive / 2 + 1))" "$linux"
+	    ;;
+	/dev/hd[a-z][0-9]*)
+	    drive=$(printf '%d' "'$(echo $1 | sed 's,^/dev/hd\([a-z]\).*,\1,')")
+	    drive=$(($drive - 97))
+	    part=$(echo $1 | sed 's,^/dev/hd[a-z]\([0-9][0-9]*\).*,\1,')
+	    linux=${1#/dev/}
+	    if [ "$(($drive % 2))" = 0 ]; then
+		db_metaget partman/text/ide_master_partition description
+	    else
+		db_metaget partman/text/ide_slave_partition description
+	    fi
+	    printf "$RET" "$(($drive / 2 + 1))" "$part" "$linux"
+	    ;;
 	/dev/scsi/host*/bus*/target*/lun*/disc)
 	    host=`echo $1 | sed 's,/dev/scsi/host\(.*\)/bus.*/target.*/lun.*/disc,\1,'`
 	    bus=`echo $1 | sed 's,/dev/scsi/host.*/bus\(.*\)/target.*/lun.*/disc,\1,'`
@@ -526,6 +549,48 @@ humandev () {
 	    linux=${linux#/dev/}
 	    db_metaget partman/text/scsi_partition description
 	    printf "$RET" ${scsinum} ${bus} ${target} ${lun} ${part} ${linux}
+	    ;;
+	/dev/sd[a-z]|/dev/sd[a-z][a-z])
+	    disk="${1#/dev/}"
+	    if [ -h "/sys/block/$disk/device" ]; then
+		bus_id="$(basename "$(readlink "/sys/block/$disk/device")")"
+		host="${bus_id%%:*}"
+		bus_id="${bus_id#*:}"
+		bus="${bus_id%%:*}"
+		bus_id="${bus_id#*:}"
+		target="${bus_id%%:*}"
+		lun="${bus_id#*:}"
+		scsinum="$(($host + 1))"
+		db_metaget partman/text/scsi_disk description
+		printf "$RET" "$scsinum" "$bus" "$target" "$lun" "$disk"
+	    else
+		# Can't figure out host/bus/target/lun without sysfs, but
+		# never mind; if we don't have sysfs then we're probably on
+		# 2.4 and devfs anyway.
+		echo "$1"
+	    fi
+	    ;;
+	/dev/sd[a-z][0-9]*|/dev/sd[a-z][a-z][0-9]*)
+	    part="${1#/dev/}"
+	    disk="${part%%[0-9]*}"
+	    part="${part#$disk}"
+	    if [ -h "/sys/block/$disk/device" ]; then
+		bus_id="$(basename "$(readlink "/sys/block/$disk/device")")"
+		host="${bus_id%%:*}"
+		bus_id="${bus_id#*:}"
+		bus="${bus_id%%:*}"
+		bus_id="${bus_id#*:}"
+		target="${bus_id%%:*}"
+		lun="${bus_id#*:}"
+		scsinum="$(($host + 1))"
+		db_metaget partman/text/scsi_partition description
+		printf "$RET" "$scsinum" "$bus" "$target" "$lun" "$part" "$disk"
+	    else
+		# Can't figure out host/bus/target/lun without sysfs, but
+		# never mind; if we don't have sysfs then we're probably on
+		# 2.4 and devfs anyway.
+		echo "$1"
+	    fi
 	    ;;
 	/dev/cciss/*)
 	    # /dev/cciss/hostN/targetM/disc is 2.6 form
