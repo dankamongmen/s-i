@@ -597,17 +597,17 @@ static GtkTextDirection get_text_direction(struct frontend *obj)
     return GTK_TEXT_DIR_LTR;
 }
 
-GtkWidget* display_descriptions(struct question *q)
+GtkWidget* display_descriptions(struct question *q, struct frontend *obj)
 {
     GtkWidget *description_view, *ext_description_view;
     GtkWidget *returned_box, *description_box, *icon_box, *icon_button;
     GtkTextBuffer *description_buffer, *ext_description_buffer;
-    GdkColor color;
+    GdkColor *bg_color;
     GtkTextIter start, end;
+    GtkStyle *style;
 
-    color.red = BACKGROUND_RED;
-    color.green = BACKGROUND_GREEN;
-    color.blue = BACKGROUND_BLUE;
+    style = gtk_widget_get_style (((struct frontend_data*)obj->data)->window);
+    bg_color = style->bg;
 
     description_box = gtk_vbox_new (FALSE, 0);
     icon_box = gtk_vbox_new (FALSE, 0);
@@ -634,7 +634,7 @@ GtkWidget* display_descriptions(struct question *q)
          * gtk_text_buffer_apply_tag_by_name (ext_description_buffer, "bold", &start, &end);
          * gtk_text_buffer_apply_tag_by_name (ext_description_buffer, "italic", &start, &end);
          */
-        gtk_widget_modify_base(GTK_WIDGET(ext_description_view), GTK_STATE_NORMAL, &color);
+        gtk_widget_modify_base(GTK_WIDGET(ext_description_view), GTK_STATE_NORMAL, bg_color);
     }
 
     /* here is created the question's description */
@@ -649,7 +649,7 @@ GtkWidget* display_descriptions(struct question *q)
     gtk_text_buffer_get_start_iter  (description_buffer, &start);
     gtk_text_buffer_get_end_iter  (description_buffer, &end);
     gtk_text_buffer_apply_tag_by_name (description_buffer, "italic", &start, &end);
-    gtk_widget_modify_base(GTK_WIDGET(description_view), GTK_STATE_NORMAL, &color);
+    gtk_widget_modify_base(GTK_WIDGET(description_view), GTK_STATE_NORMAL, bg_color);
 
     gtk_container_set_focus_chain(GTK_CONTAINER(description_box), NULL);
 
@@ -708,7 +708,7 @@ static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidge
 
     g_signal_connect (G_OBJECT(check), "destroy", G_CALLBACK (free_description_data), data);
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
@@ -820,7 +820,7 @@ static int gtkhandler_multiselect_single(struct frontend *obj, struct question *
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
@@ -904,7 +904,7 @@ static int gtkhandler_multiselect_multiple(struct frontend *obj, struct question
         free(defvals[j]);
     free(defvals);
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, TRUE, TRUE, 0);
@@ -934,7 +934,7 @@ static int gtkhandler_note(struct frontend *obj, struct question *q, GtkWidget *
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_note() called"); */
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
@@ -968,7 +968,7 @@ static int gtkhandler_password(struct frontend *obj, struct question *q, GtkWidg
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
@@ -1069,7 +1069,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
@@ -1204,7 +1204,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
@@ -1273,7 +1273,7 @@ static int gtkhandler_select_multiple(struct frontend *obj, struct question *q, 
     g_signal_connect (G_OBJECT(GTK_COMBO(combo)->entry), "destroy",
                       G_CALLBACK (free_description_data), data);
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
@@ -1322,7 +1322,7 @@ static int gtkhandler_string(struct frontend *obj, struct question *q, GtkWidget
 
     g_signal_connect (G_OBJECT(entry), "destroy", G_CALLBACK (free_description_data), data);
 
-    description_box = display_descriptions(q);
+    description_box = display_descriptions(q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
