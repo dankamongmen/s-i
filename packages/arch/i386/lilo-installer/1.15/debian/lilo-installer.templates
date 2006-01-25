@@ -1,0 +1,95 @@
+Template: lilo-installer/bootdev
+Type: select
+# Note to translators : Please keep your translations of the choices
+# below a 65 columns limit (which means 65 characters 
+# in single-byte languages)
+__Choices: ${disc}: Master Boot Record, ${part}: new Debian partition, Other choice (Advanced)
+_Description: LILO installation target:
+ The LILO program needs to be installed to make your new system
+ bootable. By installing it onto your disk's Master Boot Record, LILO will
+ take complete control of the boot process, but if you want to use a
+ different boot manager, just install LILO on the new Debian partition instead.
+ .
+ If unsure, install LILO into the Master Boot Record.
+
+Template: lilo-installer/bootdev_raid
+Type: select
+# Note to translators : Please keep your translations of the choices
+# below a 65 columns limit (which means 65 characters 
+# in single-byte languages)
+__Choices: ${disc}: software RAID array, Other choice (Advanced)
+_Description: LILO installation target:
+ The LILO program needs to be installed to make your new system
+ bootable. You may choose to install it onto a software RAID array or
+ another device.
+
+# Advanced words for advanced people...
+Template: lilo-installer/manual_bootdev
+Type: string
+_Description: LILO installation target:
+ Please enter the partition or disk onto which LILO should be installed.
+ Devfs style names, such as those that start with /dev/ide, /dev/scsi,
+ and /dev/discs are accepted, as well as traditional names, such as /dev/hda
+ or /dev/sda.
+
+Template: lilo-installer/manual_bootdev_error
+Type: error
+_Description: Invalid partition name
+ The path ${path} does not represent a partition or hard disk device. Please
+ try again.
+
+Template: lilo-installer/progress_title
+Type: text
+_Description: Installing LILO...
+
+Template: lilo-installer/progress_active
+Type: text
+_Description: Activating partition ${bootdev}
+
+Template: lilo-installer/progress_lilo_conf
+Type: text
+_Description: Creating lilo.conf
+
+Template: lilo-installer/progress_installing
+Type: text
+_Description: Installing the LILO package
+
+Template: lilo-installer/progress_running
+Type: text
+_Description: Running LILO for ${bootdev}
+
+Template: lilo-installer/serial-console
+Type: note
+_Description: LILO configured to use a serial console
+ LILO is configured to use serial port ${PORT} as the console.
+ The serial port speed is set to ${SPEED}.
+
+Template: lilo-installer/activate-part
+Type: boolean
+Default: true
+_Description: Would you like to make this partition active?
+ You have chosen to install LILO on a partition that is not the active one.
+ If this partition is not marked active, then LILO will not be loaded by the
+ boot loader.  This may cause you to be unable to boot into the system
+ that is being installed.
+ .
+ You should make this partition active unless you have another boot loader
+ that will allow you to access your new Linux installation.
+
+Template: lilo-installer/apt-install-failed
+Type: boolean
+Default: yes
+_Description: LILO installation failed.  Continue anyway?
+ The lilo package failed to install into /target/.  Installing LILO
+ as a boot loader is a required step.  The install problem might however be
+ unrelated to LILO, so continuing the installation may be possible.
+
+Template: lilo-installer/failed
+Type: error
+_Description: LILO installation failed
+ Running "/sbin/lilo" failed with error code "${ERRCODE}".
+
+Template: debian-installer/lilo-installer/title
+Type: text
+#  Main menu item
+_Description: Install the LILO boot loader on a hard disk
