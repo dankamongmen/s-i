@@ -4,6 +4,9 @@
 cd debian/sort-tmp
 for protocol in http ftp
 do
+    if ! grep -q "^Template: mirror/$protocol/countries" ../choose-mirror/DEBIAN/templates ; then
+        continue
+    fi
     sed -n -e "/^Template: mirror\\/$protocol\\/countries/,/^Description:/p" ../choose-mirror/DEBIAN/templates |
     perl -p -e '
     chomp;
