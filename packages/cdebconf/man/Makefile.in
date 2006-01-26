@@ -3,7 +3,7 @@ include ../globalmakeflags
 VPATH = $(srcdir)/man
 
 CENTER=Debconf
-MANPAGES=dpkg-preconfigure.8 dpkg-reconfigure.8 debconf.7
+MANPAGES=dpkg-preconfigure.8cdebconf dpkg-reconfigure.8cdebconf debconf.7cdebconf
 
 all: $(MANPAGES)
 
@@ -16,7 +16,9 @@ install: $(MANPAGES)
 	install -d -m 755 $(DESTDIR)${mandir}/man7
 	install -d -m 755 $(DESTDIR)${mandir}/man8
 	@for m in $(MANPAGES); do \
-		install -m 644 $$m $(DESTDIR)${mandir}/man$${m#*.}/; \
+		section=$${m#*.}; \
+		section=$${section%cdebconf}; \
+		install -m 644 $$m $(DESTDIR)${mandir}/man$$section/; \
 	done
 
 clean:
