@@ -58,24 +58,32 @@ client/confmodule: commands-list.in debconfclient.h client/confmodule.in
 confmodule.o confmodule.opic: commands-list.h
 
 install:
-	install -d -m 755 $(DESTDIR)${bindir}
-	install -d -m 755 $(DESTDIR)${sbindir}
 	install -d -m 755 $(DESTDIR)${etcdir}
 	install -d -m 755 $(DESTDIR)${libdir}
 	install -d -m 755 $(DESTDIR)${moddir}
-	install -d -m 755 $(DESTDIR)${sharedir}
-	install -m 755 debconf debconf-loadtemplate $(DESTDIR)${bindir}
-	install -m 755 debconf-copydb debconf-dumpdb $(DESTDIR)${bindir}
-	install -m 755 dpkg-reconfigure $(DESTDIR)${sbindir}
+	install -m 755 debconf debconf-loadtemplate $(DESTDIR)${moddir}
+	install -m 755 debconf-copydb debconf-dumpdb $(DESTDIR)${moddir}
+	install -m 755 dpkg-reconfigure $(DESTDIR)${moddir}
 	install -m 644 $(LIBNAME) $(DESTDIR)${moddir}
 	install -m 644 $(CLILIBNAME) $(DESTDIR)${libdir}
 	ln -sf $(CLILIBNAME) $(DESTDIR)${libdir}/$(CLISONAME)
 	ln -sf $(CLILIBNAME) $(DESTDIR)${libdir}/$(CLILIB)
 	install -m 644 $(CLILIBNAME_A) $(DESTDIR)${libdir}
 	install -m 644 cdebconf.conf-dist $(DESTDIR)${etcdir}/cdebconf.conf
+ifeq ($(TARGET),udeb)
+	install -d -m 755 $(DESTDIR)${bindir}
+	install -d -m 755 $(DESTDIR)${sbindir}
+	install -d -m 755 $(DESTDIR)${sharedir}
+	set -e; for p in debconf debconf-loadtemplate \
+			debconf-copydb debconf-dumpdb; do \
+		ln -sf ../lib/cdebconf/$$p $(DESTDIR)${bindir}; \
+	done
+	set -e; for p in dpkg-reconfigure; do \
+		ln -sf ../lib/cdebconf/$$p $(DESTDIR)${sbindir}; \
+	done
 	install -m 644 client/confmodule $(DESTDIR)${sharedir}
-	ln -sf ../../bin/$(DEBCONF) $(DESTDIR)${sharedir}/frontend
-ifneq ($(TARGET),udeb)
+	ln -sf ../../lib/cdebconf/$(DEBCONF) $(DESTDIR)${sharedir}/frontend
+else
 	install -d -m 755 $(DESTDIR)${incdir}
 	install -m 644 ${srcdir}/src/debconfclient.h $(DESTDIR)${incdir}
 	install -m 644 ${srcdir}/src/question.h $(DESTDIR)${incdir}
