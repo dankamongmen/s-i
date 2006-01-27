@@ -80,12 +80,6 @@
 
 #define DEFAULT_PADDING 6
 
-/* standard gtkdfb 2.0.9 background color is d6d7d6 */
-#define BACKGROUND_RED  0xd600
-#define BACKGROUND_GREEN 0xd600
-#define BACKGROUND_BLUE 0xd700
-
-
 /* used by the treeview widgets */
 enum
 {
