@@ -65,7 +65,6 @@ install:
 	install -d -m 755 $(DESTDIR)${moddir}
 	install -d -m 755 $(DESTDIR)${sharedir}
 	install -m 755 debconf debconf-loadtemplate $(DESTDIR)${bindir}
-	install -m 755 debconf-copydb debconf-dumpdb $(DESTDIR)${bindir}
 	install -m 755 dpkg-reconfigure $(DESTDIR)${sbindir}
 	install -m 644 $(LIBNAME) $(DESTDIR)${moddir}
 	install -m 644 $(CLILIBNAME) $(DESTDIR)${libdir}
@@ -76,6 +75,7 @@ install:
 	install -m 644 client/confmodule $(DESTDIR)${sharedir}
 	ln -sf ../../bin/$(DEBCONF) $(DESTDIR)${sharedir}/frontend
 ifneq ($(TARGET),udeb)
+	install -m 755 debconf debconf-copydb debconf-dumpdb $(DESTDIR)${bindir}
 	install -d -m 755 $(DESTDIR)${incdir}
 	install -m 644 ${srcdir}/src/debconfclient.h $(DESTDIR)${incdir}
 	install -m 644 ${srcdir}/src/question.h $(DESTDIR)${incdir}
