@@ -7,9 +7,8 @@
 
 # Check to see if a FrontEnd is running.
 if [ ! "$DEBIAN_HAS_FRONTEND" ]; then
-	# Ok, this is pretty crazy. Since there is no FrontEnd, this
-	# program execs a FrontEnd. It will then run a new copy of $0 that
-	# can talk to it.
+	# Since there is no FrontEnd, this program execs a FrontEnd.
+	# It will then run a new copy of $0 that can talk to it.
 	exec /usr/share/debconf/frontend $0 "$@"
 fi
 
@@ -51,12 +50,12 @@ _db_cmd () {
 
 REPEAT: db_@command@ ()	{ _db_cmd "@COMMAND@ $@"; }
 
-# Just an old alias for input.
+# An old alias for input.
 db_text () {
 	db_input $@
 }
 
-# Cannot read a return code, since there is none and we would block.
+# Cannot read a return code, since there is none and it would block.
 db_stop () {
 	echo STOP >&3
 }
