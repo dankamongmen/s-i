@@ -63,7 +63,9 @@ install:
 	install -d -m 755 $(DESTDIR)${moddir}
 	install -m 755 debconf debconf-loadtemplate $(DESTDIR)${moddir}
 	install -m 755 debconf-copydb debconf-dumpdb $(DESTDIR)${moddir}
+ifneq ($(TARGET),udeb)
 	install -m 755 dpkg-reconfigure $(DESTDIR)${moddir}
+endif
 	install -m 644 $(LIBNAME) $(DESTDIR)${moddir}
 	install -m 644 $(CLILIBNAME) $(DESTDIR)${libdir}
 	ln -sf $(CLILIBNAME) $(DESTDIR)${libdir}/$(CLISONAME)
@@ -77,9 +79,6 @@ ifeq ($(TARGET),udeb)
 	set -e; for p in debconf debconf-loadtemplate \
 			debconf-copydb debconf-dumpdb; do \
 		ln -sf ../lib/cdebconf/$$p $(DESTDIR)${bindir}; \
-	done
-	set -e; for p in dpkg-reconfigure; do \
-		ln -sf ../lib/cdebconf/$$p $(DESTDIR)${sbindir}; \
 	done
 	install -m 644 client/confmodule $(DESTDIR)${sharedir}
 	ln -sf ../../lib/cdebconf/$(DEBCONF) $(DESTDIR)${sharedir}/frontend
