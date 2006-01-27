@@ -18,6 +18,26 @@
 
 #include <gtk/gtk.h>
 
+/* horizontal padding between a question and questionbox frame */
+#define QUESTIONBOX_HPADDING 6
+/* vertical padding between two adjacent questions inside questionbox */
+#define QUESTIONBOX_VPADDING 3
+/* default padding used troughout the GTK frontend */
+#define DEFAULT_PADDING 6
+
+/* used by the treeview widgets */
+enum
+{
+    SELECT_COL_NAME,
+    SELECT_NUM_COLS
+} ;
+
+enum
+{
+  MULTISELECT_COL_BOOL ,
+  MULTISELECT_COL_NAME ,
+  MULTISELECT_NUM_COLS
+} ;
 
 /* Use this struct to store data that shall live between the questions */
 struct frontend_data

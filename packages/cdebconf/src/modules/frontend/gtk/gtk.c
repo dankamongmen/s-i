@@ -45,23 +45,9 @@
 #include "strutl.h"
 #include "cdebconf_gtk.h"
 
-#include <ctype.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <dlfcn.h>
 #include <syslog.h>
-
 #include <debian-installer/slist.h>
-
-#include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
-
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -72,27 +58,6 @@
 /* used to define horizontal and vertical padding of progressbar */
 #define PROGRESSBAR_HPADDING 60
 #define PROGRESSBAR_VPADDING 60
-
-/* used to set internal horizontal padding between a question and questionbox frame */
-#define QUESTIONBOX_HPADDING 6
-/* used to set vertical padding between two adjacent questions inside questionbox */
-#define QUESTIONBOX_VPADDING 3
-
-#define DEFAULT_PADDING 6
-
-/* used by the treeview widgets */
-enum
-{
-    SELECT_COL_NAME,
-    SELECT_NUM_COLS
-} ;
-
-enum
-{
-  MULTISELECT_COL_BOOL ,
-  MULTISELECT_COL_NAME ,
-  MULTISELECT_NUM_COLS
-} ;
 
 typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
 
