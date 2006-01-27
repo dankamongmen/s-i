@@ -896,7 +896,7 @@ static int text_progress_set(struct frontend *obj, int val)
 		last = 0;
 	/*  Prevent verbose output  */
 	if (new / 10 == last / 10)
-		return;
+		return DC_OK;
 	last = new;
 	printf("..%d%%", new);
 	fflush(stdout);
