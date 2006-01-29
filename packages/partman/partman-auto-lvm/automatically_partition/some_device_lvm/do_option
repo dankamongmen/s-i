@@ -43,7 +43,7 @@ fi
 normalscheme=$(echo "$scheme" | grep -v "lvmok")
 
 # if the schema does NOT contain a /boot, create one.
-if ! echo $normalscheme | grep -eq "[[:space:]]/boot[[:space:]]"; then
+if ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
   bootscheme="${NL}128 512 256 ext3 \$primary{ } \$bootable{ } method{ format } format{ } use_filesystem{ } filesystem{ ext3 } mountpoint{ /boot }" 
 fi
 
