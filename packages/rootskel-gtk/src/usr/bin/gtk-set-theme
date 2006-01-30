@@ -1,0 +1,24 @@
+#! /bin/sh
+
+set -e
+
+[ "$DEBIAN_FRONTEND" = "gtk" ] || exit 0
+
+THEME="$1"
+CONFFILE="/etc/gtk-2.0/gtkrc"
+
+[ -n "$THEME" ] || exit 1
+[ -f "$CONFFILE" ] || exit 1
+
+#TODO: test that theme actually exists
+
+if grep -q "^gtk-theme-name" $CONFFILE ; then
+	cp $CONFFILE $CONFFILE.old
+	sed "s/^gtk-theme-name.*$/gtk-theme-name = \"$THEME\"/" \
+		$CONFFILE.old >$CONFFILE
+	rm -f $CONFFILE.old
+else
+	echo "gtk-theme-name = \"$THEME\"" >>$CONFFILE
+fi
+
+exit 0

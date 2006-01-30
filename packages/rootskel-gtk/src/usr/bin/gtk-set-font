@@ -1,0 +1,49 @@
+#! /bin/sh
+
+set -e
+
+[ "$DEBIAN_FRONTEND" = "gtk" ] || exit 0
+
+language="$1"
+CONFFILE="/etc/gtk-2.0/gtkrc"
+
+[ -n "$language" ] || exit 1
+[ -f "$CONFFILE" ] || exit 1
+
+DEFAULT_FONT="FreeSans"
+# Default font size; good for 640x480 or 800x600 screens
+FONT_SIZE=12
+
+# Set the primary GTK font according to language
+case "$language" in
+    ar)
+	FONT_NAME="ae_AlMohanad"
+	;;
+    fa)
+	FONT_NAME="Nazli"
+	;;
+    ja)
+	FONT_NAME="Sazanami Gothic"
+	;;
+    ko)
+	FONT_NAME="UnDotum"
+	;;
+    zh)
+	FONT_NAME="AR PL ShanHeiSun Uni"
+	;;
+    *)
+	FONT_NAME=$DEFAULT_FONT
+	;;
+esac
+
+# Fall back to default if font does not exist; default is assumed to exist
+if ! fc-list | grep -q "$FONT_NAME"; then
+	FONT_NAME=$DEFAULT_FONT
+fi
+
+cp $CONFFILE $CONFFILE.old
+sed "s/^gtk-font-name.*$/gtk-font-name = \"$FONT_NAME $FONT_SIZE\"/" \
+	$CONFFILE.old >$CONFFILE
+rm -f $CONFFILE.old
+
+exit 0
