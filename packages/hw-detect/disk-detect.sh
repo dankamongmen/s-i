@@ -14,7 +14,9 @@ is_not_loaded() {
 }
 
 list_modules_dir() {
-	find $1 -type f | sed -e 's/\.k\?o$//' -e 's/.*\///'
+	if [ -d "$1" ]; then
+		find $1 -type f | sed -e 's/\.k\?o$//' -e 's/.*\///'
+	fi
 }
 
 list_disk_modules() {
@@ -23,6 +25,8 @@ list_disk_modules() {
 	list_modules_dir /lib/modules/*/kernel/drivers/ide
 	list_modules_dir /lib/modules/*/kernel/drivers/scsi
 	list_modules_dir /lib/modules/*/kernel/drivers/block
+	list_modules_dir /lib/modules/*/kernel/drivers/message/fusion
+	list_modules_dir /lib/modules/*/kernel/drivers/message/i2o
 }
 
 disk_found() {
