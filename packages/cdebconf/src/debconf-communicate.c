@@ -97,7 +97,8 @@ int main(int argc, char **argv)
         /* extract the first number as the return code */
         code = atoi(ret);
 
-        printf ("%s\n", ret);
+        write(confmodule->outfd, ret, strlen(ret));
+        write(confmodule->outfd, "\n", 1);
         free(ret);
     }
 
