@@ -42,7 +42,7 @@ static int frontend_add(struct frontend *obj, struct question *q)
 
 static int frontend_go(struct frontend *obj)
 {
-	return 0;
+	return DC_OK;
 }
 
 static void frontend_clear(struct frontend *obj)
