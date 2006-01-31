@@ -125,8 +125,8 @@ int main(int argc, char **argv)
         /* extract the first number as the return code */
         code = atoi(ret);
 
-        write(confmodule->outfd, ret, strlen(ret));
-        write(confmodule->outfd, "\n", 1);
+        write(1, ret, strlen(ret));
+        write(1, "\n", 1);
         free(ret);
     }
 
