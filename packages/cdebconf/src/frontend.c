@@ -184,6 +184,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	obj->config = cfg;
 	obj->tdb = tdb;
 	obj->qdb = qdb;
+    frontend_set_title(obj, "");
     snprintf(obj->configpath, sizeof(obj->configpath),
         "frontend::instance::%s", modname);
 
