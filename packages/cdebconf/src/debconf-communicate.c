@@ -18,6 +18,11 @@ static struct confmodule *confmodule = NULL;
 static struct question_db *questions = NULL;
 static struct template_db *templates = NULL;
 
+static struct option options[] = {
+    { "frontend", 1, 0, 'f' },
+    { 0, 0, 0, 0 }
+};
+
 static int save()
 {
         return confmodule->save(confmodule);
@@ -46,8 +51,30 @@ void sighandler(int sig)
 
 void help(const char *exename)
 {
-    fprintf(stderr, "%s [package]\n", exename);
+    fprintf(stderr, "%s [-ffrontend] [package]\n", exename);
     exit(-1);
+}
+
+void parsecmdline(struct configuration *config, int argc, char **argv)
+{
+    int c;
+
+    while ((c = getopt_long(argc, argv, "f:", options, NULL)) > 0)
+    {
+        switch (c)
+        {
+            case 'f':
+                config->set(config, "_cmdline::frontend", optarg);
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (optind > argc)
+    {
+        help(argv[0]);
+    }
 }
 
 int main(int argc, char **argv)
@@ -64,6 +91,7 @@ int main(int argc, char **argv)
 	if (!config) {
 	  DIE("Cannot read new config");
 	}
+	parsecmdline(config, argc, argv);
 
 	/* parse the configuration info */
 	if (config->read(config, DEBCONFCONFIG) == 0)
@@ -84,8 +112,8 @@ int main(int argc, char **argv)
 	/* startup the confmodule; run the config script and talk to it */
 	confmodule = confmodule_new(config, templates, questions, frontend);
 
-    if (argc > 1)
-        confmodule->owner = argv[1];
+    if (optind < argc)
+        confmodule->owner = argv[optind];
     else
         confmodule->owner = "unknown";
 
