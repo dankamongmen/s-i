@@ -147,7 +147,7 @@ for lang in $languages; do
 
     if [ "$lang" = "en" ] ; then
         # For English (if updated), we need to merge the XML and update the POT files
-        if [ -n "$LANG_UPDATED" ] ; then
+        if [ -n "$LANG_UPDATED" -o ! -d "$source/integrated/en" ] ; then
             EN_UPDATED="1"
             update_templates >>$mainlog 2>&1
             checkfatal "$?" "updating templates"
