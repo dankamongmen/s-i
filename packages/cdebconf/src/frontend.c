@@ -162,7 +162,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
     if (modpath == NULL)
 	DIE("Frontend module path not defined (global::module_path::frontend)");
 
-    if (strcmp(modname, "none") != 0)
+    if (strcmp(modname, "none") != 0 && strcmp(modname, "noninteractive") != 0)
     {
         q = qdb->methods.get(qdb, "debconf/frontend");
         if (q)
