@@ -34,7 +34,12 @@ for XML in `find $SOURCEDIR -name "*.xml"` ; do
     POT=$(basename $XML .xml).pot
 
     # Let's also set a proper POT-Creation-Date
+    # The hack to set the POT creation date is no longer needed for poxml 3.5.0
+    # But the authors of poxml also decided to set some nice KDE defaults we
+    # don't want...
     xml2pot $XML | \
+        sed "s/^.*Report-Msgid-Bugs-To:.*$/\"Report-Msgid-Bugs-To: debian-boot@lists.debian.org\\\n\"/" | \
+        sed "s/^.*Language-Team:.*$/\"Language-Team: LANGUAGE <LL@li.org>\\\n\"/" | \
         sed "s/^.*POT-Creation-Date:.*$/\"POT-Creation-Date: $(date -u "+%F %R%z")\\\n\"/" \
         >$PODIR/pot/$POT.new
     RC=$?
