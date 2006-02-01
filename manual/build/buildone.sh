@@ -182,7 +182,7 @@ create_dvi () {
         -b utf-8 \
         -o $tempdir/install.${language}.tex \
         -d $stylesheet_dsssl \
-        -V tex-backend \
+        -V tex-backend declaration/xml.dcl \
         $tempdir/install.${language}.profiled.xml
     RET=$?; [ $RET -ne 0 ] && return $RET
 
