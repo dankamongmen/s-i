@@ -49,7 +49,8 @@ for dev in $DEVICES/*; do
 		db_subst $template DEVICE $(humandev $(cat device))
 
 		status=failed
-# libreiserfs has not yet been packaged as udeb so the following will fail
+		# Trying to use parted will probably fail; parted doesn't
+		# support reiser currently.
  		name_progress_bar $template
  		open_dialog CREATE_FILE_SYSTEM $id reiserfs
  		read_line status
