@@ -39,6 +39,7 @@ ssh_question("password:", $ENV{NETWORK_CONSOLE_PASSWORD});
 $ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
 	[ "-re", "step.*failed" => sub { exit 1 } ],
 	[ "English" => sub { sleep 2; $exp->send("\r"); exp_continue; } ],
+	[ "-re", "Start.*menu" => sub { sleep 2; $exp->send("\r"); exp_continue; } ],
 	[ "-re", "<Go.*Back>" => sub { sleep 2; $exp->send("\r"); exp_continue; } ],
 	[ "-re", "rebooting.*the.*system." => sub { } ],
 	[ "-re", "down.*NOW" => sub { } ],
