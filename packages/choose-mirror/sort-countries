@@ -29,7 +29,11 @@ do
         else
             [ -d ../locales/$unilang.UTF-8 ] || localedef -c -f UTF-8 -i $unilang ../locales/$unilang.UTF-8
             LOCPATH=`pwd` LC_ALL=../locales/$unilang.UTF-8 sort -k 2.1 $file | sed -e 's/ .*/, /' | tr -d '\n' | sed -e "s/^/Indices-$lang.UTF-8: 1, /" -e 's/, $//' > sorted$file
-	echo "" >>sorted$file
+            if [ -s sorted$file ]; then
+                echo "" >>sorted$file
+            else
+                rm -f sorted$file
+            fi
         fi
     done
     #  Now ../choose-mirror/DEBIAN/templates must be patched: all sortedlist.*
