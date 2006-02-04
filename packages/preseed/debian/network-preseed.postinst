@@ -30,16 +30,15 @@ preseed_relative () {
 set_preseed_url () {
 	test -x /sbin/dhclient   && LEASE=/var/lib/dhcp/dhclient.leases 
 	test -x /sbin/dhclient3  && LEASE=/var/lib/dhcp3/dhclient.leases 
-	if [ -r "${LEASE}" ]; then
-		FN=$( sed -n -e '/filename/s/.*"\(.*\)"./\1/p' ${LEASE} )
+	if [ -r "$LEASE" ]; then
+		FN=$( sed -n -e '/filename/s/.*"\(.*\)"./\1/p' $LEASE )
 		if [ -z "${FN##*://*}" ]; then
-			db_set preseed/url ${FN}
+			db_set preseed/url $FN
 		fi
 	fi
 }
 
-db_get preseed/url
-if db_get preseed/url && [ "$RET" ] ; then
+if ! db_get preseed/url || [ -z "$RET" ] ; then
 	set_preseed_url
 fi
 
