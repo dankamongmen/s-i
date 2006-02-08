@@ -24,6 +24,7 @@ valid () {
 	echo "$line" > $ROOT$tmp
 	
 	if $chroot $ROOT apt-get -o APT::Get::List-Cleanup=false \
+		-o Acquire::gpgv::Options::=--ignore-time-conflict \
 		-o Dir::Etc::sourcelist=$tmp update
 	then
 		rm -f $ROOT$tmp
