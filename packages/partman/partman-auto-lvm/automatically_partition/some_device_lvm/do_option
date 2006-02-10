@@ -6,9 +6,9 @@
 . /lib/partman/auto-shared.sh
 
 bail_out() {
-    db_input critical partman-auto-lvm/$1 || true
-    db_go || true
-    exit 1
+	db_input critical partman-auto-lvm/$1 || true
+	db_go || true
+	exit 1
 }
 
 
@@ -23,13 +23,13 @@ modprobe dm-mod >/dev/null 2>&1 || true
 modprobe lvm-mod >/dev/null 2>&1 || true
 
 if type update-dev >/dev/null 2>&1; then
-    log-output -t update-dev update-dev
+	log-output -t update-dev update-dev
 fi
 
 # check if the device already contains any physical volumes
 realdev=$(mapdevfs "$(cat $dev/device)")
 if PV_list | grep -q "$realdev" ; then
-    bail_out pv_on_device
+	bail_out pv_on_device
 fi
 
 # we need to be sure we can perform the selected receipe and be able to add /boot.
@@ -63,7 +63,7 @@ normalscheme=$(echo "$scheme" | grep -v "lvmok")
 
 # if the schema does NOT contain a /boot, create one.
 if ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
-  bootscheme="${NL}128 512 256 ext3 \$primary{ } \$bootable{ } method{ format } format{ } use_filesystem{ } filesystem{ ext3 } mountpoint{ /boot }" 
+	bootscheme="${NL}128 512 256 ext3 \$primary{ } \$bootable{ } method{ format } format{ } use_filesystem{ } filesystem{ ext3 } mountpoint{ /boot }" 
 fi
 
 # creating envelope
@@ -95,28 +95,30 @@ update_all
 
 # lvm doesn't like devfs paths.
 for pv in $devfspv_devices; do
-    realpath="$(mapdevfs "$pv")"
-    pv_devices="$pv_devices $realpath"
+	realpath="$(mapdevfs "$pv")"
+	pv_devices="$pv_devices $realpath"
 done
 
 # Choose name, create VG and attach each partition as a physical volume
 noninteractive=true
 while true; do
-    db_input medium partman-auto-lvm/new_vg_name || eval $noninteractive
-    db_go || exit 1
-    db_get partman-auto-lvm/new_vg_name
-    VG_name="$RET"
+	db_input medium partman-auto-lvm/new_vg_name || eval $noninteractive
+	db_go || exit 1
+	db_get partman-auto-lvm/new_vg_name
+	VG_name="$RET"
 
-    # check if the volume group name is not in use
-    if [ -z "$(VG_list | grep " $VG_name${TAB}")" ]; then break; fi
-    noninteractive="bail_out vg_exists"
-    db_register partman-auto-lvm/new_vg_name_exists partman-auto-lvm/new_vg_name
+	# check if the volume group name is not in use
+	if [ -z "$(VG_list | grep " $VG_name${TAB}")" ]; then
+		break
+	fi
+	noninteractive="bail_out vg_exists"
+	db_register partman-auto-lvm/new_vg_name_exists partman-auto-lvm/new_vg_name
 done
 
 if VG_create "$VG_name" $pv_devices; then
-    perform_recipe_by_lvm $VG_name $recipe
+	perform_recipe_by_lvm $VG_name $recipe
 else
-    bail_out vg_create_error
+	bail_out vg_create_error
 fi
 
 # default to accepting the autopartitioning

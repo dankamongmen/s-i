@@ -30,9 +30,9 @@ foreach_partition '
 	newmin="${1}000"
 	newmed="${2}000"
 	if [ "$3" != "1000000000" ]; then
-           newmax="${3}000"
+		newmax="${3}000"
 	else
-	   newmax="$3"
+		newmax="$3"
 	fi
 	shift; shift; shift
 	newscheme="$newscheme${NL}$newmin $newmed $newmax $*"
@@ -48,79 +48,80 @@ db_progress STEP 1
 
 name_number=1
 foreach_partition '
-
-    if echo $* | grep -q "mountpoint{"; then
-	lvname=$(echo $* | sed \
-	    -e "s/.*mountpoint{  *\([^ }]*\) *}.*/\1/g" \
-	    -e "s!//!/!g" \
-	    -e '\''s!/$!!g'\'' \
-	    -e "s/_/__/g" \
-	    -e "s/+/_+/g" \
-	    -e "s/-/_dash/g" \
-	    -e "s/ /_space/g" \
-	    -e '\''s!^/root$!_root!g'\'' \
-	    -e '\''s!^$!/root!g'\'' \
-	    -e "s!^/!!" \
-	    -e "s!/!+!g"
-	)
-    elif echo $* | grep -q "method{"; then
-	lvname=$(echo $* | sed \
-	  -e "s/.*method{  *\([^ }]*\) *}.*/\1/g")
-	lvname="${lvname}_$name_number"
-	name_number=$(($name_number + 1))
-    else
-	lvname=_$name_number
-	name_number=$(($name_number + 1))
-    fi
-
-    if [ "$last" = "yes" ]; then
-      LV_create $VG_name full  "$lvname" || autopartitioning_failed
-    else
-      LV_create $VG_name "$1"000 "$lvname" || autopartitioning_failed
-    fi
-
-    device=/dev/mapper/"$VG_name"-"$lvname"
-
-    dirname=$(echo "$device" | sed "s:/:=:g")
-    dev=$DEVICES/$dirname
-
-    rm -rf $dev
-    mkdir $dev || autopartitioning_failed
-    printf "%s" "$device" >$dev/device
-    printf "%s" "$4" >$dev/size
-    printf "%s" "$VG_name - $lvname" >$dev/model
-    
-    cd $dev
-    open_dialog OPEN "$(cat $dev/device)"
-    read_line responce
-    close_dialog
-    if [ "$responce" = failed ]; then
-	cd /
-	rm -rf $dev
-	autopartitioning_failed
-    fi
-    
-    open_dialog NEW_LABEL loop
-    close_dialog
-    # find the free space
-    open_dialog PARTITIONS
-    free_space=""
-    while { read_line num id size type fs path name; [ "$id" ]; }; do
-	if [ "$fs" = free ]; then
-	    free_space=$id
-	    free_size=$size
+	if echo $* | grep -q "mountpoint{"; then
+		lvname=$(echo $* | sed \
+			-e "s/.*mountpoint{  *\([^ }]*\) *}.*/\1/g" \
+			-e "s!//!/!g" \
+			-e '\''s!/$!!g'\'' \
+			-e "s/_/__/g" \
+			-e "s/+/_+/g" \
+			-e "s/-/_dash/g" \
+			-e "s/ /_space/g" \
+			-e '\''s!^/root$!_root!g'\'' \
+			-e '\''s!^$!/root!g'\'' \
+			-e "s!^/!!" \
+			-e "s!/!+!g"
+		)
+	elif echo $* | grep -q "method{"; then
+		lvname=$(echo $* | sed \
+			-e "s/.*method{  *\([^ }]*\) *}.*/\1/g")
+		lvname="${lvname}_$name_number"
+		name_number=$(($name_number + 1))
+	else
+		lvname=_$name_number
+		name_number=$(($name_number + 1))
 	fi
-    done
-    close_dialog
-    # create partition in the free space
-    [ "$free_space" ] || autopartitioning_failed
-    open_dialog NEW_PARTITION primary ext2 $free_space full $free_size
-    read_line num id size type fs path name
-    close_dialog
-    
-    shift; shift; shift; shift
-    setup_partition $id $*
-    db_progress STEP 1
+
+	if [ "$last" = "yes" ]; then
+		LV_create $VG_name full  "$lvname" || autopartitioning_failed
+	else
+		LV_create $VG_name "$1"000 "$lvname" || autopartitioning_failed
+	fi
+
+	device=/dev/mapper/"$VG_name"-"$lvname"
+
+	dirname=$(echo "$device" | sed "s:/:=:g")
+	dev=$DEVICES/$dirname
+
+	rm -rf $dev
+	mkdir $dev || autopartitioning_failed
+	printf "%s" "$device" >$dev/device
+	printf "%s" "$4" >$dev/size
+	printf "%s" "$VG_name - $lvname" >$dev/model
+	
+	cd $dev
+	open_dialog OPEN "$(cat $dev/device)"
+	read_line responce
+	close_dialog
+	if [ "$responce" = failed ]; then
+		cd /
+		rm -rf $dev
+		autopartitioning_failed
+	fi
+	
+	open_dialog NEW_LABEL loop
+	close_dialog
+
+	# find the free space
+	open_dialog PARTITIONS
+	free_space=""
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+		if [ "$fs" = free ]; then
+			free_space=$id
+			free_size=$size
+		fi
+	done
+	close_dialog
+
+	# create partition in the free space
+	[ "$free_space" ] || autopartitioning_failed
+	open_dialog NEW_PARTITION primary ext2 $free_space full $free_size
+	read_line num id size type fs path name
+	close_dialog
+	
+	shift; shift; shift; shift
+	setup_partition $id $*
+	db_progress STEP 1
 '
 
 db_progress STOP
