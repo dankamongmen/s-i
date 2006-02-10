@@ -5,11 +5,32 @@
 . /lib/partman/lvm_tools.sh
 . /lib/partman/auto-shared.sh
 
+bail_out() {
+    db_input critical partman-auto-lvm/$1 || true
+    db_go || true
+    exit 1
+}
+
+
 dev=$1
 
 [ -f $dev/size ] || exit 1
 free_size=$(cat $dev/size)
 free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
+
+# be sure the modules are loaded
+modprobe dm-mod >/dev/null 2>&1 || true
+modprobe lvm-mod >/dev/null 2>&1 || true
+
+if type update-dev >/dev/null 2>&1; then
+    log-output -t update-dev update-dev
+fi
+
+# check if the device already contains any physical volumes
+realdev=$(mapdevfs "$(cat $dev/device)")
+if PV_list | grep -q "$realdev" ; then
+    bail_out pv_on_device
+fi
 
 # we need to be sure we can perform the selected receipe and be able to add /boot.
 # virtually remove 200Mb from the free space. Perhaps a reiteration over the recipe
@@ -26,9 +47,7 @@ decode_recipe $recipe
 
 # check if the recipe contains lvmok tags otherwise fail
 if [ -z "$(echo "$scheme" | grep "lvmok")" ]; then
-	db_input critical partman-auto-lvm/unusable_recipe || true
-	db_go || true
-	exit 1
+	bail_out unusable_recipe
 fi
 
 ### situation:
@@ -74,14 +93,6 @@ update_all
 
 #### now we have the container! yeppa!!! ####
 
-# be sure the modules are loaded
-modprobe dm-mod >/dev/null 2>&1 || true
-modprobe lvm-mod >/dev/null 2>&1 || true
-
-if type update-dev >/dev/null 2>&1; then
-    log-output -t update-dev update-dev
-fi
-
 # lvm doesn't like devfs paths.
 for pv in $devfspv_devices; do
     realpath="$(mapdevfs "$pv")"
@@ -96,11 +107,17 @@ while true; do
     db_get partman-auto-lvm/new_vg_name
     VG_name="$RET"
 
-    if VG_create "$VG_name" $pv_devices; then break; fi
-    noninteractive="exit 1"
+    # check if the volume group name is not in use
+    if [ -z "$(VG_list | grep " $VG_name${TAB}")" ]; then break; fi
+    noninteractive="bail_out vg_exists"
+    db_register partman-auto-lvm/new_vg_name_exists partman-auto-lvm/new_vg_name
 done
 
-perform_recipe_by_lvm $VG_name $recipe
+if VG_create "$VG_name" $pv_devices; then
+    perform_recipe_by_lvm $VG_name $recipe
+else
+    bail_out vg_create_error
+fi
 
 # default to accepting the autopartitioning
 menudir_default_choice /lib/partman/choose_partition finish finish || true

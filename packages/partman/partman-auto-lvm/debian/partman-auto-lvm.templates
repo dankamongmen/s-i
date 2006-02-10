@@ -11,8 +11,35 @@ Type: string
 Default: Debian
 _Description: Name of the volume group for the new system:
 
+Template: partman-auto-lvm/new_vg_name_exists
+Type: string
+_Description: Name of the volume group for the new system:
+ The name selected for the volume group is already in use on your system.
+ Please enter a different name.
+
 Template: partman-auto-lvm/unusable_recipe
 Type: error
 _Description: Failed to partition the selected disk
  This happened because the selected recipe does not contain any partition
  that can be created on LVM volumes.
+
+Template: partman-auto-lvm/pv_on_device
+Type: error
+_Description: Selected device already contains a physical volume
+ The device you selected already contains one or more physical volumes. It
+ is not possible to automatically partition the device using LVM.
+
+Template: partman-auto-lvm/vg_exists
+Type: error
+_Description: Volume group name already in use
+ The volume group name used to automatically partition using LVM is already
+ in use. It is possible to specify an alternative name by running the
+ installation at medium or low priority.
+
+Template: partman-auto-lvm/vg_create_error
+Type: error
+_Description: Unexpected error while creating volume group
+ Autopartitioning using LVM failed because an error occurred while creating
+ the volume group.
+ .
+ Check /var/log/syslog or see virtual console 4 for the details.

@@ -1,6 +1,11 @@
 
 TAB='	'
 
+# Print a list of the names of all physical volumes and the volume groups they contain
+PV_list () {
+	pvs -o pv_name,vg_name --noheadings --sort pv_name,vg_name --separator "${TAB}"
+}
+
 # Print a list of the names of all volume groups and their size in M (including decimals!)
 VG_list () {
 	vgs -o vg_name,vg_size --nosuffix --units M --noheadings --sort vg_name --separator "${TAB}"
@@ -13,7 +18,7 @@ VG_create () {
     local vg
     vg="$1"
     shift
-    log-output -t partman-auto-lvm pvcreate -ff -y $*
+    log-output -t partman-auto-lvm pvcreate -ff -y $* || return 1
     log-output -t partman-auto-lvm vgcreate "$vg" $* || return 1
     return 0
 }
