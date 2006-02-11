@@ -603,6 +603,8 @@ GtkWidget* display_descriptions(struct question *q, struct frontend *obj)
     gtk_text_view_set_editable (GTK_TEXT_VIEW(description_view), FALSE);
     gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(description_view), FALSE);
     gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(description_view), GTK_WRAP_WORD);
+    gtk_text_view_set_left_margin (GTK_TEXT_VIEW(description_view), 4);
+    gtk_text_view_set_right_margin (GTK_TEXT_VIEW(description_view), 4);
     gtk_text_buffer_create_tag (description_buffer, "italic", "style", PANGO_STYLE_ITALIC, NULL);
     g_object_set_data (G_OBJECT (description_view), "tag", "italic");
     gtk_text_buffer_get_start_iter  (description_buffer, &start);
@@ -1626,8 +1628,8 @@ static void gtk_set_title(struct frontend *obj, const char *title)
 
     label_title = ((struct frontend_data*) obj->data)->title;
     gtk_misc_set_alignment(GTK_MISC(label_title), 0, 0);
-    label_title_string = malloc(strlen(title) + 8 );
-    sprintf(label_title_string,"<b>%s</b>", title);
+    label_title_string = malloc(strlen(title) + 10 );
+    sprintf(label_title_string,"<b> %s</b>", title);
     gtk_label_set_markup(GTK_LABEL(label_title), label_title_string);
 }
 
@@ -1697,8 +1699,8 @@ static int gtk_progress_info(struct frontend *obj, const char *info)
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info); */
 
     progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
-    progress_bar_label_string = malloc(strlen(info) + 11 );
-    sprintf(progress_bar_label_string,"<i>%s...</i>",info);
+    progress_bar_label_string = malloc(strlen(info) + 13 );
+    sprintf(progress_bar_label_string,"<i> %s...</i>",info);
     gtk_label_set_markup(GTK_LABEL(progress_bar_label), progress_bar_label_string);
     free(progress_bar_label_string);
 
