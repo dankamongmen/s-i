@@ -51,20 +51,11 @@ fi
 rm -fr ranges
 mkdir ranges
 
-rm -f fontfiles.txt ttfname.txt
-find $1 -name *.ttf > fontfiles.txt
-for FONTFILE in `cat fontfiles.txt` ; do
-    basename ${FONTFILE} >> ttfname.txt
-done
-
-
 # associate a .rng file to each .ttf file
 # the rng file contains a sorted list of the unicode coordinates contained in  the ttf file
-for FONTFILE in `cat fontfiles.txt` ; do
-    RANGEFILE="ranges/$(basename ${FONTFILE} | sed "s:.ttf$:.rng1:")"
-    ./showttf ${FONTFILE} | grep "^Glyph" | awk '{print $7}' | sort | uniq > ${RANGEFILE}
-    cat $RANGEFILE | sed "s|U|$(basename ${FONTFILE}):U|" > "ranges/$(basename ${RANGEFILE} | sed "s:.rng1$:.rng:")"
-    rm $RANGEFILE
+for FONTFILE in $(find $1 -name *.ttf) ; do
+    RANGEFILE="ranges/$(basename ${FONTFILE} | sed "s:.ttf$:.rng:")"
+    ./showttf ${FONTFILE} | grep "^Glyph" | awk '{print $7}' | sort | uniq | sed "s|^U+||" > ${RANGEFILE}
 done
 
 rm -f all_ranges.txt
@@ -74,32 +65,32 @@ for RANGEFILE in $(cat rangefiles.txt) ; do
 done
 
 # create a list of the unicode coords used at least on one font file
-cat all_ranges.txt | awk -F: '{print $2}' | sort | uniq > used_coords.txt
+sort all_ranges.txt | uniq > used_coords.txt
 
 # For each unicode coordinate used in one or more ttf files produce this stats
 #
-# U+0000 1 0 1 0 1
-# U+0020 0 0 0 1 1 
-rm -f tbl.txt
+# 0000 1 0 1 0 1
+# 0020 0 0 0 1 1 
 
 i=0
-num_loops=500
+num_loops=5
+ranges=$(cat rangefiles.txt)
 
-for COORD in `cat used_coords.txt` ; do
-    echo -n "${COORD}:" >> tbl.txt
+exec 6>&1 
+exec > tbl.txt
+for COORD in $(cat used_coords.txt) ; do
+    echo -n "${COORD}:"
 
-    for RANGEFILE in `cat rangefiles.txt` ; do
-	grep -F -q -w ${COORD} ${RANGEFILE} 
+    for RANGEFILE in $ranges ; do
+	grep --mmap -F -q -w ${COORD} ${RANGEFILE}
 	if [ $? = 0 ]; then
-	    echo -n "1:"   >> tbl.txt  # found
+	    echo -n "1:"  # found
 	else
-	    echo -n "0:"   >> tbl.txt  # not found
+	    echo -n "0:"  # not found
 	fi
-	
     done
 
-    echo ""  >> tbl.txt
-
+    echo ""
 ##
 ## For profiling: 
 ##                time * num_lines(used_coords.txt) / num_loops
@@ -107,9 +98,12 @@ for COORD in `cat used_coords.txt` ; do
 
 #     i=`expr $i + 1`
 #     if [ $i -eq ${num_loops} ] ; then
-# 	exit 0
+#	 echo "</tabella>"
+#	 exit 0
 #     fi
 done
+
+exec 1>&6 6>&-
 
 cat rangefiles.txt | sed "s|ranges/||" > tmp.1
 mv tmp.1 rangefiles.txt
