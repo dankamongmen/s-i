@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33725 untranslated -->
+<!-- original version: 33725 -->
 
 
    <sect3 id="mdcfg">
@@ -71,6 +71,7 @@ che si intende creare. Attualmente quelli supportati sono:
 
 <term>RAID0</term><listitem><para>
 
+<!--
 Is mainly aimed at performance.  RAID0 splits all incoming data into
 <firstterm>stripes</firstterm> and distributes them equally over each
 disk in the array. This can increase the speed of read/write
@@ -78,6 +79,15 @@ operations, but when one of the disks fails, you will loose
 <emphasis>everything</emphasis> (part of the information is still on
 the healthy disk(s), the other part <emphasis>was</emphasis> on the
 failed disk).
+-->
+
+Lo scopo di RAID0 sono le prestazioni. RAID0 divide tutti i dati entranti
+in <firstterm>strisce</firstterm> e le distribuisce in modo uniforme su
+tutti i dischi. Questo può incrementare la velocità delle operazioni di
+lettura/scrittura, ma in caso di rottura di uno dei dischi si perdono
+<emphasis>tutti</emphasis> i dati (infatti parte delle informazioni sono
+sui dischi integri e l'altra parte <emphasis>era</emphasis> sul disco
+rotto).
 
 </para><para>
 
@@ -93,6 +103,7 @@ Un uso tipico di RAID0 è una partizione per l'editing video.
 
 <term>RAID1</term><listitem><para>
 
+<!--
 Is suitable for setups where reliability is the first concern.  It
 consists of several (usually two) equally sized partitions where every
 partition contains exactly the same data. This essentially means three
@@ -102,6 +113,17 @@ of the available capacity (more precisely, it is the size of the
 smallest partition in the RAID). Third, file reads are load balanced among
 the disks, which can improve performance on a server, such as a file
 server, that tends to be loaded with more disk reads than writes.
+-->
+
+Adatto nelle situazioni in cui l'affidabilità è la necessità primaria.
+Consiste di più partizioni (di solito due) della stessa dimensione e ogni
+partizione contiene esattamente gli stessi dati. Questo comporta tre cose:
+se uno dei dischi si rompe i dati rimangono disponibili sugli altri dischi,
+è possibile usare solo una parte della capacità dei dischi (in particolare
+la dimensione della partizione più piccola in RAID), incremento delle
+prestazioni dato che la lettura dei dati è bilanciata sui dischi, per
+esempio su un file server il numero delle letture è superiore a quello
+delle scritture.
 
 </para><para>
 
@@ -119,6 +141,7 @@ rottura di uno degli altri dischi lo rimpiazza.
 
 <term>RAID5</term><listitem><para>
 
+<!--
 Is a good compromise between speed, reliability and data redundancy.
 RAID5 splits all incomming data into stripes and distributes them
 equally on all but one disks (similar to RAID0). Unlike RAID0, RAID5
@@ -130,6 +153,20 @@ disks fails, the missing part of information can be computed from
 remaining data and its parity. RAID5 must consist of at least three
 active partitions. Optionally you can have a spare disk in the array
 which will take the place of the failed disk in the case of failure.
+-->
+
+È un buon compromesso fra velocità, affidabilità e ridondanza dei dati.
+RAID5 divide tutti i dati entranti in strisce e le distribuisce in modo
+uniforme su tutti i dischi (come con RAID0) tranne uno. Diversamente da
+RAID0, con RAID5 sono calcolate le informazioni sulla
+<firstterm>parità</firstterm> che poi sono scritte sul disco rimanente. Il
+disco di parità non è fisso (questo è vero per RAID4) ma viene cambiato
+periodicamente in modo che anche le informazioni di parità sono distribuite
+uniformemente su tutti i dischi. Quando un disco si rompe la parte mancante
+dei dati può essere calcolata usando le altre parti dei dati e le
+informazioni di parità. RAID5 deve essere composto da almeno tre partizioni
+attive, inoltre nell'array si può avere anche un disco di scorta che nel
+caso di rottura di un disco rimpiazza il disco rotto.
 
 </para><para>
 
@@ -226,42 +263,76 @@ HOWTO</ulink>.
 
 </para><para>
 
+<!--
 To create a MD device, you need to have the desired partitions it
 should consist of marked for use in a RAID.  (This is done in
 <command>partman</command> in the <guimenu>Partition
 settings</guimenu> menu where you should select <menuchoice>
 <guimenu>Use as:</guimenu> <guimenuitem>physical volume for
 RAID</guimenuitem> </menuchoice>.)
+-->
+
+Per creare un device MD si devono marcare le partizioni per essere usate
+in RAID (questo si può fare con <command>partman</command>, nel menu
+<guimenu>Impostazioni della partizione</guimenu> scegliere <menuchoice>
+<guimenu>Usato come:</guimenu> <guimenuitem>volume fisico per il
+RAID</guimenuitem> </menuchoice>). 
 
 </para><warning><para>
 
+<!--
 Support for MD is a relatively new addition to the installer.
 You may experience problems for some RAID levels and in combination
 with some bootloaders if you try to use MD for the root
 (<filename>/</filename>) filesystem. For experienced users, it may be
 possible to work around some of these problems by executing some
 configuration or installation steps manually from a shell.
+-->
+
+Il supporto per MD è un'aggiunta al sistema d'installazione relativamente
+recente. Si potrebbero verificare dei problemi con alcuni dei livelli RAID
+in combinazione con alcuni bootloader se si prova a usare un device MD per
+il file system di root (<filename>/</filename>). Gli utenti più esperti
+possono aggirare alcuni di questi problemi eseguendo alcuni passi
+dell'installazione manualmente tramite una shell.
 
 </para></warning><para>
 
+<!--
 Next, you should choose <guimenuitem>Configure software
 RAID</guimenuitem> from the main <command>partman</command> menu.
 On the first screen of <command>mdcfg</command> simply select
 <guimenuitem>Create MD device</guimenuitem>. You will be presented with
 a list of supported types of MD devices, from which you should choose
 one (e.g. RAID1). What follows depends on the type of MD you selected.
+-->
+
+Poi nel menu principale di <command>partman</command> si deve selezionare
+<guimenuitem>Configurare il RAID software</guimenuitem>. Nella prima
+schermata di <command>mdcfg</command> selezionare <guimenuitem>Creare un
+device multidisk (MD)</guimenuitem>, viene presentato un elenco dei tipi
+di device MD supportati dal quale scegliere. Quello che segue dipende dal
+tipo di device MD scelto.
+
 </para>
 
 <itemizedlist>
 <listitem><para>
 
+<!--
 RAID0 is simple &mdash; you will be issued with the list of available
 RAID partitions and your only task is to select the partitions which
 will form the MD.
+-->
+
+RAID0 è semplice, viene mostrato l'elenco delle partizioni RAID disponibili
+e l'unica cosa da fare è scegliere le partizioni con le quali si vuole
+comporre il device MD.
 
 </para></listitem>
 <listitem><para>
 
+<!--
 RAID1 is a bit more tricky. First, you will be asked to enter the
 number of active devices and the number of spare devices which will
 form the MD. Next, you need to select from the list of available RAID
@@ -270,6 +341,16 @@ spare. The count of selected partitions must be equal to the number
 provided few seconds ago. Don't worry. If you make a mistake and
 select different number of partitions, the &d-i; won't let you
 continue until you correct the issue.
+-->
+
+RAID1 è leggermente più complesso. Prima viene chiesto il numero di
+partizioni attive e il numero di partizioni di scorta per il nuovo device
+MD. Poi è necessario scegliere dall'elenco delle partizioni RAID disponibili
+quali saranno quelle attive e quali saranno quelle di scorta. Il numero totale
+di partizioni deve coincidere con quello specificato poco prima. Se durante la
+selezione si compie un errore e si seleziona un numero sbagliato di partizioni
+il &d-i; non permette di proseguire con l'installazione fino a quando non si
+corregge questo errore.
 
 </para></listitem>
 <listitem><para>
@@ -298,9 +379,9 @@ and use the other three partitions (2 active and 1 spare) for RAID1
 -->
 
 È possibile avere diversi tipi di MD contemporaneamente. Per esempio se
-si dedicano al MD 3 hard disk da 200&nbsp;GB, ciascun disco con due
+si dedicano al MD 3 hard disk da 200&nbsp;GB, ciascuno dei quali con due
 partizioni da 100&nbsp;GB, si possono combinare le prime partizioni di
-tutti e tre i dischi in un RAID0 (partizione veloce da 300&nbsp;GB per
+tutti e tre i dischi in un RAID0 (come partizione veloce da 300&nbsp;GB per
 l'editing video) e usare le altre tre partizioni (2 attive e 1 di scorta)
 in RAID1 (come partizione da 100&nbsp;GB più affidabile per la
 <filename>/home</filename>).

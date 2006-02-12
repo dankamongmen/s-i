@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33891 -->
+<!-- original version: 34168 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -818,9 +818,27 @@ d-i netcfg/choose_interface select auto
 # di esso, questo potrebbe essere utile.
 #d-i netcfg/dhcp_timeout string 60
 <!--
-# If you prefer to configure the network manually, here's how:
+# If you prefer to configure the network manually, uncomment this line and
+# the static network configuration below.
 -->
-# Se si preferisce configurare manualmente la rete, ecco come fare:
+# Se si preferisce configurare manualmente la rete, togliere il commento
+# alla prossima riga e alle righe con la configurazione statica della rete.
+#d-i netcfg/disable_dhcp boolean true
+<!--
+# If you want the preseed file to work on systems both with and without 
+# a dhcp server, uncomment these lines and the static network configuration
+# below.
+-->
+# Se si desidera che il file di preconfigurazione funzioni su qualsiasi
+# sistema, a prescindere dalla presenza di un server DHCP in rete, si può
+# togliere il commento alle righe seguenti e alle righe con la configurazione
+# statica della rete.
+#d-i netcfg/dhcp_failed note
+#d-i netcfg/dhcp_options select Configure network manually
+<!--
+# Static network configuration.
+-->
+# Configurazione statica della rete.
 #d-i netcfg/disable_dhcp boolean true
 #d-i netcfg/get_nameservers string 192.168.1.1
 #d-i netcfg/get_ipaddress string 192.168.1.42

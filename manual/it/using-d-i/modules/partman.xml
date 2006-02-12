@@ -1,25 +1,42 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 30158 untranslated -->
+<!-- original version: 30158 -->
+
 
    <sect3 id="partman">
-   <title>Partitioning Your Disks</title>
+   <!-- <title>Partitioning Your Disks</title> -->
+   <title>Partizionamento dei dischi</title>
 
 <para>
 
+<!--
 Now it is time to partition your disks. If you are uncomfortable with
 partitioning, or just want to know more details, see <xref
 linkend="partitioning"/>.
+-->
+
+Ora è il momento di partizionare i dischi. Se non si ha confidenza con
+il partizionamento, o si desidera conoscere più particolari, si veda
+<xref linkend="partitioning"/>.
 
 </para><para>
 
+<!--
 First you will be given the opportunity to automatically partition
 either an entire drive, or free space on a drive. This is also called
 <quote>guided</quote> partitioning. If you do not want to
 autopartition, choose <guimenuitem>Manually edit partition
 table</guimenuitem> from the menu.
+-->
+
+In primo luogo è data l'opportunità di partizionare automaticamente un
+intero disco o solo lo spazio libero. Ciò è chiamato partizionamento
+<quote>guidato</quote>. Se non si desidera usare l'autopartizionamento,
+scegliere <guimenuitem>Modificare la tabella delle partizioni
+manualmente</guimenuitem> dal menu.
 
 </para><para>
 
+<!--
 If you choose guided partitioning, you will be able to choose from the
 schemes listed in the table below. All schemes have their pros and cons,
 some of which are discussed in <xref linkend="partitioning"/>. If you are
@@ -27,6 +44,16 @@ unsure, choose the first one. Bear in mind, that guided partitioning
 needs certain minimal amount of free space to operate with. If you don't
 give it at least about 1GB of space (depends on chosen scheme), guided
 partitioning will fail.
+-->
+
+Se si sceglie il partizionamento guidato, è possibile scegliere uno degli
+schemi elencati nella tabella qui sotto. Tutti gli schemi hanno pro e contro,
+alcuni dei quali sono discussi in <xref linkend="partitioning"/>. Si consiglia
+l'uso del primo schema se si hanno dei dubbi su quale scegliere. Inoltre si
+deve tener presente che il partizionamento guidato ha bisogno di quantità
+minima di spazio libero per funzionare, se sul disco non è presente circa
+1&nbsp;GB di spazio (dipende dallo schema scelto), il partizionamento
+guidato non funziona.
 
 </para>
 
@@ -34,25 +61,34 @@ partitioning will fail.
 <tgroup cols="3">
 <thead>
 <row>
-  <entry>Partitioning scheme</entry>
-  <entry>Minimum space</entry>
-  <entry>Created partitions</entry>
+  <entry><!-- Partitioning scheme -->Schema di partizionamento</entry>
+  <entry><!-- Minimum space -->Spazio minimo</entry>
+  <entry><!-- Created partitions -->Partizioni create</entry>
 </row>
 </thead>
 
 <tbody>
 <row>
-  <entry>All files in one partition</entry>
+  <entry>
+    <!-- All files in one partition -->
+    Tutti i file in una partizione
+  </entry>
   <entry>600MB</entry>
   <entry><filename>/</filename>, swap</entry>
 </row><row>
-  <entry>Desktop machine</entry>
+  <entry>
+    <!-- Desktop machine -->
+    Macchina desktop
+  </entry>
   <entry>500MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, swap
   </entry>
 </row><row>
-  <entry>Multi-user workstation</entry>
+  <entry>
+    <!-- Multi-user workstation -->
+    Stazione di lavoro multi-utente
+  </entry>
   <entry>1GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -65,27 +101,51 @@ partitioning will fail.
 
 <para arch="ia64">
 
+<!--
 If you chose an automatic partitioning for your IA64 system, there
 will be an additional partition, formatted as a FAT16 bootable filesystem,
 for the EFI boot loader.
 There is also an additional menu item in the formatting menu to manually
 set up a partition as an EFI boot partition.
+-->
+
+Se si sceglie il partizionamento automatico su un sistema IA64 viene
+allocata un'ulteriore partizione avviabile, formattata con un file system
+FAT16, per il boot loader EFI. C'è anche un'apposita voce nel menu per la
+formattazione che serve a impostare una partizione come quella d'avvio
+per EFI.
 
 </para><para arch="alpha">
 
+<!--
 If you chose an automatic partitioning for your Alpha system, an
 additional, unformatted partition will be allocated at the beginning of
 your disk to reserve this space for the aboot boot loader.
+-->
+
+Se si sceglie il partizionamento automatico su un sistema Alpha viene
+allocata un'ulteriore partizione all'inizio del disco per riservare lo
+spazio al boot loader aboot.
 
 </para><para>
 
+<!--
 After selecting a scheme, the next screen will show your new partition
 table, including information on whether and how partitions will be
 formatted and where they will be mounted.
+-->
+
+Dopo la selezione dello schema, la schermata successiva mostrerà la nuova
+tabella delle partizioni, comprese le informazioni sulla formattazione delle
+partizioni e dove saranno montate.
 
 </para><para>
 
+<!--
 The list of partitions might look like this:
+-->
+
+L'elenco delle partizioni dovrebbe assomigliare a questo:
 
 <!-- TODO: show some flags here (lightning, skull, smiley) -->
 <informalexample><screen>
@@ -106,13 +166,21 @@ The list of partitions might look like this:
         #9 logical   65.8 GB     ext2
 </screen></informalexample>
 
+<!--
 This example shows two IDE harddrives divided into several partitions;
 the first disk has some free space. Each partition line consists of the
 partition number, its type, size, optional flags, file system, and
 mountpoint (if any).
+-->
+
+Questo esempio mostra due dischi IDE divisi in parecchie partizioni; il
+primo disco dispone anche di un po' di spazio libero. In ogni riga che
+corrisponde a una partizione è riportato numero, tipo, dimensione, flag
+opzionali, file system e mout point (se assegnato) della partizione.
 
 </para><para>
 
+<!--
 This concludes the guided partitioning. If you are satisfied with the
 generated partition table, you can choose <guimenuitem>Finish
 partitioning and write changes to disk</guimenuitem> from the menu to
@@ -120,25 +188,54 @@ implement the new partition table (as described at the end of this
 section). If you are not happy, you can choose to <guimenuitem>Undo
 changes to partitions</guimenuitem>, to run guided partitioning again
 or modify the proposed changes as described below for manual partitioning.
+-->
+
+Con questo si conclude la parte guidata del partizionamento. Se si è
+soddisfatti della tabella delle partizioni appena creata si può selezionare
+<guimenuitem>Terminare il partizionamento e scrivere i cambiamenti sul
+disco</guimenuitem> dal menu per scrivere la nuova tabella delle partizioni
+(come descritto alla fine di questa sezione). Invece se il risultato non è
+soddisfacente si può scegliere <guimenuitem>Annullare i cambiamenti alle
+partizioni</guimenuitem> per eseguire un nuovo partizionamento guidato o
+modificare i cambiamenti proposti usando la stessa procedura (descritta in
+seguito) per il partizionamento manuale.
 
 </para><para>
 
+<!--
 A similar screen to the one shown just above will be displayed if you
 choose manual partitioning except that your existing partition table will
 be shown and without the mount points. How to manually setup your partition
 table and the usage of partitions by your new Debian system will be covered
 in the remainder of this section.
+-->
+
+Se si sceglie di partizionare manualmente viene mostrata una schermata
+simile alla precedente ma con la tabella delle partizioni esistente e
+senza i mount point. Come configurare manualmente la tabella delle
+partizioni e l'uso delle partizioni nel nuovo sistema sono argomenti
+trattati nel seguito di questa sezione.
 
 </para><para>
 
+<!--
 If you select a pristine disk which doesn't have neither partitions
 nor free space on it, you will be offered to create a new partition
 table (this is needed so you can create new partitions). After this
 a new line entitled <quote>FREE SPACE</quote> should appear under the
 selected disk.
+-->
+
+Se si sceglie un disco nuovo, su cui non è presente nessuna partizione o
+su cui non c'è spazio libero, viene richiesta la creazione di una nuova
+tabella delle partizioni (questa operazione è necessaria per poter creare
+delle nuove partizioni). Come conseguenza a questa operazione, sotto il
+disco selezionato, appare una nuova riga intitolata <quote>SPAZIO
+LIBERO</quote>.
 
 </para><para>
 
+<!--
 If you select some free space, you will be offered to create new
 partition. You will have to answer a quick series of questions about
 its size, type (primary or logical), and location (beginning or end of
@@ -154,9 +251,27 @@ existing partition onto this one.
 When you are satisfied with your new partition, select
 <guimenuitem>Done setting up the partition</guimenuitem> and you will be
 thrown back to the <command>partman</command>'s main screen.
+-->
+
+Quando si seleziona dello spazio libero viene data la possibilità di creare
+una nuova partizione; è necessario rispondere a poche domande sulla sua
+dimensione, il tipo (primaria o logica) e la posizione (all'inizio o alla
+fine dello spazio libero). Poi è visualizzato un dettagliato resoconto della
+nuova partizione. Inoltre è possibile specificare alcune opzioni come il
+mount point, le opzioni di mount, il flag avviabile o il modo d'uso. Se i
+valori predefiniti non sono di proprio gradimento si possono cambiare, per
+esempio selezionando l'opzione <guimenuitem>Usato come:</guimenuitem> si
+può cambiare il file system per la partizione compresa la possibilità di
+usare la partizione come swap, in RAID software, con LVM o non utilizzarla
+affatto. Un'altra comoda funzionalità è la possibilità di copiare i dati
+da una partizione esistente. Quando si è conclusa la configurazione della
+partizione si può selezionare <guimenuitem>Preparazione di questa partizione
+completata</guimenuitem> che permette di ritornare alla schermata principale
+di <command>partman</command>.
 
 </para><para>
 
+<!--
 If you decide you want to change something about your partition,
 simply select the partition, which will bring you to the partition
 configuration menu. Because this is the same screen like when creating
@@ -165,35 +280,76 @@ which might not be very obvious at a first glance is that you can
 resize the partition by selecting the item displaying the size of the
 partition. Filesystems known to work are at least fat16, fat32, ext2,
 ext3 and swap. This menu also allows you to delete a partition.
+-->
+
+Per cambiare qualcosa sulle partizioni si deve selezionare la partizione,
+in questo modo appare il menu di configurazione della partizione. Poiché
+usa la stessa schermata della creazione di una nuova partizione è possibile
+modificare le stesse opzioni. Una delle funzioni possibili ma non ovvia è
+la possibilità di ridimensionare la partizione selezionando la voce in cui
+è mostrata la dimensione della partizione. Il ridimensionamento funziona
+almeno sui file system fat16, fat32, ext2, ext3 e swap. Questo menu consente
+anche di cancellare una partizione.
 
 </para><para>
 
+<!--
 Be sure to create at least two partitions: one for the
 <emphasis>root</emphasis> filesystem (which must be mounted as
 <filename>/</filename>) and one for <emphasis>swap</emphasis>. If you
 forget to mount the root filesystem, <command>partman</command> won't
 let you continue until you correct this issue.
+-->
+
+Devono essere creare almeno due partizioni: una per il file system di
+<emphasis>root</emphasis> (che verrà montato come <filename>/</filename>)
+e una per l'area di <emphasis>swap</emphasis>. Se non si dichiara un
+file system di root <command>partman</command> impedisce l'avanzamento
+dell'installazione.
 
 </para><para arch="ia64">
 
+<!--
 If you forget to select and format an EFI boot partition
 <command>partman</command> will detect this and will not let you continue
 until you allocate one.
+-->
+
+Se si scorda la scelta o la formattazione una partizione d'avvio EFI,
+<command>partman</command> rileva questo errore e impedisce il proseguimento
+dell'installazione fino a quando non ne viene allocata una.
 
 </para><para>
 
+<!--
 Capabilities of <command>partman</command> can be extended with installer
 modules, but are dependent on your system's architecture. So if you can't
 see all promised goodies, check if you have loaded all required modules
 (e.g. <filename>partman-ext3</filename>, <filename>partman-xfs</filename>,
 or <filename>partman-lvm</filename>).
+-->
+
+Le capacità di <command>partman</command> possono essere estese con altri
+moduli per l'installatore che però dipendono dall'architettura del sistema.
+Perciò se non tutte le funzionalità promesse sono disponibili si deve
+verificare che tutti i moduli necessari siano stati caricati (per esempio
+<filename>partman-ext3</filename>, <filename>partman-xfs</filename> o
+<filename>partman-lvm</filename>).
 
 </para><para>
 
+<!--
 After you are satisfied with partitioning, select <guimenuitem>Finish
 partitioning and write changes to disk</guimenuitem> from the partitioning
 menu. You will be presented with a summary of changes made to the disks
 and asked to confirm that the filesystems should be created as requested.
+-->
+
+Quando si è soddisfatti della tabella delle partizioni, selezionare
+<guimenuitem>Terminare il partizionamento e scrivere i cambiamenti sul
+disco</guimenuitem> dal menu. Verrà presentato un breve riepilogo delle
+modifiche fatte sui dischi e verrà chiesto di confermare la creazione dei
+file system.
 
 </para>
    </sect3>
