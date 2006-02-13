@@ -18,7 +18,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * compile with
+ * This small application is meant to be compiled against GTKDFB libraries
+ * and user to test how the translated strings found in the debian installer
+ * look with different fonts.
+ *
+ * You can compile this application with
  * gcc gtk_font_tester.c -o gtk_font_tester `pkg-config --cflags --libs gtk+-2.0`
 **/
 
@@ -30,10 +34,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DEFAULT_PADDING 6
+
 GtkWidget *window, *scroll, *view, *button, *hbox, *vbox, *buttonbox, *entrybox, *entry, *loadfilebutton, *clearfilebutton;
 GtkTextBuffer *buffer;
 
-/* Another callback */
+
 static void destroy( GtkWidget *widget,
                      gpointer   data )
 {
@@ -126,18 +132,18 @@ void screenshot_callback(GtkWidget *view )
     gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END);
     close_button = gtk_button_new_with_label ("Continue");
     g_signal_connect_swapped (G_OBJECT (close_button), "clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (window));
-    gtk_box_pack_end (GTK_BOX(actionbox), close_button, TRUE, TRUE, 5);
+    gtk_box_pack_end (GTK_BOX(actionbox), close_button, TRUE, TRUE, DEFAULT_PADDING);
 
-    v_box = gtk_vbox_new(FALSE, 5);
+    v_box = gtk_vbox_new(FALSE, DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX (v_box), title_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX (v_box), message_label, FALSE, FALSE, 5);
+    gtk_box_pack_start(GTK_BOX (v_box), message_label, FALSE, FALSE, DEFAULT_PADDING);
     separator = gtk_hseparator_new();
     gtk_box_pack_start(GTK_BOX (v_box), separator, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX (v_box), actionbox, FALSE, FALSE, 0);
-    h_box = gtk_hbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX (h_box), v_box, FALSE, FALSE, 5);
-    v_box_outer = gtk_vbox_new(FALSE, 5);
-    gtk_box_pack_start(GTK_BOX (v_box_outer), h_box, FALSE, FALSE, 5);
+    h_box = gtk_hbox_new(FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (h_box), v_box, FALSE, FALSE, DEFAULT_PADDING);
+    v_box_outer = gtk_vbox_new(FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX (v_box_outer), h_box, FALSE, FALSE, DEFAULT_PADDING);
     
     frame = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type (GTK_FRAME(frame), GTK_SHADOW_OUT);
@@ -159,43 +165,44 @@ int main( int   argc, char *argv[] )
     gtk_widget_set_size_request (window, 800, 600);
 
     view = gtk_text_view_new ();
+    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
+    gtk_text_view_set_left_margin (GTK_TEXT_VIEW(view), DEFAULT_PADDING);
+    gtk_text_view_set_right_margin (GTK_TEXT_VIEW(view), DEFAULT_PADDING);
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-    gtk_text_buffer_set_text (buffer, "You can type some text inside this GTKTextView or load text from a file", -1);
+    gtk_text_buffer_set_text (buffer, "You can type some text inside this GTKTextView or load text from a file by entering its name inside the above GtkEntry and see it rendered here", -1);
     scroll = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (scroll), view);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (scroll), view);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-
-	buttonbox = gtk_hbox_new (TRUE, 5);
-	button = gtk_button_new_with_label("Reload gtkrc");
+    buttonbox = gtk_hbox_new (TRUE, DEFAULT_PADDING);
+    button = gtk_button_new_with_label("Reload gtkrc");
     g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (reload_gtkrc_callback), G_OBJECT (window));
-    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, 5);
-   	button = gtk_button_new_with_label("Screenshot");
+    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING);
+    button = gtk_button_new_with_label("Screenshot");
     g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (screenshot_callback), G_OBJECT (view));
-    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, 5);  
-   	button = gtk_button_new_with_label("Quit");
+    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING);  
+    button = gtk_button_new_with_label("Quit");
     g_signal_connect_swapped (G_OBJECT (button), "clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (view));
-    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, 5); 
+    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING); 
 
-	entrybox = gtk_hbox_new (FALSE, 5);
+    entrybox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
     entry = gtk_entry_new ();
     gtk_entry_set_text (GTK_ENTRY(entry), "Enter here name of file to be displayed");
     gtk_entry_set_max_length (GTK_ENTRY (entry), 256 );
-   	loadfilebutton = gtk_button_new_with_label("Append file");
+    loadfilebutton = gtk_button_new_with_label("Append file");
     g_signal_connect (G_OBJECT (loadfilebutton), "clicked", G_CALLBACK (loadfile_callback), NULL);
-	clearfilebutton = gtk_button_new_with_label("Clear");
+    clearfilebutton = gtk_button_new_with_label("Clear");
     g_signal_connect (G_OBJECT (clearfilebutton), "clicked", G_CALLBACK (clear_callback), NULL);
-    gtk_box_pack_start(GTK_BOX(entrybox), entry, TRUE, TRUE, 5); 
-    gtk_box_pack_start(GTK_BOX(entrybox), loadfilebutton, FALSE, TRUE, 5); 
-    gtk_box_pack_start(GTK_BOX(entrybox), clearfilebutton, FALSE, TRUE, 5);
+    gtk_box_pack_start(GTK_BOX(entrybox), entry, TRUE, TRUE, DEFAULT_PADDING); 
+    gtk_box_pack_start(GTK_BOX(entrybox), loadfilebutton, FALSE, TRUE, DEFAULT_PADDING); 
+    gtk_box_pack_start(GTK_BOX(entrybox), clearfilebutton, FALSE, TRUE, DEFAULT_PADDING);
 
-    vbox = gtk_vbox_new (FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 5);
-    gtk_box_pack_start(GTK_BOX(vbox), entrybox, FALSE, TRUE, 5);
-    gtk_box_pack_start(GTK_BOX(vbox), buttonbox, FALSE, TRUE, 5);
-    hbox = gtk_hbox_new (FALSE, 5);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 5);
-    
+    vbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX(vbox), entrybox, FALSE, TRUE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX(vbox), buttonbox, FALSE, TRUE, DEFAULT_PADDING);
+    hbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_container_add(GTK_CONTAINER(window), hbox);
 
     gtk_widget_show_all (window);
