@@ -4,4 +4,13 @@ db_get preseed/url || exit 1
 if [ -n "$RET" ]; then
 	exit 0
 fi
+test -x /sbin/dhclient   && LEASE=/var/lib/dhcp/dhclient.leases 
+test -x /sbin/dhclient3  && LEASE=/var/lib/dhcp3/dhclient.leases 
+if [ -r "$LEASE" ]; then
+	FN=$( sed -n -e '/filename/s/.*"\(.*\)"./\1/p' $LEASE )
+	if [ -z "${FN##*://*}" ]; then
+		db_set preseed/url $FN
+		exit 0
+	fi
+fi
 exit 1
