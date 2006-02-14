@@ -16,7 +16,7 @@ fi
 . /usr/lib/user-setup/functions.sh
 
 # Set a password, via chpasswd.
-# Use perl rather than echo, to avoid the password
+# Use a heredoc rather than echo, to avoid the password
 # showing in the process table. (However, this is normally
 # only called when first installing the system, when root has no
 # password at all, so that should be an unnecessary precaution).
@@ -24,22 +24,17 @@ fi
 # Pass in three arguments: the user, the password, and 'true' if the
 # password has been pre-crypted (by preseeding).
 setpassword () {
-	SETPASSWD_PW="$2"
-	export SETPASSWD_PW
-
+	local USER
+	local PASSWD
+	local PRECRYPTED
+	USER="$1"
+	PASSWD="$2"
 	if [ "$3" = true ]; then
-		PRECRYPTED=1
-	else
-		PRECRYPTED=''
+		PRECRYPTED=-e
 	fi
-	export PRECRYPTED
-	$chroot $ROOT perl -e '
-		open(P,"| chpasswd ".($ENV{PRECRYPTED} ? "-e " : "")." -m");
-		print P shift().":$ENV{SETPASSWD_PW}\n";
-		close P;
-	' "$1"
-	SETPASSWD_PW=''
-	PRECRYPTED=''
+	$chroot $ROOT chpasswd $PRECRYPTED -m <<EOF
+$USER:$PASSWD
+EOF
 }
 
 # Enable/disable shadow passwords.
