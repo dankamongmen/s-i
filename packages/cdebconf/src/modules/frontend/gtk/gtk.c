@@ -239,8 +239,9 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
         char *text = q_get_description(obj->info);
         if (text) {
             message = malloc(strlen(text) + 8 );
+            /* TODO */
             /* setting custom font colours would make GTKDFB 2.0.9 crash */
-            /* this issue has already been fixed in GTKDFB 2.8.3 */
+            /* this issue has already been fixed in recent GTKDFB verions */
             /* sprintf(message,"<b><span foreground=\"#ffffff\">%s</span></b>", text); */
             sprintf(message,"<b>%s</b>", text);
             layout = gtk_widget_create_pango_layout(wid, NULL);
@@ -431,7 +432,7 @@ void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_
         sprintf(str_iter_index, "%d", i);
         path  = gtk_tree_path_new_from_string(str_iter_index);
 
-        /*
+        /* TODO
          * The above hack is needed since gtk_tree_path_new_from_indices()
          * was implemented first in GTK v. 2.2
          * path  = gtk_tree_path_new_from_indices ( i, -1);
@@ -455,7 +456,6 @@ void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_
         result = g_strdup("");
 
     question_setvalue(q, result);
-//  printf("result: %s\n",result);
     free(result);
     free(choices);
     free(choices_translated);
@@ -583,16 +583,6 @@ GtkWidget* display_descriptions(struct question *q, struct frontend *obj)
         gtk_text_view_set_editable (GTK_TEXT_VIEW(ext_description_view), FALSE);
         gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(ext_description_view), FALSE);
         gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(ext_description_view), GTK_WRAP_WORD);
-        /*
-         * gtk_text_buffer_create_tag (ext_description_buffer, "bold", "weight", PANGO_WEIGHT_BOLD, NULL);
-         * gtk_text_buffer_create_tag (ext_description_buffer, "italic", "style", PANGO_STYLE_ITALIC, NULL);
-         * g_object_set_data (G_OBJECT (ext_description_view), "tag", "bold");
-         * g_object_set_data (G_OBJECT (ext_description_view), "tag", "italic");
-         * gtk_text_buffer_get_start_iter  (ext_description_buffer, &start);
-         * gtk_text_buffer_get_end_iter  (ext_description_buffer, &end);
-         * gtk_text_buffer_apply_tag_by_name (ext_description_buffer, "bold", &start, &end);
-         * gtk_text_buffer_apply_tag_by_name (ext_description_buffer, "italic", &start, &end);
-         */
         gtk_widget_modify_base(GTK_WIDGET(ext_description_view), GTK_STATE_NORMAL, bg_color);
     }
 
@@ -1001,8 +991,8 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
         gtk_list_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
         if (defval && strcmp(choices[tindex[i]], defval) == 0)
         {
-            /* gtk_tree_view_scroll_to_cell() works only with GTKDFB 2.7/2.8
-             * and it doesn't with GTKDFB 2.0.9
+            /* TODO
+             * gtk_tree_view_scroll_to_cell() is broken in GTKDFB 2.0.9
              */
             path = gtk_tree_model_get_path(model, &iter);
             gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
@@ -1384,8 +1374,9 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 
     /* Here the the progressbar is placed */
     progress_bar = gtk_progress_bar_new ();
-    ((struct frontend_data*)obj->data)->progress_bar = progress_bar;
-    /* gtk_progress_bar_set_ellipsize() was introduced in GTK v 2.6.0
+    ((struct frontend_data*)obj->data)->progress_bar = progress_bar;  
+    /* TODO
+     * gtk_progress_bar_set_ellipsize() was introduced in GTK v 2.6.0
      * so this nice and useful function won't be usable while we're stuck
      * with GTKDFB 2.0.9
      */
@@ -1568,10 +1559,8 @@ static int gtk_go(struct frontend *obj)
     gtk_button_set_label (GTK_BUTTON(data->button_prev), get_text(obj, "debconf/button-goback", "Go Back") );
     gtk_button_set_label (GTK_BUTTON(data->button_next), get_text(obj, "debconf/button-continue", "Continue") );
 
-    /* gtk_button_set_image() was first implemented in GTK v. 2.6 while
-     * the most recent working build of GTK with GDK DFB support is 2.0.9,
-     * so we'll have to stay with text-only arrows until GDK DFB library
-     * is update to compile with GTK v 2.8 :(
+    /* TODO
+     * gtk_button_set_image() was first implemented in GTK v. 2.6
      */
 
     /* image_button_back = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_SMALL_TOOLBAR ); */
