@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install-methods\n"
 "POT-Creation-Date: 2006-01-03 19:55+0000\n"
-"PO-Revision-Date: 2006-02-15 17:16+0100\n"
+"PO-Revision-Date: 2006-02-16 00:21+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -89,7 +89,7 @@ msgstr "Installationsfiler för Alpha"
 #: install-methods.xml:114
 #, no-c-format
 msgid "If you choose to boot from ARC console firmware using <command>MILO</command>, you will also need to prepare a disk containing <command>MILO</command> and <command>LINLOAD.EXE</command> from the provided disk images. See <xref linkend=\"alpha-firmware\"/> for more information on Alpha firmware and boot loaders. The floppy images can be found in the <filename>MILO</filename> directory as <filename>milo_<replaceable>subarchitecture</replaceable>.bin</filename>."
-msgstr "Om du väljer att starta från ARC-konsollens firmware med <command>MILO</command> behöver du att förbereda en disk som innehåller <command>MILO</command> och <command>LINLOAD.EXE</command> från den angivna diskavbilden. Se <xref linkend=\"alpha-firmware\"/> för mer information om Alpha-firmware och startladdare. Diskettavbilder kan hittas i katalogen <filename>MILO</filename> som <filename>milo_<replaceable>underarkitektur</replaceable>.bin</filename>."
+msgstr "Om du väljer att starta från ARC-konsollens firmware med <command>MILO</command> behöver du att förbereda en disk som innehåller <command>MILO</command> och <command>LINLOAD.EXE</command> från den angivna diskavbilden. Se <xref linkend=\"alpha-firmware\"/> för mer information om Alpha-firmware och startprogram. Diskettavbilder kan hittas i katalogen <filename>MILO</filename> som <filename>milo_<replaceable>underarkitektur</replaceable>.bin</filename>."
 
 #. Tag: para
 #: install-methods.xml:125
@@ -501,7 +501,7 @@ msgstr ""
 #: install-methods.xml:693
 #, no-c-format
 msgid "Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and copy the following files from the Debian archives to the stick: <itemizedlist> <listitem><para> <filename>vmlinuz</filename> (kernel binary) </para></listitem> <listitem><para> <filename>initrd.gz</filename> (initial ramdisk image) </para></listitem> <listitem><para> <filename>syslinux.cfg</filename> (SYSLINUX configuration file) </para></listitem> <listitem><para> Optional kernel modules </para></listitem> </itemizedlist> If you want to rename the files, please note that <command>SYSLINUX</command> can only process DOS (8.3) file names."
-msgstr ""
+msgstr "Montera partitionen (<userinput>mount /dev/sda1 /mnt</userinput>) och kopiera följande filer från Debian-arkiven till minnet: <itemizedlist> <listitem><para> <filename>vmlinuz</filename> (kärnbinär) </para></listitem> <listitem><para> <filename>initrd.gz</filename> (initial ramdiskavbild) </para></listitem> <listitem><para> <filename>syslinux.cfg</filename> (konfigurationsfil för SYSLINUX) </para></listitem> <listitem><para> Valfria kärnmoduler </para></listitem> </itemizedlist> Om du vill byta namn på filerna, vänligen notera att <command>SYSLINUX</command> endast kan behandla DOS-filnamn (8.3)."
 
 #. Tag: para
 #: install-methods.xml:724
@@ -512,6 +512,10 @@ msgid ""
 "append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw\n"
 "</screen></informalexample> Please note that the <userinput>ramdisk_size</userinput> parameter may need to be increased, depending on the image you are booting."
 msgstr ""
+"Konfigurationsfilen <filename>syslinux.cfg</filename> bör innehålla de två följande raderna: <informalexample><screen>\n"
+"default vmlinuz\n"
+"append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw\n"
+"</screen></informalexample> Vänligen notera att parametern <userinput>ramdisk_size</userinput> kan behöva ökas, beroende på avbilden du startar upp."
 
 #. Tag: para
 #: install-methods.xml:743
@@ -545,7 +549,7 @@ msgstr ""
 #: install-methods.xml:784
 #, no-c-format
 msgid "Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and copy the following files from the Debian archives to the stick:"
-msgstr ""
+msgstr "Montera partitionen (<userinput>mount /dev/sda2 /mnt</userinput>) och kopiera följande filer från Debian-arkiven till minnet:"
 
 #. Tag: para
 #: install-methods.xml:790
@@ -594,6 +598,18 @@ msgid ""
 "        read-only\n"
 "</screen></informalexample> Please note that the <userinput>initrd-size</userinput> parameter may need to be increased, depending on the image you are booting."
 msgstr ""
+"Konfigurationsfilen <filename>yaboot.conf</filename> bör innehålla följande rader: <informalexample><screen>\n"
+"default=install\n"
+"root=/dev/ram\n"
+"\n"
+"message=/boot.msg\n"
+"\n"
+"image=/vmlinux\n"
+"        label=install\n"
+"        initrd=/initrd.gz\n"
+"        initrd-size=10000\n"
+"        read-only\n"
+"</screen></informalexample> Vänligen notera att parametern <userinput>initrd-size</userinput> kan behöva ökas, beroende på avbilden du startar upp."
 
 #. Tag: title
 #: install-methods.xml:832
@@ -713,7 +729,7 @@ msgstr "<filename>initrd.gz</filename> (ramdisk-avbild)"
 #: install-methods.xml:949
 #, no-c-format
 msgid "Finally, to configure the bootloader proceed to <xref linkend=\"boot-initrd\"/>."
-msgstr ""
+msgstr "Till slut, för att konfigurera startprogrammet kan du fortsätta till <xref linkend=\"boot-initrd\"/>."
 
 #. Tag: title
 #: install-methods.xml:959
