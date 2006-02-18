@@ -91,9 +91,9 @@ rm -fr ranges all_ranges.txt rangefiles.txt
 mkdir ranges
 
 # associate a .rng file to each .ttf file
-# the rng file contains a sorted list of the unicode coordinates contained in  the ttf file
+# the rng file contains a sorted list of the unicode coordinates contained in the ttf file
 tot_size=0
-for FONTFILE in $(find $1 -name *.ttf) ; do
+for FONTFILE in $(find $1 -name "*.ttf") ; do
     RANGEFILE="ranges/$(basename ${FONTFILE} | sed "s:.ttf$:.rng:")"
     echo $RANGEFILE >> rangefiles.txt
     ./showttf ${FONTFILE} | grep "^Glyph" | awk '{print $7}' | sort | uniq | sed "s|^U+||" > ${RANGEFILE}
