@@ -75,13 +75,17 @@ echo "}"
 exec 1>&7 7>&-
 }
 
-if [ ! -f ./showttf ] ; then
+if type showttf >/dev/null 2>&1; then
+    SHOWTTF="showttf"
+elif [ -f ./showttf ] ; then
+    SHOWTTF="./showttf"
+else
     echo "Error: showttf is needed to run this script"
     exit 1
 fi
 
-if [ ! -d $1 ] ; then
-    echo "$1 does not exist"
+if [ ! -d "$1" ] ; then
+    echo "Error: directory '$1' does not exist"
     exit 1
 fi
 
@@ -90,13 +94,19 @@ fi
 rm -fr ranges all_ranges.txt rangefiles.txt
 mkdir ranges
 
+FONTFILES="$(find $1 -name "*.ttf")"
+if [ -z "$FONTFILES" ] ; then
+    echo "No .ttf files found under '$1'"
+    exit 1
+fi
+
 # associate a .rng file to each .ttf file
 # the rng file contains a sorted list of the unicode coordinates contained in the ttf file
 tot_size=0
-for FONTFILE in $(find $1 -name "*.ttf") ; do
-    RANGEFILE="ranges/$(basename ${FONTFILE} | sed "s:.ttf$:.rng:")"
+for FONTFILE in ${FONTFILES} ; do
+    RANGEFILE="ranges/$(basename ${FONTFILE} | sed "s:\.ttf$:.rng:")"
     echo $RANGEFILE >> rangefiles.txt
-    ./showttf ${FONTFILE} | grep "^Glyph" | awk '{print $7}' | sort | uniq | sed "s|^U+||" > ${RANGEFILE}
+    ${SHOWTTF} ${FONTFILE} | grep "^Glyph" | awk '{print $7}' | sort | uniq | sed "s|^U+||" > ${RANGEFILE}
 
     nglyphs=$(wc -l ${RANGEFILE} | awk '{print $1}')
     size=$(ls -la ${FONTFILE} | awk '{print $5}')
