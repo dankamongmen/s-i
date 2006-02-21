@@ -330,7 +330,7 @@ questions even if the preseeding below misses some.
 
 It's also possible to use DHCP to specify a preseed file to download from
 the network. DHCP allows specifying a filename. Normally this is a file to
-netboot, but it it appears to be an URL then installation media that
+netboot, but if it appears to be an URL then installation media that
 support network preseeding will download the file from the URL and use it
 as a preseed file. Here is an example of how to set it up in the dhcpd.conf
 for version 3 of the ISC DHCP server (the dhcp3-server Debian package).
@@ -344,17 +344,20 @@ if substring (option vendor-class-identifier, 0, 3) = "d-i" {
 </screen></informalexample>
 
 <para>
+
 Note that the above example limits this filename to DHCP clients that identify
 themselves as "d-i", so it will not affect regular DHCP clients, but only
 the installer. You can also put the text in a stanza for only one particular
 host to avoid preseeding all installs on your network.
 
 </para><para>
+
 A good way to use the DHCP preseeding is to only preseed values specific to
 your network, such as the Debian mirror to use. This way installs on your
 network will automatically get a good mirror selected, but the rest of the
 installation can be performed interactively. Using DHCP preseeding to fully
 automate Debian installs should only be done with care.
+
 </para>
 
   <sect2 id="preseed-bootparms">
