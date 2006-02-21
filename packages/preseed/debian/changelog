@@ -10,8 +10,14 @@ preseed (1.13) UNRELEASED; urgency=low
     accidents.
   * Look for dhcp lease files in turn, not based on which dhcp client is
     found, to avoid tight binding to which one netcfg prefers to run.
+  * Load dhcp preseed file first, but then load any specified preseed/url.
+    This allows for using dhcp preseeding for network-global stuff, like
+    mirrors etc, while fully automating installs in the old manner. Note that
+    I chose to let preseed/url override the dhcp preseeding, which should
+    override the other is debatable. Also, there is some code duplication
+    between network-preseed.isinstallable and network-preseed.postinst.
 
- -- Joey Hess <joeyh@debian.org>  Tue, 21 Feb 2006 15:31:17 -0500
+ -- Joey Hess <joeyh@debian.org>  Tue, 21 Feb 2006 15:40:57 -0500
 
 preseed (1.12) unstable; urgency=low
 

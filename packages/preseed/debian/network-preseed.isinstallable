@@ -8,7 +8,6 @@ for file in /var/lib/dhcp/dhclient.leases /var/lib/dhcp3/dhclient.leases; do
 	if [ -r "$file" ]; then
 		FN="$(sed -n -e '/filename/s/.*"\(.*\)"./\1/p' $file)"
 		if [ -z "${FN##*://*}" ]; then
-			db_set preseed/url "$FN"
 			exit 0
 		fi
 	fi
