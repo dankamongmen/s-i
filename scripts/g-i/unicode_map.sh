@@ -100,11 +100,11 @@ if [ -z "$FONTFILES" ] ; then
     exit 1
 fi
 
-# associate a .rng file to each .ttf file
-# the rng file contains a sorted list of the unicode coordinates contained in the ttf file
+# associate a .lst file to each .ttf file
+# the lst file contains a sorted list of the unicode coordinates contained in the ttf file
 tot_size=0
 for FONTFILE in ${FONTFILES} ; do
-    RANGEFILE="ranges/$(basename ${FONTFILE} | sed "s:\.ttf$:.rng:")"
+    RANGEFILE="ranges/$(basename ${FONTFILE} | sed "s:\.ttf$:.lst:")"
     echo $RANGEFILE >> rangefiles.txt
     ${SHOWTTF} ${FONTFILE} | grep "^Glyph" | awk '{print $7}' | sort | uniq | sed "s|^U+||" > ${RANGEFILE}
 
