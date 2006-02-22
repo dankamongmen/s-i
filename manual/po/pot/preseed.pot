@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2006-02-22 20:35+0000\n"
+"POT-Creation-Date: 2006-02-22 20:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,7 @@ msgstr ""
 msgid "This appendix explains the intricacies of preseeding answers to questions in &d-i; to automate your installation."
 msgstr ""
 
-#: preseed.xml:23
+#: preseed.xml:23 preseed.xml:431
 #, no-c-format
 #. Tag: para
 msgid "The configuration fragments used in this appendix are also available as an example preseed file from &urlset-example-preseed;."
@@ -206,5 +206,850 @@ msgstr ""
 msgid ""
       "d-i foo/bar string value\n"
       "d-i foo/bar seen false"
+msgstr ""
+
+#: preseed.xml:247
+#, no-c-format
+#. Tag: title
+msgid "Using preseeding"
+msgstr ""
+
+#: preseed.xml:248
+#, no-c-format
+#. Tag: para
+msgid "Of course you will first need to create a preseed file and place it in the location from where you want to use it. Creating the preseed file is covered later in this appendix. Putting it in the correct location is fairly straightforward for network preseeding or if you want to read the file off a floppy or usb-stick. If you want to include the file on a CD or DVD, you will have to remaster the ISO image. How to get the preseed file included in the initrd is outside the scope of this document; please consult the developers documentation for &d-i;."
+msgstr ""
+
+#: preseed.xml:259
+#, no-c-format
+#. Tag: para
+msgid "An example preseed file that you can use as basis for your preseed file is available from &urlset-example-preseed;. This file is based on the configuration fragments included in this appendix."
+msgstr ""
+
+#: preseed.xml:268
+#, no-c-format
+#. Tag: title
+msgid "Loading the preseed file"
+msgstr ""
+
+#: preseed.xml:269
+#, no-c-format
+#. Tag: para
+msgid "If you are using initrd preseeding, you only have to make sure a file named <filename>preseed.cfg</filename> is included in the root directory of the initrd. The installer will automatically check if this file is present and load it."
+msgstr ""
+
+#: preseed.xml:276
+#, no-c-format
+#. Tag: para
+msgid "For the other preseeding methods you need to tell the installer what file to use when you boot it. This is normally done by passing the kernel a boot parameter, either manually at boot time or by editing the bootloader configuration file (e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end of the append line(s) for the kernel."
+msgstr ""
+
+#: preseed.xml:284
+#, no-c-format
+#. Tag: para
+msgid "If you do specify the preseed file in the bootloader configuration, you might change the configuration so you don't need to hit enter to boot the installer. For syslinux this means setting the timeout to 1 in <filename>syslinux.cfg</filename>."
+msgstr ""
+
+#: preseed.xml:291
+#, no-c-format
+#. Tag: para
+msgid "To make sure the installer gets the right preseed file, you can optionally specify a checksum for the file. Currently this needs to be a md5sum, and if specified it must match the preseed file or the installer will refuse to use it."
+msgstr ""
+
+#: preseed.xml:299
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "Boot parameters to specify:\n"
+      "- if you're netbooting:\n"
+      "  preseed/url=http://host/path/to/preseed.cfg\n"
+      "  preseed/url/checksum=5da499872becccfeda2c4872f9171c3d\n"
+      "\n"
+      "- if you're booting a remastered CD:\n"
+      "  preseed/file=/cdrom/preseed.cfg\n"
+      "  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d\n"
+      "\n"
+      "- if you're installing from USB media (put the preseed file in the\n"
+      "  toplevel directory of the USB stick):\n"
+      "  preseed/file=/hd-media/preseed.cfg\n"
+      "  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d"
+msgstr ""
+
+#: preseed.xml:301
+#, no-c-format
+#. Tag: para
+msgid "While you're at it, you may want to add a boot parameter <userinput>debconf/priority=critical</userinput>. This will avoid most questions even if the preseeding below misses some."
+msgstr ""
+
+#: preseed.xml:311
+#, no-c-format
+#. Tag: title
+msgid "Using a DHCP server to specify preseed files"
+msgstr ""
+
+#: preseed.xml:312
+#, no-c-format
+#. Tag: para
+msgid "It's also possible to use DHCP to specify a preseed file to download from the network. DHCP allows specifying a filename. Normally this is a file to netboot, but if it appears to be an URL then installation media that support network preseeding will download the file from the URL and use it as a preseed file. Here is an example of how to set it up in the dhcpd.conf for version 3 of the ISC DHCP server (the dhcp3-server Debian package)."
+msgstr ""
+
+#: preseed.xml:323
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "if substring (option vendor-class-identifier, 0, 3) = \"d-i\" {\n"
+      "        filename \"http://host/preseed.cfg\";\n"
+      "}"
+msgstr ""
+
+#: preseed.xml:325
+#, no-c-format
+#. Tag: para
+msgid "Note that the above example limits this filename to DHCP clients that identify themselves as \"d-i\", so it will not affect regular DHCP clients, but only the installer. You can also put the text in a stanza for only one particular host to avoid preseeding all installs on your network."
+msgstr ""
+
+#: preseed.xml:332
+#, no-c-format
+#. Tag: para
+msgid "A good way to use the DHCP preseeding is to only preseed values specific to your network, such as the Debian mirror to use. This way installs on your network will automatically get a good mirror selected, but the rest of the installation can be performed interactively. Using DHCP preseeding to fully automate Debian installs should only be done with care."
+msgstr ""
+
+#: preseed.xml:344
+#, no-c-format
+#. Tag: title
+msgid "Using boot parameters to supplement preseeding"
+msgstr ""
+
+#: preseed.xml:345
+#, no-c-format
+#. Tag: para
+msgid "Some parts of the installation process cannot be automated using some forms of preseeding because the questions are asked before the preseed file is loaded. For example, if the preseed file is downloaded over the network, the network setup must be done first. One reason to use initrd preseeding is that it allows preseeding of even these early steps of the installation process."
+msgstr ""
+
+#: preseed.xml:354
+#, no-c-format
+#. Tag: para
+msgid "If a preseed file cannot be used to preseed some steps, the install can still be fully automated, since you can pass preseed values to the kernel on the command line. Just pass <userinput>path/to/var=value</userinput> for any of the preseed variables listed in the examples."
+msgstr ""
+
+#: preseed.xml:362
+#, no-c-format
+#. Tag: para
+msgid "The 2.4 kernel accepts a maximum of 8 command line options and 8 environment options (including any options added by default for the installer). If these numbers are exceeded, 2.4 kernels will drop any excess options and 2.6 kernels will panic. For kernel 2.6.9 and later, you can use 32 command line options and 32 environment options."
+msgstr ""
+
+#: preseed.xml:371
+#, no-c-format
+#. Tag: para
+msgid "For most installations some of the default options in your bootloader configuration file, like 'vga=normal', may be safely removed which may allow you to add more options for preseeding."
+msgstr ""
+
+#: preseed.xml:378
+#, no-c-format
+#. Tag: para
+msgid "It may not always be possible to specify values with spaces for boot parameters, even if you delimit them with quotes."
+msgstr ""
+
+#: preseed.xml:388
+#, no-c-format
+#. Tag: title
+msgid "Creating a preseed file"
+msgstr ""
+
+#: preseed.xml:389
+#, no-c-format
+#. Tag: para
+msgid "The preconfiguration file is in the format used by the <command>debconf-set-selections</command> command."
+msgstr ""
+
+#: preseed.xml:397
+#, no-c-format
+#. Tag: para
+msgid "File format"
+msgstr ""
+
+#: preseed.xml:400
+#, no-c-format
+#. Tag: para
+msgid "Only single space allowed between template type and value"
+msgstr ""
+
+#: preseed.xml:403
+#, no-c-format
+#. Tag: para
+msgid "Relation with /var/lib/(c)debconf/templates"
+msgstr ""
+
+#: preseed.xml:406
+#, no-c-format
+#. Tag: para
+msgid "Types of templates and how to provide values for them"
+msgstr ""
+
+#: preseed.xml:409
+#, no-c-format
+#. Tag: para
+msgid "Most values need to be in English or codes"
+msgstr ""
+
+#: preseed.xml:412
+#, no-c-format
+#. Tag: para
+msgid "Using a manual installation as base"
+msgstr ""
+
+#: preseed.xml:415
+#, no-c-format
+#. Tag: para
+msgid "Finding other possible values"
+msgstr ""
+
+#: preseed.xml:420
+#, no-c-format
+#. Tag: para
+msgid "To check if the format of your preseed file is valid before performing an install, you can use the command <command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>."
+msgstr ""
+
+#: preseed.xml:430
+#, no-c-format
+#. Tag: title
+msgid "Contents of the preseed file"
+msgstr ""
+
+#: preseed.xml:436
+#, no-c-format
+#. Tag: para
+msgid "Note that this example is based on an installation for the Intel x86 architecture. If you are installing a different architecture, some of the examples (like keyboard selection and bootloader installation) may not be relevant and will need to be replaced by debconf settings appropriate for your architecture."
+msgstr ""
+
+#: preseed.xml:447
+#, no-c-format
+#. Tag: title
+msgid "Localization"
+msgstr ""
+
+#: preseed.xml:448
+#, no-c-format
+#. Tag: para
+msgid "Setting localization values will only work if you are using initrd preseeding. With all other methods the preseed file will only be loaded after these questions have been asked."
+msgstr ""
+
+#: preseed.xml:454
+#, no-c-format
+#. Tag: para
+msgid "The locale can be used to specify both language and country. To specify the locale as a boot parameter, use <userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>."
+msgstr ""
+
+#: preseed.xml:460
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# Locale sets language and country.\n"
+      "d-i debian-installer/locale string en_US"
+msgstr ""
+
+#: preseed.xml:462
+#, no-c-format
+#. Tag: para
+msgid "Keyboard configuration consists of selecting a keyboard architecture and a keymap. In most cases the correct keyboard architecture is selected by default, so there's normally no need to preseed it. The keymap must be valid for the selected keyboard architecture."
+msgstr ""
+
+#: preseed.xml:469
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# Keyboard selection.\n"
+      "#d-i console-tools/archs select at\n"
+      "d-i console-keymaps-at/keymap select us\n"
+      "# Example for a different keyboard architecture\n"
+      "#d-i console-keymaps-usb/keymap select mac-usb-us"
+msgstr ""
+
+#: preseed.xml:471
+#, no-c-format
+#. Tag: para
+msgid "To skip keyboard configuration preseed <classname>console-tools/archs</classname> with <userinput>skip-config</userinput>. This will result in the kernel keymap remaining active."
+msgstr ""
+
+#: preseed.xml:480
+#, no-c-format
+#. Tag: para
+msgid "The changes in the input layer for 2.6 kernels have made the keyboard architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote> (<userinput>at</userinput>) keymap should be selected."
+msgstr ""
+
+#: preseed.xml:490
+#, no-c-format
+#. Tag: title
+msgid "Network configuration"
+msgstr ""
+
+#: preseed.xml:491
+#, no-c-format
+#. Tag: para
+msgid "Of course, preseeding the network configuration won't work if you're loading your preseed file from the network. But it's great when you're booting from CD or USB stick. If you are loading preseed files from the network, you can pass network config parameters in using kernel boot parameters."
+msgstr ""
+
+#: preseed.xml:499
+#, no-c-format
+#. Tag: para
+msgid "If you need to pick a particular interface when netbooting before loading a preseed file from the network, use a boot parameter such as <userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>."
+msgstr ""
+
+#: preseed.xml:507
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# netcfg will choose an interface that has link if possible. This makes it\n"
+      "# skip displaying a list if there is more than one interface.\n"
+      "d-i netcfg/choose_interface select auto\n"
+      "\n"
+      "# To pick a particular interface instead:\n"
+      "#d-i netcfg/choose_interface select eth1\n"
+      "\n"
+      "# If you have a slow dhcp server and the installer times out waiting for\n"
+      "# it, this might be useful.\n"
+      "#d-i netcfg/dhcp_timeout string 60\n"
+      "\n"
+      "# If you prefer to configure the network manually, uncomment this line and\n"
+      "# the static network configuration below.\n"
+      "#d-i netcfg/disable_dhcp boolean true\n"
+      "\n"
+      "# If you want the preseed file to work on systems both with and without \n"
+      "# a dhcp server, uncomment these lines and the static network configuration\n"
+      "# below.\n"
+      "#d-i netcfg/dhcp_failed note\n"
+      "#d-i netcfg/dhcp_options select Configure network manually\n"
+      "\n"
+      "# Static network configuration.\n"
+      "#d-i netcfg/get_nameservers string 192.168.1.1\n"
+      "#d-i netcfg/get_ipaddress string 192.168.1.42\n"
+      "#d-i netcfg/get_netmask string 255.255.255.0\n"
+      "#d-i netcfg/get_gateway string 192.168.1.1\n"
+      "#d-i netcfg/confirm_static boolean true\n"
+      "\n"
+      "# Any hostname and domain names assigned from dhcp take precedence over\n"
+      "# values set here. However, setting the values still prevents the questions\n"
+      "# from being shown, even if values come from dhcp.\n"
+      "d-i netcfg/get_hostname string unassigned-hostname\n"
+      "d-i netcfg/get_domain string unassigned-domain\n"
+      "\n"
+      "# Disable that annoying WEP key dialog.\n"
+      "d-i netcfg/wireless_wep string\n"
+      "# The wacky dhcp hostname that some ISPs use as a password of sorts.\n"
+      "#d-i netcfg/dhcp_hostname string radish"
+msgstr ""
+
+#: preseed.xml:512
+#, no-c-format
+#. Tag: title
+msgid "Mirror settings"
+msgstr ""
+
+#: preseed.xml:513
+#, no-c-format
+#. Tag: para
+msgid "Depending on the installation method you use, a mirror may be used both to download additional components of the installer, the base system and to set up the <filename>/etc/apt/sources.list</filename> for the installed system."
+msgstr ""
+
+#: preseed.xml:520
+#, no-c-format
+#. Tag: para
+msgid "The parameter <classname>mirror/suite</classname> determines the suite for the installed system."
+msgstr ""
+
+#: preseed.xml:525
+#, no-c-format
+#. Tag: para
+msgid "The parameter <classname>mirror/udeb/suite</classname> determines the suite for additional components for the installer. It is only useful to set this if components are actually downloaded over the network and should match the suite that was used to build the initrd for the installation method used for the installation. By default the value for <classname>mirror/udeb/suite</classname> is the same as <classname>mirror/suite</classname>."
+msgstr ""
+
+#: preseed.xml:537
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "d-i mirror/country string enter information manually\n"
+      "d-i mirror/http/hostname string http.us.debian.org\n"
+      "d-i mirror/http/directory string /debian\n"
+      "d-i mirror/http/proxy string\n"
+      "\n"
+      "# Suite to install.\n"
+      "#d-i mirror/suite string testing\n"
+      "# Suite to use for loading installer components (optional).\n"
+      "#d-i mirror/udeb/suite string testing"
+msgstr ""
+
+#: preseed.xml:542
+#, no-c-format
+#. Tag: title
+msgid "Partitioning"
+msgstr ""
+
+#: preseed.xml:543
+#, no-c-format
+#. Tag: para
+msgid "Using preseeding to partition the harddisk is very much limited to what is supported by <classname>partman-auto</classname>. You can choose to either partition existing free space on a disk or a whole disk. The layout of the disk can be determined by using a predefined recipe, a custom recipe from a recipe file or a recipe included in the preseed file. It is currently not possible to partition multiple disks using preseeding nor to set up RAID."
+msgstr ""
+
+#: preseed.xml:554
+#, no-c-format
+#. Tag: para
+msgid "The identification of disks is dependent on the order in which their drivers are loaded. If there are multiple disks in the system, make very sure the correct one will be selected before using preseeding."
+msgstr ""
+
+#: preseed.xml:562
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# If the system has free space you can choose to only partition that space.\n"
+      "# Note: the preseed value for this template needs to be localized (translated).\n"
+      "#d-i partman-auto/init_automatically_partition \\\n"
+      "#      select Use the largest continuous free space\n"
+      "\n"
+      "# Alternatively, you can specify a disk to partition. The device name can\n"
+      "# be given in either devfs or traditional non-devfs format.\n"
+      "# For example, to use the first disk devfs knows of:\n"
+      "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
+      "\n"
+      "# You can choose from any of the predefined partitioning recipes.\n"
+      "# Note: the preseed value for this template needs to be localized (translated).\n"
+      "d-i partman-auto/choose_recipe \\\n"
+      "       select All files in one partition (recommended for new users)\n"
+      "#d-i partman-auto/choose_recipe \\\n"
+      "#       select Separate /home partition\n"
+      "#d-i partman-auto/choose_recipe \\\n"
+      "#       select Separate /home, /usr, /var, and /tmp partitions\n"
+      "\n"
+      "# Or provide a recipe of your own...\n"
+      "# The recipe format is documented in the file devel/partman-auto-recipe.txt.\n"
+      "# If you have a way to get a recipe file into the d-i environment, you can\n"
+      "# just point at it.\n"
+      "#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
+      "\n"
+      "# If not, you can put an entire recipe the preseed file in one (logical)\n"
+      "# line. This example creates a small /boot partition, suitable swap, and\n"
+      "# uses the rest of the space for the root partition:\n"
+      "#d-i partman-auto/expert_recipe string                         \\\n"
+      "#      boot-root ::                                            \\\n"
+      "#              40 50 100 ext3                                  \\\n"
+      "#                      $primary{ } $bootable{ }                \\\n"
+      "#                      method{ format } format{ }              \\\n"
+      "#                      use_filesystem{ } filesystem{ ext3 }    \\\n"
+      "#                      mountpoint{ /boot }                     \\\n"
+      "#              .                                               \\\n"
+      "#              500 10000 1000000000 ext3                       \\\n"
+      "#                      method{ format } format{ }              \\\n"
+      "#                      use_filesystem{ } filesystem{ ext3 }    \\\n"
+      "#                      mountpoint{ / }                         \\\n"
+      "#              .                                               \\\n"
+      "#              64 512 300% linux-swap                          \\\n"
+      "#                      method{ swap } format{ }                \\\n"
+      "#              .\n"
+      "\n"
+      "# This makes partman automatically partition without confirmation.\n"
+      "d-i partman/confirm_write_new_label boolean true\n"
+      "d-i partman/choose_partition \\\n"
+      "       select Finish partitioning and write changes to disk\n"
+      "d-i partman/confirm boolean true"
+msgstr ""
+
+#: preseed.xml:567
+#, no-c-format
+#. Tag: title
+msgid "Clock and time zone setup"
+msgstr ""
+
+#: preseed.xml:569
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# Controls whether or not the hardware clock is set to UTC.\n"
+      "d-i clock-setup/utc boolean true\n"
+      "\n"
+      "# You may set this to any valid setting for $TZ; see the contents of\n"
+      "# /usr/share/zoneinfo/ for valid values.\n"
+      "d-i time/zone string US/Eastern"
+msgstr ""
+
+#: preseed.xml:574
+#, no-c-format
+#. Tag: title
+msgid "Apt setup"
+msgstr ""
+
+#: preseed.xml:575
+#, no-c-format
+#. Tag: para
+msgid "Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration options is fully automated based on your installation method and answers to earlier questions. Only the three variables below are relevant for preseeding."
+msgstr ""
+
+#: preseed.xml:583
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# You can choose to install non-free and contrib software.\n"
+      "#d-i apt-setup/non-free boolean true\n"
+      "#d-i apt-setup/contrib boolean true\n"
+      "# To avoid adding security sources, or to use a different server\n"
+      "# than security.debian.org.\n"
+      "#d-i apt-setup/security_host string"
+msgstr ""
+
+#: preseed.xml:588
+#, no-c-format
+#. Tag: title
+msgid "Account setup"
+msgstr ""
+
+#: preseed.xml:589
+#, no-c-format
+#. Tag: para
+msgid "The password for the root account and name and password for a first regular user's account can be preseeded. For the passwords you can use either clear text values or MD5 <emphasis>hashes</emphasis>."
+msgstr ""
+
+#: preseed.xml:596
+#, no-c-format
+#. Tag: para
+msgid "Be aware that preseeding passwords is not completely secure as everyone with access to the preseed file will have the knowledge of these passwords. Using MD5 hashes is considered slightly better in terms of security but it might also give a false sense of security as access to a MD5 hash allows for brute force attacks."
+msgstr ""
+
+#: preseed.xml:606
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# Root password, either in clear text\n"
+      "#d-i passwd/root-password password r00tme\n"
+      "#d-i passwd/root-password-again password r00tme\n"
+      "# or encrypted using an MD5 hash.\n"
+      "#d-i passwd/root-password-crypted password [MD5 hash]\n"
+      "\n"
+      "# Skip creation of a normal user account.\n"
+      "#d-i passwd/make-user boolean false\n"
+      "\n"
+      "# Alternatively, create a normal user account.\n"
+      "#d-i passwd/user-fullname string Debian User\n"
+      "#d-i passwd/username string debian\n"
+      "# Normal user's password, either in clear text\n"
+      "#d-i passwd/user-password password insecure\n"
+      "#d-i passwd/user-password-again password insecure\n"
+      "# or encrypted using an MD5 hash.\n"
+      "#d-i passwd/user-password-crypted password [MD5 hash]"
+msgstr ""
+
+#: preseed.xml:608
+#, no-c-format
+#. Tag: para
+msgid "The <classname>passwd/root-password-crypted</classname> and <classname>passwd/user-password-crypted</classname> variables can also be preseeded with <quote>!</quote> as their value. In that case, the corresponding account is disabled. This may be convenient for the root account, provided of course that an alternate method is setup to allow administrative activities or root login (for instance by using SSH key authentication or sudo)."
+msgstr ""
+
+#: preseed.xml:618
+#, no-c-format
+#. Tag: para
+msgid "An MD5 hash for a password can be generated using the following command."
+msgstr ""
+
+#: preseed.xml:622
+#, no-c-format
+#. Tag: screen
+msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+msgstr ""
+
+#: preseed.xml:628
+#, no-c-format
+#. Tag: title
+msgid "Base system installation"
+msgstr ""
+
+#: preseed.xml:629
+#, no-c-format
+#. Tag: para
+msgid "There is actually not very much that can be preseeded for this stage of the installation. The only questions asked concern the installation of the kernel."
+msgstr ""
+
+#: preseed.xml:636
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
+      "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+msgstr ""
+
+#: preseed.xml:641
+#, no-c-format
+#. Tag: title
+msgid "Boot loader installation"
+msgstr ""
+
+#: preseed.xml:643
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# Grub is the default boot loader (for x86). If you want lilo installed\n"
+      "# instead, uncomment this:\n"
+      "#d-i grub-installer/skip boolean true\n"
+      "\n"
+      "# This is fairly safe to set, it makes grub install automatically to the MBR\n"
+      "# if no other operating system is detected on the machine.\n"
+      "d-i grub-installer/only_debian boolean true\n"
+      "\n"
+      "# This one makes grub-installer install to the MBR if if finds some other OS\n"
+      "# too, which is less safe as it might not be able to boot that other OS.\n"
+      "d-i grub-installer/with_other_os boolean true\n"
+      "\n"
+      "# Alternatively, if you want to install to a location other than the mbr,\n"
+      "# uncomment and edit these lines:\n"
+      "#d-i grub-installer/bootdev  string (hd0,0)\n"
+      "#d-i grub-installer/only_debian boolean false\n"
+      "#d-i grub-installer/with_other_os boolean false"
+msgstr ""
+
+#: preseed.xml:648
+#, no-c-format
+#. Tag: title
+msgid "Package selection"
+msgstr ""
+
+#: preseed.xml:649
+#, no-c-format
+#. Tag: para
+msgid "You can choose to install any combination of tasks that are available. Available tasks as of this writing include:"
+msgstr ""
+
+#: preseed.xml:658
+#, no-c-format
+#. Tag: userinput
+msgid "Standard system"
+msgstr ""
+
+#: preseed.xml:661
+#, no-c-format
+#. Tag: userinput
+msgid "Desktop environment"
+msgstr ""
+
+#: preseed.xml:664
+#, no-c-format
+#. Tag: userinput
+msgid "Web server"
+msgstr ""
+
+#: preseed.xml:667
+#, no-c-format
+#. Tag: userinput
+msgid "Print server"
+msgstr ""
+
+#: preseed.xml:670
+#, no-c-format
+#. Tag: userinput
+msgid "DNS server"
+msgstr ""
+
+#: preseed.xml:673
+#, no-c-format
+#. Tag: userinput
+msgid "File server"
+msgstr ""
+
+#: preseed.xml:676
+#, no-c-format
+#. Tag: userinput
+msgid "Mail server"
+msgstr ""
+
+#: preseed.xml:679
+#, no-c-format
+#. Tag: userinput
+msgid "SQL database"
+msgstr ""
+
+#: preseed.xml:682
+#, no-c-format
+#. Tag: userinput
+msgid "Laptop"
+msgstr ""
+
+#: preseed.xml:686
+#, no-c-format
+#. Tag: para
+msgid "You can also choose to install no tasks, and force the installation of a set of packages in some other way. We recommend always including the <userinput>Standard system</userinput> task."
+msgstr ""
+
+#: preseed.xml:694
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "tasksel tasksel/first multiselect Standard system, Desktop environment\n"
+      "#tasksel tasksel/first multiselect Standard system, Web server\n"
+      "\n"
+      "# Some versions of the installer can report back on what software you have\n"
+      "# installed, and what software you use. The default is not to report back,\n"
+      "# but sending reports helps the project determine what software is most\n"
+      "# popular and include it on CDs.\n"
+      "#popularity-contest popularity-contest/participate boolean false"
+msgstr ""
+
+#: preseed.xml:699
+#, no-c-format
+#. Tag: title
+msgid "Finishing up the first stage install"
+msgstr ""
+
+#: preseed.xml:701
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# Avoid that last message about the install being complete.\n"
+      "d-i prebaseconfig/reboot_in_progress note\n"
+      "\n"
+      "# This will prevent the installer from ejecting the CD during the reboot,\n"
+      "# which is useful in some situations.\n"
+      "#d-i cdrom-detect/eject boolean false"
+msgstr ""
+
+#: preseed.xml:706
+#, no-c-format
+#. Tag: title
+msgid "Mailer configuration"
+msgstr ""
+
+#: preseed.xml:707
+#, no-c-format
+#. Tag: para
+msgid "During a normal install, exim asks only a few questions. Here's how to avoid even those. More complicated preseeding is possible."
+msgstr ""
+
+#: preseed.xml:714
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "exim4-config exim4/dc_eximconfig_configtype \\\n"
+      "       select no configuration at this time\n"
+      "exim4-config exim4/no_config boolean true\n"
+      "exim4-config exim4/no_config boolean true\n"
+      "exim4-config exim4/dc_postmaster string"
+msgstr ""
+
+#: preseed.xml:719
+#, no-c-format
+#. Tag: title
+msgid "X configuration"
+msgstr ""
+
+#: preseed.xml:720
+#, no-c-format
+#. Tag: para
+msgid "Preseeding Debian's X config is possible, but you probably need to know some details about the video hardware of the machine, since Debian's X configurator does not do fully automatic configuration of everything."
+msgstr ""
+
+#: preseed.xml:728
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# X can detect the right driver for some cards, but if you're preseeding,\n"
+      "# you override whatever it chooses. Still, vesa will work most places.\n"
+      "#xserver-xorg xserver-xorg/config/device/driver select vesa\n"
+      "\n"
+      "# A caveat with mouse autodetection is that if it fails, X will retry it\n"
+      "# over and over. So if it's preseeded to be done, there is a possibility of\n"
+      "# an infinite loop if the mouse is not autodetected.\n"
+      "#xserver-xorg xserver-xorg/autodetect_mouse boolean true\n"
+      "\n"
+      "# Monitor autodetection is recommended.\n"
+      "xserver-xorg xserver-xorg/autodetect_monitor boolean true\n"
+      "# Uncomment if you have an LCD display.\n"
+      "#xserver-xorg xserver-xorg/config/monitor/lcd boolean true\n"
+      "# X has three configuration paths for the monitor. Here's how to preseed\n"
+      "# the \"medium\" path, which is always available. The \"simple\" path may not\n"
+      "# be available, and the \"advanced\" path asks too many questions.\n"
+      "xserver-xorg xserver-xorg/config/monitor/selection-method \\\n"
+      "       select medium\n"
+      "xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
+      "       select 1024x768 @ 60 Hz"
+msgstr ""
+
+#: preseed.xml:733
+#, no-c-format
+#. Tag: title
+msgid "Preseeding other packages"
+msgstr ""
+
+#: preseed.xml:735
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# Depending on what software you choose to install, or if things go wrong\n"
+      "# during the installation process, it's possible that other questions may\n"
+      "# be asked. You can preseed those too, of course. To get a list of every\n"
+      "# possible question that could be asked during an install, do an\n"
+      "# installation, and then run these commands:\n"
+      "#   debconf-get-selections --installer > file\n"
+      "#   debconf-get-selections >> file"
+msgstr ""
+
+#: preseed.xml:741
+#, no-c-format
+#. Tag: title
+msgid "Advanced options"
+msgstr ""
+
+#: preseed.xml:744
+#, no-c-format
+#. Tag: title
+msgid "Shell commands"
+msgstr ""
+
+#: preseed.xml:746
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
+      "# for attempts at buffer overflows or other exploits of the values of a\n"
+      "# preseed file like this one. Only use preseed files from trusted\n"
+      "# locations! To drive that home, and because it's generally useful, here's\n"
+      "# a way to run any shell command you'd like inside the installer,\n"
+      "# automatically.\n"
+      "\n"
+      "# This first command is run as early as possible, just after\n"
+      "# preseeding is read.\n"
+      "#d-i preseed/early_command string anna-install some-udeb\n"
+      "\n"
+      "# This command is run just before the install finishes, but when there is\n"
+      "# still a usable /target directory. You can chroot to /target and use it\n"
+      "# directly, or use the apt-install and in-target commands to easily install\n"
+      "# packages and run commands in the target system.\n"
+      "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
+msgstr ""
+
+#: preseed.xml:751
+#, no-c-format
+#. Tag: title
+msgid "Chainloading preseed files"
+msgstr ""
+
+#: preseed.xml:752
+#, no-c-format
+#. Tag: para
+msgid "It is possible to include other preseed files from a preseed file. Any settings in those files will override pre-existing settings from files loaded earlier. This makes it possible to put, for example, general networking settings for your location in one file and more specific settings for certain configurations in other files."
+msgstr ""
+
+#: preseed.xml:762
+#, no-c-format
+#. Tag: screen
+msgid ""
+      "# More that one file can be listed, separated by spaces; all will be\n"
+      "# loaded. The included files can have preseed/include directives of their\n"
+      "# own as well. Note that if the filenames are relative, they are taken from\n"
+      "# the same directory as the preseed file that includes them.\n"
+      "#d-i preseed/include string x.cfg\n"
+      "\n"
+      "# The installer can optionally verify checksums of preseed files before\n"
+      "# using them. Currently only md5sums are supported, list the md5sums\n"
+      "# in the same order as the list of files to include.\n"
+      "#d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d\n"
+      "\n"
+      "# More flexibly, this runs a shell command and if it outputs the names of\n"
+      "# preseed files, includes those files. \n"
+      "#d-i preseed/include_command \\\n"
+      "#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi"
 msgstr ""
 
