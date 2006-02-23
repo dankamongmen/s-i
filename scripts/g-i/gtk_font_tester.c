@@ -23,7 +23,7 @@
  * look with different fonts.
  *
  * You can compile this application with
- * gcc gtk_font_tester.c -o gtk_font_tester `pkg-config --cflags --libs gtk+-2.0`
+ * gcc gtk_font_tester.c -o gtk_font_tester `pkg-config --cflags --libs gtk+-2.0 gthread-2.0`
 **/
 
 #include <gtk/gtk.h>
@@ -36,9 +36,13 @@
 
 #define DEFAULT_PADDING 6
 
-GtkWidget *window, *scroll, *view, *button, *hbox, *vbox, *buttonbox, *entrybox, *entry, *loadfilebutton, *clearfilebutton;
+GtkWidget *window, *scroll, *view, *button, *button_screenshot, *buttonbox_screenshot, *hbox, *vbox, *buttonbox, *entrybox, *entry, *loadfilebutton, *clearfilebutton;
 GtkTextBuffer *buffer;
 
+char preset_filename[1024];
+int width=800 , height=600;
+
+void screenshot_callback(GtkWidget *view );
 
 static void destroy( GtkWidget *widget,
                      gpointer   data )
@@ -53,23 +57,27 @@ static gboolean delete_event( GtkWidget *widget,
     return FALSE;
 } 
 
-
-void loadfile_callback(GtkWidget *button)
+void append_text(char *filename)
 {
-    GtkTextIter *end_iter;
-	char *filename, buf[1024];
 	int fd, i; 
-	filename = (char*)gtk_entry_get_text(GTK_ENTRY(entry));
-
+	char buf[1024];
     if ( access(filename, R_OK) )
     	return;
     	
 	fd=open(filename,O_RDONLY );
 	while ( (i=read(fd, buf, 1024)) > 0) {
-		gtk_text_buffer_insert_at_cursor (buffer, buf, i);    	
+		gtk_text_buffer_insert_at_cursor (buffer, buf, i);
 	}
-
 	
+}
+
+void loadfile_callback(GtkWidget *button)
+{
+    GtkTextIter *end_iter;
+	char *filename;
+	filename = (char*)gtk_entry_get_text(GTK_ENTRY(entry));
+    append_text(filename);
+
 }
 
 void clear_callback(GtkWidget *button)
@@ -81,6 +89,17 @@ void reload_gtkrc_callback(GtkWidget *button, GtkWidget *view)
 {
     gtk_rc_reparse_all();
     
+}
+
+void screenshot_thread()
+{
+    sleep(1);
+    gdk_threads_enter();
+
+    screenshot_callback(view);
+    gtk_main_quit();    
+
+    gdk_threads_leave();
 }
 
 void screenshot_callback(GtkWidget *view )
@@ -111,58 +130,92 @@ void screenshot_callback(GtkWidget *view )
     gdk_pixbuf_save (gdk_pixbuf, screenshot_name, "png", NULL, NULL);
     g_object_unref(gdk_pixbuf);
 
-    /* A message inside a popup window tells the user the sceenshot has
-     * been saved correctly
-     */
-    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_resizable (GTK_WINDOW (window), FALSE);
-    gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
-    gtk_window_set_decorated (GTK_WINDOW (window), FALSE);
-    gtk_container_set_border_width (GTK_CONTAINER (window), 0);
+    if(strlen(preset_filename) == 0) {
+	    /* A message inside a popup window tells the user the screenshot has
+	     * been saved correctly
+	     */
+        window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+        gtk_window_set_resizable (GTK_WINDOW (window), FALSE);
+        gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
+        gtk_window_set_decorated (GTK_WINDOW (window), FALSE);
+        gtk_container_set_border_width (GTK_CONTAINER (window), 0);
 
-    title_label = gtk_label_new ("Screenshot");
-    gtk_misc_set_alignment(GTK_MISC(title_label), 0, 0);
-    label_title_string = malloc( strlen("Screenshot") + 8 );
-    sprintf(label_title_string,"<b>Screenshot</b>");
-    gtk_label_set_markup(GTK_LABEL(title_label), label_title_string);
-    sprintf(popup_message, "Screenshot saved as %s", screenshot_name );
-    message_label = gtk_label_new (popup_message);
+        title_label = gtk_label_new ("Screenshot");
+        gtk_misc_set_alignment(GTK_MISC(title_label), 0, 0);
+        label_title_string = malloc( strlen("Screenshot") + 8 );
+        sprintf(label_title_string,"<b>Screenshot</b>");
+        gtk_label_set_markup(GTK_LABEL(title_label), label_title_string);
+        sprintf(popup_message, "Screenshot saved as %s", screenshot_name );
+        message_label = gtk_label_new (popup_message);
 
-    actionbox = gtk_hbutton_box_new();
-    gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END);
-    close_button = gtk_button_new_with_label ("Continue");
-    g_signal_connect_swapped (G_OBJECT (close_button), "clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (window));
-    gtk_box_pack_end (GTK_BOX(actionbox), close_button, TRUE, TRUE, DEFAULT_PADDING);
+        actionbox = gtk_hbutton_box_new();
+        gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END);
+        close_button = gtk_button_new_with_label ("Continue");
+        g_signal_connect_swapped (G_OBJECT (close_button), "clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (window));
+        gtk_box_pack_end (GTK_BOX(actionbox), close_button, TRUE, TRUE, DEFAULT_PADDING);
 
-    v_box = gtk_vbox_new(FALSE, DEFAULT_PADDING);
-    gtk_box_pack_start(GTK_BOX (v_box), title_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX (v_box), message_label, FALSE, FALSE, DEFAULT_PADDING);
-    separator = gtk_hseparator_new();
-    gtk_box_pack_start(GTK_BOX (v_box), separator, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX (v_box), actionbox, FALSE, FALSE, 0);
-    h_box = gtk_hbox_new(FALSE, DEFAULT_PADDING);
-    gtk_box_pack_start(GTK_BOX (h_box), v_box, FALSE, FALSE, DEFAULT_PADDING);
-    v_box_outer = gtk_vbox_new(FALSE, DEFAULT_PADDING);
-    gtk_box_pack_start(GTK_BOX (v_box_outer), h_box, FALSE, FALSE, DEFAULT_PADDING);
-    
-    frame = gtk_frame_new(NULL);
-    gtk_frame_set_shadow_type (GTK_FRAME(frame), GTK_SHADOW_OUT);
-    gtk_container_add (GTK_CONTAINER (frame), v_box_outer);
-    gtk_container_add (GTK_CONTAINER (window), frame);
-    gtk_widget_show_all (window);
+        v_box = gtk_vbox_new(FALSE, DEFAULT_PADDING);
+        gtk_box_pack_start(GTK_BOX (v_box), title_label, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX (v_box), message_label, FALSE, FALSE, DEFAULT_PADDING);
+        separator = gtk_hseparator_new();
+        gtk_box_pack_start(GTK_BOX (v_box), separator, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX (v_box), actionbox, FALSE, FALSE, 0);
+        h_box = gtk_hbox_new(FALSE, DEFAULT_PADDING);
+        gtk_box_pack_start(GTK_BOX (h_box), v_box, FALSE, FALSE, DEFAULT_PADDING);
+        v_box_outer = gtk_vbox_new(FALSE, DEFAULT_PADDING);
+        gtk_box_pack_start(GTK_BOX (v_box_outer), h_box, FALSE, FALSE, DEFAULT_PADDING);
+	    
+        frame = gtk_frame_new(NULL);
+        gtk_frame_set_shadow_type (GTK_FRAME(frame), GTK_SHADOW_OUT);
+        gtk_container_add (GTK_CONTAINER (frame), v_box_outer);
+        gtk_container_add (GTK_CONTAINER (window), frame);
+        gtk_widget_show_all (window);
 
-    free(label_title_string);
+	    free(label_title_string);
+    }
+    else {
+        printf("Screenshot saved as \"%s\"\n", screenshot_name);
+    }
 }
 
-int main( int   argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
- 
-    gtk_init (&argc, &argv);
+	GThread *thread_screenshot; 
+	GError *err1 = NULL;
+	
+    if  ( argc == 1 )
+        strcpy( preset_filename, "");
+        
+    else if ( argc == 4 ) {
+        if ( access(argv[1], R_OK) ) {
+            printf ("File %s could not be open\n", argv[1]);
+            exit(0);
             
+        }
+        else {
+            strcpy(preset_filename, argv[1]);
+            width = atoi(argv[2]);
+            height = atoi(argv[3]);
+        }
+    }
+   
+    else {
+        printf ("Usage: %s [FILE WIDTH HEIGHT]\n", argv[0]);
+        exit (0);
+    }
+
+    gtk_init (&argc, &argv);
+
+    if( !g_thread_supported() )
+    {
+       g_thread_init(NULL);
+       gdk_threads_init();
+    }
+  
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     g_signal_connect (G_OBJECT (window), "delete_event", G_CALLBACK (delete_event), NULL);
     g_signal_connect (G_OBJECT (window), "destroy", G_CALLBACK (destroy), NULL);
-    gtk_widget_set_size_request (window, 800, 600);
+    gtk_widget_set_size_request (window, width, height);
 
     view = gtk_text_view_new ();
     gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(view), GTK_WRAP_WORD);
@@ -170,42 +223,58 @@ int main( int   argc, char *argv[] )
     gtk_text_view_set_right_margin (GTK_TEXT_VIEW(view), DEFAULT_PADDING);
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
     gtk_text_buffer_set_text (buffer, "You can type some text inside this GTKTextView or load text from a file by entering its name inside the above GtkEntry and see it rendered here", -1);
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (scroll), view);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
-    buttonbox = gtk_hbox_new (TRUE, DEFAULT_PADDING);
-    button = gtk_button_new_with_label("Reload gtkrc");
-    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (reload_gtkrc_callback), G_OBJECT (window));
-    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING);
-    button = gtk_button_new_with_label("Screenshot");
-    g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (screenshot_callback), G_OBJECT (view));
-    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING);  
-    button = gtk_button_new_with_label("Quit");
-    g_signal_connect_swapped (G_OBJECT (button), "clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (view));
-    gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING); 
-
-    entrybox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
-    entry = gtk_entry_new ();
-    gtk_entry_set_text (GTK_ENTRY(entry), "Enter here name of file to be displayed");
-    gtk_entry_set_max_length (GTK_ENTRY (entry), 256 );
-    loadfilebutton = gtk_button_new_with_label("Append file");
-    g_signal_connect (G_OBJECT (loadfilebutton), "clicked", G_CALLBACK (loadfile_callback), NULL);
-    clearfilebutton = gtk_button_new_with_label("Clear");
-    g_signal_connect (G_OBJECT (clearfilebutton), "clicked", G_CALLBACK (clear_callback), NULL);
-    gtk_box_pack_start(GTK_BOX(entrybox), entry, TRUE, TRUE, DEFAULT_PADDING); 
-    gtk_box_pack_start(GTK_BOX(entrybox), loadfilebutton, FALSE, TRUE, DEFAULT_PADDING); 
-    gtk_box_pack_start(GTK_BOX(entrybox), clearfilebutton, FALSE, TRUE, DEFAULT_PADDING);
-
-    vbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
-    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, DEFAULT_PADDING);
-    gtk_box_pack_start(GTK_BOX(vbox), entrybox, FALSE, TRUE, DEFAULT_PADDING);
-    gtk_box_pack_start(GTK_BOX(vbox), buttonbox, FALSE, TRUE, DEFAULT_PADDING);
     hbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
+    vbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
+
+    if(strlen(preset_filename) == 0) {
+        scroll = gtk_scrolled_window_new(NULL, NULL);
+        gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW (scroll), view);
+        gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    	gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, DEFAULT_PADDING);
+    	
+        buttonbox = gtk_hbox_new (TRUE, DEFAULT_PADDING);
+        button = gtk_button_new_with_label("Reload gtkrc");
+        g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (reload_gtkrc_callback), G_OBJECT (window));
+        gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING);
+        button = gtk_button_new_with_label("Screenshot");
+        g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (screenshot_callback), G_OBJECT (view));
+        gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING);  
+        button = gtk_button_new_with_label("Quit");
+        g_signal_connect_swapped (G_OBJECT (button), "clicked", G_CALLBACK (gtk_widget_destroy), G_OBJECT (view));
+        gtk_box_pack_start(GTK_BOX(buttonbox), button, TRUE, TRUE, DEFAULT_PADDING); 
+
+        entrybox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
+        entry = gtk_entry_new ();
+        gtk_entry_set_text (GTK_ENTRY(entry), "Enter here name of file to be displayed");
+	    gtk_entry_set_max_length (GTK_ENTRY (entry), 256 );
+        loadfilebutton = gtk_button_new_with_label("Append file");
+        g_signal_connect (G_OBJECT (loadfilebutton), "clicked", G_CALLBACK (loadfile_callback), NULL);
+        clearfilebutton = gtk_button_new_with_label("Clear");
+        g_signal_connect (G_OBJECT (clearfilebutton), "clicked", G_CALLBACK (clear_callback), NULL);
+        gtk_box_pack_start(GTK_BOX(entrybox), entry, TRUE, TRUE, DEFAULT_PADDING); 
+        gtk_box_pack_start(GTK_BOX(entrybox), loadfilebutton, FALSE, TRUE, DEFAULT_PADDING); 
+        gtk_box_pack_start(GTK_BOX(entrybox), clearfilebutton, FALSE, TRUE, DEFAULT_PADDING);
+        gtk_box_pack_start(GTK_BOX(vbox), entrybox, FALSE, TRUE, DEFAULT_PADDING);
+        gtk_box_pack_start(GTK_BOX(vbox), buttonbox, FALSE, TRUE, DEFAULT_PADDING);
+    }
+    else {
+        gtk_box_pack_start(GTK_BOX(vbox), view, TRUE, TRUE, DEFAULT_PADDING);
+        append_text(preset_filename);
+    }
+
     gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, DEFAULT_PADDING);
     gtk_container_add(GTK_CONTAINER(window), hbox);
 
     gtk_widget_show_all (window);
+
+    if(strlen(preset_filename) > 0) {
+    	if( (thread_screenshot = g_thread_create((GThreadFunc)screenshot_thread, NULL, TRUE, &err1)) == NULL) {
+		    printf("Thread create failed: %s!!\n", err1->message );
+            g_error_free ( err1 ) ;
+            exit(0);
+        }   
+    }
 
     gtk_main ();
     
