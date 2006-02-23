@@ -75,26 +75,12 @@ load_module() {
 	local devs=""
 	local olddevs=""
 	local newdev=""
-	local params=""
     
-	if [ "$PROMPT_MODULE_PARAMS" = 1 ]; then
-		db_register hw-detect/module_params hw-detect/module_params/$module
-		db_subst hw-detect/module_params/$module MODULE "$module"
-		db_input low hw-detect/module_params/$module || [ $? -eq 30 ]
-		db_go
-		db_get hw-detect/module_params/$module
-		params="$RET"
-	fi
-	
 	old=`cat /proc/sys/kernel/printk`
 	echo 0 > /proc/sys/kernel/printk
     
 	devs="$(snapshot_devs)"
-	if log-output -t hw-detect modprobe -v "$module" "$params"; then
-		if [ "$params" != "" ]; then
-			register-module "$module" "$params"
-		fi
-	
+	if log-output -t hw-detect modprobe -v "$module"; then
 		olddevs="$devs"
 		devs="$(snapshot_devs)"
 		newdevs="$(compare_devs "$olddevs" "$devs")"
@@ -112,7 +98,7 @@ load_module() {
 	else   
 		log "Error loading '$module'"
 		if [ "$module" != floppy ] && [ "$module" != ide-floppy ] && [ "$module" != ide-cd ]; then
-			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
+			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 			db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
 			db_go
 		fi
@@ -431,15 +417,6 @@ if [ "$LIST" ]; then
 	db_go || exit 10 # back up
 	db_get hw-detect/select_modules
 	LIST="$RET"
-fi
-
-db_input low hw-detect/prompt_module_params || true
-db_go || exit 10 # back up
-db_get hw-detect/prompt_module_params
-if [ "$RET" = true ]; then
-	PROMPT_MODULE_PARAMS=1
-else
-	PROMPT_MODULE_PARAMS=0
 fi
 
 list_to_lines() {

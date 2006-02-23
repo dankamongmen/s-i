@@ -114,59 +114,41 @@ ethernet_found() {
 module_probe() {
 	local module="$1"
 	local priority="$2"
-	local template="hw-detect/module_params"
 	local question="$template/$module"
 	local modinfo=""
 	local devs=""
 	local olddevs=""
 	local newdev=""
-	local prompted_params=""
 	
 	devs="$(snapshot_devs)"
 
-	db_register "$template" "$question"
-	db_subst "$question" MODULE "$module"
-	if db_input $priority "$question"; then
-		prompted_params=1
-	fi
-	db_go
-	db_get "$question"
-	local params="$RET"
-	
-	if ! log-output -t ethdetect modprobe -v "$module" "$params"; then
-		if [ -z "$params" ] && [ ! "$prompted_params" ]; then
-			# Prompt the user for parameters for the module.
-			template="hw-detect/retry_params"
-			db_unregister "$question"
-			db_register "$template" "$question"
-			db_subst "$question" MODULE "$module"
-			db_input critical "$question" || [ $? -eq 30 ]
-			db_go
-			db_get "$question"
-			params="$RET"
+	if ! log-output -t ethdetect modprobe -v "$module"; then
+		# Prompt the user for parameters for the module.
+		local template="hw-detect/retry_params"
+		db_unregister "$question"
+		db_register "$template" "$question"
+		db_subst "$question" MODULE "$module"
+		db_input critical "$question" || [ $? -eq 30 ]
+		db_go
+		db_get "$question"
+		local params="$RET"
 
-			if [ -n "$params" ] && \
-			   ! log-output -t ethdetect modprobe -v "$module" $params; then
+		if [ -n "$params" ]; then
+			if ! log-output -t ethdetect modprobe -v "$module" $params; then
 				db_unregister "$question"
 				db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
 				db_input critical hw-detect/modprobe_error || [ $? -eq 30 ]
 				db_go
 				false
+			else
+				# Module loaded successfully
+				if [ "$params" != "" ]; then
+					register-module "$module" "$params"
+				fi
 			fi
-		else
-			db_unregister "$question"
-			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module $params"
-			db_input critical hw-detect/modprobe_error || [ $? -eq 30 ]
-			db_go
-			false
 		fi
 	fi
 
-	# Module loaded successfully
-	if [ "$params" != "" ]; then
-		register-module "$module" "$params"
-	fi
-	
 	olddevs="$devs"
 	devs="$(snapshot_devs)"
 	newdevs="$(compare_devs "$olddevs" "$devs")"
