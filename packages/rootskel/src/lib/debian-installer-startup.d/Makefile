@@ -16,6 +16,7 @@ endif
 
 files = \
 	S01mount \
+	S01module-params \
 	S02udev-fixup \
 	S03hotplug \
 	S10syslog \

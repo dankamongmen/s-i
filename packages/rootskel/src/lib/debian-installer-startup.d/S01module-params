@@ -1,0 +1,21 @@
+# Before udev is started, parse kernel command line for module params of
+# the form module.param=value and register them so they will be used when
+# modules are loaded.
+NEWLINE='
+'
+OLDIFS=$IFS
+IFS=$NEWLINE
+for line in $(set); do
+	var="${line%=*}"
+	val="${line#[!=]*=}"
+	# grep out the normal variables with no dots
+	varnodot="${var##*.*}"
+	if [ "$var" != "" ] && [ "$varnodot" = "" ]; then
+		module="${var%.*}"
+		param="${var#[!.]*.}"
+		if [ "$module" != "" ] && [ "$param" != "" ]; then
+			register-module -p -a "$module" "$param=$val"
+		fi
+	fi
+done
+IFS=$OLDIFS
