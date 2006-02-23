@@ -2,6 +2,7 @@
 QUEUE=/var/lib/register-module
 TYPE=options
 PARAMS_ONLY=0
+ADD_PARAMS=1
 
 if [ "$1" = "-t" ]; then
 	TYPE=$2
@@ -9,6 +10,10 @@ if [ "$1" = "-t" ]; then
 fi
 if [ "$1" = "-p" ]; then
 	PARAMS_ONLY=1
+	shift 1
+fi
+if [ "$1" = "-a" ]; then
+	ADD_PARAMS=1
 	shift 1
 fi
 
@@ -23,9 +28,13 @@ mkdir -p $QUEUE
 if [ "$PARAMS_ONLY" = 0 ]; then
 	touch $QUEUEFILE
 fi
-grep -v "^$TYPE:" $PARAMFILE > $PARAMFILE.new
-[ -n "$PARAMS" ] && echo "$TYPE:$PARAMS" >> $PARAMFILE.new
-mv $PARAMFILE.new $PARAMFILE
+if [ "$ADD_PARAMS" = 0 ]; then
+	grep -v "^$TYPE:" $PARAMFILE > $PARAMFILE.new
+	mv $PARAMFILE.new $PARAMFILE
+else
+	PARAMS="$PARAMS $(grep "^$TYPE:" $PARAMFILE | sed "s/^$TYPE://")"
+fi
+[ -n "$PARAMS" ] && echo "$TYPE:$PARAMS" >> $PARAMFILE
 
 if [ -n "$PARAMS" ] && [ "$TYPE" = options ]; then
 	for file in /etc/modules.conf /etc/modprobe.conf; do
