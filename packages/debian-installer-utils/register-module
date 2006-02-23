@@ -28,12 +28,11 @@ mkdir -p $QUEUE
 if [ "$PARAMS_ONLY" = 0 ]; then
 	touch $QUEUEFILE
 fi
-if [ "$ADD_PARAMS" = 0 ]; then
-	grep -v "^$TYPE:" $PARAMFILE > $PARAMFILE.new
-	mv $PARAMFILE.new $PARAMFILE
-else
-	PARAMS="$PARAMS $(grep "^$TYPE:" $PARAMFILE | sed "s/^$TYPE://")"
+if [ "$ADD_PARAMS" = 1 ]; then
+	PARAMS="$PARAMS $(grep "^$TYPE:" $PARAMFILE 2>/dev/null | sed "s/^$TYPE://")"
 fi
+grep -v "^$TYPE:" $PARAMFILE > $PARAMFILE.new
+mv $PARAMFILE.new $PARAMFILE
 [ -n "$PARAMS" ] && echo "$TYPE:$PARAMS" >> $PARAMFILE
 
 if [ -n "$PARAMS" ] && [ "$TYPE" = options ]; then
