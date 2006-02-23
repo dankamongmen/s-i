@@ -1564,7 +1564,7 @@ command_change_file_system()
         PedPartition *part;
         char *s_fstype;
         PedFileSystemType *fstype;
-	PedPartitionFlag flag;
+        PedPartitionFlag flag;
         scan_device_name();
         if (dev == NULL)
                 critical_error("The device %s is not opened.", device_name);
@@ -1573,23 +1573,23 @@ command_change_file_system()
                 critical_error("Expected partition id and file system");
         log("command_change_file_system(%s,%s)", id, s_fstype);
         part = partition_with_id(disk, id);
-	if (part == NULL) {
-		critical_error("Partition not found: %s", id);
-	}
+        if (part == NULL) {
+                critical_error("Partition not found: %s", id);
+        }
         free(id);
         fstype = ped_file_system_type_get(s_fstype);
         free(s_fstype);
         if (fstype == NULL) {
-		log("Filesystem %s not found, let's see if it is a flag", s_fstype);
-		flag = ped_partition_flag_get_by_name(s_fstype);
-		if (ped_partition_is_flag_available(part, flag)) {
-			ped_partition_set_flag(part, flag, 1);
-		} else {
-                	critical_error("Bad file system or flag type: %s", s_fstype);
-		}
-	} else {
-        	ped_partition_set_system(part, fstype);
-	}
+                log("Filesystem %s not found, let's see if it is a flag", s_fstype);
+                flag = ped_partition_flag_get_by_name(s_fstype);
+                if (ped_partition_is_flag_available(part, flag)) {
+                        ped_partition_set_flag(part, flag, 1);
+                } else {
+                        critical_error("Bad file system or flag type: %s", s_fstype);
+                }
+        } else {
+                ped_partition_set_system(part, fstype);
+        }
         oprintf("OK\n");
 }
 
