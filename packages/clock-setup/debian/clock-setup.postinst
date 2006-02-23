@@ -6,7 +6,7 @@ set -e
 db_progress START 0 1 clock-setup/progress/title
 db_progress INFO clock-setup/progress/working
 
-check_os () {
+os_needs_local_clock () {
 	while read line; do
 		shortname=$(echo "$line" | cut -d : -f 3)
 		case $shortname in
@@ -26,7 +26,7 @@ if db_fget clock-setup/utc seen && [ "$RET" = true ]; then
 else
 	probed=$(os-prober)
 
-	if echo "$probed" | check_os; then
+	if echo "$probed" | os_needs_local_clock; then
 		# default to localtime for some OSes
 		db_set clock-setup/utc false
 		pri=low
