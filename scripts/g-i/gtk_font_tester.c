@@ -24,6 +24,11 @@
  *
  * You can compile this application with
  * gcc gtk_font_tester.c -o gtk_font_tester `pkg-config --cflags --libs gtk+-2.0 gthread-2.0`
+ *
+ * It can be run either interactively or in batch mode:
+ *   ./gtk_font_tester test.txt  1024 768
+ *
+ * Images will be saved in /var/log
 **/
 
 #include <gtk/gtk.h>
@@ -183,6 +188,8 @@ int main( int argc, char *argv[] )
 	GThread *thread_screenshot; 
 	GError *err1 = NULL;
 	
+	int run_mode = 0;	/* 0 - interactive mode (default), 1 - batch mode */
+
     if  ( argc == 1 )
         strcpy( preset_filename, "");
         
@@ -193,6 +200,7 @@ int main( int argc, char *argv[] )
             
         }
         else {
+	    run_mode = 1;
             strcpy(preset_filename, argv[1]);
             width = atoi(argv[2]);
             height = atoi(argv[3]);
@@ -222,7 +230,9 @@ int main( int argc, char *argv[] )
     gtk_text_view_set_left_margin (GTK_TEXT_VIEW(view), DEFAULT_PADDING);
     gtk_text_view_set_right_margin (GTK_TEXT_VIEW(view), DEFAULT_PADDING);
     buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-    gtk_text_buffer_set_text (buffer, "You can type some text inside this GTKTextView or load text from a file by entering its name inside the above GtkEntry and see it rendered here", -1);
+
+    if (!run_mode)
+      gtk_text_buffer_set_text (buffer, "You can type some text inside this GTKTextView or load text from a file by entering its name inside the above GtkEntry and see it rendered here", -1);
 
     hbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
     vbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
