@@ -6,6 +6,18 @@ set -e
 db_progress START 0 1 clock-setup/progress/title
 db_progress INFO clock-setup/progress/working
 
+check_os () {
+	while read line; do
+		shortname=$(echo "$line" | cut -d : -f 3)
+		case $shortname in
+		MS-DOS*|Windows*|FreeDOS*) # keep in sync with os-prober
+			return 0
+		;;
+		esac
+	done
+	return 1
+}
+
 pri=high
 
 if db_fget clock-setup/utc seen && [ "$RET" = true ]; then
@@ -14,17 +26,11 @@ if db_fget clock-setup/utc seen && [ "$RET" = true ]; then
 else
 	probed=$(os-prober)
 
-	for line in $probed; do
-		shortname=$(echo "$line" | cut -d : -f 3)
-		case $shortname in
-		MS-DOS*|Windows*|FreeDOS*) # keep in sync with os-prober
-			# default to localtime with those OSes
-			db_set clock-setup/utc false
-			pri=low
-			break
-		;;
-		esac
-	done
+	if echo "$probed" | check_os; then
+		# default to localtime for some OSes
+		db_set clock-setup/utc false
+		pri=low
+	fi
 
 	if [ -z "$probed" ]; then
 		# installing the only OS, so use UTC
