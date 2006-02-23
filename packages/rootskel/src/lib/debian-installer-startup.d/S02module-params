@@ -1,13 +1,9 @@
-# Before udev is started, parse kernel command line for module params of
+# Before udev is started, parse kernel command word for module params of
 # the form module.param=value and register them so they will be used when
 # modules are loaded.
-NEWLINE='
-'
-OLDIFS=$IFS
-IFS=$NEWLINE
-for line in $(set); do
-	var="${line%=*}"
-	val="${line#[!=]*=}"
+for word in $(cat /proc/cmdline); do
+	var="${word%=*}"
+	val="${word#[!=]*=}"
 	# grep out the normal variables with no dots
 	varnodot="${var##*.*}"
 	if [ "$var" != "" ] && [ "$varnodot" = "" ]; then
@@ -18,4 +14,3 @@ for line in $(set); do
 		fi
 	fi
 done
-IFS=$OLDIFS
