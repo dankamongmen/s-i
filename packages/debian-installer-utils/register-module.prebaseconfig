@@ -11,15 +11,20 @@ create () {
 	fi
 }
 
-OLDIFS=$IFS
-
-for QUEUEFILE in $QUEUE/*; do
+for QUEUEFILE in $QUEUE/*.load; do
 	[ ! -e $QUEUEFILE ] && break
 	MODULE=$(basename $QUEUEFILE)
 
 	create $MODFILE
 	echo "$MODULE" >> $MODFILE
+	rm $QUEUEFILE
+done
 
+OLDIFS=$IFS
+for QUEUEFILE in $QUEUE/*.params; do
+	[ ! -e $QUEUEFILE ] && break
+	MODULE=$(basename $QUEUEFILE)
+	
 	IFS=":"
 	while read TYPE PARAMS; do
 		case $TYPE in
