@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 34168 -->
+<!-- original version: 35051 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -144,8 +144,7 @@ La plupart des dialogues de l'installateur Debian peuvent être
 préconfigurés de cette manière. Il y a cependant des exceptions
 notables. On doit partitionner tout un disque ou partitionner
 une partie de l'espace disponible&nbsp;; on ne peut pas utiliser des
-partitions existantes .
-On ne peut pas installer RAID et LVM en utilisant cette méthode.
+partitions existantes. On ne peut pas installer RAID en utilisant cette méthode.
 
 </para>
   </sect2>
@@ -330,6 +329,40 @@ même si la préconfiguration qui suit ne les aborde pas.
 
 </para>
   </sect2>
+
+  <sect2 id="preseed-dhcp">
+  <title>Utiliser un serveur DHCP pour indiquer les fichiers de préconfiguration</title>
+<para>
+
+Il est aussi possible d'utiliser DHCP pour spécifier un fichier à télécharger sur le réseau.
+DHCP permet d'indiquer un nom de fichier. Normalement ce fichier sert à un amorçage sur
+le réseau. S'il se trouve être un URL, le système d'installation qui permet
+une préconfiguration de type network téléchargera le fichier et l'utilisera comme
+fichier de préconfiguration. Voici un exemple montrant comment configurer le
+fichier dhcpd.conf appartenant à la version 3 du serveur ISC DHCP
+(paquet debian dhcp3-server).
+</para>
+
+<informalexample><screen>
+if substring (option vendor-class-identifier, 0, 3) = "d-i" {
+	filename "http://host/preseed.cfg";
+}
+</screen></informalexample>
+
+<para>
+Remarquez que l'exemple précédent n'autorise le fichier qu'aux clients DHCP
+qui s'identifient comme « d-i ». Les autres clients DHCP ne sont pas affectés.
+Vous pouvez aussi mettre le texte dans un paragraphe à destination d'un seul hôte
+pour ne pas préconfigurer toutes les installations faites dans votre réseau.
+</para>
+<para>
+Une bonne façon d'utiliser cette technique est de ne préconfigurer que les valeurs
+liées à votre réseau, par exemple le nom de votre miroir Debian. De cette manière
+les installations utilisent automatiquement le bon miroir et la suite de l'installation
+peut se faire interactivement. Il faut être très prudent si l'on veut automatiser
+toute l'installation avec une préconfiguration de type DHCP.
+</para>
+</sect2>
 
   <sect2 id="preseed-bootparms">
   <title>Utiliser les paramètres d'amorçage pour compléter la préconfiguration</title>
@@ -597,8 +630,7 @@ par <classname>partman-auto</classname>. Vous pouvez partitionner un disque enti
 ou seulement un espace libre sur ce disque. La disposition du disque peut être
 indiquée par un schéma prédefini, un schéma inclus dans un fichier de schémas ou un
 schéma mis dans dans le fichier de préconfiguration. Pour l'instant, on ne peut pas
-préconfigurer le partitionnement de plusieurs disques ni la mise en &oelig;uvre de RAID et
-LVM.
+préconfigurer le partitionnement de plusieurs disques ni la mise en &oelig;uvre de RAID.
 
 </para>
 
@@ -613,6 +645,7 @@ sera choisi avant de préconfigurer son partitionnement.
 <informalexample role="example"><screen>
 # Si le système possède un espace libre, vous pouvez ne partitionner que cet
 # espace.
+# Note : la valeur du choix doit être traduit.
 #d-i partman-auto/init_automatically_partition	\
 #    select Use the largest continuous free space
 
@@ -623,6 +656,7 @@ sera choisi avant de préconfigurer son partitionnement.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
 # Vous pouvez choisir parmi tous les schémas prédéfinis...
+# Note : la valeur du choix doit être traduit.
 d-i partman-auto/choose_recipe \
     select All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe \
