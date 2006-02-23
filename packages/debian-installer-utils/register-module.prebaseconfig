@@ -2,6 +2,7 @@
 QUEUE=/var/lib/register-module
 MODFILE=/target/etc/modules
 MODCONFDIR=/target/etc/modutils/
+MODUTILSDIR=/etc/modprobe.d/
 
 create () {
 	if [ ! -e $1 ]; then
@@ -29,9 +30,10 @@ for QUEUEFILE in $QUEUE/*.params; do
 	while read TYPE PARAMS; do
 		case $TYPE in
 		options)
-			FILE=$MODCONFDIR/local
-			create $FILE
-			echo "options $MODULE $PARAMS" >> $FILE
+			for FILE in $MODCONFDIR/local $MODUTILSDIR/local; do
+				create $FILE
+				echo "options $MODULE $PARAMS" >> $FILE
+			done
 			;;
 		chandev)
 			FILE=$MODCONFDIR/local.chandev
