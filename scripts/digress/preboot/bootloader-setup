@@ -30,6 +30,11 @@ i386)
 	if [ -n "$GRAPHICS_DISABLE" ]; then
 		sed -i -e 's/display .*//i' $CFG
 	fi
+
+	if [ -n "$SERIAL_CONSOLE_PXELINUX" ]; then
+	        sed -i -e "1,1iserial $SERIAL_CONSOLE_PXELINUX" $CFG
+		sed -i -e "/^label linux$/ilabel local\n\tLOCALBOOT 0\n" $CFG
+	fi
 ;;
 mipsel)
 	cfg="$NFSROOT_DIR/nfsroot/default.colo"
