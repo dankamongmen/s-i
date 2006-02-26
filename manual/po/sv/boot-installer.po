@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: installation-guide 20051025 boot-installer\n"
 "POT-Creation-Date: 2006-01-03 19:55+0000\n"
-"PO-Revision-Date: 2006-02-26 00:10+0100\n"
+"PO-Revision-Date: 2006-02-26 10:59+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -831,7 +831,7 @@ msgstr "Det finns olika sätt att göra en TFTP-uppstart på i386."
 #: boot-installer.xml:920
 #, no-c-format
 msgid "NIC or Motherboard that support PXE"
-msgstr "NIC eller moderkort som har stöd för PXE"
+msgstr "Nätverkskort eller moderkort med stöd för PXE"
 
 #. Tag: para
 #: boot-installer.xml:921
@@ -843,7 +843,7 @@ msgstr "Det kan vara så att ditt nätverkskort eller moderkort erbjuder funktio
 #: boot-installer.xml:932
 #, no-c-format
 msgid "NIC with Network BootROM"
-msgstr "NIC med Network BootROM"
+msgstr "Nätverkskort med Network BootROM"
 
 #. Tag: para
 #: boot-installer.xml:933
@@ -1145,6 +1145,13 @@ msgid ""
 "}\n"
 "</screen></informalexample> Note that the goal is to get <command>elilo.efi</command> running on the client."
 msgstr ""
+"En lämplig TFTP-post för att starta upp via nätverket på ett ia64-system ser ut ungefär som den här: <informalexample><screen>\n"
+"host mcmuffin {\n"
+"        hardware ethernet 00:30:6e:1e:0e:83;\n"
+"        fixed-address 10.0.0.21;\n"
+"        filename \"debian-installer/ia64/elilo.efi\";\n"
+"}\n"
+"</screen></informalexample> Notera att målet är att få <command>elilo.efi</command> att köra på klienten."
 
 #. Tag: para
 #: boot-installer.xml:1439
@@ -1228,7 +1235,7 @@ msgstr ""
 #: boot-installer.xml:1541
 #, no-c-format
 msgid "If you're having trouble, check <ulink url=\"&url-m68k-cts-faq;\">cts's &arch-title; debian-installer FAQ</ulink>."
-msgstr ""
+msgstr "Om du får problem, ta en titt i <ulink url=\"&url-m68k-cts-faq;\">cts's &arch-title; debian-installer FAQ</ulink>."
 
 #. Tag: title
 #: boot-installer.xml:1558
@@ -1819,13 +1826,13 @@ msgstr ""
 #: boot-installer.xml:2547
 #, no-c-format
 msgid "If this is the first time you're booting the system, try the default boot parameters (i.e., don't try setting parameters) and see if it works correctly. It probably will. If not, you can reboot later and look for any special parameters that inform the system about your hardware."
-msgstr ""
+msgstr "Om det här är första gången du starta upp systemet, prova de uppstartsparametrar som är standard (alltså, ställ inte in några parametrar) och se om det fungerar korrekt. Det kommer säkert att göra det. Om inte, kan du starta om senare och leta efter några speciella parametrar som informerar systemet om din hårdvara."
 
 #. Tag: para
 #: boot-installer.xml:2554
 #, no-c-format
 msgid "Information on many boot parameters can be found in the <ulink url=\"http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html\"> Linux BootPrompt HOWTO</ulink>, including tips for obscure hardware. This section contains only a sketch of the most salient parameters. Some common gotchas are included below in <xref linkend=\"boot-troubleshooting\"/>."
-msgstr ""
+msgstr "Information om många uppstartsparametrar kan hittas i <ulink url=\"http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html\"> Linux BootPrompt HOWTO</ulink>, inklusive tips för obskyr hårdvara. Den här sektion innehåller endast en del av de mest vanliga parametrarna. Vissa vanliga problem finns beskrivna i <xref linkend=\"boot-troubleshooting\"/>."
 
 #. Tag: para
 #: boot-installer.xml:2563
@@ -1835,12 +1842,15 @@ msgid ""
 "Memory:<replaceable>avail</replaceable>k/<replaceable>total</replaceable>k available\n"
 "</screen></informalexample> should be emitted early in the process. <replaceable>total</replaceable> should match the total amount of RAM, in kilobytes. If this doesn't match the actual amount of RAM you have installed, you need to use the <userinput>mem=<replaceable>ram</replaceable></userinput> parameter, where <replaceable>ram</replaceable> is set to the amount of memory, suffixed with <quote>k</quote> for kilobytes, or <quote>m</quote> for megabytes. For example, both <userinput>mem=65536k</userinput> and <userinput>mem=64m</userinput> mean 64MB of RAM."
 msgstr ""
+"När kärnan startar upp visas meddelandet <informalexample><screen>\n"
+"Memory:<replaceable>tillgänglig</replaceable>k/<replaceable>totalt</replaceable>k available\n"
+"</screen></informalexample> bör visas tidigt i processen. <replaceable>totalt</replaceable> bör stämma med totalt RAM-minne i kilobyte. Om det inte stämmer med den faktiska mängden RAM-minne du har installerad behöver du använda parametern <userinput>mem=<replaceable>ram</replaceable></userinput>, där <replaceable>ram</replaceable> är inställd till mängden minne och ändelsen <quote>k</quote> för kilobyte eller <quote>m</quote> för megabyte. Till exempel, både <userinput>mem=65536k</userinput> och <userinput>mem=64m</userinput> betyder 64MB RAM-minne."
 
 #. Tag: para
 #: boot-installer.xml:2579
 #, no-c-format
 msgid "If you are booting with a serial console, generally the kernel will autodetect this<phrase arch=\"mipsel\"> (although not on DECstations)</phrase>. If you have a videocard (framebuffer) and a keyboard also attached to the computer which you wish to boot via serial console, you may have to pass the <userinput>console=<replaceable>device</replaceable></userinput> argument to the kernel, where <replaceable>device</replaceable> is your serial device, which is usually something like <filename>ttyS0</filename>."
-msgstr ""
+msgstr "Om du startar upp på en seriekonsoll kommer generellt sett kärnan att autodetektera det<phrase arch=\"mipsel\"> (dock inte på DECstation)</phrase>. Om du har ett grafikkort (framebuffer) och ett tangentbord anslutet till datorn som du önskar starta upp via seriekonsoll, kan du skicka med följande argument <userinput>console=<replaceable>enhet</replaceable></userinput> till kärnan, där <replaceable>enhet</replaceable> är din serieenhet, som vanligtvis är något liknande <filename>ttyS0</filename>."
 
 #. Tag: para
 #: boot-installer.xml:2592
@@ -1852,13 +1862,13 @@ msgstr ""
 #: boot-installer.xml:2603
 #, no-c-format
 msgid "Debian Installer Parameters"
-msgstr "Parametrar för Debian-installeraren"
+msgstr "Parametrar för Debian Installer"
 
 #. Tag: para
 #: boot-installer.xml:2604
 #, no-c-format
 msgid "The installation system recognizes a few additional boot parameters<footnote> <para> Note that the kernel accepts a maximum of 8 command line options and 8 environment options (including any options added by default for the installer). If these numbers are exceeded, 2.4 kernels will drop any excess options and 2.6 kernels will panic. With kernel 2.6.9 or newer, you can use 32 command line options and 32 environment options. </para> </footnote> which may be useful."
-msgstr ""
+msgstr "Installationssystemet känner igen ytterligare ett antal uppstartsparametrar<footnote> <para> Notera att kärnan accepterar maximalt 8 kommandoradsflaggor och 8 miljöflaggor (inklusive de flaggor som läggs till som standard för installeraren). Om de här siffrorna överstigs kommer 2.4-kärnor att förkasta de flaggor som överstiger gränsen och 2.6-kärnor får panik. Med kärnan 2.6.9 eller senare kan du använda 32 kommandoradsflaggor eller 32 miljöflaggor. </para> </footnote> som kan vara användbara."
 
 #. Tag: term
 #: boot-installer.xml:2624
@@ -1870,7 +1880,7 @@ msgstr "debconf/priority"
 #: boot-installer.xml:2625
 #, no-c-format
 msgid "This parameter sets the lowest priority of messages to be displayed."
-msgstr ""
+msgstr "Den här parametern ställer in så att meddelanden med lägst prioritet visas."
 
 #. Tag: para
 #: boot-installer.xml:2629
@@ -1894,7 +1904,7 @@ msgstr "DEBIAN_FRONTEND"
 #: boot-installer.xml:2651
 #, no-c-format
 msgid "This boot parameter controls the type of user interface used for the installer. The current possible parameter settings are: <itemizedlist> <listitem> <para><userinput>DEBIAN_FRONTEND=noninteractive</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=text</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=newt</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=slang</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=bogl</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=corba</userinput></para> </listitem> </itemizedlist> The default front end is <userinput>DEBIAN_FRONTEND=newt</userinput>. <userinput>DEBIAN_FRONTEND=text</userinput> may be preferable for serial console installs. Generally only the <userinput>newt</userinput> frontend is available on default install media, so this is not very useful right now."
-msgstr ""
+msgstr "Den här uppstartsparametern kontrollerar den typ av användargränssnitt som används för installeraren. De för närvarande möjliga parametervärdena är: <itemizedlist> <listitem> <para><userinput>DEBIAN_FRONTEND=noninteractive</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=text</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=newt</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=slang</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=bogl</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para> </listitem><listitem> <para><userinput>DEBIAN_FRONTEND=corba</userinput></para> </listitem> </itemizedlist> Standardgränssnitt är <userinput>DEBIAN_FRONTEND=newt</userinput>. <userinput>DEBIAN_FRONTEND=text</userinput> kan föredras för installationer via seriekonsoll. Generellt sett är endast gränssnittet <userinput>newt</userinput> tillgängligt på standardinstallationsmedia så den här parametern är inte så användbar just nu."
 
 #. Tag: term
 #: boot-installer.xml:2687
