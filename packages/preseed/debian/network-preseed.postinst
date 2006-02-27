@@ -31,7 +31,7 @@ preseed_relative () {
 for file in /var/lib/dhcp/dhclient.leases /var/lib/dhcp3/dhclient.leases; do
 	if [ -r "$file" ]; then
 		FN="$(sed -n -e '/filename/s/.*"\(.*\)"./\1/p' $file)"
-		if [ -z "${FN##*://*}" ]; then
+		if [ -n "$FN" -a -z "${FN##*://*}" ]; then
 			preseed_location "$FN"
 		fi
 	fi
