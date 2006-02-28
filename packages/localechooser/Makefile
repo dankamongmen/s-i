@@ -3,12 +3,15 @@ all: debian/SUPPORTED-short debian/short-tmp/shortlists debian/templates check-s
 LIST     = languagelist
 L10NLIST = languagelist.l10n
 
-debian/templates.base: mktemplates.language debian/localechooser.templates-in $(LIST) $(L10NLIST)
+debian/templates.base: mktemplates.language debian/localechooser.templates-in $(LIST) $(L10NLIST) debian/iso-3166.tab
 	LC_COLLATE=C ./mktemplates.language $(LIST) $(L10NLIST) debian/templates.lang debian/localechooser.templates-in
 	./mktemplates.country debian/templates debian/templates.lang
 
-debian/iso-codes: 
+debian/iso-codes:
 	./get-iso-codes
+
+debian/iso-3166.tab:
+	./iso3166tab.py /usr/share/xml/iso-codes/iso_3166.xml >debian/iso-3166.tab
 
 debian/templates: debian/templates.base debian/short-tmp/shortlists
 	./mk_shortlist_templates
@@ -45,5 +48,5 @@ demo: localechooser.templates localechooser
 	DEBIAN_FRONTEND=dialog DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./localechooser
 
 clean:
-	$(RM) localechooser.templates debian/templates debian/templates.lang debian/templates.tmp debian/templates.base SUPPORTED-short
+	$(RM) localechooser.templates debian/templates debian/templates.lang debian/templates.tmp debian/templates.base SUPPORTED-short debian/iso-3166.tab
 	$(RM) -rf debian/short-tmp debian/iso-codes
