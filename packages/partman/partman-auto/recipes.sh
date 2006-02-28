@@ -252,8 +252,31 @@ setup_partition () {
     return 0
 }
 
+get_recipedir () {
+    local archdetect arch sub recipedir
+
+    if [ -x /bin/archdetect ]; then
+	archdetect=$(archdetect)
+    else
+	archdetect=unknown/generic
+    fi
+    arch=${archdetect%/*}
+    sub=${archdetect#*/}
+
+    for recipedir in \
+	/lib/partman/recipes-$arch-$sub \
+	/lib/partman/recipes-$arch \
+	/lib/partman/recipes
+    do
+	if [ -d $recipedir ]; then
+	    echo $recipedir
+	    break
+	fi
+    done
+}
+
 choose_recipe () {
-    local recipes archdetect arch sub free_size choices min_size
+    local recipes recipedir free_size choices min_size
     
     # Preseeding of recipes.
     db_get partman-auto/expert_recipe
@@ -270,24 +293,7 @@ choose_recipe () {
 	fi
     fi
 
-    if [ -x /bin/archdetect ]; then
-	archdetect=$(archdetect)
-    else
-	archdetect=unknown/generic
-    fi
-    arch=${archdetect%/*}
-    sub=${archdetect#*/}
-
-    for recipedir in \
-	/lib/partman/recipes-$arch-$sub \
-	/lib/partman/recipes-$arch \
-	/lib/partman/recipes
-    do
-        if [ -d $recipedir ]; then
-	    break
-	fi
-    done
-
+    recipedir=$(get_recipedir)
     
     free_size=$1
     choices=''
