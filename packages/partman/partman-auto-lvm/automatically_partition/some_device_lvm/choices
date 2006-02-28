@@ -1,6 +1,13 @@
 #!/bin/sh
 
 . /lib/partman/definitions.sh
+. /lib/partman/recipes.sh
+
+# If there are no recipies that support LVM then don't offer auto-lvm
+recipedir=$(get_recipedir)
+if ! grep -q "\$lvmok" $recipedir/*; then
+	exit 0
+fi
 
 mypart=''
 mysize=0
