@@ -23,8 +23,9 @@ binary-indep: build
 	for file in /usr/share/terminfo/a/ansi /usr/share/terminfo/l/linux \
 	  /usr/share/terminfo/v/vt102; do \
 		mkdir -p debian/di-utils-terminfo/`dirname $$file`; \
-        	cp -pL $$file debian/di-utils-terminfo/$$file; \
-        done
+		cp -pL $$file debian/di-utils-terminfo/$$file; \
+	done
+	cp debian/di-utils-shell.isinstallable debian/di-utils-shell/DEBIAN/isinstallable;
 	dh_installdeb -i
 	dh_gencontrol -i
 	dh_builddeb -i
@@ -34,9 +35,9 @@ binary-arch: build
 	dh_testroot
 	dh_clean -k
 	dh_install -pdi-utils anna-install apt-install debconf-disconnect \
-	                      debconf-get debconf-set log-output \
-	                      register-module search-path update-dev \
-	                      user-params in-target bin
+			      debconf-get debconf-set log-output \
+			      register-module search-path update-dev \
+			      user-params in-target bin
 	dh_install -pdi-utils chroot-setup.sh lib
 	dh_installdirs -pdi-utils usr/lib/prebaseconfig.d
 	install register-module.prebaseconfig debian/di-utils/usr/lib/prebaseconfig.d/50register-module
