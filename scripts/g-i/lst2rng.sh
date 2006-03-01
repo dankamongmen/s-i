@@ -52,3 +52,6 @@ for ((j=`expr $start + 1`;j<=${num_glyphs};j+=1)); do
 	end=$j
     fi
 done
+
+echo ""
+
