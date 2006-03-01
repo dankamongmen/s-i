@@ -82,8 +82,7 @@ locale2langname() {
 				# More than one match; try matching the
 				# country as well.
 				countrypart="${1#*_}"
-				countrypart="${countrypart%%[@.]*}"
-				countryline="$(echo "$line" | grep ";$countrypart\$" || true)"
+				countryline="$(echo "$line" | grep ";$countrypart\$")"
 				if [ "$countryline" ]; then
 					echo "${countryline%%;*}"
 					return
@@ -199,8 +198,8 @@ fi
 #
 # No framebuffer and text interface      -->level 0 (only ASCII)
 # No framebuffer and other interface     -->level 1 (only Latin1)
-# Framebuffer and non graphical interface-->level 2 (no combining langs)
-# Framebuffer and graphical interface    -->level 3 (all langs)
+# Framebuffer and non graphical interface-->level 2 and 3 (no combining langs)
+# Framebuffer and graphical interface    -->level 4 (all langs)
 # Depending on these values, we use different templates with a different
 # list of languages. These lists are built at the package build-time
 # from the contents of the second field of languagelist entries

@@ -46,6 +46,28 @@ echo "LANG=\"$LOCALE\"" >> $DESTFILE
 if [ "$LANGLIST" ]; then
 	echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
 fi
+
+# For languages that have no chance to be displayed at the Linux console
+# let's set root's environment with a non localized environment
+ROOTPROFILE="/target/root/.profile"
+# We must map the language to its "level" from languagelist
+LANGUAGECODE=`echo $LOCALE|cut -f1 -d_`
+# For language with multiple entries such as pt/pt_BR or zh_CN/zh_TW
+# we don't really care about the entry we will match as the level will always 
+# be the same 
+LEVEL=`cat /usr/share/localechooser/languagelist |\
+	cut -f 2-3 -d\; | \
+	grep "$LANGUAGECODE" | \
+	head -1 | \
+	cut -f1 -d\;`
+if [ "$LEVEL" = "3" ] || [ "$LEVEL" = "4" ] ; then
+	echo "# Installed by Debian Installer:" >>$ROOTPROFILE
+	echo "#  no localization for root because $LOCALE" >>$ROOTPROFILE
+	echo "#  cannot be properly displayed at the Linux console" >>$ROOTPROFILE
+	echo "LANG=C" >>$ROOTPROFILE
+	echo "LANGUAGE=C" >>$ROOTPROFILE
+fi
+
 # If the locale isn't already valid, append it to locale.gen
 gen=
 if log-output -t localechooser --pass-stdout \
