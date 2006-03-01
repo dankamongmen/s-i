@@ -2,22 +2,22 @@
 #
 # -*-sh-*-
 #
-#     Copyright (C) 2004-2005 Davide Viti <zinosat@tiscali.it>
-# 
-#     This program is free software; you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation; either version 2 of the License, or
-#     (at your option) any later version.
-# 
+#     Copyright (C) 2004-2006 Davide Viti <zinosat@tiscali.it>
+#
+#     
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License
+#     as published by the Free Software Foundation; either version 2
+#     of the License, or (at your option) any later version.
+#     
 #     This program is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
-# 
-#     You should have received a copy of the GNU General Public
-#     License along with this program; if not, write to the Free
-#     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-#     MA 02111-1307 USA
+#     
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
 usage() {
@@ -113,13 +113,42 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 fi
 
 # remove ${ALL_THESE_VARIABLES} if they do not need to be spell checked
+# ${KBD-ARCHS-L10N} is a particular case which has to be treated as a variable
 if [ ${REMOVE_VARS} = "yes" ] ; then
     NEEDS_RM="${NO_VARS} ${NEEDS_RM}"
-    grep -e "^-" ${ALL_STRINGS} | sed s/\$\{[a-zA-Z0-9_]*\}//g > ${NO_VARS}
+    grep -e "^-" ${ALL_STRINGS} | sed s/\$\{[a-zA-Z0-9_]*\}//g | sed "s|\${KBD-ARCHS-L10N}||"> ${NO_VARS}
+
     FILE_TO_CHECK=${NO_VARS}
 else
     FILE_TO_CHECK=${ALL_STRINGS}
 fi
+
+# Find unicode points
+if [ ${REMOVE_VARS} = "yes" ] ; then
+    FILE_CODEPOINTS=${FILE_TO_CHECK}
+else
+    # remove header
+    FILE_CODEPOINTS=temp-codes.txt
+    cat ${FILE_TO_CHECK} | sed "1,2d" > ${FILE_CODEPOINTS}
+fi
+
+    cat ${FILE_CODEPOINTS} | sed "s:^- ::" | sed "s:^\"\"$:\" \":"  | sed "s|\\\\\"||g" | sed "s|\$TCPIP|TCPIP|" | \
+	utf2uxx.pl > ${LANG}_codes1.txt
+    
+    # FIXME: U0022 was removed from utf2uxx.pl
+    # now I put it back in (count for this char are wrong)
+    echo "<U0022>" >> ${LANG}_codes1.txt    
+    cat ${LANG}_codes1.txt | sed "s|><|>\n<|g" | sed "s:\"::g" | sort | uniq -c > ${DEST_DIR}/${LANG}_codes.txt
+    FILES_TO_KEEP="${DEST_DIR}/${LANG}_codes.txt ${FILES_TO_KEEP}" 
+    CODEPOINTS=$(wc -l ${DEST_DIR}/${LANG}_codes.txt | awk '{print $1}')
+    
+    cat ${DEST_DIR}/${LANG}_codes.txt | awk '{print $2}' >> ${DEST_DIR}/all_codes-tmp.txt
+    rm ${LANG}_codes1.txt
+
+    if [ ${REMOVE_VARS} != "yes" ] ; then
+	rm ${FILE_CODEPOINTS}
+    fi
+
 
 # if a binary wl exists, use it
 if [ -f ${WLS_PATH}/${LANG}_di_wl ] ; then
@@ -140,14 +169,14 @@ if [ ${DICT} != "null" ] ; then
 	SUSPECT_EXIST=
     fi
 
-# build the entry of stats.txt for the current language (i.e "395 it 1")
-    echo `wc -l ${UNKN} | awk '{print $1}'` ${LANG} ${SUSPECT_EXIST} >> ${DEST_DIR}/stats.txt
+# build the entry of stats.txt for the current language (i.e "395 it 1 134")
+    echo `wc -l ${UNKN} | awk '{print $1}'` ${LANG} ${SUSPECT_EXIST} ${CODEPOINTS} >> ${DEST_DIR}/stats.txt
 else
     if [ ${HANDLE_SUSPECT_VARS} = "no" ] ; then
 	SUSPECT_EXIST=
     fi
 
-    echo "-1 ${LANG} ${SUSPECT_EXIST}" >> ${DEST_DIR}/stats.txt
+    echo "-1 ${LANG} ${SUSPECT_EXIST} ${CODEPOINTS}" >> ${DEST_DIR}/stats.txt
 
     NEEDS_RM=`echo ${NEEDS_RM} | sed "s:${ALL_UNKNOWN}::"`
     FILES_TO_KEEP=`echo ${FILES_TO_KEEP} | sed "s:${UNKN}::"`

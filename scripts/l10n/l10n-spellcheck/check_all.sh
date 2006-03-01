@@ -2,22 +2,22 @@
 #
 # -*-sh-*-
 #
-#     Copyright (C) 2004-2005 Davide Viti <zinosat@tiscali.it>
-# 
-#     This program is free software; you can redistribute it and/or modify
-#     it under the terms of the GNU General Public License as published by
-#     the Free Software Foundation; either version 2 of the License, or
-#     (at your option) any later version.
-# 
+#     Copyright (C) 2004-2006 Davide Viti <zinosat@tiscali.it>
+#
+#     
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License
+#     as published by the Free Software Foundation; either version 2
+#     of the License, or (at your option) any later version.
+#     
 #     This program is distributed in the hope that it will be useful,
 #     but WITHOUT ANY WARRANTY; without even the implied warranty of
 #     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #     GNU General Public License for more details.
-# 
-#     You should have received a copy of the GNU General Public
-#     License along with this program; if not, write to the Free
-#     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-#     MA 02111-1307 USA
+#     
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 
 usage() {
@@ -67,6 +67,20 @@ for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
 
     i=`expr $i + 1`
 done
+
+# This should be fixed: all_codes-tmp.txt is created somewhere else and deleted here
+sort ${DEST_DIR}/all_codes-tmp.txt | uniq -c > ${DEST_DIR}/all_codes.txt
+
+HERE=$(pwd)
+cd ${DEST_DIR}/nozip
+tar cf codepoints.tar *_codes.txt
+mv codepoints.tar ${DEST_DIR} && cd ${DEST_DIR}
+tar rf codepoints.tar all_codes.txt
+gzip - < codepoints.tar > ${DEST_DIR}/zip/codepoints.tar.gz
+rm codepoints.tar
+cd ${HERE}
+
+rm -f ${DEST_DIR}/all_codes-tmp.txt
 
 if [ ! -d ${DEST_DIR} ] ; then
     echo does not exist: for some reasons nothing could be checked

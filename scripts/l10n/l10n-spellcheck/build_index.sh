@@ -44,6 +44,7 @@ TABLE_HTML=`mktemp`
 i=0
 TOTAL=0
 AVERAGE=0
+UNIQUE_CODEPOINTS=0
 for VAL in `cat ${STATS} | sort -n | awk '{print $1}'`; do
     if [ ${VAL} -ne -1 ] ; then
 	TOTAL=`expr ${TOTAL} + ${VAL}`
@@ -75,14 +76,16 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 fi
 
 echo "   <th class=\"t1\">Custom wordlist</th>"
+echo "   <th class=\"t1\">Codepoints</th>"
 echo "   <th class=\"t1\">All files</th>"
 echo " </tr>"
 
 # fill the table:
-# Language, Unknown words, Messages, List of unknown words, Suspect vars, All Files
+# Lang, Unkn words, Msg, List of unknown words, Susp vars, Custom wl, codepoints, All Files
 for ROW in `cat ${STATS} | sed  "s: :,:g"`; do
     LANG=`echo ${ROW} | awk -F, '{print $2}'`
     UNKN=`echo ${ROW} | awk -F, '{print $1}'`
+    CODEPOINTS=`echo ${ROW} | awk -F, '{print $4}'`
 
     ISO_CODE=`grep -w "^${LANG}" ${CFG_DIR}/iso_codes.txt | awk -F, '{print $2}'`
 
@@ -148,6 +151,7 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 fi
 
 echo "   <td><a href=\"${WORDLIST}\">${WORDLIST_NAME}</a></td>"
+echo "   <td><a href=\"latest/nozip/${LANG}_codes.txt\">${CODEPOINTS}</a></td>"
 echo "   <td><a href=\"latest/zip/${LANG}.tar.gz\">${LANG}.tar.gz</a></td>"
 echo "  </tr>"
     
@@ -183,3 +187,10 @@ mv ${TABLE_HTML} ${INDEX_HTML}
 
 sed "s|<!-- COMMON WL -->|latest/nozip/di_common_wl.txt|" ${INDEX_HTML} > ${TABLE_HTML}
 mv ${TABLE_HTML} ${INDEX_HTML}
+
+sed "s|<!-- CODEPOINTS_TARBALL -->|latest/zip/codepoints.tar.gz|" ${INDEX_HTML} > ${TABLE_HTML}
+mv ${TABLE_HTML} ${INDEX_HTML}
+
+sed "s|<!-- CODEPOINTS -->|latest/all_codes.txt|" ${INDEX_HTML} > ${TABLE_HTML}
+mv ${TABLE_HTML} ${INDEX_HTML}
+
