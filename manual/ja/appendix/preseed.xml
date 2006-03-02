@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 34168 -->
+<!-- original version: 35051 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -223,14 +223,14 @@ preseed できません。
 Although most questions used by &d-i; can be preseeded using this method,
 there are some notable exceptions. You must (re)partition an entire disk
 or use available free space on a disk; it is not possible to use existing
-partitions. You currently cannot use preseeding to set up RAID and LVM.
+partitions. You currently cannot use preseeding to set up RAID.
 -->
 &d-i; で行われる質問のほとんどはこの方法で preseed できますが、
 いくつか注目すべき例外があります。
 ディスク全体を (再度) パーティション分割するか、
 ディスクの空き領域を利用しなければなりません。
 つまり既存のパーティションを利用できないと言うことです。
-また現在、RAID や LVM のセットアップに preseed を利用できません。
+また現在、RAID のセットアップに preseed を利用できません。
 
 </para>
   </sect2>
@@ -427,15 +427,15 @@ initrd preseed を使用する場合、<filename>preseed.cfg</filename>
 </para><para>
 
 <!--
-For the other preseeding methods you need to tell the installer what file to
-use when you boot it. This is done by passing the kernel a boot parameter,
-either manually at boot time or by editing the bootloader configuration file
-(e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end
-of the append line(s) for the kernel.
+For the other preseeding methods you need to tell the installer what file
+to use when you boot it. This is normally done by passing the kernel a boot
+parameter, either manually at boot time or by editing the bootloader
+configuration file (e.g. <filename>syslinux.cfg</filename>) and adding the
+parameter to the end of the append line(s) for the kernel.
 -->
 他の preseed 方法では、ブート時にどのファイルを読み込むか、
 インストーラに指定する必要があります。
-カーネルのブートパラメータで渡して行います。
+通常、カーネルのブートパラメータで渡して行います。
 これは起動時に手動で与えるか、
 ブートローダ設定ファイル (例: <filename>syslinux.cfg</filename>) を編集し、
 カーネルへの append 行の最後にパラメータを追加して与えます。
@@ -512,6 +512,71 @@ questions even if the preseeding below misses some.
 <userinput>debconf/priority=critical</userinput> を追加したいかもしれません。
 preseed でいくつか以下の設定を漏らしても、
 ほとんどの質問が表示されなくなります。
+
+</para>
+  </sect2>
+  
+  <sect2 id="preseed-dhcp">
+<!--
+  <title>Using a DHCP server to specify preseed files</title>
+-->
+  <title>preseed ファイルを指定するための DHCP の利用方法</title>
+<para>
+ 
+<!--
+It's also possible to use DHCP to specify a preseed file to download from
+the network. DHCP allows specifying a filename. Normally this is a file to
+netboot, but if it appears to be an URL then installation media that
+support network preseeding will download the file from the URL and use it
+as a preseed file. Here is an example of how to set it up in the dhcpd.conf
+for version 3 of the ISC DHCP server (the dhcp3-server Debian package).
+-->
+preseed ファイルをネットワークからダウンロードするよう指定するのに、
+DHCP も使用できます。DHCP はファイル名の指定ができます。
+通常これは netboot のファイルですが、URL 形式になっていると、
+ネットワーク preseed をサポートするインストールメディアが、
+URL からファイルをダウンロードし、preseed ファイルとして使用します。
+以下は、ISC DHCP サーバのバージョン 3 用 dhcpd.conf で設定するサンプルです。
+
+</para>
+
+<informalexample><screen>
+if substring (option vendor-class-identifier, 0, 3) = "d-i" {
+       filename "http://host/preseed.cfg";
+}
+</screen></informalexample>
+
+<para>
+
+<!--
+Note that the above example limits this filename to DHCP clients that identify
+themselves as "d-i", so it will not affect regular DHCP clients, but only
+the installer. You can also put the text in a stanza for only one particular
+host to avoid preseeding all installs on your network.
+-->
+上記の例は、
+"d-i" を名乗る DHCP クライアントにこのファイル名を渡すよう制限されており、
+通常の DHCP クライアントではなく、
+インストーラにのみ影響を与えることに注意してください。
+この文字列で、ネットワーク上の全マシンに preseed でインストールするのではなく、
+特定のホストに対して行うようにもできます。
+
+</para><para>
+
+<!--
+A good way to use the DHCP preseeding is to only preseed values specific to
+your network, such as the Debian mirror to use. This way installs on your
+network will automatically get a good mirror selected, but the rest of the
+installation can be performed interactively. Using DHCP preseeding to fully
+automate Debian installs should only be done with care.
+-->
+DHCP preseed を使用するよい方法は、自分のネットワークには、
+Debian ミラーサイトのような preseed の値のみ指定することです。
+自分のネットワークにこの方法でインストールすると、
+選択したよいミラーサイトから自動で取得しますが、
+インストールの残りのプロセスはインタラクティブに行われます。
+DHCP preseed を用いた Debian の完全自動インストールは、
+十分注意しなければ行うべきではありません。
 
 </para>
   </sect2>
@@ -942,8 +1007,7 @@ supported by <classname>partman-auto</classname>. You can choose to either
 partition existing free space on a disk or a whole disk. The layout of the
 disk can be determined by using a predefined recipe, a custom recipe from
 a recipe file or a recipe included in the preseed file. It is currently not
-possible to partition multiple disks using preseeding nor to set up RAID or
-LVM.
+possible to partition multiple disks using preseeding nor to set up RAID.
 -->
 ハードディスクのパーティション分割に preseed を使用するのは、
 <classname>partman-auto</classname> でサポートしている機能に限定されています。
@@ -952,7 +1016,7 @@ LVM.
 レシピファイルによるカスタムレシピ、
 preseed ファイルに書いたレシピから選択できます。
 現在のところ、パーティションに preseed を用いて複数のディスクを割り当ることや、
-RAID や LVM の設定することはできません。
+RAID の設定することはできません。
 
 </para>
 
@@ -971,6 +1035,7 @@ correct one will be selected before using preseeding.
 
 <informalexample role="example"><screen>
 # If the system has free space you can choose to only partition that space.
+# Note: the preseed value for this template needs to be localized (translated).
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 
@@ -979,7 +1044,8 @@ correct one will be selected before using preseeding.
 # For example, to use the first disk devfs knows of:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
-# You can choose from any of the predefined partitioning recipes:
+# You can choose from any of the predefined partitioning recipes.
+# Note: the preseed value for this template needs to be localized (translated).
 d-i partman-auto/choose_recipe \
        select All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe \
