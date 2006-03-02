@@ -132,13 +132,14 @@ else
     cat ${FILE_TO_CHECK} | sed "1,2d" > ${FILE_CODEPOINTS}
 fi
 
-    cat ${FILE_CODEPOINTS} | sed "s:^- ::" | sed "s:^\"\"$:\" \":"  | sed "s|\\\\\"||g" | sed "s|\$TCPIP|TCPIP|" | \
+   cat ${FILE_CODEPOINTS} | \
+    sed "s:^- ::" | sed "s:^\"\"$::"  | sed "s|\\\\\"||g" | sed "s|\$TCPIP|TCPIP|" | \
 	utf2uxx.pl > ${DEST_DIR}/${LANG}_codes1.txt
     
     # FIXME: U0022 was removed from utf2uxx.pl
     # now I put it back in (count for this char are wrong)
     echo "<U0022>" >> ${DEST_DIR}/${LANG}_codes1.txt    
-    cat ${DEST_DIR}/${LANG}_codes1.txt | sed "s|><|>\n<|g" | sed "s:\"::g" | sort | uniq -c > ${DEST_DIR}/${LANG}_codes.txt
+    cat ${DEST_DIR}/${LANG}_codes1.txt | sed "s|><|>\n<|g" | sed "s:\"::g" | sort | sed -e '/^$/d' | uniq -c > ${DEST_DIR}/${LANG}_codes.txt
     FILES_TO_KEEP="${DEST_DIR}/${LANG}_codes.txt ${FILES_TO_KEEP}" 
     CODEPOINTS=$(wc -l ${DEST_DIR}/${LANG}_codes.txt | awk '{print $1}')
     
