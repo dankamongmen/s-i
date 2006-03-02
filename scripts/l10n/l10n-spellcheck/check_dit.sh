@@ -128,22 +128,22 @@ if [ ${REMOVE_VARS} = "yes" ] ; then
     FILE_CODEPOINTS=${FILE_TO_CHECK}
 else
     # remove header
-    FILE_CODEPOINTS=temp-codes.txt
+    FILE_CODEPOINTS=${DEST_DIR}/temp-codes.txt
     cat ${FILE_TO_CHECK} | sed "1,2d" > ${FILE_CODEPOINTS}
 fi
 
     cat ${FILE_CODEPOINTS} | sed "s:^- ::" | sed "s:^\"\"$:\" \":"  | sed "s|\\\\\"||g" | sed "s|\$TCPIP|TCPIP|" | \
-	utf2uxx.pl > ${LANG}_codes1.txt
+	utf2uxx.pl > ${DEST_DIR}/${LANG}_codes1.txt
     
     # FIXME: U0022 was removed from utf2uxx.pl
     # now I put it back in (count for this char are wrong)
-    echo "<U0022>" >> ${LANG}_codes1.txt    
-    cat ${LANG}_codes1.txt | sed "s|><|>\n<|g" | sed "s:\"::g" | sort | uniq -c > ${DEST_DIR}/${LANG}_codes.txt
+    echo "<U0022>" >> ${DEST_DIR}/${LANG}_codes1.txt    
+    cat ${DEST_DIR}/${LANG}_codes1.txt | sed "s|><|>\n<|g" | sed "s:\"::g" | sort | uniq -c > ${DEST_DIR}/${LANG}_codes.txt
     FILES_TO_KEEP="${DEST_DIR}/${LANG}_codes.txt ${FILES_TO_KEEP}" 
     CODEPOINTS=$(wc -l ${DEST_DIR}/${LANG}_codes.txt | awk '{print $1}')
     
     cat ${DEST_DIR}/${LANG}_codes.txt | awk '{print $2}' >> ${DEST_DIR}/all_codes-tmp.txt
-    rm ${LANG}_codes1.txt
+    rm ${DEST_DIR}/${LANG}_codes1.txt
 
     if [ ${REMOVE_VARS} != "yes" ] ; then
 	rm ${FILE_CODEPOINTS}
