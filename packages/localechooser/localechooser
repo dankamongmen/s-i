@@ -82,7 +82,8 @@ locale2langname() {
 				# More than one match; try matching the
 				# country as well.
 				countrypart="${1#*_}"
-				countryline="$(echo "$line" | grep ";$countrypart\$")"
+				countrypart="${countrypart%%[@.]*}"
+				countryline="$(echo "$line" | grep ";$countrypart\$" ||true)"
 				if [ "$countryline" ]; then
 					echo "${countryline%%;*}"
 					return
