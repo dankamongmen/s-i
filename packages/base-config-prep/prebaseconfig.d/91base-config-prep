@@ -10,77 +10,77 @@ set -e
 TEMPLATE_ROOT=base-config-prep
 
 log() {
-    logger -t base-config-prep "$@"
+	logger -t base-config-prep "$@"
 }
 
 config_ncc_user () {
-    echo 'installer:x:0:0:installer:/:/usr/sbin/base-config-network-console' >> /target/etc/passwd
-    grep "^installer:" /etc/shadow >> /target/etc/shadow
+	echo 'installer:x:0:0:installer:/:/usr/sbin/base-config-network-console' >> /target/etc/passwd
+	grep "^installer:" /etc/shadow >> /target/etc/shadow
 }
 
 setup_ssh_install () {
-    if [ "$TERM_TYPE" != network ] ; then
-        return 1
-    fi
+	if [ "$TERM_TYPE" != network ] ; then
+		return 1
+	fi
 
-    NCC=network-console-config
-    # Try installing network-console-config has been installed
-    if apt-install $NCC; then
-        config_ncc_user
-        db_input critical $TEMPLATE_ROOT/nc-prebaseconfig-reminder
-        db_go
-        return 0
-    else
-        log "Package $NCC could not be installed"
-        log "The system will not be set up to run base configuration over SSH"
-        db_subst $TEMPLATE_ROOT/nc-prebaseconfig-failure PACKAGE $NCC
-        db_input critical $TEMPLATE_ROOT/nc-prebaseconfig-failure
-        db_go
-        return 1
-    fi
+	NCC=network-console-config
+	# Try installing network-console-config has been installed
+	if apt-install $NCC; then
+		config_ncc_user
+		db_input critical $TEMPLATE_ROOT/nc-prebaseconfig-reminder
+		db_go
+		return 0
+	else
+		log "Package $NCC could not be installed"
+		log "The system will not be set up to run base configuration over SSH"
+		db_subst $TEMPLATE_ROOT/nc-prebaseconfig-failure PACKAGE $NCC
+		db_input critical $TEMPLATE_ROOT/nc-prebaseconfig-failure
+		db_go
+		return 1
+	fi
 }
 
 config_inittab () {
-    # Since this script is running with debconf, 'tty' does
-    # not give reliable answers about what sort of terminal
-    # we have.  The stdin of /sbin/debian-installer seems
-    # to tell the truth.
+	# Since this script is running with debconf, 'tty' does
+	# not give reliable answers about what sort of terminal
+	# we have.  The stdin of /sbin/debian-installer seems
+	# to tell the truth.
 
-    # If the installation is run using network-console (over ssh),
-    # there can be two debian-installer processes; only use the first.
+	# If the installation is run using network-console (over ssh),
+	# there can be two debian-installer processes; only use the first.
 
-    inst_pid=$(pidof debian-installer | cut -d" " -f1)
-    rawconsole=$(readlink /proc/${inst_pid}/fd/0)
-    console=$(mapdevfs "$rawconsole")
-    rawconsole=${rawconsole#/dev/}
-    console=${console#/dev/}
+	inst_pid=$(pidof debian-installer | cut -d" " -f1)
+	rawconsole=$(readlink /proc/${inst_pid}/fd/0)
+	console=$(mapdevfs "$rawconsole")
+	rawconsole=${rawconsole#/dev/}
+	console=${console#/dev/}
 
-    if setup_ssh_install ; then
-        log "Network installation: not configuring /etc/inittab to run base-config after reboot"
-    else
-        case "$console" in
-        ttyS*)
-            log "Configuring /etc/inittab to run base-config for serial console"
-            mv /target/etc/inittab /target/etc/inittab.real
-            sed -e "s/^\([23]\):/#\1:/" \
-                -e "s#CONSOLEDEV#/dev/$console#g" \
-                /usr/share/base-config-prep/inittab > /target/etc/inittab
-            ;;
-        *)
-            log "Configuring /etc/inittab to run base-config for regular console"
-            mv /target/etc/inittab /target/etc/inittab.real
-            sed -e "s#CONSOLEDEV#/dev/$console#g" /usr/share/base-config-prep/inittab \
-                > /target/etc/inittab
-            ;;
-        esac
-    fi
+	if setup_ssh_install ; then
+		log "Network installation: not configuring /etc/inittab to run base-config after reboot"
+	else
+		case "$console" in
+		    ttyS*)
+			log "Configuring /etc/inittab to run base-config for serial console"
+			mv /target/etc/inittab /target/etc/inittab.real
+			sed -e "s/^\([23]\):/#\1:/" \
+			    -e "s#CONSOLEDEV#/dev/$console#g" \
+			    /usr/share/base-config-prep/inittab > /target/etc/inittab
+			;;
+		    *)
+			log "Configuring /etc/inittab to run base-config for regular console"
+			mv /target/etc/inittab /target/etc/inittab.real
+			sed -e "s#CONSOLEDEV#/dev/$console#g" \
+			    /usr/share/base-config-prep/inittab > /target/etc/inittab
+			;;
+		esac
+	fi
 }
 
 # Only run if we're installing Sarge
 if db_get mirror/codename && [ "$RET" ]; then
-        if [ "$RET" != sarge ]; then
-                exit 0
-        fi
+	if [ "$RET" != sarge ]; then
+		exit 0
+	fi
 fi
 
 config_inittab
