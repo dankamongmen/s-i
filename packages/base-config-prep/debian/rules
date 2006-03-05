@@ -2,6 +2,9 @@
 
 DESTDIR = debian/base-config-prep
 
+scripts = \
+	91base-config-prep
+
 build:
 	dh_testdir
 
@@ -15,7 +18,10 @@ install: build
 	dh_testroot
 	dh_installdirs
 	install -m0644 inittab.install $(DESTDIR)/usr/share/base-config-prep/inittab
-	install -m0755 prebaseconfig $(DESTDIR)/usr/lib/prebaseconfig.d/91base-config-prep
+	set -e ; for file in $(scripts); do \
+		install -m0755 prebaseconfig.d/$$file $(DESTDIR)/usr/lib/prebaseconfig.d/$$file; \
+	done
+
 
 binary-indep: build install
 	dh_testdir
