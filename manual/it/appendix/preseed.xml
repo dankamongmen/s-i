@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 34168 -->
+<!-- original version: 35051 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -206,14 +206,14 @@ che queste domande siano poste.
 Although most questions used by &d-i; can be preseeded using this method,
 there are some notable exceptions. You must (re)partition an entire disk
 or use available free space on a disk; it is not possible to use existing
-partitions. You currently cannot use preseeding to set up RAID and LVM.
+partitions. You currently cannot use preseeding to set up RAID.
 -->
 
 Nonostante che la maggior parte delle domande poste da &d-i; possa essere
 preconfigurata, esistono delle eccezioni notevoli. Si deve partizionare
 l'intero disco oppure usare solo lo spazio libero sul disco; non è possibile
 usare delle partizioni esistenti. Attualmente non si può usare la
-preconfigurazione per impostare RAID e LVM.
+preconfigurazione per impostare il RAID.
 
 </para>
   </sect2>
@@ -407,17 +407,17 @@ e lo carica.
 </para><para>
 
 <!--
-For the other preseeding methods you need to tell the installer what file to
-use when you boot it. This is done by passing the kernel a boot parameter,
-either manually at boot time or by editing the bootloader configuration file
-(e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end
-of the append line(s) for the kernel.
+For the other preseeding methods you need to tell the installer what file
+to use when you boot it. This is normally done by passing the kernel a boot
+parameter, either manually at boot time or by editing the bootloader
+configuration file (e.g. <filename>syslinux.cfg</filename>) and adding the
+parameter to the end of the append line(s) for the kernel.
 -->
 
 Per gli altri metodi di preconfigurazione è necessario specificare durante
-l'avvio dell'installatore quale file usare. Questo può essere fatto passando
-al kernel determinato parametro d'avvio, manualmente durante l'avvio oppure
-tramite il file di configurazione del boot loader (p.e.
+l'avvio dell'installatore quale file usare. Normalmente questo può essere
+fatto passando al kernel determinato parametro d'avvio, manualmente durante
+l'avvio oppure tramite il file di configurazione del boot loader (p.e.
 <filename>syslinux.cfg</filename>) aggiungendo il parametro alla fine delle
 righe <quote>append</quote> per il kernel.
 
@@ -488,6 +488,75 @@ questions even if the preseeding below misses some.
 A questo punto si può anche aggiungere come parametro d'avvio
 <userinput>debconf/priority=critical</userinput>. Questo evita la maggior
 parte delle domande anche se non sono state preconfigurate.
+
+</para>
+  </sect2>
+
+  <sect2 id="preseed-dhcp">
+  <!-- <title>Using a DHCP server to specify preseed files</title> -->
+  <title>Uso di un server DHCP per specificare un file di preconfigurazione</title>
+<para>
+ 
+<!--
+It's also possible to use DHCP to specify a preseed file to download from
+the network. DHCP allows specifying a filename. Normally this is a file to
+netboot, but if it appears to be an URL then installation media that
+support network preseeding will download the file from the URL and use it
+as a preseed file. Here is an example of how to set it up in the dhcpd.conf
+for version 3 of the ISC DHCP server (the dhcp3-server Debian package).
+-->
+
+È possibile usare anche DHCP per indicare un file di preconfigurazione da
+scaricare dalla rete, questo è possibile perché DHCP consente il passaggio
+del nome di un file fra server e client. Normalmente il file specificato è
+quello per l'avvio dalla rete, però se al suo posto è inserito un URL allora
+il programma d'installazione scarica il file dall'URL e lo usa come un file
+di preconfigurazione. Segue un esempio di come deve essere impostato il file
+dhcpd.conf per la versione 3 del server DHCP di ISC (il pacchetto Debian
+dhcp3-server).
+
+</para>
+
+<informalexample><screen>
+if substring (option vendor-class-identifier, 0, 3) = "d-i" {
+	filename "http://host/preseed.cfg";
+}
+</screen></informalexample>
+
+<para>
+
+<!--
+Note that the above example limits this filename to DHCP clients that identify
+themselves as "d-i", so it will not affect regular DHCP clients, but only
+the installer. You can also put the text in a stanza for only one particular
+host to avoid preseeding all installs on your network.
+-->
+
+Notare che l'esempio precedente limita la specifica del nome del file ai
+soli client DHCP che s'identificano come <quote>d-i</quote>, quindi ha
+effetto solo sul programma d'installazione e non influenza i normali
+client DHCP. Si può anche inserire mettere il testo in una sezione del
+file di configurazione in modo che sia usata da un solo host per impedire
+la preconfigurazione di tutte le macchine che si installano sulla propria
+rete.
+
+</para><para>
+
+<!--
+A good way to use the DHCP preseeding is to only preseed values specific to
+your network, such as the Debian mirror to use. This way installs on your
+network will automatically get a good mirror selected, but the rest of the
+installation can be performed interactively. Using DHCP preseeding to fully
+automate Debian installs should only be done with care.
+-->
+
+Un modo corretto per usare la preconfigurazione tramite DHCP è preconfigurare
+i soli valori specifici della propria rete, per esempio quale mirror Debian
+usare. In questo modo tutte le installazioni fatte sulla propria rete hanno
+già attivo un buon mirror, ma il resto della configurazione deve essere
+fatto interattivamente. L'uso della preconfigurazione tramite DHCP per fare
+la completa configurazione delle installazioni Debian deve essere fatto con
+molta cautela.
 
 </para>
   </sect2>
@@ -951,8 +1020,7 @@ supported by <classname>partman-auto</classname>. You can choose to either
 partition existing free space on a disk or a whole disk. The layout of the
 disk can be determined by using a predefined recipe, a custom recipe from
 a recipe file or a recipe included in the preseed file. It is currently not
-possible to partition multiple disks using preseeding nor to set up RAID or
-LVM.
+possible to partition multiple disks using preseeding nor to set up RAID.
 -->
 
 Il supporto della preconfigurazione per il partizionamento è limitato
@@ -961,7 +1029,7 @@ partizionare lo spazio libero esistente sul disco oppure l'intero disco.
 La struttura delle partizioni sul disco possono essere determinate usando
 una ricetta predefinita oppure una ricetta personalizzata in un file o
 inclusa nel file di preconfigurazione. Attualmente non è possibile partizionare
-più dischi e nemmeno impostare RAID o LVM.
+più dischi e nemmeno impostare il RAID.
 
 </para>
 
@@ -983,10 +1051,12 @@ preconfigurazione.
 <informalexample role="example"><screen>
 <!--
 # If the system has free space you can choose to only partition that space.
+# Note: the preseed value for this template needs to be localized (translated).
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 --># Se il sistema ha spazio libero è possibile scegliere di partizionare
-# soltanto quello spazio.
+# soltanto quello spazio. Nota: il valore di questa preconfigurazione deve
+# essere localizzato (cioè tradotto).
 #d-i partman-auto/init_automatically_partition \
 #    select Usa lo spazio libero continuo più grande
 <!--
@@ -1000,10 +1070,12 @@ preconfigurazione.
 # Per esempio, per usare il primo disco riconosciuto da devfs:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 <!--
-# You can choose from any of the predefined partitioning recipes:
+# You can choose from any of the predefined partitioning recipes.
+# Note: the preseed value for this template needs to be localized (translated).
 -->
 # È possibile scegliere da una qualsiasi delle ricette di partizionamento
-# predefinite:
+# predefinite. Nota: il valore di questa preconfigurazione deve essere
+# localizzato (cioè tradotto).
 d-i partman-auto/choose_recipe \
 <!--
        select All files in one partition (recommended for new users)
