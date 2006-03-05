@@ -67,6 +67,9 @@ typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *q
 #define q_get_choices_vals(q)           question_get_field((q), NULL, "choices")
 #define q_get_indices(q)                question_get_field((q), "", "indices")
 
+static GCond *button_cond = NULL;
+static GMutex *button_mutex = NULL;
+
 /* A struct to let a question handler store appropriate set functions that will be called after
    gtk_main has quit */
 struct setter_struct
@@ -490,7 +493,15 @@ void exit_button_callback(GtkWidget *button, struct frontend* obj)
 
     ((struct frontend_data*)obj->data)->button_val = value;
 
-    gtk_main_quit();
+    g_mutex_lock (button_mutex);
+    /* gtk_go() gets unblocked */ 
+    g_cond_signal (button_cond);
+    g_mutex_unlock (button_mutex);
+}
+
+void cancel_button_callback(GtkWidget *button, struct frontend* obj)
+{
+    ((struct frontend_data*)obj->data)->button_val = DC_GOBACK;
 }
 
 gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *model, GtkTreePath *path, gboolean path_currently_selected, struct frontend_question_data *data)
@@ -1309,7 +1320,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
 {
 
     GtkWidget *v_mainbox, *h_mainbox, *logobox, *targetbox, *actionbox, *h_actionbox;
-    GtkWidget *button_next, *button_prev, *button_screenshot;
+    GtkWidget *button_next, *button_prev, *button_screenshot, *button_cancel;
     GtkWidget *progress_bar, *progress_bar_label, *progress_bar_box, *h_progress_bar_box, *v_progress_bar_box;
     GtkWidget *label_title, *h_title_box, *v_title_box, *logo_button;
     GList *focus_chain = NULL;
@@ -1366,6 +1377,17 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_widget_set_sensitive (button_prev, FALSE);
     gtk_widget_set_sensitive (button_next, FALSE);
 
+    /* Cancel button is not displayed by default */
+    button_cancel = gtk_button_new_with_label (get_text(obj, "debconf/button-cancel", "Cancel"));
+    ret_val = NEW(int);
+    *ret_val = DC_GOBACK;
+    gtk_object_set_user_data (GTK_OBJECT(button_cancel), ret_val);
+    g_signal_connect (G_OBJECT(button_cancel), "clicked",
+                      G_CALLBACK(cancel_button_callback), obj);
+    gtk_box_pack_start (GTK_BOX(actionbox), button_cancel, TRUE, TRUE, DEFAULT_PADDING);
+    ((struct frontend_data*) obj->data)->button_cancel = button_cancel;
+    gtk_widget_hide(button_cancel);
+
     /* focus order inside actionbox */
     focus_chain = g_list_append(focus_chain, button_next);
     focus_chain = g_list_append(focus_chain, button_prev);
@@ -1411,10 +1433,20 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
      
 }
 
+void *eventhandler_thread()
+{
+    gdk_threads_enter();
+    gtk_main ();
+    gdk_threads_leave();
+    return 0;
+}
+
 static int gtk_initialize(struct frontend *obj, struct configuration *conf)
 {
     struct frontend_data *fe_data;
     GtkWidget *window;
+	GThread *thread_events_listener;
+	GError *err_events_listener = NULL ;
     int args = 1;
     char **name;
 
@@ -1441,6 +1473,16 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     fe_data->setters = NULL;
     fe_data->button_val = DC_NOTOK;
 
+    if( !g_thread_supported() ) {
+       g_thread_init(NULL);
+       gdk_threads_init();
+    }
+    else {
+        INFO(INFO_DEBUG, "GTK_DI - gtk_initialize() failed to initialize threads\n%s", err_events_listener->message);
+		g_error_free ( err_events_listener ) ;
+        return DC_NOTOK;
+    }
+    
     gtk_init (&args, &name);
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -1452,6 +1494,15 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     gtk_rc_reparse_all();
     ((struct frontend_data*) obj->data)->window = window;
     gtk_widget_show_all(window);
+
+    button_cond = g_cond_new ();
+    button_mutex = g_mutex_new ();
+      
+	if( (thread_events_listener = g_thread_create((GThreadFunc)eventhandler_thread, NULL, TRUE, &err_events_listener)) == NULL) {
+        INFO(INFO_DEBUG, "GTK_DI - gtk_initialize() failed to create events listener thread\n%s", err_events_listener->message);
+		g_error_free ( err_events_listener ) ;
+        return DC_NOTOK;
+	}   
 
     return DC_OK;
 }
@@ -1474,6 +1525,8 @@ static int gtk_go(struct frontend *obj)
     if (q == NULL) return DC_OK;
 
     data->setters = NULL;
+
+    gdk_threads_enter();
 
     gtk_rc_reparse_all();
 
@@ -1576,8 +1629,16 @@ static int gtk_go(struct frontend *obj)
 
     gtk_widget_show_all(data->window);
     gtk_widget_hide(((struct frontend_data*)obj->data)->progress_bar_box) ;
+    gtk_widget_hide(((struct frontend_data*)obj->data)->button_cancel) ;
 
-    gtk_main();
+    gdk_threads_leave();
+
+    g_mutex_lock (button_mutex);
+    /* frontend blocked here until the user presses either back or forward button */
+    g_cond_wait (button_cond, button_mutex);
+    g_mutex_unlock (button_mutex);
+	
+    gdk_threads_enter();
 
     if (data->button_val == DC_OK)
     {
@@ -1600,6 +1661,8 @@ static int gtk_go(struct frontend *obj)
     gtk_widget_set_sensitive (data->button_prev, FALSE);
     gtk_widget_set_sensitive (data->button_next, FALSE);
 
+    gdk_threads_leave();
+
     if (data->button_val == DC_OK)
         return DC_OK;
     else if (data->button_val == DC_GOBACK)
@@ -1615,11 +1678,13 @@ static void gtk_set_title(struct frontend *obj, const char *title)
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_set_title() called"); */
 
+    gdk_threads_enter();
     label_title = ((struct frontend_data*) obj->data)->title;
     gtk_misc_set_alignment(GTK_MISC(label_title), 0, 0);
     label_title_string = malloc(strlen(title) + 10 );
     sprintf(label_title_string,"<b> %s</b>", title);
     gtk_label_set_markup(GTK_LABEL(label_title), label_title_string);
+    gdk_threads_leave();
 }
 
 static bool gtk_can_go_back(struct frontend *obj, struct question *q)
@@ -1627,14 +1692,41 @@ static bool gtk_can_go_back(struct frontend *obj, struct question *q)
     return (obj->capability & DCF_CAPB_BACKUP);
 }
 
+static bool	gtk_can_cancel_progress(struct frontend *obj)
+{
+    return (obj->capability & DCF_CAPB_PROGRESSCANCEL);
+}
+
+static void set_design_elements_while_progressbar_runs(struct frontend *obj)
+{
+    struct frontend_data *data = (struct frontend_data *) obj->data;
+
+    /* cancel button has to be displayed */
+    if (obj->methods.can_cancel_progress(obj)) {
+        gtk_widget_hide(data->button_screenshot);
+        gtk_widget_hide(data->button_prev);
+        gtk_widget_hide(data->button_next);
+        gtk_widget_show(data->button_cancel);
+        GTK_WIDGET_SET_FLAGS (GTK_WIDGET(data->button_cancel), GTK_CAN_DEFAULT);
+        gtk_widget_grab_default (GTK_WIDGET(data->button_cancel));    
+    }
+    else {
+        gtk_widget_set_sensitive (data->button_screenshot, FALSE);
+        gtk_widget_set_sensitive (data->button_prev, FALSE);
+        gtk_widget_set_sensitive (data->button_next, FALSE);
+        gtk_widget_hide(data->button_cancel);
+    }
+
+    gtk_widget_show(data->progress_bar_box);
+}
+
 static void gtk_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
     GtkWidget *progress_bar;
 
-    struct frontend_data *data = (struct frontend_data *) obj->data;
-    gtk_widget_set_sensitive (data->button_screenshot, FALSE);
-    gtk_widget_show_all(data->window);
-
+    gdk_threads_enter();
+    gtk_rc_reparse_all();
+    set_design_elements_while_progressbar_runs(obj);
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
@@ -1643,11 +1735,9 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
+    gdk_threads_leave();
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_start(min=%d, max=%d, title=%s) called", min, max, title); */
-
-    while (gtk_events_pending ())
-        gtk_main_iteration ();
 }
 
 static int gtk_progress_set(struct frontend *obj, int val)
@@ -1655,8 +1745,9 @@ static int gtk_progress_set(struct frontend *obj, int val)
     gdouble progress;
     GtkWidget *progress_bar;
     struct frontend_data *data = (struct frontend_data *) obj->data;
-    gtk_widget_set_sensitive (data->button_screenshot, FALSE);
-
+    gdk_threads_enter();
+    set_design_elements_while_progressbar_runs(obj);
+    
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val); */
 
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
@@ -1669,13 +1760,12 @@ static int gtk_progress_set(struct frontend *obj, int val)
                    (gdouble)(obj->progress_max - obj->progress_min);
         gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar), progress);
     }
+    gdk_threads_leave();
 
-    gtk_widget_show_all(data->window);
-
-    while (gtk_events_pending ())
-        gtk_main_iteration ();
-
-    return DC_OK;
+    if (data->button_val == DC_OK || data->button_val == DC_GOBACK)
+        return (data->button_val);
+    else
+        return DC_OK;
 }
 
 static int gtk_progress_info(struct frontend *obj, const char *info)
@@ -1683,8 +1773,8 @@ static int gtk_progress_info(struct frontend *obj, const char *info)
     GtkWidget *progress_bar_label;
     char *progress_bar_label_string;
     struct frontend_data *data = (struct frontend_data *) obj->data;
-    gtk_widget_set_sensitive (data->button_screenshot, FALSE);
-
+    gdk_threads_enter();
+    set_design_elements_while_progressbar_runs(obj);
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info); */
 
     progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
@@ -1692,23 +1782,21 @@ static int gtk_progress_info(struct frontend *obj, const char *info)
     sprintf(progress_bar_label_string,"<i> %s...</i>",info);
     gtk_label_set_markup(GTK_LABEL(progress_bar_label), progress_bar_label_string);
     free(progress_bar_label_string);
+    gdk_threads_leave();
 
-    gtk_widget_show_all(data->window);
-
-    while (gtk_events_pending ())
-        gtk_main_iteration ();
-
-    return DC_OK;
+    if (data->button_val == DC_OK || data->button_val == DC_GOBACK)
+        return (data->button_val);
+    else
+        return DC_OK;
 }
 
 static void gtk_progress_stop(struct frontend *obj)
 {
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_stop() called"); */
-
+    gdk_threads_enter();
     gtk_widget_hide( ((struct frontend_data*)obj->data)->progress_bar_box );
-
-    while (gtk_events_pending ())
-        gtk_main_iteration ();
+    gtk_widget_hide( ((struct frontend_data*)obj->data)->button_cancel );
+    gdk_threads_leave();
 }
 
 static unsigned long gtk_query_capability(struct frontend *f)
@@ -1723,6 +1811,7 @@ struct frontend_module debconf_frontend_module =
     go: gtk_go,
     set_title: gtk_set_title,
     can_go_back: gtk_can_go_back,
+    can_cancel_progress: gtk_can_cancel_progress,
     progress_start: gtk_progress_start,
     progress_info: gtk_progress_info,
     progress_set: gtk_progress_set,

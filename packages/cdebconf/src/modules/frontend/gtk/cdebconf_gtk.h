@@ -55,6 +55,7 @@ struct frontend_data
   GtkWidget *button_next;
   GtkWidget *button_prev;
   GtkWidget *button_screenshot;
+  GtkWidget *button_cancel;
 
   /* Pointer to the Progress Bar, when initialized */
   GtkWidget *progress_bar; 
