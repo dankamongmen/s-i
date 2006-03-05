@@ -1,0 +1,18 @@
+This udeb will prepare the target system to run base-config after the reboot.
+It also installs network-console-config if the installation is taking place
+over ssh and sets up base-config to be run when the installer user logs into
+the system after reboot.
+
+This is only needed when installing Sarge using the Etch installer.
+
+TODO
+====
+- base-installer needs to be fixed so it will fall back to initrd-tools
+  of neither yaird or initramfs-tools available
+- base-installer selects smp kernel by default for 2.6.8 kernel (vmware, 686)
+- for some arches kernel selection may be completely broken for Sarge
+  installations due to 2.4->2.6 switch
+- Sarge does not like the 'hotplug' networking setup
+- Sarge's base-config does not like to be in UTF-8 environment
+- clock setup (UTC/local), timezone iselection and apt-setup are run
+  unconditionally, so these should be disabled in 1st stage
