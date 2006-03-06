@@ -1,3 +1,11 @@
 #!/bin/sh
 set -e
 anna cdrom-retriever default
+
+# If a -support udeb is available for the selected release, install it
+# This will mostly be used to preserve backwards compatibility with stable
+. /usr/share/debconf/confmodule
+if db_get mirror/codename && [ "$RET" ]; then
+	anna-install $RET-support || true
+fi
+
