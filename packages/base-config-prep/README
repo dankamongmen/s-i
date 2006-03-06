@@ -1,21 +1,41 @@
-This udeb will prepare the target system to run base-config after the reboot.
-It also installs network-console-config if the installation is taking place
-over ssh and sets up base-config to be run when the installer user logs into
-the system after reboot.
+This udeb will prepare the target system for Sarge installations using the
+Etch installer. It reintruduces some functionality that was dropped for Etch
+but is needed when installing Sarge.
+Note that the aim is not to perfectly reproduce a Sarge install, just to get
+things working.
 
-This is only needed when installing Sarge using the Etch installer.
+FEATURES
+========
+- if network-console is not used, inittab is set up to start base-config
+  on reboot
+- if network-console is used, the 'installer' user is set up in the target
+  system; base-config is run on (remote) login using this user
+- disable 'hotplug' networking configuration for eth0 as otherwise it will
+  probably not be brought up on boot
+- create /var/log/debian-installer symlink to /var/log/installer
+
+DIFFERENCES
+===========
+There are some notable differences with a real Sarge install.
+Note: this list is i386 centric.
+- udev will be installed by default when using 2.6 based install
+- environment will be set up to use UTF-8 by default
 
 TODO
 ====
 - something needs to be made responsible for installing this udeb...
 - base-installer needs to be fixed so it will fall back to initrd-tools
-  of neither yaird or initramfs-tools available
+  if neither yaird or initramfs-tools are available (maybe with a kernel
+  version check)
 - base-installer selects smp kernel by default for 2.6.8 kernel (vmware, 686)
 - for some arches kernel selection may be completely broken for Sarge
-  installations due to 2.4->2.6 switch
-- Sarge does not like the 'hotplug' networking setup
-- Sarge's base-config does not like to be in UTF-8 environment
+  installations due to 2.4->2.6 switch; maybe even explicitly not support these
+- Sarge's base-config does not like to be in UTF-8 environment (English install)
+  - unicode-start has been run for base-config, but borders are missing
+  - for other VTs, unicode-start has not been run
+  - for VT1 the problems are gone after reboot, not for the others
+  - for base-config, this is a termwrap problem: disabling jbfterm in termwrap
+    (like is already done for Greek) solves the problem
 - clock setup (UTC/local), timezone iselection and apt-setup are run
   unconditionally, so these should be disabled in 1st stage
-- debconf value for normal user name needs to be copied for exim config
 - functionality for network-config installs is untested

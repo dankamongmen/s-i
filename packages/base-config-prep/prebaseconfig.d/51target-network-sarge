@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Hotplug network configuration does not really work for Sarge
+# So modify network configuration to bring eth0 up automatically
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+TEMPLATE_ROOT=base-config-prep
+
+log() {
+	logger -t base-config-prep "$@"
+}
+
+# Only run if we're installing Sarge
+if db_get mirror/codename && [ "$RET" ]; then
+	if [ "$RET" != sarge ]; then
+		exit 0
+	fi
+fi
+
+chroot /target sed -i "s/^allow-hotplug eth0/auto eth0/" /etc/network/interfaces
+chroot /target sed -i "s/^\tmap eth0/#\tmap eth0/" /etc/network/interfaces
