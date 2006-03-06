@@ -85,6 +85,13 @@ fi
 
 config_inittab
 
+# The termwrap shipped with Sarge does not set up correctly for UTF-8 for most
+# languages, so we replace it with a modified version. Not the way things
+# should be done, but as termwrap is part of base-config, not unacceptable
+if [ -f /target/usr/sbin/termwrap ]; then
+	cp /usr/share/sarge-support/termwrap /target/usr/sbin/
+fi
+
 # We need to copy d-i debconf variable passwd/username for use by exim4-config
 # Other variables base-config knows how to deal with itself
 debconf-copydb -p "^passwd/username$" configdb target_configdb
