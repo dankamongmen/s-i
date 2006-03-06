@@ -85,6 +85,10 @@ fi
 
 config_inittab
 
+# We need to copy d-i debconf variable passwd/username for use by exim4-config
+# Other variables base-config knows how to deal with itself
+debconf-copydb -p "^passwd/username$" configdb target_configdb
+
 # Sarge's base-config expects installation logs in /var/log/debian-installer
 # Needed to get debconf values from 1st stage
 cd /target/var/log
