@@ -538,7 +538,7 @@ for package in $packages ; do
  if [ "$DEBUG" = "Y" ] ; then
    echo -n "      - rebuild languages files: "
  fi
- # For each languages listed in packages/po, update PO files
+ # For each language listed in packages/po, update PO files
  for lang in $languages ; do
       if [ "$DEBUG" = "Y" ] ; then
         echo -n "$lang "
@@ -567,9 +567,9 @@ EOF
         oldfiltered=`tempfile`
         newfiltered=`tempfile`
         filter="((PO-Revision-Date|Project-Id-Version|Report-Msgid-Bugs-To|POT-Creation-Date|Last-Translator|Language-Team|MIME-Version|Content-Type|Content-Transfer-Encoding|X-Generator|Plural-Forms):)|^#[^,]|^\#$"
-        cat $lang.po | egrep -v "$filter" >$oldfiltered
-        cat $lang.po.new | egrep -v "$filter" >$newfiltered
-        if [ $(diff --ignore-matching-lines="PO-Revision-Date:" $lang.po $lang.po.new | wc -l) = 0 ] ; then
+        egrep -v "$filter" $lang.po >$oldfiltered
+        egrep -v "$filter" $lang.po.new >$newfiltered
+        if [ -z "$(diff --ignore-matching-lines="PO-Revision-Date:" $lang.po $lang.po.new)" ] ; then
 	  # We don't commit if only PO-Revision-Date changed
 	  rm $lang.po.new
         else
