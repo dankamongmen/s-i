@@ -14,8 +14,7 @@ ifeq ($(DEB_HOST_ARCH_OS),)
   DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
 endif
 
-files = \
-	S65fontconfig
+files = 
 
 ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
    files += \
