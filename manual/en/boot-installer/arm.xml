@@ -11,7 +11,9 @@
 
 Netwinders have two network interfaces: A 10Mbps NE2000-compatible
 card (which is generally referred to as <filename>eth0</filename>) and
-A 100Mbps Tulip card.
+a 100Mbps Tulip card.  There may be problems loading the image via TFTP
+using the 100Mbps card so it is recommended that you use the 10Mbps
+interfaced (the one labeled with <filename>10 Base-T</filename>).
 
 </para><note><para>
 
@@ -41,8 +43,14 @@ from
 
 When you boot your Netwinder you have to interrupt the boot process during the
 countdown.  This allows you to set a number of firmware settings needed in
-order to boot the installer.  You must first configure the network, either
-with a static address:
+order to boot the installer.  First of all, start by loading the default
+settings:
+
+<informalexample><screen>
+    NeTTrom command-&gt; load-defaults
+</screen></informalexample>
+
+Furthermore, you must configure the network, either with a static address:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv netconfig_eth0 flash
@@ -52,37 +60,54 @@ with a static address:
 where 24 is the number of set bits in the netmask, or a dynamic address:
 
 <informalexample><screen>
-    NeTTrom command-&gt; boot diskless
+    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
 </screen></informalexample>
 
 You may also need to configure the <userinput>route1</userinput>
 settings if the TFTP
-server is not on the local subnet.  The rest of the config is pretty
-standard (the save-all step is optional):
+server is not on the local subnet.
+
+Following these settings, you have to specify the TFTP server and the
+location of the image.  You can then store your settings to flash.
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
     NeTTrom command-&gt; setenv kerntftpfile boot.img
     NeTTrom command-&gt; save-all
-    NeTTrom command-&gt; setenv kernconfig tftp
-    NeTTrom command-&gt; setenv rootdev /dev/ram
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
 </screen></informalexample>
 
-Only the last three of these interfere with normal disk booting, so it is
-safe to issue <command>save-all</command> right before them, which will
-store the network settings in case you need to boot from the network
-again.
+Now you have to tell the firmware that the TFTP image should be booted:
 
-If you want to use the serial console to install your Netwinder, you also
-need the following setting:
+<informalexample><screen>
+    NeTTrom command-&gt; setenv kernconfig tftp
+    NeTTrom command-&gt; setenv rootdev /dev/ram
+</screen></informalexample>
+
+If you use a serial console to install your Netwinder, you need to add the
+following setting:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
 </screen></informalexample>
 
-Use the <command>printenv</command> command to review your
-environment settings.
+Alternatively, for installations using a keyboard and monitor you have to
+set:
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
+</screen></informalexample>
+
+You can use the <command>printenv</command> command to review your
+environment settings.  After you have verified that the settings are
+correct, you can load the image:
+
+<informalexample><screen>
+    NeTTrom command-&gt; boot
+</screen></informalexample>
+
+In case you run into any problems, a detailed HOWTO is <ulink
+url="http://www.netwinder.org/howto/Firmware-HOWTO.html"></ulink> is
+available.
 
 </para>
   </sect3>
