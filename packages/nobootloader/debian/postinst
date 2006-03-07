@@ -66,11 +66,12 @@ case "`archdetect`" in
 		db_input high nobootloader/confirmation_powerpc_chrp_pegasos || true
 	;;
 	arm/netwinder)
+	# TODO: figure out whether we're running NeTTrom or ABLE (#345317)
 		kernel=/vmlinuz
 		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNDEV "$bootfs"
 		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNFILE "$kernel"
 		db_subst nobootloader/confirmation_arm_netwinder_nettrom ROOTDEV "$rootfs"
-		# TODO: handle serial console
+		# TODO: handle serial console (#274695)
 		db_subst nobootloader/confirmation_arm_netwinder_nettrom CMDAPPEND "root=$rootfs"
 		db_input high nobootloader/confirmation_arm_netwinder_nettrom || true
 	;;
