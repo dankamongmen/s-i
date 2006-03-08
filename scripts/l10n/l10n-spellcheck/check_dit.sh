@@ -132,24 +132,24 @@ else
     cat ${FILE_TO_CHECK} | sed "1,2d" > ${FILE_CODEPOINTS}
 fi
 
-   cat ${FILE_CODEPOINTS} | \
-    sed "s:^- ::" | sed "s:^\"\"$::"  | sed "s|\\\\\"||g" | sed "s|\$TCPIP|TCPIP|" | \
-	utf2uxx.pl > ${DEST_DIR}/${LANG}_codes1.txt
-    
-    # FIXME: U0022 was removed from utf2uxx.pl
-    # now I put it back in (count for this char are wrong)
-    echo "<U0022>" >> ${DEST_DIR}/${LANG}_codes1.txt    
-    cat ${DEST_DIR}/${LANG}_codes1.txt | sed "s|><|>\n<|g" | sed "s:\"::g" | sort | sed -e '/^$/d' | uniq -c > ${DEST_DIR}/${LANG}_codes.txt
+    cat ${FILE_CODEPOINTS} | \
+    sed "s|^- \"\(.*\)\"$|\1|" | \
+    sed "s|\$TCPIP|TCPIP|" | \
+    sed "s|\\\\\"|\"|g"  > ${DEST_DIR}/fully_stripped.txt
+
+    iconv -f utf8 -t ucs-4le ${DEST_DIR}/fully_stripped.txt | od -v -tx2 -An -w2 | sed "s|\(....\)$|<U\1>|" > ${DEST_DIR}/${LANG}_codes1.txt
+
+    sort ${DEST_DIR}/${LANG}_codes1.txt | uniq -c | grep -vw "<U0000>" | grep -vw "<U000a>" > ${DEST_DIR}/${LANG}_codes.txt
+
     FILES_TO_KEEP="${DEST_DIR}/${LANG}_codes.txt ${FILES_TO_KEEP}" 
     CODEPOINTS=$(wc -l ${DEST_DIR}/${LANG}_codes.txt | awk '{print $1}')
     
     cat ${DEST_DIR}/${LANG}_codes.txt | awk '{print $2}' >> ${DEST_DIR}/all_codes-tmp.txt
-    rm ${DEST_DIR}/${LANG}_codes1.txt
+    rm ${DEST_DIR}/${LANG}_codes1.txt ${DEST_DIR}/fully_stripped.txt
 
     if [ ${REMOVE_VARS} != "yes" ] ; then
 	rm ${FILE_CODEPOINTS}
     fi
-
 
 # if a binary wl exists, use it
 if [ -f ${WLS_PATH}/${LANG}_di_wl ] ; then
