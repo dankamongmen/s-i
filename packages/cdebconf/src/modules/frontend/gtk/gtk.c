@@ -1458,8 +1458,8 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     obj->data = NEW(struct frontend_data);
     obj->interactive = 1;
 
-    /* Always remember to set fields in frontend_data structure to NULL
-     * since otherwise GTKDFB tends to segfault.
+    /* It's recomended setting fields in frontend_data structure to NULL,
+     * as otherwise older GTKDFB versions may cause segfaults.
      */
     fe_data = obj->data;
     fe_data->window = NULL;
@@ -1467,6 +1467,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     fe_data->target_box = NULL;
     fe_data->button_next = NULL;
     fe_data->button_prev = NULL;
+    fe_data->button_cancel = NULL;
     fe_data->progress_bar = NULL;
     fe_data->progress_bar_label = NULL;
     fe_data->progress_bar_box = NULL;
@@ -1493,6 +1494,7 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     set_design_elements (obj, window);
     gtk_rc_reparse_all();
     ((struct frontend_data*) obj->data)->window = window;
+    gtk_widget_set_default_direction(get_text_direction(obj));
     gtk_widget_show_all(window);
 
     button_cond = g_cond_new ();
@@ -1520,7 +1522,7 @@ static int gtk_go(struct frontend *obj)
     /* GtkWidget *image_button_forward, *image_button_back; */
     di_slist *plugins;
     int i, j;
-    int ret;;
+    int ret;
 
     if (q == NULL) return DC_OK;
 
@@ -1611,6 +1613,7 @@ static int gtk_go(struct frontend *obj)
     gtk_button_set_label (GTK_BUTTON(data->button_screenshot), get_text(obj, "debconf/gtk-button-screenshot", "Screenshot") );
     gtk_button_set_label (GTK_BUTTON(data->button_prev), get_text(obj, "debconf/button-goback", "Go Back") );
     gtk_button_set_label (GTK_BUTTON(data->button_next), get_text(obj, "debconf/button-continue", "Continue") );
+    gtk_button_set_label (GTK_BUTTON(data->button_cancel), get_text(obj, "debconf/button-cancel", "Cancel") );
 
     /* TODO
      * gtk_button_set_image() was first implemented in GTK v. 2.6
@@ -1726,6 +1729,11 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
 
     gdk_threads_enter();
     gtk_rc_reparse_all();
+    gtk_button_set_label (GTK_BUTTON(((struct frontend_data*)obj->data)->button_screenshot), get_text(obj, "debconf/gtk-button-screenshot", "Screenshot") );
+    gtk_button_set_label (GTK_BUTTON(((struct frontend_data*)obj->data)->button_prev), get_text(obj, "debconf/button-goback", "Go Back") );
+    gtk_button_set_label (GTK_BUTTON(((struct frontend_data*)obj->data)->button_next), get_text(obj, "debconf/button-continue", "Continue") );
+    gtk_button_set_label (GTK_BUTTON(((struct frontend_data*)obj->data)->button_cancel), get_text(obj, "debconf/button-cancel", "Cancel") );
+    gtk_widget_set_default_direction(get_text_direction(obj));
     set_design_elements_while_progressbar_runs(obj);
     DELETE(obj->progress_title);
     obj->progress_title=strdup(title);
