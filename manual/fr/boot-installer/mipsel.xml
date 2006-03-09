@@ -1,12 +1,93 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 24701 -->
+<!-- original version: 35328 -->
 
- <sect2 arch="mipsel">
- <title></title>
+ <sect2 arch="mipsel" id="boot-tftp">
+ <title>Amorcer avec TFTP</title>
+   <sect3>
+   <title>Amorcer une machine Cobalt avec TFTP</title>
+<para>
+Cobalt n'utilise pas TFP mais NFS pour s'amorcer. Vous devez installer un serveur NFS
+et mettre les fichiers de l'installateur dans <filename>/nfsroot</filename>.
+Quand vous amorcez la machine Cobalt, vous devez appuyer en même temps
+sur les boutons gauche et droit du curseur, ce qui provoquera l'amorçage depuis NFS.
+Plusieurs options sont affichées à l'écran. Il existe deux méthodes d'installation&nbsp;:
+
+<itemizedlist>
+<listitem><para>
+
+Avec SSH (méthode par défaut)&nbsp;: l'installateur configure le réseau avec DHCP et
+lance un serveur SSH. Un mot de passe est affiché à l'écran ainsi que d'autres informations de
+connexion (une adresse IP, par exemple). Quand vous vous connectez à la machine avec un
+client SSH, vous pouvez lancer l'installation.
+
+</para></listitem>
+<listitem><para>
+
+Avec une console série&nbsp;: avec un cable null modem, vous pouvez vous connecter
+au port série de la machine Cobalt (à 115200 bps) et lancer l'installation.
+Cette façon de faire n'est pas possible sur les Qube 2700 (Qube1) car elles n'ont pas
+de port série.
+
+</para></listitem>
+</itemizedlist>
+
+ </para>
+  </sect3>
+
+   <sect3>
+
+   <title>Amorcer avec TFTP la carte Broadcom BCM91250A</title>
 <para>
 
-<!-- Placeholder document; please write and include in
-     boot-installer.xml and build/templates/docstruct.ent -->
+Avec la carte d'évaluation Broadcom BCM91250A, vous devez charger via TFTP 
+le programme d'amorçage SiByl, lequel chargera et lancera l'installateur
+Debian. Dans la plupart des cas vous obtiendrez une adresse IP par DHCP, mais 
+il est aussi possible d'indiquer une adresse fixe. Pour utiliser DHCP, il
+suffit d'entrer la commande suivante à l'invite CFE&nbsp;:
+
+<informalexample><screen>
+ifconfig eth0 -auto
+</screen></informalexample>
+
+Une fois l'adresse obtenue, vous pouvez charger SiByl avec la commande 
+suivante&nbsp;:
+
+<informalexample><screen>
+boot 192.168.1.1:/boot/sibyl
+</screen></informalexample>
+
+Vous devez changer l'adresse donnée dans l'exemple et indiquer soit le nom soit
+l'adresse de votre serveur TFTP. Une fois cette commande exécutée, 
+l'installateur sera automatiquement chargé.
 
 </para>
- </sect2>
+</sect3>
+  </sect2>
+
+  <sect2 arch="mipsel"><title>Paramètres d'amorçage</title>
+
+   <sect3>
+   <title>Cobalt TFTP Booting</title>
+<para>
+
+Vous ne pouvez pas passer des paramètres d'amorçage directement. Vous devez
+modifier le fichier <filename>/nfsroot/default.colo</filename> sur le serveur NFS
+et y ajouter vos paramètres avec la variable <replaceable>args</replaceable>. 
+
+</para>
+  </sect3>
+
+   <sect3>
+
+   <title>Amorcer avec TFTP la carte Broadcom BCM91250A</title>
+<para>
+
+Vous ne pouvez pas indiquer des paramètres d'amorçage à l'invite CFE. 
+Vous devez modifier le fichier <filename>/boot/sibyl.conf</filename> sur le
+serveur TFTP et mettre vos paramètres dans la variable 
+<replaceable>extra_args</replaceable>.
+
+</para>
+  </sect3>
+
+  </sect2>
