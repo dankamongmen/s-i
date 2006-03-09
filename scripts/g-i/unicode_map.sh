@@ -116,13 +116,13 @@ for FONTFILE in ${FONTFILES} ; do
 done
 
 # create a list of the unicode coords used at least on one font file
-sort all_ranges.txt | uniq > used_coords.txt
+sort all_ranges.txt | uniq > avail_codes.lst
 
 echo ""
 echo "Font files: $(wc -l rangefiles.txt | awk '{print $1}')"
 echo "Total size: $tot_size bytes"
-echo "Unique Glyphs: $(wc -l used_coords.txt | awk '{print $1}')"
-echo "Bytes per glyph: $(expr $tot_size / $(wc -l used_coords.txt | awk '{print $1}'))"
+echo "Unique Glyphs: $(wc -l avail_codes.lst | awk '{print $1}')"
+echo "Bytes per glyph: $(expr $tot_size / $(wc -l avail_codes.lst | awk '{print $1}'))"
 
 # For each unicode coordinate used in one or more ttf files produce this stats
 #
@@ -164,7 +164,7 @@ else
     ECELLTAG=":"
 fi
 
-for COORD in $(cat used_coords.txt) ; do
+for COORD in $(cat avail_codes.lst) ; do
     echo -n "<${ROWTAG}><${COORDTAG}>${COORD}</${COORDTAG}>"
 
     for RANGEFILE in $ranges ; do
@@ -180,7 +180,7 @@ for COORD in $(cat used_coords.txt) ; do
 
 ##
 ## For profiling: 
-##                time * num_lines(used_coords.txt) / num_loops
+##                time * num_lines(avail_codes.lst) / num_loops
 ##
 
 #    i=`expr $i + 1`
