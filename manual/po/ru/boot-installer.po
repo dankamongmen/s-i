@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: boot-installer\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
 "POT-Creation-Date: 2006-03-08 01:02+0000\n"
-"PO-Revision-Date: 2006-03-09 19:46+0300\n"
+"PO-Revision-Date: 2006-03-11 18:07+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -41,7 +41,7 @@ msgid ""
 "is powered up or reset. There are two different console specifications used "
 "on Alpha systems, and hence two classes of console firmware available:"
 msgstr ""
-"Прошивка консоли хранится во флэш-ПЗУ и выполняется, когда система Alpha "
+"Прошивка консоли хранится во флеш ПЗУ и выполняется, когда система Alpha "
 "включается или перезагружается. На системах Alpha используется две различные "
 "спецификации консоли, и, следовательно, доступно два класса прошивок консоли:"
 
@@ -846,19 +846,25 @@ msgid ""
 "100Mbps card so it is recommended that you use the 10Mbps interfaced (the "
 "one labeled with <literal>10 Base-T</literal>)."
 msgstr ""
+"Системы Netwinder имеют два сетевых интерфейса: 10Мбитная NE2000-совместимая "
+"карта (к которой обычно обращаются через <literal>eth0</literal>) и 100Мбитная "
+"карта Tulip. При загрузке образа по TFTP через 100Мбитную карту могут "
+"возникнуть проблемы, поэтому рекомендуется использовать 10Мбитный интерфейс "
+"(помеченный как <literal>10 Base-T</literal>)."
 
 #. Tag: para
 #: boot-installer.xml:469
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "You need NeTTrom 2.2.1 or later to boot the installation system, and version "
 "2.3.3 is recommended. Unfortunately, firmware files are currently not "
 "available for download because of license issues. If this situation changes, "
 "you may find new images at <ulink url=\"http//www.netwinder.org/\"></ulink>."
 msgstr ""
-"Вам потребуется NeTTrom версии 2.2.1 или новее для загрузки системы. "
-"Рекомендуется NeTTrom версии 2.3.3: загрузите следующие файлы с <ulink url="
-"\"ftp://ftp.netwinder.org/pub/netwinder/firmware/\"></ulink>:"
+"Вам потребуется NeTTrom версии 2.2.1 или новее для загрузки системы, но "
+"рекомендуется версия 2.3.3. К сожалению, из-за лицензионных проблем "
+"файлы микропрограмм недоступны для загрузки. Если ситуация изменится, вы "
+"можете найти новые образы на <ulink url=\"http//www.netwinder.org/\"></ulink>."
 
 #. Tag: para
 #: boot-installer.xml:477
@@ -903,6 +909,44 @@ msgid ""
 "\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">detailed HOWTO</"
 "ulink> is available."
 msgstr ""
+"При загрузке Netwinder вы можете прервать этот процесс во время отсчёта "
+"времени. Это позволит настроить параметры микропрограммы, необходимые для "
+"загрузки программы установки. Во-первых, начните с загрузки значений "
+"по умолчанию: <informalexample><screen>\n"
+"    NeTTrom command-&gt; load-defaults\n"
+"</screen></informalexample> "
+"Кроме этого, вы должны настроить сетевые параметры, или "
+"указав статический адрес: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 flash\n"
+"    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24\n"
+"</screen></informalexample>, где 24 &mdash; это число бит "
+"в маске сети, или динамический адрес: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 dhcp\n"
+"</screen></informalexample> Также вам может потребоваться "
+"настроить параметр <userinput>route1</userinput>, если TFTP сервер "
+"находится в другой подсети. После этих настроек, укажите TFTP сервер "
+"и место размещения образа. Затем сохраните настройки во флеш памяти. "
+"<informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1\n"
+"    NeTTrom command-&gt; setenv kerntftpfile boot.img\n"
+"    NeTTrom command-&gt; save-all\n"
+"</screen></informalexample> Теперь нужно указать микропрограмме, "
+"что образ должен быть загружен по TFTP: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kernconfig tftp\n"
+"    NeTTrom command-&gt; setenv rootdev /dev/ram\n"
+"</screen></informalexample> Если для установки вы хотите использовать последовательную консоль Netwinder, то нужно добавить следующую "
+"настройку: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram "
+"console=ttyS0,115200\n"
+"</screen></informalexample> Если для установки используются "
+"клавиатура и монитор нужно указать: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram\n"
+"</screen></informalexample> Чтобы просмотреть настройки используйте "
+"команду <command>printenv</command>. После проверки правильности "
+"настроек, загрузите образ: <informalexample><screen>\n"
+"    NeTTrom command-&gt; boot\n"
+"</screen></informalexample> При возникновении проблем, обратитесь к "
+"<ulink url=\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">подробному HOWTO</ulink>."
 
 #. Tag: title
 #: boot-installer.xml:529
@@ -1004,9 +1048,9 @@ msgstr ""
 # index.docbook:807, index.docbook:1949, index.docbook:2282, index.docbook:2442
 #. Tag: title
 #: boot-installer.xml:589
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Booting from Firmware"
-msgstr "Загрузка CHRP из OpenFirmware"
+msgstr "Загрузка из микропрограммы"
 
 #. Tag: para
 #: boot-installer.xml:595
@@ -1016,6 +1060,10 @@ msgid ""
 "flash chip on the device. The installer can be written to flash so it will "
 "automatically start when you reboot your machines."
 msgstr ""
+"В настоящее время растёт число бытовых устройств, которые "
+"загружаются непосредственно из флеш памяти устройства. Для них программа "
+"установки может быть записана во флеш, для автоматического запуска при "
+"перезагрузке устройства."
 
 #. Tag: para
 #: boot-installer.xml:601
@@ -1026,25 +1074,28 @@ msgid ""
 "are problems during the flashing process. Therefore, please take care and "
 "follow the steps precisely."
 msgstr ""
+"В большинстве случаев такое изменение микропрограммы устройства лишает "
+"гарантии. Также, иногда невозможно починить устройство, если возникнут "
+"проблемы при записи во флеш. Поэтому точно следуйте указаниям."
 
 # index.docbook:254, index.docbook:866, index.docbook:1402, index.docbook:1886, index.docbook:1969, index.docbook:2240, index.docbook:2348
 #. Tag: title
 #: boot-installer.xml:612
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Booting the NSLU2"
-msgstr "Загрузка с помощью MILO"
+msgstr "Загрузка NSLU2"
 
 #. Tag: para
 #: boot-installer.xml:613
 #, no-c-format
 msgid "There are three ways how to put the installer firmware into flash:"
-msgstr ""
+msgstr "Есть три способа заливки микропрограммы установки в флеш:"
 
 #. Tag: title
 #: boot-installer.xml:619
 #, no-c-format
 msgid "Using the NSLU2 web interface"
-msgstr ""
+msgstr "С помощью веб интерфейса NSLU2"
 
 #. Tag: para
 #: boot-installer.xml:620
@@ -1056,12 +1107,16 @@ msgid ""
 "button, confirm, wait for a few minutes and confirm again. The system will "
 "then boot straight into the installer."
 msgstr ""
+"Перейдите в раздел управления и выбери пункт меню <literal>Upgrade</"
+"literal>. Затем выберите с диска образ программы установки. Нажмите кнопку "
+"<literal>Start Upgrade</literal>, подтвердите, подождите несколько минут "
+" и подтвердите ещё раз. Система будет перезагружена прямо в программу установки."
 
 #. Tag: title
 #: boot-installer.xml:631
 #, no-c-format
 msgid "Via the network using Linux/Unix"
-msgstr ""
+msgstr "По сети с помощью Linux/Unix"
 
 #. Tag: para
 #: boot-installer.xml:632
@@ -1091,12 +1146,35 @@ msgid ""
 "reboot. Make sure you connect your USB disk again now, otherwise the "
 "installer won't be able to find it."
 msgstr ""
+"Для обновления по сети вы можете использовать <command>upslug2</command> "
+"с любой Linux или Unix машины. Эта программа существует в виде пакета Debian. "
+"Во-первых, переведите NSLU2 в режим обновления: <orderedlist> "
+"<listitem><para> Отключите диски и/или другие устройства из портов USB.</"
+"para></listitem> <listitem><para> Выключите питание NSLU2 </para></listitem> "
+"<listitem><para> Нажмите и удерживайте кнопку сброса ( она находится в маленьком "
+"отверстии на задней стенке над разъёмом питания). </para></listitem> "
+"<listitem><para> Нажмите и отпустите кнопку питания NSLU2. </"
+"para></listitem> <listitem><para> Подождите 10 секунд, наблюдая за индикатором "
+"готовности/состояния. По прошествии 10 секунд его состояние изменится с жёлтого на красный. "
+"Немедленно отпустите кнопку сброса. </para></listitem> <listitem><para> "
+"Лампочка индикатора готовности/состояния NSLU2 заморгает попеременно "
+"красным/зелёным (будет задержка в 1 секунду перед первым появлением зелёного "
+"цвета). Теперь NSLU2 находится в режиме обновления. </para></"
+"listitem> </orderedlist> При возникновении проблем обратитесь к "
+"<ulink url=\"http://www.nslu2-linux.org/"
+"wiki/OpenSlug/UsingTheBinary\">странице NSLU2-Linux</ulink>. После "
+"того как NSLU2 в режиме обновления, вы можете записать новый образ во флеш память: <informalexample><screen>\n"
+"sudo upslug2 -i di-nslu2.bin\n"
+"</screen></informalexample> Заметим, что эта утилита также показывать "
+"MAC адрес NSLU2, который может пригодиться при настройке DHCP сервера. "
+"После записи и проверки образа, система будет автоматически перезагружена. "
+"Убедитесь, что обратно вставили USB диск, иначе программа установки не сможет найти его."
 
 #. Tag: title
 #: boot-installer.xml:693
 #, no-c-format
 msgid "Via the network using Windows"
-msgstr ""
+msgstr "По сети с помощью Windows"
 
 #. Tag: para
 #: boot-installer.xml:694
@@ -1106,6 +1184,8 @@ msgid ""
 "all_router_utility.zip\">a tool</ulink> for Windows to upgrade the firmware "
 "via the network."
 msgstr ""
+"Для обновления микропрограммы по сети существует <ulink url=\"http://www.everbesthk.com/8-download/sercomm/firmware/"
+"all_router_utility.zip\">утилита</ulink> для Windows."
 
 # index.docbook:572, index.docbook:1037, index.docbook:1837, index.docbook:2084, index.docbook:2388
 #. Tag: title
@@ -1119,9 +1199,7 @@ msgstr "Загрузка с CD-ROM"
 #: boot-installer.xml:848
 #, no-c-format
 msgid "Booting from Linux Using <command>LILO</command> or <command>GRUB</command>"
-msgstr ""
-"Загрузка из Linux с помощью <command>LILO</command> или <command>GRUB</"
-"command>"
+msgstr "Загрузка из Linux с помощью <command>LILO</command> или <command>GRUB</command>"
 
 # index.docbook:1670, index.docbook:2168
 #. Tag: para
@@ -2666,7 +2744,7 @@ msgstr ""
 "двойной щелчок по иконке <guiicon>Penguin Prefs</guiicon> в каталоге "
 "<filename>Penguin</filename>. Запустится загрузчик <command>Penguin</"
 "command>. Выберите <guimenuitem>Settings</guimenuitem> из меню "
-"<guimenu>File</guimenu>, щёклните по вкладке <guilabel>Kernel</guilabel>. "
+"<guimenu>File</guimenu>, щёлкните по вкладке <guilabel>Kernel</guilabel>. "
 "Выберите образы ядра (<filename>vmlinuz</filename>) и ramdisk "
 "(<filename>initrd.gz</filename>) в каталоге <filename>install</filename>, "
 "нажав соответствующие кнопки в верхнем правом углу, чтобы добраться до "
@@ -2943,9 +3021,9 @@ msgstr ""
 # index.docbook:1972, index.docbook:2015
 #. Tag: title
 #: boot-installer.xml:2167 boot-installer.xml:2229
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Cobalt TFTP Booting"
-msgstr "Загрузка SGI Indys с сервера TFTP"
+msgstr "Загрузка Cobalt с сервера TFTP"
 
 #. Tag: para
 #: boot-installer.xml:2168
@@ -2958,6 +3036,12 @@ msgid ""
 "network from NFS. It will then display several options on the display. There "
 "are the following two installation methods:"
 msgstr ""
+"Собственно говоря, Cobalt использует для загрузки NFS, а не TFTP. "
+"Вам потребуется установить NFS сервер и положить файлы программы установки в "
+"каталог <filename>/nfsroot</filename>. При загрузки Cobalt, нужно одновременно "
+"нажать левую и правую клавиши курсора и машина будет загружена по сети "
+"с NFS сервера. На экране будут показаны несколько параметров. "
+"Есть два метода установки:"
 
 #. Tag: para
 #: boot-installer.xml:2178
@@ -2969,6 +3053,10 @@ msgid ""
 "connect to the machine with an SSH client you can start with the "
 "installation."
 msgstr ""
+"По SSH (по умолчанию): В этом случае, программа установки выполнит настройку "
+"сети по DHCP и запустит SSH сервер. Затем она покажет случайный пароль и "
+"другую информацию для входа (например, IP адрес) на Cobalt LCD. После "
+"подключения к машине с помощью SSH клиента, вы можете начать установку."
 
 #. Tag: para
 #: boot-installer.xml:2187
@@ -2979,19 +3067,23 @@ msgid ""
 "this way. This option is not available on Qube 2700 (Qube1) machines since "
 "they have no serial port."
 msgstr ""
+"Через последовательный порт: С помощью нуль-модемного кабеля, вы можете подключиться к"
+"последовательному порту Cobalt (на скорости 115200 bps) и выполнить установку. "
+"Этот способ не работает на машинах Qube 2700 (Qube1), так как они не имеют "
+"последовательного порта."
 
 #. Tag: para
 #: boot-installer.xml:2230
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "You cannot pass any boot parameters directly. Instead, you have to edit the "
 "<filename>/nfsroot/default.colo</filename> file on the NFS server and add "
 "your parameters to the <replaceable>args</replaceable> variable."
 msgstr ""
-"Вы не можете передавать параметры прямо из приглашения CFE. Вместо этого, вы "
-"должны отредактировать файл <filename>/boot/sibyl.conf</filename> на TFTP "
-"сервере и добавить ваши параметры в переменную <replaceable>extra_args</"
-"replaceable>."
+"Вы не можете передать параметры загрузки напрямую. Вместо этого, вы "
+"должны отредактировать файл <filename>/nfsroot/default.colo</filename> "
+"на NFS сервере и добавить параметры в переменную "
+"<replaceable>args</replaceable>."
 
 #. Tag: title
 #: boot-installer.xml:2258
