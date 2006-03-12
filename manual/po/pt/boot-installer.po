@@ -1,24 +1,13 @@
 # Portuguese translation of the Debian Installation Manual.
 # Daniel Costa, Miguel Figueiredo e Etur, 2005.
+# Miguel Figueiredo <elmig@debianpt.org>, 2006
 # 
-# 2005-06-04 - Etur - Final polishing.
-# 2005-06-05 - Etur - 3 new fuzzys.
-# 2005-07-15 - Miguel Figueiredo <elmig@debianpt.org> - 9f2u
-# 2005-07-18 - Miguel Figueiredo <elmig@debianpt.org> - 1u
-# 2005-07-23 - Miguel Figueiredo <elmig@debianpt.org> - 1f
-# 2005-08-18 - Miguel Figueiredo <elmig@debianpt.org> - 2f
-# 2005-08-24 - Miguel Figueiredo <elmig@debianpt.org> - 2f
-# 2005-09-07 - Miguel Figueiredo <elmig@debianpt.org> - 1f
-# 2005-10-02 - Miguel Figueiredo <elmig@debianpt.org> - fixed small typos
-# 2005-11-22 - Miguel Figueiredo <elmig@debianpt.org> - 2f2u
-# 2006-01-04 - Miguel Figueiredo <elmig@debianpt.org> - 6f
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: boot-installer\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
 "POT-Creation-Date: 2006-03-08 01:02+0000\n"
-"PO-Revision-Date: 2006-01-04 21:12+0000\n"
+"PO-Revision-Date: 2006-03-12 09:56+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -842,7 +831,7 @@ msgstr ""
 
 #. Tag: title
 #: boot-installer.xml:459
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Booting from TFTP on Netwinder"
 msgstr "Iniciar a partir de TFTP em NetWinder"
 
@@ -856,10 +845,11 @@ msgid ""
 "100Mbps card so it is recommended that you use the 10Mbps interfaced (the "
 "one labeled with <literal>10 Base-T</literal>)."
 msgstr ""
+"Os Netwinder têm dois interfaces de rede: uma placa compatível com NE2000 a 10Mbps (que é normalmente referenciada como <literal>eth0</literal> e uma placa Tulip a 100Mbps. Poderá haver problemas em carregar a imagem via TFTP utilizando a placa a 100Mbps por isso é recomendado que utilize o interface a 10Mbps (a que está identiticada como <literal>10 Base-T</literal>)."
 
 #. Tag: para
 #: boot-installer.xml:469
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "You need NeTTrom 2.2.1 or later to boot the installation system, and version "
 "2.3.3 is recommended. Unfortunately, firmware files are currently not "
@@ -867,8 +857,7 @@ msgid ""
 "you may find new images at <ulink url=\"http//www.netwinder.org/\"></ulink>."
 msgstr ""
 "Necessita do NeTTrom 2.2.1 ou posterior para arrancar o sistema de "
-"instalação.  recomendado o NeTTrom 2.3.3: pode conseguir estes ficheiros em "
-"<ulink url=\"ftp://ftp.netwinder.org/pub/netwinder/firmware/\"></ulink>"
+"instalação, é recomendada a versão 2.3.3. Infelizmente, os ficheiros de firmware actualmente não estão disponíveis para download por razões de licenciamento. Se esta situação se modificar, poderá encontrar as novas imagens <ulink url=\"ftp://ftp.netwinder.org/pub/netwinder/firmware/\"></ulink>"
 
 #. Tag: para
 #: boot-installer.xml:477
@@ -913,6 +902,32 @@ msgid ""
 "\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">detailed HOWTO</"
 "ulink> is available."
 msgstr ""
+"Quando arrancar o seu Netwinder você tem de interromper o processo de arranque durante a contagem decrescente. Isto permite-lhe definir uma série de configurações de firmware necessárias para arrancar com o instalador. Em primeiro lugar, começe por carregar as configurações de omissão:  <informalexample><screen>\n"
+"    NeTTrom command-&gt; load-defaults\n"
+"</screen></informalexample> De seguida, tem de configurar a rede, "
+"quer com endereço estático:  <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 flash\n"
+"    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24\n"
+"</screen></informalexample> onde 24 é número de set bits na netmask, ou um endereço dinâmico:  <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 dhcp\n"
+"</screen></informalexample>Se o servidor de TFTP não estiver na subrede local pode também necessitar de configurar as configurações <userinput>route1</userinput>, tem de especificar o servidor TFTP e a localização da imagem. Depois pode guardar as suas configurações para a flash."
+"<informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1\n"
+"    NeTTrom command-&gt; setenv kerntftpfile boot.img\n"
+"    NeTTrom command-&gt; save-all\n"
+"</screen></informalexample> Agora tem de dizer ao firmware que a imagem TFTP tem de ser iniciada:<informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kernconfig tftp\n"
+"    NeTTrom command-&gt; setenv rootdev /dev/ram\n"
+"</screen></informalexample> Se utilizar uma consola série para instalar o seu Netwinder, tem de adicionar a seguinte configuração:  <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram "
+"console=ttyS0,115200\n"
+"</screen></informalexample> Em alternativa, para instalações com um teclado e monitor tem de definir:  <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram\n"
+"</screen></informalexample> Pode utilizar o comando <command>printenv</printenv> para rever as suas configurações. Depois de ter verificado que as configurações estão correctas, pode carregar a imagem: <informalexample><screen>\n"
+"    NeTTrom command-&gt; boot\n"
+"</screen></informalexample> No caso de ter algum problema, está disponível um <ulink url="
+"\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">HOWTO detalhado</"
+"ulink>"
 
 #. Tag: title
 #: boot-installer.xml:529
@@ -1011,9 +1026,9 @@ msgstr ""
 
 #. Tag: title
 #: boot-installer.xml:589
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Booting from Firmware"
-msgstr "Iniciando CHRP a partir de OpenFirmware"
+msgstr "Arrancar a partir de Firmware"
 
 #. Tag: para
 #: boot-installer.xml:595
@@ -1023,6 +1038,7 @@ msgid ""
 "flash chip on the device. The installer can be written to flash so it will "
 "automatically start when you reboot your machines."
 msgstr ""
+"Existe um número cada vez maior de dispositivos para os consumidores que arrancam directamente a partir de um chip flash no dispositivo. O instalador pode ser escrito para flash de modo a que arranque automaticamente quando reiniciar as suas máquinas."
 
 #. Tag: para
 #: boot-installer.xml:601
@@ -1033,24 +1049,25 @@ msgid ""
 "are problems during the flashing process. Therefore, please take care and "
 "follow the steps precisely."
 msgstr ""
+"em muitos casos, mudar o firmware de um dispositivo embebido inutiliza a sua garantia. Por vezes nem sequer consegue recuperar o seu dispositivo se ocorrerem problemas durante o processo de flash. Por isso, tenha cuidado e siga os passos com cuidado."
 
 #. Tag: title
 #: boot-installer.xml:612
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Booting the NSLU2"
-msgstr "Iniciar com o MILO"
+msgstr "Arrancar o NSLU2"
 
 #. Tag: para
 #: boot-installer.xml:613
 #, no-c-format
 msgid "There are three ways how to put the installer firmware into flash:"
-msgstr ""
+msgstr "Existem três formas de colocar o firmware do instalador em flash:"
 
 #. Tag: title
 #: boot-installer.xml:619
 #, no-c-format
 msgid "Using the NSLU2 web interface"
-msgstr ""
+msgstr "Utilizando o interface web NSLU2"
 
 #. Tag: para
 #: boot-installer.xml:620
@@ -1062,12 +1079,13 @@ msgid ""
 "button, confirm, wait for a few minutes and confirm again. The system will "
 "then boot straight into the installer."
 msgstr ""
+"Vá à secção de administração e escolha o item do menu <literal>Upgrade</literal>. Depois pode navegar pelo seu disco à procura da imagem do instalador de que fez download anteriormente. Depois carregue no botão <literal>Start Upgrade</literal>, confirme, espere alguns minutos e confirme novamente. Então o sistema irá arrancar directo para o instalador."
 
 #. Tag: title
 #: boot-installer.xml:631
 #, no-c-format
 msgid "Via the network using Linux/Unix"
-msgstr ""
+msgstr "Através da rede utilizando Linux/Unix"
 
 #. Tag: para
 #: boot-installer.xml:632
@@ -1097,12 +1115,15 @@ msgid ""
 "reboot. Make sure you connect your USB disk again now, otherwise the "
 "installer won't be able to find it."
 msgstr ""
+"Pode utilizar <command>upslug2</command> a partir de qualquer máquina Linux ou Unix para actualizar a máquina a partir da rede. Este software está empacotado em Debian. Primeiro, tem de colocar o seu NLSU2 em modo de upgrade: <orderedlist> <listitem><para>Desligar quaisquer discos e/ou dispositivos das portas USB. </para></listitem> <listitem><para>Desligar o NSLU2</para></listitem>Carregar e manter pressionado o botão de reset (acessível através de um pequeno buraco atrás, mesmo acima da entrada para alimentação).</para></listitem> <listitem><para>Carregue e largue o botão de ligar para ligar o NSLU2. </para></listitem> Espere 10 segundos olhando para o LED ready/status. </para></listitem> O LED ready/status irá piscar alternanado vermelho/verde (existe uma espera de 1 segundo antes do primeiro verde). O NLSU2 está agora em modo de actualização. </para></listitem> </orderedlist> Se tiver problemas com isto veja as <ulink url=\"http://www.nslu2-linux.org/wiki/OpenSlug/UsingTheBinary\">páginas Linux-NSLU2</ulink>. Uma vez estando o NLSU2 em modo de actualização, pode flashar a nova imagem: <informalexample><screen>\n"
+"sudo upslug2 -i di-nslu2.bin\n"
+"</screen></informalexample> Note que a ferramenta também mostra o endereço MAC da seu NSLU2, que pode ser útil para configurar o seu servidor DHCP. Após toda a imagem estar escrita e verificada, o sistema irá reiniciar automaticamente. Assegure-se que liga novamente o seu disco USB, caso contrário o instalador não conseguirá encontra-lo."
 
 #. Tag: title
 #: boot-installer.xml:693
 #, no-c-format
 msgid "Via the network using Windows"
-msgstr ""
+msgstr "Através da rede utilizando Windows"
 
 #. Tag: para
 #: boot-installer.xml:694
@@ -1112,6 +1133,8 @@ msgid ""
 "all_router_utility.zip\">a tool</ulink> for Windows to upgrade the firmware "
 "via the network."
 msgstr ""
+"Para Windows existe <ulink url=\"http://www.everbesthk.com/8-download/sercomm/firmware/"
+"all_router_utility.zip\">uma ferramenta</ulink> para actualizar o firmware via rede."
 
 #. Tag: title
 #: boot-installer.xml:710 boot-installer.xml:1129 boot-installer.xml:1944
@@ -2970,9 +2993,9 @@ msgstr ""
 
 #. Tag: title
 #: boot-installer.xml:2167 boot-installer.xml:2229
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Cobalt TFTP Booting"
-msgstr "Iniciar de TFTP em SGI Indys"
+msgstr "Iniciar o Cobalt TFTP"
 
 #. Tag: para
 #: boot-installer.xml:2168
@@ -2985,6 +3008,7 @@ msgid ""
 "network from NFS. It will then display several options on the display. There "
 "are the following two installation methods:"
 msgstr ""
+"Falando concretamente, para arrancar, o Cobalt não utiliza TFTP mas sim NFS. Você necessita instalar um servidor NFS e colocar os ficheiros do instalador em <filename>/nfsroot</filename>. Quando arrancar o seu Cobalt, tem de carregar os botões de cursor esquerda e direita ao mesmo tempo e a máquina arranca a partir da rede via NFS. De seguida irá mostrar várias opções. Aqui estão os dois seguintes métodos de instalação:"
 
 #. Tag: para
 #: boot-installer.xml:2178
@@ -2996,6 +3020,7 @@ msgid ""
 "connect to the machine with an SSH client you can start with the "
 "installation."
 msgstr ""
+"Via SSH (omissão): Neste caso, o instalador irá configurar a rede via DHCP e inicar um servidor SSH. Irá então mostrar no LCD do Cobalt uma password gerada aleatóriamente e outras informações de login (tal como o endereço IP). Quando ligar à máquina com um cliente SSH pode iniciar a instalação."
 
 #. Tag: para
 #: boot-installer.xml:2187
@@ -3006,18 +3031,19 @@ msgid ""
 "this way. This option is not available on Qube 2700 (Qube1) machines since "
 "they have no serial port."
 msgstr ""
+"Via consola série: Utilizando um cabo null modem, pode ligar à porta série da sua máquina Cobalt (a 115200 bps) e fazer desta forma a instalação. Esta opção não está disponível em máquinas Qube 2700 (Qube1) já que não têm porta série."
 
 #. Tag: para
 #: boot-installer.xml:2230
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "You cannot pass any boot parameters directly. Instead, you have to edit the "
 "<filename>/nfsroot/default.colo</filename> file on the NFS server and add "
 "your parameters to the <replaceable>args</replaceable> variable."
 msgstr ""
-"Não pode passar qualquer parâmetro de arranque directamente do prompt CFE. "
-"Em vez de ter de editar o ficheiro no servidor TFTP e adicionar os seus "
-"parâmetros à variável <replaceable>extra_args</replaceable>."
+"Não pode passar qualquer parâmetro de arranque directamente. "
+"Em vez disso, tem de editar o ficheiro <filename>/nfsroot/default.colo</filename> no servidor NFS e adicionar os seus "
+"parâmetros à variável <replaceable>args</replaceable>."
 
 #. Tag: title
 #: boot-installer.xml:2258
