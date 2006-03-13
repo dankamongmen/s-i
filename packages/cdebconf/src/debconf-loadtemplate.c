@@ -127,7 +127,7 @@ int main(int argc, char **argv)
                 q->template = t;
                 template_ref(t);
             }
-            else if (strcmp(q->template->tag, t->tag) != 0)
+            else if (q->template != t)
             {
                 template_deref(q->template);
                 q->template = t;

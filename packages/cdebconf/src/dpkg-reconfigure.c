@@ -141,6 +141,12 @@ void loadtemplate(const char *filename, const char *owner)
 			q->template = t;
                         template_ref(t);
 		}
+		else if (q->template != t)
+		{
+			template_deref(q->template);
+			q->template = t;
+			template_ref(t);
+		}
 		question_owner_add(q, owner);
 		if (g_questions->methods.set(g_questions, q) != DC_OK)
 			INFO(INFO_ERROR, "Cannot add question %s", t->tag);
