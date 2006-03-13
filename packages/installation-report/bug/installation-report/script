@@ -75,31 +75,32 @@ if [ ! -e "$logsavedir/hardware-summary" ]; then
 	fi
 fi
 
-if [ -e "$logsavedir/lsb-release" ]; then
-	gettext "Including installer lsb-release file in report.."
-	echo
-	header "Installer lsb-release file:" >&3
-	cat "$logsavedir/lsb-release" 2>&1 >&3
-fi
+getlog () {
+	log="$1"
 
+	if [ -e "$logsavedir/$log" ]; then
+		gettext "Including installer $log in report.."
+		echo
+		header "Installer $log:" >&3
+		if [ -r "$logsavedir/$log" ]; then
+			cat "$logsavedir/$log" 2>&1 >&3
+		else
+			gettext "Only root can read $logsavedir/$log .."
+			su root -c "cat $logsavedir/$log" >&3
+		fi
+	fi
+}
+
+getlog lsb-release
 if [ -e "$logsavedir/hardware-summary" ]; then
-	gettext "Including hardware summart in report.."
-	echo
-	header "Hardware information for installed system:" >&3
-	cat "$logsavedir/hardware-summary" 2>&1 >&3
+	getlog hardware-summary
 else
 	gettext "Running report-hw to summarise hardware for report."
 	echo
 	header "Hardware information for running system:" >&3
 	report-hw 2>&1 >&3
 fi
-
-if [ -e "$logsavedir/status" ]; then
-	gettext "Including installer status file in report.."
-	echo
-	header "Installer status file:" >&3
-	cat "$logsavedir/status" 2>&1 >&3
-fi
+getlog status
 
 if [ -e "$logsavedir/messages" ] || [ -e "$logsavedir/syslog" ] || \
    [ -e "$logsavedir/partman" ]; then
@@ -110,23 +111,8 @@ the install."
 	echo
 	yesno "$(gettext "Include additional log files in report?") " nop
 	if [ "$REPLY" = yep ]; then
-		if [ -e "$logsavedir/syslog" ]; then
-			gettext "Including installer syslog in report.."
-			echo
-			header "Installer syslog:" >&3
-			cat "$logsavedir/syslog" 2>&1 >&3
-		fi
-		if [ -e "$logsavedir/messages" ]; then
-			gettext "Including installer messages log in report.."
-			echo
-			header "Installer messages log:" >&3
-			cat "$logsavedir/messages" 2>&1 >&3
-		fi
-		if [ -e "$logsavedir/partman" ]; then
-			gettext "Including installer partman log in report.."
-			echo
-			header "Installer partman log:" >&3
-			cat "$logsavedir/syslog" 2>&1 >&3
-		fi
+		getlog syslog
+		getlog messages
+		getlog partman
 	fi
 fi
