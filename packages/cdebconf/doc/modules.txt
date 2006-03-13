@@ -147,6 +147,7 @@ struct database_module {
 	dcd_question_set_t question_set;
 	dcd_question_disown_t question_disown;
 	dcd_question_disownall_t question_disownall;
+	dcd_question_remove_t question_remove;
 	dcd_question_lock_t question_lock;
 	dcd_question_unlock_t question_unlock;
 	dcd_question_visible_t question_visible;
@@ -204,10 +205,10 @@ struct template *template_get(struct database *, char *name):
     name is "name".
     XXX should return NULL if fails?
 
-int *template_remove(struct database *, char *name):
+int template_remove(struct database *, char *name):
     remove a template from the database
 
-int *(template|question)_[un]lock(struct database *, char *name):
+int (template|question)_[un]lock(struct database *, char *name):
     XXX WTF? Nothing implements this right now
 
 struct template *template_iterate(struct database *, void **iter):
@@ -245,6 +246,10 @@ struct question *question_disown_all(struct database *, char *owner):
     Semantically, this should be the same as iterating, and for each question
     removing the owner and resetting it. However, you might be able to avoid
     iterating on some of the question, if the backend is structured correctly.
+
+int question_remove(struct database *, char *name):
+    remove a question from the database (useful while moving a question to a
+    different database)
 
 int question_visible(struct database *, char *name, char *priority)
     XXX - WTF, nothing implements this either.

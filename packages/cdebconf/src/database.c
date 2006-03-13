@@ -257,6 +257,11 @@ static int question_db_disownall(struct question_db *db, const char *owner)
 	return 0;
 }
 
+static int question_db_remove(struct question_db *db, const char *name)
+{
+	return DC_NOTIMPL;
+}
+
 static int question_db_lock(struct question_db *db, const char *name)
 {
 	return DC_NOTIMPL;
@@ -423,6 +428,7 @@ struct question_db *question_db_new(struct configuration *cfg,
 	SETMETHOD(get);
 	SETMETHOD(disown);
 	SETMETHOD(disownall);
+	SETMETHOD(remove);
 	SETMETHOD(lock);
 	SETMETHOD(unlock);
 	SETMETHOD(is_visible);

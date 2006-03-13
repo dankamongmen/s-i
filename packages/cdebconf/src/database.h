@@ -44,6 +44,7 @@ struct question_db_module {
     struct question *(*get)(struct question_db *db, const char *name);
     int (*disown)(struct question_db *, const char *name, const char *owner);
     int (*disownall)(struct question_db *, const char *owner);
+    int (*remove)(struct question_db *, const char *name);
     int (*lock)(struct question_db *, const char *name);
     int (*unlock)(struct question_db *, const char *name);
     int (*is_visible)(struct question_db *, const char *name, const char *priority);

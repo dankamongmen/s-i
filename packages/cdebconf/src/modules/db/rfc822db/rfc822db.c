@@ -301,7 +301,6 @@ static int rfc822db_template_set(struct template_db *db, struct template *templa
     return DC_OK;
 }
 
-/* FIXME b0rken */
 static int rfc822db_template_remove(struct template_db *db, const char *tag)
 {
     struct template_db_cache *dbdata = db->data;
@@ -309,11 +308,14 @@ static int rfc822db_template_remove(struct template_db *db, const char *tag)
 
     INFO(INFO_VERBOSE, "rfc822db_template_remove(db,tag=%s)",tag);
 
+    memset(&t2, 0, sizeof (struct template));
     t2.tag = (char*) tag;
-    t = tdelete(&t, &dbdata->root, nodetemplatecomp);
+    t = tfind(&t2, &dbdata->root, nodetemplatecomp);
 
     if (t)
     {
+            t = *(struct template **) t;
+            tdelete(t, &dbdata->root, nodetemplatecomp);
             template_deref(t);
             return DC_OK;
     }
@@ -603,6 +605,25 @@ static int rfc822db_question_disown(struct question_db *db, const char *tag,
     return DC_OK;
 }
 
+static int rfc822db_question_remove(struct question_db *db, const char *tag)
+{
+    struct question_db_cache *dbdata = db->data;
+    struct question *q, q2;
+
+    INFO(INFO_VERBOSE, "rfc822db_question_remove(db,tag=%s)", tag);
+
+    memset(&q2, 0, sizeof (struct question));
+    q2.tag = (char*) tag;
+    q = tfind(&q2, &dbdata->root, nodequestioncomp);
+    if (q != NULL) {
+        q = *(struct question **) q;
+        tdelete(q, &dbdata->root, nodequestioncomp);
+        question_deref(q);
+        return DC_OK;
+    }
+    return DC_NOTOK;
+}
+
 /* TODO: This is an ugly hack because there's no better way to do this
  * within the constraints of twalk() (since there's no user-data argument).
  * If we ever switch to some other tree API, this should go away
@@ -673,6 +694,7 @@ struct question_db_module debconf_question_db_module = {
     set: rfc822db_question_set,
     get: rfc822db_question_get,
     disown: rfc822db_question_disown,
+    remove: rfc822db_question_remove,
     iterate: rfc822db_question_iterate,
 };
 

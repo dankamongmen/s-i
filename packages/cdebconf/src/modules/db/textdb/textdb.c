@@ -381,6 +381,21 @@ static int textdb_question_disown(struct question_db *db, const char *tag,
 	return DC_OK;
 }
 
+static int textdb_question_remove(struct question_db *db, const char *tag)
+{
+	char *filename;
+
+	if (tag == NULL) return DC_NOTOK;
+
+	/* questions are not cached at present */
+
+	filename = question_filename(db, tag);
+	if (unlink(filename) == 0)
+		return DC_OK;
+	else
+		return DC_NOTOK;
+}
+
 static struct question *textdb_question_iterate(struct question_db *db,
 	void **iter)
 {
@@ -436,6 +451,7 @@ struct question_db_module debconf_question_db_module = {
     set: textdb_question_set,
     get: textdb_question_get,
     disown: textdb_question_disown,
+    remove: textdb_question_remove,
     iterate: textdb_question_iterate,
 };
 

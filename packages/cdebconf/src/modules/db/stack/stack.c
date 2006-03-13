@@ -129,6 +129,7 @@ static int stack_template_db_set(struct template_db *db, struct template *t)
      while (tstack) {
           ret = tstack->db->methods.accept(tstack->db, t->tag, t->type);
           if (ret == DC_REJECT) {
+               tstack->db->methods.remove(tstack->db, t->tag);
                tstack = tstack->next;
                continue;
           }
@@ -139,6 +140,7 @@ static int stack_template_db_set(struct template_db *db, struct template *t)
           case DC_NOTOK:
                return DC_NOTOK;
           case DC_REJECT: /* obsolete as return code from set() */
+               tstack->db->methods.remove(tstack->db, t->tag);
                tstack = tstack->next;
                continue;
           }
@@ -289,6 +291,7 @@ static int stack_question_db_set(struct question_db *db, struct question *t) {
           const char *type = t->template ? t->template->type : "";
           ret = qstack->db->methods.accept(qstack->db, t->tag, type);
           if (ret == DC_REJECT) {
+               qstack->db->methods.remove(qstack->db, t->tag);
                qstack = qstack->next;
                continue;
           }
@@ -299,6 +302,7 @@ static int stack_question_db_set(struct question_db *db, struct question *t) {
           case DC_NOTOK:
                return DC_NOTOK;
           case DC_REJECT: /* obsolete as return code from set() */
+               qstack->db->methods.remove(qstack->db, t->tag);
                qstack = qstack->next;
                continue;
           }
@@ -350,6 +354,22 @@ static int stack_question_db_disownall(struct question_db *db, const char *owner
           qstack = qstack->next;
      }
      return DC_OK;
+}
+
+static int stack_question_db_remove(struct question_db *db, const char *name)
+{
+     struct question_stack *qstack = (struct question_stack *)db->data;
+     struct question *q;
+     while (qstack) {
+          q = qstack->db->methods.get(qstack->db, name);
+          if (q) {
+               question_deref(q);
+               return qstack->db->methods.remove(qstack->db, name);
+          }
+          qstack = qstack->next;
+     }
+     /* nobody had it?  fail. */
+     return DC_NOTOK;
 }
 
 static int stack_question_db_lock(struct question_db *db, const char *name)
@@ -410,6 +430,7 @@ struct question_db_module debconf_question_db_module = {
     get: stack_question_db_get,
     disown: stack_question_db_disown,
     disownall: stack_question_db_disownall,
+    remove: stack_question_db_remove,
     iterate: stack_question_db_iterate,
     lock: stack_question_db_lock,
     unlock: stack_question_db_unlock,
