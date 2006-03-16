@@ -566,16 +566,16 @@ EOF
 	# EXCEPT the fuzzy markers (^\#,.*$)
         oldfiltered=`tempfile`
         newfiltered=`tempfile`
-        filter="((PO-Revision-Date|Project-Id-Version|Report-Msgid-Bugs-To|POT-Creation-Date|Last-Translator|Language-Team|MIME-Version|Content-Type|Content-Transfer-Encoding|X-Generator|Plural-Forms):)|^#[^,]|^\#$"
+	filter="^(\"(PO-Revision-Date|Project-Id-Version|Report-Msgid-Bugs-To|POT-Creation-Date|Last-Translator|Language-Team|X-.*):|#[^,]|#$)"
         egrep -v "$filter" $lang.po >$oldfiltered
         egrep -v "$filter" $lang.po.new >$newfiltered
-        if [ -z "$(diff --ignore-matching-lines="PO-Revision-Date:" $lang.po $lang.po.new)" ] ; then
-	  # We don't commit if only PO-Revision-Date changed
+        if [ -z "$(diff $oldfiltered $newfiltered)" ] ; then
+	  # We don't commit if a filtered line was the only change
 	  rm $lang.po.new
         else
+	  # At least one non filtered line changed
           # We put the old Revision-Date back if asked for
-	  # or if only a comment or header line changed
-	  if [ "$KEEP_REVISION" != "N" -a "$KEEP_REVISION" = "$lang" -o $(diff $oldfiltered $newfiltered | wc -l) = 0 ] ; then
+	  if [ "$KEEP_REVISION" != "N" -a "$KEEP_REVISION" = "$lang" ] ; then
 	    # We grab back the PO-Revision-Date from the old file
 	    old_revision=`cat $lang.po| grep -e "^\"PO-Revision-Date:" | sed 's/\\\\n\"//g'`
 	    # And we replace the one from the new file by it
