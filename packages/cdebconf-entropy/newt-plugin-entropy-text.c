@@ -35,7 +35,7 @@
 #define FIFO "/var/run/random.fifo"
 #define KEYSIZE 2925
 
-#define error(fmt, args...) syslog(LOG_ERR, fmt, ##args)
+#define error(fmt, args...) syslog(LOG_ERR, MODULE ": " fmt, ##args)
 
 /* From cdebconf/strutl.c */
 extern int strtruncate (char *what, size_t maxsize);
@@ -106,14 +106,15 @@ setup_handler_dlsyms(void)
     return newt;
 }
 
-int 
+static int 
 copy_byte(int in, int out)
 {
     char byte;
+    ssize_t n;
 
-    if (read(in, &byte, 1) != 1) {
+    if ((n = read(in, &byte, 1)) < 1) {
         byte = 0;
-        error("read: %s", strerror(errno));
+        error("read: %s", (n == 0) ? "short read" : strerror(errno));
         return -1;
     }
     
@@ -121,9 +122,9 @@ copy_byte(int in, int out)
      * fifo is writable, so this write can block if there isn't
      * anyone reading from the fifo.
      */
-    if (write(out, &byte, 1) != 1) {
+    if ((n = write(out, &byte, 1)) < 1) {
         byte = 0;
-        error("write: %s", strerror(errno));
+        error("write: %s", (n == 0) ? "short write" : strerror(errno));
         return -1;
     }
 
