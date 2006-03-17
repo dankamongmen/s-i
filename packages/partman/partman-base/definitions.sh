@@ -780,7 +780,7 @@ default_disk_label () {
 		r5k-ip32 | r10k-ip32 | r12k-ip32)
 		    echo dvh;;
 		# Broadcom SB1 evaluation boards
-		sb1-bcm91250a | sb1-bcm91480b)
+		sb1-bcm91250a | sb1a-bcm91480b)
 		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
@@ -793,7 +793,7 @@ default_disk_label () {
 		r4k-kn04)
 		    echo msdos;;
 		# Broadcom SB1 evaluation boards
-		sb1-bcm91250a | sb1-bcm91480b)
+		sb1-bcm91250a | sb1a-bcm91480b)
 		    echo msdos;;
 		cobalt)
 		    echo msdos;;

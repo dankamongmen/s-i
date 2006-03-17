@@ -13,7 +13,7 @@ case "`archdetect`" in
         # The SWARM is a normal ATX board with standard IDE/SCSI devices
         cfdisk $DISK
         ;;
-"mipsel/sb1-bcm91250a")
+"mipsel/sb1a-bcm91250a")
         # The BigSur is a normal ATX board with standard IDE/SCSI devices
         cfdisk $DISK
         ;;
