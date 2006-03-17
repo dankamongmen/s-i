@@ -45,10 +45,10 @@ if ! apt-install sibyl ; then
 	fi
 else
 	case "`archdetect`" in
-		mips/sb1-swarm-bn)
+		mips/*)
 			FLAG="-EB"
 		;;
-		mipsel/sb1-swarm-bn)
+		mipsel/*)
 			FLAG="-EL"
 		;;
 		*)
@@ -64,7 +64,7 @@ db_progress INFO sibyl-installer/conf
 
 # The kernel path should not start with a / because SiByl cannot handle
 # that.
-kernel=`find /target/boot -name 'vmlinu*sb1-swarm-bn' | tail -1`
+kernel=`find /target/boot -name 'vmlinu*sb1*' | tail -1`
 kernel=${kernel#/target/boot/}
 info "Using kernel '$kernel'"
 
