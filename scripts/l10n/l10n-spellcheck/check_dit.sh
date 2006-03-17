@@ -141,11 +141,17 @@ fi
 
     sort ${DEST_DIR}/${LANG}_codes1.txt | uniq -c | grep -vw "<U0000>" | grep -vw "<U000a>" > ${DEST_DIR}/${LANG}_codes.txt
 
+# Add a third column with the encoded character
+#  567 - <U0033> "3"
+
+    sed "s|\(.* \)\(<U....>\)|\1\2  \"\2\" |" ${DEST_DIR}/${LANG}_codes.txt | uxx2utf > ${DEST_DIR}/${LANG}_codes1.txt
+    mv ${DEST_DIR}/${LANG}_codes1.txt ${DEST_DIR}/${LANG}_codes.txt
+
     FILES_TO_KEEP="${DEST_DIR}/${LANG}_codes.txt ${FILES_TO_KEEP}" 
     CODEPOINTS=$(wc -l ${DEST_DIR}/${LANG}_codes.txt | awk '{print $1}')
     
     cat ${DEST_DIR}/${LANG}_codes.txt | awk '{print $2}' >> ${DEST_DIR}/all_codes-tmp.txt
-    rm ${DEST_DIR}/${LANG}_codes1.txt ${DEST_DIR}/fully_stripped.txt
+    rm -f ${DEST_DIR}/fully_stripped.txt
 
     if [ ${REMOVE_VARS} != "yes" ] ; then
 	rm ${FILE_CODEPOINTS}
