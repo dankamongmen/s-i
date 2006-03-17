@@ -39,7 +39,7 @@ static struct cpu system_sgi_o2_cpu[] = {
 };
 
 static struct cpu system_sibyte_sb1_cpu[] = {
-	{ "SiByte SB1 ", "sb1-swarm-bn" },
+	{ "SiByte SB1 ", "sb1-bcm91250a" },
 	{ "SiByte SB1A", "sb1-bcm91480b" },
 	{ NULL, "unknown" }
 };
