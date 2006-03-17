@@ -779,19 +779,21 @@ default_disk_label () {
 		# O2
 		r5k-ip32 | r10k-ip32 | r12k-ip32)
 		    echo dvh;;
-		# SiByte SWARM
-		sb1-swarm-bn)
+		# Broadcom SB1 evaluation boards
+		sb1-bcm91250a | sb1-bcm91480b)
 		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
 	mipsel)
 	    case "$sub" in
+		# DECstation
 		r3k-kn02)
 		    echo msdos;;
 		r4k-kn04)
 		    echo msdos;;
-		sb1-swarm-bn)
+		# Broadcom SB1 evaluation boards
+		sb1-bcm91250a | sb1-bcm91480b)
 		    echo msdos;;
 		cobalt)
 		    echo msdos;;
