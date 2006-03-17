@@ -11,8 +11,12 @@ case "`archdetect`" in
         # SGI dvh disklabels are best supported by fdisk.
         fdisk $DISK
         ;;
-"mips/sb1-swarm-bn")
-        # The Broadcom is a normal ATX board with standard IDE/SCSI devices
+"mips/sb1-bcm91250a")
+        # The SWARM is a normal ATX board with standard IDE/SCSI devices
+        cfdisk $DISK
+        ;;
+"mips/sb1-bcm91480b")
+        # The BigSur is a normal ATX board with standard IDE/SCSI devices
         cfdisk $DISK
         ;;
 *)

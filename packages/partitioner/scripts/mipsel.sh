@@ -9,8 +9,12 @@ case "`archdetect`" in
 "mipsel/r4k-kn04")
         fdisk $DISK
         ;;
-"mipsel/sb1-swarm-bn")
-        # The Broadcom is a normal ATX board with standard IDE/SCSI devices
+"mipsel/sb1-bcm91250a")
+        # The SWARM is a normal ATX board with standard IDE/SCSI devices
+        cfdisk $DISK
+        ;;
+"mipsel/sb1-bcm91250a")
+        # The BigSur is a normal ATX board with standard IDE/SCSI devices
         cfdisk $DISK
         ;;
 "mipsel/cobalt")
