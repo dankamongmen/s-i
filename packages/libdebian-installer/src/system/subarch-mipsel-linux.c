@@ -31,49 +31,6 @@ static struct cpu system_cobalt_cpu[] = {
 	{ NULL, "unknown" }
 };
 
-static struct cpu system_lasat_cpu[] = {
-	{ "R5000", "lasat" },
-	{ NULL, "unknown" }
-};
-
-static struct cpu system_xxs1500_cpu[] = {
-	{ "Au1500", "xxs1500" },
-	{ NULL, "unknown" }
-};
-
-static struct cpu system_sni_rm200c_cpu[] = {
-	{ "R4", "r4k-rm200c" },
-	{ NULL, "unknown" }
-};
-
-static struct cpu system_necddb_5074_cpu[] = {
-	{ "R5000", "r5000-ddb5074" },
-	{ NULL, "unknown" }
-};
-
-static struct cpu system_necddb_5476_cpu[] = {
-	{ "R5432", "r5432-ddb5476" },
-	{ NULL, "unknown" }
-};
-
-static struct cpu system_necddb_5477_cpu[] = {
-	{ "R5432", "r5432-ddb5477" },
-	{ "R5500", "r5500-ddb5477" },
-	{ NULL, "unknown" }
-};
-
-static struct cpu system_necddb_rockhopper_cpu[] = {
-	{ "R5432", "r5432-rockhopper" },
-	{ "R5500", "r5500-rockhopper" },
-	{ NULL, "unknown" }
-};
-
-static struct cpu system_necddb_rockhopper2_cpu[] = {
-	{ "R5432", "r5432-rockhopper2" },
-	{ "R5500", "r5500-rockhopper2" },
-	{ NULL, "unknown" }
-};
-
 static struct cpu system_bcm_bcm947xx_cpu[] = {
 	/* 2.4 */
 	{ "BCM3302", "bcm947xx" },
@@ -111,18 +68,6 @@ static struct systype system_type[] = {
 	 *	"Cobalt Qube2"
 	 */
 	{"Cobalt ", system_cobalt_cpu },
-	/* LASAT Masquerade Pro */
-	{"MQ Pro", system_lasat_cpu },
-	/* MyCable xxs1500 board */
-	{"XXS1500", system_xxs1500_cpu },
-	/* SNI RM200C */
-	{"SNI RM200_PCI", system_sni_rm200c_cpu },
-	/* NEC development boards */
-	{"NEC DDB Vrc-5074", system_necddb_5074_cpu },
-	{"NEC DDB Vrc-5476", system_necddb_5476_cpu },
-	{"NEC DDB Vrc-5477", system_necddb_5477_cpu },
-	{"NEC Rockhopper", system_necddb_rockhopper_cpu },
-	{"NEC RockhopperII", system_necddb_rockhopper2_cpu },
 	/* Broadcom based APs/NAS */
 	{"Broadcom BCM947XX", system_bcm_bcm947xx_cpu },
 	/* add new system types here */

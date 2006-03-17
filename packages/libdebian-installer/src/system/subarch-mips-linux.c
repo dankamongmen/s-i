@@ -44,12 +44,6 @@ static struct cpu system_sibyte_sb1_cpu[] = {
 	{ NULL, "unknown" }
 };
 
-static struct cpu system_sni_rm200c_cpu[] = {
-	/* match various R4000 variants */
-	{ "R4", "r4k-rm200c" },
-	{ NULL, "unknown" }
-};
-
 /* add new system types here */
 
 static struct cpu system_unknown_cpu[] = {
@@ -57,7 +51,7 @@ static struct cpu system_unknown_cpu[] = {
 };
 
 static struct systype system_type[] = {
-	/* match "SGI Indy" and "SGI Indigo2" */
+	/* match "SGI Indy" and "SGI Indigo2" (ip22) */
 	{"SGI Ind", system_sgi_ind_cpu },
 	/* SGI Origin (ip27) */
 	{"SGI Origin", system_sgi_origin_cpu },
@@ -66,8 +60,6 @@ static struct systype system_type[] = {
 	{"SGI O2", system_sgi_o2_cpu },
 	/* match Broadcom SB1 development boards */
 	{"SiByte BCM9", system_sibyte_sb1_cpu },
-	/* SNI RM200C */
-	{"SNI RM200_PCI", system_sni_rm200c_cpu },
 	/* add new system types here */
 	{ NULL, system_unknown_cpu }
 };
