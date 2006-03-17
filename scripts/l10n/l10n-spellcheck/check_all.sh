@@ -68,8 +68,12 @@ for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
     i=`expr $i + 1`
 done
 
-# This should be fixed: all_codes-tmp.txt is created somewhere else and deleted here
 sort ${DEST_DIR}/all_codes-tmp.txt | uniq -c > ${DEST_DIR}/all_codes.txt
+
+# Add a third column with the encoded character
+#  567 - <U0033> "3"
+sed "s|\(.* \)\(<U....>\)|\1\2  \"\2\" |" ${DEST_DIR}/all_codes.txt | uxx2utf > ${DEST_DIR}/all_codes-tmp.txt
+mv ${DEST_DIR}/all_codes-tmp.txt ${DEST_DIR}/all_codes.txt
 
 HERE=$(pwd)
 cd ${DEST_DIR}/nozip
@@ -79,8 +83,6 @@ tar rf codepoints.tar all_codes.txt
 gzip - < codepoints.tar > ${DEST_DIR}/zip/codepoints.tar.gz
 rm codepoints.tar
 cd ${HERE}
-
-rm -f ${DEST_DIR}/all_codes-tmp.txt
 
 if [ ! -d ${DEST_DIR} ] ; then
     echo does not exist: for some reasons nothing could be checked
