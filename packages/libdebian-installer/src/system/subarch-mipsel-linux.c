@@ -21,7 +21,8 @@ static struct cpu system_dec_decs_cpu[] = {
 };
 
 static struct cpu system_sibyte_sb1_cpu[] = {
-	{ "SiByte SB1", "sb1-swarm-bn" },
+	{ "SiByte SB1 ", "sb1-swarm-bn" },
+	{ "SiByte SB1A", "sb1-bcm91480b" },
 	{ NULL, "unknown" }
 };
 
@@ -98,8 +99,8 @@ static struct systype system_type[] = {
 	 *	"Digital Personal DECstation"
 	 */
 	{"Digital ", system_dec_decs_cpu },
-	/* match the Broadcom SWARM development board */
-	{"SiByte BCM91250A", system_sibyte_sb1_cpu },
+	/* match Broadcom SB1 development boards */
+	{"SiByte BCM9", system_sibyte_sb1_cpu },
 	/* match MIPS based Cobalt machines (with old kernels) */
 	{"MIPS Cobalt", system_cobalt_cpu },
 	/* match MIPS based Cobalt machines (with new kernels),
