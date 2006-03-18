@@ -1,157 +1,391 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 35328 -->
 
 
   <sect2 arch="arm" id="boot-tftp">
-  <!--<title>Booting from TFTP</title>-->
+  <!-- <title>Booting from TFTP</title> -->
   <title>Avvio da TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <!-- <sect3 arch="arm"><title>Booting from TFTP on NetWinder</title> -->
-  <sect3 arch="arm"><title>Avvio di NetWinder da TFTP</title>
-
+   <sect3 arch="arm">
+   <!-- <title>Booting from TFTP on Netwinder</title> -->
+   <title>Avvio di Netwinder da TFTP</title>
 <para>
 
-<!--NetWinders have two network interfaces: The 10Mbps NE2000-compatible
-card is <filename>eth0</filename> and the 100Mbps Tulip card is
-<filename>eth1</filename>. -->
+<!--
+Netwinders have two network interfaces: A 10Mbps NE2000-compatible
+card (which is generally referred to as <literal>eth0</literal>) and
+a 100Mbps Tulip card.  There may be problems loading the image via TFTP
+using the 100Mbps card so it is recommended that you use the 10Mbps
+interfaced (the one labeled with <literal>10 Base-T</literal>).
+-->
 
-Le macchine NetWinder possiedono due interfacce di rete: quella da 10Mbps
-compatibile con NE2000 è <filename>eth0</filename> mentre
-quella Tulip da 100Mbps è <filename>eth1</filename>.
+Le macchine Netwinder possiedono due interfacce di rete: una a 10&nbsp;Mbps
+compatibile con NE2000 (solitamente <literal>eth0</literal>) e una a
+100&nbsp;Mbps Tulip. Purtroppo ci sono parecchi problemi nel caricare
+l'immagine via TFTP con la scheda a 100&nbsp;Mbps, quindi si consiglia
+l'uso dell'interfaccia a 10&nbsp;Mbps (riconoscibile dell'etichetta
+<literal>10 Base-T</literal>).
 
-</para><note><para>
+</para>
+<note><para>
 
-<!-- You need NeTTrom 2.2.1 or later to boot the
-installation system. NeTTrom 2.3.3 is recommended: get these files
-from -->
+<!--
+You need NeTTrom 2.2.1 or later to boot the installation system, and
+version 2.3.3 is recommended.  Unfortunately, firmware files are currently
+not available for download because of license issues.  If this situation
+changes, you may find new images at <ulink url="http//www.netwinder.org/"></ulink>.
+-->
 
-Per avviare la macchina è necessario avere NeTTrom 2.2.1 o
-una versione più recente. La versione raccomandata è la 2.3.3:
-scaricare questi file da
-<ulink url="ftp://ftp.netwinder.org/pub/netwinder/firmware/"></ulink>:
-<itemizedlist>
-<listitem><para>
+Per avviare il sistema d'installazione è necessario avere la NeTTrom
+2.2.1 o una versione più recente. La versione raccomandata è la 2.3.3.
+Sfortunatamente non è possibile scaricare i file con il firmware a causa
+della licenza con cui sono rilasciati. Nel caso questa situazione cambi,
+potrebbe essere possibile trovare delle nuove immagini su
+<ulink url="http//www.netwinder.org/"></ulink>.
 
-<filename>nettrom-2.3-3.armv4l.rpm</filename>
+</para></note>
+<para>
 
-</para></listitem>
-<listitem><para>
+<!--
+When you boot your Netwinder you have to interrupt the boot process during the
+countdown.  This allows you to set a number of firmware settings needed in
+order to boot the installer.  First of all, start by loading the default
+settings:
+-->
 
-<filename>nettrom-2.3.3.bin</filename>
-
-</para></listitem>
-<listitem><para>
-
-<filename>nettrom-2.3.3.bin.md5sum</filename>
-
-</para></listitem>
-</itemizedlist>
-
-</para></note><para>
-
-<!--After rebooting and interrupting the boot process during the countdown, you
-must first configure the network either with a static address: -->
-
-Dopo aver riavviato la macchina e interrotto il processo di avvio durante
-il conto alla rovescia, sarà possibile configurare la rete sia con
-un indirizzo IP statico:
+Quando si avvia la Netwinder è necessario interrompere il processo
+d'avvio durante il conto alla rovescia. Questo permette di effettuare
+alcune impostazioni necessarie per l'avvio del sistema d'installazione.
+Per prima cosa si devono caricare le impostazioni predefinite:
 
 <informalexample><screen>
+    NeTTrom command-&gt; load-defaults
+</screen></informalexample>
+
+<!--
+Furthermore, you must configure the network, either with a static address:
+-->
+
+Poi è necessario configurare la rete, con un indirizzo statico:
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv netconfig_eth0 flash
     NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
 </screen></informalexample>
 
-<!-- where 24 is the number of set bits in the netmask, or a dynamic address: -->
+<!--
+where 24 is the number of set bits in the netmask, or a dynamic address:
+-->
 
-dove 24 è il numero di bit impostati a 1 della netmask; sia con un
+dove 24 è il numero di bit impostati a 1 della netmask, oppure con un
 indirizzo dinamico:
 
 <informalexample><screen>
-    NeTTrom command-&gt; boot diskless
+    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
 </screen></informalexample>
 
-<!-- You may also need to configure the <userinput>route1</userinput>
-settings if the TFTP
-server is not on the local subnet.  The rest of the config is pretty
-standard (the save-all step is optional): -->
+<!--
+You may also need to configure the <userinput>route1</userinput>
+settings if the TFTP server is not on the local subnet.
+-->
 
-È anche possibile configurare la <userinput>route1</userinput>
-se il server TFTP non è nella sottorete locale. Il resto della
-configurazione è molto semplice (il passo save-all è
-opzionale):
+È anche possibile configurare la <userinput>route1</userinput> nel caso
+che il server TFTP non sia nella sottorete locale.
+
+<!--
+Following these settings, you have to specify the TFTP server and the
+location of the image.  You can then store your settings to flash.
+-->
+
+Con le seguenti impostazioni si specifica il server TFTP e la posizione
+dell'immagine, queste impostazioni possono essere memorizzate nella
+memoria flash.
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
     NeTTrom command-&gt; setenv kerntftpfile tftpboot.img
     NeTTrom command-&gt; save-all
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
+</screen></informalexample>
+
+<!--
+Now you have to tell the firmware that the TFTP image should be booted:
+-->
+
+Adesso si deve indicare al firmware quale immagine TFTP deve essere avviata:
+
+<informalexample><screen>
     NeTTrom command-&gt; setenv kernconfig tftp
+    NeTTrom command-&gt; setenv rootdev /dev/ram
 </screen></informalexample>
 
 </para><para>
 
-<!-- Only the last two of these interfere with normal disk booting, so it is
-safe to issue <command>save-all</command> right before them, which will
-store the network settings in case you need to boot from the network
-again. -->
+<!--
+If you use a serial console to install your Netwinder, you need to add the
+following setting:
+-->
 
-Solo gli ultimi due interferiscono con il normale avvio da disco fisso
-e quindi è possibile eseguire <command>save-all</command> subito
-prima e memorizzare le impostazioni della rete nel caso ce ne sia un
-successivo bisogno.
-
-<!-- If you want to use the serial console to install your NetWinder, you also
-need the following setting: -->
-
-Se si vuole usare la console seriale per installare il proprio NetWinder è
-necessaria anche la seguente impostazione:
+Se si usa una console seriale per fare l'installazione sulla propria
+Netwinder è necessario aggiungere la seguente impostazione:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
 </screen></informalexample>
 
-<!-- Use the <command>printenv</command> command to review your
-environment settings. Finally, if your <envar>cmdappend</envar>
-NeTTrom variable has the <option>noinitrd</option> option, you must
-remove it so the downloaded kernel can boot with its attached ramdisk. -->
+<!--
+Alternatively, for installations using a keyboard and monitor you have to
+set:
+-->
 
- Usare il comando <command>printenv</command>
-per controllare le proprie variabili d'ambiente. Alla fine, se la
-variabile NeTTrom <envar>cmdappend</envar> contiene l'opzione
-<option>noinitrd</option>, si deve eliminarla in modo che il kernel scaricato
-possa utilizzare il proprio ramdisk.
+Invece se l'installazione avviene usando una tastiera e un monitor si
+deve usare:
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
+</screen></informalexample>
+
+<!--
+You can use the <command>printenv</command> command to review your
+environment settings.  After you have verified that the settings are
+correct, you can load the image:
+-->
+
+È possibile usare il comando <command>printenv</command> per controllare
+le proprie impostazioni. Dopo aver verificato che la configurazione sia
+corretta si può caricare l'immagine:
+
+<informalexample><screen>
+    NeTTrom command-&gt; boot
+</screen></informalexample>
+
+<!--
+In case you run into any problems, a <ulink
+url="http://www.netwinder.org/howto/Firmware-HOWTO.html">detailed
+HOWTO</ulink> is available.
+-->
+
+Nel caso si verifichino dei problemi si può consultare un <ulink
+url="http://www.netwinder.org/howto/Firmware-HOWTO.html">dettagliato
+HOWTO</ulink>.
 
 </para>
-  </sect3>
+   </sect3>
 
-  <!--<sect3 arch="arm"><title>Booting from TFTP on CATS</title> -->
-  <sect3 arch="arm"><title>Avviare CATS da TFTP</title>
-
+   <sect3 arch="arm">
+   <!-- <title>Booting from TFTP on CATS</title> -->
+   <title>Avvio di CATS da TFTP</title>
 <para>
 
-<!-- On CATS machines, use <command>boot de0:</command> or similar at the
-Cyclone prompt. -->
+<!--
+On CATS machines, use <command>boot de0:</command> or similar at the
+Cyclone prompt.
+-->
 
-Sulla macchina CATS utilizzare un comando come <command>boot de0:</command>
-al prompt di Cyclone.
+Su una macchina CATS utilizzare il comando <command>boot de0:</command>
+o uno simile al prompt di Cyclone.
 
 </para>
    </sect3>
   </sect2>
 
 
-  <!--<sect2 arch="arm"><title>Booting from CD-ROM</title> -->
-  <sect2 arch="arm"><title>Avviare da CD-ROM</title>
+  <sect2 arch="arm">
+  <!-- <title>Booting from CD-ROM</title> -->
+  <title>Avvio da CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
 
 <para>
 
-<!-- To boot a CD-ROM from the Cyclone console prompt, use the command -->
-
-Per avviare da CD-ROM a partire dal prompt della console Cyclone, usare il comando
+<!--
+To boot a CD-ROM from the Cyclone console prompt, use the command
 <command>boot cd0:cats.bin</command>
+-->
+
+Per avviare da CD-ROM a partire dal prompt della console Cyclone, usare
+il comando <command>boot cd0:cats.bin</command>
 
 </para>
+  </sect2>
+
+  <sect2 arch="arm" id="boot-firmware">
+  <!-- <title>Booting from Firmware</title> -->
+  <title>Avvio da firmware</title>
+
+&boot-installer-intro-firmware.xml;
+
+   <sect3 arch="arm" id="boot-firmware-nslu2">
+   <!-- <title>Booting the NSLU2</title> -->
+   <title>Avvio di NSLU2</title>
+<para>
+
+<!--
+There are three ways how to put the installer firmware into flash:
+-->
+
+Ci sono tre modi per mettere il firmware d'installazione nella memoria
+flash:
+
+</para>
+
+    <sect4 arch="arm">
+    <!-- <title>Using the NSLU2 web interface</title> -->
+    <title>Tramite l'interfaccia web di NSLU2</title>
+<para>
+
+<!--
+Go to the administration section and choose the menu item
+<literal>Upgrade</literal>.  You can then browse your disk for the
+installer image you have previously downloaded.  Then press the
+<literal>Start Upgrade</literal> button, confirm, wait for a few minutes
+and confirm again.  The system will then boot straight into the installer.
+-->
+
+Nella sezione d'amministrazione scegliere dal menu la voce
+<literal>Upgrade</literal> e indicare l'immagine del programma
+d'installazione scaricata in precedenza. Poi premere il bottone
+<literal>Start Upgrade</literal> per confermare la scelta, attendere
+alcuni minuti e confermare nuovamente l'operazione. Il sistema si riavvia
+automaticamente e riparte direttamente con il programma d'installazione.
+
+</para>
+    </sect4>
+
+    <sect4 arch="arm">
+    <!-- <title>Via the network using Linux/Unix</title> -->
+    <title>Tramite la rete con Linux/Unix</title>
+<para>
+
+<!--
+You can use <command>upslug2</command> from any Linux or Unix machine to
+upgrade the machine via the network.  This software is packaged for
+Debian.
+
+First, you have to put your NSLU2 in upgrade mode:
+-->
+
+Da qualsiasi macchina Linux o Unix è possibile usare il comando
+<command>upslug2</command> per aggiornare la macchina tramite la rete.
+Esiste anche un pacchetto Debian con questo programma. La prima cosa da
+fare è mettere il NSLU2 in modalità aggiornamento:
+
+<orderedlist>
+<listitem><para>
+
+<!--
+Disconnect any disks and/or devices from the USB ports.
+-->
+
+Scollegare i dischi e qualsiasi altro dispositivo dalle porte USB
+
+</para></listitem>
+<listitem><para>
+
+<!--
+Power off the NSLU2
+-->
+
+Spegnere il NSLU2
+
+</para></listitem>
+<listitem><para>
+
+<!--
+Press and hold the reset button (accessible through the small hole on the
+back just above the power input).
+-->
+
+Tenere premuto il bottone reset (accessibile attraverso il piccolo foro sul
+retro accanto al connettore per l'alimentazione).
+
+</para></listitem>
+<listitem><para>
+
+<!--
+Press and release the power button to power on the NSLU2.
+-->
+
+Premere e rilasciare il bottone power per accendere il NSLU.
+
+</para></listitem>
+<listitem><para>
+
+<!--
+Wait for 10 seconds watching the ready/status LED. After 10 seconds it
+will change from amber to red. Immediately release the reset button.
+-->
+
+Attendere 10 secondi controllando il LED ready/status, dopo 10 secondi
+passa da ambra a rosso. Rilasciare immediatamente il bottone reset.
+
+</para></listitem>
+<listitem><para>
+
+<!--
+The NSLU2 ready/status LED will flash alternately red/green (there is a 1
+second delay before the first green). The NSLU2 is now in upgrade mode.
+-->
+
+Il LED ready/status inizia a lampeggiare alternando rosso e verde (c'è 1
+secondo di ritardo prima del primo verde). Adesso il NSLU2 è pronto per
+l'aggiornamento.
+
+</para></listitem>
+</orderedlist>
+
+<!--
+See the <ulink
+url="http://www.nslu2-linux.org/wiki/OpenSlug/UsingTheBinary">NSLU2-Linux
+pages</ulink> if you have problems with this.
+
+Once your NSLU2 is in upgrade mode, you can flash the new image:
+-->
+
+In caso di problemi si consultino le <ulink
+url="http://www.nslu2-linux.org/wiki/OpenSlug/UsingTheBinary">pagine su
+NSLU2-Linux</ulink>. Quando il NSLU2 è pronto per l'aggiornamento si può
+scrivere la nuova immagine nella memoria flash.
+
+<informalexample><screen>
+sudo upslug2 -i di-nslu2.bin
+</screen></informalexample>
+
+<!--
+Note that the tool also shows the MAC address of your NSLU2, which may come
+in handy to configure your DHCP server.  After the whole image has been
+written and verified, the system will automatically reboot.  Make sure you
+connect your USB disk again now, otherwise the installer won't be able to
+find it.
+-->
+
+Notare che il programma mostra anche l'indirizzo MAC del NSLU2, questa
+informazione può essere utile per configurare il server DHCP. Completata
+la scrittura e la successiva verifica dell'immagine il sistema si riavvia
+automaticamente. Collegare nuovamente il disco USB, altrimenti
+l'installazione non può proseguire.
+
+</para>
+    </sect4>
+
+    <sect4 arch="arm">
+    <!-- <title>Via the network using Windows</title> -->
+    <title>Tramite la rete con Windows</title>
+<para>
+
+<!--
+There is <ulink
+url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zip">a
+tool</ulink> for Windows to upgrade the firmware via the network.
+-->
+
+Esiste <ulink
+url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zip">un
+programma</ulink> per Windows che consente l'aggiornamento del firmware
+tramite la rete.
+
+</para>
+    </sect4>
+   </sect3>
   </sect2>
