@@ -23,16 +23,13 @@ fi
 # vmware uses the mptscsih driver; because of driver changes, mkinitrd
 # does not pick this up correctly for the 2.6.8 kernel
 if lsmod | grep -q "^mptscsih.*1 mptspi"; then
-	if db_get base-installer/kernel/image && [ "$RET" ]; then
-		kernelver=${RET#kernel-image-*}
-		if echo $kernelver | grep -q "2\.6" &&
-		   [ -x /target/usr/sbin/mkinitrd ] &&
-		   [ -f /target/boot/initrd.img-$kernelver ] ; then
-			echo mptscsih >>/target/etc/mkinitrd/modules
-			# Regenerate the initrd
-			chroot_setup
-			chroot /target mkinitrd -o /boot/initrd.img-$kernelver $kernelver
-			chroot_cleanup
-		fi
+	initrd=$(ls /target/boot/initrd.img-2.6.8* 2>/dev/null || true)
+	if [ "$initrd" ] && [ -x /target/usr/sbin/mkinitrd ] ; then
+		kernelver=${initrd#*initrd.img-}
+		echo mptscsih >>/target/etc/mkinitrd/modules
+		# Regenerate the initrd
+		chroot_setup
+		chroot /target mkinitrd -o /boot/initrd.img-$kernelver $kernelver
+		chroot_cleanup
 	fi
 fi
