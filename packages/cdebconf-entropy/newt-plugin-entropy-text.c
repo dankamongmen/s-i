@@ -10,6 +10,7 @@
 
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/mman.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,6 +50,7 @@ void(*create_window)(const int width, const int height, const char *title, const
 static void 
 prepare_window(newtComponent *, struct frontend *, struct question *, int);
 
+static char rnd_byte;
 static newtComponent entry;
 static newtComponent textbox;
 static newtComponent textbox2;
@@ -109,11 +111,10 @@ setup_handler_dlsyms(void)
 static int 
 copy_byte(int in, int out)
 {
-    char byte;
     ssize_t n;
 
-    if ((n = read(in, &byte, 1)) < 1) {
-        byte = 0;
+    if ((n = read(in, &rnd_byte, 1)) < 1) {
+        rnd_byte = 0;
         error("read: %s", (n == 0) ? "short read" : strerror(errno));
         return -1;
     }
@@ -122,13 +123,13 @@ copy_byte(int in, int out)
      * fifo is writable, so this write can block if there isn't
      * anyone reading from the fifo.
      */
-    if ((n = write(out, &byte, 1)) < 1) {
-        byte = 0;
+    if ((n = write(out, &rnd_byte, 1)) < 1) {
+        rnd_byte = 0;
         error("write: %s", (n == 0) ? "short write" : strerror(errno));
         return -1;
     }
 
-    byte = 0;
+    rnd_byte = 0;
     return 0;
 }
 
@@ -150,6 +151,11 @@ newt_handler_entropy_text(struct frontend *obj, struct question *q)
     if (!newt)
         return DC_NOTOK;
     
+    if (mlock(&rnd_byte, sizeof(rnd_byte)) < 0) {
+        error("mlock failed: %s", strerror(errno));
+        goto errout;
+    }
+        
     if (mkfifo(FIFO, 0600) < 0) {
         error("mkfifo(%s): %s", FIFO, strerror(errno));
         goto errout;
@@ -228,6 +234,7 @@ errout:
     unlink(FIFO);
     dlclose(newt);
 
+    munlock(&rnd_byte, sizeof(rnd_byte));
     return ret;
 }
 
