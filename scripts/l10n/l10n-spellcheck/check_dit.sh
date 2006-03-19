@@ -144,7 +144,7 @@ fi
 # Add a third column with the encoded character
 #  567 - <U0033> "3"
 
-    sed "s|\(.* \)\(<U....>\)|\1\2  \"\2\" |" ${DEST_DIR}/${LANG}_codes.txt | uxx2utf > ${DEST_DIR}/${LANG}_codes1.txt
+    sed "s|\(.* \)\(<U....>\)|\1\2  \"\2\" |" ${DEST_DIR}/${LANG}_codes.txt | uxx2utf > ${DEST_DIR}/${LANG}_codes1.txt  2>&1 /dev/null
     mv ${DEST_DIR}/${LANG}_codes1.txt ${DEST_DIR}/${LANG}_codes.txt
 
     FILES_TO_KEEP="${DEST_DIR}/${LANG}_codes.txt ${FILES_TO_KEEP}" 
