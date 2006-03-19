@@ -61,9 +61,10 @@ KEY_FINGERPRINT=$(ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' ')
 # Queue installation of ssh to make sure we can log in after reboot
 apt-install openssh-server || true
 
-db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
 IPADDR=$(ifconfig | grep 'inet addr:' | head -n 1 | \
     sed 's/.*inet addr:\([0-9.]*\).*/\1/')
+db_subst $TEMPLATE_ROOT/start ip $IPADDR
+db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
 case "$ARCHDETECT" in
 	arm/nslu2 | armeb/nslu2)
 		beep -f 220 -l 500 -d 500 -r 3
