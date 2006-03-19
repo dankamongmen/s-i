@@ -4,6 +4,9 @@ if [ ! -e /var/lib/lowmem ]; then
 	exit 0
 fi
 
-if cd /lib/modules/*/kernel/drivers; then
-	rm -rf net cdrom ide ieee1394 input scsi usb video parport block
+# Let's not delete anything yet if no discs have been found
+if [ -d /dev/discs ]; then
+	if cd /lib/modules/*/kernel/drivers; then
+		rm -rf net cdrom ide ieee1394 input scsi usb video parport block
+	fi
 fi
