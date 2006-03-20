@@ -113,10 +113,14 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 fi
 
 # remove ${ALL_THESE_VARIABLES} if they do not need to be spell checked
+# remove %s, %c, %d (to get better count of unicode points)
 # ${KBD-ARCHS-L10N} is a particular case which has to be treated as a variable
 if [ ${REMOVE_VARS} = "yes" ] ; then
     NEEDS_RM="${NO_VARS} ${NEEDS_RM}"
-    grep -e "^-" ${ALL_STRINGS} | sed s/\$\{[a-zA-Z0-9_]*\}//g | sed "s|\${KBD-ARCHS-L10N}||"> ${NO_VARS}
+    grep -e "^-" ${ALL_STRINGS} | \
+    sed s/\$\{[a-zA-Z0-9_]*\}//g | \
+    sed "s/%[scd]//g" | \
+    sed "s|\${KBD-ARCHS-L10N}||"> ${NO_VARS}
 
     FILE_TO_CHECK=${NO_VARS}
 else
@@ -135,7 +139,6 @@ fi
     cat ${FILE_CODEPOINTS} | \
     sed "s|^- \"\(.*\)\"$|\1|" | \
     sed "s|\$TCPIP|TCPIP|" | \
-    sed "s|%[scd]||g" | \
     sed "s|\\\\\"|\"|g"  > ${DEST_DIR}/fully_stripped.txt
 
     iconv -f utf8 -t ucs-4le ${DEST_DIR}/fully_stripped.txt | od -v -tx2 -An -w2 | sed "s|\(....\)$|<U\1>|" > ${DEST_DIR}/${LANG}_codes1.txt
