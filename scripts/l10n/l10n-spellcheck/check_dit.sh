@@ -135,6 +135,7 @@ fi
     cat ${FILE_CODEPOINTS} | \
     sed "s|^- \"\(.*\)\"$|\1|" | \
     sed "s|\$TCPIP|TCPIP|" | \
+    sed "s|%[scd]||g" | \
     sed "s|\\\\\"|\"|g"  > ${DEST_DIR}/fully_stripped.txt
 
     iconv -f utf8 -t ucs-4le ${DEST_DIR}/fully_stripped.txt | od -v -tx2 -An -w2 | sed "s|\(....\)$|<U\1>|" > ${DEST_DIR}/${LANG}_codes1.txt
