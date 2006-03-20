@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/utsname.h>
 #include <debian-installer.h>
 #include "xmalloc.h"
 #include "kbd-chooser.h"
@@ -55,10 +56,29 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 	 * For other keyboard vendors and if architecture is x86 or powerpc (prep and chrp),
 	 * force the installer to display the list of AT keymaps. This is needed because, for
 	 * 2.6 kernels, we can not assume that a AT connector will be detected in at-kbd.c.
+	 *
+	 * UPDATE
+	 * Because of the changes in the input layer, we can now be sure for some
+	 * arches that an AT keyboard layout is needed, even if an USB keyboard is detected,
+	 * so for those arches we force any USB keyboard to AT and no longer include the
+	 * option to select a USB keymap.
 	 */
+
+	/* Some architectures always use AT keymaps for USB keyboards;
+	 * if so, force any USB keyboard to AT
+         */
+	int skip_26_kernels = 0;
+#if (defined(__i386__) || defined(__amd64__) || defined(__sparc__)) && defined (AT_KBD)
+	struct utsname buf;
+	uname(&buf);
+	if (strncmp(buf.release, "2.6", 3) == 0)
+		skip_26_kernels = 1;
+#endif
+
 	kbd_t *p;
 	usb_data *data;
 	int usb_present = 0;
+
 	for (p = keyboards; p != NULL; p = p->next) {
 		if (strcmp(p->name,"usb") == 0) {
 //			usb_present = 1;
@@ -69,11 +89,6 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 			} else {
 				di_debug ("non-Apple USB keyboard detected\n");
 				p->present = UNKNOWN;     // Is this really an USB/Mac keyboard?
-#if (defined(__i386__) || defined(__amd64__)) && defined (AT_KBD)
-				di_debug ("Forcing keymap list to AT (x86)\n");
-				p->name = "at";           // Force installer to show AT keymaps
-				p->present = TRUE;
-#endif
 #if defined(__powerpc__) && defined (AT_KBD)
 				if (strstr (subarch, "mac") == NULL) {
 					di_debug ("Forcing keymap list to AT (powerpc)\n");
@@ -82,12 +97,17 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 				}
 #endif
 			}
+			if ((strcmp(p->name,"usb") == 0) && (skip_26_kernels)) {
+				di_debug ("Forcing keymap list to AT (2.6 kernel)\n");
+				p->name = "at";           // Force installer to use AT keymap
+				p->present = TRUE;
+			}
 			if (strcmp(p->name,"usb") == 0)
 				usb_present = 1;
 		}
 	}
-	// Ensure at least 1 USB entry
-	if (!usb_present) {
+	// Ensure at least 1 USB entry, unless the arch uses AT for 2.6 kernels
+	if ((!usb_present) && (!skip_26_kernels)) {
 		di_debug ("Adding generic entry for USB keymaps\n");
 		p = usb_new_entry (keyboards);
 		keyboards = p;
