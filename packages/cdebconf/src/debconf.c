@@ -81,7 +81,7 @@ void parsecmdline(struct configuration *config, int argc, char **argv)
 {
     int c;
 
-    while ((c = getopt_long(argc, argv, "o:p:f:", options, NULL)) > 0)
+    while ((c = getopt_long(argc, argv, "+o:p:f:", options, NULL)) > 0)
     {
         switch (c)
         {
