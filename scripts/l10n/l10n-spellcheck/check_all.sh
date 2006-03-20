@@ -51,7 +51,7 @@ initialise	# initalise some variables
 checks          # do an environment check
 
 i=0
-for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
+for LANGUAGE in $(sed "s:^[ \t]*#.*::" ${LANGUAGE_LIST}) ; do
     LANG=`echo  ${LANGUAGE} | awk -F, '{print $1}'`
     DICT=`echo  ${LANGUAGE} | awk -F, '{print $2}'`
 
@@ -62,7 +62,6 @@ for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
 	echo "*** checking \"$LANG\" using aspell-${DICT} ***"
     fi
 
-    
     check_dit.sh ${LANG} ${DICT} ${DI_COPY} ${DEST_DIR}
 
     i=`expr $i + 1`
@@ -105,6 +104,11 @@ for ROW in `cat ${STATS}.txt | sort -n | sed 's: :,:g'`; do
 	echo ${VAL} >> ${GNUPLOT_DATA}
     fi
 done
+
+if [ ${#XTICS} = 0 ] ; then
+    echo "No data to plot"
+    exit 0
+fi
 
 XTICS=`echo ${XTICS} | sed "s:^":\(":" | sed "s:,$:):"`
 
