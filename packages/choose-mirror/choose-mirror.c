@@ -457,6 +457,60 @@ int get_codename (void) {
 	return ret;
 }
 
+/* Check if the mirror carries the architecture that's being installed. */
+int check_arch (void) {
+	char *command;
+	FILE *f = NULL;
+	char *hostname, *directory, *suite = NULL;
+	int valid = 0;
+
+	hostname = add_protocol("hostname");
+	debconf_get(debconf, hostname);
+	free(hostname);
+	hostname = strdup(debconf->value);
+	directory = add_protocol("directory");
+	debconf_get(debconf, directory);
+	free(directory);
+	directory = strdup(debconf->value);
+
+	/* As suite has been determined previously, this should not fail */
+	debconf_get(debconf, DEBCONF_BASE "suite");
+	if (strlen(debconf->value) > 0) {
+		suite = strdup(debconf->value);
+
+		asprintf(&command, "wget -q %s://%s%s/dists/%s/main/binary-%s/Release -O - | grep Architecture",
+			 protocol, hostname, directory, suite, ARCH_TEXT);
+		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
+		f = popen(command, "r");
+		free(command);
+
+		if (f != NULL) {
+			char buf[SUITE_LENGTH];
+			if (fgets(buf, SUITE_LENGTH - 1, f))
+				if (strlen(buf) > 1)
+					valid = 1;
+		}
+		pclose(f);
+	}
+
+	free(hostname);
+	free(directory);
+	if (suite)
+		free(suite);
+
+	if (valid) {
+		return 0;
+	}
+	else {
+		di_log(DI_LOG_LEVEL_DEBUG, "Architecture not supported by selected mirror");
+		debconf_input(debconf, "critical", DEBCONF_BASE "noarch");
+		if (debconf_go(debconf) == 30)
+			exit(10); /* back up to menu */
+		else
+			return 1; /* back to beginning of questions */
+	}
+}
+
 int main (void) {
 	/* Use a state machine with a function to run in each state */
 	int state = 0;
@@ -471,6 +525,7 @@ int main (void) {
 		validate_mirror,
 		choose_suite,
 		get_codename,
+		check_arch,
 		NULL,
 	};
 

@@ -1,7 +1,9 @@
 USE_HTTP=1
 #USE_FTP=1
 
-CFLAGS=-Wall -g -D_GNU_SOURCE
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+CFLAGS=-Wall -g -D_GNU_SOURCE -DARCH_TEXT='"$(DEB_HOST_ARCH)"'
 templates=debian/choose-mirror.templates-in
 
 ifeq (1,${USE_HTTP})
