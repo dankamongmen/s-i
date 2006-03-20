@@ -72,7 +72,7 @@ sort ${DEST_DIR}/all_codes-tmp.txt | uniq -c > ${DEST_DIR}/all_codes.txt
 
 # Add a third column with the encoded character
 #  567 - <U0033> "3"
-sed "s|\(.* \)\(<U....>\)|\1\2  \"\2\" |" ${DEST_DIR}/all_codes.txt | uxx2utf > ${DEST_DIR}/all_codes-tmp.txt 2>&1 /dev/null
+sed "s|\(.* \)\(<U....>\)|\1\2  \"\2\" |" ${DEST_DIR}/all_codes.txt | uxx2utf > ${DEST_DIR}/all_codes-tmp.txt 2> /dev/null
 mv ${DEST_DIR}/all_codes-tmp.txt ${DEST_DIR}/all_codes.txt
 
 HERE=$(pwd)
