@@ -133,7 +133,7 @@ if [ ${REMOVE_VARS} = "yes" ] ; then
 else
     # remove header
     FILE_CODEPOINTS=${DEST_DIR}/temp-codes.txt
-    cat ${FILE_TO_CHECK} | sed "1,2d" > ${FILE_CODEPOINTS}
+    cat ${FILE_TO_CHECK} | sed "1,2d" | sed "s/%[scd]//g" > ${FILE_CODEPOINTS}
 fi
 
     cat ${FILE_CODEPOINTS} | \
