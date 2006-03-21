@@ -1,0 +1,18 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+log() {
+	logger -t lilo-installer "$@"
+}
+
+MANUFACTURER="$(dmidecode -s system-manufacturer)"
+case $MANUFACTURER in
+	Apple*)
+		log "LILO not usable on Intel-based Macs; use elilo"
+		exit 1
+		;;
+esac
+;;
+
+exit 0
