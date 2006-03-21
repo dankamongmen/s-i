@@ -3,6 +3,9 @@
 # This script sets method "efi" for all fat16 partitions that have the boot
 # flag set.
 
+# Give the kernel a chance to create /proc/efi if appropriate.
+modprobe efivars >/dev/null 2>&1 || true
+
 if [ ! -d /proc/efi ] && [ ! -d /sys/firmware/efi ]; then
     exit 0
 fi
