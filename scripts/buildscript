@@ -187,6 +187,9 @@ case $ARCH in
     hppa)
 	do_subdir packages/partman/partman-palo
 	;;
+    i386|ia64)
+	do_subdir packages/partman/partman-efi
+	;;
     powerpc)
 	do_subdir packages/partman/partman-newworld \
 	    packages/partman/partman-prep
@@ -243,6 +246,10 @@ esac
 
 # Arch dependent udebs, which may not build cleanly elsewhere.
 case $ARCH in
+    amd64)
+	do_subdir packages/arch/i386/grub-installer \
+	    packages/arch/i386/lilo-installer
+	;;
     alpha)
 	do_subdir packages/arch/alpha/aboot-installer \
 	    packages/arch/alpha/srm-reader
@@ -250,9 +257,10 @@ case $ARCH in
     hppa)
 	do_subdir packages/arch/hppa/palo-installer
 	;;
-    i386|amd64)
+    i386)
 	do_subdir packages/arch/i386/grub-installer \
-	    packages/arch/i386/lilo-installer
+	    packages/arch/i386/lilo-installer \
+	    packages/arch/ia64/elilo-installer
 	;;
     ia64)
 	do_subdir packages/arch/ia64/efi-reader \
