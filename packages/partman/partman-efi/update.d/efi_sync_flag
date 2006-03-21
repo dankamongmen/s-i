@@ -3,6 +3,10 @@
 # This script removes the efi flag for partitions whose method is not
 # efi and sets it for partition whose method is efi
 
+if [ ! -d /proc/efi ] && [ ! -d /sys/firmware/efi ]; then
+    exit 0
+fi
+
 . /lib/partman/definitions.sh
 
 dev=$1
