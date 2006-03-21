@@ -119,7 +119,6 @@ if [ ${REMOVE_VARS} = "yes" ] ; then
     NEEDS_RM="${NO_VARS} ${NEEDS_RM}"
     grep -e "^-" ${ALL_STRINGS} | \
     sed s/\$\{[a-zA-Z0-9_]*\}//g | \
-    sed "s/%[scd]//g" | \
     sed "s|\${KBD-ARCHS-L10N}||"> ${NO_VARS}
 
     FILE_TO_CHECK=${NO_VARS}
@@ -133,12 +132,13 @@ if [ ${REMOVE_VARS} = "yes" ] ; then
 else
     # remove header
     FILE_CODEPOINTS=${DEST_DIR}/temp-codes.txt
-    cat ${FILE_TO_CHECK} | sed "1,2d" | sed "s/%[scd]//g" > ${FILE_CODEPOINTS}
+    cat ${FILE_TO_CHECK} | sed "1,2d" > ${FILE_CODEPOINTS}
 fi
 
     cat ${FILE_CODEPOINTS} | \
     sed "s|^- \"\(.*\)\"$|\1|" | \
     sed "s|\$TCPIP|TCPIP|" | \
+    sed "s/%l*[scdbniuBFNS]//g" | \
     sed "s|\\\\\"|\"|g"  > ${DEST_DIR}/fully_stripped.txt
 
     iconv -f utf8 -t ucs-4le ${DEST_DIR}/fully_stripped.txt | od -v -tx2 -An -w2 | sed "s|\(....\)$|<U\1>|" > ${DEST_DIR}/${LANG}_codes1.txt
