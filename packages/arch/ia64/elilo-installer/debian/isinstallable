@@ -4,10 +4,6 @@ set -e
 ARCH="$(archdetect)"
 
 case $ARCH in
-	ia64/*)
-		# All ia64 systems use elilo.
-		exit 0
-		;;
 	i386/*)
 		MANUFACTURER="$(dmidecode -s system-manufacturer)"
 		case $MANUFACTURER in
@@ -16,8 +12,11 @@ case $ARCH in
 				exit 0
 				;;
 		esac
+
+		# Everyone else should use a different boot loader.
+		exit 1
 		;;
 esac
 
-# Everyone else should use a different boot loader.
-exit 1
+# All ia64 systems use elilo.
+exit 0
