@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 31190 -->
+<!-- original version: 34713 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
+<!-- actualizado jfs, 23 marzo 2006 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalar &debian; desde un sistema Unix/Linux</title>
@@ -95,18 +96,34 @@ en particiones distintas.
 de Debian, es también la forma oficial de instalar un sistema base
 Debian.  Éste usa <command>wget</command> y <command>ar</command>,
 pero, salvo ésto, sólo
-depende de <classname>/bin/sh</classname>. Si aún no lo ha hecho,
+depende de <classname>/bin/sh</classname> y algunas herramientas básicas
+de Unix/Linux<footnote>
+
+<para>
+Esto incluye las utilidades principales de GNU y órdenes como
+<command>sed</command>,
+<command>grep</command>, <command>tar</command> y <command>gzip</command>.
+
+</para>
+
+</footnote>. Si aún no lo ha hecho,
 instale <command>wget</command> y <command>ar</command>
 en su sistema actual, y luego
 descargue e instale <command>debootstrap</command>.
 
-</para><para>
+</para>
+
+<!-- The files linked to here are from 2004 and thus currently not usable
+<para>
 
 Si tiene un sistema basado en rpm, puede usar alien para
 convertir el .deb en .rpm, o descargar una versión adaptada a rpm de
 <ulink url="http://people.debian.org/~blade/install/debootstrap"></ulink>
 
-</para><para>
+</para>
+-->
+
+<para>
 
 O bien, puede usar el siguiente procedimiento para instalarlo manualmente.
 Cree un directorio temporal <quote>trabajo</quote> para extraer el .deb en él:
@@ -356,20 +373,6 @@ asociada con el nombre de la interfaz (eth0, eth1, etc.) que haya indicado.
    </sect3>
 
    <sect3>
-   <title>Configurar zona horaria, usuarios y APT</title>
-<para>
-
-Configure su zona horaria, añada un usuario común y elija sus fuentes
-<command>apt</command> ejecutando
-
-<informalexample><screen>
-# /usr/sbin/base-config
-</screen></informalexample>
-
-</para>
-   </sect3>
-
-   <sect3>
    <title>Configurar locales</title>
 <para>
 
@@ -383,7 +386,8 @@ al inglés:
 # dpkg-reconfigure locales
 </screen></informalexample>
 
-NOTA: Debe haber configurado antes Apt, durante la fase base-config.
+NOTA: Debe haber configurado antes Apt creando el archivo sources.list
+y ejecutando apt-get update.
 Consulte el CÓMO de localización apropiado antes de utilizar valores
 de localización con juegos de caracteres distintos a ASCII o
 latin1.
