@@ -245,8 +245,11 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
             /* TODO */
             /* setting custom font colours would make GTKDFB 2.0.9 crash */
             /* this issue has already been fixed in recent GTKDFB verions */
-            /* sprintf(message,"<b><span foreground=\"#ffffff\">%s</span></b>", text); */
+            #if GTK_CHECK_VERSION(2,8,0)
+            sprintf(message,"<b><span foreground=\"#ffffff\">%s</span></b>", text);
+            #else
             sprintf(message,"<b>%s</b>", text);
+            #endif
             layout = gtk_widget_create_pango_layout(wid, NULL);
             pango_layout_set_markup(layout, message, strlen(message));
             pango_layout_set_font_description(layout, pango_font_description_from_string("Sans 12"));
@@ -1397,12 +1400,9 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     /* Here the the progressbar is placed */
     progress_bar = gtk_progress_bar_new ();
     ((struct frontend_data*)obj->data)->progress_bar = progress_bar;  
-    /* TODO
-     * gtk_progress_bar_set_ellipsize() was introduced in GTK v 2.6.0
-     * so this nice and useful function won't be usable while we're stuck
-     * with GTKDFB 2.0.9
-     */
-    /* gtk_progress_bar_set_ellipsize (GTK_PROGRESS_BAR(progress_bar), PANGO_ELLIPSIZE_MIDDLE); */
+    #if GTK_CHECK_VERSION(2,6,0)
+    gtk_progress_bar_set_ellipsize (GTK_PROGRESS_BAR(progress_bar), PANGO_ELLIPSIZE_MIDDLE);
+    #endif
     progress_bar_box = gtk_vbox_new (FALSE, 0);
     v_progress_bar_box = gtk_vbox_new (FALSE, 0);
     h_progress_bar_box = gtk_hbox_new (FALSE, 0);
@@ -1519,7 +1519,9 @@ static int gtk_go(struct frontend *obj)
     struct frontend_data *data = (struct frontend_data *) obj->data;
     struct question *q = obj->questions;
     GtkWidget *questionbox, *questionbox_scroll;
-    /* GtkWidget *image_button_forward, *image_button_back; */
+    #if GTK_CHECK_VERSION(2,6,0)
+    GtkWidget *image_button_forward, *image_button_back;
+    #endif
     di_slist *plugins;
     int i, j;
     int ret;
@@ -1615,14 +1617,12 @@ static int gtk_go(struct frontend *obj)
     gtk_button_set_label (GTK_BUTTON(data->button_next), get_text(obj, "debconf/button-continue", "Continue") );
     gtk_button_set_label (GTK_BUTTON(data->button_cancel), get_text(obj, "debconf/button-cancel", "Cancel") );
 
-    /* TODO
-     * gtk_button_set_image() was first implemented in GTK v. 2.6
-     */
-
-    /* image_button_back = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_SMALL_TOOLBAR ); */
-    /* image_button_forward = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_SMALL_TOOLBAR ); */
-    /* gtk_button_set_image (GTK_BUTTON(data->button_prev), image_button_back); */
-    /* gtk_button_set_image (GTK_BUTTON(data->button_next), image_button_forward); */
+    #if GTK_CHECK_VERSION(2,6,0)
+    image_button_back = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_SMALL_TOOLBAR );
+    image_button_forward = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_SMALL_TOOLBAR );
+    gtk_button_set_image (GTK_BUTTON(data->button_prev), image_button_back);
+    gtk_button_set_image (GTK_BUTTON(data->button_next), image_button_forward);
+    #endif
 
     gtk_widget_set_default_direction(get_text_direction(obj));
 
