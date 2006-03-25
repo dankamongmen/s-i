@@ -1217,8 +1217,8 @@ command_partitions()
                 if (PED_PARTITION_FREESPACE & part->type
                     && ped_disk_type_check_feature(disk->type,
                                                    PED_DISK_TYPE_EXTENDED)
-                    && (part->geom).length
-                    < dev->bios_geom.sectors * dev->bios_geom.heads)
+                    && ((part->geom).length
+                        < dev->bios_geom.sectors * dev->bios_geom.heads))
                         continue;
                 /* Another hack :) */
                 if (0 == strcmp(disk->type->name, "dvh")

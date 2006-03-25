@@ -380,15 +380,15 @@ error_handler () {
 		;;
 	    Information)
 		type='Information'
-		priority=low
+		priority=medium
 		;;
 	    Warning)
 		type='Warning!'
-		priority=medium
+		priority=high
 		;;
 	    Error)
 		type='ERROR!!!'
-		priority=high
+		priority=critical
 		;;
 	    Fatal)
 		type='FATAL ERROR!!!'
