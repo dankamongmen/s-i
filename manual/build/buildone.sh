@@ -145,15 +145,13 @@ create_text () {
 
     # Set encoding for output file
     case "$language" in
-        cs)
-            CHARSET=ISO-8859-2 ;;
         ja)
             CHARSET=EUC-JP ;;
         ko)
             CHARSET=EUC-KR ;;
         ru)
             CHARSET=KOI8-R ;;
-        el|ro|zh_CN|zh_TW)
+        cs|el|ro|zh_CN|zh_TW)
             CHARSET=UTF-8 ;;
         *)
             CHARSET=ISO-8859-1 ;;
