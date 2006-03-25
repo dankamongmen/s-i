@@ -479,10 +479,9 @@ remember_geometries_named(const char *name)
                                 continue;
                         if (PED_PARTITION_FREESPACE & part->type)
                                 continue;
-                        ped_geometry_init(geometries+last,
+                        ped_geometry_init(geometries + last,
                                           disk->dev,
-                                          part->geom.start,
-                                          part->geom.length);
+                                          part->geom.start, part->geom.length);
                         last = last + 1;
                         if (last >= max_partition)
                                 critical_error("Too many partitions");
@@ -524,7 +523,7 @@ named_partition_is_virtual(const char *name, PedSector start, PedSector end)
                 log("yes");
                 return true;
         }
-        for (i=0; i<last; i++) {
+        for (i = 0; i < last; i++) {
                 if (start == geometries[i].start && end == geometries[i].end) {
                         log("no");
                         return false;
@@ -628,7 +627,7 @@ add_primary_partition(PedDisk *disk, PedFileSystemType *fs_type,
 {
         PedPartition *part;
         assert(disk != NULL);
-        log("add_primary_partition(disk(%lli),%lli-%lli)", 
+        log("add_primary_partition(disk(%lli),%lli-%lli)",
             disk->dev->length, start, end);
         if (has_extended_partition(disk)) {
                 /* Minimise the extended partition.  If there is an
@@ -689,7 +688,7 @@ resize_partition(PedDisk *disk, PedPartition *part,
         PedConstraint *constraint;
         PedSector old_start, old_end;
         bool result;
-        log("resize_partition(openfs=%s)", open_filesystem ? "true":"false");
+        log("resize_partition(openfs=%s)", open_filesystem ? "true" : "false");
         old_start = (part->geom).start;
         old_end = (part->geom).end;
         if (old_start == start && old_end == end)
@@ -1086,7 +1085,7 @@ command_virtual()
         log("is virtual partition with id %s", id);
         part = partition_with_id(disk, id);
         oprintf("OK\n");
-        if (named_partition_is_virtual(device_name, 
+        if (named_partition_is_virtual(device_name,
                                        part->geom.start, part->geom.end)) {
                 oprintf("yes\n");
         } else {
@@ -1219,7 +1218,7 @@ command_partitions()
                     && ped_disk_type_check_feature(disk->type,
                                                    PED_DISK_TYPE_EXTENDED)
                     && (part->geom).length
-                       < dev->bios_geom.sectors * dev->bios_geom.heads)
+                    < dev->bios_geom.sectors * dev->bios_geom.heads)
                         continue;
                 /* Another hack :) */
                 if (0 == strcmp(disk->type->name, "dvh")
@@ -1541,7 +1540,7 @@ command_get_file_system()
         log("command_get_file_system: File system for partition %s", id);
         part = partition_with_id(disk, id);
         oprintf("OK\n");
-        if (named_partition_is_virtual(device_name, 
+        if (named_partition_is_virtual(device_name,
                                        part->geom.start, part->geom.end)) {
                 oprintf("none\n");
         } else {
@@ -1580,12 +1579,14 @@ command_change_file_system()
         fstype = ped_file_system_type_get(s_fstype);
         free(s_fstype);
         if (fstype == NULL) {
-                log("Filesystem %s not found, let's see if it is a flag", s_fstype);
+                log("Filesystem %s not found, let's see if it is a flag",
+                    s_fstype);
                 flag = ped_partition_flag_get_by_name(s_fstype);
                 if (ped_partition_is_flag_available(part, flag)) {
                         ped_partition_set_flag(part, flag, 1);
                 } else {
-                        critical_error("Bad file system or flag type: %s", s_fstype);
+                        critical_error("Bad file system or flag type: %s",
+                                       s_fstype);
                 }
         } else {
                 ped_partition_set_system(part, fstype);
@@ -1649,8 +1650,7 @@ command_create_file_system()
                 critical_error("Bad file system type: %s", s_fstype);
         ped_partition_set_system(part, fstype);
         deactivate_exception_handler();
-        if ((fs = timered_file_system_create(&(part->geom), fstype)) != NULL)
-        {
+        if ((fs = timered_file_system_create(&(part->geom), fstype)) != NULL) {
                 ped_file_system_close(fs);
                 ped_disk_commit_to_dev(disk);
         }
@@ -1831,7 +1831,7 @@ command_resize_partition()
         log("New size: %lli", new_size);
         start = (part->geom).start;
         end = start + new_size / PED_SECTOR_SIZE - 1;
-        if (named_partition_is_virtual(device_name, 
+        if (named_partition_is_virtual(device_name,
                                        part->geom.start, part->geom.end)) {
                 resize_partition(disk, part, start, end, false);
         } else {
@@ -1905,7 +1905,7 @@ command_get_resize_range()
         part = partition_with_id(disk, id);
         if (part == NULL)
                 critical_error("No such partition");
-        if (!named_partition_is_virtual(device_name, 
+        if (!named_partition_is_virtual(device_name,
                                         part->geom.start, part->geom.end)) {
                 fs = ped_file_system_open(&(part->geom));
                 if (NULL != fs && (fs->geom->start < (part->geom).start
@@ -2036,22 +2036,23 @@ command_copy_partition()
         free(srcid);
 }
 
-void command_get_disk_type()
+void
+command_get_disk_type()
 {
-	log("command_get_disk_type()");
-	scan_device_name();
-	open_out();
-	oprintf("OK\n");
-	deactivate_exception_handler();
-	if((disk == NULL) || (disk->type == NULL) 
-			  || (disk->type->name == NULL)) {
-		oprintf("unknown\n");
-	} else {
-		oprintf("%s\n", disk->type->name);
-	}
-	activate_exception_handler();
+        log("command_get_disk_type()");
+        scan_device_name();
+        open_out();
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        if ((disk == NULL) || (disk->type == NULL)
+            || (disk->type->name == NULL)) {
+                oprintf("unknown\n");
+        } else {
+                oprintf("%s\n", disk->type->name);
+        }
+        activate_exception_handler();
 }
-	
+
 /**********************************************************************
    Main
 **********************************************************************/
@@ -2136,8 +2137,8 @@ main_loop()
                         command_get_virtual_resize_range();
                 else if (!strcasecmp(str, "COPY_PARTITION"))
                         command_copy_partition();
-		else if (!strcasecmp(str, "GET_DISK_TYPE"))
-			command_get_disk_type();
+                else if (!strcasecmp(str, "GET_DISK_TYPE"))
+                        command_get_disk_type();
                 else
                         critical_error("Unknown command %s", str);
                 free(str);
