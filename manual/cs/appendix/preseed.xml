@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 33825 -->
+<!-- original version: 35836 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -136,7 +136,7 @@ souboru s přednastavením, můžete využít zaváděcí parametry jádra, viz
 Přestože takto můžete přednastavit většinu otázek &d-i;u, existuje
 několik výjimek. Při dělení disku musíte rozdělit buď celý disk, nebo
 použít stávající volné místo &mdash; není možné použít existující
-oblasti. Také nemůžete přednastavit vytváření RAID polí a LVM.
+oblasti. Také nemůžete přednastavit vytváření RAID polí.
 
 </para>
   </sect2>
@@ -331,6 +331,46 @@ odchytí většinu případných otázek, které zde zapomenete nastavit.
 </para>
   </sect2>
 
+  <sect2 id="preseed-dhcp">
+  <title>Použití DHCP serveru pro určení souboru s přednastavením</title>
+<para>
+
+Jelikož DHCP umí předávat jméno souboru, je možné toho zneužít pro
+určení souboru s přednastavením. Obvykle se totiž tato možnost používá
+pro určení souboru, kterým se zavede systém ze sítě. Pokud ale bude
+soubor ve formě URL, instalace to rozpozná a pokusí se soubor stáhnout
+a použít jako soubor s přednastavením. Následující příkaz ukazuje, jak
+upravit konfigurační soubor <filename>dhcpd.conf</filename> serveru
+ISC DHCP verze 3 (balík dhcp3-server).
+
+</para>
+
+<informalexample><screen>
+if substring (option vendor-class-identifier, 0, 3) = "d-i" {
+       filename "http://pocitac/preseed.cfg";
+}
+</screen></informalexample>
+
+<para>
+
+Všimněte si, že předchozí příklad omezuje použití na DHCP klienty,
+kteří se identifikují jako <quote>d-i</quote>, takže by to nemělo
+ovlivnit běžné DHCP klienty, ale pouze instalace. Direktivu
+<userinput>filename</userinput> můžete zadat například i do sekce pro
+jediný počítač, takže neovlivníte ostatní instalace na síti.
+
+</para><para>
+
+K dobrým zvykům při přednastavování přes DHCP patří přednastavení
+pouze hodnot, které jsou specifické pro vaši síť, jako je
+např. lokální zrcadlo. Tím se při instalaci automaticky vybere správné
+zrcadlo, ale zbytek instalace probíhá interaktivně. Kompletní
+přednastavení přes DHCP byste měli provádět pouze s nejvyšší
+opatrností.
+
+</para>
+  </sect2>
+
   <sect2 id="preseed-bootparms">
   <title>Použití zaváděcích parametrů jako formu přednastavení</title>
 <para>
@@ -476,7 +516,7 @@ mapa jádra.
 <note><para>
 
 Změny ve vstupní vrstvě jader 2.6 v podstatě smazaly význam typů
-klávesnic, takže by většinou měla stačit typ <quote>PC</quote>
+klávesnic, takže by většinou měl stačit typ <quote>PC</quote>
 (<userinput>at</userinput>).
 
 </para></note>
@@ -491,6 +531,13 @@ samozřejmě nebude fungovat! V takovém případě zadejte potřebné
 parametry sítě zavaděči jádra. Zavádíte-li z CD nebo USB, bude
 nastavení fungovat bez problémů.
 
+</para><para>
+
+Potřebujete-li při zavádění ze sítě vybrat konkrétní síťové rozhraní
+ještě před nahráním souboru s přednastavením, použijte zaváděcí
+parametr
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+
 </para>
 
 <informalexample role="example"><screen>
@@ -498,12 +545,23 @@ nastavení fungovat bez problémů.
 # a tím pádem přeskočí výběr ze seznamu nalezených rozhraní.
 d-i netcfg/choose_interface select auto
 
+# Výběr konkrétního síťového rozhraní:
+#d-i netcfg/choose_interface select eth1
+
 # Máte-li pomalejší dhcp server a instalačnímu systému vyprší čas při
 # čekání na odpověď, bude užitečné následující.
 #d-i netcfg/dhcp_timeout string 60
 
 # Pokud dáváte přednost ručnímu nastavení sítě:
 #d-i netcfg/disable_dhcp boolean true
+
+# Má-li tento soubor s přednastavením fungovat na systémech s i bez
+# dhcp serveru, odkomentujte následující řádky a také statické
+# nastavení sítě níže.
+#d-i netcfg/dhcp_failed note
+#d-i netcfg/dhcp_options select Configure network manually
+
+# Statické nastavení sítě.
 #d-i netcfg/get_nameservers string 192.168.1.1
 #d-i netcfg/get_ipaddress string 192.168.1.42
 #d-i netcfg/get_netmask string 255.255.255.0
@@ -572,8 +630,7 @@ Dělení disku je víceméně omezeno možnostmi, které nabízí
 stávajícího volného místa, nebo celého disku. Rozvržení oblastí můžete
 nadefinovat pomocí předdefinovaného schematu, vlastního schematu ze
 souboru nebo schematu obsaženém v souboru s přednastavením. Momentálně
-není možné přednastavit rozdělení více disků nebo nastavení RAIDu
-a LVM.
+není možné přednastavit rozdělení více disků nebo nastavení RAIDu.
 
 </para><warning><para>
 
@@ -585,15 +642,17 @@ ovladače. Jestliže se v systému nachází více disků, tak se ubezpečte,
 
 <informalexample role="example"><screen>
 # Pokud má systém volné místo, můžete je vybrat k automatickému rozdělení.
+# Pozn: hodnota této šablony musí být lokalizována (přeložena).
 #d-i partman-auto/init_automatically_partition \
-#      select Use the largest continuous free space
+#      select Použít největší spojité volné místo
 
 # Alternativně můžete zadat k automatickému dělení celý disk. Název
 # zařízení může být v tradičním formátu nebo ve formátu devfs.
 # Například pro použití prvního disku, který devfs najde:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
-# Můžete vybrat libovolné z přednastavených schémat dělení:
+# Můžete vybrat libovolné z přednastavených schémat dělení.
+# Pozn: hodnota této šablony musí být lokalizována (přeložena).
 d-i partman-auto/choose_recipe \
        select All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe \
@@ -665,8 +724,8 @@ tři relevantní proměnné.
 # Můžete si zvolit instalaci softwaru ze sekcí non-free a contrib.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
-# Pokud nechcete přidat zdroje s opravami, nebo pokud chcete použít
-# jiný server než security.debian.org.
+# Odkomentujte, pokud nechcete přidat zdroje s opravami, nebo pokud
+# chcete použít jiný server než security.debian.org.
 #d-i apt-setup/security_host string
 </screen></informalexample>
 
@@ -692,22 +751,22 @@ hrubou silou.
 
 <informalexample role="example"><screen>
 # Rootovo heslo v čitelném tvaru
-#passwd passwd/root-password password r00tme
-#passwd passwd/root-password-again password r00tme
+#d-i passwd/root-password password r00tme
+#d-i passwd/root-password-again password r00tme
 # nebo šifrované pomocí MD5 hashe.
-#passwd passwd/root-password-crypted password [MD5 hash]
+#d-i passwd/root-password-crypted password [MD5 hash]
 
 # Přeskočí vytváření běžného uživatelského účtu.
-#passwd passwd/make-user boolean false
+#d-i passwd/make-user boolean false
 
 # Alternativně můžete vytvořit účet běžného uživatele.
-#passwd passwd/user-fullname string Jan Novak
-#passwd passwd/username string jan
+#d-i passwd/user-fullname string Jan Novak
+#d-i passwd/username string jan
 # Heslo běžného uživatele v čitelném tvaru
-#passwd passwd/user-password password nebezpecne
-#passwd passwd/user-password-again password nebezpecne
+#d-i passwd/user-password password nebezpecne
+#d-i passwd/user-password-again password nebezpecne
 # nebo šifrované pomocí MD5 hashe.
-#passwd passwd/user-password-crypted password [MD5 hash]
+#d-i passwd/user-password-crypted password [MD5 hash]
 </screen></informalexample>
 
 <para>
@@ -878,23 +937,23 @@ tudíž byste si měli o přítomném hardwaru zjistit nějaké podrobnosti.
 <informalexample role="example"><screen>
 # I když X rozpozná správný ovladač grafické karty, zde jej můžete
 # přepsat. Vesa bude fungovat ve většině případů.
-#xserver-xfree86 xserver-xfree86/config/device/driver select vesa
+#xserver-xorg xserver-xorg/config/device/driver select vesa
 
 # Pokud se automatické rozpoznání myši nezdaří, dostanete se do
 # nekonečné smyčky, protože nástroj se bude ptát znovu a znovu
 # a pokaždé (ne)nalezne stejnou nefunkční myš.
-#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
+#xserver-xorg xserver-xorg/autodetect_mouse boolean true
 
 # Automatické rozpoznání monitoru je doporučeno.
-xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
+xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # Odkomentujete pokud máte LCD displej.
-#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
+#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
 # X má tři metody nastavení monitoru. Ukážeme střední cestu
 # ("medium"), která je dostupná vždy. Možnost "simple" nemusí být
 # dostupná a "advanced" se ptá příliš mnoho otázek.
-xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
+xserver-xorg xserver-xorg/config/monitor/selection-method \
        select medium
-xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
+xserver-xorg xserver-xorg/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
 

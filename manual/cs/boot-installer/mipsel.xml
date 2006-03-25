@@ -1,10 +1,92 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 24701 -->
+<!-- original version: 35612 -->
 
- <sect2 arch="mipsel">
- <title></title>
+  <sect2 arch="mipsel" id="boot-tftp"><title>Zavedení z TFTP</title>
+
+   <sect3>
+   <title>TFTP zavádění na strojích Cobalt</title>
 <para>
 
+Přesněji řečeno Cobalt nepoužívá pro zavádění TFTP, ale NFS. Nejprve
+tedy musíte nainstalovat NFS server a nakopírovat soubory instalačního
+systému do adresáře <filename>/nfsroot</filename>. Při zavádění
+Cobaltu musíte současně stisknout levou a pravou kurzorovou klávesu,
+což způsobí zavedení ze sítě pomocí NFS. Následně se zobrazí několik
+možností, mezi kterými jsou tyto dva způsoby instalace:
+
+<itemizedlist>
+<listitem><para>
+
+Přes SSH (výchozí): V tomto případě instalátor nastaví síť přes DHCP
+a spustí SSH server. Poté na LCD displeji Cobaltu zobrazí náhodné heslo
+a další informace nutné pro přihlášení (např. IP adresu). Instalaci
+zahájíte připojením na instalovaný počítač pomocí SSH klienta.
+
+</para></listitem>
+<listitem><para>
+
+Přes sériovou konzoli: Můžete použít nullmodemový kabel na sériovém
+portu a připojit se k Cobaltu rychlostí 115200 bps.Tato možnost není
+dostupná na počítačích Qube 2700 (Qube1), jelikož nemají sériový
+port.
+
+</para></listitem>
+</itemizedlist>
+
 </para>
- </sect2>
+  </sect3>
+
+   <sect3>
+   <title>TFTP zavádění na Broadcom BCM91250A a BCM91480B</title>
+<para>
+
+Na Broadcom BCM91250A a BCM91480B musíte zavést zavaděč SiByl přes
+TFTP a ten pak nahraje a spustí instalaci Debianu. Ve většině případů
+nejprve obdržíte IP adresu přes DHCP, ale nic vám nebrání nastavit si
+statickou adresu ručně. Chcete-li použít DHCP, zadejte v CFE promptu
+následující příkaz:
+
+<informalexample><screen>
+ifconfig eth0 -auto
+</screen></informalexample>
+
+Poté, co obdržíte IP adresu, můžete zavést zavaděč SiByl příkazem:
+
+<informalexample><screen>
+boot <replaceable>192.168.1.1</replaceable>:/boot/sibyl
+</screen></informalexample>
+
+IP adresu v příkladu samozřejmě musíte nahradit jménem nebo IP adresou
+vašeho místního TFTP serveru. Instalační program by se měl zavést
+automaticky.
+
+</para>
+   </sect3>
+  </sect2>
+
+  <sect2 arch="mipsel"><title>Zaváděcí parametry</title>
+
+   <sect3>
+   <title>Cobalt</title>
+<para>
+
+Parametry není možno zadat přímo, ale musíte je zadat do proměnné
+<replaceable>args</replaceable> v souboru
+<filename>/nfsroot/default.colo</filename> ležícím na NFS serveru.
+
+</para>
+  </sect3>
+
+   <sect3>
+   <title>Broadcom BCM91250A a BCM91480B</title>
+<para>
+
+Přímo z CFE promptu nemůžete zadávat žádné příkazy. Místo toho musíte
+na FTP serveru upravit soubor <filename>/boot/sibyl.conf</filename>
+a přidat své parametry do proměnné
+<replaceable>extra_args</replaceable>.
+
+</para>
+   </sect3>
+  </sect2>
