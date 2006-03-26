@@ -255,12 +255,18 @@ if db_go; then
 		LANGNAME="$RET"
 		db_set ${langname_all} "$LANGNAME"
 		. languagemap
-		db_set "$languagecode" "$LANGUAGELIST"
+		if [ -z "$LANGUAGELIST" ] ; then
+			db_set "$languagecode" "$LANGUAGE"
+			log "Set $languagecode = '$LANGUAGE'"
+			LANGUAGELIST="$LANGUAGE"
+		else
+			db_set "$languagecode" "$LANGUAGELIST"
+			log "Set $languagecode = '$LANGUAGELIST'"
+		fi
 		db_set "$localecode"   "$LOCALE"
 		db_set "$fallbacklocalecode"   "$FALLBACKLOCALE"
 		db_set "$countrycode"  "$COUNTRY"
 		db_set "$consoledisplay"  "$CONSOLE"
-		log "Set $languagecode = '$LANGUAGELIST'"
 		log "Set $localecode = '$LOCALE'"
 		log "Set $fallbacklocalecode = '$FALLBACKLOCALE'"
 		log "Set $countrycode = '$COUNTRY'"
@@ -452,7 +458,7 @@ log "Set $localecode = '$LOCALE'"
 # list we got from languagechooser
 # We shouldn't just add this before the former list in case the country 
 # is changed several times.
-if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n "$LANGUAGE" -a "$LOCALE" != "C" ]; then
+if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n "$LANGUAGE" -a "$LOCALE" != "C" -a "$LANGUAGELIST" != "$LANGUAGE" ]; then
 	LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:${LANGUAGELIST}
 	# Languagelist setting
 	db_set "$languagecode" "$LANGUAGELIST"

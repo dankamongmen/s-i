@@ -43,8 +43,10 @@ fi
 # TODO cjwatson 2006-02-19: remove any old LANG/LANGUAGE settings
 DESTFILE="/target/etc/environment"
 echo "LANG=\"$LOCALE\"" >> $DESTFILE
-if [ "$LANGLIST" ]; then
-	echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
+# We set LANGUAGE only if the languagelist is a list of
+# languages with alternatives. Otherwise, setting it is useless
+if echo "$LANGLIST" | grep -q ":"; then
+		echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
 fi
 
 # For languages that have no chance to be displayed at the Linux console
