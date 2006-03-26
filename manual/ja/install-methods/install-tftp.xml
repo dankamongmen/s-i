@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31138 -->
+<!-- original version: 35613 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>TFTP ネットブート用ファイルの準備</title>
@@ -233,13 +233,13 @@ TFTP サーバが Linux 2.4 で動作している GNU/Linux の場合は、
 </screen></informalexample>
 
 <!--
-to turn off Path MTU discovery, otherwise the Indy's PROM can't
+to turn off Path MTU discovery, otherwise the SGI's PROM can't
 download the kernel. Furthermore, make sure TFTP packets are sent from
 a source port no greater than 32767, or the download will stall after
 the first packet.  Again, it's Linux 2.4.X tripping this bug in the
 PROM, and you can avoid it by setting
 -->
-これを行わないと、Indy の PROM はカーネルをダウンロードできません。
+これを行わないと、SGI の PROM はカーネルをダウンロードできません。
 さらに、TFTP パケットのソースポートは 32767 以上であってはいけません。
 さもないと最初のパケットを受信しただけでダウンロードが停止します。
 この PROM のバグに引っかかるのも Linux 2.4.X です。
@@ -565,17 +565,20 @@ TFTP サーバから最初にロードするようにしてください。
    </sect3>
 
    <sect3 arch="mips">
-   <title>SGI Indys TFTP ブート</title>
+<!--
+   <title>SGI TFTP Booting</title>
+-->
+   <title>SGI TFTP ブート</title>
 <para>
 
 <!--
-On SGI Indys you can rely on the <command>bootpd</command> to supply
+On SGI machines you can rely on the <command>bootpd</command> to supply
 the name of the TFTP file. It is given either as the
 <userinput>bf=</userinput> in <filename>/etc/bootptab</filename> or as
 the <userinput>filename=</userinput> option in
 <filename>/etc/dhcpd.conf</filename>.
 -->
-SGI Indy では、TFTP ファイルの名前の指定を
+SGI のマシンでは、TFTP ファイルの名前の指定を
 <command>bootpd</command> に行わせることができます。
 これは
 <filename>/etc/bootptab</filename> の <userinput>bf=</userinput> に指定するか、
@@ -586,7 +589,10 @@ SGI Indy では、TFTP ファイルの名前の指定を
    </sect3>
 
    <sect3 arch="mips">
-   <title>Broadcom BCM91250A TFTP ブート</title>
+<!--
+   <title>Broadcom BCM91250A and BCM91480B TFTP Booting</title>
+-->
+   <title>Broadcom BCM91250A, BCM91480B の TFTP ブート</title>
 <para>
 
 <!--

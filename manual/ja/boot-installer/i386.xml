@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31616 -->
+<!-- original version: 33886 -->
 
   <sect2 arch="i386"><title>CD-ROM からの起動</title>
 
@@ -11,7 +11,7 @@
 <!--
 CD #1 of official Debian CD-ROM sets for &arch-title; will present a
 <prompt>boot:</prompt> prompt on most hardware. Press
-<keycap>F3</keycap> to see the list of kernel options available
+<keycap>F4</keycap> to see the list of kernel options available
 from which to boot. Just type your chosen flavor name (idepci,
 vanilla, compact, bf24) at the <prompt>boot:</prompt> prompt
 followed by &enterkey;.
@@ -218,7 +218,7 @@ image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
        root=/dev/ram0
-       append="<phrase condition="sarge">devfs=mount,dall </phrase>ramdisk_size=12000"
+       append="ramdisk_size=12000"
 </screen></informalexample>
 
 <!--
@@ -256,15 +256,9 @@ initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
 <!--
-and reboot. <phrase condition="sarge">If the boot fails, you can try adding
-<userinput>devfs=mount,dall</userinput> to the <quote>kernel</quote> line.
-</phrase>
+and reboot.
 -->
 その後再起動してください。
-<phrase condition="sarge">起動に失敗する場合は、
-<quote>kernel</quote> 行に <userinput>devfs=mount,dall</userinput> 
-を追加してみてください。
-</phrase>
 
 </para><para>
 
@@ -282,7 +276,7 @@ initrd イメージのサイズ用に <userinput>ramdisk_size</userinput> の、
 </para>
   </sect2>
 
-  <sect2 arch="i386" id="usb-boot">
+  <sect2 arch="i386" condition="bootable-usb" id="usb-boot">
   <title>USB メモリスティックからの起動</title>
 <para>
 
@@ -301,7 +295,7 @@ arguments, or just hit &enterkey;.
 システムが起動したら <prompt>boot:</prompt> プロンプトが表示されるはずです。
 ここで、オプションのブート引数を入力するか、ただ &enterkey; を打ちます。
 
-</para><para>
+</para><para condition="supports-floppy-boot">
 
 <!--
 In case your computer doesn't support booting from USB memory devices,
@@ -321,7 +315,7 @@ root フロッピーについて訊かれたら、単に &enterkey; を押してください。
 </para>
   </sect2>
 
-  <sect2 arch="i386" id="floppy-boot">
+  <sect2 arch="i386" condition="supports-floppy-boot" id="floppy-boot">
   <title>フロッピーからの起動</title>
 <para>
 
@@ -533,15 +527,13 @@ parameters.
 <!--
 Information on available boot methods and on boot parameters which might
 be useful can be found by pressing <keycap>F2</keycap> through
-<phrase condition="sarge"><keycap>F7</keycap></phrase><phrase
-condition="etch"><keycap>F8</keycap></phrase>. If you add any parameters to
+<keycap>F8</keycap>. If you add any parameters to
 the boot command line, be sure to type the boot method (the default is
 <userinput>linux</userinput>) and a space before the first parameter (e.g.,
 <userinput>linux debconf/priority=medium</userinput>).
 -->
 有効な起動方法や起動パラメータの有用な情報を、<keycap>F2</keycap> から
-<phrase condition="sarge"><keycap>F7</keycap></phrase><phrase
-condition="etch"><keycap>F8</keycap></phrase> を押すと表示します。
+<keycap>F8</keycap> を押すと表示します。
 パラメータを起動コマンドラインに追加する場合には、
 起動方法 (デフォルトは <userinput>linux</userinput>) をタイプし、
 最初のパラメータの前にスペースを空けてください
