@@ -1,11 +1,10 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31138 -->
+<!-- original version: 35613 -->
 
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <!-- <title>Preparing Files for TFTP Net Booting</title> -->
  <title>Preparare i file per l'avvio TFTP da rete</title>
-
 <para>
 
 <!-- If your machine is connected to a local area network, you may be able
@@ -40,7 +39,7 @@ itself. Another way is to use the BOOTP protocol. </phrase> -->
 Protocol) è un metodo per comunicare ai client quale indirizzo IP usare.
 In alternativa è possibile usare il protocollo BOOTP. </phrase>
 
-<!--<phrase condition="supports-bootp">BOOTP is an IP protocol that
+<!-- <phrase condition="supports-bootp">BOOTP is an IP protocol that
 informs a computer of its IP address and where on the network to obtain
 a boot image. </phrase> -->
 
@@ -48,14 +47,14 @@ a boot image. </phrase> -->
 un computer qual è il proprio indirizzo IP e dove può recuperare dalla rete
 un'immagine per l'avvio. </phrase>
 
-<!--<phrase arch="m68k"> Yet another alternative exists on VMEbus
+<!-- <phrase arch="m68k"> Yet another alternative exists on VMEbus
 systems: the IP address can be manually configured in boot ROM. </phrase> -->
 
 <phrase arch="m68k">Sui sistemi VMEbus esiste un'altra alternativa:
 l'indirizzo IP può essere configurato manualmente nella ROM di avvio.
 </phrase>
 
-<!--<phrase condition="supports-dhcp">The DHCP (Dynamic Host Configuration
+<!-- <phrase condition="supports-dhcp">The DHCP (Dynamic Host Configuration
 Protocol) is a more flexible, backwards-compatible extension of BOOTP.
 Some systems can only be configured via DHCP. </phrase> -->
 
@@ -99,7 +98,7 @@ prestare il proprio aiuto per poter usare MOP per l'avvio di Linux su Alpha.
 
 </para>
 
-<!--</footnote>. You can also enter the IP configuration for network
+<!-- </footnote>. You can also enter the IP configuration for network
 interfaces directly in the SRM console. -->
 
 </footnote>. È anche possibile inserire la configurazione IP per le
@@ -154,7 +153,6 @@ consiglia l'uso di quest'ultimo.
   <sect2 id="tftpd">
   <!-- <title>Enabling the TFTP Server</title> -->
   <title>Attivare il server TFTP</title>
-
 <para>
 
 <!-- To get the TFTP server ready to go, you should first make sure that
@@ -215,13 +213,13 @@ server:
 # echo 1 &gt; /proc/sys/net/ipv4/ip_no_pmtu_disc
 </screen></informalexample>
 
-<!-- to turn off Path MTU discovery, otherwise the Indy's PROM can't
+<!-- to turn off Path MTU discovery, otherwise the SGI's PROM can't
 download the kernel. Furthermore, make sure TFTP packets are sent from
 a source port no greater than 32767, or the download will stall after
 the first packet.  Again, it's Linux 2.4.X tripping this bug in the
 PROM, and you can avoid it by setting -->
 
-per disattivare il Path MTU discovery, in caso contrario la PROM delle Indy
+per disattivare il Path MTU discovery, in caso contrario la PROM delle SGI
 non può scaricare il kernel. Inoltre, assicurarsi che i pacchetti TFTP siano
 inviati da una porta inferiore alla 32767 altrimenti il trasferimento si
 interromperà dopo il primo pacchetto. Anche questo bug della PROM può essere
@@ -241,7 +239,6 @@ per regolare l'intervallo delle porte sorgente usate sul server TFTP Linux.
   <sect2 id="tftp-images">
   <!-- <title>Move TFTP Images Into Place</title> -->
   <title>Posizionamento delle immagini TFTP</title>
-
 <para>
 
 <!-- Next, place the TFTP boot image you need, as found in
@@ -311,7 +308,6 @@ a <command>tftpd</command>.
    <sect3 arch="mipsel">
    <!-- <title>DECstation TFTP Images</title> -->
    <title>Immagini TFTP per DECstation</title>
-
 <para>
 
 <!-- For DECstations, there are tftpimage files for each subarchitecture,
@@ -416,8 +412,7 @@ essere trovata nelle pagine web di NetBSD:
 
    <sect3 arch="alpha">
    <!-- <title>Alpha TFTP Booting</title> -->
-   <title>Avvio TFTP su Alpha</title>
-
+   <title>Avvio TFTP di macchine Alpha</title>
 <para>
 
 <!-- On Alpha, you must specify the filename (as a relative path to the
@@ -446,8 +441,7 @@ appena descritti.
 
    <sect3 arch="sparc">
    <!-- <title>SPARC TFTP Booting</title> -->
-   <title>Avvio TFTP su SPARC</title>
-
+   <title>Avvio TFTP di macchine SPARC</title>
 <para>
 
 <!-- SPARC architectures for instance use the subarchitecture names, such
@@ -498,8 +492,7 @@ nella directory in cui il server TFTP ricerca i file.
 
    <sect3 arch="m68k">
    <!-- <title>BVM/Motorola TFTP Booting</title> -->
-   <title>Avvio TFTP su BVM/Motorola</title>
-
+   <title>Avvio TFTP di macchine BVM/Motorola</title>
 <para>
 
 <!-- For BVM and Motorola VMEbus systems copy the files
@@ -526,18 +519,19 @@ specifica del sistema.
    </sect3>
 
    <sect3 arch="mips">
-   <!-- <title>SGI Indys TFTP Booting</title> -->
-   <title>Avvio TFTP su SGI Indy</title>
-
+   <!-- <title>SGI TFTP Booting</title> -->
+   <title>Avvio TFTP di macchine SGI</title>
 <para>
 
-<!-- On SGI Indys you can rely on the <command>bootpd</command> to supply
+<!--
+On SGI machines you can rely on the <command>bootpd</command> to supply
 the name of the TFTP file. It is given either as the
 <userinput>bf=</userinput> in <filename>/etc/bootptab</filename> or as
 the <userinput>filename=</userinput> option in
-<filename>/etc/dhcpd.conf</filename>. -->
+<filename>/etc/dhcpd.conf</filename>.
+-->
 
-Sulle macchine SGI Indy si può fare affidamento su <command>bootpd</command>
+Sulle macchine SGI si può fare affidamento su <command>bootpd</command>
 per avere il nome del file TFTP; infatti può essere fornito con l'opzione
 <userinput>bf=</userinput> in <filename>/etc/bootptab</filename> oppure
 come l'opzione <userinput>filename=</userinput> in
@@ -547,9 +541,8 @@ come l'opzione <userinput>filename=</userinput> in
    </sect3>
 
    <sect3 arch="mips">
-   <!-- <title>Broadcom BCM91250A TFTP Booting</title> -->
-   <title>Avvio TFTP su Broadcom BCM91250A</title>
-
+   <!-- <title>Broadcom BCM91250A and BCM91480B TFTP Booting</title> -->
+   <title>Avvio TFTP di Broadcom BCM91250A e BCM91480B</title>
 <para>
 
 <!-- You don't have to configure DHCP in a special way because you'll pass
@@ -560,7 +553,6 @@ passare il percorso completo del file da caricare a CFE.
 
 </para>
    </sect3>
-
   </sect2>
 
 <!-- FIXME: commented out since it seems too old to be usable and a current
