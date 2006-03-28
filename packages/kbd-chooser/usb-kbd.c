@@ -58,17 +58,14 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 	 * 2.6 kernels, we can not assume that a AT connector will be detected in at-kbd.c.
 	 *
 	 * UPDATE
-	 * Because of the changes in the input layer, we can now be sure for some
-	 * arches that an AT keyboard layout is needed, even if an USB keyboard is detected,
-	 * so for those arches we force any USB keyboard to AT and no longer include the
-	 * option to select a USB keymap.
+	 * Because of the changes in the input layer, we can now be sure that an
+	 * AT keyboard layout is needed, even if an USB keyboard is detected. So we force
+	 * any USB keyboard to AT and no longer include the option to select a USB keymap.
 	 */
 
-	/* Some architectures always use AT keymaps for USB keyboards;
-	 * if so, force any USB keyboard to AT
-         */
+	// Always use AT keymaps for USB keyboards with 2.6 kernel
 	int skip_26_kernels = 0;
-#if (defined(__i386__) || defined(__amd64__) || defined(__sparc__)) && defined (AT_KBD)
+#if defined (AT_KBD)
 	struct utsname buf;
 	uname(&buf);
 	if (strncmp(buf.release, "2.6", 3) == 0)
