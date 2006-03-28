@@ -713,7 +713,7 @@ d-i time/zone string US/Eastern
 
 Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
 options is fully automated based on your installation method and answers to
-earlier questions. Only the three variables below are relevant for preseeding.
+earlier questions. You can optionally add other (local) repositories.
 
 </para>
 
@@ -723,7 +723,14 @@ earlier questions. Only the three variables below are relevant for preseeding.
 #d-i apt-setup/contrib boolean true
 # Uncomment this to avoid adding security sources, or
 # add a hostname to use a different server than security.debian.org.
-#d-i apt-setup/security_host string 
+#d-i apt-setup/security_host string
+
+# Additional repositories, local[0-9] available
+#d-i apt-setup/local0/comment string local server
+#d-i apt-setup/local0/repository string \
+#       deb http://local.server/debian stable main
+# URL to the public key of the localrepository
+#d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
   </sect2>
