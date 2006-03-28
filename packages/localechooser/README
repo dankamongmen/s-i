@@ -208,11 +208,12 @@ Information passed into other modules
 
    - The country set is used as a default choice
 
-  base-config
+  tzsetup
 
-   - Locale and list of language codes to use when choosing
-     translations.
    - Timezone restricted list of choices based on the selected country
+
+  locales
+   - The selected additionnal locales will be generated on the installed system
 
 Interaction with the lowmem package
 -----------------------------------
@@ -230,11 +231,11 @@ language and country.
 Technical details
 -----------------
 
-Languagechooser
+Language choice
 ---------------
 
 The core of the package are the languagelist/languagelist.l10n files.
-For a language to appear in the languagechooser screen it must have entries in both these files.
+For a language to appear in the language chooser screen it must have entries in both these files.
 
   languagelist
   ------------
@@ -313,13 +314,14 @@ Language;supported_environments;locale;fallbacklocale;langcode;countrycode;langl
                      package
 
    -langlist        =colon-separated list of possible fallback languages
-                     this will be used in the LANGUAGE variable
-                     this DOES NOT be empty
+		     It will usually be empty except for languages
+		     where fallback to something else than English is wished
+		     
+		     Setting this field will enfore setting LANGUAGE in
+		     /etc/environment or /etc/default/locale
 
-                     Please think carefully before adding "close" languages.
-		     Experience has proven that this is not always a good
-                     idea because of hidden political or cultural problems.
-                      
+                     Never add random languages without talking deeply
+		     with the i18n coordinators.
 
    -console-data    =special options for the console-data package
                      (mostly keyboard or temrinal settings)
