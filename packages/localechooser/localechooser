@@ -38,15 +38,21 @@ code2country() {
 	if [ -z "$1" ] ; then
 		echo
 	elif [ -n "$1" ] ; then
-		line=`grep "$1" $ISO3166TAB`
+		# Return a "safe default" in case the iso-3166 file
+		# isn't available
+		if [ -f "$ISO3166TAB" ] ; then
+			line=`grep "$1" "$ISO3166TAB"`
 
-		if [ -n "$line" ]; then
-			# Remember that country names may have
-			# spaces so the code is different than in
-			# country2code.
-			echo $line | cut -b 4-
+			if [ -n "$line" ]; then
+				# Remember that country names may have
+				# spaces so the code is different than in
+				# country2code.
+				echo $line | cut -b 4-
+			else
+				line="US	United States"
+			fi
 		else
-			echo
+			line="US	United States"
 		fi
 	else
 		error "Missing argument"
