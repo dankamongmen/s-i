@@ -241,7 +241,7 @@ For a language to appear in the language chooser screen it must have entries in 
   ------------
 The format if the following:
 
-Language;supported_environments;fallbacklocale;langcode;countrycode;langlist;console-data
+Language;supported_environments;langcode;countrycode;fallbacklocale;langlist;console-data
  where:
 
    -Language        =language name, in English
@@ -255,24 +255,6 @@ Language;supported_environments;fallbacklocale;langcode;countrycode;langlist;con
                      3=OK with the framebuffer console but not
                        possible to display in the regular Linux console
                      4=OK only with the graphical installer
-   -fallbacklocale  =fallback locale (MUST be valid, except for modifier
-                                      see below)
-                     This locale will be used in case the user goes to
-                     the "other" choice in countrychooser and chooses a
-                     country with "unsupported" locale
-
-		     It is recommended to use here the country where
-                     the language is most widely spoken
-
-		     Any modifier (@euro for instance) or charset mentioned
-                     here will be ADDED to the final locale if such combination
-		     is supported. 
-
-                     Example: English uses "en_US@euro". If the user chooses
-                              USA as country, the @euro will be dropped as
-                              these is no en_US@euro locale. However, if
-                              Ireland is chosen, the locale will be en_IE@euro
-
    -langcode        =iso-639 TWO characters language code
                      
                      DO NOT GUESS IT. Please check in the iso-codes
@@ -291,6 +273,25 @@ Language;supported_environments;fallbacklocale;langcode;countrycode;langlist;con
 
                      DO NOT GUESS IT. Please check in the iso-codes
                      package
+
+   -fallbacklocale  =fallback locale (MUST be valid, except for modifier
+                                      see below)
+                     This locale will be used in case the user goes to
+                     the "other" choice in countrychooser and chooses a
+                     country with "unsupported" locale
+
+		     It is recommended to use here the country where
+                     the language is most widely spoken
+
+		     Any modifier (@euro for instance) or charset mentioned
+                     here will be ADDED to the final locale if such combination
+		     is supported. 
+
+                     Example: Assume English uses "en_US@euro". 
+                              If the user chooses
+                              USA as country, the @euro will be dropped as
+                              these is no en_US@euro locale. However, if
+                              Ireland is chosen, the locale will be en_IE@euro
 
    -langlist        =colon-separated list of possible fallback languages
 		     It will usually be empty except for languages
