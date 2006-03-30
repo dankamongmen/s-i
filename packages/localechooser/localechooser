@@ -336,18 +336,27 @@ shortprio=high
 while [ "$STATE" != 0 -a "$STATE" -le "$LASTSTATE" ]; do
 	case "$STATE" in
 	    1)
-		# If the locale includes a country, then
-		# don't display the short list, and only show the
-		# full list at medium priority.
 		askedshort=0
-		if echo $LOCALE | grep "_" >/dev/null 2>&1; then
-			fullprio=medium
-		else
+		# If the fallback locale does not include a 
+		# country code (and thus an underscore character)
+		# we must prompt for a country, thus show the full list only
+		# Use case: Esperanto
+		# The next "if"" test will be false and "askedshort"
+		# remains to 0-->no short country list question
+		# and the long list is shown at high priority
+		# because we need a country
+		if echo $FALLBACKLOCALE | grep "_" >/dev/null 2>&1; then
+			# Otherwise, we prompt with the short list
+			# for languages that are listed in /etc/shortlists
+			# and with the full list for others, but only
+			# at medium priority then
 			if [ "$use_lang" ]; then
 				shortlist_template="$shortlist-$use_lang"
 				db_register $shortlist_template $shortlist
 				db_input $shortprio $shortlist || [ $? -eq 30 ]
 				askedshort=1
+			else
+				fullprio=medium
 			fi
 		fi
 		;;
