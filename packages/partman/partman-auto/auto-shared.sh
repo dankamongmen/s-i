@@ -62,6 +62,7 @@ wipe_disk() {
 		if [ "$fs" = free ]; then
 			free_space=$id
 			free_size=$size
+			free_type=$type
 		fi
 	done
 	close_dialog
