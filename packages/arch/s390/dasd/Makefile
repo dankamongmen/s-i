@@ -7,8 +7,8 @@
 #
 
 CC := gcc
-CFLAGS := -Wall -W -pipe -Os
-LDFLAGS := -ldebconfclient -ldebian-installer
+CFLAGS := -Wall -W -pipe -Os -I/usr/include/sysfs
+LDFLAGS := -ldebconfclient -ldebian-installer -lsysfs
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 CFLAGS += -g

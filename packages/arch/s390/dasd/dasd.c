@@ -12,10 +12,9 @@
 #include <cdebconf/debconfclient.h>
 #include <debian-installer.h>
 
+#include <libsysfs.h>
+
 const char *const file_devices = "/proc/dasd/devices";
-const char *const file_subchannels = "/proc/subchannels";
-//const char *const file_devices = "/dev/null";
-//const char *const file_subchannels = "subchannels";
 
 #define TEMPLATE_PREFIX	"s390-dasd/"
 
@@ -23,8 +22,7 @@ static struct debconfclient *client;
 
 static struct dasd
 {
-	unsigned int device;
-	unsigned int devtype;
+	char device[SYSFS_NAME_LEN];
 	enum { UNKNOWN, NEW, UNFORMATTED, FORMATTED, READY } state;
 }
 *dasds, *dasd_current;
@@ -54,19 +52,17 @@ static bool update_state (void)
 
 	while (fgets (buf, sizeof (buf), f))
 	{
-		unsigned int device;
-		sscanf (buf, "%4x", &device);
 		for (i = 0; i < dasds_items; i++)
-			if (device == dasds[i].device)
+			if (strncmp (buf, dasds[i].device, strlen (dasds[i].device)) == 0)
 			{
-				if (!strncmp (buf + 40, "active", 6))
+				if (!strncmp (buf + 48, "active", 6))
 				{
-					if (!strncmp (buf + 47, "n/f", 3))
+					if (!strncmp (buf + 55, "n/f", 3))
 						dasds[i].state = UNFORMATTED;
 					else
 						dasds[i].state = FORMATTED;
 				}
-				else if (!strncmp (buf + 40, "ready", 5))
+				else if (!strncmp (buf + 48, "ready", 5))
 					dasds[i].state = READY;
 				else
 					dasds[i].state = UNKNOWN;
@@ -79,60 +75,60 @@ static bool update_state (void)
 
 static enum state_wanted get_channel (void)
 {
-	FILE *f;
-	char buf[256], buf1[100], *ptr;
+	char buf[256], *ptr;
 	unsigned int i;
 	int ret;
+	struct dlist *devices;
+	struct sysfs_bus *bus;
+	struct sysfs_device *device;
 
 	dasds = di_new (struct dasd, 5);
 	dasd_current = NULL;
 	dasds_items = 0;
 
-	f = fopen(file_subchannels, "r");
-	
-	if (!f)
+	bus = sysfs_open_bus ("ccw");
+
+	if (!bus)
 		return WANT_ERROR;
 
-	fgets (buf, sizeof (buf), f);
-	fgets (buf, sizeof (buf), f);
+	devices = sysfs_get_bus_devices (bus);
 
-	while (fgets (buf, sizeof (buf), f))
+	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
-		if (sscanf (buf, "%4x %*4x %4x/%*2x %*4x/%*2x %s ",
-					&dasds[dasds_items].device,
-					&dasds[dasds_items].devtype,
-					buf1) == 3)
-			if(dasds[dasds_items].devtype == 0x3390 ||
-			   dasds[dasds_items].devtype == 0x3380 ||
-			   dasds[dasds_items].devtype == 0x9345 ||
-			   dasds[dasds_items].devtype == 0x9336 ||
-			   dasds[dasds_items].devtype == 0x3370)
-			{
-				if (!strncmp(buf1, "yes", 3))
-					dasds[dasds_items].state = UNKNOWN;
-				else
-					dasds[dasds_items].state = NEW;
-				dasds_items++;
-				if ((dasds_items % 5) == 0)
-					dasds = di_renew (struct dasd, dasds, dasds_items + 5);
-			}
+		struct sysfs_attribute *devtype_attr = sysfs_get_device_attr (device, "devtype");
+		unsigned int devtype;
+		if (!devtype_attr)
+			continue;
+		if (sscanf (devtype_attr->value, "%4x/%*2x", &devtype) != 1)
+			continue;
+		if(devtype == 0x3390 ||
+		   devtype == 0x3380 ||
+		   devtype == 0x9345 ||
+		   devtype == 0x9336 ||
+		   devtype == 0x3370)
+		{
+			strcpy (dasds[dasds_items].device, device->bus_id);
+			dasds[dasds_items].state = UNKNOWN;
+			dasds_items++;
+			if ((dasds_items % 5) == 0)
+				dasds = di_renew (struct dasd, dasds, dasds_items + 5);
+		}
 	}
-	fclose (f);
 
 	if (!update_state ())
+	{
+		sysfs_close_bus (bus);
 		return WANT_ERROR;
+	}
 
 	if (dasds_items > 20)
 	{
 		while (1)
 		{
-			unsigned int device;
-
 			ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose", &ptr);
-			sscanf (ptr, "%4x", &device);
 
 			for (i = 0; i < dasds_items; i++)
-				if (device == dasds[i].device)
+				if (strncmp (ptr, dasds[i].device, strlen (dasds[i].device)) == 0)
 				{
 					dasd_current = &dasds[i];
 					break;
@@ -142,7 +138,10 @@ static enum state_wanted get_channel (void)
 			{
 				ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_invalid", &ptr);
 				if (ret == 10)
+				{
+					sysfs_close_bus (bus);
 					return WANT_BACKUP;
+				}
 			}
 			else
 				break;
@@ -150,8 +149,6 @@ static enum state_wanted get_channel (void)
 	}
 	else if (dasds_items > 0)
 	{
-		unsigned int device;
-
 		buf[0] = '\0';
 		for (i = 0; i < dasds_items; i++)
 		{
@@ -172,25 +169,31 @@ static enum state_wanted get_channel (void)
 				default:
 					ptr = "(unknown)";
 			}
-			di_snprintfcat (buf, sizeof (buf), "%04x %s, ", dasds[i].device, ptr);
+			di_snprintfcat (buf, sizeof (buf), "%s %s, ", dasds[i].device, ptr);
 		}
 
 		debconf_subst (client, TEMPLATE_PREFIX "choose_select", "choices", buf);
 		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_select", &ptr);
 
 		if (ret == 10)
+		{
+			sysfs_close_bus (bus);
 			return WANT_BACKUP;
+		}
 		if (!strcmp (ptr, "Quit"))
+		{
+			sysfs_close_bus (bus);
 			return WANT_QUIT;
-		sscanf (ptr, "%4x", &device);
+		}
 
 		for (i = 0; i < dasds_items; i++)
-			if (device == dasds[i].device)
+			if (strncmp (ptr, dasds[i].device, strlen (dasds[i].device)) == 0)
 			{
 				dasd_current = &dasds[i];
 				break;
 			}
 	}
+	sysfs_close_bus (bus);
 	return WANT_NEXT;
 }
 
@@ -216,6 +219,7 @@ static int format_handler (const char *buf, size_t len, void *user_data __attrib
 
 static enum state_wanted confirm (void)
 {
+#if 0
 	char buf[256], *ptr;
 	int ret;
 	bool needs_format = false;
@@ -305,6 +309,7 @@ static enum state_wanted confirm (void)
 		di_snprintfcat (buf, sizeof (buf), " dasd=%04x", dasd_current->device);
 	debconf_set (client, "debian-installer/kernel/commandline", buf);
 
+#endif
 	return WANT_NEXT;
 }
 
