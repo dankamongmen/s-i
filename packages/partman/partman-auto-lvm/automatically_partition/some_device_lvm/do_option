@@ -32,18 +32,19 @@ if PV_list | grep -q "$realdev" ; then
 	bail_out pv_on_device
 fi
 
-# we need to be sure we can perform the selected receipe and be able to add /boot.
-# virtually remove 200Mb from the free space. Perhaps a reiteration over the recipe
-# would be more accurate, but for now this is more than fine.
-free_size=$(expr $free_size - 200)
-
-choose_recipe "$free_size" || exit $?
+choose_recipe "$free_size" lvm || exit $?
 
 wipe_disk || exit $?
 
+# Check if partition is usable; use existing partman-auto template as we depend on it
+if [ "$free_type" = unusable ]; then
+	db_input critical partman-auto/unusable_space || true
+	db_go || true
+	exit 1
+fi
 free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
 
-decode_recipe $recipe
+decode_recipe $recipe lvm
 
 # check if the recipe contains lvmok tags otherwise fail
 if [ -z "$(echo "$scheme" | grep "lvmok")" ]; then
@@ -54,20 +55,23 @@ fi
 ### we have a recipe foo from arch bar. we don't know anything other than what
 ### partitions can go on lvm ($lvmok{ } tag).
 ### as output we need to have 2 recipes:
-### - recipe 1 (normalscheme) that will contain all non-lvm partitions + /boot.
-###            We do assume that special /boot requirements are coded in arch specific recipes.
+### - recipe 1 (normalscheme) that will contain all non-lvm partitions including /boot.
+###            The /boot partition should already be defined in the schema.
 ### - recipe 2 everything that can go on lvm and it's calculated in perform_recipe_by_lvm.
 
 # get the scheme of partitions that must be created outside LVM
 normalscheme=$(echo "$scheme" | grep -v "lvmok")
 
-# if the schema does NOT contain a /boot, create one.
+# check if the scheme contains a boot partition; if not warn the user.
 if ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
-	bootscheme="${NL}128 512 256 ext3 \$primary{ } \$bootable{ } method{ format } format{ } use_filesystem{ } filesystem{ ext3 } mountpoint{ /boot }" 
+	db_input critical partman-auto-lvm/no_boot || true
+	db_go || exit 30
+	db_get partman-auto-lvm/no_boot || true
+	[ "$RET" = true ] || exit 30
 fi
 
 # creating envelope
-scheme="$normalscheme$bootscheme${NL}100 1000 1000000000 ext3 method{ lvm }"
+scheme="$normalscheme${NL}100 1000 1000000000 ext3 method{ lvm }"
 
 expand_scheme
 
