@@ -18,7 +18,7 @@ dev=$1
 free_size=$(cat $dev/size)
 free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
 
-# be sure the modules are loaded
+# Be sure the modules are loaded
 modprobe dm-mod >/dev/null 2>&1 || true
 modprobe lvm-mod >/dev/null 2>&1 || true
 
@@ -26,7 +26,7 @@ if type update-dev >/dev/null 2>&1; then
 	log-output -t update-dev update-dev
 fi
 
-# check if the device already contains any physical volumes
+# Check if the device already contains any physical volumes
 realdev=$(mapdevfs "$(cat $dev/device)")
 if PV_list | grep -q "$realdev" ; then
 	bail_out pv_on_device
@@ -46,23 +46,23 @@ free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabyte
 
 decode_recipe $recipe lvm
 
-# check if the recipe contains lvmok tags otherwise fail
+# Check if the recipe contains lvmok tags otherwise fail
 if [ -z "$(echo "$scheme" | grep "lvmok")" ]; then
 	bail_out unusable_recipe
 fi
 
-### situation:
-### we have a recipe foo from arch bar. we don't know anything other than what
+### Situation
+### We have a recipe foo from arch bar. we don't know anything other than what
 ### partitions can go on lvm ($lvmok{ } tag).
-### as output we need to have 2 recipes:
+### As output we need to have 2 recipes:
 ### - recipe 1 (normalscheme) that will contain all non-lvm partitions including /boot.
 ###            The /boot partition should already be defined in the schema.
 ### - recipe 2 everything that can go on lvm and it's calculated in perform_recipe_by_lvm.
 
-# get the scheme of partitions that must be created outside LVM
+# Get the scheme of partitions that must be created outside LVM
 normalscheme=$(echo "$scheme" | grep -v "lvmok")
 
-# check if the scheme contains a boot partition; if not warn the user.
+# Check if the scheme contains a boot partition; if not warn the user
 if ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
 	db_input critical partman-auto-lvm/no_boot || true
 	db_go || exit 30
@@ -70,7 +70,7 @@ if ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
 	[ "$RET" = true ] || exit 30
 fi
 
-# creating envelope
+# Creating envelope
 scheme="$normalscheme${NL}100 1000 1000000000 ext3 method{ lvm }"
 
 expand_scheme
@@ -79,15 +79,15 @@ clean_method
 
 create_primary_partitions
 
-# this variable will be used to store the partitions that will be LVM
-# by create_partitions. zero it to be sure it's not cluttered.
-# it will be used later to provide real paths to partitions to LVM.
+# This variable will be used to store the partitions that will be LVM
+# by create_partitions; zero it to be sure it's not cluttered.
+# It will be used later to provide real paths to partitions to LVM.
 # (still one atm)
 devfspv_devices=''
 
 create_partitions
 
-# write the partition tables
+# Write the partition tables
 disable_swap
 cd $dev
 open_dialog COMMIT
@@ -95,9 +95,9 @@ close_dialog
 
 update_all
 
-#### now we have the container! yeppa!!! ####
+#### Now we have the container! yeppa!!! ####
 
-# lvm doesn't like devfs paths.
+# lvm doesn't like devfs paths
 for pv in $devfspv_devices; do
 	realpath="$(mapdevfs "$pv")"
 	pv_devices="$pv_devices $realpath"
@@ -111,7 +111,7 @@ while true; do
 	db_get partman-auto-lvm/new_vg_name
 	VG_name="$RET"
 
-	# check if the volume group name is not in use
+	# Check if the volume group name is not in use
 	if [ -z "$(VG_list | grep " $VG_name${TAB}")" ]; then
 		break
 	fi
@@ -125,5 +125,5 @@ else
 	bail_out vg_create_error
 fi
 
-# default to accepting the autopartitioning
+# Default to accepting the autopartitioning
 menudir_default_choice /lib/partman/choose_partition finish finish || true
