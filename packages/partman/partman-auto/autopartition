@@ -13,7 +13,7 @@ if [ -z "$2" ]; then
 	free_size=$(cat $dev/size)
 	free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
 
-	choose_recipe "$free_size" || exit $?
+	choose_recipe "$free_size" default || exit $?
 
 	wipe_disk || exit $?
 else
@@ -27,7 +27,7 @@ else
 
 	free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
 
-	choose_recipe "$free_size" || exit $?
+	choose_recipe "$free_size" default || exit $?
 fi
 
 perform_recipe $dev $free_space $recipe || exit $?
