@@ -43,14 +43,6 @@ struct disk_info_t diskinfo[] = {
     { NULL,       EMPTYGEOMETRY,  MiB_TO_BLOCKS(   0),  MiB_TO_BLOCKS(   0) }
 };
 
-static int
-cmp_spaceinfo_path(const void *ap, const void *bp)
-{
-    const struct disk_info_t *a = (const struct disk_info_t *)ap;
-    const struct disk_info_t *b = (const struct disk_info_t *)bp;
-    return strcmp(a->path, b->path);
-}
-
 int
 main(int argc, char *argv[])
 {
