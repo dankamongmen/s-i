@@ -154,8 +154,8 @@ distribute_partitions(struct disk_info_t diskinfo[],
 		    reqs[j].max_blk = maxmax_blk;
 		span = reqs[j].max_blk - reqs[j].min_blk;
 		total_wanted += span;
-		autopartkit_log(0, "Adding %ld to total_wanted, now %ld\n",
-				(long)span, (long)total_wanted);
+		autopartkit_log(0, "Adding %lld to total_wanted, now %lld\n",
+				(long long)span, (long long)total_wanted);
 	    }
 	}
         if (total_wanted == 0)
