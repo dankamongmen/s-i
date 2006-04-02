@@ -15,7 +15,7 @@
 #include "autopartkit.h"
 
 /* copied from libdebian-installer, there it is named di_mapdevfs() */
-ssize_t
+static ssize_t
 mapdevfs(const char *path, char *buf, size_t n)
 {
   static struct entry
