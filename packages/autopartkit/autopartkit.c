@@ -93,7 +93,7 @@
 
 #define FAT_MINSIZE_FACTOR 1.33
 
-#define MAX_PARTITIONS 10
+#define MAX_PARTITIONS 30
 
 #define PART_SIZE_BYTE(device, part) ((part)->geom.length * (device)->sector_size)
 
@@ -905,7 +905,7 @@ makefs(const char *devpath, const char *fstype)
     else if (0 == strcmp("ext2", fstype))
         mkfs = "/sbin/mkfs.ext2";
     else if (0 == strcmp("ext3", fstype))
-        mkfs = "/sbin/mkfs.ext3";
+        mkfs = "/sbin/mkfs.ext3 -O resize_inode";
     else if (0 == strcmp("jfs", fstype))
         mkfs = "/sbin/mkfs.jfs";
     else if (0 == strcmp("xfs", fstype))
