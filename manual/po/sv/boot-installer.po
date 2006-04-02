@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: installation-guide 20051025 boot-installer\n"
 "POT-Creation-Date: 2006-03-19 13:45+0000\n"
-"PO-Revision-Date: 2006-03-28 11:43+0100\n"
+"PO-Revision-Date: 2006-04-02 17:22+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgstr "Konsollfirmware för Alpha"
 #: boot-installer.xml:21
 #, no-c-format
 msgid "Console firmware is stored in a flash ROM and started when an Alpha system is powered up or reset. There are two different console specifications used on Alpha systems, and hence two classes of console firmware available:"
-msgstr "Konsollfirmware lagras i ett flash-rom och startas när ett Alpha-system slås på eller startas om. Det finns två olika konsollspecifikationer som används på Alpha-system och därför finns två klasser av konsollfirmware tillgängliga:"
+msgstr "Konsollfirmware lagras i ett flash-rom och startas när ett Alpha-system slås på eller startas om. Det finns två olika konsollspecifikationer som används på Alpha-system och därav finns det två klasser av konsollfirmware tillgängliga:"
 
 #. Tag: para
 #: boot-installer.xml:31
@@ -328,13 +328,13 @@ msgstr "Generellt sett kan ingen av dessa konsoller starta upp Linux direkt, så
 #: boot-installer.xml:221
 #, no-c-format
 msgid "<command>MILO</command> is itself a console, which replaces ARC or SRM in memory. <command>MILO</command> can be booted from both ARC and SRM and is the only way to bootstrap Linux from the ARC console. <command>MILO</command> is platform-specific (a different <command>MILO</command> is needed for each system type) and exist only for those systems, for which ARC support is shown in the table above. See also the (unfortunately outdated) <ulink url=\"&url-milo-howto;\">MILO HOWTO</ulink>."
-msgstr ""
+msgstr "<command>MILO</command> är själv en konsoll, som ersätter ARC eller SRM i minnet. <command>MILO</command> kan startas upp från både ARC och SRM och är det enda sättet att bootstrapa Linux från ARC-konsollen. <command>MILO</command> är plattformsspecifik (olika <command>MILO</command> behövs för varje systemtyp) och existerar för de systemen, för vilka ARC-stöd visas i tabellen ovan.. Se även (tyvärr föråldrad) <ulink url=\"&url-milo-howto;\">MILO HOWTO</ulink>."
 
 #. Tag: para
 #: boot-installer.xml:231
 #, no-c-format
 msgid "<command>aboot</command> is a small, platform-independent bootloader, which runs from SRM only. See the (also unfortunately outdated) <ulink url=\"&url-srm-howto;\">SRM HOWTO</ulink> for more information on <command>aboot</command>."
-msgstr ""
+msgstr "<command>aboot</command> är en liten, plattformsoberoende starthanterare, som endast körs från SRM. Se (även den föråldrad) <ulink url=\"&url-srm-howto;\">SRM HOWTO</ulink> för mer information om <command>aboot</command>."
 
 #. Tag: para
 #: boot-installer.xml:238
@@ -346,6 +346,11 @@ msgid ""
 "ARC -&gt; MILO\n"
 "</screen></informalexample> Because <command>MILO</command> is not available for any of the Alpha systems currently in production (as of February 2000), and because it is no longer necessary to buy an OpenVMS or Tru64 Unix license to have SRM firmware on your older Alpha, it is recommended that you use SRM and <command>aboot</command> on new installations of GNU/Linux, unless you wish to dual-boot with Windows NT."
 msgstr ""
+"Därav är tre scenarion generellt sett möjliga, beroende på systemets konsollfirmware och huruvida <command>MILO</command> finns tillgänglig eller inte: <informalexample><screen>\n"
+"SRM -&gt; aboot\n"
+"SRM -&gt; MILO\n"
+"ARC -&gt; MILO\n"
+"</screen></informalexample> Därför att <command>MILO</command> inte finns tillgänglig för någon av de Alpha-system som för närvarande produceras (från och med februari 2000), och på grund av att det inte längre är nödvändigt att köpa en licens för OpenVMS eller Tru64 Unix för att få SRM-firmware på din äldre Alpha, rekommenderas det att du använder SRM och <command>aboot</command> på nyare installationer av GNU/Linux, om inte du önskar att även starta upp med Windows NT."
 
 #. Tag: para
 #: boot-installer.xml:253
@@ -387,6 +392,16 @@ msgid ""
 "&gt;&gt;&gt; set ewa0_mode <replaceable>mode</replaceable>\n"
 "</screen></informalexample> You can get a listing of valid modes with <userinput>&gt;&gt;&gt;set ewa0_mode</userinput>."
 msgstr ""
+"I SRM är Ethernet-gränssnitt namngivna med prefixet <userinput>ewa</userinput>, och kommer att listas i utskriften från kommandot <userinput>show dev</userinput>, som denna (lite redigerat): <informalexample><screen>\n"
+"&gt;&gt;&gt; show dev\n"
+"ewa0.0.0.9.0               EWA0              08-00-2B-86-98-65\n"
+"ewb0.0.0.11.0              EWB0              08-00-2B-86-98-54\n"
+"ewc0.0.0.2002.0            EWC0              00-06-2B-01-32-B0\n"
+"</screen></informalexample> Du behöver först ställa in uppstartsprotokollet: <informalexample><screen>\n"
+"&gt;&gt;&gt; set ewa0_protocol bootp\n"
+"</screen></informalexample> Sedan kontrollera att mediatypen är korrekt: <informalexample><screen>\n"
+"&gt;&gt;&gt; set ewa0_mode <replaceable>läge</replaceable>\n"
+"</screen></informalexample> Du kan få en lista på giltiga lägen med <userinput>&gt;&gt;&gt;set ewa0_mode</userinput>."
 
 #. Tag: para
 #: boot-installer.xml:302
@@ -404,7 +419,7 @@ msgstr ""
 #: boot-installer.xml:311
 #, no-c-format
 msgid "If you wish to use a serial console, you <emphasis>must</emphasis> pass the <userinput>console=</userinput> parameter to the kernel. This can be done using the <userinput>-flags</userinput> argument to the SRM <userinput>boot</userinput> command. The serial ports are named the same as their corresponding files in <userinput>/dev</userinput>. Also, when specifying additional kernel parameters, you must repeat certain default options that are needed by the &d-i; images. For example, to boot from <userinput>ewa0</userinput> and use a console on the first serial port, you would type:"
-msgstr ""
+msgstr "Om du önskar att använda en seriekonsoll, <emphasis>måste</emphasis> du skicka med parametern <userinput>console=</userinput> till kärnan. Det kan göras med argumentet <userinput>-flags</userinput> till SRM-kommandot <userinput>boot</userinput>. Serieportarna har samma namn som sina motsvarande filer i <userinput>/dev</userinput>. När ytterligare kärnparametrar anges, måste du upprepa vissa standardalternativ som behövs av &d-i;-avbilderna. Till exempel, för att starta upp från <userinput>ewa0</userinput> och använda en konsoll på första serieporten, skulle du skriva:"
 
 #. Tag: screen
 #: boot-installer.xml:323
@@ -458,6 +473,11 @@ msgid ""
 "&gt;&gt;&gt; show dev\n"
 "</screen></informalexample> to see the list of devices (e.g., if you want to boot from a CD). Note that if you are booting via MILO, <command>-flags</command> argument is ignored, so you can just type <command>boot dva0</command>. If everything works OK, you will eventually see the Linux kernel boot."
 msgstr ""
+"På SRM-prompten (<prompt>&gt;&gt;&gt;</prompt>), ange följande kommando: <informalexample><screen>\n"
+"&gt;&gt;&gt; boot dva0 -flags 0\n"
+"</screen></informalexample> ersätt möjligen <filename>dva0</filename> med det faktiska enhetsnamnet. Vanligtvis, är <filename>dva0</filename> diskettenheten; skriv <informalexample><screen>\n"
+"&gt;&gt;&gt; show dev\n"
+"</screen></informalexample> för att se listan på enheter (alltså, om du vill starta upp från en cd). Notera att om du startar upp via MILO, ignoreras argumentet <command>-flags</command>, så du kan helt enkelt skriva <command>boot dva0</command>. Om allt fungerar som det ska kommer du till slut se Linux-kärnan starta upp."
 
 #. Tag: para
 #: boot-installer.xml:376
@@ -487,7 +507,7 @@ msgstr "Uppstart från startdisketter med ARC eller AlphaBIOS-konsoll"
 #: boot-installer.xml:400
 #, no-c-format
 msgid "In the OS Selection menu, set <command>linload.exe</command> as the boot loader, and <command>milo</command> as the OS Path. Bootstrap using the newly created entry."
-msgstr ""
+msgstr "I valmenyn för operativsystem, ställ in <command>linload.exe</command> som starthanterare, och <command>milo</command> som \"OS Path\". Kör bootstrap med den nyligen skapade posten."
 
 #. Tag: title
 #: boot-installer.xml:409
@@ -499,7 +519,7 @@ msgstr "Uppstart med MILO"
 #: boot-installer.xml:410
 #, no-c-format
 msgid "MILO contained on the bootstrap media is configured to proceed straight to Linux automatically. Should you wish to intervene, all you need is to press space during MILO countdown."
-msgstr ""
+msgstr "MILO som finns på bootstrap-mediumet är konfigurerad att automatiskt fortsätta direkt till Linux. Om du önskar att avbryta är allt du behöver göra att trycka på blanksteg under MILO-nedräkningen."
 
 #. Tag: para
 #: boot-installer.xml:416
@@ -509,6 +529,9 @@ msgid ""
 "MILO> boot fd0:linux.bin.gz root=/dev/fd0 load_ramdisk=1 <!-- arguments -->\n"
 "</screen></informalexample> If you are booting from something other than a floppy, substitute <filename>fd0</filename> in the above example with the appropriate device name in Linux notation. The <command>help</command> command would give you a brief MILO command reference."
 msgstr ""
+"Om du vill uttryckligen ange alla bitar (till exempel, för att skicka med ytterligare parametrar), kan du använda ett kommando som denna: <informalexample><screen>\n"
+"MILO> boot fd0:linux.bin.gz root=/dev/fd0 load_ramdisk=1 <!-- arguments -->\n"
+"</screen></informalexample> Om du startar upp från något annat än en diskett, ersätt <filename>fd0</filename> i exemplet ovan med lämpligt enhetsnamn i Linux-notation. Kommandot <command>help</command> ger dig en kort referens på MILO-kommandon."
 
 #. Tag: title
 #: boot-installer.xml:435
@@ -559,13 +582,13 @@ msgstr "Starta upp NetWinder via TFTP"
 #: boot-installer.xml:460
 #, no-c-format
 msgid "Netwinders have two network interfaces: A 10Mbps NE2000-compatible card (which is generally referred to as <literal>eth0</literal>) and a 100Mbps Tulip card. There may be problems loading the image via TFTP using the 100Mbps card so it is recommended that you use the 10Mbps interfaced (the one labeled with <literal>10 Base-T</literal>)."
-msgstr ""
+msgstr "Netwinder har två nätverksgränssnitt: Ett 10Mbps NE2000-kompatibelt kort (som generellt sett refereras till som <literal>eth0</literal>) och ett 100Mbps Tulip-kort. Det kan uppstå problem vid inläsning av avbilden via TFTP med 100Mbps-kortet så det rekommenderas att du använder 10Mbps-gränssnittet (det som är märkt som <literal>10 Base-T</literal>)."
 
 #. Tag: para
 #: boot-installer.xml:469
 #, no-c-format
 msgid "You need NeTTrom 2.2.1 or later to boot the installation system, and version 2.3.3 is recommended. Unfortunately, firmware files are currently not available for download because of license issues. If this situation changes, you may find new images at <ulink url=\"http//www.netwinder.org/\"></ulink>."
-msgstr ""
+msgstr "Du behöver NeTTrom 2.2.1 eller senare för att starta upp installationssystemet, och version 2.3.3 rekommenderas. Tyvärr finns inte firmwarefilerna tillgängliga för hämtning för tillfället på grund av licensproblem. Om denna situation ändras, kan du hitta nya avbilder på <ulink url=\"http//www.netwinder.org/\"></ulink>."
 
 #. Tag: para
 #: boot-installer.xml:477
@@ -593,6 +616,27 @@ msgid ""
 "    NeTTrom command-&gt; boot\n"
 "</screen></informalexample> In case you run into any problems, a <ulink url=\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">detailed HOWTO</ulink> is available."
 msgstr ""
+"När du startar upp din Netwinder måste du avbryta uppstartsprocessen under nedräkningen. Det här låter dig ställa in ett antal firmwareinställningar som behövs för att kunna starta upp installeraren. Börja först med att läsa in standardinställningarna: <informalexample><screen>\n"
+"    NeTTrom command-&gt; load-defaults\n"
+"</screen></informalexample> Sedan måste du konfigurera nätverket, antingen med en statisk adress: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 flash\n"
+"    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24\n"
+"</screen></informalexample> där 24 är antalet bitar i nätmasken, eller en dynamisk adress: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 dhcp\n"
+"</screen></informalexample> Du kanske även behöver konfigurera inställningen <userinput>route1</userinput> om TFTP-servern inte finns på det lokala undernätet. Om du följer dessa inställningar, måste du ange TFTP-servern och avbildens plats. Du kan sedan lagra dina inställningar till flashminnet. <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1\n"
+"    NeTTrom command-&gt; setenv kerntftpfile boot.img\n"
+"    NeTTrom command-&gt; save-all\n"
+"</screen></informalexample> Nu måste du berätta för firmware att TFTP-avbilden ska användas för att starta upp: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kernconfig tftp\n"
+"    NeTTrom command-&gt; setenv rootdev /dev/ram\n"
+"</screen></informalexample> Om du använder en seriekonsoll för att installera din Netwinder, behöver du lägga till följande inställning: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200\n"
+"</screen></informalexample> Alternativt, för installationer med ett tangentbord och skärm måste du ställa in: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram\n"
+"</screen></informalexample> Du kan använda kommandot <command>printenv</command> för att granska dina miljöinställningar. Efter att du har validerat att inställningarna är korrekta kan du läsa in avbilden: <informalexample><screen>\n"
+"    NeTTrom command-&gt; boot\n"
+"</screen></informalexample> Om du springer på några problem, finns en <ulink url=\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">detaljerad HOWTO</ulink> tillgänglig."
 
 #. Tag: title
 #: boot-installer.xml:529
@@ -632,7 +676,7 @@ msgstr "Den enklaste vägen för de flesta personer är att använda en uppsätt
 #: boot-installer.xml:2661
 #, no-c-format
 msgid "Note that certain CD drives may require special drivers, and thus be inaccessible in the early installation stages. If it turns out the standard way of booting off a CD doesn't work for your hardware, revisit this chapter and read about alternate kernels and installation methods which may work for you."
-msgstr "Notera att vissa cd-enheter kan kräver speciella drivrutiner och kan därför vara otillgängliga i de tidiga stegen av installationen. Om det visar sig att det vanliga sättet att starta upp från en cd inte fungerar på din hårdvara, besök det här kapitlet igen och läs om alternativa kärnor och installationsmetoder som kan fungera för dig."
+msgstr "Notera att vissa cd-enheter kan kräver speciella drivrutiner och kan därför vara otillgängliga i de tidiga stegen av installationen. Om det visar sig att det vanliga sättet att starta upp från en cd inte fungerar på din maskinvara, besök det här kapitlet igen och läs om alternativa kärnor och installationsmetoder som kan fungera för dig."
 
 #. Tag: para
 #: boot-installer.xml:565
@@ -880,7 +924,7 @@ msgstr "Disketten kommer att läsas från och du bör sedan se en skärm som int
 #: boot-installer.xml:988
 #, no-c-format
 msgid "Once you press &enterkey;, you should see the message <computeroutput>Loading...</computeroutput>, followed by <computeroutput>Uncompressing Linux...</computeroutput>, and then a screenfull or so of information about the hardware in your system. More information on this phase of the boot process can be found below in <xref linkend=\"kernel-msgs\"/>."
-msgstr "När du trycker &enterkey;, bör du se meddelandet <computeroutput>Loading...</computeroutput>, följt av <computeroutput>Uncompressing Linux...</computeroutput>, och sedan en skärm full av information om hårdvaran i ditt system. Mer information angående den här fasen i uppstartsprocessen kan hittas under i <xref linkend=\"kernel-msgs\"/>."
+msgstr "När du trycker &enterkey;, bör du se meddelandet <computeroutput>Loading...</computeroutput>, följt av <computeroutput>Uncompressing Linux...</computeroutput>, och sedan en skärm full av information om maskinvaran i ditt system. Mer information angående den här fasen i uppstartsprocessen kan hittas under i <xref linkend=\"kernel-msgs\"/>."
 
 #. Tag: para
 #: boot-installer.xml:997
@@ -982,25 +1026,25 @@ msgstr "Det finns tre enkla variationer av Debians installationsskivor. Cd-skiva
 #: boot-installer.xml:1188
 #, no-c-format
 msgid "The IA-64 architecture uses the next generation Extensible Firmware Interface (EFI) from Intel. Unlike the traditional x86 BIOS which knows little about the boot device other than the partition table and Master Boot Record (MBR), EFI can read and write files from FAT16 or FAT32 formatted disk partitions. This simplifies the often arcane process of starting a system. The system boot loader and the EFI firmware that supports it have a full filesystem to store the files necessary for booting the machine. This means that the system disk on an IA-64 system has an additional disk partition dedicated to EFI instead of the simple MBR or boot block on more conventional systems."
-msgstr ""
+msgstr "Arkitekturen IA-64 använder nästa generations Extensible Firmware Interface (EFI) från Intel. Olik det traditionella x86 BIOS som inte känner till mer om uppstartsenheten annat än partitionstabellen och huvudstartsektorn (MBR), EFI kan läsa och skriva filer från FAT16- eller FAT32-formaterade diskpartitioner. Det här förenklar den ofta mystiska processen hur ett system startas upp. Starthanteraren och EFI-firmware som har stöd för det har ett helt filsystem att lagra nödvändiga filer för att starta upp maskinen. Det betyder att systemdisken på ett IA-64-system har ytterligare en diskpartition som är dedicerad till EFI istället för den enkla MBR eller uppstartsblock på mer konventionella system."
 
 #. Tag: para
 #: boot-installer.xml:1204
 #, no-c-format
 msgid "The Debian Installer CD contains a small EFI partition where the <command>ELILO</command> bootloader, its configuration file, the installer's kernel, and initial filesystem (initrd) are located. The running system also contains an EFI partition where the necessary files for booting the system reside. These files are readable from the EFI Shell as described below."
-msgstr ""
+msgstr "Debian Installer-cd-skivan innehåller en liten EFI-partition där starthanteraren <command>ELILO</command>, dess konfigurationsfil, installerarens kärna, och initiala filsystem (initrd) finns. Det körande systemet innehåller även en EFI-partition där de nödvändiga filerna för uppstart av systemet finns. De här filerna är läsbara från EFI-skalet som beskrivs nedan."
 
 #. Tag: para
 #: boot-installer.xml:1213
 #, no-c-format
 msgid "Most of the details of how <command>ELILO</command> actually loads and starts a system are transparent to the system installer. However, the installer must set up an EFI partition prior to installing the base system. Otherwise, the installation of <command>ELILO</command> will fail, rendering the system un-bootable. The EFI partition is allocated and formatted in the partitioning step of the installation prior to loading any packages on the system disk. The partitioning task also verifies that a suitable EFI partition is present before allowing the installation to proceed."
-msgstr ""
+msgstr "De flesta detaljer för hur <command>ELILO</command> faktiskt läser in och startar ett system är inte synliga för systeminstalleraren. Dock, installeraren måste ställa in en EFI-partition före installation av grundsystemet. Annars kommer installationen av <command>ELILO</command> att misslyckas som resulterar i att systemet inte kan startas upp. EFI-partitionen allokeras och formateras i partitioneringssteget av installationen före inläsningen av paketen på systemdisken. Partitioneringsuppgiften verifierar även att en lämplig EFI-partition finns före den tillåter installationen att fortsätta."
 
 #. Tag: para
 #: boot-installer.xml:1225
 #, no-c-format
 msgid "The EFI Boot Manager is presented as the last step of the firmware initialization. It displays a menu list from which the user can select an option. Depending on the model of system and what other software has been loaded on the system, this menu may be different from one system to another. There should be at least two menu items displayed, <command>Boot Option Maintenance Menu</command> and <command>EFI Shell (Built-in)</command>. Using the first option is preferred, however, if that option is not available or the CD for some reason does not boot with it, use the second option."
-msgstr ""
+msgstr "EFI Boot Manager visas som sista steget för initiering av firmware. Den visar en menylista från vilken användaren kan välja ett alternativ. Beroende på systemmodellen och vilken annan programvara som har lästs in på systemet kan den här menyn skilja sig från system till system. Det bör finnas åtminstone två menyposter, <command>Boot Option Maintenance Menu</command> och <command>EFI Shell (Built-in)</command>. Första alternativet föredras, dock, om det alternativet inte finns tillgängligt eller att cd-skivan av någon anledning inte startar upp med den, använd det andra alternativet."
 
 #. Tag: title
 #: boot-installer.xml:1244
@@ -1012,7 +1056,7 @@ msgstr "VIKTIGT"
 #: boot-installer.xml:1245
 #, no-c-format
 msgid "The EFI Boot Manager will select a default boot action, typically the first menu choice, within a pre-set number of seconds. This is indicated by a countdown at the bottom of the screen. Once the timer expires and the systems starts the default action, you may have to reboot the machine in order to continue the installation. If the default action is the EFI Shell, you can return to the Boot Manager by running <command>exit</command> at the shell prompt."
-msgstr ""
+msgstr "EFI Boot Manager kommer att välja en standardåtgärd för uppstart, vanligtvis det första menyvalet, inom ett förinställt antal sekunder. Det här indikeras av en nedräkning i nedre delen av skärmen. När räknaren har räknat ned och systemet startar standardåtgärden, kanske du måste starta om maskinen för att fortsätta installationen. Om standardåtgärden är EFI-skalet kan du återvända till Boot Manager genom att köra <command>exit</command> vid skalprompten."
 
 #. Tag: title
 #: boot-installer.xml:1257
@@ -1036,19 +1080,19 @@ msgstr "Välj <command>Boot Maintenance Menu</command> från menyn med piltangen
 #: boot-installer.xml:1276
 #, no-c-format
 msgid "Select <command>Boot From a File</command> from the menu with the arrow keys and press <command>ENTER</command>. This will display a list of devices probed by the firmware. You should see two menu lines containing either the label <command>Debian Inst [Acpi ...</command> or <command>Removable Media Boot</command>. If you examine the rest of the menu line, you will notice that the device and controller information should be the same."
-msgstr ""
+msgstr "Välj <command>Boot From a File</command> från menyn med piltangenterna och tryck <command>ENTER</command>. Det här kommer att visa en lista på enheter som firmware har sökt efter. Du bör se två menyrader som innehåller antingen etiketten <command>Debian Inst [Acpi ...</command> eller <command>Removable Media Boot</command>. Om du undersöker resten av menyraden kommer du att se att informationen för enheten och kontrollern är samma."
 
 #. Tag: para
 #: boot-installer.xml:1287
 #, no-c-format
 msgid "You can choose either of the entries that refer to the CD/DVD drive. Select your choice with the arrow keys and press <command>ENTER</command>. If you choose <command>Removable Media Boot</command> the machine will immediately start the boot load sequence. If you choose <command>Debian Inst [Acpi ...</command> instead, it will display a directory listing of the bootable portion of the CD, requiring you to proceed to the next (additional) step."
-msgstr ""
+msgstr "Du kan välja någon av posterna som refererar till cd/dvd-enheten. Välj med piltangenterna och tryck sedan <command>ENTER</command>. Om du väljer <command>Removable Media Boot</command> kommer maskinen att omedelbart påbörja uppstartssekvensen. Om du istället väljer <command>Debian Inst [Acpi ...</command>, kommer den att visa en kataloglistning på den startbara delen av cd-skivan, som kräver att du fortsätter till nästa (ytterligare) steg."
 
 #. Tag: para
 #: boot-installer.xml:1298
 #, no-c-format
 msgid "You will only need this step if you chose <command>Debian Inst [Acpi ...</command>. The directory listing will also show <command>[Treat like Removable Media Boot]</command> on the next to the last line. Select this line with the arrow keys and press <command>ENTER</command>. This will start the boot load sequence."
-msgstr ""
+msgstr "Du behöver endast det här steget om du valde <command>Debian Inst [Acpi ...</command>. Kataloglistningen kommer även att visa <command>[Treat like Removable Media Boot]</command> på den näst sista raden. Välj den raden med piltangenterna och tryck <command>ENTER</command>. Det här kommer att starta inläsningssekvensen för uppstarten."
 
 #. Tag: para
 #: boot-installer.xml:1310
@@ -1078,7 +1122,7 @@ msgstr "Mata in cd-skivan i dvd/cd-enheten och starta om maskinen. Firmware komm
 #: boot-installer.xml:1338
 #, no-c-format
 msgid "Select <command>EFI Shell</command> from the menu with the arrow keys and press <command>ENTER</command>. The EFI Shell will scan all of the bootable devices and display them to the console before displaying its command prompt. The recognized bootable partitions on devices will show a device name of <filename>fs<replaceable>n</replaceable>:</filename>. All other recognized partitions will be named <filename>blk<replaceable>n</replaceable>:</filename>. If you inserted the CD just before entering the shell, this may take a few extra seconds as it initializes the CD drive."
-msgstr ""
+msgstr "Välj <command>EFI Shell</command> från menyn med piltangenterna och tryck <command>ENTER</command>. EFI-skalet kommer att söka av alla startbara enheter och visa dem i konsollen före den visar sin kommandoprompt. De kända partitioner som är startbara på enheterna kommer att visa enhetsnamnet <filename>fs<replaceable>n</replaceable>:</filename>. Alla andra kända partitioner kommer att namnges som <filename>blk<replaceable>n</replaceable>:</filename>. Om du matade in cd-skivan precis innan du gick in i skalet kommer det ta några extra sekunder när den initierar cd-enheten."
 
 #. Tag: para
 #: boot-installer.xml:1352
@@ -1102,7 +1146,7 @@ msgstr "Ange <command>elilo</command> och tryck på <command>ENTER</command>. De
 #: boot-installer.xml:1373
 #, no-c-format
 msgid "As with option 1, these steps start the Debian boot loader which will display a menu page for you to select a boot kernel and options. You can also enter the shorter <command>fs<replaceable>n</replaceable>:elilo</command> command at the shell prompt. Proceed to selecting the boot kernel and options."
-msgstr ""
+msgstr "Som med alternativ 1, de här stegen startar Debians starthanterare som kommer att visa en menysida för dig där du kan välja en uppstartskärna och alternativ. Du kan även ange det kortare kommandot <command>fs<replaceable>n</replaceable>:elilo</command> vid skalprompten. Fortsätt till att välja uppstartskärna och alternativ."
 
 #. Tag: title
 #: boot-installer.xml:1387
@@ -1114,7 +1158,7 @@ msgstr "Installation med en seriellkonsoll"
 #: boot-installer.xml:1389
 #, no-c-format
 msgid "You may choose to perform an install using a monitor and keyboard or using a serial connection. To use a monitor/keyboard setup, select an option containing the string [VGA console]. To install over a serial connection, choose an option containing the string [<replaceable>BAUD</replaceable> baud serial console], where <replaceable>BAUD</replaceable> is the speed of your serial console. Menu items for the most typical baud rate settings on the ttyS0 device are preconfigured."
-msgstr ""
+msgstr "Du kan välja att genomföra en installation med en skärm och tangentbord eller genom att använda en serieanslutning. För att använda skärm/tangentbord, välj ett alternativ som innehåller strängen [VGA console]. För att installera över en serieanslutning, välj ett alternativ som innehåller strängen [<replaceable>BAUD</replaceable> baud serial console], där <replaceable>BAUD</replaceable> är hastigheten för din seriekonsoll. Menyposter för de mest vanliga hastigheterna för ttyS0-enheten är förkonfigurerade."
 
 #. Tag: para
 #: boot-installer.xml:1400
@@ -1126,13 +1170,13 @@ msgstr "I de flesta fall kommer att du vilja att installeraren använder samma b
 #: boot-installer.xml:1407
 #, no-c-format
 msgid "If there is not an option available that is configured for the serial device or baud rate you would like to use, you may override the console setting for one of the existing menu options. For example, to use a 57600 baud console over the ttyS1 device, enter <command>console=ttyS1,57600n8</command> into the <classname>Boot:</classname> text window."
-msgstr ""
+msgstr "Om det inte finns ett alternativ tillgängligt som är konfigurerad för serieenheten eller den hastighet du vill använda kan du åsidosätta inställningarna för konsollen för en av de existerande menyalternativen. Till exempel för att använda en konsoll på 57600 baud över enheten ttyS1, ange <command>console=ttyS1,57600n8</command> i textfönstret<classname>Boot:</classname>."
 
 #. Tag: para
 #: boot-installer.xml:1418
 #, no-c-format
 msgid "Most IA-64 boxes ship with a default console setting of 9600 baud. This setting is rather slow, and the normal installation process will take a significant time to draw each screen. You should consider either increasing the baud rate used for performing the installation, or performing a Text Mode installation. See the <classname>Params</classname> help menu for instructions on starting the installer in Text Mode."
-msgstr ""
+msgstr "De flesta IA-64-maskiner skeppas med en standardinställning för konsollen på 9600 baud. Den här inställningen är ganska långsam, och den normala installationsprocessen kommer att ta mycket längre tid att rita upp varje skärm. Du bör tänka på att antingen öka hastigheten som används för att genomföra installationen, eller genomföra en installation i textläget. Se hjälpmenyn <classname>Params</classname> för instruktioner för hur man startar installeraren i textläge."
 
 #. Tag: para
 #: boot-installer.xml:1427
@@ -1150,13 +1194,13 @@ msgstr "Välj uppstartskärna och inställningar"
 #: boot-installer.xml:1438
 #, no-c-format
 msgid "The boot loader will display a form with a menu list and a text window with a <classname>Boot:</classname> prompt. The arrow keys select an item from the menu and any text typed at the keyboard will appear in the text window. There are also help screens which can be displayed by pressing the appropriate function key. The <classname>General</classname> help screen explains the menu choices and the <classname>Params</classname> screen explains the common command line options."
-msgstr ""
+msgstr "Starthanteraren kommer att visa ett formulär med en menylista och ett textfönster med en <classname>Boot:</classname>-prompt. Piltangenterna väljer en post från menyn och all text som skrivs på tangentbordet visas i textfönstret. Det finns även hjälpskärmar som kan visas genom att tryck på lämplig funktionstangent. Hjälpskärmen <classname>General</classname> förklarar menyvalet och skärmen <classname>Params</classname> förklarar de vanliga kommandoradsflaggorna."
 
 #. Tag: para
 #: boot-installer.xml:1450
 #, no-c-format
 msgid "Consult the <classname>General</classname> help screen for the description of the kernels and install modes most appropriate for your installation. You should also consult <xref linkend=\"boot-parms\"/> below for any additional parameters that you may want to set in the <classname>Boot:</classname> text window. The kernel version you choose selects the kernel version that will be used for both the installation process and the installed system. If you encounter kernel problems with the installation, you may also have those same problems with the system you install. The following two steps will select and start the install:"
-msgstr ""
+msgstr "Konsultera hjälpskärmen <classname>General</classname> för beskrivningen av vilka kärnor och installationslägen som är mest lämpliga för din installation. Du bör även konsultera <xref linkend=\"boot-parms\"/> nedan för ytterligare parametrar som du kanske vill ställa in i textfönstret <classname>Boot:</classname>. Kärnversionen du väljer kommer att välja den kärnversion som kommer att användas för både installationsprocessen och det installerade systemet. Om du påträffar problem med kärnan under installationen, kommer du även att få de samma problem med systemet du installerar. De följande två stegen kommer att välja och påbörja installationen:"
 
 #. Tag: para
 #: boot-installer.xml:1468
@@ -1186,13 +1230,13 @@ msgstr "Fortsätt till nästa kapitel för att fortsätta installationen där du
 #: boot-installer.xml:1500
 #, no-c-format
 msgid "Booting an IA64 system from the network is similar to a CD boot. The only difference is how the installation kernel is loaded. The EFI Boot Manager can load and start programs from a server on the network. Once the installation kernel is loaded and starts, the system install will proceed thru the same steps as the CD install with the exception that the packages of the base install will be loaded from the network rather than the CD drive."
-msgstr ""
+msgstr "Starta upp ett IA64-system från nätverket är likt en uppstart från cd. Den enda skillnaden är hur installationskärnan läses in. EFI Boot Manager kan läsas in och starta program från en server på nätverket. När installationskärnan är inläst och startar kommer systeminstallationen att fortsätta genom samma steg som för cd-installationen med undantaget av att paketen för grundinstallationen kommer att läsas från nätverket istället för cd-enheten."
 
 #. Tag: para
 #: boot-installer.xml:1534
 #, no-c-format
 msgid "Network booting an ia64 system requires two architecture-specific actions. On the boot server, DHCP and TFTP must be configured to deliver <command>elilo</command>. On the client a new boot option must be defined in the EFI boot manager to enable loading over a network."
-msgstr ""
+msgstr "Nätverksuppstart för ia64-system kräver två arkitekturspecifika åtgärder. På uppstartsservern måste DHCP och TFTP konfigureras för att leverera <command>elilo</command>. På klienten måste ett nytt uppstartsalternativ definieras i EFI-uppstartshanteraren för att aktivera inläsning över ett nätverk."
 
 #. Tag: title
 #: boot-installer.xml:1545
@@ -1248,7 +1292,7 @@ msgstr ""
 #: boot-installer.xml:1566
 #, no-c-format
 msgid "The <filename>netboot.tar.gz</filename> contains an <filename>elilo.conf</filename> file that should work for most configurations. However, should you need to make changes to this file, you can find it in the <filename>debian-installer/ia64/</filename> directory. It is possible to have different config files for different clients by naming them using the client's IP address in hex with the suffix <filename>.conf</filename> instead of <filename>elilo.conf</filename>. See documentation provided in the <classname>elilo</classname> package for details."
-msgstr ""
+msgstr "Filen <filename>netboot.tar.gz</filename> innehåller en fil kallad <filename>elilo.conf</filename> som bör fungera för de flesta konfigurationer. Dock, om du behöver göra ändringar i denna fil kan du hitta den i katalogen <filename>debian-installer/ia64/</filename>. Det är möjligt att ha olika konfigurationsfiler för olika klienter genom att namnge dem med klientens IP-adress hexadecimalt och ändelsen <filename>.conf</filename> istället för <filename>elilo.conf</filename>. Se dokumentationen som tillhandahålls av paketet <classname>elilo</classname> för detaljer."
 
 #. Tag: title
 #: boot-installer.xml:1583
@@ -1260,13 +1304,13 @@ msgstr "Konfiguration av klienten"
 #: boot-installer.xml:1584
 #, no-c-format
 msgid "To configure the client to support TFTP booting, start by booting to EFI and entering the <guimenu>Boot Option Maintenance Menu</guimenu>. <itemizedlist> <listitem><para> Add a boot option. </para></listitem> <listitem><para> You should see one or more lines with the text <guimenuitem>Load File [Acpi()/.../Mac()]</guimenuitem>. If more than one of these entries exist, choose the one containing the MAC address of the interface from which you'll be booting. Use the arrow keys to highlight your choice, then press enter. </para></listitem> <listitem><para> Name the entry <userinput>Netboot</userinput> or something similar, save, and exit back to the boot options menu. </para></listitem> </itemizedlist> You should see the new boot option you just created, and selecting it should initiate a DHCP query, leading to a TFTP load of <filename>elilo.efi</filename> from the server."
-msgstr ""
+msgstr "För att konfigurera stöd för klienten att starta upp via TFTP, börja genom att starta upp till EFI och gå in i <guimenu>Boot Option Maintenance Menu</guimenu>. <itemizedlist> <listitem><para> Lägg till ett uppstartsalternativ. </para></listitem> <listitem><para> Du bör se en eller flera rader med texten <guimenuitem>Load File [Acpi()/.../Mac()]</guimenuitem>. Om fler än en av de här raderna finns, välj den som innehåller MAC-adressen för gränssnittet från vilket du kommer att starta upp. Använd piltangenterna för att markera ditt val, tryck sedan Enter. </para></listitem> <listitem><para> Namnge posten <userinput>Netboot</userinput> eller något liknande, spara, och gå tillbaka till menyn med uppstartsalternativ. </para></listitem> </itemizedlist> Du bör se det nya uppstartsalternativet som du nyss skapade, och att välja det för initiera en DHCP-fråga som leder till en inläsning av <filename>elilo.efi</filename> från TFTP-servern."
 
 #. Tag: para
 #: boot-installer.xml:1616
 #, no-c-format
 msgid "The boot loader will display its prompt after it has downloaded and processed its configuration file. At this point, the installation proceeds with the same steps as a CD install. Select a boot option as in above and when the kernel has completed installing itself from the network, it will start the Debian Installer."
-msgstr ""
+msgstr "Starthanteraren kommer att visa sin prompt efter den har hämtat och bearbetat sin konfigurationsfil. Vid denna punkt, fortsätter installationen med samma steg som en cd-installation. Välj ett uppstartsalternativ som ovan och när kärnan har installerat sig själv från nätverket, kommer den att starta Debian Installer."
 
 #. Tag: para
 #: boot-installer.xml:1625
@@ -1284,7 +1328,7 @@ msgstr "Välja en installationsmetod"
 #: boot-installer.xml:1640
 #, no-c-format
 msgid "Some &arch-title; subarchs have the option of booting using either a 2.4.x or 2.2.x linux kernel. When such a choice exists, try the 2.4.x linux kernel. The installer should also require less memory when using a 2.4.x linux kernel as 2.2.x support requires a fixed-sized ramdisk and 2.4.x uses tmpfs."
-msgstr ""
+msgstr "Vissa underarkitekturer av &arch-title; har alternativet att starta upp med antingen en Linuxkärna av version 2.4.x eller 2.2.x. När en sådan valmöjlighet finns, prova 2.4.x-kärnan. Installeraren bör även kräva mindre minne när 2.4.x-kärnan används eftersom 2.2.x kräver en fast storlek på ramdisken och 2.4.x använder tmpfs."
 
 #. Tag: para
 #: boot-installer.xml:1648
@@ -1368,7 +1412,7 @@ msgstr "Den enda installationsmetoden som är tillgänglig för mac är från h�
 #: boot-installer.xml:1727
 #, no-c-format
 msgid "If your hardware uses a 53c9x-based scsi bus, then you may need to include the kernel parameter <userinput>mac53c9x=1,0</userinput>. Hardware with two such scsi buses, such as the Quadra 950, will need <userinput>mac53c9x=2,0</userinput> instead. Alternatively, the parameter can be specified as <userinput>mac53c9x=-1,0</userinput> which will leave autodetection on, but which will disable SCSI disconnects. Note that specifying this parameter is only necessary if you have more than one hard disk; otherwise, the system will run faster if you do not specify it."
-msgstr ""
+msgstr "Om din maskinvara använder en 53c9x-baserad scsi-buss, behöver du kanske inkludera kärnparametern <userinput>mac53c9x=1,0</userinput>. Maskinvara med två sådana scsi-bussar, såsom Quadra 950, behöver istället <userinput>mac53c9x=2,0</userinput>. Alternativt, parametern kan anges som <userinput>mac53c9x=-1,0</userinput> som lämnar automatisk identifiering påslagen, men som inaktiverar SCSI-nedkopplingar. Notera att den här parametern endast behöver anges om du har fler än en hårddisk; i annat fall kommer systemet att köra snabbare än om du inte angav det."
 
 #. Tag: title
 #: boot-installer.xml:1742
@@ -1424,7 +1468,7 @@ msgstr "Åtminstone sex olika ramdiskar kan användas för att starta upp från 
 #: boot-installer.xml:1794
 #, no-c-format
 msgid "The three different types of ramdisks are <filename>cdrom</filename>, <filename>hd-media</filename>, and <filename>nativehd</filename>. These ramdisks differ only in their source for installation packages. The <filename>cdrom</filename> ramdisk uses a cdrom to get debian-installer packages. The <filename>hd-media</filename> ramdisk uses an iso image file of a cdrom currently residing on a hard disk. Finally, the <filename>nativehd</filename> ramdisk uses the net to install packages."
-msgstr ""
+msgstr "De tre olika typer av ramdiskar är <filename>cdrom</filename>, <filename>hd-media</filename> och <filename>nativehd</filename>. De här ramdiskarna skiljer sig endast i sin källkod för installationspaketen. Ramdisken <filename>cdrom</filename> använder en cd-rom för att hämta paket för debian-installer. Ramdisken <filename>hd-media</filename> använder en iso-avbild av en cd-rom som för närvarande ligger på en hårddisk. Till slut, ramdisken <filename>nativehd</filename> använder nätet för att installera paket."
 
 #. Tag: title
 #: boot-installer.xml:1815
@@ -1442,7 +1486,7 @@ msgstr "I <command>Workbench</command>, start Linux-installationsprocessen genom
 #: boot-installer.xml:1822
 #, no-c-format
 msgid "You may have to press the &enterkey; key twice after the Amiga installer program has output some debugging information into a window. After this, the screen will go grey, there will be a few seconds' delay. Next, a black screen with white text should come up, displaying all kinds of kernel debugging information. These messages may scroll by too fast for you to read, but that's OK. After a couple of seconds, the installation program should start automatically, so you can continue down at <xref linkend=\"d-i-intro\"/>."
-msgstr ""
+msgstr "Du kanske måste trycka på &enterkey;-tangenten två gånger efter att Amiga-installationsprogrammet har skrivit ut viss felsökningsinformation i ett fönster. Efter det här kommer skärmen att bli grå, sedan ett par sekunders fördröjning. Härnäst kommer en svart skärm med vit text att visas, som visar alla sorters felsökningsinformation för kärnan. De här meddelanden kan rulla förbi för snabbt för dig att läsa, men det är OK. Efter ett par sekunder ska installationsprogrammet startas automatiskt, så att du kan fortsätta på <xref linkend=\"d-i-intro\"/>."
 
 #. Tag: title
 #: boot-installer.xml:1837
@@ -1460,7 +1504,7 @@ msgstr "I skrivbordsmiljön GEM, starta Linux-installationsprocessen genom att d
 #: boot-installer.xml:1845
 #, no-c-format
 msgid "You may have to press the &enterkey; key after the Atari bootstrap program has output some debugging information into a window. After this, the screen will go grey, there will be a few seconds' delay. Next, a black screen with white text should come up, displaying all kinds of kernel debugging information. These messages may scroll by too fast for you to read, but that's OK. After a couple of seconds, the installation program should start automatically, so you can continue below at <xref linkend=\"d-i-intro\"/>."
-msgstr ""
+msgstr "Du kanske måste trycka på &enterkey;-tangenten efter att Atari-bootstrapprogrammet har skrivit ut viss felsökningsinformation i ett fönster. Efter det här kommer skärmen att bli grå, sedan ett par sekunders fördröjning. Härnäst kommer en svart skärm med vit text att visas, som visar alla sorters felsökningsinformation för kärnan. De här meddelanden kan rulla förbi för snabbt för dig att läsa, men det är OK. Efter ett par sekunder ska installationsprogrammet startas automatiskt, så att du kan fortsätta på <xref linkend=\"d-i-intro\"/>."
 
 #. Tag: title
 #: boot-installer.xml:1860
@@ -1472,25 +1516,25 @@ msgstr "Starta upp från MacOS"
 #: boot-installer.xml:1861
 #, no-c-format
 msgid "You must retain the original Mac system and boot from it. It is <emphasis>essential</emphasis> that, when booting MacOS in preparation for booting the Penguin linux loader, you hold the <keycap>shift</keycap> key down to prevent extensions from loading. If you don't use MacOS except for loading linux, you can accomplish the same thing by removing all extensions and control panels from the Mac's System Folder. Otherwise extensions may be left running and cause random problems with the running linux kernel."
-msgstr ""
+msgstr "Du måste bibehålla original Mac-systemet och starta upp från det. Det är <emphasis>viktigt</emphasis> att starta upp MacOS för att förbereda en uppstart av starthanteraren Penguin, att du håller ned tangenten <keycap>shift</keycap> för att förhindra att utökningar läses in. Om du inte använder MacOS annat än för att läsa in Linux, kan du åstadkomma samma sak genom att ta bort alla utökningar och kontrollpaneler från Macens System-mapp. Annars kan körande utökningar lämnas kvar och orsaka diverse problem för den körande Linux-kärnan."
 
 #. Tag: para
 #: boot-installer.xml:1872
 #, no-c-format
 msgid "Macs require the <command>Penguin</command> bootloader. If you do not have the tools to handle a <command>Stuffit</command> archive, &penguin19.hfs; is an hfs disk image with <command>Penguin</command> unpacked. <xref linkend=\"create-floppy\"/> describes how to copy this image to a floppy."
-msgstr ""
+msgstr "Mac kräver starthanteraren <command>Penguin</command>. Om du inte har verktygen för att hantera ett <command>Stuffit</command>-arkiv, &penguin19.hfs; är en hfs-diskavbild med en uppackad <command>Penguin</command>. <xref linkend=\"create-floppy\"/> beskriver hur man kopierar den här avbilden till en diskett."
 
 #. Tag: para
 #: boot-installer.xml:1881
 #, no-c-format
 msgid "At the MacOS desktop, start the Linux installation process by double-clicking on the <guiicon>Penguin Prefs</guiicon> icon in the <filename>Penguin</filename> directory. The <command>Penguin</command> booter will start up. Go to the <guimenuitem>Settings</guimenuitem> item in the <guimenu>File</guimenu> menu, click the <guilabel>Kernel</guilabel> tab. Select the kernel (<filename>vmlinuz</filename>) and ramdisk (<filename>initrd.gz</filename>) images in the <filename>install</filename> directory by clicking on the corresponding buttons in the upper right corner, and navigating the file select dialogs to locate the files."
-msgstr ""
+msgstr "På MacOS-skrivbordet, starta Linux-installationsprocessen genom att dubbelklicka på <guiicon>Penguin Prefs</guiicon>-ikonen i katalogen <filename>Penguin</filename>. Uppstartaren <command>Penguin</command> kommer att startas upp. Gå till posten <guimenuitem>Settings</guimenuitem> i menyn <guimenu>File</guimenu>, klicka på fliken <guilabel>Kernel</guilabel>. Välj kärnavbilden (<filename>vmlinuz</filename>) och ramdisk (<filename>initrd.gz</filename>) i katalogen <filename>install</filename> genom att klicka på motsvarande knappar i övre högra hörnet, och navigera fram till filerna i dialogrutan."
 
 #. Tag: para
 #: boot-installer.xml:1896
 #, no-c-format
 msgid "To set the boot parameters in Penguin, choose <guimenu>File</guimenu> -&gt; <guimenuitem>Settings...</guimenuitem>, then switch to the <guilabel>Options</guilabel> tab. Boot parameters may be typed in to the text entry area. If you will always want to use these settings, select <guimenu>File</guimenu> -&gt; <guimenuitem>Save Settings as Default</guimenuitem>."
-msgstr ""
+msgstr "För att ställa in uppstartsparametrarna i Penguin, välj <guimenu>File</guimenu> -&gt; <guimenuitem>Settings...</guimenuitem>, växla sedan till fliken <guilabel>Options</guilabel>. Uppstartsparametrar kan anges i textrutan. Om du alltid vill använda de här inställningarna, välj <guimenu>File</guimenu> -&gt; <guimenuitem>Save Settings as Default</guimenuitem>."
 
 #. Tag: para
 #: boot-installer.xml:1905
@@ -1502,7 +1546,7 @@ msgstr "Stäng <guilabel>Settings</guilabel>-dialogen, spara inställningarna oc
 #: boot-installer.xml:1912
 #, no-c-format
 msgid "The <command>Penguin</command> booter will output some debugging information into a window. After this, the screen will go grey, there will be a few seconds' delay. Next, a black screen with white text should come up, displaying all kinds of kernel debugging information. These messages may scroll by too fast for you to read, but that's OK. After a couple of seconds, the installation program should start automatically, so you can continue below at <xref linkend=\"d-i-intro\"/>."
-msgstr ""
+msgstr "Starthanteraren <command>Penguin</command> kommer att skriva ut viss felsökningsinformation i ett fönster. Efter det här kommer skärmen att bli grå, sedan ett par sekunders fördröjning. Härnäst kommer en svart skärm med vit text att visas, som visar alla sorters felsökningsinformation för kärnan. De här meddelanden kan rulla förbi för snabbt för dig att läsa, men det är OK. Efter ett par sekunder ska installationsprogrammet startas automatiskt, så att du kan fortsätta på <xref linkend=\"d-i-intro\"/>."
 
 #. Tag: title
 #: boot-installer.xml:1927
@@ -1587,6 +1631,11 @@ msgid ""
 "unsetenv netaddr\n"
 "</screen></informalexample> in the command monitor to do this."
 msgstr ""
+"Efter man gått in i kommandomonitorn, använd <informalexample><screen>\n"
+"bootp():\n"
+"</screen></informalexample> på SGI-maskiner för att starta upp Linux och påbörja installationen av Debian-programvaran. För att det här ska fungera måste du rensa miljövariabeln <envar>netaddr</envar>. Ange <informalexample><screen>\n"
+"unsetenv netaddr\n"
+"</screen></informalexample> i kommandomonitorn för att göra det."
 
 #. Tag: title
 #: boot-installer.xml:2098
@@ -1608,6 +1657,11 @@ msgid ""
 "boot 192.168.1.1:/boot/sibyl\n"
 "</screen></informalexample> You need to substitute the IP address listed in this example with either the name or the IP address of your TFTP server. Once you issue this command, the installer will be loaded automatically."
 msgstr ""
+"På evalueringskorten Broadcom BCM91250A och BCM91480B, måste du läsa in starthanteraren SiByl via TFTP som sedan kommer att läsa in och starta Debian-installeraren. I de flesta fall kommer du första att ta emot en IP-adress via DHCP men det är även möjligt att konfigurera en statisk adress. För att använda DHCP kan du ange följande kommando på CFE-prompten: <informalexample><screen>\n"
+"ifconfig eth0 -auto\n"
+"</screen></informalexample> När du har tagit emot en IP-adress, kan du läsa in SiByl med följande kommando: <informalexample><screen>\n"
+"boot 192.168.1.1:/boot/sibyl\n"
+"</screen></informalexample> Du behöver ersätta IP-adressen som listas i exemplet med antingen namnet eller IP-adressen för din TFTP-server. När du kört det här kommandot kommer installeraren att läsas in automatiskt."
 
 #. Tag: title
 #: boot-installer.xml:2122
@@ -1659,13 +1713,13 @@ msgstr "Starta upp Cobalt via TFTP"
 #: boot-installer.xml:2168
 #, no-c-format
 msgid "Strictly speaking, Cobalt does not use TFTP but NFS to boot. You need to install an NFS server and put the installer files in <filename>/nfsroot</filename>. When you boot your Cobalt, you have to press the left and the right cursor buttons at the same time and the machine will boot via the network from NFS. It will then display several options on the display. There are the following two installation methods:"
-msgstr ""
+msgstr "Ärligt talat använder Cobalt inte TFTP utan NFS för att starta upp. Du behöver installera en NFS-server och lägga installerarens filer i <filename>/nfsroot</filename>. När du startar upp din Cobalt måste du trycka ned vänstra och högra piltangenterna samtidigt för att maskinen ska starta upp via nätverket. Den kommer då att visa flera alternativ på skärmen. Det finns följande installationsmetoder:"
 
 #. Tag: para
 #: boot-installer.xml:2178
 #, no-c-format
 msgid "Via SSH (default): In this case, the installer will configure the network via DHCP and start an SSH server. It will then display a random password and other login information (such as the IP address) on the Cobalt LCD. When you connect to the machine with an SSH client you can start with the installation."
-msgstr ""
+msgstr "Via SSH (standard): I det här fallet kommer installeraren att konfigurera nätverket via DHCP och starta en SSH-server. Den kommer sedan att visa ett slumpat lösenord och annan inloggningsinformation (som IP-adress) på Cobalts LCD-skärm. När du ansluter till maskinen med en SSH-klient kan du påbörja installationen."
 
 #. Tag: para
 #: boot-installer.xml:2187
@@ -1713,19 +1767,19 @@ msgstr "På S/390 kan du lägga till uppstartsparametrar i parm-filen. Denna fil
 #: boot-installer.xml:2330
 #, no-c-format
 msgid "Currently, the only &arch-title; subarchitectures that support CD-ROM booting are PReP and New World PowerMacs. On PowerMacs, hold the <keycap>c</keycap> key, or else the combination of <keycap>Command</keycap>, <keycap>Option</keycap>, <keycap>Shift</keycap>, and <keycap>Delete</keycap> keys together while booting to boot from the CD-ROM."
-msgstr ""
+msgstr "För närvarande är PReP och New World PowerMac de enda underarkitekturerna för &arch-title; som har stöd för uppstart från cd-rom. På PowerMac, håll ned <keycap>c</keycap>-tangenten, eller annars tangentkombinationen <keycap>Command</keycap>, <keycap>Option</keycap>, <keycap>Shift</keycap> och <keycap>Delete</keycap> tillsammans vid uppstart för att starta upp från cd-rom."
 
 #. Tag: para
 #: boot-installer.xml:2339
 #, no-c-format
 msgid "OldWorld PowerMacs will not boot a Debian CD, because OldWorld computers relied on a Mac OS ROM CD boot driver to be present on the CD, and a free-software version of this driver is not available. All OldWorld systems have floppy drives, so use the floppy drive to launch the installer, and then point the installer to the CD for the needed files."
-msgstr ""
+msgstr "OldWorld PowerMac kommer inte att starta upp på en Debian-cd på grund av att OldWorld-datorer förlitade sig på att en Mac OS ROM cd-uppstartsdrivrutin skulle finnas på cd-skivan, och en fri version av den här drivrutinen finns inte tillgänglig. Alla OldWorld-system har diskettenheter, så använd diskettenheten för att starta installeraren, och peka sedan installeraren till cd-enheten för de nödvändiga filerna."
 
 #. Tag: para
 #: boot-installer.xml:2348
 #, no-c-format
 msgid "If your system doesn't boot directly from CD-ROM, you can still use the CD-ROM to install the system. On NewWorlds, you can also use an OpenFirmware command to boot from the CD-ROM manually. Follow the instructions in <xref linkend=\"boot-newworld\"/> for booting from the hard disk, except use the path to <command>yaboot</command> on the CD at the OF prompt, such as"
-msgstr ""
+msgstr "Om ditt system inte startar upp direkt från cd-rom, kan du fortfarande använda cd-enheten för att installera systemet. På NewWorld kan du även använde ett OpenFirmware-kommando för att manuellt starta upp från cd-rom. Följ instruktionerna i <xref linkend=\"boot-newworld\"/> för att starta upp från hårddisken, använd dock sökvägen till <command>yaboot</command> på cd-skivan vid OF-prompten, såsom"
 
 #. Tag: screen
 #: boot-installer.xml:2357
@@ -1761,7 +1815,7 @@ msgstr "Starta upp OldWorld PowerMac från MacOS"
 #: boot-installer.xml:2394
 #, no-c-format
 msgid "If you set up BootX in <xref linkend=\"files-oldworld\"/>, you can use it to boot into the installation system. Double click the <guiicon>BootX</guiicon> application icon. Click on the <guibutton>Options</guibutton> button and select <guilabel>Use Specified RAM Disk</guilabel>. This will give you the chance to select the <filename>ramdisk.image.gz</filename> file. You may need to select the <guilabel>No Video Driver</guilabel> checkbox, depending on your hardware. Then click the <guibutton>Linux</guibutton> button to shut down MacOS and launch the installer."
-msgstr ""
+msgstr "Om du ställer in en BootX i <xref linkend=\"files-oldworld\"/>, kan du använda den för att starta upp installationssystemet. Dubbelklicka på programikonen <guiicon>BootX</guiicon>. Klicka på knappen <guibutton>Options</guibutton> och välj <guilabel>Use Specified RAM Disk</guilabel>. Det här kommer att ge dig chansen att välja filen <filename>ramdisk.image.gz</filename>. Du kan behöva att kryssa i rutan <guilabel>No Video Driver</guilabel>, beroende på din maskinvara. Klicka sedan på knappen <guibutton>Linux</guibutton> för att stänga ner MacOS och starta upp installeraren."
 
 #. Tag: title
 #: boot-installer.xml:2412
@@ -1779,6 +1833,11 @@ msgid ""
 "boot:\n"
 "</screen></informalexample> At yaboot's <prompt>boot:</prompt> prompt, type either <userinput>install</userinput> or <userinput>install video=ofonly</userinput> followed by a &enterkey;. The <userinput>video=ofonly</userinput> argument is for maximum compatibility; you can try it if <userinput>install</userinput> doesn't work. The Debian installation program should start."
 msgstr ""
+"Du har redan placerat filerna <filename>vmlinux</filename>, <filename>initrd.gz</filename>, <filename>yaboot</filename> och <filename>yaboot.conf</filename> i rotnivån av din HFS-partition i <xref linkend=\"files-newworld\"/>. Starta om datorn, och omedelbart (under klockljudet) håll ned tangenterna <keycap>Option</keycap>, <keycap>Command (klöverblad/Apple)</keycap>, <keycap>o</keycap> och <keycap>f</keycap> samtidigt. Efter ett par sekunder kommer du att komma till Open Firmware-prompten. Vid prompten, ange <informalexample><screen>\n"
+"0 &gt; boot hd:<replaceable>x</replaceable>,yaboot\n"
+"</screen></informalexample> ersätt <replaceable>x</replaceable> med partitionsnumret för HFS-partitionen där kärnan och yaboot-filerna placerades, följt av &enterkey;. På vissa maskiner kan du behöva använda <userinput>ide0:</userinput> istället för <userinput>hd:</userinput>. Om ett par sekunder kommer du att se en yaboot-prompt <informalexample><screen>\n"
+"boot:\n"
+"</screen></informalexample> Vid yaboots <prompt>boot:</prompt>-prompt, ange antingen <userinput>install</userinput> eller <userinput>install video=ofonly</userinput> följt av &enterkey;. Argumentet <userinput>video=ofonly</userinput> är för maximal kompatibilitet; du kan prova den om <userinput>install</userinput> inte fungerar. Debians installationprogram ska nu starta."
 
 #. Tag: title
 #: boot-installer.xml:2448
@@ -1796,13 +1855,13 @@ msgstr "För närvarande är NewWorld PowerMac-system kända att ha stöd för u
 #: boot-installer.xml:2455
 #, no-c-format
 msgid "Make sure you have prepared everything from <xref linkend=\"boot-usb-files\"/>. To boot a Macintosh system from a USB stick, you will need to use the Open Firmware prompt, since Open Firmware does not search USB storage devices by default. To get to the prompt, hold down <keycombo><keycap>Command</keycap> <keycap>Option</keycap> <keycap>o</keycap> <keycap>f</keycap></keycombo> all together while booting (see <xref linkend=\"invoking-openfirmware\"/>)."
-msgstr ""
+msgstr "Se till att du har förberett allt från <xref linkend=\"boot-usb-files\"/>. För att starta upp ett Macintosh-system från ett USB-minne behöver du använda Open Firmware-prompten, eftersom Open Firmware inte söker efter USB-lagringsenheter som standard. För att komma till prompten, håll ned <keycombo><keycap>Command</keycap> <keycap>Option</keycap> <keycap>o</keycap> <keycap>f</keycap></keycombo> samtidigt vid uppstart (se <xref linkend=\"invoking-openfirmware\"/>)."
 
 #. Tag: para
 #: boot-installer.xml:2467
 #, no-c-format
 msgid "You will need to work out where the USB storage device appears in the device tree, since at the moment <command>ofpath</command> cannot work that out automatically. Type <userinput>dev / ls</userinput> and <userinput>devalias</userinput> at the Open Firmware prompt to get a list of all known devices and device aliases. On the author's system with various types of USB stick, paths such as <filename>usb0/disk</filename>, <filename>usb0/hub/disk</filename>, <filename>/pci@f2000000/usb@1b,1/disk@1</filename>, and <filename>/pci@f2000000/usb@1b,1/hub@1/disk@1</filename> work."
-msgstr ""
+msgstr "Du behöver ta reda på var USB-lagringsenheten visas i enhetsträdet, eftersom <command>ofpath</command> för tillfället inte kan ta reda på det automatiskt. Ange <userinput>dev / ls</userinput> och <userinput>devalias</userinput> vid Open Firmware-prompten för att gå en lista på alla kända enheter och enhetsalias. På upphovsmannens system med olika typer av USB-minnen, fungerar sökvägar såsom <filename>usb0/disk</filename>, <filename>usb0/hub/disk</filename>, <filename>/pci@f2000000/usb@1b,1/disk@1</filename> och <filename>/pci@f2000000/usb@1b,1/hub@1/disk@1</filename>."
 
 #. Tag: para
 #: boot-installer.xml:2479
@@ -1812,6 +1871,9 @@ msgid ""
 "boot <replaceable>usb0/disk</replaceable>:<replaceable>2</replaceable>,\\\\:tbxi\n"
 "</screen></informalexample> The <replaceable>2</replaceable> matches the Apple_HFS or Apple_Bootstrap partition onto which you copied the boot image earlier, and the <userinput>,\\\\:tbxi</userinput> part instructs Open Firmware to boot from the file with an HFS file type of \"tbxi\" (i.e. <command>yaboot</command>) in the directory previously blessed with <command>hattrib -b</command>."
 msgstr ""
+"Efter att enhetssökvägen har fastställts, använd ett kommando liknande den här för att starta upp installeraren: <informalexample><screen>\n"
+"boot <replaceable>usb0/disk</replaceable>:<replaceable>2</replaceable>,\\\\:tbxi\n"
+"</screen></informalexample> <replaceable>2</replaceable> matchar den Apple_HFS- eller Apple_Bootstrap-partition på vilken du tidigare kopierade in uppstartsavbilden, och delen <userinput>,\\\\:tbxi</userinput> instruerar Open Firmware att starta upp från filen med HFS-filtypen \"tbxi\" (alltså, <command>yaboot</command>) i katalogen som tidigare välsignats med <command>hattrib -b</command>."
 
 #. Tag: para
 #: boot-installer.xml:2493
@@ -1853,7 +1915,7 @@ msgstr "För att starta upp från disketten <filename>boot-floppy-hfs.img</filen
 #: boot-installer.xml:2569
 #, no-c-format
 msgid "For those not familiar with Macintosh floppy operations: a floppy placed in the machine prior to boot will be the first priority for the system to boot from. A floppy without a valid boot system will be ejected, and the machine will then check for bootable hard disk partitions."
-msgstr ""
+msgstr "För de som inte känner till hur Macintosh-disketter hanteras: en diskett som placeras i maskinen före uppstart kommer att vara första prioritet för systemet att starta upp från. En diskett utan ett giltigt uppstartssystem kommer att matas ut, och maskinen kommer sedan att leta efter startbara hårddiskpartitioner."
 
 #. Tag: para
 #: boot-installer.xml:2576
@@ -1871,19 +1933,19 @@ msgstr "Uppstartsparametrar för PowerPC"
 #: boot-installer.xml:2588
 #, no-c-format
 msgid "Many older Apple monitors used a 640x480 67Hz mode. If your video appears skewed on an older Apple monitor, try appending the boot argument <userinput>video=atyfb:vmode:6</userinput> , which will select that mode for most Mach64 and Rage video hardware. For Rage 128 hardware, this changes to <userinput>video=aty128fb:vmode:6</userinput> ."
-msgstr ""
+msgstr "Många äldre Apple-skärmar använde läget 640x480 67Hz. Om din bild verkar vara sned på en äldre Apple-skärm, prova att lägga till uppstartsargumentet <userinput>video=atyfb:vmode:6</userinput> , som kommer att välja det läget för de flesta Mach64- och Rage-grafikmaskinvara. För Rage 128-maskinvara, skall <userinput>video=aty128fb:vmode:6</userinput> användas."
 
 #. Tag: para
 #: boot-installer.xml:2628
 #, no-c-format
 msgid "On machines with OpenBoot, simply enter the boot monitor on the machine which is being installed (see <xref linkend=\"invoking-openboot\"/>). Use the command <userinput>boot net</userinput> to boot from a TFTP and RARP server, or try <userinput>boot net:bootp</userinput> or <userinput>boot net:dhcp</userinput> to boot from a TFTP and BOOTP or DHCP server. Some older OpenBoot revisions require using the device name, such as <userinput>boot le()</userinput>; these probably don't support BOOTP nor DHCP."
-msgstr ""
+msgstr "På maskiner med OpenBoot, gå helt enkelt in i uppstartsmonitorn på maskinen som ska installeras (ee <xref linkend=\"invoking-openboot\"/>). Använd kommandot <userinput>boot net</userinput> för att starta upp från en TFTP- och RARP-server, eller prova <userinput>boot net:bootp</userinput> eller <userinput>boot net:dhcp</userinput> för att starta upp från en TFTP och BOOTP eller DHCP-server. Vissa äldre OpenBoot-revisioner kräver att man använder enhetsnamnet, såsom <userinput>boot le()</userinput>; de har antagligen inte stöd för BOOTP eller DHCP."
 
 #. Tag: para
 #: boot-installer.xml:2684
 #, no-c-format
 msgid "Most OpenBoot versions support the <userinput>boot cdrom</userinput> command which is simply an alias to boot from the SCSI device on ID 6 (or the secondary master for IDE based systems). You may have to use the actual device name for older OpenBoot versions that don't support this special command. Note that some problems have been reported on Sun4m (e.g., Sparc 10s and Sparc 20s) systems booting from CD-ROM."
-msgstr ""
+msgstr "De flesta OpenBoot-versioner stöder kommandot <userinput>boot cdrom</userinput> som helt enkelt är ett alias för att starta upp från SCSI-enheten på ID 6 (eller sekundär master för IDE-baserade system). Du kanske måste använda det faktiska enhetsnamnet för äldre OpenBoot-versioner som inte har stöd för det här speciella kommandot. Notera att vissa problem har rapporterats på Sun4m-system (alltså Sparc 10 och Sparc 20) vid uppstart från cd-rom."
 
 #. Tag: para
 #: boot-installer.xml:2699
@@ -1893,6 +1955,9 @@ msgid ""
 "Stop-A -&gt; OpenBoot: \"boot floppy\"\n"
 "</screen></informalexample> Be warned that the newer Sun4u (ultra) architecture does not support floppy booting. A typical error message is <computeroutput>Bad magic number in disk label - Can't open disk label package</computeroutput>. Furthermore, a number of Sun4c models (such as the IPX) do not support the compressed images found on the disks, so also are not supported."
 msgstr ""
+"För att starta upp från en diskett på en Sparc, använd <informalexample><screen>\n"
+"Stop-A -&gt; OpenBoot: \"boot floppy\"\n"
+"</screen></informalexample> Tänk på att nyare Sun4u-arkitekturen (ultra) inte har stöd för uppstart på diskett. Ett typiskt felmeddelande är <computeroutput>Bad magic number in disk label - Can't open disk label package</computeroutput>. Vidare stöder inte ett antal Sun4c-modeller (såsom IPX) komprimerade avbilder som finns på disketter."
 
 #. Tag: para
 #: boot-installer.xml:2711
@@ -1936,13 +2001,13 @@ msgstr "Uppstartsparametrar är parametrar för Linux-kärnan som generellt sett
 #: boot-installer.xml:2757
 #, no-c-format
 msgid "If this is the first time you're booting the system, try the default boot parameters (i.e., don't try setting parameters) and see if it works correctly. It probably will. If not, you can reboot later and look for any special parameters that inform the system about your hardware."
-msgstr "Om det här är första gången du startar upp systemet kan du prova de uppstartsparametrar som är standard (alltså, ställ inte in några parametrar) och se om det fungerar korrekt. Det kommer säkert att göra det. Om inte, kan du starta om senare och leta efter några speciella parametrar som informerar systemet om din hårdvara."
+msgstr "Om det här är första gången du startar upp systemet kan du prova de uppstartsparametrar som är standard (alltså, ställ inte in några parametrar) och se om det fungerar korrekt. Det kommer säkert att göra det. Om inte, kan du starta om senare och leta efter några speciella parametrar som informerar systemet om din maskinvara."
 
 #. Tag: para
 #: boot-installer.xml:2764
 #, no-c-format
 msgid "Information on many boot parameters can be found in the <ulink url=\"http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html\"> Linux BootPrompt HOWTO</ulink>, including tips for obscure hardware. This section contains only a sketch of the most salient parameters. Some common gotchas are included below in <xref linkend=\"boot-troubleshooting\"/>."
-msgstr "Information om många uppstartsparametrar kan hittas i <ulink url=\"http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html\"> Linux BootPrompt HOWTO</ulink>, inklusive tips för obskyr hårdvara. Den här sektion innehåller endast en del av de mest vanliga parametrarna. Vissa vanliga problem finns beskrivna i <xref linkend=\"boot-troubleshooting\"/>."
+msgstr "Information om många uppstartsparametrar kan hittas i <ulink url=\"http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html\"> Linux BootPrompt HOWTO</ulink>, inklusive tips för obskyr maskinvara. Den här sektion innehåller endast en del av de mest vanliga parametrarna. Vissa vanliga problem finns beskrivna i <xref linkend=\"boot-troubleshooting\"/>."
 
 #. Tag: para
 #: boot-installer.xml:2773
@@ -2261,7 +2326,7 @@ msgstr "Det största problemet för personer som använder disketter för att in
 #: boot-installer.xml:3112
 #, no-c-format
 msgid "The boot floppy is the floppy with the worst problems, because it is read by the hardware directly, before Linux boots. Often, the hardware doesn't read as reliably as the Linux floppy disk driver, and may just stop without printing an error message if it reads incorrect data. There can also be failures in the Driver Floppies most of which indicate themselves with a flood of messages about disk I/O errors."
-msgstr "Startdisketten är den diskett med värsta problemen på grund av att den läses av hårdvaran direkt, före Linux startar upp. Ofta läser hårdvaran inte så tillförlitligt som Linux egna drivrutin för diskettenheten och kan bara stoppa upp utan att skriva ut något felmeddelande om den läser felaktig data. Det kan också bli fel i drivrutinsdisketterna som visar sig som massor av meddelanden om disk in/ut-fel."
+msgstr "Startdisketten är den diskett med värsta problemen på grund av att den läses av maskinvaran direkt, före Linux startar upp. Ofta läser maskinvaran inte så tillförlitligt som Linux egna drivrutin för diskettenheten och kan bara stoppa upp utan att skriva ut något felmeddelande om den läser felaktig data. Det kan också bli fel i drivrutinsdisketterna som visar sig som massor av meddelanden om disk in/ut-fel."
 
 #. Tag: para
 #: boot-installer.xml:3121
@@ -2279,7 +2344,7 @@ msgstr "En användare rapporterar att han måste skriva avbilderna till diskette
 #: boot-installer.xml:3137
 #, no-c-format
 msgid "Other users have reported that simply rebooting a few times with the same floppy in the floppy drive can lead to a successful boot. This is all due to buggy hardware or firmware floppy drivers."
-msgstr "Andra användare har rapporterat att helt enkelt starta om ett par gånger med samma diskett i diskettenheten kan leda till en lyckad uppstart. Det är på grund av felaktig hårdvara eller drivrutinen för diskettenheten i firmware."
+msgstr "Andra användare har rapporterat att helt enkelt starta om ett par gånger med samma diskett i diskettenheten kan leda till en lyckad uppstart. Det är på grund av felaktig maskinvara eller drivrutinen för diskettenheten i firmware."
 
 #. Tag: title
 #: boot-installer.xml:3146
@@ -2363,7 +2428,7 @@ msgstr "Vissa modeller av bärbara datorer producerade av Dell är kända att kr
 #: boot-installer.xml:3233
 #, no-c-format
 msgid "Alternatively, you can boot the installer in expert mode. You will then be asked to enter the resource range options your hardware needs. For example, if you have one of the Dell laptops mentioned above, you should enter <userinput>exclude port 0x800-0x8ff</userinput> here. There is also a list of some common resource range options in the <ulink url=\"http://pcmcia-cs.sourceforge.net/ftp/doc/PCMCIA-HOWTO-1.html#ss1.12\">System resource settings section of the PCMCIA HOWTO</ulink>. Note that you have to omit the commas, if any, when you enter this value in the installer."
-msgstr "Alternativt kan du starta upp installeraren i expert-läget. Du kommer då att bli frågad att ange inställningar för resursintervall som din hårdvara behöver. Till exempel, om du har en av Dells bärbara datorer som nämndes ovan, bör du ange <userinput>exclude port 0x800-0x8ff</userinput> här. Det finns också en lista på några vanliga resursintervall i <ulink url=\"http://pcmcia-cs.sourceforge.net/ftp/doc/PCMCIA-HOWTO-1.html#ss1.12\">System resource settings section of the PCMCIA HOWTO</ulink>. Notera att du måste ta bort eventuella kommatecken när du anger det här värdet i installeraren."
+msgstr "Alternativt kan du starta upp installeraren i expert-läget. Du kommer då att bli frågad att ange inställningar för resursintervall som din maskinvara behöver. Till exempel, om du har en av Dells bärbara datorer som nämndes ovan, bör du ange <userinput>exclude port 0x800-0x8ff</userinput> här. Det finns också en lista på några vanliga resursintervall i <ulink url=\"http://pcmcia-cs.sourceforge.net/ftp/doc/PCMCIA-HOWTO-1.html#ss1.12\">System resource settings section of the PCMCIA HOWTO</ulink>. Notera att du måste ta bort eventuella kommatecken när du anger det här värdet i installeraren."
 
 #. Tag: title
 #: boot-installer.xml:3250
