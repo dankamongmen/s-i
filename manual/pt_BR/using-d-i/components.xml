@@ -1,6 +1,7 @@
-<!-- original version: 29895 -->
+<!-- original version: 35395 -->
 <!-- revised by Marco Carvalho (macs) 2005.12.31 -->
 <!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.01.01 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.04.02 -->
 
  <sect1 id="module-details">
  <title>Usando os componentes individuais</title>
@@ -44,8 +45,6 @@ repetida depois durante este processo.
 </para>
 
 &module-lowmem.xml;
-&module-languagechooser.xml;
-&module-countrychooser.xml;
 &module-localechooser.xml;
 &module-kbd-chooser.xml;
 &module-s390-netdevice.xml;
@@ -82,20 +81,49 @@ coisas mais especificas como LVM ou dispositivos de RAID.
 &module-mdcfg.xml;
   </sect2>
 
+  <sect2 id="di-system-setup">
+  <title>Configurando o Sistema</title>
+<para>
+
+Após o particionamento o instalador fará mais algumas perguntas que serão
+usadas para configurar o sistema que está para ser instalado.
+       
+</para>
+
+&module-tzsetup.xml;
+&module-clock-setup.xml;
+&module-user-setup.xml;
+</sect2>
+
   <sect2 id="di-install-base">
   <title>Instalando o sistema básico</title>
 <para>
 
-Enquanto este estágio é o menos problemático, ele consome mais tempo de
-instalação porque ele baixa, verifica e descompacta todo o sistema
-básico. Se tem um computador ou conexão de rede lentos, isto pode levar
-muito tempo.
+Embora este estágio seja o menos problemático, ele consome uma fração 
+significante da instalação pois ele baixa, verifica e descompacta todo
+o sistema básico. Se você tem uma conexão de rede ou computador lento(s),
+isto pode levar algum tempo.
 
 </para>
 
 &module-base-installer.xml;
   </sect2>
 
+  <sect2 id="di-install-software">
+  <title>Instalando Programas Adicionais</title>
+<para>
+
+Após o sistema básico estar instalado, você tem um sistema usável mas limitado.
+A maioria dos usuários vai querer instalar programas adicionais no sistema para
+personalizá-lo às suas necessidades, e o instalador permite que você faça isso.
+Este passo posso ser ainda mais demorado do que a instalação do sistema básico
+se você tem uma conexão de rede ou computador lento(s).
+
+</para>
+&module-apt-setup.xml;
+&module-pkgsel.xml;
+  </sect2>
+    
   <sect2 id="di-make-bootable">
   <title>Tornando seu sistema inicializável</title>
 
@@ -134,11 +162,11 @@ de partida para mais informações.
   </sect2>
 
   <sect2 id="di-finish">
-  <title>Finalizando o primeiro estágio</title>
+  <title>Finalizando a Instalação</title>
 <para>
 
-Estas são pequenas coisas que devem ser feitas antes de reiniciar para seu
-novo sistema Debian. Eles consistem mais em configurações após &d-i;.
+Estes são os últimos detalhes a serem feitos antes de reiniciar para seu
+Debian. Eles consistem mais em configurações após &d-i;.
 
 </para>
 
@@ -159,6 +187,5 @@ o usuário em caso de algo dar errado.
 &module-cdrom-checker.xml;
 &module-shell.xml;
 &module-network-console.xml;
-&module-baseconfig.xml;
   </sect2>
  </sect1>
