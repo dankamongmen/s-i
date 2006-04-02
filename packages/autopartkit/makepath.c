@@ -2,6 +2,7 @@
 #include <alloca.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include "autopartkit.h"
 
 int
 make_path(const char *pathname, mode_t mode)
