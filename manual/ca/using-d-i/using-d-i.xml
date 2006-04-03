@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 33819 -->
 
 
  <chapter id="d-i-intro"><title>Utilització de l'instal·lador de Debian</title>
@@ -86,21 +86,21 @@ ssh per veure els registres que es descriuen a sota.
 
 </para><para>
 
-Els missatges d'error es redirigeixen a la tercera consola. Podeu accedir a
-aquesta consola prement
-<keycombo><keycap>Alt esquerra</keycap><keycap>F3</keycap></keycombo>
+Els missatges d'error i els registres es redirigeixen a la quarta
+consola. Podeu accedir a aquesta consola prement
+<keycombo><keycap>Alt esquerra</keycap><keycap>F4</keycap></keycombo>
 (manteniu premuda l'<keycap>Alt</keycap> esquerra mentre premeu la tecla de
-funció <keycap>F3</keycap>); torneu al procés principal de l'instal·lador
+funció <keycap>F4</keycap>); torneu al procés principal de l'instal·lador
 amb <keycombo><keycap>Alt esquerra</keycap><keycap>F1</keycap></keycombo>.
 
 </para><para>
 
-També podeu trobar aquests missatges a <filename>/var/log/messages</filename>.
+També podeu trobar aquests missatges a <filename>/var/log/syslog</filename>.
 Després de la instal·lació, aquest registre es copia a
-<filename>/var/log/debian-installer/messages</filename> del nou
+<filename>/var/log/installer/syslog</filename> del nou
 sistema. Altres missatges de la instal·lació es poden trobar a
 <filename>/var/log/</filename> durant la instal·lació i a
-<filename>/var/log/debian-installer/</filename> després que l'ordinador
+<filename>/var/log/debian/</filename> després que l'ordinador
 s'hagi iniciat amb el sistema instal·lat.
 
 </para>
@@ -137,26 +137,7 @@ per retrocedir tot el camí fet per l'element en execució.
 
 </para></listitem>
 </varlistentry>
-<varlistentry condition="sarge">
-
-<term>languagechooser</term><listitem><para>
-
-Mostra una llista d'idiomes i variants d'idiomes. L'instal·lador mostrarà
-els missatges en l'idioma triat si no és que la traducció per aquell idioma
-és incompleta. Quan una traducció no és completa es mostraran missatges
-en anglès.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="sarge">
-
-<term>countrychooser</term><listitem><para>
-
-Mostra una llista de països. L'usuari pot triar el país on viu.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="etch">
+<varlistentry>
 
 <term>localechooser</term><listitem><para>
 
@@ -309,10 +290,53 @@ IDE (pseudomaquinari) que es troben a les plaques bases més noves.
 </varlistentry>
 <varlistentry>
 
+<term>tzsetup</term><listitem><para>
+
+Selecciona la zona horària, a partir de la ubicació seleccionada
+anteriorment.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>clock-setup</term><listitem><para>
+
+Determina si el rellotge està establert a UTC o no.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>user-setup</term><listitem><para>
+
+Estableix la contrasenya de root, i afegeix un usuari normal.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
 <term>base-installer</term><listitem><para>
 
 Instal·la el conjunt de paquets més bàsic que permeten a l'ordinador
 funcionar sota Linux quan es torna a arrencar.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>apt-setup</term><listitem><para>
+
+Configura apt, gairebé automàticament, a partir del mitjà
+d'instal·lació que s'estigui fent servir.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>pkgsel</term><listitem><para>
+
+Utilitza <classname>tasksel</classname> per seleccionar i instal·lar
+programari addicional.
 
 </para></listitem>
 </varlistentry>
@@ -333,21 +357,11 @@ iniciar.
 
 <term>bootloader-installer</term><listitem><para>
 
-Instal·la un programa carregador d'arrencada al disc dur, que és
-necessari perquè l'ordinador pugui arrencar el Linux sense utilitzar un
-disquet o CD-ROM. Molts carregadors d'arrencada permeten a l'usuari triar
-un sistema operatiu alternatiu cada vegada que s'arrenca l'ordinador.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>base-config</term><listitem><para>
-
-Proporciona diàlegs per configurar els paquets bàsics del sistema segons
-les preferències de l'usuari. Aquesta possibilitat es realitza, normalment,
-després de tornar a arrencar l'ordinador, és la «primera execució» del
-nou sistema Debian.
+Cadascun dels instal·ladors de carregadors d'arrencada instal·la
+un programa al disc dur, que és necessari perquè l'ordinador pugui
+arrencar el Linux sense utilitzar un disquet o CD-ROM. Molts carregadors
+d'arrencada permeten a l'usuari triar un sistema operatiu alternatiu
+cada vegada que s'arrenca l'ordinador.
 
 </para></listitem>
 </varlistentry>
@@ -362,13 +376,13 @@ segona consola.
 </varlistentry>
 <varlistentry>
 
-<term condition="sarge">bugreporter</term><term condition="etch">save-logs</term><listitem><para>
+<term>save-logs</term><listitem><para>
 
-Proporciona un mètode perquè l'usuari pugui registrar informació en
-disquet<phrase condition="etch">, xarxa, disc dur or altres medis</phrase>
-quan es troba algun problema. Posteriorment i de forma
-acurada, pot informar als desenvolupadors de Debian dels problemes
-amb el programari d'instal·lació.
+Proporciona un mètode perquè l'usuari pugui registrar informació
+en disquet, xarxa, disc dur or altres medis quan es troba algun
+problema. Posteriorment i de forma acurada, pot informar als
+desenvolupadors de Debian dels problemes amb el programari
+d'instal·lació.
 
 </para></listitem>
 </varlistentry>
