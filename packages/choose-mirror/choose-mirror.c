@@ -195,6 +195,18 @@ int find_suite (void) {
 	return ret;
 }
 
+static int base_on_cd = 0;
+static int check_base_on_cd(void) {
+	FILE *fp;
+	if ((fp = fopen("/cdrom/.disk/base_installable", "r"))) {
+		base_on_cd = 1;
+		fclose(fp);
+	}
+	else
+		base_on_cd = 0;
+	return 0;
+}
+
 static int choose_country(void) {
 	if (country)
 		free(country);
@@ -277,7 +289,11 @@ static int get_protocol(void) {
 }
 
 static int choose_suite(void) {
-	debconf_input(debconf, "medium", DEBCONF_BASE "suite");
+	/* If the base system can be installed from CD, don't allow to
+	 * select a different suite
+	 */
+	if (! base_on_cd)
+		debconf_input(debconf, "medium", DEBCONF_BASE "suite");
 	return 0;
 }
 
@@ -515,6 +531,7 @@ int main (void) {
 	/* Use a state machine with a function to run in each state */
 	int state = 0;
 	int (*states[])() = {
+		check_base_on_cd,
 		choose_protocol,
 		get_protocol,
 		choose_country,
