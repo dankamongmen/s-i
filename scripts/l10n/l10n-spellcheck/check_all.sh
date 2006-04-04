@@ -57,14 +57,18 @@ for LANGUAGE in $(sed "s:^[ \t]*#.*::" ${LANGUAGE_LIST}) ; do
 
     if [ ${#DICT} = 0 ] ; then
 	DICT=null
-	echo "*** checking \"$LANG\" dictionary not available ***"
-    else
-	echo "*** checking \"$LANG\" using aspell-${DICT} ***"
     fi
 
+    echo -n "[${LANG}][${DICT}]"
     check_dit.sh ${LANG} ${DICT} ${DI_COPY} ${DEST_DIR}
 
-    i=`expr $i + 1`
+    if  [ $? = 0 ] ; then
+	echo " done"
+    else
+	echo " no translations for ${LANG}"
+    fi
+    
+    i=$((i+1))
 done
 
 sort ${DEST_DIR}/all_codes-tmp.txt | uniq -c > ${DEST_DIR}/all_codes.txt
@@ -93,14 +97,14 @@ i=0
 TOTAL=0
 AVERAGE=0
 
-for ROW in `cat ${STATS}.txt | sort -n | sed 's: :,:g'`; do
-    VAL=`echo ${ROW}| awk -F, '{print $1}'`
-    LANG=`echo ${ROW}| awk -F, '{print $2}'`
+for ROW in $(sort -n ${STATS}.txt | sed 's: :,:g'); do
+    VAL=$(echo ${ROW} | awk -F, '{print $1}')
+    LANG=$(echo ${ROW} | awk -F, '{print $2}')
 
     if [ ${VAL} -ne -1 ] ; then
 	XTICS=$(echo "${XTICS} \"${LANG}\" $i,")
 	TOTAL=`expr ${TOTAL} + ${VAL}`
-	i=`expr $i + 1`
+	i=$((i+1))
 	echo ${VAL} >> ${GNUPLOT_DATA}
     fi
 done
@@ -137,7 +141,7 @@ echo "plot \"${GNUPLOT_DATA}\" t \"Unknown words count\" with impulses,${AVERAGE
 
 exec 1>&6 6>&-      # Restore stdout and close file descriptor #6.
 
-gnuplot ${GNUPLOT_SCRIPT}
+gnuplot ${GNUPLOT_SCRIPT} 2> /dev/null
 
 rm -f ${GNUPLOT_DATA}
 rm -f ${GNUPLOT_SCRIPT}

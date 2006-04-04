@@ -71,12 +71,18 @@ checks		# do an environment check
 PO_FILE_LIST="${DEST_DIR}/${LANG}_file_list.txt"
 NEEDS_RM="${PO_FILE_LIST} ${NEEDS_RM}"
 
-sh ${PO_FINDER} ${BASE_SEARCH_DIR} ${LANG} > ${PO_FILE_LIST}
+sh ${PO_FINDER} ${BASE_SEARCH_DIR} ${LANG} > ${PO_FILE_LIST} 2> /dev/null
+
+# Check if exist any po file for $LANG 
+if [ $(wc -c ${PO_FILE_LIST} | cut -d ' ' -f1) = 0 ] ; then
+    rm ${PO_FILE_LIST}
+    exit 1
+fi
 
 rm -f ${ALL_STRINGS}
 
-for LANG_FILE in `cat ${PO_FILE_LIST}`; do
-    ENC=`cat ${LANG_FILE} | grep -e "^\"Content-Type:" | sed 's:^.*charset=::' | sed 's:\\\n\"::'`
+while read LANG_FILE; do
+    ENC=$(grep -e "^\"Content-Type:" ${LANG_FILE} | sed 's|.*charset=\(.*\)\\n\"$|\1|')
 
     echo "${LANG_FILE}" | grep -e ".po$" > /dev/null
     if  [ $? = 0 ] ; then
@@ -100,7 +106,7 @@ for LANG_FILE in `cat ${PO_FILE_LIST}`; do
 	fi
 	extract_msg.pl -msgid ${LANG_FILE} >> ${ALL_STRINGS}
     fi
-done
+done < ${PO_FILE_LIST}
 
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     if [ `ls -l ${SUSPECT_VARS} | awk '{print $5}'` -gt 0 ]; then
@@ -132,7 +138,7 @@ if [ ${REMOVE_VARS} = "yes" ] ; then
 else
     # remove header
     FILE_CODEPOINTS=${DEST_DIR}/temp-codes.txt
-    cat ${FILE_TO_CHECK} | sed "1,2d" > ${FILE_CODEPOINTS}
+    sed "1,2d" ${FILE_TO_CHECK} > ${FILE_CODEPOINTS}
 fi
 
     cat ${FILE_CODEPOINTS} | \
