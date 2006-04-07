@@ -21,10 +21,16 @@ while :; do
 	0)
 		# Ask how the password files should be set up.
 		db_input low passwd/shadow || true
+		# Ask if root should be allowed to login.
+		db_input medium passwd/root-login || true
 	;;
 	1)
-		# Prompt for a root password if there is none.
-		if ! root_password; then
+		db_get passwd/root-login
+		if [ "$RET" = false ]; then
+			# root password will be locked
+			db_set passwd/root-password ""
+			db_set passwd/root-password-crypted "!"
+		elif ! root_password; then
 			# First check whether the root password was preseeded crypted
 			db_get passwd/root-password-crypted || true
 			if ! test "$RET" ; then
@@ -41,8 +47,11 @@ while :; do
 		fi
 	;;
 	2)
-		# Verify and set a root password.
-		if ! root_password; then
+		db_get passwd/root-login
+		if [ "$RET" = false ]; then
+			# root password will be locked
+			db_set passwd/root-password-again ""
+		elif ! root_password; then
 			# First check whether the root password was preseeded crypted
 			db_get passwd/root-password-crypted || true
 			if ! test "$RET" ; then
@@ -74,7 +83,12 @@ while :; do
 	3)
 		# Ask if a non-root user should be made, if there is not
 		# already one.
-		if ! is_system_user; then
+		db_get passwd/root-login
+		if [ "$RET" = false ]; then
+			# always make non-root user; this user will be able
+			# to sudo to root
+			db_set passwd/make-user true
+		elif ! is_system_user; then
 			db_input medium passwd/make-user || true
 		fi
 	;;

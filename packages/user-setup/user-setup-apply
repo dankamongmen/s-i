@@ -113,6 +113,23 @@ if [ "$RET" = true ] && ! is_system_user; then
 			$log $chroot $ROOT adduser "$USER" $group >/dev/null 2>&1 || true
 		done
 	fi
+
+	db_get passwd/root-login
+	if [ "$RET" = false ] && [ -n "$USER" ]; then
+		# Ensure sudo is installed, and set up the user to be able
+		# to use it.
+		if [ ! -e $ROOT/etc/sudoers ]; then
+			# try to work in d-i and out; it's better to
+			# use apt-install in d-i
+			apt-install sudo 2>/dev/null || $log $chroot apt-get -q -y install sudo || true
+		fi
+		if [ -e $ROOT/etc/sudoers ]; then
+			echo "$USER ALL=(ALL) ALL" >> $ROOT/etc/sudoers
+		else
+			# sudo failed to install, system won't be usable
+			exit 1
+		fi
+	fi
 fi
 
 exit 0
