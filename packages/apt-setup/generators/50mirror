@@ -5,6 +5,19 @@ set -e
 
 file="$1"
 
+# Abort if no mirror is configured.
+db_get mirror/codename
+codename="$RET"
+db_get mirror/protocol
+protocol="$RET"
+db_get mirror/$protocol/hostname
+hostname="$RET"
+db_get mirror/$protocol/directory
+directory="/${RET#/}"
+if [ -z "$hostname" ] || [ -z "$directory" ]; then
+	exit 0
+fi
+
 STATE=1
 while true; do
 	case "$STATE" in
