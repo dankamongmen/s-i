@@ -1,43 +1,42 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 27345 -->
 
    <sect3 arch="powerpc">
-   <title>Particionamento da memória stick USB na &arch-title;</title>
+   <title>Particionamento da memÃ³ria stick USB na &arch-title;</title>
 <para>
 
-A maioria das memória sticks USB não vem pré-configuradas de uma
-forma que possam ser inicializadas através do Open Firmware, você 
-terá que reparticionar a memória stick. Em sistemas Mac, execute
+A maioria das memÃ³ria sticks USB nÃ£o vem prÃ©-configuradas de uma
+forma que possam ser inicializadas atravÃ©s do Open Firmware, vocÃª 
+terÃ¡ que reparticionar a memÃ³ria stick. Em sistemas Mac, execute
 o comando <userinput>mac-fdisk /dev/sda</userinput>, inicialize
-o mapa da nova partição usando o comando <userinput>i</userinput>
-e crie uma nova partição do tipo Apple_Bootstrap usando o comando
-<userinput>C</userinput>. (note que a primeira "partição" será sempre
-o próprio mapa da partição). Então digite
+o mapa da nova partiÃ§Ã£o usando o comando <userinput>i</userinput>
+e crie uma nova partiÃ§Ã£o do tipo Apple_Bootstrap usando o comando
+<userinput>C</userinput>. (note que a primeira "partiÃ§Ã£o" serÃ¡ sempre
+o prÃ³prio mapa da partiÃ§Ã£o). EntÃ£o digite
 
 <informalexample><screen>
 $ hformat /dev/<replaceable>sda2</replaceable>
 </screen></informalexample>
 
-Tenha atenção de estar usando o nome de dispositivo correto para seu 
-dispositivo de memória stick. O comando
+Tenha atenÃ§Ã£o de estar usando o nome de dispositivo correto para seu 
+dispositivo de memÃ³ria stick. O comando
 <command>hformat</command> vem junto com o pacote da Debian
 <classname>hfsutils</classname>.
 
 </para><para>
 
-Para iniciar um kernel após iniicalizar através de um dispositivo USB,
-nós colocaremos um gerenciador de partida na memória stick. O 
+Para iniciar um kernel apÃ³s iniicalizar atravÃ©s de um dispositivo USB,
+nÃ³s colocaremos um gerenciador de partida na memÃ³ria stick. O 
 gerenciador de partida <command>yaboot</command> pode ser instalado em
 um sistema de arquivos HFS e pode ser reconfigurado simplesmente pela
-edição de um arquivo de textos. Qualquer sistema operacional que 
+ediÃ§Ã£o de um arquivo de textos. Qualquer sistema operacional que 
 suporte o sistema de arquivos HFS pode ser usado para realizar
-alterações na configuração d gerenciador de partida.
+alteraÃ§Ãµes na configuraÃ§Ã£o d gerenciador de partida.
 
 </para><para>
 
 A ferramenta <command>ybin</command> que vem com o 
-<command>yaboot</command> não entende o formato de dispositivos de 
-armazenamento USB, assim você terá que instalar o 
+<command>yaboot</command> nÃ£o entende o formato de dispositivos de 
+armazenamento USB, assim vocÃª terÃ¡ que instalar o 
 <command>yaboot</command> manualmente usando as ferramentas
 <classname>hfsutils</classname>. Digite
 
@@ -50,22 +49,22 @@ $ humount
 </screen></informalexample>
 
 Novamente, tenha cuidado ao usar o nome de dispositivos.
-A partição não deverá estar montada durante este processo. Este procedimento
-gravará um setor de partida na partição e usará os utilitários HFS para
-marca-lo de forma que o Open Firmware possa inicializar através dele. 
-Tendo feito isto, o resto da memória stick USB poderá ser preparada usando
-utilitários padrões do Unix.
+A partiÃ§Ã£o nÃ£o deverÃ¡ estar montada durante este processo. Este procedimento
+gravarÃ¡ um setor de partida na partiÃ§Ã£o e usarÃ¡ os utilitÃ¡rios HFS para
+marca-lo de forma que o Open Firmware possa inicializar atravÃ©s dele. 
+Tendo feito isto, o resto da memÃ³ria stick USB poderÃ¡ ser preparada usando
+utilitÃ¡rios padrÃµes do Unix.
 
 </para><para>
 
-Monte a partição (<userinput>mount /dev/sda2 /mnt</userinput>) e
-copie os seguintes arquivos do repositório da Debian para a memória
+Monte a partiÃ§Ã£o (<userinput>mount /dev/sda2 /mnt</userinput>) e
+copie os seguintes arquivos do repositÃ³rio da Debian para a memÃ³ria
 stick:
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinux</filename> (binário do kernel)
+<filename>vmlinux</filename> (binÃ¡rio do kernel)
 
 </para></listitem>
 <listitem><para>
@@ -75,24 +74,24 @@ stick:
 </para></listitem>
 <listitem><para>
 
-<filename>yaboot.conf</filename> (arquivo de configuração do yaboot)
+<filename>yaboot.conf</filename> (arquivo de configuraÃ§Ã£o do yaboot)
 
 </para></listitem>
 <listitem><para>
 
-<filename>boot.msg</filename> (mensagem de inicialização personalizada)
+<filename>boot.msg</filename> (mensagem de inicializaÃ§Ã£o personalizada)
 
 </para></listitem>
 <listitem><para>
 
-Módulos opcionais do kernel
+MÃ³dulos opcionais do kernel
 
 </para></listitem>
 </itemizedlist>
 
 </para><para>
 
-O arquivo de configuração <filename>yaboot.conf</filename> deverá conter
+O arquivo de configuraÃ§Ã£o <filename>yaboot.conf</filename> deverÃ¡ conter
 as seguintes linhas:
 
 <informalexample><screen>
@@ -109,7 +108,7 @@ image=/vmlinux
         read-only
 </screen></informalexample>
 
-Note que pode ser necessário aumentar o parâmetro <userinput>initrd-size</userinput> 
+Note que pode ser necessÃ¡rio aumentar o parÃ¢metro <userinput>initrd-size</userinput> 
 dependendo do tamanho da imagem que estiver inicializando.
 
 </para>

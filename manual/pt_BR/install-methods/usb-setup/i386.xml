@@ -1,70 +1,69 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- retain these comments for translator revision tracking -->
 <!-- original version: 32141 -->
 <!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
 
    <sect3 arch="i386">
-   <title>Particionamento de memória stick USB na &arch-title;</title>
+   <title>Particionamento de memÃ³ria stick USB na &arch-title;</title>
 <para>
 
-Nós iremos mostrar como configurar uma memória stick para usar a primeira
-partição ao invés de todo dispositivo.
+NÃ³s iremos mostrar como configurar uma memÃ³ria stick para usar a primeira
+partiÃ§Ã£o ao invÃ©s de todo dispositivo.
 
 </para><note><para>
 
-Como a maioria dos dispositivos stick USB vêm com uma partição
-contendo um sistema de arquivos FAT16 já configurada, você provavelmente
-não precisará reparticionar ou reformatar o stick. Se tiver que fazer
+Como a maioria dos dispositivos stick USB vÃªm com uma partiÃ§Ã£o
+contendo um sistema de arquivos FAT16 jÃ¡ configurada, vocÃª provavelmente
+nÃ£o precisarÃ¡ reparticionar ou reformatar o stick. Se tiver que fazer
 isto de qualquer forma, use o <command>cfdisk</command> ou qualquer
-outra ferramenta de particionamento para criar a partição FAT16 e
-então crie o sistema de arquivos usando:
+outra ferramenta de particionamento para criar a partiÃ§Ã£o FAT16 e
+entÃ£o crie o sistema de arquivos usando:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sda1</replaceable>
 </screen></informalexample>
 
-Tenha atenção de usar o nome de dispositivo correto para o stick USB.
+Tenha atenÃ§Ã£o de usar o nome de dispositivo correto para o stick USB.
 O comando <command>mkdosfs</command> vem junto com o pacote da
 Debian <classname>dosfstools</classname>.
 
 </para></note><para>
 
-Para iniciar o kernel após a inicialização da memória stick USB,
-nós precisaremos colocar um gerenciador de partida na memória
+Para iniciar o kernel apÃ³s a inicializaÃ§Ã£o da memÃ³ria stick USB,
+nÃ³s precisaremos colocar um gerenciador de partida na memÃ³ria
 stick. No entanto, qualquer gerenciador de partida
-(e.g. <command>LILO</command>) deverá funcionar. É conveniente usar
-o <command>SYSLINUX</command> pois ele usa uma partição FAT16
-e pode ser configurado apenas com a edição de um arquivo de textos.
+(e.g. <command>LILO</command>) deverÃ¡ funcionar. Ã‰ conveniente usar
+o <command>SYSLINUX</command> pois ele usa uma partiÃ§Ã£o FAT16
+e pode ser configurado apenas com a ediÃ§Ã£o de um arquivo de textos.
 Qualquer sistema operacional que suporte o sistema de arquivos FAT
-poderá ser usado para fazer alterações na configuração do gerenciador
+poderÃ¡ ser usado para fazer alteraÃ§Ãµes na configuraÃ§Ã£o do gerenciador
 de partida.
 
 </para><para>
 
-Para colocar o <command>SYSLINUX</command> em uma partição FAT16 de sua
-memória stick USB, instale os pacotes <classname>syslinux</classname> e
+Para colocar o <command>SYSLINUX</command> em uma partiÃ§Ã£o FAT16 de sua
+memÃ³ria stick USB, instale os pacotes <classname>syslinux</classname> e
 <classname>mtools</classname> em seu sistema e execute:
 
 <informalexample><screen>
 # syslinux /dev/<replaceable>sda1</replaceable>
 </screen></informalexample>
 
-Novamente, tenha atenção ao usar o nome de dispositivo. A partição
-não deverá estar montada ao iniciar o <command>SYSLINUX</command>.
-Este processo grava um setor de partida na partição e cria um
-arquivo <filename>ldlinux.sys</filename> que contém o código do
+Novamente, tenha atenÃ§Ã£o ao usar o nome de dispositivo. A partiÃ§Ã£o
+nÃ£o deverÃ¡ estar montada ao iniciar o <command>SYSLINUX</command>.
+Este processo grava um setor de partida na partiÃ§Ã£o e cria um
+arquivo <filename>ldlinux.sys</filename> que contÃ©m o cÃ³digo do
 gerenciador de partida.
 
 </para><para>
 
-Monte a partição (<userinput>mount /dev/sda1 /mnt</userinput>) e
-copie os seguintes arquivos de um repositório da Debian para
-a memória stick:
+Monte a partiÃ§Ã£o (<userinput>mount /dev/sda1 /mnt</userinput>) e
+copie os seguintes arquivos de um repositÃ³rio da Debian para
+a memÃ³ria stick:
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (binário do kernel)
+<filename>vmlinuz</filename> (binÃ¡rio do kernel)
 
 </para></listitem>
 <listitem><para>
@@ -74,36 +73,36 @@ a memória stick:
 </para></listitem>
 <listitem><para>
 
-<filename>syslinux.cfg</filename> (arquivo de configuração do SYSLINUX)
+<filename>syslinux.cfg</filename> (arquivo de configuraÃ§Ã£o do SYSLINUX)
 
 </para></listitem>
 <listitem><para>
 
-Módulos opcionais de kernel
+MÃ³dulos opcionais de kernel
 
 </para></listitem>
 </itemizedlist>
 
-Se quiser renomear os arquivos, tenha atenção ao fato de que o
+Se quiser renomear os arquivos, tenha atenÃ§Ã£o ao fato de que o
 <command>SYSLINUX</command> somente pode processar nomes de arquivos no
 formato (8.3) do DOS.
 
 </para><para>
 
-O arquivo de configuração do SYSLINUX <filename>syslinux.cfg</filename>
-deverá conter as seguintes duas linhas:
+O arquivo de configuraÃ§Ã£o do SYSLINUX <filename>syslinux.cfg</filename>
+deverÃ¡ conter as seguintes duas linhas:
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw
 </screen></informalexample>
 
-Note que o parâmetro <userinput>ramdisk_size</userinput> pode
+Note que o parÃ¢metro <userinput>ramdisk_size</userinput> pode
 ser aumentado, dependendo da imagem que estiver sendo usada para a
-inicialização.
+inicializaÃ§Ã£o.
 
 <phrase condition="sarge">
-Caso a inicialização falhe, você pode tentar adicionar
+Caso a inicializaÃ§Ã£o falhe, vocÃª pode tentar adicionar
 <userinput>devfs=mount,dall</userinput> na linha <quote>append</quote>.
 </phrase>
 
