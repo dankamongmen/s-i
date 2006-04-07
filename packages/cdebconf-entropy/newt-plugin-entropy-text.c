@@ -80,7 +80,7 @@ static const char *
 success_text(struct frontend *obj)
 {
     return question_get_text(obj, "partman-crypto/entropy-text-success", 
-      "Key data has been created sucessfully.");
+      "Key data has been created successfully.");
 }
 
 static void *
