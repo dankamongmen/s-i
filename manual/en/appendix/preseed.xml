@@ -339,7 +339,7 @@ for version 3 of the ISC DHCP server (the dhcp3-server Debian package).
 
 <informalexample><screen>
 if substring (option vendor-class-identifier, 0, 3) = "d-i" {
-	filename "http://host/preseed.cfg";
+    filename "http://host/preseed.cfg";
 }
 </screen></informalexample>
 
@@ -392,8 +392,8 @@ you can use 32 command line options and 32 environment options.
 <para>
 
 For most installations some of the default options in your bootloader
-configuration file, like 'vga=normal', may be safely removed which may
-allow you to add more options for preseeding.
+configuration file, like <literal>vga=normal</literal>, may be safely
+removed which may allow you to add more options for preseeding.
 
 </para>
 <note><para>
@@ -405,40 +405,92 @@ parameters, even if you delimit them with quotes.
   </sect2>
  </sect1>
 
- <sect1 condition="FIXME" id="preseed-creating">
+ <sect1 id="preseed-creating">
  <title>Creating a preseed file</title>
 <para>
 
 The preconfiguration file is in the format used by the
-<command>debconf-set-selections</command> command.
+<command>debconf-set-selections</command> command. The general format of
+a line in a preconfiguration file is:
+
+<informalexample><screen>
+&lt;owner&gt; &lt;template name&gt; &lt;template type&gt; &lt;value&gt;
+</screen></informalexample>
+
+</para><para>
+
+There are a few rules to keep in mind when writing a preconfiguration file.
+
+<itemizedlist>
+<listitem>
+  Put only a single space or tab between type and value: any additional
+  whitespace will be interpreted as belonging to the value.
+</listitem><listitem>
+  A line can be split into multiple lines by appending a backslash
+  (<quote><literal>/</literal></quote>) as the line continuation character.
+  A good place to split a line is after the template name; a bad place is
+  between type and value.
+</listitem><listitem>
+  Most templates need to be preseeded using the values valid in English and
+  not the translated values. However, there are some templates (for example
+  in <classname>partman</classname> where the translated values need to be
+  used.
+</listitem><listitem>
+  Some templates take a code as value instead of the English text that is
+  shown during installation.
+</listitem>
+</itemizedlist>
+
+</para><para>
+
+The easiest way to create a preconfiguration file is to use the example file
+linked in <xref linkend="preseed-contents"/> as basis and work from there.
+
+</para><para>
+
+An alternative method is to do a manual installation and then, after
+rebooting, use the <command>debconf-get-selections</command> from the
+<classname>debconf-utils</classname> package to dump both the debconf
+database and the installer's cdebconf database to a single file:
+
+<informalexample><screen>
+$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>
+$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>
+</screen></informalexample>
+
+</para><para>
+
+However, a file generated in this manner will have some items that should
+not be preseeded, and the example file is a better starting place for most
+users.
 
 </para>
 
-<itemizedlist>
-<listitem><para>
-  File format
-</para></listitem>
-<listitem><para>
-  Only single space allowed between template type and value
-</para></listitem>
-<listitem><para>
-  Relation with /var/lib/(c)debconf/templates
-</para></listitem>
-<listitem><para>
-  Types of templates and how to provide values for them
-</para></listitem>
-<listitem><para>
-  Most values need to be in English or codes
-</para></listitem>
-<listitem><para>
-  Using a manual installation as base
-</para></listitem>
-<listitem><para>
-  Finding other possible values
-</para></listitem>
-</itemizedlist>
+<note><para>
+
+This method relies on the fact that, at the end of the installation, the
+installer's cdebconf database is saved to the installed system in
+<filename>/var/log/installer/cdebconf</filename>. However, because the
+database may contain sensitive information, by default the files are only
+readable by root.
+
+</para><para>
+
+The directory <filename>/var/log/installer</filename> and all files in it
+will be deleted from your system if you purge the package
+<classname>installation-report</classname>.
+
+</para></note>
 
 <para>
+
+To check possible values for templates, you can use <command>nano</command>
+to examine the files in <filename>/var/lib/cdebconf</filename> while an
+installation is in progress. View <filename>templates.dat</filename> for
+the raw templates and <filename>questions.dat</filename> for the current
+values and for the values assigned to variables.
+
+</para><para>
 
 To check if the format of your preseed file is valid before performing an
 install, you can use the command <command>debconf-set-selections -c
