@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35924 untranslated -->
+<!-- original version: 36167 untranslated -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -729,7 +729,7 @@ earlier questions. You can optionally add other (local) repositories.
 #d-i apt-setup/local0/comment string local server
 #d-i apt-setup/local0/repository string \
 #       deb http://local.server/debian stable main
-# URL to the public key of the localrepository
+# URL to the public key of the local repository
 #d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
@@ -755,16 +755,19 @@ for brute force attacks.
 </para></warning>
 
 <informalexample role="example"><screen>
+# Skip creation of a root account (normal user account will be able to
+# use sudo).
+#d-i passwd/root-login boolean false
+# Alternatively, to skip creation of a normal user account.
+#d-i passwd/make-user boolean false
+
 # Root password, either in clear text
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
 # or encrypted using an MD5 hash.
 #d-i passwd/root-password-crypted password [MD5 hash]
 
-# Skip creation of a normal user account.
-#d-i passwd/make-user boolean false
-
-# Alternatively, create a normal user account.
+# To create a normal user account.
 #d-i passwd/user-fullname string Debian User
 #d-i passwd/username string debian
 # Normal user's password, either in clear text
