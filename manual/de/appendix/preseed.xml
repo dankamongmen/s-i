@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 32512 -->
+<!-- original version: 35982 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -12,7 +12,7 @@ attribute is in force that does not match the specified release or if an
 Currently only a single variant of the example file is generated (for i386).
 -->
 
-<appendix id="appendix-preseed" condition="etch">
+<appendix id="appendix-preseed">
 <title>Automatisieren der Installation mittels Voreinstellung</title>
 
 <para>
@@ -32,17 +32,11 @@ in Form einer Voreinstellungsdatei unter &urlset-example-preseed; verfügbar.
  <title>Einführung</title>
 <para>
 
-Das Voreinstellen bietet einen Weg, Fragen zu beantworten, ohne dass man
-die Antworten manuell eingeben muss, während die Installation läuft. Dies
-ermöglicht es, die meisten Arten von Installationen voll zu automatisieren
-und bietet sogar einige Funktionen, die während einer normalen Installation
-nicht verfügbar sind.
-
-</para><para>
-
-Mittels Voreinstellung ist es möglich, sowohl während des ersten Schritts
-der Installation (vor dem Neustart in das neue System) wie auch in der
-zweite Stufe Fragen automatisiert zu beantworten.
+Das Voreinstellen bietet einen Weg, Fragen zu beantworten, die während der
+Installation gestellt werden, ohne dass man die Antworten manuell eingeben
+muss, während die Installation läuft. Dies ermöglicht es, die meisten
+Installationsarten voll zu automatisieren und bietet sogar einige Funktionen,
+die während einer normalen Installation nicht verfügbar sind.
 
 </para>
 
@@ -91,7 +85,7 @@ verschiedenen Installationsarten nutzen können.
   <entry>ja</entry>
   <entry>nein</entry>
 </row><row condition="supports-floppy-boot">
-  <entry>floppy-basiert (CD-Rom-Treiber)</entry>
+  <entry>floppy-basiert (CD-ROM-Treiber)</entry>
   <entry>ja</entry>
   <entry>ja</entry>
   <entry>nein</entry>
@@ -146,7 +140,7 @@ Obwohl für die meisten Fragen des &d-i; Werte voreingestellt werden
 können, gibt es einige erwähnenswerte Ausnahmen. Sie müssen eine ganze
 Festplatte oder freien verfügbaren Platz auf einer Platte (neu) partitionieren;
 es ist nicht möglich, bereits vorhandene Partitionen zu verwenden. Außerdem
-können Sie derzeit kein RAID oder LVM per Voreinstellung einrichten.
+können Sie derzeit kein RAID per Voreinstellung einrichten.
 
 </para>
   </sect2>
@@ -229,17 +223,9 @@ bezüglich weiterer Details.
   Voreinstellungsdatei geladen wurde
 </para></listitem>
 <listitem><para>
-  <userinput>preseed/late_command</userinput>: wird zum Ende der ersten Stufe
-  der Installation vor dem Reboot ausgeführt, jedoch noch bevor das
-  <filename>/target</filename>-Dateisystem ausgehängt wird
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/early_command</userinput>: wird zum Anfang der zweiten
-  Stufe der Installation ausgeführt, wenn <command>base-config</command> startet
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/late_command</userinput>: wird zum Ende von
-  <command>base-config</command> ausgeführt, kurz vor dem Login-Prompt
+  <userinput>preseed/late_command</userinput>: wird zum Ende der
+  Installation vor dem Reboot ausgeführt, jedoch noch bevor das
+  <filename>/target</filename>-Dateisystem ausgehängt wird.
 </para></listitem>
 </itemizedlist>
 
@@ -300,8 +286,8 @@ im root-Verzeichnis der initrd existiert. Der Installer wird automatisch
 </para><para>
 
 Für alle anderen Voreinstellungsmethoden müssen Sie dem Installer beim Start
-mitteilen, welche Datei er nutzen soll. Dies erledigen Sie mit einem
-Boot-Parameter, den Sie dem Kernel beim Start angeben, entweder manuell
+mitteilen, welche Datei er nutzen soll. Dies wird normalerweise mit einem
+Boot-Parameter gemacht, den Sie dem Kernel beim Start angeben, entweder manuell
 zum Boot-Zeitpunkt oder indem Sie die Konfigurationsdatei des Bootloaders
 editieren (fügen Sie z.B in <filename>syslinux.cfg</filename> den Parameter
 an das Ende der <quote>append</quote>-Zeile(n) des Kernels an).
@@ -349,6 +335,48 @@ entsprechenden Einträge fehlen sollten.
 </para>
   </sect2>
 
+  <sect2 id="preseed-dhcp">
+  <title>Voreinstellungsdateien mittels eines DHCP-Servers festlegen</title>
+<para>
+
+Es ist auch möglich, DHCP zu benutzen, um eine Voreinstellungsdatei
+anzugeben, die vom Netzwerk heruntergeladen werden soll. DHCP erlaubt es,
+einen Dateinamen anzugeben. Normalerweise ist dies eine Datei für das Booten
+per Netzwerk, wenn sie jedoch als URL angegeben wird, wird das
+Installationsmedium (dies muss Voreinstellung per Netzwerk unterstützen) die
+Datei unter der URL herunterladen und als Voreinstellungsdatei benutzen.
+Hier ein Beispiel, wie Sie die dhcpd.conf für ISC DHCP-Server Version 3
+(das Debianpaket dhcp3-server) einstellen müssen.
+
+</para>
+
+<informalexample><screen>
+if substring (option vendor-class-identifier, 0, 3) = "d-i" {
+	filename "http://host/preseed.cfg";
+}
+</screen></informalexample>
+
+<para>
+
+Beachten Sie, dass das obige Beispiel die Angabe des Dateinamens auf
+DHCP-Klienten beschränkt, die sich selbst als »d-i« identifizieren; es wird
+also keine regulären DHCP-Klienten beeinflussen, sondern nur Rechner, auf denen
+der Installer läuft. Sie können den Text auch in einen Absatz der Datei
+einfügen, der nur für einen bestimmten Host gilt, um zu vermeiden, dass ALLE
+Installationen im Netzwerk voreingestellt werden.
+
+</para><para>
+
+Eine gute Sache Voreinstellung per DHCP zu nutzen ist, nur Werte vorzugeben,
+die netzwerkspezifisch sind, wie der zu nutzende Debian-Spiegelserver. Auf diese
+Weise wird bei allen Installationen im Netzwerk automatisch ein guter
+Spiegelserver gewählt, aber der Rest der Installation kann interaktiv
+vonstatten gehen. Eine voll automatisierte Debian-Installation per
+DHCP-Voreinstellung sollte nur mit Vorsicht durchgeführt werden.
+
+</para>
+  </sect2>
+
   <sect2 id="preseed-bootparms">
   <title>Boot-Parameter nutzen, um das Voreinstellen zu ergänzen</title>
 <para>
@@ -386,7 +414,7 @@ und 2.6-Kernel (vor 2.6.9) werden eine Kernel-Panic melden.
 
 Einige der Standardoptionen wie <quote>vga=normal</quote>
 können bei den meisten Installationen getrost entfernt werden, was es
-erlaubt, mehr Optionen für Voreinstellungen anzugeben.
+erlaubt, mehr Optionen für Voreinstellungen zu verwenden.
 
 </para>
 <note><para>
@@ -443,8 +471,8 @@ Voreinstellungsdatei gültig ist, können Sie den Befehl
 </para>
  </sect1>
 
- <sect1 id="preseed-stage1">
- <title>Die erste Stufe der Installation voreinstellen</title>
+ <sect1 id="preseed-contents">
+ <title>Inhalt der Voreinstellungsdatei</title>
 <para>
 
 Die Konfigurationsfragmente, die in diesem Abschnitt benutzt werden, sind
@@ -525,6 +553,13 @@ ist toll, wenn Sie von CD oder USB-Stick booten. Sie können auch
 Netzwerkkonfigurations-Parameter automatisieren, wenn Sie die
 Voreinstellungs-Datei per Netzwerk laden, und zwar per Kernel-Parameter.
 
+</para><para>
+
+Falls Sie beim Booten per Netzwerk eine bestimmte Netzwerkschnittstelle
+auswählen müssen, bevor eine Voreinstellungsdatei vom Netzwerk geladen wurde,
+benutzen Sie einen Bootparameter wie
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+
 </para>
 
 <informalexample role="example"><screen>
@@ -534,13 +569,25 @@ Voreinstellungs-Datei per Netzwerk laden, und zwar per Kernel-Parameter.
 # eine Schnittstelle verfügbar ist.
 d-i netcfg/choose_interface select auto
 
+# Um stattdessen eine bestimmte Schnittstelle vorzugeben:
+#d-i netcfg/choose_interface select eth1
+
 # Wenn Sie einen langsamen DHCP-Server haben und der Installer läuft in eine
 # Zeitüberschreitung, während er auf ihn wartet, könnte dies nützlich sein:
 #d-i netcfg/dhcp_timeout string 60
 
-# Wenn Sie es vorziehen, das Netzwerk manuell zu konfigurieren: hier steht,
-# wie es geht:
+# Wenn Sie es vorziehen, das Netzwerk manuell zu konfigurieren, entfernen Sie
+# hier das Kommentarzeichen und ebenso bei den Zeilen für die statische
+# Netzwerkkonfiguration unten.
 #d-i netcfg/disable_dhcp boolean true
+
+# Falls Sie möchten, dass die Voreinstellungsdatei sowohl auf Systemen mit
+# DHCP-Server wie auch ohne einen solchen funktioniert, entfernen Sie hier die
+# Kommentarzeichen und unten bei der statischen Netzwerkkonfiguration auch.
+#d-i netcfg/dhcp_failed note
+#d-i netcfg/dhcp_options select Configure network manually
+
+# Statische Netzwerkkonfiguration.
 #d-i netcfg/get_nameservers string 192.168.1.1
 #d-i netcfg/get_ipaddress string 192.168.1.42
 #d-i netcfg/get_netmask string 255.255.255.0
@@ -614,8 +661,8 @@ Platte zu partitionieren, oder die komplette Platte. Das Layout der Disk kann
 durch ein vordefiniertes Rezept festgelegt werden, durch ein selbst erstelltes
 aus einer Rezeptdatei oder durch ein Rezept, das in der Vorkonfigurationsdatei
 enthalten ist. Derzeit ist es nicht möglich, mehrere Festplatten per
-Voreinstellung zu partitionieren; es kann außerdem auch kein RAID oder LVM
-eingerichtet werden.
+Voreinstellung zu partitionieren; es kann außerdem auch kein RAID eingerichtet
+werden.
 
 </para>
 
@@ -631,8 +678,10 @@ Voreinstellung nutzen.
 <informalexample role="example"><screen>
 # Wenn das System freien Platz auf der Platte hat, können Sie festlegen, nur
 # diesen Platz zu partitionieren.
+# HINWEIS: die Voreinstellungswerte für diese Frage müssen lokalisiert
+# (übersetzt) sein.
 #d-i partman-auto/init_automatically_partition \
-#      select Use the largest continuous free space
+#      select Größten, ununterbrochenen freien Speicher benutzen
 
 # Alternativ können Sie eine Festplatte angeben, die partitioniert werden soll.
 # Der Gerätename kann entweder als devfs-Bezeichnung oder im traditionellen
@@ -640,12 +689,14 @@ Voreinstellung nutzen.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
 # Sie können eines der vordefinierten Partitionierungsrezepte wählen:
+# HINWEIS: die Voreinstellungswerte für diese Frage müssen lokalisiert
+# (übersetzt) sein.
 d-i partman-auto/choose_recipe \
-       select All files in one partition (recommended for new users)
+       select Alle Dateien auf eine Partition (für Anfänger empf.)
 #d-i partman-auto/choose_recipe \
-#       select Separate /home partition
+#       select Separate /home-Partition
 #d-i partman-auto/choose_recipe \
-#       select Separate /home, /usr, /var, and /tmp partitions
+#       select Separate /home-, /usr-, /var- und /tmp-Partitionen
 
 # Oder erstellen Sie ein eigenes Rezept...
 # Das Rezept-Format ist in der Datei devel/partman-auto-recipe.txt beschrieben.
@@ -704,8 +755,8 @@ d-i time/zone string US/Eastern
 
 Die Konfiguration von <filename>/etc/apt/sources.list</filename> und
 grundlegenden Einstellungsoptionen ist voll automatisiert, basierend auf der
-Installationsmethode und Antworten auf frühere Fragen. Nur die beiden folgenden
-Variablen sind für die Voreinstellung relevant:
+Installationsmethode und Antworten auf frühere Fragen. Sie können optional
+weitere (lokale) Paket-Repositories hinzufügen.
 
 </para>
 
@@ -714,6 +765,17 @@ Variablen sind für die Voreinstellung relevant:
 # "contrib"-Zweig installieren möchten.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+# Entfernen Sie hier das Kommentarzeichen, um das Hinzufügen von Quellen
+# von Sicherheitsaktualierungen zu vermeiden oder fügen Sie einen Hostnamen
+# hinzu, um einen anderen Server als security.debian.org zu verwenden.
+#d-i apt-setup/security_host string
+
+# Zusätzliche Paketquellen (Repositories), local[0-9] verfügbar
+#d-i apt-setup/local0/comment string local server
+#d-i apt-setup/local0/repository string \
+#       deb http://local.server/debian stable main
+# URL zum öffentlichen Schlüssel des lokalen Repositories
+#d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
   </sect2>
@@ -732,7 +794,7 @@ Sie entweder Klartext-Werte oder MD5-<emphasis>Hashes</emphasis> verwenden.
 Bedenken Sie, dass die Voreinstellung von Passwörtern nicht ganz sicher
 ist, da jeder, der Zugang zur Voreinstellungsdatei hat, Kenntnis von den
 Passwörtern hat. Hier MD5-Hashes zu verwenden, wird von der
-Sicherheit betrachtet als besser angesehen, allerdings könnte dies auch
+Sicherheit her betrachtet als besser angesehen, allerdings könnte dies auch
 in falscher Sicherheit wiegen: der Zugriff auf einen MD5-Hash birgt
 die Gefahr von Brute-Force-Attacken.
 
@@ -740,22 +802,22 @@ die Gefahr von Brute-Force-Attacken.
 
 <informalexample role="example"><screen>
 # Root-Passwort, entweder als Klartext ...
-#passwd passwd/root-password password r00tme
-#passwd passwd/root-password-again password r00tme
+#d-i passwd/root-password password r00tme
+#d-i passwd/root-password-again password r00tme
 # ... oder verschlüsselt als MD5-Hash.
-#passwd passwd/root-password-crypted password [MD5 hash]
+#d-i passwd/root-password-crypted password [MD5 hash]
 
 # Erstellung eines regulären Benutzerkontos abbrechen.
-#passwd passwd/make-user boolean false
+#d-i passwd/make-user boolean false
 
 # Alternativ dazu: ein reguläres Benutzerkonto erstellen.
-#passwd passwd/user-fullname string Debian User
-#passwd passwd/username string debian
+#d-i passwd/user-fullname string Debian User
+#d-i passwd/username string debian
 # Passwort des regulären Benutzers, entweder als Klartext ...
-#passwd passwd/user-password password insecure
-#passwd passwd/user-password-again password insecure
+#d-i passwd/user-password password insecure
+#d-i passwd/user-password-again password insecure
 # ... oder verschlüsselt als MD5-Hash.
-#passwd passwd/user-password-crypted password [MD5 hash]
+#d-i passwd/user-password-crypted password [MD5 hash]
 </screen></informalexample>
 
 <para>
@@ -777,6 +839,24 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 </screen></informalexample>
 
 </para>
+  </sect2>
+
+  <sect2 id="preseed-base-installer">
+  <title>Installation des Basissystems</title>
+<para>
+
+Es gibt derzeit nicht viel, was an diesem Punkt der Installation voreingestellt
+werden kann. Die einzigen gestellten Fragen betreffen die Installation des
+Kernels.
+
+</para>
+
+<informalexample role="example"><screen>
+# Den initramfs-Generator wählen, der zur Erstellung der initrds für
+# 2.6-Kernels genutzt wird.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
+</screen></informalexample>
+
   </sect2>
 
   <sect2 id="preseed-bootloader">
@@ -805,49 +885,7 @@ d-i grub-installer/with_other_os boolean true
 
   </sect2>
 
-  <sect2 id="preseed-finish">
-  <title>Die erste Installationsstufe beenden</title>
-
-<informalexample role="example"><screen>
-# Die letzte Meldung "Installation abgeschlossen" unterdrücken.
-d-i prebaseconfig/reboot_in_progress note
-
-# Dies verhindert, dass der Installer während des Neustarts die CD
-# auswirft, was in einigen Situationen sinnvoll sein könnte.
-#d-i cdrom-detect/eject boolean false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
- <sect1 id="preseed-stage2">
- <title>Die zweite Stufe der Installation voreinstellen</title>
-
-  <sect2 id="preseed-baseconfig">
-  <title>Base-config</title>
-
-<informalexample role="example"><screen>
-# Die Einführungs-Nachricht unterdrücken.
-base-config base-config/intro note
-
-# Die abschließende Nachricht unterdrücken.
-base-config base-config/login note
-
-# Wenn ein Display-Manager installiert wurde, aber nicht direkt gestartet
-# werden soll, nachdem base-config beendet ist:
-#base-config base-config/start-display-manager boolean false
-
-# Einige Versionen des Installers können Informationen an das Debian-Projekt
-# zurück senden, welche Pakete Sie installiert haben. Standardeinstellung
-# ist, nichts zu senden, aber Informationen zu senden hilft dem Projekt
-# zu entscheiden, welche Software wie beliebt ist und ob sie auf die CDs
-# gepackt werden sollte.
-#popularity-contest popularity-contest/participate boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-tasksel">
+  <sect2 id="preseed-pkgsel">
   <title>Paketauswahl</title>
 <para>
 
@@ -858,49 +896,67 @@ Mögliche Werte zum Zeitpunkt, als dies geschrieben wurde:
 
 <itemizedlist>
 <listitem><para>
-  <userinput>Standard system</userinput>
+  <userinput>Standard system (Standard-System)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Desktop environment</userinput>
+  <userinput>Desktop environment (Arbeitsplatz-System)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Web server</userinput>
+  <userinput>Web server (Web-Server)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Print server</userinput>
+  <userinput>Print server (Druck-Server)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>DNS server</userinput>
+  <userinput>DNS server (DNS-Server)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>File server</userinput>
+  <userinput>File server (Datei-Server)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Mail server</userinput>
+  <userinput>Mail server (Mail-Server)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>SQL database</userinput>
+  <userinput>SQL database (SQL-Datenbank)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Laptop</userinput>
-</para></listitem>
-<listitem><para>
-  <userinput>manual package selection</userinput>
+  <userinput>Laptop (Laptop, tragbarer Computer)</userinput>
 </para></listitem>
 </itemizedlist>
 
 <para>
 
-Die letzte dieser Möglichkeiten startet aptitude. Sie können auch wählen,
-hier gar nichts zu installieren und die Installation von bestimmten
-Paketen auf andere Art erzwingen. Wir empfehlen, immer zumindest die
-Programmgruppe <quote>Standard system</quote> auszuwählen.
+Sie können hier auch wählen, gar nichts zu installieren und die
+Installation von bestimmten Paketen auf andere Art erzwingen. Wir empfehlen
+aber, immer zumindest die Programmgruppe <quote>Standard system</quote>
+auszuwählen.
 
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
+
+# Einige Versionen des Installers können Informationen an das Debian-Projekt
+# zurück senden, welche Pakete Sie installiert haben. Standardeinstellung
+# ist, nichts zu senden, aber Informationen zu senden hilft dem Projekt
+# zu entscheiden, welche Software wie beliebt ist und ob bzw. wo sie auf
+# die CDs gepackt werden sollte.
+#popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-finish">
+  <title>Die erste Installationsstufe beenden</title>
+
+<informalexample role="example"><screen>
+# Die letzte Meldung "Installation abgeschlossen" unterdrücken.
+d-i prebaseconfig/reboot_in_progress note
+
+# Dies verhindert, dass der Installer während des Neustarts die CD
+# auswirft, was in einigen Situationen sinnvoll sein könnte.
+#d-i cdrom-detect/eject boolean false
 </screen></informalexample>
 
   </sect2>
@@ -940,32 +996,32 @@ Konfiguration durchführen kann.
 # X kann den richtigen Treiber für einige Grafikkarten erkennen, aber wenn
 # Sie eine Voreinstellung treffen, überschreiben Sie diese Auswahl. Vesa
 # sollte aber in den meisten Fällen funktionieren.
-#xserver-xfree86 xserver-xfree86/config/device/driver select vesa
+#xserver-xorg xserver-xorg/config/device/driver select vesa
 
 # Das Problem mit der automatischen Mauserkennung ist: wenn es schief geht,
 # wird X es wieder und wieder versuchen. Wenn also automatische Erkennung
 # voreingestellt ist, besteht die Gefahr einer Endlosschleife, falls die
 # Maus nicht erkannt werden kann.
-#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
+#xserver-xorg xserver-xorg/autodetect_mouse boolean true
 
 # Die automatische Erkennung des Monitors wird empfohlen.
-xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
+xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # Entfernen Sie hier das Kommentarzeichen, wenn Sie ein LCD-Display haben.
-#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
+#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
 # Die X-Konfiguration bietet drei mögliche Wege für die Konfiguration des
 # Monitors. Dies ist die Voreinstellung für "medium", was immer verfügbar ist.
 # Der einfache Weg ("simple") ist nicht immer verfügbar und "advanced"
 # (erweitert) stellt zu viele Fragen.
-xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
+xserver-xorg xserver-xorg/config/monitor/selection-method \
        select medium
-xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
+xserver-xorg xserver-xorg/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
 
   </sect2>
 
   <sect2 id="preseed-other">
-  <title>Andere Dinge voreinstellen</title>
+  <title>Andere Pakete voreinstellen</title>
 
 <informalexample role="example"><screen>
 # Abhängig davon, welche Software Sie zur Installation auswählen oder ob
@@ -1002,18 +1058,11 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 
 # Dieses Kommando wird ausgeführt, kurz bevor der Installer fertig ist, wenn
 # aber noch ein nutzbares /target-Verzeichnis verfügbar ist.
-#d-i preseed/late_command string echo foo > /target/etc/bar
-
-# Dieser Befehl wird ausgeführt, wenn base-config startet.
-#base-config base-config/early_command string echo hi mom
-
-# Dieses Kommando wird ausgeführt, wenn base-config fertig ist, direkt vor dem
-# Login:-Prompt. An dieser Stelle wäre eine gute Möglichkeit, einen Satz
-# Pakete zu installieren, die Sie haben möchten, oder die Konfiguration des
-# Systems zu optimieren.
-#base-config base-config/late_command \
-#      string apt-get install zsh; chsh -s /bin/zsh
-</screen></informalexample>
+# Sie können nach /target »chroot«-en und es direkt benutzen, oder benutzen
+# Sie apt-install und in-target-Kommandos, um einfach Pakete zu installieren
+# oder Kommandos im Zielsystem auszuführen.
+#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
+ </screen></informalexample>
 
   </sect2>
 

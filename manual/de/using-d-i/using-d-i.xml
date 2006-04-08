@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 33819 -->
 
  <chapter id="d-i-intro"><title>Den Debian-Installer verwenden</title>
 
@@ -86,20 +86,22 @@ werden.
 
 </para><para>
 
-Fehlermeldungen werden auf die dritte Konsole umgeleitet. Sie können durch Drücken von
-<keycombo><keycap>Alt</keycap><keycap>F3</keycap></keycombo> auf diese
-Konsole wechseln (halten Sie die linke <keycap>Alt</keycap>-Taste gedrückt, während Sie die
-Funktionstaste <keycap>F3</keycap> drücken); zurück zum Installer-Hauptprogramm gelangen Sie mit
+Fehlermeldungen und Logdaten werden auf die vierte Konsole umgeleitet.
+Sie können durch Drücken von
+<keycombo><keycap>Alt</keycap><keycap>F4</keycap></keycombo> auf diese
+Konsole wechseln (halten Sie die linke <keycap>Alt</keycap>-Taste gedrückt,
+während Sie die Funktionstaste <keycap>F4</keycap> drücken); zurück zum
+Installer-Hauptprogramm gelangen Sie mit
 <keycombo><keycap>Alt</keycap><keycap>F1</keycap></keycombo>.
 
 </para><para>
 
-Diese Meldungen finden Sie auch unter <filename>/var/log/messages</filename>.
+Diese Meldungen finden Sie auch unter <filename>/var/log/syslog</filename>.
 Nach der Installation wird diese Datei nach
-<filename>/var/log/debian-installer/messages</filename> auf dem neuen System
+<filename>/var/log/installer/syslog</filename> auf dem neuen System
 kopiert. Weitere Installationsmeldungen können während der Installation unter
 <filename>/var/log/</filename> und nach dem Start des neuen Systems unter
-<filename>/var/log/debian-installer/</filename> gefunden werden.
+<filename>/var/log/debian/</filename> gefunden werden.
 
 </para>
  </sect1>
@@ -137,29 +139,9 @@ drücken, um die derzeit laufende Komponente abzubrechen.
 
 </para></listitem>
 </varlistentry>
-<varlistentry condition="sarge">
+<varlistentry>
 
-<term>languagechooser (Sprachauswahl)</term><listitem><para>
-
-Zeigt eine Liste der Sprachen und Sprachvariationen. Der Installer zeigt
-die Meldungen in der ausgewählten Sprache an, es sei denn die Übersetzung
-für diese Sprache ist nicht komplett. Ist dies der Fall, so werden die
-Meldungen auf Englisch angezeigt.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="sarge">
-
-<term>countrychooser (Landesauswahl)</term><listitem><para>
-
-Zeigt eine Liste der Länder. Der Benutzer kann hier das Land auswählen, in
-dem er lebt.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="etch">
-
-<term>localechooser (Lokalisierunsauswahl)</term><listitem><para>
+<term>localechooser (Lokalisierungsauswahl)</term><listitem><para>
 
 Erlaubt dem Benutzer, Lokalisierungs-Optionen für die Installation und
 das zu installierende System auszuwählen: Sprache, Land und Locale-Code. Der
@@ -311,10 +293,55 @@ neueren Motherboards finden, für gewöhnlich überlegen.
 </varlistentry>
 <varlistentry>
 
+<term>tzsetup (Zeitzone einrichten)</term><listitem><para>
+
+Hier können Sie die Zeitzone auswählen, basierend auf dem Wohnort,
+den Sie bereits früher angegeben haben.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>clock-setup (Uhr konfigurieren)</term><listitem><para>
+
+Legt fest, ob die Uhr auf UTC (Universal Coordinated Time,
+koordinierte Weltzeit) eingestellt wird oder nicht.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>user-setup (Benutzer einrichten)</term><listitem><para>
+
+Legt das root-Passwort fest und fügt dem System einen normale Benutzer
+hinzu.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
 <term>base-installer (Basispakete installieren)</term><listitem><para>
 
 Installiert die wichtigsten Pakete, die dem Computer nach dem
 Neustart den Betrieb unter Linux ermöglichen.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>apt-setup (apt konfigurieren)</term><listitem><para>
+
+Konfiguriert überwiegend automatisch apt, basierend darauf, von welchem
+Medium der Installer läuft.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>pkgsel (Paketauswahl)</term><listitem><para>
+
+Benutzt <classname>tasksel</classname>, um Auswahl und Installation
+zusätzlicher Software zu ermöglichen.
 
 </para></listitem>
 </varlistentry>
@@ -334,20 +361,12 @@ Booten auswählen, welches Betriebssystem gestartet werden soll.
 
 <term>bootloader-installer (Installation des Bootloaders)</term><listitem><para>
 
-Installiert ein Bootloader-Programm auf der Festplatte, welches zum
-Starten des Computers ohne Verwendung einer Diskette oder CD-ROM
-notwendig ist. Viele Bootloader erlauben dem Benutzer die Auswahl eines
-alternativen Betriebssystems bei jedem Start des Computers.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>baseconfig (Konfiguration des Basissystems)</term><listitem><para>
-
-Bietet Dialoge zum Einrichten der Basissystem-Pakete entsprechend
-den Benutzer-Eingaben. Dies wird normalerweise nach dem Neustart
-des Computers durchgeführt, wenn das neue Debian-System das erste Mal läuft.
+Die verschiedenen Bootloader-Installer (diese unterscheiden sich
+architekturabhängig geringfügig) installieren alle ein Bootloader-Programm
+auf der Festplatte, welches zum Starten des Computers ohne Verwendung
+einer Diskette oder CD-ROM notwendig ist. Viele Bootloader erlauben
+dem Benutzer die Auswahl eines alternativen Betriebssystems bei jedem
+Start des Computers.
 
 </para></listitem>
 </varlistentry>
@@ -362,13 +381,11 @@ zweiten Konsole.
 </varlistentry>
 <varlistentry>
 
-<term condition="sarge">bugreporter (Probleme melden)</term><term
-condition="etch">save-logs (Logdateien sichern)</term><listitem><para>
+<term>save-logs (Logdateien sichern)</term><listitem><para>
 
-Bietet dem Benutzer die Möglichkeit, bei Problemen
-Informationen auf einer Diskette<phrase condition="etch">, über Netzwerk
-auf einem entfernten Laufwerk, auf Festplatte oder auf einem anderen
-Medium</phrase> abzuspeichern, um den Debian-Entwicklern später
+Bietet dem Benutzer die Möglichkeit, bei Problemen Informationen auf
+einer Diskette, über Netzwerk auf einem entfernten Laufwerk, auf Festplatte
+oder auf einem anderen Medium abzuspeichern, um den Debian-Entwicklern später
 präzise von Probleme mit der Installer-Software berichten zu können.
 
 </para></listitem>

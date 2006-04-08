@@ -1,49 +1,47 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 35328 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Booten per TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <sect3 arch="arm"><title>Booten von NetWinder-Maschinen per TFTP</title>
+   <sect3 arch="arm"><title>Booten von Netwinder-Maschinen per TFTP</title>
 
 <para>
 
-NetWinder-Maschinen haben zwei Netzwerkschnittstellen: die
-10Mbps NE2000-kompatible Karte ist <filename>eth0</filename> und die
-100Mbps Tulip-Karte ist <filename>eth1</filename>.
+Netwinder-Maschinen haben zwei Netzwerkschnittstellen: eine
+10Mbps NE2000-kompatible Karte (auf die allgemein mittels <literal>eth0</literal>
+verwiesen wird) und eine 100Mbps Tulip-Karte. Es könnte Probleme geben, das
+Image via TFTP über die 100Mbps-Karte zu laden, deshalb wird empfohlen, die
+10Mbps-Schnittstelle zu benutzen (diejenige, die mit <literal>10 Base-T</literal>
+beschriftet ist).
 
-</para><note><para>
+</para>
+<note><para>
 
-Sie benötigen NeTTrom 2.2.1 oder höher, um das Installationssystem zu booten.
-Empfohlen wird NeTTrom 2.3.3: laden Sie folgende Dateien von
-<ulink url="ftp://ftp.netwinder.org/pub/netwinder/firmware/"></ulink>
-herunter:
-<itemizedlist>
-<listitem><para>
+Sie benötigen NeTTrom 2.2.1 oder höher, um das Installationssystem zu booten;
+empfohlen wird NeTTrom 2.3.3. Unglücklicherweise sind Firmware-Dateien derzeit
+aufgrund von Lizenzproblemen nicht zum Download verfügbar. Wenn sich diese
+Situation wieder ändert, findet Sie unter Umständen neue Images auf
+<ulink url="http//www.netwinder.org/"></ulink>.
 
-<filename>nettrom-2.3-3.armv4l.rpm</filename>
+</para></note>
+<para>
 
-</para></listitem>
-<listitem><para>
-
-<filename>nettrom-2.3.3.bin</filename>
-
-</para></listitem>
-<listitem><para>
-
-<filename>nettrom-2.3.3.bin.md5sum</filename>
-
-</para></listitem>
-</itemizedlist>
-
-</para></note><para>
-
-Nach einem Rechnerneustart und Unterbrechen des Bootvorgangs während des
-Countdowns müssen Sie zunächst Ihr Netzwerk konfigurieren, und zwar entweder
-mit einer statischen IP-Adresse:
+Wenn Sie Ihren Netwinder starten, müssen Sie den Bootprozess während des
+Countdowns unterbrechen. Dann ist es Ihnen möglich, einige Firmware-Einstellungen
+zu setzen, die zum Booten des Installers nötig sind. Starten Sie als erstes mit
+dem Laden der Standardeinstellungen:
 
 <informalexample><screen>
+    NeTTrom command-&gt; load-defaults
+</screen></informalexample>
+
+Des weiteren müssen Sie Ihr Netzwerk konfigurieren, entweder mit einer statischen
+Adresse ...
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv netconfig_eth0 flash
     NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
 </screen></informalexample>
 
@@ -51,46 +49,60 @@ mit einer statischen IP-Adresse:
 dynamischen IP-Adresse:
 
 <informalexample><screen>
-    NeTTrom command-&gt; boot diskless
+    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
 </screen></informalexample>
 
 Unter Umständen müssen Sie noch die <userinput>route1</userinput>-Einstellungen
 ändern, falls sich der TFTP-Server nicht im lokalen Subnetz befindet.
-Der Rest der Konfiguration ist im Prinzip Standard (der <quote>save-all</quote>-Schritt ist
-optional):
+
+Dieser Anleitung folgend, müssen Sie den TFTP-Server angeben und den
+Ort/den Namen des Images. Dann können Sie Ihre Einstellungen ins Flash
+speichern.
+
 <informalexample><screen>
     NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
     NeTTrom command-&gt; setenv kerntftpfile boot.img
     NeTTrom command-&gt; save-all
+</screen></informalexample>
+
+Jetzt müssen Sie der Firmware sagen, dass das FTFP-Image gebootet werden soll:
+
+<informalexample><screen>
     NeTTrom command-&gt; setenv netconfig_eth0 flash
     NeTTrom command-&gt; setenv kernconfig tftp
     NeTTrom command-&gt; setenv rootdev /dev/ram
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
 </screen></informalexample>
 
-Die letzten vier Schritte könnten sich störend auf einen normalen
-Bootvorgang von Festplatte auswirken; deshalb ist es sicher, vorher den
-<command>save-all</command>-Befehl auszuführen. Die Netzwerkeinstellungen
-werden hierdurch gespeichert für den Fall, dass Sie noch einmal per Netzwerk
-booten müssen.
-
-Wenn Sie die serielle Konsole benutzen möchten, um Debian auf Ihrer NetWinder-Maschine
-zu installieren, benötigen Sie noch die folgende Einstellung:
+Wenn Sie eine serielle Konsole benutzen, um Ihren Netwinder zu installieren,
+benötigen Sie noch die folgende Einstellung:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
 </screen></informalexample>
 
+Wollen Sie alternativ dazu per Tastatur und Monitor installieren, müssen
+Sie einstellen:
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
+</screen></informalexample>
+
 Mit dem <command>printenv</command>-Kommando können Sie Ihre
-Einstellungen zur Kontrolle noch einmal überprüfen. Zu guter Letzt: falls
-bei Ihnen für die NeTTrom-Variable <envar>cmdappend</envar> die Option
-<option>noinitrd</option> gesetzt ist, müssen Sie sie entfernen, damit der
-heruntergeladene Kernel mit der zugehörigen RAM-Disk starten kann.
+Einstellungen zur Kontrolle noch einmal überprüfen. Wenn Sie sich vergewissert
+haben, dass sie richtig sind, können Sie das Image laden:
+
+<informalexample><screen>
+    NeTTrom command-&gt; boot
+</screen></informalexample>
+
+Falls Sie auf Probleme stoßen: es gibt ein <ulink
+url="http://www.netwinder.org/howto/Firmware-HOWTO.html">detailliertes
+HowTo</ulink>.
 
 </para>
-  </sect3>
+   </sect3>
 
-  <sect3 arch="arm"><title>Booten von CATS-Maschinen per TFTP</title>
+   <sect3 arch="arm"><title>Booten von CATS-Maschinen per TFTP</title>
 
 <para>
 
@@ -100,7 +112,6 @@ oder ähnliches am Cyclone-Prompt.
 </para>
    </sect3>
   </sect2>
-
 
 
   <sect2 arch="arm"><title>Booten von CD-ROM</title>
@@ -113,4 +124,107 @@ Um eine CD-ROM vom Cyclone-Konsolen-Prompt aus zu booten, benutzen Sie
 <command>boot cd0:cats.bin</command>.
 
 </para>
+  </sect2>
+
+
+  <sect2 arch="arm" id="boot-firmware"><title>Booten von Firmware</title>
+
+&boot-installer-intro-firmware.xml;
+
+   <sect3 arch="arm" id="boot-firmware-nslu2"><title>Den NSLU2 booten</title>
+<para>
+
+Es gibt drei Wege, die Installer-Firmware in das Flash zu bekommen:
+
+</para>
+
+    <sect4 arch="arm"><title>Das Webinterface des NSLU2 benutzen</title>
+<para>
+
+Gehen Sie zum Abschnitt <literal>Administration</literal> und wählen Sie
+den Menüpunkt <literal>Upgrade</literal>. Sie können dann auf Ihrer Festplatte
+das Firmware-Image suchen, das Sie vorher heruntergeladen haben. Drücken Sie
+dann <literal>Start Upgrade</literal>, bestätigen Sie die Nachfrage, warten
+Sie ein paar Minuten und bestätigen Sie erneut. Das System wird dann direkt
+den Installer booten.
+
+</para>
+    </sect4>
+
+    <sect4 arch="arm"><title>Via Netzwerk mit Linux/Unix</title>
+<para>
+
+Sie können <command>upslug2</command> von jeder Linux- oder Unix-Maschine
+aus benutzen, um den NSLU2 via Netzwerk zu aktualisieren. Diese Software ist
+auch als Debian-Paket verfügbar.
+
+Als erstes müssen Sie Ihren NSLU2 in den Upgrade-Modus bringen:
+
+<orderedlist>
+<listitem><para>
+
+Entfernen Sie alle Festplatten und/oder anderen Geräte von den USB-Ports.
+
+</para></listitem>
+<listitem><para>
+
+Schalten Sie den NSLU2 aus.
+
+</para></listitem>
+<listitem><para>
+
+Drücken und halten Sie den Reset-Knopf (Sie erreichen Ihn durch das kleine
+Loch auf der Rückseite direkt über der Buchse für die Versorgungsspannung).
+
+</para></listitem>
+<listitem><para>
+Drücken Sie den Power-Knopf des NSLU2 und lassen Sie ihn wieder los, um
+das Gerät einzuschalten.
+
+</para></listitem>
+<listitem><para>
+
+Warten Sie 10 Sekunden und beobachten Sie dabei die Ready/Status-LED.
+Nach 10 Sekunden wechselt sie von beige nach rot. Lassen Sie dann den
+Reset-Knopf los.
+
+</para></listitem>
+<listitem><para>
+
+Die Ready/Status-LED des NSLU2 wird abwechselnd rot und grün blinken (es gibt
+eine kleine Verzögerung von einer Sekunde vor dem ersten Aufleuchten).
+Der NSLU2 befindet sich jetzt im Upgrade-Modus.
+
+</para></listitem>
+</orderedlist>
+
+Falls Sie Probleme hiermit haben sollten, besuchen Sie die <ulink
+url="http://www.nslu2-linux.org/wiki/OpenSlug/UsingTheBinary">NSLU2-Linux-Seiten</ulink>.
+
+Sobald Ihr NSLU2 sich im Upgrade-Modus befindet, können Sie das neue
+Image ins Flash übertragen:
+
+<informalexample><screen>
+sudo upslug2 -i di-nslu2.bin
+</screen></informalexample>
+
+Beachten Sie, dass das Programm auch die MAC-Adresse Ihres NSLU2 anzeigt,
+welche nützlich sein könnte, um Ihren DHCP-Server zu konfigurieren. Nachdem
+das komplette Image übertragen und nochmals überprüft wurde, wird das System
+automatisch neu starten. Schließen Sie jetzt unbedingt Ihre USB-Festplatte
+wieder an, ansonsten kann der Installer sie nicht finden.
+
+</para>
+    </sect4>
+
+    <sect4 arch="arm"><title>Via Netzwerk mit Windows</title>
+<para>
+
+Es gibt <ulink
+url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zip">ein
+Hilfsprogramm</ulink> für Windows, um die Firmware über das Netzwerk zu aktualisieren.
+
+</para>
+    </sect4>
+   </sect3>
   </sect2>

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31616 -->
+<!-- original version: 33886 -->
 
   <sect2 arch="i386"><title>Von einer CD-ROM starten</title>
 
@@ -11,7 +11,7 @@
 <!-- 
 CD #1 of official Debian CD-ROM sets for &arch-title; will present a
 <prompt>boot:</prompt> prompt on most hardware. Press
-<keycap>F3</keycap> to see the list of kernel options available
+<keycap>F4</keycap> to see the list of kernel options available
 from which to boot. Just type your chosen flavor name (idepci,
 vanilla, compact, bf24) at the <prompt>boot:</prompt> prompt
 followed by &enterkey;.
@@ -164,7 +164,7 @@ image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
        root=/dev/ram0
-       append="<phrase condition="sarge">devfs=mount,dall </phrase>ramdisk_size=12000"
+       append="ramdisk_size=12000"
 </screen></informalexample>
 
 Mehr Details finden Sie in den Handbuchseiten von
@@ -188,9 +188,6 @@ initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
 Starten Sie danach den Rechner neu.
-<phrase condition="sarge">Falls der Systemstart fehlschlägt, können
-Sie versuchen, <userinput>devfs=mount,dall</userinput> zu der
-<quote>kernel</quote>-Zeile hinzuzufügen.</phrase>
 
 </para><para>
 
@@ -202,7 +199,7 @@ und <command>lilo</command>.
 </para>
   </sect2>
 
-  <sect2 arch="i386" id="usb-boot">
+  <sect2 arch="i386" condition="bootable-usb" id="usb-boot">
   <title>Von einem USB-Memory-Stick booten</title>
 <para>
 Wir nehmen an, Sie haben alles wie unter
@@ -212,7 +209,7 @@ Steckplatz und starten den Rechner neu. Das System sollte booten und den
 <prompt>boot:</prompt>-Prompt anzeigen. Sie können hier zusätzliche
 Boot-Parameter eintippen oder einfach &enterkey; drücken.
 
-</para><para>
+</para><para condition="supports-floppy-boot">
 
 Für den Fall, dass Ihr Rechner das Booten von einem USB-Speicher nicht
 unterstützt, können Sie eine einfache Floppy-Disk für den eigentlichen
@@ -225,7 +222,7 @@ Sie sollten jetzt sehen, wie der &d-i; startet.
 </para>
   </sect2>
 
-  <sect2 arch="i386" id="floppy-boot">
+  <sect2 arch="i386" condition="supports-floppy-boot" id="floppy-boot">
   <title>Von Floppy-Disketten booten</title>
 <para>
 
@@ -352,8 +349,7 @@ sowie optionale Bootparameter.
 
 Informationen zu verfügbaren Bootmethoden und Bootparametern, die für
 Sie nützlich sein könnten, bekommen Sie, indem Sie die Tasten <keycap>F2</keycap>
-bis <phrase condition="sarge"><keycap>F7</keycap></phrase><phrase
-condition="etch"><keycap>F8</keycap></phrase> drücken. Sollten Sie irgendwelche
+bis <keycap>F8</keycap> drücken. Sollten Sie irgendwelche
 Parameter am Boot-Prompt eingeben, denken Sie daran, die Bootmethode
 (Standard hierfür ist <userinput>linux</userinput>) sowie ein nachfolgendes
 Leerzeichen vor den ersten Parameter zu stellen (z.B.
