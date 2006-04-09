@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 35982 -->
+<!-- original version: 36205 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -345,7 +345,7 @@ fichier dhcpd.conf appartenant à la version 3 du serveur ISC DHCP
 
 <informalexample><screen>
 if substring (option vendor-class-identifier, 0, 3) = "d-i" {
-	filename "http://host/preseed.cfg";
+    filename "http://host/preseed.cfg";
 }
 </screen></informalexample>
 
@@ -397,7 +397,7 @@ commandes et 32 variables d'environnement.
 <para>
 
 On peut sans risque supprimer certaines options par défaut, comme 
-'vga=normal'. Cela permet de rajouter autant d'options
+<literal>vga=normal</literal>. Cela permet de rajouter autant d'options
 pour la préconfiguration.
 
 </para>
@@ -410,46 +410,96 @@ dans les paramètres d'amorçage, même encadrés par des guillemets.
   </sect2>
  </sect1>
 
- <sect1 condition="FIXME" id="preseed-creating">
+ <sect1 id="preseed-creating">
  <title>Créer un fichier de préconfiguration</title>
 <para>
 
 Le format de ce fichier est celui de la commande 
-<command>debconf-set-selections</command>.
+<command>debconf-set-selections</command>. Chaque ligne est de la forme suivante&nbsp;:
 
-</para>
+<informalexample><screen>
+&lt;propriétaire&gt; &lt;nom&gt; &lt;type&gt; &lt;valeur&gt;
+</screen></informalexample>
+
+</para><para>
+
+Voici quelques règles pour écrire un fichier de préconfiguration.
 
 <itemizedlist>
 <listitem><para>
-  Format du fichier
+  Un seul espace (ou tabulation) autorisé entre le type et la valeur.
+  Tout autre espace sera considéré comme appartenant à la valeur.
 </para></listitem>
 <listitem><para>
-  Un seul espace autorisé entre le type de la question et la valeur
+  Une ligne peut être divisée an ajoutant une barre oblique inverse
+  (<quote><literal>\</literal></quote>) pour signifier la continuation de la ligne.
+  Il vaut mieux couper la ligne après le nom. Ce n'est pas très heureux de la couper
+  entre le type et la valeur.
 </para></listitem>
 <listitem><para>
-  Relation avec /var/lib/(c)debconf/templates
+  La plupart des valeurs doivent être en anglais et non pas en français. Mais il existe
+  des valeurs, dans <classname>partman</classname> par exemple, qui doivent être données
+  en français.
 </para></listitem>
 <listitem><para>
-  Types des questions et manière de leur donner une valeur
-</para></listitem>
-<listitem><para>
-  La plupart des valeurs doivent être en anglais
-</para></listitem>
-<listitem><para>
-  Se servir d'une installation normalement effectuée
-</para></listitem>
-<listitem><para>
-  Trouver d'autres valeurs possibles
+  Certaines valeurs recoivent du code comme valeur au lieu du texte anglais qui
+  est affiché pendant l'installation.
 </para></listitem>
 </itemizedlist>
+</para>
+<para>
+
+Pour créer le fichier de préconfiguration, la méthode la plus facile est
+de travailler à partir du fichier d'exemple dans <xref linkend="preseed-contents"/>.
+</para>
+<para>
+
+Une autre méthode est de faire une installation puis, après le redémarrage,
+d'utiliser la commande <command>debconf-get-selections</command> du paquet
+<classname>debconf-utils</classname> pour copier la base de données debconf et
+la base de données cdebconf de l'installateur dans un fichier&nbsp;:
+
+<informalexample><screen>
+$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>
+$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>
+</screen></informalexample>
+
+</para>
+<para>
+
+Cependant ce fichier contiendra des éléments qui ne peuvent pas être
+préconfigurés et il vaut mieux utiliser le fichier d'exemple.
+</para>
+
+<note><para>
+
+Cette méthode est fondée sur le fait qu'à la fin de l'installation la base
+de données cdebconf de l'installateur est sauvegardée dans le fichier
+<filename>/var/log/installer/cdebconf</filename>. Mais cette base peut contenir des
+données sensibles et par défaut elle n'est lisible que par le superutilisateur.
+</para>
+</note>
+
+<para>
+Le répertoire <filename>/var/log/installer</filename> et tous ses fichiers sera détruit
+si vous <quote>purgez</quote> le paquet <classname>installation-report</classname>.
+</para>
 
 <para>
 
-Pour vérifier le format de votre fichier de préconfiguration avant de
-commencer une installation, vous pouvez utiliser la commande 
-<command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>.
-
+Pour examiner les valeurs données aux variables, on peut utiliser <command>nano</command>
+et consulter les fichiers dans <filename>/var/lib/cdebconf</filename> pendant l'installation.
+Regardez <filename>templates.dat</filename> pour les variables et
+<filename>questions.dat</filename> pour les valeurs actuelles et les valeurs affectées
+aux variables.
 </para>
+
+<para>
+Pour vérifier que votre fichier de préconfiguration est correct avant de faire une
+installation, vous pouvez utiliser la commande
+<command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>.
+</para>
+
  </sect1>
 
  <sect1 id="preseed-contents">
@@ -647,7 +697,7 @@ sera choisi avant de préconfigurer son partitionnement.
 # espace.
 # Note : la valeur du choix doit être traduit.
 #d-i partman-auto/init_automatically_partition	\
-#    select Use the largest continuous free space
+#    select Utiliser le plus grand espace disponible
 
 
 # Vous pouvez aussi choisir un disque entier. Le format de son nom peut être
@@ -762,20 +812,22 @@ car un accès au hachage MD5 permet les attaques en force.
 </para></warning>
 
 <informalexample role="example"><screen>
+# Ne pas créer de compte root (le simple utilisateur utilisera sudo).
+#d-i passwd/root-login boolean false
+# On peut aussi ne pas créer de compte d'utilisateur.
+#d-i passwd/make-user boolean false
+
 #Le mot de passe de root en clair...
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
 # ... ou chiffré avec un hachage MD5
 #d-i passwd/root-password-crypted password [MD5 hash]
 
-# Si vous voulez ne pas créer d'utilisateur :
-#d-i passwd/make-user boolean false
 
 # Vous pouvez aussi présélectionner le nom de l'utilisateur et son identifiant
 # de connexion
 #d-i passwd/user-fullname string Debian User
 #d-i passwd/username string debian
-
 # Mot de passe de l'utilisateur en clair...
 #d-i passwd/user-password password insecure
 #d-i passwd/user-password-again password insecure
@@ -790,7 +842,7 @@ Les variables <classname>passwd/root-password-crypted</classname> et
 préconfigurées avec la valeur <quote>!</quote>. Dans ce cas, l'identifiant
 correspondant est désactivé. Cette méthode convient pour le compte root. Mais
 il faut pouvoir autoriser la gestion administrative ou la connexion de root d'une
-autre manière, par exemple authentification avec clé SSH, ou sudo.
+autre manière, par exemple authentification avec clé SSH, ou <command>sudo</command>.
 
 </para>
 <para>
