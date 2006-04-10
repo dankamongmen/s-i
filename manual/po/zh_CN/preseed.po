@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
 "POT-Creation-Date: 2006-04-08 15:02+0000\n"
-"PO-Revision-Date: 2006-02-24 10:30+0800\n"
+"PO-Revision-Date: 2006-04-10 18:49+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1080,19 +1080,17 @@ msgstr "设置 apt"
 
 #. Tag: para
 #: preseed.xml:575
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
 "configuration options is fully automated based on your installation method "
 "and answers to earlier questions. You can optionally add other (local) "
 "repositories."
-msgstr ""
-"设置 <filename>/etc/apt/sources.list</filename> 和其他的基本设置将自动基于您"
-"使用的安装方式和前面回答的问题。只有下面三个变量与预置有关。"
+msgstr "设置 <filename>/etc/apt/sources.list</filename> 和其他的基本配置选项，将自动地基于您使用的安装方式以及前面问题的回答。您也可以选择性地安装其他(或本地)的仓库。"
 
 #. Tag: screen
 #: preseed.xml:583
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
@@ -1111,9 +1109,16 @@ msgstr ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
 "#d-i apt-setup/contrib boolean true\n"
-"# To avoid adding security sources, or to use a different server\n"
-"# than security.debian.org.\n"
-"#d-i apt-setup/security_host string"
+"# Uncomment this to avoid adding security sources, or\n"
+"# add a hostname to use a different server than security.debian.org.\n"
+"#d-i apt-setup/security_host string\n"
+"\n"
+"# Additional repositories, local[0-9] available\n"
+"#d-i apt-setup/local0/comment string local server\n"
+"#d-i apt-setup/local0/repository string \\\n"
+"#       deb http://local.server/debian stable main\n"
+"# URL to the public key of the local repository\n"
+"#d-i apt-setup/local0/key string http://local.server/key"
 
 #. Tag: title
 #: preseed.xml:588
@@ -1147,7 +1152,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:606
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
 "# use sudo).\n"
@@ -1170,16 +1175,19 @@ msgid ""
 "# or encrypted using an MD5 hash.\n"
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 msgstr ""
+"# Skip creation of a root account (normal user account will be able to\n"
+"# use sudo).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Alternatively, to skip creation of a normal user account.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
 "# Root password, either in clear text\n"
 "#d-i passwd/root-password password r00tme\n"
 "#d-i passwd/root-password-again password r00tme\n"
 "# or encrypted using an MD5 hash.\n"
 "#d-i passwd/root-password-crypted password [MD5 hash]\n"
 "\n"
-"# Skip creation of a normal user account.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Alternatively, create a normal user account.\n"
+"# To create a normal user account.\n"
 "#d-i passwd/user-fullname string Debian User\n"
 "#d-i passwd/username string debian\n"
 "# Normal user's password, either in clear text\n"
