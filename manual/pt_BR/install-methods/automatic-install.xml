@@ -1,6 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 32424 -->
+<!-- original version: 33725 -->
 <!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
+<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.04.10 -->
 
  <sect1 id="automatic-install">
 
@@ -27,81 +28,11 @@ através de arquivos de pré-configuração. Um arquivo de pré-configuração
 pode ser carregado através da rede ou de uma mídia removível e usado para
 responder as questões feitas durante o processo de instalação.
 
-</para><para condition="etch">
+</para><para>
 
 Documentação completa sobre <quote>preseeding</quote>, incluindo um exemplo
 funcional que você pode editar, está localizado em
 <xref linkend="appendix-preseed"/>.
-
-</para><para condition="sarge">
-
-A maioria das caixas de diálogo usadas pelo &d-i; podem ser preenchidas 
-usando este método, existem algumas excessões que deve notar. Você poderá
-(re)particionar todo um disco ou usar seu espaço livre disponível; mas não é
-poss[ivel usar partições existentes. Você não poderá usar o preenchimento
-automático para configurar um RAID ou LVM. 
-Também, com a excessão dos módulos de controladores de dispositivos, não é 
-possível pré-configurar os parâmetros de módulos do kernel.
-
-</para><para condition="sarge">
-
-O arquivo de pré-configuração usa o mesmo formato utilizado
-pelo comando <command>debconf-set-selections</command>. 
-Um exemplo funcional e bem documentado que você pode editar está 
-localizado em <xref linkend="example-preseed"/>.
-
-</para><para condition="sarge">
-
-Alternativamente, um método de se obter um arquivo completo listando
-os valores que podem ser preenchidos é fazer a instalação manual e então usar o 
-<filename>debconf-get-selections</filename> que vem com o pacote 
-<classname>debconf-utils</classname> para fazer o dump da base de dados
-do debconf e do cdebconf que estão em /var/log/debian-installer/cdebconf 
-para um arquivo simples:
-
-<informalexample><screen>
-$ debconf-get-selections --installer &gt; <replaceable>arquivo</replaceable>
-$ debconf-get-selections &gt;&gt; <replaceable>arquivo</replaceable>
-</screen></informalexample>
-
-No entanto, um arquivo gerado desta forma tem alguns ítens que não podem ser 
-preenchidos e o arquivo em <xref linkend="example-preseed"/> será um melhor 
-ponto de partida para a maioria dos usuários.
-
-</para><para condition="sarge">
-
-Assim que tiver um arquivo de pré-configuração, você pode edita-lo se 
-necessário e coloca-lo em um servidor web ou copia-lo para uma mídia
-de inicialização do programa de instalação. Onde quer que coloque o 
-arquivo, você precisará passar um parâmetro para o programa de instalação
-no momento da inicialização dizendo para usar aquele arquivo.
-
-</para><para condition="sarge">
-
-Para fazer o programa de instalação utilizar o arquivo de pré-configuração
-copiado através da rede, passe o parâmetro
-<emphasis>preseed/url=http://url/para/preseed.cfg</emphasis> para o kernel.
-É claro que a pré-configuração não terá efeito até que o programa de instalação
-configure a rede para baixar o arquivo, desta forma isto é mais útil caso
-o programa de instalação pode configurar a rede através do DHCP sem perguntar
-qualquer questão. Você pode desejar ajustar a prioridade da instalação para
-crítica para evitar qualquer questão durante a configuração da rede. Veja
-<xref linkend="installer-args"/>.
-
-</para><para condition="sarge">
-
-Para colocar um arquivo de pré-configuração em um CD, você precisará 
-regravar a imagem ISO após incluir seu arquivo de pré-configuração. Veja
-a página de manual do mkisofs para deatlhes. Alternativamente, coloque o 
-arquivo que contém as pré-configurações em um disquete e 
-passe o argumento use preseed/file=/floppy/preseed.cfg para o kernel.
-
-</para><para arch="i386" condition="sarge">
-
-Se estiver inicializando através de um memory stick USB, simplesmente copie
-seu arquivo de pré-configuração para o sistema de arquivos da memory stick 
-e edite o arquivo syslinux.cfg adicionando preseed/file=/hd-media/preseed.cfg 
-como parâmetro de inicialização do kernel.
 
 </para>
   </sect2>
