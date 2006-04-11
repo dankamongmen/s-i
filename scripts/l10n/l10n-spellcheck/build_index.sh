@@ -45,10 +45,10 @@ i=0
 TOTAL=0
 AVERAGE=0
 UNIQUE_CODEPOINTS=0
-for VAL in `cat ${STATS} | sort -n | awk '{print $1}'`; do
+for VAL in `sort -n ${STATS} | awk '{print $1}'`; do
     if [ ${VAL} -ne -1 ] ; then
 	TOTAL=`expr ${TOTAL} + ${VAL}`
-	i=`expr $i + 1`
+	i=$((i+1))
     fi
 done
 
@@ -82,7 +82,7 @@ echo " </tr>"
 
 # fill the table:
 # Lang, Unkn words, Msg, List of unknown words, Susp vars, Custom wl, codepoints, All Files
-for ROW in `cat ${STATS} | sed  "s: :,:g"`; do
+for ROW in `sed  "s: :,:g" ${STATS}`; do
     LANG=`echo ${ROW} | awk -F, '{print $2}'`
     UNKN=`echo ${ROW} | awk -F, '{print $1}'`
     CODEPOINTS=`echo ${ROW} | awk -F, '{print $4}'`
@@ -112,6 +112,7 @@ fi
 echo "  <tr>"
 echo "   <td class=\"col1\">${ISO_CODE} [${LANG}]</td>"
 
+# Number of unknown words
 if [ ${UNKN} -eq -1 ] ; then
     echo "   <td>-</td>"
 else
@@ -126,7 +127,8 @@ fi
 
 echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a>${DIFF}</td>"
 
-if [ ${UNKN} -eq -1 ] ; then
+# List of unknown words
+if [ ${UNKN} -eq -1 ] || [ ${UNKN} -eq 0 ] ; then
     echo "   <td>-</td>"
 else
 
@@ -151,7 +153,13 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 fi
 
 echo "   <td><a href=\"${WORDLIST}\">${WORDLIST_NAME}</a></td>"
-echo "   <td><a href=\"latest/nozip/${LANG}_codes.txt\">${CODEPOINTS}</a></td>"
+
+if [ ${CODEPOINTS} -eq 0 ] ; then
+    echo "   <td>-</td>"
+else
+    echo "   <td><a href=\"latest/nozip/${LANG}_codes.txt\">${CODEPOINTS}</a></td>"
+fi
+
 echo "   <td><a href=\"latest/zip/${LANG}.tar.gz\">${LANG}.tar.gz</a></td>"
 echo "  </tr>"
     
@@ -178,19 +186,9 @@ echo "  </tr>"
 echo "</table>"
 exec 1>&6 6>&-      # Restore stdout and close file descriptor #6.
 
-sed "/<!-- HTML TABLE STARTS HERE -->/r ${TABLE_HTML}" ${TEMPLATE} > ${INDEX_HTML}
-
-# reuse ${TABLE_HTML} as temporary file
-NOW="$(date --utc)"
-sed "s|<\!-- TODAY DATE -->|${NOW}|" ${INDEX_HTML} > ${TABLE_HTML}
-mv ${TABLE_HTML} ${INDEX_HTML}
-
-sed "s|<!-- COMMON WL -->|latest/nozip/di_common_wl.txt|" ${INDEX_HTML} > ${TABLE_HTML}
-mv ${TABLE_HTML} ${INDEX_HTML}
-
-sed "s|<!-- CODEPOINTS_TARBALL -->|latest/zip/codepoints.tar.gz|" ${INDEX_HTML} > ${TABLE_HTML}
-mv ${TABLE_HTML} ${INDEX_HTML}
-
-sed "s|<!-- CODEPOINTS -->|latest/all_codes.txt|" ${INDEX_HTML} > ${TABLE_HTML}
-mv ${TABLE_HTML} ${INDEX_HTML}
-
+sed -e "/<!-- HTML TABLE STARTS HERE -->/r ${TABLE_HTML}" \
+    -e "s|<!-- TODAY DATE -->|$(date --utc)|" \
+    -e "s|<!-- COMMON WL -->|latest/nozip/di_common_wl.txt|" \
+    -e "s|<!-- CODEPOINTS_TARBALL -->|latest/zip/codepoints.tar.gz|" \
+    -e "s|<!-- CODEPOINTS -->|latest/all_codes.txt|" \
+    ${TEMPLATE} > ${INDEX_HTML}
