@@ -2,6 +2,12 @@
 # verify and optionally save out the file
 set -e
 
+NOTEST=""
+if [ "$1" = "--invalid" ]; then
+	NOTEST=1
+	shift
+fi
+
 file="$1"
 saveto="$2"
 
@@ -44,7 +50,7 @@ for line in $(sed 's/^/:/' $file); do
 	line="${line#:}"
 	if expr "$line" : '.*[^ ].*' >/dev/null && [ "$(expr "$line" : "#")" != 1 ]; then
 		items=$(expr "$items" + 1)
-		if valid "$line"; then
+		if [ -z "$NOTEST" ] && valid "$line"; then
 			gooditems=$(expr "$gooditems" + 1)
 			saveline "$line"
 		else

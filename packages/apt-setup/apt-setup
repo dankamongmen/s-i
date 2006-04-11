@@ -38,21 +38,30 @@ for generator in $gendir/*; do
 	
 	tmp=$($chroot $ROOT tempfile)
 	echo > $ROOT$tmp
-	if $generator $ROOT$tmp; then
+
+	code=0
+	$generator $ROOT$tmp || code=$?
+	case $code in
+	    0)
 		if ! apt-setup-verify $ROOT$tmp $ROOT/etc/apt/sources.list.new; then
 			warning "$generator output did not verify"
 		fi
-	else
-		code="$?"
-		if [ "$code" = 10 ]; then
-			# TODO handle backup better
-			log "$generator backed up"
-			rm -f $ROOT$tmp
-			db_progress STOP
-			exit 10
-		fi
+		;;
+	    9)
+		apt-setup-verify --invalid $ROOT$tmp $ROOT/etc/apt/sources.list.new || true
+		warning "$generator output added commented out"
+		;;
+	    10)
+		# TODO handle backup better
+		log "$generator backed up"
+		rm -f $ROOT$tmp
+		db_progress STOP
+		exit 10
+		;;
+	    *)
 		warning "$generator returned error code $code; discarding output"
-	fi
+		;;
+	esac
 	rm -f $ROOT$tmp
 	db_progress STEP 1
 done
