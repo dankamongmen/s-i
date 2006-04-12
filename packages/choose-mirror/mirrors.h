@@ -13,6 +13,11 @@ struct mirror_t {
  * current version of d-i is targeted at installing. */
 #define PREFERRED_DISTRIBUTION "etch"
 
+/* The two strings defined below must match the strings used in the
+ * templates (http and ftp) for these options. */
+#define NO_MIRROR    "don't use a network mirror"
+#define MANUAL_ENTRY "enter information manually"
+
 #define SUITE_LENGTH 32
 
 /* Stack of suites */

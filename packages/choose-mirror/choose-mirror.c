@@ -97,7 +97,7 @@ static char **mirrors_in(char *country) {
 /* returns true if there is a mirror in the specificed country */
 static inline int has_mirror(char *country) {
 	char **mirrors;
-	if (strcmp(country, "enter information manually") == 0)
+	if (strcmp(country, MANUAL_ENTRY) == 0)
 		return 1;
 	mirrors = mirrors_in(country);
 	return (mirrors[0] == NULL) ? 0 : 1;
@@ -252,7 +252,7 @@ static int set_country(void) {
 	country = strdup(debconf->value);
 	free (countries);
 
-	if (! strcmp(country, "don't use a network mirror")) {
+	if (! strcmp(country, NO_MIRROR)) {
 		if (! base_on_cd) {
 			debconf_input(debconf, "critical", DEBCONF_BASE "required");
 			if (debconf_go(debconf) == 30)
@@ -316,7 +316,7 @@ static int choose_mirror(void) {
 	char *list;
 
 	debconf_get(debconf, DEBCONF_BASE "country");
-	manual_entry = ! strcmp(debconf->value, "enter information manually");
+	manual_entry = ! strcmp(debconf->value, MANUAL_ENTRY);
 	if (! manual_entry) {
 		char *mir = add_protocol("mirror");
 
