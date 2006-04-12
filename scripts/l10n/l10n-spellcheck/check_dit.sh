@@ -124,8 +124,8 @@ fi
 if [ ${REMOVE_VARS} = "yes" ] ; then
     NEEDS_RM="${NO_VARS} ${NEEDS_RM}"
     grep -e "^-" ${ALL_STRINGS} | \
-    sed s/\$\{[a-zA-Z0-9_]*\}//g | \
-    sed "s|\${KBD-ARCHS-L10N}||"> ${NO_VARS}
+    sed -e s/\$\{[a-zA-Z0-9_]*\}//g \
+	-e "s|\${KBD-ARCHS-L10N}||" > ${NO_VARS}
 
     FILE_TO_CHECK=${NO_VARS}
 else
@@ -141,26 +141,31 @@ else
     sed "1,2d" ${FILE_TO_CHECK} > ${FILE_CODEPOINTS}
 fi
 
-    cat ${FILE_CODEPOINTS} | \
-    sed "s|^- \"\(.*\)\"$|\1|" | \
-    sed "s|\$TCPIP|TCPIP|" | \
-    sed "s/%l*[scdbniuBFNS]//g" | \
-    sed "s|\\\\\"|\"|g"  > ${DEST_DIR}/fully_stripped.txt
+    sed -e "s|^- \"\(.*\)\"$|\1|" \
+	-e "s|\$TCPIP|TCPIP|" \
+	-e "s/%l*[scdbniuBFNS]//g" \
+	-e "s|\\\\\"|\"|g" ${FILE_CODEPOINTS} > ${DEST_DIR}/fully_stripped.txt
 
-    iconv -f utf8 -t ucs-4le ${DEST_DIR}/fully_stripped.txt | od -v -tx2 -An -w2 | sed "s|\(....\)$|<U\1>|" > ${DEST_DIR}/${LANG}_codes1.txt
+    iconv -f utf8 -t ucs-4le ${DEST_DIR}/fully_stripped.txt | \
+	od -v -tx2 -An -w2 | \
+	sed "s|\(....\)$|<U\1>|" > ${DEST_DIR}/${LANG}_codes1.txt
 
-    sort ${DEST_DIR}/${LANG}_codes1.txt | uniq -c | grep -vw "<U0000>" | grep -vw "<U000a>" > ${DEST_DIR}/${LANG}_codes.txt
+    sort ${DEST_DIR}/${LANG}_codes1.txt | \
+	uniq -c | \
+	grep -vw "<U0000>" | \
+	grep -vw "<U000a>" > ${DEST_DIR}/${LANG}_codes.txt
 
 # Add a third column with the encoded character
 #  567 - <U0033> "3"
+    sed "s|\(.* \)\(<U....>\)|\1\2  \"\2\" |" ${DEST_DIR}/${LANG}_codes.txt | \
+	uxx2utf > ${DEST_DIR}/${LANG}_codes1.txt 2> /dev/null
 
-    sed "s|\(.* \)\(<U....>\)|\1\2  \"\2\" |" ${DEST_DIR}/${LANG}_codes.txt | uxx2utf > ${DEST_DIR}/${LANG}_codes1.txt 2> /dev/null
     mv ${DEST_DIR}/${LANG}_codes1.txt ${DEST_DIR}/${LANG}_codes.txt
 
     FILES_TO_KEEP="${DEST_DIR}/${LANG}_codes.txt ${FILES_TO_KEEP}" 
     CODEPOINTS=$(wc -l ${DEST_DIR}/${LANG}_codes.txt | awk '{print $1}')
     
-    cat ${DEST_DIR}/${LANG}_codes.txt | awk '{print $2}' >> ${DEST_DIR}/all_codes-tmp.txt
+    awk '{print $2}' ${DEST_DIR}/${LANG}_codes.txt >> ${DEST_DIR}/all_codes-tmp.txt
     rm -f ${DEST_DIR}/fully_stripped.txt
 
     if [ ${REMOVE_VARS} != "yes" ] ; then
@@ -174,12 +179,12 @@ fi
 
 if [ ${DICT} != "null" ] ; then
 # spell check the selected strings eventually using a custom wl 
-    cat ${FILE_TO_CHECK} | aspell list --lang=${LANG} --encoding=utf-8 ${WL_PARAM} ${ASPELL_EXTRA_PARAM} > ${ALL_UNKNOWN}
+    aspell list --lang=${LANG} --encoding=utf-8 ${WL_PARAM} ${ASPELL_EXTRA_PARAM} < ${FILE_TO_CHECK} > ${ALL_UNKNOWN}
 
 # sort all the unrecognized words (don't care about upper/lower case)
 # count duplicates
 # take note of unknown words
-    cat ${ALL_UNKNOWN} | sort -f | uniq -c > ${UNKN}
+    sort -f ${ALL_UNKNOWN} | uniq -c > ${UNKN}
 
 # if we're *not* handling suspecet vars (i.e. d-i manual), make this an empty string
     if [ ${HANDLE_SUSPECT_VARS} = "no" ] ; then
@@ -213,7 +218,7 @@ fi
 # in "nozip" it's utf-8 like the other files 
 if [ -f ${WLS_PATH}/${LANG}_wl.txt ] ; then
     WORDLIST=${WLS_PATH}/${LANG}_wl.txt
-    cat ${WORDLIST} | iconv --from iso-8859-1 --to utf-8 > ${DEST_DIR}/nozip/${LANG}_wl.txt
+    iconv --from iso-8859-1 --to utf-8 ${WORDLIST} > ${DEST_DIR}/nozip/${LANG}_wl.txt
     cp ${WORDLIST} ${DEST_DIR}
     WL_ISO8859=${DEST_DIR}/${LANG}_wl.txt
 fi
