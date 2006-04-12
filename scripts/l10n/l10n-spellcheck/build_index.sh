@@ -47,14 +47,14 @@ AVERAGE=0
 UNIQUE_CODEPOINTS=0
 for VAL in `sort -n ${STATS} | awk '{print $1}'`; do
     if [ ${VAL} -ne -1 ] ; then
-	TOTAL=`expr ${TOTAL} + ${VAL}`
+	TOTAL=$((${TOTAL} + ${VAL}))
 	i=$((i+1))
     fi
 done
 
 # avoid division by 0
 if [ $i -ne 0 ] ; then
-    AVERAGE=`expr ${TOTAL} / $i`
+    AVERAGE=$((${TOTAL} / $i))
 fi
 
 LOGFILE=${TABLE_HTML}
@@ -69,7 +69,6 @@ echo "  <tr>"
 echo "   <th class=\"col1\">Language</th>"
 echo "   <th class=\"t1\">Unknown words</th>"
 echo "   <th class=\"t1\">Messages</th>"
-echo "   <th class=\"t1\">List of unknown words</th>"
 
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     echo "   <th class=\"t1\">Suspect variables</th>"
@@ -93,30 +92,32 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     SUSP=`echo ${ROW} | awk -F, '{print $3}'`
 
     if [ ${SUSP} = "1" ] ; then
-	SUSPECT_VARS_URL="latest/nozip/${LANG}_var.txt"
-	SUSPECT_VARS_NAME="${LANG}_var.txt"
+	SUSPECT_VARS_URL="<a href=\"latest/nozip/${LANG}_var.txt\">${LANG}_var.txt</a>"
     else
-	SUSPECT_VARS_URL=""
-	SUSPECT_VARS_NAME="-"
+	SUSPECT_VARS_URL="-"
     fi
 fi
 
 if [ -f ${WLS_PATH}/${LANG}_wl.txt ] ; then
-    WORDLIST="latest/nozip/${LANG}_wl.txt"
-    WORDLIST_NAME="${LANG}_wl.txt"
+    WORDLIST="<a href=\"latest/nozip/${LANG}_wl.txt\">${LANG}_wl.txt</a>"
 else
-    WORDLIST=""
-    WORDLIST_NAME="-"
+    WORDLIST="-"
 fi
 
 echo "  <tr>"
 echo "   <td class=\"col1\">${ISO_CODE} [${LANG}]</td>"
 
 # Number of unknown words
-if [ ${UNKN} -eq -1 ] ; then
+if [ ${UNKN} -eq -1 ] || [ ${UNKN} -eq 0 ] ; then
     echo "   <td>-</td>"
 else
-    echo "   <td>${UNKN}</td>"
+    if [ -f ${DIFF_DIR}/nozip/${LANG}_unkn_wl.diff ] ; then
+	DIFF="<a href=\"latest/nozip/${LANG}_unkn_wl.diff\">  (*)</a>"
+    else
+	DIFF=
+    fi
+
+    echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${UNKN}</a>${DIFF}</td>"
 fi
 
 if [ -f ${DIFF_DIR}/nozip/${LANG}_all.diff ] ; then
@@ -127,32 +128,18 @@ fi
 
 echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a>${DIFF}</td>"
 
-# List of unknown words
-if [ ${UNKN} -eq -1 ] || [ ${UNKN} -eq 0 ] ; then
-    echo "   <td>-</td>"
-else
-
-    if [ -f ${DIFF_DIR}/nozip/${LANG}_unkn_wl.diff ] ; then
-	DIFF="<a href=\"latest/nozip/${LANG}_unkn_wl.diff\">  (*)</a>"
-    else
-	DIFF=
-    fi
-
-    echo "   <td><a href=\"latest/nozip/${LANG}_unkn_wl.txt\">${LANG}_unkn_wl.txt</a>${DIFF}</td>"
-fi
-
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     SUSP_PATH=${SUSPECT_VARS_URL/latest/}
-    if [ -f ${DIFF_DIR}/${SUSP_PATH/.txt/.diff} ] ; then
-	DIFF="<a href=\"${SUSPECT_VARS_URL/.txt/.diff}\">  (*)</a>"
+    if [ -f ${DIFF_DIR}/nozip/${LANG}_var.diff ] ; then
+	DIFF="<a href=\"latest/nozip/${LANG}_var.diff\">  (*)</a>"
     else
 	DIFF=
     fi
 
-    echo "   <td><a href=\"${SUSPECT_VARS_URL}\">${SUSPECT_VARS_NAME}</a>${DIFF}</td>"
+    echo "   <td>${SUSPECT_VARS_URL}${DIFF}</td>"
 fi
 
-echo "   <td><a href=\"${WORDLIST}\">${WORDLIST_NAME}</a></td>"
+echo "   <td>${WORDLIST}</td>"
 
 if [ ${CODEPOINTS} -eq 0 ] ; then
     echo "   <td>-</td>"
