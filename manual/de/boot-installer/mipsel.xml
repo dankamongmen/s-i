@@ -1,35 +1,37 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35612 untranslated -->
+<!-- original version: 35612 -->
 
-  <sect2 arch="mipsel" id="boot-tftp"><title>Booting with TFTP</title>
+  <sect2 arch="mipsel" id="boot-tftp"><title>Per TFTP booten</title>
 
    <sect3>
-   <title>Cobalt TFTP Booting</title>
+   <title>TFTP-Boot von Cobalt-Systemen</title>
 <para>
 
-Strictly speaking, Cobalt does not use TFTP but NFS to boot.  You need to
-install an NFS server and put the installer files in
-<filename>/nfsroot</filename>.  When you boot your Cobalt, you have to
-press the left and the right cursor buttons at the same time and the
-machine will boot via the network from NFS.  It will then display several
-options on the display.  There are the following two installation methods:
+Genauer gesagt benutzt ein Cobalt-System nicht TFTP, sondern NFS zum
+Booten. Sie müssen einen NFS-Server installieren und die Dateien des
+Installers in <filename>/nfsroot</filename> ablegen. Wenn Sie Ihren Cobalt
+starten, müssen Sie die linke und rechte Pfeiltaste gleichzeitig gedrückt
+halten, so dass das System per Netzwerk vom NFS bootet. Es werden dann
+mehrere Optionen auf dem Bildschirm angezeigt. Es gibt die folgenden
+beiden Installationsmethoden:
 
 <itemizedlist>
 <listitem><para>
 
-Via SSH (default): In this case, the installer will configure the network
-via DHCP and start an SSH server.  It will then display a random password
-and other login information (such as the IP address) on the Cobalt LCD.
-When you connect to the machine with an SSH client you can start with
-the installation.
+Per SSH (Voreinstellung): in diesem Fall wird der Installer das Netzwerk
+per DHCP konfigurieren und einen SSH-Server starten. Auf dem Cobalt-LCD
+werden dann ein zufällig gewähltes Passwort und andere Login-Informationen
+(wie die IP-Adresse) angezeigt. Wenn Sie sich mittels eines SSH-Klients mit
+dem Rechner verbinden, können Sie mit der Installation beginnen.
 
 </para></listitem>
 <listitem><para>
 
-Via serial console: Using a null modem cable, you can connect to the serial
-port of your Cobalt machine (using 115200 bps) and perform the installation
-this way.  This option is not available on Qube 2700 (Qube1) machines since
-they have no serial port.
+Per serieller Konsole: mit einem Nullmodem-Kabel können Sie sich mit dem
+seriellen Anschluss der Cobalt-Maschine verbinden (benutzen Sie eine
+Geschwindigkeit von 115200 bps) und die Installation auf diesem Wege
+durchführen. Diese Option ist auf Qube 2700-Rechnern (Qube1) nicht verfügbar,
+die diese keinen seriellen Port haben.
 
 </para></listitem>
 </itemizedlist>
@@ -39,56 +41,58 @@ they have no serial port.
 
    <sect3>
 <!-- Note to translators: this is the same section as in mips.xml -->
-   <title>Broadcom BCM91250A and BCM91480B TFTP Booting</title>
+   <title>TFTP-Boot von Broadcom BCM91250A und BCM91480B</title>
 <para>
 
-On the Broadcom BCM91250A and BCM91480B evaluation boards, you have to load the SiByl boot
-loader via TFTP which will then load and start the Debian installer.  In
-most cases, you will first obtain an IP address via DHCP but it is also
-possible to configure a static address.  In order to use DHCP, you can
-enter the following command on the CFE prompt:
+Bei den Broadcom BCM91250A- und BCM91480B-Evaluation-Boards müssen Sie
+den SiByl-Bootloader
+per TFTP laden, der dann den Debian-Installer lädt und startet. Meistens
+werden Sie wohl eine IP-Adresse per DHCP beziehen, es ist aber auch möglich,
+eine statische Adresse zu konfigurieren. Um DHCP zu nutzen, können Sie
+folgendes Kommando am CFE-Prompt eingeben:
 
 <informalexample><screen>
 ifconfig eth0 -auto
 </screen></informalexample>
 
-Once you have obtained an IP address, you can load SiByl with the following
-command:
+Sobald Sie eine IP-Adresse bekommen haben, können Sie SiByl mit dem folgenden
+Befehl laden:
 
 <informalexample><screen>
 boot 192.168.1.1:/boot/sibyl
 </screen></informalexample>
 
-You need to substitute the IP address listed in this example with either
-the name or the IP address of your TFTP server.  Once you issue this
-command, the installer will be loaded automatically.
+Ersetzen Sie die IP-Adresse aus dem Beispiel entweder mit dem Namen oder
+der IP-Adresse Ihres TFTP-Servers. Sobald Sie dieses Kommando ausführen, wird
+der Installer automatisch geladen.
 
 </para>
 </sect3>
   </sect2>
 
-  <sect2 arch="mipsel"><title>Boot Parameters</title>
+  <sect2 arch="mipsel"><title>Boot-Parameter</title>
 
    <sect3>
-   <title>Cobalt TFTP Booting</title>
+   <title>Cobalt TFTP-Boot</title>
 <para>
 
-You cannot pass any boot parameters directly.  Instead, you have to edit
-the <filename>/nfsroot/default.colo</filename> file on the NFS server and
-add your parameters to the <replaceable>args</replaceable> variable.
+Sie können keine Boot-Parameter direkt angeben. Sie müssen
+stattdessen in der Datei <filename>/nfsroot/default.colo</filename> auf dem
+NFS-Server Ihre Parameter zur Variable
+<replaceable>args</replaceable> hinzufügen.
 
 </para>
   </sect3>
 
    <sect3>
 <!-- Note to translators: this is the same section as in mips.xml -->
-   <title>Broadcom BCM91250A and BCM91480B TFTP Booting</title>
+   <title>TFTP-Boot von Broadcom BCM91250A und BCM91480B</title>
 <para>
 
-You cannot pass any boot parameters directly from the CFE prompt.  Instead,
-you have to edit the <filename>/boot/sibyl.conf</filename> file on the TFTP
-server and add your parameters to the <replaceable>extra_args</replaceable>
-variable.
+Am CFE-Prompt direkt können Sie keine Bootparameter angeben. Sie müssen
+stattdessen in der Datei <filename>/boot/sibyl.conf</filename> auf dem
+TFTP-Server Ihre Parameter zur Variable
+<replaceable>extra_args</replaceable> hinzufügen.
 
 </para>
   </sect3>

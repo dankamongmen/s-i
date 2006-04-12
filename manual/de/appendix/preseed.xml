@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35982 -->
+<!-- original version: 36269 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -297,7 +297,8 @@ an das Ende der <quote>append</quote>-Zeile(n) des Kernels an).
 Wenn Sie die Voreinstellungsdatei in der Bootloader-Konfiguration festlegen,
 möchten Sie vielleicht diese Konfiguration so verändern, dass Sie nicht mehr
 die Enter-Taste drücken müssen, um den Installer zu booten. In
-<filename>syslinux.cfg</filename> müssen Sie dazu den Timeout auf 1 setzen.
+<filename>syslinux.cfg</filename> müssen Sie dazu den Timeout auf
+<literal>1</literal> setzen.
 
 </para><para>
 
@@ -352,7 +353,7 @@ Hier ein Beispiel, wie Sie die dhcpd.conf für ISC DHCP-Server Version 3
 
 <informalexample><screen>
 if substring (option vendor-class-identifier, 0, 3) = "d-i" {
-	filename "http://host/preseed.cfg";
+    filename "http://host/preseed.cfg";
 }
 </screen></informalexample>
 
@@ -412,7 +413,7 @@ und 2.6-Kernel (vor 2.6.9) werden eine Kernel-Panic melden.
 </para></note>
 <para>
 
-Einige der Standardoptionen wie <quote>vga=normal</quote>
+Einige der Standardoptionen wie <literal>vga=normal</literal>
 können bei den meisten Installationen getrost entfernt werden, was es
 erlaubt, mehr Optionen für Voreinstellungen zu verwenden.
 
@@ -427,41 +428,106 @@ Anführungszeichen einfassen.
   </sect2>
  </sect1>
 
- <sect1 condition="FIXME" id="preseed-creating">
+ <sect1 id="preseed-creating">
  <title>Eine Voreinstellungsdatei erstellen</title>
 <para>
 
 Die Voreinstellungsdatei hat das gleiche Format wie es
 auch vom Befehl <command>debconf-set-selections</command>
-verwendet wird.
+verwendet wird. Das grundsätzliche Format einer Zeile in einer
+Voreinstellungsdatei ist folgendes:
+
+<informalexample><screen>
+&lt;owner&gt; &lt;template name&gt; &lt;template type&gt; &lt;value&gt;
+</screen></informalexample>
+
+</para><para>
+
+Es gibt ein paar Regeln, die man im Hinterkopf behalten sollte, wenn man
+eine Voreinstellungsdatei schreibt:
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  Dateiformat
+  Fügen Sie zwischen Typ und Wert nur ein einzelnes Leerzeichen oder Tab ein;
+  jedes zusätzliche Leerzeichen wird interpretiert, als ob es zum Wert gehört.
 </para></listitem>
 <listitem><para>
-  Nur ein Leerzeichen erlaubt zwischen Template-Typ und Wert
+  Eine Zeile kann in mehrere aufgeteilt werden, indem ein Backslash
+  (<quote><literal>\</literal></quote>) als Zeilenvorsetzungs-Zeichen angefügt
+  wird. Eine gute Stelle, um die Zeile aufzuteilen, ist hinter dem Template-Namen;
+  eine schlechte ist zwischen Typ und Wert.
 </para></listitem>
 <listitem><para>
-  Beziehung zu /var/lib/(c)debconf/templates
+  Für die meisten Templates müssen bei der Voreinstellung die gültigen Werte
+  in englischer Sprache benutzt werden und nicht die übersetzten Werte.
+  Allerdings gibt es auch einige Templates (zum Beispiel in
+  <classname>partman</classname>), wo die übersetzten Werte verwenden
+  werden müssen.
 </para></listitem>
 <listitem><para>
-  Typen der Templates und wie man Werte für sie anbietet
-</para></listitem>
-<listitem><para>
-  die meisten Werte müssen in englischer Sprache oder als Code angegeben werden
-</para></listitem>
-<listitem><para>
-  eine manuelle Installation als Basis nehmen
-</para></listitem>
-<listitem><para>
-  andere mögliche Werte finden
+  Einige Templates verwenden einen Code als Wert statt des englischen Textes,
+  der während der Installation angezeigt wird.
 </para></listitem>
 </itemizedlist>
 
 <para>
+
+Der einfachste Weg, eine Voreinstellungsdatei zu erzeugen ist, die
+Beispieldatei aus <xref linkend="preseed-contents"/> als Basis zu nehmen und
+sich von dort aus vorzuarbeiten.
+
+</para><para>
+
+Eine andere Methode ist, eine manuelle Installation durchzuführen und
+dann nach dem Neustart den Befehl <command>debconf-get-selections</command>
+aus dem Paket <classname>debconf-utils</classname> zu verwenden, um
+sowohl die debconf-Datenbank wie auch die cdebconf-Datenbank des
+Installers in eine Datei einzulesen.
+
+<informalexample><screen>
+$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>
+$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>
+</screen></informalexample>
+
+</para><para>
+
+Allerdings wird eine Datei, die auf diese Art erzeugt wurde, einige
+Einträge enthalten, die nicht voreingestellt werden sollten und die
+Beispieldatei sollte für die meisten Benutzer ein besserer Ausgangspunkt
+sein.
+
+</para>
+
+<note><para>
+
+Diese Methode basiert auf der Tatsache, dass die cdebconf-Datenbank des
+Installers zum Ende der Installation nach
+<filename>/var/log/installer/cdebconf</filename> gesichert wird.
+Allerdings könnte die Datenbank sensible Informationen enthalten und ist
+deswegen nur für root lesbar.
+
+</para><para>
+
+Das Verzeichnis <filename>/var/log/installer</filename> und alle Dateien
+darin werden von Ihrem System gelöscht, wenn Sie das Paket
+<classname>installation-report</classname> löschen und dabei die Option
+<quote>purge</quote> (vollständiges Entfernen inkl. Konfigurationsdateien)
+aktivieren.
+
+</para></note>
+
+<para>
+
+Um mögliche Werte für Voreinstellungseinträge herauszufinden, können Sie
+den Editor <command>nano</command> benutzen, um die Dateien in
+<filename>/var/lib/cdebconf</filename> zu betrachten, während die Installation
+im Gange ist. <filename>templates.dat</filename> enthält die rohen Einträge
+(Templates) und in <filename>questions.dat</filename> finden Sie die aktuellen
+Werte zu den Templates sowie die Werte, die Variablen zugewiesen sind.
+
+</para><para>
 
 Um vor dem Start einer Installation zu überprüfen, ob das Format Ihrer
 Voreinstellungsdatei gültig ist, können Sie den Befehl
@@ -563,8 +629,8 @@ benutzen Sie einen Bootparameter wie
 </para>
 
 <informalexample role="example"><screen>
-# netcfg versucht nach Möglichkeit, eine Netzwerkschnittstelle zu wählen, die
-# bereits Verbindung hat (Netzwerkkabel gesteckt, aktive Gegenstelle). 
+# netcfg versucht nach Möglichkeit, eine Netzwerkschnittstelle zu wählen,
+# die bereits Verbindung hat (Netzwerkkabel gesteckt, aktive Gegenstelle). 
 # Diese Zeile vermeidet, dass eine Liste angezeigt wird, wenn mehr als
 # eine Schnittstelle verfügbar ist.
 d-i netcfg/choose_interface select auto
@@ -576,14 +642,15 @@ d-i netcfg/choose_interface select auto
 # Zeitüberschreitung, während er auf ihn wartet, könnte dies nützlich sein:
 #d-i netcfg/dhcp_timeout string 60
 
-# Wenn Sie es vorziehen, das Netzwerk manuell zu konfigurieren, entfernen Sie
-# hier das Kommentarzeichen und ebenso bei den Zeilen für die statische
+# Wenn Sie es vorziehen, das Netzwerk manuell zu konfigurieren, entfernen
+# Sie hier das Kommentarzeichen und ebenso bei den Zeilen für die statische
 # Netzwerkkonfiguration unten.
 #d-i netcfg/disable_dhcp boolean true
 
 # Falls Sie möchten, dass die Voreinstellungsdatei sowohl auf Systemen mit
-# DHCP-Server wie auch ohne einen solchen funktioniert, entfernen Sie hier die
-# Kommentarzeichen und unten bei der statischen Netzwerkkonfiguration auch.
+# DHCP-Server wie auch ohne einen solchen funktioniert, entfernen Sie hier
+# die Kommentarzeichen sowie auch unten bei der statischen
+# Netzwerkkonfiguration.
 #d-i netcfg/dhcp_failed note
 #d-i netcfg/dhcp_options select Configure network manually
 
@@ -594,15 +661,16 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
 
-# Bedenken Sie, dass jeder Hostname und Domainname, der per DHCP zugewiesen
-# wird, Vorrang hat vor den hier angegebenen. Allerdings bewirken diese Zeilen,
-# dass keine Fragen angezeigt werden, auch wenn Werte per DHCP empfangen werden.
+# Bedenken Sie, dass jeder Hostname und Domainname, der per DHCP
+# zugewiesen wird, Vorrang hat vor den hier angegebenen. Allerdings
+# bewirken diese Zeilen, dass keine Fragen angezeigt werden, auch wenn
+# Werte per DHCP empfangen werden.
 d-i netcfg/get_hostname string unassigned-hostname
 d-i netcfg/get_domain string unassigned-domain
 
 # Den lästigen WEP-Schlüssel-Dialog unterdrücken.
 d-i netcfg/wireless_wep string
-# Der verrückte DHCP-Hostname, den einige ISP als eine Art Passwort benutzen.
+# Der verrückte DHCP-Hostname, den einige ISP als eine Art Passwort nutzen.
 #d-i netcfg/dhcp_hostname string radish
 </screen></informalexample>
 
@@ -678,17 +746,20 @@ Voreinstellung nutzen.
 <informalexample role="example"><screen>
 # Wenn das System freien Platz auf der Platte hat, können Sie festlegen, nur
 # diesen Platz zu partitionieren.
+# NOTE: this template must be preseeded with a localized (translated) value.
 # HINWEIS: die Voreinstellungswerte für diese Frage müssen lokalisiert
 # (übersetzt) sein.
 #d-i partman-auto/init_automatically_partition \
 #      select Größten, ununterbrochenen freien Speicher benutzen
 
-# Alternativ können Sie eine Festplatte angeben, die partitioniert werden soll.
-# Der Gerätename kann entweder als devfs-Bezeichnung oder im traditionellen
-# Format angegeben werden. Um z.B. die erste Platte zu nutzen, die devfs kennt:
+# Alternativ können Sie eine Festplatte angeben, die partitioniert werden
+# soll. Der Gerätename kann entweder als devfs-Bezeichnung oder im
+# traditionellen Format angegeben werden. Um z.B. die erste Platte zu
+# nutzen, die devfs kennt:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
 # Sie können eines der vordefinierten Partitionierungsrezepte wählen:
+# NOTE: this template must be preseeded with a localized (translated) value.
 # HINWEIS: die Voreinstellungswerte für diese Frage müssen lokalisiert
 # (übersetzt) sein.
 d-i partman-auto/choose_recipe \
@@ -699,9 +770,9 @@ d-i partman-auto/choose_recipe \
 #       select Separate /home-, /usr-, /var- und /tmp-Partitionen
 
 # Oder erstellen Sie ein eigenes Rezept...
-# Das Rezept-Format ist in der Datei devel/partman-auto-recipe.txt beschrieben.
-# Wenn Sie eine Möglichkeit haben, eine Rezeptdatei in die d-i-Umgebung zu
-# bekommen, können Sie einfach darauf verweisen:
+# Das Rezept-Format ist in der Datei devel/partman-auto-recipe.txt
+# beschrieben. Wenn Sie eine Möglichkeit haben, eine Rezeptdatei in die
+# d-i-Umgebung zu bekommen, können Sie einfach darauf verweisen:
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
 # Wenn nicht, können Sie auch ein ganzes Rezept in eine einzige (logische)
@@ -801,16 +872,20 @@ die Gefahr von Brute-Force-Attacken.
 </para></warning>
 
 <informalexample role="example"><screen>
+# Das Anlegen des Root-Accounts abbrechen (der normale Benutzer
+# bekommt dann die Möglichkeit, sudo zu benutzen)
+#d-i passwd/root-login boolean false
+# Alternativ dazu können Sie auch das Anlegen eines normalen
+# Benutzers abbrechen ...
+#d-i passwd/make-user boolean false
+
 # Root-Passwort, entweder als Klartext ...
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
 # ... oder verschlüsselt als MD5-Hash.
 #d-i passwd/root-password-crypted password [MD5 hash]
 
-# Erstellung eines regulären Benutzerkontos abbrechen.
-#d-i passwd/make-user boolean false
-
-# Alternativ dazu: ein reguläres Benutzerkonto erstellen.
+# Um ein reguläres Benutzerkonto zu erstellen:
 #d-i passwd/user-fullname string Debian User
 #d-i passwd/username string debian
 # Passwort des regulären Benutzers, entweder als Klartext ...
@@ -867,17 +942,19 @@ Kernels.
 # installieren möchten, entfernen Sie hier das Kommentarzeichen:
 #d-i grub-installer/skip boolean true
 
-# Dies ist eine ziemlich sichere Einstellung; sie bewirkt, dass grub automatisch
-# in den MBR installiert wird, wenn kein anderes Betriebssystem erkannt wird. 
+# Dies ist eine ziemlich sichere Einstellung; sie bewirkt, dass grub
+# automatisch in den MBR installiert wird, wenn kein anderes Betriebssystem
+# erkannt wird. 
 d-i grub-installer/only_debian boolean true
 
-# Dies bewirkt, dass grub in den MBR installiert wird, wenn andere
-# Betriebssysteme erkannt werden. Dies ist nicht so sicher, da möglicherweise
-# die anderen Systeme nicht mehr gestartet werden können.
+# Dies bewirkt, dass grub in den MBR installiert wird, wenn andere Betriebs-
+# systeme erkannt werden. Dies ist nicht so sicher, da möglicherweise die
+# anderen Systeme nicht mehr gestartet werden können.
 d-i grub-installer/with_other_os boolean true
 
-# Wenn Sie alternativ an einen anderen Ort als in den MBR installieren möchten,
-# entfernen Sie hier die Kommentarzeichen und passen Sie die Zeilen an:
+# Wenn Sie alternativ an einen anderen Ort als in den MBR installieren
+# möchten, entfernen Sie hier die Kommentarzeichen und passen Sie
+# die Zeilen an:
 #d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
@@ -937,11 +1014,11 @@ auszuwählen.
 tasksel tasksel/first multiselect Standard system, Desktop environment
 #tasksel tasksel/first multiselect Standard system, Web server
 
-# Einige Versionen des Installers können Informationen an das Debian-Projekt
-# zurück senden, welche Pakete Sie installiert haben. Standardeinstellung
-# ist, nichts zu senden, aber Informationen zu senden hilft dem Projekt
-# zu entscheiden, welche Software wie beliebt ist und ob bzw. wo sie auf
-# die CDs gepackt werden sollte.
+# Einige Versionen des Installers können Informationen an das Debian-
+# Projekt zurück senden, welche Pakete Sie installiert haben.
+# Standardeinstellung ist, nichts zu senden, aber Informationen zu senden
+# hilft dem Projekt zu entscheiden, welche Software wie beliebt ist und ob
+# bzw. wo sie auf die CDs gepackt werden sollte.
 #popularity-contest popularity-contest/participate boolean false
 </screen></informalexample>
 
@@ -1009,8 +1086,8 @@ xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # Entfernen Sie hier das Kommentarzeichen, wenn Sie ein LCD-Display haben.
 #xserver-xorg xserver-xorg/config/monitor/lcd boolean true
 # Die X-Konfiguration bietet drei mögliche Wege für die Konfiguration des
-# Monitors. Dies ist die Voreinstellung für "medium", was immer verfügbar ist.
-# Der einfache Weg ("simple") ist nicht immer verfügbar und "advanced"
+# Monitors. Dies ist die Voreinstellung für "medium", was immer verfügbar
+# ist. Der einfache Weg ("simple") ist nicht immer verfügbar und "advanced"
 # (erweitert) stellt zu viele Fragen.
 xserver-xorg xserver-xorg/config/monitor/selection-method \
        select medium
@@ -1044,23 +1121,23 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
   <title>Shell-Befehle</title>
 
 <informalexample role="example"><screen>
-# Den d-i voreinzustellen, ist von Natur aus nicht sicher. Nichts im Installer
-# überprüft auf Versuche eines Pufferüberlaufs oder anderweitiger Ausnutzung
-# der Werte einer Voreinstellungsdatei wie dieser. Benutzen Sie nur
-# Voreinstellungsdateien aus vertrauenswürdigen Quellen! Um diese Aussage zu 
-# untermauern und weil es auch generell nützlich ist, zeigen wir hier eine
-# Möglichkeit, jegliche Shell-Befehle, die Sie gerne im Installer hätten,
-# automatisch zu starten.
+# Den d-i voreinzustellen, ist von Natur aus nicht sicher. Nichts im
+# Installer überprüft auf Versuche eines Pufferüberlaufs oder anderweitiger
+# Ausnutzung der Werte einer Voreinstellungsdatei wie dieser. Benutzen Sie
+# nur Voreinstellungsdateien aus vertrauenswürdigen Quellen! Um diese
+# Aussage zu untermauern und weil es auch generell nützlich ist, zeigen wir
+# hier eine Möglichkeit, jegliche Shell-Befehle, die Sie gerne im Installer
+# hätten, automatisch auszuführen.
 
-# Dieser erste Befehl wird so früh wie möglich ausgeführt, direkt nachdem das
-# Lesen der Voreinstellungs-Datei abgeschlossen ist.
+# Dieser erste Befehl wird so früh wie möglich ausgeführt, direkt nachdem
+# das Lesen der Voreinstellungs-Datei abgeschlossen ist.
 #d-i preseed/early_command string anna-install some-udeb
 
-# Dieses Kommando wird ausgeführt, kurz bevor der Installer fertig ist, wenn
-# aber noch ein nutzbares /target-Verzeichnis verfügbar ist.
+# Dieses Kommando wird ausgeführt, kurz bevor der Installer fertig ist,
+# wenn aber noch ein nutzbares /target-Verzeichnis verfügbar ist.
 # Sie können nach /target »chroot«-en und es direkt benutzen, oder benutzen
-# Sie apt-install und in-target-Kommandos, um einfach Pakete zu installieren
-# oder Kommandos im Zielsystem auszuführen.
+# Sie apt-install und in-target-Kommandos, um einfach Pakete zu
+# installieren oder Kommandos im Zielsystem auszuführen.
 #d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
  </screen></informalexample>
 
@@ -1089,13 +1166,13 @@ für andere Zwecke/Netze/Orte in anderen Dateien.
 #d-i preseed/include string x.cfg
 
 # Der Installer kann optional die Prüfsummen von Voreinstellungs-Dateien
-# kontrollieren, bevor er diese benutzt. Derzeit werden nur md5sum-Prüfsummen
-# unterstützt. Geben Sie die md5sum-Prüfsummen in der gleichen Reihenfolge an
-# wie die Dateien, die integriert werden sollen.
+# kontrollieren, bevor er diese benutzt. Derzeit werden nur
+# md5sum-Prüfsummen unterstützt. Geben Sie die md5sum-Prüfsummen in der
+# gleichen Reihenfolge an wie die Dateien, die integriert werden sollen.
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
 
-# Der flexiblere Weg: dies startet ein Shell-Kommando und wenn dies die Namen
-# von Voreinstellungsdateien zurückgibt, werden diese integriert.
+# Der flexiblere Weg: dies startet ein Shell-Kommando und wenn dies die
+# Namen von Voreinstellungsdateien zurückgibt, werden diese integriert.
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 </screen></informalexample>
