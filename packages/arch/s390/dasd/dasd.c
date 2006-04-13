@@ -29,7 +29,7 @@ static struct dasd
 
 static unsigned int dasds_items;
 
-enum state_wanted { WANT_BACKUP, WANT_NEXT, WANT_QUIT, WANT_ERROR };
+enum state_wanted { WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
 
 int my_debconf_input(char *priority, char *template, char **ptr)
 {
@@ -180,10 +180,10 @@ static enum state_wanted get_channel (void)
 			sysfs_close_bus (bus);
 			return WANT_BACKUP;
 		}
-		if (!strcmp (ptr, "Quit"))
+		if (!strcmp (ptr, "Finish"))
 		{
 			sysfs_close_bus (bus);
-			return WANT_QUIT;
+			return WANT_FINISH;
 		}
 
 		for (i = 0; i < dasds_items; i++)
@@ -330,7 +330,7 @@ int main ()
 	enum
 	{
 		BACKUP, GET_CHANNEL,
-		CONFIRM, ERROR, QUIT
+		CONFIRM, ERROR, FINISH
 	}
 	state = GET_CHANNEL;
 
@@ -350,8 +350,8 @@ int main ()
 				break;
 			case ERROR:
 				error ();
-				state_want = WANT_QUIT;
-			case QUIT:
+				state_want = WANT_FINISH;
+			case FINISH:
 				return 0;
 		}
 		switch (state_want)
@@ -384,8 +384,8 @@ int main ()
 						break;
 				}
 				break;
-			case WANT_QUIT:
-				state = QUIT;
+			case WANT_FINISH:
+				state = FINISH;
 				break;
 			case WANT_ERROR:
 				state = ERROR;
