@@ -1,47 +1,46 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28672 -->
+<!-- original version: 35328 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Arrencada amb el TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <sect3 arch="arm"><title>Arrencada amb el TFTP a NetWinder</title>
+  <sect3 arch="arm"><title>Arrencada amb el TFTP a Netwinder</title>
 
 <para>
 
-NetWinders té dues interfícies de xarxa: la tarja compatible de
-10Mbps és <filename>eth0</filename> i la tarja Tulip de 100Mbps és
-<filename>eth1</filename>.
+Els Netwinder tenen dues interfícies de xarxa: una a 10Mbps compatible
+amb targetes NE2000 (normalment referida com <literal>eth0</literal>) i
+una targeta Tulip a 100Mbps. Podeu tenir problemes a l'hora de carregar
+la imatge via TFTP si feu servir la targeta de 100Mbps, així que es
+recomana usar la de 10Mbps (etiquetada com <literal>10 Base-T</literal>).
 
-</para><note><para>
+</para>
+<note><para>
 
 Necessiteu NeTTrom 2.2.1 o posterior per arrencar el sistema
-d'instal·lació. Recomanem NeTTrom 2.3.3: obté aquests fitxers des de
-<ulink url="ftp://ftp.netwinder.org/pub/netwinder/firmware/"></ulink>:
-<itemizedlist>
-<listitem><para>
+d'instal·lació, i la versió recomanada és 2.3.3. Malauradament, els
+fitxers de firmware no estan actualment disponibles per a descarregar
+per problemes de llicència. Si aquesta situació canvia, potser podreu
+trobar noves imatges a <ulink url="http//www.netwinder.org/"></ulink>.
 
-<filename>nettrom-2.3-3.armv4l.rpm</filename>
+</para></note>
+<para>
 
-</para></listitem>
-<listitem><para>
-
-<filename>nettrom-2.3.3.bin</filename>
-
-</para></listitem>
-<listitem><para>
-
-<filename>nettrom-2.3.3.bin.md5sum</filename>
-
-</para></listitem>
-</itemizedlist>
-
-</para></note><para>
-
-Després d'arrencar de nou i interrompre el procés durant el compte enrere,
-heu de configurar primer la xarxa amb una adreça estàtica:
+Quan arrenqueu el vostre Netwinder teniu que interrompre el procés
+d'arrencada durant el compte enrere. Això permetrà especificar alguns
+paràmetres del firmware necessaris per arrencar l'instal·lador. Primer
+de tot, comenceu per carregar els paràmetres predeterminats:
 
 <informalexample><screen>
+    NeTTrom command-&gt; load-defaults
+</screen></informalexample>
+
+Després d'això, haureu de configurar la xarxa, ja sigui amb una
+adreça estàtica:
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv netconfig_eth0 flash
     NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
 </screen></informalexample>
 
@@ -49,46 +48,60 @@ on 24 és el número de bits especificats a la màscara de xarxa, o una adreça
 dinàmica:
 
 <informalexample><screen>
-    NeTTrom command-&gt; boot diskless
+    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
 </screen></informalexample>
 
-Podeu necessitar també de configurar els paràmetres
+Podeu necessitar també configurar els paràmetres
 <userinput>route1</userinput> si el servidor TFTP no és a la subxarxa
-local. La resta de la configuració és força estàndard (el pas save-all
-és opcional):
+local.
+
+Seguint amb aquestes opcions, haureu d'especificar el servidor TFTP
+i la ubicació de la imatge. Podeu aleshores desar la configuració a
+memòria flaix.
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
     NeTTrom command-&gt; setenv kerntftpfile boot.img
     NeTTrom command-&gt; save-all
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
-    NeTTrom command-&gt; setenv kernconfig tftp
-    NeTTrom command-&gt; setenv rootdev /dev/ram
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
 </screen></informalexample>
 
-Només els últims quatre interferiran amb l'arrencada normal de disc, per
-tant és més segur executar <command>save-all</command> abans, el qual
-guardarà els paràmetres de xarxa per si necessiteu arrencar des de xarxa
-una altra vegada.
+Ara indiqueu el firmware que la imatge TFTP ha d'arrencar:
 
-Si voleu usar la consola serie per instal·lar el vostre NetWinder, també
-necessitareu els paràmetres següents:
+<informalexample><screen>
+    NeTTrom command-&gt; setenv kernconfig tftp
+    NeTTrom command-&gt; setenv rootdev /dev/ram
+</screen></informalexample>
+
+Si voleu usar la consola sèrie per instal·lar el vostre Netwinder,
+també necessitareu afegir el següent paràmetre:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
 </screen></informalexample>
 
+Alternativament, per a instal·lacions que utilitzin un teclat i monitor
+especifiqueu:
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
+</screen></informalexample>
+
 Useu l'ordre <command>printenv</command> per revisar els vostres
-paràmetres d'entorn. Finalment, si la vostra variable NeTTrom
-<envar>cmdappend</envar> té la opció <option>noinitrd</option>, podeu
-esborrar-la i el nucli descarregat pot arrencar amb el disc ram associat.
+paràmetres d'entorn. Després de verificar que tot és correcte, podeu
+carregar la imatge:
+
+<informalexample><screen>
+    NeTTrom command-&gt; boot
+</screen></informalexample>
+
+Si teniu cap problema, hi ha un <ulink
+url="http://www.netwinder.org/howto/Firmware-HOWTO.html">detallat COM
+ES FA</ulink> a la vostra disposició.
 
 </para>
-  </sect3>
+   </sect3>
 
-  <sect3 arch="arm"><title>Arrencada amb el TFTP a CATS</title>
-
+   <sect3 arch="arm"><title>Arrencada amb el TFTP a CATS</title>
 <para>
 
 A màquines CATS, useu <command>boot de0:</command> o similar a
@@ -97,7 +110,6 @@ l'indicador Cyclone.
 </para>
    </sect3>
   </sect2>
-
 
 
   <sect2 arch="arm"><title>Arrencada des de CD-ROM</title>
@@ -110,4 +122,110 @@ Per arrencar un CD-ROM des de l'indicador de consola Cyclone, useu
 l'ordre <command>boot cd0:cats.bin</command>
 
 </para>
+  </sect2>
+
+
+  <sect2 arch="arm" id="boot-firmware"><title>Arrencada amb el
+  firmware</title>
+
+&boot-installer-intro-firmware.xml;
+
+   <sect3 arch="arm" id="boot-firmware-nslu2"><title>Arrencada de
+   l'NSLU2</title>
+<para>
+
+Hi ha tres maneres de carregar el firmware a la flaix:
+
+</para>
+
+    <sect4 arch="arm"><title>Usar la interfície web de l'NSLU2</title>
+<para>
+
+Des de la secció d'administració, trieu l'opció
+<literal>Upgrade</literal> al menú. Podeu navegar aleshores pel
+vostre disc i seleccionar la imatge de l'instal·lador descarregada
+prèviament. Premeu el botó <literal>Start Upgrade</literal>, confirmeu,
+espereu uns minuts i confirmeu novament. El sistema arrencarà directament
+l'instal·lador.
+
+</para>
+    </sect4>
+
+    <sect4 arch="arm"><title>Des de la xarxa usant Linux/Unix</title>
+<para>
+
+Podeu fer servir <command>upslug2</command> des de qualsevol màquina
+Linux o Unix per actualitzar mitjançant la xarxa. Aquest programa està
+empaquetat per a Debian.
+
+Primer, haureu de posar l'NSLU2 en mode actualització:
+
+<orderedlist>
+<listitem><para>
+
+Desconnecteu qualsevol disc i/o dispositiu que hi hagi als ports USB.
+
+</para></listitem>
+<listitem><para>
+
+Atureu l'NSLU2.
+
+</para></listitem>
+<listitem><para>
+
+Premeu i mantingueu el botó de reiniciar (accessible per un petit forat
+al darrere, just per sobre de l'entrada de corrent).
+
+</para></listitem>
+<listitem><para>
+
+Premeu i deixeu anar el botó d'engegar per arrencar la màquina.
+
+</para></listitem>
+<listitem><para>
+
+Espereu 10 segons tot i observant el LED preparat/estat. Després
+d'aquests 10 segons canviarà d'àmbar a vermell. Deixeu anar el botó
+de reiniciar immediatament.
+
+</para></listitem>
+<listitem><para>
+
+El LED de preparat/estat de l'NSLU2 es veurà vermell/verd alternativament
+(hi ha un segon de retard abans del primer verd). L'NSLU2 ja està ara
+en mode actualització.
+
+</para></listitem>
+</orderedlist>
+
+Vegeu les <ulink
+url="http://www.nslu2-linux.org/wiki/OpenSlug/UsingTheBinary">pàgines
+de NSLU2-Linux</ulink> si teniu problemes amb això.
+
+Una vegada estigui en mode actualització, podeu carregar la nova imatge:
+
+<informalexample><screen>
+sudo upslug2 -i di-nslu2.bin
+</screen></informalexample>
+
+Tingueu en compte que aquesta eina també mostra l'adreça MAC de
+l'NSLU2, cosa que us pot ser molt útil per configurar un servidor
+DHCP. Després d'escriure i verificar tota la imatge, el sistema
+reiniciarà automàticament. Assegureu-vos de connectar el vostre disc
+USB un altre cop, si no ho feu ara l'instal·lador no el trobarà.
+
+</para>
+    </sect4>
+
+    <sect4 arch="arm"><title>Des de la xarxa usant Windows</title>
+<para>
+
+Hi ha <ulink
+url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zi
+p">una eina</ulink> per a Windows que serveix per actualitzar el firmware
+per xarxa.
+
+</para>
+    </sect4>
+   </sect3>
   </sect2>

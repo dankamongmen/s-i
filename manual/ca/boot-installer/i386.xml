@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31616 -->
+<!-- original version: 33886 -->
 
   <sect2 arch="i386"><title>Arrencada des d'un CD-ROM</title>
 
@@ -9,7 +9,7 @@
 <!--
 CD #1 of official Debian CD-ROM sets for &arch-title; will present a
 <prompt>boot:</prompt> prompt on most hardware. Press
-<keycap>F3</keycap> to see the list of kernel options available
+<keycap>F4</keycap> to see the list of kernel options available
 from which to boot. Just type your chosen flavor name (idepci,
 vanilla, compact, bf24) at the <prompt>boot:</prompt> prompt
 followed by &enterkey;.
@@ -169,7 +169,7 @@ image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
        root=/dev/ram0
-       append="<phrase condition="sarge">devfs=mount,dall </phrase>ramdisk_size=12000"
+       append="ramdisk_size=12000"
 </screen></informalexample>
 
 Per a més informació vegeu les pàgines del manual
@@ -192,10 +192,7 @@ kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram0 ramdisk_size=12000
 initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
-i reinicieu el sistema. <phrase condition="sarge">Si l'arrencada falla,
-podeu provar afegint <userinput>devfs=mount,dall</userinput> a la línia
-<quote>kernel</quote>.
-</phrase>
+i reinicieu el sistema.
 
 </para><para>
 Recordeu que el valor de <userinput>ramdisk_size</userinput> s'hauria
@@ -206,7 +203,7 @@ d'haver cap diferència entre el <command>GRUB</command> i el
 </para>
   </sect2>
 
-  <sect2 arch="i386" id="usb-boot">
+  <sect2 arch="i386" condition="bootable-usb" id="usb-boot">
   <title>Arrencada des d'un llapis USB</title>
 <para>
 
@@ -217,7 +214,7 @@ reiniciar l'ordinador. El sistema s'hauria d'arrencar i us hauria
 d'aparèixer l'indicador <prompt>boot:</prompt>. Podeu introduïr-hi
 els paràmetres d'arrencada opcionals o únicament prémer &enterkey;
 
-</para><para>
+</para><para condition="supports-floppy-boot">
 
 En el cas que el vostre ordinador no permeti l'arrencada des d'un
 dispositiu de memòria USB, podeu utilitzar un disquet per fer
@@ -230,7 +227,7 @@ Hauríeu de veure com s'inicialitza el &d-i;.
 </para>
   </sect2>
 
-  <sect2 arch="i386" id="floppy-boot">
+  <sect2 arch="i386" condition="supports-floppy-boot" id="floppy-boot">
   <title>Arrencada des dels disquets</title>
 <para>
 
@@ -356,8 +353,7 @@ especific d'arrencada amb paràmetres opcionals.
 
 Podeu accedir a informació útil sobre els mètodes d'arrencada i
 paràmetres d'arrencada prement les tecles de <keycap>F2</keycap> a
-<phrase condition="sarge"><keycap>F7</keycap></phrase><phrase
-condition="etch"><keycap>F8</keycap></phrase>. Si afegiu algun
+<keycap>F8</keycap>. Si afegiu algun
 paràmetre a la línia d'ordres d'arrencada, assegureu-vos d'escriure
 el mètode d'arrencada (el predeterminat és <userinput>linux</userinput>)
 i un espai abans del primer paràmetre (ex.
