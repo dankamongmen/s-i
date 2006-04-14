@@ -22,7 +22,7 @@ fi
 
 # vmware uses the mptscsih driver; because of driver changes, mkinitrd
 # does not pick this up correctly for the 2.6.8 kernel
-if lsmod | grep -q "^mptscsih.*1 mptspi"; then
+if grep -q "^mptscsih.*1 mptspi" /proc/modules; then
 	initrd=$(ls /target/boot/initrd.img-2.6.8* 2>/dev/null || true)
 	if [ "$initrd" ] && [ -x /target/usr/sbin/mkinitrd ] ; then
 		kernelver=${initrd#*initrd.img-}
