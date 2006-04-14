@@ -36,7 +36,7 @@ if ! apt-install nslu2-utils; then
 fi
 
 # Set up nslu2-flashkernel to run on kernel upgrades.
-if [ -z "`grep nslu2-flashkernel /target/etc/kernel-img.conf`" ]; then
+if ! grep -q nslu2-flashkernel /target/etc/kernel-img.conf; then
 	echo "postinst_hook = /usr/sbin/nslu2-flashkernel" >> \
 		/target/etc/kernel-img.conf
 fi
