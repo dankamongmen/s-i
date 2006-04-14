@@ -20,16 +20,20 @@ const char *const file_devices = "/proc/dasd/devices";
 
 static struct debconfclient *client;
 
-static struct dasd
+enum dasd_type { DASD_TYPE_ECKD, DASD_TYPE_FBA };
+
+struct dasd
 {
-	char device[SYSFS_NAME_LEN];
-	enum { UNKNOWN, NEW, UNFORMATTED, FORMATTED, READY } state;
-}
-*dasds, *dasd_current;
+	char name[SYSFS_NAME_LEN];
+	char driver[SYSFS_NAME_LEN];
+	char devtype[SYSFS_NAME_LEN];
+};
 
-static unsigned int dasds_items;
+static di_hash_table *dasds;
 
-enum state_wanted { WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
+static struct dasd *dasd_current;
+
+enum state_wanted { WANT_NONE = 0, WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
 
 int my_debconf_input(char *priority, char *template, char **ptr)
 {
@@ -41,6 +45,31 @@ int my_debconf_input(char *priority, char *template, char **ptr)
 	return ret;
 }
 
+static di_equal_func dasd_equal;
+static di_hash_func dasd_hash;
+
+uint16_t dasd_device (const char *i)
+{
+	unsigned int ret;
+	if (sscanf (i, "0.0.%04x", &ret) == 1)
+		return ret;
+	if (sscanf (i, "%04x", &ret) == 1)
+		return ret;
+	/* TODO */
+	exit (1);
+}
+
+bool dasd_equal (const void *key1, const void *key2)
+{
+	return dasd_device ((const char *) key1) == dasd_device ((const char *) key2);
+}
+
+uint32_t dasd_hash (const void *key)
+{
+	return dasd_device ((const char *) key);
+}
+
+#if 0
 static bool update_state (void)
 {
 	char buf[256];
@@ -72,57 +101,67 @@ static bool update_state (void)
 
 	return true;
 }
+#endif
 
-static enum state_wanted get_channel (void)
+static enum state_wanted detect_channels_driver (struct sysfs_driver *driver);
+
+static enum state_wanted detect_channels (void)
 {
-	char buf[256], *ptr;
+	struct sysfs_driver *driver;
+	enum state_wanted ret;
 	unsigned int i;
-	int ret;
+	const char *drivers[] = {
+		"dasd-eckd",
+		"dasd-fba",
+	};
+
+	dasds = di_hash_table_new (dasd_hash, dasd_equal);
+
+	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
+	{
+		driver = sysfs_open_driver ("ccw", drivers[i]);
+		if (driver)
+		{
+			ret = detect_channels_driver (driver);
+			sysfs_close_driver (driver);
+			if (ret)
+				return ret;
+		}
+	}
+	return WANT_NEXT;
+}
+
+static enum state_wanted detect_channels_driver (struct sysfs_driver *driver)
+{
 	struct dlist *devices;
-	struct sysfs_bus *bus;
 	struct sysfs_device *device;
 
-	dasds = di_new (struct dasd, 5);
-	dasd_current = NULL;
-	dasds_items = 0;
-
-	bus = sysfs_open_bus ("ccw");
-
-	if (!bus)
-		return WANT_ERROR;
-
-	devices = sysfs_get_bus_devices (bus);
+	devices = sysfs_get_driver_devices (driver);
 
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
-		struct sysfs_attribute *devtype_attr = sysfs_get_device_attr (device, "devtype");
-		unsigned int devtype;
+		struct sysfs_attribute *devtype_attr;
+		struct dasd *current;
+
+		devtype_attr = sysfs_get_device_attr (device, "devtype");
 		if (!devtype_attr)
-			continue;
-		if (sscanf (devtype_attr->value, "%4x/%*2x", &devtype) != 1)
-			continue;
-		if(devtype == 0x3390 ||
-		   devtype == 0x3380 ||
-		   devtype == 0x9345 ||
-		   devtype == 0x9336 ||
-		   devtype == 0x3370)
-		{
-			strcpy (dasds[dasds_items].device, device->bus_id);
-			dasds[dasds_items].state = UNKNOWN;
-			dasds_items++;
-			if ((dasds_items % 5) == 0)
-				dasds = di_renew (struct dasd, dasds, dasds_items + 5);
-		}
+			return WANT_NONE;
+		current = di_new (struct dasd, 1);
+		if (!current)
+			return WANT_ERROR;
+		strncpy (current->name, device->name, sizeof (current->name));
+		sysfs_read_attribute (devtype_attr);
+		strncpy (current->devtype, devtype_attr->value, sizeof (current->devtype));
+		strcpy (current->driver, driver->name);
+		di_hash_table_insert (dasds, current, current);
 	}
 
-	if (!update_state ())
-	{
-		sysfs_close_bus (bus);
-		return WANT_ERROR;
-	}
+	return WANT_NONE;
+}
 
-	if (dasds_items > 20)
-	{
+static enum state_wanted get_channel_input (void)
+{
+#if 0
 		while (1)
 		{
 			ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose", &ptr);
@@ -146,55 +185,48 @@ static enum state_wanted get_channel (void)
 			else
 				break;
 		}
-	}
-	else if (dasds_items > 0)
-	{
-		buf[0] = '\0';
-		for (i = 0; i < dasds_items; i++)
-		{
-			switch (dasds[i].state)
-			{
-				case NEW:
-					ptr = "(new)";
-					break;
-				case UNFORMATTED:
-					ptr = "(unformatted)";
-					break;
-				case FORMATTED:
-					ptr = "(formatted)";
-					break;
-				case READY:
-					ptr = "(ready)";
-					break;
-				default:
-					ptr = "(unknown)";
-			}
-			di_snprintfcat (buf, sizeof (buf), "%s %s, ", dasds[i].device, ptr);
-		}
+#endif
+	return WANT_ERROR;
+}
 
-		debconf_subst (client, TEMPLATE_PREFIX "choose_select", "choices", buf);
-		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_select", &ptr);
+static di_hfunc get_channel_select_append;
 
-		if (ret == 10)
-		{
-			sysfs_close_bus (bus);
-			return WANT_BACKUP;
-		}
-		if (!strcmp (ptr, "Finish"))
-		{
-			sysfs_close_bus (bus);
-			return WANT_FINISH;
-		}
+static enum state_wanted get_channel_select (void)
+{
+	char buf[512], *ptr;
+	int ret;
 
-		for (i = 0; i < dasds_items; i++)
-			if (strncmp (ptr, dasds[i].device, strlen (dasds[i].device)) == 0)
-			{
-				dasd_current = &dasds[i];
-				break;
-			}
-	}
-	sysfs_close_bus (bus);
-	return WANT_NEXT;
+	buf[0] = '\0';
+	di_hash_table_foreach (dasds, get_channel_select_append, buf);
+
+	debconf_subst (client, TEMPLATE_PREFIX "choose_select", "choices", buf);
+	ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_select", &ptr);
+
+	if (ret == 10)
+		return WANT_BACKUP;
+	if (!strcmp (ptr, "Finish"))
+		return WANT_FINISH;
+
+	dasd_current = di_hash_table_lookup (dasds, ptr);
+	if (dasd_current)
+		return WANT_NEXT;
+	return WANT_ERROR;
+}
+
+static void get_channel_select_append (void *key, void *value __attribute__ ((unused)), void *user_data)
+{
+	const char *name = key;
+	char *buf = user_data;
+	di_snprintfcat (buf, 512, "%s, ", name);
+}
+
+static enum state_wanted get_channel (void)
+{
+	if (di_hash_table_size (dasds) > 20)
+		return get_channel_input ();
+	else if (di_hash_table_size (dasds) > 0)
+		return get_channel_select ();
+	return WANT_ERROR;
 }
 
 struct hd_geometry {
@@ -329,19 +361,23 @@ int main ()
 
 	enum
 	{
-		BACKUP, GET_CHANNEL,
+		BACKUP, DETECT_CHANNEL, GET_CHANNEL,
 		CONFIRM, ERROR, FINISH
 	}
-	state = GET_CHANNEL;
+	state = DETECT_CHANNEL;
 
 	while (1)
 	{
 		enum state_wanted state_want = WANT_ERROR;
 
+		printf ("state: %d %d\n", state, state_want);
 		switch (state)
 		{
 			case BACKUP:
 				return 10;
+			case DETECT_CHANNEL:
+				state_want = detect_channels ();
+				break;
 			case GET_CHANNEL:
 				state_want = get_channel ();
 				break;
@@ -356,9 +392,15 @@ int main ()
 		}
 		switch (state_want)
 		{
+			case WANT_NONE:
+				state = ERROR;
+				break;
 			case WANT_NEXT:
 				switch (state)
 				{
+					case DETECT_CHANNEL:
+						state = GET_CHANNEL;
+						break;
 					case GET_CHANNEL:
 						state = CONFIRM;
 						break;
