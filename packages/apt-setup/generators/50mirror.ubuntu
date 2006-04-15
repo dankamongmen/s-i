@@ -15,6 +15,9 @@ while :; do
 			db_input low apt-setup/universe || true
 		;;
 		3)
+			db_input low apt-setup/multiverse || true
+		;;
+		4)
 			db_input low apt-setup/backports || true
 		;;
 		*)
@@ -88,7 +91,22 @@ ${COMMENT}deb $protocol://$hostname$directory $codename universe
 ${COMMENT}deb-src $protocol://$hostname$directory $codename universe
 EOF
 
-# Likewise for backports.
+# Multiverse is different, don't write anything unless enabled.
+if db_get apt-setup/multiverse && [ "$RET" = true ]; then
+	cat >> $file <<EOF
+
+## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu 
+## team, and may not be under a free licence. Please satisfy yourself as to 
+## your rights to use the software. Also, please note that software in 
+## multiverse WILL NOT receive any review or updates from the Ubuntu
+## security team.
+deb $protocol://$hostname$directory $codename multiverse
+deb-src $protocol://$hostname$directory $codename multiverse
+EOF
+fi
+
+# Even if the backports repository isn't enabled, we write example lines for
+# it.
 echo >> $file
 if db_get apt-setup/backports && [ "$RET" = true ]; then
 	COMMENT=
