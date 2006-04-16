@@ -344,7 +344,7 @@ db_progress INFO hw-detect/detect_progress_step
 # discover will see Cardbus cards.
 if [ -d /sys/bus/pci/devices ] && grep -q 0x060700 \
 	/sys/bus/pci/devices/*/class && \
-	! lsmod | grep -q ^yenta_socket; then
+	! grep -q ^yenta_socket /proc/modules; then
 	db_subst hw-detect/load_progress_step CARDNAME "Cardbus bridge"
 	db_subst hw-detect/load_progress_step MODULE "yenta_socket"
 	db_progress INFO hw-detect/load_progress_step
