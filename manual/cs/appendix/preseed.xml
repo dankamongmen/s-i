@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 35836 -->
+<!-- original version: 36269 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
-the example preseed file.
+the example preconfiguration file.
 In that file all text between <informalexample> tags that have the
 attribute 'role="example"' set is included, except if a 'condition'
 attribute is in force that does not match the specified release or if an
@@ -347,7 +347,7 @@ ISC DHCP verze 3 (balík dhcp3-server).
 
 <informalexample><screen>
 if substring (option vendor-class-identifier, 0, 3) = "d-i" {
-       filename "http://pocitac/preseed.cfg";
+    filename "http://pocitac/preseed.cfg";
 }
 </screen></informalexample>
 
@@ -399,9 +399,8 @@ a 32 proměnných prostředí.
 </para></note><para>
 
 Pro většinu instalací můžete celkem bez problémů odstranit implicitní
-volby <userinput>vga=normal</userinput>
-a <userinput>devfs=mount</userinput>, což vám umožní přidat další
-volby pro přednastavení.
+volby jako <userinput>vga=normal</userinput>, což vám umožní přidat
+další volby pro přednastavení.
 
 </para><note><para>
 
@@ -412,40 +411,95 @@ i v případě, kdy hodnotu obklopíte uvozovkami.
   </sect2>
  </sect1>
 
- <sect1 condition="FIXME" id="preseed-creating">
+ <sect1 id="preseed-creating">
  <title>Vytvoření souboru s přednastavením</title>
 <para>
 
 Soubor s přednastavením soubor má stejný formát jako používá příkaz
-<command>debconf-set-selections</command>.
+<command>debconf-set-selections</command>. Běžný řádek pak má tvar
+
+<informalexample><screen>
+&lt;vlastník&gt; &lt;jméno šablony&gt; &lt;typ šablony&gt; &lt;hodnota&gt;
+</screen></informalexample>
+
+</para><para>
+
+Při vytváření souboru s přednastavením byste měli mít na paměti
+několik pravidel.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  Formát souboru
+  Mezi typ a hodnotu vkládejte pouze jednu mezeru nebu tabulátor
+  &mdash; případné další bílé znaky budou považovány za součást
+  hodnoty.
 </para></listitem>
 <listitem><para>
-  Mezi typem šablony a hodnotou je povolena pouze jedna mezera
+  Dlouhý řádek můžete pro lepší čitelnost rozdělit na několik řádků
+  tak, že na konec řádku přidáte znak pro pokračování řádku
+  <quote><literal>\</literal></quote> (zpětné lomítko). Je vhodné
+  rozdělit řádek mezi názvem a typem šablony, ne mezi typem
+  a hodnotou.
 </para></listitem>
 <listitem><para>
-  Vztah k /var/lib/(c)debconf/templates
+  Většina šablon vyžaduje zadání hodnot v angličtině, avšak existují
+  výjimky jako třeba <classname>partman</classname>, kde musíte použít
+  přeložené hodnoty.
 </para></listitem>
 <listitem><para>
-  Typy šablon a jak jim zadat hodnoty
-</para></listitem>
-<listitem><para>
-  Většina hodnot musí být v angličtině nebo formou kódu
-</para></listitem>
-<listitem><para>
-  Použití ruční instalace jako základ
-</para></listitem>
-<listitem><para>
-  Nalezení dalších možných hodnot
+  Dále pak některé šablony vyžadují hodnotu formou kódu (a ne text,
+  který se zobrazuje během instalace).
 </para></listitem>
 </itemizedlist>
 
 <para>
+
+Nejjednodušší způsob vytvoření souboru s přednastavením je použít
+ukázkový soubor z <xref linkend="preseed-contents"/> jako základ
+a upravit si jej dle potřeb.
+
+</para><para>
+
+Jiná možnost je provést ruční instalaci a po restartu do nového
+systému použít příkaz <command>debconf-get-selections</command> (z
+balíku <classname>debconf-utils</classname>) a uložit databázi
+debconfu i cdebconfu do jediného souboru:
+
+<informalexample><screen>
+$ debconf-get-selections --installer &gt; <replaceable>soubor</replaceable>
+$ debconf-get-selections &gt;&gt; <replaceable>soubor</replaceable>
+</screen></informalexample>
+
+</para><para>
+
+Tento přístup má tu nevýhodu, že vytvořený soubor bude obsahovat
+i položky, které by se neměly přednastavovat. Z tohoto pohledu je pro
+většinu uživatelů vhodnější použití ukázkového souboru.
+
+</para><note><para>
+
+Tento způsob se spoléhá na fakt, že se na konci instalace uloží
+databáze cdebconfu do instalovaného systému do souboru
+<filename>/var/log/installer/cdebconf</filename>. Protože tato
+databáze může obsahovat důvěrné informace, jsou tyto soubory čitelné
+pouze pro uživatele root.
+
+</para><para>
+
+Pokud ze systému vyčistíte balík
+<classname>installation-report</classname>, bude smazán také adresář
+<filename>/var/log/installer</filename>.
+
+</para></note><para>
+
+Seznam možných hodnot pro šablony můžete zjistit během instalace ze
+souborů umístěných v adresáři <filename>/var/lib/cdebconf</filename>
+(např. pomocí editoru <command>nano</command>). Samotné šablony se
+nachází v souboru <filename>templates.dat</filename>, aktuální hodnoty
+naleznete v souboru <filename>questions.dat</filename>.
+
+</para><para>
 
 Ještě před instalací je vhodné zkontrolovat formát předkonfiguračního
 souboru příkazem <command>debconf-set-selections -c
@@ -715,8 +769,8 @@ d-i time/zone string US/Eastern
 
 Nastavení souboru <filename>/etc/apt/sources.list</filename>
 a několika základních parametrů je plně řízeno typem instalace
-a dříve zodpovězenými otázkami, takže pro přednastavení zbývají pouze
-tři relevantní proměnné.
+a dříve zodpovězenými otázkami. Volitelně můžete přidat další
+(lokální) archivy.
 
 </para>
 
@@ -727,6 +781,13 @@ tři relevantní proměnné.
 # Odkomentujte, pokud nechcete přidat zdroje s opravami, nebo pokud
 # chcete použít jiný server než security.debian.org.
 #d-i apt-setup/security_host string
+
+# Další archivy, k dispozici jsou local[0-9]
+#d-i apt-setup/local0/comment string local server
+#d-i apt-setup/local0/repository string \
+#       deb http://muj.server/debian stable main
+# URL k veřejnému klíči lokálního archivu
+#d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
   </sect2>
@@ -750,16 +811,19 @@ hrubou silou.
 </para></warning>
 
 <informalexample role="example"><screen>
+# Přeskočí vytvoření účtu pro roota (běžný uživatel bude moci použít
+# sudo).
+#d-i passwd/root-login boolean false
+# Volitelně přeskočí vytvoření běžného uživatelského účtu.
+#d-i passwd/make-user boolean false
+
 # Rootovo heslo v čitelném tvaru
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
 # nebo šifrované pomocí MD5 hashe.
 #d-i passwd/root-password-crypted password [MD5 hash]
 
-# Přeskočí vytváření běžného uživatelského účtu.
-#d-i passwd/make-user boolean false
-
-# Alternativně můžete vytvořit účet běžného uživatele.
+# Vytvoření účtu běžného uživatele.
 #d-i passwd/user-fullname string Jan Novak
 #d-i passwd/username string jan
 # Heslo běžného uživatele v čitelném tvaru
@@ -776,7 +840,8 @@ Do proměnných <classname>passwd/root-password-crypted</classname> a
 hodnotu zadat znak vykřičník <quote>!</quote>, což znamená, že daný
 účet bude zakázán. To se může hodit například pro účet root, což ovšem
 předpokládá, že máte nastavenu nějakou jinou možnost, jak počítač
-spravovat (například pomocí sudo nebo autentizace přes SSH klíče).
+spravovat (například pomocí <command>sudo</command> nebo autentizace
+přes SSH klíče).
 
 </para><para>
 
