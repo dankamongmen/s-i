@@ -46,4 +46,6 @@ for QUEUEFILE in $QUEUE/*.params; do
 	rm $QUEUEFILE
 done
 
-chroot /target update-modules < /dev/null 2>&1 | logger "register-modules"
+if [ -x /target/sbin/update-modules ]; then
+	chroot /target update-modules < /dev/null 2>&1 | logger "register-modules"
+fi
