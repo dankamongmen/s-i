@@ -65,20 +65,24 @@ int packages_ok (di_packages *packages) {
 }
 
 static int choose_modules(di_packages *status, di_packages **packages) {
-	char *choose_modules_question;
+	char *choose_modules_question = "anna/choose_modules" ;
+	char *question_priority = "medium";
 	char *choices;
 	int package_count = 0;
-	di_package *package, *status_package, **package_array, *test_package;
-	di_slist_node *node, *node1, *node2;
-	int reverse_depend=0;
-	int lowmem=get_lowmem_level();
+	di_package *package, *status_package, **package_array;
+	di_slist_node *node, *node1;
 	bool standard_modules = true;
-	
-	if (lowmem < 2) {
-		choose_modules_question="anna/choose_modules";
-	}
-	else {
+	bool lowmem_mode = false;
+
+	/* Test lowmem level to know if packages with want_install status
+	   will be shown */
+	if ( get_lowmem_level() >= 2) {
+		lowmem_mode = true;
 		choose_modules_question="anna/choose_modules_lowmem";
+		/* force priority to show question even in a non expert mode */
+		question_priority = "high";
+		di_log (DI_LOG_LEVEL_DEBUG, 
+			"lowmem_mode, want_install status packages will be shown");
 	}
 
 	for (node = status->list.head; node; node = node->next) {
@@ -134,28 +138,6 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 			}
 		}
  
-		if (lowmem > 1) {
-			if (package->priority == di_package_priority_standard
-			    && ! ((di_system_package *)package)->installer_menu_item) {
-				/* get only packages which are not dependencies of other packages */
-				reverse_depend=0;
-				for (node1 = (*packages)->list.head; node1; node1 = node1->next) {
-					test_package = node1->data;
-					for (node2 = test_package->depends.head; node2; node2 = node2->next) {
-						di_package_dependency *d = node2->data;
-						if (d->ptr == package) {
-							reverse_depend=1;
-						}
-					}
-				}
-				if (reverse_depend == 0 && !
-				    ((di_system_package *)package)->kernel_version) {
-					package->status_want = di_package_status_want_unknown;
-				}
-				package->priority = di_package_priority_optional;
-			}
-		}
-
 		if (package->priority >= di_package_priority_standard) {
 			if (standard_modules || ((di_system_package *)package)->kernel_version) {
 				package->status_want = di_package_status_want_install;
@@ -184,6 +166,19 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 	/* Drop packages in udeb_exclude */
 	drop_excludes(*packages);
 
+	/* in lowmem mode, we add all packages in the instlist by setting
+	   status to want_unknown except those which are menu item and
+	   their dependencies (calculated by the next function) */
+	if (lowmem_mode) {
+		for (node = (*packages)->list.head; node; node = node->next) {
+			package = node->data;
+			if ( package->status_want == di_package_status_want_install &&
+			     ((di_system_package *)package)->installer_menu_item == 0) {
+				package->status_want = di_package_status_want_unknown;
+			}
+		}	  
+	}
+
 	di_system_packages_resolve_dependencies_mark_anna(*packages, subarchitecture, running_kernel);
 
 	/* Slight over-allocation, but who cares */
@@ -199,12 +194,9 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 	qsort(package_array, package_count, sizeof(di_package *), package_name_compare);
 	choices = list_to_choices(package_array);
 	debconf_subst(debconf, choose_modules_question, "CHOICES", choices);
-	if (lowmem < 2) {
-		debconf_input(debconf, "medium", choose_modules_question);
-	}
-	else {
-		debconf_input(debconf, "high", choose_modules_question);
-	}
+	
+	debconf_input(debconf, question_priority, choose_modules_question);
+	
 	di_free(choices);
 	di_free(package_array);
 	
