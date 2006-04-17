@@ -11,7 +11,7 @@ static int quiet = 0;
 di_packages *get_packages (void) {
 	di_packages_allocator *packages_allocator = di_system_packages_allocator_alloc();
 	di_packages *packages = retriever_packages(packages_allocator);
-	
+
 	while (packages == NULL) {
 		int r=retriever_error("packages");
 		di_log(DI_LOG_LEVEL_WARNING, "bad d-i Packages file");
@@ -28,7 +28,7 @@ di_packages *get_packages (void) {
 
 	return packages;
 }
-       
+
 /* Go through the available packages to see if it contains at least
  * one package that is valid for the subarchitecture and corresponds
  * to the kernel version we are running */
@@ -39,7 +39,7 @@ int packages_ok (di_packages *packages) {
 
 	for (node = packages->list.head; node; node = node->next) {
 		package = node->data;
-        
+
 		if (!di_system_package_check_subarchitecture(package, subarchitecture))
 			continue;
 	 	if (((di_system_package *)package)->kernel_version) {
@@ -81,7 +81,7 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 		choose_modules_question="anna/choose_modules_lowmem";
 		/* force priority to show question even in a non expert mode */
 		question_priority = "high";
-		di_log (DI_LOG_LEVEL_DEBUG, 
+		di_log (DI_LOG_LEVEL_DEBUG,
 			"lowmem_mode, want_install status packages will be shown");
 	}
 
@@ -137,7 +137,7 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 				}
 			}
 		}
- 
+
 		if (package->priority >= di_package_priority_standard) {
 			if (standard_modules || ((di_system_package *)package)->kernel_version) {
 				package->status_want = di_package_status_want_install;
@@ -152,7 +152,7 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 			package->status_want = di_package_status_want_install;
 			di_log (DI_LOG_LEVEL_DEBUG, "install %s, queued by anna-install", package->package);
 		}
-		else if (((di_system_package *)package)->installer_menu_item 
+		else if (((di_system_package *)package)->installer_menu_item
 			/* we don't want to see installed packages in choices list*/
 		         && package->status != di_package_status_installed) {
 			package->status_want = di_package_status_want_unknown;
@@ -176,7 +176,7 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 			     ((di_system_package *)package)->installer_menu_item == 0) {
 				package->status_want = di_package_status_want_unknown;
 			}
-		}	  
+		}
 	}
 
 	di_system_packages_resolve_dependencies_mark_anna(*packages, subarchitecture, running_kernel);
@@ -194,15 +194,15 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 	qsort(package_array, package_count, sizeof(di_package *), package_name_compare);
 	choices = list_to_choices(package_array);
 	debconf_subst(debconf, choose_modules_question, "CHOICES", choices);
-	
+
 	debconf_input(debconf, question_priority, choose_modules_question);
-	
+
 	di_free(choices);
 	di_free(package_array);
-	
+
 	if (debconf_go(debconf) == 30)
 		return 1;
-	
+
 	debconf_get(debconf, choose_modules_question);
 	if (debconf->value != NULL) {
 		char *choices = debconf->value;
@@ -261,7 +261,7 @@ install_modules(di_packages *status, di_packages *packages) {
 				if (*fp == '/')
 					f = ++fp;
 			}
-			if (asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f) == -1) 
+			if (asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f) == -1)
 				return 5;
 
 			if (!quiet) {
@@ -287,7 +287,7 @@ install_modules(di_packages *status, di_packages *packages) {
 						continue;
 					}
 				}
-                
+
 				if (! md5sum(package->md5sum, dest_file)) {
 					di_log(DI_LOG_LEVEL_WARNING, "bad md5sum");
 					if (!quiet)
@@ -365,7 +365,7 @@ int main(int argc, char **argv) {
 	di_system_init("anna");
 
 	subarchitecture = di_system_subarch_analyze();
-	
+
 	if (uname(&uts) == 0) {
 		running_kernel = strdup(uts.release);
 	}
@@ -376,7 +376,7 @@ int main(int argc, char **argv) {
 
 	status_allocator = di_system_packages_allocator_alloc();
 	status = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, status_allocator);
-	
+
 	if (argc <= 1) {
 		fprintf(stderr, "need parameters\n");
 		exit(1);
@@ -391,22 +391,22 @@ int main(int argc, char **argv) {
 			exit(1);
 		}
 		retriever_config();
-		
+
 		packages = get_packages();
 		if (! packages) {
 			retriever_cleanup();
 			return 10;
 		}
-		
+
 		for (node = packages->list.head; node; node = node->next) {
                 	package = node->data;
 			package->status_want = di_package_status_want_deinstall;
 		}
-		
+
 		for (i = 2; i < argc; i++) {
 			int installed = 0;
 			int found = 0;
-			
+
 			for (node = status->list.head; node; node = node->next) {
 				di_slist_node *node1;
 				package = node->data;
@@ -428,7 +428,7 @@ int main(int argc, char **argv) {
 				di_log (DI_LOG_LEVEL_DEBUG, "skipping already installed %s", argv[i]);
 				continue;
 			}
-			
+
 			for (node = packages->list.head; node; node = node->next) {
 				package = node->data;
 
@@ -472,7 +472,7 @@ int main(int argc, char **argv) {
 			set_retriever(argv[1], 1);
 		}
 		retriever_config();
-		
+
 		packages = get_packages();
 		if (! packages || ! packages_ok(packages)) {
 			retriever_cleanup();
@@ -486,7 +486,7 @@ int main(int argc, char **argv) {
 			ret = install_modules(status, packages);
 		}
 	}
-	
+
 	retriever_cleanup();
 	return ret;
 }
