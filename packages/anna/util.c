@@ -28,7 +28,7 @@ int is_queued(di_package *package) {
 		}
 		fclose(fp);
 	}
-	
+
 	return 0;
 }
 
@@ -49,13 +49,13 @@ bool is_installed(di_package *p, di_packages *status) {
 	ret = (di_package_version_compare(pv, qv) <= 0);
 	di_package_version_free(pv);
 	di_package_version_free(qv);
-	
+
 	return ret;
 }
 
 static size_t choice_strcpy(char *dest, char *src, size_t size) {
 	size_t n=0;
-    
+
 	while (*src && (n < size-2)) {
 		if (*src == ',')
 			dest[n++] = '\\';

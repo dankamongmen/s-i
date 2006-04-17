@@ -4,7 +4,7 @@
  * closely correspond to the commands in the spec. Note that those that
  * have int return codes return inverted (shell-style) unless otherwise
  * noted.
- * 
+ *
  */
 #include <cdebconf/debconfclient.h>
 #include "anna.h"
@@ -15,7 +15,7 @@ char *retriever_command = NULL;
 int retriever_newdefault = 0;
 int retriever_usecached = 0;
 
-/* Select the name of the retriever to use (for example, "cdrom"). 
+/* Select the name of the retriever to use (for example, "cdrom").
  * If isdefault, the retriever is stored in the debconf db for use as the
  * default retriever later. */
 void set_retriever(const char *retriever, int isdefault) {
@@ -84,14 +84,14 @@ di_packages *retriever_packages(di_packages_allocator *allocator) {
 	else {
 		packages = di_system_packages_read_file(DOWNLOAD_PACKAGES_DEFAULT, allocator);
 	}
-	
+
 	if (retriever_newdefault && packages) {
 		rename(DOWNLOAD_PACKAGES, DOWNLOAD_PACKAGES_DEFAULT);
 	}
 	else {
 		unlink(DOWNLOAD_PACKAGES);
 	}
-	
+
 	if (!packages) {
 		di_log(DI_LOG_LEVEL_ERROR, "can't find packages file");
 	}
@@ -104,18 +104,18 @@ di_packages *retriever_packages(di_packages_allocator *allocator) {
 signed int retriever_error (const char *failing_command) {
 	char *command;
 	int ret;
-    
+
 	/* There is no mechanism to handle backing up from here, so turn it
 	 * off. */
 	debconf_capb(debconf, "");
-    
+
 	if (asprintf(&command, "%s error %s", get_retriever(), failing_command) == -1)
 		return 0;
 	ret = di_exec_shell_log(command);
 	free(command);
-    
+
 	debconf_capb(debconf, "backup");
-    
+
 	switch (ret) {
 		case 0:
 			return 1;
