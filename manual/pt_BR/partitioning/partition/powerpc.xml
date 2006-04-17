@@ -1,55 +1,54 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 23146 -->
 
   <sect2 arch="powerpc"><title>Particionamento em PowerMacs novos</title>
 <para>
 
-Se estiver instalando em um PowerMac NewWorld você deverá criar uma
-partição especial de inicialização para armazenar o gerenciador de 
-partida. O tamanho desta partição deverá ser de 800Kb e seu tipo de 
-partição deverá ser <emphasis>Apple_Bootstrap</emphasis>. Caso a 
-partição de inicialização não for criada com o tipo 
-<emphasis>Apple_Bootstrap</emphasis> sua máquina não poderá se tornar
-inicializável através do disco rígido. Esta partição poderá ser facilmente
-criada criando uma partição no <command>partman</command> e dizendo-o para 
-usa-la como uma <quote>Partição de inicialização NewWorld</quote> ou 
+Se estiver instalando em um PowerMac NewWorld vocÃª deverÃ¡ criar uma
+partiÃ§Ã£o especial de inicializaÃ§Ã£o para armazenar o gerenciador de 
+partida. O tamanho desta partiÃ§Ã£o deverÃ¡ ser de 800Kb e seu tipo de 
+partiÃ§Ã£o deverÃ¡ ser <emphasis>Apple_Bootstrap</emphasis>. Caso a 
+partiÃ§Ã£o de inicializaÃ§Ã£o nÃ£o for criada com o tipo 
+<emphasis>Apple_Bootstrap</emphasis> sua mÃ¡quina nÃ£o poderÃ¡ se tornar
+inicializÃ¡vel atravÃ©s do disco rÃ­gido. Esta partiÃ§Ã£o poderÃ¡ ser facilmente
+criada criando uma partiÃ§Ã£o no <command>partman</command> e dizendo-o para 
+usa-la como uma <quote>PartiÃ§Ã£o de inicializaÃ§Ã£o NewWorld</quote> ou 
 no <command>mac-fdisk</command> usando o comando <userinput>b</userinput>.
 
 </para><para>
 
-O tipo de partição especial Apple_Bootstrap é requerido para evitar que
-o MacOS monte e danifique a partição de inicialização, pois lá existem
-modificações especiais para faze-la inicializar o OpenFirmware automaticamente.
+O tipo de partiÃ§Ã£o especial Apple_Bootstrap Ã© requerido para evitar que
+o MacOS monte e danifique a partiÃ§Ã£o de inicializaÃ§Ã£o, pois lÃ¡ existem
+modificaÃ§Ãµes especiais para faze-la inicializar o OpenFirmware automaticamente.
 
 </para><para>
 
-Note que a partição de inicialização somente armazena 3 arquivos muito
-pequenos: o binário <command>yaboot</command>, sua configuração em
-<filename>yaboot.conf</filename> e o carregador do primeiro estágio do 
-OpenFirmware <command>ofboot.b</command>. Ele não precisa e não deve
+Note que a partiÃ§Ã£o de inicializaÃ§Ã£o somente armazena 3 arquivos muito
+pequenos: o binÃ¡rio <command>yaboot</command>, sua configuraÃ§Ã£o em
+<filename>yaboot.conf</filename> e o carregador do primeiro estÃ¡gio do 
+OpenFirmware <command>ofboot.b</command>. Ele nÃ£o precisa e nÃ£o deve
 ser montado em seu sistema de arquivos nem ter kernels ou qualquer 
-outra coisa copiada para ele. Os utilitários <command>ybin</command> e 
-<command>mkofboot</command> são usados para manipular esta partição.
+outra coisa copiada para ele. Os utilitÃ¡rios <command>ybin</command> e 
+<command>mkofboot</command> sÃ£o usados para manipular esta partiÃ§Ã£o.
 
 </para><para>
 
-Para o OpenFirmware inicializar automaticamente na &debian; a partição
-de inicialização deverá aparecer antes das partições de inicialização no 
-disco, especialmente as partições de inicialização do MacOS. A partição
-de inicialização deverá ser a primeira que criar. No entanto, se adicionar
-uma partição de inicialização mais adiante, você poderá usar o comando
+Para o OpenFirmware inicializar automaticamente na &debian; a partiÃ§Ã£o
+de inicializaÃ§Ã£o deverÃ¡ aparecer antes das partiÃ§Ãµes de inicializaÃ§Ã£o no 
+disco, especialmente as partiÃ§Ãµes de inicializaÃ§Ã£o do MacOS. A partiÃ§Ã£o
+de inicializaÃ§Ã£o deverÃ¡ ser a primeira que criar. No entanto, se adicionar
+uma partiÃ§Ã£o de inicializaÃ§Ã£o mais adiante, vocÃª poderÃ¡ usar o comando
 <userinput>r</userinput> do <command>mac-fdisk</command> para reordenar
-o mapa da partição assim a partição de inicialização se tornará a 
-real após o mapeamento (que é sempre a partição 1). É uma ordenação de 
-mapeamento lógico não de endereços físicos, isto conta.
+o mapa da partiÃ§Ã£o assim a partiÃ§Ã£o de inicializaÃ§Ã£o se tornarÃ¡ a 
+real apÃ³s o mapeamento (que Ã© sempre a partiÃ§Ã£o 1). Ã‰ uma ordenaÃ§Ã£o de 
+mapeamento lÃ³gico nÃ£o de endereÃ§os fÃ­sicos, isto conta.
 
 </para><para>
 
-Os discos da apple normalmente rem diversas pequenas partições de controladores.
-Se não tiver a intenção de fazer dupla inicialização com o MacOSX, você deverá 
-reter estas partições e uma pequena partição HFS (800Kb é o tamanho mínimo). 
-Isto é por causa que o MacOSX, em cada inicialização, se oferece para inicializar
-qualquer disco que não tem partições MacOS ativas e partições de controladores.
+Os discos da apple normalmente rem diversas pequenas partiÃ§Ãµes de controladores.
+Se nÃ£o tiver a intenÃ§Ã£o de fazer dupla inicializaÃ§Ã£o com o MacOSX, vocÃª deverÃ¡ 
+reter estas partiÃ§Ãµes e uma pequena partiÃ§Ã£o HFS (800Kb Ã© o tamanho mÃ­nimo). 
+Isto Ã© por causa que o MacOSX, em cada inicializaÃ§Ã£o, se oferece para inicializar
+qualquer disco que nÃ£o tem partiÃ§Ãµes MacOS ativas e partiÃ§Ãµes de controladores.
 
 </para>
   </sect2>

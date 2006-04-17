@@ -1,99 +1,99 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31618 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.31 -->
+<!-- original version: 35590 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.04.17 -->
+<!-- revised by Herbert P Fortes Neto (hpfn) 2006.04.13 -->
 
   <sect2 arch="i386"><title>Particionamento para &arch-title;</title>
 <para>
 
-Se já tiver um sistema operacional tal como o DOS ou Windows e
-deseja preservar este sistema durante a instalação da Debian, você
-provavelmente terá que redimencionar o tamanho da partição ocupada, liberando
-seu espaço livre para a instalação da Debian. O programa de instalação
+Se jÃ¡ tiver um sistema operacional tal como o DOS ou Windows e
+deseja preservar este sistema durante a instalaÃ§Ã£o da Debian, vocÃª
+provavelmente terÃ¡ que redimencionar o tamanho da partiÃ§Ã£o ocupada, liberando
+seu espaÃ§o livre para a instalaÃ§Ã£o da Debian. O programa de instalaÃ§Ã£o
 suporta o redimensionamento de ambos os sitemas de arquivos FAT e NTFS;
-quando chegar no passo de particionamento do sistema de instalação, selecione
-particionamento manual e simplesmente selecione a partição do sistema
+quando chegar no passo de particionamento do sistema de instalaÃ§Ã£o, selecione
+particionamento manual e simplesmente selecione a partiÃ§Ã£o do sistema
 existente e altere seu tamanho.
 
 </para><para>
 
-A BIOS do PC geralmente adiciona barreiras adicionais com relação ao
-particionamento de disco. Existe um limite de quantas partições
-<quote>primárias</quote> e <quote>lógicas</quote> uma unidade de disco pode
-ter. Adicionalmente, com BIOS pré 1994&ndash;98 existem limites de que unidades
-a BIOS pode inicializar o sistema. Mais informações podem ser encontradas no
+A BIOS do PC geralmente adiciona barreiras adicionais com relaÃ§Ã£o ao
+particionamento de disco. Existe um limite de quantas partiÃ§Ãµes
+<quote>primÃ¡rias</quote> e <quote>lÃ³gicas</quote> uma unidade de disco pode
+ter. Adicionalmente, com BIOS prÃ© 1994&ndash;98 existem limites de que unidades
+a BIOS pode inicializar o sistema. Mais informaÃ§Ãµes podem ser encontradas no
 <ulink url="&url-partition-howto;">Linux Partition HOWTO</ulink> e na
 <ulink url="&url-phoenix-bios-faq-large-disk;">Phoenix BIOS FAQ</ulink>,
-mas esta seção incluirá uma breve visão para ajudar a planejar a maioria
-das situações.
+mas esta seÃ§Ã£o incluirÃ¡ uma breve visÃ£o para ajudar a planejar a maioria
+das situaÃ§Ãµes.
 
 </para><para>
 
-As partições <quote>primárias</quote> fazem parte do esquema original de
+As partiÃ§Ãµes <quote>primÃ¡rias</quote> fazem parte do esquema original de
 particionamento para discos PC. No entanto, somente podem existir quatro delas.
-Para superar esta limitação, as partições <quote>extendidas</quote> e
-<quote>lógicas</quote> foram inventadas. Quando selecionar uma de suas
-partições primárias como uma partição extendida, você poderá subdividir todo o
-espaço alocado para aquela partição em partições lógicas. Você poderá criar até
-60 partições lógicas por partição extendida; no entanto você somente poderá ter
-uma partição extendida por unidade.
+Para superar esta limitaÃ§Ã£o, as partiÃ§Ãµes <quote>extendidas</quote> e
+<quote>lÃ³gicas</quote> foram inventadas. Quando selecionar uma de suas
+partiÃ§Ãµes primÃ¡rias como uma partiÃ§Ã£o extendida, vocÃª poderÃ¡ subdividir todo o
+espaÃ§o alocado para aquela partiÃ§Ã£o em partiÃ§Ãµes lÃ³gicas. VocÃª poderÃ¡ criar atÃ©
+60 partiÃ§Ãµes lÃ³gicas por partiÃ§Ã£o extendida; no entanto vocÃª somente poderÃ¡ ter
+uma partiÃ§Ã£o extendida por unidade.
 
 </para><para>
-O Linux limita as partições por unidade a 15 partições para discos
-SCSI (3 partições primárias utilizáveis e 12 partições lógicas) e
-63 partições em uma unidade de discos IDE (3 partições primárias
-utilizáveis e 60 partições lógicas). No entanto a
-&debian; fornece apenas 20 dispositivos para partições em sua instalação
-inicial, assim não poderá instalar usando mais de 20 partições a não ser
-que primeiro crie manualmente os dispositivos para estas partições.
+O Linux limita as partiÃ§Ãµes por unidade a 15 partiÃ§Ãµes para discos
+SCSI (3 partiÃ§Ãµes primÃ¡rias utilizÃ¡veis e 12 partiÃ§Ãµes lÃ³gicas) e
+63 partiÃ§Ãµes em uma unidade de discos IDE (3 partiÃ§Ãµes primÃ¡rias
+utilizÃ¡veis e 60 partiÃ§Ãµes lÃ³gicas). No entanto a
+&debian; fornece apenas 20 dispositivos para partiÃ§Ãµes em sua instalaÃ§Ã£o
+inicial, assim nÃ£o poderÃ¡ instalar usando mais de 20 partiÃ§Ãµes a nÃ£o ser
+que primeiro crie manualmente os dispositivos para estas partiÃ§Ãµes.
 
 </para><para>
 
-Caso tenha um disco IDE grande e está usando ou o endereçamento LBA ou
+Caso tenha um disco IDE grande e estÃ¡ usando ou o endereÃ§amento LBA ou
 controladores overlay (algumas vezes fornecidos por fabricantes de
-discos rígidos), então a partição de inicialização (a partição contendo
-a imagem do kernel) deverá ser colocada entre os primeiros 1024 cilindros
-do seu disco rígido (normalmente em torno de 524MB, sem a tradução
+discos rÃ­gidos), entÃ£o a partiÃ§Ã£o de inicializaÃ§Ã£o (a partiÃ§Ã£o contendo
+a imagem do kernel) deverÃ¡ ser colocada entre os primeiros 1024 cilindros
+do seu disco rÃ­gido (normalmente em torno de 524MB, sem a traduÃ§Ã£o
 de BIOS).
 
 </para><para>
 
-Esta restrição não se aplica se tiver uma BIOS mais nova que 1995&ndash;98
-(dependendo da adoção do seu fabricante) que suporta a <quote>Especificação
-de Suporte Avançado de Unidades de Disco</quote>. Ambos o Lilo, o Linux Loader,
+Esta restriÃ§Ã£o nÃ£o se aplica se tiver uma BIOS mais nova que 1995&ndash;98
+(dependendo da adoÃ§Ã£o do seu fabricante) que suporta a <quote>EspecificaÃ§Ã£o
+de Suporte AvanÃ§ado de Unidades de Disco</quote>. Ambos o Lilo, o Linux Loader,
 e o comando alternativo <command>mbr</command> da Debian devem usar a
-BIOS para ler o kernel do disco e carregá-lo na memória RAM. Caso as
-extensões 0x13 da BIOS para acesso a discos de grande capacidades
-foram detectadas, elas serão usadas. Caso contrário, a
-interface de acesso a disco é usada como padrão e não poderá ser
-usada para endereçar qualquer localização no disco maior que o
-cilindro 1023. Assim que o Linux for inicializado, não importa qual
-BIOS seu computador possui, estas restrições não se aplicam mais, pois o
-Linux não utiliza a BIOS para fazer acesso a disco.
+BIOS para ler o kernel do disco e carregÃ¡-lo na memÃ³ria RAM. Caso as
+extensÃµes 0x13 da BIOS para acesso a discos de grande capacidades
+foram detectadas, elas serÃ£o usadas. Caso contrÃ¡rio, a
+interface de acesso a disco Ã© usada como padrÃ£o e nÃ£o poderÃ¡ ser
+usada para endereÃ§ar qualquer localizaÃ§Ã£o no disco maior que o
+cilindro 1023. Assim que o Linux for inicializado, nÃ£o importa qual
+BIOS seu computador possui, estas restriÃ§Ãµes nÃ£o se aplicam mais, pois o
+Linux nÃ£o utiliza a BIOS para fazer acesso a disco.
 
 </para><para>
 
-Se tiver um disco grande, você pode ter que usar as técnicas de tradução
-de cilindros, que poderá configurar através do programa de configuração
-da BIOS, tal como o LBA (Logical Block addressing) ou o modo de tradução
-CHR (<quote>Large</quote>). Mais informações sobre assuntos relacionados com
+Se tiver um disco grande, vocÃª pode ter que usar as tÃ©cnicas de traduÃ§Ã£o
+de cilindros, que poderÃ¡ configurar atravÃ©s do programa de configuraÃ§Ã£o
+da BIOS, tal como o LBA (Logical Block addressing) ou o modo de traduÃ§Ã£o
+CHR (<quote>Large</quote>). Mais informaÃ§Ãµes sobre assuntos relacionados com
 discos grandes podem ser encontrados no documento
 <ulink url="&url-large-disk-howto;">Large Disk HOWTO</ulink>. Se estiver
-usando um esquema de tradução de cilindros e sua BIOS não suporta as
-extensões de acesso a discos grandes então sua partição de inicialização
-terá que caber dentro da representação <emphasis>translated</emphasis>
+usando um esquema de traduÃ§Ã£o de cilindros e sua BIOS nÃ£o suporta as
+extensÃµes de acesso a discos grandes entÃ£o sua partiÃ§Ã£o de inicializaÃ§Ã£o
+terÃ¡ que caber dentro da representaÃ§Ã£o <emphasis>translated</emphasis>
 traduzida do cilindro 1024.
 
 </para><para>
 
-O método recomendado de se fazer isto é criar uma partição
-pequena (5 a 10MB deverá ser o suficiente) no início do disco para ser
-usada como partição de inicialização, e então criar qualquer outra
-partição que desejar ter na área restante. Esta partição de inicialização
-<emphasis>deverá</emphasis> ser montada em <filename>/boot</filename>,
-pois este é o diretório aonde o kernel do Linux será armazenado.
-Esta configuração funcionará em qualquer sistema, não importando se a
-tradução LBA ou CHR é usada e não importando se sua BIOS suporta as
-extensões de acesso a discos grandes.
+O mÃ©todo recomendado de se fazer isto Ã© criar uma partiÃ§Ã£o
+pequena (25 a 50MB deverÃ¡ ser o suficiente) no inÃ­cio do disco para ser
+usada como partiÃ§Ã£o de inicializaÃ§Ã£o, e entÃ£o criar qualquer outra
+partiÃ§Ã£o que desejar ter na Ã¡rea restante. Esta partiÃ§Ã£o de inicializaÃ§Ã£o
+<emphasis>deverÃ¡</emphasis> ser montada em <filename>/boot</filename>,
+pois este Ã© o diretÃ³rio aonde o kernel do Linux serÃ¡ armazenado.
+Esta configuraÃ§Ã£o funcionarÃ¡ em qualquer sistema, nÃ£o importando se a
+traduÃ§Ã£o LBA ou CHR Ã© usada e nÃ£o importando se sua BIOS suporta as
+extensÃµes de acesso a discos grandes.
 </para>
   </sect2>
