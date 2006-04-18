@@ -25,8 +25,14 @@ grep "^[^#].*:.*:.*" $SBUSLIST | while read DEVLINE; do
 	DEVID=$(echo $DEVLINE | cut -d: -f1)
 	DEVDESCR=$(echo $DEVLINE | cut -d: -f2)
 	DEVMOD=$(echo $DEVLINE | cut -d: -f3)
+	TARGET=$(echo $DEVLINE | cut -d: -f4)
 
 	if echo "$PRTCONF" | grep -q "^ *$DEVID "; then
 		echo "$DEVMOD:$DEVDESCR"
+		if [ "$TARGET" = initrd ]; then
+			register-module -i $DEVMOD
+		else
+			register-module $DEVMOD
+		fi
 	fi
 done
