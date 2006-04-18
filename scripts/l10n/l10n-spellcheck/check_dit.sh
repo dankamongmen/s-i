@@ -40,6 +40,7 @@ UNKN=${DEST_DIR}/${LANG}_unkn_wl.txt
 FILES_TO_KEEP="${UNKN} ${FILES_TO_KEEP}"
 
 SUSPECT_VARS=${DEST_DIR}/${LANG}_var.txt
+LANG_SPECIFIC=${DEST_DIR}/${LANG}_lspec.txt
 }
 
 checks(){
@@ -91,11 +92,21 @@ while read LANG_FILE; do
 	if [ $? = 0 ]  ; then
 	    if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 		${CHECK_VAR} -s ${LANG_FILE} >> ${SUSPECT_VARS}
+
+	        # Level-specific check (only for po files)
+		if [ -f ${SPECIFIC_CHECK} ] ; then
+		    ${SPECIFIC_CHECK} ${LANG_FILE} >> ${LANG_SPECIFIC}
+		fi
 	    fi
 	    extract_msg.pl -msgstr ${LANG_FILE} >> ${ALL_STRINGS}
 	else
 	    if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 		${CHECK_VAR} -s ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${SUSPECT_VARS}
+
+	        # Level-specific check (only for po files)
+		if [ -f ${SPECIFIC_CHECK} ] ; then
+		    ${SPECIFIC_CHECK} ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${LANG_SPECIFIC}
+		fi
 	    fi
 	    extract_msg.pl -msgstr ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${ALL_STRINGS}
 	fi
@@ -108,14 +119,23 @@ while read LANG_FILE; do
     fi
 done < ${PO_FILE_LIST}
 
+#remove empty files
+find ${DEST_DIR} -empty -exec rm '{}' ';'
+
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
-    if [ `ls -l ${SUSPECT_VARS} | awk '{print $5}'` -gt 0 ]; then
+    if [ -f ${SUSPECT_VARS} ]; then
 	FILES_TO_KEEP="${SUSPECT_VARS} ${FILES_TO_KEEP}" 
 	SUSPECT_EXIST=1
     else
-	rm ${SUSPECT_VARS}
 	SUSPECT_EXIST=0
     fi
+fi
+
+if [ -f ${LANG_SPECIFIC} ]; then
+    FILES_TO_KEEP="${LANG_SPECIFIC} ${FILES_TO_KEEP}" 
+    SPECIFIC_EXIST=1
+else
+    SPECIFIC_EXIST=0
 fi
 
 # remove ${ALL_THESE_VARIABLES} if they do not need to be spell checked
@@ -191,14 +211,14 @@ if [ ${DICT} != "null" ] ; then
 	SUSPECT_EXIST=
     fi
 
-# build the entry of stats.txt for the current language (i.e "395 it 1 134")
-    echo `wc -l ${UNKN} | awk '{print $1}'` ${LANG} ${SUSPECT_EXIST} ${CODEPOINTS} >> ${DEST_DIR}/stats.txt
+# build the entry of stats.txt for the current language (i.e "395 it 1 134 0")
+    echo `wc -l ${UNKN} | awk '{print $1}'` ${LANG} ${SUSPECT_EXIST} ${CODEPOINTS} ${SPECIFIC_EXIST} >> ${DEST_DIR}/stats.txt
 else
     if [ ${HANDLE_SUSPECT_VARS} = "no" ] ; then
 	SUSPECT_EXIST=
     fi
 
-    echo "-1 ${LANG} ${SUSPECT_EXIST} ${CODEPOINTS}" >> ${DEST_DIR}/stats.txt
+    echo "-1 ${LANG} ${SUSPECT_EXIST} ${CODEPOINTS}" ${SPECIFIC_EXIST} >> ${DEST_DIR}/stats.txt
 
     NEEDS_RM=`echo ${NEEDS_RM} | sed "s:${ALL_UNKNOWN}::"`
     FILES_TO_KEEP=`echo ${FILES_TO_KEEP} | sed "s:${UNKN}::"`

@@ -39,6 +39,7 @@ fi
 export LANGUAGE_LIST="${CFG_DIR}/lang2dict.txt"
 export WLS_PATH="${CFG_DIR}/wls"
 export PO_FINDER="${CFG_DIR}/po_finder.sh"
+export SPECIFIC_CHECK="${CFG_DIR}/specific.pl"
 export HTML_PAGE="${CFG_DIR}/report_page.html"
 
 if [ -z ${LC_ALL} ] ; then

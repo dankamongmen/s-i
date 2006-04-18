@@ -74,6 +74,8 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     echo "   <th class=\"t1\">Suspect variables</th>"
 fi
 
+echo "   <th class=\"t1\">Specific checks</th>"
+
 echo "   <th class=\"t1\">Custom wordlist</th>"
 echo "   <th class=\"t1\">Codepoints</th>"
 echo "   <th class=\"t1\">All files</th>"
@@ -97,6 +99,13 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 	SUSPECT_VARS_URL="-"
     fi
 fi
+
+if [ $(echo ${ROW} | awk -F, '{print $5}') = "1" ] ; then
+	SPECIFIC_CHECK_URL="<a href=\"latest/nozip/${LANG}_lspec.txt\">${LANG}_lspec.txt</a>"
+    else
+	SPECIFIC_CHECK_URL="-"
+fi    
+
 
 if [ -f ${WLS_PATH}/${LANG}_wl.txt ] ; then
     WORDLIST="<a href=\"latest/nozip/${LANG}_wl.txt\">${LANG}_wl.txt</a>"
@@ -138,6 +147,8 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
 
     echo "   <td>${SUSPECT_VARS_URL}${DIFF}</td>"
 fi
+
+echo "   <td>${SPECIFIC_CHECK_URL}</td>"
 
 echo "   <td>${WORDLIST}</td>"
 
