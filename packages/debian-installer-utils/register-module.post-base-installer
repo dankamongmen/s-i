@@ -14,7 +14,7 @@ create () {
 
 for QUEUEFILE in $QUEUE/*.load; do
 	[ ! -e $QUEUEFILE ] && break
-	MODULE=$(basename $QUEUEFILE)
+	MODULE=$(basename $QUEUEFILE ".load")
 
 	create $MODFILE
 	echo "$MODULE" >> $MODFILE
@@ -24,7 +24,7 @@ done
 OLDIFS=$IFS
 for QUEUEFILE in $QUEUE/*.params; do
 	[ ! -e $QUEUEFILE ] && break
-	MODULE=$(basename $QUEUEFILE)
+	MODULE=$(basename $QUEUEFILE ".params")
 	
 	IFS=":"
 	while read TYPE PARAMS; do
