@@ -20,9 +20,12 @@ for dist in contrib non-free; do
 	fi
 done
 
-# mirror/codename is also set by cdrom methods
-db_get mirror/codename
+db_get mirror/codename || true
 codename="$RET"
+if [ -z "$codename" ]; then
+	db_get cdrom/codename
+	codename="$RET"
+fi
 
 # No updates for sid (unstable). Never mind.
 if [ "$codename" = sid ]; then
