@@ -1,9 +1,14 @@
 #!/bin/sh
 QUEUE=/var/lib/register-module
+ADD_TO_INITRD=0
 TYPE=options
 PARAMS_ONLY=0
 ADD_PARAMS=1
 
+if [ "$1" = "-i" ]; then
+	ADD_TO_INITRD=1
+	shift 1
+fi
 if [ "$1" = "-t" ]; then
 	TYPE=$2
 	shift 2
@@ -21,13 +26,19 @@ MODULE=$1
 shift
 PARAMS="$@"
 
-QUEUEFILE=$QUEUE/$MODULE.load
+LOADFILE=$QUEUE/$MODULE.load
+INITRDFILE=$QUEUE/$MODULE.initrd
 PARAMFILE=$QUEUE/$MODULE.params
 
 mkdir -p $QUEUE
 if [ "$PARAMS_ONLY" = 0 ]; then
-	touch $QUEUEFILE
+	if [ "$ADD_TO_INITRD" = 1 ]; then
+		touch $INITRDFILE
+	else
+		touch $LOADFILE
+	fi
 fi
+
 if [ "$ADD_PARAMS" = 1 ]; then
 	PARAMS="$PARAMS $(grep "^$TYPE:" $PARAMFILE 2>/dev/null | sed "s/^$TYPE://")"
 fi
