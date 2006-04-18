@@ -19,6 +19,12 @@ for item in $(cat $CMDLINE); do
 		continue
 	fi
 	
+	# Skip module-specific variables.
+	varnodot="${var##*.*}"
+	if [ "$varnodot" = "" ]; then
+		continue
+	fi
+	
 	if [ "$item" = "--" ]; then
 		inuser=1
 		collect=""
