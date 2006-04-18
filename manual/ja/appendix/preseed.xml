@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35836 -->
+<!-- original version: 36269 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
-the example preseed file.
-このファイルをパースしてサンプル preseed ファイルを生成するので、
+the example preconfiguration file.
+このファイルをパースしてサンプル事前設定ファイルを生成するので、
 形式に注意してください。
 In that file all text between <informalexample> tags that have the
 attribute 'role="example"' set is included, except if a 'condition'
@@ -40,10 +40,10 @@ This appendix explains the intricacies of preseeding answers to questions in
 
 <!--
 The configuration fragments used in this appendix are also available as an
-example preseed file from &urlset-example-preseed;.
+example preconfiguration file from &urlset-example-preseed;.
 -->
 本付録で使用した設定の断片は、
-&urlset-example-preseed; にあるサンプル preseed ファイルでも利用できます。
+&urlset-example-preseed; にある事前設定ファイルのサンプルで利用できます。
 
 </para>
 
@@ -82,7 +82,7 @@ There are three methods that can be used for preseeding:
 installation method and supports preseeding of more things, but it requires
 the most preparation. File and network preseeding each can be used with
 different installation methods. With file and network preseeding the first
-few installer questions cannot be preseeded because the preseed configuration
+few installer questions cannot be preseeded because the preconfiguration
 file is only loaded after they have been asked.
 -->
 preseed を利用するには、
@@ -93,7 +93,7 @@ initrd preseed は、いずれのインストール方法でも動作し、
 ファイル preseed やネットワーク preseed は、
 それぞれインストール方法が異なる場合に使用されます。
 ファイル preseed やネットワーク preseed では、
-preseed 設定ファイルが読み込まれる前にいくつか質問されてしまうため、
+事前設定ファイルが読み込まれる前にいくつか質問されてしまうため、
 その質問を preseed に含めることができません。
 
 </para><para>
@@ -169,13 +169,13 @@ installation methods.
 
 <!--
 An important difference between the preseeding methods is the point at which
-the preseed configuration file is loaded and processed. For initrd preseeding
+the preconfiguration file is loaded and processed. For initrd preseeding
 this is right at the start of the installation, before the first question is
 even asked. For file preseeding this is after the CD or CD image has been
 loaded. For network preseeding it is only after the network has been
 configured.
 -->
-preseed 方法の重要な違いは、preseed 設定ファイルを読込・処理するポイントです。
+preseed 方法の重要な違いは、事前設定ファイルを読込・処理するポイントです。
 initrd preseed では、インストールの始め (最初の質問が行われる前) に読み込まれます。
 ファイル preseed では、CD や CD イメージが読み込まれた後です。
 ネットワーク preseed では、ネットワークの設定の後でないと読み込まれません。
@@ -200,11 +200,11 @@ also already have been processed.
 
 <!--
 Obviously, any questions that have been processed before the
-preseeding configuration file is loaded cannot be preseeded.
+preconfiguration file is loaded cannot be preseeded.
 <xref linkend="preseed-bootparms"/> offers a way to avoid these
 questions being asked.
 -->
-言うまでもなく、preseed 設定ファイルが読み込まれる前に処理される質問は、
+言うまでもなく、事前設定ファイルが読み込まれる前に処理される質問は、
 preseed できません。
 <xref linkend="preseed-bootparms"/> では、
 そういった質問が出ないようにする方法を提供しています。
@@ -306,11 +306,11 @@ are stored in a separate, non-readable file in the same directory.
 <para>
 
 <!--
-A very powerful and flexible option offered by the preseeding tools is the
-ability to run commands or scripts at certain points in the installation.
-See <xref linkend="preseed-shell"/> for details.
+A very powerful and flexible option offered by the preconfiguration tools
+is the ability to run commands or scripts at certain points in the
+installation. See <xref linkend="preseed-shell"/> for details.
 -->
-preseed ツールで提供される、とても強力で柔軟なオプションに、
+事前設定ツールで提供される、とても強力で柔軟なオプションに、
 インストールの決まった場所でコマンドやスクリプトを実行する機能があります。
 詳細は <xref linkend="preseed-shell"/> をご覧ください。
 
@@ -319,11 +319,11 @@ preseed ツールで提供される、とても強力で柔軟なオプションに、
 <itemizedlist>
 <listitem><para>
 <!--
-  <userinput>preseed/early_command</userinput>: is run as soon as the the
-  preseeding configuration file has been loaded
+  <userinput>preseed/early_command</userinput>: is run as soon as the
+  preconfiguration file has been loaded
 -->
   <userinput>preseed/early_command</userinput>: は、
-  preseed 設定ファイルが読み込まれるとすぐに実行します。
+  事前設定ファイルが読み込まれるとすぐに実行します。
 </para></listitem>
 <listitem><para>
 <!--
@@ -375,33 +375,33 @@ d-i foo/bar seen false
 <para>
 
 <!--
-Of course you will first need to create a preseed file and place it in the
-location from where you want to use it. Creating the preseed file is covered
-later in this appendix. Putting it in the correct location is fairly
+Of course you will first need to create a preconfiguration file and place it in
+the location from where you want to use it. Creating the preconfiguration file
+is covered later in this appendix. Putting it in the correct location is fairly
 straightforward for network preseeding or if you want to read the file off
 a floppy or usb-stick. If you want to include the file on a CD or DVD, you
-will have to remaster the ISO image. How to get the preseed file included
-in the initrd is outside the scope of this document; please consult the
-developers documentation for &d-i;.
+will have to remaster the ISO image. How to get the preconfiguration file
+included in the initrd is outside the scope of this document; please consult
+the developers documentation for &d-i;.
 -->
-もちろん最初に preseed ファイルを作成し、使用したい場所に配置する必要があります。
-preseed ファイルの作成は本付録で後ほど扱います。
+もちろん事前設定ファイルを最初に作成し、使用する場所に配置する必要があります。
+事前設定ファイルの作成は本付録で後ほど扱います。
 ネットワーク preseed の場合や、
-ファイルをフロッピーや USB スティックから読み込みたい場合、
-正しい位置に preseed ファイルを配置するのは簡単です。
+ファイルをフロッピーや USB スティックから読み込む場合、
+簡単に正しい位置に事前設定ファイルを配置できます。
 CD や DVD にファイルを含めたければ、
 ISO イメージを再度マスタリングする必要があります。
-initrd に含まれている preseed ファイルを取り出す方法は、
+initrd に含まれている事前設定ファイルを取り出す方法は、
 この文書では扱いません。&d-i; の開発者向け文書を当たってください。
 
 </para><para>
 
 <!--
-An example preseed file that you can use as basis for your preseed file is
-available from &urlset-example-preseed;. This file is based on the
-configuration fragments included in this appendix.
+An example preconfiguration file that you can use as basis for your own
+preconfiguration file is available from &urlset-example-preseed;. This file is
+based on the configuration fragments included in this appendix.
 -->
-preseed ファイルの基礎にできる preseed ファイルのサンプルは、
+事前設定ファイルの手本にできる事前設定ファイルのサンプルは、
 &urlset-example-preseed; から取得できます。
 このファイルは、この付録にある設定の断片を元にしています。
 
@@ -409,9 +409,9 @@ preseed ファイルの基礎にできる preseed ファイルのサンプルは、
 
   <sect2 id="preseed-loading">
 <!--
-  <title>Loading the preseed file</title>
+  <title>Loading the preconfiguration file</title>
 -->
-  <title>preseed ファイルの読み込み</title>
+  <title>事前設定ファイルの読み込み</title>
 <para>
 
 <!--
@@ -443,28 +443,29 @@ parameter to the end of the append line(s) for the kernel.
 </para><para>
 
 <!--
-If you do specify the preseed file in the bootloader configuration, you might
-change the configuration so you don't need to hit enter to boot the installer.
-For syslinux this means setting the timeout to 1 in
-<filename>syslinux.cfg</filename>.
+If you do specify the preconfiguration file in the bootloader configuration,
+you might change the configuration so you don't need to hit enter to boot the
+installer. For syslinux this means setting the timeout to <literal>1</literal>
+in <filename>syslinux.cfg</filename>.
 -->
-ブートローダの設定で preseed ファイルを指定するなら、
+ブートローダの設定で事前設定ファイルを指定する場合、
 設定を変更すれば、インストーラの起動時に ENTER を押す必要はありません。
 syslinux ではこの設定をするのに、
-<filename>syslinux.cfg</filename> でタイムアウトを 1 にします。
+<filename>syslinux.cfg</filename> でタイムアウトを <literal>1</literal> にします。
 
 </para><para>
 
 <!--
-To make sure the installer gets the right preseed file, you can optionally
-specify a checksum for the file. Currently this needs to be a md5sum, and if
-specified it must match the preseed file or the installer will refuse to use it.
+To make sure the installer gets the right preconfiguration file, you can
+optionally specify a checksum for the file. Currently this needs to be a
+md5sum, and if specified it must match the preconfiguration file or the
+installer will refuse to use it.
 -->
-インストーラが確実に正しい preseed ファイルを取得するには、
-このファイルのチェックサムを指定することができます。
+インストーラが確実に正しい事前設定ファイルを取得するのに、
+このファイルのチェックサムを指定できます。
 現在、これには md5sum 値の指定が必要です。
-指定した値と preseed ファイルの値は一致しなければなりません。
-一致しない場合は、インストーラは preseed ファイルを使用しません。
+指定した値と事前設定ファイルの値は一致しなければなりません。
+一致しない場合は、インストーラは事前設定ファイルを使用しません。
 
 </para>
 
@@ -479,7 +480,7 @@ Boot parameters to specify:
   preseed/file=/cdrom/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 
-- if you're installing from USB media (put the preseed file in the
+- if you're installing from USB media (put the preconfiguration file in the
   toplevel directory of the USB stick):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
@@ -495,8 +496,8 @@ Boot parameters to specify:
   preseed/file=/cdrom/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 
-- USB メディアで起動する場合 (preseed ファイルを USB スティックの
-  トップレベルディレクトリにおくこと):
+- USB メディアで起動する場合 (事前設定ファイルを USB スティックの
+  トップレベルディレクトリに置くこと):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 </screen></informalexample>
@@ -518,31 +519,31 @@ preseed でいくつか以下の設定を漏らしても、
   
   <sect2 id="preseed-dhcp">
 <!--
-  <title>Using a DHCP server to specify preseed files</title>
+  <title>Using a DHCP server to specify preconfiguration files</title>
 -->
-  <title>preseed ファイルを指定するための DHCP の利用方法</title>
+  <title>事前設定ファイルを指定するための DHCP の利用方法</title>
 <para>
  
 <!--
-It's also possible to use DHCP to specify a preseed file to download from
-the network. DHCP allows specifying a filename. Normally this is a file to
-netboot, but if it appears to be an URL then installation media that
-support network preseeding will download the file from the URL and use it
-as a preseed file. Here is an example of how to set it up in the dhcpd.conf
+It's also possible to use DHCP to specify a preconfiguration file to download
+from the network. DHCP allows specifying a filename. Normally this is a file
+to netboot, but if it appears to be an URL then installation media that
+support network preseeding will download the file from the URL and use it as a
+preconfiguration file. Here is an example of how to set it up in the dhcpd.conf
 for version 3 of the ISC DHCP server (the dhcp3-server Debian package).
 -->
-preseed ファイルをネットワークからダウンロードするよう指定するのに、
+事前設定ファイルをネットワークからダウンロードするよう指定するのに、
 DHCP も使用できます。DHCP はファイル名の指定ができます。
 通常これは netboot のファイルですが、URL 形式になっていると、
 ネットワーク preseed をサポートするインストールメディアが、
-URL からファイルをダウンロードし、preseed ファイルとして使用します。
+URL からファイルをダウンロードし、事前設定ファイルとして使用します。
 以下は、ISC DHCP サーバのバージョン 3 用 dhcpd.conf で設定するサンプルです。
 
 </para>
 
 <informalexample><screen>
 if substring (option vendor-class-identifier, 0, 3) = "d-i" {
-       filename "http://host/preseed.cfg";
+    filename "http://host/preseed.cfg";
 }
 </screen></informalexample>
 
@@ -590,16 +591,15 @@ DHCP preseed を用いた Debian の完全自動インストールは、
 
 <!--
 Some parts of the installation process cannot be automated using some forms
-of preseeding because the questions are asked before the preseed file is
-loaded. For example, if the preseed file is downloaded over the network,
-the network setup must be done first. One reason to use initrd preseeding
-is that it allows preseeding of even these early steps of the installation
-process.
+of preseeding because the questions are asked before the preconfiguration
+file is loaded. For example, if the preconfiguration file is downloaded over
+the network, the network setup must be done first. One reason to use initrd
+preseeding is that it allows preseeding of even these early steps of the
+installation process.
 -->
 インストールプロセスのうちのある部分の質問は、
-preseed ファイルが読み込まれる前になされるため、
-自動化することができません。
-例えば、preseed ファイルをネットワークからダウンロードする場合、
+事前設定ファイルが読み込まれる前になされるため自動化できません。
+例えば、事前設定ファイルをネットワークからダウンロードする場合、
 まずネットワークの設定が完了していなければなりません。
 インストールプロセスの早い段階から preseed できるというのが、
 initrd preseed を使用する理由のひとつです。
@@ -607,12 +607,12 @@ initrd preseed を使用する理由のひとつです。
 </para><para>
 
 <!--
-If a preseed file cannot be used to preseed some steps, the install can
-still be fully automated, since you can pass preseed values to the kernel
+If a preconfiguration file cannot be used to preseed some steps, the install
+can still be fully automated, since you can pass preseed values to the kernel
 on the command line. Just pass <userinput>path/to/var=value</userinput>
 for any of the preseed variables listed in the examples.
 -->
-preseed ファイルを preseed に使用できないステップがあっても、
+事前設定ファイルを preseed に使用できないステップがあっても、
 コマンドラインから preseed の値をカーネルに渡せるので、
 まだ完全に自動化できます。
 <userinput>path/to/var=value</userinput> というように、
@@ -640,11 +640,12 @@ you can use 32 command line options and 32 environment options.
 
 <!--
 For most installations some of the default options in your bootloader
-configuration file, like 'vga=normal', may be safely removed which may
-allow you to add more options for preseeding.
+configuration file, like <literal>vga=normal</literal>, may be safely
+removed which may allow you to add more options for preseeding.
 -->
 ほとんどのインストールでは、ブートローダ設定ファイルにある
-('vga=normal' のような) デフォルトオプションを安全に削除できるかもしれません。
+(<literal>vga=normal</literal> のような) 
+デフォルトオプションを安全に削除できるかもしれません。
 これにより preseed 用にもっとオプションを追加できます。
 
 </para>
@@ -661,76 +662,172 @@ parameters, even if you delimit them with quotes.
   </sect2>
  </sect1>
 
- <sect1 condition="FIXME" id="preseed-creating">
+ <sect1 id="preseed-creating">
 <!--
- <title>Creating a preseed file</title>
+ <title>Creating a preconfiguration file</title>
 -->
- <title>preseed ファイルの作成</title>
+ <title>事前設定ファイルの作成</title>
 <para>
 
 <!--
 The preconfiguration file is in the format used by the
-<command>debconf-set-selections</command> command.
+<command>debconf-set-selections</command> command. The general format of
+a line in a preconfiguration file is:
 -->
 事前設定ファイルのフォーマットは、<command>debconf-set-selections</command>
 コマンドで使用されるものと同じです。
+事前設定ファイルの行の一般的なフォーマットは以下のようになります。
+
+<informalexample><screen>
+&lt;所有者&gt; &lt;テンプレート名&gt; &lt;テンプレート型&gt; &lt;値&gt;
+</screen></informalexample>
+
+</para><para>
+
+<!--
+There are a few rules to keep in mind when writing a preconfiguration file.
+-->
+事前設定ファイルを記述する際には、
+ちょっとした規則があると気に留めておいてください
 
 </para>
 
 <itemizedlist>
 <listitem><para>
 <!--
-  File format
+  Put only a single space or tab between type and value: any additional
+  whitespace will be interpreted as belonging to the value.
 -->
-  ファイルフォーマット
+  型と値の間には、空白かタブを 1 つだけおいてください。
+  空白を追加すると、値の一部として解釈されます。
 </para></listitem>
 <listitem><para>
 <!--
-  Only single space allowed between template type and value
+  A line can be split into multiple lines by appending a backslash
+  (<quote><literal>\</literal></quote>) as the line continuation character.
+  A good place to split a line is after the template name; a bad place is
+  between type and value.
 -->
-  テンプレートの型と値の間には空白ひとつしか許されない
+  行継続文字としてバックスラッシュ (<quote><literal>\</literal></quote>) 
+  を付けて複数行に分割できます。
+  テンプレート名の後で分割するのが適当でしょう。
+  型と値の間はよくありません。
 </para></listitem>
 <listitem><para>
 <!--
-  Relation with /var/lib/(c)debconf/templates
+  Most templates need to be preseeded using the values valid in English and
+  not the translated values. However, there are some templates (for example
+  in <classname>partman</classname> where the translated values need to be
+  used.
 -->
-  /var/lib/(c)debconf/templates との関連
+  ほとんどのテンプレートでは、
+  訳した値ではなく英語の値を指定する必要がありますが、
+  (<classname>partman</classname> など) 
+  訳した値を使用できるテンプレートもあります。
 </para></listitem>
 <listitem><para>
 <!--
-  Types of templates and how to provide values for them
+  Some templates take a code as value instead of the English text that is
+  shown during installation.
 -->
-  テンプレートの型と値の提供方法
-</para></listitem>
-<listitem><para>
-<!--
-  Most values need to be in English or codes
--->
-  ほとんどの値は英語かコード
-</para></listitem>
-<listitem><para>
-<!--
-  Using a manual installation as base
--->
-  手動インストールを基礎として使用
-</para></listitem>
-<listitem><para>
-<!--
-  Finding other possible values
--->
-  有効な値の検索
+  テンプレートの中には、インストール中に表示される英語のテキストの代わりに、
+  コードを取るものがあります。
 </para></listitem>
 </itemizedlist>
 
 <para>
 
 <!--
-To check if the format of your preseed file is valid before performing an
-install, you can use the command <command>debconf-set-selections -c
+The easiest way to create a preconfiguration file is to use the example file
+linked in <xref linkend="preseed-contents"/> as basis and work from there.
+-->
+事前設定ファイルを作成する簡単な方法は、<xref linkend="preseed-contents"/> 
+にあるサンプルファイルを元にして作業することです。
+
+</para><para>
+
+<!--
+An alternative method is to do a manual installation and then, after
+rebooting, use the <command>debconf-get-selections</command> from the
+<classname>debconf-utils</classname> package to dump both the debconf
+database and the installer's cdebconf database to a single file:
+-->
+その他には、手動インストールを行い、再起動してから 
+<classname>debconf-utils</classname> パッケージの
+<command>debconf-get-selections</command> を使用します。
+以下のように debconf データベースとインストーラの cdebconf データベースを
+1 ファイルに出力してください。
+
+<informalexample><screen>
+$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>
+$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>
+</screen></informalexample>
+
+</para><para>
+
+<!--
+However, a file generated in this manner will have some items that should
+not be preseeded, and the example file is a better starting place for most
+users.
+-->
+しかし、この方法で生成したファイルでは preseed されない項目があります。
+ほとんどのユーザはサンプルファイルから始めるのがよいでしょう。
+
+</para>
+
+<note><para>
+
+<!--
+This method relies on the fact that, at the end of the installation, the
+installer's cdebconf database is saved to the installed system in
+<filename>/var/log/installer/cdebconf</filename>. However, because the
+database may contain sensitive information, by default the files are only
+readable by root.
+-->
+この方法は、インストーラの cdebconf データベースが、
+インストールしたシステムの <filename>/var/log/installer/cdebconf</filename> 
+に保存されているのを前提にしています。
+しかし、データベースに機密情報が含まれる可能性がありますので、
+デフォルトでは root にのみ読み込みが許可されています。
+
+</para><para>
+
+<!--
+The directory <filename>/var/log/installer</filename> and all files in it
+will be deleted from your system if you purge the package
+<classname>installation-report</classname>.
+-->
+<filename>/var/log/installer</filename> ディレクトリとその中のファイルは、
+<classname>installation-report</classname> パッケージを完全削除することで、
+削除されます。
+
+</para></note>
+
+<para>
+
+<!--
+To check possible values for templates, you can use <command>nano</command>
+to examine the files in <filename>/var/lib/cdebconf</filename> while an
+installation is in progress. View <filename>templates.dat</filename> for
+the raw templates and <filename>questions.dat</filename> for the current
+values and for the values assigned to variables.
+-->
+有効なテンプレートの値をチェックするのに、
+インストール中に <filename>/var/lib/cdebconf</filename> のファイルを、
+<command>nano</command> を使用して確認できます。
+生のテンプレートは <filename>templates.dat</filename> を、
+現在の値や変数に割り当てられた値は <filename>questions.dat</filename> 
+を確認してください。
+
+</para><para>
+
+<!--
+To check if the format of your preconfiguration file is valid before performing
+an install, you can use the command <command>debconf-set-selections -c
 <replaceable>preseed.cfg</replaceable></command>.
 -->
 インストールを実行する前に、
-preseed ファイルのフォーマットが適切かどうかを調べるには、
+事前設定ファイルのフォーマットが適切かどうかを調べるには、
 <command>debconf-set-selections -c
 <replaceable>preseed.cfg</replaceable></command> が使えます。
 
@@ -739,17 +836,17 @@ preseed ファイルのフォーマットが適切かどうかを調べるには、
 
  <sect1 id="preseed-contents">
 <!--
- <title>Contents of the preseed file</title>
+ <title>Contents of the preconfiguration file</title>
 -->
- <title>preseed ファイルの内容</title>
+ <title>事前設定ファイルの内容</title>
 <para>
 
 <!--
 The configuration fragments used in this appendix are also available as an
-example preseed file from &urlset-example-preseed;.
+example preconfiguration file from &urlset-example-preseed;.
 -->
 本付録で使用する設定の断片は、
-&urlset-example-preseed; のサンプル preseed ファイルでも利用できます。
+&urlset-example-preseed; のサンプル事前設定ファイルでも利用できます。
 
 </para><para>
 
@@ -757,8 +854,8 @@ example preseed file from &urlset-example-preseed;.
 Note that this example is based on an installation for the Intel x86
 architecture. If you are installing a different architecture, some of the
 examples (like keyboard selection and bootloader installation) may not be
-relevant and will need to be replaced by debconf settings appropriate for your
-architecture.
+relevant and will need to be replaced by debconf settings appropriate for
+your architecture.
 -->
 本サンプルは、
 Intel x86 アーキテクチャ用インストールを元にしていることに注意してください。
@@ -778,12 +875,12 @@ Intel x86 アーキテクチャ用インストールを元にしていることに注意してください。
 
 <!--
 Setting localization values will only work if you are using initrd preseeding.
-With all other methods the preseed file will only be loaded after these
-questions have been asked.
+With all other methods the preconfiguration file will only be loaded after
+these questions have been asked.
 -->
 地域化の設定値は initrd preseed を利用しているときのみ動作します。
 他のすべての方法では、
-この質問をされた後にしか preseed ファイルを読み込めません。
+この質問をされた後にしか事前設定ファイルを読み込めません。
 
 </para><para>
 
@@ -827,7 +924,7 @@ d-i console-keymaps-at/keymap select us
 </para><para>
 
 <!--
-To skip keyboard configuration preseed
+To skip keyboard configuration, preseed
 <classname>console-tools/archs</classname> with
 <userinput>skip-config</userinput>.
 This will result in the kernel keymap remaining active.
@@ -863,25 +960,25 @@ architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote>
 
 <!--
 Of course, preseeding the network configuration won't work if you're
-loading your preseed file from the network. But it's great when you're
-booting from CD or USB stick. If you are loading preseed files from
-the network, you can pass network config parameters in using kernel
-boot parameters.
+loading your preconfiguration file from the network. But it's great when
+you're booting from CD or USB stick. If you are loading preconfiguration
+files from the network, you can pass network config parameters by using
+kernel boot parameters.
 -->
-もちろん、ネットワークから preseed ファイルを読み込むなら、
+もちろん、ネットワークから事前設定ファイルを読み込む場合、
 preseed のネットワーク設定は動作しません。
 しかし、CD や USB スティックから起動するときには重要です。
-ネットワークから preseed ファイルを読み込む場合、
+ネットワークから事前設定ファイルを読み込む場合、
 ネットワーク設定パラメータは、カーネルブートパラメータで渡すことになります。
 
 </para><para>
 
 <!--
 If you need to pick a particular interface when netbooting before loading
-a preseed file from the network, use a boot parameter such as
+a preconfiguration file from the network, use a boot parameter such as
 <userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
 -->
-ネットワークから preseed ファイルを読み込む前に netboot するとき、
+ネットワークから事前設定ファイルを読み込む前に netboot するとき、
 特定のインターフェースを選ぶ必要があるなら、
 <userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>
 のようにブートパラメータを使用してください。
@@ -905,9 +1002,9 @@ d-i netcfg/choose_interface select auto
 # the static network configuration below.
 #d-i netcfg/disable_dhcp boolean true
 
-# If you want the preseed file to work on systems both with and without 
-# a dhcp server, uncomment these lines and the static network configuration
-# below.
+# If you want the preconfiguration file to work on systems both with and
+# without a dhcp server, uncomment these lines and the static network
+# configuration below.
 #d-i netcfg/dhcp_failed note
 #d-i netcfg/dhcp_options select Configure network manually
 
@@ -967,8 +1064,8 @@ for additional components for the installer. It is only useful to set this
 if components are actually downloaded over the network and should match the
 suite that was used to build the initrd for the installation method used for
 the installation.
-By default the value for <classname>mirror/udeb/suite</classname> is the same
-as <classname>mirror/suite</classname>.
+By default the value for <classname>mirror/udeb/suite</classname> is the
+same as <classname>mirror/suite</classname>.
 -->
 <classname>mirror/udeb/suite</classname> パラメータでは、
 インストーラの追加コンポーネントの組を設定します。
@@ -1006,15 +1103,16 @@ Using preseeding to partition the harddisk is very much limited to what is
 supported by <classname>partman-auto</classname>. You can choose to either
 partition existing free space on a disk or a whole disk. The layout of the
 disk can be determined by using a predefined recipe, a custom recipe from
-a recipe file or a recipe included in the preseed file. It is currently not
-possible to partition multiple disks using preseeding nor to set up RAID.
+a recipe file or a recipe included in the preconfiguration file. It is
+currently not possible to partition multiple disks using preseeding nor to
+set up RAID.
 -->
 ハードディスクのパーティション分割に preseed を使用するのは、
 <classname>partman-auto</classname> でサポートしている機能に限定されています。
 パーティションはディスクに既存の空き領域とディスク全体のどちらかから選べます。
 ディスクレイアウトは、あらかじめ定義したレシピ、
 レシピファイルによるカスタムレシピ、
-preseed ファイルに書いたレシピから選択できます。
+事前設定ファイルに書いたレシピから選択できます。
 現在のところ、パーティションに preseed を用いて複数のディスクを割り当ることや、
 RAID の設定することはできません。
 
@@ -1035,7 +1133,7 @@ correct one will be selected before using preseeding.
 
 <informalexample role="example"><screen>
 # If the system has free space you can choose to only partition that space.
-# Note: the preseed value for this template needs to be localized (translated).
+# Note: this template must be preseeded with a localized (translated) value.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 
@@ -1045,7 +1143,7 @@ correct one will be selected before using preseeding.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
 # You can choose from any of the predefined partitioning recipes.
-# Note: the preseed value for this template needs to be localized (translated).
+# Note: this template must be preseeded with a localized (translated) value.
 d-i partman-auto/choose_recipe \
        select All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe \
@@ -1059,9 +1157,9 @@ d-i partman-auto/choose_recipe \
 # just point at it.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
-# If not, you can put an entire recipe the preseed file in one (logical)
-# line. This example creates a small /boot partition, suitable swap, and
-# uses the rest of the space for the root partition:
+# If not, you can put an entire recipe the preconfiguration file in one
+# (logical) line. This example creates a small /boot partition, suitable
+# swap, and uses the rest of the space for the root partition:
 #d-i partman-auto/expert_recipe string                         \
 #      boot-root ::                                            \
 #              40 50 100 ext3                                  \
@@ -1115,12 +1213,12 @@ d-i time/zone string US/Eastern
 <!--
 Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
 options is fully automated based on your installation method and answers to
-earlier questions. Only the three variables below are relevant for preseeding.
+earlier questions. You can optionally add other (local) repositories.
 -->
 <filename>/etc/apt/sources.list</filename>
 のセットアップと基本設定オプションは、
 インストール方法と初期の質問への回答から、完全に自動的に行われます。
-preseed に関連する変数は 3 つしかありません。
+さらに、他の (ローカルな) リポジトリを追加できます。
 
 </para>
 
@@ -1130,7 +1228,14 @@ preseed に関連する変数は 3 つしかありません。
 #d-i apt-setup/contrib boolean true
 # Uncomment this to avoid adding security sources, or
 # add a hostname to use a different server than security.debian.org.
-#d-i apt-setup/security_host string 
+#d-i apt-setup/security_host string
+
+# Additional repositories, local[0-9] available
+#d-i apt-setup/local0/comment string local server
+#d-i apt-setup/local0/repository string \
+#       deb http://local.server/debian stable main
+# URL to the public key of the local repository
+#d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
   </sect2>
@@ -1157,13 +1262,13 @@ root アカウント用のパスワードや、
 
 <!--
 Be aware that preseeding passwords is not completely secure as everyone
-with access to the preseed file will have the knowledge of these passwords.
-Using MD5 hashes is considered slightly better in terms of security but it
-might also give a false sense of security as access to a MD5 hash allows
-for brute force attacks.
+with access to the preconfiguration file will have the knowledge of these
+passwords. Using MD5 hashes is considered slightly better in terms of
+security but it might also give a false sense of security as access to a
+MD5 hash allows for brute force attacks.
 -->
 preseed のパスワードは、
-パスワードを知っている preseed ファイルが誰でもアクセスできるために、
+パスワードを知っている事前設定ファイルが誰でもアクセスできるために、
 完全に安全でないことを知っておいてください。
 MD5 ハッシュを使えば、セキュリティ的には多少ましと言えますが、
 MD5 ハッシュは総当たり攻撃にかけられることを考えると、
@@ -1172,16 +1277,19 @@ MD5 ハッシュは総当たり攻撃にかけられることを考えると、
 </para></warning>
 
 <informalexample role="example"><screen>
+# Skip creation of a root account (normal user account will be able to
+# use sudo).
+#d-i passwd/root-login boolean false
+# Alternatively, to skip creation of a normal user account.
+#d-i passwd/make-user boolean false
+
 # Root password, either in clear text
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
 # or encrypted using an MD5 hash.
 #d-i passwd/root-password-crypted password [MD5 hash]
 
-# Skip creation of a normal user account.
-#d-i passwd/make-user boolean false
-
-# Alternatively, create a normal user account.
+# To create a normal user account.
 #d-i passwd/user-fullname string Debian User
 #d-i passwd/username string debian
 # Normal user's password, either in clear text
@@ -1195,19 +1303,19 @@ MD5 ハッシュは総当たり攻撃にかけられることを考えると、
 
 <!--
 The <classname>passwd/root-password-crypted</classname> and
-<classname>passwd/user-password-crypted</classname> variables can also be
-preseeded with <quote>!</quote> as their value. In that case, the corresponding
-account is disabled. This may be convenient for the root account, provided
-of course that an alternate method is setup to allow administrative
-activities or root login (for instance by using SSH key authentication or
-sudo).
+<classname>passwd/user-password-crypted</classname> variables can also
+be preseeded with <quote>!</quote> as their value. In that case, the
+corresponding account is disabled. This may be convenient for the root
+account, provided of course that an alternative method is setup to allow
+administrative activities or root login (for instance by using SSH key
+authentication or <command>sudo</command>).
 -->
 <classname>passwd/root-password-crypted</classname> 変数や
 <classname>passwd/user-password-crypted</classname> 変数では、
 preseed で <quote>!</quote> という値を取れます。
 この場合、そのアカウントは無効となります。
 もちろん管理権限での実行や root ログインを許可する代替手段
-(例えば SSH キー認証や sudo) を用意しておいた上で、
+(例えば SSH キー認証や <command>sudo</command>) を用意しておいた上で、
 root アカウントに設定すると便利です。
 
 </para><para>
@@ -1496,9 +1604,9 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 <informalexample role="example"><screen>
 # d-i preseeding is inherently not secure. Nothing in the installer checks
 # for attempts at buffer overflows or other exploits of the values of a
-# preseed file like this one. Only use preseed files from trusted
-# locations! To drive that home, and because it's generally useful, here's
-# a way to run any shell command you'd like inside the installer,
+# preconfiguration file like this one. Only use preconfiguration files from
+# trusted locations! To drive that home, and because it's generally useful,
+# here's a way to run any shell command you'd like inside the installer,
 # automatically.
 
 # This first command is run as early as possible, just after
@@ -1516,19 +1624,23 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 
   <sect2 id="preseed-chainload">
 <!--
-  <title>Chainloading preseed files</title>
+  <title>Chainloading preconfiguration files</title>
 -->
-  <title>preseed ファイルの連鎖読み込み</title>
+  <title>事前設定ファイルの連鎖読み込み</title>
 <para>
 
 <!--
 It is possible to include other preseed files from a preseed file. Any
 settings in those files will override pre-existing settings from files
 loaded earlier. This makes it possible to put, for example, general
+
+It is possible to include other preconfiguration files from a preconfiguration
+file. Any settings in those files will override pre-existing settings from
+files loaded earlier. This makes it possible to put, for example, general
 networking settings for your location in one file and more specific
 settings for certain configurations in other files.
 -->
-preseed ファイルから他の preseed ファイルを読み込めます。
+事前設定ファイルから他の事前設定ファイルを読み込めます。
 前に読み込まれたファイルの既存設定を、
 後から読み込まれたいずれの設定でも上書きします。
 これは例えば、あるファイルに一般的なネットワークの設定を書いておき、
@@ -1540,16 +1652,16 @@ preseed ファイルから他の preseed ファイルを読み込めます。
 # More that one file can be listed, separated by spaces; all will be
 # loaded. The included files can have preseed/include directives of their
 # own as well. Note that if the filenames are relative, they are taken from
-# the same directory as the preseed file that includes them.
+# the same directory as the preconfiguration file that includes them.
 #d-i preseed/include string x.cfg
 
-# The installer can optionally verify checksums of preseed files before
-# using them. Currently only md5sums are supported, list the md5sums
+# The installer can optionally verify checksums of preconfiguration files
+# before using them. Currently only md5sums are supported, list the md5sums
 # in the same order as the list of files to include.
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
 
 # More flexibly, this runs a shell command and if it outputs the names of
-# preseed files, includes those files. 
+# preconfiguration files, includes those files. 
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 </screen></informalexample>
