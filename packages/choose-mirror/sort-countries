@@ -1,12 +1,7 @@
 #!/bin/sh
-
-# Note: the first two values in the choices list are not sorted
-
 [ -d debian/locales ] || mkdir debian/locales
 [ -d debian/sort-tmp ] || mkdir debian/sort-tmp
-
 cd debian/sort-tmp
-
 for protocol in http ftp
 do
     if ! grep -q "^Template: mirror/$protocol/countries" ../choose-mirror/DEBIAN/templates ; then
@@ -19,8 +14,8 @@ do
       open (OUT, "> list.$1");
       # split on commas, except for backslash-escaped ones
       @t = split(/(?<!\\), /);
-      shift(@t); shift(@t);
-      my $cnt = 2;
+      shift(@t);
+      my $cnt = 1;
       foreach my $name (@t) {$cnt++; print OUT "$cnt $name\n";}
       close OUT;
     }
@@ -33,7 +28,7 @@ do
             echo "Warning: lang $lang skipped because no UTF-8 variant found" 1>&2
         else
             [ -d ../locales/$unilang.UTF-8 ] || localedef -c -f UTF-8 -i $unilang ../locales/$unilang.UTF-8
-            LOCPATH=`pwd` LC_ALL=../locales/$unilang.UTF-8 sort -k 2.1 $file | sed -e 's/ .*/, /' | tr -d '\n' | sed -e "s/^/Indices-$lang.UTF-8: 1, 2, /" -e 's/, $//' > sorted$file
+            LOCPATH=`pwd` LC_ALL=../locales/$unilang.UTF-8 sort -k 2.1 $file | sed -e 's/ .*/, /' | tr -d '\n' | sed -e "s/^/Indices-$lang.UTF-8: 1, /" -e 's/, $//' > sorted$file
             if [ -s sorted$file ]; then
                 echo "" >>sorted$file
             else

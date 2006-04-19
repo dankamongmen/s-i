@@ -230,49 +230,36 @@ static int choose_country(void) {
 		country = "US";
 	}
 
-	char *countries;
-	countries = add_protocol("countries");
-	if (has_mirror(country)) {
-		debconf_set(debconf, countries, country);
-		debconf_fget(debconf, DEBCONF_BASE "country", "seen");
-		debconf_fset(debconf, countries, "seen", debconf->value);
+#ifdef WITH_HTTP
+	if (strcasecmp(protocol,"http") == 0) {
+		if (has_mirror(country)) {
+			debconf_set(debconf, DEBCONF_BASE "http/countries", country);
+			debconf_fget(debconf, DEBCONF_BASE "country", "seen");
+			debconf_fset(debconf, DEBCONF_BASE "http/countries", "seen", debconf->value);
+		}
+		debconf_input(debconf, "high", DEBCONF_BASE "http/countries");
 	}
-	debconf_input(debconf, "high", countries);
+#endif
+#ifdef WITH_FTP
+	if (strcasecmp(protocol,"ftp") == 0) {
+		if (has_mirror(country)) {
+			debconf_set(debconf, DEBCONF_BASE "ftp/countries", country);
+			debconf_fget(debconf, DEBCONF_BASE "country", "seen");
+			debconf_fset(debconf, DEBCONF_BASE "http/countries", "seen", debconf->value);
+		}
+		debconf_input(debconf, "high", DEBCONF_BASE "ftp/countries");
+	}
+#endif
 
-	free (countries);
 	return 0;
 }
 
 static int set_country(void) {
-	char *countries, *hostname, *directory;
-	countries = add_protocol("countries");
-	int ret = 0;
-
-	debconf_get(debconf, countries);
+	debconf_get(debconf, (strcasecmp(protocol,"http") == 0 ) ?
+		    DEBCONF_BASE "http/countries" : DEBCONF_BASE "ftp/countries");
 	country = strdup(debconf->value);
-	free (countries);
-
-	if (! strcmp(country, NO_MIRROR)) {
-		if (! base_on_cd) {
-			debconf_input(debconf, "critical", DEBCONF_BASE "required");
-			if (debconf_go(debconf) == 30)
-				exit(10); /* back up to menu */
-			else
-				return 1; /* back to beginning of questions */
-		}
-		else {
-			/* Set empty hostname and directory for current protocol */
-			hostname = add_protocol("hostname");
-			debconf_set(debconf, hostname, "");
-			directory = add_protocol("directory");
-			debconf_set(debconf, directory, "");
-			free (hostname); free (directory);
-			ret = 9;
-		}
-	}
-
 	debconf_set(debconf, DEBCONF_BASE "country", country);
-	return ret;
+	return 0;
 }
 
 static int choose_protocol(void) {
@@ -541,7 +528,6 @@ int check_arch (void) {
 }
 
 int main (void) {
-	int ret;
 	/* Use a state machine with a function to run in each state */
 	int state = 0;
 	int (*states[])() = {
@@ -567,11 +553,8 @@ int main (void) {
 	di_system_init("choose-mirror");
 
 	while (state >= 0 && states[state]) {
-		if ((ret = states[state]()) != 0) {
-			if (ret == 9)
-				return 0;  /* quit mirror selection */
-			else
-				state = 0; /* back up to start */
+		if (states[state]() != 0) { /* back up to start */
+			state = 0;
 		}
 		else if (debconf_go(debconf)) { /* back up */
 			state = state - 1;
