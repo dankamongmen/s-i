@@ -23,6 +23,11 @@ else
 	boot=""
 fi
 
+# force -t on raid
+if echo "$bootfs" | grep -q "/dev/md"; then
+	siloopt="-t"
+fi
+
 if [ -e "/target/boot/initrd.img" ]; then
 	initrd="initrd=${boot}/initrd.img"
 	initrdold="${initrd}.old"
