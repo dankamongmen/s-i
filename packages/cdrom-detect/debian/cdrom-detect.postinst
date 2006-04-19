@@ -191,5 +191,9 @@ db_input low cdrom-detect/success || [ $? -eq 30 ]
 db_go
 
 anna-install apt-cdrom-setup || true
+if [ ! -e /cdrom/.disk/base_installable ]; then
+	log "Base system not installable from CD, requesting choose-mirror"
+	anna-install choose-mirror || true
+fi
 
 exit 0
