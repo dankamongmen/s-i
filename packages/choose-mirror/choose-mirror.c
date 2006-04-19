@@ -230,35 +230,27 @@ static int choose_country(void) {
 		country = "US";
 	}
 
-#ifdef WITH_HTTP
-	if (strcasecmp(protocol,"http") == 0) {
-		if (has_mirror(country)) {
-			debconf_set(debconf, DEBCONF_BASE "http/countries", country);
-			debconf_fget(debconf, DEBCONF_BASE "country", "seen");
-			debconf_fset(debconf, DEBCONF_BASE "http/countries", "seen", debconf->value);
-		}
-		debconf_input(debconf, "high", DEBCONF_BASE "http/countries");
+	char *countries;
+	countries = add_protocol("countries");
+	if (has_mirror(country)) {
+		debconf_set(debconf, countries, country);
+		debconf_fget(debconf, DEBCONF_BASE "country", "seen");
+		debconf_fset(debconf, countries, "seen", debconf->value);
 	}
-#endif
-#ifdef WITH_FTP
-	if (strcasecmp(protocol,"ftp") == 0) {
-		if (has_mirror(country)) {
-			debconf_set(debconf, DEBCONF_BASE "ftp/countries", country);
-			debconf_fget(debconf, DEBCONF_BASE "country", "seen");
-			debconf_fset(debconf, DEBCONF_BASE "http/countries", "seen", debconf->value);
-		}
-		debconf_input(debconf, "high", DEBCONF_BASE "ftp/countries");
-	}
-#endif
+	debconf_input(debconf, "high", countries);
 
+	free (countries);
 	return 0;
 }
 
 static int set_country(void) {
-	debconf_get(debconf, (strcasecmp(protocol,"http") == 0 ) ?
-		    DEBCONF_BASE "http/countries" : DEBCONF_BASE "ftp/countries");
+	char *countries;
+	countries = add_protocol("countries");
+	debconf_get(debconf, countries);
 	country = strdup(debconf->value);
 	debconf_set(debconf, DEBCONF_BASE "country", country);
+
+	free (countries);
 	return 0;
 }
 
