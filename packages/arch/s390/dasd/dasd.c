@@ -29,7 +29,7 @@ struct dasd
 	char devtype[SYSFS_NAME_LEN];
 };
 
-static di_hash_table *dasds;
+static di_tree *dasds;
 
 static struct dasd *dasd_current;
 
@@ -45,28 +45,21 @@ int my_debconf_input(char *priority, char *template, char **ptr)
 	return ret;
 }
 
-static di_equal_func dasd_equal;
-static di_hash_func dasd_hash;
+static di_compare_func dasd_compare;
 
-uint16_t dasd_device (const char *i)
+int dasd_device (const char *i)
 {
 	unsigned int ret;
 	if (sscanf (i, "0.0.%04x", &ret) == 1)
 		return ret;
 	if (sscanf (i, "%04x", &ret) == 1)
 		return ret;
-	/* TODO */
-	exit (1);
+	return -1;
 }
 
-bool dasd_equal (const void *key1, const void *key2)
+int dasd_compare (const void *key1, const void *key2)
 {
-	return dasd_device ((const char *) key1) == dasd_device ((const char *) key2);
-}
-
-uint32_t dasd_hash (const void *key)
-{
-	return dasd_device ((const char *) key);
+	return dasd_device ((const char *) key1) - dasd_device ((const char *) key2);
 }
 
 #if 0
@@ -115,7 +108,7 @@ static enum state_wanted detect_channels (void)
 		"dasd-fba",
 	};
 
-	dasds = di_hash_table_new (dasd_hash, dasd_equal);
+	dasds = di_tree_new (dasd_compare);
 
 	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
 	{
@@ -153,7 +146,7 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver)
 		sysfs_read_attribute (devtype_attr);
 		strncpy (current->devtype, devtype_attr->value, sizeof (current->devtype));
 		strcpy (current->driver, driver->name);
-		di_hash_table_insert (dasds, current, current);
+		di_tree_insert (dasds, current, current);
 	}
 
 	return WANT_NONE;
@@ -197,7 +190,7 @@ static enum state_wanted get_channel_select (void)
 	int ret;
 
 	buf[0] = '\0';
-	di_hash_table_foreach (dasds, get_channel_select_append, buf);
+	di_tree_foreach (dasds, get_channel_select_append, buf);
 
 	debconf_subst (client, TEMPLATE_PREFIX "choose_select", "choices", buf);
 	ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_select", &ptr);
@@ -207,7 +200,7 @@ static enum state_wanted get_channel_select (void)
 	if (!strcmp (ptr, "Finish"))
 		return WANT_FINISH;
 
-	dasd_current = di_hash_table_lookup (dasds, ptr);
+	dasd_current = di_tree_lookup (dasds, ptr);
 	if (dasd_current)
 		return WANT_NEXT;
 	return WANT_ERROR;
@@ -222,9 +215,9 @@ static void get_channel_select_append (void *key, void *value __attribute__ ((un
 
 static enum state_wanted get_channel (void)
 {
-	if (di_hash_table_size (dasds) > 20)
+	if (di_tree_size (dasds) > 20)
 		return get_channel_input ();
-	else if (di_hash_table_size (dasds) > 0)
+	else if (di_tree_size (dasds) > 0)
 		return get_channel_select ();
 	return WANT_ERROR;
 }
@@ -370,7 +363,6 @@ int main ()
 	{
 		enum state_wanted state_want = WANT_ERROR;
 
-		printf ("state: %d %d\n", state, state_want);
 		switch (state)
 		{
 			case BACKUP:
