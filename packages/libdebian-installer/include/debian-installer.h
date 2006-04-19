@@ -15,6 +15,7 @@
 #include <debian-installer/release.h>
 #include <debian-installer/slist.h>
 #include <debian-installer/string.h>
+#include <debian-installer/tree.h>
 #include <debian-installer/types.h>
 #include <debian-installer/utils.h>
 #include <debian-installer/system/devfs.h>

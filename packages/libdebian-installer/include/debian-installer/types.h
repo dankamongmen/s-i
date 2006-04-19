@@ -34,6 +34,12 @@
  */
 
 /**
+ * Compare key1 and key2
+ * @param key1 first key
+ * @param key2 second key
+ */
+typedef int di_compare_func (const void *key1, const void *key2);
+/**
  * Checks the equality of key1 and key2
  * @param key1 first key
  * @param key2 second key

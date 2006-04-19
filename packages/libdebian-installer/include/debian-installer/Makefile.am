@@ -18,6 +18,7 @@ realinclude_HEADERS = \
 	release.h \
 	slist.h \
 	string.h \
+	tree.h \
 	types.h \
 	utils.h
 

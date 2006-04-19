@@ -19,6 +19,7 @@ libdebian_installer_la_SOURCES = \
 	parser_rfc822.c \
 	slist.c \
 	string.c \
+	tree.c \
 	utils.c
 
 libdebian_installer_extra_la_SOURCES = \
