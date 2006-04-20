@@ -1,6 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31190 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.31 -->
+<!-- original version: 34713 -->
+<!-- updated from 31190 to 34713 by André Luís Lopes (andrelop) 2006.04.20 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalando a &debian; a partir de um sistema Unix/Linux</title>
@@ -92,18 +92,36 @@ A ferramenta que o Debian installer utiliza, que é reconhecida
 como o método oficial de instalar um sistema básico da Debian, é o
 <command>debootstrap</command>. Ele utiliza o <command>wget</command>
 e o <command>ar</command>, mas depende somente do
-<classname>/bin/sh</classname>. Instale o <command>wget</command> e o
+<classname>/bin/sh</classname>. e de ferramentas básicas
+Unix/Linux<footnote>
+
+<para>
+
+Esses utilitários incluem os principais utilitários GNU (GNU core utilies)
+e comandos como o <command>sed</command>, <command>grep</command>,
+<command>tar</command> e o <command>gzip</command>.
+
+</para>
+
+</footnote>. Instale o <command>wget</command> e o
 <command>ar</command> caso ele ainda não esteja instalado em seu sistema,
 então baixe e instale o <command>debootstrap</command>.
 
-</para><para>
+</para>
+
+<!-- Os arquivos linkados aqui são de 2004 e portanto no momento não
+são úteis
+<para>
 
 Se tiver um sistema baseado em rpm, você poderá usar o alien para
 converter o pacote .deb do <command>debootstrap</command> em .rpm ou
 baixar uma versão em
 <ulink url="http://people.debian.org/~blade/install/debootstrap"></ulink>
 
-</para><para>
+</para>
+-->
+
+<para>
 
 Ou poderá usar o seguinte procedimento para instalá-lo manualmente.
 Crie uma pasta de trabalho para extração do pacote .deb:
@@ -349,19 +367,6 @@ o nome da interface (eth0, eth1, etc.) que deseja.
    </sect3>
 
    <sect3>
-   <title>Configurando o fuso-horário, usuários e o APT</title>
-<para>
-
-Configure seu fuso-horário, adicione um usuário normal, e
-selecione as fontes do <command>apt</command> executando
-
-<informalexample><screen>
- # /usr/sbin/base-config new
-</screen></informalexample>
-</para>
-   </sect3>
-
-   <sect3>
    <title>Configurando seus Locales</title>
 <para>
 
@@ -374,8 +379,9 @@ suporte a locales e configure-o:
  # dpkg-reconfigure locales
 </screen></informalexample>
 
-NOTA: O apt *deve* ser configurado antes. ie. durante a fase do
-base-config. Antes de usar o locales com conjunto de caracteres
+NOTA: O apt *deve* ser configurado antes criando um sources.list e
+executando apt-get update.
+Antes de usar o locales com conjunto de caracteres
 que não sejam ASCII ou latin1, por favor consulte o HOWTO apropriado
 de localização.
 </para>
