@@ -1,99 +1,98 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- retain these comments for translator revision tracking -->
 <!-- original version: 29561 -->
 <!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.31 -->
 
-  <sect2 arch="i386"><title>Particionamento através do DOS ou Windows</title>
+  <sect2 arch="i386"><title>Particionamento atravÃ©s do DOS ou Windows</title>
 <para>
 
-Se estiver manipulando partições FAT ou NTFS existentes, é recomendado
+Se estiver manipulando partiÃ§Ãµes FAT ou NTFS existentes, Ã© recomendado
 que ou use o esquema abaixo ou as ferramentas nativas do Windows ou DOS.
-Caso contrário, não é realmente necessário particionar a partir do DOS
+Caso contrÃ¡rio, nÃ£o Ã© realmente necessÃ¡rio particionar a partir do DOS
 ou Windows pois as ferramentas de particionamento do Linux geralmente fazem
 uma bom trabalho.
 
 </para><para>
 
-Mas se tiver um disco IDE grande e está usando LBA, controladores
-overlay (algumas vezes fornecidos pelo fabricante do disco rígido) ou
-não possuir uma BIOS nova (pós 1998) que suportam extensões de acesso
-a discos grandes, então será preciso posicionar a partição da Debian
-cuidadosamente no disco. Neste caso, será preciso colocar a partição de
-partida nos primeiros 1024 cilindros do seu disco rígido (normalmente
-nos primeiros 524MB, sem a tradução da BIOS). Isto pode significar que
-partições FAT ou NTFS deverão ser movidas.
+Mas se tiver um disco IDE grande e estÃ¡ usando LBA, controladores
+overlay (algumas vezes fornecidos pelo fabricante do disco rÃ­gido) ou
+nÃ£o possuir uma BIOS nova (pÃ³s 1998) que suportam extensÃµes de acesso
+a discos grandes, entÃ£o serÃ¡ preciso posicionar a partiÃ§Ã£o da Debian
+cuidadosamente no disco. Neste caso, serÃ¡ preciso colocar a partiÃ§Ã£o de
+partida nos primeiros 1024 cilindros do seu disco rÃ­gido (normalmente
+nos primeiros 524MB, sem a traduÃ§Ã£o da BIOS). Isto pode significar que
+partiÃ§Ãµes FAT ou NTFS deverÃ£o ser movidas.
 
 </para>
 
    <sect3 id="lossless">
-   <title>Reparticionamento não Destrutivo a partir do DOS, Win-32 ou OS/2
+   <title>Reparticionamento nÃ£o Destrutivo a partir do DOS, Win-32 ou OS/2
    </title>
 
 <para>
 
-Uma das instalações mais comuns é em um sistema que já tem o DOS
+Uma das instalaÃ§Ãµes mais comuns Ã© em um sistema que jÃ¡ tem o DOS
 (incluindo o Windows 3.1), Win32 (tal como Windows 95, 98, Me,
-NT, 2000, XP) ou OS/2 e é necessário colocar a Debian no mesmo disco
-sem destruir o sistema anterior. Note que o programa de instalação
-suporta a alteração de tamanho em sistemas de arquivos FAT e
-NTFS. Simplesmente inicie o programa de instalação, selecione a opção
-de menu <menuchoice> <guimenuitem>Editar a tabela de partições
-manualmente</guimenuitem></menuchoice>, selecione a partição para alterar
+NT, 2000, XP) ou OS/2 e Ã© necessÃ¡rio colocar a Debian no mesmo disco
+sem destruir o sistema anterior. Note que o programa de instalaÃ§Ã£o
+suporta a alteraÃ§Ã£o de tamanho em sistemas de arquivos FAT e
+NTFS. Simplesmente inicie o programa de instalaÃ§Ã£o, selecione a opÃ§Ã£o
+de menu <menuchoice> <guimenuitem>Editar a tabela de partiÃ§Ãµes
+manualmente</guimenuitem></menuchoice>, selecione a partiÃ§Ã£o para alterar
 o tamanho e especifique seu novo tamanho. Assim, na maioria dos casos
-você não precisará usar o método descrito abaixo.
+vocÃª nÃ£o precisarÃ¡ usar o mÃ©todo descrito abaixo.
 
 </para><para>
 
-Antes de prosseguir, você deverá decidir como deseja dividir seu disco.
-O método desta seção somente dividirá o disco em duas partes. Uma que
-terá o sistema original e a outra que será usada para a Debian. Durante
-a instalação da Debian, você terá a oportunidade de usar a porção reservada
-no disco para a instalação da Debian, i.e. como swap ou sistema de
+Antes de prosseguir, vocÃª deverÃ¡ decidir como deseja dividir seu disco.
+O mÃ©todo desta seÃ§Ã£o somente dividirÃ¡ o disco em duas partes. Uma que
+terÃ¡ o sistema original e a outra que serÃ¡ usada para a Debian. Durante
+a instalaÃ§Ã£o da Debian, vocÃª terÃ¡ a oportunidade de usar a porÃ§Ã£o reservada
+no disco para a instalaÃ§Ã£o da Debian, i.e. como swap ou sistema de
 arquivos.
 
 </para><para>
 
-A idéia é mover todos os dados da partição para o começo, antes de
-modificar as informações da partição, assim nada será perdido. É
-importante que você faça o mínimo de coisas possíveis entre a
-movimentação de dados e reparticionamento para minimizar a chance de
-um arquivo ser gravado no final da partição e isso poderá
-diminuir a quantidade de espaço que poderá obter da partição.
+A idÃ©ia Ã© mover todos os dados da partiÃ§Ã£o para o comeÃ§o, antes de
+modificar as informaÃ§Ãµes da partiÃ§Ã£o, assim nada serÃ¡ perdido. Ã‰
+importante que vocÃª faÃ§a o mÃ­nimo de coisas possÃ­veis entre a
+movimentaÃ§Ã£o de dados e reparticionamento para minimizar a chance de
+um arquivo ser gravado no final da partiÃ§Ã£o e isso poderÃ¡
+diminuir a quantidade de espaÃ§o que poderÃ¡ obter da partiÃ§Ã£o.
 
 </para><para>
 
-A primeira coisa necessária é copiar o <command>fips</command> que está
-disponível no diretório <filename>tools/</filename> do seu mirror da
-Debian mais próximo. Descompacte o arquivo compactado com unzip e copie
+A primeira coisa necessÃ¡ria Ã© copiar o <command>fips</command> que estÃ¡
+disponÃ­vel no diretÃ³rio <filename>tools/</filename> do seu mirror da
+Debian mais prÃ³ximo. Descompacte o arquivo compactado com unzip e copie
 os arquivos <filename>RESTORRB.EXE</filename>, <filename>FIPS.EXE</filename> e
 <filename>ERRORS.TXT</filename> para um disquete de partida. Um disquete de
-partida poderá ser criado usando o comando <filename>sys a:</filename> sob o
-DOS. O <command>fips</command> vem com uma documentação muito boa que poderá
-querer ler. Você definitivamente deverá ler a documentação se utilizar um
-controlador de compactação de disco ou um gerenciador de discos. Crie o disco
-e leia a documentação <emphasis>antes</emphasis> de desfragmentar o disco.
+partida poderÃ¡ ser criado usando o comando <filename>sys a:</filename> sob o
+DOS. O <command>fips</command> vem com uma documentaÃ§Ã£o muito boa que poderÃ¡
+querer ler. VocÃª definitivamente deverÃ¡ ler a documentaÃ§Ã£o se utilizar um
+controlador de compactaÃ§Ã£o de disco ou um gerenciador de discos. Crie o disco
+e leia a documentaÃ§Ã£o <emphasis>antes</emphasis> de desfragmentar o disco.
 
 </para><para>
 
-A próxima coisa necessária é mover todos os dados para o começo da partição.
+A prÃ³xima coisa necessÃ¡ria Ã© mover todos os dados para o comeÃ§o da partiÃ§Ã£o.
 O comando <command>defrag</command>, que vem com o DOS 6.0 e superiores podem
-fazer o trabalho facilmente. Veja a documentação do <command>fips</command>
+fazer o trabalho facilmente. Veja a documentaÃ§Ã£o do <command>fips</command>
 para uma lista de outros softwares que podem fazer isso. Note que estiver
-executando o Windows 9x, deverá executar o <command>defrag</command> a partir
-de lá, pois o DOS não entende o formato VFAT, que é usado para suportar nomes
+executando o Windows 9x, deverÃ¡ executar o <command>defrag</command> a partir
+de lÃ¡, pois o DOS nÃ£o entende o formato VFAT, que Ã© usado para suportar nomes
 de arquivos longos, usados no Windows 95 e superiores.
 
 </para><para>
 
-Após executar o programa de desfragmentação (que pode levar algum tempo em
+ApÃ³s executar o programa de desfragmentaÃ§Ã£o (que pode levar algum tempo em
 um disco grande), reinicie com o disquete do <command>fips</command> que criou
 na unidade de disquetes. Simplesmente digite <filename>a:\fips</filename> e
-siga as instruções.
+siga as instruÃ§Ãµes.
 
 </para><para>
 
-Note que existem outros gerenciadores de partições, no caso do
-<command>fips</command> não funcionar.
+Note que existem outros gerenciadores de partiÃ§Ãµes, no caso do
+<command>fips</command> nÃ£o funcionar.
 
 </para>
    </sect3>
@@ -103,17 +102,17 @@ Note que existem outros gerenciadores de partições, no caso do
 <para>
 
 Se estiver particionando para unidades DOS ou alterando o tamanho de
-partições DOS, usando ferramentas do Linux, muitas pessoas tem
-experimentado problemas enquanto trabalham com partições FAT resultantes.
+partiÃ§Ãµes DOS, usando ferramentas do Linux, muitas pessoas tem
+experimentado problemas enquanto trabalham com partiÃ§Ãµes FAT resultantes.
 Por exemplo, algumas tem relatado performance baixa, problemas consistentes
 com o <command>scandisk</command> ou algum outro erro estranho no DOS ou
 Windows.
 
 </para><para>
 
-Aparentemente, se criar ou mudar o tamanho de uma partição para
-uso no DOS. é uma boa idéia preencher os primeiros setores com
-zeros. Faça isso de dentro do Linux, antes de executar o comando
+Aparentemente, se criar ou mudar o tamanho de uma partiÃ§Ã£o para
+uso no DOS. Ã© uma boa idÃ©ia preencher os primeiros setores com
+zeros. FaÃ§a isso de dentro do Linux, antes de executar o comando
 <command>format</command> do DOS:
 
 <informalexample><screen>
