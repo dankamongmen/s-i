@@ -4,17 +4,17 @@ USE_HTTP=1
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 CFLAGS=-Wall -g -D_GNU_SOURCE -DARCH_TEXT='"$(DEB_HOST_ARCH)"'
-templates=debian/choose-mirror.templates-in
+templates=debian/choose-mirror-bin.templates-in
 
 ifeq (1,${USE_HTTP})
 CFLAGS:=$(CFLAGS) -DWITH_HTTP
-templates:=$(templates) debian/choose-mirror.templates.http-in
+templates:=$(templates) debian/choose-mirror-bin.templates.http-in
 endif
 ifeq (1,${USE_FTP})
 CFLAGS:=$(CFLAGS) -DWITH_FTP
-templates:=$(templates) debian/choose-mirror.templates.ftp-in
+templates:=$(templates) debian/choose-mirror-bin.templates.ftp-in
 endif
-templates:=$(templates) debian/choose-mirror.templates.both-in
+templates:=$(templates) debian/choose-mirror-bin.templates.both-in
 
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=choose-mirror
@@ -30,7 +30,7 @@ else
 CFLAGS:=$(CFLAGS) -Os -fomit-frame-pointer
 endif
 
-all: $(BIN) debian/choose-mirror.templates
+all: $(BIN) debian/choose-mirror-bin.templates
 
 ifdef MIRRORLISTURL
 # Freshen Mirrors.masterlist file, but allow failure.
@@ -52,7 +52,7 @@ debian/httplist-countries: $(MASTERLIST)
 debian/ftplist-countries: $(MASTERLIST)
 	./mirrorlist ftplist $^
 
-debian/choose-mirror.templates: $(MASTERLIST) $(templates) debian/httplist-countries debian/ftplist-countries
+debian/choose-mirror-bin.templates: $(MASTERLIST) $(templates) debian/httplist-countries debian/ftplist-countries
 	# Grab ISO codes from iso-codes package
 	./get-iso-codes
 	# Build the templates
@@ -74,7 +74,7 @@ strip: $(BIN)
 
 # Size optimized and stripped binary target.
 small: CFLAGS:=-Os $(CFLAGS) -DSMALL
-small: clean strip debian/choose-mirror.templates
+small: clean strip debian/choose-mirror-bin.templates
 	ls -l $(BIN)
 
 ftp: CFLAGS:=-Os -Wall -g -D_GNU_SOURCE -DWITH_FTP -DSMALL
@@ -92,7 +92,7 @@ clean:
 	rm -rf debian/iso-codes debian/pobuild
 
 reallyclean: clean
-	rm -f debian/choose-mirror.templates
+	rm -f debian/choose-mirror-bin.templates
 ifdef MIRRORLISTURL
 	rm -f Mirrors.masterlist
 endif
@@ -102,5 +102,5 @@ demo: choose-mirror demo.templates
 	ln -sf choose-mirror demo
 	DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./demo
 
-demo.templates: debian/choose-mirror.templates
+demo.templates: debian/choose-mirror-bin.templates
 	po2debconf $< > $@

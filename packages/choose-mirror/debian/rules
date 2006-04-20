@@ -12,30 +12,40 @@ clean:
 	dh_testroot
 	rm -f build-stamp
 	$(MAKE) clean
-	dh_clean debian/choose-mirror.templates
+	dh_clean debian/choose-mirror-bin.templates
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_install choose-mirror bin
+	dh_install -p choose-mirror-bin choose-mirror bin
 
 binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf -i
+	dh_strip -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_shlibdeps -i
+	dh_gencontrol -i
+	dh_builddeb -i
 
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installdebconf
+	dh_installdebconf -a
 	# Sort countries (including in translations)
 	# MUST be after dh_installdebconf
 	./sort-countries
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_builddeb
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_builddeb -a
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
