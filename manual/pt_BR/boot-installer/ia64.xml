@@ -1,28 +1,27 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 28672 -->
 <!-- revised by Marco Carvalho (macs) 2006.01.01 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.01.01 -->
-<!-- Obs de Gleydson -  Seja quem for que está escrevendo sobre IA-64 no manual
-     original, precisa melhorar os textos. Estou fazendo o possível para tentar
-     deixa-los claros na tradução e depois corrigir erros no original
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.01.01 -->
+<!-- Obs de Gleydson -  Seja quem for que estÃ¡ escrevendo sobre IA-64 no manual
+     original, precisa melhorar os textos. Estou fazendo o possÃ­vel para tentar
+     deixa-los claros na traduÃ§Ã£o e depois corrigir erros no original
   -->
 
-  <sect2 arch="ia64"><title>Inicializando através de um CD-ROM</title>
+  <sect2 arch="ia64"><title>Inicializando atravÃ©s de um CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
 
   <note>
-  <title>Conteúdo do CD</title>
+  <title>ConteÃºdo do CD</title>
 
 <para>
 
-Existem três variações básicas dos CDs de instalação do Debian.
-O CD <emphasis>Cartão de Visita</emphasis> possui um conjunto mínimo
-de instalação que caberá em uma pequena mídia de CD.
-Este CD requer uma conexão de rede para instalar o resto do
-sistema básico e criar um sistema utilizável.
-O CD <emphasis>Instalação via Rede</emphasis> tem todos os pacotes da
-instalação do sistema básico mas requer uma conexão de rede com um
+Existem trÃªs variaÃ§Ãµes bÃ¡sicas dos CDs de instalaÃ§Ã£o do Debian.
+O CD <emphasis>CartÃ£o de Visita</emphasis> possui um conjunto mÃ­nimo
+de instalaÃ§Ã£o que caberÃ¡ em uma pequena mÃ­dia de CD.
+Este CD requer uma conexÃ£o de rede para instalar o resto do
+sistema bÃ¡sico e criar um sistema utilizÃ¡vel.
+O CD <emphasis>InstalaÃ§Ã£o via Rede</emphasis> tem todos os pacotes da
+instalaÃ§Ã£o do sistema bÃ¡sico mas requer uma conexÃ£o de rede com um
 espelho do Debian para instalar pacotes extras que deseja para instalar
 um sistema completo.
 O conjunto de CDs do Debian pode instalar um sistema completo a partir de
@@ -32,75 +31,75 @@ uma grande variedade de pacotes sem precisar acessar a rede.
 
 <para>
 
-A arquitetura IA-64 utiliza a próxima geração da Interface de Firmware
-Extensível (EFI) fabricada pela Intel.
-Ao invés de saber um pouco sobre o dispositivo de inicialização assim
-como a BIOS x86 e um pouco sobre a tabela de partição e MBR (master boot
-record), o EFI pode ler e gravar arquivos para partições de discos
+A arquitetura IA-64 utiliza a prÃ³xima geraÃ§Ã£o da Interface de Firmware
+ExtensÃ­vel (EFI) fabricada pela Intel.
+Ao invÃ©s de saber um pouco sobre o dispositivo de inicializaÃ§Ã£o assim
+como a BIOS x86 e um pouco sobre a tabela de partiÃ§Ã£o e MBR (master boot
+record), o EFI pode ler e gravar arquivos para partiÃ§Ãµes de discos
 formatadas com o sistema FAT16 e FAT32.
-Isto simplifica o processo de inicialização do sistema.
+Isto simplifica o processo de inicializaÃ§Ã£o do sistema.
 O gerenciador de partida do sistema e o firmware EFI que o
 suportam, tem um sistema de arquivos completo para armazenar os arquivos
-necessários para a inicialização da máquina.
-Isto significa que o sistema de discos em um sistema IA64 tem uma partição
-de discos dedicada ao EFI ao invés de um MBR ou bloco de inicialização simples
+necessÃ¡rios para a inicializaÃ§Ã£o da mÃ¡quina.
+Isto significa que o sistema de discos em um sistema IA64 tem uma partiÃ§Ã£o
+de discos dedicada ao EFI ao invÃ©s de um MBR ou bloco de inicializaÃ§Ã£o simples
 como o existente em sistemas convencionais.
 
 </para><para>
 
-O CD do Debian Installer contém uma partição EFI pequena onde estão localizados
-o gerenciador de partida <command>ELILO</command>, seu arquivo de configuração, 
-o kernel de instalação e sistema de arquivos iniciais (initrd).
+O CD do Debian Installer contÃ©m uma partiÃ§Ã£o EFI pequena onde estÃ£o localizados
+o gerenciador de partida <command>ELILO</command>, seu arquivo de configuraÃ§Ã£o, 
+o kernel de instalaÃ§Ã£o e sistema de arquivos iniciais (initrd).
 
-O sistema em execução também contém uma partição EFI aonde os arquivos
-necessários para a inicialização do sistema residem. Estes arquivos são lidos a
+O sistema em execuÃ§Ã£o tambÃ©m contÃ©m uma partiÃ§Ã£o EFI aonde os arquivos
+necessÃ¡rios para a inicializaÃ§Ã£o do sistema residem. Estes arquivos sÃ£o lidos a
 partir do interpretador de comandos EFI, como descrito abaixo.
 
 </para><para>
 
 A maioria dos detalhes sobre como o <command>ELILO</command> carrega e
-inicia o sistema são transparentes para o programa de instalação do sistema.
-No entanto, o programa de instalação precisa configurar uma partição EFI antes
-de instalar o sistema básico. Caso contrário, a instalação do
-<command>ELILO</command> falhará, tornando o sistema não inicializável.
-A partição EFI é alocada e formatada no passo de particionamento da instalação,
+inicia o sistema sÃ£o transparentes para o programa de instalaÃ§Ã£o do sistema.
+No entanto, o programa de instalaÃ§Ã£o precisa configurar uma partiÃ§Ã£o EFI antes
+de instalar o sistema bÃ¡sico. Caso contrÃ¡rio, a instalaÃ§Ã£o do
+<command>ELILO</command> falharÃ¡, tornando o sistema nÃ£o inicializÃ¡vel.
+A partiÃ§Ã£o EFI Ã© alocada e formatada no passo de particionamento da instalaÃ§Ã£o,
 antes de carregar quaisquer pacotes a partir do disco de sistema. A tarefa de
-particionamento também verifica se uma partição EFI está presente antes de
-permitir a continuidade do processo de instalação.
+particionamento tambÃ©m verifica se uma partiÃ§Ã£o EFI estÃ¡ presente antes de
+permitir a continuidade do processo de instalaÃ§Ã£o.
 
 </para><para>
 
-O gerenciador de partida EFI é mostrado como último passo da
-inicialização do firmware. Ele mostra uma lista de menus aonde o
-usuário pode selecionar uma opção. Dependendo do modelo do sistema
-e de que outros softwares foram carregados, este menu poderá ser
+O gerenciador de partida EFI Ã© mostrado como Ãºltimo passo da
+inicializaÃ§Ã£o do firmware. Ele mostra uma lista de menus aonde o
+usuÃ¡rio pode selecionar uma opÃ§Ã£o. Dependendo do modelo do sistema
+e de que outros softwares foram carregados, este menu poderÃ¡ ser
 diferente de um sistema para outro.
-Devem existir pelo menos dois ítens de menu sendo mostrados,
+Devem existir pelo menos dois Ã­tens de menu sendo mostrados,
 <command>Boot Option Maintenance Menu</command> e
 <command>EFI Shell (Built-in)</command>.
-O uso da primeira opção é o método preferido, no entanto, se esta opção
-não estiver disponível ou o CD não puder inicializar através dela, use
-a segunda opção.
+O uso da primeira opÃ§Ã£o Ã© o mÃ©todo preferido, no entanto, se esta opÃ§Ã£o
+nÃ£o estiver disponÃ­vel ou o CD nÃ£o puder inicializar atravÃ©s dela, use
+a segunda opÃ§Ã£o.
 
 </para>
 
   <warning>
   <title>IMPORTANTE</title>
 <para>
-O gerenciador de partida EFI selecionará uma ação padrão de
-inicialização, tipicamente a primeira escolha do menu, dentro de um
-número de segundos pré-configurado. Isto é indicado pela contagem
-regressiva no rodapé da tela. Assim que a contagem regressiva terminar
-e o sistema iniciar a ação padrão, você pode ter que reiniciar sua
-máquina para continuar a instalação. Caso a ação padrão seja o
-"EFI shell", você poderá retornar para o gerenciador de partida
+O gerenciador de partida EFI selecionarÃ¡ uma aÃ§Ã£o padrÃ£o de
+inicializaÃ§Ã£o, tipicamente a primeira escolha do menu, dentro de um
+nÃºmero de segundos prÃ©-configurado. Isto Ã© indicado pela contagem
+regressiva no rodapÃ© da tela. Assim que a contagem regressiva terminar
+e o sistema iniciar a aÃ§Ã£o padrÃ£o, vocÃª pode ter que reiniciar sua
+mÃ¡quina para continuar a instalaÃ§Ã£o. Caso a aÃ§Ã£o padrÃ£o seja o
+"EFI shell", vocÃª poderÃ¡ retornar para o gerenciador de partida
 digitando <command>exit</command> no aviso de comandos do interpretador
 de comandos.
 </para>
   </warning>
 
   <sect3 arch="ia64" id="bootable-cd">
-  <title>Opção 1: Booting from the Boot Option Maintenance Menu</title>
+  <title>OpÃ§Ã£o 1: Booting from the Boot Option Maintenance Menu</title>
 <para>
 
 </para>
@@ -108,60 +107,60 @@ de comandos.
 <itemizedlist>
 
 <listitem><para>
-Insira o CD na unidade de CD/DVD e reinicie a máquina. O
-firmware mostrará a página do gerenciador de partida EFI e
-o menu após completar sua inicialização do sistema.
+Insira o CD na unidade de CD/DVD e reinicie a mÃ¡quina. O
+firmware mostrarÃ¡ a pÃ¡gina do gerenciador de partida EFI e
+o menu apÃ³s completar sua inicializaÃ§Ã£o do sistema.
 </para></listitem>
 
 <listitem><para>
 Selecione <command>Boot Maintenance Menu</command> a partir do
 menu com as setas e pressione <command>ENTER</command>.
-Isto mostrará um novo menu.
+Isto mostrarÃ¡ um novo menu.
 </para></listitem>
 
 <listitem><para>
 Selecione <command>Boot From a File</command> a partir do menu
 com as setas do teclado e pressione <command>ENTER</command>.
-Isto mostrará uma lista de dispositivos detectados pelo firmware.
-Você deverá ver duas linhas contendo ou o volume
+Isto mostrarÃ¡ uma lista de dispositivos detectados pelo firmware.
+VocÃª deverÃ¡ ver duas linhas contendo ou o volume
 <command>Debian Inst [Acpi ...</command> ou
 <command>Removable Media Boot</command>.
-Se examinar o resto da linha de menu, você verá que o dispositivo e
-informações sobre a controladora deverão ser os mesmos.
+Se examinar o resto da linha de menu, vocÃª verÃ¡ que o dispositivo e
+informaÃ§Ãµes sobre a controladora deverÃ£o ser os mesmos.
 </para></listitem>
 
 <listitem><para>
-Você pode escolher ambas das entradas que se referem a unidade
+VocÃª pode escolher ambas das entradas que se referem a unidade
 de CD/DVD.
-Selecione a opção com as setas de teclado e pressione
+Selecione a opÃ§Ã£o com as setas de teclado e pressione
 <command>ENTER</command>.
-Se escolher <command>Removable Media Boot</command> a máquina
-irá inicializar imediatamente a seqüência de pesquisa de inicialização.
-Se escolher <command>Debian Inst [Acpi ...</command>, ele mostrará uma
-listagem de diretório da porção inicializável do CD, requerendo que
-vá para o próximo passo (adicional).
+Se escolher <command>Removable Media Boot</command> a mÃ¡quina
+irÃ¡ inicializar imediatamente a seqÃ¼Ãªncia de pesquisa de inicializaÃ§Ã£o.
+Se escolher <command>Debian Inst [Acpi ...</command>, ele mostrarÃ¡ uma
+listagem de diretÃ³rio da porÃ§Ã£o inicializÃ¡vel do CD, requerendo que
+vÃ¡ para o prÃ³ximo passo (adicional).
 </para></listitem>
 
 <listitem><para>
-Você somente precisará fazer este passo se
+VocÃª somente precisarÃ¡ fazer este passo se
 escolher
 <command>Debian Inst [Acpi ...</command>.
-A listagem de diretório também mostrará
-<command>[Treat like Removable Media Boot]</command> próximo a última
+A listagem de diretÃ³rio tambÃ©m mostrarÃ¡
+<command>[Treat like Removable Media Boot]</command> prÃ³ximo a Ãºltima
 linha.
 Selecione esta linha com as setas do teclado e pressione
 <command>ENTER</command>.
-Isto iniciará a seqüência de inicialização.
+Isto iniciarÃ¡ a seqÃ¼Ãªncia de inicializaÃ§Ã£o.
 </para></listitem>
 
 </itemizedlist>
 
 <para>
 
-Estes passos iniciam o gerenciador de partida do Debian que irá
-mostrar uma página de menu aonde poderá selecionar um kernel de
-inicialização e suas opções. Vá até o passo onde pode selecionar
-o kernel de inicialização e opções.
+Estes passos iniciam o gerenciador de partida do Debian que irÃ¡
+mostrar uma pÃ¡gina de menu aonde poderÃ¡ selecionar um kernel de
+inicializaÃ§Ã£o e suas opÃ§Ãµes. VÃ¡ atÃ© o passo onde pode selecionar
+o kernel de inicializaÃ§Ã£o e opÃ§Ãµes.
 
 </para>
   </sect3>
@@ -170,11 +169,11 @@ o kernel de inicialização e opções.
   <title>Option 2: Booting from the EFI Shell</title>
 <para>
 
-Se, por alguma razão, a opção 1 não for completada com sucesso,
-reinicie a máquina e quando a tela do gerenciador de partida EFI
-aparecer, deverá ser mostrada uma opção chamada
+Se, por alguma razÃ£o, a opÃ§Ã£o 1 nÃ£o for completada com sucesso,
+reinicie a mÃ¡quina e quando a tela do gerenciador de partida EFI
+aparecer, deverÃ¡ ser mostrada uma opÃ§Ã£o chamada
 <command>EFI Shell [Built-in]</command>(interpretador de comandos
-EFI [embutido]). Inicialize a partir do CD de instalação do Debian
+EFI [embutido]). Inicialize a partir do CD de instalaÃ§Ã£o do Debian
 com os seguintes passos:
 
 </para>
@@ -182,188 +181,188 @@ com os seguintes passos:
 <itemizedlist>
 
 <listitem><para>
-Insira o CD na unidade de CD/DVD e reinicie a máquina. O
-firmware mostrará uma página do gerenciador de partida EFI
-e um menu após completar a inicialização do sistema.
+Insira o CD na unidade de CD/DVD e reinicie a mÃ¡quina. O
+firmware mostrarÃ¡ uma pÃ¡gina do gerenciador de partida EFI
+e um menu apÃ³s completar a inicializaÃ§Ã£o do sistema.
 </para></listitem>
 
 <listitem><para>
 Selecione <command>EFI Shell</command> a partir do menu com as
 setas de teclado e pressione <command>ENTER</command>.
-O interpretador de comandos EFI procurará em todos os dispositivos
-inicializáveis e os mostrará na console antes de mostrar seu aviso de comandos.
-As partições de inicializações reconhecidas nos dispositivos mostrarão um nome
+O interpretador de comandos EFI procurarÃ¡ em todos os dispositivos
+inicializÃ¡veis e os mostrarÃ¡ na console antes de mostrar seu aviso de comandos.
+As partiÃ§Ãµes de inicializaÃ§Ãµes reconhecidas nos dispositivos mostrarÃ£o um nome
 de dispositivo de <filename>fs<replaceable>n</replaceable>:</filename>.
-Todas as outras partições reconhecidas terão o nome
+Todas as outras partiÃ§Ãµes reconhecidas terÃ£o o nome
 <filename>blk<replaceable>n</replaceable>:</filename>.
-Caso inserir um CD antes de entrar na shell, levará alguns segundos até que
+Caso inserir um CD antes de entrar na shell, levarÃ¡ alguns segundos atÃ© que
 possa inicializar a unidade de CD.
 </para>
 </listitem>
 
 <listitem><para>
-Examine a saída a partir do interpretador de comandos procurando
-por uma unidade de CD-ROM. É mais provável que seja detectada como
-<filename>fs0:</filename> entretanto outros dispositivos com partições
-inicializáveis também serão mostrados como
+Examine a saÃ­da a partir do interpretador de comandos procurando
+por uma unidade de CD-ROM. Ã‰ mais provÃ¡vel que seja detectada como
+<filename>fs0:</filename> entretanto outros dispositivos com partiÃ§Ãµes
+inicializÃ¡veis tambÃ©m serÃ£o mostrados como
 <filename>fs<replaceable>n</replaceable></filename>.
 </para></listitem>
 
 <listitem><para>
-Entre com o parâmetro <command>fs<replaceable>n</replaceable>:</command> e
+Entre com o parÃ¢metro <command>fs<replaceable>n</replaceable>:</command> e
 pressione <command>ENTER</command> para selecionar o dispositivo, onde
 <replaceable>n</replaceable>
-é o número da partição do CDROM. O interpretador de comandos mostrará agora o
-número da partição como seu aviso de comandos.
+Ã© o nÃºmero da partiÃ§Ã£o do CDROM. O interpretador de comandos mostrarÃ¡ agora o
+nÃºmero da partiÃ§Ã£o como seu aviso de comandos.
 </para></listitem>
 
 <listitem><para>
 Digite <command>elilo</command> e pressione <command>ENTER</command>.
-Isto iniciará a seqüência de partida.
+Isto iniciarÃ¡ a seqÃ¼Ãªncia de partida.
 </para></listitem>
 
 </itemizedlist>
 
 <para>
 
-Assim como a opção 1, estes passos iniciarão o gerenciador de partida
-do Debian que mostrará uma página de menu onde possa selecionar um
-kernel para inicialização e suas opções. Você também poderá entrar
+Assim como a opÃ§Ã£o 1, estes passos iniciarÃ£o o gerenciador de partida
+do Debian que mostrarÃ¡ uma pÃ¡gina de menu onde possa selecionar um
+kernel para inicializaÃ§Ã£o e suas opÃ§Ãµes. VocÃª tambÃ©m poderÃ¡ entrar
 com o comando
 <command>fs<replaceable>n</replaceable>:elilo</command> no interpretador de
-comandos. Continue para selecionar o kernel de inicialização e suas opções.
+comandos. Continue para selecionar o kernel de inicializaÃ§Ã£o e suas opÃ§Ãµes.
 
 </para>
 
   </sect3>
 
   <sect3 arch="ia64" id="serial-console">
-  <title>Instalação usando um Console Serial</title>
+  <title>InstalaÃ§Ã£o usando um Console Serial</title>
 
 <para>
 
-Você pode optar por fazer a instalação usando um monitor e teclado ou
-usando uma conexão serial. Para usar a configuração de monitor/teclado,
-seleciona uma opção contendo a string [VGA console]. Para instalar
-através de uma conexão serial, selecione uma opção contendo a
+VocÃª pode optar por fazer a instalaÃ§Ã£o usando um monitor e teclado ou
+usando uma conexÃ£o serial. Para usar a configuraÃ§Ã£o de monitor/teclado,
+seleciona uma opÃ§Ã£o contendo a string [VGA console]. Para instalar
+atravÃ©s de uma conexÃ£o serial, selecione uma opÃ§Ã£o contendo a
 string [<replaceable>BAUD</replaceable> baud serial console], aonde
-<replaceable>BAUD</replaceable> é a velocidade de sua console serial. Os
-ítens de menus para as configurações de taxa baud mais típicas em
-ttyS0 estão pré-definidas.
+<replaceable>BAUD</replaceable> Ã© a velocidade de sua console serial. Os
+Ã­tens de menus para as configuraÃ§Ãµes de taxa baud mais tÃ­picas em
+ttyS0 estÃ£o prÃ©-definidas.
 
 </para><para>
 
-Na maioria das circunstâncias, você precisará fazer com que o programa
-de instalação utilize a mesma taxa baud de sua conexão com a console EFI.
-Se não estiver seguro de qual é a configuração, você pode obtê-la usando
+Na maioria das circunstÃ¢ncias, vocÃª precisarÃ¡ fazer com que o programa
+de instalaÃ§Ã£o utilize a mesma taxa baud de sua conexÃ£o com a console EFI.
+Se nÃ£o estiver seguro de qual Ã© a configuraÃ§Ã£o, vocÃª pode obtÃª-la usando
 o comando <command>baud</command> no interpretador de comandos do EFI.
 
 </para><para>
 
-Caso não exista uma opção disponível que esteja configurada para o
-dispositivo serial ou taxa baud que deseja usar, você pode substituir
-a configuração de console por uma das opções de menu existentes. Por
-exemplo, para usar uma taxa de console de 57600 através de um dispositivo
-ttyS1, enter com o parâmetro
+Caso nÃ£o exista uma opÃ§Ã£o disponÃ­vel que esteja configurada para o
+dispositivo serial ou taxa baud que deseja usar, vocÃª pode substituir
+a configuraÃ§Ã£o de console por uma das opÃ§Ãµes de menu existentes. Por
+exemplo, para usar uma taxa de console de 57600 atravÃ©s de um dispositivo
+ttyS1, enter com o parÃ¢metro
 <command>console=ttyS1,57600n8</command> na janela de texto
 <classname>Boot:</classname>.
 
 </para>
 
 <note><para>
-A maioria das máquinas IA-64 vem com uma configuração padrão de console baud de
-9600. Esta configuração é bem lenta, e o processo normal de instalação levará um
-tempo significativo para desenhar cada tela. Você deverá considerar ou
-aumentar a taxa baud usada para fazer a instalação ou realizar uma
-instalação usando o modo texto. Veja o menu de ajuda
-<classname>Params</classname> por instruções de como iniciar o programa de
-instalação em modo texto.
+A maioria das mÃ¡quinas IA-64 vem com uma configuraÃ§Ã£o padrÃ£o de console baud de
+9600. Esta configuraÃ§Ã£o Ã© bem lenta, e o processo normal de instalaÃ§Ã£o levarÃ¡ um
+tempo significativo para desenhar cada tela. VocÃª deverÃ¡ considerar ou
+aumentar a taxa baud usada para fazer a instalaÃ§Ã£o ou realizar uma
+instalaÃ§Ã£o usando o modo texto. Veja o menu de ajuda
+<classname>Params</classname> por instruÃ§Ãµes de como iniciar o programa de
+instalaÃ§Ã£o em modo texto.
 </para></note>
 
 <warning><para>
-Caso selecionar um tipo de console incorreto, você será capaz de
-selecionar o e kernel e entrar com parâmetros, mas ambas a tela e
-sua entrada padrão irão desaparecer assim que o kernel for iniciado,
-será necessário que reinicie antes de começar a instalação.
+Caso selecionar um tipo de console incorreto, vocÃª serÃ¡ capaz de
+selecionar o e kernel e entrar com parÃ¢metros, mas ambas a tela e
+sua entrada padrÃ£o irÃ£o desaparecer assim que o kernel for iniciado,
+serÃ¡ necessÃ¡rio que reinicie antes de comeÃ§ar a instalaÃ§Ã£o.
 </para></warning>
   </sect3>
 
   <sect3 arch="ia64" id="kernel-option-menu">
-  <title>Selecionando o Kernel de Inicialização e Opções</title>
+  <title>Selecionando o Kernel de InicializaÃ§Ã£o e OpÃ§Ãµes</title>
 
 <para>
 
-O gerenciador de partida mostrará um formulário com uma lista
-de opções de menu e uma janela de textos com o aviso
+O gerenciador de partida mostrarÃ¡ um formulÃ¡rio com uma lista
+de opÃ§Ãµes de menu e uma janela de textos com o aviso
 <classname>Boot:</classname>.
 As setas de teclado selecionam um item do menu e qualquer
-texto digitado no teclado aparecerá na janela de textos. Também
+texto digitado no teclado aparecerÃ¡ na janela de textos. TambÃ©m
 existem telas de ajuda que podem ser mostradas pressionando-se
-a tecla de função apropriada. A tela de ajuda <classname>General</classname>
+a tecla de funÃ§Ã£o apropriada. A tela de ajuda <classname>General</classname>
 explica as escolhas de menu e a tela <classname>Params</classname>
-as opções comuns de linha de comando.
+as opÃ§Ãµes comuns de linha de comando.
 
 </para><para>
 
 Consulte a tela de ajuda <classname>General</classname> para obter uma
-descrição dos kernels e modos de instalação mais apropriados para sua
-instalação.
-Você também deverá consultar <xref linkend="boot-parms"/> abaixo para
-qualquer parâmetro adicional que deseja usar na janela de texto
+descriÃ§Ã£o dos kernels e modos de instalaÃ§Ã£o mais apropriados para sua
+instalaÃ§Ã£o.
+VocÃª tambÃ©m deverÃ¡ consultar <xref linkend="boot-parms"/> abaixo para
+qualquer parÃ¢metro adicional que deseja usar na janela de texto
 <classname>Boot:</classname>.
 
-A versão do kernel que escolher seleciona a versão do kernel que será usada
-para ambos o processo de instalação e após o sistema instalado. Caso encontrar
-problemas relacionados com o kernel durante a instalação, você pode também ter
-o mesmo problema com o sistema recém instalado. Os seguintes dois passos
-selecionarão e iniciarão a instalação:
+A versÃ£o do kernel que escolher seleciona a versÃ£o do kernel que serÃ¡ usada
+para ambos o processo de instalaÃ§Ã£o e apÃ³s o sistema instalado. Caso encontrar
+problemas relacionados com o kernel durante a instalaÃ§Ã£o, vocÃª pode tambÃ©m ter
+o mesmo problema com o sistema recÃ©m instalado. Os seguintes dois passos
+selecionarÃ£o e iniciarÃ£o a instalaÃ§Ã£o:
 
 </para>
 
 <itemizedlist>
 
 <listitem><para>
-Selecione a versão do kernel e modo de instalação mais
+Selecione a versÃ£o do kernel e modo de instalaÃ§Ã£o mais
 apropriados a suas necessidades com as setas.
 </para></listitem>
 
 <listitem><para>
 
-Entre com qualquer parâmetro de inicialização digitando no teclado.
-O texto será mostrado diretamente na janela de texto. Este é o lugar aonde
-os parâmetros do kernel (tal como configurações de console serial) são
+Entre com qualquer parÃ¢metro de inicializaÃ§Ã£o digitando no teclado.
+O texto serÃ¡ mostrado diretamente na janela de texto. Este Ã© o lugar aonde
+os parÃ¢metros do kernel (tal como configuraÃ§Ãµes de console serial) sÃ£o
 especificados.
 </para></listitem>
 
 <listitem><para>
-Pressione <command>ENTER</command>. Isto carregará e iniciará o kernel.
-O kernel irá mostrar suas mensagens de inicialização padrões seguidas
-pela primeira tela do programa de instalação do Debian.
+Pressione <command>ENTER</command>. Isto carregarÃ¡ e iniciarÃ¡ o kernel.
+O kernel irÃ¡ mostrar suas mensagens de inicializaÃ§Ã£o padrÃµes seguidas
+pela primeira tela do programa de instalaÃ§Ã£o do Debian.
 </para></listitem>
 
 </itemizedlist>
 
 <para>
 
-Vá até o próximo capítulo para continuar a instalação a partir do passo
-aonde configura a localização de idioma, rede e partições de disco.
+VÃ¡ atÃ© o prÃ³ximo capÃ­tulo para continuar a instalaÃ§Ã£o a partir do passo
+aonde configura a localizaÃ§Ã£o de idioma, rede e partiÃ§Ãµes de disco.
 
 </para>
 
   </sect3>
   </sect2>
 
-  <sect2 arch="ia64" id="boot-tftp"><title>Inicialização através do TFTP</title>
+  <sect2 arch="ia64" id="boot-tftp"><title>InicializaÃ§Ã£o atravÃ©s do TFTP</title>
 
 <para>
-A inicialização de um sistema IA64 através da rede é parecido
-com o usado pelo CD. A única diferença e de como o kernel da
-instalação é carregado. O gerenciador de partida EFI pode carregar e
+A inicializaÃ§Ã£o de um sistema IA64 atravÃ©s da rede Ã© parecido
+com o usado pelo CD. A Ãºnica diferenÃ§a e de como o kernel da
+instalaÃ§Ã£o Ã© carregado. O gerenciador de partida EFI pode carregar e
 iniciar programas a partir de um servidor da rede. Assim que o kernel
-for carregado e iniciar, a instalação do sistema prosseguirá através
-dos mesmos passos usados na instalação através do CD com a
-exceção de que os pacotes da instalação do sistema básico serão
-carregados através da rede ao invés da unidade de CD.
+for carregado e iniciar, a instalaÃ§Ã£o do sistema prosseguirÃ¡ atravÃ©s
+dos mesmos passos usados na instalaÃ§Ã£o atravÃ©s do CD com a
+exceÃ§Ã£o de que os pacotes da instalaÃ§Ã£o do sistema bÃ¡sico serÃ£o
+carregados atravÃ©s da rede ao invÃ©s da unidade de CD.
 
 </para>
 
@@ -371,11 +370,11 @@ carregados através da rede ao invés da unidade de CD.
 
 <para>
 
-A inicialização através da rede em sistemas ia64 requerem duas ações
-específicas de arquitetura. Uma no servidor de inicialização, o DHCP e
+A inicializaÃ§Ã£o atravÃ©s da rede em sistemas ia64 requerem duas aÃ§Ãµes
+especÃ­ficas de arquitetura. Uma no servidor de inicializaÃ§Ã£o, o DHCP e
 TFTP devem ser configurados para entregar o <command>elilo</command>.
-Nos clientes, uma opção de inicialização nova deve ser definida no gerenciador
-de partida EFI para permitir a inicialização através da rede.
+Nos clientes, uma opÃ§Ã£o de inicializaÃ§Ã£o nova deve ser definida no gerenciador
+de partida EFI para permitir a inicializaÃ§Ã£o atravÃ©s da rede.
 
 </para>
 
@@ -383,7 +382,7 @@ de partida EFI para permitir a inicialização através da rede.
   <title>Configurando o Servidor</title>
 <para>
 
-Uma entrada TFTP recomendada para a inicialização de um sistema ia64 via
+Uma entrada TFTP recomendada para a inicializaÃ§Ã£o de um sistema ia64 via
 rede se parece com esta:
 
 <informalexample><screen>
@@ -395,17 +394,17 @@ host mcmuffin {
 
 </screen></informalexample>
 
-Note que o objetivo é ter o <command>elilo.efi</command> sendo executado no
+Note que o objetivo Ã© ter o <command>elilo.efi</command> sendo executado no
 cliente.
 
 </para><para>
 
-Descompacte o arquivo <filename>netboot.tar.gz</filename> no diretório usado
-como sistema de arquivos raíz do seu servidor tftp. Diretórios tftp raíz
-típicos incluem o <filename>/var/lib/tftp</filename> e
+Descompacte o arquivo <filename>netboot.tar.gz</filename> no diretÃ³rio usado
+como sistema de arquivos raÃ­z do seu servidor tftp. DiretÃ³rios tftp raÃ­z
+tÃ­picos incluem o <filename>/var/lib/tftp</filename> e
 <filename>/tftpboot</filename>.
-Isto criará uma árvore de diretórios do <filename>debian-installer</filename>
-contendo os arquivos de inicialização para um sistema IA-64.
+Isto criarÃ¡ uma Ã¡rvore de diretÃ³rios do <filename>debian-installer</filename>
+contendo os arquivos de inicializaÃ§Ã£o para um sistema IA-64.
 
 </para><para>
 
@@ -418,16 +417,16 @@ contendo os arquivos de inicialização para um sistema IA-64.
 [...]
 </screen></informalexample>
 
-O arquivo <filename>netboot.tar.gz</filename> contém um arquivo
+O arquivo <filename>netboot.tar.gz</filename> contÃ©m um arquivo
 <filename>elilo.conf</filename> que deve funcionar para a maioria das
-configurações.
-No entanto, você precisará fazer modificações neste arquivo, sendo encontrado
-dentro do diretório <filename>debian-installer/ia64/</filename>.
+configuraÃ§Ãµes.
+No entanto, vocÃª precisarÃ¡ fazer modificaÃ§Ãµes neste arquivo, sendo encontrado
+dentro do diretÃ³rio <filename>debian-installer/ia64/</filename>.
 
-É possível ter diferentes arquivos de configuração para clientes diferentes
-usando o endereço IP do cliente como prefixo em hexadecimal com a extensão
-<filename>.conf</filename> ao invés de <filename>elilo.conf</filename>.
-Veja a documentação que acompanha o pacote <classname>elilo</classname> para
+Ã‰ possÃ­vel ter diferentes arquivos de configuraÃ§Ã£o para clientes diferentes
+usando o endereÃ§o IP do cliente como prefixo em hexadecimal com a extensÃ£o
+<filename>.conf</filename> ao invÃ©s de <filename>elilo.conf</filename>.
+Veja a documentaÃ§Ã£o que acompanha o pacote <classname>elilo</classname> para
 detalhes
 
 </para>
@@ -437,48 +436,48 @@ detalhes
   <title>Configurando o Cliente</title>
 <para>
 
-Para configurar o suporte a inicialização TFTP no cliente, entre no
+Para configurar o suporte a inicializaÃ§Ã£o TFTP no cliente, entre no
 EFI e entre no item de menu <guimenu>Boot Option Maintenance Menu</guimenu>.
 
 <itemizedlist>
 <listitem><para>
 
-Add a boot option (Adicionar uma opção de partida).
+Add a boot option (Adicionar uma opÃ§Ã£o de partida).
 
 </para></listitem>
 <listitem><para>
 
-Você deverá ver uma ou mais linhas com o texto
+VocÃª deverÃ¡ ver uma ou mais linhas com o texto
 <guimenuitem>Load File [Acpi()/.../Mac()]</guimenuitem>.  Se mais
-de uma destas linhas existem, escolha uma que contém o endereço MAC
-da interface de onde estará inicializando. Use as setas de teclado
-para destacar sua escolha, então pressione enter.
+de uma destas linhas existem, escolha uma que contÃ©m o endereÃ§o MAC
+da interface de onde estarÃ¡ inicializando. Use as setas de teclado
+para destacar sua escolha, entÃ£o pressione enter.
 
 </para></listitem>
 <listitem><para>
 
 De o nome <userinput>Netboot</userinput> ou algo parecido, salve e
-retorne para o menu de opções de inicialização.
+retorne para o menu de opÃ§Ãµes de inicializaÃ§Ã£o.
 
 </para></listitem>
 </itemizedlist>
 
-Você deverá ver a nova opção de inicialização que criou e selecionando-a
-deverá iniciar as requisições DHCP, fazendo com que o TFTP carregue o
+VocÃª deverÃ¡ ver a nova opÃ§Ã£o de inicializaÃ§Ã£o que criou e selecionando-a
+deverÃ¡ iniciar as requisiÃ§Ãµes DHCP, fazendo com que o TFTP carregue o
 arquivo <filename>elilo.efi</filename> a partir do servidor.
 
 </para><para>
 
-O gerenciador de partida mostrará seu interpretador de comandos após
-baixar e processar seu arquivo de configuração. Neste ponto, a instalação
-seguirá com os mesmos passos do que a instalação via CD. Selecione uma opção
-de partida como mostrado acima e quando o kernel se instalar através da
-rede, ele iniciará o programa de instalação do Debian.
+O gerenciador de partida mostrarÃ¡ seu interpretador de comandos apÃ³s
+baixar e processar seu arquivo de configuraÃ§Ã£o. Neste ponto, a instalaÃ§Ã£o
+seguirÃ¡ com os mesmos passos do que a instalaÃ§Ã£o via CD. Selecione uma opÃ§Ã£o
+de partida como mostrado acima e quando o kernel se instalar atravÃ©s da
+rede, ele iniciarÃ¡ o programa de instalaÃ§Ã£o do Debian.
 
 </para><para>
 
-Vá até o próximo capítulo para continuar a instalação aonde configurou
-o <quote>locale</quote> do idioma, rede e partições de disco.
+VÃ¡ atÃ© o prÃ³ximo capÃ­tulo para continuar a instalaÃ§Ã£o aonde configurou
+o <quote>locale</quote> do idioma, rede e partiÃ§Ãµes de disco.
 
 </para>
   </sect3>
