@@ -25,8 +25,8 @@ enum dasd_type { DASD_TYPE_ECKD, DASD_TYPE_FBA };
 struct dasd
 {
 	char name[SYSFS_NAME_LEN];
-	char driver[SYSFS_NAME_LEN];
 	char devtype[SYSFS_NAME_LEN];
+	enum dasd_type type;
 };
 
 static di_tree *dasds;
@@ -96,35 +96,7 @@ static bool update_state (void)
 }
 #endif
 
-static enum state_wanted detect_channels_driver (struct sysfs_driver *driver);
-
-static enum state_wanted detect_channels (void)
-{
-	struct sysfs_driver *driver;
-	enum state_wanted ret;
-	unsigned int i;
-	const char *drivers[] = {
-		"dasd-eckd",
-		"dasd-fba",
-	};
-
-	dasds = di_tree_new (dasd_compare);
-
-	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
-	{
-		driver = sysfs_open_driver ("ccw", drivers[i]);
-		if (driver)
-		{
-			ret = detect_channels_driver (driver);
-			sysfs_close_driver (driver);
-			if (ret)
-				return ret;
-		}
-	}
-	return WANT_NEXT;
-}
-
-static enum state_wanted detect_channels_driver (struct sysfs_driver *driver)
+static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, enum dasd_type type)
 {
 	struct dlist *devices;
 	struct sysfs_device *device;
@@ -145,11 +117,40 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver)
 		strncpy (current->name, device->name, sizeof (current->name));
 		sysfs_read_attribute (devtype_attr);
 		strncpy (current->devtype, devtype_attr->value, sizeof (current->devtype));
-		strcpy (current->driver, driver->name);
+		current->type = type;
 		di_tree_insert (dasds, current, current);
 	}
 
 	return WANT_NONE;
+}
+
+static enum state_wanted detect_channels (void)
+{
+	struct sysfs_driver *driver;
+	enum state_wanted ret;
+	unsigned int i;
+	const struct {
+		const char *name;
+		enum dasd_type type;
+	} drivers[] = {
+		{ "dasd-eckd", DASD_TYPE_ECKD },
+		{ "dasd-fba", DASD_TYPE_FBA },
+	};
+
+	dasds = di_tree_new (dasd_compare);
+
+	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
+	{
+		driver = sysfs_open_driver ("ccw", drivers[i].name);
+		if (driver)
+		{
+			ret = detect_channels_driver (driver, drivers[i].type);
+			sysfs_close_driver (driver);
+			if (ret)
+				return ret;
+		}
+	}
+	return WANT_NEXT;
 }
 
 static enum state_wanted get_channel_input (void)
