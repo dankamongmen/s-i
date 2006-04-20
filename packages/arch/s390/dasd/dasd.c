@@ -155,35 +155,32 @@ static enum state_wanted detect_channels (void)
 
 static enum state_wanted get_channel_input (void)
 {
-#if 0
-		while (1)
-		{
-			ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose", &ptr);
+	int ret;
+	char *ptr;
 
-			for (i = 0; i < dasds_items; i++)
-				if (strncmp (ptr, dasds[i].device, strlen (dasds[i].device)) == 0)
-				{
-					dasd_current = &dasds[i];
-					break;
-				}
+	while (1)
+	{
+		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose", &ptr);
+		if (ret == 10)
+			return WANT_BACKUP;
 
-			if (!dasd_current)
-			{
-				ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_invalid", &ptr);
-				if (ret == 10)
-				{
-					sysfs_close_bus (bus);
-					return WANT_BACKUP;
-				}
-			}
-			else
-				break;
-		}
-#endif
-	return WANT_ERROR;
+		dasd_current = di_tree_lookup (dasds, ptr);
+		if (dasd_current)
+			return WANT_NEXT;
+
+		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_invalid", &ptr);
+		if (ret == 10)
+			return WANT_BACKUP;
+	}
 }
 
 static di_hfunc get_channel_select_append;
+static void get_channel_select_append (void *key, void *value __attribute__ ((unused)), void *user_data)
+{
+	const char *name = key;
+	char *buf = user_data;
+	di_snprintfcat (buf, 512, "%s, ", name);
+}
 
 static enum state_wanted get_channel_select (void)
 {
@@ -205,13 +202,6 @@ static enum state_wanted get_channel_select (void)
 	if (dasd_current)
 		return WANT_NEXT;
 	return WANT_ERROR;
-}
-
-static void get_channel_select_append (void *key, void *value __attribute__ ((unused)), void *user_data)
-{
-	const char *name = key;
-	char *buf = user_data;
-	di_snprintfcat (buf, 512, "%s, ", name);
 }
 
 static enum state_wanted get_channel (void)
