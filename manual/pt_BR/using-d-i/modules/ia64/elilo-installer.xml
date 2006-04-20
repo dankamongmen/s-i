@@ -1,70 +1,69 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 24321 -->
 
   <sect3 arch="ia64">
-  <title>Instalação do gerenciador de partida <command>ELILO</command> no disco
-         rígido</title>
+  <title>InstalaÃ§Ã£o do gerenciador de partida <command>ELILO</command> no disco
+         rÃ­gido</title>
 <para>
 
-O gerenciador de partida da arquitetura &architecture; é chamado 
-<quote>elilo</quote>. Ele foi construído tendo como base o gerenciador de 
+O gerenciador de partida da arquitetura &architecture; Ã© chamado 
+<quote>elilo</quote>. Ele foi construÃ­do tendo como base o gerenciador de 
 partida <quote>lilo</quote> da arquitetura x86 e usa um arquivo de 
-configuração parecido. No entanto, ao invés de escrever um MBR ou 
-registro mestre de partição no disco rígido, ele copia os arquivos 
-necessários para uma partição de disco em formato FAT e modifica o menu
+configuraÃ§Ã£o parecido. No entanto, ao invÃ©s de escrever um MBR ou 
+registro mestre de partiÃ§Ã£o no disco rÃ­gido, ele copia os arquivos 
+necessÃ¡rios para uma partiÃ§Ã£o de disco em formato FAT e modifica o menu
 do <guimenuitem>gerenciador de partida do EFI</guimenuitem> do hardware 
-apontando para os arquivos naquela partição. O gerenciador de partida 
+apontando para os arquivos naquela partiÃ§Ã£o. O gerenciador de partida 
 <command>elilo</command> realmente se divide em duas partes. O comando 
-<filename>/usr/sbin/elilo</filename> que gerencia a partição e copia os 
-arquivos para ela. O programa <filename>elilo.efi</filename> é copiado na 
-partição EFI e executado pelo <quote>gerenciador de partida do EFI</quote> 
+<filename>/usr/sbin/elilo</filename> que gerencia a partiÃ§Ã£o e copia os 
+arquivos para ela. O programa <filename>elilo.efi</filename> Ã© copiado na 
+partiÃ§Ã£o EFI e executado pelo <quote>gerenciador de partida do EFI</quote> 
 para fazer o trabalho de carregar e iniciar o kernel do Linux.
 
 </para><para>
 
-A configuração e instalação do <quote>elilo</quote> é feita como último passo
-da instalação de pacotes da instalação do sistema básico. O 
-&d-i; lhe mostrará uma lista de partições de disco potenciais que achou adequadas
-para uma instalação de uma partição do EFI.
-Selecione a partição que configurou anteriormente na instalação, tipicamente uma 
-partição no mesmo disco que contém seu sistema de arquivos
-<emphasis>raíz</emphasis>.
+A configuraÃ§Ã£o e instalaÃ§Ã£o do <quote>elilo</quote> Ã© feita como Ãºltimo passo
+da instalaÃ§Ã£o de pacotes da instalaÃ§Ã£o do sistema bÃ¡sico. O 
+&d-i; lhe mostrarÃ¡ uma lista de partiÃ§Ãµes de disco potenciais que achou adequadas
+para uma instalaÃ§Ã£o de uma partiÃ§Ã£o do EFI.
+Selecione a partiÃ§Ã£o que configurou anteriormente na instalaÃ§Ã£o, tipicamente uma 
+partiÃ§Ã£o no mesmo disco que contÃ©m seu sistema de arquivos
+<emphasis>raÃ­z</emphasis>.
 
 </para>
 
-  <warning><title>Selecione a partição correta!</title>
+  <warning><title>Selecione a partiÃ§Ã£o correta!</title>
 
 <para>
 
-O critério para seleção de uma partição é que ela deverá conter um 
-sistema de arquivos em formato FAT marcada como <emphasis>inicializável</emphasis>.
-O &d-i; pode mostrar múltiplas escolhas dependendo do que encontrar durante a
-pesquisa de discos de sistema, incluindo partições EFI de outros discos de sistema 
-e partições de diagnóstico do EFI. Lembre-se que o <command>elilo</command> 
-pode formatar a partição durante a instalação, apagando todo o conteúdo anterior.
+O critÃ©rio para seleÃ§Ã£o de uma partiÃ§Ã£o Ã© que ela deverÃ¡ conter um 
+sistema de arquivos em formato FAT marcada como <emphasis>inicializÃ¡vel</emphasis>.
+O &d-i; pode mostrar mÃºltiplas escolhas dependendo do que encontrar durante a
+pesquisa de discos de sistema, incluindo partiÃ§Ãµes EFI de outros discos de sistema 
+e partiÃ§Ãµes de diagnÃ³stico do EFI. Lembre-se que o <command>elilo</command> 
+pode formatar a partiÃ§Ã£o durante a instalaÃ§Ã£o, apagando todo o conteÃºdo anterior.
 
 </para></warning>
 
   </sect3>
 
   <sect3 arch="ia64">
-  <title>Conteúdo da Partição EFI</title>
+  <title>ConteÃºdo da PartiÃ§Ã£o EFI</title>
 
 <para>
 
-A partição EFI é uma partição contendo um sistema de arquivos no 
-formato FAT em um dos discos rígidos do sistema, normalmente o mesmo
-disco que contém o sistema de arquivos <emphasis>raíz</emphasis>.
-ela normalmente não é montada em um sistema em execução como normalmente
-só é necessária pelo <quote>Gerenciador de Partida EFI</quote> para carregar
-o sistema e a parte de instalação do <command>elilo</command> grava diretamente
-no sistema de arquivos. O utilitário <command>/usr/sbin/elilo</command> 
-grava os seguintes arquivos para o diretório <filename>efi/debian</filename> 
-da partição EFI durante a instalação.
-Note que o <quote>Gerenciador de Partida EFI</quote> encontrará estes arquivos
+A partiÃ§Ã£o EFI Ã© uma partiÃ§Ã£o contendo um sistema de arquivos no 
+formato FAT em um dos discos rÃ­gidos do sistema, normalmente o mesmo
+disco que contÃ©m o sistema de arquivos <emphasis>raÃ­z</emphasis>.
+ela normalmente nÃ£o Ã© montada em um sistema em execuÃ§Ã£o como normalmente
+sÃ³ Ã© necessÃ¡ria pelo <quote>Gerenciador de Partida EFI</quote> para carregar
+o sistema e a parte de instalaÃ§Ã£o do <command>elilo</command> grava diretamente
+no sistema de arquivos. O utilitÃ¡rio <command>/usr/sbin/elilo</command> 
+grava os seguintes arquivos para o diretÃ³rio <filename>efi/debian</filename> 
+da partiÃ§Ã£o EFI durante a instalaÃ§Ã£o.
+Note que o <quote>Gerenciador de Partida EFI</quote> encontrarÃ¡ estes arquivos
 usando o caminho <filename>fs<replaceable>n</replaceable>:\efi\debian</filename>.
 Podem existir outros arquivos neste sistema de arquivos enquanto o sistema 
-é atualizado ou reconfigurado de tempos em tempos.
+Ã© atualizado ou reconfigurado de tempos em tempos.
 
 </para>
 
@@ -74,9 +73,9 @@ Podem existir outros arquivos neste sistema de arquivos enquanto o sistema
 <term><filename>elilo.conf</filename></term>
 <listitem><para>
 
-Este é o arquivo de configuração lido pelo gerenciador de partida
-quando é iniciado. É uma cópia do <filename>/etc/elilo.conf</filename> com
-os nomes de arquivos re-gravados para se referir a arquivos dentro da partição
+Este Ã© o arquivo de configuraÃ§Ã£o lido pelo gerenciador de partida
+quando Ã© iniciado. Ã‰ uma cÃ³pia do <filename>/etc/elilo.conf</filename> com
+os nomes de arquivos re-gravados para se referir a arquivos dentro da partiÃ§Ã£o
 EFI.
 
 </para></listitem></varlistentry>
@@ -85,9 +84,9 @@ EFI.
 <term><filename>elilo.efi</filename></term>
 <listitem><para>
 
-Este é o programa gerenciador de partida que o <quote>Gerenciador de Partida EFI
-</quote> executa para inicializar o sistema. Ele também é o programa por trás do
-ítem de menu <guimenuitem>Debian GNU/Linux</guimenuitem> do menu de comando
+Este Ã© o programa gerenciador de partida que o <quote>Gerenciador de Partida EFI
+</quote> executa para inicializar o sistema. Ele tambÃ©m Ã© o programa por trÃ¡s do
+Ã­tem de menu <guimenuitem>Debian GNU/Linux</guimenuitem> do menu de comando
 <quote>EFI Boot Manager</quote>.
 
 </para></listitem></varlistentry>
@@ -96,11 +95,11 @@ Este é o programa gerenciador de partida que o <quote>Gerenciador de Partida EFI
 <term><filename>initrd.img</filename></term>
 <listitem><para>
 
-Este é um sistema de arquivos raíz inicial usado para inicializar o 
-kernel. Ele é uma cópia do arquivo referenciado no
+Este Ã© um sistema de arquivos raÃ­z inicial usado para inicializar o 
+kernel. Ele Ã© uma cÃ³pia do arquivo referenciado no
 <filename>/etc/elilo.conf</filename>.
-Em uma instalação padrão da Debian, ele deverá ser o arquivo em
-<filename>/boot</filename> referenciado através do link simbólico
+Em uma instalaÃ§Ã£o padrÃ£o da Debian, ele deverÃ¡ ser o arquivo em
+<filename>/boot</filename> referenciado atravÃ©s do link simbÃ³lico
 <filename>/initrd.img</filename>.
 
 </para></listitem></varlistentry>
@@ -109,9 +108,9 @@ Em uma instalação padrão da Debian, ele deverá ser o arquivo em
 <term><filename>readme.txt</filename></term>
 <listitem><para>
 
-Este é um pequeno arquivo de texto te alertando que o conteúdo do 
-diretório é gerenciado pelo <command>elilo</command> e que qualquer
-modificação local será perdida na próxima vez que o
+Este Ã© um pequeno arquivo de texto te alertando que o conteÃºdo do 
+diretÃ³rio Ã© gerenciado pelo <command>elilo</command> e que qualquer
+modificaÃ§Ã£o local serÃ¡ perdida na prÃ³xima vez que o
 <filename>/usr/sbin/elilo</filename> for executado.
 
 </para></listitem></varlistentry>
@@ -120,12 +119,12 @@ modificação local será perdida na próxima vez que o
 <term><filename>vmlinuz</filename></term>
 <listitem><para>
 
-Este é o próprio kernel compactado. É uma 
-cópia do arquivo referenciado em
+Este Ã© o prÃ³prio kernel compactado. Ã‰ uma 
+cÃ³pia do arquivo referenciado em
 <filename>/etc/elilo.conf</filename>.
-Em uma instalação padrão da Debian, ele será o 
+Em uma instalaÃ§Ã£o padrÃ£o da Debian, ele serÃ¡ o 
 arquivo em 
-<filename>/boot</filename> referenciado pelo link simbólico
+<filename>/boot</filename> referenciado pelo link simbÃ³lico
 <filename>/vmlinuz</filename>.
 
 </para></listitem></varlistentry>
