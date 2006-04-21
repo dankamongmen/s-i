@@ -1,6 +1,7 @@
-<!-- original version: 28997 -->
+<!-- original version: 33819 -->
 <!-- revised by Marco Carvalho (macs) 2006.01.01 -->
 <!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.01.01 -->
+<!-- updated from 28997 to 33819 by André Luís Lopes (andrelop) 2006.04.20 -->
 
  <chapter id="d-i-intro"><title>Usando o Debian Installer</title>
 
@@ -86,22 +87,22 @@ ou terceira seção de ssh para ver os logs descritos abaixo.
 
 </para><para>
 
-As mensagens de erro são direcionadas para o terceiro console.
+As mensagens de erro e logs são direcionados para o quarto console.
 Você poderá acessar este console digitando <keycombo><keycap>Left Alt</keycap>
-<keycap>F3</keycap></keycombo>
+<keycap>F4</keycap></keycombo>
 (pressione a tecla <keycap>Alt</keycap> esquerda enquanto pressiona a tecla de
-função <keycap>F3</keycap>); volte para o processo de instalação
+função <keycap>F4</keycap>); volte para o processo de instalação
 principal pressionando
 <keycombo><keycap>Left Alt</keycap><keycap>F1</keycap></keycombo>.
 
 </para><para>
 
 Esta mensagens também podem ser encontradas no arquivo
-<filename>/var/log/messages</filename>. Após a instalação, esta mensagem
-de log é copiada para <filename>/var/log/debian-installer/messages</filename>
+<filename>/var/log/syslog</filename>. Após a instalação, esta mensagem
+de log é copiada para <filename>/var/log/syslog</filename>
 em seu novo sistema. As outras mensagens de instalação podem ser encontradas em
 <filename>/var/log/</filename> durante a instalação, e
-<filename>/var/log/debian-installer/</filename> após o computador ser iniciado
+<filename>/var/log/debian/</filename> após o computador ser iniciado
 com o sistema recém instalado.
 
 </para>
@@ -140,26 +141,7 @@ sendo executado atualmente.
 
 </para></listitem>
 </varlistentry>
-<varlistentry condition="sarge">
-
-<term>languagechooser</term><listitem><para>
-
-Mostra uma lista de idiomas e variante de idioma. O instalador
-mostrará as mensagens no idioma selecionado, a não ser que a
-tradução para aquela língua não esteja completada. Quando a
-tradução não estiver completa, mensagens em Inglês são mostradas.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="sarge">
-
-<term>countrychooser</term><listitem><para>
-
-Mostra uma lista de países. O usuário poderá selecionar o país que vive.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="etch">
+<varlistentry>
 
 <term>localechooser</term><listitem><para>
 
@@ -302,10 +284,36 @@ encontradas em placas mãe mais novas.
 </varlistentry>
 <varlistentry>
 
+<term>tzsetup</term><listitem><para>
+
+Selecione o fuso horário, com base na localização anteriormente
+selecionada.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>user-setup</term><listitem><para>
+
+Configura a senha do root e adiciona um usuário não-root.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
 <term>base-installer</term><listitem><para>
 
 Instala o conjunto mais básico de pacotes que permite ao
 computador operar sob o Linux quando for reiniciado.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>apt-setup</term><listitem><para>
+
+Configura o apt, quase automaticamente, com base em a partir de
+qual mídia o instalador está sendo executado.
 
 </para></listitem>
 </varlistentry>
@@ -325,21 +333,12 @@ de selecionar que sistema operacional deverá ser usado na partida do sistema.
 
 <term>bootloader-installer</term><listitem><para>
 
-Instala o programa gerenciador de partida no disco rígido, que é
-necessário para o computador iniciar usando o Linux sem usar um
-disquete ou CD-ROM. Muitos gerenciadores de partida permitem ao
-usuário escolher um sistema operacional cada vez que ele é reiniciado.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>base-config</term><listitem><para>
-
-Mostra diálogos para configurar os pacotes do sistema básico de
-acordo com as preferências do usuário. Isto normalmente é feito
-após reiniciar o computador; é a <quote>primeira execução</quote> do novo
-sistema Debian.
+Os vários instaladores de gerenciadores de inicialização instalam
+cada qual um programa gerenciador de inicialização no disco rígido, o qual
+é necessário para que o computador inicie usando Linux sem utilizar um
+disquete ou um CD-ROM. Muitos gerenciadores de inicialização permitem que
+o usuário escolha um sistema operacional alternativo a cada vez que o
+computador inicia.
 
 </para></listitem>
 </varlistentry>
@@ -354,13 +353,12 @@ console.
 </varlistentry>
 <varlistentry>
 
-<term condition="sarge">bugreporter</term><term condition="etch">save-logs</term><listitem><para>
+<term>save-logs</term><listitem><para>
 
-Oferece um método para o usuário gravar informações em um disquete
-<phrase condition="etch">, rede, disco rígido ou outra mídia</phrase>
-sobre o problema que ele encontrou, para relatar precisamente
-problemas com a instalação de softwares aos desenvolvedores mais
-tarde.
+Oferece um método para o usuário gravar informações em um disquete,
+rede, disco rígido ou outra mídia quando problemas são encontrados, para
+que problemas no software instalador sejam relatados corretamente para os
+desenvolvedores Debian posteriormente.
 
 </para></listitem>
 </varlistentry>
