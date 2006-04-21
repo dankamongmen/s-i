@@ -137,42 +137,39 @@ parameters.  To do that, do <userinput>make-kpkg clean</userinput>.
 </para><para>
 
 Now, compile the kernel:
-<userinput>fakeroot make-kpkg --revision=custom.1.0 kernel_image</userinput>.
+<userinput>fakeroot make-kpkg --initrd --revision=custom.1.0 kernel_image</userinput>.
 The version number of <quote>1.0</quote> can be changed at will; this is just
 a version number that you will use to track your kernel builds.
 Likewise, you can put any word you like in place of <quote>custom</quote>
 (e.g., a host name).  Kernel compilation may take quite a while, depending on
 the power of your machine.
 
-</para><para condition="supports-pcmcia">
-
-If you require PCMCIA support, you'll also need to install the
-<classname>pcmcia-source</classname> package.  Unpack the gzipped tar file
-as root in the directory <filename>/usr/src</filename> (it's important that
-modules are found where they are expected to be found, namely,
-<filename>/usr/src/modules</filename>).  Then, as root, do <userinput>make-kpkg
-modules_image</userinput>.
-
 </para><para>
 
 Once the compilation is complete, you can install your custom kernel
-like any package.  As root, do <userinput>dpkg -i
+like any package.  As root, do 
+<phrase condition="classic-kpkg">
+<userinput>dpkg -i
 ../kernel-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
+<phrase condition="common-kpkg">
+<userinput>dpkg -i
+../linux-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
 The <replaceable>subarchitecture</replaceable> part is an optional
 sub-architecture,
 <phrase arch="i386"> such as <quote>i586</quote>, </phrase>
 depending on what kernel options you set.
-<userinput>dpkg -i kernel-image...</userinput> will install the
+<userinput>dpkg -i</userinput> will install the
 kernel, along with some other nice supporting files.  For instance,
 the <filename>System.map</filename> will be properly installed
 (helpful for debugging kernel problems), and
 <filename>/boot/config-&kernelversion;</filename> will be installed,
 containing your current configuration set.  Your new
-<classname>kernel-image-&kernelversion;</classname> package is also clever
-enough to automatically use your platform's boot-loader to run an
-update on the booting, allowing you to boot without re-running the
-boot loader.  If you have created a modules package, e.g., if you have
-PCMCIA, you'll need to install that package as well.
+kernel package is also clever enough to automatically update your boot
+loader to use the new kernel. If you have created a modules package,
+<phrase condition="classic-kpkg">e.g., if you have PCMCIA,</phrase>
+you'll need to install that package as well.
 
 </para><para>
 
