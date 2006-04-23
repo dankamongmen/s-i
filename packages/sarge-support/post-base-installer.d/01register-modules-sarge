@@ -1,0 +1,22 @@
+#! /bin/sh
+
+# Support installing a 2.6.8-ish kernel from a system running a newer
+# kernel. hw-detect skips registering some modules that udev picks up in
+# newer kernels, but problably not in the kernel in sarge.
+SUBARCH="$(archdetect)"
+register-module ide-detect || true
+register-module ide-cd || true
+register-module ide-disk || true
+register-module sr_mod || true
+register-module sd_mod || true
+case "$(udpkg --print-architecture)" in
+	i386|ia64|amd64)
+		register-module psmouse
+		;;
+esac
+
+case $SUBARCH in
+	powerpc/chrp*|powerpc/prep)
+		register-module psmouse
+		;;
+esac
