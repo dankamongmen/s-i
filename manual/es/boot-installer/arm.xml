@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28672 -->
+<!-- original version: 36639 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Arrancar desde TFTP</title>
 
@@ -9,70 +9,70 @@
 
 <para>
 
-Las máquinas NetWinder tienen dos interfaces de red: La tarjeta de
-10 Mbps compatible con NE2000 es <filename>eth0</filename> y la tarjeta
-Tulip de 100 Mbps es <filename>eth1</filename>.
+Las máquinas NetWinder tienen dos interfaces de red: una tarjeta de
+10 Mbps compatible con NE2000 (que habitualmente se la refiere como
+<filename>eth0</filename>) y una tarjeta
+Tulip de 100 Mbps. Si utiliza la tarjeta de 100Mbps puede tener problemas
+durante la descarga de la imagen a través de TFTP por lo que se recomienda el
+uso del interfaz de 10Mbps (el marcado como <literal>10 Base-T</literal>).
 
-</para><note><para>
+</para>
+<note><para>
 
 Necesita NeTTrom 2.2.1 o superior para arrancar el sistema de
-instalación. Se recomienda NeTTrom 2.3.3: Puede obtener estos
-ficheros en
-<ulink url="ftp://ftp.netwinder.org/pub/netwinder/firmware/"></ulink>:
-<itemizedlist>
-<listitem><para>
+instalación. Se recomienda la versión 2.3.3. Desgraciadamente,
+los archivos de «firmware» no se pueden descargar actualmente debido
+a problemas de licencia. Podrá encontrar nuevas imágenes en <ulink
+url="http//www.netwinder.org/"></ulink> si esta situación cambia en el futuro.
 
-<filename>nettrom-2.3-3.armv4l.rpm</filename>
+</para></note>
+<para>
 
-</para></listitem>
-<listitem><para>
-
-<filename>nettrom-2.3.3.bin</filename>
-
-</para></listitem>
-<listitem><para>
-
-<filename>nettrom-2.3.3.bin.md5sum</filename>
-
-</para></listitem>
-</itemizedlist>
-
-</para></note><para>
-
-Después de reiniciar e interrumpir el proceso de arranque durante la
-cuenta regresiva, primero debe configurar la red con una dirección
-estática:
+Cuando arranque Netboot debe interrumpir el proceso de arranque durante la
+cuenta hacia atrás. Esto le permite establecer algunos valores del
+«firmware» necesarios para arrancar el instalador. En primer lugar,
+debería cargar los valores por omisión:
 
 <informalexample><screen>
+   NeTTrom command-&gt; load-defaults
+</screen></informalexample>
+
+Después, puede configurar la red asignando una dirección estática:
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv netconfig_eth0 flash
     NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
 </screen></informalexample>
 
-donde 24 es el número de conjunto de bits en la máscara de red, o
-una dirección dinámica:
+donde 24 es el número de conjunto de bits en la máscara de red. O bien,
+puede utilizar una dirección dinámica:
 
 <informalexample><screen>
-    NeTTrom command-&gt; boot diskless
+    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
 </screen></informalexample>
 
 También podría necesitar configurar los valores de
 <userinput>route1</userinput> en el servidor TFTP, si es que no está
-en la misma subred. El resto de la configuración es bastante estándar
-(el paso save-all es opcional):
+en la misma subred. 
+
+Si sigue los pasos de configuraciónn indicados más abajo tendrá que
+modificar la dirección del servidor de TFTP y la ubicación
+de la imagen. Una vez hecho esto deberá guardar sus cambios en la flash.
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
     NeTTrom command-&gt; setenv kerntftpfile boot.img
     NeTTrom command-&gt; save-all
     NeTTrom command-&gt; setenv netconfig_eth0 flash
+</screen></informalexample>
+
+Tras esto deberá decir al «firmware» que debería arrancar la imagen TFTP:
+
+<informalexample><screen>
     NeTTrom command-&gt; setenv kernconfig tftp
     NeTTrom command-&gt; setenv rootdev /dev/ram
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram
 </screen></informalexample>
-
-Solamente los últimos cuatro pasos interfieren con el arranque de disco
-normal, de modo que es seguro ejecutar <command>save-all</command>
-antes de esto, lo que guardará la configuración de red en caso de que
-necesite arrancar desde la red nuevamente.
 
 También necesitar establecer el valor mostrado a continuación si
 quiere utilizar la consola serie para instalar su Netwinder:
@@ -81,11 +81,23 @@ quiere utilizar la consola serie para instalar su Netwinder:
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
 </screen></informalexample>
 
-Use la orden <command>printenv</command> para revisar los valores de
-entorno.  Finalmente, si la variable <envar>cmdappend</envar> de
-NeTTrom tiene la opción <option>noinitrd</option>, debe eliminarla
-para que el núcleo que ha descargado puede arrancar con su disco ram
-adjunto.
+En lugar de la consola puede utilizar un teclado o monitor para la instalación
+para lo que debe configurar:
+
+<informalexample><screen>
+    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
+</screen></informalexample>
+
+Puede utilizar la orden <command>printenv</command> para revisar los valores de
+su entorno. Puede cargar la imagen una vez haya verificado que son correctos:
+
+<informalexample><screen>
+    NeTTrom command-&gt; boot
+</screen></informalexample>
+
+Si tiene problemas le recomendamos que consulte el 
+<ulink url="http://www.netwinder.org/howto/Firmware-HOWTO.html">COMO
+detallado</ulink> disponible.
 
 </para>
   </sect3>
@@ -102,7 +114,6 @@ cursor Cyclone.
   </sect2>
 
 
-
   <sect2 arch="arm"><title>Arrancar desde CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
@@ -113,4 +124,108 @@ Para arrancar desde CD-ROM desde el cursor de la consola Cyclone,
 use la orden <command>boot cd0:cats.bin</command>
 
 </para>
+  </sect2>
+
+
+  <sect2 arch="arm" id="boot-firmware"><title>Arranque desde Firmware</title>
+
+&boot-installer-intro-firmware.xml;
+
+   <sect3 arch="arm" id="boot-firmware-nslu2"><title>Arranque del NSLU2</title>
+<para>
+
+Hay tres formas distintas de poner el «firmware» del instalador en flash:
+
+</para>
+
+    <sect4 arch="arm"><title>Con la interfaz web del NSLU2 </title>
+<para>
+
+Vaya a la sección de administración de la interfaz y elija el elemento
+del menú <literal>Upgrade</literal> («Actualización», N. del T.).
+Hecho esto podrá buscar en su disco la imagen del instalador que ha
+descargado previamente. Hecho esto, pulse el botón
+<literal>Start Upgrade</literal> («Comenzar la actualización», N. del T.),
+confirme la operación, espere unos minutos y vuelva a confirmar. El
+sistema debería arrancar directamente el instalador después.
+
+</para>
+    </sect4>
+
+    <sect4 arch="arm"><title>A través de una red con Linux/Unix</title>
+<para>
+
+Puede usar <command>upslug2</command> desde cualquier sistema Linux o
+Unix para actualizar el sistema por la red. Este programa está empaquetado
+para Debian.
+
+En primer lugar tiene que poner el sistema NSLU2 en modo actualización:
+
+<orderedlist>
+<listitem><para>
+
+Desconecte cualquier disco y/o dispositivo de los puertos USB.
+
+</para></listitem>
+<listitem><para>
+
+Apague el NSLU2.
+
+</para></listitem>
+<listitem><para>
+
+Pulse y mantenga apretado el botón reset (accesible a través de un pequeño agujero en la parte trasera del equipo encima de la entrada de corriente).
+
+</para></listitem>
+<listitem><para>
+
+Pulse y mantenga el botón de encendido para arrancar el NSLU2.
+
+</para></listitem>
+<listitem><para>
+
+Espere diez segundos y mire el LED de preparado/estado. Una vez transcurridos
+diez segundos debería cambiar de ambar a rojo. Suelte el botón de reset
+inmediatamente. 
+
+</para></listitem>
+<listitem><para>
+
+El LED de preparado/estado del NSLU2 empezara a parpadear de forma alternativa
+entre rojo y verde (hay una demora de un segundo antes de que aparezca el verde
+la primera vez). Cuando suceda ésto el NSLU2 estará ya en modo actualización.
+
+</para></listitem>
+</orderedlist>
+
+Si tiene problemas con estos pasos consulte las <ulink
+url="http://www.nslu2-linux.org/wiki/OpenSlug/UsingTheBinary">páginas NSLU2-Linux
+</ulink>.
+
+Una vez su NSLU2 esté en modo actualización puede guardar en la flash 
+la nueva imagen:
+
+<informalexample><screen>
+sudo upslug2 -i di-nslu2.bin
+</screen></informalexample>
+
+Tenga en cuenta que esta herramienta muestra la dirección MAC de su NSLU2.
+Este dato le puede resultar útil para configurar su servidor de DHCP.  Una vez
+se haya escrito y verificado la imagen completa el sistema reiniciará de forma
+automática. Asegúrese de que vuelve a conectar su disco USB, si no lo hace el
+instalador no lo podrá encontrar más adelante.
+
+</para>
+    </sect4>
+
+    <sect4 arch="arm"><title>A través de la red con Windows</title>
+<para>
+
+Existe una <ulink
+url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zip">herramienta</ulink>
+para Windows para actualizar el firmware a través de la red.
+
+</para>
+    </sect4>
+   </sect3>
   </sect2>
