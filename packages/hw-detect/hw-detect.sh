@@ -252,15 +252,19 @@ get_ide_floppy_info() {
 }
 
 get_input_info() {
-	case "$(udpkg --print-architecture)" in
-		i386|ia64|amd64)
-			register-module psmouse
-		;;
-	esac
+	case "$(uname -r)" in
+	2.4*)
+		case "$(udpkg --print-architecture)" in
+			i386|ia64|amd64)
+				register-module psmouse
+			;;
+		esac
 	
-	case $SUBARCH in
-		powerpc/chrp*|powerpc/prep)
-			register-module psmouse
+		case $SUBARCH in
+			powerpc/chrp*|powerpc/prep)
+				register-module psmouse
+			;;
+		esac
 		;;
 	esac
 }
@@ -467,16 +471,13 @@ fi
 
 # If there is an ide bus, then register the ide CD modules so they'll be
 # available on the target system for base-config. Disk too, in case root is
-# not ide but ide is still used.
+# not ide but ide is still used. udev should handle this for 2.6.
 if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
-	register-module ide-cd
-	register-module ide-disk
 	case "$(uname -r)" in
 	2.4*)
 		register-module ide-detect
-	;;
-	2.6*)
-		register-module ide-generic
+		register-module ide-cd
+		register-module ide-disk
 	;;
 	esac
 fi
