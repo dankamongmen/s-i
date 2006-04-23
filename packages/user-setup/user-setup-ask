@@ -34,14 +34,14 @@ while :; do
 			# First check whether the root password was preseeded crypted
 			db_get passwd/root-password-crypted || true
 			if ! test "$RET" ; then
-			    # No preseed of the root password hash
-			    # we will prompt the user
-			    db_input critical passwd/root-password || true
-			    # Note that this runs at a slightly lower
-			    # priority, so it may not always be seen. If
-			    # it isn't, don't compare passwords.
-			    COMPARE_PW=''
-			    db_input critical passwd/root-password-again \
+				# No preseed of the root password hash
+				# we will prompt the user
+				db_input critical passwd/root-password || true
+				# Note that this runs at a slightly lower
+				# priority, so it may not always be seen. If
+				# it isn't, don't compare passwords.
+				COMPARE_PW=''
+				db_input critical passwd/root-password-again \
 				&& COMPARE_PW=1 || true
 			fi
 		fi
@@ -55,28 +55,28 @@ while :; do
 			# First check whether the root password was preseeded crypted
 			db_get passwd/root-password-crypted || true
 			if ! test "$RET" ; then
-			    # Compare the two passwords, loop back if not
-			    # identical, or if empty.
-			    db_get passwd/root-password
-			    ROOT_PW="$RET"
-			    if [ -z "$ROOT_PW" ]; then
-				db_fset user-setup/password-empty seen false
-				db_input critical user-setup/password-empty
-				db_fset passwd/root-password seen false
-				db_fset passwd/root-password-again seen false
-				STATE=0
-				continue
-			    fi
-			    db_get passwd/root-password-again
-			    if [ "$COMPARE_PW" ] && [ "$ROOT_PW" != "$RET" ]; then
-				db_fset user-setup/password-mismatch seen false
-				db_input critical user-setup/password-mismatch
-				db_fset passwd/root-password seen false
-				db_fset passwd/root-password-again seen false
-				STATE=0
-				continue
-			    fi
-			    ROOT_PW=''
+				# Compare the two passwords, loop back if not
+				# identical, or if empty.
+				db_get passwd/root-password
+				ROOT_PW="$RET"
+				if [ -z "$ROOT_PW" ]; then
+					db_fset user-setup/password-empty seen false
+					db_input critical user-setup/password-empty
+					db_fset passwd/root-password seen false
+					db_fset passwd/root-password-again seen false
+					STATE=0
+					continue
+				fi
+				db_get passwd/root-password-again
+				if [ "$COMPARE_PW" ] && [ "$ROOT_PW" != "$RET" ]; then
+					db_fset user-setup/password-mismatch seen false
+					db_input critical user-setup/password-mismatch
+					db_fset passwd/root-password seen false
+					db_fset passwd/root-password-again seen false
+					STATE=0
+					continue
+				fi
+				ROOT_PW=''
 			fi
 		fi
 	;;
@@ -108,14 +108,14 @@ while :; do
 			if [ -z "$RET" ]; then
 				db_get passwd/user-fullname
 				case "$RET" in
-				    "Frans Pop")	userdefault="fjp";;
-				    "Martin Michlmayr")	userdefault="tbm";;
-				    *)
-					userdefault=`echo $RET | sed 's/ .*//' | LC_ALL=C tr A-Z a-z`
+					"Frans Pop")	userdefault="fjp";;
+					"Martin Michlmayr")	userdefault="tbm";;
+					*)
+						userdefault=`echo $RET | sed 's/ .*//' | LC_ALL=C tr A-Z a-z`
 					;;
 				esac
 				if test -n "$userdefault" && \
-				   LC_ALL=C expr "$userdefault" : '[a-z][-a-z0-9]*$' >/dev/null; then
+					LC_ALL=C expr "$userdefault" : '[a-z][-a-z0-9]*$' >/dev/null; then
 					db_set passwd/username "$userdefault"
 				fi
 			fi
@@ -139,9 +139,9 @@ while :; do
 			
 			db_get passwd/user-password-crypted || true
 			if ! test "$RET" ; then
-			    db_input critical passwd/user-password || true
-			    COMPARE_PW=''
-			    db_input critical passwd/user-password-again \
+				db_input critical passwd/user-password || true
+				COMPARE_PW=''
+				db_input critical passwd/user-password-again \
 				&& COMPARE_PW=1 || true
 			fi
 		fi
@@ -151,31 +151,31 @@ while :; do
 		if [ "$RET" = true ] && ! is_system_user; then
 			db_get passwd/user-password-crypted || true
 			if ! test "$RET" ; then
-			    # Compare the two passwords, loop with message if not
-			    # identical, or if empty.
-			    db_get passwd/user-password
-			    USER_PW="$RET"
-			    db_get passwd/user-password-again
-			    if [ "$COMPARE_PW" ] && [ "$USER_PW" != "$RET" ]; then
-				db_set passwd/user-password ""
-				db_set passwd/user-password-again ""
-				db_fset user-setup/password-mismatch seen false
-				db_input critical user-setup/password-mismatch
-				db_fset passwd/user-password seen false
-				db_fset passwd/user-password-again seen false
-				STATE=6
-				continue
-			    fi
-			    if [ -z "$USER_PW" ]; then
-				db_set passwd/user-password ""
-				db_set passwd/user-password-again ""
-				db_fset user-setup/password-empty seen false
-				db_input critical user-setup/password-empty
-				db_fset passwd/user-password seen false
-				db_fset passwd/user-password-again seen false
-				STATE=6
-				continue
-			    fi
+				# Compare the two passwords, loop with message if not
+				# identical, or if empty.
+				db_get passwd/user-password
+				USER_PW="$RET"
+				db_get passwd/user-password-again
+				if [ "$COMPARE_PW" ] && [ "$USER_PW" != "$RET" ]; then
+					db_set passwd/user-password ""
+					db_set passwd/user-password-again ""
+					db_fset user-setup/password-mismatch seen false
+					db_input critical user-setup/password-mismatch
+					db_fset passwd/user-password seen false
+					db_fset passwd/user-password-again seen false
+					STATE=6
+					continue
+				fi
+				if [ -z "$USER_PW" ]; then
+					db_set passwd/user-password ""
+					db_set passwd/user-password-again ""
+					db_fset user-setup/password-empty seen false
+					db_input critical user-setup/password-empty
+					db_fset passwd/user-password seen false
+					db_fset passwd/user-password-again seen false
+					STATE=6
+					continue
+				fi
 			fi
 		fi
 	;;
