@@ -1,19 +1,21 @@
 <!-- retain these comments for translator revision tracking -->
 <!-- original version: 32124 -->
 
+
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <!-- <title>Preparing Files for USB Memory Stick Booting</title> -->
- <title>Preparare i file per l'avvio da penne USB</title>
-
+ <title>Preparazione dei file per l'avvio da penne USB</title>
 <para>
 
-<!-- For preparing the USB stick you will need a system where GNU/Linux is
+<!--
+For preparing the USB stick you will need a system where GNU/Linux is
 already running and where USB is supported. You should ensure that the
 usb-storage kernel module is loaded (<userinput>modprobe
 usb-storage</userinput>) and try to find out which SCSI device the USB
 stick has been mapped to (in this example
 <filename>/dev/sda</filename> is used). To write to your stick, you
-will probably have to turn off its write protection switch. -->
+will probably have to turn off its write protection switch.
+-->
 
 Per preparare la penna USB è necessario un sistema GNU/Linux con supporto
 USB già funzionante. Si deve controllare che il modulo del kernel usb-storage
@@ -24,8 +26,10 @@ necessario disattivare la protezione dalla scrittura.
 
 </para><para>
 
-<!-- Note, that the USB stick should be at least 128 MB in size (smaller
-setups are possible if you follow <xref linkend="usb-copy-flexible"/>). -->
+<!--
+Note, that the USB stick should be at least 128 MB in size (smaller
+setups are possible if you follow <xref linkend="usb-copy-flexible"/>).
+-->
 
 Notare che la penna USB deve essere da almeno 128&nbsp;MB (è possibile fare
 anche installazioni più piccole seguendo <xref linkend="usb-copy-flexible"/>).
@@ -33,15 +37,16 @@ anche installazioni più piccole seguendo <xref linkend="usb-copy-flexible"/>).
 </para>
 
   <sect2 id="usb-copy-easy">
-  <!--<title>Copying the files &mdash; the easy way</title> -->
+  <!-- <title>Copying the files &mdash; the easy way</title> -->
   <title>Copia dei file &mdash; il modo semplice</title>
-
 <para arch="i386">
 
-<!-- There is an all-in-one file <filename>hd-media/boot.img.gz</filename>
+<!--
+There is an all-in-one file <filename>hd-media/boot.img.gz</filename>
 which contains all the installer files (including the kernel) as well
 as <command>SYSLINUX</command> and its configuration file. You only
-have to extract it directly to your USB stick: -->
+have to extract it directly to your USB stick:
+-->
 
 C'è un file all-in-one <filename>hd-media/boot.img.gz</filename> che
 contiene non solo tutti i file dell'installatore (kernel compreso) ma
@@ -54,19 +59,21 @@ sufficiente estrarlo direttamente sulla penna USB:
 
 </para><para arch="powerpc">
 
-<!-- There is an all-in-one file <filename>hd-media/boot.img.gz</filename>
+<!--
+There is an all-in-one file <filename>hd-media/boot.img.gz</filename>
 which contains all the installer files (including the kernel) as well
 as <command>yaboot</command> and its configuration file. Create a
 partition of type "Apple_Bootstrap" on your USB stick using
 <command>mac-fdisk</command>'s <userinput>C</userinput> command and
-extract the image directly to that: -->
+extract the image directly to that:
+-->
 
 C'è un file all-in-one <filename>hd-media/boot.img.gz</filename> che
 contiene non solo tutti i file dell'installatore (kernel compreso) ma
 anche <command>yaboot</command> e il suo file di configurazione. Creare
-una partizione di tipo "Apple_Bootstrap" sulla penna USB usando il comando
-<userinput>C</userinput> di <command>mac-fdisk</command> ed estrarre
-l'immagine direttamente sulla penna USB:
+una partizione di tipo <quote>Apple_Bootstrap</quote> sulla penna USB
+usando il comando <userinput>C</userinput> di <command>mac-fdisk</command>
+ed estrarre l'immagine direttamente sulla penna USB:
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
@@ -86,7 +93,8 @@ fare attenzione a usare il nome corretto per il device della penna USB.
 </para></warning>
 <para>
 
-<!-- After that, mount the USB memory stick (<userinput>mount
+<!--
+After that, mount the USB memory stick (<userinput>mount
 <replaceable arch="i386">/dev/sda</replaceable>
 <replaceable arch="powerpc">/dev/sda2</replaceable>
 /mnt</userinput>), which will now have
@@ -94,7 +102,8 @@ fare attenzione a usare il nome corretto per il device della penna USB.
 <phrase arch="powerpc">an HFS filesystem</phrase>
 on it, and copy a Debian netinst or businesscard ISO image to it.
 Please note that the file name must end in <filename>.iso</filename>.
-Unmount the stick (<userinput>umount /mnt</userinput>) and you are done. -->
+Unmount the stick (<userinput>umount /mnt</userinput>) and you are done.
+-->
 
 Poi montare la penna USB (<userinput>mount
 <replaceable arch="i386">/dev/sda</replaceable>
@@ -112,11 +121,12 @@ penna (<userinput>umount /mnt</userinput>).
   <sect2 id="usb-copy-flexible">
   <!-- <title>Copying the files &mdash; the flexible way</title> -->
   <title>Copia dei file &mdash; il modo flessibile</title>
-
 <para>
 
-<!-- If you like more flexibility or just want to know what's going on, you
-should use the following method to put the files on your stick. -->
+<!--
+If you like more flexibility or just want to know what's going on, you
+should use the following method to put the files on your stick.
+-->
 
 Se si preferisce avere più flessibilità o semplicemente si vuole capire
 cosa si sta facendo si deve usare questo metodo per scrivere i file sulla
@@ -129,13 +139,14 @@ penna.
 
    <sect3>
    <!-- <title>Adding an ISO image</title> -->
-   <title>Aggiungere una immagine ISO</title>
-
+   <title>Aggiungere un'immagine ISO</title>
 <para>
 
-<!-- Now you should put any Debian ISO image (businesscard, netinst or even
+<!--
+Now you should put any Debian ISO image (businesscard, netinst or even
 a full one) onto your stick (if it fits). The file name of such an
-image must end in <filename>.iso</filename>. -->
+image must end in <filename>.iso</filename>.
+-->
 
 Adesso si deve copiare una qualsiasi immagine ISO (businesscard, netinst o
 persino una completa se c'entra) sulla propria penna. Il nome del file
@@ -143,12 +154,14 @@ immagine deve avere estensione <filename>.iso</filename>.
 
 </para><para>
 
-<!-- If you want to install over the network, without using an ISO image,
+<!--
+If you want to install over the network, without using an ISO image,
 you will of course skip the previous step. Moreover you will have to
 use the initial ramdisk from the <filename>netboot</filename>
 directory instead of the one from <filename>hd-media</filename>,
 because <filename>hd-media/initrd.gz</filename> does not have network
-support. -->
+support.
+-->
 
 Se si vuole installare usando la rete, senza usare una immagine ISO, si deve
 saltare il passo precedente ma è necessario usare il ramdisk iniziale nella
@@ -158,8 +171,10 @@ non c'è il supporto per la rete.
 
 </para><para>
 
-<!-- When you are done, unmount the USB memory stick (<userinput>umount
-/mnt</userinput>) and activate its write protection switch. -->
+<!--
+When you are done, unmount the USB memory stick (<userinput>umount
+/mnt</userinput>) and activate its write protection switch.
+-->
 
 Conclusa la copia dei file, smontare la penna USB (<userinput>umount
 /mnt</userinput>) e attivare la protezione dalla scrittura.
@@ -171,13 +186,14 @@ Conclusa la copia dei file, smontare la penna USB (<userinput>umount
    <sect3 arch="i386">
    <!-- <title>Booting the USB stick</title> -->
    <title>Avvio dalla penna USB</title>
-
 <warning><para>
 
-<!-- If your system refuses to boot from the memory stick, the stick may
+<!--
+If your system refuses to boot from the memory stick, the stick may
 contain an invalid master boot record (MBR). To fix this, use the
 <command>install-mbr</command> command from the package
-<classname>mbr</classname>: -->
+<classname>mbr</classname>:
+-->
 
 Se il proprio sistema rifiuta di partire dalla penna, la penna potrebbe
 contenere un MBR (master boot record) non valido. Per risolvere questo
