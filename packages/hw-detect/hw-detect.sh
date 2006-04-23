@@ -17,8 +17,6 @@ SUBARCH="$(archdetect)"
 
 prebaseconfig=/usr/lib/prebaseconfig.d/30hw-detect
 
-# This is a hack, but we don't have a better idea right now.
-# See Debian bug #136743
 if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
@@ -108,17 +106,21 @@ load_module() {
 }
 
 load_sr_mod () {
-	if is_not_loaded "sr_mod"; then
-		if is_available "sr_mod"; then
-			db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
-			db_subst hw-detect/load_progress_step MODULE "sr_mod"
-			db_progress INFO hw-detect/load_progress_step
-			load_module sr_mod
-			register-module sr_mod
-		else
-			missing_module sr_mod "SCSI CDROM"
+	case "$(uname -r)" in
+	2.4*)
+		if is_not_loaded "sr_mod"; then
+			if is_available "sr_mod"; then
+				db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
+				db_subst hw-detect/load_progress_step MODULE "sr_mod"
+				db_progress INFO hw-detect/load_progress_step
+				load_module sr_mod
+				register-module sr_mod
+			else
+				missing_module sr_mod "SCSI CDROM"
+			fi
 		fi
-	fi
+		;;
+	esac
 }
 
 blacklist_de4x5 () {
@@ -482,30 +484,34 @@ if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
 	esac
 fi
 
-# always load sd_mod and sr_mod if a scsi controller module was loaded.
-# sd_mod to find the disks, and sr_mod to find the CD-ROMs
-if [ -e /proc/scsi/scsi ] && ! grep -q "Attached devices: none" /proc/scsi/scsi; then
-	if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi && \
-	   is_not_loaded "sd_mod" && \
-	   ! grep -q '^[^[:alpha:]]\+sd$' /proc/devices; then
-	   	if is_available "sd_mod"; then
-			db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
-			db_subst hw-detect/load_progress_step MODULE "sd_mod"
-			db_progress INFO hw-detect/load_progress_step
-			load_module sd_mod
-			register-module sd_mod
-		else
-			missing_module sd_mod "SCSI disk"
+case "$(uname -r)" in
+2.4*)
+	# always load sd_mod and sr_mod if a scsi controller module was loaded.
+	# sd_mod to find the disks, and sr_mod to find the CD-ROMs
+	if [ -e /proc/scsi/scsi ] && ! grep -q "Attached devices: none" /proc/scsi/scsi; then
+		if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi && \
+		   is_not_loaded "sd_mod" && \
+		   ! grep -q '^[^[:alpha:]]\+sd$' /proc/devices; then
+		   	if is_available "sd_mod"; then
+				db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
+				db_subst hw-detect/load_progress_step MODULE "sd_mod"
+				db_progress INFO hw-detect/load_progress_step
+				load_module sd_mod
+				register-module sd_mod
+			else
+				missing_module sd_mod "SCSI disk"
+			fi
 		fi
+		db_progress STEP $OTHER_STEPSIZE
+		if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi && \
+		   ! grep -q '^[^[:alpha:]]\+sr$' /proc/devices; then
+			load_sr_mod
+		fi
+		db_progress STEP $OTHER_STEPSIZE
 	fi
-	db_progress STEP $OTHER_STEPSIZE
-	if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi && \
-	   ! grep -q '^[^[:alpha:]]\+sr$' /proc/devices; then
-		load_sr_mod
-	fi
-	db_progress STEP $OTHER_STEPSIZE
-fi
-
+	;;
+esac
+	
 if ! is_not_loaded ohci1394; then
 	# if firewire was found, try to enable firewire cd support
 	if is_not_loaded sbp2 && is_available scsi_mod; then
@@ -543,7 +549,7 @@ if ! is_not_loaded ohci1394; then
 				db_subst hw-detect/load_progress_step MODULE "eth1394"
 				db_progress INFO hw-detect/load_progress_step
 				load_module eth1394 "FireWire ethernet"
-				# do not call register-module; hotplug will load it
+				# do not call register-module; udev/hotplug will load it
 				# on the installed system
 			else
 				missing_module eth1394 "FireWire ethernet"
