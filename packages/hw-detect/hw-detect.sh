@@ -32,8 +32,8 @@ log () {
 }
 
 is_not_loaded() {
-       ! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || \
-          (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
+	! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || \
+	   (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
 }
 
 is_available () {
@@ -73,26 +73,26 @@ load_module() {
 	local devs=""
 	local olddevs=""
 	local newdev=""
-    
+
 	old=`cat /proc/sys/kernel/printk`
 	echo 0 > /proc/sys/kernel/printk
-    
+
 	devs="$(snapshot_devs)"
 	if log-output -t hw-detect modprobe -v "$module"; then
 		olddevs="$devs"
 		devs="$(snapshot_devs)"
 		newdevs="$(compare_devs "$olddevs" "$devs")"
 
-                # Make sure space is used as a delimiter.
-                IFS_SAVE="$IFS"
-                IFS=" "
+		# Make sure space is used as a delimiter.
+		IFS_SAVE="$IFS"
+		IFS=" "
 		if [ -n "$newdevs" -a -n "$cardname" ]; then
 			mkdir -p /etc/network
 			for dev in $newdevs; do
 				echo "${dev}:${cardname}" >> /etc/network/devnames
 			done
 		fi
-                IFS="$IFS_SAVE"
+		IFS="$IFS_SAVE"
 	else   
 		log "Error loading '$module'"
 		if [ "$module" != floppy ] && [ "$module" != ide-floppy ] && [ "$module" != ide-cd ]; then
@@ -101,7 +101,7 @@ load_module() {
 			db_go
 		fi
 	fi
-    
+
 	echo $old > /proc/sys/kernel/printk
 }
 
@@ -658,7 +658,7 @@ if [ -x /etc/init.d/pcmcia ]; then
 			echo $saved_hotplug >/proc/sys/kernel/hotplug
 			rm -f /tmp/pcmcia-discover-snapshot
 		fi
-    
+
 		db_progress STEP $OTHER_STEPSIZE
 	fi
 	db_fset hw-detect/start_pcmcia seen true || true
@@ -691,16 +691,16 @@ gen_pcmcia_devnames() {
 
 have_pcmcia=0
 case "$(uname -r)" in
-  2.4*)
-    if [ -e "/proc/bus/pccard/drivers" ]; then
-      have_pcmcia=1
-    fi
-  ;;
-  2.6*)
-    if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
-      have_pcmcia=1
-    fi
-  ;;
+	2.4*)
+		if [ -e "/proc/bus/pccard/drivers" ]; then
+			have_pcmcia=1
+		fi
+	;;
+	2.6*)
+		if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
+			have_pcmcia=1
+		fi
+	;;
 esac
 
 # find Cardbus network cards on 2.6 kernels
@@ -740,10 +740,10 @@ if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>
 		>>$prebaseconfig
 
 	# Determine devnames.
-        if [ -f /var/run/stab ]; then
-                mkdir -p /etc/network
-	        gen_pcmcia_devnames < /var/run/stab
-        fi
+	if [ -f /var/run/stab ]; then
+		mkdir -p /etc/network
+		gen_pcmcia_devnames < /var/run/stab
+	fi
 fi
 
 # Ask for discover to be installed into /target/, to make sure the
