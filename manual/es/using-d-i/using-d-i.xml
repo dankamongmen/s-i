@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28997 -->
+<!-- original version: 33819 -->
 <!-- revisado jfs, 23 febrero 2005 -->
 <!-- revisado Rudy Godoy, 22 feb. 2005 -->
 
@@ -94,23 +94,23 @@ a continuación.
 
 </para><para>
 
-Los mensajes de error son redireccionados a la tercera consola. Puede
+Los mensajes de error y de registro son redireccionados a la cuarta consola. Puede
 acceder a ésta pulsando
-<keycombo><keycap>Alt Izq</keycap><keycap>F3</keycap></keycombo>
+<keycombo><keycap>Alt Izq</keycap><keycap>F4</keycap></keycombo>
 (mantenga presionada la tecla <keycap>Alt</keycap> mientras presiona la
-tecla de función <keycap>F3</keycap>). Para volver al proceso de instalación
+tecla de función <keycap>F4</keycap>). Para volver al proceso de instalación
 principal pulse
 <keycombo><keycap>Alt Izq</keycap><keycap>F1</keycap></keycombo>.
 
 </para><para>
 
 También puede encontrar los mensajes de error en
-<filename>/var/log/messages</filename>. Este registro se copia
-a <filename>/var/log/debian-installer/messages</filename>
+<filename>/var/log/syslog</filename>. Este registro se copia
+a <filename>/var/log/installer/syslog</filename>
 en su nuevo sistema una vez finalizada la instalación.
 Durante el proceso de instalación puede encontrar otros mensajes
 en <filename>/var/log/</filename>, y en
-<filename>/var/log/debian-installer/</filename> después
+<filename>/var/log/installer/</filename> después
 de que el ordenador haya sido iniciado con el sistema instalado.
 
 </para>
@@ -149,27 +149,8 @@ hasta salir del componente que está ejecutando.
 
 </para></listitem>
 </varlistentry>
-<varlistentry condition="sarge">
+<varlistentry>
 
-<term>languagechooser</term><listitem><para>
-
-Muestra una lista de idiomas y sus variantes. El instalador mostrará
-los mensajes en el idioma elegido, a menos que la traducción para
-este idioma no esté completa. Los mensajes se muestran en inglés
-cuando la traducción para éstos no está completa.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="sarge">
-
-<term>countrychooser</term><listitem><para>
-
-Muestra una lista de países. El usuario puede elegir el país en
-donde vive.
-
-</para></listitem>
-</varlistentry>
-<varlistentry condition="etch">
 
 <term>localechooser</term><listitem><para>
 
@@ -327,10 +308,54 @@ software habitualmente es mejor que los controladores baratos RAID IDE
 </varlistentry>
 <varlistentry>
 
+<term>tzsetup</term><listitem><para>
+
+Configura la zona horaria, basándose en la localización seleccionada
+anteriormente.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>clock-setup</term><listitem><para>
+
+Determina si el reloj está o no fijado a UTC.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>user-setup</term><listitem><para>
+
+Configura la contraseña del usuario «root» (administrador) y añade
+un usuario no-administrador.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
 <term>base-installer</term><listitem><para>
 
 Instala el conjunto de paquetes más básico que permitirá que el
 ordenador opere con Linux cuando se reinicie.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>apt-setup</term><listitem><para>
+
+Configura apt, casi todo automáticamente, basándose en el medio desde
+el que se está ejecutando el instalador.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>pkgsel</term><listitem><para>
+
+Utiliza <classname>tasksel</classname> para seleccionar e instalar
+programas adicionales.
 
 </para></listitem>
 </varlistentry>
@@ -352,21 +377,11 @@ operativo iniciar en el momento de arrancar su sistema.
 
 <term>bootloader-installer</term><listitem><para>
 
-Instala un gestor de arranque en el disco duro. Éste es necesario
+Los distintos instaladores del gestor de arranque instalan un programa
+de gestión de arranque en el disco duro. Éste es necesario
 para que el ordenador arranque usando Linux sin usar un disco flexible
 ó CD-ROM. Muchos gestores de arranque permiten al usuario elegir un
 sistema operativo alternativo cada vez que el ordenador se reinicia.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>base-config</term><listitem><para>
-
-Incluye preguntas para configurar los paquetes del sistema base de
-acuerdo a las preferencias del usuario. Esto se hace usualmente
-después de reiniciar el ordenador, tratándose por tanto de la
-<quote>primera ejecución</quote> en el nuevo sistema Debian.
 
 </para></listitem>
 </varlistentry>
@@ -381,11 +396,11 @@ desde la segunda consola.
 </varlistentry>
 <varlistentry>
 
-<term condition="sarge">bugreporter</term><term condition="etch">save-logs</term><listitem><para> 
+<term>save-logs</term><listitem><para> 
 
 Ofrece una forma para que el usuario pueda guardar información en un
-disco flexible<phrase condition="etch">, red, disco duro, u otros
-dispositivos</phrase> cuando se encuentre ante un problema. De esta forma puede
+disco flexible, red, disco duro, u otros
+dispositivos cuando se encuentre ante un problema. De esta forma puede
 informar después, adecuadamente, sobre los problemas que ha tenido con el
 programa del instalador a los desarrolladores de Debian.
 
