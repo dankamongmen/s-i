@@ -39,21 +39,25 @@ if [ "$PARAMS_ONLY" = 0 ]; then
 	fi
 fi
 
-if [ "$ADD_PARAMS" = 1 ]; then
-	PARAMS="$PARAMS $(grep "^$TYPE:" $PARAMFILE 2>/dev/null | sed "s/^$TYPE://")"
-fi
-grep -v "^$TYPE:" $PARAMFILE > $PARAMFILE.new
-mv $PARAMFILE.new $PARAMFILE
-[ -n "$PARAMS" ] && echo "$TYPE:$PARAMS" >> $PARAMFILE
-
-if [ -n "$PARAMS" ] && [ "$TYPE" = options ]; then
-	for file in /etc/modules.conf /etc/modprobe.conf; do
-		if [ -e "$file" ]; then
-			grep -v "$MODULE " $file > $file.new
-			mv $file.new $file
-		else
-			touch $file
+if [ -n "$PARAMS" ]; then
+	if [ -e "$PARAMFILE" ]; then
+		if [ "$ADD_PARAMS" = 1 ]; then
+			PARAMS="$(grep "^$TYPE:" $PARAMFILE 2>/dev/null | sed "s/^$TYPE:\(.*\)$/\1/") $PARAMS"
 		fi
-		echo "options $MODULE $PARAMS" >> $file
-	done
+		grep -v "^$TYPE:" $PARAMFILE > $PARAMFILE.new
+		mv $PARAMFILE.new $PARAMFILE
+	fi
+	echo "$TYPE:$PARAMS" >> $PARAMFILE
+
+	if [ "$TYPE" = options ]; then
+		for file in /etc/modules.conf /etc/modprobe.conf; do
+			if [ -e "$file" ]; then
+				grep -v "options $MODULE " $file > $file.new
+				mv $file.new $file
+			else
+				touch $file
+			fi
+			echo "options $MODULE $PARAMS" >> $file
+		done
+	fi
 fi
