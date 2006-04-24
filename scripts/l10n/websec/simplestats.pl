@@ -25,7 +25,7 @@ foreach my $line (@lines) {
     $oldglobal = $2 if ($1 eq '-');
     $newglobal = $2 if ($1 eq '+');
   }
-  elsif ($line =~ /^([-+])\s+(.*?\.po)\s+((\d+t)?(\d+f)?(\d+u)?)/) {
+  elsif ($line =~ /^([-+])(?:\s+\*?)(.*?\.po):?\s+((\d+t)?(\d+f)?(\d+u)?)/) {
     $oldfiles{$2} = $3 if ($1 eq '-');
     $newfiles{$2} = $3 if ($1 eq '+');
   }
