@@ -1,9 +1,9 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35982 -->
+<!-- original version: 36269 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
-the example preseed file.
+the example preconfiguration file.
 In that file all text between <informalexample> tags that have the
 attribute 'role="example"' set is included, except if a 'condition'
 attribute is in force that does not match the specified release or if an
@@ -401,9 +401,9 @@ opcions de línia d'ordres i 32 opcions d'entorn.
 <para>
 
 A la majoria d'instal·lacions, algunes de les opcions per defecte del fitxer
-de configuració del carregador, com 'vga=normal', es poden eliminar sense
-cap problema, la qual cosa us permet afegir més opcions de configuració
-prèvia.
+de configuració del carregador, com <literal>vga=normal</literal>, es poden
+eliminar sense cap problema, la qual cosa us permet afegir més opcions de
+configuració prèvia.
 
 </para>
 <note><para>
@@ -415,44 +415,103 @@ d'arrencada, fins i tot si els delimiteu amb cometes.
   </sect2>
  </sect1>
 
- <sect1 condition="FIXME" id="preseed-creating">
+ <sect1 id="preseed-creating">
  <title>Creació d'un fitxer de configuració prèvia</title>
 <para>
 
 El fitxer de configuració prèvia és en el format emprat per l'ordre
-<command>debconf-set-selections</command>.
+<command>debconf-set-selections</command>. El format general d'una línia a
+un fitxer de configuració prèvia és:
+<informalexample><screen>
+&lt;propietari&gt; &lt;nom de la plantilla&gt; &lt;tipus de plantilla&gt; &lt;valor&gt;
+</screen></informalexample>
+
+</para><para>
+
+Hi ha algunes regles que s'han de tenir en compte quan s'escriu un fitxer de
+configuració prèvia.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  Format de fitxer
+  Poseu tan sos un espai o un tab entre tipus i valor: qualsevol espai
+  adicional s'interpretarà que pertany al valor.
 </para></listitem>
 <listitem><para>
-  Solament és permès un únic espai entre el tipus de la plantilla i el valor
+  Una línia es pot dividir en vàries afegint una barra invertida
+  (<quote><literal>\</literal></quote>) com a caràcter per continuar.
+  Un bon lloc per dividir una línia és despres del nom de la plantilla;
+  un lloc dolent és entre un tipus i un valor.
 </para></listitem>
 <listitem><para>
-  Relació amb /var/lib/(c)debconf/templates
+  La major part de les plantilles s'han d'omplir utilitzant els valors
+  vàlids i no amb valors traduits. Però, hi ha algunes plantilles (per
+  exemple al <classname>partman</classname>) on s'han d'utilitzar valors
+  traduits.
 </para></listitem>
 <listitem><para>
-  Tipus de plantilles i com proporcionar-hi valors
-</para></listitem>
-<listitem><para>
-  La majoria de valors han d'estar en anglès o codificats
-</para></listitem>
-<listitem><para>
-  Utilització d'una instal·lació manual com a base
-</para></listitem>
-<listitem><para>
-  Cerca d'altres valors possibles
+  Algunes plantilles agafen un codi com a valor en comptes del text anglès
+  que es mostra a la instal·lació.
 </para></listitem>
 </itemizedlist>
 
 <para>
 
-Per comprovar si el format el fitxer de configuració prèvia és vàlid abans
-de dur a terme la instal·lació, empreu l'ordre
-<command>debconf-set-selections -c<replaceable>preseed.cfg</replaceable></command>.
+La manera més fàcil de crear un fitxer de configurció prèvia és utilitzar el
+fitxer d'exemple enllaçat a <xref linkend="preseed-contents"/> com a base i
+continuar la feina des d'allí.
+
+</para><para>
+
+Un mètode alternatiu és fer la instal·lació manual, i despres, quan
+es reinicie, utilitzar l'ordre <command>debconf-get-selections</command>
+del paquet <classname>debconf-utils</classname> per volcar les dos
+bases de dades de debconf i la base de dades cdebconf de l'instal·lador
+a un únic fitxer:
+
+<informalexample><screen>
+$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>
+$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>
+</screen></informalexample>
+
+</para><para>
+
+Per altra banda, un fitxer generat d'aquesta manera tindrà alguns elements
+que no pode ser configurats prèviament, i el fitxer d'example és el millor
+lloc per on començar per la majoria d'usuaris.
+
+</para>
+
+<note><para>
+
+Aquest mètode utilitza el fet de que, al acabar la instal·lació, la
+base de dades cdebconf de l'instal·lador es guarda al sistema instal·lat
+a <filename>/var/log/installer/cdebconf</filename>. Però, com que la
+base de dades pot contenir informació sensible, aquests fitxers tan sols
+els pot llegir el root.
+
+</para><para>
+
+El directori <filename>/var/log/installer</filename> i tots els seus fitxers
+s'esborraran del vostre sistema si purgueu el paquet
+<classname>installation-report</classname>.
+
+</para></note>
+
+<para>
+
+Per comprovar els possibles valors per les plantilles, podeu utilitzar
+l'ordre <command>nano</command> per examinar els fitxers
+<filename>/var/lib/cdebconf</filename> mentre la instal·lació s'està
+realitzant. Vegeu <filename>templates.dat</filename> per les plantilles i
+<filename>questions.dat</filename> pels volors assignats a les variables.
+
+</para><para>
+
+Per comprovar si el format del vostre fitxer de configuració prèvia és
+vàlid abans de fer una instal·lació, podeu utilitzar l'ordre
+<command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>.
 
 </para>
  </sect1>
@@ -473,7 +532,7 @@ adients i hauran de substituir-se per ajusts de configuració adequats a
 l'arquitectura en qüestió.
 
 </para>
- 
+
   <sect2 id="preseed-l10n">
   <title>Localització</title>
 <para>
@@ -511,7 +570,7 @@ d-i console-keymaps-at/keymap select es
 
 </para><para>
 
-Per a ometre la configuració prèvia del teclat empreu
+Per a ometre la configuració prèvia del teclat, empreu
 <classname>console-tools/archs</classname> amb
 <userinput>skip-config</userinput>.
 Això farà que romanga actiu el mapa de teclat del nucli.
@@ -657,8 +716,7 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 <informalexample role="example"><screen>
 # Si el sistema disposa d'espai lliure podeu triar de particionar només
 # aquest.
-# Nota: el valor de la configuració prèvia d'aquesta plantilla s'ha de
-# localitzar (traduir).
+# Nota: Aquest plantilla s'ha de omplir amb valors localitzats (traduits).
 #d-i partman-auto/init_automatically_partition \
 #      select Utilitza l'espai lliure continu més gran
 
@@ -668,7 +726,7 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
 # Podeu triar qualsevol de les receptes de particionat predefinides.
-# Nota: el valor de la configuració prèvia d'aquesta plantilla s'ha de
+# Nota: Aquest plantilla s'ha de omplir amb valors localitzats (traduits).
 # localitzar (traduir).
 d-i partman-auto/choose_recipe \
        select Tots els fitxers en una partició (recomanat per a nous usuaris)
@@ -778,14 +836,18 @@ de força bruta.
 </para></warning>
 
 <informalexample role="example"><screen>
+# No crar el compte de root (l'usuari normal haurà de ser capaç 
+# d'utilitzar sudo).
+#d-i passwd/root-login boolean false
+# De forma alternativa, per no crear el compte d'usuari normal.
+#d-i passwd/make-user boolean false
+
 # Contrasenya de superusuari, bé explícita
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
 # o bé xifrada fent servir un capolament MD5.
 #d-i passwd/root-password-crypted password [MD5 hash]
 
-# Per ometre la creació d'un compte d'usuari normal.
-#d-i passwd/make-user boolean false
 
 # Per crear un compte d'usuari normal.
 #d-i passwd/user-fullname string Usuari de Debian
@@ -806,7 +868,7 @@ el compte corresponent es deshabilitarà. Això pot ser convenient per al
 compte de superusuari en cas que, evidentment, s'haja establert un altre
 mètode per permetre les tasques d'administració o per entrar com a
 superusuari (per exemple fent servir l'autenticació de la clau SSH o
-el sudo).
+el <command>sudo</command>).
 
 </para><para>
 
