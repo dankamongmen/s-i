@@ -74,8 +74,9 @@ if [ ${BRAND_NEW} -ne 1 ] ; then
 	LALL=${LANG}_all.txt
 	LUWL=${LANG}_unkn_wl.txt
 	LVAR=${LANG}_var.txt
-	
-	for TO_DIFF in ${LALL} ${LUWL} ${LVAR} ; do
+	LSPC=${LANG}_lspec.txt
+
+	for TO_DIFF in ${LALL} ${LUWL} ${LVAR} ${LSPC}; do
 	    if [ -f ${OLD_PATH}/${TO_DIFF} -o -f ${NEW_PATH}/${TO_DIFF} ] ; then
 		
 		diff -u0 -N \

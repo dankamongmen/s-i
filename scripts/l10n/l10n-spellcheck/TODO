@@ -1,30 +1,31 @@
-translation errors in tzsetup, see:
-http://lists.debian.org/debian-i18n/2006/01/msg00041.html
-
----
-add a check for "Choose language" in the translation of the "Choose
-language" string
-
----
-translation for the mirror country:
-
-#: ../choose-mirror.templates.http-in:17
-msgid "US[ Default value for http]"
-msgstr ""
-
-
-#: ../choose-mirror.templates.ftp-in:17
-msgid "US[ Default value for ftp]"
-msgstr ""
-
-
-The "correct" translation here is an existing two-letter country code,
-in ASCII and all caps.
----
-Find out un-matched characters, i.e: () "" <> [] 
+Find out un-matched pairs, i.e: () "" <> [] 
 
 ---
 Make sure every msgstr containing
-"#. Translators, this is a menu choice.MUST BE UNDER xx COLUMNS"
+"#. Translators, this is a menu choice.MUST BE UNDER 65 COLUMNS"
 
-is not longer than xx
+or
+
+"#. Note to translators : Please keep your translations of the choices
+#. below the 65 columns limit (which means 65 characters for most languages)"
+
+
+is not longer than 65 (actually it would be better to extract the
+limit out of the string, which in the abouve example would be "65")
+---
+Add the possibility to email automatically the responsable of the 
+various languages if an error is spotted (check the diff file and
+if it contains "+msgstr" email the translator)
+---
+when there's a variable in a multiselect msgid, make sure its position
+is preserved in the corresponding msgstr:
+
+#. Type: select
+#. Choices
+#: ../partitioner.templates:3
+msgid "${DISCS}, Finish"
+msgstr "${DISCS}, Fine"
+
+in the above example the script should make sure that ${DISCS} isthe first item
+in the msgstr
+

@@ -137,6 +137,7 @@ fi
 
 echo "   <td><a href=\"latest/nozip/${LANG}_all.txt\">${LANG}_all.txt</a>${DIFF}</td>"
 
+# Suspect Variables
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     SUSP_PATH=${SUSPECT_VARS_URL/latest/}
     if [ -f ${DIFF_DIR}/nozip/${LANG}_var.diff ] ; then
@@ -148,7 +149,14 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     echo "   <td>${SUSPECT_VARS_URL}${DIFF}</td>"
 fi
 
-echo "   <td>${SPECIFIC_CHECK_URL}</td>"
+# Specific check
+if [ -f ${DIFF_DIR}/nozip/${LANG}_lspec.diff ] ; then
+    DIFF="<a href=\"latest/nozip/${LANG}_lspec.diff\">  (*)</a>"
+else
+    DIFF=
+fi
+echo "   <td>${SPECIFIC_CHECK_URL}${DIFF}</td>"
+
 
 echo "   <td>${WORDLIST}</td>"
 
