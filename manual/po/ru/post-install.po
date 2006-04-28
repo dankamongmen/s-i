@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: post-install\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2006-01-31 23:11+0000\n"
+"POT-Creation-Date: 2006-04-28 19:34+0000\n"
 "PO-Revision-Date: 2006-01-05 13:05+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
@@ -641,14 +641,14 @@ msgstr ""
 
 #. Tag: para
 #: post-install.xml:409
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"Now, compile the kernel: <userinput>fakeroot make-kpkg --revision=custom.1.0 "
-"kernel_image</userinput>. The version number of <quote>1.0</quote> can be "
-"changed at will; this is just a version number that you will use to track "
-"your kernel builds. Likewise, you can put any word you like in place of "
-"<quote>custom</quote> (e.g., a host name). Kernel compilation may take quite "
-"a while, depending on the power of your machine."
+"Now, compile the kernel: <userinput>fakeroot make-kpkg --initrd --"
+"revision=custom.1.0 kernel_image</userinput>. The version number of "
+"<quote>1.0</quote> can be changed at will; this is just a version number "
+"that you will use to track your kernel builds. Likewise, you can put any "
+"word you like in place of <quote>custom</quote> (e.g., a host name). Kernel "
+"compilation may take quite a while, depending on the power of your machine."
 msgstr ""
 "Теперь соберите ядро: <userinput>fakeroot make-kpkg --revision=custom.1.0 "
 "kernel_image</userinput>. Номер версии <quote>1.0</quote> можно изменить; "
@@ -659,42 +659,25 @@ msgstr ""
 
 #. Tag: para
 #: post-install.xml:419
-#, no-c-format
-msgid ""
-"If you require PCMCIA support, you'll also need to install the "
-"<classname>pcmcia-source</classname> package. Unpack the gzipped tar file as "
-"root in the directory <filename>/usr/src</filename> (it's important that "
-"modules are found where they are expected to be found, namely, <filename>/"
-"usr/src/modules</filename>). Then, as root, do <userinput>make-kpkg "
-"modules_image</userinput>."
-msgstr ""
-"Если требуется поддержка PCMCIA, вам нужно установить пакет "
-"<classname>pcmcia-source</classname>. Распакуйте сжатый tar файл с правами "
-"суперпользователя в каталог <filename>/usr/src</filename> (это важно, так "
-"как модули должны находиться там где их будут искать, то есть в <filename>/"
-"usr/src/modules</filename>). Затем, с правами суперпользователя, выполните "
-"<userinput>make-kpkg modules_image</userinput>."
-
-#. Tag: para
-#: post-install.xml:428
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "Once the compilation is complete, you can install your custom kernel like "
-"any package. As root, do <userinput>dpkg -i ../kernel-image-&kernelversion;-"
+"any package. As root, do <phrase condition=\"classic-kpkg\"> <userinput>dpkg "
+"-i ../kernel-image-&kernelversion;-<replaceable>subarchitecture</"
+"replaceable>_custom.1.0_&architecture;.deb</userinput>. </phrase> <phrase "
+"condition=\"common-kpkg\"> <userinput>dpkg -i ../linux-image-&kernelversion;-"
 "<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</"
-"userinput>. The <replaceable>subarchitecture</replaceable> part is an "
-"optional sub-architecture, <phrase arch=\"i386\"> such as <quote>i586</"
+"userinput>. </phrase> The <replaceable>subarchitecture</replaceable> part is "
+"an optional sub-architecture, <phrase arch=\"i386\"> such as <quote>i586</"
 "quote>, </phrase> depending on what kernel options you set. <userinput>dpkg -"
-"i kernel-image...</userinput> will install the kernel, along with some other "
-"nice supporting files. For instance, the <filename>System.map</filename> "
-"will be properly installed (helpful for debugging kernel problems), and "
-"<filename>/boot/config-&kernelversion;</filename> will be installed, "
-"containing your current configuration set. Your new <classname>kernel-image-"
-"&kernelversion;</classname> package is also clever enough to automatically "
-"use your platform's boot-loader to run an update on the booting, allowing "
-"you to boot without re-running the boot loader. If you have created a "
-"modules package, e.g., if you have PCMCIA, you'll need to install that "
-"package as well."
+"i</userinput> will install the kernel, along with some other nice supporting "
+"files. For instance, the <filename>System.map</filename> will be properly "
+"installed (helpful for debugging kernel problems), and <filename>/boot/"
+"config-&kernelversion;</filename> will be installed, containing your current "
+"configuration set. Your new kernel package is also clever enough to "
+"automatically update your boot loader to use the new kernel. If you have "
+"created a modules package, <phrase condition=\"classic-kpkg\">e.g., if you "
+"have PCMCIA,</phrase> you'll need to install that package as well."
 msgstr ""
 "После завершения сборки вы можете установить собранное ядро как обычный "
 "пакет. От суперпользователя выполните <userinput>dpkg -i ../kernel-image-"
@@ -714,7 +697,7 @@ msgstr ""
 "например, если у вас есть PCMCIA, то вам нужно установить и этот пакет."
 
 #. Tag: para
-#: post-install.xml:449
+#: post-install.xml:446
 #, no-c-format
 msgid ""
 "It is time to reboot the system: read carefully any warning that the above "
@@ -725,7 +708,7 @@ msgstr ""
 "r now</userinput>."
 
 #. Tag: para
-#: post-install.xml:454
+#: post-install.xml:451
 #, no-c-format
 msgid ""
 "For more information on Debian kernels and kernel compilation, see the "
@@ -739,13 +722,13 @@ msgstr ""
 "doc/kernel-package</filename>."
 
 #. Tag: title
-#: post-install.xml:470
+#: post-install.xml:467
 #, no-c-format
 msgid "Recovering a Broken System"
 msgstr "Восстановление неработающей системы"
 
 #. Tag: para
-#: post-install.xml:471
+#: post-install.xml:468
 #, no-c-format
 msgid ""
 "Sometimes, things go wrong, and the system you've carefully installed is no "
@@ -763,7 +746,7 @@ msgstr ""
 "исправить, и режим восстановления может помочь в этом."
 
 #. Tag: para
-#: post-install.xml:481
+#: post-install.xml:478
 #, no-c-format
 msgid ""
 "To access rescue mode, type <userinput>rescue</userinput> at the "
@@ -786,7 +769,7 @@ msgstr ""
 "устройства, и они будут доступны во время восстановления системы."
 
 #. Tag: para
-#: post-install.xml:496
+#: post-install.xml:493
 #, no-c-format
 msgid ""
 "Instead of the partitioning tool, you should now be presented with a list of "
@@ -802,7 +785,7 @@ msgstr ""
 "LVM."
 
 #. Tag: para
-#: post-install.xml:504
+#: post-install.xml:501
 #, no-c-format
 msgid ""
 "If possible, the installer will now present you with a shell prompt in the "
@@ -820,7 +803,7 @@ msgstr ""
 "phrase>"
 
 #. Tag: para
-#: post-install.xml:516
+#: post-install.xml:513
 #, no-c-format
 msgid ""
 "If the installer cannot run a usable shell in the root file system you "
@@ -839,7 +822,7 @@ msgstr ""
 "смонтирована в каталог <filename>/target</filename>."
 
 #. Tag: para
-#: post-install.xml:525
+#: post-install.xml:522
 #, no-c-format
 msgid "In either case, after you exit the shell, the system will reboot."
 msgstr ""
@@ -847,7 +830,7 @@ msgstr ""
 "перезагружена."
 
 #. Tag: para
-#: post-install.xml:529
+#: post-install.xml:526
 #, no-c-format
 msgid ""
 "Finally, note that repairing broken systems can be difficult, and this "
@@ -858,3 +841,19 @@ msgstr ""
 "очень трудным делом, и это руководство не пытается описать все возможные "
 "случаи, которые могут произойти и способы их решения. Если у вас есть "
 "проблемы &mdash; обратитесь к профессионалам."
+
+#~ msgid ""
+#~ "If you require PCMCIA support, you'll also need to install the "
+#~ "<classname>pcmcia-source</classname> package. Unpack the gzipped tar file "
+#~ "as root in the directory <filename>/usr/src</filename> (it's important "
+#~ "that modules are found where they are expected to be found, namely, "
+#~ "<filename>/usr/src/modules</filename>). Then, as root, do <userinput>make-"
+#~ "kpkg modules_image</userinput>."
+#~ msgstr ""
+#~ "Если требуется поддержка PCMCIA, вам нужно установить пакет "
+#~ "<classname>pcmcia-source</classname>. Распакуйте сжатый tar файл с "
+#~ "правами суперпользователя в каталог <filename>/usr/src</filename> (это "
+#~ "важно, так как модули должны находиться там где их будут искать, то есть "
+#~ "в <filename>/usr/src/modules</filename>). Затем, с правами "
+#~ "суперпользователя, выполните <userinput>make-kpkg modules_image</"
+#~ "userinput>."
