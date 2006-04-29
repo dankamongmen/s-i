@@ -56,7 +56,7 @@ processmodules() {
 			# Prefer modules in the kernel subdir, but failing
 			# that search the whole thing, to find third-party,
 			# etc modules.
-			match="$(find $moddir/kernel $moddir \
+			match="$(find `ls -d $moddir/kernel 2>/dev/null` $moddir \
 			            -name $module.o -or -name $module.ko \
 				| head -n 1 | sed "s!$moddir/!!")"
 			
@@ -78,6 +78,7 @@ version=$1-$2
 flavour=$2
 installedname=$3
 arch=$(dpkg-architecture -qDEB_HOST_ARCH)
+os=$(dpkg-architecture -qDEB_HOST_ARCH_OS)
 home=$PWD
 
 trap 'rm -rf $tmpdir' EXIT
@@ -105,29 +106,31 @@ else
 	modlistdir=modules/$arch
 fi
 
-if [ ! -e "$moddir/modules.dep" ]; then
-	echo "no $moddir/modules.dep. This file is required by kernel-wedge" >&2
-	exit 1
-fi
+if [ "$os" = "linux" ] ; then
+	if [ ! -e "$moddir/modules.dep" ]; then
+		echo "no $moddir/modules.dep. This file is required by kernel-wedge" >&2
+		exit 1
+	fi
 
-# get module dependencies from modules.dep
-# sort it by field 2
-perl -lne '
-	@words=split(" ");
-	s!'/lib/modules/$installedname'/!! foreach (@words);
-	if ($words[0] =~ /:$/) {
-		$words[0]=~s/:$//;
-		$module=shift @words;
-	}
-	foreach (@words) {
-		print "$module\t$_" unless $_ eq "\\";
-	}
-' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
-
-if [ ! -s $tmpdir/deps ] && [ ! -e $home/no-modules ]; then
-	echo "No module interdependencies found. This probably means your modules.dep is broken." >&2
-	echo "If this is intentional, touch $home/no-modules" >&2
-	exit 1
+	# get module dependencies from modules.dep
+	# sort it by field 2
+	perl -lne '
+		@words=split(" ");
+		s!'/lib/modules/$installedname'/!! foreach (@words);
+		if ($words[0] =~ /:$/) {
+			$words[0]=~s/:$//;
+			$module=shift @words;
+		}
+		foreach (@words) {
+			print "$module\t$_" unless $_ eq "\\";
+		}
+	' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
+	
+	if [ ! -s $tmpdir/deps ] && [ ! -e $home/no-modules ]; then
+		echo "No module interdependencies found. This probably means your modules.dep is broken." >&2
+		echo "If this is intentional, touch $home/no-modules" >&2
+		exit 1
+	fi
 fi
 
 mkdir $tmpdir/module-deps $tmpdir/module-list

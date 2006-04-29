@@ -44,10 +44,18 @@ while (<KVERS>) {
 			"$sourcedir/boot/vmlinux-$installedname",
 			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinux$extraname");
 	}
-	else {
+	elsif (-e "$sourcedir/boot/vmlinuz-$installedname") {
 		doit("install", "-D", "-m", 644,
 			"$sourcedir/boot/vmlinuz-$installedname",
 			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinuz$extraname");
+	}
+	elsif (-e "$sourcedir/boot/kfreebsd-$installedname.gz") {
+		doit("install", "-D", "-m", 644,
+			"$sourcedir/boot/kfreebsd-$installedname.gz",
+			"debian/kernel-image-$kernelversion-$flavour-di/boot/kfreebsd$extraname.gz");
+	}
+	else {
+		die "could not find kernel image";
 	}
 	doit("install", "-D", "-m", 644,
 		"$sourcedir/boot/System.map-$installedname",
