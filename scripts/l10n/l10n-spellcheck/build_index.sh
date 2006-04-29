@@ -94,14 +94,16 @@ if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     SUSP=`echo ${ROW} | awk -F, '{print $3}'`
 
     if [ ${SUSP} = "1" ] ; then
-	SUSPECT_VARS_URL="<a href=\"latest/nozip/${LANG}_var.txt\">${LANG}_var.txt</a>"
+	NVARS=$(msgfmt -o /dev/null --statistics ${DIFF_DIR}/nozip/${LANG}_var.txt 2>&1 | sed -e "s|^\([0-9]*\) .*|\1|")
+	SUSPECT_VARS_URL="<a href=\"latest/nozip/${LANG}_var.txt\">${NVARS}</a>"
     else
 	SUSPECT_VARS_URL="-"
     fi
 fi
 
 if [ $(echo ${ROW} | awk -F, '{print $5}') = "1" ] ; then
-	SPECIFIC_CHECK_URL="<a href=\"latest/nozip/${LANG}_lspec.txt\">${LANG}_lspec.txt</a>"
+	NVARS=$(msgfmt -o /dev/null --statistics ${DIFF_DIR}/nozip/${LANG}_lspec.txt 2>&1 | sed -e "s|^\([0-9]*\) .*|\1|")
+	SPECIFIC_CHECK_URL="<a href=\"latest/nozip/${LANG}_lspec.txt\">${NVARS}</a>"
     else
 	SPECIFIC_CHECK_URL="-"
 fi    
@@ -117,8 +119,10 @@ echo "  <tr>"
 echo "   <td class=\"col1\">${ISO_CODE} [${LANG}]</td>"
 
 # Number of unknown words
-if [ ${UNKN} -eq -1 ] || [ ${UNKN} -eq 0 ] ; then
+if [ ${UNKN} -eq -1 ] ; then
     echo "   <td>-</td>"
+elif [ ${UNKN} -eq 0 ] ; then
+    echo "   <td>0</td>"
 else
     if [ -f ${DIFF_DIR}/nozip/${LANG}_unkn_wl.diff ] ; then
 	DIFF="<a href=\"latest/nozip/${LANG}_unkn_wl.diff\">  (*)</a>"
