@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 32512  -->
+<!-- original version: 36758  -->
 <!-- traducido por jfs, 30 dic 2005 -->
 
 <!--
@@ -15,7 +15,7 @@ a una arquitectura específica.
 Actualmente sólo se genera una variante del fichero de ejemplo (para i386).
 -->
 
-<appendix id="appendix-preseed" condition="etch">
+<appendix id="appendix-preseed">
 <title>Instalar automáticamente utilizando preconfiguración</title>
 
 <para>
@@ -35,16 +35,11 @@ disponibles como un fichero de preconfiguración de ejemplo en
  <title>Introducción</title>
 <para>
 
-La preconfiguración ofrece un mecanismo para responder a preguntas sin tener
-que introducir manualmente las respuestas mientras se ejecuta la instalación.
+La preconfiguración ofrece un mecanismo para responder a preguntas realizadas
+durante la instalación sin tener que introducir manualmente las respuestas
+mientras ésta se ejecuta.
 Esto hace posible que se automatizen la mayoría de las instalaciones e incluso
 ofrece funcionalidades que no están disponibles durante una instalación normal.
-
-</para><para>
-
-Es posible responder a las preguntas que se realizan durante la primera
-fase de la instalación (antes del reinicio al nuevo sistema) y también
-a preguntas en la segunda fase utilizando la preconfiguración.
 
 </para>
 
@@ -150,7 +145,7 @@ Aunque la mayoría de las preguntas que utiliza &d-i; pueden preconfigurarse
 con este mecanismo hay algunas excepciones importantes. Tiene que (re)particionar
 el disco completo o utilizar el espacio en disco libre disponible, no puede usar
 particiones existentes. Tampoco puede aún utilizar la preconfiguración para 
-configurar RAID ó LVM.
+configurar RAID.
 
 </para>
   </sect2>
@@ -233,16 +228,8 @@ Tiene más detalles en <xref linkend="preseed-shell"/>.
 </para></listitem>
 <listitem><para>
   <userinput>preseed/late_command</userinput>: se procesa justo antes del reinicio
-  del equipo al final de la primera fase de la instalación pero antes de que
+  del equipo al final de la instalación pero antes de que
   se desmonte el sistema de ficheros <filename>/target</filename>.
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/early_command</userinput>: se procesa en la segunda
-  fase de la instalación cuando se arranca <command>base-config</command>
-</para></listitem>
-<listitem><para>
-  <userinput>base-config/late_command</userinput>: se procesa al final de la ejecución
-  de <command>base-config</command>, justo antes de mostrar el indicador de acceso al sistema.
 </para></listitem>
 </itemizedlist>
 
@@ -271,7 +258,7 @@ d-i foo/bar seen false
  <title>Utilizar la preconfiguración</title>
 <para>
 
-Por supuesto, en primer lugar ha de crear primero el fichero de preconfiguracio
+Por supuesto, en primer lugar ha de crear primero el fichero de preconfiguración
 y ponerlo en la localización donde pretende utilizarlo. La creación del fichero
 de preconfiguración se describe más adelante en este apéndice. Colocar el
 fichero en la ubicación correcta es algo relativamente sencillo para la
@@ -301,9 +288,9 @@ y lo cargará.
 </para><para>
 
 Para otros métodos de preconfiguración tiene que decirle al instalador qué
-ficheros utilizar cuando se arranca. Ésto se hace dadno un valor al parámetro
+ficheros utilizar cuando se arranca. Ésto se hace habitualmente dando un valor al parámetro
 de arranque del núcleo, bien manualmente en el arranque o bien editando el
-fichero de configuración del cargador de arranque (e.g.
+fichero de configuración del cargador de arranque (p.ej.
 <filename>syslinux.cfg</filename>) y añadiendo el parámetro al final de la/s
 línea/s <quote>append</quote> para el núcleo.
 
@@ -313,7 +300,7 @@ Si especifica un fichero de preconfiguración en la configuración del cargador
 de arranque podrá cambiar la configuración para que no tenga que pulsar enter
 en el arranque del instalador. En el caso de syslinux esto signfica que
 tiene que poner el valor de <quote>timeout</quote> en
-<filename>syslinux.cfg</filename> a uno.
+<filename>syslinux.cfg</filename> a <literal>1</literal>.
 
 </para><para>
 
@@ -351,6 +338,49 @@ responda a alguna.
 </para>
   </sect2>
 
+
+ <sect2 id="preseed-dhcp">
+ <title>Utilizar un servidor DHCP para especificar los ficheros de preconfiguración</title>
+<para>
+
+También es posible utilizar DHCP para especificar un fichero de preconfiguración
+que se debe descargar de la red. El protocolo DHCP permite especificar
+un archivo. Generalmente este es un archivo para el arranque en red,
+pero si parece ser un URL entonces el medio de instalación que soporte
+preconfiguración vía red descargará un fichero de la URL y lo utilizará
+como un fichero de preconfiguración. A continuación se muestra un ejemplo
+de cómo configurar el dhcp.conf de la versión 3 del servidor de DHCP de
+ISC (el paquete Debian dhcp3-server).
+</para>
+
+<informalexample><screen>
+if substring (option vendor-class-identifier, 0, 3) = "d-i" {
+    filename "http://servidor/preconfiguracion.cfg";
+}
+</screen></informalexample>
+
+<para>
+
+Tenga en cuenta que el ejemplo anterior limita la entrega de este nombre
+de fichero a clientes DHCP que se idenfiquen como «d-i». De esta forma
+no se afectará a clientes DHCP normales sino sólo al instalador. También
+puede poner ese texto en la definición de un sistema específico para
+evitar preconfigurar todas las instalaciones que se hagan en su red.
+
+</para><para>
+
+Una buena forma de hacer uso de la preconfiguración de DHCP es sólo
+preconfigurar los valores específicos a su red, como puedan ser la 
+réplica Debian a utilizar. De esta forma todas las instalaciones en su
+red cogerán automáticamente la réplica adecuada, mientras que el resto
+de la instalación se realizará de forma interactiva. Deberá tener
+cuidado si quiere utilizar preconfiguración DHCP para automatizar 
+la instalación completa de Debian.
+
+</para>
+  </sect2>
+
+
   <sect2 id="preseed-bootparms">
   <title>Utilizar parámetros de arranque para complementar la preconfiguración</title>
 <para>
@@ -387,7 +417,7 @@ núcleo 2.6.9 y posteriores.
 
 Para la mayoría de las instalaciones se pueden eliminar algunas de las opciones
 del fichero de configuracio del cargado de arranque, como por ejemplo
-<quote>vga=normal</quote> lo que permite añadir más opciones para la
+<literal>vga=normal</literal> lo que permite añadir más opciones para la
 preconfiguración.
 
 </para>
@@ -400,40 +430,102 @@ de arranque aunque se delimiten con comillas dobles.
   </sect2>
  </sect1>
 
- <sect1 condition="FIXME" id="preseed-creating">
+ <sect1 id="preseed-creating">
  <title>Crear un fichero de preconfiguración</title>
 <para>
 
 El fichero de preconfiguración tiene el formato que utiliza la orden
 <command>debconf-set-selections</command>.
+El formato general para una línea del fichero de preconfiguración es:
+
+<informalexample><screen>
+&lt;propietario&gt; &lt;nombre de plantillas&gt; &lt;tipo de plantilla&gt; &lt;valor&gt;
+</screen></informalexample>
+
+</para><para>
+
+Existen algunas reglas a tener en cuenta cuando se escribe un fichero
+de preconfiguración.
+
 
 </para>
 
 <itemizedlist>
 <listitem><para>
-  Fichero formato
+  Sólo se permite un espacio entre tipo de plantilla y valor. Cualquier
+  espacio adicional se considerará que pertenece al valor.
 </para></listitem>
-<listitem><para>
-  Sólo se permite un espacio entre tipo de plantilla y valor.
-</para></listitem>
-<listitem><para>
-  Relacionado con /var/lib/(c)debconf/templates.
-</para></listitem>
-<listitem><para>
-  Tipos de plantillas y cómo darles valor.
-</para></listitem>
-<listitem><para>
-  La mayoría de los valores tienen que estar en inglés o ser códigos.
-</para></listitem>
-<listitem><para>
-  Utilizar un manual de instalación como base.
-</para></listitem>
-<listitem><para>
-  Encontrar otros valores posibles.
-</para></listitem>
+<listitem><para> 
+ Se puede dividir una línea en múltiples líneas si se añade un barra invertida
+ (<quote><literal>\</literal></quote>) como caracter de continuación de línea.
+ Un buen punto para la divisón de la linea es después del nombre de la
+ plantilla. Es mala idea dividir la línea entre el tipo y el valor.
+ </para></listitem>
+ <listitem><para>
+  La mayoría de las plantillas tienen que preconfigurarse con los
+  valores que sean válidos en inglés y no en las traducciones de esos mismos
+  valores. Hay algunas plantillas, sin embargo (como es el caso de 
+  <classname>partman</classname>) donde se tienen que utilizar los valores
+  traducidos.
+ </para></listitem>
+ <listitem><para>
+  Algunas plantillas toman un código como valor en lugar del campo 
+  de texto mostrado durante la instalación (en inglés).
+ </para></listitem>
 </itemizedlist>
 
 <para>
+
+La forma más sencilla para crear un fichero de configuración es utilizar
+como base el ejemplo enlazado en <xref linkend="preseed-contents"/> y
+trabajar a partir de ahí.
+
+</para><para>
+
+Un método alternativo es realizar una instalación manual y, tras el
+rearranque, utilizar <command>debconf-get-selections</command>, disponible
+en el paquete <classname>debconf-utils</classname>, para volcar
+la base de datos de debconf y la base de datos cdebconf del instalador en un sólo fichero.
+
+<informalexample><screen>
+$ debconf-get-selections --installer &gt; <replaceable>fichero</replaceable>
+$ debconf-get-selections &gt;&gt; <replaceable>fichero</replaceable>
+</screen></informalexample>
+
++</para><para>
++
++However, a file generated in this manner will have some items that should
++not be preseeded, and the example file is a better starting place for most
++users.
++
++</para>
++
++<note><para>
++
++This method relies on the fact that, at the end of the installation, the
++installer's cdebconf database is saved to the installed system in
++<filename>/var/log/installer/cdebconf</filename>. However, because the
++database may contain sensitive information, by default the files are only
++readable by root.
++
++</para><para>
++
++The directory <filename>/var/log/installer</filename> and all files in it
++will be deleted from your system if you purge the package
++<classname>installation-report</classname>.
++
++</para></note>
++
++<para>
++
++To check possible values for templates, you can use <command>nano</command>
++to examine the files in <filename>/var/lib/cdebconf</filename> while an
++installation is in progress. View <filename>templates.dat</filename> for
++the raw templates and <filename>questions.dat</filename> for the current
++values and for the values assigned to variables.
++
++</para><para>
++
 
 Para comprobar si el formato de su fichero de preconfiguración es válido
 antes de hacer una instalación puede utilizar la orden
@@ -442,8 +534,8 @@ antes de hacer una instalación puede utilizar la orden
 </para>
  </sect1>
 
- <sect1 id="preseed-stage1">
- <title>Preconfiguración de la primera etapa de instalación</title>
+ <sect1 id="preseed-contents">
+ <title>Contenidos del fichero de preconfiguración</title>
 <para>
 
 Los fragmentos de configuración que se utilizan en este apéndice también están
@@ -524,6 +616,13 @@ cómoda cuando está arrancando de un CD o memoria USB. Si carga ficheros de
 preconfiguración de la red puede dar los parámetros de configuración de la red
 a través de parámetro de arranque del núcleo.
 
+</para><para>
+
+Tiene que utilizar un parámetro de arranque similar a
+<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>
+si tiene que escoger un interfaz particular durante el arranque vía red antes
+de cargar el fichero de preconfiguración de la red.
+
 </para>
 
 <informalexample role="example"><screen>
@@ -535,8 +634,21 @@ d-i netcfg/choose_interface select auto
 # conectarse a él, ésto puede serle útil.
 #d-i netcfg/dhcp_timeout string 60
 
-# Así es como puede configurar la red manualmente:
+# Escoger una interfaz específica en lugar de la encontrada:
+#d-i netcfg/choose_interface select eth1
+
+# Así es como puede configurar la red manualmente descomentando esta línea
+# y las líneas de configuración estática de red a continuación.
 #d-i netcfg/disable_dhcp boolean true
+
+# Si quiere que el fichero de preconfiguración funcione tanto en
+# sistemas con un servidor de DHCP como en los que no lo tengan, tendrá
+# que descomentar estas líneas y añadir la configuración estática de red
+# a continuación.
+#d-i netcfg/dhcp_failed note
+#d-i netcfg/dhcp_options select Configure network manually
+
+# Configuración estática de red
 #d-i netcfg/get_nameservers string 192.168.1.1
 #d-i netcfg/get_ipaddress string 192.168.1.42
 #d-i netcfg/get_netmask string 255.255.255.0
@@ -611,7 +723,7 @@ o todo el disco. La distribución del disco puede basarse en una receta
 existente o utilizar una receta de un fichero o una receta incluída en
 el fichero de preconfiguración. Actualmente no es posible utilizar la
 preconfiguración para particionar más de un disco o para configurar
-RAID o LVM.
+el RAID.
 
 </para>
 
@@ -626,6 +738,8 @@ de configurarlo si el sistema tiene más de un disco.
 <informalexample role="example"><screen>
 # Si el sistema tiene espacio libre puede elegir particionar solamente
 # este espacio.
+# Nota: esta plantilla tiene que ser preconfigurada con el valor localizado
+# (traducido)
 #d-i partman-auto/init_automatically_partition \
 #    select Use the largest continuous free space
 #
@@ -635,7 +749,9 @@ de configurarlo si el sistema tiene más de un disco.
 #  Por ejemplo, puede utilizar este valor para usar el primer disco devfs:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
-# Puede elegir cualquiera de las recetas de particionado predefinidas:
+# Puede elegir cualquiera de las recetas de particionado predefinidas.
+# Nota: esta plantilla tiene que ser preconfigurada con el valor localizado
+# (traducido)
 d-i partman-auto/choose_recipe \
        select All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe \
@@ -702,8 +818,9 @@ d-i time/zone string US/Eastern
 
 Se configura automáticamente <filename>/etc/apt/sources.list</filename> basándose en
 el método de instalación y las respuetas dadas anteriormente. También
-se hace una configuración básica de éste. Las dos variables mostradas
-a continuación son las relevantes a la preconfiguración.
+se hace una configuración básica de éste. Las dos líneas mostradas
+a continuación son relevantes para la preconfiguración. Desea ayudar
+(opcionalmente) otras acciones del repositorio.
 
 </para>
 
@@ -711,6 +828,16 @@ a continuación son las relevantes a la preconfiguración.
 # Puede elegir instalar software de las fuentes «non-free» y «contrib».
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+# Descomente esta línea para impedir que los recursos de seguridad
+# trabajen o me añadan un servidor distinto de security.debianorg.
+#d-i apt-setup/security_host string
+
+# Repositorios adicionales, se dispone de local[0-9]
+#d-i apt-setup/local0/comment string local server
+#d-i apt-setup/local0/repository string \
+#       deb http://local.server/debian stable main
+# URL de la clave pública en el repositorio local.
+#d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
   </sect2>
@@ -737,23 +864,27 @@ cabo ataques de fuerza bruta sobre la contraseña.
 </para></warning>
 
 <informalexample role="example"><screen>
+# No crear una cuenta de superusuario (la cuenta del usuario normal
+# utilizar sudo).
+#d-i passwd/root-login boolean false
+# Igualmente, se puede omitir la creación de una cuenta de un usuario
+# normal.
+#d-i passwd/make-user boolean false
+
 # Contraseña del superusuario, bien en texto en claro
-#passwd passwd/root-password password r00tme
-#passwd passwd/root-password-again password r00tme
+#d-i passwd/root-password password r00tme
+#d-i passwd/root-password-again password r00tme
 # o cifrada utilizando un hash MD5
-#passwd passwd/root-password-crypted password [MD5 hash]
+#d-i passwd/root-password-crypted password [MD5 hash]
 
-# Omitir la creación de una cuenta de usuario normal
-#passwd passwd/make-user boolean false
-
-# O también puede crearse una cuenta de un usuario
-#passwd passwd/user-fullname string Debian User
-#passwd passwd/username string debian
-# Contraseña del usuario normal, bien en texto en claro
-#passwd passwd/user-password password insecure
-#passwd passwd/user-password-again password insecure
+# Para crear una cuenta de un usuario:
+#d-i passwd/user-fullname string Debian User
+#d-i passwd/username string debian
+# Contraseña del usuario normal, bien en texto en claro:
+#d-i passwd/user-password password insecure
+#d-i passwd/user-password-again password insecure
 # o cifrada utilizando un hash MD5.
-#passwd passwd/user-password-crypted password [MD5 hash]
+#d-i passwd/user-password-crypted password [MD5 hash]
 </screen></informalexample>
 
 <para>
@@ -766,7 +897,7 @@ cuentas ésta se deshabilitará. Esto puede ser de ayuda para el caso de
 la cuenta de superusuario, siempre que tenga un mecanismo alternativo
 para poder llevar a cabo tareas de administración o acceder como
 superusuario (como por ejemplo, la utilización de autenticación en SSH
-mediante ficheros de clave pública o <quote>sudo</quote>).
+mediante ficheros de clave pública o <command>sudo</command>).
 
 </para><para>
 
@@ -778,6 +909,25 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 
 </para>
   </sect2>
+
+  <sect2 id="preseed-base-installer">
+  <title>Instalación del sistema base</title>
+<para>
+
+No hay mucho que pueda preconfigurarse para esta fase de la instalación.
+Las únicas preguntas que se hacen son referentes a la instalación
+del núcleo.
+
+</para>
+
+<informalexample role="example"><screen>
+# Selecciona el generador initramfs para generar el «initrd» en
+# núcleos 2.6
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
+</screen></informalexample>
+
+  </sect2>
+
 
   <sect2 id="preseed-bootloader">
   <title>Instalación del cargador de arranque</title>
@@ -806,48 +956,7 @@ d-i grub-installer/with_other_os boolean true
 
   </sect2>
 
-  <sect2 id="preseed-finish">
-  <title>Fin de la primera fase de instalación</title>
-
-<informalexample role="example"><screen>
-# Omitir el mensaje final sobre la finalización de la instalación.
-d-i prebaseconfig/reboot_in_progress note
-
-# Esta opción impedirá que el instalador expulse el CD durante el
-# reinicio, y puede ser útil en algunas circunstancias:
-#d-i cdrom-detect/eject boolean false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
- <sect1 id="preseed-stage2">
- <title>Preconfiguración de la segunda fase de la instalación</title>
-
-  <sect2 id="preseed-baseconfig">
-  <title>Base config</title>
-
-<informalexample role="example"><screen>
-# Omitir el mensaje de bienvenida.
-base-config base-config/intro note
-
-# Omitir el mensaje final.
-base-config base-config/login note
-
-# Si ha instalado un gestor de ventanas, pero no desea iniciarlo
-# inmediatamente después de que finalice «base-config».
-#base-config base-config/start-display-manager boolean false
-
-# Algunas versiones del instalador pueden informarnos lo que ha instalado.
-# La operación por omisión es no hacerlo, pero el envío de informes ayuda al
-# proyecto a determinar qué software es más popular e incluirlo en
-# los CDs.
-#popularity-contest popularity-contest/participate boolean false
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-tasksel">
+  <sect2 id="preseed-pkgsel">
   <title>Selección de paquetes</title>
 <para>
 
@@ -859,52 +968,78 @@ estas líneas incluyen:
 
 <itemizedlist>
 <listitem><para>
-  <userinput>Sistema estándar</userinput>
+  <userinput>Sistema estándar («standard»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Entorno de escritorio</userinput>
+  <userinput>Entorno de escritorio («desktop»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor web</userinput>
+  <userinput>Entorno de escritorio GNOME («gnome-desktop»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor de impresoras</userinput>
+  <userinput>Entorno de escritorio KDE («kde-desktop»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor de DNS</userinput>
+  <userinput>Servidor web («web-server»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor de ficheros</userinput>
+  <userinput>Servidor de impresoras («print-server»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor de correos</userinput>
+  <userinput>Servidor de DNS («dns-server»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Base de datos SQL</userinput>
+  <userinput>Servidor de ficheros («file-server»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Ordenador portátil</userinput>
+  <userinput>Servidor de correos («mail-server»)</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>selección manual de paquetes</userinput>
+  <userinput>Base de datos SQL («sql-database»)</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>Ordenador portátil («laptop»)</userinput>
 </para></listitem>
 </itemizedlist>
 
 <para>
 
-La última de estas opciones ejecutará aptitude. También puede no
-seleccionar ninguna tarea y forzar la instalación de un conjunto de
-paquetes de alguna otra forma. Le recomendamos que siempre introduzca
-la tarea <userinput>Sistema estándar</userinput>.
+También puede no seleccionar ninguna tarea y forzar la instalación de un
+conjunto de paquetes de alguna otra forma. Le recomendamos que siempre
+introduzca la tarea <userinput>Sistema estándar</userinput>.
 
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect Standard system, Desktop environment
-#tasksel tasksel/first multiselect Standard system, Web server
+tasksel tasksel/first multiselect standard, desktop
+#tasksel tasksel/first multiselect standard, web-server
+#tasksel tasksel/first multiselect standard, kde-desktop
+
+# Algunas verisones del instalador pueden informar de las versiones
+# de programas que tiene instalados y los programas que utiliza.
+# Por omisión, no se envía ningún informe, pero estos informes
+# ayudan al proyecto a determinar qué programas son más populares
+# y deben incluirse en los CDs
+#popularity-contest popularity-contest/participate boolean false
 </screen></informalexample>
 
   </sect2>
+
+  <sect2 id="preseed-finish">
+  <title>Finalizar la primar fase de la instalación</title>
+
+<informalexample role="example"><screen>
+# Omitir el mensaje final sobre la finalización de la instalación.
+d-i prebaseconfig/reboot_in_progress note
+
+# Esta opción impedirá que el instalador expulse el CD durante 
+# el reinicio, y puede ser útil en algunas circunstancias:
+#d-i cdrom-detect/eject boolean false
+</screen></informalexample>
+
+  </sect2>
+
+
 
   <sect2 id="preseed-mailer">
   <title>Configuración del servicio de correo</title>
@@ -941,24 +1076,24 @@ configuración totalmente automática de todo.
 # X puede detectar el controlador adecuado para algunas tarjetas, pero
 # si está preconfigurando puede modificar el que éste elija. Incluso en este caso,
 # vesa funcionará para la mayoría del hardware.
-#xserver-xfree86 xserver-xfree86/config/device/driver select vesa
+#xserver-xorg xserver-xorg/config/device/driver select vesa
 
 # Un problema con la autodetección del ratón es que, si ésta falla, X
 # reintentará el proceso una y otra vez. De modo que si se efectúa la preconfiguración,
 # existe la posibilidad de que se produzca un bucle infinito si no se autodetecta el ratón.
-#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true
+#xserver-xorg xserver-xorg/autodetect_mouse boolean true
 
 # Se recomienda la autodetección del monitor.
-xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true
+xserver-xorg xserver-xorg/autodetect_monitor boolean true
 # Descomente este valor si tiene una pantalla LCD.
-#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
+#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
 
 # X tiene tres métodos de configuración para el monitor. Ésta es la forma
 # de preconfigurar el método «medio», que siempre está disponible. El
 # método «simple» podría no estar disponible y el «avanzado» hace
-xserver-xfree86 xserver-xfree86/config/monitor/selection-method \
+xserver-xorg xserver-xorg/config/monitor/selection-method \
        select medium
-xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
+xserver-xorg xserver-xorg/config/monitor/mode-list \
        select 1024x768 @ 60 Hz
 </screen></informalexample>
 
@@ -1001,25 +1136,17 @@ xserver-xfree86 xserver-xfree86/config/monitor/mode-list \
 #d-i preseed/early_command string anna-install some-udeb
 
 # Ésta orden se ejecuta justamente antes de que finalice la instalación,
-# pero cuando todavía existe un directorio /target usable:
-#d-i preseed/late_command string echo foo > /target/etc/bar
-
-# Ésta orden se ejecuta tan pronto como se inicia el programa «base-config»:
-#base-config base-config/early_command string echo Hola mamá 
-
-# Ésta orden se ejecuta después de que termine «base-config», y
-# antes de presentar el indicador de entrada al sistema («login:»). 
-# Éste es un buen método que puede utilizar para 
-# instalar el conjunto de paquetes que desee, o para modificar la
-# configuración del sistema:
-#base-config base-config/late_command \
-#      string apt-get install zsh; chsh -s /bin/zsh
+# pero cuando todavía existe un directorio /target usable. Puede
+# hacer un chroot a /target y utilizarlo directamente o utilizar las
+# órdenes apt-install e «in-target» para instalar fácilmente paquetes
+# y ejecutar órdenes en el sistema objetivo
+#d-i preseed/late_command string apt-get install zsh; in-target chsh -s /bin/zsh
 </screen></informalexample>
 
   </sect2>
 
   <sect2 id="preseed-chainload">
-  <title>Chainloading preseed files</title>
+  <title>Carga de archivos de configuración en cadena</title>
 <para>
 
 Si lo desea puede incluir otros ficheros de preconfiguración en éste.
