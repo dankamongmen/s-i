@@ -1519,9 +1519,6 @@ static int gtk_go(struct frontend *obj)
     struct frontend_data *data = (struct frontend_data *) obj->data;
     struct question *q = obj->questions;
     GtkWidget *questionbox, *questionbox_scroll;
-    #if GTK_CHECK_VERSION(2,6,0)
-    GtkWidget *image_button_forward, *image_button_back;
-    #endif
     di_slist *plugins;
     int i, j;
     int ret;
@@ -1616,13 +1613,6 @@ static int gtk_go(struct frontend *obj)
     gtk_button_set_label (GTK_BUTTON(data->button_prev), get_text(obj, "debconf/button-goback", "Go Back") );
     gtk_button_set_label (GTK_BUTTON(data->button_next), get_text(obj, "debconf/button-continue", "Continue") );
     gtk_button_set_label (GTK_BUTTON(data->button_cancel), get_text(obj, "debconf/button-cancel", "Cancel") );
-
-    #if GTK_CHECK_VERSION(2,6,0)
-    image_button_back = gtk_image_new_from_stock (GTK_STOCK_GO_BACK, GTK_ICON_SIZE_SMALL_TOOLBAR );
-    image_button_forward = gtk_image_new_from_stock (GTK_STOCK_GO_FORWARD, GTK_ICON_SIZE_SMALL_TOOLBAR );
-    gtk_button_set_image (GTK_BUTTON(data->button_prev), image_button_back);
-    gtk_button_set_image (GTK_BUTTON(data->button_next), image_button_forward);
-    #endif
 
     gtk_widget_set_default_direction(get_text_direction(obj));
 
