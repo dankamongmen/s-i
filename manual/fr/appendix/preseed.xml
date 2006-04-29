@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 36269 -->
+<!-- original version: 36758 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -382,6 +382,14 @@ certaines étapes, on peut quand même automatiser l'installation car il est possi
 de passer des paramètres au noyau sur la ligne de commande. Il suffit d'indiquer
 une paire de type <userinput>path/to/variable=valeur</userinput> 
 pour toutes les variables listées dans les exemples.
+
+</para><para>
+
+Dans les paramètres d'amorçage, <quote>&ndash;&ndash;</quote> possède une signification
+spéciale. Tous les paramètres du noyau placés après les deux traits seront copiés
+dans la configuration du programme d'amorçage (si l'installateur le permet).
+Il se peut que ces deux traits, <quote>&ndash;&ndash;</quote>, soient déjà présents
+dans les paramètres d'amorçage par défaut.
 
 </para>
 <note><para>
@@ -910,43 +918,50 @@ Pour l'heure, les tâches disponibles sont les suivantes :
 
 <itemizedlist>
 <listitem><para>
-  <userinput>Standard system</userinput>
+  <userinput>standard</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Desktop environment</userinput>
+  <userinput>desktop</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Web server</userinput>
+  <userinput>gnome-desktop</userinput>
+ </para></listitem>
+ <listitem><para>
+  <userinput>kde-desktop</userinput>
+ </para></listitem>
+<listitem><para>
+  <userinput>web-server</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Print server</userinput>
+  <userinput>print-server</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>DNS server</userinput>
+  <userinput>dns-server</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>File server</userinput>
+  <userinput>file-server</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Mail server</userinput>
+  <userinput>mail-server</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>SQL database</userinput>
+  <userinput>sql-database</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Laptop</userinput>
+  <userinput>laptop</userinput>
 </para></listitem>
 </itemizedlist>
 
 <para>
 Vous pouvez aussi choisir de n'installer aucune tâche et forcer l'installation de paquets 
 par un autre moyen.
-Il est recommandé de toujours inclure la tâche <quote>Standard system</quote>.
+Il est recommandé de toujours inclure la tâche <quote>standard</quote>.
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect Standard system, Desktop environment
-#tasksel tasksel/first multiselect Standard system, Web server
+tasksel tasksel/first multiselect standard, desktop
+#tasksel tasksel/first multiselect standard, web-server
+#tasksel tasksel/first multiselect standard, kde-desktop
 
 # Certaines versions de l'installateur peuvent signaler les logiciels que vous avez installés
 # et ceux que vous utilisez. Par défaut, rien n'est signalé. Mais l'envoi de rapport 
