@@ -1,14 +1,14 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36614 -->
+<!-- original version: 36730 -->
 
 
  <sect1 id="kernel-baking">
  <!-- <title>Compiling a New Kernel</title> -->
  <title>Compilazione di un nuovo kernel</title>
-
 <para>
 
-<!-- Why would someone want to compile a new kernel? It is often not
+<!--
+Why would someone want to compile a new kernel? It is often not
 necessary since the default kernel shipped with Debian handles most
 configurations. Also, Debian often offers several alternative kernels.
 So you may want to check first if there is an alternative kernel image
@@ -67,7 +67,9 @@ creare un kernel monolitico al posto di uno modulare
 </para></listitem>
 <listitem><para>
 
-<!-- run an updated or development kernel -->
+<!--
+run an updated or development kernel
+-->
 
 usare un kernel aggiornato o di sviluppo
 
@@ -88,10 +90,11 @@ imparare cose nuove sui kernel linux
   <sect2>
   <!-- <title>Kernel Image Management</title> -->
   <title>Gestione dell'immagine del kernel</title>
-
 <para>
 
-<!-- Don't be afraid to try compiling the kernel.  It's fun and profitable. -->
+<!--
+Don't be afraid to try compiling the kernel.  It's fun and profitable.
+-->
 
 Non ci si deve impaurire nel provare a compilare il kernel. È
 divertente e utile.
@@ -121,11 +124,13 @@ l'elenco completo).
 
 </para><para>
 
-<!-- This method will make a .deb of your kernel source, and, if you have
+<!--
+This method will make a .deb of your kernel source, and, if you have
 non-standard modules, make a synchronized dependent .deb of those
 too. It's a better way to manage kernel images;
 <filename>/boot</filename> will hold the kernel, the System.map, and a
-log of the active config file for the build. -->
+log of the active config file for the build.
+-->
 
 Questo metodo crea un .deb dai sorgenti del kernel e, se si hanno dei
 moduli non-standard, crea anche un .deb di questi moduli sincronizzato
@@ -135,7 +140,8 @@ System.map e un log con le configurazioni attive durante la compilazione.
 
 </para><para>
 
-<!-- Note that you don't <emphasis>have</emphasis> to compile your kernel
+<!--
+Note that you don't <emphasis>have</emphasis> to compile your kernel
 the <quote>Debian way</quote>; but we find that using the packaging system
 to manage your kernel is actually safer and easier.  In fact, you can get
 your kernel sources right from Linus instead of
@@ -156,10 +162,12 @@ e comunque usare il metodo di compilazione con
 
 </para><para>
 
-<!-- Note that you'll find complete documentation on using
+<!--
+Note that you'll find complete documentation on using
 <classname>kernel-package</classname> under
 <filename>/usr/share/doc/kernel-package</filename>.  This section just
-contains a brief tutorial. -->
+contains a brief tutorial.
+-->
 
 Notare che è possibile trovare la documentazione completa sull'uso di
 <classname>kernel-package</classname> in
@@ -168,8 +176,10 @@ contiene solo un breve manuale introduttivo.
 
 </para><para>
 
-<!-- Hereafter, we'll assume you have free rein over your machine and will
-extract your kernel source to somewhere in your home directory<footnote> -->
+<!--
+Hereafter, we'll assume you have free rein over your machine and will
+extract your kernel source to somewhere in your home directory<footnote>
+-->
 
 D'ora in avanti si suppone che si abbia il controllo completo della
 macchina e che i sorgenti del kernel siano da qualche parte all'interno
@@ -177,9 +187,11 @@ della propria home directory<footnote>
 
 <para>
 
-<!-- There are other locations where you can extract kernel sources and build
+<!--
+There are other locations where you can extract kernel sources and build
 your custom kernel, but this is easiest as it does not require special
-permissions. -->
+permissions.
+-->
 
 Ci sono molti altri posti in cui è possibile estrarre i sorgenti del
 kernel e compilare un kernel personalizzato, ma è molto più semplice
@@ -187,7 +199,8 @@ se questa operazione non richiede dei permessi speciali.
 
 </para>
 
-<!-- </footnote>. We'll also assume that your kernel version is
+<!--
+</footnote>. We'll also assume that your kernel version is
 &kernelversion;. Make sure you are in the directory to where you want to
 unpack the kernel sources, extract them using 
 <phrase condition="classic-kpkg"><userinput>tar xjf
@@ -197,7 +210,8 @@ unpack the kernel sources, extract them using
 and change to the directory
 <phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
 <phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
-that will have been created. -->
+that will have been created.
+-->
 
 </footnote>. Si suppone anche che la versione del kernel sia
 &kernelversion;. Assicurarsi di trovarsi nella directory in cui si vuole
@@ -213,7 +227,8 @@ che è stata appena creata.
 
 </para><para>
 
-<!-- Now, you can configure your kernel.  Run <userinput>make
+<!--
+Now, you can configure your kernel.  Run <userinput>make
 xconfig</userinput> if X11 is installed, configured and being run; run
 <userinput>make menuconfig</userinput> otherwise (you'll need
 <classname>libncurses5-dev</classname> installed). Take the time to read
@@ -224,7 +239,8 @@ on) you are unsure about.  Be careful: other options, not related to a
 specific hardware, should be left at the default value if you do not
 understand them.  Do not forget to select <quote>Kernel module loader</quote>
 in <quote>Loadable module support</quote> (it is not selected by default).
-If not included, your Debian installation will experience problems. -->
+If not included, your Debian installation will experience problems.
+-->
 
 Adesso si può configurare il kernel. Eseguire <userinput>make
 xconfig</userinput> se X11 è installato, configurato e in esecuzione;
@@ -243,8 +259,10 @@ sistema Debian rischia di avere dei seri problemi.
 
 </para><para>
 
-<!-- Clean the source tree and reset the <classname>kernel-package</classname>
-parameters.  To do that, do <userinput>make-kpkg clean</userinput>. -->
+<!--
+Clean the source tree and reset the <classname>kernel-package</classname>
+parameters.  To do that, do <userinput>make-kpkg clean</userinput>.
+-->
 
 Ripulire i sorgenti e ripristinare i parametri di
 <classname>kernel-package</classname> usando <userinput>make-kpkg
@@ -252,15 +270,17 @@ clean</userinput>.
 
 </para><para>
 
-<!-- Now, compile the kernel:
-<userinput>fakeroot make-kpkg -revision=custom.1.0 kernel_image</userinput>.
+<!--
+Now, compile the kernel:
+<userinput>fakeroot make-kpkg -initrd -revision=custom.1.0 kernel_image</userinput>.
 The version number of <quote>1.0</quote> can be changed at will; this is just
 a version number that you will use to track your kernel builds.
 Likewise, you can put any word you like in place of <quote>custom</quote>
 (e.g., a host name).  Kernel compilation may take quite a while, depending on
-the power of your machine. -->
+the power of your machine.
+-->
 
-Adesso compilare il kernel con: <userinput>fakeroot make-kpkg
+Adesso compilare il kernel con: <userinput>fakeroot make-kpkg --initrd
 --revision=custom.1.0 kernel_image</userinput>. Il numero di versione
 <quote>1.0</quote> può essere cambiato secondo le necessità;
 questo è semplicemente il numero di versione che si può usare per
@@ -269,66 +289,65 @@ inserire qualsiasi parola al posto di <quote>custom</quote> (p.e. il
 nome dell'host). La compilazione del kernel richiede un po' di tempo,
 in base alla potenza della macchina.
 
-</para><para condition="supports-pcmcia">
-
-<!-- If you require PCMCIA support, you'll also need to install the
-<classname>pcmcia-source</classname> package.  Unpack the gzipped tar file
-as root in the directory <filename>/usr/src</filename> (it's important that
-modules are found where they are expected to be found, namely,
-<filename>/usr/src/modules</filename>).  Then, as root, do <userinput>make-kpkg
-modules_image</userinput>. -->
-
-Se si ha bisogno del supporto PCMCIA è necessario installare il
-pacchetto <classname>pcmcia-source</classname>. Estrarre il file tar
-compresso con gzip nella directory <filename>/usr/src</filename> (è
-importante che i moduli si trovino esattamente dove il sistema si
-aspetta che siano, ovvero in <filename>/usr/src/modules</filename>).
-Poi, da root, eseguire <userinput>make-kpkg modules_image</userinput>.
-
 </para><para>
 
-<!-- Once the compilation is complete, you can install your custom kernel
-like any package.  As root, do <userinput>dpkg -i
+<!--
+Once the compilation is complete, you can install your custom kernel
+like any package.  As root, do
+<phrase condition="classic-kpkg">
+<userinput>dpkg -i
 ../kernel-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
+<phrase condition="common-kpkg">
+<userinput>dpkg -i
+../linux-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
 The <replaceable>subarchitecture</replaceable> part is an optional
 sub-architecture,
 <phrase arch="i386"> such as <quote>i586</quote>, </phrase>
 depending on what kernel options you set.
-<userinput>dpkg -i kernel-image...</userinput> will install the
+<userinput>dpkg -i</userinput> will install the
 kernel, along with some other nice supporting files.  For instance,
 the <filename>System.map</filename> will be properly installed
 (helpful for debugging kernel problems), and
 <filename>/boot/config-&kernelversion;</filename> will be installed,
 containing your current configuration set.  Your new
-<classname>kernel-image-&kernelversion;</classname> package is also clever
-enough to automatically use your platform's boot-loader to run an
-update on the booting, allowing you to boot without re-running the
-boot loader.  If you have created a modules package, e.g., if you have
-PCMCIA, you'll need to install that package as well. -->
+kernel package is also clever enough to automatically update your boot
+loader to use the new kernel. If you have created a modules package,
+<phrase condition="classic-kpkg">e.g., if you have PCMCIA,</phrase>
+you'll need to install that package as well.
+-->
 
 Finita la compilazione è possibile installare il proprio kernel
 personalizzato come qualsiasi altro pacchetto. Da root eseguire
-<userinput>dpkg -i ../kernel-image-&kernelversion;-<replaceable>sottoarchitettura</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+<phrase condition="classic-kpkg">
+<userinput>dpkg -i
+../kernel-image-&kernelversion;-<replaceable>sottoarchitettura</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
+<phrase condition="common-kpkg">
+<userinput>dpkg -i
+../linux-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
 La parte <replaceable>sottoarchitettura</replaceable> è opzionale e
 indica la sottoarchitettura,
 <phrase arch="i386"> per esempio <quote>i586</quote>, </phrase>
 in base alle opzioni del kernel sono state attivate.
-<userinput>dpkg -i kernel-image...</userinput> installa il kernel più
+<userinput>dpkg -i</userinput> installa il kernel più
 alcuni file di supporto. Per esempio sono installati i file
 <filename>System.map</filename> (utile per il debug del kernel) e
 <filename>/boot/config-&kernelversion;</filename> che contiene la
-configurazione. Il nuovo pacchetto
-<classname>kernel-image-&kernelversion;</classname> è anche in grado
-di riconoscere, in base alla piattaforma, il bootloader ed eseguire
-un aggiornamento in modo da poter riavviare la macchina senza dover
-rieseguire il bootloader. Se si è creato anche un pacchetto con i
-moduli, per esempio se si usa PCMCIA, è necessario installare anche
-questo pacchetto.
+configurazione. Il nuovo pacchetto con il kernel è anche in grado di
+aggiornare automaticamente il bootloader in modo da poter usare il nuovo
+kernel. Se si è creato anche un pacchetto con i moduli,
+<phrase condition="classic-kpkg">per esempio se si usa PCMCIA,</phrase>
+è necessario installare anche questo pacchetto.
 
 </para><para>
 
-<!-- It is time to reboot the system: read carefully any warning that the
-above step may have produced, then <userinput>shutdown -r now</userinput>. -->
+<!--
+It is time to reboot the system: read carefully any warning that the
+above step may have produced, then <userinput>shutdown -r now</userinput>.
+-->
 
 Adesso si deve riavviare il sistema: leggere attentamente tutti gli
 avvertimenti che potrebbero apparire durante il passo precedente e
@@ -341,7 +360,8 @@ For more information on Debian kernels and kernel compilation, see the
 <ulink url="&url-kernel-handbook;">Debian Linux Kernel Handbook</ulink>.
 For more information on <classname>kernel-package</classname>,
 read the fine documentation in
-<filename>/usr/share/doc/kernel-package</filename>. -->
+<filename>/usr/share/doc/kernel-package</filename>.
+-->
 
 Per ulteriori informazioni sui kernel Debian e sulla
 compilazione del kernel si consulti il
