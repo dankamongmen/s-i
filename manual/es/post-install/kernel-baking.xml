@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 36614 -->
+<!-- original version: 36730 -->
 <!-- Revisado por Steve Langasek -->
 <!-- Revisado Rudy Godoy, 23 feb. 2005 -->
 
@@ -149,7 +149,7 @@ Limpie el árbol de fuentes y reinicie los parámetros de
 </para><para>
 
 Ahora, compile el núcleo: <userinput>fakeroot /usr/sbin/make-kpkg
---revision=custom.1.0 kernel_image</userinput>. Por supuesto, puede
+--initrd --revision=custom.1.0 kernel_image</userinput>. Por supuesto, puede
 cambiar el número de la versión <quote>1.0</quote>
 por cualquier otro valor; éste sólo es el número
 de versión que usará para seguir la pista a los núcleos que haya
@@ -158,36 +158,34 @@ cualquier otra palabra (por ejemplo, un nombre de máquina).
 La compilación del núcleo puede tomar un buen
 tiempo, dependiendo de la potencia de su máquina.
 
-</para><para condition="supports-pcmcia">
-
-Si necesita soporte PCMCIA, también necesitará instalar el paquete
-<classname>pcmcia-source</classname>. Desempaquete el fichero tar comprimido
-con gzip, como superusuario en el directorio <filename>/usr/src</filename>
-(es importante que los módulos se encuentren donde se espera que estén, a
-saber, <filename>/usr/src/modules</filename>). Luego, como superusuario,
-ejecute <userinput>make-kpkg modules_image</userinput>.
-
 </para><para>
 
 Una vez finalizada la compilación, puede instalar su núcleo
 personalizado como cualquier paquete. Como superusuario, ejecute
-<userinput>dpkg -i ../kernel-image-&kernelversion;-<replaceable>subarquitectura</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+<phrase condition="classic-kpkg">
+<userinput>dpkg -i
+../kernel-image-&kernelversion;-<replaceable>subarquitectura</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
+<phrase condition="common-kpkg">
+<userinput>dpkg -i
+../linux-image-&kernelversion;-<replaceable>subarchitectura</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
 La parte <replaceable>subarquitectura</replaceable> es una subarquitectura
 opcional,
 <phrase arch="i386"> como <quote>i586</quote>, </phrase> dependiendo de las opciones
 que haya establecido en el núcleo.
-<userinput>dpkg -i kernel-image...</userinput>
+<userinput>dpkg -i</userinput>
 instalará el núcleo, junto con otros ficheros de soporte. Por ejemplo,
 <filename>System.map</filename> será adecuadamente instalado (de gran ayuda
 para depuración de problemas con el núcleo), y también se instalará
 <filename>/boot/config-&kernelversion;</filename>, conteniendo su actual
 configuración. Su nuevo paquete
-<classname>kernel-image-&kernelversion;</classname> es también lo
-suficientemente listo como para usar automáticamente usar el gestor de
-de arranque de su plataforma y actualizar así la información de la imagen
-del núcleo, la cual le permita arrancar sin necesidad de ejecutarlo nuevamente.
-Deberá instalar también el paquete de módulos si lo ha hecho, como por ejemplo,
-en el caso de que tenga PCMCIA.
+es también lo suficientemente listo como para actualizar automáticamente el
+gestor de de arranque de su plataforma para que utilice la información de la
+imagen del núcleo, la cual le permita arrancar sin necesidad de ejecutarlo
+nuevamente.  Deberá instalar también el paquete de módulos si lo ha
+construido<phrase condition="classic-kpkg">, como por ejemplo, en el caso de
+que tenga PCMCIA</phrase>.
 
 </para><para>
 
