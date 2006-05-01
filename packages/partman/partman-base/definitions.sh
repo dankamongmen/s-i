@@ -636,7 +636,7 @@ humandev () {
 	    # First of all, check if this is a dm-crypt device
 	    type=""
 	    if [ -x /sbin/dmsetup ]; then
-	        type=$(/sbin/dmsetup table "$1" | head -1 | cut -d " " -f3)
+	        type=$(/sbin/dmsetup table "$1" | head -n 1 | cut -d " " -f3)
 	    fi
 
 	    if [ $type = crypt ]; then
