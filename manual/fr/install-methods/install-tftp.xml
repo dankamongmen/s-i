@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 35613 -->
+<!-- original version: 36841 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Préparer les fichiers pour amorcer depuis le réseau avec TFTP</title>
@@ -193,7 +193,7 @@ d'amorçage à <command>tftpd</command>.
 Pour les DECstation, il y a des fichiers tftpimage pour chaque 
 sous-architecture&nbsp;; ils contiennent à la fois un noyau et un 
 installateur en un seul fichier. La convention
-de nommage est <replaceable>subarchitecture</replaceable>/netboot-boot.img.
+de nommage est <filename><replaceable>subarchitecture</replaceable>/netboot-boot.img</filename>.
 Copiez l'image tftp que vous allez utiliser dans
 <userinput>/tftpboot/tftpboot.img</userinput> si vous travaillez avec
 l'exemple de configuration de BOOTP/DHCP décrit plus haut.
@@ -234,8 +234,7 @@ machine serveur TFTP. On peut lire l'adresse MAC de la DECstation en entrant
 </para></listitem>
 <listitem><para>
 
-Le microprogramme impose une taille limite aux fichiers
-             utilisés pour amorcer par TFTP.
+Le microprogramme impose une taille limite aux fichiers utilisés pour amorcer par TFTP.
 
 </para></listitem>
 </orderedlist>
@@ -256,9 +255,9 @@ relatif au répertoire de l'image d'amorçage) en utilisant l'argument
 de SRM ou en configurant la variable d'environnement 
 <userinput>BOOT_FILE</userinput>. Vous pouvez aussi passer le nom de fichier 
 via BOOTP (pour <command>dhcpd</command> ISC, utilisez la directive 
-<userinput>filename</userinput>). À la différence de Open Firmware, il n'y a 
-pas de <emphasis>nom de fichier par défaut</emphasis> dans SRM donc vous 
-<emphasis>devez</emphasis> utiliser une de ces méthodes pour spécifier un nom 
+<userinput>filename</userinput>). À la différence d'Open Firmware, il n'y a 
+pas de <emphasis>nom de fichier par défaut</emphasis> dans SRM et vous 
+<emphasis>devez</emphasis> utiliser l'une de ces méthodes pour spécifier un nom 
 de fichier.
 
 </para>
@@ -268,12 +267,11 @@ de fichier.
    <title>Amorçage TFTP pour SPARC</title>
 <para>
 
-Les architectures SPARC utilisent des noms de sous-architecture, comme 
-<quote>SUN4M</quote> ou <quote>SUN4C</quote>&nbsp;; dans certains cas, 
-l'architecture est laissée en blanc et le fichier que le client recherche
-est simplement <filename>ip-du-client-en-hexa</filename>. Ainsi, si
-votre sous-architecture système est SUN4C et que son adresseIP est 
-192.168.1.3, le nom de fichier sera <filename>C0A80103.SUN4C</filename>.
+Certaines architectures SPARC ajoutent au nom de fichier la sous-architecture, comme 
+<quote>SUN4M</quote> ou <quote>SUN4C</quote>. Ainsi, si votre sous-architecture système
+est SUN4C et que son adresseIP est 192.168.1.3, le nom de fichier sera
+<filename>C0A80103.SUN4C</filename>. Cependant, pour certaines architectures, le fichier
+recherché est simplement <filename>client-ip-in-hex</filename>.
 Pour déterminer facilement ce nom et en supposant que l'adresse IP est 
 10.0.0.4, lancez un interpréteur de commandes et faites&nbsp;:
 
@@ -281,9 +279,8 @@ Pour déterminer facilement ce nom et en supposant que l'adresse IP est
 $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 </screen></informalexample>
 
-Cela recrache l'adresse en hexadécimal. Il suffira de mettre les lettres en 
-majuscule et d'ajouter le nom de la sous-architecture pour obtenir le nom du 
-fichier.
+Il suffira de mettre les lettres en majuscule et d'ajouter le nom de la sous-architecture
+pour obtenir le nom du fichier.
 
 </para><para>
 
