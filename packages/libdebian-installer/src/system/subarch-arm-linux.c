@@ -21,8 +21,6 @@ static struct map map_hardware[] = {
     { "Compaq-PersonalServer" , "netwinder" },
     { "ADS" , "ads" }, /* Matches only ADS boards. Put any exceptions before. */
     { "Applied Data Systems" , "ads" }, /* More ADS boards. */
-    { "LART" , "lart" },
-    { "Simtec-BAST" , "bast" },
     { "Linksys NSLU2", "nslu2" },
     { NULL, NULL }
 };

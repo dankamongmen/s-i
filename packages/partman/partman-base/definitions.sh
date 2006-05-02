@@ -739,8 +739,6 @@ default_disk_label () {
 		    echo msdos;;
 		netwinder)
 		    echo msdos;;
-		bast)
-		    echo msdos;;
 		ads)
 		    echo msdos;;
 		nslu2)
