@@ -13,7 +13,6 @@ struct map {
 
 static struct map map_hardware[] = {
     { "Acorn-RiscPC" , "riscpc" },
-    { "RiscStation-RS7500" , "riscstation" },
     { "EBSA285" , "netwinder" },
     { "Rebel-NetWinder" , "netwinder" },
     { "Chalice-CATS" , "netwinder" },
