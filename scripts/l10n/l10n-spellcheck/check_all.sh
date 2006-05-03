@@ -97,13 +97,13 @@ i=0
 TOTAL=0
 AVERAGE=0
 
-for ROW in $(sort -k 4 -n ${STATS}.txt | sed 's: :,:g'); do
+for ROW in $(sort -k2 -n ${STATS}.txt | sed 's: :,:g'); do
     LANG=$(echo ${ROW} | awk -F, '{print $1}')
     VAL=$(echo ${ROW} | awk -F, '{print $2}')
 
     if [ ${VAL} -ne -1 ] ; then
 	XTICS=$(echo "${XTICS} \"${LANG}\" $i,")
-	TOTAL=`expr ${TOTAL} + ${VAL}`
+	TOTAL=$((${TOTAL}+${VAL}))
 	i=$((i+1))
 	echo ${VAL} >> ${GNUPLOT_DATA}
     fi
@@ -118,7 +118,7 @@ XTICS=`echo ${XTICS} | sed "s:^":\(":" | sed "s:,$:):"`
 
 # avoid division by 0
 if [ $i -ne 0 ] ; then
-    AVERAGE=`expr ${TOTAL} / $i`
+    AVERAGE=$((${TOTAL}/$i))
 fi
 
 LOGFILE=${GNUPLOT_SCRIPT}
