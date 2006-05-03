@@ -68,8 +68,8 @@ NEW_PATH=${WORK_DIR}/nozip
 
 if [ ${BRAND_NEW} -ne 1 ] ; then
     for ROW in `sed 's: :,:g' ${WORK_DIR}/stats.txt`; do
-	VAL=`echo ${ROW} | awk -F, '{print $1}'`
-	LANG=`echo ${ROW} | awk -F, '{print $2}'`
+	LANG=`echo ${ROW} | awk -F, '{print $1}'`
+	VAL=`echo ${ROW} | awk -F, '{print $2}'`
 	
 	LALL=${LANG}_all.txt
 	LUWL=${LANG}_unkn_wl.txt

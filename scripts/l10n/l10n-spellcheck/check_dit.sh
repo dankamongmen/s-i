@@ -125,17 +125,17 @@ find ${DEST_DIR} -empty -exec rm '{}' ';'
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     if [ -f ${SUSPECT_VARS} ]; then
 	FILES_TO_KEEP="${SUSPECT_VARS} ${FILES_TO_KEEP}" 
-	SUSPECT_EXIST=1
+	NUM_SUSPECT=$(msgfmt -o /dev/null --statistics ${SUSPECT_VARS} 2>&1 | sed -e "s|^\([0-9]*\) .*|\1|")
     else
-	SUSPECT_EXIST=0
+	NUM_SUSPECT=0
     fi
 fi
 
 if [ -f ${LANG_SPECIFIC} ]; then
     FILES_TO_KEEP="${LANG_SPECIFIC} ${FILES_TO_KEEP}" 
-    SPECIFIC_EXIST=1
+    NUM_SPECIFIC=$(msgfmt -o /dev/null --statistics ${LANG_SPECIFIC} 2>&1 | sed -e "s|^\([0-9]*\) .*|\1|")
 else
-    SPECIFIC_EXIST=0
+    NUM_SPECIFIC=0
 fi
 
 # remove ${ALL_THESE_VARIABLES} if they do not need to be spell checked
@@ -208,17 +208,17 @@ if [ ${DICT} != "null" ] ; then
 
 # if we're *not* handling suspecet vars (i.e. d-i manual), make this an empty string
     if [ ${HANDLE_SUSPECT_VARS} = "no" ] ; then
-	SUSPECT_EXIST=
+	NUM_SUSPECT=-1
     fi
 
 # build the entry of stats.txt for the current language (i.e "395 it 1 134 0")
-    echo `wc -l ${UNKN} | awk '{print $1}'` ${LANG} ${SUSPECT_EXIST} ${CODEPOINTS} ${SPECIFIC_EXIST} >> ${DEST_DIR}/stats.txt
+    echo ${LANG} $(wc -l ${UNKN} | awk '{print $1}') ${NUM_SUSPECT} ${CODEPOINTS} ${NUM_SPECIFIC} >> ${DEST_DIR}/stats.txt
 else
     if [ ${HANDLE_SUSPECT_VARS} = "no" ] ; then
-	SUSPECT_EXIST=
+	NUM_SUSPECT=-1
     fi
 
-    echo "-1 ${LANG} ${SUSPECT_EXIST} ${CODEPOINTS}" ${SPECIFIC_EXIST} >> ${DEST_DIR}/stats.txt
+    echo "${LANG} -1 ${NUM_SUSPECT} ${CODEPOINTS} ${NUM_SPECIFIC}" >> ${DEST_DIR}/stats.txt
 
     NEEDS_RM=`echo ${NEEDS_RM} | sed "s:${ALL_UNKNOWN}::"`
     FILES_TO_KEEP=`echo ${FILES_TO_KEEP} | sed "s:${UNKN}::"`

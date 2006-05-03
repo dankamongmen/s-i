@@ -51,17 +51,17 @@ echo "-------------------------"
 printf "%-8s %4s %4s %4s\n" "LANG" "OLD" "NEW" "DELTA"
 echo "-------------------------"
 
-for ROW in `cat ${NEW} | sed 's: :,:g'`
+for ROW in `sed 's: :,:g' ${NEW}`
   do
 
-  UNKN=`echo  ${ROW} | awk -F, '{print $1}'`
-  LANG=`echo  ${ROW} | awk -F, '{print $2}'`
-  
+  LANG=`echo  ${ROW} | awk -F, '{print $1}'`
+  UNKN=`echo  ${ROW} | awk -F, '{print $2}'`
+
   OLD_UNKN=`grep -w ${LANG} ${OLD}`
 
   if [ $? = 0 ]; then
-      OLD_UNKN=`echo ${OLD_UNKN} | awk '{print $1}'`
-      DELTA=`expr ${UNKN} - ${OLD_UNKN}`
+      OLD_UNKN=`echo ${OLD_UNKN} | awk '{print $2}'`
+      DELTA=$((${UNKN}-${OLD_UNKN}))
       NEW_ENTRY=0
   else
       OLD_UNKN="N/A" # new language not present in <old stats>

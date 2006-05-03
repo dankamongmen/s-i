@@ -97,9 +97,9 @@ i=0
 TOTAL=0
 AVERAGE=0
 
-for ROW in $(sort -n ${STATS}.txt | sed 's: :,:g'); do
-    VAL=$(echo ${ROW} | awk -F, '{print $1}')
-    LANG=$(echo ${ROW} | awk -F, '{print $2}')
+for ROW in $(sort -k 4 -n ${STATS}.txt | sed 's: :,:g'); do
+    LANG=$(echo ${ROW} | awk -F, '{print $1}')
+    VAL=$(echo ${ROW} | awk -F, '{print $2}')
 
     if [ ${VAL} -ne -1 ] ; then
 	XTICS=$(echo "${XTICS} \"${LANG}\" $i,")

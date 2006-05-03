@@ -45,7 +45,7 @@ i=0
 TOTAL=0
 AVERAGE=0
 UNIQUE_CODEPOINTS=0
-for VAL in `sort -n ${STATS} | awk '{print $1}'`; do
+for VAL in `sort -n ${STATS} | awk '{print $2}'`; do
     if [ ${VAL} -ne -1 ] ; then
 	TOTAL=$((${TOTAL} + ${VAL}))
 	i=$((i+1))
@@ -56,6 +56,20 @@ done
 if [ $i -ne 0 ] ; then
     AVERAGE=$((${TOTAL} / $i))
 fi
+
+TOTAL_VARS=0
+for VAL in `awk '{print $3}' ${STATS}`; do
+    if [ ${VAL} -gt 0 ] ; then
+	TOTAL_VARS=$((${TOTAL_VARS} + ${VAL}))
+    fi
+done
+
+TOTAL_SPECIFIC=0
+for VAL in `awk '{print $5}' ${STATS}`; do
+    if [ ${VAL} -gt 0 ] ; then
+	TOTAL_SPECIFIC=$((${TOTAL_SPECIFIC} + ${VAL}))
+    fi
+done
 
 LOGFILE=${TABLE_HTML}
 exec 6>&1           # Link file descriptor #6 with stdout.
@@ -84,26 +98,25 @@ echo " </tr>"
 # fill the table:
 # Lang, Unkn words, Msg, List of unknown words, Susp vars, Custom wl, codepoints, All Files
 for ROW in `sed  "s: :,:g" ${STATS}`; do
-    LANG=`echo ${ROW} | awk -F, '{print $2}'`
-    UNKN=`echo ${ROW} | awk -F, '{print $1}'`
+    LANG=`echo ${ROW} | awk -F, '{print $1}'`
+    UNKN=`echo ${ROW} | awk -F, '{print $2}'`
     CODEPOINTS=`echo ${ROW} | awk -F, '{print $4}'`
+    SPECIFIC_VARS=`echo ${ROW} | awk -F, '{print $5}'`
 
     ISO_CODE=`grep -w "^${LANG}" ${CFG_DIR}/iso_codes.txt | awk -F, '{print $2}'`
 
 if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
     SUSP=`echo ${ROW} | awk -F, '{print $3}'`
 
-    if [ ${SUSP} = "1" ] ; then
-	NVARS=$(msgfmt -o /dev/null --statistics ${DIFF_DIR}/nozip/${LANG}_var.txt 2>&1 | sed -e "s|^\([0-9]*\) .*|\1|")
-	SUSPECT_VARS_URL="<a href=\"latest/nozip/${LANG}_var.txt\">${NVARS}</a>"
+    if [ ${SUSP} -gt 0 ] ; then
+	SUSPECT_VARS_URL="<a href=\"latest/nozip/${LANG}_var.txt\">${SUSP}</a>"
     else
 	SUSPECT_VARS_URL="-"
     fi
 fi
 
-if [ $(echo ${ROW} | awk -F, '{print $5}') = "1" ] ; then
-	NVARS=$(msgfmt -o /dev/null --statistics ${DIFF_DIR}/nozip/${LANG}_lspec.txt 2>&1 | sed -e "s|^\([0-9]*\) .*|\1|")
-	SPECIFIC_CHECK_URL="<a href=\"latest/nozip/${LANG}_lspec.txt\">${NVARS}</a>"
+if [ ${SPECIFIC_VARS} -gt 0 ] ; then
+    SPECIFIC_CHECK_URL="<a href=\"latest/nozip/${LANG}_lspec.txt\">${SPECIFIC_VARS}</a>"
     else
 	SPECIFIC_CHECK_URL="-"
 fi    
@@ -179,6 +192,11 @@ done
 echo "  <tr>"
 echo "   <td class=\"col1\">TOTAL</td>"
 echo "   <td>${TOTAL}</td>"
+echo "   <td>-</td>"
+if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
+    echo "   <td>${TOTAL_VARS}</td>"
+fi
+echo "   <td>${TOTAL_SPECIFIC}</td>"
 echo "   <td></td>"
 echo "   <td></td>"
 echo "   <td></td>"
@@ -188,6 +206,11 @@ echo "  </tr>"
 echo "  <tr>"
 echo "   <td class=\"col1\">AVERAGE</td>"
 echo "   <td>${AVERAGE}</td>"
+echo "   <td></td>"
+if [ ${HANDLE_SUSPECT_VARS} = "yes" ] ; then
+    echo "   <td></td>"
+fi
+echo "   <td></td>"
 echo "   <td></td>"
 echo "   <td></td>"
 echo "   <td></td>"
