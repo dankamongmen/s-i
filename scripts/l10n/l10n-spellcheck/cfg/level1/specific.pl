@@ -9,11 +9,72 @@ sub checkSpecials (@)
     my $msgstr = shift;
     my $count_id = 0;
     my $count_st = 0;
+    my $open_ch;
+    my $close_ch;
+    my $unmatched=0;
+
+#FIXME: uk uses „quoteme“ whereas zh_CN uses “quoteme” 
+    my %pairs=('(', ')', 
+	       '[', ']',
+	       '«', '»');
+
+#FIXME: for some langs makes sense to check also '\'', '`'
+    my @singles=("\\\"");
+
 
     if (defined $msgstr)
     {
-	return 0 if $msgid =~ /^Choose language$/ && $msgstr !~ /\/[ ]*Choose language$/;
-	return 0 if $msgid =~ /^US\[/ && $msgstr !~ /^[A-Z][A-Z]$/;
+	foreach(@singles)
+	{
+	    if ($msgstr =~ m/$_/g)
+	    {
+		my $numquote=1;
+		while ($msgstr =~ /$_/g) { $numquote++ };
+		if ($numquote % 2)
+		{
+		    print "# >>> Unbalanced quote(s): $_ <<<\n";		
+		    $unmatched=1;
+		}		
+	    }
+	}
+
+	# Check for unmatched pairs: () [] etc.
+	my $bad_pair=0; 
+	while (($open_ch, $close_ch) = each(%pairs) )
+	{
+	    if ($msgstr =~ /\Q$open_ch\E/)
+	    {
+		my $count_open=0;
+		my $count_close=0;		   
+		
+		while ($msgstr =~ /\Q$open_ch\E/g) { $count_open++ }
+		while ($msgstr =~ /\Q$close_ch\E/g) { $count_close++ }		    
+		if ($count_open != $count_close)
+		{
+		    print "# >>> Unmatched pair(s): $open_ch $close_ch <<<\n";
+		    $bad_pair=1;
+		}		    
+	    }
+	    elsif ($msgstr =~ /\Q$close_ch\E/)
+	    {
+		print "# >>> Unmatched pair(s): $open_ch $close_ch <<<\n";
+		$bad_pair=1;
+	    }
+	}
+
+	$unmatched=1 if $bad_pair;
+
+	if ($msgid =~ /^Choose language$/ && $msgstr !~ /\/[ ]*Choose language$/)
+	{
+	    print "# >>> Missing \"/Choose language\" in the msgstr <<<\n";		
+	    $unmatched=1;	    
+	}
+
+	if ($msgid =~ /^US\[/ && $msgstr !~ /^[A-Z][A-Z]$/)
+	{
+	    print "# >>> Wrong country code <<<\n";		
+	    $unmatched=1;
+	}
 
 	if ($_ =~ /#.\s+Type:\s+select/ && $_ =~ /#.\s+Choices/ )
 	    {
@@ -21,18 +82,27 @@ sub checkSpecials (@)
 		if ($count_id > 0)
 		{
 		    while ($msgstr =~ /,/g) { $count_st++ };
-		    return 0 if ($count_id != $count_st);
+		    if ($count_id != $count_st)
+		    {
+			print "# >>> Wrong number of choices in the list <<<\n";		
+			$unmatched=1;			
+		    }
 		}
-	    }        
+	    }
 
 	if ($_ =~ m/#. Translators, this is a menu choice. MUST BE UNDER 65 COLUMNS/)
 	    {
 		utf8::decode($msgstr);
 		my $lung = length $msgstr;
-		return 0 if ($lung > 65);
+		if ($lung > 65)
+		{
+		    print "# >>> Line is too long: keep it under 65 characters <<<\n";		
+		    $unmatched=1;			
+		}
 	    }
-
     }
+
+    return 0 if $unmatched;
     return 1;
 }
 
