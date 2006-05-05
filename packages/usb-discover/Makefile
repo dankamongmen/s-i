@@ -1,4 +1,8 @@
+ifneq (,$(wildcard /usr/share/discover/pci.lst))
 DISCDB=/usr/share/discover/pci.lst
+else
+DISCDB=/lib/discover/pci.lst
+endif
 
 install:
 	(cat ohci-pci.lst ; \
