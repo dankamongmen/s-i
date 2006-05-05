@@ -107,12 +107,6 @@ case $1 in
     label)
 	if [ -f $part/label ]; then
 	    label=$(cat $part/label)
-	elif [ -f $part/mountpoint ]; then
-	    if [ "$filesystem" = ext2 ]; then
-		label=$(cat $part/mountpoint)
-	    else
-		label=$(sed s,.*/,, $part/mountpoint | tr a-z A-Z)
-	    fi
 	else
 	    label=''
 	fi
