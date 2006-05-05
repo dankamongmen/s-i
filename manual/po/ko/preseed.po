@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: preseed.xml\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-04-28 19:33+0000\n"
-"PO-Revision-Date: 2006-04-29 10:18+0900\n"
-"Last-Translator: Sunjae Park <darehanl@gmail.com>\n"
+"PO-Revision-Date: 2006-05-05 18:52+0900\n"
+"Last-Translator: Seok-moon Jang <drssay97@gmail.com>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: application/x-xml2pot; charset=UTF-8\n"
@@ -468,12 +468,12 @@ msgid ""
 "dhcpd.conf for version 3 of the ISC DHCP server (the dhcp3-server Debian "
 "package)."
 msgstr ""
-"DHCP를 이용하여 설정사항을 미리 기록한 파일을 네트워크에서 내려받을 수 "
-"있도록 할 수도 있습니다. DHCP는 파일명을 인자로 받을 수 있습니다. 이 파일은 "
-"대부분 netboot를 하기 위한 파일이지만, URL인 경우이라면 network preseeding을"
-"지원하는 설치 방식은 그 URL에서 파일을 내려받은 다음 설정파일로 사용합니다. "
-"데비안의 dhcp3-server 꾸러미에 해당하는 ISC DHCP 버전 3 서버에서 이 방식을 "
-"사용하기 위한 dhcpd.conf 파일의 예는 아래와 같습니다."
+"DHCP를 이용하여 설정사항을 미리 기록한 파일을 네트워크에서 내려받을 수 있도"
+"록 할 수도 있습니다. DHCP는 파일명을 인자로 받을 수 있습니다. 이 파일은 대부"
+"분 netboot를 하기 위한 파일이지만, URL인 경우이라면 network preseeding을지원"
+"하는 설치 방식은 그 URL에서 파일을 내려받은 다음 설정파일로 사용합니다. 데비"
+"안의 dhcp3-server 꾸러미에 해당하는 ISC DHCP 버전 3 서버에서 이 방식을 사용하"
+"기 위한 dhcpd.conf 파일의 예는 아래와 같습니다."
 
 #. Tag: screen
 #: preseed.xml:324
@@ -496,10 +496,10 @@ msgid ""
 "but only the installer. You can also put the text in a stanza for only one "
 "particular host to avoid preseeding all installs on your network."
 msgstr ""
-"참고로 위의 예에서 자신을 \"d-i\"로 식별하는 DHCP 클라이언트에만 이 파일을 "
-"한정하므로 일반 DHCP 클라이언트에는 아무런 영향을 주지 않습니다. 특정 호스트"
-"만 지원하도록 하여 네트워크 내의 시스템 전부 preseeding되는 것을 방지할 수도"
-" 있습니다. "
+"참고로 위의 예에서 자신을 \"d-i\"로 식별하는 DHCP 클라이언트에만 이 파일을 한"
+"정하므로 일반 DHCP 클라이언트에는 아무런 영향을 주지 않습니다. 특정 호스트만 "
+"지원하도록 하여 네트워크 내의 시스템 전부 preseeding되는 것을 방지할 수도 있"
+"습니다. "
 
 #. Tag: para
 #: preseed.xml:333
@@ -512,10 +512,10 @@ msgid ""
 "automate Debian installs should only be done with care."
 msgstr ""
 "사용할 데비안 미러 등 해당 네트워크에만 적용되는 값만 preseed(미리 설정)하게 "
-"하는 것도 DHCP preseeding을 이용하는 좋은 예입니다. 이렇게 하면 네트워크 내에 "
-"있는 시스템 적당한 미러를 자동으로 선택하면서도 설치의 다른 단계는 관리자가 "
-"직접 입력할 수 있게 됩니다. DHCP preseeding을 이용하여 데비안 설치를 완전 자"
-"동화하는 작업은 꼭 필요할 때 조심히 해야 합니다."
+"하는 것도 DHCP preseeding을 이용하는 좋은 예입니다. 이렇게 하면 네트워크 내"
+"에 있는 시스템 적당한 미러를 자동으로 선택하면서도 설치의 다른 단계는 관리자"
+"가 직접 입력할 수 있게 됩니다. DHCP preseeding을 이용하여 데비안 설치를 완전 "
+"자동화하는 작업은 꼭 필요할 때 조심히 해야 합니다."
 
 #. Tag: title
 #: preseed.xml:345
@@ -891,7 +891,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:568
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# netcfg will choose an interface that has link if possible. This makes it\n"
 "# skip displaying a list if there is more than one interface.\n"
@@ -936,9 +936,22 @@ msgstr ""
 "# 여러 개 있는 경우 목록을 건너 뜁니다.\n"
 "d-i netcfg/choose_interface select auto\n"
 "\n"
+"# 특정 인터페이스를 선택할 경우:\n"
+"#d-i netcfg/choose_interface select eth1\n"
+"\n"
 "# DHCP 서버가 느려서 응답을 기다리다가 시간이 초과되는 경우\n"
 "# 다음 설정을 쓰면 됩니다.\n"
 "#d-i netcfg/dhcp_timeout string 60\n"
+"\n"
+"# If you prefer to configure the network manually, uncomment this line and\n"
+"# the static network configuration below.\n"
+"#d-i netcfg/disable_dhcp boolean true\n"
+"\n"
+"# If you want the preconfiguration file to work on systems both with and\n"
+"# without a dhcp server, uncomment these lines and the static network\n"
+"# configuration below.\n"
+"#d-i netcfg/dhcp_failed note\n"
+"#d-i netcfg/dhcp_options select Configure network manually\n"
 "\n"
 "# 수동으로 네트워크를 설정하려면, 다음과 같이 합니다:\n"
 "#d-i netcfg/disable_dhcp boolean true\n"
@@ -1068,7 +1081,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:624
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this template must be preseeded with a localized (translated) "
@@ -1125,6 +1138,7 @@ msgid ""
 "d-i partman/confirm boolean true"
 msgstr ""
 "# 시스템에 빈 공간이 있으면 거기에 한 개의 파티션을 만들 수 있습니다.\n"
+"# Note: 이 템플릿은 지역화된(번역된) 값으로 미리 설정되어야 합니다.\n"
 "#d-i partman-auto/init_automatically_partition \\\n"
 "#      select Use the largest continuous free space\n"
 "\n"
@@ -1205,7 +1219,7 @@ msgstr "APT 설정"
 
 #. Tag: para
 #: preseed.xml:637
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
 "configuration options is fully automated based on your installation method "
@@ -1213,8 +1227,8 @@ msgid ""
 "repositories."
 msgstr ""
 "<filename>/etc/apt/sources.list</filename>의 설정과 기본 설정 옵션은 설치 방"
-"법과 그 이전의 질문에 대한 대답에 따라 완전히 자동화됩니다. 아래의 두 개의 변"
-"수만 미리 설정과 관계 있습니다."
+"법과 그 이전의 질문에 대한 대답에 따라 완전히 자동화됩니다. 추가적으로 다른 "
+"레파지토리를 지정할 수 있습니다."
 
 #. Tag: screen
 #: preseed.xml:645
@@ -1255,7 +1269,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:658
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
 "access to the preconfiguration file will have the knowledge of these "
@@ -1270,7 +1284,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:668
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
 "# use sudo).\n"
@@ -1293,27 +1307,30 @@ msgid ""
 "# or encrypted using an MD5 hash.\n"
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 msgstr ""
-"# 루트 열쇠글, 열쇠글 원문 텍스트를 직접 쓸 수도 있고\n"
-"#passwd passwd/root-password password r00tme\n"
-"#passwd passwd/root-password-again password r00tme\n"
-"# 아니면 MD5 해시로 암호화된 열쇠글을 쓸 수도 있습니다.\n"
-"#passwd passwd/root-password-crypted password [MD5 hash]\n"
+"# 루트 계정을 생성하지 않고 넘어갑니다.  (일반 유저는 sudo를 사용할 \n"
+"# 수 있습니다.).\n"
+"#d-i passwd/root-login boolean false\n"
+"# 아니면 일반 사용자를 생성하지 않고 넘어갈 수 있습니다.\n"
+"#d-i passwd/make-user boolean false\n"
 "\n"
-"# 일반 사용자 계정 만들기를 건너 뜁니다\n"
-"#passwd passwd/make-user boolean false\n"
+"# 루트 열쇠글, 열쇠글 원문 텍스트를 직접 쓸 수도 있고\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# 아니면 MD5 해시로 암호화된 열쇠글을 쓸 수도 있습니다.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
 "\n"
 "# 아니면 일반 사용자 계정을 하나 만듭니다.\n"
-"#passwd passwd/user-fullname string Debian User\n"
-"#passwd passwd/username string debian\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
 "# 일반 사용자 열쇠글, 열쇠글 원문 텍스트를 직접 쓸 수도 있고\n"
-"#passwd passwd/user-password password insecure\n"
-"#passwd passwd/user-password-again password insecure\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
 "# 아니면 MD5 해시로 암호화된 열쇠글을 쓸 수도 있습니다.\n"
-"#passwd passwd/user-password-crypted password [MD5 hash]"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
 #: preseed.xml:670
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
 "<classname>passwd/user-password-crypted</classname> variables can also be "
@@ -1325,10 +1342,10 @@ msgid ""
 msgstr ""
 "<classname>passwd/root-password-crypted</classname> 및 <classname>passwd/"
 "user-password-crypted</classname> 변수도 그 값으로 <quote>!</quote>을 써서 미"
-"리 설정할 수 있습니다. 루트 계정의 경우 이렇게 하는 게 편리할 수도 있습니다. "
-"물론 이 경우 또 다른 방법으로 시스템 관리를할 수 있거나 루트 로그인을 할 수 "
-"있는 다른 방법이 있어야 합니다. (예를 들어 SSH 키 인증을 쓰거나 sudo를 사용하"
-"는 방법)"
+"리 설정할 수 있습니다. 이 경우 연관된 게정은 사용할 수 없습니다. 루트 계정의 "
+"경우 이렇게 하는 게 편리할 수도 있습니다. 물론 이 경우 또 다른 방법으로 시스"
+"템 관리를 할 수 있거나 루트 로그인을 할 수 있는 다른 방법이 있어야 합니다. "
+"(예를 들어 SSH 키 인증을 쓰거나 sudo를 사용하는 방법)"
 
 #. Tag: para
 #: preseed.xml:680
@@ -1608,7 +1625,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:796
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# X can detect the right driver for some cards, but if you're preseeding,\n"
 "# you override whatever it chooses. Still, vesa will work most places.\n"
@@ -1632,30 +1649,26 @@ msgid ""
 "xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
 "       select 1024x768 @ 60 Hz"
 msgstr ""
-"# 데비안의 X 설정을 미리 설정하는 것도 가능하지만, 해당 컴퓨터의 비디오\n"
-"# 하드웨어에 대해 자세히 알아야 합니다. 데비안의 X 설정은 모든 설정을\n"
-"# 자동으로 하지 못하기 때문입니다.\n"
-"\n"
 "# X는 일부 카드에 대해서 올바른 드라이버를 자동 검색할 수 있지만, 미리 \n"
 "# 설정의 경우에는 자동 검색한 것보다 우선합니다. 아직도 vesa는 대부분의\n"
 "# 경우에 동작합니다.\n"
-"#xserver-xfree86 xserver-xfree86/config/device/driver select vesa\n"
+"#xserver-xorg xserver-xorg/config/device/driver select vesa\n"
 "\n"
 "# 마우스 자동 검색은 좀 위험한 부분이 있습니다. 실패하면 X가 계속해서\n"
 "# 다시 시도합니다. 그러므로 미리 설정을 하면 마우스를 검색하지 못했을\n"
 "# 때 무한루프테 빠질 가능성이 있습니다.\n"
-"#xserver-xfree86 xserver-xfree86/autodetect_mouse boolean true\n"
+"#xserver-xorg xserver-xorg/autodetect_mouse boolean true\n"
 "\n"
 "# 모니터 자동 검색을 하는 게 좋습니다.\n"
-"xserver-xfree86 xserver-xfree86/autodetect_monitor boolean true\n"
+"xserver-xorg xserver-xorg/autodetect_monitor boolean true\n"
 "# LCD 디스플레이라면 다음 줄의 주석을 없애십시오.\n"
-"#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true\n"
+"#xserver-xorg xserver-xfree86/config/monitor/lcd boolean true\n"
 "# X의 모니터 설정은 세 가지 방법이 있습니다. 다음은 \"medium\"으로 미리\n"
 "# 설정하는 방법이고 언제나 사용할 수 있습니다. \"simple\"은 사용할 수\n"
 "# 없을 수도 있고, \"advanced\"는 너무 많이 물어봅니다.\n"
-"xserver-xfree86 xserver-xfree86/config/monitor/selection-method \\\n"
+"xserver-xorg xserver-xorg/config/monitor/selection-method \\\n"
 "       select medium\n"
-"xserver-xfree86 xserver-xfree86/config/monitor/mode-list \\\n"
+"xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
 "       select 1024x768 @ 60 Hz"
 
 #. Tag: title
@@ -1697,7 +1710,7 @@ msgstr "쉘 옵션"
 
 #. Tag: screen
 #: preseed.xml:814
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
 "# for attempts at buffer overflows or other exploits of the values of a\n"
@@ -1727,24 +1740,17 @@ msgstr ""
 "# 실행합니다. \n"
 "#d-i preseed/early_command string anna-install some-udeb\n"
 "\n"
-"# 다음 명령어는 설치가 끝나기 직전에, 하지만 /target 디렉토리가 아직\n"
-"# 마운트되어 있을 때 실행합니다.\n"
-"#d-i preseed/late_command string echo foo > /target/etc/bar\n"
-"\n"
-"# 다음 명령어는 base-config가 시작할 때 실행합니다.\n"
-"#base-config base-config/early_command string echo hi mom\n"
-"\n"
-"# 다음 명령어는 base-config가 끝난 다음에 login: 프롬프트 직전에\n"
-"# 실행합니다. 다음 명령어는 필요한 꾸러미를 설치하거나 시스템의 설정을\n"
-"# 조작할 때 유용합니다.\n"
-"#base-config base-config/late_command \\\n"
-"#      string apt-get install zsh; chsh -s /bin/zsh"
+"# 이 명령은 설치를 끝내기 직전에 실행됩니다. 그러나 /target디렉토리는 \n"
+"# 아직 사용할 수 있을때 입니다. /target디렉토리로 chroot해서 직접 사용할\n"
+"# 수 있고 패키지를 쉽게 설치하기 위해서 apt-install과 in-target명령을 사용\n"
+"#할 수 있습니다.#d-i preseed/late_command string apt-install zsh; in-target "
+"chsh -s /bin/zsh"
 
 #. Tag: title
 #: preseed.xml:819
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Chainloading preconfiguration files"
-msgstr "다른 미리 설정 파일 이용하기"
+msgstr "미리설정 파일을 분리해서 사용하기"
 
 #. Tag: para
 #: preseed.xml:820
