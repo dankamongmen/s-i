@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36614 -->
+<!-- original version: 36730 -->
 
  <sect1 id="kernel-baking"><title>Einen neuen Kernel kompilieren</title>
 <para>
@@ -149,43 +149,39 @@ Säubern Sie den Kernelquellen-Baum und setzen Sie die
 </para><para>
 
 Kompilieren Sie jetzt den Kernel mit:
-<userinput>fakeroot make-kpkg --revision=custom.1.0 kernel_image</userinput>.
+<userinput>fakeroot make-kpkg --initrd --revision=custom.1.0 kernel_image</userinput>.
 Die Versionsnummer <quote>1.0</quote> können Sie nach Belieben ändern. Sie wird nur
 von Ihnen selbst verwendet, um Ihre verschiedenen Kernel zu verwalten.
 Ebenso können Sie jedes andere Wort statt <quote>custom</quote> verwenden (z.B. den
 Host-Namen des Rechners). Die Kernelkompilierung könnte eine ganze Weile dauern,
 abhängig von der Leistungsfähigkeit Ihres Rechners.
 
-</para><para condition="supports-pcmcia">
-
-Wenn Sie PCMCIA-Support benötigen, müssen Sie ebenfalls das
-<classname>pcmcia-source</classname>-Paket installieren. Entpacken Sie die
-gzip-tar-Datei als root in das Verzeichnis <filename>/usr/src</filename>
-(es ist wichtig, dass die Module dort gefunden werden, wo sie gesucht werden,
-nämlich in <filename>/usr/src/modules</filename>). Führen Sie dann als root
-<userinput>make-kpkg modules_image</userinput> aus.
-
 </para><para>
 
 Sobald die Kompilierung beendet ist, können Sie Ihren eigenen Kernel wie
-ein Paket installieren. Tippen Sie als root <userinput>dpkg -i
-../kernel-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>
-ein. Der Teil <replaceable>subarchitecture</replaceable> im Dateinamen ist eine
+ein Paket installieren. Tippen Sie als root ein: 
+<phrase condition="classic-kpkg">
+<userinput>dpkg -i 
+../kernel-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
+<phrase condition="common-kpkg">
+<userinput>dpkg -i
+../linux-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
+Der Teil <replaceable>subarchitecture</replaceable> im Dateinamen ist eine
 optionale Bezeichnung für die Unterarchitektur, <phrase arch="i386"> wie
 z.B. <quote>i586</quote>, </phrase>
 abhängig davon, welche Kerneloptionen Sie gesetzt haben.
-<userinput>dpkg -i kernel-image...</userinput> installiert den Kernel
+<userinput>dpkg -i ...</userinput> installiert den Kernel
 zusammen mit ein paar anderen dazugehörigen Dateien. Zum Beispiel wird
 die <filename>System.map</filename> korrekt installiert
 (dies ist nützlich für die Fehlersuche bei Kernelproblemen) und
 <filename>/boot/config-&kernelversion;</filename> wird installiert,
-sie enthält Ihre aktuelle Konfiguration. Ihr neues
-<classname>kernel-image-&kernelversion;</classname>-Paket ist ebenfalls
-clever genug, automatisch eine Aktualisierung Ihres Bootloaders zu starten,
-die es Ihnen erlaubt, den neuen Kernel zu booten, ohne den Bootloader manuell
-neu konfigurieren zu müssen. Wenn Sie auch ein Modul-Paket erzeugt
-haben, weil Sie z.B. PCMCIA benötigen, müssen Sie auch dieses Paket noch
-installieren.
+sie enthält Ihre aktuelle Konfiguration. Ihr neues Kernelpaket ist
+ebenfalls clever genug, automatisch Ihren Bootloader zu aktualisieren,
+so dass der neue Kernel benutzt wird. Falls Sie auch ein Modul-Paket
+erstellt haben, <phrase condition="classic-kpkg">z.B. wenn Sie PCMCIA
+haben,</phrase> müssen Sie auch dieses Paket noch installieren.
 
 </para><para>
 
