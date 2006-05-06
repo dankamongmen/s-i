@@ -138,6 +138,7 @@ done
 [ -z "$REALROOTCMD" ] && REALROOTCMD=$ROOTCMD
 
 ARCH="$(dpkg-architecture -qDEB_BUILD_ARCH)"
+ARCH_OS="$(dpkg-architecture -qDEB_BUILD_ARCH_OS 2>/dev/null || dpkg-architecture -qDEB_HOST_GNU_SYSTEM)"
 
 # Build and install packages with debs first, others build-depend on it.
 
@@ -162,8 +163,10 @@ build packages/kernel/kernel-wedge
 install_deb packages/kernel kernel-wedge
 
 # Build all other udebs.
-do_kernel packages/kernel/linux-kernel-di-$ARCH \
-	packages/kernel/linux-kernel-di-$ARCH-2.6
+if [ "$ARCH_OS" = linux ]; then
+	do_kernel packages/kernel/linux-kernel-di-$ARCH \
+		packages/kernel/linux-kernel-di-$ARCH-2.6
+fi
 
 do_subdir packages/partman/partman-base \
 	packages/partman/partman-auto \
