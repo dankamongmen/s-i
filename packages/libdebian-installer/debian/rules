@@ -10,7 +10,10 @@ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
 ifeq ($(DEB_HOST_ARCH_OS),)
-	DEB_HOST_ARCH_OS := $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+  DEB_HOST_ARCH_OS := $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+  ifeq ($(DEB_HOST_ARCH_OS),gnu)
+    DEB_HOST_ARCH_OS := hurd
+  endif
 endif
 
 #CFLAGS = -Wall -W -Werror -ggdb -Wstrict-prototypes -Wmissing-declarations -Wmissing-prototypes
@@ -46,7 +49,7 @@ build-stamp:  build/config.status
 	dh_testdir
 
 	$(MAKE) -C build
-ifneq ($(DEB_HOST_ARCH_OS),gnu)
+ifneq ($(DEB_HOST_ARCH_OS),hurd)
 	$(MAKE) -C build/doc doc
 endif
 
