@@ -13,39 +13,41 @@
 #include <cdebconf/debconfclient.h>
 #include <debian-installer.h>
 
-const char *const file_chandev = "/proc/chandev";
-//const char *const file_chandev = "chandev";
+#include <libsysfs.h>
+
+#define TEMPLATE_PREFIX	"s390-netdevice/"
 
 static struct debconfclient *client;
 
-static struct channel
+enum netdevice_channel_type
 {
-	unsigned int device;
-	unsigned int chantype;
-	unsigned int cutype;
-	unsigned int cumodel;
-	unsigned int device_first;
-}
-*channels;
+	NETDEVICE_CHANNEL_TYPE_CU3088_ALL,
+	NETDEVICE_CHANNEL_TYPE_QETH,
+};
 
-static struct device
+struct netdevice_channel
 {
-	unsigned int device_read;
-	unsigned int device_write;
-	unsigned int device_data;
-	unsigned int chantype;
-}
-*devices;
+	int key;
+	char name[SYSFS_NAME_LEN];
+	char devtype[SYSFS_NAME_LEN];
+	bool online;
+	enum netdevice_channel_type type;
+};
 
-static enum { TYPE_QETH, TYPE_CTC, TYPE_LCS, TYPE_IUCV } type;
-static size_t channels_items, devices_items;
-static int items, items_ctc, items_escon, items_lcs, items_qeth;
-static int chantype_qeth;
-static int device_selected, device_ctc_protocol, device_qeth_lcs_port;
-static char *device_qeth_portname_iucv_peer;
-static char *type_text = "", *module = "", chandev_parm[256], chandev_module_parm[256];
+static di_tree *netdevice_channels;
 
-#define TEMPLATE_PREFIX	"s390-netdevice/"
+struct driver
+{
+	const char *name;
+	int type;
+};
+
+static const struct driver drivers[] =
+{
+	{ "cu3088", NETDEVICE_CHANNEL_TYPE_CU3088_ALL },
+	{ "qeth", NETDEVICE_CHANNEL_TYPE_QETH },
+};
+enum state_wanted { WANT_NONE = 0, WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
 
 static int my_debconf_input (const char *priority, const char *template, char **p)
 {
@@ -59,19 +61,84 @@ static int my_debconf_input (const char *priority, const char *template, char **
 	return ret;
 }
 
-static int channel_sort (const void *_s1, const void *_s2)
+static di_compare_func channel_compare;
+int channel_compare (const void *key1, const void *key2)
 {
-	struct channel *s1 = (struct channel *) _s1;
-	struct channel *s2 = (struct channel *) _s2;
-	if (s1->device < s2->device)
-		return -1;
-	else if (s1->device > s2->device)
-		return 1;
-	return 0;
+	const unsigned int *k1 = key1, *k2 = key2;
+	return *k1 - *k2;
 }
 
-static int get_networktype (void)
+static int channel_device (const char *i)
 {
+	unsigned int ret;
+	if (sscanf (i, "0.0.%04x", &ret) == 1)
+		return ret;
+	if (sscanf (i, "%04x", &ret) == 1)
+		return ret;
+	return -1;
+}
+
+static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, int type)
+{
+	struct dlist *devices;
+	struct sysfs_device *device;
+
+	devices = sysfs_get_driver_devices (driver);
+
+	dlist_for_each_data (devices, device, struct sysfs_device)
+	{
+		struct sysfs_attribute *attr_devtype, *attr_online;
+		struct netdevice_channel *current;
+
+		attr_devtype = sysfs_get_device_attr (device, "devtype");
+		attr_online = sysfs_get_device_attr (device, "online");
+		if (!attr_devtype || !attr_online)
+			return WANT_NONE;
+		current = di_new (struct netdevice_channel, 1);
+		if (!current)
+			return WANT_ERROR;
+		strncpy (current->name, device->name, sizeof (current->name));
+		current->key = channel_device(device->name);
+
+		sysfs_read_attribute (attr_devtype);
+		strncpy (current->devtype, attr_devtype->value, sizeof (current->devtype));
+		current->type = type;
+
+		sysfs_read_attribute (attr_online);
+		if (strtol (attr_online->value, NULL, 10) > 0)
+			current->online = true;
+
+		di_tree_insert (netdevice_channels, current, current);
+	}
+
+	return WANT_NONE;
+}
+
+static enum state_wanted detect_channels (void)
+{
+	struct sysfs_driver *driver;
+	enum state_wanted ret;
+	unsigned int i;
+
+	netdevice_channels = di_tree_new (channel_compare);
+
+	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
+	{
+		driver = sysfs_open_driver ("ccw", drivers[i].name);
+		if (driver)
+		{
+			ret = detect_channels_driver (driver, drivers[i].type);
+			sysfs_close_driver (driver);
+			if (ret)
+				return ret;
+		}
+	}
+	return WANT_NEXT;
+}
+
+static enum state_wanted get_networktype (void)
+{
+#if 0
 	char *ptr;
 	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "choose_networktype", &ptr);
 
@@ -106,10 +173,13 @@ static int get_networktype (void)
 		return -1;
 
 	return 0;
+#endif
+	return WANT_ERROR;
 }
 
-static int get_channel (void)
+static enum state_wanted get_channel (void)
 {
+#if 0
 	FILE *f;
 	unsigned int i, k;
 	int j, ret;
@@ -297,10 +367,13 @@ static int get_channel (void)
 	for (device_selected = 0; devices[device_selected].device_read != i; device_selected++);
 
 	return ret;
+#endif
+	return WANT_ERROR;
 }
 
-static int get_ctc_protocol (void)
+static enum state_wanted get_ctc_protocol (void)
 {
+#if 0
 	char *ptr;
 	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "ctc/protocol", &ptr);
 	if (ret)
@@ -313,10 +386,13 @@ static int get_ctc_protocol (void)
 		device_ctc_protocol = 3;
 
 	return 0;
+#endif
+	return WANT_ERROR;
 }
 
-static int get_qeth_lcs_port (void)
+static enum state_wanted get_qeth_lcs_port (void)
 {
+#if 0
 	char *ptr;
 	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "qeth_lcs/port", &ptr);
 	if (ret)
@@ -325,10 +401,13 @@ static int get_qeth_lcs_port (void)
 	sscanf (ptr, "%d", &device_qeth_lcs_port);
 
 	return 0;
+#endif
+	return WANT_ERROR;
 }
 
-static int get_qeth_portname_iucv_peer (void)
+static enum state_wanted get_qeth_portname_iucv_peer (void)
 {
+#if 0
 	const char *template = NULL;
 	char *ptr;
 	int ret, j, k;
@@ -364,10 +443,13 @@ static int get_qeth_portname_iucv_peer (void)
 	}
 
 	return 1;
+#endif
+	return WANT_ERROR;
 }
 
-static int confirm (void)
+static enum state_wanted confirm (void)
 {
+#if 0
 	const char *template;
 	char buf[10], *ptr;
 	int ret;
@@ -475,10 +557,13 @@ static int confirm (void)
 	}
 
 	return 0;
+#endif
+	return WANT_ERROR;
 }
 
-static int setup (void)
+static enum state_wanted setup (void)
 {
+#if 0
 	FILE *f;
 	char buf[256], buf1[64] = "";
 
@@ -519,11 +604,12 @@ static int setup (void)
 	di_exec_shell_log (buf);
 
 	return 0;
+#endif
+	return WANT_ERROR;
 }
 
 int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
 {
-	int ret;
 	di_system_init ("s390-netdevice");
 
 	client = debconfclient_new ();
@@ -539,15 +625,18 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 
 	while (1)
 	{
+		enum state_wanted state_want = WANT_ERROR;
+
 		switch(state)
 		{
 			case BACKUP:
 				return 10;
 			case GET_NETWORKTYPE:
-				ret = get_networktype ();
+				state_want = get_networktype ();
+#if 0
 				switch (ret)
 				{
-					case 0:
+					case WANT_NEXT:
 						switch (type)
 						{
 							case TYPE_IUCV:
@@ -558,15 +647,17 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 								break;
 						}
 						break;
-					case 30:
+					case WANT_BACKUP:
 						state = BACKUP;
 						break;
 					default:
-						return 1;
+						state = WANT_ERROR;
 				}
+#endif
 				break;
 			case GET_CHANNEL:
-				ret = get_channel ();
+				state_want = get_channel ();
+#if 0
 				switch (ret)
 				{
 					case 0:
@@ -589,9 +680,11 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 					default:
 						return 1;
 				}
+#endif
 				break;
 			case GET_CTC_PROTOCOL:
-				ret = get_ctc_protocol ();
+				state_want = get_ctc_protocol ();
+#if 0
 				switch (ret)
 				{
 					case 0:
@@ -603,9 +696,11 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 					default:
 						return 1;
 				}
+#endif
 				break;
 			case GET_QETH_LCS_PORT:
-				ret = get_qeth_lcs_port ();
+				state_want = get_qeth_lcs_port ();
+#if 0
 				switch (ret)
 				{
 					case 0:
@@ -625,9 +720,11 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 					default:
 						return 1;
 				}
+#endif
 				break;
 			case GET_QETH_PORTNAME_IUCV_PEER:
-				ret = get_qeth_portname_iucv_peer ();
+				state_want = get_qeth_portname_iucv_peer ();
+#if 0
 				switch (ret)
 				{
 					case 0:
@@ -649,9 +746,11 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 					default:
 						return 1;
 				}
+#endif
 				break;
 			case CONFIRM:
-				ret = confirm ();
+				state_want = confirm ();
+#if 0
 				switch (ret)
 				{
 					case 0:
@@ -677,6 +776,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						}
 						break;
 				}
+#endif
 				break;
 		}
 	}
