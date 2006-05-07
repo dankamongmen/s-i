@@ -729,15 +729,6 @@ static enum state_wanted setup (void)
 #endif
 
 
-static enum state_wanted error (void)
-{
-	char *ptr;
-
-	my_debconf_input ("high", TEMPLATE_PREFIX "error", &ptr);
-
-	return WANT_FINISH;
-}
-
 int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
 {
 	di_system_init ("s390-netdevice");
@@ -806,8 +797,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 				state_want = write_iucv ();
 				break;
 			case ERROR:
-				state_want = error ();
-				break;
+				return 1;
 			case FINISH:
 				return 0;
 		}
@@ -896,12 +886,13 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						state = ERROR;
 				}
 				break;
+			case WANT_FINISH:
+				state = FINISH;
+				break;
 			default:
 				state = ERROR;
 		}
 	}
-
-	return 0;
 }
 
 /* vim: noexpandtab sw=8
