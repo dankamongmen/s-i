@@ -533,7 +533,7 @@ static enum state_wanted get_ctc_protocol (void)
 	return WANT_NEXT;
 }
 
-static enum state_wanted get_qeth_lcs_port (void)
+static enum state_wanted get_qeth_port (void)
 {
 #if 0
 	char *ptr;
@@ -785,133 +785,22 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 			case GET_NETWORKTYPE:
 				state_want = get_networktype ();
 				break;
-#if 0
-			case GET_CHANNEL:
-				state_want = get_channel ();
-				switch (ret)
-				{
-					case 0:
-						switch (type)
-						{
-							case TYPE_QETH:
-							case TYPE_LCS:
-								state = GET_QETH_LCS_PORT;
-								break;
-							case TYPE_CTC:
-								state = GET_CTC_PROTOCOL;
-								break;
-							default:
-								return 1;
-						}
-						break;
-					case 30:
-						state = GET_NETWORKTYPE;
-						break;
-					default:
-						return 1;
-				}
-#endif
-				break;
 			case GET_CTC_DEVICE:
 			case GET_IUCV_DEVICE:
 				state_want = get_ctc_device_iucv_device (state);
 				break;
 			case GET_CTC_PROTOCOL:
 				state_want = get_ctc_protocol ();
-#if 0
-				switch (ret)
-				{
-					case 0:
-						state = CONFIRM;
-						break;
-					case 30:
-						state = GET_CHANNEL;
-						break;
-					default:
-						return 1;
-				}
-#endif
 				break;
 			case GET_QETH_PORT:
-#if 0
-				state_want = get_qeth_lcs_port ();
-				switch (ret)
-				{
-					case 0:
-						switch (type)
-						{
-							case TYPE_QETH:
-								state = GET_QETH_PORTNAME_IUCV_PEER;
-								break;
-							default:
-								state = CONFIRM;
-								break;
-						}
-						break;
-					case 30:
-						state = GET_CHANNEL;
-						break;
-					default:
-						return 1;
-				}
-#endif
+				state_want = get_qeth_port ();
 				break;
 			case GET_QETH_PORTNAME:
 			case GET_IUCV_PEER:
 				state_want = get_qeth_portname_iucv_peer (state);
-#if 0
-				switch (ret)
-				{
-					case 0:
-						state = CONFIRM;
-						break;
-					case 1:
-						switch (type)
-						{
-							case TYPE_QETH:
-								state = CONFIRM;
-								break;
-							default:
-								break;
-						}
-						break;
-					case 30:
-						state = GET_QETH_LCS_PORT;
-						break;
-					default:
-						return 1;
-				}
-#endif
 				break;
 			case CONFIRM:
 				state_want = confirm ();
-#if 0
-				switch (ret)
-				{
-					case 0:
-						return setup ();
-					case 1:
-						state = GET_CHANNEL;
-						break;
-					case 30:
-						switch (type)
-						{
-							case TYPE_QETH:
-							case TYPE_IUCV:
-								state = GET_QETH_PORTNAME_IUCV_PEER;
-								break;
-							case TYPE_CTC:
-								state = GET_CTC_PROTOCOL;
-								break;
-							case TYPE_LCS:
-								state = GET_QETH_LCS_PORT;
-								break;
-							default:
-								return 1;
-						}
-						break;
-				}
-#endif
 				break;
 			case ERROR:
 				state_want = error ();
