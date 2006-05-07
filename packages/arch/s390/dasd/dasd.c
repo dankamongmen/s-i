@@ -42,7 +42,8 @@ struct driver
 	int type;
 };
 
-static const struct driver drivers[] = {
+static const struct driver drivers[] =
+{
 	{ "dasd-eckd", DASD_TYPE_ECKD },
 	{ "dasd-fba", DASD_TYPE_FBA },
 };
@@ -365,10 +366,14 @@ int main ()
 
 	enum
 	{
-		BACKUP, DETECT_CHANNEL, GET_CHANNEL,
-		CONFIRM, ERROR, FINISH
+		BACKUP,
+		DETECT_CHANNELS,
+		GET_CHANNEL,
+		CONFIRM,
+		ERROR,
+		FINISH
 	}
-	state = DETECT_CHANNEL;
+	state = DETECT_CHANNELS;
 
 	while (1)
 	{
@@ -378,7 +383,7 @@ int main ()
 		{
 			case BACKUP:
 				return 10;
-			case DETECT_CHANNEL:
+			case DETECT_CHANNELS:
 				state_want = detect_channels ();
 				break;
 			case GET_CHANNEL:
@@ -401,7 +406,7 @@ int main ()
 			case WANT_NEXT:
 				switch (state)
 				{
-					case DETECT_CHANNEL:
+					case DETECT_CHANNELS:
 						state = GET_CHANNEL;
 						break;
 					case GET_CHANNEL:
