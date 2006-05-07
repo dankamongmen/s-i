@@ -38,7 +38,7 @@ struct channel
 
 static di_tree *channels;
 
-static struct dasd *dasd_current;
+static struct dasd *channel_current;
 
 struct driver
 {
@@ -212,8 +212,8 @@ static enum state_wanted get_channel_input (void)
 		dev = channel_device (ptr);
 		if (dev >= 0)
 		{
-			dasd_current = di_tree_lookup (channels, &dev);
-			if (dasd_current)
+			channel_current = di_tree_lookup (channels, &dev);
+			if (channel_current)
 				return WANT_NEXT;
 		}
 
@@ -250,8 +250,8 @@ static enum state_wanted get_channel_select (void)
 		return WANT_FINISH;
 
 	dev = channel_device (ptr);
-	dasd_current = di_tree_lookup (channels, &dev);
-	if (dasd_current)
+	channel_current = di_tree_lookup (channels, &dev);
+	if (channel_current)
 		return WANT_NEXT;
 	return WANT_ERROR;
 }
