@@ -20,13 +20,16 @@ const char *const file_devices = "/proc/dasd/devices";
 
 static struct debconfclient *client;
 
+enum dasd_state { DASD_STATE_OFFLINE, DASD_STATE_ONLINE, DASD_STATE_ONLINE_UNFORMATTED };
 enum dasd_type { DASD_TYPE_ECKD, DASD_TYPE_FBA };
 
 struct dasd
 {
+	int key;
 	char name[SYSFS_NAME_LEN];
 	char devtype[SYSFS_NAME_LEN];
 	enum dasd_type type;
+	enum dasd_state state;
 };
 
 static di_tree *dasds;
@@ -59,7 +62,8 @@ int dasd_device (const char *i)
 
 int dasd_compare (const void *key1, const void *key2)
 {
-	return dasd_device ((const char *) key1) - dasd_device ((const char *) key2);
+	const unsigned int *k1 = key1, *k2 = key2;
+	return *k1 - *k2;
 }
 
 #if 0
@@ -105,19 +109,27 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, en
 
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
-		struct sysfs_attribute *devtype_attr;
+		struct sysfs_attribute *attr_devtype, *attr_online;
 		struct dasd *current;
 
-		devtype_attr = sysfs_get_device_attr (device, "devtype");
-		if (!devtype_attr)
+		attr_devtype = sysfs_get_device_attr (device, "devtype");
+		attr_online = sysfs_get_device_attr (device, "online");
+		if (!attr_devtype || !attr_online)
 			return WANT_NONE;
 		current = di_new (struct dasd, 1);
 		if (!current)
 			return WANT_ERROR;
 		strncpy (current->name, device->name, sizeof (current->name));
-		sysfs_read_attribute (devtype_attr);
-		strncpy (current->devtype, devtype_attr->value, sizeof (current->devtype));
+		current->key = dasd_device(device->name);
+
+		sysfs_read_attribute (attr_devtype);
+		strncpy (current->devtype, attr_devtype->value, sizeof (current->devtype));
 		current->type = type;
+
+		sysfs_read_attribute (attr_online);
+		if (strtol (attr_online->value, NULL, 10) > 0)
+			current->state = DASD_STATE_ONLINE;
+
 		di_tree_insert (dasds, current, current);
 	}
 
@@ -155,7 +167,7 @@ static enum state_wanted detect_channels (void)
 
 static enum state_wanted get_channel_input (void)
 {
-	int ret;
+	int ret, dev;
 	char *ptr;
 
 	while (1)
@@ -164,9 +176,13 @@ static enum state_wanted get_channel_input (void)
 		if (ret == 10)
 			return WANT_BACKUP;
 
-		dasd_current = di_tree_lookup (dasds, ptr);
-		if (dasd_current)
-			return WANT_NEXT;
+		dev = dasd_device (ptr);
+		if (dev >= 0)
+		{
+			dasd_current = di_tree_lookup (dasds, &dev);
+			if (dasd_current)
+				return WANT_NEXT;
+		}
 
 		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_invalid", &ptr);
 		if (ret == 10)
@@ -175,17 +191,17 @@ static enum state_wanted get_channel_input (void)
 }
 
 static di_hfunc get_channel_select_append;
-static void get_channel_select_append (void *key, void *value __attribute__ ((unused)), void *user_data)
+static void get_channel_select_append (void *key __attribute__ ((unused)), void *value, void *user_data)
 {
-	const char *name = key;
+	struct dasd *dasd = value;
 	char *buf = user_data;
-	di_snprintfcat (buf, 512, "%s, ", name);
+	di_snprintfcat (buf, 512, "%s, ", dasd->name);
 }
 
 static enum state_wanted get_channel_select (void)
 {
 	char buf[512], *ptr;
-	int ret;
+	int ret, dev;
 
 	buf[0] = '\0';
 	di_tree_foreach (dasds, get_channel_select_append, buf);
@@ -198,7 +214,8 @@ static enum state_wanted get_channel_select (void)
 	if (!strcmp (ptr, "Finish"))
 		return WANT_FINISH;
 
-	dasd_current = di_tree_lookup (dasds, ptr);
+	dev = dasd_device (ptr);
+	dasd_current = di_tree_lookup (dasds, &dev);
 	if (dasd_current)
 		return WANT_NEXT;
 	return WANT_ERROR;
