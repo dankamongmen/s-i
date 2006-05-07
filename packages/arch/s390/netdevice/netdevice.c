@@ -117,7 +117,7 @@ static enum state_wanted detect_channels_driver (struct dlist *devices, int type
 		if (!sysfs_path_is_link (buf))
 			continue;
 
-		current = di_new (struct channel, 1);
+		current = di_new0 (struct channel, 1);
 		if (!current)
 			return WANT_ERROR;
 		current->type = type;
@@ -159,6 +159,7 @@ static enum state_wanted detect_channels (void)
 
 struct detect_devices_info
 {
+	struct device *current_device;
 };
 
 static di_hfunc detect_devices_each;
@@ -174,13 +175,40 @@ static void detect_devices_each (void *key __attribute__ ((unused)), void *value
 			{
 				case 0x8:
 					chan->type = CHANNEL_TYPE_CU3088_CTC;
-					//printf ("found ctc channel: %s\n", chan->name);
 					break;
 				default:
 					break;
 			};
 			break;
 		case CHANNEL_TYPE_QETH:
+			if (!info->current_device)
+				info->current_device = di_new0 (struct device, 1);
+
+			if (info->current_device->channels[1])
+			{
+				if (info->current_device->channels[1]->key + 1 == chan->key)
+				{
+					info->current_device->channels[2] = chan;
+					di_tree_insert (devices, info->current_device, info->current_device);
+					info->current_device = NULL;
+				}
+				else
+					info->current_device->type = 0;
+			}
+			else if (info->current_device->channels[0])
+			{
+				if (info->current_device->channels[0]->key + 1 == chan->key)
+					info->current_device->channels[1] = chan;
+				else
+					info->current_device->type = 0;
+			}
+
+			if (info->current_device && !info->current_device->type)
+			{
+				info->current_device->type = CHANNEL_TYPE_QETH;
+				info->current_device->key = chan->key;
+				info->current_device->channels[0] = chan;
+			}
 			break;
 		default:
 			break;
@@ -189,9 +217,7 @@ static void detect_devices_each (void *key __attribute__ ((unused)), void *value
 
 static enum state_wanted detect_devices (void)
 {
-	struct detect_devices_info info =
-	{
-	};
+	struct detect_devices_info info = { 0, };
 	di_tree_foreach (channels, detect_devices_each, &info);
 	return WANT_ERROR;
 }
