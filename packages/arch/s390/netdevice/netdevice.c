@@ -56,6 +56,7 @@ struct device
 		struct
 		{
 			struct channel *channels[3];
+			int port;
 			char portname[32];
 		} qeth;
 		struct
@@ -535,17 +536,17 @@ static enum state_wanted get_ctc_protocol (void)
 
 static enum state_wanted get_qeth_port (void)
 {
-#if 0
 	char *ptr;
-	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "qeth_lcs/port", &ptr);
+	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "qeth/port", &ptr);
+
+	if (ret == 30)
+		return WANT_BACKUP;
 	if (ret)
-		return ret;
+		return WANT_ERROR;
 
-	sscanf (ptr, "%d", &device_qeth_lcs_port);
+	sscanf (ptr, "%d", &device_current->qeth.port);
 
-	return 0;
-#endif
-	return WANT_ERROR;
+	return WANT_NEXT;
 }
 
 static enum state_wanted get_qeth_portname_iucv_peer (enum state state)
@@ -852,6 +853,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						state = GET_QETH_PORTNAME;
 						break;
 					case GET_QETH_PORTNAME:
+						state = CONFIRM;
 						break;
 					case GET_IUCV_DEVICE:
 						state = GET_IUCV_PEER;
