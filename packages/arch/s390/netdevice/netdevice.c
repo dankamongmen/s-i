@@ -284,6 +284,8 @@ static enum state_wanted get_networktype (void)
 	char *ptr;
 	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "choose_networktype", &ptr);
 
+	if (ret == 30)
+		return WANT_BACKUP;
 	if (ret)
 		return WANT_ERROR;
 
@@ -514,21 +516,21 @@ static enum state_wanted get_ctc_device_iucv_device (enum state state)
 
 static enum state_wanted get_ctc_protocol (void)
 {
-#if 0
 	char *ptr;
 	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "ctc/protocol", &ptr);
+
+	if (ret == 30)
+		return WANT_BACKUP;
 	if (ret)
-		return ret;
+		return WANT_ERROR;
 
-	device_ctc_protocol = 0;
+	device_current->ctc.protocol = 0;
 	if (!strcmp (ptr, "Linux (1)"))
-		device_ctc_protocol = 1;
+		device_current->ctc.protocol = 1;
 	else if (!strcmp (ptr, "OS/390 (3)"))
-		device_ctc_protocol = 3;
+		device_current->ctc.protocol = 3;
 
-	return 0;
-#endif
-	return WANT_ERROR;
+	return WANT_NEXT;
 }
 
 static enum state_wanted get_qeth_lcs_port (void)
@@ -942,14 +944,34 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 								state = GET_QETH_DEVICE;
 								break;
 							case TYPE_IUCV:
-								state = GET_QETH_DEVICE;
+								state = GET_IUCV_DEVICE;
 								break;
 							default:
 								state = ERROR;
 						}
 						break;
+					case GET_CTC_DEVICE:
+						state = GET_CTC_CHANNEL_READ;
+						break;
+					case GET_CTC_CHANNEL_READ:
+						state = GET_CTC_CHANNEL_WRITE;
+						break;
+					case GET_QETH_DEVICE:
+						state = GET_QETH_PORT;
+						break;
+					case GET_QETH_PORT:
+						state = GET_QETH_PORTNAME;
+						break;
+					case GET_QETH_PORTNAME:
+						break;
+					case GET_IUCV_DEVICE:
+						state = GET_IUCV_PEER;
+						break;
+					case GET_IUCV_PEER:
+						break;
 					default:
 						state = ERROR;
+						break;
 				}
 				break;
 			case WANT_BACKUP:
