@@ -14,7 +14,7 @@ my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
 $exp->expect($ENV{STAGE_1_MAX_TIME},
 	[ "-re", "step.*failed" => sub { exit 1 } ],
 	[ "English" => sub { sleep 2; $exp->send("\r"); exp_continue; } ],
-	[ "To continue the installation, please use an SSH client to log in" => sub { } ],
+	[ "To continue the installation, please use an SSH client" => sub { } ],
 	[ "-re", "<Go.*Back>" => sub { sleep 2; $exp->send("\r"); exp_continue; } ],
 ) || die "failed";
 
