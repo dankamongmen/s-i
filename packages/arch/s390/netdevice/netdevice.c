@@ -30,11 +30,17 @@ struct netdevice_channel
 	int key;
 	char name[SYSFS_NAME_LEN];
 	char devtype[SYSFS_NAME_LEN];
-	bool online;
 	enum netdevice_channel_type type;
 };
 
+struct netdevice
+{
+	int key;
+	int devices[3];
+};
+
 static di_tree *netdevice_channels;
+static di_tree *netdevices;
 
 struct driver
 {
@@ -78,6 +84,14 @@ static int channel_device (const char *i)
 	return -1;
 }
 
+static enum state_wanted setup ()
+{
+	netdevice_channels = di_tree_new (channel_compare);
+	netdevices = di_tree_new (channel_compare);
+
+	return WANT_NEXT;
+}
+
 static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, int type)
 {
 	struct dlist *devices;
@@ -89,26 +103,27 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
-		struct sysfs_attribute *attr_devtype, *attr_online;
+		struct sysfs_attribute *attr_devtype;
 		struct netdevice_channel *current;
+		char buf[SYSFS_PATH_MAX];
 
-		attr_devtype = sysfs_get_device_attr (device, "devtype");
-		attr_online = sysfs_get_device_attr (device, "online");
-		if (!attr_devtype || !attr_online)
-			return WANT_NONE;
+		/* Ignore already used channels. */
+		strncpy (buf, device->path, SYSFS_PATH_MAX);
+		strncat (buf, "/group_device", SYSFS_PATH_MAX);
+		if (!sysfs_path_is_link (buf))
+			continue;
+
 		current = di_new (struct netdevice_channel, 1);
 		if (!current)
 			return WANT_ERROR;
+		current->type = type;
+
 		strncpy (current->name, device->name, sizeof (current->name));
 		current->key = channel_device(device->name);
 
+		attr_devtype = sysfs_get_device_attr (device, "devtype");
 		sysfs_read_attribute (attr_devtype);
 		strncpy (current->devtype, attr_devtype->value, sizeof (current->devtype));
-		current->type = type;
-
-		sysfs_read_attribute (attr_online);
-		if (strtol (attr_online->value, NULL, 10) > 0)
-			current->online = true;
 
 		di_tree_insert (netdevice_channels, current, current);
 	}
@@ -121,8 +136,6 @@ static enum state_wanted detect_channels (void)
 	struct sysfs_driver *driver;
 	enum state_wanted ret;
 	unsigned int i;
-
-	netdevice_channels = di_tree_new (channel_compare);
 
 	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
 	{
@@ -140,6 +153,7 @@ static enum state_wanted detect_channels (void)
 
 static enum state_wanted detect_devices (void)
 {
+	//di_tree_foreach (netdevice_channels, detect_devices_each, buf);
 	return WANT_ERROR;
 }
 
@@ -568,9 +582,9 @@ static enum state_wanted confirm (void)
 	return WANT_ERROR;
 }
 
+#if 0
 static enum state_wanted setup (void)
 {
-#if 0
 	FILE *f;
 	char buf[256], buf1[64] = "";
 
@@ -611,9 +625,9 @@ static enum state_wanted setup (void)
 	di_exec_shell_log (buf);
 
 	return 0;
-#endif
 	return WANT_ERROR;
 }
+#endif
 
 
 static enum state_wanted error (void)
@@ -635,6 +649,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 	enum
 	{
 		BACKUP,
+		SETUP,
 		DETECT_CHANNELS,
 		DETECT_DEVICES,
 		GET_NETWORKTYPE,
@@ -646,7 +661,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 		ERROR,
 		FINISH
 	}
-	state = DETECT_CHANNELS;
+	state = SETUP;
 
 	while (1)
 	{
@@ -656,6 +671,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 		{
 			case BACKUP:
 				return 10;
+			case SETUP:
+				state_want = setup ();
+				break;
 			case DETECT_CHANNELS:
 				state_want = detect_channels ();
 				break;
@@ -824,6 +842,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 			case WANT_NEXT:
 				switch (state)
 				{
+					case SETUP:
+						state = DETECT_CHANNELS;
+						break;
 					case DETECT_CHANNELS:
 						state = DETECT_DEVICES;
 						break;
