@@ -21,18 +21,22 @@ const char *const file_devices = "/proc/dasd/devices";
 static struct debconfclient *client;
 
 //enum dasd_state { DASD_STATE_OFFLINE, DASD_STATE_ONLINE, DASD_STATE_ONLINE_UNFORMATTED };
-enum dasd_type { DASD_TYPE_ECKD, DASD_TYPE_FBA };
+enum channel_type
+{
+	CHANNEL_TYPE_DASD_ECKD,
+	CHANNEL_TYPE_DASD_FBA
+};
 
-struct dasd
+struct channel
 {
 	int key;
 	char name[SYSFS_NAME_LEN];
 	char devtype[SYSFS_NAME_LEN];
 	bool online;
-	enum dasd_type type;
+	enum channel_type type;
 };
 
-static di_tree *dasds;
+static di_tree *channels;
 
 static struct dasd *dasd_current;
 
@@ -44,11 +48,29 @@ struct driver
 
 static const struct driver drivers[] =
 {
-	{ "dasd-eckd", DASD_TYPE_ECKD },
-	{ "dasd-fba", DASD_TYPE_FBA },
+	{ "dasd-eckd", CHANNEL_TYPE_DASD_ECKD },
+	{ "dasd-fba", CHANNEL_TYPE_DASD_FBA },
 };
 
-enum state_wanted { WANT_NONE = 0, WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
+enum state
+{
+	BACKUP,
+	SETUP,
+	DETECT_CHANNELS,
+	GET_CHANNEL,
+	CONFIRM,
+	ERROR,
+	FINISH
+};
+
+enum state_wanted
+{
+	WANT_NONE = 0,
+	WANT_BACKUP,
+	WANT_NEXT,
+	WANT_FINISH,
+	WANT_ERROR
+};
 
 int my_debconf_input(char *priority, char *template, char **ptr)
 {
@@ -111,6 +133,13 @@ static bool update_state (void)
 }
 #endif
 
+static enum state_wanted setup ()
+{
+	channels = di_tree_new (channel_compare);
+
+	return WANT_NEXT;
+}
+
 static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, int type)
 {
 	struct dlist *devices;
@@ -123,13 +152,13 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
 		struct sysfs_attribute *attr_devtype, *attr_online;
-		struct dasd *current;
+		struct channel *current;
 
 		attr_devtype = sysfs_get_device_attr (device, "devtype");
 		attr_online = sysfs_get_device_attr (device, "online");
 		if (!attr_devtype || !attr_online)
 			return WANT_NONE;
-		current = di_new (struct dasd, 1);
+		current = di_new (struct channel, 1);
 		if (!current)
 			return WANT_ERROR;
 		strncpy (current->name, device->name, sizeof (current->name));
@@ -143,7 +172,7 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 		if (strtol (attr_online->value, NULL, 10) > 0)
 			current->online = true;
 
-		di_tree_insert (dasds, current, current);
+		di_tree_insert (channels, current, current);
 	}
 
 	return WANT_NONE;
@@ -154,8 +183,6 @@ static enum state_wanted detect_channels (void)
 	struct sysfs_driver *driver;
 	enum state_wanted ret;
 	unsigned int i;
-
-	dasds = di_tree_new (channel_compare);
 
 	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
 	{
@@ -185,7 +212,7 @@ static enum state_wanted get_channel_input (void)
 		dev = channel_device (ptr);
 		if (dev >= 0)
 		{
-			dasd_current = di_tree_lookup (dasds, &dev);
+			dasd_current = di_tree_lookup (channels, &dev);
 			if (dasd_current)
 				return WANT_NEXT;
 		}
@@ -199,9 +226,11 @@ static enum state_wanted get_channel_input (void)
 static di_hfunc get_channel_select_append;
 static void get_channel_select_append (void *key __attribute__ ((unused)), void *value, void *user_data)
 {
-	struct dasd *dasd = value;
+	struct channel *channel = value;
 	char *buf = user_data;
-	di_snprintfcat (buf, 512, "%s, ", dasd->name);
+	if (buf[0])
+		strncat (buf, ", ", 512);
+	strncat (buf, channel->name, 512);
 }
 
 static enum state_wanted get_channel_select (void)
@@ -210,7 +239,7 @@ static enum state_wanted get_channel_select (void)
 	int ret, dev;
 
 	buf[0] = '\0';
-	di_tree_foreach (dasds, get_channel_select_append, buf);
+	di_tree_foreach (channels, get_channel_select_append, buf);
 
 	debconf_subst (client, TEMPLATE_PREFIX "choose_select", "choices", buf);
 	ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_select", &ptr);
@@ -221,7 +250,7 @@ static enum state_wanted get_channel_select (void)
 		return WANT_FINISH;
 
 	dev = channel_device (ptr);
-	dasd_current = di_tree_lookup (dasds, &dev);
+	dasd_current = di_tree_lookup (channels, &dev);
 	if (dasd_current)
 		return WANT_NEXT;
 	return WANT_ERROR;
@@ -229,9 +258,9 @@ static enum state_wanted get_channel_select (void)
 
 static enum state_wanted get_channel (void)
 {
-	if (di_tree_size (dasds) > 20)
+	if (di_tree_size (channels) > 20)
 		return get_channel_input ();
-	else if (di_tree_size (dasds) > 0)
+	else if (di_tree_size (channels) > 0)
 		return get_channel_select ();
 	return WANT_ERROR;
 }
@@ -352,15 +381,6 @@ static enum state_wanted confirm (void)
 	return WANT_NEXT;
 }
 
-static enum state_wanted error (void)
-{
-	char *ptr;
-
-	my_debconf_input ("high", TEMPLATE_PREFIX "error", &ptr);
-
-	return WANT_FINISH;
-}
-
 int main ()
 {
 	di_system_init ("s390-dasd");
@@ -368,16 +388,7 @@ int main ()
 	client = debconfclient_new ();
 	debconf_capb (client, "backup");
 
-	enum
-	{
-		BACKUP,
-		DETECT_CHANNELS,
-		GET_CHANNEL,
-		CONFIRM,
-		ERROR,
-		FINISH
-	}
-	state = DETECT_CHANNELS;
+	enum state state = SETUP;
 
 	while (1)
 	{
@@ -387,6 +398,9 @@ int main ()
 		{
 			case BACKUP:
 				return 10;
+			case SETUP:
+				state_want = setup ();
+				break;
 			case DETECT_CHANNELS:
 				state_want = detect_channels ();
 				break;
@@ -397,19 +411,18 @@ int main ()
 				state_want = confirm ();
 				break;
 			case ERROR:
-				state_want = error ();
-				break;
+				return 1;
 			case FINISH:
 				return 0;
 		}
 		switch (state_want)
 		{
-			case WANT_NONE:
-				state = ERROR;
-				break;
 			case WANT_NEXT:
 				switch (state)
 				{
+					case SETUP:
+						state = DETECT_CHANNELS;
+						break;
 					case DETECT_CHANNELS:
 						state = GET_CHANNEL;
 						break;
@@ -421,7 +434,6 @@ int main ()
 						break;
 					default:
 						state = ERROR;
-						break;
 				}
 				break;
 			case WANT_BACKUP:
@@ -435,13 +447,12 @@ int main ()
 						break;
 					default:
 						state = ERROR;
-						break;
 				}
 				break;
 			case WANT_FINISH:
 				state = FINISH;
 				break;
-			case WANT_ERROR:
+			default:
 				state = ERROR;
 		}
 	}
