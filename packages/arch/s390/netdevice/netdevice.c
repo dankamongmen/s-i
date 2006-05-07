@@ -84,6 +84,8 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 	struct sysfs_device *device;
 
 	devices = sysfs_get_driver_devices (driver);
+	if (!devices)
+		return WANT_NONE;
 
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
@@ -134,6 +136,11 @@ static enum state_wanted detect_channels (void)
 		}
 	}
 	return WANT_NEXT;
+}
+
+static enum state_wanted detect_devices (void)
+{
+	return WANT_ERROR;
 }
 
 static enum state_wanted get_networktype (void)
@@ -608,6 +615,16 @@ static enum state_wanted setup (void)
 	return WANT_ERROR;
 }
 
+
+static enum state_wanted error (void)
+{
+	char *ptr;
+
+	my_debconf_input ("high", TEMPLATE_PREFIX "error", &ptr);
+
+	return WANT_FINISH;
+}
+
 int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
 {
 	di_system_init ("s390-netdevice");
@@ -617,11 +634,19 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 
 	enum
 	{
-		BACKUP, GET_NETWORKTYPE, GET_CHANNEL,
-		GET_CTC_PROTOCOL, GET_QETH_LCS_PORT, GET_QETH_PORTNAME_IUCV_PEER,
-		CONFIRM
+		BACKUP,
+		DETECT_CHANNELS,
+		DETECT_DEVICES,
+		GET_NETWORKTYPE,
+		GET_CHANNEL,
+		GET_CTC_PROTOCOL,
+		GET_QETH_LCS_PORT,
+		GET_QETH_PORTNAME_IUCV_PEER,
+		CONFIRM,
+		ERROR,
+		FINISH
 	}
-	state = GET_NETWORKTYPE;
+	state = DETECT_CHANNELS;
 
 	while (1)
 	{
@@ -631,6 +656,12 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 		{
 			case BACKUP:
 				return 10;
+			case DETECT_CHANNELS:
+				state_want = detect_channels ();
+				break;
+			case DETECT_DEVICES:
+				state_want = detect_devices ();
+				break;
 			case GET_NETWORKTYPE:
 				state_want = get_networktype ();
 #if 0
@@ -778,6 +809,30 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 				}
 #endif
 				break;
+			case ERROR:
+				state_want = error ();
+				break;
+			case FINISH:
+				return 0;
+		}
+
+		switch (state_want)
+		{
+			case WANT_NONE:
+				state = ERROR;
+				break;
+			case WANT_NEXT:
+				switch (state)
+				{
+					case DETECT_CHANNELS:
+						state = DETECT_DEVICES;
+						break;
+					default:
+						state = ERROR;
+				}
+				break;
+			default:
+				state = ERROR;
 		}
 	}
 
