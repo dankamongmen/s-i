@@ -736,27 +736,6 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 				break;
 			case GET_NETWORKTYPE:
 				state_want = get_networktype ();
-#if 0
-				switch (ret)
-				{
-					case WANT_NEXT:
-						switch (type)
-						{
-							case TYPE_IUCV:
-								state = GET_QETH_PORTNAME_IUCV_PEER;
-								break;
-							default:
-								state = GET_CHANNEL;
-								break;
-						}
-						break;
-					case WANT_BACKUP:
-						state = BACKUP;
-						break;
-					default:
-						state = WANT_ERROR;
-				}
-#endif
 				break;
 			case GET_CHANNEL:
 				state_want = get_channel ();
@@ -890,9 +869,6 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 
 		switch (state_want)
 		{
-			case WANT_NONE:
-				state = ERROR;
-				break;
 			case WANT_NEXT:
 				switch (state)
 				{
@@ -905,10 +881,30 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 					case DETECT_DEVICES:
 						state = GET_NETWORKTYPE;
 						break;
+					case GET_NETWORKTYPE:
+						switch (type)
+						{
+							case TYPE_IUCV:
+								state = GET_QETH_PORTNAME_IUCV_PEER;
+								break;
+							default:
+								state = GET_CHANNEL;
+								break;
+						}
+						break;
 					default:
 						state = ERROR;
 				}
 				break;
+			case WANT_BACKUP:
+				switch (state)
+				{
+					case GET_NETWORKTYPE:
+						state = BACKUP;
+						break;
+					default:
+						state = ERROR;
+				}
 			default:
 				state = ERROR;
 		}
