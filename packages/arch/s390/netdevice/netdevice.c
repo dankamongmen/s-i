@@ -107,7 +107,12 @@ enum state
 	GET_QETH_PORTNAME,
 	GET_IUCV_DEVICE,
 	GET_IUCV_PEER,
-	CONFIRM,
+	CONFIRM_CTC,
+	CONFIRM_QETH,
+	CONFIRM_IUCV,
+	WRITE_CTC,
+	WRITE_QETH,
+	WRITE_IUCV,
 	ERROR,
 	FINISH
 };
@@ -393,6 +398,11 @@ static enum state_wanted get_ctc_protocol (void)
 	return WANT_NEXT;
 }
 
+static enum state_wanted get_qeth_device (void)
+{
+	return WANT_ERROR;
+}
+
 static enum state_wanted get_qeth_port (void)
 {
 	char *ptr;
@@ -445,9 +455,39 @@ static enum state_wanted get_qeth_portname_iucv_peer (enum state state)
 	return WANT_NEXT;
 }
 
+static enum state_wanted confirm_ctc (void)
+{
+	return WANT_ERROR;
+}
+
+static enum state_wanted confirm_qeth (void)
+{
+	return WANT_ERROR;
+}
+
+static enum state_wanted confirm_iucv (void)
+{
+	return WANT_ERROR;
+}
+
+static enum state_wanted write_ctc (void)
+{
+	return WANT_ERROR;
+}
+
+static enum state_wanted write_qeth (void)
+{
+	return WANT_ERROR;
+}
+
+static enum state_wanted write_iucv (void)
+{
+	return WANT_ERROR;
+}
+
+#if 0
 static enum state_wanted confirm (void)
 {
-#if 0
 	const char *template;
 	char buf[10], *ptr;
 	int ret;
@@ -555,9 +595,9 @@ static enum state_wanted confirm (void)
 	}
 
 	return 0;
-#endif
 	return WANT_ERROR;
 }
+#endif
 
 #if 0
 static enum state_wanted setup (void)
@@ -655,6 +695,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 			case GET_CTC_PROTOCOL:
 				state_want = get_ctc_protocol ();
 				break;
+			case GET_QETH_DEVICE:
+				state_want = get_qeth_device ();
+				break;
 			case GET_QETH_PORT:
 				state_want = get_qeth_port ();
 				break;
@@ -662,8 +705,23 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 			case GET_IUCV_PEER:
 				state_want = get_qeth_portname_iucv_peer (state);
 				break;
-			case CONFIRM:
-				state_want = confirm ();
+			case CONFIRM_CTC:
+				state_want = confirm_ctc ();
+				break;
+			case CONFIRM_QETH:
+				state_want = confirm_qeth ();
+				break;
+			case CONFIRM_IUCV:
+				state_want = confirm_iucv ();
+				break;
+			case WRITE_CTC:
+				state_want = write_ctc ();
+				break;
+			case WRITE_QETH:
+				state_want = write_qeth ();
+				break;
+			case WRITE_IUCV:
+				state_want = write_iucv ();
 				break;
 			case ERROR:
 				state_want = error ();
@@ -709,7 +767,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						state = GET_CTC_PROTOCOL;
 						break;
 					case GET_CTC_PROTOCOL:
-						state = CONFIRM;
+						state = CONFIRM_CTC;
 						break;
 					case GET_QETH_DEVICE:
 						state = GET_QETH_PORT;
@@ -718,16 +776,32 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						state = GET_QETH_PORTNAME;
 						break;
 					case GET_QETH_PORTNAME:
-						state = CONFIRM;
+						state = CONFIRM_QETH;
 						break;
 					case GET_IUCV_DEVICE:
 						state = GET_IUCV_PEER;
 						break;
 					case GET_IUCV_PEER:
+						state = CONFIRM_IUCV;
 						break;
-					default:
+					case CONFIRM_CTC:
+						state = WRITE_CTC;
+						break;
+					case CONFIRM_QETH:
+						state = WRITE_QETH;
+						break;
+					case CONFIRM_IUCV:
+						state = WRITE_IUCV;
+						break;
+					case WRITE_CTC:
+					case WRITE_QETH:
+					case WRITE_IUCV:
+						state = FINISH;
+						break;
+					case BACKUP:
+					case ERROR:
+					case FINISH:
 						state = ERROR;
-						break;
 				}
 				break;
 			case WANT_BACKUP:
