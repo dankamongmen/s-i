@@ -766,7 +766,8 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						state = CONFIRM_CTC;
 						break;
 					case GET_QETH_DEVICE:
-						state = GET_QETH_PORT;
+						/* state = GET_QETH_PORT; */
+						state = CONFIRM_QETH;
 						break;
 					case GET_QETH_PORT:
 						state = GET_QETH_PORTNAME;
@@ -775,7 +776,8 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						state = CONFIRM_QETH;
 						break;
 					case GET_IUCV_DEVICE:
-						state = GET_IUCV_PEER;
+						/* state = GET_IUCV_PEER; */
+						state = ERROR;
 						break;
 					case GET_IUCV_PEER:
 						state = CONFIRM_IUCV;
