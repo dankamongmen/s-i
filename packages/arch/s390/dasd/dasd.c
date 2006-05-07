@@ -117,6 +117,8 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 	struct sysfs_device *device;
 
 	devices = sysfs_get_driver_devices (driver);
+	if (!devices)
+		return WANT_NONE;
 
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
