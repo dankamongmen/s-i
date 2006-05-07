@@ -100,8 +100,7 @@ enum state
 	DETECT_DEVICES,
 	GET_NETWORKTYPE,
 	GET_CTC_DEVICE,
-	GET_CTC_CHANNEL_READ,
-	GET_CTC_CHANNEL_WRITE,
+	GET_CTC_CHANNELS,
 	GET_CTC_PROTOCOL,
 	GET_QETH_DEVICE,
 	GET_QETH_PORT,
@@ -302,198 +301,58 @@ static enum state_wanted get_networktype (void)
 	return WANT_NEXT;
 }
 
-static enum state_wanted get_channel (void)
+static di_hfunc get_ctc_channels_append;
+static void get_ctc_channels_append (void *key __attribute__ ((unused)), void *value, void *user_data)
 {
-#if 0
-	FILE *f;
-	unsigned int i, k;
-	int j, ret;
-	int chantype, chantype_ctc, chantype_escon, chantype_lcs;
-	char buf[256], *ptr, *ptr2;
+	struct channel *channel = value;
+	char *buf = user_data;
+	if (channel->type == CHANNEL_TYPE_CU3088_CTC)
+		di_snprintfcat (buf, 512, "%s, ", channel->name);
+}
 
-	channels = di_new (struct channel, 5);
-	channels_items = 0;
+static enum state_wanted get_ctc_channels (void)
+{
+	char buf[64 * 8] = { 0 }, *ptr;
+	const char *template;
+	int dev, ret;
 
-	f = fopen (file_chandev, "r");
+	di_tree_foreach (channels, get_ctc_channels_append, buf);
 
-	if (!f)
-		return -1;
-
-	while (fgets (buf, sizeof (buf), f) && strncmp (buf, "chan_type", 9));
-	// I know its a hack
-	ptr = buf + 23;
-	while ((ptr2 = strsep (&ptr, ",")))
+	if (!strlen (buf))
 	{
-		sscanf (ptr2, "ctc=%x", &chantype_ctc);
-		sscanf (ptr2, "escon=%x", &chantype_escon);
-		sscanf (ptr2, "lcs=%x", &chantype_lcs);
-		sscanf (ptr2, "qeth=%x", &chantype_qeth);
+		my_debconf_input ("critical", TEMPLATE_PREFIX "ctc/no", &ptr);
+		return WANT_BACKUP;
 	}
 
-	while (fgets (buf, sizeof (buf), f) && strncmp (buf, "channels detected", 17));
-
-	fgets (buf, sizeof (buf), f);
-	fgets (buf, sizeof (buf), f);
-	fgets (buf, sizeof (buf), f);
-
-	while (fgets (buf, sizeof (buf), f))
-		if (sscanf (buf, "0x%*x 0x%4x 0x%2x 0x%4x 0x%2x",
-					&channels[channels_items].device,
-					&channels[channels_items].chantype,
-					&channels[channels_items].cutype,
-					&channels[channels_items].cumodel) == 4)
-		{
-			if (channels[channels_items].chantype & chantype_escon)
-				channels[channels_items].chantype |= chantype_ctc;
-
-			channels[channels_items].device_first = 0;
-			channels_items++;
-			if ((channels_items % 5) == 0)
-				channels = realloc (channels, (channels_items + 5) * sizeof (struct channel));
-		}
-	fclose (f);
-
-	qsort (channels, channels_items, sizeof (struct channel), &channel_sort);
-
-	devices = malloc (5 * sizeof (struct device));
-
-	for (i = 0; i < channels_items; i++)
-	{
-		k = 0;
-		for (j = i; j >= 0; j--)
-			if (channels[i].device == channels[j].device + k &&
-			    channels[i].chantype == channels[j].chantype &&
-			    channels[i].cutype == channels[j].cutype &&
-			    channels[i].cumodel == channels[j].cumodel)
-				k++;
-			else
-				break;
-
-		if (channels[i].chantype & chantype_qeth)
-		{
-			if (!(k % 3))
-			{
-				devices[devices_items].device_read =
-					channels[i-2].device_first =
-					channels[i-1].device_first =
-					channels[i].device_first =
-						channels[i].device - 2;
-				devices[devices_items].device_write =
-					channels[i].device - 1;
-				devices[devices_items].device_data =
-					channels[i].device;
-				devices[devices_items].chantype =
-					channels[i].chantype;
-				devices_items++;
-				items_qeth++;
-			}
-		}
-		else
-		{
-			if (!(k % 2))
-			{
-				devices[devices_items].device_read =
-					channels[i-1].device_first =
-					channels[i].device_first =
-						channels[i].device - 1;
-				devices[devices_items].device_write =
-					channels[i].device;
-				devices[devices_items].chantype =
-					channels[i].chantype;
-				devices_items++;
-				if (channels[i].chantype & chantype_ctc)
-					items_ctc++;
-				if (channels[i].chantype & chantype_escon)
-					items_escon++;
-				if (channels[i].chantype & chantype_lcs)
-					items_lcs++;
-			}
-		}
-
-		if ((devices_items % 5) == 0)
-			devices = realloc (devices, (devices_items + 5) * sizeof (struct device));
-	}
-
-	chandev_parm[0] = '\0';
-	chandev_module_parm[0] = '\0';
-
-	switch (type)
-	{
-		case TYPE_QETH:
-			chantype = chantype_qeth;
-			items = items_qeth;
-			break;
-		case TYPE_CTC:
-			chantype = chantype_ctc;
-			items = items_ctc;
-			break;
-		case TYPE_LCS:
-			chantype = chantype_lcs;
-			items = items_lcs;
-			break;
-		default:
-			return -1;
-	}
-
-	if (!items)
-		switch (type)
-		{
-			case TYPE_QETH:
-				my_debconf_input ("critical", TEMPLATE_PREFIX "qeth/no", &ptr);
-				break;
-			case TYPE_CTC:
-				my_debconf_input ("critical", TEMPLATE_PREFIX "ctc/no", &ptr);
-				break;
-			case TYPE_LCS:
-				my_debconf_input ("critical", TEMPLATE_PREFIX "lcs/no", &ptr);
-				break;
-			default:
-				return -1;
-		}
-
-	ptr = malloc (items * 16); // "0x0000-0x0000, "
-	ptr[0] = '\0';
-
-	for (i = 0; i < devices_items; i++)
-		if (devices[i].chantype & chantype)
-		{
-			if (chantype == chantype_qeth)
-				di_snprintfcat (ptr, items * 16, "0x%04x-0x%04x, ", devices[i].device_read, devices[i].device_data);
-			else
-				di_snprintfcat (ptr, items * 16, "0x%04x-0x%04x, ", devices[i].device_read, devices[i].device_write);
-		}
-        if (strlen(ptr) > 2)
-		ptr[strlen(ptr) - 2] = '\0';
-
-	switch (type)
-	{
-		case TYPE_QETH:
-			ptr2 = TEMPLATE_PREFIX "qeth/choose";
-			break;
-		case TYPE_CTC:
-			ptr2 = TEMPLATE_PREFIX "ctc/choose";
-			break;
-		case TYPE_LCS:
-			ptr2 = TEMPLATE_PREFIX "lcs/choose";
-			break;
-		default:
-			return -1;
-	}
-
-	debconf_subst (client, ptr2, "choices", ptr);
-	free (ptr);
-	debconf_fset (client, ptr2, "seen", "false");
-	debconf_input (client, "critical", ptr2);
+	template = TEMPLATE_PREFIX "ctc/choose_read";
+	debconf_subst (client, template, "choices", buf);
+	debconf_fset (client, template, "seen", "false");
+	debconf_input (client, "critical", template);
 	ret = debconf_go (client);
-	debconf_get (client, ptr2);
+	if (ret == 30)
+		return WANT_BACKUP;
+	if (ret)
+		return WANT_ERROR;
+	debconf_get (client, template);
 
-	sscanf (client->value, "0x%x", &i);
+	dev = channel_device (client->value);
+	device_current->ctc.channels[0] = di_tree_lookup (channels, &dev);
 
-	for (device_selected = 0; devices[device_selected].device_read != i; device_selected++);
+	template = TEMPLATE_PREFIX "ctc/choose_write";
+	debconf_subst (client, template, "choices", buf);
+	debconf_fset (client, template, "seen", "false");
+	debconf_input (client, "critical", template);
+	ret = debconf_go (client);
+	if (ret == 30)
+		return WANT_BACKUP;
+	if (ret)
+		return WANT_ERROR;
+	debconf_get (client, template);
 
-	return ret;
-#endif
-	return WANT_ERROR;
+	dev = channel_device (client->value);
+	device_current->ctc.channels[1] = di_tree_lookup (channels, &dev);
+
+	return WANT_NEXT;
 }
 
 static enum state_wanted get_ctc_device_iucv_device (enum state state)
@@ -790,6 +649,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 			case GET_IUCV_DEVICE:
 				state_want = get_ctc_device_iucv_device (state);
 				break;
+			case GET_CTC_CHANNELS:
+				state_want = get_ctc_channels ();
+				break;
 			case GET_CTC_PROTOCOL:
 				state_want = get_ctc_protocol ();
 				break;
@@ -841,10 +703,13 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						}
 						break;
 					case GET_CTC_DEVICE:
-						state = GET_CTC_CHANNEL_READ;
+						state = GET_CTC_CHANNELS;
 						break;
-					case GET_CTC_CHANNEL_READ:
-						state = GET_CTC_CHANNEL_WRITE;
+					case GET_CTC_CHANNELS:
+						state = GET_CTC_PROTOCOL;
+						break;
+					case GET_CTC_PROTOCOL:
+						state = CONFIRM;
 						break;
 					case GET_QETH_DEVICE:
 						state = GET_QETH_PORT;
