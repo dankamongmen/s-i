@@ -62,6 +62,16 @@ static const struct driver drivers[] =
 	{ "cu3088", CHANNEL_TYPE_CU3088_ALL },
 	{ "qeth", CHANNEL_TYPE_QETH },
 };
+
+enum
+{
+	TYPE_NONE = 0,
+	TYPE_CTC,
+	TYPE_IUCV,
+	TYPE_QETH,
+}
+type = TYPE_NONE;
+
 enum state_wanted { WANT_NONE = 0, WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
 
 static int my_debconf_input (const char *priority, const char *template, char **p)
@@ -219,48 +229,27 @@ static enum state_wanted detect_devices (void)
 {
 	struct detect_devices_info info = { 0, };
 	di_tree_foreach (channels, detect_devices_each, &info);
-	return WANT_ERROR;
+	return WANT_NEXT;
 }
 
 static enum state_wanted get_networktype (void)
 {
-#if 0
 	char *ptr;
 	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "choose_networktype", &ptr);
 
 	if (ret)
-		return ret;
+		return WANT_ERROR;
 
 	if (!strncmp (ptr, "qeth", 4))
-	{
 		type = TYPE_QETH;
-		type_text = "qeth";
-		module = type_text;
-	}
 	else if (!strncmp (ptr, "ctc", 3))
-	{
 		type = TYPE_CTC;
-		type_text = "ctc";
-		module = type_text;
-	}
-	else if (!strncmp (ptr, "lcs", 3))
-	{
-		type = TYPE_LCS;
-		type_text = "lcs";
-		module = type_text;
-	}
 	else if (!strncmp (ptr, "iucv", 4))
-	{
 		type = TYPE_IUCV;
-		type_text = "iucv";
-		module = "netiucv";
-	}
 	else
-		return -1;
+		return WANT_ERROR;
 
-	return 0;
-#endif
-	return WANT_ERROR;
+	return WANT_NEXT;
 }
 
 static enum state_wanted get_channel (void)
@@ -912,6 +901,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						break;
 					case DETECT_CHANNELS:
 						state = DETECT_DEVICES;
+						break;
+					case DETECT_DEVICES:
+						state = GET_NETWORKTYPE;
 						break;
 					default:
 						state = ERROR;
