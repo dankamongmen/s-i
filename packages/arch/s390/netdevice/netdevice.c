@@ -457,12 +457,59 @@ static enum state_wanted get_qeth_portname_iucv_peer (enum state state)
 
 static enum state_wanted confirm_ctc (void)
 {
-	return WANT_ERROR;
+	const char *template = TEMPLATE_PREFIX "ctc/confirm";
+	int ret;
+	char *ptr;
+
+	debconf_subst (client, template, "device_read", device_current->ctc.channels[0]->name);
+	debconf_subst (client, template, "device_write", device_current->ctc.channels[1]->name);
+
+	switch (device_current->ctc.protocol)
+	{
+		case 0:
+			ptr = "S/390";
+			break;
+		case 1:
+			ptr = "Linux";
+			break;
+		case 3:
+			ptr = "OS/390";
+			break;
+		default:
+			ptr = "unknown";
+	}
+	debconf_subst (client,  template, "protocol", ptr);
+
+	debconf_set (client, template, "true");
+	ret = my_debconf_input ("medium", template, &ptr);
+
+	if (ret == 30 && !strstr (ptr, "true"))
+		return WANT_BACKUP;
+	if (ret)
+		return WANT_ERROR;
+
+	return WANT_NEXT;
 }
 
 static enum state_wanted confirm_qeth (void)
 {
-	return WANT_ERROR;
+	const char *template = TEMPLATE_PREFIX "qeth/confirm";
+	int ret;
+	char *ptr;
+
+	debconf_subst (client, template, "device0", device_current->ctc.channels[0]->name);
+	debconf_subst (client, template, "device1", device_current->ctc.channels[1]->name);
+	debconf_subst (client, template, "device2", device_current->ctc.channels[2]->name);
+
+	debconf_set (client, template, "true");
+	ret = my_debconf_input ("medium", template, &ptr);
+
+	if (ret == 30 && !strstr (ptr, "true"))
+		return WANT_BACKUP;
+	if (ret)
+		return WANT_ERROR;
+
+	return WANT_NEXT;
 }
 
 static enum state_wanted confirm_iucv (void)
