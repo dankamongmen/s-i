@@ -16,6 +16,7 @@
 
 const char *const file_devices = "/proc/dasd/devices";
 
+#define SYSCONFIG_DIR "/etc/sysconfig/hardware/"
 #define TEMPLATE_PREFIX	"s390-dasd/"
 
 static struct debconfclient *client;
@@ -38,7 +39,7 @@ struct channel
 
 static di_tree *channels;
 
-static struct dasd *channel_current;
+static struct channel *channel_current;
 
 struct driver
 {
@@ -59,6 +60,7 @@ enum state
 	DETECT_CHANNELS,
 	GET_CHANNEL,
 	CONFIRM,
+	WRITE,
 	ERROR,
 	FINISH
 };
@@ -206,7 +208,7 @@ static enum state_wanted get_channel_input (void)
 	while (1)
 	{
 		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose", &ptr);
-		if (ret == 10)
+		if (ret == 30)
 			return WANT_BACKUP;
 
 		dev = channel_device (ptr);
@@ -218,7 +220,7 @@ static enum state_wanted get_channel_input (void)
 		}
 
 		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_invalid", &ptr);
-		if (ret == 10)
+		if (ret == 30)
 			return WANT_BACKUP;
 	}
 }
@@ -228,9 +230,8 @@ static void get_channel_select_append (void *key __attribute__ ((unused)), void 
 {
 	struct channel *channel = value;
 	char *buf = user_data;
-	if (buf[0])
-		strncat (buf, ", ", 512);
 	strncat (buf, channel->name, 512);
+	strncat (buf, ", ", 512);
 }
 
 static enum state_wanted get_channel_select (void)
@@ -244,7 +245,7 @@ static enum state_wanted get_channel_select (void)
 	debconf_subst (client, TEMPLATE_PREFIX "choose_select", "choices", buf);
 	ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_select", &ptr);
 
-	if (ret == 10)
+	if (ret == 30)
 		return WANT_BACKUP;
 	if (!strcmp (ptr, "Finish"))
 		return WANT_FINISH;
@@ -287,97 +288,35 @@ static int format_handler (const char *buf, size_t len, void *user_data __attrib
 
 static enum state_wanted confirm (void)
 {
-#if 0
-	char buf[256], *ptr;
-	int ret;
-	bool needs_format = false;
+	return WANT_NEXT;
+}
 
-	if (dasd_current->state == NEW)
-	{
-		snprintf (buf, sizeof (buf), "echo add %04x >/proc/dasd/devices", dasd_current->device);
-		ret = di_exec_shell_log (buf);
-		if (ret)
-			return WANT_ERROR;
-		update_state ();
-	}
+static enum state_wanted write_dasd (void)
+{
+	struct sysfs_device *device;
+	struct sysfs_attribute *attr;
+        char buf[256];
+        FILE *config;
 
-	snprintf (buf, sizeof (buf), "%04x", dasd_current->device);
+        device = sysfs_open_device ("ccw", channel_current->name);
+        if (!device)
+                return WANT_ERROR;
 
-	switch (dasd_current->state)
-	{
-		case UNFORMATTED:
-		case READY:
-			needs_format = true;
-			debconf_subst (client, TEMPLATE_PREFIX "format", "device", buf);
-			debconf_set (client, TEMPLATE_PREFIX "format", "true");
-			ret = my_debconf_input ("medium", TEMPLATE_PREFIX "format", &ptr);
-			break;
-		case FORMATTED:
-			debconf_subst (client, TEMPLATE_PREFIX "format_unclean", "device", buf);
-			debconf_set (client, TEMPLATE_PREFIX "format_unclean", "false");
-			ret = my_debconf_input ("critical", TEMPLATE_PREFIX "format_unclean", &ptr);
-			break;
-		default:
-			return WANT_ERROR;
-	}
+        attr = sysfs_get_device_attr (device, "online");
+        if (!attr)
+                return WANT_ERROR;
+        if (sysfs_write_attribute (attr, "1", 1) < 0)
+                return WANT_ERROR;
 
-	if (ret == 10 || (strcmp (ptr, "true") && needs_format))
-		return WANT_BACKUP;
+        sysfs_close_device (device);
 
-	if (strcmp (ptr, "true") == 0)
-	{
-		char dev[128];
-		int fd;
-		struct hd_geometry drive_geo;
+        snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", channel_current->name);
+        config = fopen (buf, "w");
+        if (!config)
+                return WANT_ERROR;
 
-		snprintf (dev, sizeof (dev), "/dev/dasd/%04x/device", dasd_current->device);
+        fclose (config);
 
-		fd = open (dev, O_RDONLY);
-		if (fd < 0)
-			return WANT_ERROR;
-		if (ioctl (fd, HDIO_GETGEO, &drive_geo) < 0)
-			return WANT_ERROR;
-		close (fd);
-
-		debconf_subst (client, TEMPLATE_PREFIX "formatting", "device", buf);
-		debconf_progress_start (client, 0, drive_geo.cylinders, TEMPLATE_PREFIX "formatting");
-
-		snprintf (buf, sizeof (buf), "dasdfmt -l LX%04x -b 4096 -m 1 -f %s -y", dasd_current->device, dev);
-		ret = di_exec_shell_full (buf, format_handler, NULL, NULL, NULL, NULL, NULL, NULL);
-
-		debconf_progress_stop (client);
-
-		if (ret)
-			return WANT_ERROR;
-	}
-
-	debconf_get (client, "debian-installer/kernel/commandline");
-	strncpy (buf, client->value, sizeof (buf));
-
-	ptr = strstr (buf, "dasd=");
-	if (ptr)
-	{
-		char buf1[256] = "", buf2[256] = "";
-		while (*ptr++ != '=');
-		while (1)
-		{ 
-			unsigned int a = 0;
-			sscanf (ptr, "%x", &a);
-			if (a == dasd_current->device)
-				return WANT_NEXT;;
-			while (*++ptr && *ptr != ',' && !isspace (*ptr));
-			if (*ptr != ',')
-				break;
-		}
-		strncpy (buf1, buf, ptr - buf);
-		strncpy (buf2, ptr, sizeof (buf2));
-		snprintf (buf, sizeof (buf), "%s,%04x%s", buf1, dasd_current->device, buf2);
-	}
-	else
-		di_snprintfcat (buf, sizeof (buf), " dasd=%04x", dasd_current->device);
-	debconf_set (client, "debian-installer/kernel/commandline", buf);
-
-#endif
 	return WANT_NEXT;
 }
 
@@ -410,6 +349,9 @@ int main ()
 			case CONFIRM:
 				state_want = confirm ();
 				break;
+			case WRITE:
+				state_want = write_dasd ();
+				break;
 			case ERROR:
 				return 1;
 			case FINISH:
@@ -430,6 +372,9 @@ int main ()
 						state = CONFIRM;
 						break;
 					case CONFIRM:
+						state = WRITE;
+						break;
+					case WRITE:
 						state = GET_CHANNEL;
 						break;
 					default:
@@ -442,7 +387,7 @@ int main ()
 					case GET_CHANNEL:
 						state = BACKUP;
 						break;
-					case CONFIRM:
+					case WRITE:
 						state = GET_CHANNEL;
 						break;
 					default:
