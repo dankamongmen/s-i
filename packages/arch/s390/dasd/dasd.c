@@ -48,9 +48,14 @@ int my_debconf_input(char *priority, char *template, char **ptr)
 	return ret;
 }
 
-static di_compare_func dasd_compare;
+static di_compare_func channel_compare;
+int channel_compare (const void *key1, const void *key2)
+{
+	const unsigned int *k1 = key1, *k2 = key2;
+	return *k1 - *k2;
+}
 
-int dasd_device (const char *i)
+static int channel_device (const char *i)
 {
 	unsigned int ret;
 	if (sscanf (i, "0.0.%04x", &ret) == 1)
@@ -58,12 +63,6 @@ int dasd_device (const char *i)
 	if (sscanf (i, "%04x", &ret) == 1)
 		return ret;
 	return -1;
-}
-
-int dasd_compare (const void *key1, const void *key2)
-{
-	const unsigned int *k1 = key1, *k2 = key2;
-	return *k1 - *k2;
 }
 
 #if 0
@@ -120,7 +119,7 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, en
 		if (!current)
 			return WANT_ERROR;
 		strncpy (current->name, device->name, sizeof (current->name));
-		current->key = dasd_device(device->name);
+		current->key = channel_device(device->name);
 
 		sysfs_read_attribute (attr_devtype);
 		strncpy (current->devtype, attr_devtype->value, sizeof (current->devtype));
@@ -149,7 +148,7 @@ static enum state_wanted detect_channels (void)
 		{ "dasd-fba", DASD_TYPE_FBA },
 	};
 
-	dasds = di_tree_new (dasd_compare);
+	dasds = di_tree_new (channel_compare);
 
 	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
 	{
@@ -176,7 +175,7 @@ static enum state_wanted get_channel_input (void)
 		if (ret == 10)
 			return WANT_BACKUP;
 
-		dev = dasd_device (ptr);
+		dev = channel_device (ptr);
 		if (dev >= 0)
 		{
 			dasd_current = di_tree_lookup (dasds, &dev);
@@ -214,7 +213,7 @@ static enum state_wanted get_channel_select (void)
 	if (!strcmp (ptr, "Finish"))
 		return WANT_FINISH;
 
-	dev = dasd_device (ptr);
+	dev = channel_device (ptr);
 	dasd_current = di_tree_lookup (dasds, &dev);
 	if (dasd_current)
 		return WANT_NEXT;
