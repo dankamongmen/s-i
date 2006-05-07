@@ -65,6 +65,8 @@ struct device
 	};
 };
 
+struct device *device_current;
+
 static di_tree *channels;
 static di_tree *devices;
 
@@ -89,7 +91,35 @@ enum
 }
 type = TYPE_NONE;
 
-enum state_wanted { WANT_NONE = 0, WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
+enum state
+{
+	BACKUP,
+	SETUP,
+	DETECT_CHANNELS,
+	DETECT_DEVICES,
+	GET_NETWORKTYPE,
+	GET_CTC_DEVICE,
+	GET_CTC_CHANNEL_READ,
+	GET_CTC_CHANNEL_WRITE,
+	GET_CTC_PROTOCOL,
+	GET_QETH_DEVICE,
+	GET_QETH_PORT,
+	GET_QETH_PORTNAME,
+	GET_IUCV_DEVICE,
+	GET_IUCV_PEER,
+	CONFIRM,
+	ERROR,
+	FINISH
+};
+
+enum state_wanted
+{
+	WANT_NONE = 0,
+	WANT_BACKUP,
+	WANT_NEXT,
+	WANT_FINISH,
+	WANT_ERROR
+};
 
 static int my_debconf_input (const char *priority, const char *template, char **p)
 {
@@ -497,46 +527,41 @@ static enum state_wanted get_qeth_lcs_port (void)
 	return WANT_ERROR;
 }
 
-static enum state_wanted get_qeth_portname_iucv_peer (void)
+static enum state_wanted get_qeth_portname_iucv_peer (enum state state)
 {
-#if 0
 	const char *template = NULL;
-	char *ptr;
-	int ret, j, k;
+	char *ptr, *tmp;
+	int ret, i, j;
 
-        switch (type)
+        switch (state)
         {
-		case TYPE_QETH:
+		case GET_QETH_PORTNAME:
 			template = TEMPLATE_PREFIX "qeth/portname";
+			tmp = device_current->qeth.portname;
 			break;
-		case TYPE_IUCV:
+		case GET_IUCV_PEER:
 			template = TEMPLATE_PREFIX "iucv/peer";
+			tmp = device_current->iucv.peername;
 			break;
 		default:
-			break;
+			return WANT_ERROR;
 	}
 
 	ret = my_debconf_input ("critical", template, &ptr);
 	if (ret)
 		return ret;
 
-	free (device_qeth_portname_iucv_peer);
-	device_qeth_portname_iucv_peer = NULL;
+	*tmp = '0';
 
 	j = strlen (ptr);
-
 	if (j)
 	{
-		device_qeth_portname_iucv_peer = strdup (ptr);
-		for (k = 0; k < j; k++)
-			device_qeth_portname_iucv_peer[k] = toupper (device_qeth_portname_iucv_peer[k]);
-
-		return 0;
+		strcpy (tmp, ptr);
+		for (i = 0; i < j; i++)
+			tmp[i] = toupper (tmp[i]);
 	}
 
-	return 1;
-#endif
-	return WANT_ERROR;
+	return WANT_NEXT;
 }
 
 static enum state_wanted confirm (void)
@@ -717,22 +742,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 	client = debconfclient_new ();
 	debconf_capb (client, "backup");
 
-	enum
-	{
-		BACKUP,
-		SETUP,
-		DETECT_CHANNELS,
-		DETECT_DEVICES,
-		GET_NETWORKTYPE,
-		GET_CHANNEL,
-		GET_CTC_PROTOCOL,
-		GET_QETH_LCS_PORT,
-		GET_QETH_PORTNAME_IUCV_PEER,
-		CONFIRM,
-		ERROR,
-		FINISH
-	}
-	state = SETUP;
+	enum state state = SETUP;
 
 	while (1)
 	{
@@ -754,9 +764,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 			case GET_NETWORKTYPE:
 				state_want = get_networktype ();
 				break;
+#if 0
 			case GET_CHANNEL:
 				state_want = get_channel ();
-#if 0
 				switch (ret)
 				{
 					case 0:
@@ -797,9 +807,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 				}
 #endif
 				break;
-			case GET_QETH_LCS_PORT:
-				state_want = get_qeth_lcs_port ();
+			case GET_QETH_PORT:
 #if 0
+				state_want = get_qeth_lcs_port ();
 				switch (ret)
 				{
 					case 0:
@@ -821,8 +831,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 				}
 #endif
 				break;
-			case GET_QETH_PORTNAME_IUCV_PEER:
-				state_want = get_qeth_portname_iucv_peer ();
+			case GET_QETH_PORTNAME:
+			case GET_IUCV_PEER:
+				state_want = get_qeth_portname_iucv_peer (state);
 #if 0
 				switch (ret)
 				{
@@ -901,11 +912,14 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 					case GET_NETWORKTYPE:
 						switch (type)
 						{
-							case TYPE_IUCV:
-								state = GET_QETH_PORTNAME_IUCV_PEER;
+							case TYPE_CTC:
+								state = GET_CTC_DEVICE;
 								break;
-							default:
-								state = GET_CHANNEL;
+							case TYPE_QETH:
+								state = GET_QETH_DEVICE;
+								break;
+							case TYPE_IUCV:
+								state = GET_QETH_DEVICE;
 								break;
 						}
 						break;
