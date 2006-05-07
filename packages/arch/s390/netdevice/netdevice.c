@@ -22,6 +22,7 @@ static struct debconfclient *client;
 enum channel_type
 {
 	CHANNEL_TYPE_CU3088_ALL,
+	CHANNEL_TYPE_CU3088_CTC,
 	CHANNEL_TYPE_QETH,
 };
 
@@ -33,10 +34,17 @@ struct channel
 	enum channel_type type;
 };
 
+enum device_type
+{
+	DEVICE_TYPE_CTC,
+	DEVICE_TYPE_QETH,
+};
+
 struct device
 {
 	int key;
-	int devices[3];
+	struct channel *channels[3];
+	enum device_type type;
 };
 
 static di_tree *channels;
@@ -92,14 +100,9 @@ static enum state_wanted setup ()
 	return WANT_NEXT;
 }
 
-static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, int type)
+static enum state_wanted detect_channels_driver (struct dlist *devices, int type)
 {
-	struct dlist *devices;
 	struct sysfs_device *device;
-
-	devices = sysfs_get_driver_devices (driver);
-	if (!devices)
-		return WANT_NONE;
 
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
@@ -133,16 +136,18 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 
 static enum state_wanted detect_channels (void)
 {
-	struct sysfs_driver *driver;
-	enum state_wanted ret;
+	enum state_wanted ret = WANT_NONE;
 	unsigned int i;
 
 	for (i = 0; i < sizeof (drivers) / sizeof (*drivers); i++)
 	{
-		driver = sysfs_open_driver ("ccw", drivers[i].name);
+		struct sysfs_driver *driver = sysfs_open_driver ("ccw", drivers[i].name);
 		if (driver)
 		{
-			ret = detect_channels_driver (driver, drivers[i].type);
+			struct dlist *devices;
+			devices = sysfs_get_driver_devices (driver);
+			if (devices)
+				ret = detect_channels_driver (devices, drivers[i].type);
 			sysfs_close_driver (driver);
 			if (ret)
 				return ret;
