@@ -493,6 +493,25 @@ static enum state_wanted get_channel (void)
 	return WANT_ERROR;
 }
 
+static enum state_wanted get_ctc_device_iucv_device (enum state state)
+{
+	device_current = di_new0 (struct device, 1);
+
+	switch (state)
+	{
+		case GET_CTC_DEVICE:
+			device_current->type = DEVICE_TYPE_CTC;
+			break;
+		case GET_IUCV_DEVICE:
+			device_current->type = DEVICE_TYPE_IUCV;
+			break;
+		default:
+			return WANT_ERROR;
+	}
+
+	return WANT_NEXT;
+}
+
 static enum state_wanted get_ctc_protocol (void)
 {
 #if 0
@@ -533,8 +552,8 @@ static enum state_wanted get_qeth_portname_iucv_peer (enum state state)
 	char *ptr, *tmp;
 	int ret, i, j;
 
-        switch (state)
-        {
+	switch (state)
+	{
 		case GET_QETH_PORTNAME:
 			template = TEMPLATE_PREFIX "qeth/portname";
 			tmp = device_current->qeth.portname;
@@ -748,7 +767,7 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 	{
 		enum state_wanted state_want = WANT_ERROR;
 
-		switch(state)
+		switch (state)
 		{
 			case BACKUP:
 				return 10;
@@ -790,6 +809,10 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						return 1;
 				}
 #endif
+				break;
+			case GET_CTC_DEVICE:
+			case GET_IUCV_DEVICE:
+				state_want = get_ctc_device_iucv_device (state);
 				break;
 			case GET_CTC_PROTOCOL:
 				state_want = get_ctc_protocol ();
@@ -921,6 +944,8 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 							case TYPE_IUCV:
 								state = GET_QETH_DEVICE;
 								break;
+							default:
+								state = ERROR;
 						}
 						break;
 					default:
