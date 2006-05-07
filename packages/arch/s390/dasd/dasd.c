@@ -350,11 +350,13 @@ static enum state_wanted confirm (void)
 	return WANT_NEXT;
 }
 
-static void error (void)
+static enum state_wanted error (void)
 {
 	char *ptr;
 
 	my_debconf_input ("high", TEMPLATE_PREFIX "error", &ptr);
+
+	return WANT_FINISH;
 }
 
 int main ()
@@ -393,8 +395,8 @@ int main ()
 				state_want = confirm ();
 				break;
 			case ERROR:
-				error ();
-				state_want = WANT_FINISH;
+				state_want = error ();
+				break;
 			case FINISH:
 				return 0;
 		}
