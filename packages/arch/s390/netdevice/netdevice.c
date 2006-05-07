@@ -560,6 +560,39 @@ static enum state_wanted confirm_iucv (void)
 	return WANT_ERROR;
 }
 
+static enum state_wanted write_ccwgroup (const char *driver_name, const char *device_name, const char *group)
+{
+	struct sysfs_device *device;
+	struct sysfs_driver *driver;
+	struct sysfs_attribute *attr;
+
+	driver = sysfs_open_driver ("ccwgroup", driver_name);
+	if (!driver)
+		return WANT_ERROR;
+
+	attr = sysfs_get_driver_attr (driver, "group");
+	if (!attr)
+		return WANT_ERROR;
+	if (sysfs_write_attribute (attr, group, strlen (group)) < 0)
+		return WANT_ERROR;
+
+	sysfs_close_driver (driver);
+
+	device = sysfs_open_device ("ccwgroup", device_name);
+	if (!device)
+		return WANT_ERROR;
+
+	attr = sysfs_get_device_attr (device, "online");
+	if (!attr)
+		return WANT_ERROR;
+	if (sysfs_write_attribute (attr, "1", 1) < 0)
+		return WANT_ERROR;
+
+	sysfs_close_device (device);
+
+	return WANT_NONE;
+}
+
 static enum state_wanted write_ctc (void)
 {
 	return WANT_ERROR;
@@ -567,7 +600,27 @@ static enum state_wanted write_ctc (void)
 
 static enum state_wanted write_qeth (void)
 {
-	return WANT_ERROR;
+	char buf[256];
+	int ret;
+	FILE *config;
+
+	snprintf (buf, sizeof (buf), "%s,%s,%s\n", device_current->qeth.channels[0]->name, device_current->qeth.channels[1]->name, device_current->qeth.channels[2]->name);
+
+	ret = write_ccwgroup ("qeth", device_current->qeth.channels[0]->name, buf);
+	if (ret)
+		return ret;
+
+	snprintf (buf, sizeof (buf), "/tmp/config-ccw-%s", device_current->qeth.channels[0]->name);
+	config = fopen (buf, "w");
+	if (!config)
+		return WANT_ERROR;
+
+	snprintf (buf, sizeof (buf), "CCWGROUP_CHANS=(%s %s %s)\n", device_current->qeth.channels[0]->name, device_current->qeth.channels[1]->name, device_current->qeth.channels[2]->name);
+	fwrite (buf, strlen (buf), 1, config);
+
+	fclose (config);
+
+	return WANT_NEXT;
 }
 
 static enum state_wanted write_iucv (void)
