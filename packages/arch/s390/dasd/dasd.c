@@ -20,7 +20,7 @@ const char *const file_devices = "/proc/dasd/devices";
 
 static struct debconfclient *client;
 
-enum dasd_state { DASD_STATE_OFFLINE, DASD_STATE_ONLINE, DASD_STATE_ONLINE_UNFORMATTED };
+//enum dasd_state { DASD_STATE_OFFLINE, DASD_STATE_ONLINE, DASD_STATE_ONLINE_UNFORMATTED };
 enum dasd_type { DASD_TYPE_ECKD, DASD_TYPE_FBA };
 
 struct dasd
@@ -28,13 +28,24 @@ struct dasd
 	int key;
 	char name[SYSFS_NAME_LEN];
 	char devtype[SYSFS_NAME_LEN];
+	bool online;
 	enum dasd_type type;
-	enum dasd_state state;
 };
 
 static di_tree *dasds;
 
 static struct dasd *dasd_current;
+
+struct driver
+{
+	const char *name;
+	int type;
+};
+
+static const struct driver drivers[] = {
+	{ "dasd-eckd", DASD_TYPE_ECKD },
+	{ "dasd-fba", DASD_TYPE_FBA },
+};
 
 enum state_wanted { WANT_NONE = 0, WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
 
@@ -99,7 +110,7 @@ static bool update_state (void)
 }
 #endif
 
-static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, enum dasd_type type)
+static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, int type)
 {
 	struct dlist *devices;
 	struct sysfs_device *device;
@@ -127,7 +138,7 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, en
 
 		sysfs_read_attribute (attr_online);
 		if (strtol (attr_online->value, NULL, 10) > 0)
-			current->state = DASD_STATE_ONLINE;
+			current->online = true;
 
 		di_tree_insert (dasds, current, current);
 	}
@@ -140,13 +151,6 @@ static enum state_wanted detect_channels (void)
 	struct sysfs_driver *driver;
 	enum state_wanted ret;
 	unsigned int i;
-	const struct {
-		const char *name;
-		enum dasd_type type;
-	} drivers[] = {
-		{ "dasd-eckd", DASD_TYPE_ECKD },
-		{ "dasd-fba", DASD_TYPE_FBA },
-	};
 
 	dasds = di_tree_new (channel_compare);
 
