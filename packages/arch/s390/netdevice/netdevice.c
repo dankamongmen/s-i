@@ -15,6 +15,7 @@
 
 #include <libsysfs.h>
 
+#define SYSCONFIG_DIR "/etc/sysconfig/hardware/"
 #define TEMPLATE_PREFIX	"s390-netdevice/"
 
 static struct debconfclient *client;
@@ -608,7 +609,7 @@ static enum state_wanted write_ctc (void)
 	if (ret)
 		return ret;
 
-	snprintf (buf, sizeof (buf), "/tmp/config-ccw-%s", device_current->ctc.channels[0]->name);
+	snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", device_current->ctc.channels[0]->name);
 	config = fopen (buf, "w");
 	if (!config)
 		return WANT_ERROR;
@@ -635,7 +636,7 @@ static enum state_wanted write_qeth (void)
 	if (ret)
 		return ret;
 
-	snprintf (buf, sizeof (buf), "/tmp/config-ccw-%s", device_current->qeth.channels[0]->name);
+	snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", device_current->qeth.channels[0]->name);
 	config = fopen (buf, "w");
 	if (!config)
 		return WANT_ERROR;
