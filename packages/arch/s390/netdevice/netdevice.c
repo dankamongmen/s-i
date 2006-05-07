@@ -312,7 +312,11 @@ static void get_ctc_channels_append (void *key __attribute__ ((unused)), void *v
 	struct channel *channel = value;
 	char *buf = user_data;
 	if (channel->type == CHANNEL_TYPE_CU3088_CTC)
-		di_snprintfcat (buf, 512, "%s, ", channel->name);
+	{
+		if (buf[0])
+			strncat (buf, ", ", 64 * 8);
+		strncat (buf, channel->name, 64 * 8);
+	}
 }
 
 static enum state_wanted get_ctc_channels (void)
@@ -404,7 +408,11 @@ static void get_qeth_device_append (void *key __attribute__ ((unused)), void *va
 	struct device *device = value;
 	char *buf = user_data;
 	if (device->type == DEVICE_TYPE_QETH)
-		di_snprintfcat (buf, 64 * 28, "%s-%s-%s, ", device->qeth.channels[0]->name, device->qeth.channels[1]->name, device->qeth.channels[2]->name);
+	{
+		if (buf[0])
+			strncat (buf, ", ", 64 * 28);
+		di_snprintfcat (buf, 64 * 28, "%s-%s-%s", device->qeth.channels[0]->name, device->qeth.channels[1]->name, device->qeth.channels[2]->name);
+	}
 }
 
 static enum state_wanted get_qeth_device (void)
@@ -566,168 +574,6 @@ static enum state_wanted write_iucv (void)
 {
 	return WANT_ERROR;
 }
-
-#if 0
-static enum state_wanted confirm (void)
-{
-	const char *template;
-	char buf[10], *ptr;
-	int ret;
-
-	switch (type)
-	{
-		case TYPE_QETH:
-			template = TEMPLATE_PREFIX "qeth/confirm";
-			break;
-		case TYPE_CTC:
-			template = TEMPLATE_PREFIX "ctc/confirm";
-			break;
-		case TYPE_LCS:
-			template = TEMPLATE_PREFIX "lcs/confirm";
-			break;
-		case TYPE_IUCV:
-			template = TEMPLATE_PREFIX "iucv/confirm";
-			break;
-		default:
-			return -1;
-	}
-
-	if (device_qeth_portname_iucv_peer)
-		ptr = device_qeth_portname_iucv_peer;
-	else
-		ptr = "-";
-		
-	switch (type)
-	{
-		case TYPE_QETH:
-			snprintf (buf, sizeof (buf), "0x%x", devices[device_selected].device_data);
-			debconf_subst (client,  template, "device_data", buf);
-			debconf_subst (client,  template, "portname", ptr);
-
-		case TYPE_LCS:
-			snprintf (buf, sizeof (buf), "%d", device_qeth_lcs_port);
-			debconf_subst (client, template, "port", buf);
-
-		case TYPE_CTC:
-			snprintf (buf, sizeof (buf), "0x%x", devices[device_selected].device_read);
-			debconf_subst (client,  template, "device_read", buf);
-			snprintf (buf, sizeof (buf), "0x%x", devices[device_selected].device_write);
-			debconf_subst (client,  template, "device_write", buf);
-			break;
-
-		case TYPE_IUCV:
-			debconf_subst (client,  template, "peer", ptr);
-			break;
-	}
-
-	switch (type)
-	{
-		case TYPE_CTC:
-			switch (device_ctc_protocol)
-			{
-				case 0:
-					ptr = "S/390";
-					break;
-				case 1:
-					ptr = "Linux";
-					break;
-				case 3:
-					ptr = "OS/390";
-					break;
-			}
-			debconf_subst (client,  template, "protocol", ptr);
-			break;
-		default:
-			break;
-	}
-
-	debconf_set (client, template, "true");
-	ret = my_debconf_input ("medium", template, &ptr);
-
-	if (ret)
-		return ret;
-	if (!strstr (ptr, "true"))
-		return 1;
-
-	switch (type)
-	{
-		case TYPE_QETH:
-			snprintf (chandev_module_parm, sizeof (chandev_module_parm), "qeth-1,0x%x,0x%x,0x%x,0,%d",
-				  devices[device_selected].device_read,
-				  devices[device_selected].device_write,
-				  devices[device_selected].device_data,
-				  device_qeth_lcs_port);
-			if (device_qeth_portname_iucv_peer)
-				snprintf (chandev_parm, sizeof (chandev_parm), "add_parms,0x%x,0x%x,0x%x,portname:%s",
-					  chantype_qeth,
-					  devices[device_selected].device_read,
-					  devices[device_selected].device_data,
-					  device_qeth_portname_iucv_peer);
-			break;
-		case TYPE_CTC:
-			snprintf (chandev_module_parm, sizeof (chandev_module_parm), "ctc-1,0x%x,0x%x,0,%d",
-				  devices[device_selected].device_read,
-				  devices[device_selected].device_write,
-				  device_ctc_protocol);
-			break;
-		case TYPE_LCS:
-			break;
-		case TYPE_IUCV:
-			break;
-	}
-
-	return 0;
-	return WANT_ERROR;
-}
-#endif
-
-#if 0
-static enum state_wanted setup (void)
-{
-	FILE *f;
-	char buf[256], buf1[64] = "";
-
-	switch (type)
-	{
-		case TYPE_QETH:
-		case TYPE_CTC:
-		case TYPE_LCS:
-			f = fopen ("/proc/chandev", "a");
-			if (!f)
-				return 1;
-
-			if (strlen (chandev_parm))
-			{
-				snprintf (buf, sizeof (buf), "register-module -t chandev %s %s", module, chandev_parm);
-				di_exec_shell_log (buf);
-				fprintf (f, "%s\n", chandev_parm);
-			}
-
-			snprintf (buf, sizeof (buf), "register-module -t chandev %s %s", module, chandev_module_parm);
-			di_exec_shell_log (buf);
-
-			fprintf (f, "%s\n", chandev_module_parm);
-			fprintf (f, "noauto\n");
-			fprintf (f, "reprobe\n");
-			fclose (f);
-			break;
-
-		case TYPE_IUCV:
-			snprintf (buf1, sizeof (buf1), "iucv=%s", device_qeth_portname_iucv_peer);
-			break;
-	}
-
-	snprintf (buf, sizeof (buf), "register-module %s %s", module, buf1);
-	di_exec_shell_log (buf);
-
-	snprintf (buf, sizeof (buf), "modprobe %s %s", module, buf1);
-	di_exec_shell_log (buf);
-
-	return 0;
-	return WANT_ERROR;
-}
-#endif
-
 
 int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
 {
