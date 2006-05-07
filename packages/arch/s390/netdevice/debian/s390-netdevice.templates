@@ -3,7 +3,7 @@ Type: select
 # Note to translators : Please keep your translations of the choices
 # below a 65 columns limit (which means 65 characters 
 # in single-byte languages) including the initial path
-__Choices: ctc: Channel to Channel (CTC) or ESCON connection, lcs: qeth: OSA-2 Token Ring/Ethernet or OSA-Express Fast Ethernet (non-QDIO), qeth: OSA-Express in QDIO mode / HiperSockets, iucv: Inter-User Communication Vehicle - available for VM guests only
+__Choices: ctc: Channel to Channel (CTC) or ESCON connection, qeth: OSA-Express in QDIO mode / HiperSockets, iucv: Inter-User Communication Vehicle - available for VM guests only
 _Description: Network device type:
  Please choose the type of your primary network interface that you
  will need for installing the Debian system (via NFS or HTTP). Only
@@ -36,30 +36,6 @@ Choices: S/390 (0), Linux (1), OS/390 (3)
 Default: S/390 (0)
 _Description: Protocol for this connection:
 
-Template: s390-netdevice/lcs/choose
-Type: select
-Choices: ${choices}
-_Description: Device:
- The following device numbers might belong to OSA-2 or OSA-Express cards, but
- please note that CTC/ESCON devices might also be listed here.
-
-Template: s390-netdevice/lcs/confirm
-Type: boolean
-Default: true
-_Description: Do you accept this configuration?
- The configured parameters are:
-  read channel  = ${device_read}
-  write channel = ${device_write}
-  port          = ${port}
-
-Template: s390-netdevice/lcs/no
-Type: error
-_Description: No OSA-2 or OSA-Express cards
- If you are running VM please
- make sure that your card is attached to this guest. If you want to use
- HiperSockets or an OSA-Express card in QDIO mode please use the qeth
- driver instead.
-
 Template: s390-netdevice/qeth/choose
 Type: select
 Choices: ${choices}
@@ -81,9 +57,7 @@ Template: s390-netdevice/qeth/no
 Type: error
 _Description: No OSA-Express QDIO cards / HiperSockets
  No OSA-Express QDIO cards / HiperSockets were detected. If you are running
- VM please make sure that your card is attached to this guest. If you want
- to use an OSA-2 or OSA-Express card in non-QDIO mode please use the lcs
- driver instead.
+ VM please make sure that your card is attached to this guest.
 
 Template: s390-netdevice/qeth/portname
 Type: string
@@ -98,7 +72,7 @@ _Description: Portname:
  .
  The name will automatically be converted to uppercase.
 
-Template: s390-netdevice/qeth_lcs/port
+Template: s390-netdevice/qeth/port
 Type: string
 Default: 0
 _Description: Port:
