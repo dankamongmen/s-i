@@ -19,28 +19,28 @@
 
 static struct debconfclient *client;
 
-enum netdevice_channel_type
+enum channel_type
 {
-	NETDEVICE_CHANNEL_TYPE_CU3088_ALL,
-	NETDEVICE_CHANNEL_TYPE_QETH,
+	CHANNEL_TYPE_CU3088_ALL,
+	CHANNEL_TYPE_QETH,
 };
 
-struct netdevice_channel
+struct channel
 {
 	int key;
 	char name[SYSFS_NAME_LEN];
 	char devtype[SYSFS_NAME_LEN];
-	enum netdevice_channel_type type;
+	enum channel_type type;
 };
 
-struct netdevice
+struct device
 {
 	int key;
 	int devices[3];
 };
 
-static di_tree *netdevice_channels;
-static di_tree *netdevices;
+static di_tree *channels;
+static di_tree *devices;
 
 struct driver
 {
@@ -50,8 +50,8 @@ struct driver
 
 static const struct driver drivers[] =
 {
-	{ "cu3088", NETDEVICE_CHANNEL_TYPE_CU3088_ALL },
-	{ "qeth", NETDEVICE_CHANNEL_TYPE_QETH },
+	{ "cu3088", CHANNEL_TYPE_CU3088_ALL },
+	{ "qeth", CHANNEL_TYPE_QETH },
 };
 enum state_wanted { WANT_NONE = 0, WANT_BACKUP, WANT_NEXT, WANT_FINISH, WANT_ERROR };
 
@@ -86,8 +86,8 @@ static int channel_device (const char *i)
 
 static enum state_wanted setup ()
 {
-	netdevice_channels = di_tree_new (channel_compare);
-	netdevices = di_tree_new (channel_compare);
+	channels = di_tree_new (channel_compare);
+	devices = di_tree_new (channel_compare);
 
 	return WANT_NEXT;
 }
@@ -104,7 +104,7 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
 		struct sysfs_attribute *attr_devtype;
-		struct netdevice_channel *current;
+		struct channel *current;
 		char buf[SYSFS_PATH_MAX];
 
 		/* Ignore already used channels. */
@@ -113,7 +113,7 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 		if (!sysfs_path_is_link (buf))
 			continue;
 
-		current = di_new (struct netdevice_channel, 1);
+		current = di_new (struct channel, 1);
 		if (!current)
 			return WANT_ERROR;
 		current->type = type;
@@ -125,7 +125,7 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 		sysfs_read_attribute (attr_devtype);
 		strncpy (current->devtype, attr_devtype->value, sizeof (current->devtype));
 
-		di_tree_insert (netdevice_channels, current, current);
+		di_tree_insert (channels, current, current);
 	}
 
 	return WANT_NONE;
@@ -158,7 +158,7 @@ static void detect_devices_each (void *key __attribute__ ((unused)), void *value
 
 static enum state_wanted detect_devices (void)
 {
-	di_tree_foreach (netdevice_channels, detect_devices_each, NULL);
+	di_tree_foreach (channels, detect_devices_each, NULL);
 	return WANT_ERROR;
 }
 
