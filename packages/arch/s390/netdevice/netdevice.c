@@ -151,9 +151,14 @@ static enum state_wanted detect_channels (void)
 	return WANT_NEXT;
 }
 
+static di_hfunc detect_devices_each;
+static void detect_devices_each (void *key __attribute__ ((unused)), void *value, void *user_data)
+{
+}
+
 static enum state_wanted detect_devices (void)
 {
-	//di_tree_foreach (netdevice_channels, detect_devices_each, buf);
+	di_tree_foreach (netdevice_channels, detect_devices_each, NULL);
 	return WANT_ERROR;
 }
 
