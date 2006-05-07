@@ -267,7 +267,7 @@ static void detect_devices_each (void *key __attribute__ ((unused)), void *value
 
 			if (info->current_device && !info->current_device->type)
 			{
-				info->current_device->type = CHANNEL_TYPE_QETH;
+				info->current_device->type = DEVICE_TYPE_QETH;
 				info->current_device->key = chan->key;
 				info->current_device->qeth.channels[0] = chan;
 			}
@@ -398,9 +398,44 @@ static enum state_wanted get_ctc_protocol (void)
 	return WANT_NEXT;
 }
 
+static di_hfunc get_qeth_device_append;
+static void get_qeth_device_append (void *key __attribute__ ((unused)), void *value, void *user_data)
+{
+	struct device *device = value;
+	char *buf = user_data;
+	if (device->type == DEVICE_TYPE_QETH)
+		di_snprintfcat (buf, 64 * 28, "%s-%s-%s, ", device->qeth.channels[0]->name, device->qeth.channels[1]->name, device->qeth.channels[2]->name);
+}
+
 static enum state_wanted get_qeth_device (void)
 {
-	return WANT_ERROR;
+	char buf[64 * 28] = { 0 }, *ptr;
+	const char *template;
+	int dev, ret;
+
+	di_tree_foreach (devices, get_qeth_device_append, buf);
+
+	if (!strlen (buf))
+	{
+		my_debconf_input ("critical", TEMPLATE_PREFIX "qeth/no", &ptr);
+		return WANT_BACKUP;
+	}
+
+	template = TEMPLATE_PREFIX "qeth/choose";
+	debconf_subst (client, template, "choices", buf);
+	debconf_fset (client, template, "seen", "false");
+	debconf_input (client, "critical", template);
+	ret = debconf_go (client);
+	if (ret == 30)
+		return WANT_BACKUP;
+	if (ret)
+		return WANT_ERROR;
+	debconf_get (client, template);
+
+	dev = channel_device (client->value);
+	device_current = di_tree_lookup (devices, &dev);
+
+	return WANT_NEXT;
 }
 
 static enum state_wanted get_qeth_port (void)
