@@ -30,8 +30,9 @@ struct channel
 {
 	int key;
 	char name[SYSFS_NAME_LEN];
-	char devtype[SYSFS_NAME_LEN];
 	enum channel_type type;
+	unsigned int cu_type;
+	unsigned int cu_model;
 };
 
 enum device_type
@@ -106,7 +107,7 @@ static enum state_wanted detect_channels_driver (struct dlist *devices, int type
 
 	dlist_for_each_data (devices, device, struct sysfs_device)
 	{
-		struct sysfs_attribute *attr_devtype;
+		struct sysfs_attribute *attr_cutype;
 		struct channel *current;
 		char buf[SYSFS_PATH_MAX];
 
@@ -124,9 +125,9 @@ static enum state_wanted detect_channels_driver (struct dlist *devices, int type
 		strncpy (current->name, device->name, sizeof (current->name));
 		current->key = channel_device(device->name);
 
-		attr_devtype = sysfs_get_device_attr (device, "devtype");
-		sysfs_read_attribute (attr_devtype);
-		strncpy (current->devtype, attr_devtype->value, sizeof (current->devtype));
+		attr_cutype = sysfs_get_device_attr (device, "cutype");
+		sysfs_read_attribute (attr_cutype);
+		sscanf (attr_cutype->value, "%04x/%02x", &current->cu_type, &current->cu_model);
 
 		di_tree_insert (channels, current, current);
 	}
@@ -156,14 +157,42 @@ static enum state_wanted detect_channels (void)
 	return WANT_NEXT;
 }
 
+struct detect_devices_info
+{
+};
+
 static di_hfunc detect_devices_each;
 static void detect_devices_each (void *key __attribute__ ((unused)), void *value, void *user_data)
 {
+	struct channel *chan = value;
+	struct detect_devices_info *info = user_data;
+
+	switch (chan->type)
+	{
+		case CHANNEL_TYPE_CU3088_ALL:
+			switch (chan->cu_model)
+			{
+				case 0x8:
+					chan->type = CHANNEL_TYPE_CU3088_CTC;
+					//printf ("found ctc channel: %s\n", chan->name);
+					break;
+				default:
+					break;
+			};
+			break;
+		case CHANNEL_TYPE_QETH:
+			break;
+		default:
+			break;
+	};
 }
 
 static enum state_wanted detect_devices (void)
 {
-	di_tree_foreach (channels, detect_devices_each, NULL);
+	struct detect_devices_info info =
+	{
+	};
+	di_tree_foreach (channels, detect_devices_each, &info);
 	return WANT_ERROR;
 }
 
