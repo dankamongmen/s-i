@@ -39,13 +39,30 @@ enum device_type
 {
 	DEVICE_TYPE_CTC,
 	DEVICE_TYPE_QETH,
+	DEVICE_TYPE_IUCV,
 };
 
 struct device
 {
 	int key;
-	struct channel *channels[3];
 	enum device_type type;
+	union
+	{
+		struct
+		{
+			struct channel *channels[2];
+			int protocol;
+		} ctc;
+		struct
+		{
+			struct channel *channels[3];
+			char portname[32];
+		} qeth;
+		struct
+		{
+			char peername[32];
+		} iucv;
+	};
 };
 
 static di_tree *channels;
@@ -194,21 +211,21 @@ static void detect_devices_each (void *key __attribute__ ((unused)), void *value
 			if (!info->current_device)
 				info->current_device = di_new0 (struct device, 1);
 
-			if (info->current_device->channels[1])
+			if (info->current_device->qeth.channels[1])
 			{
-				if (info->current_device->channels[1]->key + 1 == chan->key)
+				if (info->current_device->qeth.channels[1]->key + 1 == chan->key)
 				{
-					info->current_device->channels[2] = chan;
+					info->current_device->qeth.channels[2] = chan;
 					di_tree_insert (devices, info->current_device, info->current_device);
 					info->current_device = NULL;
 				}
 				else
 					info->current_device->type = 0;
 			}
-			else if (info->current_device->channels[0])
+			else if (info->current_device->qeth.channels[0])
 			{
-				if (info->current_device->channels[0]->key + 1 == chan->key)
-					info->current_device->channels[1] = chan;
+				if (info->current_device->qeth.channels[0]->key + 1 == chan->key)
+					info->current_device->qeth.channels[1] = chan;
 				else
 					info->current_device->type = 0;
 			}
@@ -217,7 +234,7 @@ static void detect_devices_each (void *key __attribute__ ((unused)), void *value
 			{
 				info->current_device->type = CHANNEL_TYPE_QETH;
 				info->current_device->key = chan->key;
-				info->current_device->channels[0] = chan;
+				info->current_device->qeth.channels[0] = chan;
 			}
 			break;
 		default:
