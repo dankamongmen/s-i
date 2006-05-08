@@ -15,12 +15,12 @@ for dev in $(grep : /proc/net/dev | sort | cut -d: -f1); do
 		continue
 	fi
 
-	local vendor="$(sed 's/^0x//' "/sys/class/net/$dev/device/vendor")"
-	local device="$(sed 's/^0x//' "/sys/class/net/$dev/device/device")"
+	vendor="$(sed 's/^0x//' "/sys/class/net/$dev/device/vendor")"
+	device="$(sed 's/^0x//' "/sys/class/net/$dev/device/device")"
 	# 'tail -n 1' because for some reason lspci outputs two
 	# Device: lines.
-	local vendorname="$(lspci -d "$vendor:$device" -m -v | grep ^Vendor: | tail -n 1 | sed 's/^Vendor:[[:space:]]*//; s/,/\\,/g')"
-	local devicename="$(lspci -d "$vendor:$device" -m -v | grep ^Device: | tail -n 1 | sed 's/^Device:[[:space:]]*//; s/,/\\,/g')"
+	vendorname="$(lspci -d "$vendor:$device" -m -v | grep ^Vendor: | tail -n 1 | sed 's/^Vendor:[[:space:]]*//; s/,/\\,/g')"
+	devicename="$(lspci -d "$vendor:$device" -m -v | grep ^Device: | tail -n 1 | sed 's/^Device:[[:space:]]*//; s/,/\\,/g')"
 	if [ "$vendorname" ] || [ "$devicename" ]; then
 		echo "$dev:$vendorname $devicename" >> /etc/network/devnames
 	fi
