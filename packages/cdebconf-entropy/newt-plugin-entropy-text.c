@@ -83,6 +83,20 @@ success_text(struct frontend *obj)
       "Key data has been created successfully.");
 }
 
+static const char *
+question_get_variable(struct question *q, const char *name)
+{
+    struct questionvariable *var = q->variables;
+    
+    while (var) {
+        if (!strcmp(name, var->variable))
+            return var->value;
+        var = var->next;
+    }
+
+    return NULL;
+}
+
 static void *
 setup_handler_dlsyms(void)
 {
@@ -174,7 +188,7 @@ newt_handler_entropy_text(struct frontend *obj, struct question *q)
     }
    
     keysize = KEYSIZE;
-    p = question_getvalue(q, "partman-crypto/keysize");
+    p = question_get_variable(q, "KEYSIZE");
     if (p)
         keysize = atoi(p);
 
