@@ -230,8 +230,9 @@ static void get_channel_select_append (void *key __attribute__ ((unused)), void 
 {
 	struct channel *channel = value;
 	char *buf = user_data;
+	if (buf[0])
+		strncat (buf, ", ", 512);
 	strncat (buf, channel->name, 512);
-	strncat (buf, ", ", 512);
 }
 
 static enum state_wanted get_channel_select (void)
