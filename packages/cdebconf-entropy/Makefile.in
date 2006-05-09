@@ -11,6 +11,7 @@ incdir=${prefix}/include/cdebconf
 PACKAGE=@PACKAGE@
 CC=@CC@
 CFLAGS=@CFLAGS@ -I.
+LDFLAGS=@LDFLAGS@
 
 FRONTENDS=@FRONTENDS@
 PLUGIN_MODULES=$(addsuffix -plugin-$(PACKAGE).so,$(FRONTENDS))
@@ -24,7 +25,7 @@ install: $(PLUGIN_MODULES)
 	done
 
 newt-plugin-$(PACKAGE).so: newt-plugin-$(PACKAGE).opic
-	gcc -shared -lnewt -o $@ newt-plugin-$(PACKAGE).opic
+	$(CC) $(LDFLAGS) -shared -lnewt -o $@ newt-plugin-$(PACKAGE).opic
 
 clean:
 	rm -f $(PLUGIN_MODULES)
