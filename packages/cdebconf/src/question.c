@@ -82,6 +82,17 @@ const char *question_getvalue(const struct question *q, const char *lang)
 	return q->template->lget(q->template, lang, "default");
 }
 
+const char *question_get_variable(const struct question *q, const char *var)
+{
+	struct questionvariable *qvi = q->variables;
+
+	for (; qvi != 0; qvi = qvi->next)
+		if (strcmp(qvi->variable, var) == 0)
+			return qvi->value;
+
+	return NULL;
+}
+
 void question_variable_add(struct question *q, const char *var, 	
 	const char *value)
 {
