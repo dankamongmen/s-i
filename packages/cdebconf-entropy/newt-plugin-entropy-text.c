@@ -144,8 +144,8 @@ newt_handler_entropy_text(struct frontend *obj, struct question *q)
     int keysize;
     int nwritten = 0;
     int want_data = 1;
-    int randfd = -1;
-    int fifofd = -1;
+    int randfd = 0;
+    int fifofd = 0;
  
     newt = setup_handler_dlsyms();
     if (!newt)
