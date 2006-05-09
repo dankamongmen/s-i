@@ -164,7 +164,8 @@ fi
     sed -e "s|^- \"\(.*\)\"$|\1|" \
 	-e "s|\$TCPIP|TCPIP|" \
 	-e "s/%l*[scdbniuBFNS]//g" \
-	-e "s|\\\\\"|\"|g" ${FILE_CODEPOINTS} > ${DEST_DIR}/fully_stripped.txt
+	-e "s|\\\\\"|\"|g" \
+	-e "s|\\\n||g" ${FILE_CODEPOINTS} > ${DEST_DIR}/fully_stripped.txt
 
     iconv -f utf8 -t ucs-4le ${DEST_DIR}/fully_stripped.txt | \
 	od -v -tx2 -An -w2 | \
