@@ -219,6 +219,7 @@ char *
 insert_description (char *buf, char *description, int *first_entry)
 {
 	char *s = buf;
+	char *t = description;
 
 	if (*first_entry) {
 		*first_entry = 0;
@@ -226,8 +227,11 @@ insert_description (char *buf, char *description, int *first_entry)
 		strcpy (s, ", ");
 		s += 2;
 	}
-	strcpy (s, description);
-	s += strlen (description);
+	while (*t) {
+		if (*t == '\\' || *t == ',')
+			*s++ = '\\';
+		*s++ = *t++;
+	}
 	*s = '\0';
 	return s;
 }
