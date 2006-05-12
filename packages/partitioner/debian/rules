@@ -45,8 +45,8 @@ binary-arch: build install
 # unless partitioner depends on it
 ifeq ($(ARCH),mips)
 	dh_gencontrol -- -Vfdisk:Depends=fdisk-udeb
-else
-	dh_gencontrol
+else ifeq ($(ARCH),rm)
+	dh_gencontrol -- -Vfdisk:Depends=acorn-fdisk-udeb
 endif
 	dh_builddeb
 
