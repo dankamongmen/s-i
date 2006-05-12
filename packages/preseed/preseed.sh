@@ -23,7 +23,7 @@ preseed_location () {
 	
 	local tmp=/tmp/debconf-seed
 	
-	if ! preseed_fetch $location $tmp; then
+	if ! preseed_fetch "$location" "$tmp"; then
 		error retrieve_error "$location"
 	fi
 	if [ -n "$checksum" ] && \
@@ -33,6 +33,7 @@ preseed_location () {
 
 	db_set preseed/include ""
 	db_set preseed/include_command ""
+	db_set preseed/run ""
 	UNSEEN=
 	db_get preseed/interactive
 	if [ "$RET" = true ]; then
@@ -74,6 +75,25 @@ preseed_location () {
 		fi
 		if [ -n "$location" ]; then
 			preseed_location "$location" "$sum"
+		fi
+	done
+	
+	db_get preseed/run
+	local torun="$RET"
+	for location in $torun; do
+		if preseed_relative "$location"; then
+			location="$(dirname $last_location)/$location"
+		fi
+		if [ -n "$location" ]; then
+			if ! preseed_fetch "$location" "$tmp"; then
+				error retrieve_error "$location"
+			fi
+			chmod +x $tmp
+			if ! $tmp; then
+				error load_error "$location"
+			fi
+			log "successfully ran file from $location"
+			rm -f $tmp
 		fi
 	done
 }
