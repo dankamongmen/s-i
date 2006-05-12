@@ -196,7 +196,7 @@ runtime.
 Another readable file <filename>/var/cache/debconf/questions.dat</filename>
 is used to store the values for variables and the answers given to questions.
 A question always refers to the template used to ask it. For obvious
-security reasons the values for templates of type <quote>password</quote>
+security reasons the values for questions of type <quote>password</quote>
 are stored in a separate, non-readable file in the same directory.
 
 </para>
@@ -234,7 +234,7 @@ installation. See <xref linkend="preseed-shell"/> for details.
 It is possible to use preseeding to change the default answer for a
 question, but still have the question asked. To do this the
 <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
-setting the value for a template.
+setting the value for a question.
 
 </para>
 
@@ -423,7 +423,7 @@ The preconfiguration file is in the format used by the
 a line in a preconfiguration file is:
 
 <informalexample><screen>
-&lt;owner&gt; &lt;template name&gt; &lt;template type&gt; &lt;value&gt;
+&lt;owner&gt; &lt;queston name&gt; &lt;question type&gt; &lt;value&gt;
 </screen></informalexample>
 
 </para><para>
@@ -440,17 +440,17 @@ There are a few rules to keep in mind when writing a preconfiguration file.
 <listitem><para>
   A line can be split into multiple lines by appending a backslash
   (<quote><literal>\</literal></quote>) as the line continuation character.
-  A good place to split a line is after the template name; a bad place is
+  A good place to split a line is after the question name; a bad place is
   between type and value.
 </para></listitem>
 <listitem><para>
-  Most templates need to be preseeded using the values valid in English and
-  not the translated values. However, there are some templates (for example
+  Most questions need to be preseeded using the values valid in English and
+  not the translated values. However, there are some questions (for example
   in <classname>partman</classname> where the translated values need to be
   used.
 </para></listitem>
 <listitem><para>
-  Some templates take a code as value instead of the English text that is
+  Some questions take a code as value instead of the English text that is
   shown during installation.
 </para></listitem>
 </itemizedlist>
@@ -498,7 +498,7 @@ will be deleted from your system if you purge the package
 
 <para>
 
-To check possible values for templates, you can use <command>nano</command>
+To check possible values for questions, you can use <command>nano</command>
 to examine the files in <filename>/var/lib/cdebconf</filename> while an
 installation is in progress. View <filename>templates.dat</filename> for
 the raw templates and <filename>questions.dat</filename> for the current
@@ -707,7 +707,7 @@ correct one will be selected before using preseeding.
 
 <informalexample role="example"><screen>
 # If the system has free space you can choose to only partition that space.
-# Note: this template must be preseeded with a localized (translated) value.
+# Note: this must be preseeded with a localized (translated) value.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 
@@ -717,7 +717,7 @@ correct one will be selected before using preseeding.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
 # You can choose from any of the predefined partitioning recipes.
-# Note: this template must be preseeded with a localized (translated) value.
+# Note: this must be preseeded with a localized (translated) value.
 d-i partman-auto/choose_recipe \
        select All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe \
