@@ -43,6 +43,9 @@ binary-arch: build install
 	dh_testdir -s
 	dh_testroot -s
 	dh_installdebconf -s
+ifeq ($(ARCH),arm)
+	install -m755 debian/partconf.isinstallable debian/partconf/DEBIAN/isinstallable
+endif
 ifeq ($(ARCH),mips)
 	install -m755 debian/partconf.isinstallable debian/partconf/DEBIAN/isinstallable
 endif
