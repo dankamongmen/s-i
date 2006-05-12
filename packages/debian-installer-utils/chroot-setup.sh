@@ -83,8 +83,8 @@ chroot_cleanup () {
 	# Reverse sorting to umount the deepest mount points first.
 	# Items with count of 1 are new.
 	for dir in $( (cat /tmp/mount.pre /tmp/mount.pre; mountpoints ) | \
-		     sort -r | uniq -c | grep "[[:space:]]1[[:space:]]" | \
-		     sed "s/[[:space:]]*[0-9][[:space:]]//"); do
+		     sort -r | uniq -c | grep "^[[:space:]]*1[[:space:]]" | \
+		     sed "s/^[[:space:]]*[0-9][[:space:]]//"); do
 		if ! umount $dir ; then
 			logger -t $0 "warning: Unable to umount '$dir'"
 		fi
