@@ -104,10 +104,22 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 		}
 	}
 	// Ensure at least 1 USB entry, unless the arch uses AT for 2.6 kernels
-	if ((!usb_present) && (!skip_26_kernels)) {
-		di_debug ("Adding generic entry for USB keymaps\n");
-		p = usb_new_entry (keyboards);
-		keyboards = p;
+	if (!usb_present) {
+		if (!skip_26_kernels) {
+			di_debug ("Adding generic entry for USB keymaps\n");
+			p = usb_new_entry (keyboards);
+			keyboards = p;
+		} else {
+			/* Hack because on powerpc laptops no keyboard is detected at all
+			 * (they use ADB (Apple bus) keyboards) and keyboard configuration
+			 * actually depended on the generic USB entry being added, so we
+			 * now add a generic AT entry (yeah, ugly as hell)
+			 */
+			di_debug ("Adding generic entry for AT keymaps\n");
+			p = usb_new_entry (keyboards);
+			p->name = "at";   // Force installer to show AT keymaps
+			keyboards = p;
+		}
 	}
 	return keyboards;
 }
