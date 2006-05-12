@@ -62,6 +62,7 @@ EOF
 
 	LANG=$(debconf-get debian-installer/locale || true)
 	export LANG
+	export PERL_BADLANG=0
 
 	# Unset variables that would make scripts in the target think
 	# that debconf is already running there.
