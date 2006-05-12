@@ -122,12 +122,8 @@ binary-arch: install-arch
 	dh_fixperms -s
 	dh_makeshlibs -s --add-udeb=libdebconfclient0-udeb
 	dh_installdeb -s
-	dh_shlibdeps -s
-	# The dependency info for gtk/gdk libs is somewhat broken as ldd is
-	# unable to find the correct libs (in /usr/lib/directfb) at buildtime,
-	# although the correct libs are used during the build and when running
-	# the graphical installer. This hack corrects the dependencies.
-	sed -i 's/libgtk2.0-0 (>= [-.0-9]*)/libgtk+2.0-directfb0-udeb (>= 2.0.9.2)/' $(CURDIR)/debian/cdebconf-gtk-udeb.substvars
+	# Look first in /usr/lib/directfb to get correct dependencies for cdebconf-gtk
+	dh_shlibdeps -s -l/usr/lib/directfb
 	dh_gencontrol -s
 	dh_builddeb -s
 
