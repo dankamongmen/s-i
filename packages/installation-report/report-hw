@@ -9,7 +9,6 @@ addinfo () {
 }
 
 uname -a 2>&1 | addinfo "umame -a"
-discover -f "%m;%S;%D;%V;%M;%d\n" all | addinfo "discover" || true
 
 if type lspci >/dev/null 2>&1; then
 	lspci -v -t 2>&1 | addinfo "lspci -v -t"
@@ -29,6 +28,9 @@ fi
 lsmod 2>&1 | addinfo lsmod
 df 2>&1 | addinfo df
 free 2>&1 | addinfo free
+
+pccardctl status 2>&1 | addinfo "cardctl status"
+pccardctl ident 2>&1 | addinfo "cardctl ident"
 cardctl status 2>&1 | addinfo "cardctl status"
 cardctl ident 2>&1 | addinfo "cardctl ident"
 
