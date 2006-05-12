@@ -8,7 +8,7 @@ MOUNTABLE_DEVS_COUNT=0
 TOPLEVEL_DIRS_COUNT=0
 
 log () {
-    logger -t hd-image-detect "$@"
+    logger -t iso-scan "$@"
 }
 
 # Finds all block devices that might have a filesystem on them.
@@ -59,7 +59,6 @@ try_iso () {
 	iso_to_try=$1
 	iso_device=$2
 	if mount -t iso9660 -o loop,ro,exec $iso_to_try /cdrom 2>/dev/null; then
-		log "Mounted $1"
 		ISO_MOUNT_COUNT=$(expr $ISO_MOUNT_COUNT + 1)
 		if is_debian_iso; then
 			# This could be more sophisticated, and try to deal
@@ -77,6 +76,8 @@ try_iso () {
 			if [ ! -e /cdrom/.disk/base_installable ]; then
 				log "Base system not installable from CD image, requesting choose-mirror"
 				anna-install choose-mirror || true
+			else
+				anna-install apt-cdrom-setup || true
 			fi
 			exit 0
 		else
@@ -102,7 +103,6 @@ for dev in $DEVS; do
 	DEV_COUNT=$(expr $DEV_COUNT + 1)
 done
 
-log "Searching for Debian installation media..."
 db_progress START 0 $DEV_COUNT iso-scan/progress_title
 
 # Load up every filesystem known to man. The drive could have anything.
