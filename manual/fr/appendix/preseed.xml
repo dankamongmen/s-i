@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 36758 -->
+<!-- original version: 37253 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -144,7 +144,7 @@ La plupart des dialogues de l'installateur Debian peuvent être
 préconfigurés de cette manière. Il y a cependant des exceptions
 notables. On doit partitionner tout un disque ou partitionner
 une partie de l'espace disponible&nbsp;; on ne peut pas utiliser des
-partitions existantes. On ne peut pas installer RAID en utilisant cette méthode.
+partitions existantes. On ne peut pas non plus installer RAID en utilisant cette méthode.
 
 </para>
   </sect2>
@@ -261,7 +261,7 @@ Vous devez d'abord créer le fichier de préconfiguration et le placer là où vous
 le voulez. Cette création est abordée plus loin dans l'annexe. Mettre ce fichier au bon endroit
 est simple si vous voulez le lire sur le réseau, sur une disquette ou sur une clé usb.
 Si vous voulez inclure ce fichier sur un cédérom vous devrez recréer l'image iso.
-Expliquer comment le mettre dans l'initrd ne sera pas fait dans cette annexe. Veuillez
+Cette annexe n'expliquera pas comment le mettre dans l'initrd. Veuillez
 consulter la documentation des développeurs de l'installateur.
 
 </para>
@@ -291,7 +291,7 @@ le fichier de configuration du programme d'amorçage (par exemple
 </para><para>
 
 Si vous avez indiqué le fichier de préconfiguration dans le fichier de configuration 
-du programme d'amorçage, vous pourriez modifier la configuration pour ne pas avoir à
+du programme d'amorçage, il est possible de modifier la configuration pour ne pas avoir à
 appuyer sur la touche <quote>Entrée</quote> pour lancer l'installateur.
 Avec syslinux, il suffit de mettre le délai d'attente à 1 dans
 <filename>syslinux.cfg</filename>.
@@ -426,7 +426,7 @@ Le format de ce fichier est celui de la commande
 <command>debconf-set-selections</command>. Chaque ligne est de la forme suivante&nbsp;:
 
 <informalexample><screen>
-&lt;propriétaire&gt; &lt;nom&gt; &lt;type&gt; &lt;valeur&gt;
+&lt;propriétaire&gt; &lt;nom de la question&gt; &lt;type de la question&gt; &lt;valeur&gt;
 </screen></informalexample>
 
 </para><para>
@@ -441,8 +441,8 @@ Voici quelques règles pour écrire un fichier de préconfiguration.
 <listitem><para>
   Une ligne peut être divisée en ajoutant une barre oblique inverse
   (<quote><literal>\</literal></quote>) pour signifier la continuation de la ligne.
-  Il vaut mieux couper la ligne après le nom. Ce n'est pas très heureux de la couper
-  entre le type et la valeur.
+  Il vaut mieux couper la ligne après le nom de la question.
+  Ce n'est pas très heureux de la couper entre le type et la valeur.
 </para></listitem>
 <listitem><para>
   La plupart des valeurs doivent être en anglais et non pas en français. Mais il existe
@@ -976,7 +976,7 @@ tasksel tasksel/first multiselect standard, desktop
 
 <informalexample role="example"><screen>
 # Pour éviter le dernier message disant que l'installation est terminée.
-d-i prebaseconfig/reboot_in_progress note
+d-i finish-install/reboot_in_progress note
 
 # Pour empêcher l'éjection du cédérom au moment du redémarrage,
 # c'est utile parfois :
@@ -1106,6 +1106,14 @@ un autre fichier.
 # résultat donne les noms de ces fichiers, ils sont inclus. 
 #d-i preseed/include_command string \
 #   string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+
+# Plus encore, cela télécharge un programme et l'exécute. Le programme peut
+# utiliser des commandes comme debconf-set pour manipuler la base de données de debconf.
+# Il faut remarquer que si les fichiers sont indiqués de façon relative, ils
+# seront cherchés dans le répertoire qui contient le fichier de préconfiguration qui les
+# a lancés.
+d-i preseed/run string foo.sh
+
 </screen></informalexample>
 </sect2>
 
