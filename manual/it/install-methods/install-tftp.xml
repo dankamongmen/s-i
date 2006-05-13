@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35613 -->
+<!-- original version: 36841 -->
 
 
  <sect1 condition="supports-tftp" id="install-tftp">
@@ -358,7 +358,8 @@ a <command>tftpd</command>.
 <!--
 For DECstations, there are tftpimage files for each subarchitecture,
 which contain both kernel and installer in one file. The naming
-convention is <replaceable>subarchitecture</replaceable>/netboot-boot.img.
+convention is
+<filename><replaceable>subarchitecture</replaceable>/netboot-boot.img</filename>.
 Copy the tftpimage file you would like to use to
 <userinput>/tftpboot/tftpboot.img</userinput> if you work with the
 example BOOTP/DHCP setups described above.
@@ -367,9 +368,9 @@ example BOOTP/DHCP setups described above.
 Per le DECstation esistono più file tftpimage, uno per ciascuna
 sottoarchitettura, che contengono sia il kernel che l'installatore.
 Il nome delle immagini segue questa convenzione:
-<replaceable>sottoarchitettura</replaceable>/netboot-boot.img. Se si
-usano le impostazioni di BOOTP/DHCP descritte in precedenza copiare
-il file tftpimage che si vuole usare come
+<filename><replaceable>sottoarchitettura</replaceable>/netboot-boot.img</filename>.
+Se si usano le impostazioni di BOOTP/DHCP descritte in precedenza
+copiare il file tftpimage che si vuole usare come
 <userinput>/tftpboot/tftpboot.img</userinput>.
 
 </para><para>
@@ -409,9 +410,9 @@ reasons:
 -->
 
 Parecchie versioni del firmware DECstation hanno un problema relativo
-all'avvio da rete: il trasferimento inizia ma dopo un po' si ferma restituendo
-<computeroutput>a.out err</computeroutput>. Questo problema può avere varie
-cause:
+all'avvio da rete: il trasferimento inizia ma dopo un po' si ferma
+restituendo <computeroutput>a.out err</computeroutput>. Questo problema
+può avere varie cause:
 
 <orderedlist>
 <listitem><para>
@@ -469,7 +470,7 @@ essere trovata nelle pagine web di NetBSD:
 
    <sect3 arch="alpha">
    <!-- <title>Alpha TFTP Booting</title> -->
-   <title>Avvio TFTP di macchine Alpha</title>
+   <title>Avvio di macchine Alpha con TFTP</title>
 <para>
 
 <!--
@@ -500,43 +501,43 @@ appena descritti.
 
    <sect3 arch="sparc">
    <!-- <title>SPARC TFTP Booting</title> -->
-   <title>Avvio TFTP di macchine SPARC</title>
+   <title>Avvio di macchine SPARC con TFTP</title>
 <para>
 
 <!--
-SPARC architectures for instance use the subarchitecture names, such
-as <quote>SUN4M</quote> or <quote>SUN4C</quote>; in some cases, the
-architecture is left blank, so the file the client looks for is just
-<filename>client-ip-in-hex</filename>.  Thus, if your system
-subarchitecture is a SUN4C, and its IP is 192.168.1.3, the filename
-would be <filename>C0A80103.SUN4C</filename>. An easy way to determine
-this is to enter the following command in a shell (assuming the
-machine's intended IP is 10.0.0.4).
+Some SPARC architectures add the subarchitecture names, such as
+<quote>SUN4M</quote> or <quote>SUN4C</quote>, to the filename. Thus,
+if your system's subarchitecture is a SUN4C, and its IP is 192.168.1.3,
+the filename would be <filename>C0A80103.SUN4C</filename>. However,
+there are also subarchitectures where the file the client looks for is
+just <filename>client-ip-in-hex</filename>. An easy way to determine the
+hexadecimal code for the IP address is to enter the following command
+in a shell (assuming the machine's intended IP is 10.0.0.4).
 -->
 
-Le architetture SPARC usano dei nomi per le sottoarchitetture, per esempio
-<quote>SUN4M</quote> o <quote>SUN4C</quote> e in alcuni casi non c'è il nome
-della architettura, quindi il file cercato dal client è semplicemente
-<filename>ip-del-client-in-hex</filename>. Di conseguenza se la
-sottoarchitettura del proprio sistema è SUN4C e il suo indirizzo IP è
-192.168.1.3, il nome del file dovrebbe essere
-<filename>C0A80103.SUN4C</filename>. Un  modo semplice per determinarlo è
-inserire il seguente comando nella shell (si suppone che l'IP della macchina
-sia 10.0.0.4).
+Alcune architetture SPARC aggiungono il nome della sottoarchitettura al
+nome del file, per esempio <quote>SUN4M</quote> o <quote>SUN4C</quote>.
+Di conseguenza se la sottoarchitettura del proprio sistema è SUN4C e
+il suo indirizzo IP è 192.168.1.3, il nome del file dovrebbe essere
+<filename>C0A80103.SUN4C</filename>. Purtroppo ci sono anche altre
+sottoarchitetture che usano file il cui nome è semplicemente
+<filename>ip-del-client-in-hex</filename>. Un  modo semplice per
+determinare il codice in esadecimale dell'indirizzo IP è eseguire il
+seguente comando nella shell (si suppone che l'IP della macchina sia
+10.0.0.4).
 
 <informalexample><screen>
 $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 </screen></informalexample>
 
 <!--
-This will spit out the IP in hexadecimal; to get to the correct
-filename, you will need to change all letters to uppercase and
-if necessary append the subarchitecture name.
+To get to the correct filename, you will need to change all letters to
+uppercase and if necessary append the subarchitecture name.
 -->
 
-Questo comando restituisce l'IP in esadecimale; per ottenere il corretto
-nome del file è necessario cambiare tutte le lettere in maiuscole e, se
-necessario, aggiungere il nome della sottoarchitettura.
+Per ottenere il corretto nome del file è necessario cambiare tutte le
+lettere in maiuscole e, se necessario, aggiungere il nome della
+sottoarchitettura.
 
 </para><para>
 
@@ -557,7 +558,7 @@ nella directory in cui il server TFTP ricerca i file.
 
    <sect3 arch="m68k">
    <!-- <title>BVM/Motorola TFTP Booting</title> -->
-   <title>Avvio TFTP di macchine BVM/Motorola</title>
+   <title>Avvio di macchine BVM/Motorola con TFTP</title>
 <para>
 
 <!--
@@ -578,10 +579,10 @@ to the <filename>tftplilo.txt</filename> file for your subarchitecture
 for additional system-specific configuration information.
 -->
 
-Poi configurare le ROM di avvio o il server BOOTP per caricare inizialmente i
+Poi configurare le ROM d'avvio o il server BOOTP per caricare inizialmente i
 file <filename>tftplilo.bvme</filename> o <filename>tftplilo.mvme</filename>
-dal server TFTP. Si consulti il file <filename>tftplilo.txt</filename> per
-la propria sottoarchitettura per ulteriori informazioni sulla configurazione
+dal server TFTP. Si consulti il file <filename>tftplilo.txt</filename> della
+propria sottoarchitettura per ulteriori informazioni sulla configurazione
 specifica del sistema.
 
 </para>
@@ -589,7 +590,7 @@ specifica del sistema.
 
    <sect3 arch="mips">
    <!-- <title>SGI TFTP Booting</title> -->
-   <title>Avvio TFTP di macchine SGI</title>
+   <title>Avvio di macchine SGI con TFTP</title>
 <para>
 
 <!--
@@ -603,7 +604,7 @@ the <userinput>filename=</userinput> option in
 Sulle macchine SGI si può fare affidamento su <command>bootpd</command>
 per avere il nome del file TFTP; infatti può essere fornito con l'opzione
 <userinput>bf=</userinput> in <filename>/etc/bootptab</filename> oppure
-come l'opzione <userinput>filename=</userinput> in
+con l'opzione <userinput>filename=</userinput> in
 <filename>/etc/dhcpd.conf</filename>.
 
 </para>
@@ -611,11 +612,13 @@ come l'opzione <userinput>filename=</userinput> in
 
    <sect3 arch="mips">
    <!-- <title>Broadcom BCM91250A and BCM91480B TFTP Booting</title> -->
-   <title>Avvio TFTP di Broadcom BCM91250A e BCM91480B</title>
+   <title>Avvio di Broadcom BCM91250A e BCM91480B con TFTP</title>
 <para>
 
-<!-- You don't have to configure DHCP in a special way because you'll pass
-the full path of the file to the loaded to CFE. -->
+<!--
+You don't have to configure DHCP in a special way because you'll pass the
+full path of the file to be loaded to CFE.
+-->
 
 Non è necessario fare una particolare configurazione di DHCP perché si deve
 passare il percorso completo del file da caricare a CFE.
@@ -630,7 +633,6 @@ passare il percorso completo del file da caricare a CFE.
   <sect2 id="tftp-low-memory">
   <title>TFTP Installation for Low-Memory Systems</title>
   <title>Installazione TFTP su sistemi con poca memoria</title>
-
 <para>
 
 On some systems, the standard installation RAMdisk, combined with the

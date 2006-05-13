@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36758 -->
+<!-- original version: 37253 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -219,7 +219,7 @@ preconfigurazione per impostare il RAID.
 
 <!-- Joeyh feels this is too technical, so leave it out for now
   <sect2 id="preseed-debconf">
-  <!- <title>Debconf basics</title> ->
+  <title>Debconf basics</title>
   <title>Nozioni di base su Debconf</title>
 <para>
 
@@ -272,7 +272,7 @@ runtime.
 Another readable file <filename>/var/cache/debconf/questions.dat</filename>
 is used to store the values for variables and the answers given to questions.
 A question always refers to the template used to ask it. For obvious
-security reasons the values for templates of type <quote>password</quote>
+security reasons the values for questions of type <quote>password</quote>
 are stored in a separate, non-readable file in the same directory.
 
 </para>
@@ -328,13 +328,13 @@ in determinati momenti dell'installazione. Si consulti
 It is possible to use preseeding to change the default answer for a
 question, but still have the question asked. To do this the
 <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
-setting the value for a template.
+setting the value for a question.
 -->
 
 È possibile usare la preconfigurazione per modificare la risposta predefinita
 a una domanda ma fare in modo che la domanda venga comunque posta. Per farlo
 si deve impostare il flag <firstterm>seen</firstterm> a <quote>false</quote>
-dopo aver impostato il valore di un modello.
+dopo aver impostato il valore della domanda.
 
 </para>
 
@@ -459,7 +459,7 @@ non userà quel file.
 Boot parameters to specify:
 - if you're netbooting:
   preseed/url=http://host/path/to/preseed.cfg
--->Parametri d'avvio da specificare:
+-->Parametri di avvio da specificare:
 - con avvio da rete:
   preseed/url=http://host/parcorso/di/preseed.cfg
   preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
@@ -496,9 +496,7 @@ parte delle domande anche se non sono state preconfigurate.
 
   <sect2 id="preseed-dhcp">
   <!-- <title>Using a DHCP server to specify preconfiguration files</title> -->
-  <title>
-    Uso di un server DHCP per specificare un file di preconfigurazione
-  </title>
+  <title>Uso di un server DHCP per specificare un file di preconfigurazione</title>
 <para>
 
 <!--
@@ -566,7 +564,7 @@ molta cautela.
 
   <sect2 id="preseed-bootparms">
   <!-- <title>Using boot parameters to supplement preseeding</title> -->
-  <title>Uso dei parametri d'avvio per completare la preconfigurazione</title>
+  <title>Uso dei parametri di avvio per completare la preconfigurazione</title>
 <para>
 
 <!--
@@ -616,7 +614,7 @@ L'uso di <quote>&ndash;&ndash;</quote> nelle opzioni d'avvio ha un significato
 speciale, i parametri del kernel che lo seguono sono copiati direttamente
 nella configuarazione del boot loader nel sistema installato (se il boot
 loader è supportato dall'installatore). Notare che <quote>&ndash;&ndash;</quote>
-potrebbe già essere presente nei parametri d'avvio predefiniti.
+potrebbe già essere presente nei parametri di avvio predefiniti.
 
 </para>
 <note><para>
@@ -682,12 +680,12 @@ del file di preconfigurazione è:
 
 <!--
 <informalexample><screen>
-&lt;owner&gt; &lt;template name&gt; &lt;template type&gt; &lt;value&gt; 
+&lt;owner&gt; &lt;queston name&gt; &lt;question type&gt; &lt;value&gt; 
 </screen></informalexample>
 -->
 
 <informalexample><screen>
-&lt;owner&gt; &lt;nome modello&gt; &lt;tipo modello&gt; &lt;valore&gt; 
+&lt;owner&gt; &lt;nome domanda&gt; &lt;tipo domanda&gt; &lt;valore&gt; 
 </screen></informalexample>
 
 </para><para>
@@ -707,39 +705,39 @@ file di preconfigurazione.
   Put only a single space or tab between type and value: any additional
   whitespace will be interpreted as belonging to the value.
 -->
-  Inserire un solo spazione o un tab fra tipo e valore: ogni ulteriore
+  Inserire un singolo spazio o un solo tab fra tipo e valore: ogni ulteriore
   spazio viene interpretato come appartenente al valore.
 </para></listitem>
 <listitem><para>
 <!--
   A line can be split into multiple lines by appending a backslash
   (<quote><literal>\</literal></quote>) as the line continuation character.
-  A good place to split a line is after the template name; a bad place is
+  A good place to split a line is after the question name; a bad place is
   between type and value.
 -->
   Una riga può essere spezzata su più righe aggiungendo un backslash
   (<quote><literal>\</literal></quote>) come carattere di continuazione
-  della riga. Un buon punto in cui spezzare una riga è dopo il nome del
-  modello; invece un punto pessimo è fra il tipo e il valore.
+  della riga. Un buon punto in cui spezzare una riga è dopo il nome della
+  domanda; invece un punto pessimo è fra il tipo e il valore.
 </para></listitem>
 <listitem><para>
 <!--
-  Most templates need to be preseeded using the values valid in English and
-  not the translated values. However, there are some templates (for example
+  Most questions need to be preseeded using the values valid in English and
+  not the translated values. However, there are some questions (for example
   in <classname>partman</classname> where the translated values need to be
   used.
 -->
-  La maggior parte dei modelli deve essere preconfigurata usando i valori
+  La maggior parte delle domande deve essere preconfigurata usando i valori
   validi per la lingua inglese e non usando i valori tradotti. Comunque,
-  esistono dei modelli (per esempio in <classname>partman</classname>) in
+  esistono delle domande (per esempio in <classname>partman</classname>) in
   cui è necessario usare i valori tradotti.
 </para></listitem>
 <listitem><para>
 <!--
-  Some templates take a code as value instead of the English text that is
+  Some questions take a code as value instead of the English text that is
   shown during installation.
 -->
-  Alcuni modelli accettano come valore un codice anziché il testo in
+  Alcune domande accettano come valore un codice anziché il testo in
   inglese mostrato durante l'installazione.
 </para></listitem>
 </itemizedlist>
@@ -822,14 +820,14 @@ essa contenuti sono cancellati dal sistema quando di elimina il pacchetto
 <para>
 
 <!--
-To check possible values for templates, you can use <command>nano</command>
+To check possible values for questions, you can use <command>nano</command>
 to examine the files in <filename>/var/lib/cdebconf</filename> while an
 installation is in progress. View <filename>templates.dat</filename> for
 the raw templates and <filename>questions.dat</filename> for the current
 values and for the values assigned to variables.
 -->
 
-Per verificare quali sono i valori validi per un modello si può usare
+Per verificare quali sono i valori validi per una domanda si può usare
 <command>nano</command> per esaminare, quando l'installazione è in corso,
 i file in <filename>/var/lib/cdebconf</filename>. In
 <filename>templates.dat</filename> ci sono i modelli e in
@@ -1194,12 +1192,12 @@ preconfigurazione.
 <informalexample role="example"><screen>
 <!--
 # If the system has free space you can choose to only partition that space.
-# Note: this template must be preseeded with a localized (translated) value.
+# Note: this must be preseeded with a localized (translated) value.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 --># Se il sistema ha spazio libero è possibile scegliere di partizionare
-# soltanto quello spazio. Nota: questo modello deve essere preconfigurato
-# con un valore localizzato (cioè tradotto).
+# soltanto quello spazio. Nota: da preconfigurare con un valore
+# localizzato (cioè tradotto).
 #d-i partman-auto/init_automatically_partition \
 #    select Usa lo spazio libero continuo più grande
 <!--
@@ -1214,11 +1212,11 @@ preconfigurazione.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 <!--
 # You can choose from any of the predefined partitioning recipes.
-# Note: this template must be preseeded with a localized (translated) value.
+# Note: this must be preseeded with a localized (translated) value.
 -->
 # È possibile scegliere da una qualsiasi delle ricette di partizionamento
-# predefinite. Nota: questo modello deve essere preconfigurato con un valore
-# localizzato (cioè tradotto).
+# predefinite. Nota: da preconfigurare con un valore localizzato (cioè
+# tradotto).
 d-i partman-auto/choose_recipe \
 <!--
        select All files in one partition (recommended for new users)
@@ -1480,7 +1478,7 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 <!--
 # Grub is the default boot loader (for x86). If you want lilo installed
 # instead, uncomment this:
---># Grub è il caricatore di avvio predefinito (per x86). Se si desidera,
+--># Grub è il boot loader predefinito (per x86). Se si desidera,
 # invece, che sia installato lilo, scommentare questa:
 #d-i grub-installer/skip boolean true
 <!--
@@ -1600,7 +1598,7 @@ tasksel tasksel/first multiselect standard, desktop
 <!--
 # Avoid that last message about the install being complete.
 --># Evita l'ultimo messaggio riguardo il completamento dell'installazione.
-d-i prebaseconfig/reboot_in_progress note
+d-i finish-install/reboot_in_progress note
 <!--
 # This will prevent the installer from ejecting the CD during the reboot,
 # which is useful in some situations.
@@ -1792,9 +1790,9 @@ un file e di mettere alcune configurazioni particolari in altri file.
 # the same directory as the preconfiguration file that includes them.
 --># Si possono elencare più file separandoli con degli spazi; verranno
 # caricati tutti. Anche i file inclusi possono avere al loro interno delle
-# direttive preseed/include. Si noti che i nomi dei file sono relativi, sono
-# prelevati dalla stessa directory del file di preconfigurazione e sono
-# processati nell'ordine con cui sono inclusi.
+# direttive preseed/include. Si noti che se i nomi dei file sono relativi,
+# sono prelevati dalla stessa directory del file di preconfigurazione che
+# gli include e sono processati nell'ordine con cui sono inclusi.
 #d-i preseed/include string x.cfg
 <!--
 # The installer can optionally verify checksums of preconfiguration files
@@ -1813,6 +1811,17 @@ un file e di mettere alcune configurazioni particolari in altri file.
 # i nomi dei file di preconfigurazione allora include questi file.
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+<!--
+# Most flexibly of all, this downloads a program and runs it. The program
+# can use commands such as debconf-set to manupulate the debconf database.
+# Note that if the filenames are relative, they are taken from the same
+# directory as the preconfiguration file that runs them.
+-->
+# Il massimo della flessibilità, questo scarica ed esegue un programma. Il
+# programma può usare debconf-set per manipolare il database di debconf. Si
+# noti che se i nomi dei file sono relativi, sono prelevati dalla stessa
+# directory del file di preconfigurazione che gli esegue.
+d-i preseed/run string foo.sh
 </screen></informalexample>
   </sect2>
  </sect1>
