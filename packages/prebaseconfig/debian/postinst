@@ -5,50 +5,40 @@
 set -e
 
 log() {
-	logger -t prebaseconfig "$@"
+	logger -t finish-install "$@"
 }
 
-# Use this instead of /target/bin/run-parts because one of the
-# parts will unmount /target/. Also, progress bar.
-run_parts() {
-	partsdir="$1"
-	scriptcount=`ls "$partsdir"/* | wc -l`
+partsdir="/usr/lib/finish-install.d"
+oldpartsdir="/usr/lib/prebaseconfig.d"
+scriptcount=`ls "$partsdir"/* "$oldpartsdir"/* | wc -l`
 
-	db_progress START 0 $scriptcount prebaseconfig/progress/title
+db_progress START 0 $scriptcount finish-install/progress/title
 
-	tmpfile=/tmp/prebaseconfig.stderr.log
-	for script in "$partsdir"/*; do
+for script in $(ls "$partsdir"/* "$oldpartsdir"/* | busybox sort -n -k3 -t/)
+do
+	base=$(basename $script | sed 's/[0-9]*//')
+	if ! db_progress INFO finish-install/progress/$base &&
+	   ! db_progress INFO prebaseconfig/progress/$base; then
+		db_subst finish-install/progress/fallback SCRIPT "$base"
+		db_progress INFO finish-install/progress/fallback
+	fi
 
-		base=$(basename $script | sed 's/[0-9]*//')
-		if ! db_progress INFO prebaseconfig/progress/$base; then
-			db_subst prebaseconfig/progress/fallback SCRIPT "$base"
-			db_progress INFO prebaseconfig/progress/fallback
-		fi
-
-		if [ -x "$script" ] ; then
-			log "info: Running $script"
-			if "$script" 2> $tmpfile ; then
-				:
-			else
-				code="$?"
-				if [ "$code" = 10 ]; then
-					log "$script backed up"
-					db_progress STOP
-					exit 10
-				fi
-				log "warning: $script returned error code $code"
+	if [ -x "$script" ] ; then
+		log "info: Running $script"
+		if ! log-output -t finish-install "$script"; then
+			code="$?"
+			if [ "$code" = 10 ]; then
+				log "$script backed up"
+				db_progress STOP
+				exit 10
 			fi
-			if [ -s "$tmpfile" ] ; then
-				logger -t prebaseconfig < "$tmpfile"
-			fi
-			rm -f "$tmpfile"
-		else
-			log "error: Unable to execute $script"
+			log "warning: $script returned error code $code"
 		fi
-	
-		db_progress STEP 1
-	done
-	db_progress STOP
-}
+	else
+		log "error: Unable to execute $script"
+	fi
 
-run_parts /usr/lib/prebaseconfig.d
+	db_progress STEP 1
+done
+
+db_progress STOP
