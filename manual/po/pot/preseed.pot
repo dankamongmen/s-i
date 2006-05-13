@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2006-04-28 19:33+0000\n"
+"POT-Creation-Date: 2006-05-13 13:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -197,7 +197,7 @@ msgstr ""
 #: preseed.xml:232
 #, no-c-format
 #. Tag: para
-msgid "It is possible to use preseeding to change the default answer for a question, but still have the question asked. To do this the <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after setting the value for a template."
+msgid "It is possible to use preseeding to change the default answer for a question, but still have the question asked. To do this the <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after setting the value for a question."
 msgstr ""
 
 #: preseed.xml:241
@@ -371,7 +371,7 @@ msgstr ""
 #: preseed.xml:404
 #, no-c-format
 #. Tag: screen
-msgid "&lt;owner&gt; &lt;template name&gt; &lt;template type&gt; &lt;value&gt;"
+msgid "&lt;owner&gt; &lt;queston name&gt; &lt;question type&gt; &lt;value&gt;"
 msgstr ""
 
 #: preseed.xml:406
@@ -389,19 +389,19 @@ msgstr ""
 #: preseed.xml:417
 #, no-c-format
 #. Tag: para
-msgid "A line can be split into multiple lines by appending a backslash (<quote><literal>\\</literal></quote>) as the line continuation character. A good place to split a line is after the template name; a bad place is between type and value."
+msgid "A line can be split into multiple lines by appending a backslash (<quote><literal>\\</literal></quote>) as the line continuation character. A good place to split a line is after the question name; a bad place is between type and value."
 msgstr ""
 
 #: preseed.xml:423
 #, no-c-format
 #. Tag: para
-msgid "Most templates need to be preseeded using the values valid in English and not the translated values. However, there are some templates (for example in <classname>partman</classname> where the translated values need to be used."
+msgid "Most questions need to be preseeded using the values valid in English and not the translated values. However, there are some questions (for example in <classname>partman</classname> where the translated values need to be used."
 msgstr ""
 
 #: preseed.xml:429
 #, no-c-format
 #. Tag: para
-msgid "Some templates take a code as value instead of the English text that is shown during installation."
+msgid "Some questions take a code as value instead of the English text that is shown during installation."
 msgstr ""
 
 #: preseed.xml:435
@@ -445,7 +445,7 @@ msgstr ""
 #: preseed.xml:473
 #, no-c-format
 #. Tag: para
-msgid "To check possible values for templates, you can use <command>nano</command> to examine the files in <filename>/var/lib/cdebconf</filename> while an installation is in progress. View <filename>templates.dat</filename> for the raw templates and <filename>questions.dat</filename> for the current values and for the values assigned to variables."
+msgid "To check possible values for questions, you can use <command>nano</command> to examine the files in <filename>/var/lib/cdebconf</filename> while an installation is in progress. View <filename>templates.dat</filename> for the raw templates and <filename>questions.dat</filename> for the current values and for the values assigned to variables."
 msgstr ""
 
 #: preseed.xml:481
@@ -645,7 +645,7 @@ msgstr ""
 #. Tag: screen
 msgid ""
       "# If the system has free space you can choose to only partition that space.\n"
-      "# Note: this template must be preseeded with a localized (translated) value.\n"
+      "# Note: this must be preseeded with a localized (translated) value.\n"
       "#d-i partman-auto/init_automatically_partition \\\n"
       "#      select Use the largest continuous free space\n"
       "\n"
@@ -655,7 +655,7 @@ msgid ""
       "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
       "\n"
       "# You can choose from any of the predefined partitioning recipes.\n"
-      "# Note: this template must be preseeded with a localized (translated) value.\n"
+      "# Note: this must be preseeded with a localized (translated) value.\n"
       "d-i partman-auto/choose_recipe \\\n"
       "       select All files in one partition (recommended for new users)\n"
       "#d-i partman-auto/choose_recipe \\\n"
@@ -966,7 +966,7 @@ msgstr ""
 #. Tag: screen
 msgid ""
       "# Avoid that last message about the install being complete.\n"
-      "d-i prebaseconfig/reboot_in_progress note\n"
+      "d-i finish-install/reboot_in_progress note\n"
       "\n"
       "# This will prevent the installer from ejecting the CD during the reboot,\n"
       "# which is useful in some situations.\n"
@@ -1117,6 +1117,12 @@ msgid ""
       "# More flexibly, this runs a shell command and if it outputs the names of\n"
       "# preconfiguration files, includes those files. \n"
       "#d-i preseed/include_command \\\n"
-      "#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi"
+      "#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
+      "\n"
+      "# Most flexibly of all, this downloads a program and runs it. The program\n"
+      "# can use commands such as debconf-set to manupulate the debconf database.\n"
+      "# Note that if the filenames are relative, they are taken from the same\n"
+      "# directory as the preconfiguration file that runs them.\n"
+      "d-i preseed/run string foo.sh"
 msgstr ""
 
