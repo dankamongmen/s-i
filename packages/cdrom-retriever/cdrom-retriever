@@ -11,9 +11,6 @@ error() {
 warning() {
 	log "warning: $@"
 }
-info() {
-	log "info: $@"
-}
 
 CDMNT=/cdrom
 ARCH=`udpkg --print-architecture`
@@ -23,7 +20,6 @@ shift
 
 case "x$cmd" in
 	xconfig)
-		info "Retrieving udeb include and exclude file."
 		for f in include exclude; do
 			if [ -e "$CDMNT/.disk/udeb_$f.$ARCH" ]; then
 				ln -sf "$CDMNT/.disk/udeb_$f.$ARCH" "/var/cache/anna/$f"
@@ -44,7 +40,6 @@ case "x$cmd" in
         ;;
 
 	xpackages)
-		info "Retrieving package list."
 		rm -f "$1"
 		touch "$1"
 		if db_get cdrom/codename && [ "$RET" ]; then
