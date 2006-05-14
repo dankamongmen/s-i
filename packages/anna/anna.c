@@ -425,7 +425,7 @@ int main(int argc, char **argv) {
 			}
 
 			if (installed) {
-				di_log (DI_LOG_LEVEL_DEBUG, "skipping already installed %s", argv[i]);
+				//di_log (DI_LOG_LEVEL_DEBUG, "skipping already installed %s", argv[i]);
 				continue;
 			}
 
