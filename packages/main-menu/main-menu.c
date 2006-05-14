@@ -408,7 +408,7 @@ static void set_package_title(di_system_package *p) {
 }
 
 static int do_menu_item(di_system_package *p) {
-	di_log(DI_LOG_LEVEL_DEBUG, "Menu item '%s' selected", p->p.package);
+	di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' selected", p->p.package);
 
 	return di_config_package(p, satisfy_virtual);
 }
@@ -463,9 +463,10 @@ static void modify_debconf_priority (int raise_or_lower) {
 	if (pri > default_priority)
 		pri = default_priority;
 	if (local_priority != pri) {
-		di_log(DI_LOG_LEVEL_INFO, "Modifying debconf priority limit from '%s' to '%s'",
-			debconf->value ? debconf->value : "(null)",
-			debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
+		if (local_priority > -1)
+			di_log(DI_LOG_LEVEL_INFO, "Modifying debconf priority limit from '%s' to '%s'",
+				debconf->value ? debconf->value : "(null)",
+				debconf_priorities[pri] ? debconf_priorities[pri] : "(null)");
 		local_priority = pri;
 	    
 		debconf_set(debconf, template, debconf_priorities[pri]);
@@ -488,9 +489,10 @@ static void adjust_default_priority (void) {
 		}
 	}
 	
-	if ( pri != local_priority ) {
-		di_log(DI_LOG_LEVEL_INFO, "Priority changed externally, setting main-menu default to '%s' (%s)",
-			debconf_priorities[pri] ? debconf_priorities[pri] : "(null)", debconf->value);
+	if ( pri != local_priority) {
+		if (local_priority > -1)
+			di_log(DI_LOG_LEVEL_INFO, "Priority changed externally, setting main-menu default to '%s' (%s)",
+				debconf_priorities[pri] ? debconf_priorities[pri] : "(null)", debconf->value);
 		local_priority = pri;
 		default_priority = pri;
 	}
@@ -551,7 +553,7 @@ static void menu_startup (void) {
 			continue;
 		}
 
-		di_log(DI_LOG_LEVEL_DEBUG, "Executing %s", filename);
+		//di_log(DI_LOG_LEVEL_DEBUG, "Executing %s", filename);
 		ret = system(filename);
 		if (ret != 0)
 			di_log(DI_LOG_LEVEL_WARNING, "%s exited with status %d", filename, ret);
@@ -624,10 +626,10 @@ static int di_config_package(di_system_package *p,
 	di_slist_node *node;
 	di_system_package *dep;
 
-	di_log(DI_LOG_LEVEL_DEBUG, "configure %s, status: %d\n", p->p.package, p->p.status);
+	//di_log(DI_LOG_LEVEL_DEBUG, "configure %s, status: %d\n", p->p.package, p->p.status);
 
 	if (p->p.type == di_package_type_virtual_package) {
-		di_log(DI_LOG_LEVEL_DEBUG, "virtual package %s\n", p->p.package);
+		//di_log(DI_LOG_LEVEL_DEBUG, "virtual package %s\n", p->p.package);
 		if (virtfunc)
 			return virtfunc(p);
 		else
