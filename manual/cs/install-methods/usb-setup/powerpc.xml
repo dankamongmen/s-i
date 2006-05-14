@@ -1,43 +1,42 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 33725 -->
 
    <sect3 arch="powerpc">
-   <title>Rozdělení USB zařízení na &arch-title;</title>
+   <title>RozdÄlenĂ­ USB zaĹĂ­zenĂ­ na &arch-title;</title>
 <para>
 
-Protože většina USB klíčenek nebývá připravena pro zavádění přes Open
-Firmware, musíte klíčenku přerozdělit. Na Macintoshi spusťte příkaz
+ProtoĹže vÄtĹĄina USB klĂ­Äenek nebĂ˝vĂĄ pĹipravena pro zavĂĄdÄnĂ­ pĹes Open
+Firmware, musĂ­te klĂ­Äenku pĹerozdÄlit. Na Macintoshi spusĹĽte pĹĂ­kaz
 <userinput>mac-fdisk /dev/sda</userinput>, kde
-<userinput>/dev/sda</userinput> je USB klíčenka. Nejprve musíte
-inicializovat novou tabulku oblastí příkazem <userinput>i</userinput>
-a pak můžete vytvořit novou oblast typu Apple_Bootstrap příkazem
-<userinput>C</userinput>. (Poznámka: první <quote>oblast</quote> bude
-vždy samotná tabulka oblastí.) Poté zadejte:
+<userinput>/dev/sda</userinput> je USB klĂ­Äenka. Nejprve musĂ­te
+inicializovat novou tabulku oblastĂ­ pĹĂ­kazem <userinput>i</userinput>
+a pak mĹŻĹžete vytvoĹit novou oblast typu Apple_Bootstrap pĹĂ­kazem
+<userinput>C</userinput>. (PoznĂĄmka: prvnĂ­ <quote>oblast</quote> bude
+vĹždy samotnĂĄ tabulka oblastĂ­.) PotĂŠ zadejte:
 
 <informalexample><screen>
 <prompt>$</prompt> <userinput>hformat /dev/<replaceable>sda2</replaceable></userinput>
 </screen></informalexample>
 
-Příkaz <command>hformat</command> je obsažen v balíku
-<classname>hfsutils</classname>. Pozorně se přesvědčete, že používáte
-správný název zařízení!
+PĹĂ­kaz <command>hformat</command> je obsaĹžen v balĂ­ku
+<classname>hfsutils</classname>. PozornÄ se pĹesvÄdÄete, Ĺže pouĹžĂ­vĂĄte
+sprĂĄvnĂ˝ nĂĄzev zaĹĂ­zenĂ­!
 
 </para><para>
 
-Aby se po zavedení z USB klíčenky spustilo jádro, nainstalujeme na
-klíčenku zavaděč <command>yaboot</command>, který se umí nainstalovat
-na HFS oblast. Zavaděč můžete jednoduše konfigurovat úpravou textového
-souboru, což lze provést z libovolného operačního sytému, který
-podporuje souborový systém HFS.
+Aby se po zavedenĂ­ z USB klĂ­Äenky spustilo jĂĄdro, nainstalujeme na
+klĂ­Äenku zavadÄÄ <command>yaboot</command>, kterĂ˝ se umĂ­ nainstalovat
+na HFS oblast. ZavadÄÄ mĹŻĹžete jednoduĹĄe konfigurovat Ăşpravou textovĂŠho
+souboru, coĹž lze provĂŠst z libovolnĂŠho operaÄnĂ­ho sytĂŠmu, kterĂ˝
+podporuje souborovĂ˝ systĂŠm HFS.
 
 </para><para>
 
-Obvyklý nástroj <command>ybin</command>, jež je součástí
-<command>yaboot</command>u, zatím nepodporuje USB zařízení, takže
-budete muset <command>yaboot</command> nainstalovat ručně pomocí
-nástrojů z balíku <classname>hfsutils</classname>. Za předpokladu, že
-je vaše zvolená oblast <replaceable>/dev/sda2</replaceable>, zadejte:
+ObvyklĂ˝ nĂĄstroj <command>ybin</command>, jeĹž je souÄĂĄstĂ­
+<command>yaboot</command>u, zatĂ­m nepodporuje USB zaĹĂ­zenĂ­, takĹže
+budete muset <command>yaboot</command> nainstalovat ruÄnÄ pomocĂ­
+nĂĄstrojĹŻ z balĂ­ku <classname>hfsutils</classname>. Za pĹedpokladu, Ĺže
+je vaĹĄe zvolenĂĄ oblast <replaceable>/dev/sda2</replaceable>, zadejte:
 
 <informalexample><screen>
 <prompt>$</prompt> <userinput>hmount /dev/sda2</userinput>
@@ -47,20 +46,20 @@ je vaše zvolená oblast <replaceable>/dev/sda2</replaceable>, zadejte:
 <prompt>$</prompt> <userinput>humount</userinput>
 </screen></informalexample>
 
-Tímto zapíšete zavaděč do dané oblasti a pomocí HFS nástrojů ji
-označíte tak, že z ní bude Open Firmware schopný zavádět. Během
-procedury nesmí být oblast připojená jiným způsobem. Poté můžete
-připravit zbytek klíčenky běžnými unixovými utilitami.
+TĂ­mto zapĂ­ĹĄete zavadÄÄ do danĂŠ oblasti a pomocĂ­ HFS nĂĄstrojĹŻ ji
+oznaÄĂ­te tak, Ĺže z nĂ­ bude Open Firmware schopnĂ˝ zavĂĄdÄt. BÄhem
+procedury nesmĂ­ bĂ˝t oblast pĹipojenĂĄ jinĂ˝m zpĹŻsobem. PotĂŠ mĹŻĹžete
+pĹipravit zbytek klĂ­Äenky bÄĹžnĂ˝mi unixovĂ˝mi utilitami.
 
 </para><para>
 
-Připojte oblast (<userinput>mount /dev/sda2 /mnt</userinput>)
-a nakopírujte na ni následující soubory:
+PĹipojte oblast (<userinput>mount /dev/sda2 /mnt</userinput>)
+a nakopĂ­rujte na ni nĂĄsledujĂ­cĂ­ soubory:
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinux</filename> (jádro)
+<filename>vmlinux</filename> (jĂĄdro)
 
 </para></listitem>
 <listitem><para>
@@ -70,25 +69,25 @@ a nakopírujte na ni následující soubory:
 </para></listitem>
 <listitem><para>
 
-<filename>yaboot.conf</filename> (konfigurační soubor yabootu)
+<filename>yaboot.conf</filename> (konfiguraÄnĂ­ soubor yabootu)
 
 </para></listitem>
 <listitem><para>
 
-<filename>boot.msg</filename> (volitelná zaváděcí hláška)
+<filename>boot.msg</filename> (volitelnĂĄ zavĂĄdÄcĂ­ hlĂĄĹĄka)
 
 </para></listitem>
 <listitem><para>
 
-volitelné jaderné moduly
+volitelnĂŠ jadernĂŠ moduly
 
 </para></listitem>
 </itemizedlist>
 
 </para><para>
 
-Konfigurační soubor <filename>yaboot.conf</filename> by měl obsahovat
-následující řádky:
+KonfiguraÄnĂ­ soubor <filename>yaboot.conf</filename> by mÄl obsahovat
+nĂĄsledujĂ­cĂ­ ĹĂĄdky:
 
 <informalexample><screen>
 default=install
@@ -103,9 +102,9 @@ image=/vmlinux
         read-only
 </screen></informalexample>
 
-Možná budete muset zvýšit hodnotu u parametru
-<userinput>initrd-size</userinput>, protože tato se mění v závislosti
-na obrazu, který zavádíte.
+MoĹžnĂĄ budete muset zvĂ˝ĹĄit hodnotu u parametru
+<userinput>initrd-size</userinput>, protoĹže tato se mÄnĂ­ v zĂĄvislosti
+na obrazu, kterĂ˝ zavĂĄdĂ­te.
 
 </para>
    </sect3>

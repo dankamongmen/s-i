@@ -1,82 +1,81 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 33725 -->
+<!-- original version: 36744 -->
 
- <sect1 id="boot-parms"><title>Zaváděcí parametry</title>
+ <sect1 id="boot-parms"><title>ZavĂĄdÄcĂ­ parametry</title>
 <para>
 
-Parametry pro zavádění jsou vlastně parametry pro jádro Linuxu,
-které se používají v případech, kdy chceme zajistit, aby jádro
-korektně pracovalo s neposlušnými zařízeními. Ve většinou je jádro
-schopno rozpoznat všechna zařízení automaticky, ale v některých
-speciálních případech mu musíte trochu pomoci.
+Parametry pro zavĂĄdÄnĂ­ jsou vlastnÄ parametry pro jĂĄdro Linuxu,
+kterĂŠ se pouĹžĂ­vajĂ­ v pĹĂ­padech, kdy chceme zajistit, aby jĂĄdro
+korektnÄ pracovalo s neposluĹĄnĂ˝mi zaĹĂ­zenĂ­mi. Ve vÄtĹĄinou je jĂĄdro
+schopno rozpoznat vĹĄechna zaĹĂ­zenĂ­ automaticky, ale v nÄkterĂ˝ch
+speciĂĄlnĂ­ch pĹĂ­padech mu musĂ­te trochu pomoci.
 
 </para><para>
 
-Při prvním zavádění systému zkuste, zdali systém rozpozná všechna
-potřebná zařízení jen s implicitními parametry (tj. nenastavujte
-pro začátek žádné vlastní hodnoty). Systém obvykle naběhne.
-V případě, že se tak nestane, můžete systém zavést později poté,
-co zjistíte, jaké parametry je potřeba zadat, aby jádro korektně
-rozpoznalo váš hardware.
+PĹi prvnĂ­m zavĂĄdÄnĂ­ systĂŠmu zkuste, zdali systĂŠm rozpoznĂĄ vĹĄechna
+potĹebnĂĄ zaĹĂ­zenĂ­ jen s implicitnĂ­mi parametry (tj. nenastavujte
+pro zaÄĂĄtek ĹžĂĄdnĂŠ vlastnĂ­ hodnoty). SystĂŠm obvykle nabÄhne.
+V pĹĂ­padÄ, Ĺže se tak nestane, mĹŻĹžete systĂŠm zavĂŠst pozdÄji potĂŠ,
+co zjistĂ­te, jakĂŠ parametry je potĹeba zadat, aby jĂĄdro korektnÄ
+rozpoznalo vĂĄĹĄ hardware.
 
 </para><para>
 
-Poznatky o nejrůznějších zaváděcích parametrech a podivných zařízeních
-jsou k nalezení v
+Poznatky o nejrĹŻznÄjĹĄĂ­ch zavĂĄdÄcĂ­ch parametrech a podivnĂ˝ch zaĹĂ­zenĂ­ch
+jsou k nalezenĂ­ v
 <ulink url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html">Linux
 BootPrompt HOWTO</ulink>.
-Následující text obsahuje popis jen stěžejních parametrů. Vybrané
-problémy popisuje <xref linkend="boot-troubleshooting"/>.
+NĂĄsledujĂ­cĂ­ text obsahuje popis jen stÄĹžejnĂ­ch parametrĹŻ. VybranĂŠ
+problĂŠmy popisuje <xref linkend="boot-troubleshooting"/>.
 
 </para><para>
 
-Brzy po zavedení jádra můžete zpozorovat hlášení
+Brzy po zavedenĂ­ jĂĄdra mĹŻĹžete zpozorovat hlĂĄĹĄenĂ­
 
 <informalexample><screen>
-Memory:<replaceable>dostupná</replaceable>k/<replaceable>celkem</replaceable>k available
+Memory:<replaceable>dostupnĂĄ</replaceable>k/<replaceable>celkem</replaceable>k available
 </screen></informalexample>
 
-Hodnota <replaceable>celkem</replaceable> by měla ukazovat celkovou
-fyzickou paměť RAM (v kilobajtech), která je systému dostupná.
-Pokud tato hodnota neodpovídá aktuálnímu stavu instalované paměti,
-potom byste měli použít zaváděcí parametr
+Hodnota <replaceable>celkem</replaceable> by mÄla ukazovat celkovou
+fyzickou pamÄĹĽ RAM (v kilobajtech), kterĂĄ je systĂŠmu dostupnĂĄ.
+Pokud tato hodnota neodpovĂ­dĂĄ aktuĂĄlnĂ­mu stavu instalovanĂŠ pamÄti,
+potom byste mÄli pouĹžĂ­t zavĂĄdÄcĂ­ parametr
 <userinput>mem=<replaceable>ram</replaceable></userinput>,
-kde <replaceable>ram</replaceable> je vámi udaná velikost paměti
-zakončená znakem <quote>k</quote> pro kilobajty nebo <quote>m</quote> pro megabajty.
-Například, obě hodnoty <userinput>mem=65536k</userinput> a
-<userinput>mem=64m</userinput> znamenají 64MB RAM.
+kde <replaceable>ram</replaceable> je vĂĄmi udanĂĄ velikost pamÄti
+zakonÄenĂĄ znakem <quote>k</quote> pro kilobajty nebo <quote>m</quote> pro megabajty.
+NapĹĂ­klad, obÄ hodnoty <userinput>mem=65536k</userinput> a
+<userinput>mem=64m</userinput> znamenajĂ­ 64MB RAM.
 
 </para><para condition="supports-serial-console">
 
-Jádro <phrase arch="mipsel">(kromě počítačů DECstation)</phrase> by
-mělo být schopno rozpoznat, že zavádíte systém ze sériové konzoly.
-Pokud máte v zaváděném počítači rovněž grafickou kartu (framebuffer)
-a připojenou klávesnici, měli byste při zavádění zadat parametr
-<userinput>console=<replaceable>zařízení</replaceable></userinput>,
-kde <replaceable>zařízení</replaceable> je vaše sériové zařízení, což
-je obvykle něco jako <filename>ttyS0</filename>.
+JĂĄdro <phrase arch="mipsel">(kromÄ poÄĂ­taÄĹŻ DECstation)</phrase> by
+mÄlo bĂ˝t schopno rozpoznat, Ĺže zavĂĄdĂ­te systĂŠm ze sĂŠriovĂŠ konzoly.
+Pokud mĂĄte v zavĂĄdÄnĂŠm poÄĂ­taÄi rovnÄĹž grafickou kartu (framebuffer)
+a pĹipojenou klĂĄvesnici, mÄli byste pĹi zavĂĄdÄnĂ­ zadat parametr
+<userinput>console=<replaceable>zaĹĂ­zenĂ­</replaceable></userinput>,
+kde <replaceable>zaĹĂ­zenĂ­</replaceable> je vaĹĄe sĂŠriovĂŠ zaĹĂ­zenĂ­, coĹž
+je obvykle nÄco jako <filename>ttyS0</filename>.
 
 </para><para arch="sparc">
 
-Pro &arch-title; jsou sériová zařízení <filename>ttya</filename> nebo
-<filename>ttyb</filename>. Eventuálně můžete nastavit proměnné pro
+Pro &arch-title; jsou sĂŠriovĂĄ zaĹĂ­zenĂ­ <filename>ttya</filename> nebo
+<filename>ttyb</filename>. EventuĂĄlnÄ mĹŻĹžete nastavit promÄnnĂŠ pro
 OpenPROM <envar>input-device</envar> a <envar>output-device</envar> na
 hodnotu <filename>ttya</filename>.
 
 </para>
 
 
-  <sect2 id="installer-args"><title>Parametry instalačního programu</title>
+  <sect2 id="installer-args"><title>Parametry instalaÄnĂ­ho programu</title>
 <para>
 
-Instalační systém rozpoznává několik užitečných parametrů.<footnote><para>
+InstalaÄnĂ­ systĂŠm rozpoznĂĄvĂĄ nÄkolik uĹžiteÄnĂ˝ch parametrĹŻ.<footnote><para>
 
-Jádro akceptuje nejvýše 8 parametrů a 8 proměnných prostředí (včetně
-standardních voleb pro instalační program). Pokud tento limit
-překročíte, jádra řady 2.4 přebývající parametry zahodí, jádra 2.6
-zpanikaří. Od jádra verze 2.6.9 lze použít až 32 parametrů a 32
-proměnných prostředí.
+JĂĄdro akceptuje nejvĂ˝ĹĄe 8 parametrĹŻ a 8 promÄnnĂ˝ch prostĹedĂ­ (vÄetnÄ
+standardnĂ­ch voleb pro instalaÄnĂ­ program). Pokud tento limit
+pĹekroÄĂ­te, jĂĄdra Ĺady 2.4 pĹebĂ˝vajĂ­cĂ­ parametry zahodĂ­, jĂĄdra 2.6
+zpanikaĹĂ­. Od jĂĄdra verze 2.6.9 lze pouĹžĂ­t aĹž 32 parametrĹŻ a 32
+promÄnnĂ˝ch prostĹedĂ­.
 
 </para></footnote>
 
@@ -87,28 +86,28 @@ proměnných prostředí.
 <term>debconf/priority</term>
 <listitem><para>
 
-Nastavením tohoto parametru můžete změnit nejnižší prioritu
-zobrazených otázek.
+NastavenĂ­m tohoto parametru mĹŻĹžete zmÄnit nejniĹžĹĄĂ­ prioritu
+zobrazenĂ˝ch otĂĄzek.
 
 </para><para>
 
-Standardní instalace používá nastavení
-<userinput>debconf/priority=high</userinput>, což znamená, že se
-zobrazí jak kritické, tak důležité hlášky, ale normální a nevýznamné
-zprávy jsou přeskočeny. Jestliže se vyskytne problém, instalátor
-upraví priority otázek podle potřeb.
+StandardnĂ­ instalace pouĹžĂ­vĂĄ nastavenĂ­
+<userinput>debconf/priority=high</userinput>, coĹž znamenĂĄ, Ĺže se
+zobrazĂ­ jak kritickĂŠ, tak dĹŻleĹžitĂŠ hlĂĄĹĄky, ale normĂĄlnĂ­ a nevĂ˝znamnĂŠ
+zprĂĄvy jsou pĹeskoÄeny. JestliĹže se vyskytne problĂŠm, instalĂĄtor
+upravĂ­ priority otĂĄzek podle potĹeb.
 
 </para><para>
 
-Když použijete parametr
-<userinput>debconf/priority=medium</userinput>, zobrazí se instalační
-menu a získáte nad instalací větší kontrolu. Při použití
-<userinput>debconf/priority=low</userinput>, nic se nepřeskakuje
-a zobrazí se všechny hlášky instalačního programu (to je ekvivalentní
-zaváděcí metodě <userinput>expert</userinput>).  Hodnotou
-<userinput>debconf/priority=critical</userinput> se potlačí všechny
-zprávy a otázky se stupněm důležitosti menším než kritickým.  Pro tyto
-potlačené otázky se použijí přednastavené hodnoty.
+KdyĹž pouĹžijete parametr
+<userinput>debconf/priority=medium</userinput>, zobrazĂ­ se instalaÄnĂ­
+menu a zĂ­skĂĄte nad instalacĂ­ vÄtĹĄĂ­ kontrolu. PĹi pouĹžitĂ­
+<userinput>debconf/priority=low</userinput>, nic se nepĹeskakuje
+a zobrazĂ­ se vĹĄechny hlĂĄĹĄky instalaÄnĂ­ho programu (to je ekvivalentnĂ­
+zavĂĄdÄcĂ­ metodÄ <userinput>expert</userinput>).  Hodnotou
+<userinput>debconf/priority=critical</userinput> se potlaÄĂ­ vĹĄechny
+zprĂĄvy a otĂĄzky se stupnÄm dĹŻleĹžitosti menĹĄĂ­m neĹž kritickĂ˝m.  Pro tyto
+potlaÄenĂŠ otĂĄzky se pouĹžijĂ­ pĹednastavenĂŠ hodnoty.
 
 </para></listitem>
 </varlistentry>
@@ -117,8 +116,8 @@ potlačené otázky se použijí přednastavené hodnoty.
 <term>DEBIAN_FRONTEND</term>
 <listitem><para>
 
-Ovlivňuje uživatelské rozhraní, ve kterém bude instalace
-probíhat. Dostupné volby jsou:
+OvlivĹuje uĹživatelskĂŠ rozhranĂ­, ve kterĂŠm bude instalace
+probĂ­hat. DostupnĂŠ volby jsou:
 
 <itemizedlist>
 <listitem>
@@ -140,11 +139,11 @@ probíhat. Dostupné volby jsou:
 </listitem>
 </itemizedlist>
 
-Standardní rozhraní je <userinput>DEBIAN_FRONTEND=newt</userinput>.
-Pro instalaci přes sériovou konzolu může být vhodnější
-<userinput>DEBIAN_FRONTEND=text</userinput>. Standardní instalační
-média momentálně podporují pouze rozhraní <userinput>newt</userinput>,
-tudíž je tato volba spíše příslibem do budoucna.
+StandardnĂ­ rozhranĂ­ je <userinput>DEBIAN_FRONTEND=newt</userinput>.
+Pro instalaci pĹes sĂŠriovou konzolu mĹŻĹže bĂ˝t vhodnÄjĹĄĂ­
+<userinput>DEBIAN_FRONTEND=text</userinput>. StandardnĂ­ instalaÄnĂ­
+mĂŠdia momentĂĄlnÄ podporujĂ­ pouze rozhranĂ­ <userinput>newt</userinput>,
+tudĂ­Ĺž je tato volba spĂ­ĹĄe pĹĂ­slibem do budoucna.
 
 </para></listitem>
 </varlistentry>
@@ -153,32 +152,32 @@ tudíž je tato volba spíše příslibem do budoucna.
 <term>BOOT_DEBUG</term>
 <listitem><para>
 
-Tímto parametrem můžete kontrolovat množství zpráv, které se
-zapíší do instalačního logu.
+TĂ­mto parametrem mĹŻĹžete kontrolovat mnoĹžstvĂ­ zprĂĄv, kterĂŠ se
+zapĂ­ĹĄĂ­ do instalaÄnĂ­ho logu.
 
 <variablelist>
 <varlistentry>
 <term><userinput>BOOT_DEBUG=0</userinput></term>
-<listitem><para>Toto je standardní hodnota.</para></listitem>
+<listitem><para>Toto je standardnĂ­ hodnota.</para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><userinput>BOOT_DEBUG=1</userinput></term>
-<listitem><para>Upovídanější než obvykle.</para></listitem>
+<listitem><para>UpovĂ­danÄjĹĄĂ­ neĹž obvykle.</para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><userinput>BOOT_DEBUG=2</userinput></term>
-<listitem><para>Spousty ladících informací.</para></listitem>
+<listitem><para>Spousty ladĂ­cĂ­ch informacĂ­.</para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><userinput>BOOT_DEBUG=3</userinput></term>
 <listitem><para>
 
-Pro opravdu detailní ladění se během zavádění několikrát spustí shell,
-ve kterém můžete kontrolovat a ovlivňovat náběh systému. Když shell
-ukončíte, bude zavádění pokračovat.
+Pro opravdu detailnĂ­ ladÄnĂ­ se bÄhem zavĂĄdÄnĂ­ nÄkolikrĂĄt spustĂ­ shell,
+ve kterĂŠm mĹŻĹžete kontrolovat a ovlivĹovat nĂĄbÄh systĂŠmu. KdyĹž shell
+ukonÄĂ­te, bude zavĂĄdÄnĂ­ pokraÄovat.
 
 </para></listitem>
 </varlistentry>
@@ -191,15 +190,15 @@ ukončíte, bude zavádění pokračovat.
 <term>INSTALL_MEDIA_DEV</term>
 <listitem><para>
 
-Hodnota tohoto parametru zadává cestu k zařízení, ze kterého se má
-nahrát instalační systém, například
+Hodnota tohoto parametru zadĂĄvĂĄ cestu k zaĹĂ­zenĂ­, ze kterĂŠho se mĂĄ
+nahrĂĄt instalaÄnĂ­ systĂŠm, napĹĂ­klad
 <userinput>INSTALL_MEDIA_DEV=/dev/floppy/0</userinput>
 
 </para><para>
 
-Normálně se totiž zaváděcí disketa snaží najít kořenovou disketu na
-všech dostupných disketových mechanikách a USB discích. Tímto
-parametrem jí sdělíte, že se má podívat jenom na zadané zařízení.
+NormĂĄlnÄ se totiĹž zavĂĄdÄcĂ­ disketa snaĹžĂ­ najĂ­t koĹenovou disketu na
+vĹĄech dostupnĂ˝ch disketovĂ˝ch mechanikĂĄch. TĂ­mto parametrem jĂ­ sdÄlĂ­te,
+Ĺže se mĂĄ podĂ­vat jenom na zadanĂŠ zaĹĂ­zenĂ­.
 
 </para></listitem>
 </varlistentry>
@@ -208,35 +207,35 @@ parametrem jí sdělíte, že se má podívat jenom na zadané zařízení.
 <term>debian-installer/framebuffer</term>
 <listitem><para>
 
-Některé architektury využívají pro instalaci v různých jazycích
-jaderný framebuffer (grafická konzole). Pokud na svém systému
-zaznamenáte symptomy jako chybové hlášky o btermu a boglu, černou
-obrazovku nebo zamrznutí instalace po několika minutách od spuštění,
-můžete framebuffer vypnout parametrem
+NÄkterĂŠ architektury vyuĹžĂ­vajĂ­ pro instalaci v rĹŻznĂ˝ch jazycĂ­ch
+jadernĂ˝ framebuffer (grafickĂĄ konzole). Pokud na svĂŠm systĂŠmu
+zaznamenĂĄte symptomy jako chybovĂŠ hlĂĄĹĄky o btermu a boglu, Äernou
+obrazovku nebo zamrznutĂ­ instalace po nÄkolika minutĂĄch od spuĹĄtÄnĂ­,
+mĹŻĹžete framebuffer vypnout parametrem
 <userinput>debian-installer/framebuffer=false</userinput>.
 
 </para><para arch="i386">
 
-K vypnutí framebufferu též můžete použít parametr
-<userinput>video=vga16:off</userinput>. Tyto problémy byly hlášeny na
-počítači Dell Inspiron s grafickou kartou Mobile Radeon.
+K vypnutĂ­ framebufferu tĂŠĹž mĹŻĹžete pouĹžĂ­t parametr
+<userinput>video=vga16:off</userinput>. Tyto problĂŠmy byly hlĂĄĹĄeny na
+poÄĂ­taÄi Dell Inspiron s grafickou kartou Mobile Radeon.
 
 </para><para arch="m68k">
 
-Tyto problémy byly hlášeny na Amize 1200 a SE/30.
+Tyto problĂŠmy byly hlĂĄĹĄeny na Amize 1200 a SE/30.
 
 </para><para arch="hppa">
 
-Tyto problémy byly hlášeny na hppa.
+Tyto problĂŠmy byly hlĂĄĹĄeny na hppa.
 
 </para><note arch="sparc"><para>
 
-Kvůli zobrazovacím problémům na některých systémech je podpora
-framebufferu na architektuře &arch-title; <emphasis>implicitně
-vypnutá</emphasis>. To může způsobit ne zrovna pěkné zobrazení na
-systémech, které framebuffer podporují korektně. Příkladem jsou
-systémy s grafickými kartami ATI. Zaznamenáte-li při instalaci
-problémy se zobrazením, zkuste zavést instalační systém s parametrem
+KvĹŻli zobrazovacĂ­m problĂŠmĹŻm na nÄkterĂ˝ch systĂŠmech je podpora
+framebufferu na architektuĹe &arch-title; <emphasis>implicitnÄ
+vypnutĂĄ</emphasis>. To mĹŻĹže zpĹŻsobit ne zrovna pÄknĂŠ zobrazenĂ­ na
+systĂŠmech, kterĂŠ framebuffer podporujĂ­ korektnÄ. PĹĂ­kladem jsou
+systĂŠmy s grafickĂ˝mi kartami ATI. ZaznamenĂĄte-li pĹi instalaci
+problĂŠmy se zobrazenĂ­m, zkuste zavĂŠst instalaÄnĂ­ systĂŠm s parametrem
 <userinput>debian-installer/framebuffer=true</userinput>.
 
 </para></note></listitem>
@@ -246,7 +245,7 @@ problémy se zobrazením, zkuste zavést instalační systém s parametrem
 <term>debian-installer/probe/usb</term>
 <listitem><para>
 
-Pokud hledání USB zařízení způsobuje problémy, nastavte tento parametr
+Pokud hledĂĄnĂ­ USB zaĹĂ­zenĂ­ zpĹŻsobuje problĂŠmy, nastavte tento parametr
 na hodnotu <userinput>false</userinput>.
 
 </para></listitem>
@@ -256,19 +255,19 @@ na hodnotu <userinput>false</userinput>.
 <term>netcfg/disable_dhcp</term>
 <listitem><para>
 
-Standardně se &d-i; snaží získat nastavení sítě přes DHCP. Je-li
-získáno nějaké nastavení, instalační systém se na nic nebude ptát
-a automaticky bude pokračovat v instalaci. K ručnímu nastavení sítě se
-dostanete pouze v případě, že dotaz na DHCP server selže.
+StandardnÄ se &d-i; snaĹžĂ­ zĂ­skat nastavenĂ­ sĂ­tÄ pĹes DHCP. Je-li
+zĂ­skĂĄno nÄjakĂŠ nastavenĂ­, instalaÄnĂ­ systĂŠm se na nic nebude ptĂĄt
+a automaticky bude pokraÄovat v instalaci. K ruÄnĂ­mu nastavenĂ­ sĂ­tÄ se
+dostanete pouze v pĹĂ­padÄ, Ĺže dotaz na DHCP server selĹže.
 
 </para><para>
 
-Máte-li tedy na místní síti DHCP server, ale z nějakého důvodu jej
-nechcete použít (protože např. pro účely instalace vrací špatné
-hodnoty), můžete použít parametr
-<userinput>netcfg/disable_dhcp=false</userinput>, kterým zabráníte
-automatickému nastavení sítě přes DHCP a rovnou budete požádáni
-o ruční nastavení síťových údajů.
+MĂĄte-li tedy na mĂ­stnĂ­ sĂ­ti DHCP server, ale z nÄjakĂŠho dĹŻvodu jej
+nechcete pouĹžĂ­t (protoĹže napĹ. pro ĂşÄely instalace vracĂ­ ĹĄpatnĂŠ
+hodnoty), mĹŻĹžete pouĹžĂ­t parametr
+<userinput>netcfg/disable_dhcp=false</userinput>, kterĂ˝m zabrĂĄnĂ­te
+automatickĂŠmu nastavenĂ­ sĂ­tÄ pĹes DHCP a rovnou budete poĹžĂĄdĂĄni
+o ruÄnĂ­ nastavenĂ­ sĂ­ĹĽovĂ˝ch ĂşdajĹŻ.
 
 </para></listitem>
 </varlistentry>
@@ -277,9 +276,9 @@ o ruční nastavení síťových údajů.
 <term>hw-detect/start_pcmcia</term>
 <listitem><para>
 
-Pokud chcete zabránit startu PCMCIA služeb, nastavte tento parametr na
-hodnotu <userinput>false</userinput>. Některé notebooky jsou totiž
-nechvalně známé tím, že při startu PCMCIA služeb zaseknou celý systém.
+Pokud chcete zabrĂĄnit startu PCMCIA sluĹžeb, nastavte tento parametr na
+hodnotu <userinput>false</userinput>. NÄkterĂŠ notebooky jsou totiĹž
+nechvalnÄ znĂĄmĂŠ tĂ­m, Ĺže pĹi startu PCMCIA sluĹžeb zaseknou celĂ˝ systĂŠm.
 
 </para></listitem>
 </varlistentry>
@@ -288,8 +287,8 @@ nechvalně známé tím, že při startu PCMCIA služeb zaseknou celý systém.
 <term>preseed/url</term>
 <listitem><para>
 
-Zde můžete zadat url k souboru s přednastavením, podle kterého se
-má provést automatická instalace, viz <xref
+Zde mĹŻĹžete zadat url k souboru s pĹednastavenĂ­m, podle kterĂŠho se
+mĂĄ provĂŠst automatickĂĄ instalace, viz <xref
 linkend="automatic-install"/>.
 
 </para></listitem>
@@ -299,8 +298,8 @@ linkend="automatic-install"/>.
 <term>preseed/file</term>
 <listitem><para>
 
-Zde můžete zadat soubor s přednastavením, podle kterého se má provést
-automatická instalace, viz <xref linkend="automatic-install"/>.
+Zde mĹŻĹžete zadat soubor s pĹednastavenĂ­m, podle kterĂŠho se mĂĄ provĂŠst
+automatickĂĄ instalace, viz <xref linkend="automatic-install"/>.
 
 </para></listitem>
 </varlistentry>
@@ -309,17 +308,17 @@ automatická instalace, viz <xref linkend="automatic-install"/>.
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
-Před restartem &d-i; do nového systému se implicitně vysune optické
-médium použité během instalace. To někdy není potřeba (např. systém
-není nastaven pro automatické zavádění z CD-ROM) a v některých
-případech může být vysunutí dokonce nežádoucí. Například pokud
-mechanika neumí nahrát médium sama a uživatel zrovna není na místě,
-aby to provedl ručně. Příkladem takovýchto mechanik jsou mechaniky
-v přenosných počítačích a mechaniky se štěrbinovým podáváním.
+PĹed restartem &d-i; do novĂŠho systĂŠmu se implicitnÄ vysune optickĂŠ
+mĂŠdium pouĹžitĂŠ bÄhem instalace. To nÄkdy nenĂ­ potĹeba (napĹ. systĂŠm
+nenĂ­ nastaven pro automatickĂŠ zavĂĄdÄnĂ­ z CD-ROM) a v nÄkterĂ˝ch
+pĹĂ­padech mĹŻĹže bĂ˝t vysunutĂ­ dokonce neĹžĂĄdoucĂ­. NapĹĂ­klad pokud
+mechanika neumĂ­ nahrĂĄt mĂŠdium sama a uĹživatel zrovna nenĂ­ na mĂ­stÄ,
+aby to provedl ruÄnÄ. PĹĂ­kladem takovĂ˝chto mechanik jsou mechaniky
+v pĹenosnĂ˝ch poÄĂ­taÄĂ­ch a mechaniky se ĹĄtÄrbinovĂ˝m podĂĄvĂĄnĂ­m.
 
 </para><para>
 
-Pro zakázání automatického vysunutí nastavte parametr na hodnotu
+Pro zakĂĄzĂĄnĂ­ automatickĂŠho vysunutĂ­ nastavte parametr na hodnotu
 <userinput>false</userinput>.
 
 </para></listitem>
@@ -329,7 +328,7 @@ Pro zakázání automatického vysunutí nastavte parametr na hodnotu
 <term>ramdisk_size</term>
 <listitem><para>
 
-Používáte-li ještě jádro řady 2.2.x, budete možná muset zadat
+PouĹžĂ­vĂĄte-li jeĹĄtÄ jĂĄdro Ĺady 2.2.x, budete moĹžnĂĄ muset zadat
 &ramdisksize;.
 
 </para></listitem>
@@ -339,8 +338,8 @@ Používáte-li ještě jádro řady 2.2.x, budete možná muset zadat
 <term>rescue/enable</term>
 <listitem><para>
 
-Nastavíte-li tento parametr na hodnotu <userinput>true</userinput>,
-spustí se místo běžné instalace záchranný režim. Viz <xref
+NastavĂ­te-li tento parametr na hodnotu <userinput>true</userinput>,
+spustĂ­ se mĂ­sto bÄĹžnĂŠ instalace zĂĄchrannĂ˝ reĹžim. Viz <xref
 linkend="rescue"/>.
 
 </para></listitem>

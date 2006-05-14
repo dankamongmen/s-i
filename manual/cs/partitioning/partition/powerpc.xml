@@ -1,56 +1,55 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 23146 -->
 
   <sect2 arch="powerpc">
-  <title>Dělení disku na novějších Macintoshích</title>
+  <title>DÄlenĂ­ disku na novÄjĹĄĂ­ch MacintoshĂ­ch</title>
 <para>
 
-Pokud instalujete na <quote>Newworld</quote> PowerMac, musíte pro
-zavaděč vytvořit speciální zaváděcí oblast. Tato oblast by měla být
+Pokud instalujete na <quote>Newworld</quote> PowerMac, musĂ­te pro
+zavadÄÄ vytvoĹit speciĂĄlnĂ­ zavĂĄdÄcĂ­ oblast. Tato oblast by mÄla bĂ˝t
 typu <emphasis>Apple_Bootstrap</emphasis> o velikosti 800KB. Pokud
-oblast nebude mít požadovaný typ, nebudete schopni zavádět systém
-z pevného disku. Tuto oblast vytvoříte buď
-v <command>partman</command>u tak, že vytvoříte oblast a přiřadíte jí
-typ použití <quote>Zaváděcí oblast NewWorld</quote>, nebo
-v <command>mac-fdisk</command>u příkazem <userinput>b</userinput>.
+oblast nebude mĂ­t poĹžadovanĂ˝ typ, nebudete schopni zavĂĄdÄt systĂŠm
+z pevnĂŠho disku. Tuto oblast vytvoĹĂ­te buÄ
+v <command>partman</command>u tak, Ĺže vytvoĹĂ­te oblast a pĹiĹadĂ­te jĂ­
+typ pouĹžitĂ­ <quote>ZavĂĄdÄcĂ­ oblast NewWorld</quote>, nebo
+v <command>mac-fdisk</command>u pĹĂ­kazem <userinput>b</userinput>.
 
 </para><para>
 
-Tím, že přiřadíte zaváděcí oblasti speciální typ, předejdete
-problémům s MacOS, který by jinak oblast připojil a tím ji zničil,
-protože tato obsahuje speciální modifikace pro OpenFirmware.
-Modifikace jsou nutné pro automatický start z oblasti.
+TĂ­m, Ĺže pĹiĹadĂ­te zavĂĄdÄcĂ­ oblasti speciĂĄlnĂ­ typ, pĹedejdete
+problĂŠmĹŻm s MacOS, kterĂ˝ by jinak oblast pĹipojil a tĂ­m ji zniÄil,
+protoĹže tato obsahuje speciĂĄlnĂ­ modifikace pro OpenFirmware.
+Modifikace jsou nutnĂŠ pro automatickĂ˝ start z oblasti.
 
 </para><para>
 
-Celá zaváděcí oblast je vytvořená pro tři malé soubory: program
-<command>yaboot</command>, jeho konfigurační soubor 
-<filename>yaboot.conf</filename> a první část zavaděče OpenFirmware
-&mdash; <command>ofboot.b</command>. Tato oblast se nemusí a neměla by
-se připojovat do souborového systému, natož na ni kopírovat jádro nebo
-něco podobného. Pro manipulaci s touto oblastí slouží utility
+CelĂĄ zavĂĄdÄcĂ­ oblast je vytvoĹenĂĄ pro tĹi malĂŠ soubory: program
+<command>yaboot</command>, jeho konfiguraÄnĂ­ soubor 
+<filename>yaboot.conf</filename> a prvnĂ­ ÄĂĄst zavadÄÄe OpenFirmware
+&mdash; <command>ofboot.b</command>. Tato oblast se nemusĂ­ a nemÄla by
+se pĹipojovat do souborovĂŠho systĂŠmu, natoĹž na ni kopĂ­rovat jĂĄdro nebo
+nÄco podobnĂŠho. Pro manipulaci s touto oblastĂ­ slouĹžĂ­ utility
 <command>ybin</command> a <command>mkofboot</command>.
 
 </para><para>
 
-Aby mohl OpenFirmware zavést &debian; automaticky, měla by se zaváděcí
-oblast objevit před všemi ostatními oblastmi na disku, obzvláště před
-zaváděcími oblastmi MacOS. To znamená, že zaváděcí oblast by měla být
-první, kterou vytvoříte. Ovšem i když přidáte zaváděcí oblast později,
-můžete použít program <command>mac-fdisk</command> a příkazem
-<userinput>r</userinput> přeskládat tabulku oblastí tak, aby tato
-oblast následovala hned po tabulce rozdělení disku (což je vždy první
-oblast). Toto pořadí je logické, ne fyzické uspořádání na disku, ale o
-to nám jde. 
+Aby mohl OpenFirmware zavĂŠst &debian; automaticky, mÄla by se zavĂĄdÄcĂ­
+oblast objevit pĹed vĹĄemi ostatnĂ­mi oblastmi na disku, obzvlĂĄĹĄtÄ pĹed
+zavĂĄdÄcĂ­mi oblastmi MacOS. To znamenĂĄ, Ĺže zavĂĄdÄcĂ­ oblast by mÄla bĂ˝t
+prvnĂ­, kterou vytvoĹĂ­te. OvĹĄem i kdyĹž pĹidĂĄte zavĂĄdÄcĂ­ oblast pozdÄji,
+mĹŻĹžete pouĹžĂ­t program <command>mac-fdisk</command> a pĹĂ­kazem
+<userinput>r</userinput> pĹesklĂĄdat tabulku oblastĂ­ tak, aby tato
+oblast nĂĄsledovala hned po tabulce rozdÄlenĂ­ disku (coĹž je vĹždy prvnĂ­
+oblast). Toto poĹadĂ­ je logickĂŠ, ne fyzickĂŠ uspoĹĂĄdĂĄnĂ­ na disku, ale o
+to nĂĄm jde. 
 
 </para><para>
 
-Apple disky totiž obsahují několik malých oblastí pro ovladače. Pokud
-chcete mít na disku Debian i MacOSX, musí tyto oblasti zůstat
-zachovány včetně malé HFS oblasti (její minimální velikost je 800k).
-To je proto, že MacOSX nabízí při každém zavádění inicializaci všech
-disků, které nemají aktivní MacOS oblasti a oblasti s ovladači.
+Apple disky totiĹž obsahujĂ­ nÄkolik malĂ˝ch oblastĂ­ pro ovladaÄe. Pokud
+chcete mĂ­t na disku Debian i MacOSX, musĂ­ tyto oblasti zĹŻstat
+zachovĂĄny vÄetnÄ malĂŠ HFS oblasti (jejĂ­ minimĂĄlnĂ­ velikost je 800k).
+To je proto, Ĺže MacOSX nabĂ­zĂ­ pĹi kaĹždĂŠm zavĂĄdÄnĂ­ inicializaci vĹĄech
+diskĹŻ, kterĂŠ nemajĂ­ aktivnĂ­ MacOS oblasti a oblasti s ovladaÄi.
 
 </para>
   </sect2>

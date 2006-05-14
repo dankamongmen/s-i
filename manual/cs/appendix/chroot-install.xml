@@ -1,60 +1,59 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 34713 -->
+<!-- original version: 36758 -->
 
  <sect1 id="linux-upgrade">
- <title>Instalace Debianu ze stávajícího unixového/linuxového systému</title>
+ <title>Instalace Debianu ze stĂĄvajĂ­cĂ­ho unixovĂŠho/linuxovĂŠho systĂŠmu</title>
 
 <para>
 
-Tato kapitola se, na rozdíl od zbytku příručky, nezabývá oficiálním
-instalačním programem, ale popisuje instalaci Debianu ze stávajícího
-unixového nebo linuxového systému. Tuto kapitolu si vyžádali uživatelé
-přecházející z distribucí Red Hat, Mandrake a SUSE. Předpokládáme zde
-jisté znalosti s používáním *nixových příkazů a pohybem v souborovém
-systému. V této sekci platí, že příkazy uvozené promptem
-<prompt>$</prompt> zadáváte ve svém stávajícím systému, zatímco
-příkazy uvozené <prompt>#</prompt> se spouští v
-<firstterm>chroot</firstterm>ovaném prostředí.
+Tato kapitola se, na rozdĂ­l od zbytku pĹĂ­ruÄky, nezabĂ˝vĂĄ oficiĂĄlnĂ­m
+instalaÄnĂ­m programem, ale popisuje instalaci Debianu ze stĂĄvajĂ­cĂ­ho
+unixovĂŠho nebo linuxovĂŠho systĂŠmu. Tuto kapitolu si vyĹžĂĄdali uĹživatelĂŠ
+pĹechĂĄzejĂ­cĂ­ z distribucĂ­ Red Hat, Mandrake a SUSE. PĹedpoklĂĄdĂĄme zde
+jistĂŠ znalosti s pouĹžĂ­vĂĄnĂ­m *nixovĂ˝ch pĹĂ­kazĹŻ a pohybem v souborovĂŠm
+systĂŠmu. V tĂŠto sekci platĂ­, Ĺže pĹĂ­kazy uvozenĂŠ promptem
+<prompt>$</prompt> zadĂĄvĂĄte ve svĂŠm stĂĄvajĂ­cĂ­m systĂŠmu, zatĂ­mco
+pĹĂ­kazy uvozenĂŠ <prompt>#</prompt> se spouĹĄtĂ­ v
+<firstterm>chroot</firstterm>ovanĂŠm prostĹedĂ­.
 
 </para><para>
 
-Až si Debian vyladíte k obrazu svému, můžete do něj převést stávající
-uživatelská data a plynule přejít k nové distribuci bez zbytečných
-prostojů. Tento druh instalace je též vhodný pro systémy s podivným
-hardwarem, který jinak není podporován instalačními médii.
+AĹž si Debian vyladĂ­te k obrazu svĂŠmu, mĹŻĹžete do nÄj pĹevĂŠst stĂĄvajĂ­cĂ­
+uĹživatelskĂĄ data a plynule pĹejĂ­t k novĂŠ distribuci bez zbyteÄnĂ˝ch
+prostojĹŻ. Tento druh instalace je tĂŠĹž vhodnĂ˝ pro systĂŠmy s podivnĂ˝m
+hardwarem, kterĂ˝ jinak nenĂ­ podporovĂĄn instalaÄnĂ­mi mĂŠdii.
 
 </para>
 
   <sect2>
-  <title>Přípravné práce</title>
+  <title>PĹĂ­pravnĂŠ prĂĄce</title>
 <para>
 
-Nejprve si rozdělte disk. Budete potřebovat aspoň jeden oddíl
-(kořenový) plus oblast pro virtuální paměť (swap). Pro čistě
-konzolovou instalaci potřebujete oblast velkou minimálně 150 MB,
-jestliže budete instalovat i X Window System, počítejte s nejméně
+Nejprve si rozdÄlte disk. Budete potĹebovat aspoĹ jeden oddĂ­l
+(koĹenovĂ˝) plus oblast pro virtuĂĄlnĂ­ pamÄĹĽ (swap). Pro ÄistÄ
+konzolovou instalaci potĹebujete oblast velkou minimĂĄlnÄ 150 MB,
+jestliĹže budete instalovat i X Window System, poÄĂ­tejte s nejmĂŠnÄ
 300 megabajty.
 
 </para><para>
 
-Na nových oddílech vytvořte souborové systémy. Například souborový
-systém ext3 na oblasti <filename>/dev/hda6</filename> vytvoříte
-příkazem:
+Na novĂ˝ch oddĂ­lech vytvoĹte souborovĂŠ systĂŠmy. NapĹĂ­klad souborovĂ˝
+systĂŠm ext3 na oblasti <filename>/dev/hda6</filename> vytvoĹĂ­te
+pĹĂ­kazem:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mke2fs -j /dev/hda6</userinput>
 </screen></informalexample>
 
-(Ve zbytku návodu budeme předpokládat, že kořenový oddíl je
+(Ve zbytku nĂĄvodu budeme pĹedpoklĂĄdat, Ĺže koĹenovĂ˝ oddĂ­l je
 <filename>/dev/hda6</filename>.)
-Jestliže chcete vytvořit systém ext2, vynechejte parametr
+JestliĹže chcete vytvoĹit systĂŠm ext2, vynechejte parametr
 <userinput>-j</userinput>.
 
 </para><para>
 
-Inicializujte a aktivujte odkládací oddíl (nezapomeňte změnit číslo
-oblasti podle skutečnosti):
+Inicializujte a aktivujte odklĂĄdacĂ­ oddĂ­l (nezapomeĹte zmÄnit ÄĂ­slo
+oblasti podle skuteÄnosti):
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mkswap /dev/hda5</userinput>
@@ -62,9 +61,9 @@ oblasti podle skutečnosti):
 <prompt>#</prompt> <userinput>swapon /dev/hda5</userinput>
 </screen></informalexample>
 
-Připojte budoucí kořenovou oblast (<filename>/</filename>) do adresáře
-<filename>/mnt/debinst</filename>. Na jméně přípojného adresáře
-nezáleží.
+PĹipojte budoucĂ­ koĹenovou oblast (<filename>/</filename>) do adresĂĄĹe
+<filename>/mnt/debinst</filename>. Na jmĂŠnÄ pĹĂ­pojnĂŠho adresĂĄĹe
+nezĂĄleĹžĂ­.
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mkdir /mnt/debinst</userinput>
@@ -73,50 +72,50 @@ nezáleží.
 
 </para><note><para>
 
-Chcete-li mít části souborového systému (např. /usr) připojené na
-různých oblastech, musíte tyto adresáře vytvořit a připojit ručně
-ještě před příští kapitolou.
+Chcete-li mĂ­t ÄĂĄsti souborovĂŠho systĂŠmu (napĹ. /usr) pĹipojenĂŠ na
+rĹŻznĂ˝ch oblastech, musĂ­te tyto adresĂĄĹe vytvoĹit a pĹipojit ruÄnÄ
+jeĹĄtÄ pĹed pĹĂ­ĹĄtĂ­ kapitolou.
 
 </para></note>
   </sect2>
 
   <sect2>
-  <title>Instalace balíku <command>debootstrap</command></title>
+  <title>Instalace balĂ­ku <command>debootstrap</command></title>
 <para>
 
-<command>debootstrap</command> je program, kterým se v Debianu
-instaluje základní systém. Má minimum závislostí (pouze
+<command>debootstrap</command> je program, kterĂ˝m se v Debianu
+instaluje zĂĄkladnĂ­ systĂŠm. MĂĄ minimum zĂĄvislostĂ­ (pouze
 <classname>/bin/sh</classname>, <command>ar</command>,
-<command>wget</command> a základní unixové/linuxové nástroje<footnote>
+<command>wget</command> a zĂĄkladnĂ­ unixovĂŠ/linuxovĂŠ nĂĄstroje<footnote>
 
 <para>
 
-Sem patří GNU core utilities a příkazy typu <command>sed</command>,
+Sem patĹĂ­ GNU core utilities a pĹĂ­kazy typu <command>sed</command>,
 <command>grep</command>, <command>tar</command>
 a <command>gzip</command>.
 
 </para>
 
-</footnote>), takže se dá použít na téměř libovolném
-systému. Pokud ještě <command>wget</command> a <command>ar</command>
-nemáte, nainstalujte si je.
+</footnote>), takĹže se dĂĄ pouĹžĂ­t na tĂŠmÄĹ libovolnĂŠm
+systĂŠmu. Pokud jeĹĄtÄ <command>wget</command> a <command>ar</command>
+nemĂĄte, nainstalujte si je.
 
 </para><para>
 
 <!-- The files linked to here are from 2004 and thus currently not usable
 
-Na systému používajícím RPM balíčky si můžete stažený
-<filename>.deb</filename> soubor převést do formátu
+Na systĂŠmu pouĹžĂ­vajĂ­cĂ­m RPM balĂ­Äky si mĹŻĹžete staĹženĂ˝
+<filename>.deb</filename> soubor pĹevĂŠst do formĂĄtu
 <filename>.rpm</filename> programem <command>alien</command>, nebo
-můžete použít připravený balík z
+mĹŻĹžete pouĹžĂ­t pĹipravenĂ˝ balĂ­k z
 <ulink url="http://people.debian.org/~blade/install/debootstrap"></ulink>.
 
 </para><para>
 
 -->
 
-Poslední možností je ruční instalace. Vytvořte si pracovní adresář, do
-kterého později balík rozbalíte:
+PoslednĂ­ moĹžnostĂ­ je ruÄnĂ­ instalace. VytvoĹte si pracovnĂ­ adresĂĄĹ, do
+kterĂŠho pozdÄji balĂ­k rozbalĂ­te:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mkdir work</userinput>
@@ -124,9 +123,9 @@ kterého později balík rozbalíte:
 </screen></informalexample>
 
 Z <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
-poolu</ulink> si stáhněte balík <command>debootstrap</command> pro
-svou architekturu, uložte jej do pracovního adresáře a vybalte z něj
-binární soubory. K instalaci souborů musíte mít rootovská práva.
+poolu</ulink> si stĂĄhnÄte balĂ­k <command>debootstrap</command> pro
+svou architekturu, uloĹžte jej do pracovnĂ­ho adresĂĄĹe a vybalte z nÄj
+binĂĄrnĂ­ soubory. K instalaci souborĹŻ musĂ­te mĂ­t rootovskĂĄ prĂĄva.
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>ar -x debootstrap_0.X.X_arch.deb</userinput>
@@ -136,36 +135,36 @@ binární soubory. K instalaci souborů musíte mít rootovská práva.
 
 </para><para>
 
-Pro běh <command>debootstrap</command>u musíte mít nainstalovanou
-rozumnou minimální verzi knihovny <classname>glibc</classname>
-(momentálně GLIBC_2.3). <command>debootstrap</command> samotný je
-shellový skript, ale využívá různé nástroje, které vyžadují
+Pro bÄh <command>debootstrap</command>u musĂ­te mĂ­t nainstalovanou
+rozumnou minimĂĄlnĂ­ verzi knihovny <classname>glibc</classname>
+(momentĂĄlnÄ GLIBC_2.3). <command>debootstrap</command> samotnĂ˝ je
+shellovĂ˝ skript, ale vyuĹžĂ­vĂĄ rĹŻznĂŠ nĂĄstroje, kterĂŠ vyĹžadujĂ­
 <classname>glibc</classname>.
 
 </para>
   </sect2>
 
   <sect2>
-  <title>Spuštění <command>debootstrap</command>u</title>
+  <title>SpuĹĄtÄnĂ­ <command>debootstrap</command>u</title>
 <para>
 
-<command>debootstrap</command> si umí stáhnout potřebné soubory přímo
-z debianího archivu. Aby se soubory nestahovaly přes půl Zeměkoule,
-nahraďte v ukázce server
-<userinput>http.us.debian.org/debian</userinput> nějakým bližším.
+<command>debootstrap</command> si umĂ­ stĂĄhnout potĹebnĂŠ soubory pĹĂ­mo
+z debianĂ­ho archivu. Aby se soubory nestahovaly pĹes pĹŻl ZemÄkoule,
+nahraÄte v ukĂĄzce server
+<userinput>http.us.debian.org/debian</userinput> nÄjakĂ˝m bliĹžĹĄĂ­m.
 Seznam zrcadel naleznete v
 <ulink url="http://www.debian.org/misc/README.mirrors"></ulink>.
 
 </para><para>
 
-Pokud máte první oficiální CD, můžete jej připojit jako
-<filename>/cdrom</filename> a místo síťové adresy použít odkaz na
+Pokud mĂĄte prvnĂ­ oficiĂĄlnĂ­ CD, mĹŻĹžete jej pĹipojit jako
+<filename>/cdrom</filename> a mĂ­sto sĂ­ĹĽovĂŠ adresy pouĹžĂ­t odkaz na
 soubor: <userinput>file:/cdrom/debian/</userinput>.
 
 </para><para>
 
-V ukázkovém příkazu <command>debootstrap</command> nahraďte
-<replaceable>ARCH</replaceable> jedním z následujících:
+V ukĂĄzkovĂŠm pĹĂ­kazu <command>debootstrap</command> nahraÄte
+<replaceable>ARCH</replaceable> jednĂ­m z nĂĄsledujĂ­cĂ­ch:
 
 <userinput>alpha</userinput>,
 <userinput>arm</userinput>,
@@ -189,12 +188,12 @@ V ukázkovém příkazu <command>debootstrap</command> nahraďte
 
 
   <sect2>
-  <title>Nastavení základního systému</title>
+  <title>NastavenĂ­ zĂĄkladnĂ­ho systĂŠmu</title>
 
 <para>
 
-V adresáři <filename>/mnt/debinst</filename> teď máte opravdový, i
-když minimální, systém Debian. Nastal čas se do něj přesunout:
+V adresĂĄĹi <filename>/mnt/debinst</filename> teÄ mĂĄte opravdovĂ˝, i
+kdyĹž minimĂĄlnĂ­, systĂŠm Debian. Nastal Äas se do nÄj pĹesunout:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>LANG=C chroot /mnt/debinst /bin/bash</userinput>
@@ -203,17 +202,17 @@ když minimální, systém Debian. Nastal čas se do něj přesunout:
 </para>
 
    <sect3>
-   <title>Připojení oblastí</title>
+   <title>PĹipojenĂ­ oblastĂ­</title>
 <para>
 
-Nejprve musíte vytvořit soubor <filename>/etc/fstab</filename>.
+Nejprve musĂ­te vytvoĹit soubor <filename>/etc/fstab</filename>.
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>editor /etc/fstab</userinput>
 </screen></informalexample>
 
-Jako vzor můžete použít následující šablonu (místo
-<replaceable>XXX</replaceable> dosaďte vlastní oblasti):
+Jako vzor mĹŻĹžete pouĹžĂ­t nĂĄsledujĂ­cĂ­ ĹĄablonu (mĂ­sto
+<replaceable>XXX</replaceable> dosaÄte vlastnĂ­ oblasti):
 
 <informalexample><screen>
 # /etc/fstab: static file system information.
@@ -234,16 +233,16 @@ proc             /proc         proc    defaults                 0    0
 /dev/XXX         /home         ext3    rw,nosuid,nodev          0    2
 </screen></informalexample>
 
-Souborové systémy, které jste zadali do
-<filename>/etc/fstab</filename> můžete připojit všechny najednou
-příkazem <userinput>mount -a</userinput>, nebo individuálně příkazem:
+SouborovĂŠ systĂŠmy, kterĂŠ jste zadali do
+<filename>/etc/fstab</filename> mĹŻĹžete pĹipojit vĹĄechny najednou
+pĹĂ­kazem <userinput>mount -a</userinput>, nebo individuĂĄlnÄ pĹĂ­kazem:
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>mount /cesta</userinput> # např.:  mount /usr
+<prompt>#</prompt> <userinput>mount /cesta</userinput> # napĹ.:  mount /usr
 </screen></informalexample>
 
-Před další prací si ověřte, že máte připojený virtuální souborový
-systém <filename>/proc</filename>. Pokud tomu tak není, připojte jej:
+PĹed dalĹĄĂ­ pracĂ­ si ovÄĹte, Ĺže mĂĄte pĹipojenĂ˝ virtuĂĄlnĂ­ souborovĂ˝
+systĂŠm <filename>/proc</filename>. Pokud tomu tak nenĂ­, pĹipojte jej:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mount -t proc proc /proc</userinput>
@@ -251,9 +250,9 @@ systém <filename>/proc</filename>. Pokud tomu tak není, připojte jej:
 
 </para><para>
 
-Príkaz <userinput>ls /proc</userinput> by nyní měll vypsat neprázdný
-adresář. Pokud by se tak nestalo, stále byste měli být schopni
-připojit <filename>proc</filename> z vnějšku chrootu:
+PrĂ­kaz <userinput>ls /proc</userinput> by nynĂ­ mÄll vypsat neprĂĄzdnĂ˝
+adresĂĄĹ. Pokud by se tak nestalo, stĂĄle byste mÄli bĂ˝t schopni
+pĹipojit <filename>proc</filename> z vnÄjĹĄku chrootu:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mount -t proc proc /mnt/debinst/proc</userinput>
@@ -263,10 +262,10 @@ připojit <filename>proc</filename> z vnějšku chrootu:
    </sect3>
 
    <sect3>
-   <title>Nastavení klávesnice</title>
+   <title>NastavenĂ­ klĂĄvesnice</title>
 <para>
 
-Klávesnici nastavíte:
+KlĂĄvesnici nastavĂ­te:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>dpkg-reconfigure console-data</userinput>
@@ -274,26 +273,27 @@ Klávesnici nastavíte:
 
 </para><para>
 
-Klávesnici nemůžete v chrootu nastavit, změna se projeví až po příštím
+KlĂĄvesnici nemĹŻĹžete v chrootu nastavit, zmÄna se projevĂ­ aĹž po pĹĂ­ĹĄtĂ­m
 restartu.
 
 </para>
    </sect3>
 
    <sect3>
-   <title>Nastavení sítě</title>
+   <title>NastavenĂ­ sĂ­tÄ</title>
 <para>
 
-Síťování se nastavuje v souborech
+SĂ­ĹĽovĂĄnĂ­ se nastavuje v souborech
 <filename>/etc/network/interfaces</filename>,
-<filename>/etc/resolv.conf</filename> a
-<filename>/etc/hostname</filename>.
+<filename>/etc/resolv.conf</filename>,
+<filename>/etc/hostname</filename> a
+<filename>/etc/hosts</filename>.
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>editor /etc/network/interfaces</userinput>
 </screen></informalexample>
 
-Pro začátek vám mohou pomoci ukázky z
+Pro zaÄĂĄtek vĂĄm mohou pomoci ukĂĄzky z
 <filename>/usr/share/doc/ifupdown/examples</filename>:
 
 <informalexample><screen>
@@ -303,17 +303,17 @@ Pro začátek vám mohou pomoci ukázky z
 # available.
 ######################################################################
 
-# Virtuální loopback chceme vždy.
+# VirtuĂĄlnĂ­ loopback chceme vĹždy.
 #
 auto lo
 iface lo inet loopback
 
-# Použití dhcp:
+# PouĹžitĂ­ dhcp:
 #
 # auto eth0
 # iface eth0 inet dhcp
 
-# Statická IP adresa: (broadcast a gateway jsou volitelné)
+# StatickĂĄ IP adresa: (broadcast a gateway jsou volitelnĂŠ)
 #
 # auto eth0
 # iface eth0 inet static
@@ -324,8 +324,8 @@ iface lo inet loopback
 #     gateway 192.168.0.1
 </screen></informalexample>
 
-Do <filename>/etc/resolv.conf</filename> zadejte nastavení jmenných
-serverů (DNS):
+Do <filename>/etc/resolv.conf</filename> zadejte nastavenĂ­ jmennĂ˝ch
+serverĹŻ (DNS):
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>editor /etc/resolv.conf</userinput>
@@ -333,7 +333,7 @@ serverů (DNS):
 
 </para><para>
 
-Jednoduchý <filename>/etc/resolv.conf</filename>:
+JednoduchĂ˝ <filename>/etc/resolv.conf</filename>:
 
 <informalexample><screen>
 search hqdom.local\000
@@ -341,33 +341,33 @@ nameserver 10.1.1.36
 nameserver 192.168.9.100
 </screen></informalexample>
 
-Zadejte název svého systému (délka aspoň 2 a nejvýše 63 znaky):
+Zadejte nĂĄzev svĂŠho systĂŠmu (dĂŠlka aspoĹ 2 a nejvĂ˝ĹĄe 63 znaky):
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>echo JmenoPocitace &gt; /etc/hostname</userinput>
 </screen></informalexample>
 
-Jestliže máte více síťových karet, měli byste si pohrát s názvy modulů
-v <filename>/etc/modules</filename>, aby se karty vždy přiřadily ke
-stejnému rozhraní (eth0, eth1, atd.)
+JestliĹže mĂĄte vĂ­ce sĂ­ĹĽovĂ˝ch karet, mÄli byste si pohrĂĄt s nĂĄzvy modulĹŻ
+v <filename>/etc/modules</filename>, aby se karty vĹždy pĹiĹadily ke
+stejnĂŠmu rozhranĂ­ (eth0, eth1, atd.)
 
 </para>
    </sect3>
 
    <sect3>
-   <title>Nastavení Locales</title>
+   <title>NastavenĂ­ Locales</title>
 <para>
 
-Aby se s vámi systém bavil v jiném jazyce než je angličtina, musíte
-nainstalovat a nastavit balík pro podporu národních prostředí:
+Aby se s vĂĄmi systĂŠm bavil v jinĂŠm jazyce neĹž je angliÄtina, musĂ­te
+nainstalovat a nastavit balĂ­k pro podporu nĂĄrodnĂ­ch prostĹedĂ­:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>apt-get install locales</userinput>
 <prompt>#</prompt> <userinput>dpkg-reconfigure locales</userinput>
 </screen></informalexample>
 
-POZNÁMKA: Před tímto krokem již musíte mít nastavený systém pro správu
-balíčků &mdash; apt. Také nebude od věci nastudovat si odpovídající
+POZNĂMKA: PĹed tĂ­mto krokem jiĹž musĂ­te mĂ­t nastavenĂ˝ systĂŠm pro sprĂĄvu
+balĂ­ÄkĹŻ &mdash; apt. TakĂŠ nebude od vÄci nastudovat si odpovĂ­dajĂ­cĂ­
 dokumenty HOWTO.
 
 </para>
@@ -375,49 +375,49 @@ dokumenty HOWTO.
   </sect2>
 
   <sect2>
-  <title>Instalace jádra</title>
+  <title>Instalace jĂĄdra</title>
 <para>
 
-Jestliže budete chtít tento systém i zavádět (na 99% ano), musíte si
-nainstalovat jádro (a možná zavaděč). Následujícím příkazem zjistíte
-dostupná připravená jádra:
+JestliĹže budete chtĂ­t tento systĂŠm i zavĂĄdÄt (na 99% ano), musĂ­te si
+nainstalovat jĂĄdro (a moĹžnĂĄ zavadÄÄ). NĂĄsledujĂ­cĂ­m pĹĂ­kazem zjistĂ­te
+dostupnĂĄ pĹipravenĂĄ jĂĄdra:
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>apt-cache search kernel-image</userinput>
+<prompt>#</prompt> <phrase condition="classic-kpkg"><userinput>apt-cache search kernel-image</userinput></phrase><phrase condition="common-kpkg"><userinput>apt-cache search linux-image</userinput></phrase>
 </screen></informalexample>
 
-Vybrané jádro nainstalujte:
+VybranĂŠ jĂĄdro nainstalujte:
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>apt-get install kernel-image-2.X.X-arch-atd</userinput>
+<prompt>#</prompt> <phrase condition="classic-kpkg"><userinput>apt-get install kernel-image-<replaceable>&kernelversion;-arch-atd</replaceable></userinput></phrase><phrase condition="common-kpkg"><userinput>apt-get install linux-image-<replaceable>&kernelversion;-arch-atd</replaceable></userinput></phrase>
 </screen></informalexample>
 
 </para>
   </sect2>
 
   <sect2>
-<title>Nastavení zavaděče</title>
+<title>NastavenĂ­ zavadÄÄe</title>
 <para>
 
-Abyste mohli zavádět svůj Debian, nastavte v zavaděči, aby nahrál
-instalované jádro s novou kořenovou oblastí. Pamatujte, že debootstrap
-zavaděč neinstaluje, takže jej budete muset doinstalovat zvlášť
-(např. pomocí apt-get uvnitř chrootovaného prostředí).
+Abyste mohli zavĂĄdÄt svĹŻj Debian, nastavte v zavadÄÄi, aby nahrĂĄl
+instalovanĂŠ jĂĄdro s novou koĹenovou oblastĂ­. Pamatujte, Ĺže debootstrap
+zavadÄÄ neinstaluje, takĹže jej budete muset doinstalovat zvlĂĄĹĄĹĽ
+(napĹ. pomocĂ­ apt-get uvnitĹ chrootovanĂŠho prostĹedĂ­).
 
 </para><para arch="i386">
 
-Návod k nastavení zavaděče prozradí příkaz <userinput>info
+NĂĄvod k nastavenĂ­ zavadÄÄe prozradĂ­ pĹĂ­kaz <userinput>info
 grub</userinput> nebo <userinput>man lilo.conf</userinput>. Pokud si
-ponecháte původní operační systém, stačí do stávajícího <filename>grub
-menu.lst</filename> nebo <filename>lilo.conf</filename> přidat
-příslušnou položku. <filename>lilo.conf</filename> si také můžete
-zkopírovat do nového systému, zde ho upravit a spustit
-<command>lilo</command> (použije konfigurační soubor systému, ze
-kterého jej spouštíte).
+ponechĂĄte pĹŻvodnĂ­ operaÄnĂ­ systĂŠm, staÄĂ­ do stĂĄvajĂ­cĂ­ho <filename>grub
+menu.lst</filename> nebo <filename>lilo.conf</filename> pĹidat
+pĹĂ­sluĹĄnou poloĹžku. <filename>lilo.conf</filename> si takĂŠ mĹŻĹžete
+zkopĂ­rovat do novĂŠho systĂŠmu, zde ho upravit a spustit
+<command>lilo</command> (pouĹžije konfiguraÄnĂ­ soubor systĂŠmu, ze
+kterĂŠho jej spouĹĄtĂ­te).
 
 </para><para arch="i386">
 
-Pro inspiraci nabízíme minimální <filename>/etc/lilo.conf</filename>:
+Pro inspiraci nabĂ­zĂ­me minimĂĄlnĂ­ <filename>/etc/lilo.conf</filename>:
 
 <informalexample><screen>
 boot=/dev/hda6
@@ -431,16 +431,16 @@ label=Debian
 
 </para><para arch="powerpc">
 
-Návod k nastavení zavaděče prozradí příkaz <userinput>man
-yaboot.conf</userinput>. Pokud si ponecháte původní operační systém,
-stačí do stávajícího <filename>yaboot.conf</filename> přidat
-příslušnou položku. Tento soubor si také můžete zkopírovat do nového
-systému, zde ho upravit a spustit <command>ybin</command> (použije
-konfigurační soubor systému, ze kterého jej spouštíte).
+NĂĄvod k nastavenĂ­ zavadÄÄe prozradĂ­ pĹĂ­kaz <userinput>man
+yaboot.conf</userinput>. Pokud si ponechĂĄte pĹŻvodnĂ­ operaÄnĂ­ systĂŠm,
+staÄĂ­ do stĂĄvajĂ­cĂ­ho <filename>yaboot.conf</filename> pĹidat
+pĹĂ­sluĹĄnou poloĹžku. Tento soubor si takĂŠ mĹŻĹžete zkopĂ­rovat do novĂŠho
+systĂŠmu, zde ho upravit a spustit <command>ybin</command> (pouĹžije
+konfiguraÄnĂ­ soubor systĂŠmu, ze kterĂŠho jej spouĹĄtĂ­te).
 
 </para><para arch="powerpc">
 
-Pro inspiraci nabízíme minimální <filename>/etc/yaboot.conf</filename>:
+Pro inspiraci nabĂ­zĂ­me minimĂĄlnĂ­ <filename>/etc/yaboot.conf</filename>:
 
 <informalexample><screen>
 boot=/dev/hda2
@@ -453,7 +453,7 @@ image=/vmlinux
 label=Debian
 </screen></informalexample>
 
-Na některých počítačích musíte místo <userinput>hd:</userinput> použít
+Na nÄkterĂ˝ch poÄĂ­taÄĂ­ch musĂ­te mĂ­sto <userinput>hd:</userinput> pouĹžĂ­t
 <userinput>ide0:</userinput>.
 
 </para>

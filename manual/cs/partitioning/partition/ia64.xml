@@ -1,43 +1,42 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 28672 -->
 
-  <sect2 arch="ia64"><title>Dělení disku na &arch-title;</title>
+  <sect2 arch="ia64"><title>DÄlenĂ­ disku na &arch-title;</title>
 <para>
 
-Výchozím dělicím programem instalačního systému je
-<command>partman</command>. <command>partman</command> se stará
-o správné rozdělení disku, správu přípojných bodů a hlavně dává pozor,
-aby jste neudělali nějakou logickou chybu, která by zabránila
-instalaci. Protože toho má na starosti víc než dost, přenechává
-samotné dělení disku programu <command>parted</command>.
+VĂ˝chozĂ­m dÄlicĂ­m programem instalaÄnĂ­ho systĂŠmu je
+<command>partman</command>. <command>partman</command> se starĂĄ
+o sprĂĄvnĂŠ rozdÄlenĂ­ disku, sprĂĄvu pĹĂ­pojnĂ˝ch bodĹŻ a hlavnÄ dĂĄvĂĄ pozor,
+aby jste neudÄlali nÄjakou logickou chybu, kterĂĄ by zabrĂĄnila
+instalaci. ProtoĹže toho mĂĄ na starosti vĂ­c neĹž dost, pĹenechĂĄvĂĄ
+samotnĂŠ dÄlenĂ­ disku programu <command>parted</command>.
 
-</para><note><title>Různé formáty tabulky oddílů</title><para>
+</para><note><title>RĹŻznĂŠ formĂĄty tabulky oddĂ­lĹŻ</title><para>
 
-IA64 EFI firmware podporuje dva formáty tabulky oddílů &mdash; GPT
-a MS-DOS. Formát MS-DOS se typicky používá na počítačích i386 a pro
-systémy ia64 se již nedoporučuje. Přestože instalační systém nabízí
-dva programy pro dělení disku (<command>cfdisk</command>
-a <command>parted</command>), měli byste používat pouze druhý z nich,
-protože jenom <command>parted</command> zvládá oba formáty tabulky
-oddílů.
+IA64 EFI firmware podporuje dva formĂĄty tabulky oddĂ­lĹŻ &mdash; GPT
+a MS-DOS. FormĂĄt MS-DOS se typicky pouĹžĂ­vĂĄ na poÄĂ­taÄĂ­ch i386 a pro
+systĂŠmy ia64 se jiĹž nedoporuÄuje. PĹestoĹže instalaÄnĂ­ systĂŠm nabĂ­zĂ­
+dva programy pro dÄlenĂ­ disku (<command>cfdisk</command>
+a <command>parted</command>), mÄli byste pouĹžĂ­vat pouze druhĂ˝ z nich,
+protoĹže jenom <command>parted</command> zvlĂĄdĂĄ oba formĂĄty tabulky
+oddĂ­lĹŻ.
 
 </para></note><para>
 
-Pokud v <command>partman</command>u zvolíte automatické rozdělení
-disků, automaticky se na začátku prvního disku vytvoří malá EFI
-oblast. Jestliže rozdělujete disk ručně, můžete ji vytvořit stejným
-způsobem, jako třeba <emphasis>swap</emphasis>.
+Pokud v <command>partman</command>u zvolĂ­te automatickĂŠ rozdÄlenĂ­
+diskĹŻ, automaticky se na zaÄĂĄtku prvnĂ­ho disku vytvoĹĂ­ malĂĄ EFI
+oblast. JestliĹže rozdÄlujete disk ruÄnÄ, mĹŻĹžete ji vytvoĹit stejnĂ˝m
+zpĹŻsobem, jako tĹeba <emphasis>swap</emphasis>.
 
 </para><para>
 
-Pokud byste náhodou potřebovali vytvořit tak speciální rozdělení
-disku, že by to <command>partman</command> nezvládl, můžete se
-přepnout do shellu a ručně spustit program <command>parted</command>.
-Bohužel je <command>parted</command> ovládaný z příkazové řádky a tím
-pádem se nepoužívá tak jednoduše jako <command>partman</command>.
-Předpokládejme, že chcete smazat celý disk a vytvořit tabulku GPT
-a několik oblastí. Posloupnost příkazů by mohla vypadat nějak takto:
+Pokud byste nĂĄhodou potĹebovali vytvoĹit tak speciĂĄlnĂ­ rozdÄlenĂ­
+disku, Ĺže by to <command>partman</command> nezvlĂĄdl, mĹŻĹžete se
+pĹepnout do shellu a ruÄnÄ spustit program <command>parted</command>.
+BohuĹžel je <command>parted</command> ovlĂĄdanĂ˝ z pĹĂ­kazovĂŠ ĹĂĄdky a tĂ­m
+pĂĄdem se nepouĹžĂ­vĂĄ tak jednoduĹĄe jako <command>partman</command>.
+PĹedpoklĂĄdejme, Ĺže chcete smazat celĂ˝ disk a vytvoĹit tabulku GPT
+a nÄkolik oblastĂ­. Posloupnost pĹĂ­kazĹŻ by mohla vypadat nÄjak takto:
 
 <informalexample><screen>
       mklabel gpt
@@ -49,64 +48,64 @@ a několik oblastí. Posloupnost příkazů by mohla vypadat nějak takto:
       quit
 </screen></informalexample>
 
-Tím se vytvoří nová tabulka rozdělení disku a tři oblasti pro použití
-jako zaváděcí oblast EFI, virtuální paměť a kořenový souborový
-systém. Nakonec se oblasti EFI nastaví příznak pro zavádění.
-Oblasti se zadávají v megabajtech tak, že uvedete posunutí počátku
-a konce oblasti od začátku disku. V příkladu jsme vytvořili oblast se
-souborovým systémem ext2 o velikosti 1999MB, která začíná na
-1001. megabajtu od začátku disku.
-Poznámka: Formátování odkládací oblasti programem
-<command>parted</command> může trvat několik minut, protože se
-kontroluje výskyt vadných bloků.
+TĂ­m se vytvoĹĂ­ novĂĄ tabulka rozdÄlenĂ­ disku a tĹi oblasti pro pouĹžitĂ­
+jako zavĂĄdÄcĂ­ oblast EFI, virtuĂĄlnĂ­ pamÄĹĽ a koĹenovĂ˝ souborovĂ˝
+systĂŠm. Nakonec se oblasti EFI nastavĂ­ pĹĂ­znak pro zavĂĄdÄnĂ­.
+Oblasti se zadĂĄvajĂ­ v megabajtech tak, Ĺže uvedete posunutĂ­ poÄĂĄtku
+a konce oblasti od zaÄĂĄtku disku. V pĹĂ­kladu jsme vytvoĹili oblast se
+souborovĂ˝m systĂŠmem ext2 o velikosti 1999MB, kterĂĄ zaÄĂ­nĂĄ na
+1001. megabajtu od zaÄĂĄtku disku.
+PoznĂĄmka: FormĂĄtovĂĄnĂ­ odklĂĄdacĂ­ oblasti programem
+<command>parted</command> mĹŻĹže trvat nÄkolik minut, protoĹže se
+kontroluje vĂ˝skyt vadnĂ˝ch blokĹŻ.
 
 </para>
   </sect2>
 
-  <sect2 arch="ia64"><title>Požadavky na zaváděcí oblast</title>
+  <sect2 arch="ia64"><title>PoĹžadavky na zavĂĄdÄcĂ­ oblast</title>
 <para>
 
-ELILO, zavaděč na ia64, vyžaduje oblast obsahující souborový systém
-FAT. Jestliže jste použili oblasti GPT, měla by mít nastaven příznak
-<userinput>boot</userinput>; pokud jste použili oblasti MS-DOS, pak by
-měla být typu <quote>EF</quote>. Oblast musí být dostatečně velká, aby
-se do ní vešel zavaděč, jádra a případné RAMdisky. Obvykle stačí 16MB,
-ale jestli experimentujete s více jádry, klidně použijte oblast
+ELILO, zavadÄÄ na ia64, vyĹžaduje oblast obsahujĂ­cĂ­ souborovĂ˝ systĂŠm
+FAT. JestliĹže jste pouĹžili oblasti GPT, mÄla by mĂ­t nastaven pĹĂ­znak
+<userinput>boot</userinput>; pokud jste pouĹžili oblasti MS-DOS, pak by
+mÄla bĂ˝t typu <quote>EF</quote>. Oblast musĂ­ bĂ˝t dostateÄnÄ velkĂĄ, aby
+se do nĂ­ veĹĄel zavadÄÄ, jĂĄdra a pĹĂ­padnĂŠ RAMdisky. Obvykle staÄĂ­ 16MB,
+ale jestli experimentujete s vĂ­ce jĂĄdry, klidnÄ pouĹžijte oblast
 o velikosti 128MB.
 
 </para><para>
 
-Protože EFI Boot Manager a EFI Shell plně podporují tabulku rozdělení
-typu GPT, nemusí být zaváděcí oblast nutně první a dokonce ani nemusí
-být na stejném disku. To se hodí v případech, když tuto oblast
-zapomenete alokovat a zjistíte to až později po vytvoření
-a zformátování jiných oblastí. <command>partman</command> na tento
-problém myslí a hlídá, zda je při ukončení <command>partman</command>u
-zaváděcí EFI oblast vytvořená a zda existuje platná kořenová oblast.
-To vám dává možnost opravit rozdělení disku ještě před instalací
-balíků (což by v dané chvíli většinou nedávalo smysl). Nejjednodušší
-cesta k nápravě je zmenšit poslední oblast na disku a použít vzniklé
-volné místo právě pro zaváděcí EFI oblast.
+ProtoĹže EFI Boot Manager a EFI Shell plnÄ podporujĂ­ tabulku rozdÄlenĂ­
+typu GPT, nemusĂ­ bĂ˝t zavĂĄdÄcĂ­ oblast nutnÄ prvnĂ­ a dokonce ani nemusĂ­
+bĂ˝t na stejnĂŠm disku. To se hodĂ­ v pĹĂ­padech, kdyĹž tuto oblast
+zapomenete alokovat a zjistĂ­te to aĹž pozdÄji po vytvoĹenĂ­
+a zformĂĄtovĂĄnĂ­ jinĂ˝ch oblastĂ­. <command>partman</command> na tento
+problĂŠm myslĂ­ a hlĂ­dĂĄ, zda je pĹi ukonÄenĂ­ <command>partman</command>u
+zavĂĄdÄcĂ­ EFI oblast vytvoĹenĂĄ a zda existuje platnĂĄ koĹenovĂĄ oblast.
+To vĂĄm dĂĄvĂĄ moĹžnost opravit rozdÄlenĂ­ disku jeĹĄtÄ pĹed instalacĂ­
+balĂ­kĹŻ (coĹž by v danĂŠ chvĂ­li vÄtĹĄinou nedĂĄvalo smysl). NejjednoduĹĄĹĄĂ­
+cesta k nĂĄpravÄ je zmenĹĄit poslednĂ­ oblast na disku a pouĹžĂ­t vzniklĂŠ
+volnĂŠ mĂ­sto prĂĄvÄ pro zavĂĄdÄcĂ­ EFI oblast.
 
 </para><para>
 
-Velmi se doporučuje vytvořit zaváděcí EFI oblast na stejném disku,
-kde leží <emphasis>kořenový</emphasis> souborový systém.
+Velmi se doporuÄuje vytvoĹit zavĂĄdÄcĂ­ EFI oblast na stejnĂŠm disku,
+kde leĹžĂ­ <emphasis>koĹenovĂ˝</emphasis> souborovĂ˝ systĂŠm.
 
 </para>
   </sect2>
 
-  <sect2 arch="ia64"><title>Diagnostické EFI oblasti</title>
+  <sect2 arch="ia64"><title>DiagnostickĂŠ EFI oblasti</title>
 <para>
 
-EFI firmware je mnohem propracovanější než obvyklé BIOSy, které můžete
-nalézt ve většině osobních počítačů třídy x86. Někteří výrobci
-využívají možností EFI a ukládají si na systémový disk do speciální
-oblasti diagnostické programy a nástroje pro správu
-systému. Podrobnější informace o této oblasti se dozvíte v dokumentaci
-k systému. Nejjednodušší cesta k vytvoření diagnostické oblasti je
-vytvořit ji v <command>partman</command>u zároveň se zaváděcí EFI
-oblastí.
+EFI firmware je mnohem propracovanÄjĹĄĂ­ neĹž obvyklĂŠ BIOSy, kterĂŠ mĹŻĹžete
+nalĂŠzt ve vÄtĹĄinÄ osobnĂ­ch poÄĂ­taÄĹŻ tĹĂ­dy x86. NÄkteĹĂ­ vĂ˝robci
+vyuĹžĂ­vajĂ­ moĹžnostĂ­ EFI a uklĂĄdajĂ­ si na systĂŠmovĂ˝ disk do speciĂĄlnĂ­
+oblasti diagnostickĂŠ programy a nĂĄstroje pro sprĂĄvu
+systĂŠmu. PodrobnÄjĹĄĂ­ informace o tĂŠto oblasti se dozvĂ­te v dokumentaci
+k systĂŠmu. NejjednoduĹĄĹĄĂ­ cesta k vytvoĹenĂ­ diagnostickĂŠ oblasti je
+vytvoĹit ji v <command>partman</command>u zĂĄroveĹ se zavĂĄdÄcĂ­ EFI
+oblastĂ­.
 
 </para>
   </sect2>

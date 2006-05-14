@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 28672 -->
 
@@ -6,65 +5,65 @@
  <title>Reaktivace DOS a Windows</title>
 <para>
 
-Po instalaci základního systému a zapsání zavaděče do <emphasis>Master
-Boot Record</emphasis> budete schopni zavést Linux, ale pravděpodobně
-nic jiného. Vše závisí na tom, co jste zvolili během instalace.
-Tato kapitola popisuje, jak můžete znovu aktivovat původní systémy,
-takže budete znovu moci zavádět DOS nebo Windows.
+Po instalaci zĂĄkladnĂ­ho systĂŠmu a zapsĂĄnĂ­ zavadÄÄe do <emphasis>Master
+Boot Record</emphasis> budete schopni zavĂŠst Linux, ale pravdÄpodobnÄ
+nic jinĂŠho. VĹĄe zĂĄvisĂ­ na tom, co jste zvolili bÄhem instalace.
+Tato kapitola popisuje, jak mĹŻĹžete znovu aktivovat pĹŻvodnĂ­ systĂŠmy,
+takĹže budete znovu moci zavĂĄdÄt DOS nebo Windows.
 
 </para><para>
 
-<command>LILO</command> je zavaděč, kterým můžete zavádět i jiné
-operační systémy, než je Linux. Zavaděč se konfiguruje souborem
-<filename>/etc/lilo.conf</filename>. Po každé editaci tohoto souboru
-musíte spustit program <command>lilo</command>, aby se provedené změny
+<command>LILO</command> je zavadÄÄ, kterĂ˝m mĹŻĹžete zavĂĄdÄt i jinĂŠ
+operaÄnĂ­ systĂŠmy, neĹž je Linux. ZavadÄÄ se konfiguruje souborem
+<filename>/etc/lilo.conf</filename>. Po kaĹždĂŠ editaci tohoto souboru
+musĂ­te spustit program <command>lilo</command>, aby se provedenĂŠ zmÄny
 aktivovaly.
 
 </para><para>
 
-Důležité jsou části souboru <filename>lilo.conf</filename> obsahující
-klíčová slova <userinput>image</userinput> a
-<userinput>other</userinput> a všechny následující řádky.
-Používají se k popsání operačního systému, který má
-<command>LILO</command> zavést.
-Takový záznam může specifikovat jádro (<userinput>image</userinput>),
-kořenovou oblast (<userinput>root</userinput>), upřesňující parametry
-jádra, atd. V sekci <userinput>other</userinput> můžete popsat návod k
-zavedení nelinuxového operačního systému.
-Klíčová slova mohou být použita více než jednou. Pořadí záznamů
-v konfiguračním souboru je důležité, protože určuje systém, který
-bude zaveden automaticky po určité době (<userinput>delay</userinput>)
-za předpokladu, že <command>LILO</command> nebylo zastaveno klávesou
+DĹŻleĹžitĂŠ jsou ÄĂĄsti souboru <filename>lilo.conf</filename> obsahujĂ­cĂ­
+klĂ­ÄovĂĄ slova <userinput>image</userinput> a
+<userinput>other</userinput> a vĹĄechny nĂĄsledujĂ­cĂ­ ĹĂĄdky.
+PouĹžĂ­vajĂ­ se k popsĂĄnĂ­ operaÄnĂ­ho systĂŠmu, kterĂ˝ mĂĄ
+<command>LILO</command> zavĂŠst.
+TakovĂ˝ zĂĄznam mĹŻĹže specifikovat jĂĄdro (<userinput>image</userinput>),
+koĹenovou oblast (<userinput>root</userinput>), upĹesĹujĂ­cĂ­ parametry
+jĂĄdra, atd. V sekci <userinput>other</userinput> mĹŻĹžete popsat nĂĄvod k
+zavedenĂ­ nelinuxovĂŠho operaÄnĂ­ho systĂŠmu.
+KlĂ­ÄovĂĄ slova mohou bĂ˝t pouĹžita vĂ­ce neĹž jednou. PoĹadĂ­ zĂĄznamĹŻ
+v konfiguraÄnĂ­m souboru je dĹŻleĹžitĂŠ, protoĹže urÄuje systĂŠm, kterĂ˝
+bude zaveden automaticky po urÄitĂŠ dobÄ (<userinput>delay</userinput>)
+za pĹedpokladu, Ĺže <command>LILO</command> nebylo zastaveno klĂĄvesou
 <keycap>Shift</keycap>.
 
 </para><para>
 
-Ihned po instalaci Debianu je systém nakonfigurován pro automatické
-zavádění programem <command>LILO</command>. Jestliže chcete zavést
-jiné linuxové jádro, musíte změnit soubor
-<filename>/etc/lilo.conf</filename> a přidat (například) následující
-řádky:
+Ihned po instalaci Debianu je systĂŠm nakonfigurovĂĄn pro automatickĂŠ
+zavĂĄdÄnĂ­ programem <command>LILO</command>. JestliĹže chcete zavĂŠst
+jinĂŠ linuxovĂŠ jĂĄdro, musĂ­te zmÄnit soubor
+<filename>/etc/lilo.conf</filename> a pĹidat (napĹĂ­klad) nĂĄsledujĂ­cĂ­
+ĹĂĄdky:
 
 <informalexample><screen>
 &additional-lilo-image;
 </screen></informalexample>
 
-Pro základní nastavení postačují první dva řádky. Jestliže chcete
-vědět víc o ostatních klíčových slovech, podívejte se do dokumentace k
-programu <command>LILO</command> (v adresáři
-<filename>/usr/share/doc/lilo/</filename>). Nejdůležitější soubor je
-<filename>Manual.txt</filename>. Pokud jste nedočkaví, bude rychlejší
-si projít manuálové stránky <filename>lilo.conf</filename> pro přehled
-klíčových slov a <filename>lilo</filename> pro popis instalace nové
-konfigurace do zaváděcího sektoru.
+Pro zĂĄkladnĂ­ nastavenĂ­ postaÄujĂ­ prvnĂ­ dva ĹĂĄdky. JestliĹže chcete
+vÄdÄt vĂ­c o ostatnĂ­ch klĂ­ÄovĂ˝ch slovech, podĂ­vejte se do dokumentace k
+programu <command>LILO</command> (v adresĂĄĹi
+<filename>/usr/share/doc/lilo/</filename>). NejdĹŻleĹžitÄjĹĄĂ­ soubor je
+<filename>Manual.txt</filename>. Pokud jste nedoÄkavĂ­, bude rychlejĹĄĂ­
+si projĂ­t manuĂĄlovĂŠ strĂĄnky <filename>lilo.conf</filename> pro pĹehled
+klĂ­ÄovĂ˝ch slov a <filename>lilo</filename> pro popis instalace novĂŠ
+konfigurace do zavĂĄdÄcĂ­ho sektoru.
 
 </para><para>
 
-Poznamenejme, že v systému &debian; jsou dostupné i jiné zavaděče,
-jako třeba GRUB (balíček <classname>grub</classname>), CHOS (balíček
-<classname>chos</classname>), Extended-IPL (balíček
-<classname>extipl</classname>), loadlin (balíček
-<classname>loadlin</classname>) a mnoho dalších.
+Poznamenejme, Ĺže v systĂŠmu &debian; jsou dostupnĂŠ i jinĂŠ zavadÄÄe,
+jako tĹeba GRUB (balĂ­Äek <classname>grub</classname>), CHOS (balĂ­Äek
+<classname>chos</classname>), Extended-IPL (balĂ­Äek
+<classname>extipl</classname>), loadlin (balĂ­Äek
+<classname>loadlin</classname>) a mnoho dalĹĄĂ­ch.
 
 </para>
  </sect1>

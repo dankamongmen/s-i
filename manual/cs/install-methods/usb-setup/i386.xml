@@ -1,57 +1,56 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 33725 -->
+<!-- original version: 36841 -->
 
    <sect3 arch="i386">
-   <title>Rozdělení USB zařízení</title>
+   <title>RozdÄlenĂ­ USB zaĹĂ­zenĂ­</title>
 <note><para>
 
-Protože má většina USB klíčenek přednastavenou jednu velkou oblast
-typu FAT16, pravděpodobně nemusíte klíčenku přeformátovávat. Pokud to
-však musíte provést, použijte pro vytvoření této oblasti
-<command>cfdisk</command> nebo podobný nástroj pro dělení disku. Poté
-vytvořte souborový systém příkazem
+ProtoĹže mĂĄ vÄtĹĄina USB klĂ­Äenek pĹednastavenou jednu velkou oblast
+typu FAT16, pravdÄpodobnÄ nemusĂ­te klĂ­Äenku pĹeformĂĄtovĂĄvat. Pokud to
+vĹĄak musĂ­te provĂŠst, pouĹžijte pro vytvoĹenĂ­ tĂŠto oblasti
+<command>cfdisk</command> nebo podobnĂ˝ nĂĄstroj pro dÄlenĂ­ disku. PotĂŠ
+vytvoĹte souborovĂ˝ systĂŠm pĹĂ­kazem
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mkdosfs /dev/<replaceable>sda1</replaceable></userinput>
 </screen></informalexample>
 
-Příkaz <command>mkdosfs</command> je obsažen v balíku
-<classname>dosfstools</classname>. Pozorně se přesvědčete, že
-používáte správný název zařízení!
+PĹĂ­kaz <command>mkdosfs</command> je obsaĹžen v balĂ­ku
+<classname>dosfstools</classname>. PozornÄ se pĹesvÄdÄete, Ĺže
+pouĹžĂ­vĂĄte sprĂĄvnĂ˝ nĂĄzev zaĹĂ­zenĂ­!
 
 </para></note><para>
 
-Pro zavedení jádra z klíčenky je zapotřebí zavaděče. Přestože byste
-mohli použít téměř libovolný zavaděč (např. <command>LILO</command>),
-je zvykem používat <command>SYSLINUX</command>, protože používá oblast
-typu FAT16 a jeho nastavení se provádí úpravou jednoduchého textového
-souboru. Díky tomu můžete zavaděč konfigurovat z téměř libovolného
-operačního systému.
+Pro zavedenĂ­ jĂĄdra z klĂ­Äenky je zapotĹebĂ­ zavadÄÄe. PĹestoĹže byste
+mohli pouĹžĂ­t tĂŠmÄĹ libovolnĂ˝ zavadÄÄ (napĹ. <command>LILO</command>),
+je zvykem pouĹžĂ­vat <command>SYSLINUX</command>, protoĹže pouĹžĂ­vĂĄ oblast
+typu FAT16 a jeho nastavenĂ­ se provĂĄdĂ­ Ăşpravou jednoduchĂŠho textovĂŠho
+souboru. DĂ­ky tomu mĹŻĹžete zavadÄÄ konfigurovat z tĂŠmÄĹ libovolnĂŠho
+operaÄnĂ­ho systĂŠmu.
 
 </para><para>
 
-Pro instalaci <command>SYSLINUX</command>u na 1. oblast USB klíčenky
-musíte mít nainstalované balíky <classname>syslinux</classname> a
-<classname>mtools</classname> a daná oblast nesmí být připojená. Poté
-zadejte příkaz
+Pro instalaci <command>SYSLINUX</command>u na 1. oblast USB klĂ­Äenky
+musĂ­te mĂ­t nainstalovanĂŠ balĂ­ky <classname>syslinux</classname> a
+<classname>mtools</classname> a danĂĄ oblast nesmĂ­ bĂ˝t pĹipojenĂĄ. PotĂŠ
+zadejte pĹĂ­kaz
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>syslinux /dev/<replaceable>sda1</replaceable></userinput>
 </screen></informalexample>
 
-čímž se na začátek oblasti zapíše zaváděcí sektor a vytvoří se soubor
-<filename>ldlinux.sys</filename>, který obsahuje hlavní část zavaděče.
+ÄĂ­mĹž se na zaÄĂĄtek oblasti zapĂ­ĹĄe zavĂĄdÄcĂ­ sektor a vytvoĹĂ­ se soubor
+<filename>ldlinux.sys</filename>, kterĂ˝ obsahuje hlavnĂ­ ÄĂĄst zavadÄÄe.
 
 </para><para>
 
-Připojte oblast (<userinput>mount /dev/sda1 /mnt</userinput>)
-a nakopírujte na ni následující soubory:
+PĹipojte oblast (<userinput>mount /dev/sda1 /mnt</userinput>)
+a nakopĂ­rujte na ni nĂĄsledujĂ­cĂ­ soubory:
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (jádro)
+<filename>vmlinuz</filename> (jĂĄdro)
 
 </para></listitem>
 <listitem><para>
@@ -61,33 +60,33 @@ a nakopírujte na ni následující soubory:
 </para></listitem>
 <listitem><para>
 
-<filename>syslinux.cfg</filename> (konfigurační soubor SYSLINUXu)
+<filename>syslinux.cfg</filename> (konfiguraÄnĂ­ soubor SYSLINUXu)
 
 </para></listitem>
 <listitem><para>
 
-volitelné jaderné moduly
+volitelnĂŠ jadernĂŠ moduly
 
 </para></listitem>
 </itemizedlist>
 
-Pokud si chcete soubory přejmenovat, pamatujte, že
-<command>SYSLINUX</command> umí pracovat pouze s DOSovými (8.3) názvy
-souborů.
+Pokud si chcete soubory pĹejmenovat, pamatujte, Ĺže
+<command>SYSLINUX</command> umĂ­ pracovat pouze s DOSovĂ˝mi (8.3) nĂĄzvy
+souborĹŻ.
 
 </para><para>
 
-Konfigurační soubor <filename>syslinux.cfg</filename> by měl obsahovat
-následující dvě řádky:
+KonfiguraÄnĂ­ soubor <filename>syslinux.cfg</filename> by mÄl obsahovat
+nĂĄsledujĂ­cĂ­ dvÄ ĹĂĄdky:
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw
 </screen></informalexample>
 
-Možná budete muset zvýšit hodnotu u parametru
-<userinput>ramdisk_size</userinput>, protože tato se mění v závislosti
-na obrazu, který zavádíte.
+MoĹžnĂĄ budete muset zvĂ˝ĹĄit hodnotu u parametru
+<userinput>ramdisk_size</userinput>, protoĹže tato se mÄnĂ­ v zĂĄvislosti
+na obrazu, kterĂ˝ zavĂĄdĂ­te.
 
 </para>
    </sect3>

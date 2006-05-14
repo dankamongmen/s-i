@@ -1,79 +1,78 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 35590 -->
 
-  <sect2 arch="i386"><title>Dělení disku na &arch-title;</title>
+  <sect2 arch="i386"><title>DÄlenĂ­ disku na &arch-title;</title>
 <para>
 
-BIOS osobních počítačů obvykle přidává další omezení na rozdělení
-disku. Je určeno, kolik můžete na disku připravit <quote>primárních</quote> a
-<quote>logických</quote> oddílů. Starší BIOSy z let 1994-1998 dokáží zavést
-systém jen z části disku. Informace na toto téma podávají dokumenty
+BIOS osobnĂ­ch poÄĂ­taÄĹŻ obvykle pĹidĂĄvĂĄ dalĹĄĂ­ omezenĂ­ na rozdÄlenĂ­
+disku. Je urÄeno, kolik mĹŻĹžete na disku pĹipravit <quote>primĂĄrnĂ­ch</quote> a
+<quote>logickĂ˝ch</quote> oddĂ­lĹŻ. StarĹĄĂ­ BIOSy z let 1994-1998 dokĂĄĹžĂ­ zavĂŠst
+systĂŠm jen z ÄĂĄsti disku. Informace na toto tĂŠma podĂĄvajĂ­ dokumenty
 <ulink url="&url-partition-howto;">Linux Partition HOWTO</ulink> a
 <ulink url="&url-phoenix-bios-faq-large-disk;">Phoenix BIOS
-FAQ</ulink>, zde uvádíme jen stručný přehled.
+FAQ</ulink>, zde uvĂĄdĂ­me jen struÄnĂ˝ pĹehled.
 
 </para><para>
 
-<quote>Primární</quote> oddíly jsou původní koncept rozdělení disku. Na disku
-mohou být maximálně čtyři. Toto omezení překonávají oddíly
-<quote>rozšířené</quote> a <quote>logické</quote>. Změníte-li primární oddíl na rozšířený,
-můžete tento prostor využít k vytvoření libovolného počtu (max. 60)
-logických částí. Na disku lze však vytvořit maximálně jeden rozšířený
-oddíl.
+<quote>PrimĂĄrnĂ­</quote> oddĂ­ly jsou pĹŻvodnĂ­ koncept rozdÄlenĂ­ disku. Na disku
+mohou bĂ˝t maximĂĄlnÄ ÄtyĹi. Toto omezenĂ­ pĹekonĂĄvajĂ­ oddĂ­ly
+<quote>rozĹĄĂ­ĹenĂŠ</quote> a <quote>logickĂŠ</quote>. ZmÄnĂ­te-li primĂĄrnĂ­ oddĂ­l na rozĹĄĂ­ĹenĂ˝,
+mĹŻĹžete tento prostor vyuĹžĂ­t k vytvoĹenĂ­ libovolnĂŠho poÄtu (max. 60)
+logickĂ˝ch ÄĂĄstĂ­. Na disku lze vĹĄak vytvoĹit maximĂĄlnÄ jeden rozĹĄĂ­ĹenĂ˝
+oddĂ­l.
 
 </para><para>
 
-Linux omezuje počet oddílů na disk takto: 15 oddílů pro disky SCSI
-(tři primární a dvanáct logických) a 63 oddílů na discích IDE
-(3 primární a 60 logických). Standardní &debian; nabízí na každém
-disku pouze 20 zařízení pro oblasti, takže pokud chcete využívat
-oblasti s číslem větším než 20, musíte odpovídající zařízení vytvořit
-ručně.
+Linux omezuje poÄet oddĂ­lĹŻ na disk takto: 15 oddĂ­lĹŻ pro disky SCSI
+(tĹi primĂĄrnĂ­ a dvanĂĄct logickĂ˝ch) a 63 oddĂ­lĹŻ na discĂ­ch IDE
+(3 primĂĄrnĂ­ a 60 logickĂ˝ch). StandardnĂ­ &debian; nabĂ­zĂ­ na kaĹždĂŠm
+disku pouze 20 zaĹĂ­zenĂ­ pro oblasti, takĹže pokud chcete vyuĹžĂ­vat
+oblasti s ÄĂ­slem vÄtĹĄĂ­m neĹž 20, musĂ­te odpovĂ­dajĂ­cĂ­ zaĹĂ­zenĂ­ vytvoĹit
+ruÄnÄ.
 
 </para><para>
 
-Jestliže máte velký IDE disk na kterém nepoužíváte ani LBA adresování,
-ani překládací ovladač od výrobce, pak musíte umístit zaváděcí oddíl
-(obsahující jádro) do prvních 1024 cylindrů na disku (obvykle prvních
-524 megabajtů).
+JestliĹže mĂĄte velkĂ˝ IDE disk na kterĂŠm nepouĹžĂ­vĂĄte ani LBA adresovĂĄnĂ­,
+ani pĹeklĂĄdacĂ­ ovladaÄ od vĂ˝robce, pak musĂ­te umĂ­stit zavĂĄdÄcĂ­ oddĂ­l
+(obsahujĂ­cĂ­ jĂĄdro) do prvnĂ­ch 1024 cylindrĹŻ na disku (obvykle prvnĂ­ch
+524 megabajtĹŻ).
 
 </para><para>
 
-Toto omezení neplatí pro novější BIOSy (podle výrobce 1995-98),
-které podporují <quote>Enhanced Disk Drive Support Specification</quote>.
-Lilo, linuxový zavaděč, i debianí alternativní zavaděč
-<command>mbr</command> musí použít BIOS pro načtení jádra z disku do
-operační paměti. Jestliže jsou v BIOSu přítomna rozšíření pro přístup
-k velkým diskům (přes přerušení 0x13), pak budou použita. V opačném
-případě je použito původní rozhraní pro přístup k diskům, které
-bohužel neumí adresovat oblasti nad 1023. cylindrem.
-Avšak v okamžiku, kdy je Linux zaveden, už nezáleží na omezeních
-BIOSu, protože Linux k přístupu na disky BIOS nepoužívá.
+Toto omezenĂ­ neplatĂ­ pro novÄjĹĄĂ­ BIOSy (podle vĂ˝robce 1995-98),
+kterĂŠ podporujĂ­ <quote>Enhanced Disk Drive Support Specification</quote>.
+Lilo, linuxovĂ˝ zavadÄÄ, i debianĂ­ alternativnĂ­ zavadÄÄ
+<command>mbr</command> musĂ­ pouĹžĂ­t BIOS pro naÄtenĂ­ jĂĄdra z disku do
+operaÄnĂ­ pamÄti. JestliĹže jsou v BIOSu pĹĂ­tomna rozĹĄĂ­ĹenĂ­ pro pĹĂ­stup
+k velkĂ˝m diskĹŻm (pĹes pĹeruĹĄenĂ­ 0x13), pak budou pouĹžita. V opaÄnĂŠm
+pĹĂ­padÄ je pouĹžito pĹŻvodnĂ­ rozhranĂ­ pro pĹĂ­stup k diskĹŻm, kterĂŠ
+bohuĹžel neumĂ­ adresovat oblasti nad 1023. cylindrem.
+AvĹĄak v okamĹžiku, kdy je Linux zaveden, uĹž nezĂĄleĹžĂ­ na omezenĂ­ch
+BIOSu, protoĹže Linux k pĹĂ­stupu na disky BIOS nepouĹžĂ­vĂĄ.
 
 </para><para>
 
-Pokud máte velký disk, možná budete chtít využít techniku překladu
-cylindrů, kterou můžete zapnout v BIOSu (jako třeba LBA <quote>Logical
-Block Addressing</quote> nebo CHS <quote>Large</quote> módy).
-Více informací ohledně velkých disků najdete v
+Pokud mĂĄte velkĂ˝ disk, moĹžnĂĄ budete chtĂ­t vyuĹžĂ­t techniku pĹekladu
+cylindrĹŻ, kterou mĹŻĹžete zapnout v BIOSu (jako tĹeba LBA <quote>Logical
+Block Addressing</quote> nebo CHS <quote>Large</quote> mĂłdy).
+VĂ­ce informacĂ­ ohlednÄ velkĂ˝ch diskĹŻ najdete v
 <ulink url="&url-large-disk-howto;">Large Disk HOWTO</ulink>.
-Pokud používáte techniku překladu cylindrů a BIOS nepodporuje
-rozšíření pro přístup k velkým diskům, pak se vaše zaváděcí oblast
-musí vlézt do <emphasis>přeloženého</emphasis> ekvivalentu
+Pokud pouĹžĂ­vĂĄte techniku pĹekladu cylindrĹŻ a BIOS nepodporuje
+rozĹĄĂ­ĹenĂ­ pro pĹĂ­stup k velkĂ˝m diskĹŻm, pak se vaĹĄe zavĂĄdÄcĂ­ oblast
+musĂ­ vlĂŠzt do <emphasis>pĹeloĹženĂŠho</emphasis> ekvivalentu
 1024. cylindru.
 
 </para><para>
 
-Pro splnění těchto požadavků doporučujeme vytvořit malou oblast
-na začátku disku (25-50MB by mělo stačit), která se použije jako
-zaváděcí. Ostatní oblasti je pak možné vytvořit kdekoliv ve zbylém
-místu. Zaváděcí oblast <emphasis>musí</emphasis> být připojena jako
-<filename>/boot</filename>, protože v tomto adresáři se uchovávají
-linuxová jádra.
-Takovéto nastavení bude fungovat na libovolném počítači, bez ohledu
-na to, zda používá nebo nepoužívá LBA, CHS nebo zda podporuje
-rozšíření pro přístup k velkým diskům.
+Pro splnÄnĂ­ tÄchto poĹžadavkĹŻ doporuÄujeme vytvoĹit malou oblast
+na zaÄĂĄtku disku (25-50MB by mÄlo staÄit), kterĂĄ se pouĹžije jako
+zavĂĄdÄcĂ­. OstatnĂ­ oblasti je pak moĹžnĂŠ vytvoĹit kdekoliv ve zbylĂŠm
+mĂ­stu. ZavĂĄdÄcĂ­ oblast <emphasis>musĂ­</emphasis> bĂ˝t pĹipojena jako
+<filename>/boot</filename>, protoĹže v tomto adresĂĄĹi se uchovĂĄvajĂ­
+linuxovĂĄ jĂĄdra.
+TakovĂŠto nastavenĂ­ bude fungovat na libovolnĂŠm poÄĂ­taÄi, bez ohledu
+na to, zda pouĹžĂ­vĂĄ nebo nepouĹžĂ­vĂĄ LBA, CHS nebo zda podporuje
+rozĹĄĂ­ĹenĂ­ pro pĹĂ­stup k velkĂ˝m diskĹŻm.
 
 </para>
   </sect2>

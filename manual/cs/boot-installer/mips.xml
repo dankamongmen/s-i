@@ -1,21 +1,20 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 35613 -->
 
-  <sect2 arch="mips" id="boot-tftp"><title>Zavedení z TFTP</title>
-   <sect3><title>TFTP zavádění na SGI</title>
+  <sect2 arch="mips" id="boot-tftp"><title>ZavedenĂ­ z TFTP</title>
+   <sect3><title>TFTP zavĂĄdÄnĂ­ na SGI</title>
 <para>
 
-Na počítačích SGI vstupte do <quote>command monitoru</quote>, kde
-příkazem
+Na poÄĂ­taÄĂ­ch SGI vstupte do <quote>command monitoru</quote>, kde
+pĹĂ­kazem
 
 <informalexample><screen>
 bootp():
 </screen></informalexample>
 
-zavedete Linux a spustíte instalaci Debianu. Aby to fungovalo, budete
-možná muset v <quote>command monitoru</quote> zrušit proměnnou
-<envar>netaddr</envar> příkazem
+zavedete Linux a spustĂ­te instalaci Debianu. Aby to fungovalo, budete
+moĹžnĂĄ muset v <quote>command monitoru</quote> zruĹĄit promÄnnou
+<envar>netaddr</envar> pĹĂ­kazem
 
 <informalexample><screen>
 unsetenv netaddr
@@ -25,27 +24,27 @@ unsetenv netaddr
    </sect3>
 
    <sect3>
-   <title>TFTP zavádění na Broadcom BCM91250A a BCM91480B</title>
+   <title>TFTP zavĂĄdÄnĂ­ na Broadcom BCM91250A a BCM91480B</title>
 <para>
 
-Na Broadcom BCM91250A a BCM91480B musíte zavést zavaděč SiByl přes TFTP a ten pak
-nahraje a spustí instalaci Debianu. Ve většině případů nejprve
-obdržíte IP adresu přes DHCP, ale nic vám nebrání nastavit si
-statickou adresu ručně. Chcete-li použít DHCP, zadejte v CFE promptu
-následující příkaz:
+Na Broadcom BCM91250A a BCM91480B musĂ­te zavĂŠst zavadÄÄ SiByl pĹes TFTP a ten pak
+nahraje a spustĂ­ instalaci Debianu. Ve vÄtĹĄinÄ pĹĂ­padĹŻ nejprve
+obdrĹžĂ­te IP adresu pĹes DHCP, ale nic vĂĄm nebrĂĄnĂ­ nastavit si
+statickou adresu ruÄnÄ. Chcete-li pouĹžĂ­t DHCP, zadejte v CFE promptu
+nĂĄsledujĂ­cĂ­ pĹĂ­kaz:
 
 <informalexample><screen>
 ifconfig eth0 -auto
 </screen></informalexample>
 
-Poté, co obdržíte IP adresu, můžete zavést zavaděč SiByl příkazem:
+PotĂŠ, co obdrĹžĂ­te IP adresu, mĹŻĹžete zavĂŠst zavadÄÄ SiByl pĹĂ­kazem:
 
 <informalexample><screen>
 boot <replaceable>192.168.1.1</replaceable>:/boot/sibyl
 </screen></informalexample>
 
-IP adresu v příkladu samozřejmě musíte nahradit jménem nebo IP adresou
-vašeho místního TFTP serveru. Instalační program by se měl zavést
+IP adresu v pĹĂ­kladu samozĹejmÄ musĂ­te nahradit jmĂŠnem nebo IP adresou
+vaĹĄeho mĂ­stnĂ­ho TFTP serveru. InstalaÄnĂ­ program by se mÄl zavĂŠst
 automaticky.
 
 </para>
@@ -53,25 +52,25 @@ automaticky.
   </sect2>
 
 
-  <sect2 arch="mips"><title>Zaváděcí parametry</title>
+  <sect2 arch="mips"><title>ZavĂĄdÄcĂ­ parametry</title>
    <sect3>
    <title>SGI</title>
 <para>
 
-Na počítačích SGI můžete přidat zaváděcí parametry příkazu
+Na poÄĂ­taÄĂ­ch SGI mĹŻĹžete pĹidat zavĂĄdÄcĂ­ parametry pĹĂ­kazu
 <command>bootp():</command> v <quote>command monitoru</quote>.
 
 </para><para>
 
-Pokud jste například bootp/dhcp serveru explicitně nezadali název
-souboru, který se má zavést, můžete teď zadat jeho jméno a umístění.
-Například
+Pokud jste napĹĂ­klad bootp/dhcp serveru explicitnÄ nezadali nĂĄzev
+souboru, kterĂ˝ se mĂĄ zavĂŠst, mĹŻĹžete teÄ zadat jeho jmĂŠno a umĂ­stÄnĂ­.
+NapĹĂ­klad
 
 <informalexample><screen>
 bootp():/boot/tftpboot.img
 </screen></informalexample>
 
-Další parametry jádra můžete zadat přes <command>append</command>:
+DalĹĄĂ­ parametry jĂĄdra mĹŻĹžete zadat pĹes <command>append</command>:
 
 <informalexample><screen>
 bootp(): append="root=/dev/sda1"
@@ -84,9 +83,9 @@ bootp(): append="root=/dev/sda1"
    <title>Broadcom BCM91250A a BCM91480B</title>
 <para>
 
-Přímo z CFE promptu nemůžete zadávat žádné příkazy. Místo toho musíte
+PĹĂ­mo z CFE promptu nemĹŻĹžete zadĂĄvat ĹžĂĄdnĂŠ pĹĂ­kazy. MĂ­sto toho musĂ­te
 na FTP serveru upravit soubor <filename>/boot/sibyl.conf</filename>
-a přidat své parametry do proměnné
+a pĹidat svĂŠ parametry do promÄnnĂŠ
 <replaceable>extra_args</replaceable>.
 
 </para>

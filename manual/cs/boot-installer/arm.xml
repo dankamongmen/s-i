@@ -1,56 +1,55 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 35328 -->
+<!-- original version: 36639 -->
 
-  <sect2 arch="arm" id="boot-tftp"><title>Zavedení z TFTP</title>
+  <sect2 arch="arm" id="boot-tftp"><title>ZavedenĂ­ z TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <sect3 arch="arm"><title>Zavedení z TFTP na počítačích Netwinder</title>
+  <sect3 arch="arm"><title>ZavedenĂ­ z TFTP na poÄĂ­taÄĂ­ch Netwinder</title>
 
 <para>
 
-Netwindery mají dvě síťová rozhraní: NE2000-kompatibilní kartu na
+Netwindery majĂ­ dvÄ sĂ­ĹĽovĂĄ rozhranĂ­: NE2000-kompatibilnĂ­ kartu na
 10Mbps (obvykle <filename>eth0</filename>) a 100Mbps kartu Tulip
-(<filename>eth1</filename>). 100Mbps karta může mít problémy
-s nahráváním obrazu přes TFTP, takže raději doporučujeme použít
-pomalejší rozhraní (označené <literal>10 Base-T</literal>).
+(<filename>eth1</filename>). 100Mbps karta mĹŻĹže mĂ­t problĂŠmy
+s nahrĂĄvĂĄnĂ­m obrazu pĹes TFTP, takĹže radÄji doporuÄujeme pouĹžĂ­t
+pomalejĹĄĂ­ rozhranĂ­ (oznaÄenĂŠ <literal>10 Base-T</literal>).
 
 </para><note><para>
 
-K zavedení instalačního systému potřebujete NeTTrom verze
-2.2.1 a pozdější, doporučená verze je 2.3.3. Z licenčních důvodů se
-však soubory s firmwarem nedají stáhnout. Pokud se situace změní,
-naleznete nové obrazy na <ulink url="http//www.netwinder.org/"></ulink>.
+K zavedenĂ­ instalaÄnĂ­ho systĂŠmu potĹebujete NeTTrom verze
+2.2.1 a pozdÄjĹĄĂ­, doporuÄenĂĄ verze je 2.3.3. Z licenÄnĂ­ch dĹŻvodĹŻ se
+vĹĄak soubory s firmwarem nedajĂ­ stĂĄhnout. Pokud se situace zmÄnĂ­,
+naleznete novĂŠ obrazy na <ulink url="http//www.netwinder.org/"></ulink>.
 
 </para></note><para>
 
-Při zavádění Netwinderu musíte během odpočítávání přerušit zaváděcí
-proces, což vám dovolí nastavit různé proměnné firmwaru, které
-potřebujete pro zavedení instalačního systému. Nejprve nahrajte
-výchozí nastavení:
+PĹi zavĂĄdÄnĂ­ Netwinderu musĂ­te bÄhem odpoÄĂ­tĂĄvĂĄnĂ­ pĹeruĹĄit zavĂĄdÄcĂ­
+proces, coĹž vĂĄm dovolĂ­ nastavit rĹŻznĂŠ promÄnnĂŠ firmwaru, kterĂŠ
+potĹebujete pro zavedenĂ­ instalaÄnĂ­ho systĂŠmu. Nejprve nahrajte
+vĂ˝chozĂ­ nastavenĂ­:
 
 <informalexample><screen>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>load-defaults</userinput>
 </screen></informalexample>
 
-Dále musíte nastavit síťovou adresu buď staticky:
+DĂĄle musĂ­te nastavit sĂ­ĹĽovou adresu buÄ staticky:
 
 <informalexample><screen>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>setenv netconfig_eth0 flash</userinput>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>setenv eth0_ip 192.168.0.10/24</userinput>
 </screen></informalexample>
 
-kde 24 je počet nastavených bitů v síťové masce, nebo dynamicky:
+kde 24 je poÄet nastavenĂ˝ch bitĹŻ v sĂ­ĹĽovĂŠ masce, nebo dynamicky:
 
 <informalexample><screen>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>setenv netconfig_eth0 dhcp</userinput>
 </screen></informalexample>
 
-Pokud TFTP server není na lokální podsíti, budete možná muset upravit
-nastavení <userinput>route1</userinput>. Dále byste měli nastavit
-adresu TFTP serveru a umístění obrazu. Poté můžete uložit nastavení do
-flash paměti.
+Pokud TFTP server nenĂ­ na lokĂĄlnĂ­ podsĂ­ti, budete moĹžnĂĄ muset upravit
+nastavenĂ­ <userinput>route1</userinput>. DĂĄle byste mÄli nastavit
+adresu TFTP serveru a umĂ­stÄnĂ­ obrazu. PotĂŠ mĹŻĹžete uloĹžit nastavenĂ­ do
+flash pamÄti.
 
 <informalexample><screen>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>setenv kerntftpserver 192.168.0.1</userinput>
@@ -58,165 +57,165 @@ flash paměti.
 <prompt>NeTTrom command-&gt;</prompt> <userinput>save-all</userinput>
 </screen></informalexample>
 
-Nyní můžete firmwaru sdělit, že má z TFTP obrazu zavést systém:
+NynĂ­ mĹŻĹžete firmwaru sdÄlit, Ĺže mĂĄ z TFTP obrazu zavĂŠst systĂŠm:
 
 <informalexample><screen>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>setenv kernconfig tftp</userinput>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>setenv rootdev /dev/ram</userinput>
 </screen></informalexample>
 
-Používáte-li pro instalaci Netwinderu sériovou konzoli, budete také
-potřebovat následující nastavení:
+PouĹžĂ­vĂĄte-li pro instalaci Netwinderu sĂŠriovou konzoli, budete takĂŠ
+potĹebovat nĂĄsledujĂ­cĂ­ nastavenĂ­:
 
 <informalexample><screen>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>setenv cmdappend root=/dev/ram console=ttyS0,115200</userinput>
 </screen></informalexample>
 
-Naopak pro instalace používající klávesnici a monitor musíte nastavit:
+Naopak pro instalace pouĹžĂ­vajĂ­cĂ­ klĂĄvesnici a monitor musĂ­te nastavit:
 
 <informalexample><screen>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>setenv cmdappend root=/dev/ram</userinput>
 </screen></informalexample>
 
-Nastavení proměnných můžete zkontrolovat příkazem
-<command>printenv</command>. Je-li vše v pořádku, můžete obraz zavést
-příkazem
+NastavenĂ­ promÄnnĂ˝ch mĹŻĹžete zkontrolovat pĹĂ­kazem
+<command>printenv</command>. Je-li vĹĄe v poĹĂĄdku, mĹŻĹžete obraz zavĂŠst
+pĹĂ­kazem
 
 <informalexample><screen>
 <prompt>NeTTrom command-&gt;</prompt> <userinput>boot</userinput>
 </screen></informalexample>
 
-V případě jakýchkoliv problémů je k dispozici <ulink
-url="http://www.netwinder.org/howto/Firmware-HOWTO.html">podrobné
+V pĹĂ­padÄ jakĂ˝chkoliv problĂŠmĹŻ je k dispozici <ulink
+url="http://www.netwinder.org/howto/Firmware-HOWTO.html">podrobnĂŠ
 HOWTO</ulink>.
 
 </para>
   </sect3>
 
-  <sect3 arch="arm"><title>Zavedení z TFTP na počítačích CATS</title>
+  <sect3 arch="arm"><title>ZavedenĂ­ z TFTP na poÄĂ­taÄĂ­ch CATS</title>
 
 <para>
 
-Na strojích CATS použijte v Cyclone promptu příkaz
-<command>boot de0:</command> (nebo podobný).
+Na strojĂ­ch CATS pouĹžijte v Cyclone promptu pĹĂ­kaz
+<command>boot de0:</command> (nebo podobnĂ˝).
 
 </para>
    </sect3>
   </sect2>
 
-  <sect2 arch="arm"><title>Zavedení z CD-ROM</title>
+  <sect2 arch="arm"><title>ZavedenĂ­ z CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
 
 <para>
 
-Pro zavedení z CD-ROM zadejte v promptu Cyclone konzoly příkaz
+Pro zavedenĂ­ z CD-ROM zadejte v promptu Cyclone konzoly pĹĂ­kaz
 <command>boot cd0:cats.bin</command>
 
 </para>
   </sect2>
 
   <sect2 arch="arm" id="boot-firmware">
-  <title>Zavedení z firmwaru</title>
+  <title>ZavedenĂ­ z firmwaru</title>
 
 &boot-installer-intro-firmware.xml;
 
    <sect3 arch="arm" id="boot-firmware-nslu2">
-   <title>Zavedení NSLU2</title>
+   <title>ZavedenĂ­ NSLU2</title>
 <para>
 
-Firmware instalačního systému lze do flash paměti nahrát třemi
-způsoby.
+Firmware instalaÄnĂ­ho systĂŠmu lze do flash pamÄti nahrĂĄt tĹemi
+zpĹŻsoby.
 
 </para>
 
     <sect4 arch="arm">
-    <title>Pomocí webového rozhraní NSLU2</title>
+    <title>PomocĂ­ webovĂŠho rozhranĂ­ NSLU2</title>
 <para>
 
-Přejděte do administrátorské sekce a vyberte položku
-<literal>Upgrade</literal>. Na disku vyhledejte obraz instalátoru,
-který jste si tam již dříve stáhli. Poté stiskněte tlačítko
-<literal>Start Upgrade</literal>, potvrďte, počkejte několik minut
-a znovu potvrďte. Systém se pak zavede rovnou do instalačního
-systému.
+PĹejdÄte do administrĂĄtorskĂŠ sekce a vyberte poloĹžku
+<literal>Upgrade</literal>. Na disku vyhledejte obraz instalĂĄtoru,
+kterĂ˝ jste si tam jiĹž dĹĂ­ve stĂĄhli. PotĂŠ stisknÄte tlaÄĂ­tko
+<literal>Start Upgrade</literal>, potvrÄte, poÄkejte nÄkolik minut
+a znovu potvrÄte. SystĂŠm se pak zavede rovnou do instalaÄnĂ­ho
+systĂŠmu.
 
 </para>
     </sect4>
 
     <sect4 arch="arm">
-    <title>Přes síť pomocí Linuxu/Unixu</title>
+    <title>PĹes sĂ­ĹĽ pomocĂ­ Linuxu/Unixu</title>
 <para>
 
-Na libovolném počítači s Linuxem nebo Unixem můžete použít pro nahrání
-instalačního systému do počítače program <command>upslug2</command>.
-Tento software je dokonce zabalen přímo v Debianu.
+Na libovolnĂŠm poÄĂ­taÄi s Linuxem nebo Unixem mĹŻĹžete pouĹžĂ­t pro nahrĂĄnĂ­
+instalaÄnĂ­ho systĂŠmu do poÄĂ­taÄe program <command>upslug2</command>.
+Tento software je dokonce zabalen pĹĂ­mo v Debianu.
 
 </para><para>
 
-Nejprve musíte přepnout NSLU2 do aktualizačního režimu:
+Nejprve musĂ­te pĹepnout NSLU2 do aktualizaÄnĂ­ho reĹžimu:
 
 <orderedlist>
 <listitem><para>
 
-Od USB portů odpojte všechny disky a jiná zařízení.
+Od USB portĹŻ odpojte vĹĄechny disky a jinĂĄ zaĹĂ­zenĂ­.
 
 </para></listitem>
 <listitem><para>
 
-Vypněte NSLU2.
+VypnÄte NSLU2.
 
 </para></listitem>
 <listitem><para>
 
-Stiskněte a držte tlačítko reset (přístupné skrze malou dírku na zadní
-straně nad napájením).
+StisknÄte a drĹžte tlaÄĂ­tko reset (pĹĂ­stupnĂŠ skrze malou dĂ­rku na zadnĂ­
+stranÄ nad napĂĄjenĂ­m).
 
 </para></listitem>
 <listitem><para>
 
-Zapněte NSLU2.
+ZapnÄte NSLU2.
 
 </para></listitem>
 <listitem><para>
 
-Sledujte diodu ready/status a počkejte 10 sekund. Po 10 sekundách se
-změní barva ze žluté na červenou. V ten okamžik uvolněte tlačítko
+Sledujte diodu ready/status a poÄkejte 10 sekund. Po 10 sekundĂĄch se
+zmÄnĂ­ barva ze ĹžlutĂŠ na Äervenou. V ten okamĹžik uvolnÄte tlaÄĂ­tko
 reset.
 
 </para></listitem>
 <listitem><para>
 
-Dioda ready/status bude blikat střídavě červenou/zelenou barvou (před
-první zelenou je sekundová pauza). NSLU2 je nyní v režimu aktualizace.
+Dioda ready/status bude blikat stĹĂ­davÄ Äervenou/zelenou barvou (pĹed
+prvnĂ­ zelenou je sekundovĂĄ pauza). NSLU2 je nynĂ­ v reĹžimu aktualizace.
 
 </para></listitem>
 </orderedlist>
 
-Pokud máte s touto částí problémy, podívejte se na stránky <ulink
+Pokud mĂĄte s touto ÄĂĄstĂ­ problĂŠmy, podĂ­vejte se na strĂĄnky <ulink
 url="http://www.nslu2-linux.org/wiki/OpenSlug/UsingTheBinary">NSLU2-Linux</ulink>.
 
-Až bude NSLU2 v aktualizačním režimu můžete do něj nahrát nový obraz:
+AĹž bude NSLU2 v aktualizaÄnĂ­m reĹžimu mĹŻĹžete do nÄj nahrĂĄt novĂ˝ obraz:
 
 <informalexample><screen>
 <userinput>sudo upslug2 -i di-nslu2.bin</userinput>
 </screen></informalexample>
 
-Všimněte si, že nástroj také zobrazí MAC adresu vašeho NSLU2, což se
-může hodit pro nastavení DHCP serveru. Po zapsání a ověření celého
-obrazu se systém automaticky restartuje. Nyní musíte znovu připojit
-USB disk, protože jinak by jej instalační systém nenašel.
+VĹĄimnÄte si, Ĺže nĂĄstroj takĂŠ zobrazĂ­ MAC adresu vaĹĄeho NSLU2, coĹž se
+mĹŻĹže hodit pro nastavenĂ­ DHCP serveru. Po zapsĂĄnĂ­ a ovÄĹenĂ­ celĂŠho
+obrazu se systĂŠm automaticky restartuje. NynĂ­ musĂ­te znovu pĹipojit
+USB disk, protoĹže jinak by jej instalaÄnĂ­ systĂŠm nenaĹĄel.
 
 </para>
     </sect4>
 
     <sect4 arch="arm">
-    <title>Přes síť pomocí Windows</title>
+    <title>PĹes sĂ­ĹĽ pomocĂ­ Windows</title>
 <para>
 
 Pro Windows existuje <ulink
-url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zip">nástroj</ulink>,
-kterým se dá nahrát firmware přes síť.
+url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zip">nĂĄstroj</ulink>,
+kterĂ˝m se dĂĄ nahrĂĄt firmware pĹes sĂ­ĹĽ.
 
 </para>
     </sect4>

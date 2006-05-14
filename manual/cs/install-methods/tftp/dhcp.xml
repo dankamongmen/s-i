@@ -1,15 +1,14 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 29400 -->
 
   <sect2 condition="supports-dhcp" id="dhcpd">
-   <title>Nastavení DHCP serveru</title>
+   <title>NastavenĂ­ DHCP serveru</title>
 <para>
 
-Jedním ze svobodných DHCP serverů je ISC
-<command>dhcpd</command>. &debian; jej obsahuje jako balík
-<classname>dhcp</classname>. Následuje ukázka jednoduchého
-konfiguračního souboru (obvykle <filename>/etc/dhcpd.conf</filename>):
+JednĂ­m ze svobodnĂ˝ch DHCP serverĹŻ je ISC
+<command>dhcpd</command>. &debian; jej obsahuje jako balĂ­k
+<classname>dhcp</classname>. NĂĄsleduje ukĂĄzka jednoduchĂŠho
+konfiguraÄnĂ­ho souboru (obvykle <filename>/etc/dhcpd.conf</filename>):
 
 <informalexample><screen>
 option domain-name "priklad.cz";
@@ -33,31 +32,31 @@ host clientname {
 }
 </screen></informalexample>
 
-Poznámka: novější (a preferovaný) balík <classname>dhcp3</classname>
-používá konfigurační soubor
+PoznĂĄmka: novÄjĹĄĂ­ (a preferovanĂ˝) balĂ­k <classname>dhcp3</classname>
+pouĹžĂ­vĂĄ konfiguraÄnĂ­ soubor
 <filename>/etc/dhcp3/dhcpd.conf</filename>.
 
 </para><para>
 
-V tomto příkladu máme jeden server jménem
-<replaceable>karel</replaceable>, který obstarává práci DHCP a
-TFTP serveru a také slouží jako brána do sítě. Ve svém nastavení si
-musíte změnit alespoň doménové jméno, jméno serveru a hardwarovou
-adresu klienta. Položka <replaceable>filename</replaceable> by měla
-obsahovat název souboru, který si klient stáhne přes TFTP.
+V tomto pĹĂ­kladu mĂĄme jeden server jmĂŠnem
+<replaceable>karel</replaceable>, kterĂ˝ obstarĂĄvĂĄ prĂĄci DHCP a
+TFTP serveru a takĂŠ slouĹžĂ­ jako brĂĄna do sĂ­tÄ. Ve svĂŠm nastavenĂ­ si
+musĂ­te zmÄnit alespoĹ domĂŠnovĂŠ jmĂŠno, jmĂŠno serveru a hardwarovou
+adresu klienta. PoloĹžka <replaceable>filename</replaceable> by mÄla
+obsahovat nĂĄzev souboru, kterĂ˝ si klient stĂĄhne pĹes TFTP.
 
 </para><para>
 
-Po úpravách konfiguračního souboru musíte restartovat
-<command>dhcpd</command> příkazem <userinput>/etc/init.d/dhcpd
+Po ĂşpravĂĄch konfiguraÄnĂ­ho souboru musĂ­te restartovat
+<command>dhcpd</command> pĹĂ­kazem <userinput>/etc/init.d/dhcpd
 restart</userinput>.
 
 </para>
 
    <sect3 arch="i386">
-   <title>Povolení PXE zavádění</title>
+   <title>PovolenĂ­ PXE zavĂĄdÄnĂ­</title>
 <para>
-Další příklad souboru <filename>dhcp.conf</filename> tentokrát využívá
+DalĹĄĂ­ pĹĂ­klad souboru <filename>dhcp.conf</filename> tentokrĂĄt vyuĹžĂ­vĂĄ
 metodu PXE (Pre-boot Execution Environment) protokolu TFTP.
 
 <informalexample><screen>
@@ -69,29 +68,29 @@ max-lease-time 7200;
 allow booting;
 allow bootp;
 
-# Následující odstavec si musíte upravit dle skutečnosti
+# NĂĄsledujĂ­cĂ­ odstavec si musĂ­te upravit dle skuteÄnosti
 subnet 192.168.1.0 netmask 255.255.255.0 {
   range 192.168.1.200 192.168.1.253;
   option broadcast-address 192.168.1.255;
-# adresa brány
-# (například pro přístup k internetu)
+# adresa brĂĄny
+# (napĹĂ­klad pro pĹĂ­stup k internetu)
   option routers 192.168.1.1;
-# dns server, který chcete použít
+# dns server, kterĂ˝ chcete pouĹžĂ­t
   option domain-name-servers 192.168.1.3;
 }
 
 group {
  next-server 192.168.1.3;
  host tftpclient {
-# hardwarová adresa tftp klienta
+# hardwarovĂĄ adresa tftp klienta
   hardware ethernet  00:10:DC:27:6C:15;
   filename "/tftpboot/pxelinux.0";
  }
 }
 </screen></informalexample>
 
-Při PXE zavádění není soubor <filename>pxelinux.0</filename> obraz
-jádra, ale zavaděč (viz <xref linkend="tftp-images"/> dále v textu).
+PĹi PXE zavĂĄdÄnĂ­ nenĂ­ soubor <filename>pxelinux.0</filename> obraz
+jĂĄdra, ale zavadÄÄ (viz <xref linkend="tftp-images"/> dĂĄle v textu).
 
 </para>
    </sect3>

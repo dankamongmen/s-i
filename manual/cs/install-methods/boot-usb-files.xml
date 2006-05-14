@@ -1,36 +1,35 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 32124 -->
+<!-- original version: 37295 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
- <title>Příprava souborů pro zavedení z USB zařízení</title>
+ <title>PĹĂ­prava souborĹŻ pro zavedenĂ­ z USB zaĹĂ­zenĂ­</title>
 
 <para>
 
-Pro přípravu USB zařízení budete potřebovat počítač s nainstalovaným
-GNU/Linuxem a podporou USB. Pokud používáte jaderný modul usb-storage,
-ujistěte se, že je nahraný (<userinput>modprobe
-usb-storage</userinput>) a zkuste zjistit, na které zařízení je
-navázána vaše USB klíčenka (v tomto příkladu používáme
-<filename>/dev/sda</filename>). Pokud klíčenka obsahuje ochranu proti
-zápisu, vypněte ji.
+Pro pĹĂ­pravu USB zaĹĂ­zenĂ­ budete potĹebovat poÄĂ­taÄ s nainstalovanĂ˝m
+GNU/Linuxem a podporou USB. Pokud pouĹžĂ­vĂĄte jadernĂ˝ modul usb-storage,
+ujistÄte se, Ĺže je nahranĂ˝ (<userinput>modprobe
+usb-storage</userinput>) a zkuste zjistit, na kterĂŠ zaĹĂ­zenĂ­ je
+navĂĄzĂĄna vaĹĄe USB klĂ­Äenka (v tomto pĹĂ­kladu pouĹžĂ­vĂĄme
+<filename>/dev/sda</filename>). Pokud klĂ­Äenka obsahuje ochranu proti
+zĂĄpisu, vypnÄte ji.
 
 </para><para>
 
-USB klíčenka by měla mít velikost alespoň 128 MB. Menší velikosti jsou
-podporovány pouze při ruční výrobě podle <xref
+USB klĂ­Äenka by mÄla mĂ­t velikost alespoĹ 256 MB. MenĹĄĂ­ velikosti jsou
+podporovĂĄny pouze pĹi ruÄnĂ­ vĂ˝robÄ podle <xref
 linkend="usb-copy-flexible"/>.
 
 </para>
 
   <sect2 id="usb-copy-easy">
-  <title>Kopírování souborů &mdash; jednoduchá cesta</title>
+  <title>KopĂ­rovĂĄnĂ­ souborĹŻ &mdash; jednoduchĂĄ cesta</title>
 <para arch="i386">
 
-K dispozici máte soubor <filename>hd-media/boot.img.gz</filename>,
-který obsahuje všechny instalační soubory (včetně jádra), zavaděč
-<command>SYSLINUX</command> a jeho konfigurační soubor. Jediné co
-musíte udělat, je rozbalit ho na USB zařízení:
+K dispozici mĂĄte soubor <filename>hd-media/boot.img.gz</filename>,
+kterĂ˝ obsahuje vĹĄechny instalaÄnĂ­ soubory (vÄetnÄ jĂĄdra), zavadÄÄ
+<command>SYSLINUX</command> a jeho konfiguraÄnĂ­ soubor. JedinĂŠ co
+musĂ­te udÄlat, je rozbalit ho na USB zaĹĂ­zenĂ­:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>gzip -dc boot.img.gz &gt;/dev/<replaceable>sda</replaceable></userinput>
@@ -38,12 +37,12 @@ musíte udělat, je rozbalit ho na USB zařízení:
 
 </para><para arch="powerpc">
 
-K dispozici máte soubor <filename>hd-media/boot.img.gz</filename>,
-který obsahuje všechny instalační soubory (včetně jádra), zavaděč
-<command>yaboot</command> a jeho konfigurační soubor. Na USB zařízení
-vytvořte <command>mac-fdisk</command>em oblast typu
-<quote>Apple_Bootstrap</quote> (příkaz <userinput>C</userinput>)
-a rozbalte do ní stažený obraz:
+K dispozici mĂĄte soubor <filename>hd-media/boot.img.gz</filename>,
+kterĂ˝ obsahuje vĹĄechny instalaÄnĂ­ soubory (vÄetnÄ jĂĄdra), zavadÄÄ
+<command>yaboot</command> a jeho konfiguraÄnĂ­ soubor. Na USB zaĹĂ­zenĂ­
+vytvoĹte <command>mac-fdisk</command>em oblast typu
+<quote>Apple_Bootstrap</quote> (pĹĂ­kaz <userinput>C</userinput>)
+a rozbalte do nĂ­ staĹženĂ˝ obraz:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>gzip -dc boot.img.gz &gt;/dev/<replaceable>sda2</replaceable></userinput>
@@ -51,71 +50,75 @@ a rozbalte do ní stažený obraz:
 
 </para><warning><para>
 
-Tímto zničíte veškerá data na zařízení, takže se raději dvakrát
-přesvědčte, že pro svou klíčenku používáte správné jméno zařízení.
+TĂ­mto zniÄĂ­te veĹĄkerĂĄ data na zaĹĂ­zenĂ­, takĹže se radÄji dvakrĂĄt
+pĹesvÄdÄte, Ĺže pro svou klĂ­Äenku pouĹžĂ­vĂĄte sprĂĄvnĂŠ jmĂŠno zaĹĂ­zenĂ­.
 
 </para></warning><para>
 
-Na klíčence nyní bude jedna velká oblast typu <phrase
+Na klĂ­Äence nynĂ­ bude jedna velkĂĄ oblast typu <phrase
 arch="i386">FAT16.</phrase> <phrase arch="powerpc">HFS.</phrase>
-Připojte ji (<userinput>mount <replaceable
+PĹipojte ji (<userinput>mount <replaceable
 arch="i386">/dev/sda</replaceable> <replaceable
-arch="powerpc">/dev/sda2</replaceable> /mnt</userinput>) a nakopírujte
-na ni ISO obraz malého instalačního CD (netinst). Na názvu obrazu
-nezáleží, ale musí končit příponou <filename>.iso</filename>. Nyní
-stačí klíčenku odpojit (<userinput>umount /mnt</userinput>) a je
+arch="powerpc">/dev/sda2</replaceable> /mnt</userinput>) a nakopĂ­rujte
+na ni ISO obraz malĂŠho instalaÄnĂ­ho CD (netinst). Na nĂĄzvu obrazu
+nezĂĄleĹžĂ­, ale musĂ­ konÄit pĹĂ­ponou <filename>.iso</filename>. NynĂ­
+staÄĂ­ klĂ­Äenku odpojit (<userinput>umount /mnt</userinput>) a je
 hotovo.
 
 </para>
   </sect2>
 
   <sect2 id="usb-copy-flexible">
-  <title>Kopírování souborů &mdash; pružná cesta</title>
+  <title>KopĂ­rovĂĄnĂ­ souborĹŻ &mdash; pruĹžnĂĄ cesta</title>
 <para>
 
-Pokud máte rádi více pružnosti, nebo jen chcete zjistit <quote>co se
-děje za oponou</quote>, můžete použít nástedující metodu<phrase
-arch="not-i386">.</phrase><phrase arch="i386">, ve které mj. ukážeme,
-jak místo celého USB zařízení použít pouze první oblast.</phrase>
+Pokud mĂĄte rĂĄdi vĂ­ce pruĹžnosti, nebo jen chcete zjistit <quote>co se
+dÄje za oponou</quote>, mĹŻĹžete pouĹžĂ­t nĂĄstedujĂ­cĂ­ metodu<phrase
+arch="not-i386">.</phrase><phrase arch="i386">, ve kterĂŠ mj. ukĂĄĹžeme,
+jak mĂ­sto celĂŠho USB zaĹĂ­zenĂ­ pouĹžĂ­t pouze prvnĂ­ oblast.</phrase>
 
 </para>
 
 &usb-setup-i386.xml;
 &usb-setup-powerpc.xml;
 
-   <sect3>
-   <title>Přidání ISO obrazu</title>
+  </sect2>
+
+  <sect2>
+  <title>PĹidĂĄnĂ­ ISO obrazu</title>
 <para>
 
-Nyní je čas nakopírovat na klíčenku ISO obraz instalačního CD
-(businesscard, netinst nebo, pokud se vejde, dokonce celé první
-CD). Na názvu obrazu nezáleží, ale musí končit příponou
-<filename>.iso</filename>.
+InstalaÄnĂ­ systĂŠm bude na USB zaĹĂ­zenĂ­ hledat ISO obraz instalaÄnĂ­ho
+CD, ze kterĂŠho si zkopĂ­ruje dalĹĄĂ­ data potĹebnĂĄ pro instalaci. DalĹĄĂ­m
+krokem je tedy nakopĂ­rovĂĄnĂ­ ISO obrazu instalaÄnĂ­ho CD na
+klĂ­Äenku. PokuĹžĂ­t mĹŻĹžete obrazy typu businesscard, netinst nebo, pokud
+se vejde, dokonce celĂŠ prvnĂ­ CD. Na nĂĄzvu obrazu nezĂĄleĹžĂ­, ale musĂ­
+konÄit pĹĂ­ponou <filename>.iso</filename>.
 
 </para><para>
 
-Pokud nechcete použít ISO obraz a místo toho budete chtít instalovat
-ze sítě, předchozí krok samozřejmě přeskočte. Kromě toho budete muset
-použít ramdisk (<filename>initrd.gz</filename>) z adresáře
-<filename>netboot</filename>, protože ramdisk v adresáři
-<filename>hd-media</filename> nebsahuje podporu pro instalaci ze sítě.
+Pokud nechcete pouĹžĂ­t ISO obraz a mĂ­sto toho budete chtĂ­t instalovat
+ze sĂ­tÄ, pĹedchozĂ­ krok samozĹejmÄ pĹeskoÄte. KromÄ toho budete muset
+pouĹžĂ­t ramdisk (<filename>initrd.gz</filename>) z adresĂĄĹe
+<filename>netboot</filename>, protoĹže ramdisk v adresĂĄĹi
+<filename>hd-media</filename> nebsahuje podporu pro instalaci ze sĂ­tÄ.
 
 </para><para>
 
-Jestliže jste hotovi, odpojte klíčenku (<userinput>umount
-/mnt</userinput>) a zapněte ochranu proti zápisu.
+JestliĹže jste hotovi, odpojte klĂ­Äenku (<userinput>umount
+/mnt</userinput>) a zapnÄte ochranu proti zĂĄpisu.
 
 </para>
-   </sect3>
+  </sect2>
 
-   <!-- TODO: doesn't this section belong later? -->
-   <sect3 arch="i386">
-   <title>Problémy se zaváděním z USB klíčenky</title>
+  <!-- TODO: doesn't this section belong later? -->
+  <sect2 arch="i386">
+  <title>ProblĂŠmy se zavĂĄdÄnĂ­m z USB klĂ­Äenky</title>
 <warning><para>
 
-Pokud váš systém odmítá zavádění z klíčenky, může to být tím, že je na
-klíčence neplatný hlavní zaváděcí záznam (MBR). Opravit jej můžete
-programem <command>install-mbr</command> z balíku
+Pokud vĂĄĹĄ systĂŠm odmĂ­tĂĄ zavĂĄdÄnĂ­ z klĂ­Äenky, mĹŻĹže to bĂ˝t tĂ­m, Ĺže je na
+klĂ­Äence neplatnĂ˝ hlavnĂ­ zavĂĄdÄcĂ­ zĂĄznam (MBR). Opravit jej mĹŻĹžete
+programem <command>install-mbr</command> z balĂ­ku
 <classname>mbr</classname>:
 
 <informalexample><screen>
@@ -123,6 +126,5 @@ programem <command>install-mbr</command> z balíku
 </screen></informalexample>
 
 </para></warning>
-   </sect3>
   </sect2>
  </sect1>

@@ -1,56 +1,55 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 28997 -->
 
-  <sect2 arch="alpha"><title>Dělení disku na &arch-title;</title>
+  <sect2 arch="alpha"><title>DÄlenĂ­ disku na &arch-title;</title>
 <para>
 
-Zavádění Debianu ze SRM konzoly vyžaduje, abyste na svém zaváděcím
-disku neměli dosovou tabulku rozdělení disku, ale tzv. <quote>BSD
-disklabel</quote>. (Zaváděcí blok SRM je nekompatibilní s tabulkou
-oblastí systému MS-DOS &mdash; viz <xref linkend="alpha-firmware"/>).
-Program na dělení disku <command>partman</command> vytváří na
-architektuře &architecture; BSD disklabel automaticky, ale pokud již
-máte na disku existující dosovou tabulku oblastí, budete ji muset
+ZavĂĄdÄnĂ­ Debianu ze SRM konzoly vyĹžaduje, abyste na svĂŠm zavĂĄdÄcĂ­m
+disku nemÄli dosovou tabulku rozdÄlenĂ­ disku, ale tzv. <quote>BSD
+disklabel</quote>. (ZavĂĄdÄcĂ­ blok SRM je nekompatibilnĂ­ s tabulkou
+oblastĂ­ systĂŠmu MS-DOS &mdash; viz <xref linkend="alpha-firmware"/>).
+Program na dÄlenĂ­ disku <command>partman</command> vytvĂĄĹĂ­ na
+architektuĹe &architecture; BSD disklabel automaticky, ale pokud jiĹž
+mĂĄte na disku existujĂ­cĂ­ dosovou tabulku oblastĂ­, budete ji muset
 nejprve smazat.
 
 </para><para>
 
-Pokud pro dělení disku použijete program <command>fdisk</command>
-a vybraný disk ještě neobsahuje BSD disklabel, musíte se přepnout do
-režimu disklabel příkazem <userinput>b</userinput>.
+Pokud pro dÄlenĂ­ disku pouĹžijete program <command>fdisk</command>
+a vybranĂ˝ disk jeĹĄtÄ neobsahuje BSD disklabel, musĂ­te se pĹepnout do
+reĹžimu disklabel pĹĂ­kazem <userinput>b</userinput>.
 
 </para><para>
 
-Pokud nepotřebujete rozdělovaný disk používat z Tru64 Unixu nebo
-některého z volných klonů systému  4.4BSD-Lite (FreeBSD, OpenBSD nebo
-NetBSD), je lepší když <emphasis>nenastavíte</emphasis> třetí oblast
-aby obsahovala celý disk. Program <command>aboot</command> to
-nevyžaduje a ve skutečnosti to může vést k nepříjemnostem, protože
-utilita <command>swriteboot</command>, zvyklá instalovat
-<command>aboot</command> do zaváděcího sektoru, si bude stěžovat na
-oblast překrývající se se zaváděcím blokem.
+Pokud nepotĹebujete rozdÄlovanĂ˝ disk pouĹžĂ­vat z Tru64 Unixu nebo
+nÄkterĂŠho z volnĂ˝ch klonĹŻ systĂŠmu  4.4BSD-Lite (FreeBSD, OpenBSD nebo
+NetBSD), je lepĹĄĂ­ kdyĹž <emphasis>nenastavĂ­te</emphasis> tĹetĂ­ oblast
+aby obsahovala celĂ˝ disk. Program <command>aboot</command> to
+nevyĹžaduje a ve skuteÄnosti to mĹŻĹže vĂŠst k nepĹĂ­jemnostem, protoĹže
+utilita <command>swriteboot</command>, zvyklĂĄ instalovat
+<command>aboot</command> do zavĂĄdÄcĂ­ho sektoru, si bude stÄĹžovat na
+oblast pĹekrĂ˝vajĂ­cĂ­ se se zavĂĄdÄcĂ­m blokem.
 
 </para><para>
 
-Na začátku disku <emphasis>musíte</emphasis> nechat dostatek volného
-místa pro <command>aboot</command>, protože se zapisuje do několika
-prvních sektorů na disku (v současnosti zabírá asi 70 kilobajtů nebo
-150 sektorů). Dříve se doporučovalo pro tyto účely vytvořit na začátku
-disku malou nenaformátovanou oblast, ale nyní si myslíme, že na
-discích používaných jenom GNU/Linuxem to není nutné. (S ohledem na
-důvody zmíněné výše.) Použijete-li <command>partman</command>, oblast
-pro <command>aboot</command> se pro jistotu vytvoří automaticky.
+Na zaÄĂĄtku disku <emphasis>musĂ­te</emphasis> nechat dostatek volnĂŠho
+mĂ­sta pro <command>aboot</command>, protoĹže se zapisuje do nÄkolika
+prvnĂ­ch sektorĹŻ na disku (v souÄasnosti zabĂ­rĂĄ asi 70 kilobajtĹŻ nebo
+150 sektorĹŻ). DĹĂ­ve se doporuÄovalo pro tyto ĂşÄely vytvoĹit na zaÄĂĄtku
+disku malou nenaformĂĄtovanou oblast, ale nynĂ­ si myslĂ­me, Ĺže na
+discĂ­ch pouĹžĂ­vanĂ˝ch jenom GNU/Linuxem to nenĂ­ nutnĂŠ. (S ohledem na
+dĹŻvody zmĂ­nÄnĂŠ vĂ˝ĹĄe.) PouĹžijete-li <command>partman</command>, oblast
+pro <command>aboot</command> se pro jistotu vytvoĹĂ­ automaticky.
 
 </para><para condition="FIXME">
 
-Pro instalaci z ARC konzoly byste měli udělat na začátku disku malou
-FAT oblast, která bude obsahovat <command>MILO</command> a
+Pro instalaci z ARC konzoly byste mÄli udÄlat na zaÄĂĄtku disku malou
+FAT oblast, kterĂĄ bude obsahovat <command>MILO</command> a
 <command>linload.exe</command>.
-Podle <xref linkend="non-debian-partitioning"/> by mělo stačit
-5 megabajtů. Vytvoření této oblasti z menu zatím není podporováno,
-takže ji budete muset vytvořit ručně programem
-<command>mkdosfs</command>. (Samozřejmě ještě před instalací zavaděče.)
+Podle <xref linkend="non-debian-partitioning"/> by mÄlo staÄit
+5 megabajtĹŻ. VytvoĹenĂ­ tĂŠto oblasti z menu zatĂ­m nenĂ­ podporovĂĄno,
+takĹže ji budete muset vytvoĹit ruÄnÄ programem
+<command>mkdosfs</command>. (SamozĹejmÄ jeĹĄtÄ pĹed instalacĂ­ zavadÄÄe.)
 
 </para>
   </sect2>

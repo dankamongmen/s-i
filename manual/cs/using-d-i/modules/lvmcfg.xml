@@ -1,119 +1,118 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
 <!-- original version: 33725 -->
 
    <sect3 id="lvmcfg">
-   <title>Nastavení manažera logických svazků (LVM)</title>
+   <title>NastavenĂ­ manaĹžera logickĂ˝ch svazkĹŻ (LVM)</title>
 <para>
 
-Pracujete-li s počítači na pozici správce systému nebo pokročilého
-uživatele, jistě jste zažili situaci, kdy na jedné (zpravidla velmi
-důležité) oblasti docházelo volné místo, zatímco jiná oblast jej měla
-nadbytek. Zpravidla pak nastoupilo mazání, přesouvání a propojování
-adresářů přes symbolické odkazy.
+Pracujete-li s poÄĂ­taÄi na pozici sprĂĄvce systĂŠmu nebo pokroÄilĂŠho
+uĹživatele, jistÄ jste zaĹžili situaci, kdy na jednĂŠ (zpravidla velmi
+dĹŻleĹžitĂŠ) oblasti dochĂĄzelo volnĂŠ mĂ­sto, zatĂ­mco jinĂĄ oblast jej mÄla
+nadbytek. Zpravidla pak nastoupilo mazĂĄnĂ­, pĹesouvĂĄnĂ­ a propojovĂĄnĂ­
+adresĂĄĹĹŻ pĹes symbolickĂŠ odkazy.
 
 </para><para>
 
-Abyste do budoucna předešli popsané situaci, můžete použít manažer
-logických svazků (Logical Volume Manager). Co takový manažer dělá?
-Jednoduše řečeno, spojí diskové oblasti (v žargonu LVM se nazývají
-<firstterm>fyzické svazky</firstterm>) do virtuálního disku
-(tzv. <firstterm>skupina svazků</firstterm>), který pak můžete
-rozdělit na virtuální oblasti (<firstterm>logické
-svazky</firstterm>). Jak se tyto virtuální oblasti liší od těch
-fyzických, na kterých jsou vybudovány? Pointa je v tom, že logické
-svazky (a samozřejmě pod nimi ležící skupiny svazků) se mohou
-rozprostírat přes několik fyzických disků.
+Abyste do budoucna pĹedeĹĄli popsanĂŠ situaci, mĹŻĹžete pouĹžĂ­t manaĹžer
+logickĂ˝ch svazkĹŻ (Logical Volume Manager). Co takovĂ˝ manaĹžer dÄlĂĄ?
+JednoduĹĄe ĹeÄeno, spojĂ­ diskovĂŠ oblasti (v Ĺžargonu LVM se nazĂ˝vajĂ­
+<firstterm>fyzickĂŠ svazky</firstterm>) do virtuĂĄlnĂ­ho disku
+(tzv. <firstterm>skupina svazkĹŻ</firstterm>), kterĂ˝ pak mĹŻĹžete
+rozdÄlit na virtuĂĄlnĂ­ oblasti (<firstterm>logickĂŠ
+svazky</firstterm>). Jak se tyto virtuĂĄlnĂ­ oblasti liĹĄĂ­ od tÄch
+fyzickĂ˝ch, na kterĂ˝ch jsou vybudovĂĄny? Pointa je v tom, Ĺže logickĂŠ
+svazky (a samozĹejmÄ pod nimi leĹžĂ­cĂ­ skupiny svazkĹŻ) se mohou
+rozprostĂ­rat pĹes nÄkolik fyzickĂ˝ch diskĹŻ.
 
 </para><para>
 
-Například nyní, když si všimnete, že potřebujete více místa na starší
-160 gigabajtové oblasti s domovskými adresáři, můžete jednoduše
-dokoupit nový 300GB disk, připojit jej ke stávající skupině svazků
-a rozšířit logický svazek, který slouží jako oblast pro
-<filename>/home</filename>. Výsledkem bude jedna velká, 460
-gigabajtová oblast, která uživatelům zase chvíli vystačí. Popsaný
-příklad je samozřejmě hodně zjednodušený, ale pěkně nastiňuje využití
-LVM v praxi. Pokud jste jej ještě nečetli, měli byste si projít <ulink
+NapĹĂ­klad nynĂ­, kdyĹž si vĹĄimnete, Ĺže potĹebujete vĂ­ce mĂ­sta na starĹĄĂ­
+160 gigabajtovĂŠ oblasti s domovskĂ˝mi adresĂĄĹi, mĹŻĹžete jednoduĹĄe
+dokoupit novĂ˝ 300GB disk, pĹipojit jej ke stĂĄvajĂ­cĂ­ skupinÄ svazkĹŻ
+a rozĹĄĂ­Ĺit logickĂ˝ svazek, kterĂ˝ slouĹžĂ­ jako oblast pro
+<filename>/home</filename>. VĂ˝sledkem bude jedna velkĂĄ, 460
+gigabajtovĂĄ oblast, kterĂĄ uĹživatelĹŻm zase chvĂ­li vystaÄĂ­. PopsanĂ˝
+pĹĂ­klad je samozĹejmÄ hodnÄ zjednoduĹĄenĂ˝, ale pÄknÄ nastiĹuje vyuĹžitĂ­
+LVM v praxi. Pokud jste jej jeĹĄtÄ neÄetli, mÄli byste si projĂ­t <ulink
 url="&url-lvm-howto;">LVM HOWTO</ulink>.
 
 </para><para>
 
-Nastavení LVM v instalačním programu Debianu je poměrně jednoduché.
-Nejprve musíte označit fyzické oblasti, které mají být spravovány přes
-LVM. (To se provádí v <command>partman</command>u v menu
-<guimenu>Nastavení oblasti</guimenu>, kde byste měli nastavit položku
-<guimenu>Použít jako:</guimenu> na hodnotu <guimenuitem>fyzický svazek
-pro LVM</guimenuitem>.) Poté přejděte do komponenty
-<command>lvmcfg</command> (buď přímo z <command>partman</command>u
-nebo z hlavního menu &d-i;u), kde uvidíte dvě hlavní menu:
-<guimenuitem>Upravit skupiny svazků (VG)</guimenuitem>
-a <guimenuitem>Upravit logické svazky (LV)</guimenuitem>. Jak již
-název prvního menu napovídá, spravují se zde skupiny svazků. Prakticky
-to znamená možnost:
+NastavenĂ­ LVM v instalaÄnĂ­m programu Debianu je pomÄrnÄ jednoduchĂŠ.
+Nejprve musĂ­te oznaÄit fyzickĂŠ oblasti, kterĂŠ majĂ­ bĂ˝t spravovĂĄny pĹes
+LVM. (To se provĂĄdĂ­ v <command>partman</command>u v menu
+<guimenu>NastavenĂ­ oblasti</guimenu>, kde byste mÄli nastavit poloĹžku
+<guimenu>PouĹžĂ­t jako:</guimenu> na hodnotu <guimenuitem>fyzickĂ˝ svazek
+pro LVM</guimenuitem>.) PotĂŠ pĹejdÄte do komponenty
+<command>lvmcfg</command> (buÄ pĹĂ­mo z <command>partman</command>u
+nebo z hlavnĂ­ho menu &d-i;u), kde uvidĂ­te dvÄ hlavnĂ­ menu:
+<guimenuitem>Upravit skupiny svazkĹŻ (VG)</guimenuitem>
+a <guimenuitem>Upravit logickĂŠ svazky (LV)</guimenuitem>. Jak jiĹž
+nĂĄzev prvnĂ­ho menu napovĂ­dĂĄ, spravujĂ­ se zde skupiny svazkĹŻ. Prakticky
+to znamenĂĄ moĹžnost:
 
 <itemizedlist>
 <listitem><para>
 
-vytvořit novou skupinu z dosud nevyužitých fyzických svazků,
+vytvoĹit novou skupinu z dosud nevyuĹžitĂ˝ch fyzickĂ˝ch svazkĹŻ,
 
 </para></listitem>
 <listitem><para>
 
-smazat skupinu svazků a uvolnit tak fyzické svazky, ze kterých se
-skupina skládá,
+smazat skupinu svazkĹŻ a uvolnit tak fyzickĂŠ svazky, ze kterĂ˝ch se
+skupina sklĂĄdĂĄ,
 
 </para></listitem>
 <listitem><para>
 
-rozšířit skupinu svazků o nevyužité fyzické svazky
+rozĹĄĂ­Ĺit skupinu svazkĹŻ o nevyuĹžitĂŠ fyzickĂŠ svazky
 
 </para></listitem>
 <listitem><para>
 
-a naopak skupinu svazků zmenšit o některé fyzické svazky a tudíž je
-dát k dispozici jiným skupinám, nebo z nich
-v <command>partman</command>u udělat <quote>běžné</quote> oblasti.
+a naopak skupinu svazkĹŻ zmenĹĄit o nÄkterĂŠ fyzickĂŠ svazky a tudĂ­Ĺž je
+dĂĄt k dispozici jinĂ˝m skupinĂĄm, nebo z nich
+v <command>partman</command>u udÄlat <quote>bÄĹžnĂŠ</quote> oblasti.
 
 </para></listitem>
 </itemizedlist>
 
-Menu <guimenuitem>Upravit logické svazky (LV)</guimenuitem> nabízí
-pouze dvě možnosti:
+Menu <guimenuitem>Upravit logickĂŠ svazky (LV)</guimenuitem> nabĂ­zĂ­
+pouze dvÄ moĹžnosti:
 
 <itemizedlist>
 <listitem><para>
 
-vytvořit logický svazek z volného místa ve skupině svazků
+vytvoĹit logickĂ˝ svazek z volnĂŠho mĂ­sta ve skupinÄ svazkĹŻ
 
 </para></listitem>
 <listitem><para>
 
-smazat logický svazek ze skupiny svazků.
+smazat logickĂ˝ svazek ze skupiny svazkĹŻ.
 
 </para></listitem>
 </itemizedlist>
 
 </para><note><para>
 
-Při vytváření skupiny svazků nebo logického svazku budete požádáni
-o zadání jejich názvu. Tyto názvy by měly být krátké a výstižné,
-protože v běžícím systému se podle těchto názvů vytvoří nová bloková
-zařízení v adresáři <filename>/dev/</filename>, která se budou
-používat pro přímý přístup k daným logickým svazkům. Tedy tam, kde by
-se běžně použilo např. <filename>/dev/hda3</filename> se nyní použije
-<filename>/dev/mapper/jmskupiny/jmsvazku</filename>. (Pěkně to bude
-vidět v souboru <filename>/etc/fstab</filename> nebo na výstupu
-příkazů <command>mount</command> a <command>df</command>.)
+PĹi vytvĂĄĹenĂ­ skupiny svazkĹŻ nebo logickĂŠho svazku budete poĹžĂĄdĂĄni
+o zadĂĄnĂ­ jejich nĂĄzvu. Tyto nĂĄzvy by mÄly bĂ˝t krĂĄtkĂŠ a vĂ˝stiĹžnĂŠ,
+protoĹže v bÄĹžĂ­cĂ­m systĂŠmu se podle tÄchto nĂĄzvĹŻ vytvoĹĂ­ novĂĄ blokovĂĄ
+zaĹĂ­zenĂ­ v adresĂĄĹi <filename>/dev/</filename>, kterĂĄ se budou
+pouĹžĂ­vat pro pĹĂ­mĂ˝ pĹĂ­stup k danĂ˝m logickĂ˝m svazkĹŻm. Tedy tam, kde by
+se bÄĹžnÄ pouĹžilo napĹ. <filename>/dev/hda3</filename> se nynĂ­ pouĹžije
+<filename>/dev/mapper/jmskupiny/jmsvazku</filename>. (PÄknÄ to bude
+vidÄt v souboru <filename>/etc/fstab</filename> nebo na vĂ˝stupu
+pĹĂ­kazĹŻ <command>mount</command> a <command>df</command>.)
 
 </para></note><para>
 
-Až budete s nastavením LVM spokojeni, vraťte se zpět do
-<command>partman</command>u, kde uvidíte všechny vytvořené logické
-svazky. Logické svazky se chovají jako obyčejné oblasti, tudíž už asi
-víte, co s nimi máte dělat.<footnote><para>
+AĹž budete s nastavenĂ­m LVM spokojeni, vraĹĽte se zpÄt do
+<command>partman</command>u, kde uvidĂ­te vĹĄechny vytvoĹenĂŠ logickĂŠ
+svazky. LogickĂŠ svazky se chovajĂ­ jako obyÄejnĂŠ oblasti, tudĂ­Ĺž uĹž asi
+vĂ­te, co s nimi mĂĄte dÄlat.<footnote><para>
 
-Nápověda: vytvořit souborové systémy, vybrat přípojné body, apod.
+NĂĄpovÄda: vytvoĹit souborovĂŠ systĂŠmy, vybrat pĹĂ­pojnĂŠ body, apod.
 
 </para></footnote>
 

@@ -1,200 +1,195 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 33725 -->
+<!-- original version: 36730 -->
 
- <sect1 id="kernel-baking"><title>Kompilace nového jádra</title>
+ <sect1 id="kernel-baking"><title>Kompilace novĂŠho jĂĄdra</title>
 <para>
 
-Proč byste si chtěli sestavit nové jádro? Obvykle nejde o
-nutnost, poněvadž jádro dodávané s Debianem funguje ve většině
-počítačů. V Debianu také bývají dostupná alternativní jádra, která
-mohou odpovídat vašemu hardwaru lépe než jádro výchozí, takže byste se
-na ně určitě měli podívat. Nicméně nové jádro může být užitečné
-v následujících situacích:
+ProÄ byste si chtÄli sestavit novĂŠ jĂĄdro? Obvykle nejde o
+nutnost, ponÄvadĹž jĂĄdro dodĂĄvanĂŠ s Debianem funguje ve vÄtĹĄinÄ
+poÄĂ­taÄĹŻ. V Debianu takĂŠ bĂ˝vajĂ­ dostupnĂĄ alternativnĂ­ jĂĄdra, kterĂĄ
+mohou odpovĂ­dat vaĹĄemu hardwaru lĂŠpe neĹž jĂĄdro vĂ˝chozĂ­, takĹže byste se
+na nÄ urÄitÄ mÄli podĂ­vat. NicmĂŠnÄ novĂŠ jĂĄdro mĹŻĹže bĂ˝t uĹžiteÄnĂŠ
+v nĂĄsledujĂ­cĂ­ch situacĂ­ch:
 
 <itemizedlist>
 <listitem><para>
 
-Potřebujete vyřešit hardwarový konflikt zařízení nebo speciální nároky
-hardwaru, které dodávané jádro nezvládne.
+PotĹebujete vyĹeĹĄit hardwarovĂ˝ konflikt zaĹĂ­zenĂ­ nebo speciĂĄlnĂ­ nĂĄroky
+hardwaru, kterĂŠ dodĂĄvanĂŠ jĂĄdro nezvlĂĄdne.
 
 </para></listitem>
 <listitem><para>
 
-Ve standardním jádře postrádáte podporu zařízení nebo nějakou službu
-(např. podporu vysoké paměti).
+Ve standardnĂ­m jĂĄdĹe postrĂĄdĂĄte podporu zaĹĂ­zenĂ­ nebo nÄjakou sluĹžbu
+(napĹ. podporu vysokĂŠ pamÄti).
 
 </para></listitem>
 <listitem><para>
 
-Chcete menší jádro bez ovladačů, které nepoužíváte. Urychlíte start
-systému a ušetříte paměť.
+Chcete menĹĄĂ­ jĂĄdro bez ovladaÄĹŻ, kterĂŠ nepouĹžĂ­vĂĄte. UrychlĂ­te start
+systĂŠmu a uĹĄetĹĂ­te pamÄĹĽ.
 
 </para></listitem>
 <listitem><para>
 
-Chcete monolitické jádro místo modulárního.
+Chcete monolitickĂŠ jĂĄdro mĂ­sto modulĂĄrnĂ­ho.
 
 </para></listitem>
 <listitem><para>
 
-Chcete jádro z vývojové řady.
+Chcete jĂĄdro z vĂ˝vojovĂŠ Ĺady.
 
 </para></listitem>
 <listitem><para>
 
-Chcete se o jádře dozvědět něco víc.
+Chcete se o jĂĄdĹe dozvÄdÄt nÄco vĂ­c.
 
 </para></listitem>
 </itemizedlist>
 
 </para>
 
-  <sect2><title>Správa jader</title>
+  <sect2><title>SprĂĄva jader</title>
 <para>
 
-Nebojte se kompilace jádra, je to zábava a budete z ní mít užitek.
+Nebojte se kompilace jĂĄdra, je to zĂĄbava a budete z nĂ­ mĂ­t uĹžitek.
 
 </para><para>
 
-Doporučený způsob kompilace jádra v Debianu vyžaduje tyto balíky:
+DoporuÄenĂ˝ zpĹŻsob kompilace jĂĄdra v Debianu vyĹžaduje tyto balĂ­ky:
 <classname>fakeroot</classname>, <classname>kernel-package</classname>,
 <phrase condition="classic-kpkg">
-<classname>kernel-source-&kernelversion;</classname> (aktuální verze
-v době vzniku dokumentu)</phrase> <phrase condition="common-kpkg">
-<classname>linux-source-2.6</classname> </phrase> a další, které
-již máte patrně nainstalované (úplný seznam je v souboru
+<classname>kernel-source-&kernelversion;</classname> (aktuĂĄlnĂ­ verze
+v dobÄ vzniku dokumentu)</phrase> <phrase condition="common-kpkg">
+<classname>linux-source-2.6</classname> </phrase> a dalĹĄĂ­, kterĂŠ
+jiĹž mĂĄte patrnÄ nainstalovanĂŠ (ĂşplnĂ˝ seznam je v souboru
 <filename>/usr/share/doc/kernel-package/README.gz</filename>).
 
 </para><para>
 
-Tato metoda vytvoří ze zdrojových textů jádra .deb balíček, a jestliže
-používáte nestandardní moduly, taktéž z nich vyrobí aktuální balíčky.
-Při instalaci balíčku se do adresáře <filename>/boot</filename> uloží
-pěkně pohromadě jádro, mapa symbolů <filename>System.map</filename> a
-aktuální konfigurace.
+Tato metoda vytvoĹĂ­ ze zdrojovĂ˝ch textĹŻ jĂĄdra .deb balĂ­Äek, a jestliĹže
+pouĹžĂ­vĂĄte nestandardnĂ­ moduly, taktĂŠĹž z nich vyrobĂ­ aktuĂĄlnĂ­ balĂ­Äky.
+PĹi instalaci balĂ­Äku se do adresĂĄĹe <filename>/boot</filename> uloĹžĂ­
+pÄknÄ pohromadÄ jĂĄdro, mapa symbolĹŻ <filename>System.map</filename> a
+aktuĂĄlnĂ­ konfigurace.
 
 </para><para>
 
-Jádro <emphasis>nemusíte</emphasis> připravovat touto cestou, ale
-domníváme se, že s využitím balíčkovacího softwaru se proces
-zjednoduší a je také bezpečnější. Místo balíku
+JĂĄdro <emphasis>nemusĂ­te</emphasis> pĹipravovat touto cestou, ale
+domnĂ­vĂĄme se, Ĺže s vyuĹžitĂ­m balĂ­ÄkovacĂ­ho softwaru se proces
+zjednoduĹĄĂ­ a je takĂŠ bezpeÄnÄjĹĄĂ­. MĂ­sto balĂ­ku
 <phrase condition="classic-kpkg">
   <classname>kernel-source-&kernelversion;</classname>
 </phrase> <phrase condition="common-kpkg">
   <classname>linux-source-2.6</classname>
 </phrase>
-si klidně můžete stáhnout poslední zdrojové texty jádra přímo od
+si klidnÄ mĹŻĹžete stĂĄhnout poslednĂ­ zdrojovĂŠ texty jĂĄdra pĹĂ­mo od
 Linuse.
 
 </para><para>
 
-Popis balíku <classname>kernel-package</classname> se nachází v
-adresáři <filename>/usr/share/doc/kernel-package</filename>.
-V následujících odstavcích najdete jen stručný úvod k jeho použití.
+Popis balĂ­ku <classname>kernel-package</classname> se nachĂĄzĂ­ v
+adresĂĄĹi <filename>/usr/share/doc/kernel-package</filename>.
+V nĂĄsledujĂ­cĂ­ch odstavcĂ­ch najdete jen struÄnĂ˝ Ăşvod k jeho pouĹžitĂ­.
 
 </para><para>
 
-V dalším budeme předpokládat, že zdrojové texty jádra verze
-&kernelversion; uložíte někam do svého domovského adresáře.<footnote>
+V dalĹĄĂ­m budeme pĹedpoklĂĄdat, Ĺže zdrojovĂŠ texty jĂĄdra verze
+&kernelversion; uloĹžĂ­te nÄkam do svĂŠho domovskĂŠho adresĂĄĹe.<footnote>
 
 <para>
 
-Existují i jiná místa, kam můžete zdrojové texty jádra rozbalit, ale
-použitá možnost je nejjednodušší a nevyžaduje žádná speciální práva.
+ExistujĂ­ i jinĂĄ mĂ­sta, kam mĹŻĹžete zdrojovĂŠ texty jĂĄdra rozbalit, ale
+pouĹžitĂĄ moĹžnost je nejjednoduĹĄĹĄĂ­ a nevyĹžaduje ĹžĂĄdnĂĄ speciĂĄlnĂ­ prĂĄva.
 
 </para></footnote>
 
-Přejděte do adresáře, kde chcete mít zdrojové texty jádra
+PĹejdÄte do adresĂĄĹe, kde chcete mĂ­t zdrojovĂŠ texty jĂĄdra
 (<userinput>cd <replaceable>~/build</replaceable></userinput>),
 rozbalte archiv
 
 <phrase condition="classic-kpkg">
 
 (<userinput>tar xjf
-/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>) a vejděte
-do vzniklého adresáře (<userinput>cd
+/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput>) a vejdÄte
+do vzniklĂŠho adresĂĄĹe (<userinput>cd
 kernel-source-&kernelversion;/</userinput>).
 
 </phrase><phrase condition="common-kpkg">
 
 (<userinput>tar xjf
-/usr/src/linux-source-&kernelversion;.tar.bz2</userinput>) a vejděte
-do vzniklého adresáře (<userinput>cd
+/usr/src/linux-source-&kernelversion;.tar.bz2</userinput>) a vejdÄte
+do vzniklĂŠho adresĂĄĹe (<userinput>cd
 linux-source-&kernelversion;/</userinput>).
 
 </phrase>
 
 </para><para>
 
-V prostředí X11 nakonfigurujte jádro příkazem <userinput>make
-xconfig</userinput>, nebo v terminálu příkazem <userinput>make
-menuconfig</userinput> (musíte mít nainstalovaný balíček
-<classname>ncurses-dev</classname>). Pročtěte si nápovědu a pozorně
-vybírejte z nabízených možností. Pokud si v některém bodu nebudete
-vědět rady, je většinou lepší zařízení do jádra vložit. Volby, kterým
-nerozumíte a které se nevztahují k hardwaru, raději nechte na
-přednastavených hodnotách. Nezapomeňte do jádra zahrnout <quote>Kernel
-module loader</quote> (tj. automatické vkládání modulů) v sekci
-<quote>Loadable module support</quote>, které přednastavené nebývá,
-avšak Debian tuto službu předpokládá.
+V prostĹedĂ­ X11 nakonfigurujte jĂĄdro pĹĂ­kazem <userinput>make
+xconfig</userinput>, nebo v terminĂĄlu pĹĂ­kazem <userinput>make
+menuconfig</userinput> (musĂ­te mĂ­t nainstalovanĂ˝ balĂ­Äek
+<classname>ncurses-dev</classname>). ProÄtÄte si nĂĄpovÄdu a pozornÄ
+vybĂ­rejte z nabĂ­zenĂ˝ch moĹžnostĂ­. Pokud si v nÄkterĂŠm bodu nebudete
+vÄdÄt rady, je vÄtĹĄinou lepĹĄĂ­ zaĹĂ­zenĂ­ do jĂĄdra vloĹžit. Volby, kterĂ˝m
+nerozumĂ­te a kterĂŠ se nevztahujĂ­ k hardwaru, radÄji nechte na
+pĹednastavenĂ˝ch hodnotĂĄch. NezapomeĹte do jĂĄdra zahrnout <quote>Kernel
+module loader</quote> (tj. automatickĂŠ vklĂĄdĂĄnĂ­ modulĹŻ) v sekci
+<quote>Loadable module support</quote>, kterĂŠ pĹednastavenĂŠ nebĂ˝vĂĄ,
+avĹĄak Debian tuto sluĹžbu pĹedpoklĂĄdĂĄ.
 
 </para><para>
 
-Příkazem <userinput>make-kpkg clean</userinput> pročistíte strom
-zdrojových textů a vynulujete předchozí nastavení balíku
+PĹĂ­kazem <userinput>make-kpkg clean</userinput> proÄistĂ­te strom
+zdrojovĂ˝ch textĹŻ a vynulujete pĹedchozĂ­ nastavenĂ­ balĂ­ku
 <classname>kernel-package</classname>.
 
 </para><para>
 
-Kompilaci jádra provedete příkazem <userinput>fakeroot make-kpkg
---revision=jadro.1.0 kernel_image</userinput>. Číslo verze si můžete
-zvolit podle vlastní úvahy, slouží pouze k vaší orientaci v
-připravených balících. Kompilace zabere chvíli času, záleží na
-výpočetním výkonu vašeho počítače.
-
-</para><para condition="supports-pcmcia">
-
-Pokud využíváte zařízení PCMCIA, nainstalujte také balík
-<classname>pcmcia-source</classname>, který do
-<filename>/usr/src</filename> nakopíruje komprimovaný soubor se
-zdrojovými texty. Tento archiv rozbalte v adresáři
-<filename>/usr/src</filename>, protože programy předpokládají, že
-najdou moduly v adresáři <filename>/usr/src/modules</filename>. Balík
-s PCMCIA moduly připravíte příkazem <userinput>make-kpkg
-modules_image</userinput>. Pro oba úkony musíte mít rootovská práva.
+Kompilaci jĂĄdra provedete pĹĂ­kazem <userinput>fakeroot
+make-kpkg --initrd --revision=jadro.1.0
+kernel_image</userinput>. ÄĂ­slo verze si mĹŻĹžete zvolit podle vlastnĂ­
+Ăşvahy, slouĹžĂ­ pouze k vaĹĄĂ­ orientaci v pĹipravenĂ˝ch
+balĂ­cĂ­ch. Kompilace zabere chvĂ­li Äasu, zĂĄleĹžĂ­ na vĂ˝poÄetnĂ­m vĂ˝konu
+vaĹĄeho poÄĂ­taÄe.
 
 </para><para>
 
-Až kompilace skončí, jádro nainstalujete jako každý jiný balík. Jako
-root napište <userinput>dpkg -i
+AĹž kompilace skonÄĂ­, jĂĄdro nainstalujete jako kaĹždĂ˝ jinĂ˝ balĂ­k. Jako
+root napiĹĄte
+
+<phrase condition="classic-kpkg">
+<userinput>dpkg -i
 ../kernel-image-&kernelversion;-<replaceable>podarchitektura</replaceable>_jadro.1.0_&architecture;.deb</userinput>.
-<replaceable>podarchitektura</replaceable> je volitelné upřesnění
-architektury,
-<phrase arch="i386"> např. <quote>i586</quote>, </phrase> které jste zadali při
-konfiguraci jádra. <userinput>dpkg -i kernel-image...</userinput>
-nainstaluje jádro spolu s doprovodnými soubory. Jedná se třeba
-o soubory
-<filename>System.map</filename>, který je užitečný při dohledávání
-problémů v jádře, a <filename>/boot/config-&kernelversion;</filename>
-obsahující konfigurační soubor jádra. Balík s jádrem je dostatečně
-chytrý, aby během instalace spustil zavaděč (příslušný k vaší
-platformě) a obnovil zaváděcí záznamu na disku. Pokud jste vytvořili
-balík s moduly (třeba PCMCIA nebo lm-sensors), je nanejvýš vhodné ho
-také nainstalovat.
+</phrase><phrase condition="common-kpkg">
+<userinput>dpkg -i
+../linux-image-&kernelversion;-<replaceable>podarchitektura</replaceable>_jadro.1.0_&architecture;.deb</userinput>.
+</phrase>
+
+<replaceable>podarchitektura</replaceable> je volitelnĂŠ upĹesnÄnĂ­
+architektury, <phrase arch="i386"> napĹ. <quote>i586</quote>,
+</phrase> kterĂŠ jste zadali pĹi konfiguraci
+jĂĄdra. <userinput>dpkg -i</userinput> nainstaluje jĂĄdro spolu
+s doprovodnĂ˝mi soubory. JednĂĄ se tĹeba o soubory
+<filename>System.map</filename>, kterĂ˝ je uĹžiteÄnĂ˝ pĹi dohledĂĄvĂĄnĂ­
+problĂŠmĹŻ v jĂĄdĹe, a <filename>/boot/config-&kernelversion;</filename>
+obsahujĂ­cĂ­ konfiguraÄnĂ­ soubor jĂĄdra. BalĂ­k s jĂĄdrem je dostateÄnÄ
+chytrĂ˝, takĹže bÄhem instalace upravĂ­ zavadÄÄ tak, aby implicitnÄ
+pouĹžĂ­val novĂŠ jĂĄdro. Pokud jste vytvoĹili balĂ­k s moduly (tĹeba PCMCIA
+nebo lm-sensors), je nanejvĂ˝ĹĄ vhodnĂŠ ho takĂŠ nainstalovat.
 
 </para><para>
 
-Nyní je čas spustit systém s novým jádrem. Projděte si chybové hlášky,
-které se mohly při instalaci jádra vyskytnout, a pokud vše vypadá
-dobře, restartujte příkazem <userinput>shutdown -r now</userinput>.
+NynĂ­ je Äas spustit systĂŠm s novĂ˝m jĂĄdrem. ProjdÄte si chybovĂŠ hlĂĄĹĄky,
+kterĂŠ se mohly pĹi instalaci jĂĄdra vyskytnout, a pokud vĹĄe vypadĂĄ
+dobĹe, restartujte pĹĂ­kazem <userinput>shutdown -r now</userinput>.
 
 </para><para>
 
-Více informací o debianích jádrech a o kompilaci jader si můžete
-přečíst v <ulink
+VĂ­ce informacĂ­ o debianĂ­ch jĂĄdrech a o kompilaci jader si mĹŻĹžete
+pĹeÄĂ­st v <ulink
 url="&url-kernel-handbook;">Debian Linux Kernel Handbook</ulink>.
-Popis balíku <classname>kernel-package</classname> najdete v adresáři
+Popis balĂ­ku <classname>kernel-package</classname> najdete v adresĂĄĹi
 <filename>/usr/share/doc/kernel-package</filename>.
 
 </para>

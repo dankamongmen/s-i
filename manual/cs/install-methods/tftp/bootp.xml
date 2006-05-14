@@ -1,38 +1,36 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 35613 -->
+<!-- original version: 36841 -->
 
   <sect2 condition="supports-bootp" id="tftp-bootp">
-  <title>Nastavení BOOTP serveru</title>
+  <title>NastavenĂ­ BOOTP serveru</title>
 <para>
 
-V GNU/Linuxu můžete použít v zásadě dva BOOTP servery. Jednak je to
-CMU <command>bootpd</command> a druhý je vlastně DHCP server &mdash;
+V GNU/Linuxu mĹŻĹžete pouĹžĂ­t v zĂĄsadÄ dva BOOTP servery. Jednak je to
+CMU <command>bootpd</command> a druhĂ˝ je vlastnÄ DHCP server &mdash;
 ISC <command>dhcpd</command>. V distribuci &debian; jsou k dispozici v
-balíčcích <classname>bootp</classname> a <classname>dhcp</classname>.
+balĂ­ÄcĂ­ch <classname>bootp</classname> a <classname>dhcp</classname>.
 
 </para><para>
 
-Pokud chcete použít CMU <command>bootpd</command>, musíte nejprve
-odkomentovat (nebo přidat) jeden důležitý řádek v souboru
-<filename>/etc/inetd.conf</filename>. V systému &debian; můžete
-spustit <userinput>update-inetd --enable bootps</userinput> a následně
-restartovat inetd pomocí <userinput>/etc/init.d/inetd
-reload</userinput>. V jiných systémech přidejte řádku, která bude
+Pokud chcete pouĹžĂ­t CMU <command>bootpd</command>, musĂ­te nejprve
+odkomentovat (nebo pĹidat) jeden dĹŻleĹžitĂ˝ ĹĂĄdek v souboru
+<filename>/etc/inetd.conf</filename>. V systĂŠmu &debian; mĹŻĹžete
+spustit <userinput>update-inetd --enable bootps</userinput> a nĂĄslednÄ
+restartovat inetd pomocĂ­ <userinput>/etc/init.d/inetd
+reload</userinput>. V jinĂ˝ch systĂŠmech pĹidejte ĹĂĄdku, kterĂĄ bude
 vypadat zhruba takto:
 
 <informalexample><screen>
 bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120
 </screen></informalexample>
 
-Nyní musíte vytvořit soubor <filename>/etc/bootptab</filename>. Jeho
-struktura je velmi podobná té, co používají staré dobré soubory
-<filename>printcap</filename>, <filename>termcap</filename>, a
-<filename>disktab</filename> ze systému BSD.
-Bližší informace jsou v manuálové stránce
-<filename>bootptab</filename>. Pokud používáte CMU
-<command>bootpd</command>, musíte rovněž znát hardwarovou (MAC) adresu
-klienta. Následuje příklad souboru <filename>/etc/bootptab</filename>:
+NynĂ­ musĂ­te vytvoĹit soubor <filename>/etc/bootptab</filename>. Jeho
+struktura je velmi podobnĂĄ tĂŠ, co pouĹžĂ­vajĂ­ starĂŠ dobrĂŠ soubory
+<filename>printcap</filename>, <filename>termcap</filename>
+a <filename>disktab</filename> ze systĂŠmu BSD.  BliĹžĹĄĂ­ informace jsou
+v manuĂĄlovĂŠ strĂĄnce <filename>bootptab</filename>. Pokud pouĹžĂ­vĂĄte CMU
+<command>bootpd</command>, musĂ­te rovnÄĹž znĂĄt hardwarovou (MAC) adresu
+klienta. NĂĄsleduje pĹĂ­klad souboru <filename>/etc/bootptab</filename>:
 
 <informalexample><screen>
 client:\
@@ -44,28 +42,28 @@ client:\
   ha=0123456789AB:
 </screen></informalexample>
 
-Z příkladu budete muset změnit minimálně volbu <quote>ha</quote>,
-která značí hardwarovou adresu klienta. Volba <quote>bf</quote>
-specifikuje soubor, který si klient stáhne protokolem TFTP, viz <xref
+Z pĹĂ­kladu budete muset zmÄnit minimĂĄlnÄ volbu <quote>ha</quote>,
+kterĂĄ znaÄĂ­ hardwarovou adresu klienta. Volba <quote>bf</quote>
+specifikuje soubor, kterĂ˝ si klient stĂĄhne protokolem TFTP, viz <xref
 linkend="tftp-images"/>.
 
 <phrase arch="mips">
-Na strojích SGI stačí spustit příkazový monitor a napsat
+Na strojĂ­ch SGI staÄĂ­ spustit pĹĂ­kazovĂ˝ monitor a napsat
 <userinput>printenv</userinput>. Hodnota <userinput>eaddr</userinput>
-je MAC adresa daného počítače.
+je MAC adresa danĂŠho poÄĂ­taÄe.
 </phrase>
 
 </para><para>
 
-V kontrastu s předchozím je nastaveni BOOTP pomocí ISC
-<command>dhcpd</command> velmi jednoduché, protože dhcpd považuje
-BOOTP klienty za speciální případ DHCP klientů. Některé architektury
-však vyžadují pro zavádění klientů pomocí BOOTP komplikované
-nastavení. Je-li to váš případ, přečtěte si <xref linkend="dhcpd"/>.
-V opačném případě stačí v konfiguračním souboru vložit do bloku
-podsítě, ve které se nachází klient, direktivu <userinput>allow
+V kontrastu s pĹedchozĂ­m je nastaveni BOOTP pomocĂ­ ISC
+<command>dhcpd</command> velmi jednoduchĂŠ, protoĹže dhcpd povaĹžuje
+BOOTP klienty za speciĂĄlnĂ­ pĹĂ­pad DHCP klientĹŻ. NÄkterĂŠ architektury
+vĹĄak vyĹžadujĂ­ pro zavĂĄdÄnĂ­ klientĹŻ pomocĂ­ BOOTP komplikovanĂŠ
+nastavenĂ­. Je-li to vĂĄĹĄ pĹĂ­pad, pĹeÄtÄte si <xref linkend="dhcpd"/>.
+V opaÄnĂŠm pĹĂ­padÄ staÄĂ­ v konfiguraÄnĂ­m souboru vloĹžit do bloku
+podsĂ­tÄ, ve kterĂŠ se nachĂĄzĂ­ klient, direktivu <userinput>allow
 bootp</userinput>. Potom restartujte <command>dhcpd</command> server
-příkazem <userinput>/etc/init.d/dhcpd restart</userinput>.
+pĹĂ­kazem <userinput>/etc/init.d/dhcpd restart</userinput>.
 
 </para>
   </sect2>

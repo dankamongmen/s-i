@@ -1,85 +1,84 @@
-<?xml version="1.0" encoding="ISO-8859-2"?>
 <!-- $Id$ -->
-<!-- original version: 28672 -->
+<!-- original version: 36841 -->
 
  <sect1 condition="supports-floppy-boot" id="create-floppy">
- <title>Zápis obrazů disků na diskety</title>
+ <title>ZĂĄpis obrazĹŻ diskĹŻ na diskety</title>
 <para>
 
-Zavádění z disket se obvykle používá jako poslední možnost na
-počítačích, které neumí zavést instalační systém jinými prostředky
-(např. z CD, USB nebo sítě).
+ZavĂĄdÄnĂ­ z disket se obvykle pouĹžĂ­vĂĄ jako poslednĂ­ moĹžnost na
+poÄĂ­taÄĂ­ch, kterĂŠ neumĂ­ zavĂŠst instalaÄnĂ­ systĂŠm jinĂ˝mi prostĹedky
+(napĹ. z CD, USB nebo sĂ­tÄ).
 
 </para><para arch="powerpc">
 
-Na Macích s disketovými USB mechanikami zavádění selže.
+Na MacĂ­ch s disketovĂ˝mi USB mechanikami zavĂĄdÄnĂ­ selĹže.
 
 </para><para arch="m68k">
 
-Zavádění z disket není na Amigách a 68k Macích podporováno.
+ZavĂĄdÄnĂ­ z disket nenĂ­ na AmigĂĄch a 68k MacĂ­ch podporovĂĄno.
 
 </para><para>
 
-Obrazy disků představují úplný obsah disket v
-<emphasis>syrové</emphasis> formě. Soubory, jako je
-např. <filename>boot.img</filename>, nelze na disketu jednoduše
-nakopírovat - jejich zápis se provádí speciálním programem
-<emphasis>přímo</emphasis> do sektorů na disketě.
+Obrazy diskĹŻ pĹedstavujĂ­ ĂşplnĂ˝ obsah disket v
+<emphasis>syrovĂŠ</emphasis> formÄ. Soubory, jako je
+napĹ. <filename>boot.img</filename>, nelze na disketu jednoduĹĄe
+nakopĂ­rovat - jejich zĂĄpis se provĂĄdĂ­ speciĂĄlnĂ­m programem
+<emphasis>pĹĂ­mo</emphasis> do sektorĹŻ na disketÄ.
 
 </para><para>
 
-Příprava disket se liší systém od systému. Tato kapitola se zabývá
-přípravou disket pod různými operačními systémy.
+PĹĂ­prava disket se liĹĄĂ­ systĂŠm od systĂŠmu. Tato kapitola se zabĂ˝vĂĄ
+pĹĂ­pravou disket pod rĹŻznĂ˝mi operaÄnĂ­mi systĂŠmy.
 
 </para><para>
 
-Až budete mít diskety vytvořené, raději je ochraňte před neúmyslným
-přepsáním (nastavte mechanický přepínač do pozice zamknuto).
+AĹž budete mĂ­t diskety vytvoĹenĂŠ, radÄji je ochraĹte pĹed neĂşmyslnĂ˝m
+pĹepsĂĄnĂ­m (nastavte mechanickĂ˝ pĹepĂ­naÄ do pozice zamknuto).
 
 </para>
 
   <sect2>
-  <title>Zápis disket pod Linuxem nebo jiným unixovým systémem</title>
+  <title>ZĂĄpis disket pod Linuxem nebo jinĂ˝m unixovĂ˝m systĂŠmem</title>
 <para>
 
-Přímý zápis na diskety může většinou provádět pouze uživatel root.
-Založte do mechaniky prázdnou disketu a příkazem
+PĹĂ­mĂ˝ zĂĄpis na diskety mĹŻĹže vÄtĹĄinou provĂĄdÄt pouze uĹživatel root.
+ZaloĹžte do mechaniky prĂĄzdnou disketu a pĹĂ­kazem
 
 <informalexample><screen>
 <prompt>dd</prompt> <userinput>if=<replaceable>soubor</replaceable> of=/dev/fd0 bs=1024 conv=sync ; sync</userinput>
 </screen></informalexample>
 
-zapište <replaceable>soubor</replaceable> na disketu.
-(<xref linkend="downloading-files"/> vám řekne, co máte napsat
-místo <replaceable>soubor</replaceable>.)
-<filename>/dev/fd0</filename> bývá označení disketové jednotky. (Na
-systému Solaris je to <filename>/dev/fd/0</filename>).
-Disketu vyjměte až po zhasnutí kontrolky na mechanice, protože příkaz
-<command>dd</command> vám může vrátit příkazový řádek, ještě než
-systém dokončí zápis souboru. Na některých systémech lze
-vyjmout disketu z mechaniky pouze softwarově. (Solaris má pro tento
-účel příkaz <command>eject</command>.)
+zapiĹĄte <replaceable>soubor</replaceable> na disketu.
+(<xref linkend="downloading-files"/> vĂĄm Ĺekne, co mĂĄte napsat
+mĂ­sto <replaceable>soubor</replaceable>.)
+<filename>/dev/fd0</filename> bĂ˝vĂĄ oznaÄenĂ­ disketovĂŠ jednotky. (Na
+systĂŠmu Solaris je to <filename>/dev/fd/0</filename>).
+Disketu vyjmÄte aĹž po zhasnutĂ­ kontrolky na mechanice, protoĹže pĹĂ­kaz
+<command>dd</command> vĂĄm mĹŻĹže vrĂĄtit pĹĂ­kazovĂ˝ ĹĂĄdek, jeĹĄtÄ neĹž
+systĂŠm dokonÄĂ­ zĂĄpis souboru. Na nÄkterĂ˝ch systĂŠmech lze
+vyjmout disketu z mechaniky pouze softwarovÄ. (Solaris mĂĄ pro tento
+ĂşÄel pĹĂ­kaz <command>eject</command>.)
 
 </para><para>
 
-Některé systémy se snaží automaticky připojit disketu, jakmile ji
-vložíte do mechaniky. Abyste mohli na disketu zapisovat
-<emphasis>přímo</emphasis>, budete muset tuto funkci vypnout.
-Postup se bohužel liší systém od systému, takže se na podrobnosti
-vyptejte svého systémového administrátora. Například na Solarisu
-musíte pro přímý přístup k disketě obejít volume management: Nejprve
-se programem <command>volcheck</command> (nebo ekvivalentním příkazem
-ve správci souborů) ujistěte, že disketa je připojená. Poté normálně
-použijte výše zmíněný příklad s programem <command>dd</command>, pouze
-<filename>/dev/fd0</filename> nahraďte za
+NÄkterĂŠ systĂŠmy se snaĹžĂ­ automaticky pĹipojit disketu, jakmile ji
+vloĹžĂ­te do mechaniky. Abyste mohli na disketu zapisovat
+<emphasis>pĹĂ­mo</emphasis>, budete muset tuto funkci vypnout.
+Postup se bohuĹžel liĹĄĂ­ systĂŠm od systĂŠmu, takĹže se na podrobnosti
+vyptejte svĂŠho systĂŠmovĂŠho administrĂĄtora. NapĹĂ­klad na Solarisu
+musĂ­te pro pĹĂ­mĂ˝ pĹĂ­stup k disketÄ obejĂ­t volume management: Nejprve
+se programem <command>volcheck</command> (nebo ekvivalentnĂ­m pĹĂ­kazem
+ve sprĂĄvci souborĹŻ) ujistÄte, Ĺže disketa je pĹipojenĂĄ. PotĂŠ normĂĄlnÄ
+pouĹžijte vĂ˝ĹĄe zmĂ­nÄnĂ˝ pĹĂ­klad s programem <command>dd</command>, pouze
+<filename>/dev/fd0</filename> nahraÄte za
 <filename>/vol/rdsk/<replaceable>nazev_diskety</replaceable></filename>,
-kde <replaceable>nazev_diskety</replaceable> je jméno diskety, jaké
-jste jí přiřadili při formátování. (Nepojmenované diskety mají
-standardní jméno <filename>unnamed_floppy</filename>.)
+kde <replaceable>nazev_diskety</replaceable> je jmĂŠno diskety, jakĂŠ
+jste jĂ­ pĹiĹadili pĹi formĂĄtovĂĄnĂ­. (NepojmenovanĂŠ diskety majĂ­
+standardnĂ­ jmĂŠno <filename>unnamed_floppy</filename>.)
 
 </para><para arch="powerpc">
 
-Na powerpc vysunete disketu příkazem <command>eject</command> (možná
+Na powerpc vysunete disketu pĹĂ­kazem <command>eject</command> (moĹžnĂĄ
 jej budete muset doinstalovat).
 
 </para>
