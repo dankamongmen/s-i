@@ -216,7 +216,7 @@ fi
 # smart enough to preseed it to a supported value
 # so the template uses all possible values
 if [ -z "$LANGNAME" ] ; then
-	log "Frontend in use: $DEBIAN_FRONTEND"
+	#log "Frontend in use: $DEBIAN_FRONTEND"
 	case $DEBIAN_FRONTEND in
 	    text)
 		# Stricto-sensu, the text interface could use all languages
@@ -251,7 +251,7 @@ if [ -z "$LANGNAME" ] ; then
 else
 	template=${langname_all}
 fi
-log "Language input template is $template"
+#log "Language input template is $template"
 
 db_input high $template || [ $? -eq 30 ]
 
@@ -496,9 +496,7 @@ if [ "$LOCALE" != "C" ] ; then
 		done
 		db_subst $localecode LOCALELIST "$CHOICES"
 		db_input medium $localecode || [ $? -eq 30 ]
-		if db_go ; then
-			log "Locale set successfully"
-		else
+		if ! db_go; then
 			exit 10
 		fi
 		db_get $localecode
@@ -521,9 +519,7 @@ if [ "$LOCALE" != "C" ] ; then
 		db_set $supportedlocales "$LOCALE"
 	fi
 	db_input medium $supportedlocales || [ $? -eq 30 ]
-	if db_go; then
-		log "Supported locales successfully set"
-	else
+	if ! db_go; then
 		exit 10
 	fi
 fi
