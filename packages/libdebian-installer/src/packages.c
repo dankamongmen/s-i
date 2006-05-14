@@ -200,21 +200,25 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
           goto error;
       }
 
+#ifdef ENABLE_EXTENSIVE_DEBUG
       if (dependend_package)
         di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): mark, dependency from %s", package->package, dependend_package->package);
       else
         di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): mark", package->package);
-
+#endif
+      
       r->do_real (package, r->do_real_data);
       break;
 
     case di_package_type_virtual_package:
 
+#ifdef ENABLE_EXTENSIVE_DEBUG
       if (dependend_package)
         di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): search, dependency from %s", package->package, dependend_package->package);
       else
         di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): search", package->package);
-
+#endif
+      
       for (node = package->depends.head; node; node = node->next)
       {
         di_package_dependency *d = node->data;
