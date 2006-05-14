@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 36841 -->
+<!-- original version: 37295 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Préparation des fichiers pour un amorçage avec une clé USB</title>
@@ -7,7 +7,7 @@
 <para>
 
 Pour préparer une clé USB, vous avez besoin d'un système GNU/Linux fonctionnel
-et qui accepte les périphériques USB. Vérifiez que le module du noyau
+qui accepte les périphériques USB. Vérifiez que le module du noyau
 usb-storage est chargé (<userinput>modprobe usb-storage</userinput>) et trouvez
 à quel périphérique SCSI la clé USB est affectée (dans cet exemple, c'est
 <filename>/dev/sda</filename>). Pour pouvoir écrire sur la clé, il vous faudra
@@ -15,7 +15,7 @@ enlever la protection contre l'écriture.
 </para>
 <para>
 
-Notez que la taille de la clé doit être au moins égale à 128&nbsp;Mo. Pour des
+Notez que la taille de la clé doit être au moins égale à 256&nbsp;Mo. Pour des
 tailles inférieures, voyez <xref linkend="usb-copy-flexible"/>.
 
 </para>
@@ -56,11 +56,11 @@ le bon périphérique pour votre clé&nbsp;!
 
 Montez ensuite la clé (<userinput>mount 
 <replaceable arch="i386">/dev/sda</replaceable>
-<replaceable arch="powerpc">/dev/sda2</replaceable>
-/mnt</userinput>), qui aura maintenant un système de fichiers 
+<replaceable arch="powerpc">/dev/sda2</replaceable> /mnt</userinput>),
+qui aura maintenant un système de fichiers 
 <phrase arch="i386">FAT</phrase>
 <phrase arch="powerpc">HFS</phrase>, et copiez une image ISO de type
-netinst ou businesscard. Le nom de ce fichier doit se terminer par
+<quote>netinst</quote> ou <quote>businesscard</quote>. Le nom de ce fichier doit se terminer par
 <filename>.iso</filename>. Démontez la clé (<userinput>umount /mnt</userinput>)
 et voilà, c'est fait&nbsp;!
 </para>
@@ -86,7 +86,7 @@ sur la clé.
 
 L'installateur recherchera une image ISO Debian sur la clé où prendre les données
 nécessaires à l'installation. Il vous faut donc copier une image ISO
-(businesscard, netinst ou même l'image complète) sur la clé.
+(<quote>businesscard</quote>, <quote>netinst</quote> ou même l'image complète) sur la clé.
 Le nom de cette image doit se terminer par <filename>.iso</filename>.
 
 </para>
@@ -113,8 +113,8 @@ et activez la protection contre l'écriture.
    <title>Amorcer la clé USB</title>
 <warning><para>
 
-Si le système refuse de s'amorcer à partir de la clé, il se peut que la clé
-possède un secteur principal d'amorçage défectueux. Corrigez-le avec le
+Si le système refuse de s'amorcer à partir de la clé, il se peut que le
+secteur principal d'amorçage de la clé soit défectueux. Corrigez-le avec le
 programme <command>install-mbr</command> qui se trouve dans le paquet
 <classname>mbr</classname>&nbsp;:
 
