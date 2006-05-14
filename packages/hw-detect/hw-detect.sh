@@ -43,7 +43,6 @@ is_available () {
 
 # Module as first parameter, description of device the second.
 missing_module () {
-	log "Missing module '$module'."
 	if ! in_list "$1" "$MISSING_MODULES_LIST"; then
 		if [ -n "$MISSING_MODULES_LIST" ]; then
 			MISSING_MODULES_LIST="$MISSING_MODULES_LIST, "
@@ -145,7 +144,6 @@ discover_version () {
 			DISCOVER_VERSION=1
 		fi
 	else
-		log "No discover available. Maybe using hotplug instead?"
 		DISCOVER_VERSION=
 	fi
 }
@@ -338,7 +336,6 @@ if [ -f /etc/pcmcia/cb_mod_queue ]; then
 	fi
 fi
 
-log "Detecting hardware..."
 db_progress INFO hw-detect/detect_progress_step
 
 # Load yenta_socket on 2.6 kernels, if hardware is available, so that
@@ -431,7 +428,6 @@ if [ "$LIST" ]; then
 	MODULE_STEPSIZE=$(expr $MODULE_STEPS / $(list_to_lines | wc -l))
 fi
 
-log "Loading modules..."
 IFS="$NEWLINE"
 
 for device in $(list_to_lines); do
@@ -449,7 +445,6 @@ for device in $(list_to_lines); do
 		db_subst hw-detect/load_progress_step CARDNAME "$cardname"
 		db_subst hw-detect/load_progress_step MODULE "$module"
 		db_progress INFO hw-detect/load_progress_step
-		log "Trying to load module '$module'"
 		if [ "$cardname" = "[Unknown]" ]; then
 			load_module "$module"
 		else
@@ -752,38 +747,27 @@ fi
 # video hardware is in use.
 case "$DISCOVER_VERSION" in
 	2)
-		log "Detected discover version 2, installing discover."
 		apt-install discover || true
 		;;
 	1|'')
-		# This will break woody install, as discover1 is
-		# missing in woody.  We should try to find out which
-		# packages are available when selecting it for
-		# installation. [pere 2004-04-23]
-
-		log "Detected discover version 1, installing discover1."
 		apt-install discover1 || true
 		;;
 esac
 
 # Install udev/hotplug as well, as appropriate.
 if type udevd >/dev/null 2>&1; then
-	log "Detected udev support, installing udev."
 	apt-install udev || true
 elif [ -f /proc/sys/kernel/hotplug ]; then 
-	log "Detected hotplug support (and no udev), installing hotplug."
 	apt-install hotplug || true
 fi
 
 # TODO: should this really be conditional on hotplug support?
 if [ -f /proc/sys/kernel/hotplug ]; then
-	log "Detected hotplug support, installing usbutils."
 	apt-install usbutils || true
 fi
 
 # Install acpi (works only for 2.6 kernels)
 if [ -d /proc/acpi ]; then
-	log "Detected acpi support, installing acpi/acpid."
 	apt-install acpi || true
 	apt-install acpid || true
 fi
