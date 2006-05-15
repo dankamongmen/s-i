@@ -253,7 +253,7 @@ else
 fi
 #log "Language input template is $template"
 
-db_input high $template || [ $? -eq 30 ]
+db_input critical $template || [ $? -eq 30 ]
 
 if db_go; then
 	db_get $template
@@ -331,8 +331,8 @@ fi
 # At this step we should have either xx, or xx_YY in LOCALE
 STATE=1
 LASTSTATE=3
-fullprio=high
-shortprio=high
+fullprio=critical
+shortprio=critical
 while [ "$STATE" != 0 -a "$STATE" -le "$LASTSTATE" ]; do
 	case "$STATE" in
 	    1)
@@ -343,7 +343,7 @@ while [ "$STATE" != 0 -a "$STATE" -le "$LASTSTATE" ]; do
 		# Use case: Esperanto
 		# The next "if"" test will be false and "askedshort"
 		# remains to 0-->no short country list question
-		# and the long list is shown at high priority
+		# and the long list is shown at critical priority
 		# because we need a country
 		if echo $FALLBACKLOCALE | grep "_" >/dev/null 2>&1; then
 			# Otherwise, we prompt with the short list
