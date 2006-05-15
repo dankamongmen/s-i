@@ -97,6 +97,11 @@ if [ "$RET" = true ] && ! is_system_user; then
 	USER="$RET"
 	db_get passwd/user-fullname
 
+	HOME_EXISTED=
+	if [ -d "$ROOT/home/$USER" ]; then
+		HOME_EXISTED=1
+	fi
+
 	if [ -x $ROOT/usr/sbin/adduser ]; then
 		$log $chroot $ROOT adduser --disabled-password --gecos "$RET" $UIDOPT "$USER" >/dev/null || true
 	else
@@ -108,6 +113,14 @@ if [ "$RET" = true ] && ! is_system_user; then
 	db_set passwd/user-password ''
 	db_set passwd/user-password-again ''
 	setpassword "$USER" "$USER_PW" "$USER_PW_CRYPTED"
+
+	if [ "$HOME_EXISTED" ]; then
+		# The user's home directory already existed before we called
+		# adduser. This often means that a mount point under
+		# /home/$USER was selected in (and thus created by) partman,
+		# and the home directory may have ended up owned by root.
+		$log $chroot $ROOT chown "$USER:$USER" "/home/$USER" >/dev/null || true
+	fi
 
 	if [ -n "$USER" ]; then
 		for group in audio cdrom dialout floppy video plugdev; do
