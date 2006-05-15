@@ -48,22 +48,26 @@ fi
 if ! root_password; then
 	# Was the root password preseeded encrypted?
 	if db_get passwd/root-password-crypted && [ "$RET" ]; then
+		# The root password was preseeded encrypted.
 		ROOT_PW="$RET"
-		# The root password was preseeded encrypted. Clear it from
-		# the database, then set it.
-		db_set passwd/root-password-crypted ''
-		setpassword root "$ROOT_PW" true
-		ROOT_PW=
+		PRECRYPTED=true
 	else
 		db_get passwd/root-password
 		ROOT_PW="$RET"
-		# Clear the root password from the database, and set the
-		# password.
-		db_set passwd/root-password ''
-		db_set passwd/root-password-again ''
-		setpassword root "$ROOT_PW" false
-		ROOT_PW=
+		PRECRYPTED=false
 	fi
+	# Clear the root password from the database, and set the password.
+	db_set passwd/root-password-crypted ''
+	db_set passwd/root-password ''
+	db_set passwd/root-password-again ''
+	setpassword root "$ROOT_PW" "$PRECRYPTED"
+	ROOT_PW=
+else
+	# Just in case, clear any preseeded root password from the database
+	# anyway.
+	db_set passwd/root-password-crypted ''
+	db_set passwd/root-password ''
+	db_set passwd/root-password-again ''
 fi
 
 db_get passwd/make-user
@@ -100,12 +104,9 @@ if [ "$RET" = true ] && ! is_system_user; then
 	fi
 
 	# Clear the user password from the database.
-	if [ "$USER_PW_CRYPTED" = true ]; then
-		db_set passwd/user-password-crypted ''
-	else
-		db_set passwd/user-password ''
-		db_set passwd/user-password-again ''
-	fi
+	db_set passwd/user-password-crypted ''
+	db_set passwd/user-password ''
+	db_set passwd/user-password-again ''
 	setpassword "$USER" "$USER_PW" "$USER_PW_CRYPTED"
 
 	if [ -n "$USER" ]; then
@@ -130,6 +131,12 @@ if [ "$RET" = true ] && ! is_system_user; then
 			exit 1
 		fi
 	fi
+else
+	# Just in case, clear any preseeded user password from the database
+	# anyway.
+	db_set passwd/user-password-crypted ''
+	db_set passwd/user-password ''
+	db_set passwd/user-password-again ''
 fi
 
 exit 0
