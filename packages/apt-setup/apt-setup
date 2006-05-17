@@ -39,10 +39,10 @@ if [ -e /cdrom/.disk/base_installable ]; then
 		exit 30
 	fi
 
-	db_get apt-setup/use_mirror
 	if db_get mirror/protocol && [ "$RET" ]; then
 		protocol=$RET
 	fi
+	db_get apt-setup/use_mirror
 	if [ "$RET" = false ]; then
 		if [ "$protocol" ]; then
 			db_set mirror/$protocol/hostname ""
@@ -50,7 +50,7 @@ if [ -e /cdrom/.disk/base_installable ]; then
 		fi
 	else
 		if [ "$protocol" ]; then
-			if db_get mirror/$protocol/directory && [ -z "$RET ]; then
+			if db_get mirror/$protocol/directory && [ -z "$RET" ]; then
 				db_reset mirror/$protocol/directory
 			fi
 		fi
