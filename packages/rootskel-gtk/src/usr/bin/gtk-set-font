@@ -10,9 +10,9 @@ CONFFILE="/etc/gtk-2.0/gtkrc"
 [ -n "$language" ] || exit 1
 [ -f "$CONFFILE" ] || exit 1
 
-DEFAULT_FONT="FreeSans"
+DEFAULT_FONT="DejaVu"
 # Default font size; good for 640x480 or 800x600 screens
-FONT_SIZE=12
+FONT_SIZE=11
 
 # Set the primary GTK font according to language
 case "$language" in
@@ -40,8 +40,6 @@ if ! fc-list | grep -q "$FONT_NAME"; then
 fi
 
 cp $CONFFILE $CONFFILE.old
-sed "s/^gtk-font-name.*$/gtk-font-name = \"$FONT_NAME $FONT_SIZE\"/" \
-	$CONFFILE.old >$CONFFILE
-rm -f $CONFFILE.old
+sed -i "s/^gtk-font-name.*$/gtk-font-name = \"$FONT_NAME $FONT_SIZE\"/" $CONFFILE
 
 exit 0
