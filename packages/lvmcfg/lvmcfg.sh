@@ -13,27 +13,17 @@ fi
 # convert the return values from "xx (yy)" => "xx"
 #
 convert_return() {
+	local IFS=","
 	RET=""
 
-	#TODO: don't need this external file here: ugly
-
-	echo "$1" | tr ',' '\n' | \
-	while read LINE; do
-		part=`echo "$LINE" | cut -d " " -f1`
-		echo "$part" >>/tmp/lvmcfg.tmp
-	done
-
-	[ ! -f /tmp/lvmcfg.tmp ] && return
-
-	for i in `cat /tmp/lvmcfg.tmp`; do
+	for part in $1; do
+		part=${part%% *}
 		if [ -z "$RET" ]; then
-			RET="$i"
+			RET="$part"
 		else
-			RET="$RET, $i"
+			RET="$RET, $part"
 		fi
 	done
-
-	rm -f /tmp/lvmcfg.tmp
 }
 
 #
@@ -292,21 +282,18 @@ vg_mainmenu() {
 		db_go
 		db_get lvmcfg/vgmenu
 
-		VGRET=`echo "$RET" | \
-			sed -e 's/[[:space:]].*//' | \
-			tr 'A-Z' 'a-z'`
 		log-output -t lvmcfg vgscan
-		case "$VGRET" in
-		"create")
+		case "$RET" in
+		Create*)
 			vg_create
 			;;
-		"delete")
+		Delete*)
 			vg_delete
 			;;
-		"extend")
+		Extend*)
 			vg_extend
 			;;
-		"reduce")
+		Reduce*)
 			vg_reduce
 			;;
 		*)
@@ -562,21 +549,18 @@ lv_mainmenu() {
 		db_go
 		db_get lvmcfg/lvmenu
 
-		LVRET=`echo "$RET" | \
-			sed -e 's/[[:space:]].*//' | \
-			tr 'A-Z' 'a-z'`
 		log-output -t lvmcfg vgscan
-		case "$LVRET" in
-		"create")
+		case "$RET" in
+		Create*)
 			lv_create
 			;;
-		"delete")
+		Delete*)
 			lv_delete
 			;;
-		"extend")
+		Extend*)
 			lv_expand
 			;;
-		"reduce")
+		Reduce*)
 			lv_reduce
 			;;
 		*)
