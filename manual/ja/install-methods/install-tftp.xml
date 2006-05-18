@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35613 -->
+<!-- original version: 36841 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>TFTP ネットブート用ファイルの準備</title>
@@ -341,14 +341,15 @@ dhcp サーバが設定されていることを確認してください。
 <!--
 For DECstations, there are tftpimage files for each subarchitecture,
 which contain both kernel and installer in one file. The naming
-convention is <replaceable>subarchitecture</replaceable>/netboot-boot.img.
+convention is
+<filename><replaceable>subarchitecture</replaceable>/netboot-boot.img</filename>.
 Copy the tftpimage file you would like to use to
 <userinput>/tftpboot/tftpboot.img</userinput> if you work with the
 example BOOTP/DHCP setups described above.
 -->
 DECstation には、各サブアーキテクチャごとに tftp イメージがあり、
 カーネルとインストーラがひとつのイメージに収められています。
-命名規則は <replaceable>subarchitecture</replaceable>/netboot-boot.img です。
+命名規則は <filename><replaceable>subarchitecture</replaceable>/netboot-boot.img</filename> です。
 上述の例のように BOOTP/DHCP を設定したのでしたら、
 使いたい tftp イメージを <userinput>/tftpboot/tftpboot.img</userinput>
 にコピーします。
@@ -476,44 +477,38 @@ Alpha では、SRM の <userinput>boot</userinput> コマンドの
 <para>
 
 <!--
-SPARC architectures for instance use the subarchitecture names, such
-as <quote>SUN4M</quote> or <quote>SUN4C</quote>; in some cases, the
-architecture is left blank, so the file the client looks for is just
-<filename>client-ip-in-hex</filename>.  Thus, if your system
-subarchitecture is a SUN4C, and its IP is 192.168.1.3, the filename
-would be <filename>C0A80103.SUN4C</filename>. An easy way to determine
-this is to pull up a shell on another Unix machine and:
-
-this is to enter the following command in a shell (assuming the
-machine's intended IP is 10.0.0.4).
+Some SPARC architectures add the subarchitecture names, such as
+<quote>SUN4M</quote> or <quote>SUN4C</quote>, to the filename. Thus,
+if your system's subarchitecture is a SUN4C, and its IP is 192.168.1.3,
+the filename would be <filename>C0A80103.SUN4C</filename>. However,
+there are also subarchitectures where the file the client looks for is
+just <filename>client-ip-in-hex</filename>. An easy way to determine the
+hexadecimal code for the IP address is to enter the following command
+in a shell (assuming the machine's intended IP is 10.0.0.4).
 -->
 <!--nabetaro 訳注残しました -->
-SPARC アーキテクチャは (訳注: <replaceable>client-architecture</replaceable> に)
+SPARC アーキテクチャでは、
 <quote>SUN4M</quote> や <quote>SUN4C</quote> のような
-サブアーキテクチャの名前を使います。
-場合によってはアーキテクチャが空のこともあり、
-この場合クライアントが探すファイルは
-<filename>client-ip-in-hex</filename> だけになります。
+サブアーキテクチャの名前をファイル名に追加します。
 例えば、システムのサブアーキテクチャが SUN4C で
-IP が 192.168.1.3 の場合は、ファイル名は
-<filename>C0A80103.SUN4C</filename> となります。
-これを決定する簡単な方法は、以下のコマンドをシェルに入力します。
-(予定している IP アドレスは 10.0.0.4 とする)
+IP アドレスが 192.168.1.3 の場合、
+ファイル名は <filename>C0A80103.SUN4C</filename> となります。
+しかし、クライアントが探すファイルが
+<filename>client-ip-in-hex</filename> となるサブアーキテクチャもあります。
+IP アドレスの 16 進表記を簡単に得るには、
+以下のコマンドをシェルに入力してください。
+(想定している IP アドレスは 10.0.0.4 です)
 
 <informalexample><screen>
 $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 </screen></informalexample>
  
 <!--
-This will spit out the IP in hexadecimal; to get to the correct
-filename, you will need to change all letters to uppercase and
-if necessary append the subarchitecture name.
+To get to the correct filename, you will need to change all letters to
+uppercase and if necessary append the subarchitecture name.
 -->
-予定しているマシンの IP アドレスが 10.0.0.4 の場合、
-こうして IP アドレスを 16 進数で出力します。
 正しいファイル名を取得するには、文字をすべて大文字に変更し、
 (必要なら) サブアーキテクチャ名を追加しなければなりません。
-
 
 </para><para>
 
@@ -597,7 +592,7 @@ SGI のマシンでは、TFTP ファイルの名前の指定を
 
 <!--
 You don't have to configure DHCP in a special way because you'll pass the
-full path of the file to the loaded to CFE.
+full path of the file to be loaded to CFE.
 -->
 CFE にロードするファイルのフルパスを渡しているため、
 特殊な DHCP の設定をする必要はありません。
