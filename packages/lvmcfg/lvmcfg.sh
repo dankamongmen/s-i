@@ -294,7 +294,7 @@ vg_mainmenu() {
 
 		VGRET=`echo "$RET" | \
 			sed -e 's/[[:space:]].*//' | \
-			tr '[A-Z]' '[a-z']`
+			tr 'A-Z' 'a-z'`
 		log-output -t lvmcfg vgscan
 		case "$VGRET" in
 		"create")
@@ -564,7 +564,7 @@ lv_mainmenu() {
 
 		LVRET=`echo "$RET" | \
 			sed -e 's/[[:space:]].*//' | \
-			tr '[A-Z]' '[a-z']`
+			tr 'A-Z' 'a-z'`
 		log-output -t lvmcfg vgscan
 		case "$LVRET" in
 		"create")
