@@ -33,10 +33,15 @@ if [ -e /cdrom/.disk/base_installable ]; then
 		db_set mirror/suite $RET
 	fi
 
-	db_input high apt-setup/use_mirror
-	db_go
-	if [ $? -eq 10 ]; then
-		exit 30
+	if type choose-mirror >/dev/null 2>&1 ; then
+		db_input high apt-setup/use_mirror
+		db_go
+		if [ $? -eq 10 ]; then
+			exit 30
+		fi
+	else
+		warning "choose-mirror is not available; cannot offer network mirror"
+		db_set apt-setup/use_mirror false
 	fi
 
 	if db_get mirror/protocol && [ "$RET" ]; then
