@@ -8,10 +8,19 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <signal.h>
 
 /**********************************************************************
    Logging
 **********************************************************************/
+
+/* This file is used as pid-file. */
+char pidfile_name[] = "/var/run/parted_server.pid";
+
+/* These are the communication fifos */
+char infifo_name[] = "/var/lib/partman/infifo";
+char outfifo_name[] = "/var/lib/partman/outfifo";
+char stopfifo_name[] = "/var/lib/partman/stopfifo";
 
 /* This file is used as log-file. */
 char logfile_name[] = "/var/log/partman";
@@ -2053,6 +2062,91 @@ command_get_disk_type()
         activate_exception_handler();
 }
 
+void
+make_fifo(char* name)
+{
+    int status;
+    status = mkfifo(name, 0x644);
+    if ((status != 0))
+            if (errno != EEXIST) {
+                    perror("Cannot create FIFO");
+                    exit(252);
+            }
+}
+
+void
+make_fifos()
+{
+    make_fifo(infifo_name);
+    make_fifo(outfifo_name);
+    make_fifo(stopfifo_name);
+}   
+
+int
+write_pid_file()
+{
+        FILE *fd;
+        int status;
+        pid_t oldpid;
+        if ((fd = fopen(pidfile_name, "a+")) == NULL)
+                return -1;
+
+        if (!feof(fd)) {
+                status = fscanf(fd, "%d", &oldpid);
+                if (status != 0) {
+                        // If kill(oldpid, 0) == 0 the process is still alive
+                        // so we abort
+                        if (kill(oldpid, 0) == 0) {
+                                fprintf(stderr, "Not starting: process %d still exists\n", oldpid);
+                                fclose(fd);
+                                exit(250);
+                        }
+                }
+                // Truncate the pid file and continue
+                freopen(pidfile_name, "w", fd);
+        }
+        
+        fprintf(fd, "%d", (int)(getpid()));
+        fclose(fd);
+        return 0;
+}
+
+void
+cleanup_and_die()
+{
+        if (unlink(pidfile_name) != 0)
+                perror("Cannot unlink pid file");
+        if (unlink(infifo_name) != 0)
+                perror("Cannot unlink input FIFO");
+        if (unlink(outfifo_name) != 0)
+                perror("Cannot unlink output FIFO");
+        if (unlink(stopfifo_name) != 0)
+                perror("Cannot unlink stop FIFO");
+}
+
+void
+prnt_sig_hdlr(int signal)
+{
+        int status;
+        switch(signal) {
+                // SIGUSR1 signals that child is ready to take
+                // requests (i.e. has finished initialisation)
+                case SIGUSR1:
+                    exit(0);
+                    break;
+                // We'll only get SIGCHLD if our child has pre-deceased us
+                // In this case we should exit with its error code
+                case SIGCHLD:
+                    if (waitpid(-1, &status, WNOHANG) < 0) 
+                        exit(0);
+                    if (WIFEXITED(status))
+                        exit(WEXITSTATUS(status));
+                    break;
+                default:
+                    break;
+        }
+}
+
 /**********************************************************************
    Main
 **********************************************************************/
@@ -2149,11 +2243,51 @@ main_loop()
 int
 main(int argc, char *argv[])
 {
+        // Set up signal handling
+        struct sigaction act, oldact;
+        act.sa_handler = prnt_sig_hdlr;
+        sigemptyset(&act.sa_mask);
+
+        // Set up signal handling for parent
+        if  ((sigaction(SIGCHLD, &act, &oldact) < 0) 
+          || (sigaction(SIGUSR1, &act, &oldact) < 0))
+        {
+            fprintf(stderr, "Could not set up signal handling for parent\n");
+            exit(251);
+        }
+        
+        // The parent process should wait; we die once child is
+        // initialised (signalled by a SIGUSR1)
+        if (fork()) {
+            while (1) { sleep(5); };
+        }
+
+        // Set up signal handling for child
+        if  ((sigaction(SIGCHLD, &oldact, NULL) < 0) 
+          || (sigaction(SIGUSR1, &oldact, NULL) < 0))
+        {
+            fprintf(stderr, "Could not set up signal handling for child\n");
+            exit(250);
+        }
+ 
+        // Continue as a daemon process
         logfile = fopen(logfile_name, "a+");
         if (logfile == NULL) {
                 fprintf(stderr, "Cannot append to the log file\n");
                 exit(255);
         }
+        if (write_pid_file() != 0) {
+                fprintf(stderr, "Cannot open pid file\n");
+                exit(254);
+        }
+        if (atexit(cleanup_and_die) != 0) {
+                fprintf(stderr, "Cannot set atexit routine\n");
+                exit(253);
+        }
+        make_fifos();
+        // Signal that we've finished initialising so that the parent process
+        // can die and the shell scripts can continue
+        kill(getppid(), SIGUSR1);
         ped_exception_set_handler(exception_handler);
         log("======= Starting the server");
         main_loop();

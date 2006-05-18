@@ -255,8 +255,6 @@ stop_parted_server () {
     open_infifo
     write_line "QUIT"
     close_infifo
-
-    rm /var/run/parted_server.pid
 }
 
 # Must call stop_parted_server before calling this.
