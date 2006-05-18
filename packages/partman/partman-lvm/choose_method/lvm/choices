@@ -9,7 +9,14 @@ cd $dev
 
 lvm=no
 if grep -q "/dev/md" $dev/device; then
+	# LVM on software RAID
 	lvm=yes
+elif grep -q "/dev/mapper/" $dev/device; then
+	# LVM on device-mapper crypto
+	device=$(cat $dev/device)
+	if [ "$(dmsetup status $device | cut -d' ' -f3)" = "crypt" ]; then
+		lvm=yes
+	fi
 fi
 
 # sparc can not have LVM starting at 0 or it will destroy the partition table
