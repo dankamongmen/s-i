@@ -83,20 +83,6 @@ success_text(struct frontend *obj)
       "Key data has been created successfully.");
 }
 
-static const char *
-question_get_variable(struct question *q, const char *name)
-{
-    struct questionvariable *var = q->variables;
-    
-    while (var) {
-        if (!strcmp(name, var->variable))
-            return var->value;
-        var = var->next;
-    }
-
-    return NULL;
-}
-
 static void *
 setup_handler_dlsyms(void)
 {
