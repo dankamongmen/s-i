@@ -24,13 +24,15 @@ if [ "$(udpkg --print-architecture)" = "sparc" ] && [ "${id%%-*}" = "0" ] && [ "
     exit 0
 fi
 
-open_dialog VALID_FLAGS $id
-while { read_line flag; [ "$flag" ]; }; do
-    if [ "$flag" = lvm ]; then
-	lvm=yes
-    fi
-done
-close_dialog
+if [ $lvm = no ]; then
+	open_dialog VALID_FLAGS $id
+	while { read_line flag; [ "$flag" ]; }; do
+	    if [ "$flag" = lvm ]; then
+		lvm=yes
+	    fi
+	done
+	close_dialog
+fi
 
 if [ $lvm = no ]; then
     exit 0
