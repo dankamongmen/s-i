@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35395 -->
+<!-- original version: 37253 -->
 
  <sect1 id="module-details">
+<!--
+ <title>Using Individual Components</title>
+-->
  <title>それぞれのコンポーネントの使用法</title>
 <para>
 
@@ -25,7 +28,10 @@ the installation method you use and on your hardware.
 </para>
 
   <sect2 id="di-setup">
-  <title>Debian Installer のセットアップとハードウェアの設定</title>
+<!--
+  <title>Setting up Debian Installer and Hardware Configuration</title>
+-->
+  <title>Debian インストーラのセットアップとハードウェアの設定</title>
 <para>
 
 <!--
@@ -36,7 +42,7 @@ or even the task it should perform. Don't worry. Because &d-i; is quite
 clever, it can automatically probe your hardware, locate the rest
 of its components and upgrade itself to a capable installation system.
 -->
-Debian Installer が起動して、最初の画面が表示されていると仮定しましょう。
+Debian インストーラが起動して、最初の画面が表示されているとしましょう。
 このとき、&d-i; の機能はまだ制限されています。
 ハードウェア、希望する言語、実行するタスクなどに関しても、まだ知りません。
 しかし心配しないでください。
@@ -51,7 +57,7 @@ layout or desired network mirror).
 -->
 しかし、
 (希望する言語、キーボードレイアウト、使用するネットワークミラーの選択のように)
-いくつかのタスクでは自動的に決定することができないので、
+いくつかのタスクでは自動で決められませんので、
 &d-i; を助けてあげる必要があります。
 
 </para><para>
@@ -64,12 +70,13 @@ network card). As not all drivers may be available during this first run,
 hardware detection needs to be repeated later in the process.
 -->
 この段階で &d-i; が<firstterm>ハードウェア検出</firstterm>を
-数回行うことに気がつくでしょう。
+数回行うことに気がつくことでしょう。
 最初の検出では、
 インストーラのコンポーネントをロードするのに欠かせないハードウェア
 (例: CD-ROM ドライブやネットワークカード) を認識することが目標です。
 初回の実行ですべてのドライバが使用可能になるわけではないので、
 ハードウェア検出をこのプロセスの後で繰り返す必要があります。
+
 </para>
 
 &module-lowmem.xml;
@@ -86,7 +93,10 @@ hardware detection needs to be repeated later in the process.
   </sect2>
 
   <sect2 id="di-partition">
-  <title>パーティション分割とマウントポイント選択</title>
+<!--
+  <title>Partitioning and Mount Point Selection</title>
+-->
+  <title>パーティションの分割とマウントポイントの選択</title>
 <para>
 
 <!--
@@ -105,7 +115,7 @@ assigning mountpoints and optionally configuring closely related issues
 like LVM or RAID devices.
 -->
 本節のタイトルが表すように、
-次の少数のコンポーネントの主要なタスクは、ディスクのパーティションを分割し、
+以下、少数のコンポーネントの主なタスクは、ディスクのパーティションを分割し、
 ファイルシステムを作成し、マウントポイントを割り当てて、
 LVM や RAID 装置のような密接に関係する件のオプション設定を行うことです。
 
@@ -121,16 +131,19 @@ LVM や RAID 装置のような密接に関係する件のオプション設定を行うことです。
   </sect2>
   
   <sect2 id="di-system-setup">
+<!--
   <title>Setting up the System</title>
+-->
+  <title>システムのセットアップ</title>
 <para>
 
 <!--
 After partitioning the installer asks a few more questions that will be
 used to set up the system it is about to install.
 -->
-パーティション分割の後で、
-インストーラはインストール対象システムの設定に関する質問をしてきます。
-
+パーティションの分割が終わると、
+インストーラはインストールを行うシステムの設定に関する質問をしてきます。
+	
 </para>
 
 &module-tzsetup.xml;
@@ -139,6 +152,9 @@ used to set up the system it is about to install.
 </sect2>
 
   <sect2 id="di-install-base">
+<!--
+  <title>Installing the Base System</title>
+-->
   <title>基本システムのインストール</title>
 <para>
 
@@ -148,9 +164,9 @@ fraction of the install because it downloads, verifies and unpacks the whole
 base system. If you have a slow computer or network connection, this could
 take some time.
 -->
-この段階が最重要問題でないとはいえ、全体の基本システムをダウンロード、確認、
+この段階が最重要でないとはいえ、全体の基本システムをダウンロード、確認、
 展開にインストールのかなりの部分を費やします。
-遅いコンピュータや遅いネットワーク接続しか持っていなければ、
+遅いコンピュータや遅いネットワーク接続しかなければ、
 ある程度時間がかかるかもしれません。
 
 </para>
@@ -175,8 +191,8 @@ network.
 基本システムのインストールが終わると、
 制限されたシステムが利用できるようになります。
 ほとんどのユーザは、お好みに調整するのに、
-追加ソフトウェアをシステムに入れたいでしょう。
-そしてこれはインストーラから行えます。
+追加ソフトウェアをシステムにインストールするでしょうが、
+これはインストーラから行えます。
 遅いコンピュータや回線を使用していると、
 このステップは基本システムのインストールよりも時間がかかります。
 
@@ -184,9 +200,13 @@ network.
 &module-apt-setup.xml;
 &module-pkgsel.xml;
   </sect2>
-       
+	
   <sect2 id="di-make-bootable">
-  <title>システム起動可能化</title>
+<!--
+  <title>Making Your System Bootable</title>
+-->
+  <title>システムを起動可能に</title>
+
 <para condition="supports-nfsroot">
 
 <!--
@@ -212,7 +232,7 @@ to document the various boot managers, which vary by architecture and
 even by subarchitecture.  You should see your boot manager's
 documentation for more information.
 -->
-同一マシンで複数の OS を起動させるのは、まだかなり魔術的です。
+同一マシンで複数の OS を起動させるのは、いまだにかなり魔術的です。
 ここでは、様々なブートマネージャに言及しません。
 アーキテクチャによって、さらにサブアーキテクチャによってさえ変わるからです。
 詳しくは、ブートマネージャのドキュメントをご覧ください。
@@ -246,7 +266,7 @@ documentation for more information.
 These are the last bits to do before rebooting to your new system. It
 mostly consists of tidying up after the &d-i;.
 -->
-新しいシステムを再起動する前にちょっとすることがあります。
+新しいシステムを再起動する前に、ほんの少し行うことがあります。
 ほとんどが &d-i; の後片付けです。
 
 </para>
@@ -255,6 +275,9 @@ mostly consists of tidying up after the &d-i;.
   </sect2>
 
   <sect2 id="di-miscellaneous">
+<!--
+  <title>Miscellaneous</title>
+-->
   <title>その他</title>
 <para>
 
@@ -263,8 +286,8 @@ The components listed in this section are usually not involved in the
 installation process, but are waiting in the background to help the
 user in case something goes wrong.
 -->
-本節で挙げたコンポーネントは、通常インストールプロセスに関係しませんが、
-何かがうまく行かない時にユーザを助けられるようバックグラウンドで待っています。
+本節に挙げるコンポーネントは、通常インストールプロセスに関係しませんが、
+何かうまく行かない時に、ユーザの助けになるようバックグラウンドで待っています。
 
 </para>
 
