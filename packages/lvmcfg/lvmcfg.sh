@@ -28,15 +28,10 @@ convert_return() {
 
 #
 # Convert common terms for disk sizes into something LVM understands.
+#  e.g. "200 Gb" -> "200G"
 #
 human2lvm() {
-    input="$1"
-    input=`echo "$input" | sed -e 's/ \+KB/K/'`
-    input=`echo "$input" | sed -e 's/ \+MB/M/'`
-    input=`echo "$input" | sed -e 's/ \+GB/G/'`
-    input=`echo "$input" | sed -e 's/ \+TB/T/'`
-    input=`echo "$input" | sed -e 's/ \+\(.\)/\1/'`
-    echo "$input"
+	echo "$1" | tr -d " " | sed -e 's/\([kmgtKMGT]\)[bB]/\1/'
 }
 
 #
