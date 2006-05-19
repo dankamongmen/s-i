@@ -25,44 +25,6 @@ warning() {
         log "warning: $@"
 }
 
-if [ -e /cdrom/.disk/base_installable ]; then
-	if db_get cdrom/codename && [ "$RET" ]; then
-		db_set mirror/codename $RET
-	fi
-	if db_get cdrom/suite && [ "$RET" ]; then
-		db_set mirror/suite $RET
-	fi
-
-	if type choose-mirror >/dev/null 2>&1 ; then
-		db_input high apt-setup/use_mirror
-		db_go
-		if [ $? -eq 10 ]; then
-			exit 30
-		fi
-	else
-		warning "choose-mirror is not available; cannot offer network mirror"
-		db_set apt-setup/use_mirror false
-	fi
-
-	if db_get mirror/protocol && [ "$RET" ]; then
-		protocol=$RET
-	fi
-	db_get apt-setup/use_mirror
-	if [ "$RET" = false ]; then
-		if [ "$protocol" ]; then
-			db_set mirror/$protocol/hostname ""
-			db_set mirror/$protocol/directory ""
-		fi
-	else
-		if [ "$protocol" ]; then
-			if db_get mirror/$protocol/directory && [ -z "$RET" ]; then
-				db_reset mirror/$protocol/directory
-			fi
-		fi
-		choose-mirror
-	fi
-fi
-
 gencount=`ls "$gendir"/* | wc -l`
 db_progress START 0 $gencount apt-setup/progress/title
 
