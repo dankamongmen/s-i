@@ -947,7 +947,7 @@ dump_info(FILE *dumpfile, PedDevice *dev, PedDisk *disk)
         fprintf(dumpfile, "Device: yes\n");
         fprintf(dumpfile, "Model: %s\n", dev->model);
         fprintf(dumpfile, "Path: %s\n", dev->path);
-        fprintf(dumpfile, "Sector size: %i\n", dev->sector_size);
+        fprintf(dumpfile, "Sector size: %lli\n", dev->sector_size);
         fprintf(dumpfile, "Sectors: %lli\n", dev->length);
         fprintf(dumpfile, "Sectors/track: %i\n", dev->bios_geom.sectors);
         fprintf(dumpfile, "Heads: %i\n", dev->bios_geom.heads);
