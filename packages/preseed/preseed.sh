@@ -53,48 +53,58 @@ preseed_location () {
 	log "successfully loaded preseed file from $location"
 	local last_location="$location"
 	
-	db_get preseed/include
-	local include="$RET"
-	db_get preseed/include_command
-	if [ -n "$RET" ]; then
-		include="$include $(eval $RET)" || true # TODO error handling?
-	fi
-	if db_get preseed/include/checksum; then
-		checksum="$RET"
-	else
-		checksum=""
-	fi
-	for location in $include; do
-		sum="${checksum%% *}"
-		checksum="${checksum#$sum }"
+	while true ; do
+		db_get preseed/include
+		local include="$RET"
+		db_get preseed/include_command
+		if [ -n "$RET" ]; then
+			include="$include $(eval $RET)" || true # TODO error handling?
+		fi
+		if db_get preseed/include/checksum; then
+			checksum="$RET"
+		else
+			checksum=""
+		fi
+		db_get preseed/run
+		local torun="$RET"
 
-		# Support relative paths, just use path of last file.
-		if preseed_relative "$location"; then
-			# This works for urls too.
-			location="$(dirname $last_location)/$location"
-		fi
-		if [ -n "$location" ]; then
-			preseed_location "$location" "$sum"
-		fi
-	done
+		# not really sure if the ones above are required if this is here
+		db_set preseed/include ""
+		db_set preseed/include_command ""
+		db_set preseed/run ""
+
+		[ -n "$include" -o -n "$torun" ] || break
+
+		for location in $include; do
+			sum="${checksum%% *}"
+			checksum="${checksum#$sum }"
+
+			# Support relative paths, just use path of last file.
+			if preseed_relative "$location"; then
+				# This works for urls too.
+				location="$(dirname $last_location)/$location"
+			fi
+			if [ -n "$location" ]; then
+				preseed_location "$location" "$sum"
+			fi
+		done
 	
-	db_get preseed/run
-	local torun="$RET"
-	for location in $torun; do
-		if preseed_relative "$location"; then
-			location="$(dirname $last_location)/$location"
-		fi
-		if [ -n "$location" ]; then
-			if ! preseed_fetch "$location" "$tmp"; then
-				error retrieve_error "$location"
+		for location in $torun; do
+			if preseed_relative "$location"; then
+				location="$(dirname $last_location)/$location"
 			fi
-			chmod +x $tmp
-			if ! $tmp; then
-				error load_error "$location"
+			if [ -n "$location" ]; then
+				if ! preseed_fetch "$location" "$tmp"; then
+					error retrieve_error "$location"
+				fi
+				chmod +x $tmp
+				if ! $tmp; then
+					error load_error "$location"
+				fi
+				log "successfully ran file from $location"
+				rm -f $tmp
 			fi
-			log "successfully ran file from $location"
-			rm -f $tmp
-		fi
+		done
 	done
 }
 	
