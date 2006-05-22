@@ -70,7 +70,7 @@ mydebconf_default_set (char *template, char *value)
 		return res;
 
 	if (client->value == NULL || (strlen (client->value) == 0))
-		res = debconf_set (client, template, strdup (value));
+		res = debconf_set (client, template, value);
 	return res;
 }
 
