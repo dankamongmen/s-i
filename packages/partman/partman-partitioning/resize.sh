@@ -17,7 +17,18 @@ get_ntfs_resize_range () {
     if [ -f $backupdev/$oldid/view -a -f $backupdev/device ]; then
 	num=$(sed 's/^[^0-9]*\([0-9]*\)[^0-9].*/\1/' $backupdev/$oldid/view)
 	bdev=$(cat $backupdev/device)
-	bdev=${bdev%/disc}/part$num
+	case $bdev in
+	    */disc)
+		bdev=${bdev%/disc}/part$num
+		;;
+	    /dev/[hs]d[a-z])
+		bdev=$bdev$num
+		;;
+	    *)
+		log "get_ntfs_resize_range: strange device name $bdev"
+		return
+		;;
+	esac
 	if [ -b $bdev ]; then
 	    size=$(ntfsresize -f -i $bdev \
 		| grep '^You might resize at' \
