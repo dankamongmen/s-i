@@ -13,7 +13,7 @@ get_ntfs_resize_range () {
     # A weird way to get the real device path.  The partition numbers
     # in parted_server may be changed and the partition table is still
     # not commited to the disk
-    backupdev=/var/lib/partman/backup/${bdev#/var/lib/partman/devices/}
+    backupdev=/var/lib/partman/backup/${dev#/var/lib/partman/devices/}
     if [ -f $backupdev/$oldid/view -a -f $backupdev/device ]; then
 	num=$(sed 's/^[^0-9]*\([0-9]*\)[^0-9].*/\1/' $backupdev/$oldid/view)
 	bdev=$(cat $backupdev/device)
