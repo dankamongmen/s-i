@@ -33,26 +33,13 @@ rootfs=`grep ' /target ' $MTAB |cut -d' ' -f1 -s`
 
 rm -f /tmp/efi_boot.list
 
-for d in /dev/discs/*/disc; do
-    parted $d print | ( while read minor start end size fs nameflags ; do
-      case "$minor" in
-      Disk)
-	if [ "$start" = geometry ]; then
-	    dev=$(echo $size | sed -n "s|\([^:]*\)/disc:|\1|p")
-	fi
-	;;
-      [1-9])
-	case "$fs" in
+/usr/lib/partconf/find-partitions --flag boot | while read part fs size; do
+    case $fs in
 	fat16|fat32)
-	    if echo "$nameflags" | grep "boot" >/dev/null; then
-		echo ${dev}/part${minor} >> /tmp/efi_boot.list
-	    fi
+	    echo "$part" >> /tmp/efi_boot.list
 	    ;;
-	esac
-	;;
-      esac
-    done)
-done	
+    esac
+done
 if [ -s /tmp/efi_boot.list ]; then
     for d in `cat /tmp/efi_boot.list`; do
 	d=`mapdevfs $d`
