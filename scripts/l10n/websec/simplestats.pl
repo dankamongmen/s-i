@@ -10,6 +10,8 @@ my %oldfiles = ();
 my %newfiles = ();
 my $oldglobal = "";
 my $newglobal = "";
+my $oldmaster = "(unknown)";
+my $newmaster = "(unknown)";
 
 # Gather data
 my @lines = <>;
@@ -28,6 +30,10 @@ foreach my $line (@lines) {
   elsif ($line =~ /^([-+])(?:\s+\*?)(.*?\.po):?\s+((\d+t)?(\d+f)?(\d+u)?)/) {
     $oldfiles{$2} = $3 if ($1 eq '-');
     $newfiles{$2} = $3 if ($1 eq '+');
+  }
+  elsif ($line =~ /^([-+])Master:\s+(\d*t\d*f\d*u)/) {
+    $oldmaster = $2 if ($1 eq '-');
+    $newmaster = $2 if ($1 eq '+');
   }
 }
 
@@ -56,6 +62,8 @@ print "\n";
 print "Removed files:\n$removed\n" if ($removed ne "");
 print "Added files:\n$new\n" if ($new ne "");
 print "Changed files:\n$changed\n" if ($changed ne "");
+
+print "Master translation: $oldmaster -> $newmaster\n\n" if ($oldmaster ne $newmaster);
 
 print "Old totals: $oldglobal\n" if ($oldglobal ne "");
 print "New totals: $newglobal\n" if ($newglobal ne "");
