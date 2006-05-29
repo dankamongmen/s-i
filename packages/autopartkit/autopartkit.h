@@ -1,8 +1,7 @@
 #ifndef AUTOPARTKIT_H
 #define AUTOPARTKIT_H
 
-#include <parted/device.h>  /* for PedSector */
-#include <parted/disk.h>    /* for PedGeometry */
+#include <parted/parted.h>
 
 struct disk_info_t;
 
