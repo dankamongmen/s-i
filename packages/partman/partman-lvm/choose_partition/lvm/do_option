@@ -1,120 +1,704 @@
 #!/bin/sh
 
 . /lib/partman/definitions.sh
+. /lib/partman/lvm_tools.sh
 
-confirm_changes () {
-    local dev x part partitions num id size type fs path name filesystem partitems items
-    # Compute the changes we are going to do
-    partitems=''
-    items=''
-    for dev in $DEVICES/*; do
-	[ -d "$dev" ] || continue
-	cd $dev
+#####################################
+#
+# Functions
+#
+#####################################
 
-	open_dialog IS_CHANGED
-	read_line x
-	close_dialog
-	if [ "$x" = yes ]; then
-	    partitems="${partitems}   $(humandev $(cat device))
-"
+do_initial_setup() {
+	# load required kernel modules
+	depmod -a >/dev/null 2>&1
+	modprobe dm-mod >/dev/null 2>&1
+	modprobe lvm-mod >/dev/null 2>&1
+
+	# make sure that lvm is available
+	if ! grep -q "[0-9] device-mapper$" /proc/misc ; then
+		db_set partman-lvm/nolvm "false"
+		db_input high partman-lvm/nolvm
+		db_go
+		exit 0
 	fi
 
-	partitions=
-	open_dialog PARTITIONS
-	while { read_line num id size type fs path name; [ "$id" ]; }; do
-	    [ "$fs" != free ] || continue
-	    partitions="$partitions $id,$num"
+	# scan for logical volumes
+	log-output -t partman-lvm pvscan
+	log-output -t partman-lvm vgscan
+
+	# Commit the changes
+	confirm_changes || exit 0
+	for s in /lib/partman/commit.d/*; do
+		if [ -x $s ]; then
+			$s || {
+				db_input high partman-lvm/commit_failed || true
+				db_go || true
+				for s in /lib/partman/init.d/*; do
+					if [ -x $s ]; then
+						$s || exit 255
+					fi
+				done
+				exit 0
+			}
+		fi
 	done
-	close_dialog
-	
-	for part in $partitions; do
-	    id=${part%,*}
-	    num=${part#*,}
-            [ -f $id/method -a -f $id/format \
-                -a -f $id/visual_filesystem ] || continue
-            [ -f $id/filesystem -o ! -f $id/formatted \
-                -o $id/formatted -ot $id/method ] || continue
-            [ ! -f $id/filesystem -o ! -f $id/formatted \
-                -o $id/formatted -ot $id/method \
-                -o $id/formatted -ot $id/filesystem ] || continue
-	    filesystem=$(cat $id/visual_filesystem)
-	    db_subst partman/text/confirm_item TYPE "$filesystem"
-	    db_subst partman/text/confirm_item PARTITION "$num"
-	    db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
-	    db_metaget partman/text/confirm_item description
-	    
-	    items="${items}   ${RET}
-"
-	done
-    done
 
-    if [ "$items" ]; then
-	db_metaget partman/text/confirm_item_header description
-	items="$RET
-$items"
-    fi
-    
-    if [ "$partitems" ]; then
-	db_metaget partman/text/confirm_partitem_header description
-	partitems="$RET
-$partitems"
-    fi
-    
-    if [ "$partitems$items" ]; then
-	if [ -z "$items" ]; then
-	    x="$partitems"
-	elif [ -z "$partitems" ]; then
-	    x="$items"
-	else
-	    x="$partitems
-$items"
+	# initialize (pvcreate) all volumes that are not already prepared
+	for pv in $(pv_list); do
+		if ! pv_create "$pv"; then
+			db_subst partman-lvm/pvcreate_error PV "$pv"
+			db_set partman-lvm/nolvm "false"
+			db_input high partman-lvm/nolvm
+			db_go
+			exit 0
+		fi
+	done
+
+	if [ ! -f /var/cache/partman-lvm/first ]; then
+		# try to activate old volume groups
+		count=$(list_vgs | wc -l)
+		if [ $count -gt 0 ]; then
+			db_subst partman-lvm/activevg COUNT $count
+			db_set partman-lvm/activevg "false"
+			db_input critical partman-lvm/activevg
+			db_go
+			db_get partman-lvm/activevg
+			[ "$RET" = "true" ] && log-output -t partman-lvm vgchange -a y
+		fi
+		# ask only the first time
+		mkdir -p /var/cache/partman-lvm && touch /var/cache/partman-lvm/first
 	fi
-	db_subst partman-lvm/confirm ITEMS "$x"
-	db_input critical partman-lvm/confirm
-	db_go || true
-	db_get partman-lvm/confirm
-	if [ "$RET" = false ]; then
-	    db_reset partman-lvm/confirm
-	    return 1
-	else
-	    db_reset partman-lvm/confirm
-	    return 0
-	fi
-    else
-	db_input critical partman-lvm/confirm_nochanges
-	db_go || true
-	db_get partman-lvm/confirm_nochanges
-	if [ "$RET" = false ]; then
-	    db_reset partman-lvm/confirm_nochanges
-	    return 1
-	else
-	    db_reset partman-lvm/confirm_nochanges
-	    return 0
-	fi
-    fi
 }
 
-confirm_changes || exit 0
+confirm_changes () {
+	local dev x part partitions num id size type fs path name filesystem partitems items
+	# Compute the changes we are going to do
+	partitems=''
+	items=''
+	for dev in $DEVICES/*; do
+		[ -d "$dev" ] || continue
+		cd $dev
 
-# Commit the changes
-
-for s in /lib/partman/commit.d/*; do
-    if [ -x $s ]; then
-	$s || {
-	    db_input high partman-lvm/commit_failed || true
-	    db_go || true
-	    for s in /lib/partman/init.d/*; do
-		if [ -x $s ]; then
-		    $s || exit 255
+		open_dialog IS_CHANGED
+		read_line x
+		close_dialog
+		if [ "$x" = yes ]; then
+		    partitems="${partitems}   $(humandev $(cat device))
+		"
 		fi
-	    done
-	    exit 0
-	}
-    fi
+
+		partitions=
+		open_dialog PARTITIONS
+		while { read_line num id size type fs path name; [ "$id" ]; }; do
+		    [ "$fs" != free ] || continue
+		    partitions="$partitions $id,$num"
+		done
+		close_dialog
+
+		for part in $partitions; do
+			id=${part%,*}
+			num=${part#*,}
+			[ -f $id/method -a -f $id/format \
+			-a -f $id/visual_filesystem ] || continue
+			[ -f $id/filesystem -o ! -f $id/formatted \
+			-o $id/formatted -ot $id/method ] || continue
+			[ ! -f $id/filesystem -o ! -f $id/formatted \
+			-o $id/formatted -ot $id/method \
+			-o $id/formatted -ot $id/filesystem ] || continue
+			filesystem=$(cat $id/visual_filesystem)
+			db_subst partman/text/confirm_item TYPE "$filesystem"
+			db_subst partman/text/confirm_item PARTITION "$num"
+			db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
+			db_metaget partman/text/confirm_item description
+
+			items="${items}   ${RET}
+"
+		done
+	done
+
+	if [ "$items" ]; then
+		db_metaget partman/text/confirm_item_header description
+		items="$RET
+$items"
+	fi
+    
+	if [ "$partitems" ]; then
+		db_metaget partman/text/confirm_partitem_header description
+		partitems="$RET
+$partitems"
+	fi
+    
+	if [ "$partitems$items" ]; then
+		if [ -z "$items" ]; then
+			x="$partitems"
+		elif [ -z "$partitems" ]; then
+			x="$items"
+		else
+			x="$partitems
+			$items"
+		fi
+		db_subst partman-lvm/confirm ITEMS "$x"
+		db_input critical partman-lvm/confirm
+		db_go || true
+		db_get partman-lvm/confirm
+		if [ "$RET" = false ]; then
+			db_reset partman-lvm/confirm
+			return 1
+		else
+			db_reset partman-lvm/confirm
+			return 0
+		fi
+	else
+		db_input critical partman-lvm/confirm_nochanges
+		db_go || true
+		db_get partman-lvm/confirm_nochanges
+		if [ "$RET" = false ]; then
+			db_reset partman-lvm/confirm_nochanges
+			return 1
+		else
+			db_reset partman-lvm/confirm_nochanges
+			return 0
+		fi
+	fi
+}
+
+do_display() {
+	lvm_get_config
+	db_subst partman-lvm/displayall CURRENT_CONFIG "$RET"
+	db_set partman-lvm/displayall "false"
+	db_input critical partman-lvm/displayall
+	db_go
+	db_get partman-lvm/displayall
+}
+
+do_vg_create() {
+	local pvs pv output vg
+	pvs=""
+
+	# Look for free PVs
+	for pv in $(pv_list_free); do
+		pv_get_info "$pv"
+		output=$(printf "%-30s (%sMB)" "$pv" "$SIZE")
+		if [ -z "$pvs" ]; then
+			pvs="$output"
+		else
+			pvs="$pvs, $output"
+		fi
+	done
+	if [ -z "$pvs" ]; then
+		db_set partman-lvm/nopartitions "false"
+		db_input high partman-lvm/nopartitions
+		db_go
+		return
+	fi
+
+	# Prompt for VG name
+	db_set partman-lvm/vgcreate_name ""
+	db_input critical partman-lvm/vgcreate_name
+	db_go
+	[ $? -eq 30 ] && return
+	db_get partman-lvm/vgcreate_name
+	vg="$RET"
+	if [ -z "$vg" ]; then
+		db_set partman-lvm/vgcreate_nonamegiven "false"
+		db_input high partman-lvm/vgcreate_nonamegiven
+		db_go
+		return
+	fi
+
+	# Check whether the VG name is already in use
+	if vgs "$vg" > /dev/null 2>&1; then
+		db_set partman-lvm/vgcreate_nameused "false"
+		db_input high partman-lvm/vgcreate_nameused
+		db_go
+		return
+	fi
+
+	# Check whether the VG name overlaps with an existing device
+	if [ -e "/dev/$vg" ]; then
+		db_set partman-lvm/vgcreate_devnameused "false"
+		db_input high partman-lvm/vgcreate_devnameused
+		db_go
+		return
+	fi
+
+	# Choose the PVs to use
+	db_subst partman-lvm/vgcreate_parts PARTITIONS "$pvs"
+	db_set partman-lvm/vgcreate_parts "false"
+	db_input critical partman-lvm/vgcreate_parts
+	db_go
+	db_get partman-lvm/vgcreate_parts
+	if [ "$RET" = "false" ]; then
+		return
+	elif [ -z "$RET" ]; then
+		db_set partman-lvm/vgcreate_nosel "false"
+		db_input high partman-lvm/vgcreate_nosel
+		db_go
+		return
+	fi
+	pvs=$(echo "$RET" | sed -e 's/ *([^)]*) *//g')
+	pvs=$(csv_to_ssv "$pvs")
+
+	if ! vg_create "$vg" $pvs; then
+		db_subst partman-lvm/vgcreate_error VG "$vg"
+		db_set partman-lvm/vgcreate_error "false"
+		db_input high partman-lvm/vgcreate_error
+		db_go
+	fi
+}
+
+do_vg_delete() {
+	local vgs vg output
+	vgs=""
+
+	# Look for VGs with no LVs
+	for vg in $(vg_list); do
+		vg_get_info "$vg"
+		[ "$LVS" -eq 0 ] || continue
+		output=$(printf "%-30s (%sMB)" "$vg" "$SIZE")
+		if [ -z "$vgs" ]; then
+			vgs="$output"
+		else
+			vgs="$vgs, $output"
+		fi
+	done
+	if [ -z "$vgs" ]; then
+		db_set partman-lvm/vgdelete_novg "false"
+		db_input high partman-lvm/vgdelete_novg
+		db_go
+		return
+	fi
+
+	# Prompt for VG to delete
+	db_subst partman-lvm/vgdelete_names GROUPS "$vgs"
+	db_set partman-lvm/vgdelete_names "false"
+	db_input critical partman-lvm/vgdelete_names
+	db_go
+	db_get partman-lvm/vgdelete_names
+	[ "$RET" = "false" ] && return
+	vg=$(echo "$RET" | sed -e 's/[[:space:]]*(.*//')
+
+	# Confirm
+	db_subst partman-lvm/vgdelete_confirm VG $vg
+	db_set partman-lvm/vgdelete_confirm "false"
+	db_input critical partman-lvm/vgdelete_confirm
+	db_go
+	db_get partman-lvm/vgdelete_confirm
+	[ "$RET" = "true" ] || return
+
+	if ! vg_delete "$vg"; then 
+		db_set partman-lvm/vgdelete_error "false"
+		db_input high partman-lvm/vgdelete_error
+		db_go
+	fi
+}
+
+do_vg_extend() {
+	local pvs pv output vgs vg
+	vgs=""
+
+	# Get eligible PVs
+	pvs=""
+	for pv in $(pv_list_free); do
+		pv_get_info "$pv"
+		output=$(printf "%-30s (%sMB)" "$pv" "$SIZE")
+		if [ -z "$pvs" ]; then
+			pvs="$output"
+		else
+			pvs="$pvs, $output"
+		fi
+	done
+	if [ -z "$pvs" ]; then
+		db_set partman-lvm/nopartitions "false"
+		db_input high partman-lvm/nopartitions
+		db_go
+		return
+	fi
+
+	# Get VG list
+	vgs=""
+	for vg in $(vg_list); do
+		vg_get_info "$vg"
+		output=$(printf "%-30s (%sMB)" "$vg" "$SIZE")
+		if [ -z "$vgs" ]; then
+			vgs="$output"
+		else
+			vgs="$vgs, $output"
+		fi
+	done
+	if [ -z "$vgs" ]; then
+		db_set partman-lvm/vgextend_novg "false"
+		db_input high partman-lvm/vgextend_novg
+		db_go
+		return
+	fi
+
+	# Prompt for VG to extend
+	db_subst partman-lvm/vgextend_names GROUPS "$vgs"
+	db_set partman-lvm/vgextend_names "false"
+	db_input critical partman-lvm/vgextend_names
+	db_go
+	db_get partman-lvm/vgextend_names
+	[ "$RET" = "false" ] && return
+	vg=$(echo "$RET" | sed -e 's/[[:space:]]*(.*//')
+
+	# Prompt for PVs to use
+	db_subst partman-lvm/vgextend_parts PARTITIONS "$pvs"
+	db_set partman-lvm/vgextend_parts "false"
+	db_input critical partman-lvm/vgextend_parts
+	db_go
+	db_get partman-lvm/vgextend_parts
+	if [ -z "$RET" ]; then
+		db_set partman-lvm/vgextend_nosel "false"
+		db_input high partman-lvm/vgextend_nosel
+		db_go
+		return
+	elif [ "$RET" = "false" ]; then
+		return
+	fi
+	pvs=$(echo "$RET" | sed -e 's/ *([^)]*) *//g')
+	pvs=$(csv_to_ssv "$pvs")
+
+	for pv in $pvs; do
+		if ! vg_extend "$vg" "$pv"; then
+			db_subst partman-lvm/vgextend_error PARTITION $pv
+			db_subst partman-lvm/vgextend_error VG $vg
+			db_set partman-lvm/vgextend_error "false"
+			db_input high partman-lvm/vgextend_error
+			db_go
+			return
+		fi
+	done
+}
+
+do_vg_reduce() {
+	local vgs vg output pvs pv
+
+	# Check for VGs with more than one pv
+	vgs=""
+	db_metaget partman-lvm/text/pvs description
+	for vg in $(vg_list); do
+		vg_get_info "$vg"
+		[ "$PVS" -gt 1 ] || continue
+		output=$(printf "%-30s (%sMB - %s)" "$vg" "$FREE" "$PVS $RET")
+		if [ -z "$vgs" ]; then
+			vgs="$output"
+		else
+			vgs="$vgs, $output"
+		fi
+	done
+	if [ -z "$vgs" ]; then
+		db_set partman-lvm/vgreduce_novg "false"
+		db_input high partman-lvm/vgreduce_novg
+		db_go
+		return
+	fi
+
+	# Prompt for VG to reduce
+	db_subst partman-lvm/vgreduce_names GROUPS "$vgs"
+	db_set partman-lvm/vgreduce_names "false"
+	db_input critical partman-lvm/vgreduce_names
+	db_go
+	db_get partman-lvm/vgreduce_names
+	[ "$RET" = "false" ] && return
+	vg=$(echo "$RET" | sed -e 's/[[:space:]]*(.*//')
+
+	# Prompt for PV to remove
+	pvs=""
+	for pv in $(vg_list_pvs "$vg"); do
+		pv_get_info "$pv"
+		output=$(printf "%-30s (%sMB)" "$pv" "$SIZE")
+		if [ -z "$pvs" ]; then
+			pvs="$output"
+		else
+			pvs="$pvs, $output"
+		fi
+	done
+
+	# Prompt for PVs to use
+	db_subst partman-lvm/vgreduce_parts PARTITIONS "$pvs"
+	db_set partman-lvm/vgreduce_parts "false"
+	db_input critical partman-lvm/vgreduce_parts
+	db_go
+	db_get partman-lvm/vgreduce_parts
+	if [ -z "$RET" ]; then
+		db_set partman-lvm/vgreduce_nosel "false"
+		db_input high partman-lvm/vgreduce_nosel
+		db_go
+		return
+	elif [ "$RET" = "false" ]; then
+		return
+	fi
+	pvs=$(echo "$RET" | sed -e 's/ *([^)]*) *//g')
+	pvs=$(csv_to_ssv "$pvs")
+
+	# Check if all PVs were selected and delete in that case
+	count=$(echo -n "$pvs" | wc -w)
+	vg_get_info "$vg"
+	if [ "$count" -eq "$PVS" ]; then
+		if ! vg_delete "$vg"; then 
+			db_set partman-lvm/vgdelete_error "false"
+			db_input high partman-lvm/vgdelete_error
+			db_go
+		fi
+		return
+	fi
+
+	# Go for it
+	for pv in $pvs; do
+		if ! vg_reduce "$vg" "$pv"; then
+			db_subst partman-lvm/vgreduce_error VG "$vg"
+			db_subst partman-lvm/vgreduce_error PARTITION "$pv"
+			db_set partman-lvm/vgreduce_error "false"
+			db_input high partman-lvm/vgreduce_error
+			db_go
+			return
+		fi
+	done
+}
+
+do_lv_create() {
+	local vgs vg output lv size max_size
+
+	# Find eligible VGs
+	vgs=""
+	for vg in $(vg_list_free); do
+		vg_get_info "$vg"
+		output=$(printf "%-30s (%sMB)" "$vg" "$FREE")
+		if [ -z "$vgs" ]; then
+			vgs="$output"
+		else
+			vgs="$vgs, $output"
+		fi
+	done
+
+	if [ -z "$vgs" ]; then
+		db_set partman-lvm/lvcreate_nofreevg "false"
+		db_input high partman-lvm/lvcreate_nofreevg
+		db_go
+		return
+	fi
+
+	# Prompt for VG to use
+	db_subst partman-lvm/lvcreate_vgnames GROUPS "$vgs"
+	db_set partman-lvm/lvcreate_vgnames "false"
+	db_input critical partman-lvm/lvcreate_vgnames
+	db_go
+	db_get partman-lvm/lvcreate_vgnames
+	[ "$RET" = "false" ] && return
+	vg=$(echo "$RET" | sed -e 's/[[:space:]]*(.*//')
+
+	# Prompt for name to give the new lv
+	db_set partman-lvm/lvcreate_name ""
+	db_input critical partman-lvm/lvcreate_name
+	db_go
+	[ $? -eq 30 ] && return
+	db_get partman-lvm/lvcreate_name
+	if [ -z "$RET" ]; then
+		db_set partman-lvm/lvcreate_nonamegiven "false"
+		db_input high partman-lvm/lvcreate_nonamegiven
+		db_go
+		return
+	fi
+	lv="$RET"
+
+	# Make sure the name isn't already in use
+	if lvs "/dev/$vg/$lv" > /dev/null 2>&1; then
+		db_subst partman-lvm/lvcreate_exists LV "$lv"
+		db_subst partman-lvm/lvcreate_exists VG $vg
+		db_set partman-lvm/lvcreate_exists "false"
+		db_input high partman-lvm/lvcreate_exists
+		db_go
+		return
+	fi
+
+	# Prompt for lv size
+	vg_get_info "$vg"
+	max_size="${FREE}M"
+	db_set partman-lvm/lvcreate_size "${max_size}B"
+	db_fset partman-lvm/lvcreate_size seen false
+	db_input critical partman-lvm/lvcreate_size
+	db_go
+	[ $? -eq 30 ] && return
+	db_get partman-lvm/lvcreate_size
+	[ -z "$RET" ] && return
+	size=$(lvm_size_from_human "$RET")
+
+	# If the maximum free space should be used for the new LV, use the
+	# number of physical extents (PEs) because the size given by LVM
+	# might not be accurate, resulting in an error because the VG is
+	# not big enough (see #250594).
+	if [ "$size" = "$max_size" ]; then
+		size="full"
+	fi
+
+	if ! lv_create "$vg" "$lv" "$size"; then
+		db_subst partman-lvm/lvcreate_error VG $vg
+		db_subst partman-lvm/lvcreate_error LV $lv
+		db_subst partman-lvm/lvcreate_error SIZE $RET
+		db_set partman-lvm/lvcreate_error "false"
+		db_input high partman-lvm/lvcreate_error
+		db_go
+		return
+	fi
+}
+
+do_lv_delete() {
+	local lvs line output lv vg
+
+	lvs=""
+	db_metaget partman-lvm/text/lvdelete_invg description
+	for line in $(lv_list); do
+		lv=$(echo "$line" | cut -d':' -f1)
+		vg=$(echo "$line" | cut -d':' -f2)
+		lv_get_info "$vg" "$lv"
+		output=$(printf "%-30s (%sMB - %s %s)" "$lv" "$SIZE" "$RET" "$vg")
+		if [ -z "$lvs" ]; then
+			lvs="$output"
+		else
+			lvs="$lvs, $output"
+		fi
+	done
+
+	if [ -z "$lvs" ]; then
+		db_set partman-lvm/lvdelete_nolv "false"
+		db_input high partman-lvm/lvdelete_nolv
+		db_go
+		return
+	fi
+
+	db_subst partman-lvm/lvdelete_lvnames LVS "$lvs"
+	db_set partman-lvm/lvdelete_lvnames "false"
+	db_input critical partman-lvm/lvdelete_lvnames
+	db_go
+	db_get partman-lvm/lvdelete_lvnames
+	[ "$RET" = "false" ] && return
+	lv=$(echo "$RET" | cut -d' ' -f1)
+	vg=$(echo "$RET" | sed -e 's/.*(\(.*\))/\1/')
+	vg=${vg##* }
+
+	if ! lv_delete "$vg" "$lv"; then
+		db_subst partman-lvm/lvdelete_error VG $vg
+		db_subst partman-lvm/lvdelete_error LV $lv
+		db_set partman-lvm/lvdelete_error "false"
+		db_input high partman-lvm/lvdelete_error
+		db_go
+		return
+	fi
+}
+
+#####################################
+#
+# Main stuff
+#
+#####################################
+
+do_initial_setup
+
+# Prepare menu choice translations
+db_metaget partman-lvm/menu/display description
+menu_display="$RET"
+db_metaget partman-lvm/menu/createvg description
+menu_createvg="$RET"
+db_metaget partman-lvm/menu/deletevg description
+menu_deletevg="$RET"
+db_metaget partman-lvm/menu/extendvg description
+menu_extendvg="$RET"
+db_metaget partman-lvm/menu/reducevg description
+menu_reducevg="$RET"
+db_metaget partman-lvm/menu/createlv description
+menu_createlv="$RET"
+db_metaget partman-lvm/menu/deletelv description
+menu_deletelv="$RET"
+
+while [ 1 ]; do
+	# Get some statistics
+	used_pvs=$(pvs --noheadings | wc -l)
+	free_pvs=$(pv_list_free | wc -l)
+	vgs=$(vg_list | wc -l)
+	lvs=$(lv_list | wc -l)
+
+	# Check choices to include
+	choices="$menu_display"
+	# Create VG
+	[ $free_pvs -gt 0 ] && choices="${choices}, $menu_createvg"
+	# Extend VG
+	[ $free_pvs -gt 0 -a $vgs -gt 0 ] && choices="${choices}, $menu_extendvg"
+	# Reduce VG, Delete VG, Create LV
+	if [ $vgs -gt 0 ]; then
+		# First check, then add so that the order is constant
+		do_reducevg=""
+		do_deletevg=""
+		do_createlv=""
+		# Check VG
+		for vg in $(vg_list); do
+			vg_get_info "$vg"
+			if [ $PVS -gt 1 ]; then
+				do_reducevg="true"
+			fi
+			if [ $LVS -eq 0 ]; then
+				do_deletevg="true"
+			fi
+			if [ $FREEPE -gt 0 ]; then
+				do_createlv="true"
+			fi
+		done
+		# Checks done, add detected options
+		[ "$do_reducevg" = "true" ] && choices="${choices}, $menu_reducevg"
+		[ "$do_deletevg" = "true" ] && choices="${choices}, $menu_deletevg"
+		[ "$do_createlv" = "true" ] && choices="${choices}, $menu_createlv"
+	fi
+	# Delete LV
+	[ $lvs -gt 0 ] && choices="${choices}, $menu_deletelv"
+
+	# Setup mainmenu template
+	db_subst partman-lvm/mainmenu CHOICES "$choices"
+	db_subst partman-lvm/mainmenu FREE_PVS "$free_pvs"
+	db_subst partman-lvm/mainmenu USED_PVS "$used_pvs"
+	db_subst partman-lvm/mainmenu VGS "$vgs"
+	db_subst partman-lvm/mainmenu LVS "$lvs"
+	db_set partman-lvm/mainmenu "false"
+	db_input critical partman-lvm/mainmenu
+	db_go
+	db_get partman-lvm/mainmenu
+
+	option=$(echo "$RET" | sed -e 's/^\([[:alpha:]]*\) \([[:alpha:]]*\).*/\1\2/')
+	case "$option" in
+	Display*)
+		do_display
+		;;
+	Createvolume)
+		do_vg_create
+		;;
+	Deletevolume)
+		do_vg_delete
+		;;
+	Extendvolume)
+		do_vg_extend
+		;;
+	Reducevolume)
+		do_vg_reduce
+		;;
+	Createlogical)
+		do_lv_create
+		;;
+	Deletelogical)
+		do_lv_delete
+		;;
+	*)
+		break
+		;;
+	esac
 done
 
-lvmcfg partman
+# install lvm tools in /target if needed
+if [ $(lv_list | wc -l) -gt 0 ]; then
+	apt-install lvm2
+fi
 
 stop_parted_server
 
 restart_partman
+
+exit 0

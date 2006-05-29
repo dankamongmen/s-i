@@ -1,8 +1,10 @@
 #!/bin/sh
 
-[ -x /bin/lvmcfg ] || exit 0
-
 . /usr/share/debconf/confmodule
+. /lib/partman/lvm_tools.sh
+
+# Only show menu option if there is at least one LVM PV
+[ $(pv_list | wc -l) -gt 0 ] || exit 0
 
 db_metaget partman-lvm/text/configure_lvm description
 

@@ -28,7 +28,7 @@ fi
 
 # Check if the device already contains any physical volumes
 realdev=$(mapdevfs "$(cat $dev/device)")
-if PV_list | grep -q "$realdev" ; then
+if pv_get_info "$realdev"; then
 	bail_out pv_on_device
 fi
 
@@ -111,15 +111,15 @@ while true; do
 	db_get partman-auto-lvm/new_vg_name
 	VG_name="$RET"
 
-	# Check if the volume group name is not in use
-	if [ -z "$(VG_list | grep " $VG_name${TAB}")" ]; then
+	# Check that the volume group name is not in use
+	if ! vg_get_info "$VG_name"; then
 		break
 	fi
 	noninteractive="bail_out vg_exists"
 	db_register partman-auto-lvm/new_vg_name_exists partman-auto-lvm/new_vg_name
 done
 
-if VG_create "$VG_name" $pv_devices; then
+if vg_create "$VG_name" $pv_devices; then
 	perform_recipe_by_lvm $VG_name $recipe
 else
 	bail_out vg_create_error
