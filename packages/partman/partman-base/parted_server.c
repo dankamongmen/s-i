@@ -2091,22 +2091,19 @@ write_pid_file()
         if ((fd = fopen(pidfile_name, "a+")) == NULL)
                 return -1;
 
-        /*
-        if (!feof(fd)) {
-                status = fscanf(fd, "%d", &oldpid);
-                if (status != 0) {
-                        // If kill(oldpid, 0) == 0 the process is still alive
-                        // so we abort
-                        if (kill(oldpid, 0) == 0) {
-                                fprintf(stderr, "Not starting: process %d still exists\n", oldpid);
-                                fclose(fd);
-                                exit(250);
-                        }
-                }
-                // Truncate the pid file and continue
-                freopen(pidfile_name, "w", fd);
-        }
-        */
+        status = fscanf(fd, "%d", &oldpid);
+        if (status != 0 && status != EOF) {
+        	// If kill(oldpid, 0) == 0 the process is still alive
+		// so we abort
+		if (kill(oldpid, 0) == 0) {
+			fprintf(stderr, "Not starting: process %d still exists\n", oldpid);
+			fclose(fd);
+			exit(250);
+		}
+	}
+	
+	// Truncate the pid file and continue
+	freopen(pidfile_name, "w", fd);
         
         fprintf(fd, "%d", (int)(getpid()));
         fclose(fd);
