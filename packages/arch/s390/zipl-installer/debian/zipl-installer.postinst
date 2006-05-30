@@ -6,8 +6,13 @@ findfs () {
 	mount | grep "on /target${1%/} " | cut -d' ' -f1
 }
 
-ROOTDEV="$(findfs /)"
-ROOT="$(mapdevfs "$ROOTDEV")"
+ROOT_PLAIN="$(findfs /)"
+name="${ROOT_PLAIN#/dev/}"
+disk="${name%%[0-9]*}"
+part="${name#$disk}"
+devpath=/sys/block/$disk/$(readlink /sys/block/$disk/device) 
+dev=${devpath##*/}
+ROOT=/dev/disk/by-path/ccw-$dev-part$part
 
 db_get debian-installer/kernel/commandline
 PARAMETER="$RET root=$ROOT"
@@ -27,11 +32,13 @@ timeout = 10
 [debian]
 target = /boot
 image = /boot/vmlinuz
+ramdisk = /boot/initrd.img
 parameters = $PARAMETER
 
 [old]
 target = /boot
 image = /boot/vmlinuz.old
+ramdisk = /boot/initrd.img.old
 parameters = $PARAMETER
 optional = 1
 EOF
