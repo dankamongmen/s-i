@@ -2091,6 +2091,7 @@ write_pid_file()
         if ((fd = fopen(pidfile_name, "a+")) == NULL)
                 return -1;
 
+        /*
         if (!feof(fd)) {
                 status = fscanf(fd, "%d", &oldpid);
                 if (status != 0) {
@@ -2105,6 +2106,7 @@ write_pid_file()
                 // Truncate the pid file and continue
                 freopen(pidfile_name, "w", fd);
         }
+        */
         
         fprintf(fd, "%d", (int)(getpid()));
         fclose(fd);
