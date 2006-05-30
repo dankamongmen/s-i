@@ -660,6 +660,18 @@ humandev () {
 	    db_metaget partman/text/loopback description
 	    printf "$RET" $n
 	    ;;
+	# DASD partition, classic
+	/dev/dasd*[0-9]*)
+	    part="${1#/dev/}"
+	    disk="${part%%[0-9]*}"
+	    part="${part#$disk}"
+	    humandev_dasd_partition /sys/block/$disk/$(readlink /sys/block/$disk/device) $part
+	    ;;
+	# DASD disk, classic
+	/dev/dasd*)
+	    disk="${1#/dev/}"
+	    humandev_dasd_disk /sys/block/$disk/$(readlink /sys/block/$disk/device)
+	    ;;
 	*)
 	    # Check if it's an LVM1 device
 	    vg=`echo "$1" | sed -e 's,/dev/\([^/]\+\).*,\1,'`
@@ -672,6 +684,20 @@ humandev () {
 	    fi
 	    ;;
     esac
+}
+
+humandev_dasd_disk () {
+    dev=${1##*/}
+    discipline=$(cat $1/discipline)
+    db_metaget partman/text/dasd_disk description
+    printf "$RET" "$dev" "$discipline"
+}
+
+humandev_dasd_partition () {
+    dev=${1##*/}
+    discipline=$(cat $1/discipline)
+    db_metaget partman/text/dasd_partition description
+    printf "$RET" "$dev" "$discipline" "$part"
 }
 
 device_name () {
@@ -832,7 +858,7 @@ default_disk_label () {
 		    echo UNKNOWN;;
 	    esac;;
 	s390)
-	    echo UNSUPPORTED;; # ibm is unsupported by parted
+	    echo msdos;;
 	sparc)
 	    echo sun;;
 	*)
