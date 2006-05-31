@@ -9,15 +9,20 @@ clean:
 	dh_testdir
 	dh_clean
 
+install:
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+
+	install -D debian/s390-sysconfig-writer.prebaseconfig debian/s390-sysconfig-writer/usr/lib/prebaseconfig.d/50sysconfig-writer
+
 # Build architecture-independent files here.
 binary-indep:
 
 # Build architecture-dependent files here.
-binary-arch:
+binary-arch: install
 	dh_testdir
 	dh_testroot
-	dh_clean -k
-	dh_install
 	dh_installdirs
 	dh_installdeb 
 	dh_fixperms
