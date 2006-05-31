@@ -9,9 +9,9 @@
 ###############################################################################
 
 # Convert common terms for disk sizes into something LVM understands.
-#  e.g. "200 Gb" -> "200G"
+#  e.g. "200 gb" -> "200G"
 lvm_size_from_human() {
-	echo "$1" | sed -e 's/[:space:]//g;s/\([kmgtKMGT]\)[bB]/\1/'
+	echo "$1" | tr "kmgt" "KMGT" | sed -e 's/[:space:]//g;s/\([KMGT]\)[bB]/\1/'
 }
 
 # Convert LVM disk sizes into something human readable.
