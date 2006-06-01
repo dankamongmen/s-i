@@ -2,8 +2,27 @@
 
 [ -x /bin/mdcfg ] || exit 0
 
-. /usr/share/debconf/confmodule
+. /lib/partman/definitions.sh
 
-db_metaget partman-md/text/configure_md description
+use_raid=no
 
-printf "md\t%s\n" "$RET"
+# Make sure at least one RAID partition is setup
+for dev in $DEVICES/*; do
+	[ -d "$dev" ] || continue
+	cd $dev
+	open_dialog PARTITIONS
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+		if [ -f $id/method ]; then
+			method=$(cat $id/method)
+			if [ $method = "raid" ]; then
+				use_raid=yes
+			fi
+		fi
+	done
+	close_dialog
+done
+
+if [ "$use_raid" = yes ]; then
+	db_metaget partman-md/text/configure_md description
+	printf "md\t%s\n" "$RET"
+fi
