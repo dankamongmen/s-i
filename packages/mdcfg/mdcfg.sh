@@ -100,16 +100,17 @@ get_partitions() {
 	NUM_PART=0
 	for i in ${RAW_PARTITIONS}; do
 		DEV=`echo ${i}|sed -e "s/\/dev\///"`
-		MAPPEDDEV=`mapdevfs ${i} | sed -e "s/\/dev\///"`
+		REALDEV=$(mapdevfs "$i")
+		MAPPEDDEV=$(echo "$REALDEV" | sed -e "s/\/dev\///")
 
 		if grep -q "\(${DEV}\|${MAPPEDDEV}\)" /proc/mdstat; then
 			continue
 		fi
 
 		if [ -z "${PARTITIONS}" ] ; then
-			PARTITIONS="${i}"
+			PARTITIONS="$REALDEV"
 		else
-			PARTITIONS="${PARTITIONS}, ${i}"
+			PARTITIONS="${PARTITIONS}, $REALDEV"
 		fi
 		NUM_PART=$(($NUM_PART + 1))
 	done
