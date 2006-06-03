@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 37253 -->
+<!-- original version: 37512 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -83,8 +83,8 @@ tutti i metodi d'installazione e consente la preconfigurazione di parecchie
 domande ma richiede la preparazione più lunga. Le preconfigurazioni file e
 network si possono usare con diversi metodi d'installazione, purtroppo con
 questi due tipi di preconfigurazione non si possono preconfigurare le
-primissime domande perché il file di preconfigurazione viene letto solo dopo
-che queste domande sono state poste.
+primissime domande perché il file di preconfigurazione viene letto solo
+dopo che queste domande sono state poste.
 
 </para><para>
 
@@ -220,7 +220,7 @@ preconfigurazione per impostare il RAID.
 <!-- Joeyh feels this is too technical, so leave it out for now
   <sect2 id="preseed-debconf">
   <title>Debconf basics</title>
-  <title>Nozioni di base su Debconf</title>
+  <title>Nozioni di base su debconf</title>
 <para>
 
 Preseeding makes use of the <classname>debconf</classname> framework. This
@@ -232,30 +232,48 @@ templates for different types of questions. The actual questions are
 <quote>generated</quote> from templates at runtime;  multiple questions can
 use the same template.
 
+La preconfigurazione usa l'infrastruttura <classname>debconf</classname>.
+Questa infrastruttura è il meccanismo privilegiato in Debian per interagire
+con l'utente durante la configurazione dei pacchetti e costituisce il cuore
+del &d-i;. Nell'infrastruttura <classname>debconf</classname> le domande o
+dialoghi sono basate su <firstterm>template</firstterm>. Ci sono template
+diversi per diversi tipi di domande. Le domande sono generate a partire dai
+template durante l'esecuzione; più domande possono condividere lo stesso
+template.
+
 </para><para>
 
 The following types of templates are relevant for preseeding.
+
+Per la preconfigurazione sono usati i seguenti tipi di template.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
   string: allows the user to type any value
+  string: permette all'utente di inserire qualsiasi valore
 </para></listitem>
 <listitem><para>
   password: similar to string but the value typed is not displayed
+  password: simile a string ma il valore inserito non è visualizzato
 </para></listitem>
 <listitem><para>
   boolean: for yes/no or true/false type of questions
+  boolean: per le domande sì/no oppure vero/falso
 </para></listitem>
 <listitem><para>
   select: allows the user to select one option from a list
+  select: permette all'utente si scegliere un valore da un elenco
 </para></listitem>
 <listitem><para>
   multiselect: allows the user to select zero, one or more options from a list
+  multiselect: permette all'utente di scegliere zero, uno o più valori da un
+  elenco
 </para></listitem>
 <listitem><para>
   note: used to display a message
+  note: usato per visualizzare un messaggio
 </para></listitem>
 </itemizedlist>
 
@@ -267,6 +285,12 @@ text and all translations. It can also contain a default value for the
 template. The fixed text can include variables that will be replaced at
 runtime.
 
+I template del &d-i; sono memorizzati nel file (dal formato comprensibile)
+<filename>/var/cache/debconf/templates.dat</filename>. Questo file contiene
+tutte i testi fissi e tutte le traduzioni, può anche contenere un valore
+predefinito per il template. I testi fissi possono contenere delle variabili
+che poi sono sostituite durante l'esecuzione.
+
 </para><para>
 
 Another readable file <filename>/var/cache/debconf/questions.dat</filename>
@@ -274,6 +298,14 @@ is used to store the values for variables and the answers given to questions.
 A question always refers to the template used to ask it. For obvious
 security reasons the values for questions of type <quote>password</quote>
 are stored in a separate, non-readable file in the same directory.
+
+Un altro file (dal formato comprensibile) 
+<filename>/var/cache/debconf/questions.dat</filename> è usato per
+memorizzare i valori delle variabili e delle risposte date alle domande.
+Tutte le domande hanno un riferimento al template usato per presentarle
+all'utente. Per ovvi motivi di scurezza i valori delle domande di tipo
+<quote>password</quote> sono memorizzati in un altro file (non comprensibile)
+nella stessa directory.
 
 </para>
   </sect2>
@@ -367,7 +399,7 @@ Ovviamente le prime cose da fare sono creare un file di preconfigurazione e
 metterlo nella posizione da cui lo si vuole usare. La creazione del file
 di preconfigurazione è trattata in seguito, invece lo spostamento del file
 è molto semplice per la preconfigurazione network o quando si vuole leggere
-il file da un dischetto o da una penna USB. Invece se si vuole mettere il
+il file da un dischetto o da una chiavetta USB. Invece se si vuole mettere il
 file su un CD o DVD è necessario masterizzare una nuova immagine ISO. Come
 preparare il file di preconfigurazione per initrd è fuori dagli scopi di
 questo documento, si consulti la documentazione del &d-i; per gli
@@ -474,7 +506,7 @@ Boot parameters to specify:
   toplevel directory of the USB stick):
 -->
 - con installazione da un supporto USB (mettere il file di preconfigurazione
-  nella directory principale della penna USB):
+  nella directory principale della chiavetta USB):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 </screen></informalexample>
@@ -603,17 +635,17 @@ variabili che sono mostrate negli esempi.
 </para><para>
 
 <!--
-A <quote>&ndash;&ndash;</quote> in the boot options has special meaning.
+A <quote>- -</quote> in the boot options has special meaning.
 Kernel parameters that appear after it will be copied into the installed
 bootloader configuration (if supported by the installer for the
-bootloader). Note that the <quote>&ndash;&ndash;</quote> may already be
+bootloader). Note that the <quote>- -</quote> may already be
 present in the default boot parameters.
 -->
 
-L'uso di <quote>&ndash;&ndash;</quote> nelle opzioni d'avvio ha un significato
+L'uso di <quote>--</quote> nelle opzioni d'avvio ha un significato
 speciale, i parametri del kernel che lo seguono sono copiati direttamente
 nella configuarazione del boot loader nel sistema installato (se il boot
-loader è supportato dall'installatore). Notare che <quote>&ndash;&ndash;</quote>
+loader è supportato dall'installatore). Notare che <quote>--</quote>
 potrebbe già essere presente nei parametri di avvio predefiniti.
 
 </para>
@@ -680,12 +712,12 @@ del file di preconfigurazione è:
 
 <!--
 <informalexample><screen>
-&lt;owner&gt; &lt;queston name&gt; &lt;question type&gt; &lt;value&gt; 
+&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt; 
 </screen></informalexample>
 -->
 
 <informalexample><screen>
-&lt;owner&gt; &lt;nome domanda&gt; &lt;tipo domanda&gt; &lt;valore&gt; 
+&lt;detentore&gt; &lt;nome domanda&gt; &lt;tipo domanda&gt; &lt;valore&gt; 
 </screen></informalexample>
 
 </para><para>
@@ -786,7 +818,6 @@ non essere preconfigurate; il file d'esempio è decisamente un punto di
 partenza migliore per la maggior parte degli utenti.
 
 </para>
-
 <note><para>
 
 <!--
@@ -905,8 +936,8 @@ To specify the locale as a boot parameter, use
 <userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>.
 -->
 
-Il locale può essere specificare sia la lingua che il paese. Per specificare
-il locale come parametro d'avvio utilizzare
+Con <quote>locale</quote> si possono specificare la lingua e il paese. Per
+specificare <quote>locale</quote> fra i parametri di avvio utilizzare
 <userinput>debian-installer/locale=<replaceable>it_IT</replaceable></userinput>.
 
 <informalexample role="example"><screen>
@@ -959,7 +990,6 @@ Per saltare la configurazione della tastiera si deve preconfigurare
 tastiera del kernel rimane attiva.
 
 </para>
-
 <note><para>
 
 <!--
@@ -989,10 +1019,10 @@ files from the network, you can pass network config parameters by using
 kernel boot parameters.
 -->
 
-Naturalmente, la preconfigurazione non funzionerà se si sta caricando il
-file di preconfigurazione dalla rete! Funzionerà se si sta avviando da CD
-o da penna USB. È anche possibile passare in ingresso parametri di
-configurazione di rete sui parametri del kernel, se si stanno caricando
+Naturalmente, la preconfigurazione non funziona se si sta caricando il
+file di preconfigurazione dalla rete! Invece funziona se si sta avviando
+da CD o da chiavetta USB. È anche possibile passare i parametri di
+configurazione della rete sui parametri del kernel, se si stanno caricando
 file di preconfigurazione dalla rete.
 
 </para><para>
@@ -1019,13 +1049,14 @@ caricare il file di preconfigurazione dalla rete usando il parametro d'avvio
 d-i netcfg/choose_interface select auto
 <!--
 # To pick a particular interface instead:
---># Oppure scegliere un'interfaccia ben precisa:
+-->
+# Oppure scegliere un'interfaccia ben precisa:
 #d-i netcfg/choose_interface select eth1
 <!--
 # If you have a slow dhcp server and the installer times out waiting for
 # it, this might be useful.
 -->
-# Se si ha un server dhcp lento e l'installatore andrà in timeout in attesa
+# Se si ha un server dhcp lento e l'installatore va in timeout in attesa
 # di esso, questo potrebbe essere utile.
 #d-i netcfg/dhcp_timeout string 60
 <!--
@@ -1061,20 +1092,20 @@ d-i netcfg/choose_interface select auto
 # values set here. However, setting the values still prevents the questions
 # from being shown, even if values come from dhcp.
 -->
-# Si noti che gli eventuali nomi di host e dominio assegnati da dhcp hanno la
-# precedenza sui valori qui impostati. Naturalmente, l'impostazione dei valori
-# previene ancora che le domande siano visualizzate anche se i valori arrivano
-# da dhcp.
+# Si noti che gli eventuali nomi di host e dominio assegnati da dhcp hanno
+# la precedenza sui valori qui impostati. Naturalmente, l'impostazione dei
+# valori previene ancora che le domande siano visualizzate anche se i
+# valori arrivano da dhcp.
 d-i netcfg/get_hostname string unassigned-hostname
 d-i netcfg/get_domain string unassigned-domain
 <!--
 # Disable that annoying WEP key dialog.
 -->
-# Disabilita quella noiosa finestra di dialogo della chiave WEP.
+# Disabilita la noiosa finestra di dialogo della chiave WEP.
 d-i netcfg/wireless_wep string
 <!--
 # The wacky dhcp hostname that some ISPs use as a password of sorts.
---># Lo stupido nome dell'host da dhcp che alcuni ISP usano come una sorta
+--># Lo stupido nome host dhcp che alcuni ISP usano come una sorta
 # di password.
 #d-i netcfg/dhcp_hostname string radish
 </screen></informalexample>
@@ -1144,7 +1175,7 @@ d-i mirror/http/proxy string
 #d-i mirror/suite string testing
 <!--
 # Suite to use for loading installer components (optional).
---># Versione dei componenti dell'installatore da caricare (opzionale).
+--># Versione dei componenti dell'installatore da caricare (facoltativo).
 #d-i mirror/udeb/suite string testing
 </screen></informalexample>
   </sect2>
@@ -1199,13 +1230,13 @@ preconfigurazione.
 # soltanto quello spazio. Nota: da preconfigurare con un valore
 # localizzato (cioè tradotto).
 #d-i partman-auto/init_automatically_partition \
-#    select Usa lo spazio libero continuo più grande
+#    select Usare il più ampio spazio contiguo disponibile.
 <!--
 # Alternatively, you can specify a disk to partition. The device name can
 # be given in either devfs or traditional non-devfs format.
 # For example, to use the first disk devfs knows of:
 -->
-# In alternativa, è possibile specificare un disco da partizionare. Il nome
+# In alternativa è possibile specificare un disco da partizionare. Il nome
 # del dispositivo può essere dato sia nel formato devfs che nel tradizionale
 # formato non-devfs.
 # Per esempio, per usare il primo disco riconosciuto da devfs:
@@ -1214,28 +1245,28 @@ d-i partman-auto/disk string /dev/discs/disc0/disc
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.
 -->
-# È possibile scegliere da una qualsiasi delle ricette di partizionamento
+# È possibile scegliere una qualsiasi delle ricette di partizionamento
 # predefinite. Nota: da preconfigurare con un valore localizzato (cioè
 # tradotto).
 d-i partman-auto/choose_recipe \
 <!--
        select All files in one partition (recommended for new users)
--->       select Tutti i file in una partizione (raccomandata ai nuovi utenti)
+-->       select Tutti i file in una partizione (raccomandata per nuovi utenti)
 #d-i partman-auto/choose_recipe \
 <!--
 #       select Separate /home partition
--->#       select Una partizione separata per /home
+-->#       select Partizione /home separata
 #d-i partman-auto/choose_recipe \
 <!--
 #       select Separate /home, /usr, /var, and /tmp partitions
--->#       select Partizioni separate per /home, /usr, /var e /tmp
+-->#       select Partizioni /home, /usr, /var e /tmp separate
 <!--
 # Or provide a recipe of your own...
 # The recipe format is documented in the file devel/partman-auto-recipe.txt.
 # If you have a way to get a recipe file into the d-i environment, you can
 # just point at it.
 -->
-# Oppure fornite una ricetta personalizzata...
+# Oppure creare una ricetta personalizzata...
 # Il formato della ricetta è documentato nel file devel/partman-auto-recipe.txt.
 # Se si ha modo di importare un file ricetta dentro l'ambiente
 # dell'installatore, è possibile semplicemente puntare a questo.
@@ -1272,7 +1303,7 @@ d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
 <!--
        select Finish partitioning and write changes to disk
--->       select Termina il partizionamento e scrivi le modifiche sul disco
+-->       select Terminare il partizionamento e scrivere i cambiamenti sul disco
 d-i partman/confirm boolean true
 </screen></informalexample>
   </sect2>
@@ -1283,7 +1314,7 @@ d-i partman/confirm boolean true
 <informalexample role="example"><screen>
 <!--
 # Controls whether or not the hardware clock is set to UTC.
---># Controlla se l'orologio hardware è impostato o meno su UTC.
+--># Controlla se l'orologio hardware deve essere impostato o meno su UTC.
 d-i clock-setup/utc boolean true
 <!--
 # You may set this to any valid setting for $TZ; see the contents of
@@ -1331,7 +1362,7 @@ aggiungere altri repository (anche locali).
 -->
 # Altri repository, sono disponibili local[0-9]
 #d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/repository string \
+#d-i apt-setup/local0/source string \
 #       deb http://local.server/debian stable main
 <!--
 # URL to the public key of the localrepository
@@ -1379,12 +1410,12 @@ poiché un hash MD5 consente attacchi di tipo brute force.
 # Skip creation of a root account (normal user account will be able to
 # use sudo).
 --># Saltare la creazione dell'account di root (l'account per l'utente
-normale potrà usare sudo).
+# normale potrà usare sudo).
 #d-i passwd/root-login boolean false
 <!--
 # Alternatively, to skip creation of a normal user account.
 --># In alternativa, è possibile saltare la creazione dell'account per
-l'utente normale.
+# l'utente normale.
 #d-i passwd/make-user boolean false
 <!--
 # Root password, either in clear text
@@ -1466,7 +1497,7 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 <informalexample role="example"><screen>
 <!--
 # Select the initramfs generator used to generate the initrd for 2.6 kernels.
---># Seleziona il programma per la creazione dell'initrd per i kernel 2.6.
+--># Selezionare il programma per la creazione dell'initrd per i kernel 2.6.
 #d-i base-installer/kernel/linux/initramfs-generators string yaird
 </screen></informalexample>
   </sect2>
@@ -1478,8 +1509,8 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 <!--
 # Grub is the default boot loader (for x86). If you want lilo installed
 # instead, uncomment this:
---># Grub è il boot loader predefinito (per x86). Se si desidera,
-# invece, che sia installato lilo, scommentare questa:
+--># Grub è il boot loader predefinito (per x86). Invece, se si desidera
+# che sia installato lilo, scommentare questa riga:
 #d-i grub-installer/skip boolean true
 <!--
 # This is fairly safe to set, it makes grub install automatically to the MBR
@@ -1627,9 +1658,7 @@ possibile.
 
 <informalexample role="example"><screen>
 exim4-config exim4/dc_eximconfig_configtype \
-<!--
        select no configuration at this time
--->       non selezionare alcuna configurazione in questo momento
 exim4-config exim4/no_config boolean true
 exim4-config exim4/no_config boolean true
 exim4-config exim4/dc_postmaster string
@@ -1734,17 +1763,18 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 # here's a way to run any shell command you'd like inside the installer,
 # automatically.
 --># La preconfigurazione del d-i è intrinsecamente non sicura. Niente
-# nell'installatore verifica i tentativi di buffer overflow o altri
-# exploit dei valori di un file di preconfigurazione come questo. Usare
-# solo file di preconfigurazione da locazioni fidate! Per riuscire in ciò, e
-# poiché è generalmente utile, ecco un modo per eseguire eventuali comandi
-# da shell che si desiderano dentro l'installatore, automaticamente.
+# nell'installatore verifica i tentativi di buffer overflow o di altri
+# exploit attraverso i valori presenti in un file di preconfigurazione
+# come questo. Usare solo file di preconfigurazione provenienti da fonti
+# fidate! Per comprendere il rischio, e poiché è generalmente utile,
+# ecco un modo per eseguire automaticamente qualsiasi comando della shell
+# all'interno dell'installatore.
 <!--
 # This first command is run as early as possible, just after
 # preseeding is read.
 -->
-# Questo primo comando è eseguito prima possibile, appena dopo la lettura
-# della preconfigurazione.
+# Questo è primo comando, è eseguito il prima possibile, appena dopo la
+# lettura della preconfigurazione.
 #d-i preseed/early_command string anna-install some-udeb
 <!--
 # This command is run just before the install finishes, but when there is
@@ -1752,11 +1782,11 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 # directly, or use the apt-install and in-target commands to easily install
 # packages and run commands in the target system.
 -->
-# Questo comando è eseguito appena prima che l'installatore termini, ma
-# quando c'è ancora una directory /target usabile. È possibile fare un
-# chroot su /target e usarlo direttamente oppure usare i comandi apt-install
-# e in-target per installare dei pacchetti ed eseguire comandi nel file
-# system target.
+# Questo è l'ultimo comando, è eseguito appena prima che l'installatore
+# termini, ma quando la directory /target è ancora usabile. È possibile
+# fare un chroot su /target e usarlo direttamente oppure usare i comandi
+# apt-install e in-target per installare dei pacchetti ed eseguire comandi
+# nel file system target.
 #d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
 </screen></informalexample>
   </sect2>
@@ -1792,7 +1822,7 @@ un file e di mettere alcune configurazioni particolari in altri file.
 # caricati tutti. Anche i file inclusi possono avere al loro interno delle
 # direttive preseed/include. Si noti che se i nomi dei file sono relativi,
 # sono prelevati dalla stessa directory del file di preconfigurazione che
-# gli include e sono processati nell'ordine con cui sono inclusi.
+# gli include.
 #d-i preseed/include string x.cfg
 <!--
 # The installer can optionally verify checksums of preconfiguration files

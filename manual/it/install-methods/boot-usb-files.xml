@@ -1,10 +1,10 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36841 -->
+<!-- original version: 37295 -->
 
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <!-- <title>Preparing Files for USB Memory Stick Booting</title> -->
- <title>Preparazione dei file per l'avvio da penna USB</title>
+ <title>Preparazione dei file per l'avvio da chiavetta USB</title>
 <para>
 
 <!--
@@ -17,22 +17,24 @@ stick has been mapped to (in this example
 may have to turn off its write protection switch.
 -->
 
-Per preparare la penna USB è necessario un sistema GNU/Linux con supporto
-USB già funzionante. Si deve controllare che il modulo del kernel usb-storage
-sia caricato (<userinput>modprobe usb-storage</userinput>) e si deve scoprire
-su quale device SCSI è stata mappata la penna USB (in questo esempio è usato
-<filename>/dev/sda</filename>). Per scrivere sulla penna potrebbe essere
-necessario disattivare la protezione dalla scrittura.
+Per preparare la chiavetta USB è necessario un sistema GNU/Linux con
+supporto USB già funzionante. Si deve controllare che il modulo del
+kernel usb-storage sia caricato (<userinput>modprobe usb-storage</userinput>)
+e si deve scoprire su quale device SCSI è stata mappata la chiavetta USB
+(in questo esempio è usato <filename>/dev/sda</filename>). Per scrivere
+sulla chiavetta potrebbe essere necessario disattivare la protezione dalla
+scrittura.
 
 </para><para>
 
 <!--
-Note that the USB stick should be at least 128 MB in size (smaller
+Note that the USB stick should be at least 256 MB in size (smaller
 setups are possible if you follow <xref linkend="usb-copy-flexible"/>).
 -->
 
-Notare che la penna USB deve essere da almeno 128&nbsp;MB (è possibile fare
-anche installazioni più piccole seguendo <xref linkend="usb-copy-flexible"/>).
+Notare che la chiavetta USB deve essere da almeno 256&nbsp;MB (è possibile
+fare anche installazioni più piccole seguendo
+<xref linkend="usb-copy-flexible"/>).
 
 </para>
 
@@ -51,7 +53,7 @@ have to extract it directly to your USB stick:
 C'è un file all-in-one <filename>hd-media/boot.img.gz</filename> che
 contiene non solo tutti i file dell'installatore (kernel compreso) ma
 anche <command>SYSLINUX</command> e il suo file di configurazione. È
-sufficiente estrarlo direttamente sulla penna USB:
+sufficiente estrarlo direttamente sulla chiavetta USB:
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
@@ -71,9 +73,9 @@ extract the image directly to that:
 C'è un file all-in-one <filename>hd-media/boot.img.gz</filename> che
 contiene non solo tutti i file dell'installatore (kernel compreso) ma
 anche <command>yaboot</command> e il suo file di configurazione. Creare
-una partizione di tipo <quote>Apple_Bootstrap</quote> sulla penna USB
+una partizione di tipo <quote>Apple_Bootstrap</quote> sulla chiavetta USB
 usando il comando <userinput>C</userinput> di <command>mac-fdisk</command>
-ed estrarre l'immagine direttamente sulla penna USB:
+ed estrarre l'immagine direttamente sulla chiavetta USB:
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
@@ -88,7 +90,7 @@ that you use the correct device name for your USB stick.
 -->
 
 L'uso di questo metodo distrugge qualunque cosa sia presente sul device,
-fare attenzione a usare il nome corretto per il device della penna USB.
+fare attenzione a usare il nome corretto per il device della chiavetta USB.
 
 </para></warning>
 <para>
@@ -105,7 +107,7 @@ Please note that the file name must end in <filename>.iso</filename>.
 Unmount the stick (<userinput>umount /mnt</userinput>) and you are done.
 -->
 
-Poi montare la penna USB (<userinput>mount
+Poi montare la chiavetta USB (<userinput>mount
 <replaceable arch="i386">/dev/sda</replaceable>
 <replaceable arch="powerpc">/dev/sda2</replaceable>
 /mnt</userinput>), che adesso avrà
@@ -113,7 +115,7 @@ Poi montare la penna USB (<userinput>mount
 <phrase arch="powerpc">un filesystem HFS,</phrase>
 e copiarci l'immagine ISO netinst o businesscard Debian. Si noti che il nome
 del file deve avere estensione <filename>.iso</filename>. Infine smontare la
-penna (<userinput>umount /mnt</userinput>).
+chiavetta (<userinput>umount /mnt</userinput>).
 
 </para>
   </sect2>
@@ -130,7 +132,7 @@ should use the following method to put the files on your stick.
 
 Se si preferisce avere più flessibilità o semplicemente si vuole capire
 cosa si sta facendo si deve usare questo metodo per scrivere i file sulla
-penna.
+chiavetta.
 
 </para>
 
@@ -152,10 +154,10 @@ onto your stick (be sure to select one that fits). The file name of the
 image must end in <filename>.iso</filename>.
 -->
 
-L'installatore cerca un'immagine ISO di Debian sulla penna per usarla come
-sorgente per altri dati necessari all'installazione. Quindi il prossimo
+L'installatore cerca un'immagine ISO di Debian sulla chiavetta per usarla
+come sorgente per altri dati necessari all'installazione. Quindi il prossimo
 passo è copiare un'immagine ISO Debian (businesscard, netinst o persino
-una completa) sulla propria penna. Il nome del file immagine deve avere
+una completa) sulla propria chiavetta. Il nome del file immagine deve avere
 estensione <filename>.iso</filename>.
 
 </para><para>
@@ -182,7 +184,7 @@ When you are done, unmount the USB memory stick (<userinput>umount
 /mnt</userinput>) and activate its write protection switch.
 -->
 
-Conclusa la copia dei file, smontare la penna USB (<userinput>umount
+Conclusa la copia dei file, smontare la chiavetta USB (<userinput>umount
 /mnt</userinput>) e attivare la protezione dalla scrittura.
 
 </para>
@@ -191,7 +193,7 @@ Conclusa la copia dei file, smontare la penna USB (<userinput>umount
   <!-- TODO: doesn't this section belong later? -->
   <sect2 arch="i386">
   <!-- <title>Booting the USB stick</title> -->
-  <title>Avvio dalla penna USB</title>
+  <title>Avvio da chiavetta USB</title>
 <warning><para>
 
 <!--
@@ -201,10 +203,10 @@ contain an invalid master boot record (MBR). To fix this, use the
 <classname>mbr</classname>:
 -->
 
-Se il proprio sistema rifiuta di partire dalla penna, la penna potrebbe
-contenere un MBR (master boot record) non valido. Per risolvere questo
-problema usare il comando <command>install-mbr</command> contenuto nel
-pacchetto <classname>mbr</classname>:
+Se il proprio sistema rifiuta di partire dalla chiavetta, la chiavetta
+potrebbe contenere un MBR (master boot record) non valido. Per risolvere
+questo problema usare il comando <command>install-mbr</command> contenuto
+nel pacchetto <classname>mbr</classname>:
 
 <informalexample><screen>
 # install-mbr /dev/<replaceable>sda</replaceable>
