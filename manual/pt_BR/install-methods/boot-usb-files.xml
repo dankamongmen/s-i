@@ -1,38 +1,38 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 32124 -->
-<!-- Reviewed by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
+<!-- original version: 36841 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.05.02 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.03 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
- <title>Preparando os arquivos para a inicialização usando um memory stick USB</title>
+ <title>Preparando os arquivos para a inicializaÃ§Ã£o usando um memory stick USB</title>
 
 <para>
 
-Para preparar um memória stick USB, será necessário um sistema onde o 
-GNU/Linux já esteja sendo executado e que tenha suporte a USB. Tenha certeza
-que o módulo do kernel <filename>usb-storate</filename> está carregado (
+Para preparar um memÃ³ria stick USB, serÃ¡ necessÃ¡rio um sistema onde o 
+GNU/Linux jÃ¡ esteja sendo executado e que tenha suporte a USB. Tenha certeza
+que o mÃ³dulo do kernel <filename>usb-storate</filename> estÃ¡ carregado (
 <userinput>modprobe usb-storage</userinput>) e tente achar o dispositivo
-SCSI que recebeu a associação com a memória stick USB (neste exemplo será usado 
-o dispositivo <filename>/dev/sda</filename>). Para gravar em sua memória
-stick primeiro desative a proteção contra gravação.
+SCSI que recebeu a associaÃ§Ã£o com a memÃ³ria stick USB (neste exemplo serÃ¡ usado 
+o dispositivo <filename>/dev/sda</filename>). Para gravar em sua memÃ³ria
+stick primeiro desative a proteÃ§Ã£o contra gravaÃ§Ã£o.
 
 </para><para>
 
-Note que a memória stick USB deverá ter pelo menos 128MB de tamanho
-(é possível usar tamanhos menores, se seguir os passos descritos em 
+Note que a memÃ³ria stick USB deverÃ¡ ter pelo menos 128MB de tamanho
+(Ã© possÃ­vel usar tamanhos menores, se seguir os passos descritos em 
 <xref linkend="usb-copy-flexible"/>).
 
 </para>
 
   <sect2 id="usb-copy-easy">
-  <title>Copiando os arquivos &mdash; o método fácil</title>
+  <title>Copiando os arquivos &mdash; o mÃ©todo fÃ¡cil</title>
 <para arch="i386">
 
 Existe um arquivo <emphasis>tudo em um</emphasis> chamado 
-<filename>hd-media/boot.img.gz</filename> que contém todos os arquivos
-do programa de instalação (incluindo o kernel) também como o 
-<command>SYSLINUX</command> e seu arquivo de configuração. Você terá somente
-que descompacta-lo diretamente para sua memória stick USB:
+<filename>hd-media/boot.img.gz</filename> que contÃ©m todos os arquivos
+do programa de instalaÃ§Ã£o (incluindo o kernel) tambÃ©m como o 
+<command>SYSLINUX</command> e seu arquivo de configuraÃ§Ã£o. VocÃª terÃ¡ somente
+que descompacta-lo diretamente para sua memÃ³ria stick USB:
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
@@ -41,11 +41,11 @@ que descompacta-lo diretamente para sua memória stick USB:
 </para><para arch="powerpc">
 
 Existe um arquivo tudo-em-um <filename>hd-media/boot.img.gz</filename>
-que contém todos os arquivos do programa de instalação (incluindo o kernel) 
-assim como o <command>yaboot</command> e seu arquivo de configuração. Crie 
-uma partição do tipo "Apple_Bootstrap" em sua memória stick USB usando
+que contÃ©m todos os arquivos do programa de instalaÃ§Ã£o (incluindo o kernel) 
+assim como o <command>yaboot</command> e seu arquivo de configuraÃ§Ã£o. Crie 
+uma partiÃ§Ã£o do tipo "Apple_Bootstrap" em sua memÃ³ria stick USB usando
 o <command>mac-fdisk</command> comando <userinput>C</userinput> e 
-descompacte a imagem diretamente para lá:
+descompacte a imagem diretamente para lÃ¡:
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
@@ -54,34 +54,34 @@ descompacte a imagem diretamente para lá:
 </para>
 <warning><para>
 
-Usando este método tudo o que já estiver no disposivido será destruído.
-Tenha certeza de que você está usando o nome correto do dispositivo para a
-sua memória USB.
+Usando este mÃ©todo tudo o que jÃ¡ estiver no disposivido serÃ¡ destruÃ­do.
+Tenha certeza de que vocÃª estÃ¡ usando o nome correto do dispositivo para a
+sua memÃ³ria USB.
 
 </para></warning>
 <para>
 
-Após isto, monte a memória stick USB (<userinput>mount
+ApÃ³s isto, monte a memÃ³ria stick USB (<userinput>mount
 <replaceable arch="i386">/dev/sda</replaceable>
 <replaceable arch="powerpc">/dev/sda2</replaceable>
-/mnt</userinput>), que agora terá um sistema 
+/mnt</userinput>), que agora terÃ¡ um sistema 
 de arquivos <phrase arch="i386">FAT</phrase>
 <phrase arch="powerpc">HFS</phrase> dentro dele e
-copie a imagem ISO Debian netinst ou cartão de visita para lá. 
-Note que o nome de arquivo deverá finalizar em 
+copie a imagem ISO Debian netinst ou cartÃ£o de visita para lÃ¡. 
+Note que o nome de arquivo deverÃ¡ finalizar em 
 <filename>.iso</filename>.
-Desmonte a memória stick (<userinput>umount /mnt</userinput>) e
-você terá concluído.
+Desmonte a memÃ³ria stick (<userinput>umount /mnt</userinput>) e
+vocÃª terÃ¡ concluÃ­do.
 
 </para>
   </sect2>
 
   <sect2 id="usb-copy-flexible">
-  <title>Copiando os arquivos &mdash; o método flexível</title>
+  <title>Copiando os arquivos &mdash; o mÃ©todo flexÃ­vel</title>
 <para>
 
-Se quiser mais flexibilidade ou apenas deseja saber o que está acontecendo, 
-você deverá usar o seguinte método para armazenar os arquivos em sua memória
+Se quiser mais flexibilidade ou apenas deseja saber o que estÃ¡ acontecendo, 
+vocÃª deverÃ¡ usar o seguinte mÃ©todo para armazenar os arquivos em sua memÃ³ria
 stick. 
 
 </para>
@@ -89,38 +89,43 @@ stick.
 &usb-setup-i386.xml;
 &usb-setup-powerpc.xml;
 
-   <sect3>
+  </sect2>
+  <sect2>
+   
    <title>Adicionando uma imagem ISO</title>
 <para>
 
-Agora você deverá colocar qualquer imagem ISO da Debian (businesscard, netinst
-ou até mesmo uma completa) em sua memória stick (caso couber em seu espaço livre). 
-O nome de arquivo da imagem deverá ser finalizado em <filename>.iso</filename>.
+O instalador irÃ¡ procurar por uma imagem ISO do Debian na memÃ³ria stick, jÃ¡
+que ela Ã© a fonte de dados adicionais necessÃ¡rios para a instalaÃ§Ã£o. Assim
+o seu prÃ³ximo passo Ã© copiar a imagem ISO do Debian (businesscard, netinst ou
+atÃ© mesmo toda a imagem de um CD) para sua memÃ³ria stick (tenha a certeza de
+escolher uma que caiba). O nome de arquivo da imagem deverÃ¡ ser finalizado em
+<filename>.iso</filename>.
 
 </para><para>
 
-Se quiser instalar através da rede, sem usar uma imagem ISO, 
-você deverá, é claro, pular o passo anterior. Ainda em tempo, você 
-deverá usar um disco de memória ram inicial do diretório 
-<filename>netboot</filename> ao invés do que se encontra em 
+Se quiser instalar atravÃ©s da rede, sem usar uma imagem ISO, 
+vocÃª deverÃ¡, Ã© claro, pular o passo anterior. Ainda em tempo, vocÃª 
+deverÃ¡ usar um disco de memÃ³ria ram inicial do diretÃ³rio 
+<filename>netboot</filename> ao invÃ©s do que se encontra em 
 <filename>hd-media</filename>, porque o <filename>hd-media/initrd.gz</filename> 
-não possui suporte a rede.
+nÃ£o possui suporte a rede.
 
 </para><para>
 
-Quando terminar, desmonte a memória stick USB (<userinput>umount
-/mnt</userinput>) e ative sua proteção contra gravação.
+Quando terminar, desmonte a memÃ³ria stick USB (<userinput>umount
+/mnt</userinput>) e ative sua proteÃ§Ã£o contra gravaÃ§Ã£o.
 
 </para>
-   </sect3>
+  </sect2>
 
-   <!-- TODO: doesn't this section belong later? -->
-   <sect3 arch="i386">
-   <title>Inicialização através da memória stick USB</title>
+  <!-- TODO: doesn't this section belong later? -->
+  <sect2 arch="i386">
+  <title>InicializaÃ§Ã£o atravÃ©s da memÃ³ria stick USB</title>
 <warning><para>
 
-Caso seu sistema se recusar em inicializar a partir da memória stick, 
-ela poderá conter uma MBR inválida (master boot record). Para corrigir 
+Caso seu sistema se recusar em inicializar a partir da memÃ³ria stick, 
+ela poderÃ¡ conter uma MBR invÃ¡lida (master boot record). Para corrigir 
 isto, use o comando <command>install-mbr</command> que vem no pacote
 <classname>mbr</classname>:
 
@@ -129,6 +134,5 @@ isto, use o comando <command>install-mbr</command> que vem no pacote
 </screen></informalexample>
 
 </para></warning>
-   </sect3>
   </sect2>
  </sect1>
