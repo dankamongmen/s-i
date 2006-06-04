@@ -225,3 +225,6 @@ sed -e "/<!-- HTML TABLE STARTS HERE -->/r ${TABLE_HTML}" \
     -e "s|<!-- CODEPOINTS_TARBALL -->|latest/zip/codepoints.tar.gz|" \
     -e "s|<!-- CODEPOINTS -->|latest/all_codes.txt|" \
     ${TEMPLATE} > ${INDEX_HTML}
+
+# Remove file in /tmp
+rm ${TABLE_HTML}
