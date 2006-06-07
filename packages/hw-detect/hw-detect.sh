@@ -593,7 +593,14 @@ apply_pcmcia_resource_opts() {
 }
 
 # get pcmcia running if possible
+PCMCIA_INIT=
+if [ -x /etc/init.d/pcmciautils ]; then
+	PCMCIA_INIT=/etc/init.d/pcmciautils
+fi
 if [ -x /etc/init.d/pcmcia ]; then
+	PCMCIA_INIT=/etc/init.d/pcmcia
+fi
+if [ "$PCMCIA_INIT" ]; then
 	if ! [ -e /var/run/cardmgr.pid ]; then
 		db_input medium hw-detect/start_pcmcia || true
 	fi
@@ -608,7 +615,7 @@ if [ -x /etc/init.d/pcmcia ]; then
 		db_progress INFO hw-detect/pcmcia_step
 		
 		if [ -e /var/run/cardmgr.pid ]; then
-			# Not using /etc/init.d/pcmcia stop as it
+			# Not using $PCMCIA_INIT stop as it
 			# uses sleep which is not available and is racey.
 			kill -9 $(cat /var/run/cardmgr.pid) 2>/dev/null || true
 			rm -f /var/run/cardmgr.pid
@@ -646,7 +653,7 @@ if [ -x /etc/init.d/pcmcia ]; then
 			echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
 		fi
 	    
-		CARDMGR_OPTS="-f" /etc/init.d/pcmcia start </dev/null 3<&0 2>&1 \
+		CARDMGR_OPTS="-f" $PCMCIA_INIT start </dev/null 3<&0 2>&1 \
 			| logger -t hw-detect
 	    
 		if [ "$HOTPLUG_TYPE" = fake ]; then
