@@ -596,8 +596,7 @@ apply_pcmcia_resource_opts() {
 PCMCIA_INIT=
 if [ -x /etc/init.d/pcmciautils ]; then
 	PCMCIA_INIT=/etc/init.d/pcmciautils
-fi
-if [ -x /etc/init.d/pcmcia ]; then
+elif [ -x /etc/init.d/pcmcia ]; then
 	PCMCIA_INIT=/etc/init.d/pcmcia
 fi
 if [ "$PCMCIA_INIT" ]; then
