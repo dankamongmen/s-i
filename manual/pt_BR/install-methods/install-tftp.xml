@@ -1,7 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35613 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
-<!-- revised by Herbert P Fortes Neto 2006.04.13 -->
+<!-- original version: 36841 -->
+<!-- revised by Herbert P Fortes Neto 2006.05.02 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.07 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparando os arquivos para inicialização via rede usando TFTP</title>
@@ -203,7 +203,7 @@ Tenha certeza que seu servidor dhcp está configurado para passar o arquivo
 Para as DECstations, existem arquivos tftpimage para cada 
 sub-arquitetura. que contém ambos os kernels e o programa de 
 instalação em um arquivo. A convenção de nomes é 
-<replaceable>subarquitetura</replaceable>/netboot-boot.img.
+<filename><replaceable>subarquitetura</replaceable>/netboot-boot.img</filename>.
 Copie o arquivo tftpimage que deseja usar para
 <userinput>/tftpboot/tftpboot.img</userinput> caso você utilize o 
 exemplo BOOTP/DHCP descritos acima.
@@ -282,22 +282,21 @@ usando um destes métodos.
    <title>Inicialização através TFTP no SPARC</title>
 <para>
 
-As arquiteturas SPARC usam os nomes de sub-arquiteturas, tais como
-<quote>SUN4M</quote> ou <quote>SUN4C</quote>; em alguns casos, a arquitetura é
-deixada em branco, assim o arquivo que o cliente procura é simplesmente
-<filename>client-ip-in-hex</filename>. Assim, caso a sub-arquitetura 
-do seu sistema seja SUN4C e seu endereço IP 192.168.1.3, o nome 
-de arquivo deverá ser <filename>C0A80103.SUN4C</filename>. 
-Um método fácil de determinar isto é entrar com o seguinte comando
-no interpretador de comandos (assumindo que o IP da máquina 
-é 10.0.0.4):
+Algumas arquiteturas SPARC adicionaram nomes de sub-arquiteturas, tais como
+<quote>SUN4M</quote> ou <quote>SUN4C</quote>, ao nome de arquivo. Assim, se a
+sub-arquitetura do seu sistema é SUN4C e, seu endereço IP é 192.168.1.3, o
+nome do arquivo deverá ser <filename>C0A80103.SUN4C</filename>. Contudo,
+existem ainda sub-arquiteturas onde o arquivo que o cliente procura é apenas
+<filename>ip-do-cliente-em-hexa</filename>. Um método fácil de determinar o
+código hexadecimal para o endereço IP é executar o seguinte comando no
+interpretador de comandos (assumindo que o IP da máquina é 10.0.0.4):
+
 <informalexample><screen>
 $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 </screen></informalexample>
 
-Isto mostrará o IP em hexadecimal; para obter o nome do arquivo correto, você 
-precisará mudar todas as letras para maiúsculas e, se necessário, adicionar o 
-nome da sub-arquitetura.
+Para obter o nome do arquivo correto, vocé precisará mudar todas as letras
+para maiúsculo e, se necessário, adicionar o nome da sub-arquitetura.
 
 </para><para>
 
@@ -381,7 +380,7 @@ que estiver inicializando.
 </para></listitem>
 <listitem><para>
 
-Descompacte o arquivo raíz tar em seu servidor NFS (pode ser o mesmo
+Descompacte o arquivo raiz tar em seu servidor NFS (pode ser o mesmo
 sistema que seu servidor TFTP):
 
 <informalexample><screen>
