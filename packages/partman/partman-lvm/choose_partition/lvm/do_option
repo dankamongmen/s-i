@@ -65,6 +65,7 @@ do_initial_setup() {
 			db_go
 			db_get partman-lvm/activevg
 			[ "$RET" = "true" ] && log-output -t partman-lvm vgchange -a y
+			# TODO: We need to update the devices that LVM just claimed
 		fi
 		# ask only the first time
 		mkdir -p /var/cache/partman-lvm && touch /var/cache/partman-lvm/first
@@ -245,11 +246,17 @@ do_vg_create() {
 		db_set partman-lvm/vgcreate_error "false"
 		db_input high partman-lvm/vgcreate_error
 		db_go
+	else
+		db_subst partman-lvm/text/in_use VG "$vg"
+		db_metaget partman-lvm/text/in_use description
+		for pv in $pvs; do
+			partman_lock_unit "$pv" "$RET"
+		done
 	fi
 }
 
 do_vg_delete() {
-	local vgs vg output
+	local vgs vg output pvs
 	vgs=""
 
 	# Look for VGs with no LVs
@@ -287,10 +294,15 @@ do_vg_delete() {
 	db_get partman-lvm/vgdelete_confirm
 	[ "$RET" = "true" ] || return
 
+	pvs=$(vg_list_pvs "$vg")
 	if ! vg_delete "$vg"; then 
 		db_set partman-lvm/vgdelete_error "false"
 		db_input high partman-lvm/vgdelete_error
 		db_go
+	else
+		for pv in $pvs; do
+			partman_unlock_unit "$pv"
+		done
 	fi
 }
 
@@ -368,6 +380,10 @@ do_vg_extend() {
 			db_input high partman-lvm/vgextend_error
 			db_go
 			return
+		else
+			db_subst partman-lvm/text/in_use VG "$vg"
+			db_metaget partman-lvm/text/in_use description
+			partman_lock_unit "$pv" "$RET"
 		fi
 	done
 }
@@ -454,6 +470,8 @@ do_vg_reduce() {
 			db_input high partman-lvm/vgreduce_error
 			db_go
 			return
+		else
+			partman_unlock_unit "$pv"
 		fi
 	done
 }
