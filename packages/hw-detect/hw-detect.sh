@@ -15,7 +15,7 @@ NEWLINE="
 MISSING_MODULES_LIST=""
 SUBARCH="$(archdetect)"
 
-prebaseconfig=/usr/lib/prebaseconfig.d/30hw-detect
+finish_install=/usr/lib/finish-install.d/30hw-detect
 
 if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
@@ -123,7 +123,7 @@ load_sr_mod () {
 }
 
 blacklist_de4x5 () {
-	cat << EOF >> $prebaseconfig
+	cat << EOF >> $finish_install
 if [ -e /target/etc/discover.conf ]; then
 	touch /target/etc/discover-autoskip.conf
 	(echo "# blacklisted since tulip is used instead"; echo skip de4x5 ) >> /target/etc/discover-autoskip.conf
@@ -736,9 +736,9 @@ if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>
 	fi
 
 	echo "mkdir /target/etc/pcmcia 2>/dev/null || true" \
-		>>$prebaseconfig
+		>>$finish_install
 	echo "cp /etc/pcmcia/config.opts /target/etc/pcmcia/config.opts" \
-		>>$prebaseconfig
+		>>$finish_install
 
 	# Determine devnames.
 	if [ -f /var/run/stab ]; then

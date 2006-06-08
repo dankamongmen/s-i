@@ -17,7 +17,7 @@ bindir=$(DESTDIR)/bin/
 hpdir=$(DESTDIR)/etc/hotplug.d
 udevdir=$(DESTDIR)/etc/udev/rules.d
 didir=$(DESTDIR)/lib/debian-installer.d
-pbcdir=$(DESTDIR)/usr/lib/prebaseconfig.d
+fidir=$(DESTDIR)/usr/lib/finish-install.d
 sharedir=$(DESTDIR)/usr/share/hw-detect/
 
 INSTALL=install
@@ -42,8 +42,8 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL_DATA) net-hotplug.rules $(udevdir)/010_net-hotplug.rules
 	$(INSTALL) -d $(hpdir)/net
 	$(INSTALL) net-hotplug.sh $(hpdir)/net/hw-detect.hotplug
-	$(INSTALL) -d $(pbcdir)
-	$(INSTALL) hw-detect.prebaseconfig $(pbcdir)/30hw-detect
+	$(INSTALL) -d $(fidir)
+	$(INSTALL) hw-detect.finish-install $(fidir)/30hw-detect
 ifeq ($(DEB_HOST_ARCH),powerpc)
 	$(INSTALL) discover-mac-io.sh $(bindir)/discover-mac-io
 	$(INSTALL) discover-ibm.sh $(bindir)/discover-ibm
