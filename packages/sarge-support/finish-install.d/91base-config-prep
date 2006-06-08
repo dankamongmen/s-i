@@ -27,14 +27,14 @@ setup_ssh_install () {
 	# Try installing network-console-config has been installed
 	if apt-install $NCC; then
 		config_ncc_user
-		db_input critical $TEMPLATE_ROOT/nc-prebaseconfig-reminder
+		db_input critical $TEMPLATE_ROOT/nc-finish-install-reminder
 		db_go
 		return 0
 	else
 		log "Package $NCC could not be installed"
 		log "The system will not be set up to run base configuration over SSH"
-		db_subst $TEMPLATE_ROOT/nc-prebaseconfig-failure PACKAGE $NCC
-		db_input critical $TEMPLATE_ROOT/nc-prebaseconfig-failure
+		db_subst $TEMPLATE_ROOT/nc-finish-install-failure PACKAGE $NCC
+		db_input critical $TEMPLATE_ROOT/nc-finish-install-failure
 		db_go
 		return 1
 	fi
