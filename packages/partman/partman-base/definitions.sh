@@ -866,6 +866,67 @@ default_disk_label () {
     esac
 }
 
+# Lock a device or partition against further modifications
+partman_lock_unit() {
+	local device message dev testdev
+	device="$1"
+	message="$2"
+
+	for dev in $DEVICES/*; do
+		[ -d "$dev" ] || continue
+		cd $dev
+
+		# First check if we should lock a device
+		if [ -e "device" ]; then
+			testdev=$(mapdevfs $(cat device))
+			if [ "$device" = "$testdev" ]; then
+				echo "$message" > locked
+				return 0
+			fi
+		fi
+
+		# Second check if we should lock a partition
+		open_dialog PARTITIONS
+		while { read_line num id size type fs path name; [ "$id" ]; }; do
+			testdev=$(mapdevfs $path)
+			if [ "$device" = "$testdev" ]; then
+				echo "$message" > $id/locked
+			fi
+		done
+		close_dialog
+	done
+}
+
+# Unlock a device or partition to allow further modifications
+partman_unlock_unit() {
+	local device dev testdev
+	device="$1"
+
+	for dev in $DEVICES/*; do
+		[ -d "$dev" ] || continue
+		cd $dev
+
+		# First check if we should unlock a device
+		if [ -e "device" ]; then
+			testdev=$(mapdevfs $(cat device))
+			if [ "$device" = "$testdev" ]; then
+				rm -f locked
+				return 0
+			fi
+		fi
+
+		# Second check if we should unlock a partition
+		open_dialog PARTITIONS
+		while { read_line num id size type fs path name; [ "$id" ]; }; do
+			testdev=$(mapdevfs $path)
+			if [ "$device" = "$testdev" ]; then
+				rm -f $id/locked
+			fi
+		done
+		close_dialog
+	done
+}
+
 log '*******************************************************'
 
 # Local Variables:

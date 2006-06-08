@@ -8,6 +8,43 @@ dev=${1%//*}
 id=${1#*//}
 
 cd $dev
+device=$(humandev $(cat device))
+
+# If the user wants to modify a device or partition
+# the device may not be locked
+if [ -e "$dev/locked" ]; then
+	locked=$(cat "$dev/locked")
+	db_subst partman-base/devicelocked DEVICE "$device"
+	db_subst partman-base/devicelocked MESSAGE "$locked"
+	db_set partman-base/devicelocked "false"
+	db_input critical partman-base/devicelocked
+	db_go
+	exit 0
+fi
+
+# Two scenarios to check for here:
+# 1) If the user wants to modify a partition - it may not be locked
+# 2) If the user wants to modify a device - none of its partitions may be locked
+open_dialog PARTITIONS
+while { read_line num tmpid size type fs path name; [ "$tmpid" ]; }; do
+	if [ -n "$id" ]; then
+		[ "$id" = "$tmpid" ] || continue
+	fi
+
+	if [ -e "$dev/$tmpid/locked" ]; then
+		locked=$(cat "$dev/$tmpid/locked")
+		db_subst partman-base/partlocked DEVICE "$device"
+		db_subst partman-base/partlocked PARTITION "$num"
+		db_subst partman-base/partlocked MESSAGE "$locked"
+		db_set partman-base/partlocked "false"
+		db_input critical partman-base/partlocked
+		db_go
+		close_dialog
+		exit 0
+	fi
+done
+close_dialog
+
 
 if [ -z "$id" ]; then
 #    ask_user /lib/partman/storage_device "$dev" "$id" || true
