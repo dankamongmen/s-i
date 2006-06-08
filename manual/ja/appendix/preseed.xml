@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36269 -->
+<!-- original version: 37512 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -291,7 +291,7 @@ runtime.
 Another readable file <filename>/var/cache/debconf/questions.dat</filename>
 is used to store the values for variables and the answers given to questions.
 A question always refers to the template used to ask it. For obvious
-security reasons the values for templates of type <quote>password</quote>
+security reasons the values for questions of type <quote>password</quote>
 are stored in a separate, non-readable file in the same directory.
 
 </para>
@@ -350,10 +350,10 @@ installation. See <xref linkend="preseed-shell"/> for details.
 It is possible to use preseeding to change the default answer for a
 question, but still have the question asked. To do this the
 <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
-setting the value for a template.
+setting the value for a question.
 -->
 訊かれる質問に対するデフォルトの回答を変更するのに preseed を利用できます。
-これには、テンプレートに値を設定した後で、
+これには、質問に値を設定した後で、
 <firstterm>seen</firstterm> フラグを <quote>false</quote>
 に設定しなければなりません。
 
@@ -618,6 +618,22 @@ for any of the preseed variables listed in the examples.
 <userinput>path/to/var=value</userinput> というように、
 サンプルにある preseed 変数を渡してください。
 
+</para><para>
+
+<!--
+A <quote>-\-</quote> in the boot options has special meaning.
+Kernel parameters that appear after it will be copied into the installed
+bootloader configuration (if supported by the installer for the
+bootloader). Note that the <quote>-\-</quote> may already be
+present in the default boot parameters.
+-->
+ブートオプションの <quote>--</quote> は特別な意味を持ちます。
+これに続きカーネルパラメータがあると、
+インストール済みのブートローダの設定にコピーされます 
+(インストーラがサポートするブートローダの場合)。
+<quote>--</quote> は、デフォルトブートパラメータで、
+すでに使用されていることに注意してください。
+
 </para>
 <note><para>
 
@@ -678,8 +694,13 @@ a line in a preconfiguration file is:
 コマンドで使用されるものと同じです。
 事前設定ファイルの行の一般的なフォーマットは以下のようになります。
 
+<!--
+ <informalexample><screen>
+&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;
+ </screen></informalexample>
+-->
 <informalexample><screen>
-&lt;所有者&gt; &lt;テンプレート名&gt; &lt;テンプレート型&gt; &lt;値&gt;
+&lt;所有者&gt; &lt;質問名&gt; &lt;テンプレート型&gt; &lt;値&gt;
 </screen></informalexample>
 
 </para><para>
@@ -705,32 +726,31 @@ There are a few rules to keep in mind when writing a preconfiguration file.
 <!--
   A line can be split into multiple lines by appending a backslash
   (<quote><literal>\</literal></quote>) as the line continuation character.
-  A good place to split a line is after the template name; a bad place is
+  A good place to split a line is after the question name; a bad place is
   between type and value.
 -->
   行継続文字としてバックスラッシュ (<quote><literal>\</literal></quote>) 
   を付けて複数行に分割できます。
-  テンプレート名の後で分割するのが適当でしょう。
+  質問名の後で分割するのが適当でしょう。
   型と値の間はよくありません。
 </para></listitem>
 <listitem><para>
 <!--
-  Most templates need to be preseeded using the values valid in English and
-  not the translated values. However, there are some templates (for example
+  Most questions need to be preseeded using the values valid in English and
+  not the translated values. However, there are some questions (for example
   in <classname>partman</classname> where the translated values need to be
   used.
 -->
-  ほとんどのテンプレートでは、
-  訳した値ではなく英語の値を指定する必要がありますが、
+  ほとんどの質問では、訳した値ではなく英語の値を指定する必要がありますが、
   (<classname>partman</classname> など) 
-  訳した値を使用できるテンプレートもあります。
+  訳した値を使用できる質問もあります。
 </para></listitem>
 <listitem><para>
 <!--
-  Some templates take a code as value instead of the English text that is
+  Some questions take a code as value instead of the English text that is
   shown during installation.
 -->
-  テンプレートの中には、インストール中に表示される英語のテキストの代わりに、
+  質問の中には、インストール中に表示される英語のテキストの代わりに、
   コードを取るものがあります。
 </para></listitem>
 </itemizedlist>
@@ -806,13 +826,13 @@ will be deleted from your system if you purge the package
 <para>
 
 <!--
-To check possible values for templates, you can use <command>nano</command>
+To check possible values for questions, you can use <command>nano</command>
 to examine the files in <filename>/var/lib/cdebconf</filename> while an
 installation is in progress. View <filename>templates.dat</filename> for
 the raw templates and <filename>questions.dat</filename> for the current
 values and for the values assigned to variables.
 -->
-有効なテンプレートの値をチェックするのに、
+有効な質問の値をチェックするのに、
 インストール中に <filename>/var/lib/cdebconf</filename> のファイルを、
 <command>nano</command> を使用して確認できます。
 生のテンプレートは <filename>templates.dat</filename> を、
@@ -1133,7 +1153,7 @@ correct one will be selected before using preseeding.
 
 <informalexample role="example"><screen>
 # If the system has free space you can choose to only partition that space.
-# Note: this template must be preseeded with a localized (translated) value.
+# Note: this must be preseeded with a localized (translated) value.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 
@@ -1143,7 +1163,7 @@ correct one will be selected before using preseeding.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
 # You can choose from any of the predefined partitioning recipes.
-# Note: this template must be preseeded with a localized (translated) value.
+# Note: this must be preseeded with a localized (translated) value.
 d-i partman-auto/choose_recipe \
        select All files in one partition (recommended for new users)
 #d-i partman-auto/choose_recipe \
@@ -1232,7 +1252,7 @@ earlier questions. You can optionally add other (local) repositories.
 
 # Additional repositories, local[0-9] available
 #d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/repository string \
+#d-i apt-setup/local0/source string \
 #       deb http://local.server/debian stable main
 # URL to the public key of the local repository
 #d-i apt-setup/local0/key string http://local.server/key
@@ -1401,58 +1421,37 @@ Available tasks as of this writing include:
 
 <itemizedlist>
 <listitem><para>
-<!--
-  <userinput>Standard system</userinput>
--->
-  <userinput>Standard system (標準システム)</userinput>
+  <userinput>standard</userinput>
 </para></listitem>
 <listitem><para>
-<!--
-  <userinput>Desktop environment</userinput>
--->
-  <userinput>Desktop environment (デスクトップ環境)</userinput>
+  <userinput>desktop</userinput>
 </para></listitem>
 <listitem><para>
-<!--
-  <userinput>Web server</userinput>
--->
-  <userinput>Web server (Web サーバ)</userinput>
+  <userinput>gnome-desktop</userinput>
 </para></listitem>
 <listitem><para>
-<!--
-  <userinput>Print server</userinput>
--->
-  <userinput>Print server (印刷サーバ)</userinput>
+  <userinput>kde-desktop</userinput>
 </para></listitem>
 <listitem><para>
-<!--
-  <userinput>DNS server</userinput>
--->
-  <userinput>DNS server (DNS サーバ)</userinput>
+  <userinput>web-server</userinput>
 </para></listitem>
 <listitem><para>
-<!--
-  <userinput>File server</userinput>
--->
-  <userinput>File server (ファイルサーバ)</userinput>
+  <userinput>print-server</userinput>
 </para></listitem>
 <listitem><para>
-<!--
-  <userinput>Mail server</userinput>
--->
-  <userinput>Mail server (メールサーバ)</userinput>
+  <userinput>dns-server</userinput>
 </para></listitem>
 <listitem><para>
-<!--
-  <userinput>SQL database</userinput>
--->
-  <userinput>SQL database (SQL サーバ)</userinput>
+  <userinput>file-server</userinput>
 </para></listitem>
 <listitem><para>
-<!--
-  <userinput>Laptop</userinput>
--->
-  <userinput>Laptop (ラップトップ)</userinput>
+  <userinput>mail-server</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>sql-database</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>laptop</userinput>
 </para></listitem>
 </itemizedlist>
 
@@ -1461,17 +1460,18 @@ Available tasks as of this writing include:
 <!--
 You can also choose to install no tasks, and force the installation of a
 set of packages in some other way. We recommend always including the
-<userinput>Standard system</userinput> task.
+<userinput>standard</userinput> task.
 -->
 タスクをインストールしないこともできますし、
 他の方法でパッケージのセットが強制的にインストールされることもあります。
-<userinput>Standard system</userinput> タスクは常に含めるのをお奨めします。
+<userinput>standard</userinput> タスクは常に含めるのをお奨めします。
 
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect Standard system, Desktop environment
-#tasksel tasksel/first multiselect Standard system, Web server
+tasksel tasksel/first multiselect standard, desktop
+#tasksel tasksel/first multiselect standard, web-server
+#tasksel tasksel/first multiselect standard, kde-desktop
 
 # Some versions of the installer can report back on what software you have
 # installed, and what software you use. The default is not to report back,
@@ -1490,7 +1490,7 @@ tasksel tasksel/first multiselect Standard system, Desktop environment
 
 <informalexample role="example"><screen>
 # Avoid that last message about the install being complete.
-d-i prebaseconfig/reboot_in_progress note
+d-i finish-install/reboot_in_progress note
 
 # This will prevent the installer from ejecting the CD during the reboot,
 # which is useful in some situations.
@@ -1664,6 +1664,12 @@ settings for certain configurations in other files.
 # preconfiguration files, includes those files. 
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+
+# Most flexibly of all, this downloads a program and runs it. The program
+# can use commands such as debconf-set to manupulate the debconf database.
+# Note that if the filenames are relative, they are taken from the same
+# directory as the preconfiguration file that runs them.
+d-i preseed/run string foo.sh
 </screen></informalexample>
 
   </sect2>
