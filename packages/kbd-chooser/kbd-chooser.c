@@ -533,7 +533,6 @@ keyboards_get (void)
 
 /**
  * @brief set debian-installer/uml-console as to whether we are using a user mode linux console
- * This is then passed via prebaseconfig to base-config
  * @return 1 if present, 0 if absent, 2 if unknown.
  */
 sercon_state
@@ -554,7 +553,6 @@ check_if_uml_console (void)
 
 /**
  * @brief set debian-installer/serial console as to whether we are using a serial console
- * This is then passed via prebaseconfig to base-config
  * @return 1 if present, 0 if absent, 2 if unknown.
  */
 sercon_state
