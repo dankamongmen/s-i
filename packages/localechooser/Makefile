@@ -24,7 +24,7 @@ debian/short-tmp/shortlists: debian/iso-codes
 
 check-scripts:
 	if [ -x /bin/ash ] ; then SH=ash ; else SH=dash; fi ; \
-	for s in prebaseconfig debian/postinst languagemap localechooser ; do \
+	for s in finish-install debian/postinst languagemap localechooser ; do \
 		$$SH -n $$s ; \
 	done
 
