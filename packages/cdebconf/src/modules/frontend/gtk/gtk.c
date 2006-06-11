@@ -555,6 +555,16 @@ gboolean select_treeview_callback (GtkTreeSelection *selection, GtkTreeModel  *m
 return TRUE;
 }
 
+/* catches double-clicks, SPACEBAR, ENTER keys pressure for SELECT questions */
+void
+select_onRowActivated (GtkTreeView          *treeview,
+                       GtkTreePath          *path,
+                       GtkTreeViewColumn    *col,
+                       struct frontend_data *data)
+{
+    gtk_button_clicked ( GTK_BUTTON( data->button_next ) );
+}
+
 static const char *
 get_text(struct frontend *obj, const char *template, const char *fallback )
 {
@@ -994,6 +1004,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (view), -1, q_get_description(q), renderer, "text", SELECT_COL_NAME, NULL);
     store = gtk_list_store_new (SELECT_NUM_COLS, G_TYPE_STRING, G_TYPE_UINT);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
+    g_signal_connect (G_OBJECT(view), "row-activated", G_CALLBACK (select_onRowActivated), (struct frontend_data *) obj->data);
     gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
     g_signal_connect (G_OBJECT(view), "destroy", G_CALLBACK (free_description_data), data);
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW(view), TRUE);
