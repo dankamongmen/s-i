@@ -40,14 +40,11 @@ fi
 mount -t proc proc tree/proc/
 mount -t sysfs sysfs tree/sys/
 mknod tree/dev/fb0 c 29 0
-mknod tree/dev/tty0 c 4 0
-mknod tree/dev/tty1 c 4 1
-mknod tree/dev/tty2 c 4 2
-mknod tree/dev/tty3 c 4 3
-mknod tree/dev/tty4 c 4 4
-mknod tree/dev/tty8 c 4 8
-mknod tree/dev/tty9 c 4 9
-mknod tree/dev/tty10 c 4 10
+
+for i in $(seq 0 10) ; do
+    mknod tree/dev/tty${i} c 4 ${i}
+done
+
 # mknod tree/dev/psaux c 10 1
 
 
