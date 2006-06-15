@@ -91,6 +91,7 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
     { 77,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	5,	4 },
     { 78,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	6,	4 },
     { 79,	0,	"ida",		ENTRY_TYPE_DISC_ARRAY_CONTROLLER,	7,	4 },
+    { 80,	0,	"i2o/hd",	ENTRY_TYPE_DISC,	0,	4 },
     { 88,	0,	"hd",		ENTRY_TYPE_DISC,	12,	6 },
     { 89,	0,	"hd",		ENTRY_TYPE_DISC,	14,	6 },
     { 90,	0,	"hd",		ENTRY_TYPE_DISC,	16,	6 },
