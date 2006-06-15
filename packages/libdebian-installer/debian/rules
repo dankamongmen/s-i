@@ -1,10 +1,5 @@
 #!/usr/bin/make -f
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-#include /usr/share/debian-installer/build/make/rules
-
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
@@ -83,33 +78,17 @@ install: build
 	install $(CURDIR)/debian/tmp/usr/lib/libdebian-installer-extra.so.4 $(CURDIR)/debian/libdebian-installer-extra4-udeb/lib
 	dh_install --sourcedir=debian/tmp
 
-# Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
 
-# Build architecture-dependent files here.
 binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
 	dh_installdocs
-#	dh_installexamples
-#	dh_installmenu
-#	dh_installdebconf	
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-#	dh_installinit
-#	dh_installcron
-#	dh_installinfo
-#	dh_installman
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
-#	dh_perl
-#	d_python
 	dh_makeshlibs -plibdebian-installer4 -V \
 		--add-udeb=libdebian-installer4-udeb
 	dh_makeshlibs -plibdebian-installer-extra4 -V \
