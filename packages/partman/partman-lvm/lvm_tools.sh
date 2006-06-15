@@ -22,16 +22,24 @@ lvm_size_to_human() {
 
 # Convenience wrapper for lvs/pvs/vgs
 lvm_get_info() {
-	local type info device
+	local type info device output
 	type=$1
 	info=$2
 	device=$3
 
-	$type --noheadings --nosuffix --separator ":" --units M \
-		-o "$info" $device 2> /dev/null | \
-		sed -e 's/^[:[:space:]]\+//g;s/[:[:space:]]\+$//g'
+	output=$($type --noheadings --nosuffix --separator ":" --units M \
+		-o "$info" $device 2> /dev/null)
+	if [ $? -ne 0 ]; then
+		return 1
+	fi
+	output=$(echo "$output" | sed -e 's/^[:[:space:]]\+//g;s/[:[:space:]]\+$//g')
+	# Be careful here, we don't want to output only a newline
+	if [ -n "$output" ]; then
+		echo "$output"
+	fi
 	# NOTE: The last sed, s/:$// is necessary due to a bug in lvs which adds a
 	#       trailing separator even if there is only one field
+	return 0
 }
 
 # Converts a list of space (or newline) separated values to comma separated values
@@ -133,10 +141,13 @@ $RET
 
 # Get info on a PV
 pv_get_info() {
-	local info=$(lvm_get_info pvs pv_size,pv_pe_count,pv_free,pv_pe_alloc_count,vg_name "$1")
+	local info
+
+	info=$(lvm_get_info pvs pv_size,pv_pe_count,pv_free,pv_pe_alloc_count,vg_name "$1")
 	if [ $? -ne 0 ]; then
 		return 1
 	fi
+
 	SIZE=$(echo "$info"   | cut -d':' -f1 | cut -d'.' -f1)
 	SIZEPE=$(echo "$info" | cut -d':' -f2)
 	FREE=$(echo "$info"   | cut -d':' -f3 | cut -d'.' -f1)
@@ -272,10 +283,13 @@ lv_delete() {
 
 # Get VG info
 vg_get_info() {
-	local info=$(lvm_get_info vgs vg_size,vg_extent_count,vg_free,vg_free_count,lv_count,pv_count "$1")
+	local info
+
+	info=$(lvm_get_info vgs vg_size,vg_extent_count,vg_free,vg_free_count,lv_count,pv_count "$1")
 	if [ $? -ne 0 ]; then
 		return 1
 	fi
+
 	SIZE=$(echo "$info"   | cut -d':' -f1 | cut -d'.' -f1)
 	SIZEPE=$(echo "$info" | cut -d':' -f2)
 	FREE=$(echo "$info"   | cut -d':' -f3 | cut -d'.' -f1)
