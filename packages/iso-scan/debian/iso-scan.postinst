@@ -96,17 +96,8 @@ umount /hd-media 2>/dev/null || true
 # Hopefully this will find the drive.
 hw-detect iso-scan/detect_progress_title || true
 
-# Find all block devices, and get a count of them, for use in progress bar.
-DEVS=$(block_devices)
-DEV_COUNT=0
-for dev in $DEVS; do
-	DEV_COUNT=$(expr $DEV_COUNT + 1)
-done
-
-db_progress START 0 $DEV_COUNT iso-scan/progress_title
-
 # Load up every filesystem known to man. The drive could have anything.
-FS="ext2 ext3 reiserfs fat vfat xfs iso9660 hfs hfsplus ntfs"
+FS="ext2 ext3 reiserfs fat vfat xfs iso9660 hfsplus hfs ntfs"
 for fs in $FS; do
 	modprobe $fs >/dev/null 2>&1 || true
 done
@@ -116,48 +107,70 @@ mkdir /cdrom 2>/dev/null || true
 mkdir /hd-media 2>/dev/null || true
 
 log "First pass: Look for ISOs near top-level of each filesystem."
-for dev in $DEVS; do
-	if ! mount_device $dev; then
-		log "Waiting for $dev to possibly get ready.."
-		sleep 3
-		if ! mount_device $dev; then
-			continue
-		fi
-	fi
-
-	db_subst iso-scan/progress_scan DRIVE $dev
-	log "Mounted $dev for first pass"
-	MOUNTABLE_DEVS="$MOUNTABLE_DEVS $dev"
-	MOUNTABLE_DEVS_COUNT=$(expr $MOUNTABLE_DEVS_COUNT + 1)
-	cd /hd-media
-	for dir in . *; do
-		if [ -d "$dir" ]; then
-			if [ "$dir" != "." ]; then 
-				TOPLEVEL_DIRS_COUNT=$(expr $TOPLEVEL_DIRS_COUNT + 1)
-			fi
-			db_subst iso-scan/progress_scan DIRECTORY "$dir/"
-			db_progress INFO iso-scan/progress_scan
-			for iso in $dir/*.iso $dir/*.ISO; do
-				if [ -e $iso ]; then
-					log "Found ISO $iso on $dev"
-					ISO_COUNT=$(expr $ISO_COUNT + 1)
-					try_iso $iso $dev
-				fi
-			done
-		fi
+DEVS=$(block_devices)
+# Repeat twice if necessary, to accompdate devices that need some
+# time to initialise, like USB devices.
+for i in 1 2; do
+	DEV_COUNT=0
+	for dev in $DEVS; do
+		DEV_COUNT=$(expr $DEV_COUNT + 1)
 	done
-	cd /
-	umount /hd-media
 
-	# It's possible that the ISO was written right to the front of a
-	# device, and not to a filesystem. (Hey, we may even be spinning
-	# a real CD here, though that would be pretty weird..)
-	try_iso $dev $dev
+	db_progress START 0 $DEV_COUNT iso-scan/progress_title
 
-	db_progress STEP 1
+	for dev in $DEVS; do
+		if ! mount_device $dev; then
+			log "Waiting for $dev to possibly get ready.."
+			sleep 3
+			if ! mount_device $dev; then
+				continue
+			fi
+		fi
+
+		db_subst iso-scan/progress_scan DRIVE $dev
+		log "Mounted $dev for first pass"
+		MOUNTABLE_DEVS="$MOUNTABLE_DEVS $dev"
+		MOUNTABLE_DEVS_COUNT=$(expr $MOUNTABLE_DEVS_COUNT + 1)
+		cd /hd-media
+		for dir in . *; do
+			if [ -d "$dir" ]; then
+				if [ "$dir" != "." ]; then 
+					TOPLEVEL_DIRS_COUNT=$(expr $TOPLEVEL_DIRS_COUNT + 1)
+				fi
+				db_subst iso-scan/progress_scan DIRECTORY "$dir/"
+				db_progress INFO iso-scan/progress_scan
+				for iso in $dir/*.iso $dir/*.ISO; do
+					if [ -e $iso ]; then
+						log "Found ISO $iso on $dev"
+						ISO_COUNT=$(expr $ISO_COUNT + 1)
+						try_iso $iso $dev
+					fi
+				done
+			fi
+		done
+		cd /
+		umount /hd-media
+
+		# It's possible that the ISO was written right to the front of a
+		# device, and not to a filesystem. (Hey, we may even be spinning
+		# a real CD here, though that would be pretty weird..)
+		try_iso $dev $dev
+
+		db_progress STEP 1
+	done
+
+	db_progress STOP
+
+	OLDDEVS="$DEVS"
+	DEVS=$(block_devices)
+	if [ "$OLDDEVS" != "$DEVS" ]; then
+		# Give USB time to settle, make sure all devices are seen
+		# this time though.
+		sleep 5
+	else
+		break
+	fi
 done
-
-db_progress STOP
 
 if [ "$MOUNTABLE_DEVS_COUNT" != 0 ]; then
 	# Ask about the more expensive second pass.

@@ -1,3 +1,18 @@
+iso-scan (1.15) UNRELEASED; urgency=low
+
+  * Deal with the case where the machine is so fast that iso-scan 
+    scans for new devices before the USB disks become ready. Add a possible
+    second pass in the quick scan that sleepds, looks for new devices and,
+    if any new devices are found, rescans them all. Closes: #335093
+    (Note that rather than complex code to keep track of what devices are new,
+    I just rescan them all because this is supposed to happen only on very
+    fast machines anyway. KISS)
+  * Load hfsplus before hfs, since hfsplus filesystems show as an empty hfs
+    filesystem, which hides any iso on them. Loading hdsplus first should make
+    mount try it first. Closes: #337316
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 15 Jun 2006 17:02:17 -0400
+
 iso-scan (1.14) unstable; urgency=low
 
   * Change load-iso menu item number from 13 to 16. cdrom-detect, load-iso,
