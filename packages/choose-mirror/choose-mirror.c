@@ -18,6 +18,7 @@
 static struct debconfclient *debconf;
 static char *protocol = NULL;
 static char *country  = NULL;
+int show_progress = 1;
 
 /*
  * Returns a string on the form "DEBCONF_BASE/protocol/supplied". The
@@ -134,10 +135,12 @@ int find_suite (void) {
 	int i;
 	int ret = 0;
 
-	debconf_progress_start(debconf, 0, 1,
-			       DEBCONF_BASE "checking_title");
-	debconf_progress_info(debconf,
-			      DEBCONF_BASE "checking_download");
+	if (show_progress) {
+		debconf_progress_start(debconf, 0, 1,
+				       DEBCONF_BASE "checking_title");
+		debconf_progress_info(debconf,
+				      DEBCONF_BASE "checking_download");
+	}
 
 	hostname = add_protocol("hostname");
 	debconf_get(debconf, hostname);
@@ -189,8 +192,10 @@ int find_suite (void) {
 	free(hostname);
 	free(directory);
 
-	debconf_progress_step(debconf, 1);
-	debconf_progress_stop(debconf);
+	if (show_progress) {
+		debconf_progress_step(debconf, 1);
+		debconf_progress_stop(debconf);
+	}
 
 	return ret;
 }
@@ -519,7 +524,7 @@ int check_arch (void) {
 	}
 }
 
-int main (void) {
+int main (int argc, char **argv) {
 	/* Use a state machine with a function to run in each state */
 	int state = 0;
 	int (*states[])() = {
@@ -537,6 +542,9 @@ int main (void) {
 		check_arch,
 		NULL,
 	};
+
+	if (argc > 1 && strcmp(argv[1], "-n") == 0)
+		show_progress=0;
 
 	debconf = debconfclient_new();
 	debconf_capb(debconf, "backup");
