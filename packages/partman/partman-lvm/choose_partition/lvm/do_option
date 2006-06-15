@@ -18,7 +18,7 @@ do_initial_setup() {
 	# make sure that lvm is available
 	if ! grep -q "[0-9] device-mapper$" /proc/misc ; then
 		db_set partman-lvm/nolvm "false"
-		db_input high partman-lvm/nolvm
+		db_input critical partman-lvm/nolvm
 		db_go
 		exit 0
 	fi
@@ -32,7 +32,7 @@ do_initial_setup() {
 	for s in /lib/partman/commit.d/*; do
 		if [ -x $s ]; then
 			$s || {
-				db_input high partman-lvm/commit_failed || true
+				db_input critical partman-lvm/commit_failed || true
 				db_go || true
 				for s in /lib/partman/init.d/*; do
 					if [ -x $s ]; then
@@ -49,7 +49,7 @@ do_initial_setup() {
 		if ! pv_create "$pv"; then
 			db_subst partman-lvm/pvcreate_error PV "$pv"
 			db_set partman-lvm/nolvm "false"
-			db_input high partman-lvm/nolvm
+			db_input critical partman-lvm/nolvm
 			db_go
 			exit 0
 		fi
@@ -189,7 +189,7 @@ do_vg_create() {
 	done
 	if [ -z "$pvs" ]; then
 		db_set partman-lvm/nopartitions "false"
-		db_input high partman-lvm/nopartitions
+		db_input critical partman-lvm/nopartitions
 		db_go
 		return
 	fi
@@ -203,7 +203,7 @@ do_vg_create() {
 	vg="$RET"
 	if [ -z "$vg" ]; then
 		db_set partman-lvm/vgcreate_nonamegiven "false"
-		db_input high partman-lvm/vgcreate_nonamegiven
+		db_input critical partman-lvm/vgcreate_nonamegiven
 		db_go
 		return
 	fi
@@ -211,7 +211,7 @@ do_vg_create() {
 	# Check whether the VG name is already in use
 	if vgs "$vg" > /dev/null 2>&1; then
 		db_set partman-lvm/vgcreate_nameused "false"
-		db_input high partman-lvm/vgcreate_nameused
+		db_input critical partman-lvm/vgcreate_nameused
 		db_go
 		return
 	fi
@@ -219,7 +219,7 @@ do_vg_create() {
 	# Check whether the VG name overlaps with an existing device
 	if [ -e "/dev/$vg" ]; then
 		db_set partman-lvm/vgcreate_devnameused "false"
-		db_input high partman-lvm/vgcreate_devnameused
+		db_input critical partman-lvm/vgcreate_devnameused
 		db_go
 		return
 	fi
@@ -234,7 +234,7 @@ do_vg_create() {
 		return
 	elif [ -z "$RET" ]; then
 		db_set partman-lvm/vgcreate_nosel "false"
-		db_input high partman-lvm/vgcreate_nosel
+		db_input critical partman-lvm/vgcreate_nosel
 		db_go
 		return
 	fi
@@ -244,7 +244,7 @@ do_vg_create() {
 	if ! vg_create "$vg" $pvs; then
 		db_subst partman-lvm/vgcreate_error VG "$vg"
 		db_set partman-lvm/vgcreate_error "false"
-		db_input high partman-lvm/vgcreate_error
+		db_input critical partman-lvm/vgcreate_error
 		db_go
 	else
 		db_subst partman-lvm/text/in_use VG "$vg"
@@ -272,7 +272,7 @@ do_vg_delete() {
 	done
 	if [ -z "$vgs" ]; then
 		db_set partman-lvm/vgdelete_novg "false"
-		db_input high partman-lvm/vgdelete_novg
+		db_input critical partman-lvm/vgdelete_novg
 		db_go
 		return
 	fi
@@ -297,7 +297,7 @@ do_vg_delete() {
 	pvs=$(vg_list_pvs "$vg")
 	if ! vg_delete "$vg"; then 
 		db_set partman-lvm/vgdelete_error "false"
-		db_input high partman-lvm/vgdelete_error
+		db_input critical partman-lvm/vgdelete_error
 		db_go
 	else
 		for pv in $pvs; do
@@ -323,7 +323,7 @@ do_vg_extend() {
 	done
 	if [ -z "$pvs" ]; then
 		db_set partman-lvm/nopartitions "false"
-		db_input high partman-lvm/nopartitions
+		db_input critical partman-lvm/nopartitions
 		db_go
 		return
 	fi
@@ -341,7 +341,7 @@ do_vg_extend() {
 	done
 	if [ -z "$vgs" ]; then
 		db_set partman-lvm/vgextend_novg "false"
-		db_input high partman-lvm/vgextend_novg
+		db_input critical partman-lvm/vgextend_novg
 		db_go
 		return
 	fi
@@ -363,7 +363,7 @@ do_vg_extend() {
 	db_get partman-lvm/vgextend_parts
 	if [ -z "$RET" ]; then
 		db_set partman-lvm/vgextend_nosel "false"
-		db_input high partman-lvm/vgextend_nosel
+		db_input critical partman-lvm/vgextend_nosel
 		db_go
 		return
 	elif [ "$RET" = "false" ]; then
@@ -377,7 +377,7 @@ do_vg_extend() {
 			db_subst partman-lvm/vgextend_error PARTITION $pv
 			db_subst partman-lvm/vgextend_error VG $vg
 			db_set partman-lvm/vgextend_error "false"
-			db_input high partman-lvm/vgextend_error
+			db_input critical partman-lvm/vgextend_error
 			db_go
 			return
 		else
@@ -406,7 +406,7 @@ do_vg_reduce() {
 	done
 	if [ -z "$vgs" ]; then
 		db_set partman-lvm/vgreduce_novg "false"
-		db_input high partman-lvm/vgreduce_novg
+		db_input critical partman-lvm/vgreduce_novg
 		db_go
 		return
 	fi
@@ -440,7 +440,7 @@ do_vg_reduce() {
 	db_get partman-lvm/vgreduce_parts
 	if [ -z "$RET" ]; then
 		db_set partman-lvm/vgreduce_nosel "false"
-		db_input high partman-lvm/vgreduce_nosel
+		db_input critical partman-lvm/vgreduce_nosel
 		db_go
 		return
 	elif [ "$RET" = "false" ]; then
@@ -455,7 +455,7 @@ do_vg_reduce() {
 	if [ "$count" -eq "$PVS" ]; then
 		if ! vg_delete "$vg"; then 
 			db_set partman-lvm/vgdelete_error "false"
-			db_input high partman-lvm/vgdelete_error
+			db_input critical partman-lvm/vgdelete_error
 			db_go
 		fi
 		return
@@ -467,7 +467,7 @@ do_vg_reduce() {
 			db_subst partman-lvm/vgreduce_error VG "$vg"
 			db_subst partman-lvm/vgreduce_error PARTITION "$pv"
 			db_set partman-lvm/vgreduce_error "false"
-			db_input high partman-lvm/vgreduce_error
+			db_input critical partman-lvm/vgreduce_error
 			db_go
 			return
 		else
@@ -493,7 +493,7 @@ do_lv_create() {
 
 	if [ -z "$vgs" ]; then
 		db_set partman-lvm/lvcreate_nofreevg "false"
-		db_input high partman-lvm/lvcreate_nofreevg
+		db_input critical partman-lvm/lvcreate_nofreevg
 		db_go
 		return
 	fi
@@ -515,7 +515,7 @@ do_lv_create() {
 	db_get partman-lvm/lvcreate_name
 	if [ -z "$RET" ]; then
 		db_set partman-lvm/lvcreate_nonamegiven "false"
-		db_input high partman-lvm/lvcreate_nonamegiven
+		db_input critical partman-lvm/lvcreate_nonamegiven
 		db_go
 		return
 	fi
@@ -526,7 +526,7 @@ do_lv_create() {
 		db_subst partman-lvm/lvcreate_exists LV "$lv"
 		db_subst partman-lvm/lvcreate_exists VG $vg
 		db_set partman-lvm/lvcreate_exists "false"
-		db_input high partman-lvm/lvcreate_exists
+		db_input critical partman-lvm/lvcreate_exists
 		db_go
 		return
 	fi
@@ -556,7 +556,7 @@ do_lv_create() {
 		db_subst partman-lvm/lvcreate_error LV $lv
 		db_subst partman-lvm/lvcreate_error SIZE $RET
 		db_set partman-lvm/lvcreate_error "false"
-		db_input high partman-lvm/lvcreate_error
+		db_input critical partman-lvm/lvcreate_error
 		db_go
 		return
 	fi
@@ -582,7 +582,7 @@ do_lv_delete() {
 
 	if [ -z "$lvs" ]; then
 		db_set partman-lvm/lvdelete_nolv "false"
-		db_input high partman-lvm/lvdelete_nolv
+		db_input critical partman-lvm/lvdelete_nolv
 		db_go
 		return
 	fi
@@ -601,7 +601,7 @@ do_lv_delete() {
 		db_subst partman-lvm/lvdelete_error VG $vg
 		db_subst partman-lvm/lvdelete_error LV $lv
 		db_set partman-lvm/lvdelete_error "false"
-		db_input high partman-lvm/lvdelete_error
+		db_input critical partman-lvm/lvdelete_error
 		db_go
 		return
 	fi
