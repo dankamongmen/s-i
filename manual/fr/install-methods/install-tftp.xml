@@ -42,7 +42,7 @@ peuvent être configurés que par DHCP.</phrase>
 </para><para arch="powerpc">
 
 Pour les PowerPC, si vous avez une machine Power Macintosh NewWorld, il vaut 
-mieux utiliser DHCP plutôt que BOOTP. Certaines de ces machines ne peuvent pas 
+mieux utiliser DHCP plutôt que BOOTP. Certaines machines récentes ne peuvent pas 
 s'amorcer avec BOOTP.
 
 </para><para arch="alpha"> 
@@ -66,7 +66,7 @@ la configuration IP des interfaces réseau.
 </para><para arch="hppa"> 
 
 Quelques vieilles machines HPPA (p. ex. 715/75) utilisent RBOOTD plutôt que 
-BOOTP. Un paquet <classname>RBOOTD</classname> est disponible dans l'archive Debian.
+BOOTP. Un paquet <classname>rbootd</classname> est disponible dans l'archive Debian.
 
 </para><para>
 
@@ -82,7 +82,7 @@ le nom de Solaris) et GNU/Linux.
 Pour utiliser la méthode de démarrage par l'exécution d'un environnement de
 pré-amorçage (PXE) de TFTP, vous avez besoin d'un serveur TFTP avec
 <userinput>tsize</userinput>. Sur un serveur &debian;, les paquets
-<classname>atftpd</classname> et <classname>tftp-hpa</classname> 
+<classname>atftpd</classname> et <classname>tftpd-hpa</classname> 
 sont bons&nbsp;; nous vous conseillons <classname>tftpd-hpa</classname>.
 
 </para></note>
@@ -131,11 +131,11 @@ man&oelig;uvre suivante sur votre serveur&nbsp;:
 # echo 1 &gt; /proc/sys/net/ipv4/ip_no_pmtu_disc
 </screen></informalexample>
 
-de façon à détourner la détection du MTU, sinon la PROM de la machine SGI ne pourra 
+de façon à empêcher la détection du MTU, sinon la PROM de la machine SGI ne pourra 
 pas télécharger le nouveau noyau. En outre, assurez-vous que les paquets TFTP 
 transitent par un port source inférieur à 32767 ou bien le téléchargement 
 s'arrêtera après le premier paquet. Vous pouvez toujours contourner ce
-         bogue de la PROM grâce au noyau 2.4.X en ajustant
+bogue de la PROM grâce au noyau 2.4.X en ajustant
 
 <informalexample><screen>
 # echo "2048 32767" &gt; /proc/sys/net/ipv4/ip_local_port_range
@@ -205,7 +205,7 @@ la commande <userinput>boot <replaceable>#</replaceable>/tftp</userinput>
 où <replaceable>#</replaceable> est le numéro de périphérique 
 «&nbsp;TurboChannel&nbsp;» sur lequel amorcer. Sur la plupart des DECstation, 
 c'est le numéro <quote>3</quote>. Si le serveur BOOTP/DHCP ne fournit pas le
-nom du fichier ou bien que vous ayez besoin de passer des paramètres 
+nom du fichier ou si vous avez besoin de passer des paramètres 
 supplémentaires, cela peut se faire avec la syntaxe suivante&nbsp;:
 
 </para><para>
@@ -223,7 +223,7 @@ Il peut y avoir plusieurs causes&nbsp;:
 <listitem><para>
 
 Le microprogramme ne répond pas à une requête ARP durant un transfert TFTP. 
-Cela conduit à une suspension ARP et le transfert s'arrête. La solution est 
+Cela conduit à un <quote>timeout</quote> d'ARP et le transfert s'arrête. La solution est 
 d'ajouter l'adresse MAC de la carte Ethernet dans la table 
 ARP du serveur TFTP. On peut le faire avec
 <userinput>arp -s <replaceable>IP-address</replaceable>
@@ -311,7 +311,7 @@ des informations supplémentaires sur la configuration de votre système.
    </sect3>
 
    <sect3 arch="mips">
-   <title> Amorçage TFTP pour SGI</title>
+   <title>Amorçage TFTP pour SGI</title>
 <para>
 
 Sur les machines SGI, vous pouvez compter sur <command>bootpd</command> pour
@@ -328,7 +328,7 @@ bien par l'option <userinput>filename=</userinput> dans
 <para>
 
 Il n'est pas utile de configurer DHCP car vous indiquerez à CFE l'adresse 
-exacte du fichier qui doit être chargé
+exacte du fichier qui doit être chargé.
 
 </para>
    </sect3>
