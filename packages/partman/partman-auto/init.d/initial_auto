@@ -21,14 +21,19 @@ dev_to_partman () {
 	done
 }
 
-# Only run the first time.
+# Do not run on S/390
+if [ "$(udpkg --print-architecture)" = s390 ]; then
+	exit 0
+fi
+
+# Only run the first time
 if [ -f /var/lib/partman/initial_auto ]; then
 	exit 0
 fi
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 touch /var/lib/partman/initial_auto
 
-# See if a disk to autopartition has been set.
+# See if a disk to autopartition has been set
 db_get partman-auto/disk
 if [ -n "$RET" ]; then
 	disk="$RET"

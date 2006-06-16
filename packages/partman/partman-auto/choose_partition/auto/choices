@@ -2,7 +2,10 @@
 
 . /usr/share/debconf/confmodule
 
+# Do not run on S/390
+if [ "$(udpkg --print-architecture)" = s390 ]; then
+        exit 0
+fi
 
 db_metaget partman-auto/text/automatically_partition description
 printf "auto\t$RET"
-
