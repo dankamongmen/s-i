@@ -116,6 +116,8 @@ typedef int (newt_handler)(struct frontend *obj, struct question *q);
 #define TEXT_PADDING 1
 /*  Horizontal offset between text box and borders */
 #define BUTTON_PADDING 4
+/*  Padding of title width, allows for leading "[!!] " before title. */
+#define TITLE_PADDING 6
 
 /* gettext would be much nicer :-( */
 static const char *
@@ -356,7 +358,7 @@ show_separate_window(struct frontend *obj, struct question *q)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
-    t_width_title = newt_get_text_width(obj->title);
+    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
     newt_create_window(win_width, win_height, obj->title, q->priority);
@@ -433,7 +435,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     }
     t_height = win_height - 6;
     t_width = newt_get_text_width(full_description);
-    t_width_buttons = 2*BUTTON_PADDING;
+    t_width_buttons = 2*BUTTON_PADDING + newt_get_text_width(continue_text(obj)) + 2;
     if (obj->methods.can_go_back(obj, q))
         //  Add an interspace
         t_width_buttons += newt_get_text_width(goback_text(obj)) + 3;
@@ -441,7 +443,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
-    t_width_title = newt_get_text_width(obj->title);
+    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
     newt_create_window(win_width, win_height, obj->title, q->priority);
@@ -553,7 +555,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         t_width = sel_width;
     if (win_width > t_width + 8)
         win_width = t_width + 8;
-    t_width_title = newt_get_text_width(obj->title);
+    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
     if (show_ext_desc && full_description) {
@@ -706,7 +708,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         t_width = sel_width;
     if (win_width > t_width + 8)
         win_width = t_width + 8;
-    t_width_title = newt_get_text_width(obj->title);
+    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
     if (show_ext_desc && full_description) {
@@ -821,7 +823,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
-    t_width_title = newt_get_text_width(obj->title);
+    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
     newt_create_window(win_width, win_height, obj->title, q->priority);
