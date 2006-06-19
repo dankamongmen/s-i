@@ -10,9 +10,14 @@ IFS=$NEWLINE
 for line in $(set); do
 	var="${line%=*}"
 	val="${line#[!=]*=}"
-	# grep out the normal variables with no slashes
 	varnoslash="${var##*/*}"
+	# "nofoo" shorthand
+	if [ "$val" = "" ] && [ "$varnoslash" != "" ] && [ "${var##no}" != "" ]; then
+		var="${var##no}"
+		val="false"
+	fi
 	if [ "$val" != "" ]; then
+		# if the variable lacks a slash, it may be an alias
 		if [ "$varnoslash" != "" ]; then
 			var=$(grep "^$varnoslash[[:space:]]" /etc/preseed_aliases | cut -f2)
 		fi
