@@ -14,15 +14,14 @@ for line in $(set); do
 	varnoslash="${var##*/*}"
 	if [ "$val" != "" ]; then
 		if [ "$varnoslash" != "" ]; then
-			var=$(tr -s " 	" "	" <  /etc/preseed_aliases | \
-			      grep "^$varnoslash	" | cut -f2)
+			var=$(grep "^$varnoslash[[:space:]]" /etc/preseed_aliases | cut -f2)
 		fi
 		if [ "$var" != "" ]; then
 			# remove single quotes from around value
 			val="${val#\'}"
 			val="${val%\'}"
-			# remove double quotes (user can type those for values with
-			# spaces)
+			# remove double quotes (user can type those for values
+			# with spaces)
 			val="${val#\"}"
 			val="${val%\"}"
 	
