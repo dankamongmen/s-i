@@ -354,7 +354,7 @@ static const char *template_lget(const struct template *t,
                 free(orig_field);
                 return NULL;
             }
-            cp = strstr(altlang, ".UTF-8");
+            cp = strcasestr(altlang, ".UTF-8");
             if (cp + 6 == altlang + strlen(altlang) && cp != altlang + 1)
             {
                 *cp = 0;
@@ -465,10 +465,23 @@ static void template_lset(struct template *t, const char *lang,
                 free(orig_field);
                 return;
             }
-            cp = strstr(altlang, ".UTF-8");
-            if (cp + 6 == altlang + strlen(altlang) && cp != altlang + 1)
+            cp = strcasestr(altlang, ".UTF-8");
+
+            /* Plain debconf supports undefined character sets, on the
+               form "Description-nb_NO: ", which is valid if the text is
+               ASCII (but debconf still uses that syntax regardless of
+               validity if the application does not specify a character
+               set). To avoid losing these fields, we simply read them
+               in as if they were UTF-8 fields, as valid ASCII is always
+               valid UTF-8 as well.
+              
+               -- sesse, 2006-06-19
+            */
+            if ((cp + 6 == altlang + strlen(altlang) && cp != altlang + 1)
+	        || strchr(altlang, '.') == NULL)
             {
-                *cp = 0;
+                if (cp != NULL)
+                    *cp = 0;
                 template_lset(t, altlang, orig_field, value);
             }
 #ifndef NODEBUG
@@ -617,7 +630,7 @@ struct template *template_load(const char *filename)
 			template_lset(t, NULL, "default", p+9);
 		else if (i18n && strstr(p, "Default-") == p && t != 0)
 		{
-			cp = strstr(p, ".UTF-8: ");
+			cp = strcasestr(p, ".UTF-8: ");
 			if (cp != NULL && cp != p+8)
 			{
 				lang = strndup(p+8, (int) (cp - p - 8));
@@ -635,7 +648,7 @@ struct template *template_load(const char *filename)
 			template_lset(t, NULL, "choices", p+9);
 		else if (i18n && strstr(p, "Choices-") == p && t != 0)
 		{
-			cp = strstr(p, ".UTF-8: ");
+			cp = strcasestr(p, ".UTF-8: ");
 			if (cp != NULL && cp != p+8)
 			{
 				lang = strndup(p+8, (int) (cp - p - 8));
@@ -653,7 +666,7 @@ struct template *template_load(const char *filename)
 			template_lset(t, NULL, "indices", p+9);
 		else if (i18n && strstr(p, "Indices-") == p && t != 0)
 		{
-			cp = strstr(p, ".UTF-8: ");
+			cp = strcasestr(p, ".UTF-8: ");
 			if (cp != NULL && cp != p+8)
 			{
 				lang = strndup(p+8, (int) (cp - p - 8));
@@ -696,7 +709,7 @@ struct template *template_load(const char *filename)
 		}
 		else if (i18n && strstr(p, "Description-") == p && t != 0)
 		{
-			cp = strstr(p, ".UTF-8: ");
+			cp = strcasestr(p, ".UTF-8: ");
 			if (cp != NULL && cp != p+12)
 			{
 				lang = strndup(p+12, (int) (cp - p - 12));
