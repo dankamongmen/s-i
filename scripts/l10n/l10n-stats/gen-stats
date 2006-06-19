@@ -1,5 +1,6 @@
 #!/bin/bash
-# Copyright (c) 2004 by Dennis Stampfer <seppy@debian.org>
+# Copyright (c) 2004-2006 Dennis Stampfer <seppy@debian.org>
+# Copyright (c) 2006 Christian Perrier <bubulle@debian.org>
 # Licensed under the GNU General Public License
 #
 # Fetches sources for the installer packages and generates
@@ -20,6 +21,7 @@
 # 
 #
 
+############################### Functions ##################################
 create_dir() {
   if [ ! -d "$1" ] ; then
     if [ ! -e "$1" ] ; then
@@ -41,13 +43,46 @@ usage(){
   echo  "               level: the D-I \"level\" to work on"
 }
 
-# Defaults
+translated () {  #how many are translated?
+  $GETTEXT/msgfmt --statistics $1 2>&1  | sed -e 's/, //g' | $WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
+}
+
+
+fuzzy() {  #how many fuzzy?
+  #msgfmt -o /dev/null --statistics  $WD/$1 2>&1 | sed -e 's/.*translated messages, //g' |sed -e 's/ fuzzy.*$//g'
+  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
+}
+
+untranslated () {  #guess, what does this do?
+  #msgfmt -o /dev/null --statistics $WD/$1 2>&1|sed -e 's/.*, //g' | sed -e 's/ .*.$//g'
+  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
+}
+
+translator () { #who is last-translator?
+  #awk '/Last-Translator:/ { print $2,$3 } ' $1
+  grep "Last-Translator: " $1 | sed -e 's/"Last-Translator: //g' | sed -e 's/ <.*$//g'
+}
+
+print_text () { # print standard-text
+echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang.txt
+date -u  >> $TARGET_DIR/$lang.txt
+echo "
+
+Read: http://people.debian.org/~seppy/d-i/translation-status.html" >> $TARGET_DIR/$lang.txt
+}
+########################### End of functions ##################################
+
+
+
+########################### Defaults ##########################################
 WD="."
 FETCH=""
 GETTEXT="/usr/bin"
 LEVEL=1
+########################### End of Defaults ###################################
 
-##  Command line parsing
+
+##########################  Command line parsing ##############################
 MORETODO=true
 while $MORETODO ; do
     case "$1" in
@@ -72,7 +107,33 @@ while $MORETODO ; do
         ;;
     esac
 done
+########################## End of command line parsing ###################
 
+########################## Definitions, which depend on command-line #####
+# Directory with config files
+CONFIG_DIR=$WD/config
+# Directory for results
+RESULTS_DIR=$WD/results
+# Directory for graphs (translation ratio over time)
+GRAPHS_DIR=$WD/graphs
+# Directory for lock files and other temporary stuff
+RUN_DIR=$WD/run
+
+SCRIPTNAME="level $LEVEL"
+COPY_TO_DIR=$WD/material/level$LEVEL
+TARGET_DIR=$RESULTS_DIR/level$LEVEL
+GRAPH_FILE=".l${LEVEL}.dat"
+
+export PATH=$GETTEXT:$PATH
+
+TEMPDIR="${RUN_DIR}/gen-stats-temp-$RANDOM"
+export GETTEXT
+LANG=C
+########################## End of definitions ############################
+
+
+
+########################## Sanity and consistency checks #################
 if [ -z "$LEVEL" ] ; then
   usage
   exit 1
@@ -90,106 +151,49 @@ if [ ! -x "$GETTEXT/msgfmt" -o ! -x "$GETTEXT/msgmerge" -o ! -x "$GETTEXT/debcon
   exit 1
 fi
 
-echo $WD
-echo $LEVEL
-echo $FETCH
-echo $GETTEXT
-
-CONFIG_DIR=$WD/config
-RESULTS_DIR=$WD/results
-GRAPHS_DIR=$WD/graphs
-
-SCRIPTNAME="level $LEVEL"
-COPY_TO_DIR=$WD/material/level$LEVEL
-TARGET_DIR=$RESULTS_DIR/level$LEVEL
-GRAPH_FILE=".l${LEVEL}.dat"
-
+# Create all the needed directories (safely)
 create_dir $WD
 create_dir $TARGET_DIR
 create_dir $CONFIG_DIR
 create_dir $RESULTS_DIR
 create_dir $TARGET_DIR/POT
 create_dir $COPY_TO_DIR
-create_dir $GRAPHS_DIR
+create_dir $RUN_DIR
 create_dir $GRAPHS_DIR/data
 
 PROSPECTIVE="$WD/material/packages1/debian-installer/packages/po/PROSPECTIVE"
-
-
 if [ ! -f $PROSPECTIVE ] ; then
   echo No PROSPECTIVE file found
-  echo Please run $0 at least once for leve 1 with \"fetch\"
+  echo Please run $0 at least once for level 1 with \"fetch\"
   exit 1
 fi
 
-cd $WD
-if [ -f $LEVEL.lock ]; then
-	echo "A lockfile $LEVEL.lock exists. Exiting...";
-	echo "A lockfile $LEVEL.lock exists. Exiting..." 1>&2
-	exit
-fi
-touch $LEVEL.lock
-
-
-export PATH=$GETTEXT:$PATH
-
 LANG_NAMES="$WD/config/languages.names"
+if [ ! -f "${LANG_NAMES}" ] ; then
+  echo "No language names file (${LANG_NAMES}) found"
+  exit 1
+fi
 
-TEMPFILE="/tmp/.gen-stats-temp-$RANDOM"
-export GETTEXT
-LANG=C
+if [ -f "${RUN_DIR}/$LEVEL.lock" ]; then
+	echo "A lockfile ${RUN_DIR}/$LEVEL.lock exists. Exiting..." 1>&2
+	exit 1
+fi
+############### End of sanity and consistency checks #############
 
 
-#some functions:
-translated () {  #how many are translated?
-  $GETTEXT/msgfmt --statistics $1 2>&1  | sed -e 's/, //g' | $WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
-}
+############### THE REAL BEGINNING ###############################
+
+# Create the lock file
+cd $WD
+touch "${RUN_DIR}/$LEVEL.lock"
 
 
-fuzzy() {  #how many fuzzy?
-  #msgfmt -o /dev/null --statistics  $WD/$1 2>&1 | sed -e 's/.*translated messages, //g' |sed -e 's/ fuzzy.*$//g'
-  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
-}
-
-untranslated () {  #guess, what does this do?
-  #msgfmt -o /dev/null --statistics $WD/$1 2>&1|sed -e 's/.*, //g' | sed -e 's/ .*.$//g'
-  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
-}
-
-translator () { #who is last-translator?
-  #awk '/Last-Translator:/ { print $2,$3 } ' $1
-  grep "Last-Translator: " $1 | sed -e 's/"Last-Translator: //g' | sed -e 's/ <.*$//g'
-}
-
-print_shit () { # print standard-text
-echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang.txt
-date -u  >> $TARGET_DIR/$lang.txt
-echo "
-
-Read: http://people.debian.org/~seppy/d-i/translation-status.html" >> $TARGET_DIR/$lang.txt
-}
-
-##debug/testing. Be sure, that the functions work as theiy should:
-#f="packages/shadow/po/*.pot"
-#$GETTEXT/msgfmt --statistics $f
-#echo fuzzy $f:
-#fuzzy $f
-#echo un:
-#untranslated $f
-#echo tr:
-#translated $f
-#exit
-
-#########################################################################
+# Some output
 echo -n "$SCRIPTNAME script start by user $USER, logname $LOGNAME: "
 date
 echo "Working directory is $WD"
 echo "Skipping in rank.txt:"
 grep -v "^#" $PROSPECTIVE
-
-#update:
-#####/home/seppy/apt-get-update 2&> /dev/null
-
 
 rm -rf $TARGET_DIR/*
 if [ "$FETCH" ]; then
@@ -205,16 +209,16 @@ if [ "$FETCH" ]; then
 
 	#cleanup
 	#rm -rf $WD/packages/*
-	rm -rf $TEMPFILE > /dev/null
+	rm -rf $TEMPDIR > /dev/null
 
 	#get files:
-	mkdir $TEMPFILE
-	cd $TEMPFILE
+	mkdir $TEMPDIR
+	cd $TEMPDIR
 	echo -en "$MERKEL_DOWN" > $TARGET_DIR/packages-list
 	date -u >> $TARGET_DIR/packages-list
 	echo "From unstable:" >> $TARGET_DIR/packages-list
 	for pkg in `cat $WD/config/packages.unstable$LEVEL`; do
-		cd $TEMPFILE
+		cd $TEMPDIR
   		echo -n "Downloading $pkg..."
 		rm -rf $WD/material/packages$LEVEL/$pkg*
   		apt-get $APT_OPT source $pkg > /dev/null && echo "$pkg done." || echo "FAILED to fetch $pkg from unstable!" >> $TARGET_DIR/packages-list
@@ -231,13 +235,6 @@ if [ "$FETCH" ]; then
 			cd newt/po/
 			make newt.pot
 			chmod a+r newt.pot
-		#elif [ "$pkg" = "pppconfig" ]; then
-		#	cd $WD/packages$LEVEL/$pkg/po
-		#	mv messages.po messages.pot || echo "mv messages.po messages.pot for pppconfig"
-		#elif [ "$pkg" = "shadow" -a "$LEVEL" = "4" ]; then
-		#	$WD/patch-shadow 4
-		#elif [ "$pkg" = "shadow" -a "$LEVEL" = "2" ]; then
-		#	$WD/patch-shadow 2
 		fi
 		head -n 1 $WD/material/packages$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list
 	done
@@ -318,7 +315,7 @@ GR_FUZZY=0
 GR_UNTRANSLATED=0
 mkdir $TARGET_DIR/files
 rm -f $TARGET_DIR/.rank.txt$LEVEL
-rm -rf $TEMPFILE
+rm -rf $TEMPDIR
 for lang in `cat $WD/config/languages`; do #run for every language
   	echo -n "$lang..."
 	NAME=`cat $LANG_NAMES | grep "$lang:" | sed "s/://g" || echo $lang`
@@ -338,7 +335,6 @@ for lang in `cat $WD/config/languages`; do #run for every language
 			#now check if a file has been modified by debconf-updatepo and output a *
 			#for lang in `cat $WD/languages`; do
 			#	test -f packages/$path/$lang.po || continue
-			###pas sur qu'il faille ajouter $LEVEL dans les deux lignes qui suivent
 				ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages$LEVEL/$path/$lang.po.orig 2>&1`
 				NEW=`$GETTEXT/msgfmt --statistics $WD/material/packages$LEVEL/$path/$lang.po 2>&1`
 				if [ "$ORIG" != "$NEW" ]; then
@@ -437,7 +433,7 @@ for lang in `cat $WD/config/languages`; do #run for every language
 	fi
 	echo >>  $TARGET_DIR/$lang.txt
 
-  	print_shit
+  	print_text
 
 	LEAD="000";
   	P="${LEAD:0:${#LEAD}-${#P}}$P"
@@ -449,22 +445,16 @@ for lang in `cat $WD/config/languages`; do #run for every language
   	rm -f /tmp/.$LEVEL.error 
 
 
-	#test -d $TARGET_DIR/graph/ || mkdir $TARGET_DIR/graph/
-	
-	#für den graphen
-#	test "$P" = "000" || echo `date +%Y-%m-%d` $P >> $WD/../data/$lang$GRAPH_FILE
+	# Data needed by graphs
 	test "$P" = "000" || echo `date +%Y-%m-%d` $P >> $GRAPHS_DIR/data/$lang$GRAPH_FILE
 	
 	
-	#echo "set terminal png; set output \"$TARGET_DIR/graph/$lang.png\"; set xdata time; set timefmt \"%Y-%m-%d\"; set format x \"%d/%m\"; set xlabel \"date (day/month)\"; set ylabel \"percent\"; set title \"Translation chart of $lang\"; set tics in; set yrange [0:100]; set timestamp \"%d/%m/%y %H:%M\" 80,-2; plot \"$WD/plot/langs/$lang.dat\" using 1:2 title \"2nd-stage ($P%)\" with lines, \"$WD/plot/langs/$lang.d-i.dat\" using 1:2 title \"1st-stage\" with lines;"|gnuplot
-
-
   	echo "done. ($P%)"
 done
 #for lang in `cat languages`; do
 
 
-#generate ranking:
+# Generate ranking
 echo "Rankings for $SCRIPTNAME packages." > $TARGET_DIR/rank.txt
 date -u >> $TARGET_DIR/rank.txt
 echo >> $TARGET_DIR/rank.txt
@@ -473,9 +463,8 @@ sort -r $TARGET_DIR/.rank.txt$LEVEL | sed 's/^00/  /g' | sed 's/^0/ /g' | cat -n
 $WD/scripts/sort-ranktxt < $TARGET_DIR/.rank.txt$LEVEL >> $TARGET_DIR/rank.txt
 rm $TARGET_DIR/.rank.txt$LEVEL
 
-#move files to their destination
+# Move files to their destination
 cp $WD/config/HEADER.txt $TARGET_DIR/
-#scp -r $TARGET_DIR/ seppy@gluck.debian.org:~/public_html/d-i/
 
 
 
@@ -491,11 +480,10 @@ cp -r $TARGET_DIR $COPY_TO_DIR
 
 
 
-#cleanup
+# Cleanup
 echo "Cleanup..."
 rm -f $TARGET_DIR/.rank.txt$LEVEL
-rm -rf $TEMPFILE
-#rm -rf packages/*
+rm -rf $TEMPDIR
 rm -rf messages messages.mo
 
 chmod -R a+r $TARGET_DIR
