@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36269 -->
+<!-- original version: 37512 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -196,7 +196,7 @@ runtime.
 Another readable file <filename>/var/cache/debconf/questions.dat</filename>
 is used to store the values for variables and the answers given to questions.
 A question always refers to the template used to ask it. For obvious
-security reasons the values for templates of type <quote>password</quote>
+security reasons the values for questions of type <quote>password</quote>
 are stored in a separate, non-readable file in the same directory.
 
 </para>
@@ -234,7 +234,7 @@ instal·lació. Consulteu-ne els detalls a <xref linkend="preseed-shell"/>.
 És pot emprar la configuració prèvia per canviar les respostes
 predeterminades a les preguntes, però tot i així haver-les de respondre.
 Per fer-ho, la marca <firstterm>seen</firstterm> ha de posar-se a
-<quote>false</quote> desprès de definir el valor a la plantilla.
+<quote>false</quote> desprès de definir el valor a una pregunta.
 
 </para>
 
@@ -388,6 +388,14 @@ indiqueu al nucli, mitjançant la línia d'ordres, els valors de configuració
 prèvia. Simplement indiqueu el <userinput>camí/a/var=valor</userinput> per
 a qualsevol de les variables de configuració prèvia llistades als exemples.
 
+</para><para>
+Un <quote>--</quote> a les opcions d'arranc té un significat especial.
+Els paràmetres del nucli que apareixen despres es copiaran a la
+configuració del carregador de l'arrencada instal·lat (si està suportat
+per l'instal·lador del carregador de l'arrencada). Adoneu-vos que el
+<quote>--</quote> podria estar present als paràmetres d'arrencada per
+defecte.
+
 </para>
 <note><para>
 
@@ -423,7 +431,7 @@ El fitxer de configuració prèvia és en el format emprat per l'ordre
 <command>debconf-set-selections</command>. El format general d'una línia a
 un fitxer de configuració prèvia és:
 <informalexample><screen>
-&lt;propietari&gt; &lt;nom de la plantilla&gt; &lt;tipus de plantilla&gt; &lt;valor&gt;
+&lt;propietari&gt; &lt;nom de la pregunta&gt; &lt;tipus de pregunta&gt; &lt;valor&gt;
 </screen></informalexample>
 
 </para><para>
@@ -441,17 +449,17 @@ configuració prèvia.
 <listitem><para>
   Una línia es pot dividir en vàries afegint una barra invertida
   (<quote><literal>\</literal></quote>) com a caràcter per continuar.
-  Un bon lloc per dividir una línia és despres del nom de la plantilla;
+  Un bon lloc per dividir una línia és despres del nom de la pregunta;
   un lloc dolent és entre un tipus i un valor.
 </para></listitem>
 <listitem><para>
-  La major part de les plantilles s'han d'omplir utilitzant els valors
-  vàlids i no amb valors traduits. Però, hi ha algunes plantilles (per
+  La major part de les preguntes s'han d'omplir utilitzant els valors
+  vàlids i no amb valors traduits. Però, hi ha algunes preguntes (per
   exemple al <classname>partman</classname>) on s'han d'utilitzar valors
   traduits.
 </para></listitem>
 <listitem><para>
-  Algunes plantilles agafen un codi com a valor en comptes del text anglès
+  Algunes preguntes agafen un codi com a valor en comptes del text anglès
   que es mostra a la instal·lació.
 </para></listitem>
 </itemizedlist>
@@ -501,7 +509,7 @@ s'esborraran del vostre sistema si purgueu el paquet
 
 <para>
 
-Per comprovar els possibles valors per les plantilles, podeu utilitzar
+Per comprovar els possibles valors per les preguntes, podeu utilitzar
 l'ordre <command>nano</command> per examinar els fitxers
 <filename>/var/lib/cdebconf</filename> mentre la instal·lació s'està
 realitzant. Vegeu <filename>templates.dat</filename> per les plantilles i
@@ -716,7 +724,7 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 <informalexample role="example"><screen>
 # Si el sistema disposa d'espai lliure podeu triar de particionar només
 # aquest.
-# Nota: Aquest plantilla s'ha de omplir amb valors localitzats (traduits).
+# Nota: Aquesta s'ha de omplir amb valors localitzats (traduits).
 #d-i partman-auto/init_automatically_partition \
 #      select Utilitza l'espai lliure continu més gran
 
@@ -726,7 +734,7 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 
 # Podeu triar qualsevol de les receptes de particionat predefinides.
-# Nota: Aquest plantilla s'ha de omplir amb valors localitzats (traduits).
+# Nota: Aquesta s'ha de omplir amb valors localitzats (traduits).
 # localitzar (traduir).
 d-i partman-auto/choose_recipe \
        select Tots els fitxers en una partició (recomanat per a nous usuaris)
@@ -936,31 +944,37 @@ En aquest moment les tasques que hi ha són:
 
 <itemizedlist>
 <listitem><para>
-  <userinput>Sistema estàndard</userinput>
+  <userinput>estàndard</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Entorn d'escriptori</userinput>
+  <userinput>escriptori</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor web</userinput>
+  <userinput>escriptori-gnome</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor d'impressió</userinput>
+  <userinput>escriptori-kde</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor DNS</userinput>
+  <userinput>servidor-web</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor de fitxers</userinput>
+  <userinput>servidor-impresió</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Servidor de correu</userinput>
+  <userinput>servidor-dns</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Base de dades SQL</userinput>
+  <userinput>servidor-fitxers</userinput>
 </para></listitem>
 <listitem><para>
-  <userinput>Portàtil</userinput>
+  <userinput>servidor-correu</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>servidor-base-de-dades</userinput>
+</para></listitem>
+<listitem><para>
+  <userinput>portàtil</userinput>
 </para></listitem>
 </itemizedlist>
 
@@ -968,13 +982,14 @@ En aquest moment les tasques que hi ha són:
 
 Podeu també no instal·lar cap tasca i forçar la instal·lació d'un
 conjunt de paquets d'alguna altra manera. És recomanable incloure sempre
-la tasca <userinput>Sistema estàndard</userinput>.
+la tasca <userinput>estàndard</userinput>.
 
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect Standard system, Desktop environment
-#tasksel tasksel/first multiselect Standard system, Web server
+tasksel tasksel/first multiselect estàndard, escriptori
+#tasksel tasksel/first multiselect estàndard, servidor-web
+#tasksel tasksel/first multiselect estàndard, escriptori-kde
 
 # Algunes versions de l'instal·lador poden enviar informes del programari
 # que heu instal·lat, i els programes que feu servir. Per defecte no
@@ -1131,6 +1146,12 @@ general de la xarxa a un fitxer i els ajusts més específics a altres.
 # si s'obté cap nom d'un fitxer de configuració prèvia, s'hi inclou.
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+
+# El més flexible de tots, açò descarrega un programa i l'executa.
+# El programa pot utilitzar ordres com debconf-set per manipular la base
+# de dades debconf. Adoneu-vos que els noms d'arxiu són relatius, s'agafen
+# del mateix directori que el fitxer de preconfiguració que els executa.
+d-i preseed/run string foo.sh
 </screen></informalexample>
 
   </sect2>

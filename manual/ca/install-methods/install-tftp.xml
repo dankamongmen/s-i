@@ -190,7 +190,7 @@ que el servidor dhcp està configurat per passar
 Per a DECstations, hi ha fitxers tftpimage de cada subarquitectura,
 els quals contenen el nucli i l'instal·lador en un únic fitxer. La
 convenció quant al nom és
-<replaceable>subarquitectura</replaceable>/netboot-boot.img.
+<filename><replaceable>subarquitectura</replaceable>/netboot-boot.img</filename>.
 Copieu el fitxer tftpimage que voleu fer servir a
 <userinput>/tftpboot/tftpboot.img</userinput> si esteu emprant els
 ajusts del BOOTP/DHCP dels exemples descrits amunt.
@@ -269,22 +269,21 @@ mètodes.
    <title>Arrencada TFTP de l'SPARC</title>
 <para>
 
-Per exemple, les arquitectures SPARC empren els noms de la subarquitectura,
-com ara <quote>SUN4M</quote> o <quote>SUN4C</quote>; en alguns casos,
-l'arquitectura es deixa en blanc, de manera que el fitxer buscat pel client
-és <filename>ip-del-client-en-hex</filename>. Així, si la subarquitectura és
-SUN4C, i la IP és 192.168.1.3, el nom del fitxer és
-<filename>C0A80103.SUN4C</filename>. Per a determinar això fàcilment
-introduïu l'ordre següent en un intèrpret d'ordres (s'assumeix que la IP de la màquina
-és 10.0.0.4).
+Algunes arquitectures SPARC afegeixen els noms de la subarquitectura,
+com ara <quote>SUN4M</quote> o <quote>SUN4C</quote> al fitxer. Es a dir,
+si la subarquitectura del vostre sistema és un SUN4C, i la seva IP
+és 192.168.1.3, el fitxer serà <filename>C0A80103.SUN4C</filename>.
+Però, hi ha també subarquitectures on el fitxer del client és
+<filename>ip-del-client-en-hex</filename>. Per a determinar fàcilment el
+codi hexadecimal de la adreça IP introduiu l'ordre següent a l'intèrpret
+d'ordres (suposant que la IP de la màquina és 10.0.0.4).
 
 <informalexample><screen>
 $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 </screen></informalexample>
 
-Això indica la IP en hexadecimal; per obtenir el nom de fitxer correcte,
-canvieu totes les lletres a majúscules i afegiu-hi si cal el nom de la
-subarquitectura.
+Per obtenir el nom de fitxer correcte, canvieu totes les lletres a
+majúscules i afegiu-hi si cal el nom de la subarquitectura.
 
 </para><para>
 
@@ -331,7 +330,7 @@ fitxer TFTP. Es dóna o com a <userinput>bf=</userinput> en
 <para>
 
 No cal que configureu el DHCP de manera especial perquè passareu el
-camí complet del fitxer al carregat al CFE.
+camí complet del fitxer per carregar-lo al CFE.
 
 </para>
    </sect3>

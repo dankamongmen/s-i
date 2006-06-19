@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36614 -->
+<!-- original version: 36730 -->
 
  <sect1 id="kernel-baking"><title>Compilant un nou nucli</title>
 <para>
@@ -142,43 +142,37 @@ l'ordre <userinput>make-kpkg clean</userinput>.
 </para><para>
 
 Seguidament heu de compilar el nucli:
-<userinput>fakeroot make-kpkg --revision=custom.1.0 kernel_image</userinput>.
+<userinput>fakeroot make-kpkg --initrd --revision=custom.1.0 kernel_image</userinput>.
 El número de versió <quote>1.0</quote> es pot modificar; és únicament
 un número de versió que s'utilitzarà per registrar les generacions del nucli.
 Podeu utilitzar qualsevol paraula enlloc de <quote>custom</quote>
 (ex. un nom d'ordinador). La duració de la compilació del nucli
 dependrà de la potència de l'ordinador.
 
-</para><para condition="supports-pcmcia">
-
-Si necessiteu el suport per a PCMCIA, també haureu d'instal·lar el paquet
-<classname>pcmcia-source</classname>. Desempaqueteu el fitxer gzip tar
-com a superusuari al directori <filename>/usr/src</filename>  (és important
-que els mòduls es trobin allà on s'espera que es trobin, 
-<filename>/usr/src/modules</filename>). Seguidament, i com a superusuari,
-heu d'executar l'ordre <userinput>make-kpkg modules_image</userinput>.
 
 </para><para>
 
 Un cop finalitzada la compilació, podeu instal·lar el nucli personalitzat
-com qualsevol altre paquet. Heu d'executar, com a superusuari, l'ordre
-<userinput>dpkg -i ../kernel-image-&kernelversion;-<replaceable>subarquitectura</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+com qualsevol altre paquet. Heu d'executar, com a superusuari, 
+<phrase condition="classic-kpkg">
+<userinput>dpkg -i
+../kernel-image-&kernelversion;-<replaceable>subarquitectura</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+</phrase>
 La part <replaceable>subarquitectura</replaceable> és una subarquitectura
 opcional
 <phrase arch="i386"> com per exemple <quote>i586</quote>, </phrase>
 en funció de les opcions del nucli seleccionades.
 
-L'ordre <userinput>dpkg -i kernel-image...</userinput> instal·larà el nucli,
+L'ordre <userinput>dpkg -i</userinput> instal·larà el nucli,
 juntament amb d'altres fitxers de suport. Per exemple, s'instal·larà
 <filename>System.map</filename> (que serà d'ajuda en els problemes
 de depuració del nucli), i també s'instal·larà el fitxer
 <filename>/boot/config-&kernelversion;</filename> que contindrà el conjunt
-d'opcions de configuració actuals. El paquet
-<classname>kernel-image-&kernelversion;</classname>
-és capaç d'utilitzar directament el carregador d'arrencada de la plataforma
-per executar l'actualització en l'arrencada, possibilitant l'arrencada sense
-la necessitat de tornar a executar el carregador d'arrencada. Si heu creat
-un paquet de mòduls, ex. si diposeu de PCMCIA, també haureu d'instal·lar-lo.
+d'opcions de configuració actuals. El paquet del nucli es prou inteligent
+per actualitzar automàticament el vostra carregador d'arranc per utilitzar
+el nou nucli. Si heu creat un paquet amb mòduls,
+<phrase condition="classic-kpkg"> per exemple, si teniu una PCMCIA, </phrase>
+necessitareu instal·lar eixe paquet també.
 
 </para><para>
 
