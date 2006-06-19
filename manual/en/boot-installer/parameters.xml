@@ -74,10 +74,10 @@ The installation system recognizes a few additional boot parameters<footnote>
 
 <para>
 
-Note that the kernel accepts a maximum of 8 command line options and
+Note that the 2.4 kernel accepts a maximum of 8 command line options and
 8 environment options (including any options added by default for the
 installer). If these numbers are exceeded, 2.4 kernels will drop any
-excess options and 2.6 kernels will panic. With kernel 2.6.9 or newer,
+excess options. With kernel 2.6.9 or newer,
 you can use 32 command line options and 32 environment options.
 
 </para>
@@ -92,21 +92,22 @@ you can use 32 command line options and 32 environment options.
 <listitem><para>
 
 This parameter sets the lowest priority of messages to be displayed.
+Short form: <userinput>priority</userinput>
 
 </para><para>
 
-The default installation uses <userinput>debconf/priority=high</userinput>.
+The default installation uses <userinput>priority=high</userinput>.
 This means that both high and critical priority messages are shown, but medium
 and low priority messages are skipped.
 If problems are encountered, the installer adjusts the priority as needed.
 
 </para><para>
 
-If you add <userinput>debconf/priority=medium</userinput> as boot parameter, you
+If you add <userinput>priority=medium</userinput> as boot parameter, you
 will be shown the installation menu and gain more control over the installation.
-When <userinput>debconf/priority=low</userinput> is used, all messages are shown
+When <userinput>priority=low</userinput> is used, all messages are shown
 (this is equivalent to the <emphasis>expert</emphasis> boot method).
-With <userinput>debconf/priority=critical</userinput>, the installation system
+With <userinput>priority=critical</userinput>, the installation system
 will display only critical messages and try to do the right thing without fuss.
 
 </para></listitem>
@@ -214,15 +215,16 @@ one device.
 Some architectures use the kernel framebuffer to offer installation in
 a number of languages. If framebuffer causes a problem on your system
 you can disable the feature by the parameter
-<userinput>debian-installer/framebuffer=false</userinput>. Problem
-symptoms are error messages about bterm or bogl, a blank screen, or
-a freeze within a few minutes after starting the install.
+<userinput>debian-installer/framebuffer=false</userinput>, or
+<userinput>fb=false</userinput> for short. Problem symptoms are error messages
+about bterm or bogl, a blank screen, or a freeze within a few minutes after
+starting the install.
 
 </para><para arch="i386">
 
 The <userinput>video=vga16:off</userinput> argument may also be used
-to disable the framebuffer. Such problems have been reported on a Dell
-Inspiron with Mobile Radeon card.
+to disable the kernel's user of the framebuffer. Such problems have been
+reported on a Dell Inspiron with Mobile Radeon card.
 
 </para><para arch="m68k">
 
@@ -290,6 +292,7 @@ this misbehavior.
 
 Specify the url to a preconfiguration file to download and use in
 automating the install. See <xref linkend="automatic-install"/>.
+Short form: <userinput>url</userinput>
 
 </para></listitem>
 </varlistentry>
@@ -300,6 +303,7 @@ automating the install. See <xref linkend="automatic-install"/>.
 
 Specify the path to a preconfiguration file to load to
 automating the install. See <xref linkend="automatic-install"/>.
+Short form: <userinput>file</userinput>
 
 </para></listitem>
 </varlistentry>
