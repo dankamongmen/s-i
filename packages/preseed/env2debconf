@@ -14,7 +14,8 @@ for line in $(set); do
 	varnoslash="${var##*/*}"
 	if [ "$val" != "" ]; then
 		if [ "$varnoslash" != "" ]; then
-			var=$(grep "^$varnoslash[[:space:]]" /etc/preseed_aliases | cut -f2)
+			var=$(grep "^$varnoslash[[:space:]][[:space:]]*" /etc/preseed_aliases)
+			var=${var%[[:space:]]*}
 		fi
 		if [ "$var" != "" ]; then
 			# remove single quotes from around value
