@@ -638,6 +638,8 @@ msgid ""
 "Put only a single space or tab between type and value: any additional "
 "whitespace will be interpreted as belonging to the value."
 msgstr ""
+"형식과 값 사이에 하나의 공백이나 탭을 넣으십시오. 추가적인 공백이나 "
+"탭은 값에 속한 것으로 인식합니다."
 
 #. Tag: para
 #: preseed.xml:417
@@ -648,6 +650,9 @@ msgid ""
 "good place to split a line is after the question name; a bad place is "
 "between type and value."
 msgstr ""
+"각 줄은 줄 이음 문자로 백슬래시(<quote><literal>\\</literal></quote>)를 "
+"추가하여 여러 줄로 나눌 수 있습니다. 줄을 나누는 가장 좋은 위치는 질문 이름뒤 입니다."
+"가장 나쁜 위치는 형식과 값 사이입니다."
 
 #. Tag: para
 #: preseed.xml:423
@@ -691,6 +696,8 @@ msgid ""
 "$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>\n"
 "$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>"
 msgstr ""
+"$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>\n"
+"$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>"
 
 #. Tag: para
 #: preseed.xml:449
@@ -1080,7 +1087,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:624
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -1145,6 +1152,7 @@ msgstr ""
 "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
 "\n"
 "# 미리 정의한 파티션 방식 중의 하나를 선택할 수 있습니다.\n"
+"# Note: 이 템플릿은 지역화된(번역된) 값으로 미리 설정되어야 합니다.\n"
 "d-i partman-auto/choose_recipe \\\n"
 "       select All files in one partition (recommended for new users)\n"
 "#d-i partman-auto/choose_recipe \\\n"
@@ -1229,7 +1237,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:645
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
@@ -1249,13 +1257,12 @@ msgstr ""
 "#d-i apt-setup/non-free boolean true\n"
 "#d-i apt-setup/contrib boolean true\n"
 "# 보안 소스를 설치하는 것을 막기 위해서 이 값을 주석해제하거나,\n"
-"# security.debian.org가 아닌 다른 서버를 사용하기위해 호스트이름을 추가하십시"
-"요.\n"
+"# security.debian.org가 아닌 다른 서버를 사용하기위해 호스트이름을 추가하십시요.\n"
 "#d-i apt-setup/security_host string\n"
 "\n"
 "# 추가 레파지토리, local[0-9] 사용가능\n"
 "#d-i apt-setup/local0/comment string local server\n"
-"#d-i apt-setup/local0/repository string \\\n"
+"#d-i apt-setup/local0/source string \\\n"
 "#       deb http://local.server/debian stable main\n"
 "# 지역 레파지토리의 공개키 주소\n"
 "#d-i apt-setup/local0/key string http://local.server/key"
@@ -1780,7 +1787,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:830
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# More that one file can be listed, separated by spaces; all will be\n"
 "# loaded. The included files can have preseed/include directives of their\n"
@@ -1818,9 +1825,11 @@ msgstr ""
 "# 좀 더 유연하게 하려면, 다음과 같이 하면 미리 설정 파일의 이름을\n"
 "# 출력하는 쉘 명령어를 출력하고, 그 파일을 포함합니다.\n"
 "#d-i preseed/include_command \\\n"
-"#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi# Most "
-"flexibly of all, this downloads a program and runs it. The program\n"
-"# can use commands such as debconf-set to manupulate the debconf database.\n"
-"# Note that if the filenames are relative, they are taken from the same\n"
-"# directory as the preconfiguration file that runs them.\n"
+"#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
+"\n"
+"# 이 중에거 가장 유연한 것으로, 프로그램을 다운로드하고 이를 실행할 수 \n"
+"# 있습니다. 이 프로그램은 debconf 데이터베이스를 조작하기 위해 \n"
+"# debconf-set과 같은 명령을 사용할 수 있으며 파일명이 상대경로로 되어 \n"
+"# 있으면 프로그램을 실행하는 사전 설정파일이 있는 디렉토리에서 파일들을 \n"
+"# 찾습니다."
 "d-i preseed/run string foo.sh"
