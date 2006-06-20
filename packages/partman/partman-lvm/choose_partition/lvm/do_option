@@ -630,6 +630,8 @@ db_metaget partman-lvm/menu/createlv description
 menu_createlv="$RET"
 db_metaget partman-lvm/menu/deletelv description
 menu_deletelv="$RET"
+db_metaget partman-lvm/menu/finish description
+menu_finish="$RET"
 
 while [ 1 ]; do
 	# Get some statistics
@@ -670,6 +672,8 @@ while [ 1 ]; do
 	fi
 	# Delete LV
 	[ $lvs -gt 0 ] && choices="${choices}, $menu_deletelv"
+	# Add Finish option
+	choices="${choices}, $menu_finish"
 
 	# Setup mainmenu template
 	db_subst partman-lvm/mainmenu CHOICES "$choices"
@@ -705,7 +709,7 @@ while [ 1 ]; do
 	Deletelogical)
 		do_lv_delete
 		;;
-	*)
+	Finish|*)
 		break
 		;;
 	esac
