@@ -33,29 +33,26 @@ create_dir() {
 }
 
 usage(){
-  echo Usage: $0 [--directory=<working_directory>] [--fetch] [--level=<level>]
+  echo Usage: $0 level [config] [fetch]
   echo 
-  echo  "    --directory=\"<directory>\" : "
-  echo  "               Directory for all files (default=current directory)"
-  echo  "    --gettext=\"<directory>\" : "
-  echo  "               Directory for gettext utilities (default=/usr/bin)"
-  echo  "    --level=\"<level>\" : "
   echo  "               level: the D-I \"level\" to work on"
+  echo  "               config: optional config file"
+  echo  "               fetch: fetch translations from repositories"
 }
 
 translated () {  #how many are translated?
-  $GETTEXT/msgfmt --statistics $1 2>&1  | sed -e 's/, //g' | $WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1  | sed -e 's/, //g' | $WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
 }
 
 
 fuzzy() {  #how many fuzzy?
   #msgfmt -o /dev/null --statistics  $WD/$1 2>&1 | sed -e 's/.*translated messages, //g' |sed -e 's/ fuzzy.*$//g'
-  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
 }
 
 untranslated () {  #guess, what does this do?
   #msgfmt -o /dev/null --statistics $WD/$1 2>&1|sed -e 's/.*, //g' | sed -e 's/ .*.$//g'
-  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
 }
 
 translator () { #who is last-translator?
@@ -83,30 +80,29 @@ LEVEL=1
 
 
 ##########################  Command line parsing ##############################
-MORETODO=true
-while $MORETODO ; do
-    case "$1" in
-    "--fetch")
-        FETCH=Y
-        shift
-        ;;
-    "--level="*)
-        LEVEL=`echo $1|cut -f2 -d=`
-        shift
-        ;;
-    "--directory="*)
-        WD=`echo $1|cut -f2 -d=`
-        shift
-        ;;
-    "--gettext="*)
-        GETTEXT=`echo $1|cut -f2 -d=`
-        shift
-        ;;
-    *)
-        MORETODO=false
-        ;;
-    esac
-done
+if [ "$3" = "fetch" ] ; then
+  FETCH=Y
+fi
+
+if [ "$2" ] ; then
+  CONFIG=$2
+fi
+
+if [ "$1" ] ; then
+  LEVEL=$1
+else
+  usage
+  exit 1
+fi
+
+if [ "$CONFIG" ] ; then
+  if [ -r "$CONFIG" ] ; then
+    . "$CONFIG"
+  else
+    echo $CONFIG does not exist or unreadable
+    exit 1
+  fi
+fi
 ########################## End of command line parsing ###################
 
 ########################## Definitions, which depend on command-line #####
@@ -131,13 +127,7 @@ export GETTEXT
 LANG=C
 ########################## End of definitions ############################
 
-
-
 ########################## Sanity and consistency checks #################
-if [ -z "$LEVEL" ] ; then
-  usage
-  exit 1
-fi
 
 # Here we'll need to add some sanity check on LEVEL
 
@@ -491,4 +481,4 @@ chmod -R a+r $TARGET_DIR
 echo -n "Script end: "
 date
 
-rm $WD/$LEVEL.lock
+rm $RUN_DIR/$LEVEL.lock
