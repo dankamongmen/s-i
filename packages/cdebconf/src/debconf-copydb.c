@@ -70,9 +70,6 @@ int main(int argc, char **argv)
     if (db1name == NULL || db2name == NULL)
         usage(argv[0]);
 
-    /* suppress warnings about unknown localized fields */
-    setenv("DEBCONF_NO_I18N", "1", 1);
-
     /* parse the configuration info */
     config = config_new();
     if (config->read(config, DEBCONFCONFIG) == 0)
