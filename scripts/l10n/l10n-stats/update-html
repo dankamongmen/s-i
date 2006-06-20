@@ -10,7 +10,6 @@
 #   o update_html.conf
 #     Config file with values for files locations and levels to handle
 
-set -x
 
 create_dir() {
   if [ ! -d "$1" ] ; then
@@ -112,12 +111,12 @@ function doit() {
 
 	echo "<b>$AVERAGE% in total<br>$LANGUAGES+1(en) languages</b>"
 	if [ "$1" != "manual.txt" ]; then
-		echo -n "$AVERAGE + " >> /tmp/avg
+		echo -n "$AVERAGE + " >> $TEMPDIR/avg
 	fi
 	test "$AVERAGE" = "0" && exit
 }
 
-echo -n "(" > /tmp/avg
+echo -n "(" > $TEMPDIR/avg
 for I in $LEVELS; do
 	cp $RESULTS/level$I/rank.txt $TEMPDIR/tmp.txt
 	grep "%" $TEMPDIR/tmp.txt > $TEMPDIR/$I.txt
@@ -148,7 +147,7 @@ for i in $LEVELS ; do
   sed "/<L$i>/r $TEMPDIR/$i.txt" $TEMPDIR/template >$TEMPDIR/template.tmp
   mv $TEMPDIR/template.tmp $TEMPDIR/template
 done
-cp $TEMPDIR/template $TARGET
+cat $TEMPDIR/template | sed "s/<DATE>/$D/g" | sed "s/<TOTAL>/$TOTAL/g" | sed 's/<MANUAL>//g' > $TARGET
 
 # sed '/<L1>/r 1.txt' $TEMPLATE | sed '/<L2>/r 2.txt' | sed '/<L3>/r 3.txt' | sed '/<L4>/r 4.txt' | sed '/<L5>/r 5.txt' | sed '/<MANUAL>/r manual.txt' | sed 's/<L1>//g' | sed 's/<L2>//g' | sed 's/<L3>//g' | sed 's/<L4>//g'  | sed 's/<L5>//g' | sed "s/<DATE>/$D/g" | sed "s/<TOTAL>/$TOTAL/g" | sed 's/<MANUAL>//g' > $TARGET
 
