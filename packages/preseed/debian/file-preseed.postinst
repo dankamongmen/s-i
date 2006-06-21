@@ -4,17 +4,32 @@ set -e
 . /usr/share/debconf/confmodule
 . /lib/preseed/preseed.sh
 
-# transitional kludge to deal with old path based locations
-db_get preseed/file
-[ -n "${RET#/floppy*}" ] && RET="floppy://${RET#/floppy}"
-[ -n "${RET#/*}" ] && RET="file://$RET"
-db_set preseed/file $RET
+usedfloppy=
+
+# Used by preseed function.
+preseed_fetch () {
+	if [ "${1%/*}" = "/floppy" ]; then
+		mountfloppy || true
+		usedfloppy=1
+	fi
+	
+	if [ ! -e "$1" ] || ! cp "$1" $2; then
+		return 1
+	else
+		return 0
+	fi
+}
+preseed_relative () {
+	if [ -z "${1##/*}" ]; then
+		return 1
+	else	
+		return 0
+	fi
+}
 
 preseed preseed/file
 preseed_command preseed/early_command
 
-# check if fetch-method/floppy has set a flag
-if [ -e /var/run/preseed-usedfloppy ]; then
+if [ "$usedfloppy" ]; then
 	umount /floppy || true
-	rm /var/run/usedfloppy
 fi
