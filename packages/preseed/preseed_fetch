@@ -1,0 +1,12 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+. /lib/preseed/functions.sh
+
+db_get preseed/last_location && lastloc=$RET
+url=$(make_absolute_url $1 $lastloc)
+proto=${url%%://*}
+
+. /lib/preseed/fetch-methods/$proto
+
+protocol_fetch $url $2

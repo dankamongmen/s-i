@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /lib/preseed/functions.sh
+
 logfile=/var/lib/preseed/log
 
 log () {
@@ -15,8 +17,6 @@ error () {
 	exit 1
 }
 
-# Note: Needs a preseed_fetch function or command not provided by this
-# file, as well as preseed_relative
 preseed_location () {
 	local location="$1"
 	local checksum="$2"
@@ -79,20 +79,17 @@ preseed_location () {
 			sum="${checksum%% *}"
 			checksum="${checksum#$sum }"
 
-			# Support relative paths, just use path of last file.
-			if preseed_relative "$location"; then
-				# This works for urls too.
-				location="$(dirname $last_location)/$location"
-			fi
+			location=$(make_absolute_url "$location" "$last_location")
+			# BTW -- is this test for empty strings really needed?
 			if [ -n "$location" ]; then
 				preseed_location "$location" "$sum"
 			fi
 		done
 	
+		db_set preseed/last_location $last_location
 		for location in $torun; do
-			if preseed_relative "$location"; then
-				location="$(dirname $last_location)/$location"
-			fi
+			location=$(make_absolute_url "$location" "$last_location")
+			# BTW -- is this test for empty strings really needed?
 			if [ -n "$location" ]; then
 				if ! preseed_fetch "$location" "$tmp"; then
 					error retrieve_error "$location"

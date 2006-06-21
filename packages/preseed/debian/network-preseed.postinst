@@ -4,29 +4,6 @@ set -e
 . /usr/share/debconf/confmodule
 . /lib/preseed/preseed.sh
 
-# Used by preseed function.
-preseed_fetch () {
-	local url="$1"
-	local file="$2"
-	iters=0
-	while [ $iters -lt 3 ]; do
-		# TODO proxy support? Would it be useful?
-		# TODO add progress bar
-		if wget -q "$url" -O "$file"; then
-			return 0
-		fi
-        	iters=$(($iters + 1))
-	done
-	return 1
-}
-preseed_relative () {
-	if [ -z ${1##*://*} ]; then
-		return 1
-	else
-		return 0
-	fi
-}
-
 # DHCP filename preseeding.
 for file in /var/lib/dhcp/dhclient.leases /var/lib/dhcp3/dhclient.leases; do
 	if [ -r "$file" ]; then
@@ -39,3 +16,5 @@ done
 
 preseed preseed/url
 preseed_command preseed/early_command
+
+
