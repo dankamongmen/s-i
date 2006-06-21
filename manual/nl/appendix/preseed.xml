@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 37311 untranslated -->
+<!-- original version: 38290 untranslated -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -318,8 +318,14 @@ Boot parameters to specify:
 
 <para>
 
+Note that <filename>preseed/url</filename> can be shortened to just
+<filename>url</filename> and <filename>preseed/file</filename> to just
+<filename>file</filename> when they are passed as boot parameters.
+
+</para><para>
+
 While you're at it, you may want to add a boot parameter
-<userinput>debconf/priority=critical</userinput>. This will avoid most
+<userinput>priority=critical</userinput>. This will avoid most
 questions even if the preseeding below misses some.
 
 </para>
@@ -379,6 +385,12 @@ If a preconfiguration file cannot be used to preseed some steps, the install
 can still be fully automated, since you can pass preseed values to the kernel
 on the command line. Just pass <userinput>path/to/var=value</userinput>
 for any of the preseed variables listed in the examples.
+
+</para><para>
+
+Note that some variables that are frequently set at the boot prompt have a
+shorter alias. If an alias is available, it is used in the examples in
+this appendix instead of the full variable.
 
 </para><para>
 
@@ -542,7 +554,7 @@ these questions have been asked.
 
 The locale can be used to specify both language and country.
 To specify the locale as a boot parameter, use
-<userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>.
+<userinput>locale=<replaceable>en_US</replaceable></userinput>.
 
 <informalexample role="example"><screen>
 # Locale sets language and country.
@@ -596,7 +608,7 @@ kernel boot parameters.
 
 If you need to pick a particular interface when netbooting before loading
 a preconfiguration file from the network, use a boot parameter such as
-<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+<userinput>interface=<replaceable>eth1</replaceable></userinput>.
 
 </para>
 
@@ -794,7 +806,7 @@ earlier questions. You can optionally add other (local) repositories.
 
 # Additional repositories, local[0-9] available
 #d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/repository string \
+#d-i apt-setup/local0/source string \
 #       deb http://local.server/debian stable main
 # URL to the public key of the local repository
 #d-i apt-setup/local0/key string http://local.server/key
