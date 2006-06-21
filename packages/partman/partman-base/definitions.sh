@@ -927,6 +927,114 @@ partman_unlock_unit() {
 	done
 }
 
+# List the changes that are about to be committed and let the user confirm first
+confirm_changes () {
+	local template dev x part partitions num id size type fs path name filesystem partitems items formatted_previously
+	template="$1"
+
+	# Compute the changes we are going to do
+	partitems=''
+	items=''
+	for dev in $DEVICES/*; do
+		[ -d "$dev" ] || continue
+		cd $dev
+
+		open_dialog IS_CHANGED
+		read_line x
+		close_dialog
+		if [ "$x" = yes ]; then
+			partitems="${partitems}   $(humandev $(cat device))
+"
+		fi
+
+		partitions=
+		open_dialog PARTITIONS
+		while { read_line num id size type fs path name; [ "$id" ]; }; do
+			[ "$fs" != free ] || continue
+			partitions="$partitions $id,$num"
+		done
+		close_dialog
+	
+		formatted_previously=no
+		for part in $partitions; do
+			id=${part%,*}
+			num=${part#*,}
+			[ -f $id/method -a -f $id/format \
+			  -a -f $id/visual_filesystem ] || continue
+			# if no filesystem (e.g. swap) should either be not
+			# formatted or formatted before the method is specified
+			[ -f $id/filesystem -o ! -f $id/formatted \
+			  -o $id/formatted -ot $id/method ] || continue
+			# if it is already formatted filesystem it must be formatted 
+			# before the method or filesystem is specified
+			[ ! -f $id/filesystem -o ! -f $id/formatted \
+			  -o $id/formatted -ot $id/method \
+			  -o $id/formatted -ot $id/filesystem ] ||
+			{
+				formatted_previously=yes
+				continue
+			}
+			filesystem=$(cat $id/visual_filesystem)
+			db_subst partman/text/confirm_item TYPE "$filesystem"
+			db_subst partman/text/confirm_item PARTITION "$num"
+			db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
+			db_metaget partman/text/confirm_item description
+		    
+			items="${items}   ${RET}
+"
+		done
+	done
+
+	if [ "$items" ]; then
+		db_metaget partman/text/confirm_item_header description
+		items="$RET
+$items"
+	fi
+    
+	if [ "$partitems" ]; then
+		db_metaget partman/text/confirm_partitem_header description
+		partitems="$RET
+$partitems"
+	fi
+
+	if [ "$partitems$items" ]; then
+		if [ -z "$items" ]; then
+			x="$partitems"
+		elif [ -z "$partitems" ]; then
+			x="$items"
+		else
+			x="$partitems
+$items"
+		fi
+		db_subst $template/confirm ITEMS "$x"
+		db_input critical $template/confirm
+		db_go || true
+		db_get $template/confirm
+		if [ "$RET" = false ]; then
+			db_reset $template/confirm
+			return 1
+		else
+			db_reset $template/confirm
+			return 0
+		fi
+	else
+		if [ "$formatted_previously" = no ]; then
+			db_input critical $template/confirm_nochanges
+			db_go || true
+			db_get $template/confirm_nochanges
+			if [ "$RET" = false ]; then
+				db_reset $template/confirm_nochanges
+				return 1
+			else
+				db_reset $template/confirm_nochanges
+				return 0
+			fi
+		else
+			return 0
+		fi
+	fi
+}
+
 log '*******************************************************'
 
 # Local Variables:
