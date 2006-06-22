@@ -139,6 +139,17 @@ $RET
 #
 ###############################################################################
 
+# Check if a device contains PVs
+pv_on_device() {
+	local device
+	device="$1"
+
+	if $(pvs --noheadings --nosuffix -o pv_name | grep -q "$device"); then
+		return 0
+	fi
+	return 1
+}
+
 # Get info on a PV
 pv_get_info() {
 	local info
