@@ -22,7 +22,6 @@ l5)
 	;;
 all)
 	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/manual_d-i
-	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level1-post-sarge
 	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level1
 	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level2
 	l10n-spellcheck.sh ~/l10n-spellcheck/cfg/level3
