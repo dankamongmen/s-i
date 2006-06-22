@@ -4,8 +4,12 @@ if [ ! -e /var/lib/lowmem ]; then
 fi
 
 for log in syslog messages; do
-	echo "Log file truncated to save memory." > /var/log/$log
-	pid=$(ps | grep [t]ail | grep /var/log/$log | sed 's/ root.*//')
+	logpath=/var/log/$log
+	[ -s $logpath ] && echo "Log file truncated to save memory." > $logpath
+
+	# using % in place of / allows us to look for a pattern containing /'s
+	# the [t] stops sed's ps listing from matching it's own pattern
+	pid=$(ps ax | sed -n 's%^[ ]*\([0-9]*\).*[t]ail -f '$logpath'.*%\1%p')
 	if [ -n "$pid" ]; then
 		kill $pid || true
 	fi
