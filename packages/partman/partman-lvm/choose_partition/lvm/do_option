@@ -594,33 +594,27 @@ while [ 1 ]; do
 	db_go
 	db_get partman-lvm/mainmenu
 
-	option=$(echo "$RET" | sed -e 's/^\([[:alpha:]]*\) \([[:alpha:]]*\).*/\1\2/')
-	case "$option" in
-	Display*)
+	option="$RET"
+	if [ "$option" = "$menu_display" ]; then
 		do_display
-		;;
-	Createvolume)
+	elif [ "$option" = "$menu_createvg" ]; then
 		do_vg_create
-		;;
-	Deletevolume)
+	elif [ "$option" = "$menu_deletevg" ]; then
 		do_vg_delete
-		;;
-	Extendvolume)
+	elif [ "$option" = "$menu_extendvg" ]; then
 		do_vg_extend
-		;;
-	Reducevolume)
+	elif [ "$option" = "$menu_reducevg" ]; then
 		do_vg_reduce
-		;;
-	Createlogical)
+	elif [ "$option" = "$menu_createlv" ]; then
 		do_lv_create
-		;;
-	Deletelogical)
+	elif [ "$option" = "$menu_deletelv" ]; then
 		do_lv_delete
-		;;
-	Finish|*)
+	elif [ "$option" = "$menu_finish" ]; then
 		break
-		;;
-	esac
+	else
+		# TODO: write log error for unknown menu option
+		break
+	fi
 done
 
 # install lvm tools in /target if needed
