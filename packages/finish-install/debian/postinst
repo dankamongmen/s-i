@@ -25,7 +25,10 @@ do
 
 	if [ -x "$script" ] ; then
 		log "info: Running $script"
-		if ! log-output -t finish-install "$script"; then
+		# Else needed so we don't loose the exit code
+		if log-output -t finish-install "$script"; then
+			:
+		else
 			code="$?"
 			if [ "$code" = 10 ]; then
 				log "$script backed up"
