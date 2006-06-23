@@ -1030,7 +1030,7 @@ command_open()
         open_out();
         if (device_opened(device_name)) {
                 static char *only_ok[] = { "OK", NULL };
-                log("Warning: the device is opened");
+                log("Warning: the device is already opened");
                 pseudo_exception("Warning",
                                  "The device is already opened.", only_ok);
         } else {
