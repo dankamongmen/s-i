@@ -81,7 +81,7 @@ test_evms(struct partition *p)
 }
 
 // RAID volumes are /dev/md/# for numbers #
-// Stats are found in /dev/mdstats
+// Stats are found in /proc/mdstat
 // XXX THIS IS UNTESTED XXX
 static void
 test_raid(struct partition *p)
