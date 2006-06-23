@@ -592,8 +592,11 @@ while [ 1 ]; do
 	db_set partman-lvm/mainmenu "false"
 	db_input critical partman-lvm/mainmenu
 	db_go
-	db_get partman-lvm/mainmenu
+	if [ $? -eq 30 ]; then
+		break
+	fi
 
+	db_get partman-lvm/mainmenu
 	option="$RET"
 	if [ "$option" = "$menu_display" ]; then
 		do_display
