@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36744 -->
+<!-- original version: 38289 -->
 
  <sect1 id="boot-parms"><title>Boot-Parameter</title>
 <para>
@@ -77,13 +77,12 @@ Das Installationssystem kennt ein paar zusätzliche Boot-Parameter, <footnote>
 
 <para>
 
-Bedenken Sie, das der Kernel maximal 8 Kommandozeilen-Optionen und
+Bedenken Sie, dass 2.4-Kernel maximal 8 Kommandozeilen-Optionen und
 8 Umgebungs-Optionen (inklusive der Optionen, die standardmäßig für
-den Installer hinzugefügt werden) akzeptiert. Werden diese Grenzen
-überschritten, wird ein 2.4er Kernel überzählige Optionen ignorieren,
-ein 2.6er Kernel erzeugt eine Kernel-Panic. Falls Sie einen 2.6.9-Kernel
-oder neuer verwenden, können Sie 32 Kommandozeilenoptionen und 32
-Umgebungsoptionen angeben.
+den Installer hinzugefügt werden) akzeptieren. Werden diese Grenzen
+überschritten, wird der 2.4er Kernel überzählige Optionen einfach
+ignorieren. Falls Sie einen 2.6.9-Kernel oder neuer verwenden, können
+Sie 32 Kommandozeilenoptionen und 32 Umgebungsoptionen benutzen.
 
 </para>
 
@@ -98,23 +97,23 @@ Umgebungsoptionen angeben.
 
 Dieser Parameter legt die niedrigste Prioritätsstufe von Meldungen fest,
 die angezeigt werden (alle Meldungen mit niedrigerer Priorität als hier
-angegeben werden unterdrückt).
+angegeben werden unterdrückt). Kurzform: <userinput>priority</userinput>.
 
 </para><para>
 
-Die Standardinstallation nutzt <userinput>debconf/priority=high</userinput>.
+Die Standardinstallation nutzt <userinput>priority=high</userinput>.
 Dies bedeutet, dass Meldungen mit hoher und kritischer Priorität angezeigt
 werden, Meldungen mit Priorität medium oder niedrig werden unterdrückt.
 Treten Probleme auf, verändert der Installer die Priorität nach Bedarf.
 
 </para><para>
 
-Wenn Sie <userinput>debconf/priority=medium</userinput> als Boot-Parameter
+Wenn Sie <userinput>priority=medium</userinput> als Boot-Parameter
 angeben, wird das Installationsmenü angezeigt und gibt Ihnen mehr Kontrolle
-über die Installation. Wird <userinput>debconf/priority=low</userinput>
+über die Installation. Wird <userinput>priority=low</userinput>
 benutzt, werden alle Meldungen angezeigt (dies entspricht dem
 <emphasis>Experten</emphasis>-Modus).
-Bei <userinput>debconf/priority=critical</userinput> zeigt das
+Bei <userinput>priority=critical</userinput> zeigt das
 Installationssystem nur kritische Meldungen an und versucht, ohne viel
 Klamauk das Richtige zu tun.
 
@@ -226,15 +225,17 @@ Auf einigen Architekturen wird der Kernel-Framebuffer benutzt, um
 die Installation in vielen verschiedenen Sprachen anbieten zu können.
 Falls der Framebuffer auf Ihrem System Probleme macht, können Sie ihn
 mit dem Parameter <userinput>debian-installer/framebuffer=false</userinput>
-deaktivieren. Symptome für diese Probleme können Fehlermeldungen betreffend
-<quote>bterm</quote> oder <quote>bogl</quote> sein sowie ein schwarzer Bildschirm oder ein
-Einfrieren des Systems ein paar Minuten nach dem Installationsstart.
+oder mit seiner Kurzform <userinput>fb=false</userinput> deaktivieren.
+Symptome für diese Probleme können Fehlermeldungen betreffend
+<quote>bterm</quote> oder <quote>bogl</quote> sein sowie ein schwarzer
+Bildschirm oder ein Einfrieren des Systems ein paar Minuten nach dem
+Installationsstart.
 
 </para><para arch="i386">
 
 Manchmal muss auch <userinput>video=vga16:off</userinput> benutzt werden,
-um den Framebuffer zu deaktivieren. Solche Probleme wurden von
-einem Dell Inspiron mit Mobile Radeon-Grafikkarte berichtet.
+um die Verwendung des Framebuffers durch den Kernel zu deaktivieren. Solche
+Probleme wurden von einem Dell Inspiron mit Mobile Radeon-Grafikkarte berichtet.
 
 </para><para arch="m68k">
 
@@ -306,7 +307,8 @@ Phänomene.
 
 Geben Sie die URL einer Voreinstellungs-Datei an, die heruntergeladen
 und benutzt wird, um die Installation zu automatisieren. Siehe auch
-<xref linkend="automatic-install"/>.
+<xref linkend="automatic-install"/>. Kurzform dieses Parameters:
+<userinput>url</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -317,7 +319,7 @@ und benutzt wird, um die Installation zu automatisieren. Siehe auch
 
 Geben Sie den Pfad zu einer Voreinstellungs-Datei an, die geladen werden kann,
 um die Installation zu automatisieren. Siehe auch
-<xref linkend="automatic-install"/>.
+<xref linkend="automatic-install"/>. Kurzform: <userinput>file</userinput>.
 
 </para></listitem>
 </varlistentry>

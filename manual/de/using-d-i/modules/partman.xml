@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 30158 -->
+<!-- original version: 38406 -->
 
    <sect3 id="partman">
    <title>Partitionieren Ihrer Festplatten (partman)</title>
@@ -8,20 +8,32 @@
 
 Nun ist es Zeit, Ihre Festplatten zu partitionieren. Wenn Sie sich mit
 Partitionierung nicht auskennen oder einfach mehr Details wissen
-wollen, lesen Sie <xref linkend="partitioning"/>.
+möchten, lesen Sie <xref linkend="partitioning"/>.
 
 </para><para>
 
 Zuerst wird Ihnen die Auswahl geboten, automatisch entweder eine gesamte Platte
-zu partitionieren oder nur den freien Speicherplatz auf einer Platte.
-Dies wird auch als <quote>Geführte Partitionierung</quote>
+zu partitionieren oder nur den freien Speicherplatz auf einer Platte (falls
+vorhanden). Dies wird auch als <quote>Geführte Partitionierung</quote>
 bezeichnet. Wenn Sie keine automatische Partitionierung wollen, wählen Sie
 <guimenuitem>Partitionstabelle von Hand eingeben</guimenuitem>.
 
 </para><para>
 
-Wenn Sie die automatische Partitionierung wählen, können Sie unter den Schemata
-in der unten stehenden Tabelle wählen. Alle Schemata haben ihre Vor- und
+Wenn Sie Geführte Partitionierung wählen, haben Sie zwei Möglichkeiten:
+Partitionen direkt auf der Festplatte zu erzeugen (die klassische Methode) oder
+LVM (Logical Volume Management) zu benutzen. Im zweiten Fall wird der Installer
+die meisten Partitionen innerhalb einer großen Partition erstellen; der Vorteil
+dieser Methode ist, dass Partitionen innerhalb dieser großen Partition später
+relativ einfach in ihrer Größe verändert werden können. Beachten Sie: die
+Option LVM zu nutzen ist möglicherweise nicht auf allen Architekturen
+verfügbar.
+
+</para><para>
+
+Nachdem Sie Geführte Partitionierung gewählt haben (egal ob die klassische
+Variante oder die mit LVM), können Sie eines der Schemata aus der unten
+stehenden Tabelle wählen. Alle Schemata haben ihre Vor- und
 Nachteile, von denen einige unter <xref linkend="partitioning"/> erörtert
 sind. Wenn Sie sich nicht sicher sind, wählen Sie die erste Möglichkeit.
 Beachten Sie, dass die automatische Partitionierung ein gewisses Minimum
@@ -48,13 +60,13 @@ wird die automatische Partitionierung fehlschlagen.
   <entry><filename>/</filename>, swap
   </entry>
 </row><row>
-  <entry>Arbeitsplatz-Rechner</entry>
+  <entry>Separate /home-Partition</entry>
   <entry>500MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, swap
   </entry>
 </row><row>
-  <entry>Mehrbenutzer-Arbeitsplatz</entry>
+  <entry>Separate /home-, /usr-, /var- und /tmp-Partitionen</entry>
   <entry>1GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -65,16 +77,22 @@ wird die automatische Partitionierung fehlschlagen.
 
 </tbody></tgroup></informaltable>
 
-<para arch="ia64">
+<para>
 
-Wenn Sie automatische Partitionierung für Ihr IA64-System wählen, wird eine
+Wenn Sie Geführte Partitionierung mit LVM wählen, wird der Installer
+zusätzlich eine separate /boot-Partition erzeugen. Alle anderen Partitionen
+(außer Swap) wird innerhalb der LVM-Partition erstellt.
+
+</para><para arch="ia64">
+
+Wählen Sie Geführte Partitionierung auf Ihrem IA64-System, wird eine
 zusätzliche Partition, formatiert als bootfähiges FAT16-Dateisystem, für
 den EFI-Bootloader erstellt. Es gibt ebenfalls einen zusätzlichen Menüpunkt
 im Format-Menü, um eine Partition manuell als EFI-Boot-Partition einzurichten.
 
 </para><para arch="alpha">
 
-Wenn Sie automatische Partitionierung für Ihr Alpha-System wählen, wird am
+Wenn Sie Geführte Partitionierung für Ihr Alpha-System wählen, wird am
 Anfang der Festplatte eine zusätzliche, unformatierte Partition erstellt,
 um Platz für den aboot-Bootloader zu reservieren.
 
@@ -91,20 +109,21 @@ Die Liste der Partitionen sieht in ihrer Struktur ähnlich aus wie diese:
 <!-- TODO: show some flags here (lightning, skull, smiley) -->
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
-        #1 primär    16.4 MB     ext2       /boot
-        #2 primär   551.0 MB     swap       swap
-        #3 primär     5.8 GB     ntfs
-           pri/log    8.2 MB     FREIER SPEICHER
+        #1 primär    16.4 MB  B f ext2       /boot
+        #2 primär   551.0 MB      swap       swap
+        #3 primär     5.8 GB      ntfs
+           pri/log    8.2 MB      FREIER SPEICHER
 
   IDE1 slave (hdb) - 80.0 GB ST380021A
-        #1 primär    15.9 MB     ext3
-        #2 primär   996.0 MB     fat16
-        #3 primär     3.9 GB     xfs        /home
-        #5 logisch    6.0 GB     ext3       /
-        #6 logisch    1.0 GB     ext3       /var
-        #7 logisch  498.8 MB     ext3
-        #8 logisch  551.5 MB     swap       swap
-        #9 logisch   65.8 GB     ext2
+        #1 primär    15.9 MB      ext3
+        #2 primär   996.0 MB      fat16
+        #3 primär     3.9 GB      xfs        /home
+        #5 logisch    6.0 GB    f ext3       /
+        #6 logisch    1.0 GB    f ext3       /var
+        #7 logisch  498.8 MB      ext3
+        #8 logisch  551.5 MB      swap       swap
+        #9 logisch   65.8 GB      ext2
+
 </screen></informalexample>
 
 Dieses Beispiel zeigt, wie zwei IDE-Festplatten in mehrere Partitionen aufgeteilt
@@ -112,6 +131,9 @@ wurden; die erste Platte enthält noch etwas freien Speicher. Jede dieser Zeilen
 mit jeweils einer Partition besteht aus der Partitionsnummer,
 dem Typ (primär, erweitert, logisch), der Größe, optionalen Markierungen,
 dem Dateisystemtyp und dem Einhängepunkt im Dateisystem (falls vorhanden).
+Hinweis: dieses spezielle Setup kann nicht mittels Geführter Partitionierung
+erstellt werden, aber es zeigt mögliche Variationen, die mit manueller
+Partitionierung erreicht werden können.
 
 </para><para>
 
@@ -120,9 +142,21 @@ erstellten Partitionstabelle zufrieden sind, wählen Sie <guimenuitem>Partitioni
 beenden und Änderungen übernehmen</guimenuitem>, um die neue
 Partitionstabelle zu aktivieren (wie am Ende dieses Kapitels beschrieben).
 Sind Sie nicht zufrieden, können Sie <guimenuitem>Änderungen an den Partitionen
-rückgängig machen</guimenuitem> wählen, um die automatische Partitionierung erneut
+rückgängig machen</guimenuitem> wählen<footnote>
+
+<para>
+
+Falls Sie Geführte Partitionierung in Kombination mit LVM gewählt haben,
+können Sie nicht alle durchgeführten Änderungen rückgängig machen, da einige
+Änderungen bereits auf die Festplatte geschrieben wurden. Der Installer warnt
+Sie jedoch, bevor dies passiert. 
+
+</para>
+
+</footnote>, um die automatische Partitionierung erneut
 zu starten, oder Sie nehmen die Vorschläge als Basis und führen daran noch
-manuelle Änderungen durch, wie weiter unten für das manuelle Partitionieren erläutert.
+manuelle Änderungen durch, wie weiter unten für das manuelle Partitionieren
+erläutert.
 
 </para><para>
 
