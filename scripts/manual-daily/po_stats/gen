@@ -1,0 +1,295 @@
+#!/bin/bash
+# Copyright (c) 2004 by Dennis Stampfer <seppy@debian.org>
+# Licensed under the GNU General Public License
+#
+# Fetches sources for the installer packages and generates
+# some translation-related statistics.
+#
+# As I am not a good bash-programmer, please imagine someone else 
+# to be the author when reading this source! :)
+#
+# Files:
+#   o packages-list
+#     Names of the packages to download
+#   o languages 
+#     what languages to be checked?
+#   o paths
+#     where are the po-files located in this package?
+#     (sometimes more than one, like shadow)
+#
+#   o packages (folder)
+#     The packages get downloaded into $TEMPFILE, cleaned up
+#     and moved to packages/.
+# 
+#
+
+       SCRIPTNAME="level 1"
+       #WD="/tmp/manual/"
+       WD="/home/rfjp/d-i/bin/po_stats"
+       TARGET_DIR=$WD/man
+       PO_DIR="/home/rfjp/d-i/manual/po"
+
+cd $WD
+if [ -f manual.lock ]; then
+	echo "A lockfile manual.lock exists. Exiting...";
+	exit
+fi
+touch manual.lock
+
+
+if [ `hostname` = "gluck" ]; then
+	GETTEXT="/home/barbier/extra/bin"
+	export PATH=/home/barbier/extra/bin:$PATH
+	APT_OPT="-o Dir::Etc::sourcelist=sources.list -o Dir::Etc=/home/seppy/ -o Dir::State::lists=/home/seppy/apt-dir"
+	LANG_NAMES="/home/seppy/languages.names"
+else
+	WD=`pwd`
+	GETTEXT="/usr/bin"
+	APT_OPT=""
+fi;
+TEMPFILE="/tmp/.gen-stats-temp-$RANDOM"
+export GETTEXT
+LANG=C
+
+
+#some functions:
+translated () {  #how many are translated?
+  $GETTEXT/msgfmt --statistics $1 2>&1  | sed -e 's/, /§/g'|./rmnl 2|sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
+}
+
+
+fuzzy() {  #how many fuzzy?
+  #msgfmt -o /dev/null --statistics  $1 2>&1 | sed -e 's/.*translated messages, //g' |sed -e 's/ fuzzy.*$//g'
+  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|./rmnl 2|sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
+}
+
+untranslated () {  #guess, what does this do?
+  #msgfmt -o /dev/null --statistics $1 2>&1|sed -e 's/.*, //g' | sed -e 's/ .*.$//g'
+  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|./rmnl 2|sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
+}
+
+translator () { #who is last-translator?
+  #awk '/Last-Translator:/ { print $2,$3 } ' $1
+  grep "Last-Translator: " $1 | sed -e 's/"Last-Translator: //g' | sed -e 's/ <.*$//g'
+}
+
+print_shit () { # print standard-text
+echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang.txt
+date -u  >> $TARGET_DIR/$lang.txt
+echo "
+
+Read: http://people.debian.org/~seppy/d-i/translation-status.html" >> $TARGET_DIR/$lang.txt
+}
+
+##debug/testing. Be sure, that the functions work as theiy should:
+#f="packages/shadow/po/*.pot"
+#$GETTEXT/msgfmt --statistics $f
+#echo fuzzy $f:
+#fuzzy $f
+#echo un:
+#untranslated $f
+#echo tr:
+#translated $f
+#exit
+
+#########################################################################
+echo -n "$SCRIPTNAME script start (by user $USER, logname $LOGNAME): "
+date
+echo "Working directory is $WD"
+
+
+rm -rf $TARGET_DIR/*
+if [ "$1" = "fetch" ]; then
+	cd $PO_DIR
+	~/j_bin/svn cleanup
+	~/j_bin/svn up
+fi
+
+#get sources:
+if [ "$1" = "fetch" ]; then
+	#get files from CVS:
+	echo "Getting files from CVS:"
+
+	echo "FIXME!"
+
+	echo "Finished getting files!"
+	cd $WD
+fi
+
+
+#check how many strings at all
+echo "Counting strings..."
+TOTALU=0
+LANG=C
+mkdir $TARGET_DIR/POT
+POT_LIST=`ls -1 $PO_DIR/pot/`
+for file in $POT_LIST; do
+	U=`untranslated $PO_DIR/pot/$file`
+	cp $PO_DIR/pot/$file $TARGET_DIR/POT/
+
+  	echo "$file has $U untranslated. ($TOTALU)"
+
+  	#U=`expr $U + 1`
+  	TOTALU=`expr $TOTALU + $U || echo 0`
+	if [ "$TOTALU" = "0" -o -z "$TOTALU" ]; then
+		echo "Error while counting untranslated strings in templates."
+	fi
+done
+
+
+echo "Total strings: $TOTALU=100%"
+
+
+
+#now check:
+RANK=""
+
+#following 3 variables for generating the graph. they include all
+#strings of all languages of all packages
+GR_TRANSLATED=0
+GR_FUZZY=0
+GR_UNTRANSLATED=0
+mkdir $TARGET_DIR/files
+rm -f $TARGET_DIR/.rank.txt
+rm -rf $TEMPFILE
+#for lang in `cat languages`; do #run for every language
+for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for every language
+  	echo "$lang..."
+
+
+
+
+	NAME=`cat languages.names | grep "$lang:" | sed "s/://g" || echo $lang`
+
+	echo -e "Statistics of manual translation for $NAME\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >  $TARGET_DIR/$lang.txt
+  	MISSING=""
+
+	#for total strings of a language
+  	TU=0
+  	TT=0
+  	TF=0
+ 	for f in $POT_LIST; do #for every package
+		file=`echo $f | sed "s/t$//g"`;
+		fileprt="$file"
+		file="$PO_DIR/$lang/$file";
+
+		echo  "   $file..."
+    		if [ -e $file ]; then #if the file does exist
+      			LASTT=`translator $file`
+
+			cp $file $file.orig
+			$GETTEXT/msgmerge -U $file $PO_DIR/pot/$f > /dev/null 2>&1
+      			SIGNS="  "	
+			
+			
+			#now check if a file has been modified by debconf-updatepo and output a *
+				ORIG=`$GETTEXT/msgfmt --statistics $file.orig 2>&1`
+				NEW=`$GETTEXT/msgfmt --statistics $file 2>&1`
+				if [ "$ORIG" != "$NEW" ]; then
+					SIGNS="$SIGNS*" #>> $TARGET_DIR/$lang.txt
+				fi
+	
+				# > /dev/null 2>&1
+
+			#strings of this package:
+      			U=`untranslated $file`
+      			F=`fuzzy $file`
+     			T=`translated $file`
+      			test -z "$U" && U=0
+      			test -z "$F" && F=0
+      			test -z "$T" && T=0
+      			#echo packages/$path/$lang.po > /dev/stderr  #debug
+      			#$GETTEXT/msgfmt --statistics packages/$path/$lang.po #this gets to stderr for debugging and log
+
+
+      			#get infos:
+			TU=`expr $TU + $U`
+      			TT=`expr $TT + $T`
+      			TF=`expr $TF + $F`
+
+			#for the graph:
+			GR_TRANSLATED=`expr $GR_TRANSLATED + $TT`
+			GR_UNTRANSLATED=`expr $GR_UNTRANSLATED + $TU`
+			GR_FUZZY=`expr $GR_FUZZY + $TF`
+      			
+			#dont show completely translated files:
+      			if [ "$U" = "0" -a "$F" = "0" ]; then
+         			OK="  $fileprt: $T"t" [$LASTT]\n$OK"
+				echo -n
+			else
+      				echo "  $SIGNS$fileprt: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
+				#copy (updated) files so that they can be translated:
+				test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
+				cp $file $TARGET_DIR/files/$lang/
+      			fi
+
+			mv $file.orig $file
+    	else #=if not existing
+		MISSING_U=`untranslated $PO_DIR/pot/$f`
+		test -z $MISSING_U && MISSING_U=0
+      		MISSING="$MISSING  $fileprt: "$MISSING_U"u\n"
+      		#echo "  !!$path/$lang.po"
+    	fi
+	done #for path in `cat paths`; do
+ 
+ 	echo -e "\nTranslated:" >> $TARGET_DIR/$lang.txt
+	echo -e "$OK" >> $TARGET_DIR/$lang.txt
+	OK=""
+
+  	echo -e "Missing files:\n$MISSING\n" >>  $TARGET_DIR/$lang.txt
+	P=`echo "$TT * 100 / $TOTALU"|bc`
+  	STR=`echo "$TT + $TU + $TF" | bc`
+  	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTALU=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang.txt
+  	if [ "$STR" -gt "$TOTALU" ]; then
+  		echo "  You have more strings translated/fuzzy/untranslated that in
+  the pot-templates. Please check about that!" >>  $TARGET_DIR/$lang.txt
+  	fi
+  	echo >>  $TARGET_DIR/$lang.txt
+
+
+
+
+
+  	print_shit
+
+	LEAD="000";
+  	P="${LEAD:0:${#LEAD}-${#P}}$P"
+ 	echo -en "$P%\t $lang" >> $TARGET_DIR/.rank.txt
+  	echo >> $TARGET_DIR/.rank.txt
+
+
+	
+  	echo "$lang done. ($P%)"
+	echo
+done
+#for lang in `cat languages`; do
+
+
+#generate ranking:
+echo "Rankings for manual po files." > $TARGET_DIR/rank.txt
+date -u >> $TARGET_DIR/rank.txt
+echo >> $TARGET_DIR/rank.txt
+#cp $TARGET_DIR/rank.txt $TARGET_DIR/rank-oldformat.txt
+#sort -r $TARGET_DIR/.rank.txt | sed 's/^00/  /g' | sed 's/^0/ /g' | cat -n  >> $TARGET_DIR/rank-oldformat.txt
+$WD/sort-ranktxt < $TARGET_DIR/.rank.txt >> $TARGET_DIR/rank.txt
+rm $TARGET_DIR/.rank.txt
+
+#move files to their destination
+cp HEADER.txt $TARGET_DIR/
+#scp -r $TARGET_DIR/ seppy@gluck.debian.org:~/public_html/d-i/
+
+
+
+
+#cleanup
+echo "Cleanup..."
+rm -f $TARGET_DIR/.rank.txt
+rm -rf $TEMPFILE
+rm -rf messages messages.mo
+
+chmod -R a+r $TARGET_DIR
+
+echo -n "Script end: "
+date
+
+rm $WD/manual.lock
