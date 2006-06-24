@@ -20,11 +20,21 @@ table</guimenuitem> from the menu.
 
 </para><para>
 
-If you choose guided partitioning, you will be able to choose from the
-schemes listed in the table below. All schemes have their pros and cons,
+If you choose guided partitioning, you may have two options: to create
+partitions directly on the hard disk (classic method) or to use Logical
+Volume Management (LVM). In the second case, the installer will create most
+partitions inside one big partition; the advantage of this method is that
+partitions inside this big partition can be resized relatively easily later.
+Note: the option to use LVM may not be available on all architectures.
+
+</para><para>
+
+After you choose guided partitioning (either classic or using LVM), you
+will be able to choose from the schemes listed in the table below.
+All schemes have their pros and cons,
 some of which are discussed in <xref linkend="partitioning"/>. If you are
-unsure, choose the first one. Bear in mind, that guided partitioning
-needs certain minimal amount of free space to operate with. If you don't
+unsure, choose the first one. Bear in mind that guided partitioning
+needs a certain minimal amount of free space to operate with. If you don't
 give it at least about 1GB of space (depends on chosen scheme), guided
 partitioning will fail.
 
@@ -46,13 +56,13 @@ partitioning will fail.
   <entry>600MB</entry>
   <entry><filename>/</filename>, swap</entry>
 </row><row>
-  <entry>Desktop machine</entry>
+  <entry>Separate /home partition</entry>
   <entry>500MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, swap
   </entry>
 </row><row>
-  <entry>Multi-user workstation</entry>
+  <entry>Separate /home, /usr, /var and /tmp partitions</entry>
   <entry>1GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -63,9 +73,15 @@ partitioning will fail.
 
 </tbody></tgroup></informaltable>
 
-<para arch="ia64">
+<para>
 
-If you chose an automatic partitioning for your IA64 system, there
+If you choose guided partitioning using LVM, the installer will also create
+a separate /boot partition. The other partitions, except for the swap
+partition, will be created inside the LVM partition.
+
+</para><para arch="ia64">
+
+If you choose guided partitioning for your IA64 system, there
 will be an additional partition, formatted as a FAT16 bootable filesystem,
 for the EFI boot loader.
 There is also an additional menu item in the formatting menu to manually
@@ -73,7 +89,7 @@ set up a partition as an EFI boot partition.
 
 </para><para arch="alpha">
 
-If you chose an automatic partitioning for your Alpha system, an
+If you choose guided partitioning for your Alpha system, an
 additional, unformatted partition will be allocated at the beginning of
 your disk to reserve this space for the aboot boot loader.
 
@@ -87,29 +103,30 @@ formatted and where they will be mounted.
 
 The list of partitions might look like this:
 
-<!-- TODO: show some flags here (lightning, skull, smiley) -->
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
-        #1 primary   16.4 MB     ext2       /boot
-        #2 primary  551.0 MB     swap       swap
-        #3 primary    5.8 GB     ntfs
-           pri/log    8.2 MB     FREE SPACE
+        #1 primary   16.4 MB  B f ext2       /boot
+        #2 primary  551.0 MB      swap       swap
+        #3 primary    5.8 GB      ntfs
+           pri/log    8.2 MB      FREE SPACE
 
   IDE1 slave (hdb) - 80.0 GB ST380021A
-        #1 primary   15.9 MB     ext3
-        #2 primary  996.0 MB     fat16
-        #3 primary    3.9 GB     xfs        /home
-        #5 logical    6.0 GB     ext3       /
-        #6 logical    1.0 GB     ext3       /var
-        #7 logical  498.8 MB     ext3
-        #8 logical  551.5 MB     swap       swap
-        #9 logical   65.8 GB     ext2
+        #1 primary   15.9 MB      ext3
+        #2 primary  996.0 MB      fat16
+        #3 primary    3.9 GB      xfs        /home
+        #5 logical    6.0 GB    f ext3       /
+        #6 logical    1.0 GB    f ext3       /var
+        #7 logical  498.8 MB      ext3
+        #8 logical  551.5 MB      swap       swap
+        #9 logical   65.8 GB      ext2
 </screen></informalexample>
 
 This example shows two IDE harddrives divided into several partitions;
 the first disk has some free space. Each partition line consists of the
 partition number, its type, size, optional flags, file system, and
-mountpoint (if any).
+mountpoint (if any). Note: this particular setup cannot be created using
+guided partitioning but it does show possible variation that can be achieved
+using manual partitioning).
 
 </para><para>
 
@@ -118,8 +135,18 @@ generated partition table, you can choose <guimenuitem>Finish
 partitioning and write changes to disk</guimenuitem> from the menu to
 implement the new partition table (as described at the end of this
 section). If you are not happy, you can choose to <guimenuitem>Undo
-changes to partitions</guimenuitem>, to run guided partitioning again
-or modify the proposed changes as described below for manual partitioning.
+changes to partitions</guimenuitem><footnote>
+
+<para>
+
+If you selected guided partitioning using LVM, you will not be able to undo
+all changes made as some changes will already have been committed to the
+hard disk. The installer will warn you before that happens though.
+
+</para>
+
+</footnote> and run guided partitioning again, or modify the proposed changes
+as described below for manual partitioning.
 
 </para><para>
 
@@ -153,7 +180,7 @@ use it at all. Other nice feature is the possibility to copy data from
 existing partition onto this one.
 When you are satisfied with your new partition, select
 <guimenuitem>Done setting up the partition</guimenuitem> and you will be
-thrown back to the <command>partman</command>'s main screen.
+thrown back to <command>partman</command>'s main screen.
 
 </para><para>
 
@@ -176,7 +203,7 @@ let you continue until you correct this issue.
 
 </para><para arch="ia64">
 
-If you forget to select and format an EFI boot partition
+If you forget to select and format an EFI boot partition,
 <command>partman</command> will detect this and will not let you continue
 until you allocate one.
 
