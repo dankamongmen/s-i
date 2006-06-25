@@ -655,8 +655,9 @@ humandev () {
 	        printf "$RET" $vg $lv
 	    fi
 	    ;;
-	/dev/loop/*)
-	    n=${1#/dev/loop/}
+	/dev/loop/*|/dev/loop*)
+	    n=${1#/dev/loop}
+	    n=${n#/}
 	    db_metaget partman/text/loopback description
 	    printf "$RET" $n
 	    ;;
