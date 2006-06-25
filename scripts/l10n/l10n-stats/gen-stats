@@ -177,6 +177,9 @@ fi
 cd $WD
 touch "${RUN_DIR}/$LEVEL.lock"
 
+# Create the directories for the material
+create_dir $WD/material/packages$LEVEL
+create_dir $WD/material/packages.testing$LEVEL
 
 # Some output
 echo -n "$SCRIPTNAME script start by user $USER, logname $LOGNAME: "
@@ -195,6 +198,7 @@ fi
 #get sources:
 if [ "$FETCH" ]; then
 	echo "Getting sources via apt:"
+	
 	cat $WD/config/packages.unstable$LEVEL
 
 	#cleanup
@@ -206,6 +210,7 @@ if [ "$FETCH" ]; then
 	cd $TEMPDIR
 	echo -en "$MERKEL_DOWN" > $TARGET_DIR/packages-list
 	date -u >> $TARGET_DIR/packages-list
+	echo "   From unstable:"
 	echo "From unstable:" >> $TARGET_DIR/packages-list
 	for pkg in `cat $WD/config/packages.unstable$LEVEL`; do
 		cd $TEMPDIR
@@ -229,6 +234,30 @@ if [ "$FETCH" ]; then
 		head -n 1 $WD/material/packages$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list
 	done
 
+	echo "   From testing:"
+        echo "From testing:" >> $TARGET_DIR/packages-list-testing
+	for pkg in `cat $WD/config/packages.testing$LEVEL`; do
+		cd $TEMPDIR
+  		echo -n "Downloading $pkg..."
+		rm -rf $WD/material/packages$LEVEL/$pkg*
+  		apt-get $APT_OPT -t testing source $pkg > /dev/null && echo "$pkg done." || echo "FAILED to fetch $pkg from testing!" >> $TARGET_DIR/packages-list-testing
+  		rm -f *.tar.gz *.dsc *.diff.gz
+  
+  		mv * $WD/material/packages.testing$LEVEL/$pkg
+		if [ "$pkg" = "newt" ]; then
+			cd $WD/material/packagestesting$LEVEL/$pkg/
+			tar -xzvf *.tar.gz
+			#cat debian/patches/05_whiptail_i18n.patch debian/patches/85_more_i18n.patch | patch -p0
+			cat debian/patches/* | patch -p0
+			rm *.tar.gz
+			mv newt-* newt
+			cd newt/po/
+			make newt.pot
+			chmod a+r newt.pot
+		fi
+		head -n 1 $WD/material/packages.testing$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-testing
+	done
+
 	
 	#get files from CVS:
 	echo "Getting files from CVS:"
@@ -249,6 +278,10 @@ else
 	echo "From unstable:" >> $TARGET_DIR/packages-list
 	for pkg in `cat $WD/config/packages.unstable$LEVEL`; do
 		head -n 1 $WD/material/packages$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list
+	done
+	echo "From testing:" >> $TARGET_DIR/packages-list-testing
+	for pkg in `cat $WD/config/packages.testing$LEVEL`; do
+		head -n 1 $WD/material/packages.testing$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-testing
 	done
 	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list
 	cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list
@@ -292,6 +325,40 @@ for path in `cat $WD/config/paths$LEVEL`; do
 done
 echo "Total strings: $TOTALU=100%"
 
+#check how many strings at all
+TOTALU_T=0
+LANG=C
+for path in `cat $WD/config/paths$LEVEL`; do
+	test -f $WD/material/packages.testing$LEVEL/$path/*.pot || continue
+	U=`untranslated $WD/material/packages.testing$LEVEL/$path/*.pot`
+  	#echo packages/$path/*.pot
+  	#$GETTEXT/msgfmt --statistics packages/$path/*.pot
+  	echo "$path/*.pot has $U untranslated. ($TOTALU_T)"
+  	#U=`expr $U + 1`
+  	TOTALU_T=`expr ${TOTALU_T} + $U || echo 0`
+	if [ "$TOTALU_T" = "0" -o -z "$TOTALU_T" ]; then
+		echo "Error while counting untranslated strings in templates."
+		$GETTEXT/msgfmt --statistics $WD/material/packages.testing$LEVEL/$path/*.pot
+	#	exit
+	fi
+
+	#backup everylanguage-file to check against debconf-updatepo later
+	for lang in `cat $WD/config/languages`; do
+		test -f $WD/material/packages.testing$LEVEL/$path/$lang.po || continue
+		cp $WD/material/packages.testing$LEVEL/$path/$lang.po $WD/material/packages.testing$LEVEL/$path/$lang.po.orig
+	done
+
+	#run debconf-updatepo to update the po-files
+	#(cd packages$LEVEL/$path/; pwd | grep "debian/po" > /dev/null && $GETTEXT/debconf-updatepo )
+
+	(export PODEBCONF_LIB=/home/bubulle/share/intltool-debian; cd $WD/material/packages.testing$LEVEL/$path/; pwd | grep "debian/po" > /dev/null && ~bubulle/bin/debconf-updatepo-sid )
+
+	#(cd packages/$path/; $GETTEXT/debconf-updatepo > /dev/null 2>&1)
+
+
+done
+echo "Total strings: $TOTALU_T=100%"
+
 wget -q -O $WD/material/spellcheck${LEVEL}.txt http://d-i.alioth.debian.org/spellcheck/level${LEVEL}/latest/stats.txt || echo "Could not fetch spellcheck stats file for level $I."
 
 
@@ -310,12 +377,17 @@ for lang in `cat $WD/config/languages`; do #run for every language
   	echo -n "$lang..."
 	NAME=`cat $LANG_NAMES | grep "$lang:" | sed "s/://g" || echo $lang`
   	echo -e $MERKEL_DOWN"Statistics of $SCRIPTNAME packages for $NAME:\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >>  $TARGET_DIR/$lang.txt
+  	echo -e $MERKEL_DOWN"Statistics of $SCRIPTNAME packages in testing for $NAME:\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >>  $TARGET_DIR/$lang.testing.txt
   	MISSING=""
+  	MISSING_T=""
 
 	#for total strings of a language
   	TU=0
   	TT=0
   	TF=0
+  	TU_T=0
+  	TT_T=0
+  	TF_T=0
  	for path in `cat config/paths$LEVEL`; do #for every package
     		if [ -e $WD/material/packages$LEVEL/$path/$lang.po ]; then #if the file does exist
       			LASTT=`translator $WD/material/packages$LEVEL/$path/$lang.po`
@@ -343,7 +415,7 @@ for lang in `cat $WD/config/languages`; do #run for every language
       			test -z "$U" && U=0
       			test -z "$F" && F=0
       			test -z "$T" && T=0
-      			#echo packages/$path/$lang.po > /dev/stderr  #debug
+     			#echo packages/$path/$lang.po > /dev/stderr  #debug
       			#$GETTEXT/msgfmt --statistics packages/$path/$lang.po #this gets to stderr for debugging and log
 
 
@@ -363,41 +435,83 @@ for lang in `cat $WD/config/languages`; do #run for every language
 				echo -n
 			else
       				echo "  $SIGNS$path/$lang.po: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
-				
-				#wenn wir nur aktualisierte dateien in /files verschieben möchten:
-				#copy (updated) files so that they can be translated:
-				#test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
-				#cp packages$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//'\/'/'_'}"_$lang.po" 
-      				#$GETTEXT/msgfmt --statistics packages/$path/$lang.po;echo
       			fi
+			
 			
 			#copy (updated) files so that they can be translated:
 			test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
 			cp $WD/material/packages$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//'\/'/'_'}"_$lang.po" 
 
 			mv $WD/material/packages$LEVEL/$path/$lang.po.orig $WD/material/packages$LEVEL/$path/$lang.po
-    	else #=if not existing
-		MISSING_U=`untranslated $WD/material/packages$LEVEL/$path/*.pot`
-		test -z $MISSING_U && MISSING_U=0
-      		MISSING="$MISSING  $path/$lang.po "$MISSING_U"u\n"
-      		#echo "  !!$path/$lang.po"
-    	fi
- 	 done #for path in `cat paths`; do
+    		else #=if not existing
+			MISSING_U=`untranslated $WD/material/packages$LEVEL/$path/*.pot`
+			test -z $MISSING_U && MISSING_U=0
+      			MISSING="$MISSING  $path/$lang.po "$MISSING_U"u\n"
+      			#echo "  !!$path/$lang.po"
+    		fi
+
+    		if [ -e $WD/material/packages.testing$LEVEL/$path/$lang.po ]; then #if the file does exist
+      			LASTT_T=`translator $WD/material/packages.testing$LEVEL/$path/$lang.po`
+
+			$GETTEXT/msgmerge -U $WD/material/packages.testing$LEVEL/$path/$lang.po $WD/material/packages.testing$LEVEL/$path/*.pot > /dev/null 2>&1
+
+                        $GETTEXT/msgfmt $WD/material/packages.testing$LEVEL/$path/$lang.po > /dev/null 2>&1|| (echo "$path/$lang.po [$LASTT_T]" >> $TARGET_DIR/$lang.testing.txt; touch /tmp/.$LEVEL.error; return 1) || continue
+
+			#strings of this package:
+      			U_T=`untranslated $WD/material/packages.testing$LEVEL/$path/$lang.po`
+      			F_T=`fuzzy $WD/material/packages.testing$LEVEL/$path/$lang.po`
+     			T_T=`translated $WD/material/packages.testing$LEVEL/$path/$lang.po` 
+      			test -z "$U_T" && U_T=0
+      			test -z "$F_T" && F_T=0
+      			test -z "$T_T" && T_T=0
+			
+      			#get infos:
+			TU_T=`expr $TU_T + $U_T`
+      			TT_T=`expr $TT_T + $T_T`
+      			TF_T=`expr $TF_T + $F_T`
+
+      			
+			#dont show completely translated files:
+      			if [ "$U_T" = "0" -a "$F_T" = "0" ]; then
+         			OK_T="  $path/$lang.po $T_T"t" [$LASTT_T]\n$OK_T"
+				echo -n
+			else
+      				echo "  $path/$lang.po: $T_T"t"$F_T"f"$U_T"u" [$LASTT_T]" >> $TARGET_DIR/$lang.testing.txt
+      			fi
+			
+    		else #=if not existing
+			MISSING_U_T=`untranslated $WD/material/packages.testing$LEVEL/$path/*.pot`
+			test -z $MISSING_U_T && MISSING_U_T=0
+      			MISSING_T="$MISSING_T  $path/$lang.po "$MISSING_U_T"u\n"
+      			#echo "  !!$path/$lang.po"
+    		fi
+	done #for path in `cat paths`; do
  
  	echo -e "\nTranslated:" >> $TARGET_DIR/$lang.txt
 	echo -e "$OK" >> $TARGET_DIR/$lang.txt
 	OK=""
+ 	echo -e "\nTranslated:" >> $TARGET_DIR/$lang.testing.txt
+	echo -e "$OK_T" >> $TARGET_DIR/$lang.testing.txt
+	OK_T=""
 
   	echo -e "Missing files:\n$MISSING\n" >>  $TARGET_DIR/$lang.txt
+  	echo -e "Missing files:\n$MISSING_T\n" >>  $TARGET_DIR/$lang.testing.txt
 	P=`echo "$TT * 100 / $TOTALU"|bc`
   	STR=`echo "$TT + $TU + $TF" | bc`
+	P_T=`echo "$TT_T * 100 / $TOTALU_T"|bc`
+  	STR_T=`echo "$TT_T + $TU_T + $TF_T" | bc`
   	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTALU=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang.txt
+  	echo -e "Global statistics: "$TT_T"t"$TF_T"f"$TU_T"u ($P_T%)     (total strings: $TOTALU_T=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang.testing.txt
   	if [ "$STR" -gt "$TOTALU" ]; then
   		echo "  You have more strings translated/fuzzy/untranslated that in
   the pot-templates. Please check about that!" >>  $TARGET_DIR/$lang.txt
   	fi
+  	if [ "$STR_T" -gt "$TOTALU_T" ]; then
+  		echo "  You have more strings translated/fuzzy/untranslated that in
+  the pot-templates. Please check about that!" >>  $TARGET_DIR/$lang.testing.txt
+  	fi
   	test -e /tmp/.$LEVEL.error && echo -e "SOME FILE(S) ARE CORRUPTED! Those are marked with \"!\".\n Run a \"msgfmt --check <po-file> to see what's wrong!\"" >>  $TARGET_DIR/$lang.txt
-  	echo >>  $TARGET_DIR/$lang.txt
+  	echo >>  $TARGET_DIR/$lang.testing.txt
 	if [ $LEVEL = 1 ]; then
 		if [ -f $WD/material/packages1/debian-installer/packages/po/$lang.po ]; then
 			MASTER_F=`fuzzy $WD/material/packages1/debian-installer/packages/po/$lang.po`
@@ -422,6 +536,7 @@ for lang in `cat $WD/config/languages`; do #run for every language
 		echo "No spellcheck available for $NAME."  >>  $TARGET_DIR/$lang.txt
 	fi
 	echo >>  $TARGET_DIR/$lang.txt
+	echo >>  $TARGET_DIR/$lang.testing.txt
 
   	print_text
 
