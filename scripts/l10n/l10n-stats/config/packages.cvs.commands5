@@ -1,0 +1,33 @@
+PATH="$PATH:~/j_bin/"
+
+
+
+svn co svn://svn.debian.org/debconf/trunk/src/debconf/ debconf/
+(cd debconf/po; make > /dev/null;)
+
+mkdir -p aptitude/po
+rm -rf aptitude/po/*
+cp -v ~dburrows/public_html/darcs/aptitude/po/* aptitude/po/
+
+svn co svn://svn.debian.org/console-common/trunk/console-common console-common
+
+
+svn co svn://costa.wiggy.net/debconf/trunk/src/debconf debconf/ >/dev/null 2>&1
+cd debconf/po
+make debconf.pot > /dev/null 2>&1
+cd ../..
+
+
+svn co svn://svn.debian.org/dpkg/trunk/po dpkg/po
+
+
+#get apt:
+echo "wgetting apt"
+mkdir -p apt/po
+cd apt/po/
+rm -rf *
+wget -q -O - http://www.perrier.eu.org/debian/packages/d-i/level4/apt-main/po/ | wget -q --force-html --base=http://www.perrier.eu.org/debian/packages/d-i/level4/apt-main/po/ -i -
+rm *gif* *html*
+cd ../..
+
+

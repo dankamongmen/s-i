@@ -1,0 +1,29 @@
+PATH="$PATH:~/j_bin"
+
+svn co svn://costa.wiggy.net/tasksel/trunk tasksel > /dev/null 2>&1
+
+
+cvs -d:pserver:anonymous@haydn.debian.org:/cvsroot/pkg-isocodes co iso-codes > /dev/null 2>&1
+(cd iso-codes/iso_3166; ../iso2pot.py --is-version dummy --comments alpha_3_code --fields name,official_name,common_name --outfile iso_3166.pot iso_3166.xml )
+#cp ~seppy/iso_3166.pot iso-codes/iso_3166/
+
+rm -rf console-data
+svn co svn://svn.debian.org/console-data/trunk/console-data-2002.12.04dbs/ console-data
+
+rm -rf exim4
+mkdir exim4
+cd exim4
+mkdir debian
+cd debian
+svn co svn://svn.debian.org/svn/pkg-exim4/exim/trunk/debian/po > /dev/null 2>&1
+
+cd ../../
+
+
+cvs -z3 -d:pserver:anonymous@cvs.alioth.debian.org:/cvsroot/popcon co popularity-contest
+
+
+
+
+
+
