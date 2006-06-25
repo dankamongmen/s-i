@@ -1,5 +1,6 @@
 #!/bin/bash
-# Copyright (c) 2004 by Dennis Stampfer <seppy@debian.org>
+# Copyright (c) 2004-2006 by Dennis Stampfer <seppy@debian.org>
+# Copyright (c) 2006 by Frans Pop <fjp@debian.org>
 # Licensed under the GNU General Public License
 #
 # Fetches sources for the installer packages and generates
@@ -25,8 +26,10 @@
 
        SCRIPTNAME="Installation Guide"
        WD="/home/rfjp/d-i/bin/po_stats"
-       TARGET_DIR=$WD/out
+       TEMP_DIR="$WD/temp"
+       TARGET_DIR="$WD/out"
        PO_DIR="/home/rfjp/d-i/manual/po"
+       ALIOTH_RSYNC="alioth:/var/lib/gforge/chroot/home/users/fjp/d-i_web/manual/po_stats/"
 
 # We want the manual files group writable
 umask 0002
@@ -59,7 +62,6 @@ translated () {  #how many are translated?
   $GETTEXT/msgfmt --statistics $1 2>&1  | sed -e 's/, /§/g'|./rmnl 2|sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
 }
 
-
 fuzzy() {  #how many fuzzy?
   #msgfmt -o /dev/null --statistics  $1 2>&1 | sed -e 's/.*translated messages, //g' |sed -e 's/ fuzzy.*$//g'
   $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|./rmnl 2|sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
@@ -78,21 +80,7 @@ translator () { #who is last-translator?
 print_shit () { # print standard-text
 echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang.txt
 date -u  >> $TARGET_DIR/$lang.txt
-echo "
-
-See: http://d-i.alioth.debian.org/manual/" >> $TARGET_DIR/$lang.txt
 }
-
-##debug/testing. Be sure, that the functions work as theiy should:
-#f="packages/shadow/po/*.pot"
-#$GETTEXT/msgfmt --statistics $f
-#echo fuzzy $f:
-#fuzzy $f
-#echo un:
-#untranslated $f
-#echo tr:
-#translated $f
-#exit
 
 #########################################################################
 echo -n "$SCRIPTNAME script start (by user $USER, logname $LOGNAME): "
@@ -101,47 +89,25 @@ echo "Working directory is $WD"
 
 
 rm -rf $TARGET_DIR/*
-if [ "$1" = "fetch" ]; then
-	cd $PO_DIR
-	~/j_bin/svn cleanup
-	~/j_bin/svn up
-fi
-
-#get sources:
-if [ "$1" = "fetch" ]; then
-	#get files from CVS:
-	echo "Getting files from CVS:"
-
-	echo "FIXME!"
-
-	echo "Finished getting files!"
-	cd $WD
-fi
-
+rm -rf $TEMP_DIR
+mkdir $TEMP_DIR
 
 #check how many strings at all
 echo "Counting strings..."
 TOTALU=0
 LANG=C
-mkdir $TARGET_DIR/POT
+
 POT_LIST=`ls -1 $PO_DIR/pot/`
 for file in $POT_LIST; do
 	U=`untranslated $PO_DIR/pot/$file`
-	cp $PO_DIR/pot/$file $TARGET_DIR/POT/
-
   	echo "$file has $U untranslated. ($TOTALU)"
 
-  	#U=`expr $U + 1`
   	TOTALU=`expr $TOTALU + $U || echo 0`
 	if [ "$TOTALU" = "0" -o -z "$TOTALU" ]; then
 		echo "Error while counting untranslated strings in templates."
 	fi
 done
-
-
 echo "Total strings: $TOTALU=100%"
-
-
 
 #now check:
 RANK=""
@@ -151,19 +117,15 @@ RANK=""
 GR_TRANSLATED=0
 GR_FUZZY=0
 GR_UNTRANSLATED=0
-mkdir $TARGET_DIR/files
-rm -f $TARGET_DIR/.rank.txt
+rm -f $TEMP_DIR/rank.txt
 rm -rf $TEMPFILE
 #for lang in `cat languages`; do #run for every language
 for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for every language
   	echo "$lang..."
 
-
-
-
 	NAME=`cat languages.names | grep "$lang:" | sed "s/://g" || echo $lang`
 
-	echo -e "Statistics of manual translation for $NAME\nSee: http://d-i.alioth.debian.org/manual/\n\nOutdated:" >  $TARGET_DIR/$lang.txt
+	echo -e "Statistics of Installation Guide translation for $NAME\nSee: http://d-i.alioth.debian.org/manual/\n\nOutdated:" >  $TARGET_DIR/$lang.txt
   	MISSING=""
 
 	#for total strings of a language
@@ -179,17 +141,6 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
     		if [ -e $file ]; then #if the file does exist
       			LASTT=`translator $file`
 
-			cp $file $file.orig
-			$GETTEXT/msgmerge -U $file $PO_DIR/pot/$f > /dev/null 2>&1
-      			SIGNS="  "	
-			
-			#now check if a file has been modified by debconf-updatepo and output a *
-			ORIG=`$GETTEXT/msgfmt --statistics $file.orig 2>&1`
-			NEW=`$GETTEXT/msgfmt --statistics $file 2>&1`
-			if [ "$ORIG" != "$NEW" ]; then
-				SIGNS="* "
-			fi
-
 			#strings of this package:
       			U=`untranslated $file`
       			F=`fuzzy $file`
@@ -197,9 +148,6 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
       			test -z "$U" && U=0
       			test -z "$F" && F=0
       			test -z "$T" && T=0
-      			#echo packages/$path/$lang.po > /dev/stderr  #debug
-      			#$GETTEXT/msgfmt --statistics packages/$path/$lang.po #this gets to stderr for debugging and log
-
 
       			#get infos:
 			TU=`expr $TU + $U`
@@ -216,13 +164,9 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
          			OK="  $fileprt: $T"t" [$LASTT]\n$OK"
 				echo -n
 			else
-      				echo "$SIGNS$fileprt: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
-				#copy (updated) files so that they can be translated:
-				test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
-				cp $file $TARGET_DIR/files/$lang/
+      				echo "  $fileprt: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
       			fi
 
-			mv $file.orig $file
     	else #=if not existing
 		MISSING_U=`untranslated $PO_DIR/pot/$f`
 		test -z $MISSING_U && MISSING_U=0
@@ -245,19 +189,13 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
   	fi
   	echo >>  $TARGET_DIR/$lang.txt
 
-
-
-
-
   	print_shit
 
 	LEAD="000";
   	P="${LEAD:0:${#LEAD}-${#P}}$P"
- 	echo -en "$P%\t $lang" >> $TARGET_DIR/.rank.txt
-  	echo >> $TARGET_DIR/.rank.txt
+ 	echo -en "$P%\t $lang" >> $TEMP_DIR/rank.txt
+  	echo >> $TEMP_DIR/rank.txt
 
-
-	
   	echo "$lang done. ($P%)"
 	echo
 done
@@ -265,24 +203,23 @@ done
 
 
 #generate ranking:
-echo "Rankings for manual po files." > $TARGET_DIR/rank.txt
-date -u >> $TARGET_DIR/rank.txt
+echo "Rankings for Installation Guide po files." > $TARGET_DIR/rank.txt
 echo >> $TARGET_DIR/rank.txt
-#cp $TARGET_DIR/rank.txt $TARGET_DIR/rank-oldformat.txt
-#sort -r $TARGET_DIR/.rank.txt | sed 's/^00/  /g' | sed 's/^0/ /g' | cat -n  >> $TARGET_DIR/rank-oldformat.txt
-$WD/sort-ranktxt < $TARGET_DIR/.rank.txt >> $TARGET_DIR/rank.txt
-rm $TARGET_DIR/.rank.txt
+$WD/sort-ranktxt < $TEMP_DIR/rank.txt >> $TARGET_DIR/rank.txt
+echo -e -n "\nFiles fetched and report generated on: " >> $TARGET_DIR/rank.txt
+date -u  >> $TARGET_DIR/rank.txt
 
 #move files to their destination
 cp HEADER.txt $TARGET_DIR/
 
+#copy files to alioth
+rsync -p $TARGET_DIR/* $ALIOTH_RSYNC
+
 #cleanup
 echo "Cleanup..."
-rm -f $TARGET_DIR/.rank.txt
+rm -rf $TEMP_DIR
 rm -rf $TEMPFILE
 rm -rf messages messages.mo
-
-chmod -R a+r $TARGET_DIR
 
 echo -n "Script end: "
 date
