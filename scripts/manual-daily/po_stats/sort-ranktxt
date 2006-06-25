@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#F=`cat /dev/stdin | sed 's/^00/XX/g' | sed 's/^0/X/g' | sort | sed 's/^XX/  /g' | sed 's/^X/ /g'`
 F=`cat /dev/stdin | sort -r`
 TEMP=$RANDOM
 
@@ -15,13 +14,13 @@ for I in $F; do
         else
                 O=$N
                 C=`expr $C + 1`
-                #R=$R\n`echo  "${STR[$X]}" |sort`
-                echo -e "${STR[$X]}" | sort >> /tmp/$TEMP
+                [ $X -gt 0 ] && echo -e "${STR[$X]}" | sort >> /tmp/$TEMP
                 X=`expr $X + 1`
                 STR[$X]="${STR[$X]}$I"
         fi
 done
 echo -e "${STR[$X]}" |sort >> /tmp/$TEMP
+
 C=0
 T=0
 O=""
@@ -36,8 +35,8 @@ for I in `cat /tmp/$TEMP`; do
                 C=`expr $C + 1`
                 test "${#C}" = 1 && WHITE=" "
                 test "${#C}" = 2 && WHITE=""
-		echo -ne "\t$SAME"
-                echo -ne "\n$WHITE$C $I"
+		[ "$SAME" ] && echo -e "\t$SAME"
+                echo -ne "$WHITE$C $I"
 		SAME=1
         fi
         T=`expr $T + 1`
