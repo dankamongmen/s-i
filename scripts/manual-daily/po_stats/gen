@@ -26,7 +26,7 @@
        SCRIPTNAME="level 1"
        #WD="/tmp/manual/"
        WD="/home/rfjp/d-i/bin/po_stats"
-       TARGET_DIR=$WD/man
+       TARGET_DIR=$WD/out
        PO_DIR="/home/rfjp/d-i/manual/po"
 
 cd $WD
@@ -78,7 +78,7 @@ echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang.txt
 date -u  >> $TARGET_DIR/$lang.txt
 echo "
 
-Read: http://people.debian.org/~seppy/d-i/translation-status.html" >> $TARGET_DIR/$lang.txt
+See: http://d-i.alioth.debian.org/manual/" >> $TARGET_DIR/$lang.txt
 }
 
 ##debug/testing. Be sure, that the functions work as theiy should:
@@ -161,7 +161,7 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
 
 	NAME=`cat languages.names | grep "$lang:" | sed "s/://g" || echo $lang`
 
-	echo -e "Statistics of manual translation for $NAME\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >  $TARGET_DIR/$lang.txt
+	echo -e "Statistics of manual translation for $NAME\nSee: http://d-i.alioth.debian.org/manual/\n\nOutdated:" >  $TARGET_DIR/$lang.txt
   	MISSING=""
 
 	#for total strings of a language
@@ -181,15 +181,12 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
 			$GETTEXT/msgmerge -U $file $PO_DIR/pot/$f > /dev/null 2>&1
       			SIGNS="  "	
 			
-			
 			#now check if a file has been modified by debconf-updatepo and output a *
-				ORIG=`$GETTEXT/msgfmt --statistics $file.orig 2>&1`
-				NEW=`$GETTEXT/msgfmt --statistics $file 2>&1`
-				if [ "$ORIG" != "$NEW" ]; then
-					SIGNS="$SIGNS*" #>> $TARGET_DIR/$lang.txt
-				fi
-	
-				# > /dev/null 2>&1
+			ORIG=`$GETTEXT/msgfmt --statistics $file.orig 2>&1`
+			NEW=`$GETTEXT/msgfmt --statistics $file 2>&1`
+			if [ "$ORIG" != "$NEW" ]; then
+				SIGNS="* "
+			fi
 
 			#strings of this package:
       			U=`untranslated $file`
@@ -217,7 +214,7 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
          			OK="  $fileprt: $T"t" [$LASTT]\n$OK"
 				echo -n
 			else
-      				echo "  $SIGNS$fileprt: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
+      				echo "$SIGNS$fileprt: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
 				#copy (updated) files so that they can be translated:
 				test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
 				cp $file $TARGET_DIR/files/$lang/
@@ -276,10 +273,6 @@ rm $TARGET_DIR/.rank.txt
 
 #move files to their destination
 cp HEADER.txt $TARGET_DIR/
-#scp -r $TARGET_DIR/ seppy@gluck.debian.org:~/public_html/d-i/
-
-
-
 
 #cleanup
 echo "Cleanup..."
