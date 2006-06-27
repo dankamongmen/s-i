@@ -194,7 +194,7 @@ create_dvi () {
 
     echo "Info: creating temporary .dvi file..."
 
-    # Next we use jadetext to generate a .dvi file
+    # Next we use jadetex to generate a .dvi file
     # This needs three passes to properly generate the index (page numbering)
     cd $tempdir
     for PASS in 1 2 3 ; do
