@@ -7,11 +7,11 @@
 cd debian/sort-tmp
 
 for protocol in http ftp; do
-	if ! grep -q "^Template: mirror/$protocol/countries" ../choose-mirror/DEBIAN/templates; then
+	if ! grep -q "^Template: mirror/$protocol/countries" ../choose-mirror-bin/DEBIAN/templates; then
 		continue
 	fi
 
-	sed -n -e "/^Template: mirror\\/$protocol\\/countries/,/^Description:/p" ../choose-mirror/DEBIAN/templates |
+	sed -n -e "/^Template: mirror\\/$protocol\\/countries/,/^Description:/p" ../choose-mirror-bin/DEBIAN/templates |
 	perl -p -e '
 		chomp;
 		if (m/Choices-([^.]*)\.UTF-8:/) {
@@ -47,13 +47,13 @@ for protocol in http ftp; do
 		fi
 	done
 
-	#  Now ../choose-mirror/DEBIAN/templates must be patched: all sortedlist.*
+	#  Now ../choose-mirror-bin/DEBIAN/templates must be patched: all sortedlist.*
 	#  files have to be added to the mirror/$protocol/countries template.
-	sed -e "/$protocol.*countries/{n;q;}" ../choose-mirror/DEBIAN/templates >templates.tmp
+	sed -e "/$protocol.*countries/{n;q;}" ../choose-mirror-bin/DEBIAN/templates >templates.tmp
 	cat sorted* >>templates.tmp
-	sed -e "/$protocol.*countries/!d;/$protocol.*countries/{:end;n;b end}" ../choose-mirror/DEBIAN/templates | \
+	sed -e "/$protocol.*countries/!d;/$protocol.*countries/{:end;n;b end}" ../choose-mirror-bin/DEBIAN/templates | \
 		sed '1,2d' >> templates.tmp
-	mv templates.tmp  ../choose-mirror/DEBIAN/templates
+	mv templates.tmp  ../choose-mirror-bin/DEBIAN/templates
 done
 
 cd ../..
