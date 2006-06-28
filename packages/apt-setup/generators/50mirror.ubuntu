@@ -5,6 +5,37 @@ set -e
 
 file="$1"
 
+log() {
+	logger -t apt-setup "$@"
+}
+warning() {
+	log "warning: $@"
+}
+
+# Ask if a mirror should be used if the base system can be installed from CD.
+if [ -e /cdrom/.disk/base_installable ]; then
+	if search-path choose-mirror; then
+		db_input medium apt-setup/use_mirror
+		db_go # or exit 10
+	else
+		warning "choose-mirror is not available; cannot offer network mirror"
+		exit 1
+	fi
+
+	db_get apt-setup/use_mirror
+	if [ "$RET" = false ]; then
+		exit 1
+	fi
+
+	if db_get cdrom/codename && [ "$RET" ]; then
+		db_set mirror/codename $RET
+	fi
+	if db_get cdrom/suite && [ "$RET" ]; then
+		db_set mirror/suite $RET
+	fi
+	choose-mirror -n # no progress bar
+fi
+
 STATE=1
 while :; do
 	case "$STATE" in
@@ -41,10 +72,10 @@ if [ "$RET" = true ]; then
 	dists="$dists restricted"
 fi
 
-db_get mirror/codename
-codename="$RET"
 db_get mirror/protocol
 protocol="$RET"
+db_get mirror/codename
+codename="$RET"
 db_get mirror/$protocol/hostname
 hostname="$RET"
 db_get mirror/$protocol/directory
