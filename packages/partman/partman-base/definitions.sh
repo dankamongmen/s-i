@@ -590,7 +590,7 @@ humandev () {
 		echo "$1"
 	    fi
 	    ;;
-	/dev/cciss/*)
+	/dev/cciss/host*|/dev/cciss/disc*)
 	    # /dev/cciss/hostN/targetM/disc is 2.6 form
 	    # /dev/cciss/discM/disk seems to be 2.4 form
 	    line=`echo $1 | sed 's,/dev/cciss/\([a-z]*\)\([0-9]*\)/\(.*\),\1 \2 \3,'`
@@ -623,6 +623,10 @@ humandev () {
 	       db_metaget partman/text/scsi_partition description
 	       printf "$RET" ".CCISS" "-" ${cont} ${lun} ${part} ${linux}
 	    fi
+	    ;;
+	/dev/cciss/*)
+	    # Support for "real" /dev/cciss/ devices to be filled in
+	    echo $1
 	    ;;
 	/dev/md/*)
 	    device=`echo "$1" | sed -e "s/.*md\/\?\(.*\)/\1/"`
