@@ -624,9 +624,31 @@ humandev () {
 	       printf "$RET" ".CCISS" "-" ${cont} ${lun} ${part} ${linux}
 	    fi
 	    ;;
-	/dev/cciss/*)
-	    # Support for "real" /dev/cciss/ devices to be filled in
-	    echo $1
+	/dev/cciss/c*d*)
+	    # It would be a lot easier to parse the /sys/block/*/device
+	    # symlink. Unfortunately, unlike other block devices, this
+	    # doesn't seem to exist in this case, so we just have to live
+	    # with parsing the device name.
+	    host="$(echo "$1" | sed 's,/dev/cciss/c\([0-9]*\).*,\1,')"
+	    target="$(echo "$1" | sed 's,/dev/cciss/c[0-9]*d\([0-9]*\).*,\1,')"
+	    case $1 in
+		/dev/cciss/c*d*p*)
+		    # partition
+		    part="$(echo "$1" | sed 's,/dev/cciss/c[0-9]*d[0-9]*p\([0-9]*\).*,\1,')"
+		    ;;
+		*)
+		    part=
+		    ;;
+	    esac
+	    linux="$(mapdevfs "$1")"
+	    linux="${linux#/dev/}"
+	    if [ -z "$part" ]; then
+		db_metaget partman/text/scsi_disk description
+		printf "$RET" ".CCISS" "-" "$host" "$target" "$linux"
+	    else
+		db_metaget partman/text/scsi_partition description
+		printf "$RET" ".CCISS" "-" "$host" "$target" "$part" "$linux"
+	    fi
 	    ;;
 	/dev/md/*)
 	    device=`echo "$1" | sed -e "s/.*md\/\?\(.*\)/\1/"`
