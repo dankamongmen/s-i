@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 30158 -->
+<!-- original version: 38406 -->
 
    <sect3 id="partman">
    <title>ディスクのパーティション分割</title>
@@ -34,15 +34,37 @@ table</guimenuitem> from the menu.
 </para><para>
 
 <!--
-If you choose guided partitioning, you will be able to choose from the
-schemes listed in the table below. All schemes have their pros and cons,
+If you choose guided partitioning, you may have two options: to create
+partitions directly on the hard disk (classic method) or to use Logical
+Volume Management (LVM). In the second case, the installer will create most
+partitions inside one big partition; the advantage of this method is that
+partitions inside this big partition can be resized relatively easily later.
+Note: the option to use LVM may not be available on all architectures.
+-->
+ガイドパーティション分割を選択した場合、選択肢が 2 つあります。
+ハードディスクに直接パーティションを作成する (クラシック) 方法と、
+論理ボリューム管理 (LVM) を利用する方法です。
+2 番目の方法では、インストーラが作成するほとんどのパーティションを、
+大きなパーティションの中に作成します。
+この利点は、大きなパーティションの中にあるパーティションを、
+後から簡単に大きさを変更できることです。
+注意: LVM を使用する方法は、
+すべてのアーキテクチャで使用できるわけではありません。
+
+</para><para>
+
+<!--
+After you choose guided partitioning (either classic or using LVM), you
+will be able to choose from the schemes listed in the table below.
+All schemes have their pros and cons,
 some of which are discussed in <xref linkend="partitioning"/>. If you are
-unsure, choose the first one. Bear in mind, that guided partitioning
-needs certain minimal amount of free space to operate with. If you don't
+unsure, choose the first one. Bear in mind that guided partitioning
+needs a certain minimal amount of free space to operate with. If you don't
 give it at least about 1GB of space (depends on chosen scheme), guided
 partitioning will fail.
 -->
-ガイドパーティション分割を選択した場合、以下の表から分割案を選択できます。
+ガイドパーティション分割を選択した場合、(クラシックでも LVMでも) 
+以下の表から分割案を選択できます。
 どの案でも賛否両論あり、<xref linkend="partitioning"/> で議論されています。
 よくわからなければ、最初の項目を選択してください。
 ガイドパーティション分割は、最低限動作する空き領域が必要なことを、
@@ -68,13 +90,13 @@ partitioning will fail.
   <entry>600MB</entry>
   <entry><filename>/</filename>, swap</entry>
 </row><row>
-  <entry>Desktop machine</entry>
+  <entry>Separate /home partition</entry>
   <entry>500MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, swap
   </entry>
 </row><row>
-  <entry>Multi-user workstation</entry>
+  <entry>Separate /home, /usr, /var and /tmp partitions</entry>
   <entry>1GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -85,16 +107,28 @@ partitioning will fail.
 
 </tbody></tgroup></informaltable>
 
-<para arch="ia64">
+<para>
 
 <!--
-If you chose an automatic partitioning for your IA64 system, there
+If you choose guided partitioning using LVM, the installer will also create
+a separate /boot partition. The other partitions, except for the swap
+partition, will be created inside the LVM partition.
+-->
+LVM を利用するガイドパーティション分割を行うと決めた場合、
+インストーラは独立した /boot パーティションも作成します。
+スワップパーティションを除くその他のパーティションは、
+LVM パーティションの内部に作成します。
+
+</para><para arch="ia64">
+
+<!--
+If you choose guided partitioning for your IA64 system, there
 will be an additional partition, formatted as a FAT16 bootable filesystem,
 for the EFI boot loader.
 There is also an additional menu item in the formatting menu to manually
 set up a partition as an EFI boot partition.
 -->
-もし IA64 システムに対して自動パーティション分割を行うと決めた場合、
+IA64 システムに対してガイドパーティション分割を行うと決めた場合、
 EFI ブートローダ用に、 FAT16 の起動可能ファイルシステムでフォーマットされた
 追加パーティションがあるはずです。
 手動で EFI ブートパーティションとしてパーティションをセットアップするよう、
@@ -103,11 +137,11 @@ EFI ブートローダ用に、 FAT16 の起動可能ファイルシステムでフォーマットされた
 </para><para arch="alpha">
 
 <!--
-If you chose an automatic partitioning for your Alpha system, an
+If you choose guided partitioning for your Alpha system, an
 additional, unformatted partition will be allocated at the beginning of
 your disk to reserve this space for the aboot boot loader.
 -->
-Alpha マシンに対して自動パーティション分割を行うと決めた場合、
+Alpha マシンに対してガイドパーティション分割を行うと決めた場合、
 ディスクの先頭に aboot ブートローダ用の未フォーマット領域を、
 追加で予約しなければなりません。
 
@@ -129,36 +163,39 @@ The list of partitions might look like this:
 -->
 パーティション一覧は以下のようになります。
 
-<!-- TODO: show some flags here (lightning, skull, smiley) -->
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
-        #1 primary   16.4 MB     ext2       /boot
-        #2 primary  551.0 MB     swap       swap
-        #3 primary    5.8 GB     ntfs
-           pri/log    8.2 MB     FREE SPACE
+        #1 primary   16.4 MB  B f ext2       /boot
+        #2 primary  551.0 MB      swap       swap
+        #3 primary    5.8 GB      ntfs
+           pri/log    8.2 MB      FREE SPACE
 
   IDE1 slave (hdb) - 80.0 GB ST380021A
-        #1 primary   15.9 MB     ext3
-        #2 primary  996.0 MB     fat16
-        #3 primary    3.9 GB     xfs        /home
-        #5 logical    6.0 GB     ext3       /
-        #6 logical    1.0 GB     ext3       /var
-        #7 logical  498.8 MB     ext3
-        #8 logical  551.5 MB     swap       swap
-        #9 logical   65.8 GB     ext2
+        #1 primary   15.9 MB      ext3
+        #2 primary  996.0 MB      fat16
+        #3 primary    3.9 GB      xfs        /home
+        #5 logical    6.0 GB    f ext3       /
+        #6 logical    1.0 GB    f ext3       /var
+        #7 logical  498.8 MB      ext3
+        #8 logical  551.5 MB      swap       swap
+        #9 logical   65.8 GB      ext2
 </screen></informalexample>
 
 <!--
 This example shows two IDE harddrives divided into several partitions;
 the first disk has some free space. Each partition line consists of the
 partition number, its type, size, optional flags, file system, and
-mountpoint (if any).
+mountpoint (if any). Note: this particular setup cannot be created using
+guided partitioning but it does show possible variation that can be achieved
+using manual partitioning).
 -->
 この例では、2 つの IDE ハードディスクを、
 いくつかのパーティションに分割しています。
 第 1 ディスクには空き領域がいくらかあります。
 パーティション行ごとに、パーティション番号、パーティションタイプ、サイズ、
-追加フラグ、ファイルシステム、マウントポイントを表示しています。
+追加フラグ、ファイルシステム、マウントポイントを (あれば) 表示しています。
+注意: こういった詳細なセットアップはガイドパーティション分割では行えませんが、
+手動パーティション分割で使用できる変化を示します。
 
 </para><para>
 
@@ -168,8 +205,7 @@ generated partition table, you can choose <guimenuitem>Finish
 partitioning and write changes to disk</guimenuitem> from the menu to
 implement the new partition table (as described at the end of this
 section). If you are not happy, you can choose to <guimenuitem>Undo
-changes to partitions</guimenuitem>, to run guided partitioning again
-or modify the proposed changes as described below for manual partitioning.
+changes to partitions</guimenuitem><footnote>
 -->
 これでガイドパーティション分割を終えます。
 生成されたパーティションテーブルでよければ、
@@ -178,7 +214,26 @@ or modify the proposed changes as described below for manual partitioning.
 をメニューから選べます。
 そうでなければ、もう一度ガイドパーティション分割をしたり、
 以下に述べる手動パーティション分割で提案する変更を修正をするのに 
-<guimenuitem>Undo changes to partitions</guimenuitem> を選べます。
+<guimenuitem>Undo changes to partitions</guimenuitem><footnote>
+
+<para>
+
+<!--
+If you selected guided partitioning using LVM, you will not be able to undo
+all changes made as some changes will already have been committed to the
+hard disk. The installer will warn you before that happens though.
+-->
+LVM を使用してガイドパーティション分割を行う場合、
+ハードディスクにコミットしてしまった変更は元に戻せません。
+もっとも、そうなる前にインストーラが警告してきます
+
+</para>
+
+<!--
+</footnote> and run guided partitioning again, or modify the proposed changes
+as described below for manual partitioning.
+-->
+</footnote> を選べます。
 
 </para><para>
 
@@ -227,7 +282,7 @@ use it at all. Other nice feature is the possibility to copy data from
 existing partition onto this one.
 When you are satisfied with your new partition, select
 <guimenuitem>Done setting up the partition</guimenuitem> and you will be
-thrown back to the <command>partman</command>'s main screen.
+thrown back to <command>partman</command>'s main screen.
 -->
 空き領域を選択すると、新しいパーティションを作成するよう促されます。
 サイズやタイプ (基本か論理か) 、場所 (空き領域の先頭からか最後からか) 
@@ -289,7 +344,7 @@ let you continue until you correct this issue.
 </para><para arch="ia64">
 
 <!--
-If you forget to select and format an EFI boot partition
+If you forget to select and format an EFI boot partition,
 <command>partman</command> will detect this and will not let you continue
 until you allocate one.
 -->

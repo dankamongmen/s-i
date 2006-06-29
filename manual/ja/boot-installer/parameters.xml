@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36744 -->
+<!-- original version: 38289 -->
 
  <sect1 id="boot-parms"><title>ブートパラメータ</title>
 <para>
@@ -133,18 +133,17 @@ The installation system recognizes a few additional boot parameters<footnote>
 <para>
 
 <!--
-Note that the kernel accepts a maximum of 8 command line options and
+Note that the 2.4 kernel accepts a maximum of 8 command line options and
 8 environment options (including any options added by default for the
 installer). If these numbers are exceeded, 2.4 kernels will drop any
-excess options and 2.6 kernels will panic. With kernel 2.6.9 or newer,
+excess options. With kernel 2.6.9 or newer,
 you can use 32 command line options and 32 environment options.
 -->
-カーネルは最大でコマンドラインオプションを 8 つと、
+カーネル 2.4 は最大でコマンドラインオプションを 8 つと、
 環境オプションを 8 つ受け付けます。
 (インストーラがデフォルトで付加するオプション含む)
 もしこの数を超過すると、
-2.4 カーネルは超過したオプションを無視してしまいますし、
-2.6 カーネルはカーネルパニックを起こしてしまいます。
+2.4 カーネルは超過したオプションを無視してしまいます。
 2.6.9 カーネル以降では、
 コマンドラインオプションを 32 個と環境オプションを 32 個使用できます。
 
@@ -163,19 +162,21 @@ you can use 32 command line options and 32 environment options.
 
 <!--
 This parameter sets the lowest priority of messages to be displayed.
+Short form: <userinput>priority</userinput>
 -->
 このパラメータには、表示するメッセージのもっとも低い優先度を設定します。
+短縮形: <userinput>priority</userinput>
 
 </para><para>
 
 <!--
-The default installation uses <userinput>debconf/priority=high</userinput>.
+The default installation uses <userinput>priority=high</userinput>.
 This means that both high and critical priority messages are shown, but medium
 and low priority messages are skipped.
 If problems are encountered, the installer adjusts the priority as needed.
 -->
 デフォルトのインストールでは、
-<userinput>debconf/priority=high</userinput> を使用します。
+<userinput>priority=high</userinput> を使用します。
 優先度が「高」のものと、「重要」のもののメッセージを表示し、
 「標準」や、「低」のメッセージはスキップします。
 問題にぶつかった場合、インストーラは必要な優先度に調整します。
@@ -183,19 +184,19 @@ If problems are encountered, the installer adjusts the priority as needed.
 </para><para>
 
 <!--
-If you add <userinput>debconf/priority=medium</userinput> as boot parameter, you
+If you add <userinput>priority=medium</userinput> as boot parameter, you
 will be shown the installation menu and gain more control over the installation.
-When <userinput>debconf/priority=low</userinput> is used, all messages are shown
+When <userinput>priority=low</userinput> is used, all messages are shown
 (this is equivalent to the <emphasis>expert</emphasis> boot method).
-With <userinput>debconf/priority=critical</userinput>, the installation system
+With <userinput>priority=critical</userinput>, the installation system
 will display only critical messages and try to do the right thing without fuss.
 -->
-ブートパラメータに <userinput>debconf/priority=medium</userinput>
+ブートパラメータに <userinput>priority=medium</userinput>
 を追加すると、インストールメニューが表示され、
 インストールについて、さらに多くの制御を行うことができます。
-<userinput>debconf/priority=low</userinput> を使った場合は、
+<userinput>priority=low</userinput> を使った場合は、
 すべてのメッセージを表示します (<emphasis>expert</emphasis> 起動法と等価)。
-<userinput>debconf/priority=critical</userinput> の場合は、
+<userinput>priority=critical</userinput> の場合は、
 インストールシステムは重要なメッセージだけを表示し、
 大騒ぎせずに正しい設定をしようとします。
 
@@ -345,14 +346,16 @@ one device.
 Some architectures use the kernel framebuffer to offer installation in
 a number of languages. If framebuffer causes a problem on your system
 you can disable the feature by the parameter
-<userinput>debian-installer/framebuffer=false</userinput>. Problem
-symptoms are error messages about bterm or bogl, a blank screen, or
-a freeze within a few minutes after starting the install.
+<userinput>debian-installer/framebuffer=false</userinput>, or
+<userinput>fb=false</userinput> for short. Problem symptoms are error messages
+about bterm or bogl, a blank screen, or a freeze within a few minutes after
+starting the install.
 -->
 いくつかのアーキテクチャでは、多くの言語でインストールを行うために、
 カーネルフレームバッファを使用します。
 フレームバッファが問題となるシステムの場合、
-<userinput>debian-installer/framebuffer=false</userinput> 
+<userinput>debian-installer/framebuffer=false</userinput> や
+省略した <userinput>fb=false</userinput>
 パラメータによってこの機能を無効にできます。
 bterm や bogl に関するエラーメッセージや、真っ暗な画面、
 インストールが始まって数分後にフリーズがおきたら問題の兆候です。
@@ -361,10 +364,11 @@ bterm や bogl に関するエラーメッセージや、真っ暗な画面、
 
 <!--
 The <userinput>video=vga16:off</userinput> argument may also be used
-to disable the framebuffer. Such problems have been reported on a Dell
-Inspiron with Mobile Radeon card.
+to disable the kernel's use of the framebuffer. Such problems have been
+reported on a Dell Inspiron with Mobile Radeon card.
 -->
-<userinput>video=vga16:off</userinput> 引数はフレームバッファを無効にする効果もあります。
+<userinput>video=vga16:off</userinput> 引数は、
+カーネルのフレームバッファ利用を無効にする効果もあります。
 そのような問題が、Mobile Radeon を搭載した Dell Inspiron について報告されています。
 
 </para><para arch="m68k">
@@ -472,10 +476,12 @@ PCMCIA サービスが原因で問題が発生する場合、
 <!--
 Specify the url to a preconfiguration file to download and use in
 automating the install. See <xref linkend="automatic-install"/>.
+Short form: <userinput>url</userinput>
 -->
 preconfiguration ファイルをダウンロードする URL を指定します。
 これは自動インストールで使用します。
 <xref linkend="automatic-install"/> を参照してください。
+短縮形: <userinput>url</userinput>
 
 </para></listitem>
 </varlistentry>
