@@ -51,7 +51,7 @@ char const program_name[] = "parted_server";
                 exit(1); \
         })
 
-/* For debugint purposes */
+/* For debugging purposes */
 #define traceline() log("Line: %i", __LINE__)
 
 #define assert(x) \
@@ -266,9 +266,9 @@ timered_file_system_resize(PedFileSystem *fs, PedGeometry *geom)
  * "error", etc., `message' is the text to be presented to the user
  * and `options' is an array of pointers to strings such "Yes", "No",
  * "Cancel", etc.; the last pointer is NULL.  The function returns the
- * index of the chosen by the user option or -1 if the option read in
+ * index of the option chosen by the user or -1 if the option read in
  * 5. was "unhandled".  The client responses with "unhandled" when the
- * user cansels the debconf dialog or when the dialog was not
+ * user cancels the debconf dialog or when the dialog was not
  * presented to the user because of the debconf priority. */
 int
 pseudo_exception(char *type, char *message, char **options)
@@ -301,7 +301,7 @@ pseudo_exception(char *type, char *message, char **options)
         critical_error("exception_handler: Bad option: \"%s\"", str);
 }
 
-/* The maximal meaningfull bit in PedExceptionOption.  In the current
+/* The maximal meaningful bit in PedExceptionOption.  In the current
    version of libparted (1.6) this is 7, but let us be safer. */
 #define MAXIMAL_OPTION 10
 #define POWER_MAXIMAL_OPTION 1024       /* 2 to the MAXIMAL_OPTION */
@@ -342,7 +342,7 @@ exception_handler(PedException *ex)
                        options[response]);
 }
 
-/* If we want to disable temporary the exception handler for some
+/* If we want to temporarily disable the exception handler for some
    commands, we use deactivate_exception_handler() before them and
    activate_exception_handler after them. */
 
@@ -382,7 +382,7 @@ struct devdisk {
    `devices[number_devices - 1]'.  `number_devices' is a small number
    so there is no need to use a hash table or some more advanced data
    structure.  Moreover a version of parted_server using the hash
-   implementation from libdebian-installer was in 200 bytes longer. */
+   implementation from libdebian-installer was 200 bytes longer. */
 
 unsigned number_devices = 0;
 struct devdisk *devices = NULL;
