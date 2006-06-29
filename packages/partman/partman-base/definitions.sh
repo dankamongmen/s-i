@@ -591,8 +591,8 @@ humandev () {
 	    fi
 	    ;;
 	/dev/cciss/host*|/dev/cciss/disc*)
-	    # /dev/cciss/hostN/targetM/disc is 2.6 form
-	    # /dev/cciss/discM/disk seems to be 2.4 form
+	    # /dev/cciss/hostN/targetM/disc is 2.6 devfs form
+	    # /dev/cciss/discM/disk seems to be 2.4 devfs form
 	    line=`echo $1 | sed 's,/dev/cciss/\([a-z]*\)\([0-9]*\)/\(.*\),\1 \2 \3,'`
 	    cont=`echo "$line" | cut -d" " -f2`
 	    host=`echo "$line" | cut -d" " -f1`
