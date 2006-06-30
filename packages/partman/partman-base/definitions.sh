@@ -629,8 +629,8 @@ humandev () {
 	    # symlink. Unfortunately, unlike other block devices, this
 	    # doesn't seem to exist in this case, so we just have to live
 	    # with parsing the device name.
-	    host="$(echo "$1" | sed 's,/dev/cciss/c\([0-9]*\).*,\1,')"
-	    target="$(echo "$1" | sed 's,/dev/cciss/c[0-9]*d\([0-9]*\).*,\1,')"
+	    controller="$(echo "$1" | sed 's,/dev/cciss/c\([0-9]*\).*,\1,')"
+	    lun="$(echo "$1" | sed 's,/dev/cciss/c[0-9]*d\([0-9]*\).*,\1,')"
 	    case $1 in
 		/dev/cciss/c*d*p*)
 		    # partition
@@ -644,10 +644,10 @@ humandev () {
 	    linux="${linux#/dev/}"
 	    if [ -z "$part" ]; then
 		db_metaget partman/text/scsi_disk description
-		printf "$RET" ".CCISS" "-" "$host" "$target" "$linux"
+		printf "$RET" ".CCISS" "-" "$controller" "$lun" "$linux"
 	    else
 		db_metaget partman/text/scsi_partition description
-		printf "$RET" ".CCISS" "-" "$host" "$target" "$part" "$linux"
+		printf "$RET" ".CCISS" "-" "$controller" "$lun" "$part" "$linux"
 	    fi
 	    ;;
 	/dev/md/*)
