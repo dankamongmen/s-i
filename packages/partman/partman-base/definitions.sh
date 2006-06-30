@@ -628,7 +628,7 @@ humandev () {
 	    # It would be a lot easier to parse the /sys/block/*/device
 	    # symlink. Unfortunately, unlike other block devices, this
 	    # doesn't seem to exist in this case, so we just have to live
-	    # with parsing the device name.
+	    # with parsing the device name (note: added in upstream 2.6.18).
 	    controller="$(echo "$1" | sed 's,/dev/cciss/c\([0-9]*\).*,\1,')"
 	    lun="$(echo "$1" | sed 's,/dev/cciss/c[0-9]*d\([0-9]*\).*,\1,')"
 	    case $1 in
