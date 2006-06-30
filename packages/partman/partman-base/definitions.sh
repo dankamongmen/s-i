@@ -594,7 +594,7 @@ humandev () {
 	    # /dev/cciss/hostN/targetM/disc is 2.6 devfs form
 	    # /dev/cciss/discM/disk seems to be 2.4 devfs form
 	    line=`echo $1 | sed 's,/dev/cciss/\([a-z]*\)\([0-9]*\)/\(.*\),\1 \2 \3,'`
-	    cont=`echo "$line" | cut -d" " -f2`
+	    controller=`echo "$line" | cut -d" " -f2`
 	    host=`echo "$line" | cut -d" " -f1`
 	    line=`echo "$line" | cut -d" " -f3`
 	    if [ "$host" = host ] ; then
@@ -606,10 +606,10 @@ humandev () {
 	       line=`echo "$line" | sed 's,disc\([0-9]*\)/\([a-z]*\)\(.*\),\1 \2 \3,'`
 	       lun=`echo  "$line" | cut -d" " -f1`
 	       if [ "$lun" > 15 ] ; then
-	          cont=$(($lun / 16))
+	          controller=$(($lun / 16))
 		  lun=$(($lun % 16))
 	       else
-		  cont=0
+		  controller=0
 	       fi
 	       disc=`echo "$line" | cut -d" " -f2`
 	       part=`echo "$line" | cut -d" " -f3`
@@ -618,10 +618,10 @@ humandev () {
 	    linux=${linux#/dev/}
 	    if [ "$disc" = disc ] ; then
 	       db_metaget partman/text/scsi_disk description
-	       printf "$RET" ".CCISS" "-" ${cont} ${lun} ${linux}
+	       printf "$RET" ".CCISS" "-" ${controller} ${lun} ${linux}
 	    else
 	       db_metaget partman/text/scsi_partition description
-	       printf "$RET" ".CCISS" "-" ${cont} ${lun} ${part} ${linux}
+	       printf "$RET" ".CCISS" "-" ${controller} ${lun} ${part} ${linux}
 	    fi
 	    ;;
 	/dev/cciss/c*d*)
