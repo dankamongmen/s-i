@@ -151,7 +151,7 @@ create_dir $COPY_TO_DIR
 create_dir $RUN_DIR
 create_dir $GRAPHS_DIR/data
 
-PROSPECTIVE="$WD/material/packages1/debian-installer/packages/po/PROSPECTIVE"
+PROSPECTIVE="$WD/material/packages.unstable1/debian-installer/packages/po/PROSPECTIVE"
 if [ ! -f $PROSPECTIVE ] ; then
   echo No PROSPECTIVE file found
   echo Please run $0 at least once for level 1 with \"fetch\"
@@ -178,7 +178,7 @@ cd $WD
 touch "${RUN_DIR}/$LEVEL.lock"
 
 # Create the directories for the material
-create_dir $WD/material/packages$LEVEL
+create_dir $WD/material/packages.unstable$LEVEL
 create_dir $WD/material/packages.testing$LEVEL
 
 # Some output
@@ -219,7 +219,8 @@ if [ "$FETCH" ]; then
 			rm -rf $WD/material/packages.$dist$LEVEL/$pkg*
 	  		apt-get $APT_OPT -t $dist source $pkg > /dev/null || echo "FAILED to fetch $pkg from $dist!" >> $TARGET_DIR/packages-list-$dist
 	  		rm -f *.tar.gz *.dsc *.diff.gz
-  
+			
+			create_dir $WD/material/packages.dist$LEVEL/$pkg
   			mv * $WD/material/packages.dist$LEVEL/$pkg
 			if [ "$pkg" = "newt" ]; then
 				cd $WD/material/packages.dist$LEVEL/$pkg/
@@ -242,7 +243,7 @@ if [ "$FETCH" ]; then
 	cd $WD/material/packages.unstable$LEVEL/
 	cat $WD/config/packages.cvs$LEVEL
 
-	sh -x $WD/config/packages.cvs.commands$LEVEL
+	sh $WD/config/packages.cvs.commands$LEVEL
 	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list-unstable
 	cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list-unstable
 
