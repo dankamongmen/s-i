@@ -184,9 +184,10 @@ create_dir $WD/material/packages.testing$LEVEL
 # Some output
 echo -n "$SCRIPTNAME script start by user $USER, logname $LOGNAME: "
 date
-echo "Working directory is $WD"
-echo "Skipping in rank.txt:"
-grep -v "^#" $PROSPECTIVE
+
+## echo "Working directory is $WD"
+## echo "Skipping in rank.txt:"
+## grep -v "^#" $PROSPECTIVE
 
 rm -rf $TARGET_DIR/*
 if [ "$FETCH" ]; then
@@ -197,12 +198,10 @@ fi
 
 #get sources:
 if [ "$FETCH" ]; then
-	echo "Getting sources via apt:"
+	echo "Sources fetched via apt:"
 	
 	cat $WD/config/packages.unstable$LEVEL
 
-	#cleanup
-	#rm -rf $WD/packages/*
 	rm -rf $TEMPDIR > /dev/null
 
 	#get files:
@@ -210,81 +209,59 @@ if [ "$FETCH" ]; then
 	cd $TEMPDIR
 	echo -en "$MERKEL_DOWN" > $TARGET_DIR/packages-list
 	date -u >> $TARGET_DIR/packages-list
-	echo "   From unstable:"
-	echo "From unstable:" >> $TARGET_DIR/packages-list
-	for pkg in `cat $WD/config/packages.unstable$LEVEL`; do
-		cd $TEMPDIR
-  		echo -n "Downloading $pkg..."
-		rm -rf $WD/material/packages$LEVEL/$pkg*
-  		apt-get $APT_OPT source $pkg > /dev/null && echo "$pkg done." || echo "FAILED to fetch $pkg from unstable!" >> $TARGET_DIR/packages-list
-  		rm -f *.tar.gz *.dsc *.diff.gz
-  
-  		mv * $WD/material/packages$LEVEL/$pkg
-		if [ "$pkg" = "newt" ]; then
-			cd $WD/material/packages$LEVEL/$pkg/
-			tar -xzvf *.tar.gz
-			#cat debian/patches/05_whiptail_i18n.patch debian/patches/85_more_i18n.patch | patch -p0
-			cat debian/patches/* | patch -p0
-			rm *.tar.gz
-			mv newt-* newt
-			cd newt/po/
-			make newt.pot
-			chmod a+r newt.pot
-		fi
-		head -n 1 $WD/material/packages$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list
-	done
 
-	echo "   From testing:"
-        echo "From testing:" >> $TARGET_DIR/packages-list-testing
-	for pkg in `cat $WD/config/packages.testing$LEVEL`; do
-		cd $TEMPDIR
-  		echo -n "Downloading $pkg..."
-		rm -rf $WD/material/packages$LEVEL/$pkg*
-  		apt-get $APT_OPT -t testing source $pkg > /dev/null && echo "$pkg done." || echo "FAILED to fetch $pkg from testing!" >> $TARGET_DIR/packages-list-testing
-  		rm -f *.tar.gz *.dsc *.diff.gz
+	for dist in unstable testing ; do
+		echo "   From $dist:"
+		echo "From $dist:" >> $TARGET_DIR/packages-list
+		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
+			cd $TEMPDIR
+  			## echo -n "Downloading $pkg..."
+			rm -rf $WD/material/packages.$dist$LEVEL/$pkg*
+	  		apt-get $APT_OPT -t $dist source $pkg > /dev/null || echo "FAILED to fetch $pkg from $dist!" >> $TARGET_DIR/packages-list-$dist
+	  		rm -f *.tar.gz *.dsc *.diff.gz
   
-  		mv * $WD/material/packages.testing$LEVEL/$pkg
-		if [ "$pkg" = "newt" ]; then
-			cd $WD/material/packagestesting$LEVEL/$pkg/
-			tar -xzvf *.tar.gz
-			#cat debian/patches/05_whiptail_i18n.patch debian/patches/85_more_i18n.patch | patch -p0
-			cat debian/patches/* | patch -p0
-			rm *.tar.gz
-			mv newt-* newt
-			cd newt/po/
-			make newt.pot
-			chmod a+r newt.pot
-		fi
-		head -n 1 $WD/material/packages.testing$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-testing
+  			mv * $WD/material/packages.dist$LEVEL/$pkg
+			if [ "$pkg" = "newt" ]; then
+				cd $WD/material/packages.dist$LEVEL/$pkg/
+				tar -xzf *.tar.gz
+				#cat debian/patches/05_whiptail_i18n.patch debian/patches/85_more_i18n.patch | patch -p0
+				cat debian/patches/* | patch -p0 >/dev/null
+				rm *.tar.gz
+				mv newt-* newt
+				cd newt/po/
+				make newt.pot >/dev/null
+				chmod a+r newt.pot
+			fi
+			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-$dist
+		done
 	done
 
 	
 	#get files from CVS:
-	echo "Getting files from CVS:"
-	cd $WD/material/packages$LEVEL/
+	echo "Sources fetches from CVS/SVN:"
+	cd $WD/material/packages.unstable$LEVEL/
 	cat $WD/config/packages.cvs$LEVEL
 
 	sh -x $WD/config/packages.cvs.commands$LEVEL
-	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list
-	cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list
+	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list-unstable
+	cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list-unstable
 
-
-	echo "Finished getting files!"
+	## echo "Finished getting files!"
 	cd $WD
 else
 	#ls packages/* 2&> /dev/null || exit
 	echo "no download... (use 'fetch' to force)"
 	date -u > $TARGET_DIR/packages-list
-	echo "From unstable:" >> $TARGET_DIR/packages-list
-	for pkg in `cat $WD/config/packages.unstable$LEVEL`; do
-		head -n 1 $WD/material/packages$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list
+
+	for dist in unstable testing ; do
+		echo "From $dist:" >> $TARGET_DIR/packages-list-$dist
+		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
+			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-$dist
+		done
 	done
-	echo "From testing:" >> $TARGET_DIR/packages-list-testing
-	for pkg in `cat $WD/config/packages.testing$LEVEL`; do
-		head -n 1 $WD/material/packages.testing$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-testing
-	done
-	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list
-	cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list
+
+	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list-unstable
+	cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list-unstable
 
 fi
 
@@ -294,9 +271,9 @@ TOTALU=0
 LANG=C
 mkdir $TARGET_DIR/POT
 for path in `cat $WD/config/paths$LEVEL`; do
-	test -f $WD/material/packages$LEVEL/$path/*.pot || continue
-	U=`untranslated $WD/material/packages$LEVEL/$path/*.pot`
-	cp $WD/material/packages$LEVEL/$path/*.pot $TARGET_DIR/POT/${path//\//_}.pot
+	test -f $WD/material/packages.unstable$LEVEL/$path/*.pot || continue
+	U=`untranslated $WD/material/packages.unstable$LEVEL/$path/*.pot`
+	cp $WD/material/packages.unstable$LEVEL/$path/*.pot $TARGET_DIR/POT/${path//\//_}.pot
   	#echo packages/$path/*.pot
   	#$GETTEXT/msgfmt --statistics packages/$path/*.pot
   	echo "$path/*.pot has $U untranslated. ($TOTALU)"
@@ -304,26 +281,23 @@ for path in `cat $WD/config/paths$LEVEL`; do
   	TOTALU=`expr $TOTALU + $U || echo 0`
 	if [ "$TOTALU" = "0" -o -z "$TOTALU" ]; then
 		echo "Error while counting untranslated strings in templates."
-		$GETTEXT/msgfmt --statistics $WD/material/packages$LEVEL/$path/*.pot
+		$GETTEXT/msgfmt --statistics $WD/material/packages.unstable$LEVEL/$path/*.pot
 	#	exit
 	fi
 
 	#backup everylanguage-file to check against debconf-updatepo later
 	for lang in `cat $WD/config/languages`; do
-		test -f $WD/material/packages$LEVEL/$path/$lang.po || continue
-		cp $WD/material/packages$LEVEL/$path/$lang.po $WD/material/packages$LEVEL/$path/$lang.po.orig
+		test -f $WD/material/packages.unstable$LEVEL/$path/$lang.po || continue
+		cp $WD/material/packages.unstable$LEVEL/$path/$lang.po $WD/material/packages.unstable$LEVEL/$path/$lang.po.orig
 	done
 
-	#run debconf-updatepo to update the po-files
-	#(cd packages$LEVEL/$path/; pwd | grep "debian/po" > /dev/null && $GETTEXT/debconf-updatepo )
-
-	(export PODEBCONF_LIB=/home/bubulle/share/intltool-debian; cd $WD/material/packages$LEVEL/$path/; pwd | grep "debian/po" > /dev/null && ~bubulle/bin/debconf-updatepo-sid )
-
-	#(cd packages/$path/; $GETTEXT/debconf-updatepo > /dev/null 2>&1)
+	(export PODEBCONF_LIB=/home/bubulle/share/intltool-debian; cd $WD/material/packages.unstable$LEVEL/$path/; pwd | grep "debian/po" > /dev/null && ~bubulle/bin/debconf-updatepo-sid )
 
 
 done
 echo "Total strings: $TOTALU=100%"
+
+# Same for testing
 
 #check how many strings at all
 TOTALU_T=0
@@ -389,34 +363,31 @@ for lang in `cat $WD/config/languages`; do #run for every language
   	TT_T=0
   	TF_T=0
  	for path in `cat config/paths$LEVEL`; do #for every package
-    		if [ -e $WD/material/packages$LEVEL/$path/$lang.po ]; then #if the file does exist
-      			LASTT=`translator $WD/material/packages$LEVEL/$path/$lang.po`
+    		if [ -e $WD/material/packages.unstable$LEVEL/$path/$lang.po ]; then #if the file does exist
+      			LASTT=`translator $WD/material/packages.unstable$LEVEL/$path/$lang.po`
 
-			$GETTEXT/msgmerge -U $WD/material/packages$LEVEL/$path/$lang.po $WD/material/packages$LEVEL/$path/*.pot > /dev/null 2>&1
+			$GETTEXT/msgmerge -U $WD/material/packages.unstable$LEVEL/$path/$lang.po $WD/material/packages.unstable$LEVEL/$path/*.pot > /dev/null 2>&1
       			SIGNS="  "	
 			#now check if a file has been modified by debconf-updatepo and output a *
 			#for lang in `cat $WD/languages`; do
 			#	test -f packages/$path/$lang.po || continue
-				ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages$LEVEL/$path/$lang.po.orig 2>&1`
-				NEW=`$GETTEXT/msgfmt --statistics $WD/material/packages$LEVEL/$path/$lang.po 2>&1`
+				ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages.unstable$LEVEL/$path/$lang.po.orig 2>&1`
+				NEW=`$GETTEXT/msgfmt --statistics $WD/material/packages.unstable$LEVEL/$path/$lang.po 2>&1`
 				if [ "$ORIG" != "$NEW" ]; then
 					SIGNS="$SIGNS*" #>> $TARGET_DIR/$lang.txt
 				fi
-				#rm -f $WD/material/packages$LEVEL/$path/$lang.po.orig 
+				#rm -f $WD/material/packages.unstable$LEVEL/$path/$lang.po.orig 
 	
-
 			#done
-     			$GETTEXT/msgfmt $WD/material/packages$LEVEL/$path/$lang.po > /dev/null 2>&1|| (echo "$SIGNS!$path/$lang.po [$LASTT]" >> $TARGET_DIR/$lang.txt; touch /tmp/.$LEVEL.error; return 1) || continue
+     			$GETTEXT/msgfmt $WD/material/packages.unstable$LEVEL/$path/$lang.po > /dev/null 2>&1|| (echo "$SIGNS!$path/$lang.po [$LASTT]" >> $TARGET_DIR/$lang.txt; touch /tmp/.$LEVEL.error; return 1) || continue
 
 			#strings of this package:
-      			U=`untranslated $WD/material/packages$LEVEL/$path/$lang.po`
-      			F=`fuzzy $WD/material/packages$LEVEL/$path/$lang.po`
-     			T=`translated $WD/material/packages$LEVEL/$path/$lang.po`
+      			U=`untranslated $WD/material/packages.unstable$LEVEL/$path/$lang.po`
+      			F=`fuzzy $WD/material/packages.unstable$LEVEL/$path/$lang.po`
+     			T=`translated $WD/material/packages.unstable$LEVEL/$path/$lang.po`
       			test -z "$U" && U=0
       			test -z "$F" && F=0
       			test -z "$T" && T=0
-     			#echo packages/$path/$lang.po > /dev/stderr  #debug
-      			#$GETTEXT/msgfmt --statistics packages/$path/$lang.po #this gets to stderr for debugging and log
 
 
       			#get infos:
@@ -440,11 +411,11 @@ for lang in `cat $WD/config/languages`; do #run for every language
 			
 			#copy (updated) files so that they can be translated:
 			test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
-			cp $WD/material/packages$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//'\/'/'_'}"_$lang.po" 
+			cp $WD/material/packages.unstable$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//'\/'/'_'}"_$lang.po" 
 
-			mv $WD/material/packages$LEVEL/$path/$lang.po.orig $WD/material/packages$LEVEL/$path/$lang.po
+			mv $WD/material/packages.unstable$LEVEL/$path/$lang.po.orig $WD/material/packages.unstable$LEVEL/$path/$lang.po
     		else #=if not existing
-			MISSING_U=`untranslated $WD/material/packages$LEVEL/$path/*.pot`
+			MISSING_U=`untranslated $WD/material/packages.unstable$LEVEL/$path/*.pot`
 			test -z $MISSING_U && MISSING_U=0
       			MISSING="$MISSING  $path/$lang.po "$MISSING_U"u\n"
       			#echo "  !!$path/$lang.po"
@@ -513,10 +484,10 @@ for lang in `cat $WD/config/languages`; do #run for every language
   	test -e /tmp/.$LEVEL.error && echo -e "SOME FILE(S) ARE CORRUPTED! Those are marked with \"!\".\n Run a \"msgfmt --check <po-file> to see what's wrong!\"" >>  $TARGET_DIR/$lang.txt
   	echo >>  $TARGET_DIR/$lang.testing.txt
 	if [ $LEVEL = 1 ]; then
-		if [ -f $WD/material/packages1/debian-installer/packages/po/$lang.po ]; then
-			MASTER_F=`fuzzy $WD/material/packages1/debian-installer/packages/po/$lang.po`
-			MASTER_U=`untranslated $WD/material/packages1/debian-installer/packages/po/$lang.po`
-			MASTER_T=`translated $WD/material/packages1/debian-installer/packages/po/$lang.po`
+		if [ -f $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po ]; then
+			MASTER_F=`fuzzy $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
+			MASTER_U=`untranslated $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
+			MASTER_T=`translated $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
 			echo "Master: "$MASTER_T"t"$MASTER_F"f"$MASTER_U"u" >> $TARGET_DIR/$lang.txt
 		else
 			echo "No master file" >> $TARGET_DIR/$lang.txt
@@ -575,7 +546,7 @@ cp $WD/config/HEADER.txt $TARGET_DIR/
 
 if [ $LEVEL = 1 ]; then
 	mkdir $TARGET_DIR/master
-	cp $WD/material/packages1/debian-installer/packages/po/* $TARGET_DIR/master
+	cp $WD/material/packages.unstable1/debian-installer/packages/po/* $TARGET_DIR/master
 
 fi
 
