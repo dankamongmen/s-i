@@ -289,7 +289,7 @@ for path in `cat $WD/config/paths$LEVEL`; do
 	#backup everylanguage-file to check against debconf-updatepo later
 	for lang in `cat $WD/config/languages`; do
 		test -f $WD/material/packages.unstable$LEVEL/$path/$lang.po || continue
-		cp $WD/material/packages.unstable$LEVEL/$path/$lang.po $WD/material/packages.unstable$LEVEL/$path/$lang.po.orig
+		cp $WD/material/packages.unstable$LEVEL/$path/$lang.po $WD/material/packages.unstable$LEVEL/$path/$lang.po.orig >/dev/null 2>&1
 	done
 
 	(export PODEBCONF_LIB=/home/bubulle/share/intltool-debian; cd $WD/material/packages.unstable$LEVEL/$path/; pwd | grep "debian/po" > /dev/null && ~bubulle/bin/debconf-updatepo-sid )
@@ -320,7 +320,7 @@ for path in `cat $WD/config/paths$LEVEL`; do
 	#backup everylanguage-file to check against debconf-updatepo later
 	for lang in `cat $WD/config/languages`; do
 		test -f $WD/material/packages.testing$LEVEL/$path/$lang.po || continue
-		cp $WD/material/packages.testing$LEVEL/$path/$lang.po $WD/material/packages.testing$LEVEL/$path/$lang.po.orig
+		cp $WD/material/packages.testing$LEVEL/$path/$lang.po $WD/material/packages.testing$LEVEL/$path/$lang.po.orig >/dev/null 2>&1
 	done
 
 	#run debconf-updatepo to update the po-files
@@ -414,7 +414,7 @@ for lang in `cat $WD/config/languages`; do #run for every language
 			test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
 			cp $WD/material/packages.unstable$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//'\/'/'_'}"_$lang.po" 
 
-			mv $WD/material/packages.unstable$LEVEL/$path/$lang.po.orig $WD/material/packages.unstable$LEVEL/$path/$lang.po
+			mv $WD/material/packages.unstable$LEVEL/$path/$lang.po.orig $WD/material/packages.unstable$LEVEL/$path/$lang.po >/dev/null 2>&1
     		else #=if not existing
 			MISSING_U=`untranslated $WD/material/packages.unstable$LEVEL/$path/*.pot`
 			test -z $MISSING_U && MISSING_U=0
@@ -468,9 +468,17 @@ for lang in `cat $WD/config/languages`; do #run for every language
 
   	echo -e "Missing files:\n$MISSING\n" >>  $TARGET_DIR/$lang.txt
   	echo -e "Missing files:\n$MISSING_T\n" >>  $TARGET_DIR/$lang.testing.txt
-	P=`echo "$TT * 100 / $TOTALU"|bc`
-  	STR=`echo "$TT + $TU + $TF" | bc`
-	P_T=`echo "$TT_T * 100 / $TOTALU_T"|bc`
+	if [ "$TOTALU" != 0 ] ; then
+		P=`echo "$TT * 100 / $TOTALU"|bc`
+	else
+		P=0
+	fi
+  	STR=`echo "$TT + $TU + $TF" | bc`	
+	if [ "$TOTALU_T" != 0 ] ; then
+		P_T=`echo "$TT_T * 100 / $TOTALU_T"|bc`
+	else
+		P_T=0
+	fi
   	STR_T=`echo "$TT_T + $TU_T + $TF_T" | bc`
   	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTALU=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang.txt
   	echo -e "Global statistics: "$TT_T"t"$TF_T"f"$TU_T"u ($P_T%)     (total strings: $TOTALU_T=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang.testing.txt
