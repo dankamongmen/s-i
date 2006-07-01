@@ -97,15 +97,20 @@ boot_devfs="$(findfs /boot)"
 [ "$boot_devfs" ] || boot_devfs="$root_devfs"
 boot="$(mapdevfs "$boot_devfs")"
 info "boot partition: $boot"
-if [ "$boot_devfs" != "$root_devfs" ]; then
-    # TODO: Is this still required, now that we put kernel symlinks in
-    # /boot?
-    die quik-installer/boot_not_on_root '/boot not on /'
-fi
 
-if ! grep '[[:space:]]/target[[:space:]]ext2[[:space:]]' /proc/mounts \
-   >/dev/null; then
-    die quik-installer/root_not_ext2 '/ not ext2'
+# The partition where quik is installed must be ext2 and
+# quik must be installed on the first disk
+if [ "$boot_devfs" != "$root_devfs" ]; then
+    if ! grep '[[:space:]]/target/boot[[:space:]]ext2[[:space:]]' /proc/mounts \
+        >/dev/null; then
+        die quik-installer/boot_not_ext2 '/boot not ext2'
+    fi
+    if [ "${boot#/dev/hd}" != "$boot" ] && [ "${boot#/dev/hda}" = "$boot" ]; then
+        die quik-installer/boot_not_on_first_disk '/boot not on first disk'
+    fi
+elif ! grep '[[:space:]]/target[[:space:]]ext2[[:space:]]' /proc/mounts \
+    >/dev/null; then
+    die quik-installer/boot_not_ext2 '/boot not ext2'
 fi
 
 # Generate quik.conf
@@ -146,10 +151,22 @@ if [ "$realinitrd" ] && [ "${realinitrd#/}" = "$realinitrd" ]; then
     realinitrd="${initrd%/*}/$realinitrd"
 fi
 
-rm -f /target/etc/quik.conf
+if [ "$boot_devfs" != "$root_devfs" ]; then
+	quikconf=/target/boot/etc/quik.conf
+	mkdir -p /target/boot/etc
+	quikinstall="quik -v -f -C /boot/etc/quik.conf"
+else 
+	quikconf=/target/etc/quik.conf
+	quikinstall="quik -v -f"
+
+fi
+
+#       TODO: in case /boot is a seperate partition:
+#             make a link from /etc/quik.conf to /boot/etc/quik.conf
+rm -f $quikconf
 
 writequikconf() {
-    writefile /target/etc/quik.conf quik.conf
+    writefile $quikconf quik.conf
 }
 
 writequikconf <<EOF
@@ -161,6 +178,8 @@ timeout=100
 root=$root
 partition=$partnr
 
+#	TODO: AFAIK this comment isnt true anymore and should be removed..
+#		this needs confirmation/testing
 ## Do not point image= to a symlink, quik can't follow symlinks
 image=$realkernel
 	label=Linux
@@ -199,7 +218,7 @@ db_go || exit 10
 db_get "$WARNING_TEMPLATE"
 [ "$RET" = true ] || exit 10
 
-log-output -t quik-installer chroot /target quik -v -f || \
+log-output -t quik-installer chroot /target $quikinstall || \
     die quik-installer/quikerr "quik failed with exit status $?"
 
 # Configure OpenFirmware (OldWorld only)
