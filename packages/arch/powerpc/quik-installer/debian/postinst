@@ -7,36 +7,36 @@ set -e
 . /usr/share/debconf/confmodule
 
 log () {
-    logger -t quik-installer "$@"
+	logger -t quik-installer "$@"
 }
 
 error () {
-    log "error: $@"
+	log "error: $@"
 }
 
 info () {
-    log "info: $@"
+	log "info: $@"
 }
 
 writefile () {
-    cat >>"$1" || die quik-installer/conferr "Error writing $2"
+	cat >>"$1" || die quik-installer/conferr "Error writing $2"
 }
 
 findfs () {
-    mount | grep "on /target${1%/} " | cut -d' ' -f1
+	mount | grep "on /target${1%/} " | cut -d' ' -f1
 }
 
 db_progress START 0 0 quik-installer/progress
 
 die () {
-    template="$1"
-    shift
+	template="$1"
+	shift
 
-    error "$@"
-    db_input critical "$template" || [ $? -eq 30 ]
-    db_go
-    db_progress STOP
-    exit 10
+	error "$@"
+	db_input critical "$template" || [ $? -eq 30 ]
+	db_go
+	db_progress STOP
+	exit 10
 }
 
 # Install quik in /target
@@ -46,18 +46,18 @@ db_progress INFO quik-installer/progress/apt-install
 # Yes, it's a bit silly that we install yaboot. However, where else are we
 # going to get ofpath?
 if ! apt-install quik yaboot powerpc-utils; then
-    info "Calling 'apt-install quik yaboot powerpc-utils' failed"
-    # Hm, unable to install quik into /target/, what should we do?
-    db_input critical quik-installer/apt-install-failed || [ $? -eq 30 ]
-    if ! db_go; then
-	db_progress STOP
-	exit 10 # back up to menu
-    fi
-    db_get quik-installer/apt-install-failed
-    if [ "$RET" != true ]; then
-	db_progress STOP
-	exit 10
-    fi
+	info "Calling 'apt-install quik yaboot powerpc-utils' failed"
+	# Hm, unable to install quik into /target/, what should we do?
+	db_input critical quik-installer/apt-install-failed || [ $? -eq 30 ]
+	if ! db_go; then
+		db_progress STOP
+		exit 10 # back up to menu
+	fi
+	db_get quik-installer/apt-install-failed
+	if [ "$RET" != true ]; then
+		db_progress STOP
+		exit 10
+	fi
 fi
 
 # Find the root partition and check that quik can cope with it.
@@ -66,16 +66,16 @@ db_progress STEP 1
 db_progress INFO quik-installer/progress/checking
 
 mountvirtfs () {
-    fstype="$1"
-    path="$2"
-    if grep -q "[[:space:]]$fstype\$" /proc/filesystems && \
-       ! grep -q "^[^ ]\+ \+$path " /proc/mounts; then
-	mkdir -p "$path" || \
-	    die quik-installer/mounterr "Error creating $path"
-	mount -t "$fstype" "$fstype" "$path" || \
-	    die quik-installer/mounterr "Error mounting $path"
-	trap "umount $path" HUP INT QUIT KILL PIPE TERM EXIT
-    fi
+	fstype="$1"
+	path="$2"
+	if grep -q "[[:space:]]$fstype\$" /proc/filesystems && \
+	   ! grep -q "^[^ ]\+ \+$path " /proc/mounts; then
+		mkdir -p "$path" || \
+			die quik-installer/mounterr "Error creating $path"
+		mount -t "$fstype" "$fstype" "$path" || \
+			die quik-installer/mounterr "Error mounting $path"
+		trap "umount $path" HUP INT QUIT KILL PIPE TERM EXIT
+	fi
 }
 
 # ofpath needs proc in /target
@@ -90,7 +90,7 @@ root="$(mapdevfs "$root_devfs")"
 info "root partition: $root"
 # If ATA (/dev/hd), then it must be on the first disk (/dev/hda).
 if [ "${root#/dev/hd}" != "$root" ] && [ "${root#/dev/hda}" = "$root" ]; then
-    die quik-installer/root_not_on_first_disk '/ not on first disk'
+	die quik-installer/root_not_on_first_disk '/ not on first disk'
 fi
 
 boot_devfs="$(findfs /boot)"
@@ -101,16 +101,16 @@ info "boot partition: $boot"
 # The partition where quik is installed must be ext2 and
 # quik must be installed on the first disk
 if [ "$boot_devfs" != "$root_devfs" ]; then
-    if ! grep '[[:space:]]/target/boot[[:space:]]ext2[[:space:]]' /proc/mounts \
-        >/dev/null; then
-        die quik-installer/boot_not_ext2 '/boot not ext2'
-    fi
-    if [ "${boot#/dev/hd}" != "$boot" ] && [ "${boot#/dev/hda}" = "$boot" ]; then
-        die quik-installer/boot_not_on_first_disk '/boot not on first disk'
-    fi
+	if ! grep '[[:space:]]/target/boot[[:space:]]ext2[[:space:]]' /proc/mounts \
+	   >/dev/null; then
+		die quik-installer/boot_not_ext2 '/boot not ext2'
+	fi
+	if [ "${boot#/dev/hd}" != "$boot" ] && [ "${boot#/dev/hda}" = "$boot" ]; then
+		die quik-installer/boot_not_on_first_disk '/boot not on first disk'
+	fi
 elif ! grep '[[:space:]]/target[[:space:]]ext2[[:space:]]' /proc/mounts \
-    >/dev/null; then
-    die quik-installer/boot_not_ext2 '/boot not ext2'
+     >/dev/null; then
+	die quik-installer/boot_not_ext2 '/boot not ext2'
 fi
 
 # Generate quik.conf
@@ -122,33 +122,33 @@ partnr="`printf %s "$root" | sed 's/[^0-9]*\([0-9]\)/\1/'`"
 disk="`printf %s "$boot" | sed 's/[0-9].*//'`"
 
 if [ -e /target/boot/vmlinux ]; then
-    kernel=/boot/vmlinux
+	kernel=/boot/vmlinux
 else
-    kernel=/vmlinux
+	kernel=/vmlinux
 fi
 
 if [ -e /target/boot/initrd.img ]; then
-    initrd=/boot/initrd.img
+	initrd=/boot/initrd.img
 elif [ -e /target/initrd.img ]; then
-    initrd=/initrd.img
+	initrd=/initrd.img
 else
-    initrd=
+	initrd=
 fi
 
 realkernel="$(readlink "/target$kernel")" || \
-    die quik-installer/resolve_vmlinux \
+	die quik-installer/resolve_vmlinux \
 	"readlink $kernel failed with exit status $?"
 if [ "${realkernel#/}" = "$realkernel" ]; then
-    # target symlink is relative
-    realkernel="${kernel%/*}/$realkernel"
+	# target symlink is relative
+	realkernel="${kernel%/*}/$realkernel"
 fi
 
 realinitrd="$(readlink "/target$initrd")" || \
-    die quik-installer/resolve_initrd \
+	die quik-installer/resolve_initrd \
 	"readlink $initrd failed with exit status $?"
 if [ "$realinitrd" ] && [ "${realinitrd#/}" = "$realinitrd" ]; then
-    # target symlink is relative
-    realinitrd="${initrd%/*}/$realinitrd"
+	# target symlink is relative
+	realinitrd="${initrd%/*}/$realinitrd"
 fi
 
 if [ "$boot_devfs" != "$root_devfs" ]; then
@@ -161,12 +161,12 @@ else
 
 fi
 
-#       TODO: in case /boot is a seperate partition:
-#             make a link from /etc/quik.conf to /boot/etc/quik.conf
+#	TODO: in case /boot is a seperate partition:
+#	      make a link from /etc/quik.conf to /boot/etc/quik.conf
 rm -f $quikconf
 
 writequikconf() {
-    writefile $quikconf quik.conf
+	writefile $quikconf quik.conf
 }
 
 writequikconf <<EOF
@@ -179,19 +179,19 @@ root=$root
 partition=$partnr
 
 #	TODO: AFAIK this comment isnt true anymore and should be removed..
-#		this needs confirmation/testing
+#	      this needs confirmation/testing
 ## Do not point image= to a symlink, quik can't follow symlinks
 image=$realkernel
 	label=Linux
 	read-only
 EOF
 if [ "$realinitrd" ]; then
-    writequikconf <<EOF
+	writequikconf <<EOF
 	initrd=$realinitrd
 EOF
 fi
 if [ "$video" ]; then
-    writequikconf <<EOF
+	writequikconf <<EOF
 	append="video=$video"
 EOF
 fi
@@ -206,10 +206,10 @@ info "architecture: $ARCH"
 
 # Warn that the system may not be bootable after this.
 case $ARCH in
-    powerpc/powermac_oldworld)
+	powerpc/powermac_oldworld)
 	WARNING_TEMPLATE=quik-installer/oldworld_warning
 	;;
-    *)
+	*)
 	WARNING_TEMPLATE=quik-installer/non_oldworld_warning
 	;;
 esac
@@ -219,7 +219,7 @@ db_get "$WARNING_TEMPLATE"
 [ "$RET" = true ] || exit 10
 
 log-output -t quik-installer chroot /target $quikinstall || \
-    die quik-installer/quikerr "quik failed with exit status $?"
+	die quik-installer/quikerr "quik failed with exit status $?"
 
 # Configure OpenFirmware (OldWorld only)
 
@@ -227,15 +227,15 @@ db_progress STEP 1
 db_progress INFO quik-installer/progress/openfirmware
 
 if [ "$ARCH" = powerpc/powermac_oldworld ]; then
-    ofpath="`chroot /target ofpath "$disk"`"
-    info "ofpath $disk: $ofpath"
-    log-output -t quik-installer chroot /target nvsetenv boot-device "${ofpath}0" || \
-	die quik-installer/boot-device_failed \
-	    "nvsetenv boot-device \"${ofpath}0\" failed with exit status $?"
-    log-output -t quik-installer chroot /target \
-	nvsetenv boot-command "begin ['] boot catch 1000 ms cr again" ||
-	die quik-installer/boot-command_failed \
-	    "nvsetenv boot-command failed with exit status $?"
+	ofpath="`chroot /target ofpath "$disk"`"
+	info "ofpath $disk: $ofpath"
+	log-output -t quik-installer chroot /target nvsetenv boot-device "${ofpath}0" || \
+		die quik-installer/boot-device_failed \
+		    "nvsetenv boot-device \"${ofpath}0\" failed with exit status $?"
+	log-output -t quik-installer chroot /target \
+		nvsetenv boot-command "begin ['] boot catch 1000 ms cr again" ||
+		die quik-installer/boot-command_failed \
+		    "nvsetenv boot-command failed with exit status $?"
 fi
 
 # Done!
