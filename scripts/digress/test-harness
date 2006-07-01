@@ -121,11 +121,13 @@ if [ -z "$SCHEME" ]; then
 	else
 		echo "Available schemes for $MACHINE:"
 		for s in $DI_TESTDIR/schemes/$MACHINE/*; do
-			DESCRIPTION=""
-			echo $s | grep -q '~' && continue
-			use $(basename $s)
-			[ -z "$DESCRIPTION" ] && continue
-			echo " - $(basename $s) -- $DESCRIPTION"
+			if [ ! -d $s ]; then
+				DESCRIPTION=""
+				echo $s | grep -q '~' && continue
+				use $(basename $s)
+				[ -z "$DESCRIPTION" ] && continue
+				echo " - $(basename $s) -- $DESCRIPTION"
+			fi
 		done
 	fi
 	if [ -z "$MACHINE" ] && [ -n "$(find $STATE_DIR -maxdepth 1 -name '*-test.lock')" ]; then
