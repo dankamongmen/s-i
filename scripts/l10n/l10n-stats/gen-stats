@@ -220,10 +220,10 @@ if [ "$FETCH" ]; then
 	  		apt-get $APT_OPT -t $dist source $pkg > /dev/null || echo "FAILED to fetch $pkg from $dist!" >> $TARGET_DIR/packages-list-$dist
 	  		rm -f *.tar.gz *.dsc *.diff.gz
 			
-			create_dir $WD/material/packages.dist$LEVEL/$pkg
-  			mv * $WD/material/packages.dist$LEVEL/$pkg
+			create_dir $WD/material/packages.$dist$LEVEL/$pkg
+  			mv * $WD/material/packages.$dist$LEVEL/$pkg
 			if [ "$pkg" = "newt" ]; then
-				cd $WD/material/packages.dist$LEVEL/$pkg/
+				cd $WD/material/packages.$dist$LEVEL/$pkg/
 				tar -xzf *.tar.gz
 				#cat debian/patches/05_whiptail_i18n.patch debian/patches/85_more_i18n.patch | patch -p0
 				cat debian/patches/* | patch -p0 >/dev/null
