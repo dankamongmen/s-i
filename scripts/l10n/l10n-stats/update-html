@@ -31,8 +31,9 @@ usage(){
 WD="."
 RESULTS="."
 TARGET="translation-status.html"
-LEVELS=`seq 1 5`
+LEVELS="1 2 3 4 5"
 TEMPLATE="$WD/config/translation-status.template"
+DIST="unstable"
 ########################### End of Defaults ###################################
 
 ##########################  Command line parsing ##############################
@@ -70,9 +71,16 @@ if ! touch $TARGET ; then
   exit 1
 fi
 
+if [ "$DIST" = "unstable" ] ; then
+	ext=""
+else
+	ext=".$DIST"
+fi
+
+
 if [ -d $RESULTS ] ; then
   for i in $LEVELS ; do
-    if [ ! -f $RESULTS/level$i/rank.txt ] ; then
+    if [ ! -f $RESULTS/level$i/rank$ext.txt ] ; then
       echo $RESULTS/level$i does not seem to contain information about level $i
       echo Run gen-stats for that level before running $0
       exit 1
@@ -110,26 +118,20 @@ function doit() {
 	AVERAGE=`echo "scale=2;$COUNT / $LANGUAGES" | bc -l`
 
 	echo "<b>$AVERAGE% in total<br>$LANGUAGES+1(en) languages</b>"
-	if [ "$1" != "manual.txt" ]; then
-		echo -n "$AVERAGE + " >> $TEMPDIR/avg
-	fi
-	test "$AVERAGE" = "0" && exit
+	echo -n "$AVERAGE + " >> $TEMPDIR/avg
+#	test "$AVERAGE" = "0" && exit
 }
 
 echo -n "(" > $TEMPDIR/avg
-for I in $LEVELS; do
-	cp $RESULTS/level$I/rank.txt $TEMPDIR/tmp.txt
-	grep "%" $TEMPDIR/tmp.txt > $TEMPDIR/$I.txt
-	doit $TEMPDIR/$I.txt >> $TEMPDIR/$I.txt
+
+
+for level in $LEVELS; do
+	cp $RESULTS/level$level/rank$ext.txt $TEMPDIR/tmp.txt
+	grep "%" $TEMPDIR/tmp.txt > $TEMPDIR/$level.txt
+	doit $TEMPDIR/$level.txt >> $TEMPDIR/$level.txt
 	rm -f $TEMPDIR/tmp.txt
+	echo $level
 done
-
-cp ~seppy/public_html/d-i/manual/rank.txt $TEMPDIR/tmp.txt
-grep "%" $TEMPDIR/tmp.txt > $TEMPDIR/manual.txt
-doit $TEMPDIR/manual.txt >> $TEMPDIR/manual.txt
-rm -f $TEMPDIR/tmp.txt
-
-#cat /tmp/avg
 
 nb_levels=0
 for i in $LEVELS ; do
@@ -149,12 +151,8 @@ for i in $LEVELS ; do
 done
 cat $TEMPDIR/template | sed "s/<DATE>/$D/g" | sed "s/<TOTAL>/$TOTAL/g" | sed 's/<MANUAL>//g' > $TARGET
 
-# sed '/<L1>/r 1.txt' $TEMPLATE | sed '/<L2>/r 2.txt' | sed '/<L3>/r 3.txt' | sed '/<L4>/r 4.txt' | sed '/<L5>/r 5.txt' | sed '/<MANUAL>/r manual.txt' | sed 's/<L1>//g' | sed 's/<L2>//g' | sed 's/<L3>//g' | sed 's/<L4>//g'  | sed 's/<L5>//g' | sed "s/<DATE>/$D/g" | sed "s/<TOTAL>/$TOTAL/g" | sed 's/<MANUAL>//g' > $TARGET
-
 for i in $LEVELS ; do
   rm $TEMPDIR/$i.txt
 done
-
-rm $TEMPDIR/manual.txt
 
 rm -fr $TEMPDIR || true
