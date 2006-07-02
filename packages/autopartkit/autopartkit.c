@@ -1339,9 +1339,9 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 				lvm_reqs[lvm_reqs_index].maxsize);
                 lvm_reqs_index++;
             }
-            lvm_reqs[lvm_reqs_index].mountpoint = NULL;
             free(identmatch);
         }
+	lvm_reqs[lvm_reqs_index].mountpoint = NULL;
 
         /* Reduce vg size by LVM_SPEND_FACTOR... */
 	autopartkit_log(1, "Vg %s - %d to use\n",
