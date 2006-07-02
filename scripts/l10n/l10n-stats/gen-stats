@@ -22,6 +22,10 @@
 #
 
 ############################### Functions ##################################
+fancy_output() {
+	echo "==============================================================================="
+}
+
 create_dir() {
   if [ ! -d "$1" ] ; then
     if [ ! -e "$1" ] ; then
@@ -196,12 +200,12 @@ if [ "$FETCH" ]; then
 	done
 fi
 
+fancy_output
+
 #get sources:
 if [ "$FETCH" ]; then
 	echo "Sources fetched via apt:"
 	
-	cat $WD/config/packages.unstable$LEVEL
-
 	rm -rf $TEMPDIR > /dev/null
 
 	#get files:
@@ -211,16 +215,16 @@ if [ "$FETCH" ]; then
 	date -u >> $TARGET_DIR/packages-list
 
 	for dist in unstable testing ; do
-		echo "   From $dist:"
+		echo "  From $dist:"
 		echo "From $dist:" >> $TARGET_DIR/packages-list
 		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
 			cd $TEMPDIR
-  			## echo -n "Downloading $pkg..."
+  			echo -n "    $pkg..."
 			rm -rf $WD/material/packages.$dist$LEVEL/$pkg*
 	  		apt-get $APT_OPT -t $dist source $pkg > /dev/null || echo "FAILED to fetch $pkg from $dist!" >> $TARGET_DIR/packages-list-$dist
 	  		rm -f *.tar.gz *.dsc *.diff.gz
 			
-			create_dir $WD/material/packages.$dist$LEVEL/$pkg
+#			create_dir $WD/material/packages.$dist$LEVEL/$pkg
   			mv * $WD/material/packages.$dist$LEVEL/$pkg
 			if [ "$pkg" = "newt" ]; then
 				cd $WD/material/packages.$dist$LEVEL/$pkg/
@@ -234,14 +238,17 @@ if [ "$FETCH" ]; then
 				chmod a+r newt.pot
 			fi
 			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-$dist
+  			echo "done."
 		done
 	done
 
+	fancy_output
+
 	
 	#get files from CVS:
-	echo "Sources fetches from CVS/SVN:"
+	echo "Sources fetched from CVS/SVN for unstable statistics:"
 	cd $WD/material/packages.unstable$LEVEL/
-	cat $WD/config/packages.cvs$LEVEL
+#	cat $WD/config/packages.cvs$LEVEL
 
 	sh $WD/config/packages.cvs.commands$LEVEL
 	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list-unstable
