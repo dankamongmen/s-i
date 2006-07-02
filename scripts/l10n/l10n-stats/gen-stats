@@ -65,11 +65,11 @@ translator () { #who is last-translator?
 }
 
 print_text () { # print standard-text
-echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang.txt
+echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang$ext.txt
 date -u  >> $TARGET_DIR/$lang.txt
 echo "
 
-Read: http://people.debian.org/~seppy/d-i/translation-status.html" >> $TARGET_DIR/$lang.txt
+Read: $URL_UNSTABLE" >> $TARGET_DIR/$lang$ext.txt
 }
 ########################### End of functions ##################################
 
@@ -344,8 +344,8 @@ for dist in testing unstable ; do
 	GR_UNTRANSLATED=0
 	for lang in `cat $WD/config/languages`; do #run for every language
 		echo -n "  $lang	..."
-		NAME=`cat $LANG_NAMES | grep "$lang:" | sed "s/://g" || echo $lang`
-		echo -e "Statistics of $SCRIPTNAME packages for $NAME:\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >>  $TARGET_DIR/$lang$ext.txt
+		NAME=`cat $LANG_NAMES | grep "$lang:" | cut -f2 -d: || echo $lang`
+		echo -e "Statistics of $SCRIPTNAME packages for$NAME in $dist:\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >>  $TARGET_DIR/$lang$ext.txt
 		MISSING=""
 
 		#for total strings of a language
@@ -478,6 +478,11 @@ echo "Generating spellcheck information for unstable:"
 # Add spellcheck info to the unstable files
 for lang in `cat $WD/config/languages`; do #run for every language
 	echo -n "  $lang	..."
+	if [ "$dist" = "unstable" ] ; then
+		ext=""
+	else
+		ext=".$dist"
+	fi
 	SPELLCHECK=`grep "$lang" $WD/material/spellcheck${LEVEL}.txt | sed "s/$lang //g"`
 	if [ "$SPELLCHECK" != "" ]; then
 		printf  "Spellcheck:
