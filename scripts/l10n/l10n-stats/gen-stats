@@ -45,18 +45,16 @@ usage(){
 }
 
 translated () {  #how many are translated?
-  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1  | sed -e 's/, //g' | $WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1  | awk -F ", " '{print $1}{print $2}' |sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
 }
 
 
 fuzzy() {  #how many fuzzy?
-  #msgfmt -o /dev/null --statistics  $WD/$1 2>&1 | sed -e 's/.*translated messages, //g' |sed -e 's/ fuzzy.*$//g'
-  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | awk -F ", " '{print $1}{print $2}' |sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
 }
 
 untranslated () {  #guess, what does this do?
-  #msgfmt -o /dev/null --statistics $WD/$1 2>&1|sed -e 's/.*, //g' | sed -e 's/ .*.$//g'
-  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | sed -e 's/, /§/g'|$WD/scripts/rmnl 2|sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | awk -F ", " '{print $1}{print $2}' |sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
 }
 
 translator () { #who is last-translator?
