@@ -12,7 +12,7 @@
 #include <parted/parted.h>
 
 #ifdef __linux__
-int
+static int
 is_cdrom(const char *path)
 {
 	int fd;
