@@ -434,9 +434,9 @@ for dist in testing unstable ; do
 		LEAD="000";
 	 	P="${LEAD:0:${#LEAD}-${#P}}$P"
 		if [ ! `grep "^${lang}$" $PROSPECTIVE` ]; then
-	 	   echo -en "$P%\t $lang" >> $TARGET_DIR/.rank.txt$LEVEL
-  		   test -e /tmp/.$LEVEL.error && echo -n " SOME FILE(S) ARE CORRUPTED" >> $TARGET_DIR/.rank.txt$LEVEL
-	  	   echo >> $TARGET_DIR/.rank.txt$LEVEL
+	 	   echo -en "$P%\t $lang" >> $TARGET_DIR/.rank$ext.txt$LEVEL
+  		   test -e /tmp/.$LEVEL.error && echo -n " SOME FILE(S) ARE CORRUPTED" >> $TARGET_DIR/.rank$ext.txt$LEVEL
+	  	   echo >> $TARGET_DIR/.rank$ext.txt$LEVEL
 		fi
 	  	rm -f /tmp/.$LEVEL.error 
 
@@ -497,16 +497,21 @@ fancy_output
 
 echo "Final steps:"
 
-echo -n "  computing ranking information..."
+echo -n "  Computing ranking information..."
 # Generate ranking
-echo "Rankings for $SCRIPTNAME packages." > $TARGET_DIR/rank.txt
-date -u >> $TARGET_DIR/rank.txt
-echo >> $TARGET_DIR/rank.txt
-cp $TARGET_DIR/rank.txt $TARGET_DIR/rank-oldformat.txt
-sort -r $TARGET_DIR/.rank.txt$LEVEL | sed 's/^00/  /g' | sed 's/^0/ /g' | cat -n  >> $TARGET_DIR/rank-oldformat.txt
-$WD/scripts/sort-ranktxt < $TARGET_DIR/.rank.txt$LEVEL >> $TARGET_DIR/rank.txt
-rm $TARGET_DIR/.rank.txt$LEVEL
-
+for dist in testing unstable ; do
+	echo -n " $dist..."
+	if [ "$dist" = "unstable" ] ; then
+		ext=""
+	else
+		ext=".$dist"
+	fi
+	echo "Rankings for $SCRIPTNAME packages in $dist:" > $TARGET_DIR/rank$ext.txt
+	date -u >> $TARGET_DIR/rank$ext.txt
+	echo >> $TARGET_DIR/rank$ext.txt
+	$WD/scripts/sort-ranktxt < $TARGET_DIR/.rank$ext.txt$LEVEL >> $TARGET_DIR/rank$ext.txt
+	rm $TARGET_DIR/.rank$ext.txt$LEVEL
+done
 echo "Done."
 
 # Move files to their destination
