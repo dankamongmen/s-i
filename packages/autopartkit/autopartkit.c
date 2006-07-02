@@ -82,6 +82,14 @@
 #include <syslog.h>
 #include <assert.h>
 
+#ifdef __linux__
+#include <fcntl.h>
+#include <sys/ioctl.h>
+
+/* from <linux/cdrom.h> */
+#define CDROM_GET_CAPABILITY	0x5331	/* get capabilities */
+#endif /* __linux__ */
+
 #include "autopartkit.h"
 
 /*
@@ -305,6 +313,25 @@ static int is_root(const char *mountpoint)
     return (0 == strcmp(mountpoint, "/") );
 }
 
+#ifdef __linux__
+static int is_cdrom(const char *path)
+{
+    int fd;
+    int ret;
+
+    fd = open(path, O_RDONLY | O_NONBLOCK);
+    ret = ioctl(fd, CDROM_GET_CAPABILITY, NULL);
+    close(fd);
+
+    if (ret >= 0)
+	return 1;
+    else
+	return 0;
+}
+#else /* !__linux__ */
+#define is_cdrom(path) 0
+#endif /* __linux__ */
+
 /*
  * Step 1 & 2: Discover and select the device
  *
@@ -326,6 +353,7 @@ static PedDevice* choose_device(void)
 #if defined(fordebian)
     char       device_list[LIST_SIZE], default_device[128], table[TABLE_SIZE];
     char      *ptr_list, *ptr_table;
+    int        num_devices = 0;
     DeviceStats *stats;
 #endif /* fordebian */
 
@@ -334,6 +362,10 @@ static PedDevice* choose_device(void)
     disable_kmsg(0);
 
     dev = ped_device_get_next(NULL);
+    while (dev != NULL && (dev->read_only || is_cdrom(dev->path)))
+    {
+	dev = ped_device_get_next(dev);
+    }
 
     if (dev == NULL)
     {
@@ -352,13 +384,6 @@ static PedDevice* choose_device(void)
 	return dev;
     }
 #if defined(fordebian)
-    if (dev->next == NULL)
-    {
-	/* There's only a single device detected */
-	return dev;
-    }
-
-
     default_device[0] = '\0';
     device_list[0] = '\0';
     ptr_list = device_list;
@@ -369,6 +394,9 @@ static PedDevice* choose_device(void)
 	if (strstr(dev->path, "dev/ide/") || strstr(dev->path, "dev/scsi/"))
 	    continue;
 #endif
+	if (dev->read_only || is_cdrom(dev->path))
+	    continue;
+	++num_devices;
 	stats = get_device_stats(dev);
 	/*
 	 * This is the right way to do unfortunately I want insecable
@@ -411,6 +439,12 @@ static PedDevice* choose_device(void)
 	    strncpy(default_device, dev->path, 128);
 	}
 	free(stats);
+    }
+
+    if (num_devices == 1)
+    {
+	/* There's only a single usable device detected */
+	return ped_device_get(default_device);
     }
 
     dev = NULL;
