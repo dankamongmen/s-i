@@ -238,7 +238,7 @@ if [ "$FETCH" ]; then
 				chmod a+r newt.pot
 			fi
 			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-$dist
-  			echo "done."
+  			echo "Done."
 		done
 	done
 
@@ -324,6 +324,7 @@ rm -rf $TEMPDIR
 
 
 for dist in testing unstable ; do
+	echo "Computing languages statistics for $dist:"
 	if [ "$dist" = "unstable" ] ; then
 		ext=""
 	else
@@ -338,7 +339,7 @@ for dist in testing unstable ; do
 	GR_FUZZY=0
 	GR_UNTRANSLATED=0
 	for lang in `cat $WD/config/languages`; do #run for every language
-		echo -n "$lang..."
+		echo -n "  $lang	..."
 		NAME=`cat $LANG_NAMES | grep "$lang:" | sed "s/://g" || echo $lang`
 		echo -e $MERKEL_DOWN"Statistics of $SCRIPTNAME packages for $NAME:\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >>  $TARGET_DIR/$lang$dist.txt
 		MISSING=""
@@ -350,13 +351,13 @@ for dist in testing unstable ; do
 		for path in `cat config/paths.$dist$LEVEL`; do #for every package
 			if [ -e $WD/material/packages.$dist$LEVEL/$path/$lang.po ]; then #if the file does exist
 				LASTT=`translator $WD/material/packages.unstable$LEVEL/$path/$lang.po`
-
+				
 				$GETTEXT/msgmerge -U $WD/material/packages.$dist$LEVEL/$path/$lang.po $WD/material/packages.$dist$LEVEL/$path/*.pot > /dev/null 2>&1
       				SIGNS="  "	
 				#now check if a file has been modified by debconf-updatepo and output a *
 				#for lang in `cat $WD/languages`; do
 				#	test -f packages/$path/$lang.po || continue
-					ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig 2>&1`
+				ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig 2>&1`
 				NEW=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po 2>&1`
 				if [ "$ORIG" != "$NEW" ]; then
 					SIGNS="$SIGNS*" #>> $TARGET_DIR/$lang.txt
@@ -379,6 +380,7 @@ for dist in testing unstable ; do
 				TU=`expr $TU + $U`
       				TT=`expr $TT + $T`
       				TF=`expr $TF + $F`
+
 
 				#for the graph:
 				GR_TRANSLATED=`expr $GR_TRANSLATED + $TT`
@@ -428,22 +430,50 @@ for dist in testing unstable ; do
   the pot-templates. Please check about that!" >>  $TARGET_DIR/$lang$ext.txt
 	  	fi
 	  	test -e /tmp/.$LEVEL.error && echo -e "SOME FILE(S) ARE CORRUPTED! Those are marked with \"!\".\n Run a \"msgfmt --check <po-file> to see what's wrong!\"" >>  $TARGET_DIR/$lang$ext.txt
-	done # for dist in...
+		
+		# generate ranking information
+		LEAD="000";
+	 	P="${LEAD:0:${#LEAD}-${#P}}$P"
+		if [ ! `grep "^${lang}$" $PROSPECTIVE` ]; then
+	 	   echo -en "$P%\t $lang" >> $TARGET_DIR/.rank.txt$LEVEL
+  		   test -e /tmp/.$LEVEL.error && echo -n " SOME FILE(S) ARE CORRUPTED" >> $TARGET_DIR/.rank.txt$LEVEL
+	  	   echo >> $TARGET_DIR/.rank.txt$LEVEL
+		fi
+	  	rm -f /tmp/.$LEVEL.error 
+
+
+		# Data needed by graphs
+		test "$P" = "000" || echo `date +%Y-%m-%d` $P >> $GRAPHS_DIR/data/$lang$GRAPH_FILE
 	
-	# Special info about the master file, for unstable only
-	if [ $LEVEL = 1 ]; then
+	  	echo "Done. ($P%)"
+		
+	done # for lang...
+
+done # for dist...
+
+fancy_output
+
+# Special info about the master file, for unstable only
+if [ $LEVEL = 1 ]; then
+	echo "Computing information for the master file..."
+	for lang in `cat $WD/config/languages`; do #run for every language
+		echo -n "  $lang...	"
 		if [ -f $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po ]; then
 			MASTER_F=`fuzzy $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
 			MASTER_U=`untranslated $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
 			MASTER_T=`translated $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
-			echo "Master: "$MASTER_T"t"$MASTER_F"f"$MASTER_U"u" >> $TARGET_DIR/$lang.txt
+			echo "Master: "$MASTER_T"t"$MASTER_F"f"$MASTER_U"u" | tee -a $TARGET_DIR/$lang.txt
 		else
-			echo "No master file" >> $TARGET_DIR/$lang.txt
+			echo "No master file" | tee -a $TARGET_DIR/$lang.txt
 		fi
+	done
+	fancy_output
+fi
 
-	fi
-
-	# Add spellcheck info to the unstable files
+echo "Generating spellcheck information for unstable:"
+# Add spellcheck info to the unstable files
+for lang in `cat $WD/config/languages`; do #run for every language
+	echo -n "  $lang...	"
 	SPELLCHECK=`grep "$lang" $WD/material/spellcheck${LEVEL}.txt | sed "s/$lang //g"`
 	if [ "$SPELLCHECK" != "" ]; then
 		printf  "Spellcheck:
@@ -452,31 +482,23 @@ for dist in testing unstable ; do
    %3s codepoints
    %3s level-specific wrong msgstrs
 " $SPELLCHECK >> $TARGET_DIR/$lang.txt
+		echo "Done."
 	else
-		echo "No spellcheck available for $NAME."  >>  $TARGET_DIR/$lang.txt
+		echo "No spellcheck available."  | tee -a  $TARGET_DIR/$lang.txt
 	fi
-
   	print_text
-
-	LEAD="000";
-  	P="${LEAD:0:${#LEAD}-${#P}}$P"
-	if [ ! `grep "^${lang}$" $PROSPECTIVE` ]; then
- 	   echo -en "$P%\t $lang" >> $TARGET_DIR/.rank.txt$LEVEL
-  	   test -e /tmp/.$LEVEL.error && echo -n " SOME FILE(S) ARE CORRUPTED" >> $TARGET_DIR/.rank.txt$LEVEL
-  	   echo >> $TARGET_DIR/.rank.txt$LEVEL
-	fi
-  	rm -f /tmp/.$LEVEL.error 
-
-
-	# Data needed by graphs
-	test "$P" = "000" || echo `date +%Y-%m-%d` $P >> $GRAPHS_DIR/data/$lang$GRAPH_FILE
-	
-	
-  	echo "done. ($P%)"
 done
+
+
+	
+# done
 #for lang in `cat languages`; do
 
+fancy_output
 
+echo "Final steps:"
+
+echo -n "  computing ranking information..."
 # Generate ranking
 echo "Rankings for $SCRIPTNAME packages." > $TARGET_DIR/rank.txt
 date -u >> $TARGET_DIR/rank.txt
@@ -486,16 +508,22 @@ sort -r $TARGET_DIR/.rank.txt$LEVEL | sed 's/^00/  /g' | sed 's/^0/ /g' | cat -n
 $WD/scripts/sort-ranktxt < $TARGET_DIR/.rank.txt$LEVEL >> $TARGET_DIR/rank.txt
 rm $TARGET_DIR/.rank.txt$LEVEL
 
+echo "Done."
+
 # Move files to their destination
 cp $WD/config/HEADER.txt $TARGET_DIR/
 
 
-
+echo -n "  Moving master files to a downloadable location..."
 if [ $LEVEL = 1 ]; then
 	mkdir $TARGET_DIR/master
 	cp $WD/material/packages.unstable1/debian-installer/packages/po/* $TARGET_DIR/master
 
 fi
+echo "Done."
+
+# Cleanup
+echo -n "  Cleanup..."
 
 rm -rf $COPY_TO_DIR
 rm $WD/material/spellcheck${LEVEL}.txt
@@ -503,15 +531,18 @@ cp -r $TARGET_DIR $COPY_TO_DIR
 
 
 
-# Cleanup
-echo "Cleanup..."
 rm -f $TARGET_DIR/.rank.txt$LEVEL
 rm -rf $TEMPDIR
 rm -rf messages messages.mo
 
 chmod -R a+r $TARGET_DIR
 
+rm $RUN_DIR/$LEVEL.lock
+
+echo "Done."
+
+fancy_output
+
 echo -n "Script end: "
 date
 
-rm $RUN_DIR/$LEVEL.lock
