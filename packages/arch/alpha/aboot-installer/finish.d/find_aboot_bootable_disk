@@ -80,10 +80,10 @@ then
 		fi
 	fi
 
-	label=$(parted "$disk" print | sed -n 's/Disk label type: //p')
+	label=$(parted "$disk" print | sed -n 's/Partition Table: //p')
 	if [ -z "$label" ]; then
 		# string in old parted
-		label=$(parted "$disk" print | sed -n 's/Partition Table: //p')
+		label=$(parted "$disk" print | sed -n 's/Disk label type: //p')
 	fi
 	if [ "$label" != "bsd" ]; then
 		. /usr/share/debconf/confmodule
