@@ -162,6 +162,11 @@ if [ ! -f $PROSPECTIVE ] ; then
   exit 1
 fi
 
+if [ ! -x $WD/sort-ranktxt ] ; then
+  echo No $WD/sort-ranktxt script found
+  exit 1
+fi
+
 LANG_NAMES="$WD/config/languages.names"
 if [ ! -f "${LANG_NAMES}" ] ; then
   echo "No language names file (${LANG_NAMES}) found"
@@ -509,7 +514,7 @@ for dist in testing unstable ; do
 	echo "Rankings for $SCRIPTNAME packages in $dist:" > $TARGET_DIR/rank$ext.txt
 	date -u >> $TARGET_DIR/rank$ext.txt
 	echo >> $TARGET_DIR/rank$ext.txt
-	$WD/scripts/sort-ranktxt < $TARGET_DIR/.rank$ext.txt$LEVEL >> $TARGET_DIR/rank$ext.txt
+	$WD/sort-ranktxt < $TARGET_DIR/.rank$ext.txt$LEVEL >> $TARGET_DIR/rank$ext.txt
 	rm $TARGET_DIR/.rank$ext.txt$LEVEL
 done
 echo "Done."
