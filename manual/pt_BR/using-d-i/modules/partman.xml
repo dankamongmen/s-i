@@ -1,6 +1,7 @@
-<!-- original version: 30158 -->
+<!-- original version: 38406 -->
 <!-- revised by Marco Carvalho (macs) 2005.12.31 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.01.01 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.06.30 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.07.02 -->
 
    <sect3 id="partman">
    <title>Particionando seus discos</title>
@@ -21,14 +22,24 @@ Partição</guimenuitem> através do menu.
 
 </para><para>
 
-Se escolher particionamento guiado, você será capaz de selecionar a
-partir dos esquemas listados na tabela abaixo. Todos os esquemas tem
-seus prós e contras, alguns dos quais são discutidos em
-<xref linkend="partitioning"/>. Se não estiver certo, selecione o
+Se escolher particionamento guiado, você pode escolher duas opções: criar
+partições diretamente no disco rígido (método clássico) ou usar o 
+Gerenciamento Lógico de Volumes (LVM). No segundo caso, o instalador irá
+criar a maioria das partições dentro de uma grande partição; a vantagem deste
+método é que as partições dentro desta grande partição podem ser
+redimensionadas de maneira relativamente fácil posteriormente. Nota: a opção
+para usar LVM pode não estar disponível em todas as arquiteturas.
+
+</para><para>
+
+Após você escolher o particionamento guiado (seja o clássico ou usando LVM),
+você será capaz de escolher a partir dos esquemas listados na tabela abaixo.
+Todos os esquemas têm seus prós e contras, alguns dos quais são discutidos em
+<xref linkend="partitioning"/>. Se você estiver inseguro, selecione o
 primeiro. Tenha em mente que o particionamento guiado precisa de uma
-quantidade mínima de espaço livre para operar. Se não tiver pelo menos
-1GB de espaço (dependendo do esquema escolhido), o particionamento guiado
-falhará.
+quantidade mínima de espaço livre para operar. Se você não dispor de, pelo
+menos, 1GB de espaço (dependendo do esquema escolhido), o particionamento
+guiado falhará.
 
 </para>
 
@@ -48,13 +59,13 @@ falhará.
   <entry>600MB</entry>
   <entry><filename>/</filename>, swap</entry>
 </row><row>
-  <entry>Máquina Desktop</entry>
+  <entry>Partição /home separada</entry>
   <entry>500MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, swap
   </entry>
 </row><row>
-  <entry>Estação de trabalho multi-usuário</entry>
+  <entry>Partições /home, /usr, /var e /tmp separadas</entry>
   <entry>1GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -65,18 +76,23 @@ falhará.
 
 </tbody></tgroup></informaltable>
 
-<para arch="ia64">
+<para>
 
-Se selecionar um particionamento automático para seu sistema IA64,
-existirá uma partição adicional, formatada com um sistema de
-arquivos FAT16 inicializável que receberá o gerenciador de partida
-EFI. Também existirá um item de menu adicional no menu de
+Se você escolher o particionamento guiado usando LVM, o instalador irá também
+criar uma partição /boot separada. As outras partições, exceto a partição swap,
+serão criadas dentro da partição LVM.
+
+</para><para arch="ia64">
+Se você selecionar o particionamento guiado para o seu sistema IA64, existirá
+uma partição adicional, formatada com um sistema de arquivos FAT16
+inicializável, para o carregador de inicialização EFI.
+Também existirá um item de menu adicional no menu de
 formatação para configurar uma partição manualmente como uma partição
 de inicialização EFI.
 
 </para><para arch="alpha">
 
-Caso selecionar um particionamento automático para seu sistema Alpha, uma
+Caso seja selecionado um particionamento guiado para seu sistema Alpha, uma
 partição adicional não formatada será alocada no início do seu disco
 para reservar este espaço para o gerenciador de partida aboot.
 
@@ -90,29 +106,31 @@ serão formatadas e aonde elas serão montadas.
 
 A lista de partições deve se parecer com isto:
 
-<!-- TODO: mostre-me algumas opções aqui (lightning, skull, smiley) -->
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
-        #1 primary   16.4 MB     ext2       /boot
-        #2 primary  551.0 MB     swap       swap
-        #3 primary    5.8 GB     ntfs
-           pri/log    8.2 MB     FREE SPACE
+        #1 primary   16.4 MB  B f ext2       /boot
+        #2 primary  551.0 MB      swap       swap
+        #3 primary    5.8 GB      ntfs
+           pri/log    8.2 MB      FREE SPACE
 
   IDE1 slave (hdb) - 80.0 GB ST380021A
-        #1 primary   15.9 MB     ext3
-        #2 primary  996.0 MB     fat16
-        #3 primary    3.9 GB     xfs        /home
-        #5 logical    6.0 GB     ext3       /
-        #6 logical    1.0 GB     ext3       /var
-        #7 logical  498.8 MB     ext3
-        #8 logical  551.5 MB     swap       swap
-        #9 logical   65.8 GB     ext2
+        #1 primary   15.9 MB      ext3
+        #2 primary  996.0 MB      fat16
+        #3 primary    3.9 GB      xfs        /home
+        #5 logical    6.0 GB    f ext3       /
+        #6 logical    1.0 GB    f ext3       /var
+        #7 logical  498.8 MB      ext3
+        #8 logical  551.5 MB      swap       swap
+        #9 logical   65.8 GB      ext2
 </screen></informalexample>
 
 Este exemplo mostra duas unidades de disco rígido IDE divididas em
 diversas partições; o primeiro disco tem algum espaço livre. Cada
 linha de partição consiste no número da partição, seu tipo, tamanho,
 opções opcionais, sistema de arquivos e ponto de montagem (se tiver).
+Nota: essa configuração em particular, não pode ser criada usando o
+particionamento guiado, mas mostra uma variação que pode ser realizada
+usando o particionamento manual).
 
 </para><para>
 
@@ -121,9 +139,20 @@ a tabela de partição gerada, selecione <guimenuitem>Finalizar
 o particionamento e gravar modificações para o disco</guimenuitem> a
 partir do menu para implementar a nova tabela de partição (como descrito
 no final desta seção). Se não estiver contente, você poderá escolher
-<guimenuitem>Desfazer mudanças nas partições</guimenuitem> para executar
-o particionamento guia novamente ou modificar as alterações propostas
-como descrito abaixo para fazer o particionamento manual.
+<guimenuitem>Desfazer mudanças nas partições</guimenuitem><footnote>
+
+<para>
+
+Se você selecionou o particionamento guiado usando LVM, você não será capaz
+de desfazer todas as alterações feitas pois algumas mudanças já terão sido
+enviadas para o disco rígido. O instalador irá alertá-lo antes que isto
+aconteça.
+
+</para>
+
+</footnote> e executar o particionamento guiado novamente, ou modificar
+as alterações propostas como descrito abaixo para fazer o particionamento
+manual.
 
 </para><para>
 
