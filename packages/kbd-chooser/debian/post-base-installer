@@ -1,0 +1,42 @@
+#!/bin/sh 
+
+. /usr/share/debconf/confmodule
+
+# Silently exit if we're using a serial console
+db_get debian-installer/serial-console
+if [ "$RET" != false ]; then
+	exit 0
+fi
+
+apt-install console-tools console-data console-common || true
+
+db_get debian-installer/keymap
+KEYMAP=$RET
+# Silently exit if no keymap is set
+if [ -z "$KEYMAP" ]; then
+	exit 0
+fi
+
+# Install non-Unicode variants of Turkish keymaps
+if [ "$KEYMAP" = "trqu" ]; then
+	KEYMAP="trq"
+	db_set debian-installer/keymap $KEYMAP
+fi
+if [ "$KEYMAP" = "trfu" ]; then
+	KEYMAP="trf"
+	db_set debian-installer/keymap $KEYMAP
+fi
+
+# FIXME Workaround to install some keymaps properly
+case "$KEYMAP" in
+	trq|trf|hebrew|lt|lv-latin4|ua)
+		kbd_mode_temp="ascii" ;;
+	*)
+		kbd_mode_temp=""      ;;
+esac
+
+[ -n "$kbd_mode_temp" ] && kbd-mode --$kbd_mode_temp
+chroot /target install-keymap $KEYMAP
+[ -n "$kbd_mode_temp" ] && kbd-mode --unicode
+
+exit 0
