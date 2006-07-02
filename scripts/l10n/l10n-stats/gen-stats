@@ -211,12 +211,11 @@ if [ "$FETCH" ]; then
 	#get files:
 	mkdir $TEMPDIR
 	cd $TEMPDIR
-	echo -en "$MERKEL_DOWN" > $TARGET_DIR/packages-list
-	date -u >> $TARGET_DIR/packages-list
 
 	for dist in testing unstable ; do
+		date -u >> $TARGET_DIR/packages-list-$dist
 		echo "  From $dist:"
-		echo "From $dist:" >> $TARGET_DIR/packages-list
+		echo "From $dist:" >> $TARGET_DIR/packages-list-$dist
 		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
 			cd $TEMPDIR
   			echo -n "    $pkg..."
@@ -259,9 +258,9 @@ if [ "$FETCH" ]; then
 else
 	#ls packages/* 2&> /dev/null || exit
 	echo "no download... (use 'fetch' to force)"
-	date -u > $TARGET_DIR/packages-list
 
 	for dist in unstable testing ; do
+		date -u > $TARGET_DIR/packages-list-$dist
 		echo "From $dist:" >> $TARGET_DIR/packages-list-$dist
 		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
 			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-$dist
@@ -341,7 +340,7 @@ for dist in testing unstable ; do
 	for lang in `cat $WD/config/languages`; do #run for every language
 		echo -n "  $lang	..."
 		NAME=`cat $LANG_NAMES | grep "$lang:" | sed "s/://g" || echo $lang`
-		echo -e $MERKEL_DOWN"Statistics of $SCRIPTNAME packages for $NAME:\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >>  $TARGET_DIR/$lang$dist.txt
+		echo -e "Statistics of $SCRIPTNAME packages for $NAME:\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >>  $TARGET_DIR/$lang$ext.txt
 		MISSING=""
 
 		#for total strings of a language
@@ -413,8 +412,8 @@ for dist in testing unstable ; do
 
 		done #for path in `cat paths`; do
  
-	 	echo -e "\nTranslated:" >> $TARGET_DIR/$lang.$ext.txt
-		echo -e "$OK" >> $TARGET_DIR/$lang.ext.txt
+	 	echo -e "\nTranslated:" >> $TARGET_DIR/$lang$ext.txt
+		echo -e "$OK" >> $TARGET_DIR/$lang$ext.txt
 		OK=""
 
   		echo -e "Missing files:\n$MISSING\n" >>  $TARGET_DIR/$lang$ext.txt
@@ -473,7 +472,7 @@ fi
 echo "Generating spellcheck information for unstable:"
 # Add spellcheck info to the unstable files
 for lang in `cat $WD/config/languages`; do #run for every language
-	echo -n "  $lang...	"
+	echo -n "  $lang	..."
 	SPELLCHECK=`grep "$lang" $WD/material/spellcheck${LEVEL}.txt | sed "s/$lang //g"`
 	if [ "$SPELLCHECK" != "" ]; then
 		printf  "Spellcheck:
