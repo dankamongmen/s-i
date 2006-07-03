@@ -1,6 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36744 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.15 -->
+<!-- original version: 38289 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.06.30 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.07.02 -->
 
  <sect1 id="boot-parms"><title>Parâmetros de Inicialização</title>
 <para>
@@ -79,12 +80,12 @@ O sistema de instalação reconhece alguns parâmetros adicionais de inicializa�
 
 <para>
 
-Note que o kernel aceita um máximo de 8 opções de linha de comando
+Note que o kernel 2.4 aceita um máximo de 8 opções de linha de comando
 e 8 opções de ambiente (incluindo quaisquer opções adicionadas por
-padrão pelo programa de instalação). Caso estes números sejam excedidos,
-os kernels 2.4 ignorarão qualquer opção que ultrapasse e os kernels da
-série 2.6 entrarão em kernel panic. Para o kernel 2.6.9 e posteriores,
-você pode usar 32 opções de linha de comando e 32 opções de ambiente.
+padrão pelo programa de instalação). Caso estes números sejam excedidos, os 
+kernels 2.4 ignorarão qualquer opção em excesso. Para o kernel 2.6.9 e 
+posteriores, você pode usar 32 opções de linha de comando e 32 opções de 
+ambiente.
 
 </para>
 
@@ -100,12 +101,12 @@ que podem ser úteis.
 
 Este parâmetro definirá qual o a prioridade mais baixa de mensagens que
 serão mostradas.
-
+Forma abreviada: <userinput>priority</userinput>
 
 </para><para>
 
 
-A instalação padrão usa <userinput>debconf/priority=high</userinput>.
+A instalação padrão usa <userinput>priority=high</userinput>.
 Isto significa que ambas mensagens com prioridade <quote>high</quote> (alta) e
 <quote>critical</quote> (crítica) serão mostradas, mas não as de prioridade
 média e baixa. Caso encontre problemas, o programa de instalação ajustará a
@@ -114,13 +115,13 @@ prioridade conforme necessário.
 </para><para>
 
 
-Se adicionar <userinput>debconf/priority=medium</userinput> com parâmetro de
+Se adicionar <userinput>priority=medium</userinput> como parâmetro de
 inicialização, lhe será mostrado um menu de instalação e ganhará mais controle
 através da instalação
-Quando <userinput>debconf/priority=low</userinput> for usado, todas as mensagens
+Quando <userinput>priority=low</userinput> for usado, todas as mensagens
 são mostradas (esta opção é equivalente ao método de inicialização
 <emphasis>expert</emphasis>).
-Com <userinput>debconf/priority=critical</userinput> o sistema de instalação
+Com <userinput>priority=critical</userinput> o sistema de instalação
 mostrará somente mensagens críticas e tentará fazer a coisa certa sem bagunça.
 
 </para></listitem>
@@ -226,16 +227,17 @@ por este parâmetro para procurar somente em um único dispositivo.
 
 Algumas arquiteturas utilizam o framebuffer do kernel para fornecer a
 instalação em um grande número de idiomas. Caso o framebuffer cause um
-problema em seu sistema, a opção <userinput>debian-installer/framebuffer</userinput>
-deverá ser usada para desativar este recurso. Sintomas do problema são mensagens
-de erro sobre o bterm ou bogl, uma tela preta ou travamento depois de alguns
-minutos após iniciar a instalação.
+problema em seu sistema, você pode desabilitar este recurso com o parâmetro
+<userinput>debian-installer/framebuffer</userinput> ou, de forma abreviada,
+<userinput>fb=false</userinput>. Sintomas do problema são mensagens de erro
+sobre o bterm ou bogl, uma tela preta ou congelamento (<quote>freeze</quote>)
+alguns minutos após iniciar a instalação.
 
 </para><para arch="i386">
 
 O argumento <userinput>video=vga16:off</userinput> também pode ser usado para
-desativar o framebuffer. Tais problemas foram reportados em uma
-Dell Inspiron com uma placa Radeon móvel.
+desativar o uso do framebuffer no kernel. Tais problemas foram reportados em
+máquinas Dell Inspiron com placa Radeon Mobile.
 
 </para><para arch="m68k">
 
@@ -304,6 +306,7 @@ notebooks apresentam este mal comportamento.
 
 Especifique uma url para o arquivo de configuração que será baixado e usado
 para fazer a instalação automática. Veja <xref linkend="automatic-install"/>.
+Forma abreviada: <userinput>url</userinput>
 
 </para></listitem>
 </varlistentry>
@@ -315,6 +318,7 @@ para fazer a instalação automática. Veja <xref linkend="automatic-install"/>.
 Especifique o caminho o arquivo de configuração que será
 carregado para realizar a configuração automática. Veja
 <xref linkend="automatic-install"/>.
+Forma abreviada: <userinput>file</userinput>
 
 </para></listitem>
 </varlistentry>
