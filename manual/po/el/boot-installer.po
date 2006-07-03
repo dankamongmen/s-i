@@ -10,13 +10,14 @@
 # Thomaidis Yiannis <thomaidis55@gmail.com>, 2005.
 # yODesY <yodesy@quad-nrg.net>, 2005.
 # quad-nrg.net <galaxico@quad-nrg.net>, 2006.
+# QUAD-nrg.net <yodesy@quad-nrg.net>, 2006.
 msgid ""
 msgstr ""
 "Project-Id-Version: boot-installer\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
 "POT-Creation-Date: 2006-06-21 12:48+0000\n"
-"PO-Revision-Date: 2006-03-15 23:33+0200\n"
-"Last-Translator: quad-nrg.net <galaxico@quad-nrg.net>\n"
+"PO-Revision-Date: 2006-07-03 23:58+0300\n"
+"Last-Translator: QUAD-nrg.net <yodesy@quad-nrg.net>\n"
 "Language-Team: Greek <debian-l10n-greek@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -934,6 +935,30 @@ msgid ""
 "\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">detailed HOWTO</"
 "ulink> is available."
 msgstr ""
+"Κατά την εκκίνηση του συστήματος Netwinder θα πρέπει να διακόψετε την διαδικασία εκκίνησης κατά την αντίστροφη μέτρηση. Αυτό σας επιτρέπει να ορίσετε έναν αριθμό από ρυθμίσεις του firmware που είναι απαραίτητες για την εκκίνηση του εγκαταστάτη. Ξεκινήστε, πρώτα απ' όλα, φορτώνοντας τις προκαθορισμένες ρυθμίσεις: <informalexample><screen>\n"
+"    NeTTrom command-&gt; load-defaults\n"
+"</screen></informalexample> Επιπλέον, θα πρέπει να ρυθμίσετε το δίκτυο είτε με μια στατική διεύθυνση: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 flash\n"
+"    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24\n"
+"</screen></informalexample> όπου 24 είναι ο αριθμός των bit στην μάσκα δικτύου, ή μια δυναμική διεύθυνση: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 dhcp\n"
+"</screen></informalexample> Πιθανόν να χρειαστεί να καθορίσετε τις ρυθμίσεις διαδρομής <userinput>route1</userinput> σε περίπτωση που ο server TFTP δεν βρίσκεται στο τοπικό υποδίκτυο. Μετά από τις ρυθμίσεις αυτές θα πρέπει να προσδιορίσετε τον server TFTP και την τοποθεσία της εικόνας. Μπορείτε τότε να αποθηκεύσετε τις ρυθμίσεις σας στην μνήμη flash. "
+"<informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1\n"
+"    NeTTrom command-&gt; setenv kerntftpfile boot.img\n"
+"    NeTTrom command-&gt; save-all\n"
+"</screen></informalexample> Θα πρέπει τώρα να πείτε στο firmware ότι θα πρέπει να εκκινήσει την εικόνα TFTP: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kernconfig tftp\n"
+"    NeTTrom command-&gt; setenv rootdev /dev/ram\n"
+"</screen></informalexample> Αν χρησιμοποιείτε μια σειριακή κονσόλα για την εγκατάσταση στο σύστημα Netwinder, θα πρέπει να προσθέσετε και την ακόλουθη ρύθμιση: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram "
+"console=ttyS0,115200\n"
+"</screen></informalexample> Εναλλακτικά, για εγακταστάσεις με χρήση ενός πληκτρολογίου και οθόνης θα πρέπει να ορίσετε: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram\n"
+"</screen></informalexample> Μπορείτε να χρησιμοποιήσετε την εντολή  <command>printenv</command> για την ανασκόπηση των ρυθμίσεων του περιβάλλοντός σας. Αφού επιβεβαιώσετε ότι οι ρυθμίσεις είναι σωστές, μπορείτε να φορτώσετε την εικόνα: <informalexample><screen>\n"
+"    NeTTrom command-&gt; boot\n"
+"</screen></informalexample> Σε περίπτωση που συναντήσετε οποιεσδήποτε δυσκολίες είναι διαθέσιμο ένα <ulink url="
+"\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">αναλυτικό HOWTO</ulink>."
 
 #. Tag: title
 #: boot-installer.xml:529
@@ -1016,8 +1041,7 @@ msgstr ""
 #: boot-installer.xml:573 boot-installer.xml:743 boot-installer.xml:1153
 #: boot-installer.xml:1974 boot-installer.xml:2314 boot-installer.xml:2668
 #, no-c-format
-msgid ""
-"If you have problems booting, see <xref linkend=\"boot-troubleshooting\"/>."
+msgid "If you have problems booting, see <xref linkend=\"boot-troubleshooting\"/>."
 msgstr ""
 "Αν έχετε προβλήματα κατά την εκκίνηση, δείτε το <xref linkend=\"boot-"
 "troubleshooting\"/>."
@@ -1034,9 +1058,9 @@ msgstr ""
 
 #. Tag: title
 #: boot-installer.xml:589
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Booting from Firmware"
-msgstr "Εκκίνηση της CHRP από το OpenFirmware"
+msgstr "Εκκίνηση από το Firmware"
 
 #. Tag: para
 #: boot-installer.xml:595
@@ -1146,10 +1170,8 @@ msgstr "Εκκίνηση από CD-ROM"
 #. Tag: title
 #: boot-installer.xml:848
 #, no-c-format
-msgid ""
-"Booting from Linux Using <command>LILO</command> or <command>GRUB</command>"
-msgstr ""
-"Ξεκινώντας από το Linux με <command>LILO</command> ή <command>GRUB</command>"
+msgid "Booting from Linux Using <command>LILO</command> or <command>GRUB</command>"
+msgstr "Ξεκινώντας από το Linux με <command>LILO</command> ή <command>GRUB</command>"
 
 #. Tag: para
 #: boot-installer.xml:851
@@ -4729,18 +4751,3 @@ msgstr ""
 "βήματα που ακολουθήσατε τα όποια έφεραν το σύστημα σ'αυτή την προβληματική "
 "κατάσταση."
 
-#~ msgid ""
-#~ "In case your computer doesn't support booting from USB memory devices, "
-#~ "you can still use a single floppy to do the initial boot and then switch "
-#~ "to USB. Boot your system as described in <xref linkend=\"floppy-boot\"/>; "
-#~ "the kernel on the boot floppy should detect your USB stick automatically. "
-#~ "When it asks for the root floppy, simply press &enterkey;. You should see "
-#~ "&d-i; starting."
-#~ msgstr ""
-#~ "Σε περίπτωση που ο υπολογιστής σας δεν υποστηρίζει εκκίνηση από USB "
-#~ "συσκευές μνήμης μπορείτε ακόμα να χρησιμοποιήσετε μια μόνο δισκέττα για "
-#~ "την αρχική εκκίνηση και μετά να αλλάξετε σε USB. Εκκινήστε το σύστημά σας "
-#~ "όπως περιγράφεται στην ενότητα<xref linkend=\"floppy-boot\"/>. Ο πυρήνας "
-#~ "στη δισκέττα εκκίνησης θα πρέπει να ανιχνεύσει το USB stick αυτόματα. "
-#~ "Όταν ερωτηθείτε για τη δισκέττα root, πατήστε απλά &enterkey;. Θα πρέπει "
-#~ "να δείτε τον &d-i; να ξεκινά."
