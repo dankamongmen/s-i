@@ -25,7 +25,9 @@ fi
 
 # force -t on raid
 if echo "$bootfs" | grep -q "/dev/md"; then
-	siloopt="-t"
+	raidinstall=y
+else
+	raidinstall=n
 fi
 
 if [ -e "/target/boot/initrd.img" ]; then
@@ -59,7 +61,7 @@ timeout=100
 image=${boot}/vmlinuz
 	label=Linux
 	${initrd}
-	
+
 image=${boot}/vmlinuz.old
 	label=LinuxOLD
 	${initrdold}
@@ -72,7 +74,10 @@ ln -sf ../boot/silo.conf /target/etc/silo.conf
 ln -sf . /target/boot/boot
 ln -sf . /target/boot/etc
 
-if chroot /target /sbin/silo -f $siloopt; then
+if chroot /target /sbin/silo -f ; then
+	if [ "$raidinstall" = "y" ]; then
+		chroot /target /sbin/silo -f -t >/dev/null 2>&1
+	fi
 	db_input medium silo-installer/success || [ $? -eq 30 ]
 	db_go || true
 	exit 0
