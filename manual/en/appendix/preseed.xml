@@ -610,6 +610,21 @@ If you need to pick a particular interface when netbooting before loading
 a preconfiguration file from the network, use a boot parameter such as
 <userinput>interface=<replaceable>eth1</replaceable></userinput>.
 
+</para><para>
+
+Although preseeding the network configuration is normally not possible when
+using network preseeding (using <quote>preseed/url</quote>), you can use
+the following hack to work around that, for example if you'd like to set a
+static address for the network interface. The hack is to force the network
+configuration to run again after the preconfiguration file has been loaded
+by creating a <quote>preseed/run</quote> script containing the following
+lines:
+
+<informalexample><screen>
+killall.sh dhclient
+netcfg
+</screen></informalexample>
+
 </para>
 
 <informalexample role="example"><screen>
@@ -640,12 +655,6 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_netmask string 255.255.255.0
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
-# To make it also work for "preseed/url"
-# you have to run `netcfg` a second time,
-# while `dhclient` is not running.
-# Add to your "preseed/run" script these lines:
-#killall.sh dhclient
-#netcfg
 
 # Any hostname and domain names assigned from dhcp take precedence over
 # values set here. However, setting the values still prevents the questions
