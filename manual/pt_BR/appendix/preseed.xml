@@ -1,7 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 37512 -->
+<!-- original version: 38595 -->
 <!-- translated by Marco Carvalho (macs) 2005.12.30 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.06.15 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.07.02 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -321,8 +321,14 @@ Parâmetros de inicialização à especificar:
 
 <para>
 
-Nesse momento, você pode querer adicionar um parâmtero de inicialização
-<userinput>debconf/priority=critical</userinput>. Isto evita a maioria das
+Note que <filename>preseed/url</filename> pode ser abreviado para apenas
+<filename>url</filename> e <filename>preseed/file</filename> para apenas
+<filename>file</filename> quando são passados como parâmetros de inicialização.
+
+</para><para>
+
+Nesse momento, você pode querer adicionar um parâmetro de inicialização
+<userinput>priority=critical</userinput>. Isto evita a maioria das
 perguntas mesmo que a pré-configuração acima perca alguma.
 
 </para>
@@ -386,6 +392,12 @@ passos, a instalação ainda pode ser totalmente automatizada, desde que você
 passe os parâmetros de pré-configuração para o kernel na linha de comando.
 Apenas passe <userinput>path/to/var=value</userinput> para qualquer uma das
 variáveis de pré-configuração listada nos exemplos.
+
+</para><para>
+
+Note que algumas variáveis que são freqüentemente definidas no comando de
+inicialização têm um apelido abreviado. Se um apelido estiver disponível, ele
+é usado nos exemplos deste apêndice ao invés da variável completa.
 
 </para><para>
 
@@ -554,8 +566,7 @@ ser carregado após essas perguntas serem apresentadas.
 
 O <quote>locale</quote> pode ser usado para especificar tanto o idioma quanto o
 país. Para especificar o <quote>locale</quote> como parâmetro de inicialização,
-use <userinput>debian-installer/locale=<replaceable>pt_BR</replaceable>
-</userinput>.
+use <userinput>locale=<replaceable>pt_BR</replaceable></userinput>.
 
 <informalexample role="example"><screen>
 # Locale sets language and country.
@@ -610,7 +621,7 @@ inicialização do kernel.
 Se você precisa escolher uma interface em particular quando estiver
 inicializando pela rede antes de carregar um arquivo de pré-configuração
 pela rede, use um parâmetro de inicialização como
-<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+<userinput>interface=<replaceable>eth1</replaceable></userinput>.
 
 </para>
 
@@ -642,6 +653,12 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_netmask string 255.255.255.0
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
+# To make it also work for "preseed/url"
+# you have to run `netcfg` a second time,
+# while `dhclient` is not running.
+# Add to your "preseed/run" script these lines:
+#killall.sh dhclient
+#netcfg
 
 # Any hostname and domain names assigned from dhcp take precedence over
 # values set here. However, setting the values still prevents the questions
@@ -728,6 +745,8 @@ o correto será selecionado antes de usar a pré-configuração.
 # be given in either devfs or traditional non-devfs format.
 # For example, to use the first disk devfs knows of:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+# Or, if you want to use LVM:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
 
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.
