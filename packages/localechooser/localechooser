@@ -141,7 +141,12 @@ do_preseed() {
 		db_fset ${langname_all} seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if [ -n "$COUNTRY" ] ; then
-			if grep -q "^$LANGUAGE$" $SHORTLISTS ; then
+			if grep -q "^${LANGUAGE}_${COUNTRY}$" $SHORTLISTS ; then
+				db_set $shortlist-${LANGUAGE}_${COUNTRY} "$COUNTRY"
+				log "Set $shortlist-${LANGUAGE}_${COUNTRY} = '$COUNTRY'"
+				db_register $shortlist-${LANGUAGE}_${COUNTRY} $shortlist
+				db_fset $shortlist seen $seenflag || true
+			elif grep -q "^$LANGUAGE$" $SHORTLISTS ; then
 				db_set $shortlist-$LANGUAGE "$COUNTRY"
 				log "Set $shortlist-$LANGUAGE = '$COUNTRY'"
 				db_register $shortlist-$LANGUAGE $shortlist
