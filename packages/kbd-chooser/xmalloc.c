@@ -38,7 +38,7 @@ xrealloc(void *pp, size_t sz) {
 }
 
 char *
-xstrdup(char *p) {
+xstrdup(const char *p) {
 	char *q = strdup(p);
 	if (q == NULL)
 		nomem();

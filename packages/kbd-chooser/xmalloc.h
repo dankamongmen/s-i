@@ -16,7 +16,7 @@
 
 extern void *xmalloc(size_t sz);
 extern void *xrealloc(void *p, size_t sz);
-extern char *xstrdup(char *p);
+extern char *xstrdup(const char *p);
 extern void lkfatal(const char *s);
 extern void lkfatal1(const char *s, const char *s2);
 extern void lkfatal0(const char *, int);
