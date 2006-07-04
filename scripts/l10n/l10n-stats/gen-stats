@@ -282,7 +282,7 @@ echo "Computing the number of strings:"
 for dist in testing unstable ; do
 	echo "  In $dist:"
 	#check how many strings at all
-	TOTALU=0
+	eval "TOTAL_$dist"=0
 	LANG=C
 	mkdir -p $TARGET_DIR/POT
 	for path in `cat $WD/config/paths.$dist$LEVEL`; do
@@ -296,8 +296,8 @@ for dist in testing unstable ; do
 		
 	  	echo "      $path/*.pot:  $U"
 
-		TOTALU=`expr $TOTALU + $U || echo 0`
-		if [ "$TOTALU" = "0" -o -z "$TOTALU" ]; then
+		eval "TOTAL_$dist=`expr $TOTAL_$dist + $U || echo 0`"
+		if [ "$TOTAL_$dist" = "0" -o -z "$TOTAL_$dist" ]; then
 			echo "Error while counting untranslated strings in templates."
 			$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/*.pot
 			#	exit
@@ -308,12 +308,7 @@ for dist in testing unstable ; do
 			test -f $WD/material/packages.$dist$LEVEL/$path/$lang.po || continue
 			cp $WD/material/packages.$dist$LEVEL/$path/$lang.po $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig >/dev/null 2>&1
 		done
-
-		(export PODEBCONF_LIB=/home/bubulle/share/intltool-debian; cd $WD/material/packages.$dist$LEVEL/$path/; pwd | grep "debian/po" > /dev/null && ~bubulle/bin/debconf-updatepo-sid )
-
-
-	done
-	echo "    Total: $TOTALU"
+OTotal: $TOTAL_$dist"
 done
 
 fancy_output
@@ -420,14 +415,14 @@ for dist in testing unstable ; do
 		OK=""
 
   		echo -e "Missing files:\n$MISSING\n" >>  $TARGET_DIR/$lang$ext.txt
-		if [ "$TOTALU" != 0 ] ; then
-			P=`echo "$TT * 100 / $TOTALU"|bc`
+		if [ "$TOTAL_$dist" != 0 ] ; then
+			P=`echo "$TT * 100 / $TOTAL_$dist"|bc`
 		else
 		P=0
 		fi
 	  	STR=`echo "$TT + $TU + $TF" | bc`	
-	  	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTALU=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang$ext.txt
-	  	if [ "$STR" -gt "$TOTALU" ]; then
+	  	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTAL_$dist=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang$ext.txt
+	  	if [ "$STR" -gt "$TOTAL_$dist" ]; then
   			echo "  You have more strings translated/fuzzy/untranslated that in
   the pot-templates. Please check about that!" >>  $TARGET_DIR/$lang$ext.txt
 	  	fi
