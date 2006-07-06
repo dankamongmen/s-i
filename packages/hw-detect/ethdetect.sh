@@ -22,14 +22,14 @@ is_not_loaded() {
 load_module() {
 	local module="$1"
 	local priority=low
-    
+
 	case "$module" in
 	"plip")
 		module_probe parport_pc high
-		priority=high		
+		priority=high
 		;;
 	esac
-	
+
 	module_probe "$module" "$priority"
 }
 
@@ -71,8 +71,8 @@ get_static_modinfo() {
 	if [ ! -f "$TEMP_EXTRACT" ]; then
 		zcat $DEVNAMES_STATIC > $TEMP_EXTRACT
 	fi
-	
-	if grep -q "^${module}:" $TEMP_EXTRACT; then 
+
+	if grep -q "^${module}:" $TEMP_EXTRACT; then
 		modinfo=$(zcat $DEVNAMES_STATIC | grep "^${module}:" | head -n 1 | cut -d':' -f2-)
 	fi
 	echo "$modinfo"
@@ -111,7 +111,7 @@ ethernet_found() {
 		return 0
 	fi
 }
-		
+
 module_probe() {
 	local module="$1"
 	local priority="$2"
@@ -120,7 +120,7 @@ module_probe() {
 	local devs=""
 	local olddevs=""
 	local newdev=""
-	
+
 	devs="$(snapshot_devs)"
 
 	if ! log-output -t ethdetect modprobe -v "$module"; then
@@ -156,9 +156,9 @@ module_probe() {
 
 	# Pick up multiple cards that were loaded by a single module
 	# hence they'll have same description
-		
+
 	modinfo=$(get_static_modinfo $module)
-		
+
 	if [ -n "$newdevs" -a -n "$modinfo" ]; then
 		for ndev in $newdevs; do
 			echo "${ndev}:${modinfo}" >> /etc/network/devnames
