@@ -22,14 +22,14 @@ is_not_loaded() {
 load_module() {
 	local module="$1"
 	local priority=low
-    
+ 
 	case "$module" in
 	"plip")
 		module_probe parport_pc high
 		priority=high		
 		;;
 	esac
-	
+
 	module_probe "$module" "$priority"
 }
 
@@ -71,7 +71,7 @@ get_static_modinfo() {
 	if [ ! -f "$TEMP_EXTRACT" ]; then
 		zcat $DEVNAMES_STATIC > $TEMP_EXTRACT
 	fi
-	
+
 	if grep -q "^${module}:" $TEMP_EXTRACT; then 
 		modinfo=$(zcat $DEVNAMES_STATIC | grep "^${module}:" | head -n 1 | cut -d':' -f2-)
 	fi
@@ -88,14 +88,16 @@ ethernet_found() {
 
 	for iface in $(sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//"| sed "s/^ *//"); do
 		ifaces=$(expr $ifaces + 1)
-		if [ -f /etc/network/devnames ]; then
-			if grep "^$iface:" /etc/network/devnames | grep -q -i firewire; then
+		if [ -f "$TEMP_EXTRACT" ]; then
+			if grep "^$iface:" "$TEMP_EXTRACT" | grep -q -i firewire; then
 				firewire=$(expr $firewire + 1)
 			fi
 		fi
 	done
-	
-	if [ "$ifaces" = "$firewire" ]; then
+
+	if [ "$ifaces" = 0 ]; then
+		return 1
+	elif [ "$ifaces" = "$firewire" ]; then
 		db_input high ethdetect/use_firewire_ethernet || true
 		db_go || true
 		db_get ethdetect/use_firewire_ethernet
@@ -104,10 +106,9 @@ ethernet_found() {
 		else
 			return 1
 		fi
-	elif [ "$ifaces" != 0 ]; then
-		return 0
 	else
-		return 1
+		# At least one regular ethernet interface
+		return 0
 	fi
 }
 		
@@ -119,7 +120,7 @@ module_probe() {
 	local devs=""
 	local olddevs=""
 	local newdev=""
-	
+
 	devs="$(snapshot_devs)"
 
 	if ! log-output -t ethdetect modprobe -v "$module"; then
@@ -155,9 +156,9 @@ module_probe() {
 
 	# Pick up multiple cards that were loaded by a single module
 	# hence they'll have same description
-		
+
 	modinfo=$(get_static_modinfo $module)
-		
+
 	if [ -n "$newdevs" -a -n "$modinfo" ]; then
 		for ndev in $newdevs; do
 			echo "${ndev}:${modinfo}" >> /etc/network/devnames
