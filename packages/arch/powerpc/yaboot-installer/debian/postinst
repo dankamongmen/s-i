@@ -396,8 +396,14 @@ boot=$boot
 EOF
 fi
 
-writeyabootconf <<EOF
+if [ "$ofpath" ]; then
+    writeyabootconf <<EOF
 device=$ofpath
+EOF
+else
+    info "ofpath returned nothing; leaving out device= line and praying"
+fi
+writeyabootconf <<EOF
 partition=$partnr
 root=$root
 timeout=$timeout
