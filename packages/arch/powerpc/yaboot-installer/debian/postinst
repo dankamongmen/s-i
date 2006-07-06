@@ -358,6 +358,26 @@ fi
 # Work out user parameters.
 user_params="$(echo $(user-params))" || true
 
+# If we're using an HVC virtual serial console, put that in append=.
+# TODO: should we do this for other types of serial console too?
+OLDIFS="$IFS"
+IFS=' '
+for arg in $(cat /proc/cmdline); do
+    IFS="$OLDIFS"
+    case $arg in
+	console=*)
+	    defconsole="$arg"
+	    ;;
+    esac
+    IFS=' '
+done
+IFS="$OLDIFS"
+case $defconsole in
+    hvc*)
+	user_params="console=$defconsole${user_params:+ $user_params}"
+	;;
+esac
+
 if [ "$ARCH" = powerpc/chrp_pegasos ]; then
     # Create a /boot/yaboot symlink, and get yaboot to maintain it for us.
     # TODO: a symlink is suboptimal because it doesn't work if /boot != /.
