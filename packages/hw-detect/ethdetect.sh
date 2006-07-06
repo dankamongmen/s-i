@@ -8,12 +8,6 @@ if [ "$(uname)" != Linux ]; then
 	exit 0
 fi
 
-DEVNAMES_STATIC=/etc/network/devnames-static.gz
-TEMP_EXTRACT=/tmp/devnames-static.txt
-if [ ! -f "$TEMP_EXTRACT" ]; then
-	zcat $DEVNAMES_STATIC > $TEMP_EXTRACT
-fi
-
 # This is a hack, but we don't have a better idea right now.
 # See Debian bug #136743
 if [ -x /sbin/depmod ]; then
@@ -28,14 +22,14 @@ is_not_loaded() {
 load_module() {
 	local module="$1"
 	local priority=low
- 
+    
 	case "$module" in
 	"plip")
 		module_probe parport_pc high
 		priority=high		
 		;;
 	esac
-
+	
 	module_probe "$module" "$priority"
 }
 
@@ -68,15 +62,18 @@ compare_devs() {
 	echo ${devs#$olddevs} | sed -e 's/^ //'
 }
 
+DEVNAMES_STATIC=/etc/network/devnames-static.gz
+TEMP_EXTRACT=/tmp/devnames-static.txt
 get_static_modinfo() {
 	local module="$(echo $1 | sed 's/\.k\?o//')"
 	local modinfo=""
 
-	if [ -f "$TEMP_EXTRACT" ]; then
-		if grep -q "^${module}:" $TEMP_EXTRACT; then 
-			modinfo=$(zcat $DEVNAMES_STATIC | grep "^${module}:" | \
-				  head -n 1 | cut -d':' -f2-)
-		fi
+	if [ ! -f "$TEMP_EXTRACT" ]; then
+		zcat $DEVNAMES_STATIC > $TEMP_EXTRACT
+	fi
+	
+	if grep -q "^${module}:" $TEMP_EXTRACT; then 
+		modinfo=$(zcat $DEVNAMES_STATIC | grep "^${module}:" | head -n 1 | cut -d':' -f2-)
 	fi
 	echo "$modinfo"
 }
@@ -89,19 +86,16 @@ ethernet_found() {
 	local ifaces=0
 	local firewire=0
 
-	for iface in $(sed -e "s/lo://" < /proc/net/dev | \
-		       grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//"| sed "s/^ *//"); do
+	for iface in $(sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//"| sed "s/^ *//"); do
 		ifaces=$(expr $ifaces + 1)
-		if [ -f "$TEMP_EXTRACT" ]; then
-			if grep "^$iface:" "$TEMP_EXTRACT" | grep -q -i firewire; then
+		if [ -f /etc/network/devnames ]; then
+			if grep "^$iface:" /etc/network/devnames | grep -q -i firewire; then
 				firewire=$(expr $firewire + 1)
 			fi
 		fi
 	done
-
-	if [ "$ifaces" = 0 ]; then
-		return 1
-	elif [ "$ifaces" = "$firewire" ]; then
+	
+	if [ "$ifaces" = "$firewire" ]; then
 		db_input high ethdetect/use_firewire_ethernet || true
 		db_go || true
 		db_get ethdetect/use_firewire_ethernet
@@ -110,9 +104,10 @@ ethernet_found() {
 		else
 			return 1
 		fi
-	else
-		# At least one regular ethernet interface
+	elif [ "$ifaces" != 0 ]; then
 		return 0
+	else
+		return 1
 	fi
 }
 		
@@ -124,7 +119,7 @@ module_probe() {
 	local devs=""
 	local olddevs=""
 	local newdev=""
-
+	
 	devs="$(snapshot_devs)"
 
 	if ! log-output -t ethdetect modprobe -v "$module"; then
@@ -160,9 +155,9 @@ module_probe() {
 
 	# Pick up multiple cards that were loaded by a single module
 	# hence they'll have same description
-
+		
 	modinfo=$(get_static_modinfo $module)
-
+		
 	if [ -n "$newdevs" -a -n "$modinfo" ]; then
 		for ndev in $newdevs; do
 			echo "${ndev}:${modinfo}" >> /etc/network/devnames
