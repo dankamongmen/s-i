@@ -8,6 +8,12 @@ if [ "$(uname)" != Linux ]; then
 	exit 0
 fi
 
+DEVNAMES_STATIC=/etc/network/devnames-static.gz
+TEMP_EXTRACT=/tmp/devnames-static.txt
+if [ ! -f "$TEMP_EXTRACT" ]; then
+	zcat $DEVNAMES_STATIC > $TEMP_EXTRACT
+fi
+
 # This is a hack, but we don't have a better idea right now.
 # See Debian bug #136743
 if [ -x /sbin/depmod ]; then
@@ -62,18 +68,15 @@ compare_devs() {
 	echo ${devs#$olddevs} | sed -e 's/^ //'
 }
 
-DEVNAMES_STATIC=/etc/network/devnames-static.gz
-TEMP_EXTRACT=/tmp/devnames-static.txt
 get_static_modinfo() {
 	local module="$(echo $1 | sed 's/\.k\?o//')"
 	local modinfo=""
 
-	if [ ! -f "$TEMP_EXTRACT" ]; then
-		zcat $DEVNAMES_STATIC > $TEMP_EXTRACT
-	fi
-
-	if grep -q "^${module}:" $TEMP_EXTRACT; then 
-		modinfo=$(zcat $DEVNAMES_STATIC | grep "^${module}:" | head -n 1 | cut -d':' -f2-)
+	if [ -f "$TEMP_EXTRACT" ]; then
+		if grep -q "^${module}:" $TEMP_EXTRACT; then 
+			modinfo=$(zcat $DEVNAMES_STATIC | grep "^${module}:" | \
+				  head -n 1 | cut -d':' -f2-)
+		fi
 	fi
 	echo "$modinfo"
 }
@@ -86,7 +89,8 @@ ethernet_found() {
 	local ifaces=0
 	local firewire=0
 
-	for iface in $(sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//"| sed "s/^ *//"); do
+	for iface in $(sed -e "s/lo://" < /proc/net/dev | \
+		       grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//"| sed "s/^ *//"); do
 		ifaces=$(expr $ifaces + 1)
 		if [ -f "$TEMP_EXTRACT" ]; then
 			if grep "^$iface:" "$TEMP_EXTRACT" | grep -q -i firewire; then
