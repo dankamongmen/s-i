@@ -94,8 +94,10 @@ ethernet_found() {
 			fi
 		fi
 	done
-	
-	if [ "$ifaces" = "$firewire" ]; then
+
+	if [ "$ifaces" = 0 ]; then
+		return 1
+	elif [ "$ifaces" = "$firewire" ]; then
 		db_input high ethdetect/use_firewire_ethernet || true
 		db_go || true
 		db_get ethdetect/use_firewire_ethernet
@@ -104,10 +106,9 @@ ethernet_found() {
 		else
 			return 1
 		fi
-	elif [ "$ifaces" != 0 ]; then
-		return 0
 	else
-		return 1
+		# At least one regular ethernet interface
+		return 0
 	fi
 }
 		
