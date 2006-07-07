@@ -28,7 +28,10 @@ try_load_module md
 try_load_module raid0
 try_load_module raid1
 try_load_module raid5
-log-output -t rescue mdrun || true
+log-output -t rescue --pass-stdout \
+	   mdadm --examine --scan --config=partitions > /tmp/mdadm.conf || true
+log-output -t rescue \
+	   mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes || true
 
 # LVM support
 try_load_module dm-mod
