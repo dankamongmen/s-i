@@ -493,7 +493,6 @@ if [ ! -e /proc/mdstat ]; then
 	db_set mdcfg/nomd "false"
 	db_input high mdcfg/nomd
 	db_go
-	db_stop
 	exit 0
 fi
 
@@ -505,5 +504,4 @@ apt-install mdadm
 
 md_mainmenu
 
-#db_stop
 exit 0
