@@ -10,7 +10,8 @@
 #modprobe raid1 1>/dev/null 2>&1
 #
 ## Detect and start MD devices
-#/sbin/mdrun
+#/sbin/mdadm --examine --scan --config=partitions > /tmp/mdadm.conf
+#/sbin/mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes
 
 # Mark all RAID partitions as being MD
 for dev in /var/lib/partman/devices/*; do
