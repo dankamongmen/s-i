@@ -35,11 +35,17 @@ for i in `grep ^md /proc/mdstat|grep -v inactive|sed -e 's/^\(md.*\) : active \(
 	fi
 	size=$(($size * $sector_size))
 	echo "$size" > ${DEVICE}/size
-	open_dialog OPEN "/dev/md/${NUMBER}"
+
+	open_dialog OPENED "/dev/md/${NUMBER}"
 	read_line response
 	close_dialog
-	if [ "$response" = "failed" ]; then
-		rm -rf ${DEVICE}
+	if [ "$response" = "no" ]; then
+		open_dialog OPEN "/dev/md/${NUMBER}"
+		read_line response
+		close_dialog
+		if [ "$response" = "failed" ]; then
+			rm -rf ${DEVICE}
+		fi
 	fi
 
 	open_dialog NEW_LABEL loop
