@@ -180,6 +180,19 @@ fi
 
 ############### THE REAL BEGINNING ###############################
 
+# Do not accept working on a locked copy
+if [ "$LEVEL" = "1" ] ; then
+	LOCKFILE=$WD/material/packages.unstable$LEVEL/debian-installer/.l10n.lock
+	if [ -f $LOCKFILE ] ; then
+		echo $LOCKFILE file detected.
+		echo $DI_COPY seems to be locked by another l10n process
+		echo Please fix this before lauching the script again...
+		exit 1
+	else
+		touch $LOCKFILE
+	fi
+fi
+
 # Create the lock file
 cd $WD
 touch "${RUN_DIR}/$LEVEL.lock"
