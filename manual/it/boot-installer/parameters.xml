@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36744 -->
+<!-- original version: 38289 -->
 
 
  <sect1 id="boot-parms">
@@ -143,19 +143,19 @@ Il sistema d'installazione riconosce alcuni parametri aggiuntivi<footnote>
 <para>
 
 <!--
-Note that the kernel accepts a maximum of 8 command line options and
+Note that the 2.4 kernel accepts a maximum of 8 command line options and
 8 environment options (including any options added by default for the
 installer). If these numbers are exceeded, 2.4 kernels will drop any
-excess options and 2.6 kernels will panic. With kernel 2.6.9 or newer,
+excess options. With kernel 2.6.9 or newer,
 you can use 32 command line options and 32 environment options.
 -->
 
-Notare che il kernel accetta un massimo di 8 opzioni sulla riga di
+Notare che il kernel 2.4 accetta un massimo di 8 opzioni sulla riga di
 comando e di 8 opzioni d'ambiente (comprese tutte le opzioni aggiunte
 automaticamente dall'installatore). Se il numero di opzioni supera questo
-limite i kernel 2.4 scartano tutte le opzioni in eccesso e i kernel 2.6
-si bloccano. Con un kernel 2.6.9 o successivo si possono usare 32 opzioni
-sulla riga di comando e 32 opzioni d'ambiente.
+limite i kernel 2.4 scartano tutte le opzioni in eccesso. Con un kernel
+2.6.9 o successivo si possono usare 32 opzioni sulla riga di comando e 32
+opzioni d'ambiente.
 
 </para>
 
@@ -174,20 +174,22 @@ sulla riga di comando e 32 opzioni d'ambiente.
 
 <!--
 This parameter sets the highest priority of messages to be displayed.
+Short form: <userinput>priority</userinput>
 -->
 
 Questo parametro imposta la priorità oltre la quale sono mostrati i messaggi.
+Abbreviazione: <userinput>priority</userinput>
 
 </para><para>
 
 <!--
-The default installation uses <userinput>debconf/priority=high</userinput>.
+The default installation uses <userinput>priority=high</userinput>.
 This means that both high and critical priority messages are shown, but medium
 and low priority messages are skipped.
 If problems are encountered, the installer adjusts the priority as needed.
 -->
 
-Il valore predefinito è <userinput>debconf/priority=high</userinput>. Questo
+Il valore predefinito è <userinput>priority=high</userinput>. Questo
 vuol dire che sono mostrati i messaggi con priorità alta (high) e critica
 (critical) ma i messaggi con priorità media (medium) e bassa (low) sono
 saltati. Se durante l'installazione si verificano dei problemi l'installatore
@@ -196,20 +198,20 @@ cambia la priorità a seconda delle necessità.
 </para><para>
 
 <!--
-If you add <userinput>debconf/priority=medium</userinput> as boot parameter, you
+If you add <userinput>priority=medium</userinput> as boot parameter, you
 will be shown the installation menu and gain more control over the installation.
-When <userinput>debconf/priority=low</userinput> is used, all messages are shown
+When <userinput>priority=low</userinput> is used, all messages are shown
 (this is equivalent to the <emphasis>expert</emphasis> boot method).
-With <userinput>debconf/priority=critical</userinput>, the installation system
+With <userinput>priority=critical</userinput>, the installation system
 will display only critical messages and try to do the right thing without fuss.
 -->
 
-Se si aggiunge <userinput>debconf/priority=medium</userinput> come
+Se si aggiunge <userinput>priority=medium</userinput> come
 parametro d'avvio viene mostrato il menu d'installazione e si ottiene
 un controllo più elevato sull'installazione. Quando si usa
-<userinput>debconf/priority=low</userinput> sono mostrati tutti i messaggi
+<userinput>priority=low</userinput> sono mostrati tutti i messaggi
 (equivale al metodo d'avvio <emphasis>esperto</emphasis>). Con
-<userinput>debconf/priority=critical</userinput> il sistema d'installazione
+<userinput>priority=critical</userinput> il sistema d'installazione
 mostra solo i messaggi critici e cerca di portare avanti l'installazione
 senza troppe domande.
 
@@ -381,30 +383,31 @@ limitare la scansione a solo un device.
 Some architectures use the kernel framebuffer to offer installation in
 a number of languages. If framebuffer causes a problem on your system
 you can disable the feature by the parameter
-<userinput>debian-installer/framebuffer=false</userinput>. Problem
-symptoms are error messages about bterm or bogl, a blank screen, or
-a freeze within a few minutes after starting the install.
+<userinput>debian-installer/framebuffer=false</userinput>, or
+<userinput>fb=false</userinput> for short. Problem symptoms are error messages
+about bterm or bogl, a blank screen, or a freeze within a few minutes after
+starting the install.
 -->
 
 Su alcune architetture si usa il framebuffer del kernel per fornire
 l'installazione in più lingue. Se sul proprio sistema il framebuffer
 crea problemi è possibile disabilitarlo usando il parametro
-<userinput>debian-installer/framebuffer=false</userinput>. Dei sintomi
-di questo problema sono dei messaggi di errore riguardo bterm o bogl,
-lo schermo nero oppure un blocco entro pochi minuti dall'inizio
-dell'installazione.
+<userinput>debian-installer/framebuffer=false</userinput>, oppure in breve
+<userinput>fb=false</userinput>. Dei sintomi di questo problema sono dei
+messaggi d'errore riguardo bterm o bogl, lo schermo nero oppure un blocco
+entro pochi minuti dall'inizio dell'installazione.
 
 </para><para arch="i386">
 
 <!--
 The <userinput>video=vga16:off</userinput> argument may also be used
-to disable the framebuffer. Such problems have been reported on a Dell
-Inspiron with Mobile Radeon card.
+to disable the kernel's use of the framebuffer. Such problems have been
+reported on a Dell Inspiron with Mobile Radeon card.
 -->
 
 Si può anche usare l'argomento <userinput>video=vga16:off</userinput> per
-disabilitare il framebuffer. Problemi di questo tipo sono stati segnalati
-sui Dell Inspiron con schede Mobile Radeon.
+disabilitare l'uso del framebuffer da parte del kernel. Problemi di questo
+tipo sono stati segnalati sui Dell Inspiron con schede Mobile Radeon.
 
 </para><para arch="m68k">
 
@@ -520,10 +523,12 @@ sono famosi per questo malfunzionamento.
 <!--
 Specify the url to a preconfiguration file to download and use in
 automating the install. See <xref linkend="automatic-install"/>.
+Short form: <userinput>url</userinput>
 -->
 
 Specifica la url del file di preconfigurazione da scaricare e da usare
 nelle installazioni automatiche. Si veda <xref linkend="automatic-install"/>.
+Abbreviazione: <userinput>url</userinput>
 
 </para></listitem>
 </varlistentry>
@@ -536,10 +541,12 @@ nelle installazioni automatiche. Si veda <xref linkend="automatic-install"/>.
 <!--
 Specify the path to a preconfiguration file to load to
 automating the install. See <xref linkend="automatic-install"/>.
+Short form: <userinput>file</userinput>
 -->
 
 Specifica il percorso del file di preconfigurazione da caricare e da usare
 nelle installazioni automatiche. Si veda <xref linkend="automatic-install"/>.
+Abbreviazione: <userinput>file</userinput>
 
 </para></listitem>
 </varlistentry>

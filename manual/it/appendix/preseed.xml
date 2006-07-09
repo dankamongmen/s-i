@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 37512 -->
+<!-- original version: 38662 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -514,13 +514,26 @@ Boot parameters to specify:
 <para>
 
 <!--
+Note that <filename>preseed/url</filename> can be shortened to just
+<filename>url</filename> and <filename>preseed/file</filename> to just
+<filename>file</filename> when they are passed as boot parameters.
+-->
+
+Notare che quando <filename>preseed/url</filename> e
+<filename>preseed/file</filename> sono passati come parametri di avvio
+si possono abbreviare rispettivamente con <filename>url</filename> e
+<filename>file</filename>.
+
+</para><para>
+
+<!--
 While you're at it, you may want to add a boot parameter
-<userinput>debconf/priority=critical</userinput>. This will avoid most
+<userinput>priority=critical</userinput>. This will avoid most
 questions even if the preseeding below misses some.
 -->
 
 A questo punto si può anche aggiungere come parametro d'avvio
-<userinput>debconf/priority=critical</userinput>. Questo evita la maggior
+<userinput>priority=critical</userinput>. Questo evita la maggior
 parte delle domande anche se non sono state preconfigurate.
 
 </para>
@@ -631,6 +644,19 @@ automatico dato che è possibile passare i valori di preconfigurazione al
 kernel sulla riga di comando. È sufficiente passare
 <userinput>precorso/alla/variabile=valore</userinput> per qualunque delle
 variabili che sono mostrate negli esempi.
+
+</para><para>
+
+<!--
+Note that some variables that are frequently set at the boot prompt have a
+shorter alias. If an alias is available, it is used in the examples in
+this appendix instead of the full variable.
+-->
+
+Alcune delle variabili che più frequentemente sono impostate dal prompt
+boot dispongono di un'abbreviazione. Negli esempi contenuti in questa
+appendice è usata, quando disponibile, l'abbrevazione al posto della
+variabile completa.
 
 </para><para>
 
@@ -933,12 +959,12 @@ poste.
 <!--
 The locale can be used to specify both language and country.
 To specify the locale as a boot parameter, use
-<userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>.
+<userinput>locale=<replaceable>en_US</replaceable></userinput>.
 -->
 
 Con <quote>locale</quote> si possono specificare la lingua e il paese. Per
 specificare <quote>locale</quote> fra i parametri di avvio utilizzare
-<userinput>debian-installer/locale=<replaceable>it_IT</replaceable></userinput>.
+<userinput>locale=<replaceable>it_IT</replaceable></userinput>.
 
 <informalexample role="example"><screen>
 <!--
@@ -1030,12 +1056,38 @@ file di preconfigurazione dalla rete.
 <!--
 If you need to pick a particular interface when netbooting before loading
 a preconfiguration file from the network, use a boot parameter such as
-<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+<userinput>interface=<replaceable>eth1</replaceable></userinput>.
 -->
 
 Se necessario è possibile scegliere una particolare interfaccia prima di
 caricare il file di preconfigurazione dalla rete usando il parametro d'avvio
-<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+<userinput>interface=<replaceable>eth1</replaceable></userinput>.
+
+</para><para>
+
+<!--
+Although preseeding the network configuration is normally not possible when
+using network preseeding (using <quote>preseed/url</quote>), you can use
+the following hack to work around that, for example if you'd like to set a
+static address for the network interface. The hack is to force the network
+configuration to run again after the preconfiguration file has been loaded
+by creating a <quote>preseed/run</quote> script containing the following
+lines:
+-->
+
+Nonostante la preconfigurazione della rete non sia normalmente disponibile
+quando la preconfigurazione avviene tramite la rete (usando
+<quote>preseed/url</quote>), può essere fatta comunque ricorrendo a
+un trucco; per esempio se si vuole forzare un indirizzo statico per
+l'interfaccia di rete. Il trucco consiste nel forzare la ripetizione
+della configurazione della rete dopo che il file di preconfigurazione
+è stato caricato creando uno script da eseguire tramite
+<quote>preseed/run</quote> contenente le seguenti righe:
+
+<informalexample><screen>
+killall.sh dhclient
+netcfg
+</screen></informalexample>
 
 </para>
 
@@ -1241,6 +1293,10 @@ preconfigurazione.
 # formato non-devfs.
 # Per esempio, per usare il primo disco riconosciuto da devfs:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+<!--
+# Or, if you want to use LVM:
+--># Oppure, se si vuole usare il LVM:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
 <!--
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.

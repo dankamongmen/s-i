@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 30158 -->
+<!-- original version: 38406 -->
 
 
    <sect3 id="partman">
@@ -36,17 +36,38 @@ manualmente</guimenuitem> dal menu.
 </para><para>
 
 <!--
-If you choose guided partitioning, you will be able to choose from the
-schemes listed in the table below. All schemes have their pros and cons,
+If you choose guided partitioning, you may have two options: to create
+partitions directly on the hard disk (classic method) or to use Logical
+Volume Management (LVM). In the second case, the installer will create most
+partitions inside one big partition; the advantage of this method is that
+partitions inside this big partition can be resized relatively easily later.
+Note: the option to use LVM may not be available on all architectures.
+-->
+
+Con il partizionamento guidato si hanno due possibilità: creare le partizioni
+direttamente sull'hard disk (il metodo classico) oppure usare il Logical
+Volume Management (LVM). Nel secondo caso, l'installatore crea la maggior
+parte delle partizioni dentro una partizione più grande; il vantaggio di
+questo metodo è che in seguito le partizioni interne possono essere
+ridimensionate abbastanza facilmente. Nota: la possibilità di usare LVM
+potrebbe non essere disponibile su tutte le architetture.
+
+</para><para>
+
+<!--
+After you choose guided partitioning (either classic or using LVM), you
+will be able to choose from the schemes listed in the table below.
+All schemes have their pros and cons,
 some of which are discussed in <xref linkend="partitioning"/>. If you are
-unsure, choose the first one. Bear in mind, that guided partitioning
-needs certain minimal amount of free space to operate with. If you don't
+unsure, choose the first one. Bear in mind that guided partitioning
+needs a certain minimal amount of free space to operate with. If you don't
 give it at least about 1GB of space (depends on chosen scheme), guided
 partitioning will fail.
 -->
 
-Se si sceglie il partizionamento guidato, è possibile scegliere uno degli
-schemi elencati nella tabella qui sotto. Tutti gli schemi hanno pro e contro,
+Una volta scelto il partizionamento guidato (classico o con LVM),
+è possibile scegliere uno degli
+schemi elencati nella tabella seguente. Tutti gli schemi hanno pro e contro,
 alcuni dei quali sono discussi in <xref linkend="partitioning"/>. Si consiglia
 l'uso del primo schema se si hanno dei dubbi su quale scegliere. Inoltre si
 deve tener presente che il partizionamento guidato ha bisogno di quantità
@@ -73,15 +94,15 @@ guidato non funziona.
   <entry>600MB</entry>
   <entry><filename>/</filename>, swap</entry>
 </row><row>
-  <entry><!-- Desktop machine -->
-  Macchina desktop</entry>
+  <entry><!-- Separate /home partition -->
+  Partizione /home separata</entry>
   <entry>500MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, swap
   </entry>
 </row><row>
-  <entry><!-- Multi-user workstation -->
-  Stazione di lavoro multi-utente</entry>
+  <entry><!-- Separate /home, /usr, /var and /tmp partitions -->
+  Partizioni /home, /usr, /var e /tmp separate</entry>
   <entry>1GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -92,17 +113,29 @@ guidato non funziona.
 
 </tbody></tgroup></informaltable>
 
-<para arch="ia64">
+<para>
 
 <!--
-If you chose an automatic partitioning for your IA64 system, there
+If you choose guided partitioning using LVM, the installer will also create
+a separate /boot partition. The other partitions, except for the swap
+partition, will be created inside the LVM partition.
+-->
+
+Se si sceglie il partizionamento guidato con LVM, l'installatore crea
+una partizione /boot separata. Le altre partizioni, a eccezione della
+partizione di swap, sono create dentro la partizione LVM.
+
+</para><para arch="ia64">
+
+<!--
+If you choose guided partitioning for your IA64 system, there
 will be an additional partition, formatted as a FAT16 bootable filesystem,
 for the EFI boot loader.
 There is also an additional menu item in the formatting menu to manually
 set up a partition as an EFI boot partition.
 -->
 
-Se si sceglie il partizionamento automatico su un sistema IA64 viene
+Se si sceglie il partizionamento guidato su un sistema IA64 viene
 allocata un'ulteriore partizione avviabile, formattata con un file system
 FAT16, per il boot loader EFI. C'è anche un'apposita voce nel menu per la
 formattazione che serve a impostare una partizione come quella d'avvio
@@ -111,12 +144,12 @@ per EFI.
 </para><para arch="alpha">
 
 <!--
-If you chose an automatic partitioning for your Alpha system, an
+If you choose guided partitioning for your Alpha system, an
 additional, unformatted partition will be allocated at the beginning of
 your disk to reserve this space for the aboot boot loader.
 -->
 
-Se si sceglie il partizionamento automatico su un sistema Alpha viene
+Se si sceglie il partizionamento guidato su un sistema Alpha viene
 allocata un'ulteriore partizione all'inizio del disco per riservare lo
 spazio al boot loader aboot.
 
@@ -140,36 +173,40 @@ The list of partitions might look like this:
 
 L'elenco delle partizioni dovrebbe assomigliare a questo:
 
-<!-- TODO: show some flags here (lightning, skull, smiley) -->
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
-        #1 primary   16.4 MB     ext2       /boot
-        #2 primary  551.0 MB     swap       swap
-        #3 primary    5.8 GB     ntfs
-           pri/log    8.2 MB     FREE SPACE
+        #1 primary   16.4 MB  B f ext2       /boot
+        #2 primary  551.0 MB      swap       swap
+        #3 primary    5.8 GB      ntfs
+           pri/log    8.2 MB      FREE SPACE
 
   IDE1 slave (hdb) - 80.0 GB ST380021A
-        #1 primary   15.9 MB     ext3
-        #2 primary  996.0 MB     fat16
-        #3 primary    3.9 GB     xfs        /home
-        #5 logical    6.0 GB     ext3       /
-        #6 logical    1.0 GB     ext3       /var
-        #7 logical  498.8 MB     ext3
-        #8 logical  551.5 MB     swap       swap
-        #9 logical   65.8 GB     ext2
+        #1 primary   15.9 MB      ext3
+        #2 primary  996.0 MB      fat16
+        #3 primary    3.9 GB      xfs        /home
+        #5 logical    6.0 GB    f ext3       /
+        #6 logical    1.0 GB    f ext3       /var
+        #7 logical  498.8 MB      ext3
+        #8 logical  551.5 MB      swap       swap
+        #9 logical   65.8 GB      ext2
 </screen></informalexample>
 
 <!--
 This example shows two IDE harddrives divided into several partitions;
 the first disk has some free space. Each partition line consists of the
 partition number, its type, size, optional flags, file system, and
-mountpoint (if any).
+mountpoint (if any). Note: this particular setup cannot be created using
+guided partitioning but it does show possible variation that can be achieved
+using manual partitioning).
 -->
 
 Questo esempio mostra due dischi IDE divisi in parecchie partizioni; il
 primo disco dispone anche di un po' di spazio libero. In ogni riga che
 corrisponde a una partizione è riportato numero, tipo, dimensione, flag
 opzionali, file system e mout point (se assegnato) della partizione.
+Nota: questa particolare impostazione non può essere realizzata usando il
+partizionamento guidato poiché mostra delle variazioni che possono essere
+realizzate solo con il partizionamento manuale.
 
 </para><para>
 
@@ -179,8 +216,7 @@ generated partition table, you can choose <guimenuitem>Finish
 partitioning and write changes to disk</guimenuitem> from the menu to
 implement the new partition table (as described at the end of this
 section). If you are not happy, you can choose to <guimenuitem>Undo
-changes to partitions</guimenuitem>, to run guided partitioning again
-or modify the proposed changes as described below for manual partitioning.
+changes to partitions</guimenuitem><footnote>
 -->
 
 Con questo si conclude la parte guidata del partizionamento. Se si è
@@ -189,7 +225,29 @@ soddisfatti della tabella delle partizioni appena creata si può selezionare
 disco</guimenuitem> dal menu per scrivere la nuova tabella delle partizioni
 (come descritto alla fine di questa sezione). Invece se il risultato non è
 soddisfacente si può scegliere <guimenuitem>Annullare i cambiamenti alle
-partizioni</guimenuitem> per eseguire un nuovo partizionamento guidato o
+partizioni</guimenuitem><footnote>
+
+<para>
+
+<!--
+If you selected guided partitioning using LVM, you will not be able to undo
+all changes made as some changes will already have been committed to the
+hard disk. The installer will warn you before that happens though.
+-->
+
+Se si sceglie il partizionamento guidato con LVM, non è possibile annullare
+qualsiasi modifica dato che alcune modifiche vengono effettuate direttamente
+sull'hard disk. Comunque, prima di fare questo tipo di operazioni,
+l'installatore emette un avviso.
+
+</para>
+
+<!--
+</footnote> and run guided partitioning again, or modify the proposed changes
+as described below for manual partitioning.
+-->
+
+</footnote> e eseguire un nuovo partizionamento guidato o
 modificare i cambiamenti proposti usando la stessa procedura (descritta in
 seguito) per il partizionamento manuale.
 
@@ -243,7 +301,7 @@ use it at all. Other nice feature is the possibility to copy data from
 existing partition onto this one.
 When you are satisfied with your new partition, select
 <guimenuitem>Done setting up the partition</guimenuitem> and you will be
-thrown back to the <command>partman</command>'s main screen.
+thrown back to <command>partman</command>'s main screen.
 -->
 
 Quando si seleziona dello spazio libero viene data la possibilità di creare
@@ -303,7 +361,7 @@ dell'installazione.
 </para><para arch="ia64">
 
 <!--
-If you forget to select and format an EFI boot partition
+If you forget to select and format an EFI boot partition,
 <command>partman</command> will detect this and will not let you continue
 until you allocate one.
 -->
